@@ -579,6 +579,10 @@ void fn_800D3410(void) {
 
 extern u32 lbl_8047AA94;
 
+/* Forward declarations for converted functions */
+u32 fn_800D37CC(void);
+
+
 /* Address: 0x800D37CC | Size: 0x8 | Pattern: sda_getter */
 u32 fn_800D37CC(void) {
     return lbl_8047AA94;

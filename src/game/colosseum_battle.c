@@ -131,6 +131,14 @@ extern void fn_801657F8(void);     /* Stop sound */
 extern void fn_80165A20(u32 param); /* Fade out music */
 extern void fn_801659FC(u32 bgmId); /* Start BGM */
 
+/* Forward declarations for converted functions */
+void fn_80240BD0(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_8025A290(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
+void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3);
+
+
 /* =========================================================================
  * fn_80240BD0 - BattleOrchestrator
  *

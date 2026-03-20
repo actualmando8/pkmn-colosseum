@@ -715,6 +715,11 @@ u32 GSmemGetFreeSize(void) {
 
 extern u32 lbl_8047AB2C;
 
+/* Forward declarations for converted functions */
+u32 fn_800E2AF8(void);
+void fn_800E3560(u32 val);
+
+
 /* Address: 0x800E2AF8 | Size: 0x8 | Pattern: return_constant */
 u32 fn_800E2AF8(void) { return 1; }
 

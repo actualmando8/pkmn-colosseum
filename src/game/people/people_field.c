@@ -840,6 +840,14 @@ s32 fn_80154A14(u32 slotIdx, void* nodeData) {
 
 extern void fn_80161934(u32 slotIdx, u32 typeCode, u32 param);
 
+/* Forward declarations for converted functions */
+u8 fn_8015FFD4(void);
+u8 fn_80162464(void);
+void fn_8014D8C0(u32 val);
+void fn_8016245C(u8 val);
+void fn_8016248C(u32 val);
+
+
 /* fn_8016161C | Dispatch type 0 | Size: 0x48 */
 void fn_8016161C(u32 slotIdx) { fn_80161934(slotIdx, 0, 0); }
 

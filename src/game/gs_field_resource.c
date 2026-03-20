@@ -87,6 +87,19 @@ extern u32 lbl_8047B0B0;  /* sound buffer size limit */
 /* ===== Internal callbacks referenced by pre-funcs ===== */
 extern void fn_80115094(void);  /* GFL resource completion callback */
 
+/* Forward declarations for converted functions */
+u32 fn_801143A0(void);
+void fn_801143EC(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5);
+void fn_80114714(void);
+void fn_801147D4(void);
+void fn_80114AE0(void);
+void* fn_8011432C(void* owner, u32 param, u32 alloc_size);
+void* fn_8011445C(void* owner, u32 param, u32 alloc_size);
+void* fn_801145C0(void* owner, u32 param, u32 alloc_size);
+void* fn_80114634(void* owner, u32 param, u32 alloc_size);
+void* fn_801146A4(void* owner, u32 param, u32 alloc_size);
+
+
 /* ==================================================================
  * fn_8011432C -- floorReadGFLPreFunc
  *
@@ -260,68 +273,74 @@ u32 fn_801143A0(void) { return 0; }
  * Range: 0x8011432C - 0x80114CA8
  * =================================================================== */
 
-/* 0x8011432C | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011432C(void) {
-    /* TODO: match -- 116 bytes at 0x8011432C */
+/* 0x74 | fn_8011432C | alloc_wrapper */
+void* fn_8011432C(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
-/* 0x801143EC | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801143EC(void) {
-    /* TODO: match -- 112 bytes at 0x801143EC */
+/* 0x70 | fn_801143EC | multi_call_guarded */
+void fn_801143EC(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    fn_800F9318();
+    if (fn_801195AC() == 0) { return; }
+    fn_800F9378();
 }
-#pragma pop
 
-/* 0x8011445C | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011445C(void) {
-    /* TODO: match -- 116 bytes at 0x8011445C */
+/* 0x74 | fn_8011445C | alloc_wrapper */
+void* fn_8011445C(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
-/* 0x801145C0 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801145C0(void) {
-    /* TODO: match -- 116 bytes at 0x801145C0 */
+/* 0x74 | fn_801145C0 | alloc_wrapper */
+void* fn_801145C0(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
-/* 0x80114634 | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114634(void) {
-    /* TODO: match -- 112 bytes at 0x80114634 */
+/* 0x70 | fn_80114634 | alloc_wrapper */
+void* fn_80114634(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
-/* 0x801146A4 | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801146A4(void) {
-    /* TODO: match -- 112 bytes at 0x801146A4 */
+/* 0x70 | fn_801146A4 | alloc_wrapper */
+void* fn_801146A4(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
-/* 0x80114714 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x4C | fn_80114714 | multi_call_guarded */
 void fn_80114714(void) {
-    /* TODO: match -- 76 bytes at 0x80114714 */
+    fn_800F9318();
+    { fn_800EFD3C(); return; }
+    fn_800DD970("");
 }
-#pragma pop
 
 /* 0x801147D4 | 0x34 */
 #pragma push
@@ -332,14 +351,16 @@ void fn_801147D4(void) {
 }
 #pragma pop
 
-/* 0x80114808 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114808(void) {
-    /* TODO: match -- 116 bytes at 0x80114808 */
+/* 0x74 | fn_80114808 | alloc_wrapper */
+void* fn_80114808(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return mem;
 }
-#pragma pop
 
 /* 0x8011487C | 0xCC */
 #pragma push
@@ -350,14 +371,16 @@ void fn_8011487C(void) {
 }
 #pragma pop
 
-/* 0x80114948 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114948(void) {
-    /* TODO: match -- 116 bytes at 0x80114948 */
+/* 0x74 | fn_80114948 | alloc_wrapper */
+void* fn_80114948(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned + 0x60, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return (u8*)mem + 0x60;
 }
-#pragma pop
 
 /* 0x801149BC | 0xB4 */
 #pragma push
@@ -368,14 +391,16 @@ void fn_801149BC(void) {
 }
 #pragma pop
 
-/* 0x80114A70 | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114A70(void) {
-    /* TODO: match -- 112 bytes at 0x80114A70 */
+/* 0x70 | fn_80114A70 | alloc_wrapper */
+void* fn_80114A70(void* owner, u32 param, u32 alloc_size) {
+    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
+    void* mem = (void*)fn_800F9418(aligned + 0x60, 0x20, (u32)owner, (u32)param, 0);
+    if (mem == NULL) {
+        fn_800DD970("");
+        return NULL;
+    }
+    return (u8*)mem + 0x60;
 }
-#pragma pop
 
 /* 0x80114AE0 | 0x1C8 */
 #pragma push

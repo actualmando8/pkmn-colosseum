@@ -183,32 +183,26 @@ void fn_800318D8(void) {
 }
 #pragma pop
 
-/* 0x80031A1C | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x54 | fn_80031A1C | generic */
 void fn_80031A1C(void) {
-    /* TODO: match -- 0x54 bytes at 0x80031A1C */
+    /* refs: lbl_8047A42C */
+    fn_80109220();
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x80031A70 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x50 | fn_80031A70 | generic */
 void fn_80031A70(void) {
-    /* TODO: match -- 0x50 bytes at 0x80031A70 */
+    /* refs: lbl_8047A42C */
+    fn_80109220();
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x80031AC0 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x50 | fn_80031AC0 | generic */
 void fn_80031AC0(void) {
-    /* TODO: match -- 0x50 bytes at 0x80031AC0 */
+    /* refs: lbl_8047A42C */
+    fn_80109220();
+    fn_80109220();
 }
-#pragma pop
 
 /* 0x80031B10 | 0x3C */
 #pragma push

@@ -1113,8 +1113,15 @@ void battle_ProcessSnagging(s32 targetSlot) {
 
 extern u8 lbl_8047B420;
 extern u32 lbl_8047B424;
+extern u32 lbl_8047B428;
+extern u32 lbl_8047B42C;
+extern u32 lbl_8047B430;
 extern u8 lbl_8047B434;
+extern u32 lbl_8047B438;
 extern u8 lbl_8047B5C1;
+
+extern void* fn_800F92D4(u32 size);
+extern void fn_801E25C8(void);
 
 /* Address: 0x801E11CC | Size: 0x8 | Pattern: sda_getter */
 u8 fn_801E11CC(void) {
@@ -1200,9 +1207,11 @@ void fn_801E0FB4(void) {
 }
 #pragma peephole reset
 
-/* 0x801E1170 | size: 0x1C | tiny */
+/* 0x801E1170 | size: 0x1C */
 void fn_801E1170(void) {
-    /* TODO: decompile (0x1C bytes) */
+    lbl_8047B424 = 4;
+    lbl_8047B428 = 3;
+    lbl_8047B430 = 0;
 }
 
 /* 0x801E118C | size: 0x10 | tiny */
@@ -1211,9 +1220,12 @@ void fn_801E118C(void) { }
 /* 0x801E119C | size: 0x14 | tiny */
 void fn_801E119C(void) { }
 
-/* 0x801E11B0 | size: 0x1C | tiny */
+/* 0x801E11B0 | size: 0x1C */
 void fn_801E11B0(void) {
-    /* TODO: decompile (0x1C bytes) */
+    u32 prev = lbl_8047B428;
+    lbl_8047B424 = 1;
+    if (prev == 2) { return; }
+    lbl_8047B428 = 1;
 }
 
 /* 0x801E11D4 | size: 0xC | tiny */
@@ -1224,14 +1236,16 @@ void fn_801E11F0(void) {
     /* TODO: decompile (0x68 bytes) */
 }
 
-/* 0x801E1258 | size: 0x1C | tiny */
+/* 0x801E1258 | size: 0x1C */
 void fn_801E1258(void) {
-    /* TODO: decompile (0x1C bytes) */
+    lbl_8047B420 = 1;
+    lbl_8047B424 = 2;
+    lbl_8047B428 = 3;
 }
 
-/* 0x801E1274 | size: 0x2C | small */
+/* 0x801E1274 | size: 0x2C */
 void fn_801E1274(void) {
-    /* TODO: decompile (0x2C bytes) */
+    lbl_8047B438 = (u32)fn_800F92D4(0x0B521200);
 }
 
 /* 0x801E12A0 | size: 0x60 | small */
@@ -1251,9 +1265,9 @@ void fn_801E1368(void) {
 }
 #pragma peephole reset
 
-/* 0x801E16D0 | size: 0x20 | tiny */
+/* 0x801E16D0 | size: 0x20 */
 void fn_801E16D0(void) {
-    /* TODO: decompile (0x20 bytes) */
+    fn_801E25C8();
 }
 
 /* 0x801E16F0 | size: 0xB8 | medium */
@@ -1273,9 +1287,12 @@ void fn_801E1810(void) {
     /* TODO: decompile (0x64 bytes) */
 }
 
-/* 0x801E1874 | size: 0x28 | small */
-void fn_801E1874(void) {
-    /* TODO: decompile (0x28 bytes) */
+/* 0x801E1874 | size: 0x28 */
+extern u8 lbl_8047B440;
+extern u8 lbl_8047B441;
+u32 fn_801E1874(void) {
+    if (lbl_8047B440 == 0 || lbl_8047B441 == 0) { return 0; }
+    return 1;
 }
 
 /* 0x801E189C | size: 0x88 | medium */
@@ -1292,29 +1309,40 @@ void fn_801E1924(void) {
 }
 #pragma peephole reset
 
-/* 0x801E1B2C | size: 0x28 | small */
+/* 0x801E1B2C | size: 0x28 */
+extern void fn_801E4A6C(void);
 void fn_801E1B2C(void) {
-    /* TODO: decompile (0x28 bytes) */
+    fn_801E4A6C();
+    lbl_8047B440 = 1;
 }
 
-/* 0x801E1B54 | size: 0x30 | small */
-void fn_801E1B54(void) {
-    /* TODO: decompile (0x30 bytes) */
+/* 0x801E1B54 | size: 0x30 */
+extern u8 lbl_8046A3D0;
+extern void fn_8009F230(void*, void*, u32);
+void fn_801E1B54(void* val) {
+    fn_8009F230(&lbl_8046A3D0, val, 1);
 }
 
-/* 0x801E1B84 | size: 0x34 | small */
-void fn_801E1B84(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x801E1B84 | size: 0x34 */
+extern void fn_8009F2F8(void*, void*, u32);
+u32 fn_801E1B84(void) {
+    u32 result;
+    fn_8009F2F8(&lbl_8046A3D0, &result, 1);
+    return result;
 }
 
-/* 0x801E1BB8 | size: 0x30 | small */
-void fn_801E1BB8(void) {
-    /* TODO: decompile (0x30 bytes) */
+/* 0x801E1BB8 | size: 0x30 */
+extern u8 lbl_8046A410;
+void fn_801E1BB8(void* val) {
+    fn_8009F230(&lbl_8046A410, val, 1);
 }
 
-/* 0x801E1BE8 | size: 0x34 | small */
-void fn_801E1BE8(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x801E1BE8 | size: 0x34 */
+extern u8 lbl_8046A3F0;
+u32 fn_801E1BE8(void) {
+    u32 result;
+    fn_8009F2F8(&lbl_8046A3F0, &result, 1);
+    return result;
 }
 
 /* 0x801E1C1C | size: 0xF0 | medium */

@@ -64,6 +64,19 @@ extern f64 lbl_8047D128;   /* 4503599627370496.0 -- int-to-float magic */
 extern f32 lbl_8047D130;   /* lerp denominator constant */
 extern f64 lbl_8047D140;   /* int-to-float magic (unsigned) */
 
+/* Forward declarations for converted functions */
+u32 fn_801379E4(void);
+u32 fn_80137A2C(void);
+void fn_80137114(void);
+void fn_8013735C(void);
+void fn_8013757C(void);
+void fn_80137780(void);
+void fn_8013796C(void);
+void fn_80137AA4(void);
+void fn_80137D14(void);
+void fn_80137F58(void);
+
+
 /* =======================================================================
  *  tracefxInit / fn_8013735C
  *  Address: 0x8013735C, Size: 0x220
@@ -619,32 +632,31 @@ void fn_80137780(void) {
 }
 #pragma pop
 
-/* 0x8013796C | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x78 | fn_8013796C | multi_call_guarded */
 void fn_8013796C(void) {
-    /* TODO: match -- 120 bytes at 0x8013796C */
+    if (fn_80131428() == 0) { return; }
+    fn_80131200();
+    fn_8013139C();
 }
-#pragma pop
 
-/* 0x801379E4 | 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801379E4(void) {
-    /* TODO: match -- 72 bytes at 0x801379E4 */
+/* 0x48 | fn_801379E4 | generic */
+u32 fn_801379E4(void) {
+    fn_800B8DF4();
+    fn_800B856C();
+    fn_800EF5A4();
+    return 1;
 }
-#pragma pop
 
-/* 0x80137A2C | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80137A2C(void) {
-    /* TODO: match -- 120 bytes at 0x80137A2C */
+/* 0x78 | fn_80137A2C | generic */
+u32 fn_80137A2C(void) {
+    fn_800B8DF4();
+    fn_800B856C();
+    fn_800E24B0();
+    fn_800E209C();
+    fn_800E24B0();
+    fn_800E209C();
+    return 1;
 }
-#pragma pop
 
 /* 0x80137AA4 | 0x270 */
 #pragma push

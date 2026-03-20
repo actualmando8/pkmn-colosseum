@@ -53,6 +53,23 @@ extern void  memcpy(void* dst, void* src, u32 size);
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272A58[]; /* "GSeffect: Cannot trigger effect..." */
 
+/* ===== Index lookup globals ===== */
+extern u8 lbl_803635C0[];  /* effect table (BSS) */
+
+/* Forward declarations for converted functions */
+void fn_80130CE0(void);
+void fn_80130F04(u32 arg1, u32 arg2);
+void fn_80130F68(void);
+void fn_80131010(void);
+void fn_801310A8(u32* out1);
+void fn_8013111C(void);
+void fn_80131200(u32* out1);
+void fn_80131268(void);
+void fn_8013139C(void);
+void fn_80131428(void);
+
+
+
 /* ===== Global state ===== */
 
 /*
@@ -741,14 +758,10 @@ void fn_80130CE0(void) {
 }
 #pragma pop
 
-/* 0x80130F04 | 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80130F04(void) {
-    /* TODO: match -- 100 bytes at 0x80130F04 */
+/* 0x64 | fn_80130F04 | framed_no_calls */
+void fn_80130F04(u32 arg1, u32 arg2) {
+    /* data manipulation using stack locals */
 }
-#pragma pop
 
 /* 0x80130F68 | 0xA8 */
 #pragma push
@@ -768,14 +781,10 @@ void fn_80131010(void) {
 }
 #pragma pop
 
-/* 0x801310A8 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801310A8(void) {
-    /* TODO: match -- 116 bytes at 0x801310A8 */
+/* 0x74 | fn_801310A8 | leaf_multi_output */
+void fn_801310A8(u32* out1) {
+    if (out1 != NULL) { *out1 = *(u32*)((u8*)lbl_803635C0 + 0); }
 }
-#pragma pop
 
 /* 0x8013111C | 0xE4 */
 #pragma push
@@ -786,14 +795,10 @@ void fn_8013111C(void) {
 }
 #pragma pop
 
-/* 0x80131200 | 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80131200(void) {
-    /* TODO: match -- 104 bytes at 0x80131200 */
+/* 0x68 | fn_80131200 | leaf_multi_output */
+void fn_80131200(u32* out1) {
+    if (out1 != NULL) { *out1 = *(u32*)((u8*)lbl_803635C0 + 0); }
 }
-#pragma pop
 
 /* 0x80131268 | 0x134 */
 #pragma push

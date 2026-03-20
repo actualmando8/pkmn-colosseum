@@ -103,6 +103,11 @@ extern const char lbl_80273780[]; /* "[GSDVD_ERROR_STATE_COVEROPEN_WAIT]..." */
 extern u8 lbl_80478FAC[];  /* DVD handle table (sda21) */
 extern u8 lbl_80478FB4[];  /* DVD extended state (sda21) */
 
+/* Forward declarations for converted functions */
+s32 fn_80167E54(void);
+u32 fn_80167E5C(u8* obj);
+
+
 /* ===================================================================
  * DVD handle structure (0x0C bytes per slot)
  * =================================================================== */

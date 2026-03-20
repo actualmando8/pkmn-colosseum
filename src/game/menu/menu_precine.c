@@ -58,14 +58,12 @@ void fn_80034B5C(void) {
 }
 #pragma pop
 
-/* 0x80034DC0 | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x78 | fn_80034DC0 | call_sequence */
 void fn_80034DC0(void) {
-    /* TODO: match -- 0x78 bytes at 0x80034DC0 */
+    fn_800FB680();
+    fn_80132A38();
+    fn_800FBB34();
 }
-#pragma pop
 
 /* 0x80034E38 | 0xB8 */
 #pragma push

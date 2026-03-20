@@ -173,6 +173,27 @@ extern u32 fn_80207BF4(void* pokemon);
 /* fn_801EF8F4: Battle system entry point (in battle_main.c range) */
 extern void fn_801EF8F4(u32 param);
 
+/* SDA variables */
+extern u32 lbl_8047B610;
+extern u8 lbl_8047B626;
+
+/* Forward declarations for converted functions */
+u32 fn_80236BFC(void* ctx, u32 slot, u32 param);
+u32 fn_80239984(void* context, u32 trainerSlot, u16 sequenceId);
+void fn_8021FAD4(void);
+void fn_80221104(u32 param1, u32 param2);
+void fn_802249B8(u32 param1, u32 param2);
+void fn_8022A6C8(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_8022BE2C(u32 context, u32 param);
+void fn_8022F2F8(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_80230568(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_80232110(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_802331F4(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_80234A0C(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_8023793C(void* ctx, u32 param1, u32 param2, u32 param3);
+void fn_802395C8(void* ctx, u32 param1, u32 param2, u32 param3);
+
+
 /* =========================================================================
  * fn_802249B8 - StoryScriptExecute
  *
@@ -461,21 +482,21 @@ void fn_802223D4(u32 value) { /* stub */ }
 /* Address: 0x802223E0 | Size: 0x58 | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_802223E0(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
 /* Address: 0x80222438 | Size: 0x5C | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_80222438(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
 /* Address: 0x80222494 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80222494(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222494(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x802224D0 | Size: 0xC | Pattern: simple_setter */
 void fn_802224D0(u32 value) { /* stub */ }
@@ -490,70 +511,70 @@ void fn_802224E8(u32 value) { /* stub */ }
 void fn_802224F4(u32 value) { /* stub */ }
 
 /* Address: 0x80222500 | Size: 0x10 | Pattern: sda_getter */
-u32 fn_80222500(void) { return 0; /* stub */ }
+u32 fn_80222500(void) { return; /* stub */ }
 
 /* Address: 0x80222510 | Size: 0x10 | Pattern: sda_getter */
-u32 fn_80222510(void) { return 0; /* stub */ }
+u32 fn_80222510(void) { return; /* stub */ }
 
 /* Address: 0x80222520 | Size: 0x34 | Pattern: simple_wrapper */
-u32 fn_80222520(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222520(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222554 | Size: 0x30 | Pattern: simple_wrapper */
-u32 fn_80222554(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222554(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222584 | Size: 0x2C | Pattern: simple_wrapper */
-u32 fn_80222584(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222584(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x802225B0 | Size: 0x2C | Pattern: simple_wrapper */
-u32 fn_802225B0(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802225B0(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x802225DC | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802225DC(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802225DC(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222604 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_80222604(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222604(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x8022262C | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_8022262C(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_8022262C(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222654 | Size: 0x50 | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_80222654(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
 /* Address: 0x802226A4 | Size: 0x48 | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_802226A4(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
 /* Address: 0x802226EC | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802226EC(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802226EC(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222714 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_80222714(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80222714(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x8022273C | Size: 0x20 | Pattern: null_check_getter */
-u32 fn_8022273C(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
+u32 fn_8022273C(void* ctx) { if (!ctx) return; return; /* stub */ }
 
 /* Address: 0x8022275C | Size: 0x78 | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_8022275C(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
 /* Address: 0x802227D4 | Size: 0x70 | Pattern: field_accessor */
 #pragma peephole off
 u32 fn_802227D4(void* ctx, u32 slot, u32 param) {
-    if (!ctx) return 0;
-    return 0; /* TODO: field access */
+    if (!ctx) return;
+    return; /* TODO: field access */
 }
 #pragma peephole reset
 
@@ -2612,14 +2633,14 @@ void fn_80217AE4(void) {
 }
 #pragma peephole reset
 
-/* 0x80217BD0 | size: 0x1C | tiny */
-void fn_80217BD0(void) {
-    /* TODO: decompile (0x1C bytes) */
+/* 0x80217BD0 | size: 0x1C */
+u16 fn_80217BD0(u16 val) {
+    return (u16)(((s32)(0xFF - (u16)val) * 10) / 25);
 }
 
-/* 0x80217BEC | size: 0x18 | tiny */
-void fn_80217BEC(void) {
-    /* TODO: decompile (0x18 bytes) */
+/* 0x80217BEC | size: 0x18 */
+u16 fn_80217BEC(u16 val) {
+    return (u16)(((s32)(u16)val * 10) / 25);
 }
 
 /* 0x80217C04 | size: 0x130 | medium */
@@ -2936,9 +2957,11 @@ void fn_8021B484(void) {
 }
 #pragma peephole reset
 
-/* 0x8021B610 | size: 0x18 | tiny */
+/* 0x8021B610 | size: 0x18 */
 void fn_8021B610(void) {
-    /* TODO: decompile (0x18 bytes) */
+    u32 pc = lbl_8047B610;
+    lbl_8047B626 = 0;
+    lbl_8047B610 = pc + 1;
 }
 
 /* 0x8021B628 | size: 0xE4 | medium */

@@ -424,14 +424,13 @@ void moviePlayTPCLogo(void) {
  * Stubs for remaining movie functions (0x800361C0-0x800366A4)
  * ========================================================================= */
 
-/* 0x800361C0 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x50 | fn_800361C0 | call_sequence */
 void fn_800361C0(void) {
-    /* TODO: match -- 0x50 bytes at 0x800361C0 */
+    fn_801C41C8(0, 0);
+    fn_801C40F0(0);
+    fn_801E189C(0, 0);
+    fn_80165A20(0, 0, 0);
 }
-#pragma pop
 
 /* 0x80036210 | 0x30 */
 #pragma push
@@ -451,14 +450,13 @@ void fn_80036240(void) {
 }
 #pragma pop
 
-/* 0x80036360 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x50 | fn_80036360 | call_sequence */
 void fn_80036360(void) {
-    /* TODO: match -- 0x50 bytes at 0x80036360 */
+    fn_801C41C8(0, 0);
+    fn_801C40F0(0);
+    fn_801E189C(0, 0);
+    fn_80165A20(0, 0, 0);
 }
-#pragma pop
 
 /* 0x800363B0 | 0x4 -- nop */
 void fn_800363B0(void) { }
@@ -478,14 +476,15 @@ void fn_800363BC(void) {
 }
 #pragma pop
 
-/* 0x80036468 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80036468(void) {
-    /* TODO: match -- 0x60 bytes at 0x80036468 */
+/* 0x60 | fn_80036468 | generic */
+u32 fn_80036468(void) {
+    /* refs: lbl_8047A468 */
+    fn_800F0308();
+    fn_801E1874();
+    fn_800FF58C();
+    fn_8011288C(0, 0);
+    return 0;
 }
-#pragma pop
 
 /* 0x800364C8 | 0xE8 */
 #pragma push
@@ -505,23 +504,24 @@ void fn_800365B0(void) {
 }
 #pragma pop
 
-/* 0x800365E0 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800365E0(void) {
-    /* TODO: match -- 0x60 bytes at 0x800365E0 */
+/* 0x60 | fn_800365E0 | generic */
+u32 fn_800365E0(void) {
+    /* refs: lbl_8047A468 */
+    fn_80165F40();
+    fn_800F0308();
+    fn_801E1874();
+    fn_800FF58C();
+    fn_8011288C(0, 0);
+    return 0;
 }
-#pragma pop
 
-/* 0x80036640 | 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x5C | fn_80036640 | call_sequence */
 void fn_80036640(void) {
-    /* TODO: match -- 0x5C bytes at 0x80036640 */
+    fn_801C41C8(0, 0);
+    fn_801C40F0(0);
+    fn_801E189C(0, 0);
+    memset();
 }
-#pragma pop
 
 /* 0x8003669C | 0x4 -- nop */
 void fn_8003669C(void) { }

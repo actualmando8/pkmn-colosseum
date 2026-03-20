@@ -159,14 +159,13 @@ void fn_8001D718(void) {
 }
 #pragma pop
 
-/* 0x8001D7E4 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8001D7E4(void) {
-    /* TODO: match -- 0x50 bytes at 0x8001D7E4 */
+/* 0x50 | fn_8001D7E4 | multi_call_cond */
+u32 fn_8001D7E4(void) {
+    if (fn_800F0308() == 0) { return 1; }
+    fn_800F7AF0();
+    fn_800F7BC4();
+    return 1;
 }
-#pragma pop
 
 /* 0x8001D834 | 0xB4 */
 #pragma push
@@ -204,23 +203,24 @@ void fn_8001DACC(void) {
 }
 #pragma pop
 
-/* 0x8001DFA8 | 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8001DFA8(void) {
-    /* TODO: match -- 0x64 bytes at 0x8001DFA8 */
+/* 0x64 | fn_8001DFA8 | generic_call_check_store */
+void fn_8001DFA8(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    void* result = (void*)fn_8005D8B8(arg1);
+    if (result == NULL) { return; }
+    /* store to offset 0x66 */
+    /* store to offset 0x65 */
+    /* store to offset 0x64 */
+    /* store to offset 0x66 */
+    /* store to offset 0x65 */
+    /* store to offset 0x64 */
 }
-#pragma pop
 
-/* 0x8001E00C | 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x68 | fn_8001E00C | call_sequence */
 void fn_8001E00C(void) {
-    /* TODO: match -- 0x68 bytes at 0x8001E00C */
+    fn_801046B8();
+    fn_801026A4();
+    fn_80102568();
 }
-#pragma pop
 
 /* 0x8001E3E0 | 0xD4 */
 #pragma push

@@ -535,6 +535,24 @@ u32 fn_800FF540(void) {
 
 extern u32 lbl_8047ACC8;
 
+/* Forward declarations for converted functions */
+u32 fn_800FF540(void);
+u32 fn_800FF560(void);
+u8 fn_800FF548(void);
+u8 fn_800FF554(void);
+void fn_800FF0A0(void);
+void fn_800FF178(void);
+void fn_800FF2A0(void);
+void fn_800FF3C0(void);
+void fn_800FF4D4(void);
+void fn_800FF52C(void);
+void fn_800FF56C(void);
+void fn_800FF58C(void);
+void fn_800FF660(void);
+void fn_800FF730(u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+void fn_800FF784(void);
+
+
 /* 0x800FF0A0 | 0xD8 */
 #pragma push
 #pragma optimization_level 0
@@ -571,14 +589,11 @@ void fn_800FF3C0(void) {
 }
 #pragma pop
 
-/* 0x800FF4D4 | 0x58 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x58 | fn_800FF4D4 | generic */
 void fn_800FF4D4(void) {
-    /* TODO: match -- 88 bytes at 0x800FF4D4 */
+    /* refs: lbl_80404918, lbl_8047ACE0 */
+    memcpy(NULL, NULL, 0);
 }
-#pragma pop
 
 /* 0x800FF52C | 0x14 */
 #pragma push
@@ -631,14 +646,11 @@ void fn_800FF660(void) {
 }
 #pragma pop
 
-/* 0x800FF730 | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FF730(void) {
-    /* TODO: match -- 84 bytes at 0x800FF730 */
+/* 0x54 | fn_800FF730 | generic */
+void fn_800FF730(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+    /* refs: lbl_80478B18, lbl_8047ACA8, lbl_8047ACC4, lbl_8047ACD8 */
+    fn_8011288C();
 }
-#pragma pop
 
 /* 0x800FF784 | 0x4 | void_stub */
 void fn_800FF784(void) {

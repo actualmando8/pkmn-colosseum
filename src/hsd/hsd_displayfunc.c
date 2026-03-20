@@ -63,6 +63,11 @@ extern const char lbl_80274680[]; /* "unkown type of render pass.\n" */
 extern const char lbl_8047D9E8[]; /* "jobj" -- assertion expression for billboard null check */
 extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard found check */
 
+/* Forward declarations for converted functions */
+void fn_80197A64(void);
+void fn_80197B6C(void);
+
+
 /* ========================================================================
  * Internal DObj-like structure fields (used by both functions):
  *

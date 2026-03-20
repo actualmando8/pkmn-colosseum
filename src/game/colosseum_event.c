@@ -103,6 +103,21 @@ extern u32   fn_801254B4(void* context, u32 slot, u16 tableId, u32 flags, u32 va
 extern void  fn_80125424(void* context, u32 value);
 extern u32   fn_80142CF4(u32 context, u32 param, u16 field, u32 flags);
 
+/* SDA table pointers for event data arrays */
+extern u32 lbl_80478D38;   /* Event table count */
+extern u8  lbl_80478D30;   /* Event table base (6 bytes per entry) */
+
+/* Forward declarations for converted functions */
+void fn_8020248C(void);
+void fn_802025B8(void);
+void fn_802026E4(void);
+void fn_80203620(void);
+void fn_8020367C(void);
+void fn_802036D4(void);
+void fn_80211B94(void);
+void fn_80211E18(void);
+
+
 /* =========================================================================
  * fn_80203620 - ResolveTrainerExtendedData
  *
@@ -1501,19 +1516,19 @@ void fn_80207AE0(void) {
     /* TODO: decompile (0x7C bytes) */
 }
 
-/* 0x80207B5C | size: 0x30 | small */
-void fn_80207B5C(void) {
-    /* TODO: decompile (0x30 bytes) */
+/* 0x80207B5C | size: 0x30 */
+u32 fn_80207B5C(void* context, u8 flags, u16 value) {
+    return fn_801254B4(context, 0, 0xFF, (u8)flags, (u16)value);
 }
 
-/* 0x80207B8C | size: 0x34 | small */
-void fn_80207B8C(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x80207B8C | size: 0x34 */
+u16 fn_80207B8C(void* context, u8 field) {
+    return (u16)(u32)fn_8012640C(context, 0, 0xFF, (u8)field);
 }
 
-/* 0x80207BC0 | size: 0x34 | small */
-void fn_80207BC0(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x80207BC0 | size: 0x34 */
+u32 fn_80207BC0(void* context, u16 value) {
+    return fn_801254B4(context, 0, 0x100, 0, (u16)value);
 }
 
 /* 0x80207C24 | size: 0x48 | small */
@@ -1716,14 +1731,16 @@ void fn_80209FAC(void) {
     /* TODO: decompile (0x64 bytes) */
 }
 
-/* 0x8020A010 | size: 0x18 | tiny */
-void fn_8020A010(void) {
-    /* TODO: decompile (0x18 bytes) */
+/* 0x8020A010 | size: 0x18 */
+u32 fn_8020A010(u8* ptr) {
+    if (ptr == NULL) { return 1; }
+    return ptr[0x1];
 }
 
-/* 0x8020A028 | size: 0x18 | tiny */
-void fn_8020A028(void) {
-    /* TODO: decompile (0x18 bytes) */
+/* 0x8020A028 | size: 0x18 */
+u32 fn_8020A028(u8* ptr) {
+    if (ptr == NULL) { return 1; }
+    return ptr[0x0];
 }
 
 /* 0x8020A040 | size: 0x28 | small */
@@ -1760,19 +1777,43 @@ void fn_8020A478(void) {
 }
 #pragma peephole reset
 
-/* 0x8020A500 | size: 0x40 | small */
-void fn_8020A500(void) {
-    /* TODO: decompile (0x40 bytes) */
+/* 0x8020A500 | size: 0x40 */
+u32 fn_8020A500(u16 idx) {
+    u8* entry;
+    idx = (u16)idx;
+    if (idx >= lbl_80478D38) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478D30 + idx * 6;
+    }
+    if (entry == NULL) { return 0; }
+    return *(u16*)(entry + 4);
 }
 
-/* 0x8020A540 | size: 0x40 | small */
-void fn_8020A540(void) {
-    /* TODO: decompile (0x40 bytes) */
+/* 0x8020A540 | size: 0x40 */
+u32 fn_8020A540(u16 idx) {
+    u8* entry;
+    idx = (u16)idx;
+    if (idx >= lbl_80478D38) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478D30 + idx * 6;
+    }
+    if (entry == NULL) { return 0; }
+    return *(u16*)(entry + 2);
 }
 
-/* 0x8020A580 | size: 0x40 | small */
-void fn_8020A580(void) {
-    /* TODO: decompile (0x40 bytes) */
+/* 0x8020A580 | size: 0x40 */
+u32 fn_8020A580(u16 idx) {
+    u8* entry;
+    idx = (u16)idx;
+    if (idx >= lbl_80478D38) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478D30 + idx * 6;
+    }
+    if (entry == NULL) { return 0; }
+    return entry[0];
 }
 
 /* 0x8020A5C0 | size: 0x70 | small */

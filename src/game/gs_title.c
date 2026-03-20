@@ -225,77 +225,53 @@ void fn_800216E0(u32 val) {
  * Stubs for remaining GStitle functions (0x80024438-0x80025F84)
  * ========================================================================= */
 
-/* 0x80024438 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80024438(void) {
-    /* TODO: match -- 0x4C bytes at 0x80024438 */
+/* 0x4C | fn_80024438 | check_then_call */
+void fn_80024438(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x80024484 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80024484(void) {
-    /* TODO: match -- 0x4C bytes at 0x80024484 */
+/* 0x4C | fn_80024484 | check_then_call */
+void fn_80024484(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x800244D0 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800244D0(void) {
-    /* TODO: match -- 0x4C bytes at 0x800244D0 */
+/* 0x4C | fn_800244D0 | check_then_call */
+void fn_800244D0(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x8002451C | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8002451C(void) {
-    /* TODO: match -- 0x4C bytes at 0x8002451C */
+/* 0x4C | fn_8002451C | check_then_call */
+void fn_8002451C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x80024568 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80024568(void) {
-    /* TODO: match -- 0x4C bytes at 0x80024568 */
+/* 0x4C | fn_80024568 | check_then_call */
+void fn_80024568(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x800245B4 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800245B4(void) {
-    /* TODO: match -- 0x4C bytes at 0x800245B4 */
+/* 0x4C | fn_800245B4 | check_then_call */
+void fn_800245B4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x80024600 | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80024600(void) {
-    /* TODO: match -- 0x4C bytes at 0x80024600 */
+/* 0x4C | fn_80024600 | check_then_call */
+void fn_80024600(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
-/* 0x8002464C | 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8002464C(void) {
-    /* TODO: match -- 0x4C bytes at 0x8002464C */
+/* 0x4C | fn_8002464C | check_then_call */
+void fn_8002464C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    { fn_801902E0(); return; }
+    fn_80109220();
 }
-#pragma pop
 
 /* 0x80024698 | 0x4 -- nop */
 void fn_80024698(void) { }

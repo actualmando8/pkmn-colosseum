@@ -302,6 +302,26 @@ void* GetPokemonStatePtr(void) {
 
 extern u32 lbl_8047B5F0;
 
+/* Forward declarations for converted functions */
+u16 fn_801F6720(u8* ptr);
+u32 fn_801F6600(u8* ptr);
+u32 fn_801F66EC(u8* ptr, u8 idx);
+void fn_801F025C(void);
+void fn_801F02AC(void);
+void fn_801F2B5C(void);
+void fn_801F3BB4(void);
+void fn_801F3CE8(void);
+void fn_801F4C14(void);
+void fn_801F65F0(u8* ptr, u32 val);
+void fn_801F667C(u8* ptr, u16 val);
+void fn_801F6B54(void);
+void fn_801F7090(void);
+void fn_801F7174(void);
+void fn_801F7530(void);
+void fn_801F7954(void);
+void fn_801F7C54(void);
+
+
 /* Address: 0x801F0204 | Size: 0x18 | Pattern: nullcheck_getter */
 u32 fn_801F0204(u8* ptr) {
     if (ptr == NULL) { return 0; }
@@ -1229,39 +1249,52 @@ void fn_801F650C(void) {
     /* TODO: decompile (0x38 bytes) */
 }
 
-/* 0x801F6544 | size: 0x1C | tiny */
-void fn_801F6544(void) {
-    /* TODO: decompile (0x1C bytes) */
+/* 0x801F6544 | size: 0x1C */
+u8* fn_801F6544(u8* ptr) {
+    if (ptr == NULL) { return NULL; }
+    return ptr + 0xA4C4;
 }
 
-/* 0x801F6560 | size: 0x28 | small */
-void fn_801F6560(void) {
-    /* TODO: decompile (0x28 bytes) */
+/* 0x801F6560 | size: 0x28 */
+void fn_801F6560(u8* ptr, u16 idx, u32 val) {
+    if (ptr == NULL) { return; }
+    if ((u16)idx >= 8) { return; }
+    *(u32*)(ptr + 0xA4C4 + (u16)idx * 4) = val;
 }
 
-/* 0x801F6588 | size: 0x38 | small */
-void fn_801F6588(void) {
-    /* TODO: decompile (0x38 bytes) */
+/* 0x801F6588 | size: 0x38 */
+u32 fn_801F6588(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return 0; }
+    if ((u16)idx >= 8) { return 0; }
+    return *(u32*)(ptr + 0xA4C4 + (u16)idx * 4);
 }
 
-/* 0x801F6658 | size: 0x24 | small */
-void fn_801F6658(void) {
-    /* TODO: decompile (0x24 bytes) */
+/* 0x801F6658 | size: 0x24 */
+void fn_801F6658(u8* ptr, u8 idx, u16 val) {
+    if (ptr == NULL) { return; }
+    if ((u8)idx >= 2) { return; }
+    *(u16*)(ptr + (u8)idx * 2 + 0x14) = val;
 }
 
-/* 0x801F66EC | size: 0x34 | small */
-void fn_801F66EC(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x801F66EC | size: 0x34 */
+u32 fn_801F66EC(u8* ptr, u8 idx) {
+    if (ptr == NULL) { return 0; }
+    if ((u8)idx >= 2) { return 0; }
+    return *(u16*)(ptr + (u8)idx * 2 + 0x14);
 }
 
-/* 0x801F6AB4 | size: 0x34 | small */
-void fn_801F6AB4(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x801F6AB4 | size: 0x34 */
+u8* fn_801F6AB4(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if ((u16)idx >= 2) { return NULL; }
+    return ptr + (u16)idx * 0x5230 + 0x14;
 }
 
-/* 0x801F6B18 | size: 0x30 | small */
-void fn_801F6B18(void) {
-    /* TODO: decompile (0x30 bytes) */
+/* 0x801F6B18 | size: 0x30 */
+u8* fn_801F6B18(u8* ptr, u16 idx) {
+    if (ptr == NULL) { return NULL; }
+    if ((u16)idx >= 1) { return NULL; }
+    return ptr + (u16)idx * 0x10;
 }
 
 /* 0x801F6B54 | size: 0xF8 | medium */

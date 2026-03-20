@@ -398,6 +398,10 @@ extern u16 lbl_8047B5D6;
 extern u16 lbl_8047B5D8;
 extern u8 lbl_8047B5DA;
 
+/* Forward declarations for converted functions */
+void fn_801EFA08(void);
+
+
 /* Address: 0x801EF61C | Size: 0x8 | Pattern: sda_setter */
 void fn_801EF61C(u16 val) {
     lbl_8047B5D6 = val;

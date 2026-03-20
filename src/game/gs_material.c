@@ -321,6 +321,10 @@ static u32  gsMatCreatePoolCount;           /* @sda21 lbl_8047AB20 */
 extern void fn_800DF930(void* a, void* b, void* c, void* d, void* e);
 extern void fn_800DFE98(void* a);
 
+/* Forward declarations for converted functions */
+void fn_800E9148(void);
+
+
 /* =======================================================================
  *  GSmaterialGetPoolCount / fn_800E3B3C
  *  Address: 0x800E3B3C, Size: 0x8

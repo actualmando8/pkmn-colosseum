@@ -246,14 +246,11 @@ u32 fn_801A68F0(void) {
  *  Internal stubs: 0x801A3FBC-0x801A69C0 (31 functions)
  * ========================================================================= */
 
-/* 0x801A3FBC | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x44 | fn_801A3FBC | call_sequence */
 void fn_801A3FBC(void) {
-    /* TODO: match -- 0x44 bytes at 0x801A3FBC */
+    fn_801AA35C();
+    fn_801AA35C();
 }
-#pragma pop
 
 /* 0x801A4000 | 0x98 */
 #pragma push
@@ -264,14 +261,10 @@ void fn_801A4000(void) {
 }
 #pragma pop
 
-/* 0x801A4098 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A4098(void) {
-    /* TODO: match -- 0x60 bytes at 0x801A4098 */
+/* 0x60 | fn_801A4098 | framed_no_calls */
+void fn_801A4098(u32 arg1, u32 arg2) {
+    /* data manipulation using lbl_8047B2B4, lbl_8047B2B0 */
 }
-#pragma pop
 
 /* 0x801A40F8 | 0x174 */
 #pragma push
@@ -309,14 +302,13 @@ void fn_801A4440(void) {
 }
 #pragma pop
 
-/* 0x801A48B0 | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A48B0(void) {
-    /* TODO: match -- 0x44 bytes at 0x801A48B0 */
+/* 0x44 | fn_801A48B0 | guarded_call */
+u32 fn_801A48B0(void) {
+    if (0 /* guard r3 == 0 */) { return 1; }
+    if (0 /* guard r0 == 0 */) { return 1; }
+    fn_80191688();
+    return 0;
 }
-#pragma pop
 
 /* 0x801A48F4 | 0x88 */
 #pragma push
@@ -327,14 +319,13 @@ void fn_801A48F4(void) {
 }
 #pragma pop
 
-/* 0x801A497C | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A497C(void) {
-    /* TODO: match -- 0x44 bytes at 0x801A497C */
+/* 0x44 | fn_801A497C | guarded_call */
+u32 fn_801A497C(void) {
+    if (0 /* guard r3 == 0 */) { return 1; }
+    if (0 /* guard r0 == 0 */) { return 1; }
+    fn_80191688();
+    return 0;
 }
-#pragma pop
 
 /* 0x801A49C0 | 0x88 */
 #pragma push
@@ -349,14 +340,11 @@ void fn_801A49C0(void) {
 void fn_801A4A48(void) {
 }
 
-/* 0x801A4A54 | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A4A54(void) {
-    /* TODO: match -- 0x70 bytes at 0x801A4A54 */
+/* 0x70 | fn_801A4A54 | generic */
+u32 fn_801A4A54(u32 arg1) {
+    /* refs: jumptable_8036CA64 */
+    return 0;
 }
-#pragma pop
 
 /* 0x801A4AC4 | 0x3C */
 #pragma push

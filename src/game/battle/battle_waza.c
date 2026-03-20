@@ -80,6 +80,22 @@ extern f32   fn_801C4814(s32 slot);                        /* get slot X */
 extern f32   fn_801C483C(s32 slot);                        /* get slot Y */
 extern f32   fn_801C4864(s32 slot);                        /* get slot Z */
 
+/* Forward declarations for converted functions */
+void fn_801D349C(void);
+void fn_801D3F7C(void);
+void fn_801D44C4(void);
+void fn_801D624C(void);
+void fn_801D7464(void);
+void fn_801D7B94(void);
+void fn_801D84F4(void);
+void fn_801D87B0(void* entry, s32 type);
+void fn_801D8B38(void* entry);
+void fn_801D91EC(void* entry);
+void fn_801D9950(s32 slot, s32 motionType);
+void fn_801DAC90(void);
+void fn_801DAEF8(s32 count);
+
+
 /* =========================================================================
  * WAZA DATA ACCESS HELPERS (0x801D1338 - 0x801D1618)
  *

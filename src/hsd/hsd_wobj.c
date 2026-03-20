@@ -241,32 +241,23 @@ void fn_801914F4(void) {
 }
 #pragma pop
 
-/* 0x8019158C | 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8019158C(void) {
-    /* TODO: match -- 0x48 bytes at 0x8019158C */
+/* 0x48 | fn_8019158C | framed_no_calls */
+void fn_8019158C(u32 arg1, u32 arg2) {
+    /* data manipulation using lbl_8047B218 */
 }
-#pragma pop
 
-/* 0x801915D4 | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x54 | fn_801915D4 | call_sequence */
 void fn_801915D4(void) {
-    /* TODO: match -- 0x54 bytes at 0x801915D4 */
+    fn_801AE50C();
+    fn_801C25E4();
 }
-#pragma pop
 
-/* 0x80191628 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x60 | fn_80191628 | generic */
 void fn_80191628(void) {
-    /* TODO: match -- 0x60 bytes at 0x80191628 */
+    /* refs: lbl_8036C5F0, lbl_8047B218 */
+    fn_80193828();
+    fn_80196E10();
 }
-#pragma pop
 
 /* 0x80191688 | 0x100 */
 #pragma push
@@ -277,14 +268,10 @@ void fn_80191688(void) {
 }
 #pragma pop
 
-/* 0x80191788 | 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80191788(void) {
-    /* TODO: match -- 0x48 bytes at 0x80191788 */
+/* 0x48 | fn_80191788 | generic */
+void fn_80191788(u32 arg1, u32 arg2) {
+
 }
-#pragma pop
 
 /* 0x801917D0 | 0xCC */
 #pragma push
@@ -313,14 +300,11 @@ void fn_8019194C(void) {
 }
 #pragma pop
 
-/* 0x801919EC | 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x48 | fn_801919EC | generic */
 void fn_801919EC(void) {
-    /* TODO: match -- 0x48 bytes at 0x801919EC */
+    fn_801C27F4();
+    fn_801B0040();
 }
-#pragma pop
 
 /* 0x80191A34 | 0x398 */
 #pragma push
@@ -331,32 +315,24 @@ void fn_80191A34(void) {
 }
 #pragma pop
 
-/* 0x80191DCC | 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80191DCC(void) {
-    /* TODO: match -- 0x6C bytes at 0x80191DCC */
+/* 0x6C | fn_80191DCC | generic */
+void fn_80191DCC(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    fn_801C25E4();
+    fn_801C2670();
+    fn_801AFE68();
 }
-#pragma pop
 
-/* 0x80191E38 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x50 | fn_80191E38 | generic */
 void fn_80191E38(void) {
-    /* TODO: match -- 0x50 bytes at 0x80191E38 */
+    fn_801C29C4();
+    fn_801AFEFC();
 }
-#pragma pop
 
-/* 0x80191E88 | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x44 | fn_80191E88 | generic */
 void fn_80191E88(void) {
-    /* TODO: match -- 0x44 bytes at 0x80191E88 */
+    fn_801C25E4();
+    fn_801AFFE0();
 }
-#pragma pop
 
 /* 0x80191ECC | 0x98 */
 #pragma push

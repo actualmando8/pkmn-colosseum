@@ -117,6 +117,18 @@ extern const char lbl_80271814[];  /* Multi-line error/info block (Japanese + En
 extern const char lbl_802719C4[];  /* "loadParticle(): loading...\n" */
 extern const char lbl_802719E0[];  /* "loadParticlePtr(): can't alloc %d bytes of memory\n" */
 
+/* Forward declarations for converted functions */
+void fn_800FF788(void);
+void fn_800FF81C(void);
+void fn_800FF828(void);
+void fn_800FF970(void);
+void fn_80100B24(void);
+void fn_80101244(void);
+void fn_801012E8(void);
+void fn_801013A0(void);
+void fn_8010147C(void);
+
+
 /* ===== Global state (sbss / sdata) ===== */
 
 /* --- Floor system configuration --- */

@@ -8,14 +8,12 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_debug.h"
 
-/* 0x801A1988 | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A1988(void) {
-    /* TODO: match -- 0x78 bytes at 0x801A1988 */
+/* 0x78 | fn_801A1988 | generic */
+u32 fn_801A1988(void) {
+    fn_80196E10();
+    fn_8019D9DC();
+    return 1;
 }
-#pragma pop
 
 /* 0x801A1A00 | 0x140 */
 #pragma push
@@ -80,14 +78,10 @@ void fn_801A301C(void) {
 }
 #pragma pop
 
-/* 0x801A323C | 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A323C(void) {
-    /* TODO: match -- 0x64 bytes at 0x801A323C */
+/* 0x64 | fn_801A323C | generic */
+void fn_801A323C(u32 arg1) {
+
 }
-#pragma pop
 
 /* 0x801A32A0 | 0x2D4 */
 #pragma push
@@ -143,14 +137,13 @@ void fn_801A3D04(void) {
 }
 #pragma pop
 
-/* 0x801A3E64 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A3E64(void) {
-    /* TODO: match -- 0x50 bytes at 0x801A3E64 */
+/* 0x50 | fn_801A3E64 | global_cond_call */
+u32 fn_801A3E64(void) {
+    /* uses lbl_804655B4 */
+    if (0 /* field check */) { return 0; }
+    fn_801AA498();
+    return 0;
 }
-#pragma pop
 
 /* 0x801A3EB4 | 0x94 */
 #pragma push
@@ -161,14 +154,12 @@ void fn_801A3EB4(void) {
 }
 #pragma pop
 
-/* 0x801A3F48 | 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x5C | fn_801A3F48 | multi_call_guarded */
 void fn_801A3F48(void) {
-    /* TODO: match -- 0x5C bytes at 0x801A3F48 */
+    { fn_801AA4CC(); return; }
+    fn_80196E10();
+    memset();
 }
-#pragma pop
 
 /* 0x801A3FA4 | 0xC */
 void fn_801A3FA4(void) {

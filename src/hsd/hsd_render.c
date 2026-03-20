@@ -1,3 +1,7 @@
+
+/* Forward declarations for converted functions */
+void fn_80197650(void);
+
 /**
  * @file hsd_render.c
  * @brief HSD internal functions (0x80197344-0x80197A64).
@@ -35,14 +39,12 @@ void fn_801974A8(void) {
 }
 #pragma pop
 
-/* 0x801975FC | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801975FC(void) {
-    /* TODO: match -- 0x54 bytes at 0x801975FC */
+/* 0x54 | fn_801975FC | two_call_arg_check */
+void fn_801975FC(u32 arg1) {
+    if (arg1 == 0) { return; }
+    fn_80197650();
+    fn_80197650();
 }
-#pragma pop
 
 /* 0x80197650 | 0x134 */
 #pragma push

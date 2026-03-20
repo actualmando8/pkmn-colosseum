@@ -147,6 +147,44 @@ extern const f32  lbl_8047CEE8;  /* -1000000.0f (large negative) */
 /** Main collision state: 0x3710 bytes at lbl_80404C68 */
 extern GSColSysState lbl_80404C68;
 
+/* ===== Index lookup globals ===== */
+
+/* Forward declarations for converted functions */
+f32 fn_8010C77C(f32* a, f32* b, f32* c);
+u16 fn_8010C508(u16 idx1, u16 idx2);
+u32 fn_8010C364(void);
+u32 fn_8010C388(void);
+u32 fn_8010C3FC(void);
+u32 fn_8010CBC0(void);
+u32 fn_8010CC04(void);
+u32 fn_8010CFE4(void);
+void fn_8010C220(void);
+void fn_8010C224(void);
+void fn_8010C46C(void);
+void fn_8010C4A0(void);
+void fn_8010C4D4(void);
+void fn_8010C54C(void);
+void fn_8010C650(void);
+void fn_8010C74C(void);
+void fn_8010C7BC(void);
+void fn_8010C844(void);
+void fn_8010C8D0(void);
+void fn_8010CA30(void);
+void fn_8010CBD0(void);
+void fn_8010CC54(void);
+void fn_8010CD6C(void);
+void fn_8010CE04(void);
+void fn_8010D038(void);
+void fn_8010D064(void);
+void fn_8010D170(void);
+void fn_8010D20C(void);
+void fn_8010D3C8(void);
+void fn_8010D8D4(void);
+void fn_8010DE00(void);
+void fn_8010DEF0(void);
+
+
+
 /* =================================================================
  * Convenience macros for accessing the collision state
  * ================================================================= */
@@ -1760,23 +1798,19 @@ u32 fn_8010C364(void) {
     return 1;
 }
 
-/* 0x8010C388 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C388(void) {
-    /* TODO: match -- 116 bytes at 0x8010C388 */
+/* 0x74 | fn_8010C388 | generic */
+u32 fn_8010C388(void) {
+    /* refs: lbl_80272000, lbl_8035B4E8, lbl_80478E70, lbl_80478E74 */
+    fn_800DD970("");
+    return 0;
 }
-#pragma pop
 
-/* 0x8010C3FC | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C3FC(void) {
-    /* TODO: match -- 112 bytes at 0x8010C3FC */
+/* 0x70 | fn_8010C3FC | generic */
+u32 fn_8010C3FC(void) {
+    /* refs: lbl_80272000, lbl_8035B4E8, lbl_80478E70, lbl_80478E74 */
+    fn_800DD970("");
+    return 0;
 }
-#pragma pop
 
 /* 0x8010C46C | 0x34 */
 #pragma push
@@ -1805,14 +1839,14 @@ void fn_8010C4D4(void) {
 }
 #pragma pop
 
-/* 0x8010C508 | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C508(void) {
-    /* TODO: match -- 68 bytes at 0x8010C508 */
+/* 0x44 | fn_8010C508 | leaf_2d_array_lookup */
+u16 fn_8010C508(u16 idx1, u16 idx2) {
+    void* entry;
+    if (idx1 >= lbl_80478B38) { return 0; }
+    if (idx2 >= 0x12) { return 0; }
+    entry = (u8*)lbl_8035B500 + idx1 * 0x2C + idx2 * 0x2;
+    return *(u16*)((u8*)entry + 0x8);
 }
-#pragma pop
 
 /* 0x8010C54C | 0x104 */
 #pragma push
@@ -1841,14 +1875,13 @@ void fn_8010C74C(void) {
 }
 #pragma pop
 
-/* 0x8010C77C | 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C77C(void) {
-    /* TODO: match -- 64 bytes at 0x8010C77C */
+/* 0x40 | fn_8010C77C | dot_product_3way */
+f32 fn_8010C77C(f32* a, f32* b, f32* c) {
+    f32 dx = c[1] - b[1];
+    f32 dy = c[0] - b[0];
+    f32 dz = c[2] - b[2];
+    return a[1] * dx + a[0] * dy + a[2] * dz;
 }
-#pragma pop
 
 /* 0x8010C7BC | 0x88 */
 #pragma push
@@ -1900,14 +1933,13 @@ void fn_8010CBD0(void) {
 }
 #pragma pop
 
-/* 0x8010CC04 | 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010CC04(void) {
-    /* TODO: match -- 80 bytes at 0x8010CC04 */
+/* 0x50 | fn_8010CC04 | global_cond_call */
+u32 fn_8010CC04(void) {
+    /* uses lbl_80404C68 */
+    if (0 /* field check */) { return 1; }
+    fn_800DACC0(0 /* TODO */);
+    return 1;
 }
-#pragma pop
 
 /* 0x8010CC54 | 0x118 */
 #pragma push
@@ -1936,14 +1968,13 @@ void fn_8010CE04(void) {
 }
 #pragma pop
 
-/* 0x8010CFE4 | 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010CFE4(void) {
-    /* TODO: match -- 84 bytes at 0x8010CFE4 */
+/* 0x54 | fn_8010CFE4 | global_cond_call */
+u32 fn_8010CFE4(void) {
+    /* uses lbl_80404C68 */
+    if (1 /* field check */) { return 0; }
+    fn_8010CE04();
+    return 1;
 }
-#pragma pop
 
 /* 0x8010D038 | 0x2C */
 #pragma push

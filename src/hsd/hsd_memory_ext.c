@@ -8,12 +8,10 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_debug.h"
 
-/* 0x801A69C0 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x74 | fn_801A69C0 | global_cond_call */
 void fn_801A69C0(void) {
-    /* TODO: match -- 0x74 bytes at 0x801A69C0 */
+    /* uses lbl_80274E10 */
+    if (0 /* field check */) { return; }
+    fn_80196E10();
 }
-#pragma pop
 

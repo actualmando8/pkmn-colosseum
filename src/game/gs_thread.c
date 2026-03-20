@@ -59,6 +59,14 @@ static void GStaskSchedulerThread(void);  /* fn_800FEA74 */
 extern void fn_800FEBA0(void);            /* GStaskSwapCallback */
 extern void fn_800F0F4C(void);            /* GSthread trampoline / entry wrapper */
 
+/* Forward declarations for converted functions */
+void fn_800FE010(void);
+void fn_800FE7A0(void);
+void fn_800FE834(void);
+void fn_800FE9B0(void);
+void fn_800FEA74(void);
+
+
 /* ===== Global state (sbss) ===== */
 
 /* --- Task system globals --- */
@@ -1050,23 +1058,17 @@ void fn_800F9210(void) {
 }
 #pragma pop
 
-/* 0x800F92D4 | 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800F92D4(void) {
-    /* TODO: match -- 68 bytes at 0x800F92D4 */
+/* 0x44 | fn_800F92D4 | generic */
+u32 fn_800F92D4(u32 arg1, u32 arg2) {
+    /* refs: lbl_8047AC5C, lbl_8047AC60 */
+    return 0;
 }
-#pragma pop
 
-/* 0x800F9318 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800F9318(void) {
-    /* TODO: match -- 96 bytes at 0x800F9318 */
+/* 0x60 | fn_800F9318 | generic */
+u32 fn_800F9318(void) {
+    /* refs: lbl_8047AC5C, lbl_8047AC60 */
+    return 0;
 }
-#pragma pop
 
 /* 0x800F9378 | 0xA0 */
 #pragma push
@@ -1095,14 +1097,12 @@ void fn_800F9544(void) {
 }
 #pragma pop
 
-/* 0x800F9670 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x74 | fn_800F9670 | generic */
 void fn_800F9670(void) {
-    /* TODO: match -- 116 bytes at 0x800F9670 */
+    /* refs: lbl_8047AC58, lbl_8047AC5C, lbl_8047AC60 */
+    fn_800E3534();
+    fn_800E27B0();
 }
-#pragma pop
 
 /* 0x800F96E4 | 0x408 */
 #pragma push
@@ -1149,14 +1149,12 @@ void fn_800F9D24(void) {
 }
 #pragma pop
 
-/* 0x800F9E70 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800F9E70(void) {
-    /* TODO: match -- 116 bytes at 0x800F9E70 */
+/* 0x74 | fn_800F9E70 | generic */
+u32 fn_800F9E70(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    fn_800FE010();
+    memcpy();
+    return 0;
 }
-#pragma pop
 
 /* 0x800F9EE4 | 0x180 */
 #pragma push
@@ -1176,14 +1174,10 @@ void fn_800FA064(void) {
 }
 #pragma pop
 
-/* 0x800FA160 | 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x5C | fn_800FA160 | single_call_straight */
 void fn_800FA160(void) {
-    /* TODO: match -- 92 bytes at 0x800FA160 */
+    fn_800DBEB4();
 }
-#pragma pop
 
 /* 0x800FA1BC | 0xC4 */
 #pragma push
@@ -1212,14 +1206,11 @@ void fn_800FA314(void) {
 }
 #pragma pop
 
-/* 0x800FA3D0 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FA3D0(void) {
-    /* TODO: match -- 116 bytes at 0x800FA3D0 */
+/* 0x74 | fn_800FA3D0 | generic */
+u32 fn_800FA3D0(u32 arg1, u32 arg2) {
+    /* refs: lbl_80478B08 */
+    return 0;
 }
-#pragma pop
 
 /* 0x800FA444 | 0x654 */
 #pragma push
@@ -1302,14 +1293,10 @@ void fn_800FBE7C(void) {
 }
 #pragma pop
 
-/* 0x800FBF10 | 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x64 | fn_800FBF10 | single_call_straight */
 void fn_800FBF10(void) {
-    /* TODO: match -- 100 bytes at 0x800FBF10 */
+    fn_800EF504();
 }
-#pragma pop
 
 /* 0x800FBF74 | 0x25C */
 #pragma push
@@ -1320,23 +1307,17 @@ void fn_800FBF74(void) {
 }
 #pragma pop
 
-/* 0x800FC1D0 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FC1D0(void) {
-    /* TODO: match -- 116 bytes at 0x800FC1D0 */
+/* 0x74 | fn_800FC1D0 | generic */
+u32 fn_800FC1D0(u32 arg1) {
+    /* refs: lbl_80478B08 */
+    return 0;
 }
-#pragma pop
 
-/* 0x800FC244 | 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FC244(void) {
-    /* TODO: match -- 96 bytes at 0x800FC244 */
+/* 0x60 | fn_800FC244 | generic */
+u32 fn_800FC244(void) {
+    /* refs: lbl_80478B08 */
+    return 0;
 }
-#pragma pop
 
 /* 0x800FC2A4 | 0x4 | void_stub */
 void fn_800FC2A4(void) {

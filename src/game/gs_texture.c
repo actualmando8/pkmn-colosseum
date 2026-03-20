@@ -924,6 +924,13 @@ void fn_800F03D4(void) {
 
 extern u32 lbl_8047AC00;
 
+/* Forward declarations for converted functions */
+u16 fn_800EF4F4(u8* obj);
+u16 fn_800EF4FC(u8* obj);
+u32 fn_800EF4D4(u8* obj);
+u32 fn_800EF4DC(u8* obj);
+
+
 /* Address: 0x800F036C | Size: 0x8 | Pattern: simple_getter */
 u8 fn_800F036C(u8* obj) {
     return *(u8*)((u8*)obj + 0xB);

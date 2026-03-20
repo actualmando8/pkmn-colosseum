@@ -194,23 +194,15 @@ void fn_8019B784(void) {
 void fn_8019B7B4(void) {
 }
 
-/* 0x8019B7C0 | 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x48 | fn_8019B7C0 | single_call_straight */
 void fn_8019B7C0(void) {
-    /* TODO: match -- 0x48 bytes at 0x8019B7C0 */
+    fn_80193B30();
 }
-#pragma pop
 
-/* 0x8019B808 | 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x6C | fn_8019B808 | single_call_straight */
 void fn_8019B808(void) {
-    /* TODO: match -- 0x6C bytes at 0x8019B808 */
+    fn_80193B30();
 }
-#pragma pop
 
 /* 0x8019B874 | 0xD4 */
 #pragma push

@@ -29,6 +29,8 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern int strcmp(const char* s1, const char* s2);
 extern void OSReport(const char* fmt, ...);
+extern void* fn_801A6928(s32 size);
+extern void fn_801A6960(void* ptr);
 
 /* ========================================================================= */
 /*  ClassInfoInit                                                            */
@@ -488,20 +490,18 @@ void hsdForgetClassLibrary(const char* library_name)
  * =================================================================== */
 
 /* Address: 0x80193A8C | Size: 0x8 | Pattern: return_constant */
-u32 fn_80193A8C(void) { return 0; }
+u32 fn_80193A8C(void) { return; }
 
 /* =========================================================================
  *  Internal stubs: 0x80193748-0x80193C24 (11 functions)
  * ========================================================================= */
 
-/* 0x80193748 | 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80193748(void) {
-    /* TODO: match -- 0x40 bytes at 0x80193748 */
+/* 0x40 | fn_80193748 | generic */
+u32 fn_80193748(void) {
+    /* refs: lbl_8047B228 */
+    fn_8019BFE8();
+    return;
 }
-#pragma pop
 
 /* 0x80193788 | 0xA0 */
 #pragma push
@@ -552,32 +552,20 @@ void fn_80193A58(void) {
 void fn_80193A88(void) {
 }
 
-/* 0x80193A94 | 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80193A94(void) {
-    /* TODO: match -- 0x5C bytes at 0x80193A94 */
+/* 0x5C | fn_80193A94 | generic */
+void fn_80193A94(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+    fn_801A6928(0 /* TODO */);
 }
-#pragma pop
 
 /* 0x80193AF0 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80193AF0(void) {
-    /* TODO: match -- 0x20 bytes at 0x80193AF0 */
+void fn_80193AF0(void* ptr) {
+    fn_801A6960(ptr);
 }
-#pragma pop
 
 /* 0x80193B10 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80193B10(void) {
-    /* TODO: match -- 0x20 bytes at 0x80193B10 */
+void* fn_80193B10(s32 size) {
+    return fn_801A6928(size);
 }
-#pragma pop
 
 /* 0x80193B30 | 0xF4 */
 #pragma push

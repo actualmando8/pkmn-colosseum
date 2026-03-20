@@ -80,6 +80,15 @@ extern u8    lbl_80466E50[0x1E0]; /* scene animation context */
 extern u8    lbl_80467030[0x20];  /* BattleCameraState */
 extern u8    lbl_8046AC60[0x100]; /* battle transfer context */
 
+/* Forward declarations for converted functions */
+s32 fn_801C7730(s32 side, s32 slot);
+s32 fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType);
+void fn_801C89F8(s32 side, s32 slot);
+void fn_801CC380(void);
+void fn_801CDB04(void);
+void fn_801CFD08(void);
+
+
 /* =========================================================================
  * CAMERA CONTROL (0x801C53BC - 0x801C6928)
  * ========================================================================= */

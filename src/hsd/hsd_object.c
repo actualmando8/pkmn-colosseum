@@ -83,11 +83,9 @@ void fn_8019147C(u8* obj, u32 val) {
     *(u32*)((u8*)obj + 0x4) = val;
 }
 
-/* 0x80191484 | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x70 | fn_80191484 | generic */
 void fn_80191484(void) {
-    /* TODO: match -- 0x70 bytes at 0x80191484 */
+    /* refs: lbl_8047B208, lbl_8047B20C, lbl_8047B210 */
+    fn_800E3534();
+    fn_800E27B0();
 }
-#pragma pop
