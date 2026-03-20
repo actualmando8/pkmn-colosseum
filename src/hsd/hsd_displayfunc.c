@@ -240,3 +240,25 @@ void HSD_DObjDisplayFunc2(void* dobj, void* viewMtx, void* renderState) {
             break;
     }
 }
+
+/* =========================================================================
+ *  Internal stubs: 0x80197A64-0x80198F4C (2 functions)
+ * ========================================================================= */
+
+/* 0x80197A64 | 0x108 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80197A64(void) {
+    /* TODO: match -- 0x108 bytes at 0x80197A64 */
+}
+#pragma pop
+
+/* 0x80197B6C | 0x104 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80197B6C(void) {
+    /* TODO: match -- 0x104 bytes at 0x80197B6C */
+}
+#pragma pop

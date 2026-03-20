@@ -489,3 +489,101 @@ void hsdForgetClassLibrary(const char* library_name)
 
 /* Address: 0x80193A8C | Size: 0x8 | Pattern: return_constant */
 u32 fn_80193A8C(void) { return 0; }
+
+/* =========================================================================
+ *  Internal stubs: 0x80193748-0x80193C24 (11 functions)
+ * ========================================================================= */
+
+/* 0x80193748 | 0x40 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193748(void) {
+    /* TODO: match -- 0x40 bytes at 0x80193748 */
+}
+#pragma pop
+
+/* 0x80193788 | 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193788(void) {
+    /* TODO: match -- 0xA0 bytes at 0x80193788 */
+}
+#pragma pop
+
+/* 0x80193828 | 0xD4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193828(void) {
+    /* TODO: match -- 0xD4 bytes at 0x80193828 */
+}
+#pragma pop
+
+/* 0x801938FC | 0x120 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801938FC(void) {
+    /* TODO: match -- 0x120 bytes at 0x801938FC */
+}
+#pragma pop
+
+/* 0x80193A1C | 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193A1C(void) {
+    /* TODO: match -- 0x3C bytes at 0x80193A1C */
+}
+#pragma pop
+
+/* 0x80193A58 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193A58(void) {
+    /* TODO: match -- 0x30 bytes at 0x80193A58 */
+}
+#pragma pop
+
+/* 0x80193A88 | 0x4 */
+void fn_80193A88(void) {
+}
+
+/* 0x80193A94 | 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193A94(void) {
+    /* TODO: match -- 0x5C bytes at 0x80193A94 */
+}
+#pragma pop
+
+/* 0x80193AF0 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193AF0(void) {
+    /* TODO: match -- 0x20 bytes at 0x80193AF0 */
+}
+#pragma pop
+
+/* 0x80193B10 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193B10(void) {
+    /* TODO: match -- 0x20 bytes at 0x80193B10 */
+}
+#pragma pop
+
+/* 0x80193B30 | 0xF4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80193B30(void) {
+    /* TODO: match -- 0xF4 bytes at 0x80193B30 */
+}
+#pragma pop

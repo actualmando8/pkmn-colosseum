@@ -140,3 +140,177 @@ static void FogAdjInfoInit(void)
                      sizeof(HSD_FogAdjInfo), sizeof(HSD_FogAdj));
     HSD_CLASS_INFO(&hsdFogAdj)->release = FogAdjRelease;
 }
+
+/* =========================================================================
+ *  Internal stubs: 0x8019B490-0x8019C3C4 (20 functions)
+ * ========================================================================= */
+
+/* 0x8019B490 | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B490(void) {
+    /* TODO: match -- 0x98 bytes at 0x8019B490 */
+}
+#pragma pop
+
+/* 0x8019B528 | 0xC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B528(void) {
+    /* TODO: match -- 0xC0 bytes at 0x8019B528 */
+}
+#pragma pop
+
+/* 0x8019B5E8 | 0x168 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B5E8(void) {
+    /* TODO: match -- 0x168 bytes at 0x8019B5E8 */
+}
+#pragma pop
+
+/* 0x8019B750 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B750(void) {
+    /* TODO: match -- 0x34 bytes at 0x8019B750 */
+}
+#pragma pop
+
+/* 0x8019B784 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B784(void) {
+    /* TODO: match -- 0x30 bytes at 0x8019B784 */
+}
+#pragma pop
+
+/* 0x8019B7B4 | 0xC */
+void fn_8019B7B4(void) {
+}
+
+/* 0x8019B7C0 | 0x48 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B7C0(void) {
+    /* TODO: match -- 0x48 bytes at 0x8019B7C0 */
+}
+#pragma pop
+
+/* 0x8019B808 | 0x6C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B808(void) {
+    /* TODO: match -- 0x6C bytes at 0x8019B808 */
+}
+#pragma pop
+
+/* 0x8019B874 | 0xD4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B874(void) {
+    /* TODO: match -- 0xD4 bytes at 0x8019B874 */
+}
+#pragma pop
+
+/* 0x8019B948 | 0x230 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019B948(void) {
+    /* TODO: match -- 0x230 bytes at 0x8019B948 */
+}
+#pragma pop
+
+/* 0x8019BB78 | 0x1A0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019BB78(void) {
+    /* TODO: match -- 0x1A0 bytes at 0x8019BB78 */
+}
+#pragma pop
+
+/* 0x8019BD18 | 0x2D0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019BD18(void) {
+    /* TODO: match -- 0x2D0 bytes at 0x8019BD18 */
+}
+#pragma pop
+
+/* 0x8019BFE8 | 0x110 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019BFE8(void) {
+    /* TODO: match -- 0x110 bytes at 0x8019BFE8 */
+}
+#pragma pop
+
+/* 0x8019C0F8 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C0F8(void) {
+    /* TODO: match -- 0x30 bytes at 0x8019C0F8 */
+}
+#pragma pop
+
+/* 0x8019C128 | 0x88 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C128(void) {
+    /* TODO: match -- 0x88 bytes at 0x8019C128 */
+}
+#pragma pop
+
+/* 0x8019C1B0 | 0xB4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C1B0(void) {
+    /* TODO: match -- 0xB4 bytes at 0x8019C1B0 */
+}
+#pragma pop
+
+/* 0x8019C264 | 0xF4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C264(void) {
+    /* TODO: match -- 0xF4 bytes at 0x8019C264 */
+}
+#pragma pop
+
+/* 0x8019C358 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C358(void) {
+    /* TODO: match -- 0x30 bytes at 0x8019C358 */
+}
+#pragma pop
+
+/* 0x8019C388 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C388(void) {
+    /* TODO: match -- 0x30 bytes at 0x8019C388 */
+}
+#pragma pop
+
+/* 0x8019C3B8 | 0xC */
+void fn_8019C3B8(void) {
+}

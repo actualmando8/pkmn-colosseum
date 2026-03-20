@@ -55,3 +55,92 @@ extern u32 lbl_8047B294;
 u32 fn_8019C7B0(void) {
     return lbl_8047B294;
 }
+
+/* =========================================================================
+ *  Internal stubs: 0x8019C690-0x8019CB70 (10 functions)
+ * ========================================================================= */
+
+/* 0x8019C690 | 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C690(void) {
+    /* TODO: match -- 0x5C bytes at 0x8019C690 */
+}
+#pragma pop
+
+/* 0x8019C6EC | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C6EC(void) {
+    /* TODO: match -- 0x10 bytes at 0x8019C6EC */
+}
+#pragma pop
+
+/* 0x8019C6FC | 0xC */
+void fn_8019C6FC(void) {
+}
+
+/* 0x8019C708 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C708(void) {
+    /* TODO: match -- 0xA8 bytes at 0x8019C708 */
+}
+#pragma pop
+
+/* 0x8019C7B8 | 0x28 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C7B8(void) {
+    /* TODO: match -- 0x28 bytes at 0x8019C7B8 */
+}
+#pragma pop
+
+/* 0x8019C7E0 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C7E0(void) {
+    /* TODO: match -- 0x74 bytes at 0x8019C7E0 */
+}
+#pragma pop
+
+/* 0x8019C854 | 0x48 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C854(void) {
+    /* TODO: match -- 0x48 bytes at 0x8019C854 */
+}
+#pragma pop
+
+/* 0x8019C89C | 0x58 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C89C(void) {
+    /* TODO: match -- 0x58 bytes at 0x8019C89C */
+}
+#pragma pop
+
+/* 0x8019C8F4 | 0x84 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C8F4(void) {
+    /* TODO: match -- 0x84 bytes at 0x8019C8F4 */
+}
+#pragma pop
+
+/* 0x8019C978 | 0x1F8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8019C978(void) {
+    /* TODO: match -- 0x1F8 bytes at 0x8019C978 */
+}
+#pragma pop
