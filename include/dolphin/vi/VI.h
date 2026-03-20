@@ -12,5 +12,6 @@
 #define VI_EUR60  5
 
 u32 VIGetTvFormat(void);
+u32 VIGetCurrentLine(void);
 
 #endif /* DOLPHIN_VI_VI_H */

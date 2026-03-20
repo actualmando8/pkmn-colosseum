@@ -10,6 +10,7 @@ typedef struct OSResetFunctionInfo {
     OSResetCallback func;
     u32 priority;
     struct OSResetFunctionInfo* next;
+    struct OSResetFunctionInfo* prev;
 } OSResetFunctionInfo;
 
 void OSRegisterResetFunction(OSResetFunctionInfo* info);

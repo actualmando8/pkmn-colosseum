@@ -595,6 +595,35 @@ def try_match_patterns(fn):
                                                   "nullcheck_addis_getter", code, 'u32')
 
     # ========================================================================
+    # Pattern: Null-check addis getter, bne variant (7 instrs, 0x1C bytes)
+    # cmplwi r3,0; bne .L; li r3,0; blr; .L: addis r3, r3, IMM; load r3, OFF(r3); blr
+    # ========================================================================
+    if n == 7 and fn.size == 0x1C:
+        if (instrs[0][1] == 'cmplwi' and
+            'r3' in instrs[0][2] and '0' in instrs[0][2]):
+            if (instrs[1][1] == 'bne' and instrs[2][1] == 'li' and
+                instrs[3][1] == 'blr' and instrs[4][1] == 'addis'):
+                m_li = re.match(r'r3,\s*0x0', instrs[2][2].replace(' ', ''))
+                if m_li:
+                    m = re.match(r'r3,\s*r3,\s*(0x[0-9a-fA-F]+|\d+)', instrs[4][2])
+                    if m:
+                        addis_val = int(m.group(1), 16) if m.group(1).startswith('0x') else int(m.group(1))
+                        mnem = instrs[5][1]
+                        if is_load(mnem) and not is_float_load(mnem):
+                            parsed = parse_load_store_offset(instrs[5][2])
+                            if parsed and parsed[0] == 3 and parsed[2] == 3:
+                                hi = addis_val << 16
+                                lo = parsed[1]
+                                actual_offset = hi + lo
+                                ctype = load_type(mnem)
+                                code = (f"u32 {fn.name}(u8* ptr) {{\n"
+                                        f"    if (ptr == NULL) {{ return 0; }}\n"
+                                        f"    return *({ctype}*)((u8*)ptr + 0x{actual_offset:X});\n"
+                                        f"}}")
+                                return MatchedFunction(fn.name, fn.addr, fn.size,
+                                                      "nullcheck_addis_getter_bne", code, 'u32')
+
+    # ========================================================================
     # Pattern: Null-check addis setter (5 instrs)
     # cmplwi r3,0; beqlr; addis r3, r3, IMM; store r4, OFF(r3); blr
     # ========================================================================
@@ -660,9 +689,26 @@ def try_match_patterns(fn):
 def find_existing_functions(src_dir):
     """Scan all .c files to find which fn_XXXXXXXX names are already defined."""
     existing = set()
-    fn_re = re.compile(r'\b(fn_[0-9A-Fa-f]{8})\s*\(')
-    comment_fn_re = re.compile(r'/\*.*\b(fn_[0-9A-Fa-f]{8})\b.*\*/')
-    address_comment_re = re.compile(r'/\*\s*Address:\s*0x([0-9A-Fa-f]+)\s*\*/')
+
+    # Match function definitions: TYPE fn_XXXXXXXX(
+    # The key distinction is that a definition has a C type keyword before the name
+    type_keywords = r'(?:void|u8|u16|u32|s8|s16|s32|f32|f64|BOOL|int|unsigned|signed|char|short|long|float|double)'
+    fn_def_re = re.compile(
+        rf'^\s*(?:/\*.*?\*/\s*)?'           # optional comment
+        rf'{type_keywords}'                    # return type
+        rf'(?:\s*\*)*\s+'                     # optional pointer, whitespace
+        rf'(fn_[0-9A-Fa-f]{{8}})\s*\(',       # function name
+        re.MULTILINE
+    )
+    # Also match named functions (not fn_ prefixed) that have address comments
+    named_def_re = re.compile(
+        rf'^\s*{type_keywords}'
+        rf'(?:\s*\*)*\s+'
+        rf'(\w+)\s*\([^)]*\)\s*\{{',
+        re.MULTILINE
+    )
+    # Also catch address comments like /* Address: 0xXXXXXXXX */
+    addr_comment_re = re.compile(r'/\*\s*Address:\s*0x([0-9A-Fa-f]+)\s*\*/')
 
     for c_file in src_dir.rglob("*.c"):
         try:
@@ -670,36 +716,25 @@ def find_existing_functions(src_dir):
         except Exception:
             continue
 
-        # Find function definitions (not just calls/declarations)
-        for line in content.split('\n'):
-            stripped = line.strip()
-            # Skip pure comments and stub comments
-            if stripped.startswith('/*') and stripped.endswith('*/'):
-                # This is a comment-only line; skip unless it's an address marker
-                continue
-            if stripped.startswith('//'):
-                continue
-            if stripped.startswith('/* TODO'):
-                continue
+        # Find fn_ function definitions
+        for m in fn_def_re.finditer(content):
+            existing.add(m.group(1))
 
-            # Look for function definitions like:
-            # TYPE fn_XXXXXXXX(...) {
-            # void fn_XXXXXXXX(...)
-            for m in fn_re.finditer(line):
-                fn_name = m.group(1)
-                # Make sure this is a definition, not just a call
-                # A definition typically has the fn name at the start or after a type
-                before = line[:m.start()].strip()
-                # If it starts with bl, it's a call in asm
-                if 'bl ' in before or before.startswith('extern'):
-                    continue
-                existing.add(fn_name)
+        # Find named function definitions (they may replace fn_ names)
+        for m in named_def_re.finditer(content):
+            existing.add(m.group(1))
+
+        # Find address comments that indicate a function was already decompiled
+        for m in addr_comment_re.finditer(content):
+            addr = int(m.group(1), 16)
+            fn_name = f"fn_{addr:08X}"
+            existing.add(fn_name)
 
     return existing
 
 
 def find_existing_functions_in_file(filepath):
-    """Find fn_ names already defined or mentioned as address comments in a specific file."""
+    """Find fn_ names already defined, declared, or mentioned as address comments in a specific file."""
     existing = set()
     try:
         content = Path(filepath).read_text(encoding='utf-8', errors='replace')
@@ -709,6 +744,12 @@ def find_existing_functions_in_file(filepath):
     # Look for function definitions
     fn_def_re = re.compile(r'(?:^|\n)\s*(?:void|u8|u16|u32|s8|s16|s32|f32|f64|u8\*|void\*|BOOL|int|unsigned|signed)\s+\*?\s*(fn_[0-9A-Fa-f]{8})\s*\(')
     for m in fn_def_re.finditer(content):
+        existing.add(m.group(1))
+
+    # Also look for extern declarations (these indicate the function is already known
+    # with a specific signature and we shouldn't generate a conflicting definition)
+    extern_re = re.compile(r'extern\s+\S+\s+(fn_[0-9A-Fa-f]{8})\s*\(')
+    for m in extern_re.finditer(content):
         existing.add(m.group(1))
 
     # Also look for address comments (/* Address: 0xXXXXXXXX */) with matching fn
