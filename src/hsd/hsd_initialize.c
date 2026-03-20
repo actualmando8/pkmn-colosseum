@@ -1,0 +1,44 @@
+/**
+ * @file hsd_initialize.c
+ * @brief HSD initialization and render pass management.
+ *
+ * Colosseum address: 0x8019C690 (HSD_InitAssert1)
+ * The initialize module sets up the HSD subsystem: GX FIFO,
+ * framebuffers, heaps, and pixel format validation.
+ *
+ * Adapted from doldecomp/melee src/sysdolphin/baselib/initialize.c
+ */
+
+#include "hsd/hsd_initialize.h"
+#include "hsd/hsd_debug.h"
+
+static HSD_RenderPass current_render_pass = HSD_RP_SCREEN;
+static s32 current_heap = -1;
+
+/* ========================================================================= */
+/*  Heap management                                                          */
+/* ========================================================================= */
+
+s32 HSD_GetHeap(void)
+{
+    return current_heap;
+}
+
+void HSD_SetHeap(s32 handle)
+{
+    current_heap = handle;
+}
+
+/* ========================================================================= */
+/*  Render pass                                                              */
+/* ========================================================================= */
+
+HSD_RenderPass HSD_GetCurrentRenderPass(void)
+{
+    return current_render_pass;
+}
+
+void HSD_StartRender(HSD_RenderPass pass)
+{
+    current_render_pass = pass;
+}

@@ -1,0 +1,5 @@
+# Build system
+ninja>=1.11
+
+# Code formatting (optional)
+clang-format>=14.0

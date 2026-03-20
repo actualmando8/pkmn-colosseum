@@ -1,0 +1,55 @@
+# IDE folders
+.idea/
+.vs/
+
+# Caches
+__pycache__/
+.mypy_cache/
+.cache/
+
+# Original game files (user must supply their own)
+orig/*/*
+!orig/*/.gitkeep
+*.dol
+*.rel
+*.elf
+*.o
+*.map
+*.MAP
+*.iso
+*.gcm
+*.ciso
+*.rvz
+
+# Build artifacts
+build/
+.ninja_*
+build.ninja
+
+# decompctx output
+ctx.*
+*.ctx
+
+# Generated configs
+objdiff.json
+compile_commands.json
+
+# Toolchain binaries
+tools/mwcc_compiler/
+tools/dtk
+tools/dtk.exe
+tools/objdiff-cli.exe
+
+# Dolphin (extracted locally, not part of project)
+dolphin-2603a-x64/
+
+# Claude memory (per-user)
+.claude/
+
+# CLAUDE.md files in subdirectories
+**/CLAUDE.md
+
+# Miscellaneous
+/*.txt
+!requirements.txt
+*.exe

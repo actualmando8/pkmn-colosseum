@@ -1,0 +1,16 @@
+# Formatting style for decompiled C code
+# Matches common GCN decomp conventions (Melee, Sunshine, etc.)
+BasedOnStyle: Google
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 100
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Left
+PointerAlignment: Left
+SpaceAfterCStyleCast: false
+IncludeBlocks: Preserve
+SortIncludes: false

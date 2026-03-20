@@ -1,0 +1,23 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Source code
+*.c text
+*.cpp text
+*.h text
+*.py text
+*.yml text
+*.md text
+
+# Assembly (generated)
+*.s text
+
+# Binary files
+*.dol binary
+*.rel binary
+*.iso binary
+*.gcm binary
+*.rvz binary
+*.o binary
+*.elf binary
+*.exe binary

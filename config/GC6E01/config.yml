@@ -1,0 +1,29 @@
+# Pokémon Colosseum (NTSC-U) — GC6E01 Rev 0
+# Decompilation project configuration for decomp-toolkit (dtk)
+
+object_base: orig/GC6E01
+object: sys/main.dol
+hash: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+
+symbols: config/GC6E01/symbols.txt
+splits: config/GC6E01/splits.txt
+
+# Auto-detect objects and strings during initial split
+detect_objects: true
+detect_strings: true
+
+# Write disassembly for undecompiled functions
+write_asm: true
+
+# Fill gaps between objects with alignment symbols
+fill_gaps: true
+
+# Export all symbols
+export_all: true
+
+# CodeWarrior compiler settings
+# Exact version TBD — common GCN versions: 8, 10, 11, 14
+mw_comment_version: 8
+
+# Quick analysis mode (faster, skip deep function boundary analysis)
+quick_analysis: false

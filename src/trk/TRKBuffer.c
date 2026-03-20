@@ -1,0 +1,51 @@
+#include "dolphin/types.h"
+
+/*
+ * TRKBuffer.c - TRK message buffer management.
+ *
+ * Manages a pool of 3 message buffers used for debugger communication.
+ * Each buffer is 0x890 bytes (header + data).
+ */
+
+extern void fn_800C0CC0(void* mutex);
+extern void fn_800C0CC8(void* mutex);
+extern void fn_800C0CD0(void* mutex);
+
+/* Buffer pool at lbl_803FCE08, 3 buffers of 0x890 bytes each */
+extern u8 lbl_803FCE08[];
+
+/*
+ * TRKGetBuffer - Return a pointer to the buffer at the given index.
+ * Returns NULL if index is out of range [0..2].
+ */
+void* TRKGetBuffer(s32 index) {
+    void* result = NULL;
+
+    if (index >= 0 && index < 3) {
+        result = (void*)(lbl_803FCE08 + index * 0x890);
+    }
+
+    return result;
+}
+
+/*
+ * TRKInitializeMessageBuffers - Initialize all 3 message buffers.
+ * Creates mutexes and clears the usage flags for each buffer.
+ */
+s32 TRKInitializeMessageBuffers(void) {
+    u8* buf = lbl_803FCE08;
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        fn_800C0CD0((void*)buf); /* init mutex */
+        fn_800C0CC8((void*)buf); /* acquire mutex */
+
+        ((s32*)buf)[1] = 0; /* clear inUse flag at offset 0x04 */
+
+        fn_800C0CC0((void*)buf); /* release mutex */
+
+        buf += 0x890;
+    }
+
+    return 0;
+}
