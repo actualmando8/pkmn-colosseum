@@ -68,6 +68,19 @@ MODULE_FLAGS = {
     # Add overrides here as you discover them during matching.
 }
 
+# Per-module compiler version overrides.
+# The MetroWerks CRT library was compiled with a newer compiler (1.3)
+# than the game code (1.2.5n). Keys are relative source paths.
+MODULE_COMPILER_VERSION = {
+    "crt/global_destructor_chain.c": "1.3",
+    "crt/exit.c": "1.3",
+    "crt/printf.c": "1.3",
+    "crt/stdio.c": "1.3",
+    "crt/mem.c": "1.3",
+    "crt/string.c": "1.3",
+    "crt/__va_arg.c": "1.3",
+}
+
 # Default compiler version (GC subdir name).
 # CW comment version 8 -> one of: 1.0, 1.1, 1.1p1, 1.2.5, 1.2.5n
 # 1.2.5n is the most common for early GCN titles.
@@ -182,6 +195,15 @@ def compile_source(src_path: Path, compiler_version: str = None,
 
     out_obj = source_to_base_obj(src_path)
     out_obj.parent.mkdir(parents=True, exist_ok=True)
+
+    # Check per-module compiler version override if not explicitly set
+    if compiler_version is None:
+        try:
+            rel = str(src_path.relative_to(SRC_DIR)).replace("\\", "/")
+        except ValueError:
+            rel = src_path.name
+        if rel in MODULE_COMPILER_VERSION:
+            compiler_version = MODULE_COMPILER_VERSION[rel]
 
     compiler = get_compiler(compiler_version)
     cflags = get_cflags(src_path)

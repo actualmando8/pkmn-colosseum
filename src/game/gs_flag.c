@@ -2,7 +2,7 @@
  * @file gs_flag.c
  * @brief GSflag -- Game Flag System implementation.
  *
- * Decompiled from address range 0x8018FE30 - 0x80190E34 (9 functions).
+ * Decompiled from Address range: 0x8018FE30 - 0x80190E34 (9 functions).
  *
  * The flag system is used throughout Colosseum for tracking game state:
  *   - Story progression (which cutscenes have played, boss defeats)
