@@ -503,22 +503,18 @@ void fn_801946F0(void) {
 #pragma pop
 
 /* 0x80194788 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80194788(void) {
-    /* TODO: match -- 0x20 bytes at 0x80194788 */
+void fn_80194788(HSD_CObj* cobj, f32 aspect) {
+    if (cobj == NULL) { return; }
+    if (cobj->projection_type != PROJ_PERSPECTIVE) { return; }
+    cobj->projection_param.perspective.aspect = aspect;
 }
-#pragma pop
 
 /* 0x801947A8 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801947A8(void) {
-    /* TODO: match -- 0x20 bytes at 0x801947A8 */
+void fn_801947A8(HSD_CObj* cobj, f32 fov) {
+    if (cobj == NULL) { return; }
+    if (cobj->projection_type != PROJ_PERSPECTIVE) { return; }
+    cobj->projection_param.perspective.fov = fov;
 }
-#pragma pop
 
 /* 0x801947C8 | 0x464 */
 #pragma push
@@ -539,13 +535,11 @@ void fn_80194C2C(void) {
 #pragma pop
 
 /* 0x80194CC4 | 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80194CC4(void) {
-    /* TODO: match -- 0x30 bytes at 0x80194CC4 */
+extern void fn_80195F0C(HSD_CObj*);
+f32* fn_80194CC4(HSD_CObj* cobj) {
+    fn_80195F0C(cobj);
+    return (f32*)cobj->view_mtx;
 }
-#pragma pop
 
 /* 0x6C | fn_80194CF4 | generic */
 void fn_80194CF4(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
@@ -554,13 +548,11 @@ void fn_80194CF4(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 }
 
 /* 0x80194D60 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80194D60(void) {
-    /* TODO: match -- 0x34 bytes at 0x80194D60 */
+extern void fn_800A2D64(void*, void*);
+void fn_80194D60(HSD_CObj* cobj, void* b) {
+    f32* mtx = fn_80194CC4(cobj);
+    fn_800A2D64(mtx, b);
 }
-#pragma pop
 
 /* 0x80194D94 | 0x10 */
 #pragma push
@@ -643,13 +635,12 @@ void fn_801959DC(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80195A48 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+extern void fn_801975FC(void);
+extern void fn_801974A8(void);
 void fn_80195A48(void) {
-    /* TODO: match -- 0x24 bytes at 0x80195A48 */
+    fn_801975FC();
+    fn_801974A8();
 }
-#pragma pop
 
 /* 0x80195A6C | 0x4A0 */
 #pragma push
@@ -729,13 +720,14 @@ void fn_80196BB8(void) {
 #pragma pop
 
 /* 0x80196C3C | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80196C3C(void) {
-    /* TODO: match -- 0x18 bytes at 0x80196C3C */
+extern void fn_80196C54(void);
+extern u32 lbl_80478C58;
+void fn_80196C3C(void* callback) {
+    if (callback == NULL) {
+        callback = (void*)fn_80196C54;
+    }
+    lbl_80478C58 = (u32)callback;
 }
-#pragma pop
 
 /* 0x80196C54 | 0x8C */
 #pragma push
@@ -770,10 +762,10 @@ void fn_80196EF8(void) {
 #pragma pop
 
 /* 0x8019731C | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8019731C(void) {
-    /* TODO: match -- 0x20 bytes at 0x8019731C */
+extern u8 lbl_80478C60;
+void fn_8019731C(u8 a, u8 b, u8 c, u8 d) {
+    (&lbl_80478C60)[0] = a;
+    (&lbl_80478C60)[1] = b;
+    (&lbl_80478C60)[2] = c;
+    (&lbl_80478C60)[3] = d;
 }
-#pragma pop

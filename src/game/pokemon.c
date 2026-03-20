@@ -866,9 +866,11 @@ void fn_801F150C(void) {
     /* TODO: decompile (0x48 bytes) */
 }
 
-/* 0x801F1554 | size: 0x34 | small */
-void fn_801F1554(void) {
-    /* TODO: decompile (0x34 bytes) */
+/* 0x801F1554 | size: 0x34 */
+extern u32 fn_801254B4(void* context, u32 slot, u16 tableId, u32 flags, u32 value);
+s32 fn_801F1554(void* context) {
+    fn_801254B4(context, 0, 0x112, 0, 1);
+    return 1;
 }
 
 /* 0x801F1588 | size: 0x178 | medium */

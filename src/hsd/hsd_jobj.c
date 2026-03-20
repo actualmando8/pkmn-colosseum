@@ -594,22 +594,19 @@ void fn_8019FE8C(void) {
 #pragma pop
 
 /* 0x8019FF30 | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8019FF30(void) {
-    /* TODO: match -- 0x18 bytes at 0x8019FF30 */
+u32 fn_8019FF30(u8* ptr) {
+    if (ptr != NULL) {
+        return *(u32*)(ptr + 0x14);
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x8019FF48 | 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8019FF48(void) {
-    /* TODO: match -- 0x2C bytes at 0x8019FF48 */
+u32 fn_8019FF48(u8* ptr) {
+    if (ptr == NULL) { return 0; }
+    if ((*(u32*)(ptr + 0x14) & 0x4020) == 0) { return 0; }
+    return *(u32*)(ptr + 0x18);
 }
-#pragma pop
 
 /* 0x8019FF74 | 0x1E8 */
 #pragma push

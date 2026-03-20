@@ -264,31 +264,27 @@ void fn_801A6D5C(void) {
 }
 
 /* 0x801A6DA0 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A6DA0(void) {
-    /* TODO: match -- 0x24 bytes at 0x801A6DA0 */
+void fn_801A6DA0(u32* head, u32* node) {
+    if (head == NULL) { return; }
+    if (node == NULL) { return; }
+    node[2] = head[2];
+    head[2] = (u32)node;
 }
-#pragma pop
 
 /* 0x801A6DDC | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A6DDC(void) {
-    /* TODO: match -- 0x24 bytes at 0x801A6DDC */
+void fn_801A6DDC(u8* ptr, f32 val) {
+    u8* child;
+    if (ptr == NULL) { return; }
+    child = *(u8**)(ptr + 0xC);
+    if (child == NULL) { return; }
+    *(f32*)(child + 0xC) = val;
 }
-#pragma pop
 
 /* 0x801A6E00 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A6E00(void) {
-    /* TODO: match -- 0x24 bytes at 0x801A6E00 */
+extern void* fn_801BBFE4(u32);
+void* fn_801A6E00(void) {
+    return fn_801BBFE4(0);
 }
-#pragma pop
 
 /* 0x801A6E24 | 0x154 */
 #pragma push

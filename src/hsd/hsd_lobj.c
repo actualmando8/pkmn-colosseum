@@ -464,22 +464,16 @@ void fn_801A67BC(void) {
 #pragma pop
 
 /* 0x801A68F8 | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A68F8(void) {
-    /* TODO: match -- 0x18 bytes at 0x801A68F8 */
+void fn_801A68F8(u8* ptr, u16 mask) {
+    if (ptr == NULL) { return; }
+    *(u16*)(ptr + 0x8) &= ~mask;
 }
-#pragma pop
 
 /* 0x801A6910 | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801A6910(void) {
-    /* TODO: match -- 0x18 bytes at 0x801A6910 */
+void fn_801A6910(u8* ptr, u16 mask) {
+    if (ptr == NULL) { return; }
+    *(u16*)(ptr + 0x8) |= mask;
 }
-#pragma pop
 
 /* 0x801A6928 | 0x38 */
 #pragma push
