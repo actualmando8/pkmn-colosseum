@@ -422,3 +422,112 @@ u16 fn_801EF634(void) {
 u8 fn_801EF63C(void) {
     return lbl_8047B5DA;
 }
+
+/* #######################################################################
+ * COVERAGE STUBS: battle core / fight flow (0x801EF02C - 0x801F000C)
+ * 20 functions remaining for full coverage of battle_main.c TU.
+ * ####################################################################### */
+
+#pragma push
+#pragma force_active on
+
+/* 0x801EF02C | size: 0x54 | small */
+void fn_801EF02C(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801EF080 | size: 0x54 | small */
+void fn_801EF080(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801EF0D4 | size: 0x54 | small */
+void fn_801EF0D4(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801EF128 | size: 0xBC | medium */
+#pragma peephole off
+void fn_801EF128(void) {
+    /* TODO: decompile (0xBC bytes, ~47 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801EF1E4 | size: 0x30 | small */
+void fn_801EF1E4(void) {
+    /* TODO: decompile (0x30 bytes) */
+}
+
+/* 0x801EF214 | size: 0x60 | small */
+void fn_801EF214(void) {
+    /* TODO: decompile (0x60 bytes) */
+}
+
+/* 0x801EF274 | size: 0x60 | small */
+void fn_801EF274(void) {
+    /* TODO: decompile (0x60 bytes) */
+}
+
+/* 0x801EF2D4 | size: 0xA0 | medium */
+#pragma peephole off
+void fn_801EF2D4(void) {
+    /* TODO: decompile (0xA0 bytes, ~40 instructions) */
+}
+#pragma peephole reset
+
+/* fn_801EF374 (battle_FightEnd) - already decompiled above */
+/* fn_801EF488 (battle_FightCleanup) - already decompiled above */
+/* fn_801EF4B0 (battle_FightStart) - already decompiled above */
+/* fn_801EF5C0 (battle_FightReset) - already decompiled above */
+
+/* 0x801EF644 | size: 0xB8 | medium */
+#pragma peephole off
+void fn_801EF644(void) {
+    /* TODO: decompile (0xB8 bytes, ~46 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801EF6FC | size: 0x5C | small */
+void fn_801EF6FC(void) {
+    /* TODO: decompile (0x5C bytes) */
+}
+
+/* 0x801EF758 | size: 0x5C | small */
+void fn_801EF758(void) {
+    /* TODO: decompile (0x5C bytes) */
+}
+
+/* 0x801EF7B4 | size: 0x10 | tiny */
+void fn_801EF7B4(void) { }
+
+/* 0x801EF7C4 | size: 0x130 | medium */
+#pragma peephole off
+void fn_801EF7C4(void) {
+    /* TODO: decompile (0x130 bytes, ~76 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801EF95C | size: 0xAC | medium */
+#pragma peephole off
+void fn_801EF95C(void) {
+    /* TODO: decompile (0xAC bytes, ~43 instructions) */
+}
+#pragma peephole reset
+
+/* fn_801EFA08 (battle_MainLoop) - documented above, needs full decompilation */
+#pragma peephole off
+void fn_801EFA08(void) {
+    /* battle_MainLoop - main battle thread loop (0x5BC bytes, ~367 instructions)
+     * See detailed documentation at top of file.
+     * Drives the entire battle forward: BGM, subsystem init, camera,
+     * rendering passes, polling loop for status flags. */
+}
+#pragma peephole reset
+
+/* 0x801EFFC4 | size: 0x48 | small */
+void fn_801EFFC4(void) {
+    /* TODO: decompile (0x48 bytes) */
+}
+
+
+#pragma pop

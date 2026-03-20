@@ -737,3 +737,732 @@ u32 fn_801F6A98(u8* ptr) {
     if (ptr == NULL) { return 0; }
     return *(u32*)((u8*)ptr + 0xA474);
 }
+
+/* #######################################################################
+ * COVERAGE STUBS: Pokemon data management (0x801F000C - 0x801F7F80)
+ * 119 functions remaining for full coverage of pokemon.c TU.
+ *
+ * Key functions in this range:
+ *   fn_801F54A4 (PokemonGet)  - 510 calls, 0xD18 bytes, field dispatch
+ *   fn_801F4C14 (PokemonSet)  - 223 calls, 0x890 bytes, field write
+ *   fn_801F02AC (PokemonSlotLookup) - 89 calls, 0x46C bytes
+ *   fn_801F025C (PokemonSlotLookupDefault) - 438 calls, 0x50 bytes
+ *   fn_801F0B00 (PartyInit)   - 0x404 bytes
+ *   fn_801F3CE8 (PartyCompare) - 0x538 bytes
+ *   fn_801F2B5C (PartyDataCopy) - 0x3E0 bytes
+ * ####################################################################### */
+
+#pragma push
+#pragma force_active on
+
+/* 0x801F000C | size: 0x4C | small */
+void fn_801F000C(void) {
+    /* TODO: decompile (0x4C bytes) */
+}
+
+/* 0x801F0058 | size: 0x78 | small */
+void fn_801F0058(void) {
+    /* TODO: decompile (0x78 bytes) */
+}
+
+/* 0x801F00D0 | size: 0x64 | small */
+void fn_801F00D0(void) {
+    /* TODO: decompile (0x64 bytes) */
+}
+
+/* 0x801F0134 | size: 0xD0 | medium */
+#pragma peephole off
+void fn_801F0134(void) {
+    /* TODO: decompile (0xD0 bytes, ~52 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F0234 | size: 0x28 | small */
+void fn_801F0234(void) {
+    /* TODO: decompile (0x28 bytes) */
+}
+
+/* 0x801F025C | size: 0x50 | small */
+void fn_801F025C(void) {
+    /* TODO: decompile (0x50 bytes) */
+}
+
+/* 0x801F02AC | size: 0x46C | large */
+#pragma peephole off
+void fn_801F02AC(void) {
+    /* TODO: decompile (0x46C bytes, ~283 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F0718 | size: 0x180 | medium */
+#pragma peephole off
+void fn_801F0718(void) {
+    /* TODO: decompile (0x180 bytes, ~96 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F0898 | size: 0x90 | medium */
+#pragma peephole off
+void fn_801F0898(void) {
+    /* TODO: decompile (0x90 bytes, ~36 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F0928 | size: 0xA8 | medium */
+#pragma peephole off
+void fn_801F0928(void) {
+    /* TODO: decompile (0xA8 bytes, ~42 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F0F04 | size: 0x188 | medium */
+#pragma peephole off
+void fn_801F0F04(void) {
+    /* TODO: decompile (0x188 bytes, ~98 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1170 | size: 0x5C | small */
+void fn_801F1170(void) {
+    /* TODO: decompile (0x5C bytes) */
+}
+
+/* 0x801F11CC | size: 0x294 | large */
+#pragma peephole off
+void fn_801F11CC(void) {
+    /* TODO: decompile (0x294 bytes, ~165 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1460 | size: 0xAC | medium */
+#pragma peephole off
+void fn_801F1460(void) {
+    /* TODO: decompile (0xAC bytes, ~43 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F150C | size: 0x48 | small */
+void fn_801F150C(void) {
+    /* TODO: decompile (0x48 bytes) */
+}
+
+/* 0x801F1554 | size: 0x34 | small */
+void fn_801F1554(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F1588 | size: 0x178 | medium */
+#pragma peephole off
+void fn_801F1588(void) {
+    /* TODO: decompile (0x178 bytes, ~94 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1700 | size: 0x58 | small */
+void fn_801F1700(void) {
+    /* TODO: decompile (0x58 bytes) */
+}
+
+/* 0x801F17B0 | size: 0xD8 | medium */
+#pragma peephole off
+void fn_801F17B0(void) {
+    /* TODO: decompile (0xD8 bytes, ~54 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1888 | size: 0x54 | small */
+void fn_801F1888(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F18DC | size: 0x3C | small */
+void fn_801F18DC(void) {
+    /* TODO: decompile (0x3C bytes) */
+}
+
+/* 0x801F1918 | size: 0x74 | small */
+void fn_801F1918(void) {
+    /* TODO: decompile (0x74 bytes) */
+}
+
+/* 0x801F198C | size: 0x4 | trivial */
+s32 fn_801F198C(void) { return 0; }
+
+/* 0x801F1990 | size: 0xDC | medium */
+#pragma peephole off
+void fn_801F1990(void) {
+    /* TODO: decompile (0xDC bytes, ~55 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1A6C | size: 0xA8 | medium */
+#pragma peephole off
+void fn_801F1A6C(void) {
+    /* TODO: decompile (0xA8 bytes, ~42 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1B14 | size: 0x104 | medium */
+#pragma peephole off
+void fn_801F1B14(void) {
+    /* TODO: decompile (0x104 bytes, ~65 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1C18 | size: 0x80 | small */
+void fn_801F1C18(void) {
+    /* TODO: decompile (0x80 bytes) */
+}
+
+/* 0x801F1C98 | size: 0xC4 | medium */
+#pragma peephole off
+void fn_801F1C98(void) {
+    /* TODO: decompile (0xC4 bytes, ~49 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1D5C | size: 0x60 | small */
+void fn_801F1D5C(void) {
+    /* TODO: decompile (0x60 bytes) */
+}
+
+/* 0x801F1DBC | size: 0x174 | medium */
+#pragma peephole off
+void fn_801F1DBC(void) {
+    /* TODO: decompile (0x174 bytes, ~93 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F1F30 | size: 0x4C | small */
+void fn_801F1F30(void) {
+    /* TODO: decompile (0x4C bytes) */
+}
+
+/* 0x801F1F7C | size: 0xA4 | medium */
+#pragma peephole off
+void fn_801F1F7C(void) {
+    /* TODO: decompile (0xA4 bytes, ~41 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2020 | size: 0x1FC | medium */
+#pragma peephole off
+void fn_801F2020(void) {
+    /* TODO: decompile (0x1FC bytes, ~127 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F221C | size: 0xBC | medium */
+#pragma peephole off
+void fn_801F221C(void) {
+    /* TODO: decompile (0xBC bytes, ~47 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F22D8 | size: 0x78 | small */
+void fn_801F22D8(void) {
+    /* TODO: decompile (0x78 bytes) */
+}
+
+/* 0x801F2350 | size: 0xE4 | medium */
+#pragma peephole off
+void fn_801F2350(void) {
+    /* TODO: decompile (0xE4 bytes, ~57 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2434 | size: 0x164 | medium */
+#pragma peephole off
+void fn_801F2434(void) {
+    /* TODO: decompile (0x164 bytes, ~89 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2598 | size: 0xBC | medium */
+#pragma peephole off
+void fn_801F2598(void) {
+    /* TODO: decompile (0xBC bytes, ~47 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2654 | size: 0x54 | small */
+void fn_801F2654(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F26A8 | size: 0x12C | medium */
+#pragma peephole off
+void fn_801F26A8(void) {
+    /* TODO: decompile (0x12C bytes, ~75 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F27D4 | size: 0x30 | small */
+void fn_801F27D4(void) {
+    /* TODO: decompile (0x30 bytes) */
+}
+
+/* 0x801F2804 | size: 0x34 | small */
+void fn_801F2804(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F2838 | size: 0x54 | small */
+void fn_801F2838(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F288C | size: 0x54 | small */
+void fn_801F288C(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F28E0 | size: 0x54 | small */
+void fn_801F28E0(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F2934 | size: 0x54 | small */
+void fn_801F2934(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F2988 | size: 0x54 | small */
+void fn_801F2988(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F29DC | size: 0x54 | small */
+void fn_801F29DC(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F2A30 | size: 0x4C | small */
+void fn_801F2A30(void) {
+    /* TODO: decompile (0x4C bytes) */
+}
+
+/* 0x801F2A7C | size: 0xE0 | medium */
+#pragma peephole off
+void fn_801F2A7C(void) {
+    /* TODO: decompile (0xE0 bytes, ~56 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2B5C | size: 0x3E0 | large */
+#pragma peephole off
+void fn_801F2B5C(void) {
+    /* TODO: decompile (0x3E0 bytes, ~248 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F2F3C | size: 0x138 | medium */
+#pragma peephole off
+void fn_801F2F3C(void) {
+    /* TODO: decompile (0x138 bytes, ~78 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3074 | size: 0x104 | medium */
+#pragma peephole off
+void fn_801F3074(void) {
+    /* TODO: decompile (0x104 bytes, ~65 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3178 | size: 0x138 | medium */
+#pragma peephole off
+void fn_801F3178(void) {
+    /* TODO: decompile (0x138 bytes, ~78 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F32B0 | size: 0x3C | small */
+void fn_801F32B0(void) {
+    /* TODO: decompile (0x3C bytes) */
+}
+
+/* 0x801F32EC | size: 0xFC | medium */
+#pragma peephole off
+void fn_801F32EC(void) {
+    /* TODO: decompile (0xFC bytes, ~63 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F33E8 | size: 0x48 | small */
+void fn_801F33E8(void) {
+    /* TODO: decompile (0x48 bytes) */
+}
+
+/* 0x801F3430 | size: 0x6C | small */
+void fn_801F3430(void) {
+    /* TODO: decompile (0x6C bytes) */
+}
+
+/* 0x801F349C | size: 0x50 | small */
+void fn_801F349C(void) {
+    /* TODO: decompile (0x50 bytes) */
+}
+
+/* 0x801F34EC | size: 0x138 | medium */
+#pragma peephole off
+void fn_801F34EC(void) {
+    /* TODO: decompile (0x138 bytes, ~78 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3624 | size: 0x54 | small */
+void fn_801F3624(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F3678 | size: 0x138 | medium */
+#pragma peephole off
+void fn_801F3678(void) {
+    /* TODO: decompile (0x138 bytes, ~78 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F37B0 | size: 0x1D4 | medium */
+#pragma peephole off
+void fn_801F37B0(void) {
+    /* TODO: decompile (0x1D4 bytes, ~117 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3984 | size: 0x1A0 | medium */
+#pragma peephole off
+void fn_801F3984(void) {
+    /* TODO: decompile (0x1A0 bytes, ~104 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3B24 | size: 0x90 | medium */
+#pragma peephole off
+void fn_801F3B24(void) {
+    /* TODO: decompile (0x90 bytes, ~36 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3BB4 | size: 0x134 | medium */
+#pragma peephole off
+void fn_801F3BB4(void) {
+    /* TODO: decompile (0x134 bytes, ~77 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F3CE8 | size: 0x538 | large */
+#pragma peephole off
+void fn_801F3CE8(void) {
+    /* TODO: decompile (0x538 bytes, ~334 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4220 | size: 0x134 | medium */
+#pragma peephole off
+void fn_801F4220(void) {
+    /* TODO: decompile (0x134 bytes, ~77 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4354 | size: 0x10C | medium */
+#pragma peephole off
+void fn_801F4354(void) {
+    /* TODO: decompile (0x10C bytes, ~67 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4460 | size: 0xDC | medium */
+#pragma peephole off
+void fn_801F4460(void) {
+    /* TODO: decompile (0xDC bytes, ~55 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4718 | size: 0x9C | medium */
+#pragma peephole off
+void fn_801F4718(void) {
+    /* TODO: decompile (0x9C bytes, ~39 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F47B4 | size: 0x50 | small */
+void fn_801F47B4(void) {
+    /* TODO: decompile (0x50 bytes) */
+}
+
+/* 0x801F4804 | size: 0x5C | small */
+void fn_801F4804(void) {
+    /* TODO: decompile (0x5C bytes) */
+}
+
+/* 0x801F4860 | size: 0x260 | large */
+#pragma peephole off
+void fn_801F4860(void) {
+    /* TODO: decompile (0x260 bytes, ~152 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4AC0 | size: 0x154 | medium */
+#pragma peephole off
+void fn_801F4AC0(void) {
+    /* TODO: decompile (0x154 bytes, ~85 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F4C14 | size: 0x890 | massive */
+#pragma peephole off
+void fn_801F4C14(void) {
+    /* TODO: decompile (0x890 bytes, ~548 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F61EC | size: 0x220 | large */
+#pragma peephole off
+void fn_801F61EC(void) {
+    /* TODO: decompile (0x220 bytes, ~136 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F650C | size: 0x38 | small */
+void fn_801F650C(void) {
+    /* TODO: decompile (0x38 bytes) */
+}
+
+/* 0x801F6544 | size: 0x1C | tiny */
+void fn_801F6544(void) {
+    /* TODO: decompile (0x1C bytes) */
+}
+
+/* 0x801F6560 | size: 0x28 | small */
+void fn_801F6560(void) {
+    /* TODO: decompile (0x28 bytes) */
+}
+
+/* 0x801F6588 | size: 0x38 | small */
+void fn_801F6588(void) {
+    /* TODO: decompile (0x38 bytes) */
+}
+
+/* 0x801F6658 | size: 0x24 | small */
+void fn_801F6658(void) {
+    /* TODO: decompile (0x24 bytes) */
+}
+
+/* 0x801F66EC | size: 0x34 | small */
+void fn_801F66EC(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F6AB4 | size: 0x34 | small */
+void fn_801F6AB4(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F6B18 | size: 0x30 | small */
+void fn_801F6B18(void) {
+    /* TODO: decompile (0x30 bytes) */
+}
+
+/* 0x801F6B54 | size: 0xF8 | medium */
+#pragma peephole off
+void fn_801F6B54(void) {
+    /* TODO: decompile (0xF8 bytes, ~62 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F6C4C | size: 0x54 | small */
+void fn_801F6C4C(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6CA0 | size: 0x54 | small */
+void fn_801F6CA0(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6CF4 | size: 0x54 | small */
+void fn_801F6CF4(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6D48 | size: 0x54 | small */
+void fn_801F6D48(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6D9C | size: 0x54 | small */
+void fn_801F6D9C(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6DF0 | size: 0x54 | small */
+void fn_801F6DF0(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6E44 | size: 0x54 | small */
+void fn_801F6E44(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6E98 | size: 0x54 | small */
+void fn_801F6E98(void) {
+    /* TODO: decompile (0x54 bytes) */
+}
+
+/* 0x801F6EEC | size: 0x4C | small */
+void fn_801F6EEC(void) {
+    /* TODO: decompile (0x4C bytes) */
+}
+
+/* 0x801F6F38 | size: 0x9C | medium */
+#pragma peephole off
+void fn_801F6F38(void) {
+    /* TODO: decompile (0x9C bytes, ~39 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F6FD4 | size: 0xBC | medium */
+#pragma peephole off
+void fn_801F6FD4(void) {
+    /* TODO: decompile (0xBC bytes, ~47 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7090 | size: 0xE4 | medium */
+#pragma peephole off
+void fn_801F7090(void) {
+    /* TODO: decompile (0xE4 bytes, ~57 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7174 | size: 0xE4 | medium */
+#pragma peephole off
+void fn_801F7174(void) {
+    /* TODO: decompile (0xE4 bytes, ~57 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7258 | size: 0x58 | small */
+void fn_801F7258(void) {
+    /* TODO: decompile (0x58 bytes) */
+}
+
+/* 0x801F72B0 | size: 0xD8 | medium */
+#pragma peephole off
+void fn_801F72B0(void) {
+    /* TODO: decompile (0xD8 bytes, ~54 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7388 | size: 0x7C | small */
+void fn_801F7388(void) {
+    /* TODO: decompile (0x7C bytes) */
+}
+
+/* 0x801F7404 | size: 0x7C | small */
+void fn_801F7404(void) {
+    /* TODO: decompile (0x7C bytes) */
+}
+
+/* 0x801F7480 | size: 0xB0 | medium */
+#pragma peephole off
+void fn_801F7480(void) {
+    /* TODO: decompile (0xB0 bytes, ~44 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7530 | size: 0xC8 | medium */
+#pragma peephole off
+void fn_801F7530(void) {
+    /* TODO: decompile (0xC8 bytes, ~50 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F75F8 | size: 0xC0 | medium */
+#pragma peephole off
+void fn_801F75F8(void) {
+    /* TODO: decompile (0xC0 bytes, ~48 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F76B8 | size: 0xE0 | medium */
+#pragma peephole off
+void fn_801F76B8(void) {
+    /* TODO: decompile (0xE0 bytes, ~56 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7798 | size: 0x24 | small */
+void fn_801F7798(void) {
+    /* TODO: decompile (0x24 bytes) */
+}
+
+/* 0x801F77BC | size: 0x24 | small */
+void fn_801F77BC(void) {
+    /* TODO: decompile (0x24 bytes) */
+}
+
+/* 0x801F77F0 | size: 0x34 | small */
+void fn_801F77F0(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F7824 | size: 0x34 | small */
+void fn_801F7824(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F7870 | size: 0x2C | small */
+void fn_801F7870(void) {
+    /* TODO: decompile (0x2C bytes) */
+}
+
+/* 0x801F78D4 | size: 0x34 | small */
+void fn_801F78D4(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F7908 | size: 0x34 | small */
+void fn_801F7908(void) {
+    /* TODO: decompile (0x34 bytes) */
+}
+
+/* 0x801F7954 | size: 0x21C | large */
+#pragma peephole off
+void fn_801F7954(void) {
+    /* TODO: decompile (0x21C bytes, ~135 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7B70 | size: 0xE4 | medium */
+#pragma peephole off
+void fn_801F7B70(void) {
+    /* TODO: decompile (0xE4 bytes, ~57 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7C54 | size: 0x20C | large */
+#pragma peephole off
+void fn_801F7C54(void) {
+    /* TODO: decompile (0x20C bytes, ~131 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7E60 | size: 0x90 | medium */
+#pragma peephole off
+void fn_801F7E60(void) {
+    /* TODO: decompile (0x90 bytes, ~36 instructions) */
+}
+#pragma peephole reset
+
+/* 0x801F7EF0 | size: 0x90 | medium */
+#pragma peephole off
+void fn_801F7EF0(void) {
+    /* TODO: decompile (0x90 bytes, ~36 instructions) */
+}
+#pragma peephole reset
+
+
+#pragma pop

@@ -288,39 +288,194 @@ typedef struct TypeMatchup {
  */
 
 /* =========================================================================
- * Battle Grid (0x801C3108 - 0x801C53BC)
+ * Pre-Grid / Field Setup (0x801C01C8 - 0x801C3108) [battle_grid.c]
  * ========================================================================= */
 
-/* fn_801C3108 */ void battleGrid_GetState(void);
-/* fn_801C3114 */ void battleGrid_Init(void);
-/* fn_801C31EC */ void battleGrid_Setup(void);
-/* fn_801C3430 */ void battleGridSetup(void);                 /* 0x634 bytes */
-/* fn_801C3A64 */ void battleGridLoadModels(void);            /* 0x11C bytes */
-/* fn_801C3B80 */ void battleGridUpdatePositions(void);       /* 0x118 bytes */
-/* fn_801C3D64 */ void battleGridReplacePokemon(void* model); /* 0xD8 bytes */
-/* fn_801C3F10 */ void battleGridReplaceTrainer(void* model); /* 0xAC bytes */
+/* fn_801C01C8 */ void fn_801C01C8(void* arg0, s32 arg1);
+/* fn_801C021C */ void fn_801C021C(void* arg0, s32 arg1);
+/* fn_801C0270 */ s32  fn_801C0270(void);
+/* fn_801C027C */ void* fn_801C027C(void);
+/* fn_801C028C */ void fn_801C028C(void* ctx);                   /* 0xC94 pre-grid state machine */
+/* fn_801C0F20 */ void fn_801C0F20(void* ctx);                   /* 0x354 pre-grid anim update */
+/* fn_801C1274 */ void fn_801C1274(void* ctx, s32 slot);         /* 0x59C pre-grid model placement */
+/* fn_801C1810 */ void fn_801C1810(void* ctx);                   /* 0x6F0 encounter seq part 1 */
+/* fn_801C1F00 */ void fn_801C1F00(void* ctx);                   /* 0x6E4 encounter seq part 2 */
+/* fn_801C25E4 */ void fn_801C25E4(void* ctx, s32 mode);
+/* fn_801C2670 */ void fn_801C2670(void* ctx, s32 objType, s32 param);
+/* fn_801C27F4 */ void fn_801C27F4(void* ctx, f32 posX, f32 posZ);
+/* fn_801C29C4 */ void fn_801C29C4(s32 slot, s32 enable);
+/* fn_801C2A04 */ void fn_801C2A04(s32 slot, f32 x, f32 z);
+/* fn_801C2A60 */ s32  fn_801C2A60(void);
+/* fn_801C2A74 */ s32  fn_801C2A74(s32 slot);
+/* fn_801C2A90 */ s32  fn_801C2A90(s32 slot);
+/* fn_801C2AAC */ u8   fn_801C2AAC(void);
+/* fn_801C2AB8 */ void fn_801C2AB8(s32 slot, s32 animState);
+/* fn_801C2AE8 */ void fn_801C2AE8(s32 slot, f32 scale);
+/* fn_801C2B2C */ void fn_801C2B2C(void);
+/* fn_801C2Be0 */ void fn_801C2Be0(void* ctx, s32 arg1);
+
+/* Grid tick / state (0x801C2D54 - 0x801C3108) */
+/* fn_801C2D54 */ void fn_801C2D54(void);                        /* grid tick 1 */
+/* fn_801C2D5C */ void fn_801C2D5C(void);                        /* grid tick wrapper */
+/* fn_801C2D68 */ void fn_801C2D68(void);                        /* grid tick 2 */
+/* fn_801C2D74 */ void fn_801C2D74(void);                        /* grid tick 3 */
+/* fn_801C2D80 */ void fn_801C2D80(void);                        /* grid cleanup 0x180 */
+/* fn_801C2F00 */ void fn_801C2F00(void* data, u32 size);        /* grid load data 0x208 */
 
 /* =========================================================================
- * Battle Logic / Scene (0x801C53BC - 0x801D7230)
+ * Battle Grid Core (0x801C3108 - 0x801C53BC) [battle_grid.c]
+ * ========================================================================= */
+
+/* fn_801C3108 */ s32  fn_801C3108(void);                        /* battleGrid_GetState */
+/* fn_801C3114 */ void fn_801C3114(void);                        /* battleGrid_Init */
+/* fn_801C31EC */ void fn_801C31EC(void);                        /* battleGrid_Setup */
+/* fn_801C3430 */ void fn_801C3430(void);                        /* battleGridSetup 0x634 */
+/* fn_801C3A64 */ void fn_801C3A64(void);                        /* battleGridLoadModels 0x11C */
+/* fn_801C3B80 */ void fn_801C3B80(void);                        /* battleGridUpdatePositions */
+/* fn_801C3C98 */ void fn_801C3C98(s32 slot);
+/* fn_801C3D64 */ void fn_801C3D64(void* model);                 /* battleGridReplacePokemon */
+/* fn_801C3E3C */ void fn_801C3E3C(s32 slot, s32 animType);
+/* fn_801C3F10 */ void fn_801C3F10(void* model);                 /* battleGridReplaceTrainer */
+/* fn_801C3FBC */ void fn_801C3FBC(s32 slot);
+/* fn_801C4078 */ void* fn_801C4078(s32 slot);
+/* fn_801C409C */ void fn_801C409C(s32 slot, u8 occupied);
+/* fn_801C40F0 */ void fn_801C40F0(s32 flag);                    /* grid set rendering flag */
+/* fn_801C4164 */ void fn_801C4164(s32 mode);
+/* fn_801C41C8 */ void fn_801C41C8(s32 mode);                    /* battle camera init */
+/* fn_801C423C */ void fn_801C423C(f32 targetAngle, f32 speed);
+/* fn_801C431C */ f32  fn_801C431C(void);
+/* fn_801C432C */ void fn_801C432C(f32 angle, f32 blend);
+/* fn_801C43E4 */ void* fn_801C43E4(void);
+/* fn_801C43F4 */ void fn_801C43F4(s32 seqType, f32 param1, f32 param2); /* 0x3DC */
+/* fn_801C47D0 */ s32  fn_801C47D0(void);
+/* fn_801C4814 */ f32  fn_801C4814(s32 slot);
+/* fn_801C483C */ f32  fn_801C483C(s32 slot);
+/* fn_801C4864 */ f32  fn_801C4864(s32 slot);
+/* fn_801C488C */ void fn_801C488C(s32 slot, f32 x);
+/* fn_801C48B4 */ void fn_801C48B4(s32 slot, f32 y);
+/* fn_801C48DC */ void fn_801C48DC(s32 slot, f32 z);
+/* fn_801C4904 */ void fn_801C4904(s32 slot, f32 x, f32 y, f32 z);
+/* fn_801C4974 */ f32  fn_801C4974(s32 slot);
+/* fn_801C499C */ void fn_801C499C(s32 slot, f32 rotation);
+/* fn_801C49F4 */ f32  fn_801C49F4(s32 slot);
+/* fn_801C4A1C */ void fn_801C4A1C(s32 slot, f32 scale);
+/* fn_801C4A44 */ void fn_801C4A44(s32 slot, f32 x, f32 y, f32 z, f32 rot, f32 scale);
+/* fn_801C4C98 */ BOOL fn_801C4C98(s32 slot);
+/* fn_801C4CB8 */ void fn_801C4CB8(void);                        /* grid full render 0x704 */
+
+/* =========================================================================
+ * Battle Scene (0x801C53BC - 0x801D1338) [battle_scene.c]
+ * Camera, Pokemon model, animation, effects, transitions
  * ========================================================================= */
 
 /* Camera control */
-/* fn_801C5898 */ void battleCamera_Update(void* camObj, void* target,
-                                           f32 speed, f32 fov, f32 near, f32 far);
-/* fn_801C6008 */ void battleCamera_SetView(u8 transition, void* target,
-                                            f32 speed, f32 zoom);
-/* fn_801C63C0 */ void battleCamera_Interpolate(void* target, void* params,
-                                                f32 t, f32 speed, f32 zoom, f32 blend);
-/* fn_801C6688 */ void battleCamera_SetRotation(f32 angle);
-/* fn_801C6934 */ void battleScene_Init(void* stageModel, f32 scale);
-/* fn_801C6AE8 */ void battleScene_SetupSlot(s32 row, s32 col, u8 type);
-/* fn_801C71B0 */ void battleScene_UpdateAnimations(void);
+/* fn_801C53BC */ void fn_801C53BC(void* ctx, s32 arg1, s32 arg2, s32 arg3, f32 arg4);
+/* fn_801C54FC */ f32  fn_801C54FC(void);
+/* fn_801C5530 */ void fn_801C5530(f32 fov, f32 minFov, f32 maxFov);
+/* fn_801C55D8 */ void fn_801C55D8(f32 x, f32 y, f32 z, f32 speed);
+/* fn_801C5748 */ void fn_801C5748(void* target, f32 speed);
+/* fn_801C5898 */ void fn_801C5898(void* camObj, void* target, f32 speed, f32 fov, f32 nearClip, f32 farClip);
+/* fn_801C5B60 */ void fn_801C5B60(f32 zoomTarget, f32 zoomSpeed);
+/* fn_801C5D60 */ void fn_801C5D60(f32 angle, f32 radius, f32 height);
+/* fn_801C5ED0 */ f32  fn_801C5ED0(void);
+/* fn_801C5F6C */ f32  fn_801C5F6C(void);
+/* fn_801C6008 */ void fn_801C6008(u8 transition, void* target, f32 speed, f32 zoom);
+/* fn_801C6274 */ void fn_801C6274(f32 t, f32 ease);
+/* fn_801C63B8 */ u8   fn_801C63B8(void);
+/* fn_801C63C0 */ void fn_801C63C0(void* target, void* params, f32 t, f32 speed, f32 zoom, f32 blend);
+/* fn_801C6688 */ void fn_801C6688(f32 angle);
+/* fn_801C673C */ void fn_801C673C(void);
+/* fn_801C6760 */ void fn_801C6760(f32 intensity, f32 duration);
+/* fn_801C680C */ void fn_801C680C(void);
+/* fn_801C68D4 */ u8   fn_801C68D4(void);
+/* fn_801C6908 */ void fn_801C6908(void);
+/* fn_801C6928 */ u8   fn_801C6928(void);
 
-/* Pokemon model & animation in battle scene */
-/* fn_801C7730 */ s32  battleScene_PlacePokemon(s32 side, s32 slot);     /* 0xDCC bytes */
-/* fn_801C89F8 */ void battleScene_EncounterSequence(s32 side, s32 slot); /* state machine */
-/* fn_801C8E14 */ s32  battleScene_AnimatePokemon(s32 pokemonID, s32 animIdx,
-                                                   s16 moveID, u8 animType); /* 0xAFC bytes */
+/* Scene layout */
+/* fn_801C6934 */ void fn_801C6934(void* stageModel, f32 scale);
+/* fn_801C6AE8 */ void fn_801C6AE8(s32 row, s32 col, u8 type);
+/* fn_801C6D78 */ void fn_801C6D78(s32 slot, f32 x, f32 y, f32 z);
+/* fn_801C6E90 */ void* fn_801C6E90(s32 slot);
+/* fn_801C6EE4 */ void fn_801C6EE4(s32 slot, void* modelData);
+/* fn_801C7090 */ s32  fn_801C7090(void);
+/* fn_801C70FC */ void fn_801C70FC(s32 slot, u8 visible);
+/* fn_801C71B0 */ void fn_801C71B0(void);                        /* updateAnimations 0x43C */
+/* fn_801C75EC */ void fn_801C75EC(s32 slot);
+/* fn_801C7630 */ f32  fn_801C7630(s32 slot);
+/* fn_801C766C */ void fn_801C766C(s32 slot, f32 frame);
+
+/* Pokemon model placement & animation */
+/* fn_801C7730 */ s32  fn_801C7730(s32 side, s32 slot);          /* PlacePokemon 0xDCC */
+/* fn_801C84FC */ s32  fn_801C84FC(s32 slot);
+/* fn_801C852C */ f32  fn_801C852C(s32 species);
+/* fn_801C8628 */ void fn_801C8628(s32 slot);
+/* fn_801C8688 */ void fn_801C8688(s32 slot, s32 animIdx);
+/* fn_801C8804 */ s32  fn_801C8804(s32 slot);
+/* fn_801C8834 */ void fn_801C8834(s32 slot);
+/* fn_801C89F8 */ void fn_801C89F8(s32 side, s32 slot);          /* EncounterSequence 0x3D8 */
+/* fn_801C8DD0 */ s32  fn_801C8DD0(s32 slot);
+/* fn_801C8E14 */ s32  fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType);
+
+/* Scene state & effects */
+/* fn_801C9910 */ void fn_801C9910(void);
+/* fn_801C9B6C */ void fn_801C9B6C(s32 transitionType);
+/* fn_801C9C9C */ s32  fn_801C9C9C(void);
+/* fn_801C9F5C */ void fn_801C9F5C(void);
+/* fn_801CA358 */ void fn_801CA358(s32 effectType, s32 slot);
+/* fn_801CA5C4 */ void fn_801CA5C4(s32 effectID, f32 x, f32 y, f32 z);
+
+/* Scene transitions & mega-functions */
+/* fn_801CBF64 */ void fn_801CBF64(void);                        /* complex anim controller 0x41C */
+/* fn_801CC380 */ void fn_801CC380(void);                        /* mega-function A 0x1784 */
+/* fn_801CDB04 */ void fn_801CDB04(void);                        /* mega-function B 0x181C */
+/* fn_801CF9C8 */ void fn_801CF9C8(void);
+/* fn_801CFD08 */ void fn_801CFD08(void);                        /* transition controller 0x378 */
+/* fn_801D0DB0 */ void fn_801D0DB0(void);                        /* rendering main loop 0x588 */
+
+/* =========================================================================
+ * Waza / Move Animation System (0x801D1338 - 0x801E03D4) [battle_waza.c]
+ * ========================================================================= */
+
+/* Waza data access */
+/* fn_801D1338 */ s32  fn_801D1338(void* wazaCtx);
+/* fn_801D1364 */ void* fn_801D1364(void* wazaCtx, s32 idx);
+/* fn_801D139C */ s32  fn_801D139C(void* entry);
+/* fn_801D13E4 */ f32  fn_801D13E4(void* entry);
+/* fn_801D142C */ f32  fn_801D142C(void* entry);
+
+/* Waza animation controllers */
+/* fn_801D1734 */ void fn_801D1734(s32 attackerSlot, s32 targetSlot, s32 moveID);
+/* fn_801D1864 */ void fn_801D1864(s32 attackerSlot, s32 targetSlot, s32 moveID, s32 cameraMode);
+/* fn_801D2D28 */ void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot);
+
+/* Waza animation state machines */
+/* fn_801D30BC */ void fn_801D30BC(void);                        /* dispatcher 0x3E0 */
+/* fn_801D349C */ void fn_801D349C(void);                        /* state machine A 0xAE0 */
+/* fn_801D3F7C */ void fn_801D3F7C(void);                        /* state machine B 0x548 */
+/* fn_801D44C4 */ void fn_801D44C4(void);                        /* state machine C 0x514 */
+/* fn_801D49D8 */ void fn_801D49D8(void);                        /* state machine D 0x3C8 */
+/* fn_801D624C */ void fn_801D624C(void);                        /* mega-function 0x818 */
+
+/* Core waza sequence API */
+/* fn_801D7464 */ void fn_801D7464(void);                        /* wazaSequenceLoad 0x730 */
+/* fn_801D7B94 */ void fn_801D7B94(void);                        /* wazaSequenceUpdate 0x2C4 */
+/* fn_801D7E58 */ void fn_801D7E58(void* entry);                 /* wazaSequenceEntryStop */
+/* fn_801D81CC */ void fn_801D81CC(void* entry);                 /* wazaSequenceEntryUpdate */
+/* fn_801D84F4 */ void fn_801D84F4(void);                        /* wazaSequenceEntryStart */
+/* fn_801D87B0 */ void fn_801D87B0(void* entry, s32 type);       /* wazaSequenceStartEntry */
+/* fn_801D8B38 */ void fn_801D8B38(void* entry);                 /* _wazaSequenceParticleEntryStart */
+/* fn_801D91EC */ void fn_801D91EC(void* entry);                 /* _wazaSequenceModelEntryStart */
+/* fn_801D9950 */ void fn_801D9950(s32 slot, s32 motionType);    /* wazaSequencePokemonMotionStart */
+
+/* Waza system lifecycle */
+/* fn_801DAC90 */ void fn_801DAC90(void);                        /* waza system cleanup */
+/* fn_801DADC0 */ void fn_801DADC0(void);                        /* waza partial reset */
+/* fn_801DAEF8 */ void fn_801DAEF8(s32 count);                   /* waza system init */
+/* fn_801DB060 */ BOOL fn_801DB060(void);                        /* waza get initialized */
+/* fn_801DB088 */ void fn_801DB088(void);                        /* waza system reset */
+
+/* Waza extended functions */
+/* fn_801DFC30 */ void fn_801DFC30(void);                        /* waza master controller 0x7A4 */
 
 /* =========================================================================
  * Battle Core / Fight Flow (0x801EF02C - 0x801F000C)
