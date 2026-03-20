@@ -34,7 +34,7 @@ asm void __OSLoadFPUContext(register u8 unused, register OSContext* context) {
     lfd     f0, 0x0190(r4)
     mtfsf   255, f0
 
-    mfspr   r5, HID2
+    mfspr   r5, 920
     extrwi. r5, r5, 1, 2
     beq     _load_fpr
 
@@ -121,7 +121,7 @@ asm void __OSSaveFPUContext(register u8 unused, register OSContext* context) {
     ori     r5, r5, OS_CONTEXT_STATE_FPSAVED
     sth     r5, 0x01A2(r4)
 
-    mfspr   r5, HID2
+    mfspr   r5, 920
     extrwi. r5, r5, 1, 2
     beq     _save_fpr
 
