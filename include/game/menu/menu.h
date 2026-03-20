@@ -379,7 +379,7 @@ void menuCB_Battle_Init(void);
  * fn_80069944: Battle menu input handler.
  * Size: 0xC4
  */
-void menuCB_Battle_HandleInput(void);
+s32 menuCB_Battle_HandleInput(void);
 
 /* =========================================================================
  * menuToolBattle API (0x8007581C - 0x80075A34)
@@ -467,7 +467,7 @@ void menuPokeCoupon_ValidateRefer(void);
  * File: "menuCardE.c"
  * Size: 0x1008 (4104 bytes - large state machine)
  */
-void menuCardE_Main(void);
+s32 menuCardE_Main(void);
 
 /* =========================================================================
  * menuCardE_Matrix API (0x8007C300 - 0x8007FD64)
@@ -498,7 +498,7 @@ void menuCardE_Matrix_ValidateAnim(MenuCardEMatrixWork* cem);
  * fn_8007D978: Card e matrix main update loop.
  * Size: 0x23EC (9196 bytes - very large state machine)
  */
-void menuCardE_Matrix_Main(MenuCardEMatrixWork* cem);
+s32 menuCardE_Matrix_Main(MenuCardEMatrixWork* cem);
 
 /* =========================================================================
  * HSD Assert function (called by all menu assert macros)

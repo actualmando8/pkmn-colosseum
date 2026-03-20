@@ -196,7 +196,7 @@ BOOL ShadowPokemonCheck(void) {
     void* pokemon;
     u8 status;
 
-    pokemon = PokemonSlotLookupDefault(0x02, 0);
+    pokemon = (void*)PokemonSlotLookupDefault(0x02, 0);
     /* fn_801F6E44 reads a field at offset 0x4C, returning shadow status */
     /* status = fn_801F6E44(pokemon, 0x4C); */
     /* return (status != 2); */

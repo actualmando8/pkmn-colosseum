@@ -61,6 +61,9 @@ extern void  fn_800D3E4C(void);  /* GSgfx render end */
 extern void  fn_80059BDC(s32 menuID, s32 param);  /* UI state machine dispatch */
 extern s32   fn_80069944(void);                     /* Read controller input */
 
+/* Forward declarations for functions used before definition */
+void menuCB_Common_TransitionUpdate(void);
+
 /* =========================================================================
  * BSS / Static globals
  * ========================================================================= */

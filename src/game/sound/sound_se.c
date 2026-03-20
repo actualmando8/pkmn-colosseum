@@ -38,12 +38,12 @@ extern void  fn_801677BC(void*);  /* _sndReleaseListener */
 extern void  fn_801677F4(void*);  /* _sndReleaseListener2 */
 
 /* JAudio 3D sound setup */
-extern BOOL fn_8015ECA8(void* dst, void* pos, void* dir, u32 innerAngle,
+extern s32  fn_8015ECA8(void* dst, void* pos, void* dir, u32 innerAngle,
                         u16 pad, u8 volume, u32 pan, u32 flags);
 extern BOOL fn_8015E890(void* jAudioParams);
-extern void fn_8015ED00(void* dst, void* pos, void* srcPos,
+extern s32  fn_8015ED00(void* dst, void* pos, void* srcPos,
                         void* srcDir, void* srcUp, u8 volume, u32 flags);
-extern BOOL fn_8015EF04(void* dst, void* pos, void* fwd, void* up,
+extern s32  fn_8015EF04(void* dst, void* pos, void* fwd, void* up,
                         void* right, u8 isOmni, u8 volume, u32 pan, u32 flags);
 
 /* Internal sound volume control */
@@ -382,7 +382,7 @@ s32 sndPlaySe(void* listenerParams) {
     fn_800E01F4(&up, 0.0f, 0.0f, 0.0f);        /* lbl_8047D56C for y */
 
     return sndPlaySe3D4Point(
-        listenerParams,
+        (u32)listenerParams,
         &origin,
         &forward,
         &up,

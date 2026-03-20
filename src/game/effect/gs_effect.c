@@ -41,7 +41,7 @@
 extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
 extern u16   GSmemAllocRaw(u32 size);                    /* fn_800E3534 */
 extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
-extern void  GSmemLock(u16 handle);                      /* fn_800E24B0 */
+extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
 extern void  GSmemFree(u16 handle);                      /* fn_800E209C */
 extern u32   GStaskRegister(u32 type, u32 priority,
                              void* param, void* func);   /* fn_800FE834 */
@@ -176,7 +176,7 @@ static void effectRenderTask(void) {
 
     while (cur != NULL) {
         if (cur->updateFunc != NULL && cur->state == GSEFFECT_STATE_ACTIVE) {
-            BOOL result = cur->updateFunc(cur->userData, tickCount);
+            BOOL result = ((GSEffectStartFunc)cur->updateFunc)(cur->userData, tickCount);
             if (result == 0) {
                 /* Effect finished -- transition to stopping */
                 cur->state = GSEFFECT_STATE_STOPPING;

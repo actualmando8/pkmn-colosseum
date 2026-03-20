@@ -336,7 +336,6 @@ void GSflagSet(s32 flagID) {
 
     while (currentID != flagID && currentID != -1) {
         entry = &defTable[currentID];
-        s32 nextID = currentID;  /* Will update from cascade logic */
 
         /* Check if flag is enabled */
         if (entry->enableByte == 0) {
@@ -348,9 +347,12 @@ void GSflagSet(s32 flagID) {
 
         /* Get event trigger buffer */
         {
-            u32 evtIdx = (u32)entry->enableByte;
-            u32 levelOffset = ((u32)(typeAndWidth >> 5) & 0x3) << 2;
-            u32* evtBuffer = *(u32**)((u8*)gFlagEventTbl + levelOffset);
+            u32 evtIdx;
+            u32 levelOffset;
+            u32* evtBuffer;
+            evtIdx = (u32)entry->enableByte;
+            levelOffset = ((u32)(typeAndWidth >> 5) & 0x3) << 2;
+            evtBuffer = *(u32**)((u8*)gFlagEventTbl + levelOffset);
             buffer = GSflag_GetBuffer(typeAndWidth);
         }
 
@@ -411,9 +413,15 @@ void GSflagSet(s32 flagID) {
     if (entry->eventTrigID != 0) {
         GSflagSceneEntry* sceneEntry;
         u32  sceneIdx;
+        u8   trigCount;
+        u16  eventID;
+        u16  sceneID;
+        f32  posX;
+        f32  posY;
+        f32  posZ;
 
         sceneIdx = (u32)entry->eventTrigID * 0x18;
-        u8 trigCount = *(gFlagSceneTbl + sceneIdx);
+        trigCount = *(gFlagSceneTbl + sceneIdx);
 
         if (trigCount != 0) {
             s32 i;
@@ -436,7 +444,8 @@ void GSflagSet(s32 flagID) {
                 }
 
                 if (slot >= 0) {
-                    u8 trigByte = *(gFlagPartyPtr + slot + trigCount);
+                    u8 trigByte;
+                    trigByte = *(gFlagPartyPtr + slot + trigCount);
                     if (trigByte != 0) {
                         fn_8012F1FC(slot);
                     }
@@ -447,19 +456,19 @@ void GSflagSet(s32 flagID) {
             fn_80129280(0, 2);
 
             /* Apply event */
-            u16 eventID = *(u16*)(gFlagSceneTbl + sceneIdx + 4);
+            eventID = *(u16*)(gFlagSceneTbl + sceneIdx + 4);
             fn_8012A86C(0, eventID);
 
             /* Floor transition if sceneID is set */
-            u16 sceneID = *(u16*)(gFlagSceneTbl + sceneIdx + 2);
+            sceneID = *(u16*)(gFlagSceneTbl + sceneIdx + 2);
             if (sceneID == 0) {
                 fn_800FF56C(sceneID);
             }
 
             /* Set world position */
-            f32 posX = *(f32*)(gFlagSceneTbl + sceneIdx + 0x08);
-            f32 posY = *(f32*)(gFlagSceneTbl + sceneIdx + 0x0C);
-            f32 posZ = *(f32*)(gFlagSceneTbl + sceneIdx + 0x10);
+            posX = *(f32*)(gFlagSceneTbl + sceneIdx + 0x08);
+            posY = *(f32*)(gFlagSceneTbl + sceneIdx + 0x0C);
+            posZ = *(f32*)(gFlagSceneTbl + sceneIdx + 0x10);
             fn_80113778(0, posX, posY, posZ);
         }
     }

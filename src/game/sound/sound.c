@@ -76,7 +76,7 @@ extern void* memset(void* dst, int val, u32 size);
 
 /* FSYS: load by ID / read */
 extern void fn_8017AF6C(u32 fsysId, void* buffer);
-extern void fn_8017B2CC(u32 fsysId);
+extern s32  fn_8017B2CC(u32 fsysId);
 extern void fn_8017B370(u32 fsysId);
 
 /* Disc drive status */
@@ -99,7 +99,7 @@ extern void fn_8015EF04(void* dst, void* pos, void* fwd, void* up,
 
 /* Sound internal helpers (in later part of sound.c / adjacent modules) */
 extern void fn_80166B3C(u32 sndId, u32 unused, u32 category); /* _sndBindWork */
-extern void fn_80166BE0(u32 sndId, u32 flag, void* name,
+extern BOOL fn_80166BE0(u32 sndId, u32 flag, void* name,
                         u32 r6, u32 r7, u32 r8, u32 r9); /* _sndOpenWaveInternal */
 extern void fn_80166670(u32 sndId, u32 fadeTime, u32 flags); /* _sndCheckSndWorkAll */
 extern void fn_80166084(u32 sndId);  /* _sndIsBgm (returns bool in r3) */
@@ -116,10 +116,10 @@ extern void fn_801667D8(u32 sndId, u16 transpose); /* _sndBgmTranspose */
 extern void fn_801668DC(u32 sndId, u32 transpose, u32 volume); /* _sndSeTranspose */
 extern void fn_80166168(u32 sndId, u32 volume); /* _sndTriggerVolumeEntry */
 extern void fn_80166268(u32 sndId, u32 volume, u32 fadeTime); /* _sndQueueVolumeEntry */
-extern void fn_80166308(u32 sndId, void* pos); /* sndPlaySe3D */
+extern s32 fn_80166308(u32 sndId, void* pos); /* sndPlaySe3D */
 extern void fn_80166370(u32 sndId, void* pos, void* dir,
                         u8 volume, u8 pan); /* sndPlaySe3DFull */
-extern void fn_801664F0(void* listenerParams); /* sndPlaySe */
+extern s32 fn_801664F0(void* listenerParams); /* sndPlaySe */
 extern void fn_80166578(u32 sndId, void* pos, void* fwd,
                         void* up, void* right, u8 volume); /* sndPlaySe3D4Point */
 
@@ -151,11 +151,11 @@ extern void  fn_801678E4(void);          /* _sndAllocListener4Point */
 extern void  fn_80167964(void);          /* _sndAllocSeSlot */
 extern void  fn_801679E4(void);          /* _sndInitListenerDefaults */
 extern void  fn_80167AF0(void* work, void* slot); /* _sndBindSlotToWork */
-extern void  fn_80167E5C(void* data);   /* _sndGetStreamLength */
+extern u32   fn_80167E5C(void* data);   /* _sndGetStreamLength */
 extern void  fn_80167E64(void* data);   /* _sndReleaseStreamHandle */
-extern void  fn_80167ED0(void* handle, void* buffer, u32 size,
+extern s32   fn_80167ED0(void* handle, void* buffer, u32 size,
                          u32 offset);   /* _sndReadStreamData */
-extern void  fn_80167F28(void);         /* _sndOpenStreamFile */
+extern void* fn_80167F28(void);         /* _sndOpenStreamFile */
 
 /* Sound update callback (registered with JAudio) */
 extern void fn_80167040(void); /* _sndUpdateCallback */

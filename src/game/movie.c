@@ -39,16 +39,16 @@ extern void fn_80190528(u32 flagId);                   /* GSflagSet (used for cu
 extern u32  fn_801902E0(u32 flagId);                   /* GSflagGet */
 extern void fn_80113828(u32 a, u32 b);                /* floor resource unload helper */
 extern void fn_8011288C(u32 a, u32 b);                /* floor resource alloc helper */
-extern void fn_8011394C(void);                         /* floor state query */
+extern u32  fn_8011394C(void);                         /* floor state query */
 extern void* fn_80129280(u32 a, u32 b);               /* battle/effect state setup */
 extern void fn_80135030(void* ctx, u32 a, u32 b);     /* effect parameter set */
-extern void fn_80135168(void* ctx, u32 a);             /* effect query */
+extern void* fn_80135168(void* ctx, u32 a);            /* effect query */
 extern void fn_8012A450(u32 a, u32 b, u32 c);         /* effect system control */
-extern void fn_8012A5B0(u32 a, u32 b, u32 c);         /* effect system query */
+extern void* fn_8012A5B0(u32 a, u32 b, u32 c);        /* effect system query */
 extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
 extern s8   fn_8001E074(u32 a, u32 b, u32 c, u32 d);  /* input poll / wait */
-extern void fn_801D036C(void);                         /* battle state query */
-extern void fn_801D0748(u32 a, u32 b, u32 c);         /* battle mode set */
+extern void* fn_801D036C(void);                        /* battle state query */
+extern u32  fn_801D0748(u32 a, u32 b, u32 c);         /* battle mode set */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80266FE8[]; /* "movie/openingdemo.thp" */
@@ -344,7 +344,7 @@ void moviePlayStaffRoll(void) {
             void* pairA;
             void* pairB;
 
-            effectCtx2 = fn_80129280(savedCtx, 2);
+            effectCtx2 = fn_80129280((u32)savedCtx, 2);
             pairA = (void*)fn_8012A5B0(2, 0, 0);
             pairB = (void*)fn_8012A5B0(0, 2, 0);
 

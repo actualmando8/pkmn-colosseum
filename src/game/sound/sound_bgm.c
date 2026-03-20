@@ -43,23 +43,23 @@ extern s32 fn_8014D880(u32 handle);
 extern void fn_8014D8C8(u8 volume, u16 pan, u8 code);
 extern void fn_8014D928(u8 chorus, u16 reverb, u8 delay, u8 wet);
 extern void fn_8014D9BC(void);
-extern void fn_800A0E34(void);
+extern s32  fn_800A0E34(void);
 extern void fn_800A0EB4(u32 enable);
 
 /* Sound internal functions */
 extern u32  fn_8016737C(void* entry, u32 fadeTime, u32 flags);
 extern void fn_80167070(u32 sndId, u32 mode);
 extern s32  fn_80167408(u32 sndId, u32 volume);
-extern void fn_80167490(u32 sndId, u32 fadeTime, u32 volume);
-extern void fn_80167508(u32 sndId, u32 fadeTime, u32 volume);
+extern void fn_80167490(void* entry, u32 fadeTime, u32 volume);
+extern void fn_80167508(void* entry, u32 fadeTime, u32 volume);
 extern void fn_8016758C(u32 sndId, u32 r4);
-extern void fn_8016761C(u32 sndId, u32 fadeTime, u32 volume);
+extern void fn_8016761C(void* entry, u32 fadeTime, u32 volume);
 extern void fn_80166C34(u32 groupId);
 extern void fn_80166AB8(u32 sndId, u32 fadeTime, u32 volume);
 extern void fn_801669E4(u32 sndId, u32 fadeTime, u32 volume);
 extern void fn_80164488(void* buffer);
 extern void fn_80167A9C(u32 groupId);
-extern void fn_80167768(u32 channel, u32 category);
+extern u32  fn_80167768(u32 channel, u32 category);
 extern BOOL fn_8015FFD4(void);
 extern BOOL fn_8015FFA0(void);
 

@@ -73,12 +73,12 @@ extern void  fn_800F0494(void* handle);                  /* Model free */
 
 /* Floor subsystem inits */
 extern void  fn_801123D4(u32 floorDataEntry, u32 loadMode); /* Floor resource init */
-extern void  fn_80112380(u32 floorId);                   /* Floor check ready */
+extern s32   fn_80112380(u32 floorId);                   /* Floor check ready */
 extern void  fn_8011274C(void);                          /* Floor finalize load */
 extern void  fn_80112780(void);                          /* Floor begin transition */
 extern void  fn_80117C84(void);                          /* Floor camera update */
 extern void  fn_80115A38(u32 floorDataEntry);            /* Floor res set active */
-extern void  fn_80115A80(u32 floorDataEntry);            /* Floor res set inactive */
+extern u32   fn_80115A80(u32 floorDataEntry);            /* Floor res set inactive */
 extern void  fn_8010D064(void);                          /* Collision init */
 extern void  fn_8010CC54(void);                          /* Collision finalize */
 extern void  fn_8010CD6C(void);                          /* Collision cleanup */
@@ -92,6 +92,14 @@ extern void  fn_80175B94(void);                          /* Generator cleanup */
 extern void  fn_8016AAAC(void);                          /* Script system reset */
 extern void  fn_800E8EFC(void);                          /* Material cleanup */
 extern void  fn_8018DB04(u32 param);                     /* People system notify */
+
+/* Floor loading callbacks (forward declarations) */
+extern void  fn_80101910(void);                          /* GSfloorLoadCallback */
+extern void  fn_80101A28(void);                          /* GSfloorFindAndOpenCallback */
+extern void  fn_80101A4C(void);                          /* GSfloorLoadDataCallback */
+
+/* GFL model processing */
+extern void* fn_800E4D18(u32 handle);
 
 /* FSYS / Archive */
 extern void* fn_80191ECC(void* name, const char* tocName);  /* FSYS lookup by name */
@@ -981,8 +989,7 @@ void GSfloorFindAndOpen(const char* archiveName, u32 floorId, u32 loadParam)
     fn_800F9378(archivePtr, floorId, loadParam, (void*)fn_80101A28);
 }
 
-/* Internal callback for GSfloorFindAndOpen (fn_80101A28) */
-extern void fn_80101A28(void);
+/* Internal callback for GSfloorFindAndOpen (fn_80101A28) -- declared above */
 
 /* =======================================================================
  *  GSfloorLoadData / fn_801013A0
@@ -1033,11 +1040,7 @@ void GSfloorLoadData(const char* archiveName, u32 subFileIndex,
     }
 }
 
-/* Internal callback for GSfloorLoadData (fn_80101A4C) */
-extern void fn_80101A4C(void);
-
-/* External: GFL model processing */
-extern void* fn_800E4D18(u32 handle);
+/* Internal callback for GSfloorLoadData (fn_80101A4C) -- declared above */
 
 /* =======================================================================
  *  GSfloorLoadMain / fn_8010147C
@@ -1159,8 +1162,7 @@ postRegister:
     fn_800DD970(lbl_802717F0 + 0x574, numSubFiles, numEntries);
 }
 
-/* Internal load callback (fn_80101910) */
-extern void fn_80101910(void);
+/* Internal load callback (fn_80101910) -- declared above */
 
 /* =======================================================================
  *  GSfloorGetCurrentId
