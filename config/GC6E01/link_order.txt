@@ -1,0 +1,607 @@
+# Pokemon Colosseum (GC6E01) Translation Unit Link Order
+# Derived from .text section function address layout in the DOL.
+#
+# Format: src_path  start_addr  end_addr  func_count  notes
+#
+# The linker places each TU's .text in the order the object files appear
+# on the link command line. Within a TU, functions appear in source order.
+# Gaps between identified TUs indicate either:
+#   (a) Functions in the same TU not yet attributed
+#   (b) Separate TUs whose source file is unknown
+#
+# Generated: 2026-03-19
+# Total .text: 0x800055E0 - 0x8026635C (8,589 functions)
+
+# ============================================================================
+# SECTION 1: GAME CODE (0x800055E0 - 0x80097FFC)
+# ============================================================================
+
+# TU  1: Game entry point and main loop
+src/game/main.c                           0x800055E0  0x80006630  21  # main(), GameInit, GameMainLoop, callbacks
+
+# TU  2: Unknown game module (flag/scene accessors, early logic)
+# UNIDENTIFIED                            0x80006630  0x80033278  ~410  # Game logic, flags, battle helpers, scene management
+
+# TU  3: Card-E menu
+src/game/menu/menu_carde.c                0x80033278  0x80034280  1   # menuCardE_Main (0x1008 bytes)
+
+# TU  4: Movie player
+src/game/movie.c                          0x80035E04  0x800366D0  ~10  # Movie playback (THP), opening/credits/autodemo
+
+# NOTE: Large unidentified region between movie.c and next known TU
+# UNIDENTIFIED                            0x800366D0  0x80059BDC  ~350  # Game utilities, save helpers
+
+# TU  5: UI Core (large state machine)
+# UNIDENTIFIED (ui_core.c?)               0x80059BDC  0x80069A60  ~103  # UI state machine, 0x30F4-byte fn
+
+# TU  6: Battle menu callbacks
+src/game/menu/menu_battle.c               0x80069A60  0x80069C0C  1   # menuCB_Battle_Assert
+
+# NOTE: Unidentified menu code between battle CB and common CB
+# UNIDENTIFIED (menu related)             0x80069C0C  0x8007109C  ~100  # Menu system middle
+
+# TU  7: Common menu callbacks
+src/game/menu/menu_common.c               0x8007109C  0x8007162C  5   # Menu push/pop, asserts
+
+# TU  8: Battle tool menu
+# (menuToolBattle.c)                      0x8007581C  0x80075A34  1   # Embedded in menu block
+
+# TU  9: Rule menu callbacks
+# (menuCB_Rule.c)                         0x800767B8  0x80077A5C  4   # Rule handlers
+
+# TU 10: Extra Disc Shrine menu
+# (menuExDiscShrine.c)                    0x80077ED4  0x80078390  1   # Mt. Battle exchange
+
+# TU 11: Extra Disc Coupon menu
+# (menuExDiscCoupon.c)                    0x800792D8  0x800798E8  1   # Coupon exchange
+
+# TU 12: Poke Coupon menu
+src/game/menu/menu_pokecoupon.c           0x8007C2C0  0x8007C300  1   # Assert function
+
+# TU 13: Card-E Matrix menu
+# (menuCardE_Matrix.c)                    0x8007C300  0x8007FD64  4   # e-Reader matrix display
+
+# NOTE: TUs 8-13 may be contiguous within a larger "menu" link block.
+# The exact TU boundaries between them are unclear -- functions between
+# the identified ranges likely belong to the same menu module or
+# separate unidentified menu TUs.
+
+# TU 14: Card-E save data
+src/game/save/save_data.c                 0x80082650  0x80083AF4  11  # cardesavedata functions
+
+# TU 15: Pokemon conversion (GBA<->GCN)
+src/game/gba/pokeconv.c                   0x80089048  0x800895A4  2   # pokeconv_ConvertPokemon, ValidateItems
+
+# TU 16: GBA communication
+src/game/gba/gba_comm.c                   0x80092C90  0x800937F4  6   # gbaCommunication transfers
+
+# NOTE: Gap between gba_comm end (0x800937F4) and SDK start (0x80097FFC)
+# UNIDENTIFIED                            0x800937F4  0x80097FFC  ~60  # Late game code before SDK
+
+# ============================================================================
+# SECTION 2: DOLPHIN SDK - PPC / OS (0x80097FFC - 0x800A2B9C)
+# ============================================================================
+
+# TU 17: PPC Architecture
+src/dolphin/os/PPCArch.c                  0x80097FFC  0x80098110  19  # PPCMfmsr, PPCMtmsr, etc.
+
+# NOTE: Gap 0x80098110-0x8009820C contains unknown PPC/EXI helpers (3 fn)
+
+# TU 18: EXI Bus Interface
+src/dolphin/exi/EXI.c                     0x8009820C  0x800993A8  ~20  # EXIImm, EXIDma, EXISync, EXIInit, etc.
+
+# NOTE: Gap 0x800993A8-0x80099790 -- unknown EXI/OS helpers
+
+# TU 19: FPR Init (part of OS)
+# (OSInit-adjacent)                       0x80099790  0x800998B8  1   # __OSFPRInit
+
+# TU 20: OS Initialization
+src/dolphin/os/OSInit.c                   0x800998E0  0x8009A27C  4   # ClearArena, InquiryCallback, OSInit, OSRegisterVersion
+
+# NOTE: OSExceptionInit (0x80099E1C) is called from within OSInit.c range
+# but the exception file starts at 0x80099E1C per the source file.
+# In the DOL, OSException.c code is EMBEDDED within OSInit.c's range.
+# This is normal: OSExceptionInit is defined in OSException.c, but the
+# linker placed it between OSInit functions. However, looking more carefully,
+# the "Matches" for OSInit.c starts at 0x800998E0 and OSException.c at
+# 0x80099E1C, with OSAlarm.c at 0x8009A27C. The SDK TUs are:
+
+# TU 21: OS Exception Handling
+src/dolphin/os/OSException.c              0x80099E1C  0x8009A1E8  ~8  # OSExceptionInit, vectors, handlers
+
+# TU 22: OS Alarm System
+src/dolphin/os/OSAlarm.c                  0x8009A27C  0x8009A92C  ~8  # OSInitAlarm, OSSetAlarm, Decrementer
+
+# NOTE: Gap 0x8009A92C-0x8009AFB0 -- OSMutex or other OS module (~10 fn)
+
+# TU 23: OS Arena
+src/dolphin/os/OSArena.c                  0x8009AFB0  0x8009AFCC  4   # OSGetArenaHi/Lo, OSSetArenaHi/Lo
+
+# NOTE: Gap 0x8009AFCC-0x8009B290 -- __OSInitAudioSystem (~3 fn)
+# This is likely OSAudioSystem.c (part of OS)
+
+# TU 24: OS Cache
+src/dolphin/os/OSCache.c                  0x8009B290  0x8009B914  ~20  # DCEnable, DCFlushRange, ICInvalidateRange, etc.
+
+# TU 25: OS Context
+src/dolphin/os/OSContext.c                0x8009B914  0x8009C1B0  ~12  # OSSetCurrentContext, OSLoadContext, OSDumpContext
+
+# NOTE: Gap 0x8009C1B0-0x8009C2E0 -- unknown context/error helpers
+
+# TU 26: OS Error Reporting
+src/dolphin/os/OSError.c                  0x8009C2E0  0x8009C860  ~4  # OSReport, OSSetErrorHandler, __OSUnhandledException
+
+# NOTE: Gap 0x8009C860-0x8009DF3C -- SRAM system (~15 fn)
+# This contains __OSInitSram, __OSLockSram, __OSLockSramEx, etc.
+# Likely OSSram.c + OSSystemCall.c
+
+# TU 27: OS Interrupts
+src/dolphin/os/OSInterrupt.c              0x8009DF3C  0x8009E7A4  ~12  # OSDisable/EnableInterrupts, __OSInterruptInit
+
+# NOTE: Gap 0x8009E7A4-0x8009F1B8 -- additional OS modules
+# Likely contains: OSEXI.c / OSModule.c or other SDK TUs
+
+# TU 28: OS Memory Protection
+src/dolphin/os/OSMemory.c                 0x8009F1B8  0x8009F77C  ~8  # __OSModuleInit, MEMIntrruptHandler, Config24/48MB
+
+# NOTE: Gap 0x8009F77C-0x8009FAF8 -- unknown OS module (~8 fn)
+
+# TU 29: OS Reset
+src/dolphin/os/OSReset.c                  0x8009FAF8  0x800A03B4  ~8  # __OSReboot, OSResetSystem, OSGetResetCode
+
+# NOTE: Gap 0x800A03B4-0x800A1290 -- SRAM extended + SystemCall
+# Contains: __OSInitSram, __OSLockSramEx, __OSInitSystemCall
+
+# TU 30: OS Thread
+src/dolphin/os/OSThread.c                 0x800A1290  0x800A2774  ~20  # __OSThreadInit, OSCancelThread, SelectThread
+
+# TU 31: OS Time
+src/dolphin/os/OSTime.c                   0x800A2778  0x800A27F8  3   # OSGetTime, OSGetTick, __OSGetSystemTime
+
+# NOTE: Gap 0x800A27F8-0x800A2B9C (~2 fn, unknown OS utility)
+
+# ============================================================================
+# SECTION 3: CW RUNTIME INIT (0x800A2B9C - 0x800A2C30)
+# ============================================================================
+
+# TU 32: CW Runtime Init
+src/crt/__init_cpp_exceptions.c           0x800A2B9C  0x800A2C30  3   # __init_user, __init_cpp, _ExitProcess
+
+# ============================================================================
+# SECTION 4: DOLPHIN SDK - DB (0x800A2C30 - 0x800A2D38)
+# ============================================================================
+
+# TU 33: Debug Bridge
+src/dolphin/db/DB.c                       0x800A2C30  0x800A2D38  5   # DBInit, DBPrintf, __DBExceptionDestination
+
+# ============================================================================
+# SECTION 5: DOLPHIN SDK - DVD (0x800A2D38 - 0x800A85DC)
+# ============================================================================
+
+# NOTE: DVD subsystem contains multiple TUs linked together
+
+# TU 34: DVD Low-level
+src/dolphin/dvd/DVDLow.c                  0x800A3EB0  0x800A4CF0  ~25  # __DVDInterruptHandler, DVDLowReset, etc.
+
+# TU 35: DVD Filesystem
+src/dolphin/dvd/DVDFs.c                   0x800A4CF0  0x800A4D28  1   # __DVDFSInit
+
+# TU 36: DVD Main
+src/dolphin/dvd/DVD.c                     0x800A5624  0x800A7820  ~30  # DVDInit, stateReady, stateBusy, DVDReadDiskID
+
+# TU 37: DVD Queue
+src/dolphin/dvd/DVDQueue.c                0x800A7DE8  0x800A7F80  4   # __DVDClearWaitingQueue, Push/Pop/Check
+
+# TU 38: DVD Error
+src/dolphin/dvd/DVDError.c                0x800A7FE0  0x800A8178  2   # ErrorCode2Num, __DVDStoreErrorCode
+
+# NOTE: Gap after DVDError (0x800A8178-0x800AA430) contains DVD filesystem
+# helpers (cb, __fstLoad) and additional DVD/CARD modules (~30 fn)
+
+# ============================================================================
+# SECTION 6: DOLPHIN SDK - VIDEO / PAD / AUDIO (0x800AA430 - 0x800B5E8C)
+# ============================================================================
+
+# TU 39: VI (Video Interface)
+src/dolphin/vi/VI.c                       0x800AA430  0x800ABF5C  ~40  # VIGetTvFormat + unnamed VI functions
+
+# TU 40: PAD (Controller)
+# (PAD.c)                                 0x800ABF5C  0x800B5E8C  ~100  # __PADDisableRecalibration + unnamed
+# NOTE: This range likely contains PAD.c, AI.c (Audio), AR.c (ARAM)
+
+# ============================================================================
+# SECTION 7: GX GRAPHICS API (0x800B5E8C - 0x800BE348)
+# ============================================================================
+
+# TU 41: GX Initialization
+# GX is typically split into multiple TUs, but all contiguous here
+# src/dolphin/gx/GXInit.c                0x800B5E8C  0x800B7114  ~3  # GXInit, __GXInitGX
+# src/dolphin/gx/GXFifo.c                0x800B7114  0x800B74C8  ~5  # GXInitFifoBase, GXSetCPUFifo, GXSetGPFifo
+# ... additional GX TUs for each GX module
+# GXMisc, GXPerf, GXTexture, etc. up to __GXFlushTextureState
+
+# Treating as one block since individual GX TU boundaries are hard to
+# distinguish without more named functions:
+# src/dolphin/gx/*.c                     0x800B5E8C  0x800BE348  168  # Full GX library
+
+# ============================================================================
+# SECTION 8: METROTRK DEBUGGER (0x800BE348 - 0x800C44F8)
+# ============================================================================
+
+# TU 42: TRK Nub (Main Loop)
+src/trk/TRKNub.c                          0x800BE348  0x800BEF18  ~10  # TRKNubMainLoop, TRKInitializeNub, event queue
+
+# TU 43: TRK Buffer
+src/trk/TRKBuffer.c                       0x800BEF18  0x800BF088  ~5  # TRKGetBuffer, TRKInitializeMessageBuffers
+
+# TU 44: TRK Serial
+src/trk/TRKSerial.c                       0x800BF088  0x800BF338  ~4  # TRKInitializeSerialHandler, TRKGetInput
+
+# TU 45: TRK Dispatch
+src/trk/TRKDispatch.c                     0x800BF3C4  0x800C0EAC  ~30  # TRKDispatchMessage + command handlers
+
+# TU 46: TRK Interrupt
+src/trk/TRKInterrupt.c                    0x800C0EAC  0x800C1300  ~5  # TRKInterruptHandler, TRKExceptionHandler, TRKSwapAndGo
+
+# TU 47: TRK Target
+src/trk/TRKTarget.c                       0x800C1300  0x800C2A10  ~15  # TRKTargetSupportRequest, TRKTargetInterrupt, etc.
+
+# TU 48: TRK Save State
+src/trk/TRKSaveState.c                    0x800C2A10  0x800C2D80  2   # TRKSaveExtended1Block, TRKRestoreExtended1Block
+
+# TU 49: TRK Init
+src/trk/TRKInit.c                         0x800C2D80  0x800C33BC  ~5  # InitMetroTRK, InitMetroTRK_BBA, TRKInitializeTarget
+
+# TU 50: TRK Board
+src/trk/TRKBoard.c                        0x800C33BC  0x800C3678  ~8  # TRK_main, TRKLoadContext, TRK_board_display, ReserveEXI2Port
+
+# TU 51: TRK Comm Table
+src/trk/TRKComm.c                         0x800C3678  0x800C3B00  ~5  # TRKInitializeIntDrivenUART, InitMetroTRKCommTable
+
+# NOTE: Gap 0x800C3B00-0x800C3BB8 - TRK utility functions
+
+# TU 52: UDP CC (stub)
+src/trk/udp_cc.c                          0x800C3BB8  0x800C3C00  9   # All stubs (blr)
+
+# TU 53: DDH CC
+src/trk/ddh_cc.c                          0x800C3C00  0x800C3F44  ~12  # ddh_cc_initialize through ddh_cc_read
+
+# NOTE: Gap 0x800C3F44-0x800C41AC - TRK misc functions
+
+# TU 54: GDEV CC
+src/trk/gdev_cc.c                         0x800C41AC  0x800C44F8  ~12  # gdev_cc_initialize through gdev_cc_read
+
+# ============================================================================
+# SECTION 9: CW STANDARD LIBRARY (0x800C44F8 - 0x800CE7C4)
+# ============================================================================
+
+# TU 55: MWTRACE
+# (mwtrace.c)                             0x800C44F8  0x800C4548  1   # MWTRACE
+
+# TU 56: va_arg
+src/crt/__va_arg.c                        0x800C45A0  0x800C4668  1   # __va_arg
+
+# TU 57: Global Destructor Chain
+src/crt/global_destructor_chain.c         0x800C4668  0x800C470C  1   # __destroy_global_chain
+
+# TU 58: FPR/GPR Save/Restore (compiler runtime)
+# (runtime support, auto-generated)       0x800C470C  0x800C483C  4   # __save_fpr, __restore_fpr, __save_gpr, __restore_gpr
+
+# TU 59: Integer Division (compiler runtime)
+# (longlong.c / div.c)                    0x800C483C  0x800C4E44  ~6  # __div2u, __mod2u + helpers
+
+# TU 60: Exit
+src/crt/exit.c                            0x800C4E44  0x800C5458  ~5  # exit, atexit
+
+# TU 61: Stdio
+src/crt/stdio.c                           0x800C5458  0x800C757C  ~15  # __close_all, __flush_buffer, __prep_buffer, fwrite, fseek
+
+# TU 62: Wchar
+src/crt/wchar.c                           0x800C7FB8  0x800C811C  1   # wcstombs
+
+# TU 63: Memory
+src/crt/mem.c                             0x800C811C  0x800C8510  ~5  # __memrchr, memchr + buffer operations
+
+# TU 64: Printf
+src/crt/printf.c                          0x800C8510  0x800CA78C  ~12  # __stdio_atexit, vprintf, __pformatter, float2str, etc.
+
+# TU 65: String
+src/crt/string.c                          0x800CA78C  0x800CAA58  ~5  # strchr, strlen + helpers
+
+# NOTE: Remaining CRT area (0x800CAA58-0x800CE7C4) contains additional
+# standard library functions: fwide, math, and AMC/Hu stubs
+# These are likely from: fwide.c, math.c, alloc.c, etc.
+
+# ============================================================================
+# SECTION 10: DOLPHIN SDK - SI (0x800CE7C4 - 0x800D104C)
+# ============================================================================
+
+# NOTE: AMC_IsStub, Hu_IsStub (0x800CE7C4) are stubs before SI proper
+
+# TU 66: SI (Serial Interface)
+src/dolphin/si/SI.c                       0x800CFA60  0x800D104C  ~25  # SIInterruptHandler, SIInit, SITransfer, SIGetType, SISetSamplingRate
+
+# ============================================================================
+# SECTION 11: GENIUS SONORITY ENGINE (0x800D104C - 0x80190E34)
+# ============================================================================
+
+# NOTE: Between SI end (0x800D104C) and GSgfx (0x800D3074) there are
+# additional game/engine initialization functions (~40 fn)
+# UNIDENTIFIED                            0x800D104C  0x800D3074  ~40  # Pre-GSgfx engine init
+
+# TU 67: GSgfx - Graphics Subsystem Init
+src/game/gs_gfx.c                         0x800D3074  0x800D3E4C  ~15  # GSgfxInit, SetVideoMode, EnableRendering, SwapBuffers
+
+# TU 68: GSrender - Extended Rendering Pipeline
+src/game/gs_render.c                      0x800D3E4C  0x800E202C  278  # VBlank, matrix stack, viewport, TEV, lighting, materials, draw
+
+# TU 69: GSmem - Memory Management
+src/game/gs_mem.c                         0x800E202C  0x800E3604  ~30  # GSmemAlloc, GSmemInit, handle-based memory
+
+# TU 70: GSmaterial System (extended)
+# UNIDENTIFIED (gs_material.c?)           0x800E3604  0x800EE2C8  ~180  # Material/shader functions
+
+# NOTE: The material code at 0x800E3604 may be part of gs_render.c or a
+# separate gs_material.c file. The address range is large enough for its own TU.
+
+# TU 71: GSpart - Model Part System
+# (gs_part.c)                             0x800EE2C8  0x800EF098  ~20  # Part rotation, joint hierarchy
+
+# TU 72: GStexture - Texture System
+src/game/gs_texture.c                     0x800EF098  0x800F07A8  ~25  # GStextureCreate, format validation, size adjustment
+
+# TU 73: GSthread - Thread System
+src/game/gs_thread.c                      0x800F07A8  0x800FEBA0  ~80  # GSthreadInit, GStaskCreate, cooperative multitasking
+
+# NOTE: Input module sits WITHIN the thread range (called from task system)
+# src/game/input/input.c                 0x800F7500  0x800F8268  20  # PAD wrapper (nested within gs_thread TU area)
+# INTERLEAVING NOTE: input.c functions appear within gs_thread's range.
+# This likely means input.c is a separate TU linked between parts of
+# gs_thread, OR input functions were factored out of a shared module.
+
+# TU 74: GSfloor Data (pre-floor utilities)
+src/game/gs_floor_data.c                  0x800FF0A0  0x800FF788  ~10  # Pre-floor utility functions
+
+# TU 75: GSfloor - Floor/World System
+src/game/gs_floor.c                       0x800FF788  0x80101910  ~60  # GSfloorOpen, GSfloorInit, floor loading
+
+# TU 76: GSmodel - 3D Model Management
+src/game/gs_model.c                       0x80101910  0x8010C220  145  # Model resources, animation, rendering, skinning
+
+# TU 77: GScolsys2 - Collision System
+src/game/gs_colsys.c                      0x8010C220  0x8010E138  ~30  # Collision detection, display list debug draw
+
+# TU 78: GSfield Collision Queries
+src/game/gs_field_colquery.c              0x8010E138  0x80114300  ~200  # RayCast, SphereSweep, GridLookup, collision grid
+
+# TU 79: GSfield Resources
+src/game/gs_field_resource.c              0x8011432C  0x80114CA8  ~18  # Floor resource pre-funcs (GFL, sound, particle, etc.)
+
+# TU 80: GSfield World
+src/game/gs_field_world.c                 0x80114CA8  0x80130CE0  ~600  # Field camera, world logic, object management, transitions
+
+# TU 81: GSeffect - Effect System Core
+src/game/effect/gs_effect.c               0x80130CE0  0x8013151C  ~15  # GSEffectInit, Trigger, Register, AllocSlot
+
+# NOTE: Gap 0x8013151C-0x80137114 -- effect sub-modules (~50 fn)
+# UNIDENTIFIED (effect sub-modules)       0x8013151C  0x80137114  ~50  # Additional effect utilities
+
+# TU 82: TraceFX - Trail Effects
+src/game/effect/tracefx.c                 0x80137114  0x801380D4  ~15  # Trail rendering, parameters, segments
+
+# TU 83: Effect Visual - Lightning/Leaf/Electron/etc.
+src/game/effect/effect_visual.c           0x801380D4  0x801402AC  ~40  # Lightning, leaf, electron, filter effects
+
+# NOTE: Gap 0x801402AC-0x80140588 -- small gap between effects and people_data
+# UNIDENTIFIED                            0x801402AC  0x80140588  ~5   # Effect/people transition
+
+# TU 84: People Data (model loading)
+src/game/people/people_data.c             0x80140588  0x80144574  ~30  # peopleFieldOpen, LoadModel, field data
+
+# TU 85: People Field (spawn/world management)
+src/game/people/people_field.c            0x80144574  0x801652DC  ~300  # Large NPC/people field system
+
+# TU 86: Sound - Core
+src/game/sound/sound.c                    0x801652DC  0x80166098  ~25  # sndWaveOpen, sndStop, sndCheckFileInfo
+
+# TU 87: Sound - SE (Sound Effects)
+src/game/sound/sound_se.c                 0x80166098  0x80166670  ~15  # Sound effects playback
+
+# TU 88: Sound - BGM (Background Music)
+src/game/sound/sound_bgm.c               0x80166670  0x80166E88  ~20  # Background music control
+
+# NOTE: Gap 0x80166E88-0x80167040 -- sound utility tail functions
+# UNIDENTIFIED (sound tail)               0x80166E88  0x80167040  ~5   # Sound cleanup/utility
+
+# TU 89: GSDVD - DVD/Disc I/O System
+src/game/gs_dvd.c                         0x80167040  0x80168C64  56   # GSDVD_Open, ErrorStateMachine, Init
+
+# TU 90: Script List
+src/game/script/pslist.c                  0x80168C64  0x80169104  ~10  # pslist_Link, pslist_Unlink + helpers
+
+# NOTE: Gap 0x80169104-0x8016F430 -- additional script system functions
+# UNIDENTIFIED (script module)            0x80169104  0x8016F430  ~60  # Script engine support
+
+# TU 91: Script Interpreter
+src/game/script/psinterpret.c             0x8016F430  0x80172630  ~5   # psinterpret_Main (12,592 byte interpreter)
+
+# NOTE: Gap 0x80172630-0x8017424C -- script system continued
+# UNIDENTIFIED (script/generator gap)     0x80172630  0x8017424C  ~20  # Script continuation
+
+# TU 92: Generator System
+src/game/effect/generator.c               0x8017424C  0x8017572C  ~5   # generatorMain (camera script generation)
+
+# TU 93: GSscene - Scene Object System
+src/game/gs_scene.c                       0x8017572C  0x8017A5FC  78   # Scene objects, render, camera, XFB capture
+
+# NOTE: Gap 0x8017A5FC-0x8017AC40 -- small gap before FSYS
+# UNIDENTIFIED                            0x8017A5FC  0x8017AC40  ~5   # Scene tail / FSYS helpers
+
+# TU 94: FSYS Archive Loading
+src/game/fsys/fsys_load.c                 0x8017AC40  0x8017B07C  ~5   # FSYS_LoadTOC
+
+# TU 95: FSYS File Operations
+src/game/fsys/fsys_file.c                 0x8017B07C  0x8017F2C4  ~40  # File open/read/close (scattered ranges)
+
+# TU 96: FSYS Decompression
+src/game/fsys/fsys_decomp.c               0x8017F2C4  0x8017F3F8  1   # Decompression routine
+
+# NOTE: Gap 0x8017F3F8-0x80180C78 -- FSYS tail, pre-people code
+# UNIDENTIFIED (fsys/people gap)          0x8017F3F8  0x80180C78  ~30  # FSYS tail or world init
+
+# TU 97: People - Core
+src/game/people/people.c                  0x80180C78  0x80181850  ~15  # peopleInit, peopleUpdate, floor callbacks
+# (also has tail at 0x8018FB94-0x8018FE30)
+
+# TU 98: People - Interaction
+src/game/people/people_interact.c         0x801812E8  0x8018FBD4  ~50  # Talk, motion, spawn, getters/setters
+# NOTE: people_interact.c and people_move.c overlap in range with people.c.
+# INTERLEAVING NOTE: The people.c, people_move.c, and people_interact.c
+# functions are interleaved in the 0x80181200-0x8018FE30 range.
+# This strongly suggests they were originally ONE translation unit that
+# was later split into separate files, or they share a common header
+# that causes interleaving.
+
+# TU 99: People - Movement
+src/game/people/people_move.c             0x801812C4  0x8018F200  ~80  # Movement state machine, walk path
+
+# TU 100: GSflag - Game Flag System
+src/game/gs_flag.c                        0x8018FE30  0x80190E34  9    # GSflagSet, GSflagGet, bit operations
+
+# ============================================================================
+# SECTION 12: HAL SYSDOLPHIN (HSD) LIBRARY (0x80190E34 - 0x801C0000)
+# ============================================================================
+
+# TU 101: HSD Object (base class)
+src/hsd/hsd_object.c                      0x80190E34  0x801914F4  ~10  # HSD_ObjAlloc, ref counting
+
+# TU 102: HSD WObj (World Object)
+src/hsd/hsd_wobj.c                        0x801914F4  0x801920E4  ~20  # Animation targets
+
+# TU 103: HSD AObj (Animation Object)
+src/hsd/hsd_aobj.c                        0x801920E4  0x80193748  ~15  # Animation keyframes
+# NOTE: hsd_aobj.c address is inferred from position between wobj and class
+
+# TU 104: HSD Class
+src/hsd/hsd_class.c                       0x801938FC  0x80193C24  ~10  # OO class system
+
+# TU 105: HSD CObj (Camera Object)
+src/hsd/hsd_cobj.c                        0x80193C24  0x80197A64  ~60  # Camera management
+
+# TU 106: HSD DisplayFunc
+src/hsd/hsd_displayfunc.c                 0x80197A64  0x80198F7C  ~15  # Billboard, render pass dispatch
+
+# TU 107: HSD DObj (Display Object)
+src/hsd/hsd_dobj.c                        0x80198F7C  0x8019B7C0  ~30  # Visible geometry
+
+# TU 108: HSD Fog
+src/hsd/hsd_fog.c                         0x8019B7C0  0x8019C690  ~15  # Fog adjustment
+
+# TU 109: HSD Initialize
+src/hsd/hsd_initialize.c                  0x8019C690  0x8019CE50  ~10  # HSD system initialization
+
+# TU 110: HSD JObj (Joint Object)
+src/hsd/hsd_jobj.c                        0x8019CE50  0x801A4000  ~80  # Skeletal hierarchy
+
+# TU 111: HSD LObj (Light Object)
+src/hsd/hsd_lobj.c                        0x801A4000  0x801A69C0  ~40  # Lighting
+
+# TU 112: HSD Memory
+# (hsd_memory.c)                          0x801A69C0  0x801A6A34  1    # Memory assert
+
+# TU 113: HSD MObj (Material Object)
+src/hsd/hsd_mobj.c                        0x801A6A34  0x801AA608  ~50  # Material/texture
+
+# TU 114: HSD PObj (Primitive Object)
+src/hsd/hsd_pobj.c                        0x801AA608  0x801B019C  ~60  # Mesh data, vertex arrays
+
+# TU 115: HSD FObj (Float Object)
+src/hsd/hsd_fobj.c                        0x801B019C  0x801BBAC8  ~80  # Keyframe animation
+# NOTE: shadow.c (0x801B019C) is listed at the same address as FObj,
+# but shadow.c is HSD's stencil shadow rendering, not the game-level shadow.
+# The HSD shadow functions (0x801B019C-0x801B1730) likely belong to hsd_fobj.c
+# or a separate hsd_shadow.c. Given the source file list, treating this
+# as within the FObj range.
+
+# TU 116: HSD RObj (Reference Object)
+src/hsd/hsd_robj.c                        0x801BBAC8  0x801BF138  ~30  # Constraints
+# NOTE: hsd_robj may actually start earlier; 0x801BBAC8 is HSD_TObjInit area.
+# Re-evaluating: hsd_tobj.c starts at 0x801BBAC8, so robj is likely after tobj.
+
+# CORRECTION for TU 115-116:
+# TU 115: HSD TObj (Texture Object)
+# src/hsd/hsd_tobj.c                     0x801BBAC8  0x801BF138  ~40  # Texture management
+
+# TU 116: HSD RObj (Reference Object)
+# src/hsd/hsd_robj.c                     0x801BF138  0x801C0000  ~20  # Constraints, reference counting
+
+# NOTE: The exact TObj/RObj boundary within 0x801BBAC8-0x801C0000 is uncertain.
+
+# ============================================================================
+# SECTION 13: BATTLE SYSTEM (0x801C0000 - 0x80201800)
+# ============================================================================
+
+# NOTE: Large block of battle/game code. Individual TU boundaries are
+# difficult to determine precisely without more named functions.
+
+# TU 117: Battle Grid / Scene Setup
+# (battle_grid.c?)                        0x801C3108  0x801C53BC  36   # battleGridSetup, LoadModels, UpdatePositions
+
+# TU 118: Battle Logic / State Machine
+# (battle_logic.c?)                       0x801C53BC  0x801D7230  ~205  # Damage calc, type effectiveness, AI, status
+
+# TU 119: Waza (Move Animation) System
+# (waza.c)                                0x801D7230  0x801E03D4  ~108  # wazaSequenceLoad, update, particle/model entries
+
+# TU 120: Battle State Machine (move execution)
+src/game/battle/battle_move.c             0x801E03D4  0x801EF02C  ~150  # State machine with huge switch tables
+# NOTE: battle_type.c, battle_status.c, battle_damage.c, battle_ai.c,
+# battle_shadow.c functions are likely INTERLEAVED within this range.
+# This is typical when multiple source files implement different cases
+# of the same state machine and are compiled together.
+
+# TU 121: Battle Core / Fight Flow
+src/game/battle/battle_main.c             0x801EF02C  0x801F000C  26   # battle_FightStart, FightEnd, MainLoop
+
+# TU 122: Pokemon Core
+src/game/pokemon.c                        0x801F000C  0x801F7F80  ~60  # Pokemon data management
+
+# TU 123: Trainer
+src/game/trainer.c                        0x801F7F80  0x80201800  ~80  # Trainer data, battle setup
+
+# ============================================================================
+# SECTION 14: COLOSSEUM GAME LOGIC (0x80201800 - 0x8026635C)
+# ============================================================================
+
+# TU 124: Colosseum Event System
+src/game/colosseum_event.c                0x80201800  0x80212000  ~60  # Event flags, state management
+
+# TU 125: Colosseum Script System
+src/game/colosseum_script.c               0x80212000  0x80240000  ~150  # 52-opcode script VM, StoryScriptExecute
+
+# TU 126: Colosseum Battle Orchestration
+src/game/colosseum_battle.c               0x80240000  0x80266360  ~200  # Battle sequences, trainer battles, story progression
+
+# NOTE: Last function in .text at 0x80266320 (size 0x3C), end = 0x8026635C
+
+# ============================================================================
+# SPECIAL NOTES
+# ============================================================================
+#
+# INTERLEAVING DETECTED:
+# 1. people.c / people_move.c / people_interact.c (0x80180C78-0x8018FE30)
+#    These three files' functions are interleaved throughout the range.
+#    This strongly suggests they were originally a single TU, or the linker
+#    merged them. The people module should be treated as one TU for linking.
+#
+# 2. battle_move.c / battle_type.c / battle_status.c / battle_damage.c /
+#    battle_ai.c / battle_shadow.c (0x801E03D4-0x801EF02C)
+#    Battle sub-files are interleaved within the state machine range.
+#    These likely form a single TU or a tightly-linked group.
+#
+# 3. input.c (0x800F7500-0x800F8268) sits within gs_thread.c's range.
+#    This suggests input.c was linked between gs_thread TU sections, or
+#    was originally part of the same compilation unit.
+#
+# GAPS (unattributed address ranges):
+# See splits_refined.txt for the full gap analysis.
