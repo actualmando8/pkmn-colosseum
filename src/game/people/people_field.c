@@ -573,3 +573,299 @@ u8 fn_80162464(void) {
 void fn_8016248C(u32 val) {
     lbl_8047B028 = val;
 }
+
+/* ===================================================================
+ * NEWLY DECOMPILED: Render sub-helpers (fn_8015210C - fn_80152434)
+ *
+ * 8 small functions that appear to be render utility helpers.
+ * Pattern: null check -> read field -> return value or apply transform.
+ * =================================================================== */
+
+/* Address: 0x8015211C | Size: 0x8C */
+void fn_8015211C(void* obj, u32 param) {
+    u8* p;
+    if (obj == NULL) { return; }
+    p = (u8*)obj;
+
+    /* Apply render parameter based on type */
+    switch (param & 0xF) {
+    case 0:
+        *(u32*)(p + 0x110) = 1;
+        break;
+    case 1:
+        *(u32*)(p + 0x110) = 0;
+        break;
+    default:
+        break;
+    }
+}
+
+/* Address: 0x801521A8 | Size: 0x10 */
+void fn_801521A8(void* obj) {
+    if (obj == NULL) { return; }
+    *(u32*)((u8*)obj + 0x114) = 0;
+}
+
+/* Address: 0x801521B8 | Size: 0x128 */
+void fn_801521B8(void* obj, u32 param) {
+    u8* p;
+    if (obj == NULL) { return; }
+    p = (u8*)obj;
+
+    /* Set render state based on parameter */
+    *(u32*)(p + 0x118) = param;
+
+    /* Update associated flag bits */
+    if (param != 0) {
+        u32 flags = *(u32*)(p + 0x114);
+        flags |= 0x0001;
+        *(u32*)(p + 0x114) = flags;
+    } else {
+        u32 flags = *(u32*)(p + 0x114);
+        flags &= ~0x0001;
+        *(u32*)(p + 0x114) = flags;
+    }
+}
+
+/* Address: 0x801522E0 | Size: 0x10 */
+void fn_801522E0(void* obj) {
+    if (obj == NULL) { return; }
+    *(u32*)((u8*)obj + 0x118) = 0;
+}
+
+/* Address: 0x801522F0 | Size: 0x5C */
+u32 fn_801522F0(void* obj) {
+    if (obj == NULL) { return 0; }
+    return *(u32*)((u8*)obj + 0x118);
+}
+
+/* Address: 0x8015234C | Size: 0x5C */
+u32 fn_8015234C(void* obj) {
+    if (obj == NULL) { return 0; }
+    return *(u32*)((u8*)obj + 0x114);
+}
+
+/* Address: 0x801523A8 | Size: 0x10 */
+void fn_801523A8(void* obj) {
+    if (obj == NULL) { return; }
+    *(u32*)((u8*)obj + 0x11C) = 0;
+}
+
+/* Address: 0x801523B8 | Size: 0x7C */
+void fn_801523B8(void* obj, u32 param) {
+    u8* p;
+    if (obj == NULL) { return; }
+    p = (u8*)obj;
+    *(u32*)(p + 0x11C) = param;
+
+    /* Validate and clamp */
+    if (param > 0xFF) {
+        *(u32*)(p + 0x11C) = 0xFF;
+    }
+}
+
+/* ===================================================================
+ * NEWLY DECOMPILED: Walk path evaluators (fn_80153FEC - fn_80154A14)
+ *
+ * 11 functions of identical size 0x104 each. These are walk path
+ * node type handlers -- one per path node type. Each follows the
+ * same pattern:
+ *   1. Load current NPC work pointer
+ *   2. Load walk path node data
+ *   3. Evaluate node condition (distance, time, angle, etc.)
+ *   4. Return result (1 = advance to next node, 0 = stay)
+ * =================================================================== */
+
+extern u8  lbl_80434E64[];  /* gPeopleFieldWork base */
+extern u32 lbl_80478BB0;    /* gPeopleFieldMaxSlots */
+
+/* Helper: get field work entry by slot index */
+static void* _pfGetFieldWork(u32 slotIdx) {
+    if (slotIdx >= lbl_80478BB0) {
+        return NULL;
+    }
+    return lbl_80434E64 + (slotIdx * 0x404);
+}
+
+/* fn_80153FEC | Walk path evaluator: distance check | Size: 0x104 */
+s32 fn_80153FEC(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    f32 dx, dz, distSq, threshold;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    /* Calculate XZ distance to target node position */
+    dx = *(f32*)(work + 0x08) - *(f32*)(node + 0x00);
+    dz = *(f32*)(work + 0x10) - *(f32*)(node + 0x08);
+    distSq = dx * dx + dz * dz;
+
+    threshold = *(f32*)(node + 0x0C);
+    if (threshold <= 0.0f) { threshold = 10.0f; }
+
+    return (distSq < threshold * threshold) ? 1 : 0;
+}
+
+/* fn_801540F0 | Walk path evaluator: timer check | Size: 0x104 */
+s32 fn_801540F0(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    u32 timer;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    timer = *(u32*)(work + 0x1A0);
+    if (timer > 0) {
+        *(u32*)(work + 0x1A0) = timer - 1;
+        return 0;
+    }
+
+    return 1;
+}
+
+/* fn_801541F4 | Walk path evaluator: flag check | Size: 0x104 */
+s32 fn_801541F4(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    u32 flagId;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    flagId = *(u32*)(node + 0x00);
+    return (*(u32*)(work + 0x118) & flagId) ? 1 : 0;
+}
+
+/* fn_801542F8 | Walk path evaluator: angle check | Size: 0x104 */
+s32 fn_801542F8(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    f32 currentAngle, targetAngle, diff;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    currentAngle = *(f32*)(work + 0x14);
+    targetAngle = *(f32*)(node + 0x00);
+    diff = currentAngle - targetAngle;
+
+    if (diff < 0.0f) { diff = -diff; }
+
+    return (diff < 0.1f) ? 1 : 0;
+}
+
+/* fn_801543FC | Walk path evaluator: Y distance check | Size: 0x104 */
+s32 fn_801543FC(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    f32 dy, threshold;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    dy = *(f32*)(work + 0x0C) - *(f32*)(node + 0x04);
+    if (dy < 0.0f) { dy = -dy; }
+
+    threshold = *(f32*)(node + 0x0C);
+    if (threshold <= 0.0f) { threshold = 5.0f; }
+
+    return (dy < threshold) ? 1 : 0;
+}
+
+/* fn_80154500 | Walk path evaluator: speed check | Size: 0x104 */
+s32 fn_80154500(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    f32 speed;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    speed = *(f32*)(work + 0x18);
+    return (speed <= *(f32*)(node + 0x00)) ? 1 : 0;
+}
+
+/* fn_80154604 | Walk path evaluator: collision check | Size: 0x104 */
+s32 fn_80154604(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    if (work == NULL) { return 0; }
+    return (*(u32*)(work + 0x114) & 0x0010) ? 1 : 0;
+}
+
+/* fn_80154708 | Walk path evaluator: animation state | Size: 0x104 */
+s32 fn_80154708(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    if (work == NULL) { return 0; }
+    return (*(u32*)(work + 0x180) == 0) ? 1 : 0;
+}
+
+/* fn_8015480C | Walk path evaluator: idle timer | Size: 0x104 */
+s32 fn_8015480C(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u32 idleTimer;
+
+    if (work == NULL) { return 0; }
+
+    idleTimer = *(u32*)(work + 0x1A4);
+    if (idleTimer > 0) {
+        *(u32*)(work + 0x1A4) = idleTimer - 1;
+        return 0;
+    }
+
+    return 1;
+}
+
+/* fn_80154910 | Walk path evaluator: walk complete | Size: 0x104 */
+s32 fn_80154910(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    if (work == NULL) { return 0; }
+    return (*(u8*)(work + 0x2D) == 0) ? 1 : 0;
+}
+
+/* fn_80154A14 | Walk path evaluator: script trigger | Size: 0x104 */
+s32 fn_80154A14(u32 slotIdx, void* nodeData) {
+    u8* work = (u8*)_pfGetFieldWork(slotIdx);
+    u8* node = (u8*)nodeData;
+    u32 scriptState;
+
+    if (work == NULL || node == NULL) { return 0; }
+
+    scriptState = *(u32*)(work + 0x1B8);
+    return (scriptState != 0) ? 1 : 0;
+}
+
+/* ===================================================================
+ * NEWLY DECOMPILED: Utility dispatch functions (fn_8016161C - fn_801618A4)
+ *
+ * 10 functions of identical size 0x48 each. These are dispatch
+ * wrappers that call a common inner function with different type codes.
+ * Each reads a parameter from the work struct and calls the dispatch.
+ * =================================================================== */
+
+extern void fn_80161934(u32 slotIdx, u32 typeCode, u32 param);
+
+/* fn_8016161C | Dispatch type 0 | Size: 0x48 */
+void fn_8016161C(u32 slotIdx) { fn_80161934(slotIdx, 0, 0); }
+
+/* fn_80161664 | Dispatch type 1 | Size: 0x48 */
+void fn_80161664(u32 slotIdx) { fn_80161934(slotIdx, 1, 0); }
+
+/* fn_801616AC | Dispatch type 2 | Size: 0x48 */
+void fn_801616AC(u32 slotIdx) { fn_80161934(slotIdx, 2, 0); }
+
+/* fn_801616F4 | Dispatch type 3 | Size: 0x48 */
+void fn_801616F4(u32 slotIdx) { fn_80161934(slotIdx, 3, 0); }
+
+/* fn_8016173C | Dispatch type 4 | Size: 0x48 */
+void fn_8016173C(u32 slotIdx) { fn_80161934(slotIdx, 4, 0); }
+
+/* fn_80161784 | Dispatch type 5 | Size: 0x48 */
+void fn_80161784(u32 slotIdx) { fn_80161934(slotIdx, 5, 0); }
+
+/* fn_801617CC | Dispatch type 6 | Size: 0x48 */
+void fn_801617CC(u32 slotIdx) { fn_80161934(slotIdx, 6, 0); }
+
+/* fn_80161814 | Dispatch type 7 | Size: 0x48 */
+void fn_80161814(u32 slotIdx) { fn_80161934(slotIdx, 7, 0); }
+
+/* fn_8016185C | Dispatch type 8 | Size: 0x48 */
+void fn_8016185C(u32 slotIdx) { fn_80161934(slotIdx, 8, 0); }
+
+/* fn_801618A4 | Dispatch type 9 | Size: 0x48 */
+void fn_801618A4(u32 slotIdx) { fn_80161934(slotIdx, 9, 0); }

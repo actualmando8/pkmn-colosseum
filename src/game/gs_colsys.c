@@ -1754,14 +1754,11 @@ void fn_8010C224(void) {
 }
 #pragma pop
 
-/* 0x8010C364 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C364(void) {
-    /* TODO: match -- 36 bytes at 0x8010C364 */
+/* 0x8010C364 | 36 bytes | call_return_const */
+u32 fn_8010C364(void) {
+    fn_800EF5A4();
+    return 1;
 }
-#pragma pop
 
 /* 0x8010C388 | 0x74 */
 #pragma push
@@ -1889,14 +1886,10 @@ void fn_8010CA30(void) {
 }
 #pragma pop
 
-/* 0x8010CBC0 | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010CBC0(void) {
-    /* TODO: match -- 16 bytes at 0x8010CBC0 */
+/* 0x8010CBC0 | 16 bytes | global_getter */
+u32 fn_8010CBC0(void) {
+    return *(u32*)((u8*)&lbl_80404C68 + 0x0);
 }
-#pragma pop
 
 /* 0x8010CBD0 | 0x34 */
 #pragma push

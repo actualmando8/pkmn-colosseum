@@ -288,6 +288,8 @@ void GSfield_UpdateObjects(void) {
  * Range: 0x8010E138 - 0x8011432C
  * =================================================================== */
 
+extern u32 lbl_80408378;
+
 /* 0x8010F320 | 0x198 */
 #pragma push
 #pragma optimization_level 0
@@ -603,41 +605,25 @@ void fn_8011388C(void) {
 }
 #pragma pop
 
-/* 0x8011392C | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011392C(void) {
-    /* TODO: match -- 16 bytes at 0x8011392C */
+/* 0x8011392C | 16 bytes | global_getter */
+u32 fn_8011392C(void) {
+    return *(u32*)((u8*)lbl_80408378 + 0xC);
 }
-#pragma pop
 
-/* 0x8011393C | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011393C(void) {
-    /* TODO: match -- 16 bytes at 0x8011393C */
+/* 0x8011393C | 16 bytes | global_getter */
+u32 fn_8011393C(void) {
+    return *(u32*)((u8*)lbl_80408378 + 0x4);
 }
-#pragma pop
 
-/* 0x8011394C | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011394C(void) {
-    /* TODO: match -- 16 bytes at 0x8011394C */
+/* 0x8011394C | 16 bytes | global_getter */
+u32 fn_8011394C(void) {
+    return *(u32*)((u8*)lbl_80408378 + 0x0);
 }
-#pragma pop
 
-/* 0x8011395C | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8011395C(void) {
-    /* TODO: match -- 16 bytes at 0x8011395C */
+/* 0x8011395C | 16 bytes | global_setter */
+void fn_8011395C(u32 val) {
+    *(u32*)((u8*)lbl_80408378 + 0x0) = val;
 }
-#pragma pop
 
 /* 0x8011396C | 0x50 */
 #pragma push
@@ -675,14 +661,11 @@ void fn_80113B84(void) {
 }
 #pragma pop
 
-/* 0x80113D10 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80113D10(void) {
-    /* TODO: match -- 36 bytes at 0x80113D10 */
+/* 0x80113D10 | 36 bytes | call_return_const */
+u32 fn_80113D10(void) {
+    fn_800E4BF4();
+    return 1;
 }
-#pragma pop
 
 /* 0x80113D34 | 0x24 */
 #pragma push
