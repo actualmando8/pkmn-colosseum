@@ -126,7 +126,6 @@ s32 fn_800836AC(void) {
     /* TODO: decompile (0x448 bytes, ~274 instructions) */
     /* Uses many saved registers */
     fn_80129280();
-    memset();
     fn_800CAA3C();
     fn_80196E10();
     return 0;

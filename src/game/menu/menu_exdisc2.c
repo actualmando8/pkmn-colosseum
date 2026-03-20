@@ -342,7 +342,6 @@ s32 fn_8007AB10(void) {
 s32 fn_8007B090(void) {
     /* TODO: decompile (0x48 bytes) */
     fn_800A7BCC();
-    memcpy();
     fn_8007B114();
     return 0;
 }
@@ -361,7 +360,6 @@ s32 fn_8007B114(void) {
     fn_800A501C();
     fn_8009AAD4();
     fn_8009A9D8();
-    memset();
     fn_800A50E4();
     fn_800A541C();
     fn_800C8174();
@@ -372,8 +370,6 @@ s32 fn_8007B114(void) {
 void fn_8007B350(void) {
     /* TODO: decompile (0x354 bytes, ~213 instructions) */
     /* Uses many saved registers */
-    memset();
-    memcpy();
     fn_8009F1D0();
     fn_800A19CC();
     fn_800A1F94();

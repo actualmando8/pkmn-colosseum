@@ -256,7 +256,6 @@ s32 fn_80073E84(void) {
 s32 fn_80073E8C(void) {
     /* TODO: decompile (0x498 bytes, ~294 instructions) */
     fn_800A7BCC();
-    memcpy();
     fn_8025F350();
     fn_800A501C();
     fn_800060F0();

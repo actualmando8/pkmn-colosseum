@@ -182,7 +182,6 @@ s32 fn_80077E50(void) {
 
 /* 0x80077E80 | size: 0x24 */
 void fn_80077E80(void) {
-    memcpy();
 }
 
 /* 0x80077EA4 | size: 0x30 */

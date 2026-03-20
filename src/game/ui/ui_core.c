@@ -994,7 +994,6 @@ s32 fn_80063D14(void) {
     /* TODO: decompile (0x664 bytes, ~409 instructions) */
     /* Uses many saved registers */
     fn_80165A20();
-    memcpy();
     fn_8025DA88();
     fn_8025DA3C();
     fn_8006B09C();
@@ -1005,6 +1004,7 @@ s32 fn_80063D14(void) {
     fn_8025D89C();
     fn_8008AB20();
     fn_8025D744();
+    fn_8006ACCC();
     return 0;
 }
 

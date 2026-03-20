@@ -326,7 +326,6 @@ s32 fn_80097A38(void) {
     /* TODO: decompile (0xCC bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_800FF730();
     fn_8011288C();
     return 0;
@@ -337,7 +336,6 @@ s32 fn_80097B04(void) {
     /* TODO: decompile (0xB8 bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_8009769C();
     return 0;
 }
@@ -350,7 +348,6 @@ s32 fn_80097BBC(void) {
     fn_80123FBC();
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_800FF730();
     fn_8011288C();
     return -1;
@@ -361,7 +358,6 @@ s32 fn_80097CD0(void) {
     /* TODO: decompile (0xC4 bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_8009769C();
     return 0;
 }
@@ -371,7 +367,6 @@ s32 fn_80097D94(void) {
     /* TODO: decompile (0xC4 bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_8009769C();
     return 0;
 }
@@ -381,7 +376,6 @@ s32 fn_80097E58(void) {
     /* TODO: decompile (0xB0 bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_8009769C();
     return 0;
 }
@@ -391,7 +385,6 @@ s32 fn_80097F08(void) {
     /* TODO: decompile (0xC4 bytes) */
     fn_800F0308();
     fn_8010B560();
-    memset();
     fn_8009769C();
     return 0;
 }

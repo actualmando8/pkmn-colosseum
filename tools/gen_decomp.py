@@ -345,6 +345,11 @@ for key, func_list in sorted(plan.items()):
         ret_type, param_str, returns_value, has_ret_neg1, calls = fn_sigs[name]
         body = get_fn_body(name) if name in fn_lines else ''
 
+        # Filter out known prototyped functions from stub calls
+        SKIP_CALL = {'memset', 'memcpy', 'memcmp', 'strlen', 'strcpy', 'sprintf',
+                     'strcmp', 'strncpy', 'strncmp'}
+        calls = [c for c in calls if c not in SKIP_CALL]
+
         # Use precomputed signature for consistency
         sig = '%s %s(%s)' % (ret_type, name, param_str)
 

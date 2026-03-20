@@ -63,7 +63,6 @@ s32 fn_8007FDBC(void) {
     fn_800E2C04();
     fn_80196E10();
     fn_800E27B0();
-    memset();
     fn_800F9D24();
     fn_800E202C();
     fn_800E24B0();
@@ -79,7 +78,6 @@ s32 fn_8007FDBC(void) {
 s32 fn_80080310(void) {
     /* TODO: decompile (0xBC8 bytes, ~754 instructions) */
     /* Uses many saved registers */
-    memset();
     fn_8008102C();
     return 0;
 }

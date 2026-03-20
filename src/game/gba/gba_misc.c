@@ -306,7 +306,6 @@ void fn_80089E20(void) {
     fn_8011E868();
     fn_8011D504();
     fn_8008AE18();
-    memset();
     fn_80265F14();
     fn_800726A8();
 }
@@ -404,7 +403,6 @@ s32 fn_8008AE18(void) {
     /* TODO: decompile (0xDC4 bytes, ~881 instructions) */
     /* Contains switch/jump table */
     /* Uses many saved registers */
-    memset();
     fn_80123FBC();
     fn_8011F5B0();
     fn_8011F520();
@@ -416,6 +414,7 @@ s32 fn_8008AE18(void) {
     fn_8011E850();
     fn_8011F4D8();
     fn_800F9AEC();
+    fn_8011F508();
     return 0;
 }
 
@@ -425,7 +424,6 @@ void fn_8008BBDC(void) {
     /* Contains switch/jump table */
     /* Uses many saved registers */
     fn_80124A60();
-    memcpy();
     fn_800C8174();
     fn_8011DFE0();
     fn_8011DF90();
@@ -436,6 +434,7 @@ void fn_8008BBDC(void) {
     fn_8011D4E4();
     fn_8011D4F4();
     fn_8011F508();
+    fn_8011D4D4();
 }
 
 /* 0x8008C5D4 | size: 0x128 */

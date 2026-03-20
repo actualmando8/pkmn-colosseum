@@ -148,9 +148,9 @@ s32 fn_8007C7EC(void) {
     fn_80083BF8();
     fn_800E2C04();
     fn_800E27B0();
-    memset();
     fn_80083AF4();
     fn_800CA620();
+    fn_80082A88();
     return 0;
 }
 
