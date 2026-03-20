@@ -33,11 +33,10 @@ extern void PPCHalt(void);
  * pointers) and calls each constructor in order.
  */
 static void __init_cpp(void) {
-    FuncPtr* p = _ctors;
+    FuncPtr* p;
 
-    while (*p != NULL) {
+    for (p = _ctors; *p != NULL; p++) {
         (*p)();
-        p++;
     }
 }
 

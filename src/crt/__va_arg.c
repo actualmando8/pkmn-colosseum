@@ -32,7 +32,6 @@ typedef struct __va_list_struct {
 } __va_list_struct;
 
 void* __va_arg(__va_list_struct* ap, int type) {
-    char* reg_save;
     char* result;
     char* counter_ptr;
     int reg_count;
@@ -75,18 +74,15 @@ void* __va_arg(__va_list_struct* ap, int type) {
     if (reg_count < max_regs) {
         /* Argument is in a register save slot */
         reg_count += align_offset;
-        reg_save = ap->reg_save_area;
-        result = reg_save + area_offset + (reg_count * slot_stride);
+        result = ap->reg_save_area + area_offset + (reg_count * slot_stride);
         *counter_ptr = (char)(reg_count + increment);
     } else {
         /* Argument is in the overflow (stack) area */
-        char* overflow;
         unsigned int align_mask;
 
         *counter_ptr = 8;
-        align_mask = ~((unsigned int)slot_size - 1);
-        overflow = ap->overflow_area;
-        result = (char*)(((unsigned int)overflow + (unsigned int)slot_size - 1) & align_mask);
+        align_mask = (unsigned int)slot_size - 1;
+        result = (char*)(((unsigned int)ap->overflow_area + align_mask) & ~align_mask);
         ap->overflow_area = result + slot_size;
     }
 
