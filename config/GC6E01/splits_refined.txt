@@ -21,14 +21,17 @@
 # --- GAME CODE ---
 
 KNOWN   0x800055E0  0x80006630  src/game/main.c                           21    # main(), GameInit, GameMainLoop, OS callbacks
-GAP     0x80006630  0x80033278  ???                                        ~410  # Game logic, flag accessors, scene management, battle helpers, overworld
-  # Sub-regions within this gap:
-  #   0x80006630-0x80009700: Flag/scene accessors, early game logic
-  #   0x80009700-0x8000BA00: Large battle-related function (fn_800096B4 = 9.2KB)
-  #   0x8000BA00-0x8000D300: Battle helpers, accessor clusters (0x6C-sized)
-  #   0x8000D300-0x80010000: World/scene/overworld state
-  #   0x80010000-0x80020000: Scene scripting / event execution
-  #   0x80020000-0x80033278: Additional game utilities
+LIKELY  0x80006630  0x80009178  src/game/gs_task.c                        ~45   # GStask: scene/FSYS task management, archive load callbacks
+LIKELY  0x80009178  0x8000BA94  src/game/gs_battle_setup.c                ~15   # GSbattleSetup: battle encounter init (fn_800096B4 = 9.2KB)
+LIKELY  0x8000BA94  0x8000D290  src/game/gs_party_access.c                ~60   # GSpartyAccess: Pokemon party field get/set accessors
+GAP     0x8000D290  0x8000D298  ???                                        1    # 8-byte stub between accessors and NPC interact
+LIKELY  0x8000D298  0x80012858  src/game/gs_npc_interact.c                ~70   # GSnpcInteract: NPC dialog, items, battles, warps
+LIKELY  0x80012858  0x80015000  src/game/gs_event_exec.c                  ~35   # GSeventExec: scene scripting, event bytecode execution
+LIKELY  0x80015000  0x800181C4  src/game/gs_pokemon_summary.c             ~30   # GSpokeSummary: Pokemon status/summary screen
+LIKELY  0x800181C4  0x80020328  src/game/gs_pcbox.c                       ~60   # GSpcbox: PC Box storage system UI
+LIKELY  0x80020328  0x80026000  src/game/gs_title.c                       ~80   # GStitle: title screen, autodemo, name entry
+LIKELY  0x80026000  0x80030170  src/game/gs_worldmap.c                    ~90   # GSWorldmap: world map UI, location navigation
+LIKELY  0x80030170  0x80033278  src/game/gs_npc_event.c                   ~30   # GSnpcEvt: NPC event callbacks, trainer sprites
 
 KNOWN   0x80033278  0x80034280  src/game/menu/menu_carde.c                1     # menuCardE_Main (0x1008 bytes)
 GAP     0x80034280  0x80035E04  ???                                        ~15   # Post-menu utilities
