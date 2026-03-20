@@ -111,12 +111,9 @@ u32 __OSMaskInterrupts(u32 mask) {
 
     prev  = *(volatile u32*)0x800000C4;
     local = *(volatile u32*)0x800000C8;
-    global = prev | local;
-
-    mask &= ~global;          /* only process bits not already masked */
-    prev |= mask;             /* add to the mask */
+    mask &= ~(prev | local);
+    prev |= mask;
     *(volatile u32*)0x800000C4 = prev;
-
     global = prev | local;
 
     while (mask != 0) {
@@ -137,12 +134,9 @@ u32 __OSUnmaskInterrupts(u32 mask) {
 
     prev  = *(volatile u32*)0x800000C4;
     local = *(volatile u32*)0x800000C8;
-    global = prev | local;
-
-    mask &= global;           /* only process bits that are currently masked */
-    prev &= ~mask;            /* remove from the mask */
+    mask &= (prev | local);
+    prev &= ~mask;
     *(volatile u32*)0x800000C4 = prev;
-
     global = prev | local;
 
     while (mask != 0) {

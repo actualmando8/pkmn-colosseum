@@ -206,8 +206,8 @@ _exit_save:
 #pragma optimizewithasm off
 asm void OSSaveFPUContext(register OSContext* context) {
     nofralloc
-    /* r3 = context, map to r4 for __OSSaveFPUContext(unused, context) */
-    mr      r4, r3
+    /* r3 = context, map to r5 for __OSSaveFPUContext(unused1, unused2, context) */
+    addi    r5, r3, 0
     b       __OSSaveFPUContext
 }
 #pragma pop
@@ -335,7 +335,7 @@ void OSClearContext(OSContext* context) {
     context->mode  = 0;
     context->state = 0;
 
-    if (OS_FPUCONTEXT == context) {
+    if (context == OS_FPUCONTEXT) {
         OS_FPUCONTEXT = NULL;
     }
 }
