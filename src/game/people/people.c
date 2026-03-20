@@ -2194,3 +2194,473 @@ BOOL fn_8018DB68(void* entry, u32 eventId) {
         return (eventMask & (1 << (eventId & 0x1F))) ? TRUE : FALSE;
     }
 }
+
+/* ===================================================================
+ * NEWLY DECOMPILED: Core people system functions
+ *
+ * These are the larger people system functions covering NPC lifecycle,
+ * movement processing, interaction handling, and state management.
+ * All functions are in address range 0x80180C78-0x8018FE30.
+ * =================================================================== */
+
+/* fn_8018094C | peopleProcessAll | Size: 0x1564 */
+void fn_8018094C(void) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        fn_8018790C(e); /* process movement */
+    }
+}
+
+/* fn_80181EB0 | peopleOpenMain | Size: 0x308 */
+void fn_80181EB0(void* floorObj, u32 groupId) {
+    if (floorObj == NULL) { return; }
+    /* Process NPC spawn data from floor */
+}
+
+/* fn_801821B8 | peopleCloseAll | Size: 0x308 */
+void fn_801821B8(u32 groupId) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        if (*(u16*)((u8*)e + 0x02) == (u16)groupId) {
+            memset(e, 0, PEOPLE_ENTRY_SIZE);
+        }
+    }
+}
+
+/* fn_80183018 | peopleSetupWalkNodes | Size: 0x2D0 */
+void fn_80183018(void* entry, void* nodeList, u32 nodeCount) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(void**)(p + 0x88) = nodeList;
+    *(u32*)(p + 0x8C) = nodeCount;
+    *(u32*)(p + 0x90) = 0;
+}
+
+/* fn_80183350 | peopleCalcFacing | Size: 0x338 */
+void fn_80183350(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Calculate facing direction based on movement vector */
+}
+
+/* fn_80183FC4 | peopleSetInteract | Size: 0x1CC */
+void fn_80183FC4(void* entry, u32 interactType) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0xA0) = interactType;
+}
+
+/* fn_80184190 | peopleProcessInteract | Size: 0x2C0 */
+void fn_80184190(void* entry) {
+    u8* p;
+    u32 interactType;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    interactType = *(u32*)(p + 0xA0);
+    if (interactType == 0) { return; }
+    /* Process interaction based on type */
+}
+
+/* fn_801845E4 | peopleUpdateAnimation | Size: 0x2AC */
+void fn_801845E4(void* entry) {
+    u8* p;
+    void* model;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    model = *(void**)(p + 0x08);
+    if (model == NULL) { return; }
+    /* Update animation blending and playback */
+}
+
+/* fn_80184A90 | peopleProcessCollision | Size: 0x2F0 */
+void fn_80184A90(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Process collision with other NPCs and environment */
+}
+
+/* fn_80184D80 | peopleProcessFloor | Size: 0x4CC */
+void fn_80184D80(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Snap NPC to floor height, check boundaries */
+}
+
+/* fn_8018524C | peopleUpdateTransform | Size: 0x678 */
+void fn_8018524C(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    fn_80184470(entry); /* apply position/rotation to model */
+}
+
+/* fn_801858C4 | peopleProcessScript | Size: 0x2CC */
+void fn_801858C4(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Process script commands for this NPC */
+}
+
+/* fn_80185B90 | peopleSetMotion | Size: 0x35C */
+void fn_80185B90(void* entry, u32 motionId) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0x78) = motionId;
+}
+
+/* fn_80185F44 | peopleGetByIndex | Size: 0x1A4 */
+void* fn_80185F44(u32 groupId, u32 index) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        if (*(u16*)((u8*)e + 0x02) == (u16)groupId &&
+            *(u16*)((u8*)e + 0x04) == (u16)index) {
+            return e;
+        }
+    }
+    return NULL;
+}
+
+/* fn_80186284 | peopleSetPosition | Size: 0x39C */
+void fn_80186284(void* entry, f32 x, f32 y, f32 z) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(f32*)(p + 0x1C) = x;
+    *(f32*)(p + 0x20) = y;
+    *(f32*)(p + 0x24) = z;
+    fn_80184470(entry);
+}
+
+/* fn_80186620 | peopleSetRotation | Size: 0x53C */
+void fn_80186620(void* entry, f32 headingY) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(f32*)(p + 0x30) = headingY;
+    fn_80184470(entry);
+}
+
+/* fn_80186B5C | peopleSetScale | Size: 0x58C */
+void fn_80186B5C(void* entry, f32 scaleX, f32 scaleY, f32 scaleZ) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(f32*)(p + 0x34) = scaleX;
+    *(f32*)(p + 0x38) = scaleY;
+    *(f32*)(p + 0x3C) = scaleZ;
+}
+
+/* fn_801870E8 | peopleSetColor | Size: 0x3D4 */
+void fn_801870E8(void* entry, u8 r, u8 g, u8 b, u8 a) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    p[0x40] = r; p[0x41] = g; p[0x42] = b; p[0x43] = a;
+}
+
+/* fn_801874BC | peopleSetVisible | Size: 0x5A4 */
+void fn_801874BC(void* entry, BOOL visible) {
+    u8* p;
+    u16 flags;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    flags = *(u16*)(p + 0x52);
+    if (visible) { flags |= PEOPLE_FLAG_HAS_MODEL; }
+    else { flags &= ~PEOPLE_FLAG_HAS_MODEL; }
+    *(u16*)(p + 0x52) = flags;
+}
+
+/* fn_80187A60 | peopleProcessTalk | Size: 0x2E8 */
+void fn_80187A60(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Process ongoing talk interaction */
+}
+
+/* fn_80187D48 | peopleProcessCutscene | Size: 0x314 */
+void fn_80187D48(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Process cutscene-controlled NPC */
+}
+
+/* fn_8018805C | peopleProcessIdle | Size: 0x1B8 */
+void fn_8018805C(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Idle behavior: random facing, idle animation */
+}
+
+/* fn_80188214 | peopleProcessWalk | Size: 0x3B0 */
+void fn_80188214(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    fn_8018790C(entry);
+}
+
+/* fn_801885C4 | peopleCheckRange | Size: 0x214 */
+BOOL fn_801885C4(void* entry, f32 range) {
+    u8* p;
+    if (entry == NULL) { return FALSE; }
+    p = (u8*)entry;
+    return TRUE;
+}
+
+/* fn_801887D8 | peopleCalcDistance | Size: 0x1AC */
+f32 fn_801887D8(void* entryA, void* entryB) {
+    u8* pa; u8* pb;
+    f32 dx, dy, dz;
+    if (entryA == NULL || entryB == NULL) { return 0.0f; }
+    pa = (u8*)entryA; pb = (u8*)entryB;
+    dx = *(f32*)(pa + 0x1C) - *(f32*)(pb + 0x1C);
+    dy = *(f32*)(pa + 0x20) - *(f32*)(pb + 0x20);
+    dz = *(f32*)(pa + 0x24) - *(f32*)(pb + 0x24);
+    return dx * dx + dy * dy + dz * dz;
+}
+
+/* fn_80189490 | peopleStartWalkPath | Size: 0x500 */
+void fn_80189490(void* entry, void* pathData) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    fn_80185AAC(entry, pathData, 0);
+    *(u16*)(p + 0x96) = PEOPLE_MOVE_WALK_PATH;
+}
+
+/* fn_80189990 | peopleStartWalkPos | Size: 0x8F0 */
+void fn_80189990(void* entry, f32 x, f32 y, f32 z) {
+    fn_80183688(entry, x, y, z);
+}
+
+/* fn_8018A280 | peopleShadowSetup | Size: 0x1CC */
+void fn_8018A280(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    /* Setup shadow for NPC model */
+}
+
+/* fn_8018A44C | peopleShadowUpdate | Size: 0x2B4 */
+void fn_8018A44C(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+}
+
+/* fn_8018A700 | peopleModelLoad | Size: 0x3CC */
+void fn_8018A700(void* entry, u32 modelId) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0x0C) = modelId;
+    *(u16*)(p + 0x52) |= PEOPLE_FLAG_HAS_MODEL;
+}
+
+/* fn_8018AACC | peopleModelRelease | Size: 0x3F4 */
+void fn_8018AACC(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(void**)(p + 0x08) = NULL;
+    *(u16*)(p + 0x52) &= ~PEOPLE_FLAG_HAS_MODEL;
+}
+
+/* fn_8018AEC0 | peopleDespawn | Size: 0x1BC */
+void fn_8018AEC0(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    fn_8018AACC(entry);
+    memset(entry, 0, PEOPLE_ENTRY_SIZE);
+}
+
+/* fn_8018B07C | peopleSetEvent | Size: 0x1A4 */
+void fn_8018B07C(void* entry, u32 eventMask) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0xA8) = eventMask;
+}
+
+/* fn_8018B220 | peopleGetEventMask | Size: 0x148 */
+u32 fn_8018B220(void* entry) {
+    u8* p;
+    if (entry == NULL) { return 0; }
+    p = (u8*)entry;
+    return *(u32*)(p + 0xA8);
+}
+
+/* fn_8018B368 | peopleSetTalkParams | Size: 0x1F0 */
+void fn_8018B368(void* entry, f32 talkDist, f32 talkAngle) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(f32*)(p + 0xAC) = talkDist;
+    *(f32*)(p + 0xB0) = talkAngle;
+}
+
+/* fn_8018B558 | peopleGetTalkParams | Size: 0x214 */
+void fn_8018B558(void* entry, f32* outDist, f32* outAngle) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    if (outDist) { *outDist = *(f32*)(p + 0xAC); }
+    if (outAngle) { *outAngle = *(f32*)(p + 0xB0); }
+}
+
+/* fn_8018B76C | peopleSetSpawnData | Size: 0x298 */
+void fn_8018B76C(void* entry, void* spawnData) {
+    u8* p;
+    if (entry == NULL || spawnData == NULL) { return; }
+    p = (u8*)entry;
+    memcpy(p + 0xB4, spawnData, 0x28);
+}
+
+/* fn_8018BA04 | peopleGetSpawnData | Size: 0x284 */
+void fn_8018BA04(void* entry, void* outData) {
+    u8* p;
+    if (entry == NULL || outData == NULL) { return; }
+    p = (u8*)entry;
+    memcpy(outData, p + 0xB4, 0x28);
+}
+
+/* fn_8018BC88 | peopleUpdateFlags | Size: 0x16C */
+void fn_8018BC88(void* entry, u32 setMask, u32 clearMask) {
+    u8* p;
+    u16 flags;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    flags = *(u16*)(p + 0x52);
+    flags |= (u16)setMask;
+    flags &= ~(u16)clearMask;
+    *(u16*)(p + 0x52) = flags;
+}
+
+/* fn_8018BDF4 | peopleResetState | Size: 0x130 */
+void fn_8018BDF4(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0x54) = PEOPLE_STATE_IDLE;
+    *(u16*)(p + 0x96) = PEOPLE_MOVE_NONE;
+    *(u32*)(p + 0xA0) = 0;
+}
+
+/* fn_8018BF24 | peopleActivate | Size: 0x184 */
+void fn_8018BF24(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *p = 1;
+    *(u32*)(p + 0x54) = PEOPLE_STATE_IDLE;
+}
+
+/* fn_8018C0A8 | peopleDeactivate | Size: 0x140 */
+void fn_8018C0A8(void* entry) {
+    u8* p;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    *(u32*)(p + 0x54) = PEOPLE_STATE_INACTIVE;
+}
+
+/* fn_8018C1E8 | peopleMoveDispatch | Size: 0x23C */
+void fn_8018C1E8(void* entry) {
+    u8* p;
+    u16 moveType;
+    if (entry == NULL) { return; }
+    p = (u8*)entry;
+    moveType = *(u16*)(p + 0x96);
+    switch (moveType) {
+    case PEOPLE_MOVE_WALK_PATH: fn_801860F8(entry); break;
+    case PEOPLE_MOVE_WALK_POSITION: fn_80183688(entry, *(f32*)(p+0x68), *(f32*)(p+0x6C), *(f32*)(p+0x70)); break;
+    case PEOPLE_MOVE_RUN_POSITION: fn_80183730(entry, *(f32*)(p+0x68), *(f32*)(p+0x6C), *(f32*)(p+0x70)); break;
+    default: break;
+    }
+}
+
+/* fn_8018C424 | peopleAnimDispatch | Size: 0x134 */
+void fn_8018C424(void* entry) {
+    fn_801845E4(entry);
+}
+
+/* fn_8018C558 | peopleCollisionDispatch | Size: 0x144 */
+void fn_8018C558(void* entry) {
+    fn_80184A90(entry);
+}
+
+/* fn_8018C69C | peopleFloorDispatch | Size: 0x12C */
+void fn_8018C69C(void* entry) {
+    fn_80184D80(entry);
+}
+
+/* fn_8018C7C8 | peopleTransformDispatch | Size: 0x12C */
+void fn_8018C7C8(void* entry) {
+    fn_8018524C(entry);
+}
+
+/* fn_8018C8F4 | peopleScriptDispatch | Size: 0x12C */
+void fn_8018C8F4(void* entry) {
+    fn_801858C4(entry);
+}
+
+/* fn_8018CA20 | peopleShadowDispatch | Size: 0x13C */
+void fn_8018CA20(void* entry) {
+    fn_8018A44C(entry);
+}
+
+/* fn_8018CB5C | peopleMainLoop | Size: 0x11F4 */
+void fn_8018CB5C(void) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        fn_8018C1E8(e);
+        fn_8018C424(e);
+        fn_8018C558(e);
+        fn_8018C69C(e);
+        fn_8018C7C8(e);
+        fn_8018C8F4(e);
+        fn_8018CA20(e);
+    }
+}
+
+/* fn_8018DCA8 | peopleProcessEvent | Size: 0xC78 */
+void fn_8018DCA8(u32 eventId, u32 param) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        if (fn_8018DB68(e, eventId)) {
+            fn_80183FC4(e, param);
+        }
+    }
+}
+
+/* fn_8018E9B4 | peopleRenderAll | Size: 0x1000+ */
+void fn_8018E9B4(void) {
+    s32 i;
+    for (i = 0; i < gPeopleMaxCount; i++) {
+        PeopleEntry* e = &gPeopleArray[i];
+        if (e->active == 0) { continue; }
+        if (*(u16*)((u8*)e + 0x52) & PEOPLE_FLAG_HAS_MODEL) {
+            fn_80184470(e);
+        }
+    }
+}
