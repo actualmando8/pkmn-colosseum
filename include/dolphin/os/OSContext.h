@@ -25,7 +25,7 @@ typedef struct OSContext {
 } OSContext;
 
 void OSSetCurrentContext(OSContext* context);
-void OSGetCurrentContext(OSContext* context);
+OSContext* OSGetCurrentContext(void);
 void OSLoadContext(OSContext* context);
 void OSClearContext(OSContext* context);
 void OSSaveFPUContext(OSContext* context);

@@ -113,6 +113,14 @@ extern void* fn_8018F6F4_ext(void* scriptObj);       /* get script ref data */
 /* Forward declaration for function used before definition */
 extern void fn_8018F08C(PeopleEntry* entry, u32 motionIndex);
 
+/* Additional external functions for new decompilations */
+extern void fn_801170A4(void);
+extern void fn_80116EC8(void);
+extern void fn_80116EB0(void);
+extern void fn_800F0308(void);
+extern void fn_800F0438(void);
+extern void fn_800E9C6C(void* model, void* dst);
+
 /* ===== Rodata string references ===== */
 extern const char lbl_80273F80[];  /* floor name for blank-frame init */
 extern const char lbl_80273FD8[];  /* "Warining: people[%d,%d] group is different!!\n" */
@@ -147,6 +155,20 @@ static PeopleOpenWork* gPeopleOpenWork;
 
 /* lbl_8047B1E8 @sda21 : people open count/max for linked list */
 static s32 gPeopleOpenCount;
+
+/* ===== Additional global state for new decompilations ===== */
+
+/* lbl_8047B1F0 @sda21 : 2-element table of side pointers */
+static void* gPeopleSideTable[2];
+
+/* lbl_80478E78 @sda21 : pointer to NPC data count struct */
+static void* gNPCDataCountPtr;
+
+/* lbl_80478E7C @sda21 : pointer to NPC data array (0x2C byte entries) */
+static void* gNPCDataArrayPtr;
+
+/* Degree-to-radian conversion constant (PI/180) */
+#define DEGREES_TO_RADIANS 0.017453292f
 
 /* ===== Sdata2 float constants ===== */
 /* lbl_8047D798 @sda21 : constant used in peopleMoveUpdate */
@@ -903,6 +925,126 @@ resolve:
 }
 
 /* =======================================================================
+ * fn_8018D928 -- peopleFindBySelfPtr
+ *
+ * Search all people entries for one whose selfPtr matches the given
+ * pointer. Returns the matching PeopleEntry, or NULL if not found.
+ *
+ * r3 = ptr (self-pointer to search for)
+ * Returns: PeopleEntry* or NULL
+ *
+ * Address: 0x8018D928  Size: 0x70 (112 bytes)
+ * ======================================================================= */
+PeopleEntry* fn_8018D928(void* ptr)
+{
+    s32 i;
+    PeopleEntry* entry;
+
+    i = 0;
+    while (i < peopleGetMaxCount()) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) {
+            goto next;
+        }
+        if (entry->selfPtr != ptr) {
+            goto next;
+        }
+        return entry;
+    next:
+        i++;
+    }
+    return NULL;
+}
+
+/* =======================================================================
+ * fn_8018D998 -- peopleFindSelfPtrByGroupIndex
+ *
+ * Two-pass search: first by exact (groupId, index), then by index only
+ * with a warning. Returns the selfPtr of the found entry, or NULL.
+ *
+ * r3 = groupId
+ * r4 = index
+ * Returns: void* (selfPtr) or NULL
+ *
+ * Address: 0x8018D998  Size: 0xF0 (240 bytes)
+ * ======================================================================= */
+void* fn_8018D998(u32 groupId, u32 index)
+{
+    s32 i;
+    PeopleEntry* entry;
+
+    /* Pass 1: exact match on groupId + index */
+    i = 0;
+    while (i < peopleGetMaxCount()) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) {
+            goto next1;
+        }
+        if (entry->groupId != groupId) {
+            goto next1;
+        }
+        if (entry->index != index) {
+            goto next1;
+        }
+        return entry->selfPtr;
+    next1:
+        i++;
+    }
+
+    /* Pass 2: index-only fallback with warning */
+    i = 0;
+    while (i < peopleGetMaxCount()) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) {
+            goto next2;
+        }
+        if (entry->index != index) {
+            goto next2;
+        }
+        fn_800DD970(lbl_80273FD8, groupId, index);
+        return entry->selfPtr;
+    next2:
+        i++;
+    }
+
+    return NULL;
+}
+
+/* =======================================================================
+ * fn_8018DA88 -- peopleSetVisibleAll
+ *
+ * Iterate all people entries and set the visible flag to the given value.
+ * For each active entry, if the entry's game flag (flagId) is set, also
+ * calls fn_800F0438 (some floor/field notification).
+ *
+ * r3 = visible (u8 value to set)
+ *
+ * Address: 0x8018DA88  Size: 0x7C (124 bytes)
+ * ======================================================================= */
+void fn_8018DA88(u8 visible)
+{
+    s32 i;
+    PeopleEntry* entry;
+
+    i = 0;
+    while (i < peopleGetMaxCount()) {
+        entry = peopleGetEntry(i);
+        if (entry->active == 0) {
+            goto next;
+        }
+        if (entry == NULL) {
+            goto next;
+        }
+        entry->visible = visible;
+        if (fn_800F7108(entry->flagId) != 0) {
+            fn_800F0438();
+        }
+    next:
+        i++;
+    }
+}
+
+/* =======================================================================
  * fn_8018E1C4 -- peopleOpenSetup
  *
  * Called during floor loading to configure a newly spawned NPC.
@@ -1470,4 +1612,32 @@ PeopleEntry* peopleInit(u32 maxPeople)
     gPeopleMaxCount = (s32)maxPeople;
 
     return gPeopleArray;
+}
+
+/* ===================================================================
+ * AUTO-GENERATED accessor functions
+ * Generated by tools/gen_accessors.py
+ * 4 functions matched
+ * =================================================================== */
+
+extern u32 lbl_8047B1F8;
+
+/* Address: 0x8018FBCC | Size: 0x8 | Pattern: simple_setter */
+void fn_8018FBCC(u8* obj, u32 val) {
+    *(u32*)((u8*)obj + 0x24) = val;
+}
+
+/* Address: 0x8018FBD4 | Size: 0x8 | Pattern: simple_getter */
+u32 fn_8018FBD4(u8* obj) {
+    return *(u32*)((u8*)obj + 0x8);
+}
+
+/* Address: 0x8018FC00 | Size: 0x8 | Pattern: addi_ptr_return */
+u8* fn_8018FC00(u8* obj) {
+    return (u8*)obj + 0x9C;
+}
+
+/* Address: 0x8018FDB4 | Size: 0x8 | Pattern: sda_getter */
+u32 fn_8018FDB4(void) {
+    return lbl_8047B1F8;
 }

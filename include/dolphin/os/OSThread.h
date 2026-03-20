@@ -51,6 +51,14 @@ struct OSThread {
     /* 0x308 */ u32* stackEnd;
 };
 
+/* OSMutex - defined here for thread/mutex linkage */
+struct OSMutex {
+    /* 0x00 */ OSThreadQueue queue;
+    /* 0x08 */ OSThread* thread;
+    /* 0x0C */ s32 count;
+    /* 0x10 */ OSMutexLink link;
+};
+
 void __OSThreadInit(void);
 void OSInitThreadQueue(OSThreadQueue* queue);
 s32  OSDisableScheduler(void);
@@ -59,6 +67,30 @@ void __OSReschedule(void);
 void OSCancelThread(OSThread* thread);
 void OSClearStack(u8 val);
 OSThread* OSGetCurrentThread(void);
+BOOL OSIsThreadSuspended(OSThread* thread);
 BOOL OSIsThreadTerminated(OSThread* thread);
+
+BOOL OSCreateThread(OSThread* thread, void* (*func)(void*), void* param,
+                    void* stack, u32 stackSize, s32 priority, u16 attr);
+void OSExitThread(void* val);
+BOOL OSJoinThread(OSThread* thread, void* val);
+void OSDetachThread(OSThread* thread);
+s32  OSResumeThread(OSThread* thread);
+s32  OSSuspendThread(OSThread* thread);
+void OSSleepThread(OSThreadQueue* queue);
+void OSWakeupThread(OSThreadQueue* queue);
+BOOL OSSetThreadPriority(OSThread* thread, s32 priority);
+s32  OSGetThreadPriority(OSThread* thread);
+void OSYieldThread(void);
+OSThread* OSSetIdleFunction(void (*idleFunction)(void*), void* param,
+                            void* stack, u32 stackSize);
+OSThread* OSGetIdleFunction(void);
+s32 OSCheckActiveThreads(void);
+
+void OSInitContext(OSContext* context, u32 pc, u32 sp);
+
+void __OSUnlockAllMutex(OSThread* thread);
+s32  __OSGetEffectivePriority(OSThread* thread);
+void __OSPromoteThread(OSThread* thread, s32 priority);
 
 #endif /* DOLPHIN_OS_OSTHREAD_H */

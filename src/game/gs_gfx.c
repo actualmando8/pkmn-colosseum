@@ -144,6 +144,75 @@ void GSgfxSwapBuffers(u32 flag) {
 }
 
 /* =======================================================================
+ *  fn_800D3094 -- GSgfxGetXFBCount
+ *  Address: 0x800D3094, Size: 0xC
+ *
+ *  Returns the XFB count field (offset 0x4C) from the state.
+ * ======================================================================= */
+u32 fn_800D3094(void) {
+    return gsGfxState->xfbCount;
+}
+
+/* =======================================================================
+ *  fn_800D36B4 -- GSgfxSetClearColor
+ *  Address: 0x800D36B4, Size: 0xC8
+ *
+ *  Sets the clear color from a float[4] RGBA array. Each component
+ *  (0.0-1.0 range) is multiplied by a scaling constant and stored
+ *  as a u8 in the state at offsets 0x1C-0x1F. If all components
+ *  are zero, clears the projDirty flag.
+ *
+ *  r3 = pointer to float[4] RGBA color
+ * ======================================================================= */
+void fn_800D36B4(f32* color) {
+    f32 scale;
+    s32 r, g, b, a;
+
+    scale = 255.0f;
+
+    gsGfxState->projDirty = 1;
+
+    r = (s32)(scale * color[0]);
+    g = (s32)(scale * color[1]);
+    b = (s32)(scale * color[2]);
+    a = (s32)(scale * color[3]);
+
+    *(u8*)((u8*)gsGfxState + 0x1C) = (u8)r;
+    *(u8*)((u8*)gsGfxState + 0x1D) = (u8)g;
+    *(u8*)((u8*)gsGfxState + 0x1E) = (u8)b;
+    *(u8*)((u8*)gsGfxState + 0x1F) = (u8)a;
+
+    if (*(u8*)((u8*)gsGfxState + 0x1C) == 0 &&
+        *(u8*)((u8*)gsGfxState + 0x1D) == 0 &&
+        *(u8*)((u8*)gsGfxState + 0x1E) == 0 &&
+        *(u8*)((u8*)gsGfxState + 0x1F) == 0) {
+        gsGfxState->projDirty = 0;
+    }
+}
+
+/* =======================================================================
+ *  fn_800D377C -- GSgfxSetBlackScreen
+ *  Address: 0x800D377C, Size: 0x50
+ *
+ *  Controls screen blanking based on mode parameter.
+ *    mode 1: VISetBlack(0, 0) -- unblank
+ *    mode 2: VISetBlack(1, 0) -- blank
+ *    other:  do nothing
+ * ======================================================================= */
+void fn_800D377C(s32 mode) {
+    switch (mode) {
+    case 1:
+        fn_8019C690(0, 0);
+        break;
+    case 2:
+        fn_8019C690(1, 0);
+        break;
+    default:
+        break;
+    }
+}
+
+/* =======================================================================
  *  GSgfxSetDrawMode / fn_800D361C
  *  Address: 0x800D361C
  *

@@ -90,7 +90,7 @@ extern void  fn_80177A44(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
 extern void* fn_801FB1C0(s32 slot, u16 sceneId, s32 priority, s32 group);
-extern s32   fn_80106394(s32 slot, s32 active, s32 visible);
+extern s32   fn_80106394(s32 slot, s32 active);
 extern s32   fn_80106080(s32 slot);
 
 /* Event dispatch */
@@ -331,3 +331,125 @@ s32 GStask_LoadBattleMenu(void) {
  * extract a field, and return it. They are likely used as callback
  * function pointers passed to the UI rendering system.
  */
+
+/* ===================================================================
+ * Lookup/accessor functions
+ * =================================================================== */
+
+/* External functions used by lookup helpers */
+extern void* fn_800FA280(u32 id);
+extern void* fn_8010C4D4(u16 index);
+extern void* fn_8020DED8(void* ptr);
+
+/* Global state references */
+extern u32 lbl_80478B38;
+
+/* =======================================================================
+ * fn_8000857C -- GStask_LookupResourceById
+ *
+ * Looks up a resource by ID. If ID is 9, uses a fixed constant.
+ * If ID >= the global count (lbl_80478B38), also uses the constant.
+ * Otherwise, converts via fn_8010C4D4 and passes to fn_800FA280.
+ *
+ * Address: 0x8000857C  Size: 0x5C (92 bytes)
+ * ======================================================================= */
+void* fn_8000857C(u32 id)
+{
+    if (id == 9) {
+        return fn_800FA280(0x0000EB63);
+    }
+    if (id >= lbl_80478B38) {
+        return fn_800FA280(0x0000EB63);
+    }
+    {
+        u32 idx;
+        idx = (u16)id;
+        return fn_800FA280((u32)fn_8010C4D4(idx));
+    }
+}
+
+/* =======================================================================
+ * fn_800087FC -- GStask_LookupEventById
+ *
+ * Looks up an event resource by ID. Returns NULL-equivalent constant
+ * on invalid input or out-of-range. Otherwise, chains through
+ * fn_8020E0F8 -> fn_8020DED8 -> fn_800FA280.
+ *
+ * Address: 0x800087FC  Size: 0x6C (108 bytes)
+ * ======================================================================= */
+void* fn_800087FC(u32 id)
+{
+    void* result;
+
+    if (id == 0) {
+        return fn_800FA280(0x0000EB63);
+    }
+
+    {
+        u32 count;
+        count = *(u32*)gSceneTable;
+        if (id >= count) {
+            return fn_800FA280(0x0000EB63);
+        }
+    }
+
+    result = fn_8020DED8(((void*(*)(u16))fn_8020E0F8)((u16)id));
+
+    if (result == NULL) {
+        result = (void*)0x0000EB63;
+    }
+
+    return fn_800FA280((u32)result);
+}
+
+extern u8 lbl_8047882E;
+extern u8 lbl_8047A271;
+extern u8 lbl_8047A280;
+extern u16 lbl_8047A282;
+extern u8 lbl_8047A284;
+extern u8 lbl_8047A285;
+extern u8 lbl_8047A286;
+
+/* Address: 0x800077F8 | Size: 0x8 | Pattern: return_constant */
+u32 fn_800077F8(void) { return 1; }
+
+/* Address: 0x80007840 | Size: 0x8 | Pattern: return_constant */
+u32 fn_80007840(void) { return 1; }
+
+/* Address: 0x80008144 | Size: 0x8 | Pattern: return_constant */
+u32 fn_80008144(void) { return 1; }
+
+/* Address: 0x8000814C | Size: 0x8 | Pattern: sda_getter */
+u16 fn_8000814C(void) {
+    return lbl_8047A282;
+}
+
+/* Address: 0x80008154 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008154(void) {
+    return lbl_8047A280;
+}
+
+/* Address: 0x8000815C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000815C(void) {
+    return lbl_8047882E;
+}
+
+/* Address: 0x80008164 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008164(void) {
+    return lbl_8047A286;
+}
+
+/* Address: 0x8000816C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000816C(void) {
+    return lbl_8047A285;
+}
+
+/* Address: 0x80008174 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008174(void) {
+    return lbl_8047A284;
+}
+
+/* Address: 0x8000817C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000817C(void) {
+    return lbl_8047A271;
+}
