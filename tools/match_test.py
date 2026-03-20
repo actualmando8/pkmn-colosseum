@@ -44,7 +44,8 @@ OBJDIFF_JSON = PROJECT_ROOT / "objdiff.json"
 sys.path.insert(0, str(TOOLS_DIR))
 from compile_check import (
     compile_source, source_to_base_obj, find_target_obj,
-    run_diff_json, DEFAULT_COMPILER_VERSION, PROJECT_ROOT as _
+    run_diff_json, DEFAULT_COMPILER_VERSION, get_file_compiler_version,
+    PROJECT_ROOT as _
 )
 
 # ============================================================================
@@ -375,6 +376,10 @@ def test_function(symbol_query: str, compiler_version: str = None,
 
     print(f"  Source: {src_file.relative_to(PROJECT_ROOT)}")
 
+    # Show which compiler version will be used
+    effective_version = compiler_version or get_file_compiler_version(src_file)
+    print(f"  Compiler: GC/{effective_version}")
+
     # Compile the source file
     print()
     base_obj = compile_source(src_file, compiler_version=compiler_version,
@@ -528,7 +533,9 @@ def scan_source_file(src_path: Path, compiler_version: str = None,
     # Sort by address
     file_symbols.sort(key=lambda s: s.address)
 
+    effective_version = compiler_version or get_file_compiler_version(src_path)
     print(f"Source: {src_path.relative_to(PROJECT_ROOT)}")
+    print(f"Compiler: GC/{effective_version}")
     print(f"Functions found: {len(file_symbols)}")
     print()
 

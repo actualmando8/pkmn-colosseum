@@ -44,22 +44,72 @@ OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
 OBJDIFF_JSON = PROJECT_ROOT / "objdiff.json"
 
 # ============================================================================
-# Compiler flag presets
+# Compile configuration (loaded from compile_config.json)
 # ============================================================================
 
-# Default flags that match the original Colosseum build.
-# CW version 8 (GC compiler 1.0 - 1.2.5n range).
-# These are the most common GCN decompilation flags.
-DEFAULT_CFLAGS = [
-    "-O4,p",            # Full optimization with peephole
-    "-nodefaults",      # Don't pull in default libraries
-    "-proc", "gekko",   # Target Gekko (GCN) processor
-    "-fp", "hard",      # Hardware floating point
-    "-Cpp_exceptions", "off",  # No C++ exceptions
-    "-enum", "int",     # Enums are int-sized
-    "-warn", "off",     # Suppress warnings
-    "-i", str(INCLUDE_DIR),   # Include path
-]
+COMPILE_CONFIG_PATH = PROJECT_ROOT / "config" / "GC6E01" / "compile_config.json"
+
+# Default compiler version (GC subdir name).
+# CW comment version 8 -> one of: 1.0, 1.1, 1.1p1, 1.2.5, 1.2.5n
+# 1.2.5n is the most common for early GCN titles.
+DEFAULT_COMPILER_VERSION = "1.2.5n"
+
+
+def _load_compile_config() -> dict:
+    """Load compile_config.json and return the parsed config.
+
+    Returns a dict with keys:
+        - "default": {"compiler": "GC/X.Y.Z", "flags": "..."}
+        - "overrides": {"src/crt/mem.c": {"compiler": "GC/X.Y.Z", ...}, ...}
+
+    Falls back to hardcoded defaults if the config file is not found.
+    """
+    if COMPILE_CONFIG_PATH.exists():
+        try:
+            with open(COMPILE_CONFIG_PATH, "r") as f:
+                cfg = json.load(f)
+            return cfg
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"WARNING: Failed to load {COMPILE_CONFIG_PATH}: {e}")
+            print("  Falling back to hardcoded defaults.")
+
+    # Fallback: hardcoded defaults matching the original behaviour
+    return {
+        "default": {
+            "compiler": "GC/1.2.5n",
+            "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off",
+        },
+        "overrides": {},
+    }
+
+
+# Load the config once at import time.
+_COMPILE_CONFIG = _load_compile_config()
+
+
+def _parse_flags_string(flags_str: str) -> list:
+    """Parse a flags string like '-O4,p -proc gekko' into a list of tokens."""
+    # shlex-like splitting that respects comma-separated values
+    tokens = []
+    for part in flags_str.split():
+        tokens.append(part)
+    return tokens
+
+
+def get_default_cflags() -> list:
+    """Get the default compiler flags from compile_config.json."""
+    flags_str = _COMPILE_CONFIG.get("default", {}).get(
+        "flags",
+        "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off",
+    )
+    flags = _parse_flags_string(flags_str)
+    # Always add the include path
+    flags.extend(["-i", str(INCLUDE_DIR)])
+    return flags
+
+
+# Legacy aliases used elsewhere
+DEFAULT_CFLAGS = get_default_cflags()
 
 # Per-module flag overrides. Some TUs were compiled with different settings.
 # Keys are relative source paths (e.g., "crt/__init_cpp_exceptions.c").
@@ -68,23 +118,87 @@ MODULE_FLAGS = {
     # Add overrides here as you discover them during matching.
 }
 
-# Per-module compiler version overrides.
-# The MetroWerks CRT library was compiled with a newer compiler (1.3)
-# than the game code (1.2.5n). Keys are relative source paths.
-MODULE_COMPILER_VERSION = {
-    "crt/global_destructor_chain.c": "1.3",
-    "crt/exit.c": "1.3",
-    "crt/printf.c": "1.3",
-    "crt/stdio.c": "1.3",
-    "crt/mem.c": "1.3",
-    "crt/string.c": "1.3",
-    "crt/__va_arg.c": "1.3",
-}
 
-# Default compiler version (GC subdir name).
-# CW comment version 8 -> one of: 1.0, 1.1, 1.1p1, 1.2.5, 1.2.5n
-# 1.2.5n is the most common for early GCN titles.
-DEFAULT_COMPILER_VERSION = "1.2.5n"
+def _compiler_path_to_version(compiler_str: str) -> str:
+    """Extract the version portion from a compiler path like 'GC/1.3' -> '1.3'."""
+    if "/" in compiler_str:
+        return compiler_str.split("/", 1)[1]
+    return compiler_str
+
+
+def get_file_compiler_version(src_path: Path) -> str:
+    """Look up the compiler version for a source file from compile_config.json.
+
+    Checks the 'overrides' dict using the source path relative to the project
+    root (e.g., 'src/crt/mem.c'). Falls back to the default compiler version.
+
+    Returns:
+        The version string (e.g., '1.3' or '1.2.5n').
+    """
+    try:
+        rel = str(src_path.resolve().relative_to(PROJECT_ROOT)).replace("\\", "/")
+    except ValueError:
+        rel = src_path.name
+
+    overrides = _COMPILE_CONFIG.get("overrides", {})
+
+    # Try full path relative to project root (e.g., "src/crt/mem.c")
+    if rel in overrides:
+        compiler_str = overrides[rel].get("compiler")
+        if compiler_str:
+            return _compiler_path_to_version(compiler_str)
+
+    # Try path relative to src/ (e.g., "crt/mem.c") for legacy compat
+    try:
+        rel_src = str(src_path.resolve().relative_to(SRC_DIR)).replace("\\", "/")
+    except ValueError:
+        rel_src = src_path.name
+
+    if rel_src in overrides:
+        compiler_str = overrides[rel_src].get("compiler")
+        if compiler_str:
+            return _compiler_path_to_version(compiler_str)
+
+    # Default
+    default_compiler = _COMPILE_CONFIG.get("default", {}).get("compiler", "GC/1.2.5n")
+    return _compiler_path_to_version(default_compiler)
+
+
+def get_file_cflags(src_path: Path) -> list:
+    """Look up compiler flags for a source file from compile_config.json.
+
+    Checks the 'overrides' dict for per-file flag overrides.
+    Falls back to the default flags.
+
+    Returns:
+        List of flag tokens.
+    """
+    try:
+        rel = str(src_path.resolve().relative_to(PROJECT_ROOT)).replace("\\", "/")
+    except ValueError:
+        rel = src_path.name
+
+    overrides = _COMPILE_CONFIG.get("overrides", {})
+
+    # Check for per-file flag override
+    for key in [rel]:
+        if key in overrides and "flags" in overrides[key]:
+            flags = _parse_flags_string(overrides[key]["flags"])
+            flags.extend(["-i", str(INCLUDE_DIR)])
+            return flags
+
+    # Also try path relative to src/
+    try:
+        rel_src = str(src_path.resolve().relative_to(SRC_DIR)).replace("\\", "/")
+    except ValueError:
+        rel_src = src_path.name
+
+    if rel_src in overrides and "flags" in overrides[rel_src]:
+        flags = _parse_flags_string(overrides[rel_src]["flags"])
+        flags.extend(["-i", str(INCLUDE_DIR)])
+        return flags
+
+    return get_default_cflags()
 
 # ============================================================================
 # Source -> object mapping
@@ -165,7 +279,11 @@ def get_compiler(version: str = None) -> Path:
 
 
 def get_cflags(src_path: Path) -> list:
-    """Get compiler flags for the given source file."""
+    """Get compiler flags for the given source file.
+
+    Checks compile_config.json overrides first, then legacy MODULE_FLAGS,
+    then falls back to the default flags.
+    """
     try:
         rel = str(src_path.relative_to(SRC_DIR))
     except ValueError:
@@ -174,9 +292,12 @@ def get_cflags(src_path: Path) -> list:
     # Normalize to forward slashes for lookup
     rel = rel.replace("\\", "/")
 
+    # Legacy per-module override (for any flags set directly in code)
     if rel in MODULE_FLAGS:
         return MODULE_FLAGS[rel]
-    return list(DEFAULT_CFLAGS)
+
+    # Config-driven flags (checks compile_config.json)
+    return get_file_cflags(src_path)
 
 
 def compile_source(src_path: Path, compiler_version: str = None,
@@ -196,14 +317,10 @@ def compile_source(src_path: Path, compiler_version: str = None,
     out_obj = source_to_base_obj(src_path)
     out_obj.parent.mkdir(parents=True, exist_ok=True)
 
-    # Check per-module compiler version override if not explicitly set
+    # Check per-file compiler version override from compile_config.json
+    # (only if not explicitly set via --compiler-version CLI flag)
     if compiler_version is None:
-        try:
-            rel = str(src_path.relative_to(SRC_DIR)).replace("\\", "/")
-        except ValueError:
-            rel = src_path.name
-        if rel in MODULE_COMPILER_VERSION:
-            compiler_version = MODULE_COMPILER_VERSION[rel]
+        compiler_version = get_file_compiler_version(src_path)
 
     compiler = get_compiler(compiler_version)
     cflags = get_cflags(src_path)
