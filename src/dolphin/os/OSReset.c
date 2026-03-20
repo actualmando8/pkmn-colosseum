@@ -9,165 +9,233 @@
 /*
  * OSReset.c - System reset and reboot functionality.
  *
- * Manages the reset function chain, system reset procedure, and the
- * software reset interrupt handler.
+ * Adapted from doldecomp/melee and zeldaret/tp matching implementations.
  *
  * Matches: 0x8009FAF8 - 0x800A03B4
  */
 
-/* Hardware registers */
-#define PI_RESET        (*(volatile u32*)0xCC003024)
-#define PI_INTSR        (*(volatile u32*)0xCC003000)
-#define PI_INTMR        (*(volatile u32*)0xCC003004)
+#define ENQUEUE_INFO(info, queue)                            \
+    do {                                                     \
+        OSResetFunctionInfo* __prev = (queue)->tail;         \
+        if (__prev == 0) {                                   \
+            (queue)->head = (info);                          \
+        } else {                                             \
+            __prev->next = (info);                           \
+        }                                                    \
+        (info)->prev = __prev;                               \
+        (info)->next = 0;                                    \
+        (queue)->tail = (info);                              \
+    } while(0);
 
-/* Memory-mapped values */
-#define OS_RESET_CODE   (*(volatile u32*)0x800030F0)
-#define OS_BOOT_INFO    ((volatile u32*)0x80000000)
+#define ENQUEUE_INFO_PRIO(info, queue)               \
+    do {                                             \
+        OSResetFunctionInfo* __prev;                 \
+        OSResetFunctionInfo* __next;                 \
+        for(__next = (queue)->head; __next           \
+          && (__next->priority <= (info)->priority); \
+                __next = __next->next) ;             \
+                                                     \
+        if (__next == 0) {                           \
+            ENQUEUE_INFO(info, queue);               \
+        } else {                                     \
+            (info)->next = __next;                   \
+            __prev = __next->prev;                   \
+            __next->prev = (info);                   \
+            (info)->prev = __prev;                   \
+            if (__prev == 0) {                       \
+                (queue)->head = (info);              \
+            } else {                                 \
+                __prev->next = (info);               \
+            }                                        \
+        }                                            \
+    } while(0);
 
-static OSResetFunctionInfo* ResetFunctionList;
+typedef struct OSResetFunctionQueue {
+    OSResetFunctionInfo* head;
+    OSResetFunctionInfo* tail;
+} OSResetFunctionQueue;
+
+static OSResetFunctionQueue ResetFunctionQueue;
 
 extern void __OSReboot(u32 resetCode, u32 bootDol);
-extern OSErrorHandler __OSErrorTable[];
+extern void __OSStopAudioSystem(void);
+extern BOOL __OSSyncSram(void);
+extern void* __OSLockSram(void);
+extern void __OSUnlockSram(BOOL commit);
+extern BOOL __PADDisableRecalibration(BOOL disable);
+extern void LCDisable(void);
+extern void ICFlashInvalidate(void);
+extern void* memset(void* dest, int val, u32 n);
+
+#define __VIRegs     ((volatile u32*)0xCC002000)
+#define __PIRegs     ((volatile u32*)0xCC003000)
+
+static int CallResetFunctions(int final);
+static void CancelThreads(void);
 
 void OSRegisterResetFunction(OSResetFunctionInfo* info) {
-    OSResetFunctionInfo* iter;
-    OSResetFunctionInfo* prev;
+    ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);
+}
 
-    /* Insert into the list sorted by priority (lower = higher priority) */
-    prev = NULL;
-    for (iter = ResetFunctionList; iter != NULL; iter = iter->next) {
-        if (iter->priority > info->priority) {
+static int CallResetFunctions(int final) {
+    OSResetFunctionInfo* info;
+    int err = 0;
+
+    for (info = ResetFunctionQueue.head; info; info = info->next) {
+        err |= !info->func(final);
+    }
+    err |= !__OSSyncSram();
+    if (err) {
+        return 0;
+    }
+    return 1;
+}
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+static asm void Reset(u32 resetCode) {
+    nofralloc
+    b       _skip1
+_cache:
+    mfspr   r8, HID0
+    ori     r8, r8, 0x8
+    mtspr   HID0, r8
+    isync
+    sync
+    nop
+    b       _wait
+_skip1:
+    b       _skip2
+_wait:
+    mftb    r5, 268
+_waitloop:
+    mftb    r6, 268
+    subf    r7, r5, r6
+    cmplwi  r7, 0x1124
+    blt     _waitloop
+    nop
+    b       _reset
+_skip2:
+    b       _skip3
+_reset:
+    lis     r8, 0xCC00
+    ori     r8, r8, 0x3000
+    li      r4, 0x3
+    stw     r4, 0x24(r8)
+    stw     r3, 0x24(r8)
+    nop
+    b       _hang
+_skip3:
+    b       _hang2
+_hang:
+    nop
+    b       _hang
+_hang2:
+    b       _cache
+}
+#pragma pop
+
+static void CancelThreads(void) {
+    OSThread* thread;
+    OSThread* next;
+
+    for (thread = ((OSThreadQueue*)0x800000DC)->head; thread != NULL; thread = next) {
+        next = thread->linkActive.next;
+        switch (thread->state) {
+        case 1:
+        case 4:
+            OSCancelThread(thread);
+            break;
+        default:
             break;
         }
-        prev = iter;
-    }
-
-    info->next = iter;
-    if (prev != NULL) {
-        prev->next = info;
-    } else {
-        ResetFunctionList = info;
     }
 }
 
-static void Reset(u32 resetCode) {
-    /* Assert reset */
-    PI_RESET = 0x00000001;
-
-    /* Wait a bit by polling the time base */
-    {
-        s64 start;
-        u32 count;
-
-        start = OSGetTime();
-        while ((u32)(OSGetTime() - start) < 0x0000000C) {
-            ;
-        }
-    }
-
-    /* Deassert reset */
-    PI_RESET = 0x00000003;
-
-    /* Wait for hardware to come back */
-    {
-        s64 start;
-        start = OSGetTime();
-        while ((u32)(OSGetTime() - start) < 0x00000054) {
-            ;
-        }
-    }
+void __OSDoHotReset(u32 resetCode) {
+    OSDisableInterrupts();
+    __VIRegs[1] = 0;
+    ICFlashInvalidate();
+    Reset(resetCode * 8);
 }
 
 void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
+    int rc;
     BOOL enabled;
-    OSResetFunctionInfo* iter;
-    BOOL finalize;
+    BOOL padcal;
+
+    OSDisableScheduler();
+    __OSStopAudioSystem();
+
+    if (reset == 2) {
+        padcal = __PADDisableRecalibration(TRUE);
+    }
+
+    do {} while (CallResetFunctions(0) == 0);
+
+    if (reset == 1 && forceMenu != 0) {
+        void* sram;
+        sram = __OSLockSram();
+        *(u8*)((u8*)sram + 0x13) |= 0x40;
+        __OSUnlockSram(TRUE);
+        do {} while (__OSSyncSram() == 0);
+    }
 
     enabled = OSDisableInterrupts();
+    rc = CallResetFunctions(1);
+    LCDisable();
 
-    /* Call each reset function with final = FALSE first */
-    finalize = FALSE;
-
-    /* Give registered reset functions a chance to prepare */
-    for (iter = ResetFunctionList; iter != NULL; iter = iter->next) {
-        if (!iter->func(FALSE)) {
-            finalize = TRUE;
-        }
+    if (reset == 1) {
+        enabled = OSDisableInterrupts();
+        __VIRegs[1] = 0;
+        ICFlashInvalidate();
+        Reset(resetCode * 8);
+    } else if (reset == 0) {
+        CancelThreads();
+        OSEnableScheduler();
+        __OSReboot(resetCode, forceMenu);
     }
 
-    /* If any function wanted more time, call again with final = TRUE */
-    if (finalize) {
-        for (iter = ResetFunctionList; iter != NULL; iter = iter->next) {
-            iter->func(TRUE);
-        }
+    CancelThreads();
+
+    memset((void*)0x80000040, 0, 0x8C);
+    memset((void*)0x800000D4, 0, 0x14);
+    memset((void*)0x800000F4, 0, 4);
+    memset((void*)0x80003000, 0, 0xC0);
+    memset((void*)0x800030C8, 0, 0xC);
+
+    if (reset == 2) {
+        __PADDisableRecalibration(padcal);
     }
-
-    /* Disable all interrupts at the hardware level */
-    __OSMaskInterrupts(0xFFFFFFFF);
-
-    /* Store the reset code */
-    OS_RESET_CODE = resetCode;
-
-    if (reset == 0) {
-        /* Soft reset / hot reset */
-        if (forceMenu) {
-            /* Jump to the IPL (system menu) */
-            __OSReboot(resetCode, 0);
-        } else {
-            /* Standard reset */
-            Reset(resetCode);
-        }
-    } else if (reset == 1) {
-        /* Shutdown */
-        Reset(resetCode);
-    } else if (reset == 2) {
-        /* Restart */
-        __OSReboot(resetCode, 0);
-    }
-
-    OSRestoreInterrupts(enabled);
 }
 
 u32 OSGetResetCode(void) {
-    u32 code;
-
-    code = *(volatile u32*)0x800030F0;
-
-    if (code != 0) {
-        return (code | 0x80000000);
+    if (*(volatile u8*)0x800030E2 != 0) {
+        return 0x80000000;
     }
-
-    /* Read from hardware */
-    code = PI_RESET;
-    return code & 0x7FFFFFFF;
+    return (__PIRegs[9] & ~7) >> 3;
 }
 
 void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context) {
     u32 piIntSr;
-    u32 resetCode;
 
-    piIntSr = PI_INTSR;
+    piIntSr = __PIRegs[0];
 
-    /* Check if it's actually a reset interrupt */
     if (!(piIntSr & 0x00000010)) {
         return;
     }
 
-    /* Acknowledge the interrupt */
-    PI_INTSR = piIntSr;
-
-    /* Read the reset code from memory */
-    resetCode = OS_RESET_CODE;
+    __PIRegs[0] = piIntSr;
 
     {
-        /* The error table's reset entry */
         OSErrorHandler handler;
-        handler = __OSErrorTable[OS_ERROR_SYSTEM_INTERRUPT];
+        handler = ((OSErrorHandler*)0x80003040)[OS_ERROR_SYSTEM_INTERRUPT];
         if (handler != NULL) {
             handler(OS_ERROR_SYSTEM_INTERRUPT, context);
             return;
         }
     }
 
-    OSResetSystem(0, resetCode, FALSE);
+    OSResetSystem(0, 0, FALSE);
 }
