@@ -160,7 +160,7 @@ asm void __OSSaveFPUContext(register u8 unused1, register u8 unused2, register O
 
     mfspr   r3, 920
     extrwi. r3, r3, 1, 2
-    beqlr
+    beq     _exit_save
 
     /* save paired-singles */
     psq_st  f0,  0x01C8(r5), 0, 0
@@ -195,6 +195,7 @@ asm void __OSSaveFPUContext(register u8 unused1, register u8 unused2, register O
     psq_st  f29, 0x02B0(r5), 0, 0
     psq_st  f30, 0x02B8(r5), 0, 0
     psq_st  f31, 0x02C0(r5), 0, 0
+_exit_save:
     blr
 }
 #pragma pop
