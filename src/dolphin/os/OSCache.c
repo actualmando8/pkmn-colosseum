@@ -280,3 +280,90 @@ void __OSCacheInit(void) {
     OSSetErrorHandler(OS_ERROR_MACHINE_CHECK, (OSErrorHandler)DMAErrorHandler);
     DBPrintf("DMA error handler installed\n");
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 9 function(s)
+ * =================================================================== */
+
+/* fn_8009B300 - 0x8009B300 | size: 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B300(void) {
+    /* TODO: decompile -- 48 bytes at 0x8009B300 */
+}
+#pragma pop
+
+/* fn_8009B35C - 0x8009B35C | size: 0x2C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B35C(void) {
+    /* TODO: decompile -- 44 bytes at 0x8009B35C */
+}
+#pragma pop
+
+/* fn_8009B388 - 0x8009B388 | size: 0x2C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B388(void) {
+    /* TODO: decompile -- 44 bytes at 0x8009B388 */
+}
+#pragma pop
+
+/* fn_8009B40C - 0x8009B40C | size: 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B40C(void) {
+    /* TODO: decompile -- 204 bytes at 0x8009B40C */
+}
+#pragma pop
+
+/* fn_8009B4D8 - 0x8009B4D8 | size: 0x38 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B4D8(void) {
+    /* TODO: decompile -- 56 bytes at 0x8009B4D8 */
+}
+#pragma pop
+
+/* fn_8009B538 - 0x8009B538 | size: 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B538(void) {
+    /* TODO: decompile -- 36 bytes at 0x8009B538 */
+}
+#pragma pop
+
+/* fn_8009B55C - 0x8009B55C | size: 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B55C(void) {
+    /* TODO: decompile -- 172 bytes at 0x8009B55C */
+}
+#pragma pop
+
+/* fn_8009B608 - 0x8009B608 | size: 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B608(void) {
+    /* TODO: decompile -- 12 bytes at 0x8009B608 */
+}
+#pragma pop
+
+/* fn_8009B614 - 0x8009B614 | size: 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009B614(void) {
+    /* TODO: decompile -- 20 bytes at 0x8009B614 */
+}
+#pragma pop
+

@@ -239,3 +239,27 @@ void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context) {
 
     OSResetSystem(0, 0, FALSE);
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 2 function(s)
+ * =================================================================== */
+
+/* fn_8009FEBC - 0x8009FEBC | size: 0x94 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009FEBC(void) {
+    /* TODO: decompile -- 148 bytes at 0x8009FEBC */
+}
+#pragma pop
+
+/* fn_8009FFC0 - 0x8009FFC0 | size: 0x48 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009FFC0(void) {
+    /* TODO: decompile -- 72 bytes at 0x8009FFC0 */
+}
+#pragma pop
+

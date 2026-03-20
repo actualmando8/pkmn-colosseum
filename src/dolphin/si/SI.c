@@ -718,3 +718,108 @@ asm void fn_800CFF08(void) {
 }
 #pragma pop
 
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 11 function(s)
+ * =================================================================== */
+
+/* fn_800D00B0 - 0x800D00B0 | size: 0x20C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D00B0(void) {
+    /* TODO: decompile -- 524 bytes at 0x800D00B0 */
+}
+#pragma pop
+
+/* fn_800D02BC - 0x800D02BC | size: 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D02BC(void) {
+    /* TODO: decompile -- 124 bytes at 0x800D02BC */
+}
+#pragma pop
+
+/* fn_800D0338 - 0x800D0338 | size: 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D0338(void) {
+    /* TODO: decompile -- 20 bytes at 0x800D0338 */
+}
+#pragma pop
+
+/* fn_800D034C - 0x800D034C | size: 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D034C(void) {
+    /* TODO: decompile -- 16 bytes at 0x800D034C */
+}
+#pragma pop
+
+/* fn_800D03C8 - 0x800D03C8 | size: 0x9C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D03C8(void) {
+    /* TODO: decompile -- 156 bytes at 0x800D03C8 */
+}
+#pragma pop
+
+/* fn_800D0464 - 0x800D0464 | size: 0x6C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D0464(void) {
+    /* TODO: decompile -- 108 bytes at 0x800D0464 */
+}
+#pragma pop
+
+/* fn_800D04D0 - 0x800D04D0 | size: 0xD4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D04D0(void) {
+    /* TODO: decompile -- 212 bytes at 0x800D04D0 */
+}
+#pragma pop
+
+/* fn_800D05A4 - 0x800D05A4 | size: 0xC4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D05A4(void) {
+    /* TODO: decompile -- 196 bytes at 0x800D05A4 */
+}
+#pragma pop
+
+/* fn_800D0668 - 0x800D0668 | size: 0x8C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D0668(void) {
+    /* TODO: decompile -- 140 bytes at 0x800D0668 */
+}
+#pragma pop
+
+/* fn_800D0CBC - 0x800D0CBC | size: 0x13C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D0CBC(void) {
+    /* TODO: decompile -- 316 bytes at 0x800D0CBC */
+}
+#pragma pop
+
+/* fn_800D0DF8 - 0x800D0DF8 | size: 0x14C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800D0DF8(void) {
+    /* TODO: decompile -- 332 bytes at 0x800D0DF8 */
+}
+#pragma pop
+

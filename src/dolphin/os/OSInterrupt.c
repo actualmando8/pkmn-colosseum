@@ -174,3 +174,27 @@ asm static void ExternalInterruptHandler(register u8 exception, register OSConte
     b       __OSDispatchInterrupt
 }
 #pragma pop
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 2 function(s)
+ * =================================================================== */
+
+/* fn_8009DFA4 - 0x8009DFA4 | size: 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009DFA4(void) {
+    /* TODO: decompile -- 20 bytes at 0x8009DFA4 */
+}
+#pragma pop
+
+/* fn_8009E414 - 0x8009E414 | size: 0x344 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009E414(void) {
+    /* TODO: decompile -- 836 bytes at 0x8009E414 */
+}
+#pragma pop
+

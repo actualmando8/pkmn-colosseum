@@ -225,3 +225,45 @@ void __OSInitMemoryProtection(void) {
 
     OSRestoreInterrupts(enabled);
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 4 function(s)
+ * =================================================================== */
+
+/* fn_8009F230 - 0x8009F230 | size: 0xC8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009F230(void) {
+    /* TODO: decompile -- 200 bytes at 0x8009F230 */
+}
+#pragma pop
+
+/* fn_8009F2F8 - 0x8009F2F8 | size: 0xDC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009F2F8(void) {
+    /* TODO: decompile -- 220 bytes at 0x8009F2F8 */
+}
+#pragma pop
+
+/* fn_8009F3D4 - 0x8009F3D4 | size: 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009F3D4(void) {
+    /* TODO: decompile -- 12 bytes at 0x8009F3D4 */
+}
+#pragma pop
+
+/* fn_8009F3E0 - 0x8009F3E0 | size: 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009F3E0(void) {
+    /* TODO: decompile -- 60 bytes at 0x8009F3E0 */
+}
+#pragma pop
+

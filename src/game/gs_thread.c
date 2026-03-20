@@ -589,6 +589,399 @@ static void GStaskSchedulerThread(void) {
     }
 }
 
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 43 function(s)
+ * =================================================================== */
+
+/* fn_800F0030 - 0x800F0030 | size: 0x90 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F0030(void) {
+    /* TODO: decompile -- 144 bytes at 0x800F0030 */
+}
+#pragma pop
+
+/* fn_800F00C0 - 0x800F00C0 | size: 0x9C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F00C0(void) {
+    /* TODO: decompile -- 156 bytes at 0x800F00C0 */
+}
+#pragma pop
+
+/* fn_800F028C - 0x800F028C | size: 0x68 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F028C(void) {
+    /* TODO: decompile -- 104 bytes at 0x800F028C */
+}
+#pragma pop
+
+/* fn_800F02F4 - 0x800F02F4 | size: 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F02F4(void) {
+    /* TODO: decompile -- 20 bytes at 0x800F02F4 */
+}
+#pragma pop
+
+/* fn_800F0654 - 0x800F0654 | size: 0x154 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F0654(void) {
+    /* TODO: decompile -- 340 bytes at 0x800F0654 */
+}
+#pragma pop
+
+/* fn_800F0A74 - 0x800F0A74 | size: 0x4D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F0A74(void) {
+    /* TODO: decompile -- 1240 bytes at 0x800F0A74 */
+}
+#pragma pop
+
+/* fn_800F106C - 0x800F106C | size: 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F106C(void) {
+    /* TODO: decompile -- 124 bytes at 0x800F106C */
+}
+#pragma pop
+
+/* fn_800F10E8 - 0x800F10E8 | size: 0x2E8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F10E8(void) {
+    /* TODO: decompile -- 744 bytes at 0x800F10E8 */
+}
+#pragma pop
+
+/* fn_800F13D0 - 0x800F13D0 | size: 0x2F0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F13D0(void) {
+    /* TODO: decompile -- 752 bytes at 0x800F13D0 */
+}
+#pragma pop
+
+/* fn_800F16C0 - 0x800F16C0 | size: 0x34C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F16C0(void) {
+    /* TODO: decompile -- 844 bytes at 0x800F16C0 */
+}
+#pragma pop
+
+/* fn_800F1A0C - 0x800F1A0C | size: 0x42C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F1A0C(void) {
+    /* TODO: decompile -- 1068 bytes at 0x800F1A0C */
+}
+#pragma pop
+
+/* fn_800F1E38 - 0x800F1E38 | size: 0x42C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F1E38(void) {
+    /* TODO: decompile -- 1068 bytes at 0x800F1E38 */
+}
+#pragma pop
+
+/* fn_800F2264 - 0x800F2264 | size: 0x290 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F2264(void) {
+    /* TODO: decompile -- 656 bytes at 0x800F2264 */
+}
+#pragma pop
+
+/* fn_800F24F4 - 0x800F24F4 | size: 0x2E0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F24F4(void) {
+    /* TODO: decompile -- 736 bytes at 0x800F24F4 */
+}
+#pragma pop
+
+/* fn_800F27D4 - 0x800F27D4 | size: 0x414 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F27D4(void) {
+    /* TODO: decompile -- 1044 bytes at 0x800F27D4 */
+}
+#pragma pop
+
+/* fn_800F2BE8 - 0x800F2BE8 | size: 0x410 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F2BE8(void) {
+    /* TODO: decompile -- 1040 bytes at 0x800F2BE8 */
+}
+#pragma pop
+
+/* fn_800F2FF8 - 0x800F2FF8 | size: 0x420 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F2FF8(void) {
+    /* TODO: decompile -- 1056 bytes at 0x800F2FF8 */
+}
+#pragma pop
+
+/* fn_800F3418 - 0x800F3418 | size: 0x418 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F3418(void) {
+    /* TODO: decompile -- 1048 bytes at 0x800F3418 */
+}
+#pragma pop
+
+/* fn_800F3830 - 0x800F3830 | size: 0x420 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F3830(void) {
+    /* TODO: decompile -- 1056 bytes at 0x800F3830 */
+}
+#pragma pop
+
+/* fn_800F3C50 - 0x800F3C50 | size: 0x418 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F3C50(void) {
+    /* TODO: decompile -- 1048 bytes at 0x800F3C50 */
+}
+#pragma pop
+
+/* fn_800F4068 - 0x800F4068 | size: 0x3D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F4068(void) {
+    /* TODO: decompile -- 984 bytes at 0x800F4068 */
+}
+#pragma pop
+
+/* fn_800F4440 - 0x800F4440 | size: 0x3D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F4440(void) {
+    /* TODO: decompile -- 984 bytes at 0x800F4440 */
+}
+#pragma pop
+
+/* fn_800F4818 - 0x800F4818 | size: 0x420 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F4818(void) {
+    /* TODO: decompile -- 1056 bytes at 0x800F4818 */
+}
+#pragma pop
+
+/* fn_800F4C38 - 0x800F4C38 | size: 0x3F4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F4C38(void) {
+    /* TODO: decompile -- 1012 bytes at 0x800F4C38 */
+}
+#pragma pop
+
+/* fn_800F502C - 0x800F502C | size: 0x3D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F502C(void) {
+    /* TODO: decompile -- 984 bytes at 0x800F502C */
+}
+#pragma pop
+
+/* fn_800F5404 - 0x800F5404 | size: 0x1D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F5404(void) {
+    /* TODO: decompile -- 472 bytes at 0x800F5404 */
+}
+#pragma pop
+
+/* fn_800F55DC - 0x800F55DC | size: 0x214 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F55DC(void) {
+    /* TODO: decompile -- 532 bytes at 0x800F55DC */
+}
+#pragma pop
+
+/* fn_800F57F0 - 0x800F57F0 | size: 0x24C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F57F0(void) {
+    /* TODO: decompile -- 588 bytes at 0x800F57F0 */
+}
+#pragma pop
+
+/* fn_800F5A3C - 0x800F5A3C | size: 0x264 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F5A3C(void) {
+    /* TODO: decompile -- 612 bytes at 0x800F5A3C */
+}
+#pragma pop
+
+/* fn_800F5CA0 - 0x800F5CA0 | size: 0x24C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F5CA0(void) {
+    /* TODO: decompile -- 588 bytes at 0x800F5CA0 */
+}
+#pragma pop
+
+/* fn_800F5EEC - 0x800F5EEC | size: 0x3D0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F5EEC(void) {
+    /* TODO: decompile -- 976 bytes at 0x800F5EEC */
+}
+#pragma pop
+
+/* fn_800F62BC - 0x800F62BC | size: 0x3D0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F62BC(void) {
+    /* TODO: decompile -- 976 bytes at 0x800F62BC */
+}
+#pragma pop
+
+/* fn_800F668C - 0x800F668C | size: 0x80 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F668C(void) {
+    /* TODO: decompile -- 128 bytes at 0x800F668C */
+}
+#pragma pop
+
+/* fn_800F670C - 0x800F670C | size: 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F670C(void) {
+    /* TODO: decompile -- 160 bytes at 0x800F670C */
+}
+#pragma pop
+
+/* fn_800F67AC - 0x800F67AC | size: 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F67AC(void) {
+    /* TODO: decompile -- 28 bytes at 0x800F67AC */
+}
+#pragma pop
+
+/* fn_800F67C8 - 0x800F67C8 | size: 0x184 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F67C8(void) {
+    /* TODO: decompile -- 388 bytes at 0x800F67C8 */
+}
+#pragma pop
+
+/* fn_800F694C - 0x800F694C | size: 0x168 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F694C(void) {
+    /* TODO: decompile -- 360 bytes at 0x800F694C */
+}
+#pragma pop
+
+/* fn_800F6AB4 - 0x800F6AB4 | size: 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F6AB4(void) {
+    /* TODO: decompile -- 160 bytes at 0x800F6AB4 */
+}
+#pragma pop
+
+/* fn_800F6B54 - 0x800F6B54 | size: 0x58 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F6B54(void) {
+    /* TODO: decompile -- 88 bytes at 0x800F6B54 */
+}
+#pragma pop
+
+/* fn_800F6BAC - 0x800F6BAC | size: 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F6BAC(void) {
+    /* TODO: decompile -- 16 bytes at 0x800F6BAC */
+}
+#pragma pop
+
+/* fn_800F6BC4 - 0x800F6BC4 | size: 0x154 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F6BC4(void) {
+    /* TODO: decompile -- 340 bytes at 0x800F6BC4 */
+}
+#pragma pop
+
+/* fn_800F6D18 - 0x800F6D18 | size: 0x350 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F6D18(void) {
+    /* TODO: decompile -- 848 bytes at 0x800F6D18 */
+}
+#pragma pop
+
+/* fn_800F7068 - 0x800F7068 | size: 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F7068(void) {
+    /* TODO: decompile -- 160 bytes at 0x800F7068 */
+}
+#pragma pop
+
 /* ===================================================================
  * AUTO-GENERATED accessor functions
  * Generated by tools/gen_accessors.py

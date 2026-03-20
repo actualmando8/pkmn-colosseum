@@ -237,3 +237,18 @@ void OSInit(void) {
 void OSRegisterVersion(const char* id) {
     OSReport("%s\n", id);
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 1 function(s)
+ * =================================================================== */
+
+/* fn_8009A23C - 0x8009A23C | size: 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009A23C(void) {
+    /* TODO: decompile -- 20 bytes at 0x8009A23C */
+}
+#pragma pop
+

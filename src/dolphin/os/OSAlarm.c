@@ -199,3 +199,18 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
     __OSReschedule();
     OSLoadContext(context);
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 1 function(s)
+ * =================================================================== */
+
+/* fn_8009A590 - 0x8009A590 | size: 0x11C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009A590(void) {
+    /* TODO: decompile -- 284 bytes at 0x8009A590 */
+}
+#pragma pop
+

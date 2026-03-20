@@ -484,3 +484,81 @@ static BOOL __EXIProbe(s32 chan) {
     /* Simplified - full implementation checks device insertion/removal timing */
     return TRUE;
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 8 function(s)
+ * =================================================================== */
+
+/* fn_80098368 - 0x80098368 | size: 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098368(void) {
+    /* TODO: decompile -- 160 bytes at 0x80098368 */
+}
+#pragma pop
+
+/* fn_8009870C - 0x8009870C | size: 0x84 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009870C(void) {
+    /* TODO: decompile -- 132 bytes at 0x8009870C */
+}
+#pragma pop
+
+/* fn_80098944 - 0x80098944 | size: 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098944(void) {
+    /* TODO: decompile -- 124 bytes at 0x80098944 */
+}
+#pragma pop
+
+/* fn_800989C0 - 0x800989C0 | size: 0x128 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800989C0(void) {
+    /* TODO: decompile -- 296 bytes at 0x800989C0 */
+}
+#pragma pop
+
+/* fn_80098AE8 - 0x80098AE8 | size: 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098AE8(void) {
+    /* TODO: decompile -- 172 bytes at 0x80098AE8 */
+}
+#pragma pop
+
+/* fn_80098DDC - 0x80098DDC | size: 0xC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098DDC(void) {
+    /* TODO: decompile -- 192 bytes at 0x80098DDC */
+}
+#pragma pop
+
+/* fn_80098E9C - 0x80098E9C | size: 0x15C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098E9C(void) {
+    /* TODO: decompile -- 348 bytes at 0x80098E9C */
+}
+#pragma pop
+
+/* fn_80098FF8 - 0x80098FF8 | size: 0xC8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098FF8(void) {
+    /* TODO: decompile -- 200 bytes at 0x80098FF8 */
+}
+#pragma pop
+

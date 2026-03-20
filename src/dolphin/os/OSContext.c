@@ -439,3 +439,45 @@ void __OSContextInit(void) {
     OS_FPUCONTEXT = NULL;
     DBPrintf("FPU-unavailable handler installed\n");
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 4 function(s)
+ * =================================================================== */
+
+/* fn_8009BBC4 - 0x8009BBC4 | size: 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009BBC4(void) {
+    /* TODO: decompile -- 12 bytes at 0x8009BBC4 */
+}
+#pragma pop
+
+/* fn_8009BBD0 - 0x8009BBD0 | size: 0x80 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009BBD0(void) {
+    /* TODO: decompile -- 128 bytes at 0x8009BBD0 */
+}
+#pragma pop
+
+/* fn_8009BD30 - 0x8009BD30 | size: 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009BD30(void) {
+    /* TODO: decompile -- 48 bytes at 0x8009BD30 */
+}
+#pragma pop
+
+/* fn_8009BD84 - 0x8009BD84 | size: 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8009BD84(void) {
+    /* TODO: decompile -- 188 bytes at 0x8009BD84 */
+}
+#pragma pop
+

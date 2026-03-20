@@ -568,3 +568,45 @@ void PADInput_Recalibrate(u32 padIdx) {
     /* Re-check motor availability */
     PADInput_InitMotor(padIdx);
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 4 function(s)
+ * =================================================================== */
+
+/* fn_800F760C - 0x800F760C | size: 0xD8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F760C(void) {
+    /* TODO: decompile -- 216 bytes at 0x800F760C */
+}
+#pragma pop
+
+/* fn_800F78A4 - 0x800F78A4 | size: 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F78A4(void) {
+    /* TODO: decompile -- 124 bytes at 0x800F78A4 */
+}
+#pragma pop
+
+/* fn_800F7920 - 0x800F7920 | size: 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F7920(void) {
+    /* TODO: decompile -- 116 bytes at 0x800F7920 */
+}
+#pragma pop
+
+/* fn_800F7994 - 0x800F7994 | size: 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F7994(void) {
+    /* TODO: decompile -- 116 bytes at 0x800F7994 */
+}
+#pragma pop
+

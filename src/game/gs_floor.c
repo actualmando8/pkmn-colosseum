@@ -1267,3 +1267,27 @@ void fn_8010147C(void) {
     /* TODO: match -- 1172 bytes at 0x8010147C */
 }
 #pragma pop
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 2 function(s)
+ * =================================================================== */
+
+/* fn_800F0470 - 0x800F0470 | size: 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F0470(void) {
+    /* TODO: decompile -- 36 bytes at 0x800F0470 */
+}
+#pragma pop
+
+/* fn_800F7434 - 0x800F7434 | size: 0x1C8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800F7434(void) {
+    /* TODO: decompile -- 456 bytes at 0x800F7434 */
+}
+#pragma pop
+

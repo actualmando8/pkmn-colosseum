@@ -91,3 +91,27 @@ void __EXISetExiInterruptMask(s32 chan, EXIChan* exi) {
         }
     }
 }
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 2 function(s)
+ * =================================================================== */
+
+/* fn_80098014 - 0x80098014 | size: 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098014(void) {
+    /* TODO: decompile -- 8 bytes at 0x80098014 */
+}
+#pragma pop
+
+/* fn_80098034 - 0x80098034 | size: 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80098034(void) {
+    /* TODO: decompile -- 8 bytes at 0x80098034 */
+}
+#pragma pop
+
