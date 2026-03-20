@@ -58,8 +58,8 @@ void OSInitAlarm(void) {
         return;
     }
 
-    AlarmQueue.head = NULL;
     AlarmQueue.tail = NULL;
+    AlarmQueue.head = NULL;
     __OSSetExceptionHandler(OS_EXCEPTION_DECREMENTER,
                             (__OSExceptionHandler)DecrementerExceptionHandler);
 }

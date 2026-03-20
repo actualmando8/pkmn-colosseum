@@ -1,0 +1,306 @@
+# Pokemon Colosseum (GC6E01) Refined .text Section Splits
+# Maps address ranges to source files with gap identification.
+#
+# Format:
+#   status  start_addr    end_addr      source_file                           func_count  notes
+#
+# Status:
+#   KNOWN   = Source file confirmed (has address range in header or named symbols)
+#   LIKELY  = Source file attribution based on string references / context
+#   GAP     = Unattributed address range (source file unknown)
+#
+# Generated: 2026-03-19
+# Total .text: 0x800055E0 - 0x8026635C (8,589 functions, ~2.4MB)
+# Attributed: ~6,800 functions across 126 TUs
+# Gaps: ~1,800 functions in ~25 unidentified regions
+
+# ============================================================================
+# .text SECTION SPLIT MAP
+# ============================================================================
+
+# --- GAME CODE ---
+
+KNOWN   0x800055E0  0x80006630  src/game/main.c                           21    # main(), GameInit, GameMainLoop, OS callbacks
+GAP     0x80006630  0x80033278  ???                                        ~410  # Game logic, flag accessors, scene management, battle helpers, overworld
+  # Sub-regions within this gap:
+  #   0x80006630-0x80009700: Flag/scene accessors, early game logic
+  #   0x80009700-0x8000BA00: Large battle-related function (fn_800096B4 = 9.2KB)
+  #   0x8000BA00-0x8000D300: Battle helpers, accessor clusters (0x6C-sized)
+  #   0x8000D300-0x80010000: World/scene/overworld state
+  #   0x80010000-0x80020000: Scene scripting / event execution
+  #   0x80020000-0x80033278: Additional game utilities
+
+KNOWN   0x80033278  0x80034280  src/game/menu/menu_carde.c                1     # menuCardE_Main (0x1008 bytes)
+GAP     0x80034280  0x80035E04  ???                                        ~15   # Post-menu utilities
+KNOWN   0x80035E04  0x800366D0  src/game/movie.c                          ~10   # Movie playback (THP), opening/credits/autodemo
+GAP     0x800366D0  0x80059BDC  ???                                        ~350  # Game utilities, save helpers, state management
+GAP     0x80059BDC  0x80069A60  ??? (ui_core.c?)                          ~103  # UI core state machine (fn at 0x80059BDC = 0x30F4 bytes)
+KNOWN   0x80069A60  0x80069C0C  src/game/menu/menu_battle.c               1     # menuCB_Battle_Assert
+GAP     0x80069C0C  0x8007109C  ??? (menu_middle.c?)                      ~100  # Menu system functions between Battle and Common
+KNOWN   0x8007109C  0x8007162C  src/game/menu/menu_common.c               5     # Menu push/pop, stack asserts
+GAP     0x8007162C  0x8007581C  ???                                        ~40   # Menu functions
+LIKELY  0x8007581C  0x80075A34  src/game/menu/menu_tool_battle.c          1     # menuToolBattle_Assert (string: "BATTLEMODE_BATTLEYAMA100")
+GAP     0x80075A34  0x800767B8  ???                                        ~10   # Menu functions
+LIKELY  0x800767B8  0x80077A5C  src/game/menu/menu_rule.c                 4     # menuCB_Rule handlers
+GAP     0x80077A5C  0x80077ED4  ???                                        ~5    # Menu functions
+LIKELY  0x80077ED4  0x80078390  src/game/menu/menu_exdisc_shrine.c        1     # menuExDiscShrine_Main
+GAP     0x80078390  0x800792D8  ???                                        ~15   # Menu functions
+LIKELY  0x800792D8  0x800798E8  src/game/menu/menu_exdisc_coupon.c        1     # menuExDiscCoupon_Main (refs GBA thumb code)
+GAP     0x800798E8  0x8007C2C0  ???                                        ~20   # Menu functions
+KNOWN   0x8007C2C0  0x8007C300  src/game/menu/menu_pokecoupon.c           1     # menuPokeCoupon_Assert
+LIKELY  0x8007C300  0x8007FD64  src/game/menu/menu_carde_matrix.c         4     # menuCardE_Matrix (init, asserts, main)
+GAP     0x8007FD64  0x80082650  ???                                        ~30   # Game utilities / pre-save functions
+KNOWN   0x80082650  0x80083AF4  src/game/save/save_data.c                 11    # cardesavedata functions (validate, check, funcs)
+GAP     0x80083AF4  0x80089048  ???                                        ~40   # Game data / utility functions
+KNOWN   0x80089048  0x800895A4  src/game/gba/pokeconv.c                   2     # Pokemon GBA<->GCN conversion
+GAP     0x800895A4  0x80092C90  ???                                        ~60   # GBA/PAD/controller functions
+KNOWN   0x80092C90  0x800937F4  src/game/gba/gba_comm.c                   6     # GBA communication, ribbon data transfer
+GAP     0x800937F4  0x80097FFC  ???                                        ~60   # Late game code before SDK
+
+# --- DOLPHIN SDK: PPC / EXI / OS ---
+
+KNOWN   0x80097FFC  0x80098110  src/dolphin/os/PPCArch.c                  19    # PPCMfmsr, PPCMtmsr, SPR accessors
+GAP     0x80098110  0x8009820C  ???                                        3     # Unknown PPC/EXI helpers
+KNOWN   0x8009820C  0x800993A8  src/dolphin/exi/EXI.c                     ~20   # EXIImm, EXIDma, EXISync, EXIInit, EXILock/Unlock
+GAP     0x800993A8  0x80099790  ???                                        ~5    # EXI/OS helpers (__OSFPRInit precursors)
+LIKELY  0x80099790  0x800998B8  src/dolphin/os/OSFPRInit.c                1     # __OSFPRInit (may be part of OSInit.c)
+GAP     0x800998B8  0x800998E0  ???                                        1     # ClearArena precursor
+KNOWN   0x800998E0  0x80099E1C  src/dolphin/os/OSInit.c                   4     # ClearArena, InquiryCallback, OSInit
+KNOWN   0x80099E1C  0x8009A1E8  src/dolphin/os/OSException.c              ~8    # OSExceptionInit, exception vector, handlers
+LIKELY  0x8009A1E8  0x8009A27C  src/dolphin/os/OSInit.c (tail)            2     # __OSPSInit, OSRegisterVersion
+KNOWN   0x8009A27C  0x8009A92C  src/dolphin/os/OSAlarm.c                  ~8    # OSInitAlarm, OSCreateAlarm, OSSetAlarm, Decrementer
+GAP     0x8009A92C  0x8009AFB0  ??? (OSMutex.c / OSLink.c?)               ~10   # Mutex or link functions
+KNOWN   0x8009AFB0  0x8009AFD0  src/dolphin/os/OSArena.c                  4     # OSGetArenaHi/Lo, OSSetArenaHi/Lo
+LIKELY  0x8009AFD0  0x8009B290  src/dolphin/os/OSAudioSystem.c            3     # __OSInitAudioSystem, __OSStopAudioSystem
+KNOWN   0x8009B290  0x8009B914  src/dolphin/os/OSCache.c                  ~20   # DCEnable, DCFlushRange, ICInvalidateRange, L2GlobalInvalidate
+KNOWN   0x8009B914  0x8009C1B0  src/dolphin/os/OSContext.c                ~12   # OSSetCurrentContext, OSLoadContext, OSDumpContext
+GAP     0x8009C1B0  0x8009C2E0  ???                                        ~3    # Context/error bridge functions
+KNOWN   0x8009C2E0  0x8009C860  src/dolphin/os/OSError.c                  ~4    # OSReport, OSSetErrorHandler, __OSUnhandledException
+GAP     0x8009C860  0x8009DF3C  ??? (OSSram.c + OSSystemCall.c?)          ~15   # SRAM functions, system call init
+  # Contains: __OSInitSram, __OSLockSram, __OSLockSramEx, __OSSyncSram, __OSInitSystemCall
+KNOWN   0x8009DF3C  0x8009E7A8  src/dolphin/os/OSInterrupt.c              ~12   # OSDisable/EnableInterrupts, __OSInterruptInit
+GAP     0x8009E7A8  0x8009F1B8  ??? (OSLink.c / OSModule.c?)              ~10   # Module init, EXI interrupt helpers
+KNOWN   0x8009F1B8  0x8009F77C  src/dolphin/os/OSMemory.c                 ~8    # __OSModuleInit, MEMIntrruptHandler, Config24/48MB
+GAP     0x8009F77C  0x8009FAF8  ??? (OSSerial.c?)                          ~8    # Unknown OS peripheral module
+KNOWN   0x8009FAF8  0x800A03B4  src/dolphin/os/OSReset.c                  ~8    # __OSReboot, OSResetSystem, OSGetResetCode
+GAP     0x800A03B4  0x800A1290  ??? (OSSram.c ext + OSSystemCall.c)       ~15   # SRAM extended, system call
+  # Contains: __OSInitSram extended, __OSLockSramEx, __OSInitSystemCall
+KNOWN   0x800A1290  0x800A2774  src/dolphin/os/OSThread.c                 ~20   # __OSThreadInit, OSCancelThread, SelectThread, OSClearStack
+KNOWN   0x800A2778  0x800A27F8  src/dolphin/os/OSTime.c                   3     # OSGetTime, OSGetTick, __OSGetSystemTime
+GAP     0x800A27F8  0x800A2B9C  ???                                        ~2    # Unknown OS utility
+
+# --- CW RUNTIME INIT ---
+
+KNOWN   0x800A2B9C  0x800A2C30  src/crt/__init_cpp_exceptions.c           3     # __init_user, __init_cpp, _ExitProcess
+
+# --- DOLPHIN SDK: DB ---
+
+KNOWN   0x800A2C30  0x800A2D38  src/dolphin/db/DB.c                       5     # DBInit, DBPrintf, __DBExceptionDestination
+
+# --- DOLPHIN SDK: DVD ---
+
+GAP     0x800A2D38  0x800A3EB0  ??? (DVDCancel.c / DVDRead.c?)            ~25   # DVD read/cancel functions
+KNOWN   0x800A3EB0  0x800A4CF0  src/dolphin/dvd/DVDLow.c                  ~25   # __DVDInterruptHandler, DVDLowReset, DVDLowStopMotor
+KNOWN   0x800A4CF0  0x800A4D28  src/dolphin/dvd/DVDFs.c                   1     # __DVDFSInit
+GAP     0x800A4D28  0x800A5624  ??? (DVDFsInternal.c?)                    ~20   # DVD filesystem internals
+KNOWN   0x800A5624  0x800A7820  src/dolphin/dvd/DVD.c                     ~30   # DVDInit, stateReady, stateBusy, DVDReadDiskID
+GAP     0x800A7820  0x800A7DE8  ???                                        ~5    # DVD bridge functions
+KNOWN   0x800A7DE8  0x800A7F80  src/dolphin/dvd/DVDQueue.c                4     # __DVDClearWaitingQueue, Push/Pop/Check
+GAP     0x800A7F80  0x800A7FE0  ???                                        1     # DVD utility
+KNOWN   0x800A7FE0  0x800A8178  src/dolphin/dvd/DVDError.c                2     # ErrorCode2Num, __DVDStoreErrorCode
+GAP     0x800A8178  0x800AA430  ??? (DVDDir.c / DVDOpen.c / CARD.c?)      ~30   # DVD file operations, cb, __fstLoad
+
+# --- DOLPHIN SDK: VI / PAD / AI / AR ---
+
+KNOWN   0x800AA430  0x800ABF5C  src/dolphin/vi/VI.c                       ~40   # VIGetTvFormat + unnamed VI functions
+LIKELY  0x800ABF5C  0x800B5E8C  src/dolphin/pad/PAD.c (+ AI.c, AR.c?)    ~100  # PAD, Audio Interface, ARAM
+  # Contains __PADDisableRecalibration and many unnamed functions
+  # Sub-ranges likely include AI.c (Audio Interface), AR.c (ARAM)
+
+# --- GX GRAPHICS API ---
+
+KNOWN   0x800B5E8C  0x800BE348  src/dolphin/gx/ (multiple TUs)           168   # Full GX library
+  # GXInit.c:       0x800B5E8C - GXInit, __GXInitGX
+  # GXFifo.c:       0x800B7114 - GXInitFifoBase, GXSetCPUFifo, GXSetGPFifo, __GXFifoInit
+  # GXMisc.c:       0x800B888C - GXSetMisc
+  # GXPerf.c:       0x800B916C - __GXPEInit
+  # GXTexture.c:    0x800BB134 - GXInitTexCacheRegion, GXInitTlutRegion, __GXSetTmemConfig
+  # GXTransform.c+: remaining GX modules through __GXFlushTextureState (0x800BC0F0)
+  # Additional unnamed GX functions through 0x800BE348
+
+# --- METROTRK DEBUGGER ---
+
+KNOWN   0x800BE348  0x800BEF18  src/trk/TRKNub.c                         ~10   # TRKNubMainLoop, TRKInitializeNub, event queue
+KNOWN   0x800BEF18  0x800BF088  src/trk/TRKBuffer.c                      ~5    # TRKGetBuffer, TRKInitializeMessageBuffers
+KNOWN   0x800BF088  0x800BF338  src/trk/TRKSerial.c                      ~4    # TRKInitializeSerialHandler, TRKGetInput
+GAP     0x800BF338  0x800BF3C4  ???                                        1     # usr_put_initialize (stub)
+KNOWN   0x800BF3C4  0x800C0EAC  src/trk/TRKDispatch.c                    ~30   # TRKDispatchMessage + command handlers
+KNOWN   0x800C0EAC  0x800C1300  src/trk/TRKInterrupt.c                   ~5    # TRKInterruptHandler, TRKSwapAndGo
+KNOWN   0x800C1300  0x800C2A10  src/trk/TRKTarget.c                      ~15   # TRKTargetSupportRequest, TRKTargetInterrupt
+KNOWN   0x800C2A10  0x800C2D80  src/trk/TRKSaveState.c                   2     # TRKSaveExtended1Block, TRKRestoreExtended1Block
+KNOWN   0x800C2D80  0x800C33BC  src/trk/TRKInit.c                        ~5    # InitMetroTRK, TRKInitializeTarget
+KNOWN   0x800C33BC  0x800C3678  src/trk/TRKBoard.c                       ~8    # TRK_main, TRKLoadContext, TRK_board_display
+KNOWN   0x800C3678  0x800C3BB8  src/trk/TRKComm.c                        ~5    # TRKInitializeIntDrivenUART, InitMetroTRKCommTable
+KNOWN   0x800C3BB8  0x800C3C00  src/trk/udp_cc.c                         9     # All stubs (blr)
+KNOWN   0x800C3C00  0x800C3F44  src/trk/ddh_cc.c                         ~12   # ddh_cc functions
+GAP     0x800C3F44  0x800C41AC  ???                                        ~5    # TRK misc functions
+KNOWN   0x800C41AC  0x800C44F8  src/trk/gdev_cc.c                        ~12   # gdev_cc functions
+
+# --- CW STANDARD LIBRARY ---
+
+LIKELY  0x800C44F8  0x800C4548  src/crt/mwtrace.c                        1     # MWTRACE
+GAP     0x800C4548  0x800C45A0  ???                                        2     # CRT helpers
+KNOWN   0x800C45A0  0x800C4668  src/crt/__va_arg.c                       1     # __va_arg
+KNOWN   0x800C4668  0x800C470C  src/crt/global_destructor_chain.c        1     # __destroy_global_chain
+LIKELY  0x800C470C  0x800C483C  src/crt/runtime_support.c (auto)         4     # __save_fpr, __restore_fpr, __save_gpr, __restore_gpr
+LIKELY  0x800C483C  0x800C4E44  src/crt/longlong.c                       ~6    # __div2u, __mod2u + helpers
+KNOWN   0x800C4E44  0x800C5458  src/crt/exit.c                           ~5    # exit, atexit
+KNOWN   0x800C5458  0x800C7FB8  src/crt/stdio.c                          ~15   # __close_all, __flush_buffer, __fwrite, fwrite, fseek
+KNOWN   0x800C7FB8  0x800C811C  src/crt/wchar.c                          1     # wcstombs
+KNOWN   0x800C811C  0x800C8510  src/crt/mem.c                            ~5    # __memrchr, memchr + buffer ops
+KNOWN   0x800C8510  0x800CA78C  src/crt/printf.c                         ~12   # __stdio_atexit, vprintf, __pformatter, float2str, parse_format
+KNOWN   0x800CA78C  0x800CAA58  src/crt/string.c                         ~5    # strchr, strlen + helpers
+GAP     0x800CAA58  0x800CE7C4  ??? (fwide.c, math.c, alloc.c, etc.)    ~50   # Additional CRT: fwide, math, float/double conversion
+  # Contains: fwide (0x800CAA58), various math/conversion functions,
+  # AMC stubs (0x800CE79C-0x800CE7C4), Hu_IsStub
+
+# --- DOLPHIN SDK: SI ---
+
+GAP     0x800CE7C4  0x800CFA60  ??? (AMC/Hu stubs + SI precursors)      ~25   # AMC_IsStub, Hu_IsStub, SI helper functions (GDEV bridge)
+KNOWN   0x800CFA60  0x800D104C  src/dolphin/si/SI.c                      ~25   # SIInterruptHandler, SIInit, SITransfer, SIGetType, SISetSamplingRate
+
+# --- GENIUS SONORITY ENGINE ---
+
+GAP     0x800D104C  0x800D3074  ??? (gs_init.c / gs_util.c?)             ~40   # Pre-GSgfx engine init, PAD/GX wrappers
+KNOWN   0x800D3074  0x800D3E4C  src/game/gs_gfx.c                        ~15   # GSgfxInit, SetVideoMode, EnableRendering, SwapBuffers
+KNOWN   0x800D3E4C  0x800E202C  src/game/gs_render.c                     278   # VBlank, matrix stack, viewport, TEV, lighting, materials, draw dispatch
+KNOWN   0x800E202C  0x800E3604  src/game/gs_mem.c                        ~30   # GSmemAlloc, GSmemInit, handle-based memory system
+GAP     0x800E3604  0x800EE2C8  ??? (gs_material.c?)                     ~180  # Extended material/shader system (MObj-based)
+  # String: "GSmaterialSetPEdescr", "GSmaterialCreate: Run out of materials"
+GAP     0x800EE2C8  0x800EF098  ??? (gs_part.c?)                         ~20   # GSpart: part rotation, joint hierarchy registration
+  # String: "GSpart: part is already registered for rotation"
+KNOWN   0x800EF098  0x800F07A8  src/game/gs_texture.c                    ~25   # GStextureCreate, format validation, size adjustment
+KNOWN   0x800F07A8  0x800F7500  src/game/gs_thread.c                     ~60   # GSthreadInit, task system (first half)
+KNOWN   0x800F7500  0x800F8268  src/game/input/input.c                   20    # Game-level PAD wrapper
+  # NOTE: input.c is embedded within gs_thread.c's overall range
+KNOWN   0x800F8268  0x800FEBA0  src/game/gs_thread.c (continued)         ~20   # GSthread tail functions
+  # INTERLEAVING: input.c (0x800F7500-0x800F8268) is sandwiched between
+  # two sections of gs_thread.c code. This means either:
+  # (a) input.c is a separate TU linked between gs_thread parts, or
+  # (b) They were originally one source file split later
+GAP     0x800FEBA0  0x800FF0A0  ???                                        ~5    # Thread/floor transition
+KNOWN   0x800FF0A0  0x800FF788  src/game/gs_floor_data.c                  ~10   # Pre-floor utility functions
+KNOWN   0x800FF788  0x80101910  src/game/gs_floor.c                       ~60   # GSfloorOpen, GSfloorInit, floor loading/transitions
+KNOWN   0x80101910  0x8010C220  src/game/gs_model.c                       145   # Model resources, animation, rendering, skinning
+KNOWN   0x8010C220  0x8010E138  src/game/gs_colsys.c                      ~30   # Collision detection, debug draw
+KNOWN   0x8010E138  0x80114300  src/game/gs_field_colquery.c              ~200  # RayCast, SphereSweep, collision grid, resource init
+GAP     0x80114300  0x8011432C  ???                                        1     # Field boundary pad
+KNOWN   0x8011432C  0x80114CA8  src/game/gs_field_resource.c              ~18   # Floor resource pre-funcs (GFL, sound, particle, etc.)
+KNOWN   0x80114CA8  0x80130CE0  src/game/gs_field_world.c                 ~600  # Field camera, world logic, transitions (LARGEST game TU)
+KNOWN   0x80130CE0  0x8013151C  src/game/effect/gs_effect.c               ~15   # GSEffectInit, Trigger, Register, AllocSlot
+GAP     0x8013151C  0x80137114  ??? (effect_util.c?)                      ~50   # Effect sub-module utilities
+KNOWN   0x80137114  0x801380D4  src/game/effect/tracefx.c                 ~15   # Trail rendering, parameters, update
+KNOWN   0x801380D4  0x801402AC  src/game/effect/effect_visual.c           ~40   # Lightning, leaf, electron, filter, surf, sea effects
+GAP     0x801402AC  0x80140588  ???                                        ~5    # Effect/people transition
+KNOWN   0x80140588  0x80144574  src/game/people/people_data.c             ~30   # People field data, model loading
+KNOWN   0x80144574  0x801652DC  src/game/people/people_field.c            ~300  # Large NPC/people field system (spawn, world management)
+KNOWN   0x801652DC  0x80166098  src/game/sound/sound.c                    ~25   # Core sound: wave open, stop, check file info
+KNOWN   0x80166098  0x80166670  src/game/sound/sound_se.c                 ~15   # Sound effects playback
+KNOWN   0x80166670  0x80166E88  src/game/sound/sound_bgm.c               ~20   # Background music control
+GAP     0x80166E88  0x80167040  ???                                        ~5    # Sound tail / cleanup
+KNOWN   0x80167040  0x80168C64  src/game/gs_dvd.c                        56    # GSDVD_Open, ErrorStateMachine, Init
+KNOWN   0x80168C64  0x80169104  src/game/script/pslist.c                  ~10   # Script list link/unlink
+GAP     0x80169104  0x8016F430  ??? (script engine support)               ~60   # Script system functions
+KNOWN   0x8016F430  0x80172630  src/game/script/psinterpret.c             ~5    # 128-opcode bytecode interpreter (12,592 byte main fn)
+GAP     0x80172630  0x8017424C  ???                                        ~20   # Script continuation
+KNOWN   0x8017424C  0x8017572C  src/game/effect/generator.c               ~5    # Camera script generation
+KNOWN   0x8017572C  0x8017A5FC  src/game/gs_scene.c                       78    # Scene objects, render, camera, XFB capture
+GAP     0x8017A5FC  0x8017AC40  ???                                        ~5    # Scene tail / FSYS helpers
+KNOWN   0x8017AC40  0x8017B07C  src/game/fsys/fsys_load.c                 ~5    # FSYS_LoadTOC, archive loading
+KNOWN   0x8017B07C  0x8017F2C4  src/game/fsys/fsys_file.c                 ~40   # File operations (scattered ranges)
+KNOWN   0x8017F2C4  0x8017F3F8  src/game/fsys/fsys_decomp.c               1     # Decompression routine
+GAP     0x8017F3F8  0x80180C78  ???                                        ~30   # FSYS tail / world init transition
+KNOWN   0x80180C78  0x8018FE30  src/game/people/ (people.c + people_move.c + people_interact.c)  ~150
+  # INTERLEAVING: Three source files have interleaved functions:
+  #   people.c:          0x80180C78-0x80181250, 0x8018FB94-0x8018FE30
+  #   people_interact.c: 0x801812E8-0x80181850, 0x8018E1C4-0x8018FBD4
+  #   people_move.c:     0x801812C4, 0x80188800-0x8018F200
+  # This indicates a single compilation unit or closely-linked group.
+KNOWN   0x8018FE30  0x80190E34  src/game/gs_flag.c                        9     # GSflagSet/Get (8/16/32-bit), bit value operations
+
+# --- HAL SYSDOLPHIN (HSD) LIBRARY ---
+
+KNOWN   0x80190E34  0x801914F4  src/hsd/hsd_object.c                      ~10   # HSD_ObjAlloc, ref counting, base class
+KNOWN   0x801914F4  0x801920E4  src/hsd/hsd_wobj.c                        ~20   # World Object (animation targets)
+LIKELY  0x801920E4  0x80193748  src/hsd/hsd_aobj.c                        ~15   # Animation Object (inferred position)
+GAP     0x80193748  0x801938FC  ???                                        ~5    # HSD utility functions
+KNOWN   0x801938FC  0x80193C24  src/hsd/hsd_class.c                       ~10   # OO class system
+KNOWN   0x80193C24  0x80197A64  src/hsd/hsd_cobj.c                        ~60   # Camera Object
+KNOWN   0x80197A64  0x80198F7C  src/hsd/hsd_displayfunc.c                 ~15   # Billboard, render pass dispatch
+KNOWN   0x80198F7C  0x8019B7C0  src/hsd/hsd_dobj.c                        ~30   # Display Object (visible geometry)
+KNOWN   0x8019B7C0  0x8019C690  src/hsd/hsd_fog.c                         ~15   # Fog adjustment
+KNOWN   0x8019C690  0x8019CE50  src/hsd/hsd_initialize.c                  ~10   # HSD system initialization
+KNOWN   0x8019CE50  0x801A4000  src/hsd/hsd_jobj.c                        ~80   # Joint Object (skeletal hierarchy)
+KNOWN   0x801A4000  0x801A69C0  src/hsd/hsd_lobj.c                        ~40   # Light Object
+GAP     0x801A69C0  0x801A6A34  ??? (hsd_memory.c)                        1     # HSD_MemoryAssert
+KNOWN   0x801A6A34  0x801AA608  src/hsd/hsd_mobj.c                        ~50   # Material Object
+KNOWN   0x801AA608  0x801B019C  src/hsd/hsd_pobj.c                        ~60   # Primitive Object (mesh data)
+LIKELY  0x801B019C  0x801B1730  src/hsd/hsd_shadow.c                      14    # HSD stencil shadow system (NOT game shadow.c)
+  # NOTE: "shadow.c" string in rodata refers to this HSD module
+GAP     0x801B1730  0x801BBAC8  ??? (hsd_fobj.c?)                         ~80   # Float Object / keyframe curves
+  # Likely hsd_fobj.c based on position between shadow and tobj
+KNOWN   0x801BBAC8  0x801BF138  src/hsd/hsd_tobj.c                        ~40   # Texture Object
+LIKELY  0x801BF138  0x801C0000  src/hsd/hsd_robj.c                        ~20   # Reference Object (constraints)
+GAP     0x801C0000  0x801C3108  ???                                        ~30   # HSD tail / battle transition
+
+# --- BATTLE SYSTEM ---
+
+LIKELY  0x801C3108  0x801C53BC  src/game/battle/battle_grid.c             36    # Battle scene layout, model loading, positions
+LIKELY  0x801C53BC  0x801CC380  src/game/battle/battle_logic.c            ~150  # Damage calc, type effectiveness, AI, status
+  # Sub-ranges likely contain functions from:
+  # battle_damage.c, battle_type.c, battle_status.c, battle_ai.c
+KNOWN   0x801CC380  0x801CDB04  src/game/save/save_crypto.c               1     # SHA-1 implementation (0x1784 bytes, heavily unrolled)
+GAP     0x801CDB04  0x801D7230  ???                                        ~80   # Battle continuation / save-battle bridge
+LIKELY  0x801D7230  0x801E03D4  src/game/battle/waza.c                    ~108  # Move animation sequences (waza = "technique")
+  # wazaSequenceLoad, wazaSequenceUpdate, particle/model entries
+LIKELY  0x801E03D4  0x801E0FB4  src/game/battle/ (state machine)          ~150  # Battle state machine, move execution pipeline
+  # Contains interleaved functions from:
+  # battle_move.c, battle_type.c, battle_status.c, battle_damage.c,
+  # battle_ai.c, battle_shadow.c
+KNOWN   0x801E0FB4  0x801E1B54  src/game/save/save.c                      ~10   # save_CardUpdate, save_CardSystemInit, save_DataInit
+GAP     0x801E1B54  0x801EF02C  ??? (THP player + card + misc)            ~150  # THP movie player, card system, GBA bridge
+KNOWN   0x801EF02C  0x801F000C  src/game/battle/battle_main.c             26    # battle_FightStart, FightEnd, MainLoop
+KNOWN   0x801F000C  0x801F7F80  src/game/pokemon.c                        ~60   # Pokemon data management
+KNOWN   0x801F7F80  0x80201800  src/game/trainer.c                        ~80   # Trainer data, battle setup
+
+# --- COLOSSEUM GAME LOGIC ---
+
+KNOWN   0x80201800  0x80212000  src/game/colosseum_event.c                ~60   # Event flags, state management, story progression
+KNOWN   0x80212000  0x80240000  src/game/colosseum_script.c               ~150  # 52-opcode script VM, StoryScriptExecute (6012 bytes)
+KNOWN   0x80240000  0x8026635C  src/game/colosseum_battle.c               ~200  # Battle sequences, trainer battles, story encounters
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+#
+# Total TUs identified:        ~126
+# TUs with confirmed source:   ~85
+# TUs with likely source:      ~15
+# Unidentified gaps:           ~26
+#
+# Largest TUs by code size:
+#   1. gs_field_world.c         0x21E38 bytes (138 KB, ~600 fn)
+#   2. people_field.c           0x20D68 bytes (131 KB, ~300 fn)
+#   3. colosseum_battle.c       0x2635C bytes (153 KB, ~200 fn)
+#   4. colosseum_script.c       0x2E000 bytes (184 KB, ~150 fn)
+#   5. colosseum_event.c        0x10800 bytes ( 66 KB, ~60 fn)
+#   6. gs_render.c              0x0E1E0 bytes ( 56 KB, 278 fn)
+#   7. gs_model.c               0x0A910 bytes ( 42 KB, 145 fn)
+#   8. hsd_jobj.c               0x071B0 bytes ( 28 KB, ~80 fn)
+#   9. hsd_cobj.c               0x03E40 bytes ( 16 KB, ~60 fn)
+#  10. gs_thread.c              0x0E3F8 bytes ( 57 KB, ~80 fn)
+#
+# Key interleaving cases (possible single-TU origins):
+#   - people.c + people_move.c + people_interact.c
+#   - battle_move.c + battle_type.c + battle_status.c + battle_damage.c + battle_ai.c + battle_shadow.c
+#   - input.c within gs_thread.c range
