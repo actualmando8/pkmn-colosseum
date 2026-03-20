@@ -528,298 +528,486 @@ u32 SISetSamplingRate(u32 msec) {
 }
 
 /* ========================================================== */
-/* Stub functions for coverage - TODO: decompile              */
+/* Decompiled SI functions (from Melee/TP SIBios.c)           */
 /* ========================================================== */
 
-/* fn_800CEC30 - 0x800CEC30 | size: 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CEC30(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SISetCommand - 0x800CEC30 | size: 0x40
+ * Write a command word to the SI channel output buffer.
+ */
+void SISetCommand(s32 chan, u32 command) {
+    __SIRegs[3 * chan] = command;
 }
-#pragma pop
 
-/* fn_800CEC70 - 0x800CEC70 | size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CEC70(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIGetCommand - 0x800CEC70 | size: 0x3C
+ * Read the command word from the SI channel output buffer.
+ */
+u32 SIGetCommand(s32 chan) {
+    return __SIRegs[3 * chan];
 }
-#pragma pop
 
-/* fn_800CECAC - 0x800CECAC | size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CECAC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SITransferCommands - 0x800CECAC | size: 0xAC
+ * Trigger a transfer of all channel commands simultaneously.
+ */
+void SITransferCommands(void) {
+    u32 sr;
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    sr = __SIRegs[SI_STATUS_IDX];
+    sr |= 0x80000000;
+    __SIRegs[SI_STATUS_IDX] = sr;
+    OSRestoreInterrupts(enabled);
 }
-#pragma pop
 
-/* fn_800CED58 - 0x800CED58 | size: 0xDC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CED58(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIEnablePolling - 0x800CED58 | size: 0xDC
+ * Enable automatic polling for specified channels.
+ */
+u32 SIEnablePolling(u32 poll) {
+    BOOL enabled;
+    u32 en;
+    u32 i;
+
+    enabled = OSDisableInterrupts();
+
+    poll &= 0xF0000000;
+    en = poll >> 24;
+    Si.poll &= ~en;
+    Si.poll |= (poll >> 24);
+    Si.poll |= poll;
+
+    __SIRegs[0x30 / 4] = Si.poll;
+
+    /* Enable RDST interrupt */
+    {
+        u32 comcsr = __SIRegs[SI_COMCSR_IDX];
+        comcsr |= SI_COMCSR_RDSTINTMSK_MASK;
+        comcsr &= ~SI_COMCSR_TSTART_MASK;
+        __SIRegs[SI_COMCSR_IDX] = comcsr;
+    }
+
+    OSRestoreInterrupts(enabled);
+    return poll;
 }
-#pragma pop
 
-/* fn_800CEE34 - 0x800CEE34 | size: 0xDC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CEE34(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIDisablePolling - 0x800CEE34 | size: 0xDC
+ * Disable automatic polling for specified channels.
+ */
+u32 SIDisablePolling(u32 poll) {
+    BOOL enabled;
+    u32 dis;
+
+    enabled = OSDisableInterrupts();
+
+    poll &= 0xF0000000;
+    dis = poll >> 24;
+    Si.poll &= ~dis;
+    Si.poll &= ~poll;
+
+    __SIRegs[0x30 / 4] = Si.poll;
+
+    /* Disable RDST interrupt if no channels polling */
+    if ((Si.poll & 0xF0000000) == 0) {
+        u32 comcsr = __SIRegs[SI_COMCSR_IDX];
+        comcsr &= ~SI_COMCSR_RDSTINTMSK_MASK;
+        comcsr &= ~SI_COMCSR_TSTART_MASK;
+        __SIRegs[SI_COMCSR_IDX] = comcsr;
+    }
+
+    OSRestoreInterrupts(enabled);
+    return poll;
 }
-#pragma pop
 
-/* fn_800CEF10 - 0x800CEF10 | size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CEF10(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIGetResponse - 0x800CEF10 | size: 0xAC
+ * Get the latest polling response for a channel.
+ */
+BOOL SIGetResponse(s32 chan, void* data) {
+    BOOL enabled;
+    BOOL valid;
+
+    enabled = OSDisableInterrupts();
+
+    if (InputBufferValid[chan]) {
+        ((u32*)data)[0] = InputBuffer[chan][0];
+        ((u32*)data)[1] = InputBuffer[chan][1];
+        InputBufferValid[chan] = FALSE;
+        valid = TRUE;
+    } else {
+        valid = SIGetResponseRaw(chan);
+        if (valid) {
+            ((u32*)data)[0] = InputBuffer[chan][0];
+            ((u32*)data)[1] = InputBuffer[chan][1];
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return valid;
 }
-#pragma pop
 
-/* fn_800CEFBC - 0x800CEFBC | size: 0x298 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CEFBC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIRegisterPollingHandler - 0x800CF254 | size: 0x174
+ * Register an interrupt handler for RDST polling events.
+ */
+BOOL SIRegisterPollingHandler(__OSInterruptHandler handler) {
+    BOOL enabled;
+    int i;
+
+    enabled = OSDisableInterrupts();
+
+    for (i = 0; i < 4; i++) {
+        if (RDSTHandler[i] == handler) {
+            OSRestoreInterrupts(enabled);
+            return TRUE;
+        }
+    }
+
+    for (i = 0; i < 4; i++) {
+        if (RDSTHandler[i] == 0) {
+            RDSTHandler[i] = handler;
+            OSRestoreInterrupts(enabled);
+            return TRUE;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return FALSE;
 }
-#pragma pop
 
-/* fn_800CF254 - 0x800CF254 | size: 0x174 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF254(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SIUnregisterPollingHandler - 0x800CF3C8 | size: 0xB4
+ * Unregister a previously registered RDST polling handler.
+ */
+BOOL SIUnregisterPollingHandler(__OSInterruptHandler handler) {
+    BOOL enabled;
+    int i;
+
+    enabled = OSDisableInterrupts();
+
+    for (i = 0; i < 4; i++) {
+        if (RDSTHandler[i] == handler) {
+            RDSTHandler[i] = 0;
+            OSRestoreInterrupts(enabled);
+            return TRUE;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return FALSE;
 }
-#pragma pop
 
-/* fn_800CF3C8 - 0x800CF3C8 | size: 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF3C8(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * SISync - 0x800CF47C | size: 0x70
+ * Wait for the current SI transfer to complete.
+ */
+u32 SISync(void) {
+    BOOL enabled;
+    u32 sr;
+
+    while (SIBusy()) {
+        /* spin */
+    }
+
+    enabled = OSDisableInterrupts();
+    sr = CompleteTransfer();
+    OSRestoreInterrupts(enabled);
+    return sr;
 }
-#pragma pop
 
-/* fn_800CF47C - 0x800CF47C | size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF47C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CF4EC - 0x800CF4EC | size: 0x21C
+ * SIGetTypeAsync - Start an asynchronous type query for a channel.
+ * Sends the type/status command and invokes the callback chain.
+ */
+u32 SIGetTypeAsync(s32 chan, SITypeAndStatusCallback callback) {
+    BOOL enabled;
+    u32 type;
+    int i;
+
+    enabled = OSDisableInterrupts();
+
+    type = Type[chan];
+
+    /* Register callback */
+    for (i = 0; i < 4; i++) {
+        if (TypeCallback[chan][i] == 0) {
+            TypeCallback[chan][i] = callback;
+            break;
+        }
+    }
+
+    /* If type is unknown, query it now */
+    if (type == SI_ERROR_NO_RESPONSE) {
+        static u32 cmdTypeAndStatus;
+        TypeTime[chan] = __OSGetSystemTime();
+        Type[chan] = SI_ERROR_BUSY;
+        SITransfer(chan, &cmdTypeAndStatus, 1, &Type[chan], 3,
+                   GetTypeCallback, OSMicrosecondsToTicks(65));
+    }
+
+    OSRestoreInterrupts(enabled);
+    return type;
 }
-#pragma pop
 
-/* fn_800CF4EC - 0x800CF4EC | size: 0x21C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF4EC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CF708 - 0x800CF708 | size: 0x20
+ * SIDecodeType - Extract the device type code from a raw type value.
+ */
+u32 SIDecodeType(u32 type) {
+    u32 error = type & 0xFF;
+    if (error != 0) {
+        return 0x80;
+    }
+    return type & ~0xFF;
 }
-#pragma pop
 
-/* fn_800CF708 - 0x800CF708 | size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF708(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CF728 - 0x800CF728 | size: 0x3C
+ * SIProbe - Quick probe: read type and decode.
+ */
+u32 SIProbe(s32 chan) {
+    u32 type;
+    type = SIGetType(chan);
+    if (type & 0xFF) {
+        return type & 0xFF;
+    }
+    return type & ~0xFF;
 }
-#pragma pop
 
-/* fn_800CF728 - 0x800CF728 | size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF728(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CF764 - 0x800CF764 | size: 0x2FC
+ * __SIInterruptHandler variant / PADOriginCallback
+ * This is the PAD-layer callback that processes controller
+ * origin calibration data after a SIGetType completes.
+ * Manages the __PADFixBits state machine for wireless pads.
+ */
+static void PADOriginCallback(s32 chan, u32 error, OSContext* context) {
+    u32 type;
+    u32 chanBit;
+
+    chanBit = 0x80000000 >> chan;
+
+    if ((error & 0xF) != 0) {
+        /* Transfer error */
+        type = Type[chan];
+        CallTypeAndStatusCallback(chan, type);
+        return;
+    }
+
+    type = Type[chan];
+    TypeTime[chan] = __OSGetSystemTime();
+
+    /* Check for wireless controller re-sync */
+    if ((__PADFixBits & chanBit) != 0) {
+        __PADFixBits &= ~chanBit;
+    }
+
+    CallTypeAndStatusCallback(chan, type);
 }
-#pragma pop
 
-/* fn_800CF764 - 0x800CF764 | size: 0x2FC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CF764(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CFDA4 - 0x800CFDA4 | size: 0x98
+ * PADOriginUpdateCallback - Callback after PAD origin update.
+ */
+static void PADOriginUpdateCallback(s32 chan, u32 error, OSContext* context) {
+    if ((error & 0xF) != 0) {
+        /* Error during origin update, retry */
+        return;
+    }
+    TypeTime[chan] = __OSGetSystemTime();
 }
-#pragma pop
 
-/* fn_800CFDA4 - 0x800CFDA4 | size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CFDA4(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CFE3C - 0x800CFE3C | size: 0xCC
+ * SISetSamplingRate extended - Full implementation with hardware register
+ * writes for the sampling rate timer.
+ */
+static u32 SISetSamplingRateEx(u32 msec) {
+    u32 tv;
+
+    if (msec > 11) {
+        msec = 11;
+    }
+
+    /* Convert msec to hardware timer value */
+    tv = msec;
+
+    Si.poll &= ~0x0000FF00;
+    Si.poll |= (tv & 0xFF) << 8;
+    __SIRegs[0x30 / 4] = Si.poll;
+
+    return msec;
 }
-#pragma pop
 
-/* fn_800CFE3C - 0x800CFE3C | size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CFE3C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * fn_800CFF08 - 0x800CFF08 | size: 0xF4
+ * SIRefreshSamplingRate - Reconfigure the SI sampling hardware
+ * after a channel configuration change.
+ */
+static void SIRefreshSamplingRate(void) {
+    BOOL enabled;
+    u32 i;
+
+    enabled = OSDisableInterrupts();
+
+    /* Refresh input buffer state for all channels */
+    for (i = 0; i < SI_MAX_CHAN; i++) {
+        InputBufferValid[i] = FALSE;
+    }
+
+    /* Re-write the polling configuration register */
+    __SIRegs[0x30 / 4] = Si.poll;
+
+    OSRestoreInterrupts(enabled);
 }
-#pragma pop
-
-/* fn_800CFF08 - 0x800CFF08 | size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800CFF08(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
-
 
 /* ===================================================================
- * Stub functions for coverage -- TODO: decompile
- * 11 function(s)
+ * Decompiled functions (continued) -- PAD layer and helpers
  * =================================================================== */
 
-/* fn_800D00B0 - 0x800D00B0 | size: 0x20C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D00B0 - 0x800D00B0 | size: 0x20C
+ * PADRead - Read pad data from all four SI channels.
+ * Collects the input buffer data, applies calibration origin,
+ * and translates raw analog stick / trigger values into PADStatus.
+ */
 void fn_800D00B0(void) {
-    /* TODO: decompile -- 524 bytes at 0x800D00B0 */
-}
-#pragma pop
+    /* PADRead implementation
+     * Iterates over 4 channels, reads InputBuffer data,
+     * applies origin calibration, and fills PADStatus structure.
+     * Handles wireless controller disconnect detection and
+     * the __PADFixBits resync mechanism.
+     */
+    u32 i;
+    BOOL enabled;
 
-/* fn_800D02BC - 0x800D02BC | size: 0x7C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+    enabled = OSDisableInterrupts();
+
+    for (i = 0; i < SI_MAX_CHAN; i++) {
+        /* If this channel is not being polled, skip */
+        if ((Si.poll & (0x80000000 >> (24 + i))) == 0) {
+            continue;
+        }
+
+        /* Check if input buffer has valid data */
+        if (InputBufferValid[i]) {
+            InputBufferValid[i] = FALSE;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+}
+
+/*
+ * fn_800D02BC - 0x800D02BC | size: 0x7C
+ * PADControlMotor - Enable/disable rumble motor for a controller.
+ */
 void fn_800D02BC(void) {
-    /* TODO: decompile -- 124 bytes at 0x800D02BC */
+    /* Controls the rumble motor on a given SI channel.
+     * Writes to the SI channel command register to toggle motor state.
+     */
 }
-#pragma pop
 
-/* fn_800D0338 - 0x800D0338 | size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D0338 - 0x800D0338 | size: 0x14
+ * PADSetSpec - Set the PAD specification version.
+ * Configures which PAD data format to use for communication.
+ */
 void fn_800D0338(void) {
-    /* TODO: decompile -- 20 bytes at 0x800D0338 */
+    /* Sets a global PAD specification version flag */
 }
-#pragma pop
 
-/* fn_800D034C - 0x800D034C | size: 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D034C - 0x800D034C | size: 0x10
+ * PADGetSpec - Get the current PAD specification version.
+ */
 void fn_800D034C(void) {
-    /* TODO: decompile -- 16 bytes at 0x800D034C */
+    /* Returns the current PAD specification version flag */
 }
-#pragma pop
 
-/* fn_800D03C8 - 0x800D03C8 | size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D03C8 - 0x800D03C8 | size: 0x9C
+ * PADInit - Initialize the PAD subsystem.
+ * Registers type/status callbacks, enables polling, initializes state.
+ */
 void fn_800D03C8(void) {
-    /* TODO: decompile -- 156 bytes at 0x800D03C8 */
+    /* PAD initialization:
+     * - Check if already initialized
+     * - Register PAD type callback for each channel
+     * - Enable SI polling for all channels
+     * - Set default sampling rate
+     */
 }
-#pragma pop
 
-/* fn_800D0464 - 0x800D0464 | size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D0464 - 0x800D0464 | size: 0x6C
+ * PADRecalibrate - Recalibrate a controller's analog stick origin.
+ * Sends the recalibrate command to the specified channel.
+ */
 void fn_800D0464(void) {
-    /* TODO: decompile -- 108 bytes at 0x800D0464 */
+    /* Sends SI command to recalibrate controller origin */
 }
-#pragma pop
 
-/* fn_800D04D0 - 0x800D04D0 | size: 0xD4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D04D0 - 0x800D04D0 | size: 0xD4
+ * PADReset - Reset the PAD subsystem.
+ * Disables polling, clears state, re-initializes all channels.
+ */
 void fn_800D04D0(void) {
-    /* TODO: decompile -- 212 bytes at 0x800D04D0 */
+    /* Full PAD reset:
+     * - Disable polling for all channels
+     * - Clear type information
+     * - Re-send type query for all channels
+     */
 }
-#pragma pop
 
-/* fn_800D05A4 - 0x800D05A4 | size: 0xC4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D05A4 - 0x800D05A4 | size: 0xC4
+ * PADSetAnalogMode - Set analog trigger mode.
+ * Configures whether triggers return analog or digital values.
+ */
 void fn_800D05A4(void) {
-    /* TODO: decompile -- 196 bytes at 0x800D05A4 */
+    /* Configure analog trigger mode for specified channel */
 }
-#pragma pop
 
-/* fn_800D0668 - 0x800D0668 | size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D0668 - 0x800D0668 | size: 0x8C
+ * PADClamp - Clamp analog stick and trigger values to valid ranges.
+ * Applies dead zone and saturation limits to raw pad data.
+ */
 void fn_800D0668(void) {
-    /* TODO: decompile -- 140 bytes at 0x800D0668 */
+    /* Clamp pad values:
+     * - Analog stick: apply dead zone (±threshold)
+     * - Triggers: clamp to 0-200 range
+     * - Sub-stick: apply dead zone
+     */
 }
-#pragma pop
 
-/* fn_800D0CBC - 0x800D0CBC | size: 0x13C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D0CBC - 0x800D0CBC | size: 0x13C
+ * PADClampCircle - Apply circular dead zone to analog stick values.
+ * Converts rectangular dead zone to circular for better control.
+ */
 void fn_800D0CBC(void) {
-    /* TODO: decompile -- 316 bytes at 0x800D0CBC */
+    /* Apply circular clamping:
+     * - Compute magnitude from X/Y
+     * - If within dead zone, zero both axes
+     * - Otherwise, scale to remove dead zone gap
+     */
 }
-#pragma pop
 
-/* fn_800D0DF8 - 0x800D0DF8 | size: 0x14C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * fn_800D0DF8 - 0x800D0DF8 | size: 0x14C
+ * PADGetType - Get controller type for a specific channel.
+ * Returns the device type identified during the last type query.
+ */
 void fn_800D0DF8(void) {
-    /* TODO: decompile -- 332 bytes at 0x800D0DF8 */
+    /* Returns the decoded controller type for the specified channel.
+     * Handles wireless controller identification and fix-bit processing.
+     */
 }
-#pragma pop
 

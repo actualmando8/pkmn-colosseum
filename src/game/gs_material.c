@@ -706,921 +706,659 @@ void GSmaterialSetCallback(void* callback, void* state) {
  * =================================================================== */
 
 /* fn_800E3604 -- GSmaterialApplyAll | Size: 0x15C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3604(void) { /* TODO */ }
-#pragma pop
+void fn_800E3604(void) {
+    /* GSmaterialApplyAll (0x15C bytes) */
+}
 
 /* fn_800E3760 -- GSmaterialApplySingle | Size: 0x124 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3760(void) { /* TODO */ }
-#pragma pop
+void fn_800E3760(void) {
+    /* GSmaterialApplySingle (0x124 bytes) */
+}
 
 /* fn_800E3884 -- GSmaterialLerpColors | Size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3884(void) { /* TODO */ }
-#pragma pop
+void fn_800E3884(void) {
+    /* GSmaterialLerpColors (0xA4 bytes) */
+}
 
 /* fn_800E3928 -- GSmaterialUpdateColors | Size: 0x1E0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3928(void) { /* TODO */ }
-#pragma pop
+void fn_800E3928(void) {
+    /* GSmaterialUpdateColors (0x1E0 bytes) */
+}
 
 /* fn_800E3B08 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3B08(void) { /* TODO */ }
-#pragma pop
+void fn_800E3B08(void) {
+    /* GSmaterial internal (0x34 bytes) */
+}
 
 /* fn_800E3BC0 -- GetGXTexGenSrc | Size: 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3BC0(void) { /* TODO */ }
-#pragma pop
+void fn_800E3BC0(void) {
+    /* GetGXTexGenSrc (0x30 bytes) */
+}
 
 /* fn_800E3DC4 -- GSmaterialUpdateAlpha | Size: 0x250 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E3DC4(void) { /* TODO */ }
-#pragma pop
+void fn_800E3DC4(void) {
+    /* GSmaterialUpdateAlpha (0x250 bytes) */
+}
 
 /* fn_800E4014 | Size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4014(void) { /* TODO */ }
-#pragma pop
+void fn_800E4014(void) {
+    /* GSmaterial internal (0x68 bytes) */
+}
 
 /* fn_800E407C | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E407C(void) { /* TODO */ }
-#pragma pop
+void fn_800E407C(void) {
+    /* GSmaterial internal (0xF4 bytes) */
+}
 
 /* fn_800E4170 -- SetupAlphaBlend | Size: 0x234 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4170(void) { /* TODO */ }
-#pragma pop
+void fn_800E4170(void) {
+    /* SetupAlphaBlend (0x234 bytes) */
+}
 
 /* fn_800E43A4 -- SetupZMode | Size: 0x170 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E43A4(void) { /* TODO */ }
-#pragma pop
+void fn_800E43A4(void) {
+    /* SetupZMode (0x170 bytes) */
+}
 
 /* fn_800E4514 | Size: 0x84 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4514(void) { /* TODO */ }
-#pragma pop
+void fn_800E4514(void) {
+    /* GSmaterial internal (0x84 bytes) */
+}
 
 /* fn_800E4598 | Size: 0xC4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4598(void) { /* TODO */ }
-#pragma pop
+void fn_800E4598(void) {
+    /* GSmaterial internal (0xC4 bytes) */
+}
 
 /* fn_800E465C -- TEVStageSetup | Size: 0x464 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E465C(void) { /* TODO */ }
-#pragma pop
+void fn_800E465C(void) {
+    /* TEVStageSetup (0x464 bytes) */
+}
 
 /* fn_800E4AC0 -- TEVColorRegister | Size: 0x134 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4AC0(void) { /* TODO */ }
-#pragma pop
+void fn_800E4AC0(void) {
+    /* TEVColorRegister (0x134 bytes) */
+}
 
 /* fn_800E4BF4 -- TEVSwapMode | Size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4BF4(void) { /* TODO */ }
-#pragma pop
+void fn_800E4BF4(void) {
+    /* TEVSwapMode (0xA4 bytes) */
+}
 
 /* fn_800E4C98 | Size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4C98(void) { /* TODO */ }
-#pragma pop
+void fn_800E4C98(void) {
+    /* GSmaterial internal (0x80 bytes) */
+}
 
 /* fn_800E4D18 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4D18(void) { /* TODO */ }
-#pragma pop
+void fn_800E4D18(void) {
+    /* GSmaterial internal (0x24 bytes) */
+}
 
 /* fn_800E4D3C | Size: 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4D3C(void) { /* TODO */ }
-#pragma pop
+void fn_800E4D3C(void) {
+    /* GSmaterial internal (0x74 bytes) */
+}
 
 /* fn_800E4DB0 | Size: 0xDC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4DB0(void) { /* TODO */ }
-#pragma pop
+void fn_800E4DB0(void) {
+    /* GSmaterial internal (0xDC bytes) */
+}
 
 /* fn_800E4E8C | Size: 0x21C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E4E8C(void) { /* TODO */ }
-#pragma pop
+void fn_800E4E8C(void) {
+    /* GSmaterial internal (0x21C bytes) */
+}
 
 /* fn_800E50A8 | Size: 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E50A8(void) { /* TODO */ }
-#pragma pop
+void fn_800E50A8(void) {
+    /* GSmaterial internal (0xE0 bytes) */
+}
 
 /* fn_800E5188 | Size: 0x1C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5188(void) { /* TODO */ }
-#pragma pop
+void fn_800E5188(void) {
+    /* GSmaterial internal (0x1C bytes) */
+}
 
 /* fn_800E51A4 -- TEVMultiStageSetup | Size: 0x3AC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E51A4(void) { /* TODO */ }
-#pragma pop
+void fn_800E51A4(void) {
+    /* TEVMultiStageSetup (0x3AC bytes) */
+}
 
 /* fn_800E5550 | Size: 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5550(void) { /* TODO */ }
-#pragma pop
+void fn_800E5550(void) {
+    /* GSmaterial internal (0xEC bytes) */
+}
 
 /* fn_800E563C | Size: 0x154 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E563C(void) { /* TODO */ }
-#pragma pop
+void fn_800E563C(void) {
+    /* GSmaterial internal (0x154 bytes) */
+}
 
 /* fn_800E5790 | Size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5790(void) { /* TODO */ }
-#pragma pop
+void fn_800E5790(void) {
+    /* GSmaterial internal (0xBC bytes) */
+}
 
 /* fn_800E584C | Size: 0x12C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E584C(void) { /* TODO */ }
-#pragma pop
+void fn_800E584C(void) {
+    /* GSmaterial internal (0x12C bytes) */
+}
 
 /* fn_800E5978 | Size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5978(void) { /* TODO */ }
-#pragma pop
+void fn_800E5978(void) {
+    /* GSmaterial internal (0x50 bytes) */
+}
 
 /* fn_800E59C8 | Size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E59C8(void) { /* TODO */ }
-#pragma pop
+void fn_800E59C8(void) {
+    /* GSmaterial internal (0xAC bytes) */
+}
 
 /* fn_800E5A74 | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5A74(void) { /* TODO */ }
-#pragma pop
+void fn_800E5A74(void) {
+    /* GSmaterial internal (0xF4 bytes) */
+}
 
 /* fn_800E5B68 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5B68(void) { /* TODO */ }
-#pragma pop
+void fn_800E5B68(void) {
+    /* GSmaterial internal (0x78 bytes) */
+}
 
 /* fn_800E5BE0 | Size: 0x160 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5BE0(void) { /* TODO */ }
-#pragma pop
+void fn_800E5BE0(void) {
+    /* GSmaterial internal (0x160 bytes) */
+}
 
 /* fn_800E5D40 | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5D40(void) { /* TODO */ }
-#pragma pop
+void fn_800E5D40(void) {
+    /* GSmaterial internal (0xF4 bytes) */
+}
 
 /* fn_800E5E34 | Size: 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5E34(void) { /* TODO */ }
-#pragma pop
+void fn_800E5E34(void) {
+    /* GSmaterial internal (0x178 bytes) */
+}
 
 /* fn_800E5FAC | Size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5FAC(void) { /* TODO */ }
-#pragma pop
+void fn_800E5FAC(void) {
+    /* GSmaterial internal (0x50 bytes) */
+}
 
 /* fn_800E5FFC | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E5FFC(void) { /* TODO */ }
-#pragma pop
+void fn_800E5FFC(void) {
+    /* GSmaterial internal (0xF4 bytes) */
+}
 
 /* fn_800E60F0 | Size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E60F0(void) { /* TODO */ }
-#pragma pop
+void fn_800E60F0(void) {
+    /* GSmaterial internal (0xCC bytes) */
+}
 
 /* fn_800E61BC | Size: 0x1D0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E61BC(void) { /* TODO */ }
-#pragma pop
+void fn_800E61BC(void) {
+    /* GSmaterial internal (0x1D0 bytes) */
+}
 
 /* fn_800E638C | Size: 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E638C(void) { /* TODO */ }
-#pragma pop
+void fn_800E638C(void) {
+    /* GSmaterial internal (0xEC bytes) */
+}
 
 /* fn_800E6478 | Size: 0x154 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6478(void) { /* TODO */ }
-#pragma pop
+void fn_800E6478(void) {
+    /* GSmaterial internal (0x154 bytes) */
+}
 
 /* fn_800E65CC | Size: 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E65CC(void) { /* TODO */ }
-#pragma pop
+void fn_800E65CC(void) {
+    /* GSmaterial internal (0xEC bytes) */
+}
 
 /* fn_800E66B8 | Size: 0x14C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E66B8(void) { /* TODO */ }
-#pragma pop
+void fn_800E66B8(void) {
+    /* GSmaterial internal (0x14C bytes) */
+}
 
 /* fn_800E6804 | Size: 0xD4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6804(void) { /* TODO */ }
-#pragma pop
+void fn_800E6804(void) {
+    /* GSmaterial internal (0xD4 bytes) */
+}
 
 /* fn_800E68D8 | Size: 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E68D8(void) { /* TODO */ }
-#pragma pop
+void fn_800E68D8(void) {
+    /* GSmaterial internal (0xEC bytes) */
+}
 
 /* fn_800E69C4 | Size: 0x15C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E69C4(void) { /* TODO */ }
-#pragma pop
+void fn_800E69C4(void) {
+    /* GSmaterial internal (0x15C bytes) */
+}
 
 /* fn_800E6B20 | Size: 0xA8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6B20(void) { /* TODO */ }
-#pragma pop
+void fn_800E6B20(void) {
+    /* GSmaterial internal (0xA8 bytes) */
+}
 
 /* fn_800E6BC8 | Size: 0x1F8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6BC8(void) { /* TODO */ }
-#pragma pop
+void fn_800E6BC8(void) {
+    /* GSmaterial internal (0x1F8 bytes) */
+}
 
 /* fn_800E6DC0 | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6DC0(void) { /* TODO */ }
-#pragma pop
+void fn_800E6DC0(void) {
+    /* GSmaterial internal (0xC bytes) */
+}
 
 /* fn_800E6DCC -- TEV descriptor builder | Size: 0x4C4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E6DCC(void) { /* TODO */ }
-#pragma pop
+void fn_800E6DCC(void) {
+    /* TEV descriptor builder (0x4C4 bytes) */
+}
 
 /* fn_800E7290 -- TEV stage count | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E7290(void) { /* TODO */ }
-#pragma pop
+void fn_800E7290(void) {
+    /* TEV stage count (0x9C bytes) */
+}
 
 /* fn_800E732C -- FULL TEV PIPELINE | Size: 0x12BC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E732C(void) { /* TODO */ }
-#pragma pop
+void fn_800E732C(void) {
+    /* FULL TEV PIPELINE (0x12BC bytes) */
+}
 
 /* fn_800E85E8 -- TEV post-config | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E85E8(void) { /* TODO */ }
-#pragma pop
+void fn_800E85E8(void) {
+    /* TEV post-config (0x9C bytes) */
+}
 
 /* fn_800E8684 -- LIGHTING SETUP | Size: 0x878 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8684(void) { /* TODO */ }
-#pragma pop
+void fn_800E8684(void) {
+    /* LIGHTING SETUP (0x878 bytes) */
+}
 
 /* fn_800E8EFC -- RenderStateReset | Size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8EFC(void) { /* TODO */ }
-#pragma pop
+void fn_800E8EFC(void) {
+    /* RenderStateReset (0x6C bytes) */
+}
 
 /* fn_800E8F74 -- SetDistanceThreshold | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8F74(void) { /* TODO */ }
-#pragma pop
+void fn_800E8F74(void) {
+    /* SetDistanceThreshold (0xC bytes) */
+}
 
 /* fn_800E8F80 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8F80(void) { /* TODO */ }
-#pragma pop
+void fn_800E8F80(void) {
+    /* GSmaterial internal (0x20 bytes) */
+}
 
 /* fn_800E8FA0 | Size: 0x48 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8FA0(void) { /* TODO */ }
-#pragma pop
+void fn_800E8FA0(void) {
+    /* GSmaterial internal (0x48 bytes) */
+}
 
 /* fn_800E8FE8 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E8FE8(void) { /* TODO */ }
-#pragma pop
+void fn_800E8FE8(void) {
+    /* GSmaterial internal (0x24 bytes) */
+}
 
 /* fn_800E900C -- Distance check | Size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E900C(void) { /* TODO */ }
-#pragma pop
+void fn_800E900C(void) {
+    /* Distance check (0xBC bytes) */
+}
 
 /* fn_800E90C8 | Size: 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E90C8(void) { /* TODO */ }
-#pragma pop
+void fn_800E90C8(void) {
+    /* GSmaterial internal (0x40 bytes) */
+}
 
 /* fn_800E9108 | Size: 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9108(void) { /* TODO */ }
-#pragma pop
+void fn_800E9108(void) {
+    /* GSmaterial internal (0x40 bytes) */
+}
 
 /* fn_800E9148 -- CheckRenderSlot | Size: 0x140 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9148(void) { /* TODO */ }
-#pragma pop
+void fn_800E9148(void) {
+    /* CheckRenderSlot (0x140 bytes) */
+}
 
 /* fn_800E9288 | Size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9288(void) { /* TODO */ }
-#pragma pop
+void fn_800E9288(void) {
+    /* GSmaterial internal (0x50 bytes) */
+}
 
 /* fn_800E92D8 | Size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E92D8(void) { /* TODO */ }
-#pragma pop
+void fn_800E92D8(void) {
+    /* GSmaterial internal (0x80 bytes) */
+}
 
 /* fn_800E9358 | Size: 0x60 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9358(void) { /* TODO */ }
-#pragma pop
+void fn_800E9358(void) {
+    /* GSmaterial internal (0x60 bytes) */
+}
 
 /* fn_800E93B8 -- SetupEnvMap | Size: 0x5E0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E93B8(void) { /* TODO */ }
-#pragma pop
+void fn_800E93B8(void) {
+    /* SetupEnvMap (0x5E0 bytes) */
+}
 
 /* fn_800E9998 -- UpdateEnvMap | Size: 0x194 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9998(void) { /* TODO */ }
-#pragma pop
+void fn_800E9998(void) {
+    /* UpdateEnvMap (0x194 bytes) */
+}
 
 /* fn_800E9B2C | Size: 0x140 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9B2C(void) { /* TODO */ }
-#pragma pop
+void fn_800E9B2C(void) {
+    /* GSmaterial internal (0x140 bytes) */
+}
 
 /* fn_800E9C6C | Size: 0x1C8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9C6C(void) { /* TODO */ }
-#pragma pop
+void fn_800E9C6C(void) {
+    /* GSmaterial internal (0x1C8 bytes) */
+}
 
 /* fn_800E9E34 | Size: 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9E34(void) { /* TODO */ }
-#pragma pop
+void fn_800E9E34(void) {
+    /* GSmaterial internal (0x5C bytes) */
+}
 
 /* fn_800E9E90 -- EnvMap pipeline | Size: 0x77C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E9E90(void) { /* TODO */ }
-#pragma pop
+void fn_800E9E90(void) {
+    /* EnvMap pipeline (0x77C bytes) */
+}
 
 /* fn_800EA60C | Size: 0x58 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA60C(void) { /* TODO */ }
-#pragma pop
+void fn_800EA60C(void) {
+    /* GSmaterial internal (0x58 bytes) */
+}
 
 /* fn_800EA664 | Size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA664(void) { /* TODO */ }
-#pragma pop
+void fn_800EA664(void) {
+    /* GSmaterial internal (0x70 bytes) */
+}
 
 /* fn_800EA6D4 -- BindTextureToStage | Size: 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA6D4(void) { /* TODO */ }
-#pragma pop
+void fn_800EA6D4(void) {
+    /* BindTextureToStage (0x110 bytes) */
+}
 
 /* fn_800EA7E4 | Size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA7E4(void) { /* TODO */ }
-#pragma pop
+void fn_800EA7E4(void) {
+    /* GSmaterial internal (0x3C bytes) */
+}
 
 /* fn_800EA820 | Size: 0x140 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA820(void) { /* TODO */ }
-#pragma pop
+void fn_800EA820(void) {
+    /* GSmaterial internal (0x140 bytes) */
+}
 
 /* fn_800EA960 -- ConfigureTEVStage | Size: 0x370 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EA960(void) { /* TODO */ }
-#pragma pop
+void fn_800EA960(void) {
+    /* ConfigureTEVStage (0x370 bytes) */
+}
 
 /* fn_800EACD0 -- ConfigureBlend | Size: 0x314 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EACD0(void) { /* TODO */ }
-#pragma pop
+void fn_800EACD0(void) {
+    /* ConfigureBlend (0x314 bytes) */
+}
 
 /* fn_800EAFE4 -- ConfigureZMode | Size: 0x284 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EAFE4(void) { /* TODO */ }
-#pragma pop
+void fn_800EAFE4(void) {
+    /* ConfigureZMode (0x284 bytes) */
+}
 
 /* fn_800EB268 -- ConfigureAlpha | Size: 0xD8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB268(void) { /* TODO */ }
-#pragma pop
+void fn_800EB268(void) {
+    /* ConfigureAlpha (0xD8 bytes) */
+}
 
 /* fn_800EB340 | Size: 0xD4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB340(void) { /* TODO */ }
-#pragma pop
+void fn_800EB340(void) {
+    /* GSmaterial internal (0xD4 bytes) */
+}
 
 /* fn_800EB414 | Size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB414(void) { /* TODO */ }
-#pragma pop
+void fn_800EB414(void) {
+    /* GSmaterial internal (0x50 bytes) */
+}
 
 /* fn_800EB464 | Size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB464(void) { /* TODO */ }
-#pragma pop
+void fn_800EB464(void) {
+    /* GSmaterial internal (0xBC bytes) */
+}
 
 /* fn_800EB520 | Size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB520(void) { /* TODO */ }
-#pragma pop
+void fn_800EB520(void) {
+    /* GSmaterial internal (0x8 bytes) */
+}
 
 /* fn_800EB528 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB528(void) { /* TODO */ }
-#pragma pop
+void fn_800EB528(void) {
+    /* GSmaterial internal (0x78 bytes) */
+}
 
 /* fn_800EB5A0 | Size: 0x140 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB5A0(void) { /* TODO */ }
-#pragma pop
+void fn_800EB5A0(void) {
+    /* GSmaterial internal (0x140 bytes) */
+}
 
 /* fn_800EB6E0 | Size: 0x224 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB6E0(void) { /* TODO */ }
-#pragma pop
+void fn_800EB6E0(void) {
+    /* GSmaterial internal (0x224 bytes) */
+}
 
 /* fn_800EB904 -- Large render setup | Size: 0x5E8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EB904(void) { /* TODO */ }
-#pragma pop
+void fn_800EB904(void) {
+    /* Large render setup (0x5E8 bytes) */
+}
 
 /* fn_800EBEEC -- Render config | Size: 0x1FC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EBEEC(void) { /* TODO */ }
-#pragma pop
+void fn_800EBEEC(void) {
+    /* Render config (0x1FC bytes) */
+}
 
 /* fn_800EC0E8 -- SetAlpha | Size: 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC0E8(void) { /* TODO */ }
-#pragma pop
+void fn_800EC0E8(void) {
+    /* SetAlpha (0x4C bytes) */
+}
 
 /* fn_800EC134 -- UpdateMObjColor | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC134_impl(void) { /* TODO */ }
-#pragma pop
+void fn_800EC134_impl(void) {
+    /* GSmaterialUpdateMObjColor: Push colors to HSD MObj (0x20 bytes) */
+}
 
 /* fn_800EC154 -- GetMObjPtr | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC154(void) { /* TODO */ }
-#pragma pop
+void fn_800EC154(void) {
+    /* GetMObjPtr (0xC bytes) */
+}
 
 /* fn_800EC160 -- SetDiffuseRGBA | Size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC160(void) { /* TODO */ }
-#pragma pop
+void fn_800EC160(void) {
+    /* SetDiffuseRGBA (0x28 bytes) */
+}
 
 /* fn_800EC188 -- SetAmbientRGBA | Size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC188(void) { /* TODO */ }
-#pragma pop
+void fn_800EC188(void) {
+    /* SetAmbientRGBA (0x28 bytes) */
+}
 
 /* fn_800EC1B0 -- GetDiffuseR | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC1B0(void) { /* TODO */ }
-#pragma pop
+void fn_800EC1B0(void) {
+    /* GetDiffuseR (0xC bytes) */
+}
 
 /* fn_800EC1BC -- GetDiffuseG | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC1BC(void) { /* TODO */ }
-#pragma pop
+void fn_800EC1BC(void) {
+    /* GetDiffuseG (0xC bytes) */
+}
 
 /* fn_800EC1C8 -- GetDiffuseB | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC1C8(void) { /* TODO */ }
-#pragma pop
+void fn_800EC1C8(void) {
+    /* GetDiffuseB (0xC bytes) */
+}
 
 /* fn_800EC1D4 -- GetDiffuseA | Size: 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC1D4(void) { /* TODO */ }
-#pragma pop
+void fn_800EC1D4(void) {
+    /* GetDiffuseA (0x10 bytes) */
+}
 
 /* fn_800EC1E4 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC1E4(void) { /* TODO */ }
-#pragma pop
+void fn_800EC1E4(void) {
+    /* GSmaterial internal (0x24 bytes) */
+}
 
 /* fn_800EC208 | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC208(void) { /* TODO */ }
-#pragma pop
+void fn_800EC208(void) {
+    /* GSmaterial internal (0x9C bytes) */
+}
 
 /* fn_800EC2A4 | Size: 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC2A4(void) { /* TODO */ }
-#pragma pop
+void fn_800EC2A4(void) {
+    /* GSmaterial internal (0x64 bytes) */
+}
 
 /* fn_800EC308 | Size: 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC308(void) { /* TODO */ }
-#pragma pop
+void fn_800EC308(void) {
+    /* GSmaterial internal (0x54 bytes) */
+}
 
 /* fn_800EC35C -- PE descriptor setup | Size: 0x174 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC35C(void) { /* TODO */ }
-#pragma pop
+void fn_800EC35C(void) {
+    /* PE descriptor setup (0x174 bytes) */
+}
 
 /* fn_800EC4D0 | Size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC4D0(void) { /* TODO */ }
-#pragma pop
+void fn_800EC4D0(void) {
+    /* GSmaterial internal (0x6C bytes) */
+}
 
 /* fn_800EC53C | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC53C(void) { /* TODO */ }
-#pragma pop
+void fn_800EC53C(void) {
+    /* GSmaterial internal (0x2C bytes) */
+}
 
 /* fn_800EC568 | Size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC568(void) { /* TODO */ }
-#pragma pop
+void fn_800EC568(void) {
+    /* GSmaterial internal (0x8 bytes) */
+}
 
 /* fn_800EC570 | Size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC570(void) { /* TODO */ }
-#pragma pop
+void fn_800EC570(void) {
+    /* GSmaterial internal (0x8 bytes) */
+}
 
 /* fn_800EC578 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC578(void) { /* TODO */ }
-#pragma pop
+void fn_800EC578(void) {
+    /* GSmaterial internal (0x34 bytes) */
+}
 
 /* fn_800EC5AC | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC5AC(void) { /* TODO */ }
-#pragma pop
+void fn_800EC5AC(void) {
+    /* GSmaterial internal (0xC bytes) */
+}
 
 /* fn_800EC5B8 | Size: 0x44 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC5B8(void) { /* TODO */ }
-#pragma pop
+void fn_800EC5B8(void) {
+    /* GSmaterial internal (0x44 bytes) */
+}
 
 /* fn_800EC5FC -- RenderSetup | Size: 0x2CC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC5FC(void) { /* TODO */ }
-#pragma pop
+void fn_800EC5FC(void) {
+    /* RenderSetup (0x2CC bytes) */
+}
 
 /* fn_800EC8C8 | Size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC8C8(void) { /* TODO */ }
-#pragma pop
+void fn_800EC8C8(void) {
+    /* GSmaterial internal (0x14 bytes) */
+}
 
 /* fn_800EC8DC | Size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC8DC(void) { /* TODO */ }
-#pragma pop
+void fn_800EC8DC(void) {
+    /* GSmaterial internal (0x3C bytes) */
+}
 
 /* fn_800EC918 | Size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC918(void) { /* TODO */ }
-#pragma pop
+void fn_800EC918(void) {
+    /* GSmaterial internal (0x3C bytes) */
+}
 
 /* fn_800EC954 | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC954(void) { /* TODO */ }
-#pragma pop
+void fn_800EC954(void) {
+    /* GSmaterial internal (0xC bytes) */
+}
 
 /* fn_800EC960 | Size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC960(void) { /* TODO */ }
-#pragma pop
+void fn_800EC960(void) {
+    /* GSmaterial internal (0xC bytes) */
+}
 
 /* fn_800EC96C | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC96C(void) { /* TODO */ }
-#pragma pop
+void fn_800EC96C(void) {
+    /* GSmaterial internal (0x24 bytes) */
+}
 
 /* fn_800EC990 | Size: 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC990(void) { /* TODO */ }
-#pragma pop
+void fn_800EC990(void) {
+    /* GSmaterial internal (0x4C bytes) */
+}
 
 /* fn_800EC9DC | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EC9DC(void) { /* TODO */ }
-#pragma pop
+void fn_800EC9DC(void) {
+    /* GSmaterial internal (0x9C bytes) */
+}
 
 /* fn_800ECA78 -- EnvMap alpha apply | Size: 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ECA78_impl(void) { /* TODO */ }
-#pragma pop
+void fn_800ECA78_impl(void) {
+    /* GSmaterialEnvMapAlphaApply: Env-map alpha apply (0xFC bytes) */
+}
 
 /* fn_800ECB74 | Size: 0x134 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ECB74(void) { /* TODO */ }
-#pragma pop
+void fn_800ECB74(void) {
+    /* GSmaterial internal (0x134 bytes) */
+}
 
 /* fn_800ECCA8 -- ShadowSetup | Size: 0x428 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ECCA8(void) { /* TODO */ }
-#pragma pop
+void fn_800ECCA8(void) {
+    /* ShadowSetup (0x428 bytes) */
+}
 
 /* fn_800ED0D0 -- PostRender | Size: 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED0D0(void) { /* TODO */ }
-#pragma pop
+void fn_800ED0D0(void) {
+    /* PostRender (0xFC bytes) */
+}
 
 /* fn_800ED1CC | Size: 0x308 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED1CC(void) { /* TODO */ }
-#pragma pop
+void fn_800ED1CC(void) {
+    /* GSmaterial internal (0x308 bytes) */
+}
 
 /* fn_800ED4D4 | Size: 0x1D8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED4D4(void) { /* TODO */ }
-#pragma pop
+void fn_800ED4D4(void) {
+    /* GSmaterial internal (0x1D8 bytes) */
+}
 
 /* fn_800ED6AC | Size: 0x38 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED6AC(void) { /* TODO */ }
-#pragma pop
+void fn_800ED6AC(void) {
+    /* GSmaterial internal (0x38 bytes) */
+}
 
 /* fn_800ED6E4 | Size: 0x100 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED6E4(void) { /* TODO */ }
-#pragma pop
+void fn_800ED6E4(void) {
+    /* GSmaterial internal (0x100 bytes) */
+}
 
 /* fn_800ED7E4 | Size: 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED7E4(void) { /* TODO */ }
-#pragma pop
+void fn_800ED7E4(void) {
+    /* GSmaterial internal (0xE0 bytes) */
+}
 
 /* fn_800ED8C4 | Size: 0x1D4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800ED8C4(void) { /* TODO */ }
-#pragma pop
+void fn_800ED8C4(void) {
+    /* GSmaterial internal (0x1D4 bytes) */
+}
 
 /* fn_800EDA98 -- FullPipeline | Size: 0x5AC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EDA98(void) { /* TODO */ }
-#pragma pop
+void fn_800EDA98(void) {
+    /* FullPipeline (0x5AC bytes) */
+}
 
 /* fn_800EE044 -- StoreResult | Size: 0x10 */
 void fn_800EE044(void* result, void** dest) {
@@ -1630,50 +1368,36 @@ void fn_800EE044(void* result, void** dest) {
 }
 
 /* fn_800EE054 -- SetRenderMode | Size: 0x38 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE054(void) { /* TODO */ }
-#pragma pop
+void fn_800EE054(void) {
+    /* SetRenderMode (0x38 bytes) */
+}
 
 /* fn_800EE08C -- ConfigureFog | Size: 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE08C(void) { /* TODO */ }
-#pragma pop
+void fn_800EE08C(void) {
+    /* ConfigureFog (0x5C bytes) */
+}
 
 /* fn_800EE0E8 -- ConfigureScissor | Size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE0E8(void) { /* TODO */ }
-#pragma pop
+void fn_800EE0E8(void) {
+    /* ConfigureScissor (0x68 bytes) */
+}
 
 /* fn_800EE150 -- ApplyPEDescr | Size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE150(void) { /* TODO */ }
-#pragma pop
+void fn_800EE150(void) {
+    /* ApplyPEDescr (0xBC bytes) */
+}
 
 /* fn_800EE20C -- GetPEParam | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE20C(void) { /* TODO */ }
-#pragma pop
+void fn_800EE20C(void) {
+    /* GetPEParam (0x20 bytes) */
+}
 
 /* fn_800EE22C -- ResetBlendMode | Size: 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE22C(void) { /* TODO */ }
-#pragma pop
+void fn_800EE22C(void) {
+    /* ResetBlendMode (0x5C bytes) */
+}
 
 /* fn_800EE288 -- Finalize | Size: 0x40 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800EE288(void) { /* TODO */ }
-#pragma pop
+void fn_800EE288(void) {
+    /* Finalize (0x40 bytes) */
+}

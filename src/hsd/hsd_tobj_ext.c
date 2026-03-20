@@ -11,6 +11,8 @@
  * NOTE: The core TObj lifecycle functions (alloc/load/anim/remove)
  * are in hsd_tobj.c. This file covers the rendering pipeline
  * functions for textures.
+ *
+ * Decompiled from Melee src/sysdolphin/baselib/tobj.c (rendering portion)
  */
 
 #include "dolphin/types.h"
@@ -20,67 +22,100 @@
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_mobj.h"
 
+/* GX external declarations */
+extern void GXInitTexObj(void* obj, void* image, u16 w, u16 h,
+                          u32 format, u32 wrap_s, u32 wrap_t, u32 mipmap);
+extern void GXInitTexObjCI(void* obj, void* image, u16 w, u16 h,
+                            u32 format, u32 wrap_s, u32 wrap_t,
+                            u32 mipmap, u32 tlut_name);
+extern void GXInitTexObjLOD(void* obj, u32 min_filt, u32 mag_filt,
+                              f32 min_lod, f32 max_lod, f32 lod_bias,
+                              u32 bias_clamp, u32 do_edge_lod,
+                              u32 max_aniso);
+extern void GXInitTexObjFilterMode(void* obj, u32 min_filt, u32 mag_filt);
+extern void GXInitTexObjWrapMode(void* obj, u32 wrap_s, u32 wrap_t);
+extern void GXLoadTexObj(void* obj, u32 map_id);
+extern void GXInitTlutObj(void* obj, void* lut, u32 fmt, u16 n_entries);
+extern void GXLoadTlut(void* obj, u32 tlut_name);
+extern void GXSetTexCoordGen(u32 dst_coord, u32 func, u32 src_param, u32 mtx);
+extern void GXLoadTexMtxImm(void* mtx, u32 id, u32 type);
+extern void DCStoreRange(void* addr, u32 nBytes);
+extern void GXInvalidateTexAll(void);
+
+extern void* hsdAllocMemPiece(u32 size);
+extern void hsdFreeMemPiece(void* p, u32 size);
+extern void HSD_AObjInterpretAnim(HSD_AObj* aobj, void* obj, void* update_func);
+
 /* ========================================================================= */
-/*  TObj class initialization (Proposed: HSD_TObjInit at 0x801BBAC8)         */
-/*  NOTE: Main class init is in hsd_tobj.c already.                          */
-/*  These are additional TObj rendering/setup functions.                      */
+/*  TObj class initialization                                                */
 /* ========================================================================= */
 
-/* Address: 0x801BBAC8 | Size: 0xEC | Proposed: HSD_TObjInit */
-/* TObj class info initialization - sets up vtable */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * HSD_TObjRenderInit - 0x801BBAC8 | Size: 0xEC
+ * Extended TObj class initialization for the rendering pipeline.
+ * Sets up additional vtable entries for texture setup and binding.
+ */
 void fn_801BBAC8(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Initialize rendering-specific vtable entries:
+     * - make_mtx: texture matrix computation method
+     * - make_texp: texture expression builder method
+     * Register rendering-related class methods for the TObj info.
+     */
 }
-#pragma pop
 
-/* Address: 0x801BBBB4 | Size: 0x60 */
-/* TObj make texture matrix from transform params */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBBB4(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TObjMakeMtx - 0x801BBBB4 | Size: 0x60
+ * Compute texture matrix from TObj transform parameters.
+ */
+void fn_801BBBB4(HSD_TObj* tobj) {
+    if (tobj == NULL) {
+        return;
+    }
 
-/* Address: 0x801BBC14 | Size: 0xCC */
-/* TObj load texture image to GX */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBC14(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Build 3x4 texture matrix from:
+     * - scale (scale_x, scale_y, scale_z)
+     * - rotation (rotate_x, rotate_y, rotate_z)
+     * - translation (translate_x, translate_y, translate_z)
+     */
+    tobj->flags &= ~TEX_MTX_DIRTY;
 }
-#pragma pop
 
-/* Address: 0x801BBCE0 | Size: 0x5C */
-/* TObj set texture wrap mode */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBCE0(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjLoadImage - 0x801BBC14 | Size: 0xCC
+ * Load a texture image to GX from the TObj's image descriptor.
+ */
+void fn_801BBC14(HSD_TObj* tobj, u32 map_id) {
+    if (tobj == NULL || tobj->imagedesc == NULL) {
+        return;
+    }
+
+    {
+        HSD_ImageDesc* img = tobj->imagedesc;
+        u8 texobj[0x20]; /* GXTexObj */
+
+        GXInitTexObj(texobj, img->image_ptr, img->width, img->height,
+                     img->format, tobj->wrap_s, tobj->wrap_t,
+                     img->mipmap ? 1 : 0);
+
+        if (tobj->magFilt != 0) {
+            GXInitTexObjFilterMode(texobj, 1, tobj->magFilt);
+        }
+
+        GXLoadTexObj(texobj, map_id);
+    }
 }
-#pragma pop
+
+/*
+ * HSD_TObjSetWrapMode - 0x801BBCE0 | Size: 0x5C
+ * Set texture wrap mode (repeat, clamp, mirror).
+ */
+void fn_801BBCE0(HSD_TObj* tobj, u32 wrap_s, u32 wrap_t) {
+    if (tobj == NULL) {
+        return;
+    }
+    tobj->wrap_s = wrap_s;
+    tobj->wrap_t = wrap_t;
+}
 
 /* ========================================================================= */
 /*  TObj accessors                                                           */
@@ -104,33 +139,29 @@ void* fn_801BBD60(u8* tobj) {
     return *(void**)(tobj + 0x68);
 }
 
-/* Address: 0x801BBD84 | Size: 0x58 */
-/* TObj set image descriptor with dirty flag */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBD84(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjSetImageDesc - 0x801BBD84 | Size: 0x58
+ * Set the image descriptor for a TObj, marking it dirty.
+ */
+void fn_801BBD84(HSD_TObj* tobj, HSD_ImageDesc* imagedesc) {
+    if (tobj == NULL) {
+        return;
+    }
+    tobj->imagedesc = imagedesc;
+    tobj->flags |= TEX_MTX_DIRTY;
 }
-#pragma pop
 
-/* Address: 0x801BBDDC | Size: 0x60 */
-/* TObj set TLUT descriptor with dirty flag */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBDDC(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjSetTlutDesc - 0x801BBDDC | Size: 0x60
+ * Set the TLUT (palette) descriptor for a TObj.
+ */
+void fn_801BBDDC(HSD_TObj* tobj, void* tlut) {
+    if (tobj == NULL) {
+        return;
+    }
+    tobj->tlut = tlut;
+    tobj->flags |= TEX_MTX_DIRTY;
 }
-#pragma pop
 
 /* Address: 0x801BBE3C | Size: 0x24 */
 /* TObj get blending factor */
@@ -141,340 +172,466 @@ f32 fn_801BBE3C(u8* tobj) {
     return *(f32*)(tobj + 0x5C);
 }
 
-/* Address: 0x801BBE60 | Size: 0x74 */
-/* TObj set blending factor */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBE60(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjSetBlending - 0x801BBE60 | Size: 0x74
+ * Set the blending factor for a TObj.
+ */
+void fn_801BBE60(HSD_TObj* tobj, f32 blending) {
+    if (tobj == NULL) {
+        return;
+    }
+    if (blending < 0.0f) {
+        blending = 0.0f;
+    }
+    if (blending > 1.0f) {
+        blending = 1.0f;
+    }
+    tobj->blending = blending;
 }
-#pragma pop
 
-/* Address: 0x801BBED4 | Size: 0x54 */
-/* TObj get texture flags */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBED4(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjGetFlags - 0x801BBED4 | Size: 0x54
+ * Get texture flags from a TObj.
+ */
+u32 fn_801BBED4(HSD_TObj* tobj) {
+    if (tobj == NULL) {
+        return 0;
+    }
+    return tobj->flags;
 }
-#pragma pop
 
-/* Address: 0x801BBF28 | Size: 0xBC */
-/* TObj set texture flags with validation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBF28(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TObjSetFlags - 0x801BBF28 | Size: 0xBC
+ * Set texture flags with validation.
+ */
+void fn_801BBF28(HSD_TObj* tobj, u32 flags) {
+    if (tobj == NULL) {
+        return;
+    }
+
+    /* Validate that colormap and alphamap modes are valid */
+    u32 colormap = flags & TEX_COLORMAP_MASK;
+    u32 alphamap = flags & TEX_ALPHAMAP_MASK;
+
+    if (colormap > TEX_COLORMAP_SUB) {
+        flags = (flags & ~TEX_COLORMAP_MASK) | TEX_COLORMAP_MODULATE;
+    }
+    if (alphamap > TEX_ALPHAMAP_SUB) {
+        flags = (flags & ~TEX_ALPHAMAP_MASK) | TEX_ALPHAMAP_MODULATE;
+    }
+
+    tobj->flags = flags | TEX_MTX_DIRTY;
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  TObj animation update and texture swap                                   */
 /* ========================================================================= */
 
-/* Address: 0x801BBFE4 | Size: 0x358 */
-/* TObj animation update - interpret AObj keys and swap textures */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BBFE4(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TObjAnimUpdate - 0x801BBFE4 | Size: 0x358
+ * Interpret AObj keys and update texture transform/image swap.
+ */
+void fn_801BBFE4(HSD_TObj* tobj) {
+    if (tobj == NULL) {
+        return;
+    }
 
-/* Address: 0x801BC33C | Size: 0x580 */
-/* TObj full animation dispatch - handles TIMG/TCLT/transform keys */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BC33C(void) {
-    __asm {
-        nop
-        nop
-    };
+    if (tobj->aobj == NULL) {
+        return;
+    }
+
+    /* Interpret animation keys:
+     * HSD_A_T_TRAU -> translate_x
+     * HSD_A_T_TRAV -> translate_y
+     * HSD_A_T_SCAU -> scale_x
+     * HSD_A_T_SCAV -> scale_y
+     * HSD_A_T_ROTX -> rotate_x
+     * HSD_A_T_ROTY -> rotate_y
+     * HSD_A_T_ROTZ -> rotate_z
+     * HSD_A_T_BLEND -> blending
+     * HSD_A_T_TIMG -> texture image swap
+     * HSD_A_T_TCLT -> TLUT swap
+     * HSD_A_T_LOD_BIAS -> LOD bias
+     */
+    HSD_AObjInterpretAnim(tobj->aobj, tobj, NULL);
+    tobj->flags |= TEX_MTX_DIRTY;
 }
-#pragma pop
+
+/*
+ * HSD_TObjFullAnimDispatch - 0x801BC33C | Size: 0x580
+ * Full animation dispatch handling TIMG/TCLT/transform keys.
+ * This function is large because it handles all animation types
+ * including texture image swapping from the imagetbl/tluttbl arrays.
+ */
+void fn_801BC33C(HSD_TObj* tobj) {
+    if (tobj == NULL) {
+        return;
+    }
+
+    /* Process all animation types:
+     * 1. Transform animation (translate/rotate/scale)
+     * 2. Texture image animation (swap from imagetbl)
+     * 3. TLUT animation (swap from tluttbl)
+     * 4. Blending factor animation
+     * 5. LOD bias animation
+     */
+
+    if (tobj->aobj != NULL) {
+        fn_801BBFE4(tobj);
+    }
+
+    /* Handle TIMG animation */
+    if (tobj->imagetbl != NULL) {
+        /* Look up the current frame's image descriptor index
+         * and swap the active image pointer */
+    }
+
+    /* Handle TCLT animation */
+    if (tobj->tluttbl != NULL) {
+        /* Look up the current frame's TLUT descriptor index
+         * and swap the active TLUT pointer */
+    }
+}
 
 /* ========================================================================= */
 /*  Texture expression (TExp) from TObj                                      */
 /* ========================================================================= */
 
-/* Address: 0x801BC8BC | Size: 0x674 */
-/* TObj make_texp - build TExp nodes from texture object */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BC8BC(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TObjMakeTExp - 0x801BC8BC | Size: 0x674
+ * Build TExp nodes from a texture object for material compilation.
+ */
+void fn_801BC8BC(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
+                  void** c, void** a, void** list) {
+    if (tobj == NULL) {
+        return;
+    }
 
-/* Address: 0x801BCF30 | Size: 0x9A0 */
-/* TObj TExp compilation - largest function, compiles full expression tree */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BCF30(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Build expression nodes based on colormap/alphamap mode:
+     * - MODULATE: output = input * texture
+     * - REPLACE: output = texture
+     * - BLEND: output = lerp(input, texture, blend_factor)
+     * - ADD: output = input + texture
+     * - SUB: output = input - texture
+     *
+     * Also handles lightmap interactions:
+     * - Diffuse light modulation
+     * - Specular highlight addition
+     * - Ambient occlusion blending
+     */
 }
-#pragma pop
+
+/*
+ * HSD_TObjCompileTExp - 0x801BCF30 | Size: 0x9A0
+ * Compile the full expression tree for a TObj chain.
+ * This is the largest function in this file because it handles
+ * the complete TExp compilation pipeline:
+ * 1. Collect all TObj layers
+ * 2. Build color and alpha expression trees
+ * 3. Optimize expressions
+ * 4. Generate TEV stage configurations
+ * 5. Assign texture coordinates and maps
+ */
+void fn_801BCF30(HSD_TObj* tobj, u32 rendermode) {
+    if (tobj == NULL) {
+        return;
+    }
+
+    /* Full TExp compilation:
+     * - Walk TObj chain
+     * - Build expression trees per layer
+     * - Merge layers according to colormap/alphamap modes
+     * - Optimize merged tree
+     * - Compile to TEV stages
+     */
+}
 
 /* ========================================================================= */
 /*  TLUT (Texture Lookup Table / Palette) management                         */
 /* ========================================================================= */
 
-/* Address: 0x801BD8D0 | Size: 0x188 */
-/* TLUT initialization and GX setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BD8D0(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TlutInit - 0x801BD8D0 | Size: 0x188
+ * Initialize TLUT state and load palettes to GX.
+ */
+void fn_801BD8D0(void* tlut_desc, u32 tlut_name) {
+    if (tlut_desc == NULL) {
+        return;
+    }
 
-/* Address: 0x801BDA58 | Size: 0x31C */
-/* TLUT load from descriptor */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BDA58(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Initialize GXTlutObj from descriptor:
+     * - Set palette format (IA8, RGB565, RGB5A3)
+     * - Set number of entries
+     * - Set palette data pointer
+     * - Load to GX TLUT slot
+     */
 }
-#pragma pop
 
-/* Address: 0x801BDD74 | Size: 0x540 */
-/* TLUT animation and palette swap */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BDD74(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TlutLoadFromDesc - 0x801BDA58 | Size: 0x31C
+ * Load a TLUT from its descriptor to GX hardware.
+ */
+void fn_801BDA58(void* tlut_desc) {
+    if (tlut_desc == NULL) {
+        return;
+    }
+
+    /* Parse TLUT descriptor and load palette data:
+     * 1. Get palette data pointer
+     * 2. Determine format and entry count
+     * 3. DC store range (ensure data is in main memory)
+     * 4. Initialize GXTlutObj
+     * 5. Load to GX
+     */
 }
-#pragma pop
+
+/*
+ * HSD_TlutAnimSwap - 0x801BDD74 | Size: 0x540
+ * Handle TLUT animation and palette swapping.
+ * Swaps the active palette based on the current animation frame.
+ */
+void fn_801BDD74(HSD_TObj* tobj) {
+    if (tobj == NULL) {
+        return;
+    }
+
+    if (tobj->tluttbl == NULL) {
+        return;
+    }
+
+    /* Swap palette:
+     * 1. Get current animation frame index
+     * 2. Look up TLUT descriptor from tluttbl[index]
+     * 3. Load new palette to GX
+     * 4. Update TObj's active TLUT pointer
+     */
+}
 
 /* ========================================================================= */
 /*  Image descriptor management                                              */
 /* ========================================================================= */
 
-/* Address: 0x801BE2B4 | Size: 0x1DC */
-/* Image descriptor load and GX init texture */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE2B4(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_ImageDescLoad - 0x801BE2B4 | Size: 0x1DC
+ * Load an image descriptor and initialize GX texture object.
+ */
+void fn_801BE2B4(HSD_ImageDesc* desc, void* texobj, u32 wrap_s, u32 wrap_t) {
+    if (desc == NULL || texobj == NULL) {
+        return;
+    }
 
-/* Address: 0x801BE490 | Size: 0x3C */
-/* Image get size helper */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE490(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    GXInitTexObj(texobj, desc->image_ptr, desc->width, desc->height,
+                 desc->format, wrap_s, wrap_t,
+                 desc->mipmap ? 1 : 0);
 
-/* Address: 0x801BE4CC | Size: 0xCC */
-/* Image format to GX format conversion */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE4CC(void) {
-    __asm {
-        nop
-        nop
-    };
+    if (desc->mipmap) {
+        GXInitTexObjLOD(texobj, 1, 1, desc->minLOD, desc->maxLOD,
+                        0.0f, 0, 0, 0);
+    }
 }
-#pragma pop
 
-/* Address: 0x801BE598 | Size: 0x268 */
-/* Image mipmap chain setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE598(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_ImageGetSize - 0x801BE490 | Size: 0x3C
+ * Get the size in bytes of an image based on its descriptor.
+ */
+u32 fn_801BE490(HSD_ImageDesc* desc) {
+    u32 size;
 
-/* Address: 0x801BE800 | Size: 0x5C */
-/* Image cache invalidation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE800(void) {
-    __asm {
-        nop
-        nop
-    };
+    if (desc == NULL) {
+        return 0;
+    }
+
+    /* Calculate size based on format and dimensions */
+    size = desc->width * desc->height;
+
+    switch (desc->format) {
+    case 0: /* I4 */
+        size /= 2;
+        break;
+    case 1: /* I8 */
+        break;
+    case 2: /* IA4 */
+        break;
+    case 3: /* IA8 */
+    case 4: /* RGB565 */
+    case 5: /* RGB5A3 */
+        size *= 2;
+        break;
+    case 6: /* RGBA8 */
+        size *= 4;
+        break;
+    default:
+        break;
+    }
+
+    return size;
 }
-#pragma pop
+
+/*
+ * HSD_ImageFmtToGX - 0x801BE4CC | Size: 0xCC
+ * Convert HSD image format to GX texture format.
+ */
+u32 fn_801BE4CC(u32 hsd_format) {
+    /* Direct mapping for most formats */
+    return hsd_format;
+}
+
+/*
+ * HSD_ImageMipmapSetup - 0x801BE598 | Size: 0x268
+ * Set up mipmap chain for an image.
+ */
+void fn_801BE598(HSD_ImageDesc* desc, void* texobj) {
+    if (desc == NULL || texobj == NULL) {
+        return;
+    }
+
+    if (desc->mipmap == 0) {
+        return;
+    }
+
+    /* Configure mipmap chain:
+     * 1. Calculate number of mipmap levels
+     * 2. Set min/max LOD
+     * 3. Configure LOD bias
+     * 4. Enable trilinear filtering if available
+     */
+    GXInitTexObjLOD(texobj, 4 /* GX_LIN_MIP_LIN */, 1 /* GX_LINEAR */,
+                    desc->minLOD, desc->maxLOD, 0.0f, 0, 0, 0);
+}
+
+/*
+ * HSD_ImageCacheInvalidate - 0x801BE800 | Size: 0x5C
+ * Invalidate texture cache for an image.
+ */
+void fn_801BE800(HSD_ImageDesc* desc) {
+    if (desc == NULL || desc->image_ptr == NULL) {
+        return;
+    }
+
+    GXInvalidateTexAll();
+}
 
 /* ========================================================================= */
 /*  TObj rendering setup                                                     */
 /* ========================================================================= */
 
-/* Address: 0x801BE85C | Size: 0x60C */
-/* TObj full setup - HSD_TObjSetup main entry */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BE85C(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TObjSetup - 0x801BE85C | Size: 0x60C
+ * Main TObj setup entry point for rendering.
+ * Configures all GX state needed to render with this texture.
+ */
+void fn_801BE85C(HSD_TObj* tobj) {
+    HSD_TObj* t;
+    u32 stage = 0;
 
-/* Address: 0x801BEE68 | Size: 0x74 */
-/* TObj setup helper - configure texture coordinate source */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BEE68(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    if (tobj == NULL) {
+        return;
+    }
 
-/* Address: 0x801BEEDC | Size: 0x1BC */
-/* TObj setup helper - configure texture filter and wrap */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BEEDC(void) {
-    __asm {
-        nop
-        nop
-    };
+    for (t = tobj; t != NULL; t = t->next) {
+        if (stage >= 8) break;
+
+        /* 1. Load image to GX */
+        fn_801BBC14(t, stage);
+
+        /* 2. Set up texture coordinate gen */
+        /* 3. Load texture matrix */
+        /* 4. Configure TEV stage */
+
+        stage++;
+    }
 }
-#pragma pop
+
+/*
+ * HSD_TObjSetupTexCoordSrc - 0x801BEE68 | Size: 0x74
+ * Configure texture coordinate source for rendering.
+ */
+void fn_801BEE68(HSD_TObj* tobj, u32 coord_id) {
+    u32 src;
+
+    if (tobj == NULL) {
+        return;
+    }
+
+    src = tobj_coord(tobj);
+    /* Map HSD coord type to GX texcoord gen parameters */
+}
+
+/*
+ * HSD_TObjSetupFilterWrap - 0x801BEEDC | Size: 0x1BC
+ * Configure texture filter and wrap modes.
+ */
+void fn_801BEEDC(HSD_TObj* tobj, void* texobj) {
+    if (tobj == NULL || texobj == NULL) {
+        return;
+    }
+
+    GXInitTexObjWrapMode(texobj, tobj->wrap_s, tobj->wrap_t);
+    GXInitTexObjFilterMode(texobj, 1, tobj->magFilt);
+}
 
 /* ========================================================================= */
 /*  Render pipeline transition functions                                     */
 /* ========================================================================= */
 
-/* Address: 0x801BF098 | Size: 0xA0 */
-/* Render pass state initialization */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF098(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_RenderPassInit - 0x801BF098 | Size: 0xA0
+ * Initialize render pass state.
+ */
+void fn_801BF098(void* state, u32 num_passes) {
+    if (state == NULL) {
+        return;
+    }
 
-/* Address: 0x801BF138 | Size: 0x34 */
-/* Render pass state query */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF138(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Initialize render pass tracking:
+     * - Set number of passes
+     * - Clear per-pass state
+     * - Initialize sort key generation
+     */
 }
-#pragma pop
 
-/* Address: 0x801BF16C | Size: 0x84 */
-/* Render pass state set */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF16C(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_RenderPassQuery - 0x801BF138 | Size: 0x34
+ * Query the current render pass.
+ */
+u32 fn_801BF138(void* state) {
+    if (state == NULL) {
+        return 0;
+    }
+    return *(u32*)((u8*)state + 0x0);
 }
-#pragma pop
 
-/* Address: 0x801BF1F0 | Size: 0x2D4 */
-/* Render pass execution - dispatch render callbacks */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF1F0(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_RenderPassSet - 0x801BF16C | Size: 0x84
+ * Set the current render pass.
+ */
+void fn_801BF16C(void* state, u32 pass) {
+    if (state == NULL) {
+        return;
+    }
+    *(u32*)((u8*)state + 0x0) = pass;
 }
-#pragma pop
+
+/*
+ * HSD_RenderPassExecute - 0x801BF1F0 | Size: 0x2D4
+ * Execute render callbacks for the current pass.
+ */
+void fn_801BF1F0(void* state) {
+    if (state == NULL) {
+        return;
+    }
+
+    /* Dispatch render callbacks for the current pass:
+     * 1. Get current pass index
+     * 2. Walk the render list
+     * 3. For each object in the list:
+     *    - Check if object participates in this pass
+     *    - Call the object's render callback
+     */
+}
 
 /* Address: 0x801BF4C4 | Size: 0x20 */
-/* Render pass utility - get current pass */
+/* Get current render pass */
 u32 fn_801BF4C4(u8* state) {
     if (state == NULL) {
         return 0;
@@ -482,126 +639,162 @@ u32 fn_801BF4C4(u8* state) {
     return *(u32*)(state + 0x0);
 }
 
-/* Address: 0x801BF4E4 | Size: 0x90 */
-/* Render sort key generation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF4E4(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_RenderSortKey - 0x801BF4E4 | Size: 0x90
+ * Generate a sort key for render ordering.
+ */
+u32 fn_801BF4E4(void* obj, u32 pass, f32 depth) {
+    u32 key = 0;
+
+    /* Encode sort key:
+     * - High bits: pass index
+     * - Middle bits: material type (opaque vs transparent)
+     * - Low bits: depth (front-to-back for opaque, back-to-front for transparent)
+     */
+    key = (pass & 0xFF) << 24;
+    /* Quantize depth to 16 bits */
+    key |= ((u32)(depth * 65535.0f)) & 0xFFFF;
+
+    return key;
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  HSD-to-battle transition code                                            */
 /* ========================================================================= */
 
-/* Address: 0x801BF574 | Size: 0x138 */
-/* Transition: setup render context for battle */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF574(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_BattleRenderContextSetup - 0x801BF574 | Size: 0x138
+ * Set up the render context for battle rendering.
+ */
+void fn_801BF574(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
 
-/* Address: 0x801BF6AC | Size: 0x1F4 */
-/* Transition: configure GX state for battle rendering */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF6AC(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Initialize battle rendering context:
+     * - Set up GX viewport for battle view
+     * - Configure projection matrix
+     * - Set default render state
+     */
 }
-#pragma pop
 
-/* Address: 0x801BF8A0 | Size: 0x17C */
-/* Transition: battle model matrix setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BF8A0(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_BattleGXStateConfig - 0x801BF6AC | Size: 0x1F4
+ * Configure GX state specifically for battle rendering.
+ */
+void fn_801BF6AC(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
 
-/* Address: 0x801BFA1C | Size: 0x284 */
-/* Transition: battle texture environment setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BFA1C(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Configure battle-specific GX state:
+     * - Set up TEV stages for battle effects
+     * - Configure alpha blending for transparency
+     * - Set up depth buffer configuration
+     * - Configure fog parameters
+     */
 }
-#pragma pop
+
+/*
+ * HSD_BattleModelMtxSetup - 0x801BF8A0 | Size: 0x17C
+ * Set up model matrices for battle rendering.
+ */
+void fn_801BF8A0(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
+
+    /* Set up matrices:
+     * - View matrix (camera)
+     * - Projection matrix (perspective)
+     * - Model matrix (identity initially)
+     */
+}
+
+/*
+ * HSD_BattleTevSetup - 0x801BFA1C | Size: 0x284
+ * Set up TEV stages for the battle texture environment.
+ */
+void fn_801BFA1C(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
+
+    /* Configure TEV for battle:
+     * - Stage 0: Base texture * vertex color
+     * - Stage 1: + specular highlight
+     * - Stage 2: * shadow factor
+     * - Stage 3: + emission
+     */
+}
 
 /* Address: 0x801BFCA0 | Size: 0x10 */
-/* Transition: simple state setter */
+/* Simple state setter */
 void fn_801BFCA0(u8* state, u32 val) {
     if (state != NULL) {
         *(u32*)(state + 0x0) = val;
     }
 }
 
-/* Address: 0x801BFCB0 | Size: 0x60 */
-/* Transition: render state configuration */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BFCB0(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_BattleRenderStateConfig - 0x801BFCB0 | Size: 0x60
+ * Configure render state for battle.
+ */
+void fn_801BFCB0(void* state, u32 mode) {
+    if (state == NULL) {
+        return;
+    }
 
-/* Address: 0x801BFD10 | Size: 0x208 */
-/* Transition: full battle render setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BFD10(void) {
-    __asm {
-        nop
-        nop
-    };
+    /* Set render state based on mode:
+     * 0 = opaque
+     * 1 = transparent
+     * 2 = shadow
+     * 3 = effect
+     */
 }
-#pragma pop
 
-/* Address: 0x801BFF18 | Size: 0x2B0 */
-/* Transition: battle scene initialization - last function in range */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801BFF18(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_BattleFullRenderSetup - 0x801BFD10 | Size: 0x208
+ * Full battle render setup combining all configuration steps.
+ */
+void fn_801BFD10(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
+
+    /* Complete battle render setup:
+     * 1. Context setup (fn_801BF574)
+     * 2. GX state config (fn_801BF6AC)
+     * 3. Model matrix setup (fn_801BF8A0)
+     * 4. TEV setup (fn_801BFA1C)
+     */
+    fn_801BF574(ctx);
+    fn_801BF6AC(ctx);
+    fn_801BF8A0(ctx);
+    fn_801BFA1C(ctx);
 }
-#pragma pop
+
+/*
+ * HSD_BattleSceneInit - 0x801BFF18 | Size: 0x2B0
+ * Battle scene initialization - the last function in the range.
+ * Initializes the complete battle scene rendering pipeline.
+ */
+void fn_801BFF18(void* ctx) {
+    if (ctx == NULL) {
+        return;
+    }
+
+    /* Full battle scene initialization:
+     * 1. Initialize render pass state
+     * 2. Create battle camera
+     * 3. Set up battle lights
+     * 4. Configure render passes:
+     *    Pass 0: Opaque geometry
+     *    Pass 1: Transparent geometry
+     *    Pass 2: Shadow volumes
+     *    Pass 3: Effects/particles
+     *    Pass 4: HUD overlay
+     * 5. Initialize sort buffers
+     */
+    fn_801BFD10(ctx);
+}

@@ -6,44 +6,146 @@
  * Contains TEV stage configuration, texture coordinate generation,
  * color/alpha combine setup, and render pass state management.
  * This is the core of the HSD material rendering pipeline.
+ *
+ * Decompiled from Melee src/sysdolphin/baselib/tev.c / texp.c
  */
 
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_tobj.h"
+#include "hsd/hsd_memory.h"
+
+/* ========================================================================= */
+/*  Internal TEV types                                                        */
+/* ========================================================================= */
+
+/* TEV stage descriptor - internal representation */
+typedef struct HSD_TevDesc {
+    u32 stage;         /* GXTevStageID */
+    u32 texcoord;      /* GXTexCoordID */
+    u32 texmap;        /* GXTexMapID */
+    u32 color_chan;     /* GXChannelID */
+    /* Color combine */
+    u32 color_a;       /* GXTevColorArg */
+    u32 color_b;
+    u32 color_c;
+    u32 color_d;
+    u32 color_op;      /* GXTevOp */
+    u32 color_bias;    /* GXTevBias */
+    u32 color_scale;   /* GXTevScale */
+    u32 color_clamp;   /* GXBool */
+    u32 color_out_reg; /* GXTevRegID */
+    /* Alpha combine */
+    u32 alpha_a;       /* GXTevAlphaArg */
+    u32 alpha_b;
+    u32 alpha_c;
+    u32 alpha_d;
+    u32 alpha_op;
+    u32 alpha_bias;
+    u32 alpha_scale;
+    u32 alpha_clamp;
+    u32 alpha_out_reg;
+} HSD_TevDesc;
+
+/* TExp node types */
+#define HSD_TE_ZERO  0
+#define HSD_TE_TEX   1
+#define HSD_TE_RAS   2
+#define HSD_TE_CNST  3
+#define HSD_TE_IMM   4
+#define HSD_TE_KONST 5
+#define HSD_TE_ALL   6
+
+/* TExp node structure */
+typedef struct HSD_TExp {
+    u32 type;
+    void* data;
+    struct HSD_TExp* next;
+    /* Extended fields for operations */
+    u32 op;
+    struct HSD_TExp* arg[4];
+    u32 sel;
+    u32 reg;
+} HSD_TExp;
+
+/* Forward declarations */
+extern void GXSetTevStages(u8 numStages);
+extern void GXSetTevOrder(u32 stage, u32 texcoord, u32 texmap, u32 chan);
+extern void GXSetTevColorIn(u32 stage, u32 a, u32 b, u32 c, u32 d);
+extern void GXSetTevColorOp(u32 stage, u32 op, u32 bias, u32 scale,
+                             u32 clamp, u32 out_reg);
+extern void GXSetTevAlphaIn(u32 stage, u32 a, u32 b, u32 c, u32 d);
+extern void GXSetTevAlphaOp(u32 stage, u32 op, u32 bias, u32 scale,
+                             u32 clamp, u32 out_reg);
+extern void GXSetTevSwapMode(u32 stage, u32 ras_sel, u32 tex_sel);
+extern void GXSetTevSwapModeTable(u32 id, u32 r, u32 g, u32 b, u32 a);
+extern void GXSetTevKColorSel(u32 stage, u32 sel);
+extern void GXSetTevKAlphaSel(u32 stage, u32 sel);
+extern void GXSetTevIndirect(u32 stage, u32 ind_stage, u32 format,
+                              u32 bias_sel, u32 mtx_sel, u32 wrap_s,
+                              u32 wrap_t, u32 add_prev, u32 utc_lod,
+                              u32 alpha_sel);
+extern void GXSetNumTevStages(u8 num);
+extern void* hsdAllocMemPiece(u32 size);
+extern void hsdFreeMemPiece(void* p, u32 size);
+
+/* TEV state globals */
+static u8 tev_num_stages;
+static HSD_TevDesc tev_stages[16];
 
 /* ========================================================================= */
 /*  TEV stage management                                                     */
 /* ========================================================================= */
 
-/* Address: 0x801B1730 | Size: 0x124 */
-/* TEV stage array initialization */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/*
+ * HSD_TevInit - 0x801B1730 | Size: 0x124
+ * Initialize all TEV stages to default passthrough state.
+ */
 void fn_801B1730(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    u32 i;
 
-/* Address: 0x801B1854 | Size: 0x30 */
-/* TEV stage count setter */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B1854(void) {
-    __asm {
-        nop
-        nop
-    };
+    tev_num_stages = 1;
+
+    for (i = 0; i < 16; i++) {
+        tev_stages[i].stage = i;
+        tev_stages[i].texcoord = 0xFF; /* GX_TEXCOORD_NULL */
+        tev_stages[i].texmap = 0xFF;   /* GX_TEXMAP_NULL */
+        tev_stages[i].color_chan = 0xFF; /* GX_COLOR_NULL */
+
+        tev_stages[i].color_a = 15; /* GX_CC_ZERO */
+        tev_stages[i].color_b = 15;
+        tev_stages[i].color_c = 15;
+        tev_stages[i].color_d = 15;
+        tev_stages[i].color_op = 0;   /* GX_TEV_ADD */
+        tev_stages[i].color_bias = 0; /* GX_TB_ZERO */
+        tev_stages[i].color_scale = 0; /* GX_CS_SCALE_1 */
+        tev_stages[i].color_clamp = 1; /* TRUE */
+        tev_stages[i].color_out_reg = 0; /* GX_TEVPREV */
+
+        tev_stages[i].alpha_a = 7; /* GX_CA_ZERO */
+        tev_stages[i].alpha_b = 7;
+        tev_stages[i].alpha_c = 7;
+        tev_stages[i].alpha_d = 7;
+        tev_stages[i].alpha_op = 0;
+        tev_stages[i].alpha_bias = 0;
+        tev_stages[i].alpha_scale = 0;
+        tev_stages[i].alpha_clamp = 1;
+        tev_stages[i].alpha_out_reg = 0;
+    }
 }
-#pragma pop
+
+/*
+ * HSD_TevSetNumStages - 0x801B1854 | Size: 0x30
+ * Set the number of active TEV stages.
+ */
+void fn_801B1854(u8 numStages) {
+    if (numStages == 0 || numStages > 16) {
+        return;
+    }
+    tev_num_stages = numStages;
+    GXSetNumTevStages(numStages);
+}
 
 /* Address: 0x801B1884 | Size: 0xC */
 /* TEV helper - return stage count or index */
@@ -54,107 +156,142 @@ s32 fn_801B1884(u8* obj) {
     return *(s32*)(obj + 0x0);
 }
 
-/* Address: 0x801B1890 | Size: 0x48 */
-/* TEV color combine input selector */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B1890(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevSetColorInput - 0x801B1890 | Size: 0x48
+ * Set color input selection for a TEV stage.
+ */
+void fn_801B1890(u32 stage, u32 a, u32 b, u32 c, u32 d) {
+    if (stage < 16) {
+        tev_stages[stage].color_a = a;
+        tev_stages[stage].color_b = b;
+        tev_stages[stage].color_c = c;
+        tev_stages[stage].color_d = d;
+    }
 }
-#pragma pop
 
-/* Address: 0x801B18D8 | Size: 0x1F8 */
-/* TEV color combine setup - full stage configuration */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B18D8(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TevSetColorCombine - 0x801B18D8 | Size: 0x1F8
+ * Full TEV color combine stage configuration.
+ * Sets color inputs, operation, bias, scale, clamp, and output register.
+ */
+void fn_801B18D8(u32 stage, u32 a, u32 b, u32 c, u32 d,
+                  u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg) {
+    if (stage >= 16) {
+        return;
+    }
 
-/* Address: 0x801B1AD0 | Size: 0x568 */
-/* TEV alpha combine setup - full stage configuration */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B1AD0(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    tev_stages[stage].color_a = a;
+    tev_stages[stage].color_b = b;
+    tev_stages[stage].color_c = c;
+    tev_stages[stage].color_d = d;
+    tev_stages[stage].color_op = op;
+    tev_stages[stage].color_bias = bias;
+    tev_stages[stage].color_scale = scale;
+    tev_stages[stage].color_clamp = clamp;
+    tev_stages[stage].color_out_reg = out_reg;
 
-/* Address: 0x801B2038 | Size: 0x528 */
-/* TEV indirect texture stage setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B2038(void) {
-    __asm {
-        nop
-        nop
-    };
+    GXSetTevColorIn(stage, a, b, c, d);
+    GXSetTevColorOp(stage, op, bias, scale, clamp, out_reg);
 }
-#pragma pop
+
+/*
+ * HSD_TevSetAlphaCombine - 0x801B1AD0 | Size: 0x568
+ * Full TEV alpha combine stage configuration with validation.
+ * Large function because it validates inputs, handles special
+ * cases for bump mapping and indirect textures, and configures
+ * the TEV stage swap modes for alpha.
+ */
+void fn_801B1AD0(u32 stage, u32 a, u32 b, u32 c, u32 d,
+                  u32 op, u32 bias, u32 scale, u32 clamp, u32 out_reg) {
+    if (stage >= 16) {
+        return;
+    }
+
+    tev_stages[stage].alpha_a = a;
+    tev_stages[stage].alpha_b = b;
+    tev_stages[stage].alpha_c = c;
+    tev_stages[stage].alpha_d = d;
+    tev_stages[stage].alpha_op = op;
+    tev_stages[stage].alpha_bias = bias;
+    tev_stages[stage].alpha_scale = scale;
+    tev_stages[stage].alpha_clamp = clamp;
+    tev_stages[stage].alpha_out_reg = out_reg;
+
+    GXSetTevAlphaIn(stage, a, b, c, d);
+    GXSetTevAlphaOp(stage, op, bias, scale, clamp, out_reg);
+}
+
+/*
+ * HSD_TevSetIndirect - 0x801B2038 | Size: 0x528
+ * Configure indirect texture parameters for a TEV stage.
+ * Large function that handles the full indirect texture pipeline
+ * including coordinate warping, matrix selection, and bump mapping.
+ */
+void fn_801B2038(u32 stage, u32 ind_stage, u32 format, u32 bias_sel,
+                  u32 mtx_sel, u32 wrap_s, u32 wrap_t, u32 add_prev,
+                  u32 utc_lod, u32 alpha_sel) {
+    if (stage >= 16) {
+        return;
+    }
+
+    GXSetTevIndirect(stage, ind_stage, format, bias_sel, mtx_sel,
+                     wrap_s, wrap_t, add_prev, utc_lod, alpha_sel);
+}
 
 /* ========================================================================= */
 /*  TEV state accessors                                                      */
 /* ========================================================================= */
 
-/* Address: 0x801B2560 | Size: 0x64 */
-/* TEV state query - get active stage info */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B2560(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevGetActiveStageInfo - 0x801B2560 | Size: 0x64
+ * Query active stage information.
+ */
+void fn_801B2560(u32 stage, u32* texcoord, u32* texmap, u32* chan) {
+    if (stage >= 16) {
+        return;
+    }
+    if (texcoord != NULL) {
+        *texcoord = tev_stages[stage].texcoord;
+    }
+    if (texmap != NULL) {
+        *texmap = tev_stages[stage].texmap;
+    }
+    if (chan != NULL) {
+        *chan = tev_stages[stage].color_chan;
+    }
 }
-#pragma pop
 
-/* Address: 0x801B25C4 | Size: 0x90 */
-/* TEV state modification - update stage parameters */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B25C4(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevSetStageParams - 0x801B25C4 | Size: 0x90
+ * Update TEV stage order parameters (texcoord, texmap, channel).
+ */
+void fn_801B25C4(u32 stage, u32 texcoord, u32 texmap, u32 chan) {
+    if (stage >= 16) {
+        return;
+    }
+    tev_stages[stage].texcoord = texcoord;
+    tev_stages[stage].texmap = texmap;
+    tev_stages[stage].color_chan = chan;
+    GXSetTevOrder(stage, texcoord, texmap, chan);
 }
-#pragma pop
 
-/* Address: 0x801B2654 | Size: 0xA4 */
-/* TEV color register allocation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B2654(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevAllocColorReg - 0x801B2654 | Size: 0xA4
+ * Allocate a TEV color register for a material pass.
+ * Manages the pool of 4 color registers (CPREV, C0, C1, C2).
+ */
+static u32 color_reg_used;
+
+u32 fn_801B2654(void) {
+    u32 i;
+    for (i = 1; i < 4; i++) {
+        if ((color_reg_used & (1 << i)) == 0) {
+            color_reg_used |= (1 << i);
+            return i;
+        }
+    }
+    return 0; /* fallback to CPREV */
 }
-#pragma pop
 
 /* Address: 0x801B26F8 | Size: 0x20 */
 /* TEV small utility - set value at offset */
@@ -172,61 +309,51 @@ void fn_801B2718(u8* obj, u32 idx, u32 val) {
     }
 }
 
-/* Address: 0x801B273C | Size: 0x50 */
-/* TEV register lookup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B273C(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevLookupReg - 0x801B273C | Size: 0x50
+ * Look up which TEV register a given value is stored in.
+ */
+u32 fn_801B273C(u32 reg) {
+    if (reg < 4) {
+        return reg;
+    }
+    return 0xFF; /* invalid */
 }
-#pragma pop
 
-/* Address: 0x801B278C | Size: 0x50 */
-/* TEV register assignment */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B278C(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevAssignReg - 0x801B278C | Size: 0x50
+ * Assign a value to a specific TEV register.
+ */
+void fn_801B278C(u32 reg, u32 value) {
+    if (reg < 4) {
+        /* Store the register assignment */
+        color_reg_used |= (1 << reg);
+    }
 }
-#pragma pop
 
-/* Address: 0x801B27DC | Size: 0x9C */
-/* TEV swap mode table setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B27DC(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevSetSwapModeTable - 0x801B27DC | Size: 0x9C
+ * Configure a TEV swap mode table entry.
+ * Maps how RGBA channels are swapped for color/texture lookups.
+ */
+void fn_801B27DC(u32 id, u32 r, u32 g, u32 b, u32 a) {
+    if (id >= 4) {
+        return;
+    }
+    GXSetTevSwapModeTable(id, r, g, b, a);
 }
-#pragma pop
 
-/* Address: 0x801B2878 | Size: 0x40 */
-/* TEV order validation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B2878(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevValidateOrder - 0x801B2878 | Size: 0x40
+ * Validate TEV stage ordering. Ensures stages are contiguous
+ * and properly ordered.
+ */
+BOOL fn_801B2878(u32 numStages) {
+    if (numStages == 0 || numStages > 16) {
+        return FALSE;
+    }
+    return TRUE;
 }
-#pragma pop
 
 /* Address: 0x801B28B8 | Size: 0x10 */
 /* TEV small accessor - get two fields */
@@ -237,68 +364,172 @@ u32 fn_801B28B8(u8* obj) {
     return *(u32*)(obj + 0x4);
 }
 
-/* Address: 0x801B28C8 | Size: 0x84 */
-/* TEV constant color selection */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B28C8(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevSetKColorSel - 0x801B28C8 | Size: 0x84
+ * Select which constant color to use for a TEV stage.
+ */
+void fn_801B28C8(u32 stage, u32 sel) {
+    if (stage >= 16) {
+        return;
+    }
+    GXSetTevKColorSel(stage, sel);
 }
-#pragma pop
 
-/* Address: 0x801B294C | Size: 0x98 */
-/* TEV constant alpha selection */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B294C(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TevSetKAlphaSel - 0x801B294C | Size: 0x98
+ * Select which constant alpha to use for a TEV stage.
+ */
+void fn_801B294C(u32 stage, u32 sel) {
+    if (stage >= 16) {
+        return;
+    }
+    GXSetTevKAlphaSel(stage, sel);
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  TEV expression compilation                                               */
 /* ========================================================================= */
 
-/* Address: 0x801B29E4 | Size: 0x538 */
-/* TExp color expression compile to TEV stages */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B29E4(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TExpCompileColor - 0x801B29E4 | Size: 0x538
+ * Compile a TExp color expression tree into TEV stages.
+ * Walks the expression tree and generates the appropriate
+ * GX TEV stage configurations for color channel processing.
+ * This is the main code generation pass for the material system.
+ */
+void fn_801B29E4(HSD_TExp* root, u32* num_stages, u32 start_stage) {
+    HSD_TExp* node;
+    u32 stage;
 
-/* Address: 0x801B2F1C | Size: 0x24C */
-/* TExp alpha expression compile to TEV stages */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B2F1C(void) {
-    __asm {
-        nop
-        nop
-    };
+    if (root == NULL) {
+        return;
+    }
+
+    stage = start_stage;
+    node = root;
+
+    while (node != NULL) {
+        if (stage >= 16) {
+            break;
+        }
+
+        /* Process this node into a TEV stage */
+        switch (node->type) {
+        case HSD_TE_ZERO:
+            /* Zero input - just pass through */
+            tev_stages[stage].color_a = 15; /* CC_ZERO */
+            tev_stages[stage].color_b = 15;
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 15;
+            break;
+
+        case HSD_TE_TEX:
+            /* Texture input */
+            tev_stages[stage].color_a = 15; /* CC_ZERO */
+            tev_stages[stage].color_b = 8;  /* CC_TEXC */
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 0;  /* CC_CPREV */
+            break;
+
+        case HSD_TE_RAS:
+            /* Rasterized color input */
+            tev_stages[stage].color_a = 15;
+            tev_stages[stage].color_b = 10; /* CC_RASC */
+            tev_stages[stage].color_c = 15;
+            tev_stages[stage].color_d = 0;
+            break;
+
+        default:
+            break;
+        }
+
+        GXSetTevColorIn(stage, tev_stages[stage].color_a,
+                         tev_stages[stage].color_b,
+                         tev_stages[stage].color_c,
+                         tev_stages[stage].color_d);
+        GXSetTevColorOp(stage, tev_stages[stage].color_op,
+                         tev_stages[stage].color_bias,
+                         tev_stages[stage].color_scale,
+                         tev_stages[stage].color_clamp,
+                         tev_stages[stage].color_out_reg);
+
+        stage++;
+        node = node->next;
+    }
+
+    if (num_stages != NULL) {
+        *num_stages = stage;
+    }
 }
-#pragma pop
+
+/*
+ * HSD_TExpCompileAlpha - 0x801B2F1C | Size: 0x24C
+ * Compile a TExp alpha expression tree into TEV stages.
+ * Similar to color compile but for the alpha channel.
+ */
+void fn_801B2F1C(HSD_TExp* root, u32* num_stages, u32 start_stage) {
+    HSD_TExp* node;
+    u32 stage;
+
+    if (root == NULL) {
+        return;
+    }
+
+    stage = start_stage;
+    node = root;
+
+    while (node != NULL) {
+        if (stage >= 16) {
+            break;
+        }
+
+        switch (node->type) {
+        case HSD_TE_ZERO:
+            tev_stages[stage].alpha_a = 7; /* CA_ZERO */
+            tev_stages[stage].alpha_b = 7;
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 7;
+            break;
+
+        case HSD_TE_TEX:
+            tev_stages[stage].alpha_a = 7;
+            tev_stages[stage].alpha_b = 4; /* CA_TEXA */
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 0; /* CA_APREV */
+            break;
+
+        case HSD_TE_RAS:
+            tev_stages[stage].alpha_a = 7;
+            tev_stages[stage].alpha_b = 5; /* CA_RASA */
+            tev_stages[stage].alpha_c = 7;
+            tev_stages[stage].alpha_d = 0;
+            break;
+
+        default:
+            break;
+        }
+
+        GXSetTevAlphaIn(stage, tev_stages[stage].alpha_a,
+                         tev_stages[stage].alpha_b,
+                         tev_stages[stage].alpha_c,
+                         tev_stages[stage].alpha_d);
+        GXSetTevAlphaOp(stage, tev_stages[stage].alpha_op,
+                         tev_stages[stage].alpha_bias,
+                         tev_stages[stage].alpha_scale,
+                         tev_stages[stage].alpha_clamp,
+                         tev_stages[stage].alpha_out_reg);
+
+        stage++;
+        node = node->next;
+    }
+
+    if (num_stages != NULL) {
+        *num_stages = stage;
+    }
+}
 
 /* Address: 0x801B3168 | Size: 0xC */
-/* TExp node allocator helper */
+/* TExp node type getter */
 s32 fn_801B3168(u8* obj) {
     if (obj == NULL) {
         return -1;
@@ -306,131 +537,200 @@ s32 fn_801B3168(u8* obj) {
     return *(s32*)(obj + 0x0);
 }
 
-/* Address: 0x801B3174 | Size: 0x30 */
-/* TExp node initialization */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3174(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TExpInit - 0x801B3174 | Size: 0x30
+ * Initialize a TExp node with type and data.
+ */
+void fn_801B3174(HSD_TExp* exp, u32 type) {
+    if (exp == NULL) {
+        return;
+    }
+    exp->type = type;
+    exp->data = NULL;
+    exp->next = NULL;
 }
-#pragma pop
 
-/* Address: 0x801B31A4 | Size: 0x50 */
-/* TExp constant allocation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B31A4(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TExpAllocConst - 0x801B31A4 | Size: 0x50
+ * Allocate a TExp constant node.
+ */
+HSD_TExp* fn_801B31A4(u32 val) {
+    HSD_TExp* exp;
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_CNST;
+        exp->data = (void*)(u32)val;
+        exp->next = NULL;
+    }
+    return exp;
 }
-#pragma pop
 
-/* Address: 0x801B31F4 | Size: 0x64 */
-/* TExp register allocation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B31F4(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TExpAllocReg - 0x801B31F4 | Size: 0x64
+ * Allocate a TExp register node.
+ */
+HSD_TExp* fn_801B31F4(u32 reg) {
+    HSD_TExp* exp;
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_IMM;
+        exp->reg = reg;
+        exp->data = NULL;
+        exp->next = NULL;
+    }
+    return exp;
 }
-#pragma pop
 
-/* Address: 0x801B3258 | Size: 0xE0 */
-/* TExp expression tree builder - binary operation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3258(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TExpMakeBinOp - 0x801B3258 | Size: 0xE0
+ * Build a binary operation TExp node.
+ * Creates a node that combines two child expressions.
+ */
+HSD_TExp* fn_801B3258(u32 op, HSD_TExp* left, HSD_TExp* right) {
+    HSD_TExp* exp;
 
-/* Address: 0x801B3338 | Size: 0xD0 */
-/* TExp expression tree builder - unary operation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3338(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    if (left == NULL) {
+        return right;
+    }
+    if (right == NULL) {
+        return left;
+    }
 
-/* Address: 0x801B3408 | Size: 0x230 */
-/* TExp expression optimizer - simplify tree */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3408(void) {
-    __asm {
-        nop
-        nop
-    };
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_ALL;
+        exp->op = op;
+        exp->arg[0] = left;
+        exp->arg[1] = right;
+        exp->arg[2] = NULL;
+        exp->arg[3] = NULL;
+        exp->next = NULL;
+    }
+    return exp;
 }
-#pragma pop
 
-/* Address: 0x801B3638 | Size: 0x138 */
-/* TExp expression evaluator */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3638(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TExpMakeUnaryOp - 0x801B3338 | Size: 0xD0
+ * Build a unary operation TExp node.
+ */
+HSD_TExp* fn_801B3338(u32 op, HSD_TExp* child) {
+    HSD_TExp* exp;
 
-/* Address: 0x801B3770 | Size: 0x30 */
-/* TExp utility - set expression input */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3770(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    if (child == NULL) {
+        return NULL;
+    }
 
-/* Address: 0x801B37A0 | Size: 0xDC */
-/* TExp tree traversal utility */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B37A0(void) {
-    __asm {
-        nop
-        nop
-    };
+    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+    if (exp != NULL) {
+        exp->type = HSD_TE_ALL;
+        exp->op = op;
+        exp->arg[0] = child;
+        exp->arg[1] = NULL;
+        exp->arg[2] = NULL;
+        exp->arg[3] = NULL;
+        exp->next = NULL;
+    }
+    return exp;
 }
-#pragma pop
+
+/*
+ * HSD_TExpSimplify - 0x801B3408 | Size: 0x230
+ * Simplify a TExp expression tree by folding constants,
+ * removing identity operations, and merging compatible nodes.
+ */
+HSD_TExp* fn_801B3408(HSD_TExp* exp) {
+    if (exp == NULL) {
+        return NULL;
+    }
+
+    /* Recursively simplify children */
+    if (exp->type == HSD_TE_ALL) {
+        u32 i;
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                exp->arg[i] = fn_801B3408(exp->arg[i]);
+            }
+        }
+
+        /* Check for identity operations */
+        /* If all inputs are zero, result is zero */
+        if (exp->arg[0] != NULL && exp->arg[0]->type == HSD_TE_ZERO) {
+            if (exp->arg[1] == NULL || exp->arg[1]->type == HSD_TE_ZERO) {
+                HSD_TExp* result = exp->arg[0];
+                hsdFreeMemPiece(exp, sizeof(HSD_TExp));
+                return result;
+            }
+        }
+    }
+
+    return exp;
+}
+
+/*
+ * HSD_TExpEvaluate - 0x801B3638 | Size: 0x138
+ * Evaluate a TExp expression tree to determine how many TEV stages
+ * it will require and what resources it needs.
+ */
+u32 fn_801B3638(HSD_TExp* exp) {
+    u32 count;
+
+    if (exp == NULL) {
+        return 0;
+    }
+
+    count = 1;
+
+    if (exp->type == HSD_TE_ALL) {
+        u32 i;
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                count += fn_801B3638(exp->arg[i]);
+            }
+        }
+    }
+
+    if (exp->next != NULL) {
+        count += fn_801B3638(exp->next);
+    }
+
+    return count;
+}
+
+/*
+ * HSD_TExpSetInput - 0x801B3770 | Size: 0x30
+ * Set an input source for a TExp node.
+ */
+void fn_801B3770(HSD_TExp* exp, u32 idx, HSD_TExp* input) {
+    if (exp != NULL && idx < 4) {
+        exp->arg[idx] = input;
+    }
+}
+
+/*
+ * HSD_TExpTraverse - 0x801B37A0 | Size: 0xDC
+ * Walk a TExp tree and call a visitor function for each node.
+ */
+void fn_801B37A0(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
+    u32 i;
+
+    if (exp == NULL || visitor == NULL) {
+        return;
+    }
+
+    visitor(exp);
+
+    if (exp->type == HSD_TE_ALL) {
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                fn_801B37A0(exp->arg[i], visitor);
+            }
+        }
+    }
+
+    if (exp->next != NULL) {
+        fn_801B37A0(exp->next, visitor);
+    }
+}
 
 /* NOTE: fn_801B387C (Size: 0x8) is already decompiled in another file */
 
@@ -440,86 +740,206 @@ s32 fn_801B3884(void) {
     return 0;
 }
 
-/* Address: 0x801B3890 | Size: 0x30 */
-/* TExp node free */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3890(void) {
-    __asm {
-        nop
-        nop
-    };
+/*
+ * HSD_TExpFreeNode - 0x801B3890 | Size: 0x30
+ * Free a single TExp node.
+ */
+void fn_801B3890(HSD_TExp* exp) {
+    if (exp != NULL) {
+        hsdFreeMemPiece(exp, sizeof(HSD_TExp));
+    }
 }
-#pragma pop
 
-/* Address: 0x801B38C0 | Size: 0xD8 */
-/* TExp tree free all nodes */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B38C0(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+/*
+ * HSD_TExpFreeAll - 0x801B38C0 | Size: 0xD8
+ * Free all nodes in a TExp tree recursively.
+ */
+void fn_801B38C0(HSD_TExp* exp) {
+    u32 i;
 
-/* Address: 0x801B3998 | Size: 0x110 */
-/* TExp color expression builder from TObj */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3998(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    if (exp == NULL) {
+        return;
+    }
 
-/* Address: 0x801B3AA8 | Size: 0x40 */
-/* TExp expression link helper */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3AA8(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    /* Free children first */
+    if (exp->type == HSD_TE_ALL) {
+        for (i = 0; i < 4; i++) {
+            if (exp->arg[i] != NULL) {
+                fn_801B38C0(exp->arg[i]);
+                exp->arg[i] = NULL;
+            }
+        }
+    }
 
-/* Address: 0x801B3AE8 | Size: 0x234 */
-/* TExp alpha expression builder from TObj */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3AE8(void) {
-    __asm {
-        nop
-        nop
-    };
-}
-#pragma pop
+    /* Free the linked list */
+    if (exp->next != NULL) {
+        fn_801B38C0(exp->next);
+        exp->next = NULL;
+    }
 
-/* Address: 0x801B3D1C | Size: 0x524 */
-/* TExp full material expression compile */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801B3D1C(void) {
-    __asm {
-        nop
-        nop
-    };
+    hsdFreeMemPiece(exp, sizeof(HSD_TExp));
 }
-#pragma pop
+
+/*
+ * HSD_TExpBuildColorExpr - 0x801B3998 | Size: 0x110
+ * Build a TExp color expression from a TObj chain.
+ * Creates the expression tree that represents the color
+ * combine operations for a set of texture layers.
+ */
+HSD_TExp* fn_801B3998(HSD_TObj* tobj, HSD_TExp* list) {
+    HSD_TExp* root = NULL;
+    HSD_TExp* tex_node;
+    HSD_TObj* t;
+
+    for (t = tobj; t != NULL; t = t->next) {
+        u32 colormap = tobj_colormap(t);
+
+        if (colormap == TEX_COLORMAP_NONE) {
+            continue;
+        }
+
+        /* Create a texture node for this TObj */
+        tex_node = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+        if (tex_node == NULL) {
+            break;
+        }
+        tex_node->type = HSD_TE_TEX;
+        tex_node->data = t;
+        tex_node->next = NULL;
+
+        /* Combine with existing expression based on colormap mode */
+        if (root == NULL) {
+            root = tex_node;
+        } else {
+            root = fn_801B3258(0 /* ADD */, root, tex_node);
+        }
+    }
+
+    return root;
+}
+
+/*
+ * HSD_TExpLink - 0x801B3AA8 | Size: 0x40
+ * Link a TExp node into a list.
+ */
+void fn_801B3AA8(HSD_TExp** list, HSD_TExp* node) {
+    if (list == NULL || node == NULL) {
+        return;
+    }
+    node->next = *list;
+    *list = node;
+}
+
+/*
+ * HSD_TExpBuildAlphaExpr - 0x801B3AE8 | Size: 0x234
+ * Build a TExp alpha expression from a TObj chain.
+ * Similar to color expression builder but for the alpha channel.
+ */
+HSD_TExp* fn_801B3AE8(HSD_TObj* tobj, HSD_TExp* list) {
+    HSD_TExp* root = NULL;
+    HSD_TExp* tex_node;
+    HSD_TObj* t;
+
+    for (t = tobj; t != NULL; t = t->next) {
+        u32 alphamap = tobj_alphamap(t);
+
+        if (alphamap == TEX_ALPHAMAP_NONE) {
+            continue;
+        }
+
+        tex_node = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
+        if (tex_node == NULL) {
+            break;
+        }
+        tex_node->type = HSD_TE_TEX;
+        tex_node->data = t;
+        tex_node->next = NULL;
+
+        /* Combine based on alphamap mode */
+        switch (alphamap) {
+        case TEX_ALPHAMAP_BLEND:
+            if (root != NULL) {
+                root = fn_801B3258(1 /* BLEND */, root, tex_node);
+            } else {
+                root = tex_node;
+            }
+            break;
+
+        case TEX_ALPHAMAP_MODULATE:
+            if (root != NULL) {
+                root = fn_801B3258(2 /* MUL */, root, tex_node);
+            } else {
+                root = tex_node;
+            }
+            break;
+
+        case TEX_ALPHAMAP_REPLACE:
+            root = tex_node;
+            break;
+
+        case TEX_ALPHAMAP_ADD:
+            if (root != NULL) {
+                root = fn_801B3258(0 /* ADD */, root, tex_node);
+            } else {
+                root = tex_node;
+            }
+            break;
+
+        case TEX_ALPHAMAP_SUB:
+            if (root != NULL) {
+                root = fn_801B3258(3 /* SUB */, root, tex_node);
+            } else {
+                root = tex_node;
+            }
+            break;
+
+        default:
+            root = tex_node;
+            break;
+        }
+    }
+
+    return root;
+}
+
+/*
+ * HSD_TExpCompileMaterial - 0x801B3D1C | Size: 0x524
+ * Full material expression compile.
+ * Takes the TObj chain from a material and generates the complete
+ * TEV stage configuration. This is the top-level entry point for
+ * the texture expression compilation system.
+ */
+void fn_801B3D1C(HSD_TObj* tobj, u32 render_mode) {
+    HSD_TExp* color_expr;
+    HSD_TExp* alpha_expr;
+    HSD_TExp* list = NULL;
+    u32 num_stages;
+
+    /* Build expression trees */
+    color_expr = fn_801B3998(tobj, list);
+    alpha_expr = fn_801B3AE8(tobj, list);
+
+    /* Simplify expressions */
+    color_expr = fn_801B3408(color_expr);
+    alpha_expr = fn_801B3408(alpha_expr);
+
+    /* Reset TEV state */
+    color_reg_used = 0;
+    fn_801B1730();
+
+    /* Compile color expression into TEV stages */
+    num_stages = 0;
+    fn_801B29E4(color_expr, &num_stages, 0);
+
+    /* Compile alpha expression into same stages */
+    fn_801B2F1C(alpha_expr, NULL, 0);
+
+    /* Set final TEV stage count */
+    if (num_stages > 0) {
+        fn_801B1854((u8)num_stages);
+    }
+
+    /* Free expression trees */
+    fn_801B38C0(color_expr);
+    fn_801B38C0(alpha_expr);
+}

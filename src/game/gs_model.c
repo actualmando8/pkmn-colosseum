@@ -73,6 +73,37 @@ extern void  fn_800A37CC(void* mtx, void* vec, void* out); /* MTXMultVec3 */
 /* Model resource table (BSS) */
 extern u8 lbl_80402518[];  /* model resource table -- 0x2400 bytes */
 
+/* Additional external references */
+extern u32  lbl_80478B20;            /* resource entry count (SDA) */
+extern u8   lbl_80315690[];          /* resource info table (data) */
+extern u32  lbl_8047ACF4;            /* callback function pointer (SDA) */
+extern u32  lbl_8047ACF8;            /* callback result store (SDA) */
+extern u16  fn_800E0C54(void);       /* GSrandom */
+extern u32  fn_800BE31C(void);       /* time/tick get */
+extern void fn_800D2738(void);       /* GSgfx sync A */
+extern void fn_800E4BF4(void);       /* GSgfx sync B */
+extern u32  OSGetTick(void);         /* dolphin OS get tick */
+extern void fn_800D9ED8(u32 arg);    /* GSgfx mode set */
+extern void fn_800D88DC(u32 arg);    /* GSgfx config A */
+extern void fn_800D888C(u32 arg);    /* GSgfx config B */
+extern void fn_800D9B58(void);       /* GSgfx render param */
+extern void fn_800F0308(void);       /* GSthread context switch */
+extern void fn_800EF5FC(void);       /* GSmem defrag/gc */
+extern void fn_8005DA18(void);       /* HSD_PadFlushQueue */
+extern void fn_8005D934(void);       /* HSD_PadRead */
+extern void fn_8005D858(void);       /* HSD_PadReset */
+extern void fn_8005D7F8(void);       /* HSD_PadInit */
+extern void fn_8005D798(void);       /* HSD_PadGetRawTrigger */
+extern void fn_8005D830(void);       /* HSD_PadGetStatus */
+extern void fn_80166A28(void);       /* sound system update */
+extern void fn_800B8FD8(void);       /* VI configure */
+extern void fn_800BD91C(void);       /* VI setup */
+
+/* Forward declarations for functions defined later in this TU */
+void fn_80109664(void);
+void fn_80109718(void);
+void fn_80109764(void);
+
 /* ===================================================================
  * Constants
  * =================================================================== */
@@ -235,16 +266,16 @@ void GSmodel_ProcessSkinning(void* model) {
 
 /* ===== Small accessor / utility functions ===== */
 
-/* fn_80101A28 */
+/* fn_80101A28 -- calls fn_800D2738 then returns 1 */
 u32 GSmodel_GetResourceCount(void) {
-    /* TODO: match -- 36 bytes at 0x80101A28 */
-    return 0;
+    fn_800D2738();
+    return 1;
 }
 
-/* fn_80101A4C */
-void* GSmodel_GetResourceByIndex(u32 index) {
-    /* TODO: match -- 36 bytes at 0x80101A4C */
-    return (void*)0;
+/* fn_80101A4C -- calls fn_800E4BF4 then returns 1 */
+u32 GSmodel_GetResourceByIndex(u32 index) {
+    fn_800E4BF4();
+    return 1;
 }
 
 /* fn_80102004 */
@@ -301,10 +332,10 @@ u32 fn_801046B8(void);
 u8 fn_801096E8(u8 val);
 u8 fn_801096F8(u8 val);
 void fn_801019F8(void);
-void fn_80101A70(void);
-void fn_80101A9C(void);
-void fn_80101AC4(u32 arg1, u32 arg2, u32 arg3, u32 arg4);
-void fn_80101B34(u32 arg1, u32 arg2, u32 arg3, u32 arg4);
+u32 fn_80101A70(u32 idx);
+u32 fn_80101A9C(u32 idx);
+u32 fn_80101AC4(u32 idx);
+void fn_80101B34(u32 arg1);
 void fn_80101B90(void);
 void fn_80101D8C(void);
 void fn_801026A4(void);
@@ -317,44 +348,56 @@ void* fn_80104704(s32 key);
 void* fn_80105624(void);
 
 
-/* 0x801019F8 | 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x801019F8 | 0x30 -- memset(lbl_80402518, 0, 0x2400) */
 void fn_801019F8(void) {
-    /* TODO: match -- 48 bytes at 0x801019F8 */
-}
-#pragma pop
-
-/* 0x80101A70 | 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80101A70(void) {
-    /* TODO: match -- 44 bytes at 0x80101A70 */
-}
-#pragma pop
-
-/* 0x80101A9C | 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80101A9C(void) {
-    /* TODO: match -- 40 bytes at 0x80101A9C */
-}
-#pragma pop
-
-/* 0x70 | fn_80101AC4 | multi_call_guarded */
-void fn_80101AC4(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_80101A70();
-    { fn_80101A9C(); return; }
-    fn_800E0C54();
+    memset(lbl_80402518, 0, GSMODEL_TABLE_SIZE);
 }
 
-/* 0x54 | fn_80101B34 | guarded_call */
-void fn_80101B34(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    if (1 /* guard r0 != 0x3 */) { return; }
-    fn_800BE31C();
+/* 0x80101A70 | 0x2C -- resource handle getter: table[idx*8 + 4] */
+u32 fn_80101A70(u32 idx) {
+    if (idx >= lbl_80478B20) {
+        return 0;
+    }
+    return *(u32*)(lbl_80315690 + idx * 8 + 4);
+}
+
+/* 0x80101A9C | 0x28 -- resource active getter: table[idx*8 + 0] */
+u32 fn_80101A9C(u32 idx) {
+    if (idx >= lbl_80478B20) {
+        return 0;
+    }
+    return *(u32*)(lbl_80315690 + idx * 8);
+}
+
+/* 0x70 | fn_80101AC4 -- get random resource index in range [active..handle] */
+u32 fn_80101AC4(u32 idx) {
+    u32 handle = fn_80101A70(idx);
+    u32 active = fn_80101A9C(idx);
+    u32 rnd;
+    u32 range;
+
+    if (handle == active) {
+        return active;
+    }
+
+    rnd = fn_800E0C54();
+    range = handle - active + 1;
+    return active + (rnd % range);
+}
+
+/* 0x54 | fn_80101B34 -- conditional callback with tick store */
+void fn_80101B34(u32 arg1) {
+    typedef void (*CallbackFn)(u32);
+    CallbackFn cb;
+
+    if ((arg1 & 0xFFFF) == 3) {
+        lbl_8047ACF8 = fn_800BE31C();
+    }
+
+    cb = (CallbackFn)lbl_8047ACF4;
+    if (cb != NULL) {
+        cb(arg1);
+    }
 }
 
 /* 0x80101B90 | 0x1CC */
@@ -391,23 +434,18 @@ void fn_80101FB8(u32 arg1) {
     fn_800BD91C();
 }
 
-/* 0x80102014 | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x80102014 | 0x24 -- calls fn_80109718(0) */
 void fn_80102014(void) {
-    /* TODO: match -- 36 bytes at 0x80102014 */
+    fn_80109718();
 }
-#pragma pop
 
-/* 0x80102038 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80102038(void) {
-    /* TODO: match -- 52 bytes at 0x80102038 */
+/* 0x80102038 | 0x34 -- init sequence: fn_801096AC, fn_80109664, fn_80109764 */
+extern f32 lbl_8047CDC0;
+void fn_80102038(f32 arg) {
+    fn_801096AC();
+    fn_80109664();
+    fn_80109764();
 }
-#pragma pop
 
 /* 0x54 | fn_8010206C | call_sequence */
 void fn_8010206C(void) {
@@ -603,14 +641,12 @@ u8 fn_80103CB0(void) {
     return *(u8*)((u8*)lbl_80404ACC + 0x92);
 }
 
-/* 0x80103CC0 | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80103CC0(void) {
-    /* TODO: match -- 24 bytes at 0x80103CC0 */
+/* 0x80103CC0 | 0x18 -- swap byte at lbl_80404ACC+0x92 */
+u8 fn_80103CC0(u8 val) {
+    u8 old = *(u8*)((u8*)&lbl_80404ACC + 0x92);
+    *(u8*)((u8*)&lbl_80404ACC + 0x92) = val;
+    return old;
 }
-#pragma pop
 
 /* 0x80103CD8 | 0x190 */
 #pragma push
@@ -666,23 +702,17 @@ void* fn_801040A0(void* ptr) {
     return (u8*)ptr + 0x9C;
 }
 
-/* 0x801040B8 | 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801040B8(void) {
-    /* TODO: match -- 24 bytes at 0x801040B8 */
+/* 0x801040B8 | 0x18 -- set indexed field: ptr[idx*4 + 0x60] = val */
+void fn_801040B8(void* ptr, u32 idx, u32 val) {
+    if (ptr == NULL) { return; }
+    *(u32*)((u8*)ptr + idx * 4 + 0x60) = val;
 }
-#pragma pop
 
-/* 0x801040D0 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801040D0(void) {
-    /* TODO: match -- 32 bytes at 0x801040D0 */
+/* 0x801040D0 | 0x20 -- get indexed field: ptr[idx*4 + 0x60] */
+u32 fn_801040D0(void* ptr, u32 idx) {
+    if (ptr == NULL) { return 0; }
+    return *(u32*)((u8*)ptr + idx * 4 + 0x60);
 }
-#pragma pop
 
 /* 0x70 | fn_801040F0 | two_call_arg_check */
 void fn_801040F0(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7, u32 arg8) {
@@ -749,14 +779,17 @@ u32 fn_801046B8(void) {
     return *(u32*)((u8*)lbl_80404ACC + 0x4);
 }
 
-/* 0x801046C8 | 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801046C8(void) {
-    /* TODO: match -- 60 bytes at 0x801046C8 */
+/* 0x801046C8 | 0x3C -- linked list search by s16 key at offset 6 */
+void* fn_801046C8(void* obj, u16 key) {
+    void* node;
+    if (obj == NULL) { return NULL; }
+    node = *(void**)((u8*)obj + 0x1C);
+    while (node != NULL) {
+        if (*(s16*)((u8*)node + 0x6) == (s16)key) { return node; }
+        node = *(void**)((u8*)node + 0x0);
+    }
+    return NULL;
 }
-#pragma pop
 
 /* 0x48 | fn_80104704 | leaf_list_search */
 void* fn_80104704(s32 key) {
@@ -1053,7 +1086,7 @@ void* fn_801070F4(void) {
 /* 0x60 | fn_80107170 | generic */
 u32 fn_80107170(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     fn_80104704(0);
-    fn_801046C8();
+    fn_801046C8(NULL, 0);
     return 0;
 }
 
@@ -1068,7 +1101,7 @@ void fn_801071D0(void) {
 
 /* 0x60 | fn_80107E78 | generic */
 u32 fn_80107E78(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6) {
-    fn_801046C8();
+    fn_801046C8(NULL, 0);
     fn_8005D830();
     return 0;
 }
@@ -1226,14 +1259,11 @@ u32 fn_80109810(void) {
     return 0;
 }
 
-/* 0x80109884 | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80109884(void) {
-    /* TODO: match -- 16 bytes at 0x80109884 */
+/* 0x80109884 | 0x10 -- set lbl_8047AD20 = 1, return 0 */
+u32 fn_80109884(void) {
+    lbl_8047AD20 = 1;
+    return 0;
 }
-#pragma pop
 
 /* 0x80109894 | 0xA0 */
 #pragma push

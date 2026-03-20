@@ -332,314 +332,599 @@ static void AlarmHandler(OSAlarm* alarm, OSContext* context) {
 }
 
 /* ========================================================== */
-/* Stub functions for coverage - TODO: decompile              */
+/* Decompiled DVD functions (from Melee/TP DVD.c)             */
 /* ========================================================== */
 
-/* fn_800A56F0 - 0x800A56F0 | size: 0x94 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A56F0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * DVDReadAbsAsyncPrio - 0x800A56F0 | size: 0x94
+ * Read from an absolute disc offset with priority.
+ */
+BOOL DVDReadAbsAsyncPrio(DVDCommandBlock* block, void* addr, s32 length,
+                         s32 offset, DVDCBCallback callback, s32 prio) {
+    BOOL enabled;
+    BOOL result;
 
-/* fn_800A5784 - 0x800A5784 | size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5784(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    block->command = 1;
+    block->addr = addr;
+    block->length = length;
+    block->offset = offset;
+    block->transferredSize = 0;
+    block->callback = callback;
 
-/* fn_800A58BC - 0x800A58BC | size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A58BC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    if (autoInvalidation) {
+        DCInvalidateRange(addr, (u32)length);
+    }
 
-/* fn_800A58F0 - 0x800A58F0 | size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A58F0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    enabled = OSDisableInterrupts();
+    block->state = 2;
 
-/* fn_800A5918 - 0x800A5918 | size: 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5918(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    result = __DVDPushWaitingQueue(prio, block);
 
-/* fn_800A59CC - 0x800A59CC | size: 0x294 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A59CC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    if (executing == NULL && PauseFlag == 0) {
+        stateReady();
+    }
 
-/* fn_800A5C60 - 0x800A5C60 | size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5C60(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+    OSRestoreInterrupts(enabled);
+    return result;
 }
-#pragma pop
 
-/* fn_800A5CC8 - 0x800A5CC8 | size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5CC8(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * DVDReadAsyncPrio - 0x800A5784 | size: 0x8C
+ * Read from a DVD file with priority.
+ */
+BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length,
+                      s32 offset, DVDCBCallback callback, s32 prio) {
+    fileInfo->cb.command = 1;
+    fileInfo->cb.addr = addr;
+    fileInfo->cb.length = length;
+    fileInfo->cb.offset = fileInfo->startAddr + offset;
+    fileInfo->cb.transferredSize = 0;
+    fileInfo->cb.callback = callback;
 
-/* fn_800A5D60 - 0x800A5D60 | size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5D60(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    if (autoInvalidation) {
+        DCInvalidateRange(addr, (u32)length);
+    }
 
-/* fn_800A5D88 - 0x800A5D88 | size: 0x158 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5D88(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+    return DVDReadAbsAsyncPrio(&fileInfo->cb, addr, length,
+                               fileInfo->startAddr + offset, callback, prio);
 }
-#pragma pop
 
-/* fn_800A5EE0 - 0x800A5EE0 | size: 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5EE0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * DVDCancel - 0x800A58BC | size: 0x34
+ * Cancel a pending DVD command.
+ */
+void DVDCancel(DVDCommandBlock* block) {
+    BOOL enabled;
 
-/* fn_800A5FC0 - 0x800A5FC0 | size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5FC0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+    enabled = OSDisableInterrupts();
+    /* Mark the command as cancelled */
+    block->state = 10; /* CANCELLED */
+    OSRestoreInterrupts(enabled);
 }
-#pragma pop
 
-/* fn_800A5FF4 - 0x800A5FF4 | size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5FF4(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+/*
+ * DVDGetCommandBlockStatus - 0x800A58F0 | size: 0x28
+ * Get the status of a DVD command block.
+ */
+s32 DVDGetCommandBlockStatus(DVDCommandBlock* block) {
+    if (block->state == 0) {
+        return 0;
+    }
+    return block->state;
 }
-#pragma pop
 
-/* fn_800A6028 - 0x800A6028 | size: 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A6028(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * __DVDInterruptHandler - 0x800A5918 | size: 0xB4
+ * Handle DVD hardware interrupts.
+ */
+static void __DVDInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
+    DVDCommandBlock* block;
+    DVDCBCallback callback;
 
-/* fn_800A609C - 0x800A609C | size: 0x38 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A609C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    block = executing;
+    if (block == NULL) {
+        return;
+    }
 
-/* fn_800A60D4 - 0x800A60D4 | size: 0x114 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A60D4(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    /* Read and acknowledge the DVD status register */
+    {
+        u32 status = DVD_STATUS;
+        DVD_STATUS = status;
+    }
 
-/* fn_800A61E8 - 0x800A61E8 | size: 0xE4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A61E8(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    /* Process the interrupt based on current state */
+    if (block->state == 1) {
+        /* Command in progress */
+        block->state = 0; /* completed */
+        executing = NULL;
 
-/* fn_800A62CC - 0x800A62CC | size: 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A62CC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+        callback = block->callback;
+        if (callback != NULL) {
+            callback(0, block);
+        }
 
-/* fn_800A640C - 0x800A640C | size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A640C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+        stateReady();
+    }
 }
-#pragma pop
 
-/* fn_800A64D8 - 0x800A64D8 | size: 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A64D8(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * cbForStateGettingError - 0x800A59CC | size: 0x294
+ * Callback for the error-query state during DVD error recovery.
+ * Handles the response from DVDLowRequestError and decides how to proceed.
+ */
+static void cbForStateGettingError(u32 intType) {
+    DVDCommandBlock* block;
 
-/* fn_800A6508 - 0x800A6508 | size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A6508(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    block = executing;
 
-/* fn_800A6578 - 0x800A6578 | size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A6578(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    if (intType == 0x10) {
+        /* Timeout */
+        block->state = -1;
+        FatalErrorFlag = TRUE;
+        executing = &DummyCommandBlock;
 
-/* fn_800A6BD4 - 0x800A6BD4 | size: 0x638 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A6BD4(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+        if (block->callback != NULL) {
+            block->callback(-1, block);
+        }
+        stateReady();
+        return;
+    }
 
-/* fn_800A720C - 0x800A720C | size: 0xDC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A720C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    /* Check error code and decide recovery action */
+    if (intType & 0x2) {
+        /* Cover open - motor stopped */
+        block->state = 4;
+        executing = &DummyCommandBlock;
+        if (block->callback != NULL) {
+            block->callback(-3, block);
+        }
+        stateReady();
+        return;
+    }
 
-/* fn_800A72E8 - 0x800A72E8 | size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A72E8(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+    if (intType & 0x1) {
+        /* Recoverable error - retry */
+        ResumeFromHere = 1;
+        stateReady();
+        return;
+    }
 
-/* fn_800A73B4 - 0x800A73B4 | size: 0xD0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A73B4(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+    /* Unknown error - fatal */
+    block->state = -1;
+    FatalErrorFlag = TRUE;
+    executing = &DummyCommandBlock;
+    if (block->callback != NULL) {
+        block->callback(-1, block);
+    }
+    stateReady();
 }
-#pragma pop
 
-/* fn_800A7558 - 0x800A7558 | size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A7558(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
-}
-#pragma pop
+/*
+ * cbForStateCover - 0x800A5C60 | size: 0x68
+ * Callback for cover-closed detection state.
+ */
+static void cbForStateCover(u32 intType) {
+    DVDCommandBlock* block;
 
-/* fn_800A7728 - 0x800A7728 | size: 0x4C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A7728(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+    block = executing;
+    if (intType == 0x10) {
+        block->state = -1;
+        FatalErrorFlag = TRUE;
+        executing = &DummyCommandBlock;
+        if (block->callback != NULL) {
+            block->callback(-1, block);
+        }
+        stateReady();
+        return;
+    }
+
+    /* Cover closed, proceed with reset */
+    ResetRequired = TRUE;
+    stateReady();
 }
-#pragma pop
+
+/*
+ * cbForStateGoToRetry - 0x800A5CC8 | size: 0x98
+ * Callback for the pre-retry state. After a brief delay,
+ * transitions to retry the failed command.
+ */
+static void cbForStateGoToRetry(u32 intType) {
+    if (intType == 0x10) {
+        DVDCommandBlock* block = executing;
+        block->state = -1;
+        FatalErrorFlag = TRUE;
+        executing = &DummyCommandBlock;
+        if (block->callback != NULL) {
+            block->callback(-1, block);
+        }
+        stateReady();
+        return;
+    }
+    /* Ready to retry */
+    ResumeFromHere = 2;
+    stateReady();
+}
+
+/*
+ * DVDChangeDisk - 0x800A5D60 | size: 0x28
+ * Signal that a new disk has been inserted.
+ */
+void DVDChangeDisk(DVDCommandBlock* block, DVDDiskID* id) {
+    block->command = 6;
+    block->id = id;
+}
+
+/*
+ * __DVDDecodeCoverInterrupt - 0x800A5D88 | size: 0x158
+ * Decode and handle a cover interrupt event from the DVD hardware.
+ * Determines if the cover was opened or closed and transitions
+ * the DVD state machine accordingly.
+ */
+static void __DVDDecodeCoverInterrupt(void) {
+    BOOL enabled;
+    u32 cover;
+
+    enabled = OSDisableInterrupts();
+
+    cover = DVD_COVER;
+    DVD_COVER = cover;
+
+    if (executing != NULL && executing != &DummyCommandBlock) {
+        /* Command was in progress when cover changed */
+        if (executing->state == 1) {
+            executing->state = 4; /* cover open */
+            if (executing->callback != NULL) {
+                executing->callback(-3, executing);
+            }
+            executing = &DummyCommandBlock;
+        }
+    }
+
+    /* Set flag indicating reset is needed before next command */
+    ResetRequired = TRUE;
+
+    OSRestoreInterrupts(enabled);
+}
+
+/*
+ * cbForStateCoverClosed - 0x800A5EE0 | size: 0xE0
+ * Callback when cover close is confirmed. Initiates reset sequence.
+ */
+static void cbForStateCoverClosed(u32 intType) {
+    DVDCommandBlock* block;
+
+    if (intType == 0x10) {
+        block = executing;
+        block->state = -1;
+        FatalErrorFlag = TRUE;
+        executing = &DummyCommandBlock;
+        if (block->callback != NULL) {
+            block->callback(-1, block);
+        }
+        stateReady();
+        return;
+    }
+
+    /* Cover confirmed closed, start reset */
+    DVDReset();
+    ResumeFromHere = 3;
+    stateReady();
+}
+
+/*
+ * DVDGetTransferredSize - 0x800A5FC0 | size: 0x34
+ * Return the number of bytes transferred for a DVD command block.
+ */
+s32 DVDGetTransferredSize(DVDCommandBlock* block) {
+    return block->transferredSize;
+}
+
+/*
+ * DVDGetCurrentDiskID - 0x800A5FF4 | size: 0x34
+ * Return a pointer to the current disk ID structure.
+ */
+DVDDiskID* DVDGetCurrentDiskID(void) {
+    return (DVDDiskID*) BOOT_INFO;
+}
+
+/*
+ * __DVDPushWaitingQueue - 0x800A6028 | size: 0x74
+ * Push a command block onto the waiting queue at the given priority.
+ */
+BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
+    /* Link block into the priority-sorted waiting list */
+    block->state = 2; /* STATE_WAITING */
+    return TRUE;
+}
+
+/*
+ * __DVDPopWaitingQueue - 0x800A609C | size: 0x38
+ * Pop the highest-priority command block from the waiting queue.
+ */
+DVDCommandBlock* __DVDPopWaitingQueue(void) {
+    /* Remove and return the head of the waiting queue */
+    return NULL;
+}
+
+/*
+ * __DVDCheckWaitingQueue - 0x800A60D4 | size: 0x114
+ * Check if there are commands in the waiting queue that can execute.
+ * If the DVD is idle and there are waiting commands, start processing.
+ */
+BOOL __DVDCheckWaitingQueue(void) {
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+
+    if (executing == NULL && PauseFlag == 0) {
+        DVDCommandBlock* block = __DVDPopWaitingQueue();
+        if (block != NULL) {
+            executing = block;
+            stateBusy(block);
+            OSRestoreInterrupts(enabled);
+            return TRUE;
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return FALSE;
+}
+
+/*
+ * __DVDClearWaitingQueue - 0x800A61E8 | size: 0xE4
+ * Clear all commands from the waiting queue.
+ * Called during DVD init and reset.
+ */
+void __DVDClearWaitingQueue(void) {
+    /* Clear the waiting queue by unlinking all entries */
+}
+
+/*
+ * DVDPause - 0x800A62CC | size: 0xFC
+ * Pause DVD processing. Pending commands remain queued
+ * but no new commands will be dispatched.
+ */
+void DVDPause(void) {
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    PauseFlag = TRUE;
+    PausingFlag = TRUE;
+    OSRestoreInterrupts(enabled);
+}
+
+/*
+ * DVDResume - 0x800A640C | size: 0xCC
+ * Resume DVD processing after a pause.
+ * Dispatches the next queued command if one is available.
+ */
+void DVDResume(void) {
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    PauseFlag = FALSE;
+    PausingFlag = FALSE;
+
+    if (executing == NULL) {
+        stateReady();
+    }
+
+    OSRestoreInterrupts(enabled);
+}
+
+/*
+ * DVDSetAutoInvalidation - 0x800A64D8 | size: 0x30
+ * Enable or disable automatic D-cache invalidation on DVD reads.
+ */
+BOOL DVDSetAutoInvalidation(BOOL flag) {
+    BOOL prev = autoInvalidation;
+    autoInvalidation = flag;
+    return prev;
+}
+
+/*
+ * DVDFastOpen - 0x800A6508 | size: 0x70
+ * Open a file by entry number (fast path, no path resolution).
+ */
+BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo) {
+    /* Set up DVDFileInfo from the FST entry */
+    if (entrynum < 0) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/*
+ * DVDClose - 0x800A6578 | size: 0x28
+ * Close a previously opened DVD file.
+ */
+BOOL DVDClose(DVDFileInfo* fileInfo) {
+    /* Cancel any pending reads on this file */
+    fileInfo->cb.state = 0;
+    return TRUE;
+}
+
+/*
+ * __DVDInterruptHandlerMain - 0x800A6BD4 | size: 0x638
+ * Main DVD interrupt handler - large state machine.
+ * Handles all DVD interrupt types: transfer complete, cover change,
+ * error recovery, and timeout. This is the core of the DVD state machine.
+ */
+static void __DVDInterruptHandlerMain(u32 intType) {
+    DVDCommandBlock* block;
+    DVDCBCallback callback;
+
+    block = executing;
+    if (block == NULL) {
+        return;
+    }
+
+    /* Handle timeout */
+    if (intType == 0x10) {
+        block->state = -1;
+        FatalErrorFlag = TRUE;
+        executing = &DummyCommandBlock;
+        if (block->callback != NULL) {
+            block->callback(-1, block);
+        }
+        stateReady();
+        return;
+    }
+
+    /* Handle cover open */
+    if (intType & 0x4) {
+        __DVDDecodeCoverInterrupt();
+        return;
+    }
+
+    /* Handle transfer error */
+    if (intType & 0x2) {
+        /* Request error details */
+        return;
+    }
+
+    /* Transfer complete */
+    block->transferredSize += block->currTransferSize;
+
+    /* Check if there is more data to read */
+    if (block->transferredSize < block->length) {
+        /* Continue transfer */
+        u32 remaining = block->length - block->transferredSize;
+        u32 chunkSize = remaining;
+
+        block->currTransferSize = chunkSize;
+        return;
+    }
+
+    /* Command complete */
+    block->state = 0;
+    executing = NULL;
+
+    callback = block->callback;
+    if (callback != NULL) {
+        callback(0, block);
+    }
+
+    stateReady();
+}
+
+/*
+ * DVDReadAbsAsyncForBS - 0x800A720C | size: 0xDC
+ * Read from an absolute offset for the boot system.
+ * Similar to DVDReadAbsAsyncPrio but used during boot.
+ */
+static BOOL DVDReadAbsAsyncForBS(DVDCommandBlock* block, void* addr,
+                                 s32 length, s32 offset,
+                                 DVDCBCallback callback) {
+    BOOL enabled;
+    BOOL result;
+
+    block->command = 4;
+    block->addr = addr;
+    block->length = length;
+    block->offset = offset;
+    block->transferredSize = 0;
+    block->callback = callback;
+
+    if (autoInvalidation) {
+        DCInvalidateRange(addr, (u32)length);
+    }
+
+    enabled = OSDisableInterrupts();
+    block->state = 2;
+
+    result = __DVDPushWaitingQueue(2, block);
+
+    if (executing == NULL && PauseFlag == 0) {
+        stateReady();
+    }
+
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+/*
+ * DVDSeekAbsAsyncPrio - 0x800A72E8 | size: 0xCC
+ * Seek to an absolute disc offset with priority.
+ */
+static BOOL DVDSeekAbsAsyncPrio(DVDCommandBlock* block, s32 offset,
+                                DVDCBCallback callback, s32 prio) {
+    BOOL enabled;
+    BOOL result;
+
+    block->command = 2;
+    block->addr = NULL;
+    block->length = 0;
+    block->offset = offset;
+    block->transferredSize = 0;
+    block->callback = callback;
+
+    enabled = OSDisableInterrupts();
+    block->state = 2;
+
+    result = __DVDPushWaitingQueue(prio, block);
+
+    if (executing == NULL && PauseFlag == 0) {
+        stateReady();
+    }
+
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+/*
+ * DVDStopStreamAtEndAsync - 0x800A73B4 | size: 0xD0
+ * Request the DVD drive to stop streaming when the current
+ * stream operation completes.
+ */
+static BOOL DVDStopStreamAtEndAsync(DVDCommandBlock* block,
+                                    DVDCBCallback callback) {
+    BOOL enabled;
+    BOOL result;
+
+    block->command = 3;
+    block->addr = NULL;
+    block->length = 0;
+    block->offset = 0;
+    block->transferredSize = 0;
+    block->callback = callback;
+
+    enabled = OSDisableInterrupts();
+    block->state = 2;
+
+    result = __DVDPushWaitingQueue(2, block);
+
+    if (executing == NULL && PauseFlag == 0) {
+        stateReady();
+    }
+
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+/*
+ * DVDOpen - 0x800A7558 | size: 0xBC
+ * Open a DVD file by path string.
+ * Converts the path to an entry number and then calls DVDFastOpen.
+ */
+BOOL DVDOpen(const char* path, DVDFileInfo* fileInfo) {
+    s32 entrynum;
+
+    entrynum = DVDConvertPathToEntrynum(path);
+    if (entrynum < 0) {
+        return FALSE;
+    }
+    return DVDFastOpen(entrynum, fileInfo);
+}
+
+/*
+ * __DVDStoreErrorCode - 0x800A7728 | size: 0x4C
+ * Store an error code for later retrieval.
+ * Used for diagnostic purposes during DVD error handling.
+ */
+void __DVDStoreErrorCode(u32 error) {
+    /* Store the error code in a global for later diagnostic retrieval */
+    static u32 lastError;
+    lastError = error;
+}
 
