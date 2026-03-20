@@ -55,51 +55,81 @@ src/game/menu/menu_carde.c                0x80033278  0x80034280  1   # menuCard
 # TU 13: Movie player
 src/game/movie.c                          0x80035E04  0x800366D0  ~10  # Movie playback (THP), opening/credits/autodemo
 
-# NOTE: Large unidentified region between movie.c and next known TU
-# UNIDENTIFIED                            0x800366D0  0x80059BDC  ~350  # Game utilities, save helpers
+# TU 14: Scene init, transition, and game-start thread management
+src/game/scene_init.c                     0x8003686C  0x80039998  49   # Thread setup, fade, card detect, OSGetResetCode
 
-# TU 14: UI Core (large state machine)
+# TU 15: General Colosseum UI utility functions
+src/game/colosseum_ui.c                   0x80039A50  0x8003AEF0  12   # UI framework helpers, state machines
+
+# TU 16: Shop / item purchase-sale menu
+src/game/menu/menu_shop.c                 0x8003AEF0  0x8003D1FC  18   # Shop inventory, buy/sell, transaction
+
+# TU 17: Pokemon summary screen and party management UI
+src/game/menu/menu_pokemon.c              0x8003D1FC  0x800495C8  36   # Summary pages, party list, cursor, stats
+
+# TU 18: Evolution sequence and animation system
+src/game/pokemon/evolution.c              0x800495C8  0x8004BE0C  10   # Evolution cutscene, model lerp, post-evo
+
+# TU 19: Pokemon detail sub-screens
+src/game/pokemon/poke_detail.c            0x8004BE0C  0x8004EADC  46   # Stat renderers, move info, held items
+
+# TU 20: Bag / item pocket management
+src/game/menu/menu_bag.c                  0x8004EADC  0x80053110   9   # Item cache (553 spp), pocket switch, use/toss
+
+# TU 21: Game script callback handlers
+src/game/script/script_callback.c         0x80053110  0x80054914  25   # Script-to-UI bridge, condition checks
+
+# TU 22: Status screen and stat display
+src/game/menu/menu_status.c               0x80054914  0x80056C54  35   # Stat bars, trainer card, numeric display
+
+# TU 23: Message box / text rendering
+src/game/menu/menu_msgbox.c               0x80056C54  0x80057B34  24   # Text display, scrolling, char decode
+
+# TU 24: Dialog window system
+src/game/menu/menu_dialog.c               0x80057B34  0x80059BDC  19   # Window open/close, choice selection
+
+# TU 25: UI Core (large state machine)
 # UNIDENTIFIED (ui_core.c?)               0x80059BDC  0x80069A60  ~103  # UI state machine, 0x30F4-byte fn
 
-# TU 15: Battle menu callbacks
+# TU 26: Battle menu callbacks
 src/game/menu/menu_battle.c               0x80069A60  0x80069C0C  1   # menuCB_Battle_Assert
 
 # NOTE: Unidentified menu code between battle CB and common CB
 # UNIDENTIFIED (menu related)             0x80069C0C  0x8007109C  ~100  # Menu system middle
 
-# TU 16: Common menu callbacks
+# TU 27: Common menu callbacks
 src/game/menu/menu_common.c               0x8007109C  0x8007162C  5   # Menu push/pop, asserts
 
-# TU 17: Battle tool menu
+# TU 28: Battle tool menu
 # (menuToolBattle.c)                      0x8007581C  0x80075A34  1   # Embedded in menu block
 
-# TU 18: Rule menu callbacks
+# TU 29: Rule menu callbacks
 # (menuCB_Rule.c)                         0x800767B8  0x80077A5C  4   # Rule handlers
 
-# TU 19: Extra Disc Shrine menu
+# TU 30: Extra Disc Shrine menu
 # (menuExDiscShrine.c)                    0x80077ED4  0x80078390  1   # Mt. Battle exchange
 
-# TU 20: Extra Disc Coupon menu
+# TU 31: Extra Disc Coupon menu
 # (menuExDiscCoupon.c)                    0x800792D8  0x800798E8  1   # Coupon exchange
 
-# TU 12: Poke Coupon menu
+# TU 32: Poke Coupon menu
 src/game/menu/menu_pokecoupon.c           0x8007C2C0  0x8007C300  1   # Assert function
 
-# TU 13: Card-E Matrix menu
+# TU 33: Card-E Matrix menu
 # (menuCardE_Matrix.c)                    0x8007C300  0x8007FD64  4   # e-Reader matrix display
 
-# NOTE: TUs 8-13 may be contiguous within a larger "menu" link block.
+# NOTE: TUs 28-33 may be contiguous within a larger "menu" link block.
 # The exact TU boundaries between them are unclear -- functions between
 # the identified ranges likely belong to the same menu module or
 # separate unidentified menu TUs.
 
-# TU 14: Card-E save data
+# TU 34: Card-E save data
 src/game/save/save_data.c                 0x80082650  0x80083AF4  11  # cardesavedata functions
 
-# TU 15: Pokemon conversion (GBA<->GCN)
+# TU 35: Pokemon conversion (GBA<->GCN)
 src/game/gba/pokeconv.c                   0x80089048  0x800895A4  2   # pokeconv_ConvertPokemon, ValidateItems
 
-# TU 16: GBA communication
+# TU 36: GBA communication
 src/game/gba/gba_comm.c                   0x80092C90  0x800937F4  6   # gbaCommunication transfers
 
 # NOTE: Gap between gba_comm end (0x800937F4) and SDK start (0x80097FFC)
