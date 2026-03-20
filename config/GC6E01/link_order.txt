@@ -19,8 +19,35 @@
 # TU  1: Game entry point and main loop
 src/game/main.c                           0x800055E0  0x80006630  21  # main(), GameInit, GameMainLoop, callbacks
 
-# TU  2: Unknown game module (flag/scene accessors, early logic)
-# UNIDENTIFIED                            0x80006630  0x80033278  ~410  # Game logic, flags, battle helpers, scene management
+# TU  2: Scene/FSYS task management (archive loading, scene callbacks)
+src/game/gs_task.c                        0x80006630  0x80009178  ~45   # GStask: scene tasks, archive load, resource callbacks
+
+# TU  3: Battle encounter setup (trainer config, shadow encounters)
+src/game/gs_battle_setup.c                0x80009178  0x8000BA94  ~15   # GSbattleSetup: battle init, encounter config
+
+# TU  4: Pokemon party data accessors (species, stats, items, etc.)
+src/game/gs_party_access.c                0x8000BA94  0x8000D290  ~60   # GSpartyAccess: party field get/set accessors
+
+# TU  5: Overworld NPC interaction and dialog system
+src/game/gs_npc_interact.c                0x8000D298  0x80012858  ~70   # GSnpcInteract: dialog, items, battle triggers, warps
+
+# TU  6: Scene scripting and event execution engine
+src/game/gs_event_exec.c                  0x80012858  0x80015000  ~35   # GSeventExec: event bytecode, scripted sequences
+
+# TU  7: Pokemon summary screen and status display
+src/game/gs_pokemon_summary.c             0x80015000  0x800181C4  ~30   # GSpokeSummary: multi-page Pokemon detail view
+
+# TU  8: PC Box Pokemon storage system
+src/game/gs_pcbox.c                       0x800181C4  0x80020328  ~60   # GSpcbox: deposit/withdraw/move, box UI
+
+# TU  9: Title screen, autodemo, and intro sequence
+src/game/gs_title.c                       0x80020328  0x80026000  ~80   # GStitle: title loop, name entry, save select
+
+# TU 10: World map UI and location navigation
+src/game/gs_worldmap.c                    0x80026000  0x80030170  ~90   # GSWorldmap: map render, travel, location system
+
+# TU 11: NPC event callbacks and overworld sprite rendering
+src/game/gs_npc_event.c                   0x80030170  0x80033278  ~30   # GSnpcEvt: event callbacks, trainer sprites, items
 
 # TU  3: Card-E menu
 src/game/menu/menu_carde.c                0x80033278  0x80034280  1   # menuCardE_Main (0x1008 bytes)
@@ -449,21 +476,11 @@ src/game/fsys/fsys_decomp.c               0x8017F2C4  0x8017F3F8  1   # Decompre
 # NOTE: Gap 0x8017F3F8-0x80180C78 -- FSYS tail, pre-people code
 # UNIDENTIFIED (fsys/people gap)          0x8017F3F8  0x80180C78  ~30  # FSYS tail or world init
 
-# TU 97: People - Core
-src/game/people/people.c                  0x80180C78  0x80181850  ~15  # peopleInit, peopleUpdate, floor callbacks
-# (also has tail at 0x8018FB94-0x8018FE30)
-
-# TU 98: People - Interaction
-src/game/people/people_interact.c         0x801812E8  0x8018FBD4  ~50  # Talk, motion, spawn, getters/setters
-# NOTE: people_interact.c and people_move.c overlap in range with people.c.
-# INTERLEAVING NOTE: The people.c, people_move.c, and people_interact.c
-# functions are interleaved in the 0x80181200-0x8018FE30 range.
-# This strongly suggests they were originally ONE translation unit that
-# was later split into separate files, or they share a common header
-# that causes interleaving.
-
-# TU 99: People - Movement
-src/game/people/people_move.c             0x801812C4  0x8018F200  ~80  # Movement state machine, walk path
+# TU 97: People (merged -- core + movement + interaction)
+# Formerly split across people.c, people_move.c, people_interact.c.
+# Link order analysis confirmed interleaved functions throughout the range,
+# indicating a single original translation unit.
+src/game/people/people.c                  0x80180C78  0x8018FE30  ~150  # Core, movement, interaction (merged TU)
 
 # TU 100: GSflag - Game Flag System
 src/game/gs_flag.c                        0x8018FE30  0x80190E34  9    # GSflagSet, GSflagGet, bit operations
@@ -553,12 +570,12 @@ src/hsd/hsd_robj.c                        0x801BBAC8  0x801BF138  ~30  # Constra
 # TU 119: Waza (Move Animation) System
 # (waza.c)                                0x801D7230  0x801E03D4  ~108  # wazaSequenceLoad, update, particle/model entries
 
-# TU 120: Battle State Machine (move execution)
-src/game/battle/battle_move.c             0x801E03D4  0x801EF02C  ~150  # State machine with huge switch tables
-# NOTE: battle_type.c, battle_status.c, battle_damage.c, battle_ai.c,
-# battle_shadow.c functions are likely INTERLEAVED within this range.
-# This is typical when multiple source files implement different cases
-# of the same state machine and are compiled together.
+# TU 120: Battle Logic (merged -- moves, types, status, damage, AI, shadow)
+# Formerly split across battle_move.c, battle_type.c, battle_status.c,
+# battle_damage.c, battle_ai.c, battle_shadow.c.
+# Link order analysis confirmed interleaved functions throughout the range,
+# indicating a single original translation unit.
+src/game/battle/battle_logic.c            0x801E03D4  0x801EF02C  ~150  # Battle logic (merged TU)
 
 # TU 121: Battle Core / Fight Flow
 src/game/battle/battle_main.c             0x801EF02C  0x801F000C  26   # battle_FightStart, FightEnd, MainLoop
@@ -588,20 +605,21 @@ src/game/colosseum_battle.c               0x80240000  0x80266360  ~200  # Battle
 # SPECIAL NOTES
 # ============================================================================
 #
-# INTERLEAVING DETECTED:
+# INTERLEAVING RESOLVED:
 # 1. people.c / people_move.c / people_interact.c (0x80180C78-0x8018FE30)
-#    These three files' functions are interleaved throughout the range.
-#    This strongly suggests they were originally a single TU, or the linker
-#    merged them. The people module should be treated as one TU for linking.
+#    MERGED into src/game/people/people.c. Functions were interleaved
+#    throughout the range, confirming a single original TU.
 #
 # 2. battle_move.c / battle_type.c / battle_status.c / battle_damage.c /
 #    battle_ai.c / battle_shadow.c (0x801E03D4-0x801EF02C)
-#    Battle sub-files are interleaved within the state machine range.
-#    These likely form a single TU or a tightly-linked group.
+#    MERGED into src/game/battle/battle_logic.c. Functions were interleaved
+#    within the state machine range, confirming a single original TU.
 #
 # 3. input.c (0x800F7500-0x800F8268) sits within gs_thread.c's range.
-#    This suggests input.c was linked between gs_thread TU sections, or
-#    was originally part of the same compilation unit.
+#    LEFT SEPARATE. input.c occupies a contiguous block within gs_thread's
+#    range (no function interleaving detected). This is consistent with
+#    input.c being a separate TU that was linked adjacent to gs_thread.c
+#    sections rather than being compiled together.
 #
 # GAPS (unattributed address ranges):
 # See splits_refined.txt for the full gap analysis.

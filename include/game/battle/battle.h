@@ -13,8 +13,13 @@
  *   0x801C3108 - 0x801C53BC : Battle Grid (scene layout, 36 functions)
  *   0x801C53BC - 0x801D7230 : Battle Logic (damage, types, status, ~205 functions)
  *   0x801D7230 - 0x801E03D4 : Waza/Move Animation System (~108 functions)
- *   0x801E03D4 - 0x801EF02C : Battle State Machine (~150 functions)
- *   0x801EF02C - 0x801F000C : Battle Core / Fight Flow (26 functions)
+ *   0x801E03D4 - 0x801EF02C : Battle State Machine (~150 functions) [battle_logic.c]
+ *   0x801EF02C - 0x801F000C : Battle Core / Fight Flow (26 functions) [battle_main.c]
+ *
+ * The battle_logic.c TU contains all interleaved battle logic functions
+ * (formerly split across battle_move.c, battle_type.c, battle_status.c,
+ * battle_damage.c, battle_ai.c, and battle_shadow.c). Link order analysis
+ * confirmed these were originally compiled as a single translation unit.
  *
  * Colosseum uses exclusively Double Battles with up to 4 Pokemon on the
  * field at once (2 per side). The engine is built on Gen III mechanics

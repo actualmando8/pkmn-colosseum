@@ -8,8 +8,11 @@
  * within that group. A pointer indirection (self-pointer at +0x04) is used
  * to resolve script-side object references.
  *
+ * All people functions reside in a single translation unit (people.c),
+ * covering core management, movement, and interaction subsystems.
+ *
  * Data was recovered from disassembly of address range:
- *   0x80181094 - 0x8018FE30  (People/NPC system, ~227 functions)
+ *   0x80180C78 - 0x8018FE30  (People/NPC system, ~227 functions)
  *
  * Debug string: "Warining: people[%d,%d] group is different!!"
  *               "ERROR! [%s]: People[%d,%d] WalkMotion[%d] is frame zero."
@@ -276,7 +279,7 @@ void peopleSetTransform(PeopleEntry* entry, void* mtx);
 void* peopleGetTransform(PeopleEntry* entry);
 
 /* =========================================================================
- * Function declarations -- people_move.c (Movement)
+ * Function declarations -- Movement subsystem
  * ========================================================================= */
 
 /** Tick-update one NPC's movement (called 60 times per update cycle).
@@ -302,7 +305,7 @@ void peopleMoveCheck(void* entry, u8 param, s32* outNode, u8* outResult);
 BOOL peopleIsWithinRange(u32 posA, u32 posB, u32 posC, f32 range);
 
 /* =========================================================================
- * Function declarations -- people_interact.c (Interaction)
+ * Function declarations -- Interaction subsystem
  * ========================================================================= */
 
 /** Look up a people entry by (groupId, index) and handle talk state.

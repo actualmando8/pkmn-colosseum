@@ -28,9 +28,7 @@ Last updated: 2026-03-19
 | hsd_displayfunc.c | 11/11 | HSD render pass dispatch |
 | hsd_initialize.c | ALL | HSD init |
 | battle_main.c | 51/51 | Battle loop, fight start/end |
-| battle_move.c | 15/15 | Move execution, turn order |
-| battle_shadow.c | 10/10 | Shadow Pokémon battle mechanics |
-| battle_ai.c | 5/5 | Trainer AI decisions |
+| battle_logic.c | 30/30 | Move execution, types, status, damage, AI, shadow (merged TU) |
 | gs_gfx.c | 36/36 | Graphics init/config |
 | gs_mem.c | 13/13 | Handle-based heap allocator |
 | gs_thread.c | 18/18 | Cooperative task system |

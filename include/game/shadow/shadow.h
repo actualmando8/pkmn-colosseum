@@ -15,7 +15,7 @@
  *   - Shadow Pokemon data tables (species, trainer, heart gauge initial values)
  *
  * For the *battle* Shadow Pokemon mechanics (Hyper Mode, Shadow Rush, snagging
- * during battle), see game/battle/battle.h and battle_shadow.c.
+ * during battle), see game/battle/battle.h and battle_logic.c.
  *
  * The Shadow Pokemon data is loaded from common_rel.fdat (index 80/81 in
  * the CommonIndexes table). Each shadow Pokemon entry defines:

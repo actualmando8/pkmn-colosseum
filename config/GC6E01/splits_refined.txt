@@ -220,12 +220,9 @@ KNOWN   0x8017AC40  0x8017B07C  src/game/fsys/fsys_load.c                 ~5    
 KNOWN   0x8017B07C  0x8017F2C4  src/game/fsys/fsys_file.c                 ~40   # File operations (scattered ranges)
 KNOWN   0x8017F2C4  0x8017F3F8  src/game/fsys/fsys_decomp.c               1     # Decompression routine
 GAP     0x8017F3F8  0x80180C78  ???                                        ~30   # FSYS tail / world init transition
-KNOWN   0x80180C78  0x8018FE30  src/game/people/ (people.c + people_move.c + people_interact.c)  ~150
-  # INTERLEAVING: Three source files have interleaved functions:
-  #   people.c:          0x80180C78-0x80181250, 0x8018FB94-0x8018FE30
-  #   people_interact.c: 0x801812E8-0x80181850, 0x8018E1C4-0x8018FBD4
-  #   people_move.c:     0x801812C4, 0x80188800-0x8018F200
-  # This indicates a single compilation unit or closely-linked group.
+KNOWN   0x80180C78  0x8018FE30  src/game/people/people.c (merged TU)      ~150
+  # RESOLVED: Formerly split across people.c, people_move.c, people_interact.c.
+  # Interleaved functions confirmed single original TU. Now merged into people.c.
 KNOWN   0x8018FE30  0x80190E34  src/game/gs_flag.c                        9     # GSflagSet/Get (8/16/32-bit), bit value operations
 
 # --- HAL SYSDOLPHIN (HSD) LIBRARY ---
@@ -257,16 +254,14 @@ GAP     0x801C0000  0x801C3108  ???                                        ~30  
 
 LIKELY  0x801C3108  0x801C53BC  src/game/battle/battle_grid.c             36    # Battle scene layout, model loading, positions
 LIKELY  0x801C53BC  0x801CC380  src/game/battle/battle_logic.c            ~150  # Damage calc, type effectiveness, AI, status
-  # Sub-ranges likely contain functions from:
-  # battle_damage.c, battle_type.c, battle_status.c, battle_ai.c
 KNOWN   0x801CC380  0x801CDB04  src/game/save/save_crypto.c               1     # SHA-1 implementation (0x1784 bytes, heavily unrolled)
 GAP     0x801CDB04  0x801D7230  ???                                        ~80   # Battle continuation / save-battle bridge
 LIKELY  0x801D7230  0x801E03D4  src/game/battle/waza.c                    ~108  # Move animation sequences (waza = "technique")
   # wazaSequenceLoad, wazaSequenceUpdate, particle/model entries
-LIKELY  0x801E03D4  0x801E0FB4  src/game/battle/ (state machine)          ~150  # Battle state machine, move execution pipeline
-  # Contains interleaved functions from:
-  # battle_move.c, battle_type.c, battle_status.c, battle_damage.c,
-  # battle_ai.c, battle_shadow.c
+KNOWN   0x801E03D4  0x801E0FB4  src/game/battle/battle_logic.c (merged TU) ~150  # Battle state machine (merged TU)
+  # RESOLVED: Formerly split across battle_move.c, battle_type.c, battle_status.c,
+  # battle_damage.c, battle_ai.c, battle_shadow.c. Interleaved functions confirmed
+  # single original TU. Now merged into battle_logic.c.
 KNOWN   0x801E0FB4  0x801E1B54  src/game/save/save.c                      ~10   # save_CardUpdate, save_CardSystemInit, save_DataInit
 GAP     0x801E1B54  0x801EF02C  ??? (THP player + card + misc)            ~150  # THP movie player, card system, GBA bridge
 KNOWN   0x801EF02C  0x801F000C  src/game/battle/battle_main.c             26    # battle_FightStart, FightEnd, MainLoop
@@ -300,7 +295,9 @@ KNOWN   0x80240000  0x8026635C  src/game/colosseum_battle.c               ~200  
 #   9. hsd_cobj.c               0x03E40 bytes ( 16 KB, ~60 fn)
 #  10. gs_thread.c              0x0E3F8 bytes ( 57 KB, ~80 fn)
 #
-# Key interleaving cases (possible single-TU origins):
-#   - people.c + people_move.c + people_interact.c
-#   - battle_move.c + battle_type.c + battle_status.c + battle_damage.c + battle_ai.c + battle_shadow.c
-#   - input.c within gs_thread.c range
+# Interleaving cases (resolved):
+#   - people.c + people_move.c + people_interact.c -> MERGED into people.c
+#   - battle_move.c + battle_type.c + battle_status.c + battle_damage.c
+#     + battle_ai.c + battle_shadow.c -> MERGED into battle_logic.c
+#   - input.c within gs_thread.c range -> LEFT SEPARATE (contiguous block,
+#     no interleaving; likely separate TU linked adjacent)
