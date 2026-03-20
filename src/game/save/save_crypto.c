@@ -2,7 +2,7 @@
  * @file save_crypto.c
  * @brief SHA-1 hash implementation for save data integrity verification.
  *
- * Address: fn_801CC380, Size: 0x1784 bytes
+ * Address: 0x801CC380, Size: 0x1784 bytes
  *
  * This is a standard SHA-1 implementation used to verify save data
  * integrity. The function is confirmed as SHA-1 by the presence of

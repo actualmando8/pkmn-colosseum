@@ -73,6 +73,11 @@ static asm void Config24MB(void) {
     addi    r4, r4, 0x0002
     lis     r3, 0x8000
     addi    r3, r3, 0x01FF
+    /* Pre-load DBAT2/IBAT2 values */
+    lis     r6, 0x0100
+    addi    r6, r6, 0x0002
+    lis     r5, 0x8100
+    addi    r5, r5, 0x00FF
     isync
     mtdbatu 0, r7
     mtdbatl 0, r4
@@ -83,11 +88,6 @@ static asm void Config24MB(void) {
     mtibatu 0, r3
 
     /* DBAT2: 0x81000000, 8MB */
-    isync
-    lis     r6, 0x0100
-    addi    r6, r6, 0x0002
-    lis     r5, 0x8100
-    addi    r5, r5, 0x00FF
     isync
     mtdbatu 2, r7
     mtdbatl 2, r6
@@ -121,6 +121,11 @@ static asm void Config48MB(void) {
     addi    r4, r4, 0x0002
     lis     r3, 0x8000
     addi    r3, r3, 0x03FF
+    /* Pre-load DBAT2/IBAT2 values */
+    lis     r6, 0x0200
+    addi    r6, r6, 0x0002
+    lis     r5, 0x8200
+    addi    r5, r5, 0x01FF
     isync
     mtdbatu 0, r7
     mtdbatl 0, r4
@@ -131,11 +136,6 @@ static asm void Config48MB(void) {
     mtibatu 0, r3
 
     /* DBAT2: 0x82000000, 16MB */
-    isync
-    lis     r6, 0x0200
-    addi    r6, r6, 0x0002
-    lis     r5, 0x8200
-    addi    r5, r5, 0x01FF
     isync
     mtdbatu 2, r7
     mtdbatl 2, r6
