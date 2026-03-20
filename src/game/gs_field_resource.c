@@ -254,3 +254,134 @@ void* floorReadCameraPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 
 /* Address: 0x801143A0 | Size: 0x8 | Pattern: return_constant */
 u32 fn_801143A0(void) { return 0; }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 14 stubs
+ * Range: 0x8011432C - 0x80114CA8
+ * =================================================================== */
+
+/* 0x8011432C | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8011432C(void) {
+    /* TODO: match -- 116 bytes at 0x8011432C */
+}
+#pragma pop
+
+/* 0x801143EC | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801143EC(void) {
+    /* TODO: match -- 112 bytes at 0x801143EC */
+}
+#pragma pop
+
+/* 0x8011445C | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8011445C(void) {
+    /* TODO: match -- 116 bytes at 0x8011445C */
+}
+#pragma pop
+
+/* 0x801145C0 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801145C0(void) {
+    /* TODO: match -- 116 bytes at 0x801145C0 */
+}
+#pragma pop
+
+/* 0x80114634 | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114634(void) {
+    /* TODO: match -- 112 bytes at 0x80114634 */
+}
+#pragma pop
+
+/* 0x801146A4 | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801146A4(void) {
+    /* TODO: match -- 112 bytes at 0x801146A4 */
+}
+#pragma pop
+
+/* 0x80114714 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114714(void) {
+    /* TODO: match -- 76 bytes at 0x80114714 */
+}
+#pragma pop
+
+/* 0x801147D4 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801147D4(void) {
+    /* TODO: match -- 52 bytes at 0x801147D4 */
+}
+#pragma pop
+
+/* 0x80114808 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114808(void) {
+    /* TODO: match -- 116 bytes at 0x80114808 */
+}
+#pragma pop
+
+/* 0x8011487C | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8011487C(void) {
+    /* TODO: match -- 204 bytes at 0x8011487C */
+}
+#pragma pop
+
+/* 0x80114948 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114948(void) {
+    /* TODO: match -- 116 bytes at 0x80114948 */
+}
+#pragma pop
+
+/* 0x801149BC | 0xB4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801149BC(void) {
+    /* TODO: match -- 180 bytes at 0x801149BC */
+}
+#pragma pop
+
+/* 0x80114A70 | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114A70(void) {
+    /* TODO: match -- 112 bytes at 0x80114A70 */
+}
+#pragma pop
+
+/* 0x80114AE0 | 0x1C8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80114AE0(void) {
+    /* TODO: match -- 456 bytes at 0x80114AE0 */
+}
+#pragma pop

@@ -1181,3 +1181,89 @@ GSFloorContext* GSfloorGetContext(void)
 {
     return gsFloorCurrent;
 }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 9 stubs
+ * Range: 0x800FF788 - 0x80101910
+ * =================================================================== */
+
+/* 0x800FF788 | 0x94 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF788(void) {
+    /* TODO: match -- 148 bytes at 0x800FF788 */
+}
+#pragma pop
+
+/* 0x800FF81C | 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF81C(void) {
+    /* TODO: match -- 12 bytes at 0x800FF81C */
+}
+#pragma pop
+
+/* 0x800FF828 | 0x148 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF828(void) {
+    /* TODO: match -- 328 bytes at 0x800FF828 */
+}
+#pragma pop
+
+/* 0x800FF970 | 0x11B4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF970(void) {
+    /* TODO: match -- 4532 bytes at 0x800FF970 */
+}
+#pragma pop
+
+/* 0x80100B24 | 0x720 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80100B24(void) {
+    /* TODO: match -- 1824 bytes at 0x80100B24 */
+}
+#pragma pop
+
+/* 0x80101244 | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80101244(void) {
+    /* TODO: match -- 164 bytes at 0x80101244 */
+}
+#pragma pop
+
+/* 0x801012E8 | 0xB8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801012E8(void) {
+    /* TODO: match -- 184 bytes at 0x801012E8 */
+}
+#pragma pop
+
+/* 0x801013A0 | 0xDC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801013A0(void) {
+    /* TODO: match -- 220 bytes at 0x801013A0 */
+}
+#pragma pop
+
+/* 0x8010147C | 0x494 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010147C(void) {
+    /* TODO: match -- 1172 bytes at 0x8010147C */
+}
+#pragma pop

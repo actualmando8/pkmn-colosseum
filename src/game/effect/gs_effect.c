@@ -726,3 +726,98 @@ u16 GSEffectAllocSlot(void* callbacks, u16 dataSize) {
 
     return slot->id;
 }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 10 stubs
+ * Range: 0x80130CE0 - 0x8013151C
+ * =================================================================== */
+
+/* 0x80130CE0 | 0x224 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80130CE0(void) {
+    /* TODO: match -- 548 bytes at 0x80130CE0 */
+}
+#pragma pop
+
+/* 0x80130F04 | 0x64 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80130F04(void) {
+    /* TODO: match -- 100 bytes at 0x80130F04 */
+}
+#pragma pop
+
+/* 0x80130F68 | 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80130F68(void) {
+    /* TODO: match -- 168 bytes at 0x80130F68 */
+}
+#pragma pop
+
+/* 0x80131010 | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80131010(void) {
+    /* TODO: match -- 152 bytes at 0x80131010 */
+}
+#pragma pop
+
+/* 0x801310A8 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801310A8(void) {
+    /* TODO: match -- 116 bytes at 0x801310A8 */
+}
+#pragma pop
+
+/* 0x8013111C | 0xE4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8013111C(void) {
+    /* TODO: match -- 228 bytes at 0x8013111C */
+}
+#pragma pop
+
+/* 0x80131200 | 0x68 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80131200(void) {
+    /* TODO: match -- 104 bytes at 0x80131200 */
+}
+#pragma pop
+
+/* 0x80131268 | 0x134 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80131268(void) {
+    /* TODO: match -- 308 bytes at 0x80131268 */
+}
+#pragma pop
+
+/* 0x8013139C | 0x8C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8013139C(void) {
+    /* TODO: match -- 140 bytes at 0x8013139C */
+}
+#pragma pop
+
+/* 0x80131428 | 0xF4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80131428(void) {
+    /* TODO: match -- 244 bytes at 0x80131428 */
+}
+#pragma pop

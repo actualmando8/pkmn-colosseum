@@ -577,3 +577,98 @@ void tracefxUpdate(void* work) {
         model = seg;
     }
 }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 10 stubs
+ * Range: 0x80137114 - 0x801380D4
+ * =================================================================== */
+
+/* 0x80137114 | 0x248 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137114(void) {
+    /* TODO: match -- 584 bytes at 0x80137114 */
+}
+#pragma pop
+
+/* 0x8013735C | 0x220 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8013735C(void) {
+    /* TODO: match -- 544 bytes at 0x8013735C */
+}
+#pragma pop
+
+/* 0x8013757C | 0x204 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8013757C(void) {
+    /* TODO: match -- 516 bytes at 0x8013757C */
+}
+#pragma pop
+
+/* 0x80137780 | 0x1EC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137780(void) {
+    /* TODO: match -- 492 bytes at 0x80137780 */
+}
+#pragma pop
+
+/* 0x8013796C | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8013796C(void) {
+    /* TODO: match -- 120 bytes at 0x8013796C */
+}
+#pragma pop
+
+/* 0x801379E4 | 0x48 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_801379E4(void) {
+    /* TODO: match -- 72 bytes at 0x801379E4 */
+}
+#pragma pop
+
+/* 0x80137A2C | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137A2C(void) {
+    /* TODO: match -- 120 bytes at 0x80137A2C */
+}
+#pragma pop
+
+/* 0x80137AA4 | 0x270 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137AA4(void) {
+    /* TODO: match -- 624 bytes at 0x80137AA4 */
+}
+#pragma pop
+
+/* 0x80137D14 | 0x244 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137D14(void) {
+    /* TODO: match -- 580 bytes at 0x80137D14 */
+}
+#pragma pop
+
+/* 0x80137F58 | 0x17C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80137F58(void) {
+    /* TODO: match -- 380 bytes at 0x80137F58 */
+}
+#pragma pop
