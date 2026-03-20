@@ -221,12 +221,13 @@ asm void PPCMtfpscr(register u32 val) {
 #pragma pop
 
 /* 0x800980C8 - mfspr r3, HID2; blr */
+/* HID2 is SPR 920 on Gekko; CW's built-in HID2 name maps to a different SPR */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 asm u32 PPCMfhid2(void) {
     nofralloc
-    mfspr r3, HID2
+    mfspr r3, 920
     blr
 }
 #pragma pop
@@ -237,7 +238,7 @@ asm u32 PPCMfhid2(void) {
 #pragma optimizewithasm off
 asm void PPCMthid2(register u32 val) {
     nofralloc
-    mtspr HID2, r3
+    mtspr 920, r3
     blr
 }
 #pragma pop

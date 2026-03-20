@@ -115,87 +115,86 @@ _exit_load:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void __OSSaveFPUContext(register u8 unused, register OSContext* context) {
+asm void __OSSaveFPUContext(register u8 unused1, register u8 unused2, register OSContext* context) {
     nofralloc
-    lhz     r5, 0x01A2(r4)
-    ori     r5, r5, OS_CONTEXT_STATE_FPSAVED
-    sth     r5, 0x01A2(r4)
+    lhz     r3, 0x01A2(r5)
+    ori     r3, r3, OS_CONTEXT_STATE_FPSAVED
+    sth     r3, 0x01A2(r5)
 
-    mfspr   r5, 920
-    extrwi. r5, r5, 1, 2
-    beq     _save_fpr
-
-    /* save paired-singles */
-    psq_st  f0,  0x01C8(r4), 0, 0
-    psq_st  f1,  0x01D0(r4), 0, 0
-    psq_st  f2,  0x01D8(r4), 0, 0
-    psq_st  f3,  0x01E0(r4), 0, 0
-    psq_st  f4,  0x01E8(r4), 0, 0
-    psq_st  f5,  0x01F0(r4), 0, 0
-    psq_st  f6,  0x01F8(r4), 0, 0
-    psq_st  f7,  0x0200(r4), 0, 0
-    psq_st  f8,  0x0208(r4), 0, 0
-    psq_st  f9,  0x0210(r4), 0, 0
-    psq_st  f10, 0x0218(r4), 0, 0
-    psq_st  f11, 0x0220(r4), 0, 0
-    psq_st  f12, 0x0228(r4), 0, 0
-    psq_st  f13, 0x0230(r4), 0, 0
-    psq_st  f14, 0x0238(r4), 0, 0
-    psq_st  f15, 0x0240(r4), 0, 0
-    psq_st  f16, 0x0248(r4), 0, 0
-    psq_st  f17, 0x0250(r4), 0, 0
-    psq_st  f18, 0x0258(r4), 0, 0
-    psq_st  f19, 0x0260(r4), 0, 0
-    psq_st  f20, 0x0268(r4), 0, 0
-    psq_st  f21, 0x0270(r4), 0, 0
-    psq_st  f22, 0x0278(r4), 0, 0
-    psq_st  f23, 0x0280(r4), 0, 0
-    psq_st  f24, 0x0288(r4), 0, 0
-    psq_st  f25, 0x0290(r4), 0, 0
-    psq_st  f26, 0x0298(r4), 0, 0
-    psq_st  f27, 0x02A0(r4), 0, 0
-    psq_st  f28, 0x02A8(r4), 0, 0
-    psq_st  f29, 0x02B0(r4), 0, 0
-    psq_st  f30, 0x02B8(r4), 0, 0
-    psq_st  f31, 0x02C0(r4), 0, 0
-
-_save_fpr:
-    stfd    f0,  0x0090(r4)
-    stfd    f1,  0x0098(r4)
-    stfd    f2,  0x00A0(r4)
-    stfd    f3,  0x00A8(r4)
-    stfd    f4,  0x00B0(r4)
-    stfd    f5,  0x00B8(r4)
-    stfd    f6,  0x00C0(r4)
-    stfd    f7,  0x00C8(r4)
-    stfd    f8,  0x00D0(r4)
-    stfd    f9,  0x00D8(r4)
-    stfd    f10, 0x00E0(r4)
-    stfd    f11, 0x00E8(r4)
-    stfd    f12, 0x00F0(r4)
-    stfd    f13, 0x00F8(r4)
-    stfd    f14, 0x0100(r4)
-    stfd    f15, 0x0108(r4)
-    stfd    f16, 0x0110(r4)
-    stfd    f17, 0x0118(r4)
-    stfd    f18, 0x0120(r4)
-    stfd    f19, 0x0128(r4)
-    stfd    f20, 0x0130(r4)
-    stfd    f21, 0x0138(r4)
-    stfd    f22, 0x0140(r4)
-    stfd    f23, 0x0148(r4)
-    stfd    f24, 0x0150(r4)
-    stfd    f25, 0x0158(r4)
-    stfd    f26, 0x0160(r4)
-    stfd    f27, 0x0168(r4)
-    stfd    f28, 0x0170(r4)
-    stfd    f29, 0x0178(r4)
-    stfd    f30, 0x0180(r4)
-    stfd    f31, 0x0188(r4)
+    stfd    f0,  0x0090(r5)
+    stfd    f1,  0x0098(r5)
+    stfd    f2,  0x00A0(r5)
+    stfd    f3,  0x00A8(r5)
+    stfd    f4,  0x00B0(r5)
+    stfd    f5,  0x00B8(r5)
+    stfd    f6,  0x00C0(r5)
+    stfd    f7,  0x00C8(r5)
+    stfd    f8,  0x00D0(r5)
+    stfd    f9,  0x00D8(r5)
+    stfd    f10, 0x00E0(r5)
+    stfd    f11, 0x00E8(r5)
+    stfd    f12, 0x00F0(r5)
+    stfd    f13, 0x00F8(r5)
+    stfd    f14, 0x0100(r5)
+    stfd    f15, 0x0108(r5)
+    stfd    f16, 0x0110(r5)
+    stfd    f17, 0x0118(r5)
+    stfd    f18, 0x0120(r5)
+    stfd    f19, 0x0128(r5)
+    stfd    f20, 0x0130(r5)
+    stfd    f21, 0x0138(r5)
+    stfd    f22, 0x0140(r5)
+    stfd    f23, 0x0148(r5)
+    stfd    f24, 0x0150(r5)
+    stfd    f25, 0x0158(r5)
+    stfd    f26, 0x0160(r5)
+    stfd    f27, 0x0168(r5)
+    stfd    f28, 0x0170(r5)
+    stfd    f29, 0x0178(r5)
+    stfd    f30, 0x0180(r5)
+    stfd    f31, 0x0188(r5)
 
     mffs    f0
-    stfd    f0, 0x0190(r4)
-    lfd     f0, 0x0090(r4)
+    stfd    f0, 0x0190(r5)
+    lfd     f0, 0x0090(r5)
+
+    mfspr   r3, 920
+    extrwi. r3, r3, 1, 2
+    beqlr
+
+    /* save paired-singles */
+    psq_st  f0,  0x01C8(r5), 0, 0
+    psq_st  f1,  0x01D0(r5), 0, 0
+    psq_st  f2,  0x01D8(r5), 0, 0
+    psq_st  f3,  0x01E0(r5), 0, 0
+    psq_st  f4,  0x01E8(r5), 0, 0
+    psq_st  f5,  0x01F0(r5), 0, 0
+    psq_st  f6,  0x01F8(r5), 0, 0
+    psq_st  f7,  0x0200(r5), 0, 0
+    psq_st  f8,  0x0208(r5), 0, 0
+    psq_st  f9,  0x0210(r5), 0, 0
+    psq_st  f10, 0x0218(r5), 0, 0
+    psq_st  f11, 0x0220(r5), 0, 0
+    psq_st  f12, 0x0228(r5), 0, 0
+    psq_st  f13, 0x0230(r5), 0, 0
+    psq_st  f14, 0x0238(r5), 0, 0
+    psq_st  f15, 0x0240(r5), 0, 0
+    psq_st  f16, 0x0248(r5), 0, 0
+    psq_st  f17, 0x0250(r5), 0, 0
+    psq_st  f18, 0x0258(r5), 0, 0
+    psq_st  f19, 0x0260(r5), 0, 0
+    psq_st  f20, 0x0268(r5), 0, 0
+    psq_st  f21, 0x0270(r5), 0, 0
+    psq_st  f22, 0x0278(r5), 0, 0
+    psq_st  f23, 0x0280(r5), 0, 0
+    psq_st  f24, 0x0288(r5), 0, 0
+    psq_st  f25, 0x0290(r5), 0, 0
+    psq_st  f26, 0x0298(r5), 0, 0
+    psq_st  f27, 0x02A0(r5), 0, 0
+    psq_st  f28, 0x02A8(r5), 0, 0
+    psq_st  f29, 0x02B0(r5), 0, 0
+    psq_st  f30, 0x02B8(r5), 0, 0
+    psq_st  f31, 0x02C0(r5), 0, 0
     blr
 }
 #pragma pop

@@ -34,7 +34,7 @@ void OSSwitchFPUContext(u8 exception, OSContext* context);
 
 void __OSContextInit(void);
 void __OSLoadFPUContext(u8 unused, OSContext* context);
-void __OSSaveFPUContext(u8 unused, OSContext* context);
+void __OSSaveFPUContext(u8 unused1, u8 unused2, OSContext* context);
 
 u32 OSSaveContext(OSContext* context);
 void OSDumpContext(OSContext* context);
