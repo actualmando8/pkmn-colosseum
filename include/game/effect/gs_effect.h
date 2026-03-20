@@ -34,7 +34,12 @@
  *   "auraEffectStart: Could not start aura effect!"
  *   "Failed to create Patchiru texture"  (Jirachi effect)
  *
- * Address range:  0x80130000 - 0x8014A000 (~446 functions)
+ * Address ranges:
+ *   Core manager (gs_effect.c):    0x80130CE0 - 0x80131500
+ *   Trail effects (tracefx.c):     0x80137114 - 0x80137F58
+ *   Visual effects (effect_visual.c): 0x801380D4 - 0x801402AC
+ *   Generator (generator.c):       0x8017424C - 0x8017572C
+ *
  * Global state:   lbl_803635C0 (GSEffectGlobals, 0x18 bytes in .data)
  */
 #ifndef GS_EFFECT_H

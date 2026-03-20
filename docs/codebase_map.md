@@ -170,9 +170,32 @@ Named: `SIInterruptHandler`, `SIInit`, `SITransfer`, `SIGetType`, etc.
 
 Strings: `"GSgfx: unable to allocate gsgfx state!"`, `"GSgfx: Init OK, state located at %08Xh (size=%d)"`
 
-### 0x800D3E4C - 0x800E2DB0: GSgfx Extended / GSmatrix / GSlog (~221 functions)
-Includes matrix operations, GSlog system.
-Strings: `"GSgfx: invalid matrix index"`, `"GSgfx: matrix stack underflow!"`, `"GSgfx: matrix stack overflow!"`
+### 0x800D3E4C - 0x800E202C: GSrender -- Extended rendering pipeline (278 functions)
+**Source: gs_render.c / gs_render.h** (NEW -- Gap 3 decompilation)
+
+Sub-modules within this range:
+- **GSgfx callbacks** (0x800D3E4C-0x800D4610): VBlank, retrace, draw-done
+- **GSlog** (0x800D461C-0x800D5504): Debug printf with hex formatting
+- **GSgfx matrix** (0x800D5504-0x800D7900): ~80 matrix stack operations
+- **GSgfx viewport** (0x800D7900-0x800D9F40): Viewport, projection, scissor
+- **GSgfx blend/TEV** (0x800D9F40-0x800DA2BC): Blend, TEV, fog config
+- **GSgfx lighting** (0x800DB890-0x800DC224): Light setup and commands
+- **GSmaterial** (0x800DC224-0x800DE680): HSD MObj-based material system
+- **GSgfx draw** (0x800DE680-0x800E202C): Draw command dispatch
+
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x800D3E4C | `GSgfx_VBlankCallback` | 0x78 | State save/restore (0x5A0 bytes) |
+| 0x800D3EC4 | `GSgfx_PreRetraceCallback` | 0x8C | 6 float params for viewport |
+| 0x800D3F50 | `GSgfx_DrawDoneCallback` | 0xC | Sets flag at lbl_8047AA91 |
+| 0x800D3FA4 | `GSgfx_BeginFrame` | 0x654 | Full frame setup |
+| 0x800D461C | `GSlog_PrintFormatted` | 0x97C | Varargs printf |
+| 0x800D4F98 | `GSlog_QueueCommand` | 0x56C | Batch rendering commands |
+| 0x800D892C | `GSgfx_ConfigurePipeline` | 0x910 | Full GX pipeline config |
+| 0x800DE680 | `GSmaterial_Create` | 0x948 | Material setup + envmap |
+| 0x800E1544 | `GSgfx_DrawDispatch` | 0xAE8 | Main draw dispatch |
+
+Strings: `"GSgfx: invalid matrix index"`, `"GSgfx: matrix stack underflow!"`, `"GSgfx: matrix stack overflow!"`, `"0123456789ABCDEF"`, `"GSmaterialSetPEdescr: Warning: already using a custom description!"`, `"GSmaterialCreate: Run out of materials..."`, `"GSmaterial MObj"`, `"GSmaterial: Unsupported texture format for environment map!"`, `"GSmaterial: Error creating environment map: no texture defined!"`
 
 ### 0x800E2DB0 - 0x800E3604: GSmem - Memory Management
 | Address | Proposed Name | Size |
@@ -207,7 +230,7 @@ Strings: `"GStexture: invalid texture format"`, `"GStexture: warning -- texture 
 
 Strings: `"GSthreadCreate. Warning: 'usesFPU==FALE' OK?"`, `"GSthread: Init OK, maximum of %d threads"`, `"Stack overflow."`
 
-### 0x800FF788 - 0x80110000: GSfloor - Floor/World System (~199 functions)
+### 0x800FF788 - 0x80101910: GSfloor - Floor/World System (~199 functions)
 | Address | Proposed Name | Size |
 |---------|---------------|------|
 | 0x800FF788 | `GSfloor_Open` | 0x94 |
@@ -218,28 +241,68 @@ Strings: `"GSthreadCreate. Warning: 'usesFPU==FALE' OK?"`, `"GSthread: Init OK, 
 
 Strings: `"GSfloorOpen: cannot find floor %d"`, `"loadParticle(): loading..."`
 
-### 0x8010D3C8 - 0x8010D8D4: GScolsys2 - Collision System
+### 0x80101910 - 0x8010C220: GSmodel -- 3D Model Management (145 functions)
+**Source: gs_model.c / gs_model.h** (NEW -- Gap 2 decompilation)
+
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x80101910 | `GSmodel_FindLoadedResource` | 0xE8 | Unrolled search (bdnz, 3 slots/iter) |
+| 0x801019F8 | `GSmodel_ClearResourceTable` | 0x30 | memset(table, 0, 0x2400) |
+| 0x801028B0 | `GSmodel_AttachAnimation` | 0x624 | Joint hierarchy + playback init |
+| 0x80102F38 | `GSmodel_UpdateAnimation` | 0x54C | Per-frame anim advance |
+| 0x801074D4 | `GSmodel_RenderModel` | 0x9A4 | Full GX render dispatch |
+| 0x80108580 | `GSmodel_BuildDisplayList` | 0x694 | GX display list cache |
+| 0x80108C14 | `GSmodel_ProcessSkinning` | 0x5E0 | Skeletal vertex skinning |
+
+BSS: Model resource table at lbl_80402518 (0x2400 bytes, 0x48 per slot, ~0x60 slots).
+No debug strings in this range (silent module, errors via GSgfx/GSmem paths).
+
+### 0x8010C220 - 0x8010E138: GScolsys2 -- Collision System
+**Source: gs_colsys.c** (existing)
+
 | Address | Proposed Name | Size |
 |---------|---------------|------|
 | 0x8010D3C8 | `GScolsys2_Draw` | 0x50C |
 
 String: `"GScolsys2Draw : can't alloc display list memory."`
 
-### 0x8011432C - 0x80114CA8: Floor Loading System (18 functions)
-| Address | Proposed Name | Size |
-|---------|---------------|------|
-| 0x8011432C | `floorReadGFLPreFunc` | 0x74 |
-| 0x8011487C | `floorReadSoundPreFunc` | 0xCC |
-| 0x80114AE0 | `floorReadParticlePreFunc` | 0x1C8 |
+### 0x8010E138 - 0x80130CE0: GSfield -- Field/World System (824 functions, 142KB)
+**Source: gs_field_colquery.c, gs_field_resource.c, gs_field_world.c / gs_field.h** (NEW -- Gap 1 decompilation, PRIORITY)
 
-Strings: `"floorReadGFLPreFunc(): can't alloc %d bytes of memory"`, `"ERROR: Over Sound Buffer! snd_res_id=%d buffer size=%d"`, `"floorReadParticlePreFunc(): can't alloc %d bytes of memory"`, `"floorReadWZXPreFunc()"`, `"floorReadPKXPreFunc()"`, `"floorReadTexPreFunc()"`, `"floorReadCameraPreFunc"`, `"floorReadMapPreFunc"`, `"floorReadScriptPreFunc()"`, `"floorReadFontPreFunc()"`, `"floorReadMsgPreFunc()"`, `"floorReadNormalPreFunc()"`
+Three sub-modules:
 
-### 0x80114CA8 - 0x80130000: Field / World Logic (~727 functions)
-| Address | Proposed Name | Size |
-|---------|---------------|------|
-| 0x80117514 | `floorUpdateFieldCamera` | 0x1B4 |
+**gs_field_colquery.c** (0x8010E138-0x80114300): Collision queries
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x8010E138 | `GSfield_RayCast` | 0x404 | Ray vs collision mesh |
+| 0x8010E53C | `GSfield_SphereSweep` | 0x5EC | Swept sphere test |
+| 0x8010EFE4 | `GSfield_LinePlaneTest` | 0x1A4 | Segment-plane test |
+| 0x8010F71C | `GSfield_FindGroundHeight` | 0x338 | Vertical ray cast |
+| 0x801101B4 | `GSfield_BuildCollisionGrid` | 0x4E8 | Spatial acceleration |
+| 0x8011069C | `GSfield_GridLookup` | 0x7C8 | Grid point query |
+| 0x801123D4 | `GSfield_ResourceInit` | 0x32C | Resource slot setup |
+| 0x801129CC | `GSfield_UpdateObjects` | 0x5C0 | Per-frame object update |
 
-Includes field camera, world update logic, field object management.
+**gs_field_resource.c** (0x8011432C-0x80114CA8): Floor resource pre-funcs
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x8011432C | `floorReadGFLPreFunc` | 0x74 | Geometry alloc (32-byte align) |
+| 0x801143A8 | `floorReadSoundPreFunc_CheckBuffer` | 0x44 | Buffer overflow check |
+| 0x801144D0 | `floorReadSoundPreFunc` | 0xF0 | Sound buffer alloc |
+| 0x80114760 | `floorReadParticlePreFunc` | 0x74 | Particle alloc |
+
+Strings: `"floorReadGFLPreFunc(): can't alloc..."`, `"ERROR: Over Sound Buffer!"`, `"floorReadParticlePreFunc(): can't alloc..."`, `"floorReadWZXPreFunc()"`, `"floorReadPKXPreFunc()"`, `"floorReadTexPreFunc()"`, `"floorReadCameraPreFunc"`, `"floorReadMapPreFunc"`, `"floorReadScriptPreFunc()"`, `"floorReadFontPreFunc()"`, `"floorReadMsgPreFunc()"`, `"floorReadNormalPreFunc()"`
+
+**gs_field_world.c** (0x80114CA8-0x80130CE0): Field camera, world logic
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x80117514 | `floorUpdateFieldCamera` | 0x1B4 | Camera interpolation |
+| 0x801254B4 | `GSfield_RenderPass` | 0xF58 | Full field render |
+| 0x8012640C | `GSfield_TransitionStateMachine` | 0x1550 | Floor transition (LARGEST) |
+| 0x80124A60 | `GSfield_ObjectBatchUpdate` | 0x7D8 | Batch object update |
+| 0x8012CA84 | `GSfield_ProcessTriggers` | 0x838 | Event/warp triggers |
+
+~600 functions total. Many small accessors (0x18-0x34 bytes) read struct fields at fixed offsets.
 String: `"floorUpdateFieldCamera: error updating field camera - divide by zero!"`
 
 ### 0x80130000 - 0x8014A000: GSeffect / VFX System (~446 functions)
@@ -276,6 +339,26 @@ Strings: `"%s/test%04d.thp"` (THP movie paths), `"GSmem state OK"`, `"GSmem stat
 Source: sound.c
 Strings: `"ERROR: can't open WAVE ID = %d"`, `"ERROR: can't open WAVE File = %s"`, `"soundStop: Warning! BGM cannot be stopped.(snd_id=%d)"`, `"ERROR(sound.c): invalid file_info number snd_id=%d"`, `"ERROR: Can't Read Group(%d)"`, `"GSsndGetStatus:Forced termination SE=%d"`, `"GSsndGetStatus:Forced termination BGM=%d"`, `"_sndCheckSndWorkALL:Start"`, `"_sndCheckSndWorkALL:End"`
 
+### 0x80167040 - 0x80168C64: GSDVD -- DVD/Disc I/O System (56 functions)
+**Source: gs_dvd.c / gs_dvd.h** (NEW -- Gap 4 decompilation)
+
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x80167040 | `GSDVD_CheckAndClose` | 0x30 | Check active + close |
+| 0x80167070 | `GSDVD_CloseHandle` | 0xA8 | Free handle resources |
+| 0x80167118 | `GSDVD_Open` | 0x180 | Open file (8 params) |
+| 0x80167720 | `GSDVD_CheckActive` | 0x48 | Poll handle activity |
+| 0x80167FA4 | `GSDVD_EmptyFunc` | 0x4 | Stub (blr) |
+| 0x80167FA8 | `GSDVD_ErrorStateMachine` | 0x118 | Error recovery FSM |
+| 0x80168284 | `_sndCheckSndWorkALL` | 0x184 | Validate sound buffers |
+| 0x80168638 | `GSDVD_ErrorCoverOpenMain` | 0x2FC | Cover-open handler |
+| 0x80168934 | `GSDVD_Init` | 0x330 | DVD subsystem init |
+
+Handle table: lbl_80478FAC (0x0C bytes per handle, sda21).
+Extended state: lbl_80478FB4 (0x18 bytes per entry, sda21).
+
+Strings: `"_sndCheckSndWorkALL:Start"`, `"_sndCheckSndWorkALL:End"`, `"[GSDVD_ERROR_STATE_COVEROPEN_WAIT]  status = %d"`
+
 ### 0x80168C64 - 0x80168DAC: Script List System (2 functions)
 | Address | Proposed Name | Size | Source File |
 |---------|---------------|------|-------------|
@@ -296,6 +379,27 @@ Strings: `"ERROR: can't open WAVE ID = %d"`, `"ERROR: can't open WAVE File = %s"
 | 0x8017424C | `generator_Main` | 0x14E0 | generator.c |
 
 String: `"psCamera"` -- generates camera scripts.
+
+### 0x8017572C - 0x8017A5FC: GSscene -- Scene Object System (78 functions)
+**Source: gs_scene.c / gs_scene.h** (NEW -- Gap 5 decompilation)
+
+| Address | Proposed Name | Size | Notes |
+|---------|---------------|------|-------|
+| 0x8017572C | `GSscene_ProcessFreeList` | 0x1AC | Active/free list management |
+| 0x80175B94 | `GSscene_SpawnObject` | 0x25C | Allocate + init object |
+| 0x80176228 | `GSscene_DetachFromParent` | 0x3CC | Hierarchy management |
+| 0x801766A8 | `GSscene_SetPosition` | 0xB0 | Set XYZ position |
+| 0x80176C78 | `GSscene_Render` | 0x194 | Scene render dispatch |
+| 0x8017707C | `GSscene_MainUpdate` | 0x378 | Per-frame scene update |
+| 0x80177A64 | `GSscene_XFBCapture` | 0xBF8 | Framebuffer capture (LARGEST) |
+| 0x80178AA8 | `GSscene_CameraUpdate` | 0x578 | Scene camera update |
+| 0x80179020 | `GSscene_CameraInterpolate` | 0x3E4 | Camera interpolation |
+| 0x80179FA4 | `GSscene_Init` | 0x658 | Scene system init |
+
+Object lists (sda21): Active=lbl_8047B188, Free=lbl_8047B18C, Count=lbl_8047B118.
+Camera state: lbl_80478C40. Scene render table: lbl_80478FB8.
+
+String: `"gs%04d.xfb"` (numbered framebuffer capture for debug screenshots)
 
 ### 0x8017AC40 - 0x8017AF6C: FSYS Archive System
 | Address | Proposed Name | Size |
@@ -457,6 +561,13 @@ Strings: `"---------- fight end !! ----------"`, `"---------- fight start !! ---
 | initialize.c | lbl_802749E4 | 0x8019C690-0x8019C978 | 4 |
 | memory.c | lbl_80274E10 | 0x801A69C0-0x801A6A34 | 1 |
 | shadow.c | lbl_802752C0 | 0x801B019C-0x801B1730 | 10 |
+| gs_render.c | (gap 3) | 0x800D3E4C-0x800E202C | 278 |
+| gs_model.c | (gap 2) | 0x80101910-0x8010C220 | 145 |
+| gs_field_colquery.c | (gap 1a) | 0x8010E138-0x80114300 | ~200 |
+| gs_field_resource.c | (gap 1b) | 0x8011432C-0x80114CA8 | ~18 |
+| gs_field_world.c | (gap 1c) | 0x80114CA8-0x80130CE0 | ~600 |
+| gs_dvd.c | (gap 4) | 0x80167040-0x80168C64 | 56 |
+| gs_scene.c | (gap 5) | 0x8017572C-0x8017A5FC | 78 |
 
 ---
 
@@ -476,8 +587,11 @@ Strings: `"---------- fight end !! ----------"`, `"---------- fight start !! ---
 | 0x80272A58 | `"GSeffect: Cannot trigger effect..."` | GSeffect |
 | 0x80273548 | `"ERROR: can't open WAVE ID = %d"` | Sound |
 | 0x802735C4 | `"ERROR(sound.c)..."` | Sound |
+| 0x80273748 | `"_sndCheckSndWorkALL:Start"` | GSDVD |
+| 0x80273780 | `"[GSDVD_ERROR_STATE_COVEROPEN_WAIT]..."` | GSDVD |
 | 0x802737B8 | `"pslist.c"` | Script |
 | 0x802739A0 | `"psinterpret.c"` | Script |
+| 0x80273A00 | `"gs%04d.xfb"` | GSscene |
 | 0x80273F70 | `"gsfsys.toc"` | FSYS |
 | 0x802741F8 | `"ERROR[GSflagSet]..."` | GSflag |
 | 0x80275808 | `"battleGridReplacePokemon..."` | Battle |
@@ -503,14 +617,25 @@ Strings: `"---------- fight end !! ----------"`, `"---------- fight start !! ---
 - **Total .text functions**: 8,589
 - **SDK/Library named**: 274
 - **Game code (fn_*)**: 8,315
-- **Proposed names this pass**: 122
-- **Subsystems identified**: 30+
-- **Source files confirmed**: 20
-- **Remaining unnamed**: 8,193 (~98.5% of game code)
+- **Proposed names this pass**: 252 (122 original + 130 from gap analysis)
+- **Subsystems identified**: 37 (30 original + 5 from gap analysis + 2 sub-modules)
+- **Source files**: 27 (20 confirmed + 7 new gap decompilations)
+- **Functions covered by gap analysis**: 1,381 (824+145+278+56+78)
+- **Remaining unnamed**: ~6,812 (~82% of game code)
+
+## New subsystems from gap analysis (2026-03-19)
+
+| Gap | Range | Size | Subsystem | Functions | Source Files |
+|-----|-------|------|-----------|-----------|--------------|
+| 1 (PRIORITY) | 0x8010E138-0x80130CE0 | 142KB | GSfield (field/world) | 824 | gs_field_colquery.c, gs_field_resource.c, gs_field_world.c |
+| 2 | 0x80101910-0x8010C220 | 44KB | GSmodel (3D models) | 145 | gs_model.c |
+| 3 | 0x800D3E4C-0x800E202C | 56KB | GSrender (GX pipeline) | 278 | gs_render.c |
+| 4 | 0x80167040-0x80168C64 | 7KB | GSDVD (disc I/O) | 56 | gs_dvd.c |
+| 5 | 0x8017572C-0x8017A5FC | 22KB | GSscene (scene objects) | 78 | gs_scene.c |
 
 ## Priority areas for further analysis
-1. **Battle logic** (0x801C53BC-0x801D7230): 205 functions, core game mechanics
-2. **Field/World** (0x80114CA8-0x80130000): 727 functions, overworld logic
+1. **GSfield matching** (0x8010E138-0x80130CE0): 824 functions now identified, begin matching
+2. **Battle logic** (0x801C53BC-0x801D7230): 205 functions, core game mechanics
 3. **VFX system** (0x80130000-0x8014A000): 446 functions, visual effects
 4. **People/NPC** (0x80181300-0x8018F200): 227+ functions, NPC management
 5. **UI Core** (0x80059BDC-0x8006A000): 103 functions, menu state machine
