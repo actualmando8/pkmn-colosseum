@@ -109,3 +109,19 @@ asm void DBPrintf(const char* fmt, ...) {
     addi   r1, r1, 0x70
     blr
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800A2C58 - 0x800A2C58 | size: 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A2C58(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

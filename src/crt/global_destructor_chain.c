@@ -46,3 +46,19 @@ void __destroy_global_chain(void) {
         entry->destructor(entry->object, -1);
     }
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C46B0 - 0x800C46B0 | size: 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C46B0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

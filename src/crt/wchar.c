@@ -48,3 +48,19 @@ u32 wcstombs(char* dst, const wchar_t* src, u32 n) {
 
     return count;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C80D0 - 0x800C80D0 | size: 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C80D0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

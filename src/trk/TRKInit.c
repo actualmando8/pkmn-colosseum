@@ -321,3 +321,52 @@ asm void TRKLoadContext(register void* ctx, register u32 exceptionID) {
     /* Enter the interrupt handler */
     b       TRKInterruptHandler
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C2EAC - 0x800C2EAC | size: 0x1EC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C2EAC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3098 - 0x800C3098 | size: 0x134 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3098(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3218 - 0x800C3218 | size: 0x12C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3218(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3344 - 0x800C3344 | size: 0x58 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3344(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

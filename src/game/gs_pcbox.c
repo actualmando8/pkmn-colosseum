@@ -118,3 +118,187 @@ extern void* fn_8005DA18(void* data);
 
 /* lbl_803A2688: Working party data copy
  * Used during box operations to avoid corrupting the party until commit */
+
+/* =========================================================================
+ * Stubs for remaining GSpcbox functions (0x8001C064-0x8001FD48)
+ * ========================================================================= */
+
+/* 0x8001C064 | 0x754 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001C064(void) {
+    /* TODO: match -- 0x754 bytes at 0x8001C064 */
+}
+#pragma pop
+
+/* 0x8001C7B8 | 0xBC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001C7B8(void) {
+    /* TODO: match -- 0xBC0 bytes at 0x8001C7B8 */
+}
+#pragma pop
+
+/* 0x8001D378 | 0x2AC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D378(void) {
+    /* TODO: match -- 0x2AC bytes at 0x8001D378 */
+}
+#pragma pop
+
+/* 0x8001D718 | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D718(void) {
+    /* TODO: match -- 0xCC bytes at 0x8001D718 */
+}
+#pragma pop
+
+/* 0x8001D7E4 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D7E4(void) {
+    /* TODO: match -- 0x50 bytes at 0x8001D7E4 */
+}
+#pragma pop
+
+/* 0x8001D834 | 0xB4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D834(void) {
+    /* TODO: match -- 0xB4 bytes at 0x8001D834 */
+}
+#pragma pop
+
+/* 0x8001D8E8 | 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D8E8(void) {
+    /* TODO: match -- 0xAC bytes at 0x8001D8E8 */
+}
+#pragma pop
+
+/* 0x8001D994 | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001D994(void) {
+    /* TODO: match -- 0xCC bytes at 0x8001D994 */
+}
+#pragma pop
+
+/* 0x8001DACC | 0x4DC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001DACC(void) {
+    /* TODO: match -- 0x4DC bytes at 0x8001DACC */
+}
+#pragma pop
+
+/* 0x8001DFA8 | 0x64 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001DFA8(void) {
+    /* TODO: match -- 0x64 bytes at 0x8001DFA8 */
+}
+#pragma pop
+
+/* 0x8001E00C | 0x68 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001E00C(void) {
+    /* TODO: match -- 0x68 bytes at 0x8001E00C */
+}
+#pragma pop
+
+/* 0x8001E3E0 | 0xD4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001E3E0(void) {
+    /* TODO: match -- 0xD4 bytes at 0x8001E3E0 */
+}
+#pragma pop
+
+/* 0x8001E4B4 | 0xD8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001E4B4(void) {
+    /* TODO: match -- 0xD8 bytes at 0x8001E4B4 */
+}
+#pragma pop
+
+/* 0x8001E644 | 0x454 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001E644(void) {
+    /* TODO: match -- 0x454 bytes at 0x8001E644 */
+}
+#pragma pop
+
+/* 0x8001EA98 | 0x170 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001EA98(void) {
+    /* TODO: match -- 0x170 bytes at 0x8001EA98 */
+}
+#pragma pop
+
+/* 0x8001EC08 | 0x370 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001EC08(void) {
+    /* TODO: match -- 0x370 bytes at 0x8001EC08 */
+}
+#pragma pop
+
+/* 0x8001EF78 | 0x270 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001EF78(void) {
+    /* TODO: match -- 0x270 bytes at 0x8001EF78 */
+}
+#pragma pop
+
+/* 0x8001F1E8 | 0x11C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001F1E8(void) {
+    /* TODO: match -- 0x11C bytes at 0x8001F1E8 */
+}
+#pragma pop
+
+/* 0x8001F304 | 0xA44 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001F304(void) {
+    /* TODO: match -- 0xA44 bytes at 0x8001F304 */
+}
+#pragma pop
+
+/* 0x8001FD48 | 0x5E0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001FD48(void) {
+    /* TODO: match -- 0x5E0 bytes at 0x8001FD48 */
+}
+#pragma pop

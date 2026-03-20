@@ -50,3 +50,30 @@ s64 __OSGetSystemTime(void) {
     OSRestoreInterrupts(enabled);
     return time;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800A27FC - 0x800A27FC | size: 0x19C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A27FC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A2998 - 0x800A2998 | size: 0x204 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A2998(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

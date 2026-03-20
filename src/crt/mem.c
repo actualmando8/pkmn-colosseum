@@ -185,3 +185,63 @@ void* memchr(const void* src, int val, u32 count) {
     }
     return NULL;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C8174 - 0x800C8174 | size: 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C8174(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C8240 - 0x800C8240 | size: 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C8240(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C82EC - 0x800C82EC | size: 0xC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C82EC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C83AC - 0x800C83AC | size: 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C83AC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C8454 - 0x800C8454 | size: 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C8454(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

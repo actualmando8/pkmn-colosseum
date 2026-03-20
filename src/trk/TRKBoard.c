@@ -76,3 +76,41 @@ void ReserveEXI2Port(void) {
     CommFunc func = (CommFunc)((u32*)gDBCommTable)[9]; /* offset 0x24 */
     func();
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C3588 - 0x800C3588 | size: 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3588(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C35C4 - 0x800C35C4 | size: 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C35C4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3600 - 0x800C3600 | size: 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3600(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

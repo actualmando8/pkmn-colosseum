@@ -3,6 +3,7 @@
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSTime.h"
 #include "dolphin/os/OSContext.h"
+#include "dolphin/gx/GX.h"
 
 /*
  * VIFull.c - Full Video Interface implementation.
@@ -313,3 +314,217 @@ static void setInterruptRegs(void) {
 static void setScalingRegs(u16 panelWidth, u16 dispWidth) {
     /* Internal helper for VI scaling configuration */
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800AA498 - 0x800AA498 | size: 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA498(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AA4D4 - 0x800AA4D4 | size: 0x1A4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA4D4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AA678 - 0x800AA678 | size: 0xC4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA678(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AA73C - 0x800AA73C | size: 0xC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA73C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AA7FC - 0x800AA7FC | size: 0xD8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA7FC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AA8D4 - 0x800AA8D4 | size: 0x32C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AA8D4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AAC00 - 0x800AAC00 | size: 0x134 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AAC00(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AAD34 - 0x800AAD34 | size: 0x100 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AAD34(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AAE34 - 0x800AAE34 | size: 0x104 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AAE34(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AAF38 - 0x800AAF38 | size: 0x218 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AAF38(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB150 - 0x800AB150 | size: 0x3AC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB150(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB4FC - 0x800AB4FC | size: 0xB8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB4FC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB5B4 - 0x800AB5B4 | size: 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB5B4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB614 - 0x800AB614 | size: 0x174 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB614(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB788 - 0x800AB788 | size: 0x174 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB788(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800AB8FC - 0x800AB8FC | size: 0x3F8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800AB8FC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800ABCF4 - 0x800ABCF4 | size: 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800ABCF4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800ABD68 - 0x800ABD68 | size: 0x194 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800ABD68(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800ABEFC - 0x800ABEFC | size: 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800ABEFC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

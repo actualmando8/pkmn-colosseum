@@ -185,3 +185,63 @@ void TRKEXICallBack(s32 chan, void* ctx) {
     OSEnableScheduler();
     TRKLoadContext(ctx, 0x500);
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C39A0 - 0x800C39A0 | size: 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C39A0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C39B0 - 0x800C39B0 | size: 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C39B0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C39BC - 0x800C39BC | size: 0x84 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C39BC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3A40 - 0x800C3A40 | size: 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3A40(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C3AFC - 0x800C3AFC | size: 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C3AFC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

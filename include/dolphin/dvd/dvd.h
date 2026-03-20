@@ -91,16 +91,9 @@ void DVDPause(void);
 void DVDResume(void);
 s32  DVDGetCommandBlockStatus(DVDCommandBlock* block);
 
-/* FST globals */
-extern void*  __FSTStart;
-extern u32    __FSTMaxEntries;
-extern char*  __FSTStringStart;
-extern u32    __DVDCurrentDir;
+/* FST globals - actual types defined in individual .c files */
 
-/* __fstLoad */
-BOOL __fstLoad(void);
-
-/* __DVDPushWaitingQueue alternate signature */
-void __DVDPushWaitingQueue(DVDCommandBlock* block);
+/* __fstLoad - declared above as BOOL __fstLoad(void) via FST section */
+/* __DVDPushWaitingQueue - declared above as BOOL __DVDPushWaitingQueue(s32, DVDCommandBlock*) */
 
 #endif /* DOLPHIN_DVD_DVD_H */

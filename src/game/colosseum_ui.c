@@ -63,3 +63,12 @@ asm void fn_80039A84(void) { nofralloc
 }
 
 #pragma pop
+
+/* 0x8003AD6C | 0x118 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8003AD6C(void) {
+    /* TODO: match -- 0x118 bytes at 0x8003AD6C */
+}
+#pragma pop

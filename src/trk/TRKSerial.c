@@ -76,3 +76,30 @@ void TRKGetInput(void) {
         fn_800BE47C((void*)eventBuf); /* post event */
     }
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800BF14C - 0x800BF14C | size: 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800BF14C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800BF33C - 0x800BF33C | size: 0x88 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800BF33C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

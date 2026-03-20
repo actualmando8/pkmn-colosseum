@@ -60,3 +60,30 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     /* Trigger hardware reset via PI register */
     piReg[9] = (resetCode << 3) | 0x3;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800A064C - 0x800A064C | size: 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A064C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A06AC - 0x800A06AC | size: 0x118 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A06AC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

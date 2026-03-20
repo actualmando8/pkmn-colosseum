@@ -191,3 +191,63 @@ s32 fwide(__FILE* file, s32 mode) {
 
     return file->wideOrient;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C5500 - 0x800C5500 | size: 0x1A4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C5500(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C56A4 - 0x800C56A4 | size: 0x3B4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C56A4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C5A58 - 0x800C5A58 | size: 0x1784 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C5A58(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C71DC - 0x800C71DC | size: 0x278 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C71DC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C7558 - 0x800C7558 | size: 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C7558(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

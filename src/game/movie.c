@@ -419,3 +419,115 @@ void moviePlayGSLogo(void) {
 void moviePlayTPCLogo(void) {
     fn_801E189C(lbl_80267040, 0);
 }
+
+/* =========================================================================
+ * Stubs for remaining movie functions (0x800361C0-0x800366A4)
+ * ========================================================================= */
+
+/* 0x800361C0 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800361C0(void) {
+    /* TODO: match -- 0x50 bytes at 0x800361C0 */
+}
+#pragma pop
+
+/* 0x80036210 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80036210(void) {
+    /* TODO: match -- 0x30 bytes at 0x80036210 */
+}
+#pragma pop
+
+/* 0x80036240 | 0x120 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80036240(void) {
+    /* TODO: match -- 0x120 bytes at 0x80036240 */
+}
+#pragma pop
+
+/* 0x80036360 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80036360(void) {
+    /* TODO: match -- 0x50 bytes at 0x80036360 */
+}
+#pragma pop
+
+/* 0x800363B0 | 0x4 -- nop */
+void fn_800363B0(void) { }
+
+/* 0x800363B4 | 0x4 -- nop */
+void fn_800363B4(void) { }
+
+/* 0x800363B8 | 0x4 -- nop */
+void fn_800363B8(void) { }
+
+/* 0x800363BC | 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800363BC(void) {
+    /* TODO: match -- 0xAC bytes at 0x800363BC */
+}
+#pragma pop
+
+/* 0x80036468 | 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80036468(void) {
+    /* TODO: match -- 0x60 bytes at 0x80036468 */
+}
+#pragma pop
+
+/* 0x800364C8 | 0xE8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800364C8(void) {
+    /* TODO: match -- 0xE8 bytes at 0x800364C8 */
+}
+#pragma pop
+
+/* 0x800365B0 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800365B0(void) {
+    /* TODO: match -- 0x30 bytes at 0x800365B0 */
+}
+#pragma pop
+
+/* 0x800365E0 | 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800365E0(void) {
+    /* TODO: match -- 0x60 bytes at 0x800365E0 */
+}
+#pragma pop
+
+/* 0x80036640 | 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80036640(void) {
+    /* TODO: match -- 0x5C bytes at 0x80036640 */
+}
+#pragma pop
+
+/* 0x8003669C | 0x4 -- nop */
+void fn_8003669C(void) { }
+
+/* 0x800366A0 | 0x4 -- nop */
+void fn_800366A0(void) { }
+
+/* 0x800366A4 | 0x4 -- nop */
+void fn_800366A4(void) { }

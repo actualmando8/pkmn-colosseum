@@ -220,3 +220,256 @@ u32 fn_80020E9C(void) { return 0; }
 void fn_800216E0(u32 val) {
     lbl_8047A358 = val;
 }
+
+/* =========================================================================
+ * Stubs for remaining GStitle functions (0x80024438-0x80025F84)
+ * ========================================================================= */
+
+/* 0x80024438 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024438(void) {
+    /* TODO: match -- 0x4C bytes at 0x80024438 */
+}
+#pragma pop
+
+/* 0x80024484 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024484(void) {
+    /* TODO: match -- 0x4C bytes at 0x80024484 */
+}
+#pragma pop
+
+/* 0x800244D0 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800244D0(void) {
+    /* TODO: match -- 0x4C bytes at 0x800244D0 */
+}
+#pragma pop
+
+/* 0x8002451C | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002451C(void) {
+    /* TODO: match -- 0x4C bytes at 0x8002451C */
+}
+#pragma pop
+
+/* 0x80024568 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024568(void) {
+    /* TODO: match -- 0x4C bytes at 0x80024568 */
+}
+#pragma pop
+
+/* 0x800245B4 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800245B4(void) {
+    /* TODO: match -- 0x4C bytes at 0x800245B4 */
+}
+#pragma pop
+
+/* 0x80024600 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024600(void) {
+    /* TODO: match -- 0x4C bytes at 0x80024600 */
+}
+#pragma pop
+
+/* 0x8002464C | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002464C(void) {
+    /* TODO: match -- 0x4C bytes at 0x8002464C */
+}
+#pragma pop
+
+/* 0x80024698 | 0x4 -- nop */
+void fn_80024698(void) { }
+
+/* 0x8002469C | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002469C(void) {
+    /* TODO: match -- 0x30 bytes at 0x8002469C */
+}
+#pragma pop
+
+/* 0x800246CC | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800246CC(void) {
+    /* TODO: match -- 0x30 bytes at 0x800246CC */
+}
+#pragma pop
+
+/* 0x800246FC | 0x330 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800246FC(void) {
+    /* TODO: match -- 0x330 bytes at 0x800246FC */
+}
+#pragma pop
+
+/* 0x80024A2C | 0x178 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024A2C(void) {
+    /* TODO: match -- 0x178 bytes at 0x80024A2C */
+}
+#pragma pop
+
+/* 0x80024BA4 | 0x138 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024BA4(void) {
+    /* TODO: match -- 0x138 bytes at 0x80024BA4 */
+}
+#pragma pop
+
+/* 0x80024CDC | 0xE0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024CDC(void) {
+    /* TODO: match -- 0xE0 bytes at 0x80024CDC */
+}
+#pragma pop
+
+/* 0x80024DBC | 0x170 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024DBC(void) {
+    /* TODO: match -- 0x170 bytes at 0x80024DBC */
+}
+#pragma pop
+
+/* 0x80024F2C | 0x170 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80024F2C(void) {
+    /* TODO: match -- 0x170 bytes at 0x80024F2C */
+}
+#pragma pop
+
+/* 0x8002509C | 0x170 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002509C(void) {
+    /* TODO: match -- 0x170 bytes at 0x8002509C */
+}
+#pragma pop
+
+/* 0x8002520C | 0x170 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002520C(void) {
+    /* TODO: match -- 0x170 bytes at 0x8002520C */
+}
+#pragma pop
+
+/* 0x8002537C | 0x114 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8002537C(void) {
+    /* TODO: match -- 0x114 bytes at 0x8002537C */
+}
+#pragma pop
+
+/* 0x80025490 | 0x114 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025490(void) {
+    /* TODO: match -- 0x114 bytes at 0x80025490 */
+}
+#pragma pop
+
+/* 0x800255A4 | 0x18C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800255A4(void) {
+    /* TODO: match -- 0x18C bytes at 0x800255A4 */
+}
+#pragma pop
+
+/* 0x80025730 | 0x280 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025730(void) {
+    /* TODO: match -- 0x280 bytes at 0x80025730 */
+}
+#pragma pop
+
+/* 0x800259B0 | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800259B0(void) {
+    /* TODO: match -- 0xCC bytes at 0x800259B0 */
+}
+#pragma pop
+
+/* 0x80025A7C | 0x4 -- nop */
+void fn_80025A7C(void) { }
+
+/* 0x80025A80 | 0x19C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025A80(void) {
+    /* TODO: match -- 0x19C bytes at 0x80025A80 */
+}
+#pragma pop
+
+/* 0x80025C1C | 0x358 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025C1C(void) {
+    /* TODO: match -- 0x358 bytes at 0x80025C1C */
+}
+#pragma pop
+
+/* 0x80025F74 | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025F74(void) {
+    /* TODO: match -- 0x10 bytes at 0x80025F74 */
+}
+#pragma pop
+
+/* 0x80025F84 | 0x3EC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80025F84(void) {
+    /* TODO: match -- 0x3EC bytes at 0x80025F84 */
+}
+#pragma pop

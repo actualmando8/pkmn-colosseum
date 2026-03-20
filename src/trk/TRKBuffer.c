@@ -58,3 +58,19 @@ s32 TRKInitializeMessageBuffers(void) {
 
 /* Address: 0x800BF080 | Size: 0x8 | Pattern: return_constant */
 u32 fn_800BF080(void) { return 0; }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800BEF44 - 0x800BEF44 | size: 0xC8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800BEF44(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

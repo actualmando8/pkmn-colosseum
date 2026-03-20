@@ -321,3 +321,118 @@ u16 OSGetWirelessID(s32 chan) {
     __OSUnlockSramEx(FALSE);
     return id;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800A09B0 - 0x800A09B0 | size: 0x308 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A09B0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A0D10 - 0x800A0D10 | size: 0x124 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A0D10(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A0E34 - 0x800A0E34 | size: 0x80 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A0E34(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A0EB4 - 0x800A0EB4 | size: 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A0EB4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A0F58 - 0x800A0F58 | size: 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A0F58(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A0FC8 - 0x800A0FC8 | size: 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A0FC8(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A106C - 0x800A106C | size: 0x6C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A106C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A10D8 - 0x800A10D8 | size: 0x84 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A10D8(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A115C - 0x800A115C | size: 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A115C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800A1208 - 0x800A1208 | size: 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A1208(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

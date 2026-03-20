@@ -54,3 +54,63 @@ char* strchr(const char* str, int c) {
     }
     return NULL;
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800CA7BC - 0x800CA7BC | size: 0x40 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800CA7BC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800CA7FC - 0x800CA7FC | size: 0x128 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800CA7FC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800CA924 - 0x800CA924 | size: 0x44 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800CA924(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800CA968 - 0x800CA968 | size: 0xB8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800CA968(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800CAA3C - 0x800CAA3C | size: 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800CAA3C(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

@@ -148,3 +148,63 @@ asm void MWTRACE(s32 level, const char* fmt, ...) {
 void usr_put_initialize(void) {
     /* empty */
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C4F34 - 0x800C4F34 | size: 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C4F34(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C4FA4 - 0x800C4FA4 | size: 0x58 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C4FA4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C4FFC - 0x800C4FFC | size: 0x158 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C4FFC(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C5154 - 0x800C5154 | size: 0x294 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C5154(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C53E8 - 0x800C53E8 | size: 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C53E8(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

@@ -292,3 +292,19 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
         callback();
     }
 }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800A7F80 - 0x800A7F80 | size: 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800A7F80(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

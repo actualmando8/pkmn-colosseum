@@ -197,3 +197,151 @@ extern u8 lbl_8047A2A0;
 u8 fn_8000DAA8(void) {
     return lbl_8047A2A0;
 }
+
+/* =========================================================================
+ * Stubs for remaining GSnpcInteract functions (0x800111C4-0x80011EA4)
+ * ========================================================================= */
+
+/* 0x800111C4 | 0x24 -- small accessor */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800111C4(void) {
+    /* TODO: match -- 0x24 bytes at 0x800111C4 */
+}
+#pragma pop
+
+/* 0x800111E8 | 0x24 -- small accessor */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800111E8(void) {
+    /* TODO: match -- 0x24 bytes at 0x800111E8 */
+}
+#pragma pop
+
+/* 0x8001120C | 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8001120C(void) {
+    /* TODO: match -- 0x7C bytes at 0x8001120C */
+}
+#pragma pop
+
+/* 0x80011288 | 0x21C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011288(void) {
+    /* TODO: match -- 0x21C bytes at 0x80011288 */
+}
+#pragma pop
+
+/* 0x800114A4 | 0x25C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800114A4(void) {
+    /* TODO: match -- 0x25C bytes at 0x800114A4 */
+}
+#pragma pop
+
+/* 0x80011700 | 0xBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011700(void) {
+    /* TODO: match -- 0xBC bytes at 0x80011700 */
+}
+#pragma pop
+
+/* 0x800117BC | 0x1EC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800117BC(void) {
+    /* TODO: match -- 0x1EC bytes at 0x800117BC */
+}
+#pragma pop
+
+/* 0x800119A8 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800119A8(void) {
+    /* TODO: match -- 0x74 bytes at 0x800119A8 */
+}
+#pragma pop
+
+/* 0x80011A1C | 0x130 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011A1C(void) {
+    /* TODO: match -- 0x130 bytes at 0x80011A1C */
+}
+#pragma pop
+
+/* 0x80011B4C | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011B4C(void) {
+    /* TODO: match -- 0x78 bytes at 0x80011B4C */
+}
+#pragma pop
+
+/* 0x80011BC4 | 0xB4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011BC4(void) {
+    /* TODO: match -- 0xB4 bytes at 0x80011BC4 */
+}
+#pragma pop
+
+/* 0x80011C78 | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011C78(void) {
+    /* TODO: match -- 0x78 bytes at 0x80011C78 */
+}
+#pragma pop
+
+/* 0x80011CF0 | 0xAC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011CF0(void) {
+    /* TODO: match -- 0xAC bytes at 0x80011CF0 */
+}
+#pragma pop
+
+/* 0x80011D9C | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011D9C(void) {
+    /* TODO: match -- 0xCC bytes at 0x80011D9C */
+}
+#pragma pop
+
+/* 0x80011E68 | 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011E68(void) {
+    /* TODO: match -- 0x3C bytes at 0x80011E68 */
+}
+#pragma pop
+
+/* 0x80011EA4 | 0x9B4 -- GSnpc_WarpToLocation continued */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80011EA4(void) {
+    /* TODO: match -- 0x9B4 bytes at 0x80011EA4 */
+}
+#pragma pop

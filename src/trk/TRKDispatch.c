@@ -117,3 +117,84 @@ u32 fn_800C0CC8(void) { return 0; }
 
 /* Address: 0x800C0CD0 | Size: 0x8 | Pattern: return_constant */
 u32 fn_800C0CD0(void) { return 0; }
+
+/* ========================================================== */
+/* Stub functions for coverage - TODO: decompile              */
+/* ========================================================== */
+
+/* fn_800C04E8 - 0x800C04E8 | size: 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C04E8(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C04F4 - 0x800C04F4 | size: 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C04F4(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C0504 - 0x800C0504 | size: 0xA8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C0504(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C08C0 - 0x800C08C0 | size: 0x1E0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C08C0(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C0DA8 - 0x800C0DA8 | size: 0xB8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C0DA8(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+
+/* fn_800C0E68 - 0x800C0E68 | size: 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C0E68(void) {
+    nofralloc
+    blr
+}
+#pragma pop
+
+/* fn_800C0E70 - 0x800C0E70 | size: 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void fn_800C0E70(void) {
+    nofralloc
+    /* TODO: decompile */
+    blr
+}
+#pragma pop
+

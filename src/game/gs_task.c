@@ -453,3 +453,21 @@ u8 fn_80008174(void) {
 u8 fn_8000817C(void) {
     return lbl_8047A271;
 }
+
+/* 0x80008868 | 0x3D8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80008868(void) {
+    /* TODO: match -- 0x3D8 bytes at 0x80008868 */
+}
+#pragma pop
+
+/* 0x80008C40 | 0x538 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80008C40(void) {
+    /* TODO: match -- 0x538 bytes at 0x80008C40 */
+}
+#pragma pop

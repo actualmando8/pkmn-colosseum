@@ -133,3 +133,151 @@ extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color, u16 modelId);
  * Processes an overworld NPC event. Checks the NPC's event flags and
  * model type to determine the appropriate rendering and behavior.
  * ========================================================================= */
+
+/* =========================================================================
+ * Stubs for remaining GSnpcEvt functions (0x80031188-0x800330B8)
+ * ========================================================================= */
+
+/* 0x80031188 | 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031188(void) {
+    /* TODO: match -- 0xA0 bytes at 0x80031188 */
+}
+#pragma pop
+
+/* 0x80031228 | 0x1DC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031228(void) {
+    /* TODO: match -- 0x1DC bytes at 0x80031228 */
+}
+#pragma pop
+
+/* 0x80031404 | 0x244 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031404(void) {
+    /* TODO: match -- 0x244 bytes at 0x80031404 */
+}
+#pragma pop
+
+/* 0x80031648 | 0x290 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031648(void) {
+    /* TODO: match -- 0x290 bytes at 0x80031648 */
+}
+#pragma pop
+
+/* 0x800318D8 | 0x144 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800318D8(void) {
+    /* TODO: match -- 0x144 bytes at 0x800318D8 */
+}
+#pragma pop
+
+/* 0x80031A1C | 0x54 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031A1C(void) {
+    /* TODO: match -- 0x54 bytes at 0x80031A1C */
+}
+#pragma pop
+
+/* 0x80031A70 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031A70(void) {
+    /* TODO: match -- 0x50 bytes at 0x80031A70 */
+}
+#pragma pop
+
+/* 0x80031AC0 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031AC0(void) {
+    /* TODO: match -- 0x50 bytes at 0x80031AC0 */
+}
+#pragma pop
+
+/* 0x80031B10 | 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031B10(void) {
+    /* TODO: match -- 0x3C bytes at 0x80031B10 */
+}
+#pragma pop
+
+/* 0x80031B4C | 0x954 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80031B4C(void) {
+    /* TODO: match -- 0x954 bytes at 0x80031B4C */
+}
+#pragma pop
+
+/* 0x800324A0 | 0xC4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800324A0(void) {
+    /* TODO: match -- 0xC4 bytes at 0x800324A0 */
+}
+#pragma pop
+
+/* 0x80032564 | 0x28 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80032564(void) {
+    /* TODO: match -- 0x28 bytes at 0x80032564 */
+}
+#pragma pop
+
+/* 0x8003258C | 0x270 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8003258C(void) {
+    /* TODO: match -- 0x270 bytes at 0x8003258C */
+}
+#pragma pop
+
+/* 0x800327FC | 0x6DC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800327FC(void) {
+    /* TODO: match -- 0x6DC bytes at 0x800327FC */
+}
+#pragma pop
+
+/* 0x80032ED8 | 0x1E0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_80032ED8(void) {
+    /* TODO: match -- 0x1E0 bytes at 0x80032ED8 */
+}
+#pragma pop
+
+/* 0x800330B8 | 0x1C0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800330B8(void) {
+    /* TODO: match -- 0x1C0 bytes at 0x800330B8 */
+}
+#pragma pop
