@@ -49,37 +49,37 @@ src/game/gs_worldmap.c                    0x80026000  0x80030170  ~90   # GSWorl
 # TU 11: NPC event callbacks and overworld sprite rendering
 src/game/gs_npc_event.c                   0x80030170  0x80033278  ~30   # GSnpcEvt: event callbacks, trainer sprites, items
 
-# TU  3: Card-E menu
+# TU 12: Card-E menu
 src/game/menu/menu_carde.c                0x80033278  0x80034280  1   # menuCardE_Main (0x1008 bytes)
 
-# TU  4: Movie player
+# TU 13: Movie player
 src/game/movie.c                          0x80035E04  0x800366D0  ~10  # Movie playback (THP), opening/credits/autodemo
 
 # NOTE: Large unidentified region between movie.c and next known TU
 # UNIDENTIFIED                            0x800366D0  0x80059BDC  ~350  # Game utilities, save helpers
 
-# TU  5: UI Core (large state machine)
+# TU 14: UI Core (large state machine)
 # UNIDENTIFIED (ui_core.c?)               0x80059BDC  0x80069A60  ~103  # UI state machine, 0x30F4-byte fn
 
-# TU  6: Battle menu callbacks
+# TU 15: Battle menu callbacks
 src/game/menu/menu_battle.c               0x80069A60  0x80069C0C  1   # menuCB_Battle_Assert
 
 # NOTE: Unidentified menu code between battle CB and common CB
 # UNIDENTIFIED (menu related)             0x80069C0C  0x8007109C  ~100  # Menu system middle
 
-# TU  7: Common menu callbacks
+# TU 16: Common menu callbacks
 src/game/menu/menu_common.c               0x8007109C  0x8007162C  5   # Menu push/pop, asserts
 
-# TU  8: Battle tool menu
+# TU 17: Battle tool menu
 # (menuToolBattle.c)                      0x8007581C  0x80075A34  1   # Embedded in menu block
 
-# TU  9: Rule menu callbacks
+# TU 18: Rule menu callbacks
 # (menuCB_Rule.c)                         0x800767B8  0x80077A5C  4   # Rule handlers
 
-# TU 10: Extra Disc Shrine menu
+# TU 19: Extra Disc Shrine menu
 # (menuExDiscShrine.c)                    0x80077ED4  0x80078390  1   # Mt. Battle exchange
 
-# TU 11: Extra Disc Coupon menu
+# TU 20: Extra Disc Coupon menu
 # (menuExDiscCoupon.c)                    0x800792D8  0x800798E8  1   # Coupon exchange
 
 # TU 12: Poke Coupon menu
