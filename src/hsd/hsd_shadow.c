@@ -22,59 +22,23 @@
 
 /* Address: 0x801B019C | Size: 0x204 | Proposed: HSD_ShadowFunc1 */
 /* Shadow map initialization and projection matrix setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B019C(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B03A0 | Size: 0x68 | Proposed: HSD_ShadowFunc2 */
 /* Shadow texture coordinate generation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B03A0(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B0408 | Size: 0xD8 | Proposed: HSD_ShadowFunc3 */
 /* Shadow TEV stage configuration */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B0408(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B04E0 | Size: 0x1F4 | Proposed: HSD_ShadowFunc4 */
 /* Shadow map projection computation */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B04E0(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  Shadow state management                                                  */
@@ -82,45 +46,18 @@ void fn_801B04E0(void) {
 
 /* Address: 0x801B06DC | Size: 0x60 */
 /* Shadow state setter / initializer */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B06DC(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B073C | Size: 0x98 */
 /* Shadow map texture bind */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B073C(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B07D4 | Size: 0xAC */
 /* Shadow light direction setup */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B07D4(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  Main shadow rendering                                                    */
@@ -128,84 +65,30 @@ void fn_801B07D4(void) {
 
 /* Address: 0x801B0880 | Size: 0x218 | Proposed: HSD_ShadowFunc5 */
 /* Shadow pass setup - configures GX for shadow map rendering */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B0880(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B0A98 | Size: 0x140 | Proposed: HSD_ShadowFunc6 */
 /* Shadow receiver configuration */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B0A98(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B0BD8 | Size: 0x2E0 | Proposed: HSD_ShadowFunc7 */
 /* Shadow caster traversal and rendering */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B0BD8(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B0EB8 | Size: 0x66C | Proposed: HSD_ShadowMain */
 /* Main shadow system entry point - orchestrates shadow map gen and apply */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B0EB8(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B1524 | Size: 0x19C | Proposed: HSD_ShadowFunc9 */
 /* Shadow cleanup / restore GX state */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B1524(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801B16C0 | Size: 0x70 | Proposed: HSD_ShadowFunc10 */
 /* Shadow finalize - restore render state after shadow pass */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801B16C0(void) {
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop

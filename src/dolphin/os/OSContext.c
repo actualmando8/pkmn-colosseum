@@ -455,8 +455,10 @@ void fn_8009BBC4(void) {
 }
 
 /* fn_8009BBD0 - 0x8009BBD0 | size: 0x80 */
+/* OSSaveContext - saves full CPU context: GQRs, CR, LR, MSR, CTR, XER, SP */
 void fn_8009BBD0(void) {
     u32 tmp = 0;
+    u32 r1 = 0;
     u32 r2 = 0;
     u32 r3 = 0;
     u32 r13 = 0;
@@ -485,7 +487,7 @@ void fn_8009BBD0(void) {
     *(u32*)((u8*)r3 + 0x88) = tmp;
     /* mfxer tmp */;
     *(u32*)((u8*)r3 + 0x8C) = tmp;
-    *(u32*)((u8*)r3 + 0x4) = (u32)sp;
+    *(u32*)((u8*)r3 + 0x4) = r1;
     *(u32*)((u8*)r3 + 0x8) = r2;
     tmp = 0x1;
     *(u32*)((u8*)r3 + 0xC) = tmp;
@@ -494,20 +496,22 @@ void fn_8009BBD0(void) {
 }
 
 /* fn_8009BD30 - 0x8009BD30 | size: 0x30 */
+/* Stack pointer manipulation - uses r1 directly */
 void fn_8009BD30(void) {
     u32 tmp = 0;
+    u32 r1 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
 
-    r5 = (u32)sp;
+    r5 = r1;
     r4 += -8; *(u32*)r4 = r5;
-    (u32)sp = r4;
+    r1 = r4;
     *(u32*)((u8*)r5 + 0x4) = tmp;
     /* blrl  */;
-    r5 = *(u32*)((u8*)(u32)sp + 0x0);
+    r5 = *(u32*)((u8*)r1 + 0x0);
     tmp = *(u32*)((u8*)r5 + 0x4);
-    (u32)sp = r5;
+    r1 = r5;
     return;
 }
 

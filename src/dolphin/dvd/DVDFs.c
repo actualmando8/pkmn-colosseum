@@ -284,6 +284,7 @@ void fn_800A501C(void) {
     extern u8 lbl_803119B8[];
     extern void fn_800A4D28();
     extern void fn_800A5268();
+    u8 sp[0xA0];
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;

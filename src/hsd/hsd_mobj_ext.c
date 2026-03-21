@@ -22,32 +22,14 @@ extern u32 lbl_8047B2D4;
 
 /* Address: 0x801A8354 | Size: 0x68 */
 /* Material PE (pixel engine) setup helper */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A8354(void) {
     /* Pixel engine blend mode configuration */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A83BC | Size: 0x6C */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A83BC(void) {
     /* Pixel engine alpha compare setup */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* ========================================================================= */
 /*  Small accessor / utility functions                                       */
@@ -83,18 +65,9 @@ u32 fn_801A8458(HSD_MObj* mobj) {
 /* NOTE: fn_801A8470 is already in hsd_mobj.c */
 
 /* Address: 0x801A8478 | Size: 0x30 */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A8478(void) {
     /* Material color channel setup */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A84A8 | Size: 0xC */
 void fn_801A84A8(u8* obj) {
@@ -104,18 +77,9 @@ void fn_801A84A8(u8* obj) {
 }
 
 /* Address: 0x801A84B4 | Size: 0x30 */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A84B4(void) {
     /* Material alpha channel setup */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A84E4 | Size: 0xC */
 void fn_801A84E4(u8* obj) {
@@ -125,57 +89,21 @@ void fn_801A84E4(u8* obj) {
 }
 
 /* Address: 0x801A84F0 | Size: 0x34 */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A84F0(void) {
     /* GX channel control setup (diffuse) */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A8524 | Size: 0x4C */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A8524(void) {
     /* GX channel control setup (specular) */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A8570 | Size: 0x34 */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A8570(void) {
     /* GX channel ambient color setup */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop
 
 /* Address: 0x801A85A4 | Size: 0x4C */
-#pragma push
-#pragma force_active on
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801A85A4(void) {
     /* GX channel material color setup */
-    __asm {
-        nop
-        nop
-    };
 }
-#pragma pop

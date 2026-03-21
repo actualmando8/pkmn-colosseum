@@ -14082,6 +14082,7 @@ void fn_801ECAB0(void) {
     extern void fn_800C4C98();
     extern void fn_801ECF14();
     extern void fn_801ECFA4();
+    u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;

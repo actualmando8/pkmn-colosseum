@@ -60,10 +60,10 @@ typedef struct GSSceneRenderEntry {
 /** fn_80175B94 */ void*  GSscene_SpawnObject(u32 type, u32 param);
 /** fn_80175F44 */ u32    GSscene_GetObjectCount(void);
 /** fn_80177A64 */ void   GSscene_XFBCapture(u32 captureIndex);
-/** fn_80178AA8 */ void   GSscene_CameraUpdate(void* sceneObj);
-/** fn_80179020 */ void   GSscene_CameraInterpolate(void* camera);
+/** fn_80178AA8 */ void   GSscene_CameraUpdate(u32 sceneObj);
+/** fn_80179020 */ void   GSscene_CameraInterpolate(u32 camera);
 /** fn_80179FA4 */ void   GSscene_Init(void);
-/** fn_80176948 */ f32    GSscene_GetPositionX(void* obj);
+/** fn_80176948 */ f32    GSscene_GetPositionX(u32 obj);
 /** fn_8017697C */ f32    GSscene_GetPositionY(void* obj);
 /** fn_801769B0 */ f32    GSscene_GetPositionZ(void* obj);
 

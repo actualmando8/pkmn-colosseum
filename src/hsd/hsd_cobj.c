@@ -793,6 +793,7 @@ void fn_801943E4(HSD_CObj* cobj, f32 xmin, f32 xmax, f32 ymin, f32 ymax) {
 /* 0x80194400 | 0xA4 */
 void fn_80194400(void) {
     extern u8 lbl_8047D970[];
+    u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;

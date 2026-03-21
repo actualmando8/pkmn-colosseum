@@ -1247,7 +1247,7 @@ L_80178638:
  *   - offset 0x40: horizontal angle
  *   - offset 0x44: vertical angle
  * ================================================================== */
-void GSscene_CameraUpdate(void* sceneObj) {
+void GSscene_CameraUpdate(u32 sceneObj) {
     extern u8 lbl_8036C248[];
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D728[];
@@ -1524,7 +1524,7 @@ if ((u32)sceneObj == 0) goto L_80178E70;
     *(f32*)((u8*)sceneObj + 0x1C) = f29;
 L_80178E70:
     r4 = *(u32*)&lbl_80478C40;
-sceneObj = (void*)(u32)sp + 0x1c;
+sceneObj = (u32)sp + 0x1c;
     f1 = *(f32*)lbl_8047D740;
     *(f32*)((u8*)r4 + 0x44) = f29;
     r4 = *(u32*)&lbl_80478C40;
@@ -1568,17 +1568,17 @@ if ((u32)sceneObj == 0) goto L_80178F24;
     *(f32*)((u8*)sceneObj + 0x20) = f29;
 L_80178F24:
     r4 = *(u32*)&lbl_80478C40;
-sceneObj = (void*)(u32)sp + 0x34;
+sceneObj = (u32)sp + 0x34;
     *(f32*)((u8*)r4 + 0x14) = f29;
     r4 = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)r4 + 0x14);
     ((void(*)(void))fn_800E0518)();
-sceneObj = (void*)(u32)sp + 0x1c;
+sceneObj = (u32)sp + 0x1c;
     r4 = (u32)sp + 0x34;
 r5 = (u32)sceneObj;
     ((void(*)(void))fn_800DFF98)();
     r5 = *(u32*)&lbl_80478C40;
-sceneObj = (void*)(u32)sp + 0x28;
+sceneObj = (u32)sp + 0x28;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
@@ -1626,7 +1626,7 @@ L_80178FEC:
  *
  * Interpolate the camera between two states. 996 bytes.
  * ================================================================== */
-void GSscene_CameraInterpolate(void* camera) {
+void GSscene_CameraInterpolate(u32 camera) {
     extern u8 lbl_80315540[];
     extern u8 lbl_8031554C[];
     extern u8 lbl_80315558[];
@@ -1714,25 +1714,25 @@ L_801790E8:
 camera = (void*)(u32)lbl_80315540;
     r4 = (u32)lbl_80315540;
     f1 = *(f32*)((u8*)r5 + 0x10);
-camera = (void*)(u32)sp + 0x54;
+camera = (u32)sp + 0x54;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
 camera = (void*)(u32)lbl_8031554C;
     r4 = (u32)lbl_8031554C;
     f1 = *(f32*)((u8*)r5 + 0x14);
-camera = (void*)(u32)sp + 0x44;
+camera = (u32)sp + 0x44;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
 camera = (void*)(u32)lbl_80315558;
     r4 = (u32)lbl_80315558;
     f1 = *(f32*)((u8*)r5 + 0x18);
-camera = (void*)(u32)sp + 0x34;
+camera = (u32)sp + 0x34;
     fn_800E0718();
-camera = (void*)(u32)sp + 0x24;
+camera = (u32)sp + 0x24;
     r4 = (u32)sp + 0x54;
     r5 = (u32)sp + 0x34;
     fn_800E0738();
-camera = (void*)(u32)sp + 0x24;
+camera = (u32)sp + 0x24;
     r4 = (u32)sp + 0x44;
 r5 = (u32)camera;
     fn_800E0738();
@@ -1790,18 +1790,18 @@ tmp = (u32)camera & 0x00000800;
     f0 = -f28;
     f3 = *(f32*)lbl_8047D740;
     f1 = f29 / f30;
-camera = (void*)(u32)sp + 0x18;
+camera = (u32)sp + 0x18;
     f2 = f0 / f30;
     ((void(*)(void))fn_800E01F4)();
     goto L_80179268;
 L_80179254:
     f1 = f29 / f30;
     f2 = *(f32*)lbl_8047D740;
-camera = (void*)(u32)sp + 0x18;
+camera = (u32)sp + 0x18;
     f3 = f28 / f30;
     ((void(*)(void))fn_800E01F4)();
 L_80179268:
-camera = (void*)(u32)sp + 0x64;
+camera = (u32)sp + 0x64;
     r4 = (u32)sp + 0x24;
     r5 = (u32)sp + 0x18;
     fn_800DFEEC();
@@ -2313,13 +2313,13 @@ L_80175F64:
  *   lfs fX, offset(r3)
  *   blr
  * ================================================================== */
-f32 GSscene_GetPositionX(void* obj) {
+f32 GSscene_GetPositionX(u32 obj) {
     extern void fn_800E01D0();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r4 = 0;
 
-obj = (void*)(u32)sp + 0x8;
+obj = (u32)sp + 0x8;
     ((void(*)(void))fn_800E01F4)();
 obj = (void*)*(u32*)&lbl_80478C40;
     r4 = (u32)sp + 0x8;
