@@ -14763,8 +14763,8 @@ u32 fn_8011ED68(u32 arg1) {
 /* 0x8011EDC4 | 0x34 */
 void* fn_8011EDC4(u8* ptr, u16 idx) {
     if (ptr == NULL) { return NULL; }
-    if ((u16)idx >= 1) { return NULL; }
-    return ptr + (u32)(u16)idx * 16 + 0xE8;
+    if (idx >= 1) { return NULL; }
+    return ptr + idx * 16 + 0xE8;
 }
 
 /* 0x8011EE70 | 44 bytes | compound_getter */
