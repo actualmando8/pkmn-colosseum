@@ -10041,32 +10041,14 @@ L_802266D8: ;
 #pragma pop
 
 /* Address: 0x802266EC | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_802266EC(void* ctx, u32 slot, u32 param) {
     extern void fn_801F025C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r3 = 0x11;
-    r4 = 0x0;
-    fn_801F025C();
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = *(u32*)&lbl_8047B610;
-    r0 = r3 + 0x1;
-    *(u32*)&lbl_8047B610 = r0;
-    return;
+    u32 r;
+    fn_801F025C(0x11, 0);
+    r = (u32)fn_8012640C(0, 0, 0xd9, 0);
+    *(u32*)&lbl_8047B610 = *(u32*)&lbl_8047B610 + 1;
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x80226730 | Size: 0xB8 */
 #pragma push
@@ -22355,38 +22337,14 @@ L_80233190: ;
 #pragma pop
 
 /* Address: 0x802331A4 | Size: 0x50 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_802331A4(void* ctx, u32 slot, u32 param) {
     extern void fn_801FE7EC();
-    extern void fn_801FECD4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* stmw r30, 0x8(r1) */;
-    r30 = r3;
-    r31 = r4;
-    fn_801FECD4();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) goto L_802331E0;
-    r3 = r30;
-    r4 = r31;
-    r5 = 0x0;
-    r6 = 0x0;
-    fn_801FE7EC();
-L_802331E0: ;
-    /* lmw r30, 0x8(r1) */;
-    return;
+    extern u32 fn_801FECD4();
+    if ((fn_801FECD4() & 0xFF) == 1) {
+        fn_801FE7EC(ctx, slot, 0, 0);
+    }
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x802331F4 | Size: 0xBBC (3004 bytes) */
 #pragma push
