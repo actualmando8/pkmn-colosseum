@@ -22257,14 +22257,14 @@ L_80251138: ;
 #pragma pop
 
 /* Address: 0x80251158 | Size: 0x3C | Pattern: simple_wrapper */
-extern u32 fn_80211170(void* ctx, u32 p1, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6);
-u32 fn_80251158(void* ctx, u32 param1, u32 param2) {
-    return fn_80211170(ctx, param2, param1, 0, 0, 0, 0);
+extern u32 fn_80211170(void* ctx, u32 p1, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6, u32 p7);
+u32 fn_80251158(void* ctx, u32 param1, u32 param2, u32 param3) {
+    return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0);
 }
 
 /* Address: 0x80251194 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80251194(void* ctx, u32 param1, u32 param2) {
-    return fn_80211170(ctx, param2, param1, 0, 0, 0, 0);
+u32 fn_80251194(void* ctx, u32 param1, u32 param2, u32 param3) {
+    return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0);
 }
 
 /* Address: 0x802511E0 | Size: 0x84 | Pattern: field_accessor */
