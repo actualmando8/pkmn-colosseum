@@ -465,8 +465,91 @@ def convert_state_dispatch(parsed, check_47e=True):
             continue
         else_body.append(l)
 
-    # --- Convert else branch: simulate register dataflow ---
-    converted_else = simulate_else_branch(else_body, param_saves, param_names, reg_decls)
+    # --- Simulate register state from function start to else entry ---
+    # Build initial register state from param mapping
+    entry_state = {}
+    for reg, pname in param_names.items():
+        entry_state[reg] = pname
+
+    # Simulate lines from start up to else label to get register state at else entry
+    for i in range(else_start):
+        l = clean[i]
+        if l.startswith('if (') or l.startswith('goto ') or l.startswith('L_'):
+            continue
+        if l in ('/* crclr cr1eq */;', '/* crset cr1eq */;'):
+            continue
+
+        # Track assignments using the same logic as simulate_else_branch
+        m = re.match(r'^(r\d+) = \*\(u32\*\)lbl_8047AA80;$', l)
+        if m:
+            entry_state[m.group(1)] = 'state'
+            continue
+        m = re.match(r'^(r\d+) = \(u32\)(fn_[0-9a-fA-F]+);$', l)
+        if m:
+            entry_state[m.group(1)] = f'(u32){m.group(2)}'
+            continue
+        m = re.match(r'^(r\d+) = \(u32\)(&?lbl_[0-9a-fA-F]+(?:\[\])?);$', l)
+        if m:
+            entry_state[m.group(1)] = f'(u32){m.group(2)}'
+            continue
+        m = re.match(r'^(r\d+) = (0x[0-9a-fA-F]+|-?\d+);$', l)
+        if m:
+            entry_state[m.group(1)] = m.group(2)
+            continue
+        m = re.match(r'^(r\d+) = (r\d+);$', l)
+        if m:
+            entry_state[m.group(1)] = entry_state.get(m.group(2), m.group(2))
+            continue
+        m = re.match(r'^(r\d+) = (r\d+) << (\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            entry_state[m.group(1)] = f'({src} << {m.group(3)})'
+            continue
+        m = re.match(r'^(r\d+) = (r\d+) \* (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            entry_state[m.group(1)] = f'({src} * {m.group(3)})'
+            continue
+        m = re.match(r'^(r\d+) = (r\d+) \+ (r\d+);$', l)
+        if m:
+            lhs = entry_state.get(m.group(2), m.group(2))
+            rhs = entry_state.get(m.group(3), m.group(3))
+            entry_state[m.group(1)] = f'({lhs} + {rhs})'
+            continue
+        m = re.match(r'^(r\d+) = (r\d+) \+ (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            entry_state[m.group(1)] = f'({src} + {m.group(3)})'
+            continue
+        m = re.match(r'^(r\d+) = (r\d+) & (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            mask = m.group(3)
+            if mask == '0xFF':
+                entry_state[m.group(1)] = f'(u8){src}'
+            elif mask == '0xFFFF':
+                entry_state[m.group(1)] = f'(u16){src}'
+            else:
+                entry_state[m.group(1)] = f'({src} & {mask})'
+            continue
+        m = re.match(r'^(r\d+) = \(s8\)(r\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            entry_state[m.group(1)] = f'(s8){src}'
+            continue
+        m = re.match(r'^(r\d+) = \(s16\)(r\d+);$', l)
+        if m:
+            src = entry_state.get(m.group(2), m.group(2))
+            entry_state[m.group(1)] = f'(s16){src}'
+            continue
+        m = re.match(r'^(r\d+) = \*\((u32|u16|u8|s32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\);$', l)
+        if m:
+            base = entry_state.get(m.group(3), m.group(3))
+            entry_state[m.group(1)] = f'*({m.group(2)}*)((u8*){base} + {m.group(4)})'
+            continue
+
+    # --- Convert else branch with full register state context ---
+    converted_else = simulate_else_branch_with_state(else_body, entry_state)
 
     if converted_else is None:
         return None

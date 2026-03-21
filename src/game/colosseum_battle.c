@@ -184,7 +184,7 @@ void fn_80240BD0(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
@@ -922,7 +922,7 @@ void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
@@ -2009,11 +2009,10 @@ void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3) {
     f32 f0 = 0.0f;
     f32 f4 = 0.0f;
     f32 f8 = 0.0f;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
@@ -3223,11 +3222,10 @@ void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
     f32 f1 = 0.0f;
     f32 f3 = 0.0f;
     f32 f5 = 0.0f;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r31 = r4;
     r29 = r3;
@@ -5129,7 +5127,6 @@ void fn_80241660(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r6 = 0x1;
     r7 = 0x1;
@@ -6317,12 +6314,11 @@ void fn_80242730(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
 
-    f1 = *(f32*)lbl_8047E638;
+    f1 = *(f32*)(u32)lbl_8047E638;
     r30 = r5;
     r28 = r3;
     r29 = r4;
@@ -6350,7 +6346,7 @@ void fn_80242730(void* ctx, u32 param1, u32 param2, u32 param3) {
     fn_80239EE8();
     goto L_80242888;
 L_802427B4:
-    f1 = *(f32*)lbl_8047E63C;
+    f1 = *(f32*)(u32)lbl_8047E63C;
     r3 = r28;
     r4 = r29;
     r5 = -0x1;
@@ -6376,7 +6372,7 @@ L_802427B4:
     fn_80239EE8();
     goto L_80242888;
 L_80242820:
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r3 = r28;
     r4 = r29;
     r5 = -0x1;
@@ -6813,11 +6809,10 @@ void fn_80242DB0(void* ctx, u32 param1, u32 param2) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
 
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r29 = r4;
     r30 = r5;
     r28 = r3;
@@ -7805,7 +7800,6 @@ void fn_80243A0C(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
@@ -7819,7 +7813,7 @@ void fn_80243A0C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r31 = r3;
     r0 = r3 & 0xFF;
     if ((u32)r0 != (u32)0x1) goto L_80243AB0;
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r3 = r27;
     r4 = r28;
     r5 = 0x1;
@@ -7847,7 +7841,7 @@ void fn_80243A0C(void* ctx, u32 param1, u32 param2, u32 param3) {
 L_80243AB0:
     r0 = r31 & 0xFF;
     if ((u32)r0 != (u32)0x1) goto L_80243B24;
-    f1 = *(f32*)lbl_8047E640;
+    f1 = *(f32*)(u32)lbl_8047E640;
     r3 = r27;
     r4 = r28;
     r5 = -0x1;
@@ -8037,7 +8031,6 @@ void fn_80243CD8(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
@@ -8116,7 +8109,7 @@ L_80243DB8:
     r10 = 0x16a;
     fn_80239EE8();
 L_80243E0C:
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r3 = r31;
     r4 = r30;
     r5 = -0x1;
@@ -9853,7 +9846,6 @@ void fn_80245578(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
@@ -9885,7 +9877,7 @@ L_802455B0:
     r10 = 0x148;
     fn_80239EE8();
 L_802455F8:
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r3 = r30;
     r4 = r28;
     r5 = -0x1;
@@ -9973,11 +9965,10 @@ void fn_80245718(void* ctx, u32 param1, u32 param2) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
 
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r30 = r5;
     r28 = r3;
     r29 = r4;
@@ -10029,7 +10020,6 @@ void fn_802457B0(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
@@ -10062,7 +10052,7 @@ void fn_802457B0(void* ctx, u32 param1, u32 param2, u32 param3) {
     r10 = 0x144;
     fn_80239EE8();
 L_80245834:
-    f1 = *(f32*)lbl_8047E630;
+    f1 = *(f32*)(u32)lbl_8047E630;
     r3 = r27;
     r4 = r28;
     r5 = -0x1;
@@ -12775,7 +12765,6 @@ void fn_80248D3C(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r29 = r5;
     r27 = r3;
@@ -12958,7 +12947,6 @@ void fn_80248FC4(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r28 = r6;
     r26 = r4;
@@ -15552,7 +15540,6 @@ void fn_8024B474(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r29 = r4;
     r28 = r5;
@@ -16327,7 +16314,6 @@ void fn_8024BFC0(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r4 = param1;
     u32 r5 = param2;
     u32 r6 = param3;
-    f32 f32 = 0.0f;
 
     r29 = r4;
     r28 = r5;
@@ -25892,7 +25878,6 @@ u32 fn_80255AE4(void* ctx, u32 slot, u32 param) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = slot;
     u32 r5 = param;
 
@@ -25905,7 +25890,7 @@ u32 fn_80255AE4(void* ctx, u32 slot, u32 param) {
     r3 = 0x0;
     goto L_80255B38;
 L_80255B14:
-    f1 = *(f32*)lbl_8047E648;
+    f1 = *(f32*)(u32)lbl_8047E648;
     r3 = r30;
     r4 = r31;
     r5 = 0x0;
@@ -26642,7 +26627,6 @@ u32 fn_802564C8(void* ctx, u32 slot, u32 param) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = slot;
     u32 r5 = param;
 
@@ -26651,7 +26635,7 @@ u32 fn_802564C8(void* ctx, u32 slot, u32 param) {
     fn_80235AA0();
     r0 = r3 & 0xFF;
     if ((u32)r0 >= (u32)0xc) goto L_8025650C;
-    f1 = *(f32*)lbl_8047E64C;
+    f1 = *(f32*)(u32)lbl_8047E64C;
     r3 = r30;
     r4 = r31;
     r5 = -0x1;
@@ -29513,7 +29497,6 @@ u32 fn_80258A64(void* ctx, u32 slot, u32 param) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = slot;
     u32 r5 = param;
 
@@ -29526,7 +29509,7 @@ u32 fn_80258A64(void* ctx, u32 slot, u32 param) {
     r3 = 0x0;
     goto L_80258ABC;
 L_80258A98:
-    f1 = *(f32*)lbl_8047E650;
+    f1 = *(f32*)(u32)lbl_8047E650;
     r3 = r30;
     r4 = r31;
     r5 = -0x1;
@@ -31831,7 +31814,6 @@ void fn_8025A870(void* ctx, u32 param1, u32 param2) {
     u32 r30 = 0;
     u32 r31 = 0;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
 
@@ -31852,7 +31834,7 @@ L_8025A8A4:
     r3 = 0x0;
     goto L_8025A8E8;
 L_8025A8C4:
-    f1 = *(f32*)lbl_8047E648;
+    f1 = *(f32*)(u32)lbl_8047E648;
     r3 = r30;
     r4 = r31;
     r5 = 0x0;
@@ -34505,7 +34487,6 @@ void fn_8025CB3C(void* ctx, u32 param1, u32 param2) {
     u32 r1 = (u32)sp;
     u32 r4 = param1;
     u32 r5 = param2;
-    f32 f32 = 0.0f;
 
     r5 = 0xf7;
     r6 = 0x0;
@@ -34891,7 +34872,6 @@ void fn_8025D0A8(void* ctx, u32 param1, u32 param2) {
     u32 r31 = 0;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
 
@@ -34930,8 +34910,8 @@ L_8025D120:
 L_8025D128:
     r31 = r31 + 0x1;
     if ((s32)r31 < (s32)0x6) goto L_8025D0D8;
-    f1 = *(f32*)lbl_8047E658;
-    f0 = *(f32*)lbl_8047E65C;
+    f1 = *(f32*)(u32)lbl_8047E658;
+    f0 = *(f32*)(u32)lbl_8047E65C;
     ctr_fn = (void(*)(void))r30;
     if ((s32)r30 <= (s32)0x0) goto L_8025D150;
 L_8025D148:
@@ -34964,8 +34944,6 @@ void fn_8025D164(void* ctx, u32 param1, u32 param2, u32 param3) {
     u32 r31 = 0;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
-    f32 f32 = 0.0f;
-    f32 f64 = 0.0f;
     u32 r4 = param1;
     u32 r5 = param2;
 
@@ -35006,8 +34984,8 @@ L_8025D1E4:
 L_8025D1EC:
     r29 = r29 + 0x1;
     if ((s32)r29 < (s32)0x6) goto L_8025D194;
-    f1 = *(f32*)lbl_8047E658;
-    f0 = *(f32*)lbl_8047E65C;
+    f1 = *(f32*)(u32)lbl_8047E658;
+    f0 = *(f32*)(u32)lbl_8047E65C;
     ctr_fn = (void(*)(void))r28;
     if ((s32)r28 <= (s32)0x0) goto L_8025D214;
 L_8025D20C:
@@ -35024,7 +35002,7 @@ L_8025D234:
     r3 = (u32)lbl_8039A664;
     r0 = r0 << 2;
     r3 = (u32)lbl_8039A664;
-    f0 = *(f32*)(r3 + r0);
+    f0 = *(f32*)(void*)(r3 + r0);
     f1 = f1 * f0;
     goto L_8025D26C;
 L_8025D24C:
@@ -35034,11 +35012,11 @@ L_8025D258:
     r3 = (u32)lbl_8039A648;
     r0 = r27 << 2;
     r3 = (u32)lbl_8039A648;
-    f0 = *(f32*)(r3 + r0);
+    f0 = *(f32*)(void*)(r3 + r0);
     f1 = f1 * f0;
 L_8025D26C:
     f0 = (f64)(s32)f1;
-    *(f64*)(sp + 0x8) = f0;
+    *(f64*)(void*)(sp + 0x8) = f0;
     r3 = *(u32*)(sp + 0xC);
     return;
 }
@@ -35062,7 +35040,6 @@ void fn_8025D2D4(void* ctx, u32 param1, u32 param2) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
     u32 r4 = param1;
-    f32 f32 = 0.0f;
 
     r31 = r4;
     fn_8006B09C();
@@ -35595,9 +35572,6 @@ u32 fn_8025DBD4(u32 idx) {
     extern u8 lbl_80478E08[];
     extern u8 lbl_80478E0C[];
     extern void fn_800DD970();
-    u32 r1 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
 
     u32 count;
     u32* table;
