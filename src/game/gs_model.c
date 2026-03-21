@@ -2633,18 +2633,11 @@ L_80101D3C: ;
 
 /* 0x80101D5C | 0x30 */
 void fn_80101D5C(void) {
-    extern void fn_800B8C58();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
+    extern void fn_800B8C58(u32);
 
-    r0 = *(u32*)&lbl_8047ACF0;
-    if ((s32)r0 == (s32)0x0) goto L_80101D7C;
-    r3 = 0x3;
-    fn_800B8C58();
-L_80101D7C: ;
-    return;
+    if (lbl_8047ACF0 != 0) {
+        fn_800B8C58(3);
+    }
 }
 
 /* 0x80101D8C | 0x22C */

@@ -1,42 +1,25 @@
 #!/usr/bin/env python3
 """
-Convert pragma-guarded register-level C to idiomatic C89 for Pokemon Colosseum decomp.
+Convert pragma-guarded register-level C to idiomatic C89.
+Pokemon Colosseum decomp -- gs_render.c and gs_field_world.c
 
-This script processes gs_render.c and gs_field_world.c, converting all
-pragma-guarded functions from register-level pseudocode to idiomatic C89
-that matches when compiled with CW GC/1.2.5n or GC/1.3 at -O4,p.
-
-Patterns handled:
-1. GSgfx state check + fn_800D4F98 dispatch (with 0x47E check)
-2. Simple state check + fn_800D4F98 dispatch (without 0x47E check)
-3. State check + fn_800D6B00 + store pattern
-4. Generic cleanup (remove register boilerplate, keep logic)
+Full register data-flow analysis + semantic conversion.
 """
 
 import re
 import sys
 import os
-import copy
 
 
-def parse_pragma_blocks(lines):
-    """
-    Parse file into a list of segments:
-    - ('code', line_list): regular code
-    - ('pragma', start, end, block_lines): pragma-guarded function
-    """
-    segments = []
+def extract_blocks(filepath):
+    """Extract pragma blocks with their surrounding context."""
+    with open(filepath, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    blocks = []
     i = 0
-    current_code = []
-
     while i < len(lines):
         if lines[i].strip() == '#pragma push':
-            # Save any accumulated code
-            if current_code:
-                segments.append(('code', current_code))
-                current_code = []
-
-            # Find matching #pragma pop
             start = i
             depth = 1
             j = i + 1
@@ -46,568 +29,756 @@ def parse_pragma_blocks(lines):
                 elif lines[j].strip() == '#pragma pop':
                     depth -= 1
                 j += 1
-            end = j  # line after #pragma pop
-            segments.append(('pragma', start, end, lines[start:end]))
-            i = end
+            blocks.append((start, j, lines[start:j]))
+            i = j
         else:
-            current_code.append(lines[i])
             i += 1
-
-    if current_code:
-        segments.append(('code', current_code))
-
-    return segments
+    return lines, blocks
 
 
-def extract_func_info(block_lines):
-    """Extract function name, signature, extern declarations, and body from pragma block."""
-    sig_line = None
+def parse_block(block_lines):
+    """Parse a pragma block into structured info."""
+    text = ''.join(block_lines)
+    lines_stripped = [l.rstrip('\n') for l in block_lines]
+
+    # Find function signature
+    sig = None
     sig_idx = None
+    for i, l in enumerate(lines_stripped):
+        s = l.strip()
+        if s.startswith('#pragma'):
+            continue
+        if s.startswith('/*'):
+            continue
+        if '(' in s and '{' in s:
+            for prefix in ['void ', 'u32 ', 'u8 ', 's32 ', 'u16 ', 's16 ',
+                          'f32 ', 'f64 ', 'BOOL ', 'int ', 'u8* ',
+                          'void* ', 'u32* ', 's32* ', 'u16* ']:
+                if s.startswith(prefix):
+                    sig = s.rstrip(' {').rstrip('{').rstrip() + ' {'
+                    sig_idx = i
+                    break
+            if sig:
+                break
+
+    if sig is None:
+        return None
+
+    # Extract function name
+    m = re.search(r'(\w+)\s*\(', sig)
+    func_name = m.group(1) if m else '???'
+
+    # Extract declared params from signature
+    m = re.search(r'\(([^)]*)\)', sig)
+    params_str = m.group(1).strip() if m else ''
+    if params_str == 'void' or params_str == '':
+        declared_params = []
+    else:
+        declared_params = [p.strip() for p in params_str.split(',')]
+
+    # Extract externs and body
     externs = []
-    comment_before = []
-    body_lines = []
+    typedefs = []
+    body = []
     in_body = False
     brace_depth = 0
 
-    for i, line in enumerate(block_lines):
-        s = line.strip()
-
-        # Skip pragma directives
-        if s in ('#pragma push', '#pragma pop',
-                 '#pragma optimization_level 0',
-                 '#pragma optimizewithasm off'):
+    for i, l in enumerate(lines_stripped):
+        s = l.strip()
+        if s.startswith('#pragma'):
             continue
-
-        # Collect comments before function
-        if not in_body and (s.startswith('/*') or s.startswith('*') or s.startswith('//')):
-            comment_before.append(line)
+        if i == sig_idx:
+            in_body = True
+            brace_depth = s.count('{') - s.count('}')
             continue
+        if not in_body:
+            continue
+        if s.startswith('extern '):
+            externs.append(s)
+            continue
+        if s.startswith('typedef '):
+            typedefs.append(s)
+            continue
+        body.append(s)
 
-        # Find function signature
-        if not in_body and sig_line is None and '(' in s:
-            # Check if this looks like a function definition
-            if any(s.startswith(t) for t in ['void ', 'u32 ', 'u8 ', 's32 ', 'u16 ', 's16 ',
-                                              'f32 ', 'f64 ', 'BOOL ', 'int ', 'u8* ',
-                                              'void* ', 'u32* ', 's32* ']):
-                sig_line = line
-                sig_idx = i
-                if '{' in s:
-                    brace_depth += s.count('{') - s.count('}')
-                    in_body = True
-                continue
-            elif s == '{':
-                brace_depth = 1
-                in_body = True
-                continue
+    # Remove trailing } and empty lines
+    while body and body[-1] in ('}', '', '#pragma pop'):
+        body.pop()
 
-        if sig_line is not None and not in_body:
-            if s == '{':
-                brace_depth = 1
-                in_body = True
-                continue
-
-        if in_body:
-            if s.startswith('extern '):
-                externs.append(line)
-                continue
-            if s.startswith('typedef '):
-                externs.append(line)
-                continue
-            body_lines.append(line)
-
-    # Extract function name
-    func_name = None
-    if sig_line:
-        m = re.search(r'(\w+)\s*\(', sig_line)
+    # Extract register declarations and their initial values
+    reg_decls = {}
+    clean_body = []
+    for l in body:
+        m = re.match(r'^(u32) (r\d+) = (.+);$', l)
         if m:
-            func_name = m.group(1)
+            reg_decls[m.group(2)] = m.group(1)
+            continue
+        m = re.match(r'^(f32|f64) (f\d+) = (.+);$', l)
+        if m:
+            reg_decls[m.group(2)] = m.group(1)
+            continue
+        if re.match(r'^u8 sp\[', l):
+            continue
+        if re.match(r'^void \(\*ctr_fn\)', l):
+            reg_decls['ctr_fn'] = 'void(*)(void)'
+            continue
+        if re.match(r'^u32 ctr = 0;', l):
+            reg_decls['ctr'] = 'u32'
+            continue
+        clean_body.append(l)
 
     return {
         'name': func_name,
-        'sig_line': sig_line,
+        'sig': sig,
+        'declared_params': declared_params,
         'externs': externs,
-        'comment_before': comment_before,
-        'body_lines': body_lines,
+        'typedefs': typedefs,
+        'reg_decls': reg_decls,
+        'body': clean_body,
     }
 
 
-def is_reg_decl(line):
-    """Check if line is a register variable declaration."""
-    s = line.strip()
-    if re.match(r'^u32 r\d+ = ', s):
-        return True
-    if re.match(r'^f32 f\d+ = ', s):
-        return True
-    if re.match(r'^f64 f\d+ = ', s):
-        return True
-    if re.match(r'^void \(\*ctr_fn\)', s):
-        return True
-    if re.match(r'^u32 ctr = 0;', s):
-        return True
-    return False
-
-
-def is_stack_decl(line):
-    return bool(re.match(r'\s*u8 sp\[', line.strip()))
-
-
-def is_epilogue_restore(line):
-    s = line.strip()
-    return bool(re.match(r'^r\d+ = \*\(u32\*\)\(sp \+ 0x[0-9a-fA-F]+\);$', s))
-
-
-def is_prologue_epilogue_noise(line):
-    s = line.strip()
-    if s.startswith('/* stmw') or s.startswith('/* lmw'):
-        return True
-    if s.startswith('/* psq_st') or s.startswith('/* psq_l'):
-        return True
-    if re.match(r'^\*\(f64\*\)\(sp \+ 0x[0-9a-fA-F]+\) = f\d+;$', s):
-        return True
-    if re.match(r'^f\d+ = \*\(f64\*\)\(sp \+ 0x[0-9a-fA-F]+\);$', s):
-        return True
-    return False
-
-
-def is_crclr_comment(line):
-    s = line.strip()
-    return s in ('/* crclr cr1eq */;', '/* crset cr1eq */;')
-
-
-def is_lwzx_comment(line):
-    s = line.strip()
-    return bool(re.match(r'^/\* (lwzx|stbx|subi|clrlslwi|lbzx|rlwinm) .* \*/;?$', s))
-
-
-def classify_block(body_text):
+def infer_input_regs(body_lines):
     """
-    Classify pragma block body into conversion category.
-    """
-    has_gslog = 'fn_800D4F98' in body_text
-    has_47e_check = '0x47E' in body_text or '0x47e' in body_text
-    has_state_check = "*(s32*)state == 1" in body_text or "!= (s32)0x1" in body_text or "!= (s32)0x1" in body_text
-    has_r_state = "*(u32*)lbl_8047AA80" in body_text
-    has_6b00 = 'fn_800D6B00' in body_text
-    has_jumptable = 'jumptable_' in body_text
-    has_loop_ctr = 'if (--ctr' in body_text or 'ctr != 0' in body_text
-    has_memcpy = 'memcpy' in body_text
-    has_memset = 'memset' in body_text
+    Infer which registers are used as input params.
+    In PPC calling convention: r3=param1, r4=param2, r5=param3, etc.
+    f1=float1, f2=float2, etc.
 
+    We detect input regs by finding registers that are READ before being WRITTEN.
+    """
+    written = set()
+    inputs = set()
+
+    for l in body_lines:
+        # Skip noise
+        if l.startswith('/*') or l.startswith('L_') or l == 'return;':
+            continue
+        if re.match(r'^r\d+ = \*\(u32\*\)\(sp \+ 0x', l):
+            continue
+        if l.startswith('/* stmw') or l.startswith('/* lmw'):
+            continue
+        if l.startswith('/* psq_'):
+            continue
+        if re.match(r'^\*\(f64\*\)\(sp', l):
+            continue
+        if re.match(r'^f\d+ = \*\(f64\*\)\(sp', l):
+            continue
+
+        # Find all register references in the line
+        # Right side (reads)
+        reads = set()
+        writes = set()
+
+        # Assignment: LHS = RHS;
+        m = re.match(r'^(r\d+|f\d+) = (.+);$', l)
+        if m:
+            lhs = m.group(1)
+            rhs = m.group(2)
+            writes.add(lhs)
+            # Find register refs in RHS
+            for r in re.findall(r'\b(r\d+|f\d+)\b', rhs):
+                if r != lhs:
+                    reads.add(r)
+        else:
+            # Other lines (function calls, stores, etc.)
+            for r in re.findall(r'\b(r\d+|f\d+)\b', l):
+                reads.add(r)
+
+        # Check if any reads are of unwritten registers
+        for r in reads:
+            if r not in written:
+                inputs.add(r)
+        written.update(writes)
+
+    return inputs
+
+
+def infer_param_type(body_lines, reg, declared_params):
+    """Infer the type of an input parameter register based on usage."""
+    body_text = '\n'.join(body_lines)
+
+    # Check for casts applied to this register
+    # r5 = r3 & 0xFF -> u8
+    if re.search(r'\b' + reg + r' & 0xFF\b', body_text):
+        return 'u8'
+    # r5 = r3 & 0xFFFF -> u16
+    if re.search(r'\b' + reg + r' & 0xFFFF\b', body_text):
+        return 'u16'
+    # r5 = (s8)r3 -> s8
+    if re.search(r'\(s8\)' + reg + r'\b', body_text):
+        return 's8'
+    # r5 = (s16)r3 -> s16
+    if re.search(r'\(s16\)' + reg + r'\b', body_text):
+        return 's16'
+
+    # Check for float usage
+    if reg.startswith('f'):
+        return 'f32'
+
+    # Check how it's stored
+    # *(u8*)(...) = rN -> u8
+    if re.search(r'\*\(u8\*\).*= ' + reg + r'\b', body_text):
+        return 'u8'
+    if re.search(r'\*\(u16\*\).*= ' + reg + r'\b', body_text):
+        return 'u16'
+    if re.search(r'\*\(f32\*\).*= ' + reg + r'\b', body_text):
+        return 'f32'
+
+    return 'u32'
+
+
+def convert_function(parsed):
+    """
+    Convert a parsed pragma block to idiomatic C89.
+    Returns list of lines, or None if too complex.
+    """
+    name = parsed['name']
+    body = parsed['body']
+    externs = parsed['externs']
+    typedefs = parsed['typedefs']
+    reg_decls = parsed['reg_decls']
+    declared_params = parsed['declared_params']
+
+    body_text = '\n'.join(body)
+
+    # Check complexity
     goto_count = len(re.findall(r'\bgoto\b', body_text))
     label_count = len(re.findall(r'^L_[0-9a-fA-F]+\s*:', body_text, re.MULTILINE))
+    has_jt = 'jumptable_' in body_text
+    has_gslog = 'fn_800D4F98' in body_text
+    has_47e = '0x47E' in body_text or '0x47e' in body_text
+    has_6b00 = 'fn_800D6B00' in body_text
+    has_loop = 'ctr != 0' in body_text or '--ctr' in body_text
+    line_count = len(body)
 
-    # Pattern 1: GSgfx state + 0x47E check + fn_800D4F98 dispatch + else store fn ptr
-    # These have exactly 2-3 gotos and 2-3 labels
-    if has_gslog and has_47e_check and goto_count <= 3 and label_count <= 3:
-        return 'state_47e_dispatch'
+    # --- Pattern: STATE_47E_DISPATCH ---
+    if has_gslog and has_47e and goto_count <= 3 and label_count <= 3:
+        return convert_state_dispatch(parsed, check_47e=True)
 
-    # Pattern 2: Simple state check + fn_800D4F98 dispatch (no 0x47E check)
-    if has_gslog and not has_47e_check and goto_count <= 3 and label_count <= 3:
-        return 'state_simple_dispatch'
+    # --- Pattern: STATE_SIMPLE_DISPATCH ---
+    if has_gslog and not has_47e and goto_count <= 3 and label_count <= 3:
+        return convert_state_dispatch(parsed, check_47e=False)
 
-    # Pattern 3: State check + fn_800D6B00 + stores (matrix-related)
-    if has_gslog and has_6b00 and goto_count <= 3:
-        return 'state_6b00_dispatch'
+    # --- Pattern: STATE_MULTI (more branches, still with gslog) ---
+    if has_gslog and goto_count <= 6 and label_count <= 6:
+        return convert_state_dispatch(parsed, check_47e=has_47e)
 
-    # Pattern 4: State check with direct calls (more branches)
-    if has_gslog and goto_count <= 5 and label_count <= 5:
-        return 'state_multi_branch'
-
-    # Jump table functions
-    if has_jumptable:
-        return 'jumptable'
-
-    # Loop functions
-    if has_loop_ctr:
-        return 'loop'
-
-    # Small functions with few branches
-    if goto_count <= 5:
-        return 'small_complex'
-
-    return 'large_complex'
+    # --- Everything else: too complex for auto, keep pragmas ---
+    return None
 
 
-def try_convert_state_47e_dispatch(info, body_lines):
+def convert_state_dispatch(parsed, check_47e=True):
     """
-    Convert pattern: state[0x47E] check + fn_800D4F98 dispatch.
-
-    Register-level pattern:
-        r5 = *(u32*)lbl_8047AA80;
-        r0 = *(u8*)((u8*)r5 + 0x47E);
-        if ((u32)r0 != (u32)0x0) goto L_ELSE;
-        r0 = *(u32*)((u8*)r5 + 0x0);
-        if ((s32)r0 != (s32)0x1) goto L_ELSE;
-        <set up args from r3/r4/r5/etc>
-        r3 = CMD;
-        r4 = ARGC;
-        fn_800D4F98();
-        goto L_END;
-    L_ELSE:
-        <store fn ptr and params into state>
-    L_END:
-        return;
-
-    Converts to:
-        u8* state = (u8*)lbl_8047AA80;
-        if (state[0x47E] == 0 && *(s32*)state == 1) {
-            fn_800D4F98(CMD, ARGC, ...);
-        } else {
-            <direct execution>
-        }
+    Convert a state-check + fn_800D4F98 dispatch function.
+    Handles both 0x47E and non-0x47E variants.
     """
-    # Parse the register-level body to extract:
-    # 1. CMD and ARGC values
-    # 2. Parameter mappings (which input params go to fn_800D4F98)
-    # 3. Else-branch stores
+    body = parsed['body']
+    externs = parsed['externs']
+    typedefs = parsed['typedefs']
+    reg_decls = parsed['reg_decls']
+    name = parsed['name']
 
-    body_text = '\n'.join(l.strip() for l in body_lines)
-
-    # Find CMD: r3 = 0xNN; right before fn_800D4F98()
-    cmd_match = re.search(r'r3 = (0x[0-9a-fA-F]+);.*?fn_800D4F98\(\)', body_text, re.DOTALL)
-    if not cmd_match:
-        return None
-    cmd = cmd_match.group(1)
-
-    # Find ARGC: r4 = 0xNN; right before fn_800D4F98()
-    argc_match = re.search(r'r4 = (0x[0-9a-fA-F]+);.*?fn_800D4F98\(\)', body_text, re.DOTALL)
-    if not argc_match:
-        return None
-    argc = argc_match.group(1)
-    argc_int = int(argc, 16)
-
-    # Find the else label and extract stores
-    labels = re.findall(r'(L_[0-9a-fA-F]+)\s*:', body_text)
-    if len(labels) < 1:
-        return None
-
-    # The else branch: everything between the first label and the last label (or return)
-    else_label = labels[0]
-    end_label = labels[-1] if len(labels) > 1 else None
-
-    # Extract else-branch lines
-    in_else = False
-    else_lines = []
-    for line in body_lines:
-        s = line.strip()
-        if s.startswith(else_label):
-            in_else = True
+    # Clean body: remove prologue/epilogue noise
+    clean = []
+    for l in body:
+        if l.startswith('/* stmw') or l.startswith('/* lmw'):
             continue
-        if in_else:
-            if end_label and s.startswith(end_label):
-                break
-            if s == 'return;' or s == '}':
-                break
-            if is_epilogue_restore(s) or is_prologue_epilogue_noise(s):
-                continue
-            else_lines.append(s)
-
-    # Now reconstruct the function
-    # Determine parameters from function signature
-    sig = info['sig_line'].strip()
-
-    # Determine param args to fn_800D4F98 by looking at r5, r6, r7 assignments before CMD
-    # Parse the if-branch for param setup
-    if_lines = []
-    collecting_if = False
-    for line in body_lines:
-        s = line.strip()
-        # Start collecting after the state check passes
-        if '0x47E' in s or '0x47e' in s:
-            collecting_if = True
+        if l.startswith('/* psq_st') or l.startswith('/* psq_l'):
             continue
-        if collecting_if:
-            if s.startswith(else_label):
-                break
-            if s.startswith('goto'):
-                break
-            if_lines.append(s)
+        if re.match(r'^\*\(f64\*\)\(sp \+ 0x[0-9a-fA-F]+\) = f\d+;$', l):
+            continue
+        if re.match(r'^f\d+ = \*\(f64\*\)\(sp \+ 0x[0-9a-fA-F]+\);$', l):
+            continue
+        if re.match(r'^r\d+ = \*\(u32\*\)\(sp \+ 0x[0-9a-fA-F]+\);$', l):
+            continue
+        if l in ('/* crclr cr1eq */;', '/* crset cr1eq */;'):
+            continue
+        if re.match(r'^/\* (lwzx|stbx|subi|clrlslwi|lbzx|rlwinm) .* \*/;?$', l):
+            continue
+        if l == '/* indirect jump via ctr */;':
+            continue
+        clean.append(l)
 
-    # Extract extra args from if branch (r5, r6, r7, etc assignments)
-    extra_args = []
-    for line in if_lines:
-        # r5 = r3 & 0xFF; -> (u8)param
-        # r5 = (s8)r3; -> (s8)param
-        # r5 = r3; -> param
-        # r5 = (s16)r3; -> (s16)param
-        m = re.match(r'r(\d+) = r3 & 0xFF;', line)
+    # Infer actual input registers
+    inputs = infer_input_regs(clean)
+
+    # Only consider r3..r10, f1..f8 as potential params
+    param_regs = sorted([r for r in inputs if re.match(r'^r[3-9]$|^r10$|^f[1-8]$', r)],
+                       key=lambda r: int(r[1:]) if r[0] == 'r' else 100 + int(r[1:]))
+
+    # Find param saves (r31=r4, r30=r3, etc.)
+    param_saves = {}  # saved_reg -> input_reg
+    for l in clean[:20]:
+        m = re.match(r'^(r\d+) = (r[3-9]|r10);$', l)
         if m:
-            extra_args.append('(u32)(u8)r3_param')
-            continue
-        m = re.match(r'r(\d+) = r3 & 0xFFFF;', line)
-        if m:
-            extra_args.append('(u32)(u16)r3_param')
-            continue
-        m = re.match(r'r(\d+) = \(s8\)r3;', line)
-        if m:
-            extra_args.append('(s32)(s8)r3_param')
-            continue
-        m = re.match(r'r(\d+) = \(s16\)r3;', line)
-        if m:
-            extra_args.append('(s32)(s16)r3_param')
-            continue
-        m = re.match(r'r(\d+) = r3;', line)
-        if m:
-            extra_args.append('r3_param')
-            continue
+            dst = m.group(1)
+            src = m.group(2)
+            if int(dst[1:]) >= 20:  # saved regs are r20-r31
+                param_saves[dst] = src
 
-    # Build converted else branch
-    converted_else = []
-    for line in else_lines:
-        # Clean up store patterns
-        if is_crclr_comment(line):
-            continue
-        if is_lwzx_comment(line):
-            continue
-        if line.startswith('r') and '=' in line and 'fn_' not in line:
-            # Register assignment - convert to state access
-            converted_else.append('    ' + line)
-        elif 'fn_' in line:
-            converted_else.append('    ' + line)
+    # Infer param types
+    param_types = {}
+    for reg in param_regs:
+        param_types[reg] = infer_param_type(clean, reg, parsed['declared_params'])
+
+    # Create param name mapping
+    param_names = {}
+    param_idx = 0
+    int_param_idx = 0
+    float_param_idx = 0
+    for reg in param_regs:
+        if reg.startswith('f'):
+            float_param_idx += 1
+            param_names[reg] = f'fp{float_param_idx}'
         else:
-            converted_else.append('    ' + line)
+            int_param_idx += 1
+            ptype = param_types[reg]
+            if ptype in ('u8', 's8'):
+                param_names[reg] = f'param{int_param_idx}'
+            elif ptype in ('u16', 's16'):
+                param_names[reg] = f'param{int_param_idx}'
+            else:
+                param_names[reg] = f'param{int_param_idx}'
 
-    # We can't always perfectly reconstruct, so let's do the simpler approach:
-    # Just strip pragmas and clean up the boilerplate
-    return None  # Fall through to generic cleanup
+    # Map saved regs to param names
+    for saved, inp in param_saves.items():
+        if inp in param_names:
+            param_names[saved] = param_names[inp]
 
-
-def generic_cleanup(block_lines):
-    """
-    Generic cleanup: remove pragmas, register declarations, stack arrays,
-    epilogue restores, prologue/epilogue comments. Keep everything else.
-    """
-    result = []
-    for line in block_lines:
-        s = line.strip()
-
-        # Skip pragma directives
-        if s in ('#pragma push', '#pragma pop',
-                 '#pragma optimization_level 0',
-                 '#pragma optimizewithasm off'):
-            continue
-
-        # Skip register variable declarations
-        if is_reg_decl(s):
-            continue
-
-        # Skip stack array declarations
-        if is_stack_decl(s):
-            continue
-
-        # Skip epilogue register restores
-        if is_epilogue_restore(s):
-            continue
-
-        # Skip prologue/epilogue noise
-        if is_prologue_epilogue_noise(s):
-            continue
-
-        # Skip crclr/crset comments
-        if is_crclr_comment(s):
-            continue
-
-        result.append(line)
-
-    return result
-
-
-def convert_known_pattern_47e(func_name, sig_line, externs, body_lines, comment_lines):
-    """
-    Full conversion of state[0x47E] + state[0] check + fn_800D4F98 dispatch.
-
-    Returns converted function lines, or None if can't convert.
-    """
-    body_text = '\n'.join(l.strip() for l in body_lines)
-
-    # ---- Step 1: Find the input register mappings ----
-    # r31 = r4; (save param2 to r31)
-    # r30 = r3; (save param1 to r30)
-    # etc.
-    param_saves = {}  # r31 -> 'r4' etc.
-    for line in body_lines:
-        s = line.strip()
-        m = re.match(r'^(r\d+) = (r[3-9]|r10);$', s)
-        if m:
-            param_saves[m.group(1)] = m.group(2)
-
-    # ---- Step 2: Find CMD and ARGC ----
-    # Find the line "r3 = CMD_VALUE;" near fn_800D4F98()
-    # and "r4 = ARGC_VALUE;"
-    lines_flat = [l.strip() for l in body_lines]
-    fn_idx = None
-    for i, s in enumerate(lines_flat):
-        if 'fn_800D4F98()' in s:
-            fn_idx = i
+    # --- Find fn_800D4F98 call and extract CMD, ARGC, extra args ---
+    gslog_idx = None
+    for i, l in enumerate(clean):
+        if 'fn_800D4F98()' in l or 'fn_800D4F98(' in l:
+            gslog_idx = i
             break
 
-    if fn_idx is None:
+    if gslog_idx is None:
         return None
 
-    # Search backward for r3 = CMD and r4 = ARGC
-    cmd = None
-    argc = None
-    for i in range(fn_idx - 1, max(fn_idx - 10, -1), -1):
-        s = lines_flat[i]
+    # Find CMD and ARGC
+    cmd = argc = None
+    for i in range(gslog_idx - 1, max(gslog_idx - 10, -1), -1):
+        l = clean[i]
         if cmd is None:
-            m = re.match(r'^r3 = (0x[0-9a-fA-F]+);$', s)
-            if m:
-                cmd = m.group(1)
+            m = re.match(r'^r3 = (0x[0-9a-fA-F]+);$', l)
+            if m: cmd = m.group(1)
         if argc is None:
-            m = re.match(r'^r4 = (0x[0-9a-fA-F]+);$', s)
-            if m:
-                argc = m.group(1)
+            m = re.match(r'^r4 = (0x[0-9a-fA-F]+);$', l)
+            if m: argc = m.group(1)
 
     if cmd is None or argc is None:
         return None
 
-    argc_int = int(argc, 16)
-
-    # ---- Step 3: Find extra args for fn_800D4F98 ----
-    # Between the state check and fn_800D4F98 call, look for r5, r6, r7... assignments
-    # These are the varargs to fn_800D4F98
+    # Find extra args: lines between state check and CMD that set r5..r10
     extra_args = []
-    param_lines_zone = lines_flat[:fn_idx]
-
-    # Find where the state check ends (after "if ... goto L_")
-    state_check_end = 0
-    for i, s in enumerate(param_lines_zone):
-        if '0x47E' in s or '0x47e' in s:
-            state_check_end = i
-        if 'if ((s32)r0 != (s32)0x1)' in s:
-            state_check_end = i + 1
-            break
-        if 'if ((u32)r0 != (u32)0x0)' in s and '0x47E' not in s and '0x47e' not in s:
-            pass
-
-    # Extract arg-setup lines between state check and CMD/ARGC setup
-    arg_setup = param_lines_zone[state_check_end:]
-
-    for s in arg_setup:
-        # r5 = r3 & 0xFF; -> param cast as u8
-        m = re.match(r'^r(\d+) = r(\d+) & 0xFF;$', s)
-        if m:
-            src_reg = 'r' + m.group(2)
-            # Resolve to original param register
-            actual = param_saves.get(src_reg, src_reg)
-            extra_args.append(f'(u32)(u8){actual}_param')
+    state_check_found = False
+    for i in range(gslog_idx):
+        l = clean[i]
+        if 'if ((s32)r0 != (s32)0x1)' in l:
+            state_check_found = True
             continue
+        if state_check_found:
+            if l.startswith('r3 = 0x') or l.startswith('r4 = 0x'):
+                break
+            if l.startswith('goto '):
+                break
 
-        m = re.match(r'^r(\d+) = r(\d+) & 0xFFFF;$', s)
-        if m:
-            src_reg = 'r' + m.group(2)
-            actual = param_saves.get(src_reg, src_reg)
-            extra_args.append(f'(u32)(u16){actual}_param')
-            continue
+            # r5 = r3;
+            m = re.match(r'^r(\d+) = (r\d+);$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                orig = param_saves.get(src, src)
+                pname = param_names.get(orig, orig)
+                extra_args.append(pname)
+                continue
 
-        m = re.match(r'^r(\d+) = \(s8\)(r\d+);$', s)
-        if m:
-            src_reg = m.group(2)
-            actual = param_saves.get(src_reg, src_reg)
-            extra_args.append(f'(s32)(s8){actual}_param')
-            continue
+            # r5 = r3 & 0xFF;
+            m = re.match(r'^r(\d+) = (r\d+) & 0xFF;$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                orig = param_saves.get(src, src)
+                pname = param_names.get(orig, orig)
+                extra_args.append(f'(u32)(u8){pname}')
+                continue
 
-        m = re.match(r'^r(\d+) = \(s16\)(r\d+);$', s)
-        if m:
-            src_reg = m.group(2)
-            actual = param_saves.get(src_reg, src_reg)
-            extra_args.append(f'(s32)(s16){actual}_param')
-            continue
+            # r5 = r3 & 0xFFFF;
+            m = re.match(r'^r(\d+) = (r\d+) & 0xFFFF;$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                orig = param_saves.get(src, src)
+                pname = param_names.get(orig, orig)
+                extra_args.append(f'(u32)(u16){pname}')
+                continue
 
-        m = re.match(r'^r(\d+) = (r\d+);$', s)
-        if m and m.group(2) in ('r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10'):
-            dst = m.group(1)
-            src = m.group(2)
-            if int(dst) >= 5:  # These are extra args
-                actual = param_saves.get(src, src)
-                extra_args.append(f'{actual}_param')
-            continue
+            # r5 = (s8)r3;
+            m = re.match(r'^r(\d+) = \(s8\)(r\d+);$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                orig = param_saves.get(src, src)
+                pname = param_names.get(orig, orig)
+                extra_args.append(f'(s32)(s8){pname}')
+                continue
 
-    # ---- Step 4: Find the else branch ----
-    # Find the first label after the state check
+            # r5 = (s16)r3;
+            m = re.match(r'^r(\d+) = \(s16\)(r\d+);$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                orig = param_saves.get(src, src)
+                pname = param_names.get(orig, orig)
+                extra_args.append(f'(s32)(s16){pname}')
+                continue
+
+            # r7 = (s8)r30; (saved reg)
+            m = re.match(r'^r(\d+) = \(s8\)(r\d+);$', l)
+            if m and int(m.group(1)) >= 5:
+                src = m.group(2)
+                pname = param_names.get(src, src)
+                extra_args.append(f'(s32)(s8){pname}')
+                continue
+
+    args_str = ', '.join([cmd, argc] + extra_args)
+
+    # --- Find labels and extract else branch ---
     labels = []
-    for i, s in enumerate(lines_flat):
-        m = re.match(r'^(L_[0-9a-fA-F]+)\s*:$', s)
+    for i, l in enumerate(clean):
+        m = re.match(r'^(L_[0-9a-fA-F]+)\s*:?\s*;?$', l)
         if m:
             labels.append((i, m.group(1)))
 
-    if len(labels) < 1:
+    if not labels:
         return None
 
-    else_label_idx = labels[0][0]
-    else_label = labels[0][1]
+    else_start = labels[0][0] + 1
+    if len(labels) > 1:
+        else_end = labels[-1][0]
+    else:
+        else_end = len(clean)
 
-    # Find end label
-    end_label_idx = labels[-1][0] if len(labels) > 1 else len(lines_flat)
-
-    # Extract else-branch lines
     else_body = []
-    for i in range(else_label_idx + 1, end_label_idx):
-        s = lines_flat[i]
-        if s == 'return;':
+    for i in range(else_start, else_end):
+        l = clean[i]
+        if l == 'return;':
             break
-        if is_epilogue_restore(s):
+        if l.startswith('goto '):
             continue
-        if is_prologue_epilogue_noise(s):
+        if l.startswith('L_') and ':' in l:
             continue
-        if is_crclr_comment(s):
-            continue
-        if is_lwzx_comment(s):
-            continue
-        if s.startswith('goto '):
-            continue
-        else_body.append(s)
+        else_body.append(l)
 
-    # Convert else body: replace register refs with state ptr operations
-    # This is the tricky part - for now, keep the else body as-is with state ptr
-    converted_else = []
-    for line in else_body:
-        # Replace *(u32*)lbl_8047AA80 with state cast
-        line = line.replace('*(u32*)lbl_8047AA80', '(u32)state')
-        converted_else.append('        ' + line)
+    # --- Convert else branch: simulate register dataflow ---
+    converted_else = simulate_else_branch(else_body, param_saves, param_names, reg_decls)
 
-    # ---- Step 5: Build the converted function ----
-    # This is complex enough that for now, just do the generic cleanup
-    return None
+    if converted_else is None:
+        return None
+
+    # --- Build output function ---
+    # Reconstruct function signature with inferred params
+    ret_type = 'void'
+    m = re.match(r'(\w+(?:\s*\*)?)\s+' + re.escape(name) + r'\s*\(', parsed['sig'])
+    if m:
+        ret_type = m.group(1)
+
+    if param_regs:
+        params_list = []
+        for reg in param_regs:
+            ptype = param_types[reg]
+            pname = param_names[reg]
+            params_list.append(f'{ptype} {pname}')
+        new_sig = f'{ret_type} {name}({", ".join(params_list)})'
+    else:
+        new_sig = f'{ret_type} {name}(void)'
+
+    out = []
+    out.append(new_sig + ' {')
+
+    for ext in externs:
+        out.append('    ' + ext)
+    for td in typedefs:
+        out.append('    ' + td)
+
+    out.append('    u8* state = (u8*)lbl_8047AA80;')
+
+    if check_47e:
+        out.append('    if (state[0x47E] == 0 && *(s32*)state == 1) {')
+    else:
+        out.append('    if (*(s32*)state == 1) {')
+
+    out.append(f'        fn_800D4F98({args_str});')
+
+    if converted_else:
+        out.append('    } else {')
+        for l in converted_else:
+            out.append('        ' + l)
+        out.append('    }')
+    else:
+        out.append('    }')
+
+    out.append('}')
+
+    return out
+
+
+def simulate_else_branch(else_lines, param_saves, param_names, reg_decls):
+    """
+    Simulate register dataflow in else branch and convert to C statements.
+
+    Tracks register values as symbolic expressions and converts
+    store operations to equivalent C.
+    """
+    if not else_lines:
+        return []
+
+    # Track register state: reg -> symbolic expression
+    reg_state = {}
+
+    # Initialize with param names
+    for reg, pname in param_names.items():
+        reg_state[reg] = pname
+
+    # Also set state pointer
+    # Find which register holds the state pointer
+    for l in else_lines:
+        m = re.match(r'^(r\d+) = \*\(u32\*\)lbl_8047AA80;$', l)
+        if m:
+            reg_state[m.group(1)] = 'state'
+
+    output = []
+
+    for l in else_lines:
+        # r3 = *(u32*)lbl_8047AA80;
+        m = re.match(r'^(r\d+) = \*\(u32\*\)lbl_8047AA80;$', l)
+        if m:
+            reg_state[m.group(1)] = 'state'
+            continue
+
+        # r4 = (u32)fn_XXXXXXXX;
+        m = re.match(r'^(r\d+) = \(u32\)(fn_[0-9a-fA-F]+);$', l)
+        if m:
+            reg_state[m.group(1)] = f'(u32){m.group(2)}'
+            continue
+
+        # r4 = (u32)lbl_XXXXXXXX;
+        m = re.match(r'^(r\d+) = \(u32\)(lbl_[0-9a-fA-F]+(?:\[\])?);$', l)
+        if m:
+            reg_state[m.group(1)] = f'(u32){m.group(2)}'
+            continue
+
+        # r0 = 0x1; (or other constant)
+        m = re.match(r'^(r\d+) = (0x[0-9a-fA-F]+|0|-?\d+);$', l)
+        if m:
+            reg_state[m.group(1)] = m.group(2)
+            continue
+
+        # r5 = r3 << 2;
+        m = re.match(r'^(r\d+) = (r\d+) << (\d+);$', l)
+        if m:
+            src_val = reg_state.get(m.group(2), m.group(2))
+            reg_state[m.group(1)] = f'({src_val} << {m.group(3)})'
+            continue
+
+        # r3 = r3 * 0x1c;
+        m = re.match(r'^(r\d+) = (r\d+) \* (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src_val = reg_state.get(m.group(2), m.group(2))
+            reg_state[m.group(1)] = f'({src_val} * {m.group(3)})'
+            continue
+
+        # r3 = r7 + r5;
+        m = re.match(r'^(r\d+) = (r\d+) \+ (r\d+);$', l)
+        if m:
+            lhs_val = reg_state.get(m.group(2), m.group(2))
+            rhs_val = reg_state.get(m.group(3), m.group(3))
+            reg_state[m.group(1)] = f'({lhs_val} + {rhs_val})'
+            continue
+
+        # r3 = r3 + 0x360;
+        m = re.match(r'^(r\d+) = (r\d+) \+ (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src_val = reg_state.get(m.group(2), m.group(2))
+            reg_state[m.group(1)] = f'({src_val} + {m.group(3)})'
+            continue
+
+        # r3 = r3 - 0x1;
+        m = re.match(r'^(r\d+) = (r\d+) - (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src_val = reg_state.get(m.group(2), m.group(2))
+            reg_state[m.group(1)] = f'({src_val} - {m.group(3)})'
+            continue
+
+        # r0 = r3 & 0xFF;
+        m = re.match(r'^(r\d+) = (r\d+) & (0x[0-9a-fA-F]+|\d+);$', l)
+        if m:
+            src_val = reg_state.get(m.group(2), m.group(2))
+            reg_state[m.group(1)] = f'({src_val} & {m.group(3)})'
+            continue
+
+        # r3 = r31; (simple copy)
+        m = re.match(r'^(r\d+) = (r\d+);$', l)
+        if m:
+            reg_state[m.group(1)] = reg_state.get(m.group(2), m.group(2))
+            continue
+
+        # *(u32*)((u8*)r3 + 0x4A8) = r4;
+        m = re.match(r'^\*\((u32|u16|u8|f32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\) = (r\d+|f\d+);$', l)
+        if m:
+            cast_type = m.group(1)
+            base = reg_state.get(m.group(2), m.group(2))
+            offset = m.group(3)
+            val = reg_state.get(m.group(4), m.group(4))
+
+            # Simplify: if base is 'state', emit clean
+            if base == 'state' or base == '(u32)state':
+                output.append(f'*({cast_type}*)(state + {offset}) = {val};')
+            else:
+                output.append(f'*({cast_type}*)((u8*){base} + {offset}) = {val};')
+            continue
+
+        # *(u32*)lbl_8047AA80 = rN;
+        m = re.match(r'^\*\(u32\*\)lbl_8047AA80 = (r\d+);$', l)
+        if m:
+            val = reg_state.get(m.group(1), m.group(1))
+            output.append(f'*(u32*)lbl_8047AA80 = {val};')
+            continue
+
+        # *(u16*)lbl_XXXXXXXX = rN;
+        m = re.match(r'^\*\((u32|u16|u8)\*\)(lbl_[0-9a-fA-F]+) = (r\d+);$', l)
+        if m:
+            cast = m.group(1)
+            label = m.group(2)
+            val = reg_state.get(m.group(3), m.group(3))
+            output.append(f'*({cast}*){label} = {val};')
+            continue
+
+        # *(f32*)((u8*)r26 + 0x0) = f0;
+        m = re.match(r'^\*\((f32|f64)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\) = (f\d+);$', l)
+        if m:
+            cast_type = m.group(1)
+            base = reg_state.get(m.group(2), m.group(2))
+            offset = m.group(3)
+            val = reg_state.get(m.group(4), m.group(4))
+            output.append(f'*({cast_type}*)((u8*){base} + {offset}) = {val};')
+            continue
+
+        # Function calls: fn_XXXXXXXX();
+        m = re.match(r'^(fn_[0-9a-fA-F]+)\(\);$', l)
+        if m:
+            output.append(l)
+            continue
+
+        # Function calls with args
+        m = re.match(r'^(fn_[0-9a-fA-F]+)\((.+)\);$', l)
+        if m:
+            output.append(l)
+            continue
+
+        # memcpy/memset
+        if l.startswith('memcpy(') or l.startswith('memset('):
+            # Resolve register refs in args
+            resolved = l
+            for reg in sorted(reg_state.keys(), key=lambda r: -len(r)):
+                resolved = resolved.replace(f'(void*){reg}', f'(void*){reg_state[reg]}')
+                resolved = resolved.replace(f'(const void*){reg}', f'(const void*){reg_state[reg]}')
+                resolved = resolved.replace(f'(u32){reg}', f'(u32){reg_state[reg]}')
+            output.append(resolved)
+            continue
+
+        # r3 += NNN; *(u8*)r3 = rM;
+        m = re.match(r'^(r\d+) \+= (\d+); \*\(u8\*\)(r\d+) = (r\d+);$', l)
+        if m:
+            # Complex combined operation - bail
+            return None
+
+        # OSGetTick(), other void calls
+        m = re.match(r'^(\w+)\(\);$', l)
+        if m:
+            output.append(l)
+            continue
+
+        # If we get here with an unhandled line that uses registers, bail
+        if re.search(r'\br\d+\b', l) or re.search(r'\bf\d+\b', l):
+            # Try to resolve register references
+            resolved = l
+            has_unresolved = False
+            for reg in re.findall(r'\b(r\d+|f\d+)\b', l):
+                if reg in reg_state:
+                    resolved = re.sub(r'\b' + reg + r'\b', str(reg_state[reg]), resolved, count=1)
+                else:
+                    has_unresolved = True
+            if has_unresolved:
+                return None  # Can't resolve all register refs
+            output.append(resolved)
+            continue
+
+        # Non-register lines
+        output.append(l)
+
+    return output
 
 
 def process_file(filepath):
-    """Process a single C file, converting all pragma blocks."""
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
-        lines = content.split('\n')
-        # Preserve line endings
-        lines_with_nl = [l + '\n' for l in lines]
-        if content.endswith('\n'):
-            lines_with_nl[-1] = lines[-1] + '\n'
-        else:
-            lines_with_nl[-1] = lines[-1]
+    """Process a C file, converting all pragma blocks."""
+    lines, blocks = extract_blocks(filepath)
 
-    with open(filepath, 'r', encoding='utf-8') as f:
-        original_lines = f.readlines()
+    print(f"Found {len(blocks)} pragma blocks in {os.path.basename(filepath)}")
 
-    segments = parse_pragma_blocks(original_lines)
-
-    total_pragma = sum(1 for s in segments if s[0] == 'pragma')
-    print(f"Found {total_pragma} pragma blocks in {os.path.basename(filepath)}")
-
+    # Process blocks from end to start
     converted = 0
-    result_lines = []
+    kept = 0
+    stats = {}
 
-    for seg in segments:
-        if seg[0] == 'code':
-            result_lines.extend(seg[1])
-        elif seg[0] == 'pragma':
-            start, end, block = seg[1], seg[2], seg[3]
-            cleaned = generic_cleanup(block)
-            result_lines.extend(cleaned)
+    for start, end, block_lines in reversed(blocks):
+        parsed = parse_block(block_lines)
+        if parsed is None:
+            kept += 1
+            continue
+
+        result = convert_function(parsed)
+
+        body_text = '\n'.join(parsed['body'])
+        has_47e = '0x47E' in body_text
+        has_gslog = 'fn_800D4F98' in body_text
+        has_jt = 'jumptable_' in body_text
+        gotos = len(re.findall(r'\bgoto\b', body_text))
+
+        if has_jt: cat = 'JUMPTABLE'
+        elif has_47e and has_gslog and gotos <= 3: cat = 'STATE_47E'
+        elif has_gslog and gotos <= 3: cat = 'STATE_SIMPLE'
+        elif has_gslog and gotos <= 6: cat = 'STATE_MULTI'
+        else: cat = 'OTHER'
+
+        if result is not None:
+            # Find the comment line(s) before pragma push
+            # Look for /* fn_XXXXXXXX | Size: 0xNN */ pattern
+            comment_start = start
+            while comment_start > 0 and lines[comment_start - 1].strip().startswith('/*'):
+                comment_start -= 1
+
+            # Preserve comments
+            comments = lines[comment_start:start]
+
+            new_lines = []
+            for c in comments:
+                new_lines.append(c)
+            for l in result:
+                new_lines.append(l + '\n')
+            new_lines.append('\n')
+
+            lines[comment_start:end] = new_lines
             converted += 1
+            stats[cat + '_OK'] = stats.get(cat + '_OK', 0) + 1
+        else:
+            kept += 1
+            stats[cat + '_FAIL'] = stats.get(cat + '_FAIL', 0) + 1
 
     # Write result
     with open(filepath, 'w', encoding='utf-8', newline='') as f:
-        f.writelines(result_lines)
+        f.writelines(lines)
 
-    print(f"Cleaned {converted}/{total_pragma} pragma blocks")
+    print(f"Converted: {converted}")
+    print(f"Kept as pragma: {kept}")
+    for k, v in sorted(stats.items()):
+        print(f"  {k}: {v}")
+
     return converted
 
 
@@ -619,4 +790,5 @@ if __name__ == '__main__':
     total = 0
     for filepath in sys.argv[1:]:
         total += process_file(filepath)
-    print(f"\nTotal: {total} blocks cleaned")
+        print()
+    print(f"Total converted: {total}")
