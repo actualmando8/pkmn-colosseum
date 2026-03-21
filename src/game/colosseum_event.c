@@ -15767,23 +15767,13 @@ void fn_8020D698(void) {
 }
 #pragma pop
 
-/* 0x8020D7CC | size: 0x1C | tiny */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020D7CC(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-
-    if ((u32)r3 != (u32)0x0) goto L_8020D7DC;
-    r3 = -0x80;
-    return;
-L_8020D7DC: ;
-    r0 = *(u8*)((u8*)r3 + 0x0);
-    r3 = (s8)r0;
-    return;
+/* fn_8020D7CC | Size: 0x1C | Read signed byte, return -128 if NULL */
+s32 fn_8020D7CC(u8* ptr) {
+    if (ptr == NULL) {
+        return -128;
+    }
+    return (s8)ptr[0];
 }
-#pragma pop
 
 /* 0x8020D7E8 | size: 0x2C | small */
 #pragma push
@@ -16284,24 +16274,14 @@ L_8020DE3C: ;
 }
 #pragma pop
 
-/* 0x8020DE68 | size: 0x18 | tiny */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020DE68(void) {
-    extern u8 lbl_8047E530[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-
-    if ((u32)r3 != (u32)0x0) goto L_8020DE78;
-    f1 = *(f32*)lbl_8047E530;
-    return;
-L_8020DE78: ;
-    f1 = *(f32*)((u8*)r3 + 0x4);
-    return;
+/* fn_8020DE68 | Size: 0x18 | Get float from ptr+4, or default if NULL */
+f32 fn_8020DE68(u8* ptr) {
+    extern f32 lbl_8047E530;
+    if (ptr == NULL) {
+        return lbl_8047E530;
+    }
+    return *(f32*)(ptr + 0x4);
 }
-#pragma pop
 
 /* 0x8020DEB0 | size: 0x28 | small */
 #pragma push
