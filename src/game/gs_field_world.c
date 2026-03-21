@@ -105,9 +105,6 @@ extern const char lbl_802725CC[]; /* "floorReadNormalPreFunc(): can't alloc..." 
  *   - If distance is near-zero, snaps to destination (avoids /0)
  *   - On divide-by-zero path: logs lbl_80272770
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void floorUpdateFieldCamera(void) {
     extern u8 lbl_8047CFD0[];
     extern u8 lbl_8047CFDC[];
@@ -249,7 +246,6 @@ L_80117684: ;
     /* lmw r25, 0x24(r1) */;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8012640C -- Field transition state machine
@@ -265,9 +261,6 @@ L_80117684: ;
  * Uses a switch/case state machine (detected by large jump table in
  * the disassembly).
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSfield_TransitionStateMachine(void) {
     extern void fn_8011BEB4();
     extern void fn_8011CE44();
@@ -1857,7 +1850,6 @@ L_8012793C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_801254B4 -- Field rendering pass
@@ -1869,9 +1861,6 @@ L_8012793C: ;
  *   - Drawing field objects and NPCs
  *   - Applying post-processing effects
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSfield_RenderPass(void) {
     extern void fn_8011BBD8();
     extern void fn_8011CEA0();
@@ -3050,16 +3039,12 @@ L_801263F0: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80124A60 -- Field object batch update
  *
  * 2008 bytes. Updates all active field objects in a single pass.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSfield_ObjectBatchUpdate(void) {
     extern void fn_8011B950();
     extern void fn_8011D480();
@@ -3574,7 +3559,6 @@ L_80125220: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8012CA84 -- Field event/trigger processing
@@ -3582,9 +3566,6 @@ L_80125220: ;
  * 2104 bytes. Processes field event triggers (door warps, NPC
  * interaction zones, item pickups, etc.).
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSfield_ProcessTriggers(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -4171,7 +4152,6 @@ L_8012D270: ;
     /* lmw r23, 0xbc(r1) */;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * Small accessor functions -- field object getters
@@ -4189,9 +4169,6 @@ L_8012D270: ;
  *   lhz r3, 0x8(r3)    ; read u16 at offset 0x8
  *   blr
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 
 /* fn_8011E4A4 */ u16 GSfield_GetObjAttrU16(void* obj, u16 slot) {
     if (obj == NULL) { return 0; }
@@ -4232,7 +4209,6 @@ L_8012D270: ;
     return *(u16*)(sub + 0xA);
 }
 
-#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -5965,9 +5941,6 @@ u32 fn_80115C48(void) {
 }
 
 /* 0x80115CB4 | 0xB0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80115CB4(void) {
     extern u8 lbl_80478EB8[];
     extern u8 lbl_80478EBC[];
@@ -6023,12 +5996,8 @@ L_80115D50: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80115D64 | 0xA0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80115D64(void) {
     extern u8 lbl_80478EB8[];
     extern u8 lbl_80478EBC[];
@@ -6085,7 +6054,6 @@ L_80115DF0: ;
     /* lmw r25, 0x14(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x68 | fn_80115E04 | global_cond_call */
 u32 fn_80115E04(void) {
@@ -6096,9 +6064,6 @@ u32 fn_80115E04(void) {
 }
 
 /* 0x80115E6C | 0x2F8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80115E6C(void) {
     extern void fn_8001E184();
     extern void fn_801069FC();
@@ -6316,12 +6281,8 @@ L_80116150: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80116164 | 0x30C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80116164(void) {
     extern u8 lbl_80478EB8[];
     extern u8 lbl_80478EBC[];
@@ -6545,12 +6506,8 @@ L_8011645C: ;
     /* lmw r23, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80116470 | 0x4E8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80116470(void) {
     extern u8 lbl_80478EC8[];
     extern u8 lbl_80478ECC[];
@@ -6919,12 +6876,8 @@ L_8011693C: ;
     /* lmw r23, 0x2c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80116958 | 0x3D8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80116958(void) {
     extern u8 lbl_80478EC8[];
     extern u8 lbl_80478ECC[];
@@ -7207,12 +7160,8 @@ L_80116D14: ;
     /* lmw r27, 0x1c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80116D30 | 0x13C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80116D30(void) {
     extern u8 lbl_80272708[];
     extern u8 lbl_80478EC0[];
@@ -7311,7 +7260,6 @@ L_80116E48: ;
     /* lmw r26, 0x8(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80116E6C | 0x18 */
 void fn_80116E6C(u8* ptr, u8 val) {
@@ -7435,9 +7383,6 @@ void fn_80117164(void) {
 }
 
 /* 0x801171C8 | 0x168 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801171C8(void) {
     extern u8 lbl_8047AD74[];
     extern u8 lbl_8047AD78[];
@@ -7551,12 +7496,8 @@ L_80117310: ;
     f30 = *(f64*)(sp + 0x20);
     return;
 }
-#pragma pop
 
 /* 0x80117330 | 0x194 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80117330(void) {
     extern u8 lbl_8047CFD0[];
     extern void fn_800CE2D8();
@@ -7684,7 +7625,6 @@ L_801174AC: ;
     f31 = *(f64*)(sp + 0x80);
     return;
 }
-#pragma pop
 
 /* 0x801174C4 | 0x28 */
 u8 fn_801174C4(void) {
@@ -7708,9 +7648,6 @@ void fn_80117500(void) {
 }
 
 /* 0x801176C8 | 0x254 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801176C8(void) {
     extern void fn_800FE714();
     extern void fn_800FE834();
@@ -7873,12 +7810,8 @@ L_80117908: ;
     /* lmw r23, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011791C | 0x1B8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011791C(void) {
     extern u8 lbl_802727B8[];
     extern void fn_800D2584();
@@ -7998,7 +7931,6 @@ L_80117AB8: ;
     r29 = *(u32*)(sp + 0x24);
     return;
 }
-#pragma pop
 
 /* 0x80117AD4 | 16 bytes | global_getter */
 u32 fn_80117AD4(void) {
@@ -8006,9 +7938,6 @@ u32 fn_80117AD4(void) {
 }
 
 /* 0x80117AE4 | 0x1A0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80117AE4(void) {
     extern u8 lbl_80478B40[];
     extern u8 lbl_8047AD80[];
@@ -8140,12 +8069,8 @@ L_80117C6C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80117C84 | 0x90 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80117C84(void) {
     extern u8 lbl_80478B40[];
     extern u8 lbl_8047AD80[];
@@ -8196,12 +8121,8 @@ L_80117CF4: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80117D14 | 0x144 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80117D14(void) {
     extern u8 lbl_8047AD88[];
     extern u8 lbl_8047AD8C[];
@@ -8304,12 +8225,8 @@ L_80117E44: ;
     r31 = *(u32*)(sp + 0x1C);
     return;
 }
-#pragma pop
 
 /* 0x80117E58 | 0x1C8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80117E58(void) {
     extern u8 lbl_80478B40[];
     extern u8 lbl_8047AD80[];
@@ -8448,7 +8365,6 @@ L_8011800C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x48 | fn_80118020 | single_call_straight */
 void fn_80118020(void) {
@@ -8456,9 +8372,6 @@ void fn_80118020(void) {
 }
 
 /* 0x80118070 | 0x90 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118070(void) {
     extern u8 lbl_80478B40[];
     extern u8 lbl_8047AD80[];
@@ -8509,16 +8422,12 @@ L_801180E0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80118100 | 0x4 | void_stub */
 void fn_80118100(void) {
 }
 
 /* 0x80118104 | 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118104(void) {
     extern void fn_800D2584();
     extern void fn_8016AB94();
@@ -8570,12 +8479,8 @@ L_80118194: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x801181B0 | 0x23C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801181B0(void) {
     extern u8 lbl_8047AD9C[];
     extern u8 lbl_8047ADA0[];
@@ -8742,12 +8647,8 @@ L_801183CC: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801183EC | 0x488 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801183EC(void) {
     extern u8 lbl_8047AD9C[];
     extern u8 lbl_8047ADA0[];
@@ -9065,12 +8966,8 @@ L_80118860: ;
     /* lmw r25, 0x54(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80118874 | 0x1F4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118874(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
@@ -9211,12 +9108,8 @@ L_80118A38: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80118A68 | 0x1B8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118A68(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
@@ -9342,7 +9235,6 @@ L_80118C04: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x68 | fn_80118C20 | guarded_call */
 void fn_80118C20(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -9398,9 +9290,6 @@ s32 fn_80118DA8(u8* ptr) {
 }
 
 /* 0x80118DE0 | 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118DE0(void) {
     extern void fn_800E01D0();
     extern void fn_80169104();
@@ -9452,7 +9341,6 @@ L_80118E6C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x78 | fn_80118E8C | two_call_arg_check */
 void fn_80118E8C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -9477,9 +9365,6 @@ void fn_80118F7C(u8* obj, void* arg) {
 }
 
 /* 0x80118FB0 | 0x12C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80118FB0(void) {
     extern u8 lbl_8047CFE8[];
     extern u8 lbl_8047CFEC[];
@@ -9575,12 +9460,8 @@ L_801190C8: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801190DC | 0x2E0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801190DC(void) {
     extern u8 lbl_8047ADA8[];
     extern u8 lbl_8047ADAC[];
@@ -9791,12 +9672,8 @@ L_801193A8: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801193BC | 0x1F0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801193BC(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
@@ -9936,12 +9813,8 @@ L_80119574: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x801195AC | 0x278 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801195AC(void) {
     extern u8 lbl_802727D8[];
     extern u8 lbl_8047AD9C[];
@@ -10121,12 +9994,8 @@ L_8011980C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80119824 | 0x10C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80119824(void) {
     extern u8 lbl_8047AD98[];
     extern u8 lbl_8047AD9C[];
@@ -10215,12 +10084,8 @@ L_8011991C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80119930 | 0x2A0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80119930(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
@@ -10409,12 +10274,8 @@ L_80119BBC: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80119BD0 | 0x1C0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80119BD0(void) {
     extern u8 lbl_8047CFE8[];
     extern u8 lbl_8047CFEC[];
@@ -10555,7 +10416,6 @@ L_80119D7C: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x40 | fn_80119D90 | index_lookup */
 u8 fn_80119D90(u16 idx) {
@@ -10630,9 +10490,6 @@ u32 fn_80119F50(u16 idx) {
 }
 
 /* 0x8011A0A8 | 0x1D8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A0A8(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -10772,12 +10629,8 @@ L_8011A26C: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011A280 | 0x164 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A280(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -10889,12 +10742,8 @@ L_8011A3D0: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011A3E4 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A3E4(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11014,12 +10863,8 @@ L_8011A550: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011A570 | 0x164 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A570(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11131,12 +10976,8 @@ L_8011A6C0: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011A6D4 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A6D4(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11256,12 +11097,8 @@ L_8011A840: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011A860 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A860(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11381,12 +11218,8 @@ L_8011A9CC: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011A9EC | 0x164 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011A9EC(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11498,12 +11331,8 @@ L_8011AB3C: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011AB50 | 0x164 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011AB50(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11615,12 +11444,8 @@ L_8011ACA0: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011ACB4 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011ACB4(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11740,12 +11565,8 @@ L_8011AE20: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011AE40 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011AE40(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11865,12 +11686,8 @@ L_8011AFAC: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011AFCC | 0x164 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011AFCC(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -11982,12 +11799,8 @@ L_8011B11C: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011B130 | 0x190 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B130(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -12108,12 +11921,8 @@ L_8011B2A0: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011B2C0 | 0x184 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B2C0(void) {
     extern void fn_80101AC4();
     extern void fn_80119D90();
@@ -12238,12 +12047,8 @@ L_8011B430: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8011B444 | 0x238 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B444(void* obj) {
     extern void fn_80119E10();
     extern void fn_80119E50();
@@ -12412,12 +12217,8 @@ L_8011B65C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011B67C | 0x10C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B67C(void* obj) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -12500,12 +12301,8 @@ L_8011B768: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011B788 | 0x1C8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B788(void) {
     extern void fn_80119E90();
     extern void fn_80119ED0();
@@ -12643,12 +12440,8 @@ L_8011B930: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011B950 | 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011B950(void) {
     extern void fn_80119F90();
     extern void fn_80119FA0();
@@ -12707,12 +12500,8 @@ L_8011B9E0: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8011BA0C | 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011BA0C(void) {
     extern u8 jumptable_8035C260[];
     u32 r0 = 0;
@@ -12766,12 +12555,8 @@ void fn_8011BA0C(void) {
     /* subi r3, r3, 0x13a7 */;
     return;
 }
-#pragma pop
 
 /* 0x8011BAC0 | 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011BAC0(void) {
     extern void fn_8011BEB4();
     u8 sp[0x20];
@@ -12822,7 +12607,6 @@ L_8011BB50: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x6C | fn_8011BB6C | single_call_straight */
 void fn_8011BB6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -12830,9 +12614,6 @@ void fn_8011BB6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x8011BBD8 | 0x2DC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011BBD8(void) {
     extern void fn_8011C1D0();
     extern void fn_8011C220();
@@ -13070,12 +12851,8 @@ L_8011BE98: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x8011BEB4 | 0x31C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011BEB4(void) {
     extern void fn_8011BEB4();
     extern void fn_8011C270();
@@ -13333,7 +13110,6 @@ L_8011C1B8: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x50 | fn_8011C1D0 | index_lookup */
 void* fn_8011C1D0(u16 idx) {
@@ -14140,9 +13916,6 @@ void fn_8011DC6C(u32 arg1, u32 arg2) {
 }
 
 /* 0x8011DCC4 | 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011DCC4(void) {
     extern void fn_8011CA04();
     extern void fn_8011CA34();
@@ -14198,7 +13971,6 @@ L_8011DD60: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x7C | fn_8011DD80 | generic */
 void fn_8011DD80(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6) {
@@ -14870,9 +14642,6 @@ u16 fn_8011F228(void* ctx, u32 p1) {
 }
 
 /* 0x8011F260 | 0x1FC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011F260(void) {
     extern u8 lbl_80478B58[];
     extern u8 lbl_80478B5C[];
@@ -15014,7 +14783,6 @@ L_8011F440: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x8011F474 | 0x34 */
 void* fn_8011F474(u8* ptr, u16 idx) {
@@ -15066,9 +14834,6 @@ void fn_8011F5FC(u32* dst, u32* src) {
 }
 
 /* 0x8011F634 | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011F634(void) {
     extern void fn_8011CBF4();
     extern void fn_8011CE18();
@@ -15121,12 +14886,8 @@ L_8011F6C0: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x8011F6D8 | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011F6D8(void) {
     extern void fn_8011CC24();
     extern void fn_8011CE18();
@@ -15179,12 +14940,8 @@ L_8011F764: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x8011F77C | 0x194 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011F77C(void) {
     extern u8 lbl_8047CFF0[];
     extern u8 lbl_8047CFF4[];
@@ -15305,12 +15062,8 @@ L_8011F8F8: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x8011F910 | 0x2BC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011F910(void) {
     extern u8 lbl_8047CFF0[];
     extern u8 lbl_8047CFF4[];
@@ -15517,7 +15270,6 @@ L_8011FBB0: ;
     /* lmw r27, 0x1c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x48 | fn_8011FBCC | generic */
 void fn_8011FBCC(void) {
@@ -15538,9 +15290,6 @@ u8 fn_8011FC74(u32 arg) {
 }
 
 /* 0x8011FCA4 | 0x124 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011FCA4(void) {
     extern u8 lbl_8047CFF4[];
     extern u8 lbl_8047D010[];
@@ -15626,12 +15375,8 @@ L_8011FDB0: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x8011FDC8 | 0x504 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011FDC8(void) {
     extern u8 lbl_8047CFF0[];
     extern u8 lbl_8047CFF4[];
@@ -15981,12 +15726,8 @@ L_80120294: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x801202CC | 0x1DC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801202CC(void) {
     extern u8 lbl_8047CFF0[];
     extern u8 lbl_8047CFF4[];
@@ -16125,12 +15866,8 @@ L_80120488: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x801204A8 | 0x1CC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801204A8(void) {
     extern void fn_800FA280();
     extern void fn_8010C46C();
@@ -16268,12 +16005,8 @@ L_80120654: ;
     /* lmw r25, 0x14(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80120674 | 0x1F8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80120674(void) {
     extern u8 lbl_8027296C[];
     extern void fn_800E0C54();
@@ -16410,12 +16143,8 @@ L_80120854: ;
     r30 = *(u32*)(sp + 0x38);
     return;
 }
-#pragma pop
 
 /* 0x8012086C | 0x294 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012086C(void) {
     extern void fn_80119ED0();
     extern void fn_8011B788();
@@ -16594,12 +16323,8 @@ L_80120AE0: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80120B00 | 0x16C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80120B00(void) {
     extern void fn_8012640C();
     u8 sp[0x30];
@@ -16704,7 +16429,6 @@ L_80120C58: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x70 | fn_80120C6C | generic */
 u32 fn_80120C6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -16714,9 +16438,6 @@ u32 fn_80120C6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80120CDC | 0x90 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80120CDC(void) {
     extern void fn_8011CE44();
     extern void fn_8011CE74();
@@ -16761,7 +16482,6 @@ L_80120D54: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x64 | fn_80120D6C | generic */
 u32 fn_80120D6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -16772,9 +16492,6 @@ u32 fn_80120D6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80120DD0 | 0x210 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80120DD0(void) {
     extern void fn_80119ED0();
     extern void fn_80119F50();
@@ -16914,12 +16631,8 @@ L_80120FC8: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80120FE0 | 0x218 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80120FE0(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -17060,12 +16773,8 @@ L_801211E4: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x801211F8 | 0x218 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801211F8(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -17206,7 +16915,6 @@ L_801213FC: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x74 | fn_80121410 | generic */
 u32 fn_80121410(void) {
@@ -17332,9 +17040,6 @@ void fn_80121BB4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80121C18 | 0x428 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80121C18(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -17617,12 +17322,8 @@ L_80122020: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80122040 | 0x2F4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122040(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -17819,7 +17520,6 @@ L_8012231C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_80122334 -- bit permutation hash mod 28 | Size: 0x3C */
 u8 fn_80122334(u32 val) {
@@ -17833,9 +17533,6 @@ u8 fn_80122334(u32 val) {
 }
 
 /* 0x80122370 | 0x360 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122370(void) {
     extern void fn_800E0C54();
     extern void fn_8011CAE0();
@@ -18076,12 +17773,8 @@ L_801226BC: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801226D0 | 0x324 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801226D0(void) {
     extern u8 lbl_80272948[];
     extern void fn_801254B4();
@@ -18308,7 +18001,6 @@ L_801229E0: ;
     /* lmw r24, 0x30(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x7C | fn_801229F4 | generic -- placeholder, depends on fn_8011CE74/fn_8011CE44 */
 u32 fn_801229F4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -18335,9 +18027,6 @@ u32 fn_80122B50(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80122BC0 | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122BC0(void) {
     extern void fn_8012640C();
     u8 sp[0x20];
@@ -18386,12 +18075,8 @@ L_80122C48: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x80122C64 | 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122C64(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -18492,12 +18177,8 @@ L_80122DC8: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80122DDC | 0x218 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122DDC(void) {
     extern void fn_80119ED0();
     extern void fn_8011B67C();
@@ -18638,12 +18319,8 @@ L_80122FE0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80122FF4 | 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80122FF4(void) {
     extern void fn_80008154();
     extern void fn_8012640C();
@@ -18691,7 +18368,6 @@ L_8012307C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x50 | fn_80123090 | multi_call_cond */
 u32 fn_80123090(void) {
@@ -18707,9 +18383,6 @@ u16 fn_801230E0(u32 arg) {
 }
 
 /* 0x80123110 | 0x94 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123110(void) {
     extern void fn_801254B4();
     extern void fn_8012640C();
@@ -18758,12 +18431,8 @@ L_8012318C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x801231A4 | 0x13C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801231A4(void) {
     extern void fn_8012640C();
     extern void fn_80131574();
@@ -18853,12 +18522,8 @@ L_801232C4: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x801232E0 | 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801232E0(void) {
     extern void fn_8012640C();
     extern void fn_801EE958();
@@ -18901,12 +18566,8 @@ L_80123350: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80123368 | 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123368(void) {
     extern void fn_801254B4();
     extern void fn_8012640C();
@@ -18951,12 +18612,8 @@ L_801233DC: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x801233F4 | 0x190 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801233F4(void) {
     extern void fn_8012640C();
     extern void fn_80135530();
@@ -19072,12 +18729,8 @@ L_8012356C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80123584 | 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123584(void) {
     extern void fn_8012640C();
     u8 sp[0x20];
@@ -19123,12 +18776,8 @@ L_80123600: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x8012361C | 0xDC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012361C(void) {
     extern void fn_801237B8();
     extern void fn_8012640C();
@@ -19201,12 +18850,8 @@ L_801236E4: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801236F8 | 0xC0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801236F8(void) {
     extern void fn_8012640C();
     u8 sp[0x20];
@@ -19262,12 +18907,8 @@ L_8012379C: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x801237B8 | 0x3A4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801237B8(void) {
     extern void fn_8011BB6C();
     extern void fn_8011F260();
@@ -19534,12 +19175,8 @@ L_80123B48: ;
     /* lmw r25, 0x14(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80123B5C | 0xF8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123B5C(void) {
     extern void fn_8012640C();
     u8 sp[0x20];
@@ -19611,7 +19248,6 @@ L_80123C34: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80 | fn_80123C54 | generic */
 void fn_80123C54(void* ptr, u32 idx, u32 arg) {
@@ -19619,9 +19255,6 @@ void fn_80123C54(void* ptr, u32 idx, u32 arg) {
 }
 
 /* 0x80123CD4 | 0x84 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123CD4(void) {
     extern void fn_8012640C();
     u8 sp[0x10];
@@ -19662,12 +19295,8 @@ L_80123D40: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80123D58 | 0x118 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123D58(void) {
     extern void fn_8011BB6C();
     extern void fn_801254B4();
@@ -19749,7 +19378,6 @@ L_80123E50: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80 | fn_80123E70 | generic */
 u32 fn_80123E70(void) {
@@ -19760,9 +19388,6 @@ u32 fn_80123E70(void) {
 }
 
 /* 0x80123EF0 | 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123EF0(void) {
     extern void fn_801254B4();
     u8 sp[0x20];
@@ -19829,12 +19454,8 @@ L_80123FA8: ;
     /* lmw r26, 0x8(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80123FBC | 0x108 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80123FBC(void) {
     extern void fn_8012640C();
     extern void fn_80135530();
@@ -19914,12 +19535,8 @@ L_801240AC: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x801240C4 | 0x34C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801240C4(void) {
     extern void fn_800E0C54();
     extern void fn_800FA280();
@@ -20156,12 +19773,8 @@ L_801243FC: ;
     /* lmw r27, 0x1c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80124410 | 0x4B4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80124410(void) {
     extern void fn_800E0C54();
     extern void fn_8012640C();
@@ -20493,12 +20106,8 @@ L_801248B0: ;
     /* lmw r21, 0x14(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801248C4 | 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801248C4(void) {
     extern void fn_8012640C();
     u8 sp[0x10];
@@ -20551,7 +20160,6 @@ L_80124960: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x80 | fn_80124978 | generic */
 u32 fn_80124978(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -20567,9 +20175,6 @@ void fn_801249F8(void) {
 }
 
 /* 0x80125238 | 0xA8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80125238(void) {
     extern void fn_8011B950();
     extern void fn_801254B4();
@@ -20620,7 +20225,6 @@ L_80125280: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x801252E0 | 0x34 */
 void fn_801252E0(u32 arg) {
@@ -20635,9 +20239,6 @@ void fn_80125314(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 
 /* 0x80125390 | 0x94 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80125390(void) {
     extern void fn_8012640C();
     u8 sp[0x10];
@@ -20682,7 +20283,6 @@ L_8012540C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x48 | fn_80125424 | generic */
 void fn_80125424(void) {
@@ -20697,9 +20297,6 @@ void fn_8012546C(void) {
 }
 
 /* 0x8012795C | 0x700 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012795C(void) {
     extern void fn_8011CB98();
     extern void fn_8011CBB0();
@@ -21183,12 +20780,8 @@ L_80128048: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012805C | 0x2A4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012805C(void) {
     extern u8 lbl_8047D020[];
     extern void fn_8011F5FC();
@@ -21395,12 +20988,8 @@ L_801282EC: ;
     /* lmw r24, 0x2e0(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80128300 | 0x224 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80128300(void) {
     extern u8 lbl_80272998[];
     extern u8 lbl_802729A4[];
@@ -21561,12 +21150,8 @@ L_80128504: ;
     r28 = *(u32*)(sp + 0x30);
     return;
 }
-#pragma pop
 
 /* 0x80128524 | 0x1A4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80128524(void) {
     extern void fn_800F9EE4();
     extern void fn_800FA280();
@@ -21708,12 +21293,8 @@ L_801286B4: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x801286C8 | 0x39C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801286C8(void) {
     extern void fn_8011E36C();
     extern void fn_8011E3B4();
@@ -21963,12 +21544,8 @@ L_80128A50: ;
     /* lmw r22, 0x8(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80128A64 | 0x25C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80128A64(void) {
     extern void fn_8011E36C();
     extern void fn_8011E3B4();
@@ -22157,7 +21734,6 @@ L_80128CAC: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80128CC0 | 0x1C */
 void* fn_80128CC0(void* ptr) {
@@ -22250,9 +21826,6 @@ void* fn_80128E2C(void) {
 }
 
 /* 0x80128E38 | 0x25C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80128E38(void) {
     extern u8 lbl_8047D028[];
     extern void fn_800057A0();
@@ -22427,12 +22000,8 @@ L_80128F3C: ;
     r29 = *(u32*)(sp + 0x24);
     return;
 }
-#pragma pop
 
 /* 0x80129094 | 0x1EC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129094(void) {
     extern void fn_8006B6B4();
     extern void fn_80083CBC();
@@ -22579,12 +22148,8 @@ L_80129268: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x80129280 | 0x104 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129280(void) {
     extern void fn_80128CC0();
     extern void fn_80128CDC();
@@ -22668,7 +22233,6 @@ L_80129370: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x78 | fn_80129384 | multi_call_guarded */
 void fn_80129384(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
@@ -22699,9 +22263,6 @@ void fn_801294C4(void) {
 }
 
 /* 0x80129514 | 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129514(void) {
     extern void fn_8012A5B0();
     extern void fn_80140A9C();
@@ -22741,12 +22302,8 @@ L_80129584: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x8012959C | 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012959C(void) {
     extern void fn_8012A5B0();
     extern void fn_80140ACC();
@@ -22805,12 +22362,8 @@ L_80129634: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x80129650 | 0xC8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129650(void) {
     extern void fn_8012A5B0();
     extern void fn_80141308();
@@ -22876,12 +22429,8 @@ L_801296FC: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x80129718 | 0xC0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129718(void) {
     extern void fn_8012A5B0();
     extern void fn_80142368();
@@ -22941,7 +22490,6 @@ L_801297C0: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x68 | fn_801297D8 | guarded_call */
 void fn_801297D8(void) {
@@ -22960,9 +22508,6 @@ void fn_80129840(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 }
 
 /* 0x801298B8 | 0x90 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801298B8(void) {
     extern void fn_80129BC8();
     extern void fn_80140588();
@@ -23009,7 +22554,6 @@ L_80129930: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x80 | fn_80129948 | generic */
 void fn_80129948(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7) {
@@ -23018,9 +22562,6 @@ void fn_80129948(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32
 }
 
 /* 0x801299C8 | 0xB0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801299C8(void) {
     extern void fn_80129BC8();
     extern void fn_80140ACC();
@@ -23076,12 +22617,8 @@ L_80129A58: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80129A78 | 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129A78(void) {
     extern void fn_80129BC8();
     extern void fn_80141308();
@@ -23139,12 +22676,8 @@ L_80129B0C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80129B2C | 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129B2C(void) {
     extern void fn_80129BC8();
     extern void fn_80142368();
@@ -23194,12 +22727,8 @@ L_80129BB0: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x80129BC8 | 0x19C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129BC8(void) {
     extern void fn_8012A5B0();
     u8 sp[0x20];
@@ -23314,12 +22843,8 @@ L_80129D40: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80129D64 | 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129D64(void) {
     extern void fn_800F9EE4();
     extern void fn_8012640C();
@@ -23375,12 +22900,8 @@ L_80129E00: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x80129E20 | 0x100 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129E20(void) {
     extern void fn_8011F5FC();
     extern void fn_80123FBC();
@@ -23457,12 +22978,8 @@ L_80129F00: ;
     r28 = *(u32*)(sp + 0x140);
     return;
 }
-#pragma pop
 
 /* 0x80129F20 | 0x16C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80129F20(void) {
     extern void fn_8011F5FC();
     extern void fn_80123EF0();
@@ -23581,12 +23098,8 @@ L_8012A078: ;
     /* lmw r24, 0x140(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012A08C | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012A08C(void) {
     extern void fn_8011F5FC();
     extern void fn_80123FBC();
@@ -23637,7 +23150,6 @@ L_8012A110: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x74 | fn_8012A130 | multi_call_cond */
 u32 fn_8012A130(void) {
@@ -23648,9 +23160,6 @@ u32 fn_8012A130(void) {
 }
 
 /* 0x8012A1A4 | 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012A1A4(void) {
     extern void fn_800E0C54();
     extern void fn_800FA280();
@@ -23699,12 +23208,8 @@ void fn_8012A1A4(void) {
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8012A248 | 0x208 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012A248(void) {
     extern void fn_801249F8();
     extern void fn_8012A450();
@@ -23842,12 +23347,8 @@ void fn_8012A248(void) {
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* 0x8012A450 | 0x160 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012A450(void) {
     extern void fn_80129280();
     extern void fn_8012A774();
@@ -23957,12 +23458,8 @@ L_8012A598: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x8012A5B0 | 0x1C4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012A5B0(void) {
     extern void fn_80129280();
     extern void fn_8012A784();
@@ -24108,7 +23605,6 @@ L_8012A75C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x8012A7DC | 0x30 */
 void fn_8012A7DC(u8* ptr, s32 val) {
@@ -24228,9 +23724,6 @@ void fn_8012AC64(u32* dst, u32* src) {
 }
 
 /* 0x8012AC9C | 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012AC9C(void) {
     extern void fn_8011F1A0();
     extern void fn_80122370();
@@ -24288,12 +23781,8 @@ L_8012AD38: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* 0x8012AD50 | 0x434 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012AD50(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -24612,7 +24101,6 @@ L_8012B170: ;
     /* lmw r21, 0x44(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012B184 | 0x18 */
 extern u8 lbl_80426BD0[];
@@ -24622,9 +24110,6 @@ void fn_8012B184(s32 val) {
 }
 
 /* 0x8012B19C | 0x448 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012B19C(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -24944,12 +24429,8 @@ L_8012B5C0: ;
     /* lmw r26, 0x68(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012B5E4 | 0x4EC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012B5E4(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -25307,7 +24788,6 @@ L_8012BAAC: ;
     /* lmw r24, 0x80(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012BAD0 | 0x20 */
 void fn_8012BAD0(u32 a, u32 b, u32 c, u32 d, u32 e) {
@@ -25320,9 +24800,6 @@ void fn_8012BAD0(u32 a, u32 b, u32 c, u32 d, u32 e) {
 }
 
 /* 0x8012BAF0 | 0xB8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012BAF0(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -25374,12 +24851,8 @@ L_8012BB94: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* 0x8012BBA8 | 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012BBA8(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -25452,12 +24925,8 @@ L_8012BC70: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* 0x8012BCA4 | 0x13C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012BCA4(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -25552,12 +25021,8 @@ L_8012BDB8: ;
     /* lmw r27, 0x2c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012BDE0 | 0xD4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012BDE0(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -25613,12 +25078,8 @@ L_8012BE94: ;
     *(u32*)((u8*)r5 + 0x144) = r4;
     return;
 }
-#pragma pop
 
 /* 0x8012BEB4 | 0x200 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012BEB4(void) {
     extern u8 lbl_8047D038[];
     extern u8 lbl_8047D040[];
@@ -25773,12 +25234,8 @@ L_8012C070: ;
     /* lmw r23, 0x3c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012C0B4 | 0x48C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012C0B4(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -26124,12 +25581,8 @@ L_8012C52C: ;
     /* lmw r24, 0x130(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012C540 | 0x120 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012C540(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -26220,12 +25673,8 @@ L_8012C640: ;
     r29 = *(u32*)(sp + 0x34);
     return;
 }
-#pragma pop
 
 /* 0x8012C660 | 0x424 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012C660(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -26524,7 +25973,6 @@ L_8012CA5C: ;
     r30 = *(u32*)(sp + 0x38);
     return;
 }
-#pragma pop
 
 /* 0x70 | fn_8012D2BC | generic */
 u32 fn_8012D2BC(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
@@ -26543,9 +25991,6 @@ u32 fn_8012D32C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 }
 
 /* 0x8012D39C | 0x454 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012D39C(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D038[];
@@ -26869,12 +26314,8 @@ L_8012D7E4: ;
 L_8012D7E8: ;
     return;
 }
-#pragma pop
 
 /* 0x8012D7F0 | 0x6A4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012D7F0(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -27346,12 +26787,8 @@ L_8012DE70: ;
     /* lmw r27, 0x9c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012DE94 | 0x4F4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012DE94(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -27704,12 +27141,8 @@ L_8012E36C: ;
     /* lmw r16, 0xc0(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012E388 | 0x430 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012E388(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -28030,12 +27463,8 @@ L_8012E79C: ;
     /* lmw r26, 0x48(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012E7B8 | 0x41C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012E7B8(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_8047D030[];
@@ -28335,12 +27764,8 @@ L_8012EBB8: ;
     /* lmw r25, 0x84(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012EBD4 | 0x3E4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012EBD4(void) {
     extern u8 lbl_80272A38[];
     extern u8 lbl_8047D030[];
@@ -28630,7 +28055,6 @@ L_8012EF94: ;
     /* lmw r26, 0x78(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x50 | fn_8012EFB8 | framed_no_calls */
 u32 fn_8012EFB8(u32 arg1, u32 arg2) {
@@ -28639,9 +28063,6 @@ u32 fn_8012EFB8(u32 arg1, u32 arg2) {
 }
 
 /* 0x8012F008 | 0x114 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012F008(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -28722,7 +28143,6 @@ L_8012F100: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* 0x8012F11C | 0x34 */
 u32 fn_8012F11C(s32 idx) {
@@ -28733,9 +28153,6 @@ u32 fn_8012F11C(s32 idx) {
 }
 
 /* 0x8012F150 | 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012F150(void) {
     extern u8 lbl_8047D038[];
     extern u8 lbl_8047D0D4[];
@@ -28790,12 +28207,8 @@ L_8012F1F4: ;
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* 0x8012F1FC | 0x210 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012F1FC(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -28949,12 +28362,8 @@ L_8012F3F8: ;
     /* lmw r27, 0x1c(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012F40C | 0x204 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012F40C(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -29103,12 +28512,8 @@ L_8012F5FC: ;
     r31 = *(u32*)(sp + 0x1C);
     return;
 }
-#pragma pop
 
 /* 0x8012F610 | 0x4C8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012F610(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -29458,12 +28863,8 @@ L_8012FA7C: ;
     /* lmw r24, 0xc0(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x8012FAD8 | 0x1FC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012FAD8(void) {
     extern u8 lbl_802729C0[];
     extern u8 lbl_80272A10[];
@@ -29590,12 +28991,8 @@ L_8012FCC0: ;
     r31 = *(u32*)(sp + 0x8C);
     return;
 }
-#pragma pop
 
 /* 0x8012FCD4 | 0x380 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8012FCD4(void) {
     extern u8 lbl_802729C0[];
     extern u8 lbl_80272A10[];
@@ -29846,12 +29243,8 @@ L_8012FFF4: ;
     /* lmw r25, 0x94(r1) */;
     return;
 }
-#pragma pop
 
 /* 0x80130054 | 0x1F8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130054(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -29989,12 +29382,8 @@ L_80130230: ;
     r29 = *(u32*)(sp + 0x24);
     return;
 }
-#pragma pop
 
 /* 0x8013024C | 0x414 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8013024C(void) {
     extern u8 lbl_8047D030[];
     extern u8 lbl_8047D034[];
@@ -30258,12 +29647,8 @@ L_80130644: ;
     r29 = *(u32*)(sp + 0x24);
     return;
 }
-#pragma pop
 
 /* 0x80130660 | 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130660(void) {
     extern void fn_800FA280();
     extern void fn_80123EF0();
@@ -30349,12 +29734,8 @@ void fn_80130660(void) {
     r30 = *(u32*)(sp + 0x148);
     return;
 }
-#pragma pop
 
 /* 0x80130770 | 0x120 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130770(void) {
     extern void fn_800FA280();
     extern void fn_80123110();
@@ -30445,12 +29826,8 @@ void fn_80130770(void) {
     r30 = *(u32*)(sp + 0x148);
     return;
 }
-#pragma pop
 
 /* 0x80130890 | 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130890(void) {
     extern void fn_800FA280();
     extern void fn_80123EF0();
@@ -30536,12 +29913,8 @@ void fn_80130890(void) {
     r30 = *(u32*)(sp + 0x148);
     return;
 }
-#pragma pop
 
 /* 0x801309A0 | 0xE8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801309A0(void) {
     extern void fn_800FA280();
     extern void fn_80123EF0();
@@ -30616,12 +29989,8 @@ void fn_801309A0(void) {
     r31 = *(u32*)(sp + 0x14C);
     return;
 }
-#pragma pop
 
 /* 0x80130A88 | 0x128 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130A88(void) {
     extern void fn_80123D58();
     extern void fn_801240C4();
@@ -30710,12 +30079,8 @@ void fn_80130A88(void) {
     r30 = *(u32*)(sp + 0x148);
     return;
 }
-#pragma pop
 
 /* 0x80130BB0 | 0x128 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80130BB0(void) {
     extern void fn_80123D58();
     extern void fn_801240C4();
@@ -30803,4 +30168,3 @@ void fn_80130BB0(void) {
     r30 = *(u32*)(sp + 0x148);
     return;
 }
-#pragma pop

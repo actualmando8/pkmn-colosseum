@@ -131,9 +131,6 @@ extern u8 lbl_80400B28[];  /* light/material command buffer */
  *   ; mode 0: memcpy(lbl_80400248, r4, 0x5A0)
  *   ; mode 1: memcpy(r4=r31, lbl_80400248, 0x5A0)
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSgfx_VBlankCallback(s32 mode, void* buffer) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -168,7 +165,6 @@ L_800D3EB0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800D3EC4 -- GSgfx pre-retrace callback
@@ -227,9 +223,6 @@ void GSgfx_DrawDoneCallback(void) {
  * Increment frame counter and dispatch queued operations.
  * 72 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSgfx_FrameEndCallback(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -252,7 +245,6 @@ void GSgfx_FrameEndCallback(void) {
 L_800D3F94: ;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800D3FA4 -- GSgfx_BeginFrame
@@ -266,9 +258,6 @@ L_800D3F94: ;
  *   - TEV stages
  *   - Projection matrix
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSgfx_BeginFrame(void) {
     extern u8 lbl_803147C8[];
     extern u8 lbl_804001F0[];
@@ -742,7 +731,6 @@ L_800D45E4: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800D461C -- GSlog_PrintFormatted
@@ -751,9 +739,6 @@ L_800D45E4: ;
  * At 0x97C (2428) bytes, this is a substantial printf implementation.
  * Uses "0123456789ABCDEF" for hex digit lookup.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSlog_PrintFormatted(u32 channel, u32 paramCount, ...) {
     extern void fn_800D30AC();
     extern void fn_800D55D0();
@@ -1465,7 +1450,6 @@ L_800D4F7C: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800D4F98 -- GSlog_QueueCommand
@@ -1474,9 +1458,6 @@ L_800D4F7C: ;
  * Used by lighting, material, and draw functions to batch commands.
  * 1388 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSlog_QueueCommand(u32 opcode, u32 paramCount, ...) {
     extern u8 jumptable_803142F8[];
     u8 sp[0x90];
@@ -1835,7 +1816,6 @@ L_800D54EC: ;
     r30 = *(u32*)(sp + 0x88);
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * Matrix accessor functions (0x800D7230 - 0x800D75D0)
@@ -1861,9 +1841,6 @@ L_800D54EC: ;
  * Configure the full GX rendering pipeline. At 2320 bytes, this is
  * a major setup function. Called once per render mode change.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSgfx_ConfigurePipeline(void) {
     extern u8 lbl_80314404[];
     extern u8 lbl_803144F0[];
@@ -2497,7 +2474,6 @@ L_800D9224: ;
     /* lmw r18, 0x8(r1) */;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800DE680 -- GSmaterial_Create
@@ -2512,9 +2488,6 @@ L_800D9224: ;
  *
  * This function produces the material-related error strings.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSmaterial_Create(void* params) {
     extern u8 lbl_80400F30[];
     extern u8 lbl_80478AE8[];
@@ -3159,7 +3132,6 @@ L_800DEF9C: ;
     /* lmw r18, 0x18(r1) */;
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_800E1544 -- GSgfx_DrawDispatch
@@ -3168,9 +3140,6 @@ L_800DEF9C: ;
  * largest function in the rendering pipeline. It interprets draw
  * commands and submits vertices/primitives to GX.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSgfx_DrawDispatch(void* drawList) {
     extern u8 lbl_80270BB8[];
     extern u8 lbl_8047AB28[];
@@ -3918,7 +3887,6 @@ L_800E2018: ;
     /* lmw r22, 0x18(r1) */;
     return;
 }
-#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -3979,9 +3947,6 @@ void fn_800D4610(u8 val) {
 }
 
 /* fn_800D5504 -- GSlog_Init | Size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D5504(void) {
     extern u8 lbl_802703C0[];
     extern u8 lbl_804001F0[];
@@ -4043,7 +4008,6 @@ L_800D55B8: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800D55D0 | Size: 0x78 */
 void fn_800D55D0(f32 val) {
@@ -4613,9 +4577,6 @@ void fn_800D6680(f32 fp1, f32 fp2, f32 fp3) {
 
 
 /* fn_800D6728 | Size: 0x94 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D6728(void) {
     extern void fn_800D4F98();
     extern void fn_800D6B00();
@@ -4656,12 +4617,8 @@ L_800D676C: ;
 L_800D67AC: ;
     return;
 }
-#pragma pop
 
 /* fn_800D67BC -- MTX operations | Size: 0x244 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D67BC(void) {
     extern u8 lbl_80314350[];
     extern u8 lbl_804001F0[];
@@ -4828,7 +4785,6 @@ L_800D69EC: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D6A00 | Size: 0x5C */
 void fn_800D6A00(u32 val) {
@@ -4852,9 +4808,6 @@ void fn_800D6A5C(u32 dx, u32 dy) {
 }
 
 /* fn_800D6A80 | Size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D6A80(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4897,12 +4850,8 @@ L_800D6AEC: ;
     *(u32*)((u8*)r6 + 0x0) = r0;
     return;
 }
-#pragma pop
 
 /* fn_800D6B00 -- Large matrix setup | Size: 0x730 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D6B00(void) {
     extern u8 lbl_804007E8[];
     extern void fn_800DB098();
@@ -5371,7 +5320,6 @@ L_800D7210: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800D7230 | Size: 0x1C */
 void fn_800D7230(void) {
@@ -5733,9 +5681,6 @@ void fn_800D7650(u8* obj) {
 }
 
 /* fn_800D76A8 | Size: 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D76A8(void) {
     extern u8 lbl_80314370[];
     extern u8 lbl_803143A8[];
@@ -5854,7 +5799,6 @@ L_800D780C: ;
     /* lmw r24, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800D7820 | Size: 0x48 */
 void fn_800D7820(u32 val) {
@@ -5880,9 +5824,6 @@ void fn_800D7868(u8* base, u32 idx, u32 p5, u32 p6, u32 p7, u8 p8, u32 p9, u8 p1
 }
 
 /* fn_800D7894 -- GSgfx_InitViewport | Size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7894(void) {
     extern u8 lbl_803144D0[];
     extern u8 lbl_8047AAAC[];
@@ -5939,12 +5880,8 @@ L_800D7938: ;
     r3 = 0x0;
     return;
 }
-#pragma pop
 
 /* fn_800D7940 | Size: 0x130 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7940(void) {
     extern void fn_800D5724();
     extern void fn_800D579C();
@@ -6040,12 +5977,8 @@ L_800D7A4C: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800D7A70 | Size: 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7A70(void) {
     extern u8 lbl_80314370[];
     extern u8 lbl_803143A8[];
@@ -6133,12 +6066,8 @@ L_800D7B44: ;
     /* lmw r25, 0x14(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800D7B80 -- GSgfx_InitProjection | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7B80(void) {
     extern u8 lbl_8047AAA8[];
     extern u8 lbl_8047AAAC[];
@@ -6181,12 +6110,8 @@ L_800D7BD4: ;
 L_800D7BE8: ;
     return;
 }
-#pragma pop
 
 /* fn_800D7BF8 | Size: 0x7C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7BF8(void) {
     extern void fn_800D1A70();
     extern void fn_800D1B3C();
@@ -6226,12 +6151,8 @@ L_800D7C60: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D7C74 | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7C74(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6282,12 +6203,8 @@ L_800D7CFC: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D7D10 | Size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7D10(void) {
     extern u8 lbl_80400948[];
     extern void fn_800D4F98();
@@ -6329,12 +6246,8 @@ L_800D7D68: ;
 L_800D7D80: ;
     return;
 }
-#pragma pop
 
 /* fn_800D7D90 | Size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7D90(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6397,12 +6310,8 @@ L_800D7E40: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800D7E5C | Size: 0xB8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7E5C(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6463,12 +6372,8 @@ L_800D7F00: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D7F14 | Size: 0xD0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7F14(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6537,12 +6442,8 @@ L_800D7FD0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D7FE4 | Size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D7FE4(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6598,12 +6499,8 @@ L_800D8074: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D8088 | Size: 0xCC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D8088(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6670,12 +6567,8 @@ L_800D8140: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D8154 | Size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D8154(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6727,12 +6620,8 @@ L_800D81D8: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D81EC | Size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D81EC(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6784,12 +6673,8 @@ L_800D8270: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D8284 | Size: 0xC8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D8284(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6860,12 +6745,8 @@ L_800D8330: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D834C | Size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D834C(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6917,12 +6798,8 @@ L_800D83D0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D83E4 -- GSgfx_InitMatrixStack | Size: 0xA8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D83E4(void) {
     extern u8 lbl_80314610[];
     extern u8 lbl_80400948[];
@@ -6982,12 +6859,8 @@ L_800D8478: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800D848C | Size: 0x148 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D848C(void) {
     extern u8 lbl_80314404[];
     extern u8 lbl_80314424[];
@@ -7086,12 +6959,8 @@ L_800D85B8: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800D85D4 | Size: 0x1D8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D85D4(void) {
     extern u8 lbl_803144F0[];
     extern u8 lbl_80314510[];
@@ -7232,12 +7101,8 @@ L_800D8790: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800D87AC -- GSgfx_SetInternalMode | Size: 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D87AC(void) {
     extern u8 lbl_80314404[];
     extern void fn_800B857C();
@@ -7311,7 +7176,6 @@ L_800D8878: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800D888C | Size: 0x50 */
 void fn_800D888C(u32 mask) {
@@ -7336,9 +7200,6 @@ void fn_800D88DC(u32 mask) {
 }
 
 /* fn_800D923C | Size: 0x400 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D923C(void) {
     extern u8 lbl_804001F0[];
     extern void fn_800B884C();
@@ -7648,12 +7509,8 @@ L_800D961C: ;
     /* lmw r21, 0x24(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800D963C | Size: 0x4B4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D963C(void) {
     u8 sp[0x20];
     u32 r0 = 0;
@@ -7974,7 +7831,6 @@ L_800D9ADC: ;
     r1 = r1 + 0x20;
     return;
 }
-#pragma pop
 
 /* fn_800D9AF0 | Size: 0x34 */
 void fn_800D9AF0(u16* out_x, u16* out_y, u16* out_w, u16* out_h) {
@@ -8029,9 +7885,6 @@ void fn_800D9BD0(void) {
 }
 
 /* fn_800D9C24 -- GSgfx_SetViewportRect | Size: 0x144 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9C24(void) {
     extern u8 lbl_8047CA50[];
     extern u8 lbl_8047CA58[];
@@ -8127,12 +7980,8 @@ L_800D9D48: ;
     r28 = *(u32*)(sp + 0x30);
     return;
 }
-#pragma pop
 
 /* fn_800D9D68 -- GSgfx_SetScissor | Size: 0xE4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9D68(void) {
     extern void fn_800BD7A0();
     extern void fn_800D2150();
@@ -8200,12 +8049,8 @@ L_800D9E2C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800D9E4C | Size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9E4C(void) {
     extern u8 lbl_8047AA8C[];
     extern void fn_800D4F98();
@@ -8248,12 +8093,8 @@ L_800D9EC0: ;
 L_800D9EC8: ;
     return;
 }
-#pragma pop
 
 /* fn_800D9ED8 | Size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9ED8(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -8284,12 +8125,8 @@ L_800D9F20: ;
 L_800D9F30: ;
     return;
 }
-#pragma pop
 
 /* fn_800D9F40 -- GSgfx_ConfigureFog | Size: 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9F40(void) {
     extern void fn_800B953C();
     extern void fn_800D4F98();
@@ -8325,12 +8162,8 @@ L_800D9F98: ;
 L_800D9FA4: ;
     return;
 }
-#pragma pop
 
 /* fn_800D9FB4 | Size: 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800D9FB4(void) {
     extern void fn_800BD870();
     extern void fn_800D4F98();
@@ -8366,7 +8199,6 @@ L_800DA00C: ;
 L_800DA018: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA028 -- GSgfx_ConfigureTEV | Size: 0x64 */
 void fn_800DA028(u32 param1) {
@@ -8384,9 +8216,6 @@ void fn_800DA028(u32 param1) {
 
 
 /* fn_800DA08C | Size: 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA08C(void) {
     extern void fn_800BCFDC();
     extern void fn_800D4F98();
@@ -8422,12 +8251,8 @@ L_800DA0E4: ;
 L_800DA0F0: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA100 -- GSgfx_ConfigureAlpha | Size: 0xE8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA100(void) {
     extern u8 lbl_8031456C[];
     extern u8 lbl_8031457C[];
@@ -8501,12 +8326,8 @@ L_800DA1A4: ;
 L_800DA1D8: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA1E8 -- GSgfx_ConfigureZ | Size: 0xD4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA1E8(void) {
     extern u8 lbl_8031454C[];
     extern void fn_800BCE88();
@@ -8570,12 +8391,8 @@ L_800DA274: ;
 L_800DA2AC: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA2BC -- GSgfx_ConfigureBlend | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA2BC(void) {
     extern void fn_800BCE30();
     extern void fn_800BCE5C();
@@ -8647,12 +8464,8 @@ L_800DA374: ;
 L_800DA3A0: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA3B0 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA3B0(void) {
     extern void fn_800BD008();
     extern void fn_800D4F98();
@@ -8690,12 +8503,8 @@ L_800DA40C: ;
 L_800DA418: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA428 | Size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA428(void) {
     extern u8 lbl_803145D0[];
     extern void fn_800BCDDC();
@@ -8743,12 +8552,8 @@ L_800DA488: ;
 L_800DA4B4: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA4C4 | Size: 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA4C4(void) {
     extern u8 lbl_8031459C[];
     extern u8 lbl_803145A8[];
@@ -8805,12 +8610,8 @@ L_800DA52C: ;
 L_800DA568: ;
     return;
 }
-#pragma pop
 
 /* fn_800DA578 | Size: 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA578(void) {
     extern void fn_800DA6F0();
     u8 sp[0x20];
@@ -8919,12 +8720,8 @@ L_800DA6DC: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800DA6F0 | Size: 0x190 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA6F0(void) {
     extern void fn_800DA880();
     extern u8 jumptable_803152B8[];
@@ -9043,12 +8840,8 @@ L_800DA868: ;
     /* lmw r26, 0x8(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800DA880 | Size: 0x440 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DA880(void) {
     extern u8 jumptable_80315320[];
     extern u8 jumptable_80315340[];
@@ -9338,7 +9131,6 @@ L_800DACA8: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DACC0 | Size: 0x50 */
 void fn_800DACC0(u8* obj) {
@@ -9353,9 +9145,6 @@ void fn_800DACC0(u8* obj) {
 }
 
 /* fn_800DAD10 | Size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DAD10(void) {
     extern void fn_800BD0FC();
     extern void fn_800D4F98();
@@ -9404,12 +9193,8 @@ L_800DADA0: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DADB4 | Size: 0x1AC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DADB4(void) {
     extern void fn_800E209C();
     extern void fn_800E24B0();
@@ -9532,12 +9317,8 @@ L_800DAF4C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DAF60 | Size: 0x138 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DAF60(void) {
     extern u8 lbl_8047AAD4[];
     extern u8 lbl_8047AAD8[];
@@ -9629,12 +9410,8 @@ L_800DB07C: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800DB098 | Size: 0x6C0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DB098(void) {
     extern void fn_800D724C();
     extern void fn_800D7268();
@@ -10110,12 +9887,8 @@ L_800DB748: ;
     if (--ctr != 0) goto L_800DB5CC;
     return;
 }
-#pragma pop
 
 /* fn_800DB758 | Size: 0x138 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DB758(void) {
     extern void fn_800D6A80();
     extern u8 jumptable_80315364[];
@@ -10201,12 +9974,8 @@ L_800DB83C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DB890 -- GSgfx_InitLighting | Size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DB890(void) {
     extern u8 lbl_8047AAD0[];
     extern u8 lbl_8047AAD4[];
@@ -10246,7 +10015,6 @@ L_800DB8E4: ;
 L_800DB8F0: ;
     return;
 }
-#pragma pop
 
 /* fn_800DB900 | Size: 0x88 */
 void fn_800DB900(u32 param1, u32 param2, u32 param3) {
@@ -10275,9 +10043,6 @@ void fn_800DB988(u32 param1, u8 param2, u32 param3) {
 
 
 /* fn_800DB9F0 | Size: 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DB9F0(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10310,7 +10075,6 @@ L_800DBA2C: ;
 L_800DBA44: ;
     return;
 }
-#pragma pop
 
 /* fn_800DBA54 | Size: 0x50 */
 void fn_800DBA54(u8 val) {
@@ -10338,9 +10102,6 @@ void fn_800DBAA4(u32 param1) {
 
 
 /* fn_800DBB0C | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBB0C(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10379,12 +10140,8 @@ L_800DBB48: ;
 L_800DBB74: ;
     return;
 }
-#pragma pop
 
 /* fn_800DBB84 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBB84(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10423,12 +10180,8 @@ L_800DBBC0: ;
 L_800DBBEC: ;
     return;
 }
-#pragma pop
 
 /* fn_800DBBFC | Size: 0xE8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBBFC(void) {
     extern void fn_800D4F98();
     u8 sp[0x30];
@@ -10493,12 +10246,8 @@ L_800DBCC4: ;
     r28 = *(u32*)(sp + 0x20);
     return;
 }
-#pragma pop
 
 /* fn_800DBCE4 | Size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBCE4(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10544,12 +10293,8 @@ L_800DBD30: ;
 L_800DBD60: ;
     return;
 }
-#pragma pop
 
 /* fn_800DBD70 | Size: 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBD70(void) {
     extern void fn_800D4F98();
     u8 sp[0x30];
@@ -10617,7 +10362,6 @@ L_800DBE3C: ;
     r28 = *(u32*)(sp + 0x20);
     return;
 }
-#pragma pop
 
 /* fn_800DBE5C | Size: 0x58 */
 void fn_800DBE5C(u32 idx) {
@@ -10668,9 +10412,6 @@ void fn_800DBF78(u32 idx, u32 val) {
 }
 
 /* fn_800DBFD4 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DBFD4(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10711,12 +10452,8 @@ L_800DC01C: ;
 L_800DC03C: ;
     return;
 }
-#pragma pop
 
 /* fn_800DC04C | Size: 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC04C(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10763,12 +10500,8 @@ L_800DC0A0: ;
 L_800DC0C4: ;
     return;
 }
-#pragma pop
 
 /* fn_800DC0D4 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC0D4(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10809,12 +10542,8 @@ L_800DC11C: ;
 L_800DC13C: ;
     return;
 }
-#pragma pop
 
 /* fn_800DC14C | Size: 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC14C(void) {
     extern void fn_800D4F98();
     u8 sp[0x10];
@@ -10861,7 +10590,6 @@ L_800DC1A0: ;
 L_800DC1C4: ;
     return;
 }
-#pragma pop
 
 /* fn_800DC1D4 | Size: 0x50 */
 void fn_800DC1D4(u8 val) {
@@ -10891,9 +10619,6 @@ void fn_800DC224(u32 param1, u8 param2, u32 param3, u32 param4, u32 param5) {
 
 
 /* fn_800DC298 | Size: 0xF8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC298(void) {
     extern u8 lbl_80400EE0[];
     extern u8 lbl_8047AAE0[];
@@ -10963,12 +10688,8 @@ L_800DC37C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DC390 | Size: 0x1B0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC390(void) {
     extern u8 lbl_80400EE0[];
     extern u8 lbl_8047AAE0[];
@@ -11085,7 +10806,6 @@ L_800DC520: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800DC540 | Size: 0x20 */
 void fn_800DC540(void) {
@@ -11100,9 +10820,6 @@ void fn_800DC540(void) {
 }
 
 /* fn_800DC560 | Size: 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC560(void) {
     extern u8 lbl_80400EE0[];
     extern u8 lbl_8047AAE0[];
@@ -11204,12 +10921,8 @@ L_800DC6BC: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800DC6D8 | Size: 0x19C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC6D8(void) {
     extern u8 lbl_8047AAEC[];
     extern u8 lbl_8047AAF0[];
@@ -11323,7 +11036,6 @@ L_800DC848: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800DC874 | Size: 0x4 */
 void fn_800DC874(void) {
@@ -11331,9 +11043,6 @@ void fn_800DC874(void) {
 }
 
 /* fn_800DC878 | Size: 0x198 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DC878(void) {
     extern u8 lbl_8047AAF4[];
     extern u8 lbl_8047CA78[];
@@ -11454,12 +11163,8 @@ L_800DC9EC: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800DCA10 | Size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCA10(void) {
     extern void fn_801A48B0();
     extern void fn_801A497C();
@@ -11500,7 +11205,6 @@ void fn_800DCA10(void) {
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DCAA4 | Size: 0xC */
 void fn_800DCAA4(void* self) {
@@ -11524,9 +11228,6 @@ void fn_800DCADC(void* self, f32 value) {
 }
 
 /* fn_800DCAF0 | Size: 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCAF0(void) {
     extern u8 lbl_8047CA88[];
     extern void fn_800D37CC();
@@ -11573,12 +11274,8 @@ L_800DCB5C: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DCB78 | Size: 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCB78(void) {
     extern u8 lbl_8047AAF4[];
     extern u8 lbl_8047CA78[];
@@ -11637,7 +11334,6 @@ L_800DCC14: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DCC3C | Size: 0x24 */
 void fn_800DCC3C(void* self) {
@@ -11652,9 +11348,6 @@ void fn_800DCC60(void* self) {
 }
 
 /* fn_800DCC84 | Size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCC84(void) {
     extern void fn_801A4A48();
     u8 sp[0x30];
@@ -11690,12 +11383,8 @@ void fn_800DCC84(void) {
     fn_801A4A48();
     return;
 }
-#pragma pop
 
 /* fn_800DCCF0 | Size: 0xA8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCCF0(void) {
     extern void fn_801A68F8();
     extern void fn_801A6910();
@@ -11745,12 +11434,8 @@ L_800DCD7C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DCD98 | Size: 0xB4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCD98(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -11800,12 +11485,8 @@ L_800DCE28: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DCE4C | Size: 0x170 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCE4C(void) {
     extern u8 lbl_8047AAEC[];
     extern u8 lbl_8047AAF0[];
@@ -11921,12 +11602,8 @@ L_800DCFA8: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DCFBC | Size: 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DCFBC(void) {
     extern u8 lbl_8047AAEC[];
     extern u8 lbl_8047AAF0[];
@@ -12008,12 +11685,8 @@ L_800DD0A4: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DD0B8 | Size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DD0B8(void) {
     extern u8 lbl_8047AAE8[];
     extern u8 lbl_8047AAEC[];
@@ -12053,7 +11726,6 @@ L_800DD10C: ;
 L_800DD118: ;
     return;
 }
-#pragma pop
 
 /* fn_800DD128 | Size: 0x4C */
 void fn_800DD128(u8* obj) {
@@ -12069,9 +11741,6 @@ void fn_800DD128(u8* obj) {
 }
 
 /* fn_800DD174 | Size: 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DD174(void) {
     extern u8 lbl_8047AAEC[];
     extern u8 lbl_8047AAF0[];
@@ -12149,12 +11818,8 @@ L_800DD254: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DD270 | Size: 0x114 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DD270(void) {
     extern u8 lbl_8047AAF8[];
     extern u8 lbl_8047AAFA[];
@@ -12238,12 +11903,8 @@ L_800DD370: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-#pragma pop
 
 /* fn_800DD38C | Size: 0x5E4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DD38C(void) {
     extern u8 lbl_802704B4[];
     extern u8 lbl_80400F30[];
@@ -12660,12 +12321,8 @@ L_800DD94C: ;
     r30 = *(u32*)(sp + 0xA8);
     return;
 }
-#pragma pop
 
 /* fn_800DD970 -- OSReport/GSlog | Size: 0x5E4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DD970_impl(void) {
     extern u8 lbl_802704B4[];
     extern u8 lbl_80401044[];
@@ -13082,12 +12739,8 @@ L_800DDF30: ;
     r30 = *(u32*)(sp + 0xA8);
     return;
 }
-#pragma pop
 
 /* fn_800DDF54 | Size: 0x148 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DDF54(void) {
     extern u8 lbl_8047AAF8[];
     extern u8 lbl_8047AAFA[];
@@ -13190,12 +12843,8 @@ L_800DE084: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DE09C | Size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DE09C(void) {
     extern void fn_800DE128();
     u8 sp[0x80];
@@ -13241,12 +12890,8 @@ L_800DE0D0: ;
     r31 = *(u32*)(sp + 0x7C);
     return;
 }
-#pragma pop
 
 /* fn_800DE128 | Size: 0x558 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DE128(void) {
     extern u8 lbl_80401168[];
     extern u8 lbl_80401178[];
@@ -13629,7 +13274,6 @@ L_800DE65C: ;
     /* lmw r20, 0x10(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800DEFC8 | Size: 0x60 */
 void fn_800DEFC8(u8* self) {
@@ -13652,9 +13296,6 @@ void fn_800DEFC8(u8* self) {
 }
 
 /* fn_800DF028 | Size: 0xF4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF028(void) {
     extern u8 lbl_8047CAC8[];
     extern void fn_800B8DF4();
@@ -13729,7 +13370,6 @@ L_800DF100: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800DF11C | Size: 0x24 */
 void fn_800DF11C(void* self, void* out) {
@@ -13808,9 +13448,6 @@ void fn_800DF21C(void* self) {
 }
 
 /* fn_800DF248 | Size: 0x13C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF248(void) {
     extern void fn_801A6FF0();
     extern void fn_801BBD3C();
@@ -13898,12 +13535,8 @@ L_800DF35C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800DF384 | Size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF384(void) {
     extern void fn_800DFABC();
     extern void fn_801A6FF0();
@@ -13937,12 +13570,8 @@ L_800DF3D4: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800DF3F0 | Size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF3F0(void) {
     extern void fn_801A8458();
     u8 sp[0x10];
@@ -13985,7 +13614,6 @@ L_800DF45C: ;
     r3 = r4;
     return;
 }
-#pragma pop
 
 /* fn_800DF470 | Size: 0x28 */
 void fn_800DF470(void* self) {
@@ -14002,9 +13630,6 @@ void fn_800DF470(void* self) {
 }
 
 /* fn_800DF498 | Size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF498(void) {
     extern void fn_800DD970();
     u8 sp[0x10];
@@ -14036,7 +13661,6 @@ L_800DF4E4: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DF504 | Size: 0x4C */
 void fn_800DF504(u8* self) {
@@ -14050,9 +13674,6 @@ void fn_800DF504(u8* self) {
 }
 
 /* fn_800DF550 | Size: 0xB8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF550(void) {
     extern void fn_801A6FF0();
     extern void fn_801A8428();
@@ -14112,12 +13733,8 @@ L_800DF5E0: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800DF608 | Size: 0x19C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF608(void) {
     extern void fn_800B8DF4();
     extern void fn_801A6FF0();
@@ -14230,12 +13847,8 @@ L_800DF774: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800DF7A4 | Size: 0xB0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF7A4(void) {
     extern u8 lbl_8047AB1C[];
     extern u8 lbl_8047AB20[];
@@ -14293,12 +13906,8 @@ L_800DF800: ;
 L_800DF844: ;
     return;
 }
-#pragma pop
 
 /* fn_800DF854 -- GSmaterialInit | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF854(void) {
     extern u8 lbl_80315490[];
     extern u8 lbl_8047AB18[];
@@ -14342,12 +13951,8 @@ L_800DF8A4: ;
 L_800DF8BC: ;
     return;
 }
-#pragma pop
 
 /* fn_800DF8CC -- GSmaterialClassInit | Size: 0x64 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF8CC(void) {
     extern u8 lbl_80315490[];
     extern u8 lbl_8036CB30[];
@@ -14384,12 +13989,8 @@ void fn_800DF8CC(void) {
     *(u32*)((u8*)r4 + 0x44) = r0;
     return;
 }
-#pragma pop
 
 /* fn_800DF930 | Size: 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DF930(void) {
     extern u8 lbl_8036CB30[];
     extern void fn_801B5F08();
@@ -14512,12 +14113,8 @@ L_800DFA9C: ;
     r28 = *(u32*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800DFABC | Size: 0x3DC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DFABC(void) {
     extern u8 lbl_803154E4[];
     extern u8 lbl_8047CAC8[];
@@ -14802,7 +14399,6 @@ L_800DFE84: ;
     /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800DFE98 | Size: 0x54 */
 u32 fn_800DFE98(u8* self) {
@@ -14817,9 +14413,6 @@ u32 fn_800DFE98(u8* self) {
 }
 
 /* fn_800DFEEC | Size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800DFEEC(void) {
     u32 r3 = 0;
     u32 r4 = 0;
@@ -14882,7 +14475,6 @@ void fn_800DFEEC(void) {
     *(f32*)((u8*)r3 + 0x8) = f0;
     return;
 }
-#pragma pop
 
 /* fn_800DFF98 | Size: 0x34 */
 void fn_800DFF98(void* a, void* b, void* c) {
@@ -15080,9 +14672,6 @@ void fn_800E042C(void* dst, f32* scale) {
 }
 
 /* fn_800E048C | Size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E048C(void) {
     extern u8 lbl_80315568[];
     u8 sp[0x30];
@@ -15119,7 +14708,6 @@ void fn_800E048C(void) {
     r31 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800E04F4 | Size: 0x24 */
 void fn_800E04F4(void* dst) {
@@ -15150,9 +14738,6 @@ void fn_800E0560(void* dst, f32* trans) {
 }
 
 /* fn_800E05C0 | Size: 0x68 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E05C0(void) {
     extern u8 lbl_80315568[];
     u8 sp[0x30];
@@ -15189,7 +14774,6 @@ void fn_800E05C0(void) {
     r31 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800E0628 | Size: 0x24 */
 void fn_800E0628(void* dst, void* src) {
@@ -15271,9 +14855,6 @@ void fn_800E0790(void) {
 }
 
 /* fn_800E07E4 | Size: 0x128 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E07E4(void) {
     extern u8 lbl_8047CAE0[];
     extern u8 lbl_8047CAE4[];
@@ -15362,12 +14943,8 @@ L_800E0844: ;
     r30 = *(u32*)(sp + 0x18);
     return;
 }
-#pragma pop
 
 /* fn_800E090C | Size: 0xA8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E090C(void) {
     extern u8 lbl_8047CAF0[];
     extern u8 lbl_8047CAF4[];
@@ -15423,7 +15000,6 @@ L_800E0994: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-#pragma pop
 
 /* fn_800E09B4 | Size: 0x34 */
 f32 fn_800E09B4(f32 a, f32 b, f32 t) {
@@ -15439,9 +15015,6 @@ f32 fn_800E09B4(f32 a, f32 b, f32 t) {
 }
 
 /* fn_800E09E8 | Size: 0x1B8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E09E8(void) {
     extern u8 lbl_8047CAF8[];
     extern u8 lbl_8047CAFC[];
@@ -15576,7 +15149,6 @@ L_800E0B40: ;
     /* lmw r27, 0x2c(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800E0BA0 | Size: 0x44 */
 f32 fn_800E0BA0(void) {
@@ -15617,9 +15189,6 @@ void fn_800E0C78(void) {
 }
 
 /* fn_800E0CA0 | Size: 0x84 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0CA0(void) {
     extern u8 lbl_804011B8[];
     extern u8 lbl_8047CB18[];
@@ -15669,12 +15238,8 @@ L_800E0CE8: ;
     f31 = *(f64*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800E0D24 | Size: 0xB8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0D24(void) {
     extern u8 lbl_804011B8[];
     extern u8 lbl_8047CB30[];
@@ -15731,7 +15296,6 @@ L_800E0D70: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-#pragma pop
 
 /* fn_800E0DDC | Size: 0x38 */
 u32 fn_800E0DDC(void) {
@@ -15756,9 +15320,6 @@ u32 fn_800E0DDC(void) {
 }
 
 /* fn_800E0E14 | Size: 0x730 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0E14(void) {
     extern u8 lbl_80270658[];
     extern u8 lbl_8047AB28[];
@@ -16270,12 +15831,8 @@ L_800E152C: ;
     /* lmw r24, 0x20(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800E202C | Size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E202C(void) {
     extern u8 lbl_8047AB28[];
     extern u8 lbl_8047AB34[];
@@ -16317,4 +15874,3 @@ L_800E2094: ;
     r3 = *(u16*)((u8*)r4 + 0x0);
     return;
 }
-#pragma pop
