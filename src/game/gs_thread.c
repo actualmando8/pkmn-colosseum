@@ -7539,33 +7539,24 @@ void fn_800F6AB4(void) {
 }
 
 
-/* fn_800F6B54 - 0x800F6B54 | size: 0x58 */
-void fn_800F6B54(void) {
+/* fn_800F6B54 - 0x800F6B54 | size: 0x58
+ * GSthreadPushMarker - Push a -1 marker onto the thread's stack.
+ * The stack is an array of u32 starting at offset 0x6C, with the
+ * count at offset 0x28. Asserts if count exceeds 0x40.
+ */
+u32 fn_800F6B54(u8* thread) {
     extern u8 lbl_80271068[];
-    extern void fn_800DD38C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+    extern void fn_800DD38C(const char* msg);
+    s32 count;
 
-    
-    r5 = *(u32*)((u8*)r3 + 0x28);
-    if ((s32)r5 <= (s32)0x40) goto L_800F6B80;
-    r3 = (u32)lbl_80271068;
-    r3 = (u32)lbl_80271068;
-    /* crclr cr1eq */;
-    fn_800DD38C();
-    goto L_800F6B98;
-    L_800F6B80: ;
-    r4 = r5 + 0x1;
-    r0 = r5 << 2;
-    *(u32*)((u8*)r3 + 0x28) = r4;
-    r3 = r3 + r0;
-    r0 = -0x1;
-    *(u32*)((u8*)r3 + 0x6C) = r0;
-    L_800F6B98: ;
-    r3 = 0x1;
-    return;
+    count = *(s32*)(thread + 0x28);
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(thread + 0x28) = count + 1;
+        *(u32*)(thread + 0x6C + count * 4) = (u32)-1;
+    }
+    return 1;
 }
 
 

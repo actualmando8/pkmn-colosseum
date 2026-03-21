@@ -773,36 +773,32 @@ L_800A1054:
     return;
 }
 
-/* fn_800A106C - 0x800A106C | size: 0x6C */
-void fn_800A106C(void) {
-    extern void fn_800A09B0();
+/* fn_800A106C - 0x800A106C | size: 0x6C
+ * __OSLockSramEx2 - Lock the SRAM structure and read a byte field.
+ * Acquires the lock at Scb+0x48, stores interrupt state at Scb+0x44.
+ * Reads byte at offset 0x12 of the SRAM data. Returns the byte value,
+ * or 0 if the lock is already held.
+ */
+u32 fn_800A106C(void) {
+    extern void fn_800A09B0(u32 a, u32 b);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    BOOL enabled;
+    u32 result;
 
-    r3 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A10A4;
-    OSRestoreInterrupts(r3);
-    r31 = 0x0;
-    goto L_800A10B0;
-L_800A10A4:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A10B0:
-    r31 = *(u8*)((u8*)r31 + 0x12);
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_800A09B0();
-    r3 = r31;
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+        result = 0;
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+        result = *(u8*)(sram + 0x12);
+    }
+
+    fn_800A09B0(0, 0);
+    return result;
 }
 
 /* fn_800A10D8 - 0x800A10D8 | size: 0x84 */

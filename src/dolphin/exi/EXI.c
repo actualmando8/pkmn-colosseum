@@ -490,52 +490,26 @@ static BOOL __EXIProbe(s32 chan) {
  * 8 function(s)
  * =================================================================== */
 
-/* fn_80098368 - 0x80098368 | size: 0xA0 */
-void fn_80098368(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_80098368 - 0x80098368 | size: 0xA0
+ * EXIImmEx - Transfer data via EXI in chunks of up to 4 bytes.
+ * Returns TRUE on success, FALSE if any transfer fails.
+ */
+BOOL fn_80098368(s32 chan, u8* buf, s32 len, s32 mode) {
+    s32 chunkSize;
 
-    r28 = r3 + 0x0;
-    r29 = r4 + 0x0;
-    r30 = r5 + 0x0;
-    goto L_800983E8;
-L_8009838C:
-    if ((s32)r30 >= 4) goto L_8009839C;
-    r31 = r30;
-    goto L_800983A0;
-L_8009839C:
-    r31 = 0x4;
-L_800983A0:
-    r3 = r28 + 0x0;
-    r4 = r29 + 0x0;
-    r5 = r31 + 0x0;
-    r7 = 0x0;
-    EXIImm(r3, (void*)r4, r5, 0, 0);
-    if ((s32)r3 != 0) goto L_800983C8;
-    r3 = 0x0;
-    goto L_800983F4;
-L_800983C8:
-    r3 = r28;
-    EXISync(r3);
-    if ((s32)r3 != 0) goto L_800983E0;
-    r3 = 0x0;
-    goto L_800983F4;
-L_800983E0:
-    r29 = r29 + r31;
-    r30 = r30 - r31;
-L_800983E8:
-    if ((s32)r30 != 0) goto L_8009838C;
-    r3 = 0x1;
-L_800983F4:
-    return;
+    while (len > 0) {
+        chunkSize = (len >= 4) ? 4 : len;
+
+        if (!EXIImm(chan, buf, chunkSize, mode, NULL)) {
+            return FALSE;
+        }
+        if (!EXISync(chan)) {
+            return FALSE;
+        }
+        buf += chunkSize;
+        len -= chunkSize;
+    }
+    return TRUE;
 }
 
 /* fn_8009870C - 0x8009870C | size: 0x84 */

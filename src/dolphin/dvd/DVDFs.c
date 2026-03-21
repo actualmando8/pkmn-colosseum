@@ -557,17 +557,15 @@ L_800A53AC:
     return;
 }
 
-/* fn_800A53EC - 0x800A53EC | size: 0x30 */
-void fn_800A53EC(void) {
-    u32 tmp = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-
-    r12 = *(u32*)((u8*)r4 + 0x38);
-    if (r12 == 0) goto L_800A540C;
-    /* blrl  */;
-L_800A540C:
-    return;
+/* fn_800A53EC - 0x800A53EC | size: 0x30
+ * DVDCommandCallback - Invoke the user callback stored in the
+ * command block at offset 0x38, if non-NULL.
+ */
+void fn_800A53EC(s32 result, u8* cmdBlock) {
+    void (*callback)(s32, u8*) = (void (*)(s32, u8*))*(u32*)(cmdBlock + 0x38);
+    if (callback != NULL) {
+        callback(result, cmdBlock);
+    }
 }
 
 /* fn_800A541C - 0x800A541C | size: 0x118 */
@@ -714,17 +712,15 @@ L_800A55AC:
     return;
 }
 
-/* fn_800A55F0 - 0x800A55F0 | size: 0x30 */
-void fn_800A55F0(void) {
-    u32 tmp = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-
-    r12 = *(u32*)((u8*)r4 + 0x38);
-    if (r12 == 0) goto L_800A5610;
-    /* blrl  */;
-L_800A5610:
-    return;
+/* fn_800A55F0 - 0x800A55F0 | size: 0x30
+ * DVDCommandCallback2 - Same as fn_800A53EC, invoke user callback
+ * at offset 0x38 if non-NULL.
+ */
+void fn_800A55F0(s32 result, u8* cmdBlock) {
+    void (*callback)(s32, u8*) = (void (*)(s32, u8*))*(u32*)(cmdBlock + 0x38);
+    if (callback != NULL) {
+        callback(result, cmdBlock);
+    }
 }
 
 /* fn_800A5620 - 0x800A5620 | size: 0x4 */

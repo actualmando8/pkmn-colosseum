@@ -916,25 +916,27 @@ L_800A16D0:
     return;
 }
 
-/* fn_800A16E8 - 0x800A16E8 | size: 0x50 */
-void fn_800A16E8(void) {
-    extern void fn_800A1528();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+/* fn_800A16E8 - 0x800A16E8 | size: 0x50
+ * __OSReschedule - Reschedule threads at a given priority level.
+ * Repeatedly calls fn_800A1528 to wake/schedule threads while
+ * the thread's suspend count is <= 0 and its effective priority
+ * is higher than the given level.
+ */
+void fn_800A16E8(u8* thread, s32 priority) {
+    extern u8* fn_800A1528(u8* thread, s32 priority);
 
-    r31 = r4;
-L_800A16FC:
-    tmp = *(u32*)((u8*)r3 + 0x2CC);
-    if ((s32)tmp > 0) goto L_800A1724;
-    tmp = *(u32*)((u8*)r3 + 0x2D0);
-    if ((s32)tmp <= (s32)r31) goto L_800A1724;
-    r4 = r31;
-    fn_800A1528();
-    if (r3 != 0) goto L_800A16FC;
-L_800A1724:
-    return;
+    while (1) {
+        if (*(s32*)(thread + 0x2CC) > 0) {
+            break;
+        }
+        if (*(s32*)(thread + 0x2D0) <= priority) {
+            break;
+        }
+        thread = fn_800A1528(thread, priority);
+        if (thread == NULL) {
+            break;
+        }
+    }
 }
 
 /* fn_800A1990 - 0x800A1990 | size: 0x3C */

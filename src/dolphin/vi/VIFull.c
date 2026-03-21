@@ -2279,31 +2279,22 @@ L_800ABEE4:
     return;
 }
 
-/* fn_800ABEFC - 0x800ABEFC | size: 0x60 */
-void fn_800ABEFC(void) {
-    u8 sp[0x20];
+/* fn_800ABEFC - 0x800ABEFC | size: 0x60
+ * VICallPreRetraceCallback - Call the pre-retrace callback if set.
+ * Sets up a temporary context so the callback runs safely.
+ */
+void fn_800ABEFC(u32 retraceCount, OSContext* currentCtx) {
     extern u8 lbl_8047A8BC[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r31 = 0;
+    OSContext tmpCtx;
+    void (*callback)(u32);
 
-    r31 = r4 + 0x0;
-    tmp = *(u32*)lbl_8047A8BC;
-    if (tmp == 0) goto L_800ABF48;
-    r3 = (u32)sp + 0x10;
-    OSClearContext((OSContext*)r3);
-    r3 = (u32)sp + 0x10;
-    OSSetCurrentContext((OSContext*)r3);
-    r12 = *(u32*)lbl_8047A8BC;
-    /* blrl  */;
-    r3 = (u32)sp + 0x10;
-    OSClearContext((OSContext*)r3);
-    r3 = r31;
-    OSSetCurrentContext((OSContext*)r3);
-L_800ABF48:
-    return;
+    callback = (void (*)(u32))*(u32*)lbl_8047A8BC;
+    if (callback != NULL) {
+        OSClearContext(&tmpCtx);
+        OSSetCurrentContext(&tmpCtx);
+        callback(retraceCount);
+        OSClearContext(&tmpCtx);
+        OSSetCurrentContext(currentCtx);
+    }
 }
 

@@ -153,38 +153,25 @@ void usr_put_initialize(void) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800C4F34 - 0x800C4F34 | size: 0x70 */
-void fn_800C4F34(void) {
+/* fn_800C4F34 - 0x800C4F34 | size: 0x70
+ * atexit - Register an exit handler function.
+ * On first call, initializes the handler table (0x34 bytes).
+ * Then adds the function via fn_800C4FA4.
+ */
+void fn_800C4F34(void* handler) {
     extern u8 lbl_803FFBB8[];
     extern u8 lbl_8047AA08[];
-    extern void fn_800C4FA4();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    extern void fn_800C4FA4(u8* table, void* handler);
 
-    r31 = r3;
-    r3 = 0x1;
     __begin_critical_region(1);
-    tmp = *(u8*)lbl_8047AA08;
-    if (tmp != 0) goto L_800C4F78;
-    r3 = (u32)lbl_803FFBB8;
-    r4 = 0x0;
-    r3 = (u32)lbl_803FFBB8;
-    r5 = 0x34;
-    memset((void*)r3, (int)r4, (u32)r5);
-    tmp = 0x1;
-    *(u8*)lbl_8047AA08 = tmp;
-L_800C4F78:
-    r3 = (u32)lbl_803FFBB8;
-    r4 = r31;
-    r3 = (u32)lbl_803FFBB8;
-    fn_800C4FA4();
-    r3 = 0x1;
+
+    if (*(u8*)lbl_8047AA08 == 0) {
+        memset(lbl_803FFBB8, 0, 0x34);
+        *(u8*)lbl_8047AA08 = 1;
+    }
+
+    fn_800C4FA4(lbl_803FFBB8, handler);
     __end_critical_region(1);
-    return;
 }
 
 /* fn_800C4FA4 - 0x800C4FA4 | size: 0x58 */

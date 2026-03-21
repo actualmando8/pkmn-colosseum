@@ -758,24 +758,17 @@ L_800BEE28:
     return;
 }
 
-/* fn_800BEE74 - 0x800BEE74 | size: 0x40 */
-void fn_800BEE74(void) {
-    extern void fn_80003458();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+/* fn_800BEE74 - 0x800BEE74 | size: 0x40
+ * TRKResetBuffer - Clear a TRK buffer's read/write positions
+ * and optionally zero the data area (0x880 bytes at offset 0x10).
+ */
+void fn_800BEE74(u8* buf, s32 keepData) {
+    extern void fn_80003458(void* dst, s32 val, u32 len);
 
-    tmp = 0x0;
-    *(u32*)((u8*)r3 + 0x8) = tmp;
-    *(u32*)((u8*)r3 + 0xC) = tmp;
-    if ((s32)r4 != 0) goto L_800BEEA4;
-    r3 = r3 + 0x10;
-    r4 = 0x0;
-    r5 = 0x880;
-    fn_80003458();
-L_800BEEA4:
-    return;
+    *(u32*)(buf + 0x8) = 0;
+    *(u32*)(buf + 0xC) = 0;
+    if (keepData == 0) {
+        fn_80003458(buf + 0x10, 0, 0x880);
+    }
 }
 

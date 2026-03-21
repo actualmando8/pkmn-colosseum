@@ -388,31 +388,19 @@ L_800C0E50:
 void fn_800C0E68(void) {
 }
 
-/* fn_800C0E70 - 0x800C0E70 | size: 0x3C */
-void fn_800C0E70(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
+/* fn_800C0E70 - 0x800C0E70 | size: 0x3C
+ * TRKCopyMemory - Byte-by-byte copy with MSR manipulation for
+ * accessing protected memory during debugging. Copies len bytes
+ * from src to dst, toggling address translation via MSR.
+ */
+void fn_800C0E70(u8* dst, u8* src, s32 len, u32 readMSR, u32 writeMSR) {
+    s32 i;
 
-    r8 = 0; /* mfmsr */;
-    r10 = 0x0;
-L_800C0E78:
-    if ((s32)r10 == (s32)r5) goto L_800C0EA0;
-    /* mtmsr r7 */;
-    /* sync */;
-    r9 = *(u8*)(r10 + r4);
-    /* mtmsr r6 */;
-    /* sync */;
-    *(u8*)(r10 + r3) = r9;
-    r10 = r10 + 0x1;
-    goto L_800C0E78;
-L_800C0EA0:
-    /* mtmsr r8 */;
+    for (i = 0; i < len; i++) {
+        /* In the original, MSR is toggled between reads and writes
+         * to access physical memory. The C version just does a copy. */
+        dst[i] = src[i];
+    }
     /* sync */;
     return;
 }
