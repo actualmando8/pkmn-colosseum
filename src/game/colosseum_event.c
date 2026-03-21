@@ -11671,29 +11671,15 @@ u32 fn_8020A028(u8* ptr) {
     return ptr[0x0];
 }
 
-/* 0x8020A040 | size: 0x28 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020A040(void) {
+/* fn_8020A040 | Size: 0x28 | Look up 2-byte entry in table */
+u16* fn_8020A040(u16 index) {
     extern u8 lbl_80375DD0[];
     extern u8 lbl_80478D70[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r0 = *(u32*)lbl_80478D70;
-    r5 = r3 & 0xFFFF;
-    r4 = (u32)lbl_80375DD0;
-    /* clrlslwi r3, r3, 16, 1 */;
-    r0 = (u32)lbl_80375DD0;
-    r3 = r0 + r3;
-    if ((u32)r5 < (u32)r0) return;
-    r3 = 0x0;
-    return;
+    if (index < *(u32*)lbl_80478D70) {
+        return (u16*)&lbl_80375DD0[index * 2];
+    }
+    return NULL;
 }
-#pragma pop
 
 /* 0x8020A080 | size: 0x24 | small */
 #pragma push

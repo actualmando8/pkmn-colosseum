@@ -2200,7 +2200,7 @@ void fn_801E119C(void) { }
 
 /* 0x801E11B0 | size: 0x1C */
 void fn_801E11B0(void) {
-    s32 prev = lbl_8047B428;
+    u32 prev = lbl_8047B428;
     lbl_8047B424 = 1;
     if (prev == 2) { return; }
     lbl_8047B428 = 1;
