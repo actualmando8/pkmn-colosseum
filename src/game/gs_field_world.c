@@ -5693,83 +5693,34 @@ u32 fn_80115274(u32 val) {
 }
 
 /* 0x80115280 | 0x10C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80115280(void) {
-    extern u8 lbl_80272608;
-    extern u8 lbl_8027262C;
-    extern u8 lbl_8035BB50;
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = 0x0;
-    if ((u32)r3 != (u32)0x0) goto L_801152B8;
-    r3 = (u32)&lbl_80272608;
-    r4 = (u32)&lbl_8035BB50;
-    r3 = (u32)&lbl_80272608;
-    r4 = (u32)&lbl_8035BB50;
-    /* crclr cr1eq */;
-    ((void(*)(void))fn_800DD970)();
-    r3 = 0x0;
-    goto L_8011537C;
-L_801152B8: ;
-    r3 = *(u32*)((u8*)r3 + 0x10);
-    if ((u32)r3 != (u32)0x0) goto L_801152CC;
-    r3 = 0x0;
-    goto L_8011537C;
-L_801152CC: ;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r3 != (u32)0x0) goto L_801152F8;
-    r3 = (u32)&lbl_8027262C;
-    r4 = (u32)&lbl_8035BB50;
-    r3 = (u32)&lbl_8027262C;
-    r4 = (u32)&lbl_8035BB50;
-    /* crclr cr1eq */;
-    ((void(*)(void))fn_800DD970)();
-    r3 = 0x0;
-    goto L_8011537C;
-L_801152F8: ;
-    r0 = *(u32*)((u8*)r3 + 0x8);
-    if ((u32)r0 == (u32)0x0) goto L_80115308;
-    r4 = 0x1;
-L_80115308: ;
-    r0 = *(u32*)((u8*)r3 + 0xC);
-    if ((u32)r0 == (u32)0x0) goto L_80115318;
-    r4 = r4 + 0x1;
-L_80115318: ;
-    r0 = *(u32*)((u8*)r3 + 0x10);
-    if ((u32)r0 == (u32)0x0) goto L_80115328;
-    r4 = r4 + 0x1;
-L_80115328: ;
-    r0 = *(u32*)((u8*)r3 + 0x14);
-    if ((u32)r0 == (u32)0x0) goto L_80115338;
-    r4 = r4 + 0x1;
-L_80115338: ;
-    r0 = *(u32*)((u8*)r3 + 0x18);
-    if ((u32)r0 == (u32)0x0) goto L_80115348;
-    r4 = r4 + 0x1;
-L_80115348: ;
-    r0 = *(u32*)((u8*)r3 + 0x1C);
-    if ((u32)r0 == (u32)0x0) goto L_80115358;
-    r4 = r4 + 0x1;
-L_80115358: ;
-    r0 = *(u32*)((u8*)r3 + 0x20);
-    if ((u32)r0 == (u32)0x0) goto L_80115368;
-    r4 = r4 + 0x1;
-L_80115368: ;
-    r0 = *(u32*)((u8*)r3 + 0x24);
-    if ((u32)r0 == (u32)0x0) goto L_80115378;
-    r4 = r4 + 0x1;
-L_80115378: ;
-    r3 = r4;
-L_8011537C: ;
-    return;
+u32 fn_80115280(void* ptr) {
+    extern char lbl_80272608;
+    extern char lbl_8027262C;
+    extern char lbl_8035BB50;
+    u32* data;
+    u32 count;
+    u32 i;
+    if (ptr == NULL) {
+        fn_800DD970(&lbl_80272608, &lbl_8035BB50);
+        return 0;
+    }
+    data = *(u32**)((u8*)ptr + 0x10);
+    if (data == NULL) {
+        return 0;
+    }
+    data = *(u32**)data;
+    if (data == NULL) {
+        fn_800DD970(&lbl_8027262C, &lbl_8035BB50);
+        return 0;
+    }
+    count = 0;
+    for (i = 2; i < 10; i++) {
+        if (data[i] != 0) {
+            count++;
+        }
+    }
+    return count;
 }
-#pragma pop
 
 /* 0x8011538C | 0xA0 */
 extern const char lbl_80272608[];

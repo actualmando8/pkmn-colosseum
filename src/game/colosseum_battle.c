@@ -135,7 +135,7 @@ extern void fn_801659FC(u32 bgmId); /* Start BGM */
 void fn_80240BD0(void* ctx, u32 param1, u32 param2, u32 param3);
 void fn_80245FC4(void* ctx, u32 param1, u32 param2, u32 param3);
 void fn_8024E690(void* ctx, u32 param1, u32 param2, u32 param3);
-void fn_8025A290(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
+u32 fn_8025A290(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
 void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3);
 
 
@@ -3273,69 +3273,23 @@ BOOL CheckBattleCondition(void* context, u32 slot) {
  * @param resultSlot    Result query slot
  * @param resultType    Type of result to process
  * ========================================================================= */
-/* TODO: Decompile fn_8025A290 (0xB0 bytes) */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8025A290(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType) {
-    extern void fn_8023793C();
-    extern void fn_80239500();
-    extern void fn_802395C8();
-    extern void fn_8025C264();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* stmw r27, 0xc(r1) */;
-    r31 = r4;
-    r28 = r5;
-    r27 = r3;
-    r29 = r6;
-    r5 = r31;
-    r4 = r28;
-    fn_802395C8();
-    r0 = r3;
-    r3 = r27;
-    r30 = r0;
-    r4 = r31;
-    r5 = r28;
-    r6 = r29;
-    r7 = 0x0;
-    fn_8025C264();
-    r0 = r3;
-    r3 = r27;
-    r31 = r0;
-    r4 = r28;
-    fn_80239500();
-    r6 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = r30;
-    fn_8023793C();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 != (u32)0x43) goto L_8025A314;
-    r31 = 0x0;
-L_8025A314: ;
-    if ((s32)r31 != (s32)0x0) goto L_8025A324;
-    r3 = 0x0;
-    goto L_8025A32C;
-L_8025A324: ;
-    r3 = 0x1;
-L_8025A32C: ;
-    /* lmw r27, 0xc(r1) */;
-    return;
+/* fn_8025A290 | size: 0xB0 */
+u32 fn_8025A290(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType) {
+    extern u16 fn_8023793C();
+    extern u32 fn_80239500();
+    extern u32 fn_802395C8();
+    extern u32 fn_8025C264();
+    u32 statusVal;
+    u32 resultVal;
+    u32 slotData;
+    statusVal = fn_802395C8(trainerCtx, resultSlot, trainerSlot);
+    resultVal = fn_8025C264(trainerCtx, trainerSlot, resultSlot, resultType, 0);
+    slotData = fn_80239500(trainerCtx, resultSlot);
+    if (fn_8023793C(trainerCtx, resultType, statusVal, slotData) == 0x43) {
+        resultVal = 0;
+    }
+    return (resultVal != 0) ? 1 : 0;
 }
-#pragma pop
 
 /* =========================================================================
  * fn_8026316C - FinalCleanup
@@ -4474,47 +4428,16 @@ u32 fn_80262D34(void) { return 0; }
  * ------------------------------------------------------------------- */
 
 /* Address: 0x802400D8 | Size: 0x6C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-u32 fn_802400D8(void* ctx, u32 slot, u32 param) {
-    extern void fn_8023CA9C();
-    extern void fn_8025CB3C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* stmw r28, 0x10(r1) */;
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    r31 = r6;
-    fn_8025CB3C();
-    r5 = r3;
-    r0 = r30 & 0xFFFF;
-    r3 = r3 & 0xFFFF;
-    if ((u32)r3 == (u32)r0) goto L_8024012C;
-    if ((u32)r3 == (u32)0x0) goto L_8024012C;
-    r3 = r28;
-    r4 = r29;
-    r6 = r31;
-    fn_8023CA9C();
-    goto L_80240130;
-L_8024012C: ;
-    r3 = 0x0;
-L_80240130: ;
-    /* lmw r28, 0x10(r1) */;
-    return;
+u32 fn_802400D8(void* ctx, u32 slot, u16 species, u32 extra) {
+    extern u32 fn_8023CA9C();
+    extern u16 fn_8025CB3C();
+    u16 currentSpecies;
+    currentSpecies = fn_8025CB3C(ctx);
+    if (currentSpecies == species || currentSpecies == 0) {
+        return 0;
+    }
+    return fn_8023CA9C(ctx, slot, currentSpecies, extra);
 }
-#pragma pop
 
 /* Address: 0x80240144 | Size: 0xAC */
 #pragma push
