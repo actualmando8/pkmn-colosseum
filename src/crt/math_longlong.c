@@ -147,7 +147,7 @@ void fn_800C4B44(void) {
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
-    if ((s32)cr7 >= (s32)r3) goto L_800C4B54;
+    if ((s32)r3 >= (s32)0x0) goto L_800C4B54;
     r4 = 0x0 - r4;
     /* subfze r3, r3 */;
 L_800C4B54: ;
@@ -274,6 +274,7 @@ void fn_800C4C74(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800C4C98(void) {
+    u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;

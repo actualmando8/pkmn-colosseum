@@ -171,7 +171,7 @@ void fn_800C4F34(void) {
 
     r31 = r3;
     r3 = 0x1;
-    __begin_critical_region();
+    __begin_critical_region(1);
     r0 = *(u8*)lbl_8047AA08;
     if ((u32)r0 != (u32)0x0) goto L_800C4F78;
     r3 = (u32)lbl_803FFBB8;
@@ -187,7 +187,7 @@ L_800C4F78: ;
     r3 = (u32)lbl_803FFBB8;
     fn_800C4FA4();
     r3 = 0x1;
-    __end_critical_region();
+    __end_critical_region(1);
     r31 = *(u32*)(sp + 0xC);
     return;
 }
@@ -522,6 +522,7 @@ L_800C53D8: ;
 #pragma optimizewithasm off
 void fn_800C53E8(void) {
     extern void fn_800C7904();
+    extern u8 __files[];
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;

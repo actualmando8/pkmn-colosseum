@@ -76,7 +76,7 @@ BOOL DVDReadAbsAsyncPrio(DVDCommandBlock* block, void* addr, s32 length,
     DCInvalidateRange(addr, (u32)length);
 
     /* Queue the command */
-    __DVDPushWaitingQueue(block);
+    __DVDPushWaitingQueue(prio, block);
 
     OSRestoreInterrupts(enabled);
     return TRUE;
@@ -149,7 +149,7 @@ BOOL DVDSeekAbsAsyncPrio(DVDCommandBlock* block, s32 offset,
     block->state = 1;
 
     enabled = OSDisableInterrupts();
-    __DVDPushWaitingQueue(block);
+    __DVDPushWaitingQueue(prio, block);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }

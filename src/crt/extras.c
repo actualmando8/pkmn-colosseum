@@ -4586,8 +4586,9 @@ void fn_800CE5A4(void) {
     extern u8 lbl_8047C978[];
     extern u8 lbl_8047C980[];
     extern u8 lbl_8047C988[];
+    u8 sp[0x10];
     u32 r0 = 0;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     f32 f0 = 0.0f;

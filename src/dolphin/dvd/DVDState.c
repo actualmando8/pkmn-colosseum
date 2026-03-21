@@ -22,7 +22,7 @@
 
 extern void OSReport(const char* fmt, ...);
 extern DVDCommandBlock* __DVDGetExecutingCommand(void);
-extern void __DVDPopWaitingQueue(void);
+extern DVDCommandBlock* __DVDPopWaitingQueue(void);
 
 static u32 PauseFlag;
 static u32 CoverStatus;

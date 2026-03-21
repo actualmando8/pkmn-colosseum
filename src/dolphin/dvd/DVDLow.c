@@ -60,6 +60,15 @@ static void AlarmHandlerForTimeout(OSAlarm* alarm, OSContext* context);
 extern void OSInitAlarm(void);
 extern s64 __OSGetSystemTime(void);
 
+/* SDA symbol aliases used by stub functions */
+extern u32 CommandList_803FC290;
+extern u32 NextCommandNumber_8047A7C4;
+extern u32 StopAtNextInt_8047A780;
+extern u32 Callback_8047A788;
+extern u32 WorkAroundSeekLocation_8047A7A8;
+extern u32 WorkAroundType_8047A7A4;
+extern u32 AlarmForTimeout_803FC2F8;
+
 /*
  * __DVDInitWA - Initialize workaround system
  * 0x800A3EB0 | size: 0x40
@@ -284,13 +293,13 @@ void fn_800A42C4(void) {
     r3 = r31 + 0x68;
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0x14;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r6 = r30 + 0x0;
     r3 = r31 + 0x68;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     goto L_800A43B4;
 L_800A4384: ;
     r3 = (0x8000 << 16);
@@ -298,13 +307,13 @@ L_800A4384: ;
     r3 = r31 + 0x68;
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r6 = r30 + 0x0;
     r3 = r31 + 0x68;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
 L_800A43B4: ;
     return;
 }
@@ -538,13 +547,13 @@ L_800A4650: ;
     r23 = r5 + r0;
     r22 = r4 + r6; /* +carry */;
     r3 = r31 + 0x40;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)fn_800A41D0;
     r7 = (u32)fn_800A41D0;
     r6 = r23 + 0x0;
     r5 = r22 + 0x0;
     r3 = r31 + 0x40;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     goto L_800A46D4;
 L_800A46C0: ;
     r3 = r24 + 0x0;
@@ -593,13 +602,13 @@ void fn_800A46EC(void) {
     r0 = *(u32*)((u8*)r4 + 0xF8);
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -644,13 +653,13 @@ void fn_800A47AC(void) {
     r0 = *(u32*)((u8*)r5 + 0xF8);
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -688,13 +697,13 @@ void fn_800A48DC(void) {
     r3 = r31 + 0x0;
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -736,13 +745,13 @@ void fn_800A4968(void) {
     r0 = *(u32*)((u8*)r5 + 0xF8);
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -783,13 +792,13 @@ void fn_800A4A04(void) {
     r0 = *(u32*)((u8*)r4 + 0xF8);
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -827,13 +836,13 @@ void fn_800A4A9C(void) {
     r0 = *(u32*)((u8*)r4 + 0xF8);
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }
@@ -875,13 +884,13 @@ L_800A4B54: ;
     r3 = r31 + 0x0;
     r0 = (u32)r0 >> 2;
     r30 = r0 * 0xa;
-    OSCreateAlarm();
+    OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
     r3 = r31 + 0x0;
     r6 = r30 + 0x0;
     r5 = 0x0;
-    OSSetAlarm();
+    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     r3 = 0x1;
     return;
 }

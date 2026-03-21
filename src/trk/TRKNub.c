@@ -44,6 +44,9 @@ extern s32 TRKInitializeTarget(void);
 extern s32 TRKInitializeIntDrivenUART(s32 baud, s32 polarity, s32 pad, void* pendingPtr);
 extern void TRK_board_display(const char* msg);
 
+/* gTRKBigEndian - endianness flag (1=big, 0=little) */
+extern u8 gTRKBigEndian[];
+
 /* Event queue structure - 0x28 bytes at lbl_803FCDD8 */
 /* Offset 0x00: mutex (4 bytes)
  * Offset 0x04: count (4 bytes)
@@ -216,9 +219,8 @@ s32 TRKInitializeNub(void) {
         u32 testWord = *(u32*)testBytes;
         u32* pBigEndian;
 
-        /* gTRKBigEndian at gTRKBigEndian address */
-        extern u32 gTRKBigEndian;
-        pBigEndian = &gTRKBigEndian;
+        /* gTRKBigEndian declared at file scope as u8[] */
+        pBigEndian = (u32*)gTRKBigEndian;
         *pBigEndian = 1; /* assume big endian initially */
 
         if (testWord == 0x12345678) {
@@ -304,7 +306,7 @@ void fn_800BE800(void) {
     r3 = 0x1;
     r4 = (u32)lbl_8026F640;
     /* crclr cr1eq */;
-    MWTRACE();
+    ((void(*)(void))MWTRACE)();
     r3 = 0x0;
     return;
 }

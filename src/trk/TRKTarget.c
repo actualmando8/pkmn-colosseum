@@ -31,6 +31,12 @@ extern u8 gTRKCPUState[];  /* saved CPU context */
 /* Breakpoint info at lbl_80313834 */
 extern u8 lbl_80313834[];
 
+/* TRK exception status structure at 80313824 */
+extern u8 gTRKExceptionStatus_80313824[];
+
+/* TRK restore flags */
+extern u8 gTRKRestoreFlags[];
+
 /*
  * TRKTargetSetInputPendingPtr - Store the input pending flag pointer.
  * This pointer is checked by interrupt handlers to determine if
@@ -396,7 +402,7 @@ L_800C1578: ;
     *(u32*)((u8*)r31 + 0x4) = r6;
     *(u32*)((u8*)r31 + 0x0) = r6;
     /* crclr cr1eq */;
-    MWTRACE();
+    ((void(*)(void))MWTRACE)();
     r3 = (u32)gTRKCPUState;
     r4 = *(u32*)((u8*)r31 + 0x4);
     r3 = (u32)gTRKCPUState;
@@ -453,7 +459,7 @@ L_800C1630: ;
     *(u32*)((u8*)r31 + 0x4) = r5;
     *(u32*)((u8*)r31 + 0x0) = r0;
     /* crclr cr1eq */;
-    MWTRACE();
+    ((void(*)(void))MWTRACE)();
     r3 = (u32)gTRKCPUState;
     r4 = *(u32*)((u8*)r31 + 0x4);
     r3 = (u32)gTRKCPUState;

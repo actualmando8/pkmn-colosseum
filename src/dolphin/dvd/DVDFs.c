@@ -18,6 +18,11 @@ static u32* FstStart;           /* 0x8047A7CC */
 static u32* FstStringStart;     /* 0x8047A7D0 */
 static u32  MaxEntryNum;        /* 0x8047A7D4 */
 
+/* SDA symbol aliases used by stub functions */
+extern u32 FstStart_8047A7CC;
+extern u32 FstStringStart_8047A7D0;
+extern u32 __DVDLongFileNameFlag;
+
 /*
  * __DVDFSInit - Initialize the DVD filesystem
  * 0x800A4CF0 | size: 0x38

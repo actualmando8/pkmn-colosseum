@@ -412,6 +412,7 @@ void fn_800C1218(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800C123C(void) {
+    extern u8 gTRKExceptionStatus_80313824[];
     extern void fn_800C2EAC();
     extern void fn_800C3098();
     u8 sp[0x30];

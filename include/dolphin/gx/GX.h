@@ -49,6 +49,9 @@ typedef struct GXRenderModeObj {
     u8  vfilter[7];
 } GXRenderModeObj;
 
+/* Internal GX context data (opaque) */
+typedef struct GXData GXData;
+
 /* Function declarations */
 void* GXInit(void* base, u32 size);
 void __GXInitGX(void);
