@@ -303,43 +303,71 @@ void fn_801D19A4(s32 seqHandle, f32 speed) {
 #pragma pop
 
 /**
- * fn_801D1A44 - Waza animation pause.
+ * fn_801D1A44 - Waza entry get field 0x14 by index.
  * Address: 0x801D1A44 | Size: 0x44
+ * Bounds-checks idx against lbl_80478E98->count, then
+ * returns entry[idx*0x2C + 0x14] from lbl_80478E9C.
  */
-void fn_801D1A44(s32 seqHandle) {
-    /* Pause waza animation */
+extern u32 lbl_80478E98; /* waza context pointer */
+extern u32 lbl_80478E9C; /* waza entry array pointer */
+u32 fn_801D1A44(s32 idx) {
+    void* entry;
+    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+    }
+    if (entry == NULL) return 0;
+    return *(u32*)((u8*)entry + 0x14);
 }
 
 /**
- * fn_801D1A88 - Waza animation resume.
+ * fn_801D1A88 - Waza entry get field 0x0C by index.
  * Address: 0x801D1A88 | Size: 0x44
  */
-void fn_801D1A88(s32 seqHandle) {
-    /* Resume waza animation */
+u32 fn_801D1A88(s32 idx) {
+    void* entry;
+    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+    }
+    if (entry == NULL) return 0;
+    return *(u32*)((u8*)entry + 0x0C);
 }
 
 /**
- * fn_801D1ACC - Waza animation get progress.
+ * fn_801D1ACC - Waza entry get field 0x10 by index.
  * Address: 0x801D1ACC | Size: 0x44
  */
-f32 fn_801D1ACC(s32 seqHandle) {
-    return 0.0f;
+u32 fn_801D1ACC(s32 idx) {
+    void* entry;
+    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+    }
+    if (entry == NULL) return 0;
+    return *(u32*)((u8*)entry + 0x10);
 }
 
 /**
- * fn_801D1B10 - Waza animation check done.
+ * fn_801D1B10 - Waza set byte in battle party by handle.
  * Address: 0x801D1B10 | Size: 0x3C
+ * Calls fn_80129280(0, 0xA), stores (handle & 0xFF) to result+0x442.
  */
-BOOL fn_801D1B10(s32 seqHandle) {
-    return TRUE;
+void fn_801D1B10(u8 val) {
+    void* party = (void*)fn_80129280(0, 0x0A);
+    *(u8*)((u8*)party + 0x442) = val;
 }
 
 /**
- * fn_801D1B4C - Waza animation stop.
+ * fn_801D1B4C - Waza get byte from battle party at offset 0x442.
  * Address: 0x801D1B4C | Size: 0x2C
  */
-void fn_801D1B4C(s32 seqHandle) {
-    /* Stop waza animation */
+u8 fn_801D1B4C(void) {
+    void* party = (void*)fn_80129280(0, 0x0A);
+    return *(u8*)((u8*)party + 0x442);
 }
 
 /**

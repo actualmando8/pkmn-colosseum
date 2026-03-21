@@ -96,78 +96,15 @@ def decompile_function(fn_name, asm_funcs):
     if n == 1 and real[0][0] == 'blr':
         return ('void', '', False)
 
-    # ---- Pattern: 3-instruction SDA getter ----
-    if n == 3 and real[2][0] == 'blr':
-        m0, o0 = real[0]
-        m1, o1 = real[1]
-        if m0 == 'lwz' and '@sda21' in o0 and m1 in ('lwz', 'lbz', 'lhz', 'lfs'):
-            op0 = ops_list(o0)
-            sda_reg = op0[0]
-            sda_label = re.search(r'(lbl_\w+)', o0).group(1)
-            op1 = ops_list(o1)
-            off, base = parse_mem(op1[1])
-            if isinstance(off, int):
-                rtype = {'lwz': 'u32', 'lbz': 'u8', 'lhz': 'u16', 'lfs': 'f32'}[m1]
-                if m1 == 'lfs':
-                    return ('f32', f'    return *(f32*)((u8*){sda_label} + 0x{off:X});\n', False)
-                return (rtype, f'    return *({rtype}*)((u8*){sda_label} + 0x{off:X});\n', False)
-
-    # ---- Pattern: 3-instruction SDA setter ----
-    if n == 3 and real[2][0] == 'blr':
-        m0, o0 = real[0]
-        m1, o1 = real[1]
-        if m0 == 'lwz' and '@sda21' in o0 and m1 in ('stw', 'stb', 'sth', 'stfs'):
-            sda_label = re.search(r'(lbl_\w+)', o0).group(1)
-            op1 = ops_list(o1)
-            src_reg = op1[0]
-            off, base = parse_mem(op1[1])
-            if isinstance(off, int):
-                stype = {'stw': 'u32', 'stb': 'u8', 'sth': 'u16', 'stfs': 'f32'}[m1]
-                # src_reg is r3 = first param, or f1 for stfs
-                if m1 == 'stfs':
-                    return ('void', f'    *(f32*)((u8*){sda_label} + 0x{off:X}) = val;\n', False)
-                return ('void', f'    *({stype}*)((u8*){sda_label} + 0x{off:X}) = val;\n', False)
-
-    # ---- Pattern: li + stb/stw on r3 (set constant) ----
-    if n == 3 and real[2][0] == 'blr' and real[0][0] == 'li' and real[1][0] in ('stb', 'sth', 'stw'):
-        op0 = ops_list(real[0][1])
-        val = int(op0[1], 0)
-        op1 = ops_list(real[1][1])
-        off, base = parse_mem(op1[1])
-        if isinstance(off, int):
-            stype = {'stb': 'u8', 'sth': 'u16', 'stw': 'u32'}[real[1][0]]
-            return ('void', f'    *({stype}*)((u8*)obj + 0x{off:X}) = {val};\n', False)
+    # For all simple patterns: fall through to the general decompiler
+    # which properly declares register variables
 
     # Now handle the full instruction-by-instruction decompilation
     return decompile_full(fn_name, insns, real)
 
 
 def decompile_full(fn_name, insns, real):
-    """Full decompilation for complex functions."""
-    n = len(real)
-
-    # Check for GX FIFO pattern (writes to 0xCC008000 via lis 0xcc01)
-    has_fifo = any(m == 'lis' and '0xcc01' in o for m, o in real)
-    has_frame = real[0][0] == 'stwu' if real else False
-    has_branches = any(m.startswith('b') and m not in ('blr', 'bl', 'bctrl', 'bctr',
-                       'beqlr', 'bnelr', 'bgelr', 'bltlr', 'bgtlr', 'blelr')
-                       for m, o in real)
-    has_labels = any(t == 'label' for t, *_ in insns)
-
-    # ---- GX FIFO leaf functions (no frame, no branches) ----
-    if has_fifo and not has_frame and not has_branches:
-        return decompile_gx_fifo_leaf(fn_name, insns, real)
-
-    # ---- Simple leaf (no frame, no branches) ----
-    if not has_frame and not has_branches:
-        return decompile_simple_leaf(fn_name, insns, real)
-
-    # ---- Simple wrapper with one bl call ----
-    bl_count = sum(1 for m, o in real if m == 'bl' and not o.startswith('_'))
-    if has_frame and bl_count == 1 and n <= 20 and not has_labels:
-        return decompile_wrapper(fn_name, insns, real)
-
-    # ---- General case: register-level C with gotos ----
+    """Full decompilation -- always use the general decompiler."""
     return decompile_general(fn_name, insns, real)
 
 
@@ -455,7 +392,7 @@ def decompile_general(fn_name, insns, real):
             m = re.match(r'^r(\d+)$', o)
             if m:
                 rn = int(m.group(1))
-                if rn not in (0, 1, 2):
+                if rn != 2:
                     used_iregs.add(rn)
             m = re.match(r'^f(\d+)$', o)
             if m:
@@ -465,7 +402,7 @@ def decompile_general(fn_name, insns, real):
         for o in op:
             for rm in re.finditer(r'r(\d+)', o):
                 rn = int(rm.group(1))
-                if rn not in (0, 1, 2):
+                if rn != 2:
                     used_iregs.add(rn)
             for fm in re.finditer(r'f(\d+)', o):
                 used_fregs.add(int(fm.group(1)))
@@ -526,13 +463,37 @@ def decompile_general(fn_name, insns, real):
     for fn_target in sorted(bl_targets):
         decl_lines.append(f'    extern void {fn_target}();')
 
-    # r1 is stack pointer - declare as pointer to sp if used
-    if 1 in used_iregs and frame_size > 0:
-        decl_lines.append(f'    u8* r1 = sp;')
+    # Also find jumptable and fn_ references used as addresses
+    jt_set = set()
+    fn_addr_set = set()
+    has_bdnz = False
+    for entry in insns:
+        if entry[0] != 'inst':
+            continue
+        ops_str = entry[2] if len(entry) > 2 else ''
+        for m2 in re.finditer(r'(jumptable_[0-9A-Fa-f]+)', ops_str):
+            jt_set.add(m2.group(1))
+        # Check for fn_ used as address (not bl target)
+        if entry[1] not in ('bl',):
+            for m2 in re.finditer(r'(fn_[0-9A-Fa-f]+)@', ops_str):
+                fn_addr_set.add(m2.group(1))
+        if entry[1] == 'bdnz':
+            has_bdnz = True
+    for jt in sorted(jt_set):
+        decl_lines.append(f'    extern u8 {jt}[];')
+    for fa in sorted(fn_addr_set):
+        if fa not in bl_targets:
+            decl_lines.append(f'    extern void {fa}();')
+
+    # Stack frame local variables (must come before r1)
+    if frame_size > 0:
+        decl_lines.append(f'    u8 sp[0x{frame_size:X}];')
 
     # Integer register declarations (include r0 as a temp)
     for rn in sorted(used_iregs):
-        if 0 <= rn <= 31 and rn not in (1, 2):
+        if rn == 1 and frame_size > 0:
+            decl_lines.append(f'    u32 r1 = (u32)sp;')
+        elif rn not in (1, 2):
             decl_lines.append(f'    u32 r{rn} = 0;')
 
     # Float register declarations
@@ -540,13 +501,13 @@ def decompile_general(fn_name, insns, real):
         if 0 <= fn <= 31:
             decl_lines.append(f'    f32 f{fn} = 0.0f;')
 
-    # Stack frame local variables
-    if frame_size > 0 and stack_locals:
-        decl_lines.append(f'    u8 sp[0x{frame_size:X}];')
-
     # CTR variable for indirect calls
     if has_ctr_call or any(m == 'mtctr' for m, _ in real):
         decl_lines.append('    void (*ctr_fn)(void) = 0;')
+
+    # CTR counter for bdnz loops
+    if has_bdnz:
+        decl_lines.append('    u32 ctr = 0;')
 
     # Second pass: generate code
     body_lines = []
@@ -646,9 +607,7 @@ def decompile_general(fn_name, insns, real):
         if mnem in ('beq', 'bne', 'blt', 'bgt', 'ble', 'bge'):
             target = op[-1].strip().replace('.L_', 'L_')
             cmp_op = mnem[1:]  # eq, ne, lt, gt, le, ge
-            cmp_type = last_cmp_info[0] if 'last_cmp_info' in dir() else 'cmpwi'
-            lhs = last_cmp_info[1] if 'last_cmp_info' in dir() else 'r0'
-            rhs = last_cmp_info[2] if 'last_cmp_info' in dir() else '0'
+            cmp_type, lhs, rhs = last_cmp_info
             sign = '(s32)' if cmp_type in ('cmpwi', 'cmpw') else '(u32)' if cmp_type in ('cmplwi', 'cmplw') else ''
 
             op_map = {'eq': '==', 'ne': '!=', 'lt': '<', 'gt': '>', 'le': '<=', 'ge': '>='}
@@ -658,9 +617,7 @@ def decompile_general(fn_name, insns, real):
 
         if mnem in ('beqlr', 'bnelr', 'bltlr', 'bgtlr', 'blelr', 'bgelr'):
             cmp_op = mnem[1:-2]  # strip b and lr
-            cmp_type = last_cmp_info[0] if 'last_cmp_info' in dir() else 'cmpwi'
-            lhs = last_cmp_info[1] if 'last_cmp_info' in dir() else 'r0'
-            rhs = last_cmp_info[2] if 'last_cmp_info' in dir() else '0'
+            cmp_type, lhs, rhs = last_cmp_info
             sign = '(s32)' if cmp_type in ('cmpwi', 'cmpw') else '(u32)' if cmp_type in ('cmplwi', 'cmplw') else ''
             op_map = {'eq': '==', 'ne': '!=', 'lt': '<', 'gt': '>', 'le': '<=', 'ge': '>='}
             c_op = op_map.get(cmp_op, '==')
@@ -935,6 +892,12 @@ def translate_inst(mnem, op, ops_str):
         target = op[0].strip()
         if target.startswith('_save') or target.startswith('_rest'):
             return f'/* {target} */;'
+        # Well-known CRT functions
+        if target == 'memcpy':
+            return f'memcpy((void*)r3, (const void*)r4, (u32)r5);'
+        if target == 'memset':
+            return f'memset((void*)r3, (int)r4, (u32)r5);'
+        # Generic function call
         return f'{target}();'
     if mnem == 'bctrl':
         return f'/* indirect call via ctr */;'

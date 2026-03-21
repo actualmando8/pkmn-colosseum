@@ -60,7 +60,7 @@ extern void fn_800FEBA0(void);            /* GStaskSwapCallback */
 extern void fn_800F0F4C(void);            /* GSthread trampoline / entry wrapper */
 
 /* Forward declarations for converted functions */
-void fn_800FE010(void);
+u32 fn_800FE010(void);
 void fn_800FE7A0(void);
 void fn_800FE834(void);
 void fn_800FE9B0(void);
@@ -1400,19 +1400,16 @@ u32 fn_800FDFE4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FE010(void) {
+u32 fn_800FE010(void) {
     /* TODO: match -- 844 bytes at 0x800FE010 */
 }
 #pragma pop
 
-/* 0x800FE35C | 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x800FE35C | 0x30 -- fn_800D9D68(0, 0, 0x27F, 0x1DF) -- set viewport 640x480 */
+extern void fn_800D9D68(u32 x, u32 y, u32 w, u32 h);
 void fn_800FE35C(void) {
-    /* TODO: match -- 48 bytes at 0x800FE35C */
+    fn_800D9D68(0, 0, 0x27F, 0x1DF);
 }
-#pragma pop
 
 /* 0x800FE38C | 0x148 */
 #pragma push
@@ -1440,41 +1437,33 @@ void fn_800FE6A0(f32 f1, f32 f2) {
     lbl_80478B14 = f2;
 }
 
-/* 0x800FE6AC | 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FE6AC(void) {
-    /* TODO: match -- 36 bytes at 0x800FE6AC */
+/* 0x800FE6AC | 0x24 -- output lbl_8047AC70 and lbl_8047AC72 to pointers */
+extern s16 lbl_8047AC70;
+extern s16 lbl_8047AC72;
+void fn_800FE6AC(s16* outX, s16* outY) {
+    if (outX != NULL) { *outX = lbl_8047AC70; }
+    if (outY != NULL) { *outY = lbl_8047AC72; }
 }
-#pragma pop
 
-/* 0x800FE6D0 | 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FE6D0(void) {
-    /* TODO: match -- 12 bytes at 0x800FE6D0 */
+/* 0x800FE6D0 | 0xC -- set lbl_8047AC70 and lbl_8047AC72 */
+void fn_800FE6D0(s16 x, s16 y) {
+    lbl_8047AC70 = x;
+    lbl_8047AC72 = y;
 }
-#pragma pop
 
-/* 0x800FE6DC | 0x1C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FE6DC(void) {
-    /* TODO: match -- 28 bytes at 0x800FE6DC */
+/* 0x800FE6DC | 0x1C -- task unpause by 1-based ID: gsTaskArray[(id-1)*0x18 + 0xD] = 0 */
+void fn_800FE6DC(u32 taskId) {
+    u32 idx = taskId - 1;
+    u8* ptr = (u8*)gsTaskArray + idx * sizeof(GSTask) + 0x0D;
+    *ptr = 0;
 }
-#pragma pop
 
-/* 0x800FE6F8 | 0x1C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FE6F8(void) {
-    /* TODO: match -- 28 bytes at 0x800FE6F8 */
+/* 0x800FE6F8 | 0x1C -- task pause by 1-based ID: gsTaskArray[(id-1)*0x18 + 0xD] = 1 */
+void fn_800FE6F8(u32 taskId) {
+    u32 idx = taskId - 1;
+    u8* ptr = (u8*)gsTaskArray + idx * sizeof(GSTask) + 0x0D;
+    *ptr = 1;
 }
-#pragma pop
 
 /* 0x800FE714 | 0x8C */
 #pragma push

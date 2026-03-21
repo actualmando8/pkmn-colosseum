@@ -57,6 +57,10 @@ extern u8 lbl_80363C00[];  /* trace table (BSS) */
 extern u32 lbl_80478B98;  /* effect count (SDA) */
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
 
+/* External function declarations */
+extern u8   fn_80102620(u32 objID);
+extern void fn_80102510(u32 arg1);
+
 /* Forward declarations for converted functions */
 void fn_80131CE8(u32 arg1, u32 arg2);
 void fn_80133E6C(void);
@@ -617,8 +621,8 @@ void fn_80132C6C(void) {
 
 /* 0x5C | fn_80132F7C | multi_call_cond */
 u32 fn_80132F7C(void) {
-    if (fn_80102620() == 0) { return 171; }
-    fn_80102510();
+    if (fn_80102620(0) == 0) { return 171; }
+    fn_80102510(0);
     fn_801026A4();
     return 0;
 }
@@ -657,49 +661,48 @@ void fn_801330C8(void) {
 }
 #pragma pop
 
-/* 0x80133218 | 0x38 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80133218(void) {
-    /* TODO: match -- 56 bytes at 0x80133218 */
-}
-#pragma pop
-
-/* 0x80133250 | 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80133250(void) {
-    /* TODO: match -- 44 bytes at 0x80133250 */
-}
-#pragma pop
-
-/* 0x5C | fn_8013327C | multi_call_cond */
-u32 fn_8013327C(void) {
-    if (fn_800E0E14() != 0) { return 1; }
-    fn_800DD970("");
-    fn_800DD970("");
+/* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+extern u32  fn_800E1544(void);
+extern void fn_800DD970(const char* fmt, ...);
+extern const char lbl_80272AB8[];
+u32 fn_80133218(void) {
+    u32 val = fn_800E1544();
+    fn_800DD970(lbl_80272AB8, val);
     return 0;
 }
 
-/* 0x801332D8 | 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801332D8(void) {
-    /* TODO: match -- 40 bytes at 0x801332D8 */
+/* 0x80133250 | 0x2C -- fn_800E0E14(1, 1), return 0 */
+extern u8 fn_800E0E14(u32 a, u32 b);
+u32 fn_80133250(void) {
+    fn_800E0E14(1, 1);
+    return 0;
 }
-#pragma pop
 
-/* 0x80133300 | 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80133300(void) {
-    /* TODO: match -- 40 bytes at 0x80133300 */
+/* 0x5C | fn_8013327C -- fn_800E0E14(1,0) check then print */
+extern const char lbl_80272AE0[];
+extern const char lbl_80272AF0[];
+u32 fn_8013327C(void) {
+    u8 result = fn_800E0E14(1, 0);
+    if ((result & 0xFF) == 1) {
+        fn_800DD970(lbl_80272AE0);
+    } else {
+        fn_800DD970(lbl_80272AF0);
+    }
+    return 0;
 }
-#pragma pop
+
+/* 0x801332D8 | 0x28 -- fn_800D3074(2), return 0 */
+extern void fn_800D3074(u32 mode);
+u32 fn_801332D8(void) {
+    fn_800D3074(2);
+    return 0;
+}
+
+/* 0x80133300 | 0x28 -- fn_800D3074(1), return 0 */
+u32 fn_80133300(void) {
+    fn_800D3074(1);
+    return 0;
+}
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
 u32 fn_80133328(void) {
@@ -728,31 +731,35 @@ void fn_801333AC(void) {
 /* 0x58 | fn_80133450 | call_sequence */
 void fn_80133450(void) {
     fn_801026A4();
-    fn_80102510();
+    fn_80102510(0);
 }
 
-/* 0x801334A8 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801334A8(void) {
-    /* TODO: match -- 52 bytes at 0x801334A8 */
+/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call fn_800E8F80 */
+extern u8   lbl_8047AED9;
+extern void fn_800E8F80(u32 val);
+u32 fn_801334A8(void) {
+    u32 clz = __cntlzw(lbl_8047AED9);
+    u8 val = (u8)((clz >> 19) & 0xFF);
+    lbl_8047AED9 = val;
+    fn_800E8F80(val);
+    return 0;
 }
-#pragma pop
 
-/* 0x801334DC | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801334DC(void) {
-    /* TODO: match -- 52 bytes at 0x801334DC */
+/* 0x801334DC | 0x34 -- toggle lbl_8047AED8 (cntlzw/extrwi), call fn_800D4610 */
+extern u8   lbl_8047AED8;
+extern void fn_800D4610(u32 val);
+u32 fn_801334DC(void) {
+    u32 clz = __cntlzw(lbl_8047AED8);
+    u8 val = (u8)((clz >> 19) & 0xFF);
+    lbl_8047AED8 = val;
+    fn_800D4610(val);
+    return 0;
 }
-#pragma pop
 
 /* 0x5C | fn_80133510 | multi_call_cond */
 u32 fn_80133510(void) {
-    if (fn_80102620() == 0) { return 7; }
-    fn_80102510();
+    if (fn_80102620(0) == 0) { return 7; }
+    fn_80102510(0);
     fn_801026A4();
     return 0;
 }
@@ -767,20 +774,20 @@ u32 fn_8013356C(void) {
 
 /* 0x5C | fn_801335D4 | multi_call_cond */
 u32 fn_801335D4(void) {
-    if (fn_80102620() == 0) { return 4; }
-    fn_80102510();
+    if (fn_80102620(0) == 0) { return 4; }
+    fn_80102510(0);
     fn_801026A4();
     return 0;
 }
 
-/* 0x80133630 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80133630(void) {
-    /* TODO: match -- 52 bytes at 0x80133630 */
+/* 0x80133630 | 0x34 -- toggle lbl_8047AED4 (cntlzw>>5), call fn_80101B88 */
+extern u32  lbl_8047AED4;
+u32 fn_80133630(void) {
+    u32 clz = __cntlzw(lbl_8047AED4);
+    lbl_8047AED4 = clz >> 5;
+    fn_80101B88(clz >> 5);
+    return 0;
 }
-#pragma pop
 
 /* 0x80133664 | 0x13C */
 #pragma push
@@ -797,23 +804,19 @@ u8 fn_801337A0(void) { return lbl_8047AED0; }
 /* 0x801337A8 | 0x8 | sda_setter */
 void fn_801337A8(u8 val) { lbl_8047AED0 = val; }
 
-/* 0x801337B0 | 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_801337B0(void) {
-    /* TODO: match -- 52 bytes at 0x801337B0 */
+/* 0x801337B0 | 0x34 -- check fn_80102620(lbl_80478848) != 0, return 0 or 1 */
+extern u32  lbl_80478848;
+u32 fn_801337B0(void) {
+    u8 result = fn_80102620(lbl_80478848);
+    return (result != 0) ? 0 : 1;
 }
-#pragma pop
 
-/* 0x801337E4 | 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x801337E4 | 0x2C -- set lbl_8047AED1 = 0, call fn_80102510(lbl_80478848) */
+extern u8   lbl_8047AED1;
 void fn_801337E4(void) {
-    /* TODO: match -- 44 bytes at 0x801337E4 */
+    lbl_8047AED1 = 0;
+    fn_80102510(lbl_80478848);
 }
-#pragma pop
 
 /* 0x80133810 | 0x94 */
 #pragma push
@@ -883,23 +886,20 @@ void fn_80134164(void) {
 }
 #pragma pop
 
-/* 0x80134228 | 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80134228(void) {
-    /* TODO: match -- 48 bytes at 0x80134228 */
+/* 0x80134228 | 0x30 -- saturate add: max(0, lbl_80478848 + arg) then fn_80104704 */
+extern void* fn_80104704(s32 key);
+void* fn_80134228(s32 offset) {
+    s32 key = (s32)lbl_80478848 + offset;
+    if (key < 0) key = 0;
+    return fn_80104704(key);
 }
-#pragma pop
 
-/* 0x80134258 | 0x1C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80134258(void) {
-    /* TODO: match -- 28 bytes at 0x80134258 */
+/* 0x80134258 | 0x1C -- get relative key from obj->0x04, return (key - lbl_80478848), or -1 */
+s32 fn_80134258(void* obj) {
+    u32 val = *(u32*)((u8*)obj + 0x04);
+    if ((s32)val < (s32)lbl_80478848) return -1;
+    return (s32)(val - lbl_80478848);
 }
-#pragma pop
 
 /* 0x44 | fn_80134274 | call_then_multi_check */
 u32 fn_80134274(void) {
