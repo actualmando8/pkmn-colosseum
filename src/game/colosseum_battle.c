@@ -41569,34 +41569,20 @@ L_8025FBBC: ;
 /* Address: 0x8025FBCC | Size: 0x168 (360 bytes) */
 extern u8* fn_80129280(u32, u32);
 extern u32 fn_800E0C04(s32);
-static void fn_8025FBCC_inner(u8* data, u16 itemId) {
-    u16 count = *(u16*)data;
-    u16 j;
-    for (j = 0; (u16)j < count; j++) {
-        if ((*(u16*)(data + (u16)j * 0xc + 4) & 0x3FFF) == itemId) {
-            return;
-        }
-    }
-    *(u16*)(data + count * 0xc + 4) = (u16)(itemId | 0x8000);
-    {
-        u32 val = fn_800E0C04(-1);
-        *(u32*)(data + *(u16*)data * 0xc + 0xc) = val;
-    }
-    *(u16*)data = (u16)(*(u16*)data + 1);
-}
 void fn_8025FBCC(u32 flag) {
-    u32 i;
+    u16 i;
+    u8* data;
 
     if (flag == 0) {
         fn_80129280(0, 0xc);
     }
 
-    for (i = 1; (u16)i <= 0xfbu; i++) {
-        u8* data = fn_80129280(0, 0xc);
-        u16 count = *(u16*)data;
-        u16 j;
-        for (j = 0; (u16)j < count; j++) {
-            if ((*(u16*)(data + (u16)j * 0xc + 4) & 0x3FFF) == (u16)i) {
+    for (i = 1; i <= 0xfbu; i++) {
+        u16 count, j;
+        data = fn_80129280(0, 0xc);
+        count = *(u16*)data;
+        for (j = 0; j < count; j++) {
+            if ((*(u16*)(data + j * 0xc + 4) & 0x3FFF) == i) {
                 goto next1;
             }
         }
@@ -41609,12 +41595,12 @@ void fn_8025FBCC(u32 flag) {
     next1:;
     }
 
-    for (i = 0x115; (u16)i <= 0x19bu; i++) {
-        u8* data = fn_80129280(0, 0xc);
-        u16 count = *(u16*)data;
-        u16 j;
-        for (j = 0; (u16)j < count; j++) {
-            if ((*(u16*)(data + (u16)j * 0xc + 4) & 0x3FFF) == (u16)i) {
+    for (i = 0x115; i <= 0x19bu; i++) {
+        u16 count, j;
+        data = fn_80129280(0, 0xc);
+        count = *(u16*)data;
+        for (j = 0; j < count; j++) {
+            if ((*(u16*)(data + j * 0xc + 4) & 0x3FFF) == i) {
                 goto next2;
             }
         }

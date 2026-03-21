@@ -8738,8 +8738,6 @@ L_80207B48: ;
 
 /* 0x80207B5C | size: 0x30 */
 u32 fn_80207B5C(void* context, u8 flags, u16 value) {
-    u32 pad[1];
-    (void)pad;
     return fn_801254B4(context, 0, 0xFF, flags, value);
 }
 
@@ -14203,38 +14201,20 @@ void fn_8020BFA0(void) {
 #pragma pop
 
 /* 0x8020C0C0 | size: 0x24 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020C0C0(void) {
-    extern void fn_8022D084();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
+/* fn_8020C0C0 | Size: 0x24 | Call fn_8022D084 and return 1 */
+s32 fn_8020C0C0(void) {
+    extern void fn_8022D084(void);
     fn_8022D084();
-    r3 = 0x1;
-    return;
+    return 1;
 }
-#pragma pop
 
 /* 0x8020C0E4 | size: 0x24 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020C0E4(void) {
-    extern void fn_8022E410();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
+/* fn_8020C0E4 | Size: 0x24 | Call fn_8022E410 and return 1 */
+s32 fn_8020C0E4(void) {
+    extern void fn_8022E410(void);
     fn_8022E410();
-    r3 = 0x1;
-    return;
+    return 1;
 }
-#pragma pop
 
 /* 0x8020C108 | size: 0x54 | small */
 #pragma push
@@ -16598,20 +16578,16 @@ L_8020E4A4: ;
 #pragma pop
 
 /* 0x8020E4CC | size: 0x1C | tiny */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020E4CC(void) {
-    u32 r3 = 0;
-
-    if ((s32)r3 >= (s32)0x0) goto L_8020E4D8;
-    r3 = 0x0;
-L_8020E4D8: ;
-    if ((s32)r3 <= (s32)0xc) return;
-    r3 = 0xc;
-    return;
+/* fn_8020E4CC | Size: 0x1C | Clamp value to [0, 12] */
+s32 fn_8020E4CC(s32 value) {
+    if (value < 0) {
+        value = 0;
+    }
+    if (value > 12) {
+        value = 12;
+    }
+    return value;
 }
-#pragma pop
 
 /* 0x8020E4E8 | size: 0x94 | medium */
 #pragma push

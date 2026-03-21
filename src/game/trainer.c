@@ -7222,7 +7222,7 @@ void fn_801FC808(u8* ptr, u8 idx, u8 val) {
 /* 0x801FC838 | size: 0x1C */
 s32 fn_801FC838(u8* ptr) {
     if (!ptr) { return -1; }
-    return (s8)ptr[0x2];
+    { u8 val = ptr[0x2]; return (s8)val; }
 }
 
 /* 0x801FC854 | size: 0x1C */
