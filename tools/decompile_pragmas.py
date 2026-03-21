@@ -177,8 +177,10 @@ def parse_body(body_lines):
         if m:
             regs.add(m.group(1))
             continue
-        # u32 r1 = (u32)sp;
-        if re.match(r'u32\s+r1\s*=\s*\(u32\)sp;', line):
+        # u32 r1 = (u32)sp;  -- r1 is the stack pointer alias
+        m2 = re.match(r'u32\s+r1\s*=\s*\(u32\)sp;', line)
+        if m2:
+            regs.add('r1')
             continue
         # f32 fN = 0.0f;
         m = re.match(r'f32\s+(f\d+)\s*=\s*0\.0f;$', line)
@@ -269,9 +271,12 @@ def rebuild_function(lines, start, end, func_line, func_end):
         if reg != 'r1':
             result.append(f'    u32 {reg} = 0;\n')
 
-    # r1 is special -- it's the stack pointer, declared as (u32)sp
+    # r1 is special -- it's the stack pointer register
     if uses_r1:
-        result.append('    u32 r1 = (u32)sp;\n')
+        if sp_size > 0:
+            result.append('    u32 r1 = (u32)sp;\n')
+        else:
+            result.append('    u32 r1 = 0;\n')
 
     # Float register declarations
     for freg in sorted(used_fregs, key=lambda x: int(x[1:])):

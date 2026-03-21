@@ -2,14 +2,11 @@
 """
 convert_colosseum_script.py - Convert pragma-guarded register-level C to idiomatic C89.
 
-Performs two-phase conversion of all pragma-guarded functions in colosseum_script.c:
-
-Phase 1: Strip pragma boilerplate (push/pop/optimizewithasm), clean up synthetic
-          stack frames, epilogue register restores, and assembly comments.
-          Keep #pragma optimization_level 0 for compiler stability.
-
-Phase 2: For functions matching known patterns, convert register-level code to
-          idiomatic C89 with meaningful variable names and structured control flow.
+Strips pragma boilerplate (push/pop/optimizewithasm) from all functions.
+Keeps #pragma optimization_level 0 for CW compiler stability.
+Cleans up: synthetic stack frames (when safe), epilogue register restores,
+and assembly prologue/epilogue comments.
+Preserves all register variables and body code that may be needed.
 
 Target compiler: CW GC/1.2.5n with -O4,p flags.
 """
@@ -20,7 +17,12 @@ import os
 
 
 def process_file(filepath):
-    """Full conversion of colosseum_script.c pragma blocks."""
+    """Full conversion of colosseum_script.c pragma blocks.
+
+    Uses a stack-based approach to properly handle nested pragma blocks.
+    Inner blocks (optimization_level/optimizewithasm) get their functions cleaned.
+    Outer blocks (force_active) get their push/pop stripped.
+    """
     with open(filepath, 'r') as f:
         content = f.read()
 
@@ -28,92 +30,146 @@ def process_file(filepath):
     total_lines = len(lines)
 
     # =========================================================================
-    # Phase 1: Strip pragma boilerplate, clean up synthetic constructs
+    # Step 1: Find all pragma push/pop blocks using stack-based nesting
     # =========================================================================
+    stack = []
+    all_blocks = []  # (start, end, depth) - depth 0 = outermost
 
-    # Identify all pragma block boundaries
-    blocks = []
-    i = 0
-    while i < len(lines):
-        if lines[i].strip() == '#pragma push':
-            start = i
-            for j in range(i + 1, len(lines)):
-                if lines[j].strip() == '#pragma pop':
-                    blocks.append((start, j))
-                    break
-            i = j + 1
+    for i, line in enumerate(lines):
+        if line.strip() == '#pragma push':
+            stack.append(i)
+        elif line.strip() == '#pragma pop':
+            if stack:
+                start = stack.pop()
+                depth = len(stack)
+                all_blocks.append((start, i, depth))
+
+    # Classify blocks
+    function_blocks = []  # Blocks containing function definitions (have optimization_level)
+    wrapper_blocks = []   # Outer blocks (force_active, etc.)
+
+    for start, end, depth in sorted(all_blocks):
+        block_lines = lines[start:end + 1]
+        has_opt_level = any('#pragma optimization_level' in l for l in block_lines[:5])
+        has_force_active = any('#pragma force_active' in l for l in block_lines[:5])
+
+        if has_opt_level:
+            function_blocks.append((start, end))
+        elif has_force_active:
+            wrapper_blocks.append((start, end))
         else:
-            i += 1
+            wrapper_blocks.append((start, end))
 
-    print(f"Found {len(blocks)} pragma blocks in {os.path.basename(filepath)}")
+    print(f"Found {len(function_blocks)} function pragma blocks, "
+          f"{len(wrapper_blocks)} wrapper pragma blocks")
 
-    # Process each block
-    # We'll build a new file by processing blocks in order
+    # =========================================================================
+    # Step 2: Process function blocks (convert register-level code)
+    # =========================================================================
+    # Sort by start line for ordered processing
+    function_blocks.sort()
+
+    # Build replacement map: line_idx -> replacement line (or None to delete)
+    replacements = {}
+
+    for start, end in function_blocks:
+        converted = convert_block(lines, start, end)
+        # Mark original lines for replacement
+        for i in range(start, end + 1):
+            replacements[i] = None  # Delete original
+        # Store converted lines at the start position
+        replacements[start] = converted
+
+    # =========================================================================
+    # Step 3: Process wrapper blocks (just strip push/pop/force_active)
+    # =========================================================================
+    for start, end in wrapper_blocks:
+        # Only delete the push and pop lines themselves, plus force_active
+        for i in range(start, min(start + 3, end)):
+            s = lines[i].strip()
+            if s == '#pragma push' or s.startswith('#pragma force_active'):
+                if i not in replacements:
+                    replacements[i] = None
+        if end not in replacements:
+            s = lines[end].strip()
+            if s == '#pragma pop':
+                replacements[end] = None
+
+    # =========================================================================
+    # Step 4: Build output
+    # =========================================================================
     new_lines = []
-    prev_end = -1
-
-    for block_idx, (start, end) in enumerate(blocks):
-        # Copy lines between previous block end and this block start
-        for i in range(prev_end + 1, start):
+    i = 0
+    while i < total_lines:
+        if i in replacements:
+            val = replacements[i]
+            if val is not None:
+                # This is a converted block (list of lines)
+                new_lines.extend(val)
+            # else: line deleted
+        else:
             new_lines.append(lines[i])
-
-        # Process this block
-        converted = convert_block(lines, start, end, block_idx)
-        new_lines.extend(converted)
-
-        prev_end = end
-
-    # Copy remaining lines after last block
-    for i in range(prev_end + 1, total_lines):
-        new_lines.append(lines[i])
-
-    # =========================================================================
-    # Phase 2: Fix forward declarations and u16 parameter issues
-    # =========================================================================
-    result = '\n'.join(new_lines)
+        i += 1
 
     # Fix u16 params that cause CW ICE
+    result = '\n'.join(new_lines)
     result = result.replace('u16 sequenceId', 'u32 sequenceId')
     result = result.replace('u16 seqId', 'u32 seqId')
 
-    # Write result
+    # Final cleanup: remove any stray push/pop that might remain
+    result_lines = result.split('\n')
+    final_lines = []
+    for line in result_lines:
+        s = line.strip()
+        if s == '#pragma pop' or s == '#pragma push':
+            continue
+        if s.startswith('#pragma force_active'):
+            continue
+        if s.startswith('#pragma optimizewithasm'):
+            continue
+        final_lines.append(line)
+
     with open(filepath, 'w') as f:
-        f.write(result)
+        f.write('\n'.join(final_lines))
 
-    print(f"Converted {len(blocks)} pragma blocks.")
-    return len(blocks)
+    total_converted = len(function_blocks) + len(wrapper_blocks)
+    print(f"Converted {total_converted} pragma blocks total.")
+    return total_converted
 
 
-def convert_block(lines, start, end, block_idx):
-    """Convert a single pragma block to cleaner C.
+def convert_block(lines, start, end):
+    """Convert a single pragma block to cleaned idiomatic C.
+
+    Strategy:
+    1. Parse function signature, externs, declarations, body
+    2. First pass over body to identify what variables are needed
+    3. Emit #pragma optimization_level 0 + cleaned function
 
     Returns list of output lines (strings without newlines).
     """
-    # Extract block lines
     block = lines[start:end + 1]
 
-    # Parse the block structure
+    # === Parse the block ===
     func_sig = None
     func_sig_idx = None
     externs = []
-    decl_lines = []
-    body_lines = []
+    all_decl_lines = []  # ALL register/stack declarations
+    raw_body_lines = []  # Everything after declarations
     has_stack = False
     stack_size = None
+    has_r1 = False
 
-    # Track what we find
     in_func_body = False
     past_decls = False
 
     for i, line in enumerate(block):
         s = line.strip()
 
-        # Skip pragma directives entirely
-        if s == '#pragma push' or s == '#pragma pop':
+        # Skip all pragma directives
+        if s in ('#pragma push', '#pragma pop'):
             continue
         if s.startswith('#pragma optimizewithasm'):
             continue
-        # Keep optimization_level 0 but we'll add it ourselves
         if s.startswith('#pragma optimization_level'):
             continue
 
@@ -133,236 +189,134 @@ def convert_block(lines, start, end, block_idx):
         if not in_func_body:
             continue
 
-        # Closing brace
-        if s == '}' and i == len(block) - 1:
-            continue
+        # Closing brace at end
         if s == '}' and i >= len(block) - 2:
             continue
 
-        # Extern declarations (keep them)
+        # Extern declarations
         if s.startswith('extern '):
             externs.append(s)
             continue
 
-        # Stack frame declarations (mark but don't keep)
+        # Stack frame declaration
         if re.match(r'^u8\s+sp\[\s*0x[0-9A-Fa-f]+\s*\];$', s):
             has_stack = True
             m2 = re.search(r'0x([0-9A-Fa-f]+)', s)
             if m2:
                 stack_size = int(m2.group(1), 16)
+            all_decl_lines.append(('stack', s))
             continue
 
-        # r1 = (u32)sp assignment (skip)
+        # r1 = (u32)sp
         if re.match(r'^u32\s+r1\s*=\s*\(u32\)sp;$', s):
+            has_r1 = True
+            all_decl_lines.append(('r1_assign', s))
             continue
 
         # Register variable declarations
         m = re.match(r'^(u32|s32|u16|u8|f32|f64)\s+(r\d+|f\d+)\s*=\s*(.+);$', s)
         if m and not past_decls:
-            reg = m.group(2)
-            if reg == 'r1':
-                continue  # Skip stack pointer
-            decl_lines.append(s)
+            all_decl_lines.append(('reg', s, m.group(2)))
             continue
 
-        # ctr_fn and ctr declarations
-        if re.match(r'^void\s+\(\*ctr_fn\)\(void\)\s*=\s*0;$', s):
-            decl_lines.append(s)
+        # ctr_fn and ctr
+        if re.match(r'^void\s+\(\*ctr_fn\)\(void\)\s*=\s*0;$', s) and not past_decls:
+            all_decl_lines.append(('ctr_fn', s))
             continue
-        if re.match(r'^u32\s+ctr\s*=\s*0;$', s):
-            decl_lines.append(s)
+        if re.match(r'^u32\s+ctr\s*=\s*0;$', s) and not past_decls:
+            all_decl_lines.append(('ctr', s))
             continue
 
-        # Past declarations now
+        # Once we hit non-declaration code, we're past declarations
         past_decls = True
-
-        # Assembly prologue/epilogue comments (skip)
-        if re.match(r'^/\*\s*(stmw|lmw|stwu|lwz\s+r1)\b.*\*/\s*;?\s*$', s):
-            continue
-
-        # Epilogue register restores from stack (skip)
-        if re.match(r'^r\d+\s*=\s*\*\(u32\*\)\(sp\s*\+\s*0x[0-9A-Fa-f]+\);$', s):
-            continue
-
-        # Float save/restore to/from stack for epilogue (skip)
-        if re.match(r'^f\d+\s*=\s*\*\(f64\*\)\(sp\s*\+\s*0x[0-9A-Fa-f]+\);$', s):
-            # Check if this is an epilogue restore (near end of function)
-            remaining = len(block) - i
-            if remaining <= 10:
-                continue
-
-        # Float save to stack for prologue
-        if re.match(r'^\*\(f64\*\)\(sp\s*\+\s*0x[0-9A-Fa-f]+\)\s*=\s*f\d+;$', s):
-            # Prologue save -- keep if used later, skip if near start
-            if i - func_sig_idx <= 20:
-                continue
-
-        body_lines.append(line)
+        raw_body_lines.append((i, line))
 
     if func_sig is None:
-        # Can't parse -- return lines with pragmas stripped
+        # Can't parse -- strip pragmas only
         out = []
         for line in block:
             s = line.strip()
-            if s == '#pragma push' or s == '#pragma pop':
+            if s in ('#pragma push', '#pragma pop'):
                 continue
             if s.startswith('#pragma optimization_level') or s.startswith('#pragma optimizewithasm'):
                 continue
             out.append(line)
         return out
 
-    # =========================================================================
-    # Try to convert to idiomatic C (Phase 2)
-    # =========================================================================
-    idiomatic = try_idiomatic_conversion(func_sig, externs, decl_lines, body_lines,
-                                          has_stack, stack_size)
-    if idiomatic is not None:
-        return idiomatic
+    # === Determine which body lines to keep ===
+    # Remove epilogue register restores and asm prologue/epilogue comments
+    clean_body = []
+    for idx, line in raw_body_lines:
+        s = line.strip()
 
-    # =========================================================================
-    # Fallback: cleaned register-level C with #pragma optimization_level 0
-    # =========================================================================
+        # Skip assembly prologue/epilogue comments
+        if re.match(r'^/\*\s*(stmw|lmw|stwu|lwz\s+r1|psq_st|psq_l)\b.*\*/\s*;?\s*$', s):
+            continue
+
+        # Skip epilogue register restores from stack
+        if re.match(r'^r\d+\s*=\s*\*\(u32\*\)\(sp\s*\+\s*0x[0-9A-Fa-f]+\);$', s):
+            continue
+
+        # Skip epilogue float restores near end of function
+        if re.match(r'^f\d+\s*=\s*\*\(f64\*\)\(sp\s*\+\s*0x[0-9A-Fa-f]+\);$', s):
+            remaining = end - idx
+            if remaining <= 10:
+                continue
+
+        clean_body.append(line)
+
+    # === Determine which declarations are needed ===
+    body_text = '\n'.join(l.strip() for l in clean_body)
+
+    # Check if r1 or sp is referenced in body
+    r1_used = bool(re.search(r'\br1\b', body_text))
+    sp_used = bool(re.search(r'\bsp\b', body_text))
+
+    # For each register, check if used in body
+    needed_decls = []
+    for decl_info in all_decl_lines:
+        dtype = decl_info[0]
+
+        if dtype == 'stack':
+            # Keep sp declaration if sp is referenced in body
+            if sp_used or r1_used:
+                needed_decls.append(decl_info[1])
+        elif dtype == 'r1_assign':
+            # Keep r1 = (u32)sp if r1 is referenced in body
+            if r1_used:
+                needed_decls.append(decl_info[1])
+        elif dtype == 'reg':
+            varname = decl_info[2]
+            if re.search(r'\b' + re.escape(varname) + r'\b', body_text):
+                needed_decls.append(decl_info[1])
+        elif dtype == 'ctr_fn':
+            if 'ctr_fn' in body_text:
+                needed_decls.append(decl_info[1])
+        elif dtype == 'ctr':
+            if re.search(r'\bctr\b', body_text):
+                needed_decls.append(decl_info[1])
+
+    # === Build output ===
     out = []
     out.append('#pragma optimization_level 0')
     out.append(func_sig + ' {')
 
-    # Emit externs
+    # Externs
     for ext in externs:
         out.append('    ' + ext)
 
-    # Determine which registers are actually used in body
-    body_text = '\n'.join(l.strip() for l in body_lines)
-    used_decls = []
-    for decl in decl_lines:
-        m = re.match(r'^(?:u32|s32|u16|u8|f32|f64)\s+(r\d+|f\d+|ctr_fn|ctr)\b', decl)
-        if m:
-            varname = m.group(1)
-            # Check if this variable is used in body
-            if re.search(r'\b' + re.escape(varname) + r'\b', body_text):
-                used_decls.append(decl)
-        elif 'ctr_fn' in decl:
-            if 'ctr_fn' in body_text:
-                used_decls.append(decl)
-        elif 'ctr' in decl:
-            if re.search(r'\bctr\b', body_text):
-                used_decls.append(decl)
-
-    # Check if sp is used in body (for stack-based locals)
-    sp_used_in_body = 'sp' in body_text and has_stack
-    if sp_used_in_body:
-        out.append(f'    u8 sp[0x{stack_size:X}];')
-
-    for decl in used_decls:
+    # Declarations
+    for decl in needed_decls:
         out.append('    ' + decl)
 
-    if externs or used_decls or sp_used_in_body:
+    if externs or needed_decls:
         out.append('')
 
-    # Emit body
-    for line in body_lines:
+    # Body
+    for line in clean_body:
         out.append(line)
 
-    # Closing brace
-    if not out[-1].strip().endswith('}'):
-        out.append('}')
-
-    return out
-
-
-def try_idiomatic_conversion(func_sig, externs, decl_lines, body_lines,
-                              has_stack, stack_size):
-    """Try to convert register-level code to idiomatic C.
-
-    Returns list of output lines if conversion succeeds, None otherwise.
-    """
-    body_text = '\n'.join(l.strip() for l in body_lines)
-    body_stripped = [l.strip() for l in body_lines if l.strip()]
-
-    # Count complexity metrics
-    num_gotos = body_text.count('goto ')
-    num_labels = len(re.findall(r'^L_[0-9A-Fa-f]+\s*:', body_text, re.MULTILINE))
-    num_fn_calls = len(re.findall(r'\bfn_[0-9A-Fa-f]+\(\)', body_text))
-    num_lines = len(body_stripped)
-
-    # Skip very complex functions (keep as cleaned register-level)
-    if num_lines > 100:
-        return None
-
-    # =========================================================================
-    # Pattern: Script PC advance with conditional branch
-    # =========================================================================
-    # Many functions read from the script stream, do a comparison, and
-    # either branch to a target PC or advance by N bytes.
-    # Pattern:
-    #   r3 = *(u32*)&lbl_8047B610;
-    #   ... read fields from r3+offset ...
-    #   if (condition) goto LABEL;
-    #   ... advance PC by N ...
-    #   LABEL: ... set PC to target ...
-
-    # For now, only convert the simplest patterns
-    if num_gotos <= 2 and num_labels <= 2 and num_fn_calls <= 3 and num_lines <= 40:
-        return try_convert_simple_function(func_sig, externs, decl_lines,
-                                           body_lines, has_stack, stack_size)
-
-    return None
-
-
-def try_convert_simple_function(func_sig, externs, decl_lines, body_lines,
-                                 has_stack, stack_size):
-    """Try to convert a simple function (few gotos, few calls) to idiomatic C.
-
-    These are typically:
-    1. Wrappers that call 1-3 functions and advance the script PC
-    2. Field accessors that read script data and branch
-    3. Simple conditional checks
-    """
-    body_text = '\n'.join(l.strip() for l in body_lines)
-    body_stripped = [l.strip() for l in body_lines if l.strip()]
-
-    # Check if sp is used in body
-    sp_in_body = 'sp' in body_text and has_stack
-
-    # Determine used registers
-    used_regs = set()
-    for decl in decl_lines:
-        m = re.match(r'^(?:u32|s32|u16|u8|f32|f64)\s+(r\d+|f\d+)\b', decl)
-        if m:
-            varname = m.group(1)
-            if re.search(r'\b' + re.escape(varname) + r'\b', body_text):
-                used_regs.add(varname)
-
-    # Build the idiomatic version
-    # For simple functions, we keep the register variables but clean up
-    # and add proper comments
-
-    out = []
-    out.append(func_sig + ' {')
-
-    for ext in externs:
-        out.append('    ' + ext)
-
-    if sp_in_body:
-        out.append(f'    u8 sp[0x{stack_size:X}];')
-
-    # Emit only used register declarations
-    for decl in decl_lines:
-        m = re.match(r'^(?:u32|s32|u16|u8|f32|f64)\s+(r\d+|f\d+|ctr_fn|ctr)\b', decl)
-        if m:
-            varname = m.group(1)
-            if varname in used_regs or (varname in ('ctr_fn', 'ctr') and varname in body_text):
-                out.append('    ' + decl)
-        elif 'ctr_fn' in decl and 'ctr_fn' in body_text:
-            out.append('    ' + decl)
-        elif 'ctr' in decl and re.search(r'\bctr\b', body_text):
-            out.append('    ' + decl)
-
-    if externs or used_regs or sp_in_body:
-        out.append('')
-
-    for line in body_lines:
-        out.append(line)
-
+    # Ensure closing brace
     if not out[-1].strip().endswith('}'):
         out.append('}')
 

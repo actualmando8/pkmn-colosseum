@@ -341,6 +341,7 @@ s32 fn_80059BDC(void) {
     extern u8 jumptable_802E62B0[];
     u8 sp[0x220];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -359,7 +360,6 @@ s32 fn_80059BDC(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -3845,6 +3845,7 @@ s32 fn_8005D184(void) {
     extern void fn_80109220();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -3855,7 +3856,6 @@ s32 fn_8005D184(void) {
     u32 r10 = 0;
     u32 r11 = 0;
     u32 r12 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -3917,11 +3917,11 @@ s32 fn_8005D26C(void) {
     extern void fn_8010264C();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r5 = *(u32*)&lbl_8047BF30;
@@ -3955,6 +3955,7 @@ s32 fn_8005D2E8(void) {
     extern void fn_80109220();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -3965,7 +3966,6 @@ s32 fn_8005D2E8(void) {
     u32 r10 = 0;
     u32 r11 = 0;
     u32 r12 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -4028,6 +4028,7 @@ s32 fn_8005D3D0(void) {
     extern void fn_801046B8();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -4035,7 +4036,6 @@ s32 fn_8005D3D0(void) {
     u32 r7 = 0;
     u32 r8 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r5 = *(u32*)&lbl_8047BF38;
@@ -4187,13 +4187,13 @@ s32 fn_8005D5CC(void) {
     extern void fn_80109220();
     u8 sp[0x50];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r7 = 0;
     u32 r8 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -4259,12 +4259,12 @@ s32 fn_8005D6A8(void) {
     extern void fn_80166A50();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r31 = r3;
@@ -4581,6 +4581,7 @@ s32 fn_8005DA48(void) {
     extern void fn_80105624();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -4590,7 +4591,6 @@ s32 fn_8005DA48(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r28 = r3;
@@ -4980,6 +4980,7 @@ s32 fn_8005DFC8(void) {
     extern void fn_800626CC();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -4987,7 +4988,6 @@ s32 fn_8005DFC8(void) {
     u32 r7 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -7248,6 +7248,7 @@ s32 fn_8005FFE4(void) {
     extern void fn_8025DA88();
     u8 sp[0x140];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -7261,7 +7262,6 @@ s32 fn_8005FFE4(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -7550,6 +7550,7 @@ s32 fn_80060434(void) {
     extern void fn_8025DAD0();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -7561,7 +7562,6 @@ s32 fn_80060434(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r29 = r3;
@@ -8211,6 +8211,7 @@ s32 fn_80060D70(void) {
     extern void fn_801EF634();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -8218,7 +8219,6 @@ s32 fn_80060D70(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -8425,6 +8425,7 @@ s32 fn_8006106C(void) {
     extern void fn_801040F0();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -8438,7 +8439,6 @@ s32 fn_8006106C(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -8563,6 +8563,7 @@ s32 fn_80061240(void) {
     extern void fn_800D88DC();
     u8 sp[0x60];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -8574,7 +8575,6 @@ s32 fn_80061240(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -8723,6 +8723,7 @@ s32 fn_80061454(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -8735,7 +8736,6 @@ s32 fn_80061454(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -8855,6 +8855,7 @@ s32 fn_800615F4(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -8867,7 +8868,6 @@ s32 fn_800615F4(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
 
     
@@ -9000,6 +9000,7 @@ s32 fn_800617E0(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9011,7 +9012,6 @@ s32 fn_800617E0(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
 
     
@@ -9165,6 +9165,7 @@ s32 fn_80061A2C(void) {
     extern void fn_801040F0();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9176,7 +9177,6 @@ s32 fn_80061A2C(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
 
     
@@ -9291,6 +9291,7 @@ s32 fn_80061BBC(void) {
     extern void fn_800FE6D0();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9303,7 +9304,6 @@ s32 fn_80061BBC(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
 
@@ -9404,6 +9404,7 @@ void fn_80061D34(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9417,7 +9418,6 @@ void fn_80061D34(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r30 = r4;
@@ -9577,6 +9577,7 @@ s32 fn_80061F6C(void) {
     extern void fn_8025DBB0();
     u8 sp[0x40];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9585,7 +9586,6 @@ s32 fn_80061F6C(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
 
@@ -9842,6 +9842,7 @@ void fn_80062334(void) {
     extern void fn_8025DA88();
     u8 sp[0x70];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -9858,7 +9859,6 @@ void fn_80062334(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -10110,6 +10110,7 @@ s32 fn_800626CC(void) {
     extern void fn_800626CC();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -10120,7 +10121,6 @@ s32 fn_800626CC(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r27 = r4;
@@ -10219,6 +10219,7 @@ void fn_80062834(void) {
     extern void fn_8025DA88();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r27 = 0;
@@ -10226,7 +10227,6 @@ void fn_80062834(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     fn_8025DA88();
@@ -10433,6 +10433,7 @@ s32 fn_80062AB4(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -10446,7 +10447,6 @@ s32 fn_80062AB4(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r28 = r3;
@@ -10861,6 +10861,7 @@ s32 fn_80063060(void) {
     extern u8 jumptable_802ED9B8[];
     u8 sp[0x50];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -10883,7 +10884,6 @@ s32 fn_80063060(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -11587,6 +11587,7 @@ s32 fn_80063AD4(void) {
     extern void fn_800FE38C();
     u8 sp[0x60];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -11595,7 +11596,6 @@ s32 fn_80063AD4(void) {
     u32 r8 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -11755,6 +11755,7 @@ s32 fn_80063D14(void) {
     extern void fn_8025DA88();
     u8 sp[0x40];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -11771,7 +11772,6 @@ s32 fn_80063D14(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
@@ -13740,6 +13740,7 @@ s32 fn_80065A48(void) {
     extern u8 jumptable_802EDB7C[];
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -13750,7 +13751,6 @@ s32 fn_80065A48(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -15705,6 +15705,7 @@ s32 fn_800679C0(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -15716,7 +15717,6 @@ s32 fn_800679C0(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -16220,13 +16220,13 @@ s32 fn_800681B4(void) {
     extern void fn_8025DA18();
     u8 sp[0x40];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -16386,6 +16386,7 @@ s32 fn_80068418(void) {
     extern void fn_800F7BC4();
     u8 sp[0x40];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r25 = 0;
@@ -16395,7 +16396,6 @@ s32 fn_80068418(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -16627,6 +16627,7 @@ s32 fn_80068794(void) {
     extern void fn_8025DA88();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -16636,7 +16637,6 @@ s32 fn_80068794(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -16927,6 +16927,7 @@ s32 fn_80068BB0(void) {
     extern void fn_8025DA88();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -16936,7 +16937,6 @@ s32 fn_80068BB0(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
@@ -17272,6 +17272,7 @@ s32 fn_8006905C(void) {
     extern void fn_8025DA88();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r26 = 0;
@@ -17280,7 +17281,6 @@ s32 fn_8006905C(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     void (*ctr_fn)(void) = 0;
@@ -17404,12 +17404,12 @@ s32 fn_80069220(void) {
     extern void fn_800D37CC();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -17518,11 +17518,11 @@ s32 fn_800693A4(void) {
     extern void fn_800D37CC();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -17624,11 +17624,11 @@ s32 fn_80069504(void) {
     extern void fn_800D37CC();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -17730,11 +17730,11 @@ s32 fn_80069664(void) {
     extern void fn_800D37CC();
     u8 sp[0x30];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
-    u32 r1 = (u32)sp;
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
@@ -17848,6 +17848,7 @@ void fn_800697F4(void) {
     extern void fn_8025DA88();
     u8 sp[0x20];
     u32 r0 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -17857,7 +17858,6 @@ void fn_800697F4(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    u32 r1 = (u32)sp;
 
     
     r26 = r3;

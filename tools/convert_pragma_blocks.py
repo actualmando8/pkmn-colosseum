@@ -369,72 +369,49 @@ def convert_state_dispatch(parsed, check_47e=True):
     if cmd is None or argc is None:
         return None
 
-    # Find extra args: lines between state check and CMD that set r5..r10
-    extra_args = []
-    state_check_found = False
-    for i in range(gslog_idx):
-        l = clean[i]
-        if 'if ((s32)r0 != (s32)0x1)' in l:
-            state_check_found = True
+    # Extract extra args using full register simulation up to gslog call
+    pre_call_state = {}
+    for reg, pname in param_names.items():
+        pre_call_state[reg] = pname
+    for l in clean[:gslog_idx]:
+        s = l.strip()
+        if s.startswith('if (') or s.startswith('goto ') or s.startswith('L_'):
             continue
-        if state_check_found:
-            if l.startswith('r3 = 0x') or l.startswith('r4 = 0x'):
-                break
-            if l.startswith('goto '):
-                break
+        if s in ('/* crclr cr1eq */;', '/* crset cr1eq */;'):
+            continue
+        m = re.match(r'^(r\d+) = \*\(u32\*\)lbl_8047AA80;$', s)
+        if m: pre_call_state[m.group(1)] = 'state'; continue
+        m = re.match(r'^(r\d+) = (r\d+);$', s)
+        if m: pre_call_state[m.group(1)] = pre_call_state.get(m.group(2), m.group(2)); continue
+        m = re.match(r'^(r\d+) = (0x[0-9a-fA-F]+|-?\d+);$', s)
+        if m: pre_call_state[m.group(1)] = m.group(2); continue
+        m = re.match(r'^(r\d+) = (r\d+) & 0xFF;$', s)
+        if m: pre_call_state[m.group(1)] = f'(u8){pre_call_state.get(m.group(2), m.group(2))}'; continue
+        m = re.match(r'^(r\d+) = (r\d+) & 0xFFFF;$', s)
+        if m: pre_call_state[m.group(1)] = f'(u16){pre_call_state.get(m.group(2), m.group(2))}'; continue
+        m = re.match(r'^(r\d+) = \(s8\)(r\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'(s8){pre_call_state.get(m.group(2), m.group(2))}'; continue
+        m = re.match(r'^(r\d+) = \(s16\)(r\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'(s16){pre_call_state.get(m.group(2), m.group(2))}'; continue
+        m = re.match(r'^(r\d+) = (r\d+) << (\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'({pre_call_state.get(m.group(2), m.group(2))} << {m.group(3)})'; continue
+        m = re.match(r'^(r\d+) = (r\d+) \* (0x[0-9a-fA-F]+|\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'({pre_call_state.get(m.group(2), m.group(2))} * {m.group(3)})'; continue
+        m = re.match(r'^(r\d+) = (r\d+) \+ (r\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'({pre_call_state.get(m.group(2), m.group(2))} + {pre_call_state.get(m.group(3), m.group(3))})'; continue
+        m = re.match(r'^(r\d+) = (r\d+) \+ (0x[0-9a-fA-F]+|\d+);$', s)
+        if m: pre_call_state[m.group(1)] = f'({pre_call_state.get(m.group(2), m.group(2))} + {m.group(3)})'; continue
+        m = re.match(r'^(r\d+) = \*\((u32|u16|u8|s32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\);$', s)
+        if m: pre_call_state[m.group(1)] = f'*({m.group(2)}*)((u8*){pre_call_state.get(m.group(3), m.group(3))} + {m.group(4)})'; continue
 
-            # r5 = r3;
-            m = re.match(r'^r(\d+) = (r\d+);$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                orig = param_saves.get(src, src)
-                pname = param_names.get(orig, orig)
-                extra_args.append(pname)
-                continue
-
-            # r5 = r3 & 0xFF;
-            m = re.match(r'^r(\d+) = (r\d+) & 0xFF;$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                orig = param_saves.get(src, src)
-                pname = param_names.get(orig, orig)
-                extra_args.append(f'(u32)(u8){pname}')
-                continue
-
-            # r5 = r3 & 0xFFFF;
-            m = re.match(r'^r(\d+) = (r\d+) & 0xFFFF;$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                orig = param_saves.get(src, src)
-                pname = param_names.get(orig, orig)
-                extra_args.append(f'(u32)(u16){pname}')
-                continue
-
-            # r5 = (s8)r3;
-            m = re.match(r'^r(\d+) = \(s8\)(r\d+);$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                orig = param_saves.get(src, src)
-                pname = param_names.get(orig, orig)
-                extra_args.append(f'(s32)(s8){pname}')
-                continue
-
-            # r5 = (s16)r3;
-            m = re.match(r'^r(\d+) = \(s16\)(r\d+);$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                orig = param_saves.get(src, src)
-                pname = param_names.get(orig, orig)
-                extra_args.append(f'(s32)(s16){pname}')
-                continue
-
-            # r7 = (s8)r30; (saved reg)
-            m = re.match(r'^r(\d+) = \(s8\)(r\d+);$', l)
-            if m and int(m.group(1)) >= 5:
-                src = m.group(2)
-                pname = param_names.get(src, src)
-                extra_args.append(f'(s32)(s8){pname}')
-                continue
+    # Extra args from r5..r10
+    extra_args = []
+    for reg in ['r5', 'r6', 'r7', 'r8', 'r9', 'r10']:
+        val = pre_call_state.get(reg, None)
+        if val is not None and val != reg and '<clobbered>' not in str(val):
+            extra_args.append(str(val))
+        else:
+            break
 
     args_str = ', '.join([cmd, argc] + extra_args)
 
@@ -599,6 +576,174 @@ def convert_state_dispatch(parsed, check_47e=True):
     out.append('}')
 
     return out
+
+
+def simplify_expr(expr, state_name='state'):
+    """Simplify a symbolic expression."""
+    if expr is None:
+        return None
+    expr = str(expr)
+    if '<clobbered>' in expr:
+        return None
+    expr = expr.replace('(u8*)lbl_8047AA80', state_name)
+    return expr
+
+
+def convert_line_with_state(line, reg_state):
+    """Convert a single register-level line to C using current register state."""
+    m = re.match(r'^(r\d+) = \*\(u32\*\)lbl_8047AA80;$', line)
+    if m:
+        reg_state[m.group(1)] = 'state'
+        return []
+    m = re.match(r'^(r\d+) = \(u32\)(fn_[0-9a-fA-F]+);$', line)
+    if m:
+        reg_state[m.group(1)] = f'(u32){m.group(2)}'
+        return []
+    m = re.match(r'^(r\d+) = \(u32\)(&?lbl_[0-9a-fA-F]+(?:\[\])?);$', line)
+    if m:
+        reg_state[m.group(1)] = f'(u32){m.group(2)}'
+        return []
+    m = re.match(r'^(r\d+) = (0x[0-9a-fA-F]+|-?\d+);$', line)
+    if m:
+        reg_state[m.group(1)] = m.group(2)
+        return []
+    m = re.match(r'^(r\d+) = (r\d+);$', line)
+    if m:
+        reg_state[m.group(1)] = reg_state.get(m.group(2), m.group(2))
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) << (\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'({src} << {m.group(3)})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) \* (0x[0-9a-fA-F]+|\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'({src} * {m.group(3)})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) \+ (r\d+);$', line)
+    if m:
+        lhs = reg_state.get(m.group(2), m.group(2))
+        rhs = reg_state.get(m.group(3), m.group(3))
+        reg_state[m.group(1)] = f'({lhs} + {rhs})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) \+ (0x[0-9a-fA-F]+|\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'({src} + {m.group(3)})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) - (0x[0-9a-fA-F]+|\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'({src} - {m.group(3)})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) - (r\d+);$', line)
+    if m:
+        lhs = reg_state.get(m.group(2), m.group(2))
+        rhs = reg_state.get(m.group(3), m.group(3))
+        reg_state[m.group(1)] = f'({lhs} - {rhs})'
+        return []
+    m = re.match(r'^(r\d+) = (r\d+) & (0x[0-9a-fA-F]+|\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        mask = m.group(3)
+        if mask == '0xFF': reg_state[m.group(1)] = f'(u8){src}'
+        elif mask == '0xFFFF': reg_state[m.group(1)] = f'(u16){src}'
+        else: reg_state[m.group(1)] = f'({src} & {mask})'
+        return []
+    m = re.match(r'^(r\d+) = \(s8\)(r\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'(s8){src}'
+        return []
+    m = re.match(r'^(r\d+) = \(s16\)(r\d+);$', line)
+    if m:
+        src = reg_state.get(m.group(2), m.group(2))
+        reg_state[m.group(1)] = f'(s16){src}'
+        return []
+    # LOAD
+    m = re.match(r'^(r\d+) = \*\((u32|u16|u8|s32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\);$', line)
+    if m:
+        base = reg_state.get(m.group(3), m.group(3))
+        bs = simplify_expr(base)
+        if bs is None: return None
+        reg_state[m.group(1)] = f'*({m.group(2)}*)({bs} + {m.group(4)})'
+        return []
+    m = re.match(r'^(f\d+) = \*\((f32|f64)\*\)(lbl_[0-9a-fA-F]+);$', line)
+    if m:
+        reg_state[m.group(1)] = f'*({m.group(2)}*){m.group(3)}'
+        return []
+    m = re.match(r'^(r\d+) = \*\(u32\*\)&(lbl_[0-9a-fA-F]+);$', line)
+    if m:
+        reg_state[m.group(1)] = f'*(u32*)&{m.group(2)}'
+        return []
+    # STORE
+    m = re.match(r'^\*\((u32|u16|u8|f32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\) = (r\d+|f\d+);$', line)
+    if m:
+        base = reg_state.get(m.group(2), m.group(2))
+        val = reg_state.get(m.group(4), m.group(4))
+        bs = simplify_expr(base)
+        vs = simplify_expr(val)
+        if bs is None or vs is None: return None
+        return [f'*({m.group(1)}*)({bs} + {m.group(3)}) = {vs};']
+    m = re.match(r'^\*\((u32|u16|u8)\*\)(lbl_[0-9a-fA-F]+) = (r\d+);$', line)
+    if m:
+        val = reg_state.get(m.group(3), m.group(3))
+        vs = simplify_expr(val)
+        if vs is None: return None
+        return [f'*({m.group(1)}*){m.group(2)} = {vs};']
+    m = re.match(r'^\*\(u32\*\)lbl_8047AA80 = (r\d+);$', line)
+    if m:
+        val = reg_state.get(m.group(1), m.group(1))
+        vs = simplify_expr(val)
+        if vs is None: return None
+        return [f'*(u32*)lbl_8047AA80 = {vs};']
+    # FUNCTION CALLS
+    m = re.match(r'^(fn_[0-9a-fA-F]+)\(\);$', line)
+    if m:
+        for vreg in ['r0','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12']:
+            reg_state.pop(vreg, None)
+            reg_state[vreg] = '<clobbered>'
+        return [line]
+    m = re.match(r'^(fn_[0-9a-fA-F]+)\((.+)\);$', line)
+    if m:
+        for vreg in ['r0','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12']:
+            reg_state[vreg] = '<clobbered>'
+        return [line]
+    if line.startswith('memcpy(') or line.startswith('memset('):
+        resolved = line
+        for reg in sorted(reg_state.keys(), key=lambda r: -len(r)):
+            val = simplify_expr(reg_state[reg])
+            if val is None: return None
+            resolved = resolved.replace(f'(void*){reg}', f'(void*){val}')
+            resolved = resolved.replace(f'(const void*){reg}', f'(const void*){val}')
+            resolved = resolved.replace(f'(u32){reg})', f'(u32){val})')
+        for vreg in ['r0','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12']:
+            reg_state[vreg] = '<clobbered>'
+        return [resolved]
+    m = re.match(r'^(\w+)\(\);$', line)
+    if m:
+        for vreg in ['r0','r3','r4','r5','r6','r7','r8','r9','r10','r11','r12']:
+            reg_state[vreg] = '<clobbered>'
+        return [line]
+    # Unrecognized with register refs
+    if re.search(r'\br\d+\b', line) or re.search(r'\bf\d+\b', line):
+        return None
+    return [line]
+
+
+def simulate_else_branch_with_state(else_lines, entry_state):
+    """Simulate register dataflow in else branch with pre-computed entry state."""
+    if not else_lines:
+        return []
+    reg_state = dict(entry_state)
+    output = []
+    for l in else_lines:
+        result = convert_line_with_state(l, reg_state)
+        if result is None:
+            return None
+        output.extend(result)
+    return output
 
 
 def simulate_else_branch(else_lines, param_saves, param_names, reg_decls):

@@ -4234,41 +4234,36 @@ L_801042F8: ;
 }
 
 /* 0x80104318 | 0x8C */
-void fn_80104318(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x80104318 -- search linked list for the entry at target index */
+void* fn_80104318(void* obj) {
+    u32 r3;
+    void* node;
+    s32 idx = 0;
+    s8 target;
 
-    r30 = r3;
-    r3 = *(u32*)((u8*)r30 + 0x4);
+    r3 = *(u32*)((u8*)obj + 0x4);
     ((void(*)(void))fn_8005DA18)();
-    r3 = *(s16*)((u8*)r3 + 0x4);
+    node = (void*)r3;
+    r3 = *(s16*)((u8*)node + 0x4);
     ((void(*)(void))fn_8005D934)();
-    r31 = 0x0;
-L_80104344: ;
-    r0 = *(u8*)((u8*)r3 + 0x0);
-    if ((u32)r0 == (u32)0x0) goto L_8010436C;
-    r0 = *(u8*)((u8*)r30 + 0x95);
-    r0 = (s8)r0;
-    if ((s32)r0 != (s32)r31) goto L_80104368;
-    goto L_8010438C;
-L_80104368: ;
-    r31 = r31 + 0x1;
-L_8010436C: ;
-    r0 = *(u8*)((u8*)r3 + 0x0);
-    if ((u32)r0 != (u32)0x0) goto L_80104388;
-    r3 = *(s16*)((u8*)r3 + 0x18);
-    ((void(*)(void))fn_8005D934)();
-    goto L_80104344;
-L_80104388: ;
-    r3 = 0x0;
-L_8010438C: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
-    return;
+    node = (void*)r3;
+    target = (s8)*(u8*)((u8*)obj + 0x95);
+
+    for (;;) {
+        if (*(u8*)node != 0) {
+            if ((s32)target == idx) {
+                return node;
+            }
+            idx++;
+        }
+        if (*(u8*)node == 0) {
+            r3 = *(s16*)((u8*)node + 0x18);
+            ((void(*)(void))fn_8005D934)();
+            node = (void*)r3;
+        } else {
+            return NULL;
+        }
+    }
 }
 
 /* 0x801043A4 | 0x12C */
@@ -6247,48 +6242,18 @@ u32 fn_80105FB0(void) {
 }
 
 /* 0x80105FF8 | 0x88 */
-void fn_80105FF8(void) {
+u32 fn_80105FF8(u32 arg0, u32 arg1, u32 arg2) {
     extern u8 lbl_8047AD10[];
-    extern void fn_801026A4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
+    extern u32 fn_801026A4(u32, s32, u32, u32, u32, u32);
+    u32 flags = 0;
 
-    r0 = 0x10c;
-    r6 = 0x0;
-    if ((s32)r0 != (s32)0x0) goto L_80106018;
-    goto L_8010606C;
-L_80106018: ;
-    r0 = r5 & 0xFF;
-    r4 = 0x1;
-    *(u8*)lbl_8047AD10 = r4;
-    if ((u32)r0 == (u32)0x0) goto L_80106034;
-    r0 = r6 | 0x1;
-    r6 = r0 & 0xFF;
-L_80106034: ;
-    r4 = 0x0;
-    r0 = r6 | 0x2;
-    r9 = r3;
-    r10 = r0 & 0xFF;
-    r3 = 0x10c;
-    r4 = -0x1;
-    r5 = 0x0;
-    r6 = 0x0;
-    r7 = 0x0;
-    r8 = 0x3;
-    fn_801026A4();
-    r6 = r3;
-L_8010606C: ;
-    r3 = r6;
-    return;
+    /* 0x10C is always non-zero, so this always executes */
+    *(u8*)lbl_8047AD10 = 1;
+    if ((arg2 & 0xFF) != 0) {
+        flags |= 0x01;
+    }
+    flags |= 0x02;
+    return fn_801026A4(0x10C, -1, 0, 0, 0, 3);
 }
 
 /* 0x80106080 | 0xE0 */
