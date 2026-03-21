@@ -328,6 +328,7 @@ asm void TRKLoadContext(register void* ctx, register u32 exceptionID) {
 
 /* fn_800C2EAC - 0x800C2EAC | size: 0x1EC */
 void fn_800C2EAC(void) {
+    u8 sp[0x30];
     extern void fn_800AC954();
     extern void fn_800AC990();
     extern void fn_800ACBCC();
@@ -476,7 +477,7 @@ L_800C3070:
 L_800C3080:
     r10 = *(u32*)((u8*)(u32)sp + 0x0);
     tmp = *(u32*)((u8*)r10 + 0x4);
-    (u32)sp = r10;
+    /* sp = r10; (stack restore - compiler epilogue) */
     return;
 }
 

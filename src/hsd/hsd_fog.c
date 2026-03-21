@@ -187,6 +187,7 @@ L_8019B500:
 
 /* 0x8019B528 | 0xC0 */
 void fn_8019B528(void) {
+    u8 sp[0x20];
     extern u8 lbl_8047DA3C[];
     extern u8 lbl_8047DA58[];
     u32 tmp = 0;
