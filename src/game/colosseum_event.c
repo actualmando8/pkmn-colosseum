@@ -20897,11 +20897,10 @@ u32 fn_802117FC(void) { return (*(u32*)lbl_8047B618 & 0x80) == 0; }
 
 /* fn_80211810 | Size: 0x20 | Set/clear bit 0x80 in flags */
 void fn_80211810(u8 enable) {
-    extern u32 lbl_8047B618;
     if (enable == 1) {
-        lbl_8047B618 &= ~0x80;
+        *(u32*)lbl_8047B618 &= ~0x80u;
     } else {
-        lbl_8047B618 |= 0x80;
+        *(u32*)lbl_8047B618 |= 0x80u;
     }
 }
 
@@ -21066,9 +21065,9 @@ L_802119C0: ;
 
 /* fn_802119D4 | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
 void fn_802119D4(void) {
-    extern u32 lbl_8047B618;
+    extern u8 lbl_8047B618[];
     extern void fn_80213270(void);
-    lbl_8047B618 &= ~0x00100000;
+    *(u32*)lbl_8047B618 &= ~0x00100000u;
     fn_80213270();
 }
 
