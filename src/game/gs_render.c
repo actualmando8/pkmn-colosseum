@@ -10658,38 +10658,23 @@ L_800DC9EC: ;
 void fn_800DCA10(void) {
     extern void fn_801A48B0();
     extern void fn_801A497C();
-    u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
+    u8* src;
+    u8* dst;
 
-    r31 = r4;
-    r4 = r31 + 0x4;
-    r30 = r3;
-    r0 = *(u8*)((u8*)r3 + 0x1);
-    *(u8*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u8*)((u8*)r3 + 0x3);
-    *(u8*)((u8*)r31 + 0x1) = r0;
-    r3 = *(u32*)((u8*)r3 + 0xC);
-    fn_801A497C();
-    r3 = *(u32*)((u8*)r30 + 0xC);
-    r4 = r31 + 0x10;
-    fn_801A48B0();
-    r0 = *(u32*)((u8*)r30 + 0x60);
-    *(u32*)((u8*)r31 + 0x1C) = r0;
-    f0 = *(f32*)((u8*)r30 + 0x68);
-    *(f32*)((u8*)r31 + 0x20) = f0;
-    f0 = *(f32*)((u8*)r30 + 0x64);
-    *(f32*)((u8*)r31 + 0x24) = f0;
-    r0 = *(u32*)((u8*)r30 + 0x5C);
-    *(u32*)((u8*)r31 + 0x28) = r0;
-    r0 = *(u8*)((u8*)r30 + 0x70);
-    *(u8*)((u8*)r31 + 0x2) = r0;
-    r0 = *(u8*)((u8*)r30 + 0x71);
-    *(u8*)((u8*)r31 + 0x3) = r0;
-    return;
+    dst = (u8*)r4;
+    src = (u8*)r3;
+    dst[0] = src[1];
+    dst[1] = src[3];
+    fn_801A497C(*(u32*)(src + 0xC), (u32)(dst + 4));
+    fn_801A48B0(*(u32*)(src + 0xC), (u32)(dst + 0x10));
+    *(u32*)(dst + 0x1C) = *(u32*)(src + 0x60);
+    *(f32*)(dst + 0x20) = *(f32*)(src + 0x68);
+    *(f32*)(dst + 0x24) = *(f32*)(src + 0x64);
+    *(u32*)(dst + 0x28) = *(u32*)(src + 0x5C);
+    dst[2] = src[0x70];
+    dst[3] = src[0x71];
 }
 
 /* fn_800DCAA4 | Size: 0xC */
@@ -10719,43 +10704,22 @@ void fn_800DCAF0(void) {
     extern void fn_800D37CC();
     extern void fn_801C028C();
     extern void fn_801C027C();
-    u8 sp[0x20];
-    u32 r0 = 0;
     u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
     f32 f1 = 0.0f;
-    f32 f31 = 0.0f;
+    u8* self;
+    f32 value;
 
-    *(f64*)(sp + 0x10) = f31;
-    /* psq_st f31, 0x18((u32)sp), 0, qr0 */;
-    r31 = r3;
-    f31 = f1;
-    r0 = *(u8*)((u8*)r3 + 0x2);
-    if ((u32)r0 == (u32)0x0) goto L_800DCB5C;
+    self = (u8*)r3;
+    value = f1;
+    if (self[2] == 0) {
+        return;
+    }
     fn_800D37CC();
-    if ((s32)r3 != (s32)0x32) goto L_800DCB30;
-    f0 = *(f32*)lbl_8047CA88;
-    f31 = f31 * f0;
-L_800DCB30: ;
-    *(f32*)((u8*)r31 + 0x64) = f31;
-    r3 = (u32)fn_801C027C;
-    r6 = (u32)fn_801C027C;
-    r4 = (0x1 << 16);
-    r3 = *(u32*)((u8*)r31 + 0xC);
-    f1 = *(f32*)((u8*)r31 + 0x64);
-    r4 = 0x7;
-    r7 = 0x1;
-    /* crset cr1eq */;
-    fn_801C028C();
-L_800DCB5C: ;
-    /* psq_l f31, 0x18((u32)sp), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x10);
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    if ((s32)r3 == 0x32) {
+        value = value * *(f32*)lbl_8047CA88;
+    }
+    *(f32*)(self + 0x64) = value;
+    fn_801C028C(*(u32*)(self + 0xC), 7, value, (u32)fn_801C027C, 1);
 }
 
 /* fn_800DCB78 | Size: 0xB4 */
@@ -10865,44 +10829,16 @@ void fn_800DCCF0(void) {
     extern void fn_801A6910();
     u32 r3 = 0;
     u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* self;
+    s32 mode;
 
-    r31 = r4;
-    r4 = 0x3;
-    r30 = r3;
-    r3 = *(u32*)((u8*)r3 + 0xC);
-    fn_801A68F8();
-    if ((s32)r31 == (s32)0x2) goto L_800DCD60;
-    if ((s32)r31 >= (s32)0x2) goto L_800DCD34;
-    if ((s32)r31 == (s32)0x0) goto L_800DCD40;
-    if ((s32)r31 >= (s32)0x0) goto L_800DCD50;
-    goto L_800DCD7C;
-L_800DCD34: ;
-    if ((s32)r31 >= (s32)0x4) goto L_800DCD7C;
-    goto L_800DCD70;
-L_800DCD40: ;
-    r3 = *(u32*)((u8*)r30 + 0xC);
-    r4 = 0x0;
-    fn_801A6910();
-    goto L_800DCD7C;
-L_800DCD50: ;
-    r3 = *(u32*)((u8*)r30 + 0xC);
-    r4 = 0x1;
-    fn_801A6910();
-    goto L_800DCD7C;
-L_800DCD60: ;
-    r3 = *(u32*)((u8*)r30 + 0xC);
-    r4 = 0x2;
-    fn_801A6910();
-    goto L_800DCD7C;
-L_800DCD70: ;
-    r3 = *(u32*)((u8*)r30 + 0xC);
-    r4 = 0x3;
-    fn_801A6910();
-L_800DCD7C: ;
-    *(u32*)((u8*)r30 + 0x4) = r31;
-    return;
+    mode = (s32)r4;
+    self = (u8*)r3;
+    fn_801A68F8(*(u32*)(self + 0xC), 3);
+    if (mode >= 0 && mode <= 3) {
+        fn_801A6910(*(u32*)(self + 0xC), mode);
+    }
+    *(u32*)(self + 0x4) = (u32)mode;
 }
 
 /* fn_800DCD98 | Size: 0xB4 */
