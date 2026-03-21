@@ -320,6 +320,9 @@ def convert_block(lines, start, end):
     if not out[-1].strip().endswith('}'):
         out.append('}')
 
+    # Restore optimization level after function
+    out.append('#pragma optimization_level 4')
+
     return out
 
 

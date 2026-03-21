@@ -408,10 +408,15 @@ def convert_state_dispatch(parsed, check_47e=True):
     extra_args = []
     for reg in ['r5', 'r6', 'r7', 'r8', 'r9', 'r10']:
         val = pre_call_state.get(reg, None)
-        if val is not None and val != reg and '<clobbered>' not in str(val):
+        if val is not None and val != reg and '<clobbered>' not in str(val) and 'r1' not in str(val):
             extra_args.append(str(val))
         else:
             break
+
+    # Bail if any arg contains unresolved register refs
+    for a in extra_args:
+        if re.search(r'\br[012]\b', a):
+            return None
 
     args_str = ', '.join([cmd, argc] + extra_args)
 
@@ -451,8 +456,9 @@ def convert_state_dispatch(parsed, check_47e=True):
     # Simulate lines from start up to else label to get register state at else entry
     for i in range(else_start):
         l = clean[i]
-        if l.startswith('if (') or l.startswith('goto ') or l.startswith('L_'):
-            continue
+        # Stop simulation at first branch/label (we only want pre-check state)
+        if l.startswith('if (') or l.startswith('goto ') or (l.startswith('L_') and ':' in l):
+            break
         if l in ('/* crclr cr1eq */;', '/* crset cr1eq */;'):
             continue
 
@@ -523,6 +529,11 @@ def convert_state_dispatch(parsed, check_47e=True):
         if m:
             base = entry_state.get(m.group(3), m.group(3))
             entry_state[m.group(1)] = f'*({m.group(2)}*)((u8*){base} + {m.group(4)})'
+            continue
+        # Float register copy: f30 = f1; (save float param)
+        m = re.match(r'^(f\d+) = (f\d+);$', l)
+        if m:
+            entry_state[m.group(1)] = entry_state.get(m.group(2), m.group(2))
             continue
 
     # --- Convert else branch with full register state context ---
@@ -660,6 +671,11 @@ def convert_line_with_state(line, reg_state):
     if m:
         src = reg_state.get(m.group(2), m.group(2))
         reg_state[m.group(1)] = f'(s16){src}'
+        return []
+    # fN = fM; (float copy)
+    m = re.match(r'^(f\d+) = (f\d+);$', line)
+    if m:
+        reg_state[m.group(1)] = reg_state.get(m.group(2), m.group(2))
         return []
     # LOAD
     m = re.match(r'^(r\d+) = \*\((u32|u16|u8|s32)\*\)\(\(u8\*\)(r\d+) \+ (0x[0-9a-fA-F]+)\);$', line)

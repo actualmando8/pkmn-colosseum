@@ -8223,67 +8223,40 @@ L_80109278: ;
     return;
 }
 
-/* 0x80109290 | 0xC8 */
-void fn_80109290(void) {
+/* 0x80109290 | 0xC8 -- allocate a 0x78-byte slot from pool, link to list head */
+void* fn_80109290(void* listHead) {
     extern u8 lbl_80271EE8[];
     extern u8 lbl_8047AD1C[];
     extern u8 lbl_8047CE3C[];
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+    u8* pool;
+    u8* slot;
+    u8* cur;
+    s32 i;
 
-    r30 = r3;
-    if ((u32)r30 != (u32)0x0) goto L_801092B8;
-    r3 = 0x0;
-    goto L_80109340;
-L_801092B8: ;
-    r31 = *(u32*)lbl_8047AD1C;
-    r0 = 0x168;
-    ctr_fn = (void(*)(void))r0;
-L_801092C4: ;
-    r0 = *(u8*)((u8*)r31 + 0x4);
-    r0 = (s8)r0;
-    if ((s32)r0 != (s32)0x0) goto L_80109324;
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0x78;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r0 = 0x7;
-    f0 = *(f32*)lbl_8047CE3C;
-    *(u8*)((u8*)r31 + 0x4) = r0;
-    r0 = -0x1;
-    r3 = r30;
-    *(f32*)((u8*)r31 + 0x68) = f0;
-    *(f32*)((u8*)r31 + 0x6C) = f0;
-    *(u32*)((u8*)r31 + 0x64) = r0;
-    goto L_8010930C;
-L_80109308: ;
-    r3 = r0;
-L_8010930C: ;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r0 != (u32)0x0) goto L_80109308;
-    *(u32*)((u8*)r3 + 0x0) = r31;
-    r3 = r31;
-    goto L_80109340;
-L_80109324: ;
-    r31 = r31 + 0x78;
-    if (--ctr != 0) goto L_801092C4;
-    r3 = (u32)lbl_80271EE8;
-    r3 = (u32)lbl_80271EE8;
-    ((void(*)(void))fn_800DD970)();
-    r3 = 0x0;
-L_80109340: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
-    return;
+    if (listHead == NULL) return NULL;
+
+    pool = (u8*)*(u32*)lbl_8047AD1C;
+    for (i = 0; i < 0x168; i++) {
+        slot = pool + i * 0x78;
+        if ((s8)slot[0x4] == 0) {
+            /* Found free slot -- initialize it */
+            memset(slot, 0, 0x78);
+            slot[0x4] = 0x7;
+            *(f32*)(slot + 0x68) = *(f32*)lbl_8047CE3C;
+            *(f32*)(slot + 0x6C) = *(f32*)lbl_8047CE3C;
+            *(u32*)(slot + 0x64) = (u32)-1;
+            /* Append to end of linked list */
+            cur = (u8*)listHead;
+            while (*(u32*)cur != 0) {
+                cur = (u8*)*(u32*)cur;
+            }
+            *(u32*)cur = (u32)slot;
+            return slot;
+        }
+    }
+    /* Pool exhausted */
+    fn_800DD970((const char*)lbl_80271EE8);
+    return NULL;
 }
 
 /* 0x70 | fn_80109358 | multi_call_guarded */
@@ -8628,52 +8601,43 @@ u32 fn_80109884(void) {
 }
 
 /* 0x80109894 | 0xA0 */
-void fn_80109894(void) {
+/* 0x80109894 -- animation callback: update state based on mode byte */
+u32 fn_80109894(void* obj, u32 arg1) {
     extern u8 lbl_8047CE70[];
     extern void fn_800EC1BC();
     extern void fn_800EC990();
     extern void fn_800EC9DC();
     extern void fn_800ECCA8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
+    u8* p;
+    u32 r3;
+    f32 f1;
 
-    r31 = r3;
-    if ((u32)r31 != (u32)0x0) goto L_801098B8;
-    r3 = 0x0;
-    goto L_80109920;
-L_801098B8: ;
-    r0 = *(u8*)((u8*)r31 + 0x1);
-    if ((u32)r0 == (u32)0x0) goto L_801098D8;
-    r0 = *(u8*)((u8*)r31 + 0x4);
-    if ((u32)r0 != (u32)0x0) goto L_8010991C;
-    *(u32*)((u8*)r31 + 0xC) = r4;
-    goto L_8010991C;
-L_801098D8: ;
-    r0 = *(u8*)((u8*)r31 + 0x14);
-    if ((u32)r0 != (u32)0x0) goto L_8010991C;
-    *(u32*)((u8*)r31 + 0x1C) = r4;
-    r3 = *(u32*)((u8*)r31 + 0x24);
-    fn_800EC1BC();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 == (u32)0x0) goto L_8010991C;
-    r3 = *(u32*)((u8*)r31 + 0x24);
-    r4 = *(u32*)((u8*)r31 + 0x1C);
-    fn_800ECCA8();
-    r3 = *(u32*)((u8*)r31 + 0x24);
-    f1 = *(f32*)lbl_8047CE70;
-    fn_800EC9DC();
-    r3 = *(u32*)((u8*)r31 + 0x24);
-    fn_800EC990();
-L_8010991C: ;
-    r3 = 0x1;
-L_80109920: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    if (obj == NULL) return 0;
+    p = (u8*)obj;
+
+    if (p[0x01] != 0) {
+        /* Active mode: store arg if field 4 is clear */
+        if (p[0x04] == 0) {
+            *(u32*)(p + 0x0C) = arg1;
+        }
+    } else {
+        /* Inactive mode: init if field 0x14 is clear */
+        if (p[0x14] == 0) {
+            *(u32*)(p + 0x1C) = arg1;
+            r3 = *(u32*)(p + 0x24);
+            fn_800EC1BC();
+            if ((r3 & 0xFF) != 0) {
+                r3 = *(u32*)(p + 0x24);
+                fn_800ECCA8();
+                r3 = *(u32*)(p + 0x24);
+                f1 = *(f32*)lbl_8047CE70;
+                fn_800EC9DC();
+                r3 = *(u32*)(p + 0x24);
+                fn_800EC990();
+            }
+        }
+    }
+    return 1;
 }
 
 /* 0x80109934 | 0x25C */

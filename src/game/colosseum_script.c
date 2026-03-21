@@ -1856,6 +1856,7 @@ L_80226114: ;
 L_80226120: ;
     return;
 }
+#pragma optimization_level 4
 
 /* =========================================================================
  * fn_80221104 - ColosseumMatchSetup
@@ -2938,6 +2939,7 @@ L_802220BC: ;
 L_802220FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* =========================================================================
  * fn_8021FAD4 - TeamValidation
@@ -4204,6 +4206,7 @@ L_8022D06C: ;
 L_8022D070: ;
     return;
 }
+#pragma optimization_level 4
 
 /* =========================================================================
  * fn_80230568 - TeamRegistration
@@ -5434,6 +5437,7 @@ L_802316B0: ;
 L_802316E8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* =========================================================================
  * fn_80239984 - PreBattleSetup
@@ -5480,6 +5484,7 @@ L_802399E4: ;
     r3 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* =========================================================================
  * fn_80239EE8 - BattleSequenceStart
@@ -5674,6 +5679,7 @@ L_8023A100: ;
 L_8023A104: ;
     return;
 }
+#pragma optimization_level 4
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -5753,6 +5759,7 @@ L_80220850: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80220868 | Size: 0x324 (804 bytes) */
 #pragma optimization_level 0
@@ -5981,6 +5988,7 @@ L_80220B6C: ;
 L_80220B78: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80220B8C | Size: 0x4E0 (1248 bytes) */
 #pragma optimization_level 0
@@ -6307,6 +6315,7 @@ L_80220CB8: ;
 L_80221058: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022106C | Size: 0x98 */
 #pragma optimization_level 0
@@ -6361,6 +6370,7 @@ L_802210D0: ;
     *(u8*)((u8*)r3 + 0x60A5) = r4;
     return;
 }
+#pragma optimization_level 4
 
 
 /* -------------------------------------------------------------------
@@ -6431,6 +6441,7 @@ L_802221E4: ;
     r3 = 0x3c;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802221EC | Size: 0x108 (264 bytes) */
 #pragma optimization_level 0
@@ -6516,6 +6527,7 @@ L_802222B4: ;
 L_802222E0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802222F4 | Size: 0x7C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -6556,6 +6568,7 @@ L_80222344: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222370 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -6589,6 +6602,7 @@ L_802223A8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802223D4 | Size: 0xC | Pattern: simple_setter */
 void fn_802223D4(u32 value) { /* stub */ }
@@ -6623,6 +6637,7 @@ L_80222424: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222438 | Size: 0x5C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -6653,6 +6668,7 @@ L_80222480: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222494 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fn_80222494(void* ctx, u32 param) { return; /* stub */ }
@@ -6730,6 +6746,7 @@ L_80222694: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802226A4 | Size: 0x48 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -6762,6 +6779,7 @@ L_802226DC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802226EC | Size: 0x28 | Pattern: simple_wrapper */
 u32 fn_802226EC(void* ctx, u32 param) { return; /* stub */ }
@@ -6818,6 +6836,7 @@ L_802227CC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802227D4 | Size: 0x70 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -6862,6 +6881,7 @@ L_8022282C: ;
     *(u32*)&lbl_8047B610 = r8;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222844 | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
@@ -6923,6 +6943,7 @@ L_802228F8: ;
     *(u32*)&lbl_8047B610 = r4;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022290C | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -6990,6 +7011,7 @@ L_802229D4: ;
     *(u32*)&lbl_8047B610 = r5;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802229EC | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -7057,6 +7079,7 @@ L_80222AB4: ;
     *(u32*)&lbl_8047B610 = r5;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222ACC | Size: 0x10 | Pattern: sda_getter */
 u32 fn_80222ACC(void) { return 0; /* stub */ }
@@ -7112,6 +7135,7 @@ L_80222B4C: ;
     fn_8011BBD8();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222B7C | Size: 0x5C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -7144,6 +7168,7 @@ u32 fn_80222B7C(void* ctx, u32 slot, u32 param) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222BD8 | Size: 0x6C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -7181,6 +7206,7 @@ u32 fn_80222BD8(void* ctx, u32 slot, u32 param) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222C44 | Size: 0x2AC (684 bytes) */
 #pragma optimization_level 0
@@ -7386,6 +7412,7 @@ L_80222ED0: ;
 L_80222EDC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80222EF0 | Size: 0x1CC (460 bytes) */
 #pragma optimization_level 0
@@ -7524,6 +7551,7 @@ L_802230A4: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802230BC | Size: 0x238 (568 bytes) */
 #pragma optimization_level 0
@@ -7698,6 +7726,7 @@ L_802232DC: ;
 L_802232E0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802232F4 | Size: 0x730 (1840 bytes) */
 #pragma optimization_level 0
@@ -8237,6 +8266,7 @@ L_80223A04: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223A24 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -8269,6 +8299,7 @@ L_80223A70: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223A88 | Size: 0x6C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -8302,6 +8333,7 @@ L_80223ADC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223AF4 | Size: 0x180 (384 bytes) */
 #pragma optimization_level 0
@@ -8410,6 +8442,7 @@ L_80223C5C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223C74 | Size: 0x74 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -8446,6 +8479,7 @@ L_80223CD0: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223CE8 | Size: 0x7C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -8487,6 +8521,7 @@ L_80223D48: ;
 L_80223D50: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223D64 | Size: 0xDC (220 bytes) */
 #pragma optimization_level 0
@@ -8552,6 +8587,7 @@ L_80223E20: ;
 L_80223E2C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223E40 | Size: 0xDC (220 bytes) */
 #pragma optimization_level 0
@@ -8617,6 +8653,7 @@ L_80223EFC: ;
 L_80223F08: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80223F1C | Size: 0x144 (324 bytes) */
 #pragma optimization_level 0
@@ -8717,6 +8754,7 @@ L_80224040: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80224060 | Size: 0xF8 (248 bytes) */
 #pragma optimization_level 0
@@ -8796,6 +8834,7 @@ L_80224108: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80224158 | Size: 0x5E8 (1512 bytes) */
 #pragma optimization_level 0
@@ -9223,6 +9262,7 @@ L_80224720: ;
 L_8022472C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80224740 | Size: 0x90 */
 #pragma optimization_level 0
@@ -9269,6 +9309,7 @@ L_802247A4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802247D0 | Size: 0x28 | Pattern: simple_wrapper */
 u32 fn_802247D0(void* ctx, u32 param) { return 0; /* stub */ }
@@ -9395,6 +9436,7 @@ L_80224998: ;
     *(u8*)lbl_8047B625 = r0;
     return;
 }
+#pragma optimization_level 4
 
 
 /* -------------------------------------------------------------------
@@ -9442,6 +9484,7 @@ L_80226194: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802261B0 | Size: 0x7C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -9483,6 +9526,7 @@ L_80226210: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022622C | Size: 0x58 | Pattern: field_accessor */
 /* fn_8022622C | Size: 0x58 | Script command: conditionally call fn_801F000C */
@@ -9794,6 +9838,7 @@ L_802266CC: ;
 L_802266D8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802266EC | Size: 0x44 | Pattern: field_accessor */
 u32 fn_802266EC(void* ctx, u32 slot, u32 param) {
@@ -9860,6 +9905,7 @@ L_802267C8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802267E8 | Size: 0x12C (300 bytes) */
 #pragma optimization_level 0
@@ -9958,6 +10004,7 @@ L_802268F4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80226914 | Size: 0x5F8 (1528 bytes) */
 #pragma optimization_level 0
@@ -10385,6 +10432,7 @@ L_80226EEC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80226F0C | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
@@ -10447,6 +10495,7 @@ L_80226FB4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80226FD4 | Size: 0x1A4 (420 bytes) */
 #pragma optimization_level 0
@@ -10574,6 +10623,7 @@ L_80227158: ;
 L_80227164: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80227178 | Size: 0x34 | Pattern: simple_wrapper */
 u32 fn_80227178(void* ctx, u32 param) { return 0; /* stub */ }
@@ -10774,6 +10824,7 @@ L_80227464: ;
 L_8022747C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80227490 | Size: 0x30 | Pattern: simple_wrapper */
 u32 fn_80227490(void* ctx, u32 param) { return 0; /* stub */ }
@@ -11130,6 +11181,7 @@ L_802279CC: ;
 L_802279E4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802279F8 | Size: 0x248 (584 bytes) */
 #pragma optimization_level 0
@@ -11289,6 +11341,7 @@ L_80227C04: ;
 L_80227C2C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80227C40 | Size: 0x178 (376 bytes) */
 #pragma optimization_level 0
@@ -11400,6 +11453,7 @@ L_80227D80: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80227DB8 | Size: 0x2D4 (724 bytes) */
 #pragma optimization_level 0
@@ -11602,6 +11656,7 @@ L_8022806C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022808C | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -11768,6 +11823,7 @@ L_802282AC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802282D8 | Size: 0x1D8 (472 bytes) */
 #pragma optimization_level 0
@@ -11920,6 +11976,7 @@ L_80228484: ;
     *(u32*)&lbl_8047B610 = r4;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802284B0 | Size: 0x8FC (2300 bytes) */
 #pragma optimization_level 0
@@ -12540,6 +12597,7 @@ L_80228D74: ;
 L_80228D98: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80228DAC | Size: 0x8D0 (2256 bytes) */
 #pragma optimization_level 0
@@ -13132,6 +13190,7 @@ L_80229664: ;
 L_80229668: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022967C | Size: 0x88 */
 #pragma optimization_level 0
@@ -13175,6 +13234,7 @@ L_802296EC: ;
 L_802296F0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80229704 | Size: 0x230 (560 bytes) */
 #pragma optimization_level 0
@@ -13337,6 +13397,7 @@ L_8022991C: ;
 L_80229920: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80229934 | Size: 0x23C (572 bytes) */
 #pragma optimization_level 0
@@ -13502,6 +13563,7 @@ L_80229B58: ;
 L_80229B5C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80229B70 | Size: 0x68 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -13534,6 +13596,7 @@ L_80229BC0: ;
 L_80229BC4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* fn_80229BD8 | Size: 0x50 | Check if item type is 0x11 or 0x4E */
 BOOL fn_80229BD8(u32 itemId) {
@@ -13578,6 +13641,7 @@ L_80229C78: ;
 L_80229C7C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80229C90 | Size: 0x1C4 (452 bytes) */
 #pragma optimization_level 0
@@ -13710,6 +13774,7 @@ L_80229E34: ;
 L_80229E40: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80229E54 | Size: 0x6B0 (1712 bytes) */
 #pragma optimization_level 0
@@ -14174,6 +14239,7 @@ L_8022A4E4: ;
 L_8022A4F0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022A504 | Size: 0x1C4 (452 bytes) */
 #pragma optimization_level 0
@@ -14308,6 +14374,7 @@ L_8022A6B0: ;
 L_8022A6B4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022A6C8 | Size: 0xBD4 (3028 bytes) */
 #pragma optimization_level 0
@@ -15134,6 +15201,7 @@ L_8022B284: ;
 L_8022B288: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022B29C | Size: 0x30 | Pattern: simple_wrapper */
 u32 fn_8022B29C(void* ctx, u32 param) { return 0; /* stub */ }
@@ -15356,6 +15424,7 @@ L_8022B5B0: ;
     r3 = r30;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022B5C8 | Size: 0x5BC (1468 bytes) */
 #pragma optimization_level 0
@@ -15758,6 +15827,7 @@ L_8022BB6C: ;
 L_8022BB70: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022BB84 | Size: 0x2A8 (680 bytes) */
 #pragma optimization_level 0
@@ -15953,6 +16023,7 @@ L_8022BE14: ;
 L_8022BE18: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022D084 | Size: 0x188 (392 bytes) */
 #pragma optimization_level 0
@@ -16075,6 +16146,7 @@ L_8022D1F4: ;
 L_8022D1F8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022D20C | Size: 0xC0 */
 #pragma optimization_level 0
@@ -16138,6 +16210,7 @@ L_8022D274: ;
 L_8022D2B8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022D2CC | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
@@ -16203,6 +16276,7 @@ L_8022D338: ;
 L_8022D380: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022D394 | Size: 0x328 (808 bytes) */
 #pragma optimization_level 0
@@ -16431,6 +16505,7 @@ L_8022D6A4: ;
 L_8022D6A8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022D6BC | Size: 0x5FC (1532 bytes) */
 #pragma optimization_level 0
@@ -16841,6 +16916,7 @@ L_8022DCA0: ;
     r3 = r17;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022DCB8 | Size: 0x250 (592 bytes) */
 #pragma optimization_level 0
@@ -17017,6 +17093,7 @@ L_8022DEF0: ;
 L_8022DEF4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022DF08 | Size: 0x2BC (700 bytes) */
 #pragma optimization_level 0
@@ -17221,6 +17298,7 @@ L_8022E17C: ;
 L_8022E1B0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022E1C4 | Size: 0x34 | Pattern: simple_wrapper */
 u32 fn_8022E1C4(void* ctx, u32 param) { return 0; /* stub */ }
@@ -17317,6 +17395,7 @@ L_8022E2FC: ;
 L_8022E300: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022E314 | Size: 0x38 | Pattern: simple_wrapper */
 u32 fn_8022E314(void* ctx, u32 param) { return 0; /* stub */ }
@@ -17386,6 +17465,7 @@ L_8022E3F8: ;
 L_8022E3FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022E410 | Size: 0x2E0 (736 bytes) */
 #pragma optimization_level 0
@@ -17592,6 +17672,7 @@ L_8022E6BC: ;
 L_8022E6DC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022E6F0 | Size: 0x4AC (1196 bytes) */
 #pragma optimization_level 0
@@ -17943,6 +18024,7 @@ L_8022EB70: ;
 L_8022EB88: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022EB9C | Size: 0xA4 */
 #pragma optimization_level 0
@@ -18000,6 +18082,7 @@ L_8022EC28: ;
 L_8022EC2C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022EC40 | Size: 0x1AC (428 bytes) */
 #pragma optimization_level 0
@@ -18124,6 +18207,7 @@ L_8022EDD4: ;
 L_8022EDD8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022EDEC | Size: 0x50C (1292 bytes) */
 #pragma optimization_level 0
@@ -18484,6 +18568,7 @@ L_8022F2E0: ;
 L_8022F2E4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022F2F8 | Size: 0xB28 (2856 bytes) */
 #pragma optimization_level 0
@@ -19277,6 +19362,7 @@ L_8022FE08: ;
     r3 = r21;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022FE20 | Size: 0x60 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -19306,6 +19392,7 @@ L_8022FE68: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022FE80 | Size: 0x110 (272 bytes) */
 #pragma optimization_level 0
@@ -19396,6 +19483,7 @@ L_8022FF00: ;
     fn_801F37B0();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8022FF90 | Size: 0xF8 (248 bytes) */
 #pragma optimization_level 0
@@ -19479,6 +19567,7 @@ L_8022FFF8: ;
     fn_801F37B0();
     return;
 }
+#pragma optimization_level 4
 
 
 /* -------------------------------------------------------------------
@@ -19535,6 +19624,7 @@ L_802300B0: ;
 L_80230108: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023011C | Size: 0x8C */
 #pragma optimization_level 0
@@ -19580,6 +19670,7 @@ L_80230190: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802301A8 | Size: 0x170 (368 bytes) */
 #pragma optimization_level 0
@@ -19701,6 +19792,7 @@ L_802302EC: ;
 L_80230304: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80230318 | Size: 0x250 (592 bytes) */
 #pragma optimization_level 0
@@ -19890,6 +19982,7 @@ L_8023053C: ;
 L_80230554: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802316FC | Size: 0xE8 (232 bytes) */
 #pragma optimization_level 0
@@ -19965,6 +20058,7 @@ L_802317CC: ;
 L_802317D0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802317E4 | Size: 0x7E4 (2020 bytes) */
 #pragma optimization_level 0
@@ -20527,6 +20621,7 @@ L_80231FA8: ;
 L_80231FB4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80231FC8 | Size: 0x5C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -20556,6 +20651,7 @@ L_8023200C: ;
 L_80232010: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80232024 | Size: 0xEC (236 bytes) */
 #pragma optimization_level 0
@@ -20634,6 +20730,7 @@ L_802320F8: ;
 L_802320FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80232110 | Size: 0xC18 (3096 bytes) */
 #pragma optimization_level 0
@@ -21400,6 +21497,7 @@ L_80232D10: ;
     r3 = r14 + 0x2;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80232D28 | Size: 0x2BC (700 bytes) */
 #pragma optimization_level 0
@@ -21588,6 +21686,7 @@ L_80232FCC: ;
 L_80232FD0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80232FE4 | Size: 0x1C0 (448 bytes) */
 #pragma optimization_level 0
@@ -21714,6 +21813,7 @@ L_8023318C: ;
 L_80233190: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802331A4 | Size: 0x50 | Pattern: field_accessor */
 u32 fn_802331A4(void* ctx, u32 slot, u32 param) {
@@ -22532,6 +22632,7 @@ L_80233D80: ;
 L_80233D9C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80233DB0 | Size: 0x51C (1308 bytes) */
 #pragma optimization_level 0
@@ -22901,6 +23002,7 @@ L_80234298: ;
 L_802342B8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802342CC | Size: 0x740 (1856 bytes) */
 #pragma optimization_level 0
@@ -23410,6 +23512,7 @@ L_802349EC: ;
 L_802349F8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80234A0C | Size: 0xC50 (3152 bytes) */
 #pragma optimization_level 0
@@ -24233,6 +24336,7 @@ L_8023563C: ;
     if ((u32)r0 < (u32)r22) goto L_80235434;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023565C | Size: 0xB8 */
 #pragma optimization_level 0
@@ -24288,6 +24392,7 @@ void fn_8023565C(void* ctx, u32 param1, u32 param2) {
     r3 = r0 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235714 | Size: 0xB8 */
 #pragma optimization_level 0
@@ -24343,6 +24448,7 @@ void fn_80235714(void* ctx, u32 param1, u32 param2) {
     r3 = r0 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802357CC | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -24408,6 +24514,7 @@ L_80235894: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802358AC | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24438,6 +24545,7 @@ u32 fn_802358AC(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235910 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24468,6 +24576,7 @@ u32 fn_80235910(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235974 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24498,6 +24607,7 @@ u32 fn_80235974(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802359D8 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24528,6 +24638,7 @@ u32 fn_802359D8(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235A3C | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24558,6 +24669,7 @@ u32 fn_80235A3C(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235AA0 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -24588,6 +24700,7 @@ u32 fn_80235AA0(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235B04 | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -24649,6 +24762,7 @@ L_80235BCC: ;
 L_80235BD0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80235BE4 | Size: 0x684 (1668 bytes) */
 #pragma optimization_level 0
@@ -25089,6 +25203,7 @@ L_80236250: ;
 L_80236254: ;
     return;
 }
+#pragma optimization_level 4
 
 
 /* -------------------------------------------------------------------
@@ -25234,6 +25349,7 @@ L_80236440: ;
 L_80236444: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236458 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -25264,6 +25380,7 @@ u32 fn_80236458(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802364BC | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -25294,6 +25411,7 @@ u32 fn_802364BC(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236520 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -25324,6 +25442,7 @@ u32 fn_80236520(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236584 | Size: 0x248 (584 bytes) */
 #pragma optimization_level 0
@@ -25498,6 +25617,7 @@ L_802367A8: ;
 L_802367B8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802367CC | Size: 0x1EC (492 bytes) */
 #pragma optimization_level 0
@@ -25641,6 +25761,7 @@ L_80236994: ;
     r3 = r30;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802369B8 | Size: 0x1E0 (480 bytes) */
 #pragma optimization_level 0
@@ -25780,6 +25901,7 @@ L_80236B74: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236B98 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -25810,6 +25932,7 @@ u32 fn_80236B98(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236BFC | Size: 0x84 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -25852,6 +25975,7 @@ L_80236C68: ;
 L_80236C6C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236C80 | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -25918,6 +26042,7 @@ L_80236D48: ;
 L_80236D4C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236D60 | Size: 0x13C (316 bytes) */
 #pragma optimization_level 0
@@ -26008,6 +26133,7 @@ void fn_80236D60(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = r30 - r0;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236E9C | Size: 0xB0 */
 #pragma optimization_level 0
@@ -26061,6 +26187,7 @@ void fn_80236E9C(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236F4C | Size: 0xB0 */
 #pragma optimization_level 0
@@ -26114,6 +26241,7 @@ void fn_80236F4C(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80236FFC | Size: 0xB0 */
 #pragma optimization_level 0
@@ -26167,6 +26295,7 @@ void fn_80236FFC(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802370AC | Size: 0xB0 */
 #pragma optimization_level 0
@@ -26220,6 +26349,7 @@ void fn_802370AC(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023715C | Size: 0xB0 */
 #pragma optimization_level 0
@@ -26273,6 +26403,7 @@ void fn_8023715C(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023720C | Size: 0x7C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -26312,6 +26443,7 @@ L_80237270: ;
 L_80237274: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237288 | Size: 0x88 */
 #pragma optimization_level 0
@@ -26354,6 +26486,7 @@ L_802372F8: ;
 L_802372FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237310 | Size: 0xA0 */
 #pragma optimization_level 0
@@ -26403,6 +26536,7 @@ L_80237398: ;
 L_8023739C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802373B0 | Size: 0x18C (396 bytes) */
 #pragma optimization_level 0
@@ -26516,6 +26650,7 @@ L_80237520: ;
     f31 = *(f64*)(sp + 0x30);
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023753C | Size: 0x128 (296 bytes) */
 #pragma optimization_level 0
@@ -26600,6 +26735,7 @@ void fn_8023753C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = r4 + r3; /* +carry */;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237664 | Size: 0x88 */
 #pragma optimization_level 0
@@ -26641,6 +26777,7 @@ void fn_80237664(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802376EC | Size: 0x88 */
 #pragma optimization_level 0
@@ -26682,6 +26819,7 @@ void fn_802376EC(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237774 | Size: 0x74 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -26718,6 +26856,7 @@ u32 fn_80237774(void* ctx, u32 slot, u32 param) {
     fn_80203E7C();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802377E8 | Size: 0x74 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -26754,6 +26893,7 @@ u32 fn_802377E8(void* ctx, u32 slot, u32 param) {
     fn_80203DAC();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023785C | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -26820,6 +26960,7 @@ L_80237924: ;
 L_80237928: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023793C | Size: 0x37C (892 bytes) */
 #pragma optimization_level 0
@@ -27068,6 +27209,7 @@ L_80237CA0: ;
 L_80237CA4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237CB8 | Size: 0x104 (260 bytes) */
 #pragma optimization_level 0
@@ -27150,6 +27292,7 @@ L_80237D98: ;
     r3 = r30;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237DBC | Size: 0x1B8 (440 bytes) */
 #pragma optimization_level 0
@@ -27277,6 +27420,7 @@ L_80237F5C: ;
 L_80237F60: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80237F74 | Size: 0xEC (236 bytes) */
 #pragma optimization_level 0
@@ -27348,6 +27492,7 @@ L_80238048: ;
 L_8023804C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238060 | Size: 0x164 (356 bytes) */
 #pragma optimization_level 0
@@ -27450,6 +27595,7 @@ void fn_80238060(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = r4 + r3; /* +carry */;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802381C4 | Size: 0xAC */
 #pragma optimization_level 0
@@ -27503,6 +27649,7 @@ void fn_802381C4(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238270 | Size: 0xAC */
 #pragma optimization_level 0
@@ -27556,6 +27703,7 @@ void fn_80238270(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023831C | Size: 0x88 */
 #pragma optimization_level 0
@@ -27599,6 +27747,7 @@ void fn_8023831C(void* ctx, u32 param1, u32 param2) {
     fn_802041EC();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802383A4 | Size: 0x88 */
 #pragma optimization_level 0
@@ -27642,6 +27791,7 @@ void fn_802383A4(void* ctx, u32 param1, u32 param2) {
     fn_802042E0();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023842C | Size: 0x88 */
 #pragma optimization_level 0
@@ -27683,6 +27833,7 @@ void fn_8023842C(void* ctx, u32 param1, u32 param2) {
     r3 = r3 & 0xFFFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802384B4 | Size: 0x84 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -27725,6 +27876,7 @@ L_80238520: ;
 L_80238524: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238538 | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
@@ -27785,6 +27937,7 @@ L_802385E8: ;
 L_802385EC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238600 | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
@@ -27845,6 +27998,7 @@ L_802386B0: ;
 L_802386B4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802386C8 | Size: 0x80 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -27885,6 +28039,7 @@ u32 fn_802386C8(void* ctx, u32 slot, u32 param) {
     ((void(*)(void))fn_8012640C)();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238748 | Size: 0x80 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -27926,6 +28081,7 @@ L_802387B0: ;
 L_802387B4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802387C8 | Size: 0x54 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -27953,6 +28109,7 @@ u32 fn_802387C8(void* ctx, u32 slot, u32 param) {
     fn_80203A6C();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023881C | Size: 0x110 (272 bytes) */
 #pragma optimization_level 0
@@ -28031,6 +28188,7 @@ void fn_8023881C(void* ctx, u32 param1, u32 param2, u32 param3) {
     r3 = r0 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023892C | Size: 0x54 | Pattern: field_accessor */
 u32 fn_8023892C(void* ctx, u32 slot, u32 param) {
@@ -28148,6 +28306,7 @@ L_80238AE8: ;
     r3 = r27;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238B0C | Size: 0x324 (804 bytes) */
 #pragma optimization_level 0
@@ -28375,6 +28534,7 @@ L_80238E18: ;
 L_80238E1C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80238E30 | Size: 0x228 (552 bytes) */
 #pragma optimization_level 0
@@ -28532,6 +28692,7 @@ L_80239040: ;
 L_80239044: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239058 | Size: 0xFC (252 bytes) */
 #pragma optimization_level 0
@@ -28609,6 +28770,7 @@ L_8023913C: ;
 L_80239140: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239154 | Size: 0x8C */
 #pragma optimization_level 0
@@ -28652,6 +28814,7 @@ L_802391C8: ;
 L_802391CC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802391E0 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28683,6 +28846,7 @@ u32 fn_802391E0(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239244 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28714,6 +28878,7 @@ u32 fn_80239244(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802392A8 | Size: 0xF8 (248 bytes) */
 #pragma optimization_level 0
@@ -28788,6 +28953,7 @@ L_80239360: ;
     r3 = r0 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802393A0 | Size: 0x9C */
 #pragma optimization_level 0
@@ -28837,6 +29003,7 @@ L_80239410: ;
 L_80239428: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023943C | Size: 0x5C | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28867,6 +29034,7 @@ u32 fn_8023943C(void* ctx, u32 slot, u32 param) {
     fn_8011BAC0();
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239498 | Size: 0x68 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28900,6 +29068,7 @@ u32 fn_80239498(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239500 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28931,6 +29100,7 @@ u32 fn_80239500(void* ctx, u32 slot, u32 param) {
     r3 = (s16)r3;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239564 | Size: 0x64 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28962,6 +29132,7 @@ u32 fn_80239564(void* ctx, u32 slot, u32 param) {
     r3 = r3 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802395C8 | Size: 0x1F0 (496 bytes) */
 #pragma optimization_level 0
@@ -29097,6 +29268,7 @@ L_802397A0: ;
 L_802397A4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802397B8 | Size: 0x12C (300 bytes) */
 #pragma optimization_level 0
@@ -29189,6 +29361,7 @@ L_802398C4: ;
 L_802398D0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x802398E4 | Size: 0xA0 */
 #pragma optimization_level 0
@@ -29236,6 +29409,7 @@ L_8023996C: ;
     r3 = r6;
     return;
 }
+#pragma optimization_level 4
 
 /* fn_802399FC | Size: 0x44 | Clamped add to [-200, 200] range */
 s32 fn_802399FC(s32 value, s32 delta) {
@@ -29452,6 +29626,7 @@ L_80239CB4: ;
 L_80239CB8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x80239CCC | Size: 0x21C (540 bytes) */
 #pragma optimization_level 0
@@ -29620,6 +29795,7 @@ L_80239ED0: ;
 L_80239ED4: ;
     return;
 }
+#pragma optimization_level 4
 
 
 /* -------------------------------------------------------------------
@@ -29780,6 +29956,7 @@ L_8023A2F0: ;
 L_8023A2F4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023A308 | Size: 0x438 (1080 bytes) */
 #pragma optimization_level 0
@@ -30080,6 +30257,7 @@ L_8023A6EC: ;
 L_8023A72C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023A740 | Size: 0xD58 (3416 bytes) */
 #pragma optimization_level 0
@@ -30991,6 +31169,7 @@ L_8023B42C: ;
 L_8023B484: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023B498 | Size: 0xED0 (3792 bytes) */
 #pragma optimization_level 0
@@ -31997,6 +32176,7 @@ L_8023C2E4: ;
 L_8023C354: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023C370 | Size: 0x1C0 (448 bytes) */
 #pragma optimization_level 0
@@ -32134,6 +32314,7 @@ L_8023C518: ;
 L_8023C51C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023C530 | Size: 0x56C (1388 bytes) */
 #pragma optimization_level 0
@@ -32504,6 +32685,7 @@ L_8023CA6C: ;
 L_8023CA88: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CA9C | Size: 0xC4 (196 bytes) */
 #pragma optimization_level 0
@@ -32567,6 +32749,7 @@ L_8023CB30: ;
 L_8023CB4C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CB60 | Size: 0x140 (320 bytes) */
 #pragma optimization_level 0
@@ -32668,6 +32851,7 @@ L_8023CC88: ;
     r3 = r27;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CCA0 | Size: 0x12C (300 bytes) */
 #pragma optimization_level 0
@@ -32762,6 +32946,7 @@ L_8023CDB4: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CDCC | Size: 0x94 */
 #pragma optimization_level 0
@@ -32815,6 +33000,7 @@ L_8023CE48: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CE60 | Size: 0x17C (380 bytes) */
 #pragma optimization_level 0
@@ -32933,6 +33119,7 @@ L_8023CFC4: ;
     r3 = r25;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023CFDC | Size: 0x17C (380 bytes) */
 #pragma optimization_level 0
@@ -33051,6 +33238,7 @@ L_8023D140: ;
     r3 = r25;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D158 | Size: 0x1CC (460 bytes) */
 #pragma optimization_level 0
@@ -33194,6 +33382,7 @@ L_8023D30C: ;
     r3 = r30;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D324 | Size: 0x15C (348 bytes) */
 #pragma optimization_level 0
@@ -33305,6 +33494,7 @@ L_8023D468: ;
     r3 = r25;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D480 | Size: 0x90 */
 #pragma optimization_level 0
@@ -33357,6 +33547,7 @@ L_8023D4F8: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D510 | Size: 0x23C (572 bytes) */
 #pragma optimization_level 0
@@ -33530,6 +33721,7 @@ L_8023D734: ;
     r3 = r25;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D74C | Size: 0x200 (512 bytes) */
 #pragma optimization_level 0
@@ -33686,6 +33878,7 @@ L_8023D934: ;
     r3 = r26;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023D94C | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -33865,6 +34058,7 @@ L_8023DB24: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023DB98 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34044,6 +34238,7 @@ L_8023DD70: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023DDE4 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34223,6 +34418,7 @@ L_8023DFBC: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023E030 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34402,6 +34598,7 @@ L_8023E208: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023E27C | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34581,6 +34778,7 @@ L_8023E454: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023E4C8 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34760,6 +34958,7 @@ L_8023E6A0: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023E714 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -34939,6 +35138,7 @@ L_8023E8EC: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023E960 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -35118,6 +35318,7 @@ L_8023EB38: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023EBAC | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -35297,6 +35498,7 @@ L_8023ED84: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023EDF8 | Size: 0x24C (588 bytes) */
 #pragma optimization_level 0
@@ -35476,6 +35678,7 @@ L_8023EFD0: ;
     r3 = r24;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023F044 | Size: 0x100 (256 bytes) */
 #pragma optimization_level 0
@@ -35558,6 +35761,7 @@ L_8023F12C: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023F144 | Size: 0x134 (308 bytes) */
 #pragma optimization_level 0
@@ -35652,6 +35856,7 @@ L_8023F260: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023F278 | Size: 0x648 (1608 bytes) */
 #pragma optimization_level 0
@@ -36097,6 +36302,7 @@ L_8023F8A8: ;
     r3 = r25;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023F8C0 | Size: 0x15C (348 bytes) */
 #pragma optimization_level 0
@@ -36203,6 +36409,7 @@ L_8023FA04: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023FA1C | Size: 0x140 (320 bytes) */
 #pragma optimization_level 0
@@ -36307,6 +36514,7 @@ L_8023FB44: ;
     r3 = r28;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023FB5C | Size: 0x1E8 (488 bytes) */
 #pragma optimization_level 0
@@ -36453,6 +36661,7 @@ L_8023FD2C: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023FD44 | Size: 0x98 */
 #pragma optimization_level 0
@@ -36509,6 +36718,7 @@ L_8023FDC4: ;
     r3 = r31;
     return;
 }
+#pragma optimization_level 4
 
 /* Address: 0x8023FDDC | Size: 0x2FC (764 bytes) */
 #pragma optimization_level 0
@@ -36740,6 +36950,7 @@ L_802400C0: ;
     r3 = r28;
     return;
 }
+#pragma optimization_level 4
 
 /* #######################################################################
  * COVERAGE STUBS: Colosseum script system (0x80212000 - 0x80220000)
@@ -36753,6 +36964,8 @@ L_802400C0: ;
  *   fn_80215xxx-0x80220000 - Colosseum match setup, team validation
  * ####################################################################### */
 
+
+/* 0x802126C4 | size: 0x17C | medium */
 #pragma optimization_level 0
 void fn_802126C4(void) {
     extern void fn_801437E0();
@@ -36867,6 +37080,7 @@ L_80212810: ;
 L_8021282C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80212840 | size: 0x90 */
 void fn_80212840(void* ctx) {
@@ -37219,6 +37433,7 @@ L_80212CE0: ;
 L_80212D58: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80212D6C | size: 0x3EC | large */
 #pragma optimization_level 0
@@ -37501,6 +37716,7 @@ L_802130C4: ;
     fn_8026246C();
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80213158 | size: 0x118 | medium */
 #pragma optimization_level 0
@@ -37591,6 +37807,7 @@ L_80213230: ;
     fn_8026246C();
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80213270 | size: 0x264 | large */
 #pragma optimization_level 0
@@ -37779,6 +37996,7 @@ L_80213474: ;
 L_802134C0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802134D4 | size: 0x84 */
 u32 fn_802134D4(void* ctx) {
@@ -37892,6 +38110,7 @@ L_8021368C: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802136A4 | size: 0x24 | small */
 u32 fn_802136A4(void) {
@@ -38378,6 +38597,7 @@ L_80213E74: ;
 L_80213E80: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80213E94 | size: 0x5BC | large */
 #pragma optimization_level 0
@@ -38790,6 +39010,7 @@ L_80214404: ;
     fn_802087C0();
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214450 | size: 0x178 | medium */
 #pragma optimization_level 0
@@ -38890,6 +39111,7 @@ L_802145A8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802145C8 | size: 0xEC | medium */
 #pragma optimization_level 0
@@ -38962,6 +39184,7 @@ L_8021464C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802146B4 | size: 0x10 | tiny */
 void fn_802146B4(void) { }
@@ -39035,6 +39258,7 @@ L_80214774: ;
 L_80214780: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214794 | size: 0xD0 | medium */
 #pragma optimization_level 0
@@ -39102,6 +39326,7 @@ L_80214844: ;
 L_80214850: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214864 | size: 0x154 | medium */
 #pragma optimization_level 0
@@ -39197,6 +39422,7 @@ L_80214998: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802149B8 | size: 0xFC | medium */
 #pragma optimization_level 0
@@ -39272,6 +39498,7 @@ L_80214A9C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214AB4 | size: 0x48 | small */
 void fn_80214AB4(void) {
@@ -39381,6 +39608,7 @@ L_80214C90: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214CB0 | size: 0x4C | small */
 void fn_80214CB0(void) {
@@ -39458,6 +39686,7 @@ L_80214D98: ;
 L_80214D9C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214DB0 | size: 0xA0 | medium */
 #pragma optimization_level 0
@@ -39509,6 +39738,7 @@ L_80214E08: ;
 L_80214E3C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214E50 | size: 0xC0 | medium */
 #pragma optimization_level 0
@@ -39569,6 +39799,7 @@ L_80214EC8: ;
 L_80214EFC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80214F10 | size: 0xF8 | medium */
 #pragma optimization_level 0
@@ -39655,6 +39886,7 @@ L_80214FE8: ;
 L_80214FF4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215008 | size: 0x1B8 | medium */
 #pragma optimization_level 0
@@ -39786,6 +40018,7 @@ L_8021519C: ;
     r3 = r27;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802151C0 | size: 0xE8 | medium */
 #pragma optimization_level 0
@@ -39857,6 +40090,7 @@ L_80215280: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802152A8 | size: 0x58 | small */
 #pragma optimization_level 0
@@ -39892,6 +40126,7 @@ L_802152F8: ;
     r3 = 0x78;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215300 | size: 0x74 | small */
 #pragma optimization_level 0
@@ -39929,6 +40164,7 @@ L_80215354: ;
 L_80215360: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215374 | size: 0x1B4 | medium */
 #pragma optimization_level 0
@@ -40059,6 +40295,7 @@ L_802154F8: ;
 L_80215514: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215528 | size: 0xEC | medium */
 #pragma optimization_level 0
@@ -40136,6 +40373,7 @@ L_802155F0: ;
 L_80215600: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215614 | size: 0x10C | medium */
 #pragma optimization_level 0
@@ -40218,6 +40456,7 @@ L_802156E8: ;
 L_8021570C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215720 | size: 0xE8 | medium */
 #pragma optimization_level 0
@@ -40292,6 +40531,7 @@ L_802157E8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215808 | size: 0xC8 | medium */
 #pragma optimization_level 0
@@ -40353,6 +40593,7 @@ L_80215898: ;
 L_802158BC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802158D0 | size: 0x84 | medium */
 #pragma optimization_level 0
@@ -40396,6 +40637,7 @@ L_80215924: ;
 L_80215940: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215954 | size: 0x124 | medium */
 #pragma optimization_level 0
@@ -40485,6 +40727,7 @@ L_80215A58: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215A78 | size: 0x74 | small */
 #pragma optimization_level 0
@@ -40522,6 +40765,7 @@ L_80215ABC: ;
 L_80215AD8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215AEC | size: 0x184 | medium */
 #pragma optimization_level 0
@@ -40636,6 +40880,7 @@ L_80215C50: ;
 L_80215C5C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215C70 | size: 0x80 | small */
 #pragma optimization_level 0
@@ -40674,6 +40919,7 @@ L_80215CD0: ;
 L_80215CDC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80215CF0 | size: 0x358 | large */
 #pragma optimization_level 0
@@ -40924,6 +41170,7 @@ L_80216028: ;
 L_80216034: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216048 | size: 0xA4 | medium */
 #pragma optimization_level 0
@@ -40973,6 +41220,7 @@ L_802160D4: ;
 L_802160D8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802160EC | size: 0x104 | medium */
 #pragma optimization_level 0
@@ -41052,6 +41300,7 @@ L_802161D0: ;
 L_802161DC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802161F0 | size: 0x74 | small */
 #pragma optimization_level 0
@@ -41089,6 +41338,7 @@ L_80216234: ;
 L_80216250: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216264 | size: 0x8C | medium */
 #pragma optimization_level 0
@@ -41134,6 +41384,7 @@ L_802162D0: ;
 L_802162DC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802162F0 | size: 0x74 | small */
 #pragma optimization_level 0
@@ -41171,6 +41422,7 @@ L_80216334: ;
 L_80216350: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216364 | size: 0xAC | medium */
 #pragma optimization_level 0
@@ -41227,6 +41479,7 @@ L_802163F0: ;
 L_802163FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216410 | size: 0x140 | medium */
 #pragma optimization_level 0
@@ -41333,6 +41586,7 @@ void fn_80216410(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216550 | size: 0x64 | small */
 #pragma optimization_level 0
@@ -41365,6 +41619,7 @@ L_80216594: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802165B4 | size: 0x9C | medium */
 #pragma optimization_level 0
@@ -41415,6 +41670,7 @@ L_80216630: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216650 | size: 0x130 | medium */
 #pragma optimization_level 0
@@ -41507,6 +41763,7 @@ L_80216724: ;
 L_8021676C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216780 | size: 0x84 | medium */
 #pragma optimization_level 0
@@ -41552,6 +41809,7 @@ L_802167E8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216804 | size: 0x70 | small */
 #pragma optimization_level 0
@@ -41588,6 +41846,7 @@ L_80216854: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216874 | size: 0xEC | medium */
 #pragma optimization_level 0
@@ -41651,6 +41910,7 @@ L_80216940: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216960 | size: 0xF8 | medium */
 #pragma optimization_level 0
@@ -41718,6 +41978,7 @@ L_80216A38: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216A58 | size: 0x2A0 | large */
 #pragma optimization_level 0
@@ -41920,6 +42181,7 @@ L_80216CD8: ;
 L_80216CE4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216CF8 | size: 0xA4 | medium */
 #pragma optimization_level 0
@@ -41970,6 +42232,7 @@ L_80216D78: ;
     r3 = r3 + 0x2;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216D9C | size: 0x1B4 | medium */
 #pragma optimization_level 0
@@ -42105,6 +42368,7 @@ L_80216F30: ;
 L_80216F3C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80216F50 | size: 0xC8 | medium */
 #pragma optimization_level 0
@@ -42171,6 +42435,7 @@ L_80216FF8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217018 | size: 0x9C | medium */
 #pragma optimization_level 0
@@ -42222,6 +42487,7 @@ void fn_80217018(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802170B4 | size: 0x108 | medium */
 #pragma optimization_level 0
@@ -42304,6 +42570,7 @@ L_8021719C: ;
 L_802171A8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802171BC | size: 0x64 | small */
 #pragma optimization_level 0
@@ -42336,6 +42603,7 @@ L_80217200: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217220 | size: 0x1B4 | medium */
 #pragma optimization_level 0
@@ -42471,6 +42739,7 @@ L_802173B4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802173D4 | size: 0x60 */
 void fn_802173D4(void) {
@@ -42556,6 +42825,7 @@ L_80217504: ;
 L_80217510: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217524 | size: 0x84 | medium */
 #pragma optimization_level 0
@@ -42601,6 +42871,7 @@ L_8021758C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802175A8 | size: 0x23C | large */
 #pragma optimization_level 0
@@ -42765,6 +43036,7 @@ L_802177C4: ;
 L_802177D0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802177E4 | size: 0x110 | medium */
 #pragma optimization_level 0
@@ -42845,6 +43117,7 @@ L_802178B0: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802178F4 | size: 0xA8 | medium */
 #pragma optimization_level 0
@@ -42899,6 +43172,7 @@ L_8021797C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021799C | size: 0x148 | medium */
 #pragma optimization_level 0
@@ -43000,6 +43274,7 @@ L_80217AB8: ;
 L_80217AD0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217AE4 | size: 0xEC | medium */
 #pragma optimization_level 0
@@ -43072,6 +43347,7 @@ L_80217BA8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217BD0 | size: 0x1C */
 u16 fn_80217BD0(u16 val) {
@@ -43181,6 +43457,7 @@ L_80217D00: ;
 L_80217D20: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217D34 | size: 0xEC | medium */
 #pragma optimization_level 0
@@ -43251,6 +43528,7 @@ L_80217E00: ;
 L_80217E0C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80217E20 | size: 0x1F8 | medium */
 #pragma optimization_level 0
@@ -43402,6 +43680,7 @@ L_80217FF8: ;
 L_80218004: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218018 | size: 0x1C0 | medium */
 #pragma optimization_level 0
@@ -43536,6 +43815,7 @@ L_802181C0: ;
 L_802181C4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802181D8 | size: 0x98 | medium */
 #pragma optimization_level 0
@@ -43585,6 +43865,7 @@ L_8021823C: ;
 L_8021825C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218270 | size: 0x64 | small */
 #pragma optimization_level 0
@@ -43617,6 +43898,7 @@ L_802182B4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802182D4 | size: 0xE8 | medium */
 #pragma optimization_level 0
@@ -43691,6 +43973,7 @@ L_8021838C: ;
 L_802183A8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802183BC | size: 0xC0 | medium */
 #pragma optimization_level 0
@@ -43753,6 +44036,7 @@ L_80218428: ;
 L_80218468: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021847C | size: 0x3A8 | large */
 #pragma optimization_level 0
@@ -44020,6 +44304,7 @@ L_80218804: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218824 | size: 0x248 | large */
 #pragma optimization_level 0
@@ -44190,6 +44475,7 @@ L_80218A4C: ;
 L_80218A58: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218A6C | size: 0x100 | medium */
 #pragma optimization_level 0
@@ -44269,6 +44555,7 @@ L_80218B28: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218B6C | size: 0x68 | small */
 #pragma optimization_level 0
@@ -44310,6 +44597,7 @@ L_80218BC0: ;
     r3 = *(u8*)((u8*)r3 + 0x1);
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218BD4 | size: 0xA0 | medium */
 #pragma optimization_level 0
@@ -44357,6 +44645,7 @@ L_80218C54: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218C74 | size: 0xB0 | medium */
 #pragma optimization_level 0
@@ -44411,6 +44700,7 @@ L_80218D04: ;
 L_80218D10: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80218D24 | size: 0x2B8 | large */
 #pragma optimization_level 0
@@ -44607,6 +44897,7 @@ L_80218F00: ;
 L_80218FC8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* fn_80218FDC | Size: 0x40 | Check if ID is in special set */
 BOOL fn_80218FDC(u16 id) {
@@ -44648,6 +44939,7 @@ L_80219078: ;
 L_8021907C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021908C | size: 0x1E4 | medium */
 #pragma optimization_level 0
@@ -44788,6 +45080,7 @@ L_8021922C: ;
 L_8021925C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219270 | size: 0x44 */
 u32 fn_80219270(u32 val) {
@@ -44853,6 +45146,7 @@ L_80219334: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219354 | size: 0x24C | large */
 #pragma optimization_level 0
@@ -45018,6 +45312,7 @@ L_8021955C: ;
 L_8021958C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802195A0 | size: 0x108 | medium */
 #pragma optimization_level 0
@@ -45100,6 +45395,7 @@ L_80219688: ;
 L_80219694: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x802196A8 | size: 0x15C | medium */
 #pragma optimization_level 0
@@ -45205,6 +45501,7 @@ L_802197E4: ;
 L_802197F0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219804 | size: 0x34 | small */
 u32 fn_80219804(u32 id) {
@@ -45309,6 +45606,7 @@ L_80219944: ;
 L_80219950: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219964 | size: 0x1C8 | medium */
 #pragma optimization_level 0
@@ -45441,6 +45739,7 @@ L_80219AF4: ;
 L_80219B18: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219B2C | size: 0x1C8 | medium */
 #pragma optimization_level 0
@@ -45573,6 +45872,7 @@ L_80219CBC: ;
 L_80219CE0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219CF4 | size: 0xA4 | medium */
 #pragma optimization_level 0
@@ -45627,6 +45927,7 @@ void fn_80219CF4(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219D98 | size: 0x78 | small */
 #pragma optimization_level 0
@@ -45666,6 +45967,7 @@ void fn_80219D98(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219E10 | size: 0x1D4 | medium */
 #pragma optimization_level 0
@@ -45814,6 +46116,7 @@ L_80219F54: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x80219FE4 | size: 0x70 | small */
 #pragma optimization_level 0
@@ -45855,6 +46158,7 @@ L_8021A04C: ;
     r3 = 0x1;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A054 | size: 0x26C | large */
 #pragma optimization_level 0
@@ -46036,6 +46340,7 @@ L_8021A240: ;
 L_8021A2AC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A2C0 | size: 0x78 | small */
 #pragma optimization_level 0
@@ -46080,6 +46385,7 @@ L_8021A318: ;
     r3 = r0 & 0xFF;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A338 | size: 0x140 | medium */
 #pragma optimization_level 0
@@ -46181,6 +46487,7 @@ L_8021A458: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A478 | size: 0x254 | large */
 #pragma optimization_level 0
@@ -46362,6 +46669,7 @@ L_8021A6AC: ;
 L_8021A6B8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A6CC | size: 0x98 | medium */
 #pragma optimization_level 0
@@ -46412,6 +46720,7 @@ L_8021A744: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A764 | size: 0xA8 | medium */
 #pragma optimization_level 0
@@ -46466,6 +46775,7 @@ L_8021A7EC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A80C | size: 0x6C | small */
 #pragma optimization_level 0
@@ -46501,6 +46811,7 @@ L_8021A858: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A878 | size: 0x10C | medium */
 #pragma optimization_level 0
@@ -46582,6 +46893,7 @@ L_8021A954: ;
 L_8021A970: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021A984 | size: 0x194 | medium */
 #pragma optimization_level 0
@@ -46701,6 +47013,7 @@ L_8021AAE0: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021AB18 | size: 0x84 | medium */
 #pragma optimization_level 0
@@ -46746,6 +47059,7 @@ L_8021AB80: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021AB9C | size: 0x80 | small */
 #pragma optimization_level 0
@@ -46787,6 +47101,7 @@ void fn_8021AB9C(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021AC1C | size: 0x390 | large */
 #pragma optimization_level 0
@@ -47049,6 +47364,7 @@ L_8021AF8C: ;
 L_8021AF98: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021AFAC | size: 0x104 | medium */
 #pragma optimization_level 0
@@ -47128,6 +47444,7 @@ L_8021B090: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B0B0 | size: 0xF4 | medium */
 #pragma optimization_level 0
@@ -47204,6 +47521,7 @@ L_8021B184: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B1A4 | size: 0x1C0 | medium */
 #pragma optimization_level 0
@@ -47340,6 +47658,7 @@ L_8021B320: ;
 L_8021B350: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B364 | size: 0x120 | medium */
 #pragma optimization_level 0
@@ -47426,6 +47745,7 @@ L_8021B460: ;
     r3 = r27;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B484 | size: 0x18C | medium */
 #pragma optimization_level 0
@@ -47546,6 +47866,7 @@ L_8021B568: ;
 L_8021B5FC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B610 | size: 0x18 */
 void fn_8021B610(void) {
@@ -47621,6 +47942,7 @@ L_8021B6EC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B70C | size: 0x54 | small */
 #pragma optimization_level 0
@@ -47649,6 +47971,7 @@ L_8021B744: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B760 | size: 0xD0 | medium */
 #pragma optimization_level 0
@@ -47713,6 +48036,7 @@ L_8021B7EC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021B830 | size: 0x40 | small */
 void fn_8021B830(void) {
@@ -48257,6 +48581,7 @@ L_8021C01C: ;
 L_8021C020: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C034 | size: 0x5C | small */
 #pragma optimization_level 0
@@ -48291,6 +48616,7 @@ L_8021C088: ;
     r3 = 0x0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C090 | size: 0x64 | small */
 #pragma optimization_level 0
@@ -48327,6 +48653,7 @@ L_8021C0EC: ;
     r3 = 0x0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C0F4 | size: 0x9C | medium */
 #pragma optimization_level 0
@@ -48376,6 +48703,7 @@ L_8021C15C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C190 | size: 0x178 | medium */
 #pragma optimization_level 0
@@ -48495,6 +48823,7 @@ L_8021C280: ;
 L_8021C2F4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C308 | size: 0x188 | medium */
 #pragma optimization_level 0
@@ -48620,6 +48949,7 @@ L_8021C464: ;
 L_8021C47C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C490 | size: 0xF8 | medium */
 #pragma optimization_level 0
@@ -48701,6 +49031,7 @@ L_8021C568: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C588 | size: 0xB0 | medium */
 #pragma optimization_level 0
@@ -48758,6 +49089,7 @@ L_8021C618: ;
 L_8021C624: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C638 | size: 0xBC | medium */
 #pragma optimization_level 0
@@ -48819,6 +49151,7 @@ L_8021C6DC: ;
 L_8021C6E0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C6F4 | size: 0x10 | tiny */
 void fn_8021C6F4(void) { }
@@ -48853,6 +49186,7 @@ L_8021C748: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C75C | size: 0x1A4 | medium */
 #pragma optimization_level 0
@@ -48975,6 +49309,7 @@ L_8021C8E0: ;
 L_8021C8EC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021C900 | size: 0x100 | medium */
 #pragma optimization_level 0
@@ -49052,6 +49387,7 @@ L_8021C9C8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CA00 | size: 0x158 | medium */
 #pragma optimization_level 0
@@ -49157,6 +49493,7 @@ L_8021CB1C: ;
 L_8021CB44: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CB58 | size: 0x104 | medium */
 #pragma optimization_level 0
@@ -49236,6 +49573,7 @@ L_8021CC3C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CC5C | size: 0x84 | medium */
 #pragma optimization_level 0
@@ -49281,6 +49619,7 @@ L_8021CCC4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CCE0 | size: 0x180 | medium */
 #pragma optimization_level 0
@@ -49400,6 +49739,7 @@ L_8021CE28: ;
 L_8021CE4C: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CE60 | size: 0xDC | medium */
 #pragma optimization_level 0
@@ -49470,6 +49810,7 @@ L_8021CF24: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021CF3C | size: 0xD4 | medium */
 #pragma optimization_level 0
@@ -49541,6 +49882,7 @@ L_8021CFF0: ;
 L_8021CFFC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D010 | size: 0x80 | small */
 #pragma optimization_level 0
@@ -49583,6 +49925,7 @@ L_8021D070: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D090 | size: 0x194 | medium */
 #pragma optimization_level 0
@@ -49707,6 +50050,7 @@ L_8021D1EC: ;
 L_8021D210: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D224 | size: 0x1E8 | medium */
 #pragma optimization_level 0
@@ -49847,6 +50191,7 @@ L_8021D3EC: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D40C | size: 0x27C | large */
 #pragma optimization_level 0
@@ -50033,6 +50378,7 @@ L_8021D668: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D688 | size: 0x338 | large */
 #pragma optimization_level 0
@@ -50279,6 +50625,7 @@ L_8021D994: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021D9C0 | size: 0x1B8 | medium */
 #pragma optimization_level 0
@@ -50407,6 +50754,7 @@ L_8021DB58: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021DB78 | size: 0x1AC | medium */
 #pragma optimization_level 0
@@ -50531,6 +50879,7 @@ L_8021DD04: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021DD24 | size: 0x10 | tiny */
 void fn_8021DD24(void) { }
@@ -50574,6 +50923,7 @@ L_8021DD98: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021DDB8 | size: 0x10 | tiny */
 void fn_8021DDB8(void) { }
@@ -50618,6 +50968,7 @@ void fn_8021DDD8(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021DE3C | size: 0x10 | tiny */
 void fn_8021DE3C(void) { }
@@ -50661,6 +51012,7 @@ L_8021DEA8: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021DEC8 | size: 0x34 | small */
 void fn_8021DEC8(void) {
@@ -50749,6 +51101,7 @@ L_8021E02C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021E04C | size: 0x23C | large */
 #pragma optimization_level 0
@@ -50906,6 +51259,7 @@ L_8021E268: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021E288 | size: 0x378 | large */
 #pragma optimization_level 0
@@ -51142,6 +51496,7 @@ L_8021E5E0: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021E600 | size: 0xCC | medium */
 #pragma optimization_level 0
@@ -51209,6 +51564,7 @@ L_8021E6A4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021E6CC | size: 0x10 | tiny */
 void fn_8021E6CC(void) { }
@@ -51436,6 +51792,7 @@ L_8021E994: ;
 L_8021E9E0: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021E9F4 | size: 0xA0 | medium */
 #pragma optimization_level 0
@@ -51487,6 +51844,7 @@ L_8021EA74: ;
 L_8021EA80: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021EA94 | size: 0x54 */
 void fn_8021EA94(void) {
@@ -51588,6 +51946,7 @@ L_8021EBE0: ;
 L_8021EBEC: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021EC00 | size: 0xF8 | medium */
 #pragma optimization_level 0
@@ -51667,6 +52026,7 @@ L_8021ECC0: ;
 L_8021ECE4: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021ECF8 | size: 0x78 | small */
 #pragma optimization_level 0
@@ -51708,6 +52068,7 @@ void fn_8021ECF8(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021ED70 | size: 0xC8 | medium */
 #pragma optimization_level 0
@@ -51770,6 +52131,7 @@ L_8021EE18: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021EE38 | size: 0x10 | tiny */
 void fn_8021EE38(void) { }
@@ -52011,6 +52373,7 @@ L_8021F164: ;
 L_8021F1B8: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F1CC | size: 0x80 | small */
 #pragma optimization_level 0
@@ -52051,6 +52414,7 @@ L_8021F22C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F24C | size: 0x150 | medium */
 #pragma optimization_level 0
@@ -52155,6 +52519,7 @@ L_8021F334: ;
 L_8021F388: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F39C | size: 0xBC | medium */
 #pragma optimization_level 0
@@ -52214,6 +52579,7 @@ L_8021F440: ;
 L_8021F444: ;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F458 | size: 0x20C | large */
 #pragma optimization_level 0
@@ -52375,6 +52741,7 @@ L_8021F63C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F664 | size: 0x2C8 | large */
 #pragma optimization_level 0
@@ -52595,6 +52962,7 @@ L_8021F90C: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F92C | size: 0x6C | small */
 #pragma optimization_level 0
@@ -52631,6 +52999,7 @@ void fn_8021F92C(void) {
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021F998 | size: 0x13C | medium */
 #pragma optimization_level 0
@@ -52729,6 +53098,7 @@ L_8021FAB4: ;
     *(u32*)&lbl_8047B610 = r0;
     return;
 }
+#pragma optimization_level 4
 
 /* 0x8021FAD4 | size: 0xCA4 | massive */
 #pragma optimization_level 0
@@ -53604,5 +53974,6 @@ L_80220748: ;
 L_80220764: ;
     return;
 }
+#pragma optimization_level 4
 
 

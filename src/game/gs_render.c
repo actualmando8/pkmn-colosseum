@@ -4510,8 +4510,8 @@ void fn_800D631C(f32 fp1, f32 fp2) {
     } else {
         fn_800D6B00();
         *(u32*)(state + 0x4A8) = (u32)fn_800D7524;
-        *(f32*)(state + 0x4B8) = f30;
-        *(f32*)(state + 0x4BC) = f31;
+        *(f32*)(state + 0x4B8) = fp1;
+        *(f32*)(state + 0x4BC) = fp2;
         *(u8*)(state + 0x49F) = 0x1;
     }
 }
@@ -4604,9 +4604,9 @@ void fn_800D6680(f32 fp1, f32 fp2, f32 fp3) {
     } else {
         fn_800D6B00();
         *(u32*)(state + 0x4A8) = (u32)fn_800D75D0;
-        *(f32*)(state + 0x4B8) = f29;
-        *(f32*)(state + 0x4BC) = f30;
-        *(f32*)(state + 0x4C0) = f31;
+        *(f32*)(state + 0x4B8) = fp1;
+        *(f32*)(state + 0x4BC) = fp2;
+        *(f32*)(state + 0x4C0) = fp3;
         *(u8*)(state + 0x49F) = 0x1;
     }
 }
@@ -7995,57 +7995,23 @@ void fn_800D9B24(u16* out_x, u16* out_y, u16* out_w, u16* out_h) {
 }
 
 /* fn_800D9B58 | Size: 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800D9B58(void) {
+void fn_800D9B58(f32 fp1, f32 fp2, f32 fp3, f32 fp4) {
     extern u8 lbl_8047CA50[];
     extern u8 lbl_8047CA54[];
     extern void fn_800BD2E0();
     extern void fn_800D4F98();
     extern void fn_800D834C();
     extern void fn_800E0698();
-    u8 sp[0x50];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f5 = 0.0f;
-    f32 f6 = 0.0f;
-    f32 f7 = 0.0f;
-
-    f7 = f1;
-    f0 = f3;
-    r3 = *(u32*)lbl_8047AA80;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if ((s32)r0 != (s32)0x1) goto L_800D9B90;
-    r3 = 0x3a;
-    r4 = 0xe;
-    /* crset cr1eq */;
-    fn_800D4F98();
-    goto L_800D9BC0;
-L_800D9B90: ;
-    f1 = f2;
-    f5 = *(f32*)lbl_8047CA50;
-    f2 = f4;
-    f6 = *(f32*)lbl_8047CA54;
-    f3 = f7;
-    r3 = r1 + 0x8;
-    f4 = f0;
-    fn_800E0698();
-    r3 = r1 + 0x8;
-    r4 = 0x1;
-    fn_800BD2E0();
-    fn_800D834C();
-L_800D9BC0: ;
-    return;
+    u8* state = (u8*)lbl_8047AA80;
+    if (*(s32*)state == 1) {
+        fn_800D4F98(0x3a, 0xe);
+    } else {
+        fn_800E0698();
+        fn_800BD2E0();
+        fn_800D834C();
+    }
 }
-#pragma pop
+
 
 /* fn_800D9BD0 | Size: 0x54 */
 void fn_800D9BD0(void) {
@@ -10670,7 +10636,7 @@ void fn_800DBEB4(u32 param1, u32 param2) {
     extern void fn_800D4F98();
     u8* state = (u8*)lbl_8047AA80;
     if (*(s32*)state == 1) {
-        fn_800D4F98(0x50, 0x14, param1, (r1 + 0x8));
+        fn_800D4F98(0x50, 0x14, param1);
     } else {
         *(u32*)(((u32)lbl_80400B28 + (0x50 << 2)) + 0x1EC) = *(u32*)(0x14 + 0x0);
     }
