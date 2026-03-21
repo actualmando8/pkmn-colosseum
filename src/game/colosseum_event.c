@@ -17463,7 +17463,8 @@ void fn_8020EE1C(void) {
 #pragma pop
 
 /* 0x8020EEC0 | size: 0x14 | tiny */
-void fn_8020EEC0(void) { }
+extern u8 lbl_8047B600;
+u8 fn_8020EEC0(void) { return lbl_8047B600 == 0; }
 
 /* 0x8020EED4 | size: 0x22C | large */
 #pragma push

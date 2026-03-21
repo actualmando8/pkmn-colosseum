@@ -6914,7 +6914,8 @@ void fn_801FBDF4(u8* ptr, u8 idx, u16 val) {
 u16 fn_801FBED0(u8* ptr, u8 idx) {
     if (!ptr) { return 0; }
     if ((u8)idx > 4) { return 0; }
-    return *(u16*)(ptr + (u8)idx * 2 + 0x2);
+    ptr += (u8)idx * 2;
+    return *(u16*)(ptr + 0x2);
 }
 
 /* 0x801FC038 | size: 0x44 | small */
