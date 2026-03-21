@@ -15775,50 +15775,26 @@ s32 fn_8020D7CC(u8* ptr) {
     return (s8)ptr[0];
 }
 
-/* 0x8020D7E8 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020D7E8(void) {
+/* fn_8020D7E8 | Size: 0x2C | Look up entry in 12-byte table (u16 index) */
+void* fn_8020D7E8(u16 index) {
     extern u8 lbl_80375BB8[];
-    extern u8 lbl_80478D48[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u32*)lbl_80478D48;
-    r3 = r3 & 0xFFFF;
-    if ((u32)r3 < (u32)r0) goto L_8020D800;
-    r3 = 0x0;
-    return;
-L_8020D800: ;
-    r4 = r3 * 0xc;
-    r3 = (u32)lbl_80375BB8;
-    r0 = (u32)lbl_80375BB8;
-    r3 = r0 + r4;
-    return;
+    extern u32 lbl_80478D48;
+    if (index >= lbl_80478D48) {
+        return NULL;
+    }
+    return &lbl_80375BB8[index * 12];
 }
-#pragma pop
 
-/* 0x8020D844 | size: 0x24 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020D844(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    if ((u32)r3 == (u32)0x0) return;
-    r0 = r4 & 0xFFFF;
-    if ((u32)r0 >= (u32)0x4) return;
-    /* clrlslwi r0, r4, 16, 2 */;
-    r3 = r3 + r0;
-    *(u32*)((u8*)r3 + 0x20) = r5;
-    return;
+/* fn_8020D844 | Size: 0x24 | Store value at indexed slot (max 4) */
+void fn_8020D844(u8* ptr, u16 index, u32 value) {
+    if (ptr == NULL) {
+        return;
+    }
+    if (index >= 4) {
+        return;
+    }
+    *(u32*)(ptr + (u32)index * 4 + 0x20) = value;
 }
-#pragma pop
 
 /* 0x8020D968 | size: 0x38 | small */
 #pragma push
@@ -15848,30 +15824,15 @@ L_8020D988: ;
 }
 #pragma pop
 
-/* 0x8020D9E8 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020D9E8(void) {
+/* fn_8020D9E8 | Size: 0x2C | Look up entry in 6-byte table (u16 index) */
+void* fn_8020D9E8(u16 index) {
     extern u8 lbl_80375CB8[];
-    extern u8 lbl_80478D50[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u32*)lbl_80478D50;
-    r3 = r3 & 0xFFFF;
-    if ((u32)r3 < (u32)r0) goto L_8020DA00;
-    r3 = 0x0;
-    return;
-L_8020DA00: ;
-    r4 = r3 * 0x6;
-    r3 = (u32)lbl_80375CB8;
-    r0 = (u32)lbl_80375CB8;
-    r3 = r0 + r4;
-    return;
+    extern u32 lbl_80478D50;
+    if (index >= lbl_80478D50) {
+        return NULL;
+    }
+    return &lbl_80375CB8[index * 6];
 }
-#pragma pop
 
 /* 0x8020DA14 | size: 0xBC | medium */
 #pragma push
@@ -16283,29 +16244,15 @@ f32 fn_8020DE68(u8* ptr) {
     return *(f32*)(ptr + 0x4);
 }
 
-/* 0x8020DEB0 | size: 0x28 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020DEB0(void) {
+/* fn_8020DEB0 | Size: 0x28 | Look up entry in 12-byte table */
+void* fn_8020DEB0(u32 index) {
     extern u8 lbl_80375980[];
-    extern u8 lbl_80478D20[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u32*)lbl_80478D20;
-    if ((u32)r3 < (u32)r0) goto L_8020DEC4;
-    r3 = 0x0;
-    return;
-L_8020DEC4: ;
-    r4 = r3 * 0xc;
-    r3 = (u32)lbl_80375980;
-    r0 = (u32)lbl_80375980;
-    r3 = r0 + r4;
-    return;
+    extern u32 lbl_80478D20;
+    if (index >= lbl_80478D20) {
+        return NULL;
+    }
+    return &lbl_80375980[index * 12];
 }
-#pragma pop
 
 /* 0x8020DF10 | size: 0x40 | small */
 #pragma push
@@ -16427,30 +16374,15 @@ L_8020E0A8: ;
 }
 #pragma pop
 
-/* 0x8020E0F8 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020E0F8(void) {
-    extern u8 lbl_80478F50[];
-    extern u8 lbl_80478F54[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = *(u32*)lbl_80478F50;
-    r3 = r3 & 0xFFFF;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    if ((u32)r3 < (u32)r0) goto L_8020E114;
-    r3 = 0x0;
-    return;
-L_8020E114: ;
-    r0 = r3 * 0x38;
-    r3 = *(u32*)lbl_80478F54;
-    r3 = r3 + r0;
-    return;
+/* fn_8020E0F8 | Size: 0x2C | Look up entry in 0x38-byte table (indirect) */
+void* fn_8020E0F8(u16 index) {
+    extern u32* lbl_80478F50;
+    extern u8* lbl_80478F54;
+    if (index >= *lbl_80478F50) {
+        return NULL;
+    }
+    return lbl_80478F54 + index * 0x38;
 }
-#pragma pop
 
 /* 0x8020E124 | size: 0x80 | small */
 #pragma push
@@ -16684,24 +16616,11 @@ L_8020E600: ;
 }
 #pragma pop
 
-/* 0x8020E614 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020E614(void) {
-    extern void fn_801FD104();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    fn_801FD104();
-    r3 = -r3;
-    /* subic r0, r3, 0x1 */;
-    r3 = r3 - r0; /* -borrow */;
-    return;
+/* fn_8020E614 | Size: 0x2C | Check if fn_801FD104 returns non-zero */
+BOOL fn_8020E614(void) {
+    extern s32 fn_801FD104(void);
+    return fn_801FD104() != 0;
 }
-#pragma pop
 
 /* 0x8020E640 | size: 0x94 | medium */
 #pragma push
@@ -17464,7 +17383,7 @@ void fn_8020EE1C(void) {
 
 /* 0x8020EEC0 | size: 0x14 | tiny */
 extern u8 lbl_8047B600;
-u8 fn_8020EEC0(void) { return lbl_8047B600 == 0; }
+u8 fn_8020EEC0(void) { return (u8)(lbl_8047B600 == 1); }
 
 /* 0x8020EED4 | size: 0x22C | large */
 #pragma push
@@ -20973,27 +20892,18 @@ L_802117B8: ;
 #pragma pop
 
 /* 0x802117FC | size: 0x14 | tiny */
-void fn_802117FC(void) { }
+extern u8 lbl_8047B618[];
+u32 fn_802117FC(void) { return (*(u32*)lbl_8047B618 & 0x80) == 0; }
 
-/* 0x80211810 | size: 0x20 | tiny */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80211810(void) {
-    extern u8 lbl_8047B618[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-
-    r3 = r3 & 0xFF;
-    r0 = *(u32*)lbl_8047B618;
-    r3 = r0 | 0x80;
-    if ((u32)r3 != (u32)0x1) goto L_80211828;
-    r3 = r0 & 0xFFFFFF7F;
-L_80211828: ;
-    *(u32*)lbl_8047B618 = r3;
-    return;
+/* fn_80211810 | Size: 0x20 | Set/clear bit 0x80 in flags */
+void fn_80211810(u8 enable) {
+    extern u32 lbl_8047B618;
+    if (enable == 1) {
+        lbl_8047B618 &= ~0x80;
+    } else {
+        lbl_8047B618 |= 0x80;
+    }
 }
-#pragma pop
 
 /* 0x80211830 | size: 0xCC | medium */
 #pragma push
@@ -21154,24 +21064,13 @@ L_802119C0: ;
 }
 #pragma pop
 
-/* 0x802119D4 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* fn_802119D4 | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
 void fn_802119D4(void) {
-    extern u8 lbl_8047B618[];
-    extern void fn_80213270();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
-    r0 = *(u32*)lbl_8047B618;
-    r0 = r0 & 0xFFEFFFFF;
-    *(u32*)lbl_8047B618 = r0;
+    extern u32 lbl_8047B618;
+    extern void fn_80213270(void);
+    lbl_8047B618 &= ~0x00100000;
     fn_80213270();
-    return;
 }
-#pragma pop
 
 /* 0x80211A00 | size: 0x78 | small */
 #pragma push
