@@ -19106,33 +19106,18 @@ void fn_8021056C(void) {
 }
 #pragma pop
 
-/* 0x80210610 | size: 0x48 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80210610(void) {
-    extern void fn_80203E0C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r3 = r4;
-    fn_80203E0C();
-    r3 = r3 & 0xFF;
-    if ((u32)r3 >= (u32)0x21) goto L_80210638;
-    r3 = 0x0;
-    goto L_80210648;
-L_80210638: ;
-    r0 = 0x42;
-    r0 = r3 - r0;
-    r3 = r0 - r0; /* -borrow */;
-    r3 = r3 + 0x2;
-L_80210648: ;
-    return;
+/* fn_80210610 | Size: 0x48 | Get level category from fn_80203E0C result */
+u32 fn_80210610(void* unused, void* param) {
+    extern u8 fn_80203E0C(void* param);
+    u8 val = fn_80203E0C(param);
+    if (val < 0x21) {
+        return 0;
+    }
+    if (val >= 0x42) {
+        return 2;
+    }
+    return 1;
 }
-#pragma pop
 
 /* 0x80210658 | size: 0xA4 | medium */
 #pragma push

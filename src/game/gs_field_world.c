@@ -24180,7 +24180,7 @@ L_8012A75C: ;
 void fn_8012A7DC(u8* ptr, s32 val) {
     if (ptr == NULL) { return; }
     if (val < 0) { val = 0; }
-    if (val > 0x9896FF) { val = 0x9896FF; }
+    if (val > 0x98967F) { val = 0x98967F; }
     *(s32*)(&ptr[0xA8C]) = val;
 }
 
