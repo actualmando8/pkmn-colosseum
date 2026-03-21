@@ -579,6 +579,7 @@ L_80098770:
 
 /* fn_80098944 - 0x80098944 | size: 0x7C */
 void fn_80098944(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FB3C8[];
     extern void fn_80098790();
     extern void fn_80099400();
@@ -617,6 +618,7 @@ L_800989A8:
 
 /* fn_800989C0 - 0x800989C0 | size: 0x128 */
 void fn_800989C0(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FB3C8[];
     extern void fn_800986A0();
     extern void fn_80098790();
@@ -757,6 +759,7 @@ L_80098B80:
 
 /* fn_80098DDC - 0x80098DDC | size: 0xC0 */
 void fn_80098DDC(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FB3C8[];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -812,6 +815,7 @@ L_80098E88:
 
 /* fn_80098E9C - 0x80098E9C | size: 0x15C */
 void fn_80098E9C(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FB3C8[];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -913,6 +917,7 @@ L_80098FE4:
 
 /* fn_80098FF8 - 0x80098FF8 | size: 0xC8 */
 void fn_80098FF8(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FB3C8[];
     u32 tmp = 0;
     u32 r3 = 0;

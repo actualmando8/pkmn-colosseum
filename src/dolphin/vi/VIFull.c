@@ -443,6 +443,7 @@ L_800AA664:
 
 /* fn_800AA678 - 0x800AA678 | size: 0xC4 */
 void fn_800AA678(void) {
+    u8 sp[0x30];
     extern u8 lbl_803FC5E0[];
     extern u8 lbl_80478A0C[];
     extern u8 lbl_80478A14[];
@@ -566,6 +567,7 @@ L_800AA7E0:
 
 /* fn_800AA7FC - 0x800AA7FC | size: 0xD8 */
 void fn_800AA7FC(void) {
+    u8 sp[0x30];
     extern u8 lbl_803FC5E0[];
     extern u8 lbl_80478A0C[];
     extern u8 lbl_80478A14[];
@@ -633,6 +635,7 @@ L_800AA8BC:
 
 /* fn_800AA8D4 - 0x800AA8D4 | size: 0x32C */
 void fn_800AA8D4(void) {
+    u8 sp[0x30];
     extern u8 lbl_803FC5D0[];
     extern u8 lbl_80478A0C[];
     extern u8 lbl_80478A14[];
@@ -1269,6 +1272,7 @@ L_800AB13C:
 
 /* fn_800AB150 - 0x800AB150 | size: 0x3AC */
 void fn_800AB150(void) {
+    u8 sp[0x20];
     extern u8 lbl_803FC5E0[];
     extern u8 lbl_80478A0C[];
     extern u8 lbl_80478A18[];
@@ -2277,6 +2281,7 @@ L_800ABEE4:
 
 /* fn_800ABEFC - 0x800ABEFC | size: 0x60 */
 void fn_800ABEFC(void) {
+    u8 sp[0x20];
     extern u8 lbl_8047A8BC[];
     u32 tmp = 0;
     u32 r3 = 0;

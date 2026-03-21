@@ -328,6 +328,7 @@ u16 OSGetWirelessID(s32 chan) {
 
 /* fn_800A09B0 - 0x800A09B0 | size: 0x308 */
 void fn_800A09B0(void) {
+    u8 sp[0x20];
     extern void fn_80098368();
     extern void fn_800A064C();
     extern u32 Scb_803FB840;
@@ -536,6 +537,7 @@ L_800A0C90:
 
 /* fn_800A0D10 - 0x800A0D10 | size: 0x124 */
 void fn_800A0D10(void) {
+    u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;

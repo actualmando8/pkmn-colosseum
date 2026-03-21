@@ -96,6 +96,7 @@ L_800A0694:
 
 /* fn_800A06AC - 0x800A06AC | size: 0x118 */
 void fn_800A06AC(void) {
+    u8 sp[0x20];
     extern void fn_80098368();
     extern void fn_800A064C();
     u32 tmp = 0;

@@ -156,6 +156,7 @@ typedef struct GSSceneRenderEntry {
  *   subi r0, r3, 0x1
  *   sth r0, lbl_8047B118@sda21(r0)
  * ================================================================== */
+#pragma optimization_level 0
 void GSscene_ProcessFreeList(void) {
     extern u8 lbl_8047B180[];
     extern u8 lbl_8047D6B0[];
@@ -269,6 +270,7 @@ L_801758B0:
     if (r3 != 0) goto L_801758A8;
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80175B94 -- GSscene_SpawnObject
@@ -276,6 +278,7 @@ L_801758B0:
  * Spawn a new scene object. Allocates from the free list, initializes
  * fields, and adds to the active list. 604 bytes.
  * ================================================================== */
+#pragma optimization_level 0
 void* GSscene_SpawnObject(u32 type, u32 param) {
     extern u8 lbl_8047B180[];
     extern u8 lbl_8047B190[];
@@ -437,6 +440,7 @@ L_80175DCC:
 L_80175DD4:
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80177A64 -- GSscene_XFBCapture
@@ -447,6 +451,7 @@ L_80175DD4:
  *
  * This is likely a debug/development feature for capturing screenshots.
  * ================================================================== */
+#pragma optimization_level 0
 void GSscene_XFBCapture(u32 captureIndex) {
     extern u8 lbl_8036C248[];
     extern u8 lbl_80478AC0[];
@@ -1233,6 +1238,7 @@ L_8017862C:
 L_80178638:
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80178AA8 -- GSscene_CameraUpdate
@@ -1247,6 +1253,7 @@ L_80178638:
  *   - offset 0x40: horizontal angle
  *   - offset 0x44: vertical angle
  * ================================================================== */
+#pragma optimization_level 0
 void GSscene_CameraUpdate(u32 sceneObj) {
     extern u8 lbl_8036C248[];
     extern u8 lbl_80478AC0[];
@@ -1296,23 +1303,23 @@ tmp = (u32)sceneObj & 0xFF;
     if ((s32)tmp != 0) goto L_80178FEC;
     fn_800D3088();
     sceneObj = sceneObj;
-sceneObj = (void*)(u32)0x1;
+sceneObj = (u32)0x1;
     r4 = 0x1;
     fn_800F7994();
     tmp = (s8)sceneObj;
     r31 = tmp * sceneObj;
     fn_800D3088();
     sceneObj = sceneObj;
-sceneObj = (void*)(u32)0x1;
+sceneObj = (u32)0x1;
     r4 = 0x1;
     fn_800F7920();
     tmp = (s8)sceneObj;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
-sceneObj = (void*)((void*)(tmp * (u32)(u32)sceneObj));
+sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = ((void*)(tmp * sceneObj));
     f1 = *(f32*)((u8*)sceneObj + 0x40);
     f2 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800CE2D8)();
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f1 = (f32)f1;
     f0 = *(f32*)lbl_8047D740;
     f2 = *(f32*)((u8*)sceneObj + 0x40);
@@ -1343,13 +1350,13 @@ sceneObj = (void*)*(u32*)&lbl_80478C40;
 L_80178BA4:
     f0 = *(f64*)lbl_8047D758;
     if (f31 >= f0) goto L_80178BBC;
-sceneObj = (void*)(u32)lbl_80478AC0;
+sceneObj = (u32)lbl_80478AC0;
     f31 = *(f32*)lbl_80478AC0;
     goto L_80178C28;
 L_80178BBC:
     *(f32*)(sp + 0x8) = f31;
     tmp = 0x7F800000;
-sceneObj = (void*)(r4 & 0x7F800000);
+sceneObj = (r4 & 0x7F800000);
     if ((s32)sceneObj == (s32)tmp) goto L_80178BE4;
     if ((s32)sceneObj >= (s32)tmp) goto L_80178C14;
     if ((s32)sceneObj == 0) goto L_80178BFC;
@@ -1374,15 +1381,15 @@ L_80178C14:
     tmp = 0x4;
 L_80178C18:
     if ((s32)tmp != 1) goto L_80178C28;
-sceneObj = (void*)(u32)lbl_80478AC0;
+sceneObj = (u32)lbl_80478AC0;
     f31 = *(f32*)lbl_80478AC0;
 L_80178C28:
-sceneObj = (void*)(u32)0x1;
+sceneObj = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)sceneObj & 0x00000020;
     if ((s32)tmp == 1) goto L_80178CEC;
     tmp = 0x43300000;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     *(u32*)(sp + 0x68) = tmp;
     f1 = *(f64*)lbl_8047D738;
     f2 = *(f32*)lbl_8047D76C;
@@ -1417,16 +1424,16 @@ L_80178CC4:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178CAC;
 L_80178CD0:
-sceneObj = (void*)(u32)0x0;
+sceneObj = (u32)0x0;
 L_80178CD4:
 if ((u32)sceneObj == 0) goto L_80178CE0;
     *(f32*)((u8*)sceneObj + 0x24) = f29;
 L_80178CE0:
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     *(f32*)((u8*)sceneObj + 0x48) = f29;
     goto L_80178D4C;
 L_80178CEC:
-sceneObj = (void*)(u32)0x1;
+sceneObj = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)sceneObj & 0x00000040;
 if ((u32)sceneObj == 0) goto L_80178D24;
@@ -1449,17 +1456,17 @@ L_80178D4C:
     f1 = f30;
     fn_800CE148();
     f0 = (f32)f1;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f1 = f30;
     f0 = f31 * f0;
     *(f32*)((u8*)sceneObj + 0x40) = f0;
     fn_800CDBE0();
     f1 = (f32)f1;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f0 = *(f32*)lbl_8047D774;
     f1 = f31 * f1;
     *(f32*)((u8*)sceneObj + 0x44) = f1;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)sceneObj + 0x44);
     if (f1 >= f0) goto L_80178D98;
     *(f32*)((u8*)sceneObj + 0x44) = f0;
@@ -1469,7 +1476,7 @@ L_80178D98:
     if (f1 <= f0) goto L_80178DA8;
     *(f32*)((u8*)sceneObj + 0x44) = f0;
 L_80178DA8:
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x40);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1490,14 +1497,14 @@ L_80178DEC:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178DD4;
 L_80178DF8:
-sceneObj = (void*)(u32)0x0;
+sceneObj = (u32)0x0;
 L_80178DFC:
 if ((u32)sceneObj == 0) goto L_80178E08;
     *(f32*)((u8*)sceneObj + 0x18) = f29;
 L_80178E08:
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     *(f32*)((u8*)sceneObj + 0x40) = f29;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1518,7 +1525,7 @@ L_80178E54:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178E3C;
 L_80178E60:
-sceneObj = (void*)(u32)0x0;
+sceneObj = (u32)0x0;
 L_80178E64:
 if ((u32)sceneObj == 0) goto L_80178E70;
     *(f32*)((u8*)sceneObj + 0x1C) = f29;
@@ -1532,7 +1539,7 @@ sceneObj = (u32)sp + 0x1c;
     f3 = *(f32*)((u8*)r4 + 0x44);
     ((void(*)(void))fn_800E01F4)();
     tmp = 0x43300000;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     *(u32*)(sp + 0x68) = tmp;
     f2 = *(f64*)lbl_8047D738;
     f0 = *(f32*)lbl_8047D77C;
@@ -1541,7 +1548,7 @@ sceneObj = (void*)*(u32*)&lbl_80478C40;
     f0 = f1 / f0;
     f0 = f2 + f0;
     *(f32*)((u8*)sceneObj + 0x14) = f0;
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x14);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1562,7 +1569,7 @@ L_80178F08:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178EF0;
 L_80178F14:
-sceneObj = (void*)(u32)0x0;
+sceneObj = (u32)0x0;
 L_80178F18:
 if ((u32)sceneObj == 0) goto L_80178F24;
     *(f32*)((u8*)sceneObj + 0x20) = f29;
@@ -1582,10 +1589,10 @@ sceneObj = (u32)sp + 0x28;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     r4 = (u32)sp + 0x28;
     r5 = (u32)sp + 0x1c;
-sceneObj = (void*)((void*)((u32)(u32)sceneObj + 0x4));
+sceneObj = ((void*)(sceneObj + 0x4));
     ((void(*)(void))fn_800E019C)();
     r4 = *(u32*)&lbl_80478C40;
     sceneObj = sceneObj;
@@ -1596,7 +1603,7 @@ sceneObj = (void*)((void*)((u32)(u32)sceneObj + 0x4));
     r4 = (u32)lbl_8036C248;
     r5 = (u32)sp + 0x28;
     ((void(*)(void))fn_800D1F04)();
-sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)sceneObj + 0x40);
     f2 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800CE2D8)();
@@ -1620,12 +1627,14 @@ sceneObj = (void*)*(u32*)&lbl_80478C40;
 L_80178FEC:
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80179020 -- GSscene_CameraInterpolate
  *
  * Interpolate the camera between two states. 996 bytes.
  * ================================================================== */
+#pragma optimization_level 0
 void GSscene_CameraInterpolate(u32 camera) {
     extern u8 lbl_80315540[];
     extern u8 lbl_8031554C[];
@@ -1682,48 +1691,48 @@ void GSscene_CameraInterpolate(u32 camera) {
     fn_801337B0();
 tmp = (u32)camera & 0xFF;
     if ((s32)tmp != 0) goto L_801793C0;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     fn_800F7AF0();
     camera = camera;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     fn_800F7BC4();
     tmp = camera & camera;
     tmp = tmp & 0x00000400;
     if ((s32)tmp == 0) goto L_801790E8;
-camera = (void*)(u32)0x6;
+camera = (u32)0x6;
     fn_80102620();
 tmp = (u32)camera & 0xFF;
     if ((s32)tmp == 0) goto L_801790B8;
-camera = (void*)(u32)0x6;
+camera = (u32)0x6;
     fn_80102510();
     goto L_801790E8;
 L_801790B8:
-camera = (void*)(u32)0x6;
+camera = (u32)0x6;
     r4 = 0x0;
     r5 = 0x0;
     r6 = 0x0;
     r7 = 0x1;
     r8 = 0x0;
     fn_801026A4();
-camera = (void*)(u32)0x6;
+camera = (u32)0x6;
     r4 = 0x14;
     r5 = 0x104;
     fn_80102868();
 L_801790E8:
     r5 = *(u32*)&lbl_80478C40;
-camera = (void*)(u32)lbl_80315540;
+camera = (u32)lbl_80315540;
     r4 = (u32)lbl_80315540;
     f1 = *(f32*)((u8*)r5 + 0x10);
 camera = (u32)sp + 0x54;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
-camera = (void*)(u32)lbl_8031554C;
+camera = (u32)lbl_8031554C;
     r4 = (u32)lbl_8031554C;
     f1 = *(f32*)((u8*)r5 + 0x14);
 camera = (u32)sp + 0x44;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
-camera = (void*)(u32)lbl_80315558;
+camera = (u32)lbl_80315558;
     r4 = (u32)lbl_80315558;
     f1 = *(f32*)((u8*)r5 + 0x18);
 camera = (u32)sp + 0x34;
@@ -1736,7 +1745,7 @@ camera = (u32)sp + 0x24;
     r4 = (u32)sp + 0x44;
 r5 = (u32)camera;
     fn_800E0738();
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     r4 = 0x0;
     fn_800F7A7C();
     camera = (s8)camera;
@@ -1744,7 +1753,7 @@ camera = (void*)(u32)0x1;
     r5 = camera * camera;
     *(u32*)(sp + 0x70) = tmp;
     f1 = *(f64*)lbl_8047D738;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x74) = tmp;
     f29 = f0 - f1;
@@ -1754,7 +1763,7 @@ camera = (void*)(u32)0x1;
     r5 = camera * camera;
     *(u32*)(sp + 0x78) = tmp;
     f1 = *(f64*)lbl_8047D738;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x7C) = tmp;
     f28 = f0 - f1;
@@ -1764,7 +1773,7 @@ camera = (void*)(u32)0x1;
     r5 = camera * camera;
     *(u32*)(sp + 0x80) = tmp;
     f1 = *(f64*)lbl_8047D738;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x84) = tmp;
     f31 = f0 - f1;
@@ -1774,7 +1783,7 @@ camera = (void*)(u32)0x1;
     r4 = camera * camera;
     *(u32*)(sp + 0x88) = tmp;
     f1 = *(f64*)lbl_8047D738;
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     *(u32*)(sp + 0x8C) = tmp;
     f27 = f0 - f1;
     fn_800F7BC4();
@@ -1783,7 +1792,7 @@ tmp = (u32)camera & 0x00000040;
     f0 = *(f32*)lbl_8047D784;
     f30 = f30 * f0;
 L_80179228:
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)camera & 0x00000800;
     if ((s32)tmp == 0) goto L_80179254;
@@ -1805,17 +1814,17 @@ camera = (u32)sp + 0x64;
     r4 = (u32)sp + 0x24;
     r5 = (u32)sp + 0x18;
     fn_800DFEEC();
-camera = (void*)*(u32*)&lbl_80478C40;
+camera = *(u32*)&lbl_80478C40;
     r5 = (u32)sp + 0x64;
-camera = (void*)((void*)((u32)(u32)camera + 0x4));
+camera = ((void*)(camera + 0x4));
 r4 = (u32)camera;
     ((void(*)(void))fn_800E019C)();
-camera = (void*)(u32)0x1;
+camera = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)camera & 0x00000020;
     if ((s32)tmp == 0) goto L_80179334;
     f2 = f27 / f30;
-camera = (void*)*(u32*)&lbl_80478C40;
+camera = *(u32*)&lbl_80478C40;
     f0 = *(f32*)lbl_8047D728;
     f1 = *(f32*)((u8*)camera + 0x48);
     f1 = f2 + f1;
@@ -1846,17 +1855,17 @@ L_8017930C:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_801792F4;
 L_80179318:
-camera = (void*)(u32)0x0;
+camera = (u32)0x0;
 L_8017931C:
 if ((u32)camera == 0) goto L_80179328;
     *(f32*)((u8*)camera + 0x24) = f29;
 L_80179328:
-camera = (void*)*(u32*)&lbl_80478C40;
+camera = *(u32*)&lbl_80478C40;
     *(f32*)((u8*)camera + 0x48) = f29;
     goto L_80179350;
 L_80179334:
     f0 = *(f32*)lbl_8047D788;
-camera = (void*)*(u32*)&lbl_80478C40;
+camera = *(u32*)&lbl_80478C40;
     f0 = f0 * f30;
     f1 = *(f32*)((u8*)camera + 0x10);
     f0 = f27 / f0;
@@ -1894,6 +1903,7 @@ L_80179350:
 L_801793C0:
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80179FA4 -- GSscene_Init
@@ -1902,6 +1912,7 @@ L_801793C0:
  * Sets up the object free list, active list, camera state, render
  * tables, and initial scene configuration.
  * ================================================================== */
+#pragma optimization_level 0
 void GSscene_Init(void) {
     extern u8 lbl_80453FEC[];
     extern u8 lbl_8047B1B8[];
@@ -2278,6 +2289,7 @@ L_8017A5CC:
 L_8017A5E8:
     return;
 }
+#pragma optimization_level 4
 
 /* ===== Small accessor/setter functions ===== */
 
@@ -2287,6 +2299,7 @@ void* GSscene_NopAccessor1(void) {
 }
 
 /* fn_80175F44 -- get object count, 0x28 bytes */
+#pragma optimization_level 0
 u32 GSscene_GetObjectCount(void) {
     extern u8 lbl_80478C38[];
     u32 tmp = 0;
@@ -2303,6 +2316,7 @@ L_80175F64:
     r3 = *(u16*)lbl_80478C38;
     return;
 }
+#pragma optimization_level 4
 
 /* ==================================================================
  * Position accessors (fn_80176948-801769B0)
@@ -2321,9 +2335,9 @@ f32 GSscene_GetPositionX(u32 obj) {
 
 obj = (u32)sp + 0x8;
     ((void(*)(void))fn_800E01F4)();
-obj = (void*)*(u32*)&lbl_80478C40;
+obj = *(u32*)&lbl_80478C40;
     r4 = (u32)sp + 0x8;
-obj = (void*)((void*)((u32)(u32)obj + 0x4));
+obj = ((void*)(obj + 0x4));
     fn_800E01D0();
     return;
 }

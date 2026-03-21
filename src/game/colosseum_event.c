@@ -3023,8 +3023,9 @@ u32 fn_80204928(u32 expected, void* ctx) {
 
 /* 0x80204970 | size: 0xA0 | medium */
 void fn_80204970(void) {
+    u8 sp[0x10];
     u32 r0 = 0;
-    u32 r1 = 0;
+    u32 r1 = (u32)sp;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
