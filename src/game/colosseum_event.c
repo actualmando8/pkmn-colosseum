@@ -20844,11 +20844,12 @@ u32 fn_802117FC(void) {
 /* fn_80211810 | Size: 0x20 | Set/clear bit 0x80 in flags */
 void fn_80211810(u8 enable) {
     extern u32 lbl_8047B618;
+    u32 val = lbl_8047B618;
+    u32 result = val | 0x80u;
     if (enable == 1) {
-        lbl_8047B618 &= ~0x80u;
-    } else {
-        lbl_8047B618 |= 0x80u;
+        result = val & ~0x80u;
     }
+    lbl_8047B618 = result;
 }
 
 /* 0x80211830 | size: 0xCC | medium */

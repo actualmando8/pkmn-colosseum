@@ -20217,32 +20217,13 @@ L_8024E514: ;
 #pragma pop
 
 /* Address: 0x8024E534 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8024E534(void* ctx, u32 slot, u32 param) {
     extern void fn_801FB1C0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r4 = 0x0;
-    r5 = 0x43;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = 0x0;
-    return;
+    u32 val;
+    val = (u32)fn_801FB1C0(ctx, 0, 0x43, 0);
+    fn_801FB1C0(0, val & 0xFFFF, 0x2, 0);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8024E578 | Size: 0x118 (280 bytes) */
 #pragma push
@@ -23466,33 +23447,12 @@ u32 fn_80251FF0(void* ctx, u32 param) { return 0; /* stub */ }
 u32 fn_80252038(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x80252078 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80252078(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = r5;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    r7 = 0x46;
-    fn_8011BBD8();
-    return;
+    u32 val = (u32)fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BBD8(val, 0, 0x2f, 0, 0x46);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x802520BC | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -23603,33 +23563,12 @@ u32 fn_80252188(void* ctx, u32 slot, u32 param) {
 u32 fn_80252208(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x80252248 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80252248(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = r5;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    r7 = 0x28;
-    fn_8011BBD8();
-    return;
+    u32 val = (u32)fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BBD8(val, 0, 0x2f, 0, 0x28);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025228C | Size: 0x40 | Pattern: simple_wrapper */
 u32 fn_8025228C(void* ctx, u32 param) { return 0; /* stub */ }
@@ -23865,91 +23804,28 @@ void fn_8025253C(void* ctx, u32 param1, u32 param2) {
 #pragma pop
 
 /* Address: 0x802525F0 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_802525F0(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = r5;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    r7 = 0x1e;
-    fn_8011BBD8();
-    return;
+    u32 val = (u32)fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BBD8(val, 0, 0x2f, 0, 0x1e);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x80252634 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80252634(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = r5;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    r7 = 0x14;
-    fn_8011BBD8();
-    return;
+    u32 val = (u32)fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BBD8(val, 0, 0x2f, 0, 0x14);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x80252678 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80252678(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = r5;
-    r4 = 0x0;
-    r5 = 0xd9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0x2f;
-    r6 = 0x0;
-    r7 = 0xa;
-    fn_8011BBD8();
-    return;
+    u32 val = (u32)fn_8012640C(param, 0, 0xd9, 0);
+    fn_8011BBD8(val, 0, 0x2f, 0, 0xa);
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x802526BC | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -24118,38 +23994,14 @@ u16 fn_80252894(void* ctx, u32 p1, u32 p2, u32 p3) { return (u16)fn_802376EC(ctx
 u32 fn_802528DC(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252918 | Size: 0x54 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80252918(void* ctx, u32 slot, u32 param) {
-    extern void fn_802376EC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* stmw r29, 0x14(r1) */;
-    r29 = r3;
-    r30 = r6;
-    fn_802376EC();
-    r31 = r3 & 0xFFFF;
-    r3 = r29;
-    r4 = r30;
-    fn_802376EC();
-    r3 = r3 & 0xFFFF;
-    r0 = r31 + r3;
-    r0 = (s32)r0 >> 1;
-    /* addze r0, r0 */;
-    r3 = r3 - r0;
-    /* lmw r29, 0x14(r1) */;
-    return;
+    extern u32 fn_802376EC();
+    u32 val1, val2, avg;
+    val1 = fn_802376EC(ctx, slot) & 0xFFFF;
+    val2 = fn_802376EC(ctx, slot) & 0xFFFF;
+    avg = (s32)(val1 + val2) >> 1;
+    return val2 - avg;
 }
-#pragma pop
 
 /* Address: 0x8025297C | Size: 0x24 | Pattern: call_return_u8 */
 extern u32 fn_80237774(void*);
@@ -28399,34 +28251,12 @@ u32 fn_80255D3C(void* ctx, u32 param) { return 0; /* stub */ }
 u32 fn_80255D7C(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x80255DB4 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80255DB4(void* ctx, u32 slot, u32 param) {
-    extern void fn_8025C808();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-
-    r7 = 0x10;
-    r8 = 0x2;
-    r0 = r5;
-    r5 = r6;
-    r9 = 0x41;
-    r6 = r0;
-    fn_8025C808();
-    r3 = r3 & 0xFF;
-    /* subic r0, r3, 0x1 */;
-    r3 = r3 - r0; /* -borrow */;
-    return;
+    extern u32 fn_8025C808();
+    /* r3=ctx, r4=slot, r5=param, r6=? -> call(ctx, slot, ?, param, 0x10, 0x2, 0x41) */
+    u32 result = fn_8025C808(ctx, slot, 0, param, 0x10, 0x2, 0x41) & 0xFF;
+    return (result != 0) ? 1 : 0;
 }
-#pragma pop
 
 /* Address: 0x80255DF8 | Size: 0xB0 */
 #pragma push
@@ -37283,32 +37113,14 @@ L_8025C660: ;
 #pragma pop
 
 /* Address: 0x8025C674 | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025C674(void* ctx, u32 slot, u32 param) {
-    extern void fn_801F37B0();
+    extern u32 fn_801F37B0();
     extern void fn_8025C6BC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r4 = (u32)fn_8025C6BC;
-    r6 = 0x0;
-    r0 = 0x0;
-    r4 = (u32)fn_8025C6BC;
-    r5 = r1 + 0x8;
-    r3 = 0x0;
-    fn_801F37B0();
-    r0 = *(u32*)(sp + 0xC);
-    r3 = r0 & 0xFFFF;
-    return;
+    u32 result[2];
+    result[0] = 0;
+    fn_801F37B0(0, (u32)fn_8025C6BC, (u32)result, 0);
+    return result[1] & 0xFFFF;
 }
-#pragma pop
 
 /* Address: 0x8025C6BC | Size: 0xB4 */
 #pragma push
@@ -37730,33 +37542,15 @@ L_8025CBD4: ;
 #pragma pop
 
 /* Address: 0x8025CBE8 | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025CBE8(void* ctx, u32 slot, u32 param) {
-    extern void fn_801F37B0();
+    extern u32 fn_801F37B0();
     extern void fn_8025CC30();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r4 = (u32)fn_8025CC30;
-    r6 = 0x0;
-    r4 = (u32)fn_8025CC30;
-    r5 = r1 + 0x8;
-    r3 = 0x0;
-    fn_801F37B0();
-    r0 = r3 & 0xFF;
-    r3 = 0x1 - r0;
-    /* subic r0, r3, 0x1 */;
-    r3 = r3 - r0; /* -borrow */;
-    return;
+    u8 buf[8];
+    u32 r;
+    r = fn_801F37B0(0, (u32)fn_8025CC30, (u32)buf, 0) & 0xFF;
+    r = 1 - r;
+    return (r != 0) ? 1 : 0;
 }
-#pragma pop
 
 /* Address: 0x8025CC30 | Size: 0x60 | Pattern: field_accessor */
 #pragma push
@@ -37798,34 +37592,15 @@ L_8025CC7C: ;
 #pragma pop
 
 /* Address: 0x8025CC90 | Size: 0x50 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025CC90(void* ctx, u32 slot, u32 param) {
-    extern void fn_801F37B0();
+    extern u32 fn_801F37B0();
     extern void fn_8025CCE0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r5 = (u32)fn_8025CCE0;
-    r6 = 0x0;
-    r0 = (u32)fn_8025CCE0;
-    r5 = r1 + 0x8;
-    r3 = 0x0;
-    r4 = r0;
-    fn_801F37B0();
-    r0 = r3 & 0xFF;
-    r3 = 0x1 - r0;
-    /* subic r0, r3, 0x1 */;
-    r3 = r3 - r0; /* -borrow */;
-    return;
+    u8 buf[8];
+    u32 r;
+    r = fn_801F37B0(0, (u32)fn_8025CCE0, (u32)buf, 0) & 0xFF;
+    r = 1 - r;
+    return (r != 0) ? 1 : 0;
 }
-#pragma pop
 
 /* Address: 0x8025CCE0 | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -38698,34 +38473,17 @@ L_8025D730: ;
 #pragma pop
 
 /* Address: 0x8025D744 | Size: 0x44 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025D744(void* ctx, u32 slot, u32 param) {
-    extern void fn_8006B09C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    fn_8006B09C();
-    r5 = 0x0;
-    r0 = 0x6;
-    *(u32*)((u8*)r3 + 0x20) = r5;
-    r4 = -0x1;
-    ctr_fn = (void(*)(void))r0;
-L_8025D768: ;
-    r0 = r5 + 0x8;
-    r5 = r5 + 0x4;
-    *(u32*)(r3 + r0) = r4;
-    if (--ctr != 0) goto L_8025D768;
-    return;
+    extern void* fn_8006B09C();
+    u8* base;
+    u32 i;
+    base = (u8*)fn_8006B09C(ctx);
+    *(u32*)(base + 0x20) = 0;
+    for (i = 0; i < 6; i++) {
+        *(u32*)(base + 0x8 + i * 4) = (u32)-1;
+    }
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025D788 | Size: 0x80 | Pattern: field_accessor */
 #pragma push
@@ -39121,61 +38879,35 @@ L_8025DD7C: ;
 #pragma pop
 
 /* Address: 0x8025DDAC | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025DDAC(void* ctx, u32 slot, u32 param) {
     extern void fn_800E4170();
-    extern void fn_801DAC3C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r3 == (u32)0x0) goto L_8025DDE0;
-    fn_801DAC3C();
-    if ((u32)r3 == (u32)0x0) goto L_8025DDE0;
-    r4 = r31;
-    fn_800E4170();
-L_8025DDE0: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    extern void* fn_801DAC3C();
+    void* ptr = *(void**)ctx;
+    if (ptr != 0) {
+        ptr = fn_801DAC3C(ptr);
+        if (ptr != 0) {
+            fn_800E4170(ptr, slot);
+        }
+    }
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025DDF4 | Size: 0x18 */
 void fn_8025DDF4(u32* ptr) { if (*ptr != 0) { *ptr = 0; } }
 
 /* Address: 0x8025DE0C | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025DE0C(void* ctx, u32 slot, u32 param) {
     extern void fn_800E43A4();
-    extern void fn_801DAC3C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r3 == (u32)0x0) goto L_8025DE40;
-    fn_801DAC3C();
-    if ((u32)r3 == (u32)0x0) goto L_8025DE40;
-    r4 = r31;
-    fn_800E43A4();
-L_8025DE40: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    extern void* fn_801DAC3C();
+    void* ptr = *(void**)ctx;
+    if (ptr != 0) {
+        ptr = fn_801DAC3C(ptr);
+        if (ptr != 0) {
+            fn_800E43A4(ptr, slot);
+        }
+    }
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025DE54 | Size: 0xE4 (228 bytes) */
 #pragma push
@@ -43388,44 +43120,20 @@ u32 fn_802612D0(void* ctx, u32 slot, u32 param) {
 #pragma pop
 
 /* Address: 0x8026132C | Size: 0x5C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8026132C(void* ctx, u32 slot, u32 param) {
     extern u8 lbl_804787E0[];
     extern void fn_800F0308();
     extern void fn_800FF730();
     extern void fn_8011288C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-
-    r9 = (u32)lbl_804787E0;
-    /* stwu r3, lbl_804787E0@l(r9) */;
-    r3 = 0x386;
-    *(u32*)((u8*)r9 + 0x4) = r4;
-    *(u32*)((u8*)r9 + 0x8) = r5;
-    *(u32*)((u8*)r9 + 0xC) = r7;
-    *(u32*)((u8*)r9 + 0x10) = r6;
-    *(u32*)((u8*)r9 + 0x14) = r8;
-    fn_800FF730();
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_8011288C();
+    u8* base = lbl_804787E0;
+    *(u32*)(base + 0x0) = (u32)ctx;
+    *(u32*)(base + 0x4) = slot;
+    *(u32*)(base + 0x8) = param;
+    fn_800FF730(0x386);
+    fn_8011288C(0, 0);
     fn_800F0308();
-    r3 = (u32)lbl_804787E0;
-    r3 = (u32)lbl_804787E0;
-    r3 = *(u32*)((u8*)r3 + 0x18);
-    return;
+    return *(u32*)(base + 0x18);
 }
-#pragma pop
 
 /* Address: 0x80261388 | Size: 0x4C | Pattern: field_accessor */
 #pragma push
