@@ -13810,37 +13810,17 @@ s32 fn_8020C0E4(void) {
     return 1;
 }
 
-/* 0x8020C108 | size: 0x54 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020C108(void) {
-    extern void fn_8022E6F0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    if ((u32)r5 == (u32)0x0) goto L_8020C130;
-    r4 = *(u8*)((u8*)r5 + 0x0);
-    fn_8022E6F0();
-    goto L_8020C144;
-L_8020C130: ;
-    r4 = 0x0;
-    fn_8022E6F0();
-    r3 = r31;
-    r4 = 0x1;
-    fn_8022E6F0();
-L_8020C144: ;
-    r3 = 0x1;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+/* fn_8020C108 | Size: 0x54 | Apply effect with optional data parameter */
+s32 fn_8020C108(void* ctx, u32 unused, u8* data) {
+    extern void fn_8022E6F0(void* ctx, u32 value);
+    if (data != NULL) {
+        fn_8022E6F0(ctx, data[0]);
+    } else {
+        fn_8022E6F0(ctx, 0);
+        fn_8022E6F0(ctx, 1);
+    }
+    return 1;
 }
-#pragma pop
 
 /* 0x8020C15C | size: 0x6E4 | large */
 #pragma push
