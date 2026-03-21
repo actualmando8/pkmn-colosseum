@@ -7738,9 +7738,9 @@ L_801174AC: ;
 /* 0x801174C4 | 0x28 */
 u8 fn_801174C4(void) {
     u8 result = 0;
-    if (lbl_8047AD68 != 0 && lbl_8047AD6C != 0) {
-        result = 1;
-    }
+    if (lbl_8047AD68 == 0) { return result; }
+    if (lbl_8047AD6C == 0) { return result; }
+    result = 1;
     return result;
 }
 
@@ -17870,33 +17870,16 @@ L_8012231C: ;
 }
 #pragma pop
 
-/* 0x80122334 | 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80122334(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r4 = (0x2492 << 16);
-    r5 = ((r3 << 20) | ((u32)r3 >> 12)) & 0x00000030;
-    r5 = (r5 & ~0x000000C0) | (((r3 << 14) | ((u32)r3 >> 18)) & 0x000000C0);
-    r5 = (r5 & ~0x0000000C) | (((r3 << 26) | ((u32)r3 >> 6)) & 0x0000000C);
-    r0 = r4 + 0x4925;
-    r5 = (r5 & ~0x00000003) | (((r3 << 0) | ((u32)r3 >> 32)) & 0x00000003);
-    r3 = (u32)((u64)r0 * (u64)r5 >> 32);
-    r0 = r5 - r3;
-    r0 = (u32)r0 >> 1;
-    r0 = r0 + r3;
-    r0 = (u32)r0 >> 4;
-    r0 = r0 * 0x1c;
-    r0 = r5 - r0;
-    r3 = r0 & 0xFF;
-    return;
+/* fn_80122334 -- bit permutation hash mod 28 | Size: 0x3C */
+u8 fn_80122334(u32 val) {
+    u32 shuffled;
+    /* Bit-permute: extract pairs of bits from different positions */
+    shuffled = (val << 20 | val >> 12) & 0x30;
+    shuffled = (shuffled & ~0xC0) | ((val << 14 | val >> 18) & 0xC0);
+    shuffled = (shuffled & ~0x0C) | ((val << 26 | val >> 6) & 0x0C);
+    shuffled = (shuffled & ~0x03) | (val & 0x03);
+    return (u8)(shuffled % 28);
 }
-#pragma pop
 
 /* 0x80122370 | 0x360 */
 #pragma push

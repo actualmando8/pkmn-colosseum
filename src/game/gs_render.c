@@ -14851,12 +14851,16 @@ L_800DE65C: ;
 void fn_800DEFC8(u8* self) {
     extern void fn_800B8DF4();
     extern void fn_801BBD3C();
-    u32 handle = *(u32*)(self + 0x38);
+    u32 handle;
+    u8* sub;
+    u8* sub2;
+    u32 old;
+    handle = *(u32*)(self + 0x38);
     if ((handle + 0x01020000) != 0xFEFE) {
         fn_800B8DF4(handle);
-        u8* sub = (u8*)*(u32*)(self + 0x8);
-        u8* sub2 = (u8*)*(u32*)(sub + 0x8);
-        u32 old = *(u32*)(sub2 + 0x58);
+        sub = (u8*)*(u32*)(self + 0x8);
+        sub2 = (u8*)*(u32*)(sub + 0x8);
+        old = *(u32*)(sub2 + 0x58);
         *(u32*)(sub2 + 0x58) = *(u32*)(self + 0x38);
         fn_801BBD3C(old);
         *(u32*)(self + 0x38) = 0xFEFEFEFE;
@@ -16950,12 +16954,16 @@ u32 fn_800E0DDC(void) {
     extern u8 lbl_8047AB40[];
     extern u8 lbl_8047AB44[];
     extern u8 __OSStartTime[];
-    u8* timer = __OSStartTime;
-    u32 head = *(u32*)(timer + 0x10);
+    u8* timer;
+    u32 head;
+    u32 total;
+    u32 node;
+    timer = __OSStartTime;
+    head = *(u32*)(timer + 0x10);
     *(u32*)lbl_8047AB44 = head;
     *(u32*)lbl_8047AB40 = *(u32*)(timer + 0x14);
-    u32 total = 0;
-    u32 node = *(u32*)((u8*)head + 0x4);
+    total = 0;
+    node = *(u32*)((u8*)head + 0x4);
     while (node != 0) {
         total += *(u32*)((u8*)node + 0x8);
         node = *(u32*)((u8*)node + 0x4);

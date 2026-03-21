@@ -6135,106 +6135,40 @@ L_80205A68: ;
 }
 #pragma pop
 
-/* 0x80205A7C | size: 0x58 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80205A7C(void) {
-    extern void fn_801232E0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    if ((u32)r3 == (u32)0x0) goto L_80205AC0;
-    r4 = 0x0;
-    r5 = 0xd5;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0xcb;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = r31;
-    fn_801232E0();
-L_80205AC0: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+/* fn_80205A7C | Size: 0x58 | Two-hop resolve and call fn_801232E0 */
+void fn_80205A7C(void* ctx, u32 param) {
+    extern void fn_801232E0(void* obj, u32 param);
+    if (ctx == NULL) {
+        return;
+    }
+    ctx = fn_8012640C(ctx, 0, 0xD5, 0);
+    ctx = fn_8012640C(ctx, 0, 0xCB, 0);
+    fn_801232E0(ctx, param);
 }
-#pragma pop
 
-/* 0x80205AD4 | size: 0x58 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80205AD4(void) {
-    extern void fn_80123368();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    if ((u32)r3 == (u32)0x0) goto L_80205B18;
-    r4 = 0x0;
-    r5 = 0xd5;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = 0x0;
-    r5 = 0xcb;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r4 = r31;
-    fn_80123368();
-L_80205B18: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+/* fn_80205AD4 | Size: 0x58 | Two-hop resolve and call fn_80123368 */
+void fn_80205AD4(void* ctx, u32 param) {
+    extern void fn_80123368(void* obj, u32 param);
+    if (ctx == NULL) {
+        return;
+    }
+    ctx = fn_8012640C(ctx, 0, 0xD5, 0);
+    ctx = fn_8012640C(ctx, 0, 0xCB, 0);
+    fn_80123368(ctx, param);
 }
-#pragma pop
 
-/* 0x80205B2C | size: 0x60 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80205B2C(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    if ((u32)r3 != (u32)0x0) goto L_80205B48;
-    r3 = -0x1;
-    goto L_80205B7C;
-L_80205B48: ;
-    r4 = 0x0;
-    r5 = 0xd5;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    if ((u32)r3 != (u32)0x0) goto L_80205B68;
-    r3 = -0x1;
-    goto L_80205B7C;
-L_80205B68: ;
-    r4 = 0x0;
-    r5 = 0xce;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = (s16)r3;
-L_80205B7C: ;
-    return;
+/* fn_80205B2C | Size: 0x60 | Two-hop resolve (0xD5 -> 0xCE), return s16 or -1 */
+s16 fn_80205B2C(void* ctx) {
+    void* hop1;
+    if (ctx == NULL) {
+        return -1;
+    }
+    hop1 = fn_8012640C(ctx, 0, 0xD5, 0);
+    if (hop1 == NULL) {
+        return -1;
+    }
+    return (s16)(u32)fn_8012640C(hop1, 0, 0xCE, 0);
 }
-#pragma pop
 
 /* 0x80205BE8 | size: 0x3C | small */
 void* fn_80205BE8(void* ctx) {
