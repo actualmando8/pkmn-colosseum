@@ -7219,7 +7219,7 @@ void fn_801FC7E4(u8* ptr, u8 idx, u16 val) {
 void fn_801FC808(u8* ptr, u8 idx, u8 val) {
     if (!ptr) { return; }
     if ((u8)idx >= 6) { return; }
-    ptr += (u8)idx;
+    ptr += idx;
     *(ptr + 0x1C) = val;
 }
 
@@ -7335,7 +7335,7 @@ s32 fn_801FC9E0(u8* ptr, u8 idx) {
 void fn_801FCA58(u8* ptr, u8 idx, u8 val) {
     if (!ptr) { return; }
     if ((u8)idx >= 0xC) { return; }
-    ptr += (u8)idx;
+    ptr += idx;
     *(ptr + 0x8) = val;
 }
 

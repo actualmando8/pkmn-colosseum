@@ -38653,33 +38653,21 @@ u32 fn_8025D9F0(void* ctx, u32 param) { return 0; /* stub */ }
 /* Address: 0x8025DA18 | Size: 0x24 | Pattern: null_check_getter */
 u32 fn_8025DA18(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
 
-/* Address: 0x8025DA3C | Size: 0x4C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-u32 fn_8025DA3C(void* ctx, u32 slot, u32 param) {
-    extern void fn_8006B5A8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    fn_8006B5A8();
-    r0 = *(u32*)((u8*)r3 + 0x4);
-    r3 = 0x2;
-    if ((s32)r0 == (s32)0x2) goto L_8025DA74;
-    if ((s32)r0 >= (s32)0x2) goto L_8025DA78;
-    if ((s32)r0 >= (s32)0x0) goto L_8025DA6C;
-    goto L_8025DA78;
-L_8025DA6C: ;
-    r3 = 0x2;
-    goto L_8025DA78;
-L_8025DA74: ;
-    r3 = 0x4;
-L_8025DA78: ;
-    return;
+/* fn_8025DA3C | Size: 0x4C | Get battle party size based on mode */
+u32 fn_8025DA3C(void) {
+    extern void* fn_8006B5A8(void);
+    void* result = fn_8006B5A8();
+    s32 mode = *(s32*)((u8*)result + 0x4);
+    switch (mode) {
+        case 0:
+        case 1:
+            return 2;
+        case 2:
+            return 4;
+        default:
+            return 2;
+    }
 }
-#pragma pop
 
 /* Address: 0x8025DA88 | Size: 0x24 | Pattern: null_check_getter */
 u32 fn_8025DA88(void* ctx) { return *(u32*)((u8*)fn_8006B5A8(ctx) + 0x4); }

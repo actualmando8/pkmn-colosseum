@@ -16031,7 +16031,7 @@ void fn_8020DF10(u8* base, u8 slot, u32 value) {
     } else if (slot >= 4) {
         entry = NULL;
     } else {
-        entry = base + (u32)slot * 8 + 0x18;
+        entry = base + slot * 8 + 0x18;
     }
     if (entry == NULL) {
         return;
