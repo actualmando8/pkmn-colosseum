@@ -61,84 +61,59 @@ asm void fn_80039A84(void) { nofralloc
 }
 
 
-/* 0x8003AD6C | 0x118 */
-void fn_8003AD6C(void) {
+/* 0x8003AD6C | 0x118
+ * Check which group (0 or 1) a UI element's ID belongs to,
+ * based on lookup table lbl_80267140 (two groups of 2 IDs each).
+ * If found in a group, calls fn_80109220 with a flag indicating
+ * whether the element's current group matches.
+ */
+u32 fn_8003AD6C(u8* state, u8* element) {
     extern u8 lbl_80267140[];
-    extern void fn_80109220();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
+    extern void fn_80109220(u8* elem, u32 flag);
+    u32 groups[4]; /* 2 groups of 2 u32 IDs */
+    s32 found;
+    s32 groupIdx;
+    s32 i;
+    s16 elemId;
 
-    r5 = (u32)lbl_80267140;
-    r9 = (u32)sp + 0x8;
-    r8 = (u32)lbl_80267140;
-    r11 = 0x0;
-    r7 = *(u32*)((u8*)r8 + 0x0);
-    r10 = 0x0;
-    r6 = *(u32*)((u8*)r8 + 0x4);
-    r5 = *(u32*)((u8*)r8 + 0x8);
-    tmp = *(u32*)((u8*)r8 + 0xC);
-    *(u32*)(sp + 0x14) = tmp;
-    r6 = r9;
-    r7 = 0x0;
-    goto L_8003ADD4;
-L_8003ADB8:
-    r5 = *(s16*)((u8*)r4 + 0x6);
-    tmp = *(u32*)((u8*)r6 + 0x0);
-    if ((s32)r5 != (s32)tmp) goto L_8003ADCC;
-    r11 = 0x1;
-L_8003ADCC:
-    r6 = r6 + 0x4;
-    r7 = r7 + 0x1;
-L_8003ADD4:
-    if ((s32)r7 >= 2) goto L_8003ADE4;
-    if ((s32)r11 == 0) goto L_8003ADB8;
-L_8003ADE4:
-    if ((s32)r11 != 0) goto L_8003AE38;
-    r9 = r9 + 0x8;
-    r10 = 0x1;
-    r6 = r9;
-    r7 = 0x0;
-    goto L_8003AE1C;
-L_8003AE00:
-    r5 = *(s16*)((u8*)r4 + 0x6);
-    tmp = *(u32*)((u8*)r6 + 0x0);
-    if ((s32)r5 != (s32)tmp) goto L_8003AE14;
-    r11 = 0x1;
-L_8003AE14:
-    r6 = r6 + 0x4;
-    r7 = r7 + 0x1;
-L_8003AE1C:
-    if ((s32)r7 >= 2) goto L_8003AE2C;
-    if ((s32)r11 == 0) goto L_8003AE00;
-L_8003AE2C:
-    if ((s32)r11 != 0) goto L_8003AE38;
-    r10 = 0x2;
-L_8003AE38:
-    if ((s32)r11 != 0) goto L_8003AE48;
-    r3 = 0x0;
-    goto L_8003AE74;
-L_8003AE48:
-    tmp = *(u8*)((u8*)r3 + 0x95);
-    r3 = r4;
-    tmp = (s8)tmp;
-    if ((s32)r10 != (s32)tmp) goto L_8003AE64;
-    tmp = 0x1;
-    goto L_8003AE68;
-L_8003AE64:
-    tmp = 0x0;
-L_8003AE68:
-    r4 = tmp & 0xFF;
-    fn_80109220();
-    r3 = 0x0;
-L_8003AE74:
-    return;
+    /* Copy the group table from rodata to stack */
+    groups[0] = *(u32*)(lbl_80267140 + 0x0);
+    groups[1] = *(u32*)(lbl_80267140 + 0x4);
+    groups[2] = *(u32*)(lbl_80267140 + 0x8);
+    groups[3] = *(u32*)(lbl_80267140 + 0xC);
+
+    found = 0;
+    groupIdx = 0;
+    elemId = *(s16*)(element + 0x6);
+
+    /* Search group 0 (first 2 entries) */
+    for (i = 0; i < 2 && found == 0; i++) {
+        if ((s32)elemId == (s32)groups[i]) {
+            found = 1;
+        }
+    }
+
+    /* If not found in group 0, search group 1 */
+    if (found == 0) {
+        groupIdx = 1;
+        for (i = 0; i < 2 && found == 0; i++) {
+            if ((s32)elemId == (s32)groups[2 + i]) {
+                found = 1;
+            }
+        }
+        if (found == 0) {
+            groupIdx = 2;
+        }
+    }
+
+    if (found == 0) {
+        return 0;
+    }
+
+    {
+        s8 currentGroup = *(s8*)(state + 0x95);
+        u32 flag = (groupIdx == (s32)currentGroup) ? 1 : 0;
+        fn_80109220(element, flag);
+    }
+    return 0;
 }

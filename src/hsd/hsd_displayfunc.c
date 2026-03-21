@@ -65,7 +65,7 @@ extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard f
 
 /* Forward declarations for converted functions */
 void fn_80197A64(void);
-void fn_80197B6C(void);
+void fn_80197B6C(u8* jobj, u8* mtx, u8* out);
 
 
 /* ========================================================================
@@ -324,73 +324,45 @@ L_80197B50:
     return;
 }
 
-/* 0x80197B6C | 0x104 */
-void fn_80197B6C(void) {
-    u8 sp[0x40];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x80197B6C | 0x104
+ * hsdDoDisplayFunc - Dispatch the appropriate display function for
+ * a JObj based on its rendering type field (flags & 0xE00).
+ * 0x200=XLU, 0x400=TEX, 0x600=SPEC, 0x800=USER
+ */
+void fn_80197B6C(u8* jobj, u8* mtx, u8* out) {
+    extern void fn_800A2D98(u8* src, u8* mtx, u8* dst);
+    extern void fn_80198038(u8* jobj, u8* mtx, u8* out);
+    extern void fn_80198B20(u8* jobj, u8* mtx, u8* out);
+    extern void fn_801985E0(u8* jobj, u8* mtx, u8* out);
+    extern void fn_80197C70(u8* jobj, u8* mtx, u8* out);
+    extern void fn_80196D78(u8* file, s32 line, u8* msg);
+    u8 localMtx[0x40];
+    u32 renderType;
 
-    r31 = r5;
-    r30 = r3;
-    tmp = *(u32*)((u8*)r3 + 0x14);
-    tmp = tmp & 0x00000E00;
-    if ((s32)tmp == 0) goto L_80197C48;
-    r3 = r4;
-    r4 = r30 + 0x44;
-    r5 = (u32)sp + 0x8;
-    ((void(*)(void))fn_800A2D98)();
-    tmp = *(u32*)((u8*)r30 + 0x14);
-    tmp = tmp & 0x00000E00;
-    if ((s32)tmp == 0x600) goto L_80197C04;
-    if ((s32)tmp >= 0x600) goto L_80197BD0;
-    if ((s32)tmp == 0x400) goto L_80197BF0;
-    if ((s32)tmp >= 0x400) goto L_80197C2C;
-    if ((s32)tmp == 0x200) goto L_80197BDC;
-    goto L_80197C2C;
-L_80197BD0:
-    if ((s32)tmp == 0x800) goto L_80197C18;
-    goto L_80197C2C;
-L_80197BDC:
-    r3 = r30;
-    r5 = r31;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80198038)();
-    goto L_80197C58;
-L_80197BF0:
-    r3 = r30;
-    r5 = r31;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80198B20)();
-    goto L_80197C58;
-L_80197C04:
-    r3 = r30;
-    r5 = r31;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_801985E0)();
-    goto L_80197C58;
-L_80197C18:
-    r3 = r30;
-    r5 = r31;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80197C70)();
-    goto L_80197C58;
-L_80197C2C:
-    r3 = (u32)&lbl_802746DC;
-    r5 = (u32)&lbl_802746EC;
-    r3 = (u32)&lbl_802746DC;
-    r4 = 0x170;
-    r5 = (u32)&lbl_802746EC;
-    ((void(*)(void))fn_80196D78)();
-    goto L_80197C58;
-L_80197C48:
-    r3 = r4;
-    r5 = r31;
-    r4 = r30 + 0x44;
-    ((void(*)(void))fn_800A2D98)();
-L_80197C58:
-    return;
+    renderType = *(u32*)(jobj + 0x14) & 0x00000E00;
+
+    if (renderType == 0) {
+        fn_800A2D98(mtx, jobj + 0x44, out);
+        return;
+    }
+
+    fn_800A2D98(mtx, jobj + 0x44, localMtx);
+
+    switch (renderType) {
+    case 0x200:
+        fn_80198038(jobj, localMtx, out);
+        break;
+    case 0x400:
+        fn_80198B20(jobj, localMtx, out);
+        break;
+    case 0x600:
+        fn_801985E0(jobj, localMtx, out);
+        break;
+    case 0x800:
+        fn_80197C70(jobj, localMtx, out);
+        break;
+    default:
+        fn_80196D78((u8*)&lbl_802746DC, 0x170, (u8*)&lbl_802746EC);
+        break;
+    }
 }

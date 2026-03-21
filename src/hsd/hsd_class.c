@@ -503,110 +503,65 @@ u32 fn_80193748(void) {
     return;
 }
 
-/* 0x80193788 | 0xA0 */
-void fn_80193788(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+/* 0x80193788 | 0xA0
+ * hsdIsDescendantOf - Check if classA is the same as or a descendant of classB.
+ * Walks the parent chain of classA (via offset 0x14) looking for classB.
+ * Returns 1 if found, 0 otherwise.
+ */
+BOOL fn_80193788(u8* classA, u8* classB) {
+    if (classA == NULL || classB == NULL) {
+        return FALSE;
+    }
 
-    if (r3 == 0) goto L_801937AC;
-    if (r4 != 0) goto L_801937B4;
-L_801937AC:
-    r3 = 0x0;
-    goto L_80193810;
-L_801937B4:
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    r31 = r3;
-    r30 = r4;
-    tmp = tmp & 0x1;
-    if (r4 != 0) goto L_801937D4;
-    r12 = *(u32*)((u8*)r31 + 0x0);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-L_801937D4:
-    tmp = *(u32*)((u8*)r30 + 0x4);
-    tmp = tmp & 0x1;
-    if (r4 != 0) goto L_80193804;
-    r12 = *(u32*)((u8*)r30 + 0x0);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    goto L_80193804;
-L_801937F0:
-    if (r31 != r30) goto L_80193800;
-    r3 = 0x1;
-    goto L_80193810;
-L_80193800:
-    r31 = *(u32*)((u8*)r31 + 0x14);
-L_80193804:
-    if (r31 != 0) goto L_801937F0;
-    r3 = 0x0;
-L_80193810:
-    return;
+    /* Walk the inheritance chain of classA */
+    while (classA != NULL) {
+        if (classA == classB) {
+            return TRUE;
+        }
+        classA = (u8*)*(u32*)(classA + 0x14);
+    }
+    return FALSE;
 }
 
-/* 0x80193828 | 0xD4 */
-void fn_80193828(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+/* 0x80193828 | 0xD4
+ * hsdNew - Allocate and initialize a new HSD object.
+ * classInfo+0x00 = library func, +0x10 = size, +0x14 = parent,
+ * +0x28 = alloc, +0x2C = init, +0x34 = destroy
+ * Returns the new object or NULL on failure.
+ */
+void* fn_80193828(u8* classInfo) {
+    u8* obj;
+    s32 initResult;
+    u32 size;
+    void* (*allocFn)(u8*);
+    s32  (*initFn)(u8*);
+    void (*destroyFn)(u8*);
 
-    r29 = r3;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    tmp = tmp & 0x1;
-    if ((s32)tmp != 0) goto L_8019385C;
-    r12 = *(u32*)((u8*)r29 + 0x0);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-L_8019385C:
-    r12 = *(u32*)((u8*)r29 + 0x28);
-    r3 = r29;
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    /* mr. r30, r3 */;
-    if ((s32)tmp != 0) goto L_8019387C;
-    r3 = 0x0;
-    goto L_801938E0;
-L_8019387C:
-    tmp = *(u32*)((u8*)r29 + 0x4);
-    r31 = r29;
-    tmp = tmp & 0x1;
-    if ((s32)tmp != 0) goto L_80193898;
-    r12 = *(u32*)((u8*)r31 + 0x0);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-L_80193898:
-    r5 = *(s16*)((u8*)r31 + 0x10);
-    r3 = r30;
-    r4 = 0x0;
-    memset((void*)r3, (int)r4, (u32)r5);
-    *(u32*)((u8*)r30 + 0x0) = r29;
-    r3 = r30;
-    r12 = *(u32*)((u8*)r31 + 0x2C);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    if ((s32)r3 >= 0) goto L_801938DC;
-    r12 = *(u32*)((u8*)r29 + 0x34);
-    r3 = r30;
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    r3 = 0x0;
-    goto L_801938E0;
-L_801938DC:
-    r3 = r30;
-L_801938E0:
-    return;
+    /* Call the allocator */
+    allocFn = (void* (*)(u8*))*(u32*)(classInfo + 0x28);
+    obj = (u8*)allocFn(classInfo);
+    if (obj == NULL) {
+        return NULL;
+    }
+
+    /* Zero out the object */
+    size = (u32)*(s16*)(classInfo + 0x10);
+    memset(obj, 0, size);
+
+    /* Set class info pointer */
+    *(u32*)(obj + 0x0) = (u32)classInfo;
+
+    /* Call the initializer */
+    initFn = (s32 (*)(u8*))*(u32*)(classInfo + 0x2C);
+    initResult = initFn(obj);
+    if (initResult < 0) {
+        /* Init failed - destroy and return NULL */
+        destroyFn = (void (*)(u8*))*(u32*)(classInfo + 0x34);
+        destroyFn(obj);
+        return NULL;
+    }
+
+    return obj;
 }
 
 /* 0x801938FC | 0x120 */
@@ -780,75 +735,50 @@ void* fn_80193B10(s32 size) {
     return fn_801A6928(size);
 }
 
-/* 0x80193B30 | 0xF4 */
-void fn_80193B30(void) {
+/* 0x80193B30 | 0xF4
+ * hsdInitClassInfo - Initialize a class info descriptor and register
+ * it as a child of its parent class. Validates that the child's
+ * size fields are at least as large as the parent's.
+ * info+0x04 = flags, +0x08 = libFunc, +0x0C = destroyFunc,
+ * +0x10 = objSize, +0x12 = infoSize, +0x14 = parent,
+ * +0x18 = prevSibling, +0x1C = children, +0x20/+0x24 = reserved
+ */
+void fn_80193B30(u8* info, u8* parent, u32 libFunc, u32 destroyFunc,
+                  u16 infoSize, u16 objSize) {
     extern u8 lbl_802745B4[];
     extern u8 lbl_802745EC[];
     extern u8 lbl_8047D950[];
-    extern void fn_80196E10();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r12 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+    extern void fn_80196E10(u8* file, s32 line, u8* msg);
 
-    tmp = 0x1;
-    /* mr. r31, r4 */;
-    r4 = 0x0;
-    r30 = r3;
-    *(u32*)((u8*)r3 + 0x4) = tmp;
-    tmp = 0x0;
-    *(u32*)((u8*)r3 + 0x8) = r5;
-    r5 = 0x0;
-    *(u32*)((u8*)r3 + 0xC) = r6;
-    *(u16*)((u8*)r3 + 0x10) = r8;
-    r3 = 0x0;
-    *(u16*)((u8*)r30 + 0x12) = r7;
-    *(u32*)((u8*)r30 + 0x14) = r31;
-    *(u32*)((u8*)r30 + 0x1C) = r5;
-    *(u32*)((u8*)r30 + 0x18) = r4;
-    *(u32*)((u8*)r30 + 0x20) = r3;
-    *(u32*)((u8*)r30 + 0x24) = tmp;
-    if ((s32)tmp == 0) goto L_80193C0C;
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    tmp = tmp & 0x1;
-    if ((s32)tmp != 0) goto L_80193BA4;
-    r12 = *(u32*)((u8*)r31 + 0x0);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-L_80193BA4:
-    r3 = *(s16*)((u8*)r30 + 0x10);
-    tmp = *(s16*)((u8*)r31 + 0x10);
-    if ((s32)r3 >= (s32)tmp) goto L_80193BC8;
-    r4 = (u32)lbl_802745B4;
-    r3 = (u32)lbl_8047D950;
-    r5 = (u32)lbl_802745B4;
-    r4 = 0x67;
-    fn_80196E10();
-L_80193BC8:
-    r3 = *(s16*)((u8*)r30 + 0x12);
-    tmp = *(s16*)((u8*)r31 + 0x12);
-    if ((s32)r3 >= (s32)tmp) goto L_80193BEC;
-    r4 = (u32)lbl_802745EC;
-    r3 = (u32)lbl_8047D950;
-    r5 = (u32)lbl_802745EC;
-    r4 = 0x68;
-    fn_80196E10();
-L_80193BEC:
-    r5 = *(s16*)((u8*)r31 + 0x12);
-    r3 = r30 + 0x28;
-    r4 = r31 + 0x28;
-    memcpy((void*)r3, (const void*)r4, (u32)r5);
-    tmp = *(u32*)((u8*)r31 + 0x1C);
-    *(u32*)((u8*)r30 + 0x18) = tmp;
-    *(u32*)((u8*)r31 + 0x1C) = r30;
-L_80193C0C:
-    return;
+    *(u32*)(info + 0x4) = 1;
+    *(u32*)(info + 0x8) = libFunc;
+    *(u32*)(info + 0xC) = destroyFunc;
+    *(u16*)(info + 0x10) = objSize;
+    *(u16*)(info + 0x12) = infoSize;
+    *(u32*)(info + 0x14) = (u32)parent;
+    *(u32*)(info + 0x1C) = 0;
+    *(u32*)(info + 0x18) = 0;
+    *(u32*)(info + 0x20) = 0;
+    *(u32*)(info + 0x24) = 0;
+
+    if (parent == NULL) {
+        return;
+    }
+
+    /* Validate object size >= parent's */
+    if ((s16)*(u16*)(info + 0x10) < (s16)*(u16*)(parent + 0x10)) {
+        fn_80196E10(lbl_8047D950, 0x67, lbl_802745B4);
+    }
+
+    /* Validate info size >= parent's */
+    if ((s16)*(u16*)(info + 0x12) < (s16)*(u16*)(parent + 0x12)) {
+        fn_80196E10(lbl_8047D950, 0x68, lbl_802745EC);
+    }
+
+    /* Copy parent's vtable entries */
+    memcpy(info + 0x28, parent + 0x28, (u32)*(s16*)(parent + 0x12));
+
+    /* Link into parent's child list */
+    *(u32*)(info + 0x18) = *(u32*)(parent + 0x1C);
+    *(u32*)(parent + 0x1C) = (u32)info;
 }

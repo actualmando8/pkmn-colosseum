@@ -66,94 +66,73 @@ void fn_8019C690(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     fn_80196E10();
 }
 
-/* 0x8019C6EC | 0x10 */
-void fn_8019C6EC(void) {
+/* 0x8019C6EC | 0x10
+ * hsdSetInvalidateFlags - Set GX invalidation flags for next retrace.
+ */
+void fn_8019C6EC(u32 flags) {
     extern u8 lbl_8047B290[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    tmp = *(u32*)lbl_8047B290;
-    tmp = tmp | r3;
-    *(u32*)lbl_8047B290 = tmp;
-    return;
+    *(u32*)lbl_8047B290 = *(u32*)lbl_8047B290 | flags;
 }
 
 /* 0x8019C6FC | 0xC */
 void fn_8019C6FC(void) {
 }
 
-/* 0x8019C708 | 0xA8 */
-void fn_8019C708(void) {
+/* 0x8019C708 | 0xA8
+ * hsdVIPreRetrace - Pre-retrace callback for HSD rendering.
+ * Configures video output based on display descriptor, handles
+ * pending GX invalidation flags.
+ */
+void fn_8019C708(u32 retraceCount) {
     extern u8 lbl_80466BC0[];
     extern u8 lbl_80478C78[];
     extern u8 lbl_8047B27C[];
     extern u8 lbl_8047B290[];
-    extern void fn_800B856C();
-    extern void fn_800BB29C();
-    extern void fn_800BCEF4();
-    extern void fn_800BD07C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+    extern void fn_800B856C(void);
+    extern void fn_800BB29C(void);
+    extern void fn_800BCEF4(u32 mode, u32 param);
+    extern void fn_800BD07C(u32 interlace, u32 halfAspect);
+    u8* dispDesc = lbl_80466BC0;
+    u32 invalidateFlags;
+    u32 height;
+    u32 yOrigin;
 
-    r4 = (u32)lbl_80466BC0;
-    tmp = (u32)lbl_80466BC0;
-    r31 = tmp;
-    tmp = *(u8*)((u8*)r31 + 0x19);
-    *(u32*)&lbl_8047B294 = r3;
-    if (tmp == 0) goto L_8019C744;
-    r4 = *(u32*)lbl_80478C78;
-    r3 = 0x2;
-    fn_800BCEF4();
-    goto L_8019C750;
-L_8019C744:
-    r3 = *(u32*)lbl_8047B27C;
-    r4 = 0x0;
-    fn_800BCEF4();
-L_8019C750:
-    r4 = *(u16*)((u8*)r31 + 0x8);
-    tmp = *(u16*)((u8*)r31 + 0x10);
-    r3 = *(u8*)((u8*)r31 + 0x18);
-    tmp = r4 - tmp;
-    r4 = (u32)tmp >> 31;
-    fn_800BD07C();
-    tmp = *(u32*)lbl_8047B290;
-    if ((s32)tmp == 0) goto L_8019C79C;
-    tmp = *(u32*)lbl_8047B290;
-    tmp = tmp & 0x1;
-    if ((s32)tmp == 0) goto L_8019C784;
-    fn_800B856C();
-L_8019C784:
-    tmp = *(u32*)lbl_8047B290;
-    tmp = tmp & 0x00000002;
-    if ((s32)tmp == 0) goto L_8019C794;
-    fn_800BB29C();
-L_8019C794:
-    tmp = 0x0;
-    *(u32*)lbl_8047B290 = tmp;
-L_8019C79C:
-    return;
+    *(u32*)&lbl_8047B294 = retraceCount;
+
+    if (*(u8*)(dispDesc + 0x19) != 0) {
+        fn_800BCEF4(2, *(u32*)lbl_80478C78);
+    } else {
+        fn_800BCEF4(*(u32*)lbl_8047B27C, 0);
+    }
+
+    height = *(u16*)(dispDesc + 0x8);
+    yOrigin = *(u16*)(dispDesc + 0x10);
+    fn_800BD07C(*(u8*)(dispDesc + 0x18), (height - yOrigin) >> 31);
+
+    invalidateFlags = *(u32*)lbl_8047B290;
+    if (invalidateFlags != 0) {
+        if (invalidateFlags & 0x1) {
+            fn_800B856C();
+        }
+        if (invalidateFlags & 0x2) {
+            fn_800BB29C();
+        }
+        *(u32*)lbl_8047B290 = 0;
+    }
 }
 
-/* 0x8019C7B8 | 0x28 */
-void fn_8019C7B8(void) {
+/* 0x8019C7B8 | 0x28
+ * hsdIsInArena - Check if an address is within the HSD arena bounds.
+ * Returns 1 if addr is within [arenaLo, arenaHi), 0 otherwise.
+ */
+BOOL fn_8019C7B8(u32 addr) {
     extern u8 lbl_8047B268[];
     extern u8 lbl_8047B26C[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
 
-    tmp = *(u32*)lbl_8047B268;
-    r4 = 0x0;
-    if (tmp > r3) goto L_8019C7D8;
-    tmp = *(u32*)lbl_8047B26C;
-    if (r3 >= tmp) goto L_8019C7D8;
-    r4 = 0x1;
-L_8019C7D8:
-    r3 = r4;
-    return;
+    if (addr >= *(u32*)lbl_8047B268 && addr < *(u32*)lbl_8047B26C) {
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* 0x74 | fn_8019C7E0 | generic */
@@ -179,50 +158,35 @@ void fn_8019C89C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     fn_8009AAD4();
 }
 
-/* 0x8019C8F4 | 0x84 */
-void fn_8019C8F4(void) {
+/* 0x8019C8F4 | 0x84
+ * hsdAllocMemPiece - Allocate memory from the HSD arena.
+ * If size is 0, returns NULL. Asserts that custom heap is not active.
+ * Asserts that allocation succeeded.
+ */
+void* fn_8019C8F4(u32 size) {
     extern u8 lbl_802749E4[];
     extern u8 lbl_80274A28[];
     extern u8 lbl_80478C70[];
     extern u8 lbl_8047B288[];
     extern u8 lbl_8047DB0C[];
-    extern void fn_8009A9D8();
-    extern void fn_80196E10();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    extern void* fn_8009A9D8(void* heap, u32 size);
+    extern void fn_80196E10(u8* file, s32 line, u8* msg);
+    void* result;
 
-    /* mr. r31, r3 */;
-    if ((s32)tmp != 0) goto L_8019C914;
-    r3 = 0x0;
-    goto L_8019C964;
-L_8019C914:
-    tmp = *(u32*)lbl_8047B288;
-    if ((s32)tmp == 0) goto L_8019C938;
-    r3 = (u32)lbl_802749E4;
-    r5 = (u32)lbl_80274A28;
-    r3 = (u32)lbl_802749E4;
-    r4 = 0x1b6;
-    r5 = (u32)lbl_80274A28;
-    fn_80196E10();
-L_8019C938:
-    r3 = *(u32*)lbl_80478C70;
-    r4 = r31;
-    fn_8009A9D8();
-    /* mr. r31, r3 */;
-    if ((s32)tmp != 0) goto L_8019C960;
-    r3 = (u32)lbl_802749E4;
-    r4 = 0x17a;
-    r3 = (u32)lbl_802749E4;
-    r5 = (u32)lbl_8047DB0C;
-    fn_80196E10();
-L_8019C960:
-    r3 = r31;
-L_8019C964:
-    return;
+    if (size == 0) {
+        return NULL;
+    }
+
+    if (*(s32*)lbl_8047B288 != 0) {
+        fn_80196E10(lbl_802749E4, 0x1B6, lbl_80274A28);
+    }
+
+    result = fn_8009A9D8((void*)*(u32*)lbl_80478C70, size);
+    if (result == NULL) {
+        fn_80196E10(lbl_802749E4, 0x17A, lbl_8047DB0C);
+    }
+
+    return result;
 }
 
 /* 0x8019C978 | 0x1F8 */

@@ -542,26 +542,21 @@ void fn_800D30A0(void) {
  *  fn_800D30AC
  *  Address: 0x800D30AC, Size: 0x44
  * ======================================================================= */
+/* GSgfxWaitForGPU - Wait for GPU to finish rendering.
+ * If in mode 1, calls copy function; otherwise calls GXWaitDrawDone.
+ */
 void fn_800D30AC(void) {
     extern u8 lbl_8047AA80[];
-    extern void fn_800B8920();
-    extern void fn_800D4F98();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
+    extern void fn_800B8920(void);
+    extern void fn_800D4F98(u32 mode, u32 param);
 
-    r3 = *(u32*)lbl_8047AA80;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if ((s32)tmp != 1) goto L_800D30DC;
-    r3 = 0x4;
-    r4 = 0x0;
-    fn_800D4F98();
-    goto L_800D30E0;
-L_800D30DC:
-    fn_800B8920();
-L_800D30E0:
-    return;
+    u8* gfxState = (u8*)*(u32*)lbl_8047AA80;
+
+    if (*(s32*)(gfxState + 0x0) == 1) {
+        fn_800D4F98(4, 0);
+    } else {
+        fn_800B8920();
+    }
 }
 
 /* =======================================================================
