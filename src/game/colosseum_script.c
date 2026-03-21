@@ -9741,60 +9741,30 @@ L_80226264: ;
 #pragma pop
 
 /* Address: 0x80226284 | Size: 0x4C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80226284(void* ctx, u32 slot, u32 param) {
     extern u8 lbl_80478D78[];
-    extern void fn_802624CC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    r3 = *(u32*)&lbl_8047B610;
-    r3 = *(u32*)((u8*)r3 + 0x1);
-    fn_802624CC();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) goto L_802262B4;
-    r0 = 0x1;
-    r3 = (u32)lbl_80478D78;
-    *(u8*)((u8*)r3 + 0x7) = r0;
-L_802262B4: ;
-    r3 = *(u32*)&lbl_8047B610;
-    r0 = r3 + 0x3;
-    *(u32*)&lbl_8047B610 = r0;
-    return;
+    extern u32 fn_802624CC();
+    u32 pc = *(u32*)&lbl_8047B610;
+    u32 arg = *(u32*)((u8*)pc + 0x1);
+    if ((fn_802624CC(arg) & 0xFF) == 1) {
+        lbl_80478D78[0x7] = 1;
+    }
+    *(u32*)&lbl_8047B610 = *(u32*)&lbl_8047B610 + 3;
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x802262D0 | Size: 0x4C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_802262D0(void* ctx, u32 slot, u32 param) {
     extern u8 lbl_80478D78[];
-    extern void fn_802624CC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    r3 = *(u32*)&lbl_8047B610;
-    r3 = *(u32*)((u8*)r3 + 0x1);
-    fn_802624CC();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) goto L_80226300;
-    r0 = 0x1;
-    r3 = (u32)lbl_80478D78;
-    *(u8*)((u8*)r3 + 0x7) = r0;
-L_80226300: ;
-    r3 = *(u32*)&lbl_8047B610;
-    r0 = r3 + 0x5;
-    *(u32*)&lbl_8047B610 = r0;
-    return;
+    extern u32 fn_802624CC();
+    u32 pc = *(u32*)&lbl_8047B610;
+    u32 arg = *(u32*)((u8*)pc + 0x1);
+    if ((fn_802624CC(arg) & 0xFF) == 1) {
+        lbl_80478D78[0x7] = 1;
+    }
+    *(u32*)&lbl_8047B610 = *(u32*)&lbl_8047B610 + 5;
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8022631C | Size: 0x3D0 (976 bytes) */
 #pragma push
