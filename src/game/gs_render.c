@@ -16460,35 +16460,27 @@ void fn_800E076C(void* dst, void* src) {
     d[3] = s[3];
 }
 
-/* fn_800E0790 | Size: 0x54 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* fn_800E0790 | Size: 0x54 -- uses GQR SPRs, keep as asm */
 void fn_800E0790(void) {
     extern void fn_800E0C78();
     extern void fn_800E0D24();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    r3 = 0x4;
-    r3 = r3 | (0x4 << 16);
-    /* mtspr GQR2, r3 */;
-    r3 = 0x5;
-    r3 = r3 | (0x5 << 16);
-    /* mtspr GQR3, r3 */;
-    r3 = 0x6;
-    r3 = r3 | (0x6 << 16);
-    /* mtspr GQR4, r3 */;
-    r3 = 0x7;
-    r3 = r3 | (0x7 << 16);
-    /* mtspr GQR5, r3 */;
+    asm {
+        li r3, 0x4
+        oris r3, r3, 0x4
+        mtspr 918, r3
+        li r3, 0x5
+        oris r3, r3, 0x5
+        mtspr 919, r3
+        li r3, 0x6
+        oris r3, r3, 0x6
+        mtspr 920, r3
+        li r3, 0x7
+        oris r3, r3, 0x7
+        mtspr 921, r3
+    }
     fn_800E0C78();
     fn_800E0D24();
-    return;
 }
-#pragma pop
 
 /* fn_800E07E4 | Size: 0x128 */
 #pragma push
