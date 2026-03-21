@@ -97,12 +97,9 @@ void fn_801CFD08(void);
  * fn_801C53BC - Camera scene initialize with parameters.
  * Address: 0x801C53BC | Size: 0x140
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C53BC(void* ctx, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
     /* TODO: Camera scene init with parameters (0x140 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C54FC - Camera get field-of-view.
@@ -116,121 +113,91 @@ f32 fn_801C54FC(void) {
  * fn_801C5530 - Camera set field-of-view with bounds.
  * Address: 0x801C5530 | Size: 0xA8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C5530(f32 fov, f32 minFov, f32 maxFov) {
     /* TODO: Camera set FOV with bounds (0xA8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C55D8 - Camera position update.
  * Address: 0x801C55D8 | Size: 0x170
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C55D8(f32 x, f32 y, f32 z, f32 speed) {
     /* TODO: Camera position update (0x170 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C5748 - Camera target tracking.
  * Address: 0x801C5748 | Size: 0x150
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C5748(void* target, f32 speed) {
     /* TODO: Camera target tracking (0x150 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C5898 / battleCamera_Update - Full camera update.
  * Address: 0x801C5898 | Size: 0x2C8
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C5898(void* camObj, void* target, f32 speed, f32 fov, f32 nearClip, f32 farClip) {
     /* TODO: Full camera update (0x2C8 bytes)
      * Updates camera position, target, FOV, and clipping planes
      * with smooth interpolation.
      */
 }
-#pragma pop
 
 /**
  * fn_801C5B60 - Camera zoom controller.
  * Address: 0x801C5B60 | Size: 0x200
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C5B60(f32 zoomTarget, f32 zoomSpeed) {
     /* TODO: Camera zoom controller (0x200 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C5D60 - Camera orbit calculation.
  * Address: 0x801C5D60 | Size: 0x170
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C5D60(f32 angle, f32 radius, f32 height) {
     /* TODO: Camera orbit calculation (0x170 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C5ED0 - Camera get orbit angle.
  * Address: 0x801C5ED0 | Size: 0x9C
  */
-#pragma push
-#pragma optimization_level 0
 f32 fn_801C5ED0(void) {
     /* TODO: Camera orbit angle getter (0x9C bytes) */
     return 0.0f;
 }
-#pragma pop
 
 /**
  * fn_801C5F6C - Camera get orbit radius.
  * Address: 0x801C5F6C | Size: 0x9C
  */
-#pragma push
-#pragma optimization_level 0
 f32 fn_801C5F6C(void) {
     /* TODO: Camera orbit radius getter (0x9C bytes) */
     return 0.0f;
 }
-#pragma pop
 
 /**
  * fn_801C6008 / battleCamera_SetView - Set camera view configuration.
  * Address: 0x801C6008 | Size: 0x26C
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6008(u8 transition, void* target, f32 speed, f32 zoom) {
     /* TODO: Camera set view configuration (0x26C bytes)
      * Configures the camera for a specific view type
      * (close-up, overhead, side view, etc.) with transition.
      */
 }
-#pragma pop
 
 /**
  * fn_801C6274 - Camera view transition interpolation.
  * Address: 0x801C6274 | Size: 0x144
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6274(f32 t, f32 ease) {
     /* TODO: Camera view transition (0x144 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C63B8 - Camera get transition complete flag.
@@ -245,26 +212,20 @@ u8 fn_801C63B8(void) {
  * Address: 0x801C63C0 | Size: 0x2C8
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C63C0(void* target, void* params, f32 t, f32 speed, f32 zoom, f32 blend) {
     /* TODO: Camera smooth interpolation (0x2C8 bytes)
      * Implements cubic/bezier interpolation for smooth camera movement.
      */
 }
-#pragma pop
 
 /**
  * fn_801C6688 / battleCamera_SetRotation - Set camera rotation.
  * Address: 0x801C6688 | Size: 0xB4
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6688(f32 angle) {
     /* TODO: Camera set rotation (0xB4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C673C - Camera reset to default.
@@ -278,23 +239,17 @@ void fn_801C673C(void) {
  * fn_801C6760 - Camera shake effect.
  * Address: 0x801C6760 | Size: 0xAC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6760(f32 intensity, f32 duration) {
     /* TODO: Camera shake effect (0xAC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C680C - Camera shake update.
  * Address: 0x801C680C | Size: 0xC8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C680C(void) {
     /* TODO: Camera shake update per frame (0xC8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C68D4 - Camera get shake active.
@@ -329,39 +284,30 @@ u8 fn_801C6928(void) {
  * Address: 0x801C6934 | Size: 0x1B4
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6934(void* stageModel, f32 scale) {
     /* TODO: Scene init (0x1B4 bytes)
      * Loads stage model, sets scale, initializes lighting.
      */
 }
-#pragma pop
 
 /**
  * fn_801C6AE8 / battleScene_SetupSlot - Set up a battle slot in the scene.
  * Address: 0x801C6AE8 | Size: 0x290
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6AE8(s32 row, s32 col, u8 type) {
     /* TODO: Scene slot setup (0x290 bytes)
      * Configures a battle position with model anchor and animation data.
      */
 }
-#pragma pop
 
 /**
  * fn_801C6D78 - Scene slot transform update.
  * Address: 0x801C6D78 | Size: 0x118
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6D78(s32 slot, f32 x, f32 y, f32 z) {
     /* TODO: Scene slot transform (0x118 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C6E90 - Scene slot get model pointer.
@@ -375,12 +321,9 @@ void* fn_801C6E90(s32 slot) {
  * fn_801C6EE4 - Scene slot model setup.
  * Address: 0x801C6EE4 | Size: 0x1AC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C6EE4(s32 slot, void* modelData) {
     /* TODO: Scene slot model setup (0x1AC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C7090 - Scene get slot active count.
@@ -394,27 +337,21 @@ s32 fn_801C7090(void) {
  * fn_801C70FC - Scene slot visibility control.
  * Address: 0x801C70FC | Size: 0xB4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C70FC(s32 slot, u8 visible) {
     /* TODO: Scene slot visibility (0xB4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C71B0 / battleScene_UpdateAnimations - Update all scene animations.
  * Address: 0x801C71B0 | Size: 0x43C
  * Declared in battle.h.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C71B0(void) {
     /* TODO: Scene update all animations (0x43C bytes)
      * Iterates through all active slots, updates model animations,
      * processes animation callbacks, advances frame counters.
      */
 }
-#pragma pop
 
 /**
  * fn_801C75EC - Scene animation frame advance.
@@ -436,12 +373,9 @@ f32 fn_801C7630(s32 slot) {
  * fn_801C766C - Scene animation set frame.
  * Address: 0x801C766C | Size: 0xC4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C766C(s32 slot, f32 frame) {
     /* TODO: Scene animation set frame (0xC4 bytes) */
 }
-#pragma pop
 
 /* =========================================================================
  * POKEMON MODEL PLACEMENT & ANIMATION (0x801C7730 - 0x801C9910)
@@ -459,13 +393,10 @@ void fn_801C766C(s32 slot, f32 frame) {
  *   5. Configures shadow rendering
  *   6. Applies any status visual effects
  */
-#pragma push
-#pragma optimization_level 0
 s32 fn_801C7730(s32 side, s32 slot) {
     /* TODO: Full Pokemon placement state machine (0xDCC bytes) */
     return 0;
 }
-#pragma pop
 
 /**
  * fn_801C84FC - Pokemon model get species ID.
@@ -479,13 +410,10 @@ s32 fn_801C84FC(s32 slot) {
  * fn_801C852C - Pokemon model scale lookup.
  * Address: 0x801C852C | Size: 0xFC
  */
-#pragma push
-#pragma optimization_level 0
 f32 fn_801C852C(s32 species) {
     /* TODO: Pokemon model scale lookup (0xFC bytes) */
     return 1.0f;
 }
-#pragma pop
 
 /**
  * fn_801C8628 - Pokemon model set idle animation.
@@ -499,12 +427,9 @@ void fn_801C8628(s32 slot) {
  * fn_801C8688 - Pokemon model animation switch.
  * Address: 0x801C8688 | Size: 0x17C
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C8688(s32 slot, s32 animIdx) {
     /* TODO: Pokemon animation switch (0x17C bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C8804 - Pokemon model get animation state.
@@ -518,12 +443,9 @@ s32 fn_801C8804(s32 slot) {
  * fn_801C8834 - Pokemon model faint animation.
  * Address: 0x801C8834 | Size: 0x1C4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C8834(s32 slot) {
     /* TODO: Pokemon faint animation (0x1C4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C89F8 / battleScene_EncounterSequence - Encounter/send-out sequence.
@@ -536,12 +458,9 @@ void fn_801C8834(s32 slot) {
  *   4. Landing/pose animation
  *   5. Cry sound effect
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C89F8(s32 side, s32 slot) {
     /* TODO: Encounter sequence state machine (0x3D8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C8DD0 - Encounter sequence get state.
@@ -561,13 +480,10 @@ s32 fn_801C8DD0(s32 slot) {
  *   - Status effect visual overlays
  *   - HP bar update synchronization
  */
-#pragma push
-#pragma optimization_level 0
 s32 fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType) {
     /* TODO: Pokemon animation driver (0xAFC bytes) */
     return 0;
 }
-#pragma pop
 
 /* =========================================================================
  * SCENE STATE & HELPERS (0x801C9910 - 0x801CA9F8)
@@ -577,23 +493,17 @@ s32 fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType) {
  * fn_801C9910 - Scene state machine tick.
  * Address: 0x801C9910 | Size: 0x25C
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C9910(void) {
     /* TODO: Scene state machine tick (0x25C bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C9B6C - Scene transition trigger.
  * Address: 0x801C9B6C | Size: 0x130
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C9B6C(s32 transitionType) {
     /* TODO: Scene transition trigger (0x130 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C9C9C - Scene get current state.
@@ -607,12 +517,9 @@ s32 fn_801C9C9C(void) {
  * fn_801C9CDC - Scene state helper A.
  * Address: 0x801C9CDC | Size: 0x98
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C9CDC(s32 arg0) {
     /* TODO: Scene state helper A (0x98 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C9D74 - Scene state helper B.
@@ -626,12 +533,9 @@ void fn_801C9D74(s32 arg0) {
  * fn_801C9DC4 - Scene lighting update.
  * Address: 0x801C9DC4 | Size: 0xB8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C9DC4(f32 intensity) {
     /* TODO: Scene lighting update (0xB8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801C9E7C - Scene shadow render.
@@ -661,23 +565,17 @@ void fn_801C9F00(s32 slot, f32 x, f32 z) {
  * fn_801C9F5C - Scene complex update (multi-slot).
  * Address: 0x801C9F5C | Size: 0x3FC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801C9F5C(void) {
     /* TODO: Scene complex multi-slot update (0x3FC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CA358 - Scene effect layer setup.
  * Address: 0x801CA358 | Size: 0x180
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CA358(s32 effectType, s32 slot) {
     /* TODO: Scene effect layer setup (0x180 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CA4D8 - Scene effect get active count.
@@ -691,23 +589,17 @@ s32 fn_801CA4D8(void) {
  * fn_801CA4F8 - Scene effect update.
  * Address: 0x801CA4F8 | Size: 0xCC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CA4F8(void) {
     /* TODO: Scene effect update (0xCC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CA5C4 - Scene effect spawn.
  * Address: 0x801CA5C4 | Size: 0x144
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CA5C4(s32 effectID, f32 x, f32 y, f32 z) {
     /* TODO: Scene effect spawn (0x144 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CA708 - Scene effect clear all.
@@ -721,12 +613,9 @@ void fn_801CA708(void) {
  * fn_801CA728 - Scene effect render pass.
  * Address: 0x801CA728 | Size: 0x84
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CA728(void) {
     /* TODO: Scene effect render pass (0x84 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CA7AC - Scene get render frame count.
@@ -872,35 +761,26 @@ f32 fn_801CAAC8(s32 slot) {
  * fn_801CAAF4 - Animation helper: play slot animation sequence.
  * Address: 0x801CAAF4 | Size: 0x178
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CAAF4(s32 slot, s32 seqIdx) {
     /* TODO: Play animation sequence (0x178 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CAC6C - Animation helper: stop slot animation.
  * Address: 0x801CAC6C | Size: 0xAC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CAC6C(s32 slot) {
     /* TODO: Stop animation (0xAC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CAD18 - Animation helper: check slot animation done.
  * Address: 0x801CAD18 | Size: 0x88
  */
-#pragma push
-#pragma optimization_level 0
 BOOL fn_801CAD18(s32 slot) {
     /* TODO: Check animation done (0x88 bytes) */
     return TRUE;
 }
-#pragma pop
 
 /**
  * fn_801CADA0 - Animation helper: return zero.
@@ -914,12 +794,9 @@ s32 fn_801CADA0(void) {
  * fn_801CADA8 - Animation helper: blend between two animations.
  * Address: 0x801CADA8 | Size: 0xD8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CADA8(s32 slot, s32 animA, s32 animB, f32 blend) {
     /* TODO: Animation blend (0xD8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CAE80 - Animation get blend factor.
@@ -941,34 +818,25 @@ void fn_801CAEA0(s32 slot, void* callback, void* userData) {
  * fn_801CAF0C - Animation callback dispatch.
  * Address: 0x801CAF0C | Size: 0xC8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CAF0C(s32 slot) {
     /* TODO: Animation callback dispatch (0xC8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CAFD4 - Animation particle spawn on slot.
  * Address: 0x801CAFD4 | Size: 0xA4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CAFD4(s32 slot, s32 particleID) {
     /* TODO: Particle spawn on slot (0xA4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB078 - Animation particle update.
  * Address: 0x801CB078 | Size: 0x8C
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB078(void) {
     /* TODO: Particle update (0x8C bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB104 - Animation particle check active.
@@ -998,23 +866,17 @@ void fn_801CB180(s32 particleHandle, f32 x, f32 y, f32 z) {
  * fn_801CB1C4 - Animation model material override.
  * Address: 0x801CB1C4 | Size: 0xF4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB1C4(s32 slot, s32 materialIdx, u32 color) {
     /* TODO: Model material override (0xF4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB2B8 - Animation model material reset.
  * Address: 0x801CB2B8 | Size: 0xDC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB2B8(s32 slot) {
     /* TODO: Model material reset (0xDC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB394 - Scene HP bar get position.
@@ -1044,12 +906,9 @@ u8 fn_801CB3DC(s32 slot) {
  * fn_801CB3FC - Scene HP bar update value.
  * Address: 0x801CB3FC | Size: 0xAC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB3FC(s32 slot, s32 currentHP, s32 maxHP) {
     /* TODO: HP bar update (0xAC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB4A8 - Scene HP bar animate.
@@ -1079,34 +938,25 @@ void fn_801CB530(s32 slot, u32 statusCondition) {
  * fn_801CB59C - Scene status icon update.
  * Address: 0x801CB59C | Size: 0x80
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB59C(void) {
     /* TODO: Status icon update (0x80 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB61C - Scene name plate setup.
  * Address: 0x801CB61C | Size: 0xEC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB61C(s32 slot, s32 species) {
     /* TODO: Name plate setup (0xEC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB708 - Scene name plate render.
  * Address: 0x801CB708 | Size: 0xBC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB708(s32 slot) {
     /* TODO: Name plate render (0xBC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB7C4 - Scene name plate show/hide.
@@ -1120,23 +970,17 @@ void fn_801CB7C4(s32 slot, u8 show) {
  * fn_801CB834 - Scene trainer model setup.
  * Address: 0x801CB834 | Size: 0x120
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB834(s32 side, void* trainerData) {
     /* TODO: Trainer model setup (0x120 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB954 - Scene trainer model animate.
  * Address: 0x801CB954 | Size: 0x84
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CB954(s32 side, s32 animIdx) {
     /* TODO: Trainer model animate (0x84 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CB9D8 - Scene trainer model get state.
@@ -1178,58 +1022,43 @@ void fn_801CBA90(f32 speed) {
  * fn_801CBAB8 - Scene transition color set.
  * Address: 0x801CBAB8 | Size: 0xF4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CBAB8(u8 r, u8 g, u8 b) {
     /* TODO: Transition color set (0xF4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CBBAC - Scene transition update.
  * Address: 0x801CBBAC | Size: 0x130
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CBBAC(void) {
     /* TODO: Scene transition update (0x130 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CBCDC - Scene background scroll.
  * Address: 0x801CBCDC | Size: 0x168
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CBCDC(f32 scrollX, f32 scrollY) {
     /* TODO: Background scroll (0x168 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CBE44 - Scene background setup.
  * Address: 0x801CBE44 | Size: 0x120
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CBE44(s32 bgID) {
     /* TODO: Background setup (0x120 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CBF64 - Scene complex animation controller.
  * Address: 0x801CBF64 | Size: 0x41C
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CBF64(void) {
     /* TODO: Complex animation controller (0x41C bytes)
      * Manages multi-step animation sequences across multiple slots.
      */
 }
-#pragma pop
 
 /**
  * fn_801CC380 - Scene animation mega-function A.
@@ -1237,14 +1066,11 @@ void fn_801CBF64(void) {
  * Massive state machine (~6KB) handling a complete battle animation
  * sequence. Likely covers the full attack/hit/resolution animation cycle.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CC380(void) {
     /* TODO: Scene animation mega-function A (0x1784 bytes)
      * Large state machine with many animation states.
      */
 }
-#pragma pop
 
 /**
  * fn_801CDB04 - Scene animation mega-function B.
@@ -1252,70 +1078,52 @@ void fn_801CC380(void) {
  * Another massive state machine (~6.2KB). Handles a second major
  * animation sequence, possibly the encounter/send-out flow.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CDB04(void) {
     /* TODO: Scene animation mega-function B (0x181C bytes)
      * Large state machine with many animation states.
      */
 }
-#pragma pop
 
 /**
  * fn_801CF320 - Scene sequence step A.
  * Address: 0x801CF320 | Size: 0x248
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CF320(void) {
     /* TODO: Scene sequence step A (0x248 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CF568 - Scene sequence step B.
  * Address: 0x801CF568 | Size: 0x27C
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CF568(void) {
     /* TODO: Scene sequence step B (0x27C bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CF7E4 - Scene sequence step C.
  * Address: 0x801CF7E4 | Size: 0x1E4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CF7E4(void) {
     /* TODO: Scene sequence step C (0x1E4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CF9C8 - Scene sequence step D.
  * Address: 0x801CF9C8 | Size: 0x340
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CF9C8(void) {
     /* TODO: Scene sequence step D (0x340 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801CFD08 - Scene transition controller.
  * Address: 0x801CFD08 | Size: 0x378
  * Manages transitions between battle phases (intro -> command -> execute -> result).
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801CFD08(void) {
     /* TODO: Scene transition controller (0x378 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0080 - Scene transition get phase.
@@ -1329,12 +1137,9 @@ s32 fn_801D0080(void) {
  * fn_801D0090 - Scene transition phase handler.
  * Address: 0x801D0090 | Size: 0x284
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D0090(s32 phase) {
     /* TODO: Scene transition phase handler (0x284 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0314 - Scene transition helper A.
@@ -1356,12 +1161,9 @@ void fn_801D036C(void) {
  * fn_801D039C - Scene model pool update.
  * Address: 0x801D039C | Size: 0xD0
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D039C(void) {
     /* TODO: Scene model pool update (0xD0 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D046C - Scene model pool get count.
@@ -1399,23 +1201,17 @@ void fn_801D04F4(void* model) {
  * fn_801D055C - Scene model pool batch update.
  * Address: 0x801D055C | Size: 0x1EC
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D055C(void) {
     /* TODO: Model pool batch update (0x1EC bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0748 - Scene animation sequence manager.
  * Address: 0x801D0748 | Size: 0x2E8
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D0748(s32 seqID) {
     /* TODO: Animation sequence manager (0x2E8 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0A30 - Scene animation sequence check done.
@@ -1437,12 +1233,9 @@ void fn_801D0AA0(s32 seqID) {
  * fn_801D0AFC - Scene animation sequence restart.
  * Address: 0x801D0AFC | Size: 0xD4
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D0AFC(s32 seqID) {
     /* TODO: Animation sequence restart (0xD4 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0BD0 - Scene animation sequence get frame.
@@ -1456,12 +1249,9 @@ f32 fn_801D0BD0(s32 seqID) {
  * fn_801D0C30 - Scene complex rendering setup.
  * Address: 0x801D0C30 | Size: 0x180
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D0C30(void) {
     /* TODO: Complex rendering setup (0x180 bytes) */
 }
-#pragma pop
 
 /**
  * fn_801D0DB0 - Scene rendering main loop.
@@ -1469,9 +1259,6 @@ void fn_801D0C30(void) {
  * Large rendering loop that processes all active scene elements
  * per frame. Handles model rendering, effects, UI, and compositing.
  */
-#pragma push
-#pragma optimization_level 0
 void fn_801D0DB0(void) {
     /* TODO: Scene rendering main loop (0x588 bytes) */
 }
-#pragma pop
