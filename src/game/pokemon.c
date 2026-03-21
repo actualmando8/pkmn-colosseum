@@ -139,6 +139,7 @@ void FrameWaitForDuration(u32 duration) {
         }
     }
 }
+#pragma peephole on
 
 /* =========================================================================
  * fn_801F025C - PokemonSlotLookupDefault

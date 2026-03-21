@@ -6432,7 +6432,7 @@ void fn_800D7230(void) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
     u8* state = (u8*)lbl_8047AA80;
     u8 val = *(u8*)(state + 0x4A4);
-    *fifo = (u8)(val * 3);
+    *fifo = (u8)(val + (val << 1));
 }
 
 /* fn_800D724C | Size: 0x1C */

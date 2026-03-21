@@ -105,7 +105,7 @@ extern u32   fn_80142CF4(u32 context, u32 param, u16 field, u32 flags);
 
 /* SDA table pointers for event data arrays */
 extern u32 lbl_80478D38;   /* Event table count */
-extern u8  lbl_80478D30;   /* Event table base (6 bytes per entry) */
+extern u8  lbl_80478D30[];   /* Event table base (6 bytes per entry) */
 
 /* Forward declarations for converted functions */
 void fn_8020248C(void);
@@ -11902,7 +11902,7 @@ u32 fn_8020A500(u16 idx) {
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = &lbl_80478D30 + idx * 6;
+        entry = lbl_80478D30 + idx * 6;
     }
     if (entry == NULL) { return 0; }
     return *(u16*)(entry + 4);
@@ -11915,7 +11915,7 @@ u32 fn_8020A540(u16 idx) {
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = &lbl_80478D30 + idx * 6;
+        entry = lbl_80478D30 + idx * 6;
     }
     if (entry == NULL) { return 0; }
     return *(u16*)(entry + 2);
@@ -11928,7 +11928,7 @@ u32 fn_8020A580(u16 idx) {
     if (idx >= lbl_80478D38) {
         entry = NULL;
     } else {
-        entry = &lbl_80478D30 + idx * 6;
+        entry = lbl_80478D30 + idx * 6;
     }
     if (entry == NULL) { return 0; }
     return entry[0];

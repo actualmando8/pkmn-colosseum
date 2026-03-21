@@ -24150,11 +24150,12 @@ u32 fn_80252918(void* ctx, u32 slot, u32 param) {
 }
 #pragma pop
 
-/* Address: 0x8025297C | Size: 0x24 | Pattern: null_check_getter */
-u32 fn_8025297C(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
+/* Address: 0x8025297C | Size: 0x24 | Pattern: call_return_u8 */
+extern u32 fn_80237774(void*);
+u8 fn_8025297C(void* ctx) { return (u8)fn_80237774(ctx); }
 
-/* Address: 0x802529A0 | Size: 0x24 | Pattern: null_check_getter */
-u32 fn_802529A0(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
+/* Address: 0x802529A0 | Size: 0x24 | Pattern: call_return_u8 */
+u8 fn_802529A0(void* ctx) { return (u8)fn_80237774(ctx); }
 
 /* Address: 0x802529F4 | Size: 0x84 | Pattern: field_accessor */
 #pragma push
