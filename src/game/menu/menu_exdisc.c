@@ -91,12 +91,8 @@ s32 fn_800788BC(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80077A5C | size: 0x50 */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80077A5C(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -108,17 +104,16 @@ void fn_80077A5C(void) {
     u32 r31 = 0;
 
     r31 = 0x0;
-    if ((u32)r3 == (u32)0x0) goto L_80077A90;
+    if (r3 == 0x0) goto L_80077A90;
     r4 = 0x0;
     r5 = 0x6e;
     r6 = 0x0;
     ((void(*)(void))fn_8012640C)();
-    if ((s32)r3 != (s32)0x0) goto L_80077A94;
+    if ((s32)r3 != 0x0) goto L_80077A94;
 L_80077A90: ;
     r31 = 0x1;
 L_80077A94: ;
     r3 = r31 & 0xFF;
-    r31 = *(u32*)(sp + 0xC);
     return;
 }
 
@@ -1216,4 +1211,3 @@ L_80078CF4:
     return;
 }
 
-#pragma pop

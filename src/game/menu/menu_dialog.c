@@ -100,8 +100,6 @@ extern u8    lbl_803A9A18[];   /* Dialog window state B */
  * fn_800599AC  0x230  Choice selection wrapper (calls fn_80059034)
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80057B34 | size: 0x168 */
 asm void fn_80057B34(void) { nofralloc
@@ -113,4 +111,3 @@ asm void fn_80059034(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_dialog/fn_80059034.s"
 }
 
-#pragma pop

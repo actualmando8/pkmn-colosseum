@@ -77,8 +77,6 @@ extern u32   lbl_8047A4D4;     /* Shop item table pointer */
  * fn_8003CF38  0x2C4  Shop cleanup / finalize
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8003AEF0 | size: 0xEC */
 asm void fn_8003AEF0(void) { nofralloc
@@ -90,4 +88,3 @@ asm void fn_8003B85C(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_shop/fn_8003B85C.s"
 }
 
-#pragma pop

@@ -158,8 +158,6 @@ extern const u32 lbl_80267350[];  /* Marking/icon table (18 entries) */
  * fn_800492CC  0x304  Party selection finalize
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8003D1FC | size: 0x2CC */
 asm void fn_8003D1FC(void) { nofralloc
@@ -171,4 +169,3 @@ asm void fn_80044630(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_pokemon/fn_80044630.s"
 }
 
-#pragma pop

@@ -127,7 +127,6 @@ extern s8 fn_802050F4(struct Pokemon* pokemon);
  *
  * @param duration  Number of frame units to wait
  * ========================================================================= */
-#pragma peephole off
 void FrameWaitForDuration(u32 duration) {
     /* fn_80008184 returns a context/flag; if non-zero, enter wait loop */
     u32 target = fn_80008184();
@@ -139,7 +138,6 @@ void FrameWaitForDuration(u32 duration) {
         }
     }
 }
-#pragma peephole on
 
 /* =========================================================================
  * fn_801F025C - PokemonSlotLookupDefault
@@ -773,8 +771,6 @@ u32 fn_801F6A98(u8* ptr) {
  *   fn_801F2B5C (PartyDataCopy) - 0x3E0 bytes
  * ####################################################################### */
 
-#pragma push
-#pragma force_active on
 
 /* 0x801F000C | size: 0x4C | small */
 void fn_801F000C(void) {
@@ -8847,4 +8843,3 @@ void fn_801F7EF0(void) {
 
 
 
-#pragma pop

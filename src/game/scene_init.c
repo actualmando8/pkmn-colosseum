@@ -149,8 +149,6 @@ extern const u8 lbl_80267050[];  /* Shift-JIS: "読み出しエラー\n" (Read E
  * with a matching reimplementation during Phase 2.
  * =================================================================== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8003686C | size: 0x820 */
 /* Scene main init - OSGetResetCode handling, thread creation, card detection */
@@ -168,4 +166,3 @@ asm void fn_800370E0(void) { nofralloc
     #include "asm/GC6E01/nonmatching/scene_init/fn_800370E0.s"
 }
 
-#pragma pop

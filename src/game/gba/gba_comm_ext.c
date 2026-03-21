@@ -52,12 +52,8 @@ s32 fn_80093698(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80092C90 | size: 0x1A8 */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 fn_80092C90(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
@@ -78,12 +74,11 @@ s32 fn_80092C90(void) {
     u32 r30 = 0;
     u32 r31 = 0;
 
-    /* stmw r26, 0x8(r1) */;
     r29 = r3;
     r30 = r4;
     r31 = r5;
-    if ((s32)r29 < (s32)0x0) goto L_80092CBC;
-    if ((s32)r29 <= (s32)0x3) goto L_80092CC4;
+    if ((s32)r29 < 0x0) goto L_80092CBC;
+    if ((s32)r29 <= 0x3) goto L_80092CC4;
 L_80092CBC: ;
     r0 = 0x0;
     goto L_80092D94;
@@ -92,7 +87,7 @@ L_80092CC4: ;
     r26 = r29 << 2;
     r27 = (u32)&lbl_803FB328;
     r0 = *(u32*)(r27 + r26);
-    if ((u32)r0 == (u32)0x0) goto L_80092CE4;
+    if (r0 == 0x0) goto L_80092CE4;
     r0 = 0x1;
     goto L_80092D94;
 L_80092CE4: ;
@@ -101,7 +96,7 @@ L_80092CE4: ;
     ((void(*)(void))fn_800E2C04)();
     r28 = r3;
     r0 = r28 & 0xFFFF;
-    if ((u32)r0 != (u32)0x0) goto L_80092D14;
+    if (r0 != 0x0) goto L_80092D14;
     r3 = (u32)&lbl_8026F5A8;
     r4 = 0x1dd;
     r3 = (u32)&lbl_8026F5A8;
@@ -141,7 +136,7 @@ L_80092D14: ;
     ((void(*)(void))fn_800A1F94)();
     r0 = 0x1;
 L_80092D94: ;
-    if ((s32)r0 != (s32)0x0) goto L_80092DA4;
+    if ((s32)r0 != 0x0) goto L_80092DA4;
     r3 = 0x0;
     goto L_80092E24;
 L_80092DA4: ;
@@ -153,13 +148,13 @@ L_80092DA4: ;
     r3 = r27;
     ((void(*)(void))fn_8009F7B4)();
     r0 = *(u32*)((u8*)r27 + 0x4340);
-    if ((s32)r0 != (s32)0x0) goto L_80092DFC;
+    if ((s32)r0 != 0x0) goto L_80092DFC;
     r4 = r30;
     r5 = r31;
     r3 = r27 + 0x4344;
     ((void(*)(void))fn_80089048)();
     r26 = r3;
-    if ((s32)r26 == (s32)0x0) goto L_80092DFC;
+    if ((s32)r26 == 0x0) goto L_80092DFC;
     r0 = 0xc;
     r3 = (0x3 << 16);
     *(u32*)((u8*)r27 + 0x4340) = r0;
@@ -171,13 +166,12 @@ L_80092DFC: ;
     r3 = r27 + 0x20;
     r4 = 0x8;
     ((void(*)(void))fn_800A257C)();
-    if ((s32)r26 == (s32)0x0) goto L_80092E20;
+    if ((s32)r26 == 0x0) goto L_80092E20;
     r3 = r27 + 0x18;
     ((void(*)(void))fn_8009FABC)();
 L_80092E20: ;
     r3 = r26;
 L_80092E24: ;
-    /* lmw r26, 0x8(r1) */;
     return;
 }
 
@@ -876,4 +870,3 @@ L_800937D4:
     return;
 }
 
-#pragma pop

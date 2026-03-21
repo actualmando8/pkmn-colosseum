@@ -1837,8 +1837,6 @@ u8 fn_801FCCAC(u8* ptr) {
  *   fn_801FECD4 (CheckTrainerEventState) - 59 calls
  * ####################################################################### */
 
-#pragma push
-#pragma force_active on
 
 /* 0x801F7F80 | size: 0x80 | small */
 void fn_801F7F80(void) {
@@ -11582,4 +11580,3 @@ void fn_80201764(void) {
 
 
 
-#pragma pop

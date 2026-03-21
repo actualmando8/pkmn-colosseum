@@ -1171,8 +1171,6 @@ u32 fn_801EE468(void) { return 48; }
  * decompilations as disassembly analysis proceeds.
  * ####################################################################### */
 
-#pragma push
-#pragma force_active on
 
 /* 0x801E03D4 | size: 0x388 | large */
 void fn_801E03D4(void) {
@@ -16562,4 +16560,3 @@ L_801EF024:
 }
 
 
-#pragma pop

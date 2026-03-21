@@ -49,8 +49,6 @@ extern void  fn_80132A38(u32 effectId, u32 param);
  * fn_8003AE84  0x06C  UI sub-handler B
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80039A50 | size: 0x34 */
 asm void fn_80039A50(void) { nofralloc
@@ -62,7 +60,6 @@ asm void fn_80039A84(void) { nofralloc
     #include "asm/GC6E01/nonmatching/colosseum_ui/fn_80039A84.s"
 }
 
-#pragma pop
 
 /* 0x8003AD6C | 0x118 */
 void fn_8003AD6C(void) {

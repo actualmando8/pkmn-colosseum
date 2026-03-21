@@ -74,8 +74,6 @@ extern f32   lbl_8047BDAC;     /* 0.0f */
  * fn_8004BDFC  0x010  Evolution result accessor C
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x800495C8 | size: 0x3E0 */
 asm void fn_800495C8(void) { nofralloc
@@ -87,4 +85,3 @@ asm void fn_800499BC(void) { nofralloc
     #include "asm/GC6E01/nonmatching/evolution/fn_800499BC.s"
 }
 
-#pragma pop

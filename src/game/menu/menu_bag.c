@@ -71,8 +71,6 @@ extern u8    lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
  * fn_80053064  0x0AC  Bag cleanup
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8004EADC | size: 0x178 */
 asm void fn_8004EADC(void) { nofralloc
@@ -84,4 +82,3 @@ asm void fn_80050844(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_bag/fn_80050844.s"
 }
 
-#pragma pop

@@ -95,8 +95,6 @@ extern u32   fn_8001E200(u32 msgBank, u32 msgId);
  * fn_8004E9C0  0x11C  Complex data formatter (called by fn_8004D9C0)
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8004BE0C | size: 0x34 */
 asm void fn_8004BE0C(void) { nofralloc
@@ -108,4 +106,3 @@ asm void fn_8004C120(void) { nofralloc
     #include "asm/GC6E01/nonmatching/poke_detail/fn_8004C120.s"
 }
 
-#pragma pop

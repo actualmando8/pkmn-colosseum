@@ -432,12 +432,8 @@ u8 fn_801EF63C(void) {
  * 20 functions remaining for full coverage of battle_main.c TU.
  * ####################################################################### */
 
-#pragma push
-#pragma force_active on
 
 /* 0x801EF02C | size: 0x54 | small */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801EF02C(void) {
     extern void fn_801EE440();
     extern void fn_801EE468();
@@ -450,7 +446,6 @@ void fn_801EF02C(void) {
     u32 r30 = 0;
     u32 r31 = 0;
 
-    /* stmw r30, 0x8(r1) */;
     fn_801EE468();
     r31 = r3 & 0xFFFF;
     r30 = 0x0;
@@ -463,8 +458,7 @@ L_801EF04C: ;
     r30 = r30 + 0x1;
 L_801EF060: ;
     r0 = r30 & 0xFFFF;
-    if ((u32)r0 < (u32)r31) goto L_801EF04C;
-    /* lmw r30, 0x8(r1) */;
+    if (r0 < r31) goto L_801EF04C;
     return;
 }
 
@@ -1409,4 +1403,3 @@ L_801EFFF8:
 }
 
 
-#pragma pop

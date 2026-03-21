@@ -131,8 +131,6 @@ extern const u8 lbl_802EF0A8[];   /* Status screen data table */
  * fn_80056B74  0x0E0  Text rendering finalize
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80054914 | size: 0xDC */
 asm void fn_80054914(void) { nofralloc
@@ -144,7 +142,6 @@ asm void fn_800552D4(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_status/fn_800552D4.s"
 }
 
-#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions

@@ -88,8 +88,6 @@ extern u8    lbl_803A9768[];   /* Message box state (0x2A0 bytes) */
  * fn_80057A64  0x0D0  Text finalize
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80056C54 | size: 0x440 */
 asm void fn_80056C54(void) { nofralloc
@@ -101,4 +99,3 @@ asm void fn_80057270(void) { nofralloc
     #include "asm/GC6E01/nonmatching/menu_msgbox/fn_80057270.s"
 }
 
-#pragma pop

@@ -171,12 +171,8 @@ s32 fn_80092B2C(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x800895A4 | size: 0x114 */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 fn_800895A4(void) {
     extern void fn_8008BBDC();
     extern void fn_8012A774();
@@ -199,12 +195,11 @@ s32 fn_800895A4(void) {
     u32 r30 = 0;
     u32 r31 = 0;
 
-    /* stmw r27, 0x1c(r1) */;
     r30 = r3;
     r31 = r4;
     r0 = *(u8*)((u8*)r31 + 0x0);
     r0 = r0 & 0x00000004;
-    if ((s32)r0 == (s32)0x0) goto L_800895D4;
+    if ((s32)r0 == 0x0) goto L_800895D4;
     r0 = 0x2;
     goto L_800895D8;
 L_800895D4: ;
@@ -252,7 +247,7 @@ L_80089650: ;
     ((void(*)(void))fn_8011D494)();
     r29 = r29 + 0x64;
     r28 = r28 + 0x1;
-    if ((s32)r28 < (s32)0x6) goto L_80089650;
+    if ((s32)r28 < 0x6) goto L_80089650;
     r29 = 0x0;
 L_80089688: ;
     r0 = r29 + 0x26c;
@@ -260,8 +255,7 @@ L_80089688: ;
     r4 = *(u8*)(r31 + r0);
     fn_80265EC4();
     r29 = r29 + 0x1;
-    if ((s32)r29 < (s32)0xb) goto L_80089688;
-    /* lmw r27, 0x1c(r1) */;
+    if ((s32)r29 < 0xb) goto L_80089688;
     return;
 }
 
@@ -10654,4 +10648,3 @@ L_80092C24:
     return;
 }
 
-#pragma pop

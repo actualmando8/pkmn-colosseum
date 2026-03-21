@@ -292,8 +292,6 @@ s32 fn_80069A08(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80059BDC | size: 0x30F4 */
 s32 fn_80059BDC(void) {
@@ -18038,4 +18036,3 @@ s32 fn_80069A08(void) {
 }
 
 
-#pragma pop

@@ -47,12 +47,8 @@ s32 fn_8008102C(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x8007FD64 | size: 0x58 */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 fn_8007FD64(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -75,7 +71,7 @@ L_8007FD8C: ;
 L_8007FD98: ;
     r3 = *(u8*)((u8*)r5 + 0x1A);
     r0 = *(u8*)((u8*)r4 + 0x1A);
-    if ((u32)r3 >= (u32)r0) goto L_8007FDB0;
+    if (r3 >= r0) goto L_8007FDB0;
     r3 = -0x1;
     return;
 L_8007FDB0: ;
@@ -2719,4 +2715,3 @@ L_80082640:
     return;
 }
 
-#pragma pop

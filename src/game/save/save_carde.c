@@ -40,12 +40,8 @@ s32 fn_800836AC(void);
 
 /* ===== Function implementations ===== */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80082650 | size: 0xE8 */
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80082650(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -60,7 +56,7 @@ void fn_80082650(void) {
     u32 ctr = 0;
 
     r31 = r3;
-    if ((u32)r31 != (u32)0x0) goto L_80082684;
+    if (r31 != 0x0) goto L_80082684;
     r3 = (u32)&lbl_8026F1C8;
     r4 = 0x17f;
     r3 = (u32)&lbl_8026F1C8;
@@ -69,7 +65,7 @@ void fn_80082650(void) {
 L_80082684: ;
     r0 = *(u8*)((u8*)r31 + 0x1B);
     r0 = (s8)r0;
-    if ((s32)r0 > (s32)0x0) goto L_800826AC;
+    if ((s32)r0 > 0x0) goto L_800826AC;
     r3 = (u32)&lbl_8026F1C8;
     r5 = (u32)&lbl_8026F1D8;
     r3 = (u32)&lbl_8026F1C8;
@@ -78,7 +74,7 @@ L_80082684: ;
     ((void(*)(void))fn_80196E10)();
 L_800826AC: ;
     r30 = r31 + 0x24;
-    if ((u32)r30 != (u32)0x0) goto L_800826CC;
+    if (r30 != 0x0) goto L_800826CC;
     r3 = (u32)&lbl_8026F1C8;
     r4 = 0x1f1;
     r3 = (u32)&lbl_8026F1C8;
@@ -91,10 +87,10 @@ L_800826CC: ;
     r0 = (s8)r0;
     r0 = r3 * r0;
     ctr_fn = (void(*)(void))r0;
-    if ((s32)r0 <= (s32)0x0) goto L_80082708;
+    if ((s32)r0 <= 0x0) goto L_80082708;
 L_800826EC: ;
     r0 = *(u8*)((u8*)r30 + 0x82);
-    if ((u32)r0 == (u32)0x0) goto L_80082700;
+    if (r0 == 0x0) goto L_80082700;
     r0 = 0x1;
     goto L_8008270C;
 L_80082700: ;
@@ -104,12 +100,10 @@ L_80082708: ;
     r0 = 0x0;
 L_8008270C: ;
     r0 = r0 & 0xFF;
-    if ((u32)r0 != (u32)0x0) goto L_80082720;
+    if (r0 != 0x0) goto L_80082720;
     r0 = 0x0;
     *(u16*)((u8*)r31 + 0x0) = r0;
 L_80082720: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
     return;
 }
 
@@ -1429,4 +1423,3 @@ L_80083AE0:
     return;
 }
 
-#pragma pop

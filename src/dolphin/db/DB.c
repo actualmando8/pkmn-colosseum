@@ -38,7 +38,6 @@ void DBInit(void) {
  * fn_800A2C74 - Internal debug exception handler body.
  * Reports the exception and dumps context, then halts.
  */
-#pragma dont_inline on
 static void fn_800A2C74(void) {
     void* context;
 
@@ -49,7 +48,6 @@ static void fn_800A2C74(void) {
     OSDumpContext(context);
     PPCHalt();
 }
-#pragma dont_inline off
 
 /*
  * __DBExceptionDestination - Exception vector handler entry point.

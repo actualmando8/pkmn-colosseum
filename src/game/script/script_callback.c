@@ -95,8 +95,6 @@ extern u8    lbl_803A9720[];   /* Script callback state B (0x48 bytes) */
  * fn_80054760  0x1B4  Script state updater (lbl_803A95E8, lbl_803A9720)
  */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80053110 | size: 0x33C */
 asm void fn_80053110(void) { nofralloc
@@ -108,4 +106,3 @@ asm void fn_80053778(void) { nofralloc
     #include "asm/GC6E01/nonmatching/script_callback/fn_80053778.s"
 }
 
-#pragma pop

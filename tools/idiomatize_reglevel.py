@@ -50,7 +50,13 @@ def find_register_functions(lines):
             fname = m.group(2)
             func_start = i
             has_regs = False
-            depth = 1
+            # Count extra braces on the signature line itself (after the first {)
+            sig_rest = lines[i][lines[i].index('{') + 1:]
+            depth = 1 + sig_rest.count('{') - sig_rest.count('}')
+            if depth == 0:
+                # One-liner function like: void f(void) { return 0; }
+                i += 1
+                continue
             j = i + 1
             while j < len(lines) and depth > 0:
                 s = lines[j].strip()
@@ -192,11 +198,13 @@ def clean_function(lines, func):
             kept_decls.append(orig_line)
 
     # If r1 is kept, sp must be too since r1 = (u32)sp references sp
-    if need_r1 and not need_sp:
-        for orig_line, var_name, is_sp, _ in all_decls:
-            if is_sp and orig_line not in kept_decls:
-                kept_decls.insert(0, orig_line)
-                break
+    if need_r1:
+        sp_already_kept = any('u8 sp[' in d for d in kept_decls)
+        if not sp_already_kept:
+            for orig_line, var_name, is_sp, _ in all_decls:
+                if is_sp:
+                    kept_decls.insert(0, orig_line)
+                    break
 
     # Rebuild function
     result = [sig]

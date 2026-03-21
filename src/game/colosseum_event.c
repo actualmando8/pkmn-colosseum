@@ -990,8 +990,6 @@ u32 fn_80211168(void) { return 0; }
  *   fn_80205B8C (GetTrainerPokemonPtr) - 668 calls, trainer->pokemon nav
  * ####################################################################### */
 
-#pragma push
-#pragma force_active on
 
 /* 0x80201890 | size: 0x12C */
 void fn_80201890(void* ctx, void* typeObj) {
@@ -17152,4 +17150,3 @@ void fn_80211E18(void) {
 
 
 
-#pragma pop
