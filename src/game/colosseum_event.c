@@ -16053,63 +16053,37 @@ void* fn_8020DEB0(u32 index) {
     return &lbl_80375980[index * 12];
 }
 
-/* 0x8020DF10 | size: 0x40 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020DF10(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    if ((u32)r3 != (u32)0x0) goto L_8020DF20;
-    r4 = 0x0;
-    goto L_8020DF40;
-L_8020DF20: ;
-    r0 = r4 & 0xFF;
-    if ((u32)r0 < (u32)0x4) goto L_8020DF34;
-    r4 = 0x0;
-    goto L_8020DF40;
-L_8020DF34: ;
-    /* clrlslwi r4, r4, 24, 3 */;
-    r4 = r4 + 0x18;
-    r4 = r3 + r4;
-L_8020DF40: ;
-    if ((u32)r4 == (u32)0x0) return;
-    *(u32*)((u8*)r4 + 0x4) = r5;
-    return;
+/* fn_8020DF10 | Size: 0x40 | Write u32 to slot in 8-byte array at offset 0x18 */
+void fn_8020DF10(u8* base, u8 slot, u32 value) {
+    u8* entry;
+    if (base == NULL) {
+        entry = NULL;
+    } else if (slot >= 4) {
+        entry = NULL;
+    } else {
+        entry = base + (u32)slot * 8 + 0x18;
+    }
+    if (entry == NULL) {
+        return;
+    }
+    *(u32*)(entry + 0x4) = value;
 }
-#pragma pop
 
-/* 0x8020DF50 | size: 0x40 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020DF50(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    if ((u32)r3 != (u32)0x0) goto L_8020DF60;
-    r4 = 0x0;
-    goto L_8020DF80;
-L_8020DF60: ;
-    r0 = r4 & 0xFF;
-    if ((u32)r0 < (u32)0x4) goto L_8020DF74;
-    r4 = 0x0;
-    goto L_8020DF80;
-L_8020DF74: ;
-    /* clrlslwi r4, r4, 24, 3 */;
-    r4 = r4 + 0x18;
-    r4 = r3 + r4;
-L_8020DF80: ;
-    if ((u32)r4 == (u32)0x0) return;
-    *(u16*)((u8*)r4 + 0x0) = r5;
-    return;
+/* fn_8020DF50 | Size: 0x40 | Write u16 to slot in 8-byte array at offset 0x18 */
+void fn_8020DF50(u8* base, u8 slot, u16 value) {
+    u8* entry;
+    if (base == NULL) {
+        entry = NULL;
+    } else if (slot >= 4) {
+        entry = NULL;
+    } else {
+        entry = base + (u32)slot * 8 + 0x18;
+    }
+    if (entry == NULL) {
+        return;
+    }
+    *(u16*)(entry) = value;
 }
-#pragma pop
 
 /* 0x8020E020 | size: 0x48 | small */
 #pragma push
