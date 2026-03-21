@@ -28942,70 +28942,24 @@ void fn_8023881C(void* ctx, u32 param1, u32 param2, u32 param3) {
 #pragma pop
 
 /* Address: 0x8023892C | Size: 0x54 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8023892C(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    extern void fn_80203E7C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    fn_80203E7C();
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    extern u32 fn_801FB1C0();
+    extern u32 fn_80203E7C();
+    u32 val;
+    val = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, val, 0x2, 0);
+    return fn_80203E7C(slot);
 }
-#pragma pop
 
 /* Address: 0x80238980 | Size: 0x54 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80238980(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    extern void fn_80203DAC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    fn_80203DAC();
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    extern u32 fn_801FB1C0();
+    extern u32 fn_80203DAC();
+    u32 val;
+    val = fn_801FB1C0(ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, val, 0x2, 0);
+    return fn_80203DAC(slot);
 }
-#pragma pop
 
 /* Address: 0x802389D4 | Size: 0x138 (312 bytes) */
 #pragma push
