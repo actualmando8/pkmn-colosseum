@@ -4495,18 +4495,12 @@ void fn_80135AD0(void) {
 }
 
 /* 0x80135AEC | 0x20 */
-void fn_80135AEC(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    if ((u32)r3 == (u32)0x0) return;
-    if ((u32)r4 != (u32)0x0) goto L_80135B00;
-    return;
-L_80135B00: ;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    *(u32*)((u8*)r3 + 0x0) = r0;
-    return;
+/* Copy the first u32 from src to dst, if both are non-NULL. */
+void fn_80135AEC(u32* dst, u32* src) {
+    if (dst == NULL || src == NULL) {
+        return;
+    }
+    *dst = *src;
 }
 
 /* 0x80135B0C | 16 bytes | nc_bnelr */
@@ -4888,108 +4882,68 @@ L_80135F74: ;
 }
 
 /* 0x80135F90 | 0x2C */
-void fn_80135F90(void) {
+/* Get the u16 at offset 0x4 in an effect table entry (stride 0xA). */
+u32 fn_80135F90(u32 index) {
     extern u8 lbl_80363B18[];
     extern u8 lbl_80478B88[];
-    u32 r0 = 0;
-    u32 r3 = 0;
 
-    r0 = *(u32*)lbl_80478B88;
-    if ((u32)r3 <= (u32)r0) goto L_80135FA4;
-    r3 = 0x0;
-    return;
-L_80135FA4: ;
-    r0 = r3 * 0xa;
-    r3 = (u32)lbl_80363B18;
-    r3 = (u32)lbl_80363B18;
-    r3 = r3 + r0;
-    r3 = *(u16*)((u8*)r3 + 0x4);
-    return;
+    if (index > *(u32*)lbl_80478B88) {
+        return 0;
+    }
+    return *(u16*)(lbl_80363B18 + index * 0xA + 0x4);
 }
 
-/* 0x80135FBC | 0x3C */
-void fn_80135FBC(void) {
+/* 0x80135FBC | 0x3C
+ * Get a s16 value from the effect table at offset 0x6 + subIndex*2.
+ * Returns 0 if index or subIndex is out of range.
+ */
+s32 fn_80135FBC(u32 index, u32 subIndex) {
     extern u8 lbl_80363B18[];
     extern u8 lbl_80478B88[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
 
-    r0 = *(u32*)lbl_80478B88;
-    if ((u32)r3 > (u32)r0) goto L_80135FD0;
-    if ((u32)r4 <= (u32)0x2) goto L_80135FD8;
-L_80135FD0: ;
-    r3 = 0x0;
-    return;
-L_80135FD8: ;
-    r3 = r3 * 0xa;
-    r5 = (u32)lbl_80363B18;
-    r0 = r4 << 1;
-    r4 = (u32)lbl_80363B18;
-    r3 = r4 + r3;
-    r3 = r3 + r0;
-    r3 = *(s16*)((u8*)r3 + 0x6);
-    return;
+    if (index > *(u32*)lbl_80478B88 || subIndex > 2) {
+        return 0;
+    }
+    return *(s16*)(lbl_80363B18 + index * 0xA + subIndex * 2 + 0x6);
 }
 
-/* 0x80135FF8 | 0x2C */
-void fn_80135FF8(void) {
+/* 0x80135FF8 | 0x2C
+ * Get the u8 at offset 0x1 in an effect table entry (stride 0xA).
+ */
+u32 fn_80135FF8(u32 index) {
     extern u8 lbl_80363B18[];
     extern u8 lbl_80478B88[];
-    u32 r0 = 0;
-    u32 r3 = 0;
 
-    r0 = *(u32*)lbl_80478B88;
-    if ((u32)r3 <= (u32)r0) goto L_8013600C;
-    r3 = 0x0;
-    return;
-L_8013600C: ;
-    r0 = r3 * 0xa;
-    r3 = (u32)lbl_80363B18;
-    r3 = (u32)lbl_80363B18;
-    r3 = r3 + r0;
-    r3 = *(u8*)((u8*)r3 + 0x1);
-    return;
+    if (index > *(u32*)lbl_80478B88) {
+        return 0;
+    }
+    return *(u8*)(lbl_80363B18 + index * 0xA + 0x1);
 }
 
-/* 0x80136024 | 0x2C */
-void fn_80136024(void) {
+/* 0x80136024 | 0x2C
+ * Get the u16 at offset 0x2 in an effect table entry (stride 0xA).
+ */
+u32 fn_80136024(u32 index) {
     extern u8 lbl_80363B18[];
     extern u8 lbl_80478B88[];
-    u32 r0 = 0;
-    u32 r3 = 0;
 
-    r0 = *(u32*)lbl_80478B88;
-    if ((u32)r3 <= (u32)r0) goto L_80136038;
-    r3 = 0x0;
-    return;
-L_80136038: ;
-    r0 = r3 * 0xa;
-    r3 = (u32)lbl_80363B18;
-    r3 = (u32)lbl_80363B18;
-    r3 = r3 + r0;
-    r3 = *(u16*)((u8*)r3 + 0x2);
-    return;
+    if (index > *(u32*)lbl_80478B88) {
+        return 0;
+    }
+    return *(u16*)(lbl_80363B18 + index * 0xA + 0x2);
 }
 
-/* 0x80136050 | 0x28 */
-void fn_80136050(void) {
+/* 0x80136050 | 0x28
+ * Get the u8 at offset 0x0 in an effect table entry (stride 0xA).
+ */
+u32 fn_80136050(u32 index) {
     extern u8 lbl_80363B18[];
     extern u8 lbl_80478B88[];
-    u32 r0 = 0;
-    u32 r3 = 0;
 
-    r0 = *(u32*)lbl_80478B88;
-    if ((u32)r3 <= (u32)r0) goto L_80136064;
-    r3 = 0x0;
-    return;
-L_80136064: ;
-    r0 = r3 * 0xa;
-    r3 = (u32)lbl_80363B18;
-    r3 = (u32)lbl_80363B18;
-    r3 = *(u8*)(r3 + r0);
-    return;
+    if (index > *(u32*)lbl_80478B88) {
+        return 0;
+    }
+    return *(u8*)(lbl_80363B18 + index * 0xA);
 }
 
 /* 0x80136078 | 0xC4 */

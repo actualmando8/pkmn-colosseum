@@ -2963,42 +2963,28 @@ L_801E1D04:
 }
 
 /* 0x801E1D0C | size: 0x3C | small */
+/* Cancel the battle thread if it is active. */
 void fn_801E1D0C(void) {
     extern u8 lbl_8046A040[];
     extern u8 lbl_8047B460[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
 
-    tmp = *(u32*)lbl_8047B460;
-    if ((s32)tmp == 0) goto L_801E1D38;
-    r3 = (u32)lbl_8046A040;
-    r3 = (u32)lbl_8046A040;
-    OSCancelThread();
-    tmp = 0x0;
-    *(u32*)lbl_8047B460 = tmp;
-L_801E1D38:
-    return;
+    if (*(s32*)lbl_8047B460 != 0) {
+        OSCancelThread((void*)lbl_8046A040);
+        *(u32*)lbl_8047B460 = 0;
+    }
 }
 
-/* 0x801E1D48 | size: 0x34 | small */
+/* 0x801E1D48 | size: 0x34
+ * Resume the battle thread if it is active.
+ */
 void fn_801E1D48(void) {
     extern u8 lbl_8046A040[];
     extern u8 lbl_8047B460[];
-    extern void fn_800A1F94();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
+    extern void fn_800A1F94(void* thread);
 
-    tmp = *(u32*)lbl_8047B460;
-    if ((s32)tmp == 0) goto L_801E1D6C;
-    r3 = (u32)lbl_8046A040;
-    r3 = (u32)lbl_8046A040;
-    fn_800A1F94();
-L_801E1D6C:
-    return;
+    if (*(s32*)lbl_8047B460 != 0) {
+        fn_800A1F94((void*)lbl_8046A040);
+    }
 }
 
 /* 0x801E1D7C | size: 0xA0 | medium */
@@ -6447,42 +6433,28 @@ L_801E4D9C:
 }
 
 /* 0x801E4DAC | size: 0x3C | small */
+/* Cancel battle sub-thread 2 if active. */
 void fn_801E4DAC(void) {
     extern u8 lbl_8046BE78[];
     extern u8 lbl_8047B480[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
 
-    tmp = *(u32*)lbl_8047B480;
-    if ((s32)tmp == 0) goto L_801E4DD8;
-    r3 = (u32)lbl_8046BE78;
-    r3 = (u32)lbl_8046BE78;
-    OSCancelThread();
-    tmp = 0x0;
-    *(u32*)lbl_8047B480 = tmp;
-L_801E4DD8:
-    return;
+    if (*(s32*)lbl_8047B480 != 0) {
+        OSCancelThread((void*)lbl_8046BE78);
+        *(u32*)lbl_8047B480 = 0;
+    }
 }
 
-/* 0x801E4DE8 | size: 0x34 | small */
+/* 0x801E4DE8 | size: 0x34
+ * Resume battle sub-thread 2 if active.
+ */
 void fn_801E4DE8(void) {
     extern u8 lbl_8046BE78[];
     extern u8 lbl_8047B480[];
-    extern void fn_800A1F94();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
+    extern void fn_800A1F94(void* thread);
 
-    tmp = *(u32*)lbl_8047B480;
-    if ((s32)tmp == 0) goto L_801E4E0C;
-    r3 = (u32)lbl_8046BE78;
-    r3 = (u32)lbl_8046BE78;
-    fn_800A1F94();
-L_801E4E0C:
-    return;
+    if (*(s32*)lbl_8047B480 != 0) {
+        fn_800A1F94((void*)lbl_8046BE78);
+    }
 }
 
 /* 0x801E4E1C | size: 0xD4 | medium */
@@ -6941,42 +6913,28 @@ L_801E53F4:
 }
 
 /* 0x801E5400 | size: 0x3C | small */
+/* Cancel battle sub-thread 3 if active. */
 void fn_801E5400(void) {
     extern u8 lbl_8046D1E8[];
     extern u8 lbl_8047B488[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
 
-    tmp = *(u32*)lbl_8047B488;
-    if ((s32)tmp == 0) goto L_801E542C;
-    r3 = (u32)lbl_8046D1E8;
-    r3 = (u32)lbl_8046D1E8;
-    OSCancelThread();
-    tmp = 0x0;
-    *(u32*)lbl_8047B488 = tmp;
-L_801E542C:
-    return;
+    if (*(s32*)lbl_8047B488 != 0) {
+        OSCancelThread((void*)lbl_8046D1E8);
+        *(u32*)lbl_8047B488 = 0;
+    }
 }
 
-/* 0x801E543C | size: 0x34 | small */
+/* 0x801E543C | size: 0x34
+ * Resume battle sub-thread 3 if active.
+ */
 void fn_801E543C(void) {
     extern u8 lbl_8046D1E8[];
     extern u8 lbl_8047B488[];
-    extern void fn_800A1F94();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
+    extern void fn_800A1F94(void* thread);
 
-    tmp = *(u32*)lbl_8047B488;
-    if ((s32)tmp == 0) goto L_801E5460;
-    r3 = (u32)lbl_8046D1E8;
-    r3 = (u32)lbl_8046D1E8;
-    fn_800A1F94();
-L_801E5460:
-    return;
+    if (*(s32*)lbl_8047B488 != 0) {
+        fn_800A1F94((void*)lbl_8046D1E8);
+    }
 }
 
 /* 0x801E5470 | size: 0xD8 | medium */
@@ -14613,20 +14571,15 @@ L_801ED204:
     return;
 }
 
-/* 0x801ED218 | size: 0x34 | small */
-void fn_801ED218(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    if (r3 != 0) goto L_801ED238;
-    r3 = 0x0;
-    r4 = 0xb;
-    ((void(*)(void))fn_80129280)();
-L_801ED238:
-    r3 = *(u8*)((u8*)r3 + 0x0);
-    return;
+/* 0x801ED218 | size: 0x34
+ * Get the type byte from a pokemon data structure.
+ * If ptr is NULL, calls fn_80129280 to get a default.
+ */
+u32 fn_801ED218(u8* data) {
+    if (data == NULL) {
+        data = (u8*)fn_80129280(0, 0xB);
+    }
+    return *(u8*)(data + 0x0);
 }
 
 /* 0x801ED24C | size: 0x48 | small */
@@ -14673,20 +14626,15 @@ L_801ED2CC:
     return;
 }
 
-/* 0x801ED2DC | size: 0x34 | small */
-void fn_801ED2DC(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    if (r3 != 0) goto L_801ED2FC;
-    r3 = 0x0;
-    r4 = 0xb;
-    ((void(*)(void))fn_80129280)();
-L_801ED2FC:
-    r3 = r3 + 0x8;
-    return;
+/* 0x801ED2DC | size: 0x34
+ * Get a pointer to the name field (offset 0x8) of a pokemon data structure.
+ * If ptr is NULL, calls fn_80129280 to get a default.
+ */
+u8* fn_801ED2DC(u8* data) {
+    if (data == NULL) {
+        data = (u8*)fn_80129280(0, 0xB);
+    }
+    return data + 0x8;
 }
 
 /* 0x801ED310 | size: 0x78 | small */
@@ -15860,22 +15808,18 @@ L_801EE42C:
     return;
 }
 
-/* 0x801EE440 | size: 0x28 | small */
-void fn_801EE440(void) {
+/* 0x801EE440 | size: 0x28
+ * Look up a value in the type effectiveness table.
+ * Returns 0 if index > 0x30, otherwise returns the u16 at that offset.
+ */
+u32 fn_801EE440(u32 index) {
     extern u8 lbl_80375240[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
 
-    tmp = r3 & 0xFFFF;
-    if (tmp <= 0x30) goto L_801EE454;
-    r3 = 0x0;
-    return;
-L_801EE454:
-    r4 = (u32)lbl_80375240;
-    r3 = (u32)lbl_80375240;
-    r3 = *(u16*)(r3 + tmp);
-    return;
+    index = index & 0xFFFF;
+    if (index > 0x30) {
+        return 0;
+    }
+    return *(u16*)(lbl_80375240 + index);
 }
 
 /* 0x801EE470 | size: 0x6C | small */

@@ -546,7 +546,7 @@ void fn_800FF2A0(void);
 void fn_800FF3C0(void);
 void fn_800FF4D4(void);
 void fn_800FF52C(void);
-void fn_800FF56C(void);
+u32 fn_800FF56C(void);
 void fn_800FF58C(void);
 void fn_800FF660(void);
 void fn_800FF730(u32 arg1, u32 arg2, u32 arg3, u32 arg4);
@@ -915,18 +915,14 @@ u32 fn_800FF560(void) {
 }
 
 /* 0x800FF56C | 0x20 */
-void fn_800FF56C(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    r3 = *(u32*)&lbl_8047ACC8;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if (r3 == 0) goto L_800FF584;
-    r3 = *(u32*)((u8*)r3 + 0xC);
-    return;
-L_800FF584:
-    r3 = 0x0;
-    return;
+/* Get the floor resource count from the current floor data. Returns 0 if none. */
+u32 fn_800FF56C(void) {
+    u8* floorData = (u8*)*(u32*)&lbl_8047ACC8;
+    u8* ptr = (u8*)*(u32*)(floorData + 0x0);
+    if (ptr == NULL) {
+        return 0;
+    }
+    return *(u32*)(ptr + 0xC);
 }
 
 /* 0x800FF58C | 0xD4 */

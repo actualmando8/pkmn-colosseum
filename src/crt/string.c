@@ -258,17 +258,14 @@ L_800CAA0C:
     return;
 }
 
-/* fn_800CAA3C - 0x800CAA3C | size: 0x1C */
-void fn_800CAA3C(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-L_800CAA44:
-    tmp = *(u16*)((u8*)r4 + 0x2);
-    /* sthu tmp, 0x2(r5) */;
-    if (tmp != 0) goto L_800CAA44;
-    return;
+/* fn_800CAA3C - 0x800CAA3C | size: 0x1C
+ * wcscpy - Copy a wide character string from src to dst.
+ */
+void fn_800CAA3C(u16* dst, const u16* src) {
+    do {
+        src++;
+        dst++;
+        *dst = *src;
+    } while (*src != 0);
 }
 

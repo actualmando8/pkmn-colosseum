@@ -1013,22 +1013,17 @@ L_80011E48:
 }
 
 /* 0x80011E68 | 0x3C */
-void fn_80011E68(void) {
-    extern void fn_80103FE4();
-    extern void fn_80104704();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+/* Set an NPC's facing direction. */
+void fn_80011E68(u32 npcId, u16 direction) {
+    extern void* fn_80103FE4(void* obj);
+    extern void* fn_80104704(u32 npcId);
+    void* npc;
 
-    r31 = r4;
-    fn_80104704();
-    if (r3 == 0) goto L_80011E90;
-    fn_80103FE4();
-    *(u16*)((u8*)r3 + 0x1A) = r31;
-L_80011E90:
-    return;
+    npc = fn_80104704(npcId);
+    if (npc != NULL) {
+        u8* obj = (u8*)fn_80103FE4(npc);
+        *(u16*)(obj + 0x1A) = direction;
+    }
 }
 
 /* 0x80011EA4 | 0x9B4 -- GSnpc_WarpToLocation continued */

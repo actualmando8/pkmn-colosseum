@@ -7189,90 +7189,72 @@ void fn_800F62BC(void) {
 }
 
 
-/* fn_800F668C - 0x800F668C | size: 0x80 */
-void fn_800F668C(void) {
+/* fn_800F668C - 0x800F668C | size: 0x80
+ * GSthreadReadNextBytecode - Read the next bytecode value from the
+ * script's instruction pointer and push it onto the stack.
+ * thread+0x14 = instruction pointer, thread+0x28 = stack count,
+ * stack data starts at thread+0x6C.
+ */
+u32 fn_800F668C(u8* thread) {
     extern u8 lbl_80271068[];
-    extern void fn_800DD38C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    extern void fn_800DD38C(const char* msg);
+    u32* ip;
+    u32 value;
+    s32 stackCount;
 
-    
-    r31 = r3;
-    r3 = *(u32*)((u8*)r3 + 0x14);
-    r0 = r3 + 0x1;
-    *(u32*)((u8*)r31 + 0x14) = r0;
-    r4 = *(u32*)((u8*)r31 + 0x28);
-    r3 = *(u32*)((u8*)r31 + 0x14);
-    r5 = *(u32*)((u8*)r3 + 0x0);
-    if ((s32)r4 <= (s32)0x40) goto L_800F66D4;
-    r3 = (u32)lbl_80271068;
-    r3 = (u32)lbl_80271068;
-    /* crclr cr1eq */;
-    fn_800DD38C();
-    goto L_800F66E8;
-    L_800F66D4: ;
-    r3 = r4 + 0x1;
-    r0 = r4 << 2;
-    *(u32*)((u8*)r31 + 0x28) = r3;
-    r3 = r31 + r0;
-    *(u32*)((u8*)r3 + 0x6C) = r5;
-    L_800F66E8: ;
-    r4 = *(u32*)((u8*)r31 + 0x14);
-    r3 = 0x1;
-    r0 = r4 + 0x4;
-    *(u32*)((u8*)r31 + 0x14) = r0;
-    return;
+    /* Read value from instruction stream and advance IP */
+    ip = (u32*)*(u32*)(thread + 0x14);
+    *(u32*)(thread + 0x14) = (u32)(ip + 1);
+
+    value = *ip;
+    stackCount = *(s32*)(thread + 0x28);
+
+    if (stackCount > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(thread + 0x28) = stackCount + 1;
+        *(u32*)(thread + 0x6C + stackCount * 4) = value;
+    }
+
+    /* Advance IP by another 4 bytes (skip operand) */
+    *(u32*)(thread + 0x14) = *(u32*)(thread + 0x14) + 4;
+    return 1;
 }
 
 
-/* fn_800F670C - 0x800F670C | size: 0xA0 */
-void fn_800F670C(void) {
+/* fn_800F670C - 0x800F670C | size: 0xA0
+ * GSthreadBranchIfZero - Pop the stack and branch if zero.
+ * If the popped value is nonzero, skip the branch offset (IP += 4).
+ * If zero, read the branch offset and compute the new IP.
+ */
+u32 fn_800F670C(u8* thread) {
     extern u8 lbl_8027107C[];
-    extern void fn_800DD38C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+    extern void fn_800DD38C(const char* msg);
+    s32 stackCount;
+    u32 value;
 
-    
-    r31 = r3;
-    r3 = *(u32*)((u8*)r3 + 0x28);
-    if ((s32)r3 > (s32)0x0) goto L_800F6748;
-    r3 = (u32)lbl_8027107C;
-    r3 = (u32)lbl_8027107C;
-    /* crclr cr1eq */;
-    fn_800DD38C();
-    r0 = *(u32*)((u8*)r31 + 0x6C);
-    *(u32*)(sp + 0x8) = r0;
-    goto L_800F6760;
-    L_800F6748: ;
-    /* subi r3, r3, 0x1 */;
-    r0 = r3 << 2;
-    *(u32*)((u8*)r31 + 0x28) = r3;
-    r3 = r31 + r0;
-    r0 = *(u32*)((u8*)r3 + 0x6C);
-    *(u32*)(sp + 0x8) = r0;
-    L_800F6760: ;
-    *(u32*)(sp + 0xC) = r0;
-    if ((s32)r0 == (s32)0x0) goto L_800F6780;
-    r3 = *(u32*)((u8*)r31 + 0x14);
-    r0 = r3 + 0x4;
-    *(u32*)((u8*)r31 + 0x14) = r0;
-    goto L_800F6794;
-    L_800F6780: ;
-    r3 = *(u32*)((u8*)r31 + 0x14);
-    r4 = *(u32*)((u8*)r31 + 0x0);
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    r0 = r4 + r0;
-    *(u32*)((u8*)r31 + 0x14) = r0;
-    L_800F6794: ;
-    r3 = 0x1;
-    return;
+    stackCount = *(s32*)(thread + 0x28);
+
+    if (stackCount <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        value = *(u32*)(thread + 0x6C);
+    } else {
+        stackCount--;
+        *(u32*)(thread + 0x28) = (u32)stackCount;
+        value = *(u32*)(thread + 0x6C + stackCount * 4);
+    }
+
+    if (value != 0) {
+        /* Skip the branch offset operand */
+        *(u32*)(thread + 0x14) = *(u32*)(thread + 0x14) + 4;
+    } else {
+        /* Read offset and compute target address */
+        u32 ip = *(u32*)(thread + 0x14);
+        u32 base = *(u32*)(thread + 0x0);
+        u32 offset = *(u32*)ip;
+        *(u32*)(thread + 0x14) = base + offset;
+    }
+    return 1;
 }
 
 
@@ -7494,48 +7476,36 @@ void fn_800F694C(void) {
 }
 
 
-/* fn_800F6AB4 - 0x800F6AB4 | size: 0xA0 */
-void fn_800F6AB4(void) {
+/* fn_800F6AB4 - 0x800F6AB4 | size: 0xA0
+ * GSthreadPopN - Pop N values from the thread's stack.
+ * Reads a 1-byte skip, then a 16-bit count from the instruction
+ * stream, and decrements the stack count that many times.
+ */
+u32 fn_800F6AB4(u8* thread) {
     extern u8 lbl_8027107C[];
-    extern void fn_800DD38C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_800DD38C(const char* msg);
+    u32 ip;
+    u16 popCount;
+    s32 i;
 
-    
-    r29 = 0x0;
-    r28 = r3;
-    r3 = (u32)lbl_8027107C;
-    r4 = *(u32*)((u8*)r28 + 0x14);
-    r31 = (u32)lbl_8027107C;
-    r0 = r4 + 0x1;
-    *(u32*)((u8*)r28 + 0x14) = r0;
-    r3 = *(u32*)((u8*)r28 + 0x14);
-    r30 = *(u16*)((u8*)r3 + 0x0);
-    r0 = r3 + 0x2;
-    *(u32*)((u8*)r28 + 0x14) = r0;
-    goto L_800F6B28;
-    L_800F6B00: ;
-    r3 = *(u32*)((u8*)r28 + 0x28);
-    if ((s32)r3 > (s32)0x0) goto L_800F6B1C;
-    r3 = r31;
-    /* crclr cr1eq */;
-    fn_800DD38C();
-    goto L_800F6B24;
-    L_800F6B1C: ;
-    /* subi r0, r3, 0x1 */;
-    *(u32*)((u8*)r28 + 0x28) = r0;
-    L_800F6B24: ;
-    r29 = r29 + 0x1;
-    L_800F6B28: ;
-    if ((s32)r29 < (s32)r30) goto L_800F6B00;
-    r3 = 0x1;
-    return;
+    /* Skip one byte */
+    ip = *(u32*)(thread + 0x14);
+    *(u32*)(thread + 0x14) = ip + 1;
+
+    /* Read 16-bit pop count */
+    ip = *(u32*)(thread + 0x14);
+    popCount = *(u16*)ip;
+    *(u32*)(thread + 0x14) = ip + 2;
+
+    for (i = 0; i < (s32)popCount; i++) {
+        s32 count = *(s32*)(thread + 0x28);
+        if (count <= 0) {
+            fn_800DD38C((const char*)lbl_8027107C);
+        } else {
+            *(u32*)(thread + 0x28) = (u32)(count - 1);
+        }
+    }
+    return 1;
 }
 
 

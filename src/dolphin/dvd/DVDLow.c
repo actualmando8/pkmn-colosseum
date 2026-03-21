@@ -195,43 +195,33 @@ void __DVDLowSetWAType(u32 type, u32 location) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800A41D0 - 0x800A41D0 | size: 0x84 */
+/* fn_800A41D0 - 0x800A41D0 | size: 0x84
+ * DVDLowProcessNextCommand - Execute the next command in the command list.
+ * Command type 1 = read (fn_800A42C4), type 2 = seek (fn_800A46EC).
+ * Advances NextCommandNumber after processing.
+ */
 void fn_800A41D0(void) {
-    extern void fn_800A42C4();
-    extern void fn_800A46EC();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
+    extern void fn_800A42C4(u32 cmd, u32 addr, u32 len, u32 offset);
+    extern void fn_800A46EC(u32 addr, u32 offset);
+    u8* cmdList = (u8*)(u32)CommandList_803FC290;
+    u32 idx;
+    u32 offset;
+    u8* cmd;
+    s32 cmdType;
 
-    r3 = (u32)CommandList_803FC290;
-    r4 = (u32)CommandList_803FC290;
-    tmp = *(u32*)NextCommandNumber_8047A7C4;
-    tmp = tmp * 0x14;
-    r3 = *(u32*)(r4 + tmp);
-    if ((s32)r3 != 1) goto L_800A4220;
-    r3 = *(u32*)NextCommandNumber_8047A7C4;
-    r6 = r4 + tmp;
-    tmp = r3 + 0x1;
-    *(u32*)NextCommandNumber_8047A7C4 = tmp;
-    r3 = *(u32*)((u8*)r6 + 0x4);
-    r4 = *(u32*)((u8*)r6 + 0x8);
-    r5 = *(u32*)((u8*)r6 + 0xC);
-    r6 = *(u32*)((u8*)r6 + 0x10);
-    fn_800A42C4();
-    goto L_800A4244;
-L_800A4220:
-    if ((s32)r3 != 2) goto L_800A4244;
-    r3 = *(u32*)NextCommandNumber_8047A7C4;
-    r4 = r4 + tmp;
-    tmp = r3 + 0x1;
-    *(u32*)NextCommandNumber_8047A7C4 = tmp;
-    r3 = *(u32*)((u8*)r4 + 0xC);
-    r4 = *(u32*)((u8*)r4 + 0x10);
-    fn_800A46EC();
-L_800A4244:
-    return;
+    idx = *(u32*)&NextCommandNumber_8047A7C4;
+    offset = idx * 0x14;
+    cmd = cmdList + offset;
+    cmdType = *(s32*)(cmd);
+
+    if (cmdType == 1) {
+        *(u32*)&NextCommandNumber_8047A7C4 = idx + 1;
+        fn_800A42C4(*(u32*)(cmd + 0x4), *(u32*)(cmd + 0x8),
+                     *(u32*)(cmd + 0xC), *(u32*)(cmd + 0x10));
+    } else if (cmdType == 2) {
+        *(u32*)&NextCommandNumber_8047A7C4 = idx + 1;
+        fn_800A46EC(*(u32*)(cmd + 0xC), *(u32*)(cmd + 0x10));
+    }
 }
 
 /* fn_800A42C4 - 0x800A42C4 | size: 0x110 */
@@ -309,47 +299,37 @@ L_800A43B4:
     return;
 }
 
-/* fn_800A43D4 - 0x800A43D4 | size: 0x80 */
-void fn_800A43D4(void) {
-    extern void fn_800A46EC();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
+/* fn_800A43D4 - 0x800A43D4 | size: 0x80
+ * DVDLowSeekRead - Set up a seek command in the command list and execute it.
+ * Computes the seek location based on address alignment.
+ */
+void fn_800A43D4(u32 cmd, u32 addr, u32 length, u32 offset) {
+    extern void fn_800A46EC(u32 seekAddr, u32 offset);
+    u8* cmdList = (u8*)(u32)CommandList_803FC290;
+    u32 seekAddr;
+    u32 alignedLen;
 
-    r7 = (u32)CommandList_803FC290;
-    /* clrrwi. r8, r5, 15 */;
-    r9 = (u32)CommandList_803FC290;
-    if ((s32)tmp != 0) goto L_800A43F8;
-    r10 = 0x0;
-    goto L_800A4400;
-L_800A43F8:
-    tmp = *(u32*)WorkAroundSeekLocation_8047A7A8;
-    r10 = r8 + tmp;
-L_800A4400:
-    tmp = 0x2;
-    *(u32*)((u8*)r9 + 0x0) = tmp;
-    r8 = 0x1;
-    r7 = -0x1;
-    *(u32*)((u8*)r9 + 0xC) = r10;
-    tmp = 0x0;
-    *(u32*)((u8*)r9 + 0x10) = r6;
-    *(u32*)((u8*)r9 + 0x14) = r8;
-    *(u32*)((u8*)r9 + 0x18) = r3;
-    r3 = r10;
-    *(u32*)((u8*)r9 + 0x1C) = r4;
-    r4 = r6;
-    *(u32*)((u8*)r9 + 0x20) = r5;
-    *(u32*)((u8*)r9 + 0x24) = r6;
-    *(u32*)((u8*)r9 + 0x28) = r7;
-    *(u32*)NextCommandNumber_8047A7C4 = tmp;
-    fn_800A46EC();
-    return;
+    /* If length is page-aligned (lower 15 bits clear), compute seek address */
+    alignedLen = length & ~0x7FFF;
+    if (alignedLen != 0) {
+        seekAddr = alignedLen + *(u32*)&WorkAroundSeekLocation_8047A7A8;
+    } else {
+        seekAddr = 0;
+    }
+
+    /* Fill in the command entry */
+    *(u32*)(cmdList + 0x0) = 2;      /* command type: seek */
+    *(u32*)(cmdList + 0xC) = seekAddr;
+    *(u32*)(cmdList + 0x10) = offset;
+    *(u32*)(cmdList + 0x14) = 1;
+    *(u32*)(cmdList + 0x18) = cmd;
+    *(u32*)(cmdList + 0x1C) = addr;
+    *(u32*)(cmdList + 0x20) = length;
+    *(u32*)(cmdList + 0x24) = offset;
+    *(u32*)(cmdList + 0x28) = (u32)-1;
+    *(u32*)&NextCommandNumber_8047A7C4 = 0;
+
+    fn_800A46EC(seekAddr, offset);
 }
 
 /* fn_800A4454 - 0x800A4454 | size: 0x298 */

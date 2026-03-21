@@ -350,22 +350,14 @@ L_8019B73C:
 }
 
 /* 0x8019B750 | 0x34 */
-void fn_8019B750(void) {
+/* hsdFogRegister - Add a fog object to the fog list if non-NULL. */
+void fn_8019B750(void* fogObj) {
     extern u8 lbl_80465378[];
-    extern void fn_801AA498();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+    extern void fn_801AA498(u8* list, void* obj);
 
-    if (r3 == 0) goto L_8019B774;
-    r5 = (u32)lbl_80465378;
-    r4 = r3;
-    r3 = (u32)lbl_80465378;
-    fn_801AA498();
-L_8019B774:
-    return;
+    if (fogObj != NULL) {
+        fn_801AA498(lbl_80465378, fogObj);
+    }
 }
 
 /* 0x8019B784 | 0x30 */
