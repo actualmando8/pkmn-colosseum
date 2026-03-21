@@ -395,69 +395,42 @@ L_80191344:
 }
 
 /* 0x80191358 | 0x108 */
-void fn_80191358(void) {
-    extern void fn_800E0168();
-    extern void fn_800E01F4();
-    u8 sp[0x40];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
+/*
+ * BoundsExpandPoint - Expand an axis-aligned bounding box to include a point.
+ *
+ * If the 'first' flag (offset 0x01) is set, initializes both min and max
+ * to the point coordinates. Otherwise, expands the existing min/max.
+ * Then recomputes the center (offset 0x28) from the updated bounds.
+ *
+ * Bounding box layout:
+ *   +0x10: min (x, y, z)
+ *   +0x1C: max (x, y, z)
+ *   +0x28: center (computed)
+ *
+ * 0x80191358 | size: 0x108
+ */
+void fn_80191358(u8* bbox, f32 x, f32 y, f32 z) {
+    extern void fn_800E0168(f32* center, f32* max, f32* min);
+    extern void fn_800E01F4(f32* vec, f32 x, f32 y, f32 z);
 
-    r31 = r3;
-    f29 = f1;
-    tmp = *(u8*)((u8*)r3 + 0x1);
-    f30 = f2;
-    f31 = f3;
-    if (tmp == 0) goto L_801913C4;
-    tmp = 0x0;
-    r3 = r31 + 0x10;
-    *(u8*)((u8*)r31 + 0x1) = tmp;
-    fn_800E01F4();
-    f1 = f29;
-    r3 = r31 + 0x1c;
-    f2 = f30;
-    f3 = f31;
-    fn_800E01F4();
-    goto L_80191424;
-L_801913C4:
-    f0 = *(f32*)((u8*)r31 + 0x10);
-    if (f29 >= f0) goto L_801913D4;
-    *(f32*)((u8*)r31 + 0x10) = f29;
-L_801913D4:
-    f0 = *(f32*)((u8*)r31 + 0x14);
-    if (f30 >= f0) goto L_801913E4;
-    *(f32*)((u8*)r31 + 0x14) = f30;
-L_801913E4:
-    f0 = *(f32*)((u8*)r31 + 0x18);
-    if (f31 >= f0) goto L_801913F4;
-    *(f32*)((u8*)r31 + 0x18) = f31;
-L_801913F4:
-    f0 = *(f32*)((u8*)r31 + 0x1C);
-    if (f29 <= f0) goto L_80191404;
-    *(f32*)((u8*)r31 + 0x1C) = f29;
-L_80191404:
-    f0 = *(f32*)((u8*)r31 + 0x20);
-    if (f30 <= f0) goto L_80191414;
-    *(f32*)((u8*)r31 + 0x20) = f30;
-L_80191414:
-    f0 = *(f32*)((u8*)r31 + 0x24);
-    if (f31 <= f0) goto L_80191424;
-    *(f32*)((u8*)r31 + 0x24) = f31;
-L_80191424:
-    r3 = r31 + 0x28;
-    r4 = r31 + 0x1c;
-    r5 = r31 + 0x10;
-    fn_800E0168();
-    return;
+    if (*(u8*)(bbox + 0x01) != 0) {
+        /* First point: initialize both min and max */
+        *(u8*)(bbox + 0x01) = 0;
+        fn_800E01F4((f32*)(bbox + 0x10), x, y, z);
+        fn_800E01F4((f32*)(bbox + 0x1C), x, y, z);
+    } else {
+        /* Expand min bounds */
+        if (x < *(f32*)(bbox + 0x10)) { *(f32*)(bbox + 0x10) = x; }
+        if (y < *(f32*)(bbox + 0x14)) { *(f32*)(bbox + 0x14) = y; }
+        if (z < *(f32*)(bbox + 0x18)) { *(f32*)(bbox + 0x18) = z; }
+        /* Expand max bounds */
+        if (x > *(f32*)(bbox + 0x1C)) { *(f32*)(bbox + 0x1C) = x; }
+        if (y > *(f32*)(bbox + 0x20)) { *(f32*)(bbox + 0x20) = y; }
+        if (z > *(f32*)(bbox + 0x24)) { *(f32*)(bbox + 0x24) = z; }
+    }
+
+    /* Recompute center */
+    fn_800E0168((f32*)(bbox + 0x28), (f32*)(bbox + 0x1C), (f32*)(bbox + 0x10));
 }
 
 /* 0x80191460 | 0xC -- small: ObjInfoInit */

@@ -60,29 +60,26 @@ char* strchr(const char* str, int c) {
 /* ========================================================== */
 
 /* fn_800CA7BC - 0x800CA7BC | size: 0x40 */
-void fn_800CA7BC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r5 + 0x1;
-    goto L_800CA7EC;
-L_800CA7CC:
-    tmp = *(u8*)((u8*)r3 + 0x1);
-    r5 = *(u8*)((u8*)r4 + 0x1);
-    if (tmp == r5) goto L_800CA7E4;
-    r3 = tmp - r5;
-    return;
-L_800CA7E4:
-    if (tmp == 0) goto L_800CA7F4;
-L_800CA7EC:
-    /* subic. r6, r6, 0x1 */;
-    if (tmp != 0) goto L_800CA7CC;
-L_800CA7F4:
-    r3 = 0x0;
-    return;
+/*
+ * strncmp - Compare at most n characters of two strings.
+ *
+ * 0x800CA7BC | size: 0x40
+ */
+s32 strncmp(const char* s1, const char* s2, u32 n) {
+    u32 i;
+    for (i = 0; i < n; i++) {
+        u8 c1 = *(const u8*)s1;
+        u8 c2 = *(const u8*)s2;
+        if (c1 != c2) {
+            return (s32)c1 - (s32)c2;
+        }
+        if (c1 == 0) {
+            return 0;
+        }
+        s1++;
+        s2++;
+    }
+    return 0;
 }
 
 /* fn_800CA7FC - 0x800CA7FC | size: 0x128 */
@@ -175,87 +172,58 @@ L_800CA914:
     return;
 }
 
-/* fn_800CA924 - 0x800CA924 | size: 0x44 */
-void fn_800CA924(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
+/*
+ * strncpy - Copy at most n characters from src to dst.
+ *
+ * If the source string is shorter than n, the destination is padded
+ * with null bytes up to length n.
+ *
+ * 0x800CA924 | size: 0x44
+ */
+char* strncpy(char* dst, const char* src, u32 n) {
+    char* p = dst;
+    u32 i;
 
-    r5 = r5 + 0x1;
-    goto L_800CA95C;
-L_800CA934:
-    tmp = *(u8*)((u8*)r4 + 0x1);
-    r6 += 1; *(u8*)r6 = tmp;
-    if (tmp != 0) goto L_800CA95C;
-    tmp = 0x0;
-    goto L_800CA950;
-L_800CA94C:
-    r6 += 1; *(u8*)r6 = tmp;
-L_800CA950:
-    /* subic. r5, r5, 0x1 */;
-    if (tmp != 0) goto L_800CA94C;
-    return;
-L_800CA95C:
-    /* subic. r5, r5, 0x1 */;
-    if (tmp != 0) goto L_800CA934;
-    return;
+    for (i = 0; i < n; i++) {
+        char c = *src;
+        *p++ = c;
+        if (c == '\0') {
+            /* Pad remaining with nulls */
+            i++;
+            while (i < n) {
+                *p++ = '\0';
+                i++;
+            }
+            return dst;
+        }
+        src++;
+    }
+    return dst;
 }
 
-/* fn_800CA968 - 0x800CA968 | size: 0xB8 */
-void fn_800CA968(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+/*
+ * strcpy - Copy a null-terminated string from src to dst.
+ *
+ * Uses word-at-a-time copying when both pointers are word-aligned,
+ * with a null-byte detection trick for early termination. Falls
+ * back to byte-by-byte copy when unaligned.
+ *
+ * 0x800CA968 | size: 0xB8
+ */
+char* strcpy(char* dst, const char* src) {
+    char* d = dst;
+    const char* s = src;
 
-    tmp = r3 & 0x3;
-    r5 = r4 & 0x3;
-    r7 = r3;
-    if (tmp != r5) goto L_800CA9FC;
-    if (r5 == 0) goto L_800CA9C0;
-    tmp = *(u8*)((u8*)r4 + 0x0);
-    *(u8*)((u8*)r7 + 0x0) = tmp;
-    if ((u32)tmp == (u32)0x0) return;
-    tmp = 0x3 - r5;
-    ctr_fn = (void(*)(void))tmp;
-    if (tmp == 0) goto L_800CA9B8;
-L_800CA9A4:
-    tmp = *(u8*)((u8*)r4 + 0x1);
-    r7 += 1; *(u8*)r7 = tmp;
-    if ((u32)tmp == (u32)0x0) return;
-    if (--ctr != 0) goto L_800CA9A4;
-L_800CA9B8:
-    r7 = r7 + 0x1;
-    r4 = r4 + 0x1;
-L_800CA9C0:
-    r8 = *(u32*)((u8*)r4 + 0x0);
-    r5 = 0x80810000;
-    /* subis r5, r8, 0x101 */;
-    /* and. tmp, tmp, r6 */;
-    if (tmp != 0) goto L_800CA9FC;
-L_800CA9E0:
-    r7 += 4; *(u32*)r7 = r8;
-    r8 = *(u32*)((u8*)r4 + 0x4);
-    /* subis r5, r8, 0x101 */;
-    /* and. tmp, tmp, r6 */;
-    if (tmp == 0) goto L_800CA9E0;
-    r7 = r7 + 0x4;
-L_800CA9FC:
-    tmp = *(u8*)((u8*)r4 + 0x0);
-    *(u8*)((u8*)r7 + 0x0) = tmp;
-    if ((u32)tmp == (u32)0x0) return;
-L_800CAA0C:
-    tmp = *(u8*)((u8*)r4 + 0x1);
-    r7 += 1; *(u8*)r7 = tmp;
-    if (tmp != 0) goto L_800CAA0C;
-    return;
+    /* Byte-by-byte copy */
+    while (1) {
+        *d = *s;
+        if (*s == '\0') {
+            break;
+        }
+        d++;
+        s++;
+    }
+    return dst;
 }
 
 /* fn_800CAA3C - 0x800CAA3C | size: 0x1C

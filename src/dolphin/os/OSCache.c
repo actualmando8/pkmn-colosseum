@@ -286,215 +286,226 @@ void __OSCacheInit(void) {
  * 9 function(s)
  * =================================================================== */
 
-/* fn_8009B300 - 0x8009B300 | size: 0x30 */
-void fn_8009B300(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    if ((u32)r4 <= (u32)0x0) return;
-    r5 = r3 & 0x1F;
-    r4 = r4 + r5;
-    r4 = r4 + 0x1f;
-    r4 = (u32)r4 >> 5;
-    ctr_fn = (void(*)(void))r4;
-L_8009B31C:
-    /* dcbst tmp, r3 */;
-    r3 = r3 + 0x20;
-    if (--ctr != 0) goto L_8009B31C;
-    /* sc */;
-    return;
+/*
+ * DCStoreRange - Store (write back) a range of data cache lines.
+ *
+ * Writes back each 32-byte cache line covering [addr, addr+nBytes)
+ * then issues a sync to ensure completion.
+ *
+ * 0x8009B300 | size: 0x30
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void DCStoreRange(register void* addr, register u32 nBytes) {
+    nofralloc
+    cmplwi  r4, 0
+    blelr
+    clrlwi  r5, r3, 27
+    add     r4, r4, r5
+    addi    r4, r4, 31
+    srwi    r4, r4, 5
+    mtctr   r4
+_loop_dcs:
+    dcbst   r0, r3
+    addi    r3, r3, 32
+    bdnz    _loop_dcs
+    sc
+    blr
 }
+#pragma pop
 
-/* fn_8009B35C - 0x8009B35C | size: 0x2C */
-void fn_8009B35C(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    if ((u32)r4 <= (u32)0x0) return;
-    r5 = r3 & 0x1F;
-    r4 = r4 + r5;
-    r4 = r4 + 0x1f;
-    r4 = (u32)r4 >> 5;
-    ctr_fn = (void(*)(void))r4;
-L_8009B378:
-    /* dcbst tmp, r3 */;
-    r3 = r3 + 0x20;
-    if (--ctr != 0) goto L_8009B378;
-    return;
+/*
+ * DCStoreRangeNoSync - Store (write back) data cache lines without sync.
+ *
+ * Same as DCStoreRange but does not issue a sync instruction at the end.
+ *
+ * 0x8009B35C | size: 0x2C
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void DCStoreRangeNoSync(register void* addr, register u32 nBytes) {
+    nofralloc
+    cmplwi  r4, 0
+    blelr
+    clrlwi  r5, r3, 27
+    add     r4, r4, r5
+    addi    r4, r4, 31
+    srwi    r4, r4, 5
+    mtctr   r4
+_loop_dcsns:
+    dcbst   r0, r3
+    addi    r3, r3, 32
+    bdnz    _loop_dcsns
+    blr
 }
+#pragma pop
 
-/* fn_8009B388 - 0x8009B388 | size: 0x2C */
-void fn_8009B388(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    if ((u32)r4 <= (u32)0x0) return;
-    r5 = r3 & 0x1F;
-    r4 = r4 + r5;
-    r4 = r4 + 0x1f;
-    r4 = (u32)r4 >> 5;
-    ctr_fn = (void(*)(void))r4;
-L_8009B3A4:
-    /* dcbz tmp, r3 */;
-    r3 = r3 + 0x20;
-    if (--ctr != 0) goto L_8009B3A4;
-    return;
+/*
+ * DCZeroRange - Zero out a range of data cache lines.
+ *
+ * Zeroes each 32-byte cache line covering [addr, addr+nBytes).
+ *
+ * 0x8009B388 | size: 0x2C
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void DCZeroRange(register void* addr, register u32 nBytes) {
+    nofralloc
+    cmplwi  r4, 0
+    blelr
+    clrlwi  r5, r3, 27
+    add     r4, r4, r5
+    addi    r4, r4, 31
+    srwi    r4, r4, 5
+    mtctr   r4
+_loop_dcz:
+    dcbz    r0, r3
+    addi    r3, r3, 32
+    bdnz    _loop_dcz
+    blr
 }
+#pragma pop
 
-/* fn_8009B40C - 0x8009B40C | size: 0xCC */
-void fn_8009B40C(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r5 = 0; /* mfmsr */;
-    r5 = r5 | 0x1000;
-    /* mtmsr r5 */;
-    r3 = 0x80000000;
-    r4 = 0x400;
-    ctr_fn = (void(*)(void))r4;
-L_8009B424:
-    /* dcbt tmp, r3 */;
-    /* dcbst tmp, r3 */;
-    r3 = r3 + 0x20;
-    if (--ctr != 0) goto L_8009B424;
-    r4 = 0; /* mfspr HID2 */;
-    r4 = r4 | (0x100f << 16);
-    /* mtspr HID2, r4 */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    r3 = 0xE0000000;
-    r3 = r3 | 0x2;
-    /* mtdbatl 3, r3 */;
-    r3 = r3 | 0x1fe;
-    /* mtdbatu 3, r3 */;
-    /* isync */;
-    r3 = 0xE0000000;
-    r6 = 0x200;
-    ctr_fn = (void(*)(void))r6;
-    r6 = 0x0;
-L_8009B498:
-    /* dcbz_l r6, r3 */;
-    r3 = r3 + 0x20;
-    if (--ctr != 0) goto L_8009B498;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    /* nop  */;
-    return;
+/*
+ * LCEnable - Enable the locked cache (L2 scratch area).
+ *
+ * Flushes the lower 32KB of cached memory, enables LC in HID2,
+ * sets up DBAT3 for the LC address range 0xE0000000, and zeroes
+ * all 512 locked cache lines.
+ *
+ * 0x8009B40C | size: 0xCC
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void LCEnable(void) {
+    nofralloc
+    mfmsr   r5
+    ori     r5, r5, 0x1000
+    mtmsr   r5
+    lis     r3, 0x8000
+    li      r4, 0x400
+    mtctr   r4
+_loop_lce_flush:
+    dcbt    r0, r3
+    dcbst   r0, r3
+    addi    r3, r3, 32
+    bdnz    _loop_lce_flush
+    mfspr   r4, HID2
+    oris    r4, r4, 0x100F
+    mtspr   HID2, r4
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    lis     r3, 0xE000
+    ori     r3, r3, 0x0002
+    mtdbatl 3, r3
+    ori     r3, r3, 0x01FE
+    mtdbatu 3, r3
+    isync
+    lis     r3, 0xE000
+    li      r6, 512
+    mtctr   r6
+    li      r6, 0
+_loop_lce_zero:
+    dcbz_l  r6, r3
+    addi    r3, r3, 32
+    bdnz    _loop_lce_zero
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    blr
 }
+#pragma pop
 
-/* fn_8009B4D8 - 0x8009B4D8 | size: 0x38 */
+/*
+ * LCEnableNoInterrupts - Enable locked cache with interrupts disabled.
+ *
+ * Wraps LCEnable with interrupt disable/restore to ensure atomic setup.
+ *
+ * 0x8009B4D8 | size: 0x38
+ */
 void fn_8009B4D8(void) {
-    extern void fn_8009B40C();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    BOOL enabled;
 
-    OSDisableInterrupts();
-    r31 = r3;
-    fn_8009B40C();
-    r3 = r31;
-    OSRestoreInterrupts(r3);
-    return;
+    enabled = OSDisableInterrupts();
+    LCEnable();
+    OSRestoreInterrupts(enabled);
 }
 
-/* fn_8009B538 - 0x8009B538 | size: 0x24 */
-void fn_8009B538(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    /* extrwi r6, r5, 5, 25 */;
-    r3 = r3 & 0xFFFFFFF;
-    r6 = r6 | r3;
-    /* mtspr DMA_U, r6 */;
-    r6 = r6 | r4;
-    r6 = r6 | 0x2;
-    /* mtspr DMA_L, r6 */;
-    return;
+/*
+ * LCLoadData - Initiate a locked cache DMA load.
+ *
+ * Constructs DMA_U/DMA_L register values from the source address,
+ * destination address, and block count, then starts the transfer.
+ *
+ * 0x8009B538 | size: 0x24
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void LCLoadData(register void* destAddr, register void* srcAddr, register u32 nBlocks) {
+    nofralloc
+    extrwi  r6, r5, 5, 25
+    clrlwi  r3, r3, 4
+    or      r6, r6, r3
+    mtspr   DMA_U, r6
+    or      r6, r6, r4
+    ori     r6, r6, 0x0002
+    mtspr   DMA_L, r6
+    blr
 }
+#pragma pop
 
-/* fn_8009B55C - 0x8009B55C | size: 0xAC */
-void fn_8009B55C(void) {
-    extern void fn_8009B538();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * LCLoadBlocks - Load multiple DMA blocks into the locked cache.
+ *
+ * Splits large transfers into 128-block (0x1000 byte) chunks,
+ * calling LCLoadData for each chunk. Returns the number of
+ * full 128-block transfers performed.
+ *
+ * 0x8009B55C | size: 0xAC
+ */
+u32 LCLoadBlocks(void* destAddr, void* srcAddr, u32 nBytes) {
+    u32 dest = (u32)destAddr;
+    u32 src = (u32)srcAddr;
+    u32 blocks = (nBytes + 0x1F) >> 5;
+    u32 fullTransfers = (blocks + 0x7F) >> 7;
 
-    r28 = r3;
-    r29 = r4;
-    tmp = r5 + 0x1f;
-    r3 = (u32)tmp >> 5;
-    tmp = r3 + 0x7f;
-    r31 = r3;
-    r30 = (u32)tmp >> 7;
-    goto L_8009B598;
-L_8009B598:
-    goto L_8009B59C;
-L_8009B59C:
-    goto L_8009B5DC;
-L_8009B5A0:
-    if (r31 >= 0x80) goto L_8009B5C0;
-    r3 = r28;
-    r4 = r29;
-    r5 = r31;
-    fn_8009B538();
-    r31 = 0x0;
-    goto L_8009B5DC;
-L_8009B5C0:
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x0;
-    fn_8009B538();
-    r28 = r28 + 0x1000;
-    r29 = r29 + 0x1000;
-L_8009B5DC:
-    if (r31 != 0) goto L_8009B5A0;
-    r3 = r30;
-    return;
+    while (blocks != 0) {
+        if (blocks < 0x80) {
+            LCLoadData((void*)dest, (void*)src, blocks);
+            blocks = 0;
+        } else {
+            LCLoadData((void*)dest, (void*)src, 0);
+            dest += 0x1000;
+            src += 0x1000;
+            blocks -= 0x80;
+        }
+    }
+
+    return fullTransfers;
 }
 
 /* fn_8009B608 - 0x8009B608 | size: 0xC */
@@ -507,15 +518,25 @@ void fn_8009B608(void) {
     return;
 }
 
-/* fn_8009B614 - 0x8009B614 | size: 0x14 */
-void fn_8009B614(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    fn_8009B614_loop: ;
-    r4 = 0; /* mfspr HID2 */;
-    /* extrwi r4, r4, 4, 4 */;
-    if ((s32)r4 > (s32)r3) goto fn_8009B614_loop;
-    return;
+/*
+ * LCQueueWait - Wait for the locked cache DMA queue to drain.
+ *
+ * Polls the DMA queue length field in HID2 until it is less than
+ * or equal to the requested threshold.
+ *
+ * 0x8009B614 | size: 0x14
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void LCQueueWait(register u32 threshold) {
+    nofralloc
+_loop_lcqw:
+    mfspr   r4, HID2
+    extrwi  r4, r4, 4, 4
+    cmpw    r4, r3
+    bgt     _loop_lcqw
+    blr
 }
+#pragma pop
 

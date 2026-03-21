@@ -51,37 +51,40 @@ void __destroy_global_chain(void) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800C46B0 - 0x800C46B0 | size: 0x5C */
-void fn_800C46B0(void) {
-    extern u8 lbl_8026FE58[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
+/*
+ * __cvt_fp2unsigned - Convert a floating-point value to unsigned integer.
+ *
+ * Used by the CRT for float-to-unsigned conversions. Handles the case
+ * where the value exceeds the signed 32-bit range by subtracting 2^31
+ * (stored as a double constant) and adding 0x80000000 to the result.
+ *
+ * The double constants at lbl_8026FE58 are:
+ *   +0x00: 0.0 (lower bound)
+ *   +0x08: 2^31 as double (4503599627370496.0 / boundary)
+ *   +0x10: 2^32 as double (upper bound)
+ *
+ * 0x800C46B0 | size: 0x5C
+ */
+u32 fn_800C46B0(f64 val) {
+    extern f64 lbl_8026FE58[];
+    f64 boundary = lbl_8026FE58[1];
+    f64 upperBound = lbl_8026FE58[2];
+    u32 result = 0;
 
-    r4 = (u32)lbl_8026FE58;
-    r4 = (u32)lbl_8026FE58;
-    r3 = 0x0;
-    f0 = *(f64*)((u8*)r4 + 0x0);
-    f3 = *(f64*)((u8*)r4 + 0x8);
-    f4 = *(f64*)((u8*)r4 + 0x10);
-    if (f1 < f3) goto L_800C4704;
-    if (f1 >= f3) goto L_800C4704;
-    f2 = f1;
-    if (f1 < f4) goto L_800C46F0;
-    f2 = f1 - f4;
-L_800C46F0:
-    f2 = (f64)(s32)f2;
-    if (f1 < f4) goto L_800C4704;
-    r3 = r3 + (0x8000 << 16);
-L_800C4704:
-    return;
+    if (val < boundary || val >= boundary) {
+        return result;
+    }
+
+    if (val >= upperBound) {
+        val = val - upperBound;
+    }
+
+    result = (u32)(s32)val;
+
+    if (val >= upperBound) {
+        result += 0x80000000u;
+    }
+
+    return result;
 }
 

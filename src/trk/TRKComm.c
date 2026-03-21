@@ -191,173 +191,125 @@ void TRKEXICallBack(s32 chan, void* ctx) {
 /* ========================================================== */
 
 /* fn_800C39A0 - 0x800C39A0 | size: 0x10 */
-void fn_800C39A0(void) {
-    extern u8 lbl_803FED70[];
-    u32 r3 = 0;
-
-    r3 = (u32)lbl_803FED70;
-    r3 = (u32)lbl_803FED70;
-    r3 = *(u8*)((u8*)r3 + 0x0);
-    return;
+/*
+ * TRKCommGetState - Return the TRK comm state byte.
+ * 0x800C39A0 | size: 0x10
+ */
+u8 fn_800C39A0(void) {
+    extern u8 lbl_803FED70;
+    return lbl_803FED70;
 }
 
-/* fn_800C39B0 - 0x800C39B0 | size: 0xC */
-void fn_800C39B0(void) {
-    extern u8 lbl_803FED70[];
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = (u32)lbl_803FED70;
-    *(u8*)lbl_803FED70 = r3;
-    return;
+/*
+ * TRKCommSetState - Set the TRK comm state byte.
+ * 0x800C39B0 | size: 0xC
+ */
+void fn_800C39B0(u8 state) {
+    extern u8 lbl_803FED70;
+    lbl_803FED70 = state;
 }
 
-/* fn_800C39BC - 0x800C39BC | size: 0x84 */
-void fn_800C39BC(void) {
-    extern void fn_800C04F4();
-    extern void fn_800C2A00();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+/*
+ * TRKCommSendReset - Send a reset (0xD3) command via TRK comm.
+ *
+ * Returns 0 on success, 2 on partial, 1 on error or init failure.
+ *
+ * 0x800C39BC | size: 0x84
+ */
+u32 fn_800C39BC(u32 arg) {
+    extern s32 fn_800C04F4(void);
+    extern u32 fn_800C2A00(u32 cmd, u32 param);
+    s32 initOk;
+    u32 result;
 
-    r31 = r3;
-    fn_800C04F4();
-    if ((s32)r3 != 0) goto L_800C39E4;
-    r3 = 0x1;
-    goto L_800C3A2C;
-L_800C39E4:
-    r4 = r31;
-    r3 = 0xd3;
-    fn_800C2A00();
-    tmp = r3 & 0xFF;
-    if ((s32)tmp == 1) goto L_800C3A28;
-    if ((s32)tmp >= 1) goto L_800C3A0C;
-    if ((s32)tmp >= 0) goto L_800C3A18;
-    goto L_800C3A28;
-L_800C3A0C:
-    if ((s32)tmp >= 3) goto L_800C3A28;
-    goto L_800C3A20;
-L_800C3A18:
-    r3 = 0x0;
-    goto L_800C3A2C;
-L_800C3A20:
-    r3 = 0x2;
-    goto L_800C3A2C;
-L_800C3A28:
-    r3 = 0x1;
-L_800C3A2C:
-    return;
+    initOk = fn_800C04F4();
+    if (initOk == 0) {
+        return 1;
+    }
+
+    result = fn_800C2A00(0xD3, arg) & 0xFF;
+    switch (result) {
+    case 0:
+        return 0;
+    case 2:
+        return 2;
+    default:
+        return 1;
+    }
 }
 
-/* fn_800C3A40 - 0x800C3A40 | size: 0xBC */
-void fn_800C3A40(void) {
-    extern void fn_800C04F4();
-    extern void fn_800C29F0();
-    extern void fn_800C39A0();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * TRKCommSendRead - Send a read (0xD0) command via TRK comm.
+ *
+ * Checks comm state and init, then sends the read command with
+ * the address from *addrPtr and the given length. Stores the
+ * returned value back to *addrPtr.
+ *
+ * 0x800C3A40 | size: 0xBC
+ */
+u32 fn_800C3A40(u32 unused, u32 length, u32* addrPtr) {
+    extern u8 fn_800C39A0(void);
+    extern s32 fn_800C04F4(void);
+    extern u32 fn_800C29F0(u32 cmd, u32 dir, u32* addrBuf, u32 len);
+    u32 addrBuf;
+    u32 result;
 
-    r31 = r5;
-    r30 = r4;
-    fn_800C39A0();
-    tmp = r3 & 0xFF;
-    if ((s32)tmp != 0) goto L_800C3A70;
-    r3 = 0x1;
-    goto L_800C3AE4;
-L_800C3A70:
-    fn_800C04F4();
-    if ((s32)r3 != 0) goto L_800C3A84;
-    r3 = 0x1;
-    goto L_800C3AE4;
-L_800C3A84:
-    tmp = *(u32*)((u8*)r31 + 0x0);
-    r6 = r30;
-    r5 = (u32)sp + 0x8;
-    r3 = 0xd0;
-    *(u32*)(sp + 0x8) = tmp;
-    r4 = 0x1;
-    fn_800C29F0();
-    tmp = r3 & 0xFF;
-    *(u32*)((u8*)r31 + 0x0) = r3;
-    if ((s32)tmp == 1) goto L_800C3AE0;
-    if ((s32)tmp >= 1) goto L_800C3AC4;
-    if ((s32)tmp >= 0) goto L_800C3AD0;
-    goto L_800C3AE0;
-L_800C3AC4:
-    if ((s32)tmp >= 3) goto L_800C3AE0;
-    goto L_800C3AD8;
-L_800C3AD0:
-    r3 = 0x0;
-    goto L_800C3AE4;
-L_800C3AD8:
-    r3 = 0x2;
-    goto L_800C3AE4;
-L_800C3AE0:
-    r3 = 0x1;
-L_800C3AE4:
-    return;
+    if ((fn_800C39A0() & 0xFF) == 0) {
+        return 1;
+    }
+
+    if (fn_800C04F4() == 0) {
+        return 1;
+    }
+
+    addrBuf = *addrPtr;
+    result = fn_800C29F0(0xD0, 1, &addrBuf, length) & 0xFF;
+    *addrPtr = addrBuf;
+
+    switch (result) {
+    case 0:
+        return 0;
+    case 2:
+        return 2;
+    default:
+        return 1;
+    }
 }
 
-/* fn_800C3AFC - 0x800C3AFC | size: 0xBC */
-void fn_800C3AFC(void) {
-    extern void fn_800C04F4();
-    extern void fn_800C29F0();
-    extern void fn_800C39A0();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * TRKCommSendWrite - Send a write (0xD1) command via TRK comm.
+ *
+ * Same pattern as TRKCommSendRead but uses command 0xD1 with
+ * direction 0 (write).
+ *
+ * 0x800C3AFC | size: 0xBC
+ */
+u32 fn_800C3AFC(u32 unused, u32 length, u32* addrPtr) {
+    extern u8 fn_800C39A0(void);
+    extern s32 fn_800C04F4(void);
+    extern u32 fn_800C29F0(u32 cmd, u32 dir, u32* addrBuf, u32 len);
+    u32 addrBuf;
+    u32 result;
 
-    r31 = r5;
-    r30 = r4;
-    fn_800C39A0();
-    tmp = r3 & 0xFF;
-    if ((s32)tmp != 0) goto L_800C3B2C;
-    r3 = 0x1;
-    goto L_800C3BA0;
-L_800C3B2C:
-    fn_800C04F4();
-    if ((s32)r3 != 0) goto L_800C3B40;
-    r3 = 0x1;
-    goto L_800C3BA0;
-L_800C3B40:
-    tmp = *(u32*)((u8*)r31 + 0x0);
-    r6 = r30;
-    r5 = (u32)sp + 0x8;
-    r3 = 0xd1;
-    *(u32*)(sp + 0x8) = tmp;
-    r4 = 0x0;
-    fn_800C29F0();
-    tmp = r3 & 0xFF;
-    *(u32*)((u8*)r31 + 0x0) = r3;
-    if ((s32)tmp == 1) goto L_800C3B9C;
-    if ((s32)tmp >= 1) goto L_800C3B80;
-    if ((s32)tmp >= 0) goto L_800C3B8C;
-    goto L_800C3B9C;
-L_800C3B80:
-    if ((s32)tmp >= 3) goto L_800C3B9C;
-    goto L_800C3B94;
-L_800C3B8C:
-    r3 = 0x0;
-    goto L_800C3BA0;
-L_800C3B94:
-    r3 = 0x2;
-    goto L_800C3BA0;
-L_800C3B9C:
-    r3 = 0x1;
-L_800C3BA0:
-    return;
+    if ((fn_800C39A0() & 0xFF) == 0) {
+        return 1;
+    }
+
+    if (fn_800C04F4() == 0) {
+        return 1;
+    }
+
+    addrBuf = *addrPtr;
+    result = fn_800C29F0(0xD1, 0, &addrBuf, length) & 0xFF;
+    *addrPtr = addrBuf;
+
+    switch (result) {
+    case 0:
+        return 0;
+    case 2:
+        return 2;
+    default:
+        return 1;
+    }
 }
 

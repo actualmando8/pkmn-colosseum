@@ -189,148 +189,90 @@ void* fn_8019C8F4(u32 size) {
     return result;
 }
 
-/* 0x8019C978 | 0x1F8 */
+/*
+ * HSD_InitArena - Initialize the HSD heap from the OS arena.
+ *
+ * Computes available memory, creates the HSD memory heap either
+ * from pre-configured bounds (lbl_8047B270/274) or from the OS
+ * arena, and initializes the heap management subsystem.
+ *
+ * 0x8019C978 | size: 0x1F8
+ */
 void fn_8019C978(void) {
     extern u8 lbl_80465568[];
-    extern u8 lbl_80478C70[];
-    extern u8 lbl_8047B268[];
-    extern u8 lbl_8047B26C[];
-    extern u8 lbl_8047B270[];
-    extern u8 lbl_8047B274[];
-    extern u8 lbl_8047B284[];
-    extern u8 lbl_8047B288[];
-    extern void fn_8009AB50();
-    extern void fn_8009ABD0();
-    extern void fn_8009F3D4();
-    extern void fn_801A69C0();
-    extern void fn_801AA538();
-    extern void fn_8019C7B8();
-    extern void fn_8019C7E0();
-    extern void fn_8019C854();
-    extern void fn_8019C89C();
-    extern void fn_8019C8F4();
+    extern u32 lbl_80478C70;
+    extern u32 lbl_8047B268;
+    extern u32 lbl_8047B26C;
+    extern u32 lbl_8047B270;
+    extern u32 lbl_8047B274;
+    extern u32 lbl_8047B284;
+    extern u32 lbl_8047B288;
+    extern void* fn_8009AB50(void* heap);
+    extern void* fn_8009ABD0(u32 lo, u32 hi);
+    extern void fn_8009F3D4(void);
+    extern void fn_801A69C0(void* desc, u32 size);
+    extern void fn_801AA538(u32 size, u32 unk);
     u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r31 = 0;
+    u32 arenaLo;
+    u32 arenaHi;
+    u32 heapSize;
+    u32 heapLo;
+    u32 heapHi;
+    u32* desc = (u32*)lbl_80465568;
+    void* heap;
 
     OSGetArenaLo();
     OSGetArenaHi();
     fn_8009F3D4();
-    r4 = (u32)lbl_80465568;
-    *(u32*)lbl_80465568 = r3;
-    OSGetArenaLo();
-    r31 = r3;
-    OSGetArenaHi();
-    r4 = (u32)lbl_80465568;
-    r5 = (u32)lbl_80465568;
-    r6 = (u32)lbl_80465568;
-    tmp = *(u32*)((u8*)r6 + 0x0);
-    r4 = (u32)lbl_80465568;
-    r5 = (u32)lbl_80465568;
-    tmp = tmp - r3;
-    r4 = (u32)lbl_80465568;
-    r6 = tmp + r31;
-    r5 = *(u32*)((u8*)r5 + 0x8);
-    tmp = *(u32*)lbl_8047B288;
-    r3 = (u32)lbl_80465568;
-    r4 = *(u32*)((u8*)r4 + 0xC);
-    r5 = r6 - r5;
-    r3 = (u32)lbl_80465568;
-    tmp = r5 - r4;
-    *(u32*)((u8*)r3 + 0x4) = tmp;
-    if ((s32)tmp != 0) goto L_8019CB5C;
-    r7 = (u32)fn_8019C8F4;
-    r3 = (u32)fn_8019C7B8;
-    tmp = (u32)fn_8019C7B8;
-    r6 = (u32)fn_8019C89C;
-    r8 = (u32)fn_8019C8F4;
-    r5 = (u32)fn_8019C854;
-    r7 = (u32)fn_8019C89C;
-    r4 = (u32)fn_8019C7E0;
-    r6 = (u32)fn_8019C854;
-    r5 = (u32)fn_8019C7E0;
-    r3 = (u32)sp + 0x8;
-    r4 = 0x14;
-    *(u32*)(sp + 0x18) = tmp;
-    fn_801A69C0();
-    tmp = *(u32*)lbl_8047B270;
-    if (tmp == 0) goto L_8019CABC;
-    tmp = *(u32*)lbl_8047B274;
-    if (tmp == 0) goto L_8019CABC;
-    r5 = *(u32*)lbl_8047B270;
-    r4 = 0x0;
-    r3 = *(u32*)lbl_8047B274;
-    tmp = 0x0;
-    *(u32*)lbl_8047B268 = r5;
-    *(u32*)lbl_8047B26C = r3;
-    r3 = *(u32*)lbl_8047B268;
-    *(u32*)lbl_8047B270 = r4;
-    r4 = *(u32*)lbl_8047B26C;
-    *(u32*)lbl_8047B274 = tmp;
-    fn_8009ABD0();
-    *(u32*)lbl_80478C70 = r3;
-    r3 = *(u32*)lbl_80478C70;
-    fn_8009AB50();
-    r5 = *(u32*)lbl_8047B268;
-    r4 = (u32)lbl_80465568;
-    tmp = *(u32*)lbl_8047B26C;
-    r3 = (u32)lbl_80465568;
-    r4 = (u32)lbl_80465568;
-    tmp = tmp - r5;
-    r3 = (u32)lbl_80465568;
-    *(u32*)((u8*)r4 + 0x10) = tmp;
-    r4 = 0x0;
-    r3 = *(u32*)((u8*)r3 + 0x10);
-    fn_801AA538();
-    goto L_8019CB5C;
-L_8019CABC:
-    OSGetArenaLo();
-    tmp = r3 + 0x1f;
-    /* clrrwi r31, tmp, 5 */;
-    OSGetArenaHi();
-    tmp = *(u32*)lbl_8047B284;
-    *(u32*)lbl_8047B268 = r31;
-    if ((s32)tmp <= 0) goto L_8019CB08;
-    tmp = *(u32*)lbl_8047B284;
-    tmp = r31 + tmp;
-    *(u32*)lbl_8047B26C = tmp;
-    tmp = *(u32*)lbl_8047B26C;
-    if (tmp <= r3) goto L_8019CAF8;
-    *(u32*)lbl_8047B26C = r3;
-L_8019CAF8:
-    tmp = *(u32*)lbl_8047B26C;
-    /* clrrwi tmp, tmp, 5 */;
-    *(u32*)lbl_8047B26C = tmp;
-    goto L_8019CB10;
-L_8019CB08:
-    /* clrrwi tmp, r3, 5 */;
-    *(u32*)lbl_8047B26C = tmp;
-L_8019CB10:
-    r3 = *(u32*)lbl_8047B268;
-    r4 = *(u32*)lbl_8047B26C;
-    fn_8009ABD0();
-    *(u32*)lbl_80478C70 = r3;
-    r3 = *(u32*)lbl_80478C70;
-    fn_8009AB50();
-    r5 = *(u32*)lbl_8047B268;
-    r4 = (u32)lbl_80465568;
-    tmp = *(u32*)lbl_8047B26C;
-    r3 = (u32)lbl_80465568;
-    r4 = (u32)lbl_80465568;
-    tmp = tmp - r5;
-    r3 = (u32)lbl_80465568;
-    *(u32*)((u8*)r4 + 0x10) = tmp;
-    r4 = 0x0;
-    r3 = *(u32*)((u8*)r3 + 0x10);
-    fn_801AA538();
-    r3 = *(u32*)lbl_8047B26C;
-    OSSetArenaLo();
-L_8019CB5C:
-    return;
+
+    arenaLo = (u32)OSGetArenaLo();
+    arenaHi = (u32)OSGetArenaHi();
+
+    /* Compute available size after subtracting reserved areas */
+    heapSize = (desc[0] - arenaHi + arenaLo) - desc[2] - desc[3];
+    desc[1] = heapSize;
+
+    if (heapSize != 0) {
+        return;
+    }
+
+    /* Initialize heap allocator callbacks */
+    fn_801A69C0((void*)(sp + 0x8), 0x14);
+
+    /* Check if pre-configured heap bounds exist */
+    if (lbl_8047B270 != 0 && lbl_8047B274 != 0) {
+        /* Use pre-configured bounds */
+        lbl_8047B268 = lbl_8047B270;
+        lbl_8047B26C = lbl_8047B274;
+        lbl_8047B270 = 0;
+        lbl_8047B274 = 0;
+        heap = fn_8009ABD0(lbl_8047B268, lbl_8047B26C);
+        lbl_80478C70 = (u32)heap;
+        fn_8009AB50((void*)lbl_80478C70);
+        desc[4] = lbl_8047B26C - lbl_8047B268;
+        fn_801AA538(desc[4], 0);
+    } else {
+        /* Allocate from OS arena */
+        arenaLo = ((u32)OSGetArenaLo() + 0x1F) & ~0x1F;
+        arenaHi = (u32)OSGetArenaHi();
+        heapLo = arenaLo;
+        lbl_8047B268 = heapLo;
+
+        if ((s32)lbl_8047B284 > 0) {
+            heapHi = heapLo + lbl_8047B284;
+            if (heapHi > arenaHi) {
+                heapHi = arenaHi;
+            }
+            lbl_8047B26C = heapHi & ~0x1F;
+        } else {
+            lbl_8047B26C = arenaHi & ~0x1F;
+        }
+
+        heap = fn_8009ABD0(lbl_8047B268, lbl_8047B26C);
+        lbl_80478C70 = (u32)heap;
+        fn_8009AB50((void*)lbl_80478C70);
+        desc[4] = lbl_8047B26C - lbl_8047B268;
+        fn_801AA538(desc[4], 0);
+        OSSetArenaLo((void*)lbl_8047B26C);
+    }
 }

@@ -439,60 +439,43 @@ void* fn_80114808(void* owner, u32 param, u32 alloc_size) {
 }
 
 /* 0x8011487C | 0xCC */
-void fn_8011487C(void) {
-    extern void fn_800D27FC();
-    extern void fn_800F9318();
-    extern void fn_800F9378();
-    extern void fn_80191ECC();
-    extern void fn_80191F64();
-    extern void fn_801150DC();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * gsFieldResourceLoad - Load a field resource by ID.
+ *
+ * Allocates a resource slot, initializes it, parses the data, and
+ * registers a completion callback. Reports errors via fn_800DD970.
+ *
+ * 0x8011487C | size: 0xA8
+ */
+void* fn_8011487C(u32 owner, u32 resFlags, u32 allocSize) {
+    extern void* fn_800F9318(u32 flags);
+    extern void fn_800F9378(void* res, u32 owner, u32 flags, void* callback);
+    extern void* fn_80191ECC(void* data, const char* name);
+    extern void fn_80191F64(u32 allocSize, void* buf);
+    extern void fn_801150DC(void);
+    extern void* fn_800D27FC(void* data);
+    char* strings = (char*)&lbl_80272200;
+    void* res;
+    void* parsed;
+    u32 masked;
 
-    r28 = r3;
-    r29 = r4;
-    r30 = r5;
-    tmp = r29 & 0x7FFF0000;
-    r4 = (u32)&lbl_80272200;
-    r31 = (u32)&lbl_80272200;
-    r4 = tmp | 0x400;
-    fn_800F9318();
-    r5 = r30;
-    r30 = r3;
-    r4 = r30 + 0x60;
-    fn_80191F64();
-    r3 = r30;
-    r4 = r31 + 0xac;
-    fn_80191ECC();
-    r30 = r3;
-    if (r30 != 0) goto L_801148F0;
-    r3 = r31 + 0x1cc;
-    ((void(*)(void))fn_800DD970)();
-    goto L_80114924;
-L_801148F0:
-    r3 = *(u32*)((u8*)r30 + 0x4);
-    fn_800D27FC();
-    if (r3 != 0) goto L_80114910;
-    r3 = r31 + 0x200;
-    ((void(*)(void))fn_800DD970)();
-    goto L_80114924;
-L_80114910:
-    r5 = (u32)fn_801150DC;
-    r4 = r28;
-    r6 = (u32)fn_801150DC;
-    r5 = r29;
-    fn_800F9378();
-L_80114924:
-    r3 = r30;
-    return;
+    masked = (resFlags & 0x7FFF0000) | 0x400;
+    res = fn_800F9318(masked);
+    fn_80191F64(allocSize, (void*)((u8*)res + 0x60));
+    parsed = fn_80191ECC(res, strings + 0xAC);
+
+    if (parsed == NULL) {
+        fn_800DD970(strings + 0x1CC);
+        return parsed;
+    }
+
+    if (fn_800D27FC((void*) *(u32*)((u8*)parsed + 0x04)) == NULL) {
+        fn_800DD970(strings + 0x200);
+        return parsed;
+    }
+
+    fn_800F9378(res, owner, resFlags, (void*)fn_801150DC);
+    return parsed;
 }
 
 /* 0x74 | fn_80114948 | alloc_wrapper */
@@ -506,63 +489,50 @@ void* fn_80114948(void* owner, u32 param, u32 alloc_size) {
     return (u8*)mem + 0x60;
 }
 
-/* 0x801149BC | 0xB4 */
-void fn_801149BC(void) {
-    extern void fn_800F9318();
-    extern void fn_800F9378();
-    extern void fn_80191ECC();
-    extern void fn_80191F64();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * gsFieldResourceLoadMulti - Load a multi-part field resource.
+ *
+ * Allocates a resource slot, parses the data using a different string
+ * key (lbl_802722AC), then iterates through a pointer table at offset
+ * 0x00 of the parsed result, registering each sub-resource.
+ *
+ * 0x801149BC | size: 0xB4
+ */
+void* fn_801149BC(u32 owner, u32 resFlags, u32 allocSize) {
+    extern void* fn_800F9318(u32 flags);
+    extern void fn_800F9378(void* res, u32 owner, u32 flags, void* callback);
+    extern void* fn_80191ECC(void* data, const char* name);
+    extern void fn_80191F64(u32 size, void* buf);
+    extern const char lbl_802722AC[];
+    void* res;
+    void* parsed;
+    u32* ptrTable;
+    u32 idx;
+    u32 offset;
+    u32 maskedFlags;
 
-    r27 = r3;
-    r30 = r4;
-    r29 = r5;
-    r28 = 0x0;
-    fn_800F9318();
-    r31 = r3;
-    r5 = r29;
-    r4 = r31 + 0x60;
-    fn_80191F64();
-    r4 = (u32)&lbl_802722AC;
-    r3 = r31;
-    r4 = (u32)&lbl_802722AC;
-    fn_80191ECC();
-    r31 = r3;
-    if (r31 != 0) goto L_80114A14;
-    r3 = 0x0;
-    goto L_80114A5C;
-L_80114A14:
-    tmp = *(u32*)((u8*)r31 + 0x0);
-    r3 = r30 & 0x7FFF0000;
-    r30 = r3 | 0x1000;
-    if (tmp == 0) goto L_80114A58;
-    r29 = 0x0;
-    goto L_80114A48;
-L_80114A30:
-    r4 = r27;
-    r5 = r30 | r28;
-    r6 = 0x0;
-    fn_800F9378();
-    r29 = r29 + 0x4;
-    r28 = r28 + 0x1;
-L_80114A48:
-    r3 = *(u32*)((u8*)r31 + 0x0);
-    r3 = *(u32*)(r3 + r29);
-    if (r3 != 0) goto L_80114A30;
-L_80114A58:
-    r3 = r31;
-L_80114A5C:
-    return;
+    res = fn_800F9318(0);
+    fn_80191F64(allocSize, (void*)((u8*)res + 0x60));
+    parsed = fn_80191ECC(res, lbl_802722AC);
+
+    if (parsed == NULL) {
+        return NULL;
+    }
+
+    maskedFlags = (resFlags & 0x7FFF0000) | 0x1000;
+    ptrTable = *(u32**)((u8*)parsed + 0x00);
+    if (ptrTable != NULL) {
+        idx = 0;
+        offset = 0;
+        while (*(u32*)((u8*)ptrTable + offset) != 0) {
+            fn_800F9378((void*) *(u32*)((u8*)ptrTable + offset),
+                        owner, maskedFlags | idx, NULL);
+            offset += 4;
+            idx++;
+        }
+    }
+
+    return parsed;
 }
 
 /* 0x70 | fn_80114A70 | alloc_wrapper */

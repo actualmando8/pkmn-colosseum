@@ -432,105 +432,92 @@ void fn_800361C0(void) {
     fn_80165A20(0, 0, 0);
 }
 
-/* 0x80036210 | 0x30 */
+/*
+ * movieSetupFadeSpecial - Set fade mode 3 with speed 1.0 and enable.
+ *
+ * 0x80036210 | size: 0x30
+ */
 void fn_80036210(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-
-    f1 = *(f32*)&lbl_8047BA30;
-    r3 = 0x3;
-    ((void(*)(void))fn_801C41C8)();
-    r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
-    return;
+    fn_801C41C8(3, lbl_8047BA30);
+    fn_801C40F0(1);
 }
 
-/* 0x80036240 | 0x120 */
+/*
+ * moviePlayWithSubtitles - Play a THP movie with timed subtitle display.
+ *
+ * Polls the THP player state each frame. While playing, checks for
+ * skip-button input and processes subtitle entries from the subtitle
+ * table at lbl_802E50E0. Each entry is 6 bytes: 2-byte frame threshold,
+ * 2-byte sound ID A, 2-byte sound ID B.
+ *
+ * 0x80036240 | size: 0x120
+ */
 void fn_80036240(void) {
     extern u8 lbl_802E50E0[];
-    extern void fn_800F7AF0();
-    extern void fn_800F7BC4();
-    extern void fn_800FF58C();
-    extern void fn_8016597C();
-    extern void fn_80166A28();
-    extern void fn_8017B1AC();
-    extern void fn_801E16D0();
-    extern void fn_801E1810();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern u32 fn_800F7AF0(u32 pad);
+    extern u32 fn_800F7BC4(u32 pad);
+    extern void fn_800FF58C(u32 flag);
+    extern void fn_8016597C(u32 grp, u32 fade, u32 unk, u32 vol);
+    extern void fn_80166A28(u32 sndId);
+    extern s32 fn_8017B1AC(void);
+    extern s32 fn_801E16D0(void);
+    extern void fn_801E1810(void);
+    u32 subtitleIdx = 0;
+    u32 nextIdx;
+    u8 state;
+    s32 sysState;
+    u32 btnA, btnB, combined;
+    s32 framePos;
+    u8* entry;
+    u16 threshold, sndA, sndB;
 
-    r30 = 0x0;
-    goto L_8003630C;
-L_8003625C:
-    fn_8017B1AC();
-    if ((s32)r3 == 0xb) goto L_80036270;
-    if ((s32)r3 != 5) goto L_80036278;
-L_80036270:
-    ((void(*)(void))fn_800F0308)();
-    goto L_8003630C;
-L_80036278:
-    r3 = 0x1;
-    fn_800F7AF0();
-    r31 = r3;
-    r3 = 0x1;
-    fn_800F7BC4();
-    tmp = r3 & r31;
-    tmp = tmp & 0x1300;
-    if (tmp == 0) goto L_800362A4;
-    fn_801E1810();
-    goto L_8003631C;
-L_800362A4:
-    r31 = r30;
-    if (r30 < 0x21) goto L_800362B4;
-    goto L_80036304;
-L_800362B4:
-    fn_801E16D0();
-    if ((s32)r3 >= 0) goto L_800362C4;
-    goto L_80036304;
-L_800362C4:
-    r5 = r30 * 0x6;
-    r4 = (u32)lbl_802E50E0;
-    tmp = (u32)lbl_802E50E0;
-    r30 = tmp + r5;
-    tmp = *(u16*)((u8*)r30 + 0x0);
-    if ((s32)r3 < (s32)tmp) goto L_80036304;
-    r3 = *(u16*)((u8*)r30 + 0x2);
-    if (r3 == 0) goto L_800362F0;
-    fn_80166A28();
-L_800362F0:
-    r3 = *(u16*)((u8*)r30 + 0x4);
-    if (r3 == 0) goto L_80036300;
-    fn_80166A28();
-L_80036300:
-    r31 = r31 + 0x1;
-L_80036304:
-    r30 = r31;
-    ((void(*)(void))fn_800F0308)();
-L_8003630C:
-    ((void(*)(void))fn_801E1874)();
-    tmp = r3 & 0xFF;
-    if (tmp == 1) goto L_8003625C;
-L_8003631C:
-    r3 = 0x1;
-    r4 = 0x3e8;
-    r5 = 0x0;
-    r6 = 0x7f;
-    fn_8016597C();
-    r3 = 0x384;
-    fn_800FF58C();
-    r4 = 0x5960000;
-    r3 = 0x0;
-    r4 = r4 + 0x8;
-    ((void(*)(void))fn_8011288C)();
-    return;
+    while (1) {
+        state = fn_801E1874();
+        if ((state & 0xFF) != 1) {
+            break;
+        }
+
+        sysState = fn_8017B1AC();
+        if (sysState == 0x0B || sysState == 5) {
+            fn_800F0308();
+            continue;
+        }
+
+        btnA = fn_800F7AF0(1);
+        btnB = fn_800F7BC4(1);
+        combined = btnA & btnB;
+        if (combined & 0x1300) {
+            fn_801E1810();
+            break;
+        }
+
+        nextIdx = subtitleIdx;
+        if (subtitleIdx < 0x21) {
+            framePos = fn_801E16D0();
+            if (framePos >= 0) {
+                entry = lbl_802E50E0 + (subtitleIdx * 6);
+                threshold = *(u16*)(entry + 0);
+                if (framePos >= (s32)threshold) {
+                    sndA = *(u16*)(entry + 2);
+                    if (sndA != 0) {
+                        fn_80166A28(sndA);
+                    }
+                    sndB = *(u16*)(entry + 4);
+                    if (sndB != 0) {
+                        fn_80166A28(sndB);
+                    }
+                    nextIdx = nextIdx + 1;
+                }
+            }
+        }
+
+        subtitleIdx = nextIdx;
+        fn_800F0308();
+    }
+
+    fn_8016597C(1, 0x3E8, 0, 0x7F);
+    fn_800FF58C(0x384);
+    fn_8011288C(0, 0x59608);
 }
 
 /* 0x50 | fn_80036360 | call_sequence */
@@ -550,61 +537,43 @@ void fn_800363B4(void) { }
 /* 0x800363B8 | 0x4 -- nop */
 void fn_800363B8(void) { }
 
-/* 0x800363BC | 0xAC */
+/*
+ * moviePlayTPCSequence - Set up TPC logo DMA load and wait for completion.
+ *
+ * Configures fade mode 3, sets up a DVD read task for logo data,
+ * then yields until the task counter reaches zero.
+ *
+ * 0x800363BC | size: 0xAC
+ */
 void fn_800363BC(void) {
     extern u8 lbl_803A3E58[];
-    extern u8 lbl_8047A460[];
-    extern void fn_800A19CC();
-    extern void fn_800A1F94();
-    extern void fn_800370E0();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
+    extern u32 lbl_8047A460;
+    extern void fn_800A19CC(u8* desc, void* callback, u8* buf, u32 size, u32 align, u32 async);
+    extern void fn_800A1F94(u8* desc);
+    extern void fn_800370E0(void);
+    u8* base = lbl_803A3E58;
+    u8* taskDesc = base + 0x1318;
+    u8* buffer = base + 0x1640 + 0xFFC;
 
-    r3 = (u32)lbl_803A3E58;
-    f1 = *(f32*)&lbl_8047BA30;
-    r31 = (u32)lbl_803A3E58;
-    r3 = 0x3;
-    ((void(*)(void))fn_801C41C8)();
-    r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
-    r3 = *(u32*)lbl_8047A460;
-    r7 = 0x3;
-    r6 = r31 + 0x1640;
-    *(u32*)((u8*)r31 + 0x1318) = r7;
-    r9 = r3 + 0x1;
-    r5 = r31 + 0x1318;
-    tmp = 0x0;
-    r8 = 0x7;
-    r3 = (u32)fn_800370E0;
-    *(u32*)lbl_8047A460 = r9;
-    r4 = (u32)fn_800370E0;
-    r6 = r6 + 0xffc;
-    *(u32*)((u8*)r5 + 0x4) = r8;
-    r3 = r31 + 0x1328;
-    r7 = 0x1000;
-    r8 = 0x10;
-    *(u32*)((u8*)r5 + 0x8) = tmp;
-    r9 = 0x1;
-    *(u32*)((u8*)r5 + 0xC) = tmp;
-    fn_800A19CC();
-    r3 = r31 + 0x1328;
-    fn_800A1F94();
-    goto L_80036448;
-L_80036444:
-    ((void(*)(void))fn_800F0308)();
-L_80036448:
-    tmp = *(u32*)lbl_8047A460;
-    if ((s32)tmp != 0) goto L_80036444;
-    return;
+    /* Fade mode 3 (special), speed 1.0 */
+    fn_801C41C8(3, lbl_8047BA30);
+    fn_801C40F0(1);
+
+    /* Set up task descriptor */
+    *(u32*)(taskDesc + 0x00) = 3;   /* type */
+    *(u32*)(taskDesc + 0x04) = 7;   /* priority */
+    *(u32*)(taskDesc + 0x08) = 0;   /* offset */
+    *(u32*)(taskDesc + 0x0C) = 0;   /* flags */
+
+    lbl_8047A460 = lbl_8047A460 + 1;
+
+    fn_800A19CC(base + 0x1328, (void*)fn_800370E0, buffer, 0x1000, 0x10, 1);
+    fn_800A1F94(base + 0x1328);
+
+    /* Wait for task to complete */
+    while ((s32)lbl_8047A460 != 0) {
+        fn_800F0308();
+    }
 }
 
 /* 0x60 | fn_80036468 | generic */
@@ -617,93 +586,61 @@ u32 fn_80036468(void) {
     return 0;
 }
 
-/* 0x800364C8 | 0xE8 */
+/*
+ * moviePlayGSLogoSequence - Set up GS logo DMA read, wait, then play logo movie.
+ *
+ * Initializes state, configures a DVD read task, waits for completion,
+ * then fades in and opens the GS logo movie with BGM 0x4D1.
+ *
+ * 0x800364C8 | size: 0xE8
+ */
 void fn_800364C8(void) {
     extern u8 lbl_803A3E58[];
-    extern u8 lbl_8047A460[];
-    extern u8 lbl_8047A468[];
-    extern void fn_800A19CC();
-    extern void fn_800A1F94();
-    extern void fn_800370E0();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
+    extern u32 lbl_8047A460;
+    extern u8 lbl_8047A468;
+    extern void fn_800A19CC(u8* desc, void* callback, u8* buf, u32 size, u32 align, u32 async);
+    extern void fn_800A1F94(u8* desc);
+    extern void fn_800370E0(void);
+    u8* base = lbl_803A3E58;
+    u8* taskDesc = base + 0x1318;
+    u8* buffer = base + 0x1640 + 0xFFC;
 
-    r10 = 0x0;
-    r3 = (u32)lbl_803A3E58;
-    r31 = (u32)lbl_803A3E58;
-    *(u8*)lbl_8047A468 = r10;
-    r3 = *(u32*)lbl_8047A460;
-    r5 = r31 + 0x1318;
-    r7 = 0x5;
-    r8 = 0x4;
-    r9 = r3 + 0x1;
-    tmp = 0x6;
-    r3 = (u32)fn_800370E0;
-    r6 = r31 + 0x1640;
-    *(u32*)lbl_8047A460 = r9;
-    r4 = (u32)fn_800370E0;
-    r3 = r31 + 0x1328;
-    r6 = r6 + 0xffc;
-    *(u32*)((u8*)r31 + 0x1318) = r7;
-    r7 = 0x1000;
-    r9 = 0x1;
-    *(u32*)((u8*)r5 + 0x4) = r8;
-    r8 = 0x10;
-    *(u32*)((u8*)r5 + 0x8) = tmp;
-    *(u32*)((u8*)r5 + 0xC) = r10;
-    fn_800A19CC();
-    r3 = r31 + 0x1328;
-    fn_800A1F94();
-    goto L_80036548;
-L_80036544:
-    ((void(*)(void))fn_800F0308)();
-L_80036548:
-    tmp = *(u32*)lbl_8047A460;
-    if ((s32)tmp != 0) goto L_80036544;
-    f1 = *(f32*)&lbl_8047BA30;
-    r3 = 0x2;
-    ((void(*)(void))fn_801C41C8)();
-    r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
-    r3 = (u32)&lbl_8026702C;
-    r4 = 0x0;
-    r3 = (u32)&lbl_8026702C;
-    ((void(*)(void))fn_801E189C)();
-    r3 = 0x4d1;
-    r4 = 0x0;
-    r5 = 0x7f;
-    ((void(*)(void))fn_80165A20)();
-    r3 = 0x80000000;
-    r4 = 0x0;
-    r3 = r3 + 0x1805;
-    r5 = 0x17fb;
-    memset((void*)r3, (int)r4, (u32)r5);
-    return;
+    lbl_8047A468 = 0;
+
+    /* Set up task descriptor */
+    *(u32*)(taskDesc + 0x00) = 5;   /* type */
+    *(u32*)(taskDesc + 0x04) = 4;   /* priority */
+    *(u32*)(taskDesc + 0x08) = 6;   /* offset */
+    *(u32*)(taskDesc + 0x0C) = 0;   /* flags */
+
+    lbl_8047A460 = lbl_8047A460 + 1;
+
+    fn_800A19CC(base + 0x1328, (void*)fn_800370E0, buffer, 0x1000, 0x10, 1);
+    fn_800A1F94(base + 0x1328);
+
+    /* Wait for task to complete */
+    while ((s32)lbl_8047A460 != 0) {
+        fn_800F0308();
+    }
+
+    /* Fade in and play GS logo movie */
+    fn_801C41C8(2, lbl_8047BA30);
+    fn_801C40F0(1);
+    fn_801E189C(lbl_8026702C, 0);
+    fn_80165A20(0x4D1, 0, 0x7F);
+
+    /* Clear low memory area */
+    memset((void*)0x80001805, 0, 0x17FB);
 }
 
-/* 0x800365B0 | 0x30 */
+/*
+ * movieSetupFadeSpecial2 - Set fade mode 3 with speed 1.0 and enable.
+ *
+ * 0x800365B0 | size: 0x30
+ */
 void fn_800365B0(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-
-    f1 = *(f32*)&lbl_8047BA30;
-    r3 = 0x3;
-    ((void(*)(void))fn_801C41C8)();
-    r3 = 0x1;
-    ((void(*)(void))fn_801C40F0)();
-    return;
+    fn_801C41C8(3, lbl_8047BA30);
+    fn_801C40F0(1);
 }
 
 /* 0x60 | fn_800365E0 | generic */

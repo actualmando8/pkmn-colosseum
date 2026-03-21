@@ -224,79 +224,56 @@ void fn_800A41D0(void) {
     }
 }
 
-/* fn_800A42C4 - 0x800A42C4 | size: 0x110 */
-void fn_800A42C4(void) {
-    extern u8 lbl_8047A784[];
-    extern u8 lbl_8047A7B8[];
-    extern u8 lbl_8047A7BC[];
-    extern u8 lbl_8047A7C0[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f8 = 0.0f;
+/*
+ * DVDLowRead - Issue a DVD read command and set up timeout alarm.
+ *
+ * Writes the DI read command (0xA8) to the DVD hardware registers,
+ * sets up the DMA address and length, then creates a timeout alarm.
+ * The timeout period is 20x or 10x the bus clock tick depending on
+ * whether the DMA length exceeds 3.
+ *
+ * 0x800A42C4 | size: 0x110
+ */
+void fn_800A42C4(u32 cmd, u32 dmaAddr, u32 offset, u32 callback) {
+    extern u32 lbl_8047A784;
+    extern u32 lbl_8047A7B8;
+    extern u32 lbl_8047A7BC;
+    extern u32 lbl_8047A7C0;
+    volatile u32* dvdRegs = (volatile u32*)0xCC006000;
+    u8* cmdListBase = (u8*)(u32)CommandList_803FC290;
+    u32 busTick;
+    u32 timeout;
 
-    tmp = 0x0;
-    r30 = r5 + 0x0;
-    r29 = r4 + 0x0;
-    r28 = r3 + 0x0;
-    *(u32*)StopAtNextInt_8047A780 = tmp;
-    tmp = 0x1;
-    *(u32*)Callback_8047A788 = r6;
-    r6 = (u32)CommandList_803FC290;
-    r31 = (u32)CommandList_803FC290;
-    *(u32*)lbl_8047A7C0 = tmp;
-    __OSGetSystemTime();
-    *(u32*)lbl_8047A7BC = r4;
-    r4 = 0xCC000000;
-    tmp = 0xA00000;
-    *(u32*)lbl_8047A7B8 = r3;
-    r4 = r4 + 0x6000;
-    r3 = 0xA8000000;
-    *(u32*)((u8*)r4 + 0x8) = r3;
-    r3 = (u32)r30 >> 2;
-    *(u32*)((u8*)r4 + 0xC) = r3;
-    tmp = 0x3;
-    *(u32*)((u8*)r4 + 0x10) = r29;
-    *(u32*)((u8*)r4 + 0x14) = r28;
-    *(u32*)((u8*)r4 + 0x18) = r29;
-    *(u32*)lbl_8047A784 = r29;
-    *(u32*)((u8*)r4 + 0x1C) = tmp;
-    if (r29 <= tmp) goto L_800A4384;
-    r3 = 0x80000000;
-    tmp = *(u32*)((u8*)r3 + 0xF8);
-    r3 = r31 + 0x68;
-    tmp = (u32)tmp >> 2;
-    r30 = tmp * 0x14;
-    OSCreateAlarm((OSAlarm*)r3);
-    r3 = (u32)AlarmHandlerForTimeout;
-    r7 = (u32)AlarmHandlerForTimeout;
-    r6 = r30 + 0x0;
-    r3 = r31 + 0x68;
-    r5 = 0x0;
-    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
-    goto L_800A43B4;
-L_800A4384:
-    r3 = 0x80000000;
-    tmp = *(u32*)((u8*)r3 + 0xF8);
-    r3 = r31 + 0x68;
-    tmp = (u32)tmp >> 2;
-    r30 = tmp * 0xa;
-    OSCreateAlarm((OSAlarm*)r3);
-    r3 = (u32)AlarmHandlerForTimeout;
-    r7 = (u32)AlarmHandlerForTimeout;
-    r6 = r30 + 0x0;
-    r3 = r31 + 0x68;
-    r5 = 0x0;
-    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
-L_800A43B4:
-    return;
+    *(u32*)&StopAtNextInt_8047A780 = 0;
+    *(u32*)&Callback_8047A788 = callback;
+    lbl_8047A7C0 = 1;
+
+    /* Record start time */
+    {
+        s64 time = __OSGetSystemTime();
+        lbl_8047A7B8 = (u32)(time >> 32);
+        lbl_8047A7BC = (u32)time;
+    }
+
+    /* Write DVD hardware registers */
+    dvdRegs[2] = 0xA8000000;              /* CMD: read */
+    dvdRegs[3] = offset >> 2;             /* offset (in 4-byte units) */
+    dvdRegs[4] = dmaAddr;                 /* DMA buffer address */
+    dvdRegs[5] = cmd;                     /* DMA length */
+    dvdRegs[6] = dmaAddr;                 /* DMA length (again) */
+    lbl_8047A784 = dmaAddr;
+    dvdRegs[7] = 3;                       /* control: start */
+
+    /* Set up timeout alarm */
+    busTick = BUS_CLOCK >> 2;
+    if (dmaAddr > 3) {
+        timeout = busTick * 20;
+    } else {
+        timeout = busTick * 10;
+    }
+    OSCreateAlarm((OSAlarm*)(cmdListBase + 0x68));
+    OSSetAlarm((OSAlarm*)(cmdListBase + 0x68), (s64)timeout,
+               (OSAlarmHandler)AlarmHandlerForTimeout);
 }
 
 /* fn_800A43D4 - 0x800A43D4 | size: 0x80

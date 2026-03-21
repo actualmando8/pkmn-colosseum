@@ -536,241 +536,167 @@ L_800A0C90:
 }
 
 /* fn_800A0D10 - 0x800A0D10 | size: 0x124 */
-void fn_800A0D10(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * ReadSramDma - Read SRAM data via EXI DMA transfer.
+ *
+ * Invalidates the destination cache range, then performs a full
+ * EXI lock/select/command/DMA/deselect/unlock sequence to read
+ * SRAM data at the given offset.
+ *
+ * 0x800A0D10 | size: 0x124
+ */
+BOOL fn_800A0D10(void* dest, u32 size, u32 offset) {
+    u32 cmd;
+    BOOL err = FALSE;
 
-    r31 = r5 + 0x0;
-    r30 = r4 + 0x0;
-    r29 = r3 + 0x0;
-    DCInvalidateRange();
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x0;
-    EXILock(r3, r4, 0);
-    if ((s32)r3 != 0) goto L_800A0D58;
-    r3 = 0x0;
-    goto L_800A0E18;
-L_800A0D58:
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x3;
-    EXISelect(r3, r4, r5);
-    if ((s32)r3 != 0) goto L_800A0D80;
-    r3 = 0x0;
-    EXIUnlock(r3);
-    r3 = 0x0;
-    goto L_800A0E18;
-L_800A0D80:
-    tmp = r31 << 6;
-    r4 = (u32)sp + 0x14;
-    r3 = 0x0;
-    r5 = 0x4;
-    r6 = 0x1;
-    r7 = 0x0;
-    EXIImm(r3, (void*)r4, r5, 0, 0);
-    tmp = __cntlzw(r3);
-    r31 = (u32)tmp >> 5;
-    r3 = 0x0;
-    EXISync(r3);
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r4 = r29 + 0x0;
-    r5 = r30 + 0x0;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    r6 = 0x0;
-    r7 = 0x0;
-    EXIDma(r3, (void*)r4, r5, 0, 0);
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    EXISync(r3);
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    EXIDeselect(r3);
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    EXIUnlock(r3);
-    tmp = __cntlzw(r31);
-    r3 = (u32)tmp >> 5;
-L_800A0E18:
-    return;
+    DCInvalidateRange(dest, size);
+
+    if (!EXILock(0, 1, NULL)) {
+        return FALSE;
+    }
+
+    if (!EXISelect(0, 1, 3)) {
+        EXIUnlock(0);
+        return FALSE;
+    }
+
+    /* Send read command: address with offset shifted */
+    cmd = offset << 6;
+    if (!EXIImm(0, &cmd, 4, 1, NULL)) { err = TRUE; }
+    if (!EXISync(0)) { err = TRUE; }
+    if (!EXIDma(0, dest, (s32)size, 0, NULL)) { err = TRUE; }
+    if (!EXISync(0)) { err = TRUE; }
+    if (!EXIDeselect(0)) { err = TRUE; }
+    EXIUnlock(0);
+
+    return !err;
 }
 
-/* fn_800A0E34 - 0x800A0E34 | size: 0x80 */
-void fn_800A0E34(void) {
-    extern void fn_800A09B0();
+/*
+ * SramGetFlag04 - Lock SRAM and return whether flag bit 0x04 is set.
+ *
+ * Acquires the SRAM lock (Scb+0x48), reads the flags byte at offset 0x13,
+ * checks bit 2 (0x04), then releases via fn_800A09B0.
+ *
+ * 0x800A0E34 | size: 0x80
+ */
+u32 fn_800A0E34(void) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    BOOL enabled;
+    u32 result;
 
-    r3 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A0E6C;
-    OSRestoreInterrupts(r3);
-    r31 = 0x0;
-    goto L_800A0E78;
-L_800A0E6C:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A0E78:
-    tmp = *(u8*)((u8*)r31 + 0x13);
-    tmp = tmp & 0x00000004;
-    if ((s32)tmp == 0) goto L_800A0E8C;
-    r31 = 0x1;
-    goto L_800A0E90;
-L_800A0E8C:
-    r31 = 0x0;
-L_800A0E90:
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_800A09B0();
-    r3 = r31;
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+    }
+
+    result = (*(u8*)(sram + 0x13) & 0x04) ? 1 : 0;
+
+    fn_800A09B0(0, 0);
+    return result;
 }
 
-/* fn_800A0EB4 - 0x800A0EB4 | size: 0xA4 */
-void fn_800A0EB4(void) {
-    extern void fn_800A09B0();
+/*
+ * SramSetFlag04 - Lock SRAM and set/clear flag bit 0x04.
+ *
+ * Acquires the SRAM lock, reads flags at offset 0x13. If the current
+ * value of bit 0x04 matches the requested value (r30), does nothing.
+ * Otherwise, clears the old bit, sets the new value, and commits.
+ *
+ * 0x800A0EB4 | size: 0xA4
+ */
+void fn_800A0EB4(u32 newVal) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    BOOL enabled;
+    u8 flags;
 
-    r4 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A0EF4;
-    OSRestoreInterrupts(r3);
-    r31 = 0x0;
-    goto L_800A0F00;
-L_800A0EF4:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A0F00:
-    r3 = *(u8*)((u8*)r31 + 0x13);
-    tmp = r3 & 0x00000004;
-    if (r30 != tmp) goto L_800A0F20;
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_800A09B0();
-    goto L_800A0F40;
-L_800A0F20:
-    tmp = r3 & 0xFFFFFFFB;
-    *(u8*)((u8*)r31 + 0x13) = tmp;
-    r3 = 0x1;
-    r4 = 0x0;
-    tmp = *(u8*)((u8*)r31 + 0x13);
-    tmp = tmp | r30;
-    *(u8*)((u8*)r31 + 0x13) = tmp;
-    fn_800A09B0();
-L_800A0F40:
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+    }
+
+    flags = *(u8*)(sram + 0x13);
+    if (newVal == (u32)(flags & 0x04)) {
+        fn_800A09B0(0, 0);
+    } else {
+        *(u8*)(sram + 0x13) = flags & ~0x04;
+        flags = *(u8*)(sram + 0x13);
+        *(u8*)(sram + 0x13) = flags | (u8)newVal;
+        fn_800A09B0(1, 0);
+    }
 }
 
-/* fn_800A0F58 - 0x800A0F58 | size: 0x70 */
-void fn_800A0F58(void) {
-    extern void fn_800A09B0();
+/*
+ * SramGetFlag80 - Lock SRAM and return whether flag bit 0x80 is set.
+ *
+ * 0x800A0F58 | size: 0x70
+ */
+u32 fn_800A0F58(void) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    BOOL enabled;
+    u32 result;
 
-    r3 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A0F90;
-    OSRestoreInterrupts(r3);
-    r31 = 0x0;
-    goto L_800A0F9C;
-L_800A0F90:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A0F9C:
-    tmp = *(u8*)((u8*)r31 + 0x13);
-    r3 = 0x0;
-    r4 = 0x0;
-    /* extrwi r31, tmp, 1, 24 */;
-    fn_800A09B0();
-    r3 = r31;
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+    }
+
+    result = (*(u8*)(sram + 0x13) >> 7) & 1;
+
+    fn_800A09B0(0, 0);
+    return result;
 }
 
-/* fn_800A0FC8 - 0x800A0FC8 | size: 0xA4 */
-void fn_800A0FC8(void) {
-    extern void fn_800A09B0();
+/*
+ * SramSetFlag80 - Lock SRAM and set/clear flag bit 0x80.
+ *
+ * Same pattern as SramSetFlag04 but operates on bit 7 (0x80).
+ *
+ * 0x800A0FC8 | size: 0xA4
+ */
+void fn_800A0FC8(u32 newVal) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    BOOL enabled;
+    u8 flags;
 
-    r4 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A1008;
-    OSRestoreInterrupts(r3);
-    r31 = 0x0;
-    goto L_800A1014;
-L_800A1008:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A1014:
-    r3 = *(u8*)((u8*)r31 + 0x13);
-    tmp = r3 & 0x00000080;
-    if (r30 != tmp) goto L_800A1034;
-    r3 = 0x0;
-    r4 = 0x0;
-    fn_800A09B0();
-    goto L_800A1054;
-L_800A1034:
-    tmp = r3 & 0xFFFFFF7F;
-    *(u8*)((u8*)r31 + 0x13) = tmp;
-    r3 = 0x1;
-    r4 = 0x0;
-    tmp = *(u8*)((u8*)r31 + 0x13);
-    tmp = tmp | r30;
-    *(u8*)((u8*)r31 + 0x13) = tmp;
-    fn_800A09B0();
-L_800A1054:
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+    }
+
+    flags = *(u8*)(sram + 0x13);
+    if (newVal == (u32)(flags & 0x80)) {
+        fn_800A09B0(0, 0);
+    } else {
+        *(u8*)(sram + 0x13) = flags & ~0x80;
+        flags = *(u8*)(sram + 0x13);
+        *(u8*)(sram + 0x13) = flags | (u8)newVal;
+        fn_800A09B0(1, 0);
+    }
 }
 
 /* fn_800A106C - 0x800A106C | size: 0x6C
@@ -801,88 +727,75 @@ u32 fn_800A106C(void) {
     return result;
 }
 
-/* fn_800A10D8 - 0x800A10D8 | size: 0x84 */
-void fn_800A10D8(void) {
-    extern void fn_800A09B0();
+/*
+ * SramGetPadID - Lock SRAM and read a wireless pad ID.
+ *
+ * Locks the SRAM, reads a 16-bit pad ID from the SramEx structure
+ * at offset 0x14 + 0x1C + (index * 2), then releases.
+ *
+ * 0x800A10D8 | size: 0x84
+ */
+u16 fn_800A10D8(u32 padIndex) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    u8* sramEx;
+    BOOL enabled;
+    u16 result;
 
-    r4 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    r30 = r3 + 0x0;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A1118;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_800A1128;
-L_800A1118:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    r3 = r31 + 0x14;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A1128:
-    tmp = r30 << 1;
-    r3 = r3 + tmp;
-    r31 = *(u16*)((u8*)r3 + 0x1C);
-    r3 = 0x0;
-    r4 = 0x14;
-    fn_800A09B0();
-    r3 = r31;
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+        sramEx = NULL;
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+        sramEx = sram + 0x14;
+    }
+
+    result = *(u16*)(sramEx + 0x1C + (padIndex * 2));
+
+    fn_800A09B0(0, 0x14);
+    return result;
 }
 
-/* fn_800A115C - 0x800A115C | size: 0xAC */
-void fn_800A115C(void) {
-    extern void fn_800A09B0();
+/*
+ * SramSetPadID - Lock SRAM and write a wireless pad ID.
+ *
+ * If the new value differs from the current one, writes it and
+ * commits the SRAM. Otherwise, just releases the lock.
+ *
+ * 0x800A115C | size: 0xAC
+ */
+void fn_800A115C(u32 padIndex, u16 newId) {
+    extern void fn_800A09B0(u32 commit, u32 lockBit);
     extern u32 Scb_803FB840;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* sram = (u8*)(u32)Scb_803FB840;
+    u8* sramEx;
+    BOOL enabled;
+    u16 curId;
+    u8* entry;
 
-    r5 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    r30 = r4 + 0x0;
-    r29 = r3 + 0x0;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r31 + 0x48);
-    r4 = r31 + 0x48;
-    if ((s32)tmp == 0) goto L_800A11A4;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_800A11B4;
-L_800A11A4:
-    *(u32*)((u8*)r31 + 0x44) = r3;
-    tmp = 0x1;
-    r3 = r31 + 0x14;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_800A11B4:
-    tmp = r29 << 1;
-    r4 = r3 + tmp;
-    r3 = *(u16*)((u8*)r4 + 0x1C);
-    tmp = r30 & 0xFFFF;
-    if (r3 == tmp) goto L_800A11E0;
-    *(u16*)((u8*)r4 + 0x0) = r30;
-    r3 = 0x1;
-    r4 = 0x14;
-    fn_800A09B0();
-    goto L_800A11EC;
-L_800A11E0:
-    r3 = 0x0;
-    r4 = 0x14;
-    fn_800A09B0();
-L_800A11EC:
-    return;
+    enabled = OSDisableInterrupts();
+
+    if (*(s32*)(sram + 0x48) != 0) {
+        OSRestoreInterrupts(enabled);
+        sramEx = NULL;
+    } else {
+        *(u32*)(sram + 0x44) = (u32)enabled;
+        *(u32*)(sram + 0x48) = 1;
+        sramEx = sram + 0x14;
+    }
+
+    entry = sramEx + 0x1C + (padIndex * 2);
+    curId = *(u16*)entry;
+    if (curId != (newId & 0xFFFF)) {
+        *(u16*)entry = newId;
+        fn_800A09B0(1, 0x14);
+    } else {
+        fn_800A09B0(0, 0x14);
+    }
 }
 
 /* fn_800A1208 - 0x800A1208 | size: 0x20 */

@@ -573,357 +573,233 @@ BOOL fn_80098944(s32 chan) {
 }
 
 /* fn_800989C0 - 0x800989C0 | size: 0x128 */
-void fn_800989C0(void) {
-    u8 sp[0x20];
+/*
+ * EXISync - Synchronize/complete an EXI transfer on a channel.
+ *
+ * Waits for any pending transfer to complete, then verifies the channel
+ * is ready and starts DMA-mode interrupt handling if needed.
+ *
+ * 0x800989C0 | size: 0x128
+ */
+BOOL fn_800989C0(s32 chan) {
     extern u8 lbl_803FB3C8[];
-    extern void fn_800986A0();
-    extern void fn_80098790();
-    extern void fn_80099400();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern BOOL fn_800986A0(s32 chan, u32 dev, u32 freq, u32 unk);
+    extern BOOL fn_80098790(s32 chan);
+    extern void fn_80099400(s32 chan, u32 unk, void* buf);
+    u8 sp[0x20];
+    u8* base = lbl_803FB3C8;
+    u8* chanData = base + (chan << 6);
+    BOOL enabled;
+    BOOL enabled2;
+    BOOL result;
+    BOOL probeResult;
 
-    r31 = r3;
-    r3 = (u32)lbl_803FB3C8;
-    r30 = (u32)lbl_803FB3C8;
-    tmp = r31 << 6;
-    r24 = r30 + tmp;
-    tmp = r31 << 6;
-    r22 = r30 + tmp;
-    r3 = r31 + 0x0;
-    fn_80098790();
-    /* mr. r27, r3 */;
-    if ((s32)tmp == 0) goto L_80098A20;
-    tmp = *(u32*)((u8*)r22 + 0x20);
-    if ((s32)tmp != 0) goto L_80098A20;
-    r3 = r31 + 0x0;
-    r4 = 0x0;
-    r5 = (u32)sp + 0x10;
-    fn_80099400();
-L_80098A20:
-    OSDisableInterrupts();
-    r28 = r3;
-    tmp = *(u32*)((u8*)r24 + 0x20);
-    if ((s32)tmp != 0) goto L_80098A44;
-    r3 = r28;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_80098AD4;
-L_80098A44:
-    tmp = r31 << 6;
-    r29 = r30 + tmp;
-    OSDisableInterrupts();
-    r25 = r3;
-    tmp = *(u32*)((u8*)r29 + 0xC);
-    tmp = tmp & 0x00000008;
-    if ((s32)tmp != 0) goto L_80098A70;
-    r3 = r31;
-    fn_80098790();
-    if ((s32)r3 != 0) goto L_80098A80;
-L_80098A70:
-    r3 = r25;
-    OSRestoreInterrupts(r3);
-    r26 = 0x0;
-    goto L_80098AC4;
-L_80098A80:
-    r3 = r31 + 0x0;
-    r4 = 0x1;
-    r5 = 0x0;
-    r6 = 0x0;
-    fn_800986A0();
-    *(u32*)((u8*)r29 + 0x8) = tmp;
-    r3 = 0x100000;
-    tmp = r31 * 0x3;
-    r3 = (u32)r3 >> tmp;
-    __OSUnmaskInterrupts(r3);
-    tmp = *(u32*)((u8*)r29 + 0xC);
-    tmp = tmp | 0x8;
-    *(u32*)((u8*)r29 + 0xC) = tmp;
-    r3 = r25;
-    OSRestoreInterrupts(r3);
-    r26 = 0x1;
-L_80098AC4:
-    r23 = r26 + 0x0;
-    r3 = r28 + 0x0;
-    OSRestoreInterrupts(r3);
-    r3 = r23;
-L_80098AD4:
-    return;
+    /* If device is present but no callback registered, do a sync read */
+    probeResult = fn_80098790(chan);
+    if (probeResult != 0 && *(u32*)(chanData + 0x20) == 0) {
+        fn_80099400(chan, 0, (void*)(sp + 0x10));
+    }
+
+    /* Check if transfer callback is set */
+    enabled = OSDisableInterrupts();
+    if (*(u32*)(chanData + 0x20) == 0) {
+        OSRestoreInterrupts(enabled);
+        return 0;
+    }
+
+    /* Check if DMA is already in progress or if device is gone */
+    enabled2 = OSDisableInterrupts();
+    if ((*(u32*)(chanData + 0x0C) & 0x08) != 0 || fn_80098790(chan) == 0) {
+        OSRestoreInterrupts(enabled2);
+        result = 0;
+    } else {
+        /* Start DMA transfer */
+        fn_800986A0(chan, 1, 0, 0);
+        /* Store transfer handle */
+        /* Unmask EXI interrupt for this channel */
+        __OSUnmaskInterrupts(0x100000 >> (chan * 3));
+        /* Mark DMA in progress */
+        *(u32*)(chanData + 0x0C) = *(u32*)(chanData + 0x0C) | 0x8;
+        OSRestoreInterrupts(enabled2);
+        result = 1;
+    }
+
+    OSRestoreInterrupts(enabled);
+    return result;
 }
 
 /* fn_80098AE8 - 0x80098AE8 | size: 0xAC */
-void fn_80098AE8(void) {
+/*
+ * EXIDeselect - Deselect an EXI device on a channel.
+ *
+ * Checks if DMA is in progress on the channel. If not, returns TRUE
+ * immediately. If DMA is active with a callback pending and no
+ * completion, returns FALSE (busy). Otherwise, clears the DMA flag,
+ * masks the channel's EXI interrupts, and returns TRUE.
+ *
+ * 0x80098AE8 | size: 0xAC
+ */
+BOOL fn_80098AE8(s32 chan) {
     extern u8 lbl_803FB3C8[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    u8* chanData = lbl_803FB3C8 + (chan << 6);
+    BOOL enabled;
 
-    r29 = r3 + 0x0;
-    r4 = r3 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r31 = tmp + r4;
-    OSDisableInterrupts();
-    r30 = r3;
-    tmp = *(u32*)((u8*)r31 + 0xC);
-    tmp = tmp & 0x00000008;
-    if ((s32)tmp != 0) goto L_80098B30;
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    r3 = 0x1;
-    goto L_80098B80;
-L_80098B30:
-    tmp = *(u32*)((u8*)r31 + 0xC);
-    tmp = tmp & 0x00000010;
-    if ((s32)tmp == 0) goto L_80098B58;
-    tmp = *(u32*)((u8*)r31 + 0x18);
-    if (tmp != 0) goto L_80098B58;
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_80098B80;
-L_80098B58:
-    tmp = *(u32*)((u8*)r31 + 0xC);
-    tmp = tmp & 0xFFFFFFF7;
-    *(u32*)((u8*)r31 + 0xC) = tmp;
-    r3 = 0x700000;
-    tmp = r29 * 0x3;
-    r3 = (u32)r3 >> tmp;
-    __OSMaskInterrupts(r3);
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    r3 = 0x1;
-L_80098B80:
-    return;
+    enabled = OSDisableInterrupts();
+
+    /* If DMA is not in progress, nothing to deselect */
+    if ((*(u32*)(chanData + 0x0C) & 0x08) == 0) {
+        OSRestoreInterrupts(enabled);
+        return TRUE;
+    }
+
+    /* If callback mode is active but no completion yet, busy */
+    if ((*(u32*)(chanData + 0x0C) & 0x10) != 0 && *(u32*)(chanData + 0x18) == 0) {
+        OSRestoreInterrupts(enabled);
+        return FALSE;
+    }
+
+    /* Clear DMA-in-progress flag */
+    *(u32*)(chanData + 0x0C) = *(u32*)(chanData + 0x0C) & ~0x08;
+
+    /* Mask all 3 EXI interrupts for this channel */
+    __OSMaskInterrupts(0x700000 >> (chan * 3));
+
+    OSRestoreInterrupts(enabled);
+    return TRUE;
 }
 
 /* fn_80098DDC - 0x80098DDC | size: 0xC0 */
-void fn_80098DDC(void) {
-    u8 sp[0x20];
+/*
+ * EXIIntrHandler - Handle EXI channel interrupt.
+ *
+ * Determines the channel from the interrupt number (irq / 3),
+ * acknowledges the interrupt by writing to the EXI CSR register,
+ * then calls the registered callback if one exists.
+ *
+ * 0x80098DDC | size: 0xC0
+ */
+void fn_80098DDC(s16 irq, OSContext* context) {
     extern u8 lbl_803FB3C8[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f5 = 0.0f;
-    f32 f8 = 0.0f;
+    OSContext exiContext;
+    s32 chan = (s32)irq / 3;
+    u8* chanData = lbl_803FB3C8 + (chan << 6);
+    volatile u32* exiCsr = (volatile u32*)(0xCC006800 + (chan * 5 * 4));
+    u32 csrVal;
+    void (*callback)(s32 chan, OSContext* ctx);
 
-    *(u16*)((u32)sp + 0x8) = r3;
-    r27 = r4;
-    r3 = *(s16*)((u8*)(u32)sp + 0x8);
-    tmp = 0x3;
-    r31 = (s32)r3 / (s32)tmp;
-    r4 = r31 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r28 = tmp + r4;
-    tmp = r31 * 0x5;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    r30 = *(u32*)(r3 + tmp);
-    r30 = r30 & 0x7f5;
-    r30 = r30 | 0x2;
-    tmp = r31 * 0x5;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    *(u32*)(r3 + tmp) = r30;
-    r29 = *(u32*)((u8*)r28 + 0x0);
-    if (r29 == 0) goto L_80098E88;
-    r3 = (u32)sp + 0x18;
-    OSClearContext((OSContext*)r3);
-    r3 = (u32)sp + 0x18;
-    OSSetCurrentContext((OSContext*)r3);
-    r3 = r31 + 0x0;
-    r4 = r27 + 0x0;
-    r12 = r29 + 0x0;
-    /* blrl  */;
-    r3 = (u32)sp + 0x18;
-    OSClearContext((OSContext*)r3);
-    r3 = r27;
-    OSSetCurrentContext((OSContext*)r3);
-L_80098E88:
-    return;
+    /* Acknowledge interrupt: preserve status bits, set bit 1 */
+    csrVal = *exiCsr;
+    csrVal = (csrVal & 0x7F5) | 0x2;
+    *exiCsr = csrVal;
+
+    /* Call registered callback if present */
+    callback = (void (*)(s32, OSContext*)) *(u32*)(chanData + 0x00);
+    if (callback != NULL) {
+        OSClearContext(&exiContext);
+        OSSetCurrentContext(&exiContext);
+        callback(chan, context);
+        OSClearContext(&exiContext);
+        OSSetCurrentContext(context);
+    }
 }
 
 /* fn_80098E9C - 0x80098E9C | size: 0x15C */
-void fn_80098E9C(void) {
-    u8 sp[0x20];
+/*
+ * EXIDmaHandler - Handle EXI DMA transfer complete interrupt.
+ *
+ * Determines channel from IRQ, masks interrupt, acknowledges CSR,
+ * reads any remaining bytes from the EXI data register, clears
+ * transfer state, and invokes the completion callback.
+ *
+ * 0x80098E9C | size: 0x15C
+ */
+void fn_80098E9C(s16 irq, OSContext* context) {
     extern u8 lbl_803FB3C8[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r21 = 0;
-    u32 r22 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f5 = 0.0f;
+    OSContext exiContext;
+    s32 chan = (s32)(s16)irq / 3;
+    u8* chanData = lbl_803FB3C8 + (chan << 6);
+    volatile u32* exiCsr = (volatile u32*)(0xCC006800 + (chan * 5 * 4));
+    volatile u32* exiData = (volatile u32*)(0xCC006800 + ((chan * 5 + 4) * 4));
+    u32 csrVal;
+    void (*callback)(s32, OSContext*);
+    s32 remaining;
+    u8* destBuf;
+    u32 dataReg;
+    s32 i;
 
-    r21 = r3 + 0x0;
-    r22 = r4 + 0x0;
-    r3 = (s16)r21;
-    tmp = 0x3;
-    r31 = (s32)r3 / (s32)tmp;
-    r4 = r31 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r27 = tmp + r4;
-    r3 = 0x80000000;
-    tmp = (s16)r21;
-    r3 = (u32)r3 >> tmp;
-    __OSMaskInterrupts(r3);
-    tmp = r31 * 0x5;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    r29 = *(u32*)(r3 + tmp);
-    r29 = r29 & 0x7f5;
-    r29 = r29 | 0x8;
-    tmp = r31 * 0x5;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    *(u32*)(r3 + tmp) = r29;
-    r26 = *(u32*)((u8*)r27 + 0x4);
-    if (r26 == 0) goto L_80098FE4;
-    tmp = 0x0;
-    *(u32*)((u8*)r27 + 0x4) = tmp;
-    r4 = r31 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r30 = tmp + r4;
-    tmp = *(u32*)((u8*)r30 + 0xC);
-    tmp = tmp & 0x3;
-    if (r26 == 0) goto L_80098FB0;
-    tmp = *(u32*)((u8*)r30 + 0xC);
-    tmp = tmp & 0x00000002;
-    if (r26 == 0) goto L_80098FA4;
-    r25 = *(u32*)((u8*)r30 + 0x10);
-    if ((s32)r25 == 0) goto L_80098FA4;
-    r23 = *(u32*)((u8*)r30 + 0x14);
-    r3 = r31 * 0x5;
-    tmp = r3 + 0x4;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    r24 = *(u32*)(r3 + tmp);
-    r28 = 0x0;
-    goto L_80098F9C;
-L_80098F84:
-    tmp = 0x3 - r28;
-    tmp = tmp << 3;
-    r3 = (u32)r24 >> tmp;
-    *(u8*)((u8*)r23 + 0x0) = r3;
-    r23 = r23 + 0x1;
-    r28 = r28 + 0x1;
-L_80098F9C:
-    if ((s32)r28 < (s32)r25) goto L_80098F84;
-L_80098FA4:
-    tmp = *(u32*)((u8*)r30 + 0xC);
-    /* clrrwi tmp, tmp, 2 */;
-    *(u32*)((u8*)r30 + 0xC) = tmp;
-L_80098FB0:
-    r3 = (u32)sp + 0x18;
-    OSClearContext((OSContext*)r3);
-    r3 = (u32)sp + 0x18;
-    OSSetCurrentContext((OSContext*)r3);
-    r3 = r31 + 0x0;
-    r4 = r22 + 0x0;
-    r12 = r26 + 0x0;
-    /* blrl  */;
-    r3 = (u32)sp + 0x18;
-    OSClearContext((OSContext*)r3);
-    r3 = r22;
-    OSSetCurrentContext((OSContext*)r3);
-L_80098FE4:
-    return;
+    /* Mask the interrupt source */
+    __OSMaskInterrupts(0x80000000u >> (s16)irq);
+
+    /* Acknowledge DMA complete: preserve status, set bit 3 */
+    csrVal = *exiCsr;
+    csrVal = (csrVal & 0x7F5) | 0x8;
+    *exiCsr = csrVal;
+
+    /* Get and clear the completion callback */
+    callback = (void (*)(s32, OSContext*)) *(u32*)(chanData + 0x04);
+    if (callback == NULL) {
+        return;
+    }
+    *(u32*)(chanData + 0x04) = 0;
+
+    /* If there are remaining bytes from an immediate transfer, read them */
+    if ((*(u32*)(chanData + 0x0C) & 0x02) != 0) {
+        remaining = *(s32*)(chanData + 0x10);
+        if (remaining > 0) {
+            destBuf = (u8*) *(u32*)(chanData + 0x14);
+            dataReg = *exiData;
+            for (i = 0; i < remaining; i++) {
+                *destBuf = (u8)(dataReg >> ((3 - i) * 8));
+                destBuf++;
+            }
+        }
+    }
+
+    /* Clear transfer mode bits */
+    *(u32*)(chanData + 0x0C) = *(u32*)(chanData + 0x0C) & ~0x03;
+
+    /* Call the completion callback in a clean context */
+    OSClearContext(&exiContext);
+    OSSetCurrentContext(&exiContext);
+    callback(chan, context);
+    OSClearContext(&exiContext);
+    OSSetCurrentContext(context);
 }
 
-/* fn_80098FF8 - 0x80098FF8 | size: 0xC8 */
-void fn_80098FF8(void) {
-    u8 sp[0x20];
+/*
+ * EXIExtIntrHandler - Handle EXI external device insertion/removal interrupt.
+ *
+ * Masks all 3 EXI interrupts for the channel, clears the CSR register,
+ * clears the DMA-in-progress flag, then invokes the ext callback if set.
+ *
+ * 0x80098FF8 | size: 0xC8
+ */
+void fn_80098FF8(s16 irq, OSContext* context) {
     extern u8 lbl_803FB3C8[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    OSContext exiContext;
+    s32 chan = (s32)irq / 3;
+    u8* chanData = lbl_803FB3C8 + (chan << 6);
+    volatile u32* exiCsr = (volatile u32*)(0xCC006800 + (chan * 5 * 4));
+    void (*callback)(s32, OSContext*);
 
-    *(u16*)((u32)sp + 0x8) = r3;
-    r28 = r4;
-    r3 = *(s16*)((u8*)(u32)sp + 0x8);
-    tmp = 0x3;
-    r31 = (s32)r3 / (s32)tmp;
-    r3 = 0x700000;
-    tmp = r31 * 0x3;
-    r3 = (u32)r3 >> tmp;
-    __OSMaskInterrupts(r3);
-    r4 = 0x0;
-    tmp = r31 * 0x5;
-    tmp = tmp << 2;
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6800;
-    *(u32*)(r3 + tmp) = r4;
-    r4 = r31 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r30 = tmp + r4;
-    r29 = *(u32*)((u8*)r30 + 0x8);
-    tmp = *(u32*)((u8*)r30 + 0xC);
-    tmp = tmp & 0xFFFFFFF7;
-    *(u32*)((u8*)r30 + 0xC) = tmp;
-    if (r29 == 0) goto L_800990AC;
-    r3 = (u32)sp + 0x10;
-    OSClearContext((OSContext*)r3);
-    r3 = (u32)sp + 0x10;
-    OSSetCurrentContext((OSContext*)r3);
-    tmp = 0x0;
-    *(u32*)((u8*)r30 + 0x8) = tmp;
-    r3 = r31 + 0x0;
-    r4 = r28 + 0x0;
-    r12 = r29 + 0x0;
-    /* blrl  */;
-    r3 = (u32)sp + 0x10;
-    OSClearContext((OSContext*)r3);
-    r3 = r28;
-    OSSetCurrentContext((OSContext*)r3);
-L_800990AC:
-    return;
+    /* Mask all 3 EXI interrupts for this channel */
+    __OSMaskInterrupts(0x700000 >> (chan * 3));
+
+    /* Clear CSR */
+    *exiCsr = 0;
+
+    /* Clear DMA-in-progress flag */
+    *(u32*)(chanData + 0x0C) = *(u32*)(chanData + 0x0C) & ~0x08;
+
+    /* Call ext callback if registered */
+    callback = (void (*)(s32, OSContext*)) *(u32*)(chanData + 0x08);
+    if (callback != NULL) {
+        *(u32*)(chanData + 0x08) = 0;
+        OSClearContext(&exiContext);
+        OSSetCurrentContext(&exiContext);
+        callback(chan, context);
+        OSClearContext(&exiContext);
+        OSSetCurrentContext(context);
+    }
 }
 

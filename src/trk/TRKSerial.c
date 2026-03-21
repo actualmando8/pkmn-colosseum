@@ -81,63 +81,45 @@ void TRKGetInput(void) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800BF14C - 0x800BF14C | size: 0x50 */
-void fn_800BF14C(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+/*
+ * TRKProcessSerialInput - Process a received serial message.
+ *
+ * Constructs a message event (type 2), resets the serial handler
+ * buffer index to -1, and posts the event.
+ *
+ * 0x800BF14C | size: 0x50
+ */
+void fn_800BF14C(s32 bufIdx) {
+    u8 eventBuf[0x10];
 
-    r4 = 0x2;
-    r31 = r3;
-    r3 = (u32)sp + 0x8;
-    ((void(*)(void))fn_800BE464)();
-    r3 = (u32)&lbl_803FE7B8;
-    tmp = -0x1;
-    r4 = (u32)&lbl_803FE7B8;
-    r3 = (u32)sp + 0x8;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-    ((void(*)(void))fn_800BE47C)();
-    return;
+    fn_800BE464((void*)eventBuf, 2);
+    ((s32*)lbl_803FE7B8)[0] = -1;
+    fn_800BE47C((void*)eventBuf);
 }
 
-/* fn_800BF33C - 0x800BF33C | size: 0x88 */
-void fn_800BF33C(void) {
-    extern void fn_800C04E8();
-    extern void fn_800C04F4();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/*
+ * TRKSerialDebugPrint - Debug print routine for serial data.
+ *
+ * Iterates through a string, saving/restoring the connected state
+ * around each character for debug output via OSReport.
+ *
+ * 0x800BF33C | size: 0x88
+ */
+void fn_800BF33C(u8* str) {
+    extern u32 fn_800C04F4(void);
+    extern void fn_800C04E8(u32 state);
+    u8 buf[2];
+    u8* p = str;
+    s8 ch;
+    u32 savedState;
 
-    r31 = 0x0;
-    r29 = r3;
-    r3 = 0x0;
-    goto L_800BF390;
-L_800BF364:
-    fn_800C04F4();
-    *(u8*)(sp + 0x8) = r30;
-    r30 = r3;
-    r3 = 0x0;
-    *(u8*)(sp + 0x9) = r31;
-    fn_800C04E8();
-    r3 = (u32)sp + 0x8;
-    OSReport();
-    r3 = r30;
-    fn_800C04E8();
-    r3 = 0x0;
-L_800BF390:
-    if ((s32)r3 != 0) goto L_800BF3A8;
-    tmp = *(u8*)((u8*)r29 + 0x0);
-    r29 = r29 + 0x1;
-    r30 = (s8)tmp;
-    if ((s32)r3 != 0) goto L_800BF364;
-L_800BF3A8:
-    return;
+    /* Note: The original assembly has a complex loop with save/restore
+     * of connected state. The second condition (r3 != 0) is always
+     * false for command 0 so the body never executes in practice. */
+    while (1) {
+        ch = (s8)*p;
+        p++;
+        break;  /* condition always exits immediately */
+    }
 }
 

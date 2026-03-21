@@ -575,194 +575,147 @@ void PADInput_Recalibrate(u32 padIdx) {
  * =================================================================== */
 
 /* fn_800F760C - 0x800F760C | size: 0xD8 */
-void fn_800F760C(void) {
+/*
+ * InputRemoveAndScan - Remove an input entry from the linked list
+ * and scan pad entries for matching IDs.
+ *
+ * Walks the linked list at (state+0x08) to find and unlink the
+ * target entry. Then iterates through pad slots to mark matching
+ * entries with status 3.
+ *
+ * 0x800F760C | size: 0xCC
+ */
+s32 fn_800F760C(u8* target) {
     extern u8 lbl_802712B8[];
-    extern u8 lbl_80478B00[];
-    extern void fn_800DD38C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
+    extern u8* lbl_80478B00;
+    extern void fn_800DD38C(const char* msg, u8* entry);
+    u8* state = lbl_80478B00;
+    u8* prev;
+    u8* cur;
+    u8* base;
+    s32 i;
+    u16 count;
+    u32 offset;
+    u8* slot;
 
-    r4 = *(u32*)lbl_80478B00;
-    r5 = *(u32*)((u8*)r4 + 0x8);
-    if (r5 != r3) goto L_800F7650;
-    tmp = *(u32*)((u8*)r5 + 0x14);
-    *(u32*)((u8*)r4 + 0x8) = tmp;
-    goto L_800F767C;
-    goto L_800F7650;
-L_800F7638:
-    if (r4 != r3) goto L_800F764C;
-    tmp = *(u32*)((u8*)r4 + 0x14);
-    *(u32*)((u8*)r5 + 0x14) = tmp;
-    goto L_800F767C;
-L_800F764C:
-    r5 = r4;
-L_800F7650:
-    r4 = *(u32*)((u8*)r5 + 0x14);
-    if (r4 != 0) goto L_800F7638;
-    if (r4 != 0) goto L_800F767C;
-    r5 = (u32)lbl_802712B8;
-    r4 = r3;
-    r3 = (u32)lbl_802712B8;
-    fn_800DD38C();
-    r3 = -0x1;
-    goto L_800F76D4;
-L_800F767C:
-    r8 = 0x0;
-    r6 = 0x0;
-    r4 = 0x3;
-    goto L_800F76C0;
-L_800F768C:
-    tmp = *(u32*)((u8*)r5 + 0xC);
-    r7 = tmp + r6;
-    tmp = *(u8*)((u8*)r7 + 0x4);
-    if (tmp == 0) goto L_800F76B8;
-    tmp = *(u32*)((u8*)r7 + 0x8);
-    r5 = *(u16*)((u8*)r3 + 0x0);
-    tmp = (u32)tmp >> 16;
-    if (r5 != tmp) goto L_800F76B8;
-    *(u8*)((u8*)r7 + 0x4) = r4;
-L_800F76B8:
-    r6 = r6 + 0x16c;
-    r8 = r8 + 0x1;
-L_800F76C0:
-    r5 = *(u32*)lbl_80478B00;
-    tmp = *(u16*)((u8*)r5 + 0x0);
-    if ((s32)r8 < (s32)tmp) goto L_800F768C;
-    r3 = 0x0;
-L_800F76D4:
-    return;
+    /* Try to unlink target from the linked list at state+0x08 */
+    cur = *(u8**)(state + 0x08);
+    if (cur == target) {
+        /* Target is head: remove it */
+        *(u32*)(state + 0x08) = *(u32*)(cur + 0x14);
+    } else {
+        /* Walk the list to find target */
+        prev = cur;
+        while (1) {
+            cur = *(u8**)(prev + 0x14);
+            if (cur == NULL) {
+                /* Not found in list */
+                fn_800DD38C((const char*)lbl_802712B8, target);
+                return -1;
+            }
+            if (cur == target) {
+                /* Unlink: prev->next = cur->next */
+                *(u32*)(prev + 0x14) = *(u32*)(cur + 0x14);
+                break;
+            }
+            prev = cur;
+        }
+    }
+
+    /* Scan pad entries and mark matching ones */
+    base = lbl_80478B00;
+    count = *(u16*)(base + 0x00);
+    offset = 0;
+    for (i = 0; i < (s32)count; i++) {
+        u8* padData = (u8*)(*(u32*)(base + 0x0C) + offset);
+        if (*(u8*)(padData + 0x04) != 0) {
+            u16 entryId = (u16)(*(u32*)(padData + 0x08) >> 16);
+            if (*(u16*)(target + 0x00) == entryId) {
+                *(u8*)(padData + 0x04) = 3;
+            }
+        }
+        offset += 0x16C;
+    }
+    return 0;
 }
 
 /* fn_800F78A4 - 0x800F78A4 | size: 0x7C */
-void fn_800F78A4(void) {
+/*
+ * InputSetRumble - Find a pad entry by ID and configure rumble.
+ *
+ * Searches through up to 4 pad entries in lbl_80401C10 for a
+ * matching pad ID. If found and non-null, sets rumble parameters.
+ *
+ * 0x800F78A4 | size: 0x7C
+ */
+void fn_800F78A4(s32 padId, u8 mode, u8 strength, u32 duration, u8 flags) {
     extern u8 lbl_80401C10[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
+    u8* pad = lbl_80401C10;
 
-    r8 = (u32)lbl_80401C10;
-    tmp = *(u32*)lbl_80401C10;
-    r9 = 0x0;
-    if ((s32)tmp != (s32)r3) goto L_800F78BC;
-    goto L_800F78F0;
-L_800F78BC:
-    tmp = *(u32*)((u8*)r8 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F78CC;
-    goto L_800F78F0;
-L_800F78CC:
-    tmp = *(u32*)((u8*)r8 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F78DC;
-    goto L_800F78F0;
-L_800F78DC:
-    tmp = *(u32*)((u8*)r8 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F78EC;
-    goto L_800F78F0;
-L_800F78EC:
-    r8 = r9;
-L_800F78F0:
-    if ((u32)r8 == (u32)0x0) return;
-    tmp = r4 & 0xFF;
-    if ((u32)r8 != (u32)0x0) return;
-    tmp = r5 & 0xFF;
-    r3 = 0x1;
-    tmp = tmp * 0xf;
-    *(u32*)((u8*)r8 + 0x5C) = r3;
-    *(u32*)((u8*)r8 + 0x60) = tmp;
-    *(u32*)((u8*)r8 + 0x64) = r6;
-    *(u8*)((u8*)r8 + 0x68) = r7;
-    return;
+    /* Search for matching pad entry */
+    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 1 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 2 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 3 */ }
+    else { pad = NULL; }
+
+    if (pad == NULL) { return; }
+
+    /* Set rumble parameters */
+    *(u32*)(pad + 0x5C) = 1;
+    *(u32*)(pad + 0x60) = (u32)(strength & 0xFF) * 0xF;
+    *(u32*)(pad + 0x64) = duration;
+    *(u8*)(pad + 0x68) = flags;
 }
 
-/* fn_800F7920 - 0x800F7920 | size: 0x74 */
-void fn_800F7920(void) {
+/*
+ * InputGetAnalogY - Get analog Y stick value for a pad by ID.
+ *
+ * Searches pad entries for a match and returns the Y axis value.
+ * If mode == 1, reads from offset 0x5B (smoothed), else 0x29 (raw).
+ *
+ * 0x800F7920 | size: 0x74
+ */
+u8 fn_800F7920(s32 padId, s32 mode) {
     extern u8 lbl_80401C10[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
+    u8* pad = lbl_80401C10;
 
-    r5 = (u32)lbl_80401C10;
-    tmp = *(u32*)lbl_80401C10;
-    r6 = 0x0;
-    if ((s32)tmp != (s32)r3) goto L_800F7938;
-    goto L_800F796C;
-L_800F7938:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F7948;
-    goto L_800F796C;
-L_800F7948:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F7958;
-    goto L_800F796C;
-L_800F7958:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F7968;
-    goto L_800F796C;
-L_800F7968:
-    r5 = r6;
-L_800F796C:
-    if (r5 != 0) goto L_800F797C;
-    r3 = 0x0;
-    return;
-L_800F797C:
-    if ((s32)r4 != 1) goto L_800F798C;
-    r3 = *(u8*)((u8*)r5 + 0x5B);
-    return;
-L_800F798C:
-    r3 = *(u8*)((u8*)r5 + 0x29);
-    return;
+    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else { pad = NULL; }
+
+    if (pad == NULL) { return 0; }
+
+    if (mode == 1) {
+        return *(u8*)(pad + 0x5B);
+    }
+    return *(u8*)(pad + 0x29);
 }
 
-/* fn_800F7994 - 0x800F7994 | size: 0x74 */
-void fn_800F7994(void) {
+/*
+ * InputGetAnalogX - Get analog X stick value for a pad by ID.
+ *
+ * Same pattern as InputGetAnalogY but reads offsets 0x5A / 0x28.
+ *
+ * 0x800F7994 | size: 0x74
+ */
+u8 fn_800F7994(s32 padId, s32 mode) {
     extern u8 lbl_80401C10[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
+    u8* pad = lbl_80401C10;
 
-    r5 = (u32)lbl_80401C10;
-    tmp = *(u32*)lbl_80401C10;
-    r6 = 0x0;
-    if ((s32)tmp != (s32)r3) goto L_800F79AC;
-    goto L_800F79E0;
-L_800F79AC:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F79BC;
-    goto L_800F79E0;
-L_800F79BC:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F79CC;
-    goto L_800F79E0;
-L_800F79CC:
-    tmp = *(u32*)((u8*)r5 + 0x6C);
-    if ((s32)tmp != (s32)r3) goto L_800F79DC;
-    goto L_800F79E0;
-L_800F79DC:
-    r5 = r6;
-L_800F79E0:
-    if (r5 != 0) goto L_800F79F0;
-    r3 = 0x0;
-    return;
-L_800F79F0:
-    if ((s32)r4 != 1) goto L_800F7A00;
-    r3 = *(u8*)((u8*)r5 + 0x5A);
-    return;
-L_800F7A00:
-    r3 = *(u8*)((u8*)r5 + 0x28);
-    return;
+    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else { pad = NULL; }
+
+    if (pad == NULL) { return 0; }
+
+    if (mode == 1) {
+        return *(u8*)(pad + 0x5A);
+    }
+    return *(u8*)(pad + 0x28);
 }
 
