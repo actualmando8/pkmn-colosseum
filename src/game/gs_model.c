@@ -4753,13 +4753,14 @@ u32 fn_801046B8(void) {
     return *(u32*)((u8*)lbl_80404ACC + 0x4);
 }
 
-/* 0x801046C8 | 0x3C -- linked list search by s16 key at offset 6 */
+/* 0x801046C8 | 0x3C -- linked list search by u16 key at offset 6 */
 void* fn_801046C8(void* obj, u16 key) {
     void* node;
     if (obj == NULL) { return NULL; }
     node = *(void**)((u8*)obj + 0x1C);
     while (node != NULL) {
-        if (*(s16*)((u8*)node + 0x6) == (s16)key) { return node; }
+        s16 val = *(s16*)((u8*)node + 0x6);
+        if (val == key) { return node; }
         node = *(void**)((u8*)node + 0x0);
     }
     return NULL;
