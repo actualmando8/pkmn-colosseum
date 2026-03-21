@@ -4911,35 +4911,16 @@ L_80204A08: ;
 }
 #pragma pop
 
-/* 0x80204A10 | size: 0x4C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80204A10(void) {
-    extern void fn_801F4354();
-    extern void fn_801FB8F8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = r3;
-    r3 = 0x0;
-    fn_801F4354();
-    if ((u32)r3 != (u32)0x0) goto L_80204A38;
-    r3 = 0x0;
-    goto L_80204A4C;
-L_80204A38: ;
-    fn_801FB8F8();
-    r0 = r3 & 0xFF;
-    r0 = 0x1 - r0;
-    r0 = __cntlzw(r0);
-    /* extrwi r3, r0, 8, 19 */;
-L_80204A4C: ;
-    return;
+/* fn_80204A10 | Size: 0x4C | Check if trainer slot is active */
+BOOL fn_80204A10(u32 slotId) {
+    extern void* fn_801F4354(u32 context, u32 slot);
+    extern u8 fn_801FB8F8(void* trainer);
+    void* trainer = fn_801F4354(0, slotId);
+    if (trainer == NULL) {
+        return FALSE;
+    }
+    return fn_801FB8F8(trainer) == 1;
 }
-#pragma pop
 
 /* 0x80204A5C | size: 0x1AC | medium */
 #pragma push
