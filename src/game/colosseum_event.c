@@ -20838,7 +20838,7 @@ L_802117B8: ;
 /* 0x802117FC | size: 0x14 | tiny */
 u32 fn_802117FC(void) {
     extern u32 lbl_8047B618;
-    return (lbl_8047B618 & 0x80) == 0;
+    return !(lbl_8047B618 & 0x80);
 }
 
 /* fn_80211810 | Size: 0x20 | Set/clear bit 0x80 in flags */
@@ -21012,9 +21012,9 @@ L_802119C0: ;
 
 /* fn_802119D4 | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
 void fn_802119D4(void) {
-    extern u8 lbl_8047B618[];
+    extern u32 lbl_8047B618;
     extern void fn_80213270(void);
-    *(u32*)lbl_8047B618 &= ~0x00100000u;
+    lbl_8047B618 &= ~0x00100000u;
     fn_80213270();
 }
 

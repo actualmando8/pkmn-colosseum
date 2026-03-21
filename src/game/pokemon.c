@@ -7355,8 +7355,7 @@ void fn_801F6560(u8* ptr, u16 idx, u32 val) {
 u32 fn_801F6588(u8* ptr, u16 idx) {
     if (!ptr) { return 0; }
     if ((u16)idx >= 8) { return 0; }
-    ptr += (u16)idx * 4;
-    return *(u32*)((u8*)ptr + 0xA4C4);
+    return *(u32*)(ptr + 0xA4C4 + (u16)idx * 4);
 }
 
 /* 0x801F6658 | size: 0x24 */
