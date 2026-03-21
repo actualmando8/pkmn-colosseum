@@ -291,7 +291,25 @@ void __OSCacheInit(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B300(void) {
-    /* TODO: decompile -- 48 bytes at 0x8009B300 */
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    if ((u32)r4 <= (u32)0x0) return;
+    r5 = r3 & 0x1F;
+    r4 = r4 + r5;
+    r4 = r4 + 0x1f;
+    r4 = (u32)r4 >> 5;
+    ctr_fn = (void(*)(void))r4;
+L_8009B31C: ;
+    /* dcbst r0, r3 */;
+    r3 = r3 + 0x20;
+    if (--ctr != 0) goto L_8009B31C;
+    /* sc */;
+    return;
 }
 #pragma pop
 
@@ -300,7 +318,24 @@ void fn_8009B300(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B35C(void) {
-    /* TODO: decompile -- 44 bytes at 0x8009B35C */
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    if ((u32)r4 <= (u32)0x0) return;
+    r5 = r3 & 0x1F;
+    r4 = r4 + r5;
+    r4 = r4 + 0x1f;
+    r4 = (u32)r4 >> 5;
+    ctr_fn = (void(*)(void))r4;
+L_8009B378: ;
+    /* dcbst r0, r3 */;
+    r3 = r3 + 0x20;
+    if (--ctr != 0) goto L_8009B378;
+    return;
 }
 #pragma pop
 
@@ -309,7 +344,24 @@ void fn_8009B35C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B388(void) {
-    /* TODO: decompile -- 44 bytes at 0x8009B388 */
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    if ((u32)r4 <= (u32)0x0) return;
+    r5 = r3 & 0x1F;
+    r4 = r4 + r5;
+    r4 = r4 + 0x1f;
+    r4 = (u32)r4 >> 5;
+    ctr_fn = (void(*)(void))r4;
+L_8009B3A4: ;
+    /* dcbz r0, r3 */;
+    r3 = r3 + 0x20;
+    if (--ctr != 0) goto L_8009B3A4;
+    return;
 }
 #pragma pop
 
@@ -318,7 +370,67 @@ void fn_8009B388(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B40C(void) {
-    /* TODO: decompile -- 204 bytes at 0x8009B40C */
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    r5 = 0; /* mfmsr */;
+    r5 = r5 | 0x1000;
+    /* mtmsr r5 */;
+    r3 = (0x8000 << 16);
+    r4 = 0x400;
+    ctr_fn = (void(*)(void))r4;
+L_8009B424: ;
+    /* dcbt r0, r3 */;
+    /* dcbst r0, r3 */;
+    r3 = r3 + 0x20;
+    if (--ctr != 0) goto L_8009B424;
+    r4 = 0; /* mfspr HID2 */;
+    r4 = r4 | (0x100f << 16);
+    /* mtspr HID2, r4 */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    r3 = (0xe000 << 16);
+    r3 = r3 | 0x2;
+    /* mtdbatl 3, r3 */;
+    r3 = r3 | 0x1fe;
+    /* mtdbatu 3, r3 */;
+    /* isync */;
+    r3 = (0xe000 << 16);
+    r6 = 0x200;
+    ctr_fn = (void(*)(void))r6;
+    r6 = 0x0;
+L_8009B498: ;
+    /* dcbz_l r6, r3 */;
+    r3 = r3 + 0x20;
+    if (--ctr != 0) goto L_8009B498;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    /* nop  */;
+    return;
 }
 #pragma pop
 
@@ -327,7 +439,20 @@ void fn_8009B40C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B4D8(void) {
-    /* TODO: decompile -- 56 bytes at 0x8009B4D8 */
+    extern void fn_8009B40C();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r31 = 0;
+
+    OSDisableInterrupts();
+    r31 = r3;
+    fn_8009B40C();
+    r3 = r31;
+    OSRestoreInterrupts();
+    return;
 }
 #pragma pop
 
@@ -336,7 +461,20 @@ void fn_8009B4D8(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B538(void) {
-    /* TODO: decompile -- 36 bytes at 0x8009B538 */
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+
+    /* extrwi r6, r5, 5, 25 */;
+    r3 = r3 & 0xFFFFFFF;
+    r6 = r6 | r3;
+    /* mtspr DMA_U, r6 */;
+    /* clrlslwi r6, r5, 30, 2 */;
+    r6 = r6 | r4;
+    r6 = r6 | 0x2;
+    /* mtspr DMA_L, r6 */;
+    return;
 }
 #pragma pop
 
@@ -345,7 +483,49 @@ void fn_8009B538(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B55C(void) {
-    /* TODO: decompile -- 172 bytes at 0x8009B55C */
+    extern void fn_8009B538();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r28 = r3;
+    r29 = r4;
+    r0 = r5 + 0x1f;
+    r3 = (u32)r0 >> 5;
+    r0 = r3 + 0x7f;
+    r31 = r3;
+    r30 = (u32)r0 >> 7;
+    goto L_8009B598;
+L_8009B598: ;
+    goto L_8009B59C;
+L_8009B59C: ;
+    goto L_8009B5DC;
+L_8009B5A0: ;
+    if ((u32)r31 >= (u32)0x80) goto L_8009B5C0;
+    r3 = r28;
+    r4 = r29;
+    r5 = r31;
+    fn_8009B538();
+    r31 = 0x0;
+    goto L_8009B5DC;
+L_8009B5C0: ;
+    r3 = r28;
+    r4 = r29;
+    r5 = 0x0;
+    fn_8009B538();
+    /* subi r31, r31, 0x80 */;
+    r28 = r28 + 0x1000;
+    r29 = r29 + 0x1000;
+L_8009B5DC: ;
+    if ((u32)r31 != (u32)0x0) goto L_8009B5A0;
+    r3 = r30;
+    return;
 }
 #pragma pop
 
@@ -354,7 +534,12 @@ void fn_8009B55C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B608(void) {
-    /* TODO: decompile -- 12 bytes at 0x8009B608 */
+    u32 r3 = 0;
+    u32 r4 = 0;
+
+    r4 = 0; /* mfspr HID2 */;
+    /* extrwi r3, r4, 4, 4 */;
+    return;
 }
 #pragma pop
 
@@ -363,7 +548,13 @@ void fn_8009B608(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009B614(void) {
-    /* TODO: decompile -- 20 bytes at 0x8009B614 */
+    u32 r3 = 0;
+    u32 r4 = 0;
+
+    r4 = 0; /* mfspr HID2 */;
+    /* extrwi r4, r4, 4, 4 */;
+    if ((s32)r4 > (s32)r3) goto fn_8009B614;
+    return;
 }
 #pragma pop
 

@@ -186,7 +186,7 @@ asm void OSDefaultExceptionHandler(register __OSException exception, register OS
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009A0C0(void) {
-    /* TODO: decompile -- 4 bytes at 0x8009A0C0 */
+    /* bla 0x60 */;
 }
 #pragma pop
 

@@ -57,10 +57,33 @@ u32 wcstombs(char* dst, const wchar_t* src, u32 n) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800C80D0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800C80D0(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+
+    /* subi r6, r3, 0x1 */;
+    /* subi r7, r4, 0x1 */;
+    r4 = r5 + 0x1;
+    goto L_800C810C;
+L_800C80E0: ;
+    r3 = *(u8*)((u8*)r6 + 0x1);
+    r0 = *(u8*)((u8*)r7 + 0x1);
+    if ((u32)r3 == (u32)r0) goto L_800C810C;
+    r4 = *(u8*)((u8*)r6 + 0x0);
+    r3 = 0x1;
+    r0 = *(u8*)((u8*)r7 + 0x0);
+    if ((u32)r4 >= (u32)r0) return;
+    r3 = -0x1;
+    return;
+L_800C810C: ;
+    /* subic. r4, r4, 0x1 */;
+    if ((u32)r4 != (u32)r0) goto L_800C80E0;
+    r3 = 0x0;
+    return;
 }
 #pragma pop
 

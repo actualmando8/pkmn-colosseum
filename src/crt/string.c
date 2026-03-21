@@ -63,10 +63,31 @@ char* strchr(const char* str, int c) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800CA7BC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800CA7BC(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+
+    /* subi r3, r3, 0x1 */;
+    /* subi r4, r4, 0x1 */;
+    r6 = r5 + 0x1;
+    goto L_800CA7EC;
+L_800CA7CC: ;
+    r0 = *(u8*)((u8*)r3 + 0x1);
+    r5 = *(u8*)((u8*)r4 + 0x1);
+    if ((u32)r0 == (u32)r5) goto L_800CA7E4;
+    r3 = r0 - r5;
+    return;
+L_800CA7E4: ;
+    if ((u32)r0 == (u32)0x0) goto L_800CA7F4;
+L_800CA7EC: ;
+    /* subic. r6, r6, 0x1 */;
+    if ((u32)r0 != (u32)0x0) goto L_800CA7CC;
+L_800CA7F4: ;
+    r3 = 0x0;
+    return;
 }
 #pragma pop
 
@@ -74,10 +95,96 @@ asm void fn_800CA7BC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800CA7FC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800CA7FC(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    r5 = *(u8*)((u8*)r3 + 0x0);
+    r0 = *(u8*)((u8*)r4 + 0x0);
+    /* subf. r0, r0, r5 */;
+    if ((s32)r0 == (s32)0) goto L_800CA814;
+    r3 = r0;
+    return;
+L_800CA814: ;
+    r0 = r4 & 0x3;
+    r6 = r3 & 0x3;
+    if ((u32)r0 != (u32)r6) goto L_800CA8EC;
+    if ((u32)r6 == (u32)0x0) goto L_800CA880;
+    if ((u32)r5 != (u32)0x0) goto L_800CA83C;
+    r3 = 0x0;
+    return;
+L_800CA83C: ;
+    r0 = 0x3 - r6;
+    ctr_fn = (void(*)(void))r0;
+    if ((u32)r0 == (u32)0x0) goto L_800CA878;
+L_800CA84C: ;
+    r5 = *(u8*)((u8*)r3 + 0x1);
+    r0 = *(u8*)((u8*)r4 + 0x1);
+    /* subf. r0, r0, r5 */;
+    if ((u32)r0 == (u32)0x0) goto L_800CA864;
+    r3 = r0;
+    return;
+L_800CA864: ;
+    if ((u32)r5 != (u32)0x0) goto L_800CA874;
+    r3 = 0x0;
+    return;
+L_800CA874: ;
+    if (--ctr != 0) goto L_800CA84C;
+L_800CA878: ;
+    r3 = r3 + 0x1;
+    r4 = r4 + 0x1;
+L_800CA880: ;
+    r7 = *(u32*)((u8*)r3 + 0x0);
+    r5 = (0x8081 << 16);
+    /* subi r6, r5, 0x7f80 */;
+    r8 = *(u32*)((u8*)r4 + 0x0);
+    /* subis r5, r7, 0x101 */;
+    /* subi r0, r5, 0x101 */;
+    /* and. r0, r0, r6 */;
+    if ((u32)r5 != (u32)0x0) goto L_800CA8D4;
+    goto L_800CA8BC;
+L_800CA8A4: ;
+    r7 = *(u32*)((u8*)r3 + 0x4);
+    r8 = *(u32*)((u8*)r4 + 0x4);
+    /* subis r5, r7, 0x101 */;
+    /* subi r0, r5, 0x101 */;
+    /* and. r0, r0, r6 */;
+    if ((u32)r5 != (u32)0x0) goto L_800CA8D4;
+L_800CA8BC: ;
+    if ((u32)r7 == (u32)r8) goto L_800CA8A4;
+    r3 = -0x1;
+    if ((u32)r7 <= (u32)r8) return;
+    r3 = 0x1;
+    return;
+L_800CA8D4: ;
+    r5 = *(u8*)((u8*)r3 + 0x0);
+    r0 = *(u8*)((u8*)r4 + 0x0);
+    /* subf. r0, r0, r5 */;
+    if ((u32)r7 == (u32)r8) goto L_800CA8EC;
+    r3 = r0;
+    return;
+L_800CA8EC: ;
+    if ((u32)r5 != (u32)0x0) goto L_800CA8FC;
+    r3 = 0x0;
+    return;
+L_800CA8FC: ;
+    r5 = *(u8*)((u8*)r3 + 0x1);
+    r0 = *(u8*)((u8*)r4 + 0x1);
+    /* subf. r0, r0, r5 */;
+    if ((u32)r5 == (u32)0x0) goto L_800CA914;
+    r3 = r0;
+    return;
+L_800CA914: ;
+    if ((u32)r5 != (u32)0x0) goto L_800CA8FC;
+    r3 = 0x0;
+    return;
 }
 #pragma pop
 
@@ -85,10 +192,33 @@ asm void fn_800CA7FC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800CA924(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800CA924(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+
+    /* subi r4, r4, 0x1 */;
+    /* subi r6, r3, 0x1 */;
+    r5 = r5 + 0x1;
+    goto L_800CA95C;
+L_800CA934: ;
+    r0 = *(u8*)((u8*)r4 + 0x1);
+    r6 += 1; *(u8*)r6 = r0;
+    if ((u32)r0 != (u32)0x0) goto L_800CA95C;
+    r0 = 0x0;
+    goto L_800CA950;
+L_800CA94C: ;
+    r6 += 1; *(u8*)r6 = r0;
+L_800CA950: ;
+    /* subic. r5, r5, 0x1 */;
+    if ((u32)r0 != (u32)0x0) goto L_800CA94C;
+    return;
+L_800CA95C: ;
+    /* subic. r5, r5, 0x1 */;
+    if ((u32)r0 != (u32)0x0) goto L_800CA934;
+    return;
 }
 #pragma pop
 
@@ -96,10 +226,62 @@ asm void fn_800CA924(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800CA968(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800CA968(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    r0 = r3 & 0x3;
+    r5 = r4 & 0x3;
+    r7 = r3;
+    if ((u32)r0 != (u32)r5) goto L_800CA9FC;
+    if ((u32)r5 == (u32)0x0) goto L_800CA9C0;
+    r0 = *(u8*)((u8*)r4 + 0x0);
+    *(u8*)((u8*)r7 + 0x0) = r0;
+    if ((u32)r0 == (u32)0x0) return;
+    r0 = 0x3 - r5;
+    ctr_fn = (void(*)(void))r0;
+    if ((u32)r0 == (u32)0x0) goto L_800CA9B8;
+L_800CA9A4: ;
+    r0 = *(u8*)((u8*)r4 + 0x1);
+    r7 += 1; *(u8*)r7 = r0;
+    if ((u32)r0 == (u32)0x0) return;
+    if (--ctr != 0) goto L_800CA9A4;
+L_800CA9B8: ;
+    r7 = r7 + 0x1;
+    r4 = r4 + 0x1;
+L_800CA9C0: ;
+    r8 = *(u32*)((u8*)r4 + 0x0);
+    r5 = (0x8081 << 16);
+    /* subi r6, r5, 0x7f80 */;
+    /* subis r5, r8, 0x101 */;
+    /* subi r0, r5, 0x101 */;
+    /* and. r0, r0, r6 */;
+    if ((u32)r0 != (u32)0x0) goto L_800CA9FC;
+    /* subi r7, r7, 0x4 */;
+L_800CA9E0: ;
+    r7 += 4; *(u32*)r7 = r8;
+    r8 = *(u32*)((u8*)r4 + 0x4);
+    /* subis r5, r8, 0x101 */;
+    /* subi r0, r5, 0x101 */;
+    /* and. r0, r0, r6 */;
+    if ((u32)r0 == (u32)0x0) goto L_800CA9E0;
+    r7 = r7 + 0x4;
+L_800CA9FC: ;
+    r0 = *(u8*)((u8*)r4 + 0x0);
+    *(u8*)((u8*)r7 + 0x0) = r0;
+    if ((u32)r0 == (u32)0x0) return;
+L_800CAA0C: ;
+    r0 = *(u8*)((u8*)r4 + 0x1);
+    r7 += 1; *(u8*)r7 = r0;
+    if ((u32)r0 != (u32)0x0) goto L_800CAA0C;
+    return;
 }
 #pragma pop
 
@@ -107,10 +289,19 @@ asm void fn_800CA968(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800CAA3C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800CAA3C(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+
+    /* subi r4, r4, 0x2 */;
+    /* subi r5, r3, 0x2 */;
+L_800CAA44: ;
+    r0 = *(u16*)((u8*)r4 + 0x2);
+    /* sthu r0, 0x2(r5) */;
+    if ((u32)r0 != (u32)0x0) goto L_800CAA44;
+    return;
 }
 #pragma pop
 

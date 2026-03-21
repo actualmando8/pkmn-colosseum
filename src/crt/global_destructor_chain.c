@@ -55,10 +55,41 @@ void __destroy_global_chain(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800C46B0(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800C46B0(void) {
+    extern u8 lbl_8026FE58[];
+    u8 sp[0x10];
+    u32 r0 = 0;
+    u32 r1 = (u32)sp;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    f32 f0 = 0.0f;
+    f32 f1 = 0.0f;
+    f32 f2 = 0.0f;
+    f32 f3 = 0.0f;
+    f32 f4 = 0.0f;
+
+    r4 = (lbl_8026FE58@h << 16);
+    r4 = r4 | lbl_8026FE58@l;
+    r3 = 0x0;
+    f0 = *(f64*)((u8*)r4 + 0x0);
+    f3 = *(f64*)((u8*)r4 + 0x8);
+    f4 = *(f64*)((u8*)r4 + 0x10);
+    if (f1 < f3) goto L_800C4704;
+    /* subi r3, r3, 0x1 */;
+    if (f1 >= f3) goto L_800C4704;
+    f2 = f1;
+    if (f1 < f4) goto L_800C46F0;
+    f2 = f1 - f4;
+L_800C46F0: ;
+    f2 = (f64)(s32)f2;
+    *(f64*)(sp + 0x8) = f2;
+    r3 = *(u32*)(sp + 0xC);
+    if (f1 < f4) goto L_800C4704;
+    r3 = r3 + (0x8000 << 16);
+L_800C4704: ;
+    return;
 }
 #pragma pop
 

@@ -69,10 +69,30 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800A064C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800A064C(void) {
+    extern void fn_800A06AC();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r3 = (u32)Scb_803FB840;
+    r31 = (u32)Scb_803FB840;
+    r30 = r31 + 0x40;
+    r4 = *(u32*)((u8*)r31 + 0x40);
+    r3 = r31 + r4;
+    r5 = 0x40 - r4;
+    fn_800A06AC();
+    *(u32*)((u8*)r31 + 0x4C) = r3;
+    r0 = *(u32*)((u8*)r31 + 0x4C);
+    if ((s32)r0 == (s32)0x0) goto L_800A0694;
+    r0 = 0x40;
+    *(u32*)((u8*)r30 + 0x0) = r0;
+L_800A0694: ;
+    return;
 }
 #pragma pop
 
@@ -80,10 +100,78 @@ asm void fn_800A064C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800A06AC(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800A06AC(void) {
+    extern void fn_80098368();
+    extern void fn_800A064C();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r6 = (u32)fn_800A064C;
+    r0 = (u32)fn_800A064C;
+    r31 = r4 + 0x0;
+    r4 = 0x1;
+    r30 = r5 + 0x0;
+    r5 = r0;
+    r29 = r3 + 0x0;
+    r3 = 0x0;
+    EXILock();
+    if ((s32)r3 != (s32)0x0) goto L_800A06F8;
+    r3 = 0x0;
+    goto L_800A07A8;
+L_800A06F8: ;
+    r3 = 0x0;
+    r4 = 0x1;
+    r5 = 0x3;
+    EXISelect();
+    if ((s32)r3 != (s32)0x0) goto L_800A0720;
+    r3 = 0x0;
+    EXIUnlock();
+    r3 = 0x0;
+    goto L_800A07A8;
+L_800A0720: ;
+    r31 = r31 << 6;
+    r0 = r31 + 0x100;
+    r0 = r0 | (0xa000 << 16);
+    r4 = r1 + 0x14;
+    r3 = 0x0;
+    r5 = 0x4;
+    r6 = 0x1;
+    r7 = 0x0;
+    EXIImm();
+    r0 = __cntlzw(r3);
+    r31 = (u32)r0 >> 5;
+    r3 = 0x0;
+    EXISync();
+    r0 = __cntlzw(r3);
+    r0 = (u32)r0 >> 5;
+    r4 = r29 + 0x0;
+    r5 = r30 + 0x0;
+    r31 = r31 | r0;
+    r3 = 0x0;
+    r6 = 0x1;
+    fn_80098368();
+    r0 = __cntlzw(r3);
+    r0 = (u32)r0 >> 5;
+    r31 = r31 | r0;
+    r3 = 0x0;
+    EXIDeselect();
+    r0 = __cntlzw(r3);
+    r0 = (u32)r0 >> 5;
+    r31 = r31 | r0;
+    r3 = 0x0;
+    EXIUnlock();
+    r0 = __cntlzw(r31);
+    r3 = (u32)r0 >> 5;
+L_800A07A8: ;
+    return;
 }
 #pragma pop
 

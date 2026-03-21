@@ -102,7 +102,10 @@ void __EXISetExiInterruptMask(s32 chan, EXIChan* exi) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098014(void) {
-    /* TODO: decompile -- 8 bytes at 0x80098014 */
+    u32 r3 = 0;
+
+    /* mtspr HID0, r3 */;
+    return;
 }
 #pragma pop
 
@@ -111,7 +114,8 @@ void fn_80098014(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098034(void) {
-    /* TODO: decompile -- 8 bytes at 0x80098034 */
+    /* sc */;
+    return;
 }
 #pragma pop
 

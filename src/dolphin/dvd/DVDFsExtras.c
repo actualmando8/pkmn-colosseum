@@ -301,10 +301,31 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800A7F80(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800A7F80(void) {
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r31 = 0;
+
+    r31 = r3;
+    OSDisableInterrupts();
+    r4 = *(u32*)((u8*)r31 + 0x4);
+    r5 = *(u32*)((u8*)r31 + 0x0);
+    if ((u32)r4 == (u32)0x0) goto L_800A7FB0;
+    if ((u32)r5 != (u32)0x0) goto L_800A7FBC;
+L_800A7FB0: ;
+    OSRestoreInterrupts();
+    r3 = 0x0;
+    goto L_800A7FCC;
+L_800A7FBC: ;
+    *(u32*)((u8*)r4 + 0x0) = r5;
+    *(u32*)((u8*)r5 + 0x4) = r4;
+    OSRestoreInterrupts();
+    r3 = 0x1;
+L_800A7FCC: ;
+    return;
 }
 #pragma pop
 

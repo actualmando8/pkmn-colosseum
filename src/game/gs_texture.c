@@ -903,7 +903,36 @@ GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800F0384(void) {
-    /* TODO: decompile -- 80 bytes at 0x800F0384 */
+    extern u8 lbl_8047AC0C[];
+    extern u8 lbl_8047AC28[];
+    extern u8 lbl_8047AC30[];
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+
+    if ((u32)r3 == (u32)0x0) return;
+    r5 = 0x0;
+    r6 = 0x0;
+    r4 = r5;
+    goto L_800F03BC;
+L_800F039C: ;
+    r0 = *(u32*)lbl_8047AC28;
+    r7 = r0 + r5;
+    r0 = *(u32*)((u8*)r7 + 0xC);
+    if ((u32)r0 != (u32)r3) goto L_800F03B4;
+    *(u8*)((u8*)r7 + 0xA) = r4;
+L_800F03B4: ;
+    r5 = r5 + 0x24;
+    r6 = r6 + 0x1;
+L_800F03BC: ;
+    r0 = *(u32*)lbl_8047AC30;
+    if ((u32)r6 < (u32)r0) goto L_800F039C;
+    r0 = 0x1;
+    *(u8*)lbl_8047AC0C = r0;
+    return;
 }
 #pragma pop
 
@@ -912,7 +941,36 @@ void fn_800F0384(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800F03D4(void) {
-    /* TODO: decompile -- 80 bytes at 0x800F03D4 */
+    extern u8 lbl_8047AC0C[];
+    extern u8 lbl_8047AC28[];
+    extern u8 lbl_8047AC30[];
+    u32 r0 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+
+    if ((u32)r3 == (u32)0x0) return;
+    r6 = 0x0;
+    r5 = 0x0;
+    r4 = 0x1;
+    goto L_800F040C;
+L_800F03EC: ;
+    r0 = *(u32*)lbl_8047AC28;
+    r7 = r0 + r5;
+    r0 = *(u32*)((u8*)r7 + 0xC);
+    if ((u32)r0 != (u32)r3) goto L_800F0404;
+    *(u8*)((u8*)r7 + 0xA) = r4;
+L_800F0404: ;
+    r5 = r5 + 0x24;
+    r6 = r6 + 0x1;
+L_800F040C: ;
+    r0 = *(u32*)lbl_8047AC30;
+    if ((u32)r6 < (u32)r0) goto L_800F03EC;
+    r0 = 0x1;
+    *(u8*)lbl_8047AC0C = r0;
+    return;
 }
 #pragma pop
 

@@ -10,10 +10,17 @@
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800C4548(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800C4548(void) {
+    u8 sp[0x10];
+    u32 r0 = 0;
+    u32 r1 = (u32)sp;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+
+    r3 = *(u32*)((u8*)r3 + 0x0);
+    OSRestoreInterrupts();
+    return;
 }
 #pragma pop
 
@@ -21,10 +28,20 @@ asm void fn_800C4548(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800C456C(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800C456C(void) {
+    u8 sp[0x10];
+    u32 r0 = 0;
+    u32 r1 = (u32)sp;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r31 = 0;
+
+    r31 = r3;
+    OSDisableInterrupts();
+    *(u32*)((u8*)r31 + 0x0) = r3;
+    r31 = *(u32*)(sp + 0xC);
+    return;
 }
 #pragma pop
 

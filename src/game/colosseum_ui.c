@@ -69,6 +69,84 @@ asm void fn_80039A84(void) { nofralloc
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8003AD6C(void) {
-    /* TODO: match -- 0x118 bytes at 0x8003AD6C */
+    extern u8 lbl_80267140[];
+    extern void fn_80109220();
+    u8 sp[0x20];
+    u32 r0 = 0;
+    u32 r1 = (u32)sp;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    u32 r9 = 0;
+    u32 r10 = 0;
+    u32 r11 = 0;
+
+    r5 = (u32)lbl_80267140;
+    r9 = r1 + 0x8;
+    r8 = (u32)lbl_80267140;
+    r11 = 0x0;
+    r7 = *(u32*)((u8*)r8 + 0x0);
+    r10 = 0x0;
+    r6 = *(u32*)((u8*)r8 + 0x4);
+    r5 = *(u32*)((u8*)r8 + 0x8);
+    r0 = *(u32*)((u8*)r8 + 0xC);
+    *(u32*)(sp + 0x14) = r0;
+    r6 = r9;
+    r7 = 0x0;
+    goto L_8003ADD4;
+L_8003ADB8: ;
+    r5 = *(s16*)((u8*)r4 + 0x6);
+    r0 = *(u32*)((u8*)r6 + 0x0);
+    if ((s32)r5 != (s32)r0) goto L_8003ADCC;
+    r11 = 0x1;
+L_8003ADCC: ;
+    r6 = r6 + 0x4;
+    r7 = r7 + 0x1;
+L_8003ADD4: ;
+    if ((s32)r7 >= (s32)0x2) goto L_8003ADE4;
+    if ((s32)r11 == (s32)0x0) goto L_8003ADB8;
+L_8003ADE4: ;
+    if ((s32)r11 != (s32)0x0) goto L_8003AE38;
+    r9 = r9 + 0x8;
+    r10 = 0x1;
+    r6 = r9;
+    r7 = 0x0;
+    goto L_8003AE1C;
+L_8003AE00: ;
+    r5 = *(s16*)((u8*)r4 + 0x6);
+    r0 = *(u32*)((u8*)r6 + 0x0);
+    if ((s32)r5 != (s32)r0) goto L_8003AE14;
+    r11 = 0x1;
+L_8003AE14: ;
+    r6 = r6 + 0x4;
+    r7 = r7 + 0x1;
+L_8003AE1C: ;
+    if ((s32)r7 >= (s32)0x2) goto L_8003AE2C;
+    if ((s32)r11 == (s32)0x0) goto L_8003AE00;
+L_8003AE2C: ;
+    if ((s32)r11 != (s32)0x0) goto L_8003AE38;
+    r10 = 0x2;
+L_8003AE38: ;
+    if ((s32)r11 != (s32)0x0) goto L_8003AE48;
+    r3 = 0x0;
+    goto L_8003AE74;
+L_8003AE48: ;
+    r0 = *(u8*)((u8*)r3 + 0x95);
+    r3 = r4;
+    r0 = (s8)r0;
+    if ((s32)r10 != (s32)r0) goto L_8003AE64;
+    r0 = 0x1;
+    goto L_8003AE68;
+L_8003AE64: ;
+    r0 = 0x0;
+L_8003AE68: ;
+    r4 = r0 & 0xFF;
+    fn_80109220();
+    r3 = 0x0;
+L_8003AE74: ;
+    return;
 }
 #pragma pop

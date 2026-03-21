@@ -118,10 +118,17 @@ asm void DBPrintf(const char* fmt, ...) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-asm void fn_800A2C58(void) {
-    nofralloc
-    /* TODO: decompile */
-    blr
+void fn_800A2C58(void) {
+    u32 r0 = 0;
+    u32 r3 = 0;
+
+    r3 = *(u32*)__DBInterface;
+    if ((u32)r3 != (u32)0x0) goto L_800A2C6C;
+    r3 = 0x0;
+    return;
+L_800A2C6C: ;
+    r3 = *(u32*)((u8*)r3 + 0x0);
+    return;
 }
 #pragma pop
 

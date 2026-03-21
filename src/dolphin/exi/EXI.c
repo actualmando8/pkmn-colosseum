@@ -495,7 +495,53 @@ static BOOL __EXIProbe(s32 chan) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098368(void) {
-    /* TODO: decompile -- 160 bytes at 0x80098368 */
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r28, 0x18(r1) */;
+    r28 = r3 + 0x0;
+    r29 = r4 + 0x0;
+    r30 = r5 + 0x0;
+    goto L_800983E8;
+L_8009838C: ;
+    if ((s32)r30 >= (s32)0x4) goto L_8009839C;
+    r31 = r30;
+    goto L_800983A0;
+L_8009839C: ;
+    r31 = 0x4;
+L_800983A0: ;
+    r3 = r28 + 0x0;
+    r4 = r29 + 0x0;
+    r5 = r31 + 0x0;
+    r7 = 0x0;
+    EXIImm();
+    if ((s32)r3 != (s32)0x0) goto L_800983C8;
+    r3 = 0x0;
+    goto L_800983F4;
+L_800983C8: ;
+    r3 = r28;
+    EXISync();
+    if ((s32)r3 != (s32)0x0) goto L_800983E0;
+    r3 = 0x0;
+    goto L_800983F4;
+L_800983E0: ;
+    r29 = r29 + r31;
+    r30 = r30 - r31;
+L_800983E8: ;
+    if ((s32)r30 != (s32)0x0) goto L_8009838C;
+    r3 = 0x1;
+L_800983F4: ;
+    /* lmw r28, 0x18(r1) */;
+    return;
 }
 #pragma pop
 
@@ -504,7 +550,44 @@ void fn_80098368(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009870C(void) {
-    /* TODO: decompile -- 132 bytes at 0x8009870C */
+    extern u8 lbl_803FB3C8[];
+    extern void fn_80098110();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r28, 0x10(r1) */;
+    r30 = r3;
+    r4 = r3 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r31 = r0 + r4;
+    OSDisableInterrupts();
+    r28 = r3;
+    r29 = *(u32*)((u8*)r31 + 0x0);
+    *(u32*)((u8*)r31 + 0x0) = r0;
+    if ((s32)r30 == (s32)0x2) goto L_80098760;
+    r3 = r30 + 0x0;
+    r4 = r31 + 0x0;
+    fn_80098110();
+    goto L_80098770;
+L_80098760: ;
+    r3 = 0x0;
+    r4 = (u32)lbl_803FB3C8;
+    r4 = (u32)lbl_803FB3C8;
+    fn_80098110();
+L_80098770: ;
+    r3 = r28;
+    OSRestoreInterrupts();
+    r3 = r29;
+    /* lmw r28, 0x10(r1) */;
+    return;
 }
 #pragma pop
 
@@ -513,7 +596,43 @@ void fn_8009870C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098944(void) {
-    /* TODO: decompile -- 124 bytes at 0x80098944 */
+    extern u8 lbl_803FB3C8[];
+    extern void fn_80098790();
+    extern void fn_80099400();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r29, 0x14(r1) */;
+    r30 = r3 + 0x0;
+    r4 = r3 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r29 = r0 + r4;
+    r3 = r30 + 0x0;
+    fn_80098790();
+    /* mr. r31, r3 */;
+    if ((s32)r0 == (s32)0) goto L_800989A8;
+    r0 = *(u32*)((u8*)r29 + 0x20);
+    if ((s32)r0 != (s32)0x0) goto L_800989A8;
+    r3 = r30 + 0x0;
+    r4 = 0x0;
+    r5 = r1 + 0xc;
+    fn_80099400();
+    if ((s32)r3 == (s32)0x0) goto L_800989A4;
+    r31 = 0x1;
+    goto L_800989A8;
+L_800989A4: ;
+    r31 = 0x0;
+L_800989A8: ;
+    r3 = r31;
+    /* lmw r29, 0x14(r1) */;
+    return;
 }
 #pragma pop
 
@@ -522,7 +641,95 @@ void fn_80098944(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800989C0(void) {
-    /* TODO: decompile -- 296 bytes at 0x800989C0 */
+    extern u8 lbl_803FB3C8[];
+    extern void fn_800986A0();
+    extern void fn_80098790();
+    extern void fn_80099400();
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r22 = 0;
+    u32 r23 = 0;
+    u32 r24 = 0;
+    u32 r25 = 0;
+    u32 r26 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r22, 0x18(r1) */;
+    r31 = r3;
+    r3 = (u32)lbl_803FB3C8;
+    r30 = (u32)lbl_803FB3C8;
+    r0 = r31 << 6;
+    r24 = r30 + r0;
+    r0 = r31 << 6;
+    r22 = r30 + r0;
+    r3 = r31 + 0x0;
+    fn_80098790();
+    /* mr. r27, r3 */;
+    if ((s32)r0 == (s32)0) goto L_80098A20;
+    r0 = *(u32*)((u8*)r22 + 0x20);
+    if ((s32)r0 != (s32)0x0) goto L_80098A20;
+    r3 = r31 + 0x0;
+    r4 = 0x0;
+    r5 = r1 + 0x10;
+    fn_80099400();
+L_80098A20: ;
+    OSDisableInterrupts();
+    r28 = r3;
+    r0 = *(u32*)((u8*)r24 + 0x20);
+    if ((s32)r0 != (s32)0x0) goto L_80098A44;
+    r3 = r28;
+    OSRestoreInterrupts();
+    r3 = 0x0;
+    goto L_80098AD4;
+L_80098A44: ;
+    r0 = r31 << 6;
+    r29 = r30 + r0;
+    OSDisableInterrupts();
+    r25 = r3;
+    r0 = *(u32*)((u8*)r29 + 0xC);
+    r0 = r0 & 0x00000008;
+    if ((s32)r0 != (s32)0x0) goto L_80098A70;
+    r3 = r31;
+    fn_80098790();
+    if ((s32)r3 != (s32)0x0) goto L_80098A80;
+L_80098A70: ;
+    r3 = r25;
+    OSRestoreInterrupts();
+    r26 = 0x0;
+    goto L_80098AC4;
+L_80098A80: ;
+    r3 = r31 + 0x0;
+    r4 = 0x1;
+    r5 = 0x0;
+    r6 = 0x0;
+    fn_800986A0();
+    *(u32*)((u8*)r29 + 0x8) = r0;
+    r3 = (0x10 << 16);
+    r0 = r31 * 0x3;
+    r3 = (u32)r3 >> r0;
+    __OSUnmaskInterrupts();
+    r0 = *(u32*)((u8*)r29 + 0xC);
+    r0 = r0 | 0x8;
+    *(u32*)((u8*)r29 + 0xC) = r0;
+    r3 = r25;
+    OSRestoreInterrupts();
+    r26 = 0x1;
+L_80098AC4: ;
+    r23 = r26 + 0x0;
+    r3 = r28 + 0x0;
+    OSRestoreInterrupts();
+    r3 = r23;
+L_80098AD4: ;
+    /* lmw r22, 0x18(r1) */;
+    return;
 }
 #pragma pop
 
@@ -531,7 +738,55 @@ void fn_800989C0(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098AE8(void) {
-    /* TODO: decompile -- 172 bytes at 0x80098AE8 */
+    extern u8 lbl_803FB3C8[];
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r29, 0x14(r1) */;
+    r29 = r3 + 0x0;
+    r4 = r3 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r31 = r0 + r4;
+    OSDisableInterrupts();
+    r30 = r3;
+    r0 = *(u32*)((u8*)r31 + 0xC);
+    r0 = r0 & 0x00000008;
+    if ((s32)r0 != (s32)0) goto L_80098B30;
+    r3 = r30;
+    OSRestoreInterrupts();
+    r3 = 0x1;
+    goto L_80098B80;
+L_80098B30: ;
+    r0 = *(u32*)((u8*)r31 + 0xC);
+    r0 = r0 & 0x00000010;
+    if ((s32)r0 == (s32)0) goto L_80098B58;
+    r0 = *(u32*)((u8*)r31 + 0x18);
+    if ((u32)r0 != (u32)0x0) goto L_80098B58;
+    r3 = r30;
+    OSRestoreInterrupts();
+    r3 = 0x0;
+    goto L_80098B80;
+L_80098B58: ;
+    r0 = *(u32*)((u8*)r31 + 0xC);
+    r0 = r0 & 0xFFFFFFF7;
+    *(u32*)((u8*)r31 + 0xC) = r0;
+    r3 = (0x70 << 16);
+    r0 = r29 * 0x3;
+    r3 = (u32)r3 >> r0;
+    __OSMaskInterrupts();
+    r3 = r30;
+    OSRestoreInterrupts();
+    r3 = 0x1;
+L_80098B80: ;
+    /* lmw r29, 0x14(r1) */;
+    return;
 }
 #pragma pop
 
@@ -540,7 +795,61 @@ void fn_80098AE8(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098DDC(void) {
-    /* TODO: decompile -- 192 bytes at 0x80098DDC */
+    extern u8 lbl_803FB3C8[];
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r12 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    f32 f5 = 0.0f;
+    f32 f8 = 0.0f;
+
+    /* stmw r27, 0x2e4(r1) */;
+    *(u16*)(sp + 0x8) = r3;
+    r27 = r4;
+    r3 = *(s16*)((u8*)r1 + 0x8);
+    /* subi r3, r3, 0x9 */;
+    r0 = 0x3;
+    r31 = (s32)r3 / (s32)r0;
+    r4 = r31 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r28 = r0 + r4;
+    r0 = r31 * 0x5;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    r30 = *(u32*)(r3 + r0);
+    r30 = r30 & 0x7f5;
+    r30 = r30 | 0x2;
+    r0 = r31 * 0x5;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    *(u32*)(r3 + r0) = r30;
+    r29 = *(u32*)((u8*)r28 + 0x0);
+    if ((u32)r29 == (u32)0x0) goto L_80098E88;
+    r3 = r1 + 0x18;
+    OSClearContext();
+    r3 = r1 + 0x18;
+    OSSetCurrentContext();
+    r3 = r31 + 0x0;
+    r4 = r27 + 0x0;
+    r12 = r29 + 0x0;
+    /* blrl  */;
+    r3 = r1 + 0x18;
+    OSClearContext();
+    r3 = r27;
+    OSSetCurrentContext();
+L_80098E88: ;
+    /* lmw r27, 0x2e4(r1) */;
+    return;
 }
 #pragma pop
 
@@ -549,7 +858,107 @@ void fn_80098DDC(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098E9C(void) {
-    /* TODO: decompile -- 348 bytes at 0x80098E9C */
+    extern u8 lbl_803FB3C8[];
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r12 = 0;
+    u32 r21 = 0;
+    u32 r22 = 0;
+    u32 r23 = 0;
+    u32 r24 = 0;
+    u32 r25 = 0;
+    u32 r26 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    f32 f5 = 0.0f;
+
+    /* stmw r21, 0x2e4(r1) */;
+    r21 = r3 + 0x0;
+    r22 = r4 + 0x0;
+    r3 = (s16)r21;
+    /* subi r3, r3, 0xa */;
+    r0 = 0x3;
+    r31 = (s32)r3 / (s32)r0;
+    r4 = r31 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r27 = r0 + r4;
+    r3 = (0x8000 << 16);
+    r0 = (s16)r21;
+    r3 = (u32)r3 >> r0;
+    __OSMaskInterrupts();
+    r0 = r31 * 0x5;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    r29 = *(u32*)(r3 + r0);
+    r29 = r29 & 0x7f5;
+    r29 = r29 | 0x8;
+    r0 = r31 * 0x5;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    *(u32*)(r3 + r0) = r29;
+    r26 = *(u32*)((u8*)r27 + 0x4);
+    if ((u32)r26 == (u32)0x0) goto L_80098FE4;
+    r0 = 0x0;
+    *(u32*)((u8*)r27 + 0x4) = r0;
+    r4 = r31 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r30 = r0 + r4;
+    r0 = *(u32*)((u8*)r30 + 0xC);
+    r0 = r0 & 0x3;
+    if ((u32)r26 == (u32)0x0) goto L_80098FB0;
+    r0 = *(u32*)((u8*)r30 + 0xC);
+    r0 = r0 & 0x00000002;
+    if ((u32)r26 == (u32)0x0) goto L_80098FA4;
+    r25 = *(u32*)((u8*)r30 + 0x10);
+    if ((s32)r25 == (s32)0x0) goto L_80098FA4;
+    r23 = *(u32*)((u8*)r30 + 0x14);
+    r3 = r31 * 0x5;
+    r0 = r3 + 0x4;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    r24 = *(u32*)(r3 + r0);
+    r28 = 0x0;
+    goto L_80098F9C;
+L_80098F84: ;
+    r0 = 0x3 - r28;
+    r0 = r0 << 3;
+    r3 = (u32)r24 >> r0;
+    *(u8*)((u8*)r23 + 0x0) = r3;
+    r23 = r23 + 0x1;
+    r28 = r28 + 0x1;
+L_80098F9C: ;
+    if ((s32)r28 < (s32)r25) goto L_80098F84;
+L_80098FA4: ;
+    r0 = *(u32*)((u8*)r30 + 0xC);
+    /* clrrwi r0, r0, 2 */;
+    *(u32*)((u8*)r30 + 0xC) = r0;
+L_80098FB0: ;
+    r3 = r1 + 0x18;
+    OSClearContext();
+    r3 = r1 + 0x18;
+    OSSetCurrentContext();
+    r3 = r31 + 0x0;
+    r4 = r22 + 0x0;
+    r12 = r26 + 0x0;
+    /* blrl  */;
+    r3 = r1 + 0x18;
+    OSClearContext();
+    r3 = r22;
+    OSSetCurrentContext();
+L_80098FE4: ;
+    /* lmw r21, 0x2e4(r1) */;
+    return;
 }
 #pragma pop
 
@@ -558,7 +967,61 @@ void fn_80098E9C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80098FF8(void) {
-    /* TODO: decompile -- 200 bytes at 0x80098FF8 */
+    extern u8 lbl_803FB3C8[];
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r12 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    /* stmw r28, 0x2d8(r1) */;
+    *(u16*)(sp + 0x8) = r3;
+    r28 = r4;
+    r3 = *(s16*)((u8*)r1 + 0x8);
+    /* subi r3, r3, 0xb */;
+    r0 = 0x3;
+    r31 = (s32)r3 / (s32)r0;
+    r3 = (0x70 << 16);
+    r0 = r31 * 0x3;
+    r3 = (u32)r3 >> r0;
+    __OSMaskInterrupts();
+    r4 = 0x0;
+    r0 = r31 * 0x5;
+    r0 = r0 << 2;
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6800;
+    *(u32*)(r3 + r0) = r4;
+    r4 = r31 << 6;
+    r3 = (u32)lbl_803FB3C8;
+    r0 = (u32)lbl_803FB3C8;
+    r30 = r0 + r4;
+    r29 = *(u32*)((u8*)r30 + 0x8);
+    r0 = *(u32*)((u8*)r30 + 0xC);
+    r0 = r0 & 0xFFFFFFF7;
+    *(u32*)((u8*)r30 + 0xC) = r0;
+    if ((u32)r29 == (u32)0x0) goto L_800990AC;
+    r3 = r1 + 0x10;
+    OSClearContext();
+    r3 = r1 + 0x10;
+    OSSetCurrentContext();
+    r0 = 0x0;
+    *(u32*)((u8*)r30 + 0x8) = r0;
+    r3 = r31 + 0x0;
+    r4 = r28 + 0x0;
+    r12 = r29 + 0x0;
+    /* blrl  */;
+    r3 = r1 + 0x10;
+    OSClearContext();
+    r3 = r28;
+    OSSetCurrentContext();
+L_800990AC: ;
+    /* lmw r28, 0x2d8(r1) */;
+    return;
 }
 #pragma pop
 

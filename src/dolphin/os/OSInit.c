@@ -248,7 +248,14 @@ void OSRegisterVersion(const char* id) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009A23C(void) {
-    /* TODO: decompile -- 20 bytes at 0x8009A23C */
+    u32 r0 = 0;
+    u32 r3 = 0;
+
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x6000;
+    r0 = *(u32*)((u8*)r3 + 0x24);
+    r3 = r0 & 0xFF;
+    return;
 }
 #pragma pop
 

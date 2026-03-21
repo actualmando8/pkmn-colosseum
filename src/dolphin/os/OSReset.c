@@ -250,7 +250,41 @@ void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009FEBC(void) {
-    /* TODO: decompile -- 148 bytes at 0x8009FEBC */
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r12 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r30 = 0x0;
+    r29 = r3 + 0x0;
+    r31 = *(u32*)ResetFunctionQueue_8047A738;
+    goto L_8009FF04;
+L_8009FEE4: ;
+    r12 = *(u32*)((u8*)r31 + 0x0);
+    r3 = r29 + 0x0;
+    /* blrl  */;
+    r0 = __cntlzw(r3);
+    r31 = *(u32*)((u8*)r31 + 0x8);
+    r0 = (u32)r0 >> 5;
+    r30 = r30 | r0;
+L_8009FF04: ;
+    if ((u32)r31 == (u32)0x0) goto L_8009FF14;
+    if ((s32)r30 == (s32)0x0) goto L_8009FEE4;
+L_8009FF14: ;
+    __OSSyncSram();
+    r0 = __cntlzw(r3);
+    r0 = (u32)r0 >> 5;
+    /* or. r30, r30, r0 */;
+    if ((s32)r30 == (s32)0x0) goto L_8009FF30;
+    r3 = 0x0;
+    goto L_8009FF34;
+L_8009FF30: ;
+    r3 = 0x1;
+L_8009FF34: ;
+    return;
 }
 #pragma pop
 
@@ -259,7 +293,23 @@ void fn_8009FEBC(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_8009FFC0(void) {
-    /* TODO: decompile -- 72 bytes at 0x8009FFC0 */
+    u32 r0 = 0;
+    u32 r1 = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r31 = 0;
+
+    r31 = r3;
+    OSDisableInterrupts();
+    r3 = (0xcc00 << 16);
+    r3 = r3 + 0x2000;
+    r0 = 0x0;
+    *(u16*)((u8*)r3 + 0x2) = r0;
+    ICFlashInvalidate();
+    r3 = r31 << 3;
+    Reset();
+    return;
 }
 #pragma pop
 
