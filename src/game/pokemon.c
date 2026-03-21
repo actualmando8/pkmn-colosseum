@@ -7355,21 +7355,24 @@ void fn_801F6560(u8* ptr, u16 idx, u32 val) {
 u32 fn_801F6588(u8* ptr, u16 idx) {
     if (!ptr) { return 0; }
     if ((u16)idx >= 8) { return 0; }
-    return *(u32*)(ptr + 0xA4C4 + (u16)idx * 4);
+    ptr += (u16)idx * 4;
+    return *(u32*)((u8*)ptr + 0xA4C4);
 }
 
 /* 0x801F6658 | size: 0x24 */
 void fn_801F6658(u8* ptr, u8 idx, u16 val) {
     if (!ptr) { return; }
     if ((u8)idx >= 2) { return; }
-    *(u16*)(ptr + (u8)idx * 2 + 0x14) = val;
+    ptr += (u8)idx * 2;
+    *(u16*)(ptr + 0x14) = val;
 }
 
 /* 0x801F66EC | size: 0x34 */
 u32 fn_801F66EC(u8* ptr, u8 idx) {
     if (!ptr) { return 0; }
     if ((u8)idx >= 2) { return 0; }
-    return *(u16*)(ptr + (u8)idx * 2 + 0x14);
+    ptr += (u8)idx * 2;
+    return *(u16*)(ptr + 0x14);
 }
 
 /* 0x801F6AB4 | size: 0x34 */

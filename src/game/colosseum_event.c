@@ -20836,15 +20836,18 @@ L_802117B8: ;
 #pragma pop
 
 /* 0x802117FC | size: 0x14 | tiny */
-extern u8 lbl_8047B618[];
-u32 fn_802117FC(void) { return (*(u32*)lbl_8047B618 & 0x80) == 0; }
+u32 fn_802117FC(void) {
+    extern u32 lbl_8047B618;
+    return (lbl_8047B618 & 0x80) == 0;
+}
 
 /* fn_80211810 | Size: 0x20 | Set/clear bit 0x80 in flags */
 void fn_80211810(u8 enable) {
+    extern u32 lbl_8047B618;
     if (enable == 1) {
-        *(u32*)lbl_8047B618 &= ~0x80u;
+        lbl_8047B618 &= ~0x80u;
     } else {
-        *(u32*)lbl_8047B618 |= 0x80u;
+        lbl_8047B618 |= 0x80u;
     }
 }
 

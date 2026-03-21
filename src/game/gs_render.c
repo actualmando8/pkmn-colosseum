@@ -15343,25 +15343,14 @@ L_800DF100: ;
 #pragma pop
 
 /* fn_800DF11C | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF11C(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u8*)((u8*)r3 + 0xC);
-    *(u8*)((u8*)r4 + 0x0) = r0;
-    r0 = *(u8*)((u8*)r3 + 0xD);
-    *(u8*)((u8*)r4 + 0x1) = r0;
-    r0 = *(u8*)((u8*)r3 + 0xE);
-    *(u8*)((u8*)r4 + 0x2) = r0;
-    r0 = *(u8*)((u8*)r3 + 0xF);
-    *(u8*)((u8*)r4 + 0x3) = r0;
-    return;
+void fn_800DF11C(void* self, void* out) {
+    u8* src = (u8*)self;
+    u8* dst = (u8*)out;
+    dst[0] = src[0xC];
+    dst[1] = src[0xD];
+    dst[2] = src[0xE];
+    dst[3] = src[0xF];
 }
-#pragma pop
 
 /* fn_800DF140 | Size: 0x48 */
 #pragma push
@@ -15423,97 +15412,47 @@ void fn_800DF188(void) {
 #pragma pop
 
 /* fn_800DF1B8 | Size: 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF1B8(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    f32 f1 = 0.0f;
-
-    r4 = *(u32*)((u8*)r3 + 0x20);
-    *(f32*)((u8*)r3 + 0x34) = f1;
-    if ((u32)r4 == (u32)0x0) return;
-    *(f32*)((u8*)r4 + 0x50) = f1;
-    return;
+void fn_800DF1B8(void* self, f32 value) {
+    u8* ptr = (u8*)self;
+    u32 sub = *(u32*)(ptr + 0x20);
+    *(f32*)(ptr + 0x34) = value;
+    if (sub == 0) return;
+    *(f32*)((u8*)sub + 0x50) = value;
 }
-#pragma pop
 
 /* fn_800DF1D0 | Size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF1D0(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    f32 f1 = 0.0f;
-
-    *(u32*)((u8*)r3 + 0x2C) = r4;
-    *(u32*)((u8*)r3 + 0x30) = r5;
-    *(f32*)((u8*)r3 + 0x34) = f1;
-    *(u32*)((u8*)r3 + 0x28) = r6;
-    return;
+void fn_800DF1D0(void* self, u32 p1, u32 p2, u32 p3, f32 fval) {
+    u8* ptr = (u8*)self;
+    *(u32*)(ptr + 0x2C) = p1;
+    *(u32*)(ptr + 0x30) = p2;
+    *(f32*)(ptr + 0x34) = fval;
+    *(u32*)(ptr + 0x28) = p3;
 }
-#pragma pop
 
 /* fn_800DF1E4 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF1E4(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u8*)((u8*)r4 + 0x0);
-    *(u8*)((u8*)r3 + 0xC) = r0;
-    r0 = *(u8*)((u8*)r4 + 0x1);
-    *(u8*)((u8*)r3 + 0xD) = r0;
-    r0 = *(u8*)((u8*)r4 + 0x2);
-    *(u8*)((u8*)r3 + 0xE) = r0;
-    r0 = *(u8*)((u8*)r4 + 0x3);
-    *(u8*)((u8*)r3 + 0xF) = r0;
-    return;
+void fn_800DF1E4(void* self, void* color) {
+    u8* ptr = (u8*)self;
+    u8* c = (u8*)color;
+    ptr[0xC] = c[0];
+    ptr[0xD] = c[1];
+    ptr[0xE] = c[2];
+    ptr[0xF] = c[3];
 }
-#pragma pop
 
 /* fn_800DF208 | Size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF208(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    *(u32*)((u8*)r3 + 0x10) = r4;
-    *(u32*)((u8*)r3 + 0x14) = r5;
-    *(u32*)((u8*)r3 + 0x18) = r6;
-    *(u32*)((u8*)r3 + 0x1C) = r7;
-    return;
+void fn_800DF208(void* self, u32 a, u32 b, u32 c, u32 d) {
+    u8* ptr = (u8*)self;
+    *(u32*)(ptr + 0x10) = a;
+    *(u32*)(ptr + 0x14) = b;
+    *(u32*)(ptr + 0x18) = c;
+    *(u32*)(ptr + 0x1C) = d;
 }
-#pragma pop
 
 /* fn_800DF21C | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DF21C(void) {
+void fn_800DF21C(void* self) {
     extern void fn_801A6DDC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-
-    r3 = *(u32*)((u8*)r3 + 0x8);
-    fn_801A6DDC();
-    return;
+    fn_801A6DDC(*(u32*)((u8*)self + 0x8));
 }
-#pragma pop
 
 /* fn_800DF248 | Size: 0x13C */
 #pragma push
@@ -16642,52 +16581,16 @@ void fn_800DFEEC(void) {
 #pragma pop
 
 /* fn_800DFF98 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DFF98(void) {
+void fn_800DFF98(void* a, void* b, void* c) {
     extern void fn_800A37CC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A37CC();
-    return;
+    fn_800A37CC(b, c, a);
 }
-#pragma pop
 
 /* fn_800DFFCC | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800DFFCC(void) {
+void fn_800DFFCC(void* a, void* b, void* c) {
     extern void fn_800A3B9C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A3B9C();
-    return;
+    fn_800A3B9C(b, c, a);
 }
-#pragma pop
 
 /* fn_800E0000 | Size: 0x20 */
 void fn_800E0000(void) {
@@ -16708,24 +16611,10 @@ void fn_800E0040(void) {
 }
 
 /* fn_800E0060 | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0060(void) {
+void fn_800E0060(void* a, void* b) {
     extern void fn_800A3ADC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = r3;
-    r3 = r4;
-    r4 = r0;
-    fn_800A3ADC();
-    return;
+    fn_800A3ADC(b, a);
 }
-#pragma pop
 
 /* fn_800E008C | Size: 0x20 */
 void fn_800E008C(void) {
@@ -16759,174 +16648,64 @@ void fn_800E00AC(void) {
 #pragma pop
 
 /* fn_800E00E0 | Size: 0x28 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E00E0(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    f32 f0 = 0.0f;
-
-    f0 = *(f32*)((u8*)r4 + 0x0);
-    f0 = -f0;
-    *(f32*)((u8*)r3 + 0x0) = f0;
-    f0 = *(f32*)((u8*)r4 + 0x4);
-    f0 = -f0;
-    *(f32*)((u8*)r3 + 0x4) = f0;
-    f0 = *(f32*)((u8*)r4 + 0x8);
-    f0 = -f0;
-    *(f32*)((u8*)r3 + 0x8) = f0;
-    return;
+void fn_800E00E0(void* dst, void* src) {
+    f32* d = (f32*)dst;
+    f32* s = (f32*)src;
+    d[0] = -s[0];
+    d[1] = -s[1];
+    d[2] = -s[2];
 }
-#pragma pop
 
 /* fn_800E0108 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0108(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-
-    f1 = *(f32*)((u8*)r4 + 0x0);
-    f0 = *(f32*)((u8*)r5 + 0x0);
-    f0 = f1 * f0;
-    *(f32*)((u8*)r3 + 0x0) = f0;
-    f1 = *(f32*)((u8*)r4 + 0x4);
-    f0 = *(f32*)((u8*)r5 + 0x4);
-    f0 = f1 * f0;
-    *(f32*)((u8*)r3 + 0x4) = f0;
-    f1 = *(f32*)((u8*)r4 + 0x8);
-    f0 = *(f32*)((u8*)r5 + 0x8);
-    f0 = f1 * f0;
-    *(f32*)((u8*)r3 + 0x8) = f0;
-    return;
+void fn_800E0108(void* dst, void* a, void* b) {
+    f32* d = (f32*)dst;
+    f32* va = (f32*)a;
+    f32* vb = (f32*)b;
+    d[0] = va[0] * vb[0];
+    d[1] = va[1] * vb[1];
+    d[2] = va[2] * vb[2];
 }
-#pragma pop
 
 /* fn_800E013C | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E013C(void) {
+void fn_800E013C(void* a, void* b) {
     extern void fn_800A3AC0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = r3;
-    r3 = r4;
-    r4 = r0;
-    fn_800A3AC0();
-    return;
+    fn_800A3AC0(b, a);
 }
-#pragma pop
 
 /* fn_800E0168 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0168(void) {
+void fn_800E0168(void* a, void* b, void* c) {
     extern void fn_800A3A9C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A3A9C();
-    return;
+    fn_800A3A9C(b, c, a);
 }
-#pragma pop
 
 /* fn_800E019C | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E019C(void) {
+void fn_800E019C(void* a, void* b, void* c) {
     extern void fn_800A3A78();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A3A78();
-    return;
+    fn_800A3A78(b, c, a);
 }
-#pragma pop
 
 /* fn_800E01D0 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E01D0(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r5 = 0xc;
-    memcpy((void*)r3, (const void*)r4, (u32)r5);
-    return;
+void fn_800E01D0(void* dst, void* src) {
+    memcpy(dst, src, 0xc);
 }
-#pragma pop
 
 /* fn_800E01F4 | Size: 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E01F4(void) {
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-
-    *(f32*)((u8*)r3 + 0x0) = f1;
-    *(f32*)((u8*)r3 + 0x4) = f2;
-    *(f32*)((u8*)r3 + 0x8) = f3;
-    return;
+void fn_800E01F4(void* dst, f32 x, f32 y, f32 z) {
+    f32* d = (f32*)dst;
+    d[0] = x;
+    d[1] = y;
+    d[2] = z;
 }
-#pragma pop
 
 /* fn_800E0204 | Size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0204(void) {
+void fn_800E0204(void* dst) {
     extern u8 lbl_8047CADC[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    f32 f0 = 0.0f;
-
-    f0 = *(f32*)lbl_8047CADC;
-    *(f32*)((u8*)r3 + 0x0) = f0;
-    *(f32*)((u8*)r3 + 0x4) = f0;
-    *(f32*)((u8*)r3 + 0x8) = f0;
-    return;
+    f32 v = *(f32*)lbl_8047CADC;
+    f32* d = (f32*)dst;
+    d[0] = v;
+    d[1] = v;
+    d[2] = v;
 }
-#pragma pop
 
 /* fn_800E0218 | Size: 0x20 */
 void fn_800E0218(void) {
@@ -16935,86 +16714,28 @@ void fn_800E0218(void) {
 }
 
 /* fn_800E0238 | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0238(void) {
+void fn_800E0238(void* a, void* b) {
     extern void fn_800A2E64();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = r3;
-    r3 = r4;
-    r4 = r0;
-    fn_800A2E64();
-    return;
+    fn_800A2E64(b, a);
 }
-#pragma pop
 
 /* fn_800E0264 | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0264(void) {
+void fn_800E0264(void* a, void* b) {
     extern void fn_800A2EB4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = r3;
-    r3 = r4;
-    r4 = r0;
-    fn_800A2EB4();
-    return;
+    fn_800A2EB4(b, a);
 }
-#pragma pop
 
 /* fn_800E0290 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0290(void) {
+void fn_800E0290(void* a, void* b, void* c) {
     extern void fn_800A2D98();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A2D98();
-    return;
+    fn_800A2D98(b, c, a);
 }
-#pragma pop
 
 /* fn_800E02C4 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E02C4(void) {
+void fn_800E02C4(void* a) {
     extern void fn_800A335C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = r3;
-    fn_800A335C();
-    return;
+    fn_800A335C(0, a);
 }
-#pragma pop
 
 /* fn_800E02E8 | Size: 0x44 */
 #pragma push
@@ -17127,22 +16848,10 @@ void fn_800E03B4(void) {
 #pragma pop
 
 /* fn_800E03E8 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E03E8(void) {
+void fn_800E03E8(void* a) {
     extern void fn_800A32E8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = r3;
-    fn_800A32E8();
-    return;
+    fn_800A32E8(0, a);
 }
-#pragma pop
 
 /* fn_800E040C | Size: 0x20 */
 void fn_800E040C(void) {
@@ -17356,43 +17065,15 @@ void fn_800E05C0(void) {
 #pragma pop
 
 /* fn_800E0628 | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0628(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r5 = 0x30;
-    memcpy((void*)r3, (const void*)r4, (u32)r5);
-    return;
+void fn_800E0628(void* dst, void* src) {
+    memcpy(dst, src, 0x30);
 }
-#pragma pop
 
 /* fn_800E064C | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E064C(void) {
+void fn_800E064C(void* dst) {
     extern u8 lbl_80315568[];
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r4 = (u32)lbl_80315568;
-    r5 = 0x30;
-    r4 = (u32)lbl_80315568;
-    memcpy((void*)r3, (const void*)r4, (u32)r5);
-    return;
+    memcpy(dst, lbl_80315568, 0x30);
 }
-#pragma pop
 
 /* fn_800E0678 | Size: 0x20 */
 void fn_800E0678(void) {
@@ -17407,48 +17088,16 @@ void fn_800E0698(void) {
 }
 
 /* fn_800E06B8 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E06B8(void) {
+void fn_800E06B8(void* a, void* b, void* c) {
     extern void fn_800A3D3C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A3D3C();
-    return;
+    fn_800A3D3C(b, c, a);
 }
-#pragma pop
 
 /* fn_800E06EC | Size: 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E06EC(void) {
+void fn_800E06EC(void* a, void* b) {
     extern void fn_801ADAAC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = r3;
-    r3 = r4;
-    r4 = r0;
-    fn_801ADAAC();
-    return;
+    fn_801ADAAC(b, a);
 }
-#pragma pop
 
 /* fn_800E0718 | Size: 0x20 */
 void fn_800E0718(void) {
@@ -17457,49 +17106,20 @@ void fn_800E0718(void) {
 }
 
 /* fn_800E0738 | Size: 0x34 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E0738(void) {
+void fn_800E0738(void* a, void* b, void* c) {
     extern void fn_800A3C54();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r6 = r3;
-    r3 = r4;
-    r0 = r5;
-    r5 = r6;
-    r4 = r0;
-    fn_800A3C54();
-    return;
+    fn_800A3C54(b, c, a);
 }
-#pragma pop
 
 /* fn_800E076C | Size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800E076C(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    f32 f0 = 0.0f;
-
-    f0 = *(f32*)((u8*)r4 + 0x0);
-    *(f32*)((u8*)r3 + 0x0) = f0;
-    f0 = *(f32*)((u8*)r4 + 0x4);
-    *(f32*)((u8*)r3 + 0x4) = f0;
-    f0 = *(f32*)((u8*)r4 + 0x8);
-    *(f32*)((u8*)r3 + 0x8) = f0;
-    f0 = *(f32*)((u8*)r4 + 0xC);
-    *(f32*)((u8*)r3 + 0xC) = f0;
-    return;
+void fn_800E076C(void* dst, void* src) {
+    f32* d = (f32*)dst;
+    f32* s = (f32*)src;
+    d[0] = s[0];
+    d[1] = s[1];
+    d[2] = s[2];
+    d[3] = s[3];
 }
-#pragma pop
 
 /* fn_800E0790 | Size: 0x54 */
 #pragma push
