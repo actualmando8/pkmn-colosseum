@@ -5732,37 +5732,17 @@ u32 fn_8023C368(void) { return 0; }
  * ------------------------------------------------------------------- */
 
 /* Address: 0x80220778 | Size: 0x5C | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80220778(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FEF74();
-    extern void fn_802026E4();
+    extern u32 fn_801FEF74();
+    extern u32 fn_802026E4();
     extern void fn_80202810();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r4 = 0x14;
-    r31 = r3;
-    fn_802026E4();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) goto L_802207BC;
-    r3 = r31;
-    fn_801FEF74();
-    if ((s32)r3 > (s32)0x0) goto L_802207BC;
-    r3 = r31;
-    r4 = 0x14;
-    fn_80202810();
-L_802207BC: ;
-    r3 = 0x1;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    if ((fn_802026E4(ctx, 0x14) & 0xFF) == 1) {
+        if ((s32)fn_801FEF74(ctx) <= 0) {
+            fn_80202810(ctx, 0x14);
+        }
+    }
+    return 1;
 }
-#pragma pop
 
 /* Address: 0x802207D4 | Size: 0x94 */
 #pragma push
