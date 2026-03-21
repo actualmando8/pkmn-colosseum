@@ -6438,22 +6438,26 @@ void fn_800D7230(void) {
 /* fn_800D724C | Size: 0x1C */
 void fn_800D724C(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx << 4;
     *fifo = *(u8*)(state + 0x520);
 }
 
 /* fn_800D7268 | Size: 0x1C */
 void fn_800D7268(u32 idx) {
     volatile u16* fifo = (volatile u16*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx << 4;
     *fifo = *(u16*)(state + 0x522);
 }
 
 /* fn_800D7284 | Size: 0x20 */
 void fn_800D7284(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
-    u8 val = *(u8*)(state + 0x520);
+    u8* state = (u8*)lbl_8047AA80;
+    u8 val;
+    state += idx << 4;
+    val = *(u8*)(state + 0x520);
     *fifo = val;
     *fifo = val;
 }
@@ -6461,8 +6465,10 @@ void fn_800D7284(u32 idx) {
 /* fn_800D72A4 | Size: 0x20 */
 void fn_800D72A4(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
-    u8 val = *(u8*)(state + 0x520);
+    u8* state = (u8*)lbl_8047AA80;
+    u8 val;
+    state += idx << 4;
+    val = *(u8*)(state + 0x520);
     *fifo = val;
     *fifo = val;
 }
@@ -6470,8 +6476,10 @@ void fn_800D72A4(u32 idx) {
 /* fn_800D72C4 | Size: 0x20 */
 void fn_800D72C4(u32 idx) {
     volatile u16* fifo = (volatile u16*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
-    u16 val = *(u16*)(state + 0x522);
+    u8* state = (u8*)lbl_8047AA80;
+    u16 val;
+    state += idx << 4;
+    val = *(u16*)(state + 0x522);
     *fifo = val;
     *fifo = val;
 }
@@ -6479,8 +6487,10 @@ void fn_800D72C4(u32 idx) {
 /* fn_800D72E4 | Size: 0x20 */
 void fn_800D72E4(u32 idx) {
     volatile u16* fifo = (volatile u16*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
-    u16 val = *(u16*)(state + 0x522);
+    u8* state = (u8*)lbl_8047AA80;
+    u16 val;
+    state += idx << 4;
+    val = *(u16*)(state + 0x522);
     *fifo = val;
     *fifo = val;
 }
@@ -6488,9 +6498,11 @@ void fn_800D72E4(u32 idx) {
 /* fn_800D7304 | Size: 0x24 */
 void fn_800D7304(u32 idx) {
     volatile f32* fifo = (volatile f32*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx << 4);
-    f32 v0 = *(f32*)(state + 0x528);
-    f32 v1 = *(f32*)(state + 0x52C);
+    u8* state = (u8*)lbl_8047AA80;
+    f32 v0, v1;
+    state += idx << 4;
+    v0 = *(f32*)(state + 0x528);
+    v1 = *(f32*)(state + 0x52C);
     *fifo = v0;
     *fifo = v1;
 }
@@ -6498,38 +6510,44 @@ void fn_800D7304(u32 idx) {
 /* fn_800D7328 | Size: 0x1C */
 void fn_800D7328(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx * 12;
     *fifo = *(u8*)(state + 0x4E8);
 }
 
 /* fn_800D7344 | Size: 0x1C */
 void fn_800D7344(u32 idx) {
     volatile u16* fifo = (volatile u16*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx * 12;
     *fifo = *(u16*)(state + 0x4EC);
 }
 
 /* fn_800D7360 | Size: 0x1C */
 void fn_800D7360(u32 idx) {
     volatile u16* fifo = (volatile u16*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx * 12;
     *fifo = *(u16*)(state + 0x4EC);
 }
 
 /* fn_800D737C | Size: 0x1C */
 void fn_800D737C(u32 idx) {
     volatile u32* fifo = (volatile u32*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
+    u8* state = (u8*)lbl_8047AA80;
+    state += idx * 12;
     *fifo = *(u32*)(state + 0x4F0);
 }
 
 /* fn_800D7398 | Size: 0x2C */
 void fn_800D7398(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
-    u8 b0 = *(u8*)(state + 0x4E8);
-    u8 b1 = *(u8*)(state + 0x4E9);
-    u8 b2 = *(u8*)(state + 0x4EA);
+    u8* state = (u8*)lbl_8047AA80;
+    u8 b0, b1, b2;
+    state += idx * 12;
+    b0 = *(u8*)(state + 0x4E8);
+    b1 = *(u8*)(state + 0x4E9);
+    b2 = *(u8*)(state + 0x4EA);
     *fifo = b0;
     *fifo = b1;
     *fifo = b2;
@@ -6538,11 +6556,13 @@ void fn_800D7398(u32 idx) {
 /* fn_800D73C4 | Size: 0x34 */
 void fn_800D73C4(u32 idx) {
     volatile u8* fifo = (volatile u8*)0xCC008000;
-    u8* state = (u8*)lbl_8047AA80 + (idx * 12);
-    u8 b0 = *(u8*)(state + 0x4E8);
-    u8 b1 = *(u8*)(state + 0x4E9);
-    u8 b2 = *(u8*)(state + 0x4EA);
-    u8 b3 = *(u8*)(state + 0x4EB);
+    u8* state = (u8*)lbl_8047AA80;
+    u8 b0, b1, b2, b3;
+    state += idx * 12;
+    b0 = *(u8*)(state + 0x4E8);
+    b1 = *(u8*)(state + 0x4E9);
+    b2 = *(u8*)(state + 0x4EA);
+    b3 = *(u8*)(state + 0x4EB);
     *fifo = b0;
     *fifo = b1;
     *fifo = b2;

@@ -20533,7 +20533,7 @@ L_80211148: ;
 #pragma pop
 
 /* 0x80211164 | size: 0x4 | trivial */
-s32 fn_80211164(void) { return 0; }
+void fn_80211164(void) { return; }
 
 /* 0x80211170 | size: 0x68C | large */
 #pragma push
