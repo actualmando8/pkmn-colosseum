@@ -650,31 +650,28 @@ L_800C3320:
     return;
 }
 
-/* fn_800C3344 - 0x800C3344 | size: 0x58 */
-void fn_800C3344(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
+/* fn_800C3344 - 0x800C3344 | size: 0x58
+ * TRKValidateMemoryAddress - Convert a physical or hardware address
+ * to a virtual (cached) address. Returns the address unchanged if
+ * it falls within the TRK stack or hardware register range.
+ */
+u32 fn_800C3344(u32 addr) {
+    u32 stackBase = *(u32*)&lbl_803FED58;
 
-    r4 = (u32)&lbl_803FED58;
-    r4 = (u32)&lbl_803FED58;
-    r4 = *(u32*)((u8*)r4 + 0x0);
-    if (r3 < r4) goto L_800C3378;
-    tmp = r4 + 0x4000;
-    if (r3 >= tmp) goto L_800C3378;
-    r4 = (u32)gTRKCPUState;
-    r4 = (u32)gTRKCPUState;
-    tmp = *(u32*)((u8*)r4 + 0x238);
-    tmp = tmp & 0x3;
-    if ((u32)r3 != (u32)tmp) return;
-L_800C3378:
-    tmp = 0x7E000000;
-    if (r3 < tmp) goto L_800C3390;
-    tmp = 0x80000000;
-    if ((u32)r3 <= (u32)tmp) return;
-L_800C3390:
-    tmp = r3 & 0x3FFFFFFF;
-    r3 = tmp | (0x8000 << 16);
-    return;
+    /* Check if address is in the TRK stack (stackBase to stackBase+0x4000) */
+    if (addr >= stackBase && addr < stackBase + 0x4000) {
+        u32 msrBits = *(u32*)((u8*)gTRKCPUState + 0x238) & 0x3;
+        if (addr == msrBits) {
+            return addr;
+        }
+    }
+
+    /* Check if address is in hardware register space (0x7E000000-0x80000000) */
+    if (addr >= 0x7E000000 && addr <= 0x80000000) {
+        return addr;
+    }
+
+    /* Convert physical address to virtual (cached) address */
+    return (addr & 0x3FFFFFFF) | 0x80000000;
 }
 

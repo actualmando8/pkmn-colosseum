@@ -512,43 +512,32 @@ BOOL fn_80098368(s32 chan, u8* buf, s32 len, s32 mode) {
     return TRUE;
 }
 
-/* fn_8009870C - 0x8009870C | size: 0x84 */
-void fn_8009870C(void) {
+/* fn_8009870C - 0x8009870C | size: 0x84
+ * EXISetExiCallback - Set/clear the EXI interrupt callback for a channel.
+ * Saves the old callback, installs the new one, and calls the low-level
+ * interrupt setup function. Returns the previous callback.
+ */
+u32 fn_8009870C(s32 chan) {
     extern u8 lbl_803FB3C8[];
-    extern void fn_80098110();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_80098110(s32 chan, u8* chanState);
+    u8* chanState;
+    BOOL enabled;
+    u32 oldCallback;
 
-    r30 = r3;
-    r4 = r3 << 6;
-    r3 = (u32)lbl_803FB3C8;
-    tmp = (u32)lbl_803FB3C8;
-    r31 = tmp + r4;
-    OSDisableInterrupts();
-    r28 = r3;
-    r29 = *(u32*)((u8*)r31 + 0x0);
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    if ((s32)r30 == 2) goto L_80098760;
-    r3 = r30 + 0x0;
-    r4 = r31 + 0x0;
-    fn_80098110();
-    goto L_80098770;
-L_80098760:
-    r3 = 0x0;
-    r4 = (u32)lbl_803FB3C8;
-    r4 = (u32)lbl_803FB3C8;
-    fn_80098110();
-L_80098770:
-    r3 = r28;
-    OSRestoreInterrupts(r3);
-    r3 = r29;
-    return;
+    chanState = lbl_803FB3C8 + (chan << 6);
+    enabled = OSDisableInterrupts();
+
+    oldCallback = *(u32*)(chanState + 0x0);
+    *(u32*)(chanState + 0x0) = 0;
+
+    if (chan == 2) {
+        fn_80098110(0, lbl_803FB3C8);
+    } else {
+        fn_80098110(chan, chanState);
+    }
+
+    OSRestoreInterrupts(enabled);
+    return oldCallback;
 }
 
 /* fn_80098944 - 0x80098944 | size: 0x7C */
