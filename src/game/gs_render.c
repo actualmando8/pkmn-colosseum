@@ -6508,9 +6508,9 @@ void fn_800D7304(u32 idx) {
 }
 
 /* fn_800D7328 | Size: 0x1C */
-void fn_800D7328(s32 idx) {
-    volatile u8* fifo = (volatile u8*)0xCC008000;
+void fn_800D7328(u32 idx) {
     u8* state = (u8*)lbl_8047AA80;
+    volatile u8* fifo = (volatile u8*)0xCC008000;
     state += idx * 12;
     *fifo = *(u8*)(state + 0x4E8);
 }

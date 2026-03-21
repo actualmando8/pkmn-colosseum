@@ -22640,13 +22640,13 @@ L_802515CC: ;
 #pragma pop
 
 /* Address: 0x80251614 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80251614(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80251614(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80251658 | Size: 0x28 | Pattern: simple_wrapper */
 u32 fn_80251658(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x80251688 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80251688(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80251688(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x802516C4 | Size: 0xD4 (212 bytes) */
 #pragma push
@@ -22782,7 +22782,7 @@ L_8025180C: ;
 #pragma pop
 
 /* Address: 0x80251824 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80251824(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80251824(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80251860 | Size: 0x78 | Pattern: field_accessor */
 #pragma push
@@ -23045,7 +23045,7 @@ L_80251AE4: ;
 #pragma pop
 
 /* Address: 0x80251AFC | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80251AFC(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80251AFC(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80251B50 | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -23685,7 +23685,7 @@ u32 fn_802522CC(void* ctx, u32 slot, u32 param) {
 #pragma pop
 
 /* Address: 0x80252354 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80252354(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80252354(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252398 | Size: 0x40 | Pattern: simple_wrapper */
 u32 fn_80252398(void* ctx, u32 param) { return 0; /* stub */ }
@@ -24114,7 +24114,7 @@ void fn_80252804(void* ctx, u32 param1, u32 param2) {
 u32 fn_80252894(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x802528DC | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_802528DC(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802528DC(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252918 | Size: 0x54 | Pattern: field_accessor */
 #pragma push
@@ -24317,7 +24317,7 @@ L_80252BB0: ;
 #pragma pop
 
 /* Address: 0x80252BC8 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80252BC8(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80252BC8(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252C04 | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -24843,10 +24843,10 @@ L_802531D8: ;
 #pragma pop
 
 /* Address: 0x802531F8 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_802531F8(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802531F8(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253234 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80253234(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80253234(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253270 | Size: 0x28 | Pattern: simple_wrapper */
 u32 fn_80253270(void* ctx, u32 param) { return 0; /* stub */ }
@@ -25017,7 +25017,7 @@ L_8025346C: ;
 u32 fn_8025348C(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x802534D4 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_802534D4(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802534D4(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253548 | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -25072,10 +25072,10 @@ L_802535B4: ;
 #pragma pop
 
 /* Address: 0x802535F4 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_802535F4(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802535F4(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253630 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80253630(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_80253630(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x8025366C | Size: 0x84 | Pattern: field_accessor */
 #pragma push
@@ -25234,7 +25234,7 @@ L_802537E0: ;
 #pragma pop
 
 /* Address: 0x802537F8 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_802537F8(void* ctx, u32 param) { return 0; /* stub */ }
+u32 fn_802537F8(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253834 | Size: 0x84 | Pattern: field_accessor */
 #pragma push

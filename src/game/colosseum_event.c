@@ -16437,31 +16437,16 @@ L_8020E194: ;
 }
 #pragma pop
 
-/* 0x8020E204 | size: 0x2C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020E204(void) {
+/* fn_8020E204 | Size: 0x2C | Look up entry in 8-byte table (indirect) */
+void* fn_8020E204(u16 index) {
     extern u8 lbl_80478F00[];
     extern u8 lbl_80478F04[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r4 = *(u32*)lbl_80478F00;
-    r5 = r3 & 0xFFFF;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    if ((u32)r5 <= (u32)r0) goto L_8020E220;
-    r3 = 0x0;
-    return;
-L_8020E220: ;
-    r4 = *(u32*)lbl_80478F04;
-    /* clrlslwi r0, r3, 16, 3 */;
-    r3 = r4 + r0;
-    return;
+    u32* countPtr = (u32*)*(u32*)lbl_80478F00;
+    if (index > *countPtr) {
+        return NULL;
+    }
+    return (u8*)*(u32*)lbl_80478F04 + (u32)index * 8;
 }
-#pragma pop
 
 /* 0x8020E488 | size: 0x2C | small */
 #pragma push
