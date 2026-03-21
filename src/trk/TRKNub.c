@@ -337,7 +337,7 @@ L_800BE874:
     r25 = r31;
     goto L_800BE88C;
 L_800BE888:
-    r25 = r1 + 0x8;
+    r25 = (u32)sp + 0x8;
 L_800BE88C:
     r3 = *(u32*)((u8*)r28 + 0xC);
     r24 = 0x4;
@@ -446,7 +446,7 @@ void fn_800BE9CC(void) {
     r31 = r30;
     goto L_800BEA00;
 L_800BE9FC:
-    r31 = r1 + 0x8;
+    r31 = (u32)sp + 0x8;
 L_800BEA00:
     r3 = *(u32*)((u8*)r27 + 0xC);
     r28 = 0x8;
@@ -518,11 +518,11 @@ L_800BEAE4:
     tmp = *(u32*)((u8*)r31 + 0x0);
     r3 = *(u32*)((u8*)r30 + 0x0);
     if ((s32)tmp == 0) goto L_800BEB00;
-    r4 = r1 + 0x8;
+    r4 = (u32)sp + 0x8;
     goto L_800BEB24;
 L_800BEB00:
     r6 = *(u8*)(sp + 0xB);
-    r4 = r1 + 0xc;
+    r4 = (u32)sp + 0xc;
     r5 = *(u8*)(sp + 0xA);
     r3 = *(u8*)(sp + 0x9);
     tmp = *(u8*)(sp + 0x8);
@@ -626,11 +626,11 @@ void fn_800BEC18(void) {
     r31 = r3;
     tmp = *(u32*)gTRKBigEndian;
     if ((s32)tmp == 0) goto L_800BEC54;
-    r4 = r1 + 0x8;
+    r4 = (u32)sp + 0x8;
     goto L_800BEC98;
 L_800BEC54:
     r10 = *(u8*)(sp + 0xF);
-    r4 = r1 + 0x10;
+    r4 = (u32)sp + 0x10;
     r9 = *(u8*)(sp + 0xE);
     r8 = *(u8*)(sp + 0xD);
     r7 = *(u8*)(sp + 0xC);

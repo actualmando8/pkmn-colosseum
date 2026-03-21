@@ -467,7 +467,7 @@ void fn_800AA678(void) {
     r31 = *(u32*)lbl_80478A0C;
     tmp = 0x80000000;
     r3 = *(u32*)lbl_8047A8A4;
-    r4 = r1 + 0x1c;
+    r4 = (u32)sp + 0x1c;
     tmp = (u32)tmp >> r31;
     tmp = r3 | tmp;
     *(u32*)lbl_8047A8A4 = tmp;
@@ -589,7 +589,7 @@ void fn_800AA7FC(void) {
     r30 = *(u32*)lbl_80478A0C;
     r31 = 0x80000000;
     r3 = *(u32*)lbl_8047A8A4;
-    r4 = r1 + 0x1c;
+    r4 = (u32)sp + 0x1c;
     tmp = (u32)r31 >> r30;
     tmp = r3 | tmp;
     *(u32*)lbl_8047A8A4 = tmp;
@@ -730,7 +730,7 @@ L_800AA9E8:
     if (tmp >= 2) goto L_800AAA74;
     tmp = *(u32*)lbl_8047A8A4;
     r3 = r29 + 0x0;
-    r4 = r1 + 0x1c;
+    r4 = (u32)sp + 0x1c;
     tmp = tmp | r28;
     *(u32*)lbl_8047A8A4 = tmp;
     fn_800D05A4();
@@ -1427,7 +1427,7 @@ L_800AB30C:
     tmp = r3 & 0x00000008;
     if ((s32)r3 == 0) goto L_800AB3E4;
     r3 = r21 + 0x0;
-    r4 = r1 + 0x14;
+    r4 = (u32)sp + 0x14;
     fn_800D05A4();
     tmp = *(u32*)lbl_8047A8B0;
     /* and. tmp, tmp, r23 */;
@@ -1485,7 +1485,7 @@ L_800AB3E4:
     r20 = r20 | r23;
 L_800AB3F8:
     r3 = r21 + 0x0;
-    r4 = r1 + 0x14;
+    r4 = (u32)sp + 0x14;
     fn_800D05A4();
     if ((s32)r3 != 0) goto L_800AB428;
     tmp = -0x3;
@@ -1509,7 +1509,7 @@ L_800AB450:
     r12 = *(u32*)lbl_80478A1C;
     r3 = r21 + 0x0;
     r4 = r31 + 0x0;
-    r5 = r1 + 0x14;
+    r5 = (u32)sp + 0x14;
     /* blrl  */;
     tmp = *(u16*)((u8*)r31 + 0x0);
     tmp = tmp & 0x00002000;
@@ -2288,13 +2288,13 @@ void fn_800ABEFC(void) {
     r31 = r4 + 0x0;
     tmp = *(u32*)lbl_8047A8BC;
     if (tmp == 0) goto L_800ABF48;
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSClearContext((OSContext*)r3);
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSSetCurrentContext((OSContext*)r3);
     r12 = *(u32*)lbl_8047A8BC;
     /* blrl  */;
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSClearContext((OSContext*)r3);
     r3 = r31;
     OSSetCurrentContext((OSContext*)r3);

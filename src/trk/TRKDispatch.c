@@ -384,14 +384,9 @@ L_800C0E50:
 }
 
 /* fn_800C0E68 - 0x800C0E68 | size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800C0E68(void) {
-    nofralloc
-    blr
+/* Empty function (blr) - no-op placeholder */
+void fn_800C0E68(void) {
 }
-#pragma pop
 
 /* fn_800C0E70 - 0x800C0E70 | size: 0x3C */
 void fn_800C0E70(void) {

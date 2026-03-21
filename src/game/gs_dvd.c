@@ -277,11 +277,11 @@ L_801671B4:
     if (resId != 1) goto L_80167218;
     param3 = 0x0;
     fn_800AE78C();
-    callback = (u32)fn_80167298;
+callback = (void*)(u32)fn_80167298;
     resId = slotIndex;
     slotIndex = (u32)fn_80167298;
     fn_80159ED0();
-    slotIndex = callback;
+slotIndex = (u32)callback;
     fn_80167F28();
     *(u32*)lbl_8047B0BC = slotIndex;
     if (slotIndex != 0) goto L_801671F0;
@@ -298,14 +298,14 @@ L_801671F0:
     slotIndex = 0x0;
     goto L_80167284;
 L_80167218:
-    param3 = callback;
+param3 = (u32)callback;
     slotIndex = 0x0;
     resId = 0x0;
     fn_80159ED0();
 L_80167228:
     resId = *(u16*)((u8*)r28 + 0x2);
     slotIndex = r27;
-    callback = param3;
+callback = (void*)(u32)param3;
     param1 = r25;
     param2 = param5;
     fn_80159EF0();
@@ -868,12 +868,12 @@ L_801689BC:
     *(u32*)((u8*)r27 + 0x0) = tmp;
     goto L_80168C50;
 L_801689E4:
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     r4 = 0x0;
     r5 = 0x80;
     memset((void*)r3, (int)r4, (u32)r5);
     r5 = *(u32*)((u8*)r28 + 0x4);
-    r4 = r1 + 0x8;
+    r4 = (u32)sp + 0x8;
     r3 = 0xE000000;
     /* extrwi tmp, r5, 1, 28 */;
     /* extrwi r6, r5, 3, 4 */;
@@ -892,7 +892,7 @@ L_80168A28:
     /* and. tmp, tmp, r5 */;
     if (r28 == 0) goto L_80168A88;
     r3 = r7 << 3;
-    r4 = r1 + 0x8;
+    r4 = (u32)sp + 0x8;
     tmp = r3 + 0x4;
     *(u32*)(r4 + tmp) = r28;
     r3 = *(u32*)((u8*)r6 + 0x4);
@@ -916,10 +916,10 @@ L_80168A88:
 L_80168A90:
     if (r6 != 0) goto L_80168A28;
     r4 = r7 << 3;
-    r3 = r1 + 0xc;
+    r3 = (u32)sp + 0xc;
     tmp = 0x2;
     *(u32*)(r3 + r4) = r28;
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     r7 = 0x0;
     r5 = 0x0;
     r8 = 0x0;
@@ -971,7 +971,7 @@ L_80168B54:
     r4 = r4 + 0x3;
     if (--ctr != 0) goto L_80168AC4;
     tmp = 0x2;
-    r3 = r1 + 0x48;
+    r3 = (u32)sp + 0x48;
     r4 = 0x8;
     ctr_fn = (void(*)(void))tmp;
 L_80168B70:

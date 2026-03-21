@@ -352,10 +352,10 @@ void fn_800C2EAC(void) {
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
 
-    r11 = r1 & 0x1F;
-    r12 = r1;
+    r11 = (u32)sp & 0x1F;
+    r12 = (u32)sp;
     r11 = -0x80 - r11;
-    /* stwux r1, r1, r11 */;
+    /* stwux (u32)sp, (u32)sp, r11 */;
     *(u32*)((u8*)r12 + 0x4) = tmp;
     r31 = r4;
     r30 = r3;
@@ -413,7 +413,7 @@ L_800C2F84:
     r29 = r3;
     r25 = 0x8000000;
     if (r3 == 0) goto L_800C2FE8;
-    r28 = r1 + 0x20;
+    r28 = (u32)sp + 0x20;
     r25 = r27;
     /* dcbi tmp, r28 */;
     fn_800ACBCC();
@@ -428,7 +428,7 @@ L_800C2FC8:
     if (r3 == 0) goto L_800C2FC8;
     r3 = r30;
     r5 = r24;
-    r4 = r1 + 0x20;
+    r4 = (u32)sp + 0x20;
     ((void(*)(void))fn_80003488)();
     /* dcbf tmp, r30 */;
 L_800C2FE8:
@@ -438,7 +438,7 @@ L_800C2FE8:
     if (r3 == 0) goto L_800C304C;
     /* clrrwi r23, r31, 5 */;
     if (r23 == r25) goto L_800C3030;
-    r28 = r1 + 0x20;
+    r28 = (u32)sp + 0x20;
     /* dcbi tmp, r28 */;
     fn_800ACBCC();
     r4 = r28;
@@ -452,7 +452,7 @@ L_800C3024:
     if (r23 == r25) goto L_800C3024;
 L_800C3030:
     r25 = r30 + r31;
-    r4 = r1 + 0x20;
+    r4 = (u32)sp + 0x20;
     r3 = r25;
     r5 = 0x20 - r24;
     r4 = r4 + r24;
@@ -474,9 +474,9 @@ L_800C3070:
     if (r23 == r25) goto L_800C3070;
     fn_800ACBCC();
 L_800C3080:
-    r10 = *(u32*)((u8*)r1 + 0x0);
+    r10 = *(u32*)((u8*)(u32)sp + 0x0);
     tmp = *(u32*)((u8*)r10 + 0x4);
-    r1 = r10;
+    (u32)sp = r10;
     return;
 }
 

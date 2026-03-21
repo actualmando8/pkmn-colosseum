@@ -220,7 +220,7 @@ L_8019B538:
     f3 = *(f32*)lbl_8047DA3C;
     f2 = *(f32*)lbl_8047DA3C;
     f0 = *(f32*)lbl_8047DA3C;
-    f5 = *(f64*)((u8*)r1 + 0x8);
+    f5 = *(f64*)((u8*)(u32)sp + 0x8);
     f5 = f5 - f6;
     f5 = f5 + f1;
     *(f32*)((u8*)r3 + 0x1C) = f5;
@@ -648,7 +648,7 @@ L_8019BBD0:
     *(u32*)((u8*)r31 + 0x18) = tmp;
     goto L_8019BC44;
 L_8019BC04:
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     fn_800BD768();
     tmp = 0x2;
     r5 = 0xff;
@@ -756,7 +756,7 @@ void fn_8019BD18(void) {
     /* mr. r28, r3 */;
     if ((s32)tmp != 0) goto L_8019BD74;
     tmp = *(u32*)lbl_8047E720;
-    r4 = r1 + 0xc;
+    r4 = (u32)sp + 0xc;
     f1 = *(f32*)lbl_8047DA68;
     r3 = 0x0;
     *(u32*)(sp + 0x10) = tmp;
@@ -778,7 +778,7 @@ L_8019BD74:
 L_8019BD94:
     tmp = *(u32*)((u8*)r28 + 0x18);
     r3 = r30;
-    r31 = r1 + 0x8;
+    r31 = (u32)sp + 0x8;
     *(u32*)(sp + 0x8) = tmp;
     fn_801944D0();
     f31 = f1;
@@ -806,7 +806,7 @@ L_8019BDF8:
     if (r30 == 0) goto L_8019BFB0;
     tmp = r31 & 0x7;
     if (r30 == 0) goto L_8019BFB0;
-    r3 = r1 + 0x30;
+    r3 = (u32)sp + 0x30;
     fn_800BD768();
     tmp = r31 & 0x1;
     if (r30 == 0) goto L_8019BE74;
@@ -857,12 +857,12 @@ L_8019BED8:
     r30 = 0x0;
     goto L_8019BF8C;
 L_8019BEE0:
-    r30 = r1 + 0x5c;
-    r3 = r1 + 0x5c;
+    r30 = (u32)sp + 0x5c;
+    r3 = (u32)sp + 0x5c;
     r4 = 0x0;
     r5 = 0x40;
     memset((void*)r3, (int)r4, (u32)r5);
-    r3 = r1 + 0x14;
+    r3 = (u32)sp + 0x14;
     fn_800BD454();
     f0 = *(f32*)(sp + 0x14);
     f0 = (f64)(s32)f0;
@@ -901,11 +901,11 @@ L_8019BF54:
     *(f32*)(sp + 0x98) = f0;
 L_8019BF8C:
     r5 = r30;
-    r3 = r1 + 0x48;
+    r3 = (u32)sp + 0x48;
     r4 = r28 & 0xFFFF;
     fn_800BCB14();
     r4 = r29 & 0xFFFF;
-    r5 = r1 + 0x48;
+    r5 = (u32)sp + 0x48;
     r3 = 0x1;
     fn_800BCCDC();
     goto L_8019BFC0;

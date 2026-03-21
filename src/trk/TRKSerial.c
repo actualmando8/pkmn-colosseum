@@ -91,12 +91,12 @@ void fn_800BF14C(void) {
 
     r4 = 0x2;
     r31 = r3;
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     ((void(*)(void))fn_800BE464)();
     r3 = (u32)&lbl_803FE7B8;
     tmp = -0x1;
     r4 = (u32)&lbl_803FE7B8;
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     *(u32*)((u8*)r4 + 0x0) = tmp;
     ((void(*)(void))fn_800BE47C)();
     return;
@@ -126,7 +126,7 @@ L_800BF364:
     r3 = 0x0;
     *(u8*)(sp + 0x9) = r31;
     fn_800C04E8();
-    r3 = r1 + 0x8;
+    r3 = (u32)sp + 0x8;
     OSReport();
     r3 = r30;
     fn_800C04E8();

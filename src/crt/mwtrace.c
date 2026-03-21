@@ -35,12 +35,7 @@ void fn_800C456C(void) {
 }
 
 /* fn_800C459C - 0x800C459C | size: 0x4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800C459C(void) {
-    nofralloc
-    blr
+/* Empty function (blr) - no-op placeholder */
+void fn_800C459C(void) {
 }
-#pragma pop
 

@@ -762,13 +762,13 @@ L_80008C8C:
     r3 = *(u32*)lbl_80478838;
     tmp = r4 & 0x1;
     if ((s32)tmp == 0) goto L_80008CB4;
-    r3 = *(s16*)((u8*)r1 + 0xA);
+    r3 = *(s16*)((u8*)(u32)sp + 0xA);
     *(u16*)(sp + 0xA) = tmp;
     goto L_80008CCC;
 L_80008CB4:
     tmp = r4 & 0x00000002;
     if ((s32)tmp == 0) goto L_80008CCC;
-    r3 = *(s16*)((u8*)r1 + 0xA);
+    r3 = *(s16*)((u8*)(u32)sp + 0xA);
     tmp = r3 + 0x1;
     *(u16*)(sp + 0xA) = tmp;
 L_80008CCC:
@@ -777,7 +777,7 @@ L_80008CCC:
     r3 = *(u32*)((u8*)r28 + 0x4);
     fn_8005D9E4();
     r3 = r3 & 0xFF;
-    tmp = *(s16*)((u8*)r1 + 0xA);
+    tmp = *(s16*)((u8*)(u32)sp + 0xA);
     tmp = tmp - r3;
     tmp = (s16)tmp;
     *(u16*)(sp + 0xA) = tmp;
@@ -787,15 +787,15 @@ L_80008CFC:
     if ((s32)tmp == 0) goto L_80008D28;
     r3 = *(u32*)((u8*)r28 + 0x4);
     fn_8005D9E4();
-    tmp = *(s16*)((u8*)r1 + 0xA);
+    tmp = *(s16*)((u8*)(u32)sp + 0xA);
     r3 = r3 & 0xFF;
     r3 = r3 + tmp;
     tmp = (s16)tmp;
     *(u16*)(sp + 0xA) = tmp;
 L_80008D28:
-    r4 = *(s16*)((u8*)r1 + 0xA);
+    r4 = *(s16*)((u8*)(u32)sp + 0xA);
     if ((s32)r4 >= 0) goto L_80008D74;
-    r3 = *(s16*)((u8*)r1 + 0x8);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
     tmp = 0x0;
     *(u16*)(sp + 0xA) = tmp;
     r3 = r3 + r4;
@@ -812,7 +812,7 @@ L_80008D28:
 L_80008D74:
     r3 = (s16)r29;
     if ((s32)r4 < (s32)r3) goto L_80008DB8;
-    r3 = *(s16*)((u8*)r1 + 0x8);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
     tmp = r4 - r5;
     r3 = r3 + tmp;
     tmp = (s16)r5;
@@ -828,8 +828,8 @@ L_80008DB8:
     r3 = r31 & 0xFFFF;
     tmp = r3 & 0x00000080;
     if ((s32)tmp == 0) goto L_80008EF8;
-    r3 = *(s16*)((u8*)r1 + 0x8);
-    tmp = *(s16*)((u8*)r1 + 0xA);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
+    tmp = *(s16*)((u8*)(u32)sp + 0xA);
     r5 = r3 + tmp;
     if ((s32)r5 >= 0) goto L_80008DE4;
     tmp = 0x0;
@@ -905,8 +905,8 @@ L_80008EEC:
 L_80008EF8:
     tmp = r3 & 0x00000040;
     if ((s32)tmp == 0) goto L_80009030;
-    r3 = *(s16*)((u8*)r1 + 0x8);
-    tmp = *(s16*)((u8*)r1 + 0xA);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
+    tmp = *(s16*)((u8*)(u32)sp + 0xA);
     r5 = r3 + tmp;
     if ((s32)r5 >= 0) goto L_80008F20;
     tmp = 0x0;
@@ -979,8 +979,8 @@ L_80009028:
     r3 = tmp & 0xFFFF;
     fn_801903B0();
 L_80009030:
-    r3 = *(s16*)((u8*)r1 + 0x8);
-    tmp = *(s16*)((u8*)r1 + 0xA);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
+    tmp = *(s16*)((u8*)(u32)sp + 0xA);
     r5 = r3 + tmp;
     *(u32*)lbl_80478838 = r4;
     if ((s32)r5 >= 0) goto L_80009054;

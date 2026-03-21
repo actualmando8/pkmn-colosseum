@@ -6,13 +6,77 @@
  * Stub implementations for function coverage.
  */
 
-/* __div2u - 0x800C483C | size: 0xEC */
+/* __div2u - 0x800C483C | size: 0xEC
+ * Unsigned 64-bit division: (r3:r4) / (r5:r6) -> quotient in r3:r4
+ */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 asm void __div2u(void) {
     nofralloc
-    /* TODO: decompile */
+    cmpwi   cr0, r3, 0
+    cntlzw  r0, r3
+    cntlzw  r9, r4
+    bne     cr0, _d2u_s1
+    addi    r0, r9, 32
+_d2u_s1:
+    cmpwi   cr0, r5, 0
+    cntlzw  r9, r5
+    cntlzw  r10, r6
+    bne     cr0, _d2u_s2
+    addi    r9, r10, 32
+_d2u_s2:
+    subf    r10, r0, r9
+    cmpwi   cr0, r10, 0
+    blt     cr0, _d2u_zero
+    addi    r10, r10, 1
+    subfic  r9, r10, 64
+    subf    r10, r10, r0
+    cmpwi   cr0, r10, 32
+    blt     cr0, _d2u_sm
+    srw     r8, r3, r10
+    li      r7, 0
+    b       _d2u_sd
+_d2u_sm:
+    srw     r8, r4, r10
+    subfic  r7, r10, 32
+    slw     r7, r3, r7
+    or      r8, r8, r7
+    srw     r7, r3, r10
+_d2u_sd:
+    cmpwi   cr0, r9, 32
+    blt     cr0, _d2u_sm2
+    slw     r3, r4, r10
+    li      r4, 0
+    b       _d2u_ls
+_d2u_sm2:
+    slw     r3, r3, r9
+    subfic  r10, r9, 32
+    srw     r10, r4, r10
+    or      r3, r3, r10
+    slw     r4, r4, r9
+_d2u_ls:
+    li      r10, -1
+    addic   r7, r7, 0
+_d2u_lp:
+    adde    r4, r4, r4
+    adde    r3, r3, r3
+    adde    r8, r8, r8
+    adde    r7, r7, r7
+    subfc   r0, r6, r8
+    subfe.  r9, r5, r7
+    blt     cr0, _d2u_ns
+    mr      r8, r0
+    mr      r7, r9
+    addic   r0, r10, 1
+_d2u_ns:
+    bdnz    _d2u_lp
+    adde    r4, r4, r4
+    adde    r3, r3, r3
+    blr
+_d2u_zero:
+    li      r4, 0
+    li      r3, 0
     blr
 }
 #pragma pop
@@ -110,13 +174,74 @@ L_800C4A58:
     return;
 }
 
-/* __mod2u - 0x800C4A60 | size: 0xE4 */
+/* __mod2u - 0x800C4A60 | size: 0xE4
+ * Unsigned 64-bit modulo: (r3:r4) % (r5:r6) -> remainder in r3:r4
+ */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 asm void __mod2u(void) {
     nofralloc
-    /* TODO: decompile */
+    cmpwi   cr0, r3, 0
+    cntlzw  r0, r3
+    cntlzw  r9, r4
+    bne     cr0, _m2u_s1
+    addi    r0, r9, 32
+_m2u_s1:
+    cmpwi   cr0, r5, 0
+    cntlzw  r9, r5
+    cntlzw  r10, r6
+    bne     cr0, _m2u_s2
+    addi    r9, r10, 32
+_m2u_s2:
+    subf    r10, r0, r9
+    cmpwi   cr0, r10, 0
+    blt     cr0, _m2u_ret
+    addi    r10, r10, 1
+    subfic  r9, r10, 64
+    subf    r10, r10, r0
+    cmpwi   cr0, r10, 32
+    blt     cr0, _m2u_sm
+    srw     r8, r3, r10
+    li      r7, 0
+    b       _m2u_sd
+_m2u_sm:
+    srw     r8, r4, r10
+    subfic  r7, r10, 32
+    slw     r7, r3, r7
+    or      r8, r8, r7
+    srw     r7, r3, r10
+_m2u_sd:
+    cmpwi   cr0, r9, 32
+    blt     cr0, _m2u_sm2
+    slw     r3, r4, r10
+    li      r4, 0
+    b       _m2u_ls
+_m2u_sm2:
+    slw     r3, r3, r9
+    subfic  r10, r9, 32
+    srw     r10, r4, r10
+    or      r3, r3, r10
+    slw     r4, r4, r9
+_m2u_ls:
+    li      r10, -1
+    addic   r7, r7, 0
+_m2u_lp:
+    adde    r4, r4, r4
+    adde    r3, r3, r3
+    adde    r8, r8, r8
+    adde    r7, r7, r7
+    subfc   r0, r6, r8
+    subfe.  r9, r5, r7
+    blt     cr0, _m2u_ns
+    mr      r8, r0
+    mr      r7, r9
+    addic   r0, r10, 1
+_m2u_ns:
+    bdnz    _m2u_lp
+    mr      r4, r8
+    mr      r3, r7
+_m2u_ret:
     blr
 }
 #pragma pop

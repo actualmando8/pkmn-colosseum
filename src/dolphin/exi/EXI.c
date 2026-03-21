@@ -603,7 +603,7 @@ void fn_80098944(void) {
     if ((s32)tmp != 0) goto L_800989A8;
     r3 = r30 + 0x0;
     r4 = 0x0;
-    r5 = r1 + 0xc;
+    r5 = (u32)sp + 0xc;
     fn_80099400();
     if ((s32)r3 == 0) goto L_800989A4;
     r31 = 0x1;
@@ -652,7 +652,7 @@ void fn_800989C0(void) {
     if ((s32)tmp != 0) goto L_80098A20;
     r3 = r31 + 0x0;
     r4 = 0x0;
-    r5 = r1 + 0x10;
+    r5 = (u32)sp + 0x10;
     fn_80099400();
 L_80098A20:
     OSDisableInterrupts();
@@ -771,9 +771,9 @@ void fn_80098DDC(void) {
     f32 f5 = 0.0f;
     f32 f8 = 0.0f;
 
-    *(u16*)(r1 + 0x8) = r3;
+    *(u16*)((u32)sp + 0x8) = r3;
     r27 = r4;
-    r3 = *(s16*)((u8*)r1 + 0x8);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
     tmp = 0x3;
     r31 = (s32)r3 / (s32)tmp;
     r4 = r31 << 6;
@@ -794,15 +794,15 @@ void fn_80098DDC(void) {
     *(u32*)(r3 + tmp) = r30;
     r29 = *(u32*)((u8*)r28 + 0x0);
     if (r29 == 0) goto L_80098E88;
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSClearContext((OSContext*)r3);
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSSetCurrentContext((OSContext*)r3);
     r3 = r31 + 0x0;
     r4 = r27 + 0x0;
     r12 = r29 + 0x0;
     /* blrl  */;
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSClearContext((OSContext*)r3);
     r3 = r27;
     OSSetCurrentContext((OSContext*)r3);
@@ -895,15 +895,15 @@ L_80098FA4:
     /* clrrwi tmp, tmp, 2 */;
     *(u32*)((u8*)r30 + 0xC) = tmp;
 L_80098FB0:
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSClearContext((OSContext*)r3);
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSSetCurrentContext((OSContext*)r3);
     r3 = r31 + 0x0;
     r4 = r22 + 0x0;
     r12 = r26 + 0x0;
     /* blrl  */;
-    r3 = r1 + 0x18;
+    r3 = (u32)sp + 0x18;
     OSClearContext((OSContext*)r3);
     r3 = r22;
     OSSetCurrentContext((OSContext*)r3);
@@ -924,9 +924,9 @@ void fn_80098FF8(void) {
     u32 r30 = 0;
     u32 r31 = 0;
 
-    *(u16*)(r1 + 0x8) = r3;
+    *(u16*)((u32)sp + 0x8) = r3;
     r28 = r4;
-    r3 = *(s16*)((u8*)r1 + 0x8);
+    r3 = *(s16*)((u8*)(u32)sp + 0x8);
     tmp = 0x3;
     r31 = (s32)r3 / (s32)tmp;
     r3 = 0x700000;
@@ -948,9 +948,9 @@ void fn_80098FF8(void) {
     tmp = tmp & 0xFFFFFFF7;
     *(u32*)((u8*)r30 + 0xC) = tmp;
     if (r29 == 0) goto L_800990AC;
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSClearContext((OSContext*)r3);
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSSetCurrentContext((OSContext*)r3);
     tmp = 0x0;
     *(u32*)((u8*)r30 + 0x8) = tmp;
@@ -958,7 +958,7 @@ void fn_80098FF8(void) {
     r4 = r28 + 0x0;
     r12 = r29 + 0x0;
     /* blrl  */;
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     OSClearContext((OSContext*)r3);
     r3 = r28;
     OSSetCurrentContext((OSContext*)r3);

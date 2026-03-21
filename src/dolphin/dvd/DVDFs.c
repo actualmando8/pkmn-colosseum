@@ -295,13 +295,13 @@ void fn_800A501C(void) {
     r30 = r3 + 0x0;
     fn_800A4D28();
     if ((s32)r3 >= 0) goto L_800A5070;
-    r3 = r1 + 0x10;
+    r3 = (u32)sp + 0x10;
     r4 = 0x80;
     fn_800A5268();
     r3 = (u32)lbl_803119B8;
     r3 = (u32)lbl_803119B8;
     r4 = r30 + 0x0;
-    r5 = r1 + 0x10;
+    r5 = (u32)sp + 0x10;
     OSReport();
     r3 = 0x0;
     goto L_800A50CC;
@@ -727,12 +727,7 @@ L_800A5610:
 }
 
 /* fn_800A5620 - 0x800A5620 | size: 0x4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-asm void fn_800A5620(void) {
-    nofralloc
-    blr
+/* Empty function (blr) - no-op placeholder */
+void fn_800A5620(void) {
 }
-#pragma pop
 

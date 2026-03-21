@@ -214,15 +214,15 @@ void fn_800C8520(void) {
     r26 = r4;
     if ((s32)tmp != 0) goto L_800C855C;
 L_800C855C:
-    r29 = r1 + 0xa8;
-    r30 = r1 + 0x8;
+    r29 = (u32)sp + 0xa8;
+    r30 = (u32)sp + 0x8;
     r28 = 0x2000000;
     r31 = -0x1;
     r12 = 0x0;
     r11 = (u32)fn_800C87F8;
-    r27 = r1 + 0x74;
+    r27 = (u32)sp + 0x74;
     tmp = (u32)fn_800C87F8;
-    r4 = r1 + 0x68;
+    r4 = (u32)sp + 0x68;
     r3 = tmp;
     r5 = r26;
     r6 = r27;
@@ -255,7 +255,7 @@ void fn_800C8600(void) {
     r5 = r4;
     r7 = -0x1;
     tmp = 0x0;
-    r4 = r1 + 0x8;
+    r4 = (u32)sp + 0x8;
     r31 = r3;
     r3 = (u32)fn_800C87F8;
     r3 = (u32)fn_800C87F8;
@@ -312,11 +312,11 @@ L_800C874C:
 L_800C8794:
     r3 = 0x2;
     ((void(*)(void))__begin_critical_region)();
-    r5 = r1 + 0x88;
-    tmp = r1 + 0x8;
+    r5 = (u32)sp + 0x88;
+    tmp = (u32)sp + 0x8;
     r4 = 0x1000000;
     r3 = (u32)__FileWrite;
-    r6 = r1 + 0x68;
+    r6 = (u32)sp + 0x68;
     r3 = (u32)__FileWrite;
     r4 = r31;
     r5 = r30;

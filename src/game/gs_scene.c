@@ -687,12 +687,12 @@ L_80177DB4:
     tmp = captureIndex & 0xFF;
     if ((s32)tmp == 8) goto L_8017808C;
     r5 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0xb4;
+    captureIndex = (u32)sp + 0xb4;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
     r4 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0xb4;
+    captureIndex = (u32)sp + 0xb4;
     r5 = captureIndex;
     r4 = r4 + 0x4;
     fn_800E0168();
@@ -765,7 +765,7 @@ L_80177EEC:
     *(f32*)((u8*)captureIndex + 0x44) = f4;
     goto L_8017808C;
 L_80177EF8:
-    captureIndex = r1 + 0xb4;
+    captureIndex = (u32)sp + 0xb4;
     r4 = r29 + 0x4;
     r5 = r29 + 0x1c;
     fn_800E0168();
@@ -967,20 +967,20 @@ L_80178200:
     tmp = *(u32*)(captureIndex + tmp);
     ctr_fn = (void(*)(void))tmp;
     f1 = *(f32*)lbl_8047D740;
-    captureIndex = r1 + 0xa8;
+    captureIndex = (u32)sp + 0xa8;
     f2 = *(f32*)((u8*)r5 + 0x40);
     f3 = *(f32*)((u8*)r5 + 0x44);
     ((void(*)(void))fn_800E01F4)();
     r4 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0xf0;
+    captureIndex = (u32)sp + 0xf0;
     f1 = *(f32*)((u8*)r4 + 0x14);
     ((void(*)(void))fn_800E0518)();
-    captureIndex = r1 + 0xa8;
-    r4 = r1 + 0xf0;
+    captureIndex = (u32)sp + 0xa8;
+    r4 = (u32)sp + 0xf0;
     r5 = captureIndex;
     ((void(*)(void))fn_800DFF98)();
     r4 = *(u32*)&lbl_80478C40;
-    r5 = r1 + 0xa8;
+    r5 = (u32)sp + 0xa8;
     captureIndex = r4 + 0x4;
     r4 = r4 + 0x1c;
     ((void(*)(void))fn_800E019C)();
@@ -989,14 +989,14 @@ L_80178200:
     r4 = r4 + 0x4;
     ((void(*)(void))fn_800D207C)();
     r5 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0x9c;
+    captureIndex = (u32)sp + 0x9c;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
     r4 = (u32)lbl_8036C248;
     captureIndex = captureIndex;
     r4 = (u32)lbl_8036C248;
-    r5 = r1 + 0x9c;
+    r5 = (u32)sp + 0x9c;
     ((void(*)(void))fn_800D1F04)();
     captureIndex = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)captureIndex + 0x40);
@@ -1005,11 +1005,11 @@ L_80178200:
     f0 = (f32)f1;
     r8 = *(u32*)&lbl_80478C40;
     captureIndex = captureIndex;
-    r4 = r1 + 0x3c;
-    r5 = r1 + 0x40;
-    r6 = r1 + 0x44;
+    r4 = (u32)sp + 0x3c;
+    r5 = (u32)sp + 0x40;
+    r6 = (u32)sp + 0x44;
     f0 = -f0;
-    r7 = r1 + 0x48;
+    r7 = (u32)sp + 0x48;
     *(f32*)((u8*)r8 + 0x10) = f0;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
@@ -1020,7 +1020,7 @@ L_80178200:
     f4 = *(f32*)(sp + 0x48);
     fn_800D20CC();
     goto L_8017862C;
-    captureIndex = r1 + 0x84;
+    captureIndex = (u32)sp + 0x84;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
@@ -1031,11 +1031,11 @@ L_80178200:
     r4 = (u32)lbl_8036C248;
     captureIndex = captureIndex;
     r4 = (u32)lbl_8036C248;
-    r5 = r1 + 0x84;
+    r5 = (u32)sp + 0x84;
     ((void(*)(void))fn_800D1F04)();
     r4 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0x90;
-    r5 = r1 + 0x84;
+    captureIndex = (u32)sp + 0x90;
+    r5 = (u32)sp + 0x84;
     r4 = r4 + 0x4;
     fn_800E0168();
     f1 = *(f32*)(sp + 0x94);
@@ -1118,11 +1118,11 @@ L_80178440:
     f0 = (f32)f1;
     r8 = *(u32*)&lbl_80478C40;
     captureIndex = captureIndex;
-    r4 = r1 + 0x2c;
-    r5 = r1 + 0x30;
-    r6 = r1 + 0x34;
+    r4 = (u32)sp + 0x2c;
+    r5 = (u32)sp + 0x30;
+    r6 = (u32)sp + 0x34;
     f0 = -f0;
-    r7 = r1 + 0x38;
+    r7 = (u32)sp + 0x38;
     *(f32*)((u8*)r8 + 0x10) = f0;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
@@ -1147,19 +1147,19 @@ L_80178440:
     r4 = r4 + 0x10;
     fn_800D203C();
     captureIndex = captureIndex;
-    r4 = r1 + 0x78;
-    r5 = r1 + 0x6c;
+    r4 = (u32)sp + 0x78;
+    r5 = (u32)sp + 0x6c;
     fn_800D1EB8();
     r5 = *(u32*)&lbl_80478C40;
-    r4 = r1 + 0x6c;
+    r4 = (u32)sp + 0x6c;
     captureIndex = r5 + 0x1c;
     r5 = r5 + 0x28;
     fn_800E0168();
     captureIndex = captureIndex;
-    r4 = r1 + 0x1c;
-    r5 = r1 + 0x20;
-    r6 = r1 + 0x24;
-    r7 = r1 + 0x28;
+    r4 = (u32)sp + 0x1c;
+    r5 = (u32)sp + 0x20;
+    r6 = (u32)sp + 0x24;
+    r7 = (u32)sp + 0x28;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
     captureIndex = captureIndex;
@@ -1174,25 +1174,25 @@ L_80178440:
     fn_800D2248();
     goto L_80178638;
     f1 = *(f32*)lbl_8047D740;
-    captureIndex = r1 + 0x60;
+    captureIndex = (u32)sp + 0x60;
     f2 = *(f32*)((u8*)r5 + 0x40);
     f3 = *(f32*)((u8*)r5 + 0x44);
     ((void(*)(void))fn_800E01F4)();
     r4 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0xc0;
+    captureIndex = (u32)sp + 0xc0;
     f1 = *(f32*)((u8*)r4 + 0x14);
     ((void(*)(void))fn_800E0518)();
-    captureIndex = r1 + 0x60;
-    r4 = r1 + 0xc0;
+    captureIndex = (u32)sp + 0x60;
+    r4 = (u32)sp + 0xc0;
     r5 = captureIndex;
     ((void(*)(void))fn_800DFF98)();
     r4 = *(u32*)&lbl_80478C40;
-    r5 = r1 + 0x60;
+    r5 = (u32)sp + 0x60;
     captureIndex = r4 + 0x4;
     r4 = r4 + 0x1c;
     ((void(*)(void))fn_800E019C)();
     r5 = *(u32*)&lbl_80478C40;
-    captureIndex = r1 + 0x54;
+    captureIndex = (u32)sp + 0x54;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
@@ -1203,7 +1203,7 @@ L_80178440:
     r4 = (u32)lbl_8036C248;
     captureIndex = captureIndex;
     r4 = (u32)lbl_8036C248;
-    r5 = r1 + 0x54;
+    r5 = (u32)sp + 0x54;
     ((void(*)(void))fn_800D1F04)();
     captureIndex = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)captureIndex + 0x40);
@@ -1212,11 +1212,11 @@ L_80178440:
     f0 = (f32)f1;
     r8 = *(u32*)&lbl_80478C40;
     captureIndex = captureIndex;
-    r4 = r1 + 0xc;
-    r5 = r1 + 0x10;
-    r6 = r1 + 0x14;
+    r4 = (u32)sp + 0xc;
+    r5 = (u32)sp + 0x10;
+    r6 = (u32)sp + 0x14;
     f0 = -f0;
-    r7 = r1 + 0x18;
+    r7 = (u32)sp + 0x18;
     *(f32*)((u8*)r8 + 0x10) = f0;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
@@ -1292,27 +1292,27 @@ void GSscene_CameraUpdate(void* sceneObj) {
 
     sceneObj = sceneObj;
     fn_801337B0();
-    tmp = sceneObj & 0xFF;
+tmp = (u32)sceneObj & 0xFF;
     if ((s32)tmp != 0) goto L_80178FEC;
     fn_800D3088();
     sceneObj = sceneObj;
-    sceneObj = 0x1;
+sceneObj = (void*)(u32)0x1;
     r4 = 0x1;
     fn_800F7994();
     tmp = (s8)sceneObj;
     r31 = tmp * sceneObj;
     fn_800D3088();
     sceneObj = sceneObj;
-    sceneObj = 0x1;
+sceneObj = (void*)(u32)0x1;
     r4 = 0x1;
     fn_800F7920();
     tmp = (s8)sceneObj;
-    sceneObj = *(u32*)&lbl_80478C40;
-    sceneObj = tmp * sceneObj;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
+sceneObj = (void*)((void*)(tmp * (u32)(u32)sceneObj));
     f1 = *(f32*)((u8*)sceneObj + 0x40);
     f2 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800CE2D8)();
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f1 = (f32)f1;
     f0 = *(f32*)lbl_8047D740;
     f2 = *(f32*)((u8*)sceneObj + 0x40);
@@ -1343,13 +1343,13 @@ void GSscene_CameraUpdate(void* sceneObj) {
 L_80178BA4:
     f0 = *(f64*)lbl_8047D758;
     if (f31 >= f0) goto L_80178BBC;
-    sceneObj = (u32)lbl_80478AC0;
+sceneObj = (void*)(u32)lbl_80478AC0;
     f31 = *(f32*)lbl_80478AC0;
     goto L_80178C28;
 L_80178BBC:
     *(f32*)(sp + 0x8) = f31;
     tmp = 0x7F800000;
-    sceneObj = r4 & 0x7F800000;
+sceneObj = (void*)(r4 & 0x7F800000);
     if ((s32)sceneObj == (s32)tmp) goto L_80178BE4;
     if ((s32)sceneObj >= (s32)tmp) goto L_80178C14;
     if ((s32)sceneObj == 0) goto L_80178BFC;
@@ -1374,15 +1374,15 @@ L_80178C14:
     tmp = 0x4;
 L_80178C18:
     if ((s32)tmp != 1) goto L_80178C28;
-    sceneObj = (u32)lbl_80478AC0;
+sceneObj = (void*)(u32)lbl_80478AC0;
     f31 = *(f32*)lbl_80478AC0;
 L_80178C28:
-    sceneObj = 0x1;
+sceneObj = (void*)(u32)0x1;
     fn_800F7BC4();
-    tmp = sceneObj & 0x00000020;
+tmp = (u32)sceneObj & 0x00000020;
     if ((s32)tmp == 1) goto L_80178CEC;
     tmp = 0x43300000;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     *(u32*)(sp + 0x68) = tmp;
     f1 = *(f64*)lbl_8047D738;
     f2 = *(f32*)lbl_8047D76C;
@@ -1408,7 +1408,7 @@ L_80178C88:
     if (tmp <= 0) goto L_80178CD0;
 L_80178CAC:
     tmp = *(u32*)((u8*)r4 + 0x4);
-    if (sceneObj != tmp) goto L_80178CC4;
+if ((u32)sceneObj != tmp) goto L_80178CC4;
     tmp = r5 * 0x28;
     sceneObj = r6 + tmp;
     goto L_80178CD4;
@@ -1417,19 +1417,19 @@ L_80178CC4:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178CAC;
 L_80178CD0:
-    sceneObj = 0x0;
+sceneObj = (void*)(u32)0x0;
 L_80178CD4:
-    if (sceneObj == 0) goto L_80178CE0;
+if ((u32)sceneObj == 0) goto L_80178CE0;
     *(f32*)((u8*)sceneObj + 0x24) = f29;
 L_80178CE0:
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     *(f32*)((u8*)sceneObj + 0x48) = f29;
     goto L_80178D4C;
 L_80178CEC:
-    sceneObj = 0x1;
+sceneObj = (void*)(u32)0x1;
     fn_800F7BC4();
-    tmp = sceneObj & 0x00000040;
-    if (sceneObj == 0) goto L_80178D24;
+tmp = (u32)sceneObj & 0x00000040;
+if ((u32)sceneObj == 0) goto L_80178D24;
     tmp = 0x43300000;
     f2 = *(f64*)lbl_8047D738;
     *(u32*)(sp + 0x68) = tmp;
@@ -1449,17 +1449,17 @@ L_80178D4C:
     f1 = f30;
     fn_800CE148();
     f0 = (f32)f1;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f1 = f30;
     f0 = f31 * f0;
     *(f32*)((u8*)sceneObj + 0x40) = f0;
     fn_800CDBE0();
     f1 = (f32)f1;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f0 = *(f32*)lbl_8047D774;
     f1 = f31 * f1;
     *(f32*)((u8*)sceneObj + 0x44) = f1;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)sceneObj + 0x44);
     if (f1 >= f0) goto L_80178D98;
     *(f32*)((u8*)sceneObj + 0x44) = f0;
@@ -1469,7 +1469,7 @@ L_80178D98:
     if (f1 <= f0) goto L_80178DA8;
     *(f32*)((u8*)sceneObj + 0x44) = f0;
 L_80178DA8:
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x40);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1481,7 +1481,7 @@ L_80178DA8:
     if (tmp <= 0) goto L_80178DF8;
 L_80178DD4:
     tmp = *(u32*)((u8*)r4 + 0x4);
-    if (sceneObj != tmp) goto L_80178DEC;
+if ((u32)sceneObj != tmp) goto L_80178DEC;
     tmp = r5 * 0x28;
     sceneObj = r6 + tmp;
     goto L_80178DFC;
@@ -1490,14 +1490,14 @@ L_80178DEC:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178DD4;
 L_80178DF8:
-    sceneObj = 0x0;
+sceneObj = (void*)(u32)0x0;
 L_80178DFC:
-    if (sceneObj == 0) goto L_80178E08;
+if ((u32)sceneObj == 0) goto L_80178E08;
     *(f32*)((u8*)sceneObj + 0x18) = f29;
 L_80178E08:
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     *(f32*)((u8*)sceneObj + 0x40) = f29;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1509,7 +1509,7 @@ L_80178E08:
     if (tmp <= 0) goto L_80178E60;
 L_80178E3C:
     tmp = *(u32*)((u8*)r4 + 0x4);
-    if (sceneObj != tmp) goto L_80178E54;
+if ((u32)sceneObj != tmp) goto L_80178E54;
     tmp = r5 * 0x28;
     sceneObj = r6 + tmp;
     goto L_80178E64;
@@ -1518,13 +1518,13 @@ L_80178E54:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178E3C;
 L_80178E60:
-    sceneObj = 0x0;
+sceneObj = (void*)(u32)0x0;
 L_80178E64:
-    if (sceneObj == 0) goto L_80178E70;
+if ((u32)sceneObj == 0) goto L_80178E70;
     *(f32*)((u8*)sceneObj + 0x1C) = f29;
 L_80178E70:
     r4 = *(u32*)&lbl_80478C40;
-    sceneObj = r1 + 0x1c;
+sceneObj = (void*)(u32)sp + 0x1c;
     f1 = *(f32*)lbl_8047D740;
     *(f32*)((u8*)r4 + 0x44) = f29;
     r4 = *(u32*)&lbl_80478C40;
@@ -1532,7 +1532,7 @@ L_80178E70:
     f3 = *(f32*)((u8*)r4 + 0x44);
     ((void(*)(void))fn_800E01F4)();
     tmp = 0x43300000;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     *(u32*)(sp + 0x68) = tmp;
     f2 = *(f64*)lbl_8047D738;
     f0 = *(f32*)lbl_8047D77C;
@@ -1541,7 +1541,7 @@ L_80178E70:
     f0 = f1 / f0;
     f0 = f2 + f0;
     *(f32*)((u8*)sceneObj + 0x14) = f0;
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x14);
     ((void(*)(void))fn_800FF56C)();
     r4 = *(u32*)&lbl_80478FB8;
@@ -1553,7 +1553,7 @@ L_80178E70:
     if (tmp <= 0) goto L_80178F14;
 L_80178EF0:
     tmp = *(u32*)((u8*)r4 + 0x4);
-    if (sceneObj != tmp) goto L_80178F08;
+if ((u32)sceneObj != tmp) goto L_80178F08;
     tmp = r5 * 0x28;
     sceneObj = r6 + tmp;
     goto L_80178F18;
@@ -1562,30 +1562,30 @@ L_80178F08:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_80178EF0;
 L_80178F14:
-    sceneObj = 0x0;
+sceneObj = (void*)(u32)0x0;
 L_80178F18:
-    if (sceneObj == 0) goto L_80178F24;
+if ((u32)sceneObj == 0) goto L_80178F24;
     *(f32*)((u8*)sceneObj + 0x20) = f29;
 L_80178F24:
     r4 = *(u32*)&lbl_80478C40;
-    sceneObj = r1 + 0x34;
+sceneObj = (void*)(u32)sp + 0x34;
     *(f32*)((u8*)r4 + 0x14) = f29;
     r4 = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)r4 + 0x14);
     ((void(*)(void))fn_800E0518)();
-    sceneObj = r1 + 0x1c;
-    r4 = r1 + 0x34;
-    r5 = sceneObj;
+sceneObj = (void*)(u32)sp + 0x1c;
+    r4 = (u32)sp + 0x34;
+r5 = (u32)sceneObj;
     ((void(*)(void))fn_800DFF98)();
     r5 = *(u32*)&lbl_80478C40;
-    sceneObj = r1 + 0x28;
+sceneObj = (void*)(u32)sp + 0x28;
     r4 = r5 + 0x1c;
     r5 = r5 + 0x28;
     ((void(*)(void))fn_800E019C)();
-    sceneObj = *(u32*)&lbl_80478C40;
-    r4 = r1 + 0x28;
-    r5 = r1 + 0x1c;
-    sceneObj = sceneObj + 0x4;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
+    r4 = (u32)sp + 0x28;
+    r5 = (u32)sp + 0x1c;
+sceneObj = (void*)((void*)((u32)(u32)sceneObj + 0x4));
     ((void(*)(void))fn_800E019C)();
     r4 = *(u32*)&lbl_80478C40;
     sceneObj = sceneObj;
@@ -1594,20 +1594,20 @@ L_80178F24:
     r4 = (u32)lbl_8036C248;
     sceneObj = sceneObj;
     r4 = (u32)lbl_8036C248;
-    r5 = r1 + 0x28;
+    r5 = (u32)sp + 0x28;
     ((void(*)(void))fn_800D1F04)();
-    sceneObj = *(u32*)&lbl_80478C40;
+sceneObj = (void*)*(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)sceneObj + 0x40);
     f2 = *(f32*)((u8*)sceneObj + 0x44);
     ((void(*)(void))fn_800CE2D8)();
     f0 = (f32)f1;
     r8 = *(u32*)&lbl_80478C40;
     sceneObj = sceneObj;
-    r4 = r1 + 0xc;
-    r5 = r1 + 0x10;
-    r6 = r1 + 0x14;
+    r4 = (u32)sp + 0xc;
+    r5 = (u32)sp + 0x10;
+    r6 = (u32)sp + 0x14;
     f0 = -f0;
-    r7 = r1 + 0x18;
+    r7 = (u32)sp + 0x18;
     *(f32*)((u8*)r8 + 0x10) = f0;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
@@ -1680,63 +1680,63 @@ void GSscene_CameraInterpolate(void* camera) {
     f30 = *(f32*)lbl_8047D780;
     camera = camera;
     fn_801337B0();
-    tmp = camera & 0xFF;
+tmp = (u32)camera & 0xFF;
     if ((s32)tmp != 0) goto L_801793C0;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     fn_800F7AF0();
     camera = camera;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     fn_800F7BC4();
     tmp = camera & camera;
     tmp = tmp & 0x00000400;
     if ((s32)tmp == 0) goto L_801790E8;
-    camera = 0x6;
+camera = (void*)(u32)0x6;
     fn_80102620();
-    tmp = camera & 0xFF;
+tmp = (u32)camera & 0xFF;
     if ((s32)tmp == 0) goto L_801790B8;
-    camera = 0x6;
+camera = (void*)(u32)0x6;
     fn_80102510();
     goto L_801790E8;
 L_801790B8:
-    camera = 0x6;
+camera = (void*)(u32)0x6;
     r4 = 0x0;
     r5 = 0x0;
     r6 = 0x0;
     r7 = 0x1;
     r8 = 0x0;
     fn_801026A4();
-    camera = 0x6;
+camera = (void*)(u32)0x6;
     r4 = 0x14;
     r5 = 0x104;
     fn_80102868();
 L_801790E8:
     r5 = *(u32*)&lbl_80478C40;
-    camera = (u32)lbl_80315540;
+camera = (void*)(u32)lbl_80315540;
     r4 = (u32)lbl_80315540;
     f1 = *(f32*)((u8*)r5 + 0x10);
-    camera = r1 + 0x54;
+camera = (void*)(u32)sp + 0x54;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
-    camera = (u32)lbl_8031554C;
+camera = (void*)(u32)lbl_8031554C;
     r4 = (u32)lbl_8031554C;
     f1 = *(f32*)((u8*)r5 + 0x14);
-    camera = r1 + 0x44;
+camera = (void*)(u32)sp + 0x44;
     fn_800E0718();
     r5 = *(u32*)&lbl_80478C40;
-    camera = (u32)lbl_80315558;
+camera = (void*)(u32)lbl_80315558;
     r4 = (u32)lbl_80315558;
     f1 = *(f32*)((u8*)r5 + 0x18);
-    camera = r1 + 0x34;
+camera = (void*)(u32)sp + 0x34;
     fn_800E0718();
-    camera = r1 + 0x24;
-    r4 = r1 + 0x54;
-    r5 = r1 + 0x34;
+camera = (void*)(u32)sp + 0x24;
+    r4 = (u32)sp + 0x54;
+    r5 = (u32)sp + 0x34;
     fn_800E0738();
-    camera = r1 + 0x24;
-    r4 = r1 + 0x44;
-    r5 = camera;
+camera = (void*)(u32)sp + 0x24;
+    r4 = (u32)sp + 0x44;
+r5 = (u32)camera;
     fn_800E0738();
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     r4 = 0x0;
     fn_800F7A7C();
     camera = (s8)camera;
@@ -1744,7 +1744,7 @@ L_801790E8:
     r5 = camera * camera;
     *(u32*)(sp + 0x70) = tmp;
     f1 = *(f64*)lbl_8047D738;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x74) = tmp;
     f29 = f0 - f1;
@@ -1754,7 +1754,7 @@ L_801790E8:
     r5 = camera * camera;
     *(u32*)(sp + 0x78) = tmp;
     f1 = *(f64*)lbl_8047D738;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x7C) = tmp;
     f28 = f0 - f1;
@@ -1764,7 +1764,7 @@ L_801790E8:
     r5 = camera * camera;
     *(u32*)(sp + 0x80) = tmp;
     f1 = *(f64*)lbl_8047D738;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     r4 = 0x0;
     *(u32*)(sp + 0x84) = tmp;
     f31 = f0 - f1;
@@ -1774,48 +1774,48 @@ L_801790E8:
     r4 = camera * camera;
     *(u32*)(sp + 0x88) = tmp;
     f1 = *(f64*)lbl_8047D738;
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     *(u32*)(sp + 0x8C) = tmp;
     f27 = f0 - f1;
     fn_800F7BC4();
-    tmp = camera & 0x00000040;
+tmp = (u32)camera & 0x00000040;
     if ((s32)tmp == 0) goto L_80179228;
     f0 = *(f32*)lbl_8047D784;
     f30 = f30 * f0;
 L_80179228:
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     fn_800F7BC4();
-    tmp = camera & 0x00000800;
+tmp = (u32)camera & 0x00000800;
     if ((s32)tmp == 0) goto L_80179254;
     f0 = -f28;
     f3 = *(f32*)lbl_8047D740;
     f1 = f29 / f30;
-    camera = r1 + 0x18;
+camera = (void*)(u32)sp + 0x18;
     f2 = f0 / f30;
     ((void(*)(void))fn_800E01F4)();
     goto L_80179268;
 L_80179254:
     f1 = f29 / f30;
     f2 = *(f32*)lbl_8047D740;
-    camera = r1 + 0x18;
+camera = (void*)(u32)sp + 0x18;
     f3 = f28 / f30;
     ((void(*)(void))fn_800E01F4)();
 L_80179268:
-    camera = r1 + 0x64;
-    r4 = r1 + 0x24;
-    r5 = r1 + 0x18;
+camera = (void*)(u32)sp + 0x64;
+    r4 = (u32)sp + 0x24;
+    r5 = (u32)sp + 0x18;
     fn_800DFEEC();
-    camera = *(u32*)&lbl_80478C40;
-    r5 = r1 + 0x64;
-    camera = camera + 0x4;
-    r4 = camera;
+camera = (void*)*(u32*)&lbl_80478C40;
+    r5 = (u32)sp + 0x64;
+camera = (void*)((void*)((u32)(u32)camera + 0x4));
+r4 = (u32)camera;
     ((void(*)(void))fn_800E019C)();
-    camera = 0x1;
+camera = (void*)(u32)0x1;
     fn_800F7BC4();
-    tmp = camera & 0x00000020;
+tmp = (u32)camera & 0x00000020;
     if ((s32)tmp == 0) goto L_80179334;
     f2 = f27 / f30;
-    camera = *(u32*)&lbl_80478C40;
+camera = (void*)*(u32*)&lbl_80478C40;
     f0 = *(f32*)lbl_8047D728;
     f1 = *(f32*)((u8*)camera + 0x48);
     f1 = f2 + f1;
@@ -1837,7 +1837,7 @@ L_801792D0:
     if (tmp <= 0) goto L_80179318;
 L_801792F4:
     tmp = *(u32*)((u8*)r4 + 0x4);
-    if (camera != tmp) goto L_8017930C;
+if ((u32)camera != tmp) goto L_8017930C;
     tmp = r5 * 0x28;
     camera = r6 + tmp;
     goto L_8017931C;
@@ -1846,17 +1846,17 @@ L_8017930C:
     r5 = r5 + 0x1;
     if (--ctr != 0) goto L_801792F4;
 L_80179318:
-    camera = 0x0;
+camera = (void*)(u32)0x0;
 L_8017931C:
-    if (camera == 0) goto L_80179328;
+if ((u32)camera == 0) goto L_80179328;
     *(f32*)((u8*)camera + 0x24) = f29;
 L_80179328:
-    camera = *(u32*)&lbl_80478C40;
+camera = (void*)*(u32*)&lbl_80478C40;
     *(f32*)((u8*)camera + 0x48) = f29;
     goto L_80179350;
 L_80179334:
     f0 = *(f32*)lbl_8047D788;
-    camera = *(u32*)&lbl_80478C40;
+camera = (void*)*(u32*)&lbl_80478C40;
     f0 = f0 * f30;
     f1 = *(f32*)((u8*)camera + 0x10);
     f0 = f27 / f0;
@@ -1879,10 +1879,10 @@ L_80179350:
     r4 = r4 + 0x10;
     fn_800D203C();
     camera = camera;
-    r4 = r1 + 0x8;
-    r5 = r1 + 0xc;
-    r6 = r1 + 0x10;
-    r7 = r1 + 0x14;
+    r4 = (u32)sp + 0x8;
+    r5 = (u32)sp + 0xc;
+    r6 = (u32)sp + 0x10;
+    r7 = (u32)sp + 0x14;
     fn_800D1FDC();
     r4 = *(u32*)&lbl_80478C40;
     camera = camera;
@@ -2319,11 +2319,11 @@ f32 GSscene_GetPositionX(void* obj) {
     u32 tmp = 0;
     u32 r4 = 0;
 
-    obj = r1 + 0x8;
+obj = (void*)(u32)sp + 0x8;
     ((void(*)(void))fn_800E01F4)();
-    obj = *(u32*)&lbl_80478C40;
-    r4 = r1 + 0x8;
-    obj = obj + 0x4;
+obj = (void*)*(u32*)&lbl_80478C40;
+    r4 = (u32)sp + 0x8;
+obj = (void*)((void*)((u32)(u32)obj + 0x4));
     fn_800E01D0();
     return;
 }
