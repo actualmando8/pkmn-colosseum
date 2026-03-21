@@ -4847,32 +4847,10 @@ L_80204914: ;
 #pragma pop
 
 /* 0x80204928 | size: 0x48 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80204928(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r5 = 0xd5;
-    r6 = 0x0;
-    r31 = r3;
-    r3 = r4;
-    r4 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r0 = r31 - r3;
-    r31 = *(u32*)(sp + 0xC);
-    r0 = __cntlzw(r0);
-    /* extrwi r3, r0, 8, 19 */;
-    return;
+u32 fn_80204928(u32 expected, void* ctx) {
+    u32 result = (u32)fn_8012640C(ctx, 0, 0xd5, 0);
+    return (expected == result) ? 1 : 0;
 }
-#pragma pop
 
 /* 0x80204970 | size: 0xA0 | medium */
 #pragma push
@@ -6344,30 +6322,10 @@ L_80205B7C: ;
 #pragma pop
 
 /* 0x80205BE8 | size: 0x3C | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80205BE8(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    if ((u32)r3 != (u32)0x0) goto L_80205C04;
-    r3 = 0x0;
-    goto L_80205C14;
-L_80205C04: ;
-    r4 = 0x0;
-    r5 = 0xcc;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-L_80205C14: ;
-    return;
+void* fn_80205BE8(void* ctx) {
+    if (ctx == 0) return 0;
+    return fn_8012640C(ctx, 0, 0xcc, 0);
 }
-#pragma pop
 
 /* 0x80205C24 | size: 0x684 | large */
 #pragma push
@@ -8752,33 +8710,13 @@ u32 fn_80207BC0(void* context, u16 value) {
 }
 
 /* 0x80207C24 | size: 0x48 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80207C24(void) {
+void fn_80207C24(void* ctx, u32 param) {
     extern void fn_801DA5AC();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r5 = 0xee;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    if ((u32)r3 == (u32)0x0) goto L_80207C58;
-    r4 = r31;
-    fn_801DA5AC();
-L_80207C58: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    void* obj = fn_8012640C(ctx, 0, 0xee, 0);
+    if (obj != 0) {
+        fn_801DA5AC(obj, param);
+    }
 }
-#pragma pop
 
 /* 0x80207C6C | size: 0x2F0 | large */
 #pragma push
