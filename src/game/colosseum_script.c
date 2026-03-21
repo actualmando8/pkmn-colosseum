@@ -24517,190 +24517,70 @@ L_80235894: ;
 #pragma optimization_level 4
 
 /* Address: 0x802358AC | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_802358AC(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xeb;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xEB, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80235910 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80235910(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xea;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xEA, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80235974 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80235974(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xe9;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xE9, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x802359D8 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_802359D8(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xe8;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xE8, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80235A3C | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80235A3C(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xe7;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xE7, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80235AA0 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80235AA0(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xe6;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xE6, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80235B04 | Size: 0xE0 (224 bytes) */
 #pragma optimization_level 0
@@ -25352,97 +25232,37 @@ L_80236444: ;
 #pragma optimization_level 4
 
 /* Address: 0x80236458 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80236458(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xef;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFFFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xEF, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x802364BC | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_802364BC(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xf0;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFFFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xF0, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80236520 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80236520(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xf1;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFFFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xF1, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80236584 | Size: 0x248 (584 bytes) */
 #pragma optimization_level 0
@@ -25904,35 +25724,15 @@ L_80236B74: ;
 #pragma optimization_level 4
 
 /* Address: 0x80236B98 | Size: 0x64 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_80236B98(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xfa;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r3 = r3 & 0xFFFF;
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    return fn_8012640C(slot, 0, 0xFA, 0) & 0xFF;
 }
-#pragma optimization_level 4
 
 /* Address: 0x80236BFC | Size: 0x84 | Pattern: field_accessor */
 #pragma optimization_level 0
@@ -28082,34 +27882,17 @@ L_802387B4: ;
     return;
 }
 #pragma optimization_level 4
-
 /* Address: 0x802387C8 | Size: 0x54 | Pattern: field_accessor */
-#pragma optimization_level 0
 u32 fn_802387C8(void* ctx, u32 slot, u32 param) {
-    extern void fn_801FB1C0();
-    extern void fn_80203A6C();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    extern u32 fn_801FB1C0(u32, u32, u32, u32);
+    extern void fn_80203A6C(u32);
+    u32 pokemonId;
 
-
-    r5 = 0x43;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    fn_801FB1C0();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r3 = r31;
-    fn_80203A6C();
-    return;
+    pokemonId = fn_801FB1C0((u32)ctx, 0, 0x43, 0) & 0xFFFF;
+    fn_801FB1C0(0, pokemonId, 0x2, 0);
+    fn_80203A6C(slot);
+    return 0;
 }
-#pragma optimization_level 4
 
 /* Address: 0x8023881C | Size: 0x110 (272 bytes) */
 #pragma optimization_level 0
