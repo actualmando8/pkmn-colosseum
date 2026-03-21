@@ -11295,35 +11295,15 @@ void* fn_8020A224(void* base, u32 index) {
     return (u8*)base + 0x8 + (index & 0xFFFF) * 16;
 }
 
-/* 0x8020A2B8 | size: 0x40 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020A2B8(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    if ((u32)r3 == (u32)0x0) return;
-    if ((u32)r4 == (u32)0x0) return;
-    r0 = 0x15;
-    /* subi r5, r3, 0x4 */;
-    /* subi r4, r4, 0x4 */;
-    ctr_fn = (void(*)(void))r0;
-L_8020A2D8: ;
-    r3 = *(u32*)((u8*)r4 + 0x4);
-    r0 = *(u32*)((u8*)r4 + 0x8);
-    *(u32*)((u8*)r5 + 0x4) = r3;
-    r5 += 8; *(u32*)r5 = r0;
-    if (--ctr != 0) goto L_8020A2D8;
-    r0 = *(u32*)((u8*)r4 + 0x4);
-    *(u32*)((u8*)r5 + 0x4) = r0;
-    return;
+/* 0x8020A2B8 | size: 0x40 -- copy 0xAC bytes (43 u32s) */
+void fn_8020A2B8(u32* dst, u32* src) {
+    s32 i;
+    if (dst == 0) return;
+    if (src == 0) return;
+    for (i = 0; i < 43; i++) {
+        dst[i] = src[i];
+    }
 }
-#pragma pop
 
 /* 0x8020A398 | size: 0xE0 | medium */
 #pragma push

@@ -37653,37 +37653,24 @@ L_8025CD50: ;
 #pragma pop
 
 /* Address: 0x8025CD64 | Size: 0x54 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_8025CD64(void* ctx, u32 slot, u32 param) {
     extern u8 lbl_8047B650[];
-    extern void fn_800E202C();
+    extern u32 fn_800E202C();
     extern void fn_800E209C();
     extern void fn_800E24B0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r31 = 0;
-
-    r3 = *(u32*)lbl_8047B650;
-    if ((u32)r3 == (u32)0x0) goto L_8025CDA4;
-    fn_800E202C();
-    r0 = r3 & 0xFFFF;
-    r31 = r3;
-    if ((u32)r3 == (u32)0x0) goto L_8025CD9C;
-    fn_800E24B0();
-    r3 = r31;
-    fn_800E209C();
-L_8025CD9C: ;
-    r0 = 0x0;
-    *(u32*)lbl_8047B650 = r0;
-L_8025CDA4: ;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    u32 handle;
+    u32 id;
+    handle = *(u32*)lbl_8047B650;
+    if (handle != 0) {
+        id = fn_800E202C(handle) & 0xFFFF;
+        if (id != 0) {
+            fn_800E24B0(id);
+            fn_800E209C(id);
+        }
+        *(u32*)lbl_8047B650 = 0;
+    }
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025CDB8 | Size: 0x2B4 (692 bytes) */
 #pragma push
@@ -38697,37 +38684,22 @@ u32 fn_8025DBB0(void* ctx) { return *(u32*)((u8*)fn_8006B5A8(ctx) + 0x14); }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-u32 fn_8025DBD4(void* ctx, u32 slot, u32 param) {
+u32 fn_8025DBD4(u32 idx) {
     extern u8 lbl_8027A450[];
     extern u8 lbl_8039A690[];
     extern u8 lbl_80478E08[];
     extern u8 lbl_80478E0C[];
     extern void fn_800DD970();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = *(u32*)lbl_80478E08;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    if ((u32)r3 < (u32)r0) goto L_8025DC10;
-    r3 = (u32)lbl_8027A450;
-    r4 = (u32)lbl_8039A690;
-    r3 = (u32)lbl_8027A450;
-    r4 = (u32)lbl_8039A690;
-    /* crclr cr1eq */;
-    fn_800DD970();
-    r3 = 0x0;
-    goto L_8025DC1C;
-L_8025DC10: ;
-    r4 = *(u32*)lbl_80478E0C;
-    r0 = r3 << 2;
-    r3 = *(u32*)(r4 + r0);
-L_8025DC1C: ;
-    return;
+    u32 count;
+    u32* table;
+    count = *(u32*)*(u32*)lbl_80478E08;
+    if (idx >= count) {
+        fn_800DD970(lbl_8027A450, lbl_8039A690);
+        return 0;
+    }
+    table = (u32*)*(u32*)lbl_80478E0C;
+    return table[idx];
 }
-#pragma pop
 
 /* Address: 0x8025DC2C | Size: 0x90 */
 #pragma push
@@ -40543,37 +40515,18 @@ u32 fn_8025F2AC(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
 u32 fn_8025F2C0(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x8025F2FC | Size: 0x54 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-u32 fn_8025F2FC(void* ctx, u32 slot, u32 param) {
+u32 fn_8025F2FC(u32 idx) {
     extern u8 lbl_804783E0[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = (u32)lbl_804783E0;
-    r3 = r3 << 8;
-    r0 = (u32)lbl_804783E0;
-    r3 = r0 + r3;
-    r0 = *(u32*)((u8*)r3 + 0x20);
-    if ((s32)r0 != (s32)0x0) return;
-    r0 = *(u8*)((u8*)r3 + 0x5);
-    if ((u32)r0 != (u32)0x0) goto L_8025F330;
-    r0 = *(u8*)((u8*)r3 + 0x6);
-    if ((u32)r0 == (u32)0x4) goto L_8025F33C;
-L_8025F330: ;
-    r0 = 0x1;
-    *(u32*)((u8*)r3 + 0x20) = r0;
-    return;
-L_8025F33C: ;
-    r0 = *(u8*)((u8*)r3 + 0x7);
-    r3 = *(u32*)((u8*)r3 + 0x14);
-    r0 = r0 & 0x3a;
-    *(u8*)((u8*)r3 + 0x0) = r0;
-    return;
+    u8* entry;
+    entry = lbl_804783E0 + (idx << 8);
+    if (*(u32*)(entry + 0x20) != 0) return 0;
+    if (*(u8*)(entry + 0x5) != 0 || *(u8*)(entry + 0x6) != 4) {
+        *(u32*)(entry + 0x20) = 1;
+        return 0;
+    }
+    *(u8*)*(u32*)(entry + 0x14) = *(u8*)(entry + 0x7) & 0x3A;
+    return 0;
 }
-#pragma pop
 
 /* Address: 0x8025F350 | Size: 0xA4 */
 #pragma push
@@ -47906,40 +47859,20 @@ u32 fn_802658C8(void* ctx, u32 slot, u32 param) {
 u32 fn_80265924(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x8026595C | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-u32 fn_8026595C(void* ctx, u32 slot, u32 param) {
+f32 fn_8026595C(void) {
     extern u8 lbl_80478800[];
     extern u8 lbl_8047E6D8[];
     extern u8 lbl_8047E6DC[];
     extern u8 lbl_8047E6E8[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-
-    r3 = (u32)lbl_80478800;
-    r3 = (u32)lbl_80478800;
-    r0 = *(u8*)((u8*)r3 + 0x1);
-    if ((u32)r0 != (u32)0x1) goto L_80265978;
-    f1 = *(f32*)lbl_8047E6E8;
-    return;
-L_80265978: ;
-    r0 = *(u32*)((u8*)r3 + 0xC);
-    if ((u32)r0 != (u32)0x0) goto L_8026598C;
-    f1 = *(f32*)lbl_8047E6D8;
-    return;
-L_8026598C: ;
-    f1 = *(f32*)((u8*)r3 + 0x4);
-    f0 = *(f32*)lbl_8047E6DC;
-    f2 = *(f32*)((u8*)r3 + 0x8);
-    f0 = f1 / f0;
-    f1 = f2 - f0;
-    return;
+    u8* data = (u8*)lbl_80478800;
+    if (*(u8*)(data + 0x1) == 1) {
+        return *(f32*)lbl_8047E6E8;
+    }
+    if (*(u32*)(data + 0xC) == 0) {
+        return *(f32*)lbl_8047E6D8;
+    }
+    return *(f32*)(data + 0x8) - *(f32*)(data + 0x4) / *(f32*)lbl_8047E6DC;
 }
-#pragma pop
 
 /* fn_802659A4 | Size: 0x54 | Check audio state and call fn_800F0438 */
 s32 fn_802659A4(void) {
@@ -48078,40 +48011,20 @@ L_80265B18: ;
 u32 fn_80265B3C(void* ctx, u32 param) { return 0; /* stub */ }
 
 /* Address: 0x80265B74 | Size: 0x48 | Pattern: field_accessor */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-u32 fn_80265B74(void* ctx, u32 slot, u32 param) {
+f32 fn_80265B74(void) {
     extern u8 lbl_80478810[];
     extern u8 lbl_8047E6D8[];
     extern u8 lbl_8047E6DC[];
     extern u8 lbl_8047E6E8[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-
-    r3 = (u32)lbl_80478810;
-    r3 = (u32)lbl_80478810;
-    r0 = *(u8*)((u8*)r3 + 0x1);
-    if ((u32)r0 != (u32)0x1) goto L_80265B90;
-    f1 = *(f32*)lbl_8047E6E8;
-    return;
-L_80265B90: ;
-    r0 = *(u32*)((u8*)r3 + 0xC);
-    if ((u32)r0 != (u32)0x0) goto L_80265BA4;
-    f1 = *(f32*)lbl_8047E6D8;
-    return;
-L_80265BA4: ;
-    f1 = *(f32*)((u8*)r3 + 0x4);
-    f0 = *(f32*)lbl_8047E6DC;
-    f2 = *(f32*)((u8*)r3 + 0x8);
-    f0 = f1 / f0;
-    f1 = f2 - f0;
-    return;
+    u8* data = (u8*)lbl_80478810;
+    if (*(u8*)(data + 0x1) == 1) {
+        return *(f32*)lbl_8047E6E8;
+    }
+    if (*(u32*)(data + 0xC) == 0) {
+        return *(f32*)lbl_8047E6D8;
+    }
+    return *(f32*)(data + 0x8) - *(f32*)(data + 0x4) / *(f32*)lbl_8047E6DC;
 }
-#pragma pop
 
 /* fn_80265BBC | Size: 0x54 | Check audio state and call fn_800F0438 (channel 2) */
 s32 fn_80265BBC(void) {
