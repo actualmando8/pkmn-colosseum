@@ -16690,49 +16690,22 @@ void fn_800DFFCC(void) {
 #pragma pop
 
 /* fn_800E0000 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0000(void) {
     extern void fn_800A3B7C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3B7C();
-    return;
 }
-#pragma pop
 
 /* fn_800E0020 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0020(void) {
     extern void fn_800A3BD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3BD8();
-    return;
 }
-#pragma pop
 
 /* fn_800E0040 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0040(void) {
     extern void fn_800A3C00();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3C00();
-    return;
 }
-#pragma pop
 
 /* fn_800E0060 | Size: 0x2C */
 #pragma push
@@ -16755,19 +16728,10 @@ void fn_800E0060(void) {
 #pragma pop
 
 /* fn_800E008C | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E008C(void) {
     extern void fn_800A3B38();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3B38();
-    return;
 }
-#pragma pop
 
 /* fn_800E00AC | Size: 0x34 */
 #pragma push
@@ -16965,19 +16929,10 @@ void fn_800E0204(void) {
 #pragma pop
 
 /* fn_800E0218 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0218(void) {
     extern void fn_800A3458();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3458();
-    return;
 }
-#pragma pop
 
 /* fn_800E0238 | Size: 0x2C */
 #pragma push
@@ -17190,19 +17145,10 @@ void fn_800E03E8(void) {
 #pragma pop
 
 /* fn_800E040C | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E040C(void) {
     extern void fn_800A33B4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A33B4();
-    return;
 }
-#pragma pop
 
 /* fn_800E042C | Size: 0x60 */
 #pragma push
@@ -17449,34 +17395,16 @@ void fn_800E064C(void) {
 #pragma pop
 
 /* fn_800E0678 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0678(void) {
     extern void fn_800A3910();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3910();
-    return;
 }
-#pragma pop
 
 /* fn_800E0698 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0698(void) {
     extern void fn_800A39E0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A39E0();
-    return;
 }
-#pragma pop
 
 /* fn_800E06B8 | Size: 0x34 */
 #pragma push
@@ -17523,19 +17451,10 @@ void fn_800E06EC(void) {
 #pragma pop
 
 /* fn_800E0718 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0718(void) {
     extern void fn_800A3CB0();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_800A3CB0();
-    return;
 }
-#pragma pop
 
 /* fn_800E0738 | Size: 0x34 */
 #pragma push
@@ -17964,19 +17883,10 @@ void fn_800E0BA0(void) {
 #pragma pop
 
 /* fn_800E0BE4 | Size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800E0BE4(void) {
     extern void fn_801ADC7C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-
     fn_801ADC7C();
-    return;
 }
-#pragma pop
 
 /* fn_800E0C04 | Size: 0x50 */
 #pragma push

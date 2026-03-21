@@ -11681,27 +11681,15 @@ u16* fn_8020A040(u16 index) {
     return NULL;
 }
 
-/* 0x8020A080 | size: 0x24 | small */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8020A080(void) {
+/* fn_8020A080 | Size: 0x24 | Look up byte in table with bounds check */
+u8* fn_8020A080(u16 index) {
     extern u8 lbl_80478D58[];
     extern u8 lbl_80478D60[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r0 = *(u32*)lbl_80478D60;
-    r4 = r3 & 0xFFFF;
-    r3 = (u32)lbl_80478D58;
-    r0 = (u32)lbl_80478D58;
-    r3 = r0 + r4;
-    if ((u32)r4 < (u32)r0) return;
-    r3 = 0x0;
-    return;
+    if (index < *(u32*)lbl_80478D60) {
+        return &lbl_80478D58[index];
+    }
+    return NULL;
 }
-#pragma pop
 
 /* 0x8020A224 | size: 0x34 | small */
 #pragma push
