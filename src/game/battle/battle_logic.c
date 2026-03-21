@@ -2629,6 +2629,8 @@ void fn_801E16F0(void) {
     extern void fn_801E38D8();
     extern void fn_801E3F54();
     extern void fn_801E4724();
+    extern u8 lbl_8047B440;
+    extern u8 lbl_8047B441;
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2688,6 +2690,8 @@ void fn_801E17A8(void) {
     extern u8 lbl_8047B458[];
     extern u8 lbl_8047B45C[];
     extern void fn_801E3978();
+    extern u8 lbl_8047B440;
+    extern u8 lbl_8047B441;
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2734,6 +2738,7 @@ void fn_801E1810(void) {
     extern void fn_800EE928();
     extern void fn_801E3F54();
     extern void fn_801E4724();
+    extern u8 lbl_8047B441;
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -8930,6 +8935,7 @@ void fn_801E6684(void) {
     f32 f31 = 0.0f;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
+    u8 sp[0x100];
 
     r3 = (u32)lbl_8046D500;
     *(f64*)(sp + 0x30) = f31;
@@ -10700,6 +10706,7 @@ void fn_801E810C(void) {
     f32 f31 = 0.0f;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
+    u8 sp[0x100];
 
     r3 = (u32)lbl_8046D500;
     *(f64*)(sp + 0x30) = f31;
@@ -12472,6 +12479,7 @@ void fn_801E9B98(void) {
     f32 f31 = 0.0f;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
+    u8 sp[0x100];
 
     r4 = (u32)lbl_8046D500;
     *(f64*)(sp + 0x38) = f31;

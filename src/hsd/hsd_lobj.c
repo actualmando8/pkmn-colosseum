@@ -2878,6 +2878,7 @@ void fn_801A6494(void) {
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     void (*ctr_fn)(void) = 0;
+    u8 sp[0x100];
 
     if ((u32)r3 == (u32)0x0) goto L_801A66D8;
     /* subi r0, r4, 0x9 */;

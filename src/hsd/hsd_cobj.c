@@ -2428,6 +2428,7 @@ void fn_80195A6C(void) {
     extern void fn_80196D78();
     extern void fn_80197400();
     extern void fn_8019C7B0();
+    extern u8 lbl_80478C58;
     u8 sp[0x110];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2754,7 +2755,7 @@ L_80195ED0: ;
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80195F0C(void) {
+void fn_80195F0C(HSD_CObj* cobj_param) {
     extern u8 lbl_8047D958[];
     extern u8 lbl_8047D960[];
     extern u8 lbl_8047D978[];
@@ -2766,7 +2767,7 @@ void fn_80195F0C(void) {
     u8 sp[0x40];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
-    u32 r3 = 0;
+    u32 r3 = (u32)cobj_param;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
@@ -2898,6 +2899,7 @@ void fn_801960C4(void) {
     extern void fn_800BD7A0();
     extern void fn_800C46B0();
     extern void fn_800CE220();
+    extern u8 lbl_80478C58;
     u8 sp[0xD0];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -3132,6 +3134,7 @@ void fn_801963E0(void) {
     extern void fn_800BD7A0();
     extern void fn_800C46B0();
     extern void fn_800CE220();
+    extern u8 lbl_80478C58;
     u8 sp[0xB0];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -3857,6 +3860,7 @@ void fn_80196EF8(void) {
     extern void fn_800BD4B4();
     extern void fn_800BD554();
     extern void fn_801B25C4();
+    extern u8 lbl_80478C60;
     u8 sp[0x70];
     u32 r0 = 0;
     u32 r1 = (u32)sp;

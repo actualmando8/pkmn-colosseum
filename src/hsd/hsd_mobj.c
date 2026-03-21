@@ -1560,6 +1560,7 @@ void fn_801A7E84(void) {
     f32 f1 = 0.0f;
     f32 f2 = 0.0f;
     void (*ctr_fn)(void) = 0;
+    u8 sp[0x100];
 
     if ((u32)r3 == (u32)0x0) goto L_801A834C;
     if ((u32)r4 > (u32)0xd) goto L_801A834C;

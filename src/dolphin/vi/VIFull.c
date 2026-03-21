@@ -335,7 +335,7 @@ void fn_800AA498(void) {
     r4 = (0xcc00 << 16);
     r0 = *(u16*)((u8*)r4 + 0x206E);
     r31 = r0 & 0x3;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r3 = r31 & 0x1;
     return;
 }
@@ -582,7 +582,7 @@ L_800AA780: ;
     *(u32*)lbl_8047A8B8 = r0;
     fn_800A115C();
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
 L_800AA7E0: ;
     return;
 }
@@ -983,7 +983,7 @@ L_800AACC0: ;
     *(u32*)lbl_8047A8B8 = r0;
     fn_800A115C();
     r3 = r30;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
 L_800AAD18: ;
     return;
 }
@@ -1066,7 +1066,7 @@ L_800AADAC: ;
     fn_800D0CBC();
 L_800AAE10: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r3 = 0x1;
     return;
 }
@@ -1150,7 +1150,7 @@ L_800AAEB0: ;
     fn_800D0CBC();
 L_800AAF14: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r3 = 0x1;
     return;
 }
@@ -1180,6 +1180,7 @@ void fn_800AAF38(void) {
     extern void fn_800D0CBC();
     extern void fn_800D104C();
     extern void fn_800AA8D4();
+    extern u32 __PADSpec;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1205,7 +1206,7 @@ void fn_800AAF38(void) {
     goto L_800AB13C;
 L_800AAF64: ;
     r3 = *(u32*)lbl_80478A08;
-    OSRegisterVersion();
+    OSRegisterVersion((const char*)r3);
     r3 = *(u32*)__PADSpec;
     if ((u32)r3 == (u32)0x0) goto L_800AAF7C;
     fn_800AB5B4();
@@ -1319,7 +1320,7 @@ L_800AB0D0: ;
     fn_800D0CBC();
 L_800AB130: ;
     r3 = r27;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r3 = 0x1;
 L_800AB13C: ;
     /* lmw r25, 0x1c(r1) */;
@@ -1442,7 +1443,7 @@ L_800AB20C: ;
     fn_800D0CBC();
 L_800AB260: ;
     r3 = r25;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r0 = -0x2;
     *(u8*)((u8*)r31 + 0xA) = r0;
     r3 = r31 + 0x0;
@@ -1534,7 +1535,7 @@ L_800AB370: ;
     *(u32*)lbl_8047A8B8 = r0;
     fn_800A115C();
     r3 = r25;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r0 = -0x1;
     *(u8*)((u8*)r31 + 0xA) = r0;
     r3 = r31 + 0x0;
@@ -1607,7 +1608,7 @@ L_800AB4C8: ;
     r31 = r31 + 0xc;
     if ((s32)r21 < (s32)0x4) goto L_800AB1A0;
     r3 = r22;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r3 = r20;
     /* lmw r20, 0x20(r1) */;
     return;
@@ -1672,7 +1673,7 @@ L_800AB57C: ;
     fn_800D034C();
 L_800AB598: ;
     r3 = r30;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     /* lmw r27, 0x14(r1) */;
     return;
 }
@@ -1688,6 +1689,7 @@ void fn_800AB5B4(void) {
     extern void fn_800AB614();
     extern void fn_800AB788();
     extern void fn_800AB8FC();
+    extern u32 __PADSpec;
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -2264,7 +2266,7 @@ void fn_800ABCF4(void) {
     *(u32*)lbl_8047A8B4 = r0;
     fn_800D0464();
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     return;
 }
 #pragma pop
@@ -2375,7 +2377,7 @@ L_800ABE54: ;
     fn_800D0CBC();
 L_800ABEB8: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     r0 = 0x1;
     *(u32*)lbl_8047A8C0 = r0;
     r3 = 0x0;
@@ -2410,15 +2412,15 @@ void fn_800ABEFC(void) {
     r0 = *(u32*)lbl_8047A8BC;
     if ((u32)r0 == (u32)0x0) goto L_800ABF48;
     r3 = r1 + 0x10;
-    OSClearContext();
+    OSClearContext((OSContext*)r3);
     r3 = r1 + 0x10;
-    OSSetCurrentContext();
+    OSSetCurrentContext((OSContext*)r3);
     r12 = *(u32*)lbl_8047A8BC;
     /* blrl  */;
     r3 = r1 + 0x10;
-    OSClearContext();
+    OSClearContext((OSContext*)r3);
     r3 = r31;
-    OSSetCurrentContext();
+    OSSetCurrentContext((OSContext*)r3);
 L_800ABF48: ;
     return;
 }

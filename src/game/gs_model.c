@@ -286,6 +286,7 @@ void GSmodel_AttachAnimation(void* model, void* animData, f32 startFrame) {
     extern void fn_801093C8();
     extern void fn_801C43F4();
     extern void fn_801D2404();
+    extern u8 lbl_80404ACC;
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2540,6 +2541,7 @@ u32 GSmodel_GetResourceByIndex(u32 index) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 u32 GSmodel_GetJointCount(void* model) {
+    extern u8 lbl_80404ACC;
     u32 r3 = 0;
 
     r3 = (u32)&lbl_80404ACC;

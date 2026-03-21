@@ -451,7 +451,7 @@ void fn_8009B4D8(void) {
     r31 = r3;
     fn_8009B40C();
     r3 = r31;
-    OSRestoreInterrupts();
+    OSRestoreInterrupts(r3);
     return;
 }
 #pragma pop
@@ -551,9 +551,10 @@ void fn_8009B614(void) {
     u32 r3 = 0;
     u32 r4 = 0;
 
+fn_8009B614_loop: ;
     r4 = 0; /* mfspr HID2 */;
     /* extrwi r4, r4, 4, 4 */;
-    if ((s32)r4 > (s32)r3) goto fn_8009B614;
+    if ((s32)r4 > (s32)r3) goto fn_8009B614_loop;
     return;
 }
 #pragma pop

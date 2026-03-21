@@ -2258,6 +2258,7 @@ void fn_801338A4(void) {
     extern void fn_801338A4();
     extern void fn_80133C3C();
     extern void fn_80133E6C();
+    extern void fn_80104704();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2522,6 +2523,7 @@ void fn_80133C3C(void) {
     extern u8 lbl_80478F8C[];
     extern void fn_800057A8();
     extern void fn_80133E6C();
+    extern void fn_80104704();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2685,6 +2687,7 @@ void fn_80133E6C(void) {
     extern void fn_80134274();
     extern void fn_801342B8();
     extern void fn_80134304();
+    extern void fn_80104704();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5042,6 +5045,7 @@ u32 fn_80135C40(void* ptr) {
 void fn_80135C58(void) {
     u32 r3 = 0;
     u32 r4 = 0;
+    u32 r0 = 0;
 
     /* mr. r4, r3 */;
     if ((s32)r0 == (s32)0) goto L_80135C6C;

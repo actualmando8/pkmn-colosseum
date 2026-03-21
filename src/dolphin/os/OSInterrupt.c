@@ -15,6 +15,12 @@ extern void* memset(void* dest, int val, u32 n);
 
 static __OSInterruptHandler* InterruptHandlerTable;
 
+/* SDA symbol aliases used by stub functions */
+extern u32 InterruptHandlerTable_8047A710;
+extern u16 __OSLastInterrupt;
+extern u32 __OSLastInterruptTime;
+extern u32 __OSLastInterruptSrr0;
+
 /* Hardware registers */
 #define PI_INTMR    (*(volatile u32*)0xCC003004)
 
@@ -223,7 +229,7 @@ void fn_8009E414(void) {
     if ((u32)r0 != (u32)0x0) goto L_8009E460;
 L_8009E458: ;
     r3 = r30;
-    OSLoadContext();
+    OSLoadContext((OSContext*)r3);
 L_8009E460: ;
     r0 = r31 & 0x00000080;
     r0 = 0x0;
@@ -388,7 +394,7 @@ L_8009E6D8: ;
     if ((s32)r29 <= (s32)0x4) goto L_8009E70C;
     *(u16*)__OSLastInterrupt = r29;
     OSGetTime();
-    *(u32*)__OSLastInterruptTime+0x4 = r4;
+    *((u32*)&__OSLastInterruptTime + 1) = r4;
     *(u32*)__OSLastInterruptTime = r3;
     r0 = *(u32*)((u8*)r30 + 0x198);
     *(u32*)__OSLastInterruptSrr0 = r0;
@@ -401,10 +407,10 @@ L_8009E70C: ;
     OSEnableScheduler();
     __OSReschedule();
     r3 = r30;
-    OSLoadContext();
+    OSLoadContext((OSContext*)r3);
 L_8009E734: ;
     r3 = r30;
-    OSLoadContext();
+    OSLoadContext((OSContext*)r3);
     return;
 }
 #pragma pop

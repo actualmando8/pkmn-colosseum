@@ -20,6 +20,9 @@ extern void __OSStopAudioSystem(void);
 extern void LCDisable(void);
 extern void* memcpy(void* dest, const void* src, u32 n);
 
+/* SDA/data symbol aliases used by stub functions */
+extern u32 Scb_803FB840;
+
 /*
  * __OSReboot - Perform a full system reboot.
  * 0x800A03B4 | size: 0x298

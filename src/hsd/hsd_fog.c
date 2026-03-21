@@ -515,6 +515,7 @@ void fn_8019B948(void) {
     f32 f0 = 0.0f;
     f32 f1 = 0.0f;
     void (*ctr_fn)(void) = 0;
+    u8 sp[0x100];
 
     if ((u32)r3 == (u32)0x0) goto L_8019BB70;
     if ((u32)r4 > (u32)0x15) goto L_8019BB70;

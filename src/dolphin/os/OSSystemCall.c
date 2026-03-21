@@ -24,8 +24,8 @@ extern void* memcpy(void* dest, const void* src, u32 n);
  * System call vector: a small assembly stub that is copied to
  * exception address 0x80000C00.
  */
-extern u8 __OSSystemCallVectorStart[];
-extern u8 __OSSystemCallVectorEnd[];
+extern void __OSSystemCallVectorStart(void);
+extern void __OSSystemCallVectorEnd(void);
 
 /*
  * __OSSystemCallVector - The system call handler stub.

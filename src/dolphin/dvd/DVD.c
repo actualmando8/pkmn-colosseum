@@ -393,13 +393,14 @@ BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length,
  * DVDCancel - 0x800A58BC | size: 0x34
  * Cancel a pending DVD command.
  */
-void DVDCancel(DVDCommandBlock* block) {
+BOOL DVDCancel(DVDCommandBlock* block) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
     /* Mark the command as cancelled */
     block->state = 10; /* CANCELLED */
     OSRestoreInterrupts(enabled);
+    return 1;
 }
 
 /*

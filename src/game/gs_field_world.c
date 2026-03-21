@@ -114,6 +114,8 @@ void floorUpdateFieldCamera(void) {
     extern u8 lbl_8047CFE0[];
     extern void fn_800E0020();
     extern void fn_800E01F4();
+    extern u8 lbl_8047AD68;
+    extern u8 lbl_8047AD6C;
     u8 sp[0xA0];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -3616,6 +3618,7 @@ void GSfield_ProcessTriggers(void) {
     extern void fn_8018F658();
     extern void fn_8018F678();
     extern void fn_8018F6F4();
+    extern u8 lbl_80426BD0;
     u8 sp[0x120];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5694,6 +5697,9 @@ u32 fn_80115274(u32 val) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_80115280(void) {
+    extern u8 lbl_80272608;
+    extern u8 lbl_8027262C;
+    extern u8 lbl_8035BB50;
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -7513,6 +7519,7 @@ void fn_801171C8(void) {
     extern void fn_80176868();
     extern void fn_80177908();
     extern void fn_80177A38();
+    extern u8 lbl_8047AD70;
     u8 sp[0x40];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -8647,6 +8654,7 @@ void fn_801181B0(void) {
     extern void fn_801694A8();
     extern void fn_801695FC();
     extern void fn_80175A1C();
+    extern void fn_801694E0();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -24379,6 +24387,7 @@ void fn_8012AC9C(void) {
     extern void fn_8012A5B0();
     extern void fn_80143F6C();
     extern void fn_801440A0();
+    extern u8 lbl_80426BD0;
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -24461,6 +24470,7 @@ void fn_8012AD50(void) {
     extern void fn_8018CA20();
     extern void fn_801C409C();
     extern void fn_801D0AFC();
+    extern u8 lbl_80426BD0;
     u8 sp[0x70];
     u32 r0 = 0;
     u32 r1 = (u32)sp;

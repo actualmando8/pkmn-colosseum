@@ -735,6 +735,7 @@ void fn_800A13F8(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800A1484(void) {
+    extern u32 RunQueueBits_8047A760;
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -807,6 +808,9 @@ L_800A1518: ;
 #pragma optimizewithasm off
 void fn_800A1528(void) {
     extern void fn_800A1484();
+    extern u32 RunQueueBits_8047A760;
+    extern u32 RunQueueHint_8047A764;
+    extern u32 RunQueue_803FB898;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -970,9 +974,9 @@ void fn_800A1990(void) {
     OSDisableInterrupts();
     r31 = r3 + 0x0;
     r3 = 0x1;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
     r3 = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     return;
 }
 #pragma pop
@@ -985,6 +989,7 @@ void fn_800A19CC(void) {
     extern u8 lbl_80478990[];
     extern void fn_8009BD84();
     extern void fn_800A1BB4();
+    extern u32 __OSErrorTable;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1119,7 +1124,7 @@ L_800A1B88: ;
     r0 = 0x0;
     *(u32*)((u8*)r31 + 0x2FC) = r0;
     *(u32*)((u8*)r5 + 0x0) = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = 0x1;
 L_800A1BA0: ;
     /* lmw r27, 0x3c(r1) */;
@@ -1134,6 +1139,7 @@ L_800A1BA0: ;
 void fn_800A1BB4(void) {
     extern void fn_8009F958();
     extern void fn_800A2478();
+    extern u32 RunQueueHint_8047A764;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1150,7 +1156,7 @@ void fn_800A1BB4(void) {
     r30 = *(u32*)((u8*)r31 + 0xE4);
     r29 = r3 + 0x0;
     r3 = r30 + 0x0;
-    OSClearContext();
+    ((void(*)(void))OSClearContext)();
     r0 = *(u16*)((u8*)r30 + 0x2CA);
     r0 = r0 & 0x1;
     if ((s32)r0 == (s32)0) goto L_800A1C38;
@@ -1186,10 +1192,10 @@ L_800A1C44: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A1C70;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A1C70: ;
     r3 = r29;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     return;
 }
 #pragma pop
@@ -1242,7 +1248,7 @@ L_800A1EDC: ;
 L_800A1EE8: ;
     if ((s32)r0 != (s32)0x0) goto L_800A1F00;
     r3 = r30;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = 0x0;
     goto L_800A1F78;
 L_800A1F00: ;
@@ -1271,12 +1277,12 @@ L_800A1F54: ;
     r0 = 0x0;
     *(u16*)((u8*)r31 + 0x2C8) = r0;
     r3 = r30;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = 0x1;
     goto L_800A1F78;
 L_800A1F6C: ;
     r3 = r30;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = 0x0;
 L_800A1F78: ;
     return;
@@ -1290,6 +1296,9 @@ L_800A1F78: ;
 void fn_800A1F94(void) {
     extern void fn_800A14EC();
     extern void fn_800A1528();
+    extern u32 RunQueueBits_8047A760;
+    extern u32 RunQueueHint_8047A764;
+    extern u32 RunQueue_803FB898;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1450,10 +1459,10 @@ L_800A21E0: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A21F4;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A21F4: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = r30;
     return;
 }
@@ -1467,6 +1476,7 @@ void fn_800A221C(void) {
     extern void fn_800A1484();
     extern void fn_800A14EC();
     extern void fn_800A1528();
+    extern u32 RunQueueHint_8047A764;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1554,10 +1564,10 @@ L_800A2350: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A2364;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A2364: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = r30;
     return;
 }
@@ -1568,6 +1578,7 @@ L_800A2364: ;
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800A238C(void) {
+    extern u32 RunQueueHint_8047A764;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1623,10 +1634,10 @@ L_800A243C: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A2458;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A2458: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     return;
 }
 #pragma pop
@@ -1636,6 +1647,9 @@ L_800A2458: ;
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800A2478(void) {
+    extern u32 RunQueueBits_8047A760;
+    extern u32 RunQueueHint_8047A764;
+    extern u32 RunQueue_803FB898;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1697,10 +1711,10 @@ L_800A253C: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A255C;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A255C: ;
     r3 = r31;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     return;
 }
 #pragma pop
@@ -1712,6 +1726,7 @@ L_800A255C: ;
 void fn_800A257C(void) {
     extern void fn_800A14EC();
     extern void fn_800A1528();
+    extern u32 RunQueueHint_8047A764;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1751,10 +1766,10 @@ L_800A2600: ;
     r0 = *(u32*)RunQueueHint_8047A764;
     if ((s32)r0 == (s32)0x0) goto L_800A2614;
     r3 = 0x0;
-    SelectThread();
+    ((void(*)(void))SelectThread)();
 L_800A2614: ;
     r3 = r30;
-    OSRestoreInterrupts();
+    ((void(*)(void))OSRestoreInterrupts)();
     r3 = 0x1;
 L_800A2620: ;
     return;
@@ -1768,6 +1783,7 @@ L_800A2620: ;
 void fn_800A263C(void) {
     extern void fn_800A19CC();
     extern void fn_800A1F94();
+    extern u32 RunQueue_803FB898;
     u32 r0 = 0;
     u32 r1 = 0;
     u32 r3 = 0;
@@ -1803,7 +1819,7 @@ L_800A26A0: ;
     r0 = *(u16*)((u8*)r31 + 0x3C8);
     if ((u32)r0 == (u32)0x0) goto L_800A26B4;
     r3 = r31 + 0x100;
-    OSCancelThread();
+    ((void(*)(void))OSCancelThread)();
 L_800A26B4: ;
     r3 = 0x0;
 L_800A26B8: ;

@@ -6,6 +6,9 @@
 #include "dolphin/os/OSTime.h"
 #include "dolphin/os/PPCArch.h"
 
+/* SDA symbol aliases used by stub functions */
+extern u32 ResetFunctionQueue_8047A738;
+
 /*
  * OSReset.c - System reset and reboot functionality.
  *
@@ -308,7 +311,7 @@ void fn_8009FFC0(void) {
     *(u16*)((u8*)r3 + 0x2) = r0;
     ICFlashInvalidate();
     r3 = r31 << 3;
-    Reset();
+    Reset(r3);
     return;
 }
 #pragma pop
