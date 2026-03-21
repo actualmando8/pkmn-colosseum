@@ -98,24 +98,16 @@ void __EXISetExiInterruptMask(s32 chan, EXIChan* exi) {
  * =================================================================== */
 
 /* fn_80098014 - 0x80098014 | size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80098014(void) {
     u32 r3 = 0;
 
     /* mtspr HID0, r3 */;
     return;
 }
-#pragma pop
 
 /* fn_80098034 - 0x80098034 | size: 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80098034(void) {
     /* sc */;
     return;
 }
-#pragma pop
 

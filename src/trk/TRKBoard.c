@@ -82,13 +82,9 @@ void ReserveEXI2Port(void) {
 /* ========================================================== */
 
 /* fn_800C3588 - 0x800C3588 | size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C3588(void) {
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r5 = 0;
     u32 r12 = 0;
@@ -99,21 +95,16 @@ void fn_800C3588(void) {
     r12 = *(u32*)((u8*)r5 + 0x14);
     ctr_fn = (void(*)(void))r12;
     ctr_fn();
-    r0 = -r3;
-    r0 = r0 | r3;
-    r3 = (s32)r0 >> 31;
+    tmp = -r3;
+    tmp = tmp | r3;
+    r3 = (s32)tmp >> 31;
     return;
 }
-#pragma pop
 
 /* fn_800C35C4 - 0x800C35C4 | size: 0x3C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C35C4(void) {
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r5 = 0;
     u32 r12 = 0;
@@ -124,21 +115,16 @@ void fn_800C35C4(void) {
     r12 = *(u32*)((u8*)r5 + 0x10);
     ctr_fn = (void(*)(void))r12;
     ctr_fn();
-    r0 = -r3;
-    r0 = r0 | r3;
-    r3 = (s32)r0 >> 31;
+    tmp = -r3;
+    tmp = tmp | r3;
+    r3 = (s32)tmp >> 31;
     return;
 }
-#pragma pop
 
 /* fn_800C3600 - 0x800C3600 | size: 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C3600(void) {
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r12 = 0;
     void (*ctr_fn)(void) = 0;
@@ -150,5 +136,4 @@ void fn_800C3600(void) {
     ctr_fn();
     return;
 }
-#pragma pop
 

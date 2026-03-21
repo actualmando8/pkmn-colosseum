@@ -52,14 +52,10 @@ void __destroy_global_chain(void) {
 /* ========================================================== */
 
 /* fn_800C46B0 - 0x800C46B0 | size: 0x5C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C46B0(void) {
     extern u8 lbl_8026FE58[];
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r6 = 0;
@@ -77,19 +73,15 @@ void fn_800C46B0(void) {
     f3 = *(f64*)((u8*)r4 + 0x8);
     f4 = *(f64*)((u8*)r4 + 0x10);
     if (f1 < f3) goto L_800C4704;
-    /* subi r3, r3, 0x1 */;
     if (f1 >= f3) goto L_800C4704;
     f2 = f1;
     if (f1 < f4) goto L_800C46F0;
     f2 = f1 - f4;
-L_800C46F0: ;
+L_800C46F0:
     f2 = (f64)(s32)f2;
-    *(f64*)(sp + 0x8) = f2;
-    r3 = *(u32*)(sp + 0xC);
     if (f1 < f4) goto L_800C4704;
     r3 = r3 + (0x8000 << 16);
-L_800C4704: ;
+L_800C4704:
     return;
 }
-#pragma pop
 

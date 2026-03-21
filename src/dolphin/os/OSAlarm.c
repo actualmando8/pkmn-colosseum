@@ -206,13 +206,9 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
  * =================================================================== */
 
 /* fn_8009A590 - 0x8009A590 | size: 0x11C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009A590(void) {
     extern u8 AlarmQueue_8047A6E0[];
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -225,67 +221,62 @@ void fn_8009A590(void) {
 
     r30 = r3;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r30 + 0x0);
+    tmp = *(u32*)((u8*)r30 + 0x0);
     r31 = r3 + 0x0;
-    if ((u32)r0 != (u32)0x0) goto L_8009A5CC;
+    if (tmp != 0) goto L_8009A5CC;
     r3 = r31;
     OSRestoreInterrupts(r3);
     goto L_8009A690;
-L_8009A5CC: ;
+L_8009A5CC:
     r29 = *(u32*)((u8*)r30 + 0x14);
-    if ((u32)r29 != (u32)0x0) goto L_8009A5E8;
-    r0 = *(u32*)((u8*)r30 + 0x10);
+    if (r29 != 0) goto L_8009A5E8;
+    tmp = *(u32*)((u8*)r30 + 0x10);
     r3 = (u32)AlarmQueue_8047A6E0;
-    *(u32*)((u8*)r3 + 0x4) = r0;
+    *(u32*)((u8*)r3 + 0x4) = tmp;
     goto L_8009A5F0;
-L_8009A5E8: ;
-    r0 = *(u32*)((u8*)r30 + 0x10);
-    *(u32*)((u8*)r29 + 0x10) = r0;
-L_8009A5F0: ;
+L_8009A5E8:
+    tmp = *(u32*)((u8*)r30 + 0x10);
+    *(u32*)((u8*)r29 + 0x10) = tmp;
+L_8009A5F0:
     r3 = *(u32*)((u8*)r30 + 0x10);
-    if ((u32)r3 == (u32)0x0) goto L_8009A604;
+    if (r3 == 0) goto L_8009A604;
     *(u32*)((u8*)r3 + 0x14) = r29;
     goto L_8009A680;
-L_8009A604: ;
+L_8009A604:
     *(u32*)AlarmQueue_8047A6E0 = r29;
-    if ((u32)r29 == (u32)0x0) goto L_8009A680;
+    if (r29 == 0) goto L_8009A680;
     __OSGetSystemTime();
     r6 = *(u32*)((u8*)r29 + 0xC);
     r7 = 0x0;
-    r0 = *(u32*)((u8*)r29 + 0x8);
-    /* xoris r5, r7, 0x8000 */;
+    tmp = *(u32*)((u8*)r29 + 0x8);
     r8 = r6 - r4;
-    r0 = r0 - r3; /* -borrow */;
-    /* xoris r6, r0, 0x8000 */;
-    r0 = r8 - r7;
+    tmp = tmp - r3; /* -borrow */;
+    tmp = r8 - r7;
     r5 = r6 - r5; /* -borrow */;
     r5 = r6 - r6; /* -borrow */;
     /* neg. r5, r5 */;
-    if ((u32)r29 == (u32)0x0) goto L_8009A650;
+    if (r29 == 0) goto L_8009A650;
     r3 = 0x0;
     PPCMtdec(r3);
     goto L_8009A680;
-L_8009A650: ;
-    r4 = (0x8000 << 16);
-    /* xoris r3, r7, 0x8000 */;
-    r0 = r8 - r4;
+L_8009A650:
+    r4 = 0x80000000;
+    tmp = r8 - r4;
     r3 = r6 - r3; /* -borrow */;
     r3 = r6 - r6; /* -borrow */;
     /* neg. r3, r3 */;
-    if ((u32)r29 == (u32)0x0) goto L_8009A678;
+    if (r29 == 0) goto L_8009A678;
     r3 = r8;
     PPCMtdec(r3);
     goto L_8009A680;
-L_8009A678: ;
-    /* subi r3, r4, 0x1 */;
+L_8009A678:
     PPCMtdec(r3);
-L_8009A680: ;
-    r0 = 0x0;
-    *(u32*)((u8*)r30 + 0x0) = r0;
+L_8009A680:
+    tmp = 0x0;
+    *(u32*)((u8*)r30 + 0x0) = tmp;
     r3 = r31;
     OSRestoreInterrupts(r3);
-L_8009A690: ;
+L_8009A690:
     return;
 }
-#pragma pop
 

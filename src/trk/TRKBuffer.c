@@ -64,15 +64,11 @@ u32 fn_800BF080(void) { return 0; }
 /* ========================================================== */
 
 /* fn_800BEF44 - 0x800BEF44 | size: 0xC8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800BEF44(void) {
     extern u8 lbl_8026F668[];
     extern void fn_800BF33C();
     u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r27 = 0;
@@ -81,50 +77,47 @@ void fn_800BEF44(void) {
     u32 r30 = 0;
     u32 r31 = 0;
 
-    r0 = 0x0;
-    /* stmw r27, 0xc(r1) */;
+    tmp = 0x0;
     r28 = r4;
     r27 = r3;
     r30 = 0x300;
     r29 = 0x0;
-    *(u32*)((u8*)r4 + 0x0) = r0;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
     goto L_800BEFD8;
-L_800BEF70: ;
+L_800BEF70:
     r31 = 0x0;
-    if ((s32)r29 < (s32)0x0) goto L_800BEF94;
-    if ((s32)r29 >= (s32)0x3) goto L_800BEF94;
+    if ((s32)r29 < 0) goto L_800BEF94;
+    if ((s32)r29 >= 3) goto L_800BEF94;
     r4 = r29 * 0x890;
     r3 = (u32)&lbl_803FCE08;
-    r0 = (u32)&lbl_803FCE08;
-    r31 = r0 + r4;
-L_800BEF94: ;
+    tmp = (u32)&lbl_803FCE08;
+    r31 = tmp + r4;
+L_800BEF94:
     r3 = r31;
     ((void(*)(void))fn_800C0CC8)();
-    r0 = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)r0 != (s32)0x0) goto L_800BEFCC;
+    tmp = *(u32*)((u8*)r31 + 0x4);
+    if ((s32)tmp != 0) goto L_800BEFCC;
     r3 = 0x0;
-    r0 = 0x1;
+    tmp = 0x1;
     *(u32*)((u8*)r31 + 0x8) = r3;
     r30 = 0x0;
     *(u32*)((u8*)r31 + 0xC) = r3;
-    *(u32*)((u8*)r31 + 0x4) = r0;
+    *(u32*)((u8*)r31 + 0x4) = tmp;
     *(u32*)((u8*)r28 + 0x0) = r31;
     *(u32*)((u8*)r27 + 0x0) = r29;
     r29 = 0x3;
-L_800BEFCC: ;
+L_800BEFCC:
     r3 = r31;
     ((void(*)(void))fn_800C0CC0)();
     r29 = r29 + 0x1;
-L_800BEFD8: ;
-    if ((s32)r29 < (s32)0x3) goto L_800BEF70;
-    if ((s32)r30 != (s32)0x300) goto L_800BEFF4;
+L_800BEFD8:
+    if ((s32)r29 < 3) goto L_800BEF70;
+    if ((s32)r30 != 0x300) goto L_800BEFF4;
     r3 = (u32)lbl_8026F668;
     r3 = (u32)lbl_8026F668;
     fn_800BF33C();
-L_800BEFF4: ;
+L_800BEFF4:
     r3 = r30;
-    /* lmw r27, 0xc(r1) */;
     return;
 }
-#pragma pop
 

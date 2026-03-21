@@ -327,15 +327,11 @@ u16 OSGetWirelessID(s32 chan) {
 /* ========================================================== */
 
 /* fn_800A09B0 - 0x800A09B0 | size: 0x308 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A09B0(void) {
     extern void fn_80098368();
     extern void fn_800A064C();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -350,125 +346,124 @@ void fn_800A09B0(void) {
     u32 ctr = 0;
 
     r3 = (u32)Scb_803FB840;
-    /* stmw r27, 0x1c(r1) */;
     r31 = (u32)Scb_803FB840;
-    if ((s32)r3 == (s32)0x0) goto L_800A0C90;
-    if ((u32)r4 != (u32)0x0) goto L_800A0B84;
+    if ((s32)r3 == 0) goto L_800A0C90;
+    if (r4 != 0) goto L_800A0B84;
     r3 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r3 & 0x3;
-    if ((u32)r0 <= (u32)0x2) goto L_800A09F0;
-    /* clrrwi r0, r3, 2 */;
-    *(u8*)((u8*)r31 + 0x13) = r0;
-L_800A09F0: ;
-    r0 = 0x0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = r3 & 0x3;
+    if (tmp <= 2) goto L_800A09F0;
+    /* clrrwi tmp, r3, 2 */;
+    *(u8*)((u8*)r31 + 0x13) = tmp;
+L_800A09F0:
+    tmp = 0x0;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = r31 + 0x14;
     r6 = r31 + 0xc;
     r3 = r5 + 0x1;
-    *(u16*)((u8*)r31 + 0x0) = r0;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
     r3 = r3 - r6;
     r3 = (u32)r3 >> 1;
-    if ((u32)r6 >= (u32)r5) goto L_800A0B84;
-    /* srwi. r0, r3, 3 */;
-    ctr_fn = (void(*)(void))r0;
-    if ((u32)r6 == (u32)r5) goto L_800A0B54;
-L_800A0A24: ;
+    if (r6 >= r5) goto L_800A0B84;
+    /* srwi. tmp, r3, 3 */;
+    ctr_fn = (void(*)(void))tmp;
+    if (r6 == r5) goto L_800A0B54;
+L_800A0A24:
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x0);
+    tmp = *(u16*)((u8*)r6 + 0x0);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x0);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x2);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x2);
+    tmp = *(u16*)((u8*)r6 + 0x2);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x2);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x4);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x4);
+    tmp = *(u16*)((u8*)r6 + 0x4);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x4);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x6);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x6);
+    tmp = *(u16*)((u8*)r6 + 0x6);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x6);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x8);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x8);
+    tmp = *(u16*)((u8*)r6 + 0x8);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x8);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0xA);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0xA);
+    tmp = *(u16*)((u8*)r6 + 0xA);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0xA);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0xC);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0xC);
+    tmp = *(u16*)((u8*)r6 + 0xC);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0xC);
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0xE);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0xE);
+    tmp = *(u16*)((u8*)r6 + 0xE);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0xE);
     r6 = r6 + 0x10;
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     if (--ctr != 0) goto L_800A0A24;
     r3 = r3 & 0x7;
-    if ((u32)r6 == (u32)r5) goto L_800A0B84;
-L_800A0B54: ;
+    if (r6 == r5) goto L_800A0B84;
+L_800A0B54:
     ctr_fn = (void(*)(void))r3;
-L_800A0B58: ;
+L_800A0B58:
     r5 = *(u16*)((u8*)r31 + 0x0);
-    r0 = *(u16*)((u8*)r6 + 0x0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x0) = r0;
-    r0 = *(u16*)((u8*)r6 + 0x0);
+    tmp = *(u16*)((u8*)r6 + 0x0);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x0) = tmp;
+    tmp = *(u16*)((u8*)r6 + 0x0);
     r6 = r6 + 0x2;
     r5 = *(u16*)((u8*)r31 + 0x2);
-    r0 = ~(r0 | r0);
-    r0 = r5 + r0;
-    *(u16*)((u8*)r31 + 0x2) = r0;
+    tmp = ~(tmp | tmp);
+    tmp = r5 + tmp;
+    *(u16*)((u8*)r31 + 0x2) = tmp;
     if (--ctr != 0) goto L_800A0B58;
-L_800A0B84: ;
+L_800A0B84:
     r30 = r31 + 0x40;
-    r0 = *(u32*)((u8*)r31 + 0x40);
-    if ((u32)r4 >= (u32)r0) goto L_800A0B98;
+    tmp = *(u32*)((u8*)r31 + 0x40);
+    if (r4 >= tmp) goto L_800A0B98;
     *(u32*)((u8*)r30 + 0x0) = r4;
-L_800A0B98: ;
+L_800A0B98:
     r29 = *(u32*)((u8*)r30 + 0x0);
     r3 = (u32)fn_800A064C;
     r5 = (u32)fn_800A064C;
@@ -477,77 +472,71 @@ L_800A0B98: ;
     r3 = 0x0;
     r4 = 0x1;
     EXILock(r3, r4, 0);
-    if ((s32)r3 != (s32)0x0) goto L_800A0BC8;
-    r0 = 0x0;
+    if ((s32)r3 != 0) goto L_800A0BC8;
+    tmp = 0x0;
     goto L_800A0C78;
-L_800A0BC8: ;
+L_800A0BC8:
     r3 = 0x0;
     r4 = 0x1;
     r5 = 0x3;
     EXISelect(r3, r4, r5);
-    if ((s32)r3 != (s32)0x0) goto L_800A0BF0;
+    if ((s32)r3 != 0) goto L_800A0BF0;
     r3 = 0x0;
     EXIUnlock(r3);
-    r0 = 0x0;
+    tmp = 0x0;
     goto L_800A0C78;
-L_800A0BF0: ;
+L_800A0BF0:
     r3 = r29 << 6;
-    r0 = r3 + 0x100;
-    r0 = r0 | (0xa000 << 16);
+    tmp = r3 + 0x100;
+    tmp = tmp | (0xa000 << 16);
     r4 = r1 + 0x10;
     r3 = 0x0;
     r5 = 0x4;
     r6 = 0x1;
     r7 = 0x0;
     EXIImm(r3, (void*)r4, r5, 0, 0);
-    r0 = __cntlzw(r3);
-    r29 = (u32)r0 >> 5;
+    tmp = __cntlzw(r3);
+    r29 = (u32)tmp >> 5;
     r3 = 0x0;
     EXISync(r3);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
     r4 = r28 + 0x0;
     r5 = r27 + 0x0;
-    r29 = r29 | r0;
+    r29 = r29 | tmp;
     r3 = 0x0;
     r6 = 0x1;
     fn_80098368();
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
-    r29 = r29 | r0;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
+    r29 = r29 | tmp;
     r3 = 0x0;
     EXIDeselect(r3);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
-    r29 = r29 | r0;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
+    r29 = r29 | tmp;
     r3 = 0x0;
     EXIUnlock(r3);
-    r0 = __cntlzw(r29);
-    r0 = (u32)r0 >> 5;
-L_800A0C78: ;
-    *(u32*)((u8*)r31 + 0x4C) = r0;
-    r0 = *(u32*)((u8*)r31 + 0x4C);
-    if ((s32)r0 == (s32)0x0) goto L_800A0C90;
-    r0 = 0x40;
-    *(u32*)((u8*)r30 + 0x0) = r0;
-L_800A0C90: ;
-    r0 = 0x0;
-    *(u32*)((u8*)r31 + 0x48) = r0;
+    tmp = __cntlzw(r29);
+    tmp = (u32)tmp >> 5;
+L_800A0C78:
+    *(u32*)((u8*)r31 + 0x4C) = tmp;
+    tmp = *(u32*)((u8*)r31 + 0x4C);
+    if ((s32)tmp == 0) goto L_800A0C90;
+    tmp = 0x40;
+    *(u32*)((u8*)r30 + 0x0) = tmp;
+L_800A0C90:
+    tmp = 0x0;
+    *(u32*)((u8*)r31 + 0x48) = tmp;
     r3 = *(u32*)((u8*)r31 + 0x44);
     OSRestoreInterrupts(r3);
     r3 = *(u32*)((u8*)r31 + 0x4C);
-    /* lmw r27, 0x1c(r1) */;
     return;
 }
-#pragma pop
 
 /* fn_800A0D10 - 0x800A0D10 | size: 0x124 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A0D10(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -565,71 +554,66 @@ void fn_800A0D10(void) {
     r4 = 0x1;
     r5 = 0x0;
     EXILock(r3, r4, 0);
-    if ((s32)r3 != (s32)0x0) goto L_800A0D58;
+    if ((s32)r3 != 0) goto L_800A0D58;
     r3 = 0x0;
     goto L_800A0E18;
-L_800A0D58: ;
+L_800A0D58:
     r3 = 0x0;
     r4 = 0x1;
     r5 = 0x3;
     EXISelect(r3, r4, r5);
-    if ((s32)r3 != (s32)0x0) goto L_800A0D80;
+    if ((s32)r3 != 0) goto L_800A0D80;
     r3 = 0x0;
     EXIUnlock(r3);
     r3 = 0x0;
     goto L_800A0E18;
-L_800A0D80: ;
-    r0 = r31 << 6;
+L_800A0D80:
+    tmp = r31 << 6;
     r4 = r1 + 0x14;
     r3 = 0x0;
     r5 = 0x4;
     r6 = 0x1;
     r7 = 0x0;
     EXIImm(r3, (void*)r4, r5, 0, 0);
-    r0 = __cntlzw(r3);
-    r31 = (u32)r0 >> 5;
+    tmp = __cntlzw(r3);
+    r31 = (u32)tmp >> 5;
     r3 = 0x0;
     EXISync(r3);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
     r4 = r29 + 0x0;
     r5 = r30 + 0x0;
-    r31 = r31 | r0;
+    r31 = r31 | tmp;
     r3 = 0x0;
     r6 = 0x0;
     r7 = 0x0;
     EXIDma(r3, (void*)r4, r5, 0, 0);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
-    r31 = r31 | r0;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
+    r31 = r31 | tmp;
     r3 = 0x0;
     EXISync(r3);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
-    r31 = r31 | r0;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
+    r31 = r31 | tmp;
     r3 = 0x0;
     EXIDeselect(r3);
-    r0 = __cntlzw(r3);
-    r0 = (u32)r0 >> 5;
-    r31 = r31 | r0;
+    tmp = __cntlzw(r3);
+    tmp = (u32)tmp >> 5;
+    r31 = r31 | tmp;
     r3 = 0x0;
     EXIUnlock(r3);
-    r0 = __cntlzw(r31);
-    r3 = (u32)r0 >> 5;
-L_800A0E18: ;
+    tmp = __cntlzw(r31);
+    r3 = (u32)tmp >> 5;
+L_800A0E18:
     return;
 }
-#pragma pop
 
 /* fn_800A0E34 - 0x800A0E34 | size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A0E34(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -638,42 +622,37 @@ void fn_800A0E34(void) {
     r3 = (u32)Scb_803FB840;
     r31 = (u32)Scb_803FB840;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A0E6C;
+    if ((s32)tmp == 0) goto L_800A0E6C;
     OSRestoreInterrupts(r3);
     r31 = 0x0;
     goto L_800A0E78;
-L_800A0E6C: ;
+L_800A0E6C:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A0E78: ;
-    r0 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r0 & 0x00000004;
-    if ((s32)r0 == (s32)0x0) goto L_800A0E8C;
+    tmp = 0x1;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A0E78:
+    tmp = *(u8*)((u8*)r31 + 0x13);
+    tmp = tmp & 0x00000004;
+    if ((s32)tmp == 0) goto L_800A0E8C;
     r31 = 0x1;
     goto L_800A0E90;
-L_800A0E8C: ;
+L_800A0E8C:
     r31 = 0x0;
-L_800A0E90: ;
+L_800A0E90:
     r3 = 0x0;
     r4 = 0x0;
     fn_800A09B0();
     r3 = r31;
     return;
 }
-#pragma pop
 
 /* fn_800A0EB4 - 0x800A0EB4 | size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A0EB4(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -682,49 +661,43 @@ void fn_800A0EB4(void) {
 
     r4 = (u32)Scb_803FB840;
     r31 = (u32)Scb_803FB840;
-    /* clrlslwi r30, r3, 31, 2 */;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A0EF4;
+    if ((s32)tmp == 0) goto L_800A0EF4;
     OSRestoreInterrupts(r3);
     r31 = 0x0;
     goto L_800A0F00;
-L_800A0EF4: ;
+L_800A0EF4:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A0F00: ;
+    tmp = 0x1;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A0F00:
     r3 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r3 & 0x00000004;
-    if ((u32)r30 != (u32)r0) goto L_800A0F20;
+    tmp = r3 & 0x00000004;
+    if (r30 != tmp) goto L_800A0F20;
     r3 = 0x0;
     r4 = 0x0;
     fn_800A09B0();
     goto L_800A0F40;
-L_800A0F20: ;
-    r0 = r3 & 0xFFFFFFFB;
-    *(u8*)((u8*)r31 + 0x13) = r0;
+L_800A0F20:
+    tmp = r3 & 0xFFFFFFFB;
+    *(u8*)((u8*)r31 + 0x13) = tmp;
     r3 = 0x1;
     r4 = 0x0;
-    r0 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r0 | r30;
-    *(u8*)((u8*)r31 + 0x13) = r0;
+    tmp = *(u8*)((u8*)r31 + 0x13);
+    tmp = tmp | r30;
+    *(u8*)((u8*)r31 + 0x13) = tmp;
     fn_800A09B0();
-L_800A0F40: ;
+L_800A0F40:
     return;
 }
-#pragma pop
 
 /* fn_800A0F58 - 0x800A0F58 | size: 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A0F58(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -733,36 +706,31 @@ void fn_800A0F58(void) {
     r3 = (u32)Scb_803FB840;
     r31 = (u32)Scb_803FB840;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A0F90;
+    if ((s32)tmp == 0) goto L_800A0F90;
     OSRestoreInterrupts(r3);
     r31 = 0x0;
     goto L_800A0F9C;
-L_800A0F90: ;
+L_800A0F90:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A0F9C: ;
-    r0 = *(u8*)((u8*)r31 + 0x13);
+    tmp = 0x1;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A0F9C:
+    tmp = *(u8*)((u8*)r31 + 0x13);
     r3 = 0x0;
     r4 = 0x0;
-    /* extrwi r31, r0, 1, 24 */;
+    /* extrwi r31, tmp, 1, 24 */;
     fn_800A09B0();
     r3 = r31;
     return;
 }
-#pragma pop
 
 /* fn_800A0FC8 - 0x800A0FC8 | size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A0FC8(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -771,49 +739,43 @@ void fn_800A0FC8(void) {
 
     r4 = (u32)Scb_803FB840;
     r31 = (u32)Scb_803FB840;
-    /* clrlslwi r30, r3, 31, 7 */;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A1008;
+    if ((s32)tmp == 0) goto L_800A1008;
     OSRestoreInterrupts(r3);
     r31 = 0x0;
     goto L_800A1014;
-L_800A1008: ;
+L_800A1008:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A1014: ;
+    tmp = 0x1;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A1014:
     r3 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r3 & 0x00000080;
-    if ((u32)r30 != (u32)r0) goto L_800A1034;
+    tmp = r3 & 0x00000080;
+    if (r30 != tmp) goto L_800A1034;
     r3 = 0x0;
     r4 = 0x0;
     fn_800A09B0();
     goto L_800A1054;
-L_800A1034: ;
-    r0 = r3 & 0xFFFFFF7F;
-    *(u8*)((u8*)r31 + 0x13) = r0;
+L_800A1034:
+    tmp = r3 & 0xFFFFFF7F;
+    *(u8*)((u8*)r31 + 0x13) = tmp;
     r3 = 0x1;
     r4 = 0x0;
-    r0 = *(u8*)((u8*)r31 + 0x13);
-    r0 = r0 | r30;
-    *(u8*)((u8*)r31 + 0x13) = r0;
+    tmp = *(u8*)((u8*)r31 + 0x13);
+    tmp = tmp | r30;
+    *(u8*)((u8*)r31 + 0x13) = tmp;
     fn_800A09B0();
-L_800A1054: ;
+L_800A1054:
     return;
 }
-#pragma pop
 
 /* fn_800A106C - 0x800A106C | size: 0x6C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A106C(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -822,17 +784,17 @@ void fn_800A106C(void) {
     r3 = (u32)Scb_803FB840;
     r31 = (u32)Scb_803FB840;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A10A4;
+    if ((s32)tmp == 0) goto L_800A10A4;
     OSRestoreInterrupts(r3);
     r31 = 0x0;
     goto L_800A10B0;
-L_800A10A4: ;
+L_800A10A4:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A10B0: ;
+    tmp = 0x1;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A10B0:
     r31 = *(u8*)((u8*)r31 + 0x12);
     r3 = 0x0;
     r4 = 0x0;
@@ -840,17 +802,12 @@ L_800A10B0: ;
     r3 = r31;
     return;
 }
-#pragma pop
 
 /* fn_800A10D8 - 0x800A10D8 | size: 0x84 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A10D8(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -861,20 +818,20 @@ void fn_800A10D8(void) {
     r31 = (u32)Scb_803FB840;
     r30 = r3 + 0x0;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A1118;
+    if ((s32)tmp == 0) goto L_800A1118;
     OSRestoreInterrupts(r3);
     r3 = 0x0;
     goto L_800A1128;
-L_800A1118: ;
+L_800A1118:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
+    tmp = 0x1;
     r3 = r31 + 0x14;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A1128: ;
-    r0 = r30 << 1;
-    r3 = r3 + r0;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A1128:
+    tmp = r30 << 1;
+    r3 = r3 + tmp;
     r31 = *(u16*)((u8*)r3 + 0x1C);
     r3 = 0x0;
     r4 = 0x14;
@@ -882,17 +839,12 @@ L_800A1128: ;
     r3 = r31;
     return;
 }
-#pragma pop
 
 /* fn_800A115C - 0x800A115C | size: 0xAC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A115C(void) {
     extern void fn_800A09B0();
     extern u32 Scb_803FB840;
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -905,41 +857,37 @@ void fn_800A115C(void) {
     r30 = r4 + 0x0;
     r29 = r3 + 0x0;
     OSDisableInterrupts();
-    r0 = *(u32*)((u8*)r31 + 0x48);
+    tmp = *(u32*)((u8*)r31 + 0x48);
     r4 = r31 + 0x48;
-    if ((s32)r0 == (s32)0x0) goto L_800A11A4;
+    if ((s32)tmp == 0) goto L_800A11A4;
     OSRestoreInterrupts(r3);
     r3 = 0x0;
     goto L_800A11B4;
-L_800A11A4: ;
+L_800A11A4:
     *(u32*)((u8*)r31 + 0x44) = r3;
-    r0 = 0x1;
+    tmp = 0x1;
     r3 = r31 + 0x14;
-    *(u32*)((u8*)r4 + 0x0) = r0;
-L_800A11B4: ;
-    r0 = r29 << 1;
-    r4 = r3 + r0;
+    *(u32*)((u8*)r4 + 0x0) = tmp;
+L_800A11B4:
+    tmp = r29 << 1;
+    r4 = r3 + tmp;
     r3 = *(u16*)((u8*)r4 + 0x1C);
-    r0 = r30 & 0xFFFF;
-    if ((u32)r3 == (u32)r0) goto L_800A11E0;
+    tmp = r30 & 0xFFFF;
+    if (r3 == tmp) goto L_800A11E0;
     *(u16*)((u8*)r4 + 0x0) = r30;
     r3 = 0x1;
     r4 = 0x14;
     fn_800A09B0();
     goto L_800A11EC;
-L_800A11E0: ;
+L_800A11E0:
     r3 = 0x0;
     r4 = 0x14;
     fn_800A09B0();
-L_800A11EC: ;
+L_800A11EC:
     return;
 }
-#pragma pop
 
 /* fn_800A1208 - 0x800A1208 | size: 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A1208(void) {
     u32 r9 = 0;
     u32 r10 = 0;
@@ -953,5 +901,4 @@ void fn_800A1208(void) {
     /* rfi */; return;
     /* nop  */;
 }
-#pragma pop
 

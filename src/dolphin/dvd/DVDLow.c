@@ -196,14 +196,10 @@ void __DVDLowSetWAType(u32 type, u32 location) {
 /* ========================================================== */
 
 /* fn_800A41D0 - 0x800A41D0 | size: 0x84 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A41D0(void) {
     extern void fn_800A42C4();
     extern void fn_800A46EC();
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -211,45 +207,40 @@ void fn_800A41D0(void) {
 
     r3 = (u32)CommandList_803FC290;
     r4 = (u32)CommandList_803FC290;
-    r0 = *(u32*)NextCommandNumber_8047A7C4;
-    r0 = r0 * 0x14;
-    r3 = *(u32*)(r4 + r0);
-    if ((s32)r3 != (s32)0x1) goto L_800A4220;
+    tmp = *(u32*)NextCommandNumber_8047A7C4;
+    tmp = tmp * 0x14;
+    r3 = *(u32*)(r4 + tmp);
+    if ((s32)r3 != 1) goto L_800A4220;
     r3 = *(u32*)NextCommandNumber_8047A7C4;
-    r6 = r4 + r0;
-    r0 = r3 + 0x1;
-    *(u32*)NextCommandNumber_8047A7C4 = r0;
+    r6 = r4 + tmp;
+    tmp = r3 + 0x1;
+    *(u32*)NextCommandNumber_8047A7C4 = tmp;
     r3 = *(u32*)((u8*)r6 + 0x4);
     r4 = *(u32*)((u8*)r6 + 0x8);
     r5 = *(u32*)((u8*)r6 + 0xC);
     r6 = *(u32*)((u8*)r6 + 0x10);
     fn_800A42C4();
     goto L_800A4244;
-L_800A4220: ;
-    if ((s32)r3 != (s32)0x2) goto L_800A4244;
+L_800A4220:
+    if ((s32)r3 != 2) goto L_800A4244;
     r3 = *(u32*)NextCommandNumber_8047A7C4;
-    r4 = r4 + r0;
-    r0 = r3 + 0x1;
-    *(u32*)NextCommandNumber_8047A7C4 = r0;
+    r4 = r4 + tmp;
+    tmp = r3 + 0x1;
+    *(u32*)NextCommandNumber_8047A7C4 = tmp;
     r3 = *(u32*)((u8*)r4 + 0xC);
     r4 = *(u32*)((u8*)r4 + 0x10);
     fn_800A46EC();
-L_800A4244: ;
+L_800A4244:
     return;
 }
-#pragma pop
 
 /* fn_800A42C4 - 0x800A42C4 | size: 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A42C4(void) {
     extern u8 lbl_8047A784[];
     extern u8 lbl_8047A7B8[];
     extern u8 lbl_8047A7BC[];
     extern u8 lbl_8047A7C0[];
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -261,38 +252,38 @@ void fn_800A42C4(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     r30 = r5 + 0x0;
     r29 = r4 + 0x0;
     r28 = r3 + 0x0;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = 0x1;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = 0x1;
     *(u32*)Callback_8047A788 = r6;
     r6 = (u32)CommandList_803FC290;
     r31 = (u32)CommandList_803FC290;
-    *(u32*)lbl_8047A7C0 = r0;
+    *(u32*)lbl_8047A7C0 = tmp;
     __OSGetSystemTime();
     *(u32*)lbl_8047A7BC = r4;
-    r4 = (0xcc00 << 16);
-    r0 = (0xa0 << 16);
+    r4 = 0xCC000000;
+    tmp = 0xA00000;
     *(u32*)lbl_8047A7B8 = r3;
     r4 = r4 + 0x6000;
-    r3 = (0xa800 << 16);
+    r3 = 0xA8000000;
     *(u32*)((u8*)r4 + 0x8) = r3;
     r3 = (u32)r30 >> 2;
     *(u32*)((u8*)r4 + 0xC) = r3;
-    r0 = 0x3;
+    tmp = 0x3;
     *(u32*)((u8*)r4 + 0x10) = r29;
     *(u32*)((u8*)r4 + 0x14) = r28;
     *(u32*)((u8*)r4 + 0x18) = r29;
     *(u32*)lbl_8047A784 = r29;
-    *(u32*)((u8*)r4 + 0x1C) = r0;
-    if ((u32)r29 <= (u32)r0) goto L_800A4384;
-    r3 = (0x8000 << 16);
-    r0 = *(u32*)((u8*)r3 + 0xF8);
+    *(u32*)((u8*)r4 + 0x1C) = tmp;
+    if (r29 <= tmp) goto L_800A4384;
+    r3 = 0x80000000;
+    tmp = *(u32*)((u8*)r3 + 0xF8);
     r3 = r31 + 0x68;
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0x14;
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0x14;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -301,12 +292,12 @@ void fn_800A42C4(void) {
     r5 = 0x0;
     OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     goto L_800A43B4;
-L_800A4384: ;
-    r3 = (0x8000 << 16);
-    r0 = *(u32*)((u8*)r3 + 0xF8);
+L_800A4384:
+    r3 = 0x80000000;
+    tmp = *(u32*)((u8*)r3 + 0xF8);
     r3 = r31 + 0x68;
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -314,19 +305,14 @@ L_800A4384: ;
     r3 = r31 + 0x68;
     r5 = 0x0;
     OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
-L_800A43B4: ;
+L_800A43B4:
     return;
 }
-#pragma pop
 
 /* fn_800A43D4 - 0x800A43D4 | size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A43D4(void) {
     extern void fn_800A46EC();
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -339,19 +325,19 @@ void fn_800A43D4(void) {
     r7 = (u32)CommandList_803FC290;
     /* clrrwi. r8, r5, 15 */;
     r9 = (u32)CommandList_803FC290;
-    if ((s32)r0 != (s32)0) goto L_800A43F8;
+    if ((s32)tmp != 0) goto L_800A43F8;
     r10 = 0x0;
     goto L_800A4400;
-L_800A43F8: ;
-    r0 = *(u32*)WorkAroundSeekLocation_8047A7A8;
-    r10 = r8 + r0;
-L_800A4400: ;
-    r0 = 0x2;
-    *(u32*)((u8*)r9 + 0x0) = r0;
+L_800A43F8:
+    tmp = *(u32*)WorkAroundSeekLocation_8047A7A8;
+    r10 = r8 + tmp;
+L_800A4400:
+    tmp = 0x2;
+    *(u32*)((u8*)r9 + 0x0) = tmp;
     r8 = 0x1;
     r7 = -0x1;
     *(u32*)((u8*)r9 + 0xC) = r10;
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)((u8*)r9 + 0x10) = r6;
     *(u32*)((u8*)r9 + 0x14) = r8;
     *(u32*)((u8*)r9 + 0x18) = r3;
@@ -361,16 +347,12 @@ L_800A4400: ;
     *(u32*)((u8*)r9 + 0x20) = r5;
     *(u32*)((u8*)r9 + 0x24) = r6;
     *(u32*)((u8*)r9 + 0x28) = r7;
-    *(u32*)NextCommandNumber_8047A7C4 = r0;
+    *(u32*)NextCommandNumber_8047A7C4 = tmp;
     fn_800A46EC();
     return;
 }
-#pragma pop
 
 /* fn_800A4454 - 0x800A4454 | size: 0x298 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4454(void) {
     extern u8 lbl_804789B8[];
     extern u8 lbl_8047A7B0[];
@@ -379,8 +361,7 @@ void fn_800A4454(void) {
     extern void fn_800A43D4();
     extern void fn_800A7BCC();
     extern void fn_800A41D0();
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -401,8 +382,7 @@ void fn_800A4454(void) {
     f32 f4 = 0.0f;
     f32 f8 = 0.0f;
 
-    r7 = (0xcc00 << 16);
-    /* stmw r22, 0x18(r1) */;
+    r7 = 0xCC000000;
     r25 = r4 + 0x0;
     r4 = r7 + 0x6000;
     r7 = (u32)CommandList_803FC290;
@@ -415,110 +395,105 @@ void fn_800A4454(void) {
     *(u32*)((u8*)r31 + 0xC4) = r24;
     *(u32*)((u8*)r31 + 0xC8) = r25;
     *(u32*)((u8*)r31 + 0xCC) = r26;
-    r0 = *(u32*)WorkAroundType_8047A7A4;
-    if ((u32)r0 != (u32)0x0) goto L_800A44CC;
-    r0 = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = r0;
-    r0 = 0x0;
+    tmp = *(u32*)WorkAroundType_8047A7A4;
+    if (tmp != 0) goto L_800A44CC;
+    tmp = -0x1;
+    *(u32*)((u8*)r31 + 0x0) = tmp;
+    tmp = 0x0;
     r3 = r24 + 0x0;
-    *(u32*)NextCommandNumber_8047A7C4 = r0;
+    *(u32*)NextCommandNumber_8047A7C4 = tmp;
     r4 = r25 + 0x0;
     r5 = r26 + 0x0;
     r6 = r27 + 0x0;
     fn_800A42C4();
     goto L_800A46D4;
-L_800A44CC: ;
-    r0 = *(u32*)WorkAroundType_8047A7A4;
-    if ((u32)r0 != (u32)0x1) goto L_800A46D4;
-    r0 = *(u32*)lbl_804789B8;
-    if ((s32)r0 == (s32)0x0) goto L_800A44FC;
+L_800A44CC:
+    tmp = *(u32*)WorkAroundType_8047A7A4;
+    if (tmp != 1) goto L_800A46D4;
+    tmp = *(u32*)lbl_804789B8;
+    if ((s32)tmp == 0) goto L_800A44FC;
     r3 = r24 + 0x0;
     r4 = r25 + 0x0;
     r5 = r26 + 0x0;
     r6 = r27 + 0x0;
     fn_800A43D4();
     goto L_800A46D4;
-L_800A44FC: ;
+L_800A44FC:
     r29 = r31 + 0xbc;
-    r0 = *(u32*)((u8*)r30 + 0x0);
+    tmp = *(u32*)((u8*)r30 + 0x0);
     r28 = r31 + 0xc0;
     r3 = *(u32*)((u8*)r31 + 0xBC);
     r4 = *(u32*)((u8*)r31 + 0xC0);
-    r23 = (u32)r0 >> 15;
-    /* subi r0, r3, 0x1 */;
-    r0 = r4 + r0;
-    r22 = (u32)r0 >> 15;
+    r23 = (u32)tmp >> 15;
+    tmp = r4 + tmp;
+    r22 = (u32)tmp >> 15;
     fn_800A7BCC();
-    r0 = *(u8*)((u8*)r3 + 0x8);
-    if ((u32)r0 == (u32)0x0) goto L_800A4538;
-    r0 = 0x1;
+    tmp = *(u8*)((u8*)r3 + 0x8);
+    if (tmp == 0) goto L_800A4538;
+    tmp = 0x1;
     goto L_800A453C;
-L_800A4538: ;
-    r0 = 0x0;
-L_800A453C: ;
-    if ((s32)r0 == (s32)0x0) goto L_800A454C;
+L_800A4538:
+    tmp = 0x0;
+L_800A453C:
+    if ((s32)tmp == 0) goto L_800A454C;
     r3 = 0x5;
     goto L_800A4550;
-L_800A454C: ;
+L_800A454C:
     r3 = 0xf;
-L_800A4550: ;
-    /* subi r0, r22, 0x2 */;
-    if ((u32)r23 > (u32)r0) goto L_800A456C;
-    r0 = r3 + 0x3;
-    r0 = r22 + r0;
-    if ((u32)r23 >= (u32)r0) goto L_800A4574;
-L_800A456C: ;
-    r0 = 0x1;
+L_800A4550:
+    if (r23 > tmp) goto L_800A456C;
+    tmp = r3 + 0x3;
+    tmp = r22 + tmp;
+    if (r23 >= tmp) goto L_800A4574;
+L_800A456C:
+    tmp = 0x1;
     goto L_800A4578;
-L_800A4574: ;
-    r0 = 0x0;
-L_800A4578: ;
-    if ((s32)r0 != (s32)0x0) goto L_800A45A8;
-    r0 = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = r0;
-    r0 = 0x0;
+L_800A4574:
+    tmp = 0x0;
+L_800A4578:
+    if ((s32)tmp != 0) goto L_800A45A8;
+    tmp = -0x1;
+    *(u32*)((u8*)r31 + 0x0) = tmp;
+    tmp = 0x0;
     r3 = r24 + 0x0;
-    *(u32*)NextCommandNumber_8047A7C4 = r0;
+    *(u32*)NextCommandNumber_8047A7C4 = tmp;
     r4 = r25 + 0x0;
     r5 = r26 + 0x0;
     r6 = r27 + 0x0;
     fn_800A42C4();
     goto L_800A46D4;
-L_800A45A8: ;
+L_800A45A8:
     r3 = *(u32*)((u8*)r29 + 0x0);
     r4 = *(u32*)((u8*)r28 + 0x0);
-    /* subi r3, r3, 0x1 */;
-    r0 = *(u32*)((u8*)r30 + 0x0);
+    tmp = *(u32*)((u8*)r30 + 0x0);
     r3 = r4 + r3;
     r3 = (u32)r3 >> 15;
-    r4 = (u32)r0 >> 15;
-    if ((u32)r3 == (u32)r4) goto L_800A45D8;
-    r0 = r3 + 0x1;
-    if ((u32)r0 != (u32)r4) goto L_800A46C0;
-L_800A45D8: ;
+    r4 = (u32)tmp >> 15;
+    if (r3 == r4) goto L_800A45D8;
+    tmp = r3 + 0x1;
+    if (tmp != r4) goto L_800A46C0;
+L_800A45D8:
     __OSGetSystemTime();
-    r5 = (0x8000 << 16);
+    r5 = 0x80000000;
     r8 = *(u32*)lbl_8047A7B0;
-    r0 = *(u32*)((u8*)r5 + 0xF8);
-    r5 = (0x1062 << 16);
+    tmp = *(u32*)((u8*)r5 + 0xF8);
+    r5 = 0x10620000;
     r9 = *(u32*)lbl_8047A7B4;
     r6 = 0x0;
-    r7 = (u32)r0 >> 2;
-    r0 = r5 + 0x4dd3;
-    r0 = (u32)((u64)r0 * (u64)r7 >> 32);
-    r0 = (u32)r0 >> 6;
+    r7 = (u32)tmp >> 2;
+    tmp = r5 + 0x4dd3;
+    tmp = (u32)((u64)tmp * (u64)r7 >> 32);
+    tmp = (u32)tmp >> 6;
     r9 = r4 - r9;
     r8 = r3 - r8; /* -borrow */;
-    r5 = r0 * 0x5;
-    /* xoris r4, r6, 0x8000 */;
-    /* xoris r3, r8, 0x8000 */;
-    r0 = r5 - r9;
+    r5 = tmp * 0x5;
+    tmp = r5 - r9;
     r3 = r4 - r3; /* -borrow */;
     r3 = r4 - r4; /* -borrow */;
     /* neg. r3, r3 */;
-    if ((u32)r0 == (u32)r4) goto L_800A4650;
-    r0 = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = r0;
+    if (tmp == r4) goto L_800A4650;
+    tmp = -0x1;
+    *(u32*)((u8*)r31 + 0x0) = tmp;
     r3 = r24 + 0x0;
     r4 = r25 + 0x0;
     *(u32*)NextCommandNumber_8047A7C4 = r6;
@@ -526,25 +501,24 @@ L_800A45D8: ;
     r6 = r27 + 0x0;
     fn_800A42C4();
     goto L_800A46D4;
-L_800A4650: ;
-    r0 = 0x1;
-    *(u32*)((u8*)r31 + 0x0) = r0;
-    r3 = (0x431c << 16);
-    /* subi r0, r3, 0x217d */;
+L_800A4650:
+    tmp = 0x1;
+    *(u32*)((u8*)r31 + 0x0) = tmp;
+    r3 = 0x431C0000;
     *(u32*)((u8*)r31 + 0x4) = r24;
-    r0 = (u32)((u64)r0 * (u64)r7 >> 32);
+    tmp = (u32)((u64)tmp * (u64)r7 >> 32);
     *(u32*)((u8*)r31 + 0x8) = r25;
     *(u32*)((u8*)r31 + 0xC) = r26;
-    r0 = (u32)r0 >> 15;
-    r3 = r0 * 0x1f4;
+    tmp = (u32)tmp >> 15;
+    r3 = tmp * 0x1f4;
     *(u32*)((u8*)r31 + 0x10) = r27;
-    r0 = -0x1;
-    *(u32*)((u8*)r31 + 0x14) = r0;
+    tmp = -0x1;
+    *(u32*)((u8*)r31 + 0x14) = tmp;
     r5 = r5 - r9;
     r4 = r6 - r8; /* -borrow */;
-    r0 = (u32)r3 >> 3;
+    tmp = (u32)r3 >> 3;
     *(u32*)NextCommandNumber_8047A7C4 = r6;
-    r23 = r5 + r0;
+    r23 = r5 + tmp;
     r22 = r4 + r6; /* +carry */;
     r3 = r31 + 0x40;
     OSCreateAlarm((OSAlarm*)r3);
@@ -555,26 +529,20 @@ L_800A4650: ;
     r3 = r31 + 0x40;
     OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
     goto L_800A46D4;
-L_800A46C0: ;
+L_800A46C0:
     r3 = r24 + 0x0;
     r4 = r25 + 0x0;
     r5 = r26 + 0x0;
     r6 = r27 + 0x0;
     fn_800A43D4();
-L_800A46D4: ;
-    /* lmw r22, 0x18(r1) */;
+L_800A46D4:
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A46EC - 0x800A46EC | size: 0x94 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A46EC(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -584,24 +552,24 @@ void fn_800A46EC(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)Callback_8047A788 = r4;
-    r4 = (0xcc00 << 16);
+    r4 = 0xCC000000;
     r4 = r4 + 0x6000;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = (0xab00 << 16);
-    *(u32*)((u8*)r4 + 0x8) = r0;
-    r0 = (u32)r3 >> 2;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = 0xAB000000;
+    *(u32*)((u8*)r4 + 0x8) = tmp;
+    tmp = (u32)r3 >> 2;
     r3 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r4 + 0xC) = r0;
-    r0 = 0x1;
+    *(u32*)((u8*)r4 + 0xC) = tmp;
+    tmp = 0x1;
     r31 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r4 + 0x1C) = r0;
-    r4 = (0x8000 << 16);
+    *(u32*)((u8*)r4 + 0x1C) = tmp;
+    r4 = 0x80000000;
     r3 = r31 + 0x0;
-    r0 = *(u32*)((u8*)r4 + 0xF8);
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    tmp = *(u32*)((u8*)r4 + 0xF8);
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -612,15 +580,10 @@ void fn_800A46EC(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A47AC - 0x800A47AC | size: 0xA4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A47AC(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -632,27 +595,27 @@ void fn_800A47AC(void) {
     f32 f8 = 0.0f;
 
     r8 = 0x0;
-    r5 = (0xa800 << 16);
-    r0 = r5 + 0x40;
+    r5 = 0xA8000000;
+    tmp = r5 + 0x40;
     r6 = 0x20;
-    r5 = (0x8000 << 16);
+    r5 = 0x80000000;
     *(u32*)Callback_8047A788 = r4;
-    r4 = (0xcc00 << 16);
+    r4 = 0xCC000000;
     r7 = r4 + 0x6000;
     *(u32*)StopAtNextInt_8047A780 = r8;
-    *(u32*)((u8*)r4 + 0x6008) = r0;
+    *(u32*)((u8*)r4 + 0x6008) = tmp;
     r4 = (u32)AlarmForTimeout_803FC2F8;
-    r0 = 0x3;
+    tmp = 0x3;
     *(u32*)((u8*)r7 + 0xC) = r8;
     r31 = (u32)AlarmForTimeout_803FC2F8;
     *(u32*)((u8*)r7 + 0x10) = r6;
     *(u32*)((u8*)r7 + 0x14) = r3;
     r3 = r31;
     *(u32*)((u8*)r7 + 0x18) = r6;
-    *(u32*)((u8*)r7 + 0x1C) = r0;
-    r0 = *(u32*)((u8*)r5 + 0xF8);
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    *(u32*)((u8*)r7 + 0x1C) = tmp;
+    tmp = *(u32*)((u8*)r5 + 0xF8);
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -663,15 +626,10 @@ void fn_800A47AC(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A48DC - 0x800A48DC | size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A48DC(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -681,22 +639,22 @@ void fn_800A48DC(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)Callback_8047A788 = r3;
-    r3 = (0xcc00 << 16);
+    r3 = 0xCC000000;
     r4 = r3 + 0x6000;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = (0xe000 << 16);
-    *(u32*)((u8*)r3 + 0x6008) = r0;
-    r0 = 0x1;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = 0xE0000000;
+    *(u32*)((u8*)r3 + 0x6008) = tmp;
+    tmp = 0x1;
     r3 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r4 + 0x1C) = r0;
-    r4 = (0x8000 << 16);
+    *(u32*)((u8*)r4 + 0x1C) = tmp;
+    r4 = 0x80000000;
     r31 = (u32)AlarmForTimeout_803FC2F8;
-    r0 = *(u32*)((u8*)r4 + 0xF8);
+    tmp = *(u32*)((u8*)r4 + 0xF8);
     r3 = r31 + 0x0;
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -707,15 +665,10 @@ void fn_800A48DC(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A4968 - 0x800A4968 | size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4968(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -726,25 +679,25 @@ void fn_800A4968(void) {
     f32 f8 = 0.0f;
 
     r6 = 0x20;
-    r0 = 0x0;
-    r5 = (0x8000 << 16);
+    tmp = 0x0;
+    r5 = 0x80000000;
     *(u32*)Callback_8047A788 = r4;
-    r4 = (0xcc00 << 16);
+    r4 = 0xCC000000;
     r7 = r4 + 0x6000;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = (0x1200 << 16);
-    *(u32*)((u8*)r4 + 0x6008) = r0;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = 0x12000000;
+    *(u32*)((u8*)r4 + 0x6008) = tmp;
     r4 = (u32)AlarmForTimeout_803FC2F8;
-    r0 = 0x3;
+    tmp = 0x3;
     *(u32*)((u8*)r7 + 0x10) = r6;
     r31 = (u32)AlarmForTimeout_803FC2F8;
     *(u32*)((u8*)r7 + 0x14) = r3;
     r3 = r31 + 0x0;
     *(u32*)((u8*)r7 + 0x18) = r6;
-    *(u32*)((u8*)r7 + 0x1C) = r0;
-    r0 = *(u32*)((u8*)r5 + 0xF8);
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    *(u32*)((u8*)r7 + 0x1C) = tmp;
+    tmp = *(u32*)((u8*)r5 + 0xF8);
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -755,15 +708,10 @@ void fn_800A4968(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A4A04 - 0x800A4A04 | size: 0x98 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4A04(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -773,25 +721,25 @@ void fn_800A4A04(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)Callback_8047A788 = r6;
-    r6 = (0xcc00 << 16);
+    r6 = 0xCC000000;
     r6 = r6 + 0x6000;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = r3 | (0xe100 << 16);
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = r3 | (0xe100 << 16);
     r3 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r6 + 0x8) = r0;
-    r0 = (u32)r5 >> 2;
+    *(u32*)((u8*)r6 + 0x8) = tmp;
+    tmp = (u32)r5 >> 2;
     r31 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r6 + 0xC) = r0;
-    r0 = 0x1;
+    *(u32*)((u8*)r6 + 0xC) = tmp;
+    tmp = 0x1;
     r3 = r31 + 0x0;
     *(u32*)((u8*)r6 + 0x10) = r4;
-    r4 = (0x8000 << 16);
-    *(u32*)((u8*)r6 + 0x1C) = r0;
-    r0 = *(u32*)((u8*)r4 + 0xF8);
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    r4 = 0x80000000;
+    *(u32*)((u8*)r6 + 0x1C) = tmp;
+    tmp = *(u32*)((u8*)r4 + 0xF8);
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -802,15 +750,10 @@ void fn_800A4A04(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A4A9C - 0x800A4A9C | size: 0x8C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4A9C(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -820,22 +763,22 @@ void fn_800A4A9C(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)Callback_8047A788 = r4;
-    r4 = (0xcc00 << 16);
+    r4 = 0xCC000000;
     r4 = r4 + 0x6000;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    r0 = r3 | (0xe200 << 16);
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    tmp = r3 | (0xe200 << 16);
     r3 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r4 + 0x8) = r0;
-    r0 = 0x1;
+    *(u32*)((u8*)r4 + 0x8) = tmp;
+    tmp = 0x1;
     r31 = (u32)AlarmForTimeout_803FC2F8;
-    *(u32*)((u8*)r4 + 0x1C) = r0;
-    r4 = (0x8000 << 16);
+    *(u32*)((u8*)r4 + 0x1C) = tmp;
+    r4 = 0x80000000;
     r3 = r31 + 0x0;
-    r0 = *(u32*)((u8*)r4 + 0xF8);
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    tmp = *(u32*)((u8*)r4 + 0xF8);
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -846,15 +789,10 @@ void fn_800A4A9C(void) {
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A4B28 - 0x800A4B28 | size: 0x9C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4B28(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -864,26 +802,26 @@ void fn_800A4B28(void) {
     u32 r31 = 0;
     f32 f8 = 0.0f;
 
-    r0 = 0x0;
+    tmp = 0x0;
     *(u32*)Callback_8047A788 = r5;
-    *(u32*)StopAtNextInt_8047A780 = r0;
-    if ((s32)r3 == (s32)0x0) goto L_800A4B54;
-    r0 = (0x1 << 16);
-L_800A4B54: ;
-    r0 = r0 | (0xe400 << 16);
-    r3 = (0xcc00 << 16);
-    r0 = r4 | r0;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
+    if ((s32)r3 == 0) goto L_800A4B54;
+    tmp = 0x10000;
+L_800A4B54:
+    tmp = tmp | (0xe400 << 16);
+    r3 = 0xCC000000;
+    tmp = r4 | tmp;
     r3 = r3 + 0x6000;
-    *(u32*)((u8*)r3 + 0x8) = r0;
-    r0 = 0x1;
-    r4 = (0x8000 << 16);
-    *(u32*)((u8*)r3 + 0x1C) = r0;
+    *(u32*)((u8*)r3 + 0x8) = tmp;
+    tmp = 0x1;
+    r4 = 0x80000000;
+    *(u32*)((u8*)r3 + 0x1C) = tmp;
     r3 = (u32)AlarmForTimeout_803FC2F8;
     r31 = (u32)AlarmForTimeout_803FC2F8;
-    r0 = *(u32*)((u8*)r4 + 0xF8);
+    tmp = *(u32*)((u8*)r4 + 0xF8);
     r3 = r31 + 0x0;
-    r0 = (u32)r0 >> 2;
-    r30 = r0 * 0xa;
+    tmp = (u32)tmp >> 2;
+    r30 = tmp * 0xa;
     OSCreateAlarm((OSAlarm*)r3);
     r3 = (u32)AlarmHandlerForTimeout;
     r7 = (u32)AlarmHandlerForTimeout;
@@ -894,39 +832,30 @@ L_800A4B54: ;
     r3 = 0x1;
     return;
 }
-#pragma pop
 
 /* fn_800A4C80 - 0x800A4C80 | size: 0x14 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4C80(void) {
     extern u8 lbl_8047A7A0[];
-    u32 r0 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
 
-    r0 = 0x1;
-    *(u32*)StopAtNextInt_8047A780 = r0;
+    tmp = 0x1;
+    *(u32*)StopAtNextInt_8047A780 = tmp;
     r3 = 0x1;
-    *(u32*)lbl_8047A7A0 = r0;
+    *(u32*)lbl_8047A7A0 = tmp;
     return;
 }
-#pragma pop
 
 /* fn_800A4C94 - 0x800A4C94 | size: 0x18 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800A4C94(void) {
-    u32 r0 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
 
-    r3 = (0xcc00 << 16);
-    r0 = 0x0;
-    *(u32*)((u8*)r3 + 0x6004) = r0;
+    r3 = 0xCC000000;
+    tmp = 0x0;
+    *(u32*)((u8*)r3 + 0x6004) = tmp;
     r3 = *(u32*)Callback_8047A788;
-    *(u32*)Callback_8047A788 = r0;
+    *(u32*)Callback_8047A788 = tmp;
     return;
 }
-#pragma pop
 

@@ -144,26 +144,21 @@ typedef struct GSDVDEntry {
  *   li r4, 0x0
  *   bl fn_80167070       ; GSDVD_CloseHandle
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSDVD_CheckAndClose(void) {
     extern void fn_80167070();
     extern void fn_80167720();
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
 
     fn_80167720();
-    if ((u32)r3 == (u32)0x0) goto L_80167060;
+    if (r3 == 0) goto L_80167060;
     r4 = 0x0;
     fn_80167070();
-L_80167060: ;
+L_80167060:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80167070 -- GSDVD_CloseHandle
@@ -172,58 +167,49 @@ L_80167060: ;
  * clears the handle slot.
  * 168 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {
     extern void fn_8016782C();
     extern void fn_80167AF0();
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
+    u32 tmp = 0;
     u32 r5 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
 
-    r0 = r3 * 0xc;
+    tmp = handleIndex * 0xc;
     r5 = *(u32*)&lbl_80478FAC;
-    r31 = r5 + r0;
-    r0 = *(u8*)((u8*)r31 + 0x0);
-    /* extrwi r0, r0, 1, 26 */;
-    if ((u32)r0 == (u32)0x1) goto L_801670A8;
-    r3 = 0x0;
+    r31 = r5 + tmp;
+    tmp = *(u8*)((u8*)r31 + 0x0);
+    /* extrwi tmp, tmp, 1, 26 */;
+    if (tmp == 1) goto L_801670A8;
+    handleIndex = 0x0;
     goto L_80167100;
-L_801670A8: ;
+L_801670A8:
     r30 = *(u32*)((u8*)r31 + 0x8);
-    if ((u32)r30 != (u32)0x0) goto L_801670BC;
-    r3 = 0x0;
+    if (r30 != 0) goto L_801670BC;
+    handleIndex = 0x0;
     goto L_80167100;
-L_801670BC: ;
-    r0 = r4 & 0xFF;
-    if ((u32)r0 != (u32)0x1) goto L_801670D4;
-    r4 = 0x0;
+L_801670BC:
+    tmp = mode & 0xFF;
+    if (tmp != 1) goto L_801670D4;
+    mode = 0x0;
     r5 = 0x0;
     ((void(*)(void))fn_801669E4)();
-L_801670D4: ;
-    r3 = r31;
-    r4 = r30;
+L_801670D4:
+    handleIndex = r31;
+    mode = r30;
     fn_80167AF0();
-    r3 = r30;
+    handleIndex = r30;
     fn_8016782C();
-    r4 = 0x0;
-    r3 = 0x1;
-    *(u32*)((u8*)r31 + 0x8) = r4;
-    r0 = *(u8*)((u8*)r31 + 0x0);
-    r0 = (r0 & ~0x00000020) | (((r4 << 5) | ((u32)r4 >> 27)) & 0x00000020);
-    *(u8*)((u8*)r31 + 0x0) = r0;
-L_80167100: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
+    mode = 0x0;
+    handleIndex = 0x1;
+    *(u32*)((u8*)r31 + 0x8) = mode;
+    tmp = *(u8*)((u8*)r31 + 0x0);
+    tmp = (tmp & ~0x00000020) | (((mode << 5) | ((u32)mode >> 27)) & 0x00000020);
+    *(u8*)((u8*)r31 + 0x0) = tmp;
+L_80167100:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80167118 -- GSDVD_Open
@@ -232,9 +218,6 @@ L_80167100: ;
  * resource, and sets up the read buffer. Takes 8 parameters.
  * 384 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5) {
     extern u8 lbl_8047B0B8[];
     extern u8 lbl_8047B0BC[];
@@ -248,123 +231,105 @@ s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2,
     extern void fn_80167F28();
     extern void fn_80167298();
     u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
+    u32 tmp = 0;
     u32 r25 = 0;
-    u32 r26 = 0;
     u32 r27 = 0;
     u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
 
-    r0 = r3 * 0x18;
-    /* stmw r23, 0xc(r1) */;
-    r29 = r4;
-    r30 = r5;
-    r31 = r6;
-    r23 = r7;
-    r26 = r8;
-    r24 = r10;
-    r3 = *(u32*)&lbl_80478FB4;
-    r28 = r3 + r0;
-    r0 = *(u8*)((u8*)r28 + 0x1);
-    if ((u32)r0 != (u32)0x1) goto L_80167160;
-    r3 = 0x0;
+    tmp = slotIndex * 0x18;
+    resId = resId;
+    callback = callback;
+    param1 = param1;
+    param2 = param2;
+    param3 = param3;
+    param5 = param5;
+    slotIndex = *(u32*)&lbl_80478FB4;
+    r28 = slotIndex + tmp;
+    tmp = *(u8*)((u8*)r28 + 0x1);
+    if (tmp != 1) goto L_80167160;
+    slotIndex = 0x0;
     goto L_80167284;
-L_80167160: ;
-    r3 = r23;
-    r4 = r9;
+L_80167160:
+    slotIndex = param2;
+    resId = param4;
     ((void(*)(void))fn_800F9318)();
-    /* mr. r27, r3 */;
-    if ((u32)r0 != (u32)0x1) goto L_8016717C;
-    r3 = 0x0;
+    /* mr. r27, slotIndex */;
+    if (tmp != 1) goto L_8016717C;
+    slotIndex = 0x0;
     goto L_80167284;
-L_8016717C: ;
-    r3 = r23;
-    r4 = r24;
+L_8016717C:
+    slotIndex = param2;
+    resId = param5;
     ((void(*)(void))fn_800F9318)();
-    /* mr. r25, r3 */;
-    if ((u32)r0 != (u32)0x1) goto L_80167198;
-    r3 = 0x0;
+    /* mr. r25, slotIndex */;
+    if (tmp != 1) goto L_80167198;
+    slotIndex = 0x0;
     goto L_80167284;
-L_80167198: ;
-    r3 = r23;
-    r4 = r26;
+L_80167198:
+    slotIndex = param2;
+    resId = param3;
     ((void(*)(void))fn_800F9318)();
-    /* mr. r24, r3 */;
-    if ((u32)r0 != (u32)0x1) goto L_801671B4;
-    r3 = 0x0;
+    /* mr. param5, slotIndex */;
+    if (tmp != 1) goto L_801671B4;
+    slotIndex = 0x0;
     goto L_80167284;
-L_801671B4: ;
-    if ((u32)r29 != (u32)0x1) goto L_80167218;
-    r26 = 0x0;
+L_801671B4:
+    if (resId != 1) goto L_80167218;
+    param3 = 0x0;
     fn_800AE78C();
-    r5 = (u32)fn_80167298;
-    r4 = r3;
-    r3 = (u32)fn_80167298;
+    callback = (u32)fn_80167298;
+    resId = slotIndex;
+    slotIndex = (u32)fn_80167298;
     fn_80159ED0();
-    r3 = r30;
+    slotIndex = callback;
     fn_80167F28();
-    *(u32*)lbl_8047B0BC = r3;
-    if ((u32)r3 != (u32)0x0) goto L_801671F0;
-    r3 = 0x0;
+    *(u32*)lbl_8047B0BC = slotIndex;
+    if (slotIndex != 0) goto L_801671F0;
+    slotIndex = 0x0;
     goto L_80167284;
-L_801671F0: ;
-    *(u32*)lbl_8047B0B8 = r31;
+L_801671F0:
+    *(u32*)lbl_8047B0B8 = param1;
     fn_800AE78C();
     fn_80167BB0();
-    *(u32*)lbl_8047B0C0 = r3;
-    if ((u32)r3 != (u32)0x0) goto L_80167228;
-    r3 = *(u32*)lbl_8047B0BC;
+    *(u32*)lbl_8047B0C0 = slotIndex;
+    if (slotIndex != 0) goto L_80167228;
+    slotIndex = *(u32*)lbl_8047B0BC;
     fn_80167E64();
-    r3 = 0x0;
+    slotIndex = 0x0;
     goto L_80167284;
-L_80167218: ;
-    r26 = r30;
-    r3 = 0x0;
-    r4 = 0x0;
+L_80167218:
+    param3 = callback;
+    slotIndex = 0x0;
+    resId = 0x0;
     fn_80159ED0();
-L_80167228: ;
-    r4 = *(u16*)((u8*)r28 + 0x2);
-    r3 = r27;
-    r5 = r26;
-    r6 = r25;
-    r7 = r24;
+L_80167228:
+    resId = *(u16*)((u8*)r28 + 0x2);
+    slotIndex = r27;
+    callback = param3;
+    param1 = r25;
+    param2 = param5;
     fn_80159EF0();
-    r0 = r3 & 0xFF;
-    if ((u32)r3 != (u32)0x0) goto L_80167260;
-    if ((u32)r29 != (u32)0x1) goto L_80167258;
-    r3 = *(u32*)lbl_8047B0BC;
+    tmp = slotIndex & 0xFF;
+    if (slotIndex != 0) goto L_80167260;
+    if (resId != 1) goto L_80167258;
+    slotIndex = *(u32*)lbl_8047B0BC;
     fn_80167E64();
-L_80167258: ;
-    r3 = 0x0;
+L_80167258:
+    slotIndex = 0x0;
     goto L_80167284;
-L_80167260: ;
-    if ((u32)r29 != (u32)0x1) goto L_80167278;
-    r3 = *(u32*)lbl_8047B0C0;
+L_80167260:
+    if (resId != 1) goto L_80167278;
+    slotIndex = *(u32*)lbl_8047B0C0;
     fn_80167B70();
-    r3 = *(u32*)lbl_8047B0BC;
+    slotIndex = *(u32*)lbl_8047B0BC;
     fn_80167E64();
-L_80167278: ;
-    r0 = 0x1;
-    r3 = 0x1;
-    *(u8*)((u8*)r28 + 0x1) = r0;
-L_80167284: ;
-    /* lmw r23, 0xc(r1) */;
+L_80167278:
+    tmp = 0x1;
+    slotIndex = 0x1;
+    *(u8*)((u8*)r28 + 0x1) = tmp;
+L_80167284:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80167FA4 -- GSDVD_EmptyFunc
@@ -386,9 +351,6 @@ void GSDVD_EmptyFunc(void) {
  *   - Fatal error
  *   - Retry
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSDVD_ErrorStateMachine(void) {
     extern u8 lbl_80478C24[];
     extern u8 lbl_80478C28[];
@@ -405,49 +367,48 @@ void GSDVD_ErrorStateMachine(void) {
     extern void fn_8016824C();
     extern void fn_80167BE8();
     u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
 
-    r0 = r3;
-    r3 = r0 * 0x44;
-    *(u32*)lbl_8047B0F8 = r0;
+    tmp = r3;
+    r3 = tmp * 0x44;
+    *(u32*)lbl_8047B0F8 = tmp;
     fn_8016824C();
     *(u32*)lbl_8047B0F4 = r3;
-    if ((u32)r3 != (u32)0x0) goto L_80167FD8;
+    if (r3 != 0) goto L_80167FD8;
     r3 = 0x0;
     goto L_801680B0;
-L_80167FD8: ;
+L_80167FD8:
     fn_8016821C();
     DVDInit();
     fn_800057A8();
-    if ((s32)r3 == (s32)0x4) goto L_8016808C;
+    if ((s32)r3 == 4) goto L_8016808C;
     fn_800057A0();
-    if ((s32)r3 == (s32)0x1) goto L_80168020;
-    if ((s32)r3 >= (s32)0x1) goto L_80168008;
-    if ((s32)r3 >= (s32)0x0) goto L_80168014;
+    if ((s32)r3 == 1) goto L_80168020;
+    if ((s32)r3 >= 1) goto L_80168008;
+    if ((s32)r3 >= 0) goto L_80168014;
     goto L_80168034;
-L_80168008: ;
-    if ((s32)r3 >= (s32)0x3) goto L_80168034;
+L_80168008:
+    if ((s32)r3 >= 3) goto L_80168034;
     goto L_8016802C;
-L_80168014: ;
-    r0 = (u32)lbl_8047D578;
-    *(u32*)lbl_80478C24 = r0;
+L_80168014:
+    tmp = (u32)lbl_8047D578;
+    *(u32*)lbl_80478C24 = tmp;
     goto L_80168034;
-L_80168020: ;
-    r0 = (u32)lbl_8047D594;
-    *(u32*)lbl_80478C24 = r0;
+L_80168020:
+    tmp = (u32)lbl_8047D594;
+    *(u32*)lbl_80478C24 = tmp;
     goto L_80168034;
-L_8016802C: ;
-    r0 = (u32)lbl_8047D594;
-    *(u32*)lbl_80478C24 = r0;
-L_80168034: ;
+L_8016802C:
+    tmp = (u32)lbl_8047D594;
+    *(u32*)lbl_80478C24 = tmp;
+L_80168034:
     fn_800A7BCC();
     r4 = *(u32*)lbl_80478C24;
-    r0 = 0x0;
+    tmp = 0x0;
     r4 = *(u8*)((u8*)r4 + 0x0);
     *(u8*)((u8*)r3 + 0x0) = r4;
     r4 = *(u32*)lbl_80478C24;
@@ -465,9 +426,9 @@ L_80168034: ;
     r4 = *(u32*)lbl_80478C28;
     r4 = *(u8*)((u8*)r4 + 0x1);
     *(u8*)((u8*)r3 + 0x5) = r4;
-    *(u8*)((u8*)r3 + 0x6) = r0;
-    *(u8*)((u8*)r3 + 0x7) = r0;
-L_8016808C: ;
+    *(u8*)((u8*)r3 + 0x6) = tmp;
+    *(u8*)((u8*)r3 + 0x7) = tmp;
+L_8016808C:
     r3 = 0x1;
     fn_800A82FC();
     r4 = (u32)fn_80167BE8;
@@ -477,10 +438,9 @@ L_8016808C: ;
     r4 = 0x13;
     fn_800FE834();
     r3 = 0x1;
-L_801680B0: ;
+L_801680B0:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80168284 -- _sndCheckSndWorkALL
@@ -492,9 +452,6 @@ L_801680B0: ;
  *   lbl_80273748: "_sndCheckSndWorkALL:Start"
  *   lbl_80273764: "_sndCheckSndWorkALL:End"
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void _sndCheckSndWorkALL(void) {
     extern u8 lbl_804526E0[];
     extern u8 lbl_8047D5A0[];
@@ -516,8 +473,7 @@ void _sndCheckSndWorkALL(void) {
     extern void fn_800DA2BC();
     extern void fn_800DA4C4();
     u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -534,10 +490,10 @@ void _sndCheckSndWorkALL(void) {
 
     r3 = (u32)lbl_804526E0;
     r31 = (u32)lbl_804526E0;
-    r0 = *(u8*)((u8*)r31 + 0x19);
-    if ((u32)r0 == (u32)0x0) goto L_801683EC;
-    r0 = *(u8*)((u8*)r31 + 0x1A);
-    if ((u32)r0 == (u32)0x0) goto L_801683EC;
+    tmp = *(u8*)((u8*)r31 + 0x19);
+    if (tmp == 0) goto L_801683EC;
+    tmp = *(u8*)((u8*)r31 + 0x1A);
+    if (tmp == 0) goto L_801683EC;
     r30 = *(u8*)((u8*)r31 + 0x18);
     r3 = 0x1;
     r29 = *(u32*)((u8*)r31 + 0x0);
@@ -578,14 +534,13 @@ void _sndCheckSndWorkALL(void) {
     fn_800D7820();
     r3 = 0x6;
     fn_800D6A00();
-    r0 = *(u8*)((u8*)r31 + 0x1A);
-    /* clrlslwi r3, r0, 18, 2 */;
+    tmp = *(u8*)((u8*)r31 + 0x1A);
     fn_800D67BC();
     r31 = 0x0;
     goto L_801683D4;
-L_80168370: ;
-    r0 = *(u8*)((u8*)r29 + 0x2);
-    if ((u32)r0 == (u32)0x0) goto L_801683CC;
+L_80168370:
+    tmp = *(u8*)((u8*)r29 + 0x2);
+    if (tmp == 0) goto L_801683CC;
     r3 = 0x0;
     fn_800D5FA4();
     r4 = r31;
@@ -606,22 +561,18 @@ L_80168370: ;
     r4 = r31;
     r3 = 0x0;
     fn_800D5A38();
-L_801683CC: ;
+L_801683CC:
     r31 = r31 + 0x1;
     r29 = r29 + 0x4;
-L_801683D4: ;
-    r0 = r31 & 0xFF;
-    if ((u32)r0 < (u32)r30) goto L_80168370;
+L_801683D4:
+    tmp = r31 & 0xFF;
+    if (tmp < r30) goto L_80168370;
     fn_800D6728();
     r3 = 0x0;
     fn_800D9ED8();
-L_801683EC: ;
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
+L_801683EC:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80168638 -- GSDVD_ErrorCoverOpenMain
@@ -630,9 +581,6 @@ L_801683EC: ;
  * 764 bytes -- manages the recovery sequence when the disc lid
  * is opened during gameplay.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSDVD_ErrorCoverOpenMain(void) {
     extern u8 lbl_804526E0[];
     extern u8 lbl_8047B100[];
@@ -646,8 +594,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
     extern void fn_800FE834();
     extern void fn_80168284();
     u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -664,16 +611,14 @@ void GSDVD_ErrorCoverOpenMain(void) {
 
     r4 = (u32)lbl_804526E0;
     r5 = 0x24;
-    /* stmw r27, 0xc(r1) */;
     r30 = r3;
     r3 = (u32)lbl_804526E0;
     r4 = 0x0;
     memset((void*)r3, (int)r4, (u32)r5);
-    /* clrlslwi r27, r30, 24, 2 */;
     r3 = r27;
     fn_800E3534();
-    r0 = r3 & 0xFFFF;
-    if ((s32)r0 == (s32)0) goto L_80168920;
+    tmp = r3 & 0xFFFF;
+    if ((s32)tmp == 0) goto L_80168920;
     r4 = (u32)lbl_804526E0;
     r28 = (u32)lbl_804526E0;
     *(u16*)((u8*)r28 + 0x1C) = r3;
@@ -686,37 +631,37 @@ void GSDVD_ErrorCoverOpenMain(void) {
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r27;
     fn_800E3534();
-    r0 = r3 & 0xFFFF;
-    if ((s32)r0 != (s32)0) goto L_8016871C;
+    tmp = r3 & 0xFFFF;
+    if ((s32)tmp != 0) goto L_8016871C;
     r28 = *(u16*)((u8*)r28 + 0x1C);
-    if ((u32)r28 == (u32)0x0) goto L_801686C8;
+    if (r28 == 0) goto L_801686C8;
     r3 = r28;
     fn_800E24B0();
     r3 = r28;
     fn_800E209C();
-L_801686C8: ;
+L_801686C8:
     r3 = (u32)lbl_804526E0;
     r3 = (u32)lbl_804526E0;
     r27 = *(u16*)((u8*)r3 + 0x1E);
-    if ((u32)r27 == (u32)0x0) goto L_801686EC;
+    if (r27 == 0) goto L_801686EC;
     r3 = r27;
     fn_800E24B0();
     r3 = r27;
     fn_800E209C();
-L_801686EC: ;
+L_801686EC:
     r3 = (u32)lbl_804526E0;
     r3 = (u32)lbl_804526E0;
     r3 = *(u32*)((u8*)r3 + 0x20);
-    if ((u32)r3 == (u32)0x0) goto L_80168704;
+    if (r3 == 0) goto L_80168704;
     fn_800D75F4();
-L_80168704: ;
+L_80168704:
     r3 = (u32)lbl_804526E0;
     r4 = 0x0;
     r3 = (u32)lbl_804526E0;
     r5 = 0x24;
     memset((void*)r3, (int)r4, (u32)r5);
     goto L_80168920;
-L_8016871C: ;
+L_8016871C:
     r4 = (u32)lbl_804526E0;
     r29 = (u32)lbl_804526E0;
     *(u16*)((u8*)r29 + 0x1E) = r3;
@@ -729,53 +674,53 @@ L_8016871C: ;
     memset((void*)r3, (int)r4, (u32)r5);
     r3 = r27;
     fn_800E3534();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r3 != (u32)0x0) goto L_801687BC;
+    tmp = r3 & 0xFFFF;
+    if (r3 != 0) goto L_801687BC;
     r28 = *(u16*)((u8*)r28 + 0x1C);
-    if ((u32)r28 == (u32)0x0) goto L_80168770;
+    if (r28 == 0) goto L_80168770;
     r3 = r28;
     fn_800E24B0();
     r3 = r28;
     fn_800E209C();
-L_80168770: ;
+L_80168770:
     r27 = *(u16*)((u8*)r29 + 0x1E);
-    if ((u32)r27 == (u32)0x0) goto L_8016878C;
+    if (r27 == 0) goto L_8016878C;
     r3 = r27;
     fn_800E24B0();
     r3 = r27;
     fn_800E209C();
-L_8016878C: ;
+L_8016878C:
     r3 = (u32)lbl_804526E0;
     r3 = (u32)lbl_804526E0;
     r3 = *(u32*)((u8*)r3 + 0x20);
-    if ((u32)r3 == (u32)0x0) goto L_801687A4;
+    if (r3 == 0) goto L_801687A4;
     fn_800D75F4();
-L_801687A4: ;
+L_801687A4:
     r3 = (u32)lbl_804526E0;
     r4 = 0x0;
     r3 = (u32)lbl_804526E0;
     r5 = 0x24;
     memset((void*)r3, (int)r4, (u32)r5);
     goto L_80168920;
-L_801687BC: ;
+L_801687BC:
     r3 = (u32)lbl_804526E0;
     r4 = 0x0;
     r29 = (u32)lbl_804526E0;
     r3 = 0x1e0;
-    r0 = 0x280;
+    tmp = 0x280;
     *(u16*)((u8*)r29 + 0xA) = r4;
     r27 = r29 + 0x8;
     *(u16*)((u8*)r29 + 0x8) = r4;
     *(u16*)((u8*)r29 + 0xC) = r4;
     *(u16*)((u8*)r29 + 0xE) = r3;
-    *(u16*)((u8*)r29 + 0x10) = r0;
+    *(u16*)((u8*)r29 + 0x10) = tmp;
     *(u16*)((u8*)r29 + 0x12) = r3;
-    *(u16*)((u8*)r29 + 0x14) = r0;
+    *(u16*)((u8*)r29 + 0x14) = tmp;
     *(u16*)((u8*)r29 + 0x16) = r4;
     *(u8*)((u8*)r29 + 0x18) = r30;
     fn_800D7894();
     /* mr. r28, r3 */;
-    if ((u32)r3 == (u32)0x0) goto L_8016884C;
+    if (r3 == 0) goto L_8016884C;
     r9 = r27;
     r4 = 0x1;
     r5 = 0x1;
@@ -794,57 +739,56 @@ L_801687BC: ;
     r10 = 0x4;
     fn_800D7868();
     goto L_80168850;
-L_8016884C: ;
+L_8016884C:
     r28 = 0x0;
-L_80168850: ;
+L_80168850:
     r3 = (u32)lbl_804526E0;
-    r0 = r30 & 0xFF;
+    tmp = r30 & 0xFF;
     r3 = (u32)lbl_804526E0;
     r5 = 0x0;
     *(u32*)((u8*)r3 + 0x20) = r28;
     r4 = *(u32*)((u8*)r3 + 0x0);
     goto L_80168878;
-L_8016886C: ;
+L_8016886C:
     *(u8*)((u8*)r4 + 0x0) = r5;
     r5 = r5 + 0x1;
     r4 = r4 + 0x4;
-L_80168878: ;
+L_80168878:
     r3 = r5 & 0xFF;
-    if ((u32)r3 < (u32)r0) goto L_8016886C;
+    if (r3 < tmp) goto L_8016886C;
     r3 = (u32)lbl_804526E0;
     r4 = *(u8*)((u8*)r29 + 0x18);
     r6 = (u32)lbl_804526E0;
-    r0 = *(u8*)((u8*)r6 + 0x19);
-    if ((u32)r0 >= (u32)r4) goto L_80168900;
+    tmp = *(u8*)((u8*)r6 + 0x19);
+    if (tmp >= r4) goto L_80168900;
     r7 = *(u32*)((u8*)r6 + 0x0);
     r3 = 0x0;
     goto L_801688F4;
-L_801688A8: ;
-    r0 = *(u8*)((u8*)r7 + 0x1);
-    if ((u32)r0 != (u32)0x0) goto L_801688EC;
+L_801688A8:
+    tmp = *(u8*)((u8*)r7 + 0x1);
+    if (tmp != 0) goto L_801688EC;
     r5 = *(u32*)((u8*)r31 + 0x4);
-    /* clrlslwi r4, r3, 24, 2 */;
     r3 = 0x0;
-    r0 = 0x1;
+    tmp = 0x1;
     r4 = r5 + r4;
     *(u8*)((u8*)r4 + 0x0) = r3;
     *(u8*)((u8*)r4 + 0x1) = r3;
     *(u8*)((u8*)r4 + 0x2) = r3;
     *(u8*)((u8*)r4 + 0x3) = r3;
-    *(u8*)((u8*)r7 + 0x1) = r0;
+    *(u8*)((u8*)r7 + 0x1) = tmp;
     r3 = *(u8*)((u8*)r6 + 0x19);
-    r0 = r3 + 0x1;
-    *(u8*)((u8*)r6 + 0x19) = r0;
+    tmp = r3 + 0x1;
+    *(u8*)((u8*)r6 + 0x19) = tmp;
     goto L_80168904;
-L_801688EC: ;
+L_801688EC:
     r3 = r3 + 0x1;
     r7 = r7 + 0x4;
-L_801688F4: ;
-    r0 = r3 & 0xFF;
-    if ((u32)r0 < (u32)r4) goto L_801688A8;
-L_80168900: ;
+L_801688F4:
+    tmp = r3 & 0xFF;
+    if (tmp < r4) goto L_801688A8;
+L_80168900:
     r7 = 0x0;
-L_80168904: ;
+L_80168904:
     r3 = (u32)fn_80168284;
     *(u32*)lbl_8047B100 = r7;
     r6 = (u32)fn_80168284;
@@ -852,11 +796,9 @@ L_80168904: ;
     r3 = 0x1;
     r5 = 0x0;
     fn_800FE834();
-L_80168920: ;
-    /* lmw r27, 0xc(r1) */;
+L_80168920:
     return;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_80168934 -- GSDVD_Init
@@ -865,14 +807,10 @@ L_80168920: ;
  * at 816 bytes. Sets up handle table, error callbacks, and
  * initial disc state.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void GSDVD_Init(void) {
     extern u8 lbl_80452708[];
     u8 sp[0xA0];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -889,98 +827,97 @@ void GSDVD_Init(void) {
     u32 ctr = 0;
 
     r6 = (u32)lbl_80452708;
-    /* stmw r26, 0x88(r1) */;
     r31 = (u32)lbl_80452708;
     r30 = r3 << 2;
     r26 = r4;
     r3 = r31 + 0x40;
     r29 = r31 + 0x80;
     r27 = r5;
-    r0 = *(u32*)(r3 + r30);
+    tmp = *(u32*)(r3 + r30);
     r28 = *(u32*)(r29 + r30);
-    if ((s32)r0 != (s32)0x0) goto L_801689BC;
-    if ((u32)r28 != (u32)0x0) goto L_8016898C;
-    r0 = 0x0;
+    if ((s32)tmp != 0) goto L_801689BC;
+    if (r28 != 0) goto L_8016898C;
+    tmp = 0x0;
     r3 = 0x0;
-    *(u32*)((u8*)r26 + 0x0) = r0;
-    *(u32*)((u8*)r27 + 0x0) = r0;
+    *(u32*)((u8*)r26 + 0x0) = tmp;
+    *(u32*)((u8*)r27 + 0x0) = tmp;
     goto L_80168C50;
-L_8016898C: ;
-    r0 = *(u32*)((u8*)r28 + 0x4);
-    r0 = r0 & 0x00000008;
-    if ((u32)r28 == (u32)0x0) goto L_801689A0;
+L_8016898C:
+    tmp = *(u32*)((u8*)r28 + 0x4);
+    tmp = tmp & 0x00000008;
+    if (r28 == 0) goto L_801689A0;
     *(u32*)((u8*)r26 + 0x0) = r28;
     goto L_801689A8;
-L_801689A0: ;
-    r0 = 0x0;
-    *(u32*)((u8*)r26 + 0x0) = r0;
-L_801689A8: ;
+L_801689A0:
+    tmp = 0x0;
+    *(u32*)((u8*)r26 + 0x0) = tmp;
+L_801689A8:
     r4 = r31 + 0x0;
     r3 = r28;
-    r0 = *(u32*)(r4 + r30);
-    *(u32*)((u8*)r27 + 0x0) = r0;
+    tmp = *(u32*)(r4 + r30);
+    *(u32*)((u8*)r27 + 0x0) = tmp;
     goto L_80168C50;
-L_801689BC: ;
-    r0 = 0x0;
-    *(u32*)(r3 + r30) = r0;
-    if ((u32)r28 != (u32)0x0) goto L_801689E4;
+L_801689BC:
+    tmp = 0x0;
+    *(u32*)(r3 + r30) = tmp;
+    if (r28 != 0) goto L_801689E4;
     r4 = r31 + 0x0;
     r3 = 0x0;
-    *(u32*)(r4 + r30) = r0;
-    *(u32*)((u8*)r26 + 0x0) = r0;
-    *(u32*)((u8*)r27 + 0x0) = r0;
+    *(u32*)(r4 + r30) = tmp;
+    *(u32*)((u8*)r26 + 0x0) = tmp;
+    *(u32*)((u8*)r27 + 0x0) = tmp;
     goto L_80168C50;
-L_801689E4: ;
+L_801689E4:
     r3 = r1 + 0x8;
     r4 = 0x0;
     r5 = 0x80;
     memset((void*)r3, (int)r4, (u32)r5);
     r5 = *(u32*)((u8*)r28 + 0x4);
     r4 = r1 + 0x8;
-    r3 = (0xe00 << 16);
-    /* extrwi r0, r5, 1, 28 */;
+    r3 = 0xE000000;
+    /* extrwi tmp, r5, 1, 28 */;
     /* extrwi r6, r5, 3, 4 */;
-    r0 = r0 ^ 0x1;
+    tmp = tmp ^ 0x1;
     r5 = r3 + 0x8;
-    r0 = r0 << 3;
-    r7 = r6 + r0;
-    r0 = r7 << 3;
-    *(u32*)(r4 + r0) = r28;
+    tmp = tmp << 3;
+    r7 = r6 + tmp;
+    tmp = r7 << 3;
+    *(u32*)(r4 + tmp) = r28;
     r6 = *(u32*)((u8*)r28 + 0x0);
     goto L_80168A90;
-L_80168A28: ;
+L_80168A28:
     r3 = *(u32*)((u8*)r28 + 0x4);
-    r0 = *(u32*)((u8*)r6 + 0x4);
-    r0 = r3 ^ r0;
-    /* and. r0, r0, r5 */;
-    if ((u32)r28 == (u32)0x0) goto L_80168A88;
+    tmp = *(u32*)((u8*)r6 + 0x4);
+    tmp = r3 ^ tmp;
+    /* and. tmp, tmp, r5 */;
+    if (r28 == 0) goto L_80168A88;
     r3 = r7 << 3;
     r4 = r1 + 0x8;
-    r0 = r3 + 0x4;
-    *(u32*)(r4 + r0) = r28;
+    tmp = r3 + 0x4;
+    *(u32*)(r4 + tmp) = r28;
     r3 = *(u32*)((u8*)r6 + 0x4);
-    /* extrwi r0, r3, 1, 28 */;
+    /* extrwi tmp, r3, 1, 28 */;
     /* extrwi r3, r3, 3, 4 */;
-    r0 = r0 ^ 0x1;
-    r0 = r0 << 3;
-    r7 = r3 + r0;
-    r0 = r7 << 3;
-    r3 = r4 + r0;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r0 != (u32)0x0) goto L_80168A80;
+    tmp = tmp ^ 0x1;
+    tmp = tmp << 3;
+    r7 = r3 + tmp;
+    tmp = r7 << 3;
+    r3 = r4 + tmp;
+    tmp = *(u32*)((u8*)r3 + 0x0);
+    if (tmp != 0) goto L_80168A80;
     *(u32*)((u8*)r3 + 0x0) = r6;
     goto L_80168A88;
-L_80168A80: ;
+L_80168A80:
     r3 = *(u32*)((u8*)r3 + 0x4);
     *(u32*)((u8*)r3 + 0x0) = r6;
-L_80168A88: ;
+L_80168A88:
     r28 = r6;
     r6 = *(u32*)((u8*)r6 + 0x0);
-L_80168A90: ;
-    if ((u32)r6 != (u32)0x0) goto L_80168A28;
+L_80168A90:
+    if (r6 != 0) goto L_80168A28;
     r4 = r7 << 3;
     r3 = r1 + 0xc;
-    r0 = 0x2;
+    tmp = 0x2;
     *(u32*)(r3 + r4) = r28;
     r3 = r1 + 0x8;
     r7 = 0x0;
@@ -988,121 +925,119 @@ L_80168A90: ;
     r8 = 0x0;
     r6 = 0x0;
     r4 = 0x0;
-    ctr_fn = (void(*)(void))r0;
-L_80168AC4: ;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r0 == (u32)0x0) goto L_80168AE8;
-    if ((u32)r5 != (u32)0x0) goto L_80168AE0;
-    r5 = r0;
+    ctr_fn = (void(*)(void))tmp;
+L_80168AC4:
+    tmp = *(u32*)((u8*)r3 + 0x0);
+    if (tmp == 0) goto L_80168AE8;
+    if (r5 != 0) goto L_80168AE0;
+    r5 = tmp;
     goto L_80168AE4;
-L_80168AE0: ;
-    *(u32*)((u8*)r7 + 0x0) = r0;
-L_80168AE4: ;
+L_80168AE0:
+    *(u32*)((u8*)r7 + 0x0) = tmp;
+L_80168AE4:
     r7 = *(u32*)((u8*)r3 + 0x4);
-L_80168AE8: ;
-    r0 = *(u32*)((u8*)r3 + 0x8);
-    if ((u32)r0 == (u32)0x0) goto L_80168B0C;
-    if ((u32)r5 != (u32)0x0) goto L_80168B04;
-    r5 = r0;
+L_80168AE8:
+    tmp = *(u32*)((u8*)r3 + 0x8);
+    if (tmp == 0) goto L_80168B0C;
+    if (r5 != 0) goto L_80168B04;
+    r5 = tmp;
     goto L_80168B08;
-L_80168B04: ;
-    *(u32*)((u8*)r7 + 0x0) = r0;
-L_80168B08: ;
+L_80168B04:
+    *(u32*)((u8*)r7 + 0x0) = tmp;
+L_80168B08:
     r7 = *(u32*)((u8*)r3 + 0xC);
-L_80168B0C: ;
-    r0 = *(u32*)((u8*)r3 + 0x10);
-    if ((u32)r0 == (u32)0x0) goto L_80168B30;
-    if ((u32)r5 != (u32)0x0) goto L_80168B28;
-    r5 = r0;
+L_80168B0C:
+    tmp = *(u32*)((u8*)r3 + 0x10);
+    if (tmp == 0) goto L_80168B30;
+    if (r5 != 0) goto L_80168B28;
+    r5 = tmp;
     goto L_80168B2C;
-L_80168B28: ;
-    *(u32*)((u8*)r7 + 0x0) = r0;
-L_80168B2C: ;
+L_80168B28:
+    *(u32*)((u8*)r7 + 0x0) = tmp;
+L_80168B2C:
     r7 = *(u32*)((u8*)r3 + 0x14);
-L_80168B30: ;
-    r0 = *(u32*)((u8*)r3 + 0x18);
-    if ((u32)r0 == (u32)0x0) goto L_80168B54;
-    if ((u32)r5 != (u32)0x0) goto L_80168B4C;
-    r5 = r0;
+L_80168B30:
+    tmp = *(u32*)((u8*)r3 + 0x18);
+    if (tmp == 0) goto L_80168B54;
+    if (r5 != 0) goto L_80168B4C;
+    r5 = tmp;
     goto L_80168B50;
-L_80168B4C: ;
-    *(u32*)((u8*)r7 + 0x0) = r0;
-L_80168B50: ;
+L_80168B4C:
+    *(u32*)((u8*)r7 + 0x0) = tmp;
+L_80168B50:
     r7 = *(u32*)((u8*)r3 + 0x1C);
-L_80168B54: ;
+L_80168B54:
     r3 = r3 + 0x20;
     r4 = r4 + 0x3;
     if (--ctr != 0) goto L_80168AC4;
-    r0 = 0x2;
+    tmp = 0x2;
     r3 = r1 + 0x48;
     r4 = 0x8;
-    ctr_fn = (void(*)(void))r0;
-L_80168B70: ;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if ((u32)r0 == (u32)0x0) goto L_80168B94;
-    if ((u32)r6 != (u32)0x0) goto L_80168B8C;
-    r6 = r0;
+    ctr_fn = (void(*)(void))tmp;
+L_80168B70:
+    tmp = *(u32*)((u8*)r3 + 0x0);
+    if (tmp == 0) goto L_80168B94;
+    if (r6 != 0) goto L_80168B8C;
+    r6 = tmp;
     goto L_80168B90;
-L_80168B8C: ;
-    *(u32*)((u8*)r8 + 0x0) = r0;
-L_80168B90: ;
+L_80168B8C:
+    *(u32*)((u8*)r8 + 0x0) = tmp;
+L_80168B90:
     r8 = *(u32*)((u8*)r3 + 0x4);
-L_80168B94: ;
-    r0 = *(u32*)((u8*)r3 + 0x8);
-    if ((u32)r0 == (u32)0x0) goto L_80168BB8;
-    if ((u32)r6 != (u32)0x0) goto L_80168BB0;
-    r6 = r0;
+L_80168B94:
+    tmp = *(u32*)((u8*)r3 + 0x8);
+    if (tmp == 0) goto L_80168BB8;
+    if (r6 != 0) goto L_80168BB0;
+    r6 = tmp;
     goto L_80168BB4;
-L_80168BB0: ;
-    *(u32*)((u8*)r8 + 0x0) = r0;
-L_80168BB4: ;
+L_80168BB0:
+    *(u32*)((u8*)r8 + 0x0) = tmp;
+L_80168BB4:
     r8 = *(u32*)((u8*)r3 + 0xC);
-L_80168BB8: ;
-    r0 = *(u32*)((u8*)r3 + 0x10);
-    if ((u32)r0 == (u32)0x0) goto L_80168BDC;
-    if ((u32)r6 != (u32)0x0) goto L_80168BD4;
-    r6 = r0;
+L_80168BB8:
+    tmp = *(u32*)((u8*)r3 + 0x10);
+    if (tmp == 0) goto L_80168BDC;
+    if (r6 != 0) goto L_80168BD4;
+    r6 = tmp;
     goto L_80168BD8;
-L_80168BD4: ;
-    *(u32*)((u8*)r8 + 0x0) = r0;
-L_80168BD8: ;
+L_80168BD4:
+    *(u32*)((u8*)r8 + 0x0) = tmp;
+L_80168BD8:
     r8 = *(u32*)((u8*)r3 + 0x14);
-L_80168BDC: ;
-    r0 = *(u32*)((u8*)r3 + 0x18);
-    if ((u32)r0 == (u32)0x0) goto L_80168C00;
-    if ((u32)r6 != (u32)0x0) goto L_80168BF8;
-    r6 = r0;
+L_80168BDC:
+    tmp = *(u32*)((u8*)r3 + 0x18);
+    if (tmp == 0) goto L_80168C00;
+    if (r6 != 0) goto L_80168BF8;
+    r6 = tmp;
     goto L_80168BFC;
-L_80168BF8: ;
-    *(u32*)((u8*)r8 + 0x0) = r0;
-L_80168BFC: ;
+L_80168BF8:
+    *(u32*)((u8*)r8 + 0x0) = tmp;
+L_80168BFC:
     r8 = *(u32*)((u8*)r3 + 0x1C);
-L_80168C00: ;
+L_80168C00:
     r3 = r3 + 0x20;
     r4 = r4 + 0x3;
     if (--ctr != 0) goto L_80168B70;
     r3 = 0x0;
-    if ((u32)r7 == (u32)0x0) goto L_80168C20;
+    if (r7 == 0) goto L_80168C20;
     r3 = r5;
     *(u32*)((u8*)r7 + 0x0) = r6;
-L_80168C20: ;
-    if ((u32)r8 == (u32)0x0) goto L_80168C3C;
-    if ((u32)r3 != (u32)0x0) goto L_80168C34;
+L_80168C20:
+    if (r8 == 0) goto L_80168C3C;
+    if (r3 != 0) goto L_80168C34;
     r3 = r6;
-L_80168C34: ;
-    r0 = 0x0;
-    *(u32*)((u8*)r8 + 0x0) = r0;
-L_80168C3C: ;
+L_80168C34:
+    tmp = 0x0;
+    *(u32*)((u8*)r8 + 0x0) = tmp;
+L_80168C3C:
     r4 = r31 + 0x0;
     *(u32*)(r29 + r30) = r3;
     *(u32*)(r4 + r30) = r6;
     *(u32*)((u8*)r26 + 0x0) = r5;
     *(u32*)((u8*)r27 + 0x0) = r6;
-L_80168C50: ;
-    /* lmw r26, 0x88(r1) */;
+L_80168C50:
     return;
 }
-#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions

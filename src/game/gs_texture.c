@@ -899,14 +899,11 @@ GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
  * =================================================================== */
 
 /* fn_800F0384 - 0x800F0384 | size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800F0384(void) {
     extern u8 lbl_8047AC0C[];
     extern u8 lbl_8047AC28[];
     extern u8 lbl_8047AC30[];
-    u32 r0 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -918,33 +915,29 @@ void fn_800F0384(void) {
     r6 = 0x0;
     r4 = r5;
     goto L_800F03BC;
-L_800F039C: ;
-    r0 = *(u32*)lbl_8047AC28;
-    r7 = r0 + r5;
-    r0 = *(u32*)((u8*)r7 + 0xC);
-    if ((u32)r0 != (u32)r3) goto L_800F03B4;
+L_800F039C:
+    tmp = *(u32*)lbl_8047AC28;
+    r7 = tmp + r5;
+    tmp = *(u32*)((u8*)r7 + 0xC);
+    if (tmp != r3) goto L_800F03B4;
     *(u8*)((u8*)r7 + 0xA) = r4;
-L_800F03B4: ;
+L_800F03B4:
     r5 = r5 + 0x24;
     r6 = r6 + 0x1;
-L_800F03BC: ;
-    r0 = *(u32*)lbl_8047AC30;
-    if ((u32)r6 < (u32)r0) goto L_800F039C;
-    r0 = 0x1;
-    *(u8*)lbl_8047AC0C = r0;
+L_800F03BC:
+    tmp = *(u32*)lbl_8047AC30;
+    if (r6 < tmp) goto L_800F039C;
+    tmp = 0x1;
+    *(u8*)lbl_8047AC0C = tmp;
     return;
 }
-#pragma pop
 
 /* fn_800F03D4 - 0x800F03D4 | size: 0x50 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800F03D4(void) {
     extern u8 lbl_8047AC0C[];
     extern u8 lbl_8047AC28[];
     extern u8 lbl_8047AC30[];
-    u32 r0 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -956,23 +949,22 @@ void fn_800F03D4(void) {
     r5 = 0x0;
     r4 = 0x1;
     goto L_800F040C;
-L_800F03EC: ;
-    r0 = *(u32*)lbl_8047AC28;
-    r7 = r0 + r5;
-    r0 = *(u32*)((u8*)r7 + 0xC);
-    if ((u32)r0 != (u32)r3) goto L_800F0404;
+L_800F03EC:
+    tmp = *(u32*)lbl_8047AC28;
+    r7 = tmp + r5;
+    tmp = *(u32*)((u8*)r7 + 0xC);
+    if (tmp != r3) goto L_800F0404;
     *(u8*)((u8*)r7 + 0xA) = r4;
-L_800F0404: ;
+L_800F0404:
     r5 = r5 + 0x24;
     r6 = r6 + 0x1;
-L_800F040C: ;
-    r0 = *(u32*)lbl_8047AC30;
-    if ((u32)r6 < (u32)r0) goto L_800F03EC;
-    r0 = 0x1;
-    *(u8*)lbl_8047AC0C = r0;
+L_800F040C:
+    tmp = *(u32*)lbl_8047AC30;
+    if (r6 < tmp) goto L_800F03EC;
+    tmp = 0x1;
+    *(u8*)lbl_8047AC0C = tmp;
     return;
 }
-#pragma pop
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions

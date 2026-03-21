@@ -366,58 +366,36 @@ asm void TRKInterruptHandlerEnableInterrupts(void) {
 /* ========================================================== */
 
 /* fn_800C11F4 - 0x800C11F4 | size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C11F4(void) {
     u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     f32 f31 = 0.0f;
 
-    *(f64*)(sp + 0x10) = f31;
-    /* psq_st f31, 0x20(r1), 0, qr0 */;
     /* mffs f31 */;
     *(f64*)((u8*)r3 + 0x0) = f31;
-    /* psq_l f31, 0x20(r1), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800C1218 - 0x800C1218 | size: 0x24 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C1218(void) {
     u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     f32 f31 = 0.0f;
 
-    *(f64*)(sp + 0x10) = f31;
-    /* psq_st f31, 0x20(r1), 0, qr0 */;
     f31 = *(f64*)((u8*)r3 + 0x0);
     /* mtfsf 255, f31 */;
-    /* psq_l f31, 0x20(r1), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x10);
     return;
 }
-#pragma pop
 
 /* fn_800C123C - 0x800C123C | size: 0xC4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800C123C(void) {
     extern u8 gTRKExceptionStatus_80313824[];
     extern void fn_800C2EAC();
     extern void fn_800C3098();
     u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -430,7 +408,7 @@ void fn_800C123C(void) {
     u32 r31 = 0;
 
     r7 = (u32)gTRKExceptionStatus_80313824;
-    r0 = 0x0;
+    tmp = 0x0;
     r31 = (u32)gTRKExceptionStatus_80313824;
     r30 = 0x0;
     r29 = r5;
@@ -438,34 +416,26 @@ void fn_800C123C(void) {
     r9 = *(u32*)((u8*)r31 + 0x0);
     r8 = *(u32*)((u8*)r31 + 0x4);
     r7 = *(u32*)((u8*)r31 + 0x8);
-    *(u8*)((u8*)r31 + 0xD) = r0;
-    if ((s32)r6 == (s32)0x0) goto L_800C129C;
+    *(u8*)((u8*)r31 + 0xD) = tmp;
+    if ((s32)r6 == 0) goto L_800C129C;
     fn_800C3098();
     goto L_800C12A0;
-L_800C129C: ;
+L_800C129C:
     fn_800C2EAC();
-L_800C12A0: ;
-    r0 = *(u8*)((u8*)r31 + 0xD);
-    if ((u32)r0 == (u32)0x0) goto L_800C12B8;
-    r0 = 0x0;
+L_800C12A0:
+    tmp = *(u8*)((u8*)r31 + 0xD);
+    if (tmp == 0) goto L_800C12B8;
+    tmp = 0x0;
     r30 = 0x702;
-    *(u32*)((u8*)r29 + 0x0) = r0;
-L_800C12B8: ;
+    *(u32*)((u8*)r29 + 0x0) = tmp;
+L_800C12B8:
     r3 = (u32)gTRKExceptionStatus_80313824;
-    r6 = *(u32*)(sp + 0x8);
     r7 = (u32)gTRKExceptionStatus_80313824;
-    r5 = *(u32*)(sp + 0xC);
-    r4 = *(u32*)(sp + 0x10);
     r3 = r30;
-    r0 = *(u32*)(sp + 0x14);
     *(u32*)((u8*)r7 + 0x0) = r6;
     *(u32*)((u8*)r7 + 0x4) = r5;
     *(u32*)((u8*)r7 + 0x8) = r4;
-    *(u32*)((u8*)r7 + 0xC) = r0;
-    r31 = *(u32*)(sp + 0x2C);
-    r30 = *(u32*)(sp + 0x28);
-    r29 = *(u32*)(sp + 0x24);
+    *(u32*)((u8*)r7 + 0xC) = tmp;
     return;
 }
-#pragma pop
 

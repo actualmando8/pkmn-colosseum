@@ -446,70 +446,56 @@ void __OSContextInit(void) {
  * =================================================================== */
 
 /* fn_8009BBC4 - 0x8009BBC4 | size: 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009BBC4(void) {
     u32 r3 = 0;
 
-    r3 = (0x8000 << 16);
+    r3 = 0x80000000;
     r3 = *(u32*)((u8*)r3 + 0xD4);
     return;
 }
-#pragma pop
 
 /* fn_8009BBD0 - 0x8009BBD0 | size: 0x80 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009BBD0(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r2 = 0;
     u32 r3 = 0;
     u32 r13 = 0;
 
-    /* stmw r13, 0x34(r3) */;
-    r0 = 0; /* mfspr GQR1 */;
-    *(u32*)((u8*)r3 + 0x1A8) = r0;
-    r0 = 0; /* mfspr GQR2 */;
-    *(u32*)((u8*)r3 + 0x1AC) = r0;
-    r0 = 0; /* mfspr GQR3 */;
-    *(u32*)((u8*)r3 + 0x1B0) = r0;
-    r0 = 0; /* mfspr GQR4 */;
-    *(u32*)((u8*)r3 + 0x1B4) = r0;
-    r0 = 0; /* mfspr GQR5 */;
-    *(u32*)((u8*)r3 + 0x1B8) = r0;
-    r0 = 0; /* mfspr GQR6 */;
-    *(u32*)((u8*)r3 + 0x1BC) = r0;
-    r0 = 0; /* mfspr GQR7 */;
-    *(u32*)((u8*)r3 + 0x1C0) = r0;
-    r0 = 0; /* mfcr */;
-    *(u32*)((u8*)r3 + 0x80) = r0;
-    *(u32*)((u8*)r3 + 0x84) = r0;
-    *(u32*)((u8*)r3 + 0x198) = r0;
-    r0 = 0; /* mfmsr */;
-    *(u32*)((u8*)r3 + 0x19C) = r0;
-    r0 = 0; /* mfctr */;
-    *(u32*)((u8*)r3 + 0x88) = r0;
-    /* mfxer r0 */;
-    *(u32*)((u8*)r3 + 0x8C) = r0;
+    tmp = 0; /* mfspr GQR1 */;
+    *(u32*)((u8*)r3 + 0x1A8) = tmp;
+    tmp = 0; /* mfspr GQR2 */;
+    *(u32*)((u8*)r3 + 0x1AC) = tmp;
+    tmp = 0; /* mfspr GQR3 */;
+    *(u32*)((u8*)r3 + 0x1B0) = tmp;
+    tmp = 0; /* mfspr GQR4 */;
+    *(u32*)((u8*)r3 + 0x1B4) = tmp;
+    tmp = 0; /* mfspr GQR5 */;
+    *(u32*)((u8*)r3 + 0x1B8) = tmp;
+    tmp = 0; /* mfspr GQR6 */;
+    *(u32*)((u8*)r3 + 0x1BC) = tmp;
+    tmp = 0; /* mfspr GQR7 */;
+    *(u32*)((u8*)r3 + 0x1C0) = tmp;
+    tmp = 0; /* mfcr */;
+    *(u32*)((u8*)r3 + 0x80) = tmp;
+    *(u32*)((u8*)r3 + 0x84) = tmp;
+    *(u32*)((u8*)r3 + 0x198) = tmp;
+    tmp = 0; /* mfmsr */;
+    *(u32*)((u8*)r3 + 0x19C) = tmp;
+    tmp = 0; /* mfctr */;
+    *(u32*)((u8*)r3 + 0x88) = tmp;
+    /* mfxer tmp */;
+    *(u32*)((u8*)r3 + 0x8C) = tmp;
     *(u32*)((u8*)r3 + 0x4) = r1;
     *(u32*)((u8*)r3 + 0x8) = r2;
-    r0 = 0x1;
-    *(u32*)((u8*)r3 + 0xC) = r0;
+    tmp = 0x1;
+    *(u32*)((u8*)r3 + 0xC) = tmp;
     r3 = 0x0;
     return;
 }
-#pragma pop
 
 /* fn_8009BD30 - 0x8009BD30 | size: 0x30 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009BD30(void) {
-    u32 r0 = 0;
-    u32 r1 = 0;
+    u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
     u32 r5 = 0;
@@ -517,21 +503,17 @@ void fn_8009BD30(void) {
     r5 = r1;
     r4 += -8; *(u32*)r4 = r5;
     r1 = r4;
-    *(u32*)((u8*)r5 + 0x4) = r0;
+    *(u32*)((u8*)r5 + 0x4) = tmp;
     /* blrl  */;
     r5 = *(u32*)((u8*)r1 + 0x0);
-    r0 = *(u32*)((u8*)r5 + 0x4);
+    tmp = *(u32*)((u8*)r5 + 0x4);
     r1 = r5;
     return;
 }
-#pragma pop
 
 /* fn_8009BD84 - 0x8009BD84 | size: 0xBC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009BD84(void) {
-    u32 r0 = 0;
+    u32 tmp = 0;
     u32 r2 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -544,48 +526,47 @@ void fn_8009BD84(void) {
     r11 = 0x0;
     r11 = r11 | 0x9032;
     *(u32*)((u8*)r3 + 0x19C) = r11;
-    r0 = 0x0;
-    *(u32*)((u8*)r3 + 0x80) = r0;
-    *(u32*)((u8*)r3 + 0x8C) = r0;
+    tmp = 0x0;
+    *(u32*)((u8*)r3 + 0x80) = tmp;
+    *(u32*)((u8*)r3 + 0x8C) = tmp;
     *(u32*)((u8*)r3 + 0x8) = r2;
     *(u32*)((u8*)r3 + 0x34) = r13;
-    *(u32*)((u8*)r3 + 0xC) = r0;
-    *(u32*)((u8*)r3 + 0x10) = r0;
-    *(u32*)((u8*)r3 + 0x14) = r0;
-    *(u32*)((u8*)r3 + 0x18) = r0;
-    *(u32*)((u8*)r3 + 0x1C) = r0;
-    *(u32*)((u8*)r3 + 0x20) = r0;
-    *(u32*)((u8*)r3 + 0x24) = r0;
-    *(u32*)((u8*)r3 + 0x28) = r0;
-    *(u32*)((u8*)r3 + 0x2C) = r0;
-    *(u32*)((u8*)r3 + 0x30) = r0;
-    *(u32*)((u8*)r3 + 0x38) = r0;
-    *(u32*)((u8*)r3 + 0x3C) = r0;
-    *(u32*)((u8*)r3 + 0x40) = r0;
-    *(u32*)((u8*)r3 + 0x44) = r0;
-    *(u32*)((u8*)r3 + 0x48) = r0;
-    *(u32*)((u8*)r3 + 0x4C) = r0;
-    *(u32*)((u8*)r3 + 0x50) = r0;
-    *(u32*)((u8*)r3 + 0x54) = r0;
-    *(u32*)((u8*)r3 + 0x58) = r0;
-    *(u32*)((u8*)r3 + 0x5C) = r0;
-    *(u32*)((u8*)r3 + 0x60) = r0;
-    *(u32*)((u8*)r3 + 0x64) = r0;
-    *(u32*)((u8*)r3 + 0x68) = r0;
-    *(u32*)((u8*)r3 + 0x6C) = r0;
-    *(u32*)((u8*)r3 + 0x70) = r0;
-    *(u32*)((u8*)r3 + 0x74) = r0;
-    *(u32*)((u8*)r3 + 0x78) = r0;
-    *(u32*)((u8*)r3 + 0x7C) = r0;
-    *(u32*)((u8*)r3 + 0x1A4) = r0;
-    *(u32*)((u8*)r3 + 0x1A8) = r0;
-    *(u32*)((u8*)r3 + 0x1AC) = r0;
-    *(u32*)((u8*)r3 + 0x1B0) = r0;
-    *(u32*)((u8*)r3 + 0x1B4) = r0;
-    *(u32*)((u8*)r3 + 0x1B8) = r0;
-    *(u32*)((u8*)r3 + 0x1BC) = r0;
-    *(u32*)((u8*)r3 + 0x1C0) = r0;
+    *(u32*)((u8*)r3 + 0xC) = tmp;
+    *(u32*)((u8*)r3 + 0x10) = tmp;
+    *(u32*)((u8*)r3 + 0x14) = tmp;
+    *(u32*)((u8*)r3 + 0x18) = tmp;
+    *(u32*)((u8*)r3 + 0x1C) = tmp;
+    *(u32*)((u8*)r3 + 0x20) = tmp;
+    *(u32*)((u8*)r3 + 0x24) = tmp;
+    *(u32*)((u8*)r3 + 0x28) = tmp;
+    *(u32*)((u8*)r3 + 0x2C) = tmp;
+    *(u32*)((u8*)r3 + 0x30) = tmp;
+    *(u32*)((u8*)r3 + 0x38) = tmp;
+    *(u32*)((u8*)r3 + 0x3C) = tmp;
+    *(u32*)((u8*)r3 + 0x40) = tmp;
+    *(u32*)((u8*)r3 + 0x44) = tmp;
+    *(u32*)((u8*)r3 + 0x48) = tmp;
+    *(u32*)((u8*)r3 + 0x4C) = tmp;
+    *(u32*)((u8*)r3 + 0x50) = tmp;
+    *(u32*)((u8*)r3 + 0x54) = tmp;
+    *(u32*)((u8*)r3 + 0x58) = tmp;
+    *(u32*)((u8*)r3 + 0x5C) = tmp;
+    *(u32*)((u8*)r3 + 0x60) = tmp;
+    *(u32*)((u8*)r3 + 0x64) = tmp;
+    *(u32*)((u8*)r3 + 0x68) = tmp;
+    *(u32*)((u8*)r3 + 0x6C) = tmp;
+    *(u32*)((u8*)r3 + 0x70) = tmp;
+    *(u32*)((u8*)r3 + 0x74) = tmp;
+    *(u32*)((u8*)r3 + 0x78) = tmp;
+    *(u32*)((u8*)r3 + 0x7C) = tmp;
+    *(u32*)((u8*)r3 + 0x1A4) = tmp;
+    *(u32*)((u8*)r3 + 0x1A8) = tmp;
+    *(u32*)((u8*)r3 + 0x1AC) = tmp;
+    *(u32*)((u8*)r3 + 0x1B0) = tmp;
+    *(u32*)((u8*)r3 + 0x1B4) = tmp;
+    *(u32*)((u8*)r3 + 0x1B8) = tmp;
+    *(u32*)((u8*)r3 + 0x1BC) = tmp;
+    *(u32*)((u8*)r3 + 0x1C0) = tmp;
     /* b OSClearContext */;
 }
-#pragma pop
 

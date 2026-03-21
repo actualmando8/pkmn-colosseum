@@ -182,11 +182,7 @@ asm void OSDefaultExceptionHandler(register __OSException exception, register OS
  * =================================================================== */
 
 /* fn_8009A0C0 - 0x8009A0C0 | size: 0x4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8009A0C0(void) {
     /* bla 0x60 */;
 }
-#pragma pop
 
