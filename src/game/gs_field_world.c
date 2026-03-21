@@ -7738,9 +7738,9 @@ L_801174AC: ;
 /* 0x801174C4 | 0x28 */
 u8 fn_801174C4(void) {
     u8 result = 0;
-    if (lbl_8047AD68 == 0) { return result; }
-    if (lbl_8047AD6C == 0) { return result; }
-    result = 1;
+    if (lbl_8047AD68 != 0 && lbl_8047AD6C != 0) {
+        result = 1;
+    }
     return result;
 }
 
