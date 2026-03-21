@@ -63,61 +63,49 @@ u32 fn_800BF080(void) { return 0; }
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800BEF44 - 0x800BEF44 | size: 0xC8 */
-void fn_800BEF44(void) {
+/* fn_800BEF44 - 0x800BEF44 | size: 0xC8
+ * TRKAcquireBuffer - Find and acquire a free buffer from the pool.
+ * Iterates through the 3 buffer slots, locks each mutex, checks
+ * if the buffer is unused, and claims it. Stores the buffer index
+ * in *indexOut and the buffer pointer in *bufOut.
+ * Returns 0 on success, 0x300 if no buffer available.
+ */
+u32 fn_800BEF44(s32* indexOut, u8** bufOut) {
     extern u8 lbl_8026F668[];
-    extern void fn_800BF33C();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_800BF33C(const char* msg);
+    s32 i;
+    u32 result;
+    u8* buf;
 
-    tmp = 0x0;
-    r28 = r4;
-    r27 = r3;
-    r30 = 0x300;
-    r29 = 0x0;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-    goto L_800BEFD8;
-L_800BEF70:
-    r31 = 0x0;
-    if ((s32)r29 < 0) goto L_800BEF94;
-    if ((s32)r29 >= 3) goto L_800BEF94;
-    r4 = r29 * 0x890;
-    r3 = (u32)&lbl_803FCE08;
-    tmp = (u32)&lbl_803FCE08;
-    r31 = tmp + r4;
-L_800BEF94:
-    r3 = r31;
-    ((void(*)(void))fn_800C0CC8)();
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)tmp != 0) goto L_800BEFCC;
-    r3 = 0x0;
-    tmp = 0x1;
-    *(u32*)((u8*)r31 + 0x8) = r3;
-    r30 = 0x0;
-    *(u32*)((u8*)r31 + 0xC) = r3;
-    *(u32*)((u8*)r31 + 0x4) = tmp;
-    *(u32*)((u8*)r28 + 0x0) = r31;
-    *(u32*)((u8*)r27 + 0x0) = r29;
-    r29 = 0x3;
-L_800BEFCC:
-    r3 = r31;
-    ((void(*)(void))fn_800C0CC0)();
-    r29 = r29 + 0x1;
-L_800BEFD8:
-    if ((s32)r29 < 3) goto L_800BEF70;
-    if ((s32)r30 != 0x300) goto L_800BEFF4;
-    r3 = (u32)lbl_8026F668;
-    r3 = (u32)lbl_8026F668;
-    fn_800BF33C();
-L_800BEFF4:
-    r3 = r30;
-    return;
+    result = 0x300;
+    *bufOut = NULL;
+
+    for (i = 0; i < 3; i++) {
+        buf = NULL;
+        if (i >= 0 && i < 3) {
+            buf = lbl_803FCE08 + i * 0x890;
+        }
+        fn_800C0CC8((void*)buf); /* lock mutex */
+
+        if (*(s32*)(buf + 0x4) == 0) {
+            /* Buffer is free - claim it */
+            *(u32*)(buf + 0x8) = 0;
+            *(u32*)(buf + 0xC) = 0;
+            *(u32*)(buf + 0x4) = 1;
+            *bufOut = buf;
+            *indexOut = i;
+            result = 0;
+            fn_800C0CC0((void*)buf); /* unlock mutex */
+            i = 3; /* break out of loop */
+            continue;
+        }
+        fn_800C0CC0((void*)buf); /* unlock mutex */
+    }
+
+    if (result == 0x300) {
+        fn_800BF33C((const char*)lbl_8026F668);
+    }
+
+    return result;
 }
 

@@ -248,61 +248,46 @@ void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context) {
  * 2 function(s)
  * =================================================================== */
 
-/* fn_8009FEBC - 0x8009FEBC | size: 0x94 */
-void fn_8009FEBC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r12 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_8009FEBC - 0x8009FEBC | size: 0x94
+ * CallResetFunctions variant - walks the reset function queue, calling
+ * each function. Stops early if any function fails. Returns 1 on
+ * success, 0 if any function (or SyncSram) failed.
+ */
+s32 fn_8009FEBC(s32 final) {
+    OSResetFunctionInfo* info;
+    s32 err;
 
-    r30 = 0x0;
-    r29 = r3 + 0x0;
-    r31 = *(u32*)ResetFunctionQueue_8047A738;
-    goto L_8009FF04;
-L_8009FEE4:
-    r12 = *(u32*)((u8*)r31 + 0x0);
-    r3 = r29 + 0x0;
-    /* blrl  */;
-    tmp = __cntlzw(r3);
-    r31 = *(u32*)((u8*)r31 + 0x8);
-    tmp = (u32)tmp >> 5;
-    r30 = r30 | tmp;
-L_8009FF04:
-    if (r31 == 0) goto L_8009FF14;
-    if ((s32)r30 == 0) goto L_8009FEE4;
-L_8009FF14:
-    __OSSyncSram();
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    /* or. r30, r30, tmp */;
-    if ((s32)r30 == 0) goto L_8009FF30;
-    r3 = 0x0;
-    goto L_8009FF34;
-L_8009FF30:
-    r3 = 0x1;
-L_8009FF34:
-    return;
+    err = 0;
+    info = (OSResetFunctionInfo*)(*(u32*)&ResetFunctionQueue_8047A738);
+
+    while (info != NULL && err == 0) {
+        s32 (*func)(s32) = (s32 (*)(s32))(*(u32*)((u8*)info + 0x0));
+        if (!func(final)) {
+            err = 1;
+        }
+        info = (OSResetFunctionInfo*)(*(u32*)((u8*)info + 0x8));
+    }
+
+    if (!__OSSyncSram()) {
+        err = 1;
+    }
+
+    if (err != 0) {
+        return 0;
+    }
+    return 1;
 }
 
-/* fn_8009FFC0 - 0x8009FFC0 | size: 0x48 */
-void fn_8009FFC0(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+/* fn_8009FFC0 - 0x8009FFC0 | size: 0x48
+ * __OSDoHotReset variant - disables interrupts, blanks video,
+ * flushes instruction cache, and triggers hardware reset.
+ */
+void fn_8009FFC0(u32 resetCode) {
+    volatile u16* viRegs = (volatile u16*)0xCC002000;
 
-    r31 = r3;
     OSDisableInterrupts();
-    r3 = 0xCC000000;
-    r3 = r3 + 0x2000;
-    tmp = 0x0;
-    *(u16*)((u8*)r3 + 0x2) = tmp;
+    viRegs[1] = 0;
     ICFlashInvalidate();
-    r3 = r31 << 3;
-    Reset(r3);
-    return;
+    Reset(resetCode << 3);
 }
 

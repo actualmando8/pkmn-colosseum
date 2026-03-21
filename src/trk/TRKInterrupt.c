@@ -389,53 +389,53 @@ void fn_800C1218(void) {
     return;
 }
 
-/* fn_800C123C - 0x800C123C | size: 0xC4 */
-void fn_800C123C(void) {
+/* fn_800C123C - 0x800C123C | size: 0xC4
+ * TRKDispatchMessage - Dispatch a TRK command.
+ * Saves/restores exception status, calls the appropriate handler
+ * based on whether the target is running, and checks for exceptions
+ * that occurred during handling.
+ */
+u32 fn_800C123C(u32 cmd, u32 arg1, u32* resultOut) {
     extern u8 gTRKExceptionStatus_80313824[];
-    extern void fn_800C2EAC();
-    extern void fn_800C3098();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_800C2EAC(void);
+    extern void fn_800C3098(void);
+    u8* status = gTRKExceptionStatus_80313824;
+    u32 result;
+    u32 savedPC;
+    u32 savedField4;
+    u32 savedField8;
+    u32 savedInExc;
 
-    r7 = (u32)gTRKExceptionStatus_80313824;
-    tmp = 0x0;
-    r31 = (u32)gTRKExceptionStatus_80313824;
-    r30 = 0x0;
-    r29 = r5;
-    r6 = *(u32*)((u8*)r31 + 0xC);
-    r9 = *(u32*)((u8*)r31 + 0x0);
-    r8 = *(u32*)((u8*)r31 + 0x4);
-    r7 = *(u32*)((u8*)r31 + 0x8);
-    *(u8*)((u8*)r31 + 0xD) = tmp;
-    if ((s32)r6 == 0) goto L_800C129C;
-    fn_800C3098();
-    goto L_800C12A0;
-L_800C129C:
-    fn_800C2EAC();
-L_800C12A0:
-    tmp = *(u8*)((u8*)r31 + 0xD);
-    if (tmp == 0) goto L_800C12B8;
-    tmp = 0x0;
-    r30 = 0x702;
-    *(u32*)((u8*)r29 + 0x0) = tmp;
-L_800C12B8:
-    r3 = (u32)gTRKExceptionStatus_80313824;
-    r7 = (u32)gTRKExceptionStatus_80313824;
-    r3 = r30;
-    *(u32*)((u8*)r7 + 0x0) = r6;
-    *(u32*)((u8*)r7 + 0x4) = r5;
-    *(u32*)((u8*)r7 + 0x8) = r4;
-    *(u32*)((u8*)r7 + 0xC) = tmp;
-    return;
+    result = 0;
+
+    /* Save exception status fields */
+    savedInExc = *(u32*)(status + 0xC);
+    savedPC    = *(u32*)(status + 0x0);
+    savedField4 = *(u32*)(status + 0x4);
+    savedField8 = *(u32*)(status + 0x8);
+
+    /* Clear exceptionOccurred flag */
+    *(u8*)(status + 0xD) = 0;
+
+    /* Dispatch based on whether already in exception */
+    if (savedInExc != 0) {
+        fn_800C3098();
+    } else {
+        fn_800C2EAC();
+    }
+
+    /* Check if an exception occurred during dispatch */
+    if (*(u8*)(status + 0xD) != 0) {
+        result = 0x702;
+        *resultOut = 0;
+    }
+
+    /* Restore exception status */
+    *(u32*)(status + 0x0) = savedInExc;
+    *(u32*)(status + 0x4) = arg1;
+    *(u32*)(status + 0x8) = cmd;
+    *(u32*)(status + 0xC) = *(u8*)(status + 0xD);
+
+    return result;
 }
 

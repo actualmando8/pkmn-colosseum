@@ -68,104 +68,65 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800A064C - 0x800A064C | size: 0x60 */
+/* fn_800A064C - 0x800A064C | size: 0x60
+ * Reads data into a buffer structure at Scb_803FB840.
+ * Calls fn_800A06AC to fill remaining space at offset 0x40,
+ * then updates the length field.
+ */
 void fn_800A064C(void) {
-    extern void fn_800A06AC();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern u32 fn_800A06AC(u8* dst, u32 addr, u32 len);
+    u8* base = (u8*)(u32)Scb_803FB840;
+    u32 offset;
+    u32 result;
 
-    r3 = (u32)Scb_803FB840;
-    r31 = (u32)Scb_803FB840;
-    r30 = r31 + 0x40;
-    r4 = *(u32*)((u8*)r31 + 0x40);
-    r3 = r31 + r4;
-    r5 = 0x40 - r4;
-    fn_800A06AC();
-    *(u32*)((u8*)r31 + 0x4C) = r3;
-    tmp = *(u32*)((u8*)r31 + 0x4C);
-    if ((s32)tmp == 0) goto L_800A0694;
-    tmp = 0x40;
-    *(u32*)((u8*)r30 + 0x0) = tmp;
-L_800A0694:
-    return;
+    offset = *(u32*)(base + 0x40);
+    result = fn_800A06AC(base + offset, offset, 0x40 - offset);
+    *(u32*)(base + 0x4C) = result;
+
+    if (*(s32*)(base + 0x4C) != 0) {
+        *(u32*)(base + 0x40) = 0x40;
+    }
 }
 
-/* fn_800A06AC - 0x800A06AC | size: 0x118 */
-void fn_800A06AC(void) {
-    u8 sp[0x20];
-    extern void fn_80098368();
-    extern void fn_800A064C();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_800A06AC - 0x800A06AC | size: 0x118
+ * EXI read helper - reads data from an EXI device (SRAM/RTC).
+ * Locks EXI channel 0, selects device 1, sends an address command,
+ * reads data, and returns success/failure.
+ */
+u32 fn_800A06AC(u8* dst, u32 addr, u32 len) {
+    extern BOOL fn_80098368(s32 chan, u8* buf, u32 len, s32 mode);
+    u8 cmdBuf[0x20];
+    u32 err;
+    u32 cmdAddr;
 
-    r6 = (u32)fn_800A064C;
-    tmp = (u32)fn_800A064C;
-    r31 = r4 + 0x0;
-    r4 = 0x1;
-    r30 = r5 + 0x0;
-    r5 = tmp;
-    r29 = r3 + 0x0;
-    r3 = 0x0;
-    EXILock();
-    if ((s32)r3 != 0) goto L_800A06F8;
-    r3 = 0x0;
-    goto L_800A07A8;
-L_800A06F8:
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x3;
-    EXISelect();
-    if ((s32)r3 != 0) goto L_800A0720;
-    r3 = 0x0;
-    EXIUnlock();
-    r3 = 0x0;
-    goto L_800A07A8;
-L_800A0720:
-    r31 = r31 << 6;
-    tmp = r31 + 0x100;
-    tmp = tmp | (0xa000 << 16);
-    r4 = (u32)sp + 0x14;
-    r3 = 0x0;
-    r5 = 0x4;
-    r6 = 0x1;
-    r7 = 0x0;
-    EXIImm();
-    tmp = __cntlzw(r3);
-    r31 = (u32)tmp >> 5;
-    r3 = 0x0;
-    EXISync();
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r4 = r29 + 0x0;
-    r5 = r30 + 0x0;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    r6 = 0x1;
-    fn_80098368();
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    EXIDeselect();
-    tmp = __cntlzw(r3);
-    tmp = (u32)tmp >> 5;
-    r31 = r31 | tmp;
-    r3 = 0x0;
-    EXIUnlock();
-    tmp = __cntlzw(r31);
-    r3 = (u32)tmp >> 5;
-L_800A07A8:
-    return;
+    if (!EXILock(0, 1, (void*)fn_800A064C)) {
+        return 0;
+    }
+
+    if (!EXISelect(0, 1, 3)) {
+        EXIUnlock(0);
+        return 0;
+    }
+
+    /* Build the read command address */
+    cmdAddr = ((addr << 6) + 0x100) | 0xA0000000;
+    *(u32*)(cmdBuf + 0x14) = cmdAddr;
+
+    err = 0;
+    if (!EXIImm(0, cmdBuf + 0x14, 4, 1, NULL)) {
+        err = 1;
+    }
+    if (!EXISync(0)) {
+        err = 1;
+    }
+    if (!fn_80098368(0, dst, len, 1)) {
+        err = 1;
+    }
+    if (!EXIDeselect(0)) {
+        err = 1;
+    }
+    EXIUnlock(0);
+
+    return err ? 0 : 1;
 }
 

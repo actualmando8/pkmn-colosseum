@@ -297,30 +297,28 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800A7F80 - 0x800A7F80 | size: 0x60 */
-void fn_800A7F80(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+/* fn_800A7F80 - 0x800A7F80 | size: 0x60
+ * Unlink a node from a doubly-linked list with interrupt protection.
+ * node+0x00 = next, node+0x04 = prev.
+ * Returns 1 if successfully unlinked, 0 if either link is NULL.
+ */
+u32 fn_800A7F80(u8* node) {
+    BOOL enabled;
+    u32 prev;
+    u32 next;
 
-    r31 = r3;
-    OSDisableInterrupts();
-    r4 = *(u32*)((u8*)r31 + 0x4);
-    r5 = *(u32*)((u8*)r31 + 0x0);
-    if (r4 == 0) goto L_800A7FB0;
-    if (r5 != 0) goto L_800A7FBC;
-L_800A7FB0:
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_800A7FCC;
-L_800A7FBC:
-    *(u32*)((u8*)r4 + 0x0) = r5;
-    *(u32*)((u8*)r5 + 0x4) = r4;
-    OSRestoreInterrupts(r3);
-    r3 = 0x1;
-L_800A7FCC:
-    return;
+    enabled = OSDisableInterrupts();
+    prev = *(u32*)(node + 0x4);
+    next = *(u32*)(node + 0x0);
+
+    if (prev == 0 || next == 0) {
+        OSRestoreInterrupts(enabled);
+        return 0;
+    }
+
+    *(u32*)((u8*)prev + 0x0) = next;
+    *(u32*)((u8*)next + 0x4) = prev;
+    OSRestoreInterrupts(enabled);
+    return 1;
 }
 

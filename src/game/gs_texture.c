@@ -898,72 +898,58 @@ GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
  * 2 function(s)
  * =================================================================== */
 
-/* fn_800F0384 - 0x800F0384 | size: 0x50 */
-void fn_800F0384(void) {
+/* fn_800F0384 - 0x800F0384 | size: 0x50
+ * Disable all TLUT entries matching the given TLUT pointer.
+ * Sets the entry's enable byte (offset 0xA) to 0.
+ */
+void fn_800F0384(u32 tlutPtr) {
     extern u8 lbl_8047AC0C[];
     extern u8 lbl_8047AC28[];
     extern u8 lbl_8047AC30[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+    u32 i;
+    u32 offset;
+    u8* entry;
 
-    if ((u32)r3 == (u32)0x0) return;
-    r5 = 0x0;
-    r6 = 0x0;
-    r4 = r5;
-    goto L_800F03BC;
-L_800F039C:
-    tmp = *(u32*)lbl_8047AC28;
-    r7 = tmp + r5;
-    tmp = *(u32*)((u8*)r7 + 0xC);
-    if (tmp != r3) goto L_800F03B4;
-    *(u8*)((u8*)r7 + 0xA) = r4;
-L_800F03B4:
-    r5 = r5 + 0x24;
-    r6 = r6 + 0x1;
-L_800F03BC:
-    tmp = *(u32*)lbl_8047AC30;
-    if (r6 < tmp) goto L_800F039C;
-    tmp = 0x1;
-    *(u8*)lbl_8047AC0C = tmp;
-    return;
+    if (tlutPtr == 0) {
+        return;
+    }
+
+    offset = 0;
+    for (i = 0; i < *(u32*)lbl_8047AC30; i++) {
+        entry = (u8*)(*(u32*)lbl_8047AC28) + offset;
+        if (*(u32*)(entry + 0xC) == tlutPtr) {
+            *(u8*)(entry + 0xA) = 0;
+        }
+        offset += 0x24;
+    }
+    *(u8*)lbl_8047AC0C = 1;
 }
 
-/* fn_800F03D4 - 0x800F03D4 | size: 0x50 */
-void fn_800F03D4(void) {
+/* fn_800F03D4 - 0x800F03D4 | size: 0x50
+ * Enable all TLUT entries matching the given TLUT pointer.
+ * Sets the entry's enable byte (offset 0xA) to 1.
+ */
+void fn_800F03D4(u32 tlutPtr) {
     extern u8 lbl_8047AC0C[];
     extern u8 lbl_8047AC28[];
     extern u8 lbl_8047AC30[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+    u32 i;
+    u32 offset;
+    u8* entry;
 
-    if ((u32)r3 == (u32)0x0) return;
-    r6 = 0x0;
-    r5 = 0x0;
-    r4 = 0x1;
-    goto L_800F040C;
-L_800F03EC:
-    tmp = *(u32*)lbl_8047AC28;
-    r7 = tmp + r5;
-    tmp = *(u32*)((u8*)r7 + 0xC);
-    if (tmp != r3) goto L_800F0404;
-    *(u8*)((u8*)r7 + 0xA) = r4;
-L_800F0404:
-    r5 = r5 + 0x24;
-    r6 = r6 + 0x1;
-L_800F040C:
-    tmp = *(u32*)lbl_8047AC30;
-    if (r6 < tmp) goto L_800F03EC;
-    tmp = 0x1;
-    *(u8*)lbl_8047AC0C = tmp;
-    return;
+    if (tlutPtr == 0) {
+        return;
+    }
+
+    offset = 0;
+    for (i = 0; i < *(u32*)lbl_8047AC30; i++) {
+        entry = (u8*)(*(u32*)lbl_8047AC28) + offset;
+        if (*(u32*)(entry + 0xC) == tlutPtr) {
+            *(u8*)(entry + 0xA) = 1;
+        }
+        offset += 0x24;
+    }
+    *(u8*)lbl_8047AC0C = 1;
 }
 
 /* ===================================================================

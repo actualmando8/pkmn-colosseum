@@ -112,17 +112,17 @@ asm void DBPrintf(const char* fmt, ...) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800A2C58 - 0x800A2C58 | size: 0x1C */
-void fn_800A2C58(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
+/* fn_800A2C58 - 0x800A2C58 | size: 0x1C
+ * __DBGetFirstCallback - Return the first callback in the debug interface list.
+ * Returns NULL if the interface pointer is NULL.
+ */
+u32 fn_800A2C58(void) {
+    u32 ptr;
 
-    r3 = *(u32*)__DBInterface;
-    if (r3 != 0) goto L_800A2C6C;
-    r3 = 0x0;
-    return;
-L_800A2C6C:
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    return;
+    ptr = *(u32*)__DBInterface;
+    if (ptr == 0) {
+        return 0;
+    }
+    return *(u32*)((u8*)ptr);
 }
 

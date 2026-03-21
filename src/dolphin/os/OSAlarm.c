@@ -205,78 +205,53 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
  * 1 function(s)
  * =================================================================== */
 
-/* fn_8009A590 - 0x8009A590 | size: 0x11C */
-void fn_8009A590(void) {
+/* fn_8009A590 - 0x8009A590 | size: 0x11C
+ * OSCancelAlarm - Remove an alarm from the alarm queue.
+ * Unlinks it from the doubly-linked list, and if the removed alarm
+ * was at the head, re-programs the decrementer for the new head.
+ * alarm+0x00 = handler, alarm+0x08 = fire (hi), alarm+0x0C = fire (lo),
+ * alarm+0x10 = prev, alarm+0x14 = next
+ */
+void fn_8009A590(u8* alarm) {
     extern u8 AlarmQueue_8047A6E0[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    BOOL enabled;
+    u8* next;
+    u8* prev;
 
-    r30 = r3;
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r30 + 0x0);
-    r31 = r3 + 0x0;
-    if (tmp != 0) goto L_8009A5CC;
-    r3 = r31;
-    OSRestoreInterrupts(r3);
-    goto L_8009A690;
-L_8009A5CC:
-    r29 = *(u32*)((u8*)r30 + 0x14);
-    if (r29 != 0) goto L_8009A5E8;
-    tmp = *(u32*)((u8*)r30 + 0x10);
-    r3 = (u32)AlarmQueue_8047A6E0;
-    *(u32*)((u8*)r3 + 0x4) = tmp;
-    goto L_8009A5F0;
-L_8009A5E8:
-    tmp = *(u32*)((u8*)r30 + 0x10);
-    *(u32*)((u8*)r29 + 0x10) = tmp;
-L_8009A5F0:
-    r3 = *(u32*)((u8*)r30 + 0x10);
-    if (r3 == 0) goto L_8009A604;
-    *(u32*)((u8*)r3 + 0x14) = r29;
-    goto L_8009A680;
-L_8009A604:
-    *(u32*)AlarmQueue_8047A6E0 = r29;
-    if (r29 == 0) goto L_8009A680;
-    __OSGetSystemTime();
-    r6 = *(u32*)((u8*)r29 + 0xC);
-    r7 = 0x0;
-    tmp = *(u32*)((u8*)r29 + 0x8);
-    r8 = r6 - r4;
-    tmp = tmp - r3; /* -borrow */;
-    tmp = r8 - r7;
-    r5 = r6 - r5; /* -borrow */;
-    r5 = r6 - r6; /* -borrow */;
-    /* neg. r5, r5 */;
-    if (r29 == 0) goto L_8009A650;
-    r3 = 0x0;
-    PPCMtdec(r3);
-    goto L_8009A680;
-L_8009A650:
-    r4 = 0x80000000;
-    tmp = r8 - r4;
-    r3 = r6 - r3; /* -borrow */;
-    r3 = r6 - r6; /* -borrow */;
-    /* neg. r3, r3 */;
-    if (r29 == 0) goto L_8009A678;
-    r3 = r8;
-    PPCMtdec(r3);
-    goto L_8009A680;
-L_8009A678:
-    PPCMtdec(r3);
-L_8009A680:
-    tmp = 0x0;
-    *(u32*)((u8*)r30 + 0x0) = tmp;
-    r3 = r31;
-    OSRestoreInterrupts(r3);
-L_8009A690:
-    return;
+    enabled = OSDisableInterrupts();
+
+    /* If handler is NULL, alarm isn't active */
+    if (*(u32*)(alarm + 0x0) == 0) {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+
+    next = (u8*)*(u32*)(alarm + 0x14);
+    prev = (u8*)*(u32*)(alarm + 0x10);
+
+    /* Unlink from list */
+    if (next == NULL) {
+        /* Alarm is tail - update queue tail */
+        *(u32*)(AlarmQueue_8047A6E0 + 0x4) = (u32)prev;
+    } else {
+        /* Update next's prev pointer */
+        *(u32*)(next + 0x10) = (u32)prev;
+    }
+
+    if (prev != NULL) {
+        /* Update prev's next pointer */
+        *(u32*)(prev + 0x14) = (u32)next;
+    } else {
+        /* Alarm was head - update queue head and reprogram decrementer */
+        *(u32*)AlarmQueue_8047A6E0 = (u32)next;
+        if (next != NULL) {
+            /* Set decrementer to 0 to trigger immediate re-evaluation */
+            PPCMtdec(0);
+        }
+    }
+
+    /* Mark alarm as inactive */
+    *(u32*)(alarm + 0x0) = 0;
+    OSRestoreInterrupts(enabled);
 }
 

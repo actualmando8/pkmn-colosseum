@@ -156,7 +156,6 @@ typedef struct GSSceneRenderEntry {
  *   subi r0, r3, 0x1
  *   sth r0, lbl_8047B118@sda21(r0)
  * ================================================================== */
-#pragma optimization_level 0
 void GSscene_ProcessFreeList(void) {
     extern u8 lbl_8047B180[];
     extern u8 lbl_8047D6B0[];
@@ -270,7 +269,6 @@ L_801758B0:
     if (r3 != 0) goto L_801758A8;
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80175B94 -- GSscene_SpawnObject
@@ -278,7 +276,6 @@ L_801758B0:
  * Spawn a new scene object. Allocates from the free list, initializes
  * fields, and adds to the active list. 604 bytes.
  * ================================================================== */
-#pragma optimization_level 0
 void* GSscene_SpawnObject(u32 type, u32 param) {
     extern u8 lbl_8047B180[];
     extern u8 lbl_8047B190[];
@@ -440,7 +437,6 @@ L_80175DCC:
 L_80175DD4:
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80177A64 -- GSscene_XFBCapture
@@ -451,7 +447,6 @@ L_80175DD4:
  *
  * This is likely a debug/development feature for capturing screenshots.
  * ================================================================== */
-#pragma optimization_level 0
 void GSscene_XFBCapture(u32 captureIndex) {
     extern u8 lbl_8036C248[];
     extern u8 lbl_80478AC0[];
@@ -1238,7 +1233,6 @@ L_8017862C:
 L_80178638:
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80178AA8 -- GSscene_CameraUpdate
@@ -1253,7 +1247,6 @@ L_80178638:
  *   - offset 0x40: horizontal angle
  *   - offset 0x44: vertical angle
  * ================================================================== */
-#pragma optimization_level 0
 void GSscene_CameraUpdate(u32 sceneObj) {
     extern u8 lbl_8036C248[];
     extern u8 lbl_80478AC0[];
@@ -1627,14 +1620,12 @@ sceneObj = *(u32*)&lbl_80478C40;
 L_80178FEC:
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80179020 -- GSscene_CameraInterpolate
  *
  * Interpolate the camera between two states. 996 bytes.
  * ================================================================== */
-#pragma optimization_level 0
 void GSscene_CameraInterpolate(u32 camera) {
     extern u8 lbl_80315540[];
     extern u8 lbl_8031554C[];
@@ -1903,7 +1894,6 @@ L_80179350:
 L_801793C0:
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * fn_80179FA4 -- GSscene_Init
@@ -1912,7 +1902,6 @@ L_801793C0:
  * Sets up the object free list, active list, camera state, render
  * tables, and initial scene configuration.
  * ================================================================== */
-#pragma optimization_level 0
 void GSscene_Init(void) {
     extern u8 lbl_80453FEC[];
     extern u8 lbl_8047B1B8[];
@@ -2289,7 +2278,6 @@ L_8017A5CC:
 L_8017A5E8:
     return;
 }
-#pragma optimization_level 4
 
 /* ===== Small accessor/setter functions ===== */
 
@@ -2299,7 +2287,6 @@ void* GSscene_NopAccessor1(void) {
 }
 
 /* fn_80175F44 -- get object count, 0x28 bytes */
-#pragma optimization_level 0
 u32 GSscene_GetObjectCount(void) {
     extern u8 lbl_80478C38[];
     u32 tmp = 0;
@@ -2316,7 +2303,6 @@ L_80175F64:
     r3 = *(u16*)lbl_80478C38;
     return;
 }
-#pragma optimization_level 4
 
 /* ==================================================================
  * Position accessors (fn_80176948-801769B0)

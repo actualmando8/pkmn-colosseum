@@ -231,140 +231,113 @@ void __OSInitMemoryProtection(void) {
  * 4 function(s)
  * =================================================================== */
 
-/* fn_8009F230 - 0x8009F230 | size: 0xC8 */
-void fn_8009F230(void) {
-    extern void fn_800A238C();
-    extern void fn_800A2478();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_8009F230 - 0x8009F230 | size: 0xC8
+ * OSEnqueueMessage - Enqueue a message into an OS message queue.
+ * queue+0x10 = buffer, queue+0x14 = capacity, queue+0x18 = head,
+ * queue+0x1C = count. If blocking (flags & 1), waits when full.
+ * Returns TRUE on success, FALSE if non-blocking and queue is full.
+ */
+BOOL fn_8009F230(u8* queue, u32 msg, u32 flags) {
+    extern void fn_800A238C(u8* queue);
+    extern void fn_800A2478(u8* queue);
+    BOOL enabled;
+    u32 capacity;
+    u32 count;
+    u32 head;
+    u32* buf;
+    u32 idx;
 
-    r31 = r5 + 0x0;
-    r29 = r4 + 0x0;
-    r28 = r3 + 0x0;
-    OSDisableInterrupts();
-    r30 = r3 + 0x0;
-    r31 = r31 & 0x1;
-    goto L_8009F288;
-L_8009F268:
-    if ((s32)r31 != 0) goto L_8009F280;
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_8009F2D8;
-L_8009F280:
-    r3 = r28;
-    fn_800A238C();
-L_8009F288:
-    r6 = *(u32*)((u8*)r28 + 0x14);
-    r4 = *(u32*)((u8*)r28 + 0x1C);
-    if ((s32)r6 <= (s32)r4) goto L_8009F268;
-    tmp = *(u32*)((u8*)r28 + 0x18);
-    r3 = r28 + 0x8;
-    r5 = *(u32*)((u8*)r28 + 0x10);
-    r4 = tmp + r4;
-    tmp = (s32)r4 / (s32)r6;
-    tmp = tmp * r6;
-    tmp = r4 - tmp;
-    tmp = tmp << 2;
-    *(u32*)(r5 + tmp) = r29;
-    r4 = *(u32*)((u8*)r28 + 0x1C);
-    tmp = r4 + 0x1;
-    *(u32*)((u8*)r28 + 0x1C) = tmp;
-    fn_800A2478();
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    r3 = 0x1;
-L_8009F2D8:
-    return;
+    flags = flags & 1;
+    enabled = OSDisableInterrupts();
+
+    while (1) {
+        capacity = *(u32*)(queue + 0x14);
+        count = *(u32*)(queue + 0x1C);
+        if ((s32)capacity > (s32)count) {
+            break;
+        }
+        if (flags == 0) {
+            OSRestoreInterrupts(enabled);
+            return FALSE;
+        }
+        fn_800A238C(queue);
+    }
+
+    head = *(u32*)(queue + 0x18);
+    buf  = (u32*)(*(u32*)(queue + 0x10));
+    idx  = (head + count) % capacity;
+    buf[idx] = msg;
+    *(u32*)(queue + 0x1C) = count + 1;
+
+    fn_800A2478(queue);
+    OSRestoreInterrupts(enabled);
+    return TRUE;
 }
 
-/* fn_8009F2F8 - 0x8009F2F8 | size: 0xDC */
-void fn_8009F2F8(void) {
-    extern void fn_800A238C();
-    extern void fn_800A2478();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_8009F2F8 - 0x8009F2F8 | size: 0xDC
+ * OSReceiveMessage - Dequeue a message from an OS message queue.
+ * If msgOut is non-NULL, stores the dequeued message there.
+ * If blocking (flags & 1), waits when empty.
+ * Returns TRUE on success, FALSE if non-blocking and queue is empty.
+ */
+BOOL fn_8009F2F8(u8* queue, u32* msgOut, u32 flags) {
+    extern void fn_800A238C(u8* condvar);
+    extern void fn_800A2478(u8* queue);
+    BOOL enabled;
+    u32 count;
+    u32 head;
+    u32 capacity;
 
-    r31 = r3 + 0x0;
-    r30 = r5 + 0x0;
-    r28 = r4 + 0x0;
-    OSDisableInterrupts();
-    r29 = r3 + 0x0;
-    r30 = r30 & 0x1;
-    goto L_8009F350;
-L_8009F330:
-    if ((s32)r30 != 0) goto L_8009F348;
-    r3 = r29;
-    OSRestoreInterrupts(r3);
-    r3 = 0x0;
-    goto L_8009F3B4;
-L_8009F348:
-    r3 = r31 + 0x8;
-    fn_800A238C();
-L_8009F350:
-    tmp = *(u32*)((u8*)r31 + 0x1C);
-    if ((s32)tmp == 0) goto L_8009F330;
-    if (r28 == 0) goto L_8009F378;
-    tmp = *(u32*)((u8*)r31 + 0x18);
-    r3 = *(u32*)((u8*)r31 + 0x10);
-    tmp = tmp << 2;
-    tmp = *(u32*)(r3 + tmp);
-    *(u32*)((u8*)r28 + 0x0) = tmp;
-L_8009F378:
-    r5 = *(u32*)((u8*)r31 + 0x18);
-    r3 = r31;
-    r4 = *(u32*)((u8*)r31 + 0x14);
-    r5 = r5 + 0x1;
-    tmp = (s32)r5 / (s32)r4;
-    tmp = tmp * r4;
-    tmp = r5 - tmp;
-    *(u32*)((u8*)r31 + 0x18) = tmp;
-    r4 = *(u32*)((u8*)r31 + 0x1C);
-    *(u32*)((u8*)r31 + 0x1C) = tmp;
-    fn_800A2478();
-    r3 = r29;
-    OSRestoreInterrupts(r3);
-    r3 = 0x1;
-L_8009F3B4:
-    return;
+    flags = flags & 1;
+    enabled = OSDisableInterrupts();
+
+    while (1) {
+        count = *(u32*)(queue + 0x1C);
+        if ((s32)count != 0) {
+            break;
+        }
+        if (flags == 0) {
+            OSRestoreInterrupts(enabled);
+            return FALSE;
+        }
+        fn_800A238C(queue + 0x8);
+    }
+
+    if (msgOut != NULL) {
+        u32* buf;
+        head = *(u32*)(queue + 0x18);
+        buf = (u32*)(*(u32*)(queue + 0x10));
+        *msgOut = buf[head];
+    }
+
+    /* Advance head pointer with wraparound */
+    head = *(u32*)(queue + 0x18);
+    capacity = *(u32*)(queue + 0x14);
+    head = (head + 1) % capacity;
+    *(u32*)(queue + 0x18) = head;
+    *(u32*)(queue + 0x1C) = head;  /* Note: original stores head back to count field */
+    fn_800A2478(queue);
+    OSRestoreInterrupts(enabled);
+    return TRUE;
 }
 
-/* fn_8009F3D4 - 0x8009F3D4 | size: 0xC */
-void fn_8009F3D4(void) {
-    u32 r3 = 0;
-
-    r3 = 0x80000000;
-    r3 = *(u32*)((u8*)r3 + 0x28);
-    return;
+/* fn_8009F3D4 - 0x8009F3D4 | size: 0xC
+ * OSGetConsoleSimulatedMemSize - returns simulated memory size from boot info.
+ */
+u32 fn_8009F3D4(void) {
+    return *(volatile u32*)0x80000028;
 }
 
-/* fn_8009F3E0 - 0x8009F3E0 | size: 0x3C */
-void fn_8009F3E0(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f0 = 0.0f;
-
-    if ((s32)r3 == 0) goto L_8009F408;
-    r3 = 0xCC000000;
-    tmp = 0xff;
-    *(u16*)((u8*)r3 + 0x4010) = tmp;
-    r3 = 0xF0000000;
-    __OSMaskInterrupts(r3);
-L_8009F408:
-    r3 = 0x1;
-    return;
+/* fn_8009F3E0 - 0x8009F3E0 | size: 0x3C
+ * OSProtectMemory reset callback - disables memory protection
+ * when the system is being reset (final == TRUE).
+ * Returns TRUE always.
+ */
+BOOL fn_8009F3E0(s32 final) {
+    if (final != 0) {
+        *(volatile u16*)0xCC004010 = 0xFF;
+        __OSMaskInterrupts(0xF0000000);
+    }
+    return TRUE;
 }
 
