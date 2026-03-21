@@ -29,7 +29,7 @@ extern void fn_800E27B0();
 extern void fn_800E2C04();
 extern void fn_800F0308();
 extern void fn_80196E10();
-extern void strlen();
+extern u32 strlen();
 extern void* memset(void* dst, int val, u32 size);
 
 /* ===== SDA globals ===== */

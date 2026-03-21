@@ -19,6 +19,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "gx_tev.h"
 
 #include <stdio.h>
@@ -503,3 +507,6 @@ void gx_tev_get_cache_stats(u32* outHits, u32* outMisses, u32* outTotal) {
     if (outMisses) *outMisses = g_cacheMisses;
     if (outTotal) *outTotal = g_shaderCacheCount;
 }
+
+
+#endif /* __MWERKS__ */

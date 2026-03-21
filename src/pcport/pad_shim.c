@@ -9,6 +9,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "pad_shim.h"
 
 #include <stdio.h>
@@ -373,3 +377,6 @@ void PADShim_HandleControllerEvent(u32 eventType, s32 deviceId) {
      * }
      */
 }
+
+
+#endif /* __MWERKS__ */

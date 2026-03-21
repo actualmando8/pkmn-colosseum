@@ -16,45 +16,9 @@
 #include "hsd/hsd_tobj.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_memory.h"
+#include "hsd/hsd_gobj.h"
 
-/* Forward declarations for GObj system */
-typedef struct HSD_GObj HSD_GObj;
-typedef struct HSD_GProc HSD_GProc;
-typedef void (*HSD_GObjProc)(HSD_GObj* gobj);
-typedef void (*HSD_GRenderFunc)(HSD_GObj* gobj, s32 pass);
-
-struct HSD_GProc {
-    HSD_GProc* child;
-    HSD_GProc* next;
-    HSD_GProc* prev;
-    u8 priority;
-    u8 flags;
-    HSD_GObjProc callback;
-};
-
-struct HSD_GObj {
-    u16 classifier;
-    u8 p_link;
-    u8 gx_link;
-    u8 p_priority;
-    u8 render_priority;
-    u8 obj_kind;
-    u8 user_data_kind;
-    HSD_GObj* next;
-    HSD_GObj* prev;
-    HSD_GObj* next_gx;
-    HSD_GObj* prev_gx;
-    HSD_GProc* proc;
-    HSD_GRenderFunc render_cb;
-    u64 gxlink_prios;
-    void* hsd_obj;
-    void* user_data;
-    void (*user_data_remove_func)(void* data);
-};
-
-/* External declarations */
-extern void* hsdAllocMemPiece(u32 size);
-extern void hsdFreeMemPiece(void* p, u32 size);
+/* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void* hsdNew(HSD_ClassInfo* info);
 extern void HSD_JObjDispAll(void* jobj, f32 mtx[3][4], s32 flags);
 
@@ -688,10 +652,10 @@ void fn_801B84A4(void) {
         HSD_GObj* gobj = gobj_list[i];
         while (gobj != NULL) {
             HSD_GObj* next = gobj->next;
-            HSD_GProc* proc = gobj->proc;
+            HSD_GObjProc* proc = gobj->proc;
 
             while (proc != NULL) {
-                HSD_GProc* next_proc = proc->next;
+                HSD_GObjProc* next_proc = proc->next;
                 if (proc->callback != NULL) {
                     proc->callback(gobj);
                 }
@@ -773,7 +737,7 @@ void fn_801B8B84(HSD_GObj* gobj, u8 p_link, u8 priority) {
  * Destroy a game object and clean up all resources.
  */
 void fn_801B8D5C(HSD_GObj* gobj) {
-    HSD_GProc* proc;
+    HSD_GObjProc* proc;
 
     if (gobj == NULL) {
         return;
@@ -787,8 +751,8 @@ void fn_801B8D5C(HSD_GObj* gobj) {
     /* Free all processes */
     proc = gobj->proc;
     while (proc != NULL) {
-        HSD_GProc* next = proc->next;
-        hsdFreeMemPiece(proc, sizeof(HSD_GProc));
+        HSD_GObjProc* next = proc->next;
+        hsdFreeMemPiece(proc, sizeof(HSD_GObjProc));
         proc = next;
     }
 

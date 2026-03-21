@@ -42,8 +42,7 @@ extern void GXLoadTexMtxImm(void* mtx, u32 id, u32 type);
 extern void DCStoreRange(void* addr, u32 nBytes);
 extern void GXInvalidateTexAll(void);
 
-extern void* hsdAllocMemPiece(u32 size);
-extern void hsdFreeMemPiece(void* p, u32 size);
+/* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void HSD_AObjInterpretAnim(HSD_AObj* aobj, void* obj, void* update_func);
 
 /* ========================================================================= */
@@ -205,13 +204,16 @@ u32 fn_801BBED4(HSD_TObj* tobj) {
  * Set texture flags with validation.
  */
 void fn_801BBF28(HSD_TObj* tobj, u32 flags) {
+    u32 colormap;
+    u32 alphamap;
+
     if (tobj == NULL) {
         return;
     }
 
     /* Validate that colormap and alphamap modes are valid */
-    u32 colormap = flags & TEX_COLORMAP_MASK;
-    u32 alphamap = flags & TEX_ALPHAMAP_MASK;
+    colormap = flags & TEX_COLORMAP_MASK;
+    alphamap = flags & TEX_ALPHAMAP_MASK;
 
     if (colormap > TEX_COLORMAP_SUB) {
         flags = (flags & ~TEX_COLORMAP_MASK) | TEX_COLORMAP_MODULATE;

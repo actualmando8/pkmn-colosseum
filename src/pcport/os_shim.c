@@ -9,6 +9,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "os_shim.h"
 
 #include <stdio.h>
@@ -351,3 +355,6 @@ void VISetBlack_PC(BOOL black) {
      * instead of rendering the scene.
      */
 }
+
+
+#endif /* __MWERKS__ */

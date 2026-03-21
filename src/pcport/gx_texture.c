@@ -13,6 +13,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "gx_texture.h"
 
 #include <stdio.h>
@@ -547,3 +551,6 @@ void gx_texture_free(GXDecodedTexture* decoded) {
         decoded->dataSize = 0;
     }
 }
+
+
+#endif /* __MWERKS__ */

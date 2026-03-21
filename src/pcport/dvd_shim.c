@@ -9,6 +9,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "dvd_shim.h"
 
 #include <stdio.h>
@@ -324,3 +328,6 @@ void DVDShim_Shutdown(void) {
 u32 DVDShim_GetBytesRead(void) {
     return g_totalBytesRead;
 }
+
+
+#endif /* __MWERKS__ */

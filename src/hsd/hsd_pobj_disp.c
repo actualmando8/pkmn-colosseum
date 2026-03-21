@@ -34,6 +34,12 @@ extern void GXSetNumTexGens(u8 num);
 static u32 pobj_render_flags;
 static u32 pobj_cull_mode;
 
+/* Forward declarations for display dispatch functions */
+void fn_801AA8BC(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+void fn_801AABB4(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+void fn_801AAEA8(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+void fn_801AB67C(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+
 /* ========================================================================= */
 /*  Vertex descriptor and attribute setup                                    */
 /* ========================================================================= */

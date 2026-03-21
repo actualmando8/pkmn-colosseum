@@ -57,17 +57,18 @@ typedef struct HSD_TevDesc {
 #define HSD_TE_KONST 5
 #define HSD_TE_ALL   6
 
-/* TExp node structure */
-typedef struct HSD_TExp {
-    u32 type;
-    void* data;
-    struct HSD_TExp* next;
-    /* Extended fields for operations */
-    u32 op;
-    struct HSD_TExp* arg[4];
-    u32 sel;
-    u32 reg;
-} HSD_TExp;
+/* TExp node structure - full definition of the union forward-declared in hsd_forward.h */
+union HSD_TExp {
+    struct {
+        u32 type;
+        void* data;
+        union HSD_TExp* next;
+        u32 op;
+        union HSD_TExp* arg[4];
+        u32 sel;
+        u32 reg;
+    };
+};
 
 /* Forward declarations */
 extern void GXSetTevStages(u8 numStages);
@@ -87,8 +88,7 @@ extern void GXSetTevIndirect(u32 stage, u32 ind_stage, u32 format,
                               u32 wrap_t, u32 add_prev, u32 utc_lod,
                               u32 alpha_sel);
 extern void GXSetNumTevStages(u8 num);
-extern void* hsdAllocMemPiece(u32 size);
-extern void hsdFreeMemPiece(void* p, u32 size);
+/* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 
 /* TEV state globals */
 static u8 tev_num_stages;

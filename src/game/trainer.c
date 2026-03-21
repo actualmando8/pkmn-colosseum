@@ -133,7 +133,7 @@ extern u32* lbl_80478F30;  /* Story/event header */
 extern u8*  lbl_80478F34;  /* Story/event data */
 
 /* ===== Index lookup globals ===== */
-extern u32 lbl_80478F18;  /* trainer count (SDA) */
+/* lbl_80478F18 already declared above as u32* */
 
 /* Forward declarations for converted functions */
 u16 fn_801FCC94(u8* ptr);

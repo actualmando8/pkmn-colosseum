@@ -29,7 +29,7 @@ extern void  fn_800E209C(u16 handle);
 extern u16   fn_800E202C(void* ptr);
 
 /* DVD / file operations */
-extern void  fn_800CA968(void* dst, const void* src);
+extern s32   fn_800CA968(void* dst, const void* src);
 extern u32   fn_80167F28(const char* path);
 extern u32   fn_80167E5C(u32 fileInfo);
 extern void  fn_80167E64(u32 fileInfo);
@@ -1192,10 +1192,10 @@ BOOL fn_8017FA5C(void) {
 }
 
 /* fn_80180320 | FSYSLoadMgrQueueRequest | Size: 0x130 */
-void fn_80180320(u32 fileHandle, u32 nameHash, u32 priority) {
-    FSYSSlot* slot = FSYSFindSlot(fileHandle, 0);
+void fn_80180320(void* fileHandle, void* nameHash, u32 priority) {
+    FSYSSlot* slot = FSYSFindSlot((u32)fileHandle, 0);
     if (slot == NULL) { return; }
-    slot->requestID = nameHash;
+    slot->requestID = (u32)nameHash;
     slot->loadMode = priority;
     slot->status = FSYS_STATUS_PENDING;
 }

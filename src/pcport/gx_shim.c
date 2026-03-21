@@ -14,6 +14,10 @@
  * Phase 3 PC port scaffolding -- skeleton only.
  */
 
+#ifdef __MWERKS__
+/* GCN build: pcport shim not applicable */
+#else
+
 #include "gx_shim.h"
 #include "gx_tev.h"
 #include "gx_texture.h"
@@ -936,3 +940,6 @@ void GXSetNumTexGens(u8 nTexGens) {
      * many texcoord varyings are passed to the fragment shader.
      */
 }
+
+
+#endif /* __MWERKS__ */
