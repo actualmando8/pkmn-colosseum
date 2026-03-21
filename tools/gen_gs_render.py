@@ -162,10 +162,6 @@ def decompile_full(fn_name, insns, real):
     if not has_frame and not has_branches:
         return decompile_simple_leaf(fn_name, insns, real)
 
-    # ---- Simple leaf with conditional return (beqlr etc) ----
-    if not has_frame and not has_labels:
-        return decompile_leaf_condret(fn_name, insns, real)
-
     # ---- Simple wrapper with one bl call ----
     bl_count = sum(1 for m, o in real if m == 'bl' and not o.startswith('_'))
     if has_frame and bl_count == 1 and n <= 20 and not has_labels:
@@ -425,15 +421,142 @@ def decompile_wrapper(fn_name, insns, real):
 
 
 def decompile_general(fn_name, insns, real):
-    """General decompilation -- register-level C with gotos."""
-    lines = []
-    in_epilogue = False
+    """General decompilation -- compilable C with register vars and gotos."""
+
+    # First pass: collect used registers, labels, float regs, stack locals
+    used_iregs = set()
+    used_fregs = set()
+    used_labels = set()
+    branch_targets = set()
     has_frame = real[0][0] == 'stwu' if real else False
+    frame_size = 0
+    stack_loads = set()  # offsets loaded from stack
+    stack_stores = set()  # offsets stored to stack (that aren't LR/saved regs)
+    has_ctr_call = False
+    last_cmp = None
+
+    if has_frame:
+        op = ops_list(real[0][1])
+        fmem = parse_mem(op[1])
+        if fmem[0] is not None and isinstance(fmem[0], int):
+            frame_size = -fmem[0]
 
     for entry in insns:
         if entry[0] == 'label':
-            label_name = entry[1]
-            lines.append(f'{label_name}:')
+            used_labels.add(entry[1])
+            continue
+        if entry[0] != 'inst':
+            continue
+        mnem, ops_str = entry[1], entry[2] if len(entry) > 2 else ''
+        op = ops_list(ops_str) if ops_str else []
+
+        # Collect register usage
+        for o in op:
+            m = re.match(r'^r(\d+)$', o)
+            if m:
+                rn = int(m.group(1))
+                if rn not in (0, 1, 2):
+                    used_iregs.add(rn)
+            m = re.match(r'^f(\d+)$', o)
+            if m:
+                used_fregs.add(int(m.group(1)))
+
+        # Also find registers in memory operands
+        for o in op:
+            for rm in re.finditer(r'r(\d+)', o):
+                rn = int(rm.group(1))
+                if rn not in (0, 1, 2):
+                    used_iregs.add(rn)
+            for fm in re.finditer(r'f(\d+)', o):
+                used_fregs.add(int(fm.group(1)))
+
+        # Collect branch targets
+        if mnem.startswith('b') and mnem not in ('blr', 'bl', 'bctrl', 'bctr',
+                                                   'beqlr', 'bnelr', 'bgelr',
+                                                   'bltlr', 'bgtlr', 'blelr'):
+            target = op[-1].strip() if op else ''
+            if target.startswith('.L_'):
+                branch_targets.add(target)
+
+        if mnem == 'bctrl':
+            has_ctr_call = True
+
+        # Track stack loads for local variables
+        if mnem in ('lwz', 'lbz', 'lhz', 'lfs', 'lfd') and len(op) >= 2:
+            off, base = parse_mem(op[1])
+            if base == 'r1' and isinstance(off, int) and off > 0 and off < frame_size:
+                stack_loads.add(off)
+        if mnem in ('stw', 'stb', 'sth', 'stfs', 'stfd') and len(op) >= 2:
+            off, base = parse_mem(op[1])
+            if base == 'r1' and isinstance(off, int) and off > 0 and off < frame_size:
+                stack_stores.add(off)
+
+    # Determine which stack offsets are local variables (both read and written)
+    stack_locals = stack_loads & stack_stores
+    # Also include stores that are later loaded (even if only stored first)
+    stack_locals = stack_loads | stack_stores
+
+    # Collect SDA/HA label references
+    sda_labels = set()
+    ha_labels = set()
+    bl_targets = set()
+    for entry in insns:
+        if entry[0] != 'inst':
+            continue
+        ops_str = entry[2] if len(entry) > 2 else ''
+        for m in re.finditer(r'(lbl_[0-9A-Fa-f]+)@sda21', ops_str):
+            sda_labels.add(m.group(1))
+        for m in re.finditer(r'(lbl_[0-9A-Fa-f]+)@ha', ops_str):
+            ha_labels.add(m.group(1))
+        for m in re.finditer(r'(lbl_[0-9A-Fa-f]+)@l', ops_str):
+            ha_labels.add(m.group(1))
+        if entry[1] == 'bl':
+            target = ops_str.strip()
+            if not target.startswith('_') and target.startswith('fn_'):
+                bl_targets.add(target)
+
+    # Build declarations
+    decl_lines = []
+
+    # Declare extern labels
+    for lbl in sorted(sda_labels | ha_labels):
+        decl_lines.append(f'    extern u8 {lbl}[];')
+
+    # Declare extern functions called
+    for fn_target in sorted(bl_targets):
+        decl_lines.append(f'    extern void {fn_target}();')
+
+    # r1 is stack pointer - declare as pointer to sp if used
+    if 1 in used_iregs and frame_size > 0:
+        decl_lines.append(f'    u8* r1 = sp;')
+
+    # Integer register declarations (include r0 as a temp)
+    for rn in sorted(used_iregs):
+        if 0 <= rn <= 31 and rn not in (1, 2):
+            decl_lines.append(f'    u32 r{rn} = 0;')
+
+    # Float register declarations
+    for fn in sorted(used_fregs):
+        if 0 <= fn <= 31:
+            decl_lines.append(f'    f32 f{fn} = 0.0f;')
+
+    # Stack frame local variables
+    if frame_size > 0 and stack_locals:
+        decl_lines.append(f'    u8 sp[0x{frame_size:X}];')
+
+    # CTR variable for indirect calls
+    if has_ctr_call or any(m == 'mtctr' for m, _ in real):
+        decl_lines.append('    void (*ctr_fn)(void) = 0;')
+
+    # Second pass: generate code
+    body_lines = []
+    in_epilogue = False
+    last_cmp_info = ('cmpwi', 'r0', '0')  # (type, lhs, rhs)
+
+    for entry in insns:
+        if entry[0] == 'label':
+            label_name = entry[1].replace('.L_', 'L_')
+            body_lines.append(f'{label_name}: ;')
             in_epilogue = False
             continue
 
@@ -444,7 +567,7 @@ def decompile_general(fn_name, insns, real):
         ops_str = entry[2] if len(entry) > 2 else ''
         op = ops_list(ops_str) if ops_str else []
 
-        # Skip prologue/epilogue boilerplate
+        # Skip prologue/epilogue
         if mnem == 'stwu' and op and op[0] == 'r1':
             continue
         if mnem == 'mflr':
@@ -455,32 +578,144 @@ def decompile_general(fn_name, insns, real):
         if in_epilogue and mnem == 'addi' and op and op[0] == 'r1':
             continue
         if mnem == 'blr':
-            lines.append('    return;')
+            body_lines.append('    return;')
             in_epilogue = False
             continue
 
-        # Stack saves/restores
-        if mnem in ('stw', 'lwz') and len(op) >= 2:
+        # Stack saves/restores of callee-saved registers
+        if mnem == 'stw' and len(op) >= 2:
+            off, base = parse_mem(op[1])
+            if base == 'r1' and isinstance(off, int) and off > 0:
+                # Callee-saved register save or LR save
+                src = op[0]
+                if src.startswith('r') and src != 'r0':
+                    continue  # skip saving callee-saved regs
+                if src == 'r0' and off >= frame_size - 4:
+                    continue  # LR save
+                # Otherwise it's a stack local store
+                body_lines.append(f'    *(u32*)(sp + 0x{off:X}) = {src};')
+                continue
+
+        if mnem == 'lwz' and len(op) >= 2:
             off, base = parse_mem(op[1])
             if base == 'r1' and isinstance(off, int):
-                if mnem == 'stw' and off > 0:
-                    # Stack save of LR or saved register
+                if in_epilogue and off > 0:
+                    continue  # skip restoring callee-saved regs
+                if off > 0 and off < frame_size:
+                    # Stack local load
+                    body_lines.append(f'    {op[0]} = *(u32*)(sp + 0x{off:X});')
                     continue
-                if mnem == 'lwz' and in_epilogue:
-                    continue
-                if mnem == 'lwz' and off > 0:
-                    # Could be loading from stack local
-                    pass
+                if off > 0:
+                    continue  # LR or register restore
 
         # _save/_rest register calls
         if mnem == 'bl' and (ops_str.startswith('_save') or ops_str.startswith('_rest')):
             continue
 
-        c = translate_inst(mnem, op, ops_str)
-        if c:
-            lines.append(f'    {c}')
+        # Track comparisons for condition codes
+        if mnem == 'cmpwi':
+            parts = op
+            if len(parts) >= 2:
+                last_cmp_expr = f'(s32){parts[0]} == {parts[1]}'
+                last_cmp_info = ('cmpwi', parts[0], parts[1])
+        elif mnem == 'cmplwi':
+            parts = op
+            if len(parts) >= 2:
+                last_cmp_expr = f'(u32){parts[0]} == {parts[1]}'
+                last_cmp_info = ('cmplwi', parts[0], parts[1])
+        elif mnem == 'cmpw':
+            parts = op
+            if len(parts) >= 2:
+                last_cmp_expr = f'(s32){parts[0]} == {parts[1]}'
+                last_cmp_info = ('cmpw', parts[0], parts[1])
+        elif mnem == 'cmplw':
+            parts = op
+            if len(parts) >= 2:
+                last_cmp_expr = f'(u32){parts[0]} == {parts[1]}'
+                last_cmp_info = ('cmplw', parts[0], parts[1])
+        elif mnem == 'fcmpo' or mnem == 'fcmpu':
+            parts = op
+            if len(parts) >= 3:
+                last_cmp_expr = f'{parts[1]} == {parts[2]}'
+                last_cmp_info = ('fcmp', parts[1], parts[2])
+            elif len(parts) >= 2:
+                last_cmp_expr = f'{parts[0]} == {parts[1]}'
+                last_cmp_info = ('fcmp', parts[0], parts[1])
 
-    return ('void', '\n'.join(lines) + '\n', True)
+        # Handle branch instructions with proper conditions
+        if mnem in ('beq', 'bne', 'blt', 'bgt', 'ble', 'bge'):
+            target = op[-1].strip().replace('.L_', 'L_')
+            cmp_op = mnem[1:]  # eq, ne, lt, gt, le, ge
+            cmp_type = last_cmp_info[0] if 'last_cmp_info' in dir() else 'cmpwi'
+            lhs = last_cmp_info[1] if 'last_cmp_info' in dir() else 'r0'
+            rhs = last_cmp_info[2] if 'last_cmp_info' in dir() else '0'
+            sign = '(s32)' if cmp_type in ('cmpwi', 'cmpw') else '(u32)' if cmp_type in ('cmplwi', 'cmplw') else ''
+
+            op_map = {'eq': '==', 'ne': '!=', 'lt': '<', 'gt': '>', 'le': '<=', 'ge': '>='}
+            c_op = op_map[cmp_op]
+            body_lines.append(f'    if ({sign}{lhs} {c_op} {sign}{rhs}) goto {target};')
+            continue
+
+        if mnem in ('beqlr', 'bnelr', 'bltlr', 'bgtlr', 'blelr', 'bgelr'):
+            cmp_op = mnem[1:-2]  # strip b and lr
+            cmp_type = last_cmp_info[0] if 'last_cmp_info' in dir() else 'cmpwi'
+            lhs = last_cmp_info[1] if 'last_cmp_info' in dir() else 'r0'
+            rhs = last_cmp_info[2] if 'last_cmp_info' in dir() else '0'
+            sign = '(s32)' if cmp_type in ('cmpwi', 'cmpw') else '(u32)' if cmp_type in ('cmplwi', 'cmplw') else ''
+            op_map = {'eq': '==', 'ne': '!=', 'lt': '<', 'gt': '>', 'le': '<=', 'ge': '>='}
+            c_op = op_map.get(cmp_op, '==')
+            body_lines.append(f'    if ({sign}{lhs} {c_op} {sign}{rhs}) return;')
+            continue
+
+        if mnem == 'b':
+            target = op[0].strip().replace('.L_', 'L_')
+            if target.startswith('L_'):
+                body_lines.append(f'    goto {target};')
+            else:
+                body_lines.append(f'    /* b {target} */;')
+            continue
+
+        # MTR for indirect calls
+        if mnem == 'mtctr':
+            body_lines.append(f'    ctr_fn = (void(*)(void)){op[0]};')
+            continue
+        if mnem == 'bctrl':
+            body_lines.append(f'    ctr_fn();')
+            continue
+
+        # Skip comparison instructions (already tracked above)
+        if mnem in ('cmpwi', 'cmplwi', 'cmpw', 'cmplw', 'fcmpo', 'fcmpu'):
+            continue
+
+        # Generate the C statement
+        c = translate_inst_v2(mnem, op, ops_str, frame_size)
+        if c:
+            body_lines.append(f'    {c}')
+
+    # Combine declarations and body
+    all_lines = decl_lines + [''] + body_lines if decl_lines else body_lines
+    return ('void', '\n'.join(all_lines) + '\n', True)
+
+
+def translate_inst_v2(mnem, op, ops_str, frame_size):
+    """Translate instruction to C, using sp[] for stack frame."""
+
+    # Stores to stack frame
+    if mnem in ('stw', 'stb', 'sth', 'stfs', 'stfd') and len(op) >= 2:
+        off, base = parse_mem(op[1])
+        if base == 'r1' and isinstance(off, int) and off > 0:
+            st = {'stw': 'u32', 'stb': 'u8', 'sth': 'u16', 'stfs': 'f32', 'stfd': 'f64'}[mnem]
+            return f'*({st}*)(sp + 0x{off:X}) = {op[0]};'
+
+    # Loads from stack frame
+    if mnem in ('lwz', 'lbz', 'lhz', 'lfs', 'lfd') and len(op) >= 2:
+        off, base = parse_mem(op[1])
+        if base == 'r1' and isinstance(off, int) and off > 0 and off < frame_size:
+            lt = {'lwz': 'u32', 'lbz': 'u8', 'lhz': 'u16', 'lfs': 'f32', 'lfd': 'f64'}[mnem]
+            return f'{op[0]} = *({lt}*)(sp + 0x{off:X});'
+
+    # Use the standard translator
+    return translate_inst(mnem, op, ops_str)
 
 
 def translate_inst(mnem, op, ops_str):
@@ -678,21 +913,21 @@ def translate_inst(mnem, op, ops_str):
     if mnem == 'b':
         target = op[0].strip()
         if target.startswith('.L_'):
-            return f'goto {target};'
+            return f'goto {target.replace(".L_", "L_")};'
         return f'/* b {target} */;'
     if mnem in ('beq', 'bne', 'blt', 'bgt', 'ble', 'bge'):
         target = op[-1].strip()
         cond = {'beq': 'eq', 'bne': 'ne', 'blt': 'lt', 'bgt': 'gt',
                 'ble': 'le', 'bge': 'ge'}[mnem]
         if target.startswith('.L_'):
-            return f'if (/* {cond} */) goto {target};'
+            return f'if (/* {cond} */) goto {target.replace(".L_", "L_")};'
         return f'/* {mnem} {ops_str} */;'
     if mnem in ('beqlr', 'bnelr', 'bltlr', 'bgtlr', 'blelr', 'bgelr'):
         cond = mnem[1:-2]  # strip b and lr
         return f'if (/* {cond} */) return;'
     if mnem == 'bdnz':
-        target = op[0].strip()
-        if target.startswith('.L_'):
+        target = op[0].strip().replace('.L_', 'L_')
+        if target.startswith('L_'):
             return f'if (--ctr != 0) goto {target};'
 
     # Function calls

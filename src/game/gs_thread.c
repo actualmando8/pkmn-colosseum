@@ -1131,14 +1131,11 @@ void fn_800F9C04(void) {
 }
 #pragma pop
 
-/* 0x800F9D04 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
+/* 0x800F9D04 | 0x20 -- calls fn_80080ED8 */
+extern void fn_80080ED8(void);
 void fn_800F9D04(void) {
-    /* TODO: match -- 32 bytes at 0x800F9D04 */
+    fn_80080ED8();
 }
-#pragma pop
 
 /* 0x800F9D24 | 0x14C */
 #pragma push
@@ -1341,14 +1338,12 @@ void fn_800FC39C(void) {
 }
 #pragma pop
 
-/* 0x800FC518 | 0x10 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FC518(void) {
-    /* TODO: match -- 16 bytes at 0x800FC518 */
+/* 0x800FC518 | 0x10 -- store r3 to lbl_80478B08->0x28, return 0 */
+extern u32 lbl_80478B08;
+u32 fn_800FC518(u32 val) {
+    *(u32*)((u8*)lbl_80478B08 + 0x28) = val;
+    return 0;
 }
-#pragma pop
 
 /* 0x800FC528 | 0x2B8 */
 #pragma push
@@ -1395,14 +1390,11 @@ void fn_800FDF1C(void) {
 }
 #pragma pop
 
-/* 0x800FDFE4 | 0x2C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FDFE4(void) {
-    /* TODO: match -- 44 bytes at 0x800FDFE4 */
+/* 0x800FDFE4 | 0x2C -- (fn_800FE010() + 1) >> 1 - 1 */
+u32 fn_800FDFE4(void) {
+    u32 result = (u32)fn_800FE010();
+    return ((result + 1) >> 1) - 1;
 }
-#pragma pop
 
 /* 0x800FE010 | 0x34C */
 #pragma push
@@ -1440,14 +1432,13 @@ void fn_800FE4D4(void) {
 }
 #pragma pop
 
-/* 0x800FE6A0 | 0xC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FE6A0(void) {
-    /* TODO: match -- 12 bytes at 0x800FE6A0 */
+/* 0x800FE6A0 | 0xC -- store two floats to SDA globals */
+extern f32 lbl_80478B10;
+extern f32 lbl_80478B14;
+void fn_800FE6A0(f32 f1, f32 f2) {
+    lbl_80478B10 = f1;
+    lbl_80478B14 = f2;
 }
-#pragma pop
 
 /* 0x800FE6AC | 0x24 */
 #pragma push

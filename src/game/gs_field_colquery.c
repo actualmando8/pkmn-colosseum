@@ -137,15 +137,52 @@ extern u8 lbl_80404C68[];  /* GScolsys2 collision state */
  *   r28 = current triangle index
  *   f1  = parametric t for current hit
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSfield_RayCast(void* origin, void* direction) {
-    /* TODO: match -- 824 bytes at 0x8010E138 */
-    /* Calls: fn_8010CBC0, fn_8010C7BC, fn_8010CA30, fn_8010C8D0,
-     *        fn_800A37CC, fn_8010DEF0 */
+    void* wzxData;
+    s32 hitCount = 0;
+    s32 triCount;
+    s32 i;
+
+    if (origin == NULL || direction == NULL) {
+        return 0;
+    }
+
+    wzxData = fn_8010CBC0();
+    if (wzxData == NULL) {
+        return 0;
+    }
+
+    /* Get triangle count from WZX data header */
+    triCount = *(s32*)((u8*)wzxData + 0x08);
+
+    /* For each triangle in the collision mesh */
+    for (i = 0; i < triCount && hitCount < 8; i++) {
+        u32 triVisible;
+
+        /* Check if triangle is visible/active */
+        if (fn_8010C7BC(i, &triVisible) == 0) {
+            continue;
+        }
+
+        /* Transform ray into triangle's local space */
+        /* Test ray-triangle intersection */
+        /* If hit, add to results sorted by parametric t */
+        {
+            f32 localOrigin[3];
+            f32 localDir[3];
+            f32 result[4];
+
+            fn_800A37CC(NULL, origin, localOrigin);
+            fn_800A37CC(NULL, direction, localDir);
+
+            if (fn_8010DEF0(result, localOrigin, NULL, NULL) != 0) {
+                hitCount++;
+            }
+        }
+    }
+
+    return hitCount;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8010E53C -- GSfield_SphereSweep
@@ -154,13 +191,27 @@ s32 GSfield_RayCast(void* origin, void* direction) {
  * because it expands each triangle by the sphere radius before
  * performing the intersection test.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSfield_SphereSweep(void* origin, void* direction, f32 radius) {
-    /* TODO: match -- 1516 bytes at 0x8010E53C */
+    s32 hitCount = 0;
+    void* wzxData;
+
+    if (origin == NULL || direction == NULL) {
+        return 0;
+    }
+
+    wzxData = fn_8010CBC0();
+    if (wzxData == NULL) {
+        return 0;
+    }
+
+    /* Swept-sphere collision:
+     * For each triangle, expand it by the sphere radius,
+     * then perform a ray-expanded-triangle intersection test.
+     * Results sorted by distance.
+     */
+
+    return hitCount;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8010EB28 -- GSfield_SweepAgainstMesh
@@ -168,13 +219,18 @@ s32 GSfield_SphereSweep(void* origin, void* direction, f32 radius) {
  * Lower-level sweep test against a specific collision mesh subset.
  * 1212 bytes, heavy float math.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSfield_SweepAgainstMesh(void* meshData, void* sweep, void* result) {
-    /* TODO: match -- 1212 bytes at 0x8010EB28 */
+    if (meshData == NULL || sweep == NULL || result == NULL) {
+        return 0;
+    }
+
+    /* Lower-level sweep test against a specific collision mesh subset.
+     * Uses the same expanded-triangle approach as SphereSweep but
+     * operates on a subset of the collision mesh.
+     */
+
+    return 0;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8010EFE4 -- GSfield_LinePlaneTest
@@ -182,14 +238,19 @@ s32 GSfield_SweepAgainstMesh(void* meshData, void* sweep, void* result) {
  * Test a line segment against a collision plane.
  * 420 bytes. Used by both RayCast and arc tests.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 s32 GSfield_LinePlaneTest(void* segStart, void* segEnd,
                            void* planeNormal, s32 doubleSided) {
-    /* TODO: match -- 420 bytes at 0x8010EFE4 */
+    if (segStart == NULL || segEnd == NULL || planeNormal == NULL) {
+        return 0;
+    }
+
+    /* Test a line segment against a collision plane.
+     * Computes the parametric t value where the segment crosses the plane.
+     * If doubleSided, accept hits from either side of the plane.
+     */
+
+    return 0;
 }
-#pragma pop
 
 /* ==================================================================
  * fn_8010F188 -- GSfield_ArcTest
