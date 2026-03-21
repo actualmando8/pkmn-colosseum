@@ -8737,8 +8737,8 @@ L_80207B48: ;
 #pragma pop
 
 /* 0x80207B5C | size: 0x30 */
-u32 fn_80207B5C(void* context, u8 flags, u16 value) {
-    return fn_801254B4(context, 0, 0xFF, (u8)flags, (u16)value);
+u32 fn_80207B5C(void* context, u32 flags, u32 value) {
+    return fn_801254B4(context, 0, 0xFF, flags & 0xFF, value & 0xFFFF);
 }
 
 /* 0x80207B8C | size: 0x34 */
