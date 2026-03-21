@@ -41564,8 +41564,8 @@ L_8025FBBC: ;
 extern u8* fn_80129280(u32, u32);
 extern u32 fn_800E0C04(s32);
 void fn_8025FBCC(u32 flag) {
-    u32 i;
     u8* data;
+    u32 i;
     u16 count, j;
 
     if (flag == 0) {
