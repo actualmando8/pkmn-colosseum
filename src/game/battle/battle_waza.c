@@ -427,19 +427,28 @@ BOOL fn_801D1E50(s32 seqHandle) {
 #pragma pop
 
 /**
- * fn_801D1F0C - Waza projectile destroy.
+ * fn_801D1F0C - Waza get party entry by index from u16 array.
  * Address: 0x801D1F0C | Size: 0x70
+ * Gets party via fn_80129280(0, 0xA), bounds-checks idx against party+0x400,
+ * returns u16 at party[idx*2].
  */
-void fn_801D1F0C(s32 seqHandle) {
-    /* Destroy projectile */
+s32 fn_801D1F0C(s32 idx) {
+    void* party;
+    u16 count;
+    party = (void*)fn_80129280(0, 0x0A);
+    if (idx < 0) return -1;
+    count = *(u16*)((u8*)(void*)fn_80129280(0, 0x0A) + 0x400);
+    if (idx >= (s32)count) return -1;
+    return *(u16*)((u8*)party + idx * 2);
 }
 
 /**
- * fn_801D1F7C - Waza get active effect count.
+ * fn_801D1F7C - Waza get active effect count from party+0x400.
  * Address: 0x801D1F7C | Size: 0x2C
  */
-s32 fn_801D1F7C(void) {
-    return 0;
+u16 fn_801D1F7C(void) {
+    void* party = (void*)fn_80129280(0, 0x0A);
+    return *(u16*)((u8*)party + 0x400);
 }
 
 /**
@@ -558,11 +567,12 @@ void fn_801D2B4C(void) {
 #pragma pop
 
 /**
- * fn_801D2C6C - Waza get global state.
+ * fn_801D2C6C - Waza get global state from SDA.
  * Address: 0x801D2C6C | Size: 0x8
  */
-u8 fn_801D2C6C(void) {
-    return 0;
+extern u32 lbl_8047B3EC;
+u32 fn_801D2C6C(void) {
+    return lbl_8047B3EC;
 }
 
 /* =========================================================================
@@ -606,11 +616,15 @@ void fn_801D2F94(void) {
 #pragma pop
 
 /**
- * fn_801D301C - Waza animation get teardown flag.
+ * fn_801D301C - Waza animation reset: set lbl_8047B3F4=1, lbl_8047B3EC=0, lbl_8047B3F0=0.
  * Address: 0x801D301C | Size: 0x18
  */
-u8 fn_801D301C(void) {
-    return 0;
+extern u8  lbl_8047B3F4;
+extern u32 lbl_8047B3F0;
+void fn_801D301C(void) {
+    lbl_8047B3F4 = 1;
+    lbl_8047B3EC = 0;
+    lbl_8047B3F0 = 0;
 }
 
 /**
@@ -852,11 +866,12 @@ void fn_801D7230(void) {
 #pragma pop
 
 /**
- * fn_801D744C - Move animation get finalize state.
+ * fn_801D744C - Move animation OR bits into lbl_804673F8+0xC.
  * Address: 0x801D744C | Size: 0x18
  */
-u8 fn_801D744C(void) {
-    return 1;
+extern u8 lbl_804673F8[];
+void fn_801D744C(u32 bits) {
+    *(u32*)(lbl_804673F8 + 0x0C) |= bits;
 }
 
 /* =========================================================================
@@ -1048,11 +1063,12 @@ void fn_801D9C1C(s32 slot) {
 #pragma pop
 
 /**
- * fn_801D9E1C - Pokemon motion get complete.
+ * fn_801D9E1C - Pokemon motion get complete. Returns obj->0x77 or 0 if NULL.
  * Address: 0x801D9E1C | Size: 0x18
  */
-BOOL fn_801D9E1C(s32 slot) {
-    return TRUE;
+u8 fn_801D9E1C(void* obj) {
+    if (obj == NULL) return 0;
+    return *(u8*)((u8*)obj + 0x77);
 }
 
 /**
@@ -1120,11 +1136,12 @@ void fn_801DA2C4(void* effect, f32 radius, f32 t) {
 #pragma pop
 
 /**
- * fn_801DA354 - Waza effect get trajectory type.
+ * fn_801DA354 - Waza effect get trajectory type. Returns effect->0x18 or 0 if NULL.
  * Address: 0x801DA354 | Size: 0x18
  */
-s32 fn_801DA354(void* effect) {
-    return 0;
+u8 fn_801DA354(void* effect) {
+    if (effect == NULL) return 0;
+    return *(u8*)((u8*)effect + 0x18);
 }
 
 /**
@@ -1144,11 +1161,12 @@ void fn_801DA3CC(void* effect, f32 vx, f32 vy, f32 vz) {
 }
 
 /**
- * fn_801DA42C - Waza effect get velocity magnitude.
+ * fn_801DA42C - Waza effect get bit 0 of field 0x18.
  * Address: 0x801DA42C | Size: 0x1C
  */
-f32 fn_801DA42C(void* effect) {
-    return 0.0f;
+u32 fn_801DA42C(void* effect) {
+    if (effect == NULL) return 0;
+    return *(u8*)((u8*)effect + 0x18) & 1;
 }
 
 /**
@@ -1174,11 +1192,13 @@ void fn_801DA4E8(void* effect, f32 drag) {
 #pragma pop
 
 /**
- * fn_801DA5AC - Waza effect get lifetime remaining.
+ * fn_801DA5AC - Waza effect set fields 0x16=0, 0x17=r4.
  * Address: 0x801DA5AC | Size: 0x18
  */
-f32 fn_801DA5AC(void* effect) {
-    return 0.0f;
+void fn_801DA5AC(void* effect, u8 val) {
+    if (effect == NULL) return;
+    *(u8*)((u8*)effect + 0x16) = 0;
+    *(u8*)((u8*)effect + 0x17) = val;
 }
 
 /**

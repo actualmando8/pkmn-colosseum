@@ -455,9 +455,25 @@ def decompile_general(fn_name, insns, real):
     # Build declarations
     decl_lines = []
 
-    # Declare extern labels
+    # Labels already declared at file scope with specific types
+    FILE_SCOPE_LABELS = {
+        'lbl_80270440', 'lbl_80270460', 'lbl_80270480',
+        'lbl_802704A0', 'lbl_80270528', 'lbl_8027056C',
+        'lbl_802705C0', 'lbl_802705D0', 'lbl_80270610',
+        'lbl_80400248', 'lbl_8047AA80', 'lbl_80400B28',
+        'lbl_80400248',
+    }
+    # Labels declared as u32 (not arrays)
+    U32_LABELS = {'lbl_8047AB08'}
+
+    # Declare extern labels (skip file-scope ones)
     for lbl in sorted(sda_labels | ha_labels):
-        decl_lines.append(f'    extern u8 {lbl}[];')
+        if lbl in FILE_SCOPE_LABELS:
+            continue
+        if lbl in U32_LABELS:
+            decl_lines.append(f'    extern u32 {lbl};')
+        else:
+            decl_lines.append(f'    extern u8 {lbl}[];')
 
     # Declare extern functions called
     for fn_target in sorted(bl_targets):
@@ -467,9 +483,11 @@ def decompile_general(fn_name, insns, real):
     jt_set = set()
     fn_addr_set = set()
     has_bdnz = False
+    extra_labels = set()
     for entry in insns:
         if entry[0] != 'inst':
             continue
+        mnem = entry[1]
         ops_str = entry[2] if len(entry) > 2 else ''
         for m2 in re.finditer(r'(jumptable_[0-9A-Fa-f]+)', ops_str):
             jt_set.add(m2.group(1))
@@ -477,13 +495,30 @@ def decompile_general(fn_name, insns, real):
         if entry[1] not in ('bl',):
             for m2 in re.finditer(r'(fn_[0-9A-Fa-f]+)@', ops_str):
                 fn_addr_set.add(m2.group(1))
-        if entry[1] == 'bdnz':
+        if mnem == 'bdnz':
             has_bdnz = True
+        # For bl calls, add implicit argument registers
+        if mnem == 'bl':
+            target = ops_str.strip()
+            if target == 'memcpy' or target == 'memset':
+                used_iregs.update({3, 4, 5})
+            elif target.startswith('fn_') or target.startswith('_'):
+                pass  # don't add implicit regs for general calls
+            else:
+                used_iregs.update({3, 4, 5})
+        # For li rX, label@sda21, declare the label
+        if mnem == 'li' and '@sda21' in ops_str:
+            m2 = re.search(r'(\w+)@sda21', ops_str)
+            if m2:
+                extra_labels.add(m2.group(1))
     for jt in sorted(jt_set):
         decl_lines.append(f'    extern u8 {jt}[];')
     for fa in sorted(fn_addr_set):
         if fa not in bl_targets:
             decl_lines.append(f'    extern void {fa}();')
+    for el in sorted(extra_labels):
+        if el not in (sda_labels | ha_labels | FILE_SCOPE_LABELS | U32_LABELS):
+            decl_lines.append(f'    extern u8 {el}[];')
 
     # Stack frame local variables (must come before r1)
     if frame_size > 0:
@@ -679,7 +714,11 @@ def translate_inst(mnem, op, ops_str):
     """Translate a PPC instruction to a C statement."""
 
     if mnem == 'li':
-        return f'{op[0]} = {op[1]};'
+        val = op[1]
+        if '@sda21' in val:
+            label = val.replace('@sda21', '')
+            return f'{op[0]} = (u32){label};'
+        return f'{op[0]} = {val};'
     if mnem == 'lis':
         if '@ha' in op[1]:
             label = op[1].replace('@ha', '')
@@ -746,7 +785,7 @@ def translate_inst(mnem, op, ops_str):
     if mnem == 'stbu':
         off, base = parse_mem(op[1])
         if isinstance(off, str):
-            return f'{base} = (u8*){off}; *(u8*){base} = {op[0]};'
+            return f'{base} = (u32){off}; *(u8*){base} = {op[0]};'
         if isinstance(off, int):
             return f'{base} += {off}; *(u8*){base} = {op[0]};'
 
