@@ -6628,11 +6628,17 @@ void fn_80116470(void) {
                                     fn_801669BC();
                                     r3 = 0x46;
                                     fn_80166A28();
+<<<<<<< Updated upstream
 
                                         } else {
                                             }
                                                     }
                                                     }
+=======
+                                }
+                                }
+                                }
+>>>>>>> Stashed changes
 
                             r0 = r31 & 0x00000004;
                             if ((s32)r0 != (s32)0x0) {
