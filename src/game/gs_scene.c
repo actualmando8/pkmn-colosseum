@@ -234,6 +234,7 @@ void GSscene_ProcessFreeList(void) {
                     *(u16*)&lbl_8047B118 = tmp;
                     }
                     }
+                }
                 *(u32*)&lbl_8047B184 = r29;
                 if (r29 != 0) {
                     while (1) {
@@ -364,6 +365,7 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                     *(u16*)&lbl_8047B118 = tmp;
                     }
                     }
+                }
                 *(u32*)&lbl_8047B184 = r29;
                 if (r29 != 0) {
                     while (1) {
@@ -1378,9 +1380,8 @@ sceneObj = *(u32*)&lbl_80478C40;
         sceneObj = (r4 & 0x7F800000);
         do {
             if ((s32)sceneObj != (s32)tmp) {
-                if ((s32)sceneObj >= (s32)tmp) goto L_80178C14;
-                if ((s32)sceneObj != 0) {
-                    goto L_80178C14;
+                if ((s32)sceneObj >= (s32)tmp || (s32)sceneObj != 0) {
+                    tmp = 0x4; break;
                 }
                 tmp = r4 & 0x7FFFFF;
                 if ((s32)sceneObj != 0) {
@@ -1397,8 +1398,6 @@ sceneObj = *(u32*)&lbl_80478C40;
             }
             tmp = 0x3;
             break;
-        L_80178C14:
-            tmp = 0x4;
         } while (0);
             if ((s32)tmp == 1) {
             sceneObj = (u32)lbl_80478AC0;

@@ -5155,8 +5155,7 @@ void fn_801F3CE8(void) {
         r0 = r0 & 0xFFFF;
         if ((u32)r30 != (u32)0x0) {
             r29 = 0x0;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5164,8 +5163,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x0;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5173,8 +5171,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x1;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5182,8 +5179,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x2;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5191,8 +5187,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x3;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5200,8 +5195,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x4;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5209,8 +5203,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x1;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5218,8 +5211,7 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x2;
-            goto L_801F3EC4;
-        }
+        } else {
         r3 = r26;
         r4 = 0x0;
         r5 = 0xa;
@@ -5227,11 +5219,18 @@ void fn_801F3CE8(void) {
         fn_801F54A4();
         if ((s32)r3 == (s32)0x1) {
             r29 = 0x3;
-            goto L_801F3EC4;
-        }
+        } else {
         r29 = 0x0;
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
+        }
     }
-    L_801F3EC4: ;
     r3 = r26;
     r4 = 0x0;
     r5 = 0x1d;

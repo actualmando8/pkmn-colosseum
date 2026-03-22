@@ -387,9 +387,9 @@ L_800C5768:
         r3 = r5 & 0x7FF00000;
         *(u8*)((u8*)r30 + 0x4) = r4;
         if ((s32)r3 != (s32)tmp) {
-            if ((s32)r3 >= (s32)tmp) goto L_800C57F8;
+            if ((s32)r3 >= (s32)tmp) { tmp = 0x4; break; }
             if ((s32)r3 != 0) {
-                goto L_800C57F8;
+                tmp = 0x4; break;
             }
             tmp = r5 & 0xFFFFF;
             if ((s32)r3 == 0) {
@@ -410,8 +410,8 @@ L_800C5768:
             }
         tmp = 0x3;
         break;
-    L_800C57F8:
-        tmp = 0x4;
+
+
     } while (0);
         tmp = 0x49;
         if ((s32)tmp == 1) {

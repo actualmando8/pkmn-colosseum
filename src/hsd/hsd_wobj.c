@@ -1530,9 +1530,9 @@ while (1) {
                     tmp = 0x7F800000;
                     r3 = r3 & 0x7F800000;
                     if ((s32)r3 != (s32)tmp) {
-                        if ((s32)r3 >= (s32)tmp) goto L_80192950;
+                        if ((s32)r3 >= (s32)tmp) { tmp = 0x4; break; }
                         if ((s32)r3 != 0) {
-                            goto L_80192950;
+                            tmp = 0x4; break;
                         }
                         tmp = tmp & 0x7FFFFF;
                         if ((s32)r3 != 0) {
@@ -1549,8 +1549,8 @@ while (1) {
                     }
                     tmp = 0x3;
                     break;
-                L_80192950:
-                    tmp = 0x4;
+
+
                 } while (0);
                     if ((s32)tmp == 1) {
                         r3 = (u32)lbl_80478AC0;

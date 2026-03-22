@@ -613,10 +613,10 @@ do {
                 if ((s32)tmp < 0x3c) {
                     if ((s32)tmp != 0x3a) {
                         if ((s32)tmp < 0x3a) {
-                            goto L_8001C774;
+                            tmp = 0x0; break;
                         }
                         if ((s32)tmp != 0x3e) {
-                            if ((s32)tmp >= 0x3e) goto L_8001C774;
+                            if ((s32)tmp >= 0x3e) { tmp = 0x0; break; }
                             goto L_8001C764;
                             }
                         tmp = 0x2;
@@ -633,8 +633,8 @@ do {
                         }
             tmp = 0x6;
             break;
-        L_8001C774:
-            tmp = 0x0;
+
+
         } while (0);
             tmp = tmp & 0xFFFF;
             r3 = (u32)lbl_802E4EB8;
@@ -1321,10 +1321,10 @@ void fn_8001C7B8(void) {
                                 if ((s32)tmp < 0x3c) {
                                     if ((s32)tmp != 0x3a) {
                                         if ((s32)tmp < 0x3a) {
-                                            goto L_8001D124;
+                                            tmp = 0x0; break;
                                         }
                                         if ((s32)tmp != 0x3e) {
-                                            if ((s32)tmp >= 0x3e) goto L_8001D124;
+                                            if ((s32)tmp >= 0x3e) { tmp = 0x0; break; }
                                             goto L_8001D114;
                                             }
                                         tmp = 0x2;
@@ -1341,8 +1341,8 @@ void fn_8001C7B8(void) {
                                         }
                             tmp = 0x6;
                             break;
-                        L_8001D124:
-                            tmp = 0x0;
+
+
                         } while (0);
                             tmp = tmp & 0xFFFF;
                             r3 = (u32)lbl_802E4EB8;
@@ -1672,10 +1672,10 @@ void fn_8001D378(void) {
                 if ((s32)tmp < 0x3c) {
                     if ((s32)tmp != 0x3a) {
                         if ((s32)tmp < 0x3a) {
-                            goto L_8001D5E4;
+                            tmp = 0x0; break;
                         }
                         if ((s32)tmp != 0x3e) {
-                            if ((s32)tmp >= 0x3e) goto L_8001D5E4;
+                            if ((s32)tmp >= 0x3e) { tmp = 0x0; break; }
                             goto L_8001D5D4;
                             }
                         tmp = 0x2;
@@ -1692,8 +1692,8 @@ void fn_8001D378(void) {
                         }
             tmp = 0x6;
             break;
-        L_8001D5E4:
-            tmp = 0x0;
+
+
         } while (0);
             tmp = tmp & 0xFFFF;
             r3 = (u32)lbl_802E4EB8;
