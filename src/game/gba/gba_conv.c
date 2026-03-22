@@ -5218,18 +5218,18 @@ L_800887C8:
             r6 = 0x1;
             ((void(*)(void))fn_8001E074)();
             tmp = (s8)r3;
-        } while ((s32)tmp != 0);
-        fn_80128E24();
-        r5 = 0x20000;
-        r4 = r28;
-        memcpy((void*)r3, (const void*)r4, (u32)r5);
-        r3 = 0x0;
-        ((void(*)(void))fn_8006ADB4)();
-        r3 = r28;
-        ((void(*)(void))fn_8007109C)();
-        r3 = 0x0;
-        return;
-            }
+        }
+    } while ((s32)tmp != 0);
+    fn_80128E24();
+    r5 = 0x20000;
+    r4 = r28;
+    memcpy((void*)r3, (const void*)r4, (u32)r5);
+    r3 = 0x0;
+    ((void(*)(void))fn_8006ADB4)();
+    r3 = r28;
+    ((void(*)(void))fn_8007109C)();
+    r3 = 0x0;
+    return;
     r3 = r28;
     ((void(*)(void))fn_8007109C)();
     r3 = 0x1;

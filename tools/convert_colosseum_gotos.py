@@ -1456,12 +1456,14 @@ def process_file(filepath, verbose=False):
         changes += convert_multi_ref_forward_2(lines, rc, lp, ls)
 
         # 6b: if { goto MERGE } else_code -> if(!(cond)) { else_code }
-        rc, lp, ls = build_indices(lines)
-        changes += convert_if_goto_else_block(lines, rc, lp, ls)
+        # (disabled - causes brace nesting corruption)
+        # rc, lp, ls = build_indices(lines)
+        # changes += convert_if_goto_else_block(lines, rc, lp, ls)
 
         # 6c: Unconditional forward goto (single ref) -> else block
-        rc, lp, ls = build_indices(lines)
-        changes += convert_uncond_fwd_goto_to_else(lines, rc, lp, ls)
+        # (disabled - causes brace nesting corruption)
+        # rc, lp, ls = build_indices(lines)
+        # changes += convert_uncond_fwd_goto_to_else(lines, rc, lp, ls)
 
         # 7: Do-while permissive
         rc, lp, ls = build_indices(lines)

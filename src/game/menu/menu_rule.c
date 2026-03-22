@@ -74,12 +74,12 @@ s32 fn_800767B8(void) {
         r0 = r3 & 0xFF;
         if (r0 == 0x0) {
             r0 = 0x0;
-            goto L_8007680C;
+            break;
         }
         r24 = r24 + 0x1;
     } while ((s32)r24 < 0x4);
     r0 = 0x1;
-L_8007680C: ;
+
     r0 = r0 & 0xFF;
     if (r0 == 0x0) {
         r3 = 0x0;
@@ -225,12 +225,12 @@ L_8007680C: ;
             r0 = r0 & 0xFF;
             if (r0 == 0x0) {
                 r0 = 0x0;
-                goto L_80076A48;
+                break;
             }
             r30 = r30 + 0x1;
         } while ((s32)r30 < 0x3);
         r0 = 0x1;
-    L_80076A48: ;
+
         r0 = r0 & 0xFF;
         if (r0 == 0x0) {
             r3 = 0x0;
@@ -1143,23 +1143,23 @@ s32 fn_800776E4(void) {
             tmp = r3 & 0xFF;
             if (tmp == 0) {
                 tmp = 0x0;
-                goto L_80077744;
+                break;
             }
             r27 = r27 + 0x1;
         } while ((s32)r27 < 6);
         tmp = 0x1;
-    L_80077744:
+
         tmp = tmp & 0xFF;
         if (tmp == 0) {
             tmp = 0x0;
-            goto L_8007776C;
+            break;
         }
         r26 = r26 + 0x1;
 
 
     }
     tmp = 0x1;
-L_8007776C:
+
     r3 = tmp & 0xFF;
     tmp = -r3;
     tmp = tmp | r3;
@@ -1177,12 +1177,12 @@ L_8007776C:
         tmp = r3 & 0xFF;
         if (tmp == 0) {
             tmp = 0x0;
-            goto L_800777C8;
+            break;
         }
         r24 = r24 + 0x1;
     } while ((s32)r24 < 4);
     tmp = 0x1;
-L_800777C8:
+
     tmp = tmp & 0xFF;
     if (tmp == 0) {
         tmp = 0x0;
@@ -1328,16 +1328,16 @@ L_800777C8:
             tmp = tmp & 0xFF;
             if (tmp == 0) {
                 tmp = 0x0;
-                goto L_80077A04;
+                break;
             }
             r26 = r26 + 0x1;
         } while ((s32)r26 < 3);
         tmp = 0x1;
-    L_80077A04:
+
         tmp = tmp & 0xFF;
         if (tmp == 0) {
             tmp = 0x0;
-            goto L_80077A34;
+            break;
         }
         r29 = r29 + 0x1;
     L_80077A1C:

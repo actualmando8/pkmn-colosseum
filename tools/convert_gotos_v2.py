@@ -274,91 +274,184 @@ def convert_multi_ref_while(lines, lp, rc, ls):
     return changes
 
 
-def convert_if_else_multiref(lines, lp, rc, ls):
-    """If-else where end label has multi refs."""
+def convert_validation_chain(lines, lp, rc, ls):
+    """Convert validation chain pattern (very common in PPC decomps):
+
+    if (c1) goto L1; fail_code; goto END; L1: ;
+    ...code1...
+    if (c2) goto L2; fail_code; goto END; L2: ;
+    ...code2...
+    if (c3) goto L3; fail_code; goto END; L3: ;
+    success_code;
+    END: ;
+
+    Into:
+    if (c1) {
+        ...code1...
+        if (c2) {
+            ...code2...
+            if (c3) {
+                success_code;
+            } else { fail_code; }
+        } else { fail_code; }
+    } else { fail_code; }
+
+    Or simpler form when fail_code is just "r0 = 0;":
+    r0 = 0;
+    if (c1) {
+        ...code1...
+        if (c2) {
+            ...code2...
+            if (c3) {
+                success_code;
+            }
+        }
+    }
+    """
     changes = 0
-    for i in range(len(lines) - 1, -1, -1):
-        m = re.match(r'^(\s+)if \((.+)\) goto (L_[0-9A-Fa-f]+);$', lines[i])
-        if not m:
-            continue
-        indent, cond, else_label = m.group(1), m.group(2), m.group(3)
+    processed = set()
 
-        if rc.get(else_label, 0) != 1:
-            continue
-        if else_label not in lp:
-            continue
-        else_idx = lp[else_label]
-        if else_idx <= i:
+    # Find candidate end labels (targets of multiple unconditional gotos)
+    for end_label, end_pos in sorted(lp.items(), key=lambda x: x[1]):
+        if end_label in processed:
             continue
 
-        # Find unconditional goto just before else_label
-        end_goto_idx = end_label = None
-        for k in range(else_idx - 1, i, -1):
-            s = lines[k].strip()
-            if not s:
-                continue
-            mg = re.match(r'^goto (L_[0-9A-Fa-f]+);$', s)
-            if mg:
-                end_goto_idx = k
-                end_label = mg.group(1)
-            break
-
-        if end_goto_idx is None or end_label is None:
-            continue
-        if end_label not in lp:
-            continue
-        end_idx = lp[end_label]
-        if end_idx <= else_idx:
+        sources = ls.get(end_label, [])
+        if len(sources) < 2:
             continue
 
-        # No labels in then-branch
-        if any(re.match(r'^\s*L_[0-9A-Fa-f]+\s*:\s*;?\s*$', lines[k]) for k in range(i + 1, end_goto_idx)):
+        # Find all unconditional gotos to this label
+        uncond_gotos = []
+        for src in sources:
+            m = re.match(r'^(\s+)goto ' + re.escape(end_label) + r';$', lines[src])
+            if m and src < end_pos:
+                uncond_gotos.append(src)
+
+        if len(uncond_gotos) < 2:
             continue
-        # No labels in else-branch
-        if any(re.match(r'^\s*L_[0-9A-Fa-f]+\s*:\s*;?\s*$', lines[k]) for k in range(else_idx + 1, end_idx)):
-            continue
-        # No bad gotos in then-branch
-        has_bad = False
-        for k in range(i + 1, end_goto_idx):
-            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
-            if gm and gm.group(1) in lp:
-                t = lp[gm.group(1)]
-                if t < i or t > end_idx:
-                    has_bad = True
+
+        uncond_gotos.sort()
+
+        # For each uncond goto, find the preceding pattern:
+        # line X: if (cond) goto L_next;
+        # line X+1..Y-1: fail assignments (1-3 lines)
+        # line Y: goto END;             <- this is our uncond_goto
+        # line Y+1: L_next: ;
+
+        chain = []
+        valid = True
+        for ug in uncond_gotos:
+            # Find fail code between conditional goto and unconditional goto
+            # Walk backward from ug to find the if-goto
+            cond_line = None
+            cond_text = None
+            next_label = None
+            fail_lines = []
+
+            for k in range(ug - 1, max(ug - 6, -1), -1):
+                s = lines[k].strip()
+                if not s:
+                    continue
+                m_if = re.match(r'^if \((.+)\) goto (L_[0-9A-Fa-f]+);$', s)
+                if m_if:
+                    cond_line = k
+                    cond_text = m_if.group(1)
+                    next_label = m_if.group(2)
                     break
-        if has_bad:
-            continue
-        for k in range(else_idx + 1, end_idx):
-            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
-            if gm and gm.group(1) in lp:
-                t = lp[gm.group(1)]
-                if t < i or t > end_idx:
-                    has_bad = True
-                    break
-        if has_bad:
+                else:
+                    fail_lines.insert(0, k)
+
+            if cond_line is None or next_label is None:
+                valid = False
+                break
+
+            # next_label should be right after the uncond goto
+            if next_label not in lp:
+                valid = False
+                break
+            next_label_pos = lp[next_label]
+            if next_label_pos < ug or next_label_pos > ug + 2:
+                valid = False
+                break
+            if rc.get(next_label, 0) != 1:
+                valid = False
+                break
+
+            chain.append({
+                'cond_line': cond_line,
+                'cond': cond_text,
+                'fail_lines': fail_lines,
+                'uncond_goto': ug,
+                'next_label': next_label,
+                'next_label_pos': next_label_pos,
+            })
+
+        if not valid or len(chain) < 2:
             continue
 
-        inv = invert_cond(cond)
-        if inv is None:
+        chain.sort(key=lambda x: x['cond_line'])
+
+        # Verify chain is contiguous
+        is_contiguous = True
+        for ci in range(len(chain) - 1):
+            if chain[ci]['next_label_pos'] > chain[ci + 1]['cond_line']:
+                is_contiguous = False
+                break
+        if not is_contiguous:
             continue
 
-        lines[i] = indent + 'if (' + inv + ') {'
-        for k in range(i + 1, end_goto_idx):
-            if lines[k].strip():
-                lines[k] = '    ' + lines[k]
-        lines[end_goto_idx] = indent + '} else {'
-        lines[else_idx] = ''
-        for k in range(else_idx + 1, end_idx):
-            if lines[k].strip():
-                lines[k] = '    ' + lines[k]
+        # Check all fail paths have the same assignment (typically r0 = 0)
+        fail_assignments = set()
+        for part in chain:
+            for fl in part['fail_lines']:
+                fail_assignments.add(lines[fl].strip())
 
-        rc[end_label] = rc.get(end_label, 0) - 1
-        rc[else_label] = 0
-        if rc.get(end_label, 0) <= 0:
-            lines[end_idx] = indent + '}'
+        # Get the indent
+        indent = re.match(r'^(\s*)', lines[chain[0]['cond_line']]).group(1)
+
+        # Convert: wrap each validation step in if (cond) { }
+        # The fail code before each goto END becomes redundant since we
+        # just fall out of all the ifs
+        # Put the common fail assignment before the chain
+
+        if len(fail_assignments) == 1:
+            common_fail = list(fail_assignments)[0]
+            # Put common fail assignment at the beginning, before first cond
+            # Then wrap each step in if(cond) { ... }
+            for ci, part in enumerate(chain):
+                lines[part['cond_line']] = indent + 'if (' + part['cond'] + ') {'
+                for fl in part['fail_lines']:
+                    lines[fl] = ''  # Remove fail assignment (already set before)
+                lines[part['uncond_goto']] = ''  # Remove goto END
+                lines[part['next_label_pos']] = ''  # Remove next label
+                rc[end_label] = rc.get(end_label, 0) - 1
+                rc[part['next_label']] = 0
+                changes += 1
+
+            # Now add closing braces at end_pos
+            # We need N closing braces for N chain entries
+            close_braces = '\n'.join([indent + '}'] * len(chain))
+            if rc.get(end_label, 0) <= 0:
+                lines[end_pos] = close_braces
+            else:
+                lines[end_pos] = close_braces + '\n' + lines[end_pos]
+
+            # Indent the body between each chain step
+            # Each deeper level gets one more indent
+            for ci in range(len(chain)):
+                extra_indent = '    ' * (ci + 1)
+                start = chain[ci]['next_label_pos'] + 1 if chain[ci]['next_label_pos'] > chain[ci]['cond_line'] else chain[ci]['cond_line'] + 1
+                end = chain[ci + 1]['cond_line'] if ci + 1 < len(chain) else end_pos
+
+                for k in range(start, end):
+                    if lines[k].strip():
+                        lines[k] = extra_indent + lines[k].lstrip()
+
+            processed.add(end_label)
+
         else:
-            lines[end_idx] = indent + '}\n' + lines[end_idx]
-        changes += 2
+            # Different fail assignments - skip for now
+            continue
 
     return changes
 
@@ -854,7 +947,7 @@ def process_file(filepath):
         lp, rc, ls = build_indices(lines)
         iter_changes += convert_return_value(lines, lp, rc, ls)
         lp, rc, ls = build_indices(lines)
-        iter_changes += convert_if_else_multiref(lines, lp, rc, ls)
+        iter_changes += convert_validation_chain(lines, lp, rc, ls)
         lp, rc, ls = build_indices(lines)
         iter_changes += convert_cascaded_if_else(lines, lp, rc, ls)
         lp, rc, ls = build_indices(lines)
