@@ -2653,18 +2653,18 @@ void fn_80195F0C(HSD_CObj* cobj_param) {
     }
     }
     if ((s32)r4 == 0) return;
-if ((u32)cobj_param != 0) goto L_80195FC8;
-cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
+if ((u32)cobj_param == 0) {
+    cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
     r4 = 0x318;
     r5 = (u32)lbl_8047D960;
     fn_80196E10();
-L_80195FC8:
-if ((u32)cobj_param != 0) goto L_80195FE0;
-cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
+}
+if ((u32)cobj_param == 0) {
+    cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
     r4 = 0x2e8;
     r5 = (u32)lbl_8047D960;
     fn_80196E10();
-L_80195FE0:
+}
 cobj_param = (HSD_CObj*)((HSD_CObj*)*(u32*)((u8*)(u32)cobj_param + 0x24));
     r4 = (u32)sp + 0x20;
     fn_80191688();
@@ -2679,18 +2679,18 @@ cobj_param = (HSD_CObj*)((HSD_CObj*)*(u32*)((u8*)(u32)cobj_param + 0x24));
         *(f32*)(sp + 0x18) = f1;
         *(f32*)(sp + 0x1C) = f0;
     }
-if ((u32)cobj_param != 0) goto L_80196030;
-cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
+if ((u32)cobj_param == 0) {
+    cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
     r4 = 0x300;
     r5 = (u32)lbl_8047D960;
     fn_80196E10();
-L_80196030:
-if ((u32)cobj_param != 0) goto L_80196048;
-cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
+}
+if ((u32)cobj_param == 0) {
+    cobj_param = (HSD_CObj*)(u32)lbl_8047D958;
     r4 = 0x2d0;
     r5 = (u32)lbl_8047D960;
     fn_80196E10();
-L_80196048:
+}
 cobj_param = (HSD_CObj*)((HSD_CObj*)*(u32*)((u8*)(u32)cobj_param + 0x28));
     r4 = (u32)sp + 0x8;
     fn_80191688();
@@ -2707,16 +2707,16 @@ cobj_param = (HSD_CObj*)((HSD_CObj*)*(u32*)((u8*)(u32)cobj_param + 0x28));
     tmp = *(u32*)((u8*)cobj_param + 0x8);
     tmp = tmp & 0xFFFFFFFD;
     *(u32*)((u8*)cobj_param + 0x8) = tmp;
-if ((u32)cobj_param == 0) goto L_8019609C;
+if ((u32)cobj_param != 0) {
     tmp = *(u32*)((u8*)cobj_param + 0x8);
     tmp = tmp & 0xBFFFFFFF;
     *(u32*)((u8*)cobj_param + 0x8) = tmp;
-L_8019609C:
-if ((u32)cobj_param == 0) goto L_801960B0;
+}
+if ((u32)cobj_param != 0) {
     tmp = *(u32*)((u8*)cobj_param + 0x8);
     tmp = tmp | (0x8000 << 16);
     *(u32*)((u8*)cobj_param + 0x8) = tmp;
-L_801960B0:
+}
     return;
 }
 

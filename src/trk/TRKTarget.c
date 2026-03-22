@@ -446,11 +446,11 @@ void fn_800C1610(void) {
     tmp = tmp | 0x400;
     *(u32*)((u8*)r3 + 0x1F8) = tmp;
 
-    if ((s32)r4 != 0 && (s32)r4 != 0x10) goto L_800C1694;
+    if ((s32)r4 == 0 && (s32)r4 != 0x10) {
 
-    r3 = *(u32*)((u8*)r31 + 0x8);
-    *(u32*)((u8*)r31 + 0x8) = tmp;
-L_800C1694:
+        r3 = *(u32*)((u8*)r31 + 0x8);
+        *(u32*)((u8*)r31 + 0x8) = tmp;
+    }
     r3 = (u32)gTRKState;
     tmp = 0x0;
     r4 = (u32)gTRKState;
