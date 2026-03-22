@@ -312,3 +312,7 @@ void GSgfx_DrawDispatch(void* drawList) {
     /* TODO: match -- 2792 bytes at 0x800E1544 */
 }
 #pragma pop
+
+/* No-op functions (1) */
+/* Address: 0x800DC874 | Size: 0x4 */
+void fn_800DC874(void) {}

@@ -419,3 +419,22 @@ void moviePlayGSLogo(void) {
 void moviePlayTPCLogo(void) {
     fn_801E189C(lbl_80267040, 0);
 }
+
+/* No-op functions (6) */
+/* Address: 0x800363B0 | Size: 0x4 */
+void fn_800363B0(void) {}
+
+/* Address: 0x800363B4 | Size: 0x4 */
+void fn_800363B4(void) {}
+
+/* Address: 0x800363B8 | Size: 0x4 */
+void fn_800363B8(void) {}
+
+/* Address: 0x8003669C | Size: 0x4 */
+void fn_8003669C(void) {}
+
+/* Address: 0x800366A0 | Size: 0x4 */
+void fn_800366A0(void) {}
+
+/* Address: 0x800366A4 | Size: 0x4 */
+void fn_800366A4(void) {}
