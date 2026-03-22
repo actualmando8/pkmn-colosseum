@@ -883,7 +883,7 @@ void fn_80194510(void) {
         return;
     }
     if ((s32)tmp >= 1) {
-    f1 = *(f32*)lbl_8047D980;
+        f1 = *(f32*)lbl_8047D980;
     f0 = *(f32*)((u8*)r31 + 0x40);
     f2 = *(f32*)lbl_8047D97C;
     f0 = f1 * f0;
@@ -895,6 +895,7 @@ void fn_80194510(void) {
     f0 = f0 * f1;
     f1 = f2 * f0;
     return;
+    }
 
     f1 = *(f32*)((u8*)r31 + 0x4C);
     return;
