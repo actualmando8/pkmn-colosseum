@@ -1500,6 +1500,7 @@ void fn_801E075C(void) {
         fn_800E4BF4();
         r25 = 0x0;
     L_801E099C:
+        ;
     } while ((s32)r30 != 0);
     return;
 }
@@ -1860,6 +1861,7 @@ void fn_801E09E0(void) {
         fn_800E4BF4();
         r29 = 0x0;
     L_801E0F34:
+        ;
     } while ((s32)r28 != 0);
     return;
 }

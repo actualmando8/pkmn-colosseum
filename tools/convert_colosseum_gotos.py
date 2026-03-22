@@ -1407,6 +1407,310 @@ def convert_if_goto_else_block(lines, label_refcount, label_pos, label_sources):
     return changes
 
 
+def convert_guard_set_goto_merge(lines, label_refcount, label_pos, label_sources):
+    """Convert pattern:
+        if (cond) {
+            rN = VALUE;
+            goto L_MERGE;
+        }
+        rN = OTHER_VALUE;
+    L_MERGE: ;
+
+    Into:
+        if (cond) {
+            rN = VALUE;
+        } else {
+            rN = OTHER_VALUE;
+        }
+
+    This is the most common remaining pattern in colosseum_event.c.
+    Handles single-ref labels only.
+    """
+    changes = 0
+    for i in range(len(lines) - 1, -1, -1):
+        # Look for: goto L_LABEL; (unconditional)
+        m = re.match(r'^(\s+)goto (L_[0-9A-Fa-f]+);$', lines[i])
+        if not m:
+            continue
+        indent = m.group(1)
+        label = m.group(2)
+        if label_refcount.get(label, 0) != 1:
+            continue
+        if label not in label_pos:
+            continue
+        label_idx = label_pos[label]
+        if label_idx <= i:
+            continue
+
+        # The goto must be followed by } then assignment then L_MERGE:
+        # Pattern:
+        #   line i:   goto MERGE;
+        #   line i+1: }
+        #   line i+2: rN = OTHER; (1-3 assignment lines)
+        #   line label_idx: L_MERGE: ;
+
+        # Check closing brace right after goto
+        close_idx = None
+        for k in range(i + 1, min(i + 3, len(lines))):
+            s = lines[k].strip()
+            if not s:
+                continue
+            if s == '}':
+                close_idx = k
+            break
+
+        if close_idx is None:
+            continue
+
+        # Check that between close_idx+1 and label_idx there are 1-3 assignment lines
+        body_lines = []
+        valid = True
+        for k in range(close_idx + 1, label_idx):
+            s = lines[k].strip()
+            if not s:
+                continue
+            # Must be a simple assignment (rN = val; or similar)
+            if re.match(r'^(r\d+|tmp|r0)\s*=\s*.+;$', s):
+                body_lines.append(k)
+            elif re.match(r'^L_[0-9A-Fa-f]+\s*:', s):
+                valid = False
+                break
+            elif re.search(r'\bgoto\b', s):
+                valid = False
+                break
+            else:
+                valid = False
+                break
+
+        if not valid or len(body_lines) < 1 or len(body_lines) > 3:
+            continue
+
+        # Check there's an if-block containing the goto
+        # The goto should be preceded by an assignment within a { } block
+        # Look backwards from the goto to find the if ( ... ) {
+        if_line = None
+        d = 0
+        for k in range(i, max(i - 10, -1), -1):
+            d += lines[k].count('}') - lines[k].count('{')
+            if d < 0:
+                if re.match(r'^\s*if\s*\(', lines[k]):
+                    if_line = k
+                break
+
+        if if_line is None:
+            continue
+
+        # Convert: the goto becomes the end of the if-block,
+        # the } after becomes } else {, and the assignment lines become the else body,
+        # and the label becomes }
+        lines[i] = ''  # remove goto
+        # Find the indent of the if statement for proper } else { indentation
+        if_indent_m = re.match(r'^(\s*)', lines[if_line])
+        if_indent = if_indent_m.group(1) if if_indent_m else ''
+
+        lines[close_idx] = if_indent + '} else {'
+        # Indent the else body lines
+        for k in body_lines:
+            lines[k] = if_indent + '    ' + lines[k].strip()
+        lines[label_idx] = if_indent + '}'
+
+        label_refcount[label] = 0
+        changes += 1
+
+    return changes
+
+
+def convert_cond_goto_with_assign_merge(lines, label_refcount, label_pos, label_sources):
+    """Convert pattern where conditional goto is inside if-block with assignment:
+        if (cond) {
+            rN = 0x0;
+            goto L_MERGE;
+        }
+
+    Where L_MERGE is multi-ref but all refs follow this same pattern.
+    Convert each ref individually when possible using the guard_set pattern.
+    """
+    # This is handled by convert_guard_set_goto_merge for single-ref.
+    # For multi-ref, we need a different approach.
+    # For now, just return 0.
+    return 0
+
+
+def convert_assign_goto_to_assign(lines, label_refcount, label_pos, label_sources):
+    """Convert pattern where an unconditional goto targets a label followed by
+    code that continues execution. When the goto is the only ref and the label
+    has no other references entering it, convert by just removing the goto and label.
+
+    Also handles: rN = val; goto L; ... L: ; where L is followed by r0 = r0 & 0xFF;
+    These are common in colosseum_event.c guard chains.
+
+    Specifically targets:
+        if (cond) {
+            r0 = 0x0;
+            goto L_MERGE;
+        }
+        r0 = 0x1;
+    L_MERGE: ;
+        r0 = r0 & 0xFF;
+
+    Where multiple gotos target MERGE, this pattern can be converted by
+    recognizing that the if(cond) { r0=0; goto MERGE; } r0=1; MERGE:
+    is equivalent to r0 = cond ? 0 : 1; (with r0 being a byte flag).
+
+    For each if-block ending in { r0 = 0x0; goto MERGE; } preceded by r0 = 0x1;
+    at the MERGE label, we convert to:
+        if (!(cond)) {
+            r0 = 0x1;
+        }
+    """
+    changes = 0
+    # This needs to work differently - find patterns from the goto side
+    for i in range(len(lines) - 1, -1, -1):
+        # Look for: r0 = 0x0; followed by goto L on next line, inside { }
+        line = lines[i].strip()
+        if line != 'r0 = 0x0;':
+            continue
+        # Next non-blank should be a goto
+        goto_idx = None
+        goto_label = None
+        for k in range(i + 1, min(i + 3, len(lines))):
+            s = lines[k].strip()
+            if not s:
+                continue
+            mg = re.match(r'^goto (L_[0-9A-Fa-f]+);$', s)
+            if mg:
+                goto_idx = k
+                goto_label = mg.group(1)
+            break
+
+        if goto_idx is None:
+            continue
+
+        if goto_label not in label_pos:
+            continue
+        label_idx = label_pos[goto_label]
+        if label_idx <= goto_idx:
+            continue
+
+        # Check there's a } after the goto
+        close_idx = None
+        for k in range(goto_idx + 1, min(goto_idx + 3, len(lines))):
+            s = lines[k].strip()
+            if not s:
+                continue
+            if s == '}':
+                close_idx = k
+            break
+
+        if close_idx is None:
+            continue
+
+        # Check that between close_idx and label_idx there's exactly "r0 = 0x1;"
+        has_r0_1 = False
+        r0_1_idx = None
+        valid = True
+        for k in range(close_idx + 1, label_idx):
+            s = lines[k].strip()
+            if not s:
+                continue
+            if s == 'r0 = 0x1;' and not has_r0_1:
+                has_r0_1 = True
+                r0_1_idx = k
+            elif re.match(r'^L_[0-9A-Fa-f]+\s*:', s):
+                valid = False
+                break
+            elif re.search(r'\bgoto\b', s):
+                valid = False
+                break
+            else:
+                valid = False
+                break
+
+        if not valid or not has_r0_1:
+            continue
+
+        # Find the enclosing if statement
+        if_line = None
+        d = 0
+        for k in range(i - 1, max(i - 10, -1), -1):
+            s = lines[k].strip()
+            d += s.count('}') - s.count('{')
+            if d < 0:
+                if re.match(r'^if\s*\(', s):
+                    if_line = k
+                break
+
+        if if_line is None:
+            continue
+
+        # Get the if condition
+        if_m = re.match(r'^(\s*)if \((.+)\) \{$', lines[if_line])
+        if not if_m:
+            continue
+
+        if_indent = if_m.group(1)
+        cond = if_m.group(2)
+
+        # Invert condition
+        inv = invert_cond(cond)
+        if inv is None:
+            continue
+
+        # Apply transformation:
+        # Replace: if (cond) { r0=0; goto MERGE; } r0=1;
+        # With: if (!(cond)) { r0=0x1; } else { r0=0x0; }
+        # But wait - this is simpler: just replace with
+        # r0 = (cond) ? 0x0 : 0x1; but MWCC doesn't have ternary elegantly
+        # Better: if (!(cond)) { r0 = 0x1; }
+        # since r0 starts at 0 (set by the original r0 = 0x0 in the if branch)
+        # Actually no, we need to keep both paths.
+        #
+        # Simplest safe transform:
+        # if (cond) { r0 = 0; } else { r0 = 1; }
+        lines[if_line] = if_indent + 'if (' + cond + ') {'
+        lines[i] = if_indent + '    r0 = 0x0;'
+        lines[goto_idx] = ''  # remove goto
+        lines[close_idx] = if_indent + '} else {'
+        lines[r0_1_idx] = if_indent + '    r0 = 0x1;'
+
+        # If this was the only ref to the label, remove it
+        label_refcount[goto_label] = label_refcount.get(goto_label, 0) - 1
+        if label_refcount.get(goto_label, 0) <= 0:
+            lines[label_idx] = if_indent + '}'
+        else:
+            # Can't remove the label, but we still removed the goto
+            # Need to add closing brace before the label
+            # Insert } before the label
+            # This is tricky with line arrays... skip for now
+            # Actually we need to put } right before the label
+            # The safest thing: put } on the r0_1_idx line after the assignment
+            # Actually label_idx should have the label, and we need } before it
+            # Let's just add } to the line before label
+            # Find last non-empty line before label
+            for k in range(label_idx - 1, r0_1_idx, -1):
+                if lines[k].strip():
+                    lines[k] = lines[k] + ' /* end else */'
+                    break
+            # We can't easily add } here without breaking line numbering
+            # So only do this transform when the label has 1 ref
+            # Undo everything
+            lines[if_line] = if_m.group(0)
+            lines[i] = if_indent + '    r0 = 0x0;'
+            lines[goto_idx] = if_indent + '    goto ' + goto_label + ';'
+            lines[close_idx] = if_indent + '}'
+            lines[r0_1_idx] = if_indent + 'r0 = 0x1;'
+            label_refcount[goto_label] = label_refcount.get(goto_label, 0) + 1
+            for k in range(label_idx - 1, r0_1_idx, -1):
+                if '/* end else */' in lines[k]:
+                    lines[k] = lines[k].replace(' /* end else */', '')
+                    break
+            continue
+
+        changes += 1
+
+    return changes
+
+
 def process_file(filepath, verbose=False):
     """Process a single file through all conversion passes."""
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:

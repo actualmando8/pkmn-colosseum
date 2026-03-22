@@ -10,6 +10,29 @@ import os
 def invert_cond(cond):
     """Invert a condition expression."""
     cond = cond.strip()
+
+    # Handle compound conditions with && (De Morgan's: !(A && B) = !A || !B)
+    if ' && ' in cond:
+        parts = cond.split(' && ')
+        inverted_parts = []
+        for p in parts:
+            inv = invert_cond(p.strip())
+            if inv is None:
+                return None
+            inverted_parts.append(inv)
+        return ' || '.join(inverted_parts)
+
+    # Handle compound conditions with || (De Morgan's: !(A || B) = !A && !B)
+    if ' || ' in cond:
+        parts = cond.split(' || ')
+        inverted_parts = []
+        for p in parts:
+            inv = invert_cond(p.strip())
+            if inv is None:
+                return None
+            inverted_parts.append(inv)
+        return ' && '.join(inverted_parts)
+
     replacements = [
         (' == ', ' != '),
         (' != ', ' == '),
