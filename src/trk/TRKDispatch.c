@@ -257,8 +257,8 @@ L_800C09B8:
         r5 = r25;
         ((void(*)(void))MWTRACE)();
     }
-    if ((s32)r30 != 0) goto L_800C0A38;
-    if ((s32)r24 != 0) goto L_800C0A38;
+    if ((s32)r30 != 0 || (s32)r24 != 0) goto L_800C0A38;
+
     r5 = r26;
     if ((s32)r26 != 0x80) goto L_800C0A20;
     if ((s32)r25 == 0) goto L_800C0A38;

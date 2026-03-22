@@ -673,53 +673,53 @@ s32 fn_80078390(void) {
     r4 = (u32)&lbl_803F6E40;
     tmp = *(u32*)((u8*)r4 + 0x8);
     tmp = tmp & 0x00000008;
-    if (tmp == 0) goto L_80078494;
-    r4 = r3;
-    r3 = 0x4d;
-    ((void(*)(void))fn_80132A38)();
-    tmp = r31 & 0xFF;
-    if ((s32)tmp == 1) goto L_80078444;
-    if ((s32)tmp >= 1) goto L_80078444;
-    if ((s32)tmp >= 0) goto L_80078428;
-    goto L_80078444;
-L_80078428:
-    r3 = 0x1;
-    ((void(*)(void))fn_80103CC0)();
-    r3 = 0x43cb;
-    r4 = 0x1;
-    r5 = 0x0;
-    ((void(*)(void))fn_801067E8)();
-    goto L_8007845C;
-L_80078444:
-    r3 = 0x1;
-    ((void(*)(void))fn_80103CC0)();
-    r3 = 0x43cd;
-    r4 = 0x1;
-    r5 = 0x0;
-    ((void(*)(void))fn_801067E8)();
-L_8007845C:
-    r3 = 0x1;
-    ((void(*)(void))fn_801069FC)();
-    r3 = 0x1;
-    ((void(*)(void))fn_80103CC0)();
-    r3 = 0x2;
-    r4 = 0x44cf;
-    r5 = 0x1;
-    r6 = 0x0;
-    ((void(*)(void))fn_80106D3C)();
-    r3 = 0x1;
-    ((void(*)(void))fn_801069FC)();
-    tmp = 0x0;
-    *(u32*)&lbl_8047A620 = tmp;
-    return;
-L_80078494:
+    if (tmp != 0) {
+        r4 = r3;
+        r3 = 0x4d;
+        ((void(*)(void))fn_80132A38)();
+        tmp = r31 & 0xFF;
+        if ((s32)tmp == 1 || (s32)tmp >= 1) goto L_80078444;
+
+        if ((s32)tmp >= 0) goto L_80078428;
+        goto L_80078444;
+    L_80078428:
+        r3 = 0x1;
+        ((void(*)(void))fn_80103CC0)();
+        r3 = 0x43cb;
+        r4 = 0x1;
+        r5 = 0x0;
+        ((void(*)(void))fn_801067E8)();
+        goto L_8007845C;
+    L_80078444:
+        r3 = 0x1;
+        ((void(*)(void))fn_80103CC0)();
+        r3 = 0x43cd;
+        r4 = 0x1;
+        r5 = 0x0;
+        ((void(*)(void))fn_801067E8)();
+    L_8007845C:
+        r3 = 0x1;
+        ((void(*)(void))fn_801069FC)();
+        r3 = 0x1;
+        ((void(*)(void))fn_80103CC0)();
+        r3 = 0x2;
+        r4 = 0x44cf;
+        r5 = 0x1;
+        r6 = 0x0;
+        ((void(*)(void))fn_80106D3C)();
+        r3 = 0x1;
+        ((void(*)(void))fn_801069FC)();
+        tmp = 0x0;
+        *(u32*)&lbl_8047A620 = tmp;
+        return;
+    }
     r30 = r3;
     r4 = r3;
     r3 = 0x4d;
     ((void(*)(void))fn_80132A38)();
     tmp = r31 & 0xFF;
-    if ((s32)tmp == 1) goto L_800784DC;
-    if ((s32)tmp >= 1) goto L_800784DC;
+    if ((s32)tmp == 1 || (s32)tmp >= 1) goto L_800784DC;
+
     if ((s32)tmp >= 0) goto L_800784C0;
     goto L_800784DC;
 L_800784C0:

@@ -532,20 +532,20 @@ L_80076EB8:
     r5 = 0x3;
     fn_80076F2C();
     tmp = r3 & 0xFF;
-    if (tmp != 0) goto L_80076F08;
-    r30 = 0x0;
-    if (r31 == 0) goto L_80076EFC;
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0x6e;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    if ((s32)r3 != 0) goto L_80076F00;
-L_80076EFC:
-    r30 = 0x1;
-L_80076F00:
-    if ((s32)r30 != 0) { r3 = r29 & 0xFF; return; }
-L_80076F08:
+    if (tmp == 0) {
+        r30 = 0x0;
+        if (r31 == 0) goto L_80076EFC;
+        r3 = r31;
+        r4 = 0x0;
+        r5 = 0x6e;
+        r6 = 0x0;
+        ((void(*)(void))fn_8012640C)();
+        if ((s32)r3 != 0) goto L_80076F00;
+    L_80076EFC:
+        r30 = 0x1;
+    L_80076F00:
+        if ((s32)r30 != 0) { r3 = r29 & 0xFF; return; }
+    }
     r29 = 0x1;
 
     r3 = r29 & 0xFF;

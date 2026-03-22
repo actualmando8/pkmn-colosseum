@@ -560,21 +560,21 @@ L_8007C9D0:
     tmp = tmp << 2;
     r28 = *(u32*)(r3 + tmp);
 L_8007C9DC:
-    if (r28 == 0) goto L_8007CA18;
-    r29 = *(u8*)((u8*)r31 + 0xB5);
-    goto L_8007CA08;
-L_8007C9EC:
-    r3 = r28;
-    r4 = r29;
-    ((void(*)(void))fn_80082A88)();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) goto L_8007CA14;
-L_8007CA08:
-    tmp = (s8)r29;
-    if ((s32)tmp > 0) goto L_8007C9EC;
-L_8007CA14:
-    *(u8*)((u8*)r31 + 0xB5) = r29;
-L_8007CA18:
+    if (r28 != 0) {
+        r29 = *(u8*)((u8*)r31 + 0xB5);
+        goto L_8007CA08;
+    L_8007C9EC:
+        r3 = r28;
+        r4 = r29;
+        ((void(*)(void))fn_80082A88)();
+        tmp = r3 & 0xFF;
+        if (tmp != 0) goto L_8007CA14;
+    L_8007CA08:
+        tmp = (s8)r29;
+        if ((s32)tmp > 0) goto L_8007C9EC;
+    L_8007CA14:
+        *(u8*)((u8*)r31 + 0xB5) = r29;
+    }
     r3 = *(u32*)((u8*)r31 + 0xA4);
     tmp = *(u32*)((u8*)r31 + 0xA0);
     if ((s32)r3 == (s32)tmp) {
@@ -2335,8 +2335,8 @@ L_8007E5AC:
     if (tmp == 0) goto L_8007E6B0;
 L_8007E5D8:
     tmp = *(u32*)((u8*)r18 + 0xBC);
-    if ((s32)tmp == 0) goto L_8007E604;
-    if ((s32)tmp == 6) goto L_8007E604;
+    if ((s32)tmp == 0 || (s32)tmp == 6) goto L_8007E604;
+
     tmp = *(u32*)((u8*)r18 + 0xC0);
     if ((s32)tmp != (s32)r28) goto L_8007E604;
     tmp = *(u8*)((u8*)r18 + 0xB6);

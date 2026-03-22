@@ -2274,67 +2274,67 @@ s32 fn_8007480C(void) {
         r22 = tmp;
     }
     r16 = 0x0;
-L_80074858:
-    if (r16 > 0x20) {
-        r3 = 0xDD650000;
-        r20 = r3 + 0x4321;
-    } else {
-
-        OSGetTick();
-        tmp = r3 & 0xFFFFFF;
-        r20 = tmp | (0xdd00 << 16);
-    }
-    r3 = 0x0;
-    r5 = r20;
-    r4 = r3;
-    tmp = 0x4;
-    ctr_fn = (void(*)(void))tmp;
     do {
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
+        if (r16 > 0x20) {
+            r3 = 0xDD650000;
+            r20 = r3 + 0x4321;
+        } else {
+
+            OSGetTick();
+            tmp = r3 & 0xFFFFFF;
+            r20 = tmp | (0xdd00 << 16);
         }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        tmp = r5 & 0x1;
-        if (tmp != 0) {
-            r3 = r3 + 0x1;
-        }
-        r5 = (u32)r5 >> 1;
-        r4 = r4 + 0x7;
-    } while (--ctr != 0);
-    r16 = r16 + 0x1;
-    if (r3 < 0xa) goto L_80074858;
-    if (r3 > 0x18) goto L_80074858;
+        r3 = 0x0;
+        r5 = r20;
+        r4 = r3;
+        tmp = 0x4;
+        ctr_fn = (void(*)(void))tmp;
+        do {
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            tmp = r5 & 0x1;
+            if (tmp != 0) {
+                r3 = r3 + 0x1;
+            }
+            r5 = (u32)r5 >> 1;
+            r4 = r4 + 0x7;
+        } while (--ctr != 0);
+        r16 = r16 + 0x1;
+    } while (r3 < 0xa || r3 > 0x18);
+
     r3 = (u32)r20 >> 24;
     tmp = ((r20 << 24) | ((u32)r20 >> 8)) & 0x0000FF00;
     r4 = ((r20 << 8) | ((u32)r20 >> 24)) & 0x00FF0000;

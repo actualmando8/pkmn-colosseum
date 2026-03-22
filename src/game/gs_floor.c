@@ -3558,17 +3558,17 @@ void fn_800F7434(void) {
     return;
 L_800F74C8:
     tmp = *(u8*)((u8*)r30 + 0x4);
-    if (tmp != 0) goto L_800F74E8;
-    r4 = *(u32*)((u8*)r30 + 0x8);
-    r3 = r31 + 0x120;
-    ((void(*)(void))fn_800DD970)();
-    goto L_800F7570;
-L_800F74E8:
+    if (tmp == 0) {
+        r4 = *(u32*)((u8*)r30 + 0x8);
+        r3 = r31 + 0x120;
+        ((void(*)(void))fn_800DD970)();
+
+    } else if (tmp == 3) {
     if (tmp != 3) goto L_800F74FC;
-    tmp = 0x0;
-    *(u8*)((u8*)r30 + 0x4) = tmp;
-    goto L_800F7570;
-L_800F74FC:
+        tmp = 0x0;
+        *(u8*)((u8*)r30 + 0x4) = tmp;
+
+    }
     r3 = *(u32*)((u8*)r30 + 0x14);
     tmp = r3 + 0x1;
     *(u32*)((u8*)r30 + 0x14) = tmp;
@@ -3595,7 +3595,7 @@ L_800F7548:
     do {
     } while (--ctr != 0);
     goto L_800F74C8;
-L_800F7570:
+
     tmp = *(u8*)((u8*)r30 + 0x4);
     if (tmp == 4) {
         tmp = 0x0;

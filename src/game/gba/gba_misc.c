@@ -1274,35 +1274,35 @@ L_8008A36C:
     r4 = 0x0;
     fn_801FD614();
     tmp = r3 & 0xFFFF;
-    if (tmp != 0xa) goto L_8008A4AC;
-    r4 = 0x1;
-    goto L_8008A4D0;
-L_8008A4AC:
+    if (tmp == 0xa) {
+        r4 = 0x1;
+
+    } else if (tmp == 0xb) {
     if (tmp != 0xb) goto L_8008A4BC;
-    r4 = 0x2;
-    goto L_8008A4D0;
-L_8008A4BC:
+        r4 = 0x2;
+
+    } else if (tmp == 0xf) {
     if (tmp != 0xf) goto L_8008A4CC;
-    r4 = 0x3;
-    goto L_8008A4D0;
-L_8008A4CC:
-    r4 = 0x0;
-L_8008A4D0:
+        r4 = 0x3;
+
+    } else {
+        r4 = 0x0;
+    }
     tmp = r3 & 0xFFFF;
-    if (tmp != 0xa) goto L_8008A4E4;
-    tmp = 0x1;
-    goto L_8008A508;
-L_8008A4E4:
+    if (tmp == 0xa) {
+        tmp = 0x1;
+
+    } else if (tmp == 0xb) {
     if (tmp != 0xb) goto L_8008A4F4;
-    tmp = 0x2;
-    goto L_8008A508;
-L_8008A4F4:
+        tmp = 0x2;
+
+    } else if (tmp == 0xf) {
     if (tmp != 0xf) goto L_8008A504;
-    tmp = 0x3;
-    goto L_8008A508;
-L_8008A504:
-    tmp = 0x0;
-L_8008A508:
+        tmp = 0x3;
+
+    } else {
+        tmp = 0x0;
+    }
     r3 = tmp & 0xFFFF;
     tmp = r4 & 0xFFFF;
     r3 = r3 << 8;
@@ -1325,25 +1325,25 @@ L_8008A548:
     r5 = (u32)sp + 0x18;
     fn_801F2020();
     tmp = r3 & 0xFF;
-    if (tmp != 2) goto L_8008A5A8;
-    fn_80207BF4();
-    tmp = r3 & 0xFFFF;
-    if (tmp != 0x17) goto L_8008A580;
-    tmp = 0x2;
-    goto L_8008A5A4;
-L_8008A580:
-    if (tmp != 0x2a) goto L_8008A590;
-    tmp = 0x3;
-    goto L_8008A5A4;
-L_8008A590:
-    if (tmp != 0x47) goto L_8008A5A0;
-    tmp = 0x4;
-    goto L_8008A5A4;
-L_8008A5A0:
-    tmp = 0x0;
-L_8008A5A4:
-    r3 = tmp & 0xFF;
-L_8008A5A8:
+    if (tmp == 2) {
+        fn_80207BF4();
+        tmp = r3 & 0xFFFF;
+        if (tmp == 0x17) {
+            tmp = 0x2;
+
+        } else if (tmp == 0x2a) {
+        if (tmp != 0x2a) goto L_8008A590;
+            tmp = 0x3;
+
+        } else if (tmp == 0x47) {
+        if (tmp != 0x47) goto L_8008A5A0;
+            tmp = 0x4;
+
+        } else {
+            tmp = 0x0;
+        }
+        r3 = tmp & 0xFF;
+    }
     r4 = (u32)sp + 0x28;
     tmp = r6 << 2;
     r4 = r4 + tmp;

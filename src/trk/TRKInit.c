@@ -609,8 +609,8 @@ L_800C3284:
     tmp = 0x1;
     tmp = tmp << r30;
     /* and. tmp, r29, tmp */;
-    if (tmp == 0x44) goto L_800C3320;
-    if ((s32)r30 == 4) goto L_800C3320;
+    if (tmp == 0x44 || (s32)r30 == 4) goto L_800C3320;
+
     r3 = (u32)&lbl_803FED58;
     r6 = *(u32*)((u8*)r31 + 0x0);
     r3 = (u32)&lbl_803FED58;

@@ -759,8 +759,8 @@ void fn_8013735C(void) {
     r5 = 0xac;
     memset((void*)r3, (int)r4, (u32)r5);
     tmp = *(u32*)((u8*)r31 + 0x3C);
-    if ((s32)tmp == 2) goto L_801373B8;
-    if ((s32)tmp >= 2) goto L_801373B8;
+    if ((s32)tmp == 2 || (s32)tmp >= 2) goto L_801373B8;
+
     if ((s32)tmp >= 1) goto L_801373A8;
     goto L_801373B8;
 L_801373A8:
@@ -1047,8 +1047,8 @@ void fn_80137780(void) {
     tmp = *(u32*)((u8*)r30 + 0x0);
     *(u8*)((u8*)r27 + 0x4C) = tmp;
     tmp = *(u32*)((u8*)r30 + 0x8);
-    if ((s32)tmp == 3) goto L_801377DC;
-    if ((s32)tmp >= 3) goto L_801377DC;
+    if ((s32)tmp == 3 || (s32)tmp >= 3) goto L_801377DC;
+
     if ((s32)tmp >= 1) goto L_801377D4;
     goto L_801377DC;
 L_801377D4:
