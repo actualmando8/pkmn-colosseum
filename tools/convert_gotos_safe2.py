@@ -263,6 +263,17 @@ def convert_single_bwd_cond(lines):
         if bal != 0:
             continue
 
+        # Check no intermediate depth goes negative (no block boundary crossing)
+        running_depth = 0
+        depth_ok = True
+        for i in range(dst + 1, src):
+            running_depth += lines[i].count('{') - lines[i].count('}')
+            if running_depth < 0:
+                depth_ok = False
+                break
+        if not depth_ok:
+            continue
+
         # Check safety (using dst as the "src" boundary and src as the "dst" boundary)
         ok = True
         for i in range(dst + 1, src):
@@ -342,6 +353,28 @@ def convert_multi_fwd_do_while(lines):
         first = min(sources)
         bal = brace_balance(lines, first, dst)
         if bal != 0:
+            continue
+
+        # ALL goto sources must be at the same brace depth as the label
+        # Compute brace depth from first to each source and to dst
+        # All should be 0 (flat flow at same level)
+        depth_ok = True
+        running_depth = 0
+        for i in range(first, dst):
+            running_depth += lines[i].count('{') - lines[i].count('}')
+            if running_depth < 0:
+                depth_ok = False
+                break
+        if not depth_ok:
+            continue
+
+        # Check each source is at depth 0 relative to first
+        for s, _, _ in goto_info:
+            d = brace_balance(lines, first, s)
+            if d != 0:
+                depth_ok = False
+                break
+        if not depth_ok:
             continue
 
         # No external label refs

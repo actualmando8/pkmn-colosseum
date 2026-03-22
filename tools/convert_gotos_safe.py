@@ -964,6 +964,99 @@ def pass_uncond_forward_deadcode(lines, lp, rc, ls):
     return changes
 
 
+def pass_goto_in_if_else(lines, lp, rc, ls):
+    """Pattern: goto END; } <else-code>; END: -> } else { <else-code>; }
+    Converts goto-at-end-of-if-block into else block."""
+    changes = 0
+    for i in range(len(lines) - 1, -1, -1):
+        m = re.match(r'^(\s+)goto (L_[0-9A-Fa-f]+);$', lines[i])
+        if not m:
+            continue
+        goto_indent = m.group(1)
+        end_label = m.group(2)
+        if end_label not in lp:
+            continue
+        end_pos = lp[end_label]
+        if end_pos <= i:
+            continue
+        if rc.get(end_label, 0) != 1:
+            continue
+        # Next non-empty line must be '}'
+        close_brace_idx = None
+        for k in range(i + 1, min(i + 3, len(lines))):
+            s = lines[k].strip()
+            if s:
+                if s == '}':
+                    close_brace_idx = k
+                break
+        if close_brace_idx is None:
+            continue
+        brace_indent = re.match(r'^(\s*)', lines[close_brace_idx]).group(1)
+        # Verify the closing brace belongs to an if statement, not a loop/switch
+        # Walk backward from close_brace_idx to find the matching open brace
+        depth = 0
+        open_brace_line = None
+        for k in range(close_brace_idx, -1, -1):
+            depth += lines[k].count('}') - lines[k].count('{')
+            if depth <= 0:
+                open_brace_line = k
+                break
+        if open_brace_line is None:
+            continue
+        open_line_stripped = lines[open_brace_line].strip()
+        # Must be an if(...) { block
+        if not re.match(r'^if\s*\(', open_line_stripped):
+            continue
+        # Else body is between close_brace_idx+1 and end_pos
+        else_lines = []
+        has_label_inside = False
+        has_bad_goto = False
+        brace_depth = 0
+        for k in range(close_brace_idx + 1, end_pos):
+            s = lines[k].strip()
+            if not s:
+                continue
+            brace_depth += lines[k].count('{') - lines[k].count('}')
+            ml = re.match(r'^(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', s)
+            if ml:
+                lbl_name = ml.group(1)
+                for src in ls.get(lbl_name, []):
+                    if src < i or src >= end_pos:
+                        has_label_inside = True
+                        break
+            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', s)
+            if gm and gm.group(1) != end_label:
+                t_lbl = gm.group(1)
+                if t_lbl in lp and lp[t_lbl] < i:
+                    has_bad_goto = True
+            else_lines.append(k)
+        if has_label_inside or has_bad_goto:
+            continue
+        if brace_depth != 0:
+            continue
+        if len(else_lines) == 0:
+            continue
+        if len(else_lines) > 200:
+            continue
+        # Convert: remove goto, change } to } else {, indent else body, add }
+        lines[i] = ''  # remove goto
+        lines[close_brace_idx] = brace_indent + '} else {'
+        for k in else_lines:
+            lines[k] = '    ' + lines[k]
+        # Clear empty lines between else body and label
+        for k in range(close_brace_idx + 1, end_pos):
+            if k not in else_lines and not lines[k].strip():
+                lines[k] = ''
+        # Handle end label
+        rc[end_label] = rc.get(end_label, 0) - 1
+        if rc.get(end_label, 0) <= 0:
+            lines[end_pos] = brace_indent + '}'
+        else:
+            lines[end_pos] = brace_indent + '}\n' + lines[end_pos]
+        changes += 1
+    return changes
+
+
 def process_file(filepath):
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
         content = f.read()
@@ -991,6 +1084,7 @@ def process_file(filepath):
         ('do_while', pass_do_while),
         ('break_from_loop', pass_break_from_loop),
         ('continue_in_loop', pass_continue_in_loop),
+        # ('goto_in_if_else', pass_goto_in_if_else),  # disabled: creates double else blocks
         ('uncond_forward_deadcode', pass_uncond_forward_deadcode),
         ('remove_unused_labels', pass_remove_unused_labels),
     ]

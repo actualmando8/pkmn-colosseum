@@ -194,6 +194,40 @@ def try_transforms(lines, skip_ids):
         new[i:li + 1] = replacement
         return new, tid, f'if-skip single {lbl} (line {i+1})'
 
+    # === PASS 3b: if(cond) goto L; <code> L: multi-use, same depth, no external targets ===
+    # Even if code doesn't terminate, we can wrap in if(!cond){...} and keep L:
+    # Control falls through if-block to L: naturally
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is None:
+            continue
+        cond, lbl = g
+        tid = f'ifskipmulti:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0 or li <= i:
+            continue
+        code = lines[i + 1:li]
+        if brace_depth_change(code) != 0:
+            continue
+        if has_labels_targeted_from_outside(lines, i + 1, li):
+            continue
+
+        ind = get_indent(lines[i])
+        new = list(lines)
+        replacement = [f'{ind}if ({negate(cond)}) {{']
+        replacement += indent_block(code)
+        replacement.append(f'{ind}}}')
+        # Always keep label for multi-use (others still goto it)
+        uses = label_use_count(lines, lbl)
+        if uses <= 1:
+            new[i:li + 1] = replacement
+        else:
+            new[i:li] = replacement
+        return new, tid, f'if-skip-multi {lbl} (line {i+1})'
+
     # === PASS 4: if(cond) goto L; <code terminating> L: multi-use OK ===
     for i in range(len(lines)):
         g = extract_goto(lines[i])
@@ -339,6 +373,116 @@ def try_transforms(lines, skip_ids):
         end = lb + 1 if label_use_count(lines, lbl_b) <= 1 else lb
         new[i:end] = replacement
         return new, tid, f'if-else {lbl_a}/{lbl_b} (line {i+1})'
+
+    # === PASS 8: Multi-use backward goto -> while(1) + continue ===
+    # If ALL gotos to a backward label are within the label..last_goto range,
+    # wrap in while(1) and convert each goto to continue
+    backward_labels = {}
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g:
+            continue
+        _, lbl = g
+        li = find_label(lines, lbl, 0, i)
+        if li >= 0:
+            if lbl not in backward_labels:
+                backward_labels[lbl] = {'label_line': li, 'gotos': []}
+            backward_labels[lbl]['gotos'].append((i, g[0]))
+
+    for lbl, info in backward_labels.items():
+        label_line = info['label_line']
+        gotos = info['gotos']
+        tid = f'whileloop:{label_line}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        # All gotos must be the ONLY references to this label
+        if label_use_count(lines, lbl) != len(gotos):
+            continue
+
+        # All gotos must be after the label
+        if not all(gi > label_line for gi, _ in gotos):
+            continue
+
+        last_goto = max(gi for gi, _ in gotos)
+        body = lines[label_line + 1:last_goto + 1]
+
+        # Body must have balanced braces
+        if brace_depth_change(body) != 0:
+            continue
+
+        # Build the new while(1) loop with gotos replaced by continue
+        ind = get_indent(lines[label_line])
+        goto_set = {gi for gi, _ in gotos}
+        new_body = []
+        for j in range(label_line + 1, last_goto + 1):
+            if j in goto_set:
+                g = extract_goto(lines[j])
+                if g and g[1] == lbl:
+                    gi_ind = get_indent(lines[j])
+                    if g[0]:  # conditional
+                        new_body.append(f'    {gi_ind}if ({g[0]}) continue;')
+                    else:  # unconditional
+                        new_body.append(f'    {gi_ind}continue;')
+                else:
+                    new_body.append(f'    {lines[j]}')
+            else:
+                if lines[j].strip():
+                    new_body.append(f'    {lines[j]}')
+                else:
+                    new_body.append(lines[j])
+
+        # Add a break at the end if the last line isn't a continue/return/break
+        last_ne = [l.strip() for l in new_body if l.strip()]
+        if last_ne and not (last_ne[-1] == 'continue;' or last_ne[-1].startswith('return')
+                          or last_ne[-1] == 'break;'):
+            new_body.append(f'    {ind}break;')
+
+        replacement = [f'{ind}while (1) {{']
+        replacement += new_body
+        replacement.append(f'{ind}}}')
+
+        new = list(lines)
+        new[label_line:last_goto + 1] = replacement
+        return new, tid, f'while-loop {lbl} (line {label_line+1})'
+
+    # === PASS 9: Unconditional goto L; followed by code then L: (dead code removal) ===
+    # goto L; <dead code (no targeted labels)> L: -> remove goto and dead code
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is not None:
+            continue
+        lbl = g[1]
+        tid = f'deadcode:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0 or li <= i + 1:
+            continue
+
+        # Check no labels in between are targeted from outside
+        dead_code = lines[i + 1:li]
+        has_live_target = False
+        for di, dl in enumerate(dead_code):
+            dlbl = is_label(dl)
+            if dlbl and label_use_count(lines, dlbl) > 0:
+                has_live_target = True
+                break
+
+        if has_live_target:
+            continue
+
+        # Can only remove if label is single-use (otherwise other gotos need it)
+        if label_use_count(lines, lbl) != 1:
+            # Just remove the goto and dead code, keep label
+            new = list(lines)
+            new[i:li] = []
+            return new, tid, f'dead-code {lbl} (line {i+1})'
+        else:
+            new = list(lines)
+            new[i:li + 1] = []
+            return new, tid, f'dead-code+label {lbl} (line {i+1})'
 
     return None
 
