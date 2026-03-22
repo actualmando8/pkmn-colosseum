@@ -1445,78 +1445,74 @@ void fn_800A221C(void) {
     tmp = r4 + 0x1;
     /* mr. r30, r4 */;
     *(u32*)((u8*)r29 + 0x2CC) = tmp;
-    if ((s32)tmp != 0) goto L_800A2364;
-    tmp = *(u16*)((u8*)r29 + 0x2C8);
-    if ((s32)tmp == 3) goto L_800A2350;
-    if ((s32)tmp >= 3) goto L_800A2274;
-    if ((s32)tmp == 1) goto L_800A2290;
-    if ((s32)tmp >= 1) goto L_800A2280;
-    goto L_800A2350;
-L_800A2274:
-    if ((s32)tmp >= 5) goto L_800A2350;
-    goto L_800A229C;
-L_800A2280:
-    tmp = 0x1;
-    *(u32*)RunQueueHint_8047A764 = tmp;
-    *(u16*)((u8*)r29 + 0x2C8) = tmp;
-    goto L_800A2350;
-L_800A2290:
-    r3 = r29;
-    fn_800A1484();
-    goto L_800A2350;
-L_800A229C:
-    r4 = *(u32*)((u8*)r29 + 0x2E0);
-    r5 = *(u32*)((u8*)r29 + 0x2E4);
-    if (r4 == 0) {
-        r3 = *(u32*)((u8*)r29 + 0x2DC);
-        *(u32*)((u8*)r3 + 0x4) = r5;
-    } else {
-
-        *(u32*)((u8*)r4 + 0x2E4) = r5;
+    if ((s32)tmp == 0) {
+        tmp = *(u16*)((u8*)r29 + 0x2C8);
+        switch ((s32)tmp) {
+            case 2:
+                tmp = 0x1;
+                *(u32*)RunQueueHint_8047A764 = tmp;
+                *(u16*)((u8*)r29 + 0x2C8) = tmp;
+                break;
+            case 1:
+                r3 = r29;
+                fn_800A1484();
+                break;
+            case 4:
+                r4 = *(u32*)((u8*)r29 + 0x2E0);
+                r5 = *(u32*)((u8*)r29 + 0x2E4);
+                if (r4 == 0) {
+                    r3 = *(u32*)((u8*)r29 + 0x2DC);
+                    *(u32*)((u8*)r3 + 0x4) = r5;
+                } else {
+                    *(u32*)((u8*)r4 + 0x2E4) = r5;
+                }
+                if (r5 == 0) {
+                    r3 = *(u32*)((u8*)r29 + 0x2DC);
+                    *(u32*)((u8*)r3 + 0x0) = r4;
+                } else {
+                    *(u32*)((u8*)r5 + 0x2E0) = r4;
+                }
+                tmp = 0x20;
+                *(u32*)((u8*)r29 + 0x2D0) = tmp;
+                r4 = *(u32*)((u8*)r29 + 0x2DC);
+                r3 = *(u32*)((u8*)r4 + 0x4);
+                if (r3 == 0) {
+                    *(u32*)((u8*)r4 + 0x0) = r29;
+                } else {
+                    *(u32*)((u8*)r3 + 0x2E0) = r29;
+                }
+                *(u32*)((u8*)r29 + 0x2E4) = r3;
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x2E0) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x2DC);
+                *(u32*)((u8*)r3 + 0x4) = r29;
+                r3 = *(u32*)((u8*)r29 + 0x2F0);
+                if (r3 != 0) {
+                    r29 = *(u32*)((u8*)r3 + 0x8);
+                    while (1) {
+                        tmp = *(u32*)((u8*)r29 + 0x2CC);
+                        if ((s32)tmp > 0) break;
+                        r3 = r29;
+                        fn_800A14EC();
+                        tmp = *(u32*)((u8*)r29 + 0x2D0);
+                        r4 = r3 + 0x0;
+                        if ((s32)tmp == (s32)r4) break;
+                        r3 = r29;
+                        fn_800A1528();
+                        /* mr. r29, r3 */;
+                        if ((s32)tmp == (s32)r4) break;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        tmp = *(u32*)RunQueueHint_8047A764;
+        if ((s32)tmp != 0) {
+            r3 = 0x0;
+            ((void(*)(void))SelectThread)();
+        }
     }
-    if (r5 == 0) {
-        r3 = *(u32*)((u8*)r29 + 0x2DC);
-        *(u32*)((u8*)r3 + 0x0) = r4;
-    } else {
-
-        *(u32*)((u8*)r5 + 0x2E0) = r4;
-    }
-    tmp = 0x20;
-    *(u32*)((u8*)r29 + 0x2D0) = tmp;
-    r4 = *(u32*)((u8*)r29 + 0x2DC);
-    r3 = *(u32*)((u8*)r4 + 0x4);
-    if (r3 == 0) {
-        *(u32*)((u8*)r4 + 0x0) = r29;
-    } else {
-
-        *(u32*)((u8*)r3 + 0x2E0) = r29;
-    }
-    *(u32*)((u8*)r29 + 0x2E4) = r3;
-    tmp = 0x0;
-    *(u32*)((u8*)r29 + 0x2E0) = tmp;
-    r3 = *(u32*)((u8*)r29 + 0x2DC);
-    *(u32*)((u8*)r3 + 0x4) = r29;
-    r3 = *(u32*)((u8*)r29 + 0x2F0);
-    if (r3 == 0) goto L_800A2350;
-    r29 = *(u32*)((u8*)r3 + 0x8);
-L_800A231C:
-    tmp = *(u32*)((u8*)r29 + 0x2CC);
-    if ((s32)tmp > 0) goto L_800A2350;
-    r3 = r29;
-    fn_800A14EC();
-    tmp = *(u32*)((u8*)r29 + 0x2D0);
-    r4 = r3 + 0x0;
-    if ((s32)tmp == (s32)r4) goto L_800A2350;
-    r3 = r29;
-    fn_800A1528();
-    /* mr. r29, r3 */;
-    if ((s32)tmp != (s32)r4) goto L_800A231C;
-L_800A2350:
-    tmp = *(u32*)RunQueueHint_8047A764;
-    if ((s32)tmp == 0) goto L_800A2364;
-    r3 = 0x0;
-    ((void(*)(void))SelectThread)();
-L_800A2364:
     r3 = r31;
     ((void(*)(void))OSRestoreInterrupts)();
     r3 = r30;

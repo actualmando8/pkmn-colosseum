@@ -8210,29 +8210,16 @@ ctx = (void*)((void*)*(u8*)((u8*)(u32)ctx + 0x1));
     param1 = *(u32*)&lbl_8047B610;
     tmp = *(u8*)((u8*)param1 + 0x3);
     var_r30 = *(u8*)((u8*)param1 + 0x2);
-    if (tmp > 7) goto L_80223B7C;
-    param1 = (u32)jumptable_8039A200;
-    tmp = tmp << 2;
-    param1 = (u32)jumptable_8039A200;
-    tmp = *(u32*)(param1 + tmp);
-    ctr_fn = (void(*)(void))tmp;
-    param2 = 0xe6;
-    goto L_80223B80;
-    param2 = 0xe7;
-    goto L_80223B80;
-    param2 = 0xea;
-    goto L_80223B80;
-    param2 = 0xe8;
-    goto L_80223B80;
-    param2 = 0xe9;
-    goto L_80223B80;
-    param2 = 0xeb;
-    goto L_80223B80;
-    param2 = 0xec;
-    goto L_80223B80;
-L_80223B7C:
-    param2 = 0x0;
-L_80223B80:
+    switch (tmp) {
+        case 0: param2 = 0xe6; break;
+        case 1: param2 = 0xe7; break;
+        case 2: param2 = 0xea; break;
+        case 3: param2 = 0xe8; break;
+        case 4: param2 = 0xe9; break;
+        case 5: param2 = 0xeb; break;
+        case 6: param2 = 0xec; break;
+        default: param2 = 0x0; break;
+    }
     param1 = 0x0;
     param3 = 0x0;
     ((void(*)(void))fn_8012640C)();
@@ -8240,48 +8227,42 @@ L_80223B80:
     param1 = *(u32*)&lbl_8047B610;
 param2 = (u32)ctx & 0xFF;
 ctx = (void*)*(u8*)((u8*)param1 + 0x4);
-    if ((s32)tmp == 3) goto L_80223C0C;
-    if ((s32)tmp >= 3) goto L_80223BC0;
-    if ((s32)tmp == 1) goto L_80223BE4;
-    if ((s32)tmp >= 1) goto L_80223BF8;
-    if ((s32)tmp >= 0) goto L_80223BD0;
-    goto L_80223C44;
-L_80223BC0:
-    if ((s32)tmp == 5) goto L_80223C34;
-    if ((s32)tmp >= 5) goto L_80223C44;
-    goto L_80223C20;
-L_80223BD0:
-tmp = (u32)ctx & 0xFF;
-    if (param2 != tmp) goto L_80223C44;
-    var_r31 = 0x1;
-    goto L_80223C44;
-L_80223BE4:
-tmp = (u32)ctx & 0xFF;
-    if (param2 == tmp) goto L_80223C44;
-    var_r31 = 0x1;
-    goto L_80223C44;
-L_80223BF8:
-tmp = (u32)ctx & 0xFF;
-    if (param2 <= tmp) goto L_80223C44;
-    var_r31 = 0x1;
-    goto L_80223C44;
-L_80223C0C:
-tmp = (u32)ctx & 0xFF;
-    if (param2 >= tmp) goto L_80223C44;
-    var_r31 = 0x1;
-    goto L_80223C44;
-L_80223C20:
-tmp = (u32)ctx & 0xFF;
-    /* and. tmp, param2, tmp */;
-    if (param2 == tmp) goto L_80223C44;
-    var_r31 = 0x1;
-    goto L_80223C44;
-L_80223C34:
-tmp = (u32)ctx & 0xFF;
-    /* and. tmp, param2, tmp */;
-    if (param2 != tmp) goto L_80223C44;
-    var_r31 = 0x1;
-L_80223C44:
+    switch ((s32)tmp) {
+        case 0:
+            tmp = (u32)ctx & 0xFF;
+            if (param2 != tmp) break;
+            var_r31 = 0x1;
+            break;
+        case 1:
+            tmp = (u32)ctx & 0xFF;
+            if (param2 == tmp) break;
+            var_r31 = 0x1;
+            break;
+        case 2:
+            tmp = (u32)ctx & 0xFF;
+            if (param2 <= tmp) break;
+            var_r31 = 0x1;
+            break;
+        case 3:
+            tmp = (u32)ctx & 0xFF;
+            if (param2 >= tmp) break;
+            var_r31 = 0x1;
+            break;
+        case 4:
+            tmp = (u32)ctx & 0xFF;
+            /* and. tmp, param2, tmp */;
+            if (param2 == tmp) break;
+            var_r31 = 0x1;
+            break;
+        case 5:
+            tmp = (u32)ctx & 0xFF;
+            /* and. tmp, param2, tmp */;
+            if (param2 != tmp) break;
+            var_r31 = 0x1;
+            break;
+        default:
+            break;
+    }
     tmp = var_r31 & 0xFF;
     if (param2 != tmp) {
         tmp = *(u32*)((u8*)param1 + 0x5);

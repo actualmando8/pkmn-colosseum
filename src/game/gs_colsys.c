@@ -1979,53 +1979,40 @@ void fn_8010C54C(void) {
     r31 = 0x0;
     r29 = 0x0;
     *(u8*)(sp + 0x8) = r4;
-    goto L_8010C628;
-L_8010C570:
-    tmp = r29 & 0xFFFF;
-    if (tmp == 9) goto L_8010C624;
-    tmp = *(u8*)(sp + 0x8);
-    if (tmp != 1) goto L_8010C5D8;
-    r3 = r26 & 0xFFFF;
-    r4 = r29 & 0xFFFF;
-    fn_8010C508();
-    tmp = r3 & 0xFFFF;
-    r28 = r3;
-    r30 = r28;
-    if (tmp != 0x43) goto L_8010C5B0;
-    goto L_8010C624;
-L_8010C5B0:
-    tmp = r30 & 0xFFFF;
-    if (tmp != 0x42) goto L_8010C5C4;
-    goto L_8010C624;
-L_8010C5C4:
-    tmp = r30 & 0xFFFF;
-    if (tmp != 0x41) goto L_8010C624;
-    r31 = r31 + 0xa;
-    goto L_8010C624;
-L_8010C5D8:
-    r3 = r29 & 0xFFFF;
-    r4 = r26 & 0xFFFF;
-    fn_8010C508();
-    tmp = r3 & 0xFFFF;
-    r27 = r3;
-    r30 = r27;
-    if (tmp != 0x43) goto L_8010C600;
-    r31 = r31 + 0xa;
-    goto L_8010C624;
-L_8010C600:
-    tmp = r30 & 0xFFFF;
-    if (tmp != 0x42) goto L_8010C614;
-    r31 = r31 + 0xa;
-    goto L_8010C624;
-L_8010C614:
-    tmp = r30 & 0xFFFF;
-    if (tmp != 0x41) goto L_8010C624;
-L_8010C624:
-    r29 = r29 + 0x1;
-L_8010C628:
-    tmp = *(u32*)&lbl_80478B38;
-    r3 = r29 & 0xFFFF;
-    if (r3 < tmp) goto L_8010C570;
+    for (r29 = 0x0; (r29 & 0xFFFF) < *(u32*)&lbl_80478B38; r29 = r29 + 0x1) {
+        tmp = r29 & 0xFFFF;
+        if (tmp == 9) continue;
+        tmp = *(u8*)(sp + 0x8);
+        if (tmp == 1) {
+            r3 = r26 & 0xFFFF;
+            r4 = r29 & 0xFFFF;
+            fn_8010C508();
+            tmp = r3 & 0xFFFF;
+            r28 = r3;
+            r30 = r28;
+            if (tmp == 0x43) {
+                /* skip */
+            } else if ((r30 & 0xFFFF) == 0x42) {
+                /* skip */
+            } else if ((r30 & 0xFFFF) == 0x41) {
+                r31 = r31 + 0xa;
+            }
+        } else {
+            r3 = r29 & 0xFFFF;
+            r4 = r26 & 0xFFFF;
+            fn_8010C508();
+            tmp = r3 & 0xFFFF;
+            r27 = r3;
+            r30 = r27;
+            if (tmp == 0x43) {
+                r31 = r31 + 0xa;
+            } else if ((r30 & 0xFFFF) == 0x42) {
+                r31 = r31 + 0xa;
+            } else if ((r30 & 0xFFFF) == 0x41) {
+                /* no increment here */
+            }
+        }
+    }
     r3 = r31;
     return;
 }

@@ -2978,61 +2978,43 @@ void fn_801A67BC(void) {
     u32 r5 = 0;
     u32 r31 = 0;
 
-    if ((s32)r3 == 0x10) goto L_801A6858;
-    if ((s32)r3 >= 0x10) goto L_801A6808;
-    if ((s32)r3 == 4) goto L_801A6848;
-    if ((s32)r3 >= 4) goto L_801A67FC;
-    if ((s32)r3 == 2) goto L_801A6840;
-    if ((s32)r3 >= 2) goto L_801A6880;
-    if ((s32)r3 >= 1) goto L_801A6838;
-    goto L_801A6880;
-L_801A67FC:
-    if ((s32)r3 == 8) goto L_801A6850;
-    goto L_801A6880;
-L_801A6808:
-    if ((s32)r3 == 0x80) goto L_801A6870;
-    if ((s32)r3 >= 0x80) goto L_801A682C;
-    if ((s32)r3 == 0x40) goto L_801A6868;
-    if ((s32)r3 >= 0x40) goto L_801A6880;
-    if ((s32)r3 == 0x20) goto L_801A6860;
-    goto L_801A6880;
-L_801A682C:
-    if ((s32)r3 == 0x100) goto L_801A6878;
-    goto L_801A6880;
-L_801A6838:
-    r31 = 0x0;
-    goto L_801A6890;
-L_801A6840:
-    r31 = 0x1;
-    goto L_801A6890;
-L_801A6848:
-    r31 = 0x2;
-    goto L_801A6890;
-L_801A6850:
-    r31 = 0x3;
-    goto L_801A6890;
-L_801A6858:
-    r31 = 0x4;
-    goto L_801A6890;
-L_801A6860:
-    r31 = 0x5;
-    goto L_801A6890;
-L_801A6868:
-    r31 = 0x6;
-    goto L_801A6890;
-L_801A6870:
-    r31 = 0x7;
-    goto L_801A6890;
-L_801A6878:
-    r31 = 0x8;
-    goto L_801A6890;
-L_801A6880:
-    r3 = (u32)lbl_8047DBB8;
-    r4 = 0x4a1;
-    r5 = (u32)lbl_8047DBD4;
-    fn_80196E10();
-L_801A6890:
+    switch ((s32)r3) {
+        case 1:
+            r31 = 0x0;
+            break;
+        case 2:
+            r31 = 0x1;
+            break;
+        case 4:
+            r31 = 0x2;
+            break;
+        case 8:
+            r31 = 0x3;
+            break;
+        case 0x10:
+            r31 = 0x4;
+            break;
+        case 0x20:
+            r31 = 0x5;
+            break;
+        case 0x40:
+            r31 = 0x6;
+            break;
+        case 0x80:
+            r31 = 0x7;
+            break;
+        case 0x100:
+            r31 = 0x8;
+            break;
+        default:
+            r3 = (u32)lbl_8047DBB8;
+            r4 = 0x4a1;
+            r5 = (u32)lbl_8047DBD4;
+            fn_80196E10();
+            break;
+    }
     /* mr. tmp, r31 */;
+    tmp = r31;
     if (((s32)r3 >= 0x100) && ((s32)tmp < 9)) {
 
         r3 = (u32)lbl_804655E0;
