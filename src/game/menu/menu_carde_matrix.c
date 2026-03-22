@@ -101,15 +101,11 @@ s32 fn_8007C300(void) {
     ((void(*)(void))fn_80104704)();
     ((void(*)(void))fn_801040A0)();
     r31 = *(u32*)((u8*)r3 + 0x0);
-    do {
-        if (r31 == 0x0) {
-            r31 = 0x0;
-            break;
-        }
+    if (r31 != 0x0) {
         r0 = 0x0;
         *(u8*)((u8*)r31 + 0xC8) = r0;
-        goto L_8007C374;
-    do {
+        r0 = *(u8*)((u8*)r31 + 0xB6);
+        while (r0 != 0x0) {
             ((void(*)(void))fn_800F0308)();
             r3 = 0xa6;
             ((void(*)(void))fn_80104704)();
@@ -119,10 +115,11 @@ s32 fn_8007C300(void) {
                 r31 = 0x0;
                 break;
             }
-        L_8007C374: ;
             r0 = *(u8*)((u8*)r31 + 0xB6);
-    } while (r0 != 0x0);
-    } while (0);
+        }
+    } else {
+        r31 = 0x0;
+    }
 
     if (r31 == 0x0) return;
     r6 = *(u32*)((u8*)r31 + 0xAC);
