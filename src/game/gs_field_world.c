@@ -13699,8 +13699,7 @@ void fn_8011F260(void) {
     }
     if ((s32)r0 == (s32)0) {
         r0 = 0x0;
-        goto L_8011F2E4;
-    }
+    } else {
     if ((s32)r0 == (s32)0) {
         r0 = 0x0;
     } else {
@@ -13709,8 +13708,7 @@ void fn_8011F260(void) {
     r0 = r0 & 0xFFFF;
     if ((s32)r0 == (s32)0) {
         r0 = 0x0;
-        goto L_8011F2E4;
-    }
+    } else {
     if ((u32)r30 == (u32)0x0) {
         r0 = 0x0;
     } else {
@@ -13718,10 +13716,11 @@ void fn_8011F260(void) {
     }
     if ((s32)r0 < (s32)0x0) {
         r0 = 0x0;
-        goto L_8011F2E4;
-    }
+    } else {
     r0 = 0x1;
-L_8011F2E4: ;
+    }
+    }
+    }
     r0 = r0 & 0xFF;
     if ((u32)r0 == (u32)0x1) {
         if ((u32)r30 == (u32)0x0) {
@@ -13739,8 +13738,7 @@ L_8011F2E4: ;
     }
     if ((u32)r30 == (u32)0x0) {
         r0 = 0x0;
-        goto L_8011F374;
-    }
+    } else {
     if ((u32)r30 == (u32)0x0) {
         r0 = 0x0;
     } else {
@@ -13749,8 +13747,7 @@ L_8011F2E4: ;
     r0 = r0 & 0xFFFF;
     if ((u32)r30 == (u32)0x0) {
         r0 = 0x0;
-        goto L_8011F374;
-    }
+    } else {
     if ((u32)r30 == (u32)0x0) {
         r0 = 0x0;
     } else {
@@ -13758,10 +13755,11 @@ L_8011F2E4: ;
     }
     if ((s32)r0 < (s32)0x0) {
         r0 = 0x0;
-        goto L_8011F374;
-    }
+    } else {
     r0 = 0x1;
-L_8011F374: ;
+    }
+    }
+    }
     r0 = r0 & 0xFF;
     if ((u32)r0 == (u32)0x1) {
         r0 = r31 & 0xFFFF;
@@ -13781,19 +13779,21 @@ L_8011F374: ;
             r3 = (u32)lbl_80478B58;
             return;
         }
-        if ((u32)r0 != (u32)0x1) goto L_8011F3D8;
+        if ((u32)r0 == (u32)0x1) {
         r0 = r3 & 0xFF;
+        }
     }
-    if ((u32)r0 >= (u32)0x2) goto L_8011F410;
+    if ((u32)r0 < (u32)0x2) {
     r3 = (u32)lbl_80478B5C;
     return;
-L_8011F3D8: ;
+    }
     if ((u32)r0 == (u32)0x2) {
         r0 = r3 & 0xFF;
-        if ((u32)r0 >= (u32)0x4) goto L_8011F410;
+        if ((u32)r0 < (u32)0x4) {
         r3 = (u32)lbl_80478B5C;
         return;
-    }
+        }
+    } else
     if ((u32)r0 == (u32)0x3) {
         r0 = r3 & 0xFF;
         if ((u32)r0 < (u32)0x5) {
@@ -13801,7 +13801,6 @@ L_8011F3D8: ;
             return;
     }
     }
-L_8011F410: ;
     r0 = r31 & 0xFFFF;
     if ((u32)r0 >= (u32)0x4) {
         r0 = r31 & 0xFFFF;
