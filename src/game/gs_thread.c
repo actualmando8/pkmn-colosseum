@@ -8260,6 +8260,8 @@ void fn_800F8428(void) {
                                 }
                         }
                         }
+                        }
+                        }
 
                 r8 = *(u32*)((u8*)r4 + 0x64);
                 if ((u32)r8 != (u32)0x0) {
@@ -8301,8 +8303,6 @@ void fn_800F8428(void) {
         fn_800AB4FC();
     }
     return;
-}
-}
 }
 
 /* 0x800F8654 | 0x400 */
@@ -9040,6 +9040,8 @@ void fn_800F9210(void) {
             if ((u32)r0 != (u32)r3) continue;
             r0 = *(u32*)((u8*)r31 + 0xC);
             if ((u32)r0 != (u32)r4) continue;
+        } while (--ctr != 0);
+    }
     if ((u32)r31 == (u32)0x0) return;
     r12 = *(u32*)((u8*)r31 + 0x10);
     if ((u32)r12 != (u32)0x0) {
