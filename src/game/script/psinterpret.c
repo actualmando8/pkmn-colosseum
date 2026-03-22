@@ -167,6 +167,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
     s32 resultUnused;
     s32 opResult;
     void* scratchPtr;
+    s32 yieldFlag;
     f32 tempF[4];  /* Stack temporaries for float arguments */
 
     /* ---- Early-out: check if particle is marked as paused (bit 20) ---- */
@@ -277,9 +278,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
         } else {
 
             pp->waitTimer--;
-            if (pp->waitTimer != 0) {
-                goto postExecution;
-            }
+            if (pp->waitTimer == 0) {
 
             /* ================================================================
              * Phase 3: Bytecode execution loop
@@ -287,6 +286,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
              * Resume execution from saved PC position.
              */
             stream = (u8*)pp->scriptData + pp->pc;
+            yieldFlag = 0;
 
             /* ---- Main fetch-decode-execute loop ---- */
             do {
@@ -322,21 +322,22 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         bankData = sLinkDataBanks[pp->bankIndex];
                         objTable = ((void**)bankData)[pp->animIndex];
 
-                        if (objTable == NULL) goto endOpcode;
+                        if (objTable != NULL) {
                         objEntry = (void*)((u32)objTable + 0x18);
-                        if (objEntry == NULL) goto endOpcode;
+                        if (objEntry != NULL) {
 
                         /* Look up the specific object reference */
                         ref = ((void**)objEntry)[objRef];
-                        if (ref == NULL) goto endOpcode;
+                        if (ref != NULL) {
 
                         /* Set the object reference flag */
                         pp->flags |= PS_FLAG_OBJ_REF;
-                        goto endOpcode;
+                        }
+                        }
+                        }
                     }
 
                     /* For other modes, delay is the wait value */
-                    goto endOpcode;
                     }
                 }
 
@@ -373,7 +374,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                     }
 
                     tableIndex = (normalizedOp & 0xFF) - 0x80;
-                    if (tableIndex > 0x7F) goto endOpcode;
+                    if (tableIndex <= 0x7F) {
 
                     /* Dispatch via jump table */
                     /* The actual dispatch is: bctr to jumptable[tableIndex] */
@@ -1024,7 +1025,8 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
 
                         pp->repeatCount = 1;
                         /* Fall through to yield handling */
-                        goto handleYield;
+                        yieldFlag = 1;
+                        break;
                     }
 
                     /* ============================================================
@@ -1102,7 +1104,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         result = psCameraCollisionCheck(pp, camData, speedA, speedB);
                         if (result != 0) {
                             pp->repeatCount = 1;
-                            goto handleYield;
+                            yieldFlag = 1;
                         }
                         break;
                     }
@@ -1290,29 +1292,26 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                     case 0xFA:
                     case 0xFB:  /* TERMINATE - identical handler */
                         pp->repeatCount = 1;
-                        goto handleYield;
+                        yieldFlag = 1;
+                        break;
 
                     default:
                         /* Unknown opcode - skip to end */
                         break;
                     }
-                }
+                    }
 
-        endOpcode:
                 /* Check if delay value (r29) is nonzero - if so, stop execution */
                 ;
-            } while (delay == 0);
+            } while (delay == 0 && !yieldFlag);
 
-        handleYield:
-            /* ================================================================
-             * Phase 4: Save execution state
-             * ================================================================ */
+            /* Phase 4: Save execution state */
             /* Save current PC */
             pp->pc = (u16)((u32)stream - (u32)pp->scriptData);
             pp->waitTimer = delay;
 
+            }
         }
-    postExecution:
         /* ================================================================
          * Phase 5: Post-execution updates
          * ================================================================ */
