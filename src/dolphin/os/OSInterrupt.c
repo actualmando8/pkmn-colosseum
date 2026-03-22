@@ -369,9 +369,9 @@ L_8009E460:
     r3 = (u32)lbl_803117E8;
     tmp = (u32)lbl_803117E8;
     r3 = tmp;
-    goto L_8009E6B0;
-L_8009E6B0:
-    goto L_8009E6B4;
+
+
+
 L_8009E6B4:
     tmp = *(u32*)((u8*)r3 + 0x0);
     tmp = r4 & tmp;

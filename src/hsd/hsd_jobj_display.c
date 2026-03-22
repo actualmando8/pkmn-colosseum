@@ -1185,16 +1185,16 @@ void fn_801A20C8(void) {
         r4 = (u32)sp + 0x14;
         fn_800A2D64();
     }
-    if (r27 == 0x36) goto L_801A2AFC;
-    if (r27 != 0x38) goto L_801A2B08;
-L_801A2AFC:
+
+    if (r27 != 0x36 && r27 != 0x38) goto L_801A2B08;
+
     r3 = (u32)sp + 0x14;
     r4 = r30 + 0x38;
     fn_801A9570();
 L_801A2B08:
-    if (r27 == 0x36) goto L_801A2B18;
-    if (r27 != 0x37) goto L_801A2B24;
-L_801A2B18:
+
+    if (r27 != 0x36 && r27 != 0x37) goto L_801A2B24;
+
     r3 = (u32)sp + 0x14;
     r4 = r30 + 0x1c;
     fn_801A98CC();

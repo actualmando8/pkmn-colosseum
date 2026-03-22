@@ -88,32 +88,28 @@ void fn_800A27FC(void) {
     tmp = r7 - r6;
     r11 = r5 * 0x16d;
     *(u32*)((u8*)r4 + 0x18) = tmp;
-    goto L_800A284C;
-L_800A284C:
-    r6 = 0x51EC0000;
-    goto L_800A2858;
-L_800A2858:
-    goto L_800A2864;
-L_800A285C:
-L_800A2864:
-    if ((s32)r5 < 1) {
-        tmp = 0x0;
-    } else {
 
-        tmp = (s32)((s64)r10 * (s64)tmp >> 32);
-        r8 = (s32)tmp >> 7;
-        r6 = (s32)tmp >> 5;
-        tmp = r5 + 0x3;
-        r7 = (u32)r6 >> 31;
-        tmp = (s32)tmp >> 2;
-        r9 = (u32)r8 >> 31;
-        r6 = r6 + r7;
-        r7 = r8 + r9;
-        tmp = tmp - r6;
-        tmp = r7 + tmp;
-    }
-    tmp = r11 + tmp;
-    if ((s32)r3 < (s32)tmp) goto L_800A285C;
+
+    r6 = 0x51EC0000;
+
+    do {
+        if ((s32)r5 < 1) {
+            tmp = 0x0;
+        } else {
+            tmp = (s32)((s64)r10 * (s64)tmp >> 32);
+            r8 = (s32)tmp >> 7;
+            r6 = (s32)tmp >> 5;
+            tmp = r5 + 0x3;
+            r7 = (u32)r6 >> 31;
+            tmp = (s32)tmp >> 2;
+            r9 = (u32)r8 >> 31;
+            r6 = r6 + r7;
+            r7 = r8 + r9;
+            tmp = tmp - r6;
+            tmp = r7 + tmp;
+        }
+        tmp = r11 + tmp;
+    } while ((s32)r3 < (s32)tmp);
     r6 = (s32)r5 >> 2;
     *(u32*)((u8*)r4 + 0x14) = r5;
     r6 = r6 << 2;
@@ -156,12 +152,12 @@ L_800A2864:
     }
     r7 = 0xc;
     r3 = 0x30;
-    goto L_800A2968;
-L_800A2968:
-    goto L_800A296C;
-L_800A296C:
-    r5 = *(u32*)(r6 + r3);
-    if ((s32)tmp < (s32)r5) goto L_800A296C;
+
+
+
+    do {
+        r5 = *(u32*)(r6 + r3);
+    } while ((s32)tmp < (s32)r5);
     *(u32*)((u8*)r4 + 0x10) = r7;
     r3 = *(u32*)(r6 + r3);
     r3 = tmp - r3;

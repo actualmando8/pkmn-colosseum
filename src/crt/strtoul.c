@@ -263,9 +263,9 @@ L_800C7CB0:
     r31 = 0x0;
     r4 = 0x0;
     /* extrwi tmp, tmp, 3, 23 */;
-    if (tmp == 1) goto L_800C7D18;
-    if (tmp != 2) goto L_800C7D24;
-L_800C7D18:
+
+    if (tmp != 1 && tmp != 2) goto L_800C7D24;
+
     tmp = *(u8*)((u8*)r30 + 0xA);
     if (tmp == 0) goto L_800C7D34;
 L_800C7D24:
@@ -311,9 +311,9 @@ L_800C7DA8:
     if (tmp == 3) goto L_800C7E3C;
     tmp = *(u8*)((u8*)r30 + 0x8);
     /* extrwi tmp, tmp, 3, 24 */;
-    if (tmp == 2) goto L_800C7DD8;
-    if (tmp != 3) goto L_800C7E3C;
-L_800C7DD8:
+
+    if (tmp != 2 && tmp != 3) goto L_800C7E3C;
+
     tmp = *(u32*)((u8*)r30 + 0x18);
     if (r3 >= tmp) goto L_800C7DF4;
     tmp = *(u32*)((u8*)r30 + 0x34);
@@ -396,9 +396,9 @@ void fn_800C7ED4(void) {
     tmp = *(u16*)((u8*)r30 + 0x4);
     r4 = 0x0;
     /* extrwi tmp, tmp, 3, 23 */;
-    if (tmp == 1) goto L_800C7F10;
-    if (tmp != 2) goto L_800C7F1C;
-L_800C7F10:
+
+    if (tmp != 1 && tmp != 2) goto L_800C7F1C;
+
     tmp = *(u8*)((u8*)r30 + 0xA);
     if (tmp == 0) goto L_800C7F2C;
 L_800C7F1C:

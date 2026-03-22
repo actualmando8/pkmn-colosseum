@@ -1864,9 +1864,9 @@ void fn_8001D994(void) {
     r3 = r30;
     fn_8011F5C8();
     tmp = r3 & 0xFFFF;
-    if (tmp == 0x1d) goto L_8001D9E0;
-    if (tmp != 0x20) goto L_8001DA40;
-L_8001D9E0:
+
+    if (tmp != 0x1d && tmp != 0x20) goto L_8001DA40;
+
     r3 = r30;
     r4 = 0x0;
     r5 = 0x6e;
@@ -3991,9 +3991,9 @@ void fn_8001FD48(void) {
 L_8001FE00:
     fn_8017B1AC();
     r29 = r3;
-    if ((s32)r29 == 0xb) goto L_8001FE18;
-    if ((s32)r29 != 4) goto L_8001FE40;
-L_8001FE18:
+
+    if ((s32)r29 != 0xb && (s32)r29 != 4) goto L_8001FE40;
+
     tmp = *(u32*)lbl_8047A318;
     if ((s32)tmp == 0) {
         fn_800EC918();

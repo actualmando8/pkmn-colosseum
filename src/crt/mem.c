@@ -47,64 +47,60 @@ void __fill_mem(void* dest, int val, u32 count) {
     u32 align;
     u32 i;
 
-    if (count < 0x20) {
-        /* Small fill: byte by byte */
-        goto byte_fill;
+    if (count >= 0x20) {
+        /* Align to 4-byte boundary */
+        align = (-(u32)dst) & 3;
+        if (align != 0) {
+            count -= align;
+            while (align-- != 0) {
+                *dst++ = (u8)v;
+            }
+        }
+
+        /* Build 32-bit fill value by replicating byte across word */
+        if (v != 0) {
+            wordVal = (v << 24) | (v << 16) | (v << 8) | v;
+        } else {
+            wordVal = 0;
+        }
+
+        /* Fill in 32-byte (8-word) blocks */
+        numBlocks = count >> 5;
+        {
+            u32* wp = (u32*)(dst - 4);
+            if (numBlocks != 0) {
+                do {
+                    wp[1] = wordVal;
+                    wp[2] = wordVal;
+                    wp[3] = wordVal;
+                    wp[4] = wordVal;
+                    wp[5] = wordVal;
+                    wp[6] = wordVal;
+                    wp[7] = wordVal;
+                    *(wp += 8) = wordVal;
+                } while (--numBlocks != 0);
+            }
+
+            /* Fill remaining whole words (count bits [2:4]) */
+            numWords = (count & 0x1C) >> 2;
+            if (numWords != 0) {
+                do {
+                    *(wp += 1) = wordVal;
+                } while (--numWords != 0);
+            }
+
+            dst = (u8*)(wp + 1);
+        }
+
+        /* Remaining bytes (count & 3) */
+        count &= 3;
     }
 
-    /* Align to 4-byte boundary */
-    align = (-(u32)dst) & 3;
-    if (align != 0) {
-        count -= align;
-        while (align-- != 0) {
+    /* Byte-by-byte fill for small counts or remainder */
+    if (count != 0) {
+        while (count-- != 0) {
             *dst++ = (u8)v;
         }
-    }
-
-    /* Build 32-bit fill value by replicating byte across word */
-    if (v != 0) {
-        wordVal = (v << 24) | (v << 16) | (v << 8) | v;
-    } else {
-        wordVal = 0;
-    }
-
-    /* Fill in 32-byte (8-word) blocks */
-    numBlocks = count >> 5;
-    {
-        u32* wp = (u32*)(dst - 4);
-        if (numBlocks != 0) {
-            do {
-                wp[1] = wordVal;
-                wp[2] = wordVal;
-                wp[3] = wordVal;
-                wp[4] = wordVal;
-                wp[5] = wordVal;
-                wp[6] = wordVal;
-                wp[7] = wordVal;
-                *(wp += 8) = wordVal;
-            } while (--numBlocks != 0);
-        }
-
-        /* Fill remaining whole words (count bits [2:4]) */
-        numWords = (count & 0x1C) >> 2;
-        if (numWords != 0) {
-            do {
-                *(wp += 1) = wordVal;
-            } while (--numWords != 0);
-        }
-
-        dst = (u8*)(wp + 1);
-    }
-
-    /* Remaining bytes (count & 3) */
-    count &= 3;
-
-byte_fill:
-    if (count == 0) {
-        return;
-    }
-    while (count-- != 0) {
-        *dst++ = (u8)v;
     }
 }
 

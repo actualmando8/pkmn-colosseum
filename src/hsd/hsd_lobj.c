@@ -2610,9 +2610,9 @@ void fn_801A620C(void) {
     r3 = (u32)sp + 0x8;
     r4 = (u32)sp + 0x14;
     fn_800A3A9C();
-    if (r31 == 0) goto L_801A62C4;
-    if (r31 != 0) goto L_801A62CC;
-L_801A62C4:
+
+    if (r31 != 0 && r31 != 0) goto L_801A62CC;
+
     tmp = -0x1;
     goto L_801A6338;
 L_801A62CC:
