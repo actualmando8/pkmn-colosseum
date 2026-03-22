@@ -1300,6 +1300,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
                     }
+                }
 
                 /* Check if delay value (r29) is nonzero - if so, stop execution */
                 ;

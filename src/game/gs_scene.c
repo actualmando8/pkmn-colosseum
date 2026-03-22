@@ -196,6 +196,8 @@ void GSscene_ProcessFreeList(void) {
                 } else {
                     tmp = *(u16*)((u8*)r31 + 0x12);
                     tmp = tmp & 0x00003800;
+                    {
+                    s32 _skip1 = 0;
                     do {
                         if (tmp == 0) break;
                         r3 = *(u32*)((u8*)r31 + 0x50);
@@ -209,8 +211,9 @@ void GSscene_ProcessFreeList(void) {
                         r29 = r31;
                         *(f32*)((u8*)r31 + 0x8) = f0;
                         *(u16*)((u8*)r31 + 0x10) = tmp;
-                        goto L_80175834;
+                        _skip1 = 1;
                     } while (0);
+                    if (!_skip1) {
                     if (r29 == 0) {
                         tmp = *(u32*)((u8*)r31 + 0x0);
                         *(u32*)&lbl_8047B188 = tmp;
@@ -229,8 +232,8 @@ void GSscene_ProcessFreeList(void) {
                     r3 = *(u16*)&lbl_8047B118;
                     *(u32*)&lbl_8047B18C = r31;
                     *(u16*)&lbl_8047B118 = tmp;
-                }
-            L_80175834:
+                    }
+                    }
                 *(u32*)&lbl_8047B184 = r29;
                 if (r29 != 0) {
                     while (1) {
@@ -323,6 +326,8 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                 } else {
                     tmp = *(u16*)((u8*)r30 + 0x12);
                     tmp = tmp & 0x00003800;
+                    {
+                    s32 _skip2 = 0;
                     do {
                         if (tmp == 0) break;
                         type = *(u32*)((u8*)r30 + 0x50);
@@ -336,8 +341,9 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                         r29 = r30;
                         *(f32*)((u8*)r30 + 0x8) = f0;
                         *(u16*)((u8*)r30 + 0x10) = tmp;
-                        goto L_80175CA0;
+                        _skip2 = 1;
                     } while (0);
+                    if (!_skip2) {
                     if (r29 == 0) {
                         tmp = *(u32*)((u8*)r30 + 0x0);
                         *(u32*)&lbl_8047B188 = tmp;
@@ -356,8 +362,8 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                     type = *(u16*)&lbl_8047B118;
                     *(u32*)&lbl_8047B18C = r30;
                     *(u16*)&lbl_8047B118 = tmp;
-                }
-            L_80175CA0:
+                    }
+                    }
                 *(u32*)&lbl_8047B184 = r29;
                 if (r29 != 0) {
                     while (1) {
@@ -748,9 +754,8 @@ void GSscene_XFBCapture(u32 captureIndex) {
                     tmp = 0x7F800000;
                     captureIndex = r4 & 0x7F800000;
                     if ((s32)captureIndex != (s32)tmp) {
-                        if ((s32)captureIndex >= (s32)tmp) goto L_80177ED8;
-                        if ((s32)captureIndex != 0) {
-                            goto L_80177ED8;
+                        if ((s32)captureIndex >= (s32)tmp || (s32)captureIndex != 0) {
+                            tmp = 0x4; break;
                         }
                         tmp = r4 & 0x7FFFFF;
                         if ((s32)captureIndex != 0) {
@@ -767,8 +772,6 @@ void GSscene_XFBCapture(u32 captureIndex) {
                     }
                     tmp = 0x3;
                     break;
-                L_80177ED8:
-                    tmp = 0x4;
                 } while (0);
                     if ((s32)tmp == 1) {
                         captureIndex = (u32)lbl_80478AC0;
@@ -824,9 +827,8 @@ void GSscene_XFBCapture(u32 captureIndex) {
                     tmp = 0x7F800000;
                     captureIndex = r4 & 0x7F800000;
                     if ((s32)captureIndex != (s32)tmp) {
-                        if ((s32)captureIndex >= (s32)tmp) goto L_80177FEC;
-                        if ((s32)captureIndex != 0) {
-                            goto L_80177FEC;
+                        if ((s32)captureIndex >= (s32)tmp || (s32)captureIndex != 0) {
+                            tmp = 0x4; break;
                         }
                         tmp = r4 & 0x7FFFFF;
                         if ((s32)captureIndex != 0) {
@@ -843,8 +845,6 @@ void GSscene_XFBCapture(u32 captureIndex) {
                     }
                     tmp = 0x3;
                     break;
-                L_80177FEC:
-                    tmp = 0x4;
                 } while (0);
                     if ((s32)tmp == 1) {
                         captureIndex = (u32)lbl_80478AC0;
@@ -1104,9 +1104,8 @@ L_80178200:
                 tmp = 0x7F800000;
                 captureIndex = r4 & 0x7F800000;
                 if ((s32)captureIndex != (s32)tmp) {
-                    if ((s32)captureIndex >= (s32)tmp) goto L_8017842C;
-                    if ((s32)captureIndex != 0) {
-                        goto L_8017842C;
+                    if ((s32)captureIndex >= (s32)tmp || (s32)captureIndex != 0) {
+                        tmp = 0x4; break;
                     }
                     tmp = r4 & 0x7FFFFF;
                     if ((s32)captureIndex != 0) {
@@ -1123,8 +1122,6 @@ L_80178200:
                 }
                 tmp = 0x3;
                 break;
-            L_8017842C:
-                tmp = 0x4;
             } while (0);
                 if ((s32)tmp == 1) {
                     captureIndex = (u32)lbl_80478AC0;

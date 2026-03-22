@@ -1821,12 +1821,15 @@ s32 fn_8008AC34(void) {
     tmp = *(u32*)((u8*)r31 + 0x0);
     if ((s32)tmp != 2) {
         if ((s32)tmp < 2) {
-            if ((s32)tmp < 1) {
-                goto L_8008ADD4;
-            }
-            if ((s32)tmp >= 4) goto L_8008ADD4;
-
+            if ((s32)tmp < 1 || (s32)tmp >= 4) {
+                tmp = r29 << 1;
+                r3 = (u32)&lbl_8047A67C;
+                r3 = r3 + tmp;
+                tmp = 0x0;
+                *(u16*)((u8*)r3 + (-2)) = tmp;
+                r3 = 0x1;
             } else {
+
             r4 = (u32)sp + 0x8;
             ((void(*)(void))fn_80073A44)();
             if ((s32)r3 == 0) {
@@ -1839,8 +1842,7 @@ s32 fn_8008AC34(void) {
                 tmp = 0x0;
                 *(u16*)((u8*)r4 + (-2)) = r5;
                 *(u16*)((u8*)r6 + (-2)) = tmp;
-                goto L_8008ADEC;
-            }
+            } else {
             do {
                 if ((s32)r3 > 2) break;
                 tmp = r29 << 1;
@@ -1852,7 +1854,6 @@ s32 fn_8008AC34(void) {
                 *(u16*)((u8*)r5 + (-2)) = r4;
                 if (tmp > 0xa) break;
                 r3 = 0x0;
-                goto L_8008ADEC;
             } while (0);
 
             r7 = r29 << 1;
@@ -1869,8 +1870,9 @@ s32 fn_8008AC34(void) {
             *(u32*)((u8*)r5 + (-4)) = r6;
             *(u16*)((u8*)r4 + (-2)) = r6;
             *(u16*)((u8*)r8 + 0x0) = r6;
-            goto L_8008ADEC;
             }
+            }
+        } else {
         ((void(*)(void))fn_80073990)();
         if ((s32)r3 == 0) {
             tmp = r29 << 1;
@@ -1902,23 +1904,15 @@ s32 fn_8008AC34(void) {
         r4 = r4 + tmp;
         tmp = 0x0;
         *(u16*)((u8*)r4 + (-2)) = tmp;
-        goto L_8008ADEC;
-    }
+        }
+    } else {
     tmp = r29 << 1;
     r3 = (u32)&lbl_8047A67C;
     r3 = r3 + tmp;
     tmp = 0x0;
     *(u16*)((u8*)r3 + (-2)) = tmp;
     r3 = 0x0;
-    goto L_8008ADEC;
-L_8008ADD4:
-    tmp = r29 << 1;
-    r3 = (u32)&lbl_8047A67C;
-    r3 = r3 + tmp;
-    tmp = 0x0;
-    *(u16*)((u8*)r3 + (-2)) = tmp;
-    r3 = 0x1;
-L_8008ADEC:
+    }
     r4 = (u32)&lbl_803FB308;
     tmp = (u32)&lbl_803FB308;
     r4 = tmp + r30;
@@ -2577,8 +2571,7 @@ s32 fn_8008AE18(void) {
         if (tmp != 0) {
             tmp = r27 | 0x40;
             r27 = tmp & 0xFFFF;
-            goto L_8008B754;
-        }
+        } else {
         r3 = r28;
         r4 = 0x7;
         fn_80121ADC();
@@ -2586,8 +2579,7 @@ s32 fn_8008AE18(void) {
         if (tmp != 0) {
             tmp = r27 | 0x20;
             r27 = tmp & 0xFFFF;
-            goto L_8008B754;
-        }
+        } else {
         r3 = r28;
         r4 = 0x6;
         fn_80121ADC();
@@ -2595,8 +2587,7 @@ s32 fn_8008AE18(void) {
         if (tmp != 0) {
             tmp = r27 | 0x10;
             r27 = tmp & 0xFFFF;
-            goto L_8008B754;
-        }
+        } else {
         r3 = r28;
         r4 = 0x3;
         fn_80121ADC();
@@ -2618,8 +2609,10 @@ s32 fn_8008AE18(void) {
                 r27 = tmp & 0xFFFF;
             }
         }
+        }
+        }
+        }
     }
-L_8008B754:
     r3 = r28;
     r27 = r27 & 0xFFFF;
     fn_8011F45C();
@@ -3513,24 +3506,21 @@ void fn_8008BBDC(void) {
             r4 = 0x5;
             r5 = 0x0;
             fn_801219F4();
-            goto L_8008C4B0;
-        }
+        } else {
         tmp = r29 & 0x00000020;
         if ((s32)tmp != 0) {
             r3 = r30;
             r4 = 0x7;
             r5 = 0x0;
             fn_801219F4();
-            goto L_8008C4B0;
-        }
+        } else {
         tmp = r29 & 0x00000010;
         if ((s32)tmp != 0) {
             r3 = r30;
             r4 = 0x6;
             r5 = 0x0;
             fn_801219F4();
-            goto L_8008C4B0;
-        }
+        } else {
         tmp = r29 & 0x00000008;
         if ((s32)tmp != 0) {
             r3 = r30;
@@ -3551,8 +3541,10 @@ void fn_8008BBDC(void) {
                 fn_8012173C();
             }
         }
+        }
+        }
+        }
     }
-L_8008C4B0:
     r6 = *(u32*)((u8*)r31 + 0x50);
     r3 = r30;
     tmp = r6 & 0x0000FF00;
