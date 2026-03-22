@@ -43158,13 +43158,13 @@ void fn_80218A6C(void) {
     r4 = r4 & 0xFF;
     r5 = 0x0;
     ctr_fn = (void(*)(void))tmp;
-        do {
+    do {
         tmp = *(u8*)((u8*)r3 + 0x0);
         if (r4 > tmp) {
             r5 = r5 + 0x2;
             r3 = r3 + 0x2;
-        } while (--ctr != 0);
-    }
+        }
+    } while (--ctr != 0);
     r4 = (u32)lbl_80279F7C;
     r3 = var_r31;
     tmp = (u32)lbl_80279F7C;
@@ -43207,13 +43207,13 @@ void fn_80218B6C(void) {
     r4 = r4 & 0xFF;
     r5 = 0x0;
     ctr_fn = (void(*)(void))tmp;
-        do {
+    do {
         tmp = *(u8*)((u8*)r3 + 0x0);
         if (r4 > tmp) {
             r5 = r5 + 0x2;
             r3 = r3 + 0x2;
-        } while (--ctr != 0);
-    }
+        }
+    } while (--ctr != 0);
     r3 = (u32)lbl_80279F7C;
     tmp = (u32)lbl_80279F7C;
     r3 = tmp + r5;
