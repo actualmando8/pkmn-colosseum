@@ -1811,7 +1811,6 @@ void fn_800F16C0(void) {
         r29 = r3;
 
     } else if ((s32)r0 == (s32)0x73) {
-    if ((s32)r0 != (s32)0x73) goto L_800F1888;
         r4 = (u32)lbl_80401A78;
         r0 = 0x0;
         r4 = (u32)lbl_80401A78;
@@ -1827,6 +1826,7 @@ void fn_800F16C0(void) {
         r27 = r27 + 0x1;
         goto L_800F17D0;
     }
+L_800F1898:
     r26 = r26 + r29;
     goto L_800F18EC;
     L_800F18A0: ;
@@ -7575,7 +7575,6 @@ void fn_800F6BC4(void) {
         ((void(*)(void))fn_800DD970)();
 
     } else if ((u32)r0 == (u32)0x3) {
-    if ((u32)r0 != (u32)0x3) goto L_800F6C18;
         r0 = 0x0;
         *(u8*)((u8*)r31 + 0x4) = r0;
 
@@ -8545,7 +8544,6 @@ void fn_800F8A54(void) {
         r6 = 0x0;
 
     } else if ((s32)r6 > (s32)0x0) {
-    if ((s32)r6 <= (s32)0x0) goto L_800F8B0C;
         /* subi r6, r6, 0xa */;
 
     } else {
@@ -8556,7 +8554,6 @@ void fn_800F8A54(void) {
         r5 = 0x0;
 
     } else if ((s32)r5 > (s32)0x0) {
-    if ((s32)r5 <= (s32)0x0) goto L_800F8B38;
         /* subi r5, r5, 0xa */;
 
     } else {
@@ -8647,7 +8644,6 @@ void fn_800F8A54(void) {
         r6 = 0x0;
 
     } else if ((s32)r6 > (s32)0x0) {
-    if ((s32)r6 <= (s32)0x0) goto L_800F8CA0;
         /* subi r6, r6, 0xa */;
 
     } else {
@@ -8658,7 +8654,6 @@ void fn_800F8A54(void) {
         r5 = 0x0;
 
     } else if ((s32)r5 > (s32)0x0) {
-    if ((s32)r5 <= (s32)0x0) goto L_800F8CCC;
         /* subi r5, r5, 0xa */;
 
     } else {
@@ -8753,7 +8748,6 @@ void fn_800F8A54(void) {
         r6 = 0x0;
 
     } else if ((s32)r6 > (s32)0x0) {
-    if ((s32)r6 <= (s32)0x0) goto L_800F8E4C;
         /* subi r6, r6, 0xa */;
 
     } else {
@@ -8764,7 +8758,6 @@ void fn_800F8A54(void) {
         r5 = 0x0;
 
     } else if ((s32)r5 > (s32)0x0) {
-    if ((s32)r5 <= (s32)0x0) goto L_800F8E78;
         /* subi r5, r5, 0xa */;
 
     } else {
@@ -8859,7 +8852,6 @@ void fn_800F8A54(void) {
         r6 = 0x0;
 
     } else if ((s32)r6 > (s32)0x0) {
-    if ((s32)r6 <= (s32)0x0) goto L_800F8FF8;
         /* subi r6, r6, 0xa */;
 
     } else {
@@ -8870,7 +8862,6 @@ void fn_800F8A54(void) {
         r5 = 0x0;
 
     } else if ((s32)r5 > (s32)0x0) {
-    if ((s32)r5 <= (s32)0x0) goto L_800F9024;
         /* subi r5, r5, 0xa */;
 
     } else {

@@ -641,11 +641,9 @@ L_800A54D4:
         r31 = *(u32*)((u8*)r31 + 0x20);
 
     } else if ((s32)tmp == (s32)-0x1) {
-    if ((s32)tmp != (s32)-0x1) goto L_800A54F8;
         r31 = -0x1;
 
     } else if ((s32)tmp == 0xa) {
-    if ((s32)tmp != 0xa) goto L_800A5508;
         r31 = -0x3;
 
     } else {

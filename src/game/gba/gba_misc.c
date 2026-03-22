@@ -1278,11 +1278,9 @@ L_8008A36C:
             r4 = 0x1;
 
         } else if (tmp == 0xb) {
-        if (tmp != 0xb) goto L_8008A4BC;
             r4 = 0x2;
 
         } else if (tmp == 0xf) {
-        if (tmp != 0xf) goto L_8008A4CC;
             r4 = 0x3;
 
         } else {
@@ -1293,11 +1291,9 @@ L_8008A36C:
             tmp = 0x1;
 
         } else if (tmp == 0xb) {
-        if (tmp != 0xb) goto L_8008A4F4;
             tmp = 0x2;
 
         } else if (tmp == 0xf) {
-        if (tmp != 0xf) goto L_8008A504;
             tmp = 0x3;
 
         } else {
@@ -1332,11 +1328,9 @@ L_8008A548:
             tmp = 0x2;
 
         } else if (tmp == 0x2a) {
-        if (tmp != 0x2a) goto L_8008A590;
             tmp = 0x3;
 
         } else if (tmp == 0x47) {
-        if (tmp != 0x47) goto L_8008A5A0;
             tmp = 0x4;
 
         } else {

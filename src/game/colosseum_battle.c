@@ -20499,15 +20499,12 @@ void fn_80250BBC(void* ctx, u32 param1, u32 param2) {
         r0 = 0xb;
 
     } else if ((u32)r0 == (u32)0x3) {
-    if ((u32)r0 != (u32)0x3) goto L_80250C18;
         r0 = 0x5;
 
     } else if ((u32)r0 == (u32)0x1) {
-    if ((u32)r0 != (u32)0x1) goto L_80250C28;
         r0 = 0xa;
 
     } else if ((u32)r0 == (u32)0x4) {
-    if ((u32)r0 != (u32)0x4) goto L_80250C38;
         r0 = 0xf;
 
     } else {
@@ -24083,15 +24080,12 @@ void fn_80253FDC(void* ctx, u32 param1, u32 param2, u32 param3) {
         r30 = 0xb;
 
     } else if ((u32)r0 == (u32)0x3) {
-    if ((u32)r0 != (u32)0x3) goto L_8025402C;
         r30 = 0x5;
 
     } else if ((u32)r0 == (u32)0x1) {
-    if ((u32)r0 != (u32)0x1) goto L_8025403C;
         r30 = 0xa;
 
     } else if ((u32)r0 == (u32)0x4) {
-    if ((u32)r0 != (u32)0x4) goto L_8025404C;
         r30 = 0xf;
 
     } else {

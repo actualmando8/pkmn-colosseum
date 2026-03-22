@@ -3564,7 +3564,6 @@ L_800F74C8:
         ((void(*)(void))fn_800DD970)();
 
     } else if (tmp == 3) {
-    if (tmp != 3) goto L_800F74FC;
         tmp = 0x0;
         *(u8*)((u8*)r30 + 0x4) = tmp;
 

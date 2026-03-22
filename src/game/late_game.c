@@ -2718,7 +2718,6 @@ L_80095E10:
         r26 = 0x2be7;
 
     } else if (r28 == 0xff) {
-    if (r28 != 0xff) goto L_80095E34;
         r26 = 0x2be5;
 
     }
@@ -3403,7 +3402,6 @@ L_80096864:
         r6 = 0xe8;
 
     } else if (r3 != 0) {
-    if (r3 == 0) goto L_800968A0;
         r6 = 0xe7;
 
     } else {

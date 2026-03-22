@@ -8309,7 +8309,6 @@ L_800DA650: ;
         if ((s32)r0 == (s32)0xa8) goto L_800DA67C;
 
     } else if ((s32)r0 != (s32)0xb8) {
-    if ((s32)r0 == (s32)0xb8) goto L_800DA674;
 
     }
     r31 = 0x0;

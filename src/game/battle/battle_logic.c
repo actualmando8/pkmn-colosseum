@@ -7133,13 +7133,11 @@ L_801E567C:
         fn_801E62D8();
 
     } else if (tmp == 0xdb) {
-    if (tmp != 0xdb) goto L_801E56B4;
         fn_801E5A28();
         tmp = r3 & 0xFF;
         if (tmp != 0xdb) { r3 = r3 & 0xFF; return; }
 
     } else if (tmp == 0xda) {
-    if (tmp != 0xda) goto L_801E56D0;
         fn_801E590C();
         tmp = r3 & 0xFF;
         if (tmp != 0xda) { r3 = r3 & 0xFF; return; }
