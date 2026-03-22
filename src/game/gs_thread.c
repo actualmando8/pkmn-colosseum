@@ -545,11 +545,11 @@ GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
 
     gsThreadActive = 1;
     return thread;
-}
         }
         thread++;
     }
     return NULL;
+}
 
 /* =======================================================================
  *  GStaskSchedulerThread / fn_800FEA74  (INTERNAL)
@@ -1052,7 +1052,8 @@ void fn_800F0A74(void) {
                         r3 = *(u16*)((u8*)r21 + 0x22);
                         fn_800E209C();
 
-                    } else {
+                    }
+                } else {
                         r3 = r23;
                         fn_800EEA50();
                         r0 = r3 & 0xFF;
@@ -1072,9 +1073,8 @@ void fn_800F0A74(void) {
                         fn_800E24B0();
                         r3 = *(u16*)((u8*)r21 + 0x20);
                         fn_800E24B0();
-                            }
-                    }
-                    }
+                }
+                }
             r0 = *(u8*)lbl_8047AC0C;
             if ((u32)r0 != (u32)0x0) {
                 if ((u32)r21 == (u32)0x0) {
