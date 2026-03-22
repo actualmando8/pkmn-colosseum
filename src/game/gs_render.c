@@ -8673,34 +8673,34 @@ void fn_800DA880(void) {
                                 if ((s32)r8 >= (s32)r3) break;
                                 r3 = (0x1 << 16);
                     }
-                            if ((s32)r8 == (s32)r3) goto L_800DABDC;
-                            break;
-                        }
-                        r3 = (0x10 << 16);
+                            if ((s32)r8 != (s32)r3) {
+                                break;
+                            }
+                            r3 = (0x10 << 16);
+                            if ((s32)r8 == (s32)r3) break;
+                            if ((s32)r8 >= (s32)r3) break;
+                            r3 = (0x8 << 16);
+                    }
+                        if ((s32)r8 == (s32)r3) goto L_800DABE4;
+                        break;
+                    }
+                    r3 = (0x100 << 16);
+                    if ((s32)r8 == (s32)r3) goto L_800DABE4;
+                    if ((s32)r8 < (s32)r3) {
+                        r3 = (0x80 << 16);
                         if ((s32)r8 == (s32)r3) break;
                         if ((s32)r8 >= (s32)r3) break;
-                        r3 = (0x8 << 16);
-                }
-                    if ((s32)r8 == (s32)r3) goto L_800DABE4;
-                    break;
-                }
-                r3 = (0x100 << 16);
-                if ((s32)r8 == (s32)r3) goto L_800DABE4;
-                if ((s32)r8 < (s32)r3) {
-                    r3 = (0x80 << 16);
+                        r3 = (0x40 << 16);
+                        if ((s32)r8 == (s32)r3) goto L_800DABEC;
+                        break;
+                    }
+                    r3 = (0x400 << 16);
                     if ((s32)r8 == (s32)r3) break;
                     if ((s32)r8 >= (s32)r3) break;
-                    r3 = (0x40 << 16);
+                    r3 = (0x200 << 16);
                     if ((s32)r8 == (s32)r3) goto L_800DABEC;
                     break;
-                }
-                r3 = (0x400 << 16);
-                if ((s32)r8 == (s32)r3) break;
-                if ((s32)r8 >= (s32)r3) break;
-                r3 = (0x200 << 16);
-                if ((s32)r8 == (s32)r3) goto L_800DABEC;
-                break;
-            L_800DABDC: ;
+                            }
                 r0 = 0x1;
                 break;
             }

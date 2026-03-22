@@ -5434,6 +5434,7 @@ u16 fn_8011F5C8(u8* ptr) {
 /* Address: 0x80128E24 | Size: 0x8 | Pattern: sda_getter */
 u32 fn_80128E24(void) {
     return lbl_8047ADB8;
+}
 
 /* ===================================================================
  * Generated: 1 pattern-matched + 515 stubs
