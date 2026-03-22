@@ -746,18 +746,19 @@ void fn_800318D8(void) {
             goto L_80031A00;
         }
         tmp = *(u32*)lbl_8047A424;
-        if ((s32)tmp != (s32)r8) goto L_80031A00;
-        r3 = r4;
-        r4 = 0x1;
-        fn_80109220();
-        return;
-    }
-    tmp = *(u32*)lbl_8047A420;
-    if ((s32)tmp == (s32)r8) {
-        r3 = r4;
-        r4 = 0x1;
-        fn_80109220();
-        return;
+        if ((s32)tmp == (s32)r8) {
+            r3 = r4;
+            r4 = 0x1;
+            fn_80109220();
+            return;
+        }
+        tmp = *(u32*)lbl_8047A420;
+        if ((s32)tmp == (s32)r8) {
+            r3 = r4;
+            r4 = 0x1;
+            fn_80109220();
+            return;
+        }
     }
 L_80031A00:
     r3 = r4;

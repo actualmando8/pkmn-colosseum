@@ -110,8 +110,25 @@ def try_trivial_forward(lines, goto_idx, label_idx, label_name):
     return False
 
 
+def brace_depth_between(lines, start, end):
+    """Count net brace depth between start (exclusive) and end (exclusive)."""
+    depth = 0
+    for i in range(start + 1, end):
+        if lines[i] is None:
+            continue
+        for ch in lines[i]:
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+    return depth
+
+
 def try_set_and_skip(lines, goto_idx, label_idx, label_name):
-    """Pattern: r0=X; goto L; } ... r0=Y; L:  ->  r0=X; } else { ... r0=Y; }"""
+    """Pattern: r0=X; goto L; } ... r0=Y; L:  ->  r0=X; } else { ... r0=Y; }
+
+    Only works when braces are balanced between goto+1 and label.
+    """
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
@@ -130,6 +147,12 @@ def try_set_and_skip(lines, goto_idx, label_idx, label_name):
     pre_label = lines[label_idx - 1].rstrip()
     if not re.search(r'\b[rf]\d+\s*=', pre_label):
         return False
+
+    # Check brace balance: from the } after goto to the label
+    depth = brace_depth_between(lines, goto_idx, label_idx)
+    if depth != 0:
+        return False
+
     brace_indent = get_indent(lines[goto_idx + 1])
     lines[goto_idx] = None
     lines[goto_idx + 1] = ' ' * brace_indent + '} else {\n'

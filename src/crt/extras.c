@@ -453,16 +453,17 @@ void fn_800CB024(void) {
             if ((s32)r31 >= 0) return;
             goto L_800CB0F8;
         }
-        if ((s32)r31 >= 4) goto L_800CB0F8;
-        f1 = *(f64*)lbl_8047C530;
-        return;
-        return;
+        if ((s32)r31 < 4) {
+            f1 = *(f64*)lbl_8047C530;
+            return;
+            return;
 
-        f1 = *(f64*)lbl_8047C528;
-        return;
+            f1 = *(f64*)lbl_8047C528;
+            return;
 
-        f1 = *(f64*)lbl_8047C530;
-        return;
+            f1 = *(f64*)lbl_8047C530;
+            return;
+        }
     }
 L_800CB0F8:
 do {
@@ -1267,9 +1268,10 @@ void fn_800CBA90(void) {
             r9 = (s32)r7 >> r8;
             r8 = r9 << r8;
         }
-        if ((s32)r7 != (s32)r8) goto L_800CBBCC;
-        r4 = r9 & 0x1;
-        r4 = 0x2 - r4;
+        if ((s32)r7 == (s32)r8) {
+            r4 = r9 & 0x1;
+            r4 = 0x2 - r4;
+        }
     }
 L_800CBBCC:
     if (r11 == 0) {
@@ -1787,17 +1789,18 @@ void fn_800CC2C0(void) {
             tmp = *(u32*)((u8*)r30 + 0x0);
             /* extrwi tmp, tmp, 11, 1 */;
             tmp = r4 - tmp;
-            if ((s32)tmp <= 0x31) goto L_800CC4FC;
-            f0 = *(f64*)lbl_8047C7C0;
-            f2 = f4;
-            f1 = *(f64*)lbl_8047C7C8;
-            f3 = f0 * f5;
-            f4 = f4 - f3;
-            f0 = f2 - f4;
-            f0 = f0 - f3;
-            f1 = f1 * f5 - f0;
-            f0 = f4 - f1;
-            *(f64*)((u8*)r30 + 0x0) = f0;
+            if ((s32)tmp > 0x31) {
+                f0 = *(f64*)lbl_8047C7C0;
+                f2 = f4;
+                f1 = *(f64*)lbl_8047C7C8;
+                f3 = f0 * f5;
+                f4 = f4 - f3;
+                f0 = f2 - f4;
+                f0 = f0 - f3;
+                f1 = f1 * f5 - f0;
+                f0 = f4 - f1;
+                *(f64*)((u8*)r30 + 0x0) = f0;
+            }
         }
     L_800CC4FC:
         f0 = *(f64*)((u8*)r30 + 0x0);

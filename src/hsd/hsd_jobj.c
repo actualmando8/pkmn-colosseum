@@ -1586,15 +1586,16 @@ L_8019DC3C:
             }
             }
         }
-        if ((s32)r3 == 0) goto L_8019DCD0;
-        r4 = *(u32*)((u8*)r31 + 0x0);
-        r3 = r31;
-        r12 = *(u32*)((u8*)r4 + 0x40);
-        ctr_fn = (void(*)(void))r12;
-        ctr_fn();
-        tmp = *(u32*)((u8*)r31 + 0x14);
-        tmp = tmp & 0xFFFFFFBF;
-        *(u32*)((u8*)r31 + 0x14) = tmp;
+        if ((s32)r3 != 0) {
+            r4 = *(u32*)((u8*)r31 + 0x0);
+            r3 = r31;
+            r12 = *(u32*)((u8*)r4 + 0x40);
+            ctr_fn = (void(*)(void))r12;
+            ctr_fn();
+            tmp = *(u32*)((u8*)r31 + 0x14);
+            tmp = tmp & 0xFFFFFFBF;
+            *(u32*)((u8*)r31 + 0x14) = tmp;
+        }
     }
 L_8019DCD0:
     tmp = *(u32*)((u8*)r31 + 0x14);
