@@ -1500,39 +1500,36 @@ void fn_80194DA4(void) {
     tmp = tmp & 0x1;
     if (r31 != 0) {
         if (r31 != 0) {
-            goto L_80194DF0;
-        }
-        tmp = -0x1;
-        goto L_80194E5C;
-    L_80194DF0:
-        f0 = *(f32*)((u8*)r31 + 0x0);
-        r3 = (u32)lbl_80478AC8;
-        /* fabs */ f1 = (f0 < 0) ? -f0 : f0;
-        f0 = *(f32*)lbl_80478AC8;
-        /* cror eq, lt, eq */;
-        do {
-            if (f1 != f0) break;
-            f0 = *(f32*)((u8*)r31 + 0x4);
+            f0 = *(f32*)((u8*)r31 + 0x0);
             r3 = (u32)lbl_80478AC8;
             /* fabs */ f1 = (f0 < 0) ? -f0 : f0;
             f0 = *(f32*)lbl_80478AC8;
             /* cror eq, lt, eq */;
-            if (f1 != f0) break;
-            f0 = *(f32*)((u8*)r31 + 0x8);
-            r3 = (u32)lbl_80478AC8;
-            /* fabs */ f1 = (f0 < 0) ? -f0 : f0;
-            f0 = *(f32*)lbl_80478AC8;
-            /* cror eq, lt, eq */;
-            if (f1 != f0) break;
-            tmp = -0x1;
-            break;
-        } while (0);
+            do {
+                if (f1 != f0) break;
+                f0 = *(f32*)((u8*)r31 + 0x4);
+                r3 = (u32)lbl_80478AC8;
+                /* fabs */ f1 = (f0 < 0) ? -f0 : f0;
+                f0 = *(f32*)lbl_80478AC8;
+                /* cror eq, lt, eq */;
+                if (f1 != f0) break;
+                f0 = *(f32*)((u8*)r31 + 0x8);
+                r3 = (u32)lbl_80478AC8;
+                /* fabs */ f1 = (f0 < 0) ? -f0 : f0;
+                f0 = *(f32*)lbl_80478AC8;
+                /* cror eq, lt, eq */;
+                if (f1 != f0) break;
+                tmp = -0x1;
+                break;
+            } while (0);
 
-        r3 = r31;
-        r4 = (u32)sp + 0x38;
-        fn_800A3ADC();
-        tmp = 0x0;
-    L_80194E5C:
+            r3 = r31;
+            r4 = (u32)sp + 0x38;
+            fn_800A3ADC();
+            tmp = 0x0;
+        } else {
+            tmp = -0x1;
+        }
         if ((s32)tmp != 0) {
             r3 = (u32)lbl_8027464C;
             r3 = (u32)lbl_8027464C;

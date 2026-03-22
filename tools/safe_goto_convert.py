@@ -511,14 +511,28 @@ def cleanup_empty(lines):
 
 
 def write_file(filepath, text):
-    """Write text to file, handling encoding issues."""
-    try:
-        with open(filepath, 'w', newline='') as f:
-            f.write(text)
-    except Exception:
-        # Fallback: write with default newline handling
-        with open(filepath, 'w') as f:
-            f.write(text)
+    """Write text to file, handling encoding and permission issues."""
+    import time
+    for attempt in range(3):
+        try:
+            with open(filepath, 'w', newline='') as f:
+                f.write(text)
+            return
+        except PermissionError:
+            if attempt < 2:
+                time.sleep(1)
+            else:
+                raise
+        except Exception:
+            try:
+                with open(filepath, 'w') as f:
+                    f.write(text)
+                return
+            except PermissionError:
+                if attempt < 2:
+                    time.sleep(1)
+                else:
+                    raise
 
 
 def process_file(filepath, ver):
@@ -592,7 +606,6 @@ def main():
 
     BROKEN = {
         'src/game/battle/battle_logic.c',
-        'src/game/colosseum_script.c',
         'src/game/gba/gba_conv.c',
         'src/game/gs_field_world.c',
         'src/game/menu/menu_common_ext.c',

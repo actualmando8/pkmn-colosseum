@@ -1523,37 +1523,38 @@ while (1) {
             if (f1 < f0) {
                 r3 = (u32)lbl_80478AC0;
                 f1 = *(f32*)lbl_80478AC0;
-                goto L_80192964;
-            }
-            *(f32*)(sp + 0x8) = f1;
-            tmp = 0x7F800000;
-            r3 = r3 & 0x7F800000;
-            if ((s32)r3 != (s32)tmp) {
-                if ((s32)r3 >= (s32)tmp) goto L_80192950;
-                if ((s32)r3 != 0) {
-                    goto L_80192950;
-                }
+
+            } else {
+                *(f32*)(sp + 0x8) = f1;
+                tmp = 0x7F800000;
+                r3 = r3 & 0x7F800000;
+                if ((s32)r3 != (s32)tmp) {
+                    if ((s32)r3 >= (s32)tmp) goto L_80192950;
+                    if ((s32)r3 != 0) {
+                        goto L_80192950;
+                    }
+                    tmp = tmp & 0x7FFFFF;
+                    if ((s32)r3 != 0) {
+                        tmp = 0x1;
+                        goto L_80192954;
+                    }
+                    tmp = 0x2;
+                    goto L_80192954;
+                    }
                 tmp = tmp & 0x7FFFFF;
                 if ((s32)r3 != 0) {
-                    tmp = 0x1;
+                    tmp = 0x5;
                     goto L_80192954;
                 }
-                tmp = 0x2;
+                tmp = 0x3;
                 goto L_80192954;
+            L_80192950:
+                tmp = 0x4;
+            L_80192954:
+                if ((s32)tmp == 1) {
+                    r3 = (u32)lbl_80478AC0;
+                    f1 = *(f32*)lbl_80478AC0;
                 }
-            tmp = tmp & 0x7FFFFF;
-            if ((s32)r3 != 0) {
-                tmp = 0x5;
-                goto L_80192954;
-            }
-            tmp = 0x3;
-            goto L_80192954;
-        L_80192950:
-            tmp = 0x4;
-        L_80192954:
-            if ((s32)tmp == 1) {
-                r3 = (u32)lbl_80478AC0;
-                f1 = *(f32*)lbl_80478AC0;
             }
         L_80192964:
             *(f32*)(sp + 0x10) = f1;
@@ -1957,10 +1958,11 @@ while (1) {
                 goto L_80192FA8;
             }
             f1 = *(f32*)lbl_8047D944;
-            goto L_80192FA8;
+
+        } else {
+            fn_800CE2D8();
+            f1 = (f32)f1;
         }
-        fn_800CE2D8();
-        f1 = (f32)f1;
     L_80192FA8:
         f0 = *(f64*)lbl_8047D920;
         f0 = f0 * f1;

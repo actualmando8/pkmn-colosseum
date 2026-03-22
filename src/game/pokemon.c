@@ -1565,18 +1565,15 @@ void fn_801F0F04(void) {
         *(u32*)lbl_8047B5E8 = r0;
         r0 = r0 & 0x1F;
         *(u32*)lbl_8047B5E8 = r0;
-        goto L_801F0F84;
+        r3 = r30;
+        r4 = r29;
+        fn_8020D78C();
+        r3 = r31;
+        r4 = r29;
+        fn_8020D78C();
+    } else {
+        r31 = 0x0;
     }
-    r31 = 0x0;
-    goto L_801F0F9C;
-    L_801F0F84: ;
-    r3 = r30;
-    r4 = r29;
-    fn_8020D78C();
-    r3 = r31;
-    r4 = r29;
-    fn_8020D78C();
-    L_801F0F9C: ;
     if ((u32)r31 == (u32)0x0) {
         r3 = 0x2;
         return;

@@ -647,9 +647,10 @@ void fn_800117BC(void) {
     tmp = *(u8*)((u8*)r28 + 0x44);
     if (tmp == 0) {
         r31 = 0x4c;
-        goto L_800117F0;
+
+    } else {
+        r31 = 0xf7;
     }
-    r31 = 0xf7;
 L_800117F0:
     r3 = r31;
     r4 = 0x1e;
@@ -1127,14 +1128,15 @@ void fn_80011EA4(void) {
             }
             if ((s32)r6 >= 0x536) goto L_80011FA8;
         }
-        goto L_80011F8C;
+
+    } else {
+        if ((s32)r6 < 0x53e) {
+            if ((s32)r6 >= 0x53c) goto L_80011F8C;
+            goto L_80011FC0;
+        }
+        if ((s32)r6 >= 0x540) goto L_80011FC0;
+        goto L_80011FA8;
     }
-    if ((s32)r6 < 0x53e) {
-        if ((s32)r6 >= 0x53c) goto L_80011F8C;
-        goto L_80011FC0;
-    }
-    if ((s32)r6 >= 0x540) goto L_80011FC0;
-    goto L_80011FA8;
 L_80011F8C:
     tmp = *(u8*)((u8*)r3 + 0x29);
     if (tmp != 0) {
@@ -1147,9 +1149,10 @@ L_80011FA8:
     tmp = *(u8*)((u8*)r3 + 0x29);
     if (tmp != 0) {
         r4 = 0x1;
-        goto L_80011FC0;
+
+    } else {
+        r4 = 0x0;
     }
-    r4 = 0x0;
 L_80011FC0:
 do {
     if ((s32)r6 < 0x534) {

@@ -801,45 +801,46 @@ void fn_800AA8D4(void) {
         r9 = 0x0;
         r6 = r6 + 0x10;
         SITransfer();
-        goto L_800AAB7C;
-        }
-    tmp = r6 & 0x00100000;
-    if (r5 != 0) {
-        tmp = r6 & 0x00080000;
-        if (r5 == 0) {
-            tmp = r6 & 0x00040000;
-        }
-        if (r5 != 0) goto L_800AAB7C;
-        tmp = r6 & 0x40000000;
+
+        } else {
+        tmp = r6 & 0x00100000;
         if (r5 != 0) {
+            tmp = r6 & 0x00080000;
+            if (r5 == 0) {
+                tmp = r6 & 0x00040000;
+            }
+            if (r5 != 0) goto L_800AAB7C;
+            tmp = r6 & 0x40000000;
+            if (r5 != 0) {
+                tmp = r29 * 0xc;
+                r3 = (u32)fn_800AA678;
+                r6 = r30 + tmp;
+                r8 = (u32)fn_800AA678;
+                r3 = r29 + 0x0;
+                r4 = (u32)lbl_80478A20;
+                r5 = 0x1;
+                r7 = 0xa;
+                r10 = 0x0;
+                r9 = 0x0;
+                r6 = r6 + 0x10;
+                SITransfer();
+                goto L_800AAB7C;
+            }
             tmp = r29 * 0xc;
-            r3 = (u32)fn_800AA678;
+            r3 = (u32)fn_800AA7FC;
+            r4 = r30 + r4;
             r6 = r30 + tmp;
-            r8 = (u32)fn_800AA678;
+            r8 = (u32)fn_800AA7FC;
             r3 = r29 + 0x0;
-            r4 = (u32)lbl_80478A20;
-            r5 = 0x1;
-            r7 = 0xa;
+            r5 = 0x3;
+            r7 = 0x8;
             r10 = 0x0;
             r9 = 0x0;
+            r4 = r4 + 0x40;
             r6 = r6 + 0x10;
             SITransfer();
-            goto L_800AAB7C;
         }
-        tmp = r29 * 0xc;
-        r3 = (u32)fn_800AA7FC;
-        r4 = r30 + r4;
-        r6 = r30 + tmp;
-        r8 = (u32)fn_800AA7FC;
-        r3 = r29 + 0x0;
-        r5 = 0x3;
-        r7 = 0x8;
-        r10 = 0x0;
-        r9 = 0x0;
-        r4 = r4 + 0x40;
-        r6 = r6 + 0x10;
-        SITransfer();
-    }
+        }
 L_800AAB7C:
     if ((s32)r3 != 0) return;
     r5 = *(u32*)lbl_8047A8A8;

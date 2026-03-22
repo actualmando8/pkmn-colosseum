@@ -5415,6 +5415,7 @@ u32 fn_8012AC3C(u8* ptr) {
 /* Address: 0x80130CD8 | Size: 0x8 | Pattern: sda_getter */
 u32 fn_80130CD8(void) {
     return lbl_8047ADC0;
+}
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -5423,7 +5424,6 @@ u32 fn_80130CD8(void) {
  * =================================================================== */
 
 extern u32 lbl_8047ADB8;
-}
 
 /* Address: 0x8011F5C8 | Size: 0x18 | Pattern: nullcheck_getter */
 u16 fn_8011F5C8(u8* ptr) {
@@ -5434,6 +5434,7 @@ u16 fn_8011F5C8(u8* ptr) {
 /* Address: 0x80128E24 | Size: 0x8 | Pattern: sda_getter */
 u32 fn_80128E24(void) {
     return lbl_8047ADB8;
+}
 
 /* ===================================================================
  * Generated: 1 pattern-matched + 515 stubs
@@ -18331,50 +18332,51 @@ L_8012444C: ;
     r0 = (s8)r25;
     r0 = r3 & 0xFFFF;
     r31 = r0 | r23;
-    if ((s32)r0 < (s32)0) goto L_801247FC;
-    if ((u32)r24 == (u32)0x0) {
-        r0 = 0x2;
-
-    } else {
-        r3 = r24;
-        r4 = 0x0;
-        r5 = 0x6e;
-        r6 = 0x0;
-        fn_8012640C();
-        r4 = r3 & 0xFFFF;
-        r3 = 0x0;
-        r5 = 0x13;
-        r6 = 0x0;
-        fn_8012640C();
-        r23 = r3 & 0xFFFF;
-        r3 = 0x0;
-        fn_80131574();
-        r0 = r3 & 0xFF;
-        if ((s32)r23 == (s32)r0) {
-            r0 = 0x0;
+    if ((s32)r0 >= (s32)0) {
+        if ((u32)r24 == (u32)0x0) {
+            r0 = 0x2;
 
         } else {
-            r3 = 0x1;
+            r3 = r24;
+            r4 = 0x0;
+            r5 = 0x6e;
+            r6 = 0x0;
+            fn_8012640C();
+            r4 = r3 & 0xFFFF;
+            r3 = 0x0;
+            r5 = 0x13;
+            r6 = 0x0;
+            fn_8012640C();
+            r23 = r3 & 0xFFFF;
+            r3 = 0x0;
             fn_80131574();
             r0 = r3 & 0xFF;
             if ((s32)r23 == (s32)r0) {
-                r0 = 0x1;
+                r0 = 0x0;
 
             } else {
-                r3 = 0x2;
+                r3 = 0x1;
                 fn_80131574();
                 r0 = r3 & 0xFF;
                 if ((s32)r23 == (s32)r0) {
-                    r0 = 0x2;
+                    r0 = 0x1;
 
                 } else {
-                    r0 = -0x1;
-                }
-                }
-                }
-                }
+                    r3 = 0x2;
+                    fn_80131574();
+                    r0 = r3 & 0xFF;
+                    if ((s32)r23 == (s32)r0) {
+                        r0 = 0x2;
 
-    r0 = (s8)r0;
+                    } else {
+                        r0 = -0x1;
+                    }
+                    }
+                    }
+                    }
+
+        r0 = (s8)r0;
+    }
     if ((s32)r23 >= (s32)r0) goto L_801247FC;
     r0 = (s8)r25;
     if ((s32)r0 != (s32)0x2) {

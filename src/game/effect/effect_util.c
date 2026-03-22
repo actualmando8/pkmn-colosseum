@@ -1060,16 +1060,13 @@ void fn_80132834(void* table, u32 stride, u32 count, u32 type) {
     r4 = 0x10;
     r7 = 0x8;
 L_801328BC: ;
-    if ((s32)r6 != (s32)0x5) {
-        goto L_801328D4;
+    if ((s32)r6 == (s32)0x5) {
+        r8 = (u32)lbl_80363610;
+        r8 = (u32)lbl_80363610;
+    } else {
+        r8 = (u32)lbl_803635F0;
+        r8 = (u32)lbl_803635F0;
     }
-    r8 = (u32)lbl_80363610;
-    r8 = (u32)lbl_80363610;
-    goto L_801328DC;
-L_801328D4: ;
-    r8 = (u32)lbl_803635F0;
-    r8 = (u32)lbl_803635F0;
-L_801328DC: ;
     r10 = r9 << 1;
     while (1) {
         r11 = *(u32*)(sp + 0x8);
