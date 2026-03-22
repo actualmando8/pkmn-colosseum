@@ -104,19 +104,16 @@ void TRKNubMainLoop(void) {
                 u8** ppInput = (u8**)&gTRKInputPendingPtr;
                 u8* pInput = *ppInput;
                 if (*pInput != 0) {
-                    /* Input pending flag was cleared, try to continue */
-                    goto try_continue;
+                    /* Input pending flag was set, try to continue */
+                    if (!TRKTargetStopped()) {
+                        TRKTargetContinue();
+                    }
+                    firstPass = 0;
+                    continue;
                 }
             }
             firstPass = 1;
             TRKGetInput();
-            continue;
-
-        try_continue:
-            if (!TRKTargetStopped()) {
-                TRKTargetContinue();
-            }
-            firstPass = 0;
         }
     }
 }

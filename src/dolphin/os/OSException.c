@@ -94,12 +94,17 @@ void OSExceptionInit(void) {
                 DBPrintf(">>> Installing debug handler at vector 0x%x\n", exception);
                 /* Copy the debug jump code */
                 memcpy(__DBVECTOR, dbIntEnd, dbJumpSize);
-                goto next;
+            } else {
+                /* Fill vector location with nops then copy the vector code */
+                u32* dest = (u32*)__DBVECTOR;
+                u32  numWords = (dbJumpSize + 3) / 4;
+                u32  i;
+                for (i = 0; i < numWords; i++) {
+                    *dest++ = 0x60000000;  /* nop */
+                }
             }
-        }
-
-        /* Fill vector location with nops then copy the vector code */
-        {
+        } else {
+            /* Fill vector location with nops then copy the vector code */
             u32* dest = (u32*)__DBVECTOR;
             u32  numWords = (dbJumpSize + 3) / 4;
             u32  i;
@@ -108,7 +113,6 @@ void OSExceptionInit(void) {
             }
         }
 
-    next:
         /* Copy vector code to exception address */
         {
             void* destAddr = (void*)(ExceptionVectorAddr[exception] + 0x80000000);

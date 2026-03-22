@@ -169,21 +169,16 @@ void TRKTargetSupportRequest(void) {
 s32 TRKTargetInterrupt(void* event) {
     s32 result = 0;
     s32 eventType = *(s32*)event;
+    s32 needCheckStop = 0;
 
     /* Only handle types 3 and 4 */
-    if (eventType < 3 || eventType >= 5) {
-        goto done;
-    }
-
-    {
+    if (eventType >= 3 && eventType < 5) {
         u8* bpInfo = lbl_80313834;
         s32 bpActive = *(s32*)&bpInfo[0];
 
         if (bpActive == 0) {
-            goto check_stop;
-        }
-
-        {
+            needCheckStop = 1;
+        } else {
             u8* cpuState = gTRKCPUState;
             s32 doStop = 1;
             u32 msr;
@@ -192,10 +187,6 @@ s32 TRKTargetInterrupt(void* event) {
             msr = *(u32*)&cpuState[0x1F8];
             msr &= ~0x400;
             *(u32*)&cpuState[0x1F8] = msr;
-
-            if (doStop == 0) {
-                goto check_stop_2;
-            }
 
             /* Check if this is a trace exception (0xD00) */
             {
@@ -225,49 +216,45 @@ s32 TRKTargetInterrupt(void* event) {
             if (doStop != 0) {
                 /* Clear breakpoint and go to check_stop */
                 *(s32*)&bpInfo[0] = 0;
-                goto check_stop;
-            }
+                needCheckStop = 1;
+            } else {
+                /* check_stop_2: Breakpoint still active */
+                *(s32*)&bpInfo[0] = 1;
 
-        check_stop_2:
-            /* Breakpoint still active */
-            *(s32*)&bpInfo[0] = 1;
+                MWTRACE(1, "TRKTargetInterrupt: stepping\n");
 
-            MWTRACE(1, "TRKTargetInterrupt: stepping\n");
+                /* Re-enable single-step bit */
+                msr = *(u32*)&cpuState[0x1F8];
+                msr |= 0x400;
+                *(u32*)&cpuState[0x1F8] = msr;
 
-            /* Re-enable single-step bit */
-            msr = *(u32*)&cpuState[0x1F8];
-            msr |= 0x400;
-            *(u32*)&cpuState[0x1F8] = msr;
-
-            {
-                s32 bpType2 = *(s32*)&bpInfo[4];
-                if (bpType2 == 0 || bpType2 == 0x10) {
-                    /* Decrement step count */
-                    u32 count2 = *(u32*)&bpInfo[8];
-                    *(u32*)&bpInfo[8] = count2 - 1;
+                {
+                    s32 bpType2 = *(s32*)&bpInfo[4];
+                    if (bpType2 == 0 || bpType2 == 0x10) {
+                        /* Decrement step count */
+                        u32 count2 = *(u32*)&bpInfo[8];
+                        *(u32*)&bpInfo[8] = count2 - 1;
+                    }
                 }
+
+                /* Clear stopped flag */
+                *(s32*)&gTRKState[0x98] = 0;
             }
+        }
 
-            /* Clear stopped flag */
-            *(s32*)&gTRKState[0x98] = 0;
+        /* check_stop */
+        if (needCheckStop) {
+            u8* bpInfo2 = lbl_80313834;
+            s32 bpActive2 = *(s32*)&bpInfo2[0];
+
+            if (bpActive2 == 0) {
+                /* Set stopped and signal break event */
+                *(s32*)&gTRKState[0x98] = 1;
+                result = fn_800C0CD8(0x90);
+            }
         }
     }
 
-check_stop:
-    {
-        u8* bpInfo2 = lbl_80313834;
-        s32 bpActive2 = *(s32*)&bpInfo2[0];
-
-        if (bpActive2 != 0) {
-            goto done;
-        }
-
-        /* Set stopped and signal break event */
-        *(s32*)&gTRKState[0x98] = 1;
-        result = fn_800C0CD8(0x90);
-    }
-
-done:
     return result;
 }
 
