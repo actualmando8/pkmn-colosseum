@@ -1486,7 +1486,8 @@ void fn_8001C7B8(void) {
     L_8001D354:
         r23 = -0x1;
     L_8001D358:
-    } while ((s32)r23 != (s32)-0x1);
+        ;
+    } while ((s32)r23 != (s32)(-0x1));
     r3 = 0x0;
     return;
 }
@@ -4345,6 +4346,7 @@ void fn_8001FD48(void) {
     L_800202F8:
         r31 = 0x0;
     L_800202FC:
+        ;
     } while ((s32)r31 != 0);
     return;
 }
