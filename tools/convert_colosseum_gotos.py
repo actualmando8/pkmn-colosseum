@@ -651,7 +651,7 @@ def convert_chain_checks_to_body(lines, label_refcount, label_pos, label_sources
         if not all_cond or not all_forward:
             continue
         # The last ref should be close to the label (within 5 lines)
-        if pos - ref_lines[-1] > 5:
+        if pos - ref_lines[-1] > 15:
             continue
         # Check: between last ref and label, should be simple code or empty
         # (it could be the "else" branch - if check3 fails, goto L_skip)
