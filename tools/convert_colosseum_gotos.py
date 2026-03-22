@@ -16,6 +16,27 @@ import sys
 
 def invert_cond(cond):
     """Invert a C condition. Returns None if unable."""
+    # Handle compound conditions with || and &&
+    if ' || ' in cond:
+        # De Morgan: !(A || B) = !A && !B
+        parts = cond.split(' || ')
+        inverted = []
+        for p in parts:
+            inv = invert_cond(p.strip())
+            if inv is None:
+                return None
+            inverted.append(inv)
+        return ' && '.join(inverted)
+    if ' && ' in cond:
+        # De Morgan: !(A && B) = !A || !B
+        parts = cond.split(' && ')
+        inverted = []
+        for p in parts:
+            inv = invert_cond(p.strip())
+            if inv is None:
+                return None
+            inverted.append(inv)
+        return ' || '.join(inverted)
     if ' == ' in cond and cond.count('==') == 1:
         return cond.replace(' == ', ' != ')
     elif ' != ' in cond and cond.count('!=') == 1:
@@ -614,19 +635,28 @@ def convert_multi_ref_forward_2(lines, label_refcount, label_pos, label_sources)
 
 
 def convert_chain_checks_to_body(lines, label_refcount, label_pos, label_sources):
-    """Convert pattern where multiple forward gotos to same label form an OR:
+    """Convert multi-ref forward gotos to same label into do-while(0)+break pattern.
+
+    Pattern:
         if (check1) goto L_body;
         ...code1...
         if (check2) goto L_body;
         ...code2...
         if (!check3) goto L_skip;
     L_body:
-        ...body...
-    L_skip:
 
-    This pattern is: if (check1 || check2 || check3) { body }.
-    Only handle the case where the last ref is immediately before the label
-    AND the second-to-last ref's intervening code is simple (no labels, no gotos).
+    Becomes:
+        do {
+            if (check1) break;
+            ...code1...
+            if (check2) break;
+            ...code2...
+            if (!check3) goto L_skip;
+        } while (0);
+    L_body: (now unreferenced by gotos, may be removable)
+
+    This preserves semantics because each check is evaluated with the correct
+    variable values at that point in the execution flow.
     """
     changes = 0
     processed = set()
@@ -635,7 +665,7 @@ def convert_chain_checks_to_body(lines, label_refcount, label_pos, label_sources
             continue
         refs = label_sources.get(label, [])
         refcount = label_refcount.get(label, 0)
-        if refcount < 2 or refcount > 10:
+        if refcount < 2 or refcount > 15:
             continue
         # All refs must be conditional forward gotos
         all_cond = True
@@ -650,35 +680,24 @@ def convert_chain_checks_to_body(lines, label_refcount, label_pos, label_sources
                 break
         if not all_cond or not all_forward:
             continue
-        # The last ref should be close to the label (within 5 lines)
+        # The last ref should be reasonably close to the label
         if pos - ref_lines[-1] > 15:
             continue
-        # Check: between last ref and label, should be simple code or empty
-        # (it could be the "else" branch - if check3 fails, goto L_skip)
-        between_last = []
+        # Check: between last ref and label, should have no internal labels
         has_label_between = False
         for k in range(ref_lines[-1] + 1, pos):
             s = lines[k].strip()
-            if not s:
-                continue
             if re.match(r'^L_[0-9A-Fa-f]+\s*:\s*;?\s*$', s):
                 has_label_between = True
                 break
-            between_last.append(k)
         if has_label_between:
             continue
-
-        # Don't handle if between-last has gotos
-        if any(re.search(r'\bgoto\b', lines[k]) for k in between_last):
-            continue
-
-        # Check that between consecutive refs, there are no labels or gotos from outside
+        # Check that between consecutive refs, inner labels are only internal
         valid = True
         for ri in range(len(ref_lines) - 1):
             for k in range(ref_lines[ri] + 1, ref_lines[ri + 1]):
                 s = lines[k].strip()
                 if re.match(r'^L_[0-9A-Fa-f]+\s*:\s*;?\s*$', s):
-                    # Check if referenced from outside
                     lm = re.match(r'^(L_[0-9A-Fa-f]+)', s)
                     inner_lbl = lm.group(1)
                     for src in label_sources.get(inner_lbl, []):
@@ -691,30 +710,39 @@ def convert_chain_checks_to_body(lines, label_refcount, label_pos, label_sources
                 break
         if not valid:
             continue
-
-        # All checks pass - now determine if this is a "skip" or "body" pattern
-        # If any ref goes to a label and the code after the label is the body,
-        # this is: if (check1 || check2 || ...) { body_after_label }
-        # We can collapse the multiple gotos into a single OR condition
-
-        # First: collapse the gotos into a single combined goto
-        conditions = []
-        for r in ref_lines:
-            m = re.match(r'^\s+if \((.+)\) goto ' + re.escape(label) + r';$', lines[r])
-            if m:
-                conditions.append(m.group(1))
-
-        if len(conditions) < 2:
+        # Check that brace depth is balanced from first ref to label
+        depth = 0
+        for k in range(ref_lines[0], pos):
+            depth += lines[k].count('{') - lines[k].count('}')
+        if depth != 0:
             continue
 
-        # Combine into one goto
-        indent = re.match(r'^(\s+)', lines[ref_lines[0]]).group(1)
-        combined = ' || '.join(conditions)
-        lines[ref_lines[0]] = indent + 'if (' + combined + ') goto ' + label + ';'
-        for r in ref_lines[1:]:
-            lines[r] = ''
+        # All gotos to this label are within the chain range
+        # Wrap from first ref to just before label in do { } while(0)
+        # Convert gotos to break
+        indent = re.match(r'^(\s*)', lines[ref_lines[0]]).group(1)
+
+        # Convert all gotos to break
+        for r in ref_lines:
+            lines[r] = re.sub(
+                r'goto\s+' + re.escape(label) + r'\s*;',
+                'break;',
+                lines[r]
+            )
             label_refcount[label] = label_refcount.get(label, 0) - 1
             changes += 1
+
+        # Indent all lines from first ref to just before label
+        for k in range(ref_lines[0], pos):
+            if lines[k].strip():
+                lines[k] = '    ' + lines[k]
+
+        # Insert do { at the first ref position (prepend)
+        lines[ref_lines[0]] = indent + 'do {' + '\n' + lines[ref_lines[0]]
+
+        # Insert } while(0); before label
+        lines[pos] = indent + '} while (0);' + '\n' + lines[pos]
+
         processed.add(label)
 
     return changes
@@ -885,9 +913,9 @@ def process_file(filepath, verbose=False):
         rc, lp, ls = build_indices(lines)
         changes += convert_goto_after_loop_to_break(lines, rc, lp)
 
-        # 9b: Chain checks to body (OR collapse)
-        rc, lp, ls = build_indices(lines)
-        changes += convert_chain_checks_to_body(lines, rc, lp, ls)
+        # 9b: Chain checks to body (disabled - do-while(0) causes brace issues)
+        # rc, lp, ls = build_indices(lines)
+        # changes += convert_chain_checks_to_body(lines, rc, lp, ls)
 
         # 10: Continue in loop
         rc, lp, ls = build_indices(lines)
