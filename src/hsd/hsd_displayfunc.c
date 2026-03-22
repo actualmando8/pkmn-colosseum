@@ -63,11 +63,6 @@ extern const char lbl_80274680[]; /* "unkown type of render pass.\n" */
 extern const char lbl_8047D9E8[]; /* "jobj" -- assertion expression for billboard null check */
 extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard found check */
 
-/* Forward declarations for converted functions */
-void* fn_80197A64(void* dobj, void* outputMtx);
-void fn_80197B6C(u8* jobj, u8* mtx, u8* out);
-
-
 /* ========================================================================
  * Internal DObj-like structure fields (used by both functions):
  *
@@ -243,108 +238,5 @@ void HSD_DObjDisplayFunc2(void* dobj, void* viewMtx, void* renderState) {
         default:
             fn_80196D78(lbl_802746DC, 0x170, lbl_80274680);
             break;
-    }
-}
-
-/* =========================================================================
- *  Internal stubs: 0x80197A64-0x80198F4C (2 functions)
- * ========================================================================= */
-
-/* 0x80197A64 | 0x108
- * Stub version of HSD_DObjDisplayFunc1 -- the decompiled version is above
- * as HSD_DObjDisplayFunc1. This stub is kept for link compatibility.
- *
- * Billboard model-view setup: walks the DObj chain looking for a
- * billboard node, asserts on null, and sets up the model-view matrix.
- */
-void* fn_80197A64(void* dobj, void* outputMtx) {
-    u32* dobjPtr = (u32*)dobj;
-    u32 flags;
-    void* cur;
-    void* found;
-    f32 localMtx[3][4];
-
-    flags = dobjPtr[5];
-    if (flags & DOBJ_FLAG_HIDDEN) {
-        return NULL;
-    }
-
-    found = dobj;
-    if (found == NULL) {
-        fn_80196E10(lbl_802746DC, 0x184, lbl_8047D9E8);
-    }
-
-    cur = dobj;
-    while (cur != NULL) {
-        u32* curPtr = (u32*)cur;
-        u32 curFlags = curPtr[5];
-        if ((curFlags & 0x03) != 0) {
-            found = cur;
-            break;
-        }
-        cur = (void*)curPtr[3];
-    }
-    if (cur == NULL) {
-        found = NULL;
-    }
-
-    if (found == NULL) {
-        fn_80196E10(lbl_802746DC, 0x1D4, lbl_8047D9F0);
-    }
-
-    if (found == dobj) {
-        fn_800A2EB4((void*)((u32*)found)[30], outputMtx);
-    } else if (found != dobj) {
-        fn_801A9DF0((void*)((u8*)found + 0x44),
-                    (void*)((u8*)dobj + 0x44), outputMtx);
-    } else {
-        fn_800A2D98((void*)((u8*)found + 0x44),
-                    (void*)((u32*)found)[30], localMtx);
-        fn_801A9DF0(localMtx, (void*)((u8*)dobj + 0x44), outputMtx);
-    }
-
-    return outputMtx;
-}
-
-/* 0x80197B6C | 0x104
- * hsdDoDisplayFunc - Dispatch the appropriate display function for
- * a JObj based on its rendering type field (flags & 0xE00).
- * 0x200=XLU, 0x400=TEX, 0x600=SPEC, 0x800=USER
- */
-void fn_80197B6C(u8* jobj, u8* mtx, u8* out) {
-    extern void fn_800A2D98(u8* src, u8* mtx, u8* dst);
-    extern void fn_80198038(u8* jobj, u8* mtx, u8* out);
-    extern void fn_80198B20(u8* jobj, u8* mtx, u8* out);
-    extern void fn_801985E0(u8* jobj, u8* mtx, u8* out);
-    extern void fn_80197C70(u8* jobj, u8* mtx, u8* out);
-    extern void fn_80196D78(u8* file, s32 line, u8* msg);
-    u8 localMtx[0x40];
-    u32 renderType;
-
-    renderType = *(u32*)(jobj + 0x14) & 0x00000E00;
-
-    if (renderType == 0) {
-        fn_800A2D98(mtx, jobj + 0x44, out);
-        return;
-    }
-
-    fn_800A2D98(mtx, jobj + 0x44, localMtx);
-
-    switch (renderType) {
-    case 0x200:
-        fn_80198038(jobj, localMtx, out);
-        break;
-    case 0x400:
-        fn_80198B20(jobj, localMtx, out);
-        break;
-    case 0x600:
-        fn_801985E0(jobj, localMtx, out);
-        break;
-    case 0x800:
-        fn_80197C70(jobj, localMtx, out);
-        break;
-    default:
-        fn_80196D78((u8*)&lbl_802746DC, 0x170, (u8*)&lbl_802746EC);
-        break;
     }
 }
