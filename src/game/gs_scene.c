@@ -686,26 +686,14 @@ void GSscene_XFBCapture(u32 captureIndex) {
         } while (0);
         r29 = *(u32*)&lbl_80478C40;
         tmp = *(u8*)((u8*)r29 + 0x0);
-        do {
-            if ((s32)tmp == 6) break;
-            if ((s32)tmp < 6) {
-                if ((s32)tmp < 2) {
-                    if ((s32)tmp >= 0) goto L_80177DB4;
-                    break;
-                }
-                if ((s32)tmp >= 5) goto L_80177DB4;
-                break;
-            }
-            if ((s32)tmp == 8) goto L_80178040;
-            if ((s32)tmp >= 8) break;
-            goto L_80177EF8;
-        L_80177DB4:
+        if ((s32)tmp == 0 || (s32)tmp == 1 || (s32)tmp == 5) {
+            /* L_80177DB4 */
             fn_801174C4();
             tmp = captureIndex & 0xFF;
-            if ((s32)tmp == 8) break;
+            if ((s32)tmp != 8) {
             fn_801174EC();
             tmp = captureIndex & 0xFF;
-            if ((s32)tmp == 8) break;
+            if ((s32)tmp != 8) {
             r5 = *(u32*)&lbl_80478C40;
             captureIndex = (u32)sp + 0xb4;
             r4 = r5 + 0x1c;
@@ -783,8 +771,10 @@ void GSscene_XFBCapture(u32 captureIndex) {
             }
             captureIndex = *(u32*)&lbl_80478C40;
             *(f32*)((u8*)captureIndex + 0x44) = f4;
-            break;
-        L_80177EF8:
+            }
+            }
+        } else if ((s32)tmp == 7) {
+            /* L_80177EF8 */
             captureIndex = (u32)sp + 0xb4;
             r4 = r29 + 0x4;
             r5 = r29 + 0x1c;
@@ -858,17 +848,19 @@ void GSscene_XFBCapture(u32 captureIndex) {
             *(f32*)((u8*)captureIndex + 0x44) = f4;
             captureIndex = *(u32*)&lbl_80478C40;
             tmp = *(u8*)((u8*)captureIndex + 0x4F);
-            if (tmp != 0) break;
+            if (tmp == 0) {
             tmp = *(u8*)((u8*)captureIndex + 0x4E);
-            if (tmp == 0) break;
+            if (tmp != 0) {
             f1 = *(f32*)(sp + 0xB4);
             f2 = *(f32*)(sp + 0xBC);
             ((void(*)(void))fn_800CE2D8)();
             f0 = (f32)f1;
             captureIndex = *(u32*)&lbl_80478C40;
             *(f32*)((u8*)captureIndex + 0x14) = f0;
-            break;
-        L_80178040:
+            }
+            }
+        } else if ((s32)tmp == 8) {
+            /* L_80178040 */
             captureIndex = *(u32*)((u8*)r29 + 0xD0);
             r4 = *(u32*)((u8*)r29 + 0xD4);
             fn_800F9318();
@@ -886,9 +878,8 @@ void GSscene_XFBCapture(u32 captureIndex) {
             captureIndex = r30;
             fn_800D1734();
             tmp = captureIndex & 0xFF;
-            if (r30 == 0) break;
-            return;
-        } while (0);
+            if (r30 != 0) return;
+        }
         captureIndex = *(u32*)&lbl_80478C40;
         tmp = *(u8*)((u8*)captureIndex + 0x4C);
         do {
@@ -913,6 +904,7 @@ void GSscene_XFBCapture(u32 captureIndex) {
     } else {
         tmp = *(u8*)((u8*)r30 + 0x0);
         if (tmp <= 8) {
+          do {
             captureIndex = (u32)jumptable_8036C278;
             tmp = tmp << 2;
             captureIndex = (u32)jumptable_8036C278;
@@ -948,7 +940,7 @@ void GSscene_XFBCapture(u32 captureIndex) {
             }
             }
             }
-            goto L_80178200;
+            break;
             captureIndex = *(u32*)((u8*)r30 + 0xD0);
             r4 = *(u32*)((u8*)r30 + 0xD4);
             fn_800F9318();
@@ -957,7 +949,7 @@ void GSscene_XFBCapture(u32 captureIndex) {
                 fn_800F92D4();
             }
             captureIndex = captureIndex;
-            if (captureIndex != 0) goto L_80178200;
+            if (captureIndex != 0) break;
             captureIndex = *(u32*)&lbl_80478C40;
             tmp = 0x0;
             *(u32*)((u8*)captureIndex + 0xD0) = tmp;
@@ -982,9 +974,9 @@ void GSscene_XFBCapture(u32 captureIndex) {
             *(u32*)((u8*)r5 + 0x3C) = tmp;
             fn_800F9318();
             captureIndex = captureIndex;
+          } while (0);
         }
     }
-L_80178200:
     r5 = *(u32*)&lbl_80478C40;
     tmp = *(u8*)((u8*)r5 + 0x0);
     do {
