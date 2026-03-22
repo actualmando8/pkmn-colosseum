@@ -2513,27 +2513,17 @@ void fn_801E16F0(void) {
     u32 r3 = 0;
     u32 r31 = 0;
 
-    tmp = *(u8*)&lbl_8047B440;
-    if (tmp == 0) goto L_801E1718;
-    tmp = *(u8*)&lbl_8047B441;
-    if (tmp != 0) goto L_801E1720;
-L_801E1718:
-    tmp = 0x0;
-    goto L_801E1724;
-L_801E1720:
-    tmp = 0x1;
-L_801E1724:
+    tmp = (*(u8*)&lbl_8047B440 != 0 && *(u8*)&lbl_8047B441 != 0) ? 0x1 : 0x0;
     tmp = tmp & 0xFF;
     if (tmp == 0) return;
     fn_801E386C();
     fn_801E38D8();
     if ((s32)r3 == 4) return;
-    if ((s32)r3 >= 4) goto L_801E174C;
-    if ((s32)r3 >= 3) goto L_801E1754;
-    return;
-L_801E174C:
-    if ((s32)r3 >= 6) return;
-L_801E1754:
+    if ((s32)r3 == 3 || ((s32)r3 >= 4 && (s32)r3 < 6)) {
+        /* fall through to music cleanup */
+    } else {
+        return;
+    }
     tmp = *(u8*)&lbl_8047B441;
     if (tmp == 0) return;
     fn_801E3F54();
