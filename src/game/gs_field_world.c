@@ -6628,17 +6628,9 @@ void fn_80116470(void) {
                                     fn_801669BC();
                                     r3 = 0x46;
                                     fn_80166A28();
-<<<<<<< Updated upstream
-
-                                        } else {
-                                            }
-                                                    }
-                                                    }
-=======
                                 }
                                 }
                                 }
->>>>>>> Stashed changes
 
                             r0 = r31 & 0x00000004;
                             if ((s32)r0 != (s32)0x0) {
@@ -6993,6 +6985,9 @@ void fn_80116958(void) {
                                         }
                                                 }
                                     }
+    }
+    }
+    }
 
     /* psq_l f31, 0x38((u32)sp), 0, qr0 */;
     f31 = *(f64*)(sp + 0x30);
@@ -7039,6 +7034,9 @@ void fn_80116D30(void) {
             ((void(*)(void))fn_800DD970)();
                     }
                     }
+    }
+    }
+    }
     ((void(*)(void))fn_800FF56C)();
     r31 = r3;
     r26 = 0x0;
@@ -7425,6 +7423,7 @@ void fn_80117330(void) {
             }
             }
             }
+    }
     /* psq_l f31, 0x88((u32)sp), 0, qr0 */;
     f31 = *(f64*)(sp + 0x80);
     return;

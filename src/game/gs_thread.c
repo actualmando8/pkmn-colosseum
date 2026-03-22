@@ -14980,7 +14980,8 @@ void fn_800FE834(void) {
     }
     ctr_fn = (void(*)(void))r8;
     if ((u32)r8 != (u32)0x0) {
-        do {
+        /* do-while loop (assembly fall-through pattern) */
+        {
             r0 = *(u32*)((u8*)r31 + 0x8);
             if ((s32)r0 == (s32)0x0) {
     if ((u32)r31 == (u32)0x0) {
@@ -15013,7 +15014,7 @@ void fn_800FE834(void) {
                 if ((u32)r6 != (u32)0x0) {
                     r4 = *(u8*)((u8*)r5 + 0xC);
                     r0 = *(u8*)((u8*)r31 + 0xC);
-            } while ((u32)r4 < (u32)r0);
+                }
             }
             if ((u32)r6 == (u32)0x0) {
                 r4 = *(u8*)((u8*)r5 + 0xC);
@@ -15053,6 +15054,8 @@ void fn_800FE834(void) {
     r3 = r3 + 0x1;
 
     return;
+}
+}
 }
 
 /* 0x800FE9B0 | 0xC4 */
@@ -15209,4 +15212,3 @@ void fn_800FEA74(void) {
         *(u32*)lbl_8047AC9C = r0;
         OSRestoreInterrupts();
     }
-}
