@@ -53,3 +53,5 @@ dolphin-2603a-x64/
 /*.txt
 !requirements.txt
 *.exe
+*.orig
+*.pre
