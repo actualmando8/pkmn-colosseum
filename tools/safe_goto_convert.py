@@ -575,6 +575,7 @@ def main():
 
     BROKEN = {
         'src/game/battle/battle_logic.c',
+        'src/game/colosseum_script.c',
         'src/game/gba/gba_conv.c',
         'src/game/gs_field_world.c',
         'src/game/menu/menu_common_ext.c',
