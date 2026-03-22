@@ -2154,12 +2154,12 @@ s32 fn_8007AB10(void) {
         /* subis tmp, r3, 0x4 */;
         if (tmp != 0) {
             tmp = 0xa;
-            goto L_8007AC44;
+
+        } else {
+            if ((s32)tmp == 0) {
+                tmp = 0x0;
+            }
         }
-        if ((s32)tmp == 0) {
-            tmp = 0x0;
-        }
-    L_8007AC44:
         if (tmp > 0xa) { r3 = 0x0; return; }
         r3 = (u32)jumptable_802EE594;
         tmp = tmp << 2;

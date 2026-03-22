@@ -510,11 +510,30 @@ def cleanup_empty(lines):
     return new
 
 
+def write_file(filepath, text):
+    """Write text to file, handling encoding issues."""
+    try:
+        with open(filepath, 'w', newline='') as f:
+            f.write(text)
+    except Exception:
+        # Fallback: write with default newline handling
+        with open(filepath, 'w') as f:
+            f.write(text)
+
+
 def process_file(filepath, ver):
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', newline='') as f:
         original = f.read()
 
-    lines = original.split('\n')
+    # Detect line ending
+    if '\r\n' in original:
+        line_ending = '\r\n'
+    else:
+        line_ending = '\n'
+
+    # Normalize to \n for processing
+    normalized = original.replace('\r\n', '\n')
+    lines = normalized.split('\n')
     total_removed = 0
     skip_ids = set()
 
@@ -533,8 +552,9 @@ def process_file(filepath, ver):
             skip_ids.add(tid)
             continue
 
-        with open(filepath, 'w') as f:
-            f.write(new_text)
+        # Write with original line endings
+        write_text = new_text.replace('\n', line_ending)
+        write_file(filepath, write_text)
 
         if test_compile(filepath, ver):
             removed = old_count - new_count
@@ -543,20 +563,17 @@ def process_file(filepath, ver):
             skip_ids.clear()  # Line numbers shifted, clear skip set
         else:
             # Revert and skip this transform
-            with open(filepath, 'w') as f:
-                f.write('\n'.join(lines))
+            write_file(filepath, '\n'.join(lines).replace('\n', line_ending))
             skip_ids.add(tid)
 
     # Cleanup
     lines = cleanup_labels(lines)
     lines = cleanup_empty(lines)
-    final = '\n'.join(lines)
-    with open(filepath, 'w') as f:
-        f.write(final)
+    final = '\n'.join(lines).replace('\n', line_ending)
+    write_file(filepath, final)
 
     if not test_compile(filepath, ver):
-        with open(filepath, 'w') as f:
-            f.write(original)
+        write_file(filepath, original)
         return 0
 
     return total_removed

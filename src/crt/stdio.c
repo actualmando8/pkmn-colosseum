@@ -440,10 +440,10 @@ L_800C5768:
                 r7 = r7 + r4;
                 r8 = (u32)r8 >> r4;
                 r6 = r6 - r4;
-                goto L_800C5880;
+
+            } else {
+                if (r3 == 1) goto L_800C5924;
             }
-            if (r3 == 1) goto L_800C5924;
-        L_800C5880:
             if ((s32)r5 > 1) {
                 tmp = (u32)r5 >> 31;
                 tmp = tmp + r5;
@@ -472,10 +472,10 @@ while (1) {
             r7 = r7 + r4;
             r8 = (u32)r8 >> r4;
             r6 = r6 - r4;
-            goto L_800C58F4;
+
+        } else {
+            if (r3 == 1) break;
         }
-        if (r3 == 1) break;
-    L_800C58F4:
         if ((s32)r5 > 1) {
             tmp = (u32)r5 >> 31;
             tmp = tmp + r5;

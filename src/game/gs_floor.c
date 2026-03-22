@@ -2652,36 +2652,36 @@ void fn_80100B24(void) {
                             if (r27 != 0) continue;
                         break;
                     }
-                        goto L_80100C98;
+
+                    } else {
+                        r30 = *(u32*)((u8*)r31 + 0x0);
+                        r27 = *(u32*)lbl_8047ACCC;
+                        goto L_80100C90;
+                    while (1) {
+                            tmp = *(u32*)((u8*)r27 + 0x8);
+                            r29 = *(u32*)((u8*)r27 + 0x4);
+                            if ((s32)tmp == 1) {
+                                tmp = *(u8*)((u8*)r27 + 0x15);
+                                if (tmp == 0) {
+                                    tmp = *(u32*)((u8*)r27 + 0xC);
+                                    if ((s32)tmp == 0) {
+                                        r12 = *(u32*)((u8*)r27 + 0x18);
+                                        r3 = r30;
+                                        r4 = *(u32*)((u8*)r27 + 0x10);
+                                        ctr_fn = (void(*)(void))r12;
+                                        ctr_fn();
+                            }
+                            }
+                            }
+                            r27 = *(u32*)((u8*)r27 + 0x4);
+                            if (r27 == 0) {
+                                r27 = r29;
+                            }
+                        L_80100C90:
+                            if (r27 != 0) continue;
+                        break;
                     }
-                    r30 = *(u32*)((u8*)r31 + 0x0);
-                    r27 = *(u32*)lbl_8047ACCC;
-                    goto L_80100C90;
-                while (1) {
-                        tmp = *(u32*)((u8*)r27 + 0x8);
-                        r29 = *(u32*)((u8*)r27 + 0x4);
-                        if ((s32)tmp == 1) {
-                            tmp = *(u8*)((u8*)r27 + 0x15);
-                            if (tmp == 0) {
-                                tmp = *(u32*)((u8*)r27 + 0xC);
-                                if ((s32)tmp == 0) {
-                                    r12 = *(u32*)((u8*)r27 + 0x18);
-                                    r3 = r30;
-                                    r4 = *(u32*)((u8*)r27 + 0x10);
-                                    ctr_fn = (void(*)(void))r12;
-                                    ctr_fn();
-                        }
-                        }
-                        }
-                        r27 = *(u32*)((u8*)r27 + 0x4);
-                        if (r27 == 0) {
-                            r27 = r29;
-                        }
-                    L_80100C90:
-                        if (r27 != 0) continue;
-                    break;
-                }
-                L_80100C98:
+                    }
                     tmp = 0x2;
                     *(u32*)((u8*)r31 + 0x10) = tmp;
                     r3 = 0x1;
@@ -3627,17 +3627,17 @@ while (1) {
         if ((s32)r4 >= 0x26) {
             r3 = r31 + 0x150;
             fn_800DD38C();
-            goto L_800F7548;
+
+        } else {
+            r3 = (u32)lbl_803155D0;
+            r3 = (u32)lbl_803155D0;
+            r12 = *(u32*)(r3 + tmp);
+            if (r12 != 0) {
+                r3 = r30;
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+            }
         }
-        r3 = (u32)lbl_803155D0;
-        r3 = (u32)lbl_803155D0;
-        r12 = *(u32*)(r3 + tmp);
-        if (r12 != 0) {
-            r3 = r30;
-            ctr_fn = (void(*)(void))r12;
-            ctr_fn();
-        }
-    L_800F7548:
         r3 = *(u32*)((u8*)r30 + 0x28);
         if ((s32)r3 <= 0) continue;
         /* subic. r3, r3, 0x1 */;

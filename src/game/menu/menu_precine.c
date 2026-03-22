@@ -1657,12 +1657,12 @@ do {
                         goto L_80035AB4;
                     }
                     if ((s32)r27 >= 2) goto L_80035AB4;
-                    goto L_80035AA0;
+
+                } else {
+                    tmp = 0x3;
+                    *(u32*)lbl_8047A458 = tmp;
+                    goto L_80035BD4;
                 }
-                tmp = 0x3;
-                *(u32*)lbl_8047A458 = tmp;
-                goto L_80035BD4;
-            L_80035AA0:
                 tmp = 0x1;
                 *(u32*)lbl_8047A458 = tmp;
                 goto L_80035AB4;

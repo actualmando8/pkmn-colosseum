@@ -1485,13 +1485,13 @@ sceneObj = *(u32*)&lbl_80478C40;
     f1 = *(f32*)((u8*)sceneObj + 0x44);
     if (f1 < f0) {
         *(f32*)((u8*)sceneObj + 0x44) = f0;
-        goto L_80178DA8;
+
+    } else {
+        f0 = *(f32*)lbl_8047D778;
+        if (f1 > f0) {
+            *(f32*)((u8*)sceneObj + 0x44) = f0;
+        }
     }
-    f0 = *(f32*)lbl_8047D778;
-    if (f1 > f0) {
-        *(f32*)((u8*)sceneObj + 0x44) = f0;
-    }
-L_80178DA8:
 sceneObj = *(u32*)&lbl_80478C40;
     f29 = *(f32*)((u8*)sceneObj + 0x40);
     ((void(*)(void))fn_800FF56C)();
@@ -1877,16 +1877,16 @@ tmp = (u32)camera & 0x00000020;
     }
     camera = *(u32*)&lbl_80478C40;
         *(f32*)((u8*)camera + 0x48) = f29;
-        goto L_80179350;
+
+    } else {
+        f0 = *(f32*)lbl_8047D788;
+    camera = *(u32*)&lbl_80478C40;
+        f0 = f0 * f30;
+        f1 = *(f32*)((u8*)camera + 0x10);
+        f0 = f27 / f0;
+        f0 = f1 - f0;
+        *(f32*)((u8*)camera + 0x10) = f0;
     }
-    f0 = *(f32*)lbl_8047D788;
-camera = *(u32*)&lbl_80478C40;
-    f0 = f0 * f30;
-    f1 = *(f32*)((u8*)camera + 0x10);
-    f0 = f27 / f0;
-    f0 = f1 - f0;
-    *(f32*)((u8*)camera + 0x10) = f0;
-L_80179350:
     f0 = *(f32*)lbl_8047D788;
     camera = camera;
     r4 = *(u32*)&lbl_80478C40;

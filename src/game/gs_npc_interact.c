@@ -1115,13 +1115,14 @@ void fn_80011EA4(void) {
                     if ((s32)r6 < 0xa5) {
             }
                 }
-                if ((s32)r6 >= 0xa4) goto L_80011FA8;
+                if ((s32)r6 < 0xa4) {
+                }
+                goto L_80011FC0;
             }
-            goto L_80011FC0;
-        }
-        if ((s32)r6 < 0x538) {
-            if ((s32)r6 < 0x534) {
-                if ((s32)r6 >= 0xaa) goto L_80011FC0;
+            if ((s32)r6 < 0x538) {
+                if ((s32)r6 < 0x534) {
+                    if ((s32)r6 >= 0xaa) goto L_80011FC0;
+                }
                 goto L_80011FA8;
             }
             if ((s32)r6 >= 0x536) goto L_80011FA8;
@@ -1161,10 +1162,10 @@ do {
                 if ((s32)r6 >= 0x538) break;
         }
         }
-        goto L_80011FFC;
+
+    } else {
+        if ((s32)r6 >= 0x540) break;
     }
-    if ((s32)r6 >= 0x540) break;
-L_80011FFC:
     if (r5 == 1) {
         r4 = 0x0;
     }

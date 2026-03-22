@@ -5415,6 +5415,7 @@ u32 fn_8012AC3C(u8* ptr) {
 /* Address: 0x80130CD8 | Size: 0x8 | Pattern: sda_getter */
 u32 fn_80130CD8(void) {
     return lbl_8047ADC0;
+}
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -5423,7 +5424,6 @@ u32 fn_80130CD8(void) {
  * =================================================================== */
 
 extern u32 lbl_8047ADB8;
-}
 
 /* Address: 0x8011F5C8 | Size: 0x18 | Pattern: nullcheck_getter */
 u16 fn_8011F5C8(u8* ptr) {
