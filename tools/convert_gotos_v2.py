@@ -576,7 +576,7 @@ def convert_forward_singles_relaxed(lines, lp, rc, ls):
         label_idx = lp[label]
         if label_idx <= i:
             continue
-        if label_idx - i > 200:
+        if label_idx - i > 2000:
             continue
 
         # Allow internal labels if all their sources are inside

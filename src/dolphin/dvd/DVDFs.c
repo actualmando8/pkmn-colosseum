@@ -99,36 +99,38 @@ L_800A4D4C:
         r23 = r23 + 0x1;
         goto L_800A4D4C;
     }
-    if ((s32)tmp != 0x2e) goto L_800A4DF0;
-    r3 = *(u8*)((u8*)r23 + 0x1);
-    tmp = (s8)r3;
-    if ((s32)tmp == 0x2e) {
-        r3 = *(u8*)((u8*)r23 + 0x2);
-        if ((s32)r3 == 0x2f) {
-            r3 = r26 * 0xc;
-            r4 = *(u32*)FstStart_8047A7CC;
-            tmp = r3 + 0x4;
-            r26 = *(u32*)(r4 + tmp);
-            r23 = r23 + 0x3;
+    do {
+        if ((s32)tmp != 0x2e) break;
+        r3 = *(u8*)((u8*)r23 + 0x1);
+        tmp = (s8)r3;
+        if ((s32)tmp == 0x2e) {
+            r3 = *(u8*)((u8*)r23 + 0x2);
+            if ((s32)r3 == 0x2f) {
+                r3 = r26 * 0xc;
+                r4 = *(u32*)FstStart_8047A7CC;
+                tmp = r3 + 0x4;
+                r26 = *(u32*)(r4 + tmp);
+                r23 = r23 + 0x3;
+                goto L_800A4D4C;
+            }
+            tmp = (s8)r3;
+            if ((s32)r3 != 0x2f) break;
+            tmp = r26 * 0xc;
+            r3 = *(u32*)FstStart_8047A7CC;
+            r3 = r3 + tmp;
+            r3 = *(u32*)((u8*)r3 + 0x4);
+            return;
+        }
+        if ((s32)tmp == 0x2f) {
+            r23 = r23 + 0x2;
             goto L_800A4D4C;
         }
         tmp = (s8)r3;
-        if ((s32)r3 != 0x2f) goto L_800A4DF0;
-        tmp = r26 * 0xc;
-        r3 = *(u32*)FstStart_8047A7CC;
-        r3 = r3 + tmp;
-        r3 = *(u32*)((u8*)r3 + 0x4);
+        if ((s32)tmp != 0x2f) break;
+        r3 = r26;
         return;
-    }
-    if ((s32)tmp == 0x2f) {
-        r23 = r23 + 0x2;
-        goto L_800A4D4C;
-    }
-    tmp = (s8)r3;
-    if ((s32)tmp != 0x2f) goto L_800A4DF0;
-    r3 = r26;
-    return;
-L_800A4DF0:
+    } while (0);
+
     tmp = *(u32*)__DVDLongFileNameFlag;
     if (tmp == 0) {
         r28 = r23 + 0x0;

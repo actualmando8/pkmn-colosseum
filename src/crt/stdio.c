@@ -253,10 +253,10 @@ void fn_800C5500(void) {
     tmp = tmp & 0x1;
     if (tmp != 0) {
         tmp = 0x1;
-        goto L_800C55CC;
+
+    } else {
+        tmp = -0x1;
     }
-    tmp = -0x1;
-L_800C55CC:
     *(u8*)((u8*)r31 + 0x4) = r6;
     if ((s32)tmp < 0) return;
     r5 = r31 + 0x5;
@@ -617,23 +617,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C5B38;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C5B38:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -683,23 +683,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C5C34;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C5C34:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -749,23 +749,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C5D30;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C5D30:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -815,23 +815,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C5E2C;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C5E2C:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -881,23 +881,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C5F28;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C5F28:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -947,23 +947,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6024;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6024:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1013,23 +1013,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6120;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6120:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1079,23 +1079,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C621C;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C621C:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1145,23 +1145,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6318;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6318:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1211,23 +1211,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6414;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6414:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1277,23 +1277,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6510;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6510:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1343,23 +1343,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C660C;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C660C:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1408,23 +1408,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6704;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6704:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1473,23 +1473,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C67FC;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C67FC:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1538,23 +1538,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C68F4;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C68F4:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1603,23 +1603,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C69EC;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C69EC:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1669,23 +1669,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6AE8;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6AE8:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1735,23 +1735,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6BE4;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6BE4:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1801,23 +1801,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6CE0;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6CE0:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1867,23 +1867,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6DDC;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6DDC:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -1933,23 +1933,23 @@ void fn_800C5A58(void) {
         if ((s32)r4 == 0x24) return;
         tmp = (s8)r3;
         if ((s32)tmp < 5) return;
-        if ((s32)tmp > 5) goto L_800C6ED8;
-        r3 = r5 + 0x1;
-        while (1) {
-            r5 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r5;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r5;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r5 + 0x1;
+            while (1) {
+                r5 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r5;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r5;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = r31 + r4;
+            tmp = *(u8*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) return;
         }
-        r3 = r31 + r4;
-        tmp = *(u8*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) return;
-    L_800C6ED8:
         r3 = *(u8*)((u8*)r31 + 0x4);
         r5 = r31 + 0x5;
         tmp = 0x0;
@@ -2192,57 +2192,59 @@ void fn_800C71DC(void) {
             r10 = r11;
         }
         r8 = r10;
-        if ((s32)r10 <= 0) goto L_800C7324;
-        /* srwi. r7, r10, 3 */;
-        ctr_fn = (void(*)(void))r7;
-        if ((s32)r10 != 0) {
+        do {
+            if ((s32)r10 <= 0) break;
+            /* srwi. r7, r10, 3 */;
+            ctr_fn = (void(*)(void))r7;
+            if ((s32)r10 != 0) {
+                do {
+                    r11 = *(u8*)((u8*)r28 + 0x0);
+                    r10 = *(u8*)((u8*)r27 + 0x0);
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x1);
+                    r10 = *(u8*)((u8*)r27 + (-1));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x2);
+                    r10 = *(u8*)((u8*)r27 + (-2));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x3);
+                    r10 = *(u8*)((u8*)r27 + (-3));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x4);
+                    r10 = *(u8*)((u8*)r27 + (-4));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x5);
+                    r10 = *(u8*)((u8*)r27 + (-5));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x6);
+                    r10 = *(u8*)((u8*)r27 + (-6));
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r11 = *(u8*)((u8*)r28 + 0x7);
+                    r10 = *(u8*)((u8*)r27 + (-7));
+                    r28 = r28 + 0x8;
+                    r30 = r30 + r7;
+                    r7 = r11 * r10;
+                    r30 = r30 + r7;
+                } while (--ctr != 0);
+                r8 = r8 & 0x7;
+                if ((s32)r10 == 0) break;
+            }
+            ctr_fn = (void(*)(void))r8;
             do {
                 r11 = *(u8*)((u8*)r28 + 0x0);
+                r28 = r28 + 0x1;
                 r10 = *(u8*)((u8*)r27 + 0x0);
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x1);
-                r10 = *(u8*)((u8*)r27 + (-1));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x2);
-                r10 = *(u8*)((u8*)r27 + (-2));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x3);
-                r10 = *(u8*)((u8*)r27 + (-3));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x4);
-                r10 = *(u8*)((u8*)r27 + (-4));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x5);
-                r10 = *(u8*)((u8*)r27 + (-5));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x6);
-                r10 = *(u8*)((u8*)r27 + (-6));
-                r30 = r30 + r7;
-                r7 = r11 * r10;
-                r11 = *(u8*)((u8*)r28 + 0x7);
-                r10 = *(u8*)((u8*)r27 + (-7));
-                r28 = r28 + 0x8;
-                r30 = r30 + r7;
                 r7 = r11 * r10;
                 r30 = r30 + r7;
             } while (--ctr != 0);
-            r8 = r8 & 0x7;
-            if ((s32)r10 == 0) goto L_800C7324;
-        }
-        ctr_fn = (void(*)(void))r8;
-        do {
-            r11 = *(u8*)((u8*)r28 + 0x0);
-            r28 = r28 + 0x1;
-            r10 = *(u8*)((u8*)r27 + 0x0);
-            r7 = r11 * r10;
-            r30 = r30 + r7;
-        } while (--ctr != 0);
-    L_800C7324:
+        } while (0);
+
         r8 = (u32)((u64)r9 * (u64)r30 >> 32);
         r7 = r8;
         r8 = (u32)r8 >> 3;
@@ -2278,21 +2280,21 @@ void fn_800C71DC(void) {
     if (r6 >= tmp) return;
     r4 = *(u8*)((u8*)r6 + 0x0);
     if (r4 < 5) return;
-    if (r4 != 5) goto L_800C73F0;
-    r5 = r6 + 0x1;
-    r4 = tmp - r5;
-    ctr_fn = (void(*)(void))r4;
-    if (r5 < tmp) {
-        do {
-            tmp = *(u8*)((u8*)r5 + 0x0);
-            if (tmp != 0) break;
-            r5 = r5 + 0x1;
-        } while (--ctr != 0);
+    if (r4 == 5) {
+        r5 = r6 + 0x1;
+        r4 = tmp - r5;
+        ctr_fn = (void(*)(void))r4;
+        if (r5 < tmp) {
+            do {
+                tmp = *(u8*)((u8*)r5 + 0x0);
+                if (tmp != 0) break;
+                r5 = r5 + 0x1;
+            } while (--ctr != 0);
+        }
+        tmp = *(u8*)((u8*)r6 + (-1));
+        tmp = tmp & 0x1;
+        if (tmp == 0) return;
     }
-    tmp = *(u8*)((u8*)r6 + (-1));
-    tmp = tmp & 0x1;
-    if (tmp == 0) return;
-L_800C73F0:
     r4 = *(u8*)((u8*)r3 + 0x4);
     r6 = r3 + 0x5;
     tmp = 0x0;

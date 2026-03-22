@@ -963,32 +963,32 @@ s32 fn_80071AE4(void) {
             r21 = tmp * 0x64;
             OSGetTick();
             r30 = r3;
-        L_80071D44:
-            OSGetTick();
-            tmp = r3 - r30;
-            if (tmp > r21) {
-                r21 = 0x11;
-                break;
-            }
-            r3 = r15;
-            r4 = (u32)sp + 0x9;
-            ((void(*)(void))fn_8025F3F4)();
-            if ((s32)r3 != 0) {
-                r21 = 0x12;
-                break;
-            }
-            tmp = *(u8*)(sp + 0x9);
-            tmp = tmp & 0x00000002;
-            if ((s32)tmp != 0) {
-                r12 = *(u32*)((u8*)r19 + 0x0);
-                if (r12 != 0) {
-                    r3 = r15;
-                    r4 = *(u32*)((u8*)r20 + 0x0);
-                    ctr_fn = (void(*)(void))r12;
-                    ctr_fn();
+                do {
+                OSGetTick();
+                tmp = r3 - r30;
+                if (tmp > r21) {
+                    r21 = 0x11;
+                    break;
                 }
-                tmp = *(u32*)(r27 + r26);
-                if ((s32)tmp == 0) goto L_80071D44;
+                r3 = r15;
+                r4 = (u32)sp + 0x9;
+                ((void(*)(void))fn_8025F3F4)();
+                if ((s32)r3 != 0) {
+                    r21 = 0x12;
+                    break;
+                }
+                tmp = *(u8*)(sp + 0x9);
+                tmp = tmp & 0x00000002;
+                if ((s32)tmp != 0) {
+                    r12 = *(u32*)((u8*)r19 + 0x0);
+                    if (r12 != 0) {
+                        r3 = r15;
+                        r4 = *(u32*)((u8*)r20 + 0x0);
+                        ctr_fn = (void(*)(void))r12;
+                        ctr_fn();
+                    }
+                    tmp = *(u32*)(r27 + r26);
+                } while ((s32)tmp == 0);
                 r21 = 0x3e8;
                 break;
             }

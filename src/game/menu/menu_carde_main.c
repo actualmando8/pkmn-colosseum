@@ -1284,16 +1284,16 @@ L_80080F48:
             r6 = tmp;
         }
         tmp = 0x2;
-        goto L_80081000;
-        }
-    tmp = r6 & 0xFF;
-    if ((tmp >= 0xa1) && (tmp <= 0xdf)) {
 
-        r6 = r6 + (0x1 << 16);
-        r6 = tmp & 0xFFFF;
-    }
-    tmp = 0x1;
-L_80081000:
+        } else {
+        tmp = r6 & 0xFF;
+        if ((tmp >= 0xa1) && (tmp <= 0xdf)) {
+
+            r6 = r6 + (0x1 << 16);
+            r6 = tmp & 0xFFFF;
+        }
+        tmp = 0x1;
+        }
     *(u16*)((u8*)r3 + 0x0) = r6;
     r3 = r3 + 0x2;
     r4 = r4 + tmp;

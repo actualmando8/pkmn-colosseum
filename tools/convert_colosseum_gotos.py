@@ -861,20 +861,36 @@ def convert_merge_gotos_to_break(lines, label_refcount, label_pos, label_sources
     """Convert multi-ref forward unconditional gotos all targeting the same merge
     label into do { ... } while (0); + break pattern.
 
-    Handles the very common pattern where multiple switch-like code paths all
-    end with 'goto L_MERGE;' to rejoin after the dispatch.
+    Pattern (common in colosseum_event.c guard chains):
+        if (check1) { r0 = 0x0; goto L_MERGE; }
+        if (check2) { r0 = 0x0; goto L_MERGE; }
+        r0 = 0x1;
+    L_MERGE: ;
+
+    Becomes:
+        do {
+            if (check1) { r0 = 0x0; break; }
+            if (check2) { r0 = 0x0; break; }
+            r0 = 0x1;
+        } while (0);
+
+    Only processes labels where:
+    - All refs are forward unconditional gotos (no conditional gotos to the label)
+    - The region is brace-balanced
+    - The region contains no inner labels referenced from outside
+    - All gotos are inside if-blocks (the pattern: if(...) { ...; goto MERGE; })
     """
     changes = 0
     processed = set()
 
-    # Sort labels by position to process from bottom up
+    # Process from bottom up so line adjustments don't affect unprocessed labels
     sorted_labels = sorted(label_pos.items(), key=lambda x: -x[1])
 
     for label, pos in sorted_labels:
         if label in processed:
             continue
         refcount = label_refcount.get(label, 0)
-        if refcount < 3:
+        if refcount < 2:
             continue
         refs = sorted(label_sources.get(label, []))
         if not refs:
@@ -882,54 +898,92 @@ def convert_merge_gotos_to_break(lines, label_refcount, label_pos, label_sources
         # All refs must be forward (before the label)
         if any(r >= pos for r in refs):
             continue
-        # Find the earliest ref
-        first_ref = refs[0]
-        # Region must not be too huge
-        if pos - first_ref > 500:
+
+        # All refs must be unconditional gotos (inside if-blocks typically)
+        all_uncond = True
+        for r in refs:
+            if not re.match(r'^\s+goto ' + re.escape(label) + r';$', lines[r]):
+                all_uncond = False
+                break
+        if not all_uncond:
             continue
-        # Check brace depth balance
+
+        # Find the actual start of the region
+        # Look for the if-block containing the first goto
+        first_ref = refs[0]
+
+        # Find the enclosing scope start: walk backwards from first_ref to find
+        # the start of the if-block
+        region_start = first_ref
+        d = 0
+        for k in range(first_ref, max(first_ref - 20, -1), -1):
+            d += lines[k].count('}') - lines[k].count('{')
+            if d < 0:
+                region_start = k
+                break
+
+        # Region must not be too huge
+        if pos - region_start > 300:
+            continue
+
+        # Check brace depth balance between region_start and pos
         depth = 0
-        for k in range(first_ref, pos):
+        for k in range(region_start, pos):
             depth += lines[k].count('{') - lines[k].count('}')
         if depth != 0:
             continue
+
         # Check that we're not already inside a do-while(0)
         in_do_while = False
-        for k in range(max(0, first_ref - 3), first_ref):
+        for k in range(max(0, region_start - 3), region_start):
             if re.match(r'^\s*do\s*\{', lines[k]):
                 in_do_while = True
                 break
         if in_do_while:
             continue
 
-        # Get the indent from the first ref line
-        indent_m = re.match(r'^(\s*)', lines[first_ref])
-        indent = indent_m.group(1) if indent_m else '    '
+        # Check no inner labels referenced from outside
+        has_ext_ref = False
+        for k in range(region_start, pos):
+            lm = re.match(r'^\s*(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', lines[k])
+            if lm:
+                inner_lbl = lm.group(1)
+                for src in label_sources.get(inner_lbl, []):
+                    if src < region_start or src >= pos:
+                        has_ext_ref = True
+                        break
+            if has_ext_ref:
+                break
+        if has_ext_ref:
+            continue
 
-        # Wrap everything from first_ref to just before pos in do { } while (0);
-        # Convert all goto MERGE to break
+        # Get indent from the first line of the region
+        indent_m = re.match(r'^(\s*)', lines[region_start])
+        indent = indent_m.group(1) if indent_m else ''
+
+        # Apply transformation:
+        # 1. Convert all gotos to break
         for r in refs:
-            # Handle both unconditional and conditional gotos
-            line = lines[r]
-            if re.match(r'^\s+goto ' + re.escape(label) + r';$', line):
-                lines[r] = re.sub(r'goto\s+' + re.escape(label) + r'\s*;', 'break;', line)
-                label_refcount[label] = label_refcount.get(label, 0) - 1
-                changes += 1
-            elif re.match(r'^\s+if \(.+\) goto ' + re.escape(label) + r';$', line):
-                lines[r] = re.sub(r'goto\s+' + re.escape(label) + r'\s*;', 'break;', line)
-                label_refcount[label] = label_refcount.get(label, 0) - 1
-                changes += 1
+            lines[r] = re.sub(r'goto\s+' + re.escape(label) + r'\s*;', 'break;', lines[r])
+            label_refcount[label] = label_refcount.get(label, 0) - 1
+            changes += 1
 
-        # Indent all lines in the range
-        for k in range(first_ref, pos):
+        # 2. Indent all lines in the region
+        for k in range(region_start, pos):
             if lines[k].strip():
                 lines[k] = '    ' + lines[k]
 
-        # Insert do { before first_ref, and } while (0); before label
-        lines[first_ref] = indent + 'do {\n' + lines[first_ref]
-        lines[pos] = indent + '} while (0);\n' + lines[pos]
+        # 3. Replace region_start line with do { + the indented original content
+        # Instead of using \n, insert a new element in the list
+        lines.insert(region_start, indent + 'do {')
+
+        # 4. Insert } while (0); before the label (which shifted by 1 due to insert)
+        # The label was at pos, now it's at pos+1
+        lines.insert(pos + 1, indent + '} while (0);')
 
         processed.add(label)
+        # Only process one label per call since line insertions shift indices
+        break
 
     return changes
 
@@ -1785,15 +1839,23 @@ def process_file(filepath, verbose=False):
         rc, lp, ls = build_indices(lines)
         changes += convert_goto_after_loop_to_break(lines, rc, lp)
 
-        # 9c: Merge gotos to break (disabled - do-while(0) wrapping breaks nesting)
-        # rc, lp, ls = build_indices(lines)
-        # changes += convert_merge_gotos_to_break(lines, rc, lp, ls)
+        # 9c: Merge gotos to break (do-while(0) wrapping)
+        rc, lp, ls = build_indices(lines)
+        changes += convert_merge_gotos_to_break(lines, rc, lp, ls)
 
         # 10: Continue in loop
         rc, lp, ls = build_indices(lines)
         changes += convert_goto_to_continue(lines, rc, lp)
 
-        # 11: Remove unreferenced labels
+        # 11: Guard set goto merge (if{r0=0;goto M;} r0=1; M: -> if/else)
+        rc, lp, ls = build_indices(lines)
+        changes += convert_guard_set_goto_merge(lines, rc, lp, ls)
+
+        # 11b: Assign+goto merge -> if/else (r0=0; goto M; ... r0=1; M:)
+        rc, lp, ls = build_indices(lines)
+        changes += convert_assign_goto_to_assign(lines, rc, lp, ls)
+
+        # 12: Remove unreferenced labels
         rc, lp, ls = build_indices(lines)
         changes += remove_unreferenced_labels(lines, rc, lp)
 

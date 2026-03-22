@@ -611,7 +611,7 @@ def find_functions(lines):
     funcs = []
     i = 0
     while i < len(lines):
-        if re.match(r'^(void|u32|s32|u16|s16|u8|s8|f32|f64|int|void\s*\*)\s+\w+\s*\(', lines[i]):
+        if re.match(r'^(void|u32|s32|u16|s16|u8|s8|f32|f64|int|void\s*\*|static\s+void|static\s+u32|static\s+s32|static\s+int|\w+\s*\*)\s+\w+\s*\(', lines[i]):
             j = i
             while j < len(lines) and '{' not in lines[j]:
                 j += 1

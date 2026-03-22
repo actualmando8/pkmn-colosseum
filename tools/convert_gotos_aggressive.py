@@ -724,6 +724,363 @@ def convert_goto_to_return_value(lines, label_refcount, label_pos):
     return changes
 
 
+def convert_single_ref_if_else(lines, label_refcount, label_pos, label_sources):
+    """Convert single-ref 'goto L; }' inside if-block to if-else.
+
+    Pattern:
+        if (cond) {
+            ... true code ...
+            goto L_merge;
+        }
+        ... false code ...
+    L_merge: ;
+
+    Into:
+        if (cond) {
+            ... true code ...
+        } else {
+            ... false code ...
+        }
+
+    This handles the most common remaining goto pattern.
+    """
+    changes = 0
+    for label in list(label_pos.keys()):
+        if label_refcount.get(label, 0) != 1:
+            continue
+        pos = label_pos[label]
+        refs = label_sources.get(label, [])
+        if len(refs) != 1:
+            continue
+        goto_idx = refs[0]
+        if goto_idx >= pos:
+            continue  # backward
+
+        # Must be unconditional goto
+        if not re.match(r'^\s+goto ' + re.escape(label) + r';$', lines[goto_idx]):
+            continue
+
+        # Next non-empty line after goto must be }
+        close_brace_idx = None
+        for k in range(goto_idx + 1, min(goto_idx + 3, len(lines))):
+            stripped = lines[k].strip()
+            if stripped:
+                if stripped == '}':
+                    close_brace_idx = k
+                break
+        if close_brace_idx is None:
+            continue
+
+        # Check brace depth: from close_brace to label must be 0
+        depth = 0
+        for k in range(close_brace_idx, pos):
+            depth += lines[k].count('{') - lines[k].count('}')
+        if depth != 0:
+            continue
+
+        # Check the } is followed by code then label (no do-while interference)
+        # Make sure there's no "while" on the close_brace line (do-while pattern)
+        if 'while' in lines[close_brace_idx]:
+            continue
+
+        # Check there's code between close_brace and label
+        has_code = False
+        for k in range(close_brace_idx + 1, pos):
+            if lines[k].strip() and not lines[k].strip().startswith('//'):
+                has_code = True
+                break
+        if not has_code:
+            # No code between - just remove goto and label
+            lines[goto_idx] = ''
+            lines[pos] = ''
+            label_refcount[label] = 0
+            changes += 1
+            continue
+
+        # Check no inner labels between close_brace and target
+        has_inner = False
+        for k in range(close_brace_idx + 1, pos):
+            if re.match(r'^\s*L_[0-9A-Fa-f]+\s*:\s*;?\s*$', lines[k]):
+                has_inner = True
+                break
+        if has_inner:
+            continue
+
+        # Check no gotos between close_brace and target that jump outside
+        has_bad_goto = False
+        for k in range(close_brace_idx + 1, pos):
+            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
+            if gm:
+                target_label = gm.group(1)
+                if target_label in label_pos:
+                    t = label_pos[target_label]
+                    if t < close_brace_idx or t > pos:
+                        has_bad_goto = True
+                        break
+        if has_bad_goto:
+            continue
+
+        # Apply: remove goto, change } to } else {, indent middle code, replace label with }
+        indent = re.match(r'^(\s*)', lines[close_brace_idx]).group(1)
+        lines[goto_idx] = ''
+        lines[close_brace_idx] = indent + '} else {'
+        for k in range(close_brace_idx + 1, pos):
+            if lines[k].strip():
+                lines[k] = '    ' + lines[k]
+        lines[pos] = indent + '}'
+        label_refcount[label] = 0
+        changes += 1
+
+    return changes
+
+
+def convert_multi_ref_if_else_chain(lines, label_refcount, label_pos, label_sources):
+    """Convert multiple gotos to same merge label forming an if-else-if chain.
+
+    Pattern:
+        if (cond1) {
+            ...code1...
+            goto L_merge;
+        }
+        if (cond2) {
+            ...code2...
+            goto L_merge;
+        }
+        ...default code...
+    L_merge: ;
+
+    Into:
+        if (cond1) {
+            ...code1...
+        } else if (cond2) {
+            ...code2...
+        } else {
+            ...default code...
+        }
+
+    Only handles labels where ALL references are unconditional forward gotos
+    that are immediately followed by }.
+    """
+    changes = 0
+    processed = set()
+
+    for label, pos in sorted(label_pos.items(), key=lambda x: x[1], reverse=True):
+        if label in processed:
+            continue
+        refcount = label_refcount.get(label, 0)
+        if refcount < 2 or refcount > 20:
+            continue
+        refs = sorted(label_sources.get(label, []))
+        if len(refs) != refcount:
+            continue
+        # All must be forward unconditional gotos before }
+        all_valid = True
+        goto_brace_pairs = []
+        for r in refs:
+            if r >= pos:
+                all_valid = False
+                break
+            if not re.match(r'^\s+goto ' + re.escape(label) + r';$', lines[r]):
+                all_valid = False
+                break
+            # Check next non-empty is }
+            found = False
+            for k in range(r + 1, min(r + 3, len(lines))):
+                stripped = lines[k].strip()
+                if stripped:
+                    if stripped == '}':
+                        goto_brace_pairs.append((r, k))
+                        found = True
+                    break
+            if not found:
+                all_valid = False
+                break
+        if not all_valid:
+            continue
+
+        # Check brace depth from first goto to label is 0
+        first_ref = refs[0]
+        depth = 0
+        for k in range(first_ref, pos):
+            depth += lines[k].count('{') - lines[k].count('}')
+        if depth != 0:
+            continue
+
+        # Check between each } and the next goto, there's code and an opening if {
+        # This validates the if-else-if chain structure
+        valid_chain = True
+        for idx in range(len(goto_brace_pairs) - 1):
+            _, brace_idx = goto_brace_pairs[idx]
+            next_goto, _ = goto_brace_pairs[idx + 1]
+            # Between brace_idx and next_goto, there should be code
+            has_code = False
+            for k in range(brace_idx + 1, next_goto + 1):
+                if lines[k].strip() and not re.match(r'^\s*L_[0-9A-Fa-f]+\s*:', lines[k]):
+                    has_code = True
+                    break
+            if not has_code:
+                valid_chain = False
+                break
+
+        if not valid_chain:
+            continue
+
+        # Check no inner labels referenced from outside
+        has_external = False
+        for k in range(first_ref, pos):
+            lm = re.match(r'^\s*(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', lines[k])
+            if lm:
+                inner = lm.group(1)
+                for src in label_sources.get(inner, []):
+                    if src < first_ref or src > pos:
+                        has_external = True
+                        break
+            if has_external:
+                break
+        if has_external:
+            continue
+
+        # Only convert the LAST goto in the chain to if-else
+        # (safest transformation - doesn't require re-nesting earlier blocks)
+        indent = re.match(r'^(\s*)', lines[goto_brace_pairs[-1][1]]).group(1)
+
+        # Check no 'while' on the last brace line
+        last_brace = goto_brace_pairs[-1][1]
+        if 'while' in lines[last_brace]:
+            continue
+
+        # Handle code between last } and label (becomes else block)
+        has_else_code = False
+        for k in range(last_brace + 1, pos):
+            if lines[k].strip() and not lines[k].strip().startswith('//'):
+                has_else_code = True
+                break
+
+        # Check brace depth between last } and label
+        depth = 0
+        for k in range(last_brace, pos):
+            depth += lines[k].count('{') - lines[k].count('}')
+        if depth != 0:
+            continue
+
+        # Check no inner labels or external gotos in else block
+        has_inner = False
+        has_bad = False
+        for k in range(last_brace + 1, pos):
+            if re.match(r'^\s*L_[0-9A-Fa-f]+\s*:\s*;?\s*$', lines[k]):
+                has_inner = True
+                break
+            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
+            if gm:
+                t_lbl = gm.group(1)
+                if t_lbl in label_pos:
+                    t = label_pos[t_lbl]
+                    if t < last_brace or t > pos:
+                        has_bad = True
+                        break
+        if has_inner or has_bad:
+            continue
+
+        if has_else_code:
+            lines[goto_brace_pairs[-1][0]] = ''
+            lines[last_brace] = indent + '} else {'
+            for k in range(last_brace + 1, pos):
+                if lines[k].strip():
+                    lines[k] = '    ' + lines[k]
+            lines[pos] = indent + '}'
+        else:
+            lines[goto_brace_pairs[-1][0]] = ''
+            lines[pos] = ''
+
+        label_refcount[label] = label_refcount.get(label, 0) - 1
+        changes += 1
+        processed.add(label)
+
+    return changes
+
+
+def convert_cond_goto_to_break_in_dowhile0(lines, label_refcount, label_pos, label_sources):
+    """Wrap multi-ref forward conditional gotos in do { } while(0) and convert to break.
+
+    For labels where all references are conditional forward gotos,
+    and the label is close to the refs, wrap the region in do { } while(0).
+    """
+    changes = 0
+    processed = set()
+
+    for label, pos in sorted(label_pos.items(), key=lambda x: x[1], reverse=True):
+        if label in processed:
+            continue
+        refcount = label_refcount.get(label, 0)
+        if refcount < 2 or refcount > 10:
+            continue
+        refs = sorted(label_sources.get(label, []))
+        if len(refs) != refcount:
+            continue
+        # All must be forward conditional
+        all_valid = True
+        for r in refs:
+            if r >= pos:
+                all_valid = False
+                break
+            if not re.match(r'^\s+if \((.+)\) goto ' + re.escape(label) + r';$', lines[r]):
+                all_valid = False
+                break
+        if not all_valid:
+            continue
+
+        first_ref = refs[0]
+        if pos - first_ref > 100:
+            continue
+
+        # Brace depth must be 0
+        depth = 0
+        for k in range(first_ref, pos):
+            depth += lines[k].count('{') - lines[k].count('}')
+        if depth != 0:
+            continue
+
+        # No inner labels from outside
+        has_external = False
+        for k in range(first_ref, pos):
+            lm = re.match(r'^\s*(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', lines[k])
+            if lm and lm.group(1) != label:
+                inner = lm.group(1)
+                for src in label_sources.get(inner, []):
+                    if src < first_ref or src > pos:
+                        has_external = True
+                        break
+            if has_external:
+                break
+        if has_external:
+            continue
+
+        # Already in do-while(0)?
+        if first_ref > 0 and re.match(r'^\s*do\s*\{', lines[first_ref - 1]):
+            continue
+
+        indent = re.match(r'^(\s*)', lines[first_ref]).group(1)
+
+        # Convert gotos to break
+        for r in refs:
+            m = re.match(r'^(\s+)if \((.+)\) goto ' + re.escape(label) + r';$', lines[r])
+            if m:
+                lines[r] = m.group(1) + 'if (' + m.group(2) + ') break;'
+                label_refcount[label] = label_refcount.get(label, 0) - 1
+                changes += 1
+
+        # Indent and wrap
+        for k in range(first_ref, pos):
+            if lines[k].strip():
+                lines[k] = '    ' + lines[k]
+        lines[first_ref] = indent + 'do {\n' + lines[first_ref]
+        lines[pos] = indent + '} while (0);\n' + lines[pos]
+
+        processed.add(label)
+
+    return changes
+
+
 def process_file(filepath, verbose=False):
     """Process a single file through all aggressive conversion passes."""
     with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
@@ -731,6 +1088,8 @@ def process_file(filepath, verbose=False):
     if 'goto' not in content:
         return 0
 
+    # Preserve original line endings
+    has_crlf = '\r\n' in content
     lines = content.split('\n')
     initial_gotos = sum(1 for line in lines if re.search(r'\bgoto\b', line))
 
@@ -770,6 +1129,14 @@ def process_file(filepath, verbose=False):
         rc, lp, ls = build_indices(lines)
         changes += convert_if_else_extended(lines, rc, lp)
 
+        # 7b: Single-ref if-else (goto; } pattern)
+        rc, lp, ls = build_indices(lines)
+        changes += convert_single_ref_if_else(lines, rc, lp, ls)
+
+        # 7c: Multi-ref if-else chain
+        rc, lp, ls = build_indices(lines)
+        changes += convert_multi_ref_if_else_chain(lines, rc, lp, ls)
+
         # 8: Forward multi-ref OR collapse
         rc, lp, ls = build_indices(lines)
         changes += convert_forward_multi_ref(lines, rc, lp, ls)
@@ -778,9 +1145,13 @@ def process_file(filepath, verbose=False):
         rc, lp, ls = build_indices(lines)
         changes += convert_forward_large_gap(lines, rc, lp, ls)
 
-        # 10: Multi-ref break pattern
+        # 10: Multi-ref break pattern (do-while(0))
         rc, lp, ls = build_indices(lines)
         changes += convert_multi_ref_break_pattern(lines, rc, lp, ls)
+
+        # 10b: Conditional goto to break in do-while(0)
+        rc, lp, ls = build_indices(lines)
+        changes += convert_cond_goto_to_break_in_dowhile0(lines, rc, lp, ls)
 
         # 11: Remove unreferenced labels
         rc, lp, ls = build_indices(lines)

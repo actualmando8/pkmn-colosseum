@@ -271,6 +271,10 @@ u32 GStaskCreate(u32 state, u8 priority, void* param, void* func) {
         u32 id = (offset / sizeof(GSTask)) + 1;
         return id;
     }
+        }
+        task++;
+    }
+    return 0;
 }
 
 /* =======================================================================
@@ -439,14 +443,6 @@ GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
     thread = gsThreadArray;
     for (i = 0; i < gsThreadMaxCount; i++) {
         if (thread->active == 0) {
-            goto found;
-        }
-        thread = (GSThread*)((u32)thread + sizeof(GSThread));
-    }
-    /* No free slots */
-    return NULL;
-
-found:
     /* Allocate stack from GSmem (32-byte aligned) */
     stackHandle = GSmemAlloc(stackSize, 0x20);
     thread->stackHandle = stackHandle;
@@ -1821,6 +1817,7 @@ void fn_800F16C0(void) {
                 *(u8*)((u8*)r26 + 0x0) = r3;
                 r26 = r26 + 0x1;
                 goto L_800F18EC;
+                }
             }
             *(u8*)((u8*)r26 + 0x0) = r3;
             r26 = r26 + 0x1;
