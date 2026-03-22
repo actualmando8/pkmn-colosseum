@@ -431,14 +431,14 @@ def main():
 
     BROKEN = {
         'src/game/battle/battle_logic.c',
+        'src/game/colosseum_script.c',
         'src/game/gba/gba_conv.c',
         'src/game/gs_field_world.c',
-        'src/game/gs_thread.c',
+        'src/game/gs_model.c',
         'src/game/menu/menu_common_ext.c',
         'src/game/menu/menu_tool.c',
         'src/game/ui/ui_core.c',
         'src/hsd/hsd_cobj.c',
-        'src/hsd/hsd_lobj.c',
     }
 
     if len(sys.argv) > 1:
