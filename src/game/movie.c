@@ -273,122 +273,112 @@ void moviePlayStaffRoll(void) {
     /* Step 3: Check floor state */
     floorState = (u32)fn_8011394C();
     if (floorState != 0x76) {
+        goto openMovie;
+    }
 
-    } else {
+    /* Step 4: Check game flags for special credits conditions */
+    flagVal = (u8)fn_801902E0(0x0476);
+    if ((flagVal & 0xFF) != 1) {
+        goto openMovie;
+    }
 
-        /* Step 4: Check game flags for special credits conditions */
-        flagVal = (u8)fn_801902E0(0x0476);
-        if ((flagVal & 0xFF) == 1) {
+    /* Set post-game flag */
+    fn_80190528(0x0478);
 
-            /* Set post-game flag */
-            fn_80190528(0x0478);
+    /* Step 5: Set up battle/effect state for credits scene */
+    effectCtx = fn_80129280(0, 1);
+    fn_80135030(effectCtx, 5, 2);
+    fn_80135030(effectCtx, 7, 1);
+    fn_80135030(effectCtx, 8, 1);
 
-            /* Step 5: Set up battle/effect state for credits scene */
-            effectCtx = fn_80129280(0, 1);
-            fn_80135030(effectCtx, 5, 2);
-            fn_80135030(effectCtx, 7, 1);
-            fn_80135030(effectCtx, 8, 1);
+    fn_8012A450(0, 0x18, 1);
 
-            fn_8012A450(0, 0x18, 1);
+    savedCtx = fn_801D036C();
 
-            savedCtx = fn_801D036C();
+    effectCtx2 = fn_80129280(0, 0);
 
-            effectCtx2 = fn_80129280(0, 0);
+    /* Copy battle state data (0x3BFA iterations) */
+    /* This is a large memcpy-like block transfer in the original assembly,
+     * copying the entire battle context state. Simplified here. */
+    {
+        u32* src = (u32*)((u8*)savedCtx - 4);
+        u32* dst = (u32*)((u8*)effectCtx2 - 4);
+        u32 count;
+        for (count = 0; count < 0x3BFA; count++) {
+            u32 val1 = src[1];
+            u32 val2 = src[2];
+            dst[1] = val1;
+            dst[2] = val2;
+            src += 2;
+            dst += 2;
+        }
+    }
 
-            /* Copy battle state data (0x3BFA iterations) */
-            /* This is a large memcpy-like block transfer in the original assembly,
-             * copying the entire battle context state. Simplified here. */
-            {
-                u32* src = (u32*)((u8*)savedCtx - 4);
-                u32* dst = (u32*)((u8*)effectCtx2 - 4);
-                u32 count;
-                for (count = 0; count < 0x3BFA; count++) {
-                    u32 val1 = src[1];
-                    u32 val2 = src[2];
-                    dst[1] = val1;
-                    dst[2] = val2;
-                    src += 2;
-                    dst += 2;
-                }
-            }
+    /* Load floor/transition for credits */
+    fn_80106D3C(2, 0x444C, 1, 0);
 
-            /* Load floor/transition for credits */
-            fn_80106D3C(2, 0x444C, 1, 0);
+    /* Poll input: wait for button press or timeout */
+    inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
 
-            /* Poll input: wait for button press or timeout */
-            inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
+    if (inputResult != 0) {
+        goto cleanup;
+    }
 
-            if (inputResult != 0) {
-                /* Early exit cleanup path */
-                fn_80165A20(1, 0, 0x7F);
-                fn_80190528(0x08D0);
-                fn_80113828(1, 0);
-                fn_8011288C(0, 0x59608);
-                return;
-            }
+    /* Check for extended credits (special pokemon conditions) */
+    {
+        u32 battleMode;
+        void* queryResult;
 
-            /* Check for extended credits (special pokemon conditions) */
-            {
-                u32 battleMode;
-                void* queryResult;
-                s32 doSpecialCredits = 0;
-
-                battleMode = (u32)fn_801D0748(3, 2, 0);
-                if (battleMode != 3) {
-                    /* skip extended credits */
-                } else {
-                    queryResult = (void*)fn_80135168(effectCtx, 4);
-                    if (queryResult == NULL) {
-                        /* skip extended credits */
-                    } else {
-                        /* Check if special pokemon pair matches */
-                        void* pairA;
-                        void* pairB;
-
-                        effectCtx2 = fn_80129280((u32)savedCtx, 2);
-                        pairA = (void*)fn_8012A5B0(2, 0, 0);
-                        pairB = (void*)fn_8012A5B0(0, 2, 0);
-
-                        if (pairA != pairB) {
-                            queryResult = (void*)fn_80135168(savedCtx, 4);
-                            if (queryResult != NULL) {
-                                /* skip extended credits */
-                                doSpecialCredits = 0;
-                            } else {
-                                doSpecialCredits = 1;
-                            }
-                        } else {
-                            doSpecialCredits = 1;
-                        }
-
-                        if (doSpecialCredits) {
-                            /* Load special credits floor */
-                            fn_80106D3C(2, 0x3C02, 1, 0);
-                            inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
-                        }
-                    }
-                }
-            }
-
-            /* Restore original battle context */
-            effectCtx2 = fn_80129280(0, 0);
-            {
-                u32* src = (u32*)((u8*)savedCtx - 4);
-                u32* dst = (u32*)((u8*)effectCtx2 - 4);
-                u32 count;
-                for (count = 0; count < 0x3BFA; count++) {
-                    u32 val1 = src[1];
-                    u32 val2 = src[2];
-                    dst[1] = val1;
-                    dst[2] = val2;
-                    src += 2;
-                    dst += 2;
-                }
-            }
-
+        battleMode = (u32)fn_801D0748(3, 2, 0);
+        if (battleMode != 3) {
+            goto postCheck;
         }
 
+        queryResult = (void*)fn_80135168(effectCtx, 4);
+        if (queryResult == NULL) {
+            goto postCheck;
+        }
+
+        /* Check if special pokemon pair matches */
+        {
+            void* pairA;
+            void* pairB;
+
+            effectCtx2 = fn_80129280((u32)savedCtx, 2);
+            pairA = (void*)fn_8012A5B0(2, 0, 0);
+            pairB = (void*)fn_8012A5B0(0, 2, 0);
+
+            if (pairA != pairB) {
+                queryResult = (void*)fn_80135168(savedCtx, 4);
+                if (queryResult != NULL) {
+                    goto postCheck;
+                }
+            }
+
+            /* Load special credits floor */
+            fn_80106D3C(2, 0x3C02, 1, 0);
+            inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
+        }
     }
+
+postCheck:
+    /* Restore original battle context */
+    effectCtx2 = fn_80129280(0, 0);
+    {
+        u32* src = (u32*)((u8*)savedCtx - 4);
+        u32* dst = (u32*)((u8*)effectCtx2 - 4);
+        u32 count;
+        for (count = 0; count < 0x3BFA; count++) {
+            u32 val1 = src[1];
+            u32 val2 = src[2];
+            dst[1] = val1;
+            dst[2] = val2;
+            src += 2;
+            dst += 2;
+        }
+    }
+
+openMovie:
     /* Open the staff roll THP movie */
     fn_801E189C(lbl_80267000, 0);
 
@@ -396,6 +386,14 @@ void moviePlayStaffRoll(void) {
     movieWaitForFinish();
 
     /* Stop sound and restore state */
+    fn_80165A20(1, 0, 0x7F);
+    fn_80190528(0x08D0);
+    fn_80113828(1, 0);
+    fn_8011288C(0, 0x59608);
+    return;
+
+cleanup:
+    /* Early exit cleanup path */
     fn_80165A20(1, 0, 0x7F);
     fn_80190528(0x08D0);
     fn_80113828(1, 0);
@@ -421,254 +419,3 @@ void moviePlayGSLogo(void) {
 void moviePlayTPCLogo(void) {
     fn_801E189C(lbl_80267040, 0);
 }
-
-/* =========================================================================
- * Stubs for remaining movie functions (0x800361C0-0x800366A4)
- * ========================================================================= */
-
-/* 0x50 | fn_800361C0 | call_sequence */
-void fn_800361C0(void) {
-    fn_801C41C8(0, 0);
-    fn_801C40F0(0);
-    fn_801E189C(0, 0);
-    fn_80165A20(0, 0, 0);
-}
-
-/*
- * movieSetupFadeSpecial - Set fade mode 3 with speed 1.0 and enable.
- *
- * 0x80036210 | size: 0x30
- */
-void fn_80036210(void) {
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
-}
-
-/*
- * moviePlayWithSubtitles - Play a THP movie with timed subtitle display.
- *
- * Polls the THP player state each frame. While playing, checks for
- * skip-button input and processes subtitle entries from the subtitle
- * table at lbl_802E50E0. Each entry is 6 bytes: 2-byte frame threshold,
- * 2-byte sound ID A, 2-byte sound ID B.
- *
- * 0x80036240 | size: 0x120
- */
-void fn_80036240(void) {
-    extern u8 lbl_802E50E0[];
-    extern u32 fn_800F7AF0(u32 pad);
-    extern u32 fn_800F7BC4(u32 pad);
-    extern void fn_800FF58C(u32 flag);
-    extern void fn_8016597C(u32 grp, u32 fade, u32 unk, u32 vol);
-    extern void fn_80166A28(u32 sndId);
-    extern s32 fn_8017B1AC(void);
-    extern s32 fn_801E16D0(void);
-    extern void fn_801E1810(void);
-    u32 subtitleIdx = 0;
-    u32 nextIdx;
-    u8 state;
-    s32 sysState;
-    u32 btnA, btnB, combined;
-    s32 framePos;
-    u8* entry;
-    u16 threshold, sndA, sndB;
-
-    while (1) {
-        state = fn_801E1874();
-        if ((state & 0xFF) != 1) {
-            break;
-        }
-
-        sysState = fn_8017B1AC();
-        if (sysState == 0x0B || sysState == 5) {
-            fn_800F0308();
-            continue;
-        }
-
-        btnA = fn_800F7AF0(1);
-        btnB = fn_800F7BC4(1);
-        combined = btnA & btnB;
-        if (combined & 0x1300) {
-            fn_801E1810();
-            break;
-        }
-
-        nextIdx = subtitleIdx;
-        if (subtitleIdx < 0x21) {
-            framePos = fn_801E16D0();
-            if (framePos >= 0) {
-                entry = lbl_802E50E0 + (subtitleIdx * 6);
-                threshold = *(u16*)(entry + 0);
-                if (framePos >= (s32)threshold) {
-                    sndA = *(u16*)(entry + 2);
-                    if (sndA != 0) {
-                        fn_80166A28(sndA);
-                    }
-                    sndB = *(u16*)(entry + 4);
-                    if (sndB != 0) {
-                        fn_80166A28(sndB);
-                    }
-                    nextIdx = nextIdx + 1;
-                }
-            }
-        }
-
-        subtitleIdx = nextIdx;
-        fn_800F0308();
-    }
-
-    fn_8016597C(1, 0x3E8, 0, 0x7F);
-    fn_800FF58C(0x384);
-    fn_8011288C(0, 0x59608);
-}
-
-/* 0x50 | fn_80036360 | call_sequence */
-void fn_80036360(void) {
-    fn_801C41C8(0, 0);
-    fn_801C40F0(0);
-    fn_801E189C(0, 0);
-    fn_80165A20(0, 0, 0);
-}
-
-/* 0x800363B0 | 0x4 -- nop */
-void fn_800363B0(void) { }
-
-/* 0x800363B4 | 0x4 -- nop */
-void fn_800363B4(void) { }
-
-/* 0x800363B8 | 0x4 -- nop */
-void fn_800363B8(void) { }
-
-/*
- * moviePlayTPCSequence - Set up TPC logo DMA load and wait for completion.
- *
- * Configures fade mode 3, sets up a DVD read task for logo data,
- * then yields until the task counter reaches zero.
- *
- * 0x800363BC | size: 0xAC
- */
-void fn_800363BC(void) {
-    extern u8 lbl_803A3E58[];
-    extern u32 lbl_8047A460;
-    extern void fn_800A19CC(u8* desc, void* callback, u8* buf, u32 size, u32 align, u32 async);
-    extern void fn_800A1F94(u8* desc);
-    extern void fn_800370E0(void);
-    u8* base = lbl_803A3E58;
-    u8* taskDesc = base + 0x1318;
-    u8* buffer = base + 0x1640 + 0xFFC;
-
-    /* Fade mode 3 (special), speed 1.0 */
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
-
-    /* Set up task descriptor */
-    *(u32*)(taskDesc + 0x00) = 3;   /* type */
-    *(u32*)(taskDesc + 0x04) = 7;   /* priority */
-    *(u32*)(taskDesc + 0x08) = 0;   /* offset */
-    *(u32*)(taskDesc + 0x0C) = 0;   /* flags */
-
-    lbl_8047A460 = lbl_8047A460 + 1;
-
-    fn_800A19CC(base + 0x1328, (void*)fn_800370E0, buffer, 0x1000, 0x10, 1);
-    fn_800A1F94(base + 0x1328);
-
-    /* Wait for task to complete */
-    while ((s32)lbl_8047A460 != 0) {
-        fn_800F0308();
-    }
-}
-
-/* 0x60 | fn_80036468 | generic */
-u32 fn_80036468(void) {
-    /* refs: lbl_8047A468 */
-    fn_800F0308();
-    fn_801E1874();
-    fn_800FF58C();
-    fn_8011288C(0, 0);
-    return 0;
-}
-
-/*
- * moviePlayGSLogoSequence - Set up GS logo DMA read, wait, then play logo movie.
- *
- * Initializes state, configures a DVD read task, waits for completion,
- * then fades in and opens the GS logo movie with BGM 0x4D1.
- *
- * 0x800364C8 | size: 0xE8
- */
-void fn_800364C8(void) {
-    extern u8 lbl_803A3E58[];
-    extern u32 lbl_8047A460;
-    extern u8 lbl_8047A468;
-    extern void fn_800A19CC(u8* desc, void* callback, u8* buf, u32 size, u32 align, u32 async);
-    extern void fn_800A1F94(u8* desc);
-    extern void fn_800370E0(void);
-    u8* base = lbl_803A3E58;
-    u8* taskDesc = base + 0x1318;
-    u8* buffer = base + 0x1640 + 0xFFC;
-
-    lbl_8047A468 = 0;
-
-    /* Set up task descriptor */
-    *(u32*)(taskDesc + 0x00) = 5;   /* type */
-    *(u32*)(taskDesc + 0x04) = 4;   /* priority */
-    *(u32*)(taskDesc + 0x08) = 6;   /* offset */
-    *(u32*)(taskDesc + 0x0C) = 0;   /* flags */
-
-    lbl_8047A460 = lbl_8047A460 + 1;
-
-    fn_800A19CC(base + 0x1328, (void*)fn_800370E0, buffer, 0x1000, 0x10, 1);
-    fn_800A1F94(base + 0x1328);
-
-    /* Wait for task to complete */
-    while ((s32)lbl_8047A460 != 0) {
-        fn_800F0308();
-    }
-
-    /* Fade in and play GS logo movie */
-    fn_801C41C8(2, lbl_8047BA30);
-    fn_801C40F0(1);
-    fn_801E189C(lbl_8026702C, 0);
-    fn_80165A20(0x4D1, 0, 0x7F);
-
-    /* Clear low memory area */
-    memset((void*)0x80001805, 0, 0x17FB);
-}
-
-/*
- * movieSetupFadeSpecial2 - Set fade mode 3 with speed 1.0 and enable.
- *
- * 0x800365B0 | size: 0x30
- */
-void fn_800365B0(void) {
-    fn_801C41C8(3, lbl_8047BA30);
-    fn_801C40F0(1);
-}
-
-/* 0x60 | fn_800365E0 | generic */
-u32 fn_800365E0(void) {
-    /* refs: lbl_8047A468 */
-    fn_80165F40();
-    fn_800F0308();
-    fn_801E1874();
-    fn_800FF58C();
-    fn_8011288C(0, 0);
-    return 0;
-}
-
-/* 0x5C | fn_80036640 | call_sequence */
-void fn_80036640(void) {
-    fn_801C41C8(0, 0);
-    fn_801C40F0(0);
-    fn_801E189C(0, 0);
-    memset();
-}
-
-/* 0x8003669C | 0x4 -- nop */
-void fn_8003669C(void) { }
-
-/* 0x800366A0 | 0x4 -- nop */
-void fn_800366A0(void) { }
-
-/* 0x800366A4 | 0x4 -- nop */
-void fn_800366A4(void) { }
