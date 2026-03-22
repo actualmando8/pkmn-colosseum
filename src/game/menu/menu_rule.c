@@ -39,7 +39,6 @@ s32 fn_800776E4(void);
 
 /* ===== Function implementations ===== */
 
-
 /* 0x800767B8 | size: 0x2D4 */
 s32 fn_800767B8(void) {
     extern void fn_80076F2C();
@@ -797,7 +796,6 @@ s32 fn_80076F2C(void) {
         }
         r21 = r21 + 0x1;
 
-
     }
     tmp = r20 & 0xFFFF;
     r5 = *(s16*)((u8*)r23 + 0x6);
@@ -1172,7 +1170,6 @@ s32 fn_800776E4(void) {
         }
         r26 = r26 + 0x1;
 
-
     }
     tmp = 0x1;
 
@@ -1375,4 +1372,3 @@ L_80077A34:
     r3 = tmp & 0xFF;
     return;
 }
-

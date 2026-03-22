@@ -377,10 +377,12 @@ def pass_fwd_single_skip(lines, lp, rc, ls):
     return changes
 
 
-def pass_multi_ref_first_skip(lines, lp, rc, ls):
-    """Multi-ref forward: convert the first (topmost) if-goto independently.
-    Safe when the block between goto and label OR next goto doesn't cross braces."""
+def pass_multi_ref_skip(lines, lp, rc, ls):
+    """Multi-ref forward: convert each if-goto to the same label independently.
+    Wraps code between each goto and the next goto/label in if (!cond) { ... }.
+    Works for both terminating and non-terminating blocks."""
     changes = 0
+    # Process labels in order
     for label in sorted(lp.keys(), key=lambda x: lp[x]):
         pos = lp[label]
         ref_count = rc.get(label, 0)
@@ -389,69 +391,70 @@ def pass_multi_ref_first_skip(lines, lp, rc, ls):
         sources = sorted(ls.get(label, []))
         if not sources:
             continue
-        # Try converting the first if-goto source
-        src = sources[0]
-        m = re.match(r'^(\s+)if \((.+)\) goto ' + re.escape(label) + r';$', lines[src])
-        if not m:
-            continue
-        indent, cond = m.group(1), m.group(2)
-        if src >= pos:
-            continue
-        # Find the end of this block: either the next source or the label
-        block_end = pos
-        for ns in sources[1:]:
-            if ns > src and ns < block_end:
-                block_end = ns
-                break
-        # Check block between src+1 and block_end
-        block_lines = []
-        has_label_ext = False
-        has_bad_goto = False
-        brace_depth = 0
-        for k in range(src + 1, block_end):
-            s = lines[k].strip()
-            if not s:
+        # Try converting each if-goto source (from last to first to avoid index shifts)
+        for si in range(len(sources) - 1, -1, -1):
+            src = sources[si]
+            m = re.match(r'^(\s+)if \((.+)\) goto ' + re.escape(label) + r';$', lines[src])
+            if not m:
                 continue
-            brace_depth += lines[k].count('{') - lines[k].count('}')
-            ml = re.match(r'^L_[0-9A-Fa-f]+\s*:\s*;?\s*$', s)
-            if ml:
-                lbl_name = ml.group(0).split(':')[0].strip()
-                for ss in ls.get(lbl_name, []):
-                    if ss < src or ss >= block_end:
-                        has_label_ext = True
-                        break
-            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', s)
-            if gm and gm.group(1) != label:
-                t_lbl = gm.group(1)
-                if t_lbl in lp and lp[t_lbl] < src:
-                    has_bad_goto = True
-            block_lines.append(k)
-        if has_label_ext or has_bad_goto:
-            continue
-        if brace_depth != 0:
-            continue
-        if len(block_lines) == 0:
-            continue
-        # Check block terminates (return/break/continue/goto-away)
-        last_stmt = lines[block_lines[-1]].strip()
-        terminates = (last_stmt.startswith('return') or last_stmt == 'break;' or
-                      last_stmt == 'continue;' or re.match(r'^goto\s+', last_stmt))
-        if not terminates:
-            continue
-        inv = invert_cond(cond)
-        if inv is None:
-            continue
-        lines[src] = indent + 'if (' + inv + ') {'
-        for k in block_lines:
-            lines[k] = '    ' + lines[k]
-        # Add closing brace
-        last_k = block_lines[-1]
-        lines[last_k] = lines[last_k] + '\n' + indent + '}'
-        for k in range(last_k + 1, block_end):
-            if not lines[k].strip():
-                lines[k] = ''
-        rc[label] = rc.get(label, 0) - 1
-        changes += 1
+            indent, cond = m.group(1), m.group(2)
+            if src >= pos:
+                continue
+            # Find the end of this block: next source or label pos
+            block_end = pos
+            for ns in sources:
+                if ns > src and ns < block_end:
+                    block_end = ns
+                    break
+            # Check block between src+1 and block_end
+            block_lines = []
+            has_label_ext = False
+            has_bad_goto = False
+            brace_depth = 0
+            for k in range(src + 1, block_end):
+                s = lines[k].strip()
+                if not s:
+                    continue
+                brace_depth += lines[k].count('{') - lines[k].count('}')
+                ml = re.match(r'^(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', s)
+                if ml:
+                    lbl_name = ml.group(1)
+                    for ss in ls.get(lbl_name, []):
+                        if ss < src or ss >= block_end:
+                            has_label_ext = True
+                            break
+                gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', s)
+                if gm and gm.group(1) != label:
+                    t_lbl = gm.group(1)
+                    if t_lbl in lp and lp[t_lbl] < src:
+                        has_bad_goto = True
+                block_lines.append(k)
+            if has_label_ext or has_bad_goto:
+                continue
+            if brace_depth != 0:
+                continue
+            if len(block_lines) == 0:
+                continue
+            inv = invert_cond(cond)
+            if inv is None:
+                continue
+            # Convert: wrap block in if (!cond) { ... }
+            lines[src] = indent + 'if (' + inv + ') {'
+            for k in block_lines:
+                lines[k] = '    ' + lines[k]
+            last_k = block_lines[-1]
+            lines[last_k] = lines[last_k] + '\n' + indent + '}'
+            for k in range(last_k + 1, block_end):
+                if not lines[k].strip():
+                    lines[k] = ''
+            rc[label] = rc.get(label, 0) - 1
+            changes += 1
+            # Rebuild sources for this label since lines changed
+            sources = []
+            for ii in range(len(lines)):
+                if re.search(r'\bgoto\s+' + re.escape(label) + r'\s*;', lines[ii]):
+                    sources.append(ii)
+            break  # Only convert one per label per iteration (will retry)
     return changes
 
 
@@ -983,7 +986,7 @@ def process_file(filepath):
         ('cascaded_if_else', pass_cascaded_if_else),
         ('fwd_single_skip', pass_fwd_single_skip),
         ('multi_ref_consecutive', pass_multi_ref_consecutive),
-        ('multi_ref_first_skip', pass_multi_ref_first_skip),
+        ('multi_ref_skip', pass_multi_ref_skip),
         ('while_loop', pass_while_loop),
         ('do_while', pass_do_while),
         ('break_from_loop', pass_break_from_loop),

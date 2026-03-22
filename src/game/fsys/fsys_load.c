@@ -263,7 +263,7 @@ FSYSSlot* FSYSFindSlot(u32 fileHandle, u32 mode) {
                 }
                 found_loaded:
                 slot->refCount++;
-                goto unmatched;
+
             }
         }
         unmatched:

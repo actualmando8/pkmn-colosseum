@@ -128,7 +128,6 @@ void fn_801012E8(void);
 void fn_801013A0(void);
 void fn_8010147C(void);
 
-
 /* ===== Global state (sbss / sdata) ===== */
 
 /* --- Floor system configuration --- */
@@ -1337,7 +1336,6 @@ void fn_800FF828(void) {
         r5 = r5 + 0x24;
         r6 = r6 + 0x1;
         *(u32*)(r3 + tmp) = r4;
-
 
     }
     r9 = *(u32*)lbl_8047ACA4;
@@ -3195,7 +3193,6 @@ void fn_801013A0(void) {
         r3 = r3 + 0x4;
         r29 = r29 + 0x1;
 
-
     }
 
     return;
@@ -3511,7 +3508,6 @@ L_8010188C:
             r4 = r4 + 0x4;
             r28 = r28 + 0x1;
 
-
         }
     }
     r3 = *(u32*)((u8*)r3 + 0x8);
@@ -3521,7 +3517,6 @@ L_8010188C:
         if (tmp == 0) break;
             r3 = r3 + 0x4;
             r29 = r29 + 0x1;
-
 
         }
     }
@@ -3593,9 +3588,10 @@ void fn_800F7434(void) {
     *(u32*)(sp + 0x78) = tmp;
     fn_800F6D18();
     /* mr. r30, r3 */;
-    if ((s32)tmp != 0) goto L_800F74C8;
-    r3 = 0x0;
-    return;
+    if ((s32)tmp == 0) {
+        r3 = 0x0;
+        return;
+    }
 L_800F74C8:
     tmp = *(u8*)((u8*)r30 + 0x4);
     if (tmp == 0) {
@@ -3663,4 +3659,3 @@ L_800F7548:
 
     return;
 }
-

@@ -548,19 +548,20 @@ void fn_8019A24C(void) {
         tmp = r3 & 0x00000080;
         /* extrwi r3, r3, 3, 25 */;
         r5 = r3 + 0x1;
-        if (tmp != 0) goto L_8019A2D0;
-        goto L_8019A2F8;
-    L_8019A2D0:
-        r3 = *(u32*)((u8*)r31 + 0x4);
-        tmp = r3 + 0x1;
-        *(u32*)((u8*)r31 + 0x4) = tmp;
-        r3 = *(u8*)((u8*)r3 + 0x0);
-        tmp = r3 & 0x00000080;
-        r3 = r3 & 0x7F;
-        r3 = r3 << r4;
-        r4 = r4 + 0x7;
-        r5 = r5 + r3;
-        if (tmp != 0) goto L_8019A2D0;
+        if (tmp == 0) {
+            goto L_8019A2F8;
+        }
+    do {
+            r3 = *(u32*)((u8*)r31 + 0x4);
+            tmp = r3 + 0x1;
+            *(u32*)((u8*)r31 + 0x4) = tmp;
+            r3 = *(u8*)((u8*)r3 + 0x0);
+            tmp = r3 & 0x00000080;
+            r3 = r3 & 0x7F;
+            r3 = r3 << r4;
+            r4 = r4 + 0x7;
+            r5 = r5 + r3;
+    } while (tmp != 0);
     L_8019A2F8:
         *(u16*)((u8*)r31 + 0x16) = r5;
     }
@@ -1573,4 +1574,3 @@ L_8019B42C:
 
     return;
 }
-

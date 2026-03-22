@@ -171,7 +171,6 @@ s32 fn_80092B2C(void);
 
 /* ===== Function implementations ===== */
 
-
 /* 0x800895A4 | size: 0x114 */
 s32 fn_800895A4(void) {
     extern void fn_8008BBDC();
@@ -345,13 +344,14 @@ s32 fn_800896E8(void) {
     fn_80189990();
     ((void(*)(void))fn_8001E184)();
     tmp = (s8)r3;
-    if ((s32)tmp == 0) goto L_8008978C;
-    if ((s32)tmp < 0) {
-    } else {
+    if ((s32)tmp != 0) {
+        if ((s32)tmp < 0) {
+        } else {
 
+        }
+        r3 = 0x0;
+        return;
     }
-    r3 = 0x0;
-    return;
 L_8008978C:
     tmp = 0x2;
     r3 = 0x231;
@@ -10735,4 +10735,3 @@ s32 fn_80092B2C(void) {
     ((void(*)(void))fn_8011288C)();
     return;
 }
-

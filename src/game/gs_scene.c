@@ -238,7 +238,6 @@ void GSscene_ProcessFreeList(void) {
                         if (tmp == 0) break;
                         *(u32*)&lbl_8047B184 = tmp;
 
-
                     }
                     break;
                 }
@@ -250,7 +249,6 @@ void GSscene_ProcessFreeList(void) {
                     tmp = *(u32*)((u8*)r3 + 0x0);
                     if (tmp == 0) break;
                     *(u32*)&lbl_8047B184 = tmp;
-
 
                 }
                 break;
@@ -268,7 +266,6 @@ void GSscene_ProcessFreeList(void) {
         if (r3 == 0) break;
         fn_801A3E64();
         *(u32*)lbl_8047B180 = r3;
-
 
     }
     return;
@@ -367,7 +364,6 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                         if (tmp == 0) break;
                         *(u32*)&lbl_8047B184 = tmp;
 
-
                     }
                     break;
                 }
@@ -379,7 +375,6 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
                     tmp = *(u32*)((u8*)type + 0x0);
                     if (tmp == 0) break;
                     *(u32*)&lbl_8047B184 = tmp;
-
 
                 }
                 break;
@@ -397,7 +392,6 @@ void* GSscene_SpawnObject(u32 type, u32 param) {
         if (type == 0) break;
         fn_801A3E64();
         *(u32*)lbl_8047B180 = type;
-
 
     }
     type = *(u32*)&lbl_8047B18C;
@@ -1447,15 +1441,15 @@ tmp = (u32)sceneObj & 0x00000020;
 sceneObj = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)sceneObj & 0x00000040;
-if ((u32)sceneObj == 0) goto L_80178D24;
-    tmp = 0x43300000;
-    f2 = *(f64*)lbl_8047D738;
-    *(u32*)(sp + 0x68) = tmp;
-    f0 = *(f32*)lbl_8047D76C;
-    f1 = f1 - f2;
-    f31 = f1 * f0 + f31;
-    goto L_80178D4C;
-L_80178D24:
+if ((u32)sceneObj != 0) {
+        tmp = 0x43300000;
+        f2 = *(f64*)lbl_8047D738;
+        *(u32*)(sp + 0x68) = tmp;
+        f0 = *(f32*)lbl_8047D76C;
+        f1 = f1 - f2;
+        f31 = f1 * f0 + f31;
+        goto L_80178D4C;
+}
     tmp = 0x43300000;
     f2 = *(f64*)lbl_8047D738;
     *(u32*)(sp + 0x68) = tmp;
@@ -1995,7 +1989,6 @@ void GSscene_Init(void) {
             tmp = r3 + 0x1;
             *(u32*)(sp + 0x74) = tmp;
 
-
         }
         tmp = -0x1;
         *(u32*)(sp + 0x78) = tmp;
@@ -2030,7 +2023,6 @@ void GSscene_Init(void) {
                 r30 = r30 + 0x8;
                 r28 = r28 + 0x1;
 
-
             }
 
             if ((s32)tmp != 0) {
@@ -2051,7 +2043,6 @@ void GSscene_Init(void) {
                         *(u32*)((u8*)r5 + 0x4) = tmp;
                     }
                     r28 = r28 + 0x1;
-
 
                 }
                 r4 = *(u32*)lbl_8047B1BC;
@@ -2101,7 +2092,6 @@ void GSscene_Init(void) {
             tmp = r3 + 0x1;
             *(u32*)(sp + 0x50) = tmp;
 
-
         }
         tmp = -0x1;
         *(u32*)(sp + 0x54) = tmp;
@@ -2136,7 +2126,6 @@ void GSscene_Init(void) {
                 r29 = r29 + 0x8;
                 r27 = r27 + 0x1;
 
-
             }
 
             if ((s32)tmp != 0) {
@@ -2157,7 +2146,6 @@ void GSscene_Init(void) {
                         *(u32*)((u8*)r5 + 0x4) = tmp;
                     }
                     r27 = r27 + 0x1;
-
 
                 }
                 r4 = *(u32*)lbl_8047B1BC;
@@ -2279,7 +2267,6 @@ void GSscene_Init(void) {
             *(u32*)(sp + 0x7C) = tmp;
             tmp = *(u32*)((u8*)r3 + 0x14);
             r23 = r23 + tmp;
-
 
         }
         r5 = *(u32*)((u8*)r31 + 0x40);

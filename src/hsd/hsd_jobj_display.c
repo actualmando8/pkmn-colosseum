@@ -1285,7 +1285,6 @@ void fn_801A2B5C(void) {
             }
             r5 = *(u32*)((u8*)r5 + 0x0);
 
-
         }
     } while (0);
 
@@ -1635,7 +1634,6 @@ void fn_801A301C(void) {
                 break;
             }
             r5 = *(u32*)((u8*)r5 + 0x0);
-
 
         }
     } while (0);
@@ -2665,4 +2663,3 @@ void fn_801A3FA4(void) {
 /* 0x801A3FB0 | 0xC */
 void fn_801A3FB0(void) {
 }
-

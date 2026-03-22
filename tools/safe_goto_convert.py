@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Ultra-conservative goto eliminator that verifies compilation after EACH transformation.
-Only applies one transformation at a time, tests compilation, then continues or reverts.
-Tracks which gotos failed to convert so it doesn't retry them infinitely.
+Ultra-conservative goto eliminator.
+Tests compilation after EACH transformation. Never produces broken code.
+
+Strategy: apply one transform, compile-check, keep or revert. Repeat.
+Tracks failed attempts to avoid infinite loops.
 """
 import re
 import os
 import subprocess
 import sys
 
-def count_gotos_text(text):
+def count_gotos(text):
     return len(re.findall(r'\bgoto\s+\w+\s*;', text))
 
 def test_compile(src, ver):
@@ -20,7 +22,7 @@ def test_compile(src, ver):
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, shell=True)
     return result.returncode == 0
 
-def is_label_line(line):
+def is_label(line):
     s = line.strip()
     m = re.match(r'^(\w+)\s*:\s*;?\s*$', s)
     if m and not s.startswith('default') and not s.startswith('case'):
@@ -47,8 +49,6 @@ def negate(cond):
         l, op, r = m.groups()
         if op in ops:
             return f'{l} {ops[op]} {r}'
-    if '&&' in cond or '||' in cond:
-        return f'!({cond})'
     return f'!({cond})'
 
 def get_indent(line):
@@ -70,208 +70,286 @@ def label_use_count(lines, label):
 
 def has_labels_targeted_from_outside(lines, start, end):
     for i in range(start, end):
-        lbl = is_label_line(lines[i])
+        lbl = is_label(lines[i])
         if lbl:
             for j, l in enumerate(lines):
                 if (j < start or j >= end) and f'goto {lbl}' in l:
                     return True
     return False
 
-def block_terminates(lines_block):
-    ne = [l.strip() for l in lines_block if l.strip()]
+def block_terminates(block):
+    ne = [l.strip() for l in block if l.strip()]
     if not ne:
         return False
     last = ne[-1]
     return (last.startswith('return') or last == 'break;' or last == 'continue;'
             or re.match(r'^goto\s+\w+\s*;$', last) is not None)
 
-def is_only_structural(lines_block):
-    for l in lines_block:
-        s = l.strip()
-        if not s:
-            continue
-        if s == '}':
-            continue
-        if is_label_line(l):
-            continue
-        return False
-    return True
-
-def brace_depth_change(lines_block):
-    depth = 0
-    for l in lines_block:
-        depth += l.count('{') - l.count('}')
-    return depth
+def brace_depth_change(block):
+    d = 0
+    for l in block:
+        d += l.count('{') - l.count('}')
+    return d
 
 def indent_block(block, extra='    '):
-    result = []
-    for l in block:
-        if l.strip():
-            result.append(extra + l)
-        else:
-            result.append(l)
-    return result
+    return [extra + l if l.strip() else l for l in block]
 
 
-def find_all_transformations(lines, skip_set):
-    """Find all possible transformations, return list of (priority, line_idx, transform_func, desc)."""
-    transforms = []
+def try_transforms(lines, skip_ids):
+    """Try one transformation. Returns (new_lines, id, desc) or None."""
 
+    # === PASS 1: Redundant goto removal ===
+    # goto L; where everything between goto and L: is just } and whitespace
+    # AND brace depth is 0 (natural fallthrough)
     for i in range(len(lines)):
-        if i in skip_set:
+        g = extract_goto(lines[i])
+        if not g or g[0] is not None:
             continue
+        lbl = g[1]
+        tid = f'redund:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0:
+            continue
+        between = lines[i + 1:li]
+        # Check: only closing braces and whitespace between
+        all_close = all(not b.strip() or b.strip() == '}' for b in between)
+        if all_close and brace_depth_change(between) == 0:
+            new = list(lines)
+            new[i] = ''
+            if label_use_count(new, lbl) == 0:
+                new[li] = ''
+            return new, tid, f'remove redundant goto {lbl} (line {i+1})'
+
+    # === PASS 2: OR-chain merging ===
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is None:
+            continue
+        cond1, lbl = g
+        tid = f'orchain:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        j = i + 1
+        while j < len(lines) and not lines[j].strip():
+            j += 1
+        if j >= len(lines):
+            continue
+        g2 = extract_goto(lines[j])
+        if not g2 or g2[0] is None or g2[1] != lbl:
+            continue
+
+        conds = [cond1, g2[0]]
+        k = j + 1
+        while k < len(lines):
+            if not lines[k].strip():
+                k += 1
+                continue
+            gk = extract_goto(lines[k])
+            if gk and gk[0] is not None and gk[1] == lbl:
+                conds.append(gk[0])
+                k += 1
+            else:
+                break
+
+        new = list(lines)
+        merged = ' || '.join(f'({c})' for c in conds)
+        ind = get_indent(lines[i])
+        new[i] = f'{ind}if ({merged}) goto {lbl};'
+        for idx in range(i + 1, k):
+            gx = extract_goto(lines[idx])
+            if gx and gx[1] == lbl:
+                new[idx] = ''
+        return new, tid, f'OR-chain {len(conds)}x goto {lbl} (line {i+1})'
+
+    # === PASS 3: if(cond) goto L; <code> L: where single-use, same depth, code has no external targets ===
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is None:
+            continue
+        cond, lbl = g
+        tid = f'ifskip:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0 or li <= i:
+            continue
+        if label_use_count(lines, lbl) != 1:
+            continue
+        code = lines[i + 1:li]
+        if brace_depth_change(code) != 0:
+            continue
+        if has_labels_targeted_from_outside(lines, i + 1, li):
+            continue
+
+        ind = get_indent(lines[i])
+        new = list(lines)
+        replacement = [f'{ind}if ({negate(cond)}) {{']
+        replacement += indent_block(code)
+        replacement.append(f'{ind}}}')
+        new[i:li + 1] = replacement
+        return new, tid, f'if-skip single {lbl} (line {i+1})'
+
+    # === PASS 4: if(cond) goto L; <code terminating> L: multi-use OK ===
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is None:
+            continue
+        cond, lbl = g
+        tid = f'ifterm:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0 or li <= i:
+            continue
+        code = lines[i + 1:li]
+        if brace_depth_change(code) != 0:
+            continue
+        if not block_terminates(code):
+            continue
+        if has_labels_targeted_from_outside(lines, i + 1, li):
+            continue
+
+        ind = get_indent(lines[i])
+        new = list(lines)
+        replacement = [f'{ind}if ({negate(cond)}) {{']
+        replacement += indent_block(code)
+        replacement.append(f'{ind}}}')
+        uses = label_use_count(lines, lbl)
+        if uses <= 1:
+            new[i:li + 1] = replacement
+        else:
+            new[i:li] = replacement
+        return new, tid, f'if-skip-term {lbl} (line {i+1})'
+
+    # === PASS 5: Backward goto (single-use) -> do-while/while ===
+    for i in range(len(lines)):
         g = extract_goto(lines[i])
         if not g:
             continue
-
         cond, lbl = g
+        tid = f'backloop:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
 
-        # Pattern 1: Redundant forward unconditional goto
-        if cond is None:
-            li = find_label(lines, lbl, i + 1)
-            if li > i:
-                between = lines[i + 1:li]
-                if is_only_structural(between) and brace_depth_change(between) == 0:
-                    def make_t1(i=i, lbl=lbl, li=li):
-                        new_lines = list(lines)
-                        new_lines[i] = ''
-                        if label_use_count(new_lines, lbl) == 0:
-                            new_lines[li] = ''
-                        return new_lines
-                    transforms.append((0, i, make_t1, f'redundant goto {lbl} at line {i+1}'))
-                    continue
-
-        # Pattern 2: OR-chain
-        if cond is not None:
-            j = i + 1
-            while j < len(lines) and not lines[j].strip():
-                j += 1
-            if j < len(lines):
-                g2 = extract_goto(lines[j])
-                if g2 and g2[0] is not None and g2[1] == lbl:
-                    conds = [cond, g2[0]]
-                    k = j + 1
-                    while k < len(lines):
-                        if not lines[k].strip():
-                            k += 1
-                            continue
-                        gk = extract_goto(lines[k])
-                        if gk and gk[0] is not None and gk[1] == lbl:
-                            conds.append(gk[0])
-                            k += 1
-                        else:
-                            break
-                    if len(conds) > 1:
-                        def make_t2(i=i, lbl=lbl, conds=conds[:], k=k):
-                            new_lines = list(lines)
-                            merged = ' || '.join(f'({c})' for c in conds)
-                            ind = get_indent(lines[i])
-                            new_lines[i] = f'{ind}if ({merged}) goto {lbl};'
-                            for idx in range(i + 1, k):
-                                gx = extract_goto(lines[idx])
-                                if gx and gx[1] == lbl:
-                                    new_lines[idx] = ''
-                            return new_lines
-                        transforms.append((1, i, make_t2, f'OR-chain {len(conds)}x -> goto {lbl} at line {i+1}'))
-                        continue
-
-        # Pattern 3: Forward conditional skip (single-use label)
-        if cond is not None:
-            li = find_label(lines, lbl, i + 1)
-            if li > i and label_use_count(lines, lbl) == 1:
-                code = lines[i + 1:li]
-                if (not has_labels_targeted_from_outside(lines, i + 1, li)
-                    and brace_depth_change(code) == 0):
-                    def make_t3(i=i, lbl=lbl, li=li, cond=cond, code=code[:]):
-                        new_lines = list(lines)
-                        ind = get_indent(lines[i])
-                        replacement = [f'{ind}if ({negate(cond)}) {{']
-                        replacement += indent_block(code)
-                        replacement.append(f'{ind}}}')
-                        new_lines[i:li + 1] = replacement
-                        return new_lines
-                    transforms.append((2, i, make_t3, f'if-skip single {lbl} at line {i+1}'))
-                    continue
-
-        # Pattern 4: Forward conditional skip (terminates, multi-use OK)
-        if cond is not None:
-            li = find_label(lines, lbl, i + 1)
-            if li > i:
-                code = lines[i + 1:li]
-                if (block_terminates(code)
-                    and not has_labels_targeted_from_outside(lines, i + 1, li)
-                    and brace_depth_change(code) == 0):
-                    def make_t4(i=i, lbl=lbl, li=li, cond=cond, code=code[:]):
-                        new_lines = list(lines)
-                        ind = get_indent(lines[i])
-                        replacement = [f'{ind}if ({negate(cond)}) {{']
-                        replacement += indent_block(code)
-                        replacement.append(f'{ind}}}')
-                        uses = label_use_count(lines, lbl)
-                        if uses <= 1:
-                            new_lines[i:li + 1] = replacement
-                        else:
-                            new_lines[i:li] = replacement
-                        return new_lines
-                    transforms.append((3, i, make_t4, f'if-skip-term {lbl} at line {i+1}'))
-                    continue
-
-        # Pattern 5: Backward goto (single-use) -> do-while
         li = find_label(lines, lbl, 0, i)
-        if li >= 0 and label_use_count(lines, lbl) == 1:
-            body = lines[li + 1:i]
-            if brace_depth_change(body) == 0:
-                def make_t5(i=i, lbl=lbl, li=li, cond=cond, body=body[:]):
-                    new_lines = list(lines)
-                    ind = get_indent(lines[li])
-                    if cond:
-                        replacement = [f'{ind}do {{']
-                        replacement += indent_block(body)
-                        replacement.append(f'{ind}}} while ({cond});')
-                    else:
-                        replacement = [f'{ind}while (1) {{']
-                        replacement += indent_block(body)
-                        replacement.append(f'{ind}}}')
-                    new_lines[li:i + 1] = replacement
-                    return new_lines
-                transforms.append((4, i, make_t5, f'backward loop {lbl} at line {i+1}'))
-                continue
+        if li < 0:
+            continue
+        if label_use_count(lines, lbl) != 1:
+            continue
+        body = lines[li + 1:i]
+        if brace_depth_change(body) != 0:
+            continue
 
-        # Pattern 6: goto before closing brace -> fallthrough
-        if cond is None:
-            j = i + 1
-            while j < len(lines) and not lines[j].strip():
-                j += 1
-            if j < len(lines) and lines[j].strip().startswith('}'):
-                li = find_label(lines, lbl, j)
-                if li >= 0:
-                    between = lines[j + 1:li]
-                    all_struct = all(
-                        not b.strip() or b.strip() == '}' or b.strip() == '} else {' or is_label_line(b)
-                        for b in between
-                    )
-                    if all_struct and brace_depth_change(lines[i+1:li]) == 0:
-                        def make_t6(i=i, lbl=lbl, li=li):
-                            new_lines = list(lines)
-                            new_lines[i] = ''
-                            if label_use_count(new_lines, lbl) == 0:
-                                new_lines[li] = ''
-                            return new_lines
-                        transforms.append((5, i, make_t6, f'goto-brace {lbl} at line {i+1}'))
-                        continue
+        ind = get_indent(lines[li])
+        new = list(lines)
+        if cond:
+            replacement = [f'{ind}do {{']
+            replacement += indent_block(body)
+            replacement.append(f'{ind}}} while ({cond});')
+        else:
+            replacement = [f'{ind}while (1) {{']
+            replacement += indent_block(body)
+            replacement.append(f'{ind}}}')
+        new[li:i + 1] = replacement
+        return new, tid, f'backward loop {lbl} (line {i+1})'
 
-    transforms.sort(key=lambda x: x[0])
-    return transforms
+    # === PASS 6: goto L; } <close-braces> L: where depth < 0 ===
+    # The goto is redundant if removing it still reaches L via fallthrough
+    # This is safe when between is ONLY closing braces (no else)
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is not None:
+            continue
+        lbl = g[1]
+        tid = f'gotobrace:{i}:{lbl}'
+        if tid in skip_ids:
+            continue
+
+        li = find_label(lines, lbl, i + 1)
+        if li < 0:
+            continue
+        between = lines[i + 1:li]
+        # ONLY allow pure closing braces and whitespace (NO else)
+        all_close = all(
+            not b.strip() or b.strip() == '}'
+            for b in between
+        )
+        if not all_close:
+            continue
+        # Any depth change is OK as long as it's only }
+        new = list(lines)
+        new[i] = ''
+        if label_use_count(new, lbl) == 0:
+            new[li] = ''
+        return new, tid, f'goto-close-brace {lbl} (line {i+1})'
+
+    # === PASS 7: if-goto-else pattern ===
+    # if(cond) goto A; <else-code> goto B; A: <then-code> B:
+    for i in range(len(lines)):
+        g = extract_goto(lines[i])
+        if not g or g[0] is None:
+            continue
+        cond, lbl_a = g
+        tid = f'ifelse:{i}:{lbl_a}'
+        if tid in skip_ids:
+            continue
+
+        la = find_label(lines, lbl_a, i + 1)
+        if la < 0 or la <= i + 1:
+            continue
+        if label_use_count(lines, lbl_a) != 1:
+            continue
+
+        # Find the goto B before label A
+        pre = la - 1
+        while pre > i and not lines[pre].strip():
+            pre -= 1
+        g2 = extract_goto(lines[pre])
+        if not g2 or g2[0] is not None or pre <= i:
+            continue
+        lbl_b = g2[1]
+
+        lb = find_label(lines, lbl_b, la + 1)
+        if lb < 0:
+            continue
+
+        else_code = lines[i + 1:pre]
+        then_code = lines[la + 1:lb]
+
+        if brace_depth_change(else_code) != 0 or brace_depth_change(then_code) != 0:
+            continue
+        if has_labels_targeted_from_outside(lines, i + 1, pre):
+            continue
+        if has_labels_targeted_from_outside(lines, la + 1, lb):
+            continue
+
+        ind = get_indent(lines[i])
+        new = list(lines)
+        replacement = [f'{ind}if ({cond}) {{']
+        replacement += indent_block(then_code)
+        replacement.append(f'{ind}}} else {{')
+        replacement += indent_block(else_code)
+        replacement.append(f'{ind}}}')
+        end = lb + 1 if label_use_count(lines, lbl_b) <= 1 else lb
+        new[i:end] = replacement
+        return new, tid, f'if-else {lbl_a}/{lbl_b} (line {i+1})'
+
+    return None
 
 
 def cleanup_labels(lines):
-    """Remove unused labels."""
     changed = True
     while changed:
         changed = False
         new = []
         for line in lines:
-            lbl = is_label_line(line)
+            lbl = is_label(line)
             if lbl and label_use_count(lines, lbl) == 0:
                 changed = True
                 continue
@@ -279,9 +357,7 @@ def cleanup_labels(lines):
         lines = new
     return lines
 
-
-def cleanup_empty_lines(lines):
-    """Remove consecutive blank lines."""
+def cleanup_empty(lines):
     new = []
     for line in lines:
         if not line.strip() and new and not new[-1].strip():
@@ -296,56 +372,44 @@ def process_file(filepath, ver):
 
     lines = original.split('\n')
     total_removed = 0
-    skip_set = set()  # Line indices that failed compilation after transform
+    skip_ids = set()
 
-    max_rounds = 500
+    max_rounds = 2000
     for round_num in range(max_rounds):
-        transforms = find_all_transformations(lines, skip_set)
-        if not transforms:
+        result = try_transforms(lines, skip_ids)
+        if result is None:
             break
 
-        applied = False
-        for priority, line_idx, make_func, desc in transforms:
-            new_lines = make_func()
+        new_lines, tid, desc = result
+        new_text = '\n'.join(new_lines)
+        old_count = count_gotos('\n'.join(lines))
+        new_count = count_gotos(new_text)
 
-            old_count = count_gotos_text('\n'.join(lines))
-            new_count = count_gotos_text('\n'.join(new_lines))
+        if new_count >= old_count:
+            skip_ids.add(tid)
+            continue
 
-            if new_count >= old_count:
-                skip_set.add(line_idx)
-                continue
+        with open(filepath, 'w') as f:
+            f.write(new_text)
 
-            # Test compilation
-            new_text = '\n'.join(new_lines)
+        if test_compile(filepath, ver):
+            removed = old_count - new_count
+            total_removed += removed
+            lines = new_lines
+            skip_ids.clear()  # Line numbers shifted, clear skip set
+        else:
+            # Revert and skip this transform
             with open(filepath, 'w') as f:
-                f.write(new_text)
+                f.write('\n'.join(lines))
+            skip_ids.add(tid)
 
-            if test_compile(filepath, ver):
-                removed = old_count - new_count
-                total_removed += removed
-                lines = new_lines
-                # Clear skip_set since line numbers changed
-                skip_set.clear()
-                applied = True
-                break
-            else:
-                # Revert
-                with open(filepath, 'w') as f:
-                    f.write('\n'.join(lines))
-                skip_set.add(line_idx)
-                continue
-
-        if not applied:
-            break
-
-    # Final cleanup: remove unused labels, empty lines
+    # Cleanup
     lines = cleanup_labels(lines)
-    lines = cleanup_empty_lines(lines)
-    final_text = '\n'.join(lines)
+    lines = cleanup_empty(lines)
+    final = '\n'.join(lines)
     with open(filepath, 'w') as f:
-        f.write(final_text)
+        f.write(final)
 
-    # Verify final state compiles
     if not test_compile(filepath, ver):
         with open(filepath, 'w') as f:
             f.write(original)
@@ -388,10 +452,11 @@ def main():
                     if fp in BROKEN:
                         continue
                     with open(fp, 'r', errors='ignore') as f:
-                        gotos = count_gotos_text(f.read())
+                        gotos = count_gotos(f.read())
                     if gotos > 0 and fp in cmap:
                         targets.append(fp)
-        targets.sort(key=lambda fp: count_gotos_text(open(fp, 'r', errors='ignore').read()))
+        # Sort smallest first for faster initial results
+        targets.sort(key=lambda fp: count_gotos(open(fp, 'r', errors='ignore').read()))
 
     grand_total = 0
     for fp in targets:
@@ -399,23 +464,24 @@ def main():
         if not ver:
             continue
         if not test_compile(fp, ver):
-            with open(fp, 'r', errors='ignore') as f:
-                before = count_gotos_text(f.read())
-            print(f"SKIP (broken): {fp} ({before} gotos)", flush=True)
+            print(f"SKIP (broken): {fp}", flush=True)
             continue
 
         with open(fp, 'r', errors='ignore') as f:
-            before = count_gotos_text(f.read())
+            before = count_gotos(f.read())
+
         removed = process_file(fp, ver)
+
         with open(fp, 'r', errors='ignore') as f:
-            after = count_gotos_text(f.read())
+            after = count_gotos(f.read())
+
         if removed > 0:
             grand_total += removed
-            print(f"OK  {fp}: {before} -> {after} (-{removed})", flush=True)
+            print(f"OK  {fp}: {before} -> {after} (-{removed}) [total: {grand_total}]", flush=True)
         else:
             print(f"---  {fp}: {before} (no safe transforms)", flush=True)
 
-    print(f"\nTotal removed: {grand_total}", flush=True)
+    print(f"\nGrand total removed: {grand_total}", flush=True)
 
 
 if __name__ == '__main__':

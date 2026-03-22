@@ -368,13 +368,14 @@ void fn_800AA4D4(void) {
                 if ((s32)r4 == 0x300) goto L_800AA5FC;
                 goto L_800AA5FC;
             }
-            if ((s32)r4 == 0x600) goto L_800AA564;
-            if ((s32)r4 < 0x600) {
-                if ((s32)r4 == 0x500) goto L_800AA564;
+            if ((s32)r4 != 0x600) {
+                if ((s32)r4 < 0x600) {
+                    if ((s32)r4 == 0x500) goto L_800AA564;
+                    goto L_800AA5FC;
+                }
+                if ((s32)r4 == 0x700) goto L_800AA564;
                 goto L_800AA5FC;
             }
-            if ((s32)r4 == 0x700) goto L_800AA564;
-            goto L_800AA5FC;
         L_800AA564:
             r4 = *(u8*)((u8*)r31 + 0x6);
             /* clrrwi r4, r4, 4 */;
@@ -1913,13 +1914,14 @@ void fn_800AB8FC(void) {
                     if ((s32)tmp == 0x300) goto L_800ABA84;
                     goto L_800ABB08;
                 }
-                if ((s32)tmp == 0x600) goto L_800AB98C;
-                if ((s32)tmp < 0x600) {
-                    if ((s32)tmp == 0x500) goto L_800AB98C;
+                if ((s32)tmp != 0x600) {
+                    if ((s32)tmp < 0x600) {
+                        if ((s32)tmp == 0x500) goto L_800AB98C;
+                        goto L_800ABB08;
+                    }
+                    if ((s32)tmp == 0x700) goto L_800AB98C;
                     goto L_800ABB08;
                 }
-                if ((s32)tmp == 0x700) goto L_800AB98C;
-                goto L_800ABB08;
             L_800AB98C:
                 tmp = *(u32*)((u8*)r5 + 0x4);
                 tmp = (u32)tmp >> 24;
@@ -2314,4 +2316,3 @@ void fn_800ABEFC(u32 retraceCount, OSContext* currentCtx) {
         OSSetCurrentContext(currentCtx);
     }
 }
-
