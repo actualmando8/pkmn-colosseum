@@ -233,6 +233,7 @@ void floorUpdateFieldCamera(void) {
     f26 = *(f64*)(sp + 0x40);
     return;
 }
+}
 
 /* ==================================================================
  * fn_8012640C -- Field transition state machine
@@ -1385,8 +1386,8 @@ do {
         fn_8011CE44();
         if ((u32)r3 <= (u32)r31) {
             r29 = r29 + 0x1;
+        }
 } while ((s32)r29 < (s32)0x65);
-    }
     r0 = r0 & 0xFF;
 
     r3 = r0 & 0xFF;
@@ -4099,6 +4100,13 @@ void GSfield_ProcessTriggers(void) {
     /* psq_l f28, 0xe8((u32)sp), 0, qr0 */;
     f28 = *(f64*)(sp + 0xE0);
     return;
+}
+}
+}
+}
+}
+}
+}
 }
 
 /* ==================================================================
