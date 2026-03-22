@@ -2006,24 +2006,26 @@ s32 fn_8008102C(void) {
         r3 = *(u32*)((u8*)r3 + 0x0);
         tmp = *(u8*)((u8*)r3 + 0x5B);
         tmp = (s8)tmp;
-        if ((s32)tmp == (s32)r5) {
-            tmp = 0x1;
-            goto L_80081B30;
-        }
-        tmp = *(u8*)((u8*)r3 + 0x5C);
-        tmp = (s8)tmp;
-        if ((s32)tmp == (s32)r5) {
-            tmp = 0x1;
-            goto L_80081B30;
-        }
-        tmp = *(u8*)((u8*)r3 + 0x5D);
-        tmp = (s8)tmp;
-        if ((s32)tmp == (s32)r5) {
-            tmp = 0x1;
-            goto L_80081B30;
-        }
-        tmp = 0x0;
-    L_80081B30:
+        do {
+            if ((s32)tmp == (s32)r5) {
+                tmp = 0x1;
+                break;
+            }
+            tmp = *(u8*)((u8*)r3 + 0x5C);
+            tmp = (s8)tmp;
+            if ((s32)tmp == (s32)r5) {
+                tmp = 0x1;
+                break;
+            }
+            tmp = *(u8*)((u8*)r3 + 0x5D);
+            tmp = (s8)tmp;
+            if ((s32)tmp == (s32)r5) {
+                tmp = 0x1;
+                break;
+            }
+            tmp = 0x0;
+        } while (0);
+
         tmp = tmp & 0xFF;
         if (tmp == 0) { r3 = 0x1; return; }
         tmp = r6 & 0xFFFF;

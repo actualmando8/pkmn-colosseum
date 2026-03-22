@@ -432,21 +432,23 @@ L_8003154C:
         r3 = r29;
         fn_8001DA60();
         tmp = r3 & 0xFF;
-        if ((s32)tmp != 1) {
-            if ((s32)tmp < 1) {
-                if ((s32)tmp < 0) {
+        do {
+            if ((s32)tmp != 1) {
+                if ((s32)tmp < 1) {
+                    if ((s32)tmp < 0) {
+                        goto L_800315B0;
+                    }
                     goto L_800315B0;
-                }
-                goto L_800315B0;
-                }
-            r28 = 0xd67;
-            goto L_800315B4;
-        }
-        r28 = 0xd68;
-        goto L_800315B4;
-    L_800315B0:
-        r28 = 0x0;
-    L_800315B4:
+                    }
+                r28 = 0xd67;
+                break;
+            }
+            r28 = 0xd68;
+            break;
+        L_800315B0:
+            r28 = 0x0;
+        } while (0);
+
         r3 = r29;
         fn_8011E8DC();
         tmp = r3 & 0xFF;
@@ -1597,23 +1599,25 @@ void fn_8003258C(void) {
         tmp = 0x0;
         *(u8*)lbl_8047A44A = tmp;
         if (r4 < 0x1e) {
-            if (tmp <= 0x12) {
-                r3 = (u32)jumptable_802E4FE0;
-                tmp = tmp << 2;
-                r3 = (u32)jumptable_802E4FE0;
-                tmp = *(u32*)(r3 + tmp);
-                ctr_fn = (void(*)(void))tmp;
+            do {
+                if (tmp <= 0x12) {
+                    r3 = (u32)jumptable_802E4FE0;
+                    tmp = tmp << 2;
+                    r3 = (u32)jumptable_802E4FE0;
+                    tmp = *(u32*)(r3 + tmp);
+                    ctr_fn = (void(*)(void))tmp;
+                    r31 = 0x258;
+                    break;
+                    r31 = 0x4b0;
+                    break;
+                    r31 = 0x960;
+                    break;
+                    r31 = 0x12c0;
+                    break;
+                }
                 r31 = 0x258;
-                goto L_8003264C;
-                r31 = 0x4b0;
-                goto L_8003264C;
-                r31 = 0x960;
-                goto L_8003264C;
-                r31 = 0x12c0;
-                goto L_8003264C;
-            }
-            r31 = 0x258;
-        L_8003264C:
+            } while (0);
+
             r3 = 0x3cc;
             r4 = 0x0;
             r5 = 0x0;

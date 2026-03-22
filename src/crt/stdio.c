@@ -2029,23 +2029,23 @@ void fn_800C5A58(void) {
         if ((s32)r5 == 0x24) goto L_800C71B4;
         tmp = (s8)r3;
         if ((s32)tmp < 5) goto L_800C71B4;
-        if ((s32)tmp > 5) goto L_800C7060;
-        r3 = r6 + 0x1;
-        while (1) {
-            r4 = *(u8*)((u8*)r3 + 0x0);
-            tmp = (s8)r4;
-            if ((s32)tmp == 0x30) break;
-            tmp = (s8)r4;
-            if ((s32)tmp != 0x30) break;
-            r3 = r3 + 0x1;
+        if ((s32)tmp <= 5) {
+            r3 = r6 + 0x1;
+            while (1) {
+                r4 = *(u8*)((u8*)r3 + 0x0);
+                tmp = (s8)r4;
+                if ((s32)tmp == 0x30) break;
+                tmp = (s8)r4;
+                if ((s32)tmp != 0x30) break;
+                r3 = r3 + 0x1;
 
 
+            }
+            r3 = (u32)sp + 0x38;
+            tmp = *(u8*)(r3 + r5);
+            tmp = tmp & 0x1;
+            if ((s32)tmp == 0x30) goto L_800C71B4;
         }
-        r3 = (u32)sp + 0x38;
-        tmp = *(u8*)(r3 + r5);
-        tmp = tmp & 0x1;
-        if ((s32)tmp == 0x30) goto L_800C71B4;
-    L_800C7060:
         r3 = *(u8*)(sp + 0x38);
         r5 = (u32)sp + 0x39;
         tmp = 0x0;
@@ -2095,23 +2095,23 @@ void fn_800C5A58(void) {
     if ((s32)r5 == 0x24) goto L_800C71B4;
     tmp = (s8)r3;
     if ((s32)tmp < 5) goto L_800C71B4;
-    if ((s32)tmp > 5) goto L_800C715C;
-    r3 = r6 + 0x1;
-    while (1) {
-        r4 = *(u8*)((u8*)r3 + 0x0);
-        tmp = (s8)r4;
-        if ((s32)tmp == 0x30) break;
-        tmp = (s8)r4;
-        if ((s32)tmp != 0x30) break;
-        r3 = r3 + 0x1;
+    if ((s32)tmp <= 5) {
+        r3 = r6 + 0x1;
+        while (1) {
+            r4 = *(u8*)((u8*)r3 + 0x0);
+            tmp = (s8)r4;
+            if ((s32)tmp == 0x30) break;
+            tmp = (s8)r4;
+            if ((s32)tmp != 0x30) break;
+            r3 = r3 + 0x1;
 
 
+        }
+        r3 = (u32)sp + 0x38;
+        tmp = *(u8*)(r3 + r5);
+        tmp = tmp & 0x1;
+        if ((s32)tmp == 0x30) goto L_800C71B4;
     }
-    r3 = (u32)sp + 0x38;
-    tmp = *(u8*)(r3 + r5);
-    tmp = tmp & 0x1;
-    if ((s32)tmp == 0x30) goto L_800C71B4;
-L_800C715C:
     r3 = *(u8*)(sp + 0x38);
     r5 = (u32)sp + 0x39;
     tmp = 0x0;
