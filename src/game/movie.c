@@ -278,108 +278,117 @@ void moviePlayStaffRoll(void) {
 
         /* Step 4: Check game flags for special credits conditions */
         flagVal = (u8)fn_801902E0(0x0476);
-        if ((flagVal & 0xFF) != 1) {
-            goto openMovie;
-        }
+        if ((flagVal & 0xFF) == 1) {
 
-        /* Set post-game flag */
-        fn_80190528(0x0478);
+            /* Set post-game flag */
+            fn_80190528(0x0478);
 
-        /* Step 5: Set up battle/effect state for credits scene */
-        effectCtx = fn_80129280(0, 1);
-        fn_80135030(effectCtx, 5, 2);
-        fn_80135030(effectCtx, 7, 1);
-        fn_80135030(effectCtx, 8, 1);
+            /* Step 5: Set up battle/effect state for credits scene */
+            effectCtx = fn_80129280(0, 1);
+            fn_80135030(effectCtx, 5, 2);
+            fn_80135030(effectCtx, 7, 1);
+            fn_80135030(effectCtx, 8, 1);
 
-        fn_8012A450(0, 0x18, 1);
+            fn_8012A450(0, 0x18, 1);
 
-        savedCtx = fn_801D036C();
+            savedCtx = fn_801D036C();
 
-        effectCtx2 = fn_80129280(0, 0);
+            effectCtx2 = fn_80129280(0, 0);
 
-        /* Copy battle state data (0x3BFA iterations) */
-        /* This is a large memcpy-like block transfer in the original assembly,
-         * copying the entire battle context state. Simplified here. */
-        {
-            u32* src = (u32*)((u8*)savedCtx - 4);
-            u32* dst = (u32*)((u8*)effectCtx2 - 4);
-            u32 count;
-            for (count = 0; count < 0x3BFA; count++) {
-                u32 val1 = src[1];
-                u32 val2 = src[2];
-                dst[1] = val1;
-                dst[2] = val2;
-                src += 2;
-                dst += 2;
-            }
-        }
-
-        /* Load floor/transition for credits */
-        fn_80106D3C(2, 0x444C, 1, 0);
-
-        /* Poll input: wait for button press or timeout */
-        inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
-
-        if (inputResult != 0) {
-            goto cleanup;
-        }
-
-        /* Check for extended credits (special pokemon conditions) */
-        {
-            u32 battleMode;
-            void* queryResult;
-
-            battleMode = (u32)fn_801D0748(3, 2, 0);
-            if (battleMode != 3) {
-                goto postCheck;
-            }
-
-            queryResult = (void*)fn_80135168(effectCtx, 4);
-            if (queryResult == NULL) {
-                goto postCheck;
-            }
-
-            /* Check if special pokemon pair matches */
+            /* Copy battle state data (0x3BFA iterations) */
+            /* This is a large memcpy-like block transfer in the original assembly,
+             * copying the entire battle context state. Simplified here. */
             {
-                void* pairA;
-                void* pairB;
+                u32* src = (u32*)((u8*)savedCtx - 4);
+                u32* dst = (u32*)((u8*)effectCtx2 - 4);
+                u32 count;
+                for (count = 0; count < 0x3BFA; count++) {
+                    u32 val1 = src[1];
+                    u32 val2 = src[2];
+                    dst[1] = val1;
+                    dst[2] = val2;
+                    src += 2;
+                    dst += 2;
+                }
+            }
 
-                effectCtx2 = fn_80129280((u32)savedCtx, 2);
-                pairA = (void*)fn_8012A5B0(2, 0, 0);
-                pairB = (void*)fn_8012A5B0(0, 2, 0);
+            /* Load floor/transition for credits */
+            fn_80106D3C(2, 0x444C, 1, 0);
 
-                if (pairA != pairB) {
-                    queryResult = (void*)fn_80135168(savedCtx, 4);
-                    if (queryResult != NULL) {
-                        goto postCheck;
+            /* Poll input: wait for button press or timeout */
+            inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
+
+            if (inputResult != 0) {
+                /* Early exit cleanup path */
+                fn_80165A20(1, 0, 0x7F);
+                fn_80190528(0x08D0);
+                fn_80113828(1, 0);
+                fn_8011288C(0, 0x59608);
+                return;
+            }
+
+            /* Check for extended credits (special pokemon conditions) */
+            {
+                u32 battleMode;
+                void* queryResult;
+                s32 doSpecialCredits = 0;
+
+                battleMode = (u32)fn_801D0748(3, 2, 0);
+                if (battleMode != 3) {
+                    /* skip extended credits */
+                } else {
+                    queryResult = (void*)fn_80135168(effectCtx, 4);
+                    if (queryResult == NULL) {
+                        /* skip extended credits */
+                    } else {
+                        /* Check if special pokemon pair matches */
+                        void* pairA;
+                        void* pairB;
+
+                        effectCtx2 = fn_80129280((u32)savedCtx, 2);
+                        pairA = (void*)fn_8012A5B0(2, 0, 0);
+                        pairB = (void*)fn_8012A5B0(0, 2, 0);
+
+                        if (pairA != pairB) {
+                            queryResult = (void*)fn_80135168(savedCtx, 4);
+                            if (queryResult != NULL) {
+                                /* skip extended credits */
+                                doSpecialCredits = 0;
+                            } else {
+                                doSpecialCredits = 1;
+                            }
+                        } else {
+                            doSpecialCredits = 1;
+                        }
+
+                        if (doSpecialCredits) {
+                            /* Load special credits floor */
+                            fn_80106D3C(2, 0x3C02, 1, 0);
+                            inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
+                        }
                     }
                 }
-
-                /* Load special credits floor */
-                fn_80106D3C(2, 0x3C02, 1, 0);
-                inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
             }
-        }
 
-    postCheck:
-        /* Restore original battle context */
-        effectCtx2 = fn_80129280(0, 0);
-        {
-            u32* src = (u32*)((u8*)savedCtx - 4);
-            u32* dst = (u32*)((u8*)effectCtx2 - 4);
-            u32 count;
-            for (count = 0; count < 0x3BFA; count++) {
-                u32 val1 = src[1];
-                u32 val2 = src[2];
-                dst[1] = val1;
-                dst[2] = val2;
-                src += 2;
-                dst += 2;
+            /* Restore original battle context */
+            effectCtx2 = fn_80129280(0, 0);
+            {
+                u32* src = (u32*)((u8*)savedCtx - 4);
+                u32* dst = (u32*)((u8*)effectCtx2 - 4);
+                u32 count;
+                for (count = 0; count < 0x3BFA; count++) {
+                    u32 val1 = src[1];
+                    u32 val2 = src[2];
+                    dst[1] = val1;
+                    dst[2] = val2;
+                    src += 2;
+                    dst += 2;
+                }
             }
+
         }
 
     }
-openMovie:
     /* Open the staff roll THP movie */
     fn_801E189C(lbl_80267000, 0);
 
@@ -387,14 +396,6 @@ openMovie:
     movieWaitForFinish();
 
     /* Stop sound and restore state */
-    fn_80165A20(1, 0, 0x7F);
-    fn_80190528(0x08D0);
-    fn_80113828(1, 0);
-    fn_8011288C(0, 0x59608);
-    return;
-
-cleanup:
-    /* Early exit cleanup path */
     fn_80165A20(1, 0, 0x7F);
     fn_80190528(0x08D0);
     fn_80113828(1, 0);

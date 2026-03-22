@@ -723,31 +723,25 @@ void sndWaveOpenByName(const char* filename, void* buffer, u32 bufSize) {
 
             if (alignedSize >= bufSize) {
                 fn_800DD970("ERROR: Over Sound Buffer\n");
-                goto release;
-            }
-
-            /* Allocate and read */
-            if (buffer == NULL) {
+            } else if (buffer == NULL) {
                 fn_800DD970("ERROR: Unable to allocate buffer\n");
-                goto release;
+            } else {
+                memset(buffer, 0xE0, alignedSize); /* fill with silence pattern */
+
+                if (fn_80167ED0(fileHandle, buffer, alignedSize, 0) <= 0) {
+                    fn_800DD970("ERROR: Failed to read data from '%s'\n", filename);
+                } else {
+                    /* success path */
+                    fn_80167E64(fileHandle);
+                    return;
+                }
             }
-
-            memset(buffer, 0xE0, alignedSize); /* fill with silence pattern */
-
-            if (fn_80167ED0(fileHandle, buffer, alignedSize, 0) <= 0) {
-                fn_800DD970("ERROR: Failed to read data from '%s'\n", filename);
-                goto release;
-            }
-
-            goto cleanup; /* success path falls through */
 
         }
-    release:
         fn_80167E64(fileHandle); /* release stream handle */
         return;
 
     }
-cleanup:
     fn_80167E64(fileHandle);
 }
 
