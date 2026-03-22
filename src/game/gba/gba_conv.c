@@ -175,12 +175,11 @@ s32 fn_80083AF4(void) {
             if ((s32)r0 > 0x6) break;
             r0 = *(u8*)((u8*)r3 + 0x1D);
             r0 = (s8)r0;
-            if ((s32)r0 > 0x5) {
-            } while (0);
+            if ((s32)r0 > 0x5) break;
             r0 = 0x0;
             *(u16*)((u8*)r3 + 0x0) = r0;
             break;
-            }
+        } while (0);
         if ((s32)r7 == (s32)r31) {
         }
         r4 = *(u8*)((u8*)r3 + 0x1C);
@@ -237,12 +236,11 @@ s32 fn_80083BF8(void) {
             if ((s32)r4 > 6) break;
             tmp = *(u8*)((u8*)r3 + 0x1D);
             tmp = (s8)tmp;
-            if ((s32)tmp > 5) {
-            } while (0);
+            if ((s32)tmp > 5) break;
             tmp = 0x0;
             *(u16*)((u8*)r3 + 0x0) = tmp;
             break;
-            }
+        } while (0);
         tmp = r4 * tmp;
         r7 = r7 + 0x1;
         r4 = tmp << 4;
@@ -4357,74 +4355,76 @@ s32 fn_80087AE8(void) {
     r28 = r26 & 0x00000002;
     r27 = r26 & 0x1;
     r26 = r26 & 0x00000004;
-L_80087B3C:
-    r3 = 0x10c;
-    ((void(*)(void))fn_80102620)();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        ((void(*)(void))fn_800F0308)();
-        goto L_80087B3C;
-    }
-    if ((s32)r28 != 0) {
-        ((void(*)(void))fn_80105624)();
-        tmp = *(u16*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x00000020;
-        if ((s32)tmp != 0) {
-            tmp = 0x2;
+while (1) {
+        r3 = 0x10c;
+        ((void(*)(void))fn_80102620)();
+        tmp = r3 & 0xFF;
+        if (tmp != 0) {
+            ((void(*)(void))fn_800F0308)();
+            continue;
+        }
+        if ((s32)r28 != 0) {
+            ((void(*)(void))fn_80105624)();
+            tmp = *(u16*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x00000020;
+            if ((s32)tmp != 0) {
+                tmp = 0x2;
+                r3 = 0x0;
+                *(u32*)((u8*)r30 + 0x28) = tmp;
+                return;
+        }
+        }
+        tmp = *(u32*)((u8*)r30 + 0x28);
+        if (tmp == 8) {
             r3 = 0x0;
-            *(u32*)((u8*)r30 + 0x28) = tmp;
-            return;
-    }
-    }
-    tmp = *(u32*)((u8*)r30 + 0x28);
-    if (tmp == 8) {
-        r3 = 0x0;
-        return;
-    }
-    if ((s32)r27 != 0) {
-        ((void(*)(void))fn_80106934)();
-        r29 = r3;
-        tmp = (s8)r29;
-        if ((s32)tmp == 0) {
-            tmp = 0x1;
-            r3 = 0x1;
-            *(u32*)((u8*)r30 + 0x28) = tmp;
             return;
         }
-        ((void(*)(void))fn_80105624)();
-        tmp = *(u16*)((u8*)r3 + 0x4);
-        tmp = tmp & 0x00000010;
-        if ((s32)tmp != 0) {
+        if ((s32)r27 != 0) {
+            ((void(*)(void))fn_80106934)();
+            r29 = r3;
             tmp = (s8)r29;
-            if ((s32)tmp == (s32)-0x1) {
+            if ((s32)tmp == 0) {
                 tmp = 0x1;
                 r3 = 0x1;
                 *(u32*)((u8*)r30 + 0x28) = tmp;
                 return;
-    }
-    }
-    }
-    do {
-        if ((s32)r26 == 0) break;
-        r3 = *(u8*)((u8*)r30 + 0x21);
-        r3 = (s8)r3;
-        ((void(*)(void))fn_800D0F44)();
-        if (r3 == 0x80) break;
-        tmp = r31 & 0xFF;
-        if (tmp != 0) {
-            /* subis tmp, r3, 0x4 */;
-            if (tmp != 0) break;
-            tmp = 0x4;
-            r3 = 0x1;
-            *(u32*)((u8*)r30 + 0x28) = tmp;
-            return;
+            }
+            ((void(*)(void))fn_80105624)();
+            tmp = *(u16*)((u8*)r3 + 0x4);
+            tmp = tmp & 0x00000010;
+            if ((s32)tmp != 0) {
+                tmp = (s8)r29;
+                if ((s32)tmp == (s32)-0x1) {
+                    tmp = 0x1;
+                    r3 = 0x1;
+                    *(u32*)((u8*)r30 + 0x28) = tmp;
+                    return;
         }
-        /* subis tmp, r3, 0x4 */;
-        if (tmp == 0) break;
-        r31 = 0x1;
-    } while (0);
-    ((void(*)(void))fn_800F0308)();
-    goto L_80087B3C;
+        }
+        }
+        do {
+            if ((s32)r26 == 0) break;
+            r3 = *(u8*)((u8*)r30 + 0x21);
+            r3 = (s8)r3;
+            ((void(*)(void))fn_800D0F44)();
+            if (r3 == 0x80) break;
+            tmp = r31 & 0xFF;
+            if (tmp != 0) {
+                /* subis tmp, r3, 0x4 */;
+                if (tmp != 0) break;
+                tmp = 0x4;
+                r3 = 0x1;
+                *(u32*)((u8*)r30 + 0x28) = tmp;
+                return;
+            }
+            /* subis tmp, r3, 0x4 */;
+            if (tmp == 0) break;
+            r31 = 0x1;
+        } while (0);
+        ((void(*)(void))fn_800F0308)();
+        continue;
+    break;
+}
 
     return;
 }
