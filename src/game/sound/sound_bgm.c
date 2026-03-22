@@ -533,21 +533,23 @@ void sndSetMasterVolume(u32 volume, u32 panValue, BOOL applyBgm,
         /* Check isActive (bit 2) */
         if ((flags >> 3) & 1) {
             /* Apply filter based on code */
+            int skip = 0;
             if (code == SND_MASTER_BGM_ONLY) {
                 /* BGM only: skip if isBGM flag is set */
                 if ((flags >> 1) & 1) {
-                    goto next;
+                    skip = 1;
                 }
             } else if (code == SND_MASTER_SE_ONLY) {
                 /* SE only: skip if isBGM flag is NOT set */
                 if (!((flags >> 1) & 1)) {
-                    goto next;
+                    skip = 1;
                 }
             }
             /* Apply the volume change */
-            fn_80167408(i, volume);
+            if (!skip) {
+                fn_80167408(i, volume);
+            }
         }
-    next:
         offset += 0x0C;
     }
 

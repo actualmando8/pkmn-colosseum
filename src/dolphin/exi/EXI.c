@@ -249,11 +249,13 @@ BOOL EXISelect(s32 chan, u32 dev, u32 freq) {
         if (dev == 0) {
             if (!(exi->flags & 0x8)) {
                 if (!__EXIProbe(chan)) {
-                    goto fail;
+                    OSRestoreInterrupts(enabled);
+                    return FALSE;
                 }
             }
             if ((exi->flags & 0x10) && exi->devType != dev) {
-                goto fail;
+                OSRestoreInterrupts(enabled);
+                return FALSE;
             }
         }
     }
@@ -279,10 +281,6 @@ BOOL EXISelect(s32 chan, u32 dev, u32 freq) {
 
     OSRestoreInterrupts(enabled);
     return TRUE;
-
-fail:
-    OSRestoreInterrupts(enabled);
-    return FALSE;
 }
 
 /*

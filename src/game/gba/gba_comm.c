@@ -134,16 +134,14 @@ s32 gbaCommunication_Transfer1(s32 channel, void* pSrc, void* pSaveCtx) {
 
     /* Validate channel range (0-3) */
     if (channel < GBA_CHANNEL_MIN || channel > GBA_CHANNEL_MAX) {
-        result = 0;
-        goto check_result;
+        return 0;
     }
 
     /* Check if channel is already allocated */
     slotOffset = (u32)channel << 2; /* channel * 4 for array index */
     if (lbl_803FB328[channel] != NULL) {
         result = 1;
-        goto check_result;
-    }
+    } else {
 
     /* Allocate work buffer: 0x44A0 bytes, 32-byte aligned */
     workHandle = fn_800E2C04(GBA_WORK_SIZE, 0x20);

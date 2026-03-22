@@ -274,35 +274,36 @@ s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2,
         slotIndex = 0x0;
         return;
     }
-    if (resId != 1) goto L_80167218;
-    param3 = 0x0;
-    fn_800AE78C();
-callback = (void*)(u32)fn_80167298;
-    resId = slotIndex;
-    slotIndex = (u32)fn_80167298;
-    fn_80159ED0();
-slotIndex = (u32)callback;
-    fn_80167F28();
-    *(u32*)lbl_8047B0BC = slotIndex;
-    if (slotIndex == 0) {
+    if (resId == 1) {
+        param3 = 0x0;
+        fn_800AE78C();
+        callback = (void*)(u32)fn_80167298;
+        resId = slotIndex;
+        slotIndex = (u32)fn_80167298;
+        fn_80159ED0();
+        slotIndex = (u32)callback;
+        fn_80167F28();
+        *(u32*)lbl_8047B0BC = slotIndex;
+        if (slotIndex == 0) {
+            slotIndex = 0x0;
+            return;
+        }
+        *(u32*)lbl_8047B0B8 = param1;
+        fn_800AE78C();
+        fn_80167BB0();
+        *(u32*)lbl_8047B0C0 = slotIndex;
+        if (slotIndex == 0) {
+            slotIndex = *(u32*)lbl_8047B0BC;
+            fn_80167E64();
+            slotIndex = 0x0;
+            return;
+        }
+    } else {
+        param3 = (u32)callback;
         slotIndex = 0x0;
-        return;
+        resId = 0x0;
+        fn_80159ED0();
     }
-    *(u32*)lbl_8047B0B8 = param1;
-    fn_800AE78C();
-    fn_80167BB0();
-    *(u32*)lbl_8047B0C0 = slotIndex;
-    if (slotIndex != 0) goto L_80167228;
-    slotIndex = *(u32*)lbl_8047B0BC;
-    fn_80167E64();
-    slotIndex = 0x0;
-    return;
-L_80167218:
-param3 = (u32)callback;
-    slotIndex = 0x0;
-    resId = 0x0;
-    fn_80159ED0();
-L_80167228:
     resId = *(u16*)((u8*)r28 + 0x2);
     slotIndex = r27;
 callback = (void*)(u32)param3;

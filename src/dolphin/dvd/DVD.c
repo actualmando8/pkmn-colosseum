@@ -208,27 +208,16 @@ s32 DVDGetDriveStatus(void) {
 
     if (FatalErrorFlag) {
         result = -1;
-        goto done;
-    }
-
-    if (PausingFlag) {
+    } else if (PausingFlag) {
         result = 8;
-        goto done;
-    }
-
-    if (executing == NULL) {
+    } else if (executing == NULL) {
         result = 0;
-        goto done;
-    }
-
-    if (executing == &DummyCommandBlock) {
+    } else if (executing == &DummyCommandBlock) {
         result = 0;
-        goto done;
+    } else {
+        result = executing->state;
     }
 
-    result = executing->state;
-
-done:
     OSRestoreInterrupts(enabled);
     return result;
 }

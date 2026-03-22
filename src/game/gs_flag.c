@@ -293,39 +293,35 @@ void GSflagSet(s32 flagID) {
         entry = &defTable[currentID];
 
         /* Check if flag is enabled */
-        if (entry->enableByte == 0) {
-            goto phase1_next;
-        }
+        if (entry->enableByte != 0) {
+            /* Get the buffer for this flag's storage level */
+            typeAndWidth = entry->typeAndWidth;
+            buffer = GSflag_GetBuffer(typeAndWidth);
 
-        /* Get the buffer for this flag's storage level */
-        typeAndWidth = entry->typeAndWidth;
-        buffer = GSflag_GetBuffer(typeAndWidth);
+            if (buffer == NULL) {
+                fn_800DD970(sErrNotInit);
+            } else {
+                /* Extract bit width and offset */
+                bitWidth  = typeAndWidth & 0x3F;
+                bitOffset = entry->bitOffset;
 
-        if (buffer == NULL) {
-            fn_800DD970(sErrNotInit);
-            goto phase1_next;
-        }
+                /* The "value" for Phase 1 is the enableByte itself */
+                value = (u32)entry->enableByte;
 
-        /* Extract bit width and offset */
-        bitWidth  = typeAndWidth & 0x3F;
-        bitOffset = entry->bitOffset;
+                /* Validate bit width does not exceed maximum */
+                {
+                    u32 maxBits = 32 - __cntlzw(value);
+                    if (maxBits > bitWidth) {
+                        fn_800DD970(sErrOverflow, flagID, value, value, bitWidth, bitWidth);
+                        value &= gFlagBitMasks[bitWidth];
+                    }
+                }
 
-        /* The "value" for Phase 1 is the enableByte itself */
-        value = (u32)entry->enableByte;
-
-        /* Validate bit width does not exceed maximum */
-        {
-            u32 maxBits = 32 - __cntlzw(value);
-            if (maxBits > bitWidth) {
-                fn_800DD970(sErrOverflow, flagID, value, value, bitWidth, bitWidth);
-                value &= gFlagBitMasks[bitWidth];
+                /* Write the value into the bitfield */
+                GSflag_WriteBits(buffer, bitOffset, bitWidth, value);
             }
         }
 
-        /* Write the value into the bitfield */
-        GSflag_WriteBits(buffer, bitOffset, bitWidth, value);
-
-    phase1_next:
         /* Follow linked flag chain */
         linkedID = entry->linkedFlagID;
         currentID = linkedID;
@@ -338,57 +334,52 @@ void GSflagSet(s32 flagID) {
         entry = &defTable[currentID];
 
         /* Check if flag is enabled */
-        if (entry->enableByte == 0) {
-            goto phase2_next;
-        }
+        if (entry->enableByte != 0) {
+            /* Process this cascade flag similarly to Phase 1 */
+            typeAndWidth = entry->typeAndWidth;
 
-        /* Process this cascade flag similarly to Phase 1 */
-        typeAndWidth = entry->typeAndWidth;
+            /* Get event trigger buffer */
+            {
+                u32 evtIdx;
+                u32 levelOffset;
+                u32* evtBuffer;
+                evtIdx = (u32)entry->enableByte;
+                levelOffset = ((u32)(typeAndWidth >> 5) & 0x3) << 2;
+                evtBuffer = *(u32**)((u8*)gFlagEventTbl + levelOffset);
+                buffer = GSflag_GetBuffer(typeAndWidth);
+            }
 
-        /* Get event trigger buffer */
-        {
-            u32 evtIdx;
-            u32 levelOffset;
-            u32* evtBuffer;
-            evtIdx = (u32)entry->enableByte;
-            levelOffset = ((u32)(typeAndWidth >> 5) & 0x3) << 2;
-            evtBuffer = *(u32**)((u8*)gFlagEventTbl + levelOffset);
-            buffer = GSflag_GetBuffer(typeAndWidth);
-        }
+            if (buffer == NULL) {
+                fn_800DD970(sErrNotInit);
+            } else {
+                bitWidth  = typeAndWidth & 0x3F;
+                bitOffset = entry->bitOffset;
+                value = 0;  /* Cascade sets always write from the event buffer */
 
-        if (buffer == NULL) {
-            fn_800DD970(sErrNotInit);
-            goto phase2_next;
-        }
+                /* Validate and write */
+                {
+                    u32 maxBits = 32 - __cntlzw(value > 0 ? value : 1);
+                    if (maxBits > bitWidth) {
+                        fn_800DD970(sErrOverflow, flagID, value, value, bitWidth, bitWidth);
+                        value &= gFlagBitMasks[bitWidth];
+                    }
+                }
 
-        bitWidth  = typeAndWidth & 0x3F;
-        bitOffset = entry->bitOffset;
-        value = 0;  /* Cascade sets always write from the event buffer */
+                GSflag_WriteBits(buffer, bitOffset, bitWidth, value);
 
-        /* Validate and write */
-        {
-            u32 maxBits = 32 - __cntlzw(value > 0 ? value : 1);
-            if (maxBits > bitWidth) {
-                fn_800DD970(sErrOverflow, flagID, value, value, bitWidth, bitWidth);
-                value &= gFlagBitMasks[bitWidth];
+                /* Fire NPC event if trigger type is set */
+                if (entry->eventTrigType != 0) {
+                    u32  trigIdx = (u32)entry->eventTrigType << 2;
+                    u16  npcEvtID;
+
+                    npcEvtID = *(u16*)(gFlagNPCTbl + trigIdx + 2);
+                    fn_801299C8(0, npcEvtID, 1, -1);
+
+                    npcEvtID = *(u16*)(gFlagNPCTbl + trigIdx);
+                    fn_80129A78(0, npcEvtID, 1, -1);
+                }
             }
         }
-
-        GSflag_WriteBits(buffer, bitOffset, bitWidth, value);
-
-        /* Fire NPC event if trigger type is set */
-        if (entry->eventTrigType != 0) {
-            u32  trigIdx = (u32)entry->eventTrigType << 2;
-            u16  npcEvtID;
-
-            npcEvtID = *(u16*)(gFlagNPCTbl + trigIdx + 2);
-            fn_801299C8(0, npcEvtID, 1, -1);
-
-            npcEvtID = *(u16*)(gFlagNPCTbl + trigIdx);
-            fn_80129A78(0, npcEvtID, 1, -1);
-        }
-
-    phase2_next:
         /* Follow linked flag chain */
         linkedID = entry->linkedFlagID;
         currentID = linkedID;
