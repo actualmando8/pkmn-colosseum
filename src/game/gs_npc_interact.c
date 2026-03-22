@@ -1105,23 +1105,27 @@ void fn_80011EA4(void) {
         if ((s32)r6 < 0x9f) {
             if ((s32)r6 == 0x9a) goto L_80011FC0;
             if ((s32)r6 < 0x9a) {
-                if ((s32)r6 >= 0x99) goto L_80011FA8;
-                goto L_80011FC0;
+                if ((s32)r6 < 0x99) {
+                    goto L_80011FC0;
+                }
+                if ((s32)r6 < 0x9d) {
+                    goto L_80011F8C;
+                }
+                if ((s32)r6 != 0xa5) {
+                    if ((s32)r6 < 0xa5) {
             }
-            if ((s32)r6 >= 0x9d) goto L_80011FA8;
-            goto L_80011F8C;
+                }
+                if ((s32)r6 >= 0xa4) goto L_80011FA8;
+            }
+            goto L_80011FC0;
         }
-        if ((s32)r6 == 0xa5) goto L_80011FC0;
-        if ((s32)r6 >= 0xa5) goto L_80011F8C;
-        if ((s32)r6 >= 0xa4) goto L_80011FA8;
-        goto L_80011FC0;
-    }
-    if ((s32)r6 < 0x538) {
-        if ((s32)r6 < 0x534) {
-            if ((s32)r6 >= 0xaa) goto L_80011FC0;
-            goto L_80011FA8;
+        if ((s32)r6 < 0x538) {
+            if ((s32)r6 < 0x534) {
+                if ((s32)r6 >= 0xaa) goto L_80011FC0;
+                goto L_80011FA8;
+            }
+            if ((s32)r6 >= 0x536) goto L_80011FA8;
         }
-        if ((s32)r6 >= 0x536) goto L_80011FA8;
         goto L_80011F8C;
     }
     if ((s32)r6 < 0x53e) {
@@ -1148,13 +1152,15 @@ L_80011FA8:
 L_80011FC0:
 do {
     if ((s32)r6 < 0x534) {
-        if ((s32)r6 == 0xa4) goto L_80011FFC;
-        if ((s32)r6 >= 0xa4) break;
-        if ((s32)r6 == 0x99) goto L_80011FFC;
-        break;
-    }
-    if ((s32)r6 < 0x53c) {
-        if ((s32)r6 >= 0x538) break;
+        if ((s32)r6 != 0xa4) {
+            if ((s32)r6 >= 0xa4) break;
+            if ((s32)r6 != 0x99) {
+                break;
+            }
+            if ((s32)r6 < 0x53c) {
+                if ((s32)r6 >= 0x538) break;
+        }
+        }
         goto L_80011FFC;
     }
     if ((s32)r6 >= 0x540) break;
@@ -1180,44 +1186,45 @@ L_80011FFC:
                 if ((s32)tmp < 0x9f) {
                     if ((s32)tmp == 0x9a) goto L_8001215C;
                     if ((s32)tmp < 0x9a) return;
-                    if ((s32)tmp >= 0x9d) goto L_80012110;
-                    return;
+                    if ((s32)tmp < 0x9d) return;
+
                 }
                 if ((s32)tmp == 0xa1) goto L_80012170;
-                if ((s32)tmp >= 0xa1) goto L_800122C8;
-                return;
+                if ((s32)tmp < 0xa1) return;
+
             }
             if ((s32)tmp < 0xaa) {
                 if ((s32)tmp == 0xa5) goto L_8001215C;
                 if ((s32)tmp < 0xa5) return;
-                if ((s32)tmp >= 0xa8) goto L_80012110;
-                return;
+                if ((s32)tmp < 0xa8) return;
+
             }
             if ((s32)tmp == 0xac) goto L_80012170;
-            if ((s32)tmp >= 0xac) goto L_800122C8;
-            return;
+            if ((s32)tmp < 0xac) return;
+
         }
         if ((s32)tmp == 0x53a) goto L_800123A4;
         if ((s32)tmp < 0x53a) {
-            if ((s32)tmp == 0x535) goto L_80012680;
-            if ((s32)tmp < 0x535) {
-                if ((s32)tmp == 0x533) goto L_800123CC;
-                if ((s32)tmp >= 0x533) return;
-                if ((s32)tmp >= 0x532) goto L_800123A4;
-                return;
+            if ((s32)tmp != 0x535) {
+                if ((s32)tmp < 0x535) {
+                    if ((s32)tmp == 0x533) goto L_800123CC;
+                    if ((s32)tmp >= 0x533) return;
+                    if ((s32)tmp < 0x532) return;
+
+                }
+                if ((s32)tmp != 0x537) return;
+
             }
-            if ((s32)tmp == 0x537) goto L_80012758;
-            return;
-        }
-        if ((s32)tmp == 0x53e) return;
-        if ((s32)tmp < 0x53e) {
-            if ((s32)tmp == 0x53c) return;
+            if ((s32)tmp == 0x53e) return;
+            if ((s32)tmp < 0x53e) {
+                if ((s32)tmp == 0x53c) return;
+            }
             if ((s32)tmp >= 0x53c) goto L_80012680;
             goto L_800123CC;
         }
         if ((s32)tmp >= 0x540) return;
         goto L_80012758;
-    L_80012110:
+
         tmp = *(u8*)((u8*)r30 + 0x29);
         if (tmp != 2) return;
         r5 = *(u16*)((u8*)r31 + 0x6);
@@ -1310,7 +1317,7 @@ L_80011FFC:
         r6 = 0xcb;
         ((void(*)(void))fn_800FB680)();
         return;
-    L_800122C8:
+
         r4 = *(u8*)((u8*)r30 + 0x17);
         r3 = 0x34;
         ((void(*)(void))fn_80132A38)();

@@ -362,14 +362,15 @@ void fn_800AA4D4(void) {
                 if ((s32)r4 < 0x200) {
                     if ((s32)r4 != 0x100) {
                         if ((s32)r4 >= 0x100) goto L_800AA5FC;
-                        if ((s32)r4 == 0) goto L_800AA564;
+                        if ((s32)r4 != 0) {
+                            goto L_800AA5FC;
+                        }
+                        if ((s32)r4 == 0x300) goto L_800AA5FC;
                         goto L_800AA5FC;
                     }
-                    if ((s32)r4 == 0x300) goto L_800AA5FC;
-                    goto L_800AA5FC;
-                }
-                if ((s32)r4 != 0x600) {
-                    if ((s32)r4 < 0x600) {
+                    if ((s32)r4 != 0x600) {
+                        if ((s32)r4 < 0x600) {
+                        }
                         if ((s32)r4 == 0x500) goto L_800AA564;
                         goto L_800AA5FC;
                     }
@@ -805,8 +806,9 @@ void fn_800AA8D4(void) {
     tmp = r6 & 0x00100000;
     if (r5 != 0) {
         tmp = r6 & 0x00080000;
-        if (r5 != 0) goto L_800AAB7C;
-        tmp = r6 & 0x00040000;
+        if (r5 == 0) {
+            tmp = r6 & 0x00040000;
+        }
         if (r5 != 0) goto L_800AAB7C;
         tmp = r6 & 0x40000000;
         if (r5 != 0) {
@@ -1911,34 +1913,56 @@ void fn_800AB8FC(void) {
                 if ((s32)tmp < 0x200) {
                     if ((s32)tmp != 0x100) {
                         if ((s32)tmp >= 0x100) goto L_800ABB08;
-                        if ((s32)tmp == 0) goto L_800AB98C;
+                        if ((s32)tmp != 0) {
+                            goto L_800ABB08;
+                        }
+                        if ((s32)tmp != 0x300) {
+                            goto L_800ABB08;
+                        }
+                        if ((s32)tmp != 0x600) {
+                            if ((s32)tmp < 0x600) {
+                        }
+                            if ((s32)tmp == 0x500) goto L_800AB98C;
+                            goto L_800ABB08;
+                        }
+                        if ((s32)tmp == 0x700) goto L_800AB98C;
                         goto L_800ABB08;
                     }
-                    if ((s32)tmp == 0x300) goto L_800ABA84;
+                L_800AB98C:
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    tmp = (u32)tmp >> 24;
+                    tmp = (s8)tmp;
+                    *(u8*)((u8*)r4 + 0x4) = tmp;
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    tmp = (u32)tmp >> 16;
+                    tmp = (s8)tmp;
+                    *(u8*)((u8*)r4 + 0x5) = tmp;
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    tmp = ((tmp << 24) | ((u32)tmp >> 8)) & 0x000000F0;
+                    *(u8*)((u8*)r4 + 0x6) = tmp;
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    tmp = ((tmp << 28) | ((u32)tmp >> 4)) & 0x000000F0;
+                    *(u8*)((u8*)r4 + 0x7) = tmp;
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    tmp = tmp & 0x000000F0;
+                    *(u8*)((u8*)r4 + 0x8) = tmp;
+                    tmp = *(u32*)((u8*)r5 + 0x4);
+                    *(u8*)((u8*)r4 + 0x9) = tmp;
                     goto L_800ABB08;
-                }
-                if ((s32)tmp != 0x600) {
-                    if ((s32)tmp < 0x600) {
-                        if ((s32)tmp == 0x500) goto L_800AB98C;
-                        goto L_800ABB08;
-                    }
-                    if ((s32)tmp == 0x700) goto L_800AB98C;
-                    goto L_800ABB08;
-                }
-            L_800AB98C:
+                        }
                 tmp = *(u32*)((u8*)r5 + 0x4);
-                tmp = (u32)tmp >> 24;
+                tmp = ((tmp << 8) | ((u32)tmp >> 24)) & 0x000000F0;
                 tmp = (s8)tmp;
                 *(u8*)((u8*)r4 + 0x4) = tmp;
                 tmp = *(u32*)((u8*)r5 + 0x4);
-                tmp = (u32)tmp >> 16;
+                tmp = ((tmp << 12) | ((u32)tmp >> 20)) & 0x000000F0;
                 tmp = (s8)tmp;
                 *(u8*)((u8*)r4 + 0x5) = tmp;
                 tmp = *(u32*)((u8*)r5 + 0x4);
-                tmp = ((tmp << 24) | ((u32)tmp >> 8)) & 0x000000F0;
+                /* extrwi tmp, tmp, 8, 8 */;
                 *(u8*)((u8*)r4 + 0x6) = tmp;
                 tmp = *(u32*)((u8*)r5 + 0x4);
-                tmp = ((tmp << 28) | ((u32)tmp >> 4)) & 0x000000F0;
+                /* extrwi tmp, tmp, 8, 16 */;
                 *(u8*)((u8*)r4 + 0x7) = tmp;
                 tmp = *(u32*)((u8*)r5 + 0x4);
                 tmp = tmp & 0x000000F0;
@@ -1946,7 +1970,7 @@ void fn_800AB8FC(void) {
                 tmp = *(u32*)((u8*)r5 + 0x4);
                 *(u8*)((u8*)r4 + 0x9) = tmp;
                 goto L_800ABB08;
-                    }
+                }
             tmp = *(u32*)((u8*)r5 + 0x4);
             tmp = ((tmp << 8) | ((u32)tmp >> 24)) & 0x000000F0;
             tmp = (s8)tmp;
@@ -1956,39 +1980,36 @@ void fn_800AB8FC(void) {
             tmp = (s8)tmp;
             *(u8*)((u8*)r4 + 0x5) = tmp;
             tmp = *(u32*)((u8*)r5 + 0x4);
-            /* extrwi tmp, tmp, 8, 8 */;
+            tmp = ((tmp << 16) | ((u32)tmp >> 16)) & 0x000000F0;
             *(u8*)((u8*)r4 + 0x6) = tmp;
             tmp = *(u32*)((u8*)r5 + 0x4);
-            /* extrwi tmp, tmp, 8, 16 */;
+            tmp = ((tmp << 20) | ((u32)tmp >> 12)) & 0x000000F0;
             *(u8*)((u8*)r4 + 0x7) = tmp;
             tmp = *(u32*)((u8*)r5 + 0x4);
-            tmp = tmp & 0x000000F0;
+            /* extrwi tmp, tmp, 8, 16 */;
             *(u8*)((u8*)r4 + 0x8) = tmp;
             tmp = *(u32*)((u8*)r5 + 0x4);
             *(u8*)((u8*)r4 + 0x9) = tmp;
+                        } else {
+
+            r6 = *(u32*)((u8*)r5 + 0x4);
+            tmp = 0x0;
+            r6 = (u32)r6 >> 24;
+            r6 = (s8)r6;
+            *(u8*)((u8*)r4 + 0x4) = r6;
+            r6 = *(u32*)((u8*)r5 + 0x4);
+            r6 = (u32)r6 >> 16;
+            r6 = (s8)r6;
+            *(u8*)((u8*)r4 + 0x5) = r6;
+            r6 = *(u32*)((u8*)r5 + 0x4);
+            /* extrwi r6, r6, 8, 16 */;
+            *(u8*)((u8*)r4 + 0x6) = r6;
+            r5 = *(u32*)((u8*)r5 + 0x4);
+            *(u8*)((u8*)r4 + 0x7) = r5;
+            *(u8*)((u8*)r4 + 0x8) = tmp;
+            *(u8*)((u8*)r4 + 0x9) = tmp;
             goto L_800ABB08;
-            }
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        tmp = ((tmp << 8) | ((u32)tmp >> 24)) & 0x000000F0;
-        tmp = (s8)tmp;
-        *(u8*)((u8*)r4 + 0x4) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        tmp = ((tmp << 12) | ((u32)tmp >> 20)) & 0x000000F0;
-        tmp = (s8)tmp;
-        *(u8*)((u8*)r4 + 0x5) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        tmp = ((tmp << 16) | ((u32)tmp >> 16)) & 0x000000F0;
-        *(u8*)((u8*)r4 + 0x6) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        tmp = ((tmp << 20) | ((u32)tmp >> 12)) & 0x000000F0;
-        *(u8*)((u8*)r4 + 0x7) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        /* extrwi tmp, tmp, 8, 16 */;
-        *(u8*)((u8*)r4 + 0x8) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        *(u8*)((u8*)r4 + 0x9) = tmp;
-        goto L_800ABB08;
-    L_800ABA84:
+        }
         r6 = *(u32*)((u8*)r5 + 0x4);
         tmp = 0x0;
         r6 = (u32)r6 >> 24;
@@ -1998,31 +2019,14 @@ void fn_800AB8FC(void) {
         r6 = (u32)r6 >> 16;
         r6 = (s8)r6;
         *(u8*)((u8*)r4 + 0x5) = r6;
-        r6 = *(u32*)((u8*)r5 + 0x4);
-        /* extrwi r6, r6, 8, 16 */;
-        *(u8*)((u8*)r4 + 0x6) = r6;
-        r5 = *(u32*)((u8*)r5 + 0x4);
-        *(u8*)((u8*)r4 + 0x7) = r5;
+        *(u8*)((u8*)r4 + 0x6) = tmp;
+        *(u8*)((u8*)r4 + 0x7) = tmp;
+        tmp = *(u32*)((u8*)r5 + 0x4);
+        /* extrwi tmp, tmp, 8, 16 */;
         *(u8*)((u8*)r4 + 0x8) = tmp;
+        tmp = *(u32*)((u8*)r5 + 0x4);
         *(u8*)((u8*)r4 + 0x9) = tmp;
-        goto L_800ABB08;
-    }
-    r6 = *(u32*)((u8*)r5 + 0x4);
-    tmp = 0x0;
-    r6 = (u32)r6 >> 24;
-    r6 = (s8)r6;
-    *(u8*)((u8*)r4 + 0x4) = r6;
-    r6 = *(u32*)((u8*)r5 + 0x4);
-    r6 = (u32)r6 >> 16;
-    r6 = (s8)r6;
-    *(u8*)((u8*)r4 + 0x5) = r6;
-    *(u8*)((u8*)r4 + 0x6) = tmp;
-    *(u8*)((u8*)r4 + 0x7) = tmp;
-    tmp = *(u32*)((u8*)r5 + 0x4);
-    /* extrwi tmp, tmp, 8, 16 */;
-    *(u8*)((u8*)r4 + 0x8) = tmp;
-    tmp = *(u32*)((u8*)r5 + 0x4);
-    *(u8*)((u8*)r4 + 0x9) = tmp;
+                        }
 L_800ABB08:
 do {
     r6 = *(u8*)((u8*)r4 + 0x2);

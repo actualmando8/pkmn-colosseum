@@ -897,9 +897,10 @@ void GSscene_XFBCapture(u32 captureIndex) {
         tmp = 0x1;
 
         tmp = tmp & 0xFF;
-        if (tmp != 0) goto L_80178200;
-        tmp = 0x0;
-        *(u8*)((u8*)captureIndex + 0x1) = tmp;
+        if (tmp == 0) {
+            tmp = 0x0;
+            *(u8*)((u8*)captureIndex + 0x1) = tmp;
+        }
         goto L_80178200;
     }
     tmp = *(u8*)((u8*)r30 + 0x0);
@@ -913,29 +914,32 @@ void GSscene_XFBCapture(u32 captureIndex) {
         r4 = *(u32*)((u8*)r30 + 0x38);
         fn_800F9318();
         /* mr. r30, captureIndex */;
-        if (tmp == 8) goto L_80178200;
-        r4 = *(u32*)&lbl_80478C40;
-        r4 = r4 + 0x1c;
-        fn_800E3D98();
-        captureIndex = *(u32*)&lbl_80478C40;
-        r4 = *(u32*)((u8*)captureIndex + 0x3C);
-        if ((s32)r4 < 0) goto L_80178200;
-        captureIndex = r30;
-        fn_800EE150();
-        /* mr. r30, captureIndex */;
-        if ((s32)r4 == 0) goto L_80178200;
-        r4 = *(u32*)&lbl_80478C40;
-        r5 = 0x0;
-        r6 = 0x0;
-        r4 = r4 + 0x28;
-        fn_800EE3BC();
-        r4 = *(u32*)&lbl_80478C40;
-        captureIndex = r4 + 0x28;
-        r5 = r4 + 0x1c;
-        r4 = captureIndex;
-        fn_800E0168();
-        captureIndex = r30;
-        fn_800EE828();
+        if (tmp != 8) {
+            r4 = *(u32*)&lbl_80478C40;
+            r4 = r4 + 0x1c;
+            fn_800E3D98();
+            captureIndex = *(u32*)&lbl_80478C40;
+            r4 = *(u32*)((u8*)captureIndex + 0x3C);
+            if ((s32)r4 >= 0) {
+                captureIndex = r30;
+                fn_800EE150();
+                /* mr. r30, captureIndex */;
+                if ((s32)r4 != 0) {
+                    r4 = *(u32*)&lbl_80478C40;
+                    r5 = 0x0;
+                    r6 = 0x0;
+                    r4 = r4 + 0x28;
+                    fn_800EE3BC();
+                    r4 = *(u32*)&lbl_80478C40;
+                    captureIndex = r4 + 0x28;
+                    r5 = r4 + 0x1c;
+                    r4 = captureIndex;
+                    fn_800E0168();
+                    captureIndex = r30;
+                    fn_800EE828();
+        }
+        }
+        }
         goto L_80178200;
         captureIndex = *(u32*)((u8*)r30 + 0xD0);
         r4 = *(u32*)((u8*)r30 + 0xD4);

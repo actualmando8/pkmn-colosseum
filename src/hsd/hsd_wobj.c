@@ -1227,11 +1227,12 @@ while (1) {
                             if ((s32)tmp >= 0x36) goto L_8019315C;
                             goto L_8019308C;
                         }
-                        if ((s32)tmp == 0x3c) goto L_801924BC;
-                        if ((s32)tmp < 0x3c) {
-                            if ((s32)tmp == 0x3a) goto L_80193608;
-                            if ((s32)tmp >= 0x3a) goto L_8019365C;
-                            goto L_801935B4;
+                        if ((s32)tmp != 0x3c) {
+                            if ((s32)tmp < 0x3c) {
+                                if ((s32)tmp == 0x3a) goto L_80193608;
+                                if ((s32)tmp >= 0x3a) goto L_8019365C;
+                                goto L_801935B4;
+                            }
                         }
                         if ((s32)tmp == 0xff) goto L_801924BC;
                         goto L_80193710;

@@ -1225,28 +1225,29 @@ s32 fn_80080ED8(void) {
         r3 = 0x0;
         return;
     }
-    if (r3 != 0) goto L_80081010;
-    goto L_80080F34;
-do {
-        if (r3 >= 0x81) {
-            tmp = r3 & 0xFF;
-            if (tmp > 0x9f) {
-            }
-            tmp = r3 & 0xFF;
-            if (tmp >= 0xe0 && tmp <= 0xfc) {
-
+    if (r3 == 0) {
+        goto L_80080F34;
+    do {
+            if (r3 >= 0x81) {
+                tmp = r3 & 0xFF;
+                if (tmp > 0x9f) {
                 }
-            r4 = r4 + 0x2;
-            r5 = r5 + 0x2;
-            goto L_80080F34;
-            }
-        r4 = r4 + 0x1;
-        r5 = r5 + 0x1;
-    L_80080F34:
-        r3 = *(u8*)((u8*)r4 + 0x0);
-} while (r3 != 0);
-    r3 = r5;
-    return;
+                tmp = r3 & 0xFF;
+                if (tmp >= 0xe0 && tmp <= 0xfc) {
+
+                    }
+                r4 = r4 + 0x2;
+                r5 = r5 + 0x2;
+                goto L_80080F34;
+                }
+            r4 = r4 + 0x1;
+            r5 = r5 + 0x1;
+        L_80080F34:
+            r3 = *(u8*)((u8*)r4 + 0x0);
+    } while (r3 != 0);
+        r3 = r5;
+        return;
+    }
     goto L_80081010;
 do {
         if (r6 >= 0x81) {
@@ -2609,8 +2610,9 @@ s32 fn_8008102C(void) {
         return;
         if ((s32)r6 != 2) {
             if ((s32)r6 < 2) {
-                if ((s32)r6 == 0) goto L_80082420;
-                if ((s32)r6 >= 0) goto L_80082438;
+                if ((s32)r6 != 0) {
+                    if ((s32)r6 >= 0) goto L_80082438;
+                }
                 goto L_80082420;
             }
             if ((s32)r6 < 4) {

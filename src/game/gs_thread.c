@@ -971,9 +971,10 @@ void fn_800F0A74(void) {
                     if ((u32)r0 != (u32)0x0) continue;
                     r0 = *(u8*)((u8*)r3 + 0x15);
                     if ((u32)r0 != (u32)0x0) continue;
-                    if ((u32)r29 == (u32)0x0) goto L_800F0BA0;
-                    r0 = *(u32*)((u8*)r3 + 0xC);
-                    if ((u32)r0 != (u32)r30) continue;
+                    if ((u32)r29 != (u32)0x0) {
+                        r0 = *(u32*)((u8*)r3 + 0xC);
+                        if ((u32)r0 != (u32)r30) continue;
+                    }
                     goto L_800F0BA0;
 
                     r3 = *(u32*)((u8*)r3 + 0x4);
@@ -10479,9 +10480,10 @@ void fn_800FA444(void) {
                             }
 
             r0 = r26 & 0xFF;
-            if ((u32)r0 == (u32)0x0) goto L_800FA9A8;
-            f2 = *(f32*)((u8*)r29 + 0xC);
-            f0 = *(f32*)((u8*)r29 + 0x4);
+            if ((u32)r0 != (u32)0x0) {
+                f2 = *(f32*)((u8*)r29 + 0xC);
+                f0 = *(f32*)((u8*)r29 + 0x4);
+            }
             if (f2 != f0) goto L_800FA9A8;
             r3 = *(u8*)((u8*)r29 + 0x22);
             r0 = (0x4330 << 16);

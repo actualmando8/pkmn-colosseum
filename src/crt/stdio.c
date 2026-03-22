@@ -1986,8 +1986,9 @@ void fn_800C5A58(void) {
         *(u8*)(sp + 0x38) = r5;
         r3 = *(u8*)((u8*)r6 + 0x0);
         tmp = (s8)r3;
-        if ((s32)r5 == 0x24) goto L_800C71B4;
-        tmp = (s8)r3;
+        if ((s32)r5 != 0x24) {
+            tmp = (s8)r3;
+        }
         if ((s32)tmp < 5) goto L_800C71B4;
         if ((s32)tmp <= 5) {
             r3 = r6 + 0x1;

@@ -983,9 +983,10 @@ void fn_80031B4C(void) {
                         if ((s32)r26 < (s32)-0x1) {
                             goto L_800323E4;
                         }
-                        if ((s32)r26 >= 2) goto L_800323E4;
-                        tmp = 0x5;
-                        *(u32*)lbl_8047A42C = tmp;
+                        if ((s32)r26 < 2) {
+                            tmp = 0x5;
+                            *(u32*)lbl_8047A42C = tmp;
+                        }
                         goto L_800323E4;
                     }
                     tmp = 0x6;

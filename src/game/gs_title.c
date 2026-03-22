@@ -2318,9 +2318,10 @@ void fn_80025F84(void) {
         r29 = *(u32*)((u8*)r3 + 0xA4);
         r28 = *(u32*)((u8*)r3 + 0xA8);
         *(u32*)lbl_8047A394 = tmp;
-        if ((s32)tmp <= 9) goto L_80026198;
-        tmp = 0x0;
-        *(u32*)lbl_8047A394 = tmp;
+        if ((s32)tmp > 9) {
+            tmp = 0x0;
+            *(u32*)lbl_8047A394 = tmp;
+        }
         goto L_80026198;
     }
     r3 = *(u32*)lbl_8047A398;
