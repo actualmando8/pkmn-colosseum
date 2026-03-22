@@ -684,13 +684,13 @@ void fn_800CB2B4(void) {
             f1 = *(f64*)lbl_8047C5A8;
             f0 = *(f64*)lbl_8047C5B0;
             f1 = f1 + f2;
-            if (f1 <= f0) goto L_800CB414;
-            f1 = f0 + f2;
-            return;
+            if (f1 > f0) {
+                f1 = f0 + f2;
+                return;
+            }
+            r6 = 0x0;
         }
-        r6 = 0x0;
-    }
-L_800CB414:
+            }
     f4 = *(f64*)lbl_8047C5D8;
     f6 = f5 * f5;
     f3 = *(f64*)lbl_8047C5D0;

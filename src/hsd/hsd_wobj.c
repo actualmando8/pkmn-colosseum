@@ -1525,6 +1525,7 @@ while (1) {
                 f1 = *(f32*)lbl_80478AC0;
 
             } else {
+            do {
                 *(f32*)(sp + 0x8) = f1;
                 tmp = 0x7F800000;
                 r3 = r3 & 0x7F800000;
@@ -1536,21 +1537,21 @@ while (1) {
                     tmp = tmp & 0x7FFFFF;
                     if ((s32)r3 != 0) {
                         tmp = 0x1;
-                        goto L_80192954;
+                        break;
                     }
                     tmp = 0x2;
-                    goto L_80192954;
+                    break;
                     }
                 tmp = tmp & 0x7FFFFF;
                 if ((s32)r3 != 0) {
                     tmp = 0x5;
-                    goto L_80192954;
+                    break;
                 }
                 tmp = 0x3;
-                goto L_80192954;
+                break;
             L_80192950:
                 tmp = 0x4;
-            L_80192954:
+            } while (0);
                 if ((s32)tmp == 1) {
                     r3 = (u32)lbl_80478AC0;
                     f1 = *(f32*)lbl_80478AC0;
