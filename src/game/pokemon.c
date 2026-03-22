@@ -3426,10 +3426,10 @@ void fn_801F26A8(void) {
             return;
     }
     }
-    if ((u32)r30 != (u32)0x0) goto L_801F26F8;
-    r29 = 0x0;
-    goto L_801F2738;
-    L_801F26F8: ;
+    if ((u32)r30 == (u32)0x0) {
+        r29 = 0x0;
+        goto L_801F2738;
+    }
     r0 = *(u32*)((u8*)r28 + 0x8);
     if ((s32)r0 == (s32)0x1) {
         r4 = r30;
@@ -4648,10 +4648,10 @@ void fn_801F34EC(void) {
         r3 = 0x1;
         return;
     }
-    if ((u32)r30 != (u32)0x0) goto L_801F352C;
-    r29 = 0x0;
-    goto L_801F356C;
-    L_801F352C: ;
+    if ((u32)r30 == (u32)0x0) {
+        r29 = 0x0;
+        goto L_801F356C;
+    }
     r0 = *(u32*)((u8*)r28 + 0x8);
     if ((s32)r0 == (s32)0x1) {
         r4 = r30;
@@ -4767,10 +4767,10 @@ void fn_801F3678(void) {
         r3 = 0x1;
         return;
     }
-    if ((u32)r30 != (u32)0x0) goto L_801F36B8;
-    r29 = 0x0;
-    goto L_801F36F8;
-    L_801F36B8: ;
+    if ((u32)r30 == (u32)0x0) {
+        r29 = 0x0;
+        goto L_801F36F8;
+    }
     r0 = *(u32*)((u8*)r28 + 0x8);
     if ((s32)r0 == (s32)0x1) {
         r4 = r30;

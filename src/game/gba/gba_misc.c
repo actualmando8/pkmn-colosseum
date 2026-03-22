@@ -1269,52 +1269,52 @@ L_8008A36C:
     tmp = r3 | tmp;
     tmp = tmp & 0xFFFF;
     *(u16*)(sp + 0x48) = tmp;
-    if (r4 != 0x181) goto L_8008A528;
-    r3 = r22;
-    r4 = 0x0;
-    fn_801FD614();
-    tmp = r3 & 0xFFFF;
-    if (tmp == 0xa) {
-        r4 = 0x1;
-
-    } else if (tmp == 0xb) {
-    if (tmp != 0xb) goto L_8008A4BC;
-        r4 = 0x2;
-
-    } else if (tmp == 0xf) {
-    if (tmp != 0xf) goto L_8008A4CC;
-        r4 = 0x3;
-
-    } else {
+    if (r4 == 0x181) {
+        r3 = r22;
         r4 = 0x0;
-    }
-    tmp = r3 & 0xFFFF;
-    if (tmp == 0xa) {
-        tmp = 0x1;
+        fn_801FD614();
+        tmp = r3 & 0xFFFF;
+        if (tmp == 0xa) {
+            r4 = 0x1;
 
-    } else if (tmp == 0xb) {
-    if (tmp != 0xb) goto L_8008A4F4;
-        tmp = 0x2;
+        } else if (tmp == 0xb) {
+        if (tmp != 0xb) goto L_8008A4BC;
+            r4 = 0x2;
 
-    } else if (tmp == 0xf) {
-    if (tmp != 0xf) goto L_8008A504;
-        tmp = 0x3;
+        } else if (tmp == 0xf) {
+        if (tmp != 0xf) goto L_8008A4CC;
+            r4 = 0x3;
 
+        } else {
+            r4 = 0x0;
+        }
+        tmp = r3 & 0xFFFF;
+        if (tmp == 0xa) {
+            tmp = 0x1;
+
+        } else if (tmp == 0xb) {
+        if (tmp != 0xb) goto L_8008A4F4;
+            tmp = 0x2;
+
+        } else if (tmp == 0xf) {
+        if (tmp != 0xf) goto L_8008A504;
+            tmp = 0x3;
+
+        } else {
+            tmp = 0x0;
+        }
+        r3 = tmp & 0xFFFF;
+        tmp = r4 & 0xFFFF;
+        r3 = r3 << 8;
+        tmp = (s32)tmp >> 8;
+        tmp = r3 | tmp;
+        tmp = tmp & 0xFFFF;
+        *(u16*)(sp + 0x4A) = tmp;
     } else {
+
         tmp = 0x0;
+        *(u16*)(sp + 0x4A) = tmp;
     }
-    r3 = tmp & 0xFFFF;
-    tmp = r4 & 0xFFFF;
-    r3 = r3 << 8;
-    tmp = (s32)tmp >> 8;
-    tmp = r3 | tmp;
-    tmp = tmp & 0xFFFF;
-    *(u16*)(sp + 0x4A) = tmp;
-    goto L_8008A530;
-L_8008A528:
-    tmp = 0x0;
-    *(u16*)(sp + 0x4A) = tmp;
-L_8008A530:
     if ((s32)tmp == 0) goto L_8008A548;
     r3 = 0x0;
     r6 = 0x0;
