@@ -1796,34 +1796,34 @@ L_80246C6C:
         r5 = 0x14;
         fn_80237F74();
         r0 = r3 & 0xFF;
-        if ((u32)r0 != (u32)0x1) goto L_80246E78;
-    }
-    r3 = r31;
-    r4 = r30;
-    fn_80239564();
-    r24 = r3 & 0xFF;
-    r3 = 0x0;
-    r4 = 0xe6;
-    r5 = 0x3e;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r24 = (s32)r24 / (s32)r3;
-    r3 = r27;
-    r4 = r24;
-    fn_802399FC();
-    r27 = r3;
-    r3 = r29;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r31;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0xe6;
-    fn_80239CCC();
-L_80246E78:
+        if ((u32)r0 == (u32)0x1) {
+        }
+        r3 = r31;
+        r4 = r30;
+        fn_80239564();
+        r24 = r3 & 0xFF;
+        r3 = 0x0;
+        r4 = 0xe6;
+        r5 = 0x3e;
+        r6 = 0x0;
+        fn_801FB1C0();
+        r24 = (s32)r24 / (s32)r3;
+        r3 = r27;
+        r4 = r24;
+        fn_802399FC();
+        r27 = r3;
+        r3 = r29;
+        fn_80205B8C();
+        r6 = (0x1 << 16);
+        r5 = r3;
+        r4 = r31;
+        r8 = r30;
+        r6 = 0x0;
+        r7 = 0x0;
+        r9 = 0x0;
+        r10 = 0xe6;
+        fn_80239CCC();
+        }
     r24 = r27;
     r3 = r24;
     return;
@@ -3311,15 +3311,15 @@ void fn_8026316C(void* ctx, u32 param1, u32 param2, u32 param3) {
         if ((s32)r3 != (s32)0xf3) {
             if ((s32)r3 < (s32)0xf3) {
                 if ((s32)r3 != (s32)0xf1) {
-                    if ((s32)r3 >= (s32)0xf1) goto L_80263258;
-                    goto L_8026326C;
-                }
-                if ((s32)r3 >= (s32)0xf5) goto L_8026326C;
-                goto L_80263268;
-                }
-            r24 = 0x100;
-            goto L_8026326C;
-        L_80263258:
+                    if ((s32)r3 < (s32)0xf1) {
+                        goto L_8026326C;
+                    }
+                    if ((s32)r3 >= (s32)0xf5) goto L_8026326C;
+                    goto L_80263268;
+                    }
+                r24 = 0x100;
+                goto L_8026326C;
+                    }
             r24 = 0x101;
             goto L_8026326C;
         }
@@ -3853,15 +3853,15 @@ L_80263A48:
     if ((s32)r3 != (s32)0xf3) {
         if ((s32)r3 < (s32)0xf3) {
             if ((s32)r3 != (s32)0xf1) {
-                if ((s32)r3 >= (s32)0xf1) goto L_80263A78;
-                goto L_80263A8C;
-            }
-            if ((s32)r3 >= (s32)0xf5) goto L_80263A8C;
-            goto L_80263A88;
-            }
-        r24 = 0x100;
-        goto L_80263A8C;
-    L_80263A78:
+                if ((s32)r3 < (s32)0xf1) {
+                    goto L_80263A8C;
+                }
+                if ((s32)r3 >= (s32)0xf5) goto L_80263A8C;
+                goto L_80263A88;
+                }
+            r24 = 0x100;
+            goto L_80263A8C;
+                }
         r24 = 0x101;
         goto L_80263A8C;
     }
@@ -3911,15 +3911,15 @@ L_80263B1C:
     if ((s32)r3 != (s32)0xf3) {
         if ((s32)r3 < (s32)0xf3) {
             if ((s32)r3 != (s32)0xf1) {
-                if ((s32)r3 >= (s32)0xf1) goto L_80263B4C;
-                goto L_80263B60;
-            }
-            if ((s32)r3 >= (s32)0xf5) goto L_80263B60;
-            goto L_80263B5C;
-            }
-        r24 = 0x100;
-        goto L_80263B60;
-    L_80263B4C:
+                if ((s32)r3 < (s32)0xf1) {
+                    goto L_80263B60;
+                }
+                if ((s32)r3 >= (s32)0xf5) goto L_80263B60;
+                goto L_80263B5C;
+                }
+            r24 = 0x100;
+            goto L_80263B60;
+                }
         r24 = 0x101;
         goto L_80263B60;
     }
@@ -33995,11 +33995,11 @@ void fn_8025BFAC(void* ctx, u32 param1, u32 param2, u32 param3) {
         r5 = 0x48;
         fn_80237F74();
         r0 = r3 & 0xFF;
-        if ((u32)r0 != (u32)0x1) goto L_8025C0E0;
-    }
-    r0 = 0x0;
-    goto L_8025C12C;
-L_8025C0E0:
+        if ((u32)r0 == (u32)0x1) {
+        }
+        r0 = 0x0;
+        goto L_8025C12C;
+        }
     r3 = r28;
     r4 = r30;
     r5 = 0x29;
