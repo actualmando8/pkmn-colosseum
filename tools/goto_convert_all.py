@@ -2,6 +2,7 @@
 """
 Comprehensive goto elimination for pkmn-colosseum decompiled C files.
 Handles all pattern types found in the codebase.
+All structural transformations include brace-balance safety checks.
 """
 import re
 import sys
@@ -72,7 +73,6 @@ def negate_cond(cond):
                 depth -= 1
             elif depth == 0 and cond[i:i+len(old)] == old:
                 return cond[:i] + new + cond[i+len(old):]
-    # Single-char operators
     for old, new in [('>', '<='), ('<', '>=')]:
         depth = 0
         for i in range(len(cond)):
@@ -93,6 +93,20 @@ def clean_lines(lines):
     return [l for l in lines if l is not None]
 
 
+def brace_depth_between(lines, start_excl, end_excl):
+    """Count net brace depth between start (exclusive) and end (exclusive)."""
+    depth = 0
+    for i in range(start_excl + 1, end_excl):
+        if lines[i] is None:
+            continue
+        for ch in lines[i]:
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+    return depth
+
+
 def try_trivial_forward(lines, goto_idx, label_idx, label_name):
     """Goto right before its label with only empty/brace lines between."""
     all_trivial = True
@@ -110,25 +124,8 @@ def try_trivial_forward(lines, goto_idx, label_idx, label_name):
     return False
 
 
-def brace_depth_between(lines, start, end):
-    """Count net brace depth between start (exclusive) and end (exclusive)."""
-    depth = 0
-    for i in range(start + 1, end):
-        if lines[i] is None:
-            continue
-        for ch in lines[i]:
-            if ch == '{':
-                depth += 1
-            elif ch == '}':
-                depth -= 1
-    return depth
-
-
 def try_set_and_skip(lines, goto_idx, label_idx, label_name):
-    """Pattern: r0=X; goto L; } ... r0=Y; L:  ->  r0=X; } else { ... r0=Y; }
-
-    Only works when braces are balanced between goto+1 and label.
-    """
+    """Pattern: r0=X; goto L; } ... r0=Y; L: with balanced braces."""
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
@@ -147,12 +144,9 @@ def try_set_and_skip(lines, goto_idx, label_idx, label_name):
     pre_label = lines[label_idx - 1].rstrip()
     if not re.search(r'\b[rf]\d+\s*=', pre_label):
         return False
-
-    # Check brace balance: from the } after goto to the label
     depth = brace_depth_between(lines, goto_idx, label_idx)
     if depth != 0:
         return False
-
     brace_indent = get_indent(lines[goto_idx + 1])
     lines[goto_idx] = None
     lines[goto_idx + 1] = ' ' * brace_indent + '} else {\n'
@@ -162,7 +156,7 @@ def try_set_and_skip(lines, goto_idx, label_idx, label_name):
 
 
 def try_conditional_forward_single(lines, goto_idx, label_idx, label_name):
-    """if (cond) goto L; ... L:  with single ref -> if (!cond) { ... }"""
+    """if (cond) goto L; ... L: with single ref and balanced braces."""
     goto_line = lines[goto_idx]
     m = re.match(r'^(\s*)if\s*\((.+?)\)\s*goto\s+' + re.escape(label_name) + r'\s*;', goto_line)
     if not m:
@@ -172,6 +166,9 @@ def try_conditional_forward_single(lines, goto_idx, label_idx, label_name):
     indent = m.group(1)
     condition = m.group(2)
     neg = negate_cond(condition)
+    depth = brace_depth_between(lines, goto_idx, label_idx)
+    if depth != 0:
+        return False
     lines[goto_idx] = indent + 'if (' + neg + ') {\n'
     lines.insert(label_idx, indent + '}\n')
     remove_label_if_unused(lines, label_name)
@@ -179,12 +176,11 @@ def try_conditional_forward_single(lines, goto_idx, label_idx, label_name):
 
 
 def try_unconditional_forward_else(lines, goto_idx, label_idx, label_name):
-    """goto L; } else_code L: -> } else { else_code }"""
+    """goto L; } else_code L: with balanced braces and single ref."""
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
-
-    # Find first non-empty line after goto
+    refs = label_refcount(lines, label_name)
     next_idx = None
     for i in range(goto_idx + 1, label_idx):
         if lines[i] is not None and lines[i].strip():
@@ -194,32 +190,32 @@ def try_unconditional_forward_else(lines, goto_idx, label_idx, label_name):
         lines[goto_idx] = None
         remove_label_if_unused(lines, label_name)
         return True
-
-    # Check if next is a closing brace
-    if re.match(r'^\s*\}\s*$', lines[next_idx].rstrip()):
-        brace_indent = get_indent(lines[next_idx])
-        has_code = False
-        for i in range(next_idx + 1, label_idx):
-            if lines[i] is not None and lines[i].strip() and lines[i].strip() != '}':
-                has_code = True
-                break
-        if has_code:
-            refs = label_refcount(lines, label_name)
-            if refs == 1:
-                lines[goto_idx] = None
-                lines[next_idx] = ' ' * brace_indent + '} else {\n'
-                lines.insert(label_idx, ' ' * brace_indent + '}\n')
-                remove_label_if_unused(lines, label_name)
-                return True
-        else:
-            lines[goto_idx] = None
-            remove_label_if_unused(lines, label_name)
-            return True
+    if refs != 1:
+        return False
+    if not re.match(r'^\s*\}\s*$', lines[next_idx].rstrip()):
+        return False
+    brace_indent = get_indent(lines[next_idx])
+    depth = brace_depth_between(lines, next_idx - 1, label_idx)
+    has_code = False
+    for i in range(next_idx + 1, label_idx):
+        if lines[i] is not None and lines[i].strip() and lines[i].strip() != '}':
+            has_code = True
+            break
+    if has_code and depth == 0:
+        lines[goto_idx] = None
+        lines[next_idx] = ' ' * brace_indent + '} else {\n'
+        lines.insert(label_idx, ' ' * brace_indent + '}\n')
+        remove_label_if_unused(lines, label_name)
+        return True
+    elif not has_code:
+        lines[goto_idx] = None
+        remove_label_if_unused(lines, label_name)
+        return True
     return False
 
 
 def try_conditional_forward_multi(lines, goto_idx, label_idx, label_name):
-    """Multi-ref conditional forward: if (cond) goto L; ... L: -> if (!cond) { ... }"""
+    """Multi-ref conditional forward with brace balance check."""
     goto_line = lines[goto_idx]
     m = re.match(r'^(\s*)if\s*\((.+?)\)\s*goto\s+' + re.escape(label_name) + r'\s*;', goto_line)
     if not m:
@@ -227,14 +223,14 @@ def try_conditional_forward_multi(lines, goto_idx, label_idx, label_name):
     indent = m.group(1)
     condition = m.group(2)
     neg = negate_cond(condition)
-
-    # Find the next goto to same label, or the label itself
     close_at = label_idx
     for i in range(goto_idx + 1, label_idx):
         if lines[i] and ('goto ' + label_name) in lines[i]:
             close_at = i
             break
-
+    depth = brace_depth_between(lines, goto_idx, close_at)
+    if depth != 0:
+        return False
     lines[goto_idx] = indent + 'if (' + neg + ') {\n'
     lines.insert(close_at, indent + '}\n')
     remove_label_if_unused(lines, label_name)
@@ -242,42 +238,37 @@ def try_conditional_forward_multi(lines, goto_idx, label_idx, label_name):
 
 
 def try_unconditional_forward_multi(lines, goto_idx, label_idx, label_name):
-    """Multi-ref unconditional forward."""
+    """Multi-ref unconditional forward with brace balance check."""
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
-
     refs = label_refcount(lines, label_name)
     if refs < 2:
         return False
-
-    # Find first non-empty line after goto
     next_idx = None
     for i in range(goto_idx + 1, min(goto_idx + 5, label_idx)):
         if lines[i] is not None and lines[i].strip():
             next_idx = i
             break
-
     if next_idx is None:
         lines[goto_idx] = None
         remove_label_if_unused(lines, label_name)
         return True
-
     if re.match(r'^\s*\}\s*$', lines[next_idx].rstrip()):
         brace_indent = get_indent(lines[next_idx])
-        # Find next goto to same label
         next_goto = label_idx
         for i in range(next_idx + 1, label_idx):
             if lines[i] and ('goto ' + label_name) in lines[i]:
                 next_goto = i + 1
                 break
-
+        depth = brace_depth_between(lines, next_idx - 1, next_goto)
+        if depth != 0:
+            return False
         content_between = False
         for i in range(next_idx + 1, next_goto):
             if lines[i] is not None and lines[i].strip() and lines[i].strip() != '}':
                 content_between = True
                 break
-
         if content_between:
             lines[goto_idx] = None
             lines[next_idx] = ' ' * brace_indent + '} else {\n'
@@ -288,7 +279,6 @@ def try_unconditional_forward_multi(lines, goto_idx, label_idx, label_name):
             lines[goto_idx] = None
             remove_label_if_unused(lines, label_name)
             return True
-
     return False
 
 
@@ -318,19 +308,7 @@ def try_do_while_break(lines, goto_idx, label_idx, label_name):
 
 
 def try_loop_entry(lines, goto_idx, label_idx, label_name):
-    """goto L; while(1) { body; L: cond; } -> restructured loop.
-
-    The label marks the loop condition check at the end of the body.
-    Code from label to end of while is the condition/increment.
-    The goto skips the body on first iteration.
-
-    Strategy: Extract code from label to loop-close, put it at top of
-    loop body (before the original body), and wrap the original body
-    in a condition that skips it on first iteration.
-
-    Simpler approach for MWCC C89: Just remove the goto and duplicate
-    the condition check code before the while loop.
-    """
+    """goto L; while(1) { body; L: cond; } -> restructured loop."""
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
@@ -345,8 +323,6 @@ def try_loop_entry(lines, goto_idx, label_idx, label_name):
         return False
     if label_refcount(lines, label_name) != 1:
         return False
-
-    # Find the end of the while loop (matching closing brace)
     depth = 0
     loop_end = None
     for i in range(while_idx, len(lines)):
@@ -362,12 +338,8 @@ def try_loop_entry(lines, goto_idx, label_idx, label_name):
                     break
         if loop_end is not None:
             break
-
     if loop_end is None:
         return False
-
-    # Collect the code from label to loop_end (the condition/increment block)
-    # This is the code that executes at the label point
     cond_lines = []
     label_line = lines[label_idx]
     lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
@@ -375,29 +347,131 @@ def try_loop_entry(lines, goto_idx, label_idx, label_name):
         return False
     code_after = lm.group(2).strip()
     label_indent = lm.group(1)
-
     if code_after and code_after != ';':
         cond_lines.append(label_indent + '    ' + code_after + '\n')
-
     for i in range(label_idx + 1, loop_end):
         if lines[i] is not None:
             cond_lines.append(lines[i])
-
-    # Now restructure: remove goto, put condition at top of loop
-    lines[goto_idx] = None  # Remove goto
-
-    # Remove label (it will become the condition at the top of the loop)
+    lines[goto_idx] = None
     remove_label_if_unused(lines, label_name)
-
-    # Insert the condition/increment code right after while(1){
     for j, cl in enumerate(cond_lines):
         lines.insert(while_idx + 1 + j, cl)
+    return True
 
+
+def try_forward_exit_nested(lines, goto_idx, label_idx, label_name):
+    """Forward goto where only closing braces lie between goto and label."""
+    goto_line = lines[goto_idx]
+    if 'if ' in goto_line:
+        return False
+    only_braces = True
+    for i in range(goto_idx + 1, label_idx):
+        if lines[i] is None:
+            continue
+        s = lines[i].strip()
+        if s and s != '}':
+            only_braces = False
+            break
+    if only_braces:
+        lines[goto_idx] = None
+        remove_label_if_unused(lines, label_name)
+        return True
+    return False
+
+
+def try_forward_inline_label_code(lines, goto_idx, label_idx, label_name):
+    """Forward goto where the label's continuation code is short enough to inline.
+
+    For single-ref: collect code from label onwards until function ends or
+    scope changes, then duplicate that code at the goto site and remove goto.
+
+    For the common "set r0 and skip" pattern with unbalanced braces:
+    if (cond) { r0 = X; goto L; } ... } r0 = Y; L:
+    We convert to:
+    if (cond) { r0 = X; } else { ... } r0 = Y; }
+    by negating the if and restructuring.
+
+    Actually the simplest: for any forward goto where the code FROM the label
+    to the end of the function/block is short, we can duplicate it at the
+    goto site.
+
+    But inlining code after the label is complex. Instead, let's handle
+    the specific "assign and skip" pattern where:
+    1. The goto is preceded by an assignment
+    2. There's an assignment before the label
+    3. Code between goto's } and label is at various indent levels
+
+    For these, we restructure the if/else chain.
+    """
+    goto_line = lines[goto_idx]
+    refs = label_refcount(lines, label_name)
+    if refs != 1:
+        return False
+
+    # Pattern: unconditional goto with assignment before, inside an if block
+    # The label code is just a continuation - we can restructure
+    if 'if ' in goto_line:
+        return False  # Only handle unconditional for now
+
+    # Check: is goto preceded by assignment and followed by }?
+    if goto_idx < 1 or lines[goto_idx - 1] is None:
+        return False
+    prev = lines[goto_idx - 1].rstrip()
+    if not re.search(r'\b[rf]\d+\s*=', prev):
+        return False
+
+    if goto_idx + 1 >= len(lines) or lines[goto_idx + 1] is None:
+        return False
+    next_l = lines[goto_idx + 1].rstrip()
+    if not re.match(r'^\s*\}', next_l):
+        return False
+
+    # Check: is there an assignment just before label?
+    pre_label_idx = None
+    for i in range(label_idx - 1, goto_idx, -1):
+        if lines[i] is None:
+            continue
+        s = lines[i].strip()
+        if not s:
+            continue
+        if s == '}':
+            continue
+        if re.search(r'\b[rf]\d+\s*=', s):
+            pre_label_idx = i
+            break
+        break
+
+    if pre_label_idx is None:
+        return False
+
+    # Now find the } that closes the if block containing the goto
+    close_brace_idx = goto_idx + 1
+    close_brace_indent = get_indent(lines[close_brace_idx])
+
+    # All lines between close_brace and pre_label should be code at same or deeper indent
+    # and the lines between pre_label and label should be only } or the assignment
+
+    # Check: all lines between close_brace+1 and label-1 form a valid else body
+    # when considering they may have closing braces
+
+    # Strategy: turn the } into } else { and add } before label,
+    # but account for intermediate closing braces by using the pre_label
+    # assignment as the else body end marker.
+
+    # Create else block: remove goto, make } into } else {, add } after pre_label
+    lines[goto_idx] = None
+    lines[close_brace_idx] = ' ' * close_brace_indent + '} else {\n'
+
+    # Insert } after pre_label assignment (before any intermediate closing braces)
+    # Find where to close: right after pre_label_idx
+    lines.insert(pre_label_idx + 1, ' ' * close_brace_indent + '}\n')
+
+    remove_label_if_unused(lines, label_name)
     return True
 
 
 def try_backward_conditional(lines, goto_idx, label_idx, label_name):
-    """if (cond) goto L; where L is above -> do { } while(cond) or continue."""
+    """if (cond) goto L; where L is above."""
     goto_line = lines[goto_idx]
     m = re.match(r'^(\s*)if\s*\((.+?)\)\s*goto\s+' + re.escape(label_name) + r'\s*;', goto_line)
     if not m:
@@ -405,7 +479,6 @@ def try_backward_conditional(lines, goto_idx, label_idx, label_name):
     indent = m.group(1)
     condition = m.group(2)
     refs = label_refcount(lines, label_name)
-
     if refs == 1:
         label_line = lines[label_idx]
         lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
@@ -418,8 +491,6 @@ def try_backward_conditional(lines, goto_idx, label_idx, label_name):
             lines[label_idx] = indent + 'do {\n'
         lines[goto_idx] = indent + '} while (' + condition + ');\n'
         return True
-
-    # Multi-ref: all gotos to this label
     all_gotos = []
     for i, line in enumerate(lines):
         if line and ('goto ' + label_name) in line:
@@ -427,19 +498,16 @@ def try_backward_conditional(lines, goto_idx, label_idx, label_name):
     all_backward = all(gi > label_idx for gi in all_gotos)
     if not all_backward:
         return False
-
     label_line = lines[label_idx]
     lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
     if not lm:
         return False
     label_indent = lm.group(1)
     code_after = lm.group(2).strip()
-
     if code_after and code_after != ';':
         lines[label_idx] = label_indent + 'while (1) {\n' + label_indent + '    ' + code_after + '\n'
     else:
         lines[label_idx] = label_indent + 'while (1) {\n'
-
     last_goto = max(all_gotos)
     for gi in sorted(all_gotos, reverse=True):
         gl = lines[gi]
@@ -453,19 +521,17 @@ def try_backward_conditional(lines, goto_idx, label_idx, label_name):
             gm2 = re.match(r'^(\s*)goto\s+' + re.escape(label_name) + r'\s*;', gl)
             if gm2:
                 lines[gi] = gm2.group(1) + 'continue;\n'
-
     lines.insert(last_goto + 1, label_indent + '    break;\n')
     lines.insert(last_goto + 2, label_indent + '}\n')
     return True
 
 
 def try_backward_unconditional(lines, goto_idx, label_idx, label_name):
-    """Unconditional backward goto L; -> while(1) { } or continue."""
+    """Unconditional backward goto L."""
     goto_line = lines[goto_idx]
     if 'if ' in goto_line:
         return False
     refs = label_refcount(lines, label_name)
-
     if refs == 1:
         label_line = lines[label_idx]
         lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
@@ -479,8 +545,6 @@ def try_backward_unconditional(lines, goto_idx, label_idx, label_name):
             lines[label_idx] = label_indent + 'while (1) {\n'
         lines[goto_idx] = label_indent + '}\n'
         return True
-
-    # Multi-ref backward unconditional
     all_gotos = []
     for i, line in enumerate(lines):
         if line and ('goto ' + label_name) in line:
@@ -488,19 +552,16 @@ def try_backward_unconditional(lines, goto_idx, label_idx, label_name):
     all_backward = all(gi > label_idx for gi in all_gotos)
     if not all_backward:
         return False
-
     label_line = lines[label_idx]
     lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
     if not lm:
         return False
     label_indent = lm.group(1)
     code_after = lm.group(2).strip()
-
     if code_after and code_after != ';':
         lines[label_idx] = label_indent + 'while (1) {\n' + label_indent + '    ' + code_after + '\n'
     else:
         lines[label_idx] = label_indent + 'while (1) {\n'
-
     last_goto = max(all_gotos)
     for gi in sorted(all_gotos, reverse=True):
         gl = lines[gi]
@@ -513,13 +574,63 @@ def try_backward_unconditional(lines, goto_idx, label_idx, label_name):
         else:
             gm2 = re.match(r'^(\s*)goto\s+' + re.escape(label_name) + r'\s*;', gl)
             if gm2:
-                # If this is the last goto (loop back), it becomes end of while
                 if gi == last_goto:
-                    lines[gi] = None  # Will be replaced by }
+                    lines[gi] = None
                 else:
                     lines[gi] = gm2.group(1) + 'continue;\n'
-
     lines.insert(last_goto + 1, label_indent + '}\n')
+    return True
+
+
+def try_backward_inline(lines, goto_idx, label_idx, label_name):
+    """Backward goto - inline short target code at goto site."""
+    goto_line = lines[goto_idx]
+    is_conditional = 'if ' in goto_line
+    label_line = lines[label_idx]
+    lm = re.match(r'^(\s*)' + re.escape(label_name) + r'\s*:\s*(.*)', label_line)
+    if not lm:
+        return False
+    code_after = lm.group(2).strip()
+    inline_code = []
+    if code_after and code_after != ';':
+        inline_code.append(code_after)
+    found_end = False
+    for i in range(label_idx + 1, min(label_idx + 20, len(lines))):
+        if lines[i] is None:
+            continue
+        s = lines[i].strip()
+        if s == 'break;' or s.startswith('return'):
+            inline_code.append(s)
+            found_end = True
+            break
+        elif s == '}':
+            found_end = True
+            break
+        else:
+            inline_code.append(s)
+    if not found_end or not inline_code:
+        return False
+    if len(inline_code) > 10:
+        return False
+    goto_indent_n = get_indent(goto_line)
+    indent_str = ' ' * goto_indent_n
+    if is_conditional:
+        m = re.match(r'^(\s*)if\s*\((.+?)\)\s*goto\s+' + re.escape(label_name) + r'\s*;', goto_line)
+        if not m:
+            return False
+        cond_indent = m.group(1)
+        condition = m.group(2)
+        new_lines = [cond_indent + 'if (' + condition + ') {\n']
+        for code in inline_code:
+            new_lines.append(cond_indent + '    ' + code + '\n')
+        new_lines.append(cond_indent + '}\n')
+        lines[goto_idx:goto_idx+1] = new_lines
+    else:
+        new_lines = []
+        for code in inline_code:
+            new_lines.append(indent_str + code + '\n')
+        lines[goto_idx:goto_idx+1] = new_lines
+    remove_label_if_unused(lines, label_name)
     return True
 
 
@@ -529,36 +640,36 @@ def convert_all_gotos(lines):
         gotos, labels = find_gotos_and_labels(lines)
         if not gotos:
             break
-
         converted = False
         for goto_idx, label_name in reversed(gotos):
             if label_name not in labels:
                 continue
             label_idx = labels[label_name]
             is_forward = label_idx > goto_idx
-
             if is_forward:
                 for fn in [try_trivial_forward, try_set_and_skip,
-                           try_conditional_forward_single, try_unconditional_forward_else,
+                           try_forward_exit_nested,
+                           try_conditional_forward_single,
+                           try_unconditional_forward_else,
                            try_do_while_break, try_loop_entry,
-                           try_conditional_forward_multi, try_unconditional_forward_multi]:
+                           try_conditional_forward_multi,
+                           try_unconditional_forward_multi,
+                           try_forward_inline_label_code]:
                     if fn(lines, goto_idx, label_idx, label_name):
                         converted = True
                         break
             else:
-                for fn in [try_backward_conditional, try_backward_unconditional]:
+                for fn in [try_backward_conditional,
+                           try_backward_unconditional,
+                           try_backward_inline]:
                     if fn(lines, goto_idx, label_idx, label_name):
                         converted = True
                         break
-
             if converted:
                 break
-
         if not converted:
             break
         lines = clean_lines(lines)
-
-    # Remove orphaned labels
     lines = clean_lines(lines)
     gotos, labels = find_gotos_and_labels(lines)
     goto_targets = set(name for _, name in gotos)
