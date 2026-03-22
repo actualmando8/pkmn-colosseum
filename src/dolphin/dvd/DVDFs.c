@@ -136,57 +136,55 @@ L_800A4D4C:
         r28 = r23 + 0x0;
         r5 = 0x0;
         r4 = 0x0;
-        goto L_800A4E50;
-    L_800A4E0C:
-        tmp = (s8)r3;
-        if ((s32)tmp == 0x2e) {
-            tmp = r28 - r23;
-            if ((s32)tmp <= 8) {
-                if ((s32)r5 == 1) {
-                }
-                r4 = 0x1;
-                goto L_800A4E68;
-                }
-            r24 = r28 + 0x1;
-            r5 = 0x1;
-            goto L_800A4E4C;
+        while ((s32)tmp != 0x2f) {
+                r3 = *(u8*)((u8*)r28 + 0x0);
+                tmp = (s8)r3;
+                if ((s32)tmp == 0x20) break;
+                tmp = (s8)r3;
+                tmp = (s8)r3;
+                if ((s32)tmp == 0x2e) {
+                    tmp = r28 - r23;
+                    if ((s32)tmp <= 8) {
+                        if ((s32)r5 == 1) {
+                        }
+                        r4 = 0x1;
+                        break;
+                        }
+                    r24 = r28 + 0x1;
+                    r5 = 0x1;
+
+                } else {
+                    if ((s32)tmp == 0x20) {
+                        r4 = 0x1;
+                    }
+                    }
+                r28 = r28 + 0x1;
         }
-        if ((s32)tmp != 0x20) goto L_800A4E4C;
-        r4 = 0x1;
-    L_800A4E4C:
-        r28 = r28 + 0x1;
-    L_800A4E50:
-        r3 = *(u8*)((u8*)r28 + 0x0);
-        tmp = (s8)r3;
-        if ((s32)tmp == 0x20) goto L_800A4E68;
-        tmp = (s8)r3;
-        if ((s32)tmp != 0x2f) goto L_800A4E0C;
-    L_800A4E68:
+
         if ((s32)r5 == 1) {
             tmp = r28 - r24;
             if ((s32)tmp > 3) {
                 r4 = 0x1;
         }
         }
-        if ((s32)r4 == 0) goto L_800A4EC8;
-        r5 = r31 + 0x0;
-        r6 = r25 + 0x0;
-        r3 = (u32)lbl_804789C0;
-        r4 = 0x17b;
-        fn_800060F0();
-        goto L_800A4EC8;
-    }
-    r28 = r23;
-    goto L_800A4EB0;
-L_800A4EAC:
-    r28 = r28 + 0x1;
-L_800A4EB0:
-    r3 = *(u8*)((u8*)r28 + 0x0);
-    tmp = (s8)r3;
-    if ((s32)r4 == 0) goto L_800A4EC8;
-    tmp = (s8)r3;
-    if ((s32)tmp != 0x2f) goto L_800A4EAC;
-L_800A4EC8:
+        if ((s32)r4 != 0) {
+            r5 = r31 + 0x0;
+            r6 = r25 + 0x0;
+            r3 = (u32)lbl_804789C0;
+            r4 = 0x17b;
+            fn_800060F0();
+
+        } else {
+            r28 = r23;
+            while ((s32)tmp != 0x2f) {
+                    r3 = *(u8*)((u8*)r28 + 0x0);
+                    tmp = (s8)r3;
+                    if ((s32)r4 == 0) break;
+                    tmp = (s8)r3;
+                    r28 = r28 + 0x1;
+            }
+        }
+        }
     tmp = *(u8*)((u8*)r28 + 0x0);
     tmp = (s8)tmp;
     if ((s32)tmp == 0x2f) {
@@ -219,34 +217,35 @@ L_800A4EC8:
             tmp = r4 & 0xFFFFFF;
             r21 = r23 + 0x0;
             r20 = r3 + tmp;
-            goto L_800A4F64;
-        L_800A4F30:
-            tmp = *(u8*)((u8*)r20 + 0x0);
-            r20 = r20 + 0x1;
-            r3 = (s8)tmp;
-            fn_800C7558();
-            tmp = *(u8*)((u8*)r21 + 0x0);
-            r22 = r3 + 0x0;
-            r21 = r21 + 0x1;
-            r3 = (s8)tmp;
-            fn_800C7558();
-            if ((s32)r3 == (s32)r22) goto L_800A4F64;
-            tmp = 0x0;
-            goto L_800A4F90;
-        L_800A4F64:
-            tmp = *(u8*)((u8*)r20 + 0x0);
-            tmp = (s8)tmp;
-            if ((s32)r3 != (s32)r22) goto L_800A4F30;
-            r3 = *(u8*)((u8*)r21 + 0x0);
-            if ((s32)r3 != 0x2f) {
-                tmp = (s8)r3;
-                if ((s32)r3 == 0x2f) {
+            while ((s32)r3 != (s32)r22) {
+                    tmp = *(u8*)((u8*)r20 + 0x0);
+                    tmp = (s8)tmp;
+                    tmp = *(u8*)((u8*)r20 + 0x0);
+                    r20 = r20 + 0x1;
+                    r3 = (s8)tmp;
+                    fn_800C7558();
+                    tmp = *(u8*)((u8*)r21 + 0x0);
+                    r22 = r3 + 0x0;
+                    r21 = r21 + 0x1;
+                    r3 = (s8)tmp;
+                    fn_800C7558();
+                    if ((s32)r3 != (s32)r22) {
+                        tmp = 0x0;
+
+                    } else {
                 }
-                tmp = 0x1;
-                goto L_800A4F90;
-                }
-            tmp = 0x0;
-        L_800A4F90:
+                r3 = *(u8*)((u8*)r21 + 0x0);
+                if ((s32)r3 != 0x2f) {
+                    tmp = (s8)r3;
+                    if ((s32)r3 == 0x2f) {
+                    }
+                    tmp = 0x1;
+
+                    } else {
+                    tmp = 0x0;
+                        }
+                    }
+
             if ((s32)tmp != 1) {
                 }
             tmp = *(u32*)FstStart_8047A7CC;
@@ -266,7 +265,6 @@ L_800A4EC8:
                 tmp = r26 + 0x1;
             }
             r26 = tmp;
-
 
         }
         r3 = -0x1;
@@ -412,7 +410,6 @@ void fn_800A5108(void) {
             *(u8*)((u8*)r5 + 0x0) = tmp;
             r5 = r5 + 0x1;
 
-
         }
         }
         tmp = r6 - r4;
@@ -439,7 +436,6 @@ void fn_800A5108(void) {
         r6 = r6 + 0x1;
         *(u8*)((u8*)r5 + 0x0) = tmp;
         r5 = r5 + 0x1;
-
 
     }
     }
@@ -642,21 +638,21 @@ void fn_800A541C(void) {
     }
     OSDisableInterrupts();
     r30 = r3;
-L_800A54D4:
-    tmp = *(u32*)((u8*)r31 + 0xC);
-    if ((s32)tmp == 0) {
-        r31 = *(u32*)((u8*)r31 + 0x20);
+while (1) {
+        tmp = *(u32*)((u8*)r31 + 0xC);
+        if ((s32)tmp == 0) {
+            r31 = *(u32*)((u8*)r31 + 0x20);
 
-    } else if ((s32)tmp == (s32)-0x1) {
-        r31 = -0x1;
+        } else if ((s32)tmp == (s32)-0x1) {
+            r31 = -0x1;
 
-    } else if ((s32)tmp == 0xa) {
-        r31 = -0x3;
+        } else if ((s32)tmp == 0xa) {
+            r31 = -0x3;
 
-    } else {
-        r3 = (u32)__DVDThreadQueue;
-        fn_800A238C();
-        goto L_800A54D4;
+        } else {
+            r3 = (u32)__DVDThreadQueue;
+            fn_800A238C();
+}
     }
     r3 = r30;
     OSRestoreInterrupts();
@@ -735,4 +731,3 @@ void fn_800A55F0(s32 result, u8* cmdBlock) {
 /* Empty function (blr) - no-op placeholder */
 void fn_800A5620(void) {
 }
-

@@ -2223,7 +2223,8 @@ void fn_801A4F54(void) {
                     r3 = *(u8*)((u8*)r26 + 0x17);
                     tmp = *(u8*)(sp + 0x1F);
                     if (r3 != tmp) {
-                    } while (0);
+                    }
+                } while (0);
 
                     r4 = (u32)sp + 0x8;
                     r3 = r26 + 0x50;
@@ -2233,7 +2234,6 @@ void fn_801A4F54(void) {
                     tmp = *(u16*)((u8*)r26 + 0x8);
                     tmp = tmp | 0x80;
                     *(u16*)((u8*)r26 + 0x8) = tmp;
-                    }
                 tmp = *(u16*)((u8*)r26 + 0x8);
                 tmp = tmp & 0x00000080;
                 if (r3 == tmp) break;
@@ -2534,7 +2534,8 @@ void fn_801A6098(void) {
             r3 = *(u8*)((u8*)r30 + 0x17);
             tmp = *(u8*)((u8*)r31 + 0x3);
             if (r3 != tmp) {
-            } while (0);
+            }
+        } while (0);
 
             tmp = *(u32*)((u8*)r31 + 0x0);
             r4 = (u32)sp + 0x8;
@@ -2546,7 +2547,6 @@ void fn_801A6098(void) {
             tmp = *(u16*)((u8*)r30 + 0x8);
             tmp = tmp | 0x80;
             *(u16*)((u8*)r30 + 0x8) = tmp;
-            }
         tmp = *(u16*)((u8*)r30 + 0x8);
         tmp = tmp & 0x00000080;
         if (r3 == tmp) break;
