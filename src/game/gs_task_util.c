@@ -70,19 +70,20 @@ void fn_800FEC34(void) {
     tmp = *(u32*)lbl_8047ACC0;
     r4 = *(u32*)lbl_8047ACB0;
     ctr_fn = (void(*)(void))tmp;
-    if (tmp == 0) goto L_800FEC78;
-L_800FEC54:
-    tmp = *(u32*)((u8*)r4 + 0x8);
-    if ((s32)tmp != 3) goto L_800FEC70;
-    tmp = *(u32*)((u8*)r4 + 0x18);
-    if (tmp != r3) goto L_800FEC70;
-    goto L_800FEC7C;
-L_800FEC70:
-    r4 = r4 + 0x24;
-    if (--ctr != 0) goto L_800FEC54;
-L_800FEC78:
-    r4 = 0x0;
-L_800FEC7C:
+    if (tmp != 0) {
+        while (ctr != 0) {
+            tmp = *(u32*)((u8*)r4 + 0x8);
+            if ((s32)tmp == 3) {
+                tmp = *(u32*)((u8*)r4 + 0x18);
+                if (tmp == r3) break;
+            }
+            r4 = r4 + 0x24;
+            --ctr;
+        }
+        if (ctr == 0) r4 = 0x0;
+    } else {
+        r4 = 0x0;
+    }
     if (r4 != 0) {
         tmp = 0x0;
         *(u8*)((u8*)r4 + 0x15) = tmp;
@@ -112,19 +113,20 @@ void fn_800FECB8(void) {
     tmp = *(u32*)lbl_8047ACC0;
     r4 = *(u32*)lbl_8047ACB0;
     ctr_fn = (void(*)(void))tmp;
-    if (tmp == 0) goto L_800FECFC;
-L_800FECD8:
-    tmp = *(u32*)((u8*)r4 + 0x8);
-    if ((s32)tmp != 3) goto L_800FECF4;
-    tmp = *(u32*)((u8*)r4 + 0x18);
-    if (tmp != r3) goto L_800FECF4;
-    goto L_800FED00;
-L_800FECF4:
-    r4 = r4 + 0x24;
-    if (--ctr != 0) goto L_800FECD8;
-L_800FECFC:
-    r4 = 0x0;
-L_800FED00:
+    if (tmp != 0) {
+        while (ctr != 0) {
+            tmp = *(u32*)((u8*)r4 + 0x8);
+            if ((s32)tmp == 3) {
+                tmp = *(u32*)((u8*)r4 + 0x18);
+                if (tmp == r3) break;
+            }
+            r4 = r4 + 0x24;
+            --ctr;
+        }
+        if (ctr == 0) r4 = 0x0;
+    } else {
+        r4 = 0x0;
+    }
     if (r4 != 0) {
         tmp = 0x1;
         *(u8*)((u8*)r4 + 0x15) = tmp;
@@ -164,17 +166,17 @@ void fn_800FED3C(void) {
     tmp = tmp * 0x24;
     r8 = r7 + tmp;
     ctr_fn = (void(*)(void))r6;
-    if (r6 == 0) goto L_800FED7C;
-L_800FED64:
-    tmp = *(u32*)((u8*)r8 + 0x8);
-    if ((s32)tmp != 0) goto L_800FED74;
-    goto L_800FED80;
-L_800FED74:
-    r8 = r8 + 0x24;
-    if (--ctr != 0) goto L_800FED64;
-L_800FED7C:
-    r8 = 0x0;
-L_800FED80:
+    if (r6 != 0) {
+        while (ctr != 0) {
+            tmp = *(u32*)((u8*)r8 + 0x8);
+            if ((s32)tmp == 0) break;
+            r8 = r8 + 0x24;
+            --ctr;
+        }
+        if (ctr == 0) r8 = 0x0;
+    } else {
+        r8 = 0x0;
+    }
     if ((u32)r8 == (u32)0x0) return;
     r7 = 0x0;
     r6 = 0x5;
@@ -196,19 +198,19 @@ L_800FED80:
         *(u32*)((u8*)r8 + 0x1C) = r7;
     }
     r4 = *(u32*)lbl_8047ACCC;
-    if (r4 != 0) goto L_800FEDEC;
-    *(u32*)lbl_8047ACCC = r8;
-    return;
-    goto L_800FEDEC;
-L_800FEDE8:
-    r4 = r5;
-L_800FEDEC:
-    r5 = *(u32*)((u8*)r4 + 0x4);
-    if (r5 == 0) goto L_800FEE08;
-    r3 = *(u8*)((u8*)r4 + 0x14);
-    tmp = *(u8*)((u8*)r8 + 0x14);
-    if (r3 < tmp) goto L_800FEDE8;
-L_800FEE08:
+    if (r4 == 0) {
+        *(u32*)lbl_8047ACCC = r8;
+        return;
+    }
+    /* Walk list to find insertion point by priority */
+    while (1) {
+        r5 = *(u32*)((u8*)r4 + 0x4);
+        if (r5 == 0) break;
+        r3 = *(u8*)((u8*)r4 + 0x14);
+        tmp = *(u8*)((u8*)r8 + 0x14);
+        if (r3 >= tmp) break;
+        r4 = r5;
+    }
     if (r5 == 0) {
         r3 = *(u8*)((u8*)r4 + 0x14);
         tmp = *(u8*)((u8*)r8 + 0x14);
@@ -256,17 +258,17 @@ void fn_800FEE68(void) {
     r7 = *(u32*)lbl_8047ACB8;
     r8 = r6 + tmp;
     ctr_fn = (void(*)(void))r7;
-    if (r7 == 0) goto L_800FEEA0;
-L_800FEE88:
-    tmp = *(u32*)((u8*)r8 + 0x8);
-    if ((s32)tmp != 0) goto L_800FEE98;
-    goto L_800FEEA4;
-L_800FEE98:
-    r8 = r8 + 0x24;
-    if (--ctr != 0) goto L_800FEE88;
-L_800FEEA0:
-    r8 = 0x0;
-L_800FEEA4:
+    if (r7 != 0) {
+        while (ctr != 0) {
+            tmp = *(u32*)((u8*)r8 + 0x8);
+            if ((s32)tmp == 0) break;
+            r8 = r8 + 0x24;
+            --ctr;
+        }
+        if (ctr == 0) r8 = 0x0;
+    } else {
+        r8 = 0x0;
+    }
     if ((u32)r8 == (u32)0x0) return;
     r7 = 0x0;
     r6 = 0x3;
@@ -288,19 +290,19 @@ L_800FEEA4:
         *(u32*)((u8*)r8 + 0x1C) = r7;
     }
     r4 = *(u32*)lbl_8047ACCC;
-    if (r4 != 0) goto L_800FEF10;
-    *(u32*)lbl_8047ACCC = r8;
-    return;
-    goto L_800FEF10;
-L_800FEF0C:
-    r4 = r5;
-L_800FEF10:
-    r5 = *(u32*)((u8*)r4 + 0x4);
-    if (r5 == 0) goto L_800FEF2C;
-    r3 = *(u8*)((u8*)r4 + 0x14);
-    tmp = *(u8*)((u8*)r8 + 0x14);
-    if (r3 < tmp) goto L_800FEF0C;
-L_800FEF2C:
+    if (r4 == 0) {
+        *(u32*)lbl_8047ACCC = r8;
+        return;
+    }
+    /* Walk list to find insertion point by priority */
+    while (1) {
+        r5 = *(u32*)((u8*)r4 + 0x4);
+        if (r5 == 0) break;
+        r3 = *(u8*)((u8*)r4 + 0x14);
+        tmp = *(u8*)((u8*)r8 + 0x14);
+        if (r3 >= tmp) break;
+        r4 = r5;
+    }
     if (r5 == 0) {
         r3 = *(u8*)((u8*)r4 + 0x14);
         tmp = *(u8*)((u8*)r8 + 0x14);
@@ -343,17 +345,17 @@ void fn_800FEF8C(void) {
     tmp = *(u32*)lbl_8047ACB4;
     r7 = *(u32*)lbl_8047ACB0;
     ctr_fn = (void(*)(void))tmp;
-    if (tmp == 0) goto L_800FEFB8;
-L_800FEFA0:
-    tmp = *(u32*)((u8*)r7 + 0x8);
-    if ((s32)tmp != 0) goto L_800FEFB0;
-    goto L_800FEFBC;
-L_800FEFB0:
-    r7 = r7 + 0x24;
-    if (--ctr != 0) goto L_800FEFA0;
-L_800FEFB8:
-    r7 = 0x0;
-L_800FEFBC:
+    if (tmp != 0) {
+        while (ctr != 0) {
+            tmp = *(u32*)((u8*)r7 + 0x8);
+            if ((s32)tmp == 0) break;
+            r7 = r7 + 0x24;
+            --ctr;
+        }
+        if (ctr == 0) r7 = 0x0;
+    } else {
+        r7 = 0x0;
+    }
     if ((u32)r7 == (u32)0x0) return;
     r6 = 0x0;
     tmp = 0x1;
@@ -374,19 +376,19 @@ L_800FEFBC:
         *(u32*)((u8*)r7 + 0x1C) = r6;
     }
     r4 = *(u32*)lbl_8047ACCC;
-    if (r4 != 0) goto L_800FF024;
-    *(u32*)lbl_8047ACCC = r7;
-    return;
-    goto L_800FF024;
-L_800FF020:
-    r4 = r5;
-L_800FF024:
-    r5 = *(u32*)((u8*)r4 + 0x4);
-    if (r5 == 0) goto L_800FF040;
-    r3 = *(u8*)((u8*)r4 + 0x14);
-    tmp = *(u8*)((u8*)r7 + 0x14);
-    if (r3 < tmp) goto L_800FF020;
-L_800FF040:
+    if (r4 == 0) {
+        *(u32*)lbl_8047ACCC = r7;
+        return;
+    }
+    /* Walk list to find insertion point by priority */
+    while (1) {
+        r5 = *(u32*)((u8*)r4 + 0x4);
+        if (r5 == 0) break;
+        r3 = *(u8*)((u8*)r4 + 0x14);
+        tmp = *(u8*)((u8*)r7 + 0x14);
+        if (r3 >= tmp) break;
+        r4 = r5;
+    }
     if (r5 == 0) {
         r3 = *(u8*)((u8*)r4 + 0x14);
         tmp = *(u8*)((u8*)r7 + 0x14);
