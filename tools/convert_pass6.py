@@ -136,6 +136,15 @@ def pass_multi_ref_dowhile(lines):
                 if ext: break
             if ext: continue
 
+            # Check no break/continue in the body (they would change target)
+            has_break_continue = False
+            for k in range(first, label_pos):
+                if k in [s for s in sources]: continue  # skip the goto lines themselves
+                stripped = lines[k].strip()
+                if stripped in ('break;', 'continue;') or stripped.startswith('if ') and ('break;' in stripped or 'continue;' in stripped):
+                    has_break_continue = True; break
+            if has_break_continue: continue
+
             indent = re.match(r'^(\s*)', lines[first]).group(1)
             lines.insert(first, indent + 'do {\n')
             label_pos += 1
@@ -222,6 +231,102 @@ def pass_cond_forward_simple(lines):
             total += 1; changed = True; break
     return total
 
+def pass_exits_blocks(lines):
+    """if (cond) goto LABEL; code; }+; LABEL: where skipped code has closing braces.
+    The goto skips code and exits some blocks. Convert by wrapping code in if(!cond)."""
+    changed = True
+    total = 0
+    while changed:
+        changed = False
+        lp, rc, ls = build_indices(lines)
+        for i, line in enumerate(lines):
+            m = re.match(r'^(\s+)if\s*\((.+?)\)\s*goto\s+(L_[0-9A-Fa-f]+)\s*;', line)
+            if not m: continue
+            indent, cond, label = m.group(1), m.group(2), m.group(3)
+            if label not in lp: continue
+            li = lp[label]
+            if li <= i or li - i > 150: continue
+
+            sk = lines[i+1:li]
+            hl = any(re.match(r'\s*L_[0-9A-Fa-f]+\s*:', l) for l in sk)
+            hg = any(re.search(r'\bgoto\s', l) for l in sk)
+            if hl or hg: continue
+
+            nb = sum(l.count('{') - l.count('}') for l in sk)
+            if nb >= 0: continue  # not exits_blocks
+
+            # Find where code ends and closing braces begin
+            # Walk backward from end to find last non-brace line
+            code_end = 0
+            for j in range(len(sk)-1, -1, -1):
+                s = sk[j].strip()
+                if s and s != '}':
+                    code_end = j + 1
+                    break
+
+            code_part = sk[:code_end]
+            brace_part = sk[code_end:]
+
+            code_nb = sum(l.count('{') - l.count('}') for l in code_part)
+            if code_nb != 0: continue  # code part has unbalanced braces
+
+            inv = invert_cond(cond)
+            if inv is None: continue
+
+            nl = [indent + 'if (' + inv + ') {\n']
+            for s in code_part:
+                nl.append(('    ' + s) if s.strip() else s)
+            nl.append(indent + '}\n')
+            for s in brace_part:
+                nl.append(s)
+
+            if rc[label] == 1:
+                lines[i:li+1] = nl
+            else:
+                lines[i:li] = nl
+            total += 1; changed = True; break
+    return total
+
+def pass_backward_with_labels(lines):
+    """Backward goto where body contains labels but all their refs are within the body."""
+    changed = True
+    total = 0
+    while changed:
+        changed = False
+        lp, rc, ls = build_indices(lines)
+        for i, line in enumerate(lines):
+            # Match both unconditional and conditional backward gotos
+            m = re.match(r'^(\s+)goto\s+(L_[0-9A-Fa-f]+)\s*;\s*$', line)
+            if not m: continue
+            indent, label = m.group(1), m.group(2)
+            if label not in lp: continue
+            li = lp[label]
+            if li >= i: continue
+            if rc[label] != 1: continue  # only single-ref for safety
+
+            body = lines[li+1:i]
+            nb = sum(l.count('{') - l.count('}') for l in body)
+            if nb != 0: continue
+
+            # Check labels in body - all refs must be within body
+            body_ok = True
+            for k in range(li+1, i):
+                lm = re.match(r'\s*(L_[0-9A-Fa-f]+)\s*:', lines[k])
+                if lm:
+                    lab = lm.group(1)
+                    if lab in ls:
+                        for src in ls[lab]:
+                            if src <= li or src >= i:
+                                body_ok = False; break
+                    if not body_ok: break
+            if not body_ok: continue
+
+            li_ind = re.match(r'^(\s*)', lines[li]).group(1)
+            lines[li] = li_ind + 'while (1) {\n'
+            lines[i] = indent + '}\n'
+            total += 1; changed = True; break
+    return total
+
 files = sys.argv[1:]
 grand = 0
 for fname in files:
@@ -240,7 +345,9 @@ for fname in files:
         t = (pass_cond_forward_simple(lines) +
              pass_uncond_sole_forward(lines) +
              pass_backward_loop(lines) +
+             pass_backward_with_labels(lines) +
              pass_self_contained_forward(lines) +
+             pass_exits_blocks(lines) +
              pass_multi_ref_dowhile(lines))
         if t == 0: break
 

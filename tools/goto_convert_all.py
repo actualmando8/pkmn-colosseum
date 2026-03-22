@@ -653,8 +653,7 @@ def convert_all_gotos(lines):
                            try_unconditional_forward_else,
                            try_do_while_break, try_loop_entry,
                            try_conditional_forward_multi,
-                           try_unconditional_forward_multi,
-                           try_forward_inline_label_code]:
+                           try_unconditional_forward_multi]:
                     if fn(lines, goto_idx, label_idx, label_name):
                         converted = True
                         break
