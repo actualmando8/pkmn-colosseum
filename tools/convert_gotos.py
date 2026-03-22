@@ -331,6 +331,20 @@ def convert_while_loop(lines, label_refcount, label_pos):
             break
 
         if not valid:
+            # Try simple case: just a single back-jump, no exit conditions
+            if len(exit_cond_lines) == 0:
+                # while_cond is just back_goto_cond
+                while_cond = back_goto_cond
+                lines[i] = indent + 'while (' + while_cond + ') {'
+                lines[body_idx] = ''
+                for k in range(body_idx + 1, cond_idx):
+                    if lines[k].strip():
+                        lines[k] = '    ' + lines[k]
+                lines[cond_idx] = ''
+                lines[back_goto_idx] = indent + '}'
+                label_refcount[cond_label] = 0
+                label_refcount[body_label] = 0
+                changes += 2
             continue
 
         # Add the back-goto condition
