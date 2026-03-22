@@ -245,20 +245,28 @@ FSYSSlot* FSYSFindSlot(u32 fileHandle, u32 mode) {
                     return slot;
                 }
                 /* Not yet loaded */
-                if (mode == 2 || mode == 7) {
-                    /* Modes 2 and 7: increment refCount */
-                    slot->refCount++;
-                } else if (mode >= 3) {
-                    /* mode >= 3 but not 7: skip to unmatched */
-                } else {
-                    /* mode == 0 or mode == 1 */
-                    if (slot->loadMode != 2 && slot->loadMode != 7) {
-                        slot->refCount++;
-                    }
+                if (mode == 2) {
+                    goto found_loaded;
                 }
-
+                if (mode >= 3) {
+                    if (mode == 7) {
+                        goto found_loaded;
+                    }
+                    goto unmatched;
+                }
+                /* mode == 0 */
+                if (slot->loadMode == 2) {
+                    goto unmatched;
+                }
+                if (slot->loadMode == 7) {
+                    goto unmatched;
+                }
+                found_loaded:
+                slot->refCount++;
+                goto unmatched;
             }
         }
+        unmatched:
         /* Check if we decided to return this slot */
         /* (The assembly is a bit tangled here; simplified) */
         if (slot->status != FSYS_STATUS_FREE &&

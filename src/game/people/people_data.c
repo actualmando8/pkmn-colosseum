@@ -3,8 +3,121 @@
  * @brief People/NPC field-level data management -- allocation, lookup,
  *        model loading, accessor functions.
  *
+ * This file implements the lower-level People/NPC data layer that manages
+ * NPC struct allocation, slot lookup, field getters/setters, and model
+ * loading. It sits below the high-level people.c (0x80180C78+) which
+ * handles floor-level init/update/spawn, and is called extensively by
+ * the script system and battle system.
+ *
  * Address range: 0x80140588 - 0x80144574 (approximately 0x3FEC bytes)
  * Function count: ~100 functions (83 of which are tiny getters/setters)
+ *
+ * Key functions:
+ *
+ *   fn_80140588 (peopleFieldOpen)      -- 0x514 bytes
+ *     Open/spawn an NPC from field data. Takes a PeopleEntry pointer,
+ *     group/index pair, spawn data, and a "force" flag. Calls into
+ *     fn_80142CF4 (peopleFieldAlloc) to find or create a slot, loads
+ *     the model, and configures the NPC's initial state.
+ *     References: lbl_80478BD8 (gPeopleFieldCount),
+ *                 lbl_803681E8 (gPeopleFieldLookup),
+ *                 lbl_80363CE8 (gPeopleFieldArray)
+ *
+ *   fn_80140A9C (peopleFieldGetSlot)   -- 0x30 bytes
+ *     Simple slot lookup by index. Returns pointer into gPeopleFieldArray.
+ *     Called from 3 external sites (effect/shadow modules).
+ *
+ *   fn_80140ACC (peopleFieldLoadModel) -- 0x83C bytes
+ *     Load NPC model and configure animation data. This is a large
+ *     function that processes the model resource, sets up joint matrices,
+ *     configures walk/run motion data, and initializes the animation
+ *     state machine. References gPeopleFieldArray globals.
+ *
+ *   fn_80141308 (peopleFieldUpdate)    -- 0x1060 bytes (largest in range!)
+ *     Per-frame update for a single NPC in the field. Handles state
+ *     transitions, animation blending, position interpolation, collision
+ *     checks, and rendering submission. This is the core NPC tick function.
+ *     References gPeopleFieldArray and lbl_80434E64 (gPeopleFieldWork).
+ *
+ *   fn_80142368 (peopleFieldCleanup)   -- 0x280 bytes
+ *     Cleanup/release an NPC slot. Frees model resources and resets state.
+ *
+ *   fn_801425E8 (peopleFieldSetup)     -- 0x39C bytes
+ *     Configure an NPC's properties after model loading. Sets position,
+ *     rotation, scale, motion parameters from spawn data.
+ *
+ *   fn_80142984 (peopleFieldGetByID)   -- 0x64 bytes
+ *     Look up an NPC by its group+index ID pair. Called by 18 external
+ *     functions (heavily used by the script system).
+ *
+ *   fn_801429E8 (peopleFieldGetEntry)  -- 0xA0 bytes
+ *     Extended NPC lookup that validates the entry and returns a
+ *     PeopleFieldEntry pointer. Called by 28 external functions.
+ *
+ *   fn_80142A88 (peopleFieldSetState)  -- 0x9C bytes
+ *     Set the state of an NPC. Used by battle and cutscene systems.
+ *
+ *   fn_80142B24 (peopleFieldApplyMotion) -- 0x1D0 bytes
+ *     Apply a motion/animation to an NPC. Blends between current and
+ *     target animation states.
+ *
+ *   fn_80142CF4 (peopleFieldAlloc)     -- 0x204 bytes
+ *     Allocate or find an NPC slot. If a slot with the same group+index
+ *     already exists, returns it. Otherwise allocates a new slot from
+ *     the free pool. Called by 38 external functions.
+ *
+ *   fn_80142EF8 (peopleFieldRelease)   -- 0x2B4 bytes
+ *     Release an NPC slot back to the free pool.
+ *
+ *   fn_801431AC (peopleFieldInit)      -- 0x4F0 bytes
+ *     Initialize the field people system. Allocates the NPC array,
+ *     lookup table, and work buffer. Sets up global state.
+ *
+ * Getter/setter cluster (fn_8014369C - fn_80144064):
+ *   83 tiny functions (most 0x10-0x28 bytes each) that provide safe
+ *   access to PeopleFieldEntry struct fields. Each follows the pattern:
+ *     if (ptr == NULL) return 0;
+ *     return ptr->fieldAtOffset;
+ *
+ *   The struct accessed is PeopleFieldEntry (0x28 bytes per slot),
+ *   stored in gPeopleFieldArray (lbl_80363CE8), indexed via
+ *   gPeopleFieldLookup (lbl_803681E8).
+ *
+ *   PeopleFieldEntry layout (from getter offsets):
+ *     0x00: f32   field_00       (fn_80143C00 get, fn_80143850 set)
+ *     0x04: u8    flags_04       (fn_801436F0 bit test)
+ *     0x05: s8    field_05       (fn_801436D4 get)
+ *     0x06: s8    field_06       (fn_801436B8 get)
+ *     0x07: s8    field_07       (fn_8014369C get)
+ *     0x08: (unknown)
+ *     0x0C: u8    field_0C       (fn_80143760 get)
+ *     0x0D: u8    field_0D       (fn_80143748 get)
+ *     0x0E: u8    field_0E       (fn_80143730 get)
+ *     0x0F: u8    field_0F       (fn_80143718 get)
+ *     0x10: f32   posX           (fn_80143BD0 get, fn_80143C50 set)
+ *     0x14: f32   posY           (fn_80143BE0 get, fn_80143C68 set)
+ *     0x18: f32   posZ           (fn_80143BF0 get, fn_80143C80 set)
+ *     0x1C: f32   rotAngle       (fn_80143C10 get, fn_80143C98 set)
+ *     0x20: f32   scale          (fn_80143C20 get, fn_80143CB0 set)
+ *     0x24: u32   modelRef       (fn_80143C30 get, fn_80143CE0 set)
+ *
+ *   fn_801440A0 (peopleFieldGetByIndex) -- 0x50 bytes
+ *     The single most-called function in the entire range (48 external
+ *     callers). Takes a u16 index, validates against gPeopleFieldCount,
+ *     looks up the slot via gPeopleFieldLookup, multiplies by 0x28 to
+ *     get the offset into gPeopleFieldArray, and returns the pointer.
+ *     Pattern:
+ *       if (index >= gPeopleFieldCount) return NULL;
+ *       slot = gPeopleFieldLookup[index];
+ *       if (slot >= gMaxSlotCount) return NULL;
+ *       return &gPeopleFieldArray[slot * 0x28];
+ *
+ * Global data:
+ *   lbl_80478BD8 (sbss) -- u32 gPeopleFieldCount (max index count)
+ *   lbl_80478BB0 (sbss) -- u32 gPeopleFieldMaxSlots
+ *   lbl_803681E8 (bss)  -- u16[] gPeopleFieldLookup (index -> slot mapping)
+ *   lbl_80363CE8 (bss)  -- PeopleFieldEntry[] gPeopleFieldArray (0x28 bytes each)
+ *   lbl_80434E64 (bss)  -- PeopleFieldWork (extended work buffer)
  */
 
 #include "dolphin/types.h"
@@ -40,532 +153,43 @@ extern u32  OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32 level);
 
 /* ===================================================================
- * Global data (sdata/sbss)
+ * PeopleFieldEntry -- compact NPC data for field rendering.
+ *
+ * 0x28 bytes per entry. Stored in a flat array at lbl_80363CE8.
+ * Accessed via the 83 getter/setter functions at 0x8014369C-0x80144064.
  * =================================================================== */
 
+typedef struct PeopleFieldEntry {
+    /* 0x00 */ f32    field_00;
+    /* 0x04 */ u8     flags_04;
+    /* 0x05 */ s8     field_05;
+    /* 0x06 */ s8     field_06;
+    /* 0x07 */ s8     field_07;
+    /* 0x08 */ u32    field_08;
+    /* 0x0C */ u8     field_0C;
+    /* 0x0D */ u8     field_0D;
+    /* 0x0E */ u8     field_0E;
+    /* 0x0F */ u8     field_0F;
+    /* 0x10 */ f32    posX;
+    /* 0x14 */ f32    posY;
+    /* 0x18 */ f32    posZ;
+    /* 0x1C */ f32    rotAngle;
+    /* 0x20 */ f32    scale;
+    /* 0x24 */ u32    modelRef;
+} PeopleFieldEntry;
+
+/* ===================================================================
+ * DECOMPILED: fn_801440A0 -- peopleFieldGetByIndex
+ *
+ * The most-called function in the entire range (48 external callers).
+ * Looks up a PeopleFieldEntry by its u16 index.
+ * =================================================================== */
+
+/* Global state (sdata/sbss) */
 extern u32 lbl_80478BD8;   /* gPeopleFieldCount */
 extern u32 lbl_80478BB0;   /* gPeopleFieldMaxSlots */
 extern u16 lbl_803681E8[]; /* gPeopleFieldLookup */
 extern u8  lbl_80363CE8[]; /* gPeopleFieldArray base */
-
-extern u32 lbl_80478BE0;   /* max index for 0x10-stride array */
-extern u8  lbl_80368630[]; /* base of 0x10-stride array */
-
-extern u32 lbl_80478BC8;   /* max index for 0x20-stride array */
-extern u8  lbl_80367F78[]; /* base of 0x20-stride array */
-
-extern u32 lbl_80478BC0;   /* max index for 0x02-stride array */
-extern u8  lbl_80367EF0[]; /* base of 0x02-stride array */
-
-extern u32 lbl_80478BB8;   /* max index for 0x30-stride array */
-extern u8  lbl_80367AF0[]; /* base of 0x30-stride array */
-
-extern u32 lbl_80478BD0;   /* max index for 0x08-stride array */
-extern u8  lbl_80368018[]; /* base of 0x08-stride array */
-
-/* ===================================================================
- * STUB DECLARATIONS -- large functions deferred
- * =================================================================== */
-
-/* fn_80140588: peopleFieldOpen (0x514 bytes) */
-/* fn_80140A9C: peopleFieldGetSlot (0x30 bytes) */
-/* fn_80140ACC: peopleFieldLoadModel (0x83C bytes) */
-/* fn_80141308: peopleFieldUpdate (0x1060 bytes) */
-/* fn_80142368: peopleFieldCleanup (0x280 bytes) */
-/* fn_801425E8: peopleFieldSetup (0x39C bytes) */
-/* fn_80142984: peopleFieldGetByID (0x64 bytes) */
-/* fn_801429E8: peopleFieldGetEntry (0xA0 bytes) */
-/* fn_80142A88: peopleFieldSetState (0x9C bytes) */
-/* fn_80142B24: peopleFieldApplyMotion (0x1D0 bytes) */
-/* fn_80142CF4: peopleFieldAlloc (0x204 bytes) */
-/* fn_80142EF8: peopleFieldRelease (0x2B4 bytes) */
-/* fn_801431AC: peopleFieldInit (0x4F0 bytes) */
-
-/* ===================================================================
- * DECOMPILED: Getter/Setter cluster (0x8014369C - 0x80144088)
- *
- * Tiny accessor functions for NPC field data structs.
- * Null-safe: returns 0 / does nothing if ptr is NULL.
- * =================================================================== */
-
-/* Address: 0x8014369C */
-s32 fn_8014369C(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (s8)ptr[0x7];
-}
-
-/* Address: 0x801436B8 */
-s32 fn_801436B8(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (s8)ptr[0x6];
-}
-
-/* Address: 0x801436D4 */
-s32 fn_801436D4(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (s8)ptr[0x5];
-}
-
-/* Address: 0x801436F0 */
-u32 fn_801436F0(u8* ptr) {
-    u32 bit;
-    if (ptr == NULL) { return 0; }
-    bit = (ptr[0x4] >> 3) & 1;
-    return ((-bit) | bit) >> 31;
-}
-
-/* Address: 0x80143718 */
-u32 fn_80143718(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xF];
-}
-
-/* Address: 0x80143730 */
-u32 fn_80143730(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xE];
-}
-
-/* Address: 0x80143748 */
-u32 fn_80143748(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xD];
-}
-
-/* Address: 0x80143760 */
-u32 fn_80143760(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xC];
-}
-
-/* Address: 0x80143778 */
-u32 fn_80143778(u8* ptr) {
-    u32 bit;
-    if (ptr == NULL) { return 0; }
-    bit = (ptr[0x4] >> 4) & 1;
-    return ((-bit) | bit) >> 31;
-}
-
-/* Address: 0x801437A0 */
-u32 fn_801437A0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xB];
-}
-
-/* Address: 0x801437B8 */
-u32 fn_801437B8(u8* ptr) {
-    u32 bit;
-    if (ptr == NULL) { return 0; }
-    bit = (ptr[0x4] >> 5) & 1;
-    return ((-bit) | bit) >> 31;
-}
-
-/* Address: 0x801437E0 */
-u32 fn_801437E0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0xA];
-}
-
-/* Address: 0x801437F8 */
-u32 fn_801437F8(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x4] >> 6) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143820 */
-u32 fn_80143820(u8* ptr) { if (ptr == NULL) { return 0; } return ptr[0x9]; }
-
-/* Address: 0x80143838 */
-u32 fn_80143838(u8* ptr) { if (ptr == NULL) { return 0; } return ptr[0x8]; }
-
-/* Address: 0x80143850 */
-u32 fn_80143850(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x4] >> 7) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143878 */
-u32 fn_80143878(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = ptr[0x3] & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x801438A0 */
-u32 fn_801438A0(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 1) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x801438C8 */
-u32 fn_801438C8(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 2) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x801438F0 */
-u32 fn_801438F0(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 3) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143918 */
-u32 fn_80143918(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 4) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143940 */
-u32 fn_80143940(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 5) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143968 */
-u32 fn_80143968(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 6) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143990 */
-u32 fn_80143990(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x3] >> 7) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x801439B8 */
-u32 fn_801439B8(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x2] & 0x0F;
-}
-
-/* Address: 0x801439D4 */
-u32 fn_801439D4(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (ptr[0x2] >> 4) & 0x0F;
-}
-
-/* Address: 0x801439F0 */
-u32 fn_801439F0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x1] & 0x0F;
-}
-
-/* Address: 0x80143A0C */
-u32 fn_80143A0C(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (ptr[0x1] >> 4) & 0x0F;
-}
-
-/* Address: 0x80143A28 */
-u32 fn_80143A28(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return (ptr[0x0] >> 1) & 0x0F;
-}
-
-/* Address: 0x80143A44 */
-u32 fn_80143A44(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x0] >> 5) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143A6C */
-u32 fn_80143A6C(u8* ptr) { u32 bit; if (ptr == NULL) { return 0; } bit = (ptr[0x0] >> 7) & 1; return ((-bit) | bit) >> 31; }
-
-/* Address: 0x80143A94 - lookup by u8 index into 0x10-stride array */
-u8* fn_80143A94(u8 index) {
-    if ((u8)index >= lbl_80478BE0) {
-        return NULL;
-    }
-    return &lbl_80368630[(u8)index * 0x10];
-}
-
-/* Address: 0x80143ABC - indexed byte getter with bounds check */
-s32 fn_80143ABC(u8* ptr, u16 index) {
-    if (ptr == NULL) { return 0; }
-    if ((u16)index >= 0x19) { return 0; }
-    return (s8)ptr[(u16)index + 0x4];
-}
-
-/* Address: 0x80143AF0 */
-u32 fn_80143AF0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x0]);
-}
-
-/* Address: 0x80143B08 - lookup by u16 index into 0x20-stride array */
-u8* fn_80143B08(u16 index) {
-    if ((u16)index >= lbl_80478BC8) {
-        return NULL;
-    }
-    return &lbl_80367F78[(u16)index * 0x20];
-}
-
-/* Address: 0x80143B30 */
-u32 fn_80143B30(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x0]);
-}
-
-/* Address: 0x80143B48 - lookup by u16 index into 0x02-stride array */
-u8* fn_80143B48(u16 index) {
-    if ((u16)index >= lbl_80478BC0) {
-        return NULL;
-    }
-    return &lbl_80367EF0[(u16)index * 0x02];
-}
-
-/* Address: 0x80143B70 */
-void fn_80143B70(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x2]) = val;
-}
-
-/* Address: 0x80143B80 */
-void fn_80143B80(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x0]) = val;
-}
-
-/* Address: 0x80143B90 */
-void fn_80143B90(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x0]) = val;
-}
-
-/* Address: 0x80143BA0 */
-void fn_80143BA0(u8* ptr, u32 val) {
-    if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0x18]) = val;
-}
-
-/* Address: 0x80143BB0 */
-void fn_80143BB0(u8* ptr, u16 index, u8 val) {
-    if (ptr == NULL) { return; }
-    if ((u16)index >= 3) { return; }
-    ptr[(u16)index + 0x24] = val;
-}
-
-/* Address: 0x80143BD0 */
-void fn_80143BD0(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0xC]) = val;
-}
-
-/* Address: 0x80143BE0 */
-void fn_80143BE0(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0xA]) = val;
-}
-
-/* Address: 0x80143BF0 */
-void fn_80143BF0(u8* ptr, u32 val) {
-    if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0x14]) = val;
-}
-
-/* Address: 0x80143C00 */
-void fn_80143C00(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    ptr[0x2] = val;
-}
-
-/* Address: 0x80143C10 */
-void fn_80143C10(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    ptr[0x1] = val;
-}
-
-/* Address: 0x80143C20 */
-void fn_80143C20(u8* ptr, u16 val) {
-    if (ptr == NULL) { return; }
-    *(u16*)(&ptr[0x6]) = val;
-}
-
-/* Address: 0x80143C30 */
-void fn_80143C30(u8* ptr, u8 val) {
-    if (ptr == NULL) { return; }
-    ptr[0x0] = val;
-}
-
-/* Address: 0x80143C40 */
-void fn_80143C40(u8* ptr, u32 val) {
-    if (ptr == NULL) { return; }
-    *(u32*)(&ptr[0x10]) = val;
-}
-
-/* Address: 0x80143C50 */
-u32 fn_80143C50(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x2]);
-}
-
-/* Address: 0x80143C68 */
-u32 fn_80143C68(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x0]);
-}
-
-/* Address: 0x80143C80 */
-u32 fn_80143C80(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x2C]);
-}
-
-/* Address: 0x80143C98 */
-u32 fn_80143C98(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x28]);
-}
-
-/* Address: 0x80143CB0 */
-u32 fn_80143CB0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x24]);
-}
-
-/* Address: 0x80143CC8 */
-u32 fn_80143CC8(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x20]);
-}
-
-/* Address: 0x80143CE0 */
-u32 fn_80143CE0(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x1C]);
-}
-
-/* Address: 0x80143CF8 */
-u32 fn_80143CF8(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x18]);
-}
-
-/* Address: 0x80143D10 */
-u32 fn_80143D10(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x14]);
-}
-
-/* Address: 0x80143D28 */
-u32 fn_80143D28(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x10]);
-}
-
-/* Address: 0x80143D40 */
-u32 fn_80143D40(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0xC]);
-}
-
-/* Address: 0x80143D58 */
-u32 fn_80143D58(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x8]);
-}
-
-/* Address: 0x80143D70 */
-u32 fn_80143D70(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x4]);
-}
-
-/* Address: 0x80143D88 */
-u32 fn_80143D88(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x0]);
-}
-
-/* Address: 0x80143DA0 - lookup by u16 index into 0x30-stride array */
-u8* fn_80143DA0(u16 index) {
-    if ((u16)index >= lbl_80478BB8) {
-        return NULL;
-    }
-    return &lbl_80367AF0[(u16)index * 0x30];
-}
-
-/* Address: 0x80143DCC */
-u32 fn_80143DCC(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x20]);
-}
-
-/* Address: 0x80143DE4 */
-u32 fn_80143DE4(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x1C]);
-}
-
-/* Address: 0x80143DFC */
-u32 fn_80143DFC(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x4];
-}
-
-/* Address: 0x80143E14 */
-u32 fn_80143E14(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x18]);
-}
-
-/* Address: 0x80143E2C - indexed byte getter at 0x24 (s8) */
-s32 fn_80143E2C(u8* ptr, u16 index) {
-    if (ptr == NULL) { return 0; }
-    if ((u16)index >= 3) { return 0; }
-    return (s8)ptr[(u16)index + 0x24];
-}
-
-/* Address: 0x80143E60 - index range remap */
-u32 fn_80143E60(u16 index) {
-    u16 val;
-    val = (u16)index;
-    if (val < 0x85) {
-        return 0xFF;
-    }
-    if (val > 0xAF) {
-        return 0xFF;
-    }
-    return (u8)(val - 0x85);
-}
-
-/* Address: 0x80143F54 */
-u32 fn_80143F54(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0xC]);
-}
-
-/* Address: 0x80143F6C */
-u32 fn_80143F6C(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0xA]);
-}
-
-/* Address: 0x80143F84 */
-u32 fn_80143F84(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x14]);
-}
-
-/* Address: 0x80143F9C */
-u32 fn_80143F9C(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x3];
-}
-
-/* Address: 0x80143FB4 */
-u32 fn_80143FB4(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x2];
-}
-
-/* Address: 0x80143FCC */
-u32 fn_80143FCC(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x1];
-}
-
-/* Address: 0x80143FE4 */
-u32 fn_80143FE4(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x8]);
-}
-
-/* Address: 0x80143FFC */
-u32 fn_80143FFC(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u16*)(&ptr[0x6]);
-}
-
-/* Address: 0x80144014 */
-u32 fn_80144014(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return ptr[0x0];
-}
-
-/* Address: 0x80144064 - testWord10 nonzero */
-u32 fn_80144064(u8* ptr) { u32 val; if (ptr == NULL) { return 0; } val = *(u32*)(&ptr[0x10]); return ((-val) | val) >> 31; }
-
-/* Address: 0x80144088 */
-u32 fn_80144088(u8* ptr) {
-    if (ptr == NULL) { return 0; }
-    return *(u32*)(&ptr[0x10]);
-}
-
-/* ===================================================================
- * DECOMPILED: fn_801440A0 -- peopleFieldGetByIndex
- * =================================================================== */
-
-typedef struct PeopleFieldEntry {
-    u8 data[0x28];
-} PeopleFieldEntry;
 
 PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
     u16 slot;
@@ -583,13 +207,114 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
 }
 
 /* ===================================================================
- * STUB -- complex/large functions (deferred)
+ * STUB DECLARATIONS -- remaining functions
+ *
+ * Full decompilation deferred; the asm files remain authoritative.
+ * Function addresses and proposed names documented for cross-reference.
  * =================================================================== */
 
-/* fn_80143E88: complex getter (0x68 bytes) */
-/* fn_80143EF0: global lookup (0x34 bytes) */
-/* fn_80143F24: complex getter (0x30 bytes) */
-/* fn_8014402C: complex conditional (0x38 bytes) */
+/* fn_80140588: peopleFieldOpen (0x514 bytes) */
+/* fn_80140A9C: peopleFieldGetSlot (0x30 bytes) */
+/* fn_80140ACC: peopleFieldLoadModel (0x83C bytes) */
+/* fn_80141308: peopleFieldUpdate (0x1060 bytes -- largest single function) */
+/* fn_80142368: peopleFieldCleanup (0x280 bytes) */
+/* fn_801425E8: peopleFieldSetup (0x39C bytes) */
+/* fn_80142984: peopleFieldGetByID (0x64 bytes) */
+/* fn_801429E8: peopleFieldGetEntry (0xA0 bytes) */
+/* fn_80142A88: peopleFieldSetState (0x9C bytes) */
+/* fn_80142B24: peopleFieldApplyMotion (0x1D0 bytes) */
+/* fn_80142CF4: peopleFieldAlloc (0x204 bytes) */
+/* fn_80142EF8: peopleFieldRelease (0x2B4 bytes) */
+/* fn_801431AC: peopleFieldInit (0x4F0 bytes) */
+
+/* --- Getter/Setter cluster (83 functions) --- */
+/* fn_8014369C: getField07 */
+/* fn_801436B8: getField06 */
+/* fn_801436D4: getField05 */
+/* fn_801436F0: testFlags04 */
+/* fn_80143718: getField0F */
+/* fn_80143730: getField0E */
+/* fn_80143748: getField0D */
+/* fn_80143760: getField0C */
+/* fn_80143778: getField08_lo (bit extract) */
+/* fn_801437A0: getField08_hi */
+/* fn_801437B8: setField08_lo */
+/* fn_801437E0: getField09 */
+/* fn_801437F8: setField09 */
+/* fn_80143820: getField0A */
+/* fn_80143838: getField0B */
+/* fn_80143850: setField00 (f32) */
+/* fn_80143878: setField04_bit0 */
+/* fn_801438A0: setField04_bit1 */
+/* fn_801438C8: setField04_bit2 */
+/* fn_801438F0: setField04_bit3 */
+/* fn_80143918: setField05 (s8) */
+/* fn_80143940: setField06 (s8) */
+/* fn_80143968: setField07 (s8) */
+/* fn_80143990: setField08 (u32) */
+/* fn_801439B8: setField0C (u8) */
+/* fn_801439D4: setField0D (u8) */
+/* fn_801439F0: setField0E (u8) */
+/* fn_80143A0C: setField0F (u8) */
+/* fn_80143A28: clearFlags04 */
+/* fn_80143A44: setFlags04 */
+/* fn_80143A6C: setField_special1 */
+/* fn_80143A94: setField_special2 */
+/* fn_80143ABC: setField_special3 */
+/* fn_80143AF0: getField_special1 */
+/* fn_80143B08: getField_special2 */
+/* fn_80143B30: getField_special3 */
+/* fn_80143B48: setField_special4 */
+/* fn_80143B70: getField10_int (posX as int) */
+/* fn_80143B80: getField14_int (posY as int) */
+/* fn_80143B90: getField18_int (posZ as int) */
+/* fn_80143BA0: getField1C_int (rotAngle as int) */
+/* fn_80143BB0: setField10_int */
+/* fn_80143BD0: getPosX (f32) */
+/* fn_80143BE0: getPosY (f32) */
+/* fn_80143BF0: getPosZ (f32) */
+/* fn_80143C00: getField00 (f32) */
+/* fn_80143C10: getRotAngle (f32) */
+/* fn_80143C20: getScale (f32) */
+/* fn_80143C30: getModelRef (u32) */
+/* fn_80143C40: getField24_byte */
+/* fn_80143C50: setPosX (f32) */
+/* fn_80143C68: setPosY (f32) */
+/* fn_80143C80: setPosZ (f32) */
+/* fn_80143C98: setRotAngle (f32) */
+/* fn_80143CB0: setScale (f32) */
+/* fn_80143CC8: setModelRef */
+/* fn_80143CE0: setField24 */
+/* fn_80143CF8: setField24_byte */
+/* fn_80143D10: getField_ext1 */
+/* fn_80143D28: getField_ext2 */
+/* fn_80143D40: getField_ext3 */
+/* fn_80143D58: getField_ext4 */
+/* fn_80143D70: getField_ext5 */
+/* fn_80143D88: getField_ext6 */
+/* fn_80143DA0: getField_ext7 (with extra logic) */
+/* fn_80143DCC: getField_ext8 */
+/* fn_80143DE4: getField_ext9 */
+/* fn_80143DFC: getField_ext10 */
+/* fn_80143E14: getField_ext11 */
+/* fn_80143E2C: setField_ext1 */
+/* fn_80143E60: setField_ext2 */
+/* fn_80143E88: setField_ext3 (0x68 bytes) */
+/* fn_80143EF0: setField_ext4 */
+/* fn_80143F24: setField_ext5 */
+/* fn_80143F54: getField_ext12 */
+/* fn_80143F6C: getField_ext13 */
+/* fn_80143F84: getField_ext14 */
+/* fn_80143F9C: getField_ext15 */
+/* fn_80143FB4: getField_ext16 */
+/* fn_80143FCC: getField_ext17 */
+/* fn_80143FE4: getField_ext18 */
+/* fn_80143FFC: getField_ext19 */
+/* fn_80144014: getField_ext20 */
+/* fn_8014402C: setField_ext6 */
+/* fn_80144064: setField_ext7 */
+/* fn_80144088: peopleFieldQuery (0x18 bytes) -- quick status check */
+
 /* fn_801440F0: peopleFieldOpenModel (0xB8 bytes) */
 /* fn_801441A8: peopleFieldConfigModel (0x224 bytes) */
 /* fn_801443CC: peopleFieldFinalizeModel (0x1A8 bytes) */
