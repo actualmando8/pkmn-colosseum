@@ -146,6 +146,17 @@ def convert_do_while_wrap(lines):
             if has_external_ref:
                 continue
 
+            # Verify brace balance from wrap_start to end_pos
+            brace_depth = 0
+            brace_ok = True
+            for k in range(wrap_start, end_pos):
+                brace_depth += lines[k].count('{') - lines[k].count('}')
+                if brace_depth < 0:
+                    brace_ok = False
+                    break
+            if not brace_ok or brace_depth != 0:
+                continue
+
             # All checks passed - apply transformation
             indent = ' ' * end_indent
 

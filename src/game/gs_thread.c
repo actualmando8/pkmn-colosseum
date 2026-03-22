@@ -546,6 +546,10 @@ GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
     gsThreadActive = 1;
     return thread;
 }
+        }
+        thread++;
+    }
+    return NULL;
 
 /* =======================================================================
  *  GStaskSchedulerThread / fn_800FEA74  (INTERNAL)
@@ -973,7 +977,6 @@ void fn_800F0A74(void) {
                     goto L_800F0BA0;
 
                     r3 = *(u32*)((u8*)r3 + 0x4);
-            }
                 L_800F0B94: ;
             } while ((u32)r3 != (u32)0x0);
             r3 = 0x0;
@@ -1220,6 +1223,7 @@ void fn_800F0A74(void) {
     }
 
     return;
+}
 }
 
 /* fn_800F106C - 0x800F106C | size: 0x7C */
@@ -8021,6 +8025,8 @@ void fn_800F6D18(void) {
 
     return;
 }
+}
+}
 
 /* fn_800F7068 - 0x800F7068 | size: 0xA0 */
 void fn_800F7068(void) {
@@ -8293,6 +8299,8 @@ void fn_800F8428(void) {
         fn_800AB4FC();
     }
     return;
+}
+}
 }
 
 /* 0x800F8654 | 0x400 */
@@ -8937,6 +8945,19 @@ void fn_800F8A54(void) {
 
     return;
 }
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
 
 /* 0x800F915C | 0xB4 */
 void fn_800F915C(void) {
@@ -9040,6 +9061,8 @@ void fn_800F9210(void) {
     *(u32*)((u8*)r31 + 0x4) = r0;
 
     return;
+}
+}
 }
 
 /* 0x44 | fn_800F92D4 | generic */
@@ -9560,6 +9583,10 @@ void fn_800F96E4(void) {
 
     return;
 }
+}
+}
+}
+}
 
 /* 0x800F9AEC | 0x118 */
 void fn_800F9AEC(void) {
@@ -9956,6 +9983,8 @@ void fn_800FA064(void) {
     *(f32*)((u8*)r31 + 0xC) = f0;
 
     return;
+}
+}
 }
 
 /* 0x5C | fn_800FA160 | single_call_straight */
@@ -10574,6 +10603,8 @@ void fn_800FA444(void) {
 
     return;
 }
+}
+}
 
 /* 0x800FAA98 | 0x460 */
 void fn_800FAA98(void) {
@@ -10871,6 +10902,8 @@ void fn_800FAA98(void) {
     *(u8*)((u8*)r23 + 0x45) = r0;
     *(u8*)((u8*)r23 + 0x1) = r26;
     return;
+}
+}
 }
 
 /* 0x800FAEF8 | 0x544 */
@@ -11222,6 +11255,8 @@ void fn_800FAEF8(void) {
     fn_800EF504();
     r3 = 0x0;
     return;
+}
+}
 }
 
 /* 0x800FB43C | 0x244 */
@@ -13423,6 +13458,13 @@ void fn_800FC7E0(void) {
 
     return;
 }
+}
+}
+}
+}
+}
+}
+}
 
 /* 0x800FD348 | 0x354 */
 void fn_800FD348(void) {
@@ -14240,6 +14282,7 @@ void fn_800FD69C(void) {
     f28 = *(f64*)(sp + 0xA0);
     return;
 }
+}
 
 /* 0x800FDF1C | 0xC8 */
 void fn_800FDF1C(void) {
@@ -15006,6 +15049,8 @@ void fn_800FE834(void) {
     r3 = r3 + 0x1;
 
     return;
+}
+}
 }
 
 /* 0x800FE9B0 | 0xC4 */

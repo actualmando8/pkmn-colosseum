@@ -764,13 +764,13 @@ void fn_800CB4D8(void) {
         r3 = r5 | r3;
         r3 = (u32)r3 >> 31;
         r3 = r8 | r3;
-        if (r3 > r6) {
-        } while (0);
-
+        if (r3 > r6) break;
+    } while (0);
+    if (r3 > r6) {
         f0 = f1 * f0;
         f1 = f0 / f0;
         return;
-        }
+    }
     do {
         if ((s32)r7 > (s32)r8) break;
         if ((s32)r7 < (s32)r8) return;

@@ -822,13 +822,10 @@ L_80083120:
             if ((s32)tmp > 6) break;
             tmp = *(u8*)((u8*)r3 + 0x1D);
             tmp = (s8)tmp;
-            if ((s32)tmp > 5) {
-            } while (0);
-
+            if ((s32)tmp > 5) break;
             tmp = 0x0;
             *(u16*)((u8*)r3 + 0x0) = tmp;
-            break;
-            }
+        } while (0);
         if ((s32)r7 == (s32)r27) {
         }
         r4 = *(u8*)((u8*)r3 + 0x1C);
@@ -1017,13 +1014,10 @@ L_800833FC:
             if ((s32)r5 > 6) break;
             r5 = *(u8*)((u8*)r3 + 0x1D);
             r5 = (s8)r5;
-            if ((s32)r5 > 5) {
-            } while (0);
-
+            if ((s32)r5 > 5) break;
             tmp = 0x0;
             *(u16*)((u8*)r3 + 0x0) = tmp;
-            break;
-            }
+        } while (0);
         if ((s32)r4 == (s32)r27) {
         }
         r6 = *(u8*)((u8*)r3 + 0x1C);
@@ -1207,13 +1201,10 @@ s32 fn_800836AC(void) {
             if ((s32)r4 > 6) break;
             tmp = *(u8*)((u8*)r3 + 0x1D);
             tmp = (s8)tmp;
-            if ((s32)tmp > 5) {
-            } while (0);
-
+            if ((s32)tmp > 5) break;
             tmp = 0x0;
             *(u16*)((u8*)r3 + 0x0) = tmp;
-            break;
-            }
+        } while (0);
         tmp = r4 * tmp;
         r7 = r7 + 0x1;
         r4 = tmp << 4;
@@ -1258,13 +1249,10 @@ s32 fn_800836AC(void) {
                 if ((s32)r5 > 6) break;
                 r5 = *(u8*)((u8*)r3 + 0x1D);
                 r5 = (s8)r5;
-                if ((s32)r5 > 5) {
-                } while (0);
-
+                if ((s32)r5 > 5) break;
                 tmp = 0x0;
                 *(u16*)((u8*)r3 + 0x0) = tmp;
-                break;
-                }
+            } while (0);
             if ((s32)r4 == (s32)r28) {
             }
             r6 = *(u8*)((u8*)r3 + 0x1C);
@@ -1331,13 +1319,10 @@ s32 fn_800836AC(void) {
             if ((s32)tmp > 6) break;
             tmp = *(u8*)((u8*)r4 + 0x1D);
             tmp = (s8)tmp;
-            if ((s32)tmp > 5) {
-            } while (0);
-
+            if ((s32)tmp > 5) break;
             tmp = 0x0;
             *(u16*)((u8*)r4 + 0x0) = tmp;
-            break;
-            }
+        } while (0);
         if ((s32)r8 == (s32)-0x1) {
         }
         r5 = *(u8*)((u8*)r4 + 0x1C);
