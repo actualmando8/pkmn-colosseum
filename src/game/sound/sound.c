@@ -578,45 +578,45 @@ u32 sndCheckFileInfo(u32 sndId, u32 fadeTime, u32 volume, u32 isBgm) {
 
     /* If the same sound is already playing, skip re-triggering */
     if (curHandle == sndId) {
-        goto bind_and_play;
-    }
 
-    /* If another sound IS playing, stop it first */
-    if ((curHandle + 0x10000) != 0xFFFF) {
-        s32 status = GSsndGetStatus(sndId);
-        if (status > 0 && status < 4) {
-            _sndCheckSndWorkAll(curHandle, SND_FADE_DEFAULT, 0);
-            _sndFadeBgm(SND_FADE_DEFAULT);
-            _sndReleaseWork(curHandle);
-        }
-    }
-
-    /* Look up wave data pointer from the file_info table */
-    fileInfoData = g_sndFileInfoData;
-    wavePtr = *(void**)((u8*)fileInfoData + (fileInfoIdx * 8));
-
-    if (wavePtr != NULL) {
-        /* Wave data already loaded -- use direct playback */
-        void* jAudioBuf = (void*)fn_800F9318(0, category);
-        sndStreamLoad(wavePtr, jAudioBuf, bufSize); /* fn_80165EE0 */
     } else {
-        /* Try stream name from second pointer in file_info entry */
-        streamName = *(void**)((u8*)fileInfoData + (fileInfoIdx * 8) + 4);
-        if (streamName != NULL) {
-            void* jAudioBuf = (void*)fn_800F9318(0, category);
-            sndWaveOpenByName(streamName, jAudioBuf, bufSize); /* fn_80165DEC */
-        } else {
-            /* No data available */
-            fn_800DD970("ERROR(sound.c): Can't Play Sound. snd_id=%d\n",
-                        sndId);
-            return 0;
+
+        /* If another sound IS playing, stop it first */
+        if ((curHandle + 0x10000) != 0xFFFF) {
+            s32 status = GSsndGetStatus(sndId);
+            if (status > 0 && status < 4) {
+                _sndCheckSndWorkAll(curHandle, SND_FADE_DEFAULT, 0);
+                _sndFadeBgm(SND_FADE_DEFAULT);
+                _sndReleaseWork(curHandle);
+            }
         }
+
+        /* Look up wave data pointer from the file_info table */
+        fileInfoData = g_sndFileInfoData;
+        wavePtr = *(void**)((u8*)fileInfoData + (fileInfoIdx * 8));
+
+        if (wavePtr != NULL) {
+            /* Wave data already loaded -- use direct playback */
+            void* jAudioBuf = (void*)fn_800F9318(0, category);
+            sndStreamLoad(wavePtr, jAudioBuf, bufSize); /* fn_80165EE0 */
+        } else {
+            /* Try stream name from second pointer in file_info entry */
+            streamName = *(void**)((u8*)fileInfoData + (fileInfoIdx * 8) + 4);
+            if (streamName != NULL) {
+                void* jAudioBuf = (void*)fn_800F9318(0, category);
+                sndWaveOpenByName(streamName, jAudioBuf, bufSize); /* fn_80165DEC */
+            } else {
+                /* No data available */
+                fn_800DD970("ERROR(sound.c): Can't Play Sound. snd_id=%d\n",
+                            sndId);
+                return 0;
+            }
+        }
+
+        /* Bind this sound to a work entry */
+        fn_80166B3C(sndId, 0, category);
+
     }
-
-    /* Bind this sound to a work entry */
-    fn_80166B3C(sndId, 0, category);
-
-bind_and_play:
     /* Track as current BGM */
     if (isBgm) {
         g_currentStreamBgmId = sndId;
@@ -707,44 +707,46 @@ void sndWaveOpenByName(const char* filename, void* buffer, u32 bufSize) {
 
     if (fileHandle == NULL) {
         fn_800DD970("ERROR: Unable to open '%s'\n", filename);
-        goto cleanup;
+
+    } else {
+
+        /* Get the file size */
+        fileSize = (u32)fn_80167E5C(fileHandle);
+
+        if (fileSize == 0) {
+            fn_800DD970("ERROR: Zero length file '%s'\n", filename);
+
+        } else {
+
+            /* Align size to 32-byte boundary */
+            alignedSize = (fileSize + 0x1F) & ~0x1F;
+
+            if (alignedSize >= bufSize) {
+                fn_800DD970("ERROR: Over Sound Buffer\n");
+                goto release;
+            }
+
+            /* Allocate and read */
+            if (buffer == NULL) {
+                fn_800DD970("ERROR: Unable to allocate buffer\n");
+                goto release;
+            }
+
+            memset(buffer, 0xE0, alignedSize); /* fill with silence pattern */
+
+            if (fn_80167ED0(fileHandle, buffer, alignedSize, 0) <= 0) {
+                fn_800DD970("ERROR: Failed to read data from '%s'\n", filename);
+                goto release;
+            }
+
+            goto cleanup; /* success path falls through */
+
+        }
+    release:
+        fn_80167E64(fileHandle); /* release stream handle */
+        return;
+
     }
-
-    /* Get the file size */
-    fileSize = (u32)fn_80167E5C(fileHandle);
-
-    if (fileSize == 0) {
-        fn_800DD970("ERROR: Zero length file '%s'\n", filename);
-        goto release;
-    }
-
-    /* Align size to 32-byte boundary */
-    alignedSize = (fileSize + 0x1F) & ~0x1F;
-
-    if (alignedSize >= bufSize) {
-        fn_800DD970("ERROR: Over Sound Buffer\n");
-        goto release;
-    }
-
-    /* Allocate and read */
-    if (buffer == NULL) {
-        fn_800DD970("ERROR: Unable to allocate buffer\n");
-        goto release;
-    }
-
-    memset(buffer, 0xE0, alignedSize); /* fill with silence pattern */
-
-    if (fn_80167ED0(fileHandle, buffer, alignedSize, 0) <= 0) {
-        fn_800DD970("ERROR: Failed to read data from '%s'\n", filename);
-        goto release;
-    }
-
-    goto cleanup; /* success path falls through */
-
-release:
-    fn_80167E64(fileHandle); /* release stream handle */
-    return;
-
 cleanup:
     fn_80167E64(fileHandle);
 }

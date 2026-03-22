@@ -659,48 +659,49 @@ void GSfloorThreadMain(void)
             memHandle = GSmemAllocRaw(totalSize);
             if ((memHandle & 0xFFFF) == 0) {
                 memHandle = 0;
-                goto transitionEnd;
-            }
 
-            {
-                u8* memPtr = (u8*)GSmemGetPtr(memHandle);
-                if (memPtr == NULL) {
-                    memHandle = 0;
-                    goto transitionEnd;
-                }
+            } else {
 
-                /* Pass 2: read each resource chunk into the allocated block */
                 {
-                    GSFloorResHandler* handler = gsFloorResHandlers;
-                    u32 handlerCount = gsFloorResHandlerCount;
-                    u32 h;
-                    u8* writePtr = memPtr;
-                    for (h = 0; h < handlerCount; h++) {
-                        if (handler->typeId == resTypeId) {
-                            u32 (*sizeFunc)(void) = (u32 (*)(void))handler->sizeFunc;
-                            u32 chunkSize = sizeFunc();
-                            u32 alignedSize = (chunkSize + 3) & ~3;
-
-                            /* Store size as header */
-                            *(u32*)writePtr = alignedSize;
-
-                            /* Call read function to fill the data */
-                            {
-                                void (*readFunc)(void*, u32) =
-                                    (void (*)(void*, u32))handler->readFunc;
-                                readFunc(writePtr + 4, alignedSize);
-                            }
-
-                            writePtr += 4 + alignedSize;
-                        }
-                        handler++;
+                    u8* memPtr = (u8*)GSmemGetPtr(memHandle);
+                    if (memPtr == NULL) {
+                        memHandle = 0;
+                        goto transitionEnd;
                     }
+
+                    /* Pass 2: read each resource chunk into the allocated block */
+                    {
+                        GSFloorResHandler* handler = gsFloorResHandlers;
+                        u32 handlerCount = gsFloorResHandlerCount;
+                        u32 h;
+                        u8* writePtr = memPtr;
+                        for (h = 0; h < handlerCount; h++) {
+                            if (handler->typeId == resTypeId) {
+                                u32 (*sizeFunc)(void) = (u32 (*)(void))handler->sizeFunc;
+                                u32 chunkSize = sizeFunc();
+                                u32 alignedSize = (chunkSize + 3) & ~3;
+
+                                /* Store size as header */
+                                *(u32*)writePtr = alignedSize;
+
+                                /* Call read function to fill the data */
+                                {
+                                    void (*readFunc)(void*, u32) =
+                                        (void (*)(void*, u32))handler->readFunc;
+                                    readFunc(writePtr + 4, alignedSize);
+                                }
+
+                                writePtr += 4 + alignedSize;
+                            }
+                            handler++;
+                        }
+                    }
+
+                    /* Free the allocation (data has been processed) */
+                    GSmemFree(memHandle);
                 }
 
-                /* Free the allocation (data has been processed) */
-                GSmemFree(memHandle);
             }
-
         transitionEnd:
             /* Store resource memory handle */
             ctx->resMemHandle = memHandle;
@@ -1104,43 +1105,44 @@ void GSfloorLoadMain(u32 fsysHandle, const char* archiveName,
     if (found != NULL) {
         /* Entry already exists: increment reference count */
         found->refCount++;
-        goto postRegister;
-    }
 
-    /* No existing entry: create a new resource load thread */
-    resThread = fn_800F9418(0x60, 0x20, loadParam1, loadParam2,
-                             (void*)fn_80101910);
-    if (resThread == NULL) {
-        fn_800DD970(lbl_802717F0 + 0x540, 0x44);
-        return;
-    }
+    } else {
 
-    /* Bind to the FSYS archive */
-    fn_80191F64(resThread, fsysHandle, archiveName);
+        /* No existing entry: create a new resource load thread */
+        resThread = fn_800F9418(0x60, 0x20, loadParam1, loadParam2,
+                                 (void*)fn_80101910);
+        if (resThread == NULL) {
+            fn_800DD970(lbl_802717F0 + 0x540, 0x44);
+            return;
+        }
 
-    /* Find a free slot and copy the entry data */
-    /* First pass: search in blocks of 4 (unrolled) for matching handles */
-    for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
-        GSFloorDataEntry* entry = &table[i];
-        if (entry->refCount != 0) {
-            u32 newHandle = ((GSFloorDataEntry*)resThread)->fsysFileHandle;
-            if (entry->fsysFileHandle == newHandle) {
-                entry->refCount++;
-                goto postRegister;
+        /* Bind to the FSYS archive */
+        fn_80191F64(resThread, fsysHandle, archiveName);
+
+        /* Find a free slot and copy the entry data */
+        /* First pass: search in blocks of 4 (unrolled) for matching handles */
+        for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
+            GSFloorDataEntry* entry = &table[i];
+            if (entry->refCount != 0) {
+                u32 newHandle = ((GSFloorDataEntry*)resThread)->fsysFileHandle;
+                if (entry->fsysFileHandle == newHandle) {
+                    entry->refCount++;
+                    goto postRegister;
+                }
             }
         }
-    }
 
-    /* No matching slot: find any free slot */
-    for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
-        GSFloorDataEntry* entry = &table[i];
-        if (entry->refCount == 0) {
-            memcpy(entry, resThread, 0x44);
-            entry->refCount = 1;
-            break;
+        /* No matching slot: find any free slot */
+        for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
+            GSFloorDataEntry* entry = &table[i];
+            if (entry->refCount == 0) {
+                memcpy(entry, resThread, 0x44);
+                entry->refCount = 1;
+                break;
+            }
         }
-    }
 
+    }
 postRegister:
     /* Look up TOC for statistics logging */
     tocEntry = fn_80191ECC(found ? found : &table[0],

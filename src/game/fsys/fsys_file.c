@@ -537,49 +537,49 @@ void FSYSBeginLoad(FSYSSlot* slot, u32 fileHandle,
 state_loaded:
     /* Re-entry: archive is loaded, process a specific file */
     if (loadMode != 3) {
-        goto state_check_mode;
-    }
 
-    /* Mode 3: resolve file within loaded archive */
-    slot->archiveHandle = 0;
-    slot->archiveSize   = 0;
-    slot->callbackA     = callbackA;
-    slot->callbackB     = callbackB;
-    slot->callbackC     = callbackC;
-    slot->fileHandle    = fileHandle;
-    slot->fileIndex     = 0;
-    slot->loadMode      = loadMode;
-    slot->reloadFlag    = 1;
+    } else {
 
-    /* Search TOC again for the entry */
-    tocData = gFSYSTocData;
-    numTocEntries = *(u32*)((u8*)tocData + 0x08);
-    tocEntryPtr = (u32*)((u8*)tocData + *(u32*)((u8*)tocData + 0x10));
-    tocName = NULL;
+        /* Mode 3: resolve file within loaded archive */
+        slot->archiveHandle = 0;
+        slot->archiveSize   = 0;
+        slot->callbackA     = callbackA;
+        slot->callbackB     = callbackB;
+        slot->callbackC     = callbackC;
+        slot->fileHandle    = fileHandle;
+        slot->fileIndex     = 0;
+        slot->loadMode      = loadMode;
+        slot->reloadFlag    = 1;
 
-    for (i = 0; i < numTocEntries; i++) {
-        if (tocEntryPtr[0] == fileHandle) {
-            u32 nameOff = tocEntryPtr[1];
-            tocName = (char*)((u8*)tocData + nameOff);
-            break;
+        /* Search TOC again for the entry */
+        tocData = gFSYSTocData;
+        numTocEntries = *(u32*)((u8*)tocData + 0x08);
+        tocEntryPtr = (u32*)((u8*)tocData + *(u32*)((u8*)tocData + 0x10));
+        tocName = NULL;
+
+        for (i = 0; i < numTocEntries; i++) {
+            if (tocEntryPtr[0] == fileHandle) {
+                u32 nameOff = tocEntryPtr[1];
+                tocName = (char*)((u8*)tocData + nameOff);
+                break;
+            }
+            tocEntryPtr = (u32*)((u8*)tocEntryPtr + 8);
         }
-        tocEntryPtr = (u32*)((u8*)tocEntryPtr + 8);
+
+        /* Format filename and set up for re-load */
+        fn_800C8520(nameBuf, "%s.fsys", tocName);
+        fn_800CA968(slot->filename, nameBuf);
+
+        /* Check if loading is blocked */
+        if (mgr->activeSlot != NULL) {
+            slot->status = FSYS_STATUS_PENDING;
+            return;
+        }
+
+        mgr->activeSlot  = slot;
+        mgr->currentSlot = slot;
+
     }
-
-    /* Format filename and set up for re-load */
-    fn_800C8520(nameBuf, "%s.fsys", tocName);
-    fn_800CA968(slot->filename, nameBuf);
-
-    /* Check if loading is blocked */
-    if (mgr->activeSlot != NULL) {
-        slot->status = FSYS_STATUS_PENDING;
-        return;
-    }
-
-    mgr->activeSlot  = slot;
-    mgr->currentSlot = slot;
-
-state_check_mode:
     if (loadMode >= 4) {
         if (loadMode == 7) {
             slot->status = FSYS_STATUS_ERROR;

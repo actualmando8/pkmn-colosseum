@@ -246,20 +246,21 @@ FSYSSlot* FSYSFindSlot(u32 fileHandle, u32 mode) {
                 }
                 /* Not yet loaded */
                 if (mode == 2) {
-                    goto found_loaded;
-                }
-                if (mode >= 3) {
-                    if (mode == 7) {
-                        goto found_loaded;
+
+                } else {
+                    if (mode >= 3) {
+                        if (mode == 7) {
+                            goto found_loaded;
+                        }
+                        goto unmatched;
                     }
-                    goto unmatched;
-                }
-                /* mode == 0 */
-                if (slot->loadMode == 2) {
-                    goto unmatched;
-                }
-                if (slot->loadMode == 7) {
-                    goto unmatched;
+                    /* mode == 0 */
+                    if (slot->loadMode == 2) {
+                        goto unmatched;
+                    }
+                    if (slot->loadMode == 7) {
+                        goto unmatched;
+                    }
                 }
                 found_loaded:
                 slot->refCount++;

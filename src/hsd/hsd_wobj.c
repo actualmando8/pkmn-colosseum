@@ -1517,47 +1517,47 @@ while (1) {
                 f8 = f3 * f0;
                 f1 = f1 * f8;
                 f1 = (f32)f1;
-                goto L_80192964;
-            }
-            f0 = *(f64*)lbl_8047D938;
-            if (f1 < f0) {
-                r3 = (u32)lbl_80478AC0;
-                f1 = *(f32*)lbl_80478AC0;
 
             } else {
-            do {
-                *(f32*)(sp + 0x8) = f1;
-                tmp = 0x7F800000;
-                r3 = r3 & 0x7F800000;
-                if ((s32)r3 != (s32)tmp) {
-                    if ((s32)r3 >= (s32)tmp) goto L_80192950;
-                    if ((s32)r3 != 0) {
-                        goto L_80192950;
-                    }
-                    tmp = tmp & 0x7FFFFF;
-                    if ((s32)r3 != 0) {
-                        tmp = 0x1;
-                        break;
-                    }
-                    tmp = 0x2;
-                    break;
-                    }
-                tmp = tmp & 0x7FFFFF;
-                if ((s32)r3 != 0) {
-                    tmp = 0x5;
-                    break;
-                }
-                tmp = 0x3;
-                break;
-            L_80192950:
-                tmp = 0x4;
-            } while (0);
-                if ((s32)tmp == 1) {
+                f0 = *(f64*)lbl_8047D938;
+                if (f1 < f0) {
                     r3 = (u32)lbl_80478AC0;
                     f1 = *(f32*)lbl_80478AC0;
+
+                } else {
+                do {
+                    *(f32*)(sp + 0x8) = f1;
+                    tmp = 0x7F800000;
+                    r3 = r3 & 0x7F800000;
+                    if ((s32)r3 != (s32)tmp) {
+                        if ((s32)r3 >= (s32)tmp) goto L_80192950;
+                        if ((s32)r3 != 0) {
+                            goto L_80192950;
+                        }
+                        tmp = tmp & 0x7FFFFF;
+                        if ((s32)r3 != 0) {
+                            tmp = 0x1;
+                            break;
+                        }
+                        tmp = 0x2;
+                        break;
+                        }
+                    tmp = tmp & 0x7FFFFF;
+                    if ((s32)r3 != 0) {
+                        tmp = 0x5;
+                        break;
+                    }
+                    tmp = 0x3;
+                    break;
+                L_80192950:
+                    tmp = 0x4;
+                } while (0);
+                    if ((s32)tmp == 1) {
+                        r3 = (u32)lbl_80478AC0;
+                        f1 = *(f32*)lbl_80478AC0;
+                    }
                 }
             }
-        L_80192964:
             *(f32*)(sp + 0x10) = f1;
             *(u32*)((u8*)r23 + 0x4) = tmp;
             continue;

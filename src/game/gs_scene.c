@@ -735,47 +735,47 @@ void GSscene_XFBCapture(u32 captureIndex) {
                 f0 = f1 * f0;
                 f4 = f4 * f0;
                 f4 = (f32)f4;
-                goto L_80177EEC;
-            }
-            f0 = *(f64*)lbl_8047D758;
-            if (f4 < f0) {
-                captureIndex = (u32)lbl_80478AC0;
-                f4 = *(f32*)lbl_80478AC0;
 
             } else {
-            do {
-                *(f32*)(sp + 0x50) = f4;
-                tmp = 0x7F800000;
-                captureIndex = r4 & 0x7F800000;
-                if ((s32)captureIndex != (s32)tmp) {
-                    if ((s32)captureIndex >= (s32)tmp) goto L_80177ED8;
-                    if ((s32)captureIndex != 0) {
-                        goto L_80177ED8;
-                    }
-                    tmp = r4 & 0x7FFFFF;
-                    if ((s32)captureIndex != 0) {
-                        tmp = 0x1;
-                        break;
-                    }
-                    tmp = 0x2;
-                    break;
-                    }
-                tmp = r4 & 0x7FFFFF;
-                if ((s32)captureIndex != 0) {
-                    tmp = 0x5;
-                    break;
-                }
-                tmp = 0x3;
-                break;
-            L_80177ED8:
-                tmp = 0x4;
-            } while (0);
-                if ((s32)tmp == 1) {
+                f0 = *(f64*)lbl_8047D758;
+                if (f4 < f0) {
                     captureIndex = (u32)lbl_80478AC0;
                     f4 = *(f32*)lbl_80478AC0;
+
+                } else {
+                do {
+                    *(f32*)(sp + 0x50) = f4;
+                    tmp = 0x7F800000;
+                    captureIndex = r4 & 0x7F800000;
+                    if ((s32)captureIndex != (s32)tmp) {
+                        if ((s32)captureIndex >= (s32)tmp) goto L_80177ED8;
+                        if ((s32)captureIndex != 0) {
+                            goto L_80177ED8;
+                        }
+                        tmp = r4 & 0x7FFFFF;
+                        if ((s32)captureIndex != 0) {
+                            tmp = 0x1;
+                            break;
+                        }
+                        tmp = 0x2;
+                        break;
+                        }
+                    tmp = r4 & 0x7FFFFF;
+                    if ((s32)captureIndex != 0) {
+                        tmp = 0x5;
+                        break;
+                    }
+                    tmp = 0x3;
+                    break;
+                L_80177ED8:
+                    tmp = 0x4;
+                } while (0);
+                    if ((s32)tmp == 1) {
+                        captureIndex = (u32)lbl_80478AC0;
+                        f4 = *(f32*)lbl_80478AC0;
+                    }
                 }
             }
-        L_80177EEC:
             captureIndex = *(u32*)&lbl_80478C40;
             *(f32*)((u8*)captureIndex + 0x44) = f4;
             break;
@@ -811,47 +811,47 @@ void GSscene_XFBCapture(u32 captureIndex) {
                 f0 = f1 * f0;
                 f4 = f4 * f0;
                 f4 = (f32)f4;
-                goto L_80178000;
-            }
-            f0 = *(f64*)lbl_8047D758;
-            if (f4 < f0) {
-                captureIndex = (u32)lbl_80478AC0;
-                f4 = *(f32*)lbl_80478AC0;
 
             } else {
-            do {
-                *(f32*)(sp + 0x4C) = f4;
-                tmp = 0x7F800000;
-                captureIndex = r4 & 0x7F800000;
-                if ((s32)captureIndex != (s32)tmp) {
-                    if ((s32)captureIndex >= (s32)tmp) goto L_80177FEC;
-                    if ((s32)captureIndex != 0) {
-                        goto L_80177FEC;
-                    }
-                    tmp = r4 & 0x7FFFFF;
-                    if ((s32)captureIndex != 0) {
-                        tmp = 0x1;
-                        break;
-                    }
-                    tmp = 0x2;
-                    break;
-                    }
-                tmp = r4 & 0x7FFFFF;
-                if ((s32)captureIndex != 0) {
-                    tmp = 0x5;
-                    break;
-                }
-                tmp = 0x3;
-                break;
-            L_80177FEC:
-                tmp = 0x4;
-            } while (0);
-                if ((s32)tmp == 1) {
+                f0 = *(f64*)lbl_8047D758;
+                if (f4 < f0) {
                     captureIndex = (u32)lbl_80478AC0;
                     f4 = *(f32*)lbl_80478AC0;
+
+                } else {
+                do {
+                    *(f32*)(sp + 0x4C) = f4;
+                    tmp = 0x7F800000;
+                    captureIndex = r4 & 0x7F800000;
+                    if ((s32)captureIndex != (s32)tmp) {
+                        if ((s32)captureIndex >= (s32)tmp) goto L_80177FEC;
+                        if ((s32)captureIndex != 0) {
+                            goto L_80177FEC;
+                        }
+                        tmp = r4 & 0x7FFFFF;
+                        if ((s32)captureIndex != 0) {
+                            tmp = 0x1;
+                            break;
+                        }
+                        tmp = 0x2;
+                        break;
+                        }
+                    tmp = r4 & 0x7FFFFF;
+                    if ((s32)captureIndex != 0) {
+                        tmp = 0x5;
+                        break;
+                    }
+                    tmp = 0x3;
+                    break;
+                L_80177FEC:
+                    tmp = 0x4;
+                } while (0);
+                    if ((s32)tmp == 1) {
+                        captureIndex = (u32)lbl_80478AC0;
+                        f4 = *(f32*)lbl_80478AC0;
+                    }
                 }
             }
-        L_80178000:
             captureIndex = *(u32*)&lbl_80478C40;
             *(f32*)((u8*)captureIndex + 0x44) = f4;
             captureIndex = *(u32*)&lbl_80478C40;
@@ -1091,47 +1091,47 @@ L_80178200:
             f0 = f1 * f0;
             f4 = f4 * f0;
             f4 = (f32)f4;
-            goto L_80178440;
-        }
-        f0 = *(f64*)lbl_8047D758;
-        if (f4 < f0) {
-            captureIndex = (u32)lbl_80478AC0;
-            f4 = *(f32*)lbl_80478AC0;
 
         } else {
-        do {
-            *(f32*)(sp + 0x8) = f4;
-            tmp = 0x7F800000;
-            captureIndex = r4 & 0x7F800000;
-            if ((s32)captureIndex != (s32)tmp) {
-                if ((s32)captureIndex >= (s32)tmp) goto L_8017842C;
-                if ((s32)captureIndex != 0) {
-                    goto L_8017842C;
-                }
-                tmp = r4 & 0x7FFFFF;
-                if ((s32)captureIndex != 0) {
-                    tmp = 0x1;
-                    break;
-                }
-                tmp = 0x2;
-                break;
-                }
-            tmp = r4 & 0x7FFFFF;
-            if ((s32)captureIndex != 0) {
-                tmp = 0x5;
-                break;
-            }
-            tmp = 0x3;
-            break;
-        L_8017842C:
-            tmp = 0x4;
-        } while (0);
-            if ((s32)tmp == 1) {
+            f0 = *(f64*)lbl_8047D758;
+            if (f4 < f0) {
                 captureIndex = (u32)lbl_80478AC0;
                 f4 = *(f32*)lbl_80478AC0;
+
+            } else {
+            do {
+                *(f32*)(sp + 0x8) = f4;
+                tmp = 0x7F800000;
+                captureIndex = r4 & 0x7F800000;
+                if ((s32)captureIndex != (s32)tmp) {
+                    if ((s32)captureIndex >= (s32)tmp) goto L_8017842C;
+                    if ((s32)captureIndex != 0) {
+                        goto L_8017842C;
+                    }
+                    tmp = r4 & 0x7FFFFF;
+                    if ((s32)captureIndex != 0) {
+                        tmp = 0x1;
+                        break;
+                    }
+                    tmp = 0x2;
+                    break;
+                    }
+                tmp = r4 & 0x7FFFFF;
+                if ((s32)captureIndex != 0) {
+                    tmp = 0x5;
+                    break;
+                }
+                tmp = 0x3;
+                break;
+            L_8017842C:
+                tmp = 0x4;
+            } while (0);
+                if ((s32)tmp == 1) {
+                    captureIndex = (u32)lbl_80478AC0;
+                    f4 = *(f32*)lbl_80478AC0;
+                }
             }
         }
-    L_80178440:
         captureIndex = *(u32*)&lbl_80478C40;
         *(f32*)((u8*)captureIndex + 0x44) = f4;
         f1 = *(f32*)(sp + 0x90);
@@ -1368,47 +1368,47 @@ sceneObj = *(u32*)&lbl_80478C40;
         f0 = f1 * f0;
         f31 = f31 * f0;
         f31 = (f32)f31;
-        goto L_80178C28;
-    }
-    f0 = *(f64*)lbl_8047D758;
-    if (f31 < f0) {
-    sceneObj = (u32)lbl_80478AC0;
-        f31 = *(f32*)lbl_80478AC0;
 
     } else {
-        *(f32*)(sp + 0x8) = f31;
-        tmp = 0x7F800000;
-    sceneObj = (r4 & 0x7F800000);
-    do {
-        if ((s32)sceneObj != (s32)tmp) {
-            if ((s32)sceneObj >= (s32)tmp) goto L_80178C14;
-            if ((s32)sceneObj != 0) {
-                goto L_80178C14;
-            }
-            tmp = r4 & 0x7FFFFF;
-            if ((s32)sceneObj != 0) {
-                tmp = 0x1;
-                break;
-            }
-            tmp = 0x2;
-            break;
-            }
-        tmp = r4 & 0x7FFFFF;
-        if ((s32)sceneObj != 0) {
-            tmp = 0x5;
-            break;
-        }
-        tmp = 0x3;
-        break;
-    L_80178C14:
-        tmp = 0x4;
-    } while (0);
-        if ((s32)tmp == 1) {
+        f0 = *(f64*)lbl_8047D758;
+        if (f31 < f0) {
         sceneObj = (u32)lbl_80478AC0;
             f31 = *(f32*)lbl_80478AC0;
+
+        } else {
+            *(f32*)(sp + 0x8) = f31;
+            tmp = 0x7F800000;
+        sceneObj = (r4 & 0x7F800000);
+        do {
+            if ((s32)sceneObj != (s32)tmp) {
+                if ((s32)sceneObj >= (s32)tmp) goto L_80178C14;
+                if ((s32)sceneObj != 0) {
+                    goto L_80178C14;
+                }
+                tmp = r4 & 0x7FFFFF;
+                if ((s32)sceneObj != 0) {
+                    tmp = 0x1;
+                    break;
+                }
+                tmp = 0x2;
+                break;
+                }
+            tmp = r4 & 0x7FFFFF;
+            if ((s32)sceneObj != 0) {
+                tmp = 0x5;
+                break;
+            }
+            tmp = 0x3;
+            break;
+        L_80178C14:
+            tmp = 0x4;
+        } while (0);
+            if ((s32)tmp == 1) {
+            sceneObj = (u32)lbl_80478AC0;
+                f31 = *(f32*)lbl_80478AC0;
+            }
         }
     }
-L_80178C28:
 sceneObj = (u32)0x1;
     fn_800F7BC4();
 tmp = (u32)sceneObj & 0x00000020;
@@ -1456,29 +1456,29 @@ tmp = (u32)sceneObj & 0x00000020;
     }
     sceneObj = *(u32*)&lbl_80478C40;
         *(f32*)((u8*)sceneObj + 0x48) = f29;
-        goto L_80178D4C;
-    }
-sceneObj = (u32)0x1;
-    fn_800F7BC4();
-tmp = (u32)sceneObj & 0x00000040;
-if ((u32)sceneObj != 0) {
-        tmp = 0x43300000;
-        f2 = *(f64*)lbl_8047D738;
-        *(u32*)(sp + 0x68) = tmp;
-        f0 = *(f32*)lbl_8047D76C;
-        f1 = f1 - f2;
-        f31 = f1 * f0 + f31;
 
-} else {
-        tmp = 0x43300000;
-        f2 = *(f64*)lbl_8047D738;
-        *(u32*)(sp + 0x68) = tmp;
-        f0 = *(f32*)lbl_8047D770;
-        f1 = f1 - f2;
-        f0 = f1 / f0;
-        f30 = f30 - f0;
-}
-L_80178D4C:
+    } else {
+    sceneObj = (u32)0x1;
+        fn_800F7BC4();
+    tmp = (u32)sceneObj & 0x00000040;
+    if ((u32)sceneObj != 0) {
+            tmp = 0x43300000;
+            f2 = *(f64*)lbl_8047D738;
+            *(u32*)(sp + 0x68) = tmp;
+            f0 = *(f32*)lbl_8047D76C;
+            f1 = f1 - f2;
+            f31 = f1 * f0 + f31;
+
+    } else {
+            tmp = 0x43300000;
+            f2 = *(f64*)lbl_8047D738;
+            *(u32*)(sp + 0x68) = tmp;
+            f0 = *(f32*)lbl_8047D770;
+            f1 = f1 - f2;
+            f0 = f1 / f0;
+            f30 = f30 - f0;
+    }
+    }
     f1 = f30;
     fn_800CE148();
     f0 = (f32)f1;
