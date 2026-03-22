@@ -167,11 +167,11 @@ void* floorReadSoundPreFunc_CheckBuffer(u32 resId, u32 loadMode, u32 dataSize) {
     tmp = dataSize + 0x1f;
     dataSize = *(u32*)&lbl_8047B0B0;
     /* clrrwi tmp, tmp, 5 */;
-    if (tmp <= dataSize) goto L_801143D8;
-    resId = (u32)&lbl_80272238;
-    resId = (u32)&lbl_80272238;
-    ((void(*)(void))fn_800DD970)();
-L_801143D8:
+    if (tmp > dataSize) {
+        resId = (u32)&lbl_80272238;
+        resId = (u32)&lbl_80272238;
+        ((void(*)(void))fn_800DD970)();
+    }
     resId = *(u32*)lbl_8047B0B4;
     return;
 }
@@ -206,7 +206,7 @@ void* floorReadSoundPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     resId = resId;
     fn_801195AC();
     resId = resId;
-    if (resId == 0) goto L_801145A8;
+    if (resId == 0) { resId = resId; return; }
     dataSize = (u32)fn_801150B8;
     loadMode = resId;
     r6 = (u32)fn_801150B8;
@@ -221,12 +221,12 @@ void* floorReadSoundPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     loadMode = (u32)&lbl_802722AC;
     fn_80191ECC();
     resId = resId;
-    if (resId != 0) goto L_80114554;
-    resId = 0x0;
-    goto L_801145AC;
-L_80114554:
+    if (resId == 0) {
+        resId = 0x0;
+        return;
+    }
     tmp = *(u32*)((u8*)resId + 0x0);
-    if (tmp == 0) goto L_801145A8;
+    if (tmp == 0) { resId = resId; return; }
     tmp = *(u32*)((u8*)resId + 0x8);
     loadMode = 0x0;
     tmp = tmp & 0x7FFF0000;
@@ -236,19 +236,19 @@ L_80114574:
     fn_80113F48();
     loadMode = resId | r31;
     fn_800F9318();
-    if (resId == 0) goto L_80114590;
-    loadMode = resId;
-    fn_800E3C08();
-L_80114590:
+    if (resId != 0) {
+        loadMode = resId;
+        fn_800E3C08();
+    }
     loadMode = loadMode + 0x4;
     r31 = r31 + 0x1;
 L_80114598:
     resId = *(u32*)((u8*)resId + 0x0);
     tmp = *(u32*)(resId + loadMode);
     if (tmp != 0) goto L_80114574;
-L_801145A8:
+
     resId = resId;
-L_801145AC:
+
     return;
 }
 
@@ -278,12 +278,12 @@ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
     loadMode = 0x20;
     ((void(*)(void))fn_800F9418)();
     resId = resId;
-    if (resId != 0) goto L_801147B8;
-    resId = (u32)&lbl_8027235C;
-    loadMode = r30;
-    resId = (u32)&lbl_8027235C;
-    ((void(*)(void))fn_800DD970)();
-L_801147B8:
+    if (resId == 0) {
+        resId = (u32)&lbl_8027235C;
+        loadMode = r30;
+        resId = (u32)&lbl_8027235C;
+        ((void(*)(void))fn_800DD970)();
+    }
     resId = resId;
     return;
 }
@@ -590,10 +590,10 @@ void fn_80114AE0(void) {
     r4 = r27 + 0xac;
     fn_80191ECC();
     r26 = r3;
-    if (r26 != 0) goto L_80114B40;
-    r3 = 0x0;
-    goto L_80114C94;
-L_80114B40:
+    if (r26 == 0) {
+        r3 = 0x0;
+        return;
+    }
     fn_80115BD8();
     r4 = r30;
     fn_80115584();
@@ -625,19 +625,19 @@ L_80114B90:
     goto L_80114BF8;
 L_80114BB4:
     fn_800DCE4C();
-    if (r3 != 0) goto L_80114BE0;
-    r4 = r31;
-    r3 = r27 + 0x298;
-    ((void(*)(void))fn_800DD970)();
-    r3 = r27 + 0x2d0;
-    ((void(*)(void))fn_800DD970)();
-    goto L_80114BF0;
-L_80114BE0:
-    r4 = r29;
-    r6 = r28;
-    r5 = r25 | r31;
-    fn_800F9378();
-L_80114BF0:
+    if (r3 == 0) {
+        r4 = r31;
+        r3 = r27 + 0x298;
+        ((void(*)(void))fn_800DD970)();
+        r3 = r27 + 0x2d0;
+        ((void(*)(void))fn_800DD970)();
+    } else {
+
+        r4 = r29;
+        r6 = r28;
+        r5 = r25 | r31;
+        fn_800F9378();
+    }
     r24 = r24 + 0x4;
     r31 = r31 + 0x1;
 L_80114BF8:
@@ -666,18 +666,19 @@ L_80114C48:
     fn_800F9378();
 L_80114C5C:
     r3 = *(u32*)((u8*)r26 + 0xC);
-    if (r3 == 0) goto L_80114C84;
-    r3 = *(u32*)((u8*)r3 + 0x0);
-    if (r3 == 0) goto L_80114C84;
-    r4 = r29;
-    r5 = r24 | 0x1a00;
-    r6 = 0x0;
-    fn_800F9378();
-L_80114C84:
+    if (r3 != 0) {
+        r3 = *(u32*)((u8*)r3 + 0x0);
+        if (r3 != 0) {
+            r4 = r29;
+            r5 = r24 | 0x1a00;
+            r6 = 0x0;
+            fn_800F9378();
+    }
+    }
     r3 = r29;
     r4 = r30;
     fn_801134E4();
     r3 = r26;
-L_80114C94:
+
     return;
 }

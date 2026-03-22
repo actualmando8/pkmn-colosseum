@@ -353,29 +353,31 @@ void fn_800A4454(void) {
     *(u32*)((u8*)r31 + 0xC8) = r25;
     *(u32*)((u8*)r31 + 0xCC) = r26;
     tmp = *(u32*)WorkAroundType_8047A7A4;
-    if (tmp != 0) goto L_800A44CC;
-    tmp = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    tmp = 0x0;
-    r3 = r24 + 0x0;
-    *(u32*)NextCommandNumber_8047A7C4 = tmp;
-    r4 = r25 + 0x0;
-    r5 = r26 + 0x0;
-    r6 = r27 + 0x0;
-    fn_800A42C4();
-    goto L_800A46D4;
-L_800A44CC:
+    if (tmp == 0) {
+        tmp = -0x1;
+        *(u32*)((u8*)r31 + 0x0) = tmp;
+        tmp = 0x0;
+        r3 = r24 + 0x0;
+        *(u32*)NextCommandNumber_8047A7C4 = tmp;
+        r4 = r25 + 0x0;
+        r5 = r26 + 0x0;
+        r6 = r27 + 0x0;
+        fn_800A42C4();
+        r3 = 0x1;
+        return;
+    }
     tmp = *(u32*)WorkAroundType_8047A7A4;
-    if (tmp != 1) goto L_800A46D4;
+    if (tmp != 1) { r3 = 0x1; return; }
     tmp = *(u32*)lbl_804789B8;
-    if ((s32)tmp == 0) goto L_800A44FC;
-    r3 = r24 + 0x0;
-    r4 = r25 + 0x0;
-    r5 = r26 + 0x0;
-    r6 = r27 + 0x0;
-    fn_800A43D4();
-    goto L_800A46D4;
-L_800A44FC:
+    if ((s32)tmp != 0) {
+        r3 = r24 + 0x0;
+        r4 = r25 + 0x0;
+        r5 = r26 + 0x0;
+        r6 = r27 + 0x0;
+        fn_800A43D4();
+        r3 = 0x1;
+        return;
+    }
     r29 = r31 + 0xbc;
     tmp = *(u32*)((u8*)r30 + 0x0);
     r28 = r31 + 0xc0;
@@ -386,18 +388,18 @@ L_800A44FC:
     r22 = (u32)tmp >> 15;
     fn_800A7BCC();
     tmp = *(u8*)((u8*)r3 + 0x8);
-    if (tmp == 0) goto L_800A4538;
-    tmp = 0x1;
-    goto L_800A453C;
-L_800A4538:
-    tmp = 0x0;
-L_800A453C:
-    if ((s32)tmp == 0) goto L_800A454C;
-    r3 = 0x5;
-    goto L_800A4550;
-L_800A454C:
-    r3 = 0xf;
-L_800A4550:
+    if (tmp != 0) {
+        tmp = 0x1;
+    } else {
+
+        tmp = 0x0;
+    }
+    if ((s32)tmp != 0) {
+        r3 = 0x5;
+    } else {
+
+        r3 = 0xf;
+    }
     if (r23 > tmp) goto L_800A456C;
     tmp = r3 + 0x3;
     tmp = r22 + tmp;
@@ -408,18 +410,19 @@ L_800A456C:
 L_800A4574:
     tmp = 0x0;
 L_800A4578:
-    if ((s32)tmp != 0) goto L_800A45A8;
-    tmp = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    tmp = 0x0;
-    r3 = r24 + 0x0;
-    *(u32*)NextCommandNumber_8047A7C4 = tmp;
-    r4 = r25 + 0x0;
-    r5 = r26 + 0x0;
-    r6 = r27 + 0x0;
-    fn_800A42C4();
-    goto L_800A46D4;
-L_800A45A8:
+    if ((s32)tmp == 0) {
+        tmp = -0x1;
+        *(u32*)((u8*)r31 + 0x0) = tmp;
+        tmp = 0x0;
+        r3 = r24 + 0x0;
+        *(u32*)NextCommandNumber_8047A7C4 = tmp;
+        r4 = r25 + 0x0;
+        r5 = r26 + 0x0;
+        r6 = r27 + 0x0;
+        fn_800A42C4();
+        r3 = 0x1;
+        return;
+    }
     r3 = *(u32*)((u8*)r29 + 0x0);
     r4 = *(u32*)((u8*)r28 + 0x0);
     tmp = *(u32*)((u8*)r30 + 0x0);
@@ -448,17 +451,18 @@ L_800A45D8:
     r3 = r4 - r3; /* -borrow */;
     r3 = r4 - r4; /* -borrow */;
     /* neg. r3, r3 */;
-    if (tmp == r4) goto L_800A4650;
-    tmp = -0x1;
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    r3 = r24 + 0x0;
-    r4 = r25 + 0x0;
-    *(u32*)NextCommandNumber_8047A7C4 = r6;
-    r5 = r26 + 0x0;
-    r6 = r27 + 0x0;
-    fn_800A42C4();
-    goto L_800A46D4;
-L_800A4650:
+    if (tmp != r4) {
+        tmp = -0x1;
+        *(u32*)((u8*)r31 + 0x0) = tmp;
+        r3 = r24 + 0x0;
+        r4 = r25 + 0x0;
+        *(u32*)NextCommandNumber_8047A7C4 = r6;
+        r5 = r26 + 0x0;
+        r6 = r27 + 0x0;
+        fn_800A42C4();
+        r3 = 0x1;
+        return;
+    }
     tmp = 0x1;
     *(u32*)((u8*)r31 + 0x0) = tmp;
     r3 = 0x431C0000;
@@ -485,14 +489,15 @@ L_800A4650:
     r5 = r22 + 0x0;
     r3 = r31 + 0x40;
     OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
-    goto L_800A46D4;
+    r3 = 0x1;
+    return;
 L_800A46C0:
     r3 = r24 + 0x0;
     r4 = r25 + 0x0;
     r5 = r26 + 0x0;
     r6 = r27 + 0x0;
     fn_800A43D4();
-L_800A46D4:
+
     r3 = 0x1;
     return;
 }
@@ -762,9 +767,9 @@ void fn_800A4B28(void) {
     tmp = 0x0;
     *(u32*)Callback_8047A788 = r5;
     *(u32*)StopAtNextInt_8047A780 = tmp;
-    if ((s32)r3 == 0) goto L_800A4B54;
-    tmp = 0x10000;
-L_800A4B54:
+    if ((s32)r3 != 0) {
+        tmp = 0x10000;
+    }
     tmp = tmp | (0xe400 << 16);
     r3 = 0xCC000000;
     tmp = r4 | tmp;

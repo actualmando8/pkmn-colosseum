@@ -46,28 +46,28 @@ void fn_8019C3C4(void) {
     f32 f8 = 0.0f;
     void (*ctr_fn)(void) = 0;
 
-    if ((s32)tmp != 0) goto L_8019C3FC;
-L_8019C3FC:
+    if ((s32)tmp == 0) {
+    }
     tmp = *(u32*)lbl_8047B280;
     r11 = (u32)lbl_80274818;
     r31 = (u32)lbl_80274818;
     r30 = 0x0;
-    if ((s32)tmp == 0) goto L_8019C45C;
-    tmp = *(u32*)lbl_8047B28C;
-    if ((s32)tmp != 0) goto L_8019C454;
-    r3 = r31 + 0x8c;
-    OSReport();
-    tmp = 0x1;
-    *(u32*)lbl_8047B28C = tmp;
-L_8019C454:
-    r3 = r30;
-    goto L_8019C678;
-L_8019C45C:
+    if ((s32)tmp != 0) {
+        tmp = *(u32*)lbl_8047B28C;
+        if ((s32)tmp == 0) {
+            r3 = r31 + 0x8c;
+            OSReport();
+            tmp = 0x1;
+            *(u32*)lbl_8047B28C = tmp;
+        }
+        r3 = r30;
+        return;
+    }
     r4 = (u32)sp + 0x98;
     tmp = (u32)sp + 0x8;
     r5 = 0x1000000;
     *(u32*)(sp + 0x70) = tmp;
-    if (r3 > 7) goto L_8019C674;
+    if (r3 > 7) { r3 = r30; return; }
     r4 = (u32)jumptable_8036C8C0;
     tmp = r3 << 2;
     r3 = (u32)jumptable_8036C8C0;
@@ -77,27 +77,30 @@ L_8019C45C:
     r4 = 0x1;
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
-    if (tmp == 0) goto L_8019C674;
+    if (tmp == 0) { r3 = r30; return; }
     *(u32*)lbl_80478C7C = tmp;
     r30 = 0x1;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = (u32)sp + 0x68;
     r4 = 0x1;
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
-    if (tmp == 0) goto L_8019C674;
+    if (tmp == 0) { r3 = r30; return; }
     *(u32*)lbl_80478C80 = tmp;
     r30 = 0x1;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = (u32)sp + 0x68;
     r4 = 0x1;
     __va_arg();
     r31 = *(u32*)((u8*)r3 + 0x0);
     fn_8009F3D4();
-    if (r31 >= r3) goto L_8019C674;
+    if (r31 >= r3) { r3 = r30; return; }
     *(u32*)lbl_8047B284 = r31;
     r30 = 0x1;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = (u32)sp + 0x68;
     r4 = 0x1;
     __va_arg();
@@ -110,7 +113,8 @@ L_8019C45C:
     r30 = 0x1;
     *(u32*)lbl_8047B270 = r31;
     *(u32*)lbl_8047B274 = tmp;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = (u32)sp + 0x68;
     r4 = 0x1;
     __va_arg();
@@ -145,28 +149,31 @@ L_8019C45C:
     *(u32*)(sp + 0x84) = tmp;
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
-    if (tmp == 0) goto L_8019C5E4;
-    r3 = r31 + 0xc8;
-    OSReport();
-    r3 = r31 + 0xec;
-    OSReport();
-    goto L_8019C674;
-L_8019C5E4:
+    if (tmp != 0) {
+        r3 = r31 + 0xc8;
+        OSReport();
+        r3 = r31 + 0xec;
+        OSReport();
+        r3 = r30;
+        return;
+    }
     r3 = (u32)sp + 0x74;
     r4 = 0x14;
     fn_801A69C0();
     tmp = 0x1;
     r30 = 0x1;
     *(u32*)lbl_8047B288 = tmp;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = (u32)sp + 0x68;
     r4 = 0x1;
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
-    if (tmp == 0) goto L_8019C674;
+    if (tmp == 0) { r3 = r30; return; }
     *(u32*)lbl_80478C74 = tmp;
     r30 = 0x1;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = r31 + 0xc8;
     OSReport();
     r3 = r31 + 0x128;
@@ -175,16 +182,17 @@ L_8019C5E4:
     r4 = 0x1;
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
-    if ((s32)tmp != 0) goto L_8019C674;
+    if ((s32)tmp != 0) { r3 = r30; return; }
     r30 = 0x1;
-    goto L_8019C674;
+    r3 = r30;
+    return;
     r3 = r31 + 0xc8;
     OSReport();
     r3 = r31 + 0x160;
     OSReport();
-L_8019C674:
+
     r3 = r30;
-L_8019C678:
+
     return;
 }
 
