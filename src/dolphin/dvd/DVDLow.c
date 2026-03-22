@@ -400,16 +400,17 @@ void fn_800A4454(void) {
 
         r3 = 0xf;
     }
-    if (r23 > tmp) goto L_800A456C;
-    tmp = r3 + 0x3;
-    tmp = r22 + tmp;
-    if (r23 >= tmp) goto L_800A4574;
-L_800A456C:
-    tmp = 0x1;
-    goto L_800A4578;
-L_800A4574:
-    tmp = 0x0;
-L_800A4578:
+    if (r23 > tmp) {
+        tmp = 0x1;
+    } else {
+        tmp = r3 + 0x3;
+        tmp = r22 + tmp;
+        if (r23 >= tmp) {
+            tmp = 0x0;
+        } else {
+            tmp = 0x1;
+        }
+    }
     if ((s32)tmp == 0) {
         tmp = -0x1;
         *(u32*)((u8*)r31 + 0x0) = tmp;
@@ -429,77 +430,75 @@ L_800A4578:
     r3 = r4 + r3;
     r3 = (u32)r3 >> 15;
     r4 = (u32)tmp >> 15;
-    if (r3 == r4) goto L_800A45D8;
-    tmp = r3 + 0x1;
-    if (tmp != r4) goto L_800A46C0;
-L_800A45D8:
-    __OSGetSystemTime();
-    r5 = 0x80000000;
-    r8 = *(u32*)lbl_8047A7B0;
-    tmp = *(u32*)((u8*)r5 + 0xF8);
-    r5 = 0x10620000;
-    r9 = *(u32*)lbl_8047A7B4;
-    r6 = 0x0;
-    r7 = (u32)tmp >> 2;
-    tmp = r5 + 0x4dd3;
-    tmp = (u32)((u64)tmp * (u64)r7 >> 32);
-    tmp = (u32)tmp >> 6;
-    r9 = r4 - r9;
-    r8 = r3 - r8; /* -borrow */;
-    r5 = tmp * 0x5;
-    tmp = r5 - r9;
-    r3 = r4 - r3; /* -borrow */;
-    r3 = r4 - r4; /* -borrow */;
-    /* neg. r3, r3 */;
-    if (tmp != r4) {
-        tmp = -0x1;
+    if (r3 == r4 || r3 + 1 == r4) {
+        __OSGetSystemTime();
+        r5 = 0x80000000;
+        r8 = *(u32*)lbl_8047A7B0;
+        tmp = *(u32*)((u8*)r5 + 0xF8);
+        r5 = 0x10620000;
+        r9 = *(u32*)lbl_8047A7B4;
+        r6 = 0x0;
+        r7 = (u32)tmp >> 2;
+        tmp = r5 + 0x4dd3;
+        tmp = (u32)((u64)tmp * (u64)r7 >> 32);
+        tmp = (u32)tmp >> 6;
+        r9 = r4 - r9;
+        r8 = r3 - r8; /* -borrow */;
+        r5 = tmp * 0x5;
+        tmp = r5 - r9;
+        r3 = r4 - r3; /* -borrow */;
+        r3 = r4 - r4; /* -borrow */;
+        /* neg. r3, r3 */;
+        if (tmp != r4) {
+            tmp = -0x1;
+            *(u32*)((u8*)r31 + 0x0) = tmp;
+            r3 = r24 + 0x0;
+            r4 = r25 + 0x0;
+            *(u32*)NextCommandNumber_8047A7C4 = r6;
+            r5 = r26 + 0x0;
+            r6 = r27 + 0x0;
+            fn_800A42C4();
+            r3 = 0x1;
+            return;
+        }
+        tmp = 0x1;
         *(u32*)((u8*)r31 + 0x0) = tmp;
+        r3 = 0x431C0000;
+        *(u32*)((u8*)r31 + 0x4) = r24;
+        tmp = (u32)((u64)tmp * (u64)r7 >> 32);
+        *(u32*)((u8*)r31 + 0x8) = r25;
+        *(u32*)((u8*)r31 + 0xC) = r26;
+        tmp = (u32)tmp >> 15;
+        r3 = tmp * 0x1f4;
+        *(u32*)((u8*)r31 + 0x10) = r27;
+        tmp = -0x1;
+        *(u32*)((u8*)r31 + 0x14) = tmp;
+        r5 = r5 - r9;
+        r4 = r6 - r8; /* -borrow */;
+        tmp = (u32)r3 >> 3;
+        *(u32*)NextCommandNumber_8047A7C4 = r6;
+        r23 = r5 + tmp;
+        r22 = r4 + r6; /* +carry */;
+        r3 = r31 + 0x40;
+        OSCreateAlarm((OSAlarm*)r3);
+        r3 = (u32)fn_800A41D0;
+        r7 = (u32)fn_800A41D0;
+        r6 = r23 + 0x0;
+        r5 = r22 + 0x0;
+        r3 = r31 + 0x40;
+        OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
+        r3 = 0x1;
+        return;
+    } else {
         r3 = r24 + 0x0;
         r4 = r25 + 0x0;
-        *(u32*)NextCommandNumber_8047A7C4 = r6;
         r5 = r26 + 0x0;
         r6 = r27 + 0x0;
-        fn_800A42C4();
+        fn_800A43D4();
+
         r3 = 0x1;
         return;
     }
-    tmp = 0x1;
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    r3 = 0x431C0000;
-    *(u32*)((u8*)r31 + 0x4) = r24;
-    tmp = (u32)((u64)tmp * (u64)r7 >> 32);
-    *(u32*)((u8*)r31 + 0x8) = r25;
-    *(u32*)((u8*)r31 + 0xC) = r26;
-    tmp = (u32)tmp >> 15;
-    r3 = tmp * 0x1f4;
-    *(u32*)((u8*)r31 + 0x10) = r27;
-    tmp = -0x1;
-    *(u32*)((u8*)r31 + 0x14) = tmp;
-    r5 = r5 - r9;
-    r4 = r6 - r8; /* -borrow */;
-    tmp = (u32)r3 >> 3;
-    *(u32*)NextCommandNumber_8047A7C4 = r6;
-    r23 = r5 + tmp;
-    r22 = r4 + r6; /* +carry */;
-    r3 = r31 + 0x40;
-    OSCreateAlarm((OSAlarm*)r3);
-    r3 = (u32)fn_800A41D0;
-    r7 = (u32)fn_800A41D0;
-    r6 = r23 + 0x0;
-    r5 = r22 + 0x0;
-    r3 = r31 + 0x40;
-    OSSetAlarm((OSAlarm*)r3, 0, (OSAlarmHandler)r7);
-    r3 = 0x1;
-    return;
-L_800A46C0:
-    r3 = r24 + 0x0;
-    r4 = r25 + 0x0;
-    r5 = r26 + 0x0;
-    r6 = r27 + 0x0;
-    fn_800A43D4();
-
-    r3 = 0x1;
-    return;
 }
 
 /* fn_800A46EC - 0x800A46EC | size: 0x94 */
