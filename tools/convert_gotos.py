@@ -803,7 +803,9 @@ def main():
     c_files = glob.glob('src/**/*.c', recursive=True)
     total_changes = 0
 
-    for iteration in range(15):
+    verbose = '--verbose' in sys.argv or '-v' in sys.argv
+
+    for iteration in range(25):
         iter_changes = 0
         for filepath in c_files:
             try:
@@ -817,43 +819,43 @@ def main():
             changes = 0
 
             # Pass 1: Remove dead gotos (goto L; L:)
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += remove_dead_gotos(lines, label_refcount, label_pos)
 
             # Pass 2: Forward single-ref gotos -> if blocks
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_forward_singles(lines, label_refcount, label_pos)
 
             # Pass 3: If/else patterns
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_if_else(lines, label_refcount, label_pos)
 
             # Pass 4: Do/while (backward single-ref)
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_do_while(lines, label_refcount, label_pos)
 
             # Pass 5: While loops (goto cond; body; cond: exit_check; back_goto)
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_while_loop(lines, label_refcount, label_pos)
 
             # Pass 5b: Simple while loops (goto cond; body; cond: eval; back_goto)
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_while_loop_simple(lines, label_refcount, label_pos)
 
             # Pass 6: Multi-target OR conditions
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_multi_target_or(lines, label_refcount, label_pos)
 
             # Pass 7: Flag-set skip patterns
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_flag_set_skip(lines, label_refcount, label_pos)
 
             # Pass 8: Multi-ref forward gotos (2 adjacent conditions -> OR)
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += convert_multi_ref_forward(lines, label_refcount, label_pos)
 
             # Pass 9: Remove unreferenced labels
-            label_refcount, label_pos = build_indices(lines)
+            label_refcount, label_pos = build_indices_compat(lines)
             changes += remove_unreferenced_labels(lines, label_refcount, label_pos)
 
             if changes > 0:
@@ -861,6 +863,8 @@ def main():
                     f.write('\n'.join(lines))
                 iter_changes += changes
                 total_changes += changes
+                if verbose:
+                    print(f'  {filepath}: {changes} changes')
 
         if iter_changes == 0:
             break
