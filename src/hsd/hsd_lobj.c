@@ -1094,47 +1094,48 @@ L_801A4C34:
     }
     tmp = 0x0;
     *(u32*)&lbl_8047B2B8 = tmp;
-    goto L_801A4CFC;
-L_801A4C6C:
-    r3 = *(u32*)lbl_8047B2B4;
-    r30 = *(u32*)((u8*)r3 + 0x4);
-    if (r30 != 0) {
-        r3 = 0x10000;
-        r4 = *(u16*)((u8*)r30 + 0x4);
-        tmp = r3 & 0xFFFF;
-        tmp = tmp - r4;
-        tmp = __cntlzw(tmp);
-        /* srwi. r3, tmp, 5 */;
+    while (1) {
+        tmp = *(u32*)lbl_8047B2B4;
+        if (tmp == 0) break;
+        r3 = *(u32*)lbl_8047B2B4;
+        r30 = *(u32*)((u8*)r3 + 0x4);
         if (r30 != 0) {
-        } else {
-
-            tmp = *(u16*)((u8*)r30 + 0x4);
-            r3 = *(u16*)((u8*)r30 + 0x4);
-            r4 = __cntlzw(tmp);
-            *(u16*)((u8*)r30 + 0x4) = tmp;
-            r3 = (u32)r4 >> 5;
-        }
-        if ((s32)r3 != 0) {
+            r3 = 0x10000;
+            r4 = *(u16*)((u8*)r30 + 0x4);
+            tmp = r3 & 0xFFFF;
+            tmp = tmp - r4;
+            tmp = __cntlzw(tmp);
+            /* srwi. r3, tmp, 5 */;
             if (r30 != 0) {
-                r4 = *(u32*)((u8*)r30 + 0x0);
-                r3 = r30;
-                r12 = *(u32*)((u8*)r4 + 0x30);
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
-                r4 = *(u32*)((u8*)r30 + 0x0);
-                r3 = r30;
-                r12 = *(u32*)((u8*)r4 + 0x34);
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
+            } else {
+
+                tmp = *(u16*)((u8*)r30 + 0x4);
+                r3 = *(u16*)((u8*)r30 + 0x4);
+                r4 = __cntlzw(tmp);
+                *(u16*)((u8*)r30 + 0x4) = tmp;
+                r3 = (u32)r4 >> 5;
+            }
+            if ((s32)r3 != 0) {
+                if (r30 != 0) {
+                    r4 = *(u32*)((u8*)r30 + 0x0);
+                    r3 = r30;
+                    r12 = *(u32*)((u8*)r4 + 0x30);
+                    ctr_fn = (void(*)(void))r12;
+                    ctr_fn();
+                    r4 = *(u32*)((u8*)r30 + 0x0);
+                    r3 = r30;
+                    r12 = *(u32*)((u8*)r4 + 0x34);
+                    ctr_fn = (void(*)(void))r12;
+                    ctr_fn();
+        }
+        }
+        }
+        r3 = *(u32*)lbl_8047B2B4;
+        fn_801A3E64();
+        *(u32*)lbl_8047B2B4 = r3;
+
+
     }
-    }
-    }
-    r3 = *(u32*)lbl_8047B2B4;
-    fn_801A3E64();
-    *(u32*)lbl_8047B2B4 = r3;
-L_801A4CFC:
-    tmp = *(u32*)lbl_8047B2B4;
-    if (tmp != 0) goto L_801A4C6C;
 
     return;
 }

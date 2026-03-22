@@ -1819,11 +1819,12 @@ L_800CC538:
     f2 = f0 - f5;
     f0 = f3 - f2;
     f0 = f4 * f0;
-    goto L_800CC600;
-L_800CC5F8:
-L_800CC600:
-    f0 = *(f64*)((u8*)r4 + (-8));
-    if (f1 == f0) goto L_800CC5F8;
+    while (1) {
+        f0 = *(f64*)((u8*)r4 + (-8));
+        if (f1 != f0) break;
+
+
+    }
     r3 = (u32)lbl_80270078;
     r4 = r30;
     r8 = (u32)lbl_80270078;
@@ -2304,14 +2305,17 @@ L_800CCCCC:
 L_800CCCE0:
     if ((s32)r5 != 0) goto L_800CCEAC;
     r10 = 0x1;
-    goto L_800CCCF4;
-L_800CCCF0:
-    r10 = r10 + 0x1;
-L_800CCCF4:
-    tmp = r28 - r10;
-    tmp = tmp << 2;
-    tmp = *(u32*)(r16 + tmp);
-    if ((s32)tmp == 0) goto L_800CCCF0;
+    while (1) {
+        tmp = r28 - r10;
+        tmp = tmp << 2;
+        tmp = *(u32*)(r16 + tmp);
+        if ((s32)tmp != 0) break;
+        r10 = r10 + 0x1;
+
+
+
+
+    }
     r9 = r31 + 0x1;
     r5 = (u32)sp + 0x58;
     tmp = r9 << 3;
@@ -2421,11 +2425,12 @@ L_800CCEAC:
     r3 = (u32)sp + 0x8;
     tmp = r31 << 2;
     r3 = r3 + tmp;
-    goto L_800CCEDC;
-L_800CCED0:
-L_800CCEDC:
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if ((s32)tmp == 0) goto L_800CCED0;
+    while (1) {
+        tmp = *(u32*)((u8*)r3 + 0x0);
+        if ((s32)tmp != 0) break;
+
+
+    }
     goto L_800CCF8C;
 L_800CCEEC:
     f1 = f25;
@@ -3855,28 +3860,29 @@ void fn_800CE378(void) {
     }
     }
     /* srawi. r3, r6, 20 */;
-    if ((s32)r6 != 0) goto L_800CE430;
-    while ((s32)r6 == 0) {
+    if ((s32)r6 == 0) {
+        while ((s32)r6 == 0) {
 
-        r4 = (u32)tmp >> 11;
-        tmp = tmp << 21;
+            r4 = (u32)tmp >> 11;
+            tmp = tmp << 21;
+            r6 = r6 | r4;
+
+        }
+        r7 = 0x0;
+        while (1) {
+            r4 = r6 & 0x00100000;
+            if ((s32)r6 != 0) break;
+            r6 = r6 << 1;
+            r7 = r7 + 0x1;
+
+
+        }
+        r4 = 0x20 - r7;
+        r4 = (u32)tmp >> r4;
+        tmp = tmp << r7;
+        r3 = r3 - r5;
         r6 = r6 | r4;
-
     }
-    r7 = 0x0;
-    goto L_800CE410;
-L_800CE408:
-    r6 = r6 << 1;
-    r7 = r7 + 0x1;
-L_800CE410:
-    r4 = r6 & 0x00100000;
-    if ((s32)r6 == 0) goto L_800CE408;
-    r4 = 0x20 - r7;
-    r4 = (u32)tmp >> r4;
-    tmp = tmp << r7;
-    r3 = r3 - r5;
-    r6 = r6 | r4;
-L_800CE430:
     r5 = r6 & 0xFFFFF;
     r4 = r4 & 0x1;
     r5 = r5 | (0x10 << 16);

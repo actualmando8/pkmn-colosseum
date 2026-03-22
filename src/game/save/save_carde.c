@@ -1382,51 +1382,53 @@ L_8008398C:
     *(u8*)((u8*)r29 + 0x1C) = tmp;
     tmp = *(u8*)((u8*)r31 + 0x5A);
     *(u8*)((u8*)r29 + 0x1D) = tmp;
-    goto L_80083ACC;
-L_80083A30:
-    if (r29 == 0) {
-        r3 = (u32)&lbl_8026F1C8;
-        r4 = 0x17f;
-        r3 = (u32)&lbl_8026F1C8;
-        r5 = (u32)&lbl_8047C180;
-        ((void(*)(void))fn_80196E10)();
-    }
-    r3 = (s8)r28;
-    r4 = 0x0;
-    if ((s32)r3 >= 0) {
+    while (1) {
         tmp = *(u8*)((u8*)r29 + 0x1B);
         tmp = (s8)tmp;
-        if ((s32)r3 < (s32)tmp) {
-            r4 = 0x1;
+        if ((s32)r28 >= (s32)tmp) break;
+        if (r29 == 0) {
+            r3 = (u32)&lbl_8026F1C8;
+            r4 = 0x17f;
+            r3 = (u32)&lbl_8026F1C8;
+            r5 = (u32)&lbl_8047C180;
+            ((void(*)(void))fn_80196E10)();
+        }
+        r3 = (s8)r28;
+        r4 = 0x0;
+        if ((s32)r3 >= 0) {
+            tmp = *(u8*)((u8*)r29 + 0x1B);
+            tmp = (s8)tmp;
+            if ((s32)r3 < (s32)tmp) {
+                r4 = 0x1;
+        }
+        }
+        if ((s32)r4 == 0) {
+            r3 = (u32)&lbl_8026F1C8;
+            r5 = (u32)&lbl_8026F1D8;
+            r3 = (u32)&lbl_8026F1C8;
+            r4 = 0x180;
+            r5 = (u32)&lbl_8026F1D8;
+            ((void(*)(void))fn_80196E10)();
+        }
+        r3 = *(u8*)((u8*)r29 + 0x1C);
+        r5 = (s8)r28;
+        tmp = *(u8*)((u8*)r29 + 0x1D);
+        r4 = r27 + 0x28;
+        r3 = (s8)r3;
+        tmp = (s8)tmp;
+        tmp = r3 * tmp;
+        r3 = tmp << 4;
+        tmp = r3 + 0x76;
+        tmp = tmp * r5;
+        r3 = r29 + tmp;
+        r3 = r3 + 0x24;
+        ((void(*)(void))fn_800CAA3C)();
+        r27 = r27 + 0x10;
+        r28 = r28 + 0x1;
+
+
+
     }
-    }
-    if ((s32)r4 == 0) {
-        r3 = (u32)&lbl_8026F1C8;
-        r5 = (u32)&lbl_8026F1D8;
-        r3 = (u32)&lbl_8026F1C8;
-        r4 = 0x180;
-        r5 = (u32)&lbl_8026F1D8;
-        ((void(*)(void))fn_80196E10)();
-    }
-    r3 = *(u8*)((u8*)r29 + 0x1C);
-    r5 = (s8)r28;
-    tmp = *(u8*)((u8*)r29 + 0x1D);
-    r4 = r27 + 0x28;
-    r3 = (s8)r3;
-    tmp = (s8)tmp;
-    tmp = r3 * tmp;
-    r3 = tmp << 4;
-    tmp = r3 + 0x76;
-    tmp = tmp * r5;
-    r3 = r29 + tmp;
-    r3 = r3 + 0x24;
-    ((void(*)(void))fn_800CAA3C)();
-    r27 = r27 + 0x10;
-    r28 = r28 + 0x1;
-L_80083ACC:
-    tmp = *(u8*)((u8*)r29 + 0x1B);
-    tmp = (s8)tmp;
-    if ((s32)r28 < (s32)tmp) goto L_80083A30;
 
     r3 = r26;
 

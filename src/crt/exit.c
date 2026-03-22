@@ -218,13 +218,14 @@ void fn_800C4FFC(void) {
     r6 = (u32)lbl_8026FEE8;
     r7 = 0x0;
     r6 = (u32)lbl_8026FEE8;
-    goto L_800C5020;
-L_800C5018:
-    r6 = r6 + 0x4;
-    r7 = r7 + 0x1;
-L_800C5020:
-    tmp = *(u32*)((u8*)r6 + 0x0);
-    if (r5 > tmp) goto L_800C5018;
+    while (1) {
+        tmp = *(u32*)((u8*)r6 + 0x0);
+        if (r5 <= tmp) break;
+        r6 = r6 + 0x4;
+        r7 = r7 + 0x1;
+
+
+    }
     r5 = r7 << 3;
     r4 = *(u32*)((u8*)r4 + (-4));
     r5 = r5 + 0x4;

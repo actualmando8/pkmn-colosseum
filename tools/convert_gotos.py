@@ -32,16 +32,25 @@ def invert_cond(cond):
 
 def build_indices(lines):
     label_refcount = {}
+    label_sources = {}
     for i, line in enumerate(lines):
         for m in re.finditer(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', line):
             lbl = m.group(1)
             label_refcount[lbl] = label_refcount.get(lbl, 0) + 1
+            if lbl not in label_sources:
+                label_sources[lbl] = []
+            label_sources[lbl].append(i)
     label_pos = {}
     for i, line in enumerate(lines):
         m = re.match(r'^\s*(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', line)
         if m:
             label_pos[m.group(1)] = i
-    return label_refcount, label_pos
+    return label_refcount, label_pos, label_sources
+
+
+def build_indices_compat(lines):
+    rc, lp, _ = build_indices(lines)
+    return rc, lp
 
 def convert_forward_singles(lines, label_refcount, label_pos):
     changes = 0
@@ -331,20 +340,6 @@ def convert_while_loop(lines, label_refcount, label_pos):
             break
 
         if not valid:
-            # Try simple case: just a single back-jump, no exit conditions
-            if len(exit_cond_lines) == 0:
-                # while_cond is just back_goto_cond
-                while_cond = back_goto_cond
-                lines[i] = indent + 'while (' + while_cond + ') {'
-                lines[body_idx] = ''
-                for k in range(body_idx + 1, cond_idx):
-                    if lines[k].strip():
-                        lines[k] = '    ' + lines[k]
-                lines[cond_idx] = ''
-                lines[back_goto_idx] = indent + '}'
-                label_refcount[cond_label] = 0
-                label_refcount[body_label] = 0
-                changes += 2
             continue
 
         # Add the back-goto condition
@@ -367,6 +362,174 @@ def convert_while_loop(lines, label_refcount, label_pos):
         label_refcount[cond_label] = 0
         label_refcount[body_label] = 0
         changes += 2  # removed at least the init goto + the back goto
+
+    return changes
+
+def convert_while_loop_simple(lines, label_refcount, label_pos):
+    """Convert simpler while-loop pattern where condition evaluation
+    code appears between the cond label and the back-jump:
+
+        goto L_cond;
+    L_body:
+        ...body...
+    L_cond:
+        ...cond eval code...
+        if (loopCond) goto L_body;
+
+    Into:
+        while (1) {
+            ...cond eval code...
+            if (!(loopCond)) break;
+            ...body...
+        }
+    """
+    changes = 0
+    i = 0
+    while i < len(lines):
+        m_goto = re.match(r'^(\s+)goto (L_[0-9A-Fa-f]+);$', lines[i])
+        if not m_goto:
+            i += 1
+            continue
+        indent = m_goto.group(1)
+        cond_label = m_goto.group(2)
+        if cond_label not in label_pos:
+            i += 1
+            continue
+        cond_idx = label_pos[cond_label]
+        if cond_idx <= i:
+            i += 1
+            continue
+
+        # Find body label right after the goto
+        body_label = None
+        body_idx = None
+        for k in range(i+1, min(i+3, cond_idx)):
+            m_body = re.match(r'^\s*(L_[0-9A-Fa-f]+)\s*:\s*;?\s*$', lines[k])
+            if m_body:
+                body_label = m_body.group(1)
+                body_idx = k
+                break
+        if body_label is None or body_idx != i + 1:
+            i += 1
+            continue
+
+        # Both labels must have refcount 1
+        if label_refcount.get(cond_label, 0) != 1:
+            i += 1
+            continue
+        if label_refcount.get(body_label, 0) != 1:
+            i += 1
+            continue
+
+        # No other labels in body
+        has_other_labels = False
+        for k in range(body_idx + 1, cond_idx):
+            if re.match(r'^\s*L_[0-9A-Fa-f]+\s*:\s*;?\s*$', lines[k]):
+                has_other_labels = True
+                break
+        if has_other_labels:
+            i += 1
+            continue
+
+        # Find the back-jump to body_label after cond_idx
+        back_goto_idx = None
+        back_goto_cond = None
+        for k in range(cond_idx + 1, min(cond_idx + 10, len(lines))):
+            stripped = lines[k].strip()
+            if not stripped:
+                continue
+            m_back = re.match(r'^if \((.+)\) goto (L_[0-9A-Fa-f]+);$', stripped)
+            if m_back and m_back.group(2) == body_label:
+                back_goto_idx = k
+                back_goto_cond = m_back.group(1)
+                break
+            # If we hit a label or unconditional goto, stop
+            if re.match(r'^L_[0-9A-Fa-f]+\s*:', stripped):
+                break
+            if re.match(r'^goto\s+', stripped):
+                break
+
+        if back_goto_idx is None:
+            i += 1
+            continue
+
+        # Check no gotos in body that jump outside
+        has_bad = False
+        for k in range(body_idx + 1, cond_idx):
+            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
+            if gm and gm.group(1) in label_pos:
+                t = label_pos[gm.group(1)]
+                if t < body_idx or t > back_goto_idx:
+                    has_bad = True
+                    break
+        if has_bad:
+            i += 1
+            continue
+
+        # Check no gotos in cond eval code that jump outside
+        for k in range(cond_idx + 1, back_goto_idx):
+            gm = re.search(r'\bgoto\s+(L_[0-9A-Fa-f]+)\s*;', lines[k])
+            if gm:
+                has_bad = True
+                break
+        if has_bad:
+            i += 1
+            continue
+
+        # Invert condition for break
+        inv_cond = invert_cond(back_goto_cond)
+        if inv_cond is None:
+            i += 1
+            continue
+
+        # Collect cond eval lines (between cond label and back-jump)
+        cond_eval_lines = []
+        for k in range(cond_idx + 1, back_goto_idx):
+            if lines[k].strip():
+                cond_eval_lines.append(k)
+
+        # Apply transformation:
+        # goto -> while (1) {
+        lines[i] = indent + 'while (1) {'
+        # body label -> empty
+        lines[body_idx] = ''
+        # Cond eval code goes first in loop (indented)
+        for k in cond_eval_lines:
+            lines[k] = '    ' + lines[k]
+        # Move cond eval + break to before body
+        # Actually, rearrange: put cond eval + break at top of loop body
+        cond_eval_content = []
+        for k in cond_eval_lines:
+            cond_eval_content.append(lines[k])
+            lines[k] = ''
+        # Back-jump becomes break
+        lines[back_goto_idx] = ''
+        # Cond label becomes empty
+        lines[cond_idx] = ''
+
+        # Now insert: cond eval + break at body_idx+1 position
+        # But we need to be careful with line indices
+        # Instead, let's restructure differently:
+        # Put while(1) at goto line
+        # Move cond eval + break into beginning of body
+        insert_lines = cond_eval_content + [indent + '    if (' + inv_cond + ') break;']
+
+        # Body lines need indenting
+        for k in range(body_idx + 1, cond_idx):
+            if lines[k].strip():
+                lines[k] = '    ' + lines[k]
+
+        # Insert cond eval after the (now empty) body_idx
+        # Replace body_idx with the cond eval + break
+        lines[body_idx] = '\n'.join(insert_lines)
+
+        # Close the while after cond area
+        lines[back_goto_idx] = indent + '}'
+
+        label_refcount[cond_label] = 0
+        label_refcount[body_label] = 0
+        changes += 2
+        i += 1
 
     return changes
 
@@ -672,6 +835,10 @@ def main():
             # Pass 5: While loops (goto cond; body; cond: exit_check; back_goto)
             label_refcount, label_pos = build_indices(lines)
             changes += convert_while_loop(lines, label_refcount, label_pos)
+
+            # Pass 5b: Simple while loops (goto cond; body; cond: eval; back_goto)
+            label_refcount, label_pos = build_indices(lines)
+            changes += convert_while_loop_simple(lines, label_refcount, label_pos)
 
             # Pass 6: Multi-target OR conditions
             label_refcount, label_pos = build_indices(lines)

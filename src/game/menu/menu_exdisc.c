@@ -458,16 +458,17 @@ L_80078048:
     r27 = 0x0;
     r3 = (u32)&lbl_803F6F18;
     r28 = (u32)&lbl_803F6F18;
-    goto L_8007808C;
-L_80078078:
-    r3 = r28;
-    r4 = r27;
-    ((void(*)(void))fn_8012AC08)();
-    ((void(*)(void))fn_80124A60)();
-    r27 = r27 + 0x1;
-L_8007808C:
-    tmp = r27 & 0xFFFF;
-    if (tmp < 6) goto L_80078078;
+    while (1) {
+        tmp = r27 & 0xFFFF;
+        if (tmp >= 6) break;
+        r3 = r28;
+        r4 = r27;
+        ((void(*)(void))fn_8012AC08)();
+        ((void(*)(void))fn_80124A60)();
+        r27 = r27 + 0x1;
+
+
+    }
     ((void(*)(void))fn_80115BD8)();
     ((void(*)(void))fn_801159F0)();
     r5 = (u32)&lbl_803F6F18;

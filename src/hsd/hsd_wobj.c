@@ -833,28 +833,29 @@ void fn_80191ECC(void) {
     r31 = 0x0;
     r30 = r4;
     r29 = r3;
-    goto L_80191F38;
-L_80191EF4:
-    r3 = *(u32*)((u8*)r29 + 0x28);
-    tmp = r31 << 3;
-    r5 = *(u32*)((u8*)r29 + 0x30);
-    r4 = r30;
-    r3 = r3 + tmp;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    r3 = r5 + tmp;
-    fn_800CA7FC();
-    if ((s32)r3 == 0) {
+    while (1) {
+        tmp = *(u32*)((u8*)r29 + 0xC);
+        if (r31 >= tmp) break;
         r3 = *(u32*)((u8*)r29 + 0x28);
         tmp = r31 << 3;
-        r4 = *(u32*)((u8*)r29 + 0x20);
-        tmp = *(u32*)(r3 + tmp);
-        r3 = r4 + tmp;
-        return;
+        r5 = *(u32*)((u8*)r29 + 0x30);
+        r4 = r30;
+        r3 = r3 + tmp;
+        tmp = *(u32*)((u8*)r3 + 0x4);
+        r3 = r5 + tmp;
+        fn_800CA7FC();
+        if ((s32)r3 == 0) {
+            r3 = *(u32*)((u8*)r29 + 0x28);
+            tmp = r31 << 3;
+            r4 = *(u32*)((u8*)r29 + 0x20);
+            tmp = *(u32*)(r3 + tmp);
+            r3 = r4 + tmp;
+            return;
+        }
+        r31 = r31 + 0x1;
+
+
     }
-    r31 = r31 + 0x1;
-L_80191F38:
-    tmp = *(u32*)((u8*)r29 + 0xC);
-    if (r31 < tmp) goto L_80191EF4;
     r3 = 0x0;
 
     return;
@@ -939,21 +940,22 @@ void fn_80191F64(void) {
     }
     *(u32*)((u8*)r29 + 0x40) = r30;
     r5 = 0x0;
-    goto L_801920B4;
-L_8019208C:
-    r3 = *(u32*)((u8*)r29 + 0x24);
-    tmp = r5 << 2;
-    r4 = *(u32*)((u8*)r29 + 0x20);
-    r5 = r5 + 0x1;
-    r3 = *(u32*)(r3 + tmp);
-    tmp = *(u32*)((u8*)r29 + 0x20);
-    r4 = r4 + r3;
-    r3 = *(u32*)((u8*)r4 + 0x0);
-    tmp = r3 + tmp;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_801920B4:
-    tmp = *(u32*)((u8*)r29 + 0x8);
-    if (r5 < tmp) goto L_8019208C;
+    while (1) {
+        tmp = *(u32*)((u8*)r29 + 0x8);
+        if (r5 >= tmp) break;
+        r3 = *(u32*)((u8*)r29 + 0x24);
+        tmp = r5 << 2;
+        r4 = *(u32*)((u8*)r29 + 0x20);
+        r5 = r5 + 0x1;
+        r3 = *(u32*)(r3 + tmp);
+        tmp = *(u32*)((u8*)r29 + 0x20);
+        r4 = r4 + r3;
+        r3 = *(u32*)((u8*)r4 + 0x0);
+        tmp = r3 + tmp;
+        *(u32*)((u8*)r4 + 0x0) = tmp;
+
+
+    }
     r3 = 0x0;
 
     return;

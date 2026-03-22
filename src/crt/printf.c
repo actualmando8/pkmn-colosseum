@@ -482,26 +482,27 @@ void fn_800CA620(void) {
     r25 = r29 + r3;
     r24 = r29 + tmp;
 L_800CA668:
-    if (r28 <= 1) goto L_800CA67C;
-    r25 = r25 - r30;
-    goto L_800CA6C0;
-L_800CA67C:
-    r5 = r30 + 0x1;
-    goto L_800CA6A8;
-L_800CA68C:
-    r6 = *(u8*)((u8*)r4 + 0x1);
-    tmp = *(u8*)((u8*)r3 + 0x1);
-    r6 = (s8)r6;
-    *(u8*)((u8*)r4 + 0x1) = tmp;
-    r4 = r4 + 0x1;
-    *(u8*)((u8*)r3 + 0x1) = r6;
-    r3 = r3 + 0x1;
-L_800CA6A8:
-    /* subic. r5, r5, 0x1 */;
-    if (r28 != 1) goto L_800CA68C;
-    if (r27 == 1) return;
-    r24 = r24 - r30;
-L_800CA6C0:
+    if (r28 > 1) {
+        r25 = r25 - r30;
+    } else {
+
+        r5 = r30 + 0x1;
+        while (1) {
+            /* subic. r5, r5, 0x1 */;
+            if (r28 == 1) break;
+            r6 = *(u8*)((u8*)r4 + 0x1);
+            tmp = *(u8*)((u8*)r3 + 0x1);
+            r6 = (s8)r6;
+            *(u8*)((u8*)r4 + 0x1) = tmp;
+            r4 = r4 + 0x1;
+            *(u8*)((u8*)r3 + 0x1) = r6;
+            r3 = r3 + 0x1;
+
+
+        }
+        if (r27 == 1) return;
+        r24 = r24 - r30;
+    }
     r26 = r28;
     tmp = r30 * tmp;
     r22 = r29 + tmp;
@@ -530,18 +531,19 @@ L_800CA6D4:
     ctr_fn();
     if ((s32)r3 >= 0) goto L_800CA668;
     r5 = r30 + 0x1;
-    goto L_800CA760;
-L_800CA744:
-    r6 = *(u8*)((u8*)r4 + 0x1);
-    tmp = *(u8*)((u8*)r3 + 0x1);
-    r6 = (s8)r6;
-    *(u8*)((u8*)r4 + 0x1) = tmp;
-    r4 = r4 + 0x1;
-    *(u8*)((u8*)r3 + 0x1) = r6;
-    r3 = r3 + 0x1;
-L_800CA760:
-    /* subic. r5, r5, 0x1 */;
-    if ((s32)r3 != 0) goto L_800CA744;
+    while (1) {
+        /* subic. r5, r5, 0x1 */;
+        if ((s32)r3 == 0) break;
+        r6 = *(u8*)((u8*)r4 + 0x1);
+        tmp = *(u8*)((u8*)r3 + 0x1);
+        r6 = (s8)r6;
+        *(u8*)((u8*)r4 + 0x1) = tmp;
+        r4 = r4 + 0x1;
+        *(u8*)((u8*)r3 + 0x1) = r6;
+        r3 = r3 + 0x1;
+
+
+    }
 L_800CA768:
     tmp = r26 << 1;
     if (tmp <= r27) goto L_800CA6D4;

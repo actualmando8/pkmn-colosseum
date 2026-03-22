@@ -1244,15 +1244,19 @@ s32 fn_80084A8C(void) {
     *(u32*)(sp + 0xC34) = tmp;
     r3 = 0x1;
     ((void(*)(void))fn_80093698)();
-    goto L_80084AF4;
-L_80084AF0:
-    ((void(*)(void))fn_800F0308)();
-L_80084AF4:
-    r5 = 0x0;
-    r4 = r3 + 0x190;
-    r3 = 0x1;
-    ((void(*)(void))fn_800932F0)();
-    if ((s32)r3 == 0) goto L_80084AF0;
+    while (1) {
+        r5 = 0x0;
+        r4 = r3 + 0x190;
+        r3 = 0x1;
+        ((void(*)(void))fn_800932F0)();
+        if ((s32)r3 != 0) break;
+        ((void(*)(void))fn_800F0308)();
+
+
+
+
+
+    }
     r3 = 0xe4;
     r4 = 0x0;
     ((void(*)(void))fn_8010264C)();
@@ -4595,13 +4599,15 @@ L_80087F6C:
     if ((s32)r7 >= 3) goto L_800880F4;
     r3 = 0x26;
     fn_80166A28();
-    goto L_80087FA8;
-L_80087FA4:
-    ((void(*)(void))fn_800F0308)();
-L_80087FA8:
-    r3 = 0x26;
-    fn_801666BC();
-    if ((s32)r3 == 2) goto L_80087FA4;
+    while (1) {
+        r3 = 0x26;
+        fn_801666BC();
+        if ((s32)r3 != 2) break;
+        ((void(*)(void))fn_800F0308)();
+
+
+
+    }
     r21 = r29;
     r20 = (u32)sp + 0xac;
     r24 = 0x0;
@@ -4684,13 +4690,15 @@ L_80087FA8:
 L_800880F4:
     r3 = 0x4a1;
     fn_80166A28();
-    goto L_80088104;
-L_80088100:
-    ((void(*)(void))fn_800F0308)();
-L_80088104:
-    r3 = 0x4a1;
-    fn_801666BC();
-    if ((s32)r3 == 2) goto L_80088100;
+    while (1) {
+        r3 = 0x4a1;
+        fn_801666BC();
+        if ((s32)r3 != 2) break;
+        ((void(*)(void))fn_800F0308)();
+
+
+
+    }
     goto L_80088120;
 L_80088118:
     r3 = 0x3c6;
@@ -4852,14 +4860,17 @@ L_80088294:
     r3 = r18;
     r4 = 0x0;
     ((void(*)(void))fn_800ECB74)();
-    goto L_800883D8;
-L_800883D4:
-    ((void(*)(void))fn_800F0308)();
-L_800883D8:
-    r3 = r18;
-    ((void(*)(void))fn_800EC960)();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) goto L_800883D4;
+    while (1) {
+        r3 = r18;
+        ((void(*)(void))fn_800EC960)();
+        tmp = r3 & 0xFF;
+        if (tmp == 0) break;
+        ((void(*)(void))fn_800F0308)();
+
+
+
+
+    }
 L_800883EC:
     r28 = r31;
     r27 = r24;

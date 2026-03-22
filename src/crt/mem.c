@@ -228,28 +228,30 @@ void fn_800C8174(void) {
         r3 = r31;
         return;
     }
-    if ((s32)r7 != 0) goto L_800C8208;
-    r5 = r5 + 0x1;
-    goto L_800C81FC;
-L_800C81F4:
-    tmp = *(u8*)((u8*)r3 + 0x1);
-    r4 += 1; *(u8*)r4 = tmp;
-L_800C81FC:
-    /* subic. r5, r5, 0x1 */;
-    if ((s32)r7 != 0) goto L_800C81F4;
-    r3 = r31;
-    return;
-L_800C8208:
+    if ((s32)r7 == 0) {
+        r5 = r5 + 0x1;
+        while (1) {
+            /* subic. r5, r5, 0x1 */;
+            if ((s32)r7 == 0) break;
+            tmp = *(u8*)((u8*)r3 + 0x1);
+            r4 += 1; *(u8*)r4 = tmp;
+
+
+        }
+        r3 = r31;
+        return;
+    }
     r3 = r4 + r5;
     r4 = r31 + r5;
     r5 = r5 + 0x1;
-    goto L_800C8220;
-L_800C8218:
-    tmp = *(u8*)((u8*)r3 + (-1));
-    r4 += -1; *(u8*)r4 = tmp;
-L_800C8220:
-    /* subic. r5, r5, 0x1 */;
-    if ((s32)r7 != 0) goto L_800C8218;
+    while (1) {
+        /* subic. r5, r5, 0x1 */;
+        if ((s32)r7 == 0) break;
+        tmp = *(u8*)((u8*)r3 + (-1));
+        r4 += -1; *(u8*)r4 = tmp;
+
+
+    }
 
     r3 = r31;
 

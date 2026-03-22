@@ -781,16 +781,17 @@ L_8007962C:
     tmp = *(u8*)&lbl_8047A631;
     if (tmp == 0) goto L_80079774;
     r29 = 0x0;
-    goto L_800796E4;
-L_800796D0:
-    r4 = r29;
-    r3 = (u32)sp + 0xf0;
-    ((void(*)(void))fn_8012AC08)();
-    ((void(*)(void))fn_80124A60)();
-    r29 = r29 + 0x1;
-L_800796E4:
-    tmp = r29 & 0xFFFF;
-    if (tmp < 6) goto L_800796D0;
+    while (1) {
+        tmp = r29 & 0xFFFF;
+        if (tmp >= 6) break;
+        r4 = r29;
+        r3 = (u32)sp + 0xf0;
+        ((void(*)(void))fn_8012AC08)();
+        ((void(*)(void))fn_80124A60)();
+        r29 = r29 + 0x1;
+
+
+    }
     ((void(*)(void))fn_80115BD8)();
     ((void(*)(void))fn_801159F0)();
     r4 = r3;
