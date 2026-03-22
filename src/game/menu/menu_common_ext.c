@@ -598,7 +598,8 @@ s32 fn_80071700(void) {
                             ctr_fn();
                         }
                         tmp = *(u32*)(r27 + r28);
-                    } while ((s32)tmp == 0);
+                    }
+                } while ((s32)tmp == 0);
                     r3 = 0x3e8;
                     break;
                 }
@@ -672,7 +673,8 @@ s32 fn_80071700(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r29 + r28);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r3 = 0x3e8;
                 break;
             }
@@ -918,7 +920,8 @@ s32 fn_80071AE4(void) {
                                 ctr_fn();
                             }
                             tmp = *(u32*)(r27 + r26);
-                        } while ((s32)tmp == 0);
+                        }
+                    } while ((s32)tmp == 0);
                         r3 = 0x3e8;
                         break;
                     }
@@ -1003,7 +1006,8 @@ s32 fn_80071AE4(void) {
                             ctr_fn();
                         }
                         tmp = *(u32*)(r27 + r26);
-                    } while ((s32)tmp == 0);
+                    }
+                } while ((s32)tmp == 0);
                     r21 = 0x3e8;
                     break;
                 }
@@ -1025,7 +1029,8 @@ s32 fn_80071AE4(void) {
         } while (0);
 
         if ((s32)r21 == 1) {
-        } while ((s32)r17 == 0);
+        }
+    } while ((s32)r17 == 0);
     }
     if ((s32)r21 != 0) {
         r4 = 0x1;
@@ -1152,7 +1157,8 @@ s32 fn_80071EA4(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r21 + r22);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r3 = 0x3e8;
                 break;
             }
@@ -1229,7 +1235,8 @@ s32 fn_80071EA4(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r26 + r27);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r3 = 0x3e8;
                 break;
             }
@@ -1314,7 +1321,8 @@ s32 fn_80071EA4(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r25 + r24);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r3 = 0x3e8;
                 break;
             }
@@ -1440,7 +1448,8 @@ s32 fn_800722A0(void) {
                             ctr_fn();
                         }
                         tmp = *(u32*)(r27 + r28);
-                    } while ((s32)tmp == 0);
+                    }
+                } while ((s32)tmp == 0);
                     r3 = 0x3e8;
                     break;
                 }
@@ -1514,7 +1523,8 @@ s32 fn_800722A0(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r29 + r28);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r3 = 0x3e8;
                 break;
             }
@@ -1730,7 +1740,8 @@ s32 fn_800726A8(void) {
                         ctr_fn();
                     }
                     tmp = *(u32*)(r30 + r29);
-                } while ((s32)tmp == 0);
+                }
+            } while ((s32)tmp == 0);
                 r16 = 0x3e8;
                 break;
             }
@@ -1787,7 +1798,8 @@ s32 fn_800726A8(void) {
                                 ctr_fn();
                             }
                             tmp = *(u32*)(r30 + r29);
-                        } while ((s32)tmp == 0);
+                        }
+                    } while ((s32)tmp == 0);
                         r3 = 0x3e8;
                         break;
                     }
@@ -1856,7 +1868,8 @@ s32 fn_800726A8(void) {
                             ctr_fn();
                         }
                         tmp = *(u32*)(r30 + r29);
-                    } while ((s32)tmp == 0);
+                    }
+                } while ((s32)tmp == 0);
                     break;
                 }
                 tmp = *(u32*)(r30 + r29);
@@ -1869,7 +1882,8 @@ s32 fn_800726A8(void) {
         } while (0);
 
         if ((s32)r16 == 1) {
-        } while ((s32)r24 == 0);
+        }
+    } while ((s32)r24 == 0);
     }
     r3 = r14;
     if ((s32)r16 != 0) {
