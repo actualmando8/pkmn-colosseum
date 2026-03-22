@@ -9066,8 +9066,6 @@ void fn_800F9210(void) {
 
     return;
 }
-}
-}
 
 /* 0x44 | fn_800F92D4 | generic */
 u32 fn_800F92D4(u32 arg1, u32 arg2) {
@@ -14584,6 +14582,8 @@ u32 fn_800FE010(void) {
 
     return;
 }
+}
+}
 
 /* 0x800FE35C | 0x30 -- fn_800D9D68(0, 0, 0x27F, 0x1DF) -- set viewport 640x480 */
 extern void fn_800D9D68(u32 x, u32 y, u32 w, u32 h);
@@ -15053,8 +15053,6 @@ void fn_800FE834(void) {
     r3 = r3 + 0x1;
 
     return;
-}
-}
 }
 
 /* 0x800FE9B0 | 0xC4 */
