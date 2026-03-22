@@ -543,28 +543,25 @@ void fn_80008868(void) {
     r3 = (u32)lbl_80266688;
     r29 = (u32)lbl_803A19C8;
     r30 = (u32)lbl_80266688;
-    goto L_80008C24;
-L_80008968:
+    while ((s32)r27 < (s32)r26) {
+    /* L_80008968 */
     tmp = *(s16*)((u8*)r28 + 0x2);
     if ((s32)tmp == (s32)r27) {
         r3 = 0xFF000000;
         r24 = r3 + 0xff;
     } else {
-
         r24 = -0x1;
     }
     /* lha tmp, lbl_80478838@sda21(tmp) */;
     r5 = r27 + tmp;
-    if ((s32)r5 >= 0) goto L_8000899C;
-    tmp = 0x0;
-    goto L_80008AA8;
-L_8000899C:
-    r3 = *(u32*)lbl_80478F98;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if (r5 < tmp) goto L_800089B4;
-    tmp = 0x0;
-    goto L_80008AA8;
-L_800089B4:
+    if ((s32)r5 < 0) {
+        tmp = 0x0;
+    } else {
+        r3 = *(u32*)lbl_80478F98;
+        tmp = *(u32*)((u8*)r3 + 0x0);
+        if (r5 >= tmp) {
+            tmp = 0x0;
+        } else {
     r7 = *(s16*)((u8*)r3 + 0x4);
     if ((s32)r5 != 0) {
         r3 = 0x0;
@@ -625,7 +622,9 @@ L_800089B4:
         r7 = *(s16*)(r4 + tmp);
     }
     tmp = r7 & 0xFFFF;
-L_80008AA8:
+        }
+    }
+    /* L_80008AA8 */
     r3 = r29;
     r4 = r30;
     r6 = tmp & 0xFFFF;
@@ -637,16 +636,14 @@ L_80008AA8:
     fn_800FAEF8();
     /* lha tmp, lbl_80478838@sda21(tmp) */;
     r4 = r27 + tmp;
-    if ((s32)r4 >= 0) goto L_80008AEC;
-    tmp = 0x0;
-    goto L_80008BF8;
-L_80008AEC:
-    r3 = *(u32*)lbl_80478F98;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if (r4 < tmp) goto L_80008B04;
-    tmp = 0x0;
-    goto L_80008BF8;
-L_80008B04:
+    if ((s32)r4 < 0) {
+        tmp = 0x0;
+    } else {
+        r3 = *(u32*)lbl_80478F98;
+        tmp = *(u32*)((u8*)r3 + 0x0);
+        if (r4 >= tmp) {
+            tmp = 0x0;
+        } else {
     r7 = *(s16*)((u8*)r3 + 0x4);
     if ((s32)r4 != 0) {
         r3 = 0x0;
@@ -707,7 +704,9 @@ L_80008B04:
         r7 = *(s16*)(r4 + tmp);
     }
     tmp = r7 & 0xFFFF;
-L_80008BF8:
+        }
+    }
+    /* L_80008BF8 */
     r3 = tmp & 0xFFFF;
     fn_801906A0();
     r7 = r3;
@@ -718,8 +717,7 @@ L_80008BF8:
     fn_800FAEF8();
     r25 = r25 + 0xd;
     r27 = r27 + 0x1;
-L_80008C24:
-    if ((s32)r27 < (s32)r26) goto L_80008968;
+    } /* end while loop */
     return;
 }
 
