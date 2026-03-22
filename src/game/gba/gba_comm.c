@@ -195,8 +195,7 @@ s32 gbaCommunication_Transfer1(s32 channel, void* pSrc, void* pSaveCtx) {
 
         result = 1;
     }
-
-check_result:
+    }
     if (result == 0) {
         return 0;
     }
@@ -259,53 +258,49 @@ s32 gbaCommunication_Transfer2(s32 channel, void* pDst) {
 
     /* Validate channel range */
     if (channel < GBA_CHANNEL_MIN || channel > GBA_CHANNEL_MAX) {
-        result = 0;
-        goto check_result;
+        return 0;
     }
 
     /* Check if channel already allocated */
     if (lbl_803FB328[channel] != NULL) {
         result = 1;
-        goto check_result;
+    } else {
+        /* Allocate work buffer */
+        workHandle = fn_800E2C04(GBA_WORK_SIZE, 0x20);
+
+        if (((u32)workHandle & 0xFFFF) == 0) {
+            fn_80196E10(sFile, 0x1DD, lbl_8047C1E8);
+        }
+
+        work = (u8*)fn_800E27B0(workHandle);
+        memset(work, 0, GBA_WORK_CLEAR_SIZE);
+
+        lbl_803FB328[channel] = work;
+
+        {
+            u8* channelPtr = (u8*)lbl_803FB328[channel];
+
+            *(u32*)(channelPtr + GBA_STATE_PHASE) = 0;
+            *(u32*)(channelPtr + GBA_STATE_PORT) = (u32)channel;
+
+            fn_800716C8(channel, channelPtr + GBA_DATA_OFFSET);
+            fn_8009F77C(channelPtr);
+            fn_8009F9C8(channelPtr + 0x18);
+
+            fn_800A19CC(
+                channelPtr + GBA_DATA_OFFSET,
+                (void*)fn_800937F4,
+                channelPtr,
+                channelPtr + GBA_STATE_PORT,
+                GBA_TRANSFER_SIZE,
+                GBA_SI_PRIORITY,
+                0
+            );
+
+            fn_800A1F94(channelPtr + GBA_DATA_OFFSET);
+            result = 1;
+        }
     }
-
-    /* Allocate work buffer */
-    workHandle = fn_800E2C04(GBA_WORK_SIZE, 0x20);
-
-    if (((u32)workHandle & 0xFFFF) == 0) {
-        fn_80196E10(sFile, 0x1DD, lbl_8047C1E8);
-    }
-
-    work = (u8*)fn_800E27B0(workHandle);
-    memset(work, 0, GBA_WORK_CLEAR_SIZE);
-
-    lbl_803FB328[channel] = work;
-
-    {
-        u8* channelPtr = (u8*)lbl_803FB328[channel];
-
-        *(u32*)(channelPtr + GBA_STATE_PHASE) = 0;
-        *(u32*)(channelPtr + GBA_STATE_PORT) = (u32)channel;
-
-        fn_800716C8(channel, channelPtr + GBA_DATA_OFFSET);
-        fn_8009F77C(channelPtr);
-        fn_8009F9C8(channelPtr + 0x18);
-
-        fn_800A19CC(
-            channelPtr + GBA_DATA_OFFSET,
-            (void*)fn_800937F4,
-            channelPtr,
-            channelPtr + GBA_STATE_PORT,
-            GBA_TRANSFER_SIZE,
-            GBA_SI_PRIORITY,
-            0
-        );
-
-        fn_800A1F94(channelPtr + GBA_DATA_OFFSET);
-        result = 1;
-    }
-
-check_result:
     if (result == 0) {
         return 0;
     }

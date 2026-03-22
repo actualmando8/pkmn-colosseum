@@ -252,41 +252,38 @@ void GSEffectInit(u16 maxEffects) {
         gsEffectGlobals.instanceTable = NULL;
         gsEffectGlobals.freeListHead = NULL;
         gsEffectGlobals.maxEffects = 0;
-        goto register_tasks;
+    } else {
+        table = (GSEffectInstance*)GSmemGetPtr(memHandle);
+        gsEffectGlobals.instanceTable = table;
+
+        /* Zero the entire table */
+        memset(table, 0, tableSize);
+
+        /* Set the free list head to the first entry */
+        gsEffectGlobals.freeListHead = table;
+
+        /* Build the doubly-linked free list */
+        table[0].prev = NULL;
+        table[0].next = &table[1];
+        table[0].id = 1;
+
+        for (i = 1; i < maxEffects - 1; i++) {
+            entry = &table[i];
+            entry->prev = &table[i - 1];
+            entry->next = &table[i + 1];
+            entry->id = i + 1;
+        }
+
+        /* Last entry: terminate the list */
+        entry = &table[maxEffects - 1];
+        entry->prev = &table[maxEffects - 2];
+        entry->next = NULL;
+        entry->id = maxEffects;
+        entry->state = GSEFFECT_STATE_UNINIT;
+
+        /* Store the max count */
+        gsEffectGlobals.maxEffects = (u32)maxEffects;
     }
-
-    table = (GSEffectInstance*)GSmemGetPtr(memHandle);
-    gsEffectGlobals.instanceTable = table;
-
-    /* Zero the entire table */
-    memset(table, 0, tableSize);
-
-    /* Set the free list head to the first entry */
-    gsEffectGlobals.freeListHead = table;
-
-    /* Build the doubly-linked free list */
-    table[0].prev = NULL;
-    table[0].next = &table[1];
-    table[0].id = 1;
-
-    for (i = 1; i < maxEffects - 1; i++) {
-        entry = &table[i];
-        entry->prev = &table[i - 1];
-        entry->next = &table[i + 1];
-        entry->id = i + 1;
-    }
-
-    /* Last entry: terminate the list */
-    entry = &table[maxEffects - 1];
-    entry->prev = &table[maxEffects - 2];
-    entry->next = NULL;
-    entry->id = maxEffects;
-    entry->state = GSEFFECT_STATE_UNINIT;
-
-    /* Store the max count */
-    gsEffectGlobals.maxEffects = (u32)maxEffects;
-
-register_tasks:
     /* Clear the active list */
     gsEffectGlobals.activeListHead = NULL;
 
@@ -788,7 +785,7 @@ void fn_80130CE0(void) {
     tmp = r3 & 0xFFFF;
     r4 = (u32)&lbl_803635C0;
     *(u16*)((u8*)r4 + 0x4) = r3;
-    if ((s32)tmp == 0) goto L_80130E98;
+    if ((s32)tmp != 0) {
     r3 = tmp;
     fn_800E27B0();
     r4 = (u32)&lbl_803635C0;
@@ -809,7 +806,7 @@ void fn_80130CE0(void) {
     *(u32*)((u8*)r24 + 0x2C) = r4;
     *(u16*)((u8*)r24 + 0x0) = tmp;
     if ((s32)r3 > 1) {
-        if ((s32)tmp <= 8) goto L_80130E60;
+        if ((s32)tmp > 8) {
         while (1) {
             r7 = r5 & 0xFFFF;
             if ((s32)r7 >= (s32)r23) break;
@@ -858,18 +855,19 @@ void fn_80130CE0(void) {
 
 
         }
-        goto L_80130E60;
-    L_80130E40:
-        tmp = r7 + 0x1;
-        *(u32*)((u8*)r4 + 0x30) = r6;
-        r6 = r4 + 0x34;
-        r5 = r5 + 0x1;
-        *(u32*)((u8*)r4 + 0x2C) = r6;
-        *(u16*)((u8*)r4 + 0x0) = tmp;
-        r4 = r4 + 0x34;
-    L_80130E60:
+        }
+        /* Single-entry loop for remaining entries */
         r7 = r5 & 0xFFFF;
-        if ((s32)r7 < (s32)r3) goto L_80130E40;
+        while ((s32)r7 < (s32)r3) {
+            tmp = r7 + 0x1;
+            *(u32*)((u8*)r4 + 0x30) = r6;
+            r6 = r4 + 0x34;
+            r5 = r5 + 0x1;
+            *(u32*)((u8*)r4 + 0x2C) = r6;
+            *(u16*)((u8*)r4 + 0x0) = tmp;
+            r4 = r4 + 0x34;
+            r7 = r5 & 0xFFFF;
+        }
     }
     r6 = 0x0;
     *(u32*)((u8*)r4 + 0x30) = tmp;
@@ -880,13 +878,12 @@ void fn_80130CE0(void) {
     *(u16*)((u8*)r4 + 0x0) = r31;
     *(u32*)((u8*)r4 + 0x4) = r5;
     *(u32*)&lbl_803635C0 = tmp;
-    goto L_80130EA8;
-L_80130E98:
-    tmp = 0x0;
-    *(u32*)((u8*)r4 + 0xC) = tmp;
-    *(u32*)((u8*)r4 + 0x8) = tmp;
-    *(u32*)((u8*)r4 + 0x0) = tmp;
-L_80130EA8:
+    } else {
+        tmp = 0x0;
+        *(u32*)((u8*)r4 + 0xC) = tmp;
+        *(u32*)((u8*)r4 + 0x8) = tmp;
+        *(u32*)((u8*)r4 + 0x0) = tmp;
+    }
     r4 = (u32)&lbl_803635C0;
     r3 = (u32)fn_80130F68;
     r4 = (u32)&lbl_803635C0;
@@ -968,20 +965,20 @@ void fn_80131010(void) {
     u32 r12 = 0;
     void (*ctr_fn)(void) = 0;
 
-    if (r3 == 0) goto L_80131058;
-    r4 = (u32)&lbl_803635C0;
-    r4 = (u32)&lbl_803635C0;
-    tmp = *(u32*)((u8*)r4 + 0x0);
-    if (r3 > tmp) goto L_80131058;
-    r3 = *(u32*)((u8*)r4 + 0xC);
-    tmp = tmp * 0x34;
-    r3 = r3 + tmp;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    if ((s32)tmp == (s32)-0x1) goto L_80131058;
-    goto L_8013105C;
-L_80131058:
-    r3 = 0x0;
-L_8013105C:
+    if (r3 != 0) {
+        r4 = (u32)&lbl_803635C0;
+        r4 = (u32)&lbl_803635C0;
+        tmp = *(u32*)((u8*)r4 + 0x0);
+        if (r3 <= tmp) {
+            r3 = *(u32*)((u8*)r4 + 0xC);
+            tmp = tmp * 0x34;
+            r3 = r3 + tmp;
+            tmp = *(u32*)((u8*)r3 + 0x4);
+            if ((s32)tmp == (s32)-0x1) r3 = 0x0;
+        } else {
+            r3 = 0x0;
+        }
+    }
     if (r3 != 0) {
         tmp = *(u32*)((u8*)r3 + 0x4);
         r12 = *(u32*)((u8*)r3 + 0x14);
@@ -1015,20 +1012,19 @@ void fn_8013111C(void) {
     u32 r31 = 0;
     void (*ctr_fn)(void) = 0;
 
-    if (r3 == 0) goto L_80131168;
-    r4 = (u32)&lbl_803635C0;
-    r4 = (u32)&lbl_803635C0;
-    tmp = *(u32*)((u8*)r4 + 0x0);
-    if (r3 > tmp) goto L_80131168;
-    r3 = *(u32*)((u8*)r4 + 0xC);
-    tmp = tmp * 0x34;
-    r31 = r3 + tmp;
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)tmp == (s32)-0x1) goto L_80131168;
-    goto L_8013116C;
-L_80131168:
     r31 = 0x0;
-L_8013116C:
+    if (r3 != 0) {
+        r4 = (u32)&lbl_803635C0;
+        r4 = (u32)&lbl_803635C0;
+        tmp = *(u32*)((u8*)r4 + 0x0);
+        if (r3 <= tmp) {
+            r3 = *(u32*)((u8*)r4 + 0xC);
+            tmp = tmp * 0x34;
+            r31 = r3 + tmp;
+            tmp = *(u32*)((u8*)r31 + 0x4);
+            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
+        }
+    }
     if (r31 == 0) { r3 = 0x0; return; }
     tmp = *(u32*)((u8*)r31 + 0x4);
     if ((s32)tmp != 0) {
@@ -1082,20 +1078,19 @@ void fn_80131268(void) {
     u32 r31 = 0;
     void (*ctr_fn)(void) = 0;
 
-    if (r3 == 0) goto L_801312BC;
-    r4 = (u32)&lbl_803635C0;
-    r4 = (u32)&lbl_803635C0;
-    tmp = *(u32*)((u8*)r4 + 0x0);
-    if (r3 > tmp) goto L_801312BC;
-    r3 = *(u32*)((u8*)r4 + 0xC);
-    tmp = tmp * 0x34;
-    r31 = r3 + tmp;
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)tmp == (s32)-0x1) goto L_801312BC;
-    goto L_801312C0;
-L_801312BC:
     r31 = 0x0;
-L_801312C0:
+    if (r3 != 0) {
+        r4 = (u32)&lbl_803635C0;
+        r4 = (u32)&lbl_803635C0;
+        tmp = *(u32*)((u8*)r4 + 0x0);
+        if (r3 <= tmp) {
+            r3 = *(u32*)((u8*)r4 + 0xC);
+            tmp = tmp * 0x34;
+            r31 = r3 + tmp;
+            tmp = *(u32*)((u8*)r31 + 0x4);
+            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
+        }
+    }
     if (r31 != 0) {
         tmp = *(u32*)((u8*)r31 + 0x4);
         r30 = *(u32*)((u8*)r31 + 0x30);
@@ -1158,20 +1153,19 @@ void fn_8013139C(void) {
     u32 r31 = 0;
     void (*ctr_fn)(void) = 0;
 
-    if (r3 == 0) goto L_801313E8;
-    r5 = (u32)&lbl_803635C0;
-    r5 = (u32)&lbl_803635C0;
-    tmp = *(u32*)((u8*)r5 + 0x0);
-    if (r3 > tmp) goto L_801313E8;
-    r3 = *(u32*)((u8*)r5 + 0xC);
-    tmp = tmp * 0x34;
-    r31 = r3 + tmp;
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)tmp == (s32)-0x1) goto L_801313E8;
-    goto L_801313EC;
-L_801313E8:
     r31 = 0x0;
-L_801313EC:
+    if (r3 != 0) {
+        r5 = (u32)&lbl_803635C0;
+        r5 = (u32)&lbl_803635C0;
+        tmp = *(u32*)((u8*)r5 + 0x0);
+        if (r3 <= tmp) {
+            r3 = *(u32*)((u8*)r5 + 0xC);
+            tmp = tmp * 0x34;
+            r31 = r3 + tmp;
+            tmp = *(u32*)((u8*)r31 + 0x4);
+            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
+        }
+    }
     if (r31 != 0) {
         r12 = *(u32*)((u8*)r31 + 0x8);
         if (r12 != 0) {

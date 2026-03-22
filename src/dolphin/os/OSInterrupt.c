@@ -214,15 +214,10 @@ void fn_8009E414(void) {
     r3 = 0xCC000000;
     r31 = *(u32*)((u8*)r3 + 0x3000);
     r31 = r31 & 0xFFFEFFFF;
-    if (r31 == 0) goto L_8009E458;
-    r3 = r3 + 0x3000;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    tmp = r31 & tmp;
-    if (tmp != 0) goto L_8009E460;
-L_8009E458:
-    r3 = r30;
-    OSLoadContext((OSContext*)r3);
-L_8009E460:
+    if (r31 == 0 || (r31 & *(u32*)(0xCC003000 + 0x4)) == 0) {
+        r3 = r30;
+        OSLoadContext((OSContext*)r3);
+    }
     tmp = r31 & 0x00000080;
     tmp = 0x0;
     if (tmp != 0) {
@@ -365,46 +360,46 @@ L_8009E460:
     r3 = *(u32*)((u8*)r3 + 0xC8);
     r3 = r4 | r3;
     r4 = tmp & ~r3;
-    if (r4 == 0) goto L_8009E734;
-    r3 = (u32)lbl_803117E8;
-    tmp = (u32)lbl_803117E8;
-    r3 = tmp;
+    if (r4 != 0) {
+        r3 = (u32)lbl_803117E8;
+        tmp = (u32)lbl_803117E8;
+        r3 = tmp;
 
+        /* Scan interrupt mask table to find pending interrupt */
+        while (1) {
+            tmp = *(u32*)((u8*)r3 + 0x0);
+            tmp = r4 & tmp;
+            if (tmp != 0) {
+                tmp = __cntlzw(tmp);
+                r29 = (s16)tmp;
+                break;
+            }
+            r3 = r3 + 0x4;
+        }
 
-
-L_8009E6B4:
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    tmp = r4 & tmp;
-    if (tmp == 0) goto L_8009E6D0;
-    tmp = __cntlzw(tmp);
-    r29 = (s16)tmp;
-    goto L_8009E6D8;
-L_8009E6D0:
-    r3 = r3 + 0x4;
-    goto L_8009E6B4;
-L_8009E6D8:
-    r3 = *(u32*)InterruptHandlerTable_8047A710;
-    tmp = r29 << 2;
-    r31 = *(u32*)(r3 + tmp);
-    if (r31 == 0) goto L_8009E734;
-    if ((s32)r29 > 4) {
-        *(u16*)__OSLastInterrupt = r29;
-        OSGetTime();
-        *((u32*)&__OSLastInterruptTime + 1) = r4;
-        *(u32*)__OSLastInterruptTime = r3;
-        tmp = *(u32*)((u8*)r30 + 0x198);
-        *(u32*)__OSLastInterruptSrr0 = tmp;
+        r3 = *(u32*)InterruptHandlerTable_8047A710;
+        tmp = r29 << 2;
+        r31 = *(u32*)(r3 + tmp);
+        if (r31 != 0) {
+            if ((s32)r29 > 4) {
+                *(u16*)__OSLastInterrupt = r29;
+                OSGetTime();
+                *((u32*)&__OSLastInterruptTime + 1) = r4;
+                *(u32*)__OSLastInterruptTime = r3;
+                tmp = *(u32*)((u8*)r30 + 0x198);
+                *(u32*)__OSLastInterruptSrr0 = tmp;
+            }
+            OSDisableScheduler();
+            r3 = r29;
+            r4 = r30;
+            r12 = r31;
+            /* blrl  */;
+            OSEnableScheduler();
+            __OSReschedule();
+            r3 = r30;
+            OSLoadContext((OSContext*)r3);
+        }
     }
-    OSDisableScheduler();
-    r3 = r29;
-    r4 = r30;
-    r12 = r31;
-    /* blrl  */;
-    OSEnableScheduler();
-    __OSReschedule();
-    r3 = r30;
-    OSLoadContext((OSContext*)r3);
-L_8009E734:
     r3 = r30;
     OSLoadContext((OSContext*)r3);
     return;

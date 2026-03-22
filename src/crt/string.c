@@ -103,7 +103,7 @@ void fn_800CA7FC(void) {
     }
     tmp = r4 & 0x3;
     r6 = r3 & 0x3;
-    if (tmp != r6) goto L_800CA8EC;
+    if (tmp == r6) {
     if (r6 != 0) {
         if (r5 == 0) {
             r3 = 0x0;
@@ -129,45 +129,55 @@ void fn_800CA7FC(void) {
         r3 = r3 + 0x1;
         r4 = r4 + 0x1;
     }
-    r7 = *(u32*)((u8*)r3 + 0x0);
-    r5 = 0x80810000;
-    r8 = *(u32*)((u8*)r4 + 0x0);
-    /* subis r5, r7, 0x101 */;
-    /* and. tmp, tmp, r6 */;
-    if (r5 != 0) goto L_800CA8D4;
-    goto L_800CA8BC;
-L_800CA8A4:
-    r7 = *(u32*)((u8*)r3 + 0x4);
-    r8 = *(u32*)((u8*)r4 + 0x4);
-    /* subis r5, r7, 0x101 */;
-    /* and. tmp, tmp, r6 */;
-    if (r5 != 0) goto L_800CA8D4;
-L_800CA8BC:
-    if (r7 == r8) goto L_800CA8A4;
-    r3 = -0x1;
-    if ((u32)r7 <= (u32)r8) return;
-    r3 = 0x1;
-    return;
-L_800CA8D4:
+    /* Word-at-a-time comparison loop */
+    while (1) {
+        r7 = *(u32*)((u8*)r3 + 0x0);
+        r5 = 0x80810000;
+        r8 = *(u32*)((u8*)r4 + 0x0);
+        /* subis r5, r7, 0x101 */;
+        /* and. tmp, tmp, r6 */;
+        if (r5 != 0) break;  /* null byte found */
+        if (r7 != r8) {
+            r3 = -0x1;
+            if ((u32)r7 <= (u32)r8) return;
+            r3 = 0x1;
+            return;
+        }
+        r3 = r3 + 0x4;
+        r4 = r4 + 0x4;
+        r7 = *(u32*)((u8*)r3 + 0x0);
+        r8 = *(u32*)((u8*)r4 + 0x0);
+        /* subis r5, r7, 0x101 */;
+        /* and. tmp, tmp, r6 */;
+        if (r5 != 0) break;
+        if (r7 != r8) {
+            r3 = -0x1;
+            if ((u32)r7 <= (u32)r8) return;
+            r3 = 0x1;
+            return;
+        }
+        r3 = r3 + 0x4;
+        r4 = r4 + 0x4;
+    }
+    /* Null found in word - compare byte by byte */
     r5 = *(u8*)((u8*)r3 + 0x0);
     tmp = *(u8*)((u8*)r4 + 0x0);
     /* subf. tmp, tmp, r5 */;
-    if (r7 == r8) goto L_800CA8EC;
-    r3 = tmp;
-    return;
-L_800CA8EC:
-    if (r5 != 0) goto L_800CA8FC;
-    r3 = 0x0;
-    return;
-L_800CA8FC:
-    r5 = *(u8*)((u8*)r3 + 0x1);
-    tmp = *(u8*)((u8*)r4 + 0x1);
-    /* subf. tmp, tmp, r5 */;
-    if (r5 != 0) {
+    if (r7 != r8) {
         r3 = tmp;
         return;
     }
-    if (r5 != 0) goto L_800CA8FC;
+    } /* end aligned case */
+    /* Byte-at-a-time comparison for tail (also handles unaligned case) */
+    while (r5 != 0) {
+        r5 = *(u8*)((u8*)r3 + 0x1);
+        tmp = *(u8*)((u8*)r4 + 0x1);
+        /* subf. tmp, tmp, r5 */;
+        if (r5 != 0) {
+            r3 = tmp;
+            return;
+        }
+    }
     r3 = 0x0;
     return;
 }

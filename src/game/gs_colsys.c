@@ -833,26 +833,22 @@ void GScolsys2_Finalize(void)
     u8* layerBase;
     s32 iter;
 
-    if (layer < 0 || layer >= GSCOLSYS_MAX_LAYERS) {
-        goto done;
-    }
+    if (layer >= 0 && layer < GSCOLSYS_MAX_LAYERS) {
+        layerBase = (u8*)COL_STATE + layer * GSCOLSYS_LAYER_SIZE;
 
-    layerBase = (u8*)COL_STATE + layer * GSCOLSYS_LAYER_SIZE;
+        for (iter = 0; iter < 3; iter++) {
+            u16* flagPtr;
+            s32 f;
 
-    for (iter = 0; iter < 3; iter++) {
-        u16* flagPtr;
-        s32 f;
-
-        /* Clear 16 flag halfwords, each spaced 0x14 apart */
-        for (f = 0; f < GSCOLSYS_FLAGS_PER_ITER; f++) {
-            flagPtr = (u16*)(layerBase + GSCOLSYS_FLAG_BASE_OFFSET + f * GSCOLSYS_FLAG_STRIDE);
-            *flagPtr &= (u16)~1;  /* Clear bit 0 (active flag) */
+            /* Clear 16 flag halfwords, each spaced 0x14 apart */
+            for (f = 0; f < GSCOLSYS_FLAGS_PER_ITER; f++) {
+                flagPtr = (u16*)(layerBase + GSCOLSYS_FLAG_BASE_OFFSET + f * GSCOLSYS_FLAG_STRIDE);
+                *flagPtr &= (u16)~1;  /* Clear bit 0 (active flag) */
         }
 
         layerBase += 0x140;
+        }
     }
-
-done:
     COL_WZX = NULL;
 }
 
@@ -1471,16 +1467,9 @@ void GScolsys2_DrawActive(void)
         u16 layerFlags = *(u16*)(layerEntry + 0x24);
         u16 triFlags;
 
-        /* Skip if layer entry already processed (bit 0 set) */
-        if (layerFlags & 1) {
-            goto next;
-        }
-
-        /* Skip if WZX triangle is inactive (bit 0 clear) */
+        /* Skip if layer entry already processed (bit 0 set) or WZX triangle inactive */
         triFlags = tri->flags;
-        if (!(triFlags & 1)) {
-            goto next;
-        }
+        if (!(layerFlags & 1) && (triFlags & 1)) {
 
         /* Build transforms */
         GScolsys2_BuildInverseTransform(invTransform, i);
@@ -1584,8 +1573,8 @@ void GScolsys2_DrawActive(void)
                 subVerts += 0x30;
             }
         }
+        }
 
-    next:
         layerEntry += GSCOLSYS_TRI_ENTRY_SIZE;
     }
 
@@ -2127,26 +2116,20 @@ void fn_8010C7BC(void) {
     r5 = (u32)&lbl_80404C68;
     r6 = (u32)&lbl_80404C68;
     r5 = *(u32*)((u8*)r6 + 0x0);
-    if (r5 != 0) goto L_8010C7D8;
-    r3 = 0x1;
-    goto L_8010C814;
-L_8010C7D8:
-    if ((s32)r3 < 0) goto L_8010C7EC;
-    tmp = *(u32*)((u8*)r5 + 0x4);
-    if (r3 < tmp) goto L_8010C7F4;
-L_8010C7EC:
-    r3 = 0x2;
-    goto L_8010C814;
-L_8010C7F4:
-    r5 = *(u32*)((u8*)r6 + 0x3704);
-    tmp = r3 * 0x28;
-    r3 = 0x0;
-    r5 = r5 * 0xdc0;
-    r5 = r6 + r5;
-    r5 = r5 + 0x4;
-    r5 = r5 + tmp;
-    r7 = r5;
-L_8010C814:
+    if (r5 == 0) {
+        r3 = 0x1;
+    } else if ((s32)r3 < 0 || r3 >= *(u32*)((u8*)r5 + 0x4)) {
+        r3 = 0x2;
+    } else {
+        r5 = *(u32*)((u8*)r6 + 0x3704);
+        tmp = r3 * 0x28;
+        r3 = 0x0;
+        r5 = r5 * 0xdc0;
+        r5 = r6 + r5;
+        r5 = r5 + 0x4;
+        r5 = r5 + tmp;
+        r7 = r5;
+    }
     if ((s32)r3 != (s32)0x0) return;
     tmp = *(u16*)((u8*)r7 + 0x24);
     tmp = tmp & 0x1;
@@ -2174,26 +2157,20 @@ void fn_8010C844(void) {
     r5 = (u32)&lbl_80404C68;
     r6 = (u32)&lbl_80404C68;
     r5 = *(u32*)((u8*)r6 + 0x0);
-    if (r5 != 0) goto L_8010C860;
-    r3 = 0x1;
-    goto L_8010C89C;
-L_8010C860:
-    if ((s32)r3 < 0) goto L_8010C874;
-    tmp = *(u32*)((u8*)r5 + 0x4);
-    if (r3 < tmp) goto L_8010C87C;
-L_8010C874:
-    r3 = 0x2;
-    goto L_8010C89C;
-L_8010C87C:
-    r5 = *(u32*)((u8*)r6 + 0x3704);
-    tmp = r3 * 0x28;
-    r3 = 0x0;
-    r5 = r5 * 0xdc0;
-    r5 = r6 + r5;
-    r5 = r5 + 0x4;
-    r5 = r5 + tmp;
-    r7 = r5;
-L_8010C89C:
+    if (r5 == 0) {
+        r3 = 0x1;
+    } else if ((s32)r3 < 0 || r3 >= *(u32*)((u8*)r5 + 0x4)) {
+        r3 = 0x2;
+    } else {
+        r5 = *(u32*)((u8*)r6 + 0x3704);
+        tmp = r3 * 0x28;
+        r3 = 0x0;
+        r5 = r5 * 0xdc0;
+        r5 = r6 + r5;
+        r5 = r5 + 0x4;
+        r5 = r5 + tmp;
+        r7 = r5;
+    }
     if ((s32)r3 != (s32)0x0) return;
     if ((s32)r4 != 0) {
         tmp = *(u16*)((u8*)r7 + 0x24);
