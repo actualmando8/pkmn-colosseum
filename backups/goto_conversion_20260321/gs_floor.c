@@ -1,0 +1,3626 @@
+/**
+ * @file gs_floor.c
+ * @brief GSfloor -- Floor/scene management (init, load, unload, transition).
+ *
+ * Decompiled from:
+ *   fn_800FF788 (GSfloorOpen)
+ *   fn_800FF81C (GSfloorSetFloorTable)
+ *   fn_800FF828 (GSfloorInit)
+ *   fn_800FF970 (GSfloorThreadMain)
+ *   fn_80100B24 (GSfloorUpdate)
+ *   fn_80101244 (GSfloorLoadParticle)
+ *   fn_801012E8 (GSfloorFindAndOpen)
+ *   fn_801013A0 (GSfloorLoadData)
+ *   fn_8010147C (GSfloorLoadMain)
+ *   fn_80101910 (GSfloorLoadCallback -- internal)
+ *
+ * Debug strings:
+ *   "GSfloorOpen: cannot find floor %d"
+ *   "loadParticle(): loading..."
+ *   "loadBGM(): loading [%s]..."
+ *   "_floorGetFilesize(): can't open file [%s]"
+ *   "_floorLoadFile(): can't open file [%s]"
+ *   "_floorLoadFile(): error reading file [%s]"
+ *
+ * The floor system creates a cooperative GSthread that runs a state machine.
+ * State transitions:
+ *   STATE_IDLE (0)          -- yield until GSfloorOpen sets state to 1
+ *   STATE_LOADING (1)       -- unload old resources, load new floor data,
+ *                              allocate resource chunks, yield
+ *   STATE_RUNNING (2)       -- per-frame update, dispatch resource callbacks,
+ *                              check model/texture load completion
+ *   STATE_UNLOADING (3)     -- clean up current floor, free resources
+ *   STATE_TRANSITIONING (4) -- re-parse floor data for next floor, set up
+ *                              the resource handlers, call subsystem inits
+ *   STATE_FINALIZING (5)    -- wait for all pending resources, finalize
+ *
+ * Address range: 0x800FF788 - 0x80101910
+ */
+
+#include "dolphin/types.h"
+#include "game/gs_floor.h"
+
+/* ===== External engine / SDK functions ===== */
+extern void  fn_800DD970(const char* fmt, ...);         /* GSlog / OSReport */
+extern u16   GSmemAllocRaw(u32 size);                   /* fn_800E3534 */
+extern void* GSmemGetPtr(u16 handle);                   /* fn_800E27B0 */
+extern void* GSmemLock(u16 handle);                     /* fn_800E24B0 */
+extern void  GSmemFree(u16 handle);                     /* fn_800E209C */
+extern void  memcpy(void* dst, const void* src, u32 n);
+
+/* GSthread */
+extern void* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
+                             u32 usesFPU, u32 autoStart, void* entryFunc);
+extern void  fn_800F0308(void);                         /* GSthread yield */
+extern void  fn_800F0438(void* modelHandle);            /* GSthread resume model */
+extern void  fn_800F0424(void* modelHandle);            /* GSthread pause model */
+extern void  fn_800F04C4(u32 floorId);                  /* GSthread flush floor */
+extern void* fn_800F716C(u32 floorId);                  /* GStexture load for floor */
+extern u16   fn_800F7274(u16 handle);                   /* GStexture free */
+extern void* fn_800F7108(u16 handle);                   /* GStexture get pointer */
+extern u32   fn_800F7318(u8 priority, void* callback,
+                          u32 stackSize, u32 p3, u32 p4,
+                          u32 p5, u32 p6, u32 p7, u32 p8);
+                                                         /* GStexture create resource */
+
+/* Resource loading */
+extern void  fn_800F9378(void* resPtr, u32 floorId, u32 loadParam,
+                          void* callback);               /* GSres load file */
+extern void* fn_800F9418(u32 size, u32 alignment, u32 loadParam,
+                          u32 loadParam2, void* callback); /* GSres alloc+load */
+extern void* fn_800F04BC(void* handle);                  /* Model check loaded */
+extern void  fn_800F0494(void* handle);                  /* Model free */
+
+/* Floor subsystem inits */
+extern void  fn_801123D4(u32 floorDataEntry, u32 loadMode); /* Floor resource init */
+extern s32   fn_80112380(u32 floorId);                   /* Floor check ready */
+extern void  fn_8011274C(void);                          /* Floor finalize load */
+extern void  fn_80112780(void);                          /* Floor begin transition */
+extern void  fn_80117C84(void);                          /* Floor camera update */
+extern void  fn_80115A38(u32 floorDataEntry);            /* Floor res set active */
+extern u32   fn_80115A80(u32 floorDataEntry);            /* Floor res set inactive */
+extern void  fn_8010D064(void);                          /* Collision init */
+extern void  fn_8010CC54(void);                          /* Collision finalize */
+extern void  fn_8010CD6C(void);                          /* Collision cleanup */
+extern void  fn_801024C0(void);                          /* Floor post-load hook */
+extern void  fn_800D2B90(u32 param);                     /* GS renderer set floor */
+
+/* Script / NPC / Sound / VFX */
+extern void  fn_800F915C(void);                          /* Particle cleanup */
+extern void  fn_80169DF8(void);                          /* Script cleanup */
+extern void  fn_80175B94(void);                          /* Generator cleanup */
+extern void  fn_8016AAAC(void);                          /* Script system reset */
+extern void  fn_800E8EFC(void);                          /* Material cleanup */
+extern void  fn_8018DB04(u32 param);                     /* People system notify */
+
+/* Floor loading callbacks (forward declarations) */
+extern void  fn_80101910(void);                          /* GSfloorLoadCallback */
+extern void  fn_80101A28(void);                          /* GSfloorFindAndOpenCallback */
+extern void  fn_80101A4C(void);                          /* GSfloorLoadDataCallback */
+
+/* GFL model processing */
+extern void* fn_800E4D18(u32 handle);
+
+/* FSYS / Archive */
+extern void* fn_80191ECC(void* name, const char* tocName);  /* FSYS lookup by name */
+extern void  fn_80191F64(void* resPtr, u32 fsysHandle, const char* name); /* FSYS bind */
+extern void* fn_800D27FC(u32 handle);                    /* FSYS get archive ptr */
+
+/* Floor resource loading callbacks */
+extern void  fn_8017B3E4(void);                          /* FSYS load wait begin */
+extern s32   fn_8017B2CC(void);                          /* FSYS load wait check */
+extern void  fn_8017B1CC(void);                          /* FSYS unload archive */
+
+/* ===== String constants (rodata references) ===== */
+extern const char lbl_802717F0[];  /* "GSfloorOpen: cannot find floor %d\n" */
+extern const char lbl_80271814[];  /* Multi-line error/info block (Japanese + English) */
+extern const char lbl_802719C4[];  /* "loadParticle(): loading...\n" */
+extern const char lbl_802719E0[];  /* "loadParticlePtr(): can't alloc %d bytes of memory\n" */
+
+/* Forward declarations for converted functions */
+void fn_800FF788(void);
+void fn_800FF81C(void);
+void fn_800FF828(void);
+void fn_800FF970(void);
+void fn_80100B24(void);
+void fn_80101244(void);
+void fn_801012E8(void);
+void fn_801013A0(void);
+void fn_8010147C(void);
+
+
+/* ===== Global state (sbss / sdata) ===== */
+
+/* --- Floor system configuration --- */
+static u16            gsFloorMemHandle;      /* lbl_8047ACA0 : GSmem handle for alloc table */
+static void*          gsFloorMemPtr;         /* lbl_8047ACA4 : resolved pointer */
+static u32            gsFloorMaxFloors;      /* lbl_8047ACA8 : max floor index count */
+static u16            gsFloorResMemHandle;   /* lbl_8047ACAC : GSmem handle for resource array */
+static void*          gsFloorResMemPtr;      /* lbl_8047ACB0 : resolved resource array pointer */
+
+/* --- Resource pool configuration --- */
+static u32            gsFloorMaxBase;        /* lbl_8047ACB4 : number of base resource slots */
+static u32            gsFloorMaxExt1;        /* lbl_8047ACB8 : number of ext pool 1 slots */
+static u32            gsFloorMaxExt2;        /* lbl_8047ACBC : number of ext pool 2 slots */
+static u32            gsFloorTotalRes;       /* lbl_8047ACC0 : total = base + ext1 + ext2 */
+
+/* --- Runtime state --- */
+static u32            gsFloorUnused;         /* lbl_8047ACC4 : unused/padding */
+static GSFloorContext* gsFloorCurrent;       /* lbl_8047ACC8 : pointer to current floor context */
+static GSFloorResource* gsFloorResListHead;  /* lbl_8047ACCC : head of active resource list */
+static void*          gsFloorTablePtr;       /* lbl_8047ACD0 : pointer to floor data table */
+static u32            gsFloorTableCount;     /* lbl_8047ACD4 : number of entries in table */
+static u32            gsFloorState;          /* lbl_8047ACD8 : current state machine phase */
+static u32            gsFloorNextState;      /* lbl_8047ACDC : next state to transition to */
+static u32            gsFloorResHandlerCount;/* lbl_8047ACE0 : number of resource type handlers */
+
+/* --- Current floor ID (sdata, initialized to -1) --- */
+static u32            gsFloorCurrentId;      /* lbl_80478B18 : current floor identifier */
+
+/* --- Static tables (bss) --- */
+static GSFloorDataEntry gsFloorDataTable[GSFLOOR_MAX_ENTRIES]; /* lbl_80402518 */
+static GSFloorResHandler gsFloorResHandlers[GSFLOOR_MAX_RES_TYPES]; /* lbl_80404918 */
+
+/* =======================================================================
+ *  GSfloorOpen / fn_800FF788
+ *  Address: 0x800FF788, Size: 0x94
+ *
+ *  Opens a floor by ID. Searches the floor data table for a matching
+ *  entry. If found, stores it as the pending floor in the current
+ *  context and sets the state to LOADING.
+ *
+ *  r3 = floorId
+ *
+ *  The floor data table (gsFloorTablePtr) is an array of 0x4C-byte
+ *  entries. Field at offset 0x0C stores the floor identifier. The
+ *  search iterates gsFloorTableCount entries.
+ * ======================================================================= */
+void GSfloorOpen(u32 floorId)
+{
+    GSFloorContext* ctx;
+    u32 i;
+    void* entry;
+
+    /* Already loading? Bail out */
+    if (gsFloorState != GSFLOOR_STATE_IDLE)
+        return;
+
+    /* Search the floor data table for this floor ID */
+    entry = gsFloorTablePtr;
+    if (gsFloorTableCount != 0) {
+        for (i = 0; i < gsFloorTableCount; i++) {
+            u32* entryBase = (u32*)((u8*)entry + i * 0x4C);
+            if (entryBase[3] == floorId) { /* offset 0x0C = floor ID */
+                goto found;
+            }
+        }
+    }
+    entry = NULL;
+
+found:
+    if (entry == NULL) {
+        fn_800DD970(lbl_802717F0, floorId);
+        return;
+    }
+
+    ctx = gsFloorCurrent;
+    ctx->floorDataEntry = entry;
+    ctx->floorId = floorId + GSFLOOR_ID_BASE;
+    ctx->isActive = 1;
+    gsFloorState = GSFLOOR_STATE_LOADING;
+}
+
+/* =======================================================================
+ *  GSfloorSetFloorTable / fn_800FF81C
+ *  Address: 0x800FF81C, Size: 0xC
+ *
+ *  Sets the floor data table pointer and entry count.
+ * ======================================================================= */
+void GSfloorSetFloorTable(void* tablePtr, u32 count)
+{
+    gsFloorTablePtr = tablePtr;
+    gsFloorTableCount = count;
+}
+
+/* =======================================================================
+ *  GSfloorInit / fn_800FF828
+ *  Address: 0x800FF828, Size: 0x148
+ *
+ *  Initializes the floor system:
+ *   1. Clears the floor data table pointer
+ *   2. Allocates the floor context pool from GSmem (maxFloors * 0x14 bytes)
+ *   3. Allocates the resource array from GSmem (totalRes * 0x24 bytes)
+ *   4. Initializes all resource slots to empty
+ *   5. Creates the floor management thread (GSthreadCreate)
+ *
+ *  r3 = maxFloors, r4 = maxBase, r5 = maxExt1, r6 = maxExt2
+ * ======================================================================= */
+void GSfloorInit(u32 maxFloors, u32 maxBase, u32 maxExt1, u32 maxExt2)
+{
+    u32 totalRes;
+    u32 allocSize;
+    u32 i;
+
+    /* Reset floor data table */
+    gsFloorTablePtr = NULL;
+    gsFloorTableCount = 0;
+
+    /* Save configuration */
+    gsFloorMaxFloors = maxFloors;
+
+    /* Allocate floor context pool: maxFloors * sizeof(GSFloorContext) = maxFloors * 0x14 */
+    allocSize = maxFloors * 0x14;
+    gsFloorMemHandle = GSmemAllocRaw(allocSize);
+    if ((gsFloorMemHandle & 0xFFFF) == 0)
+        return;
+
+    gsFloorMemPtr = GSmemGetPtr(gsFloorMemHandle);
+
+    /* Store pool configuration */
+    gsFloorMaxBase = maxBase;
+    gsFloorMaxExt1 = maxExt1;
+    gsFloorMaxExt2 = maxExt2;
+    totalRes = maxBase + maxExt1 + maxExt2;
+    gsFloorTotalRes = totalRes;
+
+    /* Allocate resource array: totalRes * sizeof(GSFloorResource) = totalRes * 0x24 */
+    allocSize = totalRes * 0x24;
+    gsFloorResMemHandle = GSmemAllocRaw(allocSize);
+    if ((gsFloorResMemHandle & 0xFFFF) == 0)
+        return;
+
+    gsFloorResMemPtr = GSmemGetPtr(gsFloorResMemHandle);
+
+    /* Initialize all resource slots */
+    for (i = 0; i < totalRes; i++) {
+        GSFloorResource* res = (GSFloorResource*)((u8*)gsFloorResMemPtr + i * 0x24);
+        res->active = 0;  /* offset 0x08 */
+    }
+
+    /* Initialize the floor context */
+    gsFloorResListHead = NULL;
+    gsFloorUnused = 0;
+
+    gsFloorCurrent = (GSFloorContext*)gsFloorMemPtr;
+    gsFloorCurrent->floorDataEntry = NULL;
+    gsFloorCurrent->floorId = 0;
+    gsFloorCurrent->resMemHandle = 0;
+    gsFloorCurrent->doFadeIn = 0;
+    gsFloorCurrent->doFadeOut = 0;
+    gsFloorCurrent->isActive = 0;
+
+    gsFloorState = GSFLOOR_STATE_IDLE;
+    gsFloorCurrentId = GSFLOOR_ID_INVALID;
+
+    /* Create the floor management thread:
+     * affinity=0, priority=0x7D0, stackSize=0x4000,
+     * usesFPU=1, autoStart=1, entryFunc=GSfloorThreadMain */
+    GSthreadCreate(0, 0x7D0, 0x4000, 1, 1, (void*)GSfloorThreadMain);
+}
+
+/* =======================================================================
+ *  unlinkResource -- internal helper
+ *
+ *  Removes a GSFloorResource from the doubly-linked active list.
+ *  If the resource has a loaded texture (status==1), frees it via
+ *  fn_800F7274.
+ * ======================================================================= */
+static void unlinkResource(GSFloorResource* res)
+{
+    /* If resource has a loaded texture, free it */
+    if (res->status == GSFLOOR_RES_LOADED) {
+        if (res->modelHandle != NULL) {
+            fn_800F7274(res->textureHandle);
+        }
+    }
+
+    /* Clear active flag */
+    res->active = 0;
+
+    /* Unlink from doubly-linked list */
+    if (res->prev != NULL) {
+        res->prev->next = res->next;
+    }
+    if (res->next != NULL) {
+        res->next->prev = res->prev;
+    }
+
+    /* If this was the list head, advance head */
+    if (gsFloorResListHead == res) {
+        gsFloorResListHead = res->next;
+    }
+
+    /* Clear link pointers */
+    res->prev = NULL;
+    res->next = NULL;
+}
+
+/* =======================================================================
+ *  unloadResourcePool -- internal helper
+ *
+ *  Iterates a pool of GSFloorResource entries and unlinks all matching
+ *  the given floorId with the specified status filter.
+ * ======================================================================= */
+static void unloadResourcePool(GSFloorResource* pool, u32 count,
+                                u32 floorId, u32 statusFilter)
+{
+    u32 i;
+    for (i = 0; i < count; i++) {
+        GSFloorResource* res = &pool[i];
+        if (res->status == statusFilter && res->floorId == floorId) {
+            unlinkResource(res);
+        }
+    }
+}
+
+/* =======================================================================
+ *  markResourcePending -- internal helper
+ *
+ *  Iterates a pool of GSFloorResource entries and marks matching
+ *  resources as pending (setting the pending byte at offset 0x15).
+ *  Also resumes model handles if status == LOADED.
+ * ======================================================================= */
+static void markResourcePending(GSFloorResource* pool, u32 count,
+                                 u32 floorId, u32 statusFilter)
+{
+    u32 i;
+    for (i = 0; i < count; i++) {
+        GSFloorResource* res = &pool[i];
+        if (res->status == statusFilter && res->floorId == floorId) {
+            res->pending = 1;
+            if (res->status == GSFLOOR_RES_LOADED) {
+                if (res->modelHandle != NULL) {
+                    fn_800F0438(res->modelHandle);
+                }
+            }
+        }
+    }
+}
+
+/* =======================================================================
+ *  GSfloorThreadMain / fn_800FF970
+ *  Address: 0x800FF970, Size: 0x11B4
+ *
+ *  Main thread entry for the floor state machine. This is a cooperative
+ *  thread that never returns -- it loops through states and yields
+ *  between frames via fn_800F0308.
+ *
+ *  State machine:
+ *    0 (IDLE):          Yield. No floor active.
+ *    1 (LOADING):       Check doFadeIn / doFadeOut flags to determine
+ *                       load mode (0=fresh, 1=fade-in only, 2=full).
+ *                       Call floor resource init, collision init,
+ *                       FSYS load wait, then transition to RUNNING.
+ *    2 (RUNNING):       Call GSfloorUpdate. If still loading, yield.
+ *                       When done, read nextState and transition.
+ *    3 (UNLOADING):     Free all resources for the departing floor
+ *                       across all three resource pools (base, ext1, ext2)
+ *                       and for both status types (FREE and LOADED).
+ *                       Then load next floor and transition to state 4.
+ *    4 (TRANSITIONING): Begin the transition. Parse the new floor's
+ *                       resource chunks, allocate memory, register
+ *                       resource handlers, mark resources as pending.
+ *    5 (FINALIZING):    Final wait state (unused in normal flow).
+ * ======================================================================= */
+void GSfloorThreadMain(void)
+{
+    u32 loadMode;
+    u32 floorDataEntry;
+    s32 loadResult;
+    u32 i;
+
+    for (;;) {
+        switch (gsFloorState) {
+
+        case GSFLOOR_STATE_IDLE:
+            /* No floor active -- yield and poll again */
+            fn_800F0308();
+            break;
+
+        case GSFLOOR_STATE_LOADING: {
+            GSFloorContext* ctx = gsFloorCurrent;
+
+            /* Determine load mode from fade flags */
+            if (ctx->doFadeIn != 0) {
+                loadMode = 0;   /* Fresh load (fade in) */
+            } else if (ctx->doFadeOut != 0) {
+                loadMode = 1;   /* Fade out only (continuing) */
+            } else {
+                loadMode = 2;   /* Full load (no fade) */
+            }
+
+            floorDataEntry = (u32)ctx->floorDataEntry;
+
+            /* Initialize floor resources for this load mode */
+            fn_801123D4(floorDataEntry, loadMode);
+
+            /* If fresh load, initialize collision */
+            if (loadMode == 0) {
+                fn_8010D064();
+            }
+
+            /* If full load, finalize collision */
+            if (loadMode == 2) {
+                fn_8010CC54();
+            }
+
+            /* Set floor resource as active */
+            fn_80115A38(floorDataEntry);
+
+            /* Begin FSYS archive load wait */
+            fn_8017B3E4();
+
+            /* Wait for FSYS load to complete */
+            for (;;) {
+                fn_80115A38(floorDataEntry);
+                loadResult = fn_8017B2CC();
+                if (loadResult < 0) {
+                    fn_800DD970(lbl_80271814);
+                }
+                if (loadResult == 0) {
+                    break;
+                }
+                fn_800F0308(); /* yield */
+            }
+
+            /* Deactivate floor resource */
+            fn_80115A80(floorDataEntry);
+
+            /* Clean up collision if not fade-out mode */
+            if (loadMode != 1) {
+                fn_8010CD6C();
+            }
+
+            /* Yield twice (frame sync) */
+            fn_800F0308();
+            fn_800F0308();
+
+            /* Transition to RUNNING state */
+            gsFloorState = GSFLOOR_STATE_RUNNING;
+            ctx->doFadeIn = 0;
+            ctx->doFadeOut = 0;
+            ctx->isActive = 1;
+            break;
+        }
+
+        case GSFLOOR_STATE_RUNNING: {
+            GSFloorContext* ctx = gsFloorCurrent;
+            u8 result = GSfloorUpdate(ctx);
+            if (result == 1) {
+                fn_800F0308(); /* yield, still loading */
+                break;
+            }
+            /* Update complete -- read next state from pending */
+            gsFloorState = gsFloorNextState;
+            break;
+        }
+
+        case GSFLOOR_STATE_UNLOADING: {
+            GSFloorContext* ctx = gsFloorCurrent;
+            GSFloorResource* resBase = (GSFloorResource*)gsFloorResMemPtr;
+            u32 floorId = ctx->floorId;
+
+            /*
+             * Free all resources belonging to the departing floor.
+             * Walk three pools (base, ext1, ext2) and free
+             * resources with status == FREE first, then status == LOADED.
+             */
+
+            /* Pool 0 (base): free status==FREE entries */
+            unloadResourcePool(resBase, gsFloorMaxBase,
+                               floorId, GSFLOOR_RES_FREE);
+
+            /* Pool 1 (ext1): free status==FREE entries */
+            {
+                GSFloorResource* pool1 = (GSFloorResource*)
+                    ((u8*)resBase + gsFloorMaxBase * 0x24);
+                unloadResourcePool(pool1, gsFloorMaxExt1,
+                                   floorId, GSFLOOR_RES_FREE);
+            }
+
+            /* Pool 2 (ext2): free status==FREE entries */
+            {
+                u32 offset = (gsFloorMaxBase + gsFloorMaxExt1) * 0x24;
+                GSFloorResource* pool2 = (GSFloorResource*)
+                    ((u8*)resBase + offset);
+                unloadResourcePool(pool2, gsFloorMaxExt2,
+                                   floorId, GSFLOOR_RES_FREE);
+            }
+
+            /* Pool 0 (base): free status==LOADED entries */
+            unloadResourcePool(resBase, gsFloorMaxBase,
+                               floorId, GSFLOOR_RES_LOADED);
+
+            /* Pool 1 (ext1): free status==LOADED entries */
+            {
+                GSFloorResource* pool1 = (GSFloorResource*)
+                    ((u8*)resBase + gsFloorMaxBase * 0x24);
+                unloadResourcePool(pool1, gsFloorMaxExt1,
+                                   floorId, GSFLOOR_RES_LOADED);
+            }
+
+            /* Pool 2 (ext2): free status==LOADED entries */
+            {
+                u32 offset = (gsFloorMaxBase + gsFloorMaxExt1) * 0x24;
+                GSFloorResource* pool2 = (GSFloorResource*)
+                    ((u8*)resBase + offset);
+                unloadResourcePool(pool2, gsFloorMaxExt2,
+                                   floorId, GSFLOOR_RES_LOADED);
+            }
+
+            /* Check floor readiness and finalize */
+            floorDataEntry = (u32)ctx->floorDataEntry;
+            if (fn_80112380(gsFloorCurrentId) == 0) {
+                fn_8011274C();
+            }
+
+            /* Update field camera */
+            fn_80117C84();
+
+            /* Notify people system */
+            fn_8018DB04(1);
+
+            /* Flush textures for this floor */
+            {
+                u32 fId = ctx->floorId;
+                fn_800F716C(fId);
+                fn_800F04C4(fId);
+            }
+
+            /* Post-load hook */
+            fn_801024C0();
+
+            /* Notify renderer */
+            fn_800D2B90(0);
+
+            /* Set floor res active/inactive */
+            fn_80115A38(floorDataEntry);
+            fn_8017B1CC();  /* Unload FSYS archive */
+            fn_80115A80(floorDataEntry);
+
+            /* Clean up subsystems */
+            fn_800F915C();   /* Particle cleanup */
+            fn_80169DF8();   /* Script cleanup */
+            fn_80175B94();   /* Generator cleanup */
+            fn_8016AAAC();   /* Script system reset */
+            fn_800E8EFC();   /* Material cleanup */
+
+            /* Clear fade flags */
+            ctx->doFadeIn = 0;
+            ctx->doFadeOut = 0;
+
+            /* Look up next floor in the floor data table */
+            if ((gsFloorCurrentId + 0x10000) == 0xFFFF) {
+                /* Invalid / no next floor */
+                gsFloorState = GSFLOOR_STATE_IDLE;
+            } else {
+                /* Search floor table for the next floor ID */
+                u32* tblPtr = (u32*)gsFloorTablePtr;
+                u32 tblCount = gsFloorTableCount;
+                void* found = NULL;
+                u32 j;
+
+                for (j = 0; j < tblCount; j++) {
+                    u32* entry = (u32*)((u8*)tblPtr + j * 0x4C);
+                    if (entry[3] == gsFloorCurrentId) {
+                        found = entry;
+                        break;
+                    }
+                }
+
+                ctx->floorDataEntry = found;
+                ctx->floorId = gsFloorCurrentId + GSFLOOR_ID_BASE;
+                gsFloorState = GSFLOOR_STATE_LOADING;
+            }
+            break;
+        }
+
+        case GSFLOOR_STATE_TRANSITIONING: {
+            GSFloorContext* ctx = gsFloorCurrent;
+            GSFloorResource* resBase;
+            u32 floorId;
+            u32 resTypeId;
+            u32 totalSize;
+            u16 memHandle;
+
+            /* Begin transition */
+            fn_80112780();
+
+            /* Set fade-in flag */
+            ctx->doFadeIn = 1;
+            ctx->doFadeOut = 0;
+
+            /* Get the floor data header to determine resource type */
+            {
+                u8* floorData = (u8*)ctx->floorDataEntry;
+                u8 headerByte = floorData[0];
+                resTypeId = (headerByte >> 1) & 0x7;  /* extract 3-bit type ID */
+            }
+
+            /* Pass 1: compute total size of all resource chunks */
+            totalSize = 0;
+            {
+                GSFloorResHandler* handler = gsFloorResHandlers;
+                u32 handlerCount = gsFloorResHandlerCount;
+                u32 h;
+                for (h = 0; h < handlerCount; h++) {
+                    if (handler->typeId == resTypeId) {
+                        /* Call size function to get chunk size */
+                        u32 (*sizeFunc)(void) = (u32 (*)(void))handler->sizeFunc;
+                        u32 chunkSize = sizeFunc();
+                        /* Align to 4 bytes and add header */
+                        totalSize += (chunkSize + 3) & ~3;
+                        totalSize += 4;
+                    }
+                    handler++;
+                }
+            }
+
+            /* Allocate memory for all resource chunks */
+            memHandle = GSmemAllocRaw(totalSize);
+            if ((memHandle & 0xFFFF) == 0) {
+                memHandle = 0;
+                goto transitionEnd;
+            }
+
+            {
+                u8* memPtr = (u8*)GSmemGetPtr(memHandle);
+                if (memPtr == NULL) {
+                    memHandle = 0;
+                    goto transitionEnd;
+                }
+
+                /* Pass 2: read each resource chunk into the allocated block */
+                {
+                    GSFloorResHandler* handler = gsFloorResHandlers;
+                    u32 handlerCount = gsFloorResHandlerCount;
+                    u32 h;
+                    u8* writePtr = memPtr;
+                    for (h = 0; h < handlerCount; h++) {
+                        if (handler->typeId == resTypeId) {
+                            u32 (*sizeFunc)(void) = (u32 (*)(void))handler->sizeFunc;
+                            u32 chunkSize = sizeFunc();
+                            u32 alignedSize = (chunkSize + 3) & ~3;
+
+                            /* Store size as header */
+                            *(u32*)writePtr = alignedSize;
+
+                            /* Call read function to fill the data */
+                            {
+                                void (*readFunc)(void*, u32) =
+                                    (void (*)(void*, u32))handler->readFunc;
+                                readFunc(writePtr + 4, alignedSize);
+                            }
+
+                            writePtr += 4 + alignedSize;
+                        }
+                        handler++;
+                    }
+                }
+
+                /* Free the allocation (data has been processed) */
+                GSmemFree(memHandle);
+            }
+
+        transitionEnd:
+            /* Store resource memory handle */
+            ctx->resMemHandle = memHandle;
+
+            /* Mark all base-pool resources as pending for the new floor */
+            resBase = (GSFloorResource*)gsFloorResMemPtr;
+            floorId = ctx->floorId;
+
+            markResourcePending(resBase, gsFloorMaxBase,
+                                floorId, GSFLOOR_RES_FREE);
+
+            {
+                GSFloorResource* pool1 = (GSFloorResource*)
+                    ((u8*)resBase + gsFloorMaxBase * 0x24);
+                markResourcePending(pool1, gsFloorMaxExt1,
+                                    floorId, GSFLOOR_RES_FREE);
+            }
+
+            {
+                u32 offset = (gsFloorMaxBase + gsFloorMaxExt1) * 0x24;
+                GSFloorResource* pool2 = (GSFloorResource*)
+                    ((u8*)resBase + offset);
+                markResourcePending(pool2, gsFloorMaxExt2,
+                                    floorId, GSFLOOR_RES_FREE);
+            }
+
+            /* Also mark LOADED resources as pending */
+            markResourcePending(resBase, gsFloorMaxBase,
+                                floorId, GSFLOOR_RES_LOADED);
+
+            {
+                GSFloorResource* pool1 = (GSFloorResource*)
+                    ((u8*)resBase + gsFloorMaxBase * 0x24);
+                markResourcePending(pool1, gsFloorMaxExt1,
+                                    floorId, GSFLOOR_RES_LOADED);
+            }
+
+            {
+                u32 offset = (gsFloorMaxBase + gsFloorMaxExt1) * 0x24;
+                GSFloorResource* pool2 = (GSFloorResource*)
+                    ((u8*)resBase + offset);
+                markResourcePending(pool2, gsFloorMaxExt2,
+                                    floorId, GSFLOOR_RES_LOADED);
+            }
+
+            /* Transition to LOADING state */
+            gsFloorState = GSFLOOR_STATE_LOADING;
+            break;
+        }
+
+        case GSFLOOR_STATE_FINALIZING:
+            /* Wait for all pending operations, then return to idle */
+            gsFloorState = GSFLOOR_STATE_IDLE;
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+/* =======================================================================
+ *  GSfloorUpdate / fn_80100B24
+ *  Address: 0x80100B24, Size: 0x720
+ *
+ *  Per-frame update for the running floor. Processes active resources
+ *  in the linked list, dispatching callbacks and checking for load
+ *  completion.
+ *
+ *  r3 = GSFloorContext* ctx
+ *  Returns: 1 if still loading (caller should yield), 0 if done
+ *
+ *  The function operates as a sub-state machine within state 2:
+ *    sub-state 1: Dispatch resource callbacks for unloaded resources.
+ *                 For loaded resources, create texture handles.
+ *    sub-state 2: Check all resources for load completion. If any
+ *                 are still pending, return 0 (not done). When all
+ *                 are complete, advance to sub-state 3.
+ *    sub-state 3: Pause/unpause resources, finalize loading.
+ *    sub-state 4: Wait for model load confirmation, transition.
+ *    sub-state 5: Final wait, return 0 to caller.
+ *    sub-state 6: Cleanup and return 1 (done).
+ * ======================================================================= */
+u8 GSfloorUpdate(GSFloorContext* ctx)
+{
+    u32 subState;
+    GSFloorResource* cur;
+    GSFloorResource* savedNext;
+    u32 floorDataEntry;
+
+    subState = ctx->isActive;
+
+    switch (subState) {
+    case 1: {
+        /*
+         * Walk the active resource list and dispatch callbacks.
+         * For unloaded resources (status == FREE), call the callback.
+         * For loaded resources (status == LOADED), create texture handles.
+         */
+        if (ctx->doFadeOut == 0) {
+            floorDataEntry = (u32)ctx->floorDataEntry;
+            cur = gsFloorResListHead;
+            while (cur != NULL) {
+                savedNext = cur->next;
+                if (cur->active == 1 && cur->pending == 0) {
+                    if (cur->status == GSFLOOR_RES_FREE) {
+                        /* Call the resource load callback */
+                        void (*cb)(u32, u32) = (void (*)(u32, u32))cur->callback;
+                        cb(floorDataEntry, cur->floorId);
+                    }
+                    if (cur->status == GSFLOOR_RES_LOADED) {
+                        /* Resource loaded: set floor res active, create texture */
+                        u32 floorId2 = (u32)fn_80115A80(floorDataEntry);
+                        u16 texHandle = fn_800F7318(
+                            cur->priority, cur->callback,
+                            0x4000, 0, 0, 4, 0, 0, 0);
+                        cur->textureHandle = texHandle;
+                        cur->modelHandle = fn_800F7108(texHandle);
+                    }
+                }
+                cur = cur->next;
+                if (cur == NULL) {
+                    cur = savedNext;
+                }
+            }
+        } else {
+            /* Fade-out mode: simpler dispatch */
+            u32 floorData2 = (u32)ctx->floorDataEntry;
+            cur = gsFloorResListHead;
+            while (cur != NULL) {
+                savedNext = cur->next;
+                if (cur->active == 1 && cur->pending == 0) {
+                    if (cur->status == GSFLOOR_RES_FREE) {
+                        void (*cb)(u32, u32) = (void (*)(u32, u32))cur->callback;
+                        cb(floorData2, cur->floorId);
+                    }
+                }
+                cur = cur->next;
+                if (cur == NULL) {
+                    cur = savedNext;
+                }
+            }
+        }
+
+        /* Advance sub-state to 2 */
+        ctx->isActive = 2;
+        break;
+    }
+
+    case 2: {
+        /* Check all base-pool resources for load completion */
+        GSFloorResource* resBase = (GSFloorResource*)gsFloorResMemPtr;
+        u32 count = gsFloorMaxBase;
+        u32 i;
+        u8 allDone = 1;
+
+        for (i = 0; i < count; i++) {
+            GSFloorResource* res = &resBase[i];
+            if (res->active != 0 && res->status == GSFLOOR_RES_LOADED
+                && res->pending == 0) {
+                if (res->modelHandle != NULL) {
+                    u8 loaded = (u8)(u32)fn_800F04BC(res->modelHandle);
+                    if (!loaded) {
+                        allDone = 0;
+                    }
+                }
+            }
+        }
+
+        if (allDone) {
+            /* All resources loaded: free model handles for base pool */
+            GSFloorResource* resBase2 = (GSFloorResource*)gsFloorResMemPtr;
+            u32 count2 = gsFloorMaxBase;
+            u32 j;
+            for (j = 0; j < count2; j++) {
+                GSFloorResource* res = &resBase2[j];
+                if (res->active != 0 && res->status == GSFLOOR_RES_LOADED
+                    && res->pending == 0) {
+                    if (res->modelHandle != NULL) {
+                        fn_800F0494(res->modelHandle);
+                        res->modelHandle = NULL;
+                    }
+                }
+            }
+
+            /* Transition to sub-state 3 */
+            ctx->isActive = 3;
+
+            /* Pause/unpause resources across ext pools */
+            {
+                GSFloorResource* pool1 = (GSFloorResource*)
+                    ((u8*)resBase + gsFloorMaxBase * 0x24);
+                u32 count1 = gsFloorMaxExt1;
+                u32 floorId = ctx->floorId;
+
+                for (i = 0; i < count1; i++) {
+                    GSFloorResource* res = &pool1[i];
+                    if (res->status == GSFLOOR_RES_FREE
+                        && res->floorId == floorId) {
+                        res->pending = 0;
+                        if (res->status == GSFLOOR_RES_LOADED
+                            && res->modelHandle != NULL) {
+                            fn_800F0424(res->modelHandle);
+                        }
+                    }
+                }
+            }
+        }
+        break;
+    }
+
+    case 3:
+        /* Ongoing checks -- return 0 to allow next sub-state */
+        ctx->isActive = 4;
+        break;
+
+    case 4:
+        /* Wait for model confirmation */
+        ctx->isActive = 5;
+        break;
+
+    case 5:
+        /* Floor fully loaded, signal completion */
+        ctx->isActive = 6;
+        break;
+
+    case 6:
+        /* Cleanup complete, return to update loop */
+        return 1;
+
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+/* =======================================================================
+ *  GSfloorLoadParticle / fn_80101244
+ *  Address: 0x80101244, Size: 0xA4
+ *
+ *  Loads particle data for the current floor. Allocates a 32-byte-aligned
+ *  buffer, then memcpy's the particle data.
+ *
+ *  r3 = dst, r4 = size, r5 = callback, r6 = callbackArg
+ * ======================================================================= */
+void GSfloorLoadParticle(void* dst, u32 size, void* callback, void* callbackArg)
+{
+    void* buf;
+
+    fn_800DD970(lbl_802719C4);  /* "loadParticle(): loading..." */
+
+    /* Allocate 32-byte aligned buffer for particle data */
+    buf = fn_800F9418((size + 0x1F) & ~0x1F, 0x20,
+                       (u32)callback, (u32)callbackArg, NULL);
+    if (buf == NULL) {
+        fn_800DD970(lbl_802719E0, size);
+        return;
+    }
+
+    memcpy(buf, dst, size);
+}
+
+/* =======================================================================
+ *  GSfloorFindAndOpen / fn_801012E8
+ *  Address: 0x801012E8, Size: 0xB8
+ *
+ *  Finds a floor's FSYS data by name and requests loading.
+ *
+ *  r3 = archiveName, r4 = floorId, r5 = loadParam
+ * ======================================================================= */
+void GSfloorFindAndOpen(const char* archiveName, u32 floorId, u32 loadParam)
+{
+    void* tocEntry;
+    void* archivePtr;
+
+    if (archiveName == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x300);  /* error: NULL archive name */
+        return;
+    }
+
+    /* Look up archive in FSYS TOC */
+    tocEntry = fn_80191ECC((void*)archiveName,
+                            lbl_802717F0 + 0x2C8);  /* TOC search key */
+    if (tocEntry == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x328);  /* error: not found in TOC */
+        return;
+    }
+
+    /* Get the archive data pointer */
+    archivePtr = fn_800D27FC(*(u32*)((u8*)tocEntry + 4));
+    if (archivePtr == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x358);  /* error: can't get archive data */
+    }
+
+    /* Begin resource loading */
+    fn_800F9378(archivePtr, floorId, loadParam, (void*)fn_80101A28);
+}
+
+/* Internal callback for GSfloorFindAndOpen (fn_80101A28) -- declared above */
+
+/* =======================================================================
+ *  GSfloorLoadData / fn_801013A0
+ *  Address: 0x801013A0, Size: 0xDC
+ *
+ *  Loads a sub-file from a named FSYS archive.
+ *
+ *  r3 = archiveName, r4 = subFileIndex (mapped to floorId), r5 = fileIndex,
+ *  r6 = loadParam
+ * ======================================================================= */
+void GSfloorLoadData(const char* archiveName, u32 subFileIndex,
+                     u32 fileIndex, u32 loadParam)
+{
+    void* tocEntry;
+    u32* fileList;
+    void* archivePtr;
+    u32 idx;
+
+    if (archiveName == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x3F4);  /* error: NULL name */
+        return;
+    }
+
+    /* Look up archive in FSYS TOC */
+    tocEntry = fn_80191ECC((void*)archiveName,
+                            lbl_802717F0 + 0x2C8);
+    if (tocEntry == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x418);  /* error: not found */
+        return;
+    }
+
+    /* Walk the file list to find the target sub-file */
+    fileList = (u32*)*(u32*)tocEntry;
+    idx = 0;
+    while (*fileList != 0) {
+        if (idx == fileIndex) {
+            /* Found the target file entry */
+            archivePtr = (void*)fn_800E4D18(fileList[idx]);
+            if (archivePtr == NULL) {
+                fn_800DD970(lbl_802717F0 + 0x448, idx);
+            }
+            fn_800F9378(archivePtr, subFileIndex, loadParam,
+                         (void*)fn_80101A4C);
+            return;
+        }
+        fileList++;
+        idx++;
+    }
+}
+
+/* Internal callback for GSfloorLoadData (fn_80101A4C) -- declared above */
+
+/* =======================================================================
+ *  GSfloorLoadMain / fn_8010147C
+ *  Address: 0x8010147C, Size: 0x494
+ *
+ *  Main floor loading procedure. Manages the floor data entry table,
+ *  allocates a resource load thread, and registers the floor in the
+ *  static floor data table.
+ *
+ *  r3 = fsysHandle, r4 = archiveName, r5 = loadParam1, r6 = loadParam2
+ *
+ *  The function:
+ *  1. Searches the floor data table (gsFloorDataTable, 0x80 entries)
+ *     for an existing entry with matching fsysHandle. If found,
+ *     increments its reference count.
+ *  2. If not found, allocates a new resource thread (fn_800F9418),
+ *     binds it to the FSYS archive (fn_80191F64), finds a free slot
+ *     in the table, and copies the entry data.
+ *  3. Counts the total number of sub-files and FSYS entries, and
+ *     logs the result.
+ * ======================================================================= */
+void GSfloorLoadMain(u32 fsysHandle, const char* archiveName,
+                     u32 loadParam1, u32 loadParam2)
+{
+    GSFloorDataEntry* table;
+    GSFloorDataEntry* found;
+    void* resThread;
+    void* tocEntry;
+    u32 numSubFiles;
+    u32 numEntries;
+    u32 i;
+
+    if (fsysHandle == 0 || archiveName == NULL)
+        return;
+
+    fn_800DD970(lbl_802717F0 + 0x520);  /* loading info message */
+
+    /* Search the unrolled loop: 8 entries per iteration, 0x10 iters = 0x80 entries */
+    table = gsFloorDataTable;
+    found = NULL;
+
+    for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
+        GSFloorDataEntry* entry = &table[i];
+        if (entry->refCount != 0 && entry->fsysFileHandle == fsysHandle) {
+            found = entry;
+            break;
+        }
+    }
+
+    if (found != NULL) {
+        /* Entry already exists: increment reference count */
+        found->refCount++;
+        goto postRegister;
+    }
+
+    /* No existing entry: create a new resource load thread */
+    resThread = fn_800F9418(0x60, 0x20, loadParam1, loadParam2,
+                             (void*)fn_80101910);
+    if (resThread == NULL) {
+        fn_800DD970(lbl_802717F0 + 0x540, 0x44);
+        return;
+    }
+
+    /* Bind to the FSYS archive */
+    fn_80191F64(resThread, fsysHandle, archiveName);
+
+    /* Find a free slot and copy the entry data */
+    /* First pass: search in blocks of 4 (unrolled) for matching handles */
+    for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
+        GSFloorDataEntry* entry = &table[i];
+        if (entry->refCount != 0) {
+            u32 newHandle = ((GSFloorDataEntry*)resThread)->fsysFileHandle;
+            if (entry->fsysFileHandle == newHandle) {
+                entry->refCount++;
+                goto postRegister;
+            }
+        }
+    }
+
+    /* No matching slot: find any free slot */
+    for (i = 0; i < GSFLOOR_MAX_ENTRIES; i++) {
+        GSFloorDataEntry* entry = &table[i];
+        if (entry->refCount == 0) {
+            memcpy(entry, resThread, 0x44);
+            entry->refCount = 1;
+            break;
+        }
+    }
+
+postRegister:
+    /* Look up TOC for statistics logging */
+    tocEntry = fn_80191ECC(found ? found : &table[0],
+                            lbl_802717F0 + 0x2C8);
+
+    /* Count sub-files */
+    numSubFiles = 0;
+    {
+        u32* fileList = (u32*)*(u32*)tocEntry;
+        if (fileList != NULL) {
+            while (*fileList != 0) {
+                fileList++;
+                numSubFiles++;
+            }
+        }
+    }
+
+    /* Count entries */
+    numEntries = 0;
+    {
+        u32* entryList = (u32*)((u8*)tocEntry + 8);
+        if (entryList != NULL) {
+            while (*entryList != 0) {
+                entryList++;
+                numEntries++;
+            }
+        }
+    }
+
+    fn_800DD970(lbl_802717F0 + 0x574, numSubFiles, numEntries);
+}
+
+/* Internal load callback (fn_80101910) -- declared above */
+
+/* =======================================================================
+ *  GSfloorGetCurrentId
+ *  Returns the current floor ID from the sdata global.
+ * ======================================================================= */
+u32 GSfloorGetCurrentId(void)
+{
+    return gsFloorCurrentId;
+}
+
+/* =======================================================================
+ *  GSfloorGetContext
+ *  Returns the current floor context pointer.
+ * ======================================================================= */
+GSFloorContext* GSfloorGetContext(void)
+{
+    return gsFloorCurrent;
+}
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 9 stubs
+ * Range: 0x800FF788 - 0x80101910
+ * =================================================================== */
+
+/* 0x800FF788 | 0x94 */
+void fn_800FF788(void) {
+    extern u8 lbl_8047ACC8[];
+    extern u8 lbl_8047ACD0[];
+    extern u8 lbl_8047ACD4[];
+    extern u8 lbl_8047ACD8[];
+    u8 sp[0x10];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    tmp = *(u32*)lbl_8047ACD8;
+    r5 = *(u32*)lbl_8047ACC8;
+    if ((s32)tmp != 0) return;
+    tmp = *(u32*)lbl_8047ACD4;
+    r4 = *(u32*)lbl_8047ACD0;
+    ctr_fn = (void(*)(void))tmp;
+    if (tmp == 0) goto L_800FF7D0;
+L_800FF7B8:
+    tmp = *(u32*)((u8*)r4 + 0xC);
+    if (tmp != r3) goto L_800FF7C8;
+    goto L_800FF7D4;
+L_800FF7C8:
+    r4 = r4 + 0x4c;
+    if (--ctr != 0) goto L_800FF7B8;
+L_800FF7D0:
+    r4 = 0x0;
+L_800FF7D4:
+    if (r4 == 0) {
+        r5 = (u32)&lbl_802717F0;
+        r4 = r3;
+        r3 = (u32)&lbl_802717F0;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    *(u32*)((u8*)r5 + 0x0) = r4;
+    r3 = r3 + 0x5001;
+    tmp = 0x1;
+    *(u32*)((u8*)r5 + 0x4) = r3;
+    *(u32*)((u8*)r5 + 0x10) = tmp;
+    *(u32*)lbl_8047ACD8 = tmp;
+
+    return;
+}
+
+/* 0x800FF81C | 0xC */
+void fn_800FF81C(void) {
+    extern u8 lbl_8047ACD0[];
+    extern u8 lbl_8047ACD4[];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+
+    *(u32*)lbl_8047ACD0 = r3;
+    *(u32*)lbl_8047ACD4 = r4;
+    return;
+}
+
+/* 0x800FF828 | 0x148 */
+void fn_800FF828(void) {
+    extern u8 lbl_80478B18[];
+    extern u8 lbl_8047ACA0[];
+    extern u8 lbl_8047ACA4[];
+    extern u8 lbl_8047ACA8[];
+    extern u8 lbl_8047ACAC[];
+    extern u8 lbl_8047ACB0[];
+    extern u8 lbl_8047ACB4[];
+    extern u8 lbl_8047ACB8[];
+    extern u8 lbl_8047ACBC[];
+    extern u8 lbl_8047ACC0[];
+    extern u8 lbl_8047ACC4[];
+    extern u8 lbl_8047ACC8[];
+    extern u8 lbl_8047ACCC[];
+    extern u8 lbl_8047ACD0[];
+    extern u8 lbl_8047ACD4[];
+    extern u8 lbl_8047ACD8[];
+    extern void fn_800E27B0();
+    extern void fn_800E3534();
+    extern void fn_800F07A8();
+    extern void fn_800FF970();
+    u8 sp[0x20];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    u32 r9 = 0;
+    u32 r10 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r7 = r3;
+    tmp = 0x0;
+    r3 = r7 * 0x14;
+    r31 = r6;
+    r30 = r5;
+    r29 = r4;
+    *(u32*)lbl_8047ACD0 = tmp;
+    *(u32*)lbl_8047ACD4 = tmp;
+    *(u32*)lbl_8047ACA8 = r7;
+    fn_800E3534();
+    tmp = r3 & 0xFFFF;
+    *(u16*)lbl_8047ACA0 = r3;
+    if ((s32)tmp == 0) return;
+    r3 = tmp;
+    fn_800E27B0();
+    tmp = r30 + r31;
+    *(u32*)lbl_8047ACA4 = r3;
+    tmp = r29 + tmp;
+    r3 = tmp * 0x24;
+    *(u32*)lbl_8047ACB4 = r29;
+    *(u32*)lbl_8047ACB8 = r30;
+    *(u32*)lbl_8047ACBC = r31;
+    *(u32*)lbl_8047ACC0 = tmp;
+    fn_800E3534();
+    tmp = r3 & 0xFFFF;
+    *(u16*)lbl_8047ACAC = r3;
+    if ((s32)tmp == 0) return;
+    r3 = tmp;
+    fn_800E27B0();
+    r5 = 0x0;
+    *(u32*)lbl_8047ACB0 = r3;
+    r4 = r5;
+    r6 = 0x0;
+    while (1) {
+        tmp = *(u32*)lbl_8047ACC0;
+        if (r6 >= tmp) break;
+        r3 = *(u32*)lbl_8047ACB0;
+        tmp = r5 + 0x8;
+        r5 = r5 + 0x24;
+        r6 = r6 + 0x1;
+        *(u32*)(r3 + tmp) = r4;
+
+
+    }
+    r9 = *(u32*)lbl_8047ACA4;
+    r10 = 0x0;
+    r3 = (u32)fn_800FF970;
+    *(u32*)lbl_8047ACCC = r10;
+    r8 = (u32)fn_800FF970;
+    tmp = -0x1;
+    *(u32*)lbl_8047ACC4 = r10;
+    r3 = 0x0;
+    r4 = 0x7d0;
+    r5 = 0x4000;
+    *(u32*)lbl_8047ACC8 = r9;
+    r6 = 0x1;
+    r7 = 0x1;
+    *(u32*)((u8*)r9 + 0x0) = r10;
+    r9 = *(u32*)lbl_8047ACC8;
+    *(u32*)((u8*)r9 + 0x4) = r10;
+    r9 = *(u32*)lbl_8047ACC8;
+    *(u16*)((u8*)r9 + 0x8) = r10;
+    r9 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r9 + 0xA) = r10;
+    r9 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r9 + 0xB) = r10;
+    r9 = *(u32*)lbl_8047ACC8;
+    *(u32*)((u8*)r9 + 0x10) = r10;
+    *(u32*)lbl_8047ACD8 = r10;
+    *(u32*)lbl_80478B18 = tmp;
+    fn_800F07A8();
+
+    return;
+}
+
+/* 0x800FF970 | 0x11B4 */
+void fn_800FF970(void) {
+    extern u8 lbl_80404918[];
+    extern u8 lbl_80478B18[];
+    extern u8 lbl_8047ACA4[];
+    extern u8 lbl_8047ACB0[];
+    extern u8 lbl_8047ACB4[];
+    extern u8 lbl_8047ACB8[];
+    extern u8 lbl_8047ACBC[];
+    extern u8 lbl_8047ACC4[];
+    extern u8 lbl_8047ACC8[];
+    extern u8 lbl_8047ACCC[];
+    extern u8 lbl_8047ACD0[];
+    extern u8 lbl_8047ACD4[];
+    extern u8 lbl_8047ACD8[];
+    extern u8 lbl_8047ACDC[];
+    extern u8 lbl_8047ACE0[];
+    extern void fn_800E209C();
+    extern void fn_800E24B0();
+    extern void fn_800E27B0();
+    extern void fn_800E3534();
+    extern void fn_800F0384();
+    extern void fn_800F03D4();
+    extern void fn_80100B24();
+    extern void fn_8010D038();
+    u8 sp[0x30];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r12 = 0;
+    u32 r25 = 0;
+    u32 r26 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+L_800FF980:
+    tmp = *(u32*)lbl_8047ACD8;
+    if ((s32)tmp == 3) goto L_800FFACC;
+    if ((s32)tmp >= 3) goto L_800FF9A8;
+    if ((s32)tmp == 1) goto L_800FF9C0;
+    if ((s32)tmp >= 1) goto L_800FFAA4;
+    if ((s32)tmp >= 0) goto L_800FF9B8;
+    goto L_800FF980;
+L_800FF9A8:
+    if ((s32)tmp == 5) goto L_80100480;
+    if ((s32)tmp >= 5) goto L_800FF980;
+    goto L_800FFFF8;
+L_800FF9B8:
+    ((void(*)(void))fn_800F0308)();
+    goto L_800FF980;
+L_800FF9C0:
+    r3 = *(u32*)lbl_8047ACC8;
+    tmp = *(u8*)((u8*)r3 + 0xA);
+    if (tmp == 0) goto L_800FF9D8;
+    r25 = 0x0;
+    goto L_800FF9F0;
+L_800FF9D8:
+    tmp = *(u8*)((u8*)r3 + 0xB);
+    if (tmp == 0) goto L_800FF9EC;
+    r25 = 0x1;
+    goto L_800FF9F0;
+L_800FF9EC:
+    r25 = 0x2;
+L_800FF9F0:
+    r29 = *(u32*)((u8*)r3 + 0x0);
+    r4 = r25;
+    r3 = r29;
+    ((void(*)(void))fn_801123D4)();
+    if ((s32)r25 == 0) {
+        ((void(*)(void))fn_8010D064)();
+    }
+    if ((s32)r25 == 2) {
+        ((void(*)(void))fn_8010CC54)();
+    }
+    r3 = r29;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B3E4)();
+    r3 = (u32)&lbl_80271814;
+    r30 = (u32)&lbl_80271814;
+L_800FFA2C:
+    r3 = r29;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B2CC)();
+    /* mr. r31, r3 */;
+    if ((s32)r25 < 2) {
+        r3 = r30;
+        ((void(*)(void))fn_800DD970)();
+    }
+    if ((s32)r31 == 0) goto L_800FFA5C;
+    ((void(*)(void))fn_800F0308)();
+    goto L_800FFA2C;
+L_800FFA5C:
+    r3 = r29;
+    ((void(*)(void))fn_80115A80)();
+    if ((s32)r25 != 1) {
+        ((void(*)(void))fn_8010CD6C)();
+    }
+    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))fn_800F0308)();
+    tmp = 0x2;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u32*)lbl_8047ACD8 = tmp;
+    r4 = 0x0;
+    tmp = 0x1;
+    *(u8*)((u8*)r3 + 0xA) = r4;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r3 + 0xB) = r4;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u32*)((u8*)r3 + 0x10) = tmp;
+    goto L_800FF980;
+L_800FFAA4:
+    r3 = *(u32*)lbl_8047ACC8;
+    fn_80100B24();
+    tmp = r3 & 0xFF;
+    if (tmp != 1) goto L_800FFAC0;
+    ((void(*)(void))fn_800F0308)();
+    goto L_800FF980;
+L_800FFAC0:
+    tmp = *(u32*)lbl_8047ACDC;
+    *(u32*)lbl_8047ACD8 = tmp;
+    goto L_800FF980;
+L_800FFACC:
+    r3 = *(u32*)lbl_8047ACC8;
+    r29 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r3 + 0x4);
+    r30 = *(u32*)lbl_8047ACB4;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r30 = *(u32*)lbl_8047ACB8;
+    r29 = r3 + tmp;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r30 = *(u32*)lbl_8047ACBC;
+    r29 = r3 + tmp;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r29 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r3 + 0x4);
+    r30 = *(u32*)lbl_8047ACB4;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r30 = *(u32*)lbl_8047ACB8;
+    r29 = r3 + tmp;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r30 = *(u32*)lbl_8047ACBC;
+    r29 = r3 + tmp;
+    while (r30 != 0) {
+
+        r3 = *(u32*)((u8*)r29 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r29 + 0x10);
+            if (tmp == r31) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r29 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r29 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r29 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r29 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r29 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r29) {
+                    tmp = *(u32*)((u8*)r29 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r29 + 0x0) = tmp;
+                *(u32*)((u8*)r29 + 0x4) = tmp;
+        }
+        }
+        r29 = r29 + 0x24;
+
+    }
+    r4 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)lbl_80478B18;
+    r29 = *(u32*)((u8*)r4 + 0x0);
+    ((void(*)(void))fn_80112380)();
+    tmp = r3 & 0xFF;
+    if (r30 == 0) {
+        ((void(*)(void))fn_8011274C)();
+    }
+    ((void(*)(void))fn_80117C84)();
+    r3 = 0x1;
+    ((void(*)(void))fn_8018DB04)();
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    ((void(*)(void))fn_800F716C)();
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    ((void(*)(void))fn_800F04C4)();
+    ((void(*)(void))fn_801024C0)();
+    r3 = 0x0;
+    ((void(*)(void))fn_800D2B90)();
+    r3 = r29;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B1CC)();
+    r3 = r29;
+    ((void(*)(void))fn_80115A80)();
+    ((void(*)(void))fn_800F915C)();
+    ((void(*)(void))fn_80169DF8)();
+    ((void(*)(void))fn_80175B94)();
+    ((void(*)(void))fn_8016AAAC)();
+    ((void(*)(void))fn_800E8EFC)();
+    r3 = *(u32*)lbl_8047ACC8;
+    r4 = 0x0;
+    *(u8*)((u8*)r3 + 0xA) = r4;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r3 + 0xB) = r4;
+    r3 = *(u32*)lbl_80478B18;
+    tmp = r3 + (0x1 << 16);
+    if (tmp == 0xffff) goto L_800FFFF0;
+    r3 = *(u32*)lbl_8047ACD4;
+    r5 = *(u32*)lbl_80478B18;
+    r4 = *(u32*)lbl_8047ACD0;
+    ctr_fn = (void(*)(void))r3;
+    if (r3 == 0) goto L_800FFFC8;
+L_800FFFAC:
+    tmp = *(u32*)((u8*)r4 + 0xC);
+    if (tmp != r5) goto L_800FFFC0;
+    goto L_800FFFCC;
+L_800FFFC0:
+    r4 = r4 + 0x4c;
+    if (--ctr != 0) goto L_800FFFAC;
+L_800FFFC8:
+    r4 = 0x0;
+L_800FFFCC:
+    r3 = *(u32*)lbl_8047ACC8;
+    tmp = 0x1;
+    *(u32*)((u8*)r3 + 0x0) = r4;
+    r4 = *(u32*)lbl_80478B18;
+    r3 = *(u32*)lbl_8047ACC8;
+    r4 = r4 + 0x5001;
+    *(u32*)((u8*)r3 + 0x4) = r4;
+    *(u32*)lbl_8047ACD8 = tmp;
+    goto L_800FF980;
+L_800FFFF0:
+    *(u32*)lbl_8047ACD8 = r4;
+    goto L_800FF980;
+L_800FFFF8:
+    ((void(*)(void))fn_80112780)();
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = 0x1;
+    r3 = (u32)lbl_80404918;
+    r31 = 0x0;
+    *(u8*)((u8*)r4 + 0xA) = tmp;
+    r29 = (u32)lbl_80404918;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r3 + 0xB) = r31;
+    r3 = *(u32*)lbl_8047ACC8;
+    r30 = *(u32*)lbl_8047ACE0;
+    r3 = *(u32*)((u8*)r3 + 0x0);
+    tmp = *(u8*)((u8*)r3 + 0x0);
+    /* extrwi r28, tmp, 3, 24 */;
+    while (r30 != 0) {
+
+        tmp = *(u8*)((u8*)r29 + 0x0);
+        if (tmp == r28) {
+            r12 = *(u32*)((u8*)r29 + 0xC);
+            ctr_fn = (void(*)(void))r12;
+            ctr_fn();
+            tmp = r3 + 0x3;
+            /* clrrwi tmp, tmp, 2 */;
+            r31 = tmp + r31;
+            r31 = r31 + 0x4;
+        }
+        r29 = r29 + 0x10;
+
+    }
+    r3 = r31;
+    fn_800E3534();
+    tmp = r3 & 0xFFFF;
+    r31 = r3;
+    if (r30 != 0) goto L_80100088;
+    r31 = 0x0;
+    goto L_80100104;
+L_80100088:
+    fn_800E27B0();
+    /* mr. r29, r3 */;
+    if (r30 != 0) goto L_8010009C;
+    r31 = 0x0;
+    goto L_80100104;
+L_8010009C:
+    r3 = (u32)lbl_80404918;
+    r27 = *(u32*)lbl_8047ACE0;
+    r25 = (u32)lbl_80404918;
+    while (r27 != 0) {
+
+        tmp = *(u8*)((u8*)r25 + 0x0);
+        if (tmp == r28) {
+            r12 = *(u32*)((u8*)r25 + 0xC);
+            ctr_fn = (void(*)(void))r12;
+            ctr_fn();
+            tmp = r3 + 0x3;
+            r30 = r29 + 0x4;
+            /* clrrwi r26, tmp, 2 */;
+            *(u32*)((u8*)r29 + 0x0) = r26;
+            r3 = r30;
+            r4 = r26;
+            r12 = *(u32*)((u8*)r25 + 0x8);
+            ctr_fn = (void(*)(void))r12;
+            ctr_fn();
+            r29 = r30 + r26;
+        }
+        r25 = r25 + 0x10;
+
+    }
+    r3 = r31;
+    fn_800E24B0();
+L_80100104:
+    r3 = *(u32*)lbl_8047ACC8;
+    r30 = 0x1;
+    *(u16*)((u8*)r3 + 0x8) = r31;
+    r3 = *(u32*)lbl_8047ACC8;
+    r28 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r3 + 0x4);
+    r29 = *(u32*)lbl_8047ACB4;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r30 = 0x1;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACB8;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    r30 = 0x1;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACBC;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r30 = 0x1;
+    r28 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r3 + 0x4);
+    r29 = *(u32*)lbl_8047ACB4;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r30 = 0x1;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACB8;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    r30 = 0x1;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r31 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACBC;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        tmp = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)tmp == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r31) {
+                *(u8*)((u8*)r28 + 0x15) = r30;
+                tmp = *(u32*)((u8*)r28 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r28 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0438)();
+        }
+        }
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    fn_800F03D4();
+    r4 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)lbl_80478B18;
+    r28 = *(u32*)((u8*)r4 + 0x0);
+    ((void(*)(void))fn_80112380)();
+    tmp = r3 & 0xFF;
+    if (r29 == 0) {
+        ((void(*)(void))fn_8011274C)();
+    }
+    ((void(*)(void))fn_80117C84)();
+    r3 = 0x0;
+    ((void(*)(void))fn_8018DB04)();
+    ((void(*)(void))fn_801024C0)();
+    r3 = 0x0;
+    ((void(*)(void))fn_800D2B90)();
+    r3 = r28;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B1CC)();
+    r3 = r28;
+    ((void(*)(void))fn_80115A80)();
+    ((void(*)(void))fn_800F915C)();
+    ((void(*)(void))fn_80169DF8)();
+    ((void(*)(void))fn_80175B94)();
+    ((void(*)(void))fn_8016AAAC)();
+    ((void(*)(void))fn_800E8EFC)();
+    r4 = *(u32*)lbl_8047ACC4;
+    r3 = 0x1;
+    r5 = *(u32*)lbl_8047ACA4;
+    tmp = 0x0;
+    r6 = r4 + 0x1;
+    r4 = r6 * 0x14;
+    *(u32*)lbl_8047ACC4 = r6;
+    r4 = r5 + r4;
+    *(u32*)lbl_8047ACC8 = r4;
+    *(u8*)((u8*)r4 + 0xA) = r3;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r3 + 0xB) = tmp;
+    r3 = *(u32*)lbl_8047ACD4;
+    r5 = *(u32*)lbl_80478B18;
+    r4 = *(u32*)lbl_8047ACD0;
+    ctr_fn = (void(*)(void))r3;
+    if (r3 == 0) goto L_80100458;
+L_8010043C:
+    tmp = *(u32*)((u8*)r4 + 0xC);
+    if (tmp != r5) goto L_80100450;
+    goto L_8010045C;
+L_80100450:
+    r4 = r4 + 0x4c;
+    if (--ctr != 0) goto L_8010043C;
+L_80100458:
+    r4 = 0x0;
+L_8010045C:
+    r3 = *(u32*)lbl_8047ACC8;
+    tmp = 0x1;
+    *(u32*)((u8*)r3 + 0x0) = r4;
+    r4 = *(u32*)lbl_80478B18;
+    r3 = *(u32*)lbl_8047ACC8;
+    r4 = r4 + 0x5001;
+    *(u32*)((u8*)r3 + 0x4) = r4;
+    *(u32*)lbl_8047ACD8 = tmp;
+    goto L_800FF980;
+L_80100480:
+    r3 = *(u32*)lbl_8047ACC8;
+    r28 = *(u32*)lbl_8047ACB0;
+    r30 = *(u32*)((u8*)r3 + 0x4);
+    r29 = *(u32*)lbl_8047ACB4;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r30 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACB8;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r30 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACBC;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 0) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r28 = *(u32*)lbl_8047ACB0;
+    r30 = *(u32*)((u8*)r3 + 0x4);
+    r29 = *(u32*)lbl_8047ACB4;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    tmp = *(u32*)lbl_8047ACB4;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = tmp * 0x24;
+    r3 = *(u32*)lbl_8047ACB0;
+    r30 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACB8;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACB4;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACC8;
+    tmp = r3 + tmp;
+    r3 = *(u32*)lbl_8047ACB0;
+    tmp = tmp * 0x24;
+    r30 = *(u32*)((u8*)r4 + 0x4);
+    r29 = *(u32*)lbl_8047ACBC;
+    r28 = r3 + tmp;
+    while (r29 != 0) {
+
+        r3 = *(u32*)((u8*)r28 + 0xC);
+        if ((s32)r3 == 1) {
+            tmp = *(u32*)((u8*)r28 + 0x10);
+            if (tmp == r30) {
+                if ((s32)r3 == 1) {
+                    tmp = *(u32*)((u8*)r28 + 0x1C);
+                    if (tmp != 0) {
+                        r3 = *(u16*)((u8*)r28 + 0x20);
+                        ((void(*)(void))fn_800F7274)();
+                }
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x8) = tmp;
+                r3 = *(u32*)((u8*)r28 + 0x0);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)((u8*)r3 + 0x4) = tmp;
+                }
+                r3 = *(u32*)((u8*)r28 + 0x4);
+                if (r3 != 0) {
+                    tmp = *(u32*)((u8*)r28 + 0x0);
+                    *(u32*)((u8*)r3 + 0x0) = tmp;
+                }
+                tmp = *(u32*)lbl_8047ACCC;
+                if (tmp == r28) {
+                    tmp = *(u32*)((u8*)r28 + 0x4);
+                    *(u32*)lbl_8047ACCC = tmp;
+                }
+                tmp = 0x0;
+                *(u32*)((u8*)r28 + 0x0) = tmp;
+                *(u32*)((u8*)r28 + 0x4) = tmp;
+        }
+        }
+        r28 = r28 + 0x24;
+
+    }
+    r4 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)lbl_80478B18;
+    r28 = *(u32*)((u8*)r4 + 0x0);
+    ((void(*)(void))fn_80112380)();
+    tmp = r3 & 0xFF;
+    if (r29 == 0) {
+        ((void(*)(void))fn_8011274C)();
+    }
+    ((void(*)(void))fn_80117C84)();
+    r3 = 0x1;
+    ((void(*)(void))fn_8018DB04)();
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    ((void(*)(void))fn_800F716C)();
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    ((void(*)(void))fn_800F04C4)();
+    ((void(*)(void))fn_801024C0)();
+    r3 = 0x0;
+    ((void(*)(void))fn_800D2B90)();
+    r3 = r28;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B1CC)();
+    r3 = r28;
+    ((void(*)(void))fn_80115A80)();
+    ((void(*)(void))fn_800F915C)();
+    fn_8010D038();
+    ((void(*)(void))fn_80169DF8)();
+    ((void(*)(void))fn_80175B94)();
+    ((void(*)(void))fn_8016AAAC)();
+    ((void(*)(void))fn_800E8EFC)();
+    r4 = *(u32*)lbl_8047ACC4;
+    r3 = 0x0;
+    r6 = *(u32*)lbl_8047ACA4;
+    tmp = 0x1;
+    r4 = 0x1;
+    r5 = r7 * 0x14;
+    *(u32*)lbl_8047ACC4 = r7;
+    r5 = r6 + r5;
+    *(u32*)lbl_8047ACC8 = r5;
+    *(u8*)((u8*)r5 + 0xA) = r3;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u8*)((u8*)r3 + 0xB) = tmp;
+    r3 = *(u32*)lbl_8047ACC8;
+    r28 = *(u32*)((u8*)r3 + 0x0);
+    r3 = r28;
+    ((void(*)(void))fn_801123D4)();
+    r3 = r28;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B3E4)();
+    r3 = (u32)&lbl_80271814;
+    r31 = (u32)&lbl_80271814;
+L_80100980:
+    r3 = r28;
+    ((void(*)(void))fn_80115A38)();
+    ((void(*)(void))fn_8017B2CC)();
+    /* mr. r30, r3 */;
+    if (r29 < 0) {
+        r3 = r31;
+        ((void(*)(void))fn_800DD970)();
+    }
+    if ((s32)r30 == 0) goto L_801009B0;
+    ((void(*)(void))fn_800F0308)();
+    goto L_80100980;
+L_801009B0:
+    r3 = r28;
+    ((void(*)(void))fn_80115A80)();
+    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))fn_800F0308)();
+    r4 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r4 + 0x0);
+    r27 = *(u16*)((u8*)r4 + 0x8);
+    tmp = *(u8*)((u8*)r3 + 0x0);
+    r3 = r27;
+    /* extrwi r26, tmp, 3, 24 */;
+    fn_800E27B0();
+    if (r3 != 0) {
+        r4 = (u32)lbl_80404918;
+        r28 = *(u32*)lbl_8047ACE0;
+        r31 = (u32)lbl_80404918;
+        while (r28 != 0) {
+
+            tmp = *(u8*)((u8*)r31 + 0x0);
+            if (tmp == r26) {
+                r29 = *(u32*)((u8*)r3 + 0x0);
+                r30 = r3 + 0x4;
+                r12 = *(u32*)((u8*)r31 + 0x4);
+                r3 = r30;
+                r4 = r29;
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+                r3 = r30 + r29;
+            }
+            r31 = r31 + 0x10;
+
+        }
+        r3 = r27;
+        fn_800E24B0();
+        r3 = r27;
+        fn_800E209C();
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r31 = 0x0;
+    r26 = *(u32*)lbl_8047ACB0;
+    r28 = *(u32*)((u8*)r3 + 0x4);
+    r27 = *(u32*)lbl_8047ACB4;
+    while (r27 != 0) {
+
+        tmp = *(u32*)((u8*)r26 + 0xC);
+        if ((s32)tmp == 0) {
+            tmp = *(u32*)((u8*)r26 + 0x10);
+            if (tmp == r28) {
+                *(u8*)((u8*)r26 + 0x15) = r31;
+                tmp = *(u32*)((u8*)r26 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r26 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0424)();
+        }
+        }
+        }
+        }
+        r26 = r26 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r31 = 0x0;
+    r26 = *(u32*)lbl_8047ACB0;
+    r28 = *(u32*)((u8*)r3 + 0x4);
+    r27 = *(u32*)lbl_8047ACB4;
+    while (r27 != 0) {
+
+        tmp = *(u32*)((u8*)r26 + 0xC);
+        if ((s32)tmp == 1) {
+            tmp = *(u32*)((u8*)r26 + 0x10);
+            if (tmp == r28) {
+                *(u8*)((u8*)r26 + 0x15) = r31;
+                tmp = *(u32*)((u8*)r26 + 0xC);
+                if ((s32)tmp == 1) {
+                    r3 = *(u32*)((u8*)r26 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0424)();
+        }
+        }
+        }
+        }
+        r26 = r26 + 0x24;
+
+    }
+    r3 = *(u32*)lbl_8047ACC8;
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    fn_800F0384();
+    tmp = 0x2;
+    r3 = *(u32*)lbl_8047ACC8;
+    *(u32*)lbl_8047ACD8 = tmp;
+    tmp = 0x1;
+    *(u32*)((u8*)r3 + 0x10) = tmp;
+    goto L_800FF980;
+}
+
+/* 0x80100B24 | 0x720 */
+void fn_80100B24(void) {
+    extern u8 lbl_8047ACB0[];
+    extern u8 lbl_8047ACB4[];
+    extern u8 lbl_8047ACB8[];
+    extern u8 lbl_8047ACBC[];
+    extern u8 lbl_8047ACCC[];
+    extern void fn_801127BC();
+    u8 sp[0x30];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    u32 r9 = 0;
+    u32 r10 = 0;
+    u32 r12 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    void (*ctr_fn)(void) = 0;
+
+    r31 = r3;
+    tmp = *(u32*)((u8*)r3 + 0x10);
+    if ((s32)tmp == 4) goto L_8010100C;
+    if ((s32)tmp >= 4) goto L_80100B60;
+    if ((s32)tmp == 2) goto L_80100CA4;
+    if ((s32)tmp >= 2) goto L_80100F3C;
+    if ((s32)tmp >= 1) goto L_80100B70;
+    r3 = 0x1;
+    return;
+L_80100B60:
+    if ((s32)tmp == 6) goto L_80101138;
+    if ((s32)tmp >= 6) { r3 = 0x1; return; }
+    goto L_80101070;
+L_80100B70:
+    tmp = *(u8*)((u8*)r31 + 0xB);
+    if (tmp != 0) goto L_80100C38;
+    r29 = *(u32*)((u8*)r31 + 0x0);
+    r27 = *(u32*)lbl_8047ACCC;
+    goto L_80100C2C;
+L_80100B88:
+    tmp = *(u32*)((u8*)r27 + 0x8);
+    r30 = *(u32*)((u8*)r27 + 0x4);
+    if ((s32)tmp == 1) {
+        tmp = *(u8*)((u8*)r27 + 0x15);
+        if (tmp == 0) {
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 0) {
+                r12 = *(u32*)((u8*)r27 + 0x18);
+                r3 = r29;
+                r4 = *(u32*)((u8*)r27 + 0x10);
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+            }
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 1) {
+                r3 = r29;
+                ((void(*)(void))fn_80115A80)();
+                tmp = 0x0;
+                r9 = r3;
+                *(u32*)(sp + 0x8) = tmp;
+                r5 = 0x4000;
+                r6 = 0x0;
+                r7 = 0x0;
+                *(u32*)(sp + 0xC) = tmp;
+                r8 = 0x4;
+                r10 = 0x0;
+                r3 = *(u8*)((u8*)r27 + 0x14);
+                r4 = *(u32*)((u8*)r27 + 0x18);
+                ((void(*)(void))fn_800F7318)();
+                *(u16*)((u8*)r27 + 0x20) = r3;
+                r3 = *(u16*)((u8*)r27 + 0x20);
+                ((void(*)(void))fn_800F7108)();
+                *(u32*)((u8*)r27 + 0x1C) = r3;
+    }
+    }
+    }
+    r27 = *(u32*)((u8*)r27 + 0x4);
+    if (r27 != 0) goto L_80100C2C;
+    r27 = r30;
+L_80100C2C:
+    if (r27 != 0) goto L_80100B88;
+    goto L_80100C98;
+L_80100C38:
+    r30 = *(u32*)((u8*)r31 + 0x0);
+    r27 = *(u32*)lbl_8047ACCC;
+    goto L_80100C90;
+L_80100C44:
+    tmp = *(u32*)((u8*)r27 + 0x8);
+    r29 = *(u32*)((u8*)r27 + 0x4);
+    if ((s32)tmp == 1) {
+        tmp = *(u8*)((u8*)r27 + 0x15);
+        if (tmp == 0) {
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 0) {
+                r12 = *(u32*)((u8*)r27 + 0x18);
+                r3 = r30;
+                r4 = *(u32*)((u8*)r27 + 0x10);
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+    }
+    }
+    }
+    r27 = *(u32*)((u8*)r27 + 0x4);
+    if (r27 != 0) goto L_80100C90;
+    r27 = r29;
+L_80100C90:
+    if (r27 != 0) goto L_80100C44;
+L_80100C98:
+    tmp = 0x2;
+    *(u32*)((u8*)r31 + 0x10) = tmp;
+    r3 = 0x1;
+    return;
+L_80100CA4:
+    r29 = *(u32*)lbl_8047ACB0;
+    r30 = *(u32*)lbl_8047ACB4;
+    goto L_80100CF8;
+L_80100CB0:
+    tmp = *(u32*)((u8*)r29 + 0x8);
+    if ((s32)tmp == 0) goto L_80100CF4;
+    tmp = *(u32*)((u8*)r29 + 0xC);
+    if ((s32)tmp != 1) goto L_80100CF4;
+    tmp = *(u8*)((u8*)r29 + 0x15);
+    if (tmp != 0) goto L_80100CF4;
+    r3 = *(u32*)((u8*)r29 + 0x1C);
+    if (r3 == 0) goto L_80100CF4;
+    ((void(*)(void))fn_800F04BC)();
+    tmp = r3 & 0xFF;
+    if (r3 == 0) goto L_80100CF4;
+    tmp = 0x0;
+    goto L_80100D60;
+L_80100CF4:
+    r29 = r29 + 0x24;
+L_80100CF8:
+    if (r30 != 0) goto L_80100CB0;
+    r27 = *(u32*)lbl_8047ACB0;
+    r30 = 0x0;
+    r28 = *(u32*)lbl_8047ACB4;
+    while (r28 != 0) {
+
+        tmp = *(u32*)((u8*)r27 + 0x8);
+        if ((s32)tmp != 0) {
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 1) {
+                tmp = *(u8*)((u8*)r27 + 0x15);
+                if (tmp == 0) {
+                    r3 = *(u32*)((u8*)r27 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0494)();
+                        *(u32*)((u8*)r27 + 0x1C) = r30;
+        }
+        }
+        }
+        }
+        r27 = r27 + 0x24;
+
+    }
+    tmp = 0x1;
+L_80100D60:
+    tmp = tmp & 0xFF;
+    if (r28 == 0) { r3 = 0x1; return; }
+    tmp = 0x3;
+    *(u32*)((u8*)r31 + 0x10) = tmp;
+    tmp = *(u8*)((u8*)r31 + 0xB);
+    if (tmp != 0) {
+        tmp = *(u32*)lbl_8047ACB4;
+        r30 = 0x0;
+        r3 = *(u32*)lbl_8047ACB0;
+        tmp = tmp * 0x24;
+        r27 = *(u32*)((u8*)r31 + 0x4);
+        r28 = *(u32*)lbl_8047ACB8;
+        r29 = r3 + tmp;
+        while (r28 != 0) {
+
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 0) {
+                tmp = *(u32*)((u8*)r29 + 0x10);
+                if (tmp == r27) {
+                    *(u8*)((u8*)r29 + 0x15) = r30;
+                    tmp = *(u32*)((u8*)r29 + 0xC);
+                    if ((s32)tmp == 1) {
+                        r3 = *(u32*)((u8*)r29 + 0x1C);
+                        if (r3 != 0) {
+                            ((void(*)(void))fn_800F0424)();
+            }
+            }
+            }
+            }
+            r29 = r29 + 0x24;
+
+        }
+        r3 = *(u32*)lbl_8047ACB4;
+        r30 = 0x0;
+        tmp = *(u32*)lbl_8047ACB8;
+        r4 = *(u32*)lbl_8047ACB0;
+        tmp = r3 + tmp;
+        r29 = *(u32*)((u8*)r31 + 0x4);
+        tmp = tmp * 0x24;
+        r28 = *(u32*)lbl_8047ACBC;
+        r27 = r4 + tmp;
+        while (r28 != 0) {
+
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 0) {
+                tmp = *(u32*)((u8*)r27 + 0x10);
+                if (tmp == r29) {
+                    *(u8*)((u8*)r27 + 0x15) = r30;
+                    tmp = *(u32*)((u8*)r27 + 0xC);
+                    if ((s32)tmp == 1) {
+                        r3 = *(u32*)((u8*)r27 + 0x1C);
+                        if (r3 != 0) {
+                            ((void(*)(void))fn_800F0424)();
+            }
+            }
+            }
+            }
+            r27 = r27 + 0x24;
+
+        }
+        tmp = *(u32*)lbl_8047ACB4;
+        r30 = 0x0;
+        r3 = *(u32*)lbl_8047ACB0;
+        tmp = tmp * 0x24;
+        r29 = *(u32*)((u8*)r31 + 0x4);
+        r28 = *(u32*)lbl_8047ACB8;
+        r27 = r3 + tmp;
+        while (r28 != 0) {
+
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 1) {
+                tmp = *(u32*)((u8*)r27 + 0x10);
+                if (tmp == r29) {
+                    *(u8*)((u8*)r27 + 0x15) = r30;
+                    tmp = *(u32*)((u8*)r27 + 0xC);
+                    if ((s32)tmp == 1) {
+                        r3 = *(u32*)((u8*)r27 + 0x1C);
+                        if (r3 != 0) {
+                            ((void(*)(void))fn_800F0424)();
+            }
+            }
+            }
+            }
+            r27 = r27 + 0x24;
+
+        }
+        r3 = *(u32*)lbl_8047ACB4;
+        r30 = 0x0;
+        tmp = *(u32*)lbl_8047ACB8;
+        r4 = *(u32*)lbl_8047ACB0;
+        tmp = r3 + tmp;
+        r29 = *(u32*)((u8*)r31 + 0x4);
+        tmp = tmp * 0x24;
+        r28 = *(u32*)lbl_8047ACBC;
+        r27 = r4 + tmp;
+        while (r28 != 0) {
+
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 1) {
+                tmp = *(u32*)((u8*)r27 + 0x10);
+                if (tmp == r29) {
+                    *(u8*)((u8*)r27 + 0x15) = r30;
+                    tmp = *(u32*)((u8*)r27 + 0xC);
+                    if ((s32)tmp == 1) {
+                        r3 = *(u32*)((u8*)r27 + 0x1C);
+                        if (r3 != 0) {
+                            ((void(*)(void))fn_800F0424)();
+            }
+            }
+            }
+            }
+            r27 = r27 + 0x24;
+
+        }
+        tmp = 0x4;
+        *(u32*)((u8*)r31 + 0x10) = tmp;
+    }
+    fn_801127BC();
+    r3 = 0x1;
+    return;
+L_80100F3C:
+    r28 = *(u32*)((u8*)r31 + 0x0);
+    r29 = *(u32*)lbl_8047ACCC;
+    goto L_80100FEC;
+L_80100F48:
+    tmp = *(u32*)((u8*)r29 + 0x8);
+    r27 = *(u32*)((u8*)r29 + 0x4);
+    if ((s32)tmp == 3) {
+        tmp = *(u8*)((u8*)r29 + 0x15);
+        if (tmp == 0) {
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 0) {
+                r12 = *(u32*)((u8*)r29 + 0x18);
+                r3 = r28;
+                r4 = *(u32*)((u8*)r29 + 0x10);
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+            }
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 1) {
+                r3 = r28;
+                ((void(*)(void))fn_80115A80)();
+                tmp = 0x0;
+                r9 = r3;
+                *(u32*)(sp + 0x8) = tmp;
+                r5 = 0x4000;
+                r6 = 0x0;
+                r7 = 0x0;
+                *(u32*)(sp + 0xC) = tmp;
+                r8 = 0x4;
+                r10 = 0x0;
+                r3 = *(u8*)((u8*)r29 + 0x14);
+                r4 = *(u32*)((u8*)r29 + 0x18);
+                ((void(*)(void))fn_800F7318)();
+                *(u16*)((u8*)r29 + 0x20) = r3;
+                r3 = *(u16*)((u8*)r29 + 0x20);
+                ((void(*)(void))fn_800F7108)();
+                *(u32*)((u8*)r29 + 0x1C) = r3;
+    }
+    }
+    }
+    r29 = *(u32*)((u8*)r29 + 0x4);
+    if (r29 != 0) goto L_80100FEC;
+    r29 = r27;
+L_80100FEC:
+    if (r29 != 0) goto L_80100F48;
+    tmp = *(u32*)((u8*)r31 + 0x10);
+    if ((s32)tmp != 3) { r3 = 0x1; return; }
+    tmp = 0x4;
+    *(u32*)((u8*)r31 + 0x10) = tmp;
+    r3 = 0x1;
+    return;
+L_8010100C:
+    r28 = *(u32*)((u8*)r31 + 0x0);
+    r29 = *(u32*)lbl_8047ACCC;
+    goto L_80101064;
+L_80101018:
+    tmp = *(u32*)((u8*)r29 + 0x8);
+    r27 = *(u32*)((u8*)r29 + 0x4);
+    if ((s32)tmp == 3) {
+        tmp = *(u8*)((u8*)r29 + 0x15);
+        if (tmp == 0) {
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 0) {
+                r12 = *(u32*)((u8*)r29 + 0x18);
+                r3 = r28;
+                r4 = *(u32*)((u8*)r29 + 0x10);
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+    }
+    }
+    }
+    r29 = *(u32*)((u8*)r29 + 0x4);
+    if (r29 != 0) goto L_80101064;
+    r29 = r27;
+L_80101064:
+    if (r29 != 0) goto L_80101018;
+    r3 = 0x1;
+    return;
+L_80101070:
+    ((void(*)(void))fn_80112780)();
+    r28 = *(u32*)((u8*)r31 + 0x0);
+    r29 = *(u32*)lbl_8047ACCC;
+    goto L_80101124;
+L_80101080:
+    tmp = *(u32*)((u8*)r29 + 0x8);
+    r27 = *(u32*)((u8*)r29 + 0x4);
+    if ((s32)tmp == 5) {
+        tmp = *(u8*)((u8*)r29 + 0x15);
+        if (tmp == 0) {
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 0) {
+                r12 = *(u32*)((u8*)r29 + 0x18);
+                r3 = r28;
+                r4 = *(u32*)((u8*)r29 + 0x10);
+                ctr_fn = (void(*)(void))r12;
+                ctr_fn();
+            }
+            tmp = *(u32*)((u8*)r29 + 0xC);
+            if ((s32)tmp == 1) {
+                r3 = r28;
+                ((void(*)(void))fn_80115A80)();
+                tmp = 0x0;
+                r9 = r3;
+                *(u32*)(sp + 0x8) = tmp;
+                r5 = 0x4000;
+                r6 = 0x0;
+                r7 = 0x0;
+                *(u32*)(sp + 0xC) = tmp;
+                r8 = 0x4;
+                r10 = 0x0;
+                r3 = *(u8*)((u8*)r29 + 0x14);
+                r4 = *(u32*)((u8*)r29 + 0x18);
+                ((void(*)(void))fn_800F7318)();
+                *(u16*)((u8*)r29 + 0x20) = r3;
+                r3 = *(u16*)((u8*)r29 + 0x20);
+                ((void(*)(void))fn_800F7108)();
+                *(u32*)((u8*)r29 + 0x1C) = r3;
+    }
+    }
+    }
+    r29 = *(u32*)((u8*)r29 + 0x4);
+    if (r29 != 0) goto L_80101124;
+    r29 = r27;
+L_80101124:
+    if (r29 != 0) goto L_80101080;
+    tmp = 0x6;
+    *(u32*)((u8*)r31 + 0x10) = tmp;
+    r3 = 0x1;
+    return;
+L_80101138:
+    r3 = *(u32*)lbl_8047ACB4;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACB0;
+    tmp = r3 + tmp;
+    r28 = *(u32*)lbl_8047ACBC;
+    tmp = tmp * 0x24;
+    r27 = r4 + tmp;
+    goto L_801011A0;
+L_80101158:
+    tmp = *(u32*)((u8*)r27 + 0x8);
+    if ((s32)tmp == 0) goto L_8010119C;
+    tmp = *(u32*)((u8*)r27 + 0xC);
+    if ((s32)tmp != 1) goto L_8010119C;
+    tmp = *(u8*)((u8*)r27 + 0x15);
+    if (tmp != 0) goto L_8010119C;
+    r3 = *(u32*)((u8*)r27 + 0x1C);
+    if (r3 == 0) goto L_8010119C;
+    ((void(*)(void))fn_800F04BC)();
+    tmp = r3 & 0xFF;
+    if (r3 == 0) goto L_8010119C;
+    tmp = 0x0;
+    goto L_8010121C;
+L_8010119C:
+    r27 = r27 + 0x24;
+L_801011A0:
+    if (r28 != 0) goto L_80101158;
+    r3 = *(u32*)lbl_8047ACB4;
+    r31 = 0x0;
+    tmp = *(u32*)lbl_8047ACB8;
+    r4 = *(u32*)lbl_8047ACB0;
+    tmp = r3 + tmp;
+    r28 = *(u32*)lbl_8047ACBC;
+    tmp = tmp * 0x24;
+    r27 = r4 + tmp;
+    while (r28 != 0) {
+
+        tmp = *(u32*)((u8*)r27 + 0x8);
+        if ((s32)tmp != 0) {
+            tmp = *(u32*)((u8*)r27 + 0xC);
+            if ((s32)tmp == 1) {
+                tmp = *(u8*)((u8*)r27 + 0x15);
+                if (tmp == 0) {
+                    r3 = *(u32*)((u8*)r27 + 0x1C);
+                    if (r3 != 0) {
+                        ((void(*)(void))fn_800F0494)();
+                        *(u32*)((u8*)r27 + 0x1C) = r31;
+        }
+        }
+        }
+        }
+        r27 = r27 + 0x24;
+
+    }
+    tmp = 0x1;
+L_8010121C:
+    tmp = tmp & 0xFF;
+    if (r28 == 0) { r3 = 0x1; return; }
+    r3 = 0x0;
+    return;
+
+    r3 = 0x1;
+
+    return;
+}
+
+/* 0x80101244 | 0xA4 */
+void fn_80101244(void) {
+    u8 sp[0x20];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r7 = (u32)&lbl_802719C4;
+    r31 = r6;
+    r30 = r5;
+    r29 = r4;
+    r28 = r3;
+    r3 = (u32)&lbl_802719C4;
+    ((void(*)(void))fn_800DD970)();
+    tmp = r29 + 0x1f;
+    r5 = r30;
+    r6 = r31;
+    r4 = 0x20;
+    /* clrrwi r3, tmp, 5 */;
+    r7 = 0x0;
+    ((void(*)(void))fn_800F9418)();
+    if (r3 == 0) {
+        r3 = (u32)&lbl_802719E0;
+        r4 = r29;
+        r3 = (u32)&lbl_802719E0;
+        ((void(*)(void))fn_800DD970)();
+    } else {
+
+        r4 = r28;
+        r5 = r29;
+        memcpy((void*)r3, (const void*)r4, (u32)r5);
+    }
+    return;
+}
+
+/* 0x801012E8 | 0xB8 */
+void fn_801012E8(void) {
+    u8 sp[0x20];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+
+    r6 = (u32)&lbl_802717F0;
+    r31 = (u32)&lbl_802717F0;
+    r29 = r5;
+    r28 = r4;
+    if (r3 == 0) {
+        r3 = r31 + 0x300;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r4 = r31 + 0x2c8;
+    ((void(*)(void))fn_80191ECC)();
+    if (r3 == 0) {
+        r3 = r31 + 0x328;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r3 = *(u32*)((u8*)r3 + 0x4);
+    ((void(*)(void))fn_800D27FC)();
+    /* mr. r30, r3 */;
+    if (r3 == 0) {
+        r3 = r31 + 0x358;
+        ((void(*)(void))fn_800DD970)();
+    }
+    r4 = (u32)fn_80101A28;
+    r3 = r30;
+    r6 = (u32)fn_80101A28;
+    r5 = r29;
+    r4 = r28;
+    ((void(*)(void))fn_800F9378)();
+
+    return;
+}
+
+/* 0x801013A0 | 0xDC */
+void fn_801013A0(void) {
+    u8 sp[0x20];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    f32 f4 = 0.0f;
+
+    r7 = (u32)&lbl_802717F0;
+    r27 = r4;
+    r30 = r5;
+    r28 = r6;
+    r31 = (u32)&lbl_802717F0;
+    if (r3 == 0) {
+        r3 = r31 + 0x3f4;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r4 = r31 + 0x2c8;
+    ((void(*)(void))fn_80191ECC)();
+    if (r3 == 0) {
+        r3 = r31 + 0x418;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r4 = *(u32*)((u8*)r3 + 0x0);
+    r29 = 0x0;
+    r3 = r4;
+    while (1) {
+        tmp = *(u32*)((u8*)r3 + 0x0);
+        if (tmp == 0) break;
+        if (r29 == r30) {
+            tmp = r29 << 2;
+            r3 = *(u32*)(r4 + tmp);
+            ((void(*)(void))fn_800E4D18)();
+            /* mr. r30, r3 */;
+            if (r29 == r30) {
+                r4 = r29;
+                r3 = r31 + 0x448;
+                ((void(*)(void))fn_800DD970)();
+            }
+            r4 = (u32)fn_80101A4C;
+            r3 = r30;
+            r6 = (u32)fn_80101A4C;
+            r5 = r28;
+            r4 = r27;
+            ((void(*)(void))fn_800F9378)();
+            return;
+        }
+        r3 = r3 + 0x4;
+        r29 = r29 + 0x1;
+
+
+    }
+
+    return;
+}
+
+/* 0x8010147C | 0x494 */
+void fn_8010147C(void) {
+    extern u8 lbl_80402518[];
+    u8 sp[0x20];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r26 = 0;
+    u32 r27 = 0;
+    u32 r28 = 0;
+    u32 r29 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    /* mr. r26, r3 */;
+    r3 = (u32)&lbl_802717F0;
+    r27 = r4;
+    r29 = r5;
+    r28 = r6;
+    r31 = (u32)&lbl_802717F0;
+    if ((s32)tmp == 0) return;
+    if (r27 == 0) {
+        return;
+    }
+    r3 = r31 + 0x520;
+    ((void(*)(void))fn_800DD970)();
+    r3 = (u32)lbl_80402518;
+    tmp = 0x10;
+    r30 = (u32)lbl_80402518;
+    r3 = 0x0;
+    ctr_fn = (void(*)(void))tmp;
+L_801014D4:
+    tmp = *(u32*)((u8*)r30 + 0x44);
+    if ((s32)tmp == 0) goto L_801014F0;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_801014F0;
+    goto L_801015E0;
+L_801014F0:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_80101510;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_80101510;
+    goto L_801015E0;
+L_80101510:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_80101530;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_80101530;
+    goto L_801015E0;
+L_80101530:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_80101550;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_80101550;
+    goto L_801015E0;
+L_80101550:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_80101570;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_80101570;
+    goto L_801015E0;
+L_80101570:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_80101590;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_80101590;
+    goto L_801015E0;
+L_80101590:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_801015B0;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_801015B0;
+    goto L_801015E0;
+L_801015B0:
+    tmp = *(u32*)((u8*)r30 + 0x8C);
+    r30 = r30 + 0x48;
+    if ((s32)tmp == 0) goto L_801015D0;
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (tmp != r26) goto L_801015D0;
+    goto L_801015E0;
+L_801015D0:
+    r3 = r3 + 0x7;
+    r30 = r30 + 0x48;
+    if (--ctr != 0) goto L_801014D4;
+    r30 = 0x0;
+L_801015E0:
+    if (r30 != 0) goto L_8010173C;
+    r3 = (u32)fn_80101910;
+    r5 = r29;
+    r7 = (u32)fn_80101910;
+    r6 = r28;
+    r3 = 0x60;
+    r4 = 0x20;
+    ((void(*)(void))fn_800F9418)();
+    /* mr. r30, r3 */;
+    if (r30 == 0) {
+        r3 = r31 + 0x540;
+        r4 = 0x44;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r4 = r26;
+    r5 = r27;
+    ((void(*)(void))fn_80191F64)();
+    r3 = (u32)lbl_80402518;
+    tmp = 0x20;
+    r6 = (u32)lbl_80402518;
+    r5 = 0x0;
+    ctr_fn = (void(*)(void))tmp;
+L_80101640:
+    r4 = *(u32*)((u8*)r6 + 0x44);
+    if ((s32)r4 == 0) goto L_80101668;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (r3 != tmp) goto L_80101668;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101668:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_80101694;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (r3 != tmp) goto L_80101694;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101694:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_801016C0;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (r3 != tmp) goto L_801016C0;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_801016C0:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_801016EC;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r30 + 0x40);
+    if (r3 != tmp) goto L_801016EC;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_801016EC:
+    r5 = r5 + 0x3;
+    r6 = r6 + 0x48;
+    if (--ctr != 0) goto L_80101640;
+    r3 = (u32)lbl_80402518;
+    tmp = 0x80;
+    r29 = (u32)lbl_80402518;
+    ctr_fn = (void(*)(void))tmp;
+L_80101708:
+    tmp = *(u32*)((u8*)r29 + 0x44);
+    if ((s32)tmp != 0) goto L_80101730;
+    r3 = r29;
+    r4 = r30;
+    r5 = 0x44;
+    memcpy((void*)r3, (const void*)r4, (u32)r5);
+    tmp = 0x1;
+    *(u32*)((u8*)r29 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101730:
+    r29 = r29 + 0x48;
+    if (--ctr != 0) goto L_80101708;
+    goto L_8010188C;
+L_8010173C:
+    r3 = (u32)fn_80101910;
+    r5 = r29;
+    r7 = (u32)fn_80101910;
+    r6 = r28;
+    r3 = 0x60;
+    r4 = 0x20;
+    ((void(*)(void))fn_800F9418)();
+    /* mr. r28, r3 */;
+    if ((s32)tmp == 0) {
+        r3 = r31 + 0x540;
+        r4 = 0x44;
+        ((void(*)(void))fn_800DD970)();
+        return;
+    }
+    r4 = r30;
+    r5 = 0x44;
+    memcpy((void*)r3, (const void*)r4, (u32)r5);
+    r3 = (u32)lbl_80402518;
+    tmp = 0x20;
+    r6 = (u32)lbl_80402518;
+    r5 = 0x0;
+    ctr_fn = (void(*)(void))tmp;
+L_80101794:
+    r4 = *(u32*)((u8*)r6 + 0x44);
+    if ((s32)r4 == 0) goto L_801017BC;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r28 + 0x40);
+    if (r3 != tmp) goto L_801017BC;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_801017BC:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_801017E8;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r28 + 0x40);
+    if (r3 != tmp) goto L_801017E8;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_801017E8:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_80101814;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r28 + 0x40);
+    if (r3 != tmp) goto L_80101814;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101814:
+    r4 = *(u32*)((u8*)r6 + 0x8C);
+    r6 = r6 + 0x48;
+    if ((s32)r4 == 0) goto L_80101840;
+    r3 = *(u32*)((u8*)r6 + 0x40);
+    tmp = *(u32*)((u8*)r28 + 0x40);
+    if (r3 != tmp) goto L_80101840;
+    tmp = r4 + 0x1;
+    *(u32*)((u8*)r6 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101840:
+    r5 = r5 + 0x3;
+    r6 = r6 + 0x48;
+    if (--ctr != 0) goto L_80101794;
+    r3 = (u32)lbl_80402518;
+    tmp = 0x80;
+    r29 = (u32)lbl_80402518;
+    ctr_fn = (void(*)(void))tmp;
+L_8010185C:
+    tmp = *(u32*)((u8*)r29 + 0x44);
+    if ((s32)tmp != 0) goto L_80101884;
+    r3 = r29;
+    r4 = r28;
+    r5 = 0x44;
+    memcpy((void*)r3, (const void*)r4, (u32)r5);
+    tmp = 0x1;
+    *(u32*)((u8*)r29 + 0x44) = tmp;
+    goto L_8010188C;
+L_80101884:
+    r29 = r29 + 0x48;
+    if (--ctr != 0) goto L_8010185C;
+L_8010188C:
+    r3 = r30;
+    r4 = r31 + 0x2c8;
+    r28 = 0x0;
+    r29 = 0x0;
+    ((void(*)(void))fn_80191ECC)();
+    r4 = *(u32*)((u8*)r3 + 0x0);
+    if (r4 != 0) {
+        while (1) {
+            tmp = *(u32*)((u8*)r4 + 0x0);
+        if (tmp == 0) break;
+            r4 = r4 + 0x4;
+            r28 = r28 + 0x1;
+
+
+        }
+    }
+    r3 = *(u32*)((u8*)r3 + 0x8);
+    if (r3 != 0) {
+        while (1) {
+            tmp = *(u32*)((u8*)r3 + 0x0);
+        if (tmp == 0) break;
+            r3 = r3 + 0x4;
+            r29 = r29 + 0x1;
+
+
+        }
+    }
+    r4 = r28;
+    r5 = r29;
+    r3 = r31 + 0x574;
+    ((void(*)(void))fn_800DD970)();
+
+    return;
+}
+
+/* ===================================================================
+ * Stub functions for coverage -- TODO: decompile
+ * 2 function(s)
+ * =================================================================== */
+
+/* fn_800F0470 - 0x800F0470 | size: 0x24 */
+void fn_800F0470(void) {
+    extern void fn_800F0A74();
+    u8 sp[0x10];
+    u32 tmp = 0;
+    u32 r4 = 0;
+
+    r4 = 0x1;
+    fn_800F0A74();
+    return;
+}
+
+/* fn_800F7434 - 0x800F7434 | size: 0x1C8 */
+void fn_800F7434(void) {
+    extern u8 lbl_80271068[];
+    extern u8 lbl_803155D0[];
+    extern void fn_800DD38C();
+    extern void fn_800F6D18();
+    u8 sp[0x90];
+    u32 tmp = 0;
+    u32 r3 = 0;
+    u32 r4 = 0;
+    u32 r5 = 0;
+    u32 r6 = 0;
+    u32 r7 = 0;
+    u32 r8 = 0;
+    u32 r9 = 0;
+    u32 r10 = 0;
+    u32 r11 = 0;
+    u32 r12 = 0;
+    u32 r30 = 0;
+    u32 r31 = 0;
+    f32 f1 = 0.0f;
+    f32 f2 = 0.0f;
+    f32 f3 = 0.0f;
+    f32 f4 = 0.0f;
+    f32 f5 = 0.0f;
+    f32 f6 = 0.0f;
+    f32 f7 = 0.0f;
+    f32 f8 = 0.0f;
+    void (*ctr_fn)(void) = 0;
+    u32 ctr = 0;
+
+    if ((s32)tmp == 0) {
+    }
+    r11 = (u32)sp + 0x98;
+    tmp = (u32)sp + 0x8;
+    r12 = 0x2000000;
+    r31 = (u32)lbl_80271068;
+    r30 = (u32)sp + 0x70;
+    r31 = (u32)lbl_80271068;
+    r5 = r30;
+    *(u32*)(sp + 0x78) = tmp;
+    fn_800F6D18();
+    /* mr. r30, r3 */;
+    if ((s32)tmp != 0) goto L_800F74C8;
+    r3 = 0x0;
+    return;
+L_800F74C8:
+    tmp = *(u8*)((u8*)r30 + 0x4);
+    if (tmp == 0) {
+        r4 = *(u32*)((u8*)r30 + 0x8);
+        r3 = r31 + 0x120;
+        ((void(*)(void))fn_800DD970)();
+
+    } else if (tmp == 3) {
+        tmp = 0x0;
+        *(u8*)((u8*)r30 + 0x4) = tmp;
+
+    }
+    r3 = *(u32*)((u8*)r30 + 0x14);
+    tmp = r3 + 0x1;
+    *(u32*)((u8*)r30 + 0x14) = tmp;
+    r4 = *(u8*)((u8*)r3 + 0x0);
+    if ((s32)r4 < 0x26) goto L_800F7524;
+    r3 = r31 + 0x150;
+    fn_800DD38C();
+    goto L_800F7548;
+L_800F7524:
+    r3 = (u32)lbl_803155D0;
+    r3 = (u32)lbl_803155D0;
+    r12 = *(u32*)(r3 + tmp);
+    if (r12 == 0) goto L_800F7548;
+    r3 = r30;
+    ctr_fn = (void(*)(void))r12;
+    ctr_fn();
+L_800F7548:
+    r3 = *(u32*)((u8*)r30 + 0x28);
+    if ((s32)r3 <= 0) goto L_800F74C8;
+    /* subic. r3, r3, 0x1 */;
+    tmp = r3 + 0x1;
+    ctr_fn = (void(*)(void))tmp;
+    if ((s32)r3 < 0) goto L_800F74C8;
+    do {
+    } while (--ctr != 0);
+    goto L_800F74C8;
+
+    tmp = *(u8*)((u8*)r30 + 0x4);
+    if (tmp == 4) {
+        tmp = 0x0;
+        *(u8*)((u8*)r30 + 0x4) = tmp;
+    }
+    r3 = *(u32*)((u8*)r30 + 0x28);
+    if ((s32)r3 <= 0) {
+        r3 = r31 + 0x14;
+        fn_800DD38C();
+        tmp = *(u32*)((u8*)r30 + 0x6C);
+        *(u32*)(sp + 0x68) = tmp;
+    } else {
+
+        tmp = r3 << 2;
+        *(u32*)((u8*)r30 + 0x28) = r3;
+        r3 = r30 + tmp;
+        tmp = *(u32*)((u8*)r3 + 0x6C);
+        *(u32*)(sp + 0x68) = tmp;
+    }
+    r12 = *(u32*)((u8*)r30 + 0x10);
+    if (r12 != 0) {
+        r3 = r30;
+        ctr_fn = (void(*)(void))r12;
+        ctr_fn();
+    }
+
+    return;
+}
+
