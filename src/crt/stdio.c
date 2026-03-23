@@ -310,7 +310,7 @@ L_800C55E8:
 
 /* fn_800C56A4 - 0x800C56A4 | size: 0x3B4 */
 void fn_800C56A4(void) {
-    extern u8 lbl_8047C400[];
+    extern f64 lbl_8047C400;
     extern void fn_800C4CC0();
     extern void fn_800C5A58();
     extern void fn_800C71DC();
@@ -335,7 +335,7 @@ void fn_800C56A4(void) {
     f32 f1 = 0.0f;
     f32 f31 = 0.0f;
 
-    f0 = *(f64*)lbl_8047C400;
+    f0 = lbl_8047C400;
     r30 = r3;
     tmp = (u32)tmp >> 31;
     r31 = (s8)tmp;

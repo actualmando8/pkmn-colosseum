@@ -456,7 +456,7 @@ void fn_800C4CC0(void) {
 void fn_800C4D8C(void) {
     extern u8 lbl_8026FE70[];
     extern u8 lbl_8026FEA8[];
-    extern u8 lbl_80478980[];
+    extern u32 lbl_80478980;
     extern void fn_8009AAD4();
     extern void fn_8009AB50();
     extern void fn_8009AB60();
@@ -471,7 +471,7 @@ void fn_800C4D8C(void) {
     u32 r31 = 0;
 
     r29 = r3;
-    tmp = *(u32*)lbl_80478980;
+    tmp = lbl_80478980;
     if ((s32)tmp == (s32)-0x1) {
         r3 = (u32)lbl_8026FE70;
         r3 = (u32)lbl_8026FE70;
@@ -498,7 +498,7 @@ void fn_800C4D8C(void) {
         r3 = r30;
         OSSetArenaLo();
     }
-    r3 = *(u32*)lbl_80478980;
+    r3 = lbl_80478980;
     r4 = r29;
     fn_8009AAD4();
     return;

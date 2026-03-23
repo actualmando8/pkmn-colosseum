@@ -219,9 +219,9 @@ s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {
  * 384 bytes.
  * ================================================================== */
 s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5) {
-    extern u8 lbl_8047B0B8[];
-    extern u8 lbl_8047B0BC[];
-    extern u8 lbl_8047B0C0[];
+    extern u32 lbl_8047B0B8;
+    extern u32 lbl_8047B0BC;
+    extern u32 lbl_8047B0C0;
     extern void fn_800AE78C();
     extern void fn_80159ED0();
     extern void fn_80159EF0();
@@ -283,17 +283,17 @@ s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2,
         fn_80159ED0();
         slotIndex = (u32)callback;
         fn_80167F28();
-        *(u32*)lbl_8047B0BC = slotIndex;
+        lbl_8047B0BC = slotIndex;
         if (slotIndex == 0) {
             slotIndex = 0x0;
             return;
         }
-        *(u32*)lbl_8047B0B8 = param1;
+        lbl_8047B0B8 = param1;
         fn_800AE78C();
         fn_80167BB0();
-        *(u32*)lbl_8047B0C0 = slotIndex;
+        lbl_8047B0C0 = slotIndex;
         if (slotIndex == 0) {
-            slotIndex = *(u32*)lbl_8047B0BC;
+            slotIndex = lbl_8047B0BC;
             fn_80167E64();
             slotIndex = 0x0;
             return;
@@ -313,16 +313,16 @@ callback = (void*)(u32)param3;
     tmp = slotIndex & 0xFF;
     if (slotIndex == 0) {
         if (resId == 1) {
-            slotIndex = *(u32*)lbl_8047B0BC;
+            slotIndex = lbl_8047B0BC;
             fn_80167E64();
         }
         slotIndex = 0x0;
         return;
     }
     if (resId == 1) {
-        slotIndex = *(u32*)lbl_8047B0C0;
+        slotIndex = lbl_8047B0C0;
         fn_80167B70();
-        slotIndex = *(u32*)lbl_8047B0BC;
+        slotIndex = lbl_8047B0BC;
         fn_80167E64();
     }
     tmp = 0x1;
@@ -353,10 +353,10 @@ void GSDVD_EmptyFunc(void) {
  *   - Retry
  * ================================================================== */
 void GSDVD_ErrorStateMachine(void) {
-    extern u8 lbl_80478C24[];
-    extern u8 lbl_80478C28[];
-    extern u8 lbl_8047B0F4[];
-    extern u8 lbl_8047B0F8[];
+    extern u32 lbl_80478C24;
+    extern u32 lbl_80478C28;
+    extern u32 lbl_8047B0F4;
+    extern u32 lbl_8047B0F8;
     extern u8 lbl_8047D578[];
     extern u8 lbl_8047D594[];
     extern void fn_800057A0();
@@ -376,9 +376,9 @@ void GSDVD_ErrorStateMachine(void) {
 
     tmp = r3;
     r3 = tmp * 0x44;
-    *(u32*)lbl_8047B0F8 = tmp;
+    lbl_8047B0F8 = tmp;
     fn_8016824C();
-    *(u32*)lbl_8047B0F4 = r3;
+    lbl_8047B0F4 = r3;
     if (r3 == 0) {
         r3 = 0x0;
         return;
@@ -391,37 +391,37 @@ void GSDVD_ErrorStateMachine(void) {
         switch ((s32)r3) {
         case 0:
             tmp = (u32)lbl_8047D578;
-            *(u32*)lbl_80478C24 = tmp;
+            lbl_80478C24 = tmp;
             break;
         case 1:
             tmp = (u32)lbl_8047D594;
-            *(u32*)lbl_80478C24 = tmp;
+            lbl_80478C24 = tmp;
             break;
         case 2:
             tmp = (u32)lbl_8047D594;
-            *(u32*)lbl_80478C24 = tmp;
+            lbl_80478C24 = tmp;
             break;
         default:
             break;
         }
         fn_800A7BCC();
-        r4 = *(u32*)lbl_80478C24;
+        r4 = lbl_80478C24;
         tmp = 0x0;
         r4 = *(u8*)((u8*)r4 + 0x0);
         *(u8*)((u8*)r3 + 0x0) = r4;
-        r4 = *(u32*)lbl_80478C24;
+        r4 = lbl_80478C24;
         r4 = *(u8*)((u8*)r4 + 0x1);
         *(u8*)((u8*)r3 + 0x1) = r4;
-        r4 = *(u32*)lbl_80478C24;
+        r4 = lbl_80478C24;
         r4 = *(u8*)((u8*)r4 + 0x2);
         *(u8*)((u8*)r3 + 0x2) = r4;
-        r4 = *(u32*)lbl_80478C24;
+        r4 = lbl_80478C24;
         r4 = *(u8*)((u8*)r4 + 0x3);
         *(u8*)((u8*)r3 + 0x3) = r4;
-        r4 = *(u32*)lbl_80478C28;
+        r4 = lbl_80478C28;
         r4 = *(u8*)((u8*)r4 + 0x0);
         *(u8*)((u8*)r3 + 0x4) = r4;
-        r4 = *(u32*)lbl_80478C28;
+        r4 = lbl_80478C28;
         r4 = *(u8*)((u8*)r4 + 0x1);
         *(u8*)((u8*)r3 + 0x5) = r4;
         *(u8*)((u8*)r3 + 0x6) = tmp;
@@ -452,9 +452,9 @@ void GSDVD_ErrorStateMachine(void) {
  * ================================================================== */
 void _sndCheckSndWorkALL(void) {
     extern u8 lbl_804526E0[];
-    extern u8 lbl_8047D5A0[];
-    extern u8 lbl_8047D5A4[];
-    extern u8 lbl_8047D5A8[];
+    extern f32 lbl_8047D5A0;
+    extern f32 lbl_8047D5A4;
+    extern f32 lbl_8047D5A8;
     extern void fn_800D5A38();
     extern void fn_800D5FA4();
     extern void fn_800D6728();
@@ -498,10 +498,10 @@ void _sndCheckSndWorkALL(void) {
     fn_800D88DC();
     r3 = 0x6;
     fn_800D888C();
-    f1 = *(f32*)lbl_8047D5A0;
-    f3 = *(f32*)lbl_8047D5A4;
+    f1 = lbl_8047D5A0;
+    f3 = lbl_8047D5A4;
     f2 = f1;
-    f4 = *(f32*)lbl_8047D5A8;
+    f4 = lbl_8047D5A8;
     fn_800D9B58();
     r3 = 0x1;
     r4 = 0x6;
@@ -575,7 +575,7 @@ void _sndCheckSndWorkALL(void) {
  * ================================================================== */
 void GSDVD_ErrorCoverOpenMain(void) {
     extern u8 lbl_804526E0[];
-    extern u8 lbl_8047B100[];
+    extern u32 lbl_8047B100;
     extern void fn_800D75F4();
     extern void fn_800D7868();
     extern void fn_800D7894();
@@ -775,7 +775,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
         }
     }
     r3 = (u32)fn_80168284;
-    *(u32*)lbl_8047B100 = r7;
+    lbl_8047B100 = r7;
     r6 = (u32)fn_80168284;
     r4 = 0xfc;
     r3 = 0x1;

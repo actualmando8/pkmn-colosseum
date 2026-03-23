@@ -160,14 +160,14 @@ void usr_put_initialize(void) {
  */
 void fn_800C4F34(void* handler) {
     extern u8 lbl_803FFBB8[];
-    extern u8 lbl_8047AA08[];
+    extern u8 lbl_8047AA08;
     extern void fn_800C4FA4(u8* table, void* handler);
 
     __begin_critical_region(1);
 
-    if (*(u8*)lbl_8047AA08 == 0) {
+    if (lbl_8047AA08 == 0) {
         memset(lbl_803FFBB8, 0, 0x34);
-        *(u8*)lbl_8047AA08 = 1;
+        lbl_8047AA08 = 1;
     }
 
     fn_800C4FA4(lbl_803FFBB8, handler);

@@ -60,7 +60,7 @@ void __DVDFSInit(void) {
 void fn_800A4D28(void) {
     extern u8 lbl_803118F0[];
     extern u8 lbl_804789C0[];
-    extern u8 lbl_8047A7D8[];
+    extern u32 lbl_8047A7D8;
     extern void fn_800060F0();
     extern void fn_800C7558();
     u32 tmp = 0;
@@ -85,7 +85,7 @@ void fn_800A4D28(void) {
     r3 = (u32)lbl_803118F0;
     r25 = r23 + 0x0;
     r31 = (u32)lbl_803118F0;
-    r26 = *(u32*)lbl_8047A7D8;
+    r26 = lbl_8047A7D8;
 while (1) {
         r3 = *(u8*)((u8*)r23 + 0x0);
         tmp = (s8)r3;
@@ -448,7 +448,7 @@ void fn_800A5108(void) {
 
 /* fn_800A5268 - 0x800A5268 | size: 0xC4 */
 void fn_800A5268(void) {
-    extern u8 lbl_8047A7D8[];
+    extern u32 lbl_8047A7D8;
     extern void fn_800A5108();
     u32 tmp = 0;
     u32 r3 = 0;
@@ -462,7 +462,7 @@ void fn_800A5268(void) {
     r5 = r30 + 0x0;
     r29 = r3 + 0x0;
     r4 = r29 + 0x0;
-    r31 = *(u32*)lbl_8047A7D8;
+    r31 = lbl_8047A7D8;
     r3 = r31 + 0x0;
     fn_800A5108();
     if (r3 == r30) {

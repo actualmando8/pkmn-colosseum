@@ -210,7 +210,7 @@ void fn_800C7A3C(void) {
 
 /* fn_800C7C64 - 0x800C7C64 | size: 0x270 */
 void fn_800C7C64(void) {
-    extern u8 lbl_8047AA10[];
+    extern u32 lbl_8047AA10;
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -233,13 +233,13 @@ void fn_800C7C64(void) {
         if (tmp != 0) {
             tmp = 0x28;
             r3 = -0x1;
-            *(u32*)lbl_8047AA10 = tmp;
+            lbl_8047AA10 = tmp;
             return;
         }
     } else {
         tmp = 0x28;
         r3 = -0x1;
-        *(u32*)lbl_8047AA10 = tmp;
+        lbl_8047AA10 = tmp;
         return;
     }
     /* L_800C7CB0 */
@@ -255,7 +255,7 @@ void fn_800C7C64(void) {
             tmp = 0x28;
             r3 = -0x1;
             *(u32*)((u8*)r30 + 0x28) = r4;
-            *(u32*)lbl_8047AA10 = tmp;
+            lbl_8047AA10 = tmp;
             return;
         }
     }
@@ -303,13 +303,13 @@ void fn_800C7C64(void) {
                 /* L_800C7D24 */
                 tmp = 0x28;
                 r3 = -0x1;
-                *(u32*)lbl_8047AA10 = tmp;
+                lbl_8047AA10 = tmp;
             }
         } else {
             /* L_800C7D24 */
             tmp = 0x28;
             r3 = -0x1;
-            *(u32*)lbl_8047AA10 = tmp;
+            lbl_8047AA10 = tmp;
         }
         /* L_800C7D9C */
         tmp = tmp + r3;
@@ -393,7 +393,7 @@ void fn_800C7C64(void) {
                 tmp = 0x28;
                 r3 = -0x1;
                 *(u32*)((u8*)r30 + 0x28) = r4;
-                *(u32*)lbl_8047AA10 = tmp;
+                lbl_8047AA10 = tmp;
                 return;
             }
         }
@@ -409,7 +409,7 @@ void fn_800C7C64(void) {
 
 /* fn_800C7ED4 - 0x800C7ED4 | size: 0xE4 */
 void fn_800C7ED4(void) {
-    extern u8 lbl_8047AA10[];
+    extern u32 lbl_8047AA10;
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -467,13 +467,13 @@ void fn_800C7ED4(void) {
             /* L_800C7F1C */
             tmp = 0x28;
             r31 = -0x1;
-            *(u32*)lbl_8047AA10 = tmp;
+            lbl_8047AA10 = tmp;
         }
     } else {
         /* L_800C7F1C */
         tmp = 0x28;
         r31 = -0x1;
-        *(u32*)lbl_8047AA10 = tmp;
+        lbl_8047AA10 = tmp;
     }
     /* L_800C7F94 */
     r3 = 0x2;

@@ -748,7 +748,7 @@ u16 GSEffectAllocSlot(void* callbacks, u16 dataSize) {
 
 /* 0x80130CE0 | 0x224 */
 void fn_80130CE0(void) {
-    extern u8 lbl_8047ADC0[];
+    extern u32 lbl_8047ADC0;
     extern void fn_800E27B0();
     extern void fn_800E3534();
     extern void fn_800FE834();
@@ -894,7 +894,7 @@ void fn_80130CE0(void) {
     r4 = 0x7f;
     r5 = 0x0;
     fn_800FE834();
-    *(u32*)lbl_8047ADC0 = r3;
+    lbl_8047ADC0 = r3;
     ((void(*)(void))fn_801E12A0)();
     r4 = (u32)fn_80130F04;
     r3 = 0x1;

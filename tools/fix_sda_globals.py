@@ -99,6 +99,14 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         rf'\*\s*\(\s*f32\s*\*\s*\)\s*\(\s*u32\s*\)\s*{le}(?!\w)',
         label, out)
 
+    # *(f32 *)(lbl_XXX) -> lbl_XXX   and   *(f32 *)lbl_XXX -> lbl_XXX
+    out = re.sub(
+        rf'\*\s*\(\s*f32\s*\*\s*\)\s*\(\s*{le}\s*\)',
+        label, out)
+    out = re.sub(
+        rf'\*\s*\(\s*f32\s*\*\s*\)\s*{le}(?!\w)',
+        label, out)
+
     # *(float *)(lbl_XXX) -> lbl_XXX
     out = re.sub(
         rf'\*\s*\(\s*float\s*\*\s*\)\s*\(\s*{le}\s*\)',
@@ -108,6 +116,14 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         label, out)
 
     # --- Double (f64) dereferences ---
+
+    # *(f64 *)(lbl_XXX) -> lbl_XXX   and   *(f64 *)lbl_XXX -> lbl_XXX
+    out = re.sub(
+        rf'\*\s*\(\s*f64\s*\*\s*\)\s*\(\s*{le}\s*\)',
+        label, out)
+    out = re.sub(
+        rf'\*\s*\(\s*f64\s*\*\s*\)\s*{le}(?!\w)',
+        label, out)
 
     # *(double *)(lbl_XXX) -> lbl_XXX
     out = re.sub(
@@ -233,6 +249,8 @@ def determine_type(label: str, lines: list, start_idx: int, end_idx: int):
         (rf'\*\s*\(\s*f32\s*\*\s*\)\s*\(?\s*{le}\s*\)?', 'f32'),
         # *(float *)(label) or *(float *)label
         (rf'\*\s*\(\s*float\s*\*\s*\)\s*\(?\s*{le}\s*\)?', 'f32'),
+        # *(f64 *)(label) or *(f64 *)label
+        (rf'\*\s*\(\s*f64\s*\*\s*\)\s*\(?\s*{le}\s*\)?', 'f64'),
         # *(double *)(label) or *(double *)label
         (rf'\*\s*\(\s*double\s*\*\s*\)\s*\(?\s*{le}\s*\)?', 'f64'),
         # *(u32 *)(label) or *(u32 *)label

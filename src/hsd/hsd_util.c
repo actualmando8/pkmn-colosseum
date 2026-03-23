@@ -11,15 +11,15 @@
 /* 0x8019C3C4 | 0x2CC */
 void fn_8019C3C4(void) {
     extern u8 lbl_80274818[];
-    extern u8 lbl_80478C74[];
-    extern u8 lbl_80478C7C[];
-    extern u8 lbl_80478C80[];
-    extern u8 lbl_8047B270[];
-    extern u8 lbl_8047B274[];
-    extern u8 lbl_8047B280[];
-    extern u8 lbl_8047B284[];
-    extern u8 lbl_8047B288[];
-    extern u8 lbl_8047B28C[];
+    extern u32 lbl_80478C74;
+    extern u32 lbl_80478C7C;
+    extern u32 lbl_80478C80;
+    extern u32 lbl_8047B270;
+    extern u32 lbl_8047B274;
+    extern u32 lbl_8047B280;
+    extern u32 lbl_8047B284;
+    extern u32 lbl_8047B288;
+    extern u32 lbl_8047B28C;
     extern void fn_8009F3D4();
     extern void fn_801A69C0();
     extern u8 jumptable_8036C8C0[];
@@ -48,17 +48,17 @@ void fn_8019C3C4(void) {
 
     if ((s32)tmp == 0) {
     }
-    tmp = *(u32*)lbl_8047B280;
+    tmp = lbl_8047B280;
     r11 = (u32)lbl_80274818;
     r31 = (u32)lbl_80274818;
     r30 = 0x0;
     if ((s32)tmp != 0) {
-        tmp = *(u32*)lbl_8047B28C;
+        tmp = lbl_8047B28C;
         if ((s32)tmp == 0) {
             r3 = r31 + 0x8c;
             OSReport();
             tmp = 0x1;
-            *(u32*)lbl_8047B28C = tmp;
+            lbl_8047B28C = tmp;
         }
         r3 = r30;
         return;
@@ -78,7 +78,7 @@ void fn_8019C3C4(void) {
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
     if (tmp == 0) { r3 = r30; return; }
-    *(u32*)lbl_80478C7C = tmp;
+    lbl_80478C7C = tmp;
     r30 = 0x1;
     r3 = r30;
     return;
@@ -87,7 +87,7 @@ void fn_8019C3C4(void) {
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
     if (tmp == 0) { r3 = r30; return; }
-    *(u32*)lbl_80478C80 = tmp;
+    lbl_80478C80 = tmp;
     r30 = 0x1;
     r3 = r30;
     return;
@@ -97,7 +97,7 @@ void fn_8019C3C4(void) {
     r31 = *(u32*)((u8*)r3 + 0x0);
     fn_8009F3D4();
     if (r31 >= r3) { r3 = r30; return; }
-    *(u32*)lbl_8047B284 = r31;
+    lbl_8047B284 = r31;
     r30 = 0x1;
     r3 = r30;
     return;
@@ -111,8 +111,8 @@ void fn_8019C3C4(void) {
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
     r30 = 0x1;
-    *(u32*)lbl_8047B270 = r31;
-    *(u32*)lbl_8047B274 = tmp;
+    lbl_8047B270 = r31;
+    lbl_8047B274 = tmp;
     r3 = r30;
     return;
     r3 = (u32)sp + 0x68;
@@ -162,7 +162,7 @@ void fn_8019C3C4(void) {
     fn_801A69C0();
     tmp = 0x1;
     r30 = 0x1;
-    *(u32*)lbl_8047B288 = tmp;
+    lbl_8047B288 = tmp;
     r3 = r30;
     return;
     r3 = (u32)sp + 0x68;
@@ -170,7 +170,7 @@ void fn_8019C3C4(void) {
     __va_arg();
     tmp = *(u32*)((u8*)r3 + 0x0);
     if (tmp == 0) { r3 = r30; return; }
-    *(u32*)lbl_80478C74 = tmp;
+    lbl_80478C74 = tmp;
     r30 = 0x1;
     r3 = r30;
     return;
