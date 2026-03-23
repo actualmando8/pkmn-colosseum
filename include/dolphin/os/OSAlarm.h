@@ -21,6 +21,6 @@ struct OSAlarm {
 void OSInitAlarm(void);
 void OSCreateAlarm(OSAlarm* alarm);
 void OSSetAlarm(OSAlarm* alarm, s64 tick, OSAlarmHandler handler);
-BOOL OSCancelAlarm(OSAlarm* alarm);
+void OSCancelAlarm(OSAlarm* alarm);
 
 #endif /* DOLPHIN_OS_OSALARM_H */

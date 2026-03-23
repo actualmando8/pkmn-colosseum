@@ -54,14 +54,11 @@ static asm void DecrementerExceptionHandler(register u8 exception, register OSCo
 
 void OSInitAlarm(void) {
     if (__OSGetExceptionHandler(OS_EXCEPTION_DECREMENTER)
-        == (__OSExceptionHandler)DecrementerExceptionHandler) {
-        return;
+        != (__OSExceptionHandler)DecrementerExceptionHandler) {
+        AlarmQueue.head = AlarmQueue.tail = NULL;
+        __OSSetExceptionHandler(OS_EXCEPTION_DECREMENTER,
+                                (__OSExceptionHandler)DecrementerExceptionHandler);
     }
-
-    AlarmQueue.tail = NULL;
-    AlarmQueue.head = NULL;
-    __OSSetExceptionHandler(OS_EXCEPTION_DECREMENTER,
-                            (__OSExceptionHandler)DecrementerExceptionHandler);
 }
 
 void OSCreateAlarm(OSAlarm* alarm) {
@@ -70,69 +67,64 @@ void OSCreateAlarm(OSAlarm* alarm) {
 }
 
 static void SetTimer(OSAlarm* alarm) {
-    s64 now;
-    s64 diff;
+    s64 delta;
 
-    now  = __OSGetSystemTime();
-    diff = alarm->fire - now;
+    delta = alarm->fire - __OSGetSystemTime();
 
-    if (diff < 0) {
+    if (delta < 0) {
         PPCMtdec(0);
-    } else if (diff < 0x80000000LL) {
-        PPCMtdec((u32)diff);
+    } else if (delta < 0x80000000) {
+        PPCMtdec((u32)delta);
     } else {
         PPCMtdec(0x7FFFFFFF);
     }
 }
 
 static void InsertAlarm(OSAlarm* alarm, s64 fire, OSAlarmHandler handler) {
-    OSAlarm* iter;
+    OSAlarm* next;
     OSAlarm* prev;
 
-    /* Handle periodic alarm scheduling */
-    if (alarm->period != 0) {
-        s64 now = __OSGetSystemTime();
-        if (now >= alarm->start) {
-            /* We've missed at least one tick; advance to the next period */
-            fire = alarm->start + alarm->period *
-                   (((now - alarm->start) / alarm->period) + 1);
+    if (0 < alarm->period) {
+        s64 time = __OSGetSystemTime();
+
+        fire = alarm->start;
+        if (alarm->start < time) {
+            fire += alarm->period * ((time - alarm->start) / alarm->period + 1);
         }
     }
 
     alarm->handler = handler;
     alarm->fire    = fire;
 
-    /* Insert into sorted list (sorted by fire time, ascending) */
-    for (iter = AlarmQueue.head; iter != NULL; iter = iter->next) {
-        if (iter->fire <= fire) {
+    for (next = AlarmQueue.head; next; next = next->next) {
+        if (next->fire <= fire) {
             continue;
         }
 
-        /* Insert before iter */
-        alarm->prev = iter->prev;
-        iter->prev  = alarm;
-        alarm->next = iter;
+        alarm->prev = next->prev;
+        next->prev  = alarm;
+        alarm->next = next;
+        prev = alarm->prev;
 
-        if (alarm->prev != NULL) {
-            alarm->prev->next = alarm;
+        if (prev) {
+            prev->next = alarm;
         } else {
             AlarmQueue.head = alarm;
             SetTimer(alarm);
         }
+
         return;
     }
 
-    /* Insert at tail */
-    alarm->next = NULL;
+    alarm->next = 0;
     prev = AlarmQueue.tail;
     AlarmQueue.tail = alarm;
     alarm->prev = prev;
 
-    if (prev != NULL) {
+    if (prev) {
         prev->next = alarm;
     } else {
-        AlarmQueue.head = alarm;
-        AlarmQueue.tail = alarm;
+        AlarmQueue.head = AlarmQueue.tail = alarm;
         SetTimer(alarm);
     }
 }
@@ -142,116 +134,80 @@ void OSSetAlarm(OSAlarm* alarm, s64 tick, OSAlarmHandler handler) {
 
     enabled = OSDisableInterrupts();
     alarm->period = 0;
-
     InsertAlarm(alarm, __OSGetSystemTime() + tick, handler);
+    OSRestoreInterrupts(enabled);
+}
+
+void OSCancelAlarm(OSAlarm* alarm) {
+    OSAlarm* next;
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+
+    if (alarm->handler == 0) {
+        OSRestoreInterrupts(enabled);
+        return;
+    }
+
+    next = alarm->next;
+    if (next == 0) {
+        AlarmQueue.tail = alarm->prev;
+    } else {
+        next->prev = alarm->prev;
+    }
+    if (alarm->prev) {
+        alarm->prev->next = next;
+    } else {
+        AlarmQueue.head = next;
+        if (next) {
+            SetTimer(next);
+        }
+    }
+    alarm->handler = 0;
     OSRestoreInterrupts(enabled);
 }
 
 static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
     OSAlarm*        alarm;
+    OSAlarm*        next;
     OSAlarmHandler  handler;
-    s64             now;
-    OSContext       tmpCtx;
+    s64             time;
 
-    now   = __OSGetSystemTime();
+    time  = __OSGetSystemTime();
     alarm = AlarmQueue.head;
 
-    if (alarm == NULL) {
+    if (alarm == 0) {
         OSLoadContext(context);
     }
 
-    /* Check if the first alarm should fire */
-    if (alarm->fire > now) {
-        /* Not time yet; set the decrementer and return */
+    if (time < alarm->fire) {
         SetTimer(alarm);
         OSLoadContext(context);
     }
 
-    /* Remove from queue head */
-    AlarmQueue.head = alarm->next;
-    if (alarm->next != NULL) {
-        alarm->next->prev = NULL;
+    next = alarm->next;
+    AlarmQueue.head = next;
+    if (next == 0) {
+        AlarmQueue.tail = 0;
     } else {
-        AlarmQueue.tail = NULL;
+        next->prev = 0;
     }
 
     handler = alarm->handler;
-    alarm->handler = NULL;
+    alarm->handler = 0;
 
-    /* Reschedule periodic alarms */
-    if (alarm->period != 0) {
+    if (0 < alarm->period) {
         InsertAlarm(alarm, 0, handler);
     }
 
-    /* Set timer for the new head alarm if any */
-    if (AlarmQueue.head != NULL) {
+    if (AlarmQueue.head) {
         SetTimer(AlarmQueue.head);
     }
 
-    /* Call the alarm handler */
     OSDisableScheduler();
-    OSClearContext(&tmpCtx);
-    OSSetCurrentContext(&tmpCtx);
     handler(alarm, context);
-    OSClearContext(&tmpCtx);
-    OSSetCurrentContext(context);
     OSEnableScheduler();
     __OSReschedule();
     OSLoadContext(context);
-}
-
-/* ===================================================================
- * Stub functions for coverage -- TODO: decompile
- * 1 function(s)
- * =================================================================== */
-
-/* fn_8009A590 - 0x8009A590 | size: 0x11C
- * OSCancelAlarm - Remove an alarm from the alarm queue.
- * Unlinks it from the doubly-linked list, and if the removed alarm
- * was at the head, re-programs the decrementer for the new head.
- * alarm+0x00 = handler, alarm+0x08 = fire (hi), alarm+0x0C = fire (lo),
- * alarm+0x10 = prev, alarm+0x14 = next
- */
-void fn_8009A590(u8* alarm) {
-    extern u8 AlarmQueue_8047A6E0[];
-    BOOL enabled;
-    u8* next;
-    u8* prev;
-
-    enabled = OSDisableInterrupts();
-
-    /* If handler is NULL, alarm isn't active */
-    if (*(u32*)(alarm + 0x0) == 0) {
-        OSRestoreInterrupts(enabled);
-        return;
-    }
-
-    next = (u8*)*(u32*)(alarm + 0x14);
-    prev = (u8*)*(u32*)(alarm + 0x10);
-
-    /* Unlink from list */
-    if (next == NULL) {
-        /* Alarm is tail - update queue tail */
-        *(u32*)(AlarmQueue_8047A6E0 + 0x4) = (u32)prev;
-    } else {
-        /* Update next's prev pointer */
-        *(u32*)(next + 0x10) = (u32)prev;
-    }
-
-    if (prev != NULL) {
-        /* Update prev's next pointer */
-        *(u32*)(prev + 0x14) = (u32)next;
-    } else {
-        /* Alarm was head - update queue head and reprogram decrementer */
-        *(u32*)AlarmQueue_8047A6E0 = (u32)next;
-        if (next != NULL) {
-            /* Set decrementer to 0 to trigger immediate re-evaluation */
-            PPCMtdec(0);
-        }
-    }
-
-    /* Mark alarm as inactive */
-    *(u32*)(alarm + 0x0) = 0;
-    OSRestoreInterrupts(enabled);
 }
 
