@@ -153,6 +153,17 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         out = re.sub(
             rf'\*\s*\(\s*u16\s*\*\s*\)\s*{le}(?!\w)',
             label, out)
+        # *(short *) store: -> lbl_XXX = val
+        out = re.sub(
+            rf'\*\s*\(\s*short\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
+            f'{label} =', out)
+        # *(short *) read: -> (short)lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*short\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            f'(short){label}', out)
+        out = re.sub(
+            rf'\*\s*\(\s*short\s*\*\s*\)\s*{le}(?!\w)',
+            f'(short){label}', out)
 
     elif new_type == 'u8':
         # Store: *(u8 *)(lbl_XXX) = val -> lbl_XXX = val
@@ -181,6 +192,15 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         out = re.sub(
             rf'\*\s*\(\s*char\s*\*\s*\)\s*{le}(?!\w)',
             f'(char){label}', out)
+
+        # Ghidra widened store artifact: *(u32 *)(lbl_XXX) = val
+        # The original binary uses stb, not stw. Fix by removing deref.
+        out = re.sub(
+            rf'\*\s*\(\s*u32\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
+            f'{label} =', out)
+        out = re.sub(
+            rf'\*\s*\(\s*u32\s*\*\s*\)\s*{le}(?!\w)\s*=',
+            f'{label} =', out)
 
     return out
 
@@ -306,14 +326,20 @@ def prescan_array_labels(lines: list) -> set:
             # Array indexing: lbl_XXX[N]
             if re.search(rf'{le}\s*\[', line):
                 array_labels.add(label)
-            # Address-of usage: (u32)lbl_XXX (taking the address as a value)
-            if re.search(rf'\(\s*u32\s*\)\s*{le}(?!\s*[\[\(])', line):
-                # Make sure it's not (u32)*(something)(lbl_XXX)
-                if not re.search(rf'\(\s*u32\s*\)\s*\*', line):
+
+            # Address-of usage only matters for non-SDA labels.
+            # For SDA labels (0x8047xxxx), (u32)lbl_XXX is just a
+            # value widening cast, not "take address of array".
+            # For rodata/data labels (0x8027, 0x8037, 0x8039), it IS
+            # an address reference.
+            if not is_sda_address(label):
+                # (u32)lbl_XXX (taking the address as a value)
+                if re.search(rf'\(\s*u32\s*\)\s*{le}(?!\s*[\[\(])', line):
+                    if not re.search(rf'\(\s*u32\s*\)\s*\*', line):
+                        array_labels.add(label)
+                # (void*)(u32)lbl_XXX pattern
+                if re.search(rf'\(\s*void\s*\*\s*\)\s*\(\s*u32\s*\)\s*{le}', line):
                     array_labels.add(label)
-            # (void*)(u32)lbl_XXX pattern
-            if re.search(rf'\(\s*void\s*\*\s*\)\s*\(\s*u32\s*\)\s*{le}', line):
-                array_labels.add(label)
 
     return array_labels
 

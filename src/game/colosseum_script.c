@@ -6235,7 +6235,7 @@ u32 fn_8022A6C8()
                               * 2 & 0x1fe));
           if (((-1 < sVar12) && (sVar13 = (int)fn_8012640C(uVar2,0,0x7f,sVar12), sVar13 != 0)) &&
              ((sVar13 != 0x165 && (sVar13 != 0x163)))) {
-            *(short *)(lbl_8047B60C) = sVar13;
+            lbl_8047B60C = sVar13;
             uVar7 = lbl_8047B618 & 0xfffffbff;
             lbl_8047B618 = uVar7;
             lbl_8047B618 = uVar7 | 0x200000;
@@ -22145,7 +22145,7 @@ void fn_80218D24(void)
     if (-1 < sVar10) {
       sVar7 = (int)fn_8012640C(uVar3,0,0x7f,sVar10);
       if (((sVar7 != 0) && (sVar7 != 0x165)) && (sVar7 != 0x163)) {
-        *(short *)(lbl_8047B60C) = sVar7;
+        lbl_8047B60C = sVar7;
         fn_8011BBD8(uVar4,0,0x26,0,(int)sVar10);
         lbl_8047B618 = lbl_8047B618 & 0xfffffbff;
         uVar2 = fn_8022B2CC(uVar2,lbl_8047B60C,uVar6,0,1,1, (void*)0xffffffff);
