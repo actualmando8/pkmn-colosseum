@@ -187,20 +187,46 @@ def full_fixup(code, func_name, source_text):
 
     # Fix computed function pointer calls - all variants
     # The Ghidra output produces: (**(void **)(expr))() which CW rejects
-    # We need: ((int (*)(void))**(void ***)(expr))() to make it callable and return int
+    # We need: ((int (*)(void))**(void ***)(expr))() to make it callable
+    # Handle nested parentheses properly
+    def fix_void_pp_call(code):
+        # Find all (**(void **)XXX)() patterns
+        result = code
+        while True:
+            m = re.search(r'\(\*\*\(void\s*\*\*\)', result)
+            if not m:
+                break
+            # From here, find the matching closing paren followed by ()
+            start = m.start()
+            cast_end = m.end()
+            # Now we need to find the matching ) for the outer (
+            # The outer ( is at start, we need to find its matching )
+            depth = 1  # We're inside the outer (
+            pos = cast_end
+            while pos < len(result) and depth > 0:
+                if result[pos] == '(':
+                    depth += 1
+                elif result[pos] == ')':
+                    depth -= 1
+                pos += 1
+            if depth != 0:
+                break
+            outer_close = pos - 1
+            # Check if followed by ()
+            rest = result[outer_close+1:].lstrip()
+            if rest.startswith('()'):
+                # Extract the expression between the cast and outer close
+                expr = result[cast_end:outer_close]
+                # Build replacement
+                call_end = outer_close + 1 + (len(result[outer_close+1:]) - len(rest)) + 2
+                replacement = f'((int (*)(void))**(void ***){expr})()'
+                result = result[:start] + replacement + result[call_end:]
+            else:
+                # Not a function call pattern, skip
+                break
+        return result
 
-    # Pattern 1: (**(void **)(expr))() -> ((int (*)(void))**(void ***)(expr))()
-    code = re.sub(
-        r'\(\*\*\(void\s*\*\*\)\(([^)]+)\)\)\s*\(\)',
-        lambda m: f'((int (*)(void))**(void ***)({m.group(1)}))()',
-        code
-    )
-    # Pattern 2: (**(void **)expr)() where expr includes complex sub-expressions
-    code = re.sub(
-        r'\(\*\*\(void\s*\*\*\)([^)]+)\)\s*\(\)',
-        lambda m: f'((int (*)(void))**(void ***)({m.group(1).strip()}))()',
-        code
-    )
+    code = fix_void_pp_call(code)
 
     # Fix void*/integer conversion issues for CW strict mode
     # Functions that return void* need casts when assigned to integer types
