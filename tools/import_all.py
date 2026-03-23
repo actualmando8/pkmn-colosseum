@@ -130,7 +130,16 @@ def full_fixup(code, func_name, source_text):
     for m in re.finditer(r'^extern\s+\w+\s+(lbl_[0-9a-fA-F]{8})', source_text, re.MULTILINE):
         all_known_lbls.add(m.group(1))
 
-    needs_fn_extern = sorted(called_fns - all_known_fns)
+    # Need extern for functions NOT at file scope, or functions defined AFTER this one
+    # in the file (since CW reads top-to-bottom)
+    # For simplicity, we ADD local externs for all called functions that have a known
+    # return type, UNLESS the function is an extern at file scope (already declared)
+    file_scope_externs = set()
+    if source_text:
+        for m2 in re.finditer(r'^extern\s+\w[\w\s\*]*\s+(fn_[0-9a-fA-F]{8})\s*\(', source_text, re.MULTILINE):
+            file_scope_externs.add(m2.group(1))
+
+    needs_fn_extern = sorted(called_fns - file_scope_externs - {func_name})
     needs_lbl_extern = sorted(lbl_refs - all_known_lbls)
 
     # Build a map of function return types from the source
