@@ -17068,20 +17068,35 @@ L_801228A8: ;
 u32 fn_801229F4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     return 0;
 }
-/* 0x70 | fn_80122A70 | generic */
-u32 fn_80122A70(void) {
-    fn_8012640C();
-    fn_8012640C();
-    return 0;
+/* 0x70 | fn_80122A70 | divide_two_fields */
+u32 fn_80122A70(void* ptr) {
+    extern u16 fn_8012640C();
+    u16 a, b;
+    if (ptr == NULL) { return 0; }
+    a = fn_8012640C(ptr, 0, 0x83, 0);
+    b = fn_8012640C(ptr, 0, 0x87, 0);
+    return (s32)((u16)a * 100) / (s32)(u16)b;
 }
-/* 0x70 | fn_80122AE0 | generic */
-u32 fn_80122AE0(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_8012640C();
+/* 0x70 | fn_80122AE0 | divide_with_min */
+u32 fn_80122AE0(void* ptr, u16 divisor) {
+    extern u16 fn_8012640C();
+    u16 a, result;
+    if (ptr == NULL) { return 0; }
+    if ((u16)divisor == 0) { return 0; }
+    a = fn_8012640C(ptr, 0, 0x83, 0);
+    result = (s32)(u16)a / (s32)(u16)divisor;
+    if ((u16)result != 0) { return result; }
     return 1;
 }
-/* 0x70 | fn_80122B50 | generic */
-u32 fn_80122B50(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_8012640C();
+/* 0x70 | fn_80122B50 | divide_with_min */
+u32 fn_80122B50(void* ptr, u16 divisor) {
+    extern u16 fn_8012640C();
+    u16 a, result;
+    if (ptr == NULL) { return 0; }
+    if ((u16)divisor == 0) { return 0; }
+    a = fn_8012640C(ptr, 0, 0x87, 0);
+    result = (s32)(u16)a / (s32)(u16)divisor;
+    if ((u16)result != 0) { return result; }
     return 1;
 }
 /* 0x80122BC0 | 0xA4 */
