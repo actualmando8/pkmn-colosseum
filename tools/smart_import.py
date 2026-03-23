@@ -129,12 +129,24 @@ def fix_c89_declarations(func_code: str) -> str:
     return '\n'.join(result)
 
 
-def fixup_function_smart(code: str, func_name: str, existing_fns: set) -> str:
+def collect_all_symbols(source_text: str) -> set:
+    """Collect all symbol names (fn_, lbl_, DAT_, etc.) referenced in source."""
+    symbols = set()
+    for m in re.finditer(r'\b(fn_[0-9a-fA-F]{8}|lbl_[0-9a-fA-F]{8}|DAT_[0-9a-fA-F]{8}|_DAT_[0-9a-fA-F]{8})\b', source_text):
+        symbols.add(m.group(1))
+    return symbols
+
+
+def fixup_function_smart(code: str, func_name: str, existing_fns: set,
+                         existing_all_syms: set = None,
+                         source_text: str = '') -> str:
     """
     Apply all C89 fixups and generate proper extern declarations.
     Only adds extern decls for functions not already declared in the source.
     Uses proper return types inferred from usage context.
     """
+    if existing_all_syms is None:
+        existing_all_syms = existing_fns
     # Step 1: Remove WARNING lines
     code = RE_WARNING_LINE.sub('', code)
 
@@ -249,7 +261,14 @@ def fixup_function_smart(code: str, func_name: str, existing_fns: set) -> str:
     lbl_refs = set(re.findall(r'\blbl_([0-9a-fA-F]{8})\b', code))
     for lbl_addr in sorted(lbl_refs):
         lbl_name = f'lbl_{lbl_addr}'
-        if lbl_name not in existing_fns:
+        # Check if declared at file scope (non-indented extern line)
+        # File-scope declarations would conflict if we re-declare with different type
+        has_file_scope_decl = bool(re.search(
+            rf'^extern\s+\w+\s+{re.escape(lbl_name)}\b',
+            source_text, re.MULTILINE
+        )) if source_text else False
+        if not has_file_scope_decl:
+            # Safe to add function-scoped extern declaration
             decls.append(f'    extern u8 {lbl_name}[];')
 
     # Non-SDA unaff register declarations

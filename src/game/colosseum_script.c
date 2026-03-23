@@ -6615,7 +6615,17 @@ tmp = (u32)ctx & 0xFF;
 #pragma optimization_level 4
 
 /* Address: 0x80222494 | Size: 0x3C | Pattern: simple_wrapper */
-u32 fn_80222494(void* ctx, u32 param) { return; /* stub */ }
+/* Address: 0x80222494 | Size: 0x3c | Ghidra import */
+void fn_80222494(void)
+
+{
+    extern u8 lbl_8047B62C[];
+
+  fn_80211B94(*(u32 *)(lbl_8047B62C),
+               *(u32 *)(*(int *)(lbl_8047B610) + 1),0);
+  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 5;
+  return;
+}
 
 /* Address: 0x802224D0 | Size: 0xC | Pattern: simple_setter */
 void fn_802224D0(u32 value) { /* stub */ }
@@ -6636,7 +6646,15 @@ u32 fn_80222500(void) { return; /* stub */ }
 u32 fn_80222510(void) { return; /* stub */ }
 
 /* Address: 0x80222520 | Size: 0x34 | Pattern: simple_wrapper */
-u32 fn_80222520(void* ctx, u32 param) { return; /* stub */ }
+/* Address: 0x80222520 | Size: 0x34 | Ghidra import */
+void fn_80222520(void)
+
+{
+
+  fn_801F000C(*(u16 *)(*(int *)(lbl_8047B610) + 1));
+  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 3;
+  return;
+}
 
 /* Address: 0x80222554 | Size: 0x30 | Pattern: simple_wrapper */
 u32 fn_80222554(void* ctx, u32 param) { return; /* stub */ }
@@ -9159,10 +9177,22 @@ void fn_80224740(void* ctx, u32 param1, u32 param2) {
 #pragma optimization_level 4
 
 /* Address: 0x802247D0 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802247D0(void* ctx, u32 param) { return 0; /* stub */ }
+/* Address: 0x802247D0 | Size: 0x28 | Ghidra import */
+void fn_802247D0(void)
+
+{
+  fn_802249B8(0,0);
+  return;
+}
 
 /* Address: 0x802247F8 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802247F8(void* ctx, u32 param) { return 0; /* stub */ }
+/* Address: 0x802247F8 | Size: 0x28 | Ghidra import */
+void fn_802247F8(void)
+
+{
+  fn_802249B8(1,0);
+  return;
+}
 
 /* Address: 0x80224820 | Size: 0x198 (408 bytes) */
 #pragma optimization_level 0
@@ -15018,7 +15048,13 @@ L_8022AF34:
 #pragma optimization_level 4
 
 /* Address: 0x8022B29C | Size: 0x30 | Pattern: simple_wrapper */
-u32 fn_8022B29C(void* ctx, u32 param) { return 0; /* stub */ }
+/* Address: 0x8022B29C | Size: 0x30 | Ghidra import */
+void fn_8022B29C(u32 r3)
+
+{
+  fn_801F2598(0,1,3,r3);
+  return;
+}
 
 /* Address: 0x8022B2CC | Size: 0x2FC (764 bytes) */
 #pragma optimization_level 0
@@ -17064,7 +17100,13 @@ void fn_8022DF08(void* ctx, u32 param1, u32 param2, u32 param3) {
 #pragma optimization_level 4
 
 /* Address: 0x8022E1C4 | Size: 0x34 | Pattern: simple_wrapper */
-u32 fn_8022E1C4(void* ctx, u32 param) { return 0; /* stub */ }
+/* Address: 0x8022E1C4 | Size: 0x34 | Ghidra import */
+void fn_8022E1C4(void)
+
+{
+  fn_801F37B0(0,0x8022e1f8,0,0);
+  return;
+}
 
 /* Address: 0x8022E1F8 | Size: 0x11C (284 bytes) */
 #pragma optimization_level 0
@@ -17157,7 +17199,16 @@ void fn_8022E1F8(void* ctx, u32 param1, u32 param2, u32 param3) {
 #pragma optimization_level 4
 
 /* Address: 0x8022E314 | Size: 0x38 | Pattern: simple_wrapper */
-u32 fn_8022E314(void* ctx, u32 param) { return 0; /* stub */ }
+/* Address: 0x8022E314 | Size: 0x38 | Ghidra import */
+void fn_8022E314(u8 r3)
+
+{
+  u8 local_8 [8];
+  
+  local_8[0] = r3;
+  fn_801F37B0(0,0x8022e34c,local_8,0);
+  return;
+}
 
 /* Address: 0x8022E34C | Size: 0xC4 (196 bytes) */
 #pragma optimization_level 0
