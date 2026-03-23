@@ -96,7 +96,7 @@ __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt) {
 
 void __OSInterruptInit(void) {
     InterruptHandlerTable = (__OSInterruptHandler*)0x80003040;
-    memset(InterruptHandlerTable, 0, 0x80);
+    memset(InterruptHandlerTable, 0, 32 * sizeof(__OSInterruptHandler));
 
     *(volatile u32*)0x800000C4 = 0;
     *(volatile u32*)0x800000C8 = 0;
@@ -107,46 +107,44 @@ void __OSInterruptInit(void) {
                             (__OSExceptionHandler)ExternalInterruptHandler);
 }
 
-u32 __OSMaskInterrupts(u32 mask) {
+u32 __OSMaskInterrupts(u32 global) {
     BOOL enabled;
     u32 prev;
     u32 local;
-    u32 global;
+    u32 mask;
 
     enabled = OSDisableInterrupts();
 
     prev  = *(volatile u32*)0x800000C4;
     local = *(volatile u32*)0x800000C8;
-    mask &= ~(prev | local);
-    prev |= mask;
-    *(volatile u32*)0x800000C4 = prev;
-    global = prev | local;
+    mask = ~(prev | local) & global;
+    global |= prev;
+    *(volatile u32*)0x800000C4 = global;
 
-    while (mask != 0) {
-        mask = __OSSetInterruptMask(mask, global);
+    while (mask) {
+        mask = __OSSetInterruptMask(mask, global | local);
     }
 
     OSRestoreInterrupts(enabled);
     return prev;
 }
 
-u32 __OSUnmaskInterrupts(u32 mask) {
+u32 __OSUnmaskInterrupts(u32 global) {
     BOOL enabled;
     u32 prev;
     u32 local;
-    u32 global;
+    u32 mask;
 
     enabled = OSDisableInterrupts();
 
     prev  = *(volatile u32*)0x800000C4;
     local = *(volatile u32*)0x800000C8;
-    mask &= (prev | local);
-    prev &= ~mask;
-    *(volatile u32*)0x800000C4 = prev;
-    global = prev | local;
+    mask = (prev | local) & global;
+    global = prev & ~global;
+    *(volatile u32*)0x800000C4 = global;
 
-    while (mask != 0) {
-        mask = __OSSetInterruptMask(mask, global);
+    while (mask) {
+        mask = __OSSetInterruptMask(mask, global | local);
     }
 
     OSRestoreInterrupts(enabled);
@@ -183,20 +181,8 @@ asm static void ExternalInterruptHandler(register u8 exception, register OSConte
 
 /* ===================================================================
  * Stub functions for coverage -- TODO: decompile
- * 2 function(s)
+ * 1 function(s)
  * =================================================================== */
-
-/* fn_8009DFA4 - 0x8009DFA4 | size: 0x14 */
-void fn_8009DFA4(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    tmp = (s16)r3;
-    r3 = *(u32*)InterruptHandlerTable_8047A710;
-    tmp = tmp << 2;
-    r3 = *(u32*)(r3 + tmp);
-    return;
-}
 
 /* fn_8009E414 - 0x8009E414 | size: 0x344 */
 void fn_8009E414(void) {
