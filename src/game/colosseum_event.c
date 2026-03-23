@@ -7695,54 +7695,25 @@ void fn_80209484(void* ctx, u32 param) {
 }
 
 /* 0x802094CC | size: 0x90 | medium */
-void fn_802094CC(void) {
-    extern void fn_800F0308();
-    extern void fn_8011BEB4();
-    extern void fn_801DA8C4();
-    extern void fn_801DA94C();
-    extern void fn_801DA9E8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_802094CC(u32 param_1, u32 param_2, u32 param_3, s8 param_4) {
+    extern void fn_800F0308(void);
+    extern u16 fn_8011BEB4(void*, u32, u16, u32);
+    extern void fn_801DA8C4(u32, u16, u32);
+    extern s8 fn_801DA94C(u32, u16, u32);
+    extern void fn_801DA9E8(u32, u16, u32);
+    u16 uVar1;
+    s8 cVar2;
 
-    r28 = r3;
-    r29 = r5;
-    r30 = r6;
-    r3 = 0x0;
-    r5 = 0x1f;
-    r6 = 0x0;
-    fn_8011BEB4();
-    r31 = r3;
-    r3 = r28;
-    r5 = r29;
-    r4 = r31 & 0xFFFF;
-    fn_801DA9E8();
-    r0 = r30 & 0xFF;
-    if ((u32)r0 != (u32)0x1) return;
-    L_80209518: ;
-    r3 = r28;
-    r5 = r29;
-    r4 = r31 & 0xFFFF;
-    fn_801DA94C();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) {
-        fn_800F0308();
-        goto L_80209518;
+    uVar1 = fn_8011BEB4(NULL, param_2, 0x1F, 0);
+    fn_801DA9E8(param_1, uVar1, param_3);
+    if (param_4 == 1) {
+        while (1) {
+            cVar2 = fn_801DA94C(param_1, uVar1, param_3);
+            if (cVar2 == 0) break;
+            fn_800F0308();
+        }
+        fn_801DA8C4(param_1, uVar1, param_3);
     }
-    r3 = r28;
-    r5 = r29;
-    r4 = r31 & 0xFFFF;
-    fn_801DA8C4();
-
-    return;
 }
 
 /* 0x8020955C | size: 0xBC | medium */
@@ -7936,32 +7907,15 @@ void fn_802096E8(void) {
 }
 
 /* 0x802097C8 | size: 0x54 | small */
-void fn_802097C8(void) {
-    extern void fn_80119ED0();
-    extern void fn_8011B2C0();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_802097C8(u32 param_1, u32 param_2, u32 param_3) {
+    extern s16 fn_80119ED0(u32);
+    extern void fn_8011B2C0(u32, u32, u32);
+    s16 sVar1;
 
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    r3 = r30;
-    fn_80119ED0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 == (u32)0x2a) {
-        r3 = r29;
-        r4 = r30;
-        r5 = r31;
-        fn_8011B2C0();
+    sVar1 = fn_80119ED0(param_2);
+    if (sVar1 == 0x2A) {
+        fn_8011B2C0(param_1, param_2, param_3);
     }
-    return;
 }
 
 /* 0x8020981C | size: 0x54 | small */
