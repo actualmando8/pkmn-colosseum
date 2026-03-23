@@ -1,72 +1,36 @@
 {
   "default": {
-    "compiler": "GC/1.2.5n",
+    "compiler": "GC/1.3",
     "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off"
   },
   "overrides": {
-    "src/crt/mem.c": {
-      "compiler": "GC/1.3",
-      "comment": "memset, __fill_mem, memcpy confirmed 100% match with CW 1.3 (bctrl pattern)"
-    },
-    "src/crt/exit.c": {
-      "compiler": "GC/1.3",
-      "comment": "exit confirmed 100% match with CW 1.3"
-    },
-    "src/crt/global_destructor_chain.c": {
-      "compiler": "GC/1.3",
-      "comment": "Uses bctrl for indirect calls (CW 1.3 pattern)"
-    },
-    "src/crt/__va_arg.c": {
-      "compiler": "GC/1.3",
-      "comment": "CRT module compiled with CW 1.3"
-    },
-    "src/crt/printf.c": {
-      "compiler": "GC/1.3",
-      "comment": "CRT module compiled with CW 1.3"
-    },
-    "src/crt/stdio.c": {
-      "compiler": "GC/1.3",
-      "comment": "CRT module compiled with CW 1.3"
-    },
-    "src/crt/wchar.c": {
-      "compiler": "GC/1.3",
-      "comment": "CRT module compiled with CW 1.3"
-    },
     "src/crt/string.c": {
       "compiler": "GC/1.2.5n",
-      "comment": "String functions use CW 1.2.5n (blrl pattern, same as game code)"
+      "comment": "String functions use CW 1.2.5n (blrl pattern, not bctrl)"
     },
     "src/crt/__init_cpp_exceptions.c": {
       "compiler": "GC/1.2.5n",
       "comment": "C++ exception init uses CW 1.2.5n"
     },
-    "src/game/colosseum_battle.c": {
-      "compiler": "GC/1.3",
-      "comment": "Game code compiled with CW 1.3 - confirmed by fn_8025297C, fn_80251158 100% match"
+    "src/dolphin/os/OSContext.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     },
-    "src/game/gs_render.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 better: avg 86.3% vs 78.6%, fn_800D9BD0 56.5%->100%, fn_800D5E34 15.2%->17.8%"
+    "src/dolphin/os/OSAlarm.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     },
-    "src/game/gs_field_world.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 better: avg 54.5% vs 49.2%, 4/6 sampled functions improved (fn_801294C4 18.2%->35.0%)"
+    "src/dolphin/os/OSCache.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     },
-    "src/game/gs_model.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 better: avg 57.8% vs 56.7%, fn_80102568 15.8%->19.6%, fn_80105E7C 7.4%->11.9%"
+    "src/dolphin/os/OSInterrupt.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     },
-    "src/game/gs_thread.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 better: avg 73.0% vs 72.4%, fn_800FBD88 22.7%->26.5%"
-    },
-    "src/game/battle/battle_waza.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 better: avg 67.1% vs 50.9%, fn_801DA224 2.5%->100% match"
-    },
-    "src/game/ui/ui_core.c": {
-      "compiler": "GC/1.3",
-      "comment": "CW 1.3 marginally better: avg 69.4% vs 69.2%, fn_800693A4 7.2%->7.9%"
+    "src/dolphin/os/OSMemory.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     }
   }
 }

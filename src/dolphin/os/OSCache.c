@@ -154,57 +154,36 @@ _loop_lcd:
 #pragma pop
 
 void L2GlobalInvalidate(void) {
-    u32 l2cr;
-
     asm { sync }
-    l2cr = PPCMfl2cr();
-    l2cr &= 0x7FFFFFFF;   /* Disable L2 */
-    PPCMtl2cr(l2cr);
+    PPCMtl2cr(PPCMfl2cr() & 0x7FFFFFFF);
     asm { sync }
 
-    /* Start L2 global invalidate */
-    l2cr = PPCMfl2cr();
-    l2cr |= 0x00200000;   /* Set L2I bit */
-    PPCMtl2cr(l2cr);
+    PPCMtl2cr(PPCMfl2cr() | 0x00200000);
 
-    /* Wait for invalidate to complete */
-    while (PPCMfl2cr() & 0x1) {
+    while (PPCMfl2cr() & 0x00000001u)
         ;
-    }
 
-    /* Clear L2I bit */
-    l2cr = PPCMfl2cr();
-    l2cr &= ~0x00200000;
-    PPCMtl2cr(l2cr);
+    PPCMtl2cr(PPCMfl2cr() & ~0x00200000);
 
-    /* Wait again for any remaining operations */
-    while (PPCMfl2cr() & 0x1) {
-        DBPrintf("L2 invalidate not yet complete\n");
+    while (PPCMfl2cr() & 0x00000001u) {
+        DBPrintf(">>> L2 INVALIDATE : SHOULD NEVER HAPPEN\n");
     }
 }
 
-void DMAErrorHandler(u16 error, ...) {
+void DMAErrorHandler(u16 error, OSContext* context, ...) {
     u32 hid2;
-    OSContext* context;
-
-    /* Get context from stack / varargs */
-    /* This is a varargs handler called from the OS error dispatch */
-    context = (OSContext*)((u32*)&error)[1];
 
     hid2 = PPCMfhid2();
 
     OSReport("Machine check received\n");
     OSReport("HID2 = 0x%08x   SRR1 = 0x%08x\n", hid2, context->srr1);
 
-    /* Check if it's a real error or a recoverable write-gather pipe issue */
     if (!(hid2 & 0x00F00000) || !(context->srr1 & 0x00200000)) {
-        /* Fatal error */
         OSReport("Unrecoverable DMA error\n");
         OSDumpContext(context);
         PPCHalt();
     }
 
-    /* Recoverable: report which errors occurred */
     OSReport("DMA error handler: recovering\n");
     OSReport("Resetting write gather pipe\n");
 
@@ -221,7 +200,6 @@ void DMAErrorHandler(u16 error, ...) {
         OSReport("  Write gather pipe error\n");
     }
 
-    /* Clear the error bits and write back */
     PPCMthid2(hid2);
 }
 
@@ -276,9 +254,9 @@ void __OSCacheInit(void) {
         }
     }
 
-    /* Install DMA error handler */
-    OSSetErrorHandler(OS_ERROR_MACHINE_CHECK, (OSErrorHandler)DMAErrorHandler);
-    DBPrintf("DMA error handler installed\n");
+    /* Install DMA error handler (error type 1 = machine check) */
+    OSSetErrorHandler(1, (OSErrorHandler)DMAErrorHandler);
+    DBPrintf("Locked cache machine check handler installed\n");
 }
 
 /* ===================================================================
@@ -442,11 +420,11 @@ _loop_lce_zero:
 /*
  * LCEnableNoInterrupts - Enable locked cache with interrupts disabled.
  *
- * Wraps LCEnable with interrupt disable/restore to ensure atomic setup.
+ * Wraps __LCEnable (exported as LCEnable in asm) with interrupt disable/restore.
  *
  * 0x8009B4D8 | size: 0x38
  */
-void fn_8009B4D8(void) {
+void LCEnableNoInterrupts(void) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -508,15 +486,21 @@ u32 LCLoadBlocks(void* destAddr, void* srcAddr, u32 nBytes) {
     return fullTransfers;
 }
 
-/* fn_8009B608 - 0x8009B608 | size: 0xC */
-void fn_8009B608(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r4 = 0; /* mfspr HID2 */;
-    /* extrwi r3, r4, 4, 4 */;
-    return;
+/*
+ * LCQueueLength - Get the current locked cache DMA queue length.
+ *
+ * 0x8009B608 | size: 0xC
+ */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm u32 LCQueueLength(void) {
+    nofralloc
+    mfspr   r4, HID2
+    rlwinm  r3, r4, 8, 28, 31
+    blr
 }
+#pragma pop
 
 /*
  * LCQueueWait - Wait for the locked cache DMA queue to drain.
