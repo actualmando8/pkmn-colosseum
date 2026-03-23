@@ -633,7 +633,7 @@ s32 GScolsys2_BuildTransform(void* outMtx, u32 triIndex)
     fn_800A2D38();  /* push/init matrix state */
 
     /* Check if triangle is active (bit 0 of flags at +0x24) */
-    if (!(*(u16*)(entry + 0x24) & 1)) {
+    if ((*(u16*)(entry + 0x24) & 1) == 0) {
         return 1;
     }
 
@@ -694,7 +694,7 @@ s32 GScolsys2_BuildInverseTransform(void* outMtx, u32 triIndex)
 
     fn_800A2D38();  /* push matrix state */
 
-    if (!(*(u16*)(entry + 0x24) & 1)) {
+    if ((*(u16*)(entry + 0x24) & 1) == 0) {
         return 1;
     }
 
@@ -1243,7 +1243,7 @@ void* GScolsys2_Draw(void)
         GSColTriangle* tri = &triBase[i];
 
         /* Skip disabled triangles (flag bit 0 clear) */
-        if (!(tri->flags & 1)) {
+        if ((tri->flags & 1) == 0) {
             continue;
         }
 
@@ -1440,7 +1440,7 @@ void GScolsys2_DrawActive(void)
 
         /* Skip if WZX triangle is inactive (bit 0 clear) */
         triFlags = tri->flags;
-        if (!(triFlags & 1)) {
+        if ((triFlags & 1) == 0) {
             goto next;
         }
 

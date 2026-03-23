@@ -475,7 +475,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         }
 
                         /* Check if ORBIT flag is clear */
-                        if (!(pp->flags & PS_FLAG_ORBIT)) {
+                        if ((pp->flags & PS_FLAG_ORBIT) == 0) {
                             psUpdateVelocity(pp, &vx);
                         } else {
                             /* Parent-relative: scale velocity by parent's bounds */

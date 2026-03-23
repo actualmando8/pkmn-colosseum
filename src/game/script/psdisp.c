@@ -92,7 +92,7 @@ void psdisp_ExecAll(u32 linkMask) {
             next = pp->next;
 
             /* Check if particle is visible (not invisible flag) */
-            if (!(pp->flags & PS_FLAG_INVISIBLE)) {
+            if ((pp->flags & PS_FLAG_INVISIBLE) == 0) {
                 /* Check if particle has an object reference */
                 if (pp->flags & PS_FLAG_OBJ_REF) {
                     void* dispCallback;
@@ -358,7 +358,7 @@ void psdisp_UpdateDisplay(PSParticle* pp) {
         return;
     }
 
-    if (!(pp->flags & PS_FLAG_OBJ_REF)) {
+    if ((pp->flags & PS_FLAG_OBJ_REF) == 0) {
         return;
     }
 
@@ -940,7 +940,7 @@ void psdisp_RenderAll(u32 renderMask) {
         pp = pslist_GetHead(linkNo);
 
         while (pp != NULL) {
-            if (!(pp->flags & PS_FLAG_INVISIBLE)) {
+            if ((pp->flags & PS_FLAG_INVISIBLE) == 0) {
                 /* Check billboard mode */
                 if (pp->flags & PS_FLAG_BILLBOARD) {
                     /* Billboard rendering */
@@ -1191,7 +1191,7 @@ u32 psdisp_CountActive(void) {
         pp = pslist_GetHead(linkNo);
 
         while (pp != NULL) {
-            if (!(pp->flags & PS_FLAG_KILLED)) {
+            if ((pp->flags & PS_FLAG_KILLED) == 0) {
                 count++;
             }
             pp = pp->next;
