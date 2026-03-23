@@ -133,13 +133,23 @@ def full_fixup(code, func_name, source_text):
     needs_fn_extern = sorted(called_fns - all_known_fns)
     needs_lbl_extern = sorted(lbl_refs - all_known_lbls)
 
+    # Build a map of function return types from the source
+    fn_return_types = {}
+    if source_text:
+        for m2 in re.finditer(r'^(extern\s+)?(void\s*\*|void|int|u32|u8|u16|s32|s16|s8|short|float|double|long)\s+(fn_[0-9a-fA-F]{8})\s*\(', source_text, re.MULTILINE):
+            fn_return_types[m2.group(3)] = m2.group(2).strip()
+
     decls = []
     for sym in sorted(dat_syms):
         decls.append(f'    extern u32 {sym};')
     for sym in sorted(udat_syms):
         decls.append(f'    extern u32 {sym};')
     for fn in needs_fn_extern:
-        ret_type = _infer_return_type(code, fn)
+        # Use the actual return type from the source if available
+        if fn in fn_return_types:
+            ret_type = fn_return_types[fn]
+        else:
+            ret_type = _infer_return_type(code, fn)
         decls.append(f'    extern {ret_type} {fn}();')
     for lbl in needs_lbl_extern:
         decls.append(f'    extern u8 {lbl}[];')
@@ -205,6 +215,31 @@ def full_fixup(code, func_name, source_text):
     code = re.sub(r',\s*0xffffffff\s*\)', ', (void*)0xffffffff)', code)
 
     code = re.sub(r'\n{3,}', '\n\n', code)
+
+    # Convert function params to () with local variable declarations
+    # This prevents "redeclared" and "does not match" errors
+    fn_sig_match = re.match(r'^(\w[\w\s\*]*\s+fn_[0-9a-fA-F]{8})\s*\(([^)]+)\)(\s*\n\n?\{)', code)
+    if fn_sig_match:
+        params = fn_sig_match.group(2).strip()
+        if params != 'void' and params != '':
+            ret_type_name = fn_sig_match.group(1)
+            brace = fn_sig_match.group(3)
+            # Parse params
+            param_parts = [p.strip() for p in params.split(',')]
+            local_decls = []
+            for p in param_parts:
+                parts = p.rsplit(None, 1)
+                if len(parts) == 2:
+                    local_decls.append(f'    {parts[0]} {parts[1]};')
+
+            new_sig = f'{ret_type_name}(){brace}'
+            if local_decls:
+                brace_pos = new_sig.rfind('{')
+                decl_str = '\n'.join(local_decls) + '\n'
+                new_sig = new_sig[:brace_pos+1] + '\n' + decl_str + new_sig[brace_pos+1:]
+
+            code = new_sig + code[fn_sig_match.end():]
+
     return code
 
 
@@ -307,7 +342,6 @@ def phase1_fix_declarations(source):
         source, flags=re.MULTILINE
     )
     # Remove forward declarations for functions in our range (they conflict with Ghidra signatures)
-    # Keep the /* Forward declarations */ comment but remove the actual declarations
     lines = source.split('\n')
     new_lines = []
     in_forward_section = False
@@ -318,9 +352,7 @@ def phase1_fix_declarations(source):
             new_lines.append(line)
             continue
         if in_forward_section:
-            # Check if this is a forward declaration (non-extern, with ;)
             if re.match(r'^(?:void|u32|int|s32|u8|u16|s16|s8|short|float|double|long)\s+fn_[0-9a-fA-F]{8}\s*\(', stripped):
-                # Skip this forward declaration
                 continue
             elif stripped == '' or stripped.startswith('/*'):
                 new_lines.append(line)
@@ -330,6 +362,44 @@ def phase1_fix_declarations(source):
         else:
             new_lines.append(line)
     source = '\n'.join(new_lines)
+
+    # Change ALL function definitions in our range to () params with local var decls
+    # This prevents "does not match" and "redeclared" errors
+    fn_def_pattern = re.compile(
+        r'^((?:void|u32|int|s32|u8|u16|s16|s8|short|float|double|long)\s+(fn_[0-9a-fA-F]{8}))\s*\(([^)]+)\)(\s*\n\n?\{)',
+        re.MULTILINE
+    )
+    for m in reversed(list(fn_def_pattern.finditer(source))):
+        fn_name = m.group(2)
+        params = m.group(3).strip()
+        addr = int(fn_name[3:], 16)
+        if not (ADDR_MIN <= addr < ADDR_MAX):
+            continue
+        if params == 'void' or params == '':
+            continue
+
+        # Parse params and create local var declarations
+        param_parts = [p.strip() for p in params.split(',')]
+        local_decls = []
+        for p in param_parts:
+            # Handle 'type name' format
+            parts = p.rsplit(None, 1)
+            if len(parts) == 2:
+                ptype, pname = parts
+                local_decls.append(f'    {ptype} {pname};')
+
+        # Replace params with () and add local var declarations
+        ret_type_name = m.group(1)
+        brace_part = m.group(4)
+        new_sig = f'{ret_type_name}(){brace_part}'
+        if local_decls:
+            # Insert declarations right after the opening brace
+            brace_idx = new_sig.rfind('{')
+            decl_str = '\n'.join(local_decls) + '\n'
+            new_sig = new_sig[:brace_idx+1] + '\n' + decl_str + new_sig[brace_idx+1:]
+
+        source = source[:m.start()] + new_sig + source[m.end():]
+
     return source
 
 
