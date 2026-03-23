@@ -618,56 +618,28 @@ DVDDiskID* DVDGetCurrentDiskID(void) {
 }
 
 /*
- * __DVDPushWaitingQueue - 0x800A6028 | size: 0x74
- * Push a command block onto the waiting queue at the given priority.
+ * fn_800A6028 - 0x800A6028 | size: 0x74
+ * DVD state machine callback (timeout / error recovery)
+ * TODO: Full decompilation
  */
-BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
-    /* Link block into the priority-sorted waiting list */
-    block->state = 2; /* STATE_WAITING */
-    return TRUE;
-}
 
 /*
- * __DVDPopWaitingQueue - 0x800A609C | size: 0x38
- * Pop the highest-priority command block from the waiting queue.
+ * fn_800A609C - 0x800A609C | size: 0x38
+ * DVD state machine callback - reads disk ID after cover close
+ * TODO: Full decompilation
  */
-DVDCommandBlock* __DVDPopWaitingQueue(void) {
-    /* Remove and return the head of the waiting queue */
-    return NULL;
-}
 
 /*
- * __DVDCheckWaitingQueue - 0x800A60D4 | size: 0x114
- * Check if there are commands in the waiting queue that can execute.
- * If the DVD is idle and there are waiting commands, start processing.
+ * fn_800A60D4 - 0x800A60D4 | size: 0x114
+ * DVD state machine callback (FST reading state)
+ * TODO: Full decompilation
  */
-BOOL __DVDCheckWaitingQueue(void) {
-    BOOL enabled;
-
-    enabled = OSDisableInterrupts();
-
-    if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        DVDCommandBlock* block = __DVDPopWaitingQueue();
-        if (block != NULL) {
-            executing_8047A7E8 = block;
-            stateBusy(block);
-            OSRestoreInterrupts(enabled);
-            return TRUE;
-        }
-    }
-
-    OSRestoreInterrupts(enabled);
-    return FALSE;
-}
 
 /*
- * __DVDClearWaitingQueue - 0x800A61E8 | size: 0xE4
- * Clear all commands from the waiting queue.
- * Called during DVD init and reset.
+ * fn_800A61E8 - 0x800A61E8 | size: 0xE4
+ * DVD state machine callback (cover closed command)
+ * TODO: Full decompilation
  */
-void __DVDClearWaitingQueue(void) {
-    /* Clear the waiting queue by unlinking all entries */
-}
 
 /*
  * DVDPause - 0x800A62CC | size: 0xFC
