@@ -82,7 +82,12 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         rf'\*\s*\*\s*\(\s*u8\s*\*\s*\*\s*\)\s*(?:\(\s*u32\s*\)\s*)?\(\s*{le}\s*\)',
         f'*(u8*){label}', out)
 
-    # *(u8 **)(u32)(lbl_XXX) -> (u8*)lbl_XXX
+    # Store: *(u8 **)(u32)(lbl_XXX) = value -> lbl_XXX = (u32)value
+    out = re.sub(
+        rf'\*\s*\(\s*u8\s*\*\s*\*\s*\)\s*\(\s*u32\s*\)\s*\(\s*{le}\s*\)\s*=\s*',
+        f'{label} = (u32)', out)
+
+    # Read: *(u8 **)(u32)(lbl_XXX) -> (u8*)lbl_XXX
     out = re.sub(
         rf'\*\s*\(\s*u8\s*\*\s*\*\s*\)\s*\(\s*u32\s*\)\s*\(\s*{le}\s*\)',
         f'(u8*){label}', out)
@@ -112,78 +117,70 @@ def apply_line_fixes(line: str, label: str, new_type: str) -> str:
         rf'\*\s*\(\s*double\s*\*\s*\)\s*{le}(?!\w)',
         label, out)
 
-    # --- u32 dereferences ---
+    # --- Type-matched dereferences ---
+    # Only remove deref patterns that match the label's actual type.
+    # Cross-type derefs (e.g., *(u8*)u32_global) are legitimate pointer ops.
 
-    # *(u32 *)(lbl_XXX) -> lbl_XXX   and   *(u32*)lbl_XXX -> lbl_XXX
-    out = re.sub(
-        rf'\*\s*\(\s*u32\s*\*\s*\)\s*\(\s*{le}\s*\)',
-        label, out)
-    out = re.sub(
-        rf'\*\s*\(\s*u32\s*\*\s*\)\s*{le}(?!\w)',
-        label, out)
+    if new_type == 'u32':
+        # *(u32 *)(lbl_XXX) -> lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*u32\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            label, out)
+        out = re.sub(
+            rf'\*\s*\(\s*u32\s*\*\s*\)\s*{le}(?!\w)',
+            label, out)
 
-    # --- int dereferences ---
-    # For reads:  *(int *)(lbl_XXX) in comparisons -> (int)lbl_XXX
-    # For stores: *(int *)(lbl_XXX) = val -> lbl_XXX = val (just remove deref)
+        # *(int *) store: *(int *)(lbl_XXX) = val -> lbl_XXX = val
+        out = re.sub(
+            rf'\*\s*\(\s*int\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
+            f'{label} =', out)
+        out = re.sub(
+            rf'\*\s*\(\s*int\s*\*\s*\)\s*{le}(?!\w)\s*=',
+            f'{label} =', out)
+        # *(int *) read: *(int *)(lbl_XXX) -> (int)lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*int\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            f'(int){label}', out)
+        out = re.sub(
+            rf'\*\s*\(\s*int\s*\*\s*\)\s*{le}(?!\w)',
+            f'(int){label}', out)
 
-    # Store pattern: *(int *)(lbl_XXX) = ...  -> lbl_XXX = ...
-    out = re.sub(
-        rf'\*\s*\(\s*int\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
-        f'{label} =', out)
-    out = re.sub(
-        rf'\*\s*\(\s*int\s*\*\s*\)\s*{le}(?!\w)\s*=',
-        f'{label} =', out)
+    elif new_type == 'u16':
+        # *(u16 *)(lbl_XXX) -> lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*u16\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            label, out)
+        out = re.sub(
+            rf'\*\s*\(\s*u16\s*\*\s*\)\s*{le}(?!\w)',
+            label, out)
 
-    # Read pattern: *(int *)(lbl_XXX) -> (int)lbl_XXX
-    out = re.sub(
-        rf'\*\s*\(\s*int\s*\*\s*\)\s*\(\s*{le}\s*\)',
-        f'(int){label}', out)
-    out = re.sub(
-        rf'\*\s*\(\s*int\s*\*\s*\)\s*{le}(?!\w)',
-        f'(int){label}', out)
+    elif new_type == 'u8':
+        # Store: *(u8 *)(lbl_XXX) = val -> lbl_XXX = val
+        out = re.sub(
+            rf'\*\s*\(\s*u8\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
+            f'{label} =', out)
+        out = re.sub(
+            rf'\*\s*\(\s*u8\s*\*\s*\)\s*{le}(?!\w)\s*=',
+            f'{label} =', out)
+        # Read: *(u8 *)(lbl_XXX) -> lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*u8\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            label, out)
+        out = re.sub(
+            rf'\*\s*\(\s*u8\s*\*\s*\)\s*{le}(?!\w)',
+            label, out)
 
-    # --- u16 dereferences ---
-
-    # *(u16 *)(lbl_XXX) -> lbl_XXX
-    out = re.sub(
-        rf'\*\s*\(\s*u16\s*\*\s*\)\s*\(\s*{le}\s*\)',
-        label, out)
-    out = re.sub(
-        rf'\*\s*\(\s*u16\s*\*\s*\)\s*{le}(?!\w)',
-        label, out)
-
-    # --- u8 dereferences ---
-
-    # Store: *(u8 *)(lbl_XXX) = val -> lbl_XXX = val
-    out = re.sub(
-        rf'\*\s*\(\s*u8\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
-        f'{label} =', out)
-    out = re.sub(
-        rf'\*\s*\(\s*u8\s*\*\s*\)\s*{le}(?!\w)\s*=',
-        f'{label} =', out)
-
-    # Read: *(u8 *)(lbl_XXX) -> lbl_XXX
-    out = re.sub(
-        rf'\*\s*\(\s*u8\s*\*\s*\)\s*\(\s*{le}\s*\)',
-        label, out)
-    out = re.sub(
-        rf'\*\s*\(\s*u8\s*\*\s*\)\s*{le}(?!\w)',
-        label, out)
-
-    # --- char dereferences ---
-
-    # Store: *(char *)(lbl_XXX) = val -> lbl_XXX = val
-    out = re.sub(
-        rf'\*\s*\(\s*char\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
-        f'{label} =', out)
-
-    # Read: *(char *)(lbl_XXX) -> (char)lbl_XXX
-    out = re.sub(
-        rf'\*\s*\(\s*char\s*\*\s*\)\s*\(\s*{le}\s*\)',
-        f'(char){label}', out)
-    out = re.sub(
-        rf'\*\s*\(\s*char\s*\*\s*\)\s*{le}(?!\w)',
-        f'(char){label}', out)
+        # *(char *) store: -> lbl_XXX = val
+        out = re.sub(
+            rf'\*\s*\(\s*char\s*\*\s*\)\s*\(\s*{le}\s*\)\s*=',
+            f'{label} =', out)
+        # *(char *) read: -> (char)lbl_XXX
+        out = re.sub(
+            rf'\*\s*\(\s*char\s*\*\s*\)\s*\(\s*{le}\s*\)',
+            f'(char){label}', out)
+        out = re.sub(
+            rf'\*\s*\(\s*char\s*\*\s*\)\s*{le}(?!\w)',
+            f'(char){label}', out)
 
     return out
 
