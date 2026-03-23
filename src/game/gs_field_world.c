@@ -12827,7 +12827,7 @@ void fn_8011D504(u8* ptr, u8 val) {
     } else {
         idx = *(u16*)(ptr + 0x0);
     }
-    if ((u16)idx >= *(u32*)lbl_80478F90) {
+    if ((u16)idx >= lbl_80478F90) {
         entry = NULL;
     } else {
         entry = (u8*)lbl_80478F94 + (u32)(u16)idx * 0x11C;
@@ -13605,7 +13605,7 @@ u8 fn_8011E868(u8* ptr) {
     } else {
         idx = *(u16*)(ptr + 0x0);
     }
-    if ((u16)idx >= *(u32*)lbl_80478F90) {
+    if ((u16)idx >= lbl_80478F90) {
         entry = NULL;
     } else {
         entry = (u8*)lbl_80478F94 + (u32)(u16)idx * 0x11C;

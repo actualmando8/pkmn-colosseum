@@ -434,6 +434,40 @@ def fix_file(filepath: str, dry_run: bool = False) -> int:
                         lines[i] = new_line
                     total_fixes += 1
 
+    # Second pass: fix dereference patterns on labels that are ALREADY
+    # declared with the correct scalar type (either at file level or
+    # in function bodies from a previous run). These have declarations
+    # like `extern u32 lbl_XXX;` but still use `*(u32*)lbl_XXX`.
+    typed_decl_pattern = re.compile(
+        r'extern\s+(u32|u16|u8|s32|s16|s8|int|f32|f64|float|double)\s+'
+        r'(lbl_[0-9A-Fa-f]+)\s*;')
+    typed_labels = {}  # label -> type
+    for line in lines:
+        m = typed_decl_pattern.search(line)
+        if m:
+            declared_type = m.group(1)
+            label = m.group(2)
+            if is_sda_address(label) and label not in global_array_labels:
+                typed_labels[label] = declared_type
+
+    for label, declared_type in typed_labels.items():
+        for i in range(len(lines)):
+            if label not in lines[i]:
+                continue
+            if re.match(r'\s*extern\s+', lines[i]):
+                continue
+
+            old_line = lines[i]
+            new_line = apply_line_fixes(old_line, label, declared_type)
+
+            if new_line != old_line:
+                if dry_run:
+                    print(f"  L{i + 1}: {old_line.strip()}")
+                    print(f"     -> {new_line.strip()}")
+                else:
+                    lines[i] = new_line
+                total_fixes += 1
+
     if not dry_run and total_fixes > 0:
         path.write_text('\n'.join(lines), encoding='utf-8')
 

@@ -303,7 +303,7 @@ extern u32 lbl_80478E98; /* waza context pointer */
 extern u32 lbl_80478E9C; /* waza entry array pointer */
 u32 fn_801D1A44(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
@@ -318,7 +318,7 @@ u32 fn_801D1A44(s32 idx) {
  */
 u32 fn_801D1A88(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
@@ -333,7 +333,7 @@ u32 fn_801D1A88(s32 idx) {
  */
 u32 fn_801D1ACC(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= *(u32*)lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);

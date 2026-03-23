@@ -36471,7 +36471,7 @@ u32 fn_8025DBD4(u32 idx) {
 
     u32 count;
     u32* table;
-    count = *(u32*)lbl_80478E08;
+    count = lbl_80478E08;
     if (idx >= count) {
     fn_800DD970(lbl_8027A450, lbl_8039A690);
     return 0;

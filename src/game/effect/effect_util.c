@@ -883,7 +883,7 @@ void fn_801324CC(void* obj) {
     if (*(u8*)((u8*)obj + 0x1) != 0) {
         stream = *(u8**)((u8*)obj + 0x30);
         idx = *stream;
-        maxIdx = *(u32*)(lbl_80478E88);
+        maxIdx = lbl_80478E88;
         if (idx >= maxIdx) {
             idx = 0;
         }
