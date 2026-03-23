@@ -83,19 +83,19 @@ extern u8 _stack_addr[];
 #define OS_CURRENT_FPU_CONTEXT  (*(OSContext* volatile*)0x800000D8)
 #define OS_CURRENT_THREAD       (*(OSThread* volatile*)0x800000E4)
 
-/* Global active thread queue at low memory */
-static OSThreadQueue* ActiveThreadQueue = (OSThreadQueue*)0x800000DC;
+/* Global active thread queue at low memory (0x800000DC) */
+static OSThreadQueue* __OSActiveThreadQueue = (OSThreadQueue*)0x800000DC;
 
-/* .bss */
-static OSThreadQueue RunQueue[32];
+/* .bss - names match assembly symbol table */
+static OSThreadQueue RunQueue_803FB898[32];
 static OSThread IdleThread;
 static OSThread DefaultThread;
 static OSContext IdleContext;
-static volatile u32 RunQueueBits;
-static volatile int RunQueueHint;
-static s32 Reschedule;
+static volatile u32 RunQueueBits_8047A760;
+static volatile int RunQueueHint_8047A764;
+static s32 Reschedule_8047A768;
 
-static OSSwitchThreadCallback SwitchThreadCallback;
+static OSSwitchThreadCallback SwitchThreadCallback_804789A8;
 
 /* Forward declarations */
 void OSInitThreadQueue(OSThreadQueue* queue);
@@ -129,19 +129,23 @@ void __OSThreadInit(void) {
     thread->stackBase = (u32*)_stack_addr;
     thread->stackEnd = (u32*)_stack_end;
     *(u32*)thread->stackEnd = 0xDEADBABE;
+
+    SwitchThreadCallback_804789A8(OS_CURRENT_THREAD, thread);
     OS_CURRENT_THREAD = thread;
-    RunQueueBits = 0;
-    RunQueueHint = 0;
+    OSClearStack(0);
+
+    RunQueueBits_8047A760 = 0;
+    RunQueueHint_8047A764 = 0;
 
     for (prio = 0; prio <= 31; prio++) {
-        OSInitThreadQueue(&RunQueue[prio]);
+        OSInitThreadQueue(&RunQueue_803FB898[prio]);
     }
-    OSInitThreadQueue(ActiveThreadQueue);
+    OSInitThreadQueue(__OSActiveThreadQueue);
 
-    ENQUEUE_THREAD(thread, ActiveThreadQueue, linkActive);
+    ENQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
 
     OSClearContext(&IdleContext);
-    Reschedule = 0;
+    Reschedule_8047A768 = 0;
 }
 
 void OSInitThreadQueue(OSThreadQueue* queue) {
@@ -176,7 +180,7 @@ static int __OSIsThreadActive(OSThread* thread) {
         return 0;
     }
 
-    for (active = ActiveThreadQueue->head; active; active = active->linkActive.next) {
+    for (active = __OSActiveThreadQueue->head; active; active = active->linkActive.next) {
         if (thread == active) {
             return 1;
         }
@@ -189,8 +193,8 @@ s32 OSDisableScheduler(void) {
     s32 count;
 
     enabled = OSDisableInterrupts();
-    count = Reschedule;
-    Reschedule = count + 1;
+    count = Reschedule_8047A768;
+    Reschedule_8047A768 = count + 1;
     OSRestoreInterrupts(enabled);
     return count;
 }
@@ -200,17 +204,17 @@ s32 OSEnableScheduler(void) {
     s32 count;
 
     enabled = OSDisableInterrupts();
-    count = Reschedule;
-    Reschedule = count - 1;
+    count = Reschedule_8047A768;
+    Reschedule_8047A768 = count - 1;
     OSRestoreInterrupts(enabled);
     return count;
 }
 
 static void SetRun(OSThread* thread) {
-    thread->queue = &RunQueue[thread->priority];
+    thread->queue = &RunQueue_803FB898[thread->priority];
     ENQUEUE_THREAD(thread, thread->queue, link);
-    RunQueueBits |= 1 << (31 - thread->priority);
-    RunQueueHint = 1;
+    RunQueueBits_8047A760 |= 1 << (31 - thread->priority);
+    RunQueueHint_8047A764 = 1;
 }
 
 static void UnsetRun(OSThread* thread) {
@@ -220,7 +224,7 @@ static void UnsetRun(OSThread* thread) {
     DEQUEUE_THREAD(thread, queue, link);
 
     if (!queue->head) {
-        RunQueueBits &= ~(1 << (31 - thread->priority));
+        RunQueueBits_8047A760 &= ~(1 << (31 - thread->priority));
     }
     thread->queue = NULL;
 }
@@ -254,7 +258,7 @@ static OSThread* SetEffectivePriority(OSThread* thread, s32 priority) {
             }
             break;
         case 2:
-            RunQueueHint = 1;
+            RunQueueHint_8047A764 = 1;
             thread->priority = priority;
             break;
     }
@@ -298,7 +302,7 @@ static OSThread* SelectThread(int yield) {
     s32 priority;
     OSThreadQueue* queue;
 
-    if (Reschedule > 0) {
+    if (Reschedule_8047A768 > 0) {
         return NULL;
     }
 
@@ -312,7 +316,7 @@ static OSThread* SelectThread(int yield) {
     if (currentThread) {
         if (currentThread->state == 2) {
             if (yield == 0) {
-                priority = __cntlzw(RunQueueBits);
+                priority = __cntlzw(RunQueueBits_8047A760);
                 if (currentThread->priority <= priority) {
                     return NULL;
                 }
@@ -327,26 +331,26 @@ static OSThread* SelectThread(int yield) {
 
     OS_CURRENT_THREAD = NULL;
 
-    if (RunQueueBits == 0) {
+    if (RunQueueBits_8047A760 == 0) {
         OSSetCurrentContext(&IdleContext);
         do {
             OSEnableInterrupts();
-            while (RunQueueBits == 0) ;
+            while (RunQueueBits_8047A760 == 0) ;
             OSDisableInterrupts();
-        } while (RunQueueBits == 0);
+        } while (RunQueueBits_8047A760 == 0);
         OSClearContext(&IdleContext);
     }
 
-    RunQueueHint = 0;
-    priority = __cntlzw(RunQueueBits);
+    RunQueueHint_8047A764 = 0;
+    priority = __cntlzw(RunQueueBits_8047A760);
 
-    queue = &RunQueue[priority];
+    queue = &RunQueue_803FB898[priority];
     nextThread = queue->head;
 
     DEQUEUE_HEAD(nextThread, queue, link);
 
     if (!queue->head) {
-        RunQueueBits &= ~(1 << (31 - priority));
+        RunQueueBits_8047A760 &= ~(1 << (31 - priority));
     }
     nextThread->queue = NULL;
     nextThread->state = 2;
@@ -355,7 +359,7 @@ static OSThread* SelectThread(int yield) {
 }
 
 void __OSReschedule(void) {
-    if (RunQueueHint != 0) {
+    if (RunQueueHint_8047A764 != 0) {
         SelectThread(0);
     }
 }
@@ -398,7 +402,7 @@ BOOL OSCreateThread(OSThread* thread, void* (*func)(void*), void* param,
     *thread->stackEnd = 0xDEADBABE;
 
     enabled = OSDisableInterrupts();
-    ENQUEUE_THREAD(thread, ActiveThreadQueue, linkActive);
+    ENQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
     OSRestoreInterrupts(enabled);
     return TRUE;
 }
@@ -409,7 +413,7 @@ void OSExitThread(void* val) {
 
     OSClearContext(&currentThread->context);
     if (currentThread->attr & 1) {
-        DEQUEUE_THREAD(currentThread, ActiveThreadQueue, linkActive);
+        DEQUEUE_THREAD(currentThread, __OSActiveThreadQueue, linkActive);
         currentThread->state = 0;
     } else {
         currentThread->state = 8;
@@ -417,8 +421,8 @@ void OSExitThread(void* val) {
     }
     __OSUnlockAllMutex(currentThread);
     OSWakeupThread(&currentThread->queueJoin);
-    RunQueueHint = 1;
-    if (RunQueueHint != 0) {
+    RunQueueHint_8047A764 = 1;
+    if (RunQueueHint_8047A764 != 0) {
         SelectThread(0);
     }
     OSRestoreInterrupts(enabled);
@@ -434,7 +438,7 @@ void OSCancelThread(OSThread* thread) {
             }
             break;
         case 2:
-            RunQueueHint = 1;
+            RunQueueHint_8047A764 = 1;
             break;
         case 4:
             DEQUEUE_THREAD(thread, thread->queue, link);
@@ -449,7 +453,7 @@ void OSCancelThread(OSThread* thread) {
     }
     OSClearContext(&thread->context);
     if (thread->attr & 1) {
-        DEQUEUE_THREAD(thread, ActiveThreadQueue, linkActive);
+        DEQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
         thread->state = 0;
     } else {
         thread->state = 8;
@@ -474,7 +478,7 @@ BOOL OSJoinThread(OSThread* thread, void* val) {
         if (val) {
             *(s32*)val = (s32)thread->val;
         }
-        DEQUEUE_THREAD(thread, ActiveThreadQueue, linkActive);
+        DEQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
         thread->state = 0;
         OSRestoreInterrupts(enabled);
         return TRUE;
@@ -488,7 +492,7 @@ void OSDetachThread(OSThread* thread) {
 
     thread->attr |= 1;
     if (thread->state == 8) {
-        DEQUEUE_THREAD(thread, ActiveThreadQueue, linkActive);
+        DEQUEUE_THREAD(thread, __OSActiveThreadQueue, linkActive);
         thread->state = 0;
     }
     OSWakeupThread(&thread->queueJoin);
@@ -531,7 +535,7 @@ s32 OSSuspendThread(OSThread* thread) {
     if (suspendCount == 0) {
         switch (thread->state) {
             case 2:
-                RunQueueHint = 1;
+                RunQueueHint_8047A764 = 1;
                 thread->state = 1;
                 break;
             case 1:
@@ -559,7 +563,7 @@ void OSSleepThread(OSThreadQueue* queue) {
     currentThread->state = 4;
     currentThread->queue = queue;
     ENQUEUE_THREAD_PRIO(currentThread, queue, link);
-    RunQueueHint = 1;
+    RunQueueHint_8047A764 = 1;
     __OSReschedule();
     OSRestoreInterrupts(enabled);
 }
@@ -626,21 +630,21 @@ OSThread* OSGetIdleFunction(void) {
 
 void OSClearStack(u8 val) {
     u32 sp;
-    u32* stackEnd;
-    u32 pattern;
     u32* p;
+    u32 pattern;
+    u32 count;
 
     pattern = (val << 24) | (val << 16) | (val << 8) | val;
-    sp = (u32)&sp;
-    stackEnd = OS_CURRENT_THREAD->stackEnd;
-    stackEnd += 1;
+    sp = OSGetStackPointer();
+    p = OS_CURRENT_THREAD->stackEnd + 1;
 
-    if ((u32)stackEnd >= sp) {
+    if ((u32)p >= sp) {
         return;
     }
 
-    p = stackEnd;
-    while ((u32)p < sp) {
+    count = (sp - (u32)p + 3) / 4;
+
+    while (count-- > 0) {
         *p++ = pattern;
     }
 }
@@ -689,12 +693,12 @@ s32 OSCheckActiveThreads(void) {
     enabled = OSDisableInterrupts();
 
     for (prio = 0; prio <= 31; prio++) {
-        if (RunQueueBits & (1 << (31 - prio))) {
+        if (RunQueueBits_8047A760 & (1 << (31 - prio))) {
         } else {
         }
     }
 
-    thread = ActiveThreadQueue->head;
+    thread = __OSActiveThreadQueue->head;
     while (thread) {
         cThread++;
         switch (thread->state) {
@@ -712,953 +716,3 @@ s32 OSCheckActiveThreads(void) {
     OSRestoreInterrupts(enabled);
     return cThread;
 }
-
-/* ========================================================== */
-/* Stub functions for coverage - TODO: decompile              */
-/* ========================================================== */
-
-/* fn_800A13F8 - 0x800A13F8 | size: 0xC */
-void fn_800A13F8(void) {
-    u32 r3 = 0;
-
-    r3 = 0x80000000;
-    r3 = *(u32*)((u8*)r3 + 0xE4);
-    return;
-}
-
-/* fn_800A1484 - 0x800A1484 | size: 0x68 */
-void fn_800A1484(void) {
-    extern u32 RunQueueBits_8047A760;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r4 = *(u32*)((u8*)r3 + 0x2E0);
-    r5 = *(u32*)((u8*)r3 + 0x2DC);
-    r6 = *(u32*)((u8*)r3 + 0x2E4);
-    if (r4 == 0) {
-        *(u32*)((u8*)r5 + 0x4) = r6;
-    } else {
-
-        *(u32*)((u8*)r4 + 0x2E4) = r6;
-    }
-    if (r6 == 0) {
-        *(u32*)((u8*)r5 + 0x0) = r4;
-    } else {
-
-        *(u32*)((u8*)r6 + 0x2E0) = r4;
-    }
-    tmp = *(u32*)((u8*)r5 + 0x0);
-    if (tmp == 0) {
-        tmp = *(u32*)((u8*)r3 + 0x2D0);
-        r4 = 0x1;
-        r5 = *(u32*)RunQueueBits_8047A760;
-        tmp = 0x1f - tmp;
-        tmp = r4 << tmp;
-        tmp = r5 & ~tmp;
-        *(u32*)RunQueueBits_8047A760 = tmp;
-    }
-    tmp = 0x0;
-    *(u32*)((u8*)r3 + 0x2DC) = tmp;
-    return;
-}
-
-/* fn_800A14EC - 0x800A14EC | size: 0x3C */
-void fn_800A14EC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    f32 f4 = 0.0f;
-
-    r4 = *(u32*)((u8*)r3 + 0x2D4);
-    r5 = *(u32*)((u8*)r3 + 0x2F4);
-    while (r5 != 0) {
-
-        r3 = *(u32*)((u8*)r5 + 0x0);
-        if (r3 != 0) {
-            tmp = *(u32*)((u8*)r3 + 0x2D0);
-            if ((s32)tmp < (s32)r4) {
-                r4 = tmp;
-        }
-        }
-        r5 = *(u32*)((u8*)r5 + 0x10);
-
-    }
-    r3 = r4;
-    return;
-}
-
-/* fn_800A1528 - 0x800A1528 | size: 0x1C0 */
-void fn_800A1528(void) {
-    extern void fn_800A1484();
-    extern u32 RunQueueBits_8047A760;
-    extern u32 RunQueueHint_8047A764;
-    extern u32 RunQueue_803FB898;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-
-    r31 = r3;
-    r30 = r4 + 0x0;
-    tmp = *(u16*)((u8*)r3 + 0x2C8);
-    if ((s32)tmp == 3 || (s32)tmp == 0 || (s32)tmp >= 5) { r3 = 0x0; return; }
-    if ((s32)tmp == 2) {
-        tmp = 0x1;
-        *(u32*)RunQueueHint_8047A764 = tmp;
-        *(u32*)((u8*)r31 + 0x2D0) = r30;
-        r3 = 0x0;
-        return;
-    }
-    if ((s32)tmp == 1) {
-        r3 = r31;
-        fn_800A1484();
-        *(u32*)((u8*)r31 + 0x2D0) = r30;
-        r3 = (u32)RunQueue_803FB898;
-        tmp = (u32)RunQueue_803FB898;
-        r3 = *(u32*)((u8*)r31 + 0x2D0);
-        r3 = r3 << 3;
-        tmp = tmp + r3;
-        *(u32*)((u8*)r31 + 0x2DC) = tmp;
-        r4 = *(u32*)((u8*)r31 + 0x2DC);
-        r3 = *(u32*)((u8*)r4 + 0x4);
-        if (r3 == 0) { *(u32*)((u8*)r4 + 0x0) = r31; }
-        else { *(u32*)((u8*)r3 + 0x2E0) = r31; }
-        *(u32*)((u8*)r31 + 0x2E4) = r3;
-        tmp = 0x0; r3 = 0x1;
-        *(u32*)((u8*)r31 + 0x2E0) = tmp;
-        r4 = *(u32*)((u8*)r31 + 0x2DC);
-        *(u32*)((u8*)r4 + 0x4) = r31;
-        tmp = *(u32*)((u8*)r31 + 0x2D0);
-        r4 = *(u32*)RunQueueBits_8047A760;
-        tmp = 0x1f - tmp; tmp = r3 << tmp; tmp = r4 | tmp;
-        *(u32*)RunQueueBits_8047A760 = tmp;
-        *(u32*)RunQueueHint_8047A764 = r3;
-        r3 = 0x0;
-        return;
-    }
-    /* tmp == 4 */
-    r4 = *(u32*)((u8*)r31 + 0x2E0);
-    r5 = *(u32*)((u8*)r31 + 0x2E4);
-    if (r4 == 0) { r3 = *(u32*)((u8*)r31 + 0x2DC); *(u32*)((u8*)r3 + 0x4) = r5; }
-    else { *(u32*)((u8*)r4 + 0x2E4) = r5; }
-    if (r5 == 0) { r3 = *(u32*)((u8*)r31 + 0x2DC); *(u32*)((u8*)r3 + 0x0) = r4; }
-    else { *(u32*)((u8*)r5 + 0x2E0) = r4; }
-    *(u32*)((u8*)r31 + 0x2D0) = r30;
-    r4 = *(u32*)((u8*)r31 + 0x2DC);
-    r5 = *(u32*)((u8*)r4 + 0x0);
-    while (r5 != 0) {
-        r3 = *(u32*)((u8*)r5 + 0x2D0);
-        tmp = *(u32*)((u8*)r31 + 0x2D0);
-        if ((s32)r3 > (s32)tmp) break;
-        r5 = *(u32*)((u8*)r5 + 0x2E0);
-    }
-    if (r5 == 0) {
-        r3 = *(u32*)((u8*)r4 + 0x4);
-        if (r3 == 0) { *(u32*)((u8*)r4 + 0x0) = r31; }
-        else { *(u32*)((u8*)r3 + 0x2E0) = r31; }
-        *(u32*)((u8*)r31 + 0x2E4) = r3;
-        tmp = 0x0; *(u32*)((u8*)r31 + 0x2E0) = tmp;
-        r3 = *(u32*)((u8*)r31 + 0x2DC); *(u32*)((u8*)r3 + 0x4) = r31;
-    } else {
-        *(u32*)((u8*)r31 + 0x2E0) = r5;
-        r3 = *(u32*)((u8*)r5 + 0x2E4);
-        *(u32*)((u8*)r5 + 0x2E4) = r31;
-        *(u32*)((u8*)r31 + 0x2E4) = r3;
-        if (r3 == 0) { r3 = *(u32*)((u8*)r31 + 0x2DC); *(u32*)((u8*)r3 + 0x0) = r31; }
-        else { *(u32*)((u8*)r3 + 0x2E0) = r31; }
-    }
-    r3 = *(u32*)((u8*)r31 + 0x2F0);
-    if (r3 == 0) { r3 = 0x0; return; }
-    r3 = *(u32*)((u8*)r3 + 0x8);
-    return;
-}
-
-/* fn_800A16E8 - 0x800A16E8 | size: 0x50
- * __OSReschedule - Reschedule threads at a given priority level.
- * Repeatedly calls fn_800A1528 to wake/schedule threads while
- * the thread's suspend count is <= 0 and its effective priority
- * is higher than the given level.
- */
-void fn_800A16E8(u8* thread, s32 priority) {
-    extern u8* fn_800A1528(u8* thread, s32 priority);
-
-    while (1) {
-        if (*(s32*)(thread + 0x2CC) > 0) {
-            break;
-        }
-        if (*(s32*)(thread + 0x2D0) <= priority) {
-            break;
-        }
-        thread = fn_800A1528(thread, priority);
-        if (thread == NULL) {
-            break;
-        }
-    }
-}
-
-/* fn_800A1990 - 0x800A1990 | size: 0x3C */
-void fn_800A1990(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    OSDisableInterrupts();
-    r31 = r3 + 0x0;
-    r3 = 0x1;
-    ((void(*)(void))SelectThread)();
-    r3 = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    return;
-}
-
-/* fn_800A19CC - 0x800A19CC | size: 0x1E8 */
-void fn_800A19CC(void) {
-    extern u8 lbl_80478990[];
-    extern void fn_8009BD84();
-    extern void fn_800A1BB4();
-    extern u32 __OSErrorTable;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f8 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r31 = r3 + 0x0;
-    r27 = r5 + 0x0;
-    r28 = r6 + 0x0;
-    r29 = r7 + 0x0;
-    if ((s32)r8 < 0) { r3 = 0x0; return; }
-    if ((s32)r8 > 0x1f) {
-
-        r3 = 0x0;
-        return;
-    }
-    r6 = 0x1;
-    *(u16*)((u8*)r31 + 0x2C8) = r6;
-    tmp = r9 & 0x1;
-    /* clrrwi r7, r28, 3 */;
-    *(u16*)((u8*)r31 + 0x2CA) = tmp;
-    tmp = -0x1;
-    r30 = 0x0;
-    *(u32*)((u8*)r31 + 0x2D4) = r8;
-    r3 = r31 + 0x0;
-    *(u32*)((u8*)r31 + 0x2D0) = r8;
-    *(u32*)((u8*)r31 + 0x2CC) = r6;
-    *(u32*)((u8*)r31 + 0x2D8) = tmp;
-    *(u32*)((u8*)r31 + 0x2F0) = r30;
-    *(u32*)((u8*)r31 + 0x2EC) = r30;
-    *(u32*)((u8*)r31 + 0x2E8) = r30;
-    *(u32*)((u8*)r31 + 0x2F8) = r30;
-    *(u32*)((u8*)r31 + 0x2F4) = r30;
-    *(u32*)((u8*)r7 + (-8)) = r30;
-    *(u32*)((u8*)r7 + (-4)) = r30;
-    fn_8009BD84();
-    r3 = (u32)fn_800A1BB4;
-    tmp = (u32)fn_800A1BB4;
-    *(u32*)((u8*)r31 + 0x84) = tmp;
-    r3 = 0xDEAE0000;
-    r4 = r28 - r29;
-    *(u32*)((u8*)r31 + 0xC) = r27;
-    *(u32*)((u8*)r31 + 0x304) = r28;
-    *(u32*)((u8*)r31 + 0x308) = r4;
-    r3 = *(u32*)((u8*)r31 + 0x308);
-    *(u32*)((u8*)r3 + 0x0) = tmp;
-    *(u32*)((u8*)r31 + 0x30C) = r30;
-    *(u32*)((u8*)r31 + 0x310) = r30;
-    *(u32*)((u8*)r31 + 0x314) = r30;
-    OSDisableInterrupts();
-    r4 = (u32)__OSErrorTable;
-    r4 = (u32)__OSErrorTable;
-    tmp = *(u32*)((u8*)r4 + 0x40);
-    if (tmp != 0) {
-        r4 = *(u32*)((u8*)r31 + 0x19C);
-        tmp = 0x4;
-        ctr_fn = (void(*)(void))tmp;
-        r5 = r31 + 0x0;
-        tmp = r4 | 0x900;
-        *(u32*)((u8*)r31 + 0x19C) = tmp;
-        tmp = *(u16*)((u8*)r31 + 0x1A2);
-        tmp = tmp | 0x1;
-        *(u16*)((u8*)r31 + 0x1A2) = tmp;
-        tmp = *(u32*)lbl_80478990;
-        tmp = tmp & 0x000000F8;
-        tmp = tmp | 0x4;
-        *(u32*)((u8*)r31 + 0x194) = tmp;
-        do {
-            tmp = -0x1;
-            *(u32*)((u8*)r5 + 0x94) = tmp;
-            *(u32*)((u8*)r5 + 0x90) = tmp;
-            *(u32*)((u8*)r5 + 0x1CC) = tmp;
-            *(u32*)((u8*)r5 + 0x1C8) = tmp;
-            *(u32*)((u8*)r5 + 0x9C) = tmp;
-            *(u32*)((u8*)r5 + 0x98) = tmp;
-            *(u32*)((u8*)r5 + 0x1D4) = tmp;
-            *(u32*)((u8*)r5 + 0x1D0) = tmp;
-            *(u32*)((u8*)r5 + 0xA4) = tmp;
-            *(u32*)((u8*)r5 + 0xA0) = tmp;
-            *(u32*)((u8*)r5 + 0x1DC) = tmp;
-            *(u32*)((u8*)r5 + 0x1D8) = tmp;
-            *(u32*)((u8*)r5 + 0xAC) = tmp;
-            *(u32*)((u8*)r5 + 0xA8) = tmp;
-            *(u32*)((u8*)r5 + 0x1E4) = tmp;
-            *(u32*)((u8*)r5 + 0x1E0) = tmp;
-            *(u32*)((u8*)r5 + 0xB4) = tmp;
-            *(u32*)((u8*)r5 + 0xB0) = tmp;
-            *(u32*)((u8*)r5 + 0x1EC) = tmp;
-            *(u32*)((u8*)r5 + 0x1E8) = tmp;
-            *(u32*)((u8*)r5 + 0xBC) = tmp;
-            *(u32*)((u8*)r5 + 0xB8) = tmp;
-            *(u32*)((u8*)r5 + 0x1F4) = tmp;
-            *(u32*)((u8*)r5 + 0x1F0) = tmp;
-            *(u32*)((u8*)r5 + 0xC4) = tmp;
-            *(u32*)((u8*)r5 + 0xC0) = tmp;
-            *(u32*)((u8*)r5 + 0x1FC) = tmp;
-            *(u32*)((u8*)r5 + 0x1F8) = tmp;
-            *(u32*)((u8*)r5 + 0xCC) = tmp;
-            *(u32*)((u8*)r5 + 0xC8) = tmp;
-            *(u32*)((u8*)r5 + 0x204) = tmp;
-            *(u32*)((u8*)r5 + 0x200) = tmp;
-            r5 = r5 + 0x40;
-        } while (--ctr != 0);
-    }
-    r4 = 0x80000000;
-    r5 = r4 + 0xdc;
-    r6 = *(u32*)((u8*)r5 + 0x4);
-    if (r6 == 0) {
-        *(u32*)((u8*)r4 + 0xDC) = r31;
-    } else {
-
-        *(u32*)((u8*)r6 + 0x2FC) = r31;
-    }
-    *(u32*)((u8*)r31 + 0x300) = r6;
-    tmp = 0x0;
-    *(u32*)((u8*)r31 + 0x2FC) = tmp;
-    *(u32*)((u8*)r5 + 0x0) = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    r3 = 0x1;
-
-    return;
-}
-
-/* fn_800A1BB4 - 0x800A1BB4 | size: 0xE4 */
-void fn_800A1BB4(void) {
-    extern void fn_8009F958();
-    extern void fn_800A2478();
-    extern u32 RunQueueHint_8047A764;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r28 = r3;
-    OSDisableInterrupts();
-    r31 = 0x80000000;
-    r30 = *(u32*)((u8*)r31 + 0xE4);
-    r29 = r3 + 0x0;
-    r3 = r30 + 0x0;
-    ((void(*)(void))OSClearContext)();
-    tmp = *(u16*)((u8*)r30 + 0x2CA);
-    tmp = tmp & 0x1;
-    if ((s32)tmp != 0) {
-        r4 = *(u32*)((u8*)r30 + 0x2FC);
-        r5 = *(u32*)((u8*)r30 + 0x300);
-        if (r4 == 0) {
-            *(u32*)((u8*)r31 + 0xE0) = r5;
-        } else {
-
-            *(u32*)((u8*)r4 + 0x300) = r5;
-        }
-        if (r5 == 0) {
-            r3 = 0x80000000;
-            *(u32*)((u8*)r3 + 0xDC) = r4;
-        } else {
-
-            *(u32*)((u8*)r5 + 0x2FC) = r4;
-        }
-        tmp = 0x0;
-        *(u16*)((u8*)r30 + 0x2C8) = tmp;
-    } else {
-
-        tmp = 0x8;
-        *(u16*)((u8*)r30 + 0x2C8) = tmp;
-        *(u32*)((u8*)r30 + 0x2D8) = r28;
-    }
-    r3 = r30;
-    fn_8009F958();
-    r3 = r30 + 0x2e8;
-    fn_800A2478();
-    tmp = 0x1;
-    *(u32*)RunQueueHint_8047A764 = tmp;
-    tmp = *(u32*)RunQueueHint_8047A764;
-    if ((s32)tmp != 0) {
-        r3 = 0x0;
-        ((void(*)(void))SelectThread)();
-    }
-    r3 = r29;
-    ((void(*)(void))OSRestoreInterrupts)();
-    return;
-}
-
-/* fn_800A1E54 - 0x800A1E54 | size: 0x140 */
-void fn_800A1E54(void) {
-    extern void fn_800A238C();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r3 + 0x0;
-    r29 = r4 + 0x0;
-    OSDisableInterrupts();
-    tmp = *(u16*)((u8*)r31 + 0x2CA);
-    r30 = r3 + 0x0;
-    tmp = tmp & 0x1;
-    {
-        s32 needL1F00 = 0;
-        if ((s32)tmp != 0) { needL1F00 = 1; }
-        if (!needL1F00) {
-            tmp = *(u16*)((u8*)r31 + 0x2C8);
-            if (tmp == 8) { needL1F00 = 1; }
-        }
-        if (!needL1F00) {
-            tmp = *(u32*)((u8*)r31 + 0x2E8);
-            if (tmp != 0) { needL1F00 = 1; }
-        }
-        if (!needL1F00) {
-            r3 = r31 + 0x2e8;
-            fn_800A238C();
-            tmp = *(u16*)((u8*)r31 + 0x2C8);
-            if (tmp == 0) {
-                tmp = 0x0;
-            } else {
-                r3 = 0x80000000;
-                r3 = *(u32*)((u8*)r3 + 0xDC);
-                tmp = 0x0;
-                while (r3 != 0) {
-                    if (r31 == r3) { tmp = 0x1; break; }
-                    r3 = *(u32*)((u8*)r3 + 0x2FC);
-                }
-            }
-            if ((s32)tmp != 0) { needL1F00 = 1; }
-        }
-        if (!needL1F00) {
-            r3 = r30;
-            ((void(*)(void))OSRestoreInterrupts)();
-            r3 = 0x0;
-            return;
-        }
-    }
-    /* L_800A1F00 */
-    tmp = *(u16*)((u8*)r31 + 0x2C8);
-    if (tmp == 8) {
-        if (r29 != 0) {
-            tmp = *(u32*)((u8*)r31 + 0x2D8);
-            *(u32*)((u8*)r29 + 0x0) = tmp;
-        }
-        r4 = *(u32*)((u8*)r31 + 0x2FC);
-        r5 = *(u32*)((u8*)r31 + 0x300);
-        if (r4 == 0) {
-            r3 = 0x80000000;
-            *(u32*)((u8*)r3 + 0xE0) = r5;
-        } else {
-
-            *(u32*)((u8*)r4 + 0x300) = r5;
-        }
-        if (r5 == 0) {
-            r3 = 0x80000000;
-            *(u32*)((u8*)r3 + 0xDC) = r4;
-        } else {
-
-            *(u32*)((u8*)r5 + 0x2FC) = r4;
-        }
-        tmp = 0x0;
-        *(u16*)((u8*)r31 + 0x2C8) = tmp;
-        r3 = r30;
-        ((void(*)(void))OSRestoreInterrupts)();
-        r3 = 0x1;
-        return;
-    }
-    r3 = r30;
-    ((void(*)(void))OSRestoreInterrupts)();
-    r3 = 0x0;
-
-    return;
-}
-
-/* fn_800A1F94 - 0x800A1F94 | size: 0x288 */
-void fn_800A1F94(void) {
-    extern void fn_800A14EC();
-    extern void fn_800A1528();
-    extern u32 RunQueueBits_8047A760;
-    extern u32 RunQueueHint_8047A764;
-    extern u32 RunQueue_803FB898;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f4 = 0.0f;
-
-    r29 = r3;
-    OSDisableInterrupts();
-    r4 = *(u32*)((u8*)r29 + 0x2CC);
-    r31 = r3 + 0x0;
-    *(u32*)((u8*)r29 + 0x2CC) = tmp;
-    r30 = r4;
-    tmp = *(u32*)((u8*)r29 + 0x2CC);
-    if ((s32)tmp < 0) {
-        tmp = 0x0;
-        *(u32*)((u8*)r29 + 0x2CC) = tmp;
-    } else if ((s32)tmp == 0) {
-        tmp = *(u16*)((u8*)r29 + 0x2C8);
-        if ((s32)tmp == 1) {
-            tmp = *(u32*)((u8*)r29 + 0x2D4);
-            r3 = *(u32*)((u8*)r29 + 0x2F4);
-            while (r3 != 0) {
-                r4 = *(u32*)((u8*)r3 + 0x0);
-                if (r4 != 0) {
-                    r4 = *(u32*)((u8*)r4 + 0x2D0);
-                    if ((s32)r4 < (s32)tmp) { tmp = r4; }
-                }
-                r3 = *(u32*)((u8*)r3 + 0x10);
-            }
-            *(u32*)((u8*)r29 + 0x2D0) = tmp;
-            r3 = (u32)RunQueue_803FB898;
-            tmp = (u32)RunQueue_803FB898;
-            r3 = *(u32*)((u8*)r29 + 0x2D0);
-            r3 = r3 << 3;
-            tmp = tmp + r3;
-            *(u32*)((u8*)r29 + 0x2DC) = tmp;
-            r4 = *(u32*)((u8*)r29 + 0x2DC);
-            r3 = *(u32*)((u8*)r4 + 0x4);
-            if (r3 == 0) { *(u32*)((u8*)r4 + 0x0) = r29; }
-            else { *(u32*)((u8*)r3 + 0x2E0) = r29; }
-            *(u32*)((u8*)r29 + 0x2E4) = r3;
-            tmp = 0x0; r3 = 0x1;
-            *(u32*)((u8*)r29 + 0x2E0) = tmp;
-            r4 = *(u32*)((u8*)r29 + 0x2DC);
-            *(u32*)((u8*)r4 + 0x4) = r29;
-            tmp = *(u32*)((u8*)r29 + 0x2D0);
-            r4 = *(u32*)RunQueueBits_8047A760;
-            tmp = 0x1f - tmp; tmp = r3 << tmp; tmp = r4 | tmp;
-            *(u32*)RunQueueBits_8047A760 = tmp;
-            *(u32*)RunQueueHint_8047A764 = r3;
-        } else if ((s32)tmp == 4) {
-            r4 = *(u32*)((u8*)r29 + 0x2E0);
-            r5 = *(u32*)((u8*)r29 + 0x2E4);
-            if (r4 == 0) { r3 = *(u32*)((u8*)r29 + 0x2DC); *(u32*)((u8*)r3 + 0x4) = r5; }
-            else { *(u32*)((u8*)r4 + 0x2E4) = r5; }
-            if (r5 == 0) { r3 = *(u32*)((u8*)r29 + 0x2DC); *(u32*)((u8*)r3 + 0x0) = r4; }
-            else { *(u32*)((u8*)r5 + 0x2E0) = r4; }
-            tmp = *(u32*)((u8*)r29 + 0x2D4);
-            r3 = *(u32*)((u8*)r29 + 0x2F4);
-            while (r3 != 0) {
-                r4 = *(u32*)((u8*)r3 + 0x0);
-                if (r4 != 0) {
-                    r4 = *(u32*)((u8*)r4 + 0x2D0);
-                    if ((s32)r4 < (s32)tmp) { tmp = r4; }
-                }
-                r3 = *(u32*)((u8*)r3 + 0x10);
-            }
-            *(u32*)((u8*)r29 + 0x2D0) = tmp;
-            r4 = *(u32*)((u8*)r29 + 0x2DC);
-            r5 = *(u32*)((u8*)r4 + 0x0);
-            while (r5 != 0) {
-                r3 = *(u32*)((u8*)r5 + 0x2D0);
-                tmp = *(u32*)((u8*)r29 + 0x2D0);
-                if ((s32)r3 > (s32)tmp) break;
-                r5 = *(u32*)((u8*)r5 + 0x2E0);
-            }
-            if (r5 == 0) {
-                r3 = *(u32*)((u8*)r4 + 0x4);
-                if (r3 == 0) { *(u32*)((u8*)r4 + 0x0) = r29; }
-                else { *(u32*)((u8*)r3 + 0x2E0) = r29; }
-                *(u32*)((u8*)r29 + 0x2E4) = r3;
-                tmp = 0x0; *(u32*)((u8*)r29 + 0x2E0) = tmp;
-                r3 = *(u32*)((u8*)r29 + 0x2DC); *(u32*)((u8*)r3 + 0x4) = r29;
-            } else {
-                *(u32*)((u8*)r29 + 0x2E0) = r5;
-                r3 = *(u32*)((u8*)r5 + 0x2E4);
-                *(u32*)((u8*)r5 + 0x2E4) = r29;
-                *(u32*)((u8*)r29 + 0x2E4) = r3;
-                if (r3 == 0) { r3 = *(u32*)((u8*)r29 + 0x2DC); *(u32*)((u8*)r3 + 0x0) = r29; }
-                else { *(u32*)((u8*)r3 + 0x2E0) = r29; }
-            }
-            r3 = *(u32*)((u8*)r29 + 0x2F0);
-            if (r3 != 0) {
-                r29 = *(u32*)((u8*)r3 + 0x8);
-                do {
-                    tmp = *(u32*)((u8*)r29 + 0x2CC);
-                    if ((s32)tmp > 0) break;
-                    r3 = r29; fn_800A14EC();
-                    tmp = *(u32*)((u8*)r29 + 0x2D0);
-                    r4 = r3 + 0x0;
-                    if ((s32)tmp == (s32)r4) break;
-                    r3 = r29; fn_800A1528();
-                } while ((s32)tmp != (s32)r4);
-            }
-        }
-        tmp = *(u32*)RunQueueHint_8047A764;
-        if ((s32)tmp != 0) { r3 = 0x0; ((void(*)(void))SelectThread)(); }
-    }
-    r3 = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    r3 = r30;
-    return;
-}
-
-/* fn_800A221C - 0x800A221C | size: 0x170 */
-void fn_800A221C(void) {
-    extern void fn_800A1484();
-    extern void fn_800A14EC();
-    extern void fn_800A1528();
-    extern u32 RunQueueHint_8047A764;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-
-    r29 = r3;
-    OSDisableInterrupts();
-    r4 = *(u32*)((u8*)r29 + 0x2CC);
-    r31 = r3 + 0x0;
-    tmp = r4 + 0x1;
-    /* mr. r30, r4 */;
-    *(u32*)((u8*)r29 + 0x2CC) = tmp;
-    if ((s32)tmp == 0) {
-        tmp = *(u16*)((u8*)r29 + 0x2C8);
-        switch ((s32)tmp) {
-            case 2:
-                tmp = 0x1;
-                *(u32*)RunQueueHint_8047A764 = tmp;
-                *(u16*)((u8*)r29 + 0x2C8) = tmp;
-                break;
-            case 1:
-                r3 = r29;
-                fn_800A1484();
-                break;
-            case 4:
-                r4 = *(u32*)((u8*)r29 + 0x2E0);
-                r5 = *(u32*)((u8*)r29 + 0x2E4);
-                if (r4 == 0) {
-                    r3 = *(u32*)((u8*)r29 + 0x2DC);
-                    *(u32*)((u8*)r3 + 0x4) = r5;
-                } else {
-                    *(u32*)((u8*)r4 + 0x2E4) = r5;
-                }
-                if (r5 == 0) {
-                    r3 = *(u32*)((u8*)r29 + 0x2DC);
-                    *(u32*)((u8*)r3 + 0x0) = r4;
-                } else {
-                    *(u32*)((u8*)r5 + 0x2E0) = r4;
-                }
-                tmp = 0x20;
-                *(u32*)((u8*)r29 + 0x2D0) = tmp;
-                r4 = *(u32*)((u8*)r29 + 0x2DC);
-                r3 = *(u32*)((u8*)r4 + 0x4);
-                if (r3 == 0) {
-                    *(u32*)((u8*)r4 + 0x0) = r29;
-                } else {
-                    *(u32*)((u8*)r3 + 0x2E0) = r29;
-                }
-                *(u32*)((u8*)r29 + 0x2E4) = r3;
-                tmp = 0x0;
-                *(u32*)((u8*)r29 + 0x2E0) = tmp;
-                r3 = *(u32*)((u8*)r29 + 0x2DC);
-                *(u32*)((u8*)r3 + 0x4) = r29;
-                r3 = *(u32*)((u8*)r29 + 0x2F0);
-                if (r3 != 0) {
-                    r29 = *(u32*)((u8*)r3 + 0x8);
-                    while (1) {
-                        tmp = *(u32*)((u8*)r29 + 0x2CC);
-                        if ((s32)tmp > 0) break;
-                        r3 = r29;
-                        fn_800A14EC();
-                        tmp = *(u32*)((u8*)r29 + 0x2D0);
-                        r4 = r3 + 0x0;
-                        if ((s32)tmp == (s32)r4) break;
-                        r3 = r29;
-                        fn_800A1528();
-                        /* mr. r29, r3 */;
-                        if ((s32)tmp == (s32)r4) break;
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-        tmp = *(u32*)RunQueueHint_8047A764;
-        if ((s32)tmp != 0) {
-            r3 = 0x0;
-            ((void(*)(void))SelectThread)();
-        }
-    }
-    r3 = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    r3 = r30;
-    return;
-}
-
-/* fn_800A238C - 0x800A238C | size: 0xEC */
-void fn_800A238C(void) {
-    extern u32 RunQueueHint_8047A764;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = r3;
-    OSDisableInterrupts();
-    r4 = 0x80000000;
-    r4 = *(u32*)((u8*)r4 + 0xE4);
-    tmp = 0x4;
-    r31 = r3;
-    *(u16*)((u8*)r4 + 0x2C8) = tmp;
-    *(u32*)((u8*)r4 + 0x2DC) = r30;
-    r5 = *(u32*)((u8*)r30 + 0x0);
-    while (r5 != 0) {
-        r3 = *(u32*)((u8*)r5 + 0x2D0);
-        tmp = *(u32*)((u8*)r4 + 0x2D0);
-        if ((s32)r3 > (s32)tmp) break;
-        r5 = *(u32*)((u8*)r5 + 0x2E0);
-    }
-    if (r5 == 0) {
-        r3 = *(u32*)((u8*)r30 + 0x4);
-        if (r3 == 0) {
-            *(u32*)((u8*)r30 + 0x0) = r4;
-        } else {
-            *(u32*)((u8*)r3 + 0x2E0) = r4;
-        }
-        *(u32*)((u8*)r4 + 0x2E4) = r3;
-        tmp = 0x0;
-        *(u32*)((u8*)r4 + 0x2E0) = tmp;
-        *(u32*)((u8*)r30 + 0x4) = r4;
-    } else {
-        *(u32*)((u8*)r4 + 0x2E0) = r5;
-        r3 = *(u32*)((u8*)r5 + 0x2E4);
-        *(u32*)((u8*)r5 + 0x2E4) = r4;
-        *(u32*)((u8*)r4 + 0x2E4) = r3;
-        if (r3 == 0) {
-            *(u32*)((u8*)r30 + 0x0) = r4;
-        } else {
-            *(u32*)((u8*)r3 + 0x2E0) = r4;
-        }
-    }
-    tmp = 0x1;
-    *(u32*)RunQueueHint_8047A764 = tmp;
-    tmp = *(u32*)RunQueueHint_8047A764;
-    if ((s32)tmp != 0) {
-        r3 = 0x0;
-        ((void(*)(void))SelectThread)();
-    }
-    r3 = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    return;
-}
-
-/* fn_800A2478 - 0x800A2478 | size: 0x104 */
-void fn_800A2478(void) {
-    extern u32 RunQueueBits_8047A760;
-    extern u32 RunQueueHint_8047A764;
-    extern u32 RunQueue_803FB898;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = r3;
-    OSDisableInterrupts();
-    r4 = (u32)RunQueue_803FB898;
-    r31 = r3 + 0x0;
-    r5 = (u32)RunQueue_803FB898;
-    r6 = *(u32*)((u8*)r30 + 0x0);
-    while (r6 != 0) {
-        r3 = *(u32*)((u8*)r6 + 0x2E0);
-        if (r3 == 0) {
-            tmp = 0x0;
-            *(u32*)((u8*)r30 + 0x4) = tmp;
-        } else {
-            tmp = 0x0;
-            *(u32*)((u8*)r3 + 0x2E4) = tmp;
-        }
-        *(u32*)((u8*)r30 + 0x0) = r3;
-        tmp = 0x1;
-        *(u16*)((u8*)r6 + 0x2C8) = tmp;
-        tmp = *(u32*)((u8*)r6 + 0x2CC);
-        if ((s32)tmp <= 0) {
-            tmp = *(u32*)((u8*)r6 + 0x2D0);
-            tmp = tmp << 3;
-            tmp = r5 + tmp;
-            *(u32*)((u8*)r6 + 0x2DC) = tmp;
-            r4 = *(u32*)((u8*)r6 + 0x2DC);
-            r3 = *(u32*)((u8*)r4 + 0x4);
-            if (r3 == 0) {
-                *(u32*)((u8*)r4 + 0x0) = r6;
-            } else {
-                *(u32*)((u8*)r3 + 0x2E0) = r6;
-            }
-            *(u32*)((u8*)r6 + 0x2E4) = r3;
-            tmp = 0x0;
-            r3 = 0x1;
-            *(u32*)((u8*)r6 + 0x2E0) = tmp;
-            r4 = *(u32*)((u8*)r6 + 0x2DC);
-            *(u32*)((u8*)r4 + 0x4) = r6;
-            tmp = *(u32*)((u8*)r6 + 0x2D0);
-            r4 = *(u32*)RunQueueBits_8047A760;
-            tmp = 0x1f - tmp;
-            tmp = r3 << tmp;
-            tmp = r4 | tmp;
-            *(u32*)RunQueueBits_8047A760 = tmp;
-            *(u32*)RunQueueHint_8047A764 = r3;
-        }
-        r6 = *(u32*)((u8*)r30 + 0x0);
-    }
-    tmp = *(u32*)RunQueueHint_8047A764;
-    if ((s32)tmp != 0) {
-        r3 = 0x0;
-        ((void(*)(void))SelectThread)();
-    }
-    r3 = r31;
-    ((void(*)(void))OSRestoreInterrupts)();
-    return;
-}
-
-/* fn_800A257C - 0x800A257C | size: 0xC0 */
-void fn_800A257C(void) {
-    extern void fn_800A14EC();
-    extern void fn_800A1528();
-    extern u32 RunQueueHint_8047A764;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* mr. r31, r4 */;
-    r29 = r3 + 0x0;
-    if ((s32)tmp < 0) { r3 = 0x0; return; }
-    if ((s32)r31 > 0x1f) {
-
-        r3 = 0x0;
-        return;
-    }
-    OSDisableInterrupts();
-    tmp = *(u32*)((u8*)r29 + 0x2D4);
-    r30 = r3 + 0x0;
-    if ((s32)tmp != (s32)r31) {
-        *(u32*)((u8*)r29 + 0x2D4) = r31;
-        r31 = r29;
-        do {
-            tmp = *(u32*)((u8*)r31 + 0x2CC);
-            if ((s32)tmp > 0) break;
-            r3 = r31;
-            fn_800A14EC();
-            tmp = *(u32*)((u8*)r31 + 0x2D0);
-            r4 = r3 + 0x0;
-            if ((s32)tmp == (s32)r4) break;
-            r3 = r31;
-            fn_800A1528();
-            /* mr. r31, r3 */;
-        } while ((s32)tmp != (s32)r4);
-        tmp = *(u32*)RunQueueHint_8047A764;
-        if ((s32)tmp != 0) {
-            r3 = 0x0;
-            ((void(*)(void))SelectThread)();
-        }
-    }
-    r3 = r30;
-    ((void(*)(void))OSRestoreInterrupts)();
-    r3 = 0x1;
-
-    return;
-}
-
-/* fn_800A263C - 0x800A263C | size: 0x90 */
-void fn_800A263C(void) {
-    extern void fn_800A19CC();
-    extern void fn_800A1F94();
-    extern u32 RunQueue_803FB898;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r31 = 0;
-
-    r8 = (u32)RunQueue_803FB898;
-    r10 = r4 + 0x0;
-    r9 = r5 + 0x0;
-    r7 = r6 + 0x0;
-    r31 = (u32)RunQueue_803FB898;
-    if (r3 != 0) {
-        tmp = *(u16*)((u8*)r31 + 0x3C8);
-        if (tmp != 0) { r3 = 0x0; return; }
-        r4 = r3 + 0x0;
-        r6 = r9 + 0x0;
-        r5 = r10 + 0x0;
-        r3 = r31 + 0x100;
-        r8 = 0x1f;
-        r9 = 0x1;
-        fn_800A19CC();
-        r3 = r31 + 0x100;
-        fn_800A1F94();
-        r3 = r31 + 0x100;
-        return;
-    }
-    tmp = *(u16*)((u8*)r31 + 0x3C8);
-    if (tmp == 0) { r3 = 0x0; return; }
-    r3 = r31 + 0x100;
-    ((void(*)(void))OSCancelThread)();
-
-    r3 = 0x0;
-
-    return;
-}
-

@@ -18,35 +18,40 @@ typedef struct DVDQueueNode {
 
 /* 4 priority levels, each is a doubly-linked list sentinel */
 /* Located at 0x803FC3F8 */
-extern DVDQueueNode WaitingQueue[4];
+extern DVDQueueNode WaitingQueue_803FC3F8[4];
 
 /*
- * __DVDClearWaitingQueue - Initialize all 4 priority queues as empty
+ * __DVDClearWaitingQueue_803FC3F8 - Initialize all 4 priority queues as empty
  * 0x800A7DE8 | size: 0x38
  *
  * Each queue is a circular doubly-linked list with a sentinel node.
  * Empty state: sentinel.next == sentinel.prev == &sentinel
  */
-void __DVDClearWaitingQueue(void) {
-    DVDQueueNode* q;
-    s32 i;
+void __DVDClearWaitingQueue_803FC3F8(void) {
+    DVDQueueNode* q0 = &WaitingQueue_803FC3F8[0];
+    DVDQueueNode* q1 = &WaitingQueue_803FC3F8[1];
+    DVDQueueNode* q2 = &WaitingQueue_803FC3F8[2];
+    DVDQueueNode* q3 = &WaitingQueue_803FC3F8[3];
 
-    for (i = 0; i < 4; i++) {
-        q = &WaitingQueue[i];
-        q->next = q;
-        q->prev = q;
-    }
+    q0->next = q0;
+    q0->prev = q0;
+    q1->next = q1;
+    q1->prev = q1;
+    q2->next = q2;
+    q2->prev = q2;
+    q3->next = q3;
+    q3->prev = q3;
 }
 
 /*
- * __DVDPushWaitingQueue - Insert a command block at the tail of a priority queue
+ * __DVDPushWaitingQueue_803FC3F8 - Insert a command block at the tail of a priority queue
  * 0x800A7E20 | size: 0x68
  *
  * Parameters:
  *   prio  - priority level (0-3)
  *   block - command block to enqueue (links at offset 0x00/0x04)
  */
-BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
+BOOL __DVDPushWaitingQueue_803FC3F8(s32 prio, DVDCommandBlock* block) {
     BOOL enabled;
     DVDQueueNode* sentinel;
     DVDQueueNode* node = (DVDQueueNode*)block;
@@ -54,7 +59,7 @@ BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
 
     enabled = OSDisableInterrupts();
 
-    sentinel = &WaitingQueue[prio];
+    sentinel = &WaitingQueue_803FC3F8[prio];
     tail = sentinel->prev;
 
     /* Insert before sentinel (at end of queue) */
@@ -68,13 +73,13 @@ BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
 }
 
 /*
- * __DVDPopWaitingQueue - Remove and return the highest-priority waiting command
+ * __DVDPopWaitingQueue_803FC3F8 - Remove and return the highest-priority waiting command
  * 0x800A7E88 | size: 0xA0
  *
  * Scans priorities 0-3, returns the first non-empty queue's head entry.
  * Returns NULL if all queues are empty.
  */
-DVDCommandBlock* __DVDPopWaitingQueue(void) {
+DVDCommandBlock* __DVDPopWaitingQueue_803FC3F8(void) {
     BOOL enabled;
     DVDQueueNode* sentinel;
     DVDQueueNode* node;
@@ -83,7 +88,7 @@ DVDCommandBlock* __DVDPopWaitingQueue(void) {
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < 4; i++) {
-        sentinel = &WaitingQueue[i];
+        sentinel = &WaitingQueue_803FC3F8[i];
 
         if (sentinel->next == sentinel) {
             /* This priority level is empty */
@@ -94,7 +99,7 @@ DVDCommandBlock* __DVDPopWaitingQueue(void) {
         OSRestoreInterrupts(enabled);
         enabled = OSDisableInterrupts();
 
-        sentinel = &WaitingQueue[i];
+        sentinel = &WaitingQueue_803FC3F8[i];
         node = sentinel->next;
 
         /* Remove from queue */
@@ -115,12 +120,12 @@ DVDCommandBlock* __DVDPopWaitingQueue(void) {
 }
 
 /*
- * __DVDCheckWaitingQueue - Check if any commands are waiting
+ * __DVDCheckWaitingQueue_803FC3F8 - Check if any commands are waiting
  * 0x800A7F28 | size: 0x58
  *
  * Returns TRUE if at least one priority queue is non-empty.
  */
-BOOL __DVDCheckWaitingQueue(void) {
+BOOL __DVDCheckWaitingQueue_803FC3F8(void) {
     BOOL enabled;
     DVDQueueNode* sentinel;
     s32 i;
@@ -128,7 +133,7 @@ BOOL __DVDCheckWaitingQueue(void) {
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < 4; i++) {
-        sentinel = &WaitingQueue[i];
+        sentinel = &WaitingQueue_803FC3F8[i];
 
         if (sentinel->next != sentinel) {
             OSRestoreInterrupts(enabled);

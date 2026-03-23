@@ -31,6 +31,22 @@
     "src/dolphin/os/OSMemory.c": {
       "compiler": "GC/1.2.5n",
       "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/os/OSThread.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/dvd/DVD.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/dvd/DVDLow.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/dvd/DVDQueue.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     }
   }
 }
