@@ -3334,55 +3334,26 @@ u32 fn_801F98BC(void* arg0) {
     return count;
 }
 
-/* 0x801F9930 | size: 0x98 | medium */
-void fn_801F9930(void) {
-    extern void fn_801FB1C0();
-    extern void fn_80206A04();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x801F9930 | size: 0x98 */
+void* fn_801F9930(void* context, void* moveData) {
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern u8 fn_80206A04(void* ptr);
+    void* pokemon;
+    void* data;
+    u16 i;
 
-    r28 = r3;
-    r29 = r4;
-    r31 = 0x0;
-    while (1) {
-        r0 = r31 & 0xFFFF;
-        if ((u32)r0 >= (u32)0x6) break;
-        r3 = r28;
-        r6 = r31;
-        r4 = 0x0;
-        r5 = 0x45;
-        fn_801FB1C0();
-        r30 = r3;
-        fn_80206A04();
-        r0 = r3 & 0xFF;
-        if ((s32)r0 != (s32)0) {
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0xcb;
-            r6 = 0x0;
-            ((void(*)(void))fn_8012640C)();
-            if ((u32)r3 != (u32)0x0) {
-                if ((u32)r29 == (u32)r3) {
-                    r3 = r30;
-                    return;
+    for (i = 0; (u16)i < 6; i++) {
+        pokemon = fn_801FB1C0(context, 0, 0x45, i);
+        if ((u8)fn_80206A04(pokemon) != 0) {
+            data = fn_8012640C(pokemon, 0, 0xCB, 0);
+            if (data != NULL) {
+                if (moveData == data) {
+                    return pokemon;
+                }
+            }
         }
-        }
-        }
-        r31 = r31 + 0x1;
-
     }
-    r3 = 0x0;
-
-    return;
+    return NULL;
 }
 
 /* 0x801F99C8 | size: 0x2F4 | large */
@@ -9287,62 +9258,23 @@ void fn_801FFEC8(void) {
     return;
 }
 
-/* 0x80200A5C | size: 0xB4 | medium */
-void fn_80200A5C(void) {
-    extern u8 lbl_80279CA4[];
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+/* 0x80200A5C | size: 0xB4 */
+typedef struct { u16 fields[9]; } FieldTable9;
+u32 fn_80200A5C(void* context) {
+    extern FieldTable9 lbl_80279CA4;
+    FieldTable9 table;
+    u8 i;
 
-    r4 = (u32)lbl_80279CA4;
-    r4 = (u32)lbl_80279CA4;
-    r0 = 0x2;
-    r5 = (u32)sp + 0x4;
-    r29 = r3;
-    /* subi r4, r4, 0x4 */;
-    ctr_fn = (void(*)(void))r0;
-    do {
-        r3 = *(u32*)((u8*)r4 + 0x4);
-        r0 = *(u32*)((u8*)r4 + 0x8);
-        *(u32*)((u8*)r5 + 0x4) = r3;
-        r5 += 8; *(u32*)r5 = r0;
-    } while (--ctr != 0);
-    r0 = *(u16*)((u8*)r4 + 0x4);
-    *(u16*)((u8*)r5 + 0x4) = r0;
-    if ((u32)r29 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    table = lbl_80279CA4;
+    if (context == NULL) {
+        return 0;
     }
-    r31 = (u32)sp + 0x8;
-    r30 = 0x0;
-    while (1) {
-        r0 = r30 & 0xFF;
-        if ((u32)r0 >= (u32)0x9) break;
-        /* clrlslwi r0, r30, 24, 1 */;
-        r3 = r29;
-        r5 = *(u16*)(r31 + r0);
-        r4 = 0x0;
-        r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
-        if ((s32)r3 == (s32)0x1) {
-            r3 = 0x1;
-            return;
+    for (i = 0; (u8)i < 9; i++) {
+        if ((s32)fn_8012640C(context, 0, table.fields[i], 0) == 1) {
+            return 1;
         }
-        r30 = r30 + 0x1;
-
     }
-    r3 = 0x0;
-
-    return;
+    return 0;
 }
 
 /* 0x80200B10 | size: 0x2F0 | large */
@@ -9875,84 +9807,44 @@ void fn_802010C8(void) {
     return;
 }
 
-/* 0x80201248 | size: 0xF8 | medium */
-void fn_80201248(void) {
-    extern void fn_801FD0EC();
-    extern void fn_8020E614();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x80201248 | size: 0xF8 */
+u8 fn_80201248(void* context, u16* output) {
+    extern u8 fn_8020E614(void* entry);
+    extern u16 fn_801FD0EC(void* entry);
+    u8* entryList;
+    u8* entry;
+    u8 count;
+    u8 i;
+    u16 moveId;
 
-    r27 = r4;
-    if ((u32)r3 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    if (context == NULL) {
+        return 0;
     }
-    r4 = 0x0;
-    r5 = 0x122;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    r31 = r3;
-    r4 = 0x0;
-    r3 = 0x0;
-    if ((u32)r27 != (u32)0x0) {
-        while (1) {
-            r0 = r4 & 0xFF;
-            if ((u32)r0 >= (u32)0x4) break;
-            /* clrlslwi r0, r4, 24, 1 */;
-            r4 = r4 + 0x1;
-            *(u16*)(r27 + r0) = r3;
-
+    entryList = (u8*)fn_8012640C(context, 0, 0x122, 0);
+    if (output != NULL) {
+        for (i = 0; (u8)i < 4; i++) {
+            output[i] = 0;
         }
-
     } else {
-        while (1) {
-            r0 = r4 & 0xFF;
-            if ((u32)r0 >= (u32)0x4) break;
-            r4 = r4 + 0x1;
-
+        for (i = 0; (u8)i < 4; i++) {
         }
     }
-    r28 = 0x0;
-    r30 = 0x0;
-    while (1) {
-        r0 = r30 & 0xFF;
-        if ((u32)r0 >= (u32)0x4) break;
-        r0 = r30 & 0xFF;
-        r0 = r0 * 0xc;
-        r29 = r31 + r0;
-        r3 = r29;
-        fn_8020E614();
-        r0 = r3 & 0xFF;
-        if ((u32)r0 != (u32)0x4) {
-            r3 = r29;
-            fn_801FD0EC();
-            r0 = r3 & 0xFFFF;
-            if ((u32)r0 != (u32)0x4) {
-                if ((u32)r0 != (u32)0x165) {
-                    if ((u32)r27 != (u32)0x0) {
-                        /* clrlslwi r0, r28, 24, 1 */;
-                        *(u16*)(r27 + r0) = r3;
+    count = 0;
+    for (i = 0; (u8)i < 4; i++) {
+        entry = entryList + (u8)i * 0xC;
+        if ((u8)fn_8020E614((void*)entry) != 0) {
+            moveId = fn_801FD0EC((void*)entry);
+            if ((u16)moveId != 0) {
+                if ((u16)moveId != 0x165) {
+                    if (output != NULL) {
+                        output[count] = moveId;
                     }
-                    r28 = r28 + 0x1;
+                    count++;
+                }
+            }
         }
-        }
-        }
-        r30 = r30 + 0x1;
-
     }
-    r3 = r28;
-
-    return;
+    return count;
 }
 
 /* 0x80201340 | size: 0xC0 */
