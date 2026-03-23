@@ -5257,11 +5257,18 @@ void* fn_80114D6C(void* owner, u32 param, u32 alloc_size) {
     }
     return mem;
 }
-/* 0x6C | fn_80114E0C | nullcheck_call_flag */
-u32 fn_80114E0C(void* obj) {
-    if (fn_800FF548() == 0) { return 0; }
-    fn_800FC39C(obj);
-    return 1;
+/* 0x6C | fn_80114E0C | alloc_and_dispatch */
+void* fn_80114E0C(void* obj, u32 param) {
+    extern u8 fn_800FF548();
+    extern void* fn_800F9318();
+    extern void fn_800FC39C();
+    void* result;
+    if ((u8)fn_800FF548() != 0) { return NULL; }
+    result = fn_800F9318(obj, param);
+    if (result != NULL) {
+        fn_800FC39C(result);
+    }
+    return result;
 }
 /* 0x80114E78 | 0xA0 */
 void* fn_80114E78(void* owner, u32 param, u32 alloc_size) {
@@ -5275,11 +5282,18 @@ void* fn_80114E78(void* owner, u32 param, u32 alloc_size) {
     }
     return mem;
 }
-/* 0x6C | fn_80114F18 | nullcheck_call_flag */
-u32 fn_80114F18(void* obj) {
-    if (fn_800FF548() == 0) { return 0; }
-    fn_800FC244(obj);
-    return 1;
+/* 0x6C | fn_80114F18 | alloc_and_dispatch */
+void* fn_80114F18(void* obj, u32 param) {
+    extern u8 fn_800FF548();
+    extern void* fn_800F9318();
+    extern void fn_800FC244();
+    void* result;
+    if ((u8)fn_800FF548() != 0) { return NULL; }
+    result = fn_800F9318(obj, param);
+    if (result != NULL) {
+        fn_800FC244(result);
+    }
+    return result;
 }
 /* 0x80114F84 | 0xA0 */
 void* fn_80114F84(void* owner, u32 param, u32 alloc_size) {
@@ -5335,21 +5349,27 @@ u32 fn_80115100(void) {
     return 1;
 }
 #pragma pop
-/* 0x4C | fn_80115124 | nullcheck_call_flag */
+/* 0x4C | fn_80115124 | flag_guarded_call */
 u32 fn_80115124(void* obj) {
-    if (fn_800FF554() == 0) { return 0; }
+    extern u8 fn_800FF554();
+    extern void fn_800F760C();
+    if ((u8)fn_800FF554() != 0) { return 0; }
     fn_800F760C(obj);
     return 1;
 }
-/* 0x4C | fn_80115170 | nullcheck_call_flag */
+/* 0x4C | fn_80115170 | flag_guarded_call */
 u32 fn_80115170(void* obj) {
-    if (fn_800FF554() == 0) { return 0; }
+    extern u8 fn_800FF554();
+    extern void fn_800FC2A8();
+    if ((u8)fn_800FF554() != 0) { return 0; }
     fn_800FC2A8(obj);
     return 1;
 }
-/* 0x4C | fn_801151BC | nullcheck_call_flag */
+/* 0x4C | fn_801151BC | flag_guarded_call */
 u32 fn_801151BC(void* obj) {
-    if (fn_800FF554() == 0) { return 0; }
+    extern u8 fn_800FF554();
+    extern void fn_800FC1D0();
+    if ((u8)fn_800FF554() != 0) { return 0; }
     fn_800FC1D0(obj);
     return 1;
 }
