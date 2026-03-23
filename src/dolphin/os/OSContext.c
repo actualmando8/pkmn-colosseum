@@ -343,10 +343,11 @@ void OSClearContext(OSContext* context) {
 /* OSDumpContext */
 void OSDumpContext(OSContext* context) {
     u32 i;
+    u32* p;
 
     OSReport("------------------------- Context 0x%08x -------------------------\n", context);
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < 16; ++i) {
         OSReport("r%-2d  = 0x%08x (%14d)  r%-2d  = 0x%08x (%14d)\n",
                  i, context->gpr[i], context->gpr[i],
                  i + 16, context->gpr[i + 16], context->gpr[i + 16]);
@@ -358,24 +359,42 @@ void OSDumpContext(OSContext* context) {
              context->srr0, context->srr1);
 
     OSReport("\nGQRs----------\n");
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4; ++i) {
         OSReport("gqr%d = 0x%08x \tgqr%d = 0x%08x\n",
                  i, context->gqr[i], i + 4, context->gqr[i + 4]);
     }
 
-    OSReport("\n\nFPRs----------\n");
-    for (i = 0; i < 32; i += 2) {
-        OSReport("fr%d \t= %d \t fr%d \t= %d\n",
-                 i, (u32)context->fpr[i], i + 1, (u32)context->fpr[i + 1]);
+    if (context->state & OS_CONTEXT_STATE_FPSAVED) {
+        OSContext* currentContext;
+        OSContext fpuContext;
+        BOOL enabled;
+
+        enabled = OSDisableInterrupts();
+        currentContext = OSGetCurrentContext();
+        OSClearContext(&fpuContext);
+        OSSetCurrentContext(&fpuContext);
+
+        OSReport("\n\nFPRs----------\n");
+        for (i = 0; i < 32; i += 2) {
+            OSReport("fr%d \t= %d \t fr%d \t= %d\n",
+                     i, (u32)context->fpr[i], i + 1, (u32)context->fpr[i + 1]);
+        }
+
+        OSReport("\n\nPSFs----------\n");
+        for (i = 0; i < 32; i += 2) {
+            OSReport("ps%d \t= 0x%x \t ps%d \t= 0x%x\n",
+                     i, (u32)context->psf[i], i + 1, (u32)context->psf[i + 1]);
+        }
+
+        OSClearContext(&fpuContext);
+        OSSetCurrentContext(currentContext);
+        OSRestoreInterrupts(enabled);
     }
 
-    OSReport("\n\nPSFs----------\n");
-    for (i = 0; i < 32; i += 2) {
-        OSReport("ps%d \t= 0x%x \t ps%d \t= 0x%x\n",
-                 i, (u32)context->psf[i], i + 1, (u32)context->psf[i + 1]);
+    OSReport("\nAddress:      Back Chain    LR Save\n");
+    for (i = 0, p = (u32*)context->gpr[1]; p && (u32)p != 0xFFFFFFFF && i++ < 16; p = (u32*)*p) {
+        OSReport("0x%08x:   0x%08x    0x%08x\n", p, p[0], p[1]);
     }
-
-    OSReport("\n");
 }
 
 /* OSSwitchFPUContext - FPU exception handler */
@@ -440,137 +459,141 @@ void __OSContextInit(void) {
     DBPrintf("FPU-unavailable handler installed\n");
 }
 
-/* ===================================================================
- * Stub functions for coverage -- TODO: decompile
- * 4 function(s)
- * =================================================================== */
-
-/* fn_8009BBC4 - 0x8009BBC4 | size: 0xC */
-void fn_8009BBC4(void) {
-    u32 r3 = 0;
-
-    r3 = 0x80000000;
-    r3 = *(u32*)((u8*)r3 + 0xD4);
-    return;
+/* OSGetCurrentContext */
+OSContext* OSGetCurrentContext(void) {
+    return OS_CURRENTCONTEXT;
 }
 
-/* fn_8009BBD0 - 0x8009BBD0 | size: 0x80 */
-/* OSSaveContext - saves full CPU context: GQRs, CR, LR, MSR, CTR, XER, SP */
-void fn_8009BBD0(void) {
-    u32 tmp = 0;
-    u32 r1 = 0;
-    u32 r2 = 0;
-    u32 r3 = 0;
-    u32 r13 = 0;
+/* OSSaveContext */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm u32 OSSaveContext(register OSContext* context) {
+    nofralloc
+    stmw    r13, 0x0034(r3)
 
-    tmp = 0; /* mfspr GQR1 */;
-    *(u32*)((u8*)r3 + 0x1A8) = tmp;
-    tmp = 0; /* mfspr GQR2 */;
-    *(u32*)((u8*)r3 + 0x1AC) = tmp;
-    tmp = 0; /* mfspr GQR3 */;
-    *(u32*)((u8*)r3 + 0x1B0) = tmp;
-    tmp = 0; /* mfspr GQR4 */;
-    *(u32*)((u8*)r3 + 0x1B4) = tmp;
-    tmp = 0; /* mfspr GQR5 */;
-    *(u32*)((u8*)r3 + 0x1B8) = tmp;
-    tmp = 0; /* mfspr GQR6 */;
-    *(u32*)((u8*)r3 + 0x1BC) = tmp;
-    tmp = 0; /* mfspr GQR7 */;
-    *(u32*)((u8*)r3 + 0x1C0) = tmp;
-    tmp = 0; /* mfcr */;
-    *(u32*)((u8*)r3 + 0x80) = tmp;
-    *(u32*)((u8*)r3 + 0x84) = tmp;
-    *(u32*)((u8*)r3 + 0x198) = tmp;
-    tmp = 0; /* mfmsr */;
-    *(u32*)((u8*)r3 + 0x19C) = tmp;
-    tmp = 0; /* mfctr */;
-    *(u32*)((u8*)r3 + 0x88) = tmp;
-    /* mfxer tmp */;
-    *(u32*)((u8*)r3 + 0x8C) = tmp;
-    *(u32*)((u8*)r3 + 0x4) = r1;
-    *(u32*)((u8*)r3 + 0x8) = r2;
-    tmp = 0x1;
-    *(u32*)((u8*)r3 + 0xC) = tmp;
-    r3 = 0x0;
-    return;
+    mfspr   r0, GQR1
+    stw     r0, 0x01A8(r3)
+    mfspr   r0, GQR2
+    stw     r0, 0x01AC(r3)
+    mfspr   r0, GQR3
+    stw     r0, 0x01B0(r3)
+    mfspr   r0, GQR4
+    stw     r0, 0x01B4(r3)
+    mfspr   r0, GQR5
+    stw     r0, 0x01B8(r3)
+    mfspr   r0, GQR6
+    stw     r0, 0x01BC(r3)
+    mfspr   r0, GQR7
+    stw     r0, 0x01C0(r3)
+
+    mfcr    r0
+    stw     r0, 0x0080(r3)
+    mflr    r0
+    stw     r0, 0x0084(r3)
+    stw     r0, 0x0198(r3)
+    mfmsr   r0
+    stw     r0, 0x019C(r3)
+    mfctr   r0
+    stw     r0, 0x0088(r3)
+    mfxer   r0
+    stw     r0, 0x008C(r3)
+
+    stw     r1, 0x0004(r3)
+    stw     r2, 0x0008(r3)
+
+    li      r0, 1
+    stw     r0, 0x000C(r3)
+    li      r3, 0
+    blr
 }
+#pragma pop
 
-/* fn_8009BD30 - 0x8009BD30 | size: 0x30 */
-/* Stack pointer manipulation - uses r1 directly */
-void fn_8009BD30(void) {
-    u32 tmp = 0;
-    u32 r1 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r5 = r1;
-    r4 += -8; *(u32*)r4 = r5;
-    r1 = r4;
-    *(u32*)((u8*)r5 + 0x4) = tmp;
-    /* blrl  */;
-    r5 = *(u32*)((u8*)r1 + 0x0);
-    tmp = *(u32*)((u8*)r5 + 0x4);
-    r1 = r5;
-    return;
+/* OSGetStackPointer */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm u32 OSGetStackPointer(void) {
+    nofralloc
+    mr      r3, r1
+    blr
 }
+#pragma pop
 
-/* fn_8009BD84 - 0x8009BD84 | size: 0xBC */
-void fn_8009BD84(void) {
-    u32 tmp = 0;
-    u32 r2 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r11 = 0;
-    u32 r13 = 0;
-
-    *(u32*)((u8*)r3 + 0x198) = r4;
-    *(u32*)((u8*)r3 + 0x4) = r5;
-    r11 = 0x0;
-    r11 = r11 | 0x9032;
-    *(u32*)((u8*)r3 + 0x19C) = r11;
-    tmp = 0x0;
-    *(u32*)((u8*)r3 + 0x80) = tmp;
-    *(u32*)((u8*)r3 + 0x8C) = tmp;
-    *(u32*)((u8*)r3 + 0x8) = r2;
-    *(u32*)((u8*)r3 + 0x34) = r13;
-    *(u32*)((u8*)r3 + 0xC) = tmp;
-    *(u32*)((u8*)r3 + 0x10) = tmp;
-    *(u32*)((u8*)r3 + 0x14) = tmp;
-    *(u32*)((u8*)r3 + 0x18) = tmp;
-    *(u32*)((u8*)r3 + 0x1C) = tmp;
-    *(u32*)((u8*)r3 + 0x20) = tmp;
-    *(u32*)((u8*)r3 + 0x24) = tmp;
-    *(u32*)((u8*)r3 + 0x28) = tmp;
-    *(u32*)((u8*)r3 + 0x2C) = tmp;
-    *(u32*)((u8*)r3 + 0x30) = tmp;
-    *(u32*)((u8*)r3 + 0x38) = tmp;
-    *(u32*)((u8*)r3 + 0x3C) = tmp;
-    *(u32*)((u8*)r3 + 0x40) = tmp;
-    *(u32*)((u8*)r3 + 0x44) = tmp;
-    *(u32*)((u8*)r3 + 0x48) = tmp;
-    *(u32*)((u8*)r3 + 0x4C) = tmp;
-    *(u32*)((u8*)r3 + 0x50) = tmp;
-    *(u32*)((u8*)r3 + 0x54) = tmp;
-    *(u32*)((u8*)r3 + 0x58) = tmp;
-    *(u32*)((u8*)r3 + 0x5C) = tmp;
-    *(u32*)((u8*)r3 + 0x60) = tmp;
-    *(u32*)((u8*)r3 + 0x64) = tmp;
-    *(u32*)((u8*)r3 + 0x68) = tmp;
-    *(u32*)((u8*)r3 + 0x6C) = tmp;
-    *(u32*)((u8*)r3 + 0x70) = tmp;
-    *(u32*)((u8*)r3 + 0x74) = tmp;
-    *(u32*)((u8*)r3 + 0x78) = tmp;
-    *(u32*)((u8*)r3 + 0x7C) = tmp;
-    *(u32*)((u8*)r3 + 0x1A4) = tmp;
-    *(u32*)((u8*)r3 + 0x1A8) = tmp;
-    *(u32*)((u8*)r3 + 0x1AC) = tmp;
-    *(u32*)((u8*)r3 + 0x1B0) = tmp;
-    *(u32*)((u8*)r3 + 0x1B4) = tmp;
-    *(u32*)((u8*)r3 + 0x1B8) = tmp;
-    *(u32*)((u8*)r3 + 0x1BC) = tmp;
-    *(u32*)((u8*)r3 + 0x1C0) = tmp;
-    /* b OSClearContext */;
+/* OSSwitchFiber */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm int OSSwitchFiber(register u32 pc, register u32 newsp) {
+    nofralloc
+    mflr    r0
+    mr      r5, r1
+    stwu    r5, -8(r4)
+    mr      r1, r4
+    stw     r0, 4(r5)
+    mtlr    r3
+    blrl
+    lwz     r5, 0(r1)
+    lwz     r0, 4(r5)
+    mtlr    r0
+    mr      r1, r5
+    blr
 }
+#pragma pop
+
+/* OSInitContext */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+asm void OSInitContext(register OSContext* context, register u32 pc, register u32 newsp) {
+    nofralloc
+    stw     r4, 0x0198(r3)
+    stw     r5, 0x0004(r3)
+    li      r11, 0
+    ori     r11, r11, 0x9032
+    stw     r11, 0x019C(r3)
+    li      r0, 0
+    stw     r0, 0x0080(r3)
+    stw     r0, 0x008C(r3)
+    stw     r2, 0x0008(r3)
+    stw     r13, 0x0034(r3)
+    stw     r0, 0x000C(r3)
+    stw     r0, 0x0010(r3)
+    stw     r0, 0x0014(r3)
+    stw     r0, 0x0018(r3)
+    stw     r0, 0x001C(r3)
+    stw     r0, 0x0020(r3)
+    stw     r0, 0x0024(r3)
+    stw     r0, 0x0028(r3)
+    stw     r0, 0x002C(r3)
+    stw     r0, 0x0030(r3)
+    stw     r0, 0x0038(r3)
+    stw     r0, 0x003C(r3)
+    stw     r0, 0x0040(r3)
+    stw     r0, 0x0044(r3)
+    stw     r0, 0x0048(r3)
+    stw     r0, 0x004C(r3)
+    stw     r0, 0x0050(r3)
+    stw     r0, 0x0054(r3)
+    stw     r0, 0x0058(r3)
+    stw     r0, 0x005C(r3)
+    stw     r0, 0x0060(r3)
+    stw     r0, 0x0064(r3)
+    stw     r0, 0x0068(r3)
+    stw     r0, 0x006C(r3)
+    stw     r0, 0x0070(r3)
+    stw     r0, 0x0074(r3)
+    stw     r0, 0x0078(r3)
+    stw     r0, 0x007C(r3)
+    stw     r0, 0x01A4(r3)
+    stw     r0, 0x01A8(r3)
+    stw     r0, 0x01AC(r3)
+    stw     r0, 0x01B0(r3)
+    stw     r0, 0x01B4(r3)
+    stw     r0, 0x01B8(r3)
+    stw     r0, 0x01BC(r3)
+    stw     r0, 0x01C0(r3)
+    b       OSClearContext
+}
+#pragma pop
 

@@ -37,6 +37,9 @@ void __OSLoadFPUContext(u8 unused, OSContext* context);
 void __OSSaveFPUContext(u8 unused1, u8 unused2, OSContext* context);
 
 u32 OSSaveContext(OSContext* context);
+u32 OSGetStackPointer(void);
+int OSSwitchFiber(u32 pc, u32 newsp);
+void OSInitContext(OSContext* context, u32 pc, u32 newsp);
 void OSDumpContext(OSContext* context);
 
 #endif /* DOLPHIN_OS_OSCONTEXT_H */
