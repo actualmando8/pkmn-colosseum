@@ -6458,50 +6458,34 @@ u16 fn_801FBED0(u8* ptr, u8 idx) {
     return *(u16*)(ptr + 0x2);
 }
 
-/* 0x801FC038 | size: 0x44 | small */
-void fn_801FC038(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    if ((u32)r3 == (u32)0x0) return;
-    if ((u32)r3 != (u32)0x0) {
-
-    r0 = r4 & 0xFFFF;
-    if ((u32)r0 < (u32)0x2) {
-
-        /* clrlslwi r4, r4, 16, 1 */;
-        r4 = r4 + 0x24;
-        r4 = r3 + r4;
+/* 0x801FC038 | size: 0x44 */
+void fn_801FC038(u8* ptr, u16 idx, u8 val) {
+    u8* entry;
+    if (ptr == NULL) return;
+    if (ptr == NULL) {
+        entry = NULL;
+    } else if (idx >= 2) {
+        entry = NULL;
+    } else {
+        entry = ptr + idx * 2 + 0x24;
     }
-    }
-    if ((u32)r4 == (u32)0x0) return;
-    *(u8*)((u8*)r4 + 0x1) = r5;
-    return;
+    if (entry == NULL) return;
+    entry[1] = val;
 }
 
-/* 0x801FC07C | size: 0x44 | small */
-void fn_801FC07C(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    if ((u32)r3 == (u32)0x0) return;
-    if ((u32)r3 != (u32)0x0) {
-
-    r0 = r4 & 0xFFFF;
-    if ((u32)r0 < (u32)0x2) {
-
-        /* clrlslwi r4, r4, 16, 1 */;
-        r4 = r4 + 0x24;
-        r4 = r3 + r4;
+/* 0x801FC07C | size: 0x44 */
+void fn_801FC07C(u8* ptr, u16 idx, u8 val) {
+    u8* entry;
+    if (ptr == NULL) return;
+    if (ptr == NULL) {
+        entry = NULL;
+    } else if (idx >= 2) {
+        entry = NULL;
+    } else {
+        entry = ptr + idx * 2 + 0x24;
     }
-    }
-    if ((u32)r4 == (u32)0x0) return;
-    *(u8*)((u8*)r4 + 0x0) = r5;
-    return;
+    if (entry == NULL) return;
+    entry[0] = val;
 }
 
 /* 0x801FC150 | size: 0x44 | small */
