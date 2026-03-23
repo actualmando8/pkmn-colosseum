@@ -10009,175 +10009,70 @@ s32 fn_80201400(void* arg0, u32 arg1) {
     return fn_80120D6C(result, arg1);
 }
 
-/* 0x8020147C | size: 0xF0 | medium */
-void fn_8020147C(void) {
-    extern void fn_80123110();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x8020147C | size: 0xF0 */
+u16 fn_8020147C(void* context, u16 moveId, u8 slot, u8 updateFlag) {
+    extern u16 fn_80123110(void* pokemon, u16 moveId, u8 slot);
+    void* partyList;
+    void* pokemon;
+    u16 result;
 
-    r29 = r4;
-    r30 = r5;
-    r31 = r6;
-    r28 = r3;
-    r4 = 0x0;
-    r5 = 0xd6;
-    r6 = 0x0;
-    ((void(*)(void))fn_8012640C)();
-    if ((u32)r3 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    partyList = fn_8012640C(context, 0, 0xD6, 0);
+    if (partyList == NULL) {
+        return 0;
     }
-    if ((u32)r3 == (u32)0x0) {
-        r3 = 0x0;
+    if (partyList == NULL) {
+        pokemon = NULL;
     } else {
-
-        r4 = 0x0;
-        r5 = 0xcc;
-        r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
+        pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
     }
-    if ((u32)r3 == (u32)0x0) {
-        r3 = 0x0;
+    if (pokemon == NULL) {
+        result = 0;
     } else {
-
-        r4 = r29;
-        r5 = r30;
-        fn_80123110();
+        result = fn_80123110(pokemon, moveId, slot);
     }
-    r0 = r31 & 0xFF;
-    r31 = r3;
-    if ((u32)r0 == (u32)0x1) {
-        r0 = r30 & 0xFF;
-        if ((u32)r0 == (u32)0x1) {
-            r7 = r3 & 0xFFFF;
-            if ((u32)r0 != (u32)0x1) {
-                r3 = r28;
-                r4 = 0x0;
-                r5 = 0xfa;
-                r6 = 0x0;
-                ((void(*)(void))fn_801254B4)();
+    if ((u8)updateFlag == 1) {
+        if ((u8)slot == 0) {
+            if ((u16)result != 0) {
+                fn_801254B4(context, 0, 0xFA, 0, (u16)result);
+            }
         }
+        if ((u8)slot == 1) {
+            if ((u16)moveId != 0) {
+                fn_801254B4(context, 0, 0xFA, 0, 0);
+            }
         }
-        r0 = r30 & 0xFF;
-        if ((u32)r0 == (u32)0x1) {
-            r0 = r29 & 0xFFFF;
-            if ((u32)r0 != (u32)0x1) {
-                r3 = r28;
-                r4 = 0x0;
-                r5 = 0xfa;
-                r6 = 0x0;
-                r7 = 0x0;
-                ((void(*)(void))fn_801254B4)();
     }
-    }
-    }
-    r3 = r31;
-
-    return;
+    return result;
 }
 
-/* 0x8020156C | size: 0x94 | medium */
-void fn_8020156C(void) {
-    extern u8 lbl_80279C80[];
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x8020156C | size: 0x94 */
+typedef struct { u16 fields[7]; } FieldTable7;
+u16 fn_8020156C(void* context) {
+    extern FieldTable7 lbl_80279C80;
+    FieldTable7 table;
+    u16 sum;
+    u8 i;
 
-    r4 = (u32)lbl_80279C80;
-    r6 = (u32)lbl_80279C80;
-    r28 = r3;
-    r31 = (u32)sp + 0x8;
-    r29 = 0x0;
-    r30 = 0x0;
-    r5 = *(u32*)((u8*)r6 + 0x0);
-    r4 = *(u32*)((u8*)r6 + 0x4);
-    r3 = *(u32*)((u8*)r6 + 0x8);
-    r0 = *(u16*)((u8*)r6 + 0xC);
-    *(u16*)(sp + 0x14) = r0;
-
-    while ((u32)r0 < (u32)0x7) {
-        /* clrlslwi r0, r30, 24, 1 */;
-        r3 = r28;
-        r5 = *(u16*)(r31 + r0);
-        r4 = 0x0;
-        r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
-        r0 = r29 + r3;
-        r30 = r30 + 0x1;
-        r29 = r0 & 0xFFFF;
-
-    r0 = r30 & 0xFF;
+    table = lbl_80279C80;
+    sum = 0;
+    for (i = 0; (u8)i < 7; i++) {
+        sum = (u16)(sum + (u32)fn_8012640C(context, 0, table.fields[i], 0));
     }
-    r3 = r29;
-    return;
+    return sum;
 }
 
-/* 0x80201600 | size: 0xA4 | medium */
-void fn_80201600(void) {
-    extern u8 lbl_80279C70[];
-    u8 sp[0x30];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x80201600 | size: 0xA4 */
+void fn_80201600(void* dest, void* src) {
+    extern FieldTable7 lbl_80279C70;
+    FieldTable7 table;
+    u16 fieldId;
+    u8 i;
 
-    r5 = (u32)lbl_80279C70;
-    r6 = (u32)lbl_80279C70;
-    r27 = r3;
-    r28 = r4;
-    r31 = (u32)sp + 0x8;
-    r29 = 0x0;
-    r5 = *(u32*)((u8*)r6 + 0x0);
-    r4 = *(u32*)((u8*)r6 + 0x4);
-    r3 = *(u32*)((u8*)r6 + 0x8);
-    r0 = *(u16*)((u8*)r6 + 0xC);
-    *(u16*)(sp + 0x14) = r0;
-
-    while ((u32)r0 < (u32)0x7) {
-        /* clrlslwi r0, r29, 24, 1 */;
-        r3 = r28;
-        r30 = *(u16*)(r31 + r0);
-        r4 = 0x0;
-        r6 = 0x0;
-        r5 = r30;
-        ((void(*)(void))fn_8012640C)();
-        r7 = r3;
-        r3 = r27;
-        r5 = r30;
-        r4 = 0x0;
-        r6 = 0x0;
-        ((void(*)(void))fn_801254B4)();
-        r29 = r29 + 0x1;
-
-    r0 = r29 & 0xFF;
+    table = lbl_80279C70;
+    for (i = 0; (u8)i < 7; i++) {
+        fieldId = table.fields[i];
+        fn_801254B4(dest, 0, fieldId, 0, (u32)fn_8012640C(src, 0, fieldId, 0));
     }
-    return;
 }
 
 /* 0x802016A4 | size: 0x60 */
@@ -10218,87 +10113,37 @@ void* fn_80201704(void* arg0) {
     return result;
 }
 
-/* 0x80201764 | size: 0x12C | medium */
-void fn_80201764(void) {
-    extern void fn_80119ED0();
-    extern void fn_8011A280();
-    extern void fn_801214FC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x80201764 | size: 0x12C */
+void fn_80201764(void* context, void* item, void* target) {
+    extern u16 fn_80119ED0(void* item);
+    extern void fn_8011A280(void* partyList, void* item, void* target);
+    extern void fn_801214FC(void* pokemon, void* item, void* target);
+    void* partyList;
+    void* pokemon;
+    u16 itemType;
 
-    r29 = r4;
-    r31 = r3;
-    r30 = r5;
-    r3 = r29;
-    fn_80119ED0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 != (u32)0x7c) {
-        r3 = r29;
-        fn_80119ED0();
-        r0 = r3 & 0xFFFF;
-        if ((u32)r0 != (u32)0xc8) {
-            r3 = r29;
-            fn_80119ED0();
-            r0 = r3 & 0xFFFF;
-            if ((u32)r0 == (u32)0xcd) {
+    itemType = (u16)fn_80119ED0(item);
+    if (itemType != 0x7C) {
+        if ((u16)fn_80119ED0(item) != 0xC8) {
+            if ((u16)fn_80119ED0(item) != 0xCD) {
+                if ((u16)fn_80119ED0(item) == 0xD8) {
+                    fn_8011A280(context, item, target);
+                }
+                return;
+            }
         }
+    }
+    partyList = fn_8012640C(context, 0, 0xD6, 0);
+    if ((u16)fn_80119ED0(item) == 0x7C || (u16)fn_80119ED0(item) == 0xC8) {
+        if (partyList == NULL) {
+            pokemon = NULL;
+        } else {
+            pokemon = fn_8012640C(partyList, 0, 0xCC, 0);
         }
-        r3 = r31;
-        r4 = 0x0;
-        r5 = 0xd6;
-        r6 = 0x0;
-        ((void(*)(void))fn_8012640C)();
-        r31 = r3;
-        r3 = r29;
-        fn_80119ED0();
-        r0 = r3 & 0xFFFF;
-        if ((u32)r0 != (u32)0x7c) {
-            r3 = r29;
-            fn_80119ED0();
-            r0 = r3 & 0xFFFF;
-            if ((u32)r0 == (u32)0xc8) {
-            }
-            if ((u32)r31 == (u32)0x0) {
-                r3 = 0x0;
-            } else {
-
-                r3 = r31;
-                r4 = 0x0;
-                r5 = 0xcc;
-                r6 = 0x0;
-                ((void(*)(void))fn_8012640C)();
-            }
-            r4 = r29;
-            r5 = r30;
-            fn_801214FC();
-            return;
-            }
-        r3 = r29;
-        fn_80119ED0();
-        r0 = r3 & 0xFFFF;
-        if ((u32)r0 != (u32)0xcd) return;
-        r3 = r31;
-        r4 = r29;
-        r5 = r30;
-        fn_8011A280();
-        return;
-            }
-    r3 = r29;
-    fn_80119ED0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 != (u32)0xd8) return;
-    r3 = r31;
-    r4 = r29;
-    r5 = r30;
-    fn_8011A280();
-
-    return;
+        fn_801214FC(pokemon, item, target);
+    } else {
+        if ((u16)fn_80119ED0(item) == 0xCD) {
+            fn_8011A280(partyList, item, target);
+        }
+    }
 }
