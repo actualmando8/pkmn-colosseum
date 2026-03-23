@@ -275,10 +275,9 @@ def full_fixup(code, func_name, source_text):
             void_fns_in_source.add(m2.group(1))
 
     # Check which void functions have their return value used
-    for vfn in list(void_fns_in_source):
+    for vfn in sorted(void_fns_in_source):
         if re.search(rf'\w+\s*=\s*{re.escape(vfn)}\s*\(', code):
-            # This function's return value is used - redeclare as int
-            # Change existing local extern from 'void fn_XXX()' to 'int fn_XXX()'
+            # This function's return value is used - change local extern from void to int
             code = re.sub(
                 rf'(\s+extern\s+)void(\s+{re.escape(vfn)}\s*\(\))',
                 r'\1int\2',
@@ -404,7 +403,7 @@ def find_function_range(source_text, func_name):
     return (start_pos, end_pos)
 
 
-def phase1_fix_declarations(source):
+def phase1_fix_declarations(source, ghidra_dict=None):
     """Fix all file-scope and forward declarations to use () params."""
     # External declarations - change to ()
     source = re.sub(
@@ -412,6 +411,31 @@ def phase1_fix_declarations(source):
         r'\1();',
         source, flags=re.MULTILINE
     )
+
+    # Check which file-scope 'void' functions have return values used in Ghidra code
+    if ghidra_dict:
+        void_fns_at_filescope = set()
+        for m in re.finditer(r'^extern\s+void\s+(fn_[0-9a-fA-F]{8})\s*\(\)', source, re.MULTILINE):
+            void_fns_at_filescope.add(m.group(1))
+
+        # Also check function definitions that return void
+        for m in re.finditer(r'^void\s+(fn_[0-9a-fA-F]{8})\s*\(', source, re.MULTILINE):
+            void_fns_at_filescope.add(m.group(1))
+
+        # Scan all Ghidra code to find which void functions have return values used
+        fns_needing_int = set()
+        for fn_name, (sz, code) in ghidra_dict.items():
+            for vfn in void_fns_at_filescope:
+                if re.search(rf'\w+\s*=\s*{re.escape(vfn)}\s*\(', code):
+                    fns_needing_int.add(vfn)
+
+        # Change those file-scope declarations from void to int
+        for vfn in fns_needing_int:
+            source = re.sub(
+                rf'^(extern\s+)void(\s+{re.escape(vfn)}\s*\(\)\s*;)',
+                r'\1int\2',
+                source, flags=re.MULTILINE
+            )
     # Remove forward declarations for functions in our range (they conflict with Ghidra signatures)
     lines = source.split('\n')
     new_lines = []
@@ -499,7 +523,7 @@ def main():
     # Phase 1: Fix file-scope declarations
     print("\nPhase 1: Fixing file-scope declarations...")
     source = SRC_FILE.read_text()
-    source = phase1_fix_declarations(source)
+    source = phase1_fix_declarations(source, ghidra_dict)
     SRC_FILE.write_text(source)
 
     ok, out = run_compile()
