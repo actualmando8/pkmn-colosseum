@@ -86,7 +86,7 @@ u32 _sndCheckSndWorkAll(u32 sndId, u32 fadeTime, u32 flags) {
         /* Already a BGM */
     } else {
         /* Check isActive flag (bit 2) */
-        if (!((entryFlags >> 3) & 1)) {
+        if (((entryFlags >> 3) & 1) == 0) {
             return 0; /* not active, nothing to do */
         }
     }
@@ -121,7 +121,7 @@ s32 GSsndGetStatus(u32 sndId) {
     flags = entry[0];
 
     /* Check isActive flag (bit 2) */
-    if (!((flags >> 3) & 1)) {
+    if (((flags >> 3) & 1) == 0) {
         return 0; /* not active */
     }
 
@@ -194,7 +194,7 @@ BOOL _sndBgmTranspose(u32 sndId, u16 transpose) {
     }
 
     /* Must be active (bit 2) */
-    if (!((flags >> 3) & 1)) {
+    if (((flags >> 3) & 1) == 0) {
         return FALSE;
     }
 
@@ -211,7 +211,7 @@ BOOL _sndBgmTranspose(u32 sndId, u16 transpose) {
     }
 
     /* Must not be fading (bit 3) */
-    if (!((flags >> 4) & 1)) {
+    if (((flags >> 4) & 1) == 0) {
         return FALSE;
     }
 
@@ -261,7 +261,7 @@ BOOL _sndSeTranspose(u32 sndId, u32 transpose, u32 volume) {
     }
 
     /* Must be active (bit 2) */
-    if (!((flags >> 3) & 1)) {
+    if (((flags >> 3) & 1) == 0) {
         return FALSE;
     }
 
@@ -277,7 +277,7 @@ BOOL _sndSeTranspose(u32 sndId, u32 transpose, u32 volume) {
     }
 
     /* Must not be fading (bit 3) */
-    if (!((flags >> 4) & 1)) {
+    if (((flags >> 4) & 1) == 0) {
         return FALSE;
     }
 
@@ -384,7 +384,7 @@ static void _sndStartPlaybackInternal(u32 sndId, u32 fadeTime, u32 volume) {
         fn_8016758C(sndId, sndId);  /* BGM play path */
     } else {
         /* Check isActive (bit 2) */
-        if (!((flags >> 3) & 1)) {
+        if (((flags >> 3) & 1) == 0) {
             return; /* not active */
         }
         fn_8016761C(entry, fadeTime, volume); /* SE play path */
@@ -541,7 +541,7 @@ void sndSetMasterVolume(u32 volume, u32 panValue, BOOL applyBgm,
                 }
             } else if (code == SND_MASTER_SE_ONLY) {
                 /* SE only: skip if isBGM flag is NOT set */
-                if (!((flags >> 1) & 1)) {
+                if (((flags >> 1) & 1) == 0) {
                     skip = 1;
                 }
             }

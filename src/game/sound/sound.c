@@ -881,7 +881,7 @@ u32 _sndGetWorkVolume(u32 sndId) {
     flags = entry[0];
 
     /* Check isActive flag (bit 2, extrwi r0, r0, 1, 26) */
-    if (!((flags >> 3) & 1)) {
+    if (((flags >> 3) & 1) == 0) {
         return 0;
     }
 

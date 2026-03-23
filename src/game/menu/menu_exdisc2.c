@@ -203,7 +203,7 @@ void fn_80078D5C(void) {
     r31 = r3;
     while (1) {
         r0 = *(u32*)&lbl_8047A620;
-        if (!((s32)r0 > 0x0)) break;
+        if ((s32)r0 <= 0x0) break;
         if (r0 <= 0xb) {
             r3 = (u32)jumptable_802EE4D8;
             r0 = r0 << 2;
@@ -1919,7 +1919,7 @@ void fn_8007A850(void) {
     fn_801C40F0();
     while (1) {
         tmp = *(u32*)&lbl_8047A638;
-        if (!((s32)tmp > 0)) break;
+        if ((s32)tmp <= 0) break;
         if ((s32)tmp != 3) {
             if ((s32)tmp < 3) {
                 if ((s32)tmp != 1) {

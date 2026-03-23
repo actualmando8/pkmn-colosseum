@@ -984,7 +984,7 @@ void fn_80034FB4(void) {
     r28 = r30 + 0xb00;
     while (1) {
         tmp = lbl_8047A458;
-        if (!((s32)tmp > 0)) break;
+        if ((s32)tmp <= 0) break;
         if (tmp <= 0xe) {
         do {
             r3 = (u32)jumptable_802E50A4;
