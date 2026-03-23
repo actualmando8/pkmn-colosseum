@@ -1848,7 +1848,7 @@ void* fn_801F7F80(void* context, u16 count) {
     if (context == NULL) {
         return NULL;
     }
-    for (i = 0; (u16)i < count; i++) {
+    for (i = 0; i < count; i++) {
         result = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(result) == 0) {
             return result;
@@ -1885,7 +1885,7 @@ u32 fn_801F8000(void* context) {
             }
         }
     }
-    if ((u8)valid == 0) {
+    if (valid == 0) {
         return 0;
     }
     slot = (u16)(u32)fn_801FB1C0(context, 0, 0x43, 0);
@@ -1919,7 +1919,7 @@ void* fn_801F8100(void* context) {
             }
         }
     }
-    if ((u8)valid == 0) {
+    if (valid == 0) {
         return NULL;
     }
     result = fn_801FB1C0(context, 0, 0x44, 0);
@@ -2127,8 +2127,8 @@ void fn_801F849C(void* arg0, u32 arg1) {
     }
     mode = (u8)arg1;
     i = 0;
-    while ((u8)i < 12) {
-        pokemon = fn_801FB1C0(arg0, 0, 0x4e, (u8)i);
+    while (i < 12) {
+        pokemon = fn_801FB1C0(arg0, 0, 0x4e, i);
         if (mode != 1 || (u8)fn_8020ECA4(pokemon)) {
             fn_8020EDBC(pokemon);
         }
@@ -2173,7 +2173,7 @@ s32 fn_801F85B0(void* context, void* target) {
         return -1;
     }
     for (i = 0; (s16)i < 2; i++) {
-        if (target == fn_801FB1C0(context, 0, 0x46, (u16)i)) {
+        if (target == fn_801FB1C0(context, 0, 0x46, i)) {
             return i;
         }
     }
@@ -2192,7 +2192,7 @@ s32 fn_801F8638(void* context, void* target) {
         return -1;
     }
     for (i = 0; (s16)i < 6; i++) {
-        if (target == fn_801FB1C0(context, 0, 0x45, (u16)i)) {
+        if (target == fn_801FB1C0(context, 0, 0x45, i)) {
             return i;
         }
     }
@@ -2216,7 +2216,7 @@ void fn_801F86C0(void* context, u8 flag) {
     if (context == NULL) {
         return;
     }
-    for (i = 0; (u16)i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         slot = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(slot) == 0) {
             slot = NULL;
@@ -2229,7 +2229,7 @@ void fn_801F86C0(void* context, u8 flag) {
                     if ((u8)fn_80121ADC(moveData, 4) == 1) {
                         fn_8012190C(moveData, 4, 1);
                     }
-                    if ((u8)flag == 1) {
+                    if (flag == 1) {
                         fn_801254B4(moveData, 0, 0x82, 0, speciesId);
                     }
                 }
@@ -2584,7 +2584,7 @@ u32 fn_801F8C00(void* context, void* filter) {
     } else if (filter == NULL) {
         pokemon = NULL;
     } else {
-        for (i = 0; (u16)i < 2; i++) {
+        for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
@@ -2606,7 +2606,7 @@ u32 fn_801F8C00(void* context, void* filter) {
     } else if (filter == NULL) {
         found = 0;
     } else {
-        for (i = 0; (u16)i < 2; i++) {
+        for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
@@ -2620,7 +2620,7 @@ u32 fn_801F8C00(void* context, void* filter) {
         }
         found = 0;
     }
-    return (u8)found != 0 ? 3 : 0;
+    return found != 0 ? 3 : 0;
 }
 
 /* 0x801F8D80 | size: 0xB4 */
@@ -2637,7 +2637,7 @@ void* fn_801F8D80(void* context, void* filter) {
     if (filter == NULL) {
         return NULL;
     }
-    for (i = 0; (u16)i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x46, i);
         if ((u8)fn_80206780(pokemon) == 0) {
             pokemon = NULL;
@@ -2672,7 +2672,7 @@ void* fn_801F8E34(void* context, void* filter) {
     } else if (filter == NULL) {
         pokemon = NULL;
     } else {
-        for (i = 0; (u16)i < 2; i++) {
+        for (i = 0; i < 2; i++) {
             pokemon = fn_801FB1C0(context, 0, 0x46, i);
             if ((u8)fn_80206780(pokemon) == 0) {
                 pokemon = NULL;
@@ -2703,7 +2703,7 @@ void* fn_801F8F24(void* context, s16 speciesId) {
     if ((s16)speciesId < 0) {
         return NULL;
     }
-    for (i = 0; (u16)i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(pokemon) == 0) {
             pokemon = NULL;
@@ -2748,7 +2748,7 @@ u32 fn_801F9034(void* context) {
     } else {
         val = 2;
     }
-    return (u8)val == 0;
+    return val == 0;
 }
 
 /* 0x801F90C4 | size: 0x6C */
@@ -2819,7 +2819,7 @@ u32 fn_801F923C(void* context, void* param) {
     if (result != NULL) {
         fn_801F1460(result);
     }
-    for (i = 0; (u16)i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
     }
     fn_80207760(fn_801FB1C0(context, 0, 0x47, 0));
@@ -2839,7 +2839,7 @@ u32 fn_801F923C(void* context, void* param) {
     } else {
         battleType = 2;
     }
-    if ((u8)battleType == 0) {
+    if (battleType == 0) {
         fn_8026316C(context, param, 0);
         return 1;
     }
@@ -2851,7 +2851,7 @@ u32 fn_801F923C(void* context, void* param) {
     } else {
         battleType = 2;
     }
-    if ((u8)battleType != 1) {
+    if (battleType != 1) {
         return 1;
     }
     if ((u8)fn_80262508(context, param) == 0) {
@@ -3049,7 +3049,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
     } else {
         battleType = 2;
     }
-    if ((u8)battleType == 0) {
+    if (battleType == 0) {
         return fn_80263DE4(context, 0, p1, p2, 0);
     }
     type = (u16)(u32)fn_801FB1C0(0, slot, 0x4, 0);
@@ -3060,7 +3060,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
     } else {
         battleType = 2;
     }
-    if ((u8)battleType != 1) {
+    if (battleType != 1) {
         return result;
     }
     return fn_80262D3C(context, p1, p2, p3);
@@ -3078,7 +3078,7 @@ void fn_801F9790(void* context) {
     if (result != NULL) {
         fn_801F1460(result);
     }
-    for (i = 0; (u16)i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
     }
     fn_80207760(fn_801FB1C0(context, 0, 0x47, 0));
@@ -3116,9 +3116,9 @@ u32 fn_801F98BC(void* arg0) {
 
     count = 0;
     i = 0;
-    while ((u8)i < 2) {
-        if ((u8)fn_802062FC(fn_801FB1C0(arg0, 0, 0x46, (u8)i))) {
-            count = (u8)((u8)count + 1);
+    while (i < 2) {
+        if ((u8)fn_802062FC(fn_801FB1C0(arg0, 0, 0x46, i))) {
+            count = (u8)(count + 1);
         }
         i++;
     }
@@ -3133,7 +3133,7 @@ void* fn_801F9930(void* context, void* moveData) {
     void* data;
     u16 i;
 
-    for (i = 0; (u16)i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(pokemon) != 0) {
             data = fn_8012640C(pokemon, 0, 0xCB, 0);
@@ -3988,16 +3988,16 @@ u32 fn_801FA524(void* context) {
             }
         }
     }
-    if ((u8)valid == 0) {
+    if (valid == 0) {
         return 0;
     }
     count = 0;
-    for (i = count; (u8)i < 6; i++) {
-        if ((u8)fn_80206608(fn_801FB1C0(context, 0, 0x45, (u8)i)) != 0) {
-            count = (u8)((u8)count + 1);
+    for (i = count; i < 6; i++) {
+        if ((u8)fn_80206608(fn_801FB1C0(context, 0, 0x45, i)) != 0) {
+            count = (u8)(count + 1);
         }
     }
-    return (u8)count != 0;
+    return count != 0;
 }
 
 /* 0x801FA634 | size: 0xA4 */
@@ -4186,8 +4186,8 @@ void fn_801FA8CC(void* base, u16 count) {
     if (base == NULL) {
         return;
     }
-    for (i = 0; (u16)i < count; i++) {
-        trainer = (u8*)base + (u16)i * 0x28E4;
+    for (i = 0; i < count; i++) {
+        trainer = (u8*)base + i * 0x28E4;
         if (trainer != NULL) {
             fn_8012A248(fn_801FB1C0(trainer, 0, 0x44, 0));
             fn_801FAA58(trainer, 0, 0x43, 0, 0);
@@ -5328,18 +5328,18 @@ void fn_801FB974(void* context, u8 mode) {
     if ((data = fn_801FB1C0(context, 0, 0x4C, 0)) == NULL) {
         return;
     }
-    if ((u8)mode == 0) {
+    if (mode == 0) {
         fn_801DDD28(data, 0x57, 4, 0);
-    } else if ((u8)mode == 1) {
+    } else if (mode == 1) {
         fn_801DA9E8(data, 0x57, 4);
-    } else if ((u8)mode == 2) {
+    } else if (mode == 2) {
         do {
             if ((u8)fn_801DA94C(data, 0x57, 4) == 0) {
                 return;
             }
             fn_800F0308(data);
         } while (1);
-    } else if ((u8)mode == 3) {
+    } else if (mode == 3) {
         fn_801DA8C4(data, 0x57, 4);
     }
 }
@@ -5357,18 +5357,18 @@ void fn_801FBA24(void* context, u8 mode) {
     if ((data = fn_801FB1C0(context, 0, 0x4C, 0)) == NULL) {
         return;
     }
-    if ((u8)mode == 0) {
+    if (mode == 0) {
         fn_801DDD28(data, 0x74, 4, 0);
-    } else if ((u8)mode == 1) {
+    } else if (mode == 1) {
         fn_801DA9E8(data, 0x74, 4);
-    } else if ((u8)mode == 2) {
+    } else if (mode == 2) {
         do {
             if ((u8)fn_801DA94C(data, 0x74, 4) == 0) {
                 return;
             }
             fn_800F0308(data);
         } while (1);
-    } else if ((u8)mode == 3) {
+    } else if (mode == 3) {
         fn_801DA8C4(data, 0x74, 4);
     }
 }
@@ -5388,30 +5388,30 @@ void fn_801FBAD4(void* context, u32 param, u8 mode) {
         return;
     }
     animId = (u16)fn_80142CF4(0, param, 0x12, 0);
-    if ((u8)mode == 0) {
-        fn_801DDD28(data, (u16)animId, 4, 0);
-    } else if ((u8)mode == 1) {
-        fn_801DA9E8(data, (u16)animId, 4);
+    if (mode == 0) {
+        fn_801DDD28(data, animId, 4, 0);
+    } else if (mode == 1) {
+        fn_801DA9E8(data, animId, 4);
         do {
-            if ((u8)fn_801DA94C(data, (u16)animId, 4) == 0) {
+            if ((u8)fn_801DA94C(data, animId, 4) == 0) {
                 return;
             }
             fn_800F0308(data);
         } while (1);
-    } else if ((u8)mode == 2) {
-        fn_801DA8C4(data, (u16)animId, 4);
-    } else if ((u8)mode == 3) {
+    } else if (mode == 2) {
+        fn_801DA8C4(data, animId, 4);
+    } else if (mode == 3) {
         fn_801DDD28(data, 0x57, 4, 0);
-    } else if ((u8)mode == 4) {
+    } else if (mode == 4) {
         fn_801DA9E8(data, 0x57, 4);
-    } else if ((u8)mode == 5) {
+    } else if (mode == 5) {
         do {
             if ((u8)fn_801DA94C(data, 0x57, 4) == 0) {
                 return;
             }
             fn_800F0308(data);
         } while (1);
-    } else if ((u8)mode == 6) {
+    } else if (mode == 6) {
         fn_801DA8C4(data, 0x57, 4);
     }
 }
@@ -5434,25 +5434,25 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
     }
     typeId = (u8)(u32)fn_8012640C(fn_80205B8C(trainerCtx), 0, 0x73, 0);
     animId = (u16)fn_80142CF4(0, typeId, 0x11, 0);
-    if ((u8)mode == 0) {
-        fn_801DDD28(data, (u16)animId, 4, 0);
-    } else if ((u8)mode == 1) {
-        fn_801DA9E8(data, (u16)animId, 4);
-    } else if ((u8)mode == 2) {
+    if (mode == 0) {
+        fn_801DDD28(data, animId, 4, 0);
+    } else if (mode == 1) {
+        fn_801DA9E8(data, animId, 4);
+    } else if (mode == 2) {
         do {
-            if ((u8)fn_801DA94C(data, (u16)animId, 4) == 0) {
+            if ((u8)fn_801DA94C(data, animId, 4) == 0) {
                 return;
             }
             fn_800F0308(data);
         } while (1);
-    } else if ((u8)mode == 3) {
-        fn_801DA8C4(data, (u16)animId, 4);
+    } else if (mode == 3) {
+        fn_801DA8C4(data, animId, 4);
     }
 }
 
 /* 0x801FBD58 | size: 0x2C */
 u8* fn_801FBD58(u16 idx) {
-    idx = (u16)idx;
+    idx = idx;
     if (idx >= lbl_80478F18[0]) { return NULL; }
     return lbl_80478F1C + idx * 0xC;
 }
@@ -5614,10 +5614,10 @@ void fn_801FC704(u8* ptr, u8 idx, u8 val) {
     u8* entry;
     if (ptr == NULL) {
         entry = NULL;
-    } else if ((u8)idx >= 4) {
+    } else if (idx >= 4) {
         entry = NULL;
     } else {
-        entry = ptr + (u8)idx * 8 + 0x30;
+        entry = ptr + idx * 8 + 0x30;
     }
     if (entry == 0) { return; }
     entry[0] = val;
@@ -5628,10 +5628,10 @@ void fn_801FC744(u8* ptr, u8 idx, u32 val) {
     u8* entry;
     if (ptr == NULL) {
         entry = NULL;
-    } else if ((u8)idx >= 4) {
+    } else if (idx >= 4) {
         entry = NULL;
     } else {
-        entry = ptr + (u8)idx * 8 + 0x30;
+        entry = ptr + idx * 8 + 0x30;
     }
     if (entry == 0) { return; }
     *(u32*)(entry + 4) = val;
@@ -5640,7 +5640,7 @@ void fn_801FC744(u8* ptr, u8 idx, u32 val) {
 /* 0x801FC7E4 | size: 0x24 */
 void fn_801FC7E4(u8* ptr, u8 idx, u16 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 6) { return; }
+    if (idx >= 6) { return; }
     ptr += idx * 2;
     *(u16*)(ptr + 0x22) = val;
 }
@@ -5648,7 +5648,7 @@ void fn_801FC7E4(u8* ptr, u8 idx, u16 val) {
 /* 0x801FC808 | size: 0x20 */
 void fn_801FC808(u8* ptr, u8 idx, u8 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 6) { return; }
+    if (idx >= 6) { return; }
     ptr += idx;
     *(ptr + 0x1C) = val;
 }
@@ -5718,7 +5718,7 @@ s32 fn_801FC948(u8* ptr) {
 /* 0x801FC9AC | size: 0x34 */
 s32 fn_801FC9AC(u8* ptr, u8 idx) {
     if (ptr == NULL) { return -1; }
-    if ((u8)idx >= 6) { return -1; }
+    if (idx >= 6) { return -1; }
     ptr += idx * 2;
     return *(s16*)(ptr + 0x22);
 }
@@ -5726,15 +5726,15 @@ s32 fn_801FC9AC(u8* ptr, u8 idx) {
 /* 0x801FC9E0 | size: 0x34 */
 s32 fn_801FC9E0(u8* ptr, u8 idx) {
     if (ptr == NULL) { return -1; }
-    if ((u8)idx >= 6) { return -1; }
-    ptr += (u8)idx;
+    if (idx >= 6) { return -1; }
+    ptr += idx;
     return (s8)*(ptr + 0x1C);
 }
 
 /* 0x801FCA58 | size: 0x20 */
 void fn_801FCA58(u8* ptr, u8 idx, u8 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 0xC) { return; }
+    if (idx >= 0xC) { return; }
     ptr += idx;
     *(ptr + 0x8) = val;
 }
@@ -5742,7 +5742,7 @@ void fn_801FCA58(u8* ptr, u8 idx, u8 val) {
 /* 0x801FCA88 | size: 0x30 */
 u32 fn_801FCA88(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
-    if ((u8)idx >= 0xC) { return 0; }
+    if (idx >= 0xC) { return 0; }
     ptr += idx;
     return *(ptr + 0x8);
 }
@@ -5758,7 +5758,7 @@ void fn_801FCB0C(u8* ptr, u8 idx, u32 val) {
 /* 0x801FCB40 | size: 0x24 */
 void fn_801FCB40(u8* ptr, u8 idx, u16 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 8) { return; }
+    if (idx >= 8) { return; }
     ptr += idx * 2;
     *(u16*)(ptr + 0x14) = val;
 }
@@ -5774,7 +5774,7 @@ u32 fn_801FCBBC(u8* ptr, u8 idx) {
 /* 0x801FCC08 | size: 0x34 */
 u32 fn_801FCC08(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
-    if ((u8)idx >= 8) { return 0; }
+    if (idx >= 8) { return 0; }
     ptr += idx * 2;
     return *(u16*)(ptr + 0x14);
 }
@@ -5788,8 +5788,8 @@ u8* fn_801FCCF0(u8* ptr) {
 /* 0x801FCD58 | size: 0x34 */
 u8* fn_801FCD58(u8* ptr, u8 idx) {
     if (ptr == NULL) { return NULL; }
-    if ((u8)idx >= 0xC) { return NULL; }
-    return ptr + (u8)idx * 0x14 + 0x27F4;
+    if (idx >= 0xC) { return NULL; }
+    return ptr + idx * 0x14 + 0x27F4;
 }
 
 /* 0x801FCE14 | size: 0x18 */
@@ -5863,7 +5863,7 @@ u8* fn_801FD5B0(u8* ptr) {
 /* 0x801FD5F0 | size: 0x24 */
 void fn_801FD5F0(u8* ptr, u8 idx, u16 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 2) { return; }
+    if (idx >= 2) { return; }
     ptr += idx * 2;
     *(u16*)(ptr + 0x65C) = val;
 }
@@ -5871,7 +5871,7 @@ void fn_801FD5F0(u8* ptr, u8 idx, u16 val) {
 /* 0x801FD614 | size: 0x34 */
 u32 fn_801FD614(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
-    if ((u8)idx >= 2) { return 0; }
+    if (idx >= 2) { return 0; }
     ptr += idx * 2;
     return *(u16*)(ptr + 0x65C);
 }
@@ -5885,7 +5885,7 @@ u8* fn_801FD648(u8* ptr) {
 /* 0x801FD660 | size: 0x24 */
 void fn_801FD660(u8* ptr, u8 idx, u16 val) {
     if (ptr == NULL) { return; }
-    if ((u8)idx >= 0xC) { return; }
+    if (idx >= 0xC) { return; }
     ptr += idx * 2;
     *(u16*)(ptr + 0x612) = val;
 }
@@ -5893,7 +5893,7 @@ void fn_801FD660(u8* ptr, u8 idx, u16 val) {
 /* 0x801FD684 | size: 0x34 */
 s32 fn_801FD684(u8* ptr, u8 idx) {
     if (ptr == NULL) { return -1; }
-    if ((u8)idx >= 0xC) { return -1; }
+    if (idx >= 0xC) { return -1; }
     ptr += idx * 2;
     return *(s16*)(ptr + 0x612);
 }
@@ -6627,7 +6627,7 @@ void fn_801FE5D4(void* context) {
     u8 i;
 
     table = lbl_80279CE4;
-    for (i = 0; (u8)i < 18; i++) {
+    for (i = 0; i < 18; i++) {
         fieldId = table.fields[i];
         srcSlot = fn_8012640C(context, 0, 0xD5, 0);
         destSlot = fn_8012640C(context, 0, 0xD7, 0);
@@ -8917,7 +8917,7 @@ u32 fn_80200A5C(void* context) {
     if (context == NULL) {
         return 0;
     }
-    for (i = 0; (u8)i < 9; i++) {
+    for (i = 0; i < 9; i++) {
         if ((s32)fn_8012640C(context, 0, table.fields[i], 0) == 1) {
             return 1;
         }
@@ -9470,20 +9470,20 @@ u8 fn_80201248(void* context, u16* output) {
     }
     entryList = (u8*)fn_8012640C(context, 0, 0x122, 0);
     if (output != NULL) {
-        for (i = 0; (u8)i < 4; i++) {
+        for (i = 0; i < 4; i++) {
             output[i] = 0;
         }
     } else {
-        for (i = 0; (u8)i < 4; i++) {
+        for (i = 0; i < 4; i++) {
         }
     }
     count = 0;
-    for (i = 0; (u8)i < 4; i++) {
-        entry = entryList + (u8)i * 0xC;
+    for (i = 0; i < 4; i++) {
+        entry = entryList + i * 0xC;
         if ((u8)fn_8020E614((void*)entry) != 0) {
             moveId = fn_801FD0EC((void*)entry);
-            if ((u16)moveId != 0) {
-                if ((u16)moveId != 0x165) {
+            if (moveId != 0) {
+                if (moveId != 0x165) {
                     if (output != NULL) {
                         output[count] = moveId;
                     }
@@ -9508,7 +9508,7 @@ void fn_80201340(void* context, void* target, u16 value) {
     if (context == NULL) {
         return;
     }
-    fn_801254B4(context, 0, 0xF7, 0, (u16)value);
+    fn_801254B4(context, 0, 0xF7, 0, value);
     data = (u8*)fn_8012640C(context, 0, 0x122, 0);
     if (target != NULL) {
         if (fn_8020E57C((void*)data, 4, target) == NULL) {
@@ -9570,14 +9570,14 @@ u16 fn_8020147C(void* context, u16 moveId, u8 slot, u8 updateFlag) {
     } else {
         result = fn_80123110(pokemon, moveId, slot);
     }
-    if ((u8)updateFlag == 1) {
-        if ((u8)slot == 0) {
-            if ((u16)result != 0) {
-                fn_801254B4(context, 0, 0xFA, 0, (u16)result);
+    if (updateFlag == 1) {
+        if (slot == 0) {
+            if (result != 0) {
+                fn_801254B4(context, 0, 0xFA, 0, result);
             }
         }
-        if ((u8)slot == 1) {
-            if ((u16)moveId != 0) {
+        if (slot == 1) {
+            if (moveId != 0) {
                 fn_801254B4(context, 0, 0xFA, 0, 0);
             }
         }
@@ -9595,7 +9595,7 @@ u16 fn_8020156C(void* context) {
 
     table = lbl_80279C80;
     sum = 0;
-    for (i = 0; (u8)i < 7; i++) {
+    for (i = 0; i < 7; i++) {
         sum = (u16)(sum + (u32)fn_8012640C(context, 0, table.fields[i], 0));
     }
     return sum;
@@ -9609,7 +9609,7 @@ void fn_80201600(void* dest, void* src) {
     u8 i;
 
     table = lbl_80279C70;
-    for (i = 0; (u8)i < 7; i++) {
+    for (i = 0; i < 7; i++) {
         fieldId = table.fields[i];
         fn_801254B4(dest, 0, fieldId, 0, (u32)fn_8012640C(src, 0, fieldId, 0));
     }

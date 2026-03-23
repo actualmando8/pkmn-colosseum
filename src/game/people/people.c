@@ -113,7 +113,7 @@ PeopleEntry* peopleInit(u32 maxPeople)
 
     /* Allocate from GSmem */
     gPeopleMemHandle = fn_800E3534(totalSize);
-    gPeopleArray = (PeopleEntry*)fn_800E27B0((u16)gPeopleMemHandle);
+    gPeopleArray = (PeopleEntry*)fn_800E27B0(gPeopleMemHandle);
 
     /* Zero-fill entire array */
     memset(gPeopleArray, 0, totalSize);

@@ -287,7 +287,7 @@ BOOL _sndSeTranspose(u32 sndId, u32 transpose, u32 volume) {
     }
 
     /* Perform the transpose */
-    fn_8014D6D8(0, (u16)transpose, handle, 0);
+    fn_8014D6D8(0, transpose, handle, 0);
     fn_8014D5C8(handle);
 
     /* Set fading flag (bit 3) */

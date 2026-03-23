@@ -403,21 +403,21 @@ s32 GScolsys2_CalcAdvantage(u16 typeA, u8 isTypeA)
         if (isTypeA == 1) {
             /* typeA attacks: query typeA vs each other type */
             interaction = GScolsys2_GetTypeInteraction((u32)typeA, (u32)(u16)i);
-            if ((u16)interaction == GSCOLSYS_TYPE_IMMUNE) {
+            if (interaction == GSCOLSYS_TYPE_IMMUNE) {
                 score -= 10;
-            } else if ((u16)interaction == GSCOLSYS_TYPE_DISADVANTAGE) {
+            } else if (interaction == GSCOLSYS_TYPE_DISADVANTAGE) {
                 score -= 10;
-            } else if ((u16)interaction == GSCOLSYS_TYPE_ADVANTAGE) {
+            } else if (interaction == GSCOLSYS_TYPE_ADVANTAGE) {
                 score += 10;
             }
         } else {
             /* typeA defends: query each other type vs typeA */
             interaction = GScolsys2_GetTypeInteraction((u32)(u16)i, (u32)typeA);
-            if ((u16)interaction == GSCOLSYS_TYPE_IMMUNE) {
+            if (interaction == GSCOLSYS_TYPE_IMMUNE) {
                 score += 10;
-            } else if ((u16)interaction == GSCOLSYS_TYPE_DISADVANTAGE) {
+            } else if (interaction == GSCOLSYS_TYPE_DISADVANTAGE) {
                 score += 10;
-            } else if ((u16)interaction == GSCOLSYS_TYPE_ADVANTAGE) {
+            } else if (interaction == GSCOLSYS_TYPE_ADVANTAGE) {
                 score -= 10;
             }
         }
@@ -455,13 +455,13 @@ u16 GScolsys2_CalcGroupResult(u16 targetType, u16* typeArray, u16 arrayCount)
         interaction = GScolsys2_GetTypeInteraction((u32)targetType, (u32)typeArray[i]);
         result = interaction;
 
-        if ((u16)result == GSCOLSYS_TYPE_IMMUNE) {
+        if (result == GSCOLSYS_TYPE_IMMUNE) {
             return GSCOLSYS_TYPE_IMMUNE;
         }
 
-        if ((u16)result == GSCOLSYS_TYPE_ADVANTAGE) {
+        if (result == GSCOLSYS_TYPE_ADVANTAGE) {
             advCount++;
-        } else if ((u16)result == GSCOLSYS_TYPE_DISADVANTAGE) {
+        } else if (result == GSCOLSYS_TYPE_DISADVANTAGE) {
             disCount++;
         }
     }
@@ -487,7 +487,7 @@ u16 GScolsys2_CalcGroupResult(u16 targetType, u16* typeArray, u16 arrayCount)
  * =================================================================== */
 u16 GScolsys2_GetTypeInteractionWrap(u16 typeA, u16 typeB)
 {
-    return GScolsys2_GetTypeInteraction((u32)(u16)typeA, (u32)(u16)typeB);
+    return GScolsys2_GetTypeInteraction((u32)typeA, (u32)typeB);
 }
 
 /* ===================================================================
@@ -1131,7 +1131,7 @@ void GScolsys2_DrawTriGroup(void* meshData, void* mtx)
         /* R component: map the high nibble through color range */
         r_float = color127 * ((f32)typeNibbleHi / color15) + color128;
         r_int = (s32)r_float;
-        colorBytes[1] = (u8)r_int;
+        colorBytes[1] = r_int;
 
         /* G component: wrap low nibble */
         typeNibbleLo = typeNibbleLo + 1;
@@ -1140,7 +1140,7 @@ void GScolsys2_DrawTriGroup(void* meshData, void* mtx)
         }
         g_float = color255 * ((f32)typeNibbleLo / color15);
         g_int = (s32)g_float;
-        colorBytes[2] = (u8)g_int;
+        colorBytes[2] = g_int;
 
         /* Extra color from byte 0x31 */
         typeNibbleHi = triPtr[0x31] >> 4;

@@ -364,7 +364,7 @@ void PADInput_SetStickMode(u32 padIdx, u32 mode) {
     if (padIdx == 0 || padIdx > PAD_MAX_CONTROLLERS) {
         return;
     }
-    sPadStates[padIdx].stickMode = (u8)mode;
+    sPadStates[padIdx].stickMode = mode;
 }
 
 /* ===================================================================
@@ -394,7 +394,7 @@ void PADInput_SetRumbleMode(u32 padIdx, u32 mode) {
     if (padIdx == 0 || padIdx > PAD_MAX_CONTROLLERS) {
         return;
     }
-    sPadStates[padIdx].rumbleMode = (u8)mode;
+    sPadStates[padIdx].rumbleMode = mode;
 }
 
 /* ===================================================================

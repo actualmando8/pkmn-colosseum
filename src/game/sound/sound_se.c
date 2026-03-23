@@ -225,7 +225,7 @@ static void _sndQueueVolumeEntry(u32 sndId, u32 volume, u32 fadeTime) {
     }
 
     /* Push the volume onto the queue */
-    resData->volQueue[queueCount] = (u8)volume;
+    resData->volQueue[queueCount] = volume;
 
     /* Increment queue count (but cap at 2 for the next push) */
     if (queueCount < 2) {
