@@ -6999,16 +6999,16 @@ u32 fn_801F6588(u8* ptr, u16 idx) {
 /* 0x801F6658 | size: 0x24 */
 void fn_801F6658(u8* ptr, u8 idx, u16 val) {
     if (!ptr) { return; }
-    if ((u8)idx >= 2) { return; }
-    ptr += (u8)idx * 2;
+    if (idx >= 2) { return; }
+    ptr += idx * 2;
     *(u16*)(ptr + 0x14) = val;
 }
 
 /* 0x801F66EC | size: 0x34 */
 u32 fn_801F66EC(u8* ptr, u8 idx) {
     if (!ptr) { return 0; }
-    if ((u8)idx >= 2) { return 0; }
-    ptr += (u8)idx * 2;
+    if (idx >= 2) { return 0; }
+    ptr += idx * 2;
     return *(u16*)(ptr + 0x14);
 }
 
