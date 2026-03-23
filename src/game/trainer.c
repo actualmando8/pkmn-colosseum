@@ -2856,139 +2856,64 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
     fn_80204F6C(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
 }
 
-/* 0x801F923C | size: 0x1BC | medium */
-void fn_801F923C(void) {
-    extern void fn_801EF634();
-    extern void fn_801F1460();
-    extern void fn_801FB1C0();
-    extern void fn_80207760();
-    extern void fn_802342CC();
-    extern void fn_80262508();
-    extern void fn_8026316C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x801F923C | size: 0x1BC */
+u32 fn_801F923C(void* context, void* param) {
+    extern u16 fn_801EF634(void* ctx);
+    extern void fn_801F1460(void* ptr);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void fn_80207760(void* ptr);
+    extern void fn_802342CC(void* ctx, void* param);
+    extern u8 fn_80262508(void* ctx, void* param);
+    extern void fn_8026316C(void* ctx, void* param, u32 flags);
+    void* result;
+    u16 slot;
+    u16 type;
+    u8 battleType;
+    u16 i;
 
-    r5 = 0x4d;
-    r6 = 0x0;
-    r30 = r4;
-    r29 = r3;
-    r4 = 0x0;
-    fn_801FB1C0();
-    if ((u32)r3 != (u32)0x0) {
-        fn_801F1460();
+    result = fn_801FB1C0(context, 0, 0x4D, 0);
+    if (result != NULL) {
+        fn_801F1460(result);
     }
-    r31 = 0x0;
-    while (1) {
-        r0 = r31 & 0xFFFF;
-        if ((u32)r0 >= (u32)0x2) break;
-        r3 = r29;
-        r6 = r31;
-        r4 = 0x0;
-        r5 = 0x46;
-        fn_801FB1C0();
-        fn_80207760();
-        r31 = r31 + 0x1;
-
+    for (i = 0; (u16)i < 2; i++) {
+        fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
     }
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x47;
-    r6 = 0x0;
-    fn_801FB1C0();
-    fn_80207760();
-    fn_801EF634();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 == (u32)0x1) {
-        r3 = 0x0;
-        return;
+    fn_80207760(fn_801FB1C0(context, 0, 0x47, 0));
+    if ((u16)fn_801EF634(context) == 1) {
+        return 0;
     }
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x43;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r31 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r4 = r31;
-    r5 = 0x2;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 != (u32)0x1) {
-        r3 = r29;
-        r4 = r30;
-        fn_802342CC();
-        r3 = 0x1;
-        return;
+    slot = (u16)(u32)fn_801FB1C0(context, 0, 0x43, 0);
+    if ((u16)(u32)fn_801FB1C0(0, slot, 0x2, 0) != 0) {
+        fn_802342CC(context, param);
+        return 1;
     }
-    r4 = r31;
-    r3 = 0x0;
-    r5 = 0x4;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 == (u32)0x1) {
-        r0 = 0x0;
-
+    type = (u16)(u32)fn_801FB1C0(0, slot, 0x4, 0);
+    if (type == 1) {
+        battleType = 0;
+    } else if (type == 2 || type == 3) {
+        battleType = 1;
     } else {
-
-        if ((u32)r0 == (u32)0x2 || (u32)r0 == (u32)0x3) {
-
-            r0 = 0x1;
-
-        } else {
-            r0 = 0x2;
-        }
+        battleType = 2;
     }
-    r0 = r0 & 0xFF;
-    if ((u32)r0 == (u32)0x3) {
-        r3 = r29;
-        r4 = r30;
-        r5 = 0x0;
-        fn_8026316C();
-        r3 = 0x1;
-        return;
+    if ((u8)battleType == 0) {
+        fn_8026316C(context, param, 0);
+        return 1;
     }
-    r4 = r31;
-    r3 = 0x0;
-    r5 = 0x4;
-    r6 = 0x0;
-    fn_801FB1C0();
-    r0 = r3 & 0xFFFF;
-    if ((u32)r0 == (u32)0x1) {
-        r0 = 0x0;
-
+    type = (u16)(u32)fn_801FB1C0(0, slot, 0x4, 0);
+    if (type == 1) {
+        battleType = 0;
+    } else if (type == 2 || type == 3) {
+        battleType = 1;
     } else {
-
-        if ((u32)r0 == (u32)0x2 || (u32)r0 == (u32)0x3) {
-
-            r0 = 0x1;
-
-        } else {
-            r0 = 0x2;
-        }
+        battleType = 2;
     }
-    r0 = r0 & 0xFF;
-    if ((u32)r0 != (u32)0x1) { r3 = 0x1; return; }
-    r3 = r29;
-    r4 = r30;
-    fn_80262508();
-    r0 = r3 & 0xFF;
-    if ((u32)r0 != (u32)0x1) { r3 = 0x1; return; }
-    r3 = 0x0;
-    return;
-
-    r3 = 0x1;
-
-    return;
+    if ((u8)battleType != 1) {
+        return 1;
+    }
+    if ((u8)fn_80262508(context, param) == 0) {
+        return 0;
+    }
+    return 1;
 }
 
 /* 0x801F93F8 | size: 0x208 | large */
