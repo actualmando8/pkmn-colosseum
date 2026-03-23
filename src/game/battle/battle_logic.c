@@ -955,7 +955,7 @@ void battle_EnterHyperMode(BattlePokemon* pokemon) {
     s32 roll;
     s32 chance;
 
-    if (!battle_IsShadowPokemon(pokemon)) {
+    if (battle_IsShadowPokemon(pokemon) == FALSE) {
         return;
     }
 
@@ -983,7 +983,7 @@ void battle_EnterHyperMode(BattlePokemon* pokemon) {
  * Exit Hyper Mode (via the "Call" action).
  */
 void battle_ExitHyperMode(BattlePokemon* pokemon) {
-    if (!battle_IsShadowPokemon(pokemon)) {
+    if (battle_IsShadowPokemon(pokemon) == FALSE) {
         return;
     }
 
@@ -1006,7 +1006,7 @@ void battle_ExitHyperMode(BattlePokemon* pokemon) {
  * Process the "Call" battle command for Shadow Pokemon.
  */
 void battle_CallPokemon(BattlePokemon* pokemon) {
-    if (!battle_IsShadowPokemon(pokemon)) {
+    if (battle_IsShadowPokemon(pokemon) == FALSE) {
         return;
     }
 
@@ -1087,7 +1087,7 @@ s32 battle_CalcShadowRushDamage(BattlePokemon* attacker, BattlePokemon* defender
  * Check if a Pokemon can be snagged.
  */
 BOOL battle_CanSnag(BattlePokemon* target) {
-    if (!battle_IsShadowPokemon(target)) {
+    if (battle_IsShadowPokemon(target) == FALSE) {
         return FALSE;
     }
 

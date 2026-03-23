@@ -189,7 +189,7 @@ s32 cardesavedata_CheckSeries(void* pCardE, CardESeries* pSeries, s8 seriesIdx) 
             }
         }
 
-        if (!inBounds) {
+        if (inBounds == 0) {
             GS_Assert(sFile, 0x180, "0 <= level && level < series->level_max");
         }
     }

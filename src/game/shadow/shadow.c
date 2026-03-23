@@ -130,7 +130,7 @@ void shadow_Reset(void) {
     u32 i;
     ShadowPokemonData* dataPtr;
 
-    if (!sShadowSystem.initialized) {
+    if (sShadowSystem.initialized == 0) {
         return;
     }
 
@@ -440,7 +440,7 @@ void shadow_ColognePurify(void* pokemon, u16 itemID) {
 void shadow_TimePurify(void) {
     u32 i;
 
-    if (!sShadowSystem.initialized) {
+    if (sShadowSystem.initialized == 0) {
         return;
     }
 

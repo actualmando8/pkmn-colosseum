@@ -137,7 +137,7 @@ void menuPokeCoupon_ValidateRefer(void) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         /* Assert: "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer" */
         fn_80196E10("menuPokeCoupon.c", 0x1A,
                      "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer");

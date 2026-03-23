@@ -852,7 +852,7 @@ u8 GSfloorUpdate(GSFloorContext* ctx)
                 && res->pending == 0) {
                 if (res->modelHandle != NULL) {
                     u8 loaded = (u8)(u32)fn_800F04BC(res->modelHandle);
-                    if (!loaded) {
+                    if (loaded == 0) {
                         allDone = 0;
                     }
                 }

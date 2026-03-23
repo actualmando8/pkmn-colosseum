@@ -355,7 +355,7 @@ void sndSetFadeTargetDefault2(u32 sndId) {
 static void _sndStartPlayback(u32 sndId, u32 fadeTime, u32 volume,
                                u32 flags) {
     /* Apply initial volume */
-    if (!fn_80167408(sndId, volume)) {
+    if (fn_80167408(sndId, volume) == 0) {
         return; /* volume set failed */
     }
 
@@ -516,9 +516,9 @@ void sndSetMasterVolume(u32 volume, u32 panValue, BOOL applyBgm,
     /* Determine the master volume command code */
     if (applyBgm && applySe) {
         code = SND_MASTER_ALL;      /* 0xFF */
-    } else if (applyBgm && !applySe) {
+    } else if (applyBgm && applySe == 0) {
         code = SND_MASTER_BGM_ONLY; /* 0xFD */
-    } else if (!applyBgm && applySe) {
+    } else if (applyBgm == 0 && applySe) {
         code = SND_MASTER_SE_ONLY;  /* 0xFE */
     } else {
         return; /* nothing to apply */
@@ -546,7 +546,7 @@ void sndSetMasterVolume(u32 volume, u32 panValue, BOOL applyBgm,
                 }
             }
             /* Apply the volume change */
-            if (!skip) {
+            if (skip == 0) {
                 fn_80167408(i, volume);
             }
         }

@@ -175,7 +175,7 @@ s32 pokeconv_ConvertPokemon(void* pDst, void* pSrc, void* pSaveCtx) {
         } else if (itemCount == GBA_PC_ITEMS_30) {
             valid = TRUE;
         }
-        if (!valid) {
+        if (valid == 0) {
             /* Assert at line 0xB7 in pokeconv.c */
             fn_80196E10(sFile, 0xB7, sAssertItemCount);
         }
@@ -319,7 +319,7 @@ void pokeconv_ValidateItems(void* pDst, void* pSrc) {
     } else if (itemCount == GBA_PC_ITEMS_30) {
         validCount = TRUE;
     }
-    if (!validCount) {
+    if (validCount == 0) {
         /* Assert at line 0x6F in pokeconv.c */
         fn_80196E10(sFile, 0x6F, sAssertItemCount);
     }

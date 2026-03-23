@@ -55,7 +55,7 @@ PSParticle* pslist_GetHead(s32 linkNo) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         /* Assert: "linkNo >= 0 && linkNo < PS_NUM_LINK" */
         /* File: "pslist.c", Line: 0x98 (152) */
         fn_80196E10("pslist.c", 0x98, "linkNo >= 0 && linkNo < PS_NUM_LINK");

@@ -36393,7 +36393,7 @@ u32 fn_8025D9F0()
 
 
 /* Address: 0x8025DA18 | Size: 0x24 | Pattern: null_check_getter */
-u32 fn_8025DA18(void* ctx) { if (!ctx) return 0; return 0; /* stub */ }
+u32 fn_8025DA18(void* ctx) { if (ctx == NULL) return 0; return 0; /* stub */ }
 
 /* fn_8025DA3C | Size: 0x4C | Get battle party size based on mode */
 u32 fn_8025DA3C(void) {
@@ -37672,7 +37672,7 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       fn_801C40F0(1);
     }
     fn_801DA8C4(uVar9,uVar1,4);
-    if (!bVar2) {
+    if (bVar2 == 0) {
       iVar8 = -1;
     }
   }

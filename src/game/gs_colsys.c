@@ -1230,7 +1230,7 @@ void* GScolsys2_Draw(void)
     fn_800D9ED8(0);   /* Fog disabled */
 
     /* Allocate display list buffer (512KB) */
-    if (!fn_800DAF60((void*)COL_GFX_HANDLE, 0x80000)) {
+    if (fn_800DAF60((void*)COL_GFX_HANDLE, 0x80000) == 0) {
         fn_800C8710(lbl_80272050);
         return NULL;
     }

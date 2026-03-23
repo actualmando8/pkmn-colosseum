@@ -187,7 +187,7 @@ void* CommonRel_GetBase(void) {
  *   lwzx  r3, rTableBase, r0
  * =================================================================== */
 void* CommonRel_GetDataTable(s32 index) {
-    if (!sCommonRelReady) {
+    if (sCommonRelReady == 0) {
         return NULL;
     }
     if (index < 0 || index >= COMMON_INDEX_COUNT) {
@@ -207,7 +207,7 @@ void* CommonRel_GetDataTable(s32 index) {
 u32 CommonRel_GetTableCount(s32 countIndex) {
     void* countPtr;
 
-    if (!sCommonRelReady) {
+    if (sCommonRelReady == 0) {
         return 0;
     }
     if (countIndex < 0 || countIndex >= COMMON_INDEX_COUNT) {

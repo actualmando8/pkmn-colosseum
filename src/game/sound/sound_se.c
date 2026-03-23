@@ -289,7 +289,7 @@ s32 sndPlaySe3DFull(u32 sndId, void* pos, void* dir, u8 volume, u8 pan) {
     workParam = *(u16*)(workEntry + 0x04);
 
     /* Configure JAudio 3D parameters */
-    if (!fn_8015ECA8(
+    if (fn_8015ECA8(
             listener->jAudioParams,  /* offset 0x28 in listener */
             pos,
             dir,
@@ -297,7 +297,7 @@ s32 sndPlaySe3DFull(u32 sndId, void* pos, void* dir, u8 volume, u8 pan) {
             workParam,
             volume,
             pan,
-            0)) {
+            0) == 0) {
         /* JAudio rejected the parameters -- release listener */
         fn_801677BC(listener);
         return 0;
@@ -315,7 +315,7 @@ s32 sndPlaySe3DFull(u32 sndId, void* pos, void* dir, u8 volume, u8 pan) {
     listener->sndWorkIndex = sndId;
 
     /* Start playback */
-    if (!fn_8015E890(listener->jAudioParams)) {
+    if (fn_8015E890(listener->jAudioParams) == 0) {
         return (s32)listener;
     }
 
@@ -344,14 +344,14 @@ BOOL sndUpdateSe3D(SndListener* listener, void* pos) {
     fn_800E0168(&interpPos, &listener->pos, pos);
 
     /* Update JAudio 3D mix */
-    if (!fn_8015ED00(
+    if (fn_8015ED00(
             (u8*)listener + 0x40,    /* JAudio update buffer */
             pos,
             &interpPos,
             (u8*)listener + 0x28,    /* jAudioParams */
             (u8*)listener + 0x34,    /* jAudioParams + 0x0C */
             listener->volume,
-            0)) {
+            0) == 0) {
         return FALSE;
     }
 
@@ -412,7 +412,7 @@ s32 sndPlaySe3D4Point(u32 sndId, void* pos, void* fwd, void* up,
     }
 
     /* Configure 4-point JAudio parameters */
-    if (!fn_8015EF04(
+    if (fn_8015EF04(
             (u8*)listener + 0x40,    /* JAudio 4-point buffer */
             pos,
             fwd,
@@ -421,7 +421,7 @@ s32 sndPlaySe3D4Point(u32 sndId, void* pos, void* fwd, void* up,
             1,                       /* isOmni = TRUE */
             volume,
             0,
-            0)) {
+            0) == 0) {
         /* JAudio rejected -- release listener */
         fn_801677F4(listener);
         return 0;

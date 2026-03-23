@@ -154,7 +154,7 @@ s32 menuCardE_Main(void) {
 
     case 2:
         /* Data transfer in progress */
-        if (!_CARDE.m_bIsProcessing) {
+        if (_CARDE.m_bIsProcessing == 0) {
             /* Transfer complete */
             _CARDE.m_nState = 3;
         }
@@ -168,7 +168,7 @@ s32 menuCardE_Main(void) {
             valid = 1;
         }
 
-        if (!valid) {
+        if (valid == 0) {
             /* Assert: "_CARDE.card_type == CARDE_CARDTYPE_TRAINER" */
             fn_80196E10("menuCardE.c", 0x1B8,
                          "_CARDE.card_type == CARDE_CARDTYPE_TRAINER");
@@ -268,7 +268,7 @@ void menuCardE_Matrix_ValidateSeries(MenuCardEMatrixWork* cem, s32 i) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         /* Assert: "i < cem->m_seriesN" */
         fn_80196E10("menuCardE_Matrix.c", 0x5E,
                      "i < cem->m_seriesN");
@@ -311,11 +311,11 @@ void menuCardE_Matrix_ValidateAnim(MenuCardEMatrixWork* cem) {
 
     /* Validate not already animating */
     valid = 0;
-    if (!cem->m_isAnimating) {
+    if (cem->m_isAnimating == 0) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         /* Assert: "!cem->m_isAnimating" */
         fn_80196E10("menuCardE_Matrix.c", 0x8C,
                      "!cem->m_isAnimating");
@@ -508,7 +508,7 @@ BOOL menuCardE_Matrix_IsCardOwned(MenuCardEMatrixWork* cem, s32 cardIdx) {
  * Interpolates between the previous and current grid positions.
  * ========================================================================= */
 void menuCardE_Matrix_AnimUpdate(MenuCardEMatrixWork* cem) {
-    if (!cem->m_isAnimating) {
+    if (cem->m_isAnimating == 0) {
         return;
     }
 

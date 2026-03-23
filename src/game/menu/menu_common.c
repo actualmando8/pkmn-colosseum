@@ -106,7 +106,7 @@ void menuCB_Common_ValidateStackNotEmpty(void) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         /* Assert: "0 < _CBC.m_nMenuStackDepth" */
         /* File: "menuCB_Common.c" */
         fn_80196E10("menuCB_Common.c", 0x3C,
@@ -128,7 +128,7 @@ void menuCB_Common_ValidateMenuID(void) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         fn_80196E10("menuCB_Common.c", 0x48,
                      "0 <= _CBC.m_eCurrentMenuID && _CBC.m_eCurrentMenuID < sMenuCallbackCount");
     }
@@ -169,7 +169,7 @@ void menuCB_Common_Update(void) {
     s32 menuID;
     s32 result;
 
-    if (!_CBC.m_bIsActive) {
+    if (_CBC.m_bIsActive == 0) {
         return;
     }
 
@@ -367,7 +367,7 @@ void menuCB_Common_ValidateTransition(void) {
         valid = 1;
     }
 
-    if (!valid) {
+    if (valid == 0) {
         fn_80196E10("menuCB_Common.c", 0x9A,
                      "_CBC.m_nTransitionState == 0");
     }

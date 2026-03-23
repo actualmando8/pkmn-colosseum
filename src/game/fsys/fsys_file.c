@@ -231,7 +231,7 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
         }
     }
 
-    if (!found) {
+    if (found == 0) {
         return 0;
     }
 
@@ -376,7 +376,7 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
     }
 
     /* Read uncompressed data (or already have decompressed data) */
-    if (!isCompressed) {
+    if (isCompressed == 0) {
         fn_80180320(subEntry->buffer, allocatedBuf, fileEntry->decompressedSize);
         DCFlushRange(subEntry->buffer, fileEntry->decompressedSize);
     }

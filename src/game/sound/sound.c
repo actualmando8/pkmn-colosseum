@@ -242,11 +242,11 @@ void sndWaveOpen(u32 waveId) {
     waveEntry = (u8*)g_sndWaveData + (waveId * 0x18);
 
     /* Call internal open with the wave's name string and parameters */
-    if (!fn_80166BE0(waveId, 1, (void*)*(u32*)(waveEntry + 0x14),
+    if (fn_80166BE0(waveId, 1, (void*)*(u32*)(waveEntry + 0x14),
                      *(u32*)(waveEntry + 0x04),
                      *(u32*)(waveEntry + 0x08),
                      *(u32*)(waveEntry + 0x0C),
-                     *(u32*)(waveEntry + 0x10))) {
+                     *(u32*)(waveEntry + 0x10)) == 0) {
         fn_800DD970("ERROR: can't open WAVE File = %s\n",
                     (void*)*(u32*)(waveEntry + 0x14));
     }
@@ -621,7 +621,7 @@ u32 sndCheckFileInfo(u32 sndId, u32 fadeTime, u32 volume, u32 isBgm) {
     if (isBgm) {
         g_currentStreamBgmId = sndId;
     }
-    if (!isBgm) {
+    if (isBgm == 0) {
         g_currentBgmId = sndId;
     }
 

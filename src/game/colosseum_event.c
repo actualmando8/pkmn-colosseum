@@ -1759,10 +1759,10 @@ void fn_80203198(void* ctx, u32 param) {
     u8 count;
     u8 i;
 
-    if (!ctx) { return; }
+    if (ctx == NULL) { return; }
     tableData = fn_8012640C(ctx, 0, 0x122, 0);
     entry = fn_8020E57C(tableData, 4, param);
-    if (!entry) { return; }
+    if (entry == NULL) { return; }
     species = fn_801FD0EC(entry);
     fn_8020E758(entry);
     if (species == 0 || species == 0x165 || species == 0xFFFF) { return; }
@@ -2699,15 +2699,15 @@ u32 fn_80204A5C(void* ctx, u8 targetSlot, u8 mode) {
             if ((u8)targetSlot == slotType) { continue; }
         }
         fn_801F54A4(0, 0, 0x14, 0);
-        if (!ctx) { valid = 0; }
+        if (ctx == NULL) { valid = 0; }
         else {
             feData = fn_8012640C(ctx, 0, 0xFE, 0);
-            if (!feData) { valid = 0; }
+            if (feData == NULL) { valid = 0; }
             else if ((u8)fn_801F1170(feData) == 0) { valid = 0; }
             else if (fn_801F0898(feData) != 0x12) { valid = 0; }
             else {
                 e5Data = fn_8012640C(ctx, 0, 0xE5, 0);
-                if (!e5Data) { valid = 0; }
+                if (e5Data == NULL) { valid = 0; }
                 else {
                     field1E = (u16)fn_80142CF4((u32)e5Data, 0, 0x1E, 0);
                     if ((u16)i == 0x12 || field1E == (u16)i) {
@@ -2780,11 +2780,11 @@ void* fn_80204CE0(void* ctx, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6, u32 p7, u32
     void* feData;
 
     e5Data = fn_8012640C(ctx, 0, 0xE5, 0);
-    if (!e5Data) { return NULL; }
+    if (e5Data == NULL) { return NULL; }
     fn_8020A398(e5Data, (u16)p6, p7, p8);
     fn_80142B24(e5Data, 0, 0x21, 0, (u32)p9);
     feData = fn_8012640C(ctx, 0, 0xFE, 0);
-    if (!feData) { feData = NULL; }
+    if (feData == NULL) { feData = NULL; }
     else {
         if ((u8)fn_801F11CC(feData, p2, ctx, p3, p4, p5) == 1) {
             fn_8020D878(feData, p6);
@@ -2812,14 +2812,14 @@ u32 fn_80204DE4(void* ctx, u16 slotId, void* tablePtr) {
     u16 field29;
 
     partyCount = fn_801F54A4(0, 0, 0x14, 0);
-    if (!ctx) { return 0; }
+    if (ctx == NULL) { return 0; }
     savedEntry = !tablePtr ? NULL : fn_801F0134(tablePtr, partyCount);
     feData = fn_8012640C(ctx, 0, 0xFE, 0);
-    if (!feData) { return 0; }
+    if (feData == NULL) { return 0; }
     if ((u8)fn_801F1170(feData) == 0) { return 0; }
     if (fn_801F0898(feData) != 0x13) { return 0; }
     d9Data = fn_8012640C(ctx, 0, 0xD9, 0);
-    if (!d9Data) { return 0; }
+    if (d9Data == NULL) { return 0; }
     field27 = fn_8011BEB4(d9Data, 0, 0x27, 0);
     field09 = fn_8011BEB4(0, field27, 0x9, 0);
     if ((u16)slotId != 0x13 && field27 != (u16)slotId) { return 0; }
@@ -3253,7 +3253,7 @@ void fn_80205274(int r3,u32 r4)
               }
             }
 LAB_00202858:
-            if (!bVar1) {
+            if (bVar1 == 0) {
               sVar8 = (int)fn_8012640C(iVar5,0,0xce,0);
               for (bVar11 = 0; bVar11 < 0xc; bVar11 = bVar11 + 1) {
                 sVar9 = (int)fn_8012640C(r3,0,0xfd,bVar11);
@@ -4353,10 +4353,10 @@ void fn_802077D4(void* basePtr, u16 count) {
     u16 i;
     void* entry;
 
-    if (!basePtr) { return; }
+    if (basePtr == NULL) { return; }
     for (i = 0; (u16)i < count; i++) {
         entry = (void*)((u32)basePtr + (u16)i * 0x154);
-        if (!entry) { continue; }
+        if (entry == NULL) { continue; }
         fn_801254B4(entry, 0, 0xCB, 0, 0);
         fn_80124A60(fn_8012640C(entry, 0, 0xCC, 0));
         fn_8011B950(fn_8012640C(entry, 0, 0xCD, 0), 1);
@@ -5762,7 +5762,7 @@ void fn_80209D90(void* ctx) {
     extern void fn_8011BBD8();
     extern void* fn_8011BEB4();
 
-    if (!ctx) { return; }
+    if (ctx == NULL) { return; }
     fn_8011BBD8(ctx, 0, 0x26, 0, (u32)-1);
     fn_8011BBD8(ctx, 0, 0x27, 0, 0);
     fn_8011BBD8(ctx, 0, 0x28, 0, 0);
@@ -6924,7 +6924,7 @@ u32 fn_8020BE38(void) {
         slotCount = fn_801F54A4(0, 0, 0x16, 0);
         for (i = 0; (u16)i < 2; i++) {
             slotData = fn_801F47B4(0, i);
-            if (!slotData) { continue; }
+            if (slotData == NULL) { continue; }
             for (j = 0; (u16)j < slotCount; j++) {
                 entry = fn_801F7258(slotData, j);
                 if (entry == NULL) { continue; }
@@ -8395,7 +8395,7 @@ u32 fn_8020E7AC()
               bVar1 = 1;
             }
           }
-          if (!bVar1) goto LAB_0020b8ac;
+          if (bVar1 == 0) goto LAB_0020b8ac;
         }
         else {
           if (iVar4 == 0) {
@@ -8490,7 +8490,7 @@ u32 fn_8020E95C()
                 bVar1 = 1;
               }
             }
-            if (!bVar1) goto LAB_0020ba60;
+            if (bVar1 == 0) goto LAB_0020ba60;
           }
           else {
             if (iVar4 == 0) {
@@ -8530,7 +8530,7 @@ LAB_0020ba60:
                 bVar1 = 1;
               }
             }
-            if (!bVar1) goto LAB_0020bae0;
+            if (bVar1 == 0) goto LAB_0020bae0;
           }
           iVar4 = 0;
         }
@@ -8593,7 +8593,7 @@ int fn_8020EBA8()
             bVar1 = 1;
           }
         }
-        if (!bVar1) {
+        if (bVar1 == 0) {
           return iVar4;
         }
       }
@@ -10345,7 +10345,7 @@ u32 fn_80211A78(void* ctx) {
 
     if ((u8)fn_802062FC(ctx) == 0) { return 1; }
     feData = fn_8012640C(ctx, 0, 0xFE, 0);
-    if (!feData) { return 1; }
+    if (feData == NULL) { return 1; }
     if ((u8)fn_801F1170(feData) == 0) { return 1; }
     if (fn_80205224(ctx) != 0x108) { return 1; }
     if ((u8)fn_802026E4(ctx, 8) != 0x108) { return 1; }
