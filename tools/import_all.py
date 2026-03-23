@@ -141,7 +141,11 @@ def full_fixup(code, func_name, source_text):
         for m2 in re.finditer(r'^extern\s+\w[\w\s\*]*\s+(fn_[0-9a-fA-F]{8})\s*\(', source_text, re.MULTILINE):
             file_scope_externs.add(m2.group(1))
 
-    needs_fn_extern = sorted(called_fns - file_scope_externs - {func_name})
+    # Also find function references used as addresses (e.g., &fn_XXX)
+    addr_fns = set(re.findall(r'&(fn_[0-9a-fA-F]{8})\b', code))
+    all_called_or_ref = called_fns | addr_fns
+
+    needs_fn_extern = sorted(all_called_or_ref - file_scope_externs - {func_name})
     needs_lbl_extern = sorted(lbl_refs - all_known_lbls)
 
     # Build a map of function return types from the source
@@ -181,23 +185,20 @@ def full_fixup(code, func_name, source_text):
     code = re.sub(r'\(\*(\w*[Vv]ar\d+)\)\s*\(', r'((void (*)())\1)(', code)
     code = re.sub(r'\(\*(r\d+)\)\s*\(', r'((void (*)())\1)(', code)
 
-    # Fix computed function pointer calls
-    # Pattern: (**(void **)(expr))() -> ((void (*)(void))**(void ***)(expr))()
+    # Fix computed function pointer calls - all variants
+    # The Ghidra output produces: (**(void **)(expr))() which CW rejects
+    # We need: ((int (*)(void))**(void ***)(expr))() to make it callable and return int
+
+    # Pattern 1: (**(void **)(expr))() -> ((int (*)(void))**(void ***)(expr))()
     code = re.sub(
         r'\(\*\*\(void\s*\*\*\)\(([^)]+)\)\)\s*\(\)',
-        lambda m: f'((void (*)(void))**(void ***)({m.group(1)}))()',
+        lambda m: f'((int (*)(void))**(void ***)({m.group(1)}))()',
         code
     )
-    # Pattern: (**(void **)expr)() where expr doesn't have parens
+    # Pattern 2: (**(void **)expr)() where expr includes complex sub-expressions
     code = re.sub(
-        r'\(\*\*\(void\s*\*\*\)(\w[^)]*)\)\s*\(\)',
-        lambda m: f'((void (*)(void))**(void ***)({m.group(1)}))()',
-        code
-    )
-    # Pattern: (*(void *)(expr))(...) -> ((void (*)())*(void **)(expr))(...)
-    code = re.sub(
-        r'\(\*\(void\s*\*\)\(([^)]+)\)\)\s*\(',
-        lambda m: f'((void (*)())*(void **)({m.group(1)}))(',
+        r'\(\*\*\(void\s*\*\*\)([^)]+)\)\s*\(\)',
+        lambda m: f'((int (*)(void))**(void ***)({m.group(1).strip()}))()',
         code
     )
 
