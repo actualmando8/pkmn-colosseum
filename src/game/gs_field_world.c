@@ -16268,11 +16268,14 @@ u32 fn_80121ADC(void* obj, u32 arg2) {
     }
     return fn_8011B67C(obj, arg2);
 }
-/* 0x68 | fn_80121B4C | generic */
-void fn_80121B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_80119ED0(0);
-    fn_80119ED0(0);
-    fn_8011B788();
+/* 0x68 | fn_80121B4C | status_guarded_call */
+void fn_80121B4C(void* obj, u32 arg2) {
+    extern u16 fn_80119ED0();
+    extern void fn_8011B788();
+    if ((u16)fn_80119ED0(arg2) == 0x7C ||
+        (u16)fn_80119ED0(arg2) == 0xC8) {
+        fn_8011B788(obj, arg2);
+    }
 }
 /* 0x64 | fn_80121BB4 | generic -- depends on fn_8011F5FC signature */
 void fn_80121BB4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
