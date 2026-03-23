@@ -218,10 +218,10 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
     resId = *(u32*)(p + 0x38);
     consumed = (resId + 0x1F) & ~0x1F;  /* align to 32 bytes */
 
-    fn_8010147C(consumed + (u32)memOffset, resId, 20000, work->memHandle1);
+    fn_8010147C(consumed + memOffset, resId, 20000, work->memHandle1);
     model = fn_800F9318(20000, work->memHandle1);
 
-    fn_801013A0(consumed + (u32)memOffset, 20000, 0, work->memHandle2);
+    fn_801013A0(consumed + memOffset, 20000, 0, work->memHandle2);
     model = fn_800F9318(20000, work->memHandle2);
 
     /* Hide the model initially */

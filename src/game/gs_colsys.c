@@ -535,7 +535,7 @@ s32 GScolsys2_QueryTriVisible(s32 triIndex, u32* outResult)
         return 1;
     }
 
-    if (triIndex < 0 || (u32)triIndex >= *(u32*)((u8*)wzx + 4)) {
+    if (triIndex < 0 || triIndex >= *(u32*)((u8*)wzx + 4)) {
         return 2;
     }
 
@@ -570,7 +570,7 @@ s32 GScolsys2_SetTriVisible(s32 triIndex, s32 visible)
         return 1;
     }
 
-    if (triIndex < 0 || (u32)triIndex >= *(u32*)((u8*)wzx + 4)) {
+    if (triIndex < 0 || triIndex >= *(u32*)((u8*)wzx + 4)) {
         return 2;
     }
 

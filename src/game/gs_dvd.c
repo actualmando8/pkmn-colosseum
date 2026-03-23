@@ -205,7 +205,7 @@ s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {
     handleIndex = 0x1;
     *(u32*)((u8*)r31 + 0x8) = mode;
     tmp = *(u8*)((u8*)r31 + 0x0);
-    tmp = (tmp & ~0x00000020) | (((mode << 5) | ((u32)mode >> 27)) & 0x00000020);
+    tmp = (tmp & ~0x00000020) | (((mode << 5) | (mode >> 27)) & 0x00000020);
     *(u8*)((u8*)r31 + 0x0) = tmp;
 
     return;

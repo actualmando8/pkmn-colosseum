@@ -8143,7 +8143,7 @@ void fn_8020E124(void) {
     r4 = lbl_80478F00;
     r7 = r3 & 0xFFFF;
     r6 = *(u32*)((u8*)r4 + 0x0);
-    if ((u32)r7 > (u32)r6) {
+    if (r7 > r6) {
         r4 = 0x0;
     } else {
 
@@ -8151,13 +8151,13 @@ void fn_8020E124(void) {
         /* clrlslwi r0, r3, 16, 3 */;
         r4 = r4 + r0;
     }
-    if ((u32)r4 == (u32)0x0) {
+    if (r4 == (u32)0x0) {
         r5 = 0x0;
     } else {
 
         r5 = *(u8*)((u8*)r4 + 0x0);
     }
-    if ((u32)r7 > (u32)r6) {
+    if (r7 > r6) {
         r4 = 0x0;
     } else {
 
@@ -8166,7 +8166,7 @@ void fn_8020E124(void) {
         r4 = r4 + r0;
     }
     r3 = r5 & 0xFF;
-    if ((u32)r4 == (u32)0x0) {
+    if (r4 == (u32)0x0) {
         r0 = 0x0;
     } else {
 

@@ -1330,7 +1330,7 @@ u32 fn_80230568(u32 r3,u32 r4)
     fn_80132A38(0xd,uVar7);
     cVar15 = fn_80202234(r3,0xe);
     if (cVar14 < cVar15) {
-      DAT_8038fffd = (u8)((u32)uVar6 >> 8);
+      DAT_8038fffd = (u8)(uVar6 >> 8);
       DAT_8038fffc = (u8)uVar6;
       uVar10 = fn_80203B5C(r3,0x10);
       fn_8011BBD8(uVar3,0,0x2d,0,uVar10);
@@ -2399,34 +2399,34 @@ ctx = (void*)*(u8*)((u8*)param1 + 0x1);
                         goto L_802228E4;
                         }
                     tmp = *(u32*)((u8*)param2 + 0x0);
-                    if ((u32)tmp != (u32)param3) return;
+                    if (tmp != (u32)param3) return;
                     *(u32*)&lbl_8047B610 = param1;
                     return;
                     }
                 tmp = *(u32*)((u8*)param2 + 0x0);
-                if ((u32)tmp == (u32)param3) return;
+                if (tmp == (u32)param3) return;
                 *(u32*)&lbl_8047B610 = param1;
                 return;
                     }
             tmp = *(u32*)((u8*)param2 + 0x0);
-            if ((u32)tmp <= (u32)param3) return;
+            if (tmp <= (u32)param3) return;
             *(u32*)&lbl_8047B610 = param1;
             return;
         }
         tmp = *(u32*)((u8*)param2 + 0x0);
-        if ((u32)tmp >= (u32)param3) return;
+        if (tmp >= (u32)param3) return;
         *(u32*)&lbl_8047B610 = param1;
         return;
     L_802228E4:
         tmp = *(u32*)((u8*)param2 + 0x0);
         /* and. tmp, tmp, param3 */;
-        if ((u32)tmp == (u32)param3) return;
+        if (tmp == (u32)param3) return;
         *(u32*)&lbl_8047B610 = param1;
         return;
                     }
     tmp = *(u32*)((u8*)param2 + 0x0);
     /* and. tmp, tmp, param3 */;
-    if ((u32)tmp != (u32)param3) return;
+    if (tmp != (u32)param3) return;
     *(u32*)&lbl_8047B610 = param1;
     return;
 }
@@ -4974,7 +4974,7 @@ LAB_002251e8:
     cVar12 = fn_802026E4(iVar1,0x10);
     if ((cVar12 == 0) && (cVar12 = fn_802026E4(iVar1,0x31), cVar12 == 1)) {
       uVar7 = fn_80201890(iVar1,0x31);
-      if (((uVar7 & 1 << (u32)bVar10) == 0) && (cVar12 = fn_801FECD4(iVar1), cVar12 == 1)) {
+      if (((uVar7 & 1 << bVar10) == 0) && (cVar12 = fn_801FECD4(iVar1), cVar12 == 1)) {
         fn_801FE7EC(iVar1,0x80,(u32)bVar10,0);
       }
     }
@@ -9374,7 +9374,7 @@ u32 fn_80233DB0(void)
            (cVar11 = fn_801233F4(iVar16), cVar11 != 0)) {
           uVar13 = 0;
           while ((uVar13 < r6 &&
-                 ((iVar8 = *(int *)(r5 + (u32)uVar13 * 4), iVar8 == 0 || (iVar8 != iVar16)))))
+                 ((iVar8 = *(int *)(r5 + uVar13 * 4), iVar8 == 0 || (iVar8 != iVar16)))))
           {
             uVar13 = uVar13 + 1;
           }
@@ -13128,7 +13128,7 @@ u32 fn_802397B8(void)
   uVar3 = 0;
   while (1) {
     if (r4 <= uVar3) break;
-    if (iVar4 <= *(int *)(r3 + (u32)uVar3 * 4)) {
+    if (iVar4 <= *(int *)(r3 + uVar3 * 4)) {
       uVar1 = (u32)uVar5;
       uVar5 = uVar5 + 1;
       local_48[uVar1] = (u32)uVar3;
@@ -21873,7 +21873,7 @@ void fn_80218824(void)
           cVar9 = fn_802026E4(uVar1,0x31);
           if (cVar9 == 1) {
             uVar4 = fn_80201890(uVar1,0x31);
-            if ((uVar4 & 1 << (u32)bVar10) == 0) {
+            if ((uVar4 & 1 << bVar10) == 0) {
               cVar9 = fn_801FECD4(uVar1);
               if (cVar9 == 1) {
                 fn_801FE7EC(uVar1,0x80,(u32)bVar10,0);

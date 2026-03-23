@@ -264,7 +264,7 @@ void GStextureFlush(GStextureHandle* tex) {
  *    blr
  * ======================================================================= */
 void* GStextureGetMipData(GStextureHandle* tex, u8 level) {
-    if ((u32)level >= 8) {
+    if (level >= 8) {
         return NULL;
     }
 
@@ -676,7 +676,7 @@ void GStextureConvertCI(GStextureHandle* tex) {
          *
          * The CI4 format stores 2 pixels per byte in 4x4 blocks.
          * This loop reconstructs the unswizzled linear pixel order. */
-        for (i = 0; i < (u32)pixelCount; i++) {
+        for (i = 0; i < pixelCount; i++) {
             u16 blockX, blockY, subX, subY;
             u16 palEntry;
             u32 srcIdx, dstIdx;
