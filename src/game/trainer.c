@@ -4169,123 +4169,43 @@ void fn_801FA6D8(void) {
     return;
 }
 
-/* 0x801FA8CC | size: 0x18C | medium */
-void fn_801FA8CC(void) {
-    extern void fn_8012A248();
-    extern void fn_801F1460();
-    extern void fn_801FAA58();
-    extern void fn_801FB1C0();
-    extern void fn_80206C3C();
-    extern void fn_80206C94();
-    extern void fn_802077D4();
-    extern void fn_8020ECE0();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x801FA8CC | size: 0x18C */
+void fn_801FA8CC(void* base, u16 count) {
+    extern void fn_8012A248(void* ptr);
+    extern void fn_801F1460(void* ptr);
+    extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void fn_80206C3C(void* ptr, u32 count);
+    extern void fn_80206C94(void* ptr);
+    extern void fn_802077D4(void* ptr, u32 count);
+    extern void fn_8020ECE0(void* ptr, u32 count);
+    u8* trainer;
+    void* result;
+    u16 i;
 
-    /* mr. r28, r3 */;
-    if ((s32)r0 == (s32)0) return;
-    r31 = r4 & 0xFFFF;
-    r29 = 0x0;
-    while (1) {
-        r0 = r29 & 0xFFFF;
-        if ((u32)r0 >= (u32)r31) break;
-        r0 = r29 & 0xFFFF;
-        r0 = r0 * 0x28e4;
-        /* add. r30, r28, r0 */;
-        if ((s32)r0 != (s32)0) {
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x44;
-            r6 = 0x0;
-            fn_801FB1C0();
-            fn_8012A248();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x43;
-            r6 = 0x0;
-            r7 = 0x0;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x45;
-            r6 = 0x0;
-            fn_801FB1C0();
-            r4 = 0x6;
-            fn_802077D4();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x46;
-            r6 = 0x0;
-            fn_801FB1C0();
-            r4 = 0x2;
-            fn_80206C3C();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x47;
-            r6 = 0x0;
-            fn_801FB1C0();
-            fn_80206C94();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x48;
-            r6 = 0x0;
-            r7 = 0x1;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x49;
-            r6 = 0x0;
-            r7 = 0x0;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x4a;
-            r6 = 0x0;
-            r7 = 0x0;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x4b;
-            r6 = 0x0;
-            r7 = 0x0;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x4c;
-            r6 = 0x0;
-            r7 = 0x0;
-            fn_801FAA58();
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x4d;
-            r6 = 0x0;
-            fn_801FB1C0();
-            if ((u32)r3 != (u32)0x0) {
-                fn_801F1460();
-            }
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x4e;
-            r6 = 0x0;
-            fn_801FB1C0();
-            r4 = 0xc;
-            fn_8020ECE0();
-        }
-        r29 = r29 + 0x1;
-
+    if (base == NULL) {
+        return;
     }
-
-    return;
+    for (i = 0; (u16)i < count; i++) {
+        trainer = (u8*)base + (u16)i * 0x28E4;
+        if (trainer != NULL) {
+            fn_8012A248(fn_801FB1C0(trainer, 0, 0x44, 0));
+            fn_801FAA58(trainer, 0, 0x43, 0, 0);
+            fn_802077D4(fn_801FB1C0(trainer, 0, 0x45, 0), 6);
+            fn_80206C3C(fn_801FB1C0(trainer, 0, 0x46, 0), 2);
+            fn_80206C94(fn_801FB1C0(trainer, 0, 0x47, 0));
+            fn_801FAA58(trainer, 0, 0x48, 0, 1);
+            fn_801FAA58(trainer, 0, 0x49, 0, 0);
+            fn_801FAA58(trainer, 0, 0x4A, 0, 0);
+            fn_801FAA58(trainer, 0, 0x4B, 0, 0);
+            fn_801FAA58(trainer, 0, 0x4C, 0, 0);
+            result = fn_801FB1C0(trainer, 0, 0x4D, 0);
+            if (result != NULL) {
+                fn_801F1460(result);
+            }
+            fn_8020ECE0(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
+        }
+    }
 }
 
 /* 0x801FAA58 | size: 0x768 | large */
