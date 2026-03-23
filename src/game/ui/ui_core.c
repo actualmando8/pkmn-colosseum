@@ -3786,17 +3786,23 @@ s32 fn_8005CF2C(void) {
 }
 
 
-/* 0x8005D094 | size: 0x24 */
+/* 0x8005D094 | size: 0x24 | call_return_const */
+#pragma push
+#pragma scheduling off
 s32 fn_8005D094(void) {
     fn_800347B8();
     return -1;
 }
+#pragma pop
 
-/* 0x8005D0B8 | size: 0x24 */
+/* 0x8005D0B8 | size: 0x24 | call_return_const */
+#pragma push
+#pragma scheduling off
 s32 fn_8005D0B8(void) {
     fn_800347C4();
     return 0;
 }
+#pragma pop
 
 /* 0x8005D0DC | size: 0x54 */
 s32 fn_8005D0DC(void) {
