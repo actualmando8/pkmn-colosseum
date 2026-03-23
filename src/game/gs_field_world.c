@@ -5235,12 +5235,19 @@ void* fn_80114CA8(void* owner, u32 param, u32 alloc_size) {
     }
     return (u8*)mem + 0x60;
 }
-/* 0x54 | fn_80114D18 | generic */
-void fn_80114D18(void) {
-    fn_800F9318();
-    fn_800FF548();
-    fn_800F76E4();
-    fn_80112700();
+/* 0x54 | fn_80114D18 | alloc_and_init */
+void* fn_80114D18(u32 arg1, u32 arg2) {
+    extern void* fn_800F9318();
+    extern u8 fn_800FF548();
+    extern void fn_800F76E4();
+    extern void fn_80112700();
+    void* result;
+    result = fn_800F9318(arg1, arg2);
+    if ((u8)fn_800FF548() == 0 && result != NULL) {
+        fn_800F76E4(result);
+        fn_80112700();
+    }
+    return result;
 }
 /* 0x80114D6C | 0xA0 */
 extern u32 fn_80115124(void*);
