@@ -5301,25 +5301,37 @@ void* fn_80115024(void* owner, u32 param, u32 alloc_size) {
     return mem;
 }
 /* 0x80115094 | 0x24 | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_80115094(void) {
     fn_801ED674();
     return 1;
 }
+#pragma pop
 /* 0x801150B8 | 36 bytes | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_801150B8(void) {
     fn_801193BC();
     return 1;
 }
+#pragma pop
 /* 0x801150DC | 36 bytes | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_801150DC(void) {
     fn_800D2738();
     return 1;
 }
+#pragma pop
 /* 0x80115100 | 36 bytes | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_80115100(void) {
     fn_800DCD98();
     return 1;
 }
+#pragma pop
 /* 0x4C | fn_80115124 | nullcheck_call_flag */
 u32 fn_80115124(void* obj) {
     if (fn_800FF554() == 0) { return 0; }
@@ -5339,15 +5351,21 @@ u32 fn_801151BC(void* obj) {
     return 1;
 }
 /* 0x80115208 | 36 bytes | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_80115208(void) {
     fn_8010CC04();
     return 1;
 }
+#pragma pop
 /* 0x8011522C | 36 bytes | call_return_const */
+#pragma push
+#pragma scheduling off
 u32 fn_8011522C(void) {
     fn_800EF5A4();
     return 1;
 }
+#pragma pop
 /* 0x80115250 | 0xC */
 u32 fn_80115250(u32 val) {
     return (val & 0x7FFF0000U) | 0x1A00;
