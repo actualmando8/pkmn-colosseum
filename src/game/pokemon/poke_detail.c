@@ -97,8 +97,13 @@ extern u32   fn_8001E200(u32 msgBank, u32 msgId);
 
 
 /* 0x8004BE0C | size: 0x34 */
-asm void fn_8004BE0C(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/poke_detail/fn_8004BE0C.s"
+extern void fn_800FF730(u32);
+extern void fn_8011288C(u32, u32);
+
+void fn_8004BE0C(void) {
+    fn_800FF730(0x392);
+    fn_8011288C(0, 0);
+    fn_800F0308();
 }
 
 /* 0x8004C120 | size: 0x1B8 */
