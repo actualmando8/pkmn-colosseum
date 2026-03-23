@@ -27,14 +27,14 @@ extern u8 lbl_8026F568[];
 extern u8 lbl_8026F574[];
 
 /* ===== Forward declarations ===== */
-s32 fn_80089048(void);
-s32 fn_80089380(void);
+void fn_80089048(void);
+void fn_80089380(void);
 
 /* ===== Function implementations ===== */
 
 
 /* 0x80089048 | size: 0x338 */
-s32 fn_80089048(void) {
+void fn_80089048(void) {
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -249,7 +249,7 @@ s32 fn_80089048(void) {
 }
 
 /* 0x80089380 | size: 0x224 */
-s32 fn_80089380(void) {
+void fn_80089380(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;

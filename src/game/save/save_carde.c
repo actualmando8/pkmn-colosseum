@@ -27,16 +27,16 @@ extern u8 lbl_8026F1D8[];
 
 /* ===== Forward declarations ===== */
 void fn_80082650(void);
-s32 fn_80082738(void);
-s32 fn_80082960(void);
-s32 fn_80082A88(void);
-s32 fn_80082BA4(void);
-s32 fn_80082CF0(void);
+void fn_80082738(void);
+void fn_80082960(void);
+void fn_80082A88(void);
+void fn_80082BA4(void);
+void fn_80082CF0(void);
 void fn_80082EA4(void);
 void fn_80082FE4(void);
-s32 fn_800830A4(void);
-s32 fn_800832C8(void);
-s32 fn_800836AC(void);
+void fn_800830A4(void);
+void fn_800832C8(void);
+void fn_800836AC(void);
 
 /* ===== Function implementations ===== */
 
@@ -107,7 +107,7 @@ void fn_80082650(void) {
 }
 
 /* 0x80082738 | size: 0x228 */
-s32 fn_80082738(void) {
+void fn_80082738(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -259,7 +259,7 @@ s32 fn_80082738(void) {
 }
 
 /* 0x80082960 | size: 0x128 */
-s32 fn_80082960(void) {
+void fn_80082960(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -333,7 +333,7 @@ s32 fn_80082960(void) {
 }
 
 /* 0x80082A88 | size: 0x11C */
-s32 fn_80082A88(void) {
+void fn_80082A88(void) {
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -411,7 +411,7 @@ s32 fn_80082A88(void) {
 }
 
 /* 0x80082BA4 | size: 0x14C */
-s32 fn_80082BA4(void) {
+void fn_80082BA4(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -494,7 +494,7 @@ s32 fn_80082BA4(void) {
 }
 
 /* 0x80082CF0 | size: 0x1B4 */
-s32 fn_80082CF0(void) {
+void fn_80082CF0(void) {
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -750,7 +750,7 @@ void fn_80082FE4(void) {
 }
 
 /* 0x800830A4 | size: 0x224 */
-s32 fn_800830A4(void) {
+void fn_800830A4(void) {
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -894,7 +894,7 @@ while (1) {
 }
 
 /* 0x800832C8 | size: 0x3E4 */
-s32 fn_800832C8(void) {
+void fn_800832C8(void) {
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -1152,7 +1152,7 @@ while (1) {
 }
 
 /* 0x800836AC | size: 0x448 */
-s32 fn_800836AC(void) {
+void fn_800836AC(void) {
     u8 sp[0x40];
     u32 tmp = 0;
     u32 r3 = 0;

@@ -8063,7 +8063,7 @@ L_80243B24:
 }
 
 /* Address: 0x80243C5C | Size: 0x7C | Pattern: field_accessor */
-u32 fn_80243C5C(void* ctx, u32 slot, u32 param) {
+void fn_80243C5C(void* ctx, u32 slot, u32 param) {
     extern void fn_80205B8C();
     extern void fn_80239984();
     extern void fn_80239EE8();
@@ -10680,7 +10680,7 @@ void fn_80245DFC(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80245F48 | Size: 0x7C | Pattern: field_accessor */
-u32 fn_80245F48(void* ctx, u32 slot, u32 param) {
+void fn_80245F48(void* ctx, u32 slot, u32 param) {
     extern void fn_801363E8();
     extern void fn_801F54A4();
     extern void fn_8023CA9C();
@@ -10722,7 +10722,7 @@ u32 fn_80245F48(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80247048 | Size: 0x7C | Pattern: field_accessor */
-u32 fn_80247048(void* ctx, u32 slot, u32 param) {
+void fn_80247048(void* ctx, u32 slot, u32 param) {
     extern void fn_80205B8C();
     extern void fn_80239984();
     extern void fn_80239EE8();
@@ -18721,7 +18721,7 @@ void fn_8024DFC4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8024E0CC | Size: 0x7C | Pattern: field_accessor */
-u32 fn_8024E0CC(void* ctx, u32 slot, u32 param) {
+void fn_8024E0CC(void* ctx, u32 slot, u32 param) {
     extern void fn_80205B8C();
     extern void fn_80239984();
     extern void fn_80239EE8();
@@ -20346,7 +20346,7 @@ void fn_802502EC(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802509A0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802509A0(void* ctx, u32 slot, u32 param) {
+void fn_802509A0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20392,7 +20392,7 @@ u32 fn_802509A0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250A2C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250A2C(void* ctx, u32 slot, u32 param) {
+void fn_80250A2C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20438,7 +20438,7 @@ u32 fn_80250A2C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250AC0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250AC0(void* ctx, u32 slot, u32 param) {
+void fn_80250AC0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20484,7 +20484,7 @@ u32 fn_80250AC0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250B44 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80250B44(void* ctx, u32 slot, u32 param) {
+void fn_80250B44(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80235B04();
     extern void fn_80250BBC();
@@ -20578,7 +20578,7 @@ void fn_80250BBC(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80250C64 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250C64(void* ctx, u32 slot, u32 param) {
+void fn_80250C64(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20624,7 +20624,7 @@ u32 fn_80250C64(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250CF0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250CF0(void* ctx, u32 slot, u32 param) {
+void fn_80250CF0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20670,7 +20670,7 @@ u32 fn_80250CF0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250D7C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250D7C(void* ctx, u32 slot, u32 param) {
+void fn_80250D7C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20716,7 +20716,7 @@ u32 fn_80250D7C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80250E00 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80250E00(void* ctx, u32 slot, u32 param) {
+void fn_80250E00(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20891,7 +20891,7 @@ void fn_80250FBC(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80251070 | Size: 0x5C | Pattern: field_accessor */
-u32 fn_80251070(void* ctx, u32 slot, u32 param) {
+void fn_80251070(void* ctx, u32 slot, u32 param) {
     extern void fn_802376EC();
     u8 sp[0x20];
     u32 r0 = 0;
@@ -20919,7 +20919,7 @@ u32 fn_80251070(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802510CC | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802510CC(void* ctx, u32 slot, u32 param) {
+void fn_802510CC(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -20976,7 +20976,7 @@ u32 fn_80251194(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802511E0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802511E0(void* ctx, u32 slot, u32 param) {
+void fn_802511E0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21079,7 +21079,7 @@ void fn_802512A4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80251358 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80251358(void* ctx, u32 slot, u32 param) {
+void fn_80251358(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x10];
@@ -21120,7 +21120,7 @@ u32 fn_80251358(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802513D0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802513D0(void* ctx, u32 slot, u32 param) {
+void fn_802513D0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21166,7 +21166,7 @@ u32 fn_802513D0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80251454 | Size: 0x70 | Pattern: field_accessor */
-u32 fn_80251454(void* ctx, u32 slot, u32 param) {
+void fn_80251454(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_8023720C();
     u8 sp[0x10];
@@ -21391,7 +21391,7 @@ void fn_802516C4(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x802517A0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802517A0(void* ctx, u32 slot, u32 param) {
+void fn_802517A0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21440,7 +21440,7 @@ u32 fn_802517A0(void* ctx, u32 slot, u32 param) {
 u32 fn_80251824(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80251860 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80251860(void* ctx, u32 slot, u32 param) {
+void fn_80251860(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x10];
@@ -21481,7 +21481,7 @@ u32 fn_80251860(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802518D8 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_802518D8(void* ctx, u32 slot, u32 param) {
+void fn_802518D8(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x10];
@@ -21583,7 +21583,7 @@ void fn_80251950(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80251A0C | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80251A0C(void* ctx, u32 slot, u32 param) {
+void fn_80251A0C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x10];
@@ -21624,7 +21624,7 @@ u32 fn_80251A0C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80251A84 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80251A84(void* ctx, u32 slot, u32 param) {
+void fn_80251A84(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x10];
@@ -21668,7 +21668,7 @@ u32 fn_80251A84(void* ctx, u32 slot, u32 param) {
 u32 fn_80251AFC(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80251B50 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80251B50(void* ctx, u32 slot, u32 param) {
+void fn_80251B50(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21714,7 +21714,7 @@ u32 fn_80251B50(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80251BD4 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80251BD4(void* ctx, u32 slot, u32 param) {
+void fn_80251BD4(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21760,7 +21760,7 @@ u32 fn_80251BD4(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80251C58 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80251C58(void* ctx, u32 slot, u32 param) {
+void fn_80251C58(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -21995,7 +21995,7 @@ void fn_80251ED4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80251F6C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80251F6C(void* ctx, u32 slot, u32 param) {
+void fn_80251F6C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22076,7 +22076,7 @@ u32 fn_80252078(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802520BC | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802520BC(void* ctx, u32 slot, u32 param) {
+void fn_802520BC(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22135,7 +22135,7 @@ u32 fn_80252148()
 
 
 /* Address: 0x80252188 | Size: 0x80 | Pattern: field_accessor */
-u32 fn_80252188(void* ctx, u32 slot, u32 param) {
+void fn_80252188(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
     extern void fn_8011BEB4();
     extern void fn_80217BD0();
@@ -22212,7 +22212,7 @@ u32 fn_8025228C()
 
 
 /* Address: 0x802522CC | Size: 0x80 | Pattern: field_accessor */
-u32 fn_802522CC(void* ctx, u32 slot, u32 param) {
+void fn_802522CC(void* ctx, u32 slot, u32 param) {
     extern void fn_8011BBD8();
     extern void fn_8011BEB4();
     extern void fn_80217BEC();
@@ -22317,7 +22317,7 @@ void fn_802523D8(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802524B8 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802524B8(void* ctx, u32 slot, u32 param) {
+void fn_802524B8(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22448,7 +22448,7 @@ u32 fn_80252678(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802526BC | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802526BC(void* ctx, u32 slot, u32 param) {
+void fn_802526BC(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22494,7 +22494,7 @@ u32 fn_802526BC(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252748 | Size: 0x74 | Pattern: field_accessor */
-u32 fn_80252748(void* ctx, u32 slot, u32 param) {
+void fn_80252748(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_802376EC();
     u8 sp[0x20];
@@ -22620,7 +22620,7 @@ u8 fn_8025297C(void* ctx) { return (u8)fn_80237774(ctx); }
 u8 fn_802529A0(void* ctx) { return (u8)fn_80237774(ctx); }
 
 /* Address: 0x802529F4 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802529F4(void* ctx, u32 slot, u32 param) {
+void fn_802529F4(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22666,7 +22666,7 @@ u32 fn_802529F4(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252A80 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252A80(void* ctx, u32 slot, u32 param) {
+void fn_80252A80(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22726,7 +22726,7 @@ u32 fn_80252B04()
 
 
 /* Address: 0x80252B44 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252B44(void* ctx, u32 slot, u32 param) {
+void fn_80252B44(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22775,7 +22775,7 @@ u32 fn_80252B44(void* ctx, u32 slot, u32 param) {
 u32 fn_80252BC8(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80252C04 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252C04(void* ctx, u32 slot, u32 param) {
+void fn_80252C04(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22821,7 +22821,7 @@ u32 fn_80252C04(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252C88 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252C88(void* ctx, u32 slot, u32 param) {
+void fn_80252C88(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22867,7 +22867,7 @@ u32 fn_80252C88(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252D0C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252D0C(void* ctx, u32 slot, u32 param) {
+void fn_80252D0C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22913,7 +22913,7 @@ u32 fn_80252D0C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252D90 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252D90(void* ctx, u32 slot, u32 param) {
+void fn_80252D90(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -22959,7 +22959,7 @@ u32 fn_80252D90(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252E14 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252E14(void* ctx, u32 slot, u32 param) {
+void fn_80252E14(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23005,7 +23005,7 @@ u32 fn_80252E14(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252E98 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252E98(void* ctx, u32 slot, u32 param) {
+void fn_80252E98(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23051,7 +23051,7 @@ u32 fn_80252E98(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80252F8C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80252F8C(void* ctx, u32 slot, u32 param) {
+void fn_80252F8C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23097,7 +23097,7 @@ u32 fn_80252F8C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80253020 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80253020(void* ctx, u32 slot, u32 param) {
+void fn_80253020(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23157,7 +23157,7 @@ u32 fn_802530A4()
 
 
 /* Address: 0x802530E4 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802530E4(void* ctx, u32 slot, u32 param) {
+void fn_802530E4(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23268,7 +23268,7 @@ int fn_80253298(void)
   return -(uVar1 & 0xffff);
 }
 /* Address: 0x802532C0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802532C0(void* ctx, u32 slot, u32 param) {
+void fn_802532C0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23314,7 +23314,7 @@ u32 fn_802532C0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025334C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_8025334C(void* ctx, u32 slot, u32 param) {
+void fn_8025334C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23370,7 +23370,7 @@ int fn_802533D8(void)
   return -(uVar1 >> 1 & 0x7fff);
 }
 /* Address: 0x80253400 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80253400(void* ctx, u32 slot, u32 param) {
+void fn_80253400(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23433,7 +23433,7 @@ u32 fn_8025348C()
 u32 fn_802534D4(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253548 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80253548(void* ctx, u32 slot, u32 param) {
+void fn_80253548(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23485,7 +23485,7 @@ u32 fn_802535F4(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211
 u32 fn_80253630(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x8025366C | Size: 0x84 | Pattern: field_accessor */
-u32 fn_8025366C(void* ctx, u32 slot, u32 param) {
+void fn_8025366C(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23531,7 +23531,7 @@ u32 fn_8025366C(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x802536F0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_802536F0(void* ctx, u32 slot, u32 param) {
+void fn_802536F0(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23577,7 +23577,7 @@ u32 fn_802536F0(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x80253774 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80253774(void* ctx, u32 slot, u32 param) {
+void fn_80253774(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23626,7 +23626,7 @@ u32 fn_80253774(void* ctx, u32 slot, u32 param) {
 u32 fn_802537F8(void* ctx, u32 param1, u32 param2, u32 param3) { return fn_80211170(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
 /* Address: 0x80253834 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_80253834(void* ctx, u32 slot, u32 param) {
+void fn_80253834(void* ctx, u32 slot, u32 param) {
     extern void fn_80211170();
     extern void fn_80236BFC();
     u8 sp[0x20];
@@ -23718,7 +23718,7 @@ void fn_802538C0(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80253950 | Size: 0x6C | Pattern: field_accessor */
-u32 fn_80253950(void* ctx, u32 slot, u32 param) {
+void fn_80253950(void* ctx, u32 slot, u32 param) {
     extern void fn_80136428();
     extern void fn_801F54A4();
     extern void fn_80237DBC();
@@ -25506,7 +25506,7 @@ int fn_80254F54()
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff));
 }
 /* Address: 0x80254F88 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80254F88(void* ctx, u32 slot, u32 param) {
+void fn_80254F88(void* ctx, u32 slot, u32 param) {
     extern void fn_80237F74();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -25673,7 +25673,7 @@ void fn_802550F0(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802551A4 | Size: 0x74 | Pattern: field_accessor */
-u32 fn_802551A4(void* ctx, u32 slot, u32 param) {
+void fn_802551A4(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -26335,7 +26335,7 @@ L_802559DC:
 }
 
 /* Address: 0x80255A38 | Size: 0x74 | Pattern: field_accessor */
-u32 fn_80255A38(void* ctx, u32 slot, u32 param) {
+void fn_80255A38(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -26387,7 +26387,7 @@ int fn_80255AAC()
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 3);
 }
 /* Address: 0x80255AE4 | Size: 0x68 | Pattern: field_accessor */
-u32 fn_80255AE4(void* ctx, u32 slot, u32 param) {
+void fn_80255AE4(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E648;
     extern void fn_80236BFC();
     extern void fn_802373B0();
@@ -26489,7 +26489,7 @@ void fn_80255B4C(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80255C18 | Size: 0x74 | Pattern: field_accessor */
-u32 fn_80255C18(void* ctx, u32 slot, u32 param) {
+void fn_80255C18(void* ctx, u32 slot, u32 param) {
     extern void fn_80119DD0();
     extern void fn_80202360();
     extern void fn_80236BFC();
@@ -27180,7 +27180,7 @@ void fn_80256410(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802564C8 | Size: 0x64 | Pattern: field_accessor */
-u32 fn_802564C8(void* ctx, u32 slot, u32 param) {
+void fn_802564C8(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E64C;
     extern void fn_80235AA0();
     extern void fn_802373B0();
@@ -27641,7 +27641,7 @@ void fn_802569B4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80256A68 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_80256A68(void* ctx, u32 slot, u32 param) {
+void fn_80256A68(void* ctx, u32 slot, u32 param) {
     extern void fn_8023793C();
     extern void fn_80239500();
     extern void fn_802395C8();
@@ -28433,7 +28433,7 @@ int fn_80257474()
   return iVar2 - ((u32)(iVar2 == 0) + -(uVar1 & 0xff) + 2);
 }
 /* Address: 0x802574AC | Size: 0x5C | Pattern: field_accessor */
-u32 fn_802574AC(void* ctx, u32 slot, u32 param) {
+void fn_802574AC(void* ctx, u32 slot, u32 param) {
     extern void fn_80229934();
     extern void fn_8025C674();
     u8 sp[0x10];
@@ -28472,7 +28472,7 @@ u32 fn_80257508(void)
   return iVar1 != 0;
 }
 /* Address: 0x80257544 | Size: 0x7C | Pattern: field_accessor */
-u32 fn_80257544(void* ctx, u32 slot, u32 param) {
+void fn_80257544(void* ctx, u32 slot, u32 param) {
     extern void fn_80119DD0();
     extern void fn_801F025C();
     extern void fn_801F6D9C();
@@ -28749,7 +28749,7 @@ void fn_80257838(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x802578C4 | Size: 0x78 | Pattern: field_accessor */
-u32 fn_802578C4(void* ctx, u32 slot, u32 param) {
+void fn_802578C4(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -29409,7 +29409,7 @@ void fn_80257FC8(void* ctx, u32 param1, u32 param2, u32 param3) {
  * ------------------------------------------------------------------- */
 
 /* Address: 0x802580BC | Size: 0x78 | Pattern: field_accessor */
-u32 fn_802580BC(void* ctx, u32 slot, u32 param) {
+void fn_802580BC(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -29514,7 +29514,7 @@ void fn_8025813C(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x8025820C | Size: 0x78 | Pattern: field_accessor */
-u32 fn_8025820C(void* ctx, u32 slot, u32 param) {
+void fn_8025820C(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_8025C264();
     u8 sp[0x20];
@@ -30185,7 +30185,7 @@ void fn_802589B4(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x80258A64 | Size: 0x6C | Pattern: field_accessor */
-u32 fn_80258A64(void* ctx, u32 slot, u32 param) {
+void fn_80258A64(void* ctx, u32 slot, u32 param) {
     extern f32 lbl_8047E650;
     extern void fn_80236BFC();
     extern void fn_802373B0();
@@ -31475,7 +31475,7 @@ void fn_8025999C(void* ctx, u32 param1, u32 param2, u32 param3) {
 }
 
 /* Address: 0x80259A84 | Size: 0x68 | Pattern: field_accessor */
-u32 fn_80259A84(void* ctx, u32 slot, u32 param) {
+void fn_80259A84(void* ctx, u32 slot, u32 param) {
     extern void fn_80236BFC();
     extern void fn_80237288();
     u8 sp[0x10];
@@ -35356,7 +35356,7 @@ u32 fn_8025CBE8(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025CC30 | Size: 0x60 | Pattern: field_accessor */
-u32 fn_8025CC30(void* ctx, u32 slot, u32 param) {
+void fn_8025CC30(void* ctx, u32 slot, u32 param) {
     extern void fn_802062FC();
     extern void fn_80237F74();
     u8 sp[0x10];
@@ -35398,7 +35398,7 @@ u32 fn_8025CC90(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025CCE0 | Size: 0x84 | Pattern: field_accessor */
-u32 fn_8025CCE0(void* ctx, u32 slot, u32 param) {
+void fn_8025CCE0(void* ctx, u32 slot, u32 param) {
     extern void fn_802062FC();
     extern void fn_80236BFC();
     extern void fn_80237F74();
@@ -36064,7 +36064,7 @@ void fn_8025D3F4(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fn_8025D560(void* ctx) { return *(u32*)((u8*)fn_8006B09C(ctx) + 0x20); }
 
 /* Address: 0x8025D584 | Size: 0x5C | Pattern: field_accessor */
-u32 fn_8025D584(void* ctx, u32 slot, u32 param) {
+void fn_8025D584(void* ctx, u32 slot, u32 param) {
     extern void fn_8006B09C();
     u8 sp[0x10];
     u32 r0 = 0;
@@ -36092,7 +36092,7 @@ u32 fn_8025D584(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025D5E0 | Size: 0x64 | Pattern: field_accessor */
-u32 fn_8025D5E0(void* ctx, u32 slot, u32 param) {
+void fn_8025D5E0(void* ctx, u32 slot, u32 param) {
     extern void fn_8006B09C();
     u8 sp[0x10];
     u32 r0 = 0;
@@ -36221,7 +36221,7 @@ u32 fn_8025D744(void* ctx, u32 slot, u32 param) {
 }
 
 /* Address: 0x8025D788 | Size: 0x80 | Pattern: field_accessor */
-u32 fn_8025D788(void* ctx, u32 slot, u32 param) {
+void fn_8025D788(void* ctx, u32 slot, u32 param) {
     extern void fn_8006B09C();
     u8 sp[0x20];
     u32 r0 = 0;
@@ -36306,7 +36306,7 @@ void fn_8025D808(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8025D89C | Size: 0x78 | Pattern: field_accessor */
-u32 fn_8025D89C(void* ctx, u32 slot, u32 param) {
+void fn_8025D89C(void* ctx, u32 slot, u32 param) {
     extern void fn_8006B09C();
     extern void fn_80123FBC();
     extern void fn_8012AC08();

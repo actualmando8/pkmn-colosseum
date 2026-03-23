@@ -39,16 +39,16 @@ extern u8 lbl_80269B68[];
 extern u8 lbl_8026C7F8[];
 
 /* ===== Forward declarations ===== */
-s32 fn_8007FD64(void);
-s32 fn_8007FDBC(void);
-s32 fn_80080310(void);
-s32 fn_80080ED8(void);
-s32 fn_8008102C(void);
+void fn_8007FD64(void);
+void fn_8007FDBC(void);
+void fn_80080310(void);
+void fn_80080ED8(void);
+void fn_8008102C(void);
 
 /* ===== Function implementations ===== */
 
 /* 0x8007FD64 | size: 0x58 */
-s32 fn_8007FD64(void) {
+void fn_8007FD64(void) {
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -80,7 +80,7 @@ s32 fn_8007FD64(void) {
 }
 
 /* 0x8007FDBC | size: 0x554 */
-s32 fn_8007FDBC(void) {
+void fn_8007FDBC(void) {
     extern void fn_8007FD64();
     u8 sp[0x40];
     u32 tmp = 0;
@@ -445,7 +445,7 @@ s32 fn_8007FDBC(void) {
 }
 
 /* 0x80080310 | size: 0xBC8 */
-s32 fn_80080310(void) {
+void fn_80080310(void) {
     extern void fn_8008102C();
     u8 sp[0xA40];
     u32 tmp = 0;
@@ -1209,7 +1209,7 @@ s32 fn_80080310(void) {
 }
 
 /* 0x80080ED8 | size: 0x154 */
-s32 fn_80080ED8(void) {
+void fn_80080ED8(void) {
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -1305,7 +1305,7 @@ s32 fn_80080ED8(void) {
 }
 
 /* 0x8008102C | size: 0x1624 */
-s32 fn_8008102C(void) {
+void fn_8008102C(void) {
     extern u8 jumptable_802EE890[];
     extern u8 jumptable_802EE924[];
     extern u8 jumptable_802EE9B8[];

@@ -2187,10 +2187,10 @@ void fn_802224E8(u32 value) { /* stub */ }
 void fn_802224F4(u32 value) { /* stub */ }
 
 /* Address: 0x80222500 | Size: 0x10 | Pattern: sda_getter */
-u32 fn_80222500(void) { return; /* stub */ }
+void fn_80222500(void) { return; /* stub */ }
 
 /* Address: 0x80222510 | Size: 0x10 | Pattern: sda_getter */
-u32 fn_80222510(void) { return; /* stub */ }
+void fn_80222510(void) { return; /* stub */ }
 
 /* Address: 0x80222520 | Size: 0x34 | Ghidra import */
 void fn_80222520(void)
@@ -2203,26 +2203,26 @@ void fn_80222520(void)
   return;
 }
 /* Address: 0x80222554 | Size: 0x30 | Pattern: simple_wrapper */
-u32 fn_80222554(void* ctx, u32 param) { return; /* stub */ }
+void fn_80222554(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222584 | Size: 0x2C | Pattern: simple_wrapper */
-u32 fn_80222584(void* ctx, u32 param) { return; /* stub */ }
+void fn_80222584(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x802225B0 | Size: 0x2C | Pattern: simple_wrapper */
-u32 fn_802225B0(void* ctx, u32 param) { return; /* stub */ }
+void fn_802225B0(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x802225DC | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802225DC(void* ctx, u32 param) { return; /* stub */ }
+void fn_802225DC(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222604 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_80222604(void* ctx, u32 param) { return; /* stub */ }
+void fn_80222604(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x8022262C | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_8022262C(void* ctx, u32 param) { return; /* stub */ }
+void fn_8022262C(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222654 | Size: 0x50 | Pattern: field_accessor */
 #pragma optimization_level 0
-u32 fn_80222654(void* ctx, u32 slot, u32 param) {
+void fn_80222654(void* ctx, u32 slot, u32 param) {
     u32 tmp = 0;
     u32 r6 = 0;
     void (*ctr_fn)(void) = 0;
@@ -2254,7 +2254,7 @@ tmp = (u32)ctx + 0xe;
 
 /* Address: 0x802226A4 | Size: 0x48 | Pattern: field_accessor */
 #pragma optimization_level 0
-u32 fn_802226A4(void* ctx, u32 slot, u32 param) {
+void fn_802226A4(void* ctx, u32 slot, u32 param) {
     u32 tmp = 0;
     void (*ctr_fn)(void) = 0;
     u32 ctr = 0;
@@ -2282,17 +2282,17 @@ tmp = (u32)ctx + 0xa;
 #pragma optimization_level 4
 
 /* Address: 0x802226EC | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_802226EC(void* ctx, u32 param) { return; /* stub */ }
+void fn_802226EC(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x80222714 | Size: 0x28 | Pattern: simple_wrapper */
-u32 fn_80222714(void* ctx, u32 param) { return; /* stub */ }
+void fn_80222714(void* ctx, u32 param) { return; /* stub */ }
 
 /* Address: 0x8022273C | Size: 0x20 | Pattern: null_check_getter */
-u32 fn_8022273C(void* ctx) { if (ctx == NULL) return; return; /* stub */ }
+void fn_8022273C(void* ctx) { if (ctx == NULL) return; return; /* stub */ }
 
 /* Address: 0x8022275C | Size: 0x78 | Pattern: field_accessor */
 #pragma optimization_level 0
-u32 fn_8022275C(void* ctx, u32 slot, u32 param) {
+void fn_8022275C(void* ctx, u32 slot, u32 param) {
     u32 tmp = 0;
     u32 r6 = 0;
     u32 r7 = 0;
@@ -2336,7 +2336,7 @@ if (tmp != (u32)ctx) {
 
 /* Address: 0x802227D4 | Size: 0x70 | Pattern: field_accessor */
 #pragma optimization_level 0
-u32 fn_802227D4(void* ctx, u32 slot, u32 param) {
+void fn_802227D4(void* ctx, u32 slot, u32 param) {
     u32 tmp = 0;
     u32 r6 = 0;
     u32 r7 = 0;

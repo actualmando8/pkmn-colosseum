@@ -40,21 +40,21 @@ extern u8 lbl_8026F5A8[];
 extern u8 lbl_803FB328[];
 
 /* ===== Forward declarations ===== */
-s32 fn_80092C90(void);
-s32 fn_80092E38(void);
-s32 fn_80092FC8(void);
-s32 fn_80093160(void);
-s32 fn_800932F0(void);
-s32 fn_800934E4(void);
-s32 fn_80093574(void);
-s32 fn_80093610(void);
-s32 fn_80093698(void);
+void fn_80092C90(void);
+void fn_80092E38(void);
+void fn_80092FC8(void);
+void fn_80093160(void);
+void fn_800932F0(void);
+void fn_800934E4(void);
+void fn_80093574(void);
+void fn_80093610(void);
+void fn_80093698(void);
 
 /* ===== Function implementations ===== */
 
 
 /* 0x80092C90 | size: 0x1A8 */
-s32 fn_80092C90(void) {
+void fn_80092C90(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
     u8 sp[0x20];
@@ -177,7 +177,7 @@ s32 fn_80092C90(void) {
 }
 
 /* 0x80092E38 | size: 0x190 */
-s32 fn_80092E38(void) {
+void fn_80092E38(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
     u8 sp[0x20];
@@ -290,7 +290,7 @@ s32 fn_80092E38(void) {
 }
 
 /* 0x80092FC8 | size: 0x198 */
-s32 fn_80092FC8(void) {
+void fn_80092FC8(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
     u8 sp[0x20];
@@ -406,7 +406,7 @@ s32 fn_80092FC8(void) {
 }
 
 /* 0x80093160 | size: 0x190 */
-s32 fn_80093160(void) {
+void fn_80093160(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
     u8 sp[0x20];
@@ -519,7 +519,7 @@ s32 fn_80093160(void) {
 }
 
 /* 0x800932F0 | size: 0x1F4 */
-s32 fn_800932F0(void) {
+void fn_800932F0(void) {
     extern void fn_800937F4();
     extern void fn_80093B04();
     u8 sp[0x20];
@@ -662,7 +662,7 @@ s32 fn_800932F0(void) {
 }
 
 /* 0x800934E4 | size: 0x90 */
-s32 fn_800934E4(void) {
+void fn_800934E4(void) {
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -701,7 +701,7 @@ s32 fn_800934E4(void) {
 }
 
 /* 0x80093574 | size: 0x9C */
-s32 fn_80093574(void) {
+void fn_80093574(void) {
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -744,7 +744,7 @@ s32 fn_80093574(void) {
 }
 
 /* 0x80093610 | size: 0x88 */
-s32 fn_80093610(void) {
+void fn_80093610(void) {
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -780,7 +780,7 @@ s32 fn_80093610(void) {
 }
 
 /* 0x80093698 | size: 0x15C */
-s32 fn_80093698(void) {
+void fn_80093698(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
