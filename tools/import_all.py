@@ -103,8 +103,10 @@ def full_fixup(code, func_name, source_text):
     # Fix Ghidra-specific identifiers that don't exist in C
     # SUB_XXXXXXXX -> fn_XXXXXXXX (Ghidra sub-function references)
     code = re.sub(r'\bSUB_([0-9a-fA-F]{8})\b', r'fn_\1', code)
-    # stack0xNNNNNNNN -> local variable (remove or replace with 0)
+    # stack0xNNNNNNNN -> local variable (replace with 0 cast)
     code = re.sub(r'\bstack0x[0-9a-fA-F]+\b', '0', code)
+    # &stack0x... patterns (address of stack var) -> 0
+    code = re.sub(r'&stack0x[0-9a-fA-F]+', '0', code)
 
     # Collect symbols
     dat_syms = set(RE_DAT.findall(code))
@@ -179,10 +181,23 @@ def full_fixup(code, func_name, source_text):
     code = re.sub(r'\(\*(\w*[Vv]ar\d+)\)\s*\(', r'((void (*)())\1)(', code)
     code = re.sub(r'\(\*(r\d+)\)\s*\(', r'((void (*)())\1)(', code)
 
-    # Fix computed function pointer calls: (**(void **)(expr))() -> ((void (*)(void))**(void ***)(expr))()
+    # Fix computed function pointer calls
+    # Pattern: (**(void **)(expr))() -> ((void (*)(void))**(void ***)(expr))()
     code = re.sub(
         r'\(\*\*\(void\s*\*\*\)\(([^)]+)\)\)\s*\(\)',
         lambda m: f'((void (*)(void))**(void ***)({m.group(1)}))()',
+        code
+    )
+    # Pattern: (**(void **)expr)() where expr doesn't have parens
+    code = re.sub(
+        r'\(\*\*\(void\s*\*\*\)(\w[^)]*)\)\s*\(\)',
+        lambda m: f'((void (*)(void))**(void ***)({m.group(1)}))()',
+        code
+    )
+    # Pattern: (*(void *)(expr))(...) -> ((void (*)())*(void **)(expr))(...)
+    code = re.sub(
+        r'\(\*\(void\s*\*\)\(([^)]+)\)\)\s*\(',
+        lambda m: f'((void (*)())*(void **)({m.group(1)}))(',
         code
     )
 
@@ -219,9 +234,29 @@ def full_fixup(code, func_name, source_text):
     code = re.sub(r'!=\s*\(\w+\s*\*\s*\)0\b(?!x)', '!= (void *)0', code)
 
     # Fix: passing integer 0 or constants as last arg where void* expected
-    # Common pattern: fn_XXX(args..., 0xffffffff) where last arg is void*
-    # Add (void*) cast for literal -1/0xffffffff in function calls
     code = re.sub(r',\s*0xffffffff\s*\)', ', (void*)0xffffffff)', code)
+
+    # Fix: void-returning functions used as values
+    # When a function is declared void but Ghidra uses its return value,
+    # we need to redeclare it as returning int inside the function body
+    # This is done by checking the local extern return types against usage
+    void_fns_in_source = set()
+    if source_text:
+        for m2 in re.finditer(r'^void\s+(fn_[0-9a-fA-F]{8})\s*\(', source_text, re.MULTILINE):
+            void_fns_in_source.add(m2.group(1))
+        for m2 in re.finditer(r'^\s+extern\s+void\s+(fn_[0-9a-fA-F]{8})\s*\(', source_text, re.MULTILINE):
+            void_fns_in_source.add(m2.group(1))
+
+    # Check which void functions have their return value used
+    for vfn in list(void_fns_in_source):
+        if re.search(rf'\w+\s*=\s*{re.escape(vfn)}\s*\(', code):
+            # This function's return value is used - redeclare as int
+            # Change existing local extern from 'void fn_XXX()' to 'int fn_XXX()'
+            code = re.sub(
+                rf'(\s+extern\s+)void(\s+{re.escape(vfn)}\s*\(\))',
+                r'\1int\2',
+                code
+            )
 
     code = re.sub(r'\n{3,}', '\n\n', code)
 
