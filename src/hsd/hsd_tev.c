@@ -71,6 +71,8 @@ union HSD_TExp {
 };
 
 /* Forward declarations */
+extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+extern u32 lbl_8047B358;
 extern void GXSetTevStages(u8 numStages);
 extern void GXSetTevOrder(u32 stage, u32 texcoord, u32 texmap, u32 chan);
 extern void GXSetTevColorIn(u32 stage, u32 a, u32 b, u32 c, u32 d);
@@ -136,24 +138,18 @@ void fn_801B1730(void) {
 }
 
 /*
- * HSD_TevSetNumStages - 0x801B1854 | Size: 0x30
- * Set the number of active TEV stages.
+ * 0x801B1854 | Size: 0x30
+ * Initialize TEV vtx desc list from BSS object.
  */
-void fn_801B1854(u8 numStages) {
-    if (numStages == 0 || numStages > 16) {
-        return;
-    }
-    tev_num_stages = numStages;
-    GXSetNumTevStages(numStages);
+extern u8 lbl_804656E0[];
+void fn_801B1854(void) {
+    fn_801AA35C(lbl_804656E0, 0x28, 4);
 }
 
 /* Address: 0x801B1884 | Size: 0xC */
-/* TEV helper - return stage count or index */
-s32 fn_801B1884(u8* obj) {
-    if (obj == NULL) {
-        return 0;
-    }
-    return *(s32*)(obj + 0x0);
+/* Get pointer to TEV vtx desc BSS object */
+void* fn_801B1884(void) {
+    return lbl_804656E0;
 }
 
 /*
@@ -529,12 +525,9 @@ void fn_801B2F1C(HSD_TExp* root, u32* num_stages, u32 start_stage) {
 }
 
 /* Address: 0x801B3168 | Size: 0xC */
-/* TExp node type getter */
-s32 fn_801B3168(u8* obj) {
-    if (obj == NULL) {
-        return -1;
-    }
-    return *(s32*)(obj + 0x0);
+/* Clear TEV stage count SDA variable */
+void fn_801B3168(void) {
+    lbl_8047B358 = 0;
 }
 
 /*
@@ -735,19 +728,21 @@ void fn_801B37A0(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
 /* NOTE: fn_801B387C (Size: 0x8) is already decompiled in another file */
 
 /* Address: 0x801B3884 | Size: 0xC */
-/* TExp small utility - return zero */
-s32 fn_801B3884(void) {
-    return 0;
+/* Clear TEV expression list SDA global */
+extern u32 lbl_8047B370;
+void fn_801B3884(void) {
+    lbl_8047B370 = 0;
 }
 
 /*
  * HSD_TExpFreeNode - 0x801B3890 | Size: 0x30
- * Free a single TExp node.
+ * Release TEV stage count from SDA variable.
  */
-void fn_801B3890(HSD_TExp* exp) {
-    if (exp != NULL) {
-        hsdFreeMemPiece(exp, sizeof(HSD_TExp));
-    }
+extern void fn_800B884C(u8 count);
+void fn_801B3890(void) {
+    u8 count = (u8)lbl_8047B358;
+    fn_800B884C(count);
+    lbl_8047B358 = 0;
 }
 
 /*
@@ -936,7 +931,7 @@ void fn_801B3D1C(HSD_TObj* tobj, u32 render_mode) {
 
     /* Set final TEV stage count */
     if (num_stages > 0) {
-        fn_801B1854((u8)num_stages);
+        fn_801B1854();
     }
 
     /* Free expression trees */
