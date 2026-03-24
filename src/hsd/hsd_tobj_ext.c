@@ -121,21 +121,16 @@ void fn_801BBCE0(HSD_TObj* tobj, u32 wrap_s, u32 wrap_t) {
 /* ========================================================================= */
 
 /* Address: 0x801BBD3C | Size: 0x24 */
-/* TObj get image descriptor */
-void* fn_801BBD3C(u8* tobj) {
-    if (tobj == NULL) {
-        return NULL;
-    }
-    return *(void**)(tobj + 0x64);
+/* Free a 0x18-byte memory piece */
+extern void fn_80193AF0(void* obj, s32 size);
+void fn_801BBD3C(void* obj) {
+    fn_80193AF0(obj, 0x18);
 }
 
 /* Address: 0x801BBD60 | Size: 0x24 */
-/* TObj get TLUT descriptor */
-void* fn_801BBD60(u8* tobj) {
-    if (tobj == NULL) {
-        return NULL;
-    }
-    return *(void**)(tobj + 0x68);
+/* Free a 0x18-byte memory piece (duplicate) */
+void fn_801BBD60(void* obj) {
+    fn_80193AF0(obj, 0x18);
 }
 
 /*
@@ -633,12 +628,11 @@ void fn_801BF1F0(void* state) {
 }
 
 /* Address: 0x801BF4C4 | Size: 0x20 */
-/* Get current render pass */
-u32 fn_801BF4C4(u8* state) {
-    if (state == NULL) {
-        return 0;
-    }
-    return *(u32*)(state + 0x0);
+/* Store value to BSS object and set flag */
+extern u8 lbl_80466BC0[];
+void fn_801BF4C4(u32 val) {
+    *(u32*)(lbl_80466BC0 + 0x3C) = val;
+    *(u8*)(lbl_80466BC0 + 0x54) = 1;
 }
 
 /*
@@ -731,11 +725,9 @@ void fn_801BFA1C(void* ctx) {
 }
 
 /* Address: 0x801BFCA0 | Size: 0x10 */
-/* Simple state setter */
-void fn_801BFCA0(u8* state, u32 val) {
-    if (state != NULL) {
-        *(u32*)(state + 0x0) = val;
-    }
+/* Get field at offset 0x1E0 from BSS object */
+u32 fn_801BFCA0(void) {
+    return *(u32*)(lbl_80466BC0 + 0x1E0);
 }
 
 /*
