@@ -16,7 +16,8 @@
 extern void fn_800DD970(const char* fmt, ...);
 
 /* ===== Global state (SDA) ===== */
-extern u8 lbl_8047AA80[];
+extern u32 lbl_8047AA74;
+extern u32 lbl_8047AA80;
 
 /* Matrix/vector math */
 extern void fn_800A37CC(void* mtx, void* vecIn, void* vecOut); /* MTXMultVec3 */
@@ -396,7 +397,7 @@ void fn_800D2248(void** instances, u32 count, u32 renderFlags) {
  * Address: 0x800D2584, Size: 0x8
  * ================================================================== */
 u32 fn_800D2584(void) {
-    return 0;
+    return lbl_8047AA74;
 }
 
 /* ==================================================================
@@ -510,8 +511,8 @@ void fn_800D2F34(void* renderTex, u32 w, u32 h) {
  * fn_800D305C - GS render: get frame counter
  * Address: 0x800D305C, Size: 0xC
  * ================================================================== */
-u32 fn_800D305C(void) {
-    return 0;
+void fn_800D305C(u8 val) {
+    *(u8*)((u8*)lbl_8047AA80 + 0x5C) = val;
 }
 
 /* ==================================================================
@@ -519,5 +520,5 @@ u32 fn_800D305C(void) {
  * Address: 0x800D3068, Size: 0xC
  * ================================================================== */
 u32 fn_800D3068(void) {
-    return 640;
+    return *(u32*)((u8*)lbl_8047AA80 + 0x58);
 }
