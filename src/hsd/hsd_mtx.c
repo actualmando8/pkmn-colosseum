@@ -42,13 +42,11 @@ void fn_801A8D1C(void) {
 }
 
 /* Address: 0x801A9570 | Size: 0x1C */
-/* Small matrix helper - possibly set identity or clear */
-void fn_801A9570(f32* mtx) {
-    if (mtx != NULL) {
-        mtx[0] = 1.0f;
-        mtx[5] = 1.0f;
-        mtx[10] = 1.0f;
-    }
+/* Extract translation vector from 3x4 matrix (last column) */
+void fn_801A9570(f32 mtx[3][4], f32* vec) {
+    vec[0] = mtx[0][3];
+    vec[1] = mtx[1][3];
+    vec[2] = mtx[2][3];
 }
 
 /* Address: 0x801A958C | Size: 0x340 */
@@ -67,7 +65,8 @@ void fn_801A9DF0(void) {
 }
 
 /* Address: 0x801AA350 | Size: 0xC */
-/* Small return-zero utility */
-s32 fn_801AA350(void) {
-    return 0;
+/* Clear vtx desc list head pointer */
+extern u32 lbl_8047B2E0;
+void fn_801AA350(void) {
+    lbl_8047B2E0 = 0;
 }
