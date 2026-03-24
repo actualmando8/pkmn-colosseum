@@ -32,31 +32,27 @@ static u32 gobj_next_id;
 /*  TExp node management                                                     */
 /* ========================================================================= */
 
+/* BSS globals */
+extern u8 lbl_80465728[];
+extern u8 lbl_80465754[];
+extern u8 lbl_80465780[];
+
 /* Address: 0x801B4240 | Size: 0xC */
-/* TExp node type getter */
-s32 fn_801B4240(u8* node) {
-    if (node == NULL) {
-        return -1;
-    }
-    return *(s32*)(node + 0x0);
+/* Get pointer to BSS object lbl_80465728 */
+void* fn_801B4240(void) {
+    return lbl_80465728;
 }
 
 /* Address: 0x801B424C | Size: 0xC */
-/* TExp node data getter */
-void* fn_801B424C(u8* node) {
-    if (node == NULL) {
-        return NULL;
-    }
-    return *(void**)(node + 0x4);
+/* Get pointer to BSS object lbl_80465754 */
+void* fn_801B424C(void) {
+    return lbl_80465754;
 }
 
 /* Address: 0x801B4258 | Size: 0xC */
-/* TExp node link getter */
-void* fn_801B4258(u8* node) {
-    if (node == NULL) {
-        return NULL;
-    }
-    return *(void**)(node + 0x8);
+/* Get pointer to BSS object lbl_80465780 */
+void* fn_801B4258(void) {
+    return lbl_80465780;
 }
 
 /*
