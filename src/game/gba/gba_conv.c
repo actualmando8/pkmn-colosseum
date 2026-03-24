@@ -2466,13 +2466,12 @@ void fn_80084A8C(void) {
             tmp = *(u32*)(r3 + tmp);
             ctr_fn = (void(*)(void))tmp;
             r17 = 0x1;
-            goto L_80085DD8;
 
 
-        }
+        } else {
         tmp = 0x0;
         goto L_80085E1C;
-    L_80085DD8:
+        }
         fn_80128E24();
         if (r3 != 0) {
             fn_80128E04();

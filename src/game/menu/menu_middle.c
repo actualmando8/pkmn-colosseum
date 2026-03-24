@@ -6714,12 +6714,11 @@ void fn_8006F720(void) {
         ctr_fn = (void(*)(void))r0;
         /* indirect jump via ctr */;
         r25 = 0x0;
-        goto L_8006F7E4;
 
 
-    }
+    } else {
     r25 = 0x8;
-    L_8006F7E4: ;
+    }
     ((void(*)(void))fn_80077BD0)();
     r0 = r3 & 0xFF;
     if (r0 != (u32)0x0) {
