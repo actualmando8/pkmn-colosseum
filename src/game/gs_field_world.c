@@ -24698,6 +24698,7 @@ L_8012D4AC: ;
     f7 = f7 * f0;
 L_8012D4E0: ;
 do {
+do {
     if ((s32)r0 == (s32)0x0) {
         r3 = -0x1;
         return;
@@ -24750,21 +24751,21 @@ do {
         r0 = r4 & 0x7FFFFF;
         if ((s32)r3 != (s32)0x0) {
             r0 = 0x1;
-            goto L_8012D5D8;
+            break;
         }
         r0 = 0x2;
-        goto L_8012D5D8;
+        break;
             }
     r0 = r4 & 0x7FFFFF;
     if ((s32)r3 != (s32)0x0) {
         r0 = 0x5;
-        goto L_8012D5D8;
+        break;
     }
     r0 = 0x3;
-    goto L_8012D5D8;
+    break;
 L_8012D5D4: ;
     r0 = 0x4;
-L_8012D5D8: ;
+} while (0);
     if ((s32)r0 == (s32)0x1) {
         r3 = (u32)lbl_80478AC0;
         f6 = *(f32*)lbl_80478AC0;

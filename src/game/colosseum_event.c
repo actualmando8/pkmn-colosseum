@@ -2666,12 +2666,12 @@ void fn_80204970(void)
   return;
 }
 /* fn_80204A10 | Size: 0x4C | Check if trainer slot is active */
-BOOL fn_80204A10(u32 slotId) {
+u8 fn_80204A10(u32 slotId) {
     extern void* fn_801F4354(u32 context, u32 slot);
     extern u8 fn_801FB8F8(void* trainer);
     void* trainer = fn_801F4354(0, slotId);
     if (trainer == NULL) {
-        return FALSE;
+        return 0;
     }
     return fn_801FB8F8(trainer) == 1;
 }
@@ -5848,10 +5848,10 @@ u8* fn_8020A080(u16 index) {
 }
 
 /* 0x8020A224 | size: 0x34 | small */
-void* fn_8020A224(void* base, u32 index) {
+void* fn_8020A224(void* base, u16 index) {
     if (base == 0) return 0;
-    if ((index & 0xFFFF) >= 9) return 0;
-    return (u8*)base + 0x8 + (index & 0xFFFF) * 16;
+    if (index >= 9) return 0;
+    return (u8*)base + 0x8 + index * 16;
 }
 
 /* 0x8020A2B8 | size: 0x40 -- copy 0xAC bytes (43 u32s) */
@@ -8321,20 +8321,16 @@ void fn_8020E6D4(void)
   return;
 }
 /* Address: 0x8020E758 | Size: 0x54 | Ghidra import */
-void fn_8020E758(void)
-
+void fn_8020E758(u32 r3)
 {
-    u32 r3;
-
     extern void fn_801FD07C();
     extern void fn_801FD08C();
     extern void fn_801FD09C();
     extern void fn_801FD0AC();
-  fn_801FD0AC(r3,0);
-  fn_801FD09C(r3,0);
-  fn_801FD08C(r3,0);
-  fn_801FD07C(r3,0);
-  return;
+    fn_801FD0AC(r3, 0);
+    fn_801FD09C(r3, 0);
+    fn_801FD08C(r3, 0);
+    fn_801FD07C(r3, 0);
 }
 /* Address: 0x8020E7AC | Size: 0x1b0 | Ghidra import */
 u32 fn_8020E7AC(void)
