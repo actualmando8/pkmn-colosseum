@@ -2467,16 +2467,8 @@ void fn_80084A8C(void) {
             ctr_fn = (void(*)(void))tmp;
             r17 = 0x1;
             goto L_80085DD8;
-            r17 = 0x2;
-            goto L_80085DD8;
-            r17 = 0x4;
-            goto L_80085DD8;
-            r17 = 0x5;
-            goto L_80085DD8;
-            r17 = 0x3;
-            goto L_80085DD8;
-            r17 = 0x6;
-            goto L_80085DD8;
+
+
         }
         tmp = 0x0;
         goto L_80085E1C;
@@ -4467,7 +4459,7 @@ L_80087B3C:
     ((void(*)(void))fn_800F0308)();
     goto L_80087B3C;
 
-    return;
+
 }
 
 /* 0x80087C64 | size: 0x7C4 */
