@@ -54,6 +54,9 @@ extern void  GSmemFree(u16 handle);                     /* fn_800E209C */
 extern void  memcpy(void* dst, const void* src, u32 n);
 extern void  memset(void* dst, int val, u32 n);
 
+/* SDA/SBSS globals */
+extern u32 lbl_8047ACC8;
+
 /* GSthread */
 extern void  fn_800F0308(void);                         /* GSthread yield */
 extern void* fn_800F9418(u32 size, u32 alignment, u32 loadParam,
@@ -513,4 +516,123 @@ void GSfloorRequestTransition(u32 nextFloorId)
     gsFloorCurrentId = nextFloorId;
     gsFloorNextState = GSFLOOR_STATE_UNLOADING;
     gsFloorState = GSFLOOR_STATE_UNLOADING;
+}
+
+/* ===================================================================
+ * Generated: 5 pattern-matched + 10 stubs
+ * Range: 0x800FF0A0 - 0x800FF788
+ * =================================================================== */
+
+extern u32 lbl_8047ACC4;
+
+/* 0x800FF0A0 | 0xD8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF0A0(void) {
+    /* TODO: match -- 216 bytes at 0x800FF0A0 */
+}
+#pragma pop
+
+/* 0x800FF178 | 0x128 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF178(void) {
+    /* TODO: match -- 296 bytes at 0x800FF178 */
+}
+#pragma pop
+
+/* 0x800FF2A0 | 0x120 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF2A0(void) {
+    /* TODO: match -- 288 bytes at 0x800FF2A0 */
+}
+#pragma pop
+
+/* 0x800FF3C0 | 0x114 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF3C0(void) {
+    /* TODO: match -- 276 bytes at 0x800FF3C0 */
+}
+#pragma pop
+
+/* 0x800FF4D4 | 0x58 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF4D4(void) {
+    /* TODO: match -- 88 bytes at 0x800FF4D4 */
+}
+#pragma pop
+
+/* 0x800FF52C | 0x14 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF52C(void) {
+    /* TODO: match -- 20 bytes at 0x800FF52C */
+}
+#pragma pop
+
+/* 0x800FF540 | 0x8 | sda_getter */
+u32 fn_800FF540(void) { return lbl_8047ACC4; }
+
+/* 0x800FF548 | 0xC | sda_deref_getter */
+u8 fn_800FF548(void) {
+    return *(u8*)((u8*)lbl_8047ACC8 + 0xB);
+}
+
+/* 0x800FF554 | 0xC | sda_deref_getter */
+u8 fn_800FF554(void) {
+    return *(u8*)((u8*)lbl_8047ACC8 + 0xA);
+}
+
+/* 0x800FF560 | 0xC | sda_deref_getter */
+u32 fn_800FF560(void) {
+    return *(u32*)((u8*)lbl_8047ACC8 + 0x4);
+}
+
+/* 0x800FF56C | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF56C(void) {
+    /* TODO: match -- 32 bytes at 0x800FF56C */
+}
+#pragma pop
+
+/* 0x800FF58C | 0xD4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF58C(void) {
+    /* TODO: match -- 212 bytes at 0x800FF58C */
+}
+#pragma pop
+
+/* 0x800FF660 | 0xD0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF660(void) {
+    /* TODO: match -- 208 bytes at 0x800FF660 */
+}
+#pragma pop
+
+/* 0x800FF730 | 0x54 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_800FF730(void) {
+    /* TODO: match -- 84 bytes at 0x800FF730 */
+}
+#pragma pop
+
+/* 0x800FF784 | 0x4 | void_stub */
+void fn_800FF784(void) {
 }

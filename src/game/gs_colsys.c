@@ -1735,3 +1735,291 @@ s32 GScolsys2_TriangleBoundsCheck(Vec3f* queryPoint, f32* triVerts)
 
     return 1;  /* Point is inside triangle */
 }
+
+/* ===================================================================
+ * Generated: 1 pattern-matched + 31 stubs
+ * Range: 0x8010C220 - 0x8010E138
+ * =================================================================== */
+
+/* 0x8010C220 | 0x4 | void_stub */
+void fn_8010C220(void) {
+}
+
+/* 0x8010C224 | 0x140 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C224(void) {
+    /* TODO: match -- 320 bytes at 0x8010C224 */
+}
+#pragma pop
+
+/* 0x8010C364 | 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C364(void) {
+    /* TODO: match -- 36 bytes at 0x8010C364 */
+}
+#pragma pop
+
+/* 0x8010C388 | 0x74 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C388(void) {
+    /* TODO: match -- 116 bytes at 0x8010C388 */
+}
+#pragma pop
+
+/* 0x8010C3FC | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C3FC(void) {
+    /* TODO: match -- 112 bytes at 0x8010C3FC */
+}
+#pragma pop
+
+/* 0x8010C46C | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C46C(void) {
+    /* TODO: match -- 52 bytes at 0x8010C46C */
+}
+#pragma pop
+
+/* 0x8010C4A0 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C4A0(void) {
+    /* TODO: match -- 52 bytes at 0x8010C4A0 */
+}
+#pragma pop
+
+/* 0x8010C4D4 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C4D4(void) {
+    /* TODO: match -- 52 bytes at 0x8010C4D4 */
+}
+#pragma pop
+
+/* 0x8010C508 | 0x44 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C508(void) {
+    /* TODO: match -- 68 bytes at 0x8010C508 */
+}
+#pragma pop
+
+/* 0x8010C54C | 0x104 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C54C(void) {
+    /* TODO: match -- 260 bytes at 0x8010C54C */
+}
+#pragma pop
+
+/* 0x8010C650 | 0xFC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C650(void) {
+    /* TODO: match -- 252 bytes at 0x8010C650 */
+}
+#pragma pop
+
+/* 0x8010C74C | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C74C(void) {
+    /* TODO: match -- 48 bytes at 0x8010C74C */
+}
+#pragma pop
+
+/* 0x8010C77C | 0x40 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C77C(void) {
+    /* TODO: match -- 64 bytes at 0x8010C77C */
+}
+#pragma pop
+
+/* 0x8010C7BC | 0x88 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C7BC(void) {
+    /* TODO: match -- 136 bytes at 0x8010C7BC */
+}
+#pragma pop
+
+/* 0x8010C844 | 0x8C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C844(void) {
+    /* TODO: match -- 140 bytes at 0x8010C844 */
+}
+#pragma pop
+
+/* 0x8010C8D0 | 0x160 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010C8D0(void) {
+    /* TODO: match -- 352 bytes at 0x8010C8D0 */
+}
+#pragma pop
+
+/* 0x8010CA30 | 0x190 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CA30(void) {
+    /* TODO: match -- 400 bytes at 0x8010CA30 */
+}
+#pragma pop
+
+/* 0x8010CBC0 | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CBC0(void) {
+    /* TODO: match -- 16 bytes at 0x8010CBC0 */
+}
+#pragma pop
+
+/* 0x8010CBD0 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CBD0(void) {
+    /* TODO: match -- 52 bytes at 0x8010CBD0 */
+}
+#pragma pop
+
+/* 0x8010CC04 | 0x50 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CC04(void) {
+    /* TODO: match -- 80 bytes at 0x8010CC04 */
+}
+#pragma pop
+
+/* 0x8010CC54 | 0x118 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CC54(void) {
+    /* TODO: match -- 280 bytes at 0x8010CC54 */
+}
+#pragma pop
+
+/* 0x8010CD6C | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CD6C(void) {
+    /* TODO: match -- 152 bytes at 0x8010CD6C */
+}
+#pragma pop
+
+/* 0x8010CE04 | 0x1E0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CE04(void) {
+    /* TODO: match -- 480 bytes at 0x8010CE04 */
+}
+#pragma pop
+
+/* 0x8010CFE4 | 0x54 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010CFE4(void) {
+    /* TODO: match -- 84 bytes at 0x8010CFE4 */
+}
+#pragma pop
+
+/* 0x8010D038 | 0x2C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D038(void) {
+    /* TODO: match -- 44 bytes at 0x8010D038 */
+}
+#pragma pop
+
+/* 0x8010D064 | 0x10C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D064(void) {
+    /* TODO: match -- 268 bytes at 0x8010D064 */
+}
+#pragma pop
+
+/* 0x8010D170 | 0x9C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D170(void) {
+    /* TODO: match -- 156 bytes at 0x8010D170 */
+}
+#pragma pop
+
+/* 0x8010D20C | 0x1BC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D20C(void) {
+    /* TODO: match -- 444 bytes at 0x8010D20C */
+}
+#pragma pop
+
+/* 0x8010D3C8 | 0x50C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D3C8(void) {
+    /* TODO: match -- 1292 bytes at 0x8010D3C8 */
+}
+#pragma pop
+
+/* 0x8010D8D4 | 0x52C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010D8D4(void) {
+    /* TODO: match -- 1324 bytes at 0x8010D8D4 */
+}
+#pragma pop
+
+/* 0x8010DE00 | 0xF0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010DE00(void) {
+    /* TODO: match -- 240 bytes at 0x8010DE00 */
+}
+#pragma pop
+
+/* 0x8010DEF0 | 0x248 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8010DEF0(void) {
+    /* TODO: match -- 584 bytes at 0x8010DEF0 */
+}
+#pragma pop
