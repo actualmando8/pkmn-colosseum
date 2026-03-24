@@ -1820,14 +1820,15 @@ void fn_80084A8C(void) {
         ((void(*)(void))fn_80093610)();
     L_800853B4:
         if ((s32)r3 != 0xe) {
+        do {
             if ((s32)r3 < 0xe) {
                 if ((s32)r3 != 2) {
-                    goto L_800855B4;
+                    break;
                 }
                 r4 = 0x20000;
                 tmp = r4 + 0x2;
-                if ((s32)r3 == (s32)tmp) goto L_800855B4;
-                goto L_800855B4;
+                if ((s32)r3 == (s32)tmp) break;
+                break;
             }
             r3 = 0x1;
             ((void(*)(void))fn_80103CC0)();
@@ -1949,7 +1950,7 @@ void fn_80084A8C(void) {
             ((void(*)(void))fn_80093698)();
             r3 = 0x0;
             return;
-        L_800855B4:
+        } while (0);
             r20 = 0x0;
         L_800855B8:
             r19 = 0x0;
@@ -5069,6 +5070,7 @@ void fn_800884BC(void) {
     r5 = r12;
     r3 = r4 & 0xFFFF;
     do {
+    do {
         r26 = (u32)sp + 0x44;
         r27 = *(u16*)((u8*)r6 + 0x0);
         r28 = 0x0;
@@ -5092,7 +5094,7 @@ void fn_800884BC(void) {
             tmp = tmp & 0xFFFF;
             if (tmp == r27) {
                 tmp = 0x1;
-                goto L_80088684;
+                break;
             }
             tmp = 0x1;
             *(u16*)(sp + 0x54) = r3;
@@ -5109,7 +5111,7 @@ void fn_800884BC(void) {
             tmp = tmp & 0xFFFF;
             if (tmp == r27) {
                 tmp = 0x1;
-                goto L_80088684;
+                break;
             }
             tmp = 0x2;
             *(u16*)(sp + 0x54) = r3;
@@ -5126,13 +5128,13 @@ void fn_800884BC(void) {
             tmp = tmp & 0xFFFF;
             if (tmp == r27) {
                 tmp = 0x1;
-                goto L_80088684;
+                break;
             }
             r26 = r26 + 0x6;
             r28 = r28 + 0x1;
         } while (--ctr != 0);
         tmp = 0x0;
-    L_80088684:
+    } while (0);
         if ((s32)tmp == 0) {
             r3 = 0x2;
             return;
