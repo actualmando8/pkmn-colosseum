@@ -73,6 +73,7 @@ union HSD_TExp {
 /* Forward declarations */
 extern void fn_801AA35C(void* list, u32 size, u32 alignment);
 extern u32 lbl_8047B358;
+extern u32 lbl_8047B370;
 extern void GXSetTevStages(u8 numStages);
 extern void GXSetTevOrder(u32 stage, u32 texcoord, u32 texmap, u32 chan);
 extern void GXSetTevColorIn(u32 stage, u32 a, u32 b, u32 c, u32 d);
@@ -532,31 +533,30 @@ void fn_801B3168(void) {
 }
 
 /*
- * HSD_TExpInit - 0x801B3174 | Size: 0x30
- * Initialize a TExp node with type and data.
+ * 0x801B3174 | Size: 0x30
+ * Clear field 0x8 of 4 entries in rodata struct array.
  */
-void fn_801B3174(HSD_TExp* exp, u32 type) {
-    if (exp == NULL) {
-        return;
+extern u8 lbl_8036CFE8[];
+void fn_801B3174(void) {
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        *(u32*)(lbl_8036CFE8 + i * 0xC + 0x8) = 0;
     }
-    exp->type = type;
-    exp->data = NULL;
-    exp->next = NULL;
 }
 
 /*
- * HSD_TExpAllocConst - 0x801B31A4 | Size: 0x50
- * Allocate a TExp constant node.
+ * 0x801B31A4 | Size: 0x50
+ * Reset TEV stages - release each stage then clear globals.
  */
-HSD_TExp* fn_801B31A4(u32 val) {
-    HSD_TExp* exp;
-    exp = (HSD_TExp*)hsdAllocMemPiece(sizeof(HSD_TExp));
-    if (exp != NULL) {
-        exp->type = HSD_TE_CNST;
-        exp->data = (void*)(u32)val;
-        exp->next = NULL;
+extern void fn_800BBC34(s32 stage);
+extern void fn_800BBC0C(s32 val);
+void fn_801B31A4(void) {
+    s32 i;
+    for (i = 0; i < 16; i++) {
+        fn_800BBC34(i);
     }
-    return exp;
+    fn_800BBC0C(0);
+    lbl_8047B370 = 0;
 }
 
 /*
@@ -730,7 +730,6 @@ void fn_801B37A0(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
 
 /* Address: 0x801B3884 | Size: 0xC */
 /* Clear TEV expression list SDA global */
-extern u32 lbl_8047B370;
 void fn_801B3884(void) {
     lbl_8047B370 = 0;
 }
