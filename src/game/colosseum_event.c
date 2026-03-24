@@ -2097,9 +2097,10 @@ void fn_80203ADC(void* ctx, u32 param) {
             resolved = fn_8012640C(resolved, 0, 0xCC, 0);
         }
     }
-    if (resolved != NULL) {
-        fn_80122AE0(resolved, param);
+    if (resolved == NULL) {
+        return;
     }
+    fn_80122AE0(resolved, param);
 }
 
 /* 0x80203B5C | size: 0x80 */
@@ -2910,32 +2911,32 @@ int fn_8020505C(void)
 }
 /* fn_80205134 | Size: 0x50 | Get field 0x30 from resolved 0xD9, default 9 */
 u16 fn_80205134(void* ctx) {
-    extern u16 fn_8011BEB4(void* ctx, u32 slot, u16 field, u32 flags);
+    extern u32 fn_8011BEB4();
     void* resolved = fn_8012640C(ctx, 0, 0xD9, 0);
     if (resolved == NULL) {
         return 9;
     }
-    return fn_8011BEB4(resolved, 0, 0x30, 0);
+    return (u16)fn_8011BEB4(resolved, 0, 0x30, 0);
 }
 
 /* fn_802051D4 | Size: 0x50 | Get field 0x27 from resolved 0xD9, default 0 */
 u16 fn_802051D4(void* ctx) {
-    extern u16 fn_8011BEB4(void* ctx, u32 slot, u16 field, u32 flags);
+    extern u32 fn_8011BEB4();
     void* resolved = fn_8012640C(ctx, 0, 0xD9, 0);
     if (resolved == NULL) {
         return 0;
     }
-    return fn_8011BEB4(resolved, 0, 0x27, 0);
+    return (u16)fn_8011BEB4(resolved, 0, 0x27, 0);
 }
 
 /* fn_80205224 | Size: 0x50 | Get field 0x27 from resolved 0xD9, default 0 */
 u16 fn_80205224(void* ctx) {
-    extern u16 fn_8011BEB4(void* ctx, u32 slot, u16 field, u32 flags);
+    extern u32 fn_8011BEB4();
     void* resolved = fn_8012640C(ctx, 0, 0xD9, 0);
     if (resolved == NULL) {
         return 0;
     }
-    return fn_8011BEB4(resolved, 0, 0x27, 0);
+    return (u16)fn_8011BEB4(resolved, 0, 0x27, 0);
 }
 
 /* Address: 0x80205274 | Size: 0x690 | Ghidra import */
@@ -3669,13 +3670,13 @@ u32 fn_80205C24(int r3,char r4)
 }
 /* 0x802062A8 | size: 0x54 | small */
 void fn_802062A8(void* param_1, u32 param_2, u32 param_3) {
-    extern u16 fn_8011BEB4(void*, u32, u16, u32);
-    extern void fn_801F00D0(u16, u32);
+    extern u32 fn_8011BEB4();
+    extern void fn_801F00D0();
     void* uVar1;
     u16 uVar2;
 
     uVar1 = fn_8012640C(param_1, 0, 0xF8, 0);
-    uVar2 = fn_8011BEB4(uVar1, 0, 0x29, 0);
+    uVar2 = (u16)fn_8011BEB4(uVar1, 0, 0x29, 0);
     fn_801F00D0(uVar2, param_3);
 }
 

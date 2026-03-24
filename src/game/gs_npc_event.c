@@ -438,16 +438,16 @@ L_8003154C:
             if ((s32)tmp != 1) {
                 if ((s32)tmp < 1) {
                     if ((s32)tmp < 0) {
-                        goto L_800315B0;
+                        continue;
                     }
-                    goto L_800315B0;
+                    continue;
                     }
                 r28 = 0xd67;
                 break;
             }
             r28 = 0xd68;
             break;
-        L_800315B0:
+
             r28 = 0x0;
         } while (0);
 

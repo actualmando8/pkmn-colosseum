@@ -2994,61 +2994,61 @@ void fn_8007B6D8(void) {
             while (1) {
                 if (r26 >= r29) break;
                 r25 = 0x0;
-            L_8007B91C:
-                tmp = *(u8*)((u8*)r31 + 0x342);
-                if (tmp != 0) {
-                    tmp = 0x9;
-                    r3 = 0x9;
-                    *(u8*)((u8*)r31 + 0x346) = tmp;
-                    return;
-                }
-                r3 = r30;
-                r4 = (u32)sp + 0x9;
-                fn_8025F3F4();
-                if ((s32)r3 != 0) {
-                    tmp = 0x9;
-                    r3 = 0x9;
-                    *(u8*)((u8*)r31 + 0x346) = tmp;
-                    return;
-                }
-                r3 = *(u8*)(sp + 0x9);
-                tmp = r3 & 0x00000030;
-                if ((s32)tmp != 0x30) {
-                    tmp = r3 & 0x00000008;
-                    if ((s32)tmp != 0) {
-                        r3 = r30;
-                        r4 = (u32)sp + 0x10;
-                        r5 = (u32)sp + 0x9;
-                        fn_8025F584();
-                    }
-                    tmp = 0x9;
-                    r3 = 0x9;
-                    *(u8*)((u8*)r31 + 0x346) = tmp;
-                    return;
-                }
-                tmp = r3 & 0x00000002;
-                if ((s32)tmp != 0) {
-                    r25 = r25 + 0x1;
-                    if (r25 > 9) {
+            while (1) {
+                    tmp = *(u8*)((u8*)r31 + 0x342);
+                    if (tmp != 0) {
                         tmp = 0x9;
                         r3 = 0x9;
                         *(u8*)((u8*)r31 + 0x346) = tmp;
                         return;
                     }
-                    r3 = r31;
-                    OSCreateAlarm();
-                    OSDisableInterrupts();
-                    r27 = r3;
-                    r3 = r31;
-                    r7 = r28;
-                    r6 = 0x10;
-                    r5 = 0x0;
-                    OSSetAlarm();
-                    r3 = r31 + 0x28;
-                    ((void(*)(void))fn_800A221C)();
-                    r3 = r27;
-                    OSRestoreInterrupts();
-                    goto L_8007B91C;
+                    r3 = r30;
+                    r4 = (u32)sp + 0x9;
+                    fn_8025F3F4();
+                    if ((s32)r3 != 0) {
+                        tmp = 0x9;
+                        r3 = 0x9;
+                        *(u8*)((u8*)r31 + 0x346) = tmp;
+                        return;
+                    }
+                    r3 = *(u8*)(sp + 0x9);
+                    tmp = r3 & 0x00000030;
+                    if ((s32)tmp != 0x30) {
+                        tmp = r3 & 0x00000008;
+                        if ((s32)tmp != 0) {
+                            r3 = r30;
+                            r4 = (u32)sp + 0x10;
+                            r5 = (u32)sp + 0x9;
+                            fn_8025F584();
+                        }
+                        tmp = 0x9;
+                        r3 = 0x9;
+                        *(u8*)((u8*)r31 + 0x346) = tmp;
+                        return;
+                    }
+                    tmp = r3 & 0x00000002;
+                    if ((s32)tmp != 0) {
+                        r25 = r25 + 0x1;
+                        if (r25 > 9) {
+                            tmp = 0x9;
+                            r3 = 0x9;
+                            *(u8*)((u8*)r31 + 0x346) = tmp;
+                            return;
+                        }
+                        r3 = r31;
+                        OSCreateAlarm();
+                        OSDisableInterrupts();
+                        r27 = r3;
+                        r3 = r31;
+                        r7 = r28;
+                        r6 = 0x10;
+                        r5 = 0x0;
+                        OSSetAlarm();
+                        r3 = r31 + 0x28;
+                        ((void(*)(void))fn_800A221C)();
+                        r3 = r27;
+                        OSRestoreInterrupts();
+            }
                 }
                 r6 = *(u32*)((u8*)r31 + 0x380);
                 r3 = r30;
@@ -3335,47 +3335,47 @@ void fn_8007B6D8(void) {
             r29 = (u32)fn_8007C23C;
             do {
                 r26 = 0x0;
-            L_8007BE58:
-                r3 = r30;
-                r4 = (u32)sp + 0x9;
-                fn_8025F3F4();
-                if ((s32)r3 != 0) {
-                    tmp = 0x9;
-                    r3 = 0x9;
-                    *(u8*)((u8*)r31 + 0x346) = tmp;
-                    return;
-                }
-                r3 = *(u8*)(sp + 0x9);
-                tmp = r3 & 0x00000030;
-                if ((s32)tmp != 0x20) {
-                    tmp = 0x9;
-                    r3 = 0x9;
-                    *(u8*)((u8*)r31 + 0x346) = tmp;
-                    return;
-                }
-                tmp = r3 & 0xa;
-                if ((s32)tmp != 8) {
-                    r26 = r26 + 0x1;
-                    if (r26 > 9) {
+            while (1) {
+                    r3 = r30;
+                    r4 = (u32)sp + 0x9;
+                    fn_8025F3F4();
+                    if ((s32)r3 != 0) {
                         tmp = 0x9;
                         r3 = 0x9;
                         *(u8*)((u8*)r31 + 0x346) = tmp;
                         return;
                     }
-                    r3 = r31;
-                    OSCreateAlarm();
-                    OSDisableInterrupts();
-                    r27 = r3;
-                    r3 = r31;
-                    r7 = r29;
-                    r6 = 0x10;
-                    r5 = 0x0;
-                    OSSetAlarm();
-                    r3 = r31 + 0x28;
-                    ((void(*)(void))fn_800A221C)();
-                    r3 = r27;
-                    OSRestoreInterrupts();
-                    goto L_8007BE58;
+                    r3 = *(u8*)(sp + 0x9);
+                    tmp = r3 & 0x00000030;
+                    if ((s32)tmp != 0x20) {
+                        tmp = 0x9;
+                        r3 = 0x9;
+                        *(u8*)((u8*)r31 + 0x346) = tmp;
+                        return;
+                    }
+                    tmp = r3 & 0xa;
+                    if ((s32)tmp != 8) {
+                        r26 = r26 + 0x1;
+                        if (r26 > 9) {
+                            tmp = 0x9;
+                            r3 = 0x9;
+                            *(u8*)((u8*)r31 + 0x346) = tmp;
+                            return;
+                        }
+                        r3 = r31;
+                        OSCreateAlarm();
+                        OSDisableInterrupts();
+                        r27 = r3;
+                        r3 = r31;
+                        r7 = r29;
+                        r6 = 0x10;
+                        r5 = 0x0;
+                        OSSetAlarm();
+                        r3 = r31 + 0x28;
+                        ((void(*)(void))fn_800A221C)();
+                        r3 = r27;
+                        OSRestoreInterrupts();
+            }
                 }
                 r3 = r30;
                 r4 = (u32)sp + 0x10;

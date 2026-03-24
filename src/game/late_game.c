@@ -330,23 +330,23 @@ while (1) {
         r29 = r3;
         if ((s32)r29 != 0x0) break;
 
-    L_80093A74: ;
-        r3 = *(u32*)((u8*)r31 + 0x4338);
-        r3 = r3 + 0x1;
-        ((void(*)(void))fn_80089CA8)();
-        r29 = r3;
-        if ((s32)r29 == 0x0) {
+    while (1) {
             r3 = *(u32*)((u8*)r31 + 0x4338);
             r3 = r3 + 0x1;
-            ((void(*)(void))fn_80089C84)();
+            ((void(*)(void))fn_80089CA8)();
             r29 = r3;
-        }
-        if ((s32)r29 < 0x0) {
-            ((void(*)(void))fn_800A13F8)();
-            r4 = 0x10;
-            ((void(*)(void))fn_800A257C)();
-            ((void(*)(void))fn_800A1990)();
-            goto L_80093A74;
+            if ((s32)r29 == 0x0) {
+                r3 = *(u32*)((u8*)r31 + 0x4338);
+                r3 = r3 + 0x1;
+                ((void(*)(void))fn_80089C84)();
+                r29 = r3;
+            }
+            if ((s32)r29 < 0x0) {
+                ((void(*)(void))fn_800A13F8)();
+                r4 = 0x10;
+                ((void(*)(void))fn_800A257C)();
+                ((void(*)(void))fn_800A1990)();
+    }
         }
         if ((s32)r29 != 0x0) break;
 
@@ -1177,9 +1177,10 @@ void fn_80094650(void) {
         }
         if ((s32)tmp < 0x1d3) {
         }
-        if ((s32)tmp >= 0x1ca) goto L_8009473C;
+        if ((s32)tmp < 0x1ca) {
 
-    } else {
+        } else {
+        }
         if ((s32)tmp >= 0x1d9) goto L_8009473C;
     }
 L_800946D0:
@@ -2323,9 +2324,10 @@ void fn_8009567C(void) {
         }
         if ((s32)tmp < 0x1d3) {
         }
-        if ((s32)tmp >= 0x1ca) goto L_80095790;
+        if ((s32)tmp < 0x1ca) {
 
-    } else {
+        } else {
+        }
         if ((s32)tmp >= 0x1d9) goto L_80095790;
     }
 L_80095724:
@@ -4013,7 +4015,7 @@ do {
                 break;
             }
             if ((s32)tmp >= 3) break;
-            goto L_8009709C;
+            continue;
             }
         tmp = 0x1;
         *(u8*)((u8*)r31 + 0x1) = tmp;
@@ -4022,7 +4024,7 @@ do {
     tmp = 0x2;
     *(u8*)((u8*)r31 + 0x1) = tmp;
     break;
-L_8009709C:
+
     tmp = 0x5;
     *(u8*)((u8*)r31 + 0x1) = tmp;
 } while (0);
@@ -4811,13 +4813,11 @@ void fn_80097BBC(void) {
         r3 = -0x1;
         return;
     }
-    goto L_80097C30;
-do {
-        ((void(*)(void))fn_800F0308)();
-    L_80097C30:
-        fn_8010B560();
-        tmp = r3 & 0xFF;
-} while (tmp != 0);
+    while (tmp != 0) {
+            fn_8010B560();
+            tmp = r3 & 0xFF;
+            ((void(*)(void))fn_800F0308)();
+    }
     r3 = (u32)&lbl_803FB380;
     r4 = 0x0;
     r3 = (u32)&lbl_803FB380;
