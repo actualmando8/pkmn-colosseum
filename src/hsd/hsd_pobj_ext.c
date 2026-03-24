@@ -15,6 +15,13 @@
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_pobj.h"
 
+/* BSS globals */
+extern u8 lbl_80465688[];
+extern u8 lbl_804656B4[];
+
+/* SDA2 constants */
+extern const f64 lbl_8047DD98;
+
 /* ========================================================================= */
 /*  Render dispatch and display list management                              */
 /* ========================================================================= */
@@ -104,31 +111,54 @@ void fn_801B0040(void) {
 }
 
 /* Address: 0x801B009C | Size: 0x44 */
-/* TEV indirect texture setup */
-void fn_801B009C(void) {
+/* Shape blend opacity flag setter - if val >= threshold, set high bit */
+void fn_801B009C(u32* obj, s32 mode, f32* val_ptr) {
+    if (obj == NULL) {
+        return;
+    }
+    if (mode != 1) {
+        return;
+    }
+    if (*val_ptr >= lbl_8047DD98) {
+        obj[1] |= 0x80000000;
+    } else {
+        obj[1] &= ~0x80000000;
+    }
 }
 
 /* Address: 0x801B00E0 | Size: 0x60 */
-/* TEV order setup helper */
-void fn_801B00E0(void) {
+/* Search linked list for matching node by type/subtype flags */
+u32* fn_801B00E0(volatile u32* node, u32 type, u32 subtype) {
+    if (node == NULL) {
+        return NULL;
+    }
+    for (; node != NULL; node = (volatile u32*)node[0]) {
+        if (!(node[1] & 0x80000000)) {
+            continue;
+        }
+        if ((node[1] & 0x70000000) != type) {
+            continue;
+        }
+        if (subtype == 0) {
+            return (u32*)node;
+        }
+        if (subtype == (node[1] & 0x0FFFFFFF)) {
+            return (u32*)node;
+        }
+    }
+    return NULL;
 }
 
 /* Address: 0x801B0140 | Size: 0xC */
-/* Small TEV utility - return value from struct */
-s32 fn_801B0140(u8* obj) {
-    if (obj == NULL) {
-        return 0;
-    }
-    return *(s32*)(obj + 0x4);
+/* Get pointer to color TEV desc BSS object */
+void* fn_801B0140(void) {
+    return lbl_80465688;
 }
 
 /* Address: 0x801B014C | Size: 0xC */
-/* Small TEV utility - return count from struct */
-s32 fn_801B014C(u8* obj) {
-    if (obj == NULL) {
-        return 0;
-    }
-    return *(s32*)(obj + 0x8);
+/* Get pointer to alpha TEV desc BSS object */
+void* fn_801B014C(void) {
+    return lbl_804656B4;
 }
 
 /* Address: 0x801B0158 | Size: 0x44 */
