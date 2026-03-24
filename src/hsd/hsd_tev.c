@@ -290,19 +290,22 @@ u32 fn_801B2654(void) {
 }
 
 /* Address: 0x801B26F8 | Size: 0x20 */
-/* TEV small utility - set value at offset */
-void fn_801B26F8(u8* obj, u32 val) {
-    if (obj != NULL) {
-        *(u32*)(obj + 0x0) = val;
-    }
+/* Wrapper calling fn_801ACD7C (display list dispatch) */
+extern void fn_801ACD7C(void);
+void fn_801B26F8(void) {
+    fn_801ACD7C();
 }
 
 /* Address: 0x801B2718 | Size: 0x24 */
-/* TEV small utility - get/set indexed value */
-void fn_801B2718(u8* obj, u32 idx, u32 val) {
-    if (obj != NULL) {
-        ((u32*)(obj))[idx] = val;
-    }
+/* Reset TEV state SDA variables */
+extern u8 lbl_8047B351;
+extern u8 lbl_8047B350;
+extern s32 lbl_8047B34C;
+void fn_801B2718(void) {
+    lbl_8047B351 = 0;
+    lbl_8047B350 = 0;
+    lbl_8047B34C = -1;
+    lbl_8047B351 = 0xFF;
 }
 
 /*
@@ -352,12 +355,10 @@ BOOL fn_801B2878(u32 numStages) {
 }
 
 /* Address: 0x801B28B8 | Size: 0x10 */
-/* TEV small accessor - get two fields */
-u32 fn_801B28B8(u8* obj) {
-    if (obj == NULL) {
-        return 0;
-    }
-    return *(u32*)(obj + 0x4);
+/* Store float into BSS object at offset 0x10 */
+extern u8 lbl_80465710[];
+void fn_801B28B8(f32 val) {
+    *(f32*)(lbl_80465710 + 0x10) = val;
 }
 
 /*
