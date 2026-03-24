@@ -2286,7 +2286,7 @@ void fn_801F87CC(void) {
                 r4 = 0x0;
                 goto L_801F89DC;
             }
-            goto L_801F89B8;
+
             do {
                 r3 = r28;
                 r4 = 0x0;
@@ -2390,7 +2390,7 @@ void fn_801F87CC(void) {
                 r3 = *(u16*)(sp + 0x8);
                 r0 = r3 + 0x1;
                 *(u16*)(sp + 0x8) = r0;
-                L_801F89B8: ;
+
                 r6 = *(u16*)(sp + 0x8);
             } while (r6 < (u32)0x6);
 
@@ -2889,7 +2889,7 @@ void fn_801F93F8(void) {
         if ((s32)r0 == (s32)0) {
             goto L_801F95C8;
         }
-        goto L_801F95A4;
+
         do {
             r3 = r30;
             r4 = 0x0;
@@ -2993,7 +2993,7 @@ void fn_801F93F8(void) {
             r3 = *(u16*)(sp + 0x8);
             r0 = r3 + 0x1;
             *(u16*)(sp + 0x8) = r0;
-            L_801F95A4: ;
+
             r6 = *(u16*)(sp + 0x8);
         } while (r6 < (u32)0x6);
 
@@ -4008,19 +4008,19 @@ u32 fn_801FA634(void* context) {
     void* result;
 
     if (context == NULL) {
-        return 0;
+        return FALSE;
     }
     if ((u16)fn_801EF634(context) == 1) {
-        return 0;
+        return FALSE;
     }
     if ((s32)fn_801FB1C0(context, 0, 0x43, 0) == 0) {
-        return 0;
+        return FALSE;
     }
     result = fn_801FB1C0(context, 0, 0x44, 0);
     if (result == NULL) {
-        return 0;
+        return FALSE;
     }
-    return (u8)fn_8012A130(result) != 0;
+    return fn_8012A130(result) != 0;
 }
 
 /* 0x801FA6D8 | size: 0x1F4 | medium */

@@ -13782,8 +13782,8 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
 
             } else {
                 _ctx = 0x0;
-                goto L_8023A98C;
-            }
+
+            } else {
             _param1 = _ctx;
             _param2 = (u32)sp + 0x1c;
             _ctx = 0x0;
@@ -13802,7 +13802,7 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
             _param3 = var_r19;
             ctr_fn = (void(*)(void))r12;
             ctr_fn();
-        L_8023A98C:
+            }
             var_r26 = var_r26 << 2;
             _param2 = (u32)sp + 0x8c;
             *(u32*)(_param2 + var_r26) = _ctx;
@@ -13897,11 +13897,11 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
                 _ctx = (u32)fn_8024E52C;
                 _ctx = (u32)fn_8024E52C;
             }
-            goto L_8023AB24;
-        }
+
+        } else {
         _ctx = 0x0;
-        goto L_8023AB40;
-    L_8023AB24:
+
+        } else {
         r12 = _ctx;
         _ctx = _ctx;
         _param1 = _param1;
@@ -13909,7 +13909,7 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
         _param3 = var_r19;
         ctr_fn = (void(*)(void))r12;
         ctr_fn();
-    L_8023AB40:
+        }
         var_r30 = var_r26 << 2;
         var_r31 = (u32)sp + 0xb4;
         *(u32*)(var_r31 + var_r30) = _ctx;
@@ -13972,8 +13972,8 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
             r9 = 0x0;
             r10 = 0x3c;
             fn_80239EE8();
-            goto L_8023AC98;
-        }
+
+        } else {
         _ctx = *(u32*)(var_r31 + var_r30);
         _param1 = _ctx;
         _param2 = 0x3d;
@@ -13990,6 +13990,7 @@ void fn_8023A740(void* ctx, u32 param1, u32 param2, u32 param3) {
         r9 = 0x0;
         r10 = 0x3d;
         fn_80239EE8();
+        }
     L_8023AC98:
         tmp = var_r14 & 0xFFFF;
         if (tmp != 9) {
@@ -15003,11 +15004,11 @@ void fn_8023B498(void* ctx, u32 param1, u32 param2, u32 param3) {
                             _ctx = (u32)fn_80253948;
                             var_r28 = (u32)fn_80253948;
                         }
-                        goto L_8023BBC4;
-                    }
+
+                    } else {
                     var_r30 = 0x0;
                     break;
-                L_8023BBC4:
+                    }
                     _param1 = _ctx;
                     param2 = (u32)sp + 0x60;
                     _ctx = 0x0;
@@ -15093,11 +15094,11 @@ void fn_8023B498(void* ctx, u32 param1, u32 param2, u32 param3) {
                             _ctx = (u32)fn_80253948;
                             var_r14 = (u32)fn_80253948;
                         }
-                        goto L_8023BD24;
-                    }
+
+                    } else {
                     _ctx = 0x0;
-                    goto L_8023BD6C;
-                L_8023BD24:
+
+                    } else {
                     _param1 = _ctx;
                     param2 = (u32)sp + 0x40;
                     _ctx = 0x0;
@@ -15116,7 +15117,7 @@ void fn_8023B498(void* ctx, u32 param1, u32 param2, u32 param3) {
                     param3 = var_r21;
                     ctr_fn = (void(*)(void))r12;
                     ctr_fn();
-                L_8023BD6C:
+                    }
 
                     tmp = var_r31 & 0xFF;
 
@@ -15713,8 +15714,8 @@ void fn_8023C530(void* ctx, u32 param1, u32 param2, u32 param3) {
     tmp = _ctx & 0xFF;
     if (tmp == 7) {
         var_r27 = 0x0;
-        goto L_8023C758;
-    }
+
+    } else {
     tmp = _param2 & 0xFFFF;
     if (tmp != 7 && tmp != 0x165) {
 
@@ -15780,7 +15781,7 @@ void fn_8023C530(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     }
     }
-L_8023C758:
+    }
 do {
     tmp = var_r27 & 0xFF;
     if (tmp == 1) {
@@ -22660,7 +22661,7 @@ void fn_80219D98(void)
   uVar2 = (int)fn_8012640C(uVar1,0,0xd9,0);
   uVar3 = fn_80203E0C(uVar1);
   fn_8011BBD8(uVar2,0,0x2d,0,uVar3);
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 1;
+  lbl_8047B610++;
   return;
 }
 /* Address: 0x80219E10 | Size: 0x1d4 | Ghidra import */
