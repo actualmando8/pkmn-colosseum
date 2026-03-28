@@ -69,7 +69,179 @@ extern void fn_80088964();
 extern void fn_800889A4();
 extern void fn_800889E4();
 extern void fn_80088C60();
-/* ... and 173 more external functions */
+extern void fn_80088D84();
+extern void fn_80089028();
+extern void fn_8008A9AC();
+extern void fn_8008A9E4();
+extern void fn_8008AB20();
+extern void fn_8008AB4C();
+extern void fn_8008ABA0();
+extern void fn_80092C90();
+extern void fn_80093574();
+extern void fn_800CE2D8();
+extern void fn_800D3088();
+extern void fn_800D37CC();
+extern void fn_800D5648();
+extern void fn_800D59B8();
+extern void fn_800D5BA0();
+extern void fn_800D5CB8();
+extern void fn_800D61E4();
+extern void fn_800D6728();
+extern void fn_800D67BC();
+extern void fn_800D6A00();
+extern void fn_800D7820();
+extern void fn_800D85D4();
+extern void fn_800D888C();
+extern void fn_800D88DC();
+extern void fn_800DA1E8();
+extern void fn_800DD270();
+extern void fn_800DD384();
+extern void fn_800E202C();
+extern void fn_800E209C();
+extern void fn_800E24B0();
+extern void fn_800E27B0();
+extern void fn_800E2C04();
+extern void fn_800F0308();
+extern void fn_800F7A08();
+extern void fn_800F7A7C();
+extern void fn_800F7AF0();
+extern void fn_800F7BC4();
+extern void fn_800F7C28();
+extern void fn_800F7EF8();
+extern void fn_800F915C();
+extern void fn_800F9210();
+extern void fn_800F92D4();
+extern void fn_800F9318();
+extern void fn_800F9E70();
+extern void fn_800F9EE4();
+extern void fn_800FA280();
+extern void fn_800FA444();
+extern void fn_800FAEF8();
+extern void fn_800FB680();
+extern void fn_800FBB34();
+extern void fn_800FE35C();
+extern void fn_800FE38C();
+extern void fn_800FE4D4();
+extern void fn_800FE6D0();
+extern void fn_800FF540();
+extern void fn_800FF548();
+extern void fn_800FF56C();
+extern void fn_800FF58C();
+extern void fn_801022B8();
+extern void fn_80102428();
+extern void fn_80102510();
+extern void fn_80102568();
+extern void fn_80102620();
+extern void fn_8010264C();
+extern void fn_801026A4();
+extern void fn_80102868();
+extern void fn_80102ED4();
+extern void fn_80103CC0();
+extern void fn_801040B8();
+extern void fn_801040D0();
+extern void fn_801040F0();
+extern void fn_801043A4();
+extern void fn_801045A8();
+extern void fn_801046B8();
+extern void fn_80104704();
+extern void fn_80105624();
+extern void fn_801069FC();
+extern void fn_80106D3C();
+extern void fn_801070F4();
+extern void fn_801080CC();
+extern void fn_80108518();
+extern void fn_80109220();
+extern void fn_80109934();
+extern void fn_8010B01C();
+extern void fn_8010B9E8();
+extern void fn_8010BBB8();
+extern void fn_80113778();
+extern void fn_80113828();
+extern void fn_80113F48();
+extern void fn_801176C8();
+extern void fn_80117AD4();
+extern void fn_8011BEB4();
+extern void fn_8011C9EC();
+extern void fn_8011CA34();
+extern void fn_8011F15C();
+extern void fn_8011F188();
+extern void fn_8011F4F0();
+extern void fn_801230E0();
+extern void fn_80123CD4();
+extern void fn_80123FBC();
+extern void fn_8012640C();
+extern void fn_80129280();
+extern void fn_80129384();
+extern void fn_801293FC();
+extern void fn_80129A78();
+extern void fn_8012A248();
+extern void fn_8012A774();
+extern void fn_8012A7C4();
+extern void fn_8012A7DC();
+extern void fn_8012A80C();
+extern void fn_8012A824();
+extern void fn_8012AC3C();
+extern void fn_8012AC54();
+extern void fn_8012AC64();
+extern void fn_80130054();
+extern void fn_80132A38();
+extern void fn_80135168();
+extern void fn_80142984();
+extern void fn_80165A20();
+extern void fn_801666BC();
+extern void fn_80166A28();
+extern void fn_80166A50();
+extern void fn_80166AB8();
+extern void fn_80176E0C();
+extern void fn_80177A44();
+extern void fn_8017B000();
+extern void fn_8017B1CC();
+extern void fn_801906A0();
+extern void fn_8019075C();
+extern void fn_80196E10();
+extern void fn_801C40F0();
+extern void fn_801CB9D8();
+extern void fn_801CBA0C();
+extern void fn_801D04E8();
+extern void fn_801EE398();
+extern void fn_801EF634();
+extern void fn_801FBD28();
+extern void fn_801FBD58();
+extern void fn_801FCC64();
+extern void fn_801FCCC4();
+extern void fn_8025CD64();
+extern void fn_8025CDB8();
+extern void fn_8025D06C();
+extern void fn_8025D164();
+extern void fn_8025D28C();
+extern void fn_8025D2B0();
+extern void fn_8025D2D4();
+extern void fn_8025D364();
+extern void fn_8025D3F4();
+extern void fn_8025D560();
+extern void fn_8025D584();
+extern void fn_8025D5E0();
+extern void fn_8025D644();
+extern void fn_8025D744();
+extern void fn_8025D788();
+extern void fn_8025D808();
+extern void fn_8025D89C();
+extern void fn_8025D914();
+extern void fn_8025D938();
+extern void fn_8025D970();
+extern void fn_8025D9A8();
+extern void fn_8025D9CC();
+extern void fn_8025D9F0();
+extern void fn_8025DA18();
+extern void fn_8025DA3C();
+extern void fn_8025DA88();
+extern void fn_8025DAAC();
+extern void fn_8025DAD0();
+extern void fn_8025DAF4();
+extern void fn_8025DB2C();
+extern void fn_8025DB5C();
+extern void fn_8025DB80();
+extern void fn_8025DBB0();
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 
@@ -294,6 +466,11 @@ void fn_80069A08(void);
 
 
 /* 0x80059BDC | size: 0x30F4 */
+#if 1
+asm void fn_80059BDC(void) {
+#include "src/game/ui/ui_core_fn_80059BDC.inc"
+}
+#else
 void fn_80059BDC(void) {
     extern void fn_80062948();
     extern void fn_80088D84();
@@ -3533,9 +3710,15 @@ void fn_80059BDC(void) {
     f29 = *(f64*)(sp + 0x1F0);
     return;
 }
+#endif
 
 
 /* 0x8005CCD0 | size: 0xB8 */
+#if 1
+asm void fn_8005CCD0(void) {
+#include "src/game/ui/ui_core_fn_8005CCD0.inc"
+}
+#else
 void fn_8005CCD0(void) {
     extern void fn_800E202C();
     extern void fn_800E209C();
@@ -3594,9 +3777,15 @@ void fn_8005CCD0(void) {
     *(u32*)&lbl_8047A5A0 = r0;
     return;
 }
+#endif
 
 
 /* 0x8005CD88 | size: 0x160 */
+#if 1
+asm void fn_8005CD88(void) {
+#include "src/game/ui/ui_core_fn_8005CD88.inc"
+}
+#else
 void fn_8005CD88(void) {
     extern void fn_800E27B0();
     extern void fn_800E2C04();
@@ -3701,9 +3890,15 @@ void fn_8005CD88(void) {
     fn_8010264C();
     return;
 }
+#endif
 
 
 /* 0x8005CEE8 | size: 0x44 */
+#if 1
+asm void fn_8005CEE8(void) {
+#include "src/game/ui/ui_core_fn_8005CEE8.inc"
+}
+#else
 void fn_8005CEE8(void) {
     extern void fn_800FF58C();
     extern void fn_80129280();
@@ -3723,9 +3918,15 @@ void fn_8005CEE8(void) {
     fn_800FF58C();
     return;
 }
+#endif
 
 
 /* 0x8005CF2C | size: 0x168 */
+#if 1
+asm void fn_8005CF2C(void) {
+#include "src/game/ui/ui_core_fn_8005CF2C.inc"
+}
+#else
 void fn_8005CF2C(void) {
     extern void fn_80102568();
     extern void fn_801026A4();
@@ -3824,27 +4025,47 @@ void fn_8005CF2C(void) {
     ((void(*)(void))fn_8006E0CC)();
     return;
 }
+#endif
 
 
 /* 0x8005D094 | size: 0x24 | call_return_const */
 #pragma push
 #pragma scheduling off
+#if 1
+asm s32 fn_8005D094(void) {
+#include "src/game/ui/ui_core_fn_8005D094.inc"
+}
+#else
 s32 fn_8005D094(void) {
     fn_800347B8();
     return -1;
 }
+#endif
+
 #pragma pop
 
 /* 0x8005D0B8 | size: 0x24 | call_return_const */
 #pragma push
 #pragma scheduling off
+#if 1
+asm s32 fn_8005D0B8(void) {
+#include "src/game/ui/ui_core_fn_8005D0B8.inc"
+}
+#else
 s32 fn_8005D0B8(void) {
     fn_800347C4();
     return 0;
 }
+#endif
+
 #pragma pop
 
 /* 0x8005D0DC | size: 0x54 */
+#if 1
+asm s32 fn_8005D0DC(void) {
+#include "src/game/ui/ui_core_fn_8005D0DC.inc"
+}
+#else
 s32 fn_8005D0DC(void) {
     extern s32 fn_80102510(s32);
     extern s32 fn_8010264C(s32, s32);
@@ -3858,9 +4079,16 @@ s32 fn_8005D0DC(void) {
     }
     return 0;
 }
+#endif
+
 
 
 /* 0x8005D130 | size: 0x54 */
+#if 1
+asm s32 fn_8005D130(void) {
+#include "src/game/ui/ui_core_fn_8005D130.inc"
+}
+#else
 s32 fn_8005D130(void) {
     extern s32 fn_80102510(s32);
     extern s32 fn_8010264C(s32, s32);
@@ -3874,9 +4102,16 @@ s32 fn_8005D130(void) {
     }
     return 0;
 }
+#endif
+
 
 
 /* 0x8005D184 | size: 0xE8 */
+#if 1
+asm void fn_8005D184(void) {
+#include "src/game/ui/ui_core_fn_8005D184.inc"
+}
+#else
 void fn_8005D184(void) {
     extern void fn_80109220();
     u8 sp[0x20];
@@ -3945,9 +4180,15 @@ void fn_8005D184(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x8005D26C | size: 0x7C */
+#if 1
+asm void fn_8005D26C(void) {
+#include "src/game/ui/ui_core_fn_8005D26C.inc"
+}
+#else
 void fn_8005D26C(void) {
     extern void fn_80102428();
     extern void fn_80102510();
@@ -3985,9 +4226,15 @@ void fn_8005D26C(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8005D2E8 | size: 0xE8 */
+#if 1
+asm void fn_8005D2E8(void) {
+#include "src/game/ui/ui_core_fn_8005D2E8.inc"
+}
+#else
 void fn_8005D2E8(void) {
     extern void fn_80109220();
     u8 sp[0x20];
@@ -4056,9 +4303,15 @@ void fn_8005D2E8(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x8005D3D0 | size: 0xDC */
+#if 1
+asm void fn_8005D3D0(void) {
+#include "src/game/ui/ui_core_fn_8005D3D0.inc"
+}
+#else
 void fn_8005D3D0(void) {
     extern void fn_80102428();
     extern void fn_80102510();
@@ -4122,9 +4375,15 @@ void fn_8005D3D0(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8005D4AC | size: 0x48 */
+#if 1
+asm void fn_8005D4AC(void) {
+#include "src/game/ui/ui_core_fn_8005D4AC.inc"
+}
+#else
 void fn_8005D4AC(void) {
     extern void fn_80109220();
     u32 r0 = 0;
@@ -4146,9 +4405,15 @@ void fn_8005D4AC(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005D4F4 | size: 0x48 */
+#if 1
+asm void fn_8005D4F4(void) {
+#include "src/game/ui/ui_core_fn_8005D4F4.inc"
+}
+#else
 void fn_8005D4F4(void) {
     extern void fn_80109220();
     u32 r0 = 0;
@@ -4170,9 +4435,15 @@ void fn_8005D4F4(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005D53C | size: 0x48 */
+#if 1
+asm void fn_8005D53C(void) {
+#include "src/game/ui/ui_core_fn_8005D53C.inc"
+}
+#else
 void fn_8005D53C(void) {
     extern void fn_80109220();
     u32 r0 = 0;
@@ -4194,9 +4465,15 @@ void fn_8005D53C(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005D584 | size: 0x48 */
+#if 1
+asm void fn_8005D584(void) {
+#include "src/game/ui/ui_core_fn_8005D584.inc"
+}
+#else
 void fn_8005D584(void) {
     extern void fn_80109220();
     u32 r0 = 0;
@@ -4218,9 +4495,15 @@ void fn_8005D584(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005D5CC | size: 0xDC */
+#if 1
+asm void fn_8005D5CC(void) {
+#include "src/game/ui/ui_core_fn_8005D5CC.inc"
+}
+#else
 void fn_8005D5CC(void) {
     extern void fn_80109220();
     u8 sp[0x50];
@@ -4289,9 +4572,15 @@ void fn_8005D5CC(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x8005D6A8 | size: 0x90 */
+#if 1
+asm void fn_8005D6A8(void) {
+#include "src/game/ui/ui_core_fn_8005D6A8.inc"
+}
+#else
 void fn_8005D6A8(void) {
     extern void fn_80102ED4();
     extern void fn_80105624();
@@ -4336,9 +4625,15 @@ void fn_8005D6A8(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8005D738 | size: 0x60 */
+#if 1
+asm void fn_8005D738(void) {
+#include "src/game/ui/ui_core_fn_8005D738.inc"
+}
+#else
 void fn_8005D738(void) {
     extern void fn_80102428();
     extern void fn_80102510();
@@ -4367,9 +4662,15 @@ void fn_8005D738(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x8005D798 | size: 0x60 */
+#if 1
+asm void fn_8005D798(void) {
+#include "src/game/ui/ui_core_fn_8005D798.inc"
+}
+#else
 void fn_8005D798(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4402,9 +4703,15 @@ void fn_8005D798(void) {
     r3 = r4;
     return;
 }
+#endif
 
 
 /* 0x8005D7F8 | size: 0x38 */
+#if 1
+asm void fn_8005D7F8(void) {
+#include "src/game/ui/ui_core_fn_8005D7F8.inc"
+}
+#else
 void fn_8005D7F8(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4427,19 +4734,39 @@ void fn_8005D7F8(void) {
     r3 = r5 + r0;
     return;
 }
+#endif
 
 
 /* 0x8005D830 | size: 0x28 */
+#if 1
+asm s32 fn_8005D830(void) {
+#include "src/game/ui/ui_core_fn_8005D830.inc"
+}
+#else
 s32 fn_8005D830(void) {
     return 0;
 }
+#endif
+
 
 /* 0x8005D858 | size: 0x28 */
+#if 1
+asm s32 fn_8005D858(void) {
+#include "src/game/ui/ui_core_fn_8005D858.inc"
+}
+#else
 s32 fn_8005D858(void) {
     return 0;
 }
+#endif
+
 
 /* 0x8005D880 | size: 0x38 */
+#if 1
+asm void fn_8005D880(void) {
+#include "src/game/ui/ui_core_fn_8005D880.inc"
+}
+#else
 void fn_8005D880(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4463,9 +4790,15 @@ void fn_8005D880(void) {
     *(u16*)((u8*)r3 + 0x4) = r5;
     return;
 }
+#endif
 
 
 /* 0x8005D8B8 | size: 0x40 */
+#if 1
+asm void fn_8005D8B8(void) {
+#include "src/game/ui/ui_core_fn_8005D8B8.inc"
+}
+#else
 void fn_8005D8B8(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4490,9 +4823,15 @@ void fn_8005D8B8(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005D8F8 | size: 0x3C */
+#if 1
+asm void fn_8005D8F8(void) {
+#include "src/game/ui/ui_core_fn_8005D8F8.inc"
+}
+#else
 void fn_8005D8F8(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4516,14 +4855,27 @@ void fn_8005D8F8(void) {
     *(u8*)((u8*)r3 + 0x0) = r0;
     return;
 }
+#endif
 
 
 /* 0x8005D934 | size: 0x28 */
+#if 1
+asm s32 fn_8005D934(void) {
+#include "src/game/ui/ui_core_fn_8005D934.inc"
+}
+#else
 s32 fn_8005D934(void) {
     return 0;
 }
+#endif
+
 
 /* 0x8005D95C | size: 0x50 */
+#if 1
+asm void fn_8005D95C(void) {
+#include "src/game/ui/ui_core_fn_8005D95C.inc"
+}
+#else
 void fn_8005D95C(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4552,9 +4904,15 @@ void fn_8005D95C(void) {
     *(u16*)((u8*)r5 + 0x0) = r0;
     return;
 }
+#endif
 
 
 /* 0x8005D9AC | size: 0x38 */
+#if 1
+asm void fn_8005D9AC(void) {
+#include "src/game/ui/ui_core_fn_8005D9AC.inc"
+}
+#else
 void fn_8005D9AC(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4578,9 +4936,15 @@ void fn_8005D9AC(void) {
     *(u16*)((u8*)r3 + 0x8) = r5;
     return;
 }
+#endif
 
 
 /* 0x8005D9E4 | size: 0x34 */
+#if 1
+asm void fn_8005D9E4(void) {
+#include "src/game/ui/ui_core_fn_8005D9E4.inc"
+}
+#else
 void fn_8005D9E4(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4601,14 +4965,27 @@ void fn_8005D9E4(void) {
     r3 = *(u8*)((u8*)r3 + 0x2);
     return;
 }
+#endif
 
 
 /* 0x8005DA18 | size: 0x30 */
+#if 1
+asm s32 fn_8005DA18(void) {
+#include "src/game/ui/ui_core_fn_8005DA18.inc"
+}
+#else
 s32 fn_8005DA18(void) {
     return 0;
 }
+#endif
+
 
 /* 0x8005DA48 | size: 0x17C */
+#if 1
+asm void fn_8005DA48(void) {
+#include "src/game/ui/ui_core_fn_8005DA48.inc"
+}
+#else
 void fn_8005DA48(void) {
     extern void fn_800DA1E8();
     extern void fn_800DD270();
@@ -4705,9 +5082,15 @@ void fn_8005DA48(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005DBC4 | size: 0x60 */
+#if 1
+asm void fn_8005DBC4(void) {
+#include "src/game/ui/ui_core_fn_8005DBC4.inc"
+}
+#else
 void fn_8005DBC4(void) {
     extern void fn_80102510();
     extern void fn_80102620();
@@ -4741,9 +5124,15 @@ void fn_8005DBC4(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005DC24 | size: 0xA0 */
+#if 1
+asm void fn_8005DC24(void) {
+#include "src/game/ui/ui_core_fn_8005DC24.inc"
+}
+#else
 void fn_8005DC24(void) {
     extern void fn_800FF56C();
     extern void fn_80102620();
@@ -4795,9 +5184,15 @@ void fn_8005DC24(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005DCC4 | size: 0x224 */
+#if 1
+asm void fn_8005DCC4(void) {
+#include "src/game/ui/ui_core_fn_8005DCC4.inc"
+}
+#else
 void fn_8005DCC4(void) {
     extern void fn_80105624();
     u8 sp[0x10];
@@ -4937,9 +5332,15 @@ void fn_8005DCC4(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 
 /* 0x8005DEE8 | size: 0xE0 */
+#if 1
+asm void fn_8005DEE8(void) {
+#include "src/game/ui/ui_core_fn_8005DEE8.inc"
+}
+#else
 void fn_8005DEE8(void) {
     extern void fn_80102428();
     extern void fn_80102510();
@@ -5001,9 +5402,15 @@ void fn_8005DEE8(void) {
     fn_80102428();
     return;
 }
+#endif
 
 
 /* 0x8005DFC8 | size: 0x6C8 */
+#if 1
+asm void fn_8005DFC8(void) {
+#include "src/game/ui/ui_core_fn_8005DFC8.inc"
+}
+#else
 void fn_8005DFC8(void) {
     extern void fn_80060A28();
     extern void fn_80069048();
@@ -5456,9 +5863,15 @@ void fn_8005DFC8(void) {
     f31 = *(f64*)(sp + 0x20);
     return;
 }
+#endif
 
 
 /* 0x8005E690 | size: 0xA0 */
+#if 1
+asm void fn_8005E690(void) {
+#include "src/game/ui/ui_core_fn_8005E690.inc"
+}
+#else
 void fn_8005E690(void) {
     extern void fn_80102ED4();
     u8 sp[0x10];
@@ -5499,14 +5912,26 @@ void fn_8005E690(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8005E730 | size: 0x20 */
+#if 1
+asm void fn_8005E730(void) {
+#include "src/game/ui/ui_core_fn_8005E730.inc"
+}
+#else
 void fn_8005E730(void) {
     fn_8005DFC8();
 }
+#endif
 
 /* 0x8005E750 | size: 0xA0 */
+#if 1
+asm void fn_8005E750(void) {
+#include "src/game/ui/ui_core_fn_8005E750.inc"
+}
+#else
 void fn_8005E750(void) {
     extern void fn_80061F6C();
     extern void fn_80102568();
@@ -5554,9 +5979,15 @@ void fn_8005E750(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x8005E7F0 | size: 0x17F4 */
+#if 1
+asm void fn_8005E7F0(void) {
+#include "src/game/ui/ui_core_fn_8005E7F0.inc"
+}
+#else
 void fn_8005E7F0(void) {
     extern void fn_80060434();
     extern void fn_800608C4();
@@ -7269,9 +7700,15 @@ void fn_8005E7F0(void) {
 
     return;
 }
+#endif
 
 
 /* 0x8005FFE4 | size: 0x450 */
+#if 1
+asm void fn_8005FFE4(void) {
+#include "src/game/ui/ui_core_fn_8005FFE4.inc"
+}
+#else
 void fn_8005FFE4(void) {
     extern void fn_8025D808();
     extern void fn_8025D89C();
@@ -7517,9 +7954,15 @@ void fn_8005FFE4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80060434 | size: 0x490 */
+#if 1
+asm void fn_80060434(void) {
+#include "src/game/ui/ui_core_fn_80060434.inc"
+}
+#else
 void fn_80060434(void) {
     extern void fn_800FA444();
     extern void fn_800FB680();
@@ -7829,9 +8272,15 @@ void fn_80060434(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800608C4 | size: 0xF0 */
+#if 1
+asm s32 fn_800608C4(void) {
+#include "src/game/ui/ui_core_fn_800608C4.inc"
+}
+#else
 s32 fn_800608C4(void) {
     extern void fn_800D59B8();
     extern void fn_800D5CB8();
@@ -7903,9 +8352,16 @@ s32 fn_800608C4(void) {
     }
     return 0;
 }
+#endif
+
 
 
 /* 0x800609B4 | size: 0x74 */
+#if 1
+asm void fn_800609B4(void) {
+#include "src/game/ui/ui_core_fn_800609B4.inc"
+}
+#else
 void fn_800609B4(void) {
     extern void fn_800FE4D4();
     extern void fn_800FE6D0();
@@ -7943,9 +8399,15 @@ void fn_800609B4(void) {
     fn_800FE4D4();
     return;
 }
+#endif
 
 
 /* 0x80060A28 | size: 0x348 */
+#if 1
+asm void fn_80060A28(void) {
+#include "src/game/ui/ui_core_fn_80060A28.inc"
+}
+#else
 void fn_80060A28(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -8181,9 +8643,15 @@ void fn_80060A28(void) {
     } while (--ctr != 0);
     return;
 }
+#endif
 
 
 /* 0x80060D70 | size: 0x184 */
+#if 1
+asm void fn_80060D70(void) {
+#include "src/game/ui/ui_core_fn_80060D70.inc"
+}
+#else
 void fn_80060D70(void) {
     extern void fn_801EF634();
     u8 sp[0x30];
@@ -8272,9 +8740,15 @@ void fn_80060D70(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80060EF4 | size: 0x124 */
+#if 1
+asm void fn_80060EF4(void) {
+#include "src/game/ui/ui_core_fn_80060EF4.inc"
+}
+#else
 void fn_80060EF4(void) {
     extern void fn_8025D9A8();
     u8 sp[0x20];
@@ -8350,13 +8824,25 @@ void fn_80060EF4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80061018 | size: 0x10 */
+#if 1
+asm void fn_80061018(void) {
+#include "src/game/ui/ui_core_fn_80061018.inc"
+}
+#else
 void fn_80061018(void) {
 }
+#endif
 
 /* 0x80061028 | size: 0x44 */
+#if 1
+asm void fn_80061028(void) {
+#include "src/game/ui/ui_core_fn_80061028.inc"
+}
+#else
 void fn_80061028(void) {
     extern void fn_80102568();
     u8 sp[0x10];
@@ -8376,9 +8862,15 @@ void fn_80061028(void) {
     *(u32*)((u8*)r3 + 0x4) = r31;
     return;
 }
+#endif
 
 
 /* 0x8006106C | size: 0x1D4 */
+#if 1
+asm void fn_8006106C(void) {
+#include "src/game/ui/ui_core_fn_8006106C.inc"
+}
+#else
 void fn_8006106C(void) {
     extern void fn_80061D34();
     extern void fn_80069A08();
@@ -8515,9 +9007,15 @@ void fn_8006106C(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x80061240 | size: 0x214 */
+#if 1
+asm void fn_80061240(void) {
+#include "src/game/ui/ui_core_fn_80061240.inc"
+}
+#else
 void fn_80061240(void) {
     extern void fn_800D5BA0();
     extern void fn_800D61E4();
@@ -8595,8 +9093,8 @@ void fn_80061240(void) {
         fn_800D6A00();
         r3 = 0x4;
         fn_800D67BC();
-        /* lha r3, lbl_80478918@sda21(r0) */;
-        /* lha r4, lbl_8047891A@sda21(r0) */;
+        /* lha r3, lbl_80478918(r13) */;
+        /* lha r4, lbl_8047891A(r13) */;
         fn_800D61E4();
         r30 = r28 & 0xFF;
         r31 = r29 & 0xFF;
@@ -8617,7 +9115,7 @@ void fn_80061240(void) {
         r26 = r28 | r0;
         r4 = r26;
         fn_800D5BA0();
-        /* lha r5, lbl_80478918@sda21(r0) */;
+        /* lha r5, lbl_80478918(r13) */;
         r3 = (0x4330 << 16);
         r4 = *(s16*)((u8*)r27 + 0x54);
         /* xoris r0, r5, 0x8000 */;
@@ -8626,7 +9124,7 @@ void fn_80061240(void) {
         /* xoris r4, r4, 0x8000 */;
         *(u32*)(sp + 0x14) = r0;
         f3 = *(f32*)&lbl_8047891C;
-        /* lha r4, lbl_8047891A@sda21(r0) */;
+        /* lha r4, lbl_8047891A(r13) */;
         f1 = *(f64*)(sp + 0x8);
         f0 = *(f64*)(sp + 0x10);
         f1 = f1 - f2;
@@ -8638,9 +9136,9 @@ void fn_80061240(void) {
         r4 = r26;
         r3 = 0x0;
         fn_800D5BA0();
-        /* lha r4, lbl_8047891A@sda21(r0) */;
+        /* lha r4, lbl_8047891A(r13) */;
         r0 = *(s16*)((u8*)r27 + 0x56);
-        /* lha r3, lbl_80478918@sda21(r0) */;
+        /* lha r3, lbl_80478918(r13) */;
         r0 = r0 - r4;
         r4 = (s16)r0;
         fn_800D61E4();
@@ -8654,7 +9152,7 @@ void fn_80061240(void) {
         r4 = r26;
         fn_800D5BA0();
         f0 = (f64)(s32)f31;
-        /* lha r3, lbl_8047891A@sda21(r0) */;
+        /* lha r3, lbl_8047891A(r13) */;
         r0 = *(s16*)((u8*)r27 + 0x56);
         *(f64*)(sp + 0x20) = f0;
         r0 = r0 - r3;
@@ -8669,9 +9167,15 @@ void fn_80061240(void) {
     f31 = *(f64*)(sp + 0x50);
     return;
 }
+#endif
 
 
 /* 0x80061454 | size: 0x1A0 */
+#if 1
+asm void fn_80061454(void) {
+#include "src/game/ui/ui_core_fn_80061454.inc"
+}
+#else
 void fn_80061454(void) {
     extern void fn_800D59B8();
     extern void fn_800D5CB8();
@@ -8802,9 +9306,15 @@ void fn_80061454(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x800615F4 | size: 0x1EC */
+#if 1
+asm void fn_800615F4(void) {
+#include "src/game/ui/ui_core_fn_800615F4.inc"
+}
+#else
 void fn_800615F4(void) {
     extern void fn_800FA280();
     extern void fn_800FB680();
@@ -8951,9 +9461,15 @@ void fn_800615F4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800617E0 | size: 0x24C */
+#if 1
+asm void fn_800617E0(void) {
+#include "src/game/ui/ui_core_fn_800617E0.inc"
+}
+#else
 void fn_800617E0(void) {
     extern void fn_800FA280();
     extern void fn_800FB680();
@@ -9120,9 +9636,15 @@ void fn_800617E0(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80061A2C | size: 0x148 */
+#if 1
+asm void fn_80061A2C(void) {
+#include "src/game/ui/ui_core_fn_80061A2C.inc"
+}
+#else
 void fn_80061A2C(void) {
     extern void fn_80061240();
     extern void fn_80061D34();
@@ -9221,9 +9743,15 @@ void fn_80061A2C(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80061B74 | size: 0x48 */
+#if 1
+asm void fn_80061B74(void) {
+#include "src/game/ui/ui_core_fn_80061B74.inc"
+}
+#else
 void fn_80061B74(void) {
     s32 state;
     u8 *base;
@@ -9234,9 +9762,15 @@ void fn_80061B74(void) {
         *(u8 *)(base + 0x4) = (s8)(*(u8 *)(base + 0x4) & ~0x02);
     }
 }
+#endif
 
 
 /* 0x80061BBC | size: 0x178 */
+#if 1
+asm void fn_80061BBC(void) {
+#include "src/game/ui/ui_core_fn_80061BBC.inc"
+}
+#else
 void fn_80061BBC(void) {
     extern void fn_80061D34();
     extern void fn_800FE4D4();
@@ -9347,9 +9881,15 @@ void fn_80061BBC(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80061D34 | size: 0x238 */
+#if 1
+asm void fn_80061D34(void) {
+#include "src/game/ui/ui_core_fn_80061D34.inc"
+}
+#else
 void fn_80061D34(void) {
     extern void fn_8025D808();
     extern void fn_8025D89C();
@@ -9509,9 +10049,15 @@ void fn_80061D34(void) {
     r3 = r31;
     return;
 }
+#endif
 
 
 /* 0x80061F6C | size: 0x318 */
+#if 1
+asm void fn_80061F6C(void) {
+#include "src/game/ui/ui_core_fn_80061F6C.inc"
+}
+#else
 void fn_80061F6C(void) {
     extern void fn_8005FFE4();
     extern void fn_80062334();
@@ -9722,9 +10268,15 @@ void fn_80061F6C(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80062284 | size: 0xB0 */
+#if 1
+asm void fn_80062284(void) {
+#include "src/game/ui/ui_core_fn_80062284.inc"
+}
+#else
 void fn_80062284(void) {
     extern void fn_80123FBC();
     extern void fn_8012640C();
@@ -9775,9 +10327,15 @@ void fn_80062284(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80062334 | size: 0x398 */
+#if 1
+asm void fn_80062334(void) {
+#include "src/game/ui/ui_core_fn_80062334.inc"
+}
+#else
 void fn_80062334(void) {
     extern void fn_8025DA88();
     u8 sp[0x70];
@@ -10026,9 +10584,15 @@ void fn_80062334(void) {
     *(f32*)((u8*)r3 + 0x40) = f2;
     return;
 }
+#endif
 
 
 /* 0x800626CC | size: 0x168 */
+#if 1
+asm void fn_800626CC(void) {
+#include "src/game/ui/ui_core_fn_800626CC.inc"
+}
+#else
 void fn_800626CC(void) {
     extern void fn_800F92D4();
     extern void fn_8017B000();
@@ -10129,9 +10693,15 @@ void fn_800626CC(void) {
     } while ((s32)r30 != (s32)0x0);
     return;
 }
+#endif
 
 
 /* 0x80062834 | size: 0x114 */
+#if 1
+asm void fn_80062834(void) {
+#include "src/game/ui/ui_core_fn_80062834.inc"
+}
+#else
 void fn_80062834(void) {
     extern void fn_800F915C();
     extern void fn_800F9210();
@@ -10214,9 +10784,15 @@ void fn_80062834(void) {
     *(u32*)((u8*)r30 + 0x18) = r0;
     return;
 }
+#endif
 
 
 /* 0x80062948 | size: 0x16C */
+#if 1
+asm void fn_80062948(void) {
+#include "src/game/ui/ui_core_fn_80062948.inc"
+}
+#else
 void fn_80062948(void) {
     extern void fn_80061028();
     extern void fn_80061F6C();
@@ -10316,9 +10892,15 @@ void fn_80062948(void) {
     r3 = r31;
     return;
 }
+#endif
 
 
 /* 0x80062AB4 | size: 0x5AC */
+#if 1
+asm void fn_80062AB4(void) {
+#include "src/game/ui/ui_core_fn_80062AB4.inc"
+}
+#else
 void fn_80062AB4(void) {
     extern void fn_8008ABA0();
     extern void fn_800F0308();
@@ -10728,9 +11310,15 @@ void fn_80062AB4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80063060 | size: 0x750 */
+#if 1
+asm void fn_80063060(void) {
+#include "src/game/ui/ui_core_fn_80063060.inc"
+}
+#else
 void fn_80063060(void) {
     extern void fn_80061028();
     extern void fn_80062284();
@@ -10956,9 +11544,9 @@ void fn_80063060(void) {
             r8 = 0x0;
             /* crclr cr1eq */;
             fn_801026A4();
-            /* lha r4, lbl_80478920@sda21(r0) */;
+            /* lha r4, lbl_80478920(r13) */;
             r3 = 0xec;
-            /* lha r5, lbl_80478922@sda21(r0) */;
+            /* lha r5, lbl_80478922(r13) */;
             fn_80102868();
             r3 = 0xec;
             r4 = 0x1;
@@ -10997,9 +11585,9 @@ void fn_80063060(void) {
             r5 = 0x0;
             r6 = 0x1;
             fn_80106D3C();
-            /* lha r4, lbl_80478920@sda21(r0) */;
+            /* lha r4, lbl_80478920(r13) */;
             r3 = 0x0;
-            /* lha r5, lbl_80478922@sda21(r0) */;
+            /* lha r5, lbl_80478922(r13) */;
             r6 = 0x1;
             ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
@@ -11020,9 +11608,9 @@ void fn_80063060(void) {
             r5 = 0x0;
             r6 = 0x1;
             fn_80106D3C();
-            /* lha r4, lbl_80478920@sda21(r0) */;
+            /* lha r4, lbl_80478920(r13) */;
             r3 = 0x0;
-            /* lha r5, lbl_80478922@sda21(r0) */;
+            /* lha r5, lbl_80478922(r13) */;
             r6 = 0x0;
             ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
@@ -11045,9 +11633,9 @@ void fn_80063060(void) {
             r5 = 0x0;
             r6 = 0x1;
             fn_80106D3C();
-            /* lha r4, lbl_80478920@sda21(r0) */;
+            /* lha r4, lbl_80478920(r13) */;
             r3 = 0x0;
-            /* lha r5, lbl_80478922@sda21(r0) */;
+            /* lha r5, lbl_80478922(r13) */;
             r6 = 0x1;
             ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
@@ -11103,9 +11691,9 @@ void fn_80063060(void) {
                 r5 = 0x0;
                 r6 = 0x1;
                 fn_80106D3C();
-                /* lha r4, lbl_80478920@sda21(r0) */;
+                /* lha r4, lbl_80478920(r13) */;
                 r3 = 0x0;
-                /* lha r5, lbl_80478922@sda21(r0) */;
+                /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x0;
                 ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
@@ -11121,9 +11709,9 @@ void fn_80063060(void) {
                 r5 = 0x0;
                 r6 = 0x1;
                 fn_80106D3C();
-                /* lha r4, lbl_80478920@sda21(r0) */;
+                /* lha r4, lbl_80478920(r13) */;
                 r3 = 0x0;
-                /* lha r5, lbl_80478922@sda21(r0) */;
+                /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x1;
                 ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
@@ -11139,9 +11727,9 @@ void fn_80063060(void) {
                 r5 = 0x0;
                 r6 = 0x1;
                 fn_80106D3C();
-                /* lha r4, lbl_80478920@sda21(r0) */;
+                /* lha r4, lbl_80478920(r13) */;
                 r3 = 0x0;
-                /* lha r5, lbl_80478922@sda21(r0) */;
+                /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x0;
                 ((void(*)(void))fn_8001E074)();
                 r16 = (s8)r3;
@@ -11164,9 +11752,9 @@ void fn_80063060(void) {
                 r5 = 0x0;
                 r6 = 0x1;
                 fn_80106D3C();
-                /* lha r4, lbl_80478920@sda21(r0) */;
+                /* lha r4, lbl_80478920(r13) */;
                 r3 = 0x0;
-                /* lha r5, lbl_80478922@sda21(r0) */;
+                /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x1;
                 ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
@@ -11271,9 +11859,15 @@ void fn_80063060(void) {
     r3 = r27;
     return;
 }
+#endif
 
 
 /* 0x800637B0 | size: 0x144 */
+#if 1
+asm void fn_800637B0(void) {
+#include "src/game/ui/ui_core_fn_800637B0.inc"
+}
+#else
 void fn_800637B0(void) {
     extern void fn_8025DA88();
     extern void fn_8025DAAC();
@@ -11356,9 +11950,15 @@ void fn_800637B0(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800638F4 | size: 0x1E0 */
+#if 1
+asm void fn_800638F4(void) {
+#include "src/game/ui/ui_core_fn_800638F4.inc"
+}
+#else
 void fn_800638F4(void) {
     extern void fn_80063AD4();
     extern void fn_800FB680();
@@ -11427,9 +12027,15 @@ void fn_800638F4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80063AD4 | size: 0x23C */
+#if 1
+asm void fn_80063AD4(void) {
+#include "src/game/ui/ui_core_fn_80063AD4.inc"
+}
+#else
 void fn_80063AD4(void) {
     extern void fn_800D5648();
     extern void fn_800D5BA0();
@@ -11582,13 +12188,25 @@ void fn_80063AD4(void) {
     f31 = *(f64*)(sp + 0x50);
     return;
 }
+#endif
 
 
 /* 0x80063D10 | size: 0x4 */
+#if 1
+asm void fn_80063D10(void) {
+#include "src/game/ui/ui_core_fn_80063D10.inc"
+}
+#else
 void fn_80063D10(void) {
 }
+#endif
 
 /* 0x80063D14 | size: 0x664 */
+#if 1
+asm void fn_80063D14(void) {
+#include "src/game/ui/ui_core_fn_80063D14.inc"
+}
+#else
 void fn_80063D14(void) {
     extern void fn_80062834();
     extern void fn_8008AB20();
@@ -12054,9 +12672,15 @@ void fn_80063D14(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80064378 | size: 0x5C */
+#if 1
+asm void fn_80064378(void) {
+#include "src/game/ui/ui_core_fn_80064378.inc"
+}
+#else
 void fn_80064378(void) {
     extern void fn_80063AD4();
     extern void fn_800FB680();
@@ -12086,9 +12710,15 @@ void fn_80064378(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800643D4 | size: 0x1254 */
+#if 1
+asm void fn_800643D4(void) {
+#include "src/game/ui/ui_core_fn_800643D4.inc"
+}
+#else
 void fn_800643D4(void) {
     extern void fn_80060EF4();
     extern void fn_800FA280();
@@ -13289,9 +13919,15 @@ void fn_800643D4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80065628 | size: 0x108 */
+#if 1
+asm void fn_80065628(void) {
+#include "src/game/ui/ui_core_fn_80065628.inc"
+}
+#else
 void fn_80065628(void) {
     extern void fn_80065A48();
     extern void fn_8025DA18();
@@ -13342,9 +13978,15 @@ void fn_80065628(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80065730 | size: 0x108 */
+#if 1
+asm void fn_80065730(void) {
+#include "src/game/ui/ui_core_fn_80065730.inc"
+}
+#else
 void fn_80065730(void) {
     extern void fn_80065A48();
     extern void fn_8025DA18();
@@ -13399,9 +14041,15 @@ void fn_80065730(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80065838 | size: 0x108 */
+#if 1
+asm void fn_80065838(void) {
+#include "src/game/ui/ui_core_fn_80065838.inc"
+}
+#else
 void fn_80065838(void) {
     extern void fn_80065A48();
     extern void fn_8025DA18();
@@ -13456,9 +14104,15 @@ void fn_80065838(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80065940 | size: 0x108 */
+#if 1
+asm void fn_80065940(void) {
+#include "src/game/ui/ui_core_fn_80065940.inc"
+}
+#else
 void fn_80065940(void) {
     extern void fn_80065A48();
     extern void fn_8025DA18();
@@ -13509,9 +14163,15 @@ void fn_80065940(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80065A48 | size: 0x1CA4 */
+#if 1
+asm void fn_80065A48(void) {
+#include "src/game/ui/ui_core_fn_80065A48.inc"
+}
+#else
 void fn_80065A48(void) {
     extern void fn_80068794();
     extern void fn_800688C4();
@@ -15371,9 +16031,15 @@ void fn_80065A48(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800676EC | size: 0x2D4 */
+#if 1
+asm void fn_800676EC(void) {
+#include "src/game/ui/ui_core_fn_800676EC.inc"
+}
+#else
 void fn_800676EC(void) {
     extern void fn_800679C0();
     extern void fn_8006905C();
@@ -15558,9 +16224,15 @@ void fn_800676EC(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x800679C0 | size: 0x7F4 */
+#if 1
+asm void fn_800679C0(void) {
+#include "src/game/ui/ui_core_fn_800679C0.inc"
+}
+#else
 void fn_800679C0(void) {
     extern void fn_800681B4();
     extern void fn_8008ABA0();
@@ -16103,9 +16775,15 @@ void fn_800679C0(void) {
     }
     return;
 }
+#endif
 
 
 /* 0x800681B4 | size: 0x264 */
+#if 1
+asm void fn_800681B4(void) {
+#include "src/game/ui/ui_core_fn_800681B4.inc"
+}
+#else
 void fn_800681B4(void) {
     extern void fn_8008A9AC();
     extern void fn_8008A9E4();
@@ -16274,9 +16952,15 @@ void fn_800681B4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80068418 | size: 0x320 */
+#if 1
+asm void fn_80068418(void) {
+#include "src/game/ui/ui_core_fn_80068418.inc"
+}
+#else
 void fn_80068418(void) {
     extern void fn_800CE2D8();
     extern void fn_800D3088();
@@ -16499,9 +17183,15 @@ void fn_80068418(void) {
     *(u16*)((u8*)r26 + 0x6) = r27;
     return;
 }
+#endif
 
 
 /* 0x80068738 | size: 0x5C */
+#if 1
+asm s32 fn_80068738(void) {
+#include "src/game/ui/ui_core_fn_80068738.inc"
+}
+#else
 s32 fn_80068738(void) {
     extern void fn_80068418(u8 *, s32);
     extern void fn_80105624(void);
@@ -16516,9 +17206,16 @@ s32 fn_80068738(void) {
     }
     return 0;
 }
+#endif
+
 
 
 /* 0x80068794 | size: 0x130 */
+#if 1
+asm void fn_80068794(void) {
+#include "src/game/ui/ui_core_fn_80068794.inc"
+}
+#else
 void fn_80068794(void) {
     extern void fn_8025D560();
     extern void fn_8025DA88();
@@ -16603,9 +17300,15 @@ void fn_80068794(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800688C4 | size: 0x138 */
+#if 1
+asm void fn_800688C4(void) {
+#include "src/game/ui/ui_core_fn_800688C4.inc"
+}
+#else
 void fn_800688C4(void) {
     extern void fn_800FA280();
     extern void fn_800FB680();
@@ -16688,9 +17391,15 @@ void fn_800688C4(void) {
 
     return;
 }
+#endif
 
 
 /* 0x800689FC | size: 0x1B4 */
+#if 1
+asm void fn_800689FC(void) {
+#include "src/game/ui/ui_core_fn_800689FC.inc"
+}
+#else
 void fn_800689FC(void) {
     extern void fn_801230E0();
     extern void fn_8025D970();
@@ -16759,9 +17468,15 @@ void fn_800689FC(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80068BB0 | size: 0x20C */
+#if 1
+asm void fn_80068BB0(void) {
+#include "src/game/ui/ui_core_fn_80068BB0.inc"
+}
+#else
 void fn_80068BB0(void) {
     extern void fn_800FB680();
     extern void fn_80123FBC();
@@ -16862,9 +17577,15 @@ void fn_80068BB0(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80068DBC | size: 0x1C8 */
+#if 1
+asm void fn_80068DBC(void) {
+#include "src/game/ui/ui_core_fn_80068DBC.inc"
+}
+#else
 void fn_80068DBC(void) {
     extern void fn_800FA280();
     extern void fn_800FB680();
@@ -16941,9 +17662,15 @@ void fn_80068DBC(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80068F84 | size: 0xC4 */
+#if 1
+asm void fn_80068F84(void) {
+#include "src/game/ui/ui_core_fn_80068F84.inc"
+}
+#else
 void fn_80068F84(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -17002,13 +17729,25 @@ void fn_80068F84(void) {
         *(u32*)((u8*)r3 + 0x4) = r0;
     } while (--ctr != 0);
 }
+#endif
 
 
 /* 0x80069048 | size: 0x14 */
+#if 1
+asm void fn_80069048(void) {
+#include "src/game/ui/ui_core_fn_80069048.inc"
+}
+#else
 void fn_80069048(void) {
 }
+#endif
 
 /* 0x8006905C | size: 0x1C4 */
+#if 1
+asm void fn_8006905C(void) {
+#include "src/game/ui/ui_core_fn_8006905C.inc"
+}
+#else
 void fn_8006905C(void) {
     extern void fn_8025D560();
     extern void fn_8025D89C();
@@ -17138,9 +17877,15 @@ void fn_8006905C(void) {
 
     return;
 }
+#endif
 
 
 /* 0x80069220 | size: 0x184 */
+#if 1
+asm void fn_80069220(void) {
+#include "src/game/ui/ui_core_fn_80069220.inc"
+}
+#else
 void fn_80069220(void) {
     extern void fn_800D3088();
     extern void fn_800D37CC();
@@ -17255,9 +18000,15 @@ void fn_80069220(void) {
     f31 = *(f64*)(sp + 0x20);
     return;
 }
+#endif
 
 
 /* 0x800693A4 | size: 0x160 */
+#if 1
+asm void fn_800693A4(void) {
+#include "src/game/ui/ui_core_fn_800693A4.inc"
+}
+#else
 void fn_800693A4(void) {
     extern void fn_800D3088();
     extern void fn_800D37CC();
@@ -17364,9 +18115,15 @@ void fn_800693A4(void) {
     f31 = *(f64*)(sp + 0x20);
     return;
 }
+#endif
 
 
 /* 0x80069504 | size: 0x160 */
+#if 1
+asm void fn_80069504(void) {
+#include "src/game/ui/ui_core_fn_80069504.inc"
+}
+#else
 void fn_80069504(void) {
     extern void fn_800D3088();
     extern void fn_800D37CC();
@@ -17473,9 +18230,15 @@ void fn_80069504(void) {
     f31 = *(f64*)(sp + 0x20);
     return;
 }
+#endif
 
 
 /* 0x80069664 | size: 0x160 */
+#if 1
+asm void fn_80069664(void) {
+#include "src/game/ui/ui_core_fn_80069664.inc"
+}
+#else
 void fn_80069664(void) {
     extern void fn_800D3088();
     extern void fn_800D37CC();
@@ -17582,15 +18345,28 @@ void fn_80069664(void) {
     f31 = *(f64*)(sp + 0x20);
     return;
 }
+#endif
 
 
 /* 0x800697C4 | size: 0x30 */
+#if 1
+asm s32 fn_800697C4(void) {
+#include "src/game/ui/ui_core_fn_800697C4.inc"
+}
+#else
 s32 fn_800697C4(void) {
     fn_8010B01C();
     return 0;
 }
+#endif
+
 
 /* 0x800697F4 | size: 0x150 */
+#if 1
+asm void fn_800697F4(void) {
+#include "src/game/ui/ui_core_fn_800697F4.inc"
+}
+#else
 void fn_800697F4(void) {
     extern void fn_80061018();
     extern void fn_8010BBB8();
@@ -17691,9 +18467,15 @@ void fn_800697F4(void) {
     r3 = r27;
     return;
 }
+#endif
 
 
 /* 0x80069944 | size: 0xC4 */
+#if 1
+asm void fn_80069944(void) {
+#include "src/game/ui/ui_core_fn_80069944.inc"
+}
+#else
 void fn_80069944(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -17752,9 +18534,15 @@ void fn_80069944(void) {
         *(u32*)((u8*)r5 + 0x4) = r0;
     } while (--ctr != 0);
 }
+#endif
 
 
 /* 0x80069A08 | size: 0x58 */
+#if 1
+asm void fn_80069A08(void) {
+#include "src/game/ui/ui_core_fn_80069A08.inc"
+}
+#else
 void fn_80069A08(void) {
     extern void fn_8010B9E8();
     u32 r0 = 0;
@@ -17782,4 +18570,5 @@ void fn_80069A08(void) {
     }
     return;
 }
+#endif
 
