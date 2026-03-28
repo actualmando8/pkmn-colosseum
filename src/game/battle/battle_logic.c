@@ -1172,7 +1172,244 @@ u32 fn_801EE468(void) { return 48; }
  * ####################################################################### */
 
 
+
+/* ============================================================ */
+/* Declarations for asm wrappers (auto-generated)               */
+/* ============================================================ */
+
+/* Standard library and system functions */
+extern void* memset(void* dst, int val, u32 size);
+extern void* memcpy(void* dst, const void* src, u32 size);
+extern u32   OSGetTick(void);
+extern u32   OSDisableInterrupts(void);
+extern void  OSRestoreInterrupts(u32 level);
+extern void  OSRegisterVersion(const char* version);
+extern void  OSCancelThread(void* thread);
+extern u32   PPCMfhid2(void);
+extern u32   VIGetTvFormat(void);
+extern void  DCFlushRange(void* addr, u32 size);
+extern void  DCInvalidateRange(void* addr, u32 size);
+extern u32   __mod2u(u32 a, u32 b);
+
+/* Forward declarations for intra-TU non-standard sig functions */
+void fn_801E1B54(void* val);
+u32 fn_801E1B84(void);
+void fn_801E1BB8(void* val);
+u32 fn_801E1BE8(void);
+u8* fn_801ED2DC(u8* data);
+
+/* Forward declarations for intra-TU functions */
+void fn_80029760(void);
+void fn_8009B388(void);
+void fn_8009B55C(void);
+void fn_8009B614(void);
+void fn_8009F1D0(void);
+void fn_800A19CC(void);
+void fn_800A1F94(void);
+void fn_800A221C(void);
+void fn_800A2D38(void);
+void fn_800A39E0(void);
+void fn_800A501C(void);
+void fn_800A50E4(void);
+void fn_800A541C(void);
+void fn_800A7AFC(void);
+void fn_800A8850(void);
+void fn_800AA2F0(void);
+void fn_800B7874(void);
+void fn_800B7D3C(void);
+void fn_800B7D74(void);
+void fn_800B857C(void);
+void fn_800B884C(void);
+void fn_800B928C(void);
+void fn_800B9E6C(void);
+void fn_800BA6B0(void);
+void fn_800BA9E4(void);
+void fn_800BACA0(void);
+void fn_800BAFFC(void);
+void fn_800BB29C(void);
+void fn_800BC114(void);
+void fn_800BC1A0(void);
+void fn_800BC1E4(void);
+void fn_800BC228(void);
+void fn_800BC290(void);
+void fn_800BC36C(void);
+void fn_800BC3E0(void);
+void fn_800BC454(void);
+void fn_800BC4C0(void);
+void fn_800BC52C(void);
+void fn_800BC580(void);
+void fn_800BC6F0(void);
+void fn_800BC8C8(void);
+void fn_800BCDDC(void);
+void fn_800BCE30(void);
+void fn_800BCE5C(void);
+void fn_800BCE88(void);
+void fn_800BCEF4(void);
+void fn_800BD2E0(void);
+void fn_800BD4B4(void);
+void fn_800BD554(void);
+void fn_800BD744(void);
+void fn_800BD7A0(void);
+void fn_800C4928(void);
+void fn_800C4C50(void);
+void fn_800C4C98(void);
+void fn_800CA7FC(void);
+void fn_800D1F84(void);
+void fn_800D2584(void);
+void fn_800D2F34(void);
+void fn_800D3088(void);
+void fn_800D3190(void);
+void fn_800D3410(void);
+void fn_800D3FA4(void);
+void fn_800D59B8(void);
+void fn_800D5C18(void);
+void fn_800D6680(void);
+void fn_800D6728(void);
+void fn_800D67BC(void);
+void fn_800D6A00(void);
+void fn_800D7820(void);
+void fn_800D85D4(void);
+void fn_800D888C(void);
+void fn_800D88DC(void);
+void fn_800D9B58(void);
+void fn_800D9ED8(void);
+void fn_800DA028(void);
+void fn_800DA1E8(void);
+void fn_800DA2BC(void);
+void fn_800DA4C4(void);
+void fn_800E008C(void);
+void fn_800E00AC(void);
+void fn_800E013C(void);
+void fn_800E01D0(void);
+void fn_800E202C(void);
+void fn_800E209C(void);
+void fn_800E24B0(void);
+void fn_800E27B0(void);
+void fn_800E2B00(void);
+void fn_800E4014(void);
+void fn_800E407C(void);
+void fn_800E43A4(void);
+void fn_800E4BF4(void);
+void fn_800EE150(void);
+void fn_800EE3BC(void);
+void fn_800EE828(void);
+void fn_800EE928(void);
+void fn_800EE9BC(void);
+void fn_800EF4F4(void);
+void fn_800EF4FC(void);
+void fn_800EFD3C(void);
+void fn_800F0308(void);
+void fn_800F0470(void);
+void fn_800F9E70(void);
+void fn_800FAEF8(void);
+void fn_800FE6DC(void);
+void fn_800FE6F8(void);
+void fn_800FE834(void);
+void fn_800FF56C(void);
+void fn_801069FC(void);
+void fn_80111C24(void);
+void fn_80113D58(void);
+void fn_80116958(void);
+void fn_8011E15C(void);
+void fn_8011E778(void);
+void fn_8011ED68(void);
+void fn_8011EE28(void);
+void fn_8011F4A8(void);
+void fn_8011F4C0(void);
+void fn_8011F550(void);
+void fn_8011F5C8(void);
+void fn_8011F910(void);
+void fn_80121ADC(void);
+void fn_80121B4C(void);
+void fn_8012361C(void);
+void fn_80123FBC(void);
+void fn_80124A60(void);
+void fn_80125424(void);
+void fn_8012BDE0(void);
+void fn_8014E9B4(void);
+void fn_8014EE40(void);
+void fn_8014F2DC(void);
+void fn_8014F838(void);
+void fn_8014FF0C(void);
+void fn_80150564(void);
+void fn_80166AB8(void);
+void fn_80183018(void);
+void fn_80183350(void);
+void fn_80185EE8(void);
+void fn_8018805C(void);
+void fn_8018A280(void);
+void fn_8018BDF4(void);
+void fn_801902E0(void);
+void fn_801906A0(void);
+void fn_8019075C(void);
+void fn_801E1D0C(void);
+void fn_801E1D48(void);
+void fn_801E1D7C(void);
+void fn_801E1E1C(void);
+void fn_801E1FF8(void);
+void fn_801E24B0(void);
+void fn_801E25C8(void);
+void fn_801E2B74(void);
+void fn_801E2CA8(void);
+void fn_801E34F0(void);
+void fn_801E3858(void);
+void fn_801E386C(void);
+void fn_801E38D8(void);
+void fn_801E38E8(void);
+void fn_801E3930(void);
+void fn_801E3978(void);
+void fn_801E3F54(void);
+void fn_801E4058(void);
+void fn_801E40F8(void);
+void fn_801E446C(void);
+void fn_801E449C(void);
+void fn_801E4650(void);
+void fn_801E4724(void);
+void fn_801E4778(void);
+void fn_801E4A6C(void);
+void fn_801E4AC4(void);
+void fn_801E4B08(void);
+void fn_801E4DAC(void);
+void fn_801E4DE8(void);
+void fn_801E4E1C(void);
+void fn_801E4EF0(void);
+void fn_801E4F34(void);
+void fn_801E5400(void);
+void fn_801E543C(void);
+void fn_801E5470(void);
+void fn_801E5548(void);
+void fn_801E578C(void);
+void fn_801E57D0(void);
+void fn_801E590C(void);
+void fn_801E5A28(void);
+void fn_801E5DE4(void);
+void fn_801E5FC4(void);
+void fn_801E60B4(void);
+void fn_801E611C(void);
+void fn_801E62D8(void);
+void fn_801E632C(void);
+void fn_801E6578(void);
+void fn_801E6684(void);
+void fn_801E810C(void);
+void fn_801E9B98(void);
+void fn_801EB644(void);
+void fn_801EBCC0(void);
+void fn_801EC368(void);
+void fn_801ECA10(void);
+void fn_801ECAB0(void);
+void fn_801ECF14(void);
+void fn_801ECFA4(void);
+void fn_801EE470(void);
+void fn_801EE4DC(void);
+void fn_801EF1E4(void);
+
+/* ============================================================ */
 /* 0x801E03D4 | size: 0x388 | large */
+#if 1
+asm void fn_801E03D4(void) {
+#include "src/game/battle/battle_logic_fn_801E03D4.inc"
+}
+#else
 void fn_801E03D4(void) {
     extern void fn_80029760();
     extern void fn_801069FC();
@@ -1341,8 +1578,14 @@ void fn_801E03D4(void) {
     } while ((s32)r31 != 0);
     return;
 }
+#endif
 
 /* 0x801E075C | size: 0x284 | large */
+#if 1
+asm void fn_801E075C(void) {
+#include "src/game/battle/battle_logic_fn_801E075C.inc"
+}
+#else
 void fn_801E075C(void) {
     extern u8 lbl_80279A00[];
     extern u8 lbl_803750C8[];
@@ -1505,8 +1748,14 @@ void fn_801E075C(void) {
     } while ((s32)r30 != 0);
     return;
 }
+#endif
 
 /* 0x801E09E0 | size: 0x598 | large */
+#if 1
+asm void fn_801E09E0(void) {
+#include "src/game/battle/battle_logic_fn_801E09E0.inc"
+}
+#else
 void fn_801E09E0(void) {
     extern u8 lbl_80279A00[];
     extern u8 lbl_803750C8[];
@@ -1867,8 +2116,14 @@ void fn_801E09E0(void) {
     } while ((s32)r28 != 0);
     return;
 }
+#endif
 
 /* 0x801E0F78 | size: 0x3C | small */
+#if 1
+asm void fn_801E0F78(void) {
+#include "src/game/battle/battle_logic_fn_801E0F78.inc"
+}
+#else
 void fn_801E0F78(void) {
     extern void fn_8011E15C();
     extern void fn_8011E778();
@@ -1889,8 +2144,14 @@ void fn_801E0F78(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E0FB4 | size: 0x1BC | medium */
+#if 1
+asm void fn_801E0FB4(void) {
+#include "src/game/battle/battle_logic_fn_801E0FB4.inc"
+}
+#else
 void fn_801E0FB4(void) {
     extern u8 lbl_80467CF8[];
     extern u8 lbl_8047B43C;
@@ -2024,32 +2285,68 @@ L_801E112C:
     fn_800D3190();
     return;
 }
+#endif
 
 /* 0x801E1170 | size: 0x1C */
+#if 1
+asm void fn_801E1170(void) {
+#include "src/game/battle/battle_logic_fn_801E1170.inc"
+}
+#else
 void fn_801E1170(void) {
     lbl_8047B424 = 4;
     lbl_8047B428 = 3;
     lbl_8047B430 = 0;
 }
+#endif
 
 /* 0x801E118C | size: 0x10 | tiny */
+#if 1
+asm void fn_801E118C(void) {
+#include "src/game/battle/battle_logic_fn_801E118C.inc"
+}
+#else
 void fn_801E118C(void) { }
+#endif
 
 /* 0x801E119C | size: 0x14 | tiny */
+#if 1
+asm void fn_801E119C(void) {
+#include "src/game/battle/battle_logic_fn_801E119C.inc"
+}
+#else
 void fn_801E119C(void) { }
+#endif
 
 /* 0x801E11B0 | size: 0x1C */
+#if 1
+asm void fn_801E11B0(void) {
+#include "src/game/battle/battle_logic_fn_801E11B0.inc"
+}
+#else
 void fn_801E11B0(void) {
     u32 prev = lbl_8047B428;
     lbl_8047B424 = 1;
     if (prev == 2) { return; }
     lbl_8047B428 = 1;
 }
+#endif
 
 /* 0x801E11D4 | size: 0xC | tiny */
+#if 1
+asm void fn_801E11D4(void) {
+#include "src/game/battle/battle_logic_fn_801E11D4.inc"
+}
+#else
 void fn_801E11D4(void) { }
+#endif
 
 /* 0x801E11F0 | size: 0x68 | small */
+#if 1
+asm void fn_801E11F0(void) {
+#include "src/game/battle/battle_logic_fn_801E11F0.inc"
+}
+#else
 void fn_801E11F0(void) {
     extern u8 lbl_80467CF8[];
     extern void fn_800FE6DC();
@@ -2078,20 +2375,38 @@ void fn_801E11F0(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E1258 | size: 0x1C */
+#if 1
+asm void fn_801E1258(void) {
+#include "src/game/battle/battle_logic_fn_801E1258.inc"
+}
+#else
 void fn_801E1258(void) {
     lbl_8047B420 = 1;
     lbl_8047B424 = 2;
     lbl_8047B428 = 3;
 }
+#endif
 
 /* 0x801E1274 | size: 0x2C */
+#if 1
+asm void fn_801E1274(void) {
+#include "src/game/battle/battle_logic_fn_801E1274.inc"
+}
+#else
 void fn_801E1274(void) {
     lbl_8047B438 = (u32)fn_800F92D4(0x0B521200);
 }
+#endif
 
 /* 0x801E12A0 | size: 0x60 | small */
+#if 1
+asm void fn_801E12A0(void) {
+#include "src/game/battle/battle_logic_fn_801E12A0.inc"
+}
+#else
 void fn_801E12A0(void) {
     extern u8 lbl_80467CF8[];
     u32 tmp = 0;
@@ -2127,8 +2442,14 @@ void fn_801E12A0(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801E1300 | size: 0x68 | small */
+#if 1
+asm void fn_801E1300(void) {
+#include "src/game/battle/battle_logic_fn_801E1300.inc"
+}
+#else
 void fn_801E1300(void) {
     extern u8 lbl_80467CF8[];
     extern u8 lbl_8047B43C;
@@ -2162,8 +2483,14 @@ void fn_801E1300(void) {
     fn_800FE834();
     return;
 }
+#endif
 
 /* 0x801E1368 | size: 0x368 | large */
+#if 1
+asm void fn_801E1368(void) {
+#include "src/game/battle/battle_logic_fn_801E1368.inc"
+}
+#else
 void fn_801E1368(void) {
     extern u8 lbl_80314958[];
     extern u8 lbl_80314C78[];
@@ -2423,13 +2750,25 @@ L_801E16B8:
 
     return;
 }
+#endif
 
 /* 0x801E16D0 | size: 0x20 */
+#if 1
+asm void fn_801E16D0(void) {
+#include "src/game/battle/battle_logic_fn_801E16D0.inc"
+}
+#else
 void fn_801E16D0(void) {
     fn_801E25C8();
 }
+#endif
 
 /* 0x801E16F0 | size: 0xB8 | medium */
+#if 1
+asm void fn_801E16F0(void) {
+#include "src/game/battle/battle_logic_fn_801E16F0.inc"
+}
+#else
 void fn_801E16F0(void) {
     extern u32 lbl_8047B450;
     extern void fn_800E202C();
@@ -2477,8 +2816,14 @@ void fn_801E16F0(void) {
 
     return;
 }
+#endif
 
 /* 0x801E17A8 | size: 0x68 | small */
+#if 1
+asm void fn_801E17A8(void) {
+#include "src/game/battle/battle_logic_fn_801E17A8.inc"
+}
+#else
 void fn_801E17A8(void) {
     extern u8 lbl_80469030[];
     extern u32 lbl_8047B454;
@@ -2509,8 +2854,14 @@ void fn_801E17A8(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E1810 | size: 0x64 | small */
+#if 1
+asm void fn_801E1810(void) {
+#include "src/game/battle/battle_logic_fn_801E1810.inc"
+}
+#else
 void fn_801E1810(void) {
     extern u32 lbl_8047B450;
     extern void fn_800E202C();
@@ -2544,6 +2895,7 @@ void fn_801E1810(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E1874 | size: 0x28 */
 extern u8 lbl_8047B440;
@@ -2554,6 +2906,11 @@ u32 fn_801E1874(void) {
 }
 
 /* 0x801E189C | size: 0x88 | medium */
+#if 1
+asm void fn_801E189C(void) {
+#include "src/game/battle/battle_logic_fn_801E189C.inc"
+}
+#else
 void fn_801E189C(void) {
     extern u8 lbl_80467D08[];
     extern u8 lbl_80468020[];
@@ -2604,8 +2961,14 @@ void fn_801E189C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E1924 | size: 0x208 | large */
+#if 1
+asm void fn_801E1924(void) {
+#include "src/game/battle/battle_logic_fn_801E1924.inc"
+}
+#else
 void fn_801E1924(void) {
     extern u8 lbl_80279A68[];
     extern u8 lbl_80466BC0[];
@@ -2767,13 +3130,20 @@ void fn_801E1924(void) {
 
     return;
 }
+#endif
 
 /* 0x801E1B2C | size: 0x28 */
 extern void fn_801E4A6C(void);
+#if 1
+asm void fn_801E1B2C(void) {
+#include "src/game/battle/battle_logic_fn_801E1B2C.inc"
+}
+#else
 void fn_801E1B2C(void) {
     fn_801E4A6C();
     lbl_8047B440 = 1;
 }
+#endif
 
 /* 0x801E1B54 | size: 0x30 */
 extern u8 lbl_8046A3D0;
@@ -2805,6 +3175,11 @@ u32 fn_801E1BE8(void) {
 }
 
 /* 0x801E1C1C | size: 0xF0 | medium */
+#if 1
+asm void fn_801E1C1C(void) {
+#include "src/game/battle/battle_logic_fn_801E1C1C.inc"
+}
+#else
 void fn_801E1C1C(void) {
     extern u8 lbl_80469040[];
     extern u8 lbl_8046AC60[];
@@ -2883,9 +3258,15 @@ void fn_801E1C1C(void) {
         r29 = r29 + 0x1;
     } while (1);
 }
+#endif
 
 /* 0x801E1D0C | size: 0x3C | small */
 /* Cancel the battle thread if it is active. */
+#if 1
+asm void fn_801E1D0C(void) {
+#include "src/game/battle/battle_logic_fn_801E1D0C.inc"
+}
+#else
 void fn_801E1D0C(void) {
     extern u8 lbl_8046A040[];
     extern u32 lbl_8047B460;
@@ -2895,10 +3276,16 @@ void fn_801E1D0C(void) {
         lbl_8047B460 = 0;
     }
 }
+#endif
 
 /* 0x801E1D48 | size: 0x34
  * Resume the battle thread if it is active.
  */
+#if 1
+asm void fn_801E1D48(void) {
+#include "src/game/battle/battle_logic_fn_801E1D48.inc"
+}
+#else
 void fn_801E1D48(void) {
     extern u8 lbl_8046A040[];
     extern u32 lbl_8047B460;
@@ -2908,8 +3295,14 @@ void fn_801E1D48(void) {
         fn_800A1F94((void*)lbl_8046A040);
     }
 }
+#endif
 
 /* 0x801E1D7C | size: 0xA0 | medium */
+#if 1
+asm void fn_801E1D7C(void) {
+#include "src/game/battle/battle_logic_fn_801E1D7C.inc"
+}
+#else
 void fn_801E1D7C(void) {
     extern u8 lbl_80469040[];
     extern u32 lbl_8047B460;
@@ -2961,8 +3354,14 @@ void fn_801E1D7C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E1E1C | size: 0x1DC | medium */
+#if 1
+asm void fn_801E1E1C(void) {
+#include "src/game/battle/battle_logic_fn_801E1E1C.inc"
+}
+#else
 void fn_801E1E1C(void) {
     extern f32 lbl_8047E494;
     extern void fn_800B928C();
@@ -3103,8 +3502,14 @@ void fn_801E1E1C(void) {
     *(u16*)((u8*)r4 + (-32768)) = tmp;
     return;
 }
+#endif
 
 /* 0x801E1FF8 | size: 0x4B8 | large */
+#if 1
+asm void fn_801E1FF8(void) {
+#include "src/game/battle/battle_logic_fn_801E1FF8.inc"
+}
+#else
 void fn_801E1FF8(void) {
     extern u32 lbl_8047E480;
     extern u32 lbl_8047E484;
@@ -3445,8 +3850,14 @@ void fn_801E1FF8(void) {
     fn_800BC580();
     return;
 }
+#endif
 
 /* 0x801E24B0 | size: 0x118 | medium */
+#if 1
+asm void fn_801E24B0(void) {
+#include "src/game/battle/battle_logic_fn_801E24B0.inc"
+}
+#else
 void fn_801E24B0(void) {
     extern void fn_800B884C();
     extern void fn_800BA6B0();
@@ -3530,8 +3941,14 @@ void fn_801E24B0(void) {
     fn_800BC580();
     return;
 }
+#endif
 
 /* 0x801E25C8 | size: 0x44 | small */
+#if 1
+asm void fn_801E25C8(void) {
+#include "src/game/battle/battle_logic_fn_801E25C8.inc"
+}
+#else
 void fn_801E25C8(void) {
     extern u8 lbl_8046AC60[];
     u32 tmp = 0;
@@ -3556,8 +3973,14 @@ void fn_801E25C8(void) {
     r3 = -0x1;
     return;
 }
+#endif
 
 /* 0x801E260C | size: 0x568 | large */
+#if 1
+asm void fn_801E260C(void) {
+#include "src/game/battle/battle_logic_fn_801E260C.inc"
+}
+#else
 void fn_801E260C(void) {
     extern u8 lbl_8046A440[];
     extern u8 lbl_8046AC60[];
@@ -3917,8 +4340,14 @@ L_801E2B3C:
 
 
 }
+#endif
 
 /* 0x801E2B74 | size: 0x134 | medium */
+#if 1
+asm void fn_801E2B74(void) {
+#include "src/game/battle/battle_logic_fn_801E2B74.inc"
+}
+#else
 void fn_801E2B74(void) {
     extern u8 lbl_8046AC60[];
     extern void fn_801E4AC4();
@@ -4013,8 +4442,14 @@ void fn_801E2B74(void) {
 
     return;
 }
+#endif
 
 /* 0x801E2CA8 | size: 0x848 | massive */
+#if 1
+asm void fn_801E2CA8(void) {
+#include "src/game/battle/battle_logic_fn_801E2CA8.inc"
+}
+#else
 void fn_801E2CA8(void) {
     extern u8 lbl_8046A440[];
     extern u32 lbl_80478D00;
@@ -4554,8 +4989,14 @@ L_801E3468:
     }
     return;
 }
+#endif
 
 /* 0x801E34F0 | size: 0x368 | large */
+#if 1
+asm void fn_801E34F0(void) {
+#include "src/game/battle/battle_logic_fn_801E34F0.inc"
+}
+#else
 void fn_801E34F0(void) {
     extern u8 lbl_8046A440[];
     extern u8 lbl_8046AC60[];
@@ -4782,11 +5223,23 @@ L_801E37E8:
 
     return;
 }
+#endif
 
 /* 0x801E3858 | size: 0x14 | tiny */
+#if 1
+asm void fn_801E3858(void) {
+#include "src/game/battle/battle_logic_fn_801E3858.inc"
+}
+#else
 void fn_801E3858(void) { }
+#endif
 
 /* 0x801E386C | size: 0x6C | small */
+#if 1
+asm void fn_801E386C(void) {
+#include "src/game/battle/battle_logic_fn_801E386C.inc"
+}
+#else
 void fn_801E386C(void) {
     extern u8 lbl_8046A494[];
     extern u32 lbl_8047B468;
@@ -4816,11 +5269,23 @@ void fn_801E386C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E38D8 | size: 0x10 | tiny */
+#if 1
+asm void fn_801E38D8(void) {
+#include "src/game/battle/battle_logic_fn_801E38D8.inc"
+}
+#else
 void fn_801E38D8(void) { }
+#endif
 
 /* 0x801E38E8 | size: 0x48 | small */
+#if 1
+asm void fn_801E38E8(void) {
+#include "src/game/battle/battle_logic_fn_801E38E8.inc"
+}
+#else
 void fn_801E38E8(void) {
     extern u8 lbl_8046AC60[];
     u8 sp[0x10];
@@ -4843,8 +5308,14 @@ void fn_801E38E8(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E3930 | size: 0x48 | small */
+#if 1
+asm void fn_801E3930(void) {
+#include "src/game/battle/battle_logic_fn_801E3930.inc"
+}
+#else
 void fn_801E3930(void) {
     extern u8 lbl_8046AC60[];
     u8 sp[0x10];
@@ -4867,8 +5338,14 @@ void fn_801E3930(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E3978 | size: 0xD8 | medium */
+#if 1
+asm void fn_801E3978(void) {
+#include "src/game/battle/battle_logic_fn_801E3978.inc"
+}
+#else
 void fn_801E3978(void) {
     extern u8 lbl_8046AC60[];
     extern void fn_801E1E1C();
@@ -4938,8 +5415,14 @@ void fn_801E3978(void) {
 
     return;
 }
+#endif
 
 /* 0x801E3A50 | size: 0x504 | large */
+#if 1
+asm void fn_801E3A50(void) {
+#include "src/game/battle/battle_logic_fn_801E3A50.inc"
+}
+#else
 void fn_801E3A50(void) {
     extern u8 lbl_8046A494[];
     extern u8 lbl_8046AC60[];
@@ -5286,8 +5769,14 @@ L_801E3E60:
 
     return;
 }
+#endif
 
 /* 0x801E3F54 | size: 0x104 | medium */
+#if 1
+asm void fn_801E3F54(void) {
+#include "src/game/battle/battle_logic_fn_801E3F54.inc"
+}
+#else
 void fn_801E3F54(void) {
     extern u8 lbl_8046A494[];
     extern u8 lbl_8046AC60[];
@@ -5365,8 +5854,14 @@ void fn_801E3F54(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E4058 | size: 0xA0 | medium */
+#if 1
+asm void fn_801E4058(void) {
+#include "src/game/battle/battle_logic_fn_801E4058.inc"
+}
+#else
 void fn_801E4058(void) {
     extern u8 lbl_8046AC60[];
     extern void fn_801E2CA8();
@@ -5409,8 +5904,14 @@ void fn_801E4058(void) {
 
 
 }
+#endif
 
 /* 0x801E40F8 | size: 0x374 | large */
+#if 1
+asm void fn_801E40F8(void) {
+#include "src/game/battle/battle_logic_fn_801E40F8.inc"
+}
+#else
 void fn_801E40F8(void) {
     extern u8 lbl_8046A440[];
     extern u32 lbl_8047B46C;
@@ -5654,8 +6155,14 @@ do {
 
 
 }
+#endif
 
 /* 0x801E446C | size: 0x30 | small */
+#if 1
+asm void fn_801E446C(void) {
+#include "src/game/battle/battle_logic_fn_801E446C.inc"
+}
+#else
 void fn_801E446C(void) {
     extern u8 lbl_8046A4B4[];
     u8 sp[0x10];
@@ -5671,8 +6178,14 @@ void fn_801E446C(void) {
     ((void(*)(void))fn_8009F230)();
     return;
 }
+#endif
 
 /* 0x801E449C | size: 0x1B4 | medium */
+#if 1
+asm void fn_801E449C(void) {
+#include "src/game/battle/battle_logic_fn_801E449C.inc"
+}
+#else
 void fn_801E449C(void) {
     extern u8 lbl_8046AC60[];
     extern u32 lbl_8047B470;
@@ -5801,8 +6314,14 @@ void fn_801E449C(void) {
 
     return;
 }
+#endif
 
 /* 0x801E4650 | size: 0xD4 | medium */
+#if 1
+asm void fn_801E4650(void) {
+#include "src/game/battle/battle_logic_fn_801E4650.inc"
+}
+#else
 void fn_801E4650(void) {
     extern u8 lbl_8046AC60[];
     u32 tmp = 0;
@@ -5868,8 +6387,14 @@ void fn_801E4650(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801E4724 | size: 0x54 | small */
+#if 1
+asm void fn_801E4724(void) {
+#include "src/game/battle/battle_logic_fn_801E4724.inc"
+}
+#else
 void fn_801E4724(void) {
     extern u8 lbl_8046AC60[];
     extern void fn_800A50E4();
@@ -5894,8 +6419,14 @@ void fn_801E4724(void) {
 
     return;
 }
+#endif
 
 /* 0x801E4778 | size: 0x2F4 | large */
+#if 1
+asm void fn_801E4778(void) {
+#include "src/game/battle/battle_logic_fn_801E4778.inc"
+}
+#else
 void fn_801E4778(void) {
     extern u8 lbl_8046A4E0[];
     extern u8 lbl_8046AC60[];
@@ -6108,8 +6639,14 @@ void fn_801E4778(void) {
 
     return;
 }
+#endif
 
 /* 0x801E4A6C | size: 0x58 | small */
+#if 1
+asm void fn_801E4A6C(void) {
+#include "src/game/battle/battle_logic_fn_801E4A6C.inc"
+}
+#else
 void fn_801E4A6C(void) {
     extern u8 lbl_8046A440[];
     extern u32 lbl_8047B468;
@@ -6136,8 +6673,14 @@ void fn_801E4A6C(void) {
     lbl_8047B468 = tmp;
     return;
 }
+#endif
 
 /* 0x801E4AC4 | size: 0x44 | small */
+#if 1
+asm void fn_801E4AC4(void) {
+#include "src/game/battle/battle_logic_fn_801E4AC4.inc"
+}
+#else
 void fn_801E4AC4(void) {
     extern u8 lbl_8046AE38[];
     u8 sp[0x10];
@@ -6158,8 +6701,14 @@ void fn_801E4AC4(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E4B08 | size: 0x30 | small */
+#if 1
+asm void fn_801E4B08(void) {
+#include "src/game/battle/battle_logic_fn_801E4B08.inc"
+}
+#else
 void fn_801E4B08(void) {
     extern u8 lbl_8046AE58[];
     u8 sp[0x10];
@@ -6175,8 +6724,14 @@ void fn_801E4B08(void) {
     ((void(*)(void))fn_8009F230)();
     return;
 }
+#endif
 
 /* 0x801E4B38 | size: 0x148 | medium */
+#if 1
+asm void fn_801E4B38(void) {
+#include "src/game/battle/battle_logic_fn_801E4B38.inc"
+}
+#else
 void fn_801E4B38(void) {
     extern u8 lbl_8046AC60[];
     extern u8 lbl_8046AE20[];
@@ -6282,8 +6837,14 @@ void fn_801E4B38(void) {
         r27 = r27 + 0x1;
     } while (1);
 }
+#endif
 
 /* 0x801E4C80 | size: 0x12C | medium */
+#if 1
+asm void fn_801E4C80(void) {
+#include "src/game/battle/battle_logic_fn_801E4C80.inc"
+}
+#else
 void fn_801E4C80(void) {
     extern u8 lbl_8046AC60[];
     extern u8 lbl_8046AE38[];
@@ -6382,9 +6943,15 @@ void fn_801E4C80(void) {
         r28 = r28 + 0x1;
     } while (1);
 }
+#endif
 
 /* 0x801E4DAC | size: 0x3C | small */
 /* Cancel battle sub-thread 2 if active. */
+#if 1
+asm void fn_801E4DAC(void) {
+#include "src/game/battle/battle_logic_fn_801E4DAC.inc"
+}
+#else
 void fn_801E4DAC(void) {
     extern u8 lbl_8046BE78[];
     extern u32 lbl_8047B480;
@@ -6394,10 +6961,16 @@ void fn_801E4DAC(void) {
         lbl_8047B480 = 0;
     }
 }
+#endif
 
 /* 0x801E4DE8 | size: 0x34
  * Resume battle sub-thread 2 if active.
  */
+#if 1
+asm void fn_801E4DE8(void) {
+#include "src/game/battle/battle_logic_fn_801E4DE8.inc"
+}
+#else
 void fn_801E4DE8(void) {
     extern u8 lbl_8046BE78[];
     extern u32 lbl_8047B480;
@@ -6407,8 +6980,14 @@ void fn_801E4DE8(void) {
         fn_800A1F94((void*)lbl_8046BE78);
     }
 }
+#endif
 
 /* 0x801E4E1C | size: 0xD4 | medium */
+#if 1
+asm void fn_801E4E1C(void) {
+#include "src/game/battle/battle_logic_fn_801E4E1C.inc"
+}
+#else
 void fn_801E4E1C(void) {
     extern u8 lbl_8046AE20[];
     extern u32 lbl_8047B480;
@@ -6471,8 +7050,14 @@ void fn_801E4E1C(void) {
 
     return;
 }
+#endif
 
 /* 0x801E4EF0 | size: 0x44 | small */
+#if 1
+asm void fn_801E4EF0(void) {
+#include "src/game/battle/battle_logic_fn_801E4EF0.inc"
+}
+#else
 void fn_801E4EF0(void) {
     extern u8 lbl_8046C1A8[];
     u8 sp[0x10];
@@ -6493,8 +7078,14 @@ void fn_801E4EF0(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E4F34 | size: 0x30 | small */
+#if 1
+asm void fn_801E4F34(void) {
+#include "src/game/battle/battle_logic_fn_801E4F34.inc"
+}
+#else
 void fn_801E4F34(void) {
     extern u8 lbl_8046C1C8[];
     u8 sp[0x10];
@@ -6510,8 +7101,14 @@ void fn_801E4F34(void) {
     ((void(*)(void))fn_8009F230)();
     return;
 }
+#endif
 
 /* 0x801E4F64 | size: 0x1F0 | medium */
+#if 1
+asm void fn_801E4F64(void) {
+#include "src/game/battle/battle_logic_fn_801E4F64.inc"
+}
+#else
 void fn_801E4F64(void) {
     extern u8 lbl_8046AC60[];
     extern u8 lbl_8046C190[];
@@ -6663,8 +7260,14 @@ void fn_801E4F64(void) {
         r27 = r27 + 0x1;
     } while (1);
 }
+#endif
 
 /* 0x801E5154 | size: 0x2AC | large */
+#if 1
+asm void fn_801E5154(void) {
+#include "src/game/battle/battle_logic_fn_801E5154.inc"
+}
+#else
 void fn_801E5154(void) {
     extern u8 lbl_8046AC60[];
     extern u8 lbl_8046C190[];
@@ -6866,9 +7469,15 @@ void fn_801E5154(void) {
         fn_801E1BB8();
     } while (1);
 }
+#endif
 
 /* 0x801E5400 | size: 0x3C | small */
 /* Cancel battle sub-thread 3 if active. */
+#if 1
+asm void fn_801E5400(void) {
+#include "src/game/battle/battle_logic_fn_801E5400.inc"
+}
+#else
 void fn_801E5400(void) {
     extern u8 lbl_8046D1E8[];
     extern u32 lbl_8047B488;
@@ -6878,10 +7487,16 @@ void fn_801E5400(void) {
         lbl_8047B488 = 0;
     }
 }
+#endif
 
 /* 0x801E543C | size: 0x34
  * Resume battle sub-thread 3 if active.
  */
+#if 1
+asm void fn_801E543C(void) {
+#include "src/game/battle/battle_logic_fn_801E543C.inc"
+}
+#else
 void fn_801E543C(void) {
     extern u8 lbl_8046D1E8[];
     extern u32 lbl_8047B488;
@@ -6891,8 +7506,14 @@ void fn_801E543C(void) {
         fn_800A1F94((void*)lbl_8046D1E8);
     }
 }
+#endif
 
 /* 0x801E5470 | size: 0xD8 | medium */
+#if 1
+asm void fn_801E5470(void) {
+#include "src/game/battle/battle_logic_fn_801E5470.inc"
+}
+#else
 void fn_801E5470(void) {
     extern u8 lbl_8046C190[];
     extern u32 lbl_8047B488;
@@ -6957,8 +7578,14 @@ void fn_801E5470(void) {
 
     return;
 }
+#endif
 
 /* 0x801E5548 | size: 0x244 | large */
+#if 1
+asm void fn_801E5548(void) {
+#include "src/game/battle/battle_logic_fn_801E5548.inc"
+}
+#else
 void fn_801E5548(void) {
     extern u32 lbl_8047B5AC;
     extern u32 lbl_8047B5B0;
@@ -7101,8 +7728,14 @@ void fn_801E5548(void) {
 
 
 }
+#endif
 
 /* 0x801E578C | size: 0x44 | small */
+#if 1
+asm void fn_801E578C(void) {
+#include "src/game/battle/battle_logic_fn_801E578C.inc"
+}
+#else
 void fn_801E578C(void) {
     extern u8 lbl_8046D618[];
     extern u32 lbl_8047B5AC;
@@ -7130,8 +7763,14 @@ void fn_801E578C(void) {
     *(u32*)((u8*)r5 + 0x14) = tmp;
     return;
 }
+#endif
 
 /* 0x801E57D0 | size: 0x13C | medium */
+#if 1
+asm void fn_801E57D0(void) {
+#include "src/game/battle/battle_logic_fn_801E57D0.inc"
+}
+#else
 void fn_801E57D0(void) {
     extern u32 lbl_8047B5B0;
     u32 tmp = 0;
@@ -7224,8 +7863,14 @@ void fn_801E57D0(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801E590C | size: 0x11C | medium */
+#if 1
+asm void fn_801E590C(void) {
+#include "src/game/battle/battle_logic_fn_801E590C.inc"
+}
+#else
 void fn_801E590C(void) {
     extern u32 lbl_8047B5B0;
     u32 tmp = 0;
@@ -7312,8 +7957,14 @@ void fn_801E590C(void) {
     *(u16*)((u8*)r4 + 0x690) = tmp;
     return;
 }
+#endif
 
 /* 0x801E5A28 | size: 0x3BC | large */
+#if 1
+asm void fn_801E5A28(void) {
+#include "src/game/battle/battle_logic_fn_801E5A28.inc"
+}
+#else
 void fn_801E5A28(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B5B0;
@@ -7561,8 +8212,14 @@ void fn_801E5A28(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801E5DE4 | size: 0x1E0 | medium */
+#if 1
+asm void fn_801E5DE4(void) {
+#include "src/game/battle/battle_logic_fn_801E5DE4.inc"
+}
+#else
 void fn_801E5DE4(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B548;
@@ -7691,8 +8348,14 @@ void fn_801E5DE4(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801E5FC4 | size: 0xF0 | medium */
+#if 1
+asm void fn_801E5FC4(void) {
+#include "src/game/battle/battle_logic_fn_801E5FC4.inc"
+}
+#else
 void fn_801E5FC4(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B548;
@@ -7770,8 +8433,14 @@ void fn_801E5FC4(void) {
     *(u8*)(r3 + r6) = tmp;
     return;
 }
+#endif
 
 /* 0x801E60B4 | size: 0x68 | small */
+#if 1
+asm void fn_801E60B4(void) {
+#include "src/game/battle/battle_logic_fn_801E60B4.inc"
+}
+#else
 void fn_801E60B4(void) {
     extern u32 lbl_8047B548;
     extern u32 lbl_8047B54C;
@@ -7814,8 +8483,14 @@ void fn_801E60B4(void) {
     }
     return;
 }
+#endif
 
 /* 0x801E611C | size: 0x1BC | medium */
+#if 1
+asm void fn_801E611C(void) {
+#include "src/game/battle/battle_logic_fn_801E611C.inc"
+}
+#else
 void fn_801E611C(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B54C;
@@ -7942,8 +8617,14 @@ void fn_801E611C(void) {
     *(u32*)((u8*)r7 + 0x88) = tmp;
     return;
 }
+#endif
 
 /* 0x801E62D8 | size: 0x54 | small */
+#if 1
+asm void fn_801E62D8(void) {
+#include "src/game/battle/battle_logic_fn_801E62D8.inc"
+}
+#else
 void fn_801E62D8(void) {
     extern u32 lbl_8047B5B0;
     u32 tmp = 0;
@@ -7973,8 +8654,14 @@ void fn_801E62D8(void) {
     *(u16*)((u8*)r3 + 0x6AC) = tmp;
     return;
 }
+#endif
 
 /* 0x801E632C | size: 0x24C | large */
+#if 1
+asm void fn_801E632C(void) {
+#include "src/game/battle/battle_logic_fn_801E632C.inc"
+}
+#else
 void fn_801E632C(void) {
     extern u32 lbl_8047B4A0;
     extern u32 lbl_8047B4C0;
@@ -8148,8 +8835,14 @@ void fn_801E632C(void) {
     lbl_8047B540 = tmp;
     return;
 }
+#endif
 
 /* 0x801E6578 | size: 0x10C | medium */
+#if 1
+asm void fn_801E6578(void) {
+#include "src/game/battle/battle_logic_fn_801E6578.inc"
+}
+#else
 void fn_801E6578(void) {
     extern u32 lbl_8047B5A4;
     extern u32 lbl_8047B5A8;
@@ -8224,8 +8917,14 @@ L_801E665C:
     /* mtspr GQR6, tmp */;
     return;
 }
+#endif
 
 /* 0x801E6684 | size: 0x1A88 | massive */
+#if 1
+asm void fn_801E6684(void) {
+#include "src/game/battle/battle_logic_fn_801E6684.inc"
+}
+#else
 void fn_801E6684(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
@@ -9685,8 +10384,14 @@ void fn_801E6684(void) {
     f27 = *(f64*)((u8*)(u32)sp + 0x10);
     return;
 }
+#endif
 
 /* 0x801E810C | size: 0x1A8C | massive */
+#if 1
+asm void fn_801E810C(void) {
+#include "src/game/battle/battle_logic_fn_801E810C.inc"
+}
+#else
 void fn_801E810C(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
@@ -11146,8 +11851,14 @@ void fn_801E810C(void) {
     f27 = *(f64*)((u8*)(u32)sp + 0x10);
     return;
 }
+#endif
 
 /* 0x801E9B98 | size: 0x1AAC | massive */
+#if 1
+asm void fn_801E9B98(void) {
+#include "src/game/battle/battle_logic_fn_801E9B98.inc"
+}
+#else
 void fn_801E9B98(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
@@ -12613,8 +13324,14 @@ void fn_801E9B98(void) {
     f27 = *(f64*)((u8*)(u32)sp + 0x18);
     return;
 }
+#endif
 
 /* 0x801EB644 | size: 0x67C | large */
+#if 1
+asm void fn_801EB644(void) {
+#include "src/game/battle/battle_logic_fn_801EB644.inc"
+}
+#else
 void fn_801EB644(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4A0;
@@ -13063,8 +13780,14 @@ L_801EB8DC:
     *(u32*)((u8*)r3 + 0x6A0) = tmp;
     return;
 }
+#endif
 
 /* 0x801EBCC0 | size: 0x6A8 | large */
+#if 1
+asm void fn_801EBCC0(void) {
+#include "src/game/battle/battle_logic_fn_801EBCC0.inc"
+}
+#else
 void fn_801EBCC0(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4C0;
@@ -13523,8 +14246,14 @@ L_801EBF54:
 
     return;
 }
+#endif
 
 /* 0x801EC368 | size: 0x6A8 | large */
+#if 1
+asm void fn_801EC368(void) {
+#include "src/game/battle/battle_logic_fn_801EC368.inc"
+}
+#else
 void fn_801EC368(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4E0;
@@ -13983,8 +14712,14 @@ L_801EC5FC:
 
     return;
 }
+#endif
 
 /* 0x801ECA10 | size: 0xA0 | medium */
+#if 1
+asm void fn_801ECA10(void) {
+#include "src/game/battle/battle_logic_fn_801ECA10.inc"
+}
+#else
 void fn_801ECA10(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_80478D08;
@@ -14028,8 +14763,14 @@ void fn_801ECA10(void) {
     r3 = 0x1;
     return;
 }
+#endif
 
 /* 0x801ECAB0 | size: 0x464 | large */
+#if 1
+asm void fn_801ECAB0(void) {
+#include "src/game/battle/battle_logic_fn_801ECAB0.inc"
+}
+#else
 void fn_801ECAB0(void) {
     extern void fn_800C4C50();
     extern void fn_800C4C98();
@@ -14330,8 +15071,14 @@ void fn_801ECAB0(void) {
 
     return;
 }
+#endif
 
 /* 0x801ECF14 | size: 0x90 | medium */
+#if 1
+asm void fn_801ECF14(void) {
+#include "src/game/battle/battle_logic_fn_801ECF14.inc"
+}
+#else
 void fn_801ECF14(void) {
     u32 tmp = 0;
     u32 r3 = 0;
@@ -14378,8 +15125,14 @@ void fn_801ECF14(void) {
     r3 = r5;
     return;
 }
+#endif
 
 /* 0x801ECFA4 | size: 0x3C | small */
+#if 1
+asm void fn_801ECFA4(void) {
+#include "src/game/battle/battle_logic_fn_801ECFA4.inc"
+}
+#else
 void fn_801ECFA4(void) {
     u32 tmp = 0;
     u32 r3 = 0;
@@ -14401,8 +15154,14 @@ void fn_801ECFA4(void) {
     *(u32*)((u8*)r3 + 0x0) = tmp;
     return;
 }
+#endif
 
 /* 0x801ECFE0 | size: 0xEC | medium */
+#if 1
+asm void fn_801ECFE0(void) {
+#include "src/game/battle/battle_logic_fn_801ECFE0.inc"
+}
+#else
 void fn_801ECFE0(void) {
     extern void fn_8011ED68();
     extern void fn_8011EE28();
@@ -14472,8 +15231,14 @@ void fn_801ECFE0(void) {
 
     return;
 }
+#endif
 
 /* 0x801ED0CC | size: 0x14C | medium */
+#if 1
+asm void fn_801ED0CC(void) {
+#include "src/game/battle/battle_logic_fn_801ED0CC.inc"
+}
+#else
 void fn_801ED0CC(void) {
     extern void fn_8011ED68();
     extern void fn_8011EE28();
@@ -14572,6 +15337,7 @@ void fn_801ED0CC(void) {
 
     return;
 }
+#endif
 
 /* 0x801ED218 | size: 0x34
  * Get the type byte from a pokemon data structure.
@@ -14585,6 +15351,11 @@ u32 fn_801ED218(u8* data) {
 }
 
 /* 0x801ED24C | size: 0x48 | small */
+#if 1
+asm void fn_801ED24C(void) {
+#include "src/game/battle/battle_logic_fn_801ED24C.inc"
+}
+#else
 void fn_801ED24C(void) {
     u8 sp[0x10];
     u32 tmp = 0;
@@ -14605,8 +15376,14 @@ void fn_801ED24C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801ED294 | size: 0x48 | small */
+#if 1
+asm void fn_801ED294(void) {
+#include "src/game/battle/battle_logic_fn_801ED294.inc"
+}
+#else
 void fn_801ED294(void) {
     u8 sp[0x10];
     u32 tmp = 0;
@@ -14627,6 +15404,7 @@ void fn_801ED294(void) {
     }
     return;
 }
+#endif
 
 /* 0x801ED2DC | size: 0x34
  * Get a pointer to the name field (offset 0x8) of a pokemon data structure.
@@ -14640,6 +15418,11 @@ u8* fn_801ED2DC(u8* data) {
 }
 
 /* 0x801ED310 | size: 0x78 | small */
+#if 1
+asm void fn_801ED310(void) {
+#include "src/game/battle/battle_logic_fn_801ED310.inc"
+}
+#else
 void fn_801ED310(void) {
     u8 sp[0x10];
     u32 tmp = 0;
@@ -14671,8 +15454,14 @@ void fn_801ED310(void) {
     }
     return;
 }
+#endif
 
 /* 0x801ED388 | size: 0x30 | small */
+#if 1
+asm void fn_801ED388(void) {
+#include "src/game/battle/battle_logic_fn_801ED388.inc"
+}
+#else
 void fn_801ED388(void) {
     extern u32 lbl_8047B5B8;
     extern void fn_8012BDE0();
@@ -14689,8 +15478,14 @@ void fn_801ED388(void) {
     lbl_8047B5B8 = r3;
     return;
 }
+#endif
 
 /* 0x801ED3B8 | size: 0x288 | large */
+#if 1
+asm void fn_801ED3B8(void) {
+#include "src/game/battle/battle_logic_fn_801ED3B8.inc"
+}
+#else
 void fn_801ED3B8(void) {
     extern void fn_8011EE28();
     extern void fn_8011F4A8();
@@ -14880,8 +15675,14 @@ L_801ED614:
 
     return;
 }
+#endif
 
 /* 0x801ED648 | size: 0x2C | small */
+#if 1
+asm void fn_801ED648(void) {
+#include "src/game/battle/battle_logic_fn_801ED648.inc"
+}
+#else
 void fn_801ED648(void) {
     extern u8 lbl_80375230[];
     extern void fn_800E01D0();
@@ -14897,11 +15698,23 @@ void fn_801ED648(void) {
     fn_800E01D0();
     return;
 }
+#endif
 
 /* 0x801ED674 | size: 0xC | tiny */
+#if 1
+asm void fn_801ED674(void) {
+#include "src/game/battle/battle_logic_fn_801ED674.inc"
+}
+#else
 void fn_801ED674(void) { }
+#endif
 
 /* 0x801ED680 | size: 0xC0 | medium */
+#if 1
+asm void fn_801ED680(void) {
+#include "src/game/battle/battle_logic_fn_801ED680.inc"
+}
+#else
 void fn_801ED680(void) {
     extern u8 lbl_8046D630[];
     extern u8 lbl_8047B5C0;
@@ -14952,8 +15765,14 @@ void fn_801ED680(void) {
     lbl_8047B5C0 = tmp;
     return;
 }
+#endif
 
 /* 0x801ED740 | size: 0x40 | small */
+#if 1
+asm void fn_801ED740(void) {
+#include "src/game/battle/battle_logic_fn_801ED740.inc"
+}
+#else
 void fn_801ED740(void) {
     extern u8 lbl_8047B5C0;
     extern void fn_800FE834();
@@ -14977,8 +15796,14 @@ void fn_801ED740(void) {
     fn_800FE834();
     return;
 }
+#endif
 
 /* 0x801ED780 | size: 0x8B4 | massive */
+#if 1
+asm void fn_801ED780(void) {
+#include "src/game/battle/battle_logic_fn_801ED780.inc"
+}
+#else
 void fn_801ED780(void) {
     extern u8 lbl_80314958[];
     extern u8 lbl_80314C78[];
@@ -15515,8 +16340,14 @@ L_801EDF2C:
 
     return;
 }
+#endif
 
 /* 0x801EE07C | size: 0x2C | small */
+#if 1
+asm void fn_801EE07C(void) {
+#include "src/game/battle/battle_logic_fn_801EE07C.inc"
+}
+#else
 void fn_801EE07C(void) {
     extern u32 lbl_80478F78;
     extern u32 lbl_80478F7C;
@@ -15537,11 +16368,23 @@ void fn_801EE07C(void) {
     r3 = r3 + tmp;
     return;
 }
+#endif
 
 /* 0x801EE0A8 | size: 0x14 | tiny */
+#if 1
+asm void fn_801EE0A8(void) {
+#include "src/game/battle/battle_logic_fn_801EE0A8.inc"
+}
+#else
 void fn_801EE0A8(void) { }
+#endif
 
 /* 0x801EE0BC | size: 0x50 | small */
+#if 1
+asm void fn_801EE0BC(void) {
+#include "src/game/battle/battle_logic_fn_801EE0BC.inc"
+}
+#else
 void fn_801EE0BC(void) {
     extern void fn_801EF1E4();
     u8 sp[0x10];
@@ -15564,8 +16407,14 @@ void fn_801EE0BC(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE10C | size: 0x68 | small */
+#if 1
+asm void fn_801EE10C(void) {
+#include "src/game/battle/battle_logic_fn_801EE10C.inc"
+}
+#else
 void fn_801EE10C(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15595,8 +16444,14 @@ void fn_801EE10C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE174 | size: 0x6C | small */
+#if 1
+asm void fn_801EE174(void) {
+#include "src/game/battle/battle_logic_fn_801EE174.inc"
+}
+#else
 void fn_801EE174(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15626,8 +16481,14 @@ void fn_801EE174(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE1E0 | size: 0x68 | small */
+#if 1
+asm void fn_801EE1E0(void) {
+#include "src/game/battle/battle_logic_fn_801EE1E0.inc"
+}
+#else
 void fn_801EE1E0(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15657,8 +16518,14 @@ void fn_801EE1E0(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE248 | size: 0x6C | small */
+#if 1
+asm void fn_801EE248(void) {
+#include "src/game/battle/battle_logic_fn_801EE248.inc"
+}
+#else
 void fn_801EE248(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15688,8 +16555,14 @@ void fn_801EE248(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE2B4 | size: 0x74 | small */
+#if 1
+asm void fn_801EE2B4(void) {
+#include "src/game/battle/battle_logic_fn_801EE2B4.inc"
+}
+#else
 void fn_801EE2B4(void) {
     extern u32 lbl_80478F6C;
     extern void fn_800F9E70();
@@ -15723,8 +16596,14 @@ void fn_801EE2B4(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE328 | size: 0x70 | small */
+#if 1
+asm void fn_801EE328(void) {
+#include "src/game/battle/battle_logic_fn_801EE328.inc"
+}
+#else
 void fn_801EE328(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15755,8 +16634,14 @@ void fn_801EE328(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE398 | size: 0xA8 | medium */
+#if 1
+asm void fn_801EE398(void) {
+#include "src/game/battle/battle_logic_fn_801EE398.inc"
+}
+#else
 void fn_801EE398(void) {
     extern u8 lbl_80375240[];
     extern u32 lbl_80478F6C;
@@ -15800,6 +16685,7 @@ void fn_801EE398(void) {
 
     return;
 }
+#endif
 
 /* 0x801EE440 | size: 0x28
  * Look up a value in the type effectiveness table.
@@ -15816,6 +16702,11 @@ u32 fn_801EE440(u32 index) {
 }
 
 /* 0x801EE470 | size: 0x6C | small */
+#if 1
+asm void fn_801EE470(void) {
+#include "src/game/battle/battle_logic_fn_801EE470.inc"
+}
+#else
 void fn_801EE470(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15845,8 +16736,14 @@ void fn_801EE470(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE4DC | size: 0x68 | small */
+#if 1
+asm void fn_801EE4DC(void) {
+#include "src/game/battle/battle_logic_fn_801EE4DC.inc"
+}
+#else
 void fn_801EE4DC(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -15876,8 +16773,14 @@ void fn_801EE4DC(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE544 | size: 0xD0 | medium */
+#if 1
+asm void fn_801EE544(void) {
+#include "src/game/battle/battle_logic_fn_801EE544.inc"
+}
+#else
 void fn_801EE544(void) {
     extern u32 lbl_80478F64;
     extern u32 lbl_80478F6C;
@@ -15930,8 +16833,14 @@ void fn_801EE544(void) {
         r30 = r30 + 0x8;
     }
 }
+#endif
 
 /* 0x801EE614 | size: 0x68 | small */
+#if 1
+asm void fn_801EE614(void) {
+#include "src/game/battle/battle_logic_fn_801EE614.inc"
+}
+#else
 void fn_801EE614(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801906A0();
@@ -15961,8 +16870,14 @@ void fn_801EE614(void) {
 
     return;
 }
+#endif
 
 /* 0x801EE67C | size: 0xD4 | medium */
+#if 1
+asm void fn_801EE67C(void) {
+#include "src/game/battle/battle_logic_fn_801EE67C.inc"
+}
+#else
 void fn_801EE67C(void) {
     extern u32 lbl_80478F6C;
     extern void fn_8019075C();
@@ -16021,8 +16936,14 @@ void fn_801EE67C(void) {
 
     return;
 }
+#endif
 
 /* 0x801EE750 | size: 0x6C | small */
+#if 1
+asm void fn_801EE750(void) {
+#include "src/game/battle/battle_logic_fn_801EE750.inc"
+}
+#else
 void fn_801EE750(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -16052,8 +16973,14 @@ void fn_801EE750(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE7BC | size: 0x68 | small */
+#if 1
+asm void fn_801EE7BC(void) {
+#include "src/game/battle/battle_logic_fn_801EE7BC.inc"
+}
+#else
 void fn_801EE7BC(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -16083,8 +17010,14 @@ void fn_801EE7BC(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE824 | size: 0x70 | small */
+#if 1
+asm void fn_801EE824(void) {
+#include "src/game/battle/battle_logic_fn_801EE824.inc"
+}
+#else
 void fn_801EE824(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801906A0();
@@ -16116,8 +17049,14 @@ void fn_801EE824(void) {
 
     return;
 }
+#endif
 
 /* 0x801EE894 | size: 0x60 | small */
+#if 1
+asm void fn_801EE894(void) {
+#include "src/game/battle/battle_logic_fn_801EE894.inc"
+}
+#else
 void fn_801EE894(void) {
     extern u32 lbl_80478F6C;
     extern void fn_8019075C();
@@ -16145,8 +17084,14 @@ void fn_801EE894(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EE8F4 | size: 0x64 | small */
+#if 1
+asm void fn_801EE8F4(void) {
+#include "src/game/battle/battle_logic_fn_801EE8F4.inc"
+}
+#else
 void fn_801EE8F4(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801902E0();
@@ -16175,8 +17120,14 @@ void fn_801EE8F4(void) {
 
     return;
 }
+#endif
 
 /* 0x801EEAD0 | size: 0x64 | small */
+#if 1
+asm void fn_801EEAD0(void) {
+#include "src/game/battle/battle_logic_fn_801EEAD0.inc"
+}
+#else
 void fn_801EEAD0(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801902E0();
@@ -16205,8 +17156,14 @@ void fn_801EEAD0(void) {
 
     return;
 }
+#endif
 
 /* 0x801EED30 | size: 0x58 | small */
+#if 1
+asm void fn_801EED30(void) {
+#include "src/game/battle/battle_logic_fn_801EED30.inc"
+}
+#else
 void fn_801EED30(void) {
     extern u32 lbl_80478F6C;
     extern void fn_8019075C();
@@ -16232,8 +17189,14 @@ void fn_801EED30(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EED88 | size: 0x64 | small */
+#if 1
+asm void fn_801EED88(void) {
+#include "src/game/battle/battle_logic_fn_801EED88.inc"
+}
+#else
 void fn_801EED88(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801902E0();
@@ -16262,8 +17225,14 @@ void fn_801EED88(void) {
 
     return;
 }
+#endif
 
 /* 0x801EEDEC | size: 0x58 | small */
+#if 1
+asm void fn_801EEDEC(void) {
+#include "src/game/battle/battle_logic_fn_801EEDEC.inc"
+}
+#else
 void fn_801EEDEC(void) {
     extern u32 lbl_80478F6C;
     extern void fn_8019075C();
@@ -16289,8 +17258,14 @@ void fn_801EEDEC(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EEE44 | size: 0x28 | small */
+#if 1
+asm void fn_801EEE44(void) {
+#include "src/game/battle/battle_logic_fn_801EEE44.inc"
+}
+#else
 void fn_801EEE44(void) {
     extern u32 lbl_80478F6C;
     u32 tmp = 0;
@@ -16309,8 +17284,14 @@ void fn_801EEE44(void) {
     r3 = *(u8*)((u8*)r4 + 0x0);
     return;
 }
+#endif
 
 /* 0x801EEE6C | size: 0x4C | small */
+#if 1
+asm void fn_801EEE6C(void) {
+#include "src/game/battle/battle_logic_fn_801EEE6C.inc"
+}
+#else
 void fn_801EEE6C(void) {
     extern void fn_801EF1E4();
     u8 sp[0x10];
@@ -16332,8 +17313,14 @@ void fn_801EEE6C(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EEEB8 | size: 0x50 | small */
+#if 1
+asm void fn_801EEEB8(void) {
+#include "src/game/battle/battle_logic_fn_801EEEB8.inc"
+}
+#else
 void fn_801EEEB8(void) {
     extern void fn_801EF1E4();
     u8 sp[0x10];
@@ -16356,8 +17343,14 @@ void fn_801EEEB8(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EEF08 | size: 0x38 | small */
+#if 1
+asm void fn_801EEF08(void) {
+#include "src/game/battle/battle_logic_fn_801EEF08.inc"
+}
+#else
 void fn_801EEF08(void) {
     extern u32 lbl_80478F6C;
     u32 tmp = 0;
@@ -16378,8 +17371,14 @@ void fn_801EEF08(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801EEF40 | size: 0x6C | small */
+#if 1
+asm void fn_801EEF40(void) {
+#include "src/game/battle/battle_logic_fn_801EEF40.inc"
+}
+#else
 void fn_801EEF40(void) {
     extern u32 lbl_80478F6C;
     extern void fn_801EF1E4();
@@ -16409,8 +17408,14 @@ void fn_801EEF40(void) {
     }
     return;
 }
+#endif
 
 /* 0x801EEFAC | size: 0x48 | small */
+#if 1
+asm void fn_801EEFAC(void) {
+#include "src/game/battle/battle_logic_fn_801EEFAC.inc"
+}
+#else
 void fn_801EEFAC(void) {
     extern u32 lbl_80478F6C;
     u32 tmp = 0;
@@ -16436,8 +17441,14 @@ void fn_801EEFAC(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x801EEFF4 | size: 0x38 | small */
+#if 1
+asm void fn_801EEFF4(void) {
+#include "src/game/battle/battle_logic_fn_801EEFF4.inc"
+}
+#else
 void fn_801EEFF4(void) {
     extern u32 lbl_80478F6C;
     u32 tmp = 0;
@@ -16458,4 +17469,5 @@ void fn_801EEFF4(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
