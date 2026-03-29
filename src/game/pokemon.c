@@ -119,6 +119,53 @@ extern struct Pokemon* fn_801F61BC(void);
 /* fn_802050F4: Pokemon nature/friendship comparison helper */
 extern s8 fn_802050F4(struct Pokemon* pokemon);
 
+/* Forward declarations for fn_801F54A4 asm wrapper */
+extern void fn_80119ED0(void);
+extern void fn_8011B444(void);
+extern void fn_8011B67C(void);
+extern void fn_8012640C(void);
+extern void fn_801EF634(void);
+extern void fn_801F981C(void);
+extern void fn_8020DD44(void);
+extern void fn_8020DD80(void);
+extern void fn_8020E0B0(void);
+extern void fn_8020E0C8(void);
+extern void fn_8020E0E0(void);
+extern void fn_8020E0F8(void);
+extern void fn_8020E124(void);
+extern void fn_8020E1A4(void);
+extern void fn_8020E1BC(void);
+extern void fn_8020E1D4(void);
+extern void fn_8020E1EC(void);
+extern void fn_8020E204(void);
+extern void fn_8020E230(void);
+extern void fn_8020E248(void);
+extern void fn_8020E260(void);
+extern void fn_8020E278(void);
+extern void fn_8020E290(void);
+extern void fn_8020E2A8(void);
+extern void fn_8020E2C0(void);
+extern void fn_8020E2D8(void);
+extern void fn_8020E2F0(void);
+extern void fn_8020E308(void);
+extern void fn_8020E320(void);
+extern void fn_8020E338(void);
+extern void fn_8020E350(void);
+extern void fn_8020E368(void);
+extern void fn_8020E380(void);
+extern void fn_8020E398(void);
+extern void fn_8020E3B0(void);
+extern void fn_8020E3C8(void);
+extern void fn_8020E3E0(void);
+extern void fn_8020E3F8(void);
+extern void fn_8020E410(void);
+extern void fn_8020E428(void);
+extern void fn_8020E440(void);
+extern void fn_8020E458(void);
+extern void fn_8020E470(void);
+extern void fn_8020E488(void);
+extern void fn_8020E4B4(void);
+
 /* =========================================================================
  * fn_801F000C - FrameWaitForDuration
  *
@@ -6773,6 +6820,18 @@ void fn_801F4C14(void) {
 
     return;
 }
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801F54A4(void) {
+#include "src/game/pokemon_fn_801F54A4.inc"
+}
+#else
+void fn_801F54A4(void) { /* TODO */ }
+#endif
+#pragma pop
 
 /* 0x801F61EC | size: 0x220 | large */
 void fn_801F61EC(void) {
