@@ -777,7 +777,7 @@ void fn_8017B5C0(void) { /* TODO: match -- 248 bytes at 0x8017B5C0 */ }
 #endif
 
 /* 0x8017B6B8 | 0x4C8 */
-extern void fn_8017F25C(void);
+extern void fn_8017F25C();
 extern void fn_8017F108(void);
 extern void fn_80167E98(void);
 extern u32 lbl_80478C48;
@@ -802,7 +802,7 @@ void fn_8017BD34(void) { /* TODO: match -- 692 bytes at 0x8017BD34 */ }
 #endif
 
 /* 0x8017C008 | 0x6C */
-extern void fn_80180C78(void);
+extern void fn_80180C78();
 #if 1
 asm void fn_8017C008(void) {
 #include "src/game/fsys/fsys_file_fn_8017C008.inc"
@@ -842,7 +842,7 @@ void fn_8017C39C(void) { /* TODO: match -- 120 bytes at 0x8017C39C */ }
 
 /* 0x8017C414 | 0x154 */
 extern void fn_8017A624(void);
-extern void OSDisableInterrupts();
+extern u32 OSDisableInterrupts();
 extern void OSRestoreInterrupts();
 #if 1
 asm void fn_8017C414(void) {
@@ -853,21 +853,29 @@ void fn_8017C414(void) { /* TODO: match -- 340 bytes at 0x8017C414 */ }
 #endif
 
 /* 0x8017C580 | 0x10 */
-#if 1
+#if 0
 asm void fn_8017C580(void) {
 #include "src/game/fsys/fsys_file_fn_8017C580.inc"
 }
 #else
-void fn_8017C580(void) { /* TODO: match -- 16 bytes at 0x8017C580 */ }
+#pragma optimization_level 4
+u32 fn_8017C580(FSYSSlot* slot) {
+    slot->status = 0x66;
+    return 0;
+}
 #endif
 
 /* 0x8017C5A0 | 0x10 */
-#if 1
+#if 0
 asm void fn_8017C5A0(void) {
 #include "src/game/fsys/fsys_file_fn_8017C5A0.inc"
 }
 #else
-void fn_8017C5A0(void) { /* TODO: match -- 16 bytes at 0x8017C5A0 */ }
+#pragma optimization_level 4
+u32 fn_8017C5A0(FSYSSlot* slot) {
+    slot->status = 0x66;
+    return 0;
+}
 #endif
 
 /* 0x8017C5B8 | 0x128 */
@@ -895,7 +903,7 @@ void fn_8017C6E0(void) { /* TODO: match -- 428 bytes at 0x8017C6E0 */ }
 #endif
 
 /* 0x8017C894 | 0x2C */
-extern void fn_8017D8F8(void);
+extern void fn_8017D8F8();
 #if 1
 asm void fn_8017C894(void) {
 #include "src/game/fsys/fsys_file_fn_8017C894.inc"
@@ -905,7 +913,7 @@ void fn_8017C894(void) { /* TODO: match -- 44 bytes at 0x8017C894 */ }
 #endif
 
 /* 0x8017C8C8 | 0x2C */
-extern void fn_8017D92C(void);
+extern void fn_8017D92C();
 #if 1
 asm void fn_8017C8C8(void) {
 #include "src/game/fsys/fsys_file_fn_8017C8C8.inc"
@@ -925,8 +933,8 @@ void fn_8017C8FC(void) { /* TODO: match -- 1408 bytes at 0x8017C8FC */ }
 #endif
 
 /* 0x8017CE7C | 0x4C */
-extern void fn_8017D960(void);
-extern void fn_8017DAB8(void);
+extern void fn_8017D960();
+extern void fn_8017DAB8();
 #if 1
 asm void fn_8017CE7C(void) {
 #include "src/game/fsys/fsys_file_fn_8017CE7C.inc"
@@ -951,12 +959,22 @@ void fn_8017CED8(void) { /* TODO: match -- 1224 bytes at 0x8017CED8 */ }
 #endif
 
 /* 0x8017D3A0 | 0x34 */
-#if 1
+#if 0
 asm void fn_8017D3A0(void) {
 #include "src/game/fsys/fsys_file_fn_8017D3A0.inc"
 }
 #else
-void fn_8017D3A0(void) { /* TODO: match -- 52 bytes at 0x8017D3A0 */ }
+#pragma optimization_level 4
+u32 fn_8017D3A0(FSYSSlot* slot) {
+    switch (slot->padding054) {
+        case 4:
+        case 5:
+        case 11:
+            return 1;
+        default:
+            return 0;
+    }
+}
 #endif
 
 /* 0x8017D3D4 | 0x2C */
@@ -1006,23 +1024,31 @@ void fn_8017D800(void) { /* TODO: match -- 248 bytes at 0x8017D800 */ }
 #endif
 
 /* 0x8017D8F8 | 0x34 */
-extern void fn_8017D960(void);
-#if 1
+extern void fn_8017D960();
+#if 0
 asm void fn_8017D8F8(void) {
 #include "src/game/fsys/fsys_file_fn_8017D8F8.inc"
 }
 #else
-void fn_8017D8F8(void) { /* TODO: match -- 52 bytes at 0x8017D8F8 */ }
+#pragma optimization_level 4
+void fn_8017D8F8(FSYSSlot* slot) {
+    fn_8017D960();
+    slot->status = FSYS_STATUS_FREE;
+}
 #endif
 
 /* 0x8017D92C | 0x34 */
-extern void fn_8017D960(void);
-#if 1
+extern void fn_8017D960();
+#if 0
 asm void fn_8017D92C(void) {
 #include "src/game/fsys/fsys_file_fn_8017D92C.inc"
 }
 #else
-void fn_8017D92C(void) { /* TODO: match -- 52 bytes at 0x8017D92C */ }
+#pragma optimization_level 4
+void fn_8017D92C(FSYSSlot* slot) {
+    fn_8017D960();
+    slot->status = FSYS_STATUS_FREE;
+}
 #endif
 
 /* 0x8017D960 | 0x158 */
