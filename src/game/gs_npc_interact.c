@@ -203,6 +203,12 @@ u8 fn_8000DAA8(void) {
  * ========================================================================= */
 
 /* 0x800111C4 | 0x24 -- small accessor */
+extern void fn_80089F78();
+#if 1
+asm void fn_800111C4(void) {
+#include "src/game/gs_npc_interact_fn_800111C4.inc"
+}
+#else
 void fn_800111C4(void) {
     extern void fn_80089F78();
     u8 sp[0x10];
@@ -213,8 +219,14 @@ void fn_800111C4(void) {
     fn_80089F78();
     return;
 }
+#endif
 
 /* 0x800111E8 | 0x24 -- small accessor */
+#if 1
+asm void fn_800111E8(void) {
+#include "src/game/gs_npc_interact_fn_800111E8.inc"
+}
+#else
 void fn_800111E8(void) {
     extern void fn_80089F78();
     u8 sp[0x10];
@@ -225,6 +237,7 @@ void fn_800111E8(void) {
     fn_80089F78();
     return;
 }
+#endif
 
 /* 0x7C | fn_8001120C | nullcheck_call_flag */
 u32 fn_8001120C(void* obj) {
@@ -234,6 +247,14 @@ u32 fn_8001120C(void* obj) {
 }
 
 /* 0x80011288 | 0x21C */
+extern void fn_8005D8F8();
+extern void fn_80102138();
+extern void fn_801026A4();
+#if 1
+asm void fn_80011288(void) {
+#include "src/game/gs_npc_interact_fn_80011288.inc"
+}
+#else
 void fn_80011288(void) {
     extern void fn_8005D8F8();
     extern void fn_80102138();
@@ -380,8 +401,24 @@ void fn_80011288(void) {
 
     return;
 }
+#endif
 
 /* 0x800114A4 | 0x25C */
+extern void fn_8020E204();
+extern void fn_8020E1A4();
+extern void fn_8001BD80();
+extern void fn_80102568();
+extern void fn_801F02AC();
+extern void fn_802062FC();
+extern void fn_802656AC();
+extern void fn_80010C98();
+extern void fn_80011288();
+extern void fn_801026A4();
+#if 1
+asm void fn_800114A4(void) {
+#include "src/game/gs_npc_interact_fn_800114A4.inc"
+}
+#else
 void fn_800114A4(void) {
     extern void fn_80010C98();
     extern void fn_80011288();
@@ -560,8 +597,14 @@ L_80011500:
 
     return;
 }
+#endif
 
 /* 0x80011700 | 0xBC */
+#if 1
+asm void fn_80011700(void) {
+#include "src/game/gs_npc_interact_fn_80011700.inc"
+}
+#else
 void fn_80011700(void) {
     extern void fn_80102568();
     extern void fn_80102620();
@@ -614,8 +657,17 @@ void fn_80011700(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x800117BC | 0x1EC */
+extern void fn_80010128();
+extern void fn_80106394();
+extern void fn_80106080();
+#if 1
+asm void fn_800117BC(void) {
+#include "src/game/gs_npc_interact_fn_800117BC.inc"
+}
+#else
 void fn_800117BC(void) {
     extern void fn_80010128();
     extern void fn_80102568();
@@ -763,6 +815,7 @@ L_800117F0:
     r3 = r27;
     return;
 }
+#endif
 
 /* 0x74 | fn_800119A8 | nullcheck_call_flag */
 u32 fn_800119A8(void* obj) {
@@ -772,6 +825,11 @@ u32 fn_800119A8(void* obj) {
 }
 
 /* 0x80011A1C | 0x130 */
+#if 1
+asm void fn_80011A1C(void) {
+#include "src/game/gs_npc_interact_fn_80011A1C.inc"
+}
+#else
 void fn_80011A1C(void) {
     extern void fn_80102568();
     extern void fn_80102620();
@@ -859,8 +917,11 @@ void fn_80011A1C(void) {
     r3 = r30;
     return;
 }
+#endif
 
 /* 0x78 | fn_80011B4C | generic */
+extern void fn_80104704();
+extern void fn_801040A0();
 u32 fn_80011B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     fn_80104704();
     fn_801040A0();
@@ -869,6 +930,15 @@ u32 fn_80011B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 }
 
 /* 0x80011BC4 | 0xB4 */
+extern void fn_80104704();
+extern void fn_80103FE4();
+extern void fn_801040A0();
+extern void fn_80166A28();
+#if 1
+asm void fn_80011BC4(void) {
+#include "src/game/gs_npc_interact_fn_80011BC4.inc"
+}
+#else
 void fn_80011BC4(void) {
     extern void fn_80103FE4();
     extern void fn_801040A0();
@@ -917,6 +987,7 @@ void fn_80011BC4(void) {
     }
     return;
 }
+#endif
 
 /* 0x78 | fn_80011C78 | generic */
 u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
@@ -927,6 +998,11 @@ u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 }
 
 /* 0x80011CF0 | 0xAC */
+#if 1
+asm void fn_80011CF0(void) {
+#include "src/game/gs_npc_interact_fn_80011CF0.inc"
+}
+#else
 void fn_80011CF0(void) {
     extern void fn_80103FE4();
     extern void fn_801040A0();
@@ -971,8 +1047,15 @@ void fn_80011CF0(void) {
     }
     return;
 }
+#endif
 
 /* 0x80011D9C | 0xCC */
+extern void fn_80103F74();
+#if 1
+asm void fn_80011D9C(void) {
+#include "src/game/gs_npc_interact_fn_80011D9C.inc"
+}
+#else
 void fn_80011D9C(void) {
     extern void fn_80103F74();
     extern void fn_80104704();
@@ -1022,6 +1105,7 @@ void fn_80011D9C(void) {
 
     return;
 }
+#endif
 
 /* 0x80011E68 | 0x3C */
 /* Set an NPC's facing direction. */
@@ -1038,6 +1122,35 @@ void fn_80011E68(u32 npcId, u16 direction) {
 }
 
 /* 0x80011EA4 | 0x9B4 -- GSnpc_WarpToLocation continued */
+extern void fn_801091F4();
+extern void fn_8001DACC();
+extern void fn_8010B9E8();
+extern void fn_801F54A4();
+extern void fn_800FA280();
+extern void fn_80104160();
+extern void fn_800D88DC();
+extern void fn_800D888C();
+extern void fn_800D6A00();
+extern void fn_800D7820();
+extern void fn_800D67BC();
+extern void fn_800D61E4();
+extern void fn_800D5BA0();
+extern void fn_800D6728();
+extern void fn_800C46B0();
+extern f64 lbl_8047B730;
+extern f32 lbl_8047B720;
+extern f64 lbl_8047B738;
+extern f32 lbl_8047B718;
+extern f32 lbl_8047B724;
+extern f32 lbl_8047B71C;
+extern f32 lbl_8047B728;
+extern f32 lbl_8047B72C;
+extern u8 lbl_80314E08[];
+#if 1
+asm void fn_80011EA4(void) {
+#include "src/game/gs_npc_interact_fn_80011EA4.inc"
+}
+#else
 void fn_80011EA4(void) {
     extern u8 lbl_80314E08[];
     extern f32 lbl_8047B718;
@@ -1628,3 +1741,431 @@ L_80012758:
 
     return;
 }
+#endif
+
+/* ===== Phase 2 recovery stubs ===== */
+
+/* fn_8000D710 - 0x8000D710 | size: 0x398 */
+extern void fn_8012C540(void);
+extern void fn_80116D30(void);
+extern void fn_8012BCA4(void);
+extern void fn_801D23C0(void);
+extern void fn_800EC918(void);
+extern void fn_800D37CC(void);
+extern void fn_8010206C(void);
+extern void fn_80102014(void);
+extern void fn_801661D0(void);
+extern void fn_800D3074(void);
+extern void fn_801906A0(void);
+extern void fn_800FF560(void);
+extern void fn_80130CD8(void);
+extern void fn_800FE6F8(void);
+extern void fn_800F03D4(void);
+extern void fn_800F07A8(void);
+extern void fn_800FE6DC(void);
+extern void fn_80102510(void);
+extern void fn_800EC8DC(void);
+extern void fn_8001BDF4(void);
+extern void fn_8004BE0C(void);
+extern void fn_80018F88(void);
+extern void fn_80019070(void);
+extern void fn_8012BAD0(void);
+extern void fn_801CBAB8(void);
+extern void fn_80109764(void);
+extern void fn_801660D8(void);
+extern void fn_80102038(void);
+extern void fn_80102428(void);
+extern void fn_8012BBA8(void);
+extern u8 lbl_8047A2A0;
+extern u32 lbl_8047B6F8;
+extern u32 lbl_8047B6F0;
+extern u32 lbl_8047A2A4;
+extern u32 lbl_8047A2A8;
+extern u32 lbl_8047A2AC;
+extern u32 lbl_8047A2B0;
+#if 1
+asm void fn_8000D710(void) {
+#include "src/game/gs_npc_interact_fn_8000D710.inc"
+}
+#else
+void fn_8000D710(void) { /* TODO */ }
+#endif
+
+/* fn_8000DAB0 - 0x8000DAB0 | size: 0x38 */
+extern void fn_8010264C(void);
+extern void fn_800F0384(void);
+extern u32 lbl_8047A2A4;
+extern u32 lbl_8047A2B0;
+extern u32 lbl_8047A2A8;
+#if 1
+asm void fn_8000DAB0(void) {
+#include "src/game/gs_npc_interact_fn_8000DAB0.inc"
+}
+#else
+void fn_8000DAB0(void) { /* TODO */ }
+#endif
+
+/* fn_8000DAE8 - 0x8000DAE8 | size: 0x1a0 */
+extern void fn_8001D834(void);
+extern void fn_800FBB34(void);
+extern u8 lbl_802E4B98[];
+extern u8 lbl_803A1B80[];
+#if 1
+asm void fn_8000DAE8(void) {
+#include "src/game/gs_npc_interact_fn_8000DAE8.inc"
+}
+#else
+void fn_8000DAE8(void) { /* TODO */ }
+#endif
+
+/* fn_8000DC88 - 0x8000DC88 | size: 0x84 */
+extern void fn_80265B74(void);
+extern void fn_801040B8(void);
+extern void fn_8026595C(void);
+#if 1
+asm void fn_8000DC88(void) {
+#include "src/game/gs_npc_interact_fn_8000DC88.inc"
+}
+#else
+void fn_8000DC88(void) { /* TODO */ }
+#endif
+
+/* fn_8000DD0C - 0x8000DD0C | size: 0x24 */
+#if 1
+asm void fn_8000DD0C(void) {
+#include "src/game/gs_npc_interact_fn_8000DD0C.inc"
+}
+#else
+void fn_8000DD0C(void) { /* TODO */ }
+#endif
+
+/* fn_8000DD30 - 0x8000DD30 | size: 0x2c */
+#if 1
+asm void fn_8000DD30(void) {
+#include "src/game/gs_npc_interact_fn_8000DD30.inc"
+}
+#else
+void fn_8000DD30(void) { /* TODO */ }
+#endif
+
+/* fn_8000DD5C - 0x8000DD5C | size: 0x3c */
+#if 1
+asm void fn_8000DD5C(void) {
+#include "src/game/gs_npc_interact_fn_8000DD5C.inc"
+}
+#else
+void fn_8000DD5C(void) { /* TODO */ }
+#endif
+
+/* fn_8000DD98 - 0x8000DD98 | size: 0x24 */
+#if 1
+asm void fn_8000DD98(void) {
+#include "src/game/gs_npc_interact_fn_8000DD98.inc"
+}
+#else
+void fn_8000DD98(void) { /* TODO */ }
+#endif
+
+/* fn_8000DDBC - 0x8000DDBC | size: 0x2c */
+#if 1
+asm void fn_8000DDBC(void) {
+#include "src/game/gs_npc_interact_fn_8000DDBC.inc"
+}
+#else
+void fn_8000DDBC(void) { /* TODO */ }
+#endif
+
+/* fn_8000DDE8 - 0x8000DDE8 | size: 0x3c */
+#if 1
+asm void fn_8000DDE8(void) {
+#include "src/game/gs_npc_interact_fn_8000DDE8.inc"
+}
+#else
+void fn_8000DDE8(void) { /* TODO */ }
+#endif
+
+/* fn_8000DE24 - 0x8000DE24 | size: 0xa0 */
+extern void fn_80102ED4(void);
+#if 1
+asm void fn_8000DE24(void) {
+#include "src/game/gs_npc_interact_fn_8000DE24.inc"
+}
+#else
+void fn_8000DE24(void) { /* TODO */ }
+#endif
+
+/* fn_8000DEC4 - 0x8000DEC4 | size: 0x12c */
+#if 1
+asm void fn_8000DEC4(void) {
+#include "src/game/gs_npc_interact_fn_8000DEC4.inc"
+}
+#else
+void fn_8000DEC4(void) { /* TODO */ }
+#endif
+
+/* fn_8000DFF0 - 0x8000DFF0 | size: 0x214 */
+extern void fn_80105624(void);
+#if 1
+asm void fn_8000DFF0(void) {
+#include "src/game/gs_npc_interact_fn_8000DFF0.inc"
+}
+#else
+void fn_8000DFF0(void) { /* TODO */ }
+#endif
+
+/* fn_8000E204 - 0x8000E204 | size: 0x88 */
+extern void fn_8005D8B8(void);
+extern void fn_801022B8(void);
+#if 1
+asm void fn_8000E204(void) {
+#include "src/game/gs_npc_interact_fn_8000E204.inc"
+}
+#else
+void fn_8000E204(void) { /* TODO */ }
+#endif
+
+/* fn_8000E28C - 0x8000E28C | size: 0x4 */
+#if 1
+asm void fn_8000E28C(void) {
+#include "src/game/gs_npc_interact_fn_8000E28C.inc"
+}
+#else
+void fn_8000E28C(void) { /* TODO */ }
+#endif
+
+/* fn_8000EA10 - 0x8000EA10 | size: 0x324 */
+extern void fn_801F2A7C(void);
+extern void fn_801F986C(void);
+extern void fn_8012640C(void);
+extern void fn_80123FBC(void);
+extern void fn_8001D624(void);
+extern void jumptable_802E4C20();
+#if 1
+asm void fn_8000EA10(void) {
+#include "src/game/gs_npc_interact_fn_8000EA10.inc"
+}
+#else
+void fn_8000EA10(void) { /* TODO */ }
+#endif
+
+/* fn_8000ED34 - 0x8000ED34 | size: 0x5dc */
+extern void fn_80102254(void);
+extern void fn_800F7920(void);
+extern void fn_800F7994(void);
+extern void fn_800CE2D8(void);
+extern u32 lbl_8047B710;
+extern u32 lbl_8047B700;
+extern u32 lbl_8047B704;
+extern u32 lbl_8047B708;
+extern u8 lbl_8047885C[];
+#if 1
+asm void fn_8000ED34(void) {
+#include "src/game/gs_npc_interact_fn_8000ED34.inc"
+}
+#else
+void fn_8000ED34(void) { /* TODO */ }
+#endif
+
+/* fn_8000F310 - 0x8000F310 | size: 0x4c */
+#if 1
+asm void fn_8000F310(void) {
+#include "src/game/gs_npc_interact_fn_8000F310.inc"
+}
+#else
+void fn_8000F310(void) { /* TODO */ }
+#endif
+
+/* fn_8000F35C - 0x8000F35C | size: 0xa4 */
+extern void jumptable_802E4C80();
+#if 1
+asm void fn_8000F35C(void) {
+#include "src/game/gs_npc_interact_fn_8000F35C.inc"
+}
+#else
+void fn_8000F35C(void) { /* TODO */ }
+#endif
+
+/* fn_8000F400 - 0x8000F400 | size: 0x368 */
+extern void fn_80205B8C(void);
+extern void fn_8011BEB4(void);
+extern void fn_800FB8C8(void);
+extern void jumptable_802E4CA8();
+#if 1
+asm void fn_8000F400(void) {
+#include "src/game/gs_npc_interact_fn_8000F400.inc"
+}
+#else
+void fn_8000F400(void) { /* TODO */ }
+#endif
+
+/* fn_8000F768 - 0x8000F768 | size: 0x1fc */
+extern void jumptable_802E4CD8();
+#if 1
+asm void fn_8000F768(void) {
+#include "src/game/gs_npc_interact_fn_8000F768.inc"
+}
+#else
+void fn_8000F768(void) { /* TODO */ }
+#endif
+
+/* fn_8000F964 - 0x8000F964 | size: 0x474 */
+extern u32 lbl_8047B710;
+extern u32 lbl_8047B700;
+extern u32 lbl_8047B704;
+extern u32 lbl_8047B708;
+extern u8 lbl_80478858[];
+#if 1
+asm void fn_8000F964(void) {
+#include "src/game/gs_npc_interact_fn_8000F964.inc"
+}
+#else
+void fn_8000F964(void) { /* TODO */ }
+#endif
+
+/* fn_8000FDD8 - 0x8000FDD8 | size: 0x60 */
+extern void fn_80103FFC(void);
+extern void* memcpy(void* dst, const void* src, u32 n);
+#if 1
+asm void fn_8000FDD8(void) {
+#include "src/game/gs_npc_interact_fn_8000FDD8.inc"
+}
+#else
+void fn_8000FDD8(void) { /* TODO */ }
+#endif
+
+/* fn_8000FE38 - 0x8000FE38 | size: 0x118 */
+#if 1
+asm void fn_8000FE38(void) {
+#include "src/game/gs_npc_interact_fn_8000FE38.inc"
+}
+#else
+void fn_8000FE38(void) { /* TODO */ }
+#endif
+
+/* fn_8000FF50 - 0x8000FF50 | size: 0x58 */
+#if 1
+asm void fn_8000FF50(void) {
+#include "src/game/gs_npc_interact_fn_8000FF50.inc"
+}
+#else
+void fn_8000FF50(void) { /* TODO */ }
+#endif
+
+/* fn_8000FFA8 - 0x8000FFA8 | size: 0x118 */
+extern void jumptable_802E4D2C();
+#if 1
+asm void fn_8000FFA8(void) {
+#include "src/game/gs_npc_interact_fn_8000FFA8.inc"
+}
+#else
+void fn_8000FFA8(void) { /* TODO */ }
+#endif
+
+/* fn_800100C0 - 0x800100C0 | size: 0x68 */
+#if 1
+asm void fn_800100C0(void) {
+#include "src/game/gs_npc_interact_fn_800100C0.inc"
+}
+#else
+void fn_800100C0(void) { /* TODO */ }
+#endif
+
+/* fn_80010128 - 0x80010128 | size: 0x16c */
+extern void fn_801FFEC8(void);
+extern void fn_802040E8(void);
+#if 1
+asm void fn_80010128(void) {
+#include "src/game/gs_npc_interact_fn_80010128.inc"
+}
+#else
+void fn_80010128(void) { /* TODO */ }
+#endif
+
+/* fn_80010294 - 0x80010294 | size: 0x1e8 */
+extern void fn_80104530(void);
+#if 1
+asm void fn_80010294(void) {
+#include "src/game/gs_npc_interact_fn_80010294.inc"
+}
+#else
+void fn_80010294(void) { /* TODO */ }
+#endif
+
+/* fn_8001047C - 0x8001047C | size: 0x10c */
+#if 1
+asm void fn_8001047C(void) {
+#include "src/game/gs_npc_interact_fn_8001047C.inc"
+}
+#else
+void fn_8001047C(void) { /* TODO */ }
+#endif
+
+/* fn_80010588 - 0x80010588 | size: 0x11c */
+#if 1
+asm void fn_80010588(void) {
+#include "src/game/gs_npc_interact_fn_80010588.inc"
+}
+#else
+void fn_80010588(void) { /* TODO */ }
+#endif
+
+/* fn_800106A4 - 0x800106A4 | size: 0x1a0 */
+#if 1
+asm void fn_800106A4(void) {
+#include "src/game/gs_npc_interact_fn_800106A4.inc"
+}
+#else
+void fn_800106A4(void) { /* TODO */ }
+#endif
+
+/* fn_80010844 - 0x80010844 | size: 0x15c */
+extern void fn_80123C54(void);
+extern void fn_801204A8(void);
+#if 1
+asm void fn_80010844(void) {
+#include "src/game/gs_npc_interact_fn_80010844.inc"
+}
+#else
+void fn_80010844(void) { /* TODO */ }
+#endif
+
+/* fn_800109A0 - 0x800109A0 | size: 0x190 */
+extern u8 lbl_80478850[];
+#if 1
+asm void fn_800109A0(void) {
+#include "src/game/gs_npc_interact_fn_800109A0.inc"
+}
+#else
+void fn_800109A0(void) { /* TODO */ }
+#endif
+
+/* fn_80010B30 - 0x80010B30 | size: 0x168 */
+extern void fn_801046C8(void);
+#if 1
+asm void fn_80010B30(void) {
+#include "src/game/gs_npc_interact_fn_80010B30.inc"
+}
+#else
+void fn_80010B30(void) { /* TODO */ }
+#endif
+
+/* fn_80010C98 - 0x80010C98 | size: 0x52c */
+extern void fn_80207BF4(void);
+extern void fn_801F8C00(void);
+extern void fn_80203848(void);
+extern void fn_800DD970(void);
+extern u8 lbl_80266788[];
+extern u8 lbl_802E4B78[];
+#if 1
+asm void fn_80010C98(void) {
+#include "src/game/gs_npc_interact_fn_80010C98.inc"
+}
+#else
+void fn_80010C98(void) { /* TODO */ }
+#endif
+
+/* fn_8001120C - 0x8001120C | size: 0x7c -- already decompiled above */
+/* fn_800119A8 - 0x800119A8 | size: 0x74 -- already decompiled above */
+/* fn_80011B4C - 0x80011B4C | size: 0x78 -- already decompiled above */
+/* fn_80011C78 - 0x80011C78 | size: 0x78 -- already decompiled above */
+
