@@ -8,6 +8,9 @@
  */
 
 extern void __destroy_global_chain(void);
+extern void PPCHalt(void);
+typedef void (*FuncPtr)(void);
+extern FuncPtr _ctors[];
 
 /*
  * This pointer is placed in the .dtors section. The CRT iterates
@@ -21,3 +24,18 @@ extern void __destroy_global_chain(void);
 #pragma section ".dtors$10"
 __declspec(section ".dtors$10") void (*const __destroy_global_chain_reference)(void) =
     __destroy_global_chain;
+
+#if 1
+asm void __init_cpp(void) {
+#include "src/crt/__init_cpp_exceptions___init_cpp.inc"
+}
+#else
+void __init_cpp(void) { /* TODO */ }
+#endif
+#if 1
+asm void _ExitProcess(void) {
+#include "src/crt/__init_cpp_exceptions__ExitProcess.inc"
+}
+#else
+void _ExitProcess(void) { /* TODO */ }
+#endif
