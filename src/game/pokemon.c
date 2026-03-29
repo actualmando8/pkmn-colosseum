@@ -352,6 +352,14 @@ extern u32 lbl_8047B5F0;
 u16 fn_801F6720(u8* ptr);
 u32 fn_801F6600(u8* ptr);
 u32 fn_801F66EC(u8* ptr, u8 idx);
+
+/* Forward declarations for functions referenced by fn_801F54A4 asm wrapper */
+u8* fn_801F6544(u8* ptr);
+u32 fn_801F6588(u8* ptr, u16 idx);
+u8* fn_801F6AB4(u8* ptr, u16 idx);
+u8* fn_801F6B18(u8* ptr, u16 idx);
+u32 fn_801F7258(u32 param_1);
+u32 fn_801F7404(u32 param_1);
 void fn_801F025C(void);
 void fn_801F02AC(void);
 void fn_801F2B5C(void);
