@@ -138,3 +138,34 @@ void HSD_AObjFree(HSD_AObj* aobj)
         HSD_Free(aobj);
     }
 }
+
+/* 0x801920E4 | 0x1664 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void OSReport(const char* fmt, ...);
+extern void fn_800CD85C(void);
+extern void fn_800CDBE0(void);
+extern void fn_800CE148(void);
+extern void fn_800CE220(void);
+extern void fn_800CE298(void);
+extern void fn_800CE2B8(void);
+extern void fn_800CE2D8(void);
+extern void fn_800CE2F8(void);
+extern void fn_800CE318(void);
+extern void fn_800CE338(void);
+extern void fn_800CE358(void);
+extern void fn_80196D78(void);
+extern void fn_80196E10(void);
+extern void fn_801A3E64(void);
+extern void fn_801A3EB4(void);
+extern void fn_801ADC3C(void);
+extern void fn_801ADC7C(void);
+#if 1
+asm void fn_801920E4(void) {
+#include "src/hsd/hsd_aobj_fn_801920E4.inc"
+}
+#else
+void fn_801920E4(void) { /* TODO */ }
+#endif
+#pragma pop
