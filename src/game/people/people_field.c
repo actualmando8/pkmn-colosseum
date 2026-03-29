@@ -533,7 +533,7 @@ extern void  fn_801429E8(void* entry);  /* peopleFieldGetEntry */
 extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 
 /* Script system */
-extern void  fn_801621BC(void* param);  /* peopleFieldUtilDispatch */
+extern void  fn_801621BC(void);  /* peopleFieldUtilDispatch - same-TU asm wrapper */
 
 /* ===================================================================
  * All functions in this module are listed above in the MODULE MAP.
@@ -556,20 +556,30 @@ asm void fn_8015211C(void) {
 #else
 void fn_8015211C(void) {}
 #endif
-#if 1
+#if 0
 asm void fn_801521A8(void) {
 #include "src/game/people/people_field_fn_801521A8.inc"
 }
 #else
-void fn_801521A8(void) {}
+s32 fn_801521A8(u16* a, u16* b) {
+    return (s32)(a[0]) - (s32)(b[0]);
+}
 #endif
+extern void _savegpr_20(void);
+extern void _restgpr_20(void);
+extern void _savegpr_23(void);
+extern void _restgpr_23(void);
+extern void _savegpr_24(void);
+extern void _restgpr_24(void);
+extern void _savegpr_25(void);
+extern void _restgpr_25(void);
 extern void _savegpr_27(void);
 extern void _restgpr_27(void);
 extern u8 lbl_80445EF8[];
 extern u8 lbl_8043CCF8[];
 extern u32 lbl_8047AF88;
 extern u32 lbl_8047AF84;
-extern u32 lbl_8047AFAA;
+extern u16 lbl_8047AFAA;
 #if 1
 asm void fn_801521B8(void) {
 #include "src/game/people/people_field_fn_801521B8.inc"
@@ -577,52 +587,77 @@ asm void fn_801521B8(void) {
 #else
 void fn_801521B8(void) {}
 #endif
-#if 1
+#if 0
 asm void fn_801522E0(void) {
 #include "src/game/people/people_field_fn_801522E0.inc"
 }
 #else
-void fn_801522E0(void) {}
+s32 fn_801522E0(u16* a, u16* b) {
+    return (s32)(a[2]) - (s32)(b[2]);
+}
 #endif
 extern u8 lbl_80438CF8[];
 extern u8 lbl_8047AF7C[];
-extern u32 lbl_8047AFA8;
+extern u16 lbl_8047AFA8;
 extern u32 lbl_8047AF78;
 #if 1
 asm void fn_801522F0(void) {
 #include "src/game/people/people_field_fn_801522F0.inc"
 }
 #else
-void fn_801522F0(void) {}
+u32 fn_801522F0(u16 key) {
+    void* result;
+    *(u16*)(lbl_8047AF7C + 4) = key;
+    result = fn_80162118(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
+    lbl_8047AF78 = (u32)result;
+    if (result == NULL) return 0;
+    return *(u32*)result;
+}
 #endif
 extern u8 lbl_804378F8[];
 extern u8 lbl_8047AF70[];
-extern u32 lbl_8047AFA6;
+extern u16 lbl_8047AFA6;
 extern u32 lbl_8047AF6C;
 #if 1
 asm void fn_8015234C(void) {
 #include "src/game/people/people_field_fn_8015234C.inc"
 }
 #else
-void fn_8015234C(void) {}
+u32 fn_8015234C(u16 key) {
+    /* calls fn_80162118 (same-TU asm) - cannot be matched with C */
+    void* result;
+    *(u16*)(lbl_8047AF70 + 4) = key;
+    result = 0;
+    lbl_8047AF6C = (u32)result;
+    if (result == NULL) return 0;
+    return *(u32*)result;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801523A8(void) {
 #include "src/game/people/people_field_fn_801523A8.inc"
 }
 #else
-void fn_801523A8(void) {}
+s32 fn_801523A8(u16* a, u16* b) {
+    return (s32)(a[2]) - (s32)(b[2]);
+}
 #endif
 extern u8 lbl_80445F18[];
 extern u8 lbl_804380F8[];
-extern u32 lbl_8047AFA4;
+extern u16 lbl_8047AFA4;
 extern u32 lbl_8047AF68;
 #if 1
 asm void fn_801523B8(void) {
 #include "src/game/people/people_field_fn_801523B8.inc"
 }
 #else
-void fn_801523B8(void) {}
+u32 fn_801523B8(u16 key, u16* out) {
+    /* calls fn_80162118 (same-TU asm) - cannot be matched with C */
+    void* result;
+    *(u16*)(lbl_80445F18 + 4) = key;
+    (void)out;
+    return 0;
+}
 #endif
 
 extern void fn_80160F10(void);
@@ -704,32 +739,1184 @@ asm void fn_80154A14(void) {
 void fn_80154A14(void) {}
 #endif
 
-extern void fn_80161134(void);
-#if 1
+extern u32 fn_80161134(u8* obj, u8* motionBase, u32 p1, u32 p2);
+#if 0
 asm void fn_8016161C(void) {
 #include "src/game/people/people_field_fn_8016161C.inc"
 }
 #else
-void fn_8016161C(void) {}
+/* If flags bit 30 (0x2) is CLEAR: return halfword at 0x25c.
+ * If SET: clear bit 30, call fn_80161134 with motion data, return its result. */
+u32 fn_8016161C(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x2)) {
+        return *(u16*)(obj + 0x25c);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x2u;
+    return fn_80161134(obj, obj + 0x23c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#if 1
+#if 0
 asm void fn_80161664(void) {
 #include "src/game/people/people_field_fn_80161664.inc"
 }
 #else
-void fn_80161664(void) {}
+/* bit 29 (0x4), offset 0x280, motion at 0x260 */
+u32 fn_80161664(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x4)) {
+        return *(u16*)(obj + 0x280);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x4u;
+    return fn_80161134(obj, obj + 0x260, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#if 1
+#if 0
 asm void fn_801616AC(void) {
 #include "src/game/people/people_field_fn_801616AC.inc"
 }
 #else
-void fn_801616AC(void) {}
+/* bit 28 (0x8), offset 0x2a4, motion at 0x284 */
+u32 fn_801616AC(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x8)) {
+        return *(u16*)(obj + 0x2a4);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x8u;
+    return fn_80161134(obj, obj + 0x284, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#if 1
+#if 0
 asm void fn_801616F4(void) {
 #include "src/game/people/people_field_fn_801616F4.inc"
 }
 #else
-void fn_801616F4(void) {}
+/* bit 27 (0x10), offset 0x2c8, motion at 0x2a8 */
+u32 fn_801616F4(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x10)) {
+        return *(u16*)(obj + 0x2c8);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x10u;
+    return fn_80161134(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016173C(void) {
+#include "src/game/people/people_field_fn_8016173C.inc"
+}
+#else
+void fn_8016173C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80161784(void) {
+#include "src/game/people/people_field_fn_80161784.inc"
+}
+#else
+void fn_80161784(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801617CC(void) {
+#include "src/game/people/people_field_fn_801617CC.inc"
+}
+#else
+void fn_801617CC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80161814(void) {
+#include "src/game/people/people_field_fn_80161814.inc"
+}
+#else
+void fn_80161814(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016185C(void) {
+#include "src/game/people/people_field_fn_8016185C.inc"
+}
+#else
+void fn_8016185C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801618A4(void) {
+#include "src/game/people/people_field_fn_801618A4.inc"
+}
+#else
+void fn_801618A4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801618EC(void) {
+#include "src/game/people/people_field_fn_801618EC.inc"
+}
+#else
+void fn_801618EC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801619E8(void) {
+#include "src/game/people/people_field_fn_801619E8.inc"
+}
+#else
+void fn_801619E8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80161D20(void) {
+#include "src/game/people/people_field_fn_80161D20.inc"
+}
+#else
+void fn_80161D20(void) { /* TODO */ }
+#endif
+#pragma pop
+extern void fn_80160BDC(void);
+extern void fn_801603C0(void);
+extern void fn_8015A484(void);
+extern void fn_8015A870(void);
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80161D90(void) {
+#include "src/game/people/people_field_fn_80161D90.inc"
+}
+#else
+void fn_80161D90(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80161E8C(void) {
+#include "src/game/people/people_field_fn_80161E8C.inc"
+}
+#else
+void fn_80161E8C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162070(void) {
+#include "src/game/people/people_field_fn_80162070.inc"
+}
+#else
+void fn_80162070(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016208C(void) {
+#include "src/game/people/people_field_fn_8016208C.inc"
+}
+#else
+void fn_8016208C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162118(void) {
+#include "src/game/people/people_field_fn_80162118.inc"
+}
+#else
+void fn_80162118(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801621BC(void) {
+#include "src/game/people/people_field_fn_801621BC.inc"
+}
+#else
+void fn_801621BC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801621CC(void) {
+#include "src/game/people/people_field_fn_801621CC.inc"
+}
+#else
+void fn_801621CC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162370(void) {
+#include "src/game/people/people_field_fn_80162370.inc"
+}
+#else
+void fn_80162370(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162428(void) {
+#include "src/game/people/people_field_fn_80162428.inc"
+}
+#else
+void fn_80162428(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016245C(void) {
+#include "src/game/people/people_field_fn_8016245C.inc"
+}
+#else
+void fn_8016245C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162464(void) {
+#include "src/game/people/people_field_fn_80162464.inc"
+}
+#else
+void fn_80162464(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016246C(void) {
+#include "src/game/people/people_field_fn_8016246C.inc"
+}
+#else
+void fn_8016246C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016248C(void) {
+#include "src/game/people/people_field_fn_8016248C.inc"
+}
+#else
+void fn_8016248C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162494(void) {
+#include "src/game/people/people_field_fn_80162494.inc"
+}
+#else
+void fn_80162494(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801624A8(void) {
+#include "src/game/people/people_field_fn_801624A8.inc"
+}
+#else
+void fn_801624A8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016265C(void) {
+#include "src/game/people/people_field_fn_8016265C.inc"
+}
+#else
+void fn_8016265C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801626AC(void) {
+#include "src/game/people/people_field_fn_801626AC.inc"
+}
+#else
+void fn_801626AC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162858(void) {
+#include "src/game/people/people_field_fn_80162858.inc"
+}
+#else
+void fn_80162858(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162878(void) {
+#include "src/game/people/people_field_fn_80162878.inc"
+}
+#else
+void fn_80162878(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016288C(void) {
+#include "src/game/people/people_field_fn_8016288C.inc"
+}
+#else
+void fn_8016288C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801628A0(void) {
+#include "src/game/people/people_field_fn_801628A0.inc"
+}
+#else
+void fn_801628A0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801628B4(void) {
+#include "src/game/people/people_field_fn_801628B4.inc"
+}
+#else
+void fn_801628B4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801628C8(void) {
+#include "src/game/people/people_field_fn_801628C8.inc"
+}
+#else
+void fn_801628C8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162904(void) {
+#include "src/game/people/people_field_fn_80162904.inc"
+}
+#else
+void fn_80162904(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016292C(void) {
+#include "src/game/people/people_field_fn_8016292C.inc"
+}
+#else
+void fn_8016292C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801629A4(void) {
+#include "src/game/people/people_field_fn_801629A4.inc"
+}
+#else
+void fn_801629A4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801629D0(void) {
+#include "src/game/people/people_field_fn_801629D0.inc"
+}
+#else
+void fn_801629D0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801629FC(void) {
+#include "src/game/people/people_field_fn_801629FC.inc"
+}
+#else
+void fn_801629FC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162A58(void) {
+#include "src/game/people/people_field_fn_80162A58.inc"
+}
+#else
+void fn_80162A58(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162D18(void) {
+#include "src/game/people/people_field_fn_80162D18.inc"
+}
+#else
+void fn_80162D18(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162D44(void) {
+#include "src/game/people/people_field_fn_80162D44.inc"
+}
+#else
+void fn_80162D44(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162D6C(void) {
+#include "src/game/people/people_field_fn_80162D6C.inc"
+}
+#else
+void fn_80162D6C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162D8C(void) {
+#include "src/game/people/people_field_fn_80162D8C.inc"
+}
+#else
+void fn_80162D8C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162DAC(void) {
+#include "src/game/people/people_field_fn_80162DAC.inc"
+}
+#else
+void fn_80162DAC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162DE0(void) {
+#include "src/game/people/people_field_fn_80162DE0.inc"
+}
+#else
+void fn_80162DE0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162E14(void) {
+#include "src/game/people/people_field_fn_80162E14.inc"
+}
+#else
+void fn_80162E14(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162EB8(void) {
+#include "src/game/people/people_field_fn_80162EB8.inc"
+}
+#else
+void fn_80162EB8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162F48(void) {
+#include "src/game/people/people_field_fn_80162F48.inc"
+}
+#else
+void fn_80162F48(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162F68(void) {
+#include "src/game/people/people_field_fn_80162F68.inc"
+}
+#else
+void fn_80162F68(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162F88(void) {
+#include "src/game/people/people_field_fn_80162F88.inc"
+}
+#else
+void fn_80162F88(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162FAC(void) {
+#include "src/game/people/people_field_fn_80162FAC.inc"
+}
+#else
+void fn_80162FAC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80162FB0(void) {
+#include "src/game/people/people_field_fn_80162FB0.inc"
+}
+#else
+void fn_80162FB0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016300C(void) {
+#include "src/game/people/people_field_fn_8016300C.inc"
+}
+#else
+void fn_8016300C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163030(void) {
+#include "src/game/people/people_field_fn_80163030.inc"
+}
+#else
+void fn_80163030(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163050(void) {
+#include "src/game/people/people_field_fn_80163050.inc"
+}
+#else
+void fn_80163050(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801630E4(void) {
+#include "src/game/people/people_field_fn_801630E4.inc"
+}
+#else
+void fn_801630E4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163104(void) {
+#include "src/game/people/people_field_fn_80163104.inc"
+}
+#else
+void fn_80163104(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163188(void) {
+#include "src/game/people/people_field_fn_80163188.inc"
+}
+#else
+void fn_80163188(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801631A8(void) {
+#include "src/game/people/people_field_fn_801631A8.inc"
+}
+#else
+void fn_801631A8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801631AC(void) {
+#include "src/game/people/people_field_fn_801631AC.inc"
+}
+#else
+void fn_801631AC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801631C0(void) {
+#include "src/game/people/people_field_fn_801631C0.inc"
+}
+#else
+void fn_801631C0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801631CC(void) {
+#include "src/game/people/people_field_fn_801631CC.inc"
+}
+#else
+void fn_801631CC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801631F4(void) {
+#include "src/game/people/people_field_fn_801631F4.inc"
+}
+#else
+void fn_801631F4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163214(void) {
+#include "src/game/people/people_field_fn_80163214.inc"
+}
+#else
+void fn_80163214(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801632B4(void) {
+#include "src/game/people/people_field_fn_801632B4.inc"
+}
+#else
+void fn_801632B4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163490(void) {
+#include "src/game/people/people_field_fn_80163490.inc"
+}
+#else
+void fn_80163490(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801634A8(void) {
+#include "src/game/people/people_field_fn_801634A8.inc"
+}
+#else
+void fn_801634A8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163794(void) {
+#include "src/game/people/people_field_fn_80163794.inc"
+}
+#else
+void fn_80163794(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163798(void) {
+#include "src/game/people/people_field_fn_80163798.inc"
+}
+#else
+void fn_80163798(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801637B8(void) {
+#include "src/game/people/people_field_fn_801637B8.inc"
+}
+#else
+void fn_801637B8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163810(void) {
+#include "src/game/people/people_field_fn_80163810.inc"
+}
+#else
+void fn_80163810(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163BCC(void) {
+#include "src/game/people/people_field_fn_80163BCC.inc"
+}
+#else
+void fn_80163BCC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163BE4(void) {
+#include "src/game/people/people_field_fn_80163BE4.inc"
+}
+#else
+void fn_80163BE4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163CA8(void) {
+#include "src/game/people/people_field_fn_80163CA8.inc"
+}
+#else
+void fn_80163CA8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163DB0(void) {
+#include "src/game/people/people_field_fn_80163DB0.inc"
+}
+#else
+void fn_80163DB0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163DE8(void) {
+#include "src/game/people/people_field_fn_80163DE8.inc"
+}
+#else
+void fn_80163DE8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163EE0(void) {
+#include "src/game/people/people_field_fn_80163EE0.inc"
+}
+#else
+void fn_80163EE0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163F88(void) {
+#include "src/game/people/people_field_fn_80163F88.inc"
+}
+#else
+void fn_80163F88(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163F98(void) {
+#include "src/game/people/people_field_fn_80163F98.inc"
+}
+#else
+void fn_80163F98(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80163FFC(void) {
+#include "src/game/people/people_field_fn_80163FFC.inc"
+}
+#else
+void fn_80163FFC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801640C4(void) {
+#include "src/game/people/people_field_fn_801640C4.inc"
+}
+#else
+void fn_801640C4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801640E4(void) {
+#include "src/game/people/people_field_fn_801640E4.inc"
+}
+#else
+void fn_801640E4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164118(void) {
+#include "src/game/people/people_field_fn_80164118.inc"
+}
+#else
+void fn_80164118(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164148(void) {
+#include "src/game/people/people_field_fn_80164148.inc"
+}
+#else
+void fn_80164148(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164204(void) {
+#include "src/game/people/people_field_fn_80164204.inc"
+}
+#else
+void fn_80164204(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164238(void) {
+#include "src/game/people/people_field_fn_80164238.inc"
+}
+#else
+void fn_80164238(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801642AC(void) {
+#include "src/game/people/people_field_fn_801642AC.inc"
+}
+#else
+void fn_801642AC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801642F8(void) {
+#include "src/game/people/people_field_fn_801642F8.inc"
+}
+#else
+void fn_801642F8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164324(void) {
+#include "src/game/people/people_field_fn_80164324.inc"
+}
+#else
+void fn_80164324(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164328(void) {
+#include "src/game/people/people_field_fn_80164328.inc"
+}
+#else
+void fn_80164328(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164360(void) {
+#include "src/game/people/people_field_fn_80164360.inc"
+}
+#else
+void fn_80164360(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164398(void) {
+#include "src/game/people/people_field_fn_80164398.inc"
+}
+#else
+void fn_80164398(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801643B8(void) {
+#include "src/game/people/people_field_fn_801643B8.inc"
+}
+#else
+void fn_801643B8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801643D8(void) {
+#include "src/game/people/people_field_fn_801643D8.inc"
+}
+#else
+void fn_801643D8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164400(void) {
+#include "src/game/people/people_field_fn_80164400.inc"
+}
+#else
+void fn_80164400(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8016442C(void) {
+#include "src/game/people/people_field_fn_8016442C.inc"
+}
+#else
+void fn_8016442C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164488(void) {
+#include "src/game/people/people_field_fn_80164488.inc"
+}
+#else
+void fn_80164488(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801644E0(void) {
+#include "src/game/people/people_field_fn_801644E0.inc"
+}
+#else
+void fn_801644E0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164520(void) {
+#include "src/game/people/people_field_fn_80164520.inc"
+}
+#else
+void fn_80164520(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164A2C(void) {
+#include "src/game/people/people_field_fn_80164A2C.inc"
+}
+#else
+void fn_80164A2C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164C40(void) {
+#include "src/game/people/people_field_fn_80164C40.inc"
+}
+#else
+void fn_80164C40(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80164DD0(void) {
+#include "src/game/people/people_field_fn_80164DD0.inc"
+}
+#else
+void fn_80164DD0(void) { /* TODO */ }
+#endif
+#pragma pop
