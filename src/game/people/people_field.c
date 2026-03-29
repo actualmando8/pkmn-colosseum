@@ -504,6 +504,9 @@ extern void  OSRestoreInterrupts(u32 level);
 extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
 
+/* External functions referenced from asm wrappers */
+extern void fn_80164488(void);
+
 /* Model system */
 extern void  fn_800EE150(void* model, u32 param);
 extern void  fn_800EE828(void* model, u32 param);
@@ -537,3 +540,196 @@ extern void  fn_801621BC(void* param);  /* peopleFieldUtilDispatch */
  * The asm files in build/GC6E01/asm/ remain the authoritative
  * implementation until each function is individually decompiled.
  * =================================================================== */
+
+extern void fn_8015210C(void);
+extern void fn_80162118(void);
+extern u8 lbl_8043D6F8[];
+extern u32 lbl_8047AF98;
+extern u8 lbl_8047AF90[];
+extern u8 lbl_8043DEF8[];
+extern u32 lbl_8047AF9C;
+extern u32 lbl_8047AF8C;
+#if 1
+asm void fn_8015211C(void) {
+#include "src/game/people/people_field_fn_8015211C.inc"
+}
+#else
+void fn_8015211C(void) {}
+#endif
+#if 1
+asm void fn_801521A8(void) {
+#include "src/game/people/people_field_fn_801521A8.inc"
+}
+#else
+void fn_801521A8(void) {}
+#endif
+extern void _savegpr_27(void);
+extern void _restgpr_27(void);
+extern u8 lbl_80445EF8[];
+extern u8 lbl_8043CCF8[];
+extern u32 lbl_8047AF88;
+extern u32 lbl_8047AF84;
+extern u32 lbl_8047AFAA;
+#if 1
+asm void fn_801521B8(void) {
+#include "src/game/people/people_field_fn_801521B8.inc"
+}
+#else
+void fn_801521B8(void) {}
+#endif
+#if 1
+asm void fn_801522E0(void) {
+#include "src/game/people/people_field_fn_801522E0.inc"
+}
+#else
+void fn_801522E0(void) {}
+#endif
+extern u8 lbl_80438CF8[];
+extern u8 lbl_8047AF7C[];
+extern u32 lbl_8047AFA8;
+extern u32 lbl_8047AF78;
+#if 1
+asm void fn_801522F0(void) {
+#include "src/game/people/people_field_fn_801522F0.inc"
+}
+#else
+void fn_801522F0(void) {}
+#endif
+extern u8 lbl_804378F8[];
+extern u8 lbl_8047AF70[];
+extern u32 lbl_8047AFA6;
+extern u32 lbl_8047AF6C;
+#if 1
+asm void fn_8015234C(void) {
+#include "src/game/people/people_field_fn_8015234C.inc"
+}
+#else
+void fn_8015234C(void) {}
+#endif
+#if 1
+asm void fn_801523A8(void) {
+#include "src/game/people/people_field_fn_801523A8.inc"
+}
+#else
+void fn_801523A8(void) {}
+#endif
+extern u8 lbl_80445F18[];
+extern u8 lbl_804380F8[];
+extern u32 lbl_8047AFA4;
+extern u32 lbl_8047AF68;
+#if 1
+asm void fn_801523B8(void) {
+#include "src/game/people/people_field_fn_801523B8.inc"
+}
+#else
+void fn_801523B8(void) {}
+#endif
+
+extern void fn_80160F10(void);
+#if 1
+asm void fn_80153FEC(void) {
+#include "src/game/people/people_field_fn_80153FEC.inc"
+}
+#else
+void fn_80153FEC(void) {}
+#endif
+#if 1
+asm void fn_801540F0(void) {
+#include "src/game/people/people_field_fn_801540F0.inc"
+}
+#else
+void fn_801540F0(void) {}
+#endif
+#if 1
+asm void fn_801541F4(void) {
+#include "src/game/people/people_field_fn_801541F4.inc"
+}
+#else
+void fn_801541F4(void) {}
+#endif
+#if 1
+asm void fn_801542F8(void) {
+#include "src/game/people/people_field_fn_801542F8.inc"
+}
+#else
+void fn_801542F8(void) {}
+#endif
+#if 1
+asm void fn_801543FC(void) {
+#include "src/game/people/people_field_fn_801543FC.inc"
+}
+#else
+void fn_801543FC(void) {}
+#endif
+#if 1
+asm void fn_80154500(void) {
+#include "src/game/people/people_field_fn_80154500.inc"
+}
+#else
+void fn_80154500(void) {}
+#endif
+#if 1
+asm void fn_80154604(void) {
+#include "src/game/people/people_field_fn_80154604.inc"
+}
+#else
+void fn_80154604(void) {}
+#endif
+#if 1
+asm void fn_80154708(void) {
+#include "src/game/people/people_field_fn_80154708.inc"
+}
+#else
+void fn_80154708(void) {}
+#endif
+#if 1
+asm void fn_8015480C(void) {
+#include "src/game/people/people_field_fn_8015480C.inc"
+}
+#else
+void fn_8015480C(void) {}
+#endif
+#if 1
+asm void fn_80154910(void) {
+#include "src/game/people/people_field_fn_80154910.inc"
+}
+#else
+void fn_80154910(void) {}
+#endif
+#if 1
+asm void fn_80154A14(void) {
+#include "src/game/people/people_field_fn_80154A14.inc"
+}
+#else
+void fn_80154A14(void) {}
+#endif
+
+extern void fn_80161134(void);
+#if 1
+asm void fn_8016161C(void) {
+#include "src/game/people/people_field_fn_8016161C.inc"
+}
+#else
+void fn_8016161C(void) {}
+#endif
+#if 1
+asm void fn_80161664(void) {
+#include "src/game/people/people_field_fn_80161664.inc"
+}
+#else
+void fn_80161664(void) {}
+#endif
+#if 1
+asm void fn_801616AC(void) {
+#include "src/game/people/people_field_fn_801616AC.inc"
+}
+#else
+void fn_801616AC(void) {}
+#endif
+#if 1
+asm void fn_801616F4(void) {
+#include "src/game/people/people_field_fn_801616F4.inc"
+}
+#else
+void fn_801616F4(void) {}
+#endif

@@ -69,6 +69,12 @@ static void __VIRetraceHandler(__OSInterrupt interrupt, OSContext* context);
 static void setInterruptRegs(void);
 static void setScalingRegs(u16 panelWidth, u16 dispWidth);
 
+/* Forward declarations for asm wrappers (used before definition in same TU) */
+extern void fn_800AB5B4(s32 spec);
+extern void fn_800AB614(void);
+extern void fn_800AB788(void);
+extern void fn_800AB8FC(void);
+
 /*
  * fn_800AA498 - __VIGetCurrentLine or helper.
  * 0x800AA498 | size: 0x3C
@@ -320,23 +326,32 @@ static void setScalingRegs(u16 panelWidth, u16 dispWidth) {
 /* ========================================================== */
 
 /* fn_800AA498 - 0x800AA498 | size: 0x3C */
-void fn_800AA498(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    OSDisableInterrupts();
-    r4 = 0xCC000000;
-    tmp = *(u16*)((u8*)r4 + 0x206E);
-    r31 = tmp & 0x3;
-    OSRestoreInterrupts(r3);
-    r3 = r31 & 0x1;
-    return;
+#if 0
+asm void fn_800AA498(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA498.inc"
 }
+#else
+u32 fn_800AA498(void) {
+    BOOL enabled;
+    u32 val;
+
+    enabled = OSDisableInterrupts();
+    val = *(volatile u16*)0xCC00206E & 0x3;
+    OSRestoreInterrupts(enabled);
+    return val & 0x1;
+}
+#endif
 
 /* fn_800AA4D4 - 0x800AA4D4 | size: 0x1A4 */
+extern u32 SIGetType(s32 chan);
+extern u8 lbl_803FC5E0[];
+extern u32 lbl_80478A14;
+extern u32 lbl_80478A10;
+#if 1
+asm void fn_800AA4D4(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA4D4.inc"
+}
+#else
 void fn_800AA4D4(void) {
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A10;
@@ -445,8 +460,26 @@ L_800AA5FC:
     }
     return;
 }
+#endif
 
 /* fn_800AA678 - 0x800AA678 | size: 0xC4 */
+extern void fn_800D05A4(void);
+extern void fn_800D0338(u32 chan, u32 cmd);
+extern void fn_800D03C8(void);
+extern void fn_800D0CBC(void);
+extern void fn_800AA4D4(void);
+extern void fn_800AA8D4(void);
+extern void* memset(void* dst, int val, u32 n);
+extern u32 lbl_80478A0C;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A14;
+extern u32 lbl_8047A8A8;
+extern u8 lbl_803FC5E0[];
+#if 1
+asm void fn_800AA678(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA678.inc"
+}
+#else
 void fn_800AA678(void) {
     u8 sp[0x30];
     extern u8 lbl_803FC5E0[];
@@ -509,8 +542,20 @@ void fn_800AA678(void) {
     }
     return;
 }
+#endif
 
 /* fn_800AA73C - 0x800AA73C | size: 0xC0 */
+extern void fn_800D0464(u32 mask);
+extern void fn_800A115C(void);
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8B8;
+#if 1
+asm void fn_800AA73C(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA73C.inc"
+}
+#else
 void fn_800AA73C(void) {
     extern u32 lbl_8047A8A4;
     extern u32 lbl_8047A8B0;
@@ -570,8 +615,19 @@ void fn_800AA73C(void) {
     }
     return;
 }
+#endif
 
 /* fn_800AA7FC - 0x800AA7FC | size: 0xD8 */
+extern u32 lbl_80478A0C;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A14;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8A8;
+#if 1
+asm void fn_800AA7FC(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA7FC.inc"
+}
+#else
 void fn_800AA7FC(void) {
     u8 sp[0x30];
     extern u8 lbl_803FC5E0[];
@@ -638,8 +694,25 @@ void fn_800AA7FC(void) {
     }
     return;
 }
+#endif
 
 /* fn_800AA8D4 - 0x800AA8D4 | size: 0x32C */
+extern void SITransfer();
+extern u8 lbl_803FC5D0[];
+extern u32 lbl_80478A0C;
+extern u32 lbl_8047A8AC;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_80478A18;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A14;
+extern u8 lbl_80478A24[];
+extern u8 lbl_80478A20[];
+extern u32 lbl_8047A8B8;
+#if 1
+asm void fn_800AA8D4(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA8D4.inc"
+}
+#else
 void fn_800AA8D4(void) {
     u8 sp[0x30];
     extern u8 lbl_803FC5D0[];
@@ -868,8 +941,18 @@ L_800AAB7C:
 
     return;
 }
+#endif
 
 /* fn_800AAC00 - 0x800AAC00 | size: 0x134 */
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8B8;
+#if 1
+asm void fn_800AAC00(void) {
+#include "src/dolphin/vi/VIFull_fn_800AAC00.inc"
+}
+#else
 void fn_800AAC00(void) {
     extern u8 lbl_803FC5E0[];
     extern u8 lbl_80478A20[];
@@ -967,8 +1050,22 @@ void fn_800AAC00(void) {
 
     return;
 }
+#endif
 
 /* fn_800AAD34 - 0x800AAD34 | size: 0x100 */
+extern u32 lbl_8047A8B8;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_80478A18;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8AC;
+extern u32 lbl_80478A0C;
+#if 1
+asm void fn_800AAD34(void) {
+#include "src/dolphin/vi/VIFull_fn_800AAD34.inc"
+}
+#else
 void fn_800AAD34(void) {
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A0C;
@@ -1046,8 +1143,21 @@ void fn_800AAD34(void) {
     r3 = 0x1;
     return;
 }
+#endif
 
 /* fn_800AAE34 - 0x800AAE34 | size: 0x104 */
+extern u32 lbl_8047A8B8;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8AC;
+extern u32 lbl_80478A0C;
+#if 1
+asm void fn_800AAE34(void) {
+#include "src/dolphin/vi/VIFull_fn_800AAE34.inc"
+}
+#else
 void fn_800AAE34(void) {
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A0C;
@@ -1126,8 +1236,30 @@ void fn_800AAE34(void) {
     r3 = 0x1;
     return;
 }
+#endif
 
 /* fn_800AAF38 - 0x800AAF38 | size: 0x218 */
+extern void fn_800C4C98(void);
+extern void fn_800D104C(void);
+extern void OSRegisterResetFunction();
+extern u32 lbl_8047A8A0;
+extern u32 lbl_80478A08;
+extern u32 lbl_8047AA58;
+extern u32 lbl_8047A8AC;
+extern u8 lbl_80312500[];
+extern u32 lbl_8047A8B8;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_80478A18;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A0C;
+extern u32 __PADSpec;
+#if 1
+asm void fn_800AAF38(void) {
+#include "src/dolphin/vi/VIFull_fn_800AAF38.inc"
+}
+#else
 void fn_800AAF38(void) {
     extern u8 lbl_80312500[];
     extern u8 lbl_803FC5D0[];
@@ -1287,8 +1419,25 @@ void fn_800AAF38(void) {
     }
     return;
 }
+#endif
 
 /* fn_800AB150 - 0x800AB150 | size: 0x3AC */
+extern void fn_800CF728(void);
+extern void fn_800D02BC(void);
+extern u32 lbl_8047A8B8;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A18;
+extern u32 lbl_8047A8AC;
+extern u32 lbl_80478A0C;
+extern u32 lbl_80478A1C;
+#if 1
+asm void fn_800AB150(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB150.inc"
+}
+#else
 void fn_800AB150(void) {
     u8 sp[0x20];
     extern u8 lbl_803FC5E0[];
@@ -1570,106 +1719,89 @@ void fn_800AB150(void) {
     r3 = r20;
     return;
 }
+#endif
 
 /* fn_800AB4FC - 0x800AB4FC | size: 0xB8 */
-void fn_800AB4FC(void) {
-    extern u32 lbl_80478A14;
-    extern u32 lbl_80478A18;
-    extern u32 lbl_8047A8A4;
-    extern void fn_800D0338();
-    extern void fn_800D034C();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+extern void fn_800D034C(void);
+extern u32 lbl_8047A8A4;
+extern u32 lbl_80478A18;
+extern u32 lbl_80478A14;
+#if 1
+asm void fn_800AB4FC(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB4FC.inc"
+}
+#else
+void fn_800AB4FC(u32* types) {
+    BOOL enabled;
+    s32 i;
+    BOOL changed;
+    u32 type;
+    u32 cmd;
+    u32* p;
 
-    r27 = r3;
-    OSDisableInterrupts();
-    r30 = r3 + 0x0;
-    r28 = 0x0;
-    r29 = 0x0;
-    r31 = 0x80000000;
+    p = types;
+    enabled = OSDisableInterrupts();
+    changed = FALSE;
+    i = 0;
     do {
-        r3 = lbl_8047A8A4;
-        tmp = (u32)r31 >> r29;
-        /* and. tmp, r3, tmp */;
-        if ((s32)tmp != 0) {
-            r3 = r29;
-            SIGetType();
-            tmp = r3 & 0x20000000;
-            if ((s32)tmp == 0) {
-                tmp = lbl_80478A18;
-                r3 = *(u32*)((u8*)r27 + 0x0);
-                if ((tmp < 2) && (r3 == 2)) {
-
-                    r3 = 0x0;
+        if (lbl_8047A8A4 & (0x80000000u >> i)) {
+            if ((SIGetType(i) & 0x20000000) == 0) {
+                type = *p;
+                if (lbl_80478A18 < 2u && type == 2u) {
+                    type = 0;
                 }
-                r4 = lbl_80478A14;
-                tmp = r3 & 0x3;
-                r3 = r29 + 0x0;
-                r4 = r4 | (0x40 << 16);
-                r4 = r4 | tmp;
-                fn_800D0338();
-                r28 = 0x1;
+                cmd = lbl_80478A14;
+                cmd |= 0x00400000;
+                cmd |= (type & 0x3);
+                fn_800D0338(i, cmd);
+                changed = TRUE;
+            }
         }
-        }
-        r29 = r29 + 0x1;
-        r27 = r27 + 0x4;
-    } while ((s32)r29 < 4);
-    if ((s32)r28 != 0) {
+        i++;
+        p++;
+    } while (i < 4);
+    if (changed != FALSE) {
         fn_800D034C();
     }
-    r3 = r30;
-    OSRestoreInterrupts(r3);
-    return;
+    OSRestoreInterrupts(enabled);
 }
+#endif
 
 /* fn_800AB5B4 - 0x800AB5B4 | size: 0x60 */
-void fn_800AB5B4(void) {
-    extern u32 lbl_80478A18;
-    extern u32 lbl_80478A1C;
-    extern void fn_800AB614();
-    extern void fn_800AB788();
-    extern void fn_800AB8FC();
-    extern u32 __PADSpec;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    tmp = 0x0;
-    *(u32*)__PADSpec = tmp;
-    if ((s32)r3 != 1) {
-        if ((s32)r3 < 1) {
-            if ((s32)r3 < 0) {
-                goto L_800AB60C;
-            }
-            if ((s32)r3 >= 6) goto L_800AB60C;
-            goto L_800AB600;
-            }
-        r4 = (u32)fn_800AB614;
-        tmp = (u32)fn_800AB614;
-        lbl_80478A1C = tmp;
-        goto L_800AB60C;
-    }
-    r4 = (u32)fn_800AB788;
-    tmp = (u32)fn_800AB788;
-    lbl_80478A1C = tmp;
-    goto L_800AB60C;
-L_800AB600:
-    r4 = (u32)fn_800AB8FC;
-    tmp = (u32)fn_800AB8FC;
-    lbl_80478A1C = tmp;
-L_800AB60C:
-    lbl_80478A18 = r3;
-    return;
+extern u32 lbl_80478A1C;
+extern u32 lbl_80478A18;
+extern u32 __PADSpec;
+#if 0
+asm void fn_800AB5B4(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB5B4.inc"
 }
+#else
+void fn_800AB5B4(s32 spec) {
+    __PADSpec = 0;
+    switch (spec) {
+    case 0:
+        lbl_80478A1C = (u32)fn_800AB614;
+        break;
+    case 1:
+        lbl_80478A1C = (u32)fn_800AB788;
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        lbl_80478A1C = (u32)fn_800AB8FC;
+        break;
+    }
+    lbl_80478A18 = spec;
+}
+#endif
 
 /* fn_800AB614 - 0x800AB614 | size: 0x174 */
+#if 1
+asm void fn_800AB614(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB614.inc"
+}
+#else
 void fn_800AB614(void) {
     u32 tmp = 0;
     u32 r3 = 0;
@@ -1776,8 +1908,14 @@ void fn_800AB614(void) {
     *(u8*)((u8*)r4 + 0x5) = tmp;
     return;
 }
+#endif
 
 /* fn_800AB788 - 0x800AB788 | size: 0x174 */
+#if 1
+asm void fn_800AB788(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB788.inc"
+}
+#else
 void fn_800AB788(void) {
     u32 tmp = 0;
     u32 r3 = 0;
@@ -1884,8 +2022,15 @@ void fn_800AB788(void) {
     *(u8*)((u8*)r4 + 0x5) = tmp;
     return;
 }
+#endif
 
 /* fn_800AB8FC - 0x800AB8FC | size: 0x3F8 */
+extern u32 lbl_80478A14;
+#if 1
+asm void fn_800AB8FC(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB8FC.inc"
+}
+#else
 void fn_800AB8FC(void) {
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A14;
@@ -2153,47 +2298,52 @@ do {
     *(u8*)((u8*)r4 + 0x7) = r3;
     return;
 }
+#endif
 
 /* fn_800ABCF4 - 0x800ABCF4 | size: 0x74 */
-void fn_800ABCF4(void) {
-    extern u32 lbl_80478A14;
-    extern u32 lbl_8047A8A4;
-    extern u32 lbl_8047A8B0;
-    extern u32 lbl_8047A8B4;
-    extern void fn_800D0464();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    OSDisableInterrupts();
-    r5 = lbl_8047A8A4;
-    r6 = r31 << 8;
-    r4 = lbl_8047A8B0;
-    r31 = r3;
-    r8 = r5 + 0x0;
-    r7 = ~(r8 | r8);
-    tmp = lbl_8047A8B4;
-    r5 = r5 & ~r5;
-    lbl_80478A14 = r6;
-    r4 = r4 & r7;
-    tmp = tmp & r7;
-    lbl_8047A8A4 = r5;
-    r3 = r8;
-    lbl_8047A8B0 = r4;
-    lbl_8047A8B4 = tmp;
-    fn_800D0464();
-    r3 = r31;
-    OSRestoreInterrupts(r3);
-    return;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_80478A14;
+#if 1
+asm void fn_800ABCF4(void) {
+#include "src/dolphin/vi/VIFull_fn_800ABCF4.inc"
 }
+#else
+void fn_800ABCF4(u32 chan) {
+    BOOL enabled;
+    u32 a4;
+    u32 mask;
+
+    enabled = OSDisableInterrupts();
+    a4 = lbl_8047A8A4;
+    mask = ~a4;
+    lbl_80478A14 = chan << 8;
+    lbl_8047A8A4 = a4 & mask;
+    lbl_8047A8B0 = lbl_8047A8B0 & mask;
+    lbl_8047A8B4 = lbl_8047A8B4 & mask;
+    fn_800D0464(a4);
+    OSRestoreInterrupts(enabled);
+}
+#endif
 
 /* fn_800ABD68 - 0x800ABD68 | size: 0x194 */
+extern void fn_800ABF5C(void);
+extern void fn_800CF708(void);
+extern u32 lbl_8047A8BC;
+extern u32 lbl_8047A8A8;
+extern u32 lbl_80478A0C;
+extern u32 lbl_8047A8C0;
+extern u32 lbl_8047A8B8;
+extern u32 lbl_8047A8B0;
+extern u32 lbl_8047A8B4;
+extern u32 lbl_8047A8A4;
+extern u32 lbl_8047A8AC;
+#if 1
+asm void fn_800ABD68(void) {
+#include "src/dolphin/vi/VIFull_fn_800ABD68.inc"
+}
+#else
 void fn_800ABD68(void) {
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A0C;
@@ -2313,6 +2463,7 @@ void fn_800ABD68(void) {
 
     return;
 }
+#endif
 
 /* fn_800ABEFC - 0x800ABEFC | size: 0x60
  * VICallPreRetraceCallback - Call the pre-retrace callback if set.

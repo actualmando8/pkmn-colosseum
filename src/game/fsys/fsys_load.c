@@ -490,3 +490,531 @@ void FSYSInitLoadManager(u32 maxRequests, u32 alignment, u32 poolSize) {
     fn_8017FDB0(poolSize);
     fn_8017FB08();
 }
+
+/* WP-0010 stubs (gap 0x8017F3F8-0x80180C78) */
+
+/* ===================================================================
+ * Queue entry struct (stride 0x44) used by async DVD read queue
+ * =================================================================== */
+typedef struct DVDQueueEntry {
+    /* 0x00 - 0x1F: fields not used in these functions */
+    u8   _pad00[0x20];
+    /* 0x20 */ u32  state;      /* 0=free, 1=occupied */
+    /* 0x24 */ u32  mode;       /* 1=ready/done */
+    /* 0x28 */ void* srcPtr;    /* source data pointer */
+    /* 0x2C */ void* dstPtr;    /* destination / user data */
+    /* 0x30 */ u32  size;       /* aligned data size */
+    /* 0x34 */ u32  flag34;     /* mode flag (0 or 1) */
+    /* 0x38 */ void (*callback)(void* entry); /* completion callback */
+    /* 0x3C */ u32  callbackArg; /* argument for callback */
+    /* 0x40 */ u32  index;       /* entry index in pool */
+} DVDQueueEntry; /* size: 0x44 */
+
+/* DVD Cache linked list node structure */
+typedef struct DVDCacheNode {
+    /* 0x00 */ void*  data;       /* cached data pointer */
+    /* 0x04 */ u32    pad04;
+    /* 0x08 */ struct DVDCacheNode* next;
+    /* 0x0C */ u32    field_0c;   /* returned by fn_8017F728 */
+    /* 0x10 */ u32    fileHandle;
+    /* 0x14 */ u32    groupID;
+    /* 0x18 */ u32    nameHash;
+    /* 0x1C */ u32    refCount;
+} DVDCacheNode;
+
+/* Global queue pointer and sizes */
+/* lbl_80454038: head of DVD cache list */
+extern DVDCacheNode* gDVDCacheHead;
+
+/* 0x8017F3F8 | 0x8C
+ * r3=a, r4=b, r5=size.
+ * Allocate size+32-aligned bytes (fn_800F9318 = alloc heap block).
+ * Then fn_800F9418(r30, 0x20, r3, r4, 0) -- some init/map.
+ * Return result or NULL.
+ */
+extern void* fn_800F9318(u32 a, u32 b);
+extern void* fn_800F9418(u32 size, u32 align, u32 a, u32 b, u32 c);
+#if 1
+asm void fn_8017F3F8(void) {
+#include "src/game/fsys/fsys_load_fn_8017F3F8.inc"
+}
+#else
+void* fn_8017F3F8(u32 a, u32 b, u32 size) {
+    u32 alignedSize;
+    void* block;
+    void* result;
+
+    alignedSize = (size + 0x1f) & ~0x1f;
+    block = fn_800F9318(b, a);
+    result = fn_800F9418(alignedSize, 0x20, a, b, 0);
+    if (result == NULL) {
+        return NULL;
+    }
+    return result;
+}
+#endif
+
+/* 0x8017F484 | 0x230 */
+extern u32 fn_8017F6B4(u32 a, u32 b);
+extern u16 fn_800E2B00(u32 size, u32 align);
+extern void fn_800F9210(u32 a, u32 b);
+extern void fn_8009ED4C(void* p, u32 size);
+extern u16 fn_800E202C(u32 handle);
+extern void fn_800E24B0(u16 handle);
+extern void fn_800E209C(u16 handle);
+extern void DCFlushRange(void* addr, u32 nBytes);
+#if 1
+asm void fn_8017F484(void) {
+#include "src/game/fsys/fsys_load_fn_8017F484.inc"
+}
+#else
+void* fn_8017F484(u32 a, u32 b, u32 size) {
+    void* block;
+    void* copy;
+    void* result;
+    u16 handle;
+    u32 alignedSize;
+    u32 allocSize;
+
+    block = fn_800F9318(b, a);
+
+    /* Complex: check field_1c >= 3 and different paths */
+    /* Leave as asm for now */
+    return block;
+}
+#endif
+
+/* 0x8017F6B4 | 0x74
+ * r3/r4=args, r5=callbackPtr stored on stack.
+ * Calls fn_800F9318(r4, r3) to get a block.
+ * If block has callback (field_0x38 != NULL), call it.
+ * Then fn_8009EFE4(block). Return 1.
+ */
+extern void fn_8009EFE4(void* p);
+#if 1
+asm void fn_8017F6B4(void) {
+#include "src/game/fsys/fsys_load_fn_8017F6B4.inc"
+}
+#else
+u32 fn_8017F6B4(u32 a, u32 b) {
+    void* block;
+    void (*cb)(void);
+
+    block = fn_800F9318(b, a);
+    cb = *(void(**)(void))((u8*)block + 0x38);
+    if (cb != NULL) {
+        cb();
+    }
+    fn_8009EFE4(block);
+    return 1;
+}
+#endif
+
+/* 0x8017F728 | 0x6C
+ * Searches gDVDCacheHead linked list for node with matching
+ * (fileHandle=r3, groupID=r4, nameHash=r5). Returns node->field_0xc.
+ */
+extern u8 lbl_80454038[];
+#if 1
+asm void fn_8017F728(void) {
+#include "src/game/fsys/fsys_load_fn_8017F728.inc"
+}
+#else
+u32 fn_8017F728(u32 fileHandle, u32 groupID, u32 nameHash) {
+    DVDCacheNode* node;
+    u32 count;
+
+    node = *(DVDCacheNode**)lbl_80454038;
+    count = 0;
+    while (node != NULL) {
+        if (node->fileHandle == fileHandle &&
+            node->groupID   == groupID &&
+            node->nameHash  == nameHash) {
+            return node->field_0c;
+        }
+        node = node->next;
+        count++;
+    }
+    return 0;
+}
+#endif
+
+/* 0x8017F800 | 0x128
+ * Walks gDVDCacheHead list searching for node with field_0x10 == r3.
+ * When found: unlinks node from the doubly-linked list (?), decrements
+ * count in lbl_80454038+0xc, clears fields, frees associated resource.
+ */
+#if 1
+asm void fn_8017F800(void) {
+#include "src/game/fsys/fsys_load_fn_8017F800.inc"
+}
+#else
+void fn_8017F800(u32 fileHandle) {
+    DVDCacheNode* node;
+    DVDCacheNode* prev;
+    DVDCacheNode* next;
+    u32* head;
+    u32 count;
+
+    head = (u32*)lbl_80454038;
+    node = *(DVDCacheNode**)head;
+    count = 0;
+    while (node != NULL) {
+        if (*(u32*)((u8*)node + 0x1c) != 0 &&
+            *(u32*)((u8*)node + 0x10) == fileHandle) {
+            prev = (DVDCacheNode*)*(u32*)((u8*)node + 8);
+            next = (DVDCacheNode*)*(u32*)((u8*)node + 4);
+            if (prev != NULL) {
+                *(u32*)((u8*)prev + 4) = *(u32*)((u8*)node + 4);
+            }
+            if (next != NULL) {
+                *(u32*)((u8*)next + 8) = *(u32*)((u8*)node + 8);
+            }
+            /* decrement count at head+0xc */
+            head[3] = head[3] - 1;
+            /* clear node fields */
+            *(u32*)((u8*)node + 0xc) = 0;
+            *(u32*)((u8*)node + 0x10) = 0;
+            *(u32*)((u8*)node + 0x14) = 0;
+            *(u32*)((u8*)node + 0x18) = 0;
+            /* if node has associated task: free it */
+            if (*(u32*)((u8*)node + 0x00) != 0) {
+                void* task = *(void**)((u8*)node + 0x00);
+                fn_8017FB08();
+                *(u32*)((u8*)node + 0x00) = 0;
+            }
+            *(u32*)((u8*)node + 0x1c) = 0;
+            /* if node is tail (head[1] == node), update tail */
+            if (head[1] == (u32)node) {
+                *(u32*)((u8*)node + 8) = 0;
+                head[1] = *(u32*)((u8*)node + 4);
+            }
+        }
+        node = (DVDCacheNode*)*(u32*)((u8*)node + 8);
+        count++;
+    }
+}
+#endif
+
+/* 0x8017FA5C | 0xAC
+ * If lbl_8047B1D0 == 0: return lbl_80455048->field_0x24.
+ * Else: walk linked list at lbl_8047B1D0, accumulating field_0x4 values.
+ * Termination: when node equals lbl_8047B1D0, add lbl_80455048->field_0x24.
+ */
+extern u32 lbl_8047B1D0;
+extern u8 lbl_80455048[];
+#if 1
+asm void fn_8017FA5C(void) {
+#include "src/game/fsys/fsys_load_fn_8017FA5C.inc"
+}
+#else
+u32 fn_8017FA5C(void) {
+    u32* list;
+    u32 accum;
+    u32* node;
+    u32 base;
+
+    accum = 0;
+    list = (u32*)lbl_8047B1D0;
+
+    if (list == NULL) {
+        return *(u32*)(lbl_80455048 + 0x24);
+    }
+
+    base = *(u32*)(lbl_80455048 + 0x24);
+    node = (u32*)list[0];
+
+    while (1) {
+        if ((u32)node <= 0x80000000u) {
+            return accum;
+        }
+        if (node != NULL) {
+            accum = accum + node[1];
+        }
+        if (node == list) {
+            return accum + base;
+        }
+        node = (u32*)node[0];
+    }
+}
+#endif
+
+/* 0x80180450 | 0x134
+ * Async DVD read request: write r3 data (r4 user, r5 size) to queue.
+ * Waits (spin-loop) for completion.
+ */
+extern void fn_801808E4(void* entry);
+extern void fn_800AE630(void* p1, void* p2, u32 a, u32 b, void* cb, void* arg, void* src, void* dst, u32 size);
+extern u32 OSDisableInterrupts(void);
+extern void OSRestoreInterrupts(u32 saved);
+extern u32 lbl_8047B1D4;
+extern u32 lbl_8047B1D8;
+#if 1
+asm void fn_80180450(void) {
+#include "src/game/fsys/fsys_load_fn_80180450.inc"
+}
+#else
+void* fn_80180450(void* src, void* dst, u32 size) {
+    DVDQueueEntry* entry;
+    DVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1f) & ~0x1f;
+
+    /* Find free queue entry */
+    entry = (DVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry = (DVDQueueEntry*)((u8*)entry + 0x44);
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = NULL;
+    entry->callbackArg = 0;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    result = entry;
+    /* Spin-wait for completion */
+    while (result->state != 0) {
+        if (result->mode != 1) {
+            result->state = 0;
+        }
+    }
+
+    return result;
+}
+#endif
+
+/* 0x80180584 | 0x110
+ * Async DVD write request variant A (flag34=1, args r6,r7 as callbacks)
+ */
+#if 1
+asm void fn_80180584(void) {
+#include "src/game/fsys/fsys_load_fn_80180584.inc"
+}
+#else
+void* fn_80180584(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
+    DVDQueueEntry* entry;
+    DVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1f) & ~0x1f;
+
+    entry = (DVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry = (DVDQueueEntry*)((u8*)entry + 0x44);
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 1;
+    entry->mode = 1;
+    entry->callback = (void(*)(void*))cbA;
+    entry->callbackArg = cbB;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 1, 0, fn_801808E4, entry, dst, src, alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    return entry;
+}
+#endif
+
+/* 0x80180694 | 0x114
+ * Async DVD write request variant B (flag34=0, args r6,r7 as callbacks)
+ */
+#if 1
+asm void fn_80180694(void) {
+#include "src/game/fsys/fsys_load_fn_80180694.inc"
+}
+#else
+void* fn_80180694(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
+    DVDQueueEntry* entry;
+    DVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1f) & ~0x1f;
+
+    entry = (DVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry = (DVDQueueEntry*)((u8*)entry + 0x44);
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = (void(*)(void*))cbA;
+    entry->callbackArg = cbB;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    return entry;
+}
+#endif
+
+/* 0x801807A8 | 0x10C
+ * Async DVD write request variant C (flag34=0, no separate cbA/cbB, r6,r7 directly)
+ */
+#if 1
+asm void fn_801807A8(void) {
+#include "src/game/fsys/fsys_load_fn_801807A8.inc"
+}
+#else
+void* fn_801807A8(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
+    DVDQueueEntry* entry;
+    DVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1f) & ~0x1f;
+
+    entry = (DVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry = (DVDQueueEntry*)((u8*)entry + 0x44);
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = NULL;
+    entry->callbackArg = 0;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    return entry;
+}
+#endif
+
+/* 0x801808B4 | 0x30
+ * Takes a DVDQueueEntry pointer.
+ * If entry->mode != 1: clear entry->state (= 0).
+ * Return entry->state.
+ */
+#if 1
+asm void fn_801808B4(void) {
+#include "src/game/fsys/fsys_load_fn_801808B4.inc"
+}
+#else
+u32 fn_801808B4(DVDQueueEntry* entry) {
+    if (entry->mode != 1) {
+        entry->state = 0;
+    }
+    return entry->state;
+}
+#endif
+
+/* 0x801808E4 | 0x68
+ * DVD read completion callback.
+ * Calls entry->callback(entry->srcPtr, entry->dstPtr) if set.
+ * Clears entry->state to 0.
+ * Calls DCFlushRange(entry->srcPtr, entry->size).
+ */
+#if 1
+asm void fn_801808E4(void) {
+#include "src/game/fsys/fsys_load_fn_801808E4.inc"
+}
+#else
+void fn_801808E4(DVDQueueEntry* entry) {
+    void (*cb)(void*, void*);
+
+    cb = (void(*)(void*,void*))entry->callback;
+    if (cb != NULL) {
+        cb(entry->srcPtr, entry->dstPtr);
+    }
+    entry->state = 0;
+    DCFlushRange(entry->srcPtr, entry->size);
+}
+#endif
+
+/* 0x8018094C | 0x248 */
+extern void fn_8017C1D8(void);
+extern void fn_8017C074(void);
+extern void fn_8017AC30(void);
+extern void fn_8018114C(void);
+extern void fn_800FE834(void);
+extern void fn_80181224(void);
+extern u8 lbl_8047B1E8[];
+extern u32 lbl_8047B1E0;
+extern u32 lbl_8047B1E4;
+extern u8 lbl_80273F80[];
+#if 1
+asm void fn_8018094C(void) {
+#include "src/game/fsys/fsys_load_fn_8018094C.inc"
+}
+#else
+void fn_8018094C(void) { /* TODO: match -- 584 bytes at 0x8018094C */ }
+#endif

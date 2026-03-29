@@ -186,7 +186,42 @@ asm void OSDefaultExceptionHandler(register __OSException exception, register OS
  * =================================================================== */
 
 /* fn_8009A0C0 - 0x8009A0C0 | size: 0x4 */
+#if 1
+asm void fn_8009A0C0(void) {
+#include "src/dolphin/os/OSException_fn_8009A0C0.inc"
+}
+#else
 void fn_8009A0C0(void) {
     /* bla 0x60 */;
 }
+#endif
 
+/* 0x8009A09C | 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void __OSDBIntegrator(void) {
+#include "src/dolphin/os/OSException___OSDBIntegrator.inc"
+}
+#else
+void __OSDBIntegrator(void) {
+    /* TODO: match -- 36 bytes at 0x8009A09C */
+}
+#endif
+#pragma pop
+
+/* 0x8009A0F4 | 0x9C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void OSExceptionVector(void) {
+#include "src/dolphin/os/OSException_OSExceptionVector.inc"
+}
+#else
+void OSExceptionVector(void) {
+    /* TODO: match -- 156 bytes at 0x8009A0F4 */
+}
+#endif
+#pragma pop

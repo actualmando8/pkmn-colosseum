@@ -1742,3 +1742,507 @@ void fn_800FEA74(void) {
 }
 #endif
 #pragma pop
+
+/* 0x800F0A74 | 0x4D8 */
+extern void fn_800F02F4(void);
+extern void fn_800F028C(void);
+extern void fn_800EEA50(void);
+extern void fn_800EEB34(void);
+extern void fn_800EEA98(void);
+extern void fn_800EEA6C(void);
+extern void DCFlushRange();
+extern u32 lbl_8047AC08;
+extern u8 lbl_804019F0[];
+extern u32 lbl_8047AC04;
+extern u32 lbl_8047AC00;
+extern u32 lbl_8047AC24;
+extern u32 lbl_8047AC20;
+extern u32 lbl_8047AC10;
+extern u32 lbl_8047AC0C;
+#if 1
+asm void fn_800F0A74(void) {
+#include "src/game/gs_thread_fn_800F0A74.inc"
+}
+#else
+void fn_800F0A74(void) {
+    /* TODO: match -- 1240 bytes at 0x800F0A74 */
+}
+#endif
+
+/* 0x800F106C | 0x7C */
+extern u32 lbl_8047AC38;
+extern u32 lbl_8047AC3C;
+extern u32 lbl_8047AC40;
+#if 1
+asm void fn_800F106C(void) {
+#include "src/game/gs_thread_fn_800F106C.inc"
+}
+#else
+void fn_800F106C(void) {
+    /* TODO: match -- 124 bytes at 0x800F106C */
+}
+#endif
+
+/* 0x800F10E8 | 0x2E8 */
+extern void fn_800DD38C(void);
+extern u8 lbl_80271068[];
+extern u32 lbl_80478B00;
+extern u32 lbl_8047AC38;
+extern u8 lbl_80401BD8[];
+extern u8 lbl_80401BB8[];
+extern u32 lbl_8047AC3C;
+extern u32 lbl_8047AC40;
+extern u8 lbl_8027107C[];
+#if 1
+asm void fn_800F10E8(void) {
+#include "src/game/gs_thread_fn_800F10E8.inc"
+}
+#else
+void fn_800F10E8(void) {
+    /* TODO: match -- 744 bytes at 0x800F10E8 */
+}
+#endif
+
+/* 0x800F13D0 | 0x2F0 */
+extern void fn_800F0308(void);
+#if 1
+asm void fn_800F13D0(void) {
+#include "src/game/gs_thread_fn_800F13D0.inc"
+}
+#else
+void fn_800F13D0(void) {
+    /* TODO: match -- 752 bytes at 0x800F13D0 */
+}
+#endif
+
+/* 0x800F16C0 | 0x34C */
+extern void fn_800C8520(void);
+extern u8 lbl_80401AB8[];
+extern u8 lbl_80401A78[];
+extern u8 lbl_8047CCB8[];
+#if 1
+asm void fn_800F16C0(void) {
+#include "src/game/gs_thread_fn_800F16C0.inc"
+}
+#else
+void fn_800F16C0(void) {
+    /* TODO: match -- 844 bytes at 0x800F16C0 */
+}
+#endif
+
+/* 0x800F1A0C | 0x42C */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCBC;
+#if 1
+asm void fn_800F1A0C(void) {
+#include "src/game/gs_thread_fn_800F1A0C.inc"
+}
+#else
+void fn_800F1A0C(void) {
+    /* TODO: match -- 1068 bytes at 0x800F1A0C */
+}
+#endif
+
+/* 0x800F1E38 | 0x42C */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCBC;
+#if 1
+asm void fn_800F1E38(void) {
+#include "src/game/gs_thread_fn_800F1E38.inc"
+}
+#else
+void fn_800F1E38(void) {
+    /* TODO: match -- 1068 bytes at 0x800F1E38 */
+}
+#endif
+
+/* 0x800F2264 | 0x290 */
+#if 1
+asm void fn_800F2264(void) {
+#include "src/game/gs_thread_fn_800F2264.inc"
+}
+#else
+void fn_800F2264(void) {
+    /* TODO: match -- 656 bytes at 0x800F2264 */
+}
+#endif
+
+/* 0x800F24F4 | 0x2E0 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F24F4(void) {
+#include "src/game/gs_thread_fn_800F24F4.inc"
+}
+#else
+void fn_800F24F4(void) {
+    /* TODO: match -- 736 bytes at 0x800F24F4 */
+}
+#endif
+
+/* 0x800F27D4 | 0x414 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F27D4(void) {
+#include "src/game/gs_thread_fn_800F27D4.inc"
+}
+#else
+void fn_800F27D4(void) {
+    /* TODO: match -- 1044 bytes at 0x800F27D4 */
+}
+#endif
+
+/* 0x800F2BE8 | 0x410 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F2BE8(void) {
+#include "src/game/gs_thread_fn_800F2BE8.inc"
+}
+#else
+void fn_800F2BE8(void) {
+    /* TODO: match -- 1040 bytes at 0x800F2BE8 */
+}
+#endif
+
+/* 0x800F2FF8 | 0x420 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F2FF8(void) {
+#include "src/game/gs_thread_fn_800F2FF8.inc"
+}
+#else
+void fn_800F2FF8(void) {
+    /* TODO: match -- 1056 bytes at 0x800F2FF8 */
+}
+#endif
+
+/* 0x800F3418 | 0x418 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F3418(void) {
+#include "src/game/gs_thread_fn_800F3418.inc"
+}
+#else
+void fn_800F3418(void) {
+    /* TODO: match -- 1048 bytes at 0x800F3418 */
+}
+#endif
+
+/* 0x800F3830 | 0x420 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F3830(void) {
+#include "src/game/gs_thread_fn_800F3830.inc"
+}
+#else
+void fn_800F3830(void) {
+    /* TODO: match -- 1056 bytes at 0x800F3830 */
+}
+#endif
+
+/* 0x800F3C50 | 0x418 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F3C50(void) {
+#include "src/game/gs_thread_fn_800F3C50.inc"
+}
+#else
+void fn_800F3C50(void) {
+    /* TODO: match -- 1048 bytes at 0x800F3C50 */
+}
+#endif
+
+/* 0x800F4068 | 0x3D8 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F4068(void) {
+#include "src/game/gs_thread_fn_800F4068.inc"
+}
+#else
+void fn_800F4068(void) {
+    /* TODO: match -- 984 bytes at 0x800F4068 */
+}
+#endif
+
+/* 0x800F4440 | 0x3D8 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F4440(void) {
+#include "src/game/gs_thread_fn_800F4440.inc"
+}
+#else
+void fn_800F4440(void) {
+    /* TODO: match -- 984 bytes at 0x800F4440 */
+}
+#endif
+
+/* 0x800F4818 | 0x420 */
+extern void fn_800CE318(void);
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F4818(void) {
+#include "src/game/gs_thread_fn_800F4818.inc"
+}
+#else
+void fn_800F4818(void) {
+    /* TODO: match -- 1056 bytes at 0x800F4818 */
+}
+#endif
+
+/* 0x800F4C38 | 0x3F4 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F4C38(void) {
+#include "src/game/gs_thread_fn_800F4C38.inc"
+}
+#else
+void fn_800F4C38(void) {
+    /* TODO: match -- 1012 bytes at 0x800F4C38 */
+}
+#endif
+
+/* 0x800F502C | 0x3D8 */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F502C(void) {
+#include "src/game/gs_thread_fn_800F502C.inc"
+}
+#else
+void fn_800F502C(void) {
+    /* TODO: match -- 984 bytes at 0x800F502C */
+}
+#endif
+
+/* 0x800F5404 | 0x1D8 */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F5404(void) {
+#include "src/game/gs_thread_fn_800F5404.inc"
+}
+#else
+void fn_800F5404(void) {
+    /* TODO: match -- 472 bytes at 0x800F5404 */
+}
+#endif
+
+/* 0x800F55DC | 0x214 */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F55DC(void) {
+#include "src/game/gs_thread_fn_800F55DC.inc"
+}
+#else
+void fn_800F55DC(void) {
+    /* TODO: match -- 532 bytes at 0x800F55DC */
+}
+#endif
+
+/* 0x800F57F0 | 0x24C */
+extern u32 lbl_8047E710;
+extern u32 lbl_8047CCBC;
+extern u32 lbl_8047CCC0;
+#if 1
+asm void fn_800F57F0(void) {
+#include "src/game/gs_thread_fn_800F57F0.inc"
+}
+#else
+void fn_800F57F0(void) {
+    /* TODO: match -- 588 bytes at 0x800F57F0 */
+}
+#endif
+
+/* 0x800F5A3C | 0x264 */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F5A3C(void) {
+#include "src/game/gs_thread_fn_800F5A3C.inc"
+}
+#else
+void fn_800F5A3C(void) {
+    /* TODO: match -- 612 bytes at 0x800F5A3C */
+}
+#endif
+
+/* 0x800F5CA0 | 0x24C */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F5CA0(void) {
+#include "src/game/gs_thread_fn_800F5CA0.inc"
+}
+#else
+void fn_800F5CA0(void) {
+    /* TODO: match -- 588 bytes at 0x800F5CA0 */
+}
+#endif
+
+/* 0x800F5EEC | 0x3D0 */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F5EEC(void) {
+#include "src/game/gs_thread_fn_800F5EEC.inc"
+}
+#else
+void fn_800F5EEC(void) {
+    /* TODO: match -- 976 bytes at 0x800F5EEC */
+}
+#endif
+
+/* 0x800F62BC | 0x3D0 */
+extern u32 lbl_8047E710;
+#if 1
+asm void fn_800F62BC(void) {
+#include "src/game/gs_thread_fn_800F62BC.inc"
+}
+#else
+void fn_800F62BC(void) {
+    /* TODO: match -- 976 bytes at 0x800F62BC */
+}
+#endif
+
+/* 0x800F668C | 0x80 */
+#if 1
+asm void fn_800F668C(void) {
+#include "src/game/gs_thread_fn_800F668C.inc"
+}
+#else
+void fn_800F668C(void) {
+    /* TODO: match -- 128 bytes at 0x800F668C */
+}
+#endif
+
+/* 0x800F670C | 0xA0 */
+#if 1
+asm void fn_800F670C(void) {
+#include "src/game/gs_thread_fn_800F670C.inc"
+}
+#else
+void fn_800F670C(void) {
+    /* TODO: match -- 160 bytes at 0x800F670C */
+}
+#endif
+
+/* 0x800F67AC | 0x1C */
+#if 1
+asm void fn_800F67AC(void) {
+#include "src/game/gs_thread_fn_800F67AC.inc"
+}
+#else
+void fn_800F67AC(void) {
+    /* TODO: match -- 28 bytes at 0x800F67AC */
+}
+#endif
+
+/* 0x800F67C8 | 0x184 */
+#if 1
+asm void fn_800F67C8(void) {
+#include "src/game/gs_thread_fn_800F67C8.inc"
+}
+#else
+void fn_800F67C8(void) {
+    /* TODO: match -- 388 bytes at 0x800F67C8 */
+}
+#endif
+
+/* 0x800F694C | 0x168 */
+extern u8 lbl_8027115C[];
+#if 1
+asm void fn_800F694C(void) {
+#include "src/game/gs_thread_fn_800F694C.inc"
+}
+#else
+void fn_800F694C(void) {
+    /* TODO: match -- 360 bytes at 0x800F694C */
+}
+#endif
+
+/* 0x800F6AB4 | 0xA0 */
+#if 1
+asm void fn_800F6AB4(void) {
+#include "src/game/gs_thread_fn_800F6AB4.inc"
+}
+#else
+void fn_800F6AB4(void) {
+    /* TODO: match -- 160 bytes at 0x800F6AB4 */
+}
+#endif
+
+/* 0x800F6B54 | 0x58 */
+#if 1
+asm void fn_800F6B54(void) {
+#include "src/game/gs_thread_fn_800F6B54.inc"
+}
+#else
+void fn_800F6B54(void) {
+    /* TODO: match -- 88 bytes at 0x800F6B54 */
+}
+#endif
+
+/* 0x800F6BAC | 0x10 */
+#if 1
+asm void fn_800F6BAC(void) {
+#include "src/game/gs_thread_fn_800F6BAC.inc"
+}
+#else
+void fn_800F6BAC(void) {
+    /* TODO: match -- 16 bytes at 0x800F6BAC */
+}
+#endif
+
+/* 0x800F6BBC | 0x8 */
+#if 1
+asm void fn_800F6BBC(void) {
+#include "src/game/gs_thread_fn_800F6BBC.inc"
+}
+#else
+void fn_800F6BBC(void) {
+    /* TODO: match -- 8 bytes at 0x800F6BBC */
+}
+#endif
+
+/* 0x800F6BC4 | 0x154 */
+extern u8 lbl_803155D0[];
+#if 1
+asm void fn_800F6BC4(void) {
+#include "src/game/gs_thread_fn_800F6BC4.inc"
+}
+#else
+void fn_800F6BC4(void) {
+    /* TODO: match -- 340 bytes at 0x800F6BC4 */
+}
+#endif
+
+/* 0x800F6D18 | 0x350 */
+extern void __va_arg();
+extern u32 lbl_80478B00;
+#if 1
+asm void fn_800F6D18(void) {
+#include "src/game/gs_thread_fn_800F6D18.inc"
+}
+#else
+void fn_800F6D18(void) {
+    /* TODO: match -- 848 bytes at 0x800F6D18 */
+}
+#endif
+
+/* 0x800F7068 | 0xA0 */
+extern u32 lbl_80478B00;
+#if 1
+asm void fn_800F7068(void) {
+#include "src/game/gs_thread_fn_800F7068.inc"
+}
+#else
+void fn_800F7068(void) {
+    /* TODO: match -- 160 bytes at 0x800F7068 */
+}
+#endif

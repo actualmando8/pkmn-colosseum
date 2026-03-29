@@ -91,6 +91,14 @@ extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void* memset(void* dst, int val, u32 size);
 
+/* External functions referenced from asm wrappers */
+extern void DCFlushRange(void* addr, u32 size);
+extern void OSGetTime(void);
+extern void fn_800D3EC4(void);
+extern void fn_800D4F98(void);
+extern void fn_800D67BC(void);
+extern void fn_800D892C(void);
+
 /* GSmem */
 extern u16   fn_800E3534(u32 size);                    /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */

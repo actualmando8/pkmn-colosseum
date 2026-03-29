@@ -243,3 +243,95 @@ static void DObjInfoInit(void)
     ((HSD_ClassInfo*) &hsdDObj)->amnesia = DObjAmnesia;
     hsdDObj.load = DObjLoad;
 }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 5 stubs
+ * Range: 0x8019B528 - 0x8019B7C0
+ * =================================================================== */
+
+/* 0x8019B528 | 0xC0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u32 lbl_8047DA58;
+extern u32 lbl_8047DA3C;
+#if 1
+asm void fn_8019B528(void) {
+#include "src/hsd/hsd_dobj_fn_8019B528.inc"
+}
+#else
+void fn_8019B528(void) {
+    /* TODO: match -- 192 bytes at 0x8019B528 */
+}
+#endif
+#pragma pop
+
+/* 0x8019B5E8 | 0x168 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_8019970C(void);
+extern void fn_801AA498(void* list, void* data);
+extern void fn_80199A84(void);
+extern void fn_8019B750(void* data);
+extern u8 lbl_80465378[];
+extern u8 lbl_802747AC[];
+#if 1
+asm void fn_8019B5E8(void) {
+#include "src/hsd/hsd_dobj_fn_8019B5E8.inc"
+}
+#else
+void fn_8019B5E8(void) {
+    /* TODO: match -- 360 bytes at 0x8019B5E8 */
+}
+#endif
+#pragma pop
+
+/* 0x8019B750 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_8019B750(void) {
+#include "src/hsd/hsd_dobj_fn_8019B750.inc"
+}
+#else
+#pragma optimization_level 4
+void fn_8019B750(void* data) {
+    if (data != NULL) {
+        fn_801AA498(lbl_80465378, data);
+    }
+}
+#endif
+#pragma pop
+
+/* 0x8019B784 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+#if 0
+asm void fn_8019B784(void) {
+#include "src/hsd/hsd_dobj_fn_8019B784.inc"
+}
+#else
+void fn_8019B784(void) {
+    fn_801AA35C(lbl_80465378, 0x30, 4);
+}
+#endif
+#pragma pop
+
+/* 0x8019B7B4 | 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 0
+asm void fn_8019B7B4(void) {
+#include "src/hsd/hsd_dobj_fn_8019B7B4.inc"
+}
+#else
+void* fn_8019B7B4(void) {
+    return lbl_80465378;
+}
+#endif
+#pragma pop

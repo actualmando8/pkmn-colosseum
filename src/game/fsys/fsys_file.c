@@ -703,3 +703,377 @@ u32 fn_8017D400(void) { return 1; }
 /* Address: 0x8017D408 | Size: 0x8 | Pattern: return_constant */
 u32 fn_8017D408(void) { return 1; }
 
+/* ===================================================================
+ * WP-0009 stubs (address range 0x8017B448 - 0x8017E1D8)
+ * =================================================================== */
+
+/* 0x8017B448 | 0x74 */
+extern u32 lbl_8047B1B4;
+extern u8 lbl_80453FEC[];
+#if 1
+asm void fn_8017B448(void) {
+#include "src/game/fsys/fsys_file_fn_8017B448.inc"
+}
+#else
+void fn_8017B448(void) { /* TODO: match -- 116 bytes at 0x8017B448 */ }
+#endif
+
+/* 0x8017B4BC | 0xE8 */
+extern u32 lbl_8047B1B4;
+#if 1
+asm void fn_8017B4BC(void) {
+#include "src/game/fsys/fsys_file_fn_8017B4BC.inc"
+}
+#else
+void fn_8017B4BC(void) { /* TODO: match -- 232 bytes at 0x8017B4BC */ }
+#endif
+
+/* 0x8017B5A4 | 0x1C */
+#if 1
+asm void fn_8017B5A4(void) {
+#include "src/game/fsys/fsys_file_fn_8017B5A4.inc"
+}
+#else
+void fn_8017B5A4(void) { /* TODO: match -- 28 bytes at 0x8017B5A4 */ }
+#endif
+
+/* 0x8017B5C0 | 0xF8 */
+extern void fn_8017BD34(void);
+extern void fn_8017F794(void);
+extern void fn_8017F728(void);
+extern void fn_8017A814(void);
+extern void fn_80180584(void);
+#if 1
+asm void fn_8017B5C0(void) {
+#include "src/game/fsys/fsys_file_fn_8017B5C0.inc"
+}
+#else
+void fn_8017B5C0(void) { /* TODO: match -- 248 bytes at 0x8017B5C0 */ }
+#endif
+
+/* 0x8017B6B8 | 0x4C8 */
+extern void fn_8017F25C(void);
+extern void fn_8017F108(void);
+extern void fn_80167E98(void);
+extern u32 lbl_80478C48;
+extern u8 lbl_8036C2A0[];
+#if 1
+asm void fn_8017B6B8(void) {
+#include "src/game/fsys/fsys_file_fn_8017B6B8.inc"
+}
+#else
+void fn_8017B6B8(void) { /* TODO: match -- 1224 bytes at 0x8017B6B8 */ }
+#endif
+
+/* 0x8017BD34 | 0x2B4 */
+extern void fn_8017A95C(void);
+extern u32 lbl_80478C48;
+#if 1
+asm void fn_8017BD34(void) {
+#include "src/game/fsys/fsys_file_fn_8017BD34.inc"
+}
+#else
+void fn_8017BD34(void) { /* TODO: match -- 692 bytes at 0x8017BD34 */ }
+#endif
+
+/* 0x8017C008 | 0x6C */
+extern void fn_80180C78(void);
+#if 1
+asm void fn_8017C008(void) {
+#include "src/game/fsys/fsys_file_fn_8017C008.inc"
+}
+#else
+void fn_8017C008(void) { /* TODO: match -- 108 bytes at 0x8017C008 */ }
+#endif
+
+/* 0x8017C074 | 0x164 */
+extern u32 lbl_80478C48;
+#if 1
+asm void fn_8017C074(void) {
+#include "src/game/fsys/fsys_file_fn_8017C074.inc"
+}
+#else
+void fn_8017C074(void) { /* TODO: match -- 356 bytes at 0x8017C074 */ }
+#endif
+
+/* 0x8017C1D8 | 0x1BC */
+extern u32 lbl_80478C48;
+#if 1
+asm void fn_8017C1D8(void) {
+#include "src/game/fsys/fsys_file_fn_8017C1D8.inc"
+}
+#else
+void fn_8017C1D8(void) { /* TODO: match -- 444 bytes at 0x8017C1D8 */ }
+#endif
+
+/* 0x8017C39C | 0x78 */
+#if 1
+asm void fn_8017C39C(void) {
+#include "src/game/fsys/fsys_file_fn_8017C39C.inc"
+}
+#else
+void fn_8017C39C(void) { /* TODO: match -- 120 bytes at 0x8017C39C */ }
+#endif
+
+/* 0x8017C414 | 0x154 */
+extern void fn_8017A624(void);
+extern void OSDisableInterrupts();
+extern void OSRestoreInterrupts();
+#if 1
+asm void fn_8017C414(void) {
+#include "src/game/fsys/fsys_file_fn_8017C414.inc"
+}
+#else
+void fn_8017C414(void) { /* TODO: match -- 340 bytes at 0x8017C414 */ }
+#endif
+
+/* 0x8017C580 | 0x10 */
+#if 1
+asm void fn_8017C580(void) {
+#include "src/game/fsys/fsys_file_fn_8017C580.inc"
+}
+#else
+void fn_8017C580(void) { /* TODO: match -- 16 bytes at 0x8017C580 */ }
+#endif
+
+/* 0x8017C5A0 | 0x10 */
+#if 1
+asm void fn_8017C5A0(void) {
+#include "src/game/fsys/fsys_file_fn_8017C5A0.inc"
+}
+#else
+void fn_8017C5A0(void) { /* TODO: match -- 16 bytes at 0x8017C5A0 */ }
+#endif
+
+/* 0x8017C5B8 | 0x128 */
+extern void fn_8017D68C(void);
+extern void fn_8017F928(void);
+extern void fn_80180694(void);
+extern u32 lbl_8047B1B8;
+extern u32 lbl_8047B1BC;
+#if 1
+asm void fn_8017C5B8(void) {
+#include "src/game/fsys/fsys_file_fn_8017C5B8.inc"
+}
+#else
+void fn_8017C5B8(void) { /* TODO: match -- 296 bytes at 0x8017C5B8 */ }
+#endif
+
+/* 0x8017C6E0 | 0x1AC */
+extern u32 lbl_80478C48;
+#if 1
+asm void fn_8017C6E0(void) {
+#include "src/game/fsys/fsys_file_fn_8017C6E0.inc"
+}
+#else
+void fn_8017C6E0(void) { /* TODO: match -- 428 bytes at 0x8017C6E0 */ }
+#endif
+
+/* 0x8017C894 | 0x2C */
+extern void fn_8017D8F8(void);
+#if 1
+asm void fn_8017C894(void) {
+#include "src/game/fsys/fsys_file_fn_8017C894.inc"
+}
+#else
+void fn_8017C894(void) { /* TODO: match -- 44 bytes at 0x8017C894 */ }
+#endif
+
+/* 0x8017C8C8 | 0x2C */
+extern void fn_8017D92C(void);
+#if 1
+asm void fn_8017C8C8(void) {
+#include "src/game/fsys/fsys_file_fn_8017C8C8.inc"
+}
+#else
+void fn_8017C8C8(void) { /* TODO: match -- 44 bytes at 0x8017C8C8 */ }
+#endif
+
+/* 0x8017C8FC | 0x580 */
+extern void fn_80179FA4(void);
+#if 1
+asm void fn_8017C8FC(void) {
+#include "src/game/fsys/fsys_file_fn_8017C8FC.inc"
+}
+#else
+void fn_8017C8FC(void) { /* TODO: match -- 1408 bytes at 0x8017C8FC */ }
+#endif
+
+/* 0x8017CE7C | 0x4C */
+extern void fn_8017D960(void);
+extern void fn_8017DAB8(void);
+#if 1
+asm void fn_8017CE7C(void) {
+#include "src/game/fsys/fsys_file_fn_8017CE7C.inc"
+}
+#else
+void fn_8017CE7C(void) { /* TODO: match -- 76 bytes at 0x8017CE7C */ }
+#endif
+
+/* 0x8017CED8 | 0x4C8 */
+extern void fn_8017D68C(void);
+extern void fn_8017FA5C(void);
+extern void fn_8017F800(void);
+extern void fn_80180450(void);
+extern u32 lbl_8047B1B8;
+extern u32 lbl_8047B1BC;
+#if 1
+asm void fn_8017CED8(void) {
+#include "src/game/fsys/fsys_file_fn_8017CED8.inc"
+}
+#else
+void fn_8017CED8(void) { /* TODO: match -- 1224 bytes at 0x8017CED8 */ }
+#endif
+
+/* 0x8017D3A0 | 0x34 */
+#if 1
+asm void fn_8017D3A0(void) {
+#include "src/game/fsys/fsys_file_fn_8017D3A0.inc"
+}
+#else
+void fn_8017D3A0(void) { /* TODO: match -- 52 bytes at 0x8017D3A0 */ }
+#endif
+
+/* 0x8017D3D4 | 0x2C */
+extern void fn_8017DB74(void);
+#if 1
+asm void fn_8017D3D4(void) {
+#include "src/game/fsys/fsys_file_fn_8017D3D4.inc"
+}
+#else
+void fn_8017D3D4(void) { /* TODO: match -- 44 bytes at 0x8017D3D4 */ }
+#endif
+
+/* 0x8017D624 | 0x68 */
+extern u32 lbl_8047B1B8;
+extern u32 lbl_8047B1BC;
+#if 1
+asm void fn_8017D624(void) {
+#include "src/game/fsys/fsys_file_fn_8017D624.inc"
+}
+#else
+void fn_8017D624(void) { /* TODO: match -- 104 bytes at 0x8017D624 */ }
+#endif
+
+/* 0x8017D68C | 0x174 */
+extern u32 lbl_8047B1B8;
+extern u32 lbl_8047B1BC;
+#if 1
+asm void fn_8017D68C(void) {
+#include "src/game/fsys/fsys_file_fn_8017D68C.inc"
+}
+#else
+void fn_8017D68C(void) { /* TODO: match -- 372 bytes at 0x8017D68C */ }
+#endif
+
+/* 0x8017D800 | 0xF8 */
+extern void fn_8017DEA4(void);
+extern void fn_8017DF4C(void);
+extern void fn_8017DFF4(void);
+extern void fn_8017E09C(void);
+extern u32 lbl_8047B1B4;
+#if 1
+asm void fn_8017D800(void) {
+#include "src/game/fsys/fsys_file_fn_8017D800.inc"
+}
+#else
+void fn_8017D800(void) { /* TODO: match -- 248 bytes at 0x8017D800 */ }
+#endif
+
+/* 0x8017D8F8 | 0x34 */
+extern void fn_8017D960(void);
+#if 1
+asm void fn_8017D8F8(void) {
+#include "src/game/fsys/fsys_file_fn_8017D8F8.inc"
+}
+#else
+void fn_8017D8F8(void) { /* TODO: match -- 52 bytes at 0x8017D8F8 */ }
+#endif
+
+/* 0x8017D92C | 0x34 */
+extern void fn_8017D960(void);
+#if 1
+asm void fn_8017D92C(void) {
+#include "src/game/fsys/fsys_file_fn_8017D92C.inc"
+}
+#else
+void fn_8017D92C(void) { /* TODO: match -- 52 bytes at 0x8017D92C */ }
+#endif
+
+/* 0x8017D960 | 0x158 */
+#if 1
+asm void fn_8017D960(void) {
+#include "src/game/fsys/fsys_file_fn_8017D960.inc"
+}
+#else
+void fn_8017D960(void) { /* TODO: match -- 344 bytes at 0x8017D960 */ }
+#endif
+
+/* 0x8017DAB8 | 0xBC */
+#if 1
+asm void fn_8017DAB8(void) {
+#include "src/game/fsys/fsys_file_fn_8017DAB8.inc"
+}
+#else
+void fn_8017DAB8(void) { /* TODO: match -- 188 bytes at 0x8017DAB8 */ }
+#endif
+
+/* 0x8017DB74 | 0x330 */
+extern u32 lbl_8047B1B8;
+extern u32 lbl_8047B1BC;
+#if 1
+asm void fn_8017DB74(void) {
+#include "src/game/fsys/fsys_file_fn_8017DB74.inc"
+}
+#else
+void fn_8017DB74(void) { /* TODO: match -- 816 bytes at 0x8017DB74 */ }
+#endif
+
+/* 0x8017DEA4 | 0xA8 */
+extern void fn_8017EB6C(void);
+extern void fn_80167DD8(void);
+#if 1
+asm void fn_8017DEA4(void) {
+#include "src/game/fsys/fsys_file_fn_8017DEA4.inc"
+}
+#else
+void fn_8017DEA4(void) { /* TODO: match -- 168 bytes at 0x8017DEA4 */ }
+#endif
+
+/* 0x8017DF4C | 0xA8 */
+#if 1
+asm void fn_8017DF4C(void) {
+#include "src/game/fsys/fsys_file_fn_8017DF4C.inc"
+}
+#else
+void fn_8017DF4C(void) { /* TODO: match -- 168 bytes at 0x8017DF4C */ }
+#endif
+
+/* 0x8017DFF4 | 0xA8 */
+#if 1
+asm void fn_8017DFF4(void) {
+#include "src/game/fsys/fsys_file_fn_8017DFF4.inc"
+}
+#else
+void fn_8017DFF4(void) { /* TODO: match -- 168 bytes at 0x8017DFF4 */ }
+#endif
+
+/* 0x8017E09C | 0x13C */
+#if 1
+asm void fn_8017E09C(void) {
+#include "src/game/fsys/fsys_file_fn_8017E09C.inc"
+}
+#else
+void fn_8017E09C(void) { /* TODO: match -- 316 bytes at 0x8017E09C */ }
+#endif
+
+/* WP-0010 stubs */
+
+/* 0x8017F25C | 0x68 */
+#if 1
+asm void fn_8017F25C(void) {
+#include "src/game/fsys/fsys_file_fn_8017F25C.inc"
+}
+#else
+void fn_8017F25C(void) { /* TODO: match -- 104 bytes at 0x8017F25C */ }
+#endif

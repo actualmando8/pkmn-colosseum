@@ -297,6 +297,26 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
+/*
+ * cb - FST load callback
+ * 0x800A839C | size: 0xD8
+ */
+extern u32 lbl_8047A838;
+extern u32 bb2_8047A83C;
+extern u32 idTmp_8047A840;
+extern void fn_800A73B4(void);
+extern void DVDReset();
+/* 0x800A839C | 0xD8 */
+#if 1
+asm void cb(void) {
+#include "src/dolphin/dvd/DVDFsExtras_cb.inc"
+}
+#else
+void cb(void) {
+    /* TODO: match -- 0xD8 bytes at 0x800A839C */
+}
+#endif
+
 /* fn_800A7F80 - 0x800A7F80 | size: 0x60
  * Unlink a node from a doubly-linked list with interrupt protection.
  * node+0x00 = next, node+0x04 = prev.

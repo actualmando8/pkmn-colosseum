@@ -179,3 +179,176 @@ void __DVDLowSetWAType(u32 type, u32 location) {
     WorkAroundSeekLocation_8047A7A8 = location;
     OSRestoreInterrupts(enabled);
 }
+
+/* fn_800A41D0 - 0x800A41D0 | size: 0x84 */
+extern void fn_800A42C4(void);
+extern BOOL fn_800A46EC(u32 offset, DVDCBCallback callback);
+#if 1
+asm void fn_800A41D0(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A41D0.inc"
+}
+#else
+void fn_800A41D0(void) {}
+#endif
+
+/* fn_800A42C4 - 0x800A42C4 | size: 0x110 */
+extern u32 lbl_8047A7C0;
+extern u32 lbl_8047A7BC;
+extern u32 lbl_8047A7B8;
+extern u32 lbl_8047A784;
+#if 1
+asm void fn_800A42C4(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A42C4.inc"
+}
+#else
+void fn_800A42C4(void) {}
+#endif
+
+/* fn_800A43D4 - 0x800A43D4 | size: 0x80 */
+#if 1
+asm void fn_800A43D4(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A43D4.inc"
+}
+#else
+void fn_800A43D4(void) {}
+#endif
+
+/* fn_800A4454 - 0x800A4454 | size: 0x298 */
+extern void fn_800A7BCC(void);
+extern u32 lbl_804789B8;
+extern u32 lbl_8047A7B0;
+extern u32 lbl_8047A7B4;
+#if 1
+asm void fn_800A4454(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4454.inc"
+}
+#else
+void fn_800A4454(void) {}
+#endif
+
+/* fn_800A46EC - 0x800A46EC | size: 0x94 */
+#if 1
+asm void fn_800A46EC(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A46EC.inc"
+}
+#else
+BOOL fn_800A46EC(u32 offset, DVDCBCallback callback) {
+    volatile u32* dvd;
+    u32 timeout;
+
+    Callback_8047A788 = callback;
+    dvd = (volatile u32*)0xCC006000;
+    StopAtNextInt_8047A780 = 0;
+
+    dvd[2] = 0xAB000000;
+    dvd[3] = offset >> 2;
+    dvd[7] = 0x1;
+
+    timeout = (BUS_CLOCK / 4) * 10;
+    OSCreateAlarm(&AlarmForTimeout_803FC2F8);
+    OSSetAlarm(&AlarmForTimeout_803FC2F8, (s64)timeout, AlarmHandlerForTimeout);
+
+    return TRUE;
+}
+#endif
+
+/* fn_800A47AC - 0x800A47AC | size: 0xA4 */
+#if 1
+asm void fn_800A47AC(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A47AC.inc"
+}
+#else
+void fn_800A47AC(void) {}
+#endif
+
+/* fn_800A48DC - 0x800A48DC | size: 0x8C */
+#if 1
+asm void fn_800A48DC(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A48DC.inc"
+}
+#else
+BOOL fn_800A48DC(DVDCBCallback callback) {
+    u32 timeout;
+
+    Callback_8047A788 = callback;
+    StopAtNextInt_8047A780 = 0;
+
+    /* Send seek command 0xE0000000 */
+    *(volatile u32*)0xCC006008 = 0xE0000000;
+
+    /* Start command */
+    DVD_CONTROL = 0x1;
+
+    /* Set up timeout alarm */
+    timeout = (BUS_CLOCK / 4) * 10;
+    OSCreateAlarm(&AlarmForTimeout_803FC2F8);
+    OSSetAlarm(&AlarmForTimeout_803FC2F8, (s64)timeout, AlarmHandlerForTimeout);
+
+    return TRUE;
+}
+#endif
+
+/* fn_800A4968 - 0x800A4968 | size: 0x9C */
+#if 1
+asm void fn_800A4968(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4968.inc"
+}
+#else
+void fn_800A4968(void) {}
+#endif
+
+/* fn_800A4A04 - 0x800A4A04 | size: 0x98 */
+#if 1
+asm void fn_800A4A04(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4A04.inc"
+}
+#else
+void fn_800A4A04(void) {}
+#endif
+
+/* fn_800A4A9C - 0x800A4A9C | size: 0x8C */
+#if 1
+asm void fn_800A4A9C(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4A9C.inc"
+}
+#else
+void fn_800A4A9C(void) {}
+#endif
+
+/* fn_800A4B28 - 0x800A4B28 | size: 0x9C */
+#if 1
+asm void fn_800A4B28(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4B28.inc"
+}
+#else
+void fn_800A4B28(void) {}
+#endif
+
+/* fn_800A4C80 - 0x800A4C80 | size: 0x14 */
+extern u32 lbl_8047A7A0;
+#if 0
+asm void fn_800A4C80(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4C80.inc"
+}
+#else
+BOOL fn_800A4C80(void) {
+    StopAtNextInt_8047A780 = 1;
+    lbl_8047A7A0 = 1;
+    return TRUE;
+}
+#endif
+
+/* fn_800A4C94 - 0x800A4C94 | size: 0x18 */
+#if 1
+asm void fn_800A4C94(void) {
+#include "src/dolphin/dvd/DVDLow_fn_800A4C94.inc"
+}
+#else
+DVDCBCallback fn_800A4C94(void) {
+    DVDCBCallback cb;
+    *(volatile u32*)0xCC006004 = 0;
+    cb = Callback_8047A788;
+    Callback_8047A788 = NULL;
+    return cb;
+}
+#endif

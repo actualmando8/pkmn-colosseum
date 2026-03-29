@@ -204,3 +204,484 @@ static void LObjInfoInit(void)
     HSD_CLASS_INFO(&hsdLObj)->release = LObjRelease;
     HSD_CLASS_INFO(&hsdLObj)->amnesia = LObjAmnesia;
 }
+
+/* 0x801A4098 | 0x60 */
+extern u32 lbl_8047B2B0;
+extern u8 lbl_8036CA20[];
+extern u32 lbl_8047B2B4;
+#if 1
+asm void fn_801A4098(void) {
+#include "src/hsd/hsd_lobj_fn_801A4098.inc"
+}
+#else
+void fn_801A4098(void) {}
+#endif
+
+/* 0x801A40F8 | 0x174 */
+extern void fn_801C25E4(void);
+#if 1
+asm void fn_801A40F8(void) {
+#include "src/hsd/hsd_lobj_fn_801A40F8.inc"
+}
+#else
+void fn_801A40F8(void) {}
+#endif
+
+/* 0x801A426C | 0xD8 */
+extern void fn_801C2670(void);
+extern void fn_80191DCC(void);
+#if 1
+asm void fn_801A426C(void) {
+#include "src/hsd/hsd_lobj_fn_801A426C.inc"
+}
+#else
+void fn_801A426C(void) {}
+#endif
+
+/* 0x801A4344 | 0xFC */
+extern void fn_80193748(void);
+extern void fn_80193828(void);
+extern void fn_80196E10();
+extern u32 lbl_8047B2B0;
+extern u8 lbl_8047DBB8[];
+extern u8 lbl_8047DBC0[];
+extern u8 lbl_8047DBC4[];
+#if 1
+asm void fn_801A4344(void) {
+#include "src/hsd/hsd_lobj_fn_801A4344.inc"
+}
+#else
+void fn_801A4344(void) {}
+#endif
+
+/* 0x801A4440 | 0x470 */
+extern void fn_801917D0(void);
+extern void fn_80196D78(void);
+extern void OSReport();
+extern u8 lbl_80274D94[];
+extern u8 lbl_8047DBC8[];
+#if 1
+asm void fn_801A4440(void) {
+#include "src/hsd/hsd_lobj_fn_801A4440.inc"
+}
+#else
+void fn_801A4440(void) {}
+#endif
+
+/* 0x801A48B0 | 0x44 */
+extern void fn_80191688();
+#if 1
+asm void fn_801A48B0(void) {
+#include "src/hsd/hsd_lobj_fn_801A48B0.inc"
+}
+#else
+/* HSD_LObjGetInterestPosition */
+s32 fn_801A48B0(HSD_LObj* lobj) {
+    if (lobj != NULL) {
+        if (lobj->interest != NULL) {
+            fn_80191688(lobj->interest);
+            return 1;
+        }
+    }
+    return 0;
+}
+#endif
+
+/* 0x801A48F4 | 0x88 */
+extern void* fn_80191628();
+extern void fn_80191788();
+extern u8 lbl_8047DBCC[];
+extern u8 lbl_80274DB8[];
+extern u8 lbl_8047DBB8[];
+#if 1
+asm void fn_801A48F4(void) {
+#include "src/hsd/hsd_lobj_fn_801A48F4.inc"
+}
+#else
+/* HSD_LObjSetInterestWObjDesc */
+void fn_801A48F4(HSD_LObj* lobj, void* desc) {
+    if (lobj == NULL) {
+        fn_80196E10(lbl_8047DBB8, 0x58c, lbl_8047DBCC);
+    }
+    if (lobj->interest == NULL) {
+        lobj->interest = fn_80191628();
+        if (lobj->interest == NULL) {
+            fn_80196E10(lbl_8047DBB8, 0x58f, lbl_80274DB8);
+        }
+    }
+    fn_80191788(lobj->interest, desc);
+}
+#endif
+
+/* 0x801A497C | 0x44 */
+#if 1
+asm void fn_801A497C(void) {
+#include "src/hsd/hsd_lobj_fn_801A497C.inc"
+}
+#else
+/* HSD_LObjGetPositionPosition */
+s32 fn_801A497C(HSD_LObj* lobj) {
+    if (lobj != NULL) {
+        if (lobj->position != NULL) {
+            fn_80191688(lobj->position);
+            return 1;
+        }
+    }
+    return 0;
+}
+#endif
+
+/* 0x801A49C0 | 0x88 */
+extern u8 lbl_80274DC8[];
+#if 1
+asm void fn_801A49C0(void) {
+#include "src/hsd/hsd_lobj_fn_801A49C0.inc"
+}
+#else
+/* HSD_LObjSetPositionWObjDesc */
+void fn_801A49C0(HSD_LObj* lobj, void* desc) {
+    if (lobj == NULL) {
+        fn_80196E10(lbl_8047DBB8, 0x568, lbl_8047DBCC);
+    }
+    if (lobj->position == NULL) {
+        lobj->position = fn_80191628();
+        if (lobj->position == NULL) {
+            fn_80196E10(lbl_8047DBB8, 0x56b, lbl_80274DC8);
+        }
+    }
+    fn_80191788(lobj->position, desc);
+}
+#endif
+
+/* 0x801A4A48 | 0xC */
+#if 0
+asm void fn_801A4A48(void) {
+#include "src/hsd/hsd_lobj_fn_801A4A48.inc"
+}
+#else
+void fn_801A4A48(HSD_LObj* lobj, u32* color) {
+    lobj->color = *color;
+}
+#endif
+
+/* 0x801A4A54 | 0x70 */
+extern void jumptable_8036CA64();
+#if 1
+asm void fn_801A4A54(void) {
+#include "src/hsd/hsd_lobj_fn_801A4A54.inc"
+}
+#else
+/* GXLightIndex to GXLightID bitmask */
+u32 fn_801A4A54(u32 idx) {
+    if (idx > 8) return 0;
+    switch (idx) {
+    case 0: return 0x1;
+    case 1: return 0x2;
+    case 2: return 0x4;
+    case 3: return 0x8;
+    case 4: return 0x10;
+    case 5: return 0x20;
+    case 6: return 0x40;
+    case 7: return 0x80;
+    case 8: return 0x100;
+    }
+    return 0;
+}
+#endif
+
+/* 0x801A4AC4 | 0x3C */
+extern u32 lbl_8047B2B4;
+#if 1
+asm void fn_801A4AC4(void) {
+#include "src/hsd/hsd_lobj_fn_801A4AC4.inc"
+}
+#else
+/* Find active light by type */
+HSD_LObj* fn_801A4AC4(u32 type) {
+    HSD_SList* p;
+    type &= 3;
+    for (p = (HSD_SList*) lbl_8047B2B4; p != NULL; p = p->next) {
+        HSD_LObj* lobj = (HSD_LObj*) p->data;
+        if ((lobj->flags & 3) == type) {
+            return lobj;
+        }
+    }
+    return NULL;
+}
+#endif
+
+/* 0x801A4B00 | 0x220 */
+extern void fn_801A3E64(void);
+extern u8 lbl_804655E0[];
+extern u32 lbl_8047B2B8;
+#if 1
+asm void fn_801A4B00(void) {
+#include "src/hsd/hsd_lobj_fn_801A4B00.inc"
+}
+#else
+void fn_801A4B00(void) {}
+#endif
+
+/* 0x801A4D20 | 0x234 */
+extern void fn_801A3EB4(void);
+extern u8 lbl_80274DD8[];
+extern u8 lbl_80274DE4[];
+extern u8 lbl_8047DBD8[];
+#if 1
+asm void fn_801A4D20(void) {
+#include "src/hsd/hsd_lobj_fn_801A4D20.inc"
+}
+#else
+void fn_801A4D20(void) {}
+#endif
+
+/* 0x801A4F54 | 0xE78 */
+extern void fn_800A37CC(void);
+extern void fn_800BA414(void);
+extern void fn_800BA198(void);
+extern void fn_800BA440(void);
+extern void fn_800BA344(void);
+extern void fn_800BA1B4(void);
+extern void fn_800A3A9C(void);
+extern void fn_800A3ADC(void);
+extern void fn_800A3820(void);
+extern void fn_800BA424(void);
+extern void fn_800BA44C(void);
+extern void jumptable_8036CAD0();
+extern void jumptable_8036CAAC();
+extern void jumptable_8036CA88();
+extern u32 lbl_8047B2BC;
+extern u32 lbl_8047B2C0;
+extern u32 lbl_8047B2C4;
+extern u32 lbl_8047B2C8;
+extern u32 lbl_8047B2B8;
+extern u32 lbl_8047DBE0;
+extern u32 lbl_8047DBE4;
+extern u32 lbl_8047DBE8;
+extern u8 lbl_80274D58[];
+extern u8 lbl_80274D64[];
+extern u8 lbl_80478AC8[];
+extern u32 lbl_8047DBF0;
+extern u32 lbl_8047DBEC;
+extern u8 lbl_8047DBD4[];
+extern u32 lbl_8047DBF8;
+extern u32 lbl_8047DBFC;
+#if 1
+asm void fn_801A4F54(void) {
+#include "src/hsd/hsd_lobj_fn_801A4F54.inc"
+}
+#else
+void fn_801A4F54(void) {}
+#endif
+
+/* 0x801A6098 | 0x174 */
+extern u32 lbl_8047DBFC;
+extern u32 lbl_8047DBE4;
+extern u32 lbl_8047DBE8;
+#if 1
+asm void fn_801A6098(void) {
+#include "src/hsd/hsd_lobj_fn_801A6098.inc"
+}
+#else
+void fn_801A6098(void) {}
+#endif
+
+/* 0x801A620C | 0x164 */
+extern u32 lbl_8047DBE8;
+extern u32 lbl_8047DBE4;
+#if 1
+asm void fn_801A620C(void) {
+#include "src/hsd/hsd_lobj_fn_801A620C.inc"
+}
+#else
+void fn_801A620C(void) {}
+#endif
+
+/* 0x801A6370 | 0x98 */
+extern void fn_801C29C4();
+extern void fn_80191E38();
+#if 0
+asm void fn_801A6370(void) {
+#include "src/hsd/hsd_lobj_fn_801A6370.inc"
+}
+#else
+/* HSD_LObjReqAnimAll - request animation start for all lobjs in list */
+void fn_801A6370(HSD_LObj* lobj, f32 startframe) {
+    HSD_LObj* l;
+    if (lobj == NULL) return;
+    for (l = lobj; l != NULL; l = l->next) {
+        if (l == NULL) continue;
+        fn_801C29C4(l->aobj, startframe);
+        fn_80191E38(l != NULL ? l->position : NULL, startframe);
+        fn_80191E38(l != NULL ? l->interest : NULL, startframe);
+    }
+}
+#endif
+
+/* 0x801A6408 | 0x8C */
+extern void fn_801C27F4();
+extern void fn_801919EC();
+#if 0
+asm void fn_801A6408(void) {
+#include "src/hsd/hsd_lobj_fn_801A6408.inc"
+}
+#else
+/* HSD_LObjAnimAll - animate all lobjs in list */
+void fn_801A6408(HSD_LObj* lobj) {
+    HSD_LObj* l;
+    if (lobj == NULL) return;
+    for (l = lobj; l != NULL; l = l->next) {
+        if (l == NULL) continue;
+        fn_801C27F4(l->aobj, l, HSD_LOBJ_METHOD(l)->load);
+        fn_801919EC(l != NULL ? l->position : NULL);
+        fn_801919EC(l != NULL ? l->interest : NULL);
+    }
+}
+#endif
+
+/* 0x801A6494 | 0x24C */
+extern void jumptable_8036CAF4();
+extern u32 lbl_8047DC08;
+extern u32 lbl_8047DBE8;
+extern u32 lbl_8047DBE4;
+extern u32 lbl_8047DC10;
+#if 1
+asm void fn_801A6494(void) {
+#include "src/hsd/hsd_lobj_fn_801A6494.inc"
+}
+#else
+void fn_801A6494(void) {}
+#endif
+
+/* 0x801A66E0 | 0xAC */
+extern void fn_80191E88(void);
+#if 1
+asm void fn_801A66E0(void) {
+#include "src/hsd/hsd_lobj_fn_801A66E0.inc"
+}
+#else
+void fn_801A66E0(void) {}
+#endif
+
+/* 0x801A678C | 0x30 */
+#if 1
+asm void fn_801A678C(void) {
+#include "src/hsd/hsd_lobj_fn_801A678C.inc"
+}
+#else
+/* Get active light by index from lbl_804655E0 table */
+extern u8 lbl_804655E0[];
+HSD_LObj* fn_801A678C(s32 idx) {
+    if (idx < 0 || idx >= 8) return NULL;
+    return ((HSD_LObj**) lbl_804655E0)[idx];
+}
+#endif
+
+/* 0x801A67BC | 0x114 */
+#if 1
+asm void fn_801A67BC(void) {
+#include "src/hsd/hsd_lobj_fn_801A67BC.inc"
+}
+#else
+void fn_801A67BC(void) {}
+#endif
+
+/* 0x801A68D0 | 0x8 */
+extern u32 lbl_8047B2B8;
+#if 0
+asm void fn_801A68D0(void) {
+#include "src/hsd/hsd_lobj_fn_801A68D0.inc"
+}
+#else
+u32 fn_801A68D0(void) {
+    return lbl_8047B2B8;
+}
+#endif
+
+/* 0x801A68D8 | 0x8 */
+extern u32 lbl_8047B2C0;
+#if 0
+asm void fn_801A68D8(void) {
+#include "src/hsd/hsd_lobj_fn_801A68D8.inc"
+}
+#else
+u32 fn_801A68D8(void) {
+    return lbl_8047B2C0;
+}
+#endif
+
+/* 0x801A68E0 | 0x8 */
+extern u32 lbl_8047B2C8;
+#if 0
+asm void fn_801A68E0(void) {
+#include "src/hsd/hsd_lobj_fn_801A68E0.inc"
+}
+#else
+u32 fn_801A68E0(void) {
+    return lbl_8047B2C8;
+}
+#endif
+
+/* 0x801A68E8 | 0x8 */
+extern u32 lbl_8047B2C4;
+#if 0
+asm void fn_801A68E8(void) {
+#include "src/hsd/hsd_lobj_fn_801A68E8.inc"
+}
+#else
+u32 fn_801A68E8(void) {
+    return lbl_8047B2C4;
+}
+#endif
+
+/* 0x801A68F0 | 0x8 */
+extern u32 lbl_8047B2BC;
+#if 0
+asm void fn_801A68F0(void) {
+#include "src/hsd/hsd_lobj_fn_801A68F0.inc"
+}
+#else
+u32 fn_801A68F0(void) {
+    return lbl_8047B2BC;
+}
+#endif
+
+/* 0x801A68F8 | 0x18 */
+#if 0
+asm void fn_801A68F8(void) {
+#include "src/hsd/hsd_lobj_fn_801A68F8.inc"
+}
+#else
+void fn_801A68F8(HSD_LObj* lobj, u32 flags) {
+    if (lobj == NULL) return;
+    lobj->flags &= ~flags;
+}
+#endif
+
+/* 0x801A6910 | 0x18 */
+#if 0
+asm void fn_801A6910(void) {
+#include "src/hsd/hsd_lobj_fn_801A6910.inc"
+}
+#else
+void fn_801A6910(HSD_LObj* lobj, u32 flags) {
+    if (lobj == NULL) return;
+    lobj->flags |= flags;
+}
+#endif
+
+/* 0x801A6990 | 0x30 */
+extern u8 lbl_80465608[];
+#if 0
+asm void fn_801A6990(void) {
+#include "src/hsd/hsd_lobj_fn_801A6990.inc"
+}
+#else
+/* Call virtual dispatch via lbl_80465608 */
+typedef void (*fn_ptr)(void*);
+void fn_801A6990(HSD_LObj* lobj) {
+    fn_ptr func;
+    func = ((fn_ptr*) lbl_80465608)[4];
+    func(lobj);
+}
+#endif

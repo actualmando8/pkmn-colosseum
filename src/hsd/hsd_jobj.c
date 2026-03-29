@@ -401,3 +401,513 @@ static void JObjInfoInit(void)
     HSD_CLASS_INFO(&hsdJObj)->release = JObjRelease;
     HSD_CLASS_INFO(&hsdJObj)->amnesia = JObjAmnesia;
 }
+
+/* ===================================================================
+ * Generated: 0 pattern-matched + 28 stubs
+ * Range: 0x8019CE50 - 0x801A1988
+ * =================================================================== */
+
+/* 0x8019CF54 | 0x68 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u32 lbl_8047B298;
+extern u8 lbl_8036C8E0[];
+extern u32 lbl_8047B29C;
+extern u32 lbl_8047B2AC;
+#if 1
+asm void fn_8019CF54(void) {
+#include "src/hsd/hsd_jobj_fn_8019CF54.inc"
+}
+#else
+void fn_8019CF54(void) {
+    /* TODO: match -- 104 bytes at 0x8019CF54 */
+}
+#endif
+#pragma pop
+
+/* 0x8019CFBC | 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_8019C128(void);
+extern void fn_8019C1B0(void);
+extern void fn_801A8570(void);
+extern void fn_801A84F0(void);
+#if 1
+asm void fn_8019CFBC(void) {
+#include "src/hsd/hsd_jobj_fn_8019CFBC.inc"
+}
+#else
+void fn_8019CFBC(void) {
+    /* TODO: match -- 160 bytes at 0x8019CFBC */
+}
+#endif
+#pragma pop
+
+/* 0x8019D05C | 0x544 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80196E10(void);
+extern void fn_80196D78(void);
+extern void fn_80199264(void);
+extern void fn_801AE50C(void);
+extern void fn_801C25E4(void);
+extern u8 lbl_80274AA0[];
+extern u8 lbl_8047DB20[];
+extern u8 lbl_8047DB28[];
+#if 1
+asm void fn_8019D05C(void) {
+#include "src/hsd/hsd_jobj_fn_8019D05C.inc"
+}
+#else
+void fn_8019D05C(void) {
+    /* TODO: match -- 1348 bytes at 0x8019D05C */
+}
+#endif
+#pragma pop
+
+/* 0x8019D5A0 | 0x70 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u32 lbl_8047DB30;
+#if 1
+asm void fn_8019D5A0(void) {
+#include "src/hsd/hsd_jobj_fn_8019D5A0.inc"
+}
+#else
+void fn_8019D5A0(void) {
+    /* TODO: match -- 112 bytes at 0x8019D5A0 */
+}
+#endif
+#pragma pop
+
+/* 0x8019DD00 | 0x760 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801B00E0(void);
+extern void fn_800A3B7C(void);
+extern void fn_800A3AC0(void);
+extern void fn_800A3A78(void);
+extern void fn_800A3A9C(void);
+extern void fn_800A3ADC(void);
+extern void fn_800CE298(void);
+extern void fn_800A3244(void);
+extern void fn_800A37CC(void);
+extern void fn_800A3B9C(void);
+extern u8 lbl_80274AC4[];
+extern u32 lbl_8047DB30;
+extern u8 lbl_8047DB68[];
+extern u32 lbl_8047DB44;
+extern u32 lbl_8047DB48;
+extern u32 lbl_8047DB50;
+extern u32 lbl_8047DB58;
+extern u32 lbl_8047DB60;
+extern u8 lbl_80478AC0[];
+extern u8 lbl_8047DB6C[];
+extern u32 lbl_8047DB74;
+extern u32 lbl_8047DB78;
+#if 1
+asm void fn_8019DD00(void) {
+#include "src/hsd/hsd_jobj_fn_8019DD00.inc"
+}
+#else
+void fn_8019DD00(void) {
+    /* TODO: match -- 1888 bytes at 0x8019DD00 */
+}
+#endif
+#pragma pop
+
+/* 0x8019E460 | 0xBBC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801AED88(void);
+extern void fn_801A9570(void);
+extern void fn_801AFCAC(void);
+extern u32 lbl_8047DB48;
+extern u8 lbl_8047DB34[];
+extern u8 lbl_8047DB3C[];
+extern u32 lbl_8047DB7C;
+extern u32 lbl_8047DB44;
+extern u32 lbl_8047DB30;
+extern u32 lbl_8047DB50;
+extern u32 lbl_8047DB58;
+extern u32 lbl_8047DB60;
+extern u32 lbl_8047DB84;
+extern u32 lbl_8047DB80;
+#if 1
+asm void fn_8019E460(void) {
+#include "src/hsd/hsd_jobj_fn_8019E460.inc"
+}
+#else
+void fn_8019E460(void) {
+    /* TODO: match -- 3004 bytes at 0x8019E460 */
+}
+#endif
+#pragma pop
+
+/* 0x8019F01C | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u32 lbl_8047B2AC;
+#if 1
+asm void fn_8019F01C(void) {
+#include "src/hsd/hsd_jobj_fn_8019F01C.inc"
+}
+#else
+void fn_8019F01C(void) {
+    /* TODO: match -- 8 bytes at 0x8019F01C */
+}
+#endif
+#pragma pop
+
+/* 0x8019F1C4 | 0x554 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80199178(void);
+#if 1
+asm void fn_8019F1C4(void) {
+#include "src/hsd/hsd_jobj_fn_8019F1C4.inc"
+}
+#else
+void fn_8019F1C4(void) {
+    /* TODO: match -- 1364 bytes at 0x8019F1C4 */
+}
+#endif
+#pragma pop
+
+/* 0x8019F778 | 0x78 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_8019D620(void);
+#if 1
+asm void fn_8019F778(void) {
+#include "src/hsd/hsd_jobj_fn_8019F778.inc"
+}
+#else
+void fn_8019F778(void) {
+    /* TODO: match -- 120 bytes at 0x8019F778 */
+}
+#endif
+#pragma pop
+
+/* 0x8019FF30 | 0x18 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8019FF30(void) {
+#include "src/hsd/hsd_jobj_fn_8019FF30.inc"
+}
+#else
+void fn_8019FF30(void) {
+    /* TODO: match -- 24 bytes at 0x8019FF30 */
+}
+#endif
+#pragma pop
+
+/* 0x8019FF48 | 0x2C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8019FF48(void) {
+#include "src/hsd/hsd_jobj_fn_8019FF48.inc"
+}
+#else
+void fn_8019FF48(void) {
+    /* TODO: match -- 44 bytes at 0x8019FF48 */
+}
+#endif
+#pragma pop
+
+/* 0x8019FF74 | 0x1E8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u8 lbl_80274B28[];
+#if 1
+asm void fn_8019FF74(void) {
+#include "src/hsd/hsd_jobj_fn_8019FF74.inc"
+}
+#else
+void fn_8019FF74(void) {
+    /* TODO: match -- 488 bytes at 0x8019FF74 */
+}
+#endif
+#pragma pop
+
+/* 0x801A015C | 0x154 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void OSReport();
+#if 1
+asm void fn_801A015C(void) {
+#include "src/hsd/hsd_jobj_fn_801A015C.inc"
+}
+#else
+void fn_801A015C(void) {
+    /* TODO: match -- 340 bytes at 0x801A015C */
+}
+#endif
+#pragma pop
+
+/* 0x801A02B0 | 0x28C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A02B0(void) {
+#include "src/hsd/hsd_jobj_fn_801A02B0.inc"
+}
+#else
+void fn_801A02B0(void) {
+    /* TODO: match -- 652 bytes at 0x801A02B0 */
+}
+#endif
+#pragma pop
+
+/* 0x801A053C | 0xB0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A053C(void) {
+#include "src/hsd/hsd_jobj_fn_801A053C.inc"
+}
+#else
+void fn_801A053C(void) {
+    /* TODO: match -- 176 bytes at 0x801A053C */
+}
+#endif
+#pragma pop
+
+/* 0x801A0744 | 0x458 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80196E10(void);
+extern void fn_801991F8(void);
+extern void fn_8019C128(void);
+extern void fn_801A05EC(void);
+extern void fn_801A0B9C(void);
+extern void fn_801A0BF0(void);
+extern void fn_801A0C1C(void);
+extern void fn_801A0C68(void);
+extern void fn_801A0C9C(void);
+extern void fn_801A0CE8(void);
+extern void fn_801A0D3C(void);
+extern void fn_801A0D48(void);
+extern void fn_801A0D94(void);
+extern void fn_801AEBE4(void);
+#if 1
+asm void fn_801A0744(void) {
+#include "src/hsd/hsd_jobj_fn_801A0744.inc"
+}
+#else
+void fn_801A0744(void) {
+    /* TODO: match -- 1112 bytes at 0x801A0744 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0B9C | 0x54 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u8 lbl_80274AF4[];
+extern u8 lbl_80274B64[];
+#if 1
+asm void fn_801A0B9C(void) {
+#include "src/hsd/hsd_jobj_fn_801A0B9C.inc"
+}
+#else
+void fn_801A0B9C(void) {
+    /* TODO: match -- 84 bytes at 0x801A0B9C */
+}
+#endif
+#pragma pop
+
+/* 0x801A0BF0 | 0x2C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0BF0(void) {
+#include "src/hsd/hsd_jobj_fn_801A0BF0.inc"
+}
+#else
+void fn_801A0BF0(void) {
+    /* TODO: match -- 44 bytes at 0x801A0BF0 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0C1C | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0C1C(void) {
+#include "src/hsd/hsd_jobj_fn_801A0C1C.inc"
+}
+#else
+void fn_801A0C1C(void) {
+    /* TODO: match -- 76 bytes at 0x801A0C1C */
+}
+#endif
+#pragma pop
+
+/* 0x801A0C68 | 0x34 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0C68(void) {
+#include "src/hsd/hsd_jobj_fn_801A0C68.inc"
+}
+#else
+void fn_801A0C68(void) {
+    /* TODO: match -- 52 bytes at 0x801A0C68 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0C9C | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern u8 lbl_80274B00[];
+#if 1
+asm void fn_801A0C9C(void) {
+#include "src/hsd/hsd_jobj_fn_801A0C9C.inc"
+}
+#else
+void fn_801A0C9C(void) {
+    /* TODO: match -- 76 bytes at 0x801A0C9C */
+}
+#endif
+#pragma pop
+
+/* 0x801A0CE8 | 0x54 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0CE8(void) {
+#include "src/hsd/hsd_jobj_fn_801A0CE8.inc"
+}
+#else
+void fn_801A0CE8(void) {
+    /* TODO: match -- 84 bytes at 0x801A0CE8 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0D3C | 0xC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0D3C(void) {
+#include "src/hsd/hsd_jobj_fn_801A0D3C.inc"
+}
+#else
+void fn_801A0D3C(void) {
+    /* TODO: match -- 12 bytes at 0x801A0D3C */
+}
+#endif
+#pragma pop
+
+/* 0x801A0D48 | 0x4C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0D48(void) {
+#include "src/hsd/hsd_jobj_fn_801A0D48.inc"
+}
+#else
+void fn_801A0D48(void) {
+    /* TODO: match -- 76 bytes at 0x801A0D48 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0D94 | 0x228 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A0D94(void) {
+#include "src/hsd/hsd_jobj_fn_801A0D94.inc"
+}
+#else
+void fn_801A0D94(void) {
+    /* TODO: match -- 552 bytes at 0x801A0D94 */
+}
+#endif
+#pragma pop
+
+/* 0x801A0FBC | 0xDC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80193748(void);
+extern void fn_80193828(void);
+extern u32 lbl_8047B298;
+#if 1
+asm void fn_801A0FBC(void) {
+#include "src/hsd/hsd_jobj_fn_801A0FBC.inc"
+}
+#else
+void fn_801A0FBC(void) {
+    /* TODO: match -- 220 bytes at 0x801A0FBC */
+}
+#endif
+#pragma pop
+
+/* 0x801A1098 | 0x334 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801992D8(void);
+extern void fn_801AE5E8(void);
+extern void fn_800A2D38(void);
+extern void fn_801A8524(void);
+extern void fn_8019C264(void);
+extern void* memcpy(void* dst, const void* src, u32 n);
+extern u32 lbl_8047B298;
+#if 1
+asm void fn_801A1098(void) {
+#include "src/hsd/hsd_jobj_fn_801A1098.inc"
+}
+#else
+void fn_801A1098(void) {
+    /* TODO: match -- 820 bytes at 0x801A1098 */
+}
+#endif
+#pragma pop
+
+/* 0x801A1980 | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801A1980(void) {
+#include "src/hsd/hsd_jobj_fn_801A1980.inc"
+}
+#else
+void fn_801A1980(void) {
+    /* TODO: match -- 8 bytes at 0x801A1980 */
+}
+#endif
+#pragma pop

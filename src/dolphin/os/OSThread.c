@@ -716,3 +716,89 @@ s32 OSCheckActiveThreads(void) {
     OSRestoreInterrupts(enabled);
     return cThread;
 }
+
+#if 0
+asm void fn_800A1484(void) {
+#include "src/dolphin/os/OSThread_fn_800A1484.inc"
+}
+#else
+void fn_800A1484(OSThread* thread) {
+    OSThread* next;
+    OSThreadQueue* queue;
+    OSThread* prev;
+
+    next = thread->link.next;
+    queue = thread->queue;
+    prev = thread->link.prev;
+
+    if (next == NULL) {
+        queue->tail = prev;
+    } else {
+        next->link.prev = prev;
+    }
+
+    if (prev == NULL) {
+        queue->head = next;
+    } else {
+        prev->link.next = next;
+    }
+
+    if (!queue->head) {
+        RunQueueBits_8047A760 &= ~(1 << (31 - thread->priority));
+    }
+    thread->queue = NULL;
+}
+#endif
+#if 0
+asm void fn_800A14EC(void) {
+#include "src/dolphin/os/OSThread_fn_800A14EC.inc"
+}
+#else
+s32 fn_800A14EC(OSThread* thread) {
+    s32 priority;
+    OSMutex* mutex;
+
+    priority = thread->base;
+    mutex = thread->queueMutex.head;
+    while (mutex != NULL) {
+        OSThread* blocked = mutex->queue.head;
+        if (blocked != NULL) {
+            if (blocked->priority < priority) {
+                priority = blocked->priority;
+            }
+        }
+        mutex = mutex->link.next;
+    }
+    return priority;
+}
+#endif
+#if 1
+asm void fn_800A1528(void) {
+#include "src/dolphin/os/OSThread_fn_800A1528.inc"
+}
+#else
+OSThread* fn_800A1528(OSThread* thread, s32 priority) {
+    /* TODO: match -- SetEffectivePriority duplicate at 0x800A1528 */
+    return NULL;
+}
+#endif
+#if 1
+asm void fn_800A16E8(void) {
+#include "src/dolphin/os/OSThread_fn_800A16E8.inc"
+}
+#else
+void fn_800A16E8(OSThread* thread, s32 priority) {
+    /* TODO: match -- __OSPromoteThread duplicate at 0x800A16E8 */
+}
+#endif
+extern void fn_8009F958(OSThread* thread);
+extern void fn_800A2478(OSThreadQueue* queue);
+#if 1
+asm void fn_800A1BB4(void) {
+#include "src/dolphin/os/OSThread_fn_800A1BB4.inc"
+}
+#else
+void fn_800A1BB4(void* val) {
+    /* TODO: match -- OSExitThread duplicate at 0x800A1BB4 */
+}
+#endif

@@ -231,9 +231,209 @@ void fn_801C6688(f32 angle) {
  * fn_801C673C - Camera reset to default.
  * Address: 0x801C673C | Size: 0x24
  */
+extern u8 lbl_80275860[];
+extern u8 lbl_802758E8[];
+extern u8 lbl_802792E8[];
+extern u8 lbl_80279320[];
+extern u8 lbl_8027932C[];
+extern u8 lbl_80314AE8[];
+extern u8 lbl_8036E030[];
+extern u8 lbl_80467050[];
+extern u8 lbl_80467090[];
+extern u8 lbl_804670E8[];
+extern u8 lbl_80467378[];
+extern u8 lbl_80478AC0[];
+extern u32 lbl_8047B3B8;
+extern u32 lbl_8047B3C0;
+extern u32 lbl_8047B3D4;
+extern u32 lbl_8047B3E0;
+extern u32 lbl_8047DFE0;
+extern u32 lbl_8047DFF4;
+extern u32 lbl_8047DFF8;
+extern u32 lbl_8047E0A8;
+extern u32 lbl_8047E0AC;
+extern u32 lbl_8047E0B8;
+extern u32 lbl_8047E0C4;
+extern u32 lbl_8047E0D0;
+extern u32 lbl_8047E0D4;
+extern u32 lbl_8047E0D8;
+extern u32 lbl_8047E0E0;
+extern u32 lbl_8047E0E8;
+extern u32 lbl_8047E0F0;
+extern u32 lbl_8047E0F8;
+extern u32 lbl_8047E100;
+extern u32 lbl_8047E108;
+extern u32 lbl_8047E114;
+extern u32 lbl_8047E11C;
+extern u32 lbl_8047E120;
+extern u32 lbl_8047E128;
+extern u32 lbl_8047E13C;
+extern u32 lbl_8047E148;
+extern u32 lbl_8047E160;
+extern u32 lbl_8047E164;
+extern u32 lbl_8047E168;
+extern u32 lbl_8047E170;
+extern u32 lbl_8047E174;
+extern u32 lbl_8047E180;
+extern u32 lbl_8047E184;
+extern u32 lbl_8047E188;
+extern u32 lbl_8047E18C;
+extern u32 lbl_8047E190;
+extern u32 lbl_8047E194;
+extern u32 lbl_8047E198;
+extern u32 lbl_8047E1A0;
+extern u32 lbl_8047E1A8;
+extern u32 jumptable_8036DE70[];
+extern u32 jumptable_8036DEA8[];
+extern u32 jumptable_8036DF74[];
+extern void OSReport();
+extern void fn_800056C4();
+extern void fn_800056D4();
+extern void fn_800057A0();
+extern void fn_800057A8();
+extern void fn_8006A718();
+extern void fn_8006ADB4();
+extern void fn_8006ADEC();
+extern void fn_8006AF44();
+extern void fn_80072A00();
+extern void fn_80089D74();
+extern void fn_8008ABA0();
+extern void fn_800A3A78();
+extern void fn_800A3A9C();
+extern void fn_800A3AC0();
+extern void fn_800A3ADC();
+extern void fn_800A3C00();
+extern void fn_800B01AC();
+extern void fn_800B01C4();
+extern void fn_800B0358();
+extern void fn_800B0388();
+extern void fn_800B2F84();
+extern void fn_800B3078();
+extern void fn_800B373C();
+extern void fn_800B3978();
+extern void fn_800B41C0();
+extern void fn_800B4488();
+extern void fn_800B45E8();
+extern void fn_800B4774();
+extern void fn_800B4C7C();
+extern void fn_800B4DC4();
+extern void fn_800B5070();
+extern void fn_800B5228();
+extern void fn_800B5530();
+extern void fn_800B565C();
+extern void fn_800B5AE0();
+extern void fn_800B5BA4();
+extern void fn_800B5BE4();
+extern void fn_800CA7FC();
+extern void fn_800CA968();
+extern void fn_800CE2D8();
+extern void fn_800D6A00();
+extern void fn_800D7820();
+extern void fn_800D85D4();
+extern void fn_800D888C();
+extern void fn_800D88DC();
+extern void fn_800D9B58();
+extern void fn_800D9ED8();
+extern void fn_800DA028();
+extern void fn_800DA100();
+extern void fn_800DA1E8();
+extern void fn_800DA2BC();
+extern void fn_800DA4C4();
+extern void fn_800E0168();
+extern void fn_800E01D0();
+extern void fn_800E01F4();
+extern void fn_800E0C04();
+extern void fn_800E0C54();
+extern void fn_800E202C();
+extern void fn_800E209C();
+extern void fn_800E24B0();
+extern void fn_800E27B0();
+extern void fn_800E2C04();
+extern void fn_800E4014();
+extern void fn_800E407C();
+extern void fn_800E43A4();
+extern void fn_800E465C();
+extern void fn_800E4BF4();
+extern void fn_800E5BE0();
+extern void fn_800EC960();
+extern void fn_800EC990();
+extern void fn_800EC9DC();
+extern void fn_800ECA78();
+extern void fn_800ECB74();
+extern void fn_800ECCA8();
+extern void fn_800EE150();
+extern void fn_800EE3BC();
+extern void fn_800EE828();
+extern void fn_800F0308();
+extern void fn_800F92D4();
+extern void fn_800F9318();
+extern void fn_800FE714();
+extern void fn_800FE834();
+extern void fn_801065B8();
+extern void fn_80106698();
+extern void fn_801069FC();
+extern void fn_80113D58();
+extern void fn_80113F48();
+extern void fn_80117AE4();
+extern void fn_80123FBC();
+extern void fn_80128E38();
+extern void fn_8012A450();
+extern void fn_8012A5B0();
+extern void fn_8012B19C();
+extern void fn_8012B5E4();
+extern void fn_8012BBA8();
+extern void fn_8012BCA4();
+extern void fn_80135030();
+extern void fn_80135168();
+extern void fn_80135B8C();
+extern void fn_80135C58();
+extern void fn_80135CD0();
+extern void fn_801653CC();
+extern void fn_80165548();
+extern void fn_8016557C();
+extern void fn_801662E8();
+extern void fn_801668DC();
+extern void fn_80166AB8();
+extern void fn_80184470();
+extern void fn_8018805C();
+extern void fn_8018A280();
+extern void fn_8018BDF4();
+extern void fn_8018D928();
+extern void fn_8018D998();
+extern void fn_8018FC50();
+extern void fn_8018FCBC();
+extern void fn_801902E0();
+extern void fn_80190528();
+extern void fn_801C40F0();
+extern void fn_801EEAD0();
+extern void fn_8025D0A8();
+extern void fn_8025D164();
+s32 fn_801C7090(void);
+f32 fn_801C7630(s32 slot);
+void fn_801CA358(s32 effectType, s32 slot);
+void fn_801CBCDC(f32 scrollX, f32 scrollY);
+void fn_801CBE44(s32 bgID);
+void fn_801CBF64(void);
+void fn_801CC380(void);
+void fn_801CDB04(void);
+void fn_801CF320(void);
+void fn_801CF568(void);
+void fn_801CF7E4(void);
+void fn_801CF9C8(void);
+void fn_801CFD08(void);
+s32 fn_801D0080(void);
+void fn_801D0090(s32 phase);
+void fn_801D0AA0(s32 seqID);
+void fn_801D0AFC(s32 seqID);
+#if 1
+asm void fn_801C673C(void) {
+#include "src/game/battle/battle_scene_fn_801C673C.inc"
+}
+#else
 void fn_801C673C(void) {
     /* Reset camera to default battle view */
 }
+#endif
 
 /**
  * fn_801C6760 - Camera shake effect.
@@ -247,9 +447,15 @@ void fn_801C6760(f32 intensity, f32 duration) {
  * fn_801C680C - Camera shake update.
  * Address: 0x801C680C | Size: 0xC8
  */
+#if 1
+asm void fn_801C680C(void) {
+#include "src/game/battle/battle_scene_fn_801C680C.inc"
+}
+#else
 void fn_801C680C(void) {
     /* TODO: Camera shake update per frame (0xC8 bytes) */
 }
+#endif
 
 /**
  * fn_801C68D4 - Camera get shake active.
@@ -263,9 +469,15 @@ u8 fn_801C68D4(void) {
  * fn_801C6908 - Camera clear shake.
  * Address: 0x801C6908 | Size: 0x20
  */
+#if 1
+asm void fn_801C6908(void) {
+#include "src/game/battle/battle_scene_fn_801C6908.inc"
+}
+#else
 void fn_801C6908(void) {
     /* Clear camera shake state */
 }
+#endif
 
 /**
  * fn_801C6928 - Camera get mode flags.
@@ -346,12 +558,18 @@ void fn_801C70FC(s32 slot, u8 visible) {
  * Address: 0x801C71B0 | Size: 0x43C
  * Declared in battle.h.
  */
+#if 1
+asm void fn_801C71B0(void) {
+#include "src/game/battle/battle_scene_fn_801C71B0.inc"
+}
+#else
 void fn_801C71B0(void) {
     /* TODO: Scene update all animations (0x43C bytes)
      * Iterates through all active slots, updates model animations,
      * processes animation callbacks, advances frame counters.
      */
 }
+#endif
 
 /**
  * fn_801C75EC - Scene animation frame advance.
@@ -493,9 +711,15 @@ s32 fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType) {
  * fn_801C9910 - Scene state machine tick.
  * Address: 0x801C9910 | Size: 0x25C
  */
+#if 1
+asm void fn_801C9910(void) {
+#include "src/game/battle/battle_scene_fn_801C9910.inc"
+}
+#else
 void fn_801C9910(void) {
     /* TODO: Scene state machine tick (0x25C bytes) */
 }
+#endif
 
 /**
  * fn_801C9B6C - Scene transition trigger.
@@ -565,9 +789,15 @@ void fn_801C9F00(s32 slot, f32 x, f32 z) {
  * fn_801C9F5C - Scene complex update (multi-slot).
  * Address: 0x801C9F5C | Size: 0x3FC
  */
+#if 1
+asm void fn_801C9F5C(void) {
+#include "src/game/battle/battle_scene_fn_801C9F5C.inc"
+}
+#else
 void fn_801C9F5C(void) {
     /* TODO: Scene complex multi-slot update (0x3FC bytes) */
 }
+#endif
 
 /**
  * fn_801CA358 - Scene effect layer setup.
@@ -589,9 +819,15 @@ s32 fn_801CA4D8(void) {
  * fn_801CA4F8 - Scene effect update.
  * Address: 0x801CA4F8 | Size: 0xCC
  */
+#if 1
+asm void fn_801CA4F8(void) {
+#include "src/game/battle/battle_scene_fn_801CA4F8.inc"
+}
+#else
 void fn_801CA4F8(void) {
     /* TODO: Scene effect update (0xCC bytes) */
 }
+#endif
 
 /**
  * fn_801CA5C4 - Scene effect spawn.
@@ -605,17 +841,29 @@ void fn_801CA5C4(s32 effectID, f32 x, f32 y, f32 z) {
  * fn_801CA708 - Scene effect clear all.
  * Address: 0x801CA708 | Size: 0x20
  */
+#if 1
+asm void fn_801CA708(void) {
+#include "src/game/battle/battle_scene_fn_801CA708.inc"
+}
+#else
 void fn_801CA708(void) {
     /* Clear all active scene effects */
 }
+#endif
 
 /**
  * fn_801CA728 - Scene effect render pass.
  * Address: 0x801CA728 | Size: 0x84
  */
+#if 1
+asm void fn_801CA728(void) {
+#include "src/game/battle/battle_scene_fn_801CA728.inc"
+}
+#else
 void fn_801CA728(void) {
     /* TODO: Scene effect render pass (0x84 bytes) */
 }
+#endif
 
 /**
  * fn_801CA7AC - Scene get render frame count.
@@ -629,9 +877,15 @@ u32 fn_801CA7AC(void) {
  * fn_801CA7CC - Scene increment render frame.
  * Address: 0x801CA7CC | Size: 0x20
  */
+#if 1
+asm void fn_801CA7CC(void) {
+#include "src/game/battle/battle_scene_fn_801CA7CC.inc"
+}
+#else
 void fn_801CA7CC(void) {
     /* Increment render frame counter */
 }
+#endif
 
 /**
  * fn_801CA7EC - Scene render layer configuration.
@@ -834,9 +1088,15 @@ void fn_801CAFD4(s32 slot, s32 particleID) {
  * fn_801CB078 - Animation particle update.
  * Address: 0x801CB078 | Size: 0x8C
  */
+#if 1
+asm void fn_801CB078(void) {
+#include "src/game/battle/battle_scene_fn_801CB078.inc"
+}
+#else
 void fn_801CB078(void) {
     /* TODO: Particle update (0x8C bytes) */
 }
+#endif
 
 /**
  * fn_801CB104 - Animation particle check active.
@@ -938,9 +1198,15 @@ void fn_801CB530(s32 slot, u32 statusCondition) {
  * fn_801CB59C - Scene status icon update.
  * Address: 0x801CB59C | Size: 0x80
  */
+#if 1
+asm void fn_801CB59C(void) {
+#include "src/game/battle/battle_scene_fn_801CB59C.inc"
+}
+#else
 void fn_801CB59C(void) {
     /* TODO: Status icon update (0x80 bytes) */
 }
+#endif
 
 /**
  * fn_801CB61C - Scene name plate setup.
@@ -1030,9 +1296,15 @@ void fn_801CBAB8(u8 r, u8 g, u8 b) {
  * fn_801CBBAC - Scene transition update.
  * Address: 0x801CBBAC | Size: 0x130
  */
+#if 1
+asm void fn_801CBBAC(void) {
+#include "src/game/battle/battle_scene_fn_801CBBAC.inc"
+}
+#else
 void fn_801CBBAC(void) {
     /* TODO: Scene transition update (0x130 bytes) */
 }
+#endif
 
 /**
  * fn_801CBCDC - Scene background scroll.
@@ -1054,11 +1326,17 @@ void fn_801CBE44(s32 bgID) {
  * fn_801CBF64 - Scene complex animation controller.
  * Address: 0x801CBF64 | Size: 0x41C
  */
+#if 1
+asm void fn_801CBF64(void) {
+#include "src/game/battle/battle_scene_fn_801CBF64.inc"
+}
+#else
 void fn_801CBF64(void) {
     /* TODO: Complex animation controller (0x41C bytes)
      * Manages multi-step animation sequences across multiple slots.
      */
 }
+#endif
 
 /**
  * fn_801CC380 - Scene animation mega-function A.
@@ -1066,11 +1344,17 @@ void fn_801CBF64(void) {
  * Massive state machine (~6KB) handling a complete battle animation
  * sequence. Likely covers the full attack/hit/resolution animation cycle.
  */
+#if 1
+asm void fn_801CC380(void) {
+#include "src/game/battle/battle_scene_fn_801CC380.inc"
+}
+#else
 void fn_801CC380(void) {
     /* TODO: Scene animation mega-function A (0x1784 bytes)
      * Large state machine with many animation states.
      */
 }
+#endif
 
 /**
  * fn_801CDB04 - Scene animation mega-function B.
@@ -1078,52 +1362,88 @@ void fn_801CC380(void) {
  * Another massive state machine (~6.2KB). Handles a second major
  * animation sequence, possibly the encounter/send-out flow.
  */
+#if 1
+asm void fn_801CDB04(void) {
+#include "src/game/battle/battle_scene_fn_801CDB04.inc"
+}
+#else
 void fn_801CDB04(void) {
     /* TODO: Scene animation mega-function B (0x181C bytes)
      * Large state machine with many animation states.
      */
 }
+#endif
 
 /**
  * fn_801CF320 - Scene sequence step A.
  * Address: 0x801CF320 | Size: 0x248
  */
+#if 1
+asm void fn_801CF320(void) {
+#include "src/game/battle/battle_scene_fn_801CF320.inc"
+}
+#else
 void fn_801CF320(void) {
     /* TODO: Scene sequence step A (0x248 bytes) */
 }
+#endif
 
 /**
  * fn_801CF568 - Scene sequence step B.
  * Address: 0x801CF568 | Size: 0x27C
  */
+#if 1
+asm void fn_801CF568(void) {
+#include "src/game/battle/battle_scene_fn_801CF568.inc"
+}
+#else
 void fn_801CF568(void) {
     /* TODO: Scene sequence step B (0x27C bytes) */
 }
+#endif
 
 /**
  * fn_801CF7E4 - Scene sequence step C.
  * Address: 0x801CF7E4 | Size: 0x1E4
  */
+#if 1
+asm void fn_801CF7E4(void) {
+#include "src/game/battle/battle_scene_fn_801CF7E4.inc"
+}
+#else
 void fn_801CF7E4(void) {
     /* TODO: Scene sequence step C (0x1E4 bytes) */
 }
+#endif
 
 /**
  * fn_801CF9C8 - Scene sequence step D.
  * Address: 0x801CF9C8 | Size: 0x340
  */
+#if 1
+asm void fn_801CF9C8(void) {
+#include "src/game/battle/battle_scene_fn_801CF9C8.inc"
+}
+#else
 void fn_801CF9C8(void) {
     /* TODO: Scene sequence step D (0x340 bytes) */
 }
+#endif
 
 /**
  * fn_801CFD08 - Scene transition controller.
  * Address: 0x801CFD08 | Size: 0x378
  * Manages transitions between battle phases (intro -> command -> execute -> result).
  */
+#if 1
+asm void fn_801CFD08(void) {
+#include "src/game/battle/battle_scene_fn_801CFD08.inc"
+}
+#else
 void fn_801CFD08(void) {
     /* TODO: Scene transition controller (0x378 bytes) */
 }
+#endif
 
 /**
  * fn_801D0080 - Scene transition get phase.
@@ -1153,17 +1473,29 @@ void fn_801D0314(s32 arg0) {
  * fn_801D036C - Scene transition helper B.
  * Address: 0x801D036C | Size: 0x30
  */
+#if 1
+asm void fn_801D036C(void) {
+#include "src/game/battle/battle_scene_fn_801D036C.inc"
+}
+#else
 void fn_801D036C(void) {
     /* Transition helper B */
 }
+#endif
 
 /**
  * fn_801D039C - Scene model pool update.
  * Address: 0x801D039C | Size: 0xD0
  */
+#if 1
+asm void fn_801D039C(void) {
+#include "src/game/battle/battle_scene_fn_801D039C.inc"
+}
+#else
 void fn_801D039C(void) {
     /* TODO: Scene model pool update (0xD0 bytes) */
 }
+#endif
 
 /**
  * fn_801D046C - Scene model pool get count.
@@ -1201,9 +1533,15 @@ void fn_801D04F4(void* model) {
  * fn_801D055C - Scene model pool batch update.
  * Address: 0x801D055C | Size: 0x1EC
  */
+#if 1
+asm void fn_801D055C(void) {
+#include "src/game/battle/battle_scene_fn_801D055C.inc"
+}
+#else
 void fn_801D055C(void) {
     /* TODO: Model pool batch update (0x1EC bytes) */
 }
+#endif
 
 /**
  * fn_801D0748 - Scene animation sequence manager.
@@ -1249,9 +1587,15 @@ f32 fn_801D0BD0(s32 seqID) {
  * fn_801D0C30 - Scene complex rendering setup.
  * Address: 0x801D0C30 | Size: 0x180
  */
+#if 1
+asm void fn_801D0C30(void) {
+#include "src/game/battle/battle_scene_fn_801D0C30.inc"
+}
+#else
 void fn_801D0C30(void) {
     /* TODO: Complex rendering setup (0x180 bytes) */
 }
+#endif
 
 /**
  * fn_801D0DB0 - Scene rendering main loop.
@@ -1259,6 +1603,12 @@ void fn_801D0C30(void) {
  * Large rendering loop that processes all active scene elements
  * per frame. Handles model rendering, effects, UI, and compositing.
  */
+#if 1
+asm void fn_801D0DB0(void) {
+#include "src/game/battle/battle_scene_fn_801D0DB0.inc"
+}
+#else
 void fn_801D0DB0(void) {
     /* TODO: Scene rendering main loop (0x588 bytes) */
 }
+#endif

@@ -30,6 +30,7 @@
 
 #include "dolphin/types.h"
 #include "game/gs_texture.h"
+#include "game/gs_thread.h"
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
@@ -891,3 +892,154 @@ GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
 
     return tex;
 }
+
+/* 0x800F028C | 0x68 */
+extern void fn_800F015C(void);
+extern void fn_800F0030(void);
+extern void fn_800F00C0(void);
+extern u32 lbl_8047AC24;
+extern u32 lbl_8047AC1C;
+extern u32 lbl_8047AC20;
+extern u32 lbl_8047AC10;
+#if 1
+asm void fn_800F028C(void) {
+#include "src/game/gs_texture_fn_800F028C.inc"
+}
+#else
+void fn_800F028C(void) {
+    /* TODO: match -- 104 bytes at 0x800F028C */
+}
+#endif
+
+/* 0x800F02F4 | 0x14 */
+#if 1
+asm void fn_800F02F4(void) {
+#include "src/game/gs_texture_fn_800F02F4.inc"
+}
+#else
+void fn_800F02F4(void) {
+    /* TODO: match -- 20 bytes at 0x800F02F4 */
+}
+#endif
+
+/* 0x800F036C | 0x8 */
+#if 0
+asm void fn_800F036C(void) {
+#include "src/game/gs_texture_fn_800F036C.inc"
+}
+#else
+/* lbz r3, 0xb(r3) -- load byte at offset 0xb from arg */
+u8 fn_800F036C(GSThread* thr) {
+    return thr->affinity;
+}
+#endif
+
+/* 0x800F0374 | 0x8 */
+#if 0
+asm void fn_800F0374(void) {
+#include "src/game/gs_texture_fn_800F0374.inc"
+}
+#else
+/* lwz r3, 0xc(r3) -- load word at offset 0xc from arg */
+u32 fn_800F0374(GSThread* thr) {
+    return thr->priority;
+}
+#endif
+
+/* 0x800F037C | 0x8 */
+extern u32 lbl_8047AC00;
+#if 0
+asm void fn_800F037C(void) {
+#include "src/game/gs_texture_fn_800F037C.inc"
+}
+#else
+/* lwz r3, lbl_8047AC00(r13) -- return gsThreadFrameCount */
+u32 fn_800F037C(void) {
+    return lbl_8047AC00;
+}
+#endif
+
+/* 0x800F0384 | 0x50 */
+extern u32 lbl_8047AC28;
+extern u32 lbl_8047AC30;
+extern u32 lbl_8047AC0C;
+#if 0
+asm void fn_800F0384(void) {
+#include "src/game/gs_texture_fn_800F0384.inc"
+}
+#else
+/*
+ * Loop over all threads; for each thread whose priority == arg, clear sleeping flag.
+ * stride = 0x24, field at +0xc = priority, field at +0xa = sleeping
+ * lbl_8047AC28 = gsThreadArray, lbl_8047AC30 = gsThreadMaxCount
+ * lbl_8047AC0C = gsThreadActive
+ */
+void fn_800F0384(u32 priority) {
+    u32 i;
+    u32 offset;
+    GSThread* arr;
+    u32 count;
+    GSThread* thr;
+
+    if (priority == 0) {
+        return;
+    }
+
+    arr = (GSThread*)lbl_8047AC28;
+    count = lbl_8047AC30;
+    offset = 0;
+    i = 0;
+
+    while (i < count) {
+        thr = (GSThread*)((u8*)arr + offset);
+        if (thr->priority == priority) {
+            thr->sleeping = 0;
+        }
+        offset += 0x24;
+        i++;
+    }
+
+    *(u8*)&lbl_8047AC0C = 1;
+}
+#endif
+
+/* 0x800F03D4 | 0x50 */
+extern u32 lbl_8047AC28;
+extern u32 lbl_8047AC30;
+extern u32 lbl_8047AC0C;
+#if 0
+asm void fn_800F03D4(void) {
+#include "src/game/gs_texture_fn_800F03D4.inc"
+}
+#else
+/*
+ * Loop over all threads; for each thread whose priority == arg, set sleeping = 1.
+ */
+void fn_800F03D4(u32 priority) {
+    u32 i;
+    u32 offset;
+    GSThread* arr;
+    u32 count;
+    GSThread* thr;
+
+    if (priority == 0) {
+        return;
+    }
+
+    arr = (GSThread*)lbl_8047AC28;
+    count = lbl_8047AC30;
+    offset = 0;
+    i = 0;
+
+    while (i < count) {
+        thr = (GSThread*)((u8*)arr + offset);
+        if (thr->priority == priority) {
+            thr->sleeping = 1;
+        }
+        offset += 0x24;
+        i++;
+    }
+
+    *(u8*)&lbl_8047AC0C = 1;
+}
+#endif
