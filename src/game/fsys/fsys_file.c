@@ -703,6 +703,31 @@ u32 fn_8017D400(void) { return 1; }
 /* Address: 0x8017D408 | Size: 0x8 | Pattern: return_constant */
 u32 fn_8017D408(void) { return 1; }
 
+/* WP-0054: restored asm wrappers */
+extern void fn_80167E34(void);
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8017B1AC(void) {
+#include "src/game/gs_scene_fn_8017B1AC.inc"
+}
+#else
+void fn_8017B1AC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8017B2CC(void) {
+#include "src/game/gs_scene_fn_8017B2CC.inc"
+}
+#else
+void fn_8017B2CC(void) { /* TODO */ }
+#endif
+#pragma pop
+
 /* ===================================================================
  * WP-0009 stubs (address range 0x8017B448 - 0x8017E1D8)
  * =================================================================== */
