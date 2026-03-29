@@ -102,6 +102,12 @@ extern void* fn_8012640C();
 extern u32   fn_801254B4();
 extern void  fn_80125424();
 extern u32   fn_80142CF4();
+extern void  fn_80119ED0(void);
+extern void  fn_80121ADC(void);
+extern void  fn_8011B67C(void);
+extern void  fn_801230E0(void);
+extern void  fn_801F0928(void);
+extern void  fn_8011BEB4(void);
 
 /* SDA table pointers for event data arrays */
 extern u32 lbl_80478D38;   /* Event table count */
@@ -2665,6 +2671,18 @@ void fn_80204970(void)
   }
   return;
 }
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_802040E8(void) {
+#include "src/game/colosseum_event_fn_802040E8.inc"
+}
+#else
+void fn_802040E8(void) { /* TODO */ }
+#endif
+#pragma pop
+
 /* fn_80204A10 | Size: 0x4C | Check if trainer slot is active */
 u8 fn_80204A10(u32 slotId) {
     extern void* fn_801F4354(u32 context, u32 slot);
@@ -2909,6 +2927,18 @@ int fn_8020505C(void)
   }
   return iVar1;
 }
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_802050F4(void) {
+#include "src/game/colosseum_event_fn_802050F4.inc"
+}
+#else
+void fn_802050F4(void) { /* TODO */ }
+#endif
+#pragma pop
+
 /* fn_80205134 | Size: 0x50 | Get field 0x30 from resolved 0xD9, default 9 */
 u16 fn_80205134(void* ctx) {
     extern u32 fn_8011BEB4();
@@ -2918,6 +2948,18 @@ u16 fn_80205134(void* ctx) {
     }
     return (u16)fn_8011BEB4(resolved, 0, 0x30, 0);
 }
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80205184(void) {
+#include "src/game/colosseum_event_fn_80205184.inc"
+}
+#else
+void fn_80205184(void) { /* TODO */ }
+#endif
+#pragma pop
 
 /* fn_802051D4 | Size: 0x50 | Get field 0x27 from resolved 0xD9, default 0 */
 u16 fn_802051D4(void* ctx) {
@@ -3381,6 +3423,18 @@ s16 fn_80205B2C(void* ctx) {
     }
     return (s16)(u32)fn_8012640C(hop1, 0, 0xCE, 0);
 }
+
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80205B8C(void) {
+#include "src/game/colosseum_event_fn_80205B8C.inc"
+}
+#else
+void fn_80205B8C(void) { /* TODO */ }
+#endif
+#pragma pop
 
 /* 0x80205BE8 | size: 0x3C | small */
 void* fn_80205BE8(void* ctx) {
