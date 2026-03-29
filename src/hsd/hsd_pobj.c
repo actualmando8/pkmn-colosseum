@@ -189,3 +189,16 @@ static void PObjInfoInit(void)
     ((HSD_ClassInfo*) &hsdPObj)->amnesia = PObjAmnesia;
     hsdPObj.load = PObjLoad;
 }
+
+/* 0x801AE000 | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801AE000(void) {
+#include "src/hsd/hsd_pobj_ext_fn_801AE000.inc"
+}
+#else
+void fn_801AE000(void) { /* TODO */ }
+#endif
+#pragma pop
