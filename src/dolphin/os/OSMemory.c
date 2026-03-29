@@ -39,6 +39,15 @@ void __OSModuleInit(void) {
     bootInfo[0x30D0 / 4] = 0;
 }
 
+extern void OSInitThreadQueue();
+#if 1
+asm void fn_8009F1D0(void) {
+#include "src/dolphin/os/OSMemory_fn_8009F1D0.inc"
+}
+#else
+void fn_8009F1D0(void) { /* TODO */ }
+#endif
+
 static void MEMIntrruptHandler(s16 interrupt, OSContext* context) {
     volatile u16* mi = (volatile u16*)0xCC004000;
     u32 cause;
@@ -59,6 +68,14 @@ static void MEMIntrruptHandler(s16 interrupt, OSContext* context) {
         __OSUnhandledException(OS_ERROR_PROTECTION, context, 0, 0);
     }
 }
+
+#if 1
+asm void fn_8009F488(void) {
+#include "src/dolphin/os/OSMemory_fn_8009F488.inc"
+}
+#else
+void fn_8009F488(void) { /* TODO */ }
+#endif
 
 /* Config24MB - sets BAT registers for 24MB physical memory layout */
 #pragma push
