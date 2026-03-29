@@ -139,47 +139,32 @@ def _fix_sda21(instr):
     """
     Convert @sda21 addressing to explicit register form.
 
-    For r13 (SDA) symbols: use symbolic form sym(r13). CW asm{} supports
-    this and produces R_PPC_SDAREL16 relocations matching the baseline.
+    Both r13 (SDA) and r2 (SDA2) symbols use the symbolic form sym(r13/r2).
+    MWCC CW asm{} supports sym(r13) and sym(r2) when the symbol is declared
+    with a file-scope extern. This produces R_PPC_SDAREL16 or R_PPC_EMB_SDA21
+    relocations matching the baseline object file.
 
-    For r2 (SDA2) symbols: CW asm{} cannot parse sym(r2) in load/store
-    instructions (error: "illegal use of label"). Must use numeric offsets
-    OFFSET(r2) instead. This produces no R_PPC_EMB_SDA21 relocation, but
-    objdiff with ppc.calculatePoolRelocations=false accepts these for fp
-    constant loads when the binary encoding matches.
+    Requirements:
+    - r13 symbols need: extern u32 sym;  (or matching type)
+    - r2 symbols need:  extern f32/f64 sym;  (must match float type used)
 
-    sym@sda21(r0) -> sym(r13)         [r13 SDA symbols]
-                  -> OFFSET(r2)       [r2 SDA2 symbols, numeric]
-    li rX, sym@sda21 -> la rX, sym(r13)     [r13 SDA symbols]
-                     -> addi rX, r2, OFFSET  [r2 SDA2 symbols, numeric]
+    sym@sda21(r0) -> sym(r13) or sym(r2)   [symbolic form always]
+    li rX, sym@sda21 -> la rX, sym(r13/r2) [symbolic form always]
     """
-    # Handle load/store: sym@sda21(r0/r13/r2) -> sym(r13) or OFFSET(r2)
+    # Handle load/store: sym@sda21(r0/r13/r2) -> sym(r13) or sym(r2)
     def _ls_replacer(m):
         sym = m.group(1)
         reg = _sda_reg(sym)
-        if reg == 'r2':
-            offset = _sda2_numeric_offset(sym)
-            if offset is not None:
-                return f'{offset}(r2)'
-            # Unknown named SDA2 symbol — keep symbolic as fallback
-            return f'{sym}(r2)'
         return f'{sym}({reg})'
     instr = re.sub(r'([a-zA-Z_][a-zA-Z0-9_]*)@sda21\(r\d+\)', _ls_replacer, instr)
 
-    # Handle: li rX, sym@sda21 -> la rX, sym(r13) or addi rX, r2, OFFSET
+    # Handle: li rX, sym@sda21 -> la rX, sym(r13) or la rX, sym(r2)
     m = re.match(r'^(li\s+(r\d+),\s+)([a-zA-Z_][a-zA-Z0-9_]*)@sda21\s*$', instr)
     if m:
         rx = m.group(2)
         sym = m.group(3)
         reg = _sda_reg(sym)
-        if reg == 'r2':
-            offset = _sda2_numeric_offset(sym)
-            if offset is not None:
-                instr = f'addi {rx}, r2, {offset}'
-            else:
-                instr = f'la {rx}, {sym}(r2)'
-        else:
-            instr = f'la {rx}, {sym}({reg})'
+        instr = f'la {rx}, {sym}({reg})'
 
     return instr
 
