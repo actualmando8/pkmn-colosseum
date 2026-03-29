@@ -44,14 +44,14 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 extern void fn_800DCC3C(void);
 extern void fn_800DCC60(void);
 extern void fn_800E01F4(void);
-extern void fn_800E3CF8(void);
-extern void fn_800E3D00(void);
-extern void fn_800E3D08(void);
-extern void fn_800E3D6C(void);
-extern void fn_800E3D98(void);
-extern void fn_800E4014(void);
-extern void fn_800E4170(void);
-extern void fn_800E43A4(void);
+extern void fn_800E3CF8(void*);
+extern void fn_800E3D00(void*);
+extern void fn_800E3D08(void*);
+extern void fn_800E3D6C(void*);
+extern void fn_800E3D98(void*, void*);
+extern void fn_800E4014(void*, u8);
+extern void fn_800E4170(void*);
+extern void fn_800E43A4(void*);
 extern void fn_800E9B2C(void);
 extern void fn_800E9C6C(void);
 extern void fn_800EC2A4(void);
@@ -725,12 +725,16 @@ void fn_801837D8(void) { /* TODO: match -- 384 bytes at 0x801837D8 */ }
 /* 0x80183958 | 0x24 */
 extern void fn_801170A4(void);
 extern void fn_80116EC8(void);
-#if 1
+#if 0
 asm void fn_80183958(void) {
 #include "src/game/people/people_fn_80183958.inc"
 }
 #else
-void fn_80183958(void) { /* TODO: match -- 36 bytes at 0x80183958 */ }
+#pragma optimization_level 4
+void fn_80183958(void) {
+    fn_801170A4();
+    fn_80116EC8();
+}
 #endif
 
 /* 0x801839A0 | 0x1A4 */
@@ -796,12 +800,15 @@ void fn_80184190(void) { /* TODO: match -- 704 bytes at 0x80184190 */ }
 #endif
 
 /* 0x80184450 | 0x20 */
-#if 1
+#if 0
 asm void fn_80184450(void) {
 #include "src/game/people/people_fn_80184450.inc"
 }
 #else
-void fn_80184450(void) { /* TODO: match -- 32 bytes at 0x80184450 */ }
+#pragma optimization_level 4
+void fn_80184450(void) {
+    fn_800F0308();
+}
 #endif
 
 /* 0x80184948 | 0x148 */
@@ -1091,23 +1098,35 @@ void fn_8018F470(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018F490(void) {
 #include "src/game/people/people_fn_8018F490.inc"
 }
 #else
-void fn_8018F490(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8018F490(void* p) {
+    if (p != NULL) {
+        return (*(u8*)p >> 4) & 1;
+    }
+    return 0;
+}
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018F4AC(void) {
 #include "src/game/people/people_fn_8018F4AC.inc"
 }
 #else
-void fn_8018F4AC(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8018F4AC(void* p) {
+    if (p != NULL) {
+        return (*(u8*)p >> 5) & 7;
+    }
+    return 0;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1135,23 +1154,35 @@ void fn_8018F5CC(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018F5FC(void) {
 #include "src/game/people/people_fn_8018F5FC.inc"
 }
 #else
-void fn_8018F5FC(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8018F5FC(void* p) {
+    if (p != NULL) {
+        return (*(u8*)p >> 2) & 3;
+    }
+    return 0;
+}
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018F6B4(void) {
 #include "src/game/people/people_fn_8018F6B4.inc"
 }
 #else
-void fn_8018F6B4(void) { /* TODO */ }
+#pragma optimization_level 4
+void* fn_8018F6B4(void* p) {
+    if (p != NULL) {
+        return *(void**)((u8*)p + 0x0C);
+    }
+    return NULL;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1201,11 +1232,13 @@ void fn_8018F87C(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018FC50(void) {
 #include "src/game/people/people_fn_8018FC50.inc"
 }
 #else
-void fn_8018FC50(void) { /* TODO */ }
+void fn_8018FC50(PeopleEntry* entry) {
+    fn_800E3CF8(entry->modelHandle);
+}
 #endif
 #pragma pop
