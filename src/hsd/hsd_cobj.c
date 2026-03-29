@@ -274,3 +274,403 @@ static void CObjInfoInit(void)
     HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease;
     HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia;
 }
+
+/* 0x80193CD0 | 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193CD0(void) {
+#include "src/hsd/hsd_cobj_fn_80193CD0.inc"
+}
+#else
+void fn_80193CD0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193D30 | 0x198 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80196E10(void);
+extern void fn_801A84F0(void);
+extern void fn_801C25E4(void);
+#if 1
+asm void fn_80193D30(void) {
+#include "src/hsd/hsd_cobj_fn_80193D30.inc"
+}
+#else
+void fn_80193D30(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193EC8 | 0x7C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80191628(void);
+#if 1
+asm void fn_80193EC8(void) {
+#include "src/hsd/hsd_cobj_fn_80193EC8.inc"
+}
+#else
+void fn_80193EC8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193F44 | 0xCC */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80193748(void);
+extern void fn_80193828(void);
+#if 1
+asm void fn_80193F44(void) {
+#include "src/hsd/hsd_cobj_fn_80193F44.inc"
+}
+#else
+void fn_80193F44(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194010 | 0x248 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_8019189C(void);
+extern void fn_801947C8(void);
+extern void fn_80194DA4(void);
+#if 1
+asm void fn_80194010(void) {
+#include "src/hsd/hsd_cobj_fn_80194010.inc"
+}
+#else
+void fn_80194010(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194258 | 0x60 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194258(void) {
+#include "src/hsd/hsd_cobj_fn_80194258.inc"
+}
+#else
+void fn_80194258(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801942B8 | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801942B8(void) {
+#include "src/hsd/hsd_cobj_fn_801942B8.inc"
+}
+#else
+void fn_801942B8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801942C0 | 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801942C0(void) {
+#include "src/hsd/hsd_cobj_fn_801942C0.inc"
+}
+#else
+void fn_801942C0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x8019431C | 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8019431C(void) {
+#include "src/hsd/hsd_cobj_fn_8019431C.inc"
+}
+#else
+void fn_8019431C(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194358 | 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194358(void) {
+#include "src/hsd/hsd_cobj_fn_80194358.inc"
+}
+#else
+void fn_80194358(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x8019437C | 0x24 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8019437C(void) {
+#include "src/hsd/hsd_cobj_fn_8019437C.inc"
+}
+#else
+void fn_8019437C(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801943A0 | 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801943A0(void) {
+#include "src/hsd/hsd_cobj_fn_801943A0.inc"
+}
+#else
+void fn_801943A0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801943BC | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801943BC(void) {
+#include "src/hsd/hsd_cobj_fn_801943BC.inc"
+}
+#else
+void fn_801943BC(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801943CC | 0x18 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801943CC(void) {
+#include "src/hsd/hsd_cobj_fn_801943CC.inc"
+}
+#else
+void fn_801943CC(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801943E4 | 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801943E4(void) {
+#include "src/hsd/hsd_cobj_fn_801943E4.inc"
+}
+#else
+void fn_801943E4(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194400 | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194400(void) {
+#include "src/hsd/hsd_cobj_fn_80194400.inc"
+}
+#else
+void fn_80194400(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801944A4 | 0x1C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801944A4(void) {
+#include "src/hsd/hsd_cobj_fn_801944A4.inc"
+}
+#else
+void fn_801944A4(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801944C0 | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801944C0(void) {
+#include "src/hsd/hsd_cobj_fn_801944C0.inc"
+}
+#else
+void fn_801944C0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801944D0 | 0x18 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801944D0(void) {
+#include "src/hsd/hsd_cobj_fn_801944D0.inc"
+}
+#else
+void fn_801944D0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801944E8 | 0x10 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801944E8(void) {
+#include "src/hsd/hsd_cobj_fn_801944E8.inc"
+}
+#else
+void fn_801944E8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801944F8 | 0x18 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801944F8(void) {
+#include "src/hsd/hsd_cobj_fn_801944F8.inc"
+}
+#else
+void fn_801944F8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194510 | 0xA0 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_800CE220(void);
+#if 1
+asm void fn_80194510(void) {
+#include "src/hsd/hsd_cobj_fn_80194510.inc"
+}
+#else
+void fn_80194510(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801945B0 | 0xA4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801945B0(void) {
+#include "src/hsd/hsd_cobj_fn_801945B0.inc"
+}
+#else
+void fn_801945B0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194654 | 0x9C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194654(void) {
+#include "src/hsd/hsd_cobj_fn_80194654.inc"
+}
+#else
+void fn_80194654(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801946F0 | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801946F0(void) {
+#include "src/hsd/hsd_cobj_fn_801946F0.inc"
+}
+#else
+void fn_801946F0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194788 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194788(void) {
+#include "src/hsd/hsd_cobj_fn_80194788.inc"
+}
+#else
+void fn_80194788(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801947A8 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801947A8(void) {
+#include "src/hsd/hsd_cobj_fn_801947A8.inc"
+}
+#else
+void fn_801947A8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801947C8 | 0x464 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void OSReport(const char* fmt, ...);
+extern void fn_800A3244(void);
+extern void fn_800A3820(void);
+extern void fn_800A3A9C(void);
+extern void fn_800A3ADC(void);
+extern void fn_800CE59C(void);
+extern void fn_800CE718(void);
+extern void fn_80194C2C(void);
+extern void fn_80194D94(void);
+extern void fn_8019513C(void);
+extern void fn_80195590(void);
+extern void fn_80195904(void);
+extern void fn_801959DC(void);
+#if 1
+asm void fn_801947C8(void) {
+#include "src/hsd/hsd_cobj_fn_801947C8.inc"
+}
+#else
+void fn_801947C8(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80194C2C | 0x98 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80194C2C(void) {
+#include "src/hsd/hsd_cobj_fn_80194C2C.inc"
+}
+#else
+void fn_80194C2C(void) { /* TODO */ }
+#endif
+#pragma pop
