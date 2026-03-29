@@ -480,3 +480,110 @@ void hsdForgetClassLibrary(const char* library_name)
         ForgetClassLibraryChild(library_name, &hsdClass);
     }
 }
+
+/* 0x80193A1C | 0x3C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193A1C(void) {
+#include "src/hsd/hsd_class_fn_80193A1C.inc"
+}
+#else
+void fn_80193A1C(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193A58 | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801A6960(void);
+#if 1
+asm void fn_80193A58(void) {
+#include "src/hsd/hsd_class_fn_80193A58.inc"
+}
+#else
+void fn_80193A58(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193A88 | 0x4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193A88(void) {
+#include "src/hsd/hsd_class_fn_80193A88.inc"
+}
+#else
+void fn_80193A88(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193A8C | 0x8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193A8C(void) {
+#include "src/hsd/hsd_class_fn_80193A8C.inc"
+}
+#else
+void fn_80193A8C(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193A94 | 0x5C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801A6928(void);
+#if 1
+asm void fn_80193A94(void) {
+#include "src/hsd/hsd_class_fn_80193A94.inc"
+}
+#else
+void fn_80193A94(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193AF0 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193AF0(void) {
+#include "src/hsd/hsd_class_fn_80193AF0.inc"
+}
+#else
+void fn_80193AF0(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193B10 | 0x20 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80193B10(void) {
+#include "src/hsd/hsd_class_fn_80193B10.inc"
+}
+#else
+void fn_80193B10(void) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80193B30 | 0xF4 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_80196E10(void);
+#if 1
+asm void fn_80193B30(void) {
+#include "src/hsd/hsd_class_fn_80193B30.inc"
+}
+#else
+void fn_80193B30(void) { /* TODO */ }
+#endif
+#pragma pop
