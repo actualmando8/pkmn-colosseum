@@ -302,3 +302,322 @@ u8 fn_80175FFC(void) {
 
 /* Address: 0x80179DFC | Size: 0x8 | Pattern: return_constant */
 u32 fn_80179DFC(void) { return 428; }
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176004(void) {
+#include "src/game/gs_scene_fn_80176004.inc"
+}
+#else
+void fn_80176004(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176030(void) {
+#include "src/game/gs_scene_fn_80176030.inc"
+}
+#else
+void fn_80176030(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176068(void) {
+#include "src/game/gs_scene_fn_80176068.inc"
+}
+#else
+void fn_80176068(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8017662C(void) {
+#include "src/game/gs_scene_fn_8017662C.inc"
+}
+#else
+void fn_8017662C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176658(void) {
+#include "src/game/gs_scene_fn_80176658.inc"
+}
+#else
+void fn_80176658(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176684(void) {
+#include "src/game/gs_scene_fn_80176684.inc"
+}
+#else
+void fn_80176684(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8017669C(void) {
+#include "src/game/gs_scene_fn_8017669C.inc"
+}
+#else
+void fn_8017669C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176A94(void) {
+#include "src/game/gs_scene_fn_80176A94.inc"
+}
+#else
+void fn_80176A94(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176F68(void) {
+#include "src/game/gs_scene_fn_80176F68.inc"
+}
+#else
+void fn_80176F68(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80176F98(void) {
+#include "src/game/gs_scene_fn_80176F98.inc"
+}
+#else
+void fn_80176F98(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177478(void) {
+#include "src/game/gs_scene_fn_80177478.inc"
+}
+#else
+void fn_80177478(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801774F0(void) {
+#include "src/game/gs_scene_fn_801774F0.inc"
+}
+#else
+void fn_801774F0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177574(void) {
+#include "src/game/gs_scene_fn_80177574.inc"
+}
+#else
+void fn_80177574(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801775EC(void) {
+#include "src/game/gs_scene_fn_801775EC.inc"
+}
+#else
+void fn_801775EC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801776E8(void) {
+#include "src/game/gs_scene_fn_801776E8.inc"
+}
+#else
+void fn_801776E8(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177858(void) {
+#include "src/game/gs_scene_fn_80177858.inc"
+}
+#else
+void fn_80177858(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801778B4(void) {
+#include "src/game/gs_scene_fn_801778B4.inc"
+}
+#else
+void fn_801778B4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801778DC(void) {
+#include "src/game/gs_scene_fn_801778DC.inc"
+}
+#else
+void fn_801778DC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177908(void) {
+#include "src/game/gs_scene_fn_80177908.inc"
+}
+#else
+void fn_80177908(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177930(void) {
+#include "src/game/gs_scene_fn_80177930.inc"
+}
+#else
+void fn_80177930(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_8017795C(void) {
+#include "src/game/gs_scene_fn_8017795C.inc"
+}
+#else
+void fn_8017795C(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177984(void) {
+#include "src/game/gs_scene_fn_80177984.inc"
+}
+#else
+void fn_80177984(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801779B0(void) {
+#include "src/game/gs_scene_fn_801779B0.inc"
+}
+#else
+void fn_801779B0(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_801779CC(void) {
+#include "src/game/gs_scene_fn_801779CC.inc"
+}
+#else
+void fn_801779CC(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177A38(void) {
+#include "src/game/gs_scene_fn_80177A38.inc"
+}
+#else
+void fn_80177A38(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80177A44(void) {
+#include "src/game/gs_scene_fn_80177A44.inc"
+}
+#else
+void fn_80177A44(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80179E04(void) {
+#include "src/game/gs_scene_fn_80179E04.inc"
+}
+#else
+void fn_80179E04(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80179EA4(void) {
+#include "src/game/gs_scene_fn_80179EA4.inc"
+}
+#else
+void fn_80179EA4(void) { /* TODO */ }
+#endif
+#pragma pop
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80179F4C(void) {
+#include "src/game/gs_scene_fn_80179F4C.inc"
+}
+#else
+void fn_80179F4C(void) { /* TODO */ }
+#endif
+#pragma pop
