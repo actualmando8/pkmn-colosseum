@@ -48,11 +48,8 @@ extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy 
 extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
 extern void fn_801A9DF0(void* a, void* b, void* c);                  /* HSD_MtxInverseConcat */
 
-/* Render pass subroutines */
-extern void fn_80198038(void* dobj, void* mtx, void* renderState); /* render pass: XLU */
-extern void fn_80198B20(void* dobj, void* mtx, void* renderState); /* render pass: OPA */
-extern void fn_801985E0(void* dobj, void* mtx, void* renderState); /* render pass: EFB */
-extern void fn_80197C70(void* dobj, void* mtx, void* renderState); /* render pass: billboard */
+/* Render pass subroutines - fn_80198038/fn_801985E0/fn_80198B20 defined as asm wrappers below */
+extern void fn_80197C70(void*, void*, void*); /* render pass: billboard (no .inc) */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_802746DC[]; /* "displayfunc.c" */
@@ -83,6 +80,64 @@ extern const char lbl_8047D9F0[]; /* "x" -- assertion expression for billboard f
 #define RENDERPASS_OPA       0x400
 #define RENDERPASS_EFB       0x600
 #define RENDERPASS_BILLBOARD 0x800
+
+/* 0x80198038 | 0x5A8 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_800A3AC0(void);
+extern void fn_800A3B38(void);
+extern void fn_800A3B9C(void);
+#if 1
+asm void fn_80198038(void* dobj, void* mtx, void* renderState) {
+#include "src/hsd/hsd_displayfunc_fn_80198038.inc"
+}
+#else
+void fn_80198038(void* dobj, void* mtx, void* renderState) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x801985E0 | 0x540 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_800A2D64(void);
+extern void fn_800A3ADC(void);
+#if 1
+asm void fn_801985E0(void* dobj, void* mtx, void* renderState) {
+#include "src/hsd/hsd_displayfunc_fn_801985E0.inc"
+}
+#else
+void fn_801985E0(void* dobj, void* mtx, void* renderState) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80198B20 | 0x42C */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
+asm void fn_80198B20(void* dobj, void* mtx, void* renderState) {
+#include "src/hsd/hsd_displayfunc_fn_80198B20.inc"
+}
+#else
+void fn_80198B20(void* dobj, void* mtx, void* renderState) { /* TODO */ }
+#endif
+#pragma pop
+
+/* 0x80198F4C | 0x30 */
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+extern void fn_801AA35C(void);
+#if 1
+asm void fn_80198F4C(void) {
+#include "src/hsd/hsd_displayfunc_fn_80198F4C.inc"
+}
+#else
+void fn_80198F4C(void) { /* TODO */ }
+#endif
+#pragma pop
 
 /* =======================================================================
  *  HSD_DObjDisplayFunc1 / fn_80197A64
