@@ -1068,9 +1068,7 @@ extern u8 lbl_8047A3F8[];
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E44;
 extern u8 lbl_8047A3F4[];
-extern u8 lbl_8047A3F0[];
 extern u8 lbl_8047A3EC[];
-extern u8 lbl_8047A3E8[];
 #if 1
 asm void fn_8002C284(void) {
 #include "src/game/gs_worldmap_fn_8002C284.inc"

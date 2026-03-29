@@ -101,6 +101,19 @@ extern void* fn_800FF56C(void);                         /* GSfloor get active */
 /* Script/generator */
 extern void  fn_80169520(void* obj);                    /* status flag update */
 extern void  fn_8016A644(void* obj);                    /* resource cleanup */
+extern void  fn_800D305C(void);                         /* gs_render_util: get frame counter */
+extern void  fn_800E24B0(void);                         /* memory/heap function */
+extern void  fn_800E01D0(void);
+extern void fn_80102620(void);
+extern void fn_801026A4(void);
+extern void fn_800D13C8(void);
+extern void fn_800D258C(void);
+extern void fn_800D1674(void);
+extern void fn_800D203C(void);
+extern void fn_800F0308(void);
+extern void fn_800F9318(void);
+extern void fn_800F92D4(void);
+extern void fn_800D173C(void);
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80273A00[]; /* "gs%04d.xfb" */
