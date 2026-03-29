@@ -75,22 +75,6 @@ u8 fn_80131574(u32 idx) {
     return ((u8*)lbl_803635D8)[idx];
 }
 
-/* 0x64 | fn_80131588 | guarded_call */
-u32 fn_80131588(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    if (1 /* guard r0 != 0 */) { return 0; }
-    if (1 /* guard r3 != 0 */) { return 0; }
-    fn_801666BC();
-    return 1;
-}
-
-/* 0x44 | fn_801315EC | guarded_call */
-u32 fn_801315EC(void) {
-    if (1 /* guard r0 != 0 */) { return 0; }
-    if (0 /* guard r3 == 0 */) { return 0; }
-    fn_80165A20();
-    return 0;
-}
-
 /* 0x80131630 | 0x30 -- read byte from stream, store extsb to obj+0x43 if flag set */
 u32 fn_80131630(void* obj) {
     u8* stream;
@@ -128,10 +112,75 @@ u16 fn_801316A0(void) { return lbl_8047AEA2; }
 extern u16  lbl_8047AEA0;
 extern void fn_801FBD58(u16 handle);
 extern void fn_801FBD28(void);
+extern u16  lbl_8047AEA0;
+/* Forward declarations for self-referencing asm blocks */
+extern void* fn_80104704(s32 key);
+extern void* fn_80134228(s32 offset);
+/* fn_80131CE8 already declared at top with typed params */
+extern void fn_80133E6C(void);
+extern s32 fn_80134258(void* obj);
+extern void* fn_80135CD0(void* ptr);
+extern u8 fn_80135BC8(void* ptr);
+extern u32 fn_80135C28(void* ptr);
+extern u32 fn_80135C40(void* ptr);
+extern u8 fn_80135BE0(void* ptr);
+extern u8 fn_80135BB0(void* ptr);
+extern u32 fn_80135C78(void* ptr);
+extern u32 fn_80135BF8(void* ptr);
+extern u32 fn_80135B0C(void* ptr);
+extern u8 fn_80135AB8(void* ptr);
+extern u8 fn_80135AA0(void* ptr);
+extern u8 fn_80135A88(void* ptr);
+extern u8 fn_80135A70(void* ptr);
+extern u32 fn_80135028(void);
+extern u32 fn_80135F90(u32 index);
+extern u32 fn_80136050(u32 index);
+extern u32 fn_80135FF8(u32 index);
+extern s32 fn_80135FBC(u32 index, u32 subIndex);
+extern u32 fn_80136024(u32 index);
+extern void fn_801026A4();
+extern void fn_80132834(void* table, u32 stride, u32 count, u32 type);
+extern void fn_80132A38(void);
+extern void fn_801338A4(void);
+extern void fn_80133B50(void);
+extern void fn_80133BE4(void);
+extern void fn_80133C3C(void);
+extern void fn_80133E1C(void);
+extern void fn_80134164(void);
+extern void fn_80134274(void);
+extern void fn_801342B8(void);
+extern void fn_80134304(void);
+extern void fn_80135338(void);
+extern void fn_801353C0(void);
+extern void fn_80135708(void);
+extern void fn_80135A30(void* ptr, u8 val);
+extern void fn_80135A40(void* ptr, u8 val);
+extern void fn_80135A50(void* ptr, u8 val);
+extern void fn_80135A60(void* ptr, u8 val);
+extern void fn_80135AEC(u32* dst, u32* src);
+extern void fn_80135B1C(void* ptr, u8 val);
+extern void fn_80135B2C(void* ptr, u8 val);
+extern void fn_80135B3C(void* ptr, u8 val);
+extern void fn_80135B4C(void* ptr, u32 val);
+extern void fn_80135B5C(void* ptr, f32 val);
+extern void fn_80135B6C(void* ptr, u32 val);
+extern void fn_80135B7C(void* ptr, u32 val);
+extern void fn_80135BA0(void* ptr, u32 val);
+extern void fn_80135C10(void);
+extern void fn_80135C90(u32 arg1, u32 arg2);
+extern void fn_80135CE8(void);
+extern void fn_8013613C(void);
+
+#if 1
+asm void fn_801316A8(void) {
+#include "src/game/effect/effect_util_fn_801316A8.inc"
+}
+#else
 void fn_801316A8(void) {
     fn_801FBD58(lbl_8047AEA0);
     fn_801FBD28();
 }
+#endif
 
 /* 0x801316D0 | 0x8 | sda_getter */
 u32 fn_801316D0(void) { return lbl_8047AE8C; }
@@ -154,12 +203,6 @@ u32 fn_801316E8(void* obj) {
     return 0;
 }
 
-/* 0x54 | fn_80131714 | generic */
-u32 fn_80131714(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_800FA064();
-    return 0;
-}
-
 /* 0x80131768 | 0x2C -- read byte from stream, store to obj+0x02 if flag set */
 extern void fn_80132834(void* table, u32 stride, u32 count, u32 type);
 u32 fn_80131768(void* obj) {
@@ -176,30 +219,60 @@ u32 fn_80131768(void* obj) {
 /* 0x80131794 | 0x34 -- fn_80132834(lbl_80426FF0, 0x10, lbl_8047AE94, 4) */
 extern u8  lbl_80426FF0[];
 extern u32 lbl_8047AE94;
+extern u32 lbl_8047AE94;
+#if 1
+asm void fn_80131794(void) {
+#include "src/game/effect/effect_util_fn_80131794.inc"
+}
+#else
 void fn_80131794(void) {
     fn_80132834(lbl_80426FF0, 0x10, lbl_8047AE94, 4);
 }
+#endif
 
 /* 0x801317C8 | 0x34 -- fn_80132834(lbl_80427010, 0x10, lbl_8047AE68, 5) */
 extern u8  lbl_80427010[];
 extern u32 lbl_8047AE68;
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_801317C8(void) {
+#include "src/game/effect/effect_util_fn_801317C8.inc"
+}
+#else
 void fn_801317C8(void) {
     fn_80132834(lbl_80427010, 0x10, lbl_8047AE68, 5);
 }
+#endif
 
 /* 0x801317FC | 0x28 -- calls fn_8011E778(lbl_8047AE90) then fn_8011E760 */
 extern u16  lbl_8047AE90;
 extern void fn_8011E778(u16 handle);
 extern void fn_8011E760(void);
+extern u16  lbl_8047AE90;
+#if 1
+asm void fn_801317FC(void) {
+#include "src/game/effect/effect_util_fn_801317FC.inc"
+}
+#else
 void fn_801317FC(void) {
     fn_8011E778(lbl_8047AE90);
     fn_8011E760();
 }
+#endif
 
 /* 0x80131824 | 0x8 | sda_getter */
 u32 fn_80131824(void) { return lbl_8047AE88; }
 
 /* 0x8013182C | 0x208 */
+extern u32 lbl_8047AE84;
+extern u8 lbl_80427030[];
+extern u32 lbl_8047AEA8;
+extern u8 lbl_80427050[];
+#if 1
+asm void fn_8013182C(void) {
+#include "src/game/effect/effect_util_fn_8013182C.inc"
+}
+#else
 void fn_8013182C(void) {
     extern u8 lbl_80427030[];
     extern u8 lbl_80427050[];
@@ -340,50 +413,100 @@ void fn_8013182C(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80131A34 | 0x34 -- fn_80132834(lbl_80427070, 0x10, lbl_8047AE80, 4) */
 extern u8 lbl_80427070[];
 extern u32 lbl_8047AE80;
+extern u32 lbl_8047AE80;
+#if 1
+asm void fn_80131A34(void) {
+#include "src/game/effect/effect_util_fn_80131A34.inc"
+}
+#else
 void fn_80131A34(void) {
     fn_80132834(lbl_80427070, 0x10, lbl_8047AE80, 4);
 }
+#endif
 
 /* 0x80131A68 | 0x34 -- fn_80132834(lbl_80427090, 0x10, lbl_8047AE6C, 2) */
 extern u8 lbl_80427090[];
 extern u32 lbl_8047AE6C;
+extern u32 lbl_8047AE6C;
+#if 1
+asm void fn_80131A68(void) {
+#include "src/game/effect/effect_util_fn_80131A68.inc"
+}
+#else
 void fn_80131A68(void) {
     fn_80132834(lbl_80427090, 0x10, lbl_8047AE6C, 2);
 }
+#endif
 
 /* 0x80131A9C | 0x34 -- fn_80132834(lbl_804270B0, 0x10, lbl_8047AE68, 2) */
 extern u8 lbl_804270B0[];
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_80131A9C(void) {
+#include "src/game/effect/effect_util_fn_80131A9C.inc"
+}
+#else
 void fn_80131A9C(void) {
     fn_80132834(lbl_804270B0, 0x10, lbl_8047AE68, 2);
 }
+#endif
 
 /* 0x80131AD0 | 0x34 -- fn_80132834(lbl_804270D0, 0x10, lbl_8047AE68, 3) */
 extern u8 lbl_804270D0[];
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_80131AD0(void) {
+#include "src/game/effect/effect_util_fn_80131AD0.inc"
+}
+#else
 void fn_80131AD0(void) {
     fn_80132834(lbl_804270D0, 0x10, lbl_8047AE68, 3);
 }
+#endif
 
 /* 0x80131B04 | 0x34 -- fn_80132834(lbl_804270F0, 0x10, lbl_8047AE68, 3) */
 extern u8 lbl_804270F0[];
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_80131B04(void) {
+#include "src/game/effect/effect_util_fn_80131B04.inc"
+}
+#else
 void fn_80131B04(void) {
     fn_80132834(lbl_804270F0, 0x10, lbl_8047AE68, 3);
 }
+#endif
 
 /* 0x80131B38 | 0x34 -- fn_80132834(lbl_80427110, 0x10, lbl_8047AE6C, 1) */
 extern u8 lbl_80427110[];
+extern u32 lbl_8047AE6C;
+#if 1
+asm void fn_80131B38(void) {
+#include "src/game/effect/effect_util_fn_80131B38.inc"
+}
+#else
 void fn_80131B38(void) {
     fn_80132834(lbl_80427110, 0x10, lbl_8047AE6C, 1);
 }
+#endif
 
 /* 0x80131B6C | 0x34 -- fn_80132834(lbl_80427130, 0x10, lbl_8047AE68, 1) */
 extern u8 lbl_80427130[];
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_80131B6C(void) {
+#include "src/game/effect/effect_util_fn_80131B6C.inc"
+}
+#else
 void fn_80131B6C(void) {
     fn_80132834(lbl_80427130, 0x10, lbl_8047AE68, 1);
 }
+#endif
 
 /* 0x80131BA0 | 0x8 | return_const */
 u32 fn_80131BA0(void) { return 0; }
@@ -420,39 +543,81 @@ u32 fn_80131BF0(void) { return lbl_8047AE20; }
 
 /* 0x80131BF8 | 0x28 -- fn_80131CE8(lbl_8047AE4C, 2) */
 extern u32 lbl_8047AE4C;
+extern u32 lbl_8047AE4C;
+#if 1
+asm void fn_80131BF8(void) {
+#include "src/game/effect/effect_util_fn_80131BF8.inc"
+}
+#else
 void fn_80131BF8(void) {
     fn_80131CE8(lbl_8047AE4C, 2);
 }
+#endif
 
 /* 0x80131C20 | 0x28 -- fn_80131CE8(lbl_8047AE48, 1) */
 extern u32 lbl_8047AE48;
+extern u32 lbl_8047AE48;
+#if 1
+asm void fn_80131C20(void) {
+#include "src/game/effect/effect_util_fn_80131C20.inc"
+}
+#else
 void fn_80131C20(void) {
     fn_80131CE8(lbl_8047AE48, 1);
 }
+#endif
 
 /* 0x80131C48 | 0x28 -- fn_80131CE8(lbl_8047AE44, 0) */
 extern u32 lbl_8047AE44;
+extern u32 lbl_8047AE44;
+#if 1
+asm void fn_80131C48(void) {
+#include "src/game/effect/effect_util_fn_80131C48.inc"
+}
+#else
 void fn_80131C48(void) {
     fn_80131CE8(lbl_8047AE44, 0);
 }
+#endif
 
 /* 0x80131C70 | 0x28 -- fn_80131CE8(lbl_8047AE1C, 2) */
 extern u32 lbl_8047AE1C;
+extern u32 lbl_8047AE1C;
+#if 1
+asm void fn_80131C70(void) {
+#include "src/game/effect/effect_util_fn_80131C70.inc"
+}
+#else
 void fn_80131C70(void) {
     fn_80131CE8(lbl_8047AE1C, 2);
 }
+#endif
 
 /* 0x80131C98 | 0x28 -- fn_80131CE8(lbl_8047AE18, 1) */
 extern u32 lbl_8047AE18;
+extern u32 lbl_8047AE18;
+#if 1
+asm void fn_80131C98(void) {
+#include "src/game/effect/effect_util_fn_80131C98.inc"
+}
+#else
 void fn_80131C98(void) {
     fn_80131CE8(lbl_8047AE18, 1);
 }
+#endif
 
 /* 0x80131CC0 | 0x28 -- fn_80131CE8(lbl_8047AE14, 0) */
 extern u32 lbl_8047AE14;
+extern u32 lbl_8047AE14;
+#if 1
+asm void fn_80131CC0(void) {
+#include "src/game/effect/effect_util_fn_80131CC0.inc"
+}
+#else
 void fn_80131CC0(void) {
     fn_80131CE8(lbl_8047AE14, 0);
 }
+#endif
 
 /* 0x80131CE8 | 0x21C */
 void fn_80131CE8(u32 arg1, u32 arg2) {
@@ -614,6 +779,17 @@ void fn_80131CE8(u32 arg1, u32 arg2) {
 }
 
 /* 0x80131F04 | 0x98 */
+extern void fn_801F4354(void);
+extern void fn_801F18DC(void);
+extern void fn_801F8100(void);
+extern void fn_802037DC(void);
+extern void fn_800FA280(void);
+extern u32 lbl_8047AE10;
+#if 1
+asm void fn_80131F04(void) {
+#include "src/game/effect/effect_util_fn_80131F04.inc"
+}
+#else
 void fn_80131F04(void) {
     extern u32 lbl_8047AE10;
     extern void fn_800FA280(u32);
@@ -636,6 +812,7 @@ void fn_80131F04(void) {
         fn_802037DC(val);
     }
 }
+#endif
 
 /* 0x80131F9C | 0x8 | sda_getter */
 u32 fn_80131F9C(void) { return lbl_8047AE0C; }
@@ -671,6 +848,12 @@ u32 fn_80131FE4(void) { return lbl_8047ADE8; }
 u32 fn_80131FEC(void) { return lbl_8047ADE4; }
 
 /* 0x80131FF4 | 0x98 */
+extern u32 lbl_8047ADE0;
+#if 1
+asm void fn_80131FF4(void) {
+#include "src/game/effect/effect_util_fn_80131FF4.inc"
+}
+#else
 void fn_80131FF4(void) {
     extern u32 lbl_8047ADE0;
     extern void fn_800FA280(u32);
@@ -693,8 +876,15 @@ void fn_80131FF4(void) {
         fn_802037DC(val);
     }
 }
+#endif
 
 /* 0x8013208C | 0x98 */
+extern u32 lbl_8047ADDC;
+#if 1
+asm void fn_8013208C(void) {
+#include "src/game/effect/effect_util_fn_8013208C.inc"
+}
+#else
 void fn_8013208C(void) {
     extern u32 lbl_8047ADDC;
     extern void fn_800FA280(u32);
@@ -717,8 +907,15 @@ void fn_8013208C(void) {
         fn_802037DC(val);
     }
 }
+#endif
 
 /* 0x80132124 | 0x98 */
+extern u32 lbl_8047ADD8;
+#if 1
+asm void fn_80132124(void) {
+#include "src/game/effect/effect_util_fn_80132124.inc"
+}
+#else
 void fn_80132124(void) {
     extern u32 lbl_8047ADD8;
     extern void fn_800FA280(u32);
@@ -741,8 +938,15 @@ void fn_80132124(void) {
         fn_802037DC(val);
     }
 }
+#endif
 
 /* 0x801321BC | 0x98 */
+extern u32 lbl_8047ADD4;
+#if 1
+asm void fn_801321BC(void) {
+#include "src/game/effect/effect_util_fn_801321BC.inc"
+}
+#else
 void fn_801321BC(void) {
     extern u32 lbl_8047ADD4;
     extern void fn_800FA280(u32);
@@ -765,6 +969,7 @@ void fn_801321BC(void) {
         fn_802037DC(val);
     }
 }
+#endif
 
 /* 0x80132254 | 0x8 | sda_getter */
 u32 fn_80132254(void) { return lbl_8047ADD0; }
@@ -779,10 +984,17 @@ u32 fn_80132264(void) { return lbl_8047ADC8; }
 extern u16  lbl_8047AE7C;
 extern void fn_8011CA34(u16 handle);
 extern void fn_8011CA1C(void);
+extern u16  lbl_8047AE7C;
+#if 1
+asm void fn_8013226C(void) {
+#include "src/game/effect/effect_util_fn_8013226C.inc"
+}
+#else
 void fn_8013226C(void) {
     fn_8011CA34(lbl_8047AE7C);
     fn_8011CA1C();
 }
+#endif
 
 /* 0x80132294 | 0x8 | sda_getter */
 u32 fn_80132294(void) { return lbl_8047AE78; }
@@ -795,15 +1007,29 @@ u32 fn_801322A4(void) { return lbl_8047AE70; }
 
 /* 0x801322AC | 0x34 -- fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0) */
 extern u8 lbl_80427150[];
+extern u32 lbl_8047AE6C;
+#if 1
+asm void fn_801322AC(void) {
+#include "src/game/effect/effect_util_fn_801322AC.inc"
+}
+#else
 void fn_801322AC(void) {
     fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0);
 }
+#endif
 
 /* 0x801322E0 | 0x34 -- fn_80132834(lbl_80427170, 0x10, lbl_8047AE68, 0) */
 extern u8 lbl_80427170[];
+extern u32 lbl_8047AE68;
+#if 1
+asm void fn_801322E0(void) {
+#include "src/game/effect/effect_util_fn_801322E0.inc"
+}
+#else
 void fn_801322E0(void) {
     fn_80132834(lbl_80427170, 0x10, lbl_8047AE68, 0);
 }
+#endif
 
 /* 0x80132314 | 0x8 | sda_getter */
 u32 fn_80132314(void) { return lbl_8047AE64; }
@@ -817,16 +1043,30 @@ u32 fn_80132324(void) { return lbl_8047AE5C; }
 /* 0x8013232C | 0x34 -- fn_80132834(lbl_80427190, 0x10, lbl_8047AE58, 0) */
 extern u8  lbl_80427190[];
 extern u32 lbl_8047AE58;
+extern u32 lbl_8047AE58;
+#if 1
+asm void fn_8013232C(void) {
+#include "src/game/effect/effect_util_fn_8013232C.inc"
+}
+#else
 void fn_8013232C(void) {
     fn_80132834(lbl_80427190, 0x10, lbl_8047AE58, 0);
 }
+#endif
 
 /* 0x80132360 | 0x34 -- fn_80132834(lbl_804271B0, 0x10, lbl_8047AE54, 0) */
 extern u8  lbl_804271B0[];
 extern u32 lbl_8047AE54;
+extern u32 lbl_8047AE54;
+#if 1
+asm void fn_80132360(void) {
+#include "src/game/effect/effect_util_fn_80132360.inc"
+}
+#else
 void fn_80132360(void) {
     fn_80132834(lbl_804271B0, 0x10, lbl_8047AE54, 0);
 }
+#endif
 
 /* 0x80132394 | 0x34 -- calls fn_801440A0(lbl_8047AE52) then fn_80144088, default to 0x2B6E */
 extern u16  lbl_8047AE52;
@@ -865,11 +1105,6 @@ u32 fn_80132428(void) {
     return fn_8012AC54();
 }
 
-/* 0x78 | fn_80132454 | generic */
-u32 fn_80132454(void) {
-    return 0;
-}
-
 /* 0x801324CC | 0xA4 -- read color index from stream, look up RGBA, apply */
 void fn_801324CC(void* obj) {
     extern u32 lbl_80478E88;
@@ -898,12 +1133,6 @@ void fn_801324CC(void* obj) {
     *(u32*)((u8*)obj + 0x30) = *(u32*)((u8*)obj + 0x30) + 1;
 }
 
-/* 0x54 | fn_80132570 | generic */
-u32 fn_80132570(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_800FA160();
-    return 0;
-}
-
 /* 0x68 | fn_801325C4 | two_call_arg_check */
 void fn_801325C4(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     if (arg1 != 0) { return; }
@@ -923,12 +1152,6 @@ u32 fn_8013262C(void* obj) {
 /* 0x8013263C | 16 bytes | set_field_return */
 u32 fn_8013263C(void* obj) {
     *(u8*)((u8*)obj + 0x4B) = 2;
-    return 0;
-}
-
-/* 0x44 | fn_8013264C | generic */
-u32 fn_8013264C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_800FAA98();
     return 0;
 }
 
@@ -967,6 +1190,11 @@ u32 fn_80132690(void* obj) {
 }
 
 /* 0x8013275C | 0x84 */
+#if 1
+asm void fn_8013275C(void) {
+#include "src/game/effect/effect_util_fn_8013275C.inc"
+}
+#else
 void fn_8013275C(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -1001,12 +1229,7 @@ void fn_8013275C(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
-
-/* 0x54 | fn_801327E0 | framed_no_calls */
-u32 fn_801327E0(u32 arg1, u32 arg2) {
-    /* data manipulation using lbl_8047D0E0 */
-    return 0;
-}
+#endif
 
 /* 0x80132834 | 0x204 */
 void fn_80132834(void* table, u32 stride, u32 count, u32 type) {
@@ -1144,6 +1367,70 @@ L_801328BC: ;
 }
 
 /* 0x80132A38 | 0x210 */
+extern void jumptable_80363630();
+extern u16 lbl_8047AE50;
+extern u16  lbl_8047AE52;
+extern u32 lbl_8047AE54;
+extern u32 lbl_8047AE58;
+extern u32 lbl_8047AE5C;
+extern u32 lbl_8047AE60;
+extern u32 lbl_8047AE64;
+extern u32 lbl_8047AE68;
+extern u32 lbl_8047AE6C;
+extern u32 lbl_8047AE70;
+extern u32 lbl_8047AE74;
+extern u32 lbl_8047AE78;
+extern u16  lbl_8047AE7C;
+extern u32 lbl_8047AE88;
+extern u32 lbl_8047AE8C;
+extern u16  lbl_8047AE90;
+extern u32 lbl_8047AE80;
+extern u32 lbl_8047AE84;
+extern u32 lbl_8047AE94;
+extern u32 lbl_8047AE98;
+extern u32 lbl_8047AE9C;
+extern u16  lbl_8047AEA0;
+extern u16 lbl_8047AEA2;
+extern u16 lbl_8047AEA4;
+extern u32 lbl_8047ADC8;
+extern u32 lbl_8047ADCC;
+extern u32 lbl_8047ADD0;
+extern u32 lbl_8047ADD4;
+extern u32 lbl_8047ADD8;
+extern u32 lbl_8047ADDC;
+extern u32 lbl_8047ADE0;
+extern u32 lbl_8047ADE4;
+extern u32 lbl_8047ADE8;
+extern u32 lbl_8047ADEC;
+extern u32 lbl_8047ADF0;
+extern u32 lbl_8047ADF4;
+extern u32 lbl_8047ADF8;
+extern u32 lbl_8047ADFC;
+extern u32 lbl_8047AE00;
+extern u32 lbl_8047AE04;
+extern u32 lbl_8047AE08;
+extern u32 lbl_8047AE0C;
+extern u32 lbl_8047AE10;
+extern u32 lbl_8047AE14;
+extern u32 lbl_8047AE18;
+extern u32 lbl_8047AE1C;
+extern u32 lbl_8047AE20;
+extern u32 lbl_8047AE24;
+extern u32 lbl_8047AE28;
+extern u32 lbl_8047AE2C;
+extern u32 lbl_8047AE30;
+extern u32 lbl_8047AE34;
+extern u32 lbl_8047AE38;
+extern u32 lbl_8047AE3C;
+extern u32 lbl_8047AE40;
+extern u32 lbl_8047AE44;
+extern u32 lbl_8047AE48;
+extern u32 lbl_8047AE4C;
+#if 1
+asm void fn_80132A38(void) {
+#include "src/game/effect/effect_util_fn_80132A38.inc"
+}
+#else
 void fn_80132A38(void) {
     extern u32 lbl_8047ADD4;
     extern u32 lbl_8047ADD8;
@@ -1290,8 +1577,21 @@ void fn_80132A38(void) {
     *(u32*)&lbl_8047AE4C = r4;
     return;
 }
+#endif
 
 /* 0x80132C48 | 36 bytes | multi_sda_store */
+extern u32 lbl_8047AE70;
+extern u32 lbl_8047AE74;
+extern u32 lbl_8047AE78;
+extern u32 lbl_8047AE60;
+extern u32 lbl_8047AE64;
+extern u32 lbl_8047AE88;
+extern u32 lbl_8047AE8C;
+#if 1
+asm void fn_80132C48(void) {
+#include "src/game/effect/effect_util_fn_80132C48.inc"
+}
+#else
 void fn_80132C48(void) {
     lbl_8047AE70 = 0;
     lbl_8047AE74 = 0;
@@ -1301,8 +1601,24 @@ void fn_80132C48(void) {
     lbl_8047AE88 = 0;
     lbl_8047AE8C = 0;
 }
+#endif
 
 /* 0x80132C6C | 0x310 */
+extern void fn_800E3534(void);
+extern void fn_800E27B0(void);
+extern u32 lbl_8047AEB4;
+extern u32 lbl_8047AEC0;
+extern u32 lbl_8047AECC;
+extern u32 lbl_8047AEC8;
+extern u16 lbl_8047AEB8;
+extern u32 lbl_8047AEB0;
+extern u16 lbl_8047AEC4;
+extern u32 lbl_8047AEBC;
+#if 1
+asm void fn_80132C6C(void) {
+#include "src/game/effect/effect_util_fn_80132C6C.inc"
+}
+#else
 void fn_80132C6C(void) {
     extern u32 lbl_8047AEB0;
     extern u32 lbl_8047AEB4;
@@ -1523,26 +1839,7 @@ void fn_80132C6C(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-
-/* 0x5C | fn_80132F7C | multi_call_cond */
-u32 fn_80132F7C(void) {
-    if (fn_80102620(0) == 0) { return 171; }
-    fn_80102510(0);
-    fn_801026A4();
-    return 0;
-}
-
-/* 0x78 | fn_80132FD8 | generic */
-u32 fn_80132FD8(void) {
-    /* refs: lbl_80272AA8 */
-    fn_801E1810();
-    fn_800F0308();
-    fn_801E1874();
-    fn_8010264C();
-    fn_800C8520();
-    fn_801E189C();
-    return 0;
-}
+#endif
 
 /* 0x80133050 | 0x3C -- fn_800D37D4(3, 2, 0, 2, 0, 0), return 0 */
 extern void fn_800D37D4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
@@ -1558,6 +1855,32 @@ u32 fn_8013308C(void) {
 }
 
 /* 0x801330C8 | 0x150 */
+extern void fn_800D88DC(void);
+extern void fn_800D888C(void);
+extern void fn_800D9B58(void);
+extern void fn_800DA4C4(void);
+extern void fn_800DA2BC(void);
+extern void fn_800DA1E8(void);
+extern void fn_800DA028(void);
+extern void fn_800D6A00(void);
+extern void fn_800D7820(void);
+extern void fn_800D67BC(void);
+extern void fn_800D6680(void);
+extern void fn_800D5CB8(void);
+extern void fn_800D6728(void);
+extern f32 lbl_8047D0F0;
+extern f32 lbl_8047D0F4;
+extern f32 lbl_8047D0F8;
+extern u8 lbl_80478AC0[];
+extern f32 lbl_8047D0FC;
+extern u8 lbl_80478AC4[];
+extern f32 lbl_8047D100;
+extern f32 lbl_8047D104;
+#if 1
+asm void fn_801330C8(void) {
+#include "src/game/effect/effect_util_fn_801330C8.inc"
+}
+#else
 void fn_801330C8(void) {
     extern u8 lbl_80478AC0[];
     extern u8 lbl_80478AC4[];
@@ -1673,6 +1996,7 @@ void fn_801330C8(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
 extern u32  fn_800E1544(void);
@@ -1694,16 +2018,6 @@ u32 fn_80133250(void) {
 /* 0x5C | fn_8013327C -- fn_800E0E14(1,0) check then print */
 extern const char lbl_80272AE0[];
 extern const char lbl_80272AF0[];
-u32 fn_8013327C(void) {
-    u8 result = fn_800E0E14(1, 0);
-    if ((result & 0xFF) == 1) {
-        fn_800DD970(lbl_80272AE0);
-    } else {
-        fn_800DD970(lbl_80272AF0);
-    }
-    return 0;
-}
-
 /* 0x801332D8 | 0x28 -- fn_800D3074(2), return 0 */
 extern void fn_800D3074(u32 mode);
 u32 fn_801332D8(void) {
@@ -1723,16 +2037,13 @@ u32 fn_80133328(void) {
     return 0;
 }
 
-/* 0x60 | fn_8013334C | generic */
-u32 fn_8013334C(void) {
-    fn_801D1CC4();
-    fn_801D1D58();
-    fn_801D268C();
-    fn_8010264C();
-    return 0;
-}
-
 /* 0x801333AC | 0xA4 */
+extern void fn_800F9318(void);
+#if 1
+asm void fn_801333AC(void) {
+#include "src/game/effect/effect_util_fn_801333AC.inc"
+}
+#else
 void fn_801333AC(void) {
     extern void fn_800F9318();
     u8 sp[0x10];
@@ -1781,12 +2092,20 @@ L_80133438: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x58 | fn_80133450 | call_sequence */
+extern u32 lbl_80478820;
+#if 1
+asm void fn_80133450(void) {
+#include "src/game/effect/effect_util_fn_80133450.inc"
+}
+#else
 void fn_80133450(void) {
     fn_801026A4();
     fn_80102510(0);
 }
+#endif
 
 /* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call fn_800E8F80 */
 extern u8   lbl_8047AED9;
@@ -1810,30 +2129,6 @@ u32 fn_801334DC(void) {
     return 0;
 }
 
-/* 0x5C | fn_80133510 | multi_call_cond */
-u32 fn_80133510(void) {
-    if (fn_80102620(0) == 0) { return 7; }
-    fn_80102510(0);
-    fn_801026A4();
-    return 0;
-}
-
-/* 0x68 | fn_8013356C | generic */
-u32 fn_8013356C(void) {
-    fn_8012F11C();
-    fn_8012F150();
-    fn_8012F1FC();
-    return 0;
-}
-
-/* 0x5C | fn_801335D4 | multi_call_cond */
-u32 fn_801335D4(void) {
-    if (fn_80102620(0) == 0) { return 4; }
-    fn_80102510(0);
-    fn_801026A4();
-    return 0;
-}
-
 /* 0x80133630 | 0x34 -- toggle lbl_8047AED4 (cntlzw>>5), call fn_80101B88 */
 extern u32  lbl_8047AED4;
 u32 fn_80133630(void) {
@@ -1844,6 +2139,13 @@ u32 fn_80133630(void) {
 }
 
 /* 0x80133664 | 0x13C */
+extern void fn_80105624(void);
+extern void fn_8005D9E4(void);
+#if 1
+asm void fn_80133664(void) {
+#include "src/game/effect/effect_util_fn_80133664.inc"
+}
+#else
 void fn_80133664(void) {
     extern void fn_8005D9E4();
     extern void fn_80105624();
@@ -1931,6 +2233,7 @@ do {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x801337A0 | 0x8 | sda_getter */
 u8 fn_801337A0(void) { return lbl_8047AED0; }
@@ -1947,12 +2250,29 @@ u32 fn_801337B0(void) {
 
 /* 0x801337E4 | 0x2C -- set lbl_8047AED1 = 0, call fn_80102510(lbl_80478848) */
 extern u8   lbl_8047AED1;
+extern u32  lbl_80478848;
+extern u8   lbl_8047AED1;
+#if 1
+asm void fn_801337E4(void) {
+#include "src/game/effect/effect_util_fn_801337E4.inc"
+}
+#else
 void fn_801337E4(void) {
     lbl_8047AED1 = 0;
     fn_80102510(lbl_80478848);
 }
+#endif
 
 /* 0x80133810 | 0x94 */
+extern u32 lbl_80478F88;
+extern u8 lbl_8047AED0;
+extern u32  lbl_80478848;
+extern u8   lbl_8047AED1;
+#if 1
+asm void fn_80133810(void) {
+#include "src/game/effect/effect_util_fn_80133810.inc"
+}
+#else
 void fn_80133810(void) {
     extern u32 lbl_80478F88;
     extern void fn_801338A4();
@@ -1994,8 +2314,18 @@ void fn_80133810(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x801338A4 | 0x2AC */
+extern u32  lbl_80478848;
+extern u32 lbl_8047AEDC;
+extern u32 lbl_80478F88;
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_801338A4(void) {
+#include "src/game/effect/effect_util_fn_801338A4.inc"
+}
+#else
 void fn_801338A4(void) {
     extern u32 lbl_80478F88;
     extern u32 lbl_80478F8C;
@@ -2201,8 +2531,15 @@ L_801338C8: ;
 
     return;
 }
+#endif
 
 /* 0x80133B50 | 0x94 */
+extern void fn_800FA444(void);
+#if 1
+asm void fn_80133B50(void) {
+#include "src/game/effect/effect_util_fn_80133B50.inc"
+}
+#else
 void fn_80133B50(void) {
     extern void fn_800FA444();
     extern void fn_80133BE4();
@@ -2246,15 +2583,17 @@ void fn_80133B50(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-
-/* 0x58 | fn_80133BE4 | generic */
-u32 fn_80133BE4(void) {
-    /* refs: lbl_80478F8C */
-    fn_80133E6C();
-    return 0;
-}
+#endif
 
 /* 0x80133C3C | 0x1E0 */
+extern void fn_800057A8(void);
+extern u32 lbl_80478F88;
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_80133C3C(void) {
+#include "src/game/effect/effect_util_fn_80133C3C.inc"
+}
+#else
 void fn_80133C3C(void) {
     extern u32 lbl_80478F88;
     extern u32 lbl_80478F8C;
@@ -2398,15 +2737,17 @@ void fn_80133C3C(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
-
-/* 0x50 | fn_80133E1C | call_then_multi_check */
-u32 fn_80133E1C(void) {
-    fn_80133E6C();
-    /* multi-branch on result */
-    return 0;
-}
+#endif
 
 /* 0x80133E6C | 0x2F8 */
+extern u32  lbl_80478848;
+extern u32 lbl_80478F88;
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_80133E6C(void) {
+#include "src/game/effect/effect_util_fn_80133E6C.inc"
+}
+#else
 void fn_80133E6C(void) {
     extern u32 lbl_80478F88;
     extern u32 lbl_80478F8C;
@@ -2638,8 +2979,16 @@ void fn_80133E6C(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80134164 | 0xC4 */
+extern u32 lbl_80478F88;
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_80134164(void) {
+#include "src/game/effect/effect_util_fn_80134164.inc"
+}
+#else
 void fn_80134164(void) {
     extern u32 lbl_80478F88;
     extern u32 lbl_80478F8C;
@@ -2702,9 +3051,10 @@ void fn_80134164(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x80134228 | 0x30 -- saturate add: max(0, lbl_80478848 + arg) then fn_80104704 */
-extern void* fn_80104704(s32 key);
+/* extern void* fn_80104704(s32 key); -- forward-declared K&R style above */
 void* fn_80134228(s32 offset) {
     s32 key = (s32)lbl_80478848 + offset;
     if (key < 0) key = 0;
@@ -2718,20 +3068,13 @@ s32 fn_80134258(void* obj) {
     return (s32)(val - lbl_80478848);
 }
 
-/* 0x44 | fn_80134274 | call_then_multi_check */
-u32 fn_80134274(void) {
-    u32 result = fn_800057A8();
-    /* multi-branch on result */
-    return result;
-}
-
-/* 0x4C | fn_801342B8 | framed_no_calls */
-u32 fn_801342B8(u32 arg1, u32 arg2) {
-    /* data manipulation using lbl_80478F8C */
-    return 0;
-}
-
 /* 0x80134304 | 0x38 */
+extern u32 lbl_80478F88;
+#if 1
+asm void fn_80134304(void) {
+#include "src/game/effect/effect_util_fn_80134304.inc"
+}
+#else
 void fn_80134304(void) {
     extern u32 lbl_80478F88;
     u8 sp[0x10];
@@ -2751,8 +3094,15 @@ void fn_80134304(void) {
     }
     return;
 }
+#endif
 
 /* 0x8013433C | 0xE4 */
+extern void fn_80140A9C(void);
+#if 1
+asm void fn_8013433C(void) {
+#include "src/game/effect/effect_util_fn_8013433C.inc"
+}
+#else
 void fn_8013433C(void) {
     extern void fn_80140A9C();
     u8 sp[0x20];
@@ -2821,8 +3171,16 @@ L_80134404: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80134420 | 0x164 */
+extern void fn_801429E8(void);
+extern void fn_80142CF4(void);
+#if 1
+asm void fn_80134420(void) {
+#include "src/game/effect/effect_util_fn_80134420.inc"
+}
+#else
 void fn_80134420(void) {
     extern void fn_801429E8();
     extern void fn_80142CF4();
@@ -2912,8 +3270,15 @@ void fn_80134420(void) {
     r28 = *(u32*)(sp + 0x10);
     return;
 }
+#endif
 
 /* 0x80134584 | 0xF8 */
+extern void fn_80140ACC(void);
+#if 1
+asm void fn_80134584(void) {
+#include "src/game/effect/effect_util_fn_80134584.inc"
+}
+#else
 void fn_80134584(void) {
     extern void fn_80140ACC();
     extern void fn_801429E8();
@@ -2994,8 +3359,15 @@ void fn_80134584(void) {
 
     return;
 }
+#endif
 
 /* 0x8013467C | 0xEC */
+extern void fn_80141308(void);
+#if 1
+asm void fn_8013467C(void) {
+#include "src/game/effect/effect_util_fn_8013467C.inc"
+}
+#else
 void fn_8013467C(void) {
     extern void fn_80141308();
     extern void fn_801429E8();
@@ -3073,12 +3445,7 @@ void fn_8013467C(void) {
 
     return;
 }
-
-/* 0x68 | fn_80134768 | generic */
-u32 fn_80134768(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_80129280(0, 0);
-    return 0;
-}
+#endif
 
 /* 0x801347D0 | 0x8 | return_const */
 u32 fn_801347D0(void) { return 235; }
@@ -3090,6 +3457,12 @@ u32 fn_801347D8(void) { return 30; }
 u32 fn_801347E0(void) { return 3; }
 
 /* 0x801347E8 | 0x104 */
+extern void fn_80123FBC(void);
+#if 1
+asm void fn_801347E8(void) {
+#include "src/game/effect/effect_util_fn_801347E8.inc"
+}
+#else
 void fn_801347E8(void) {
     extern void fn_80123FBC();
     u8 sp[0x20];
@@ -3168,8 +3541,14 @@ void fn_801347E8(void) {
     r28 = *(u32*)(sp + 0x10);
     return;
 }
+#endif
 
 /* 0x801348EC | 0xF0 */
+#if 1
+asm void fn_801348EC(void) {
+#include "src/game/effect/effect_util_fn_801348EC.inc"
+}
+#else
 void fn_801348EC(void) {
     extern void fn_80123FBC();
     u8 sp[0x20];
@@ -3241,8 +3620,15 @@ void fn_801348EC(void) {
     r28 = *(u32*)(sp + 0x10);
     return;
 }
+#endif
 
 /* 0x801349DC | 0xBC */
+extern void fn_800F9E70(void);
+#if 1
+asm void fn_801349DC(void) {
+#include "src/game/effect/effect_util_fn_801349DC.inc"
+}
+#else
 void fn_801349DC(void) {
     extern void fn_800F9E70();
     u8 sp[0x10];
@@ -3298,14 +3684,15 @@ L_80134A80: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
-
-/* 0x60 | fn_80134A98 | generic */
-u32 fn_80134A98(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_80129280(0, 0);
-    return 0;
-}
+#endif
 
 /* 0x80134AF8 | 0xC8 */
+extern void fn_80124A60(void);
+#if 1
+asm void fn_80134AF8(void) {
+#include "src/game/effect/effect_util_fn_80134AF8.inc"
+}
+#else
 void fn_80134AF8(void) {
     extern void fn_80123FBC();
     extern void fn_80124A60();
@@ -3368,8 +3755,15 @@ L_80134BA8: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
+#endif
 
 /* 0x80134BC0 | 0x250 */
+extern void fn_8012086C(void);
+#if 1
+asm void fn_80134BC0(void) {
+#include "src/game/effect/effect_util_fn_80134BC0.inc"
+}
+#else
 void fn_80134BC0(void) {
     extern void fn_8012086C();
     extern void fn_80123FBC();
@@ -3546,8 +3940,14 @@ L_80134DC0: ;
 
     return;
 }
+#endif
 
 /* 0x80134E10 | 0xE0 */
+#if 1
+asm void fn_80134E10(void) {
+#include "src/game/effect/effect_util_fn_80134E10.inc"
+}
+#else
 void fn_80134E10(void) {
     extern void fn_8012086C();
     u8 sp[0x20];
@@ -3615,8 +4015,14 @@ L_80134E94: ;
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80134EF0 | 0x98 */
+#if 1
+asm void fn_80134EF0(void) {
+#include "src/game/effect/effect_util_fn_80134EF0.inc"
+}
+#else
 void fn_80134EF0(void) {
     u8 sp[0x10];
     u32 r0 = 0;
@@ -3662,8 +4068,17 @@ L_80134F6C: ;
     r30 = *(u32*)(sp + 0x8);
     return;
 }
+#endif
 
 /* 0x80134F88 | 0x9C */
+extern void fn_800F96E4(void);
+extern void fn_801249F8(void);
+extern void fn_80142A88(void);
+#if 1
+asm void fn_80134F88(void) {
+#include "src/game/effect/effect_util_fn_80134F88.inc"
+}
+#else
 void fn_80134F88(void) {
     extern void fn_800F96E4();
     extern void fn_801249F8();
@@ -3710,15 +4125,29 @@ void fn_80134F88(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80135024 | 0x4 | void_stub */
+#if 1
+asm void fn_80135024(void) {
+#include "src/game/effect/effect_util_fn_80135024.inc"
+}
+#else
 void fn_80135024(void) {
 }
+#endif
 
 /* 0x80135028 | 0x8 | return_const */
 u32 fn_80135028(void) { return 0; }
 
 /* 0x80135030 | 0x138 */
+extern void jumptable_80363A70();
+extern f64 lbl_8047D108;
+#if 1
+asm void fn_80135030(void) {
+#include "src/game/effect/effect_util_fn_80135030.inc"
+}
+#else
 void fn_80135030(void) {
     extern f64 lbl_8047D108;
     extern void fn_80135B1C();
@@ -3818,8 +4247,15 @@ void fn_80135030(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80135168 | 0x124 */
+extern void jumptable_80363A9C();
+#if 1
+asm void fn_80135168(void) {
+#include "src/game/effect/effect_util_fn_80135168.inc"
+}
+#else
 void fn_80135168(void) {
     extern void fn_80135BB0();
     extern void fn_80135BC8();
@@ -3893,8 +4329,14 @@ done:
     r30 = *(u32*)(sp + 0x18);
     return;
 }
+#endif
 
 /* 0x8013528C | 0xAC */
+#if 1
+asm void fn_8013528C(void) {
+#include "src/game/effect/effect_util_fn_8013528C.inc"
+}
+#else
 void fn_8013528C(void) {
     extern void fn_80135338();
     extern void fn_801353C0();
@@ -3950,8 +4392,14 @@ void fn_8013528C(void) {
 
     return;
 }
+#endif
 
 /* 0x80135338 | 0x88 */
+#if 1
+asm void fn_80135338(void) {
+#include "src/game/effect/effect_util_fn_80135338.inc"
+}
+#else
 void fn_80135338(void) {
     extern void fn_80135708();
     extern void fn_80135B0C();
@@ -3992,8 +4440,14 @@ void fn_80135338(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x801353C0 | 0x170 */
+#if 1
+asm void fn_801353C0(void) {
+#include "src/game/effect/effect_util_fn_801353C0.inc"
+}
+#else
 void fn_801353C0(void) {
     extern void fn_80135708();
     extern void fn_80135A30();
@@ -4098,8 +4552,14 @@ void fn_801353C0(void) {
 
     return;
 }
+#endif
 
 /* 0x80135530 | 0x1D8 */
+#if 1
+asm void fn_80135530(void) {
+#include "src/game/effect/effect_util_fn_80135530.inc"
+}
+#else
 void fn_80135530(void) {
     extern void fn_80135A70();
     extern void fn_80135A88();
@@ -4182,8 +4642,14 @@ void fn_80135530(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x80135708 | 0x134 */
+#if 1
+asm void fn_80135708(void) {
+#include "src/game/effect/effect_util_fn_80135708.inc"
+}
+#else
 void fn_80135708(void) {
     extern void fn_80135A30();
     extern void fn_80135A40();
@@ -4267,8 +4733,14 @@ void fn_80135708(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x8013583C | 0xFC */
+#if 1
+asm void fn_8013583C(void) {
+#include "src/game/effect/effect_util_fn_8013583C.inc"
+}
+#else
 void fn_8013583C(void) {
     extern void fn_80135A30();
     extern void fn_80135A40();
@@ -4339,8 +4811,14 @@ void fn_8013583C(void) {
     r29 = *(u32*)(sp + 0x14);
     return;
 }
+#endif
 
 /* 0x80135938 | 0xF8 */
+#if 1
+asm void fn_80135938(void) {
+#include "src/game/effect/effect_util_fn_80135938.inc"
+}
+#else
 void fn_80135938(void) {
     extern void fn_80135A70();
     extern void fn_80135A88();
@@ -4424,6 +4902,7 @@ L_80135A18: ;
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x80135A30 | 0x10 | nc_setter */
 void fn_80135A30(void* ptr, u8 val) {
@@ -4474,6 +4953,11 @@ u8 fn_80135AB8(void* ptr) {
 }
 
 /* 0x80135AD0 | 0x1C */
+#if 1
+asm void fn_80135AD0(void) {
+#include "src/game/effect/effect_util_fn_80135AD0.inc"
+}
+#else
 void fn_80135AD0(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4485,6 +4969,7 @@ void fn_80135AD0(void) {
     *(u32*)((u8*)r3 + 0x0) = r0;
     return;
 }
+#endif
 
 /* 0x80135AEC | 0x20 */
 /* Copy the first u32 from src to dst, if both are non-NULL. */
@@ -4544,6 +5029,11 @@ void fn_80135B7C(void* ptr, u32 val) {
 }
 
 /* 0x80135B8C | 0x14 */
+#if 1
+asm void fn_80135B8C(void) {
+#include "src/game/effect/effect_util_fn_80135B8C.inc"
+}
+#else
 void fn_80135B8C(void) {
     u32 r3 = 0;
     u32 r5 = 0;
@@ -4554,6 +5044,7 @@ void fn_80135B8C(void) {
     *(u32*)((u8*)r3 + 0x0) = r5;
     return;
 }
+#endif
 
 /* 0x80135BA0 | 0x10 | nc_setter */
 void fn_80135BA0(void* ptr, u32 val) {
@@ -4586,6 +5077,12 @@ u32 fn_80135BF8(void* ptr) {
 }
 
 /* 0x80135C10 | 0x18 */
+extern f32 lbl_8047D110;
+#if 1
+asm void fn_80135C10(void) {
+#include "src/game/effect/effect_util_fn_80135C10.inc"
+}
+#else
 void fn_80135C10(void) {
     extern f32 lbl_8047D110;
     u32 r0 = 0;
@@ -4599,6 +5096,7 @@ void fn_80135C10(void) {
     f1 = lbl_8047D110;
     return;
 }
+#endif
 
 /* 0x80135C28 | 24 bytes | beq_default_getter */
 u32 fn_80135C28(void* ptr) {
@@ -4613,6 +5111,11 @@ u32 fn_80135C40(void* ptr) {
 }
 
 /* 0x80135C58 | 0x20 */
+#if 1
+asm void fn_80135C58(void) {
+#include "src/game/effect/effect_util_fn_80135C58.inc"
+}
+#else
 void fn_80135C58(void) {
     u32 r3 = 0;
     u32 r4 = 0;
@@ -4628,6 +5131,7 @@ void fn_80135C58(void) {
     r3 = 0x0;
     return;
 }
+#endif
 
 /* 0x80135C78 | 24 bytes | beq_default_getter */
 u32 fn_80135C78(void* ptr) {
@@ -4647,6 +5151,11 @@ void* fn_80135CD0(void* ptr) {
 }
 
 /* 0x80135CE8 | 0x28 */
+#if 1
+asm void fn_80135CE8(void) {
+#include "src/game/effect/effect_util_fn_80135CE8.inc"
+}
+#else
 void fn_80135CE8(void) {
     u32 r0 = 0;
     u32 r3 = 0;
@@ -4662,8 +5171,22 @@ void fn_80135CE8(void) {
     *(u32*)((u8*)r3 + 0x8) = r0;
     return;
 }
+#endif
 
 /* 0x80135D10 | 0x134 */
+extern void fn_8012A450(void);
+extern void fn_80142B24(void);
+extern void fn_801254B4(void);
+extern void fn_8011BBD8(void);
+extern void fn_801F4C14(void);
+extern void fn_801F75F8(void);
+extern void fn_801FAA58(void);
+extern void jumptable_80363AC8();
+#if 1
+asm void fn_80135D10(void) {
+#include "src/game/effect/effect_util_fn_80135D10.inc"
+}
+#else
 void fn_80135D10(void) {
     extern void fn_8011BBD8();
     extern void fn_801254B4();
@@ -4759,8 +5282,21 @@ void fn_80135D10(void) {
     r31 = *(u32*)(sp + 0xC);
     return;
 }
+#endif
 
 /* 0x80135E44 | 0x114 */
+extern void fn_8012A5B0(void);
+extern void fn_8012640C(void);
+extern void fn_8011BEB4(void);
+extern void fn_801F54A4(void);
+extern void fn_801F76B8(void);
+extern void fn_801FB1C0(void);
+extern void jumptable_80363AF0();
+#if 1
+asm void fn_80135E44(void) {
+#include "src/game/effect/effect_util_fn_80135E44.inc"
+}
+#else
 void fn_80135E44(void) {
     extern void fn_8011BEB4();
     extern void fn_8012640C();
@@ -4847,8 +5383,16 @@ void fn_80135E44(void) {
 
     return;
 }
+#endif
 
 /* 0x80135F58 | 0x38 */
+extern u32 lbl_80478B90;
+extern u8 lbl_80363B78[];
+#if 1
+asm void fn_80135F58(void) {
+#include "src/game/effect/effect_util_fn_80135F58.inc"
+}
+#else
 void fn_80135F58(void) {
     extern u8 lbl_80363B78[];
     extern u32 lbl_80478B90;
@@ -4873,6 +5417,7 @@ void fn_80135F58(void) {
     r3 = *(u16*)(r3 + r0);
     return;
 }
+#endif
 
 /* 0x80135F90 | 0x2C */
 /* Get the u16 at offset 0x4 in an effect table entry (stride 0xA). */
@@ -4940,6 +5485,11 @@ u32 fn_80136050(u32 index) {
 }
 
 /* 0x80136078 | 0xC4 */
+#if 1
+asm void fn_80136078(void) {
+#include "src/game/effect/effect_util_fn_80136078.inc"
+}
+#else
 void fn_80136078(void) {
     extern void fn_80135F58();
     extern void fn_80135F90();
@@ -5006,8 +5556,15 @@ void fn_80136078(void) {
 
     return;
 }
+#endif
 
 /* 0x8013613C | 0x22C */
+extern void fn_801F0134(void);
+#if 1
+asm void fn_8013613C(void) {
+#include "src/game/effect/effect_util_fn_8013613C.inc"
+}
+#else
 void fn_8013613C(void) {
     extern void fn_80135D10();
     extern void fn_80135E44();
@@ -5174,53 +5731,38 @@ do {
 
     return;
 }
-
-/* 0x40 | fn_80136368 | index_lookup */
-u32 fn_80136368(u16 idx) {
-    void* entry;
-    if (idx > lbl_80478B98) { return 0; }
-    entry = (u8*)lbl_80363B88 + idx * 0x18;
-    if (entry == NULL) { return 0; }
-    return *(u32*)((u8*)entry + 0x8);
-}
-
-/* 0x40 | fn_801363A8 | index_lookup */
-u8 fn_801363A8(u16 idx) {
-    void* entry;
-    if (idx > lbl_80478B98) { return 0; }
-    entry = (u8*)lbl_80363B88 + idx * 0x18;
-    if (entry == NULL) { return 0; }
-    return *(u8*)((u8*)entry + 0x0);
-}
-
-/* 0x40 | fn_801363E8 | index_lookup */
-u16 fn_801363E8(u16 idx) {
-    void* entry;
-    if (idx > lbl_80478BA0) { return 0; }
-    entry = (u8*)lbl_80363C00 + idx * 0xC;
-    if (entry == NULL) { return 0; }
-    return *(u16*)((u8*)entry + 0x4);
-}
-
-/* 0x40 | fn_80136428 | index_lookup */
-u8 fn_80136428(u16 idx) {
-    void* entry;
-    if (idx > lbl_80478BA0) { return 0; }
-    entry = (u8*)lbl_80363C00 + idx * 0xC;
-    if (entry == NULL) { return 0; }
-    return *(u8*)((u8*)entry + 0x0);
-}
-
-/* 0x40 | fn_80136468 | index_lookup */
-u16 fn_80136468(u16 idx) {
-    void* entry;
-    if (idx > lbl_80478BA0) { return 0; }
-    entry = (u8*)lbl_80363C00 + idx * 0xC;
-    if (entry == NULL) { return 0; }
-    return *(u16*)((u8*)entry + 0x2);
-}
+#endif
 
 /* 0x801364A8 | 0xC6C */
+extern void fn_800D37CC(void);
+extern void fn_80137780(void);
+extern void fn_800E01D0(void);
+extern void fn_800E2C04(void);
+extern void fn_800EFD3C(void);
+extern void fn_800EFD14(void);
+extern void fn_8013757C(void);
+extern void fn_800EF590(void);
+extern void fn_801DB060(void);
+extern void fn_8010147C(void);
+extern void fn_801013A0(void);
+extern void fn_800E4014(void);
+extern void fn_8013735C(void);
+extern void fn_8013D604(void);
+extern void fn_80137114(void);
+extern void* memset(void* dst, int val, u32 n);
+extern void jumptable_80363C70();
+extern void* memcpy(void* dst, const void* src, u32 n);
+extern f64 lbl_8047D128;
+extern f32 lbl_8047D118;
+extern u8 lbl_80314AE8[];
+extern u8 lbl_80314638[];
+extern f32 lbl_8047D11C;
+extern f32 lbl_8047D120;
+#if 1
+asm void fn_801364A8(void) {
+#include "src/game/effect/effect_util_fn_801364A8.inc"
+}
+#else
 void fn_801364A8(void) {
     extern u8 lbl_80314638[];
     extern u8 lbl_80314AE8[];
@@ -6001,3 +6543,209 @@ void fn_801364A8(void) {
     f30 = *(f64*)(sp + 0x50);
     return;
 }
+#endif
+extern void fn_801666BC(void);
+extern u16 lbl_8047AEA4;
+#if 1
+asm void fn_80131588(void) {
+#include "src/game/effect/effect_util_fn_80131588.inc"
+}
+#else
+void fn_80131588(void) { /* TODO */ }
+#endif
+extern void fn_80165A20(void);
+extern u16 lbl_8047AEA4;
+#if 1
+asm void fn_801315EC(void) {
+#include "src/game/effect/effect_util_fn_801315EC.inc"
+}
+#else
+void fn_801315EC(void) { /* TODO */ }
+#endif
+extern void fn_800FA064(void);
+#if 1
+asm void fn_80131714(void) {
+#include "src/game/effect/effect_util_fn_80131714.inc"
+}
+#else
+void fn_80131714(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80132454(void) {
+#include "src/game/effect/effect_util_fn_80132454.inc"
+}
+#else
+void fn_80132454(void) { /* TODO */ }
+#endif
+extern void fn_800FA160(void);
+#if 1
+asm void fn_80132570(void) {
+#include "src/game/effect/effect_util_fn_80132570.inc"
+}
+#else
+void fn_80132570(void) { /* TODO */ }
+#endif
+extern void fn_800FAA98(void);
+#if 1
+asm void fn_8013264C(void) {
+#include "src/game/effect/effect_util_fn_8013264C.inc"
+}
+#else
+void fn_8013264C(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047D0E0;
+#if 1
+asm void fn_801327E0(void) {
+#include "src/game/effect/effect_util_fn_801327E0.inc"
+}
+#else
+void fn_801327E0(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80132F7C(void) {
+#include "src/game/effect/effect_util_fn_80132F7C.inc"
+}
+#else
+void fn_80132F7C(void) { /* TODO */ }
+#endif
+extern void fn_801E1810(void);
+extern void fn_800F0308(void);
+extern void fn_801E1874(void);
+extern void fn_8010264C(void);
+extern void fn_800C8520(void);
+extern void fn_801E189C(void);
+extern u8 lbl_80272AA8[];
+extern u8 lbl_8047D0E8[];
+#if 1
+asm void fn_80132FD8(void) {
+#include "src/game/effect/effect_util_fn_80132FD8.inc"
+}
+#else
+void fn_80132FD8(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_8013327C(void) {
+#include "src/game/effect/effect_util_fn_8013327C.inc"
+}
+#else
+void fn_8013327C(void) { /* TODO */ }
+#endif
+extern void fn_801D1CC4(void);
+extern void fn_801D1D58(void);
+extern void fn_801D268C(void);
+#if 1
+asm void fn_8013334C(void) {
+#include "src/game/effect/effect_util_fn_8013334C.inc"
+}
+#else
+void fn_8013334C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80133510(void) {
+#include "src/game/effect/effect_util_fn_80133510.inc"
+}
+#else
+void fn_80133510(void) { /* TODO */ }
+#endif
+extern void fn_8012F11C(void);
+extern void fn_8012F150(void);
+extern void fn_8012F1FC(void);
+#if 1
+asm void fn_8013356C(void) {
+#include "src/game/effect/effect_util_fn_8013356C.inc"
+}
+#else
+void fn_8013356C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_801335D4(void) {
+#include "src/game/effect/effect_util_fn_801335D4.inc"
+}
+#else
+void fn_801335D4(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_80133BE4(void) {
+#include "src/game/effect/effect_util_fn_80133BE4.inc"
+}
+#else
+void fn_80133BE4(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_80133E1C(void) {
+#include "src/game/effect/effect_util_fn_80133E1C.inc"
+}
+#else
+void fn_80133E1C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80134274(void) {
+#include "src/game/effect/effect_util_fn_80134274.inc"
+}
+#else
+void fn_80134274(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478F8C;
+#if 1
+asm void fn_801342B8(void) {
+#include "src/game/effect/effect_util_fn_801342B8.inc"
+}
+#else
+void fn_801342B8(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80134768(void) {
+#include "src/game/effect/effect_util_fn_80134768.inc"
+}
+#else
+void fn_80134768(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_80134A98(void) {
+#include "src/game/effect/effect_util_fn_80134A98.inc"
+}
+#else
+void fn_80134A98(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478B98;  /* effect count (SDA) */
+#if 1
+asm void fn_80136368(void) {
+#include "src/game/effect/effect_util_fn_80136368.inc"
+}
+#else
+void fn_80136368(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478B98;  /* effect count (SDA) */
+#if 1
+asm void fn_801363A8(void) {
+#include "src/game/effect/effect_util_fn_801363A8.inc"
+}
+#else
+void fn_801363A8(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478BA0;  /* trace count (SDA) */
+#if 1
+asm void fn_801363E8(void) {
+#include "src/game/effect/effect_util_fn_801363E8.inc"
+}
+#else
+void fn_801363E8(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478BA0;  /* trace count (SDA) */
+#if 1
+asm void fn_80136428(void) {
+#include "src/game/effect/effect_util_fn_80136428.inc"
+}
+#else
+void fn_80136428(void) { /* TODO */ }
+#endif
+extern u32 lbl_80478BA0;  /* trace count (SDA) */
+#if 1
+asm void fn_80136468(void) {
+#include "src/game/effect/effect_util_fn_80136468.inc"
+}
+#else
+void fn_80136468(void) { /* TODO */ }
+#endif
