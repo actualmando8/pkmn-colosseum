@@ -1090,3 +1090,15 @@ static void ExceptionRecoveryHandler(u32 error, void* context) {
  *  produce a formatted crash dump visible on the TV output.
  * =========================================================================
  */
+
+/* ===== Phase 2 recovery stubs ===== */
+
+/* fn_800060F0 - 0x800060F0 | size: 0x160 */
+#if 1
+asm void fn_800060F0(void) {
+#include "src/game/main_fn_800060F0.inc"
+}
+#else
+void fn_800060F0(void) { /* TODO */ }
+#endif
+
