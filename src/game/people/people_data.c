@@ -338,12 +338,20 @@ extern void fn_80143C20(void);
 extern void fn_80143C30(void);
 extern void fn_80143C40(void);
 
-#if 1
+#if 0
 asm void fn_80140A9C(void) {
 #include "src/game/people/people_data_fn_80140A9C.inc"
 }
 #else
-void fn_80140A9C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80140A9C(u32* a, u32* b) {
+    u32 tmp;
+    if (a == NULL) return;
+    if (b == NULL) return;
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
 #endif
 extern u32 lbl_80478BD8;   /* gPeopleFieldCount */
 #if 1
@@ -466,215 +474,365 @@ asm void fn_801431AC(void) {
 #else
 void fn_801431AC(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_801436B8(void) {
 #include "src/game/people/people_data_fn_801436B8.inc"
 }
 #else
-void fn_801436B8(void) { /* TODO */ }
+#pragma optimization_level 4
+s8 fn_801436B8(u8* p) {
+    if (p == NULL) return 0;
+    return (s8)p[0x6];
+}
 #endif
-#if 1
+#if 0
 asm void fn_801436D4(void) {
 #include "src/game/people/people_data_fn_801436D4.inc"
 }
 #else
-void fn_801436D4(void) { /* TODO */ }
+#pragma optimization_level 4
+s8 fn_801436D4(u8* p) {
+    if (p == NULL) return 0;
+    return (s8)p[0x5];
+}
 #endif
-#if 1
+#if 0
 asm void fn_801436F0(void) {
 #include "src/game/people/people_data_fn_801436F0.inc"
 }
 #else
-void fn_801436F0(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801436F0(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x4] >> 3) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143718(void) {
 #include "src/game/people/people_data_fn_80143718.inc"
 }
 #else
-void fn_80143718(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143718(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xf];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143730(void) {
 #include "src/game/people/people_data_fn_80143730.inc"
 }
 #else
-void fn_80143730(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143730(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xe];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143748(void) {
 #include "src/game/people/people_data_fn_80143748.inc"
 }
 #else
-void fn_80143748(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143748(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xd];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143760(void) {
 #include "src/game/people/people_data_fn_80143760.inc"
 }
 #else
-void fn_80143760(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143760(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xc];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143778(void) {
 #include "src/game/people/people_data_fn_80143778.inc"
 }
 #else
-void fn_80143778(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143778(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x4] >> 4) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801437A0(void) {
 #include "src/game/people/people_data_fn_801437A0.inc"
 }
 #else
-void fn_801437A0(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_801437A0(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xb];
+}
 #endif
-#if 1
+#if 0
 asm void fn_801437B8(void) {
 #include "src/game/people/people_data_fn_801437B8.inc"
 }
 #else
-void fn_801437B8(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801437B8(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x4] >> 5) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801437E0(void) {
 #include "src/game/people/people_data_fn_801437E0.inc"
 }
 #else
-void fn_801437E0(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_801437E0(u8* p) {
+    if (p == NULL) return 0;
+    return p[0xa];
+}
 #endif
-#if 1
+#if 0
 asm void fn_801437F8(void) {
 #include "src/game/people/people_data_fn_801437F8.inc"
 }
 #else
-void fn_801437F8(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801437F8(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x4] >> 6) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143820(void) {
 #include "src/game/people/people_data_fn_80143820.inc"
 }
 #else
-void fn_80143820(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143820(u8* p) {
+    if (p == NULL) return 0;
+    return p[0x9];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143838(void) {
 #include "src/game/people/people_data_fn_80143838.inc"
 }
 #else
-void fn_80143838(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80143838(u8* p) {
+    if (p == NULL) return 0;
+    return p[0x8];
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143850(void) {
 #include "src/game/people/people_data_fn_80143850.inc"
 }
 #else
-void fn_80143850(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143850(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x4] >> 7) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143878(void) {
 #include "src/game/people/people_data_fn_80143878.inc"
 }
 #else
-void fn_80143878(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143878(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = p[0x3] & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801438A0(void) {
 #include "src/game/people/people_data_fn_801438A0.inc"
 }
 #else
-void fn_801438A0(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801438A0(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 1) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801438C8(void) {
 #include "src/game/people/people_data_fn_801438C8.inc"
 }
 #else
-void fn_801438C8(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801438C8(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 2) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801438F0(void) {
 #include "src/game/people/people_data_fn_801438F0.inc"
 }
 #else
-void fn_801438F0(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_801438F0(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 3) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143918(void) {
 #include "src/game/people/people_data_fn_80143918.inc"
 }
 #else
-void fn_80143918(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143918(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 4) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143940(void) {
 #include "src/game/people/people_data_fn_80143940.inc"
 }
 #else
-void fn_80143940(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143940(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 5) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143968(void) {
 #include "src/game/people/people_data_fn_80143968.inc"
 }
 #else
-void fn_80143968(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143968(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 6) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143990(void) {
 #include "src/game/people/people_data_fn_80143990.inc"
 }
 #else
-void fn_80143990(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143990(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x3] >> 7) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801439B8(void) {
 #include "src/game/people/people_data_fn_801439B8.inc"
 }
 #else
-void fn_801439B8(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_801439B8(u8* p) {
+    if (p == NULL) return 0;
+    return (u32)(p[0x2] & 0xF);
+}
 #endif
-#if 1
+#if 0
 asm void fn_801439D4(void) {
 #include "src/game/people/people_data_fn_801439D4.inc"
 }
 #else
-void fn_801439D4(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_801439D4(u8* p) {
+    if (p == NULL) return 0;
+    return (u32)((p[0x2] >> 4) & 0xF);
+}
 #endif
-#if 1
+#if 0
 asm void fn_801439F0(void) {
 #include "src/game/people/people_data_fn_801439F0.inc"
 }
 #else
-void fn_801439F0(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_801439F0(u8* p) {
+    if (p == NULL) return 0;
+    return (u32)(p[0x1] & 0xF);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143A0C(void) {
 #include "src/game/people/people_data_fn_80143A0C.inc"
 }
 #else
-void fn_80143A0C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80143A0C(u8* p) {
+    if (p == NULL) return 0;
+    return (u32)((p[0x1] >> 4) & 0xF);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143A28(void) {
 #include "src/game/people/people_data_fn_80143A28.inc"
 }
 #else
-void fn_80143A28(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80143A28(u8* p) {
+    if (p == NULL) return 0;
+    return (u32)((p[0x0] >> 1) & 0xF);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143A44(void) {
 #include "src/game/people/people_data_fn_80143A44.inc"
 }
 #else
-void fn_80143A44(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143A44(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x0] >> 5) & 1;
+    return v;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143A6C(void) {
 #include "src/game/people/people_data_fn_80143A6C.inc"
 }
 #else
-void fn_80143A6C(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80143A6C(u8* p) {
+    s32 v;
+    if (p == NULL) return 0;
+    v = (p[0x0] >> 7) & 1;
+    return v;
+}
 #endif
 extern u32 lbl_80478BE0;
 extern u8 lbl_80368630[];
@@ -685,19 +843,28 @@ asm void fn_80143A94(void) {
 #else
 void fn_80143A94(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80143ABC(void) {
 #include "src/game/people/people_data_fn_80143ABC.inc"
 }
 #else
-void fn_80143ABC(void) { /* TODO */ }
+#pragma optimization_level 4
+s8 fn_80143ABC(u8* p, u16 idx) {
+    if (p == NULL) return 0;
+    if ((idx & 0xFFFF) >= 0x19) return 0;
+    return (s8)(p[idx + 4]);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80143AF0(void) {
 #include "src/game/people/people_data_fn_80143AF0.inc"
 }
 #else
-void fn_80143AF0(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80143AF0(u8* p) {
+    if (p == NULL) return 0;
+    return *(u32*)p;
+}
 #endif
 extern u32 lbl_80478BC8;
 extern u8 lbl_80367F78[];
