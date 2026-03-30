@@ -3406,16 +3406,84 @@ void fn_800E93B8(void) {
 
 /* fn_800E9998 -- UpdateEnvMap | Size: 0x194 */
 extern void fn_800E0020(void);
-extern u32 lbl_8047CBC0;
-extern u32 lbl_8047AB88;
-extern u32 lbl_8047CBC8;
-#if 1
+extern f32 lbl_8047CBC0;
+extern f32 lbl_8047AB88;
+extern f32 lbl_8047CBC8;
+#if 0
 asm void fn_800E9998(void) {
 #include "src/game/gs_material_fn_800E9998.inc"
 }
 #else
-void fn_800E9998(void) {
-    /* UpdateEnvMap (0x194 bytes) */
+void* fn_800E9998(void* r26, void* r27, void* r28, void* r29) {
+    extern u8 lbl_80401490[];
+    void* r31 = (void*)lbl_80401490;
+    s32 r30 = 0;
+    while (r30 < 6) {
+        if (*(void**)r31 == r26 && *(void**)((u8*)r31 + 0x4) == r28) {
+            s32 r3_lod;
+            u8 r24 = 1;
+            if (r29 != NULL) {
+                f32 stk[3];
+                f32 f1;
+                fn_80190E34(r29, stk);
+                f1 = stk[0];
+                if (stk[1] > f1) f1 = stk[1];
+                if (stk[2] > f1) f1 = stk[2];
+                {
+                    f32* r3c = *(f32**)((u8*)r29 + 0xc);
+                    f32 f2 = r3c[0] + r3c[1] + r3c[2];
+                    f32 f0 = f2 / lbl_8047CBC0;
+                    f1 = f1 * f0;
+                }
+                r3_lod = ((s32(*)(f64))fn_800CDA74)((f64)f1);
+                r3_lod = ((s32(*)(s32))fn_800C46B0)(r3_lod);
+            } else {
+                r3_lod = 0;
+                goto do_anim;
+            }
+            {
+                u32 r48 = *(u32*)((u8*)r31 + 0x48);
+                u32 r4c = *(u32*)((u8*)r31 + 0x4c);
+                if ((u32)r3_lod < r48) {
+                    /* divide r4c by 3 */
+                    u32 div3 = (u32)(((u64)0xAAAAAAABu * (u64)r4c) >> 33);
+                    if ((u32)r3_lod < div3) { r30++; r31 = (u8*)r31 + 0x58; continue; }
+                } else {
+                    u32 x3 = r48 * 3;
+                    if ((u32)r3_lod > x3) { r30++; r31 = (u8*)r31 + 0x58; continue; }
+                }
+            }
+            do_anim:
+            if (lbl_8047AB88 > lbl_8047CBC8) {
+                f32 stk20[3];
+                fn_800E3D14(r27, stk20);
+                r24 = 1;
+                {
+                    s32 r25 = 0;
+                    while (r25 < 0x10) {
+                        void* entry8 = *(void**)((u8*)r31 + 0x8 + r25 * 4);
+                        if (entry8 != NULL) {
+                            f32 stk14[3];
+                            f32 f1;
+                            fn_800E3D14(entry8, stk14);
+                            fn_800E0020(stk20, stk14);
+                            f1 = lbl_8047AB88;
+                            if (f1 > lbl_8047CBC8) {
+                                r24 = 0;
+                                r25 = 0x10;
+                            }
+                        }
+                        r25++;
+                    }
+                }
+                if (!r24) { r30++; r31 = (u8*)r31 + 0x58; continue; }
+            }
+            return r31;
+        }
+        r30++;
+        r31 = (u8*)r31 + 0x58;
+    }
+    return NULL;
 }
 #endif
 
