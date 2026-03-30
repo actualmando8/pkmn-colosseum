@@ -3520,8 +3520,8 @@ void GSfield_ObjectBatchUpdate(void) {
  * ================================================================== */
 void GSfield_ProcessTriggers(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -14900,14 +14900,15 @@ void fn_8011F910(void) {
 #endif
 /* 0x48 | fn_8011FBCC | generic */
 extern f32 lbl_8047CFF4;
-#if 1
+#if 0
 asm void fn_8011FBCC(void) {
 #include "src/game/gs_field_world_fn_8011FBCC.inc"
 }
 #else
-void fn_8011FBCC(void) {
-    /* refs: lbl_8047CFF4 */
-    fn_801254B4();
+void fn_8011FBCC(u8* ptr, f32 f1) {
+    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+    if (ptr == NULL) { return; }
+    fn_801254B4(ptr, 0, 0xc5, 0, (u32)(s32)(lbl_8047CFF4 * f1));
 }
 #endif
 /* 0x60 | fn_8011FC14 | generic */
@@ -14919,9 +14920,22 @@ asm void fn_8011FC14(void) {
 #include "src/game/gs_field_world_fn_8011FC14.inc"
 }
 #else
-void fn_8011FC14(void) {
-    /* refs: lbl_8047CFF0, lbl_8047CFF4, lbl_8047D008 */
-    fn_8012640C();
+f32 fn_8011FC14(u8* ptr) {
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+    u32 val;
+    u32 sp[2];
+    f32 f1;
+    f64 dv;
+    f64 f2;
+    if (ptr == NULL) { return lbl_8047CFF0; }
+    val = fn_8012640C(ptr, 0, 0xc5, 0);
+    val ^= 0x80000000;
+    sp[1] = val;
+    f2 = lbl_8047D008;
+    sp[0] = 0x43300000;
+    dv = *(f64*)sp;
+    f1 = (f32)(dv - f2);
+    return f1 / lbl_8047CFF4;
 }
 #endif
 /* 0x8011FC74 | 0x30 */
@@ -22978,8 +22992,8 @@ extern void fn_801067E8(void);
 extern void fn_801065B8(void);
 extern void fn_801D0AFC(void);
 extern void fn_80113FE8(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 #if 1
 asm void fn_8012AD50(void) {
@@ -22987,8 +23001,8 @@ asm void fn_8012AD50(void) {
 }
 #else
 void fn_8012AD50(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern void* fn_800F9318();
     extern void fn_801065B8();
@@ -23312,8 +23326,8 @@ extern void fn_8010F320(void);
 extern void fn_800A3AC0(void);
 extern void fn_800A3A78(void);
 extern void fn_8010FDF8(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D03C;
 extern f32 lbl_8047D040;
 extern f32 lbl_8047D038;
@@ -23329,8 +23343,8 @@ asm void fn_8012B19C(void) {
 #else
 void fn_8012B19C(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D03C;
     extern f32 lbl_8047D040;
@@ -23640,8 +23654,8 @@ L_8012B544: ;
 }
 #endif
 /* 0x8012B5E4 | 0x4EC */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D03C;
 extern f32 lbl_8047D038;
 extern f64 lbl_8047D048;
@@ -23655,8 +23669,8 @@ asm void fn_8012B5E4(void) {
 #else
 void fn_8012B5E4(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D03C;
     extern f64 lbl_8047D048;
@@ -24053,16 +24067,16 @@ void fn_8012BAF0(void) {
 }
 #endif
 /* 0x8012BBA8 | 0xFC */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 #if 1
 asm void fn_8012BBA8(void) {
 #include "src/game/gs_field_world_fn_8012BBA8.inc"
 }
 #else
 void fn_8012BBA8(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern void fn_8018C69C();
     extern void fn_8018C7C8();
     extern void fn_8018CA20();
@@ -24128,8 +24142,8 @@ void fn_8012BBA8(void) {
 }
 #endif
 /* 0x8012BCA4 | 0x13C */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 #if 1
 asm void fn_8012BCA4(void) {
@@ -24137,8 +24151,8 @@ asm void fn_8012BCA4(void) {
 }
 #else
 void fn_8012BCA4(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern void* fn_800F9318();
     extern void fn_8012C660();
@@ -24460,8 +24474,8 @@ extern void fn_8018397C(void);
 extern void fn_801812E8(void);
 extern void fn_80189490(void);
 extern void fn_80183688(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D070;
 extern f32 lbl_8047D074;
 extern f32 lbl_8047D078;
@@ -24474,8 +24488,8 @@ asm void fn_8012C0B4(void) {
 }
 #else
 void fn_8012C0B4(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D070;
     extern f32 lbl_8047D074;
@@ -24805,8 +24819,8 @@ void fn_8012C0B4(void) {
 }
 #endif
 /* 0x8012C540 | 0x120 */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D078;
 extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
@@ -24816,8 +24830,8 @@ asm void fn_8012C540(void) {
 }
 #else
 void fn_8012C540(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D078;
     extern f32 lbl_8047D07C;
@@ -24908,8 +24922,8 @@ extern void fn_800EC578(void);
 extern void fn_800EC53C(void);
 extern void fn_800EC5FC(void);
 extern void fn_800EC5B8(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D084;
 extern f32 lbl_8047D088;
 extern f32 lbl_8047D038;
@@ -24923,8 +24937,8 @@ asm void fn_8012C660(void) {
 }
 #else
 void fn_8012C660(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D040;
     extern f32 lbl_8047D080;
@@ -25560,8 +25574,8 @@ L_8012D760: ;
 }
 #endif
 /* 0x8012D7F0 | 0x6A4 */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f64 lbl_8047D068;
 extern f32 lbl_8047D038;
 extern f64 lbl_8047D048;
@@ -25577,8 +25591,8 @@ asm void fn_8012D7F0(void) {
 #else
 void fn_8012D7F0(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -26049,8 +26063,8 @@ L_8012DE70: ;
 #endif
 /* 0x8012DE94 | 0x4F4 */
 extern void fn_800E3C64(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f64 lbl_8047D058;
 extern f64 lbl_8047D048;
@@ -26063,8 +26077,8 @@ asm void fn_8012DE94(void) {
 #else
 void fn_8012DE94(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -26410,8 +26424,8 @@ extern void fn_800F7A08(void);
 extern void fn_800F7BC4(void);
 extern void fn_80188214(void);
 extern void fn_80166458(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f64 lbl_8047D0C8;
 extern f32 lbl_8047D0B4;
 extern f32 lbl_8047D038;
@@ -26431,8 +26445,8 @@ asm void fn_8012E388(void) {
 #else
 void fn_8012E388(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -26755,8 +26769,8 @@ extern void fn_800F7AF0(void);
 extern void fn_801887D8(void);
 extern void fn_800A3C00(void);
 extern f32 lbl_8047D038;
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f64 lbl_8047D068;
 extern f32 lbl_8047D080;
 extern f32 lbl_8047D0D0;
@@ -26771,8 +26785,8 @@ asm void fn_8012E7B8(void) {
 #else
 void fn_8012E7B8(void) {
     extern u8 lbl_80478AC0[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f64 lbl_8047D048;
     extern f64 lbl_8047D050;
@@ -27070,8 +27084,8 @@ extern void fn_801337B0(void);
 extern void fn_80102620(void);
 extern void fn_8018C424(void);
 extern void fn_8000D710(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern u8 lbl_80272A38[];
 extern f32 lbl_8047D064;
 #if 1
@@ -27081,8 +27095,8 @@ asm void fn_8012EBD4(void) {
 #else
 void fn_8012EBD4(void) {
     extern u8 lbl_80272A38[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D064;
     extern void fn_8000D710();
     extern void fn_800D3088();
@@ -27360,16 +27374,16 @@ L_8012EF94: ;
 /* 0x8012F008 | 0x114 */
 extern void fn_80188AF4(void);
 extern void fn_80188F78(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 #if 1
 asm void fn_8012F008(void) {
 #include "src/game/gs_field_world_fn_8012F008.inc"
 }
 #else
 void fn_8012F008(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern void fn_80188AF4();
     extern void fn_80188F78();
     u8 sp[0x20];
@@ -27507,8 +27521,8 @@ void fn_8012F150(void) {
 }
 #endif
 /* 0x8012F1FC | 0x210 */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 #if 1
@@ -27517,8 +27531,8 @@ asm void fn_8012F1FC(void) {
 }
 #else
 void fn_8012F1FC(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D0D4;
     extern void fn_80188AF4();
@@ -27656,8 +27670,8 @@ void fn_8012F1FC(void) {
 }
 #endif
 /* 0x8012F40C | 0x204 */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 #if 1
@@ -27666,8 +27680,8 @@ asm void fn_8012F40C(void) {
 }
 #else
 void fn_8012F40C(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D0D4;
     extern void fn_80188AF4();
@@ -27807,8 +27821,8 @@ void fn_8012F40C(void) {
 extern void fn_800E3D6C(void);
 extern void fn_8010E138(void);
 extern void fn_800E4170(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D0AC;
 extern f32 lbl_8047D0D8;
 extern f32 lbl_8047D07C;
@@ -27819,8 +27833,8 @@ asm void fn_8012F610(void) {
 }
 #else
 void fn_8012F610(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D07C;
     extern f32 lbl_8047D0AC;
@@ -28307,8 +28321,8 @@ extern void fn_800EB528(void);
 extern void fn_8018CB5C(void);
 extern void fn_80189328(void);
 extern void fn_8018BF24(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 #if 1
 asm void fn_8012FCD4(void) {
@@ -28318,8 +28332,8 @@ asm void fn_8012FCD4(void) {
 void fn_8012FCD4(void) {
     extern u8 lbl_802729C0[];
     extern u8 lbl_80272A10[];
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern void fn_8006AE18();
     extern void fn_800EB528();
@@ -28571,8 +28585,8 @@ void fn_8012FCD4(void) {
 }
 #endif
 /* 0x80130054 | 0x1F8 */
-extern u32 lbl_8047D034;
-extern u32 lbl_8047D030;
+extern f32 lbl_8047D034;
+extern f32 lbl_8047D030;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 #if 1
@@ -28581,8 +28595,8 @@ asm void fn_80130054(void) {
 }
 #else
 void fn_80130054(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D0D4;
     extern void fn_8012A5B0();
@@ -28724,8 +28738,8 @@ void fn_80130054(void) {
 }
 #endif
 /* 0x8013024C | 0x414 */
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 #if 1
@@ -28734,8 +28748,8 @@ asm void fn_8013024C(void) {
 }
 #else
 void fn_8013024C(void) {
-    extern u32 lbl_8047D030;
-    extern u32 lbl_8047D034;
+    extern f32 lbl_8047D030;
+    extern f32 lbl_8047D034;
     extern f32 lbl_8047D038;
     extern f32 lbl_8047D0D4;
     extern void fn_80188AF4();
@@ -31130,8 +31144,8 @@ extern void fn_801885C4(void);
 extern void fn_800A3B7C(void);
 extern void fn_8018F678(void);
 extern void fn_8018F658(void);
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 extern f64 lbl_8047D068;
 extern f32 lbl_8047D038;
 extern f64 lbl_8047D048;
@@ -31151,8 +31165,8 @@ asm void fn_8012CA84(void) {
 #else
 void fn_8012CA84(void) { /* TODO */ }
 #endif
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 #if 1
 asm void fn_8012D2BC(void) {
 #include "src/game/gs_field_world_fn_8012D2BC.inc"
@@ -31160,8 +31174,8 @@ asm void fn_8012D2BC(void) {
 #else
 void fn_8012D2BC(void) { /* TODO */ }
 #endif
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
 #if 1
 asm void fn_8012D32C(void) {
 #include "src/game/gs_field_world_fn_8012D32C.inc"
@@ -31169,12 +31183,20 @@ asm void fn_8012D32C(void) {
 #else
 void fn_8012D32C(void) { /* TODO */ }
 #endif
-extern u32 lbl_8047D030;
-extern u32 lbl_8047D034;
-#if 1
+extern f32 lbl_8047D030;
+extern f32 lbl_8047D034;
+#if 0
 asm void fn_8012EFB8(void) {
 #include "src/game/gs_field_world_fn_8012EFB8.inc"
 }
 #else
-void fn_8012EFB8(void) { /* TODO */ }
+u32 fn_8012EFB8(u32* out_zero, u32* out_val, s32 index) {
+    u32 local[2];
+    local[0] = *(u32*)&lbl_8047D030;
+    local[1] = *(u32*)&lbl_8047D034;
+    if (index < 0 || index >= 2) { return 0; }
+    *out_zero = 0;
+    *out_val = local[index];
+    return 1;
+}
 #endif
