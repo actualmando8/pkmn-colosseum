@@ -3415,13 +3415,45 @@ extern u8 lbl_8047CBE8[];
 extern u8 lbl_8047CBF0[];
 extern u8 lbl_80270EA8[];
 extern u8 lbl_8047CBF8[];
-#if 1
+#if 0
 asm void fn_800E9C6C(void) {
 #include "src/game/gs_material_fn_800E9C6C.inc"
 }
 #else
-void fn_800E9C6C(void) {
-    /* GSmaterial internal (0x1C8 bytes) */
+void fn_800E9C6C(void* entry, void* dest) {
+    u32 r6 = *(u32*)entry;
+    *(u32*)dest = r6 & 0x322B62u;
+    fn_800E01D0((u8*)dest + 0x4, fn_800E3D00(entry));
+    fn_800E01D0((u8*)dest + 0x10, fn_800E3CF8(entry));
+    fn_800E01D0((u8*)dest + 0x1c, fn_800E3CF0(entry));
+    *(u32*)((u8*)dest + 0x28) = *(u32*)((u8*)entry + 0x90);
+    *(u32*)((u8*)dest + 0x2c) = *(u32*)((u8*)entry + 0xa8);
+    *(f32*)((u8*)dest + 0x30) = *(f32*)((u8*)entry + 0x98);
+    *(f32*)((u8*)dest + 0x34) = *(f32*)((u8*)entry + 0x94);
+    *(u32*)((u8*)dest + 0x40) = *(u32*)((u8*)entry + 0x8c);
+    *(f32*)((u8*)dest + 0x38) = *(f32*)((u8*)entry + 0xb0);
+    *(f32*)((u8*)dest + 0x3c) = *(f32*)((u8*)entry + 0xac);
+    *(u32*)((u8*)dest + 0x44) = *(u32*)((u8*)entry + 0xa4);
+    if (*(u32*)dest & 0x20000) {
+        void* r3 = *(void**)((u8*)entry + 0x8);
+        void* r30 = *(void**)((u8*)r3 + 0x10);
+        if (r30 == NULL) fn_80196E10(lbl_8047CBE8, 0x3e4, lbl_8047CBF0);
+        if ((u8*)dest + 0x48 == NULL) fn_80196E10(lbl_8047CBE8, 0x3e5, lbl_80270EA8);
+        *(u32*)((u8*)dest + 0x48) = *(u32*)((u8*)r30 + 0x38);
+        if (r30 == NULL) fn_80196E10(lbl_8047CBE8, 0x2ec, lbl_8047CBF0);
+        *(u32*)((u8*)dest + 0x4c) = *(u32*)((u8*)r30 + 0x3c);
+        *(u32*)((u8*)dest + 0x50) = *(u32*)((u8*)r30 + 0x40);
+        if (r30 == NULL) fn_80196E10(lbl_8047CBE8, 0x2fa, lbl_8047CBF0);
+        *(f32*)((u8*)dest + 0x54) = *(f32*)((u8*)r30 + 0x1c);
+        if (r30 == NULL) fn_80196E10(lbl_8047CBE8, 0x308, lbl_8047CBF0);
+        *(f32*)((u8*)dest + 0x58) = *(f32*)((u8*)r30 + 0x20);
+        if (r30 == NULL) fn_80196E10(lbl_8047CBE8, 0x351, lbl_8047CBF0);
+        *(f32*)((u8*)dest + 0x5c) = *(f32*)((u8*)r30 + 0x24);
+        if ((u8*)dest + 0x60 == NULL) fn_80196E10(lbl_8047CBE8, 0x352, lbl_8047CBF8);
+        *(u32*)((u8*)dest + 0x60) = *(u32*)((u8*)r30 + 0x2c);
+        *(u32*)((u8*)dest + 0x64) = *(u32*)((u8*)r30 + 0x30);
+        *(u32*)((u8*)dest + 0x68) = *(u32*)((u8*)r30 + 0x34);
+    }
 }
 #endif
 
@@ -3642,16 +3674,37 @@ void fn_800EAFE4(void) {
 
 /* fn_800EB268 -- ConfigureAlpha | Size: 0xD8 */
 extern void fn_80191460(void);
-extern u32 lbl_8047CC28;
+extern f32 lbl_8047CC28;
 extern u8 lbl_8047CC2C[];
 extern u8 lbl_8047CC34[];
-#if 1
+#if 0
 asm void fn_800EB268(void) {
 #include "src/game/gs_material_fn_800EB268.inc"
 }
 #else
-void fn_800EB268(void) {
-    /* ConfigureAlpha (0xD8 bytes) */
+void fn_800EB268(void* entry, s32 r4) {
+    void* r30;
+    u32 r31;
+    fn_800ECCA8(entry, r4);
+    fn_80191460((u8*)entry + 0x4c);
+    r31 = *(u32*)((u8*)entry + 0x144);
+    *(u32*)((u8*)entry + 0x144) = 0;
+    if (*(u32*)entry & 0x4) {
+        ((void(*)(void*, f32))fn_800ECA78)(entry, lbl_8047CC28);
+        fn_800EC134(entry);
+        r30 = *(void**)((u8*)entry + 0x8);
+        if (r30 == NULL) {
+            fn_80196E10(lbl_8047CC2C, 0x25d, lbl_8047CC34);
+        }
+        if (r30 != NULL) {
+            u32 flags = *(u32*)((u8*)r30 + 0x14);
+            s32 active = 0;
+            if (!(flags & 0x800000) && (flags & 0x40)) active = 1;
+            if (active) fn_8019D9DC(r30);
+        }
+    }
+    fn_800E9E34(entry, (void*)1, fn_800EB414, entry);
+    *(u32*)((u8*)entry + 0x144) = r31;
 }
 #endif
 
@@ -3792,13 +3845,39 @@ extern void fn_800E0290(void);
 extern u32 lbl_8047ABA0;
 extern u8 lbl_8047CC40[];
 extern u8 lbl_8047CC48[];
-#if 1
+#if 0
 asm void fn_800EB5A0(void) {
 #include "src/game/gs_material_fn_800EB5A0.inc"
 }
 #else
-void fn_800EB5A0(void) {
-    /* GSmaterial internal (0x140 bytes) */
+void fn_800EB5A0(void* src) {
+    void* r31;
+    char stk_c8[0x30];
+    char stk_98[0x30];
+    char stk_68[0x30];
+    char stk_38[0x30];
+    char stk_8[0x30];
+    lbl_8047ABA0 = 0;
+    ((void(*)(void*, void*, void*, void*, f32))fn_800EB6E0)(src, *(void**)((u8*)src + 0x10), *(void**)((u8*)src + 0x14), *(void**)((u8*)src + 0xc), *(f32*)((u8*)src + 0xd4));
+    r31 = *(void**)((u8*)src + 0xc);
+    if (r31 == NULL) fn_80196E10(lbl_8047CC40, 0x47c, lbl_8047CC48);
+    if (r31 != NULL) {
+        u32 flags = *(u32*)((u8*)r31 + 0x14);
+        s32 active = 0;
+        if (!(flags & 0x800000) && (flags & 0x40)) active = 1;
+        if (active) fn_8019D9DC(r31);
+    }
+    r31 = (u8*)r31 + 0x44;
+    fn_800E0560(stk_c8, (u8*)src + 0x18);
+    ((void(*)(void*, f32))fn_800E053C)(stk_98, *(f32*)((u8*)src + 0x24));
+    ((void(*)(void*, f32))fn_800E0518)(stk_68, *(f32*)((u8*)src + 0x28));
+    ((void(*)(void*, f32))fn_800E04F4)(stk_38, *(f32*)((u8*)src + 0x2c));
+    fn_800E042C(stk_8, (u8*)src + 0x30);
+    fn_800E0290(r31, r31, stk_8);
+    fn_800E0290(r31, r31, stk_c8);
+    fn_800E0290(r31, r31, stk_98);
+    fn_800E0290(r31, r31, stk_68);
+    fn_800E0290(r31, r31, stk_38);
 }
 #endif
 
@@ -5195,10 +5274,38 @@ void fn_800EC134(void* entry) {
     ((void(*)(void*))fn_800ED1CC)(entry);
 }
 #endif
-#if 1
+#if 0
 asm void fn_800ECA78(void) {
 #include "src/game/gs_material_fn_800ECA78.inc"
 }
 #else
-void fn_800ECA78(void) { /* TODO */ }
+void fn_800ECA78(void* entry, f32 f1) {
+    u32 r4 = *(u32*)entry;
+    void* r3 = *(void**)((u8*)entry + 0x8);
+    if (!(r4 & 0x4)) return;
+    if (r4 & 0x80) {
+        *(f32*)((u8*)entry + 0xc4) = f1 * *(f32*)((u8*)entry + 0xd8);
+        *(f32*)((u8*)entry + 0xc8) = f1;
+        ((void(*)(void*, s32, f32))fn_801A32A0)(*(void**)((u8*)entry + 0x10), 0x1cb, *(f32*)((u8*)entry + 0xc4));
+        ((void(*)(void*, s32, f32))fn_801A32A0)(*(void**)((u8*)entry + 0x14), 0x1cb, *(f32*)((u8*)entry + 0xc8));
+    } else {
+        if (r4 & 0x20000) r3 = *(void**)((u8*)r3 + 0x10);
+        *(f32*)((u8*)entry + 0x98) = f1;
+        *(f32*)((u8*)entry + 0x9c) = f1;
+        ((void(*)(void*, s32, f32))fn_801A32A0)(r3, 0x1cb, *(f32*)((u8*)entry + 0x9c));
+    }
+    {
+        u32 flags = *(u32*)entry & ~0x5001u;
+        *(u32*)entry = flags;
+        flags = *(u32*)entry;
+        if ((flags & 0x2000) && (flags & 0x8)) {
+            r3 = *(void**)((u8*)entry + 0x8);
+            if (flags & 0x20000) r3 = *(void**)((u8*)r3 + 0x10);
+            *(f32*)((u8*)entry + 0xb0) = f1;
+            *(f32*)((u8*)entry + 0xb4) = f1;
+            ((void(*)(void*, s32, f32))fn_801A32A0)(r3, 0x634, *(f32*)((u8*)entry + 0xb4));
+            *(u32*)entry &= ~0x8000u;
+        }
+    }
+}
 #endif
