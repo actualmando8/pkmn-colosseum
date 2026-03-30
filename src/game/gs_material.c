@@ -2674,13 +2674,37 @@ void fn_800ECA78_impl(void) {
 }
 
 /* fn_800ECB74 | Size: 0x134 */
-#if 1
+#if 0
 asm void fn_800ECB74(void) {
 #include "src/game/gs_material_fn_800ECB74.inc"
 }
 #else
-void fn_800ECB74(void) {
-    /* GSmaterial internal (0x134 bytes) */
+void fn_800ECB74(void* entry, s32 mode) {
+    void* mobj = *(void**)((u8*)entry + 0x8);
+    if (*(u32*)entry & 0x20000) {
+        mobj = *(void**)((u8*)mobj + 0x10);
+    }
+    *(s32*)((u8*)entry + 0x8c) = mode;
+    if (mode == 0) {
+        fn_801C028C(mobj, 6, 0x9b2f, fn_800EE054, 3, 0);
+    } else if (mode == 1) {
+        fn_801C028C(mobj, 6, 0x9b2f, fn_800EE054, 3, 1);
+    }
+    {
+        u32 flags = *(u32*)entry;
+        if (flags & 0x2000) {
+            void* mobj2 = *(void**)((u8*)entry + 0x8);
+            if (flags & 0x20000) {
+                mobj2 = *(void**)((u8*)mobj2 + 0x10);
+            }
+            *(s32*)((u8*)entry + 0xa4) = mode;
+            if (mode == 0) {
+                fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
+            } else if (mode == 1) {
+                fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
+            }
+        }
+    }
 }
 #endif
 
@@ -2755,25 +2779,118 @@ s32 fn_800ED6AC(GSmaterialEntry* entry) {
 #endif
 
 /* fn_800ED6E4 | Size: 0x100 */
-#if 1
+#if 0
 asm void fn_800ED6E4(void) {
 #include "src/game/gs_material_fn_800ED6E4.inc"
 }
 #else
-void fn_800ED6E4(void) {
-    /* GSmaterial internal (0x100 bytes) */
+void fn_800ED6E4(void* entry, u8 enable) {
+    u32 r5, r6, r7, r8;
+    void (*cb)(void*, void*);
+    if (*(u32*)entry & GSMAT_FLAG_RENDERTYPE) {
+        if (enable == 0) {
+            r8 = *(u32*)((u8*)entry + 0xc0);
+            r5 = 0x4000;
+            r7 = *(u32*)((u8*)entry + 0x8c);
+            r6 = 0x20;
+        } else {
+            r8 = *(u32*)((u8*)entry + 0xa8);
+            r5 = 0x8000;
+            r7 = *(u32*)((u8*)entry + 0xa4);
+            r6 = 0x40;
+        }
+    } else {
+        if (enable == 0) {
+            r8 = *(u32*)((u8*)entry + 0x90);
+            r5 = 0x4000;
+            r7 = *(u32*)((u8*)entry + 0x8c);
+            r6 = 0x20;
+        } else {
+            r8 = *(u32*)((u8*)entry + 0xa8);
+            r5 = 0x8000;
+            r7 = *(u32*)((u8*)entry + 0xa4);
+            r6 = 0x40;
+        }
+    }
+    if (r7 == 0) {
+        *(u32*)entry &= ~r6;
+    } else if (r7 == 1) {
+        *(u32*)entry &= ~r5;
+    }
+    cb = (void(*)(void*, void*))*(void**)((u8*)entry + 0xdc);
+    if (cb != NULL) {
+        struct {
+            u32 flags;
+            u32 val;
+            u32 e0;
+        } args;
+        args.flags = enable ? 2 : 1;
+        if (r7 == 1) {
+            args.flags |= 4;
+        }
+        args.val = r8;
+        args.e0 = *(u32*)((u8*)entry + 0xe0);
+        cb(entry, &args);
+    }
 }
 #endif
 
 /* fn_800ED7E4 | Size: 0xE0 */
-extern u32 lbl_8047CC78;
-#if 1
+extern f32 lbl_8047CC78;
+#if 0
 asm void fn_800ED7E4(void) {
 #include "src/game/gs_material_fn_800ED7E4.inc"
 }
 #else
-void fn_800ED7E4(void) {
-    /* GSmaterial internal (0xE0 bytes) */
+void fn_800ED7E4(void* entry, f32 delta) {
+    f32* p;
+    f32* q;
+    f32 target;
+    u32 r4;
+    u32 r7;
+    f32 threshold;
+    if (*(u32*)entry & GSMAT_FLAG_RENDERTYPE) {
+        if (delta == 0.0f) {
+            p      = (f32*)((u8*)entry + 0xc8);
+            target = *(f32*)((u8*)entry + 0xd0);
+            r7     = *(u32*)((u8*)entry + 0x8c);
+            q      = p;
+            r4     = 0x4000;
+        } else {
+            p      = (f32*)((u8*)entry + 0xb0);
+            target = *(f32*)((u8*)entry + 0xb8);
+            r7     = *(u32*)((u8*)entry + 0xa4);
+            q      = (f32*)((u8*)entry + 0xb4);
+            r4     = 0x8000;
+        }
+    } else {
+        if (delta == 0.0f) {
+            p      = (f32*)((u8*)entry + 0x98);
+            target = *(f32*)((u8*)entry + 0xa0);
+            r7     = *(u32*)((u8*)entry + 0x8c);
+            q      = (f32*)((u8*)entry + 0x9c);
+            r4     = 0x4000;
+        } else {
+            p      = (f32*)((u8*)entry + 0xb0);
+            target = *(f32*)((u8*)entry + 0xb8);
+            r7     = *(u32*)((u8*)entry + 0xa4);
+            q      = (f32*)((u8*)entry + 0xb4);
+            r4     = 0x8000;
+        }
+    }
+    threshold = target - lbl_8047CC78;
+    *p = *p + delta;
+    if (*p >= threshold) {
+        if (r7 == 0) {
+            *p = target;
+        } else if (r7 == 1) {
+            *p = *p - target;
+        }
+    }
+    if (*q >= threshold) {
+        if (r7 != 0) return;
+        *(u32*)entry |= r4;
+    }
 }
 #endif
 
