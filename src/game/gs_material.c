@@ -1006,13 +1006,67 @@ void fn_800E3BC0(GSmaterialEntry* entry) {
 #endif
 
 /* fn_800E3DC4 -- GSmaterialUpdateAlpha | Size: 0x250 */
-#if 1
+extern u8 lbl_80270E28[];
+#if 0
 asm void fn_800E3DC4(void) {
 #include "src/game/gs_material_fn_800E3DC4.inc"
 }
 #else
-void fn_800E3DC4(void) {
-    /* GSmaterialUpdateAlpha (0x250 bytes) */
+void fn_800E3DC4(void* entry, void* param) {
+    f32 stk[3];
+    fn_800E01D0(stk, (u8*)entry + 0x24);
+    fn_800E019C(stk, stk, param);
+    if (*(u32*)((u8*)entry + 0x114) == 0) {
+        void* r30;
+        fn_800E01D0((u8*)entry + 0x24, stk);
+        r30 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = stk[0];
+            if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x2a4, lbl_8047CB68);
+            if (*(u32*)((u8*)r30 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2a5, lbl_80270E28);
+            *(f32*)((u8*)r30 + 0x1c) = f31;
+            if ((*(u32*)((u8*)r30 + 0x14) & 0x2000000) && r30 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r30 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r30);
+            }
+        }
+        r30 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = stk[1];
+            if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x2b8, lbl_8047CB68);
+            if (*(u32*)((u8*)r30 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2b9, lbl_80270E28);
+            *(f32*)((u8*)r30 + 0x20) = f31;
+            if ((*(u32*)((u8*)r30 + 0x14) & 0x2000000) && r30 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r30 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r30);
+            }
+        }
+        r30 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = stk[2];
+            if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x2cc, lbl_8047CB68);
+            if (*(u32*)((u8*)r30 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2cd, lbl_80270E28);
+            *(f32*)((u8*)r30 + 0x24) = f31;
+            if ((*(u32*)((u8*)r30 + 0x14) & 0x2000000) && r30 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r30 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r30);
+            }
+        }
+    } else {
+        fn_800E01D0((u8*)entry + 0x12c, stk);
+    }
 }
 #endif
 
@@ -1071,13 +1125,63 @@ void fn_800E407C(void* entry, void* r4) {
 #endif
 
 /* fn_800E4170 -- SetupAlphaBlend | Size: 0x234 */
-#if 1
+#if 0
 asm void fn_800E4170(void) {
 #include "src/game/gs_material_fn_800E4170.inc"
 }
 #else
-void fn_800E4170(void) {
-    /* SetupAlphaBlend (0x234 bytes) */
+void fn_800E4170(void* entry, f32* param) {
+    if (*(u32*)((u8*)entry + 0x114) == 0) {
+        void* r29;
+        fn_800E01D0((u8*)entry + 0x24, param);
+        r29 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = param[0];
+            if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x2a4, lbl_8047CB68);
+            if (*(u32*)((u8*)r29 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2a5, lbl_80270E28);
+            *(f32*)((u8*)r29 + 0x1c) = f31;
+            if ((*(u32*)((u8*)r29 + 0x14) & 0x2000000) && r29 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r29 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r29);
+            }
+        }
+        r29 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = param[1];
+            if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x2b8, lbl_8047CB68);
+            if (*(u32*)((u8*)r29 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2b9, lbl_80270E28);
+            *(f32*)((u8*)r29 + 0x20) = f31;
+            if ((*(u32*)((u8*)r29 + 0x14) & 0x2000000) && r29 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r29 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r29);
+            }
+        }
+        r29 = *(void**)((u8*)entry + 0x8);
+        {
+            f32 f31 = param[2];
+            if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x2cc, lbl_8047CB68);
+            if (*(u32*)((u8*)r29 + 0x14) & 0x20000) fn_80196E10(lbl_8047CB60, 0x2cd, lbl_80270E28);
+            *(f32*)((u8*)r29 + 0x24) = f31;
+            if ((*(u32*)((u8*)r29 + 0x14) & 0x2000000) && r29 != NULL) {
+                s32 active;
+                u32 flags;
+                if (r29 == NULL) fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                flags = *(u32*)((u8*)r29 + 0x14);
+                if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+                if (!active) fn_8019D620(r29);
+            }
+        }
+    } else {
+        fn_800E01D0((u8*)entry + 0x12c, param);
+    }
 }
 #endif
 
