@@ -1606,15 +1606,152 @@ extern void fn_8019146C(void);
 extern void fn_8019F1C4(void);
 extern u32 lbl_8047AB78;
 extern u32 lbl_8047AB74;
-extern u32 lbl_8047CB84;
-extern u32 lbl_8047CB7C;
-#if 1
+extern f32 lbl_8047CB84;
+extern f32 lbl_8047CB7C;
+#if 0
 asm void fn_800E51A4(void) {
 #include "src/game/gs_material_fn_800E51A4.inc"
 }
 #else
-void fn_800E51A4(void) {
-    /* TEVMultiStageSetup (0x3AC bytes) */
+void* fn_800E51A4(void* mobj_param, void* r30_param) {
+    void* r31;
+    /* Find first free pool slot */
+    {
+        u32 count = lbl_8047AB78;
+        r31 = (void*)lbl_8047AB74;
+        if (count > 0) {
+            u32 i;
+            for (i = 0; i < count; i++, r31 = (u8*)r31 + 0x170) {
+                if (!(*(u32*)r31 & 0x1)) break;
+            }
+            if (i == count) r31 = NULL;
+        } else {
+            r31 = NULL;
+        }
+    }
+    if (r31 == NULL) return NULL;
+    /* Initialize the entry */
+    memset(r31, 0, 0x170);
+    *(u32*)r31 = 0x2001;
+    *(u32*)((u8*)r31 + 0x84) = 0;
+    *(u32*)((u8*)r31 + 0x88) = 0;
+    *(u8*)((u8*)r31 + 0x80) = 0;
+    *(u32*)((u8*)r31 + 0xdc) = 0;
+    *(u16*)((u8*)r31 + 0x150) = 0;
+    *(u32*)((u8*)r31 + 0x14c) = 0;
+    *(u16*)((u8*)r31 + 0x152) = 0;
+    *(u32*)((u8*)r31 + 0x158) = 0;
+    *(u32*)((u8*)r31 + 0x15c) = 0;
+    *(u32*)((u8*)r31 + 0x160) = 0;
+    *(u16*)((u8*)r31 + 0x164) = 0;
+    *(u32*)((u8*)r31 + 0x114) = 0;
+    *(u32*)((u8*)r31 + 0x118) = 0;
+    *(u32*)((u8*)r31 + 0x11c) = 0;
+    *(u32*)((u8*)r31 + 0x148) = 1;
+    *(void**)((u8*)r31 + 0x4) = mobj_param;
+    {
+        void* mobj = ((void*(*)(void*))fn_801A0FBC)(r30_param);
+        *(void**)((u8*)r31 + 0x8) = mobj;
+        *(u32*)((u8*)r31 + 0xc) = 0;
+        fn_800E01F4((u8*)r31 + 0x18, *(f32*)((u8*)mobj + 0x38), *(f32*)((u8*)mobj + 0x3c), *(f32*)((u8*)mobj + 0x40));
+        mobj = *(void**)((u8*)r31 + 0x8);
+        fn_800E01F4((u8*)r31 + 0x24, *(f32*)((u8*)mobj + 0x1c), *(f32*)((u8*)mobj + 0x20), *(f32*)((u8*)mobj + 0x24));
+        mobj = *(void**)((u8*)r31 + 0x8);
+        fn_800E01F4((u8*)r31 + 0x30, *(f32*)((u8*)mobj + 0x2c), *(f32*)((u8*)mobj + 0x30), *(f32*)((u8*)mobj + 0x34));
+        mobj = *(void**)((u8*)r31 + 0x8);
+        fn_800E01F4((u8*)r31 + 0x3c, *(f32*)((u8*)mobj + 0x38), *(f32*)((u8*)mobj + 0x3c), *(f32*)((u8*)mobj + 0x40));
+    }
+    *(u32*)((u8*)r31 + 0xe4) = 0;
+    *(u32*)((u8*)r31 + 0xe8) = (u32)-1;
+    *(u32*)((u8*)r31 + 0xf0) = 0;
+    *(u32*)((u8*)r31 + 0xf4) = (u32)-1;
+    *(u32*)((u8*)r31 + 0xfc) = 0;
+    *(u32*)((u8*)r31 + 0x100) = (u32)-1;
+    *(u32*)((u8*)r31 + 0x108) = 0;
+    *(u32*)((u8*)r31 + 0x10c) = (u32)-1;
+    /* Check for textures (mobj->0xc) */
+    {
+        void* mobj = *(void**)((u8*)r31 + 0x4);
+        if (*(u32*)((u8*)mobj + 0xc) != 0) {
+            *(u32*)r31 |= 0x10;
+        }
+    }
+    /* Check for texture array (mobj->0x4) */
+    {
+        void* mobj = *(void**)((u8*)r31 + 0x4);
+        if (*(u32*)((u8*)mobj + 0x4) != 0) {
+            void** texarray;
+            u32 count;
+            *(u32*)r31 |= 0x4;
+            *(u32*)((u8*)r31 + 0x90) = (u32)-1;
+            count = 0;
+            texarray = *(void***)((u8*)mobj + 0x4);
+            while (texarray[count] != NULL) count++;
+            *(u32*)((u8*)r31 + 0x84) = count;
+            fn_800ECCA8(r31, 0);
+            ((void(*)(void*, f32))fn_800EC9DC)(r31, lbl_8047CB84);
+            fn_800ECB74(r31, 1);
+        }
+    }
+    /* Check for second array (mobj->0x8) */
+    {
+        void* mobj = *(void**)((u8*)r31 + 0x4);
+        if (*(u32*)((u8*)mobj + 0x8) != 0) {
+            void** arr2;
+            u32 count;
+            *(u32*)r31 |= 0x8;
+            *(u32*)((u8*)r31 + 0xa8) = (u32)-1;
+            count = 0;
+            arr2 = *(void***)((u8*)mobj + 0x8);
+            while (arr2[count] != NULL) count++;
+            *(u32*)((u8*)r31 + 0x88) = count;
+            fn_800EC35C(r31, 0);
+            ((void(*)(void*, f32))fn_800EC308)(r31, lbl_8047CB84);
+            fn_800EC208(r31, 1);
+        }
+    }
+    /* Initialize pivot/rotation data */
+    fn_8019147C((u8*)r31 + 0x4c, (u8*)r31 + 0x3c);
+    fn_80191474((u8*)r31 + 0x4c, (u8*)r31 + 0x24);
+    fn_8019146C((u8*)r31 + 0x4c, (u8*)r31 + 0x30);
+    fn_800EB340(r31);
+    *(f32*)((u8*)r31 + 0x48) = lbl_8047CB7C;
+    /* Z-depth computation #1 */
+    {
+        void* r30;
+        if (*(u32*)r31 & 0x80) {
+            memcpy((u8*)r31 + 0x3c, (u8*)r31 + 0x18, 0xc);
+        } else {
+            r30 = fn_800EE150(r31, 1);
+            if (r30 == NULL) {
+                memcpy((u8*)r31 + 0x3c, (u8*)r31 + 0x18, 0xc);
+            } else {
+                fn_800EE3BC(r30, (u8*)r31 + 0x3c, 0, 0);
+                fn_800EE828(r30);
+                *(f32*)((u8*)r31 + 0x40) = *(f32*)((u8*)r31 + 0x40) - *(f32*)((u8*)r31 + 0x48);
+            }
+        }
+    }
+    /* Save z-depth and redo computation #2 */
+    *(f32*)((u8*)r31 + 0x48) = *(f32*)((u8*)r31 + 0x40);
+    {
+        void* r30;
+        if (*(u32*)r31 & 0x80) {
+            memcpy((u8*)r31 + 0x3c, (u8*)r31 + 0x18, 0xc);
+        } else {
+            r30 = fn_800EE150(r31, 1);
+            if (r30 == NULL) {
+                memcpy((u8*)r31 + 0x3c, (u8*)r31 + 0x18, 0xc);
+            } else {
+                fn_800EE3BC(r30, (u8*)r31 + 0x3c, 0, 0);
+                fn_800EE828(r30);
+                *(f32*)((u8*)r31 + 0x40) = *(f32*)((u8*)r31 + 0x40) - *(f32*)((u8*)r31 + 0x48);
+            }
+        }
+    }
+    /* Register callback */
+    fn_8019F1C4(*(void**)((u8*)r31 + 0x8), (u8*)r31 + 0x168, (u8*)r31 + 0x16c);
+    return r31;
 }
 #endif
 
