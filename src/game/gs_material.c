@@ -722,7 +722,7 @@ extern void fn_800E9998(void);
 extern void fn_800E9E90(void);
 extern s32 fn_800EA60C();
 extern void fn_800EA664();
-extern void fn_800EA6D4(void);
+extern void fn_800EA6D4();
 extern void fn_800EA7E4();
 extern void fn_800EA820();
 extern void fn_800EA960();
@@ -767,13 +767,47 @@ void fn_800E3604(void) {
 #endif
 
 /* fn_800E3760 -- GSmaterialApplySingle | Size: 0x124 */
-#if 1
+#if 0
 asm void fn_800E3760(void) {
 #include "src/game/gs_material_fn_800E3760.inc"
 }
 #else
-void fn_800E3760(void) {
-    /* GSmaterialApplySingle (0x124 bytes) */
+void fn_800E3760(void* entry, u32 r4) {
+    if (!(*(u32*)entry & 1)) return;
+    fn_801B25C4(0x7f);
+    {
+        void* r31 = fn_800D2584();
+        if (r31 != NULL) {
+            if (fn_80195A6C(*(void**)((u8*)r31 + 0xc)) != 0) {
+                fn_800DD174(*(void**)((u8*)r31 + 0xc));
+                fn_800E9148(entry, 1);
+                {
+                    void* mobj;
+                    if (*(u32*)entry & 0x80) {
+                        mobj = *(void**)((u8*)entry + 0xc);
+                    } else {
+                        mobj = *(void**)((u8*)entry + 0x8);
+                    }
+                    if (r4 & 0x10) {
+                        fn_801A13CC(mobj, 0, 1, 0);
+                        fn_800D6A5C(*(void**)((u8*)entry + 0x168), *(void**)((u8*)entry + 0x16c));
+                    }
+                    if (r4 & 0x1000) {
+                        fn_801A13CC(mobj, 0, 4, 0);
+                    }
+                    if (r4 & 0x2000) {
+                        fn_801A13CC(mobj, 0, 2, 0);
+                    }
+                }
+                fn_800E9148(entry, 0);
+                fn_80195A48();
+            }
+        }
+        if (*(u32*)entry & 0x200000) {
+            fn_80190E60((u8*)entry + 0x4c);
+        }
+    }
+    fn_800D87AC(-1);
 }
 #endif
 
@@ -1016,15 +1050,40 @@ void fn_800E465C(void) {
 
 /* fn_800E4AC0 -- TEVColorRegister | Size: 0x134 */
 extern void fn_800E01F4(void);
-extern u32 lbl_8047CB7C;
-extern u32 lbl_8047CB80;
-#if 1
+extern f32 lbl_8047CB7C;
+extern f32 lbl_8047CB80;
+#if 0
 asm void fn_800E4AC0(void) {
 #include "src/game/gs_material_fn_800E4AC0.inc"
 }
 #else
-void fn_800E4AC0(void) {
-    /* TEVColorRegister (0x134 bytes) */
+void fn_800E4AC0(void* entry, void* r4, s32 r5, s32 r6, u8 r7) {
+    if (*(u32*)((u8*)entry + 0x114) != 0 || r5 == 0) return;
+    *(u32*)((u8*)entry + 0x118) = *(u32*)((u8*)r4 + 0x4);
+    *(u32*)((u8*)entry + 0x11c) = *(u16*)((u8*)r4 + 0x2);
+    if (r7 != 1) {
+        fn_800E01F4((u8*)entry + 0x120, lbl_8047CB7C, lbl_8047CB7C, lbl_8047CB7C);
+        fn_800E01F4((u8*)entry + 0x12c, lbl_8047CB7C, lbl_8047CB7C, lbl_8047CB7C);
+        fn_800E01F4((u8*)entry + 0x138, lbl_8047CB80, lbl_8047CB80, lbl_8047CB80);
+    } else {
+        fn_800E01D0((u8*)entry + 0x120, (u8*)entry + 0x18);
+        fn_800E01D0((u8*)entry + 0x12c, (u8*)entry + 0x24);
+        fn_800E01D0((u8*)entry + 0x138, (u8*)entry + 0x30);
+    }
+    fn_800E01F4((u8*)entry + 0x18, lbl_8047CB7C, lbl_8047CB7C, lbl_8047CB7C);
+    fn_800E01F4((u8*)entry + 0x24, lbl_8047CB7C, lbl_8047CB7C, lbl_8047CB7C);
+    fn_800E01F4((u8*)entry + 0x30, lbl_8047CB80, lbl_8047CB80, lbl_8047CB80);
+    *(u32*)((u8*)entry + 0x114) = r5;
+    {
+        u32 flags = *(u32*)entry;
+        flags |= 0x80000;
+        *(u32*)entry = flags;
+        if (r6 & 0xff) {
+            flags = *(u32*)entry;
+            flags |= 0x40000;
+            *(u32*)entry = flags;
+        }
+    }
 }
 #endif
 
@@ -2571,13 +2630,37 @@ void fn_800EA664(void* obj) {
 #endif
 
 /* fn_800EA6D4 -- BindTextureToStage | Size: 0x110 */
-#if 1
+#if 0
 asm void fn_800EA6D4(void) {
 #include "src/game/gs_material_fn_800EA6D4.inc"
 }
 #else
-void fn_800EA6D4(void) {
-    /* BindTextureToStage (0x110 bytes) */
+void fn_800EA6D4(void* entry, void* tex, void* r5) {
+    void* r29 = tex;
+    if (r29 != NULL) {
+        u32 flags = *(u32*)((u8*)r29 + 0x14);
+        s32 r3 = 0;
+        if (!(flags & 0x800000)) {
+            if (flags & 0x40) { r3 = 1; }
+        }
+        if (r3 != 0) fn_8019D9DC(r29);
+    }
+    {
+        void* r31 = *(void**)((u8*)r29 + 0x10);
+        if (r31 != NULL) {
+            u32 flags = *(u32*)((u8*)r31 + 0x14);
+            s32 r3 = 0;
+            if (!(flags & 0x800000)) {
+                if (flags & 0x40) { r3 = 1; }
+            }
+            if (r3 != 0) fn_8019D9DC(r31);
+        }
+        fn_800A2EB4((u8*)*(void**)((u8*)r29 + 0x10) + 0x44, r5);
+        fn_800A2D98((u8*)r29 + 0x44, r5, r5);
+        if (entry != NULL) {
+            fn_800A2D98(entry, r5, r5);
+        }
+    }
 }
 #endif
 
