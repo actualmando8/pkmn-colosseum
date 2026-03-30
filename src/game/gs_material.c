@@ -1677,13 +1677,46 @@ void fn_800E9108(void* p, u32 mask) {
 
 /* fn_800E9148 -- CheckRenderSlot | Size: 0x140 */
 extern void fn_801A3918();
-#if 1
+#if 0
 asm void fn_800E9148(void) {
 #include "src/game/gs_material_fn_800E9148.inc"
 }
 #else
-void fn_800E9148(void) {
-    /* CheckRenderSlot (0x140 bytes) */
+void fn_800E9148(void* entry, u8 enable) {
+    u8* slot = lbl_80401490;
+    u8* s;
+    u32 found = 0;
+    s32 i;
+    /* Unrolled 6-slot search */
+    if (*(void**)slot == entry) {
+        found = 1;
+    } else {
+        s = slot + 0x58;
+        if (*(void**)s == entry) {
+            found = 1;
+        } else if (*(void**)(s + 0x58) == entry) {
+            found = 1;
+        } else if (*(void**)(s + 0xB0) == entry) {
+            found = 1;
+        } else if (*(void**)(s + 0x108) == entry) {
+            found = 1;
+        } else if (*(void**)(s + 0x160) == entry) {
+            found = 1;
+        }
+    }
+    if (found) {
+        void* mobj = ((void*(*)(void*))fn_800E5188)(entry);
+        if (enable == 0) {
+            fn_801A3918(mobj, fn_800E9358, 0);
+        } else {
+            fn_801A3918(mobj, fn_800E9358, 1);
+        }
+        for (i = 0; i < 6; i++, slot += 0x58) {
+            if (*(u8*)(slot + 0x50) != 0 && *(void**)slot == entry) {
+                fn_801B0880(*(u32*)(slot + 0x54), (u32)enable);
+            }
+        }
+    }
 }
 #endif
 
@@ -2303,15 +2336,59 @@ void fn_800EC308(void* entry, f32 val) {
 #endif
 
 /* fn_800EC35C -- PE descriptor setup | Size: 0x174 */
-extern void fn_801A2B5C(void);
-extern u32 lbl_8047CC5C;
-#if 1
+extern void fn_801A2B5C();
+extern f32 lbl_8047CC5C;
+#if 0
 asm void fn_800EC35C(void) {
 #include "src/game/gs_material_fn_800EC35C.inc"
 }
 #else
-void fn_800EC35C(void) {
-    /* PE descriptor setup (0x174 bytes) */
+void fn_800EC35C(void* entry, u32 idx) {
+    u32 flags = *(u32*)entry;
+    void* mobj2 = *(void**)((u8*)entry + 0x8);
+    s32 mode;
+    if (!(flags & 0x8)) {
+        return;
+    }
+    if (idx >= *(u32*)((u8*)entry + 0x88)) {
+        return;
+    }
+    if (idx != *(u32*)((u8*)entry + 0xa8)) {
+        if (flags & 0x20000) {
+            mobj2 = *(void**)((u8*)mobj2 + 0x10);
+        }
+        *(u32*)((u8*)entry + 0xa8) = idx;
+        {
+            void* tbl = *(void**)((u8*)*(void**)((u8*)entry + 0x4) + 0x8);
+            void* pe = *(void**)((u8*)tbl + idx * 4);
+            fn_801A2B5C(mobj2, 0, pe);
+        }
+        *(f32*)((u8*)entry + 0xb8) = lbl_8047CC5C;
+        fn_801C028C(mobj2, 6, 0x64db, fn_800EE08C, 2, (u8*)entry + 0xb8);
+    }
+    flags = *(u32*)entry;
+    mobj2 = *(void**)((u8*)entry + 0x8);
+    if (flags & 0x8) {
+        if (flags & 0x20000) {
+            mobj2 = *(void**)((u8*)mobj2 + 0x10);
+        }
+        *(f32*)((u8*)entry + 0xb0) = lbl_8047CC5C;
+        *(f32*)((u8*)entry + 0xb4) = lbl_8047CC5C;
+        fn_801A32A0(mobj2, 0x634, *(f32*)((u8*)entry + 0xb4));
+        *(u32*)entry = flags & ~0x8000;
+    }
+    flags = *(u32*)entry;
+    mode = *(s32*)((u8*)entry + 0xa4);
+    mobj2 = *(void**)((u8*)entry + 0x8);
+    if (flags & 0x20000) {
+        mobj2 = *(void**)((u8*)mobj2 + 0x10);
+    }
+    *(s32*)((u8*)entry + 0xa4) = mode;
+    if (mode == 0) {
+        fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
+    } else if (mode == 1) {
+        fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
+    }
 }
 #endif
 
@@ -2793,17 +2870,42 @@ u32 fn_800EE0E8(void* entry) {
 #endif
 
 /* fn_800EE150 -- ApplyPEDescr | Size: 0xBC */
-extern void fn_800EE834(void);
+extern void* fn_800EE834(void);
 extern u32 lbl_8047ABAC;
 extern u32 lbl_8047ABB0;
 extern u32 lbl_8047ABA8;
-#if 1
+#if 0
 asm void fn_800EE150(void) {
 #include "src/game/gs_material_fn_800EE150.inc"
 }
 #else
-void fn_800EE150(void) {
-    /* ApplyPEDescr (0xBC bytes) */
+void* fn_800EE150(void* entry, u32 param) {
+    void* mobj;
+    u32 max = param;
+    void* result;
+    if (*(u32*)entry & 0x20000) {
+        max = param + 1;
+    }
+    lbl_8047ABAC = max;
+    lbl_8047ABB0 = 0;
+    lbl_8047ABA8 = 0;
+    mobj = ((void*(*)(void*))fn_800E5188)(entry);
+    if (max == 0) {
+        lbl_8047ABA8 = (u32)mobj;
+    } else {
+        fn_801A3918(mobj, fn_800EE20C, 0);
+        if (lbl_8047ABA8 == 0) {
+            return NULL;
+        }
+    }
+    result = fn_800EE834();
+    if (result == NULL) {
+        return NULL;
+    }
+    *(void**)((u8*)result + 0x4) = entry;
+    *(u32*)((u8*)result + 0x8) = lbl_8047ABA8;
+    *(u16*)((u8*)result + 0x2) = (u16)param;
+    return result;
 }
 #endif
 
