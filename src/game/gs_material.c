@@ -3334,13 +3334,94 @@ void fn_800EB5A0(void) {
 #endif
 
 /* fn_800EB6E0 | Size: 0x224 */
-#if 1
+#if 0
 asm void fn_800EB6E0(void) {
 #include "src/game/gs_material_fn_800EB6E0.inc"
 }
 #else
-void fn_800EB6E0(void) {
-    /* GSmaterial internal (0x224 bytes) */
+void fn_800EB6E0(void* r28, void* r18, void* r17, void* r16, f64 f1) {
+    void* r31;
+    void* r30;
+    void* r29;
+    void* r25;
+    void* r26;
+    void* r27;
+    void* r22;
+    void* r23;
+    void* r24;
+    void* r19;
+    void* r20;
+    void* r21;
+    if (r18 == NULL) return;
+    if (r17 == NULL) return;
+    if (r16 == NULL) return;
+    ((void(*)(void*, void*, void*, void*, f64))fn_800EB904)(r28, r18, r17, r16, f1);
+    if (*(u32*)((u8*)r18 + 0x14) & 0x80000) return;
+    r31 = *(void**)((u8*)r18 + 0x10);
+    r30 = *(void**)((u8*)r17 + 0x10);
+    r29 = *(void**)((u8*)r16 + 0x10);
+    while (r31 != NULL) {
+        if (r30 == NULL) goto next1;
+        if (r29 == NULL) goto next1;
+        ((void(*)(void*, void*, void*, void*, f64))fn_800EB904)(r28, r31, r30, r29, f1);
+        if (!(*(u32*)((u8*)r31 + 0x14) & 0x80000)) {
+            r25 = *(void**)((u8*)r31 + 0x10);
+            r26 = *(void**)((u8*)r30 + 0x10);
+            r27 = *(void**)((u8*)r29 + 0x10);
+            while (r25 != NULL) {
+                if (r26 == NULL) goto next2;
+                if (r27 == NULL) goto next2;
+                ((void(*)(void*, void*, void*, void*, f64))fn_800EB904)(r28, r25, r26, r27, f1);
+                if (!(*(u32*)((u8*)r25 + 0x14) & 0x80000)) {
+                    r22 = *(void**)((u8*)r25 + 0x10);
+                    r23 = *(void**)((u8*)r26 + 0x10);
+                    r24 = *(void**)((u8*)r27 + 0x10);
+                    while (r22 != NULL) {
+                        if (r23 == NULL) goto next3;
+                        if (r24 == NULL) goto next3;
+                        ((void(*)(void*, void*, void*, void*, f64))fn_800EB904)(r28, r22, r23, r24, f1);
+                        if (!(*(u32*)((u8*)r22 + 0x14) & 0x80000)) {
+                            r19 = *(void**)((u8*)r22 + 0x10);
+                            r20 = *(void**)((u8*)r23 + 0x10);
+                            r21 = *(void**)((u8*)r24 + 0x10);
+                            while (r19 != NULL) {
+                                if (r20 == NULL) goto next4;
+                                if (r21 == NULL) goto next4;
+                                ((void(*)(void*, void*, void*, void*, f64))fn_800EB904)(r28, r19, r20, r21, f1);
+                                if (!(*(u32*)((u8*)r19 + 0x14) & 0x80000)) {
+                                    r16 = *(void**)((u8*)r19 + 0x10);
+                                    r17 = *(void**)((u8*)r20 + 0x10);
+                                    r18 = *(void**)((u8*)r21 + 0x10);
+                                    while (r16 != NULL) {
+                                        ((void(*)(void*, void*, void*, void*, f64))fn_800EB6E0)(r28, r16, r17, r18, f1);
+                                        r16 = *(void**)((u8*)r16 + 0x8);
+                                        r17 = *(void**)((u8*)r17 + 0x8);
+                                        r18 = *(void**)((u8*)r18 + 0x8);
+                                    }
+                                }
+                                next4:
+                                r19 = *(void**)((u8*)r19 + 0x8);
+                                r20 = *(void**)((u8*)r20 + 0x8);
+                                r21 = *(void**)((u8*)r21 + 0x8);
+                            }
+                        }
+                        next3:
+                        r22 = *(void**)((u8*)r22 + 0x8);
+                        r23 = *(void**)((u8*)r23 + 0x8);
+                        r24 = *(void**)((u8*)r24 + 0x8);
+                    }
+                }
+                next2:
+                r25 = *(void**)((u8*)r25 + 0x8);
+                r26 = *(void**)((u8*)r26 + 0x8);
+                r27 = *(void**)((u8*)r27 + 0x8);
+            }
+        }
+        next1:
+        r31 = *(void**)((u8*)r31 + 0x8);
+        r30 = *(void**)((u8*)r30 + 0x8);
+        r29 = *(void**)((u8*)r29 + 0x8);
+    }
 }
 #endif
 
@@ -3360,13 +3441,84 @@ void fn_800EB904(void) {
 #endif
 
 /* fn_800EBEEC -- Render config | Size: 0x1FC */
-#if 1
+#if 0
 asm void fn_800EBEEC(void) {
 #include "src/game/gs_material_fn_800EBEEC.inc"
 }
 #else
-void fn_800EBEEC(void) {
-    /* Render config (0x1FC bytes) */
+void fn_800EBEEC(void* r23) {
+    void* r31;
+    void* r30;
+    void* r29;
+    void* r28;
+    void* r27;
+    void* r26;
+    void* r25;
+    void* r24;
+    if (r23 == NULL) return;
+    fn_8019FE8C(r23, 0x20000);
+    if (*(u32*)((u8*)r23 + 0x14) & 0x80000) return;
+    r31 = *(void**)((u8*)r23 + 0x10);
+    while (r31 != NULL) {
+        fn_8019FE8C(r31, 0x20000);
+        if (!(*(u32*)((u8*)r31 + 0x14) & 0x80000)) {
+            r30 = *(void**)((u8*)r31 + 0x10);
+            while (r30 != NULL) {
+                fn_8019FE8C(r30, 0x20000);
+                if (!(*(u32*)((u8*)r30 + 0x14) & 0x80000)) {
+                    r29 = *(void**)((u8*)r30 + 0x10);
+                    while (r29 != NULL) {
+                        fn_8019FE8C(r29, 0x20000);
+                        if (!(*(u32*)((u8*)r29 + 0x14) & 0x80000)) {
+                            r28 = *(void**)((u8*)r29 + 0x10);
+                            while (r28 != NULL) {
+                                fn_8019FE8C(r28, 0x20000);
+                                if (!(*(u32*)((u8*)r28 + 0x14) & 0x80000)) {
+                                    r27 = *(void**)((u8*)r28 + 0x10);
+                                    while (r27 != NULL) {
+                                        fn_8019FE8C(r27, 0x20000);
+                                        if (!(*(u32*)((u8*)r27 + 0x14) & 0x80000)) {
+                                            r26 = *(void**)((u8*)r27 + 0x10);
+                                            while (r26 != NULL) {
+                                                fn_8019FE8C(r26, 0x20000);
+                                                if (!(*(u32*)((u8*)r26 + 0x14) & 0x80000)) {
+                                                    r25 = *(void**)((u8*)r26 + 0x10);
+                                                    while (r25 != NULL) {
+                                                        fn_8019FE8C(r25, 0x20000);
+                                                        if (!(*(u32*)((u8*)r25 + 0x14) & 0x80000)) {
+                                                            r24 = *(void**)((u8*)r25 + 0x10);
+                                                            while (r24 != NULL) {
+                                                                fn_8019FE8C(r24, 0x20000);
+                                                                if (!(*(u32*)((u8*)r24 + 0x14) & 0x80000)) {
+                                                                    r23 = *(void**)((u8*)r24 + 0x10);
+                                                                    while (r23 != NULL) {
+                                                                        ((void(*)(void*))fn_800EBEEC)(r23);
+                                                                        r23 = *(void**)((u8*)r23 + 0x8);
+                                                                    }
+                                                                }
+                                                                r24 = *(void**)((u8*)r24 + 0x8);
+                                                            }
+                                                        }
+                                                        r25 = *(void**)((u8*)r25 + 0x8);
+                                                    }
+                                                }
+                                                r26 = *(void**)((u8*)r26 + 0x8);
+                                            }
+                                        }
+                                        r27 = *(void**)((u8*)r27 + 0x8);
+                                    }
+                                }
+                                r28 = *(void**)((u8*)r28 + 0x8);
+                            }
+                        }
+                        r29 = *(void**)((u8*)r29 + 0x8);
+                    }
+                }
+                r30 = *(void**)((u8*)r30 + 0x8);
+            }
+        }
+        r31 = *(void**)((u8*)r31 + 0x8);
+    }
 }
 #endif
 
