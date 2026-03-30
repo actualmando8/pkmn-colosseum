@@ -2922,17 +2922,66 @@ extern void fn_8019FF74(void);
 extern void fn_8019FF30(void);
 extern void fn_8019FE8C(void);
 extern void fn_800E090C(void);
-extern u32 lbl_8047CB98;
+extern f32 lbl_8047CB98;
 extern u8 lbl_8047CB9C[];
 extern u8 lbl_8047CBA4[];
 extern u8 lbl_80270E60[];
-#if 1
+#if 0
 asm void fn_800E6BC8(void) {
 #include "src/game/gs_material_fn_800E6BC8.inc"
 }
 #else
-void fn_800E6BC8(void) {
-    /* GSmaterial internal (0x1F8 bytes) */
+s32 fn_800E6BC8(void* entry) {
+    if (*(u8*)((u8*)entry + 0x80) != 0) {
+        *(u8*)((u8*)entry + 0x80) = *(u8*)((u8*)entry + 0x80) + 1;
+        return 1;
+    }
+    {
+        void* r29 = *(void**)((u8*)entry + 0x8);
+        void* r31 = fn_8019F718();
+        f32 stk[3];
+        if (r31 == NULL) return 0;
+        if (*(u32*)entry & 0x20000) r29 = *(void**)((u8*)r29 + 0x10);
+        r29 = (r29 != NULL) ? *(void**)((u8*)r29 + 0x10) : NULL;
+        if (r29 == NULL) {
+            ((void(*)(void*, void*))fn_801A015C)(NULL, r31);
+        } else {
+            r29 = *(void**)((u8*)r29 + 0x10);
+            /* Find tail of linked list via ->0x8 */
+            while (r29 != NULL && *(void**)((u8*)r29 + 0x8) != NULL) {
+                r29 = *(void**)((u8*)r29 + 0x8);
+            }
+            ((void(*)(void*, void*))fn_8019FF74)(r29, r31);
+        }
+        {
+            void* r4 = fn_8019FF30(r29);
+            ((void(*)(void*, void*))fn_8019FE8C)(r31, r4);
+        }
+        ((void(*)(void*, void*, void*, f32))fn_800E090C)(stk, (u8*)entry + 0x5c, (u8*)entry + 0x68, lbl_8047CB98);
+        if (r31 == NULL) fn_80196E10(lbl_8047CB9C, 0x3a9, lbl_8047CBA4);
+        if ((u8*)stk == NULL) fn_80196E10(lbl_8047CB9C, 0x3aa, lbl_80270E60);
+        *(u32*)((u8*)r31 + 0x38) = *(u32*)&stk[0];
+        *(u32*)((u8*)r31 + 0x3c) = *(u32*)&stk[1];
+        *(u32*)((u8*)r31 + 0x40) = *(u32*)&stk[2];
+        if ((*(u32*)((u8*)r31 + 0x14) & 0x2000000) && r31 != NULL) {
+            s32 active;
+            u32 flags;
+            if (r31 == NULL) fn_80196E10(lbl_8047CB9C, 0x25d, lbl_8047CBA4);
+            flags = *(u32*)((u8*)r31 + 0x14);
+            if ((flags & 0x800000) || !(flags & 0x40)) active = 0; else active = 1;
+            if (!active) fn_8019D620(r31);
+        }
+        if (r31 != NULL) {
+            u32 flags = *(u32*)((u8*)r31 + 0x14);
+            s32 active = 0;
+            if (!(flags & 0x800000) && (flags & 0x40)) active = 1;
+            if (active) fn_8019D9DC(r31);
+        } else {
+            fn_80196E10(lbl_8047CB9C, 0x25d, lbl_8047CBA4);
+        }
+    }
+    *(u8*)((u8*)entry + 0x80) = *(u8*)((u8*)entry + 0x80) + 1;
+    return 1;
 }
 #endif
 
