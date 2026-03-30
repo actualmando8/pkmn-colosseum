@@ -1364,9 +1364,9 @@ void fn_801E25C8(void);
 void fn_801E2B74(void);
 void fn_801E2CA8(void);
 void fn_801E34F0(void);
-void fn_801E3858(void);
+void fn_801E3858(u32 *out0, u32 *out1);
 void fn_801E386C(void);
-void fn_801E38D8(void);
+u8 fn_801E38D8(void);
 void fn_801E38E8(void);
 void fn_801E3930(void);
 void fn_801E3978(void);
@@ -1379,7 +1379,7 @@ void fn_801E4650(void);
 void fn_801E4724(void);
 void fn_801E4778(void);
 void fn_801E4A6C(void);
-void fn_801E4AC4(void);
+u32 fn_801E4AC4(u32 arg);
 void fn_801E4B08(void);
 void fn_801E4DAC(void);
 void fn_801E4DE8(void);
@@ -1417,7 +1417,7 @@ void fn_801EF1E4(void);
 
 /* ============================================================ */
 /* 0x801E03D4 | size: 0x388 | large */
-#if 1
+#if 0
 asm void fn_801E03D4(void) {
 #include "src/game/battle/battle_logic_fn_801E03D4.inc"
 }
@@ -1593,7 +1593,7 @@ void fn_801E03D4(void) {
 #endif
 
 /* 0x801E075C | size: 0x284 | large */
-#if 1
+#if 0
 asm void fn_801E075C(void) {
 #include "src/game/battle/battle_logic_fn_801E075C.inc"
 }
@@ -1763,7 +1763,7 @@ void fn_801E075C(void) {
 #endif
 
 /* 0x801E09E0 | size: 0x598 | large */
-#if 1
+#if 0
 asm void fn_801E09E0(void) {
 #include "src/game/battle/battle_logic_fn_801E09E0.inc"
 }
@@ -2151,7 +2151,7 @@ void fn_801E0F78(void) {
 #endif
 
 /* 0x801E0FB4 | size: 0x1BC | medium */
-#if 1
+#if 0
 asm void fn_801E0FB4(void) {
 #include "src/game/battle/battle_logic_fn_801E0FB4.inc"
 }
@@ -2405,7 +2405,7 @@ void fn_801E1274(void) {
 #endif
 
 /* 0x801E12A0 | size: 0x60 | small */
-#if 1
+#if 0
 asm void fn_801E12A0(void) {
 #include "src/game/battle/battle_logic_fn_801E12A0.inc"
 }
@@ -2452,7 +2452,7 @@ void fn_801E1300(void) {
 #endif
 
 /* 0x801E1368 | size: 0x368 | large */
-#if 1
+#if 0
 asm void fn_801E1368(void) {
 #include "src/game/battle/battle_logic_fn_801E1368.inc"
 }
@@ -2730,7 +2730,7 @@ void fn_801E16D0(void) {
 #endif
 
 /* 0x801E16F0 | size: 0xB8 | medium */
-#if 1
+#if 0
 asm void fn_801E16F0(void) {
 #include "src/game/battle/battle_logic_fn_801E16F0.inc"
 }
@@ -2829,7 +2829,7 @@ u32 fn_801E1874(void) {
 }
 
 /* 0x801E189C | size: 0x88 | medium */
-#if 1
+#if 0
 asm void fn_801E189C(void) {
 #include "src/game/battle/battle_logic_fn_801E189C.inc"
 }
@@ -2887,7 +2887,7 @@ void fn_801E189C(void) {
 #endif
 
 /* 0x801E1924 | size: 0x208 | large */
-#if 1
+#if 0
 asm void fn_801E1924(void) {
 #include "src/game/battle/battle_logic_fn_801E1924.inc"
 }
@@ -3098,7 +3098,7 @@ u32 fn_801E1BE8(void) {
 }
 
 /* 0x801E1C1C | size: 0xF0 | medium */
-#if 1
+#if 0
 asm void fn_801E1C1C(void) {
 #include "src/game/battle/battle_logic_fn_801E1C1C.inc"
 }
@@ -3198,7 +3198,7 @@ void fn_801E1D48(void) {
 #endif
 
 /* 0x801E1D7C | size: 0xA0 | medium */
-#if 1
+#if 0
 asm void fn_801E1D7C(void) {
 #include "src/game/battle/battle_logic_fn_801E1D7C.inc"
 }
@@ -3257,7 +3257,7 @@ void fn_801E1D7C(void) {
 #endif
 
 /* 0x801E1E1C | size: 0x1DC | medium */
-#if 1
+#if 0
 asm void fn_801E1E1C(void) {
 #include "src/game/battle/battle_logic_fn_801E1E1C.inc"
 }
@@ -3405,7 +3405,7 @@ void fn_801E1E1C(void) {
 #endif
 
 /* 0x801E1FF8 | size: 0x4B8 | large */
-#if 1
+#if 0
 asm void fn_801E1FF8(void) {
 #include "src/game/battle/battle_logic_fn_801E1FF8.inc"
 }
@@ -3787,7 +3787,7 @@ void fn_801E24B0(void) {
 #endif
 
 /* 0x801E25C8 | size: 0x44 | small */
-#if 1
+#if 0
 asm void fn_801E25C8(void) {
 #include "src/game/battle/battle_logic_fn_801E25C8.inc"
 }
@@ -3804,7 +3804,7 @@ void fn_801E25C8(void) {
 #endif
 
 /* 0x801E260C | size: 0x568 | large */
-#if 1
+#if 0
 asm void fn_801E260C(void) {
 #include "src/game/battle/battle_logic_fn_801E260C.inc"
 }
@@ -3998,7 +3998,7 @@ void fn_801E260C(void) {
     L_801E28A8:
         r3 = lbl_8047B470;
         r4 = r28;
-        DCFlushRange();
+        DCFlushRange((void*)r3, r4);
         r3 = lbl_80478D00;
         r5 = r30;
         r4 = 0x0;
@@ -4009,7 +4009,7 @@ void fn_801E260C(void) {
         if (tmp == 2) {
             r3 = lbl_8047B474;
             r4 = r28;
-            DCFlushRange();
+            DCFlushRange((void*)r3, r4);
             r3 = lbl_80478D04;
             r5 = r30;
             r4 = 0x0;
@@ -4137,7 +4137,7 @@ L_801E2ADC:
     r21 = r30 << 1;
     r4 = r28;
     r3 = tmp + r21;
-    DCFlushRange();
+    DCFlushRange((void*)r3, r4);
     r3 = lbl_80478D00;
     r4 = r30;
     r5 = r30;
@@ -4149,7 +4149,7 @@ L_801E2ADC:
         tmp = lbl_8047B474;
         r4 = r30;
         r3 = tmp + r21;
-        DCFlushRange();
+        DCFlushRange((void*)r3, r4);
         r3 = lbl_80478D04;
         r4 = r30;
         r5 = r30;
@@ -4171,7 +4171,7 @@ L_801E2B3C:
 #endif
 
 /* 0x801E2B74 | size: 0x134 | medium */
-#if 1
+#if 0
 asm void fn_801E2B74(void) {
 #include "src/game/battle/battle_logic_fn_801E2B74.inc"
 }
@@ -4273,7 +4273,7 @@ void fn_801E2B74(void) {
 #endif
 
 /* 0x801E2CA8 | size: 0x848 | massive */
-#if 1
+#if 0
 asm void fn_801E2CA8(void) {
 #include "src/game/battle/battle_logic_fn_801E2CA8.inc"
 }
@@ -4436,13 +4436,13 @@ void fn_801E2CA8(void) {
     r24 = r29;
     r6 = r29;
     r5 = 0x0;
-    __mod2u();
+    __mod2u(r3, r4);
     r28 = r4;
     r3 = r18;
     r4 = r19;
     r6 = r24;
     r5 = 0x0;
-    __mod2u();
+    __mod2u(r3, r4);
     /* mr. r26, r4 */;
     if (r17 == 0) {
         r26 = r29;
@@ -4475,7 +4475,7 @@ void fn_801E2CA8(void) {
                 r3 = *(u32*)((u8*)r22 + 0x0);
                 r5 = 0x0;
                 r4 = *(u32*)((u8*)r22 + 0x4);
-                __mod2u();
+                __mod2u(r3, r4);
                 tmp = r4 - r28;
                 r20 = r20 + 0x1;
                 *(u32*)((u8*)r22 + 0x4) = tmp;
@@ -4648,7 +4648,7 @@ void fn_801E2CA8(void) {
             r3 = *(u32*)((u8*)r19 + 0x0);
             r5 = 0x0;
             r4 = *(u32*)((u8*)r19 + 0x4);
-            __mod2u();
+            __mod2u(r3, r4);
             tmp = r21 - r4;
             tmp = r20 - r3; /* -borrow */;
             tmp = r17 - r17; /* -borrow */;
@@ -4795,7 +4795,7 @@ L_801E3468:
     *(u32*)((u8*)r5 + 0x30) = tmp;
     *(u32*)((u8*)r31 + 0x3C) = tmp;
     *(u32*)((u8*)r31 + 0x38) = tmp;
-    DCFlushRange();
+    DCFlushRange((void*)r3, r4);
     r3 = lbl_80478D00;
     r5 = r29;
     r4 = 0x0;
@@ -4807,7 +4807,7 @@ L_801E3468:
     if (tmp == 2) {
         r3 = lbl_8047B474;
         r4 = r17;
-        DCFlushRange();
+        DCFlushRange((void*)r3, r4);
         r3 = lbl_80478D04;
         r5 = r29;
         r4 = 0x0;
@@ -4820,7 +4820,7 @@ L_801E3468:
 #endif
 
 /* 0x801E34F0 | size: 0x368 | large */
-#if 1
+#if 0
 asm void fn_801E34F0(void) {
 #include "src/game/battle/battle_logic_fn_801E34F0.inc"
 }
@@ -5028,7 +5028,7 @@ L_801E37E8:
     r24 = r29 << 1;
     r3 = lbl_8047B470;
     r4 = r24;
-    DCFlushRange();
+    DCFlushRange((void*)r3, r4);
     r3 = lbl_80478D00;
     r5 = r29;
     r4 = 0x0;
@@ -5039,7 +5039,7 @@ L_801E37E8:
     if (tmp == 2) {
         r3 = lbl_8047B474;
         r4 = r24;
-        DCFlushRange();
+        DCFlushRange((void*)r3, r4);
         r3 = lbl_80478D04;
         r5 = r29;
         r4 = 0x0;
@@ -5054,7 +5054,7 @@ L_801E37E8:
 #endif
 
 /* 0x801E3858 | size: 0x14 | tiny */
-#if 1
+#if 0
 asm void fn_801E3858(void) {
 #include "src/game/battle/battle_logic_fn_801E3858.inc"
 }
@@ -5095,7 +5095,7 @@ void fn_801E386C(void) {
 #endif
 
 /* 0x801E38D8 | size: 0x10 | tiny */
-#if 1
+#if 0
 asm void fn_801E38D8(void) {
 #include "src/game/battle/battle_logic_fn_801E38D8.inc"
 }
@@ -5107,7 +5107,7 @@ u8 fn_801E38D8(void) {
 #endif
 
 /* 0x801E38E8 | size: 0x48 | small */
-#if 1
+#if 0
 asm void fn_801E38E8(void) {
 #include "src/game/battle/battle_logic_fn_801E38E8.inc"
 }
@@ -5137,7 +5137,7 @@ void fn_801E38E8(void) {
 #endif
 
 /* 0x801E3930 | size: 0x48 | small */
-#if 1
+#if 0
 asm void fn_801E3930(void) {
 #include "src/game/battle/battle_logic_fn_801E3930.inc"
 }
@@ -5167,7 +5167,7 @@ void fn_801E3930(void) {
 #endif
 
 /* 0x801E3978 | size: 0xD8 | medium */
-#if 1
+#if 0
 asm void fn_801E3978(void) {
 #include "src/game/battle/battle_logic_fn_801E3978.inc"
 }
@@ -5244,7 +5244,7 @@ void fn_801E3978(void) {
 #endif
 
 /* 0x801E3A50 | size: 0x504 | large */
-#if 1
+#if 0
 asm void fn_801E3A50(void) {
 #include "src/game/battle/battle_logic_fn_801E3A50.inc"
 }
@@ -5598,7 +5598,7 @@ L_801E3E60:
 #endif
 
 /* 0x801E3F54 | size: 0x104 | medium */
-#if 1
+#if 0
 asm void fn_801E3F54(void) {
 #include "src/game/battle/battle_logic_fn_801E3F54.inc"
 }
@@ -5654,7 +5654,7 @@ void fn_801E3F54(void) {
 #endif
 
 /* 0x801E4058 | size: 0xA0 | medium */
-#if 1
+#if 0
 asm void fn_801E4058(void) {
 #include "src/game/battle/battle_logic_fn_801E4058.inc"
 }
@@ -5679,7 +5679,7 @@ void fn_801E4058(void) {
 #endif
 
 /* 0x801E40F8 | size: 0x374 | large */
-#if 1
+#if 0
 asm void fn_801E40F8(void) {
 #include "src/game/battle/battle_logic_fn_801E40F8.inc"
 }
@@ -5930,7 +5930,7 @@ do {
 #endif
 
 /* 0x801E446C | size: 0x30 | small */
-#if 1
+#if 0
 asm void fn_801E446C(void) {
 #include "src/game/battle/battle_logic_fn_801E446C.inc"
 }
@@ -5953,7 +5953,7 @@ void fn_801E446C(void) {
 #endif
 
 /* 0x801E449C | size: 0x1B4 | medium */
-#if 1
+#if 0
 asm void fn_801E449C(void) {
 #include "src/game/battle/battle_logic_fn_801E449C.inc"
 }
@@ -6024,17 +6024,17 @@ void fn_801E449C(void) {
                 r3 = r31;
                 *(u32*)((u8*)r28 + 0x168) = r31;
                 r4 = r26;
-                DCInvalidateRange();
+                DCInvalidateRange((void*)r3, r4);
                 r31 = r31 + r26;
                 r4 = r25;
                 *(u32*)((u8*)r28 + 0x16C) = r31;
                 r3 = r31;
-                DCInvalidateRange();
+                DCInvalidateRange((void*)r3, r4);
                 r31 = r31 + r25;
                 r4 = r25;
                 *(u32*)((u8*)r28 + 0x170) = r31;
                 r3 = r31;
-                DCInvalidateRange();
+                DCInvalidateRange((void*)r3, r4);
                 r27 = r27 + 0x1;
                 r31 = r31 + r25;
                 r30 = r30 + 0x10;
@@ -6089,7 +6089,7 @@ void fn_801E449C(void) {
 #endif
 
 /* 0x801E4650 | size: 0xD4 | medium */
-#if 1
+#if 0
 asm void fn_801E4650(void) {
 #include "src/game/battle/battle_logic_fn_801E4650.inc"
 }
@@ -6162,7 +6162,7 @@ void fn_801E4650(void) {
 #endif
 
 /* 0x801E4724 | size: 0x54 | small */
-#if 1
+#if 0
 asm void fn_801E4724(void) {
 #include "src/game/battle/battle_logic_fn_801E4724.inc"
 }
@@ -6179,7 +6179,7 @@ void fn_801E4724(void) {
 #endif
 
 /* 0x801E4778 | size: 0x2F4 | large */
-#if 1
+#if 0
 asm void fn_801E4778(void) {
 #include "src/game/battle/battle_logic_fn_801E4778.inc"
 }
@@ -6399,7 +6399,7 @@ void fn_801E4778(void) {
 #endif
 
 /* 0x801E4A6C | size: 0x58 | small */
-#if 1
+#if 0
 asm void fn_801E4A6C(void) {
 #include "src/game/battle/battle_logic_fn_801E4A6C.inc"
 }
@@ -6416,7 +6416,7 @@ void fn_801E4A6C(void) {
 #endif
 
 /* 0x801E4AC4 | size: 0x44 | small */
-#if 1
+#if 0
 asm void fn_801E4AC4(void) {
 #include "src/game/battle/battle_logic_fn_801E4AC4.inc"
 }
@@ -6434,7 +6434,7 @@ u32 fn_801E4AC4(u32 arg) {
 #endif
 
 /* 0x801E4B08 | size: 0x30 | small */
-#if 1
+#if 0
 asm void fn_801E4B08(void) {
 #include "src/game/battle/battle_logic_fn_801E4B08.inc"
 }
@@ -6446,7 +6446,7 @@ void fn_801E4B08(void) {
 #endif
 
 /* 0x801E4B38 | size: 0x148 | medium */
-#if 1
+#if 0
 asm void fn_801E4B38(void) {
 #include "src/game/battle/battle_logic_fn_801E4B38.inc"
 }
@@ -6559,7 +6559,7 @@ void fn_801E4B38(void) {
 #endif
 
 /* 0x801E4C80 | size: 0x12C | medium */
-#if 1
+#if 0
 asm void fn_801E4C80(void) {
 #include "src/game/battle/battle_logic_fn_801E4C80.inc"
 }
@@ -6702,7 +6702,7 @@ void fn_801E4DE8(void) {
 #endif
 
 /* 0x801E4E1C | size: 0xD4 | medium */
-#if 1
+#if 0
 asm void fn_801E4E1C(void) {
 #include "src/game/battle/battle_logic_fn_801E4E1C.inc"
 }
@@ -6772,7 +6772,7 @@ void fn_801E4E1C(void) {
 #endif
 
 /* 0x801E4EF0 | size: 0x44 | small */
-#if 1
+#if 0
 asm void fn_801E4EF0(void) {
 #include "src/game/battle/battle_logic_fn_801E4EF0.inc"
 }
@@ -6800,7 +6800,7 @@ void fn_801E4EF0(void) {
 #endif
 
 /* 0x801E4F34 | size: 0x30 | small */
-#if 1
+#if 0
 asm void fn_801E4F34(void) {
 #include "src/game/battle/battle_logic_fn_801E4F34.inc"
 }
@@ -6823,7 +6823,7 @@ void fn_801E4F34(void) {
 #endif
 
 /* 0x801E4F64 | size: 0x1F0 | medium */
-#if 1
+#if 0
 asm void fn_801E4F64(void) {
 #include "src/game/battle/battle_logic_fn_801E4F64.inc"
 }
@@ -6865,11 +6865,11 @@ void fn_801E4F64(void) {
             while (1) {
                 tmp = *(u32*)((u8*)r31 + 0xD8);
             if ((s32)tmp >= 0) break;
-                OSDisableInterrupts();
+                r3 = OSDisableInterrupts();
                 r4 = *(u32*)((u8*)r31 + 0xD8);
                 tmp = r4 + 0x1;
                 *(u32*)((u8*)r31 + 0xD8) = tmp;
-                OSRestoreInterrupts();
+                OSRestoreInterrupts(r3);
                 tmp = *(u32*)((u8*)r31 + 0xC0);
                 r5 = *(u32*)((u8*)r31 + 0x50);
                 r4 = r27 + tmp;
@@ -6934,11 +6934,11 @@ void fn_801E4F64(void) {
                 r3 = r30 + 0x18;
                 r5 = 0x1;
                 ((void(*)(void))fn_8009F230)();
-                OSDisableInterrupts();
+                r3 = OSDisableInterrupts();
                 r4 = *(u32*)((u8*)r31 + 0xD8);
                 tmp = r4 + 0x1;
                 *(u32*)((u8*)r31 + 0xD8) = tmp;
-                OSRestoreInterrupts();
+                OSRestoreInterrupts(r3);
             }
             tmp = *(u32*)((u8*)r25 + 0x0);
             r25 = r25 + 0x4;
@@ -6982,7 +6982,7 @@ void fn_801E4F64(void) {
 #endif
 
 /* 0x801E5154 | size: 0x2AC | large */
-#if 1
+#if 0
 asm void fn_801E5154(void) {
 #include "src/game/battle/battle_logic_fn_801E5154.inc"
 }
@@ -7082,11 +7082,11 @@ void fn_801E5154(void) {
                             r5 = 0x1;
                             *(u32*)((u8*)r29 + 0xC) = tmp;
                             ((void(*)(void))fn_8009F230)();
-                            OSDisableInterrupts();
+                            r3 = OSDisableInterrupts();
                             r4 = *(u32*)((u8*)r31 + 0xD8);
                             tmp = r4 + 0x1;
                             *(u32*)((u8*)r31 + 0xD8) = tmp;
-                            OSRestoreInterrupts();
+                            OSRestoreInterrupts(r3);
                         }
                         tmp = *(u32*)((u8*)r25 + 0x0);
                         r25 = r25 + 0x4;
@@ -7104,11 +7104,11 @@ void fn_801E5154(void) {
                 } while (0);
                 r3 = r28;
                 fn_801E1BB8();
-                OSDisableInterrupts();
+                r3 = OSDisableInterrupts();
                 r4 = *(u32*)((u8*)r31 + 0xD8);
                 tmp = r4 + 0x1;
                 *(u32*)((u8*)r31 + 0xD8) = tmp;
-                OSRestoreInterrupts();
+                OSRestoreInterrupts(r3);
 
 
             }
@@ -7164,11 +7164,11 @@ void fn_801E5154(void) {
                 r5 = 0x1;
                 *(u32*)((u8*)r27 + 0xC) = tmp;
                 ((void(*)(void))fn_8009F230)();
-                OSDisableInterrupts();
+                r3 = OSDisableInterrupts();
                 r4 = *(u32*)((u8*)r31 + 0xD8);
                 tmp = r4 + 0x1;
                 *(u32*)((u8*)r31 + 0xD8) = tmp;
-                OSRestoreInterrupts();
+                OSRestoreInterrupts(r3);
             }
             tmp = *(u32*)((u8*)r25 + 0x0);
             r25 = r25 + 0x4;
@@ -7228,7 +7228,7 @@ void fn_801E543C(void) {
 #endif
 
 /* 0x801E5470 | size: 0xD8 | medium */
-#if 1
+#if 0
 asm void fn_801E5470(void) {
 #include "src/game/battle/battle_logic_fn_801E5470.inc"
 }
@@ -7300,7 +7300,7 @@ void fn_801E5470(void) {
 #endif
 
 /* 0x801E5548 | size: 0x244 | large */
-#if 1
+#if 0
 asm void fn_801E5548(void) {
 #include "src/game/battle/battle_logic_fn_801E5548.inc"
 }
@@ -7450,7 +7450,7 @@ void fn_801E5548(void) {
 #endif
 
 /* 0x801E578C | size: 0x44 | small */
-#if 1
+#if 0
 asm void fn_801E578C(void) {
 #include "src/game/battle/battle_logic_fn_801E578C.inc"
 }
@@ -7485,7 +7485,7 @@ void fn_801E578C(void) {
 #endif
 
 /* 0x801E57D0 | size: 0x13C | medium */
-#if 1
+#if 0
 asm void fn_801E57D0(void) {
 #include "src/game/battle/battle_logic_fn_801E57D0.inc"
 }
@@ -7585,7 +7585,7 @@ void fn_801E57D0(void) {
 #endif
 
 /* 0x801E590C | size: 0x11C | medium */
-#if 1
+#if 0
 asm void fn_801E590C(void) {
 #include "src/game/battle/battle_logic_fn_801E590C.inc"
 }
@@ -7679,7 +7679,7 @@ void fn_801E590C(void) {
 #endif
 
 /* 0x801E5A28 | size: 0x3BC | large */
-#if 1
+#if 0
 asm void fn_801E5A28(void) {
 #include "src/game/battle/battle_logic_fn_801E5A28.inc"
 }
@@ -7934,7 +7934,7 @@ void fn_801E5A28(void) {
 #endif
 
 /* 0x801E5DE4 | size: 0x1E0 | medium */
-#if 1
+#if 0
 asm void fn_801E5DE4(void) {
 #include "src/game/battle/battle_logic_fn_801E5DE4.inc"
 }
@@ -8070,7 +8070,7 @@ void fn_801E5DE4(void) {
 #endif
 
 /* 0x801E5FC4 | size: 0xF0 | medium */
-#if 1
+#if 0
 asm void fn_801E5FC4(void) {
 #include "src/game/battle/battle_logic_fn_801E5FC4.inc"
 }
@@ -8155,7 +8155,7 @@ void fn_801E5FC4(void) {
 #endif
 
 /* 0x801E60B4 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801E60B4(void) {
 #include "src/game/battle/battle_logic_fn_801E60B4.inc"
 }
@@ -8205,7 +8205,7 @@ void fn_801E60B4(void) {
 #endif
 
 /* 0x801E611C | size: 0x1BC | medium */
-#if 1
+#if 0
 asm void fn_801E611C(void) {
 #include "src/game/battle/battle_logic_fn_801E611C.inc"
 }
@@ -8339,7 +8339,7 @@ void fn_801E611C(void) {
 #endif
 
 /* 0x801E62D8 | size: 0x54 | small */
-#if 1
+#if 0
 asm void fn_801E62D8(void) {
 #include "src/game/battle/battle_logic_fn_801E62D8.inc"
 }
@@ -8376,7 +8376,7 @@ void fn_801E62D8(void) {
 #endif
 
 /* 0x801E632C | size: 0x24C | large */
-#if 1
+#if 0
 asm void fn_801E632C(void) {
 #include "src/game/battle/battle_logic_fn_801E632C.inc"
 }
@@ -8557,7 +8557,7 @@ void fn_801E632C(void) {
 #endif
 
 /* 0x801E6578 | size: 0x10C | medium */
-#if 1
+#if 0
 asm void fn_801E6578(void) {
 #include "src/game/battle/battle_logic_fn_801E6578.inc"
 }
@@ -8639,7 +8639,7 @@ L_801E665C:
 #endif
 
 /* 0x801E6684 | size: 0x1A88 | massive */
-#if 1
+#if 0
 asm void fn_801E6684(void) {
 #include "src/game/battle/battle_logic_fn_801E6684.inc"
 }
@@ -10106,7 +10106,7 @@ void fn_801E6684(void) {
 #endif
 
 /* 0x801E810C | size: 0x1A8C | massive */
-#if 1
+#if 0
 asm void fn_801E810C(void) {
 #include "src/game/battle/battle_logic_fn_801E810C.inc"
 }
@@ -11573,7 +11573,7 @@ void fn_801E810C(void) {
 #endif
 
 /* 0x801E9B98 | size: 0x1AAC | massive */
-#if 1
+#if 0
 asm void fn_801E9B98(void) {
 #include "src/game/battle/battle_logic_fn_801E9B98.inc"
 }
@@ -13046,7 +13046,7 @@ void fn_801E9B98(void) {
 #endif
 
 /* 0x801EB644 | size: 0x67C | large */
-#if 1
+#if 0
 asm void fn_801EB644(void) {
 #include "src/game/battle/battle_logic_fn_801EB644.inc"
 }
@@ -13502,7 +13502,7 @@ L_801EB8DC:
 #endif
 
 /* 0x801EBCC0 | size: 0x6A8 | large */
-#if 1
+#if 0
 asm void fn_801EBCC0(void) {
 #include "src/game/battle/battle_logic_fn_801EBCC0.inc"
 }
@@ -13968,7 +13968,7 @@ L_801EBF54:
 #endif
 
 /* 0x801EC368 | size: 0x6A8 | large */
-#if 1
+#if 0
 asm void fn_801EC368(void) {
 #include "src/game/battle/battle_logic_fn_801EC368.inc"
 }
@@ -14434,7 +14434,7 @@ L_801EC5FC:
 #endif
 
 /* 0x801ECA10 | size: 0xA0 | medium */
-#if 1
+#if 0
 asm void fn_801ECA10(void) {
 #include "src/game/battle/battle_logic_fn_801ECA10.inc"
 }
@@ -14452,7 +14452,7 @@ void fn_801ECA10(void) {
     r4 = (u32)lbl_8046D500;
     r31 = (u32)lbl_8046D500;
     r3 = lbl_80478D08;
-    OSRegisterVersion();
+    OSRegisterVersion((const char *)r3);
     r4 = 0xE0000000;
     *(u32*)((u8*)r31 + 0x100) = r4;
     r4 = r4 + 0x2000;
@@ -14485,7 +14485,7 @@ void fn_801ECA10(void) {
 #endif
 
 /* 0x801ECAB0 | size: 0x464 | large */
-#if 1
+#if 0
 asm void fn_801ECAB0(void) {
 #include "src/game/battle/battle_logic_fn_801ECAB0.inc"
 }
@@ -14793,7 +14793,7 @@ void fn_801ECAB0(void) {
 #endif
 
 /* 0x801ECF14 | size: 0x90 | medium */
-#if 1
+#if 0
 asm void fn_801ECF14(void) {
 #include "src/game/battle/battle_logic_fn_801ECF14.inc"
 }
@@ -14847,7 +14847,7 @@ void fn_801ECF14(void) {
 #endif
 
 /* 0x801ECFA4 | size: 0x3C | small */
-#if 1
+#if 0
 asm void fn_801ECFA4(void) {
 #include "src/game/battle/battle_logic_fn_801ECFA4.inc"
 }
@@ -14876,7 +14876,7 @@ void fn_801ECFA4(void) {
 #endif
 
 /* 0x801ECFE0 | size: 0xEC | medium */
-#if 1
+#if 0
 asm void fn_801ECFE0(void) {
 #include "src/game/battle/battle_logic_fn_801ECFE0.inc"
 }
@@ -14953,7 +14953,7 @@ void fn_801ECFE0(void) {
 #endif
 
 /* 0x801ED0CC | size: 0x14C | medium */
-#if 1
+#if 0
 asm void fn_801ED0CC(void) {
 #include "src/game/battle/battle_logic_fn_801ED0CC.inc"
 }
@@ -15070,7 +15070,7 @@ u32 fn_801ED218(u8* data) {
 }
 
 /* 0x801ED24C | size: 0x48 | small */
-#if 1
+#if 0
 asm void fn_801ED24C(void) {
 #include "src/game/battle/battle_logic_fn_801ED24C.inc"
 }
@@ -15098,7 +15098,7 @@ void fn_801ED24C(void) {
 #endif
 
 /* 0x801ED294 | size: 0x48 | small */
-#if 1
+#if 0
 asm void fn_801ED294(void) {
 #include "src/game/battle/battle_logic_fn_801ED294.inc"
 }
@@ -15137,7 +15137,7 @@ u8* fn_801ED2DC(u8* data) {
 }
 
 /* 0x801ED310 | size: 0x78 | small */
-#if 1
+#if 0
 asm void fn_801ED310(void) {
 #include "src/game/battle/battle_logic_fn_801ED310.inc"
 }
@@ -15176,7 +15176,7 @@ void fn_801ED310(void) {
 #endif
 
 /* 0x801ED388 | size: 0x30 | small */
-#if 1
+#if 0
 asm void fn_801ED388(void) {
 #include "src/game/battle/battle_logic_fn_801ED388.inc"
 }
@@ -15200,7 +15200,7 @@ void fn_801ED388(void) {
 #endif
 
 /* 0x801ED3B8 | size: 0x288 | large */
-#if 1
+#if 0
 asm void fn_801ED3B8(void) {
 #include "src/game/battle/battle_logic_fn_801ED3B8.inc"
 }
@@ -15397,7 +15397,7 @@ L_801ED614:
 #endif
 
 /* 0x801ED648 | size: 0x2C | small */
-#if 1
+#if 0
 asm void fn_801ED648(void) {
 #include "src/game/battle/battle_logic_fn_801ED648.inc"
 }
@@ -15420,16 +15420,19 @@ void fn_801ED648(void) {
 #endif
 
 /* 0x801ED674 | size: 0xC | tiny */
-#if 1
+#if 0
 asm void fn_801ED674(void) {
 #include "src/game/battle/battle_logic_fn_801ED674.inc"
 }
 #else
-void fn_801ED674(void) { }
+void fn_801ED674(void) {
+    extern u8 lbl_8047B5C0;
+    lbl_8047B5C0 = 0;
+}
 #endif
 
 /* 0x801ED680 | size: 0xC0 | medium */
-#if 1
+#if 0
 asm void fn_801ED680(void) {
 #include "src/game/battle/battle_logic_fn_801ED680.inc"
 }
@@ -15487,7 +15490,7 @@ void fn_801ED680(void) {
 #endif
 
 /* 0x801ED740 | size: 0x40 | small */
-#if 1
+#if 0
 asm void fn_801ED740(void) {
 #include "src/game/battle/battle_logic_fn_801ED740.inc"
 }
@@ -15518,7 +15521,7 @@ void fn_801ED740(void) {
 #endif
 
 /* 0x801ED780 | size: 0x8B4 | massive */
-#if 1
+#if 0
 asm void fn_801ED780(void) {
 #include "src/game/battle/battle_logic_fn_801ED780.inc"
 }
@@ -16062,7 +16065,7 @@ L_801EDF2C:
 #endif
 
 /* 0x801EE07C | size: 0x2C | small */
-#if 1
+#if 0
 asm void fn_801EE07C(void) {
 #include "src/game/battle/battle_logic_fn_801EE07C.inc"
 }
@@ -16090,16 +16093,19 @@ void fn_801EE07C(void) {
 #endif
 
 /* 0x801EE0A8 | size: 0x14 | tiny */
-#if 1
+#if 0
 asm void fn_801EE0A8(void) {
 #include "src/game/battle/battle_logic_fn_801EE0A8.inc"
 }
 #else
-void fn_801EE0A8(void) { }
+u16 fn_801EE0A8(u8 idx) {
+    extern u16 *lbl_80478F74;
+    return lbl_80478F74[idx];
+}
 #endif
 
 /* 0x801EE0BC | size: 0x50 | small */
-#if 1
+#if 0
 asm void fn_801EE0BC(void) {
 #include "src/game/battle/battle_logic_fn_801EE0BC.inc"
 }
@@ -16129,7 +16135,7 @@ void fn_801EE0BC(void) {
 #endif
 
 /* 0x801EE10C | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801EE10C(void) {
 #include "src/game/battle/battle_logic_fn_801EE10C.inc"
 }
@@ -16166,7 +16172,7 @@ void fn_801EE10C(void) {
 #endif
 
 /* 0x801EE174 | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801EE174(void) {
 #include "src/game/battle/battle_logic_fn_801EE174.inc"
 }
@@ -16203,7 +16209,7 @@ void fn_801EE174(void) {
 #endif
 
 /* 0x801EE1E0 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801EE1E0(void) {
 #include "src/game/battle/battle_logic_fn_801EE1E0.inc"
 }
@@ -16240,7 +16246,7 @@ void fn_801EE1E0(void) {
 #endif
 
 /* 0x801EE248 | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801EE248(void) {
 #include "src/game/battle/battle_logic_fn_801EE248.inc"
 }
@@ -16277,7 +16283,7 @@ void fn_801EE248(void) {
 #endif
 
 /* 0x801EE2B4 | size: 0x74 | small */
-#if 1
+#if 0
 asm void fn_801EE2B4(void) {
 #include "src/game/battle/battle_logic_fn_801EE2B4.inc"
 }
@@ -16318,7 +16324,7 @@ void fn_801EE2B4(void) {
 #endif
 
 /* 0x801EE328 | size: 0x70 | small */
-#if 1
+#if 0
 asm void fn_801EE328(void) {
 #include "src/game/battle/battle_logic_fn_801EE328.inc"
 }
@@ -16356,7 +16362,7 @@ void fn_801EE328(void) {
 #endif
 
 /* 0x801EE398 | size: 0xA8 | medium */
-#if 1
+#if 0
 asm void fn_801EE398(void) {
 #include "src/game/battle/battle_logic_fn_801EE398.inc"
 }
@@ -16421,7 +16427,7 @@ u32 fn_801EE440(u32 index) {
 }
 
 /* 0x801EE470 | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801EE470(void) {
 #include "src/game/battle/battle_logic_fn_801EE470.inc"
 }
@@ -16458,7 +16464,7 @@ void fn_801EE470(void) {
 #endif
 
 /* 0x801EE4DC | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801EE4DC(void) {
 #include "src/game/battle/battle_logic_fn_801EE4DC.inc"
 }
@@ -16495,7 +16501,7 @@ void fn_801EE4DC(void) {
 #endif
 
 /* 0x801EE544 | size: 0xD0 | medium */
-#if 1
+#if 0
 asm void fn_801EE544(void) {
 #include "src/game/battle/battle_logic_fn_801EE544.inc"
 }
@@ -16555,7 +16561,7 @@ void fn_801EE544(void) {
 #endif
 
 /* 0x801EE614 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801EE614(void) {
 #include "src/game/battle/battle_logic_fn_801EE614.inc"
 }
@@ -16592,7 +16598,7 @@ void fn_801EE614(void) {
 #endif
 
 /* 0x801EE67C | size: 0xD4 | medium */
-#if 1
+#if 0
 asm void fn_801EE67C(void) {
 #include "src/game/battle/battle_logic_fn_801EE67C.inc"
 }
@@ -16658,7 +16664,7 @@ void fn_801EE67C(void) {
 #endif
 
 /* 0x801EE750 | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801EE750(void) {
 #include "src/game/battle/battle_logic_fn_801EE750.inc"
 }
@@ -16695,7 +16701,7 @@ void fn_801EE750(void) {
 #endif
 
 /* 0x801EE7BC | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801EE7BC(void) {
 #include "src/game/battle/battle_logic_fn_801EE7BC.inc"
 }
@@ -16732,7 +16738,7 @@ void fn_801EE7BC(void) {
 #endif
 
 /* 0x801EE824 | size: 0x70 | small */
-#if 1
+#if 0
 asm void fn_801EE824(void) {
 #include "src/game/battle/battle_logic_fn_801EE824.inc"
 }
@@ -16771,7 +16777,7 @@ void fn_801EE824(void) {
 #endif
 
 /* 0x801EE894 | size: 0x60 | small */
-#if 1
+#if 0
 asm void fn_801EE894(void) {
 #include "src/game/battle/battle_logic_fn_801EE894.inc"
 }
@@ -16806,7 +16812,7 @@ void fn_801EE894(void) {
 #endif
 
 /* 0x801EE8F4 | size: 0x64 | small */
-#if 1
+#if 0
 asm void fn_801EE8F4(void) {
 #include "src/game/battle/battle_logic_fn_801EE8F4.inc"
 }
@@ -16842,7 +16848,7 @@ void fn_801EE8F4(void) {
 #endif
 
 /* 0x801EEAD0 | size: 0x64 | small */
-#if 1
+#if 0
 asm void fn_801EEAD0(void) {
 #include "src/game/battle/battle_logic_fn_801EEAD0.inc"
 }
@@ -16878,7 +16884,7 @@ void fn_801EEAD0(void) {
 #endif
 
 /* 0x801EED30 | size: 0x58 | small */
-#if 1
+#if 0
 asm void fn_801EED30(void) {
 #include "src/game/battle/battle_logic_fn_801EED30.inc"
 }
@@ -16911,7 +16917,7 @@ void fn_801EED30(void) {
 #endif
 
 /* 0x801EED88 | size: 0x64 | small */
-#if 1
+#if 0
 asm void fn_801EED88(void) {
 #include "src/game/battle/battle_logic_fn_801EED88.inc"
 }
@@ -16947,7 +16953,7 @@ void fn_801EED88(void) {
 #endif
 
 /* 0x801EEDEC | size: 0x58 | small */
-#if 1
+#if 0
 asm void fn_801EEDEC(void) {
 #include "src/game/battle/battle_logic_fn_801EEDEC.inc"
 }
@@ -16980,7 +16986,7 @@ void fn_801EEDEC(void) {
 #endif
 
 /* 0x801EEE44 | size: 0x28 | small */
-#if 1
+#if 0
 asm void fn_801EEE44(void) {
 #include "src/game/battle/battle_logic_fn_801EEE44.inc"
 }
@@ -17006,7 +17012,7 @@ void fn_801EEE44(void) {
 #endif
 
 /* 0x801EEE6C | size: 0x4C | small */
-#if 1
+#if 0
 asm void fn_801EEE6C(void) {
 #include "src/game/battle/battle_logic_fn_801EEE6C.inc"
 }
@@ -17035,7 +17041,7 @@ void fn_801EEE6C(void) {
 #endif
 
 /* 0x801EEEB8 | size: 0x50 | small */
-#if 1
+#if 0
 asm void fn_801EEEB8(void) {
 #include "src/game/battle/battle_logic_fn_801EEEB8.inc"
 }
@@ -17065,7 +17071,7 @@ void fn_801EEEB8(void) {
 #endif
 
 /* 0x801EEF08 | size: 0x38 | small */
-#if 1
+#if 0
 asm void fn_801EEF08(void) {
 #include "src/game/battle/battle_logic_fn_801EEF08.inc"
 }
@@ -17093,7 +17099,7 @@ void fn_801EEF08(void) {
 #endif
 
 /* 0x801EEF40 | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801EEF40(void) {
 #include "src/game/battle/battle_logic_fn_801EEF40.inc"
 }
@@ -17130,7 +17136,7 @@ void fn_801EEF40(void) {
 #endif
 
 /* 0x801EEFAC | size: 0x48 | small */
-#if 1
+#if 0
 asm void fn_801EEFAC(void) {
 #include "src/game/battle/battle_logic_fn_801EEFAC.inc"
 }
@@ -17163,7 +17169,7 @@ void fn_801EEFAC(void) {
 #endif
 
 /* 0x801EEFF4 | size: 0x38 | small */
-#if 1
+#if 0
 asm void fn_801EEFF4(void) {
 #include "src/game/battle/battle_logic_fn_801EEFF4.inc"
 }
