@@ -49,6 +49,7 @@ typedef struct _HSD_ClassInfoHead {
     struct _HSD_ClassInfo* child;
     u32 nb_exist;
     u32 nb_peak;
+    u32 nb_alloc;
 } HSD_ClassInfoHead;
 
 /* ========================================================================= */

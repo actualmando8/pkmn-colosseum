@@ -1,0 +1,6 @@
+    nofralloc
+    cmplwi r3, 0x0
+    beqlr
+    addis r3, r3, 0x1
+    sth r4, -0x5b44(r3)
+    blr

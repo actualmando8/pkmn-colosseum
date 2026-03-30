@@ -453,3 +453,90 @@ void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
     /* Print success message */
     fn_800DD970(lbl_80270388, (u32)gsGfxState, 0x5A0);
 }
+extern u32 lbl_8047AA80;
+#if 1
+asm void fn_800D3094(void) {
+#include "src/game/gs_gfx_fn_800D3094.inc"
+}
+#else
+void fn_800D3094(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AA80;
+#if 1
+asm void fn_800D30A0(void) {
+#include "src/game/gs_gfx_fn_800D30A0.inc"
+}
+#else
+void fn_800D30A0(void) { /* TODO */ }
+#endif
+extern void fn_800D4F98(void);
+extern void fn_800B8920(void);
+extern u32 lbl_8047AA80;
+#if 1
+asm void fn_800D30AC(void) {
+#include "src/game/gs_gfx_fn_800D30AC.inc"
+}
+#else
+void fn_800D30AC(void) { /* TODO */ }
+#endif
+extern void fn_800B8D10(void);
+extern void fn_800A1990(void);
+extern void fn_8019C6FC(void);
+extern void fn_800DC560(void);
+extern void fn_801BF8A0(void);
+extern void fn_801E16F0(void);
+extern void fn_801BF6AC(void);
+extern void fn_800EF1E8(void);
+extern void fn_800B8E74(void);
+extern void fn_800BB29C(void);
+extern void fn_800D1070(void);
+extern void fn_800DC6D8(void);
+extern void fn_800E3884(void);
+extern void fn_801181B0(void);
+extern void OSGetTick();
+extern u32 lbl_8047AA80;
+extern u32 lbl_8047AA91;
+extern u32 lbl_8047AA90;
+#if 1
+asm void fn_800D3190(void) {
+#include "src/game/gs_gfx_fn_800D3190.inc"
+}
+#else
+void fn_800D3190(void) { /* TODO */ }
+#endif
+extern void fn_800D13C4(void);
+extern void fn_800DC874(void);
+extern void fn_800E3928(void);
+extern void fn_801183EC(void);
+extern void fn_800E8684(void);
+extern void fn_8019C708(void);
+extern void fn_8019731C(void);
+extern void fn_80196EF8(void);
+extern u32 lbl_8047AA80;
+extern u32 lbl_8047AA90;
+extern u32 lbl_8047CA00;
+extern u32 lbl_8047CA08;
+extern u32 lbl_8047CA04;
+#if 1
+asm void fn_800D3410(void) {
+#include "src/game/gs_gfx_fn_800D3410.inc"
+}
+#else
+void fn_800D3410(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047C9F0;
+extern u32 lbl_8047AA80;
+#if 1
+asm void fn_800D36B4(void) {
+#include "src/game/gs_gfx_fn_800D36B4.inc"
+}
+#else
+void fn_800D36B4(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800D377C(void) {
+#include "src/game/gs_gfx_fn_800D377C.inc"
+}
+#else
+void fn_800D377C(void) { /* TODO */ }
+#endif

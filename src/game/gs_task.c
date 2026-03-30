@@ -1322,14 +1322,20 @@ void fn_8000765C(void) { /* TODO */ }
 #endif
 
 /* fn_80007708 - 0x80007708 | size: 0x70 */
-extern void fn_80051E38(void);
-extern u32 lbl_8047A278;
-#if 1
+extern s32  fn_80051E38(u32 slot);
+#if 0
 asm void fn_80007708(void) {
 #include "src/game/gs_task_fn_80007708.inc"
 }
 #else
-void fn_80007708(void) { /* TODO */ }
+s32 fn_80007708(void) {
+    u16 tmp;
+    u16 slot;
+    tmp  = (u16)(u32)fn_801FB1C0((s32)lbl_8047A278, 0, 0x43, 0);
+    slot = (u16)(u32)fn_801FB1C0(0, tmp, 2, 0);
+    if (fn_801EF63C() == 0) return -1;
+    return fn_80051E38(slot);
+}
 #endif
 
 /* fn_80007778 - 0x80007778 | size: 0x20 */
@@ -1417,47 +1423,62 @@ void fn_80007848(void) { /* TODO */ }
 #endif
 
 /* fn_800078EC - 0x800078EC | size: 0x58 */
-extern void fn_801F7258(void);
-extern u32 lbl_8047A274;
-extern u32 lbl_8047A278;
-#if 1
+extern u32  fn_801F7258(u32 ptr, s32 mode);
+extern u32  lbl_8047A274;
+#if 0
 asm void fn_800078EC(void) {
 #include "src/game/gs_task_fn_800078EC.inc"
 }
 #else
-void fn_800078EC(void) { /* TODO */ }
+s32 fn_800078EC(void) {
+    if (fn_801EF63C() == 0) return -1;
+    lbl_8047A278 = fn_801F7258(lbl_8047A274, 1);
+    if (lbl_8047A278 == 0) return -1;
+    return 1;
+}
 #endif
 
 /* fn_80007944 - 0x80007944 | size: 0x58 */
-extern u32 lbl_8047A274;
-extern u32 lbl_8047A278;
-#if 1
+#if 0
 asm void fn_80007944(void) {
 #include "src/game/gs_task_fn_80007944.inc"
 }
 #else
-void fn_80007944(void) { /* TODO */ }
+s32 fn_80007944(void) {
+    if (fn_801EF63C() == 0) return -1;
+    lbl_8047A278 = fn_801F7258(lbl_8047A274, 0);
+    if (lbl_8047A278 == 0) return -1;
+    return 1;
+}
 #endif
 
 /* fn_8000799C - 0x8000799C | size: 0x58 */
-extern void fn_801F025C(void);
-extern u32 lbl_8047A274;
-#if 1
+extern u32  fn_801F025C(s32 a, s32 b);
+#if 0
 asm void fn_8000799C(void) {
 #include "src/game/gs_task_fn_8000799C.inc"
 }
 #else
-void fn_8000799C(void) { /* TODO */ }
+s32 fn_8000799C(void) {
+    if (fn_801EF63C() == 0) return -1;
+    lbl_8047A274 = fn_801F025C(5, 0);
+    if (lbl_8047A274 == 0) return -1;
+    return 1;
+}
 #endif
 
 /* fn_800079F4 - 0x800079F4 | size: 0x58 */
-extern u32 lbl_8047A274;
-#if 1
+#if 0
 asm void fn_800079F4(void) {
 #include "src/game/gs_task_fn_800079F4.inc"
 }
 #else
-void fn_800079F4(void) { /* TODO */ }
+s32 fn_800079F4(void) {
+    if (fn_801EF63C() == 0) return -1;
+    lbl_8047A274 = fn_801F025C(4, 0);
+    if (lbl_8047A274 == 0) return -1;
+    return 1;
+}
 #endif
 
 /* fn_80007A4C - 0x80007A4C | size: 0x38 */

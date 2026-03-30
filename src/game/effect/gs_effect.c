@@ -1243,7 +1243,7 @@ void fn_80131428(void) {
         *(u32*)((u8*)r28 + 0x30) = tmp;
         *(u16*)((u8*)r28 + 0x28) = r31;
         *(u32*)((u8*)r28 + 0x24) = r26;
-        memcpy((void*)r3, (const void*)r4, (u32)r5);
+        memcpy((void*)r3, (void*)r4, (u32)r5);
         *(u16*)((u8*)r28 + 0x2) = r25;
         tmp = 0x0;
         *(u32*)((u8*)r28 + 0x4) = tmp;

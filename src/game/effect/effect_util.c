@@ -147,12 +147,12 @@ extern void fn_80133BE4(void);
 extern void fn_80133C3C(void);
 extern void fn_80133E1C(void);
 extern void fn_80134164(void);
-extern void fn_80134274(void);
+extern u32 fn_80134274(void);
 extern void fn_801342B8(void);
 extern void fn_80134304(void);
-extern void fn_80135338(void);
-extern void fn_801353C0(void);
-extern void fn_80135708(void);
+extern void fn_80135338(void*);
+extern void fn_801353C0(void*, u8, u8, u8, u8);
+extern void fn_80135708(void*);
 extern void fn_80135A30(void* ptr, u8 val);
 extern void fn_80135A40(void* ptr, u8 val);
 extern void fn_80135A50(void* ptr, u8 val);
@@ -168,7 +168,7 @@ extern void fn_80135B7C(void* ptr, u32 val);
 extern void fn_80135BA0(void* ptr, u32 val);
 extern void fn_80135C10(void);
 extern void fn_80135C90(u32 arg1, u32 arg2);
-extern void fn_80135CE8(void);
+extern void fn_80135CE8(void*);
 extern void fn_8013613C(void);
 
 #if 1
@@ -2039,58 +2039,31 @@ u32 fn_80133328(void) {
 
 /* 0x801333AC | 0xA4 */
 extern void fn_800F9318(void);
-#if 1
+#if 0
 asm void fn_801333AC(void) {
 #include "src/game/effect/effect_util_fn_801333AC.inc"
 }
 #else
-void fn_801333AC(void) {
-    extern void fn_800F9318();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r4 = 0x2;
-    r31 = r3;
-    r3 = 0x0;
-    fn_800F9318();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r31 = *(u32*)(sp + 0xC);
-        return;
+#pragma optimization_level 4
+u32 fn_801333AC(s32 arg) {
+    extern void* fn_800F9318(u32, u32);
+    u8* ptr;
+    ptr = (u8*)fn_800F9318(0, 2);
+    if (ptr == 0) return 0;
+    if (arg == 0xb8) {
+        if (ptr[0] != 0) {
+            ptr[0] = 0;
+        } else {
+            ptr[0] = 1;
+        }
+    } else if (arg == 0xb9) {
+        if (ptr[1] != 0) {
+            ptr[1] = 0;
+        } else {
+            ptr[1] = 1;
+        }
     }
-    if ((s32)r31 != (s32)0xb9) {
-        if ((s32)r31 >= (s32)0xb9) goto L_80133438;
-        if ((s32)r31 < (s32)0xb8) {
-            goto L_80133438;
-        }
-        r0 = *(u8*)((u8*)r3 + 0x0);
-        if (r0 != (u32)0x0) {
-            r0 = 0x0;
-            *(u8*)((u8*)r3 + 0x0) = r0;
-            goto L_80133438;
-        }
-        r0 = 0x1;
-        *(u8*)((u8*)r3 + 0x0) = r0;
-
-    } else {
-        r0 = *(u8*)((u8*)r3 + 0x1);
-        if (r0 != (u32)0x0) {
-            r0 = 0x0;
-            *(u8*)((u8*)r3 + 0x1) = r0;
-            goto L_80133438;
-        }
-        r0 = 0x1;
-        *(u8*)((u8*)r3 + 0x1) = r0;
-    }
-L_80133438: ;
-    r3 = 0x0;
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    return 0;
 }
 #endif
 
@@ -2756,7 +2729,7 @@ void fn_80133E6C(void) {
     extern void fn_80134164();
     extern void fn_80134228();
     extern void fn_80134258();
-    extern void fn_80134274();
+    extern u32 fn_80134274();
     extern void fn_801342B8();
     extern void fn_80134304();
     extern void fn_80104704();
@@ -3098,352 +3071,137 @@ void fn_80134304(void) {
 
 /* 0x8013433C | 0xE4 */
 extern void fn_80140A9C(void);
-#if 1
+#if 0
 asm void fn_8013433C(void) {
 #include "src/game/effect/effect_util_fn_8013433C.inc"
 }
 #else
-void fn_8013433C(void) {
-    extern void fn_80140A9C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    r30 = r5;
-    /* mr. r29, r3 */;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s32 fn_8013433C(void* base, s16 idx1, s16 idx2) {
+    extern void fn_80140A9C(void*, void*);
+    void* entry1;
+    void* entry2;
+    void* b;
+    s16 i;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s16)r31;
-    if ((s32)r0 >= (s32)0) {
-        r0 = (s16)r31;
-        if ((s32)r0 >= (s32)0xeb) {
-        }
-        r31 = 0x0;
-
-        } else {
-        r4 = r0 << 2;
-        r31 = r4 + 0x6dec;
-        r31 = r3 + r31;
-        }
-    if (r31 == (u32)0x0) {
-        r3 = 0x0;
-
+    i = idx1;
+    if (i < 0 || i >= 0xeb) {
+        entry1 = 0;
     } else {
-        r3 = r29;
-        if (r29 == (u32)0x0) {
-            r3 = 0x0;
-            r4 = 0x3;
-            ((void(*)(void))fn_80129280)();
-        }
-        r0 = (s16)r30;
-        if (r29 >= (u32)0x0) {
-            r0 = (s16)r30;
-            if ((s32)r0 >= (s32)0xeb) {
-            }
-            r4 = 0x0;
-
-            } else {
-            r4 = r0 << 2;
-            r4 = r4 + 0x6dec;
-            r4 = r3 + r4;
-            }
-        if (r4 == (u32)0x0) {
-            r3 = 0x0;
-            goto L_80134404;
-        }
-        r3 = r31;
-        fn_80140A9C();
-        r3 = 0x1;
+        entry1 = (u8*)base + 0x6dec + (s32)i * 4;
     }
-L_80134404: ;
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+    if (entry1 == 0) return 0;
+    b = base;
+    if (b == 0) {
+        b = (void*)fn_80129280(0, 3);
+    }
+    i = idx2;
+    if (i < 0 || i >= 0xeb) {
+        entry2 = 0;
+    } else {
+        entry2 = (u8*)b + 0x6dec + (s32)i * 4;
+    }
+    if (entry2 == 0) return 0;
+    fn_80140A9C(entry1, entry2);
+    return 1;
 }
 #endif
 
 /* 0x80134420 | 0x164 */
-extern void fn_801429E8(void);
-extern void fn_80142CF4(void);
-#if 1
+#if 0
 asm void fn_80134420(void) {
 #include "src/game/effect/effect_util_fn_80134420.inc"
 }
 #else
-void fn_80134420(void) {
-    extern void fn_801429E8();
-    extern void fn_80142CF4();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    r28 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
-        r31 = r3;
+#pragma optimization_level 4
+u16 fn_80134420(void* base, u16 effect_id) {
+    extern u8 fn_801440A0(u16);
+    extern u8 fn_801429E8(void*);
+    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    void* cur;
+    void* entry;
+    s16 idx;
+    u16 val;
+    s32 i;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r3 = r28;
-    ((void(*)(void))fn_801440A0)();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
+    if (!fn_801440A0(effect_id)) return 0;
+    cur = (u8*)base;
+    for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
+        if (fn_801429E8((u8*)cur + 0x6dec)) {
+            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+        }
+    }
+    idx = (i < 0xeb) ? (s16)i : -1;
+    if (idx < 0) return 0;
+    entry = (idx >= 0 && idx < 0xeb) ? ((u8*)base + 0x6dec + (s32)idx * 4) : 0;
+    if (entry == 0) {
+        val = 0xFFFF;
+    } else if (fn_801429E8(entry)) {
+        val = fn_80142CF4(entry, 0, 0x1c, 0) & 0xFFFF;
     } else {
-        r29 = r31;
-        r28 = r28 & 0xFFFF;
-        for (r30 = 0x0; (s32)r30 < (s32)0xeb; r30 = r30 + 0x1, r29 = r29 + 0x4) {
-            r3 = r29 + 0x6dec;
-            fn_801429E8();
-            r0 = r3 & 0xFF;
-            if (r3 != (u32)0x0) {
-                r3 = r29 + 0x6dec;
-                r4 = 0x0;
-                r5 = 0x1b;
-                r6 = 0x0;
-                fn_80142CF4();
-                if ((s32)r28 == (s32)r3) break;
-            }
-        }
-        r3 = -0x1;
-        if ((s32)r30 < (s32)0xeb) {
-            r3 = (s16)r30;
-        }
-        r0 = (s16)r3;
-        if ((s32)r30 < (s32)0xeb) {
-            r3 = 0x0;
-        } else {
-            if ((s32)r0 < (s32)0xeb) {
-                r3 = r0 << 2;
-                r30 = r3 + 0x6dec;
-                r30 = r31 + r30;
-            } else {
-                r30 = 0x0;
-            }
-            if (r30 == (u32)0x0) {
-                r3 = (0x1 << 16);
-            } else {
-                r3 = r30;
-                fn_801429E8();
-                r0 = r3 & 0xFF;
-                if (r30 == (u32)0x0) {
-                    r3 = (0x1 << 16);
-                } else {
-                    r3 = r30;
-                    r4 = 0x0;
-                    r5 = 0x1c;
-                    r6 = 0x0;
-                    fn_80142CF4();
-                    r3 = r3 & 0xFFFF;
-                }
-            }
-            r0 = r3 & 0xFFFF;
-            if (r0 > (u32)0x3e7) {
-                r3 = 0x0;
-            }
-        }
-        r0 = 0x3e7 - r3;
-        r3 = r0 & 0xFFFF;
+        val = 0xFFFF;
     }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    r28 = *(u32*)(sp + 0x10);
-    return;
+    if (val > 0x3e7) val = 0;
+    return (u16)(0x3e7 - val);
 }
 #endif
 
 /* 0x80134584 | 0xF8 */
-extern void fn_80140ACC(void);
-#if 1
+#if 0
 asm void fn_80134584(void) {
 #include "src/game/effect/effect_util_fn_80134584.inc"
 }
 #else
-void fn_80134584(void) {
-    extern void fn_80140ACC();
-    extern void fn_801429E8();
-    extern void fn_80142CF4();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r26 = r4;
-    r27 = r5;
-    r31 = r3;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
-        r31 = r3;
-    }
-    r0 = r27 & 0xFFFF;
-    if (r3 == (u32)0x0) {
-        r3 = r27;
-        return;
-    }
-    r3 = r26;
-    ((void(*)(void))fn_801440A0)();
-    if (r3 == (u32)0x0) {
-        r3 = r27;
-        return;
-    }
-    r29 = r31;
-    r28 = r26 & 0xFFFF;
-    r30 = 0x0;
-    do {
-        r3 = r29 + 0x6dec;
-        fn_801429E8();
-        r0 = r3 & 0xFF;
-        if (r3 != (u32)0x0) {
-            r3 = r29 + 0x6dec;
-            r4 = 0x0;
-            r5 = 0x1b;
-            r6 = 0x0;
-            fn_80142CF4();
-            if ((s32)r28 == (s32)r3) break;
+#pragma optimization_level 4
+u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
+    extern u8 fn_801440A0(u16);
+    extern u8 fn_801429E8(void*);
+    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
+    void* cur; s16 idx; s32 i;
+    if (base == 0) { base = (void*)fn_80129280(0, 3); }
+    if (r5 == 0) return r5;
+    if (!fn_801440A0(effect_id)) return r5;
+    cur = (u8*)base;
+    for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
+        if (fn_801429E8((u8*)cur + 0x6dec)) {
+            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
-        r30 = r30 + 0x1;
-        r29 = r29 + 0x4;
-    } while ((s32)r30 < (s32)0xeb);
-
-    r7 = -0x1;
-    if ((s32)r30 < (s32)0xeb) {
-        r7 = (s16)r30;
     }
-    r0 = (s16)r7;
-    if ((s32)r30 < (s32)0xeb) {
-        r3 = r27;
-        return;
-    }
-    r5 = r26;
-    r6 = r27;
-    r3 = r31 + 0x6dec;
-    r4 = 0xeb;
-    r8 = 0x3e7;
-    r9 = 0x0;
-    fn_80140ACC();
-    r3 = r3 & 0xFFFF;
-
-    return;
+    idx = (i < 0xeb) ? (s16)i : -1;
+    if (idx < 0) return r5;
+    return (u16)fn_80140ACC((u8*)base + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0);
 }
 #endif
 
 /* 0x8013467C | 0xEC */
-extern void fn_80141308(void);
-#if 1
+#if 0
 asm void fn_8013467C(void) {
 #include "src/game/effect/effect_util_fn_8013467C.inc"
 }
 #else
-void fn_8013467C(void) {
-    extern void fn_80141308();
-    extern void fn_801429E8();
-    extern void fn_80142CF4();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r26 = r4;
-    r27 = r5;
-    r31 = r3;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
-        r31 = r3;
-    }
-    r0 = r27 & 0xFFFF;
-    if (r3 == (u32)0x0) {
-        r3 = r27;
-        return;
-    }
-    r3 = r26;
-    ((void(*)(void))fn_801440A0)();
-    if (r3 == (u32)0x0) {
-        r3 = r27;
-        return;
-    }
-    r29 = r31;
-    r28 = r26 & 0xFFFF;
-    r30 = 0x0;
-    do {
-        r3 = r29 + 0x6dec;
-        fn_801429E8();
-        r0 = r3 & 0xFF;
-        if (r3 != (u32)0x0) {
-            r3 = r29 + 0x6dec;
-            r4 = 0x0;
-            r5 = 0x1b;
-            r6 = 0x0;
-            fn_80142CF4();
-            if ((s32)r28 == (s32)r3) break;
+#pragma optimization_level 4
+u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
+    extern u8 fn_801440A0(u16);
+    extern u8 fn_801429E8(void*);
+    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
+    void* cur; s16 idx; s32 i;
+    if (base == 0) { base = (void*)fn_80129280(0, 3); }
+    if (r5 == 0) return r5;
+    if (!fn_801440A0(effect_id)) return r5;
+    cur = (u8*)base;
+    for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
+        if (fn_801429E8((u8*)cur + 0x6dec)) {
+            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
-        r30 = r30 + 0x1;
-        r29 = r29 + 0x4;
-    } while ((s32)r30 < (s32)0xeb);
-
-    r5 = r26;
-    r6 = r27;
-    r3 = r31 + 0x6dec;
-    r4 = 0xeb;
-    r7 = -0x1;
-    if ((s32)r30 < (s32)0xeb) {
-        r7 = (s16)r30;
     }
-    r8 = 0x3e7;
-    r9 = 0x0;
-    r10 = 0x0;
-    fn_80141308();
-    r3 = r3 & 0xFFFF;
-
-    return;
+    idx = (i < 0xeb) ? (s16)i : -1;
+    return (u16)fn_80141308((u8*)base + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0, 0);
 }
 #endif
 
@@ -3458,615 +3216,284 @@ u32 fn_801347E0(void) { return 3; }
 
 /* 0x801347E8 | 0x104 */
 extern void fn_80123FBC(void);
-#if 1
+#if 0
 asm void fn_801347E8(void) {
 #include "src/game/effect/effect_util_fn_801347E8.inc"
 }
 #else
-void fn_801347E8(void) {
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = 0x0;
-    r28 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s8 fn_801347E8(void* base, s8 slot) {
+    extern u8 fn_80123FBC(void*);
+    u8* cur;
+    s8 count;
+    s8 i;
+    count = 0;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r28;
-    if (r3 >= (u32)0x0) {
-        r0 = (s8)r28;
-        if ((s32)r0 >= (s32)0x3) {
-        }
-        r30 = -0x1;
-
-        } else {
-        r0 = r0 * 0x24a4;
-        r31 = 0x0;
-        r29 = r3 + r0;
-        while (1) {
-            r0 = (s8)r31;
-            if ((s32)r0 >= (s32)0x1e) break;
-            r0 = (s8)r28;
-            if ((s32)r0 >= (s32)0x3) {
-                r0 = (s8)r28;
-                if ((s32)r0 >= (s32)0x3) {
-                }
-                r3 = 0x0;
-
-                } else {
-                r0 = (s8)r31;
-                if ((s32)r0 >= (s32)0x3) {
-                    r0 = (s8)r31;
-                    if ((s32)r0 >= (s32)0x1e) {
-                    }
-                    r3 = 0x0;
-                    goto L_80134888;
-                    }
-                r3 = r29 + 0x14;
-                }
-        L_80134888: ;
-            if (r3 != (u32)0x0) {
-                fn_80123FBC();
-                r0 = r3 & 0xFF;
-                if (r3 != (u32)0x0) {
-                    r30 = r30 + 0x1;
-            }
-            }
-            r29 = r29 + 0x138;
-            r31 = r31 + 0x1;
-
-        }
-        }
-    r0 = (s8)r30;
-    if ((s32)r0 < (s32)0x1e) {
-        r3 = -0x1;
+    if (slot < 0 || slot >= 3) {
+        count = -1;
     } else {
-
-        r0 = 0x1e - r30;
-        r3 = (s8)r0;
+        cur = (u8*)base + (s32)slot * 0x24a4;
+        i = 0;
+        while (i < 0x1e) {
+            if (fn_80123FBC(cur + 0x14)) {
+                count++;
+            }
+            cur += 0x138;
+            i++;
+        }
     }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    r28 = *(u32*)(sp + 0x10);
-    return;
+    if (count < 0) {
+        return -1;
+    }
+    return (s8)(0x1e - count);
 }
 #endif
 
 /* 0x801348EC | 0xF0 */
-#if 1
+#if 0
 asm void fn_801348EC(void) {
 #include "src/game/effect/effect_util_fn_801348EC.inc"
 }
 #else
-void fn_801348EC(void) {
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = 0x0;
-    r28 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s32 fn_801348EC(void* base, void* src, s8 slot, s8 idx) {
+    extern void fn_8012086C(void*);
+    u8* entry;
+    s8 s;
+    s8 e;
+    u32 i;
+    u32* dst32;
+    u32* src32;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r28;
-    if (r3 >= (u32)0x0) {
-        r0 = (s8)r28;
-        if ((s32)r0 >= (s32)0x3) {
-        }
-        r3 = -0x1;
-
-        } else {
-        r0 = r0 * 0x24a4;
-        r29 = 0x0;
-        r31 = r3 + r0;
-        while (1) {
-            r0 = (s8)r29;
-            if ((s32)r0 >= (s32)0x1e) break;
-            r0 = (s8)r28;
-            if ((s32)r0 >= (s32)0x3) {
-                r0 = (s8)r28;
-                if ((s32)r0 >= (s32)0x3) {
-                }
-                r3 = 0x0;
-
-                } else {
-                r0 = (s8)r29;
-                if ((s32)r0 >= (s32)0x3) {
-                    r0 = (s8)r29;
-                    if ((s32)r0 >= (s32)0x1e) {
-                    }
-                    r3 = 0x0;
-                    goto L_8013498C;
-                    }
-                r3 = r31 + 0x14;
-                }
-        L_8013498C: ;
-            if (r3 != (u32)0x0) {
-                fn_80123FBC();
-                r0 = r3 & 0xFF;
-                if (r3 != (u32)0x0) {
-                    r30 = r30 + 0x1;
-            }
-            }
-            r31 = r31 + 0x138;
-            r29 = r29 + 0x1;
-
-        }
-        r3 = r30;
-        }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    r28 = *(u32*)(sp + 0x10);
-    return;
+    s = slot;
+    e = idx;
+    if (s < 0 || s >= 3 || e < 0 || e >= 0x1e) {
+        entry = 0;
+    } else {
+        entry = (u8*)base + (s32)s * 0x24a4 + (s32)e * 0x138 + 0x14;
+    }
+    if (entry == 0) return 0;
+    dst32 = (u32*)entry;
+    src32 = (u32*)src;
+    for (i = 0; i < 0x27; i++) {
+        dst32[0] = src32[0];
+        dst32[1] = src32[1];
+        dst32 += 2;
+        src32 += 2;
+    }
+    fn_8012086C(entry);
+    return 1;
 }
 #endif
 
 /* 0x801349DC | 0xBC */
 extern void fn_800F9E70(void);
-#if 1
+#if 0
 asm void fn_801349DC(void) {
 #include "src/game/effect/effect_util_fn_801349DC.inc"
 }
 #else
-void fn_801349DC(void) {
-    extern void fn_800F9E70();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r5;
-    r30 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s32 fn_801349DC(void* base, s8 slot, u16* name) {
+    extern void fn_800F9E70(void*, u16*);
+    u16* p;
+    s32 len;
+    s8 s;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r30;
-    if (r3 >= (u32)0x0) {
-        r0 = (s8)r30;
-        if ((s32)r0 >= (s32)0x3) {
-        }
-        r3 = 0x0;
-
-        } else {
-        if (r31 == (u32)0x0) {
-            r3 = 0x0;
-            goto L_80134A80;
-        }
-        r5 = r31;
-        r4 = 0x0;
-        while (1) {
-            r0 = *(u16*)((u8*)r5 + 0x0);
-            if (r0 == (u32)0x0) break;
-            r5 = r5 + 0x2;
-            r4 = r4 + 0x1;
-
-        }
-        if ((s32)r4 > (s32)0x8) {
-            r3 = 0x0;
-            goto L_80134A80;
-        }
-        r0 = (s8)r30;
-        r4 = r31;
-        r0 = r0 * 0x24a4;
-        r3 = r3 + r0;
-        fn_800F9E70();
-        r3 = 0x1;
-        }
-L_80134A80: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
-    return;
+    s = slot;
+    if (s < 0 || s >= 3) return 0;
+    if (name == 0) return 0;
+    p = name;
+    len = 0;
+    while (*p != 0) {
+        p++;
+        len++;
+    }
+    if (len > 8) return 0;
+    fn_800F9E70((u8*)base + (s32)s * 0x24a4, name);
+    return 1;
 }
 #endif
 
 /* 0x80134AF8 | 0xC8 */
 extern void fn_80124A60(void);
-#if 1
+#if 0
 asm void fn_80134AF8(void) {
 #include "src/game/effect/effect_util_fn_80134AF8.inc"
 }
 #else
-void fn_80134AF8(void) {
-    extern void fn_80123FBC();
-    extern void fn_80124A60();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r5;
-    r30 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s32 fn_80134AF8(void* base, s8 slot, s8 idx) {
+    extern u8 fn_80123FBC(void*);
+    extern void fn_80124A60(void*);
+    u8* entry;
+    s8 s;
+    s8 e;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r30;
-    if (r3 >= (u32)0x0) {
-        r4 = (s8)r30;
-        if ((s32)r4 >= (s32)0x3) {
-        }
-        r31 = 0x0;
-
-        } else {
-        r0 = (s8)r31;
-        if ((s32)r4 >= (s32)0x3) {
-            r0 = (s8)r31;
-            if ((s32)r0 >= (s32)0x1e) {
-            }
-            r31 = 0x0;
-            goto L_80134B74;
-            }
-        r4 = r4 * 0x24a4;
-        r0 = r0 * 0x138;
-        r4 = r4 + r0;
-        r31 = r4 + 0x14;
-        r31 = r3 + r31;
-        }
-L_80134B74: ;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0;
-
+    s = slot;
+    if (s < 0 || s >= 3) {
+        entry = 0;
     } else {
-        r3 = r31;
-        fn_80123FBC();
-        r0 = r3 & 0xFF;
-        if (r31 == (u32)0x0) {
-            r3 = 0x0;
-            goto L_80134BA8;
+        e = idx;
+        if (e < 0 || e >= 0x1e) {
+            entry = 0;
+        } else {
+            entry = (u8*)base + (s32)s * 0x24a4 + (s32)e * 0x138 + 0x14;
         }
-        r3 = r31;
-        fn_80124A60();
-        r3 = 0x1;
     }
-L_80134BA8: ;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
-    return;
+    if (entry == 0) return 0;
+    if (!fn_80123FBC(entry)) return 0;
+    fn_80124A60(entry);
+    return 1;
 }
 #endif
 
 /* 0x80134BC0 | 0x250 */
 extern void fn_8012086C(void);
-#if 1
+#if 0
 asm void fn_80134BC0(void) {
 #include "src/game/effect/effect_util_fn_80134BC0.inc"
 }
 #else
-void fn_80134BC0(void) {
-    extern void fn_8012086C();
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r29 = r4;
-    r30 = r5;
-    r31 = r3;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
-        r31 = r3;
+#pragma optimization_level 4
+s32 fn_80134BC0(void* base, void* src, s8 slot) {
+    extern u8 fn_80123FBC(void*);
+    extern void fn_8012086C(void*);
+    u8* slotbase;
+    u8* entry;
+    s8 found_slot;
+    s8 found_entry;
+    s8 si;
+    s8 ei;
+    u32 i;
+    u32* dst32;
+    u32* src32;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r30;
-    if ((s32)r0 < (s32)-0x1) { r3 = 0x0; return; }
-    if ((s32)r0 >= (s32)0x3) {
-
-        r3 = 0x0;
-        return;
+    if (slot < -1 || slot >= 3) return 0;
+    if (src == 0) return 0;
+    found_slot = slot;
+    found_entry = -1;
+    if (slot == -1) {
+        /* Search all slots for first free entry */
+        slotbase = (u8*)base;
+        for (si = 0; si < 3; si++) {
+            for (ei = 0; ei < 0x1e; ei++) {
+                entry = (ei >= 0 && ei < 0x1e) ? (slotbase + (s32)ei * 0x138 + 0x14) : 0;
+                if (entry != 0 && !fn_80123FBC(entry)) {
+                    found_entry = ei;
+                    break;
+                }
+            }
+            if (found_entry >= 0) {
+                found_slot = si;
+                break;
+            }
+            slotbase += 0x24a4;
+        }
+        if (si >= 3) return 0;
+    } else {
+        /* Search specific slot for first free entry */
+        slotbase = (u8*)base + (s32)slot * 0x24a4;
+        for (ei = 0; ei < 0x1e; ei++) {
+            entry = (ei >= 0 && ei < 0x1e) ? (slotbase + (s32)ei * 0x138 + 0x14) : 0;
+            if (entry != 0 && !fn_80123FBC(entry)) {
+                found_entry = ei;
+                break;
+            }
+        }
+        if (found_entry < 0) return 0;
     }
-    if (r29 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    /* Compute entry address */
+    if (found_slot < 0 || found_slot >= 3 || found_entry < 0 || found_entry >= 0x1e) {
+        entry = 0;
+    } else {
+        entry = (u8*)base + (s32)found_slot * 0x24a4 + (s32)found_entry * 0x138 + 0x14;
     }
-    if ((s32)r0 == (s32)-0x1) {
-        r27 = r31;
-        r30 = 0x0;
-        while (1) {
-            r0 = (s8)r30;
-            if ((s32)r0 >= (s32)0x3) break;
-            r28 = 0x0;
-        L_80134C38: ;
-            r0 = (s8)r30;
-            r3 = (s8)r28;
-            if ((s32)r0 >= (s32)-0x1) {
-                r0 = (s8)r30;
-                if ((s32)r0 >= (s32)0x3) {
-                }
-                r3 = 0x0;
-
-                } else {
-                r0 = (s8)r3;
-                if ((s32)r0 >= (s32)0x3) {
-                    if ((s32)r3 >= (s32)0x1e) {
-                    }
-                    r3 = 0x0;
-                    goto L_80134C7C;
-                    }
-                r3 = r3 * 0x138;
-                r3 = r3 + 0x14;
-                r3 = r27 + r3;
-                }
-        L_80134C7C: ;
-            if (r3 != (u32)0x0) {
-                fn_80123FBC();
-                r0 = r3 & 0xFF;
-                if (r3 != (u32)0x0) {
-                }
-                r28 = r28 + 0x1;
-                if ((s32)r28 < (s32)0x1e) goto L_80134C38;
-                }
-            r3 = -0x1;
-            if ((s32)r28 < (s32)0x1e) {
-                r3 = (s8)r28;
-            }
-            r0 = (s8)r3;
-            r28 = r3;
-            if ((s32)r28 >= (s32)0x1e) break;
-            r27 = r27 + 0x24a4;
-            r30 = r30 + 0x1;
-
-        }
-
-        r0 = (s8)r30;
-        if ((s32)r0 >= (s32)0x3) {
-            r3 = 0x0;
-            return;
-        }
-        r0 = r0 * 0x24a4;
-        r28 = 0x0;
-        r27 = r31 + r0;
-    L_80134CEC: ;
-        r0 = (s8)r30;
-        r3 = (s8)r28;
-        if ((s32)r0 >= (s32)0x3) {
-            r0 = (s8)r30;
-            if ((s32)r0 >= (s32)0x3) {
-            }
-            r3 = 0x0;
-
-            } else {
-            r0 = (s8)r3;
-            if ((s32)r0 >= (s32)0x3) {
-                if ((s32)r3 >= (s32)0x1e) {
-                }
-                r3 = 0x0;
-                goto L_80134D30;
-                }
-            r3 = r3 * 0x138;
-            r3 = r3 + 0x14;
-            r3 = r27 + r3;
-            }
-    L_80134D30: ;
-        if (r3 != (u32)0x0) {
-            fn_80123FBC();
-            r0 = r3 & 0xFF;
-            if (r3 != (u32)0x0) {
-            }
-            r28 = r28 + 0x1;
-            if ((s32)r28 < (s32)0x1e) goto L_80134CEC;
-            }
-        r3 = -0x1;
-        if ((s32)r28 < (s32)0x1e) {
-            r3 = (s8)r28;
-        }
-        r0 = (s8)r3;
-        r28 = r3;
-        if ((s32)r28 < (s32)0x1e) {
-            r3 = 0x0;
-            return;
-        }
-        }
-    r0 = (s8)r30;
-    if ((s32)r28 >= (s32)0x1e) {
-        r3 = (s8)r30;
-        if ((s32)r3 >= (s32)0x3) {
-        }
-        r3 = 0x0;
-
-        } else {
-        r0 = (s8)r28;
-        if ((s32)r3 >= (s32)0x3) {
-            r0 = (s8)r28;
-            if ((s32)r0 >= (s32)0x1e) {
-            }
-            r3 = 0x0;
-            goto L_80134DC0;
-            }
-        r3 = r3 * 0x24a4;
-        r0 = r0 * 0x138;
-        r3 = r3 + r0;
-        r3 = r3 + 0x14;
-        r3 = r31 + r3;
-        }
-L_80134DC0: ;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    if (entry == 0) return 0;
+    dst32 = (u32*)entry;
+    src32 = (u32*)src;
+    for (i = 0; i < 0x27; i++) {
+        dst32[0] = src32[0];
+        dst32[1] = src32[1];
+        dst32 += 2;
+        src32 += 2;
     }
-    r0 = 0x27;
-    ctr_fn = (void(*)(void))r0;
-    do {
-        r4 = *(u32*)((u8*)r5 + 0x4);
-        r0 = *(u32*)((u8*)r5 + 0x8);
-        *(u32*)((u8*)r6 + 0x4) = r4;
-        r6 += 8; *(u32*)r6 = r0;
-    } while (--ctr != 0);
-    fn_8012086C();
-    r3 = 0x1;
-
-    return;
+    fn_8012086C(entry);
+    return 1;
 }
 #endif
 
 /* 0x80134E10 | 0xE0 */
-#if 1
+#if 0
 asm void fn_80134E10(void) {
 #include "src/game/effect/effect_util_fn_80134E10.inc"
 }
 #else
-void fn_80134E10(void) {
-    extern void fn_8012086C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r31 = r6;
-    r30 = r5;
-    r29 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+s32 fn_80134E10(void* base, void* src, s8 slot, s8 idx) {
+    extern void fn_8012086C(void*);
+    u8* entry;
+    s8 s;
+    s8 e;
+    u32 i;
+    u32* dst32;
+    u32* src32;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r30;
-    if (r3 >= (u32)0x0) {
-        r4 = (s8)r30;
-        if ((s32)r4 >= (s32)0x3) {
-        }
-        r6 = 0x0;
-
-        } else {
-        r0 = (s8)r31;
-        if ((s32)r4 >= (s32)0x3) {
-            r0 = (s8)r31;
-            if ((s32)r0 >= (s32)0x1e) {
-            }
-            r6 = 0x0;
-            goto L_80134E94;
-            }
-        r4 = r4 * 0x24a4;
-        r0 = r0 * 0x138;
-        r4 = r4 + r0;
-        r6 = r4 + 0x14;
-        r6 = r3 + r6;
-        }
-L_80134E94: ;
-    if (r6 == (u32)0x0) {
-        r3 = 0x0;
+    s = slot;
+    e = idx;
+    if (s < 0 || s >= 3 || e < 0 || e >= 0x1e) {
+        entry = 0;
     } else {
-
-        r0 = 0x27;
-        ctr_fn = (void(*)(void))r0;
-        do {
-            r3 = *(u32*)((u8*)r4 + 0x4);
-            r0 = *(u32*)((u8*)r4 + 0x8);
-            *(u32*)((u8*)r5 + 0x4) = r3;
-            r5 += 8; *(u32*)r5 = r0;
-        } while (--ctr != 0);
-        r3 = r6;
-        fn_8012086C();
-        r3 = 0x1;
+        entry = (u8*)base + (s32)s * 0x24a4 + (s32)e * 0x138 + 0x14;
     }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+    if (entry == 0) return 0;
+    dst32 = (u32*)entry;
+    src32 = (u32*)src;
+    for (i = 0; i < 0x27; i++) {
+        dst32[0] = src32[0];
+        dst32[1] = src32[1];
+        dst32 += 2;
+        src32 += 2;
+    }
+    fn_8012086C(entry);
+    return 1;
 }
 #endif
 
 /* 0x80134EF0 | 0x98 */
-#if 1
+#if 0
 asm void fn_80134EF0(void) {
 #include "src/game/effect/effect_util_fn_80134EF0.inc"
 }
 #else
-void fn_80134EF0(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r5;
-    r30 = r4;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
+#pragma optimization_level 4
+void* fn_80134EF0(void* base, s8 r4, s8 r5) {
+    s8 slot;
+    s8 entry;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r0 = (s8)r30;
-    if (r3 >= (u32)0x0) {
-        r4 = (s8)r30;
-        if ((s32)r4 >= (s32)0x3) {
-        }
-        r0 = 0x0;
-
-        } else {
-        r0 = (s8)r31;
-        if ((s32)r4 >= (s32)0x3) {
-            r0 = (s8)r31;
-            if ((s32)r0 >= (s32)0x1e) {
-            }
-            r0 = 0x0;
-            goto L_80134F6C;
-            }
-        r4 = r4 * 0x24a4;
-        r0 = r0 * 0x138;
-        r4 = r4 + r0;
-        r0 = r4 + 0x14;
-        r0 = r3 + r0;
-        }
-L_80134F6C: ;
-    r3 = r0;
-    r31 = *(u32*)(sp + 0xC);
-    r30 = *(u32*)(sp + 0x8);
-    return;
+    slot = r4;
+    if (slot < 0 || slot >= 3) {
+        return 0;
+    }
+    entry = r5;
+    if (entry < 0 || entry >= 0x1e) {
+        return 0;
+    }
+    return (u8*)base + (s32)slot * 0x24a4 + (s32)entry * 0x138 + 0x14;
 }
 #endif
 
@@ -4074,65 +3501,42 @@ L_80134F6C: ;
 extern void fn_800F96E4(void);
 extern void fn_801249F8(void);
 extern void fn_80142A88(void);
-#if 1
+#if 0
 asm void fn_80134F88(void) {
 #include "src/game/effect/effect_util_fn_80134F88.inc"
 }
 #else
-void fn_80134F88(void) {
-    extern void fn_800F96E4();
-    extern void fn_801249F8();
-    extern void fn_80132A38();
-    extern void fn_80142A88();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_80129280)();
-        r31 = r3;
+#pragma optimization_level 4
+void fn_80134F88(void* base) {
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800F96E4(void*, u32, u32);
+    extern void fn_801249F8(void*, u32);
+    extern void fn_80142A88(void*, u32);
+    u8* cur;
+    s32 i;
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
     }
-    r30 = 0x0;
-    r29 = r31;
+    i = 0;
+    cur = (u8*)base;
     do {
-        r4 = r30 + 0x1;
-        r3 = 0x34;
-        fn_80132A38();
-        r3 = r29;
-        r4 = 0x9;
-        r5 = 0x32c9;
-        fn_800F96E4();
-        r3 = r29 + 0x14;
-        r4 = 0x1e;
-        fn_801249F8();
-        r30 = r30 + 0x1;
-        r29 = r29 + 0x24a4;
-    } while ((s32)r30 < (s32)0x3);
-    r3 = r31 + 0x6dec;
-    r4 = 0xeb;
-    fn_80142A88();
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+        fn_80132A38(0x34, i + 1);
+        fn_800F96E4(cur, 9, 0x32c9);
+        fn_801249F8(cur + 0x14, 0x1e);
+        i++;
+        cur += 0x24a4;
+    } while (i < 3);
+    fn_80142A88((u8*)base + 0x6dec, 0xeb);
 }
 #endif
 
 /* 0x80135024 | 0x4 | void_stub */
-#if 1
+#if 0
 asm void fn_80135024(void) {
 #include "src/game/effect/effect_util_fn_80135024.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_80135024(void) {
 }
 #endif
@@ -4267,640 +3671,284 @@ void fn_80135168(void) {
     extern void fn_80135C78();
     extern void fn_80135CD0();
     extern u8 jumptable_80363A9C[];
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-
-    r0 = r4 & 0xFFFF;
-    r31 = 0x0;
-    r30 = r4;
-    if ((s32)r0 == (s32)0 || r0 >= (u32)0xb) {
-        r3 = 0x0;
-    } else {
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
-            r4 = 0x0;
-            ((void(*)(void))fn_80129280)();
-            /* mr. r31, r3 */;
-            if (r3 == (u32)0x0) { r3 = 0x0; goto done; }
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-            if (r3 == (u32)0x0) { r3 = 0x0; goto done; }
-        }
-        fn_80135CD0();
-        if (r3 == (u32)0x0) { r3 = 0x0; goto done; }
-        r0 = r30 & 0xFFFF;
-        switch (r0) {
-            case 1: r3 = r31; break;
-            case 2: fn_80135C78(); break;
-            case 3: fn_80135C40(); break;
-            case 4: fn_80135C28(); break;
-            case 5:
-                fn_80135C10();
-                f0 = (f64)(s32)f1;
-                *(f64*)(sp + 0x8) = f0;
-                r3 = *(u32*)(sp + 0xC);
-                break;
-            case 6: fn_80135BF8(); break;
-            case 7:
-                fn_80135BE0();
-                r3 = r3 & 0xFF;
-                break;
-            case 8:
-                fn_80135BC8();
-                r3 = r3 & 0xFF;
-                break;
-            case 9:
-                fn_80135BB0();
-                r3 = r3 & 0xFF;
-                break;
-            default: r3 = 0x0; break;
-        }
-    }
-done:
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    return;
 }
 #endif
 
 /* 0x8013528C | 0xAC */
-#if 1
+#if 0
 asm void fn_8013528C(void) {
 #include "src/game/effect/effect_util_fn_8013528C.inc"
 }
 #else
-void fn_8013528C(void) {
-    extern void fn_80135338();
-    extern void fn_801353C0();
-    extern void fn_80135B0C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* mr. r27, r3 */;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r31 = r7;
-    if ((s32)r0 == (s32)0) return;
-    fn_80135338();
-    r3 = r27;
-    do {
-        if (r27 != (u32)0x0) break;
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
-            break;
-        }
-        r4 = 0x1;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) break;
-        r3 = 0x0;
-        break;
-    } while (0);
-    fn_80135B0C();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
+#pragma optimization_level 4
+void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+    void* base;
+    if (ptr == 0) return;
+    fn_80135338(ptr);
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) return;
+        base = (void*)fn_80129280((u32)base, 1);
+        if (base == 0) return;
+    } else {
+        base = ptr;
     }
-
-    if (r3 == (u32)0x0) return;
-    r4 = r28;
-    r5 = r29;
-    r6 = r30;
-    r7 = r31;
-    fn_801353C0();
-
-    return;
+    base = (void*)fn_80135B0C(base);
+    if (base == 0) return;
+    fn_801353C0(base, r4, r5, r6, r7);
 }
 #endif
 
 /* 0x80135338 | 0x88 */
-#if 1
+#if 0
 asm void fn_80135338(void) {
 #include "src/game/effect/effect_util_fn_80135338.inc"
 }
 #else
-void fn_80135338(void) {
-    extern void fn_80135708();
-    extern void fn_80135B0C();
-    extern void fn_80135CE8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    do {
-        if (r3 != (u32)0x0) break;
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
-            break;
-        }
-        r4 = 0x1;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) break;
-        r3 = 0x0;
-        break;
-    } while (0);
-    fn_80135B0C();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
+#pragma optimization_level 4
+void fn_80135338(void* ptr) {
+    void* base;
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) return;
+        base = (void*)fn_80129280((u32)base, 1);
+        if (base == 0) return;
+    } else {
+        base = ptr;
     }
-
-    if (r3 != (u32)0x0) {
-        fn_80135708();
-        r3 = r31;
-        fn_80135CE8();
-    }
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    base = (void*)fn_80135B0C(base);
+    if (base == 0) return;
+    fn_80135708(base);
+    fn_80135CE8(ptr);
 }
 #endif
 
 /* 0x801353C0 | 0x170 */
-#if 1
+#if 0
 asm void fn_801353C0(void) {
 #include "src/game/effect/effect_util_fn_801353C0.inc"
 }
 #else
-void fn_801353C0(void) {
-    extern void fn_80135708();
-    extern void fn_80135A30();
-    extern void fn_80135A40();
-    extern void fn_80135A50();
-    extern void fn_80135A60();
-    extern void fn_80135B0C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* mr. r27, r3 */;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r31 = r7;
-    if ((s32)r0 == (s32)0) return;
-    r0 = r28 & 0xFF;
-    if ((s32)r0 == (s32)0) return;
-    r0 = r29 & 0xFF;
-    if ((s32)r0 == (s32)0) return;
-    r0 = r30 & 0xFF;
-    if ((s32)r0 == (s32)0) return;
-    r0 = r31 & 0xFF;
-    if ((s32)r0 == (s32)0) return;
-    fn_80135708();
-    r3 = r27;
-    if (r27 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = r28 & 0xFF;
-            fn_80135A60();
-        }
-        }
-    r3 = r27;
-    if (r27 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = r29 & 0xFF;
-            fn_80135A50();
-        }
-        }
-    r3 = r27;
-    if (r27 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = r30 & 0xFF;
-            fn_80135A40();
-        }
-        }
-    r3 = r27;
-    if (r27 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) return;
-        r4 = 0x1;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) return;
+#pragma optimization_level 4
+void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+    void* base;
+    if (ptr == 0) return;
+    if ((r4 & 0xFF) == 0) return;
+    if ((r5 & 0xFF) == 0) return;
+    if ((r6 & 0xFF) == 0) return;
+    if ((r7 & 0xFF) == 0) return;
+    fn_80135708(ptr);
+    /* A60 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A60(base, (u8)(r4 & 0xFF)); }
+    } else {
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { fn_80135A60(base, (u8)(r4 & 0xFF)); }
     }
-    fn_80135B0C();
-    if (r3 == (u32)0x0) return;
-    r4 = r31 & 0xFF;
-    fn_80135A30();
-
-    return;
+    /* A50 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A50(base, (u8)(r5 & 0xFF)); }
+    } else {
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { fn_80135A50(base, (u8)(r5 & 0xFF)); }
+    }
+    /* A40 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { base = 0; } else { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A40(base, (u8)(r6 & 0xFF)); }
+    } else {
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { fn_80135A40(base, (u8)(r6 & 0xFF)); }
+    }
+    /* A30 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) return;
+        base = (void*)fn_80129280((u32)base, 1);
+        if (base == 0) return;
+    } else {
+        base = ptr;
+    }
+    base = (void*)fn_80135B0C(base);
+    if (base == 0) return;
+    fn_80135A30(base, (u8)(r7 & 0xFF));
 }
 #endif
 
 /* 0x80135530 | 0x1D8 */
-#if 1
+#if 0
 asm void fn_80135530(void) {
 #include "src/game/effect/effect_util_fn_80135530.inc"
 }
 #else
-void fn_80135530(void) {
-    extern void fn_80135A70();
-    extern void fn_80135A88();
-    extern void fn_80135AA0();
-    extern void fn_80135AB8();
-    extern void fn_80135B0C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    /* mr. r31, r3 */;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-    }
-    /* Step 1: call AB8 */
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r0 = 0x0; } else {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-            if (r3 == (u32)0x0) { r0 = 0x0; } else { fn_80135B0C(); r0 = (r3 != 0x0) ? (fn_80135AB8(), r3 & 0xFF) : 0x0; }
+#pragma optimization_level 4
+u32 fn_80135530(void* ptr) {
+    void* base; u32 r0; u32 r3;
+    if (ptr == 0) return 0;
+    /* AB8 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { r0 = 0; } else {
+            base = (void*)fn_80129280((u32)base, 1);
+            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135AB8(base) & 0xFF) : 0; }
         }
     } else {
-        fn_80135B0C();
-        if (r3 != (u32)0x0) { fn_80135AB8(); r0 = r3 & 0xFF; } else { r0 = 0x0; }
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { r0 = (u32)fn_80135AB8(base) & 0xFF; } else { r0 = 0; }
     }
-    if ((s32)r0 == (s32)0x0) { r3 = 0x0; r31 = *(u32*)(sp + 0xC); return; }
-    /* Step 2: call AA0 */
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0; r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r0 = 0x0; } else {
-            r4 = 0x1; ((void(*)(void))fn_80129280)();
-            if (r3 == (u32)0x0) { r0 = 0x0; } else { fn_80135B0C(); r0 = (r3 != 0x0) ? (fn_80135AA0(), r3 & 0xFF) : 0x0; }
+    if (r0 == 0) return 0;
+    /* AA0 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { r0 = 0; } else {
+            base = (void*)fn_80129280((u32)base, 1);
+            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135AA0(base) & 0xFF) : 0; }
         }
     } else {
-        fn_80135B0C();
-        if (r3 != (u32)0x0) { fn_80135AA0(); r0 = r3 & 0xFF; } else { r0 = 0x0; }
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { r0 = (u32)fn_80135AA0(base) & 0xFF; } else { r0 = 0; }
     }
-    if ((s32)r0 == (s32)0x0) { r3 = 0x0; r31 = *(u32*)(sp + 0xC); return; }
-    /* Step 3: call A88 */
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0; r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r0 = 0x0; } else {
-            r4 = 0x1; ((void(*)(void))fn_80129280)();
-            if (r3 == (u32)0x0) { r0 = 0x0; } else { fn_80135B0C(); r0 = (r3 != 0x0) ? (fn_80135A88(), r3 & 0xFF) : 0x0; }
+    if (r0 == 0) return 0;
+    /* A88 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { r0 = 0; } else {
+            base = (void*)fn_80129280((u32)base, 1);
+            if (base == 0) { r0 = 0; } else { base = (void*)fn_80135B0C(base); r0 = base ? ((u32)fn_80135A88(base) & 0xFF) : 0; }
         }
     } else {
-        fn_80135B0C();
-        if (r3 != (u32)0x0) { fn_80135A88(); r0 = r3 & 0xFF; } else { r0 = 0x0; }
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { r0 = (u32)fn_80135A88(base) & 0xFF; } else { r0 = 0; }
     }
-    if ((s32)r0 == (s32)0x0) { r3 = 0x0; r31 = *(u32*)(sp + 0xC); return; }
-    /* Step 4: call A70 */
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0; r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r3 = 0x0; } else {
-            r4 = 0x1; ((void(*)(void))fn_80129280)();
-            if (r3 == (u32)0x0) { r3 = 0x0; } else { fn_80135B0C(); if (r3 != 0x0) { fn_80135A70(); r3 = r3 & 0xFF; } else { r3 = 0x0; } }
+    if (r0 == 0) return 0;
+    /* A70 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) { r3 = 0; } else {
+            base = (void*)fn_80129280((u32)base, 1);
+            if (base == 0) { r3 = 0; } else { base = (void*)fn_80135B0C(base); if (base) { r3 = (u32)fn_80135A70(base) & 0xFF; } else { r3 = 0; } }
         }
     } else {
-        fn_80135B0C();
-        if (r3 != (u32)0x0) { fn_80135A70(); r3 = r3 & 0xFF; } else { r3 = 0x0; }
+        base = (void*)fn_80135B0C(ptr);
+        if (base != 0) { r3 = (u32)fn_80135A70(base) & 0xFF; } else { r3 = 0; }
     }
-    r0 = -r3;
-    r0 = r0 | r3;
-    r3 = (u32)r0 >> 31;
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    return (r3 != 0) ? 1 : 0;
 }
 #endif
 
 /* 0x80135708 | 0x134 */
-#if 1
+#if 0
 asm void fn_80135708(void) {
 #include "src/game/effect/effect_util_fn_80135708.inc"
 }
 #else
-void fn_80135708(void) {
-    extern void fn_80135A30();
-    extern void fn_80135A40();
-    extern void fn_80135A50();
-    extern void fn_80135A60();
-    extern void fn_80135B0C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    /* mr. r31, r3 */;
-    if ((s32)r0 == (s32)0) { r31 = *(u32*)(sp + 0xC); return; }
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = 0x0;
-            fn_80135A60();
-        }
-        }
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = 0x0;
-            fn_80135A50();
-        }
-        }
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 != (u32)0x0) {
-            r4 = 0x1;
-            ((void(*)(void))fn_80129280)();
-        }
-        if (r3 != (u32)0x0) {
-        }
-        fn_80135B0C();
-        if (r3 != (u32)0x0) {
-            r4 = 0x0;
-            fn_80135A40();
-        }
-        }
-    r3 = r31;
-    if (r31 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-        r4 = 0x1;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
+#pragma optimization_level 4
+void fn_80135708(void* ptr) {
+    void* base;
+    if (ptr == 0) return;
+    /* A60 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base != 0) { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A60(base, 0); }
     }
-    fn_80135B0C();
-    if (r3 == (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-    r4 = 0x0;
-    fn_80135A30();
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    /* A50 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base != 0) { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A50(base, 0); }
+    }
+    /* A40 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base != 0) { base = (void*)fn_80129280((u32)base, 1); }
+        base = (void*)fn_80135B0C(base);
+        if (base != 0) { fn_80135A40(base, 0); }
+    }
+    /* A30 */
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) return;
+        base = (void*)fn_80129280((u32)base, 1);
+        if (base == 0) return;
+    } else {
+        base = ptr;
+    }
+    base = (void*)fn_80135B0C(base);
+    if (base == 0) return;
+    fn_80135A30(base, 0);
 }
 #endif
 
 /* 0x8013583C | 0xFC */
-#if 1
+#if 0
 asm void fn_8013583C(void) {
 #include "src/game/effect/effect_util_fn_8013583C.inc"
 }
 #else
-void fn_8013583C(void) {
-    extern void fn_80135A30();
-    extern void fn_80135A40();
-    extern void fn_80135A50();
-    extern void fn_80135A60();
-    extern void fn_80135AEC();
-    extern void fn_80135B0C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r0 = r4 & 0xFFFF;
-    r31 = r5;
-    r30 = r4;
-    r29 = r3;
-    if ((s32)r0 != (s32)0 && r0 < (u32)0x7) {
-        if (r29 == (u32)0x0) {
-            r3 = 0x0;
-            r4 = 0x0;
-            ((void(*)(void))fn_80129280)();
-            if (r3 != (u32)0x0) {
-                r4 = 0x1;
-                ((void(*)(void))fn_80129280)();
-                /* mr. r29, r3 */;
-            }
-        }
-        if (r29 != (u32)0x0) {
-            r3 = r29;
-            fn_80135B0C();
-            if (r3 != (u32)0x0) {
-                r0 = r30 & 0xFFFF;
-                switch ((s32)r0) {
-                    case 1:
-                        r3 = r29;
-                        r4 = r31;
-                        fn_80135AEC();
-                        break;
-                    case 2:
-                        r4 = r31 & 0xFF;
-                        fn_80135A60();
-                        break;
-                    case 3:
-                        r4 = r31 & 0xFF;
-                        fn_80135A50();
-                        break;
-                    case 4:
-                        r4 = r31 & 0xFF;
-                        fn_80135A40();
-                        break;
-                    case 5:
-                        r4 = r31 & 0xFF;
-                        fn_80135A30();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+#pragma optimization_level 4
+void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
+    void* base; u16 et;
+    et = effect_type & 0xFFFF;
+    if (et == 0 || et >= 7) return;
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base != 0) { base = (void*)fn_80129280((u32)base, 1); }
+        ptr = base;
     }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+    if (ptr == 0) return;
+    base = (void*)fn_80135B0C(ptr);
+    if (base == 0) return;
+    switch (et) {
+        case 1: fn_80135AEC((u32*)ptr, (u32*)value); break;
+        case 2: fn_80135A60(base, (u8)(value & 0xFF)); break;
+        case 3: fn_80135A50(base, (u8)(value & 0xFF)); break;
+        case 4: fn_80135A40(base, (u8)(value & 0xFF)); break;
+        case 5: fn_80135A30(base, (u8)(value & 0xFF)); break;
+        default: break;
+    }
 }
 #endif
 
 /* 0x80135938 | 0xF8 */
-#if 1
+#if 0
 asm void fn_80135938(void) {
 #include "src/game/effect/effect_util_fn_80135938.inc"
 }
 #else
-void fn_80135938(void) {
-    extern void fn_80135A70();
-    extern void fn_80135A88();
-    extern void fn_80135AA0();
-    extern void fn_80135AB8();
-    extern void fn_80135B0C();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r0 = r4 & 0xFFFF;
-    r31 = r4;
-    if ((s32)r0 != (s32)0) {
-        if (r0 >= (u32)0x7) {
-        }
-        r3 = 0x0;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-        }
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
-            r31 = *(u32*)(sp + 0xC);
-            return;
-        }
-        r4 = 0x1;
-        ((void(*)(void))fn_80129280)();
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
-            r31 = *(u32*)(sp + 0xC);
-            return;
+#pragma optimization_level 4
+u8 fn_80135938(void* ptr, u16 effect_type) {
+    void* base; u16 et;
+    et = effect_type & 0xFFFF;
+    if (et == 0 || et >= 7) return 0;
+    if (ptr == 0) {
+        base = (void*)fn_80129280(0, 0);
+        if (base == 0) return 0;
+        base = (void*)fn_80129280((u32)base, 1);
+        if (base == 0) return 0;
+    } else {
+        base = ptr;
     }
+    base = (void*)fn_80135B0C(base);
+    if (base == 0) return 0;
+    switch (et) {
+        case 1: return 0;
+        case 2: return (u8)fn_80135AB8(base);
+        case 3: return (u8)fn_80135AA0(base);
+        case 4: return (u8)fn_80135A88(base);
+        case 5: return (u8)fn_80135A70(base);
+        default: return 0;
     }
-    fn_80135B0C();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-    }
-    r0 = r31 & 0xFFFF;
-    if ((s32)r0 != (s32)0x3) {
-        if ((s32)r0 < (s32)0x3) {
-            if ((s32)r0 == (s32)0x1) { r31 = *(u32*)(sp + 0xC); return; }
-            if ((s32)r0 < (s32)0x1) {
-                goto L_80135A18;
-            }
-            if ((s32)r0 != (s32)0x5) {
-                if ((s32)r0 >= (s32)0x5) goto L_80135A18;
-                goto L_80135A00;
-                r31 = *(u32*)(sp + 0xC);
-                return;
-                }
-            fn_80135AB8();
-            r3 = r3 & 0xFF;
-            r31 = *(u32*)(sp + 0xC);
-            return;
-        }
-        fn_80135AA0();
-        r3 = r3 & 0xFF;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-    L_80135A00: ;
-        fn_80135A88();
-        r3 = r3 & 0xFF;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-            }
-    fn_80135A70();
-    r3 = r3 & 0xFF;
-    r31 = *(u32*)(sp + 0xC);
-    return;
-L_80135A18: ;
-    r3 = 0x0;
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
 }
 #endif
 
@@ -4953,21 +4001,16 @@ u8 fn_80135AB8(void* ptr) {
 }
 
 /* 0x80135AD0 | 0x1C */
-#if 1
+#if 0
 asm void fn_80135AD0(void) {
 #include "src/game/effect/effect_util_fn_80135AD0.inc"
 }
 #else
-void fn_80135AD0(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    if (r3 == (u32)0x0) return;
-    if (r4 == (u32)0x0) return;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    *(u32*)((u8*)r3 + 0x0) = r0;
-    return;
+#pragma optimization_level 4
+void fn_80135AD0(void* dst, void* src) {
+    if (dst == 0) return;
+    if (src == 0) return;
+    *(u32*)dst = *(u32*)src;
 }
 #endif
 
@@ -5029,20 +4072,16 @@ void fn_80135B7C(void* ptr, u32 val) {
 }
 
 /* 0x80135B8C | 0x14 */
-#if 1
+#if 0
 asm void fn_80135B8C(void) {
 #include "src/game/effect/effect_util_fn_80135B8C.inc"
 }
 #else
-void fn_80135B8C(void) {
-    u32 r3 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    if (r3 == (u32)0x0) return;
-    *(u32*)((u8*)r3 + 0x4) = r6;
-    *(u32*)((u8*)r3 + 0x0) = r5;
-    return;
+#pragma optimization_level 4
+void fn_80135B8C(void* ptr, u32 unused, u32 a, u32 b) {
+    if (ptr == 0) return;
+    *(u32*)((u8*)ptr + 0x4) = b;
+    *(u32*)((u8*)ptr + 0x0) = a;
 }
 #endif
 
@@ -5151,25 +4190,21 @@ void* fn_80135CD0(void* ptr) {
 }
 
 /* 0x80135CE8 | 0x28 */
-#if 1
+#if 0
 asm void fn_80135CE8(void) {
 #include "src/game/effect/effect_util_fn_80135CE8.inc"
 }
 #else
-void fn_80135CE8(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
+#pragma optimization_level 4
+void fn_80135CE8(void* ptr) {
+    void* sub;
+    if (ptr != 0) {
+        sub = (u8*)ptr + 0x8;
     } else {
-
-        r3 = r3 + 0x8;
+        sub = 0;
     }
-    if (r3 == (u32)0x0) return;
-    r0 = 0x0;
-    *(u32*)((u8*)r3 + 0x8) = r0;
-    return;
+    if (sub == 0) return;
+    *(u32*)((u8*)sub + 0x8) = 0;
 }
 #endif
 
@@ -5285,6 +4320,7 @@ void fn_80135D10(void) {
 #endif
 
 /* 0x80135E44 | 0x114 */
+extern u16 fn_80142CF4(void*, u32, u32, u32);
 extern void fn_8012A5B0(void);
 extern void fn_8012640C(void);
 extern void fn_8011BEB4(void);
@@ -6563,35 +5599,97 @@ asm void fn_801315EC(void) {
 void fn_801315EC(void) { /* TODO */ }
 #endif
 extern void fn_800FA064(void);
-#if 1
+#if 0
 asm void fn_80131714(void) {
 #include "src/game/effect/effect_util_fn_80131714.inc"
 }
 #else
-void fn_80131714(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80131714(void* obj) {
+    extern void fn_800FA064(void*);
+    u8* p = (u8*)obj;
+    u8* stream;
+    if (p[0x01] != 0) {
+        stream = *(u8**)(p + 0x30);
+        p[0x4a] = stream[0];
+        fn_800FA064(obj);
+    }
+    stream = *(u8**)(p + 0x30);
+    *(u32*)(p + 0x30) = (u32)(stream + 1);
+    return 0;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80132454(void) {
 #include "src/game/effect/effect_util_fn_80132454.inc"
 }
 #else
-void fn_80132454(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80132454(void* obj) {
+    u8* p = (u8*)obj;
+    u8* stream;
+    s16 counter;
+    if (p[0x01] != 0) {
+        stream = *(u8**)(p + 0x30);
+        *(u32*)(p + 0x30) = (u32)(stream + 1);
+        return 0;
+    }
+    counter = *(s16*)(p + 0x48);
+    if (counter == 0) {
+        stream = *(u8**)(p + 0x30);
+        counter = (s16)((s16)stream[0] + 1);
+        *(s16*)(p + 0x48) = counter;
+    }
+    counter = (s16)(counter - 1);
+    *(s16*)(p + 0x48) = counter;
+    if (counter <= 0) {
+        *(s16*)(p + 0x48) = 0;
+        stream = *(u8**)(p + 0x30);
+        *(u32*)(p + 0x30) = (u32)(stream + 1);
+        return 0;
+    }
+    stream = *(u8**)(p + 0x30);
+    *(u32*)(p + 0x30) = (u32)(stream - 3);
+    return 1;
+}
 #endif
 extern void fn_800FA160(void);
-#if 1
+#if 0
 asm void fn_80132570(void) {
 #include "src/game/effect/effect_util_fn_80132570.inc"
 }
 #else
-void fn_80132570(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80132570(void* obj) {
+    extern void fn_800FA160(void*);
+    u8* p = (u8*)obj;
+    u8* stream;
+    if (p[0x01] != 0) {
+        stream = *(u8**)(p + 0x30);
+        *(u32*)(p + 0x24) = *(u32*)stream;
+        fn_800FA160(obj);
+    }
+    stream = *(u8**)(p + 0x30);
+    *(u32*)(p + 0x30) = (u32)(stream + 4);
+    return 0;
+}
 #endif
 extern void fn_800FAA98(void);
-#if 1
+#if 0
 asm void fn_8013264C(void) {
 #include "src/game/effect/effect_util_fn_8013264C.inc"
 }
 #else
-void fn_8013264C(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_8013264C(void* obj) {
+    extern void fn_800FAA98(void*);
+    u8* p = (u8*)obj;
+    if (p[0x01] != 0) {
+        fn_800FAA98(obj);
+    }
+    p[0x4b] = 1;
+    return 0;
+}
 #endif
 extern u32 lbl_8047D0E0;
 #if 1
@@ -6601,12 +5699,20 @@ asm void fn_801327E0(void) {
 #else
 void fn_801327E0(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80132F7C(void) {
 #include "src/game/effect/effect_util_fn_80132F7C.inc"
 }
 #else
-void fn_80132F7C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80132F7C(void) {
+    if (fn_80102620(0xab) & 0xFF) {
+        fn_80102510(0xab);
+    } else {
+        fn_801026A4(0xab, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
 #endif
 extern void fn_801E1810(void);
 extern void fn_800F0308(void);
@@ -6623,46 +5729,97 @@ asm void fn_80132FD8(void) {
 #else
 void fn_80132FD8(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013327C(void) {
 #include "src/game/effect/effect_util_fn_8013327C.inc"
 }
 #else
-void fn_8013327C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8013327C(void) {
+    if ((fn_800E0E14(1, 0) & 0xFF) == 1) {
+        fn_800DD970(lbl_80272AE0);
+    } else {
+        fn_800DD970(lbl_80272AF0);
+    }
+    return 0;
+}
 #endif
 extern void fn_801D1CC4(void);
 extern void fn_801D1D58(void);
 extern void fn_801D268C(void);
-#if 1
+#if 0
 asm void fn_8013334C(void) {
 #include "src/game/effect/effect_util_fn_8013334C.inc"
 }
 #else
-void fn_8013334C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8013334C(void) {
+    extern s32 fn_8010264C(u32, u32);
+    extern s32 fn_801D1CC4(s32);
+    extern void fn_801D1D58(s32);
+    s32 slot;
+    while ((slot = fn_8010264C(2, 1)) != -1) {
+        if (fn_801D1CC4(slot) == 0) {
+            fn_801D1D58(slot);
+            fn_801D268C();
+        }
+    }
+    return 0;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80133510(void) {
 #include "src/game/effect/effect_util_fn_80133510.inc"
 }
 #else
-void fn_80133510(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80133510(void) {
+    if (fn_80102620(0x7) & 0xFF) {
+        fn_80102510(0x7);
+    } else {
+        fn_801026A4(0x7, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
 #endif
 extern void fn_8012F11C(void);
 extern void fn_8012F150(void);
 extern void fn_8012F1FC(void);
-#if 1
+#if 0
 asm void fn_8013356C(void) {
 #include "src/game/effect/effect_util_fn_8013356C.inc"
 }
 #else
-void fn_8013356C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8013356C(u32 arg1, u32 arg2) {
+    extern u32 fn_8012F11C(s32);
+    extern void fn_8012F150(s32);
+    extern void fn_8012F1FC(s32);
+    s32 r31 = (arg2 == 0) ? 1 : -1;
+    if (r31 >= 0) {
+        if (fn_8012F11C(r31) & 0xFF) {
+            fn_8012F150(r31);
+        } else {
+            fn_8012F1FC(r31);
+        }
+    }
+    return 0;
+}
 #endif
-#if 1
+#if 0
 asm void fn_801335D4(void) {
 #include "src/game/effect/effect_util_fn_801335D4.inc"
 }
 #else
-void fn_801335D4(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_801335D4(void) {
+    if (fn_80102620(0x4) & 0xFF) {
+        fn_80102510(0x4);
+    } else {
+        fn_801026A4(0x4, 0, 0, 0, 0, 0);
+    }
+    return 0;
+}
 #endif
 extern u32 lbl_80478F8C;
 #if 1
@@ -6680,12 +5837,20 @@ asm void fn_80133E1C(void) {
 #else
 void fn_80133E1C(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80134274(void) {
 #include "src/game/effect/effect_util_fn_80134274.inc"
 }
 #else
-void fn_80134274(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80134274(void) {
+    extern u32 fn_800057A8(void);
+    s32 val = (s32)fn_800057A8();
+    if (val > 1 && val < 3) {
+        return 0x115;
+    }
+    return 2;
+}
 #endif
 extern u32 lbl_80478F8C;
 #if 1
@@ -6695,19 +5860,37 @@ asm void fn_801342B8(void) {
 #else
 void fn_801342B8(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80134768(void) {
 #include "src/game/effect/effect_util_fn_80134768.inc"
 }
 #else
-void fn_80134768(void) { /* TODO */ }
+#pragma optimization_level 4
+void* fn_80134768(void* base, s16 index) {
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
+    }
+    if ((s16)index >= 0 && (s16)index < 0xeb) {
+        return (u8*)base + 0x6dec + (s32)(s16)index * 4;
+    }
+    return 0;
+}
 #endif
-#if 1
+#if 0
 asm void fn_80134A98(void) {
 #include "src/game/effect/effect_util_fn_80134A98.inc"
 }
 #else
-void fn_80134A98(void) { /* TODO */ }
+#pragma optimization_level 4
+void* fn_80134A98(void* base, s8 index) {
+    if (base == 0) {
+        base = (void*)fn_80129280(0, 3);
+    }
+    if ((s8)index >= 0 && (s8)index < 3) {
+        return (u8*)base + (s32)(s8)index * 0x24a4;
+    }
+    return 0;
+}
 #endif
 extern u32 lbl_80478B98;  /* effect count (SDA) */
 #if 1

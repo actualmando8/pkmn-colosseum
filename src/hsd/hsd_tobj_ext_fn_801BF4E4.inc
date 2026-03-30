@@ -1,0 +1,37 @@
+    nofralloc
+    lwz r6, 0x0(r3)
+    lis r4, lbl_80466BC0@ha
+    lwz r5, 0x4(r3)
+    lis r7, lbl_80466BC0@ha
+    addi r4, r4, lbl_80466BC0@l
+    li r0, 0x1
+    stwu r6, lbl_80466BC0@l(r7)
+    stw r5, 0x4(r7)
+    lwz r6, 0x8(r3)
+    lwz r5, 0xc(r3)
+    stw r6, 0x8(r7)
+    stw r5, 0xc(r7)
+    lwz r6, 0x10(r3)
+    lwz r5, 0x14(r3)
+    stw r6, 0x10(r7)
+    stw r5, 0x14(r7)
+    lwz r6, 0x18(r3)
+    lwz r5, 0x1c(r3)
+    stw r6, 0x18(r7)
+    stw r5, 0x1c(r7)
+    lwz r6, 0x20(r3)
+    lwz r5, 0x24(r3)
+    stw r6, 0x20(r7)
+    stw r5, 0x24(r7)
+    lwz r6, 0x28(r3)
+    lwz r5, 0x2c(r3)
+    stw r6, 0x28(r7)
+    stw r5, 0x2c(r7)
+    lwz r6, 0x30(r3)
+    lwz r5, 0x34(r3)
+    stw r6, 0x30(r7)
+    stw r5, 0x34(r7)
+    lwz r3, 0x38(r3)
+    stw r3, 0x38(r7)
+    stb r0, 0x54(r4)
+    blr

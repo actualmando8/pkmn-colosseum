@@ -12,6 +12,19 @@
 HSD_ClassInfo hsdObj = { ObjInfoInit };
 extern HSD_ClassInfo hsdClass;
 
+/* Internal bounding box structure used by fn_80191358 and fn_80191460-8019147C */
+typedef struct {
+    u8 field0;     /* 0x00 */
+    u8 init_flag;  /* 0x01: non-zero if uninitialized (reset to 0 on first expand) */
+    u8 pad[2];     /* 0x02-0x03 */
+    void* field4;  /* 0x04 */
+    void* field8;  /* 0x08 */
+    void* fieldC;  /* 0x0C */
+    f32 min[3];    /* 0x10-0x18 */
+    f32 max[3];    /* 0x1C-0x24 */
+    f32 field28[3];/* 0x28-0x30 */
+} HSD_BBox;
+
 void ObjInfoInit(void)
 {
     hsdInitClassInfo(&hsdObj, &hsdClass, "sysdolphin_base_library", "hsd_obj",
@@ -67,14 +80,29 @@ void fn_80191118(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800E01F4(void);
-extern void fn_800E0168(void);
+extern void fn_800E01F4(void* vec, f32 x, f32 y, f32 z);
+extern void fn_800E0168(void* dst, void* max, void* min);
 #if 1
 asm void fn_80191358(void) {
 #include "src/hsd/hsd_object_fn_80191358.inc"
 }
 #else
-void fn_80191358(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80191358(HSD_BBox* bbox, f32 x, f32 y, f32 z) {
+    if (bbox->init_flag != 0) {
+        bbox->init_flag = 0;
+        fn_800E01F4(bbox->min, x, y, z);
+        fn_800E01F4(bbox->max, x, y, z);
+    } else {
+        if (x < bbox->min[0]) { bbox->min[0] = x; }
+        if (y < bbox->min[1]) { bbox->min[1] = y; }
+        if (z < bbox->min[2]) { bbox->min[2] = z; }
+        if (x > bbox->max[0]) { bbox->max[0] = x; }
+        if (y > bbox->max[1]) { bbox->max[1] = y; }
+        if (z > bbox->max[2]) { bbox->max[2] = z; }
+    }
+    fn_800E0168(bbox->field28, bbox->max, bbox->min);
+}
 #endif
 #pragma pop
 
@@ -82,12 +110,15 @@ void fn_80191358(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80191460(void) {
 #include "src/hsd/hsd_object_fn_80191460.inc"
 }
 #else
-void fn_80191460(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80191460(HSD_BBox* bbox) {
+    bbox->init_flag = 1;
+}
 #endif
 #pragma pop
 
@@ -95,12 +126,15 @@ void fn_80191460(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019146C(void) {
 #include "src/hsd/hsd_object_fn_8019146C.inc"
 }
 #else
-void fn_8019146C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8019146C(HSD_BBox* bbox, void* val) {
+    bbox->fieldC = val;
+}
 #endif
 #pragma pop
 
@@ -108,12 +142,15 @@ void fn_8019146C(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80191474(void) {
 #include "src/hsd/hsd_object_fn_80191474.inc"
 }
 #else
-void fn_80191474(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80191474(HSD_BBox* bbox, void* val) {
+    bbox->field8 = val;
+}
 #endif
 #pragma pop
 
@@ -121,12 +158,15 @@ void fn_80191474(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019147C(void) {
 #include "src/hsd/hsd_object_fn_8019147C.inc"
 }
 #else
-void fn_8019147C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8019147C(HSD_BBox* bbox, void* val) {
+    bbox->field4 = val;
+}
 #endif
 #pragma pop
 

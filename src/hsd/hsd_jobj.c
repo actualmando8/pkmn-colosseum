@@ -430,7 +430,7 @@ void fn_8019CF54(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019C128(void);
+extern void fn_8019C128();
 extern void fn_8019C1B0(void);
 extern void fn_801A8570(void);
 extern void fn_801A84F0(void);
@@ -449,7 +449,7 @@ void fn_8019CFBC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void);
+extern void fn_80196E10();
 extern void fn_80196D78(void);
 extern void fn_80199264(void);
 extern void fn_801AE50C(void);
@@ -555,13 +555,13 @@ void fn_8019E460(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern u32 lbl_8047B2AC;
-#if 1
+#if 0
 asm void fn_8019F01C(void) {
 #include "src/hsd/hsd_jobj_fn_8019F01C.inc"
 }
 #else
-void fn_8019F01C(void) {
-    /* TODO: match -- 8 bytes at 0x8019F01C */
+u32 fn_8019F01C(void) {
+    return lbl_8047B2AC;
 }
 #endif
 #pragma pop
@@ -602,13 +602,17 @@ void fn_8019F778(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019FF30(void) {
 #include "src/hsd/hsd_jobj_fn_8019FF30.inc"
 }
 #else
-void fn_8019FF30(void) {
-    /* TODO: match -- 24 bytes at 0x8019FF30 */
+#pragma optimization_level 4
+u32 fn_8019FF30(HSD_JObj* jobj) {
+    if (jobj != NULL) {
+        return jobj->flags;
+    }
+    return 0;
 }
 #endif
 #pragma pop
@@ -622,8 +626,15 @@ asm void fn_8019FF48(void) {
 #include "src/hsd/hsd_jobj_fn_8019FF48.inc"
 }
 #else
-void fn_8019FF48(void) {
-    /* TODO: match -- 44 bytes at 0x8019FF48 */
+#pragma optimization_level 4
+HSD_DObj* fn_8019FF48(HSD_JObj* jobj) {
+    if (jobj == NULL) {
+        return NULL;
+    }
+    if (jobj->flags & (JOBJ_SPLINE | JOBJ_PTCL)) {
+        return NULL;
+    }
+    return jobj->u.dobj;
 }
 #endif
 #pragma pop
@@ -694,17 +705,17 @@ void fn_801A053C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void);
+extern void fn_80196E10();
 extern void fn_801991F8(void);
-extern void fn_8019C128(void);
+extern void fn_8019C128();
 extern void fn_801A05EC(void);
-extern void fn_801A0B9C(void);
-extern void fn_801A0BF0(void);
-extern void fn_801A0C1C(void);
+extern void fn_801A0B9C();
+extern void fn_801A0BF0();
+extern void fn_801A0C1C();
 extern void fn_801A0C68(void);
-extern void fn_801A0C9C(void);
+extern void fn_801A0C9C();
 extern void fn_801A0CE8(void);
-extern void fn_801A0D3C(void);
+extern s32 fn_801A0D3C();
 extern void fn_801A0D48(void);
 extern void fn_801A0D94(void);
 extern void fn_801AEBE4(void);
@@ -725,13 +736,19 @@ void fn_801A0744(void) {
 #pragma optimizewithasm off
 extern u8 lbl_80274AF4[];
 extern u8 lbl_80274B64[];
-#if 1
+#if 0
 asm void fn_801A0B9C(void) {
 #include "src/hsd/hsd_jobj_fn_801A0B9C.inc"
 }
 #else
-void fn_801A0B9C(void) {
-    /* TODO: match -- 84 bytes at 0x801A0B9C */
+#pragma optimization_level 4
+void fn_801A0B9C(HSD_Obj* obj) {
+    if (obj != NULL) {
+        obj->ref_count++;
+        if (!(obj->ref_count != HSD_OBJ_NOREF)) {
+            fn_80196E10(lbl_80274AF4, 0x5d, lbl_80274B64);
+        }
+    }
 }
 #endif
 #pragma pop
@@ -740,13 +757,14 @@ void fn_801A0B9C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A0BF0(void) {
 #include "src/hsd/hsd_jobj_fn_801A0BF0.inc"
 }
 #else
-void fn_801A0BF0(void) {
-    /* TODO: match -- 44 bytes at 0x801A0BF0 */
+#pragma optimization_level 4
+void fn_801A0BF0(HSD_JObj* jobj, u32 flags) {
+    fn_8019C128(NULL, jobj, flags);
 }
 #endif
 #pragma pop
@@ -755,13 +773,17 @@ void fn_801A0BF0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A0C1C(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C1C.inc"
 }
 #else
-void fn_801A0C1C(void) {
-    /* TODO: match -- 76 bytes at 0x801A0C1C */
+#pragma optimization_level 4
+void fn_801A0C1C(HSD_Obj* obj) {
+    obj->ref_count++;
+    if (!(obj->ref_count != HSD_OBJ_NOREF)) {
+        fn_80196E10(lbl_80274AF4, 0x5d, lbl_80274B64);
+    }
 }
 #endif
 #pragma pop
@@ -775,8 +797,13 @@ asm void fn_801A0C68(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C68.inc"
 }
 #else
-void fn_801A0C68(void) {
-    /* TODO: match -- 52 bytes at 0x801A0C68 */
+#pragma optimization_level 4
+BOOL fn_801A0C68(HSD_Obj* obj) {
+    if (obj->ref_count_individual == 0) {
+        return 0;
+    }
+    obj->ref_count_individual--;
+    return obj->ref_count_individual == 0;
 }
 #endif
 #pragma pop
@@ -786,13 +813,17 @@ void fn_801A0C68(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern u8 lbl_80274B00[];
-#if 1
+#if 0
 asm void fn_801A0C9C(void) {
 #include "src/hsd/hsd_jobj_fn_801A0C9C.inc"
 }
 #else
-void fn_801A0C9C(void) {
-    /* TODO: match -- 76 bytes at 0x801A0C9C */
+#pragma optimization_level 4
+void fn_801A0C9C(HSD_Obj* obj) {
+    obj->ref_count_individual++;
+    if (!(obj->ref_count_individual != 0)) {
+        fn_80196E10(lbl_80274AF4, 0x9e, lbl_80274B00);
+    }
 }
 #endif
 #pragma pop
@@ -806,8 +837,12 @@ asm void fn_801A0CE8(void) {
 #include "src/hsd/hsd_jobj_fn_801A0CE8.inc"
 }
 #else
-void fn_801A0CE8(void) {
-    /* TODO: match -- 84 bytes at 0x801A0CE8 */
+#pragma optimization_level 4
+void fn_801A0CE8(void* obj) {
+    if (obj != NULL) {
+        HSD_CLASS_METHOD(obj)->init((HSD_Class*) obj);
+        HSD_CLASS_METHOD(obj)->release((HSD_Class*) obj);
+    }
 }
 #endif
 #pragma pop
@@ -816,13 +851,14 @@ void fn_801A0CE8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
-asm void fn_801A0D3C(void) {
+#if 0
+asm s32 fn_801A0D3C(void) {
 #include "src/hsd/hsd_jobj_fn_801A0D3C.inc"
 }
 #else
-void fn_801A0D3C(void) {
-    /* TODO: match -- 12 bytes at 0x801A0D3C */
+#pragma optimization_level 4
+s32 fn_801A0D3C(HSD_Obj* obj) {
+    return obj->ref_count_individual - 1;
 }
 #endif
 #pragma pop
@@ -836,8 +872,12 @@ asm void fn_801A0D48(void) {
 #include "src/hsd/hsd_jobj_fn_801A0D48.inc"
 }
 #else
-void fn_801A0D48(void) {
-    /* TODO: match -- 76 bytes at 0x801A0D48 */
+BOOL fn_801A0D48(void* o) {
+    BOOL ret;
+    if ((ret = (HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF))) {
+        return ret;
+    }
+    return HSD_OBJ(o)->ref_count-- == 0;
 }
 #endif
 #pragma pop
@@ -901,13 +941,13 @@ void fn_801A1098(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A1980(void) {
 #include "src/hsd/hsd_jobj_fn_801A1980.inc"
 }
 #else
-void fn_801A1980(void) {
-    /* TODO: match -- 8 bytes at 0x801A1980 */
+f32* fn_801A1980(HSD_JObj* jobj) {
+    return jobj->mtx[1];
 }
 #endif
 #pragma pop

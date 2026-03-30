@@ -146,9 +146,9 @@ extern u8  lbl_804782E0[];
 extern u8  lbl_804783E0[];
 
 /* Forward declarations for functions used as addresses in asm wrappers */
-void fn_8025F2FC(void);
+void fn_8025F2FC(int r3);
 void fn_8025F524(int r3);
-void fn_8025F618(void);
+void fn_8025F618(int r3);
 void fn_8025F7E8(int r3);
 u32  fn_8025F81C(int r3);
 u32  fn_8025F9AC(int r3, u32 r4, u32 r5, u32 r6);
@@ -157,7 +157,7 @@ u32  fn_8025F9AC(int r3, u32 r4, u32 r5, u32 r6);
 extern void fn_800AE7E0();
 extern void fn_800E01F4();
 extern int  fn_800E0C04();
-extern void fn_8011F520();
+extern u32  fn_8011F520();
 extern u32  fn_8011F5B0();
 extern u16  fn_8011F5C8();
 extern u32  fn_80129280();
@@ -36758,14 +36758,62 @@ u32 fn_8025E0B0(int *r3,u32 r4,u16 *r5,int r6)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025E1BC(void) {
 #include "src/game/colosseum_battle_fn_8025E1BC.inc"
 }
-#else
-void fn_8025E1BC(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_8025E1BC(float f1, float f2, float f3, float f4, float f5, float f6) {
+  extern u32 lbl_8047B658;
+  extern u16 lbl_80478DA0[];
+  extern f32 lbl_8047E678;
+  extern f32 lbl_8047E67C;
+  extern void fn_8025DDF4();
+  extern u32 fn_8025DF38();
+  extern void fn_8025DE0C();
+  extern void fn_8025DDAC();
+  extern void fn_8025DE54();
+  extern void fn_800E01F4();
+  u32 *r31;
+  u32 *r30;
+  float scale_buf[3];
+  float out_buf[3];
+  float sv1, sv2, sv3, sv4, sv5, sv6;
+  float fscale;
+  sv1 = f1; sv2 = f2; sv3 = f3;
+  sv4 = f4; sv5 = f5; sv6 = f6;
+  fn_801DADC0(1);
+  fn_8025DDF4(&lbl_8047B658);
+  if (fn_8025DF38(&lbl_8047B658, 0x3f, lbl_80478DA0, 1)) {
+    r31 = &lbl_8047B658;
+    if (r31 == (u32 *)0 || *r31 == 0) r31 = (u32 *)0;
+    r30 = &lbl_8047B658;
+    if (r30 == (u32 *)0 || *r30 == 0) r30 = (u32 *)0;
+    if (r30 != (u32 *)0 && *r30 != 0) {
+      fn_800E01F4(sv1, out_buf, sv2, sv3);
+      fn_8025DE0C(r30, (u32)out_buf);
+    }
+    {
+      u32 *r3;
+      r3 = &lbl_8047B658;
+      if (r3 == (u32 *)0 || *r3 == 0) r3 = (u32 *)0;
+      if (r3 != (u32 *)0 && *r3 != 0) {
+        fscale = lbl_8047E678;
+        scale_buf[0] = fscale * sv4;
+        scale_buf[1] = fscale * sv5;
+        scale_buf[2] = fscale * sv6;
+        fn_8025DDAC(r3, (u32)scale_buf);
+      }
+    }
+    if (r31 != (u32 *)0 && *r31 != 0) {
+      fn_8025DE54(r31, lbl_80478DA0, 1, 0, 0, 1);
+      fn_801C41C8(5, lbl_8047E67C);
+      fn_801C40F0(1);
+    }
+  }
+  fn_801DAC90();
+}
 
 /* Address: 0x8025E534 | Size: 0xC0 | Ghidra import */
 
@@ -37102,7 +37150,12 @@ asm void fn_8025F2AC(void) {
 #include "src/game/colosseum_battle_fn_8025F2AC.inc"
 }
 #else
-void fn_8025F2AC(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8025F2AC(void) {
+  u32 *p = &lbl_8047B668;
+  p[0] = 0xFFFFFFFF;
+  p[1] = 0xFFFFFFFF;
+}
 #endif
 #pragma pop
 
@@ -37124,62 +37177,137 @@ void fn_8025F2C0(int r3,u32 r4)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F2FC(void) {
 #include "src/game/colosseum_battle_fn_8025F2FC.inc"
 }
-#else
-void fn_8025F2FC(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_8025F2FC(int r3) {
+  u8 *entry;
+  s32 *flag;
+  u8 b5;
+  u8 b6;
+  u8 b7;
+  entry = lbl_804783E0 + (r3 * 0x100);
+  flag = (s32 *)(entry + 0x20);
+  if (*flag != 0) return;
+  b5 = *(u8 *)(entry + 0x5);
+  if (b5 != 0) { *flag = 1; return; }
+  b6 = *(u8 *)(entry + 0x6);
+  if (b6 != 4) { *flag = 1; return; }
+  b7 = *(u8 *)(entry + 0x7);
+  *(u8 *)(*(u32 *)(entry + 0x14)) = b7 & 0x3a;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F350(void) {
 #include "src/game/colosseum_battle_fn_8025F350.inc"
 }
-#else
-void fn_8025F350(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_8025F350(void) {
+  int i;
+  u32 r0;
+  u32 r30;
+  u8 *r29;
+  u8 *r28;
+  r0 = *(u32 *)0x800000F8;
+  r0 = r0 >> 2;
+  r0 = (u32)(((u64)0x431BDE83UL * r0) >> 32);
+  r0 = r0 >> 15;
+  r0 = r0 * 60;
+  r30 = r0 >> 3;
+  r29 = lbl_804783E0;
+  r28 = lbl_804782E0;
+  for (i = 0; i < 4; i++) {
+    *(u32 *)(r29 + 0x34) = r30;
+    *(u32 *)(r29 + 0x30) = 0;
+    OSInitThreadQueue((void *)(r29 + 0x24));
+    *(u32 *)(r29 + 0xF8) = (u32)r28;
+    r29 += 0x100;
+    r28 += 0x40;
+  }
+  OSInitAlarm();
+  fn_800AE7E0();
+  lbl_8047B670 = 0;
+  OSRegisterResetFunction(lbl_8039A6B8);
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F3F4(void) {
 #include "src/game/colosseum_battle_fn_8025F3F4.inc"
 }
-#else
-void fn_8025F3F4(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025F3F4(int r3, u32 r4) {
+  int idx;
+  u8 *entry;
+  u32 result;
+  idx = r3;
+  entry = lbl_804783E0 + idx * 0x100;
+  if (*(u32 *)(entry + 0x1C) != 0) {
+    result = 2;
+  } else {
+    *(u8 *)(entry + 0x0) = 0;
+    *(u32 *)(entry + 0x14) = r4;
+    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
+    result = fn_8025F9AC(idx, 1, 3, (u32)fn_8025F2FC);
+  }
+  if (result == 0) {
+    result = fn_8025F81C(idx);
+  }
+  return result;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F484(void) {
 #include "src/game/colosseum_battle_fn_8025F484.inc"
 }
-#else
-void fn_8025F484(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025F484(int r3, u32 r4) {
+  int idx;
+  u8 *entry;
+  u32 result;
+  idx = r3;
+  entry = lbl_804783E0 + idx * 0x100;
+  if (*(u32 *)(entry + 0x1C) != 0) {
+    result = 2;
+  } else {
+    *(u8 *)(entry + 0x0) = 0xFF;
+    *(u32 *)(entry + 0x14) = r4;
+    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
+    result = fn_8025F9AC(idx, 1, 3, (u32)fn_8025F2FC);
+  }
+  if (result == 0) {
+    result = fn_8025F81C(idx);
+  }
+  return result;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F514(void) {
 #include "src/game/colosseum_battle_fn_8025F514.inc"
 }
-#else
-void fn_8025F514(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025F514(void) {
+  lbl_8047B670 = 1;
+  return 1;
+}
 
 /* Address: 0x8025F524 | Size: 0x60 | Ghidra import */
 void fn_8025F524(int r3)
@@ -37197,38 +37325,83 @@ void fn_8025F524(int r3)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F584(void) {
 #include "src/game/colosseum_battle_fn_8025F584.inc"
 }
-#else
-void fn_8025F584(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025F584(int r3, u32 r4, u32 r5) {
+  int idx;
+  u8 *entry;
+  u32 result;
+  idx = r3;
+  entry = lbl_804783E0 + idx * 0x100;
+  if (*(u32 *)(entry + 0x1C) != 0) {
+    result = 2;
+  } else {
+    *(u8 *)(entry + 0x0) = 0x14;
+    *(u32 *)(entry + 0x18) = r4;
+    *(u32 *)(entry + 0x14) = r5;
+    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
+    result = fn_8025F9AC(idx, 1, 5, (u32)fn_8025F524);
+  }
+  if (result == 0) {
+    result = fn_8025F81C(idx);
+  }
+  return result;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F618(void) {
 #include "src/game/colosseum_battle_fn_8025F618.inc"
 }
-#else
-void fn_8025F618(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_8025F618(int r3) {
+  u8 *entry;
+  entry = lbl_804783E0 + r3 * 0x100;
+  if (*(s32 *)(entry + 0x20) != 0) return;
+  *(u8 *)(*(u32 *)(entry + 0x14)) = *(u8 *)(entry + 0x5) & 0x3A;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F648(void) {
 #include "src/game/colosseum_battle_fn_8025F648.inc"
 }
-#else
-void fn_8025F648(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025F648(int r3, u32 r4, u32 r5) {
+  int idx;
+  u32 r29;
+  u32 r30;
+  u8 *entry;
+  u32 result;
+  idx = r3;
+  r29 = r4;
+  r30 = r5;
+  entry = lbl_804783E0 + idx * 0x100;
+  if (*(u32 *)(entry + 0x1C) != 0) {
+    result = 2;
+  } else {
+    *(u8 *)(entry + 0x0) = 0x15;
+    memcpy(entry + 1, (void *)r29, 4);
+    *(u32 *)(entry + 0x18) = r29;
+    *(u32 *)(entry + 0x14) = r30;
+    *(u32 *)(entry + 0x1C) = (u32)fn_8025F7E8;
+    result = fn_8025F9AC(idx, 5, 1, (u32)fn_8025F618);
+  }
+  if (result == 0) {
+    result = fn_8025F81C(idx);
+  }
+  return result;
+}
 
 /* Address: 0x8025F70C | Size: 0xDC | Ghidra import */
 void fn_8025F70C(int r3,u32 r4,u32 r5)
@@ -37510,26 +37683,72 @@ void fn_8025FBCC(int r3)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025FD34(void) {
 #include "src/game/colosseum_battle_fn_8025FD34.inc"
 }
-#else
-void fn_8025FD34(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025FD34(u16 *r3, u16 r4) {
+  u16 *queue;
+  u16 count;
+  u32 lookup;
+  u16 i;
+  u32 r5;
+  u32 r0;
+  queue = r3;
+  lookup = (u32)r4;
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  count = *queue;
+  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+    r5 = (u32)(u16)i * 12;
+    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
+    if (r0 == lookup) {
+      return *(u32 *)((u8 *)queue + r5 + 8);
+    }
+  }
+  return 0;
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025FDDC(void) {
 #include "src/game/colosseum_battle_fn_8025FDDC.inc"
 }
-#else
-void fn_8025FDDC(void) { /* TODO */ }
 #endif
 #pragma pop
+u32 fn_8025FDDC(u16 *r3, u16 r4) {
+  u16 *queue;
+  u16 count;
+  u32 lookup;
+  u16 i;
+  u32 r5;
+  u32 r0;
+  queue = r3;
+  lookup = (u32)r4;
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  count = *queue;
+  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+    r5 = (u32)(u16)i * 12;
+    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
+    if (r0 == lookup) {
+      return *(u32 *)((u8 *)queue + r5 + 0xC);
+    }
+  }
+  return 0;
+}
 
 /* Address: 0x8025FE84 | Size: 0x60 | Ghidra import */
 short fn_8025FE84(short *r3,u32 r4)
@@ -37587,26 +37806,77 @@ u32 fn_8025FF18(u16 *r3)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025FF9C(void) {
 #include "src/game/colosseum_battle_fn_8025FF9C.inc"
 }
-#else
-void fn_8025FF9C(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_8025FF9C(u16 *r3, u32 r4) {
+  u16 *queue;
+  u32 r30;
+  u16 count;
+  u32 lookup;
+  u32 r5;
+  u16 i;
+  u32 r0;
+  u32 new_entry_off;
+  u8 *new_entry;
+  queue = r3;
+  r30 = r4;
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  lookup = (u32)(u16)fn_8011F5C8(r30);
+  count = *queue;
+  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+    r5 = (u32)(u16)i * 12;
+    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
+    if (r0 == lookup) {
+      return;
+    }
+  }
+  new_entry_off = (u32)count * 12;
+  new_entry = (u8 *)queue + new_entry_off;
+  *(u16 *)(new_entry + 4) = (u16)(lookup | 0x8000);
+  r5 = fn_8011F5B0(r30);
+  new_entry_off = (u32)*queue * 12;
+  new_entry = (u8 *)queue + new_entry_off;
+  *(u32 *)(new_entry + 0xC) = r5;
+  r5 = fn_8011F520(r30);
+  new_entry_off = (u32)*queue * 12;
+  new_entry = (u8 *)queue + new_entry_off;
+  *(u32 *)(new_entry + 0x8) = r5;
+  *queue = (u16)(*queue + 1);
+}
 
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80260070(void) {
 #include "src/game/colosseum_battle_fn_80260070.inc"
 }
-#else
-void fn_80260070(void) { /* TODO */ }
 #endif
 #pragma pop
+void fn_80260070(u16 *r3) {
+  u16 *queue;
+  int i;
+  u32 off;
+  u8 *entry;
+  queue = r3;
+  if (queue == (u16 *)0) {
+    queue = (u16 *)fn_80129280(0, 0xC);
+  }
+  *queue = 0;
+  off = 0;
+  for (i = 0; i < 0x1F4; i++) {
+    entry = (u8 *)queue + off;
+    *(u16 *)(entry + 4) = 0;
+    *(u32 *)(entry + 0xC) = fn_800E0C04(-1);
+    off += 12;
+  }
+}
 
 /* Address: 0x8026045C | Size: 0x27C | Ghidra import */
 int fn_8026045C(u32 r3,u32 r4,int r5)

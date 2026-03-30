@@ -1,0 +1,13 @@
+    nofralloc
+/* 800DF188 000DC188  94 21 FF F0 */	stwu r1, -0x10(r1)
+/* 800DF18C 000DC18C  C0 22 94 2C */	lfs f1, -27604(r2)
+/* 800DF190 000DC190  80 83 00 08 */	lwz r4, 0x8(r3)
+/* 800DF194 000DC194  80 84 00 0C */	lwz r4, 0xc(r4)
+/* 800DF198 000DC198  C0 04 00 0C */	lfs f0, 0xc(r4)
+/* 800DF19C 000DC19C  EC 01 00 32 */	fmuls f0, f1, f0
+/* 800DF1A0 000DC1A0  FC 00 00 1E */	fctiwz f0, f0
+/* 800DF1A4 000DC1A4  D8 01 00 08 */	stfd f0, 0x8(r1)
+/* 800DF1A8 000DC1A8  80 01 00 0C */	lwz r0, 0xc(r1)
+/* 800DF1AC 000DC1AC  98 03 00 01 */	stb r0, 0x1(r3)
+/* 800DF1B0 000DC1B0  38 21 00 10 */	addi r1, r1, 0x10
+/* 800DF1B4 000DC1B4  4E 80 00 20 */	blr

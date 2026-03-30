@@ -182,7 +182,7 @@ void __DVDLowSetWAType(u32 type, u32 location) {
 
 /* fn_800A41D0 - 0x800A41D0 | size: 0x84 */
 extern void fn_800A42C4(void);
-extern BOOL fn_800A46EC(u32 offset, DVDCBCallback callback);
+extern void fn_800A46EC(void);
 #if 1
 asm void fn_800A41D0(void) {
 #include "src/dolphin/dvd/DVDLow_fn_800A41D0.inc"
@@ -233,16 +233,14 @@ asm void fn_800A46EC(void) {
 }
 #else
 BOOL fn_800A46EC(u32 offset, DVDCBCallback callback) {
-    volatile u32* dvd;
     u32 timeout;
 
     Callback_8047A788 = callback;
-    dvd = (volatile u32*)0xCC006000;
     StopAtNextInt_8047A780 = 0;
 
-    dvd[2] = 0xAB000000;
-    dvd[3] = offset >> 2;
-    dvd[7] = 0x1;
+    DVD_CMD = 0xAB000000;
+    DVD_OFFSET_LO = offset >> 2;
+    DVD_CONTROL = 0x1;
 
     timeout = (BUS_CLOCK / 4) * 10;
     OSCreateAlarm(&AlarmForTimeout_803FC2F8);

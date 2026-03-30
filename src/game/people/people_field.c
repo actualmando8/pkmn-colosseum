@@ -963,6 +963,65 @@ asm void fn_80162118(void) {
 void fn_80162118(void) { /* TODO */ }
 #endif
 #pragma pop
+extern u32  OSEnableInterrupts(void);
+extern u32  OSGetTick(void);
+extern void fn_80098034(void);
+extern void fn_800AC0F8(void);
+extern void fn_800AC110(void);
+extern void fn_800AE794(void);
+extern void fn_800AE7CC(void);
+extern void fn_800AE7E0(void);
+extern void fn_800AE8A4(void);
+extern void fn_800AE8EC(void);
+extern void fn_800AE92C(void);
+extern void fn_800AE93C(void);
+extern void fn_800CE358(void);
+extern void fn_8015B250(void);
+extern void fn_801642AC(void);
+extern void fn_80164520(void);
+extern void fn_80164A2C(void);
+extern void fn_801652DC(void);
+extern void fn_8009B300(void);
+extern void fn_800AC02C(void);
+extern void fn_800AC070(void);
+extern void fn_800ACB44(void);
+extern void fn_800ACB4C(void);
+extern void fn_800AE630(void);
+extern void fn_800AE78C(void);
+extern void fn_8014A280(void);
+extern void fn_80158CD4(void);
+extern void fn_8015A950(void);
+extern void fn_8015AAA0(void);
+extern void fn_8015D44C(void);
+extern void fn_8015D4EC(void);
+extern void fn_8015D54C(void);
+extern void fn_8015D5F4(void);
+extern void fn_8015D7D0(void);
+extern void fn_801629A4(void);
+extern void fn_801629D0(void);
+extern void fn_801629FC(void);
+extern void fn_801632B4(void);
+extern void fn_80163490(void);
+extern void fn_801634A8(void);
+extern void fn_80163794(void);
+extern void fn_801637B8(void);
+extern void fn_80163810(void);
+extern void fn_80163BCC(void);
+extern void fn_80163BE4(void);
+extern void fn_80163CA8(void);
+extern void fn_80163DB0(void);
+extern void fn_80163DE8(void);
+extern void fn_80163FFC(void);
+extern void fn_801640C4(void);
+extern void fn_801640E4(void);
+extern void fn_80164148(void);
+extern void fn_80164204(void);
+extern void fn_80164324(void);
+extern void fn_80164328(void);
+extern void fn_80164360(void);
+extern void fn_801642F8(void);
+extern void fn_801643D8(void);
+extern void fn_80164400(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -1538,23 +1597,24 @@ void fn_801634A8(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163794(void) {
 #include "src/game/people/people_field_fn_80163794.inc"
 }
 #else
-void fn_80163794(void) { /* TODO */ }
+void fn_80163794(void) {}
 #endif
 #pragma pop
+extern void fn_800ACB44(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163798(void) {
 #include "src/game/people/people_field_fn_80163798.inc"
 }
 #else
-void fn_80163798(void) { /* TODO */ }
+void fn_80163798(void) { fn_800ACB44(); }
 #endif
 #pragma pop
 #pragma push

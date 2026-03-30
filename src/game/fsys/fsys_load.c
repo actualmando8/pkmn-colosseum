@@ -534,7 +534,7 @@ extern DVDCacheNode* gDVDCacheHead;
  */
 extern void* fn_800F9318(u32 a, u32 b);
 extern void* fn_800F9418(u32 size, u32 align, u32 a, u32 b, u32 c);
-#if 1
+#if 0
 asm void fn_8017F3F8(void) {
 #include "src/game/fsys/fsys_load_fn_8017F3F8.inc"
 }
@@ -555,7 +555,7 @@ void* fn_8017F3F8(u32 a, u32 b, u32 size) {
 #endif
 
 /* 0x8017F484 | 0x230 */
-extern u32 fn_8017F6B4(u32 a, u32 b);
+extern void fn_8017F6B4(void);
 extern u16 fn_800E2B00(u32 size, u32 align);
 extern void fn_800F9210(u32 a, u32 b);
 extern void fn_8009ED4C(void* p, u32 size);
@@ -615,7 +615,7 @@ u32 fn_8017F6B4(u32 a, u32 b) {
  * (fileHandle=r3, groupID=r4, nameHash=r5). Returns node->field_0xc.
  */
 extern u8 lbl_80454038[];
-#if 1
+#if 0
 asm void fn_8017F728(void) {
 #include "src/game/fsys/fsys_load_fn_8017F728.inc"
 }
@@ -644,7 +644,7 @@ u32 fn_8017F728(u32 fileHandle, u32 groupID, u32 nameHash) {
  * When found: unlinks node from the doubly-linked list (?), decrements
  * count in lbl_80454038+0xc, clears fields, frees associated resource.
  */
-#if 1
+#if 0
 asm void fn_8017F800(void) {
 #include "src/game/fsys/fsys_load_fn_8017F800.inc"
 }
@@ -703,7 +703,7 @@ void fn_8017F800(u32 fileHandle) {
  */
 extern u32 lbl_8047B1D0;
 extern u8 lbl_80455048[];
-#if 1
+#if 0
 asm void fn_8017FA5C(void) {
 #include "src/game/fsys/fsys_load_fn_8017FA5C.inc"
 }
@@ -743,13 +743,13 @@ u32 fn_8017FA5C(void) {
  * Async DVD read request: write r3 data (r4 user, r5 size) to queue.
  * Waits (spin-loop) for completion.
  */
-extern void fn_801808E4(void* entry);
+extern void fn_801808E4(void);
 extern void fn_800AE630(void* p1, void* p2, u32 a, u32 b, void* cb, void* arg, void* src, void* dst, u32 size);
 extern u32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32 saved);
 extern u32 lbl_8047B1D4;
 extern u32 lbl_8047B1D8;
-#if 1
+#if 0
 asm void fn_80180450(void) {
 #include "src/game/fsys/fsys_load_fn_80180450.inc"
 }
@@ -809,7 +809,7 @@ void* fn_80180450(void* src, void* dst, u32 size) {
 /* 0x80180584 | 0x110
  * Async DVD write request variant A (flag34=1, args r6,r7 as callbacks)
  */
-#if 1
+#if 0
 asm void fn_80180584(void) {
 #include "src/game/fsys/fsys_load_fn_80180584.inc"
 }
@@ -860,7 +860,7 @@ void* fn_80180584(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
 /* 0x80180694 | 0x114
  * Async DVD write request variant B (flag34=0, args r6,r7 as callbacks)
  */
-#if 1
+#if 0
 asm void fn_80180694(void) {
 #include "src/game/fsys/fsys_load_fn_80180694.inc"
 }
@@ -916,7 +916,7 @@ asm void fn_801807A8(void) {
 #include "src/game/fsys/fsys_load_fn_801807A8.inc"
 }
 #else
-void* fn_801807A8(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
+void* fn_801807A8(void* src, void* dst, u32 size) {
     DVDQueueEntry* entry;
     DVDQueueEntry* result;
     u32 i;
@@ -964,7 +964,7 @@ void* fn_801807A8(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
  * If entry->mode != 1: clear entry->state (= 0).
  * Return entry->state.
  */
-#if 1
+#if 0
 asm void fn_801808B4(void) {
 #include "src/game/fsys/fsys_load_fn_801808B4.inc"
 }

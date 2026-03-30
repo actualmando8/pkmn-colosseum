@@ -218,7 +218,7 @@ void fn_801A4098(void) {}
 #endif
 
 /* 0x801A40F8 | 0x174 */
-extern void fn_801C25E4(void);
+extern void fn_801C25E4();
 #if 1
 asm void fn_801A40F8(void) {
 #include "src/hsd/hsd_lobj_fn_801A40F8.inc"
@@ -275,6 +275,7 @@ asm void fn_801A48B0(void) {
 #include "src/hsd/hsd_lobj_fn_801A48B0.inc"
 }
 #else
+#pragma optimization_level 4
 /* HSD_LObjGetInterestPosition */
 s32 fn_801A48B0(HSD_LObj* lobj) {
     if (lobj != NULL) {
@@ -319,6 +320,7 @@ asm void fn_801A497C(void) {
 #include "src/hsd/hsd_lobj_fn_801A497C.inc"
 }
 #else
+#pragma optimization_level 4
 /* HSD_LObjGetPositionPosition */
 s32 fn_801A497C(HSD_LObj* lobj) {
     if (lobj != NULL) {

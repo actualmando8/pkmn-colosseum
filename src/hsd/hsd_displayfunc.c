@@ -129,13 +129,17 @@ void fn_80198B20(void* dobj, void* mtx, void* renderState) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA35C(void);
-#if 1
+extern void fn_801AA35C(void* list, u32 size, u32 alignment);
+extern u8 lbl_80465348[];
+#if 0
 asm void fn_80198F4C(void) {
 #include "src/hsd/hsd_displayfunc_fn_80198F4C.inc"
 }
 #else
-void fn_80198F4C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80198F4C(void) {
+    fn_801AA35C(lbl_80465348, 0x48, 4);
+}
 #endif
 #pragma pop
 

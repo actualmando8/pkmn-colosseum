@@ -30,9 +30,13 @@ extern __rom_copy_info _rom_copy_info[];
 extern __bss_init_info _bss_init_info[];
 
 /* External function declarations */
+/* __init_registers - 0x800032B0 | size: 0x90 */
 void __init_registers(void);
+/* __init_hardware - 0x80003400 | size: 0x24 */
 void __init_hardware(void);
+/* __init_data - 0x80003340 | size: 0xc0 */
 void __init_data(void);
+/* __flush_cache - 0x80003424 | size: 0x34 */
 void __flush_cache(void* addr, u32 size);
 
 extern void DBInit(void);
@@ -60,6 +64,7 @@ extern void __OSCacheInit(void);
  * copies data sections, sets up debug/TRK support, initializes the OS,
  * then calls main(). Written as asm for exact register matching.
  */
+/* __start - 0x80003154 | size: 0x15c */
 asm void __start(void) {
     nofralloc
     bl __init_registers
@@ -308,3 +313,47 @@ _flush_loop:
     isync
     blr
 }
+
+/* ===== Phase 2 recovery stubs ===== */
+
+/* __check_pad3 - 0x80003100 | size: 0x40 */
+
+/* __set_debug_bba - 0x80003140 | size: 0xc */
+
+/* __get_debug_bba - 0x8000314C | size: 0x8 */
+
+/* fn_80003458 - 0x80003458 | size: 0x30 */
+extern void fn_800C0DA8(void);
+#if 1
+asm void fn_80003458(void) {
+#include "src/init/__start_fn_80003458.inc"
+}
+#else
+void fn_80003458(void) { /* TODO: match */ }
+#endif
+
+/* fn_80003488 - 0x80003488 | size: 0x24 */
+#if 1
+asm void fn_80003488(void) {
+#include "src/init/__start_fn_80003488.inc"
+}
+#else
+void fn_80003488(void) { /* TODO: match */ }
+#endif
+
+/* fn_800053E0 - 0x800053E0 | size: 0x2c */
+extern void OSResetSystem(int, int, int);
+#if 1
+asm void fn_800053E0(void) {
+#include "src/init/__start_fn_800053E0.inc"
+}
+#else
+void fn_800053E0(void) { /* TODO: match */ }
+#endif
+
+/* memset - 0x8000540C | size: 0x30 */
+
+/* __fill_mem - 0x8000543C | size: 0xb8 */
+
+/* memcpy - 0x800054F4 | size: 0x50 */
+

@@ -352,122 +352,59 @@ asm void fn_800AA4D4(void) {
 #include "src/dolphin/vi/VIFull_fn_800AA4D4.inc"
 }
 #else
-void fn_800AA4D4(void) {
-    extern u8 lbl_803FC5E0[];
-    extern u32 lbl_80478A10;
-    extern u32 lbl_80478A14;
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+void fn_800AA4D4(s32 chan) {
+    u8* base;
+    u32 mode;
+    u32 chanBit;
 
-    r5 = (u32)lbl_803FC5E0;
-    r6 = r3 * 0xc;
-    r5 = (u32)lbl_803FC5E0;
-    r31 = r5 + r6;
-    tmp = lbl_80478A14;
-    r4 = tmp & 0x00000700;
-    tmp = 0x80000000;
-    tmp = (u32)tmp >> r3;
-    if ((s32)r4 != 0x400) {
-        if ((s32)r4 < 0x400) {
-            if ((s32)r4 != 0x200) {
-                if ((s32)r4 < 0x200) {
-                    if ((s32)r4 != 0x100) {
-                        if ((s32)r4 >= 0x100) goto L_800AA5FC;
-                        if ((s32)r4 != 0) {
-                            goto L_800AA5FC;
-                        }
-                        if ((s32)r4 == 0x300) goto L_800AA5FC;
-                        goto L_800AA5FC;
-                    }
-                    if ((s32)r4 != 0x600) {
-                        if ((s32)r4 < 0x600) {
-                        }
-                        if ((s32)r4 == 0x500) goto L_800AA564;
-                        goto L_800AA5FC;
-                    }
-                    if ((s32)r4 == 0x700) goto L_800AA564;
-                    goto L_800AA5FC;
-                }
-            L_800AA564:
-                r4 = *(u8*)((u8*)r31 + 0x6);
-                /* clrrwi r4, r4, 4 */;
-                *(u8*)((u8*)r31 + 0x6) = r4;
-                r4 = *(u8*)((u8*)r31 + 0x7);
-                /* clrrwi r4, r4, 4 */;
-                *(u8*)((u8*)r31 + 0x7) = r4;
-                r4 = *(u8*)((u8*)r31 + 0x8);
-                /* clrrwi r4, r4, 4 */;
-                *(u8*)((u8*)r31 + 0x8) = r4;
-                r4 = *(u8*)((u8*)r31 + 0x9);
-                /* clrrwi r4, r4, 4 */;
-                *(u8*)((u8*)r31 + 0x9) = r4;
-                goto L_800AA5FC;
-                    }
-            r4 = *(u8*)((u8*)r31 + 0x4);
-            /* clrrwi r4, r4, 4 */;
-            *(u8*)((u8*)r31 + 0x4) = r4;
-            r4 = *(u8*)((u8*)r31 + 0x5);
-            /* clrrwi r4, r4, 4 */;
-            *(u8*)((u8*)r31 + 0x5) = r4;
-            r4 = *(u8*)((u8*)r31 + 0x8);
-            /* clrrwi r4, r4, 4 */;
-            *(u8*)((u8*)r31 + 0x8) = r4;
-            r4 = *(u8*)((u8*)r31 + 0x9);
-            /* clrrwi r4, r4, 4 */;
-            *(u8*)((u8*)r31 + 0x9) = r4;
-            goto L_800AA5FC;
+    base = &lbl_803FC5E0[chan * 12];
+    mode = lbl_80478A14 & 0x700;
+    chanBit = 0x80000000u >> chan;
+    switch (mode) {
+    case 0x000:
+    case 0x500:
+    case 0x600:
+    case 0x700:
+        base[6] &= 0xF0;
+        base[7] &= 0xF0;
+        base[8] &= 0xF0;
+        base[9] &= 0xF0;
+        break;
+    case 0x100:
+        base[4] &= 0xF0;
+        base[5] &= 0xF0;
+        base[8] &= 0xF0;
+        base[9] &= 0xF0;
+        break;
+    case 0x200:
+        base[4] &= 0xF0;
+        base[5] &= 0xF0;
+        base[6] &= 0xF0;
+        base[7] &= 0xF0;
+        break;
+    default:
+        break;
+    }
+    base[2] = (u8)(base[2] - 0x80);
+    base[3] = (u8)(base[3] - 0x80);
+    base[4] = (u8)(base[4] - 0x80);
+    base[5] = (u8)(base[5] - 0x80);
+    if (lbl_80478A10 & chanBit) {
+        if ((s8)base[2] > 64) {
+            if ((SIGetType(chan) & ~0xFFFF) == 0x09000000u) {
+                base[2] = 0;
             }
-        r4 = *(u8*)((u8*)r31 + 0x4);
-        /* clrrwi r4, r4, 4 */;
-        *(u8*)((u8*)r31 + 0x4) = r4;
-        r4 = *(u8*)((u8*)r31 + 0x5);
-        /* clrrwi r4, r4, 4 */;
-        *(u8*)((u8*)r31 + 0x5) = r4;
-        r4 = *(u8*)((u8*)r31 + 0x6);
-        /* clrrwi r4, r4, 4 */;
-        *(u8*)((u8*)r31 + 0x6) = r4;
-        r4 = *(u8*)((u8*)r31 + 0x7);
-        /* clrrwi r4, r4, 4 */;
-        *(u8*)((u8*)r31 + 0x7) = r4;
+        }
     }
-L_800AA5FC:
-    r4 = *(u8*)((u8*)r31 + 0x2);
-    *(u8*)((u8*)r31 + 0x2) = r4;
-    r4 = *(u8*)((u8*)r31 + 0x3);
-    *(u8*)((u8*)r31 + 0x3) = r4;
-    r4 = *(u8*)((u8*)r31 + 0x4);
-    *(u8*)((u8*)r31 + 0x4) = r4;
-    r4 = *(u8*)((u8*)r31 + 0x5);
-    *(u8*)((u8*)r31 + 0x5) = r4;
-    r4 = lbl_80478A10;
-    /* and. tmp, r4, tmp */;
-    if ((s32)r4 != 0x700) {
-        tmp = *(u8*)((u8*)r31 + 0x2);
-        tmp = (s8)tmp;
-        if ((s32)tmp > 0x40) {
-            SIGetType();
-            /* clrrwi r3, r3, 16 */;
-            /* subis tmp, r3, 0x900 */;
-            if (tmp == 0) {
-                tmp = 0x0;
-                *(u8*)((u8*)r31 + 0x2) = tmp;
-    }
-    }
-    }
-    return;
 }
 #endif
 
 /* fn_800AA678 - 0x800AA678 | size: 0xC4 */
-extern void fn_800D05A4(void);
+extern void fn_800D05A4(u32 chan, void* buf);
 extern void fn_800D0338(u32 chan, u32 cmd);
-extern void fn_800D03C8(void);
-extern void fn_800D0CBC(void);
-extern void fn_800AA4D4(void);
+extern void fn_800D03C8(u32 mask);
+extern void fn_800D0CBC(u32 chan, void* callback);
+extern void fn_800AA4D4();
 extern void fn_800AA8D4(void);
 extern void* memset(void* dst, int val, u32 n);
 extern u32 lbl_80478A0C;
@@ -480,73 +417,34 @@ asm void fn_800AA678(void) {
 #include "src/dolphin/vi/VIFull_fn_800AA678.inc"
 }
 #else
-void fn_800AA678(void) {
-    u8 sp[0x30];
-    extern u8 lbl_803FC5E0[];
-    extern u32 lbl_80478A0C;
-    extern u32 lbl_80478A14;
-    extern u32 lbl_8047A8A4;
-    extern u32 lbl_8047A8A8;
-    extern void fn_800AA4D4();
-    extern void fn_800D0338();
-    extern void fn_800D03C8();
-    extern void fn_800D05A4();
-    extern void fn_800D0CBC();
-    extern void fn_800AA8D4();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+void fn_800AA678(u32 chan, u32 status) {
+    u32 buf[4];
+    u32 curChan;
+    u32 pending;
+    u32 nextChan;
 
-    tmp = r4 & 0xF;
-    if ((s32)tmp == 0) {
-        r3 = lbl_80478A0C;
-        fn_800AA4D4();
-        r31 = lbl_80478A0C;
-        tmp = 0x80000000;
-        r3 = lbl_8047A8A4;
-        r4 = (u32)sp + 0x1c;
-        tmp = (u32)tmp >> r31;
-        tmp = r3 | tmp;
-        lbl_8047A8A4 = tmp;
-        r3 = r31;
-        fn_800D05A4();
-        tmp = lbl_80478A14;
-        r3 = r31 + 0x0;
-        r4 = tmp | (0x40 << 16);
-        fn_800D0338();
-        r3 = lbl_8047A8A4;
-        fn_800D03C8();
+    if ((status & 0xF) == 0) {
+        fn_800AA4D4(lbl_80478A0C);
+        curChan = lbl_80478A0C;
+        lbl_8047A8A4 |= (0x80000000u >> curChan);
+        fn_800D05A4(curChan, buf);
+        fn_800D0338(curChan, lbl_80478A14 | 0x00400000);
+        fn_800D03C8(lbl_8047A8A4);
     }
-    r5 = lbl_8047A8A8;
-    tmp = __cntlzw(r5);
-    lbl_80478A0C = tmp;
-    r4 = lbl_80478A0C;
-    if ((s32)r4 != 0x20) {
-        tmp = 0x80000000;
-        tmp = (u32)tmp >> r4;
-        tmp = r5 & ~tmp;
-        r4 = r4 * 0xc;
-        lbl_8047A8A8 = tmp;
-        r3 = (u32)lbl_803FC5E0;
-        tmp = (u32)lbl_803FC5E0;
-        r3 = tmp + r4;
-        r4 = 0x0;
-        r5 = 0xc;
-        memset((void*)r3, (int)r4, (u32)r5);
-        r4 = (u32)fn_800AA8D4;
-        r3 = lbl_80478A0C;
-        r4 = (u32)fn_800AA8D4;
-        fn_800D0CBC();
+    pending = lbl_8047A8A8;
+    nextChan = __cntlzw(pending);
+    lbl_80478A0C = nextChan;
+    if (nextChan != 32) {
+        lbl_8047A8A8 = pending & ~(0x80000000u >> nextChan);
+        memset(&lbl_803FC5E0[nextChan * 0xC], 0, 0xC);
+        fn_800D0CBC(lbl_80478A0C, fn_800AA8D4);
     }
-    return;
 }
 #endif
 
 /* fn_800AA73C - 0x800AA73C | size: 0xC0 */
 extern void fn_800D0464(u32 mask);
-extern void fn_800A115C(void);
+extern void fn_800A115C(u32 chan, u32 val);
 extern u32 lbl_8047A8A4;
 extern u32 lbl_8047A8B0;
 extern u32 lbl_8047A8B4;
@@ -556,64 +454,28 @@ asm void fn_800AA73C(void) {
 #include "src/dolphin/vi/VIFull_fn_800AA73C.inc"
 }
 #else
-void fn_800AA73C(void) {
-    extern u32 lbl_8047A8A4;
-    extern u32 lbl_8047A8B0;
-    extern u32 lbl_8047A8B4;
-    extern u32 lbl_8047A8B8;
-    extern void fn_800A115C();
-    extern void fn_800AA4D4();
-    extern void fn_800D0464();
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_800AA73C(s32 chan, s32 status) {
+    u32 chanBit;
+    u32 mask;
+    BOOL intr;
 
-    tmp = 0x80000000;
-    r31 = r4 + 0x0;
-    r29 = r3;
-    r30 = (u32)tmp >> r29;
-    r3 = lbl_8047A8A4;
-    /* and. tmp, r3, r30 */;
-    if ((s32)tmp != 0) {
-        tmp = r31 & 0xF;
-        if ((s32)tmp == 0) {
-            r3 = r29;
-            fn_800AA4D4();
+    chanBit = 0x80000000u >> chan;
+    if (lbl_8047A8A4 & chanBit) {
+        if (!(status & 0xF)) {
+            fn_800AA4D4(chan);
         }
-        tmp = r31 & 0x00000008;
-        if ((s32)tmp != 0) {
-            OSDisableInterrupts();
-            r31 = r3 + 0x0;
-            r3 = r30 + 0x0;
-            fn_800D0464();
-            r6 = lbl_8047A8A4;
-            r8 = ~(r30 | r30);
-            r5 = lbl_8047A8B0;
-            r3 = r29;
-            r4 = lbl_8047A8B4;
-            tmp = lbl_8047A8B8;
-            r7 = r6 & r8;
-            r6 = r5 & r8;
-            lbl_8047A8A4 = r7;
-            r5 = r4 & r8;
-            tmp = tmp & r8;
-            lbl_8047A8B0 = r6;
-            r4 = 0x0;
-            lbl_8047A8B4 = r5;
-            lbl_8047A8B8 = tmp;
-            fn_800A115C();
-            r3 = r31;
-            OSRestoreInterrupts(r3);
+        if (status & 0x8) {
+            intr = OSDisableInterrupts();
+            fn_800D0464(chanBit);
+            mask = ~chanBit;
+            lbl_8047A8A4 = lbl_8047A8A4 & mask;
+            lbl_8047A8B0 = lbl_8047A8B0 & mask;
+            lbl_8047A8B4 = lbl_8047A8B4 & mask;
+            lbl_8047A8B8 = lbl_8047A8B8 & mask;
+            fn_800A115C(chan, 0);
+            OSRestoreInterrupts(intr);
+        }
     }
-    }
-    return;
 }
 #endif
 
@@ -1734,33 +1596,30 @@ asm void fn_800AB4FC(void) {
 void fn_800AB4FC(u32* types) {
     BOOL enabled;
     s32 i;
-    BOOL changed;
+    s32 changed;
     u32 type;
     u32 cmd;
-    u32* p;
 
-    p = types;
     enabled = OSDisableInterrupts();
-    changed = FALSE;
+    changed = 0;
     i = 0;
     do {
         if (lbl_8047A8A4 & (0x80000000u >> i)) {
-            if ((SIGetType(i) & 0x20000000) == 0) {
-                type = *p;
+            if (!(SIGetType(i) & 0x20000000)) {
+                type = types[0];
                 if (lbl_80478A18 < 2u && type == 2u) {
                     type = 0;
                 }
-                cmd = lbl_80478A14;
-                cmd |= 0x00400000;
+                cmd = lbl_80478A14 | 0x00400000;
                 cmd |= (type & 0x3);
                 fn_800D0338(i, cmd);
-                changed = TRUE;
+                changed = 1;
             }
         }
         i++;
-        p++;
+        types++;
     } while (i < 4);
-    if (changed != FALSE) {
+    if (changed) {
         fn_800D034C();
     }
     OSRestoreInterrupts(enabled);
@@ -2310,19 +2169,19 @@ asm void fn_800ABCF4(void) {
 #include "src/dolphin/vi/VIFull_fn_800ABCF4.inc"
 }
 #else
-void fn_800ABCF4(u32 chan) {
+void fn_800ABCF4(u32 spec) {
     BOOL enabled;
-    u32 a4;
+    u32 oldA4;
     u32 mask;
 
     enabled = OSDisableInterrupts();
-    a4 = lbl_8047A8A4;
-    mask = ~a4;
-    lbl_80478A14 = chan << 8;
-    lbl_8047A8A4 = a4 & mask;
-    lbl_8047A8B0 = lbl_8047A8B0 & mask;
-    lbl_8047A8B4 = lbl_8047A8B4 & mask;
-    fn_800D0464(a4);
+    oldA4 = lbl_8047A8A4;
+    lbl_80478A14 = spec << 8;
+    mask = ~oldA4;
+    lbl_8047A8A4 &= mask;
+    lbl_8047A8B0 &= mask;
+    lbl_8047A8B4 &= mask;
+    fn_800D0464(oldA4);
     OSRestoreInterrupts(enabled);
 }
 #endif
@@ -2472,13 +2331,13 @@ void fn_800ABD68(void) {
 void fn_800ABEFC(u32 retraceCount, OSContext* currentCtx) {
     extern u32 lbl_8047A8BC;
     OSContext tmpCtx;
-    void (*callback)(u32);
+    void (*callback)(void);
 
-    callback = (void (*)(u32))lbl_8047A8BC;
+    callback = (void (*)(void))lbl_8047A8BC;
     if (callback != NULL) {
         OSClearContext(&tmpCtx);
         OSSetCurrentContext(&tmpCtx);
-        callback(retraceCount);
+        callback();
         OSClearContext(&tmpCtx);
         OSSetCurrentContext(currentCtx);
     }

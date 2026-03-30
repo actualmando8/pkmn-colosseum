@@ -202,21 +202,44 @@ asm void fn_801A6B24(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B24.inc"
 }
 #else
-void fn_801A6B24(void) {}
+void fn_801A6B24(void* info) {
+    if (info == (void*)lbl_8047B2D0) {
+        lbl_8047B2D0 = 0;
+    }
+    if (info == (void*)lbl_8036CB30) {
+        lbl_8047B2D8 = 0;
+        lbl_8047B2DC = 0;
+    }
+    ((HSD_ClassInfo*)lbl_8036CB30)->head.parent->destroy((HSD_Class*)info);
+}
 #endif
 
 /* 0x801A6B8C | 0xA8 */
-extern void fn_801C25E4(void);
-extern void fn_80193AF0(void);
-extern void fn_801BBE60(void);
-extern void fn_801B42C0(void);
-extern void fn_801B7178(void);
+extern void fn_801C25E4(HSD_AObj* aobj);
+extern void fn_80193AF0(void* obj, s32 size);
+extern void fn_801BBE60(HSD_TObj* tobj);
+extern void fn_801B42C0(void* node);
+extern void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id);
 #if 1
 asm void fn_801A6B8C(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B8C.inc"
 }
 #else
-void fn_801A6B8C(void) {}
+void fn_801A6B8C(HSD_MObj* mobj) {
+    fn_801C25E4(mobj->aobj);
+    fn_80193AF0(mobj->mat, 0x14);
+    fn_801BBE60(mobj->tobj);
+    if (mobj->tevdesc != NULL) {
+        fn_801B42C0(mobj->tevdesc);
+    }
+    if (mobj->texp != NULL) {
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
+    }
+    if (mobj->pe != NULL) {
+        fn_80193AF0(mobj->pe, 0xc);
+    }
+    HSD_PARENT_INFO((HSD_MObjInfo*)lbl_8036CB30)->init((HSD_Class*)mobj);
+}
 #endif
 
 /* 0x801A6C34 | 0x70 */
@@ -225,19 +248,54 @@ asm void fn_801A6C34(void) {
 #include "src/hsd/hsd_mobj_fn_801A6C34.inc"
 }
 #else
-void fn_801A6C34(void) {}
+void fn_801A6C34(void* obj) {
+    u32* pp;
+    u32 node;
+
+    if (obj != NULL) {
+        pp = &lbl_8047B2DC;
+        while ((node = *pp) != 0) {
+            if ((void*)node == obj) {
+                *pp = *(u32*)((u8*)obj + 8);
+                *(u32*)((u8*)obj + 8) = 0;
+                return;
+            }
+            pp = (u32*)((u8*)node + 8);
+        }
+    }
+    while (lbl_8047B2DC != 0) {
+        node = lbl_8047B2DC;
+        lbl_8047B2DC = *(u32*)((u8*)node + 8);
+        *(u32*)((u8*)node + 8) = 0;
+    }
+}
 #endif
 
 /* 0x801A6CA4 | 0x64 */
-extern void fn_80196E10(void);
-extern u8 lbl_8047DC18[];
-extern u8 lbl_8047DC20[];
+extern void fn_80196E10(void* file, s32 line, void* msg);
+extern u32 lbl_8047DC18;
+extern u32 lbl_8047DC20;
 #if 1
 asm void fn_801A6CA4(void) {
 #include "src/hsd/hsd_mobj_fn_801A6CA4.inc"
 }
 #else
-void fn_801A6CA4(void) {}
+void fn_801A6CA4(void* obj) {
+    void* node;
+
+    if (obj == NULL) {
+        fn_80196E10(&lbl_8047DC18, 0x495, &lbl_8047DC20);
+    }
+    node = (void*)lbl_8047B2DC;
+    while (node != NULL) {
+        if (node == obj) {
+            return;
+        }
+        node = *(void**)((u8*)node + 8);
+    }
+    *(u32*)((u8*)obj + 8) = lbl_8047B2DC;
+    lbl_8047B2DC = (u32)obj;
+}
 #endif
 
 /* 0x801A6D08 | 0x54 */
@@ -246,35 +304,56 @@ asm void fn_801A6D08(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D08.inc"
 }
 #else
-void fn_801A6D08(void) {}
+void fn_801A6D08(HSD_MObj* mobj) {
+    if (mobj != NULL) {
+        HSD_CLASS_METHOD(mobj)->init((HSD_Class*) mobj);
+        HSD_CLASS_METHOD(mobj)->release((HSD_Class*) mobj);
+    }
+}
 #endif
 
 /* 0x801A6D5C | 0x44 */
-extern void fn_801BBE3C(void);
-#if 1
+extern void fn_801BBE3C(void* a, void* b);
+#if 0
 asm void fn_801A6D5C(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D5C.inc"
 }
 #else
-void fn_801A6D5C(void) {}
+void fn_801A6D5C(void* a, void* b, void* c) {
+    if (a == NULL || b == NULL || c == NULL) {
+        return;
+    }
+    fn_801BBE3C(b, c);
+}
 #endif
 
 /* 0x801A6DA0 | 0x24 */
-#if 1
+#if 0
 asm void fn_801A6DA0(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DA0.inc"
 }
 #else
-void fn_801A6DA0(void) {}
+void fn_801A6DA0(u32* a, u32* b) {
+    if (a == NULL || b == NULL) {
+        return;
+    }
+    *(u32**)((u8*)b + 8) = *(u32**)((u8*)a + 8);
+    *(u32**)((u8*)a + 8) = (u32*)b;
+}
 #endif
 
 /* 0x801A6DC4 | 0x18 */
-#if 1
+#if 0
 asm void fn_801A6DC4(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DC4.inc"
 }
 #else
-void fn_801A6DC4(void) {}
+u32* fn_801A6DC4(u32* node) {
+    if (node == NULL) {
+        return NULL;
+    }
+    return *(u32**)((u8*)node + 8);
+}
 #endif
 
 /* 0x801A6DDC | 0x24 */
@@ -283,43 +362,97 @@ asm void fn_801A6DDC(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DDC.inc"
 }
 #else
-void fn_801A6DDC(void) {}
+void fn_801A6DDC(HSD_MObj* mobj, f32 val) {
+    if (mobj == NULL) {
+        return;
+    }
+    if (mobj->mat == NULL) {
+        return;
+    }
+    mobj->mat->alpha = val;
+}
 #endif
 
 /* 0x801A6E00 | 0x24 */
-extern void fn_801BBFE4(void);
-#if 1
+extern void fn_801BBFE4(void* arg);
+#if 0
 asm void fn_801A6E00(void) {
 #include "src/hsd/hsd_mobj_fn_801A6E00.inc"
 }
 #else
-void fn_801A6E00(void) {}
+void fn_801A6E00(void) {
+    fn_801BBFE4(NULL);
+}
 #endif
 
 /* 0x801A6E24 | 0x154 */
-extern void fn_801B28B8(void);
-extern void fn_801B28C8(void);
-extern void fn_801B294C(void);
+extern void fn_801B28B8(HSD_Material* mat, f32 shininess);
+extern void fn_801B28C8(u32* ambient, u32* diffuse, u32* specular, f32 alpha);
+extern void fn_801B294C(u32 flags, HSD_PEDesc* pe);
 extern void fn_801B3884(void);
-extern void fn_801BDA58(void);
+extern void fn_801BDA58(void* tobj);
 #if 1
 asm void fn_801A6E24(void) {
 #include "src/hsd/hsd_mobj_fn_801A6E24.inc"
 }
 #else
-void fn_801A6E24(void) {}
+void fn_801A6E24(HSD_MObj* mobj) {
+    u32 rendermode;
+    u32* pp;
+    u32 tobj_slot;
+    u32 amb_copy, diff_copy, spec_copy;
+
+    fn_801B3884();
+    rendermode = mobj->rendermode;
+    spec_copy = mobj->mat->specular;
+    diff_copy = mobj->mat->diffuse;
+    amb_copy = mobj->mat->ambient;
+    fn_801B28C8(&amb_copy, &diff_copy, &spec_copy, mobj->mat->alpha);
+    if (rendermode & 0x8) {
+        fn_801B28B8(mobj->mat, mobj->mat->shininess);
+    }
+    tobj_slot = (u32)mobj->tobj;
+    pp = NULL;
+    if ((rendermode & 0x04000000) && lbl_8047B2DC != 0) {
+        pp = &tobj_slot;
+        while (*pp != 0) {
+            pp = (u32*)(*pp + 8);
+        }
+        *pp = lbl_8047B2DC;
+    }
+    if ((rendermode & 0x1000) && lbl_8047B2D8 != 0) {
+        u32* d8 = (u32*)lbl_8047B2D8;
+        if (*(u32*)((u8*)d8 + 0x58) != 0) {
+            *(u32*)((u8*)d8 + 0x8) = tobj_slot;
+            tobj_slot = lbl_8047B2D8;
+        }
+    }
+    fn_801BBFE4((void*)tobj_slot);
+    fn_801BDA58((void*)tobj_slot);
+    ((void (*)(HSD_MObj*, u32, u32))(HSD_MOBJ_METHOD(mobj)->make_texp))(mobj, tobj_slot, rendermode);
+    fn_801B294C(rendermode, mobj->pe);
+    if (pp != NULL) {
+        *pp = 0;
+    }
+}
 #endif
 
 /* 0x801A6F78 | 0x78 */
-extern void fn_801B45A4(void);
-extern void fn_801BD8D0(void);
+extern void fn_801B45A4(void* a, void* b);
+extern void fn_801BD8D0(void* a, void* b);
 extern u8 lbl_80274E5C[];
-#if 1
+#if 0
 asm void fn_801A6F78(void) {
 #include "src/hsd/hsd_mobj_fn_801A6F78.inc"
 }
 #else
-void fn_801A6F78(void) {}
+void fn_801A6F78(void* obj, void* a, void* b) {
+    if (*(u32*)((u8*)obj + 0x18) == 0) {
+        fn_80196E10(&lbl_8047DC18, 0x31e, lbl_80274E5C);
+    }
+    fn_801B45A4(*(void**)((u8*)obj + 0x18), *(void**)((u8*)obj + 0x1c));
+    fn_801BD8D0(a, b);
+}
 #endif
 
 /* 0x801A7128 | 0x9FC */
@@ -342,42 +475,135 @@ void fn_801A7128(void) {}
 #endif
 
 /* 0x801A7B24 | 0x1D8 */
-extern void fn_80193748(void);
-extern void fn_80193828(void);
-extern void fn_801B4300(void);
-extern void fn_801BC33C(void);
+extern HSD_MObj* fn_80193748(void* class_name);
+extern HSD_MObj* fn_80193828(HSD_ClassInfo* info);
+extern void fn_801B4300(void* a, void* b);
+extern void fn_801BC33C(void* tobj);
 extern u32 lbl_8047DC30;
 #if 1
 asm void fn_801A7B24(void) {
 #include "src/hsd/hsd_mobj_fn_801A7B24.inc"
 }
 #else
-void fn_801A7B24(void) {}
+HSD_MObj* fn_801A7B24(void* desc) {
+    HSD_MObj* mobj;
+    u32 tobj_slot;
+    typedef void (*load3arg_t)(HSD_MObj*, u32, HSD_TExp**);
+
+    if (desc == NULL) {
+        return NULL;
+    }
+    if (*(u32*)desc != 0) {
+        mobj = fn_80193748(*(void**)desc);
+        if (mobj != NULL) {
+            goto found;
+        }
+    }
+    if (lbl_8047B2D0 != 0) {
+        mobj = fn_80193828((HSD_ClassInfo*)lbl_8047B2D0);
+    } else {
+        mobj = fn_80193828((HSD_ClassInfo*)lbl_8036CB30);
+    }
+    if (mobj == NULL) {
+        fn_80196E10(&lbl_8047DC18, 0x44a, &lbl_8047DC30);
+    }
+    goto call_setup;
+found:
+    mobj = fn_80193828((HSD_ClassInfo*)mobj);
+    if (mobj == NULL) {
+        fn_80196E10(&lbl_8047DC18, 0x175, &lbl_8047DC30);
+    }
+call_setup:
+    HSD_MOBJ_METHOD(mobj)->setup(mobj, (u32)desc);
+    desc = NULL;
+    if (mobj == NULL) {
+        return NULL;
+    }
+    if (mobj->tevdesc != NULL) {
+        fn_801B42C0(mobj->tevdesc);
+        mobj->tevdesc = NULL;
+    }
+    if (mobj->texp != NULL) {
+        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
+        mobj->texp = NULL;
+    }
+    tobj_slot = (u32)mobj->tobj;
+    if ((mobj->rendermode & 0x04000000) && lbl_8047B2DC != 0) {
+        desc = (void*)&tobj_slot;
+        while (*(u32*)desc != 0) {
+            desc = (void*)(*(u32*)desc + 8);
+        }
+        *(u32*)desc = lbl_8047B2DC;
+    }
+    if ((mobj->rendermode & 0x1000) && lbl_8047B2D8 != 0) {
+        u32* d8 = (u32*)lbl_8047B2D8;
+        if (*(u32*)((u8*)d8 + 0x58) != 0) {
+            *(u32*)((u8*)d8 + 0x8) = tobj_slot;
+            tobj_slot = lbl_8047B2D8;
+        }
+    }
+    fn_801BC33C((void*)tobj_slot);
+    ((load3arg_t)(HSD_MOBJ_METHOD(mobj)->load))(mobj, tobj_slot, &mobj->texp);
+    fn_801B4300(&mobj->tevdesc, &mobj->texp);
+    if (desc != NULL) {
+        *(u32*)desc = 0;
+    }
+    return mobj;
+}
 #endif
 
 /* 0x801A7D58 | 0xE4 */
-extern void fn_801BE4CC(void);
-extern void fn_80193B10(void);
+extern u32 fn_801BE4CC(u32 hsd_format);
+extern void* fn_80193B10(s32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
-extern u8 lbl_8047DC28[];
-extern u32 lbl_8047DC2C;
+extern u32 lbl_8047DC28;
+extern f32 lbl_8047DC2C;
 #if 1
 asm void fn_801A7D58(void) {
 #include "src/hsd/hsd_mobj_fn_801A7D58.inc"
 }
 #else
-void fn_801A7D58(void) {}
+s32 fn_801A7D58(void* arg0, void* arg1) {
+    HSD_Material* mat;
+
+    *(u32*)((u8*)arg0 + 4) = *(u32*)((u8*)arg1 + 4);
+    *(u32*)((u8*)arg0 + 8) = fn_801BE4CC(*(u32*)((u8*)arg1 + 8));
+    mat = (HSD_Material*)fn_80193B10(0x14);
+    if (mat == NULL) {
+        fn_80196E10(&lbl_8047DC18, 0x466, &lbl_8047DC28);
+    }
+    memset(mat, 0, 0x14);
+    mat->alpha = lbl_8047DC2C;
+    *(HSD_Material**)((u8*)arg0 + 0xc) = mat;
+    memcpy(*(HSD_Material**)((u8*)arg0 + 0xc),
+           *(HSD_Material**)((u8*)arg1 + 0xc), 0x14);
+    *(u32*)((u8*)arg0 + 4) |= 0x1000;
+    if (*(u32*)((u8*)arg1 + 0x14) != 0) {
+        *(void**)((u8*)arg0 + 0x10) = fn_80193B10(0xc);
+        memcpy(*(void**)((u8*)arg0 + 0x10),
+               *(void**)((u8*)arg1 + 0x14), 0xc);
+    }
+    *(u32*)((u8*)arg0 + 0x14) = 0;
+    return 0;
+}
 #endif
 
 /* 0x801A7E3C | 0x48 */
-extern void fn_801C27F4(void);
-extern void fn_801BE800(void);
-#if 1
+extern void fn_801C27F4(HSD_AObj* aobj, HSD_MObj* mobj,
+                        void (*setup_tev)(HSD_MObj*, HSD_TObj*, u32));
+extern void fn_801BE800(HSD_TObj* tobj);
+#if 0
 asm void fn_801A7E3C(void) {
 #include "src/hsd/hsd_mobj_fn_801A7E3C.inc"
 }
 #else
-void fn_801A7E3C(void) {}
+void fn_801A7E3C(HSD_MObj* mobj) {
+    if (mobj == NULL) {
+        return;
+    }
+    fn_801C27F4(mobj->aobj, mobj, HSD_MOBJ_METHOD(mobj)->setup_tev);
+    fn_801BE800(mobj->tobj);
+}
 #endif
 
 /* 0x801A7E84 | 0x4D0 */

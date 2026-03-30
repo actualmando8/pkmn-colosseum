@@ -1,0 +1,4 @@
+    nofralloc
+/* 800DCAA4 000D9AA4  38 00 00 00 */	li r0, 0x0
+/* 800DCAA8 000D9AA8  98 03 00 03 */	stb r0, 0x3(r3)
+/* 800DCAAC 000D9AAC  4E 80 00 20 */	blr

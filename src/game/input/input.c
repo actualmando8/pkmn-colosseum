@@ -719,3 +719,159 @@ u8 fn_800F7994(s32 padId, s32 mode) {
     return *(u8*)(pad + 0x28);
 }
 
+extern u8* lbl_80478B00;
+#if 1
+asm void fn_800F75FC(void) {
+#include "src/game/input/input_fn_800F75FC.inc"
+}
+#else
+void fn_800F75FC(void) { /* TODO */ }
+#endif
+extern u8* lbl_80478B00;
+#if 1
+asm void fn_800F76E4(void) {
+#include "src/game/input/input_fn_800F76E4.inc"
+}
+#else
+void fn_800F76E4(void) { /* TODO */ }
+#endif
+extern void fn_800E3534(void);
+extern void fn_800DD38C(void);
+extern u8 lbl_80401BF8[];
+extern u8* lbl_80478B00;
+extern u8 lbl_802712E4[];
+#if 1
+asm void fn_800F7758(void) {
+#include "src/game/input/input_fn_800F7758.inc"
+}
+#else
+void fn_800F7758(void) { /* TODO */ }
+#endif
+extern u8 lbl_80401C10[];
+#if 1
+asm void fn_800F7A08(void) {
+#include "src/game/input/input_fn_800F7A08.inc"
+}
+#else
+void fn_800F7A08(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7A7C(void) {
+#include "src/game/input/input_fn_800F7A7C.inc"
+}
+#else
+void fn_800F7A7C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7AF0(void) {
+#include "src/game/input/input_fn_800F7AF0.inc"
+}
+#else
+void fn_800F7AF0(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7B5C(void) {
+#include "src/game/input/input_fn_800F7B5C.inc"
+}
+#else
+void fn_800F7B5C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7BC4(void) {
+#include "src/game/input/input_fn_800F7BC4.inc"
+}
+#else
+void fn_800F7BC4(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7C28(void) {
+#include "src/game/input/input_fn_800F7C28.inc"
+}
+#else
+void fn_800F7C28(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047CCC8;
+#if 1
+asm void fn_800F7C8C(void) {
+#include "src/game/input/input_fn_800F7C8C.inc"
+}
+#else
+void fn_800F7C8C(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047CCC8;
+#if 1
+asm void fn_800F7D38(void) {
+#include "src/game/input/input_fn_800F7D38.inc"
+}
+#else
+void fn_800F7D38(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7DE4(void) {
+#include "src/game/input/input_fn_800F7DE4.inc"
+}
+#else
+void fn_800F7DE4(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7E40(void) {
+#include "src/game/input/input_fn_800F7E40.inc"
+}
+#else
+void fn_800F7E40(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7E9C(void) {
+#include "src/game/input/input_fn_800F7E9C.inc"
+}
+#else
+void fn_800F7E9C(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F7EF8(void) {
+#include "src/game/input/input_fn_800F7EF8.inc"
+}
+#else
+void fn_800F7EF8(void) { /* TODO */ }
+#endif
+extern void fn_800D3094(void);
+extern void fn_800AAD34(void);
+extern void fn_800F8654(void);
+extern void fn_800F8A54(void);
+extern void OSDisableInterrupts();
+extern void* memcpy(void* dst, const void* src, u32 n);
+extern void OSRestoreInterrupts();
+extern u32 lbl_8047AC4C;
+extern u32 lbl_8047AC50;
+#if 1
+asm void fn_800F7F64(void) {
+#include "src/game/input/input_fn_800F7F64.inc"
+}
+#else
+void fn_800F7F64(void) { /* TODO */ }
+#endif
+#if 1
+asm void fn_800F80B0(void) {
+#include "src/game/input/input_fn_800F80B0.inc"
+}
+#else
+void fn_800F80B0(void) { /* TODO */ }
+#endif
+extern void fn_800ABCF4(void);
+extern void fn_800AAF38(void);
+extern void fn_800AB4FC(void);
+extern void fn_800AAE34(void);
+extern void fn_800F8268(void);
+extern void fn_800ABF5C(void);
+extern void SISetSamplingRate();
+extern u32 lbl_8047AC48;
+extern u32 lbl_8047CCD0;
+extern u32 lbl_8047AC4C;
+extern u32 lbl_8047AC50;
+#if 1
+asm void fn_800F8138(void) {
+#include "src/game/input/input_fn_800F8138.inc"
+}
+#else
+void fn_800F8138(void) { /* TODO */ }
+#endif

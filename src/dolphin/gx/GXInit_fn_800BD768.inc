@@ -1,0 +1,15 @@
+    nofralloc
+    lwz r4, -29632(r2)
+    lfs f0, 0x43c(r4)
+    stfs f0, 0x0(r3)
+    lfs f0, 0x440(r4)
+    stfs f0, 0x4(r3)
+    lfs f0, 0x444(r4)
+    stfs f0, 0x8(r3)
+    lfs f0, 0x448(r4)
+    stfs f0, 0xc(r3)
+    lfs f0, 0x44c(r4)
+    stfs f0, 0x10(r3)
+    lfs f0, 0x450(r4)
+    stfs f0, 0x14(r3)
+    blr

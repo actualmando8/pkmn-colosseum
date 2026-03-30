@@ -1043,3 +1043,64 @@ void fn_800F03D4(u32 priority) {
     *(u8*)&lbl_8047AC0C = 1;
 }
 #endif
+extern u32 lbl_8047AC1C;
+#if 1
+asm void fn_800F0030(void) {
+#include "src/game/gs_texture_fn_800F0030.inc"
+}
+#else
+void fn_800F0030(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AC1C;
+#if 1
+asm void fn_800F00C0(void) {
+#include "src/game/gs_texture_fn_800F00C0.inc"
+}
+#else
+void fn_800F00C0(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AC1C;
+#if 1
+asm void fn_800F015C(void) {
+#include "src/game/gs_texture_fn_800F015C.inc"
+}
+#else
+void fn_800F015C(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AC1C;
+#if 1
+asm void fn_800F01F0(void) {
+#include "src/game/gs_texture_fn_800F01F0.inc"
+}
+#else
+void fn_800F01F0(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AC18;
+extern u32 lbl_8047AC14;
+extern u32 lbl_8047AC20;
+extern u32 lbl_8047AC1C;
+extern u32 lbl_8047AC10;
+extern u32 lbl_8047AC24;
+#if 1
+asm void fn_800F0308(void) {
+#include "src/game/gs_texture_fn_800F0308.inc"
+}
+#else
+void fn_800F0308(void) { /* TODO */ }
+#endif
+extern u32 lbl_8047AC0C;
+#if 1
+asm void fn_800F0424(void) {
+#include "src/game/gs_texture_fn_800F0424.inc"
+}
+#else
+void fn_800F0424(void) { /* TODO */ }
+#endif
+void fn_800F0438(void) { /* TODO */ }
+void fn_800F0448(void) { /* TODO */ }
+void fn_800F0470(void) { /* TODO */ }
+void fn_800F0494(void) { /* TODO */ }
+void fn_800F04BC(void) { /* TODO */ }
+void fn_800F04C4(void) { /* TODO */ }
+void fn_800F05A0(void) { /* TODO */ }
+void fn_800F0654(void) { /* TODO */ }

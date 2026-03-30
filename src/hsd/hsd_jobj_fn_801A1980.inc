@@ -1,0 +1,3 @@
+    nofralloc
+    addi r3, r3, 0x54
+    blr

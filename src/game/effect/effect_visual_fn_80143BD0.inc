@@ -1,0 +1,5 @@
+    nofralloc
+/* 80143BD0 00140BD0  28 03 00 00 */	cmplwi r3, 0x0
+/* 80143BD4 00140BD4  4D 82 00 20 */	beqlr
+/* 80143BD8 00140BD8  B0 83 00 0C */	sth r4, 0xc(r3)
+/* 80143BDC 00140BDC  4E 80 00 20 */	blr

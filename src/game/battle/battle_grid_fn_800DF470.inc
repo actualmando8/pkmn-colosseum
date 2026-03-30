@@ -1,0 +1,11 @@
+    nofralloc
+/* 800DF470 000DC470  80 C3 00 3C */	lwz r6, 0x3c(r3)
+/* 800DF474 000DC474  3C 06 01 02 */	addis r0, r6, 0x102
+/* 800DF478 000DC478  28 00 FE FE */	cmplwi r0, 0xfefe
+/* 800DF47C 000DC47C  4D 82 00 20 */	beqlr
+/* 800DF480 000DC480  80 A3 00 08 */	lwz r5, 0x8(r3)
+/* 800DF484 000DC484  3C 80 FE FF */	lis r4, 0xfeff
+/* 800DF488 000DC488  38 04 FE FE */	subi r0, r4, 0x102
+/* 800DF48C 000DC48C  90 C5 00 10 */	stw r6, 0x10(r5)
+/* 800DF490 000DC490  90 03 00 3C */	stw r0, 0x3c(r3)
+/* 800DF494 000DC494  4E 80 00 20 */	blr

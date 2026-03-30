@@ -23,6 +23,9 @@
 
 #include "game/battle/battle.h"
 
+/* Use inline lmw/stmw for prologue/epilogue (all functions in this TU use stmw, not savegpr stubs) */
+#pragma use_lmw_stmw on
+
 /* =========================================================================
  * External function declarations
  * ========================================================================= */
@@ -1118,6 +1121,15 @@ extern u32 lbl_8047B42C;
 extern u32 lbl_8047B430;
 extern u8 lbl_8047B434;
 extern u32 lbl_8047B438;
+extern u8 lbl_8047B440;
+extern u8 lbl_8047B441;
+extern u32 lbl_8047B444;
+extern u32 lbl_8047B450;
+extern u32 lbl_8047B454;
+extern u32 lbl_8047B458;
+extern u32 lbl_8047B45C;
+extern u32 lbl_8047B460;
+extern u32 lbl_8047B468;
 extern u8 lbl_8047B5C1;
 
 extern void* fn_800F92D4(u32 size);
@@ -2119,30 +2131,22 @@ void fn_801E09E0(void) {
 #endif
 
 /* 0x801E0F78 | size: 0x3C | small */
-#if 1
+#if 0
 asm void fn_801E0F78(void) {
 #include "src/game/battle/battle_logic_fn_801E0F78.inc"
 }
 #else
 void fn_801E0F78(void) {
-    extern void fn_8011E15C();
-    extern void fn_8011E778();
-    extern void fn_80166AB8();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    fn_8011E778();
+    extern u32 fn_8011E778(void);
+    extern u32 fn_8011E15C(void);
+    extern void fn_80166AB8(u32, u32, u32);
+    u32 r3;
+    r3 = fn_8011E778();
     if (r3 != 0) {
-        fn_8011E15C();
+        r3 = fn_8011E15C();
         r3 = r3 & 0xFFFF;
-        r4 = 0x0;
-        r5 = 0x0;
-        fn_80166AB8();
+        fn_80166AB8(r3, 0, 0);
     }
-    return;
 }
 #endif
 
@@ -2288,7 +2292,7 @@ L_801E112C:
 #endif
 
 /* 0x801E1170 | size: 0x1C */
-#if 1
+#if 0
 asm void fn_801E1170(void) {
 #include "src/game/battle/battle_logic_fn_801E1170.inc"
 }
@@ -2301,25 +2305,31 @@ void fn_801E1170(void) {
 #endif
 
 /* 0x801E118C | size: 0x10 | tiny */
-#if 1
+#if 0
 asm void fn_801E118C(void) {
 #include "src/game/battle/battle_logic_fn_801E118C.inc"
 }
 #else
-void fn_801E118C(void) { }
+void fn_801E118C(void) {
+    lbl_8047B424 = 3;
+    lbl_8047B428 = 3;
+}
 #endif
 
 /* 0x801E119C | size: 0x14 | tiny */
-#if 1
+#if 0
 asm void fn_801E119C(void) {
 #include "src/game/battle/battle_logic_fn_801E119C.inc"
 }
 #else
-void fn_801E119C(void) { }
+void fn_801E119C(void) {
+    lbl_8047B424 = 2;
+    lbl_8047B428 = 3;
+}
 #endif
 
 /* 0x801E11B0 | size: 0x1C */
-#if 1
+#if 0
 asm void fn_801E11B0(void) {
 #include "src/game/battle/battle_logic_fn_801E11B0.inc"
 }
@@ -2327,58 +2337,51 @@ asm void fn_801E11B0(void) {
 void fn_801E11B0(void) {
     u32 prev = lbl_8047B428;
     lbl_8047B424 = 1;
-    if (prev == 2) { return; }
+    if ((s32)prev == 2) { return; }
     lbl_8047B428 = 1;
 }
 #endif
 
 /* 0x801E11D4 | size: 0xC | tiny */
-#if 1
+#if 0
 asm void fn_801E11D4(void) {
 #include "src/game/battle/battle_logic_fn_801E11D4.inc"
 }
 #else
-void fn_801E11D4(void) { }
+void fn_801E11D4(u8 arg0, u8 arg1) {
+    extern u8 lbl_8047B435;
+    lbl_8047B434 = arg0;
+    lbl_8047B435 = arg1;
+}
 #endif
 
 /* 0x801E11F0 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801E11F0(void) {
 #include "src/game/battle/battle_logic_fn_801E11F0.inc"
 }
 #else
 void fn_801E11F0(void) {
-    extern u8 lbl_80467CF8[];
-    extern void fn_800FE6DC();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r3 = (u32)lbl_80467CF8;
-    r31 = (u32)lbl_80467CF8;
-    r30 = 0x0;
-    *(u32*)&lbl_8047B424 = r30;
-    *(u8*)&lbl_8047B420 = r30;
-    while (1) {
-        tmp = *(u32*)&lbl_8047B42C;
-        if (r30 >= tmp) break;
-        r3 = *(u32*)((u8*)r31 + 0x0);
-        if (r3 != 0) {
-            fn_800FE6DC();
+    extern u32 lbl_80467CF8[];
+    extern void fn_800FE6DC(u32);
+    u32 *ptr;
+    u32 i;
+    ptr = lbl_80467CF8;
+    i = 0;
+    lbl_8047B424 = i;
+    lbl_8047B420 = (u8)i;
+    while (i < lbl_8047B42C) {
+        if (*ptr != 0) {
+            fn_800FE6DC(*ptr);
         }
-        r30 = r30 + 0x1;
-        r31 = r31 + 0x4;
-
-
+        i++;
+        ptr++;
     }
-    return;
 }
 #endif
 
 /* 0x801E1258 | size: 0x1C */
-#if 1
+#if 0
 asm void fn_801E1258(void) {
 #include "src/game/battle/battle_logic_fn_801E1258.inc"
 }
@@ -2391,7 +2394,7 @@ void fn_801E1258(void) {
 #endif
 
 /* 0x801E1274 | size: 0x2C */
-#if 1
+#if 0
 asm void fn_801E1274(void) {
 #include "src/game/battle/battle_logic_fn_801E1274.inc"
 }
@@ -2407,45 +2410,27 @@ asm void fn_801E12A0(void) {
 #include "src/game/battle/battle_logic_fn_801E12A0.inc"
 }
 #else
-void fn_801E12A0(void) {
-    extern u8 lbl_80467CF8[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r4 = *(u32*)&lbl_8047B42C;
-    tmp = r4 + 0x1;
-    if (tmp >= 4) {
-        r3 = 0x0;
-        return;
-    }
-    r4 = (u32)lbl_80467CF8;
-    tmp = 0x4;
-    r4 = (u32)lbl_80467CF8;
-    r5 = r4;
-    ctr_fn = (void(*)(void))tmp;
+s32 fn_801E12A0(u32 arg) {
+    extern u32 lbl_80467CF8[];
+    u32 *ptr;
+    u32 n;
+    if (lbl_8047B42C + 1 >= 4) return 0;
+    ptr = lbl_80467CF8;
+    n = 4;
     do {
-        tmp = *(u32*)((u8*)r5 + 0x0);
-        if (tmp == 0) {
-            r4 = *(u32*)&lbl_8047B42C;
-            *(u32*)((u8*)r5 + 0x0) = r3;
-            r3 = 0x1;
-            tmp = r4 + 0x1;
-            *(u32*)&lbl_8047B42C = tmp;
-            return;
+        if (*ptr == 0) {
+            *ptr = arg;
+            lbl_8047B42C++;
+            return 1;
         }
-        r5 = r5 + 0x4;
-    } while (--ctr != 0);
-    r3 = 0x0;
-    return;
+        ptr++;
+    } while (--n != 0);
+    return 0;
 }
 #endif
 
 /* 0x801E1300 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801E1300(void) {
 #include "src/game/battle/battle_logic_fn_801E1300.inc"
 }
@@ -2453,35 +2438,16 @@ asm void fn_801E1300(void) {
 void fn_801E1300(void) {
     extern u8 lbl_80467CF8[];
     extern u8 lbl_8047B43C;
-    extern void fn_800FE834();
-    extern void fn_801E1368();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r3 = (u32)lbl_80467CF8;
-    r6 = 0x0;
-    tmp = 0x1;
-    r3 = (u32)lbl_80467CF8;
-    r4 = 0x0;
-    *(u8*)&lbl_8047B420 = r6;
-    r5 = 0x10;
-    *(u32*)&lbl_8047B424 = r6;
-    *(u32*)&lbl_8047B42C = r6;
-    *(u32*)&lbl_8047B438 = r6;
-    *(u8*)&lbl_8047B434 = tmp;
-    lbl_8047B43C = r6;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r4 = (u32)fn_801E1368;
-    r3 = 0x1;
-    r6 = (u32)fn_801E1368;
-    r5 = 0xa;
-    r4 = 0xfd;
-    fn_800FE834();
-    return;
+    extern void fn_800FE834(u32, u32, u32, void *);
+    extern void fn_801E1368(void);
+    lbl_8047B420 = 0;
+    lbl_8047B424 = 0;
+    lbl_8047B42C = 0;
+    lbl_8047B438 = 0;
+    lbl_8047B434 = 1;
+    lbl_8047B43C = 0;
+    memset(lbl_80467CF8, 0, 0x10);
+    fn_800FE834(1, 0xfd, 0xa, fn_801E1368);
 }
 #endif
 
@@ -2753,7 +2719,7 @@ L_801E16B8:
 #endif
 
 /* 0x801E16D0 | size: 0x20 */
-#if 1
+#if 0
 asm void fn_801E16D0(void) {
 #include "src/game/battle/battle_logic_fn_801E16D0.inc"
 }
@@ -2770,130 +2736,87 @@ asm void fn_801E16F0(void) {
 }
 #else
 void fn_801E16F0(void) {
-    extern u32 lbl_8047B450;
-    extern void fn_800E202C();
-    extern void fn_800E209C();
-    extern void fn_800E24B0();
-    extern void fn_800EE928();
-    extern void fn_801E386C();
-    extern void fn_801E38D8();
-    extern void fn_801E3F54();
-    extern void fn_801E4724();
-    extern u8 lbl_8047B440;
-    extern u8 lbl_8047B441;
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r31 = 0;
+    extern u32 fn_800E202C(u32 arg);
+    extern void fn_800E209C(u32 arg);
+    extern void fn_800E24B0(void);
+    extern void fn_800EE928(void);
+    extern void fn_801E386C(void);
+    extern s32 fn_801E38D8(void);
+    extern void fn_801E3F54(void);
+    extern void fn_801E4724(void);
+    s32 r3b;
+    u32 r3;
 
-    tmp = (*(u8*)&lbl_8047B440 != 0 && *(u8*)&lbl_8047B441 != 0) ? 0x1 : 0x0;
-    tmp = tmp & 0xFF;
-    if (tmp == 0) return;
+    if (!(lbl_8047B440 != 0 && lbl_8047B441 != 0)) return;
     fn_801E386C();
-    fn_801E38D8();
-    if ((s32)r3 == 4) return;
-    if ((s32)r3 == 3 || ((s32)r3 >= 4 && (s32)r3 < 6)) {
-        /* fall through to music cleanup */
+    r3b = fn_801E38D8();
+    if (r3b == 4) return;
+    if (r3b < 4) {
+        if (r3b < 3) return;
     } else {
-        return;
+        if (r3b >= 6) return;
     }
-    tmp = *(u8*)&lbl_8047B441;
-    if (tmp == 0) return;
+    if (lbl_8047B441 == 0) return;
     fn_801E3F54();
     fn_801E4724();
-    r3 = lbl_8047B450;
-    fn_800E202C();
-    tmp = r3 & 0xFFFF;
-    r31 = r3;
-    if (tmp != 0) {
+    r3 = fn_800E202C(lbl_8047B450);
+    if (r3 & 0xFFFF) {
         fn_800E24B0();
-        r3 = r31;
-        fn_800E209C();
+        fn_800E209C(r3);
     }
-    tmp = 0x0;
-    *(u8*)&lbl_8047B441 = tmp;
+    lbl_8047B441 = 0;
     fn_800EE928();
-
-    return;
 }
 #endif
 
 /* 0x801E17A8 | size: 0x68 | small */
-#if 1
+#if 0
 asm void fn_801E17A8(void) {
 #include "src/game/battle/battle_logic_fn_801E17A8.inc"
 }
 #else
 void fn_801E17A8(void) {
-    extern u8 lbl_80469030[];
+    extern u32 lbl_80469030[];
     extern u32 lbl_8047B454;
     extern u32 lbl_8047B458;
     extern u32 lbl_8047B45C;
-    extern void fn_801E3978();
-    extern u8 lbl_8047B440;
-    extern u8 lbl_8047B441;
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    tmp = (*(u8*)&lbl_8047B440 != 0 && *(u8*)&lbl_8047B441 != 0) ? 0x1 : 0x0;
-    tmp = tmp & 0xFF;
+    extern void fn_801E3978(u32, u32, u32, u32, u32);
+    u8 tmp;
+    tmp = lbl_8047B440 != 0 && lbl_8047B441 != 0;
     if (tmp != 0) {
-        r4 = (u32)lbl_80469030;
-        r3 = lbl_8047B45C;
-        r7 = (u32)lbl_80469030;
-        r4 = lbl_8047B458;
-        r5 = lbl_8047B454;
-        r6 = *(u32*)((u8*)r7 + 0x0);
-        r7 = *(u32*)((u8*)r7 + 0x4);
-        fn_801E3978();
+        fn_801E3978(lbl_8047B45C, lbl_8047B458, lbl_8047B454, lbl_80469030[0], lbl_80469030[1]);
     }
-    return;
 }
 #endif
 
 /* 0x801E1810 | size: 0x64 | small */
-#if 1
+#if 0
 asm void fn_801E1810(void) {
 #include "src/game/battle/battle_logic_fn_801E1810.inc"
 }
 #else
 void fn_801E1810(void) {
     extern u32 lbl_8047B450;
-    extern void fn_800E202C();
-    extern void fn_800E209C();
-    extern void fn_800E24B0();
-    extern void fn_800EE928();
-    extern void fn_801E3F54();
-    extern void fn_801E4724();
+    extern u32 fn_800E202C(u32 arg);
+    extern void fn_800E209C(u32 arg);
+    extern void fn_800E24B0(void);
+    extern void fn_800EE928(void);
+    extern void fn_801E3F54(void);
+    extern void fn_801E4724(void);
     extern u8 lbl_8047B441;
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r31 = 0;
+    u32 r3;
 
-    tmp = *(u8*)&lbl_8047B441;
-    if (tmp != 0) {
+    if (lbl_8047B441 != 0) {
         fn_801E3F54();
         fn_801E4724();
-        r3 = lbl_8047B450;
-        fn_800E202C();
-        tmp = r3 & 0xFFFF;
-        r31 = r3;
-        if (tmp != 0) {
+        r3 = fn_800E202C(lbl_8047B450);
+        if (r3 & 0xFFFF) {
             fn_800E24B0();
-            r3 = r31;
-            fn_800E209C();
+            fn_800E209C(r3);
         }
-        tmp = 0x0;
-        *(u8*)&lbl_8047B441 = tmp;
+        lbl_8047B441 = 0;
         fn_800EE928();
     }
-    return;
 }
 #endif
 
@@ -3134,7 +3057,7 @@ void fn_801E1924(void) {
 
 /* 0x801E1B2C | size: 0x28 */
 extern void fn_801E4A6C(void);
-#if 1
+#if 0
 asm void fn_801E1B2C(void) {
 #include "src/game/battle/battle_logic_fn_801E1B2C.inc"
 }
@@ -3146,31 +3069,31 @@ void fn_801E1B2C(void) {
 #endif
 
 /* 0x801E1B54 | size: 0x30 */
-extern u8 lbl_8046A3D0;
+extern u8 lbl_8046A3D0[];
 extern void fn_8009F230(void*, void*, u32);
 void fn_801E1B54(void* val) {
-    fn_8009F230(&lbl_8046A3D0, val, 1);
+    fn_8009F230(lbl_8046A3D0, val, 1);
 }
 
 /* 0x801E1B84 | size: 0x34 */
 extern void fn_8009F2F8(void*, void*, u32);
 u32 fn_801E1B84(void) {
     u32 result;
-    fn_8009F2F8(&lbl_8046A3D0, &result, 1);
+    fn_8009F2F8(lbl_8046A3D0, &result, 1);
     return result;
 }
 
 /* 0x801E1BB8 | size: 0x30 */
-extern u8 lbl_8046A410;
+extern u8 lbl_8046A410[];
 void fn_801E1BB8(void* val) {
-    fn_8009F230(&lbl_8046A410, val, 1);
+    fn_8009F230(lbl_8046A410, val, 1);
 }
 
 /* 0x801E1BE8 | size: 0x34 */
-extern u8 lbl_8046A3F0;
+extern u8 lbl_8046A3F0[];
 u32 fn_801E1BE8(void) {
     u32 result;
-    fn_8009F2F8(&lbl_8046A3F0, &result, 1);
+    fn_8009F2F8(lbl_8046A3F0, &result, 1);
     return result;
 }
 
@@ -3183,86 +3106,63 @@ asm void fn_801E1C1C(void) {
 void fn_801E1C1C(void) {
     extern u8 lbl_80469040[];
     extern u8 lbl_8046AC60[];
-    extern void fn_800A221C();
-    extern void fn_800A541C();
-    extern void fn_801E446C();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern s32 fn_8009F2F8(void *, void *, u32);
+    extern void fn_8009F230(void *, void *, u32);
+    extern s32 fn_800A541C(void *, u32, u32, u32, u32);
+    extern void fn_800A221C(void *);
+    extern void fn_801E446C(u32);
+    u8 *base;
+    u8 *base2;
+    u8 sp[8];
+    u32 counter;
+    u32 val_bc;
+    u32 val_b8;
+    u32 *item;
+    u32 result;
+    u32 c0val;
+    u32 div;
+    u32 r3;
 
-    r3 = (u32)lbl_8046AC60;
-    r4 = (u32)lbl_80469040;
-    r28 = (u32)lbl_8046AC60;
-    r29 = 0x0;
-    r27 = (u32)lbl_80469040;
-    r31 = *(u32*)((u8*)r28 + 0xB8);
-    r30 = *(u32*)((u8*)r28 + 0xBC);
-    do {
-        r3 = r27 + 0x13d0;
-        r4 = (u32)sp + 0x8;
-        r5 = 0x1;
-        ((void(*)(void))fn_8009F2F8)();
-        r3 = r28;
-        r5 = r30;
-        r6 = r31;
-        r4 = *(u32*)((u8*)r26 + 0x0);
-        r7 = 0x2;
-        fn_800A541C();
-        if ((s32)r3 != (s32)r30) {
-            if ((s32)r3 == (s32)-0x1) {
-                tmp = -0x1;
-                *(u32*)((u8*)r28 + 0xA8) = tmp;
+    base = lbl_8046AC60;
+    base2 = lbl_80469040;
+    counter = 0;
+    val_b8 = *(u32 *)(base + 0xb8);
+    val_bc = *(u32 *)(base + 0xbc);
+    while (1) {
+        fn_8009F2F8(base2 + 0x13d0, sp, 1);
+        item = *(u32 **)sp;
+        result = fn_800A541C(base, item[0], val_bc, val_b8, 2);
+        if ((s32)result != (s32)val_bc) {
+            if ((s32)result == -1) {
+                *(u32 *)(base + 0xa8) = (u32)-1;
             }
-            if ((s32)r29 == 0) {
-                r3 = 0x0;
-                fn_801E446C();
+            if ((s32)counter == 0) {
+                fn_801E446C(0);
             }
-            r3 = r27 + 0x1000;
-            fn_800A221C();
+            fn_800A221C(base2 + 0x1000);
         }
-        *(u32*)((u8*)r26 + 0x4) = r29;
-        r4 = r26;
-        r3 = r27 + 0x13b0;
-        r5 = 0x1;
-        ((void(*)(void))fn_8009F230)();
-        tmp = *(u32*)((u8*)r28 + 0xC0);
-        r31 = r31 + r30;
-        r6 = *(u32*)((u8*)r28 + 0x50);
-        r4 = r29 + tmp;
-        r5 = *(u32*)((u8*)r26 + 0x0);
-        r3 = (u32)r4 / (u32)r6;
-        r30 = *(u32*)((u8*)r5 + 0x0);
-        r3 = r3 * r6;
-        r3 = r4 - r3;
-        do {
-            if (r3 != tmp) break;
-            tmp = *(u8*)((u8*)r28 + 0xA6);
-            tmp = tmp & 0x1;
-            if (r3 != tmp) {
-                r31 = *(u32*)((u8*)r28 + 0x64);
-                break;
+        item[1] = counter;
+        fn_8009F230(base2 + 0x13b0, item, 1);
+        c0val = *(u32 *)(base + 0xc0);
+        val_b8 += val_bc;
+        div = *(u32 *)(base + 0x50);
+        r3 = (counter + c0val) % div;
+        val_bc = *(u32 *)(item[0]);
+        if (r3 == div - 1) {
+            if (*(u8 *)(base + 0xa6) & 1) {
+                val_b8 = *(u32 *)(base + 0x64);
+            } else {
+                fn_800A221C(base2 + 0x1000);
             }
-            r3 = r27 + 0x1000;
-            fn_800A221C();
-        } while (0);
-        r29 = r29 + 0x1;
-    } while (1);
+        }
+        counter++;
+    }
 }
 #endif
 
 /* 0x801E1D0C | size: 0x3C | small */
 /* Cancel the battle thread if it is active. */
-#if 1
+#if 0
 asm void fn_801E1D0C(void) {
 #include "src/game/battle/battle_logic_fn_801E1D0C.inc"
 }
@@ -3271,7 +3171,7 @@ void fn_801E1D0C(void) {
     extern u8 lbl_8046A040[];
     extern u32 lbl_8047B460;
 
-    if (*(s32*)lbl_8047B460 != 0) {
+    if ((s32)lbl_8047B460 != 0) {
         OSCancelThread((void*)lbl_8046A040);
         lbl_8047B460 = 0;
     }
@@ -3281,7 +3181,7 @@ void fn_801E1D0C(void) {
 /* 0x801E1D48 | size: 0x34
  * Resume the battle thread if it is active.
  */
-#if 1
+#if 0
 asm void fn_801E1D48(void) {
 #include "src/game/battle/battle_logic_fn_801E1D48.inc"
 }
@@ -3291,7 +3191,7 @@ void fn_801E1D48(void) {
     extern u32 lbl_8047B460;
     extern void fn_800A1F94(void* thread);
 
-    if (*(s32*)lbl_8047B460 != 0) {
+    if ((s32)lbl_8047B460 != 0) {
         fn_800A1F94((void*)lbl_8046A040);
     }
 }
@@ -3853,93 +3753,36 @@ void fn_801E1FF8(void) {
 #endif
 
 /* 0x801E24B0 | size: 0x118 | medium */
-#if 1
+#if 0
 asm void fn_801E24B0(void) {
 #include "src/game/battle/battle_logic_fn_801E24B0.inc"
 }
 #else
 void fn_801E24B0(void) {
-    extern void fn_800B884C();
-    extern void fn_800BA6B0();
-    extern void fn_800BC114();
-    extern void fn_800BC52C();
-    extern void fn_800BC580();
-    extern void fn_800BC6F0();
-    extern void fn_800BC8C8();
-    extern void fn_800BCDDC();
-    extern void fn_800BCE88();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r3 = 0x1;
-    r4 = 0x7;
-    r5 = 0x0;
-    fn_800BCE88();
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x0;
-    r6 = 0xf;
-    fn_800BCDDC();
-    r3 = 0x1;
-    fn_800B884C();
-    r3 = 0x0;
-    fn_800BA6B0();
-    r3 = 0x1;
-    fn_800BC8C8();
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x0;
-    r6 = 0xff;
-    fn_800BC6F0();
-    r3 = 0x0;
-    r4 = 0x3;
-    fn_800BC114();
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x0;
-    fn_800BC52C();
-    r3 = 0x1;
-    r4 = 0x0;
-    r5 = 0x0;
-    fn_800BC52C();
-    r3 = 0x2;
-    r4 = 0x0;
-    r5 = 0x0;
-    fn_800BC52C();
-    r3 = 0x3;
-    r4 = 0x0;
-    r5 = 0x0;
-    fn_800BC52C();
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x1;
-    r6 = 0x2;
-    r7 = 0x3;
-    fn_800BC580();
-    r3 = 0x1;
-    r4 = 0x0;
-    r5 = 0x0;
-    r6 = 0x0;
-    r7 = 0x3;
-    fn_800BC580();
-    r3 = 0x2;
-    r4 = 0x1;
-    r5 = 0x1;
-    r6 = 0x1;
-    r7 = 0x3;
-    fn_800BC580();
-    r3 = 0x3;
-    r4 = 0x2;
-    r5 = 0x2;
-    r6 = 0x2;
-    r7 = 0x3;
-    fn_800BC580();
-    return;
+    extern void fn_800B884C(u32);
+    extern void fn_800BA6B0(u32);
+    extern void fn_800BC114(u32, u32);
+    extern void fn_800BC52C(u32, u32, u32);
+    extern void fn_800BC580(u32, u32, u32, u32, u32);
+    extern void fn_800BC6F0(u32, u32, u32, u32);
+    extern void fn_800BC8C8(u32);
+    extern void fn_800BCDDC(u32, u32, u32, u32);
+    extern void fn_800BCE88(u32, u32, u32);
+    fn_800BCE88(1, 7, 0);
+    fn_800BCDDC(0, 1, 0, 0xf);
+    fn_800B884C(1);
+    fn_800BA6B0(0);
+    fn_800BC8C8(1);
+    fn_800BC6F0(0, 0, 0, 0xff);
+    fn_800BC114(0, 3);
+    fn_800BC52C(0, 0, 0);
+    fn_800BC52C(1, 0, 0);
+    fn_800BC52C(2, 0, 0);
+    fn_800BC52C(3, 0, 0);
+    fn_800BC580(0, 0, 1, 2, 3);
+    fn_800BC580(1, 0, 0, 0, 3);
+    fn_800BC580(2, 1, 1, 1, 3);
+    fn_800BC580(3, 2, 2, 2, 3);
 }
 #endif
 
@@ -3951,27 +3794,12 @@ asm void fn_801E25C8(void) {
 #else
 void fn_801E25C8(void) {
     extern u8 lbl_8046AC60[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r3 = (u32)lbl_8046AC60;
-    r4 = (u32)lbl_8046AC60;
-    tmp = *(u32*)((u8*)r4 + 0xA0);
-    if ((s32)tmp != 0) {
-        tmp = *(u8*)((u8*)r4 + 0xA4);
-        if (tmp != 0) {
-            r3 = *(u32*)((u8*)r4 + 0xE8);
-            if (r3 != 0) {
-                r3 = *(u32*)((u8*)r3 + 0xC);
-                tmp = *(u32*)((u8*)r4 + 0xC0);
-                r3 = r3 + tmp;
-                return;
-    }
-    }
-    }
-    r3 = -0x1;
-    return;
+    u8 *base = lbl_8046AC60;
+    u32 *ptr;
+    if ((s32)*(u32*)(base + 0xa0) == 0) return;
+    if (*(u8*)(base + 0xa4) == 0) return;
+    ptr = *(u32**)(base + 0xe8);
+    if (ptr == 0) return;
 }
 #endif
 
@@ -5231,43 +5059,38 @@ asm void fn_801E3858(void) {
 #include "src/game/battle/battle_logic_fn_801E3858.inc"
 }
 #else
-void fn_801E3858(void) { }
+void fn_801E3858(u32 *out0, u32 *out1) {
+    extern u32 lbl_80478D00;
+    extern u32 lbl_80478D04;
+    *out0 = lbl_80478D00;
+    *out1 = lbl_80478D04;
+}
 #endif
 
 /* 0x801E386C | size: 0x6C | small */
-#if 1
+#if 0
 asm void fn_801E386C(void) {
 #include "src/game/battle/battle_logic_fn_801E386C.inc"
 }
 #else
 void fn_801E386C(void) {
     extern u8 lbl_8046A494[];
-    extern u32 lbl_8047B468;
-    extern void fn_801E4F34();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    tmp = lbl_8047B468;
-    if ((s32)tmp == 0) return;
-    r3 = (u32)lbl_8046A494;
-    r31 = (u32)lbl_8046A494;
+    extern s32 fn_8009F2F8(void*, void*, u32);
+    extern void fn_801E4F34(u32);
+    u8 *queue;
+    u8 sp[8];
+    u32 item;
+    if ((s32)lbl_8047B468 == 0) return;
+    queue = lbl_8046A494;
     while (1) {
-        r3 = r31;
-        r4 = (u32)sp + 0x8;
-        r5 = 0x0;
-        ((void(*)(void))fn_8009F2F8)();
-        if ((s32)r3 == 1) {
+        if (fn_8009F2F8(queue, sp, 0) == 1) {
+            item = *(u32 *)sp;
         } else {
-            r3 = 0x0;
+            item = 0;
         }
-        if (r3 == 0) return;
-        fn_801E4F34();
+        if (item == 0) return;
+        fn_801E4F34(item);
     }
-    return;
 }
 #endif
 
@@ -5277,7 +5100,10 @@ asm void fn_801E38D8(void) {
 #include "src/game/battle/battle_logic_fn_801E38D8.inc"
 }
 #else
-void fn_801E38D8(void) { }
+u8 fn_801E38D8(void) {
+    extern u8 lbl_8046AC60[];
+    return lbl_8046AC60[0xa4];
+}
 #endif
 
 /* 0x801E38E8 | size: 0x48 | small */
@@ -5783,76 +5609,47 @@ void fn_801E3F54(void) {
     extern u32 lbl_80478D00;
     extern u32 lbl_80478D04;
     extern u32 lbl_8047B46C;
-    extern void fn_800A7AFC();
-    extern void fn_800A8850();
-    extern void fn_8014F838();
-    extern void fn_801E1D0C();
-    extern void fn_801E4DAC();
-    extern void fn_801E5400();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+    extern void fn_800A7AFC(void);
+    extern void fn_800A8850(u32);
+    extern void fn_8014F838(u32);
+    extern void fn_801E1D0C(void);
+    extern void fn_801E4DAC(void);
+    extern void fn_801E5400(void);
+    extern s32 fn_8009F2F8(void *, void *, u32);
+    u8 sp[8];
+    u8 *queue;
+    u32 r0;
 
-    r3 = (u32)lbl_8046AC60;
-    r4 = (u32)lbl_8046AC60;
-    tmp = *(u32*)((u8*)r4 + 0xA0);
-    if ((s32)tmp != 0) {
-        tmp = *(u8*)((u8*)r4 + 0xA4);
-        if (tmp != 0) {
-            tmp = 0x0;
-            r3 = lbl_8047B46C;
-            *(u8*)((u8*)r4 + 0xA5) = tmp;
-            *(u8*)((u8*)r4 + 0xA4) = tmp;
-            fn_800A8850();
-            r3 = (u32)lbl_8046AC60;
-            r3 = (u32)lbl_8046AC60;
-            tmp = *(u32*)((u8*)r3 + 0xB0);
-            if ((s32)tmp == 0) {
-                fn_800A7AFC();
-                fn_801E1D0C();
-            }
-            fn_801E5400();
-            r3 = (u32)lbl_8046AC60;
-            r3 = (u32)lbl_8046AC60;
-            tmp = *(u8*)((u8*)r3 + 0xA7);
-            if (tmp != 0) {
-                r3 = lbl_80478D00;
-                fn_8014F838();
-                r3 = lbl_80478D04;
-                tmp = -0x1;
-                lbl_80478D00 = tmp;
-                tmp = r3 + (0x1 << 16);
-                if (tmp != 0xffff) {
-                    fn_8014F838();
-                    tmp = -0x1;
-                    lbl_80478D04 = tmp;
-                }
-                fn_801E4DAC();
-            }
-            r3 = (u32)lbl_8046A494;
-            r31 = (u32)lbl_8046A494;
-            do {
-                r3 = r31;
-                r4 = (u32)sp + 0x8;
-                r5 = 0x0;
-                ((void(*)(void))fn_8009F2F8)();
-                if ((s32)r3 == 1) {
-                } else {
-
-                    tmp = 0x0;
-                }
-            } while (tmp != 0);
-            r3 = (u32)lbl_8046AC60;
-            tmp = 0x0;
-            r3 = (u32)lbl_8046AC60;
-            *(u32*)((u8*)r3 + 0xA8) = tmp;
-            *(u32*)((u8*)r3 + 0xAC) = tmp;
+    if ((s32)*(u32*)(lbl_8046AC60 + 0xa0) == 0) return;
+    if (*(u8*)(lbl_8046AC60 + 0xa4) == 0) return;
+    *(u8*)(lbl_8046AC60 + 0xa5) = 0;
+    *(u8*)(lbl_8046AC60 + 0xa4) = 0;
+    fn_800A8850(lbl_8047B46C);
+    if ((s32)*(u32*)(lbl_8046AC60 + 0xb0) == 0) {
+        fn_800A7AFC();
+        fn_801E1D0C();
     }
+    fn_801E5400();
+    if (*(u8*)(lbl_8046AC60 + 0xa7) != 0) {
+        fn_8014F838(lbl_80478D00);
+        r0 = lbl_80478D04;
+        lbl_80478D00 = -1;
+        if ((r0 + 0x10000) != 0xffff) {
+            fn_8014F838(r0);
+            lbl_80478D04 = -1;
+        }
+        fn_801E4DAC();
     }
-    return;
+    queue = lbl_8046A494;
+    do {
+        if (fn_8009F2F8(queue, sp, 0) == 1) {
+            r0 = *(u32 *)sp;
+        } else {
+            r0 = 0;
+        }
+    } while (r0 != 0);
+    *(u32*)(lbl_8046AC60 + 0xa8) = 0;
+    *(u32*)(lbl_8046AC60 + 0xac) = 0;
 }
 #endif
 
@@ -5864,45 +5661,20 @@ asm void fn_801E4058(void) {
 #else
 void fn_801E4058(void) {
     extern u8 lbl_8046AC60[];
-    extern void fn_801E2CA8();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-
-    r3 = (u32)lbl_8046AC60;
-    r31 = (u32)lbl_8046AC60;
-    tmp = *(u32*)((u8*)r31 + 0xA0);
-    if ((s32)tmp == 0) { r3 = 0x0; return; }
-    tmp = *(u8*)((u8*)r31 + 0xA4);
-    if (tmp != 1) {
-        if (tmp != 4) { r3 = 0x0; return; }
+    extern void fn_801E2CA8(void);
+    u8 *r31 = lbl_8046AC60;
+    u8 a4;
+    if ((s32)*(u32*)(r31 + 0xa0) == 0) return;
+    a4 = *(u8*)(r31 + 0xa4);
+    if (a4 != 1 && a4 != 4) return;
+    if (a4 == 4 && *(u8*)(r31 + 0xa7) != 0) {
+        fn_801E2CA8();
     }
-    if (tmp == 4) {
-        r3 = (u32)lbl_8046AC60;
-        r3 = (u32)lbl_8046AC60;
-        tmp = *(u8*)((u8*)r3 + 0xA7);
-        if (tmp != 0) {
-            fn_801E2CA8();
-    }
-    }
-    r3 = (u32)lbl_8046AC60;
-    r6 = 0x2;
-    r4 = (u32)lbl_8046AC60;
-    r5 = 0x0;
-    tmp = -0x1;
-    *(u8*)((u8*)r31 + 0xA4) = r6;
-    r3 = 0x1;
-    *(u32*)((u8*)r4 + 0xD0) = r5;
-    *(u32*)((u8*)r4 + 0xD4) = r5;
-    *(u32*)((u8*)r4 + 0xCC) = tmp;
-    *(u32*)((u8*)r4 + 0xC8) = tmp;
-    return;
-
-
+    *(u8*)(r31 + 0xa4) = 2;
+    *(u32*)(r31 + 0xd0) = 0;
+    *(u32*)(r31 + 0xd4) = 0;
+    *(u32*)(r31 + 0xcc) = -1;
+    *(u32*)(r31 + 0xc8) = -1;
 }
 #endif
 
@@ -6397,27 +6169,12 @@ asm void fn_801E4724(void) {
 #else
 void fn_801E4724(void) {
     extern u8 lbl_8046AC60[];
-    extern void fn_800A50E4();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    r3 = (u32)lbl_8046AC60;
-    r3 = (u32)lbl_8046AC60;
-    tmp = *(u32*)((u8*)r3 + 0xA0);
-    if ((s32)tmp != 0) {
-        tmp = *(u8*)((u8*)r3 + 0xA4);
-        if (tmp == 0) {
-            tmp = 0x0;
-            *(u32*)((u8*)r3 + 0xA0) = tmp;
-            fn_800A50E4();
-            r3 = 0x1;
-            return;
+    extern void fn_800A50E4(void);
+    u8 *base = lbl_8046AC60;
+    if ((s32)*(u32*)(base + 0xa0) != 0 && *(u8*)(base + 0xa4) == 0) {
+        *(u32*)(base + 0xa0) = 0;
+        fn_800A50E4();
     }
-    }
-    r3 = 0x0;
-
-    return;
 }
 #endif
 
@@ -6649,29 +6406,12 @@ asm void fn_801E4A6C(void) {
 #else
 void fn_801E4A6C(void) {
     extern u8 lbl_8046A440[];
-    extern u32 lbl_8047B468;
-    extern void fn_8009F1D0();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    r3 = (u32)lbl_8046A440;
-    r4 = 0x0;
-    r5 = 0x1c0;
-    r31 = (u32)lbl_8046A440;
-    r3 = r31 + 0x820;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r3 = r31 + 0x54;
-    r4 = r31 + 0x48;
-    r5 = 0x3;
-    fn_8009F1D0();
-    tmp = 0x1;
-    r3 = 0x1;
-    lbl_8047B468 = tmp;
-    return;
+    extern void fn_8009F1D0(void *, void *, u32);
+    u8 *r31;
+    r31 = lbl_8046A440;
+    memset(r31 + 0x820, 0, 0x1c0);
+    fn_8009F1D0(r31 + 0x54, r31 + 0x48, 3);
+    lbl_8047B468 = 1;
 }
 #endif
 
@@ -6681,25 +6421,15 @@ asm void fn_801E4AC4(void) {
 #include "src/game/battle/battle_logic_fn_801E4AC4.inc"
 }
 #else
-void fn_801E4AC4(void) {
+u32 fn_801E4AC4(u32 arg) {
     extern u8 lbl_8046AE38[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+    extern s32 fn_8009F2F8(u8* queue, u32* out, u32 arg);
+    u32 out;
 
-    r4 = (u32)lbl_8046AE38;
-    r5 = r3;
-    r3 = (u32)lbl_8046AE38;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_8009F2F8)();
-    if ((s32)r3 == 1) {
-    } else {
-
-        r3 = 0x0;
+    if (fn_8009F2F8(lbl_8046AE38, &out, arg) == 1) {
+        return out;
     }
-    return;
+    return 0;
 }
 #endif
 
@@ -6710,19 +6440,8 @@ asm void fn_801E4B08(void) {
 }
 #else
 void fn_801E4B08(void) {
-    extern u8 lbl_8046AE58[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r5 = (u32)lbl_8046AE58;
-    r4 = r3;
-    r3 = (u32)lbl_8046AE58;
-    r5 = 0x0;
-    ((void(*)(void))fn_8009F230)();
-    return;
+    extern u8 lbl_8046AE58;
+    fn_8009F230(&lbl_8046AE58, (void *)0, 0);
 }
 #endif
 
@@ -6947,7 +6666,7 @@ void fn_801E4C80(void) {
 
 /* 0x801E4DAC | size: 0x3C | small */
 /* Cancel battle sub-thread 2 if active. */
-#if 1
+#if 0
 asm void fn_801E4DAC(void) {
 #include "src/game/battle/battle_logic_fn_801E4DAC.inc"
 }
@@ -6956,7 +6675,7 @@ void fn_801E4DAC(void) {
     extern u8 lbl_8046BE78[];
     extern u32 lbl_8047B480;
 
-    if (*(s32*)lbl_8047B480 != 0) {
+    if ((s32)lbl_8047B480 != 0) {
         OSCancelThread((void*)lbl_8046BE78);
         lbl_8047B480 = 0;
     }
@@ -6966,7 +6685,7 @@ void fn_801E4DAC(void) {
 /* 0x801E4DE8 | size: 0x34
  * Resume battle sub-thread 2 if active.
  */
-#if 1
+#if 0
 asm void fn_801E4DE8(void) {
 #include "src/game/battle/battle_logic_fn_801E4DE8.inc"
 }
@@ -6976,7 +6695,7 @@ void fn_801E4DE8(void) {
     extern u32 lbl_8047B480;
     extern void fn_800A1F94(void* thread);
 
-    if (*(s32*)lbl_8047B480 != 0) {
+    if ((s32)lbl_8047B480 != 0) {
         fn_800A1F94((void*)lbl_8046BE78);
     }
 }
@@ -7473,7 +7192,7 @@ void fn_801E5154(void) {
 
 /* 0x801E5400 | size: 0x3C | small */
 /* Cancel battle sub-thread 3 if active. */
-#if 1
+#if 0
 asm void fn_801E5400(void) {
 #include "src/game/battle/battle_logic_fn_801E5400.inc"
 }
@@ -7482,7 +7201,7 @@ void fn_801E5400(void) {
     extern u8 lbl_8046D1E8[];
     extern u32 lbl_8047B488;
 
-    if (*(s32*)lbl_8047B488 != 0) {
+    if ((s32)lbl_8047B488 != 0) {
         OSCancelThread((void*)lbl_8046D1E8);
         lbl_8047B488 = 0;
     }
@@ -7492,7 +7211,7 @@ void fn_801E5400(void) {
 /* 0x801E543C | size: 0x34
  * Resume battle sub-thread 3 if active.
  */
-#if 1
+#if 0
 asm void fn_801E543C(void) {
 #include "src/game/battle/battle_logic_fn_801E543C.inc"
 }
@@ -7502,7 +7221,7 @@ void fn_801E543C(void) {
     extern u32 lbl_8047B488;
     extern void fn_800A1F94(void* thread);
 
-    if (*(s32*)lbl_8047B488 != 0) {
+    if ((s32)lbl_8047B488 != 0) {
         fn_800A1F94((void*)lbl_8046D1E8);
     }
 }

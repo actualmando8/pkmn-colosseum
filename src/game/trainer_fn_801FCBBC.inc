@@ -1,0 +1,16 @@
+    nofralloc
+    cmplwi r3, 0x0
+    bne @L_801FCBCC
+    li r3, 0x0
+    blr
+    @L_801FCBCC:
+    clrlwi r0, r4, 24
+    cmplwi r0, 0x4
+    blt @L_801FCBE0
+    li r3, 0x0
+    blr
+    @L_801FCBE0:
+    clrlslwi r0, r4, 24, 2
+    add r3, r3, r0
+    lwz r3, 0x24(r3)
+    blr

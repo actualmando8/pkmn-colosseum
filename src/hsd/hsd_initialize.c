@@ -52,7 +52,7 @@ void HSD_StartRender(HSD_RenderPass pass)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u32 lbl_8047B290;
+extern s32 lbl_8047B290;
 #if 0
 asm void fn_8019C6EC(void) {
 #include "src/hsd/hsd_initialize_fn_8019C6EC.inc"
@@ -84,22 +84,41 @@ void fn_8019C6FC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800BCEF4(void);
-extern void fn_800BD07C(void);
+extern void fn_800BCEF4(u32 a, u32 b);
+extern void fn_800BD07C(u32 a, u32 b);
 extern void fn_800B856C(void);
 extern void fn_800BB29C(void);
 extern u8 lbl_80466BC0[];
 extern u32 lbl_8047B294;
 extern u32 lbl_80478C78;
 extern u32 lbl_8047B27C;
-extern u32 lbl_8047B290;
 #if 1
 asm void fn_8019C708(void) {
 #include "src/hsd/hsd_initialize_fn_8019C708.inc"
 }
 #else
-void fn_8019C708(void) {
-    /* TODO: match -- 168 bytes at 0x8019C708 */
+#pragma optimization_level 4
+void fn_8019C708(u32 arg) {
+    u8* p;
+    u32 tmp;
+
+    p = lbl_80466BC0;
+    lbl_8047B294 = arg;
+    if (p[0x19] != 0) {
+        fn_800BCEF4(2, lbl_80478C78);
+    } else {
+        fn_800BCEF4(lbl_8047B27C, 0);
+    }
+    fn_800BD07C(p[0x18], ((u16)(*(u16*)(p + 0x8) - *(u16*)(p + 0x10))) >> 31);
+    if (lbl_8047B290 != 0) {
+        if (lbl_8047B290 & 1) {
+            fn_800B856C();
+        }
+        if (lbl_8047B290 & 2) {
+            fn_800BB29C();
+        }
+        lbl_8047B290 = 0;
+    }
 }
 #endif
 #pragma pop
@@ -126,13 +145,11 @@ u32 fn_8019C7B0(void) {
 #pragma optimizewithasm off
 extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
-#if 0
+#if 1
 asm void fn_8019C7B8(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B8.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma optimizewithasm on
 s32 fn_8019C7B8(u32 addr) {
     if (lbl_8047B268 > addr) {
         return 0;
@@ -149,9 +166,9 @@ s32 fn_8019C7B8(u32 addr) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8009AC3C(void);
-extern void fn_8009ABD0(void);
-extern void fn_8009AB50(void);
+extern void fn_8009AC3C(u32 xfb);
+extern u32 fn_8009ABD0(u32 a, u32 b);
+extern void fn_8009AB50(u32 xfb);
 extern u32 lbl_80478C70;
 extern u32 lbl_8047B270;
 extern u32 lbl_8047B274;
@@ -162,8 +179,17 @@ asm void fn_8019C7E0(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7E0.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_8019C7E0(void) {
-    /* TODO: match -- 116 bytes at 0x8019C7E0 */
+    fn_8009AC3C(lbl_80478C70);
+    if (lbl_8047B270 != 0 && lbl_8047B274 != 0) {
+        lbl_8047B268 = lbl_8047B270;
+        lbl_8047B26C = lbl_8047B274;
+        lbl_8047B270 = 0;
+        lbl_8047B274 = 0;
+    }
+    lbl_80478C70 = fn_8009ABD0(lbl_8047B268, lbl_8047B26C);
+    fn_8009AB50(lbl_80478C70);
 }
 #endif
 #pragma pop
@@ -172,19 +198,23 @@ void fn_8019C7E0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void);
-extern void fn_8009AC50(void);
-extern u32 lbl_8047B288;
+extern void fn_80196E10(void* file, s32 line, void* msg);
+extern void fn_8009AC50(void* xfb);
+extern s32 lbl_8047B288;
 extern u8 lbl_802749E4[];
 extern u8 lbl_80274A28[];
 extern u32 lbl_80478C70;
-#if 1
+#if 0
 asm void fn_8019C854(void) {
 #include "src/hsd/hsd_initialize_fn_8019C854.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_8019C854(void) {
-    /* TODO: match -- 72 bytes at 0x8019C854 */
+    if (lbl_8047B288 != 0) {
+        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+    }
+    fn_8009AC50((void*)lbl_80478C70);
 }
 #endif
 #pragma pop
@@ -193,16 +223,20 @@ void fn_8019C854(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8009AAD4(void);
-extern u32 lbl_8047B288;
+extern void fn_8009AAD4(void* xfb, void* param);
+extern s32 lbl_8047B288;
 extern u32 lbl_80478C70;
-#if 1
+#if 0
 asm void fn_8019C89C(void) {
 #include "src/hsd/hsd_initialize_fn_8019C89C.inc"
 }
 #else
-void fn_8019C89C(void) {
-    /* TODO: match -- 88 bytes at 0x8019C89C */
+#pragma optimization_level 4
+void fn_8019C89C(void* param) {
+    if (lbl_8047B288 != 0) {
+        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+    }
+    fn_8009AAD4((void*)lbl_80478C70, param);
 }
 #endif
 #pragma pop
@@ -211,17 +245,30 @@ void fn_8019C89C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8009A9D8(void);
-extern u32 lbl_8047B288;
+extern void* fn_8009A9D8(void* xfb, void* buffer);
+extern s32 lbl_8047B288;
 extern u32 lbl_80478C70;
-extern u8 lbl_8047DB0C[];
-#if 1
+extern u32 lbl_8047DB0C;
+#if 0
 asm void fn_8019C8F4(void) {
 #include "src/hsd/hsd_initialize_fn_8019C8F4.inc"
 }
 #else
-void fn_8019C8F4(void) {
-    /* TODO: match -- 132 bytes at 0x8019C8F4 */
+#pragma optimization_level 4
+void* fn_8019C8F4(void* buffer) {
+    void* result;
+
+    if (buffer == NULL) {
+        return NULL;
+    }
+    if (lbl_8047B288 != 0) {
+        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+    }
+    result = fn_8009A9D8((void*)lbl_80478C70, buffer);
+    if (result == NULL) {
+        fn_80196E10(lbl_802749E4, 0x17a, &lbl_8047DB0C);
+    }
+    return result;
 }
 #endif
 #pragma pop
@@ -237,7 +284,7 @@ extern void OSGetArenaLo();
 extern void OSGetArenaHi();
 extern void OSSetArenaLo();
 extern u8 lbl_80465568[];
-extern u32 lbl_8047B288;
+extern s32 lbl_8047B288;
 extern u32 lbl_8047B270;
 extern u32 lbl_8047B274;
 extern u32 lbl_8047B268;

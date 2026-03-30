@@ -506,8 +506,53 @@ asm void fn_8018B220(void) {
 #include "src/game/people/people_fn_8018B220.inc"
 }
 #else
-void fn_8018B220(void) {
-    /* TODO: match -- 328 bytes at 0x8018B220 */
+void fn_8018B220(u32 groupId, u32 index) {
+    PeopleEntry* found;
+    s32 i;
+    s32 j;
+    PeopleEntry* entry;
+
+    found = NULL;
+
+    /* Loop 1: search by groupId + index */
+    for (i = 0; i < fn_8018FDB4(); i++) {
+        entry = (PeopleEntry*)fn_8018FD88(i);
+        if (*(u8*)entry == 0) continue;
+        if (*(u32*)((u8*)entry + 0x28) != groupId) continue;
+        if (*(u32*)((u8*)entry + 0x2C) != index) continue;
+        found = *(PeopleEntry**)((u8*)entry + 0x04);
+        goto loop3;
+    }
+
+    /* Loop 2: fallback search by index only */
+    for (j = 0; j < fn_8018FDB4(); j++) {
+        entry = (PeopleEntry*)fn_8018FD88(j);
+        found = entry;
+        if (*(u8*)entry == 0) continue;
+        if (*(u32*)((u8*)found + 0x2C) != index) continue;
+        fn_800DD970((u8*)lbl_80273FD8, groupId, index);
+        found = *(PeopleEntry**)((u8*)found + 0x04);
+        goto loop3;
+    }
+    found = NULL;
+
+loop3:
+    /* Loop 3: search by selfPtr */
+    for (j = 0; j < fn_8018FDB4(); j++) {
+        entry = (PeopleEntry*)fn_8018FD88(j);
+        if (*(u8*)entry == 0) continue;
+        if (*(u32*)((u8*)entry + 0x04) != (u32)found) continue;
+        goto found_entry;
+    }
+    entry = NULL;
+
+found_entry:
+    if (entry != NULL) {
+        void* model = fn_8018FBD4(entry);
+        if (model != NULL) {
+            fn_800EC96C(model);
+        }
+    }
 }
 #endif
 
