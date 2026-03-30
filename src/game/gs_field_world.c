@@ -5220,7 +5220,7 @@ extern void fn_801ED674(void);
 /* Forward declarations for functions called before definition */
 void fn_801193BC(void);
 /* Forward declarations for converted functions */
-void fn_80123E70();  /* K&R: asm void wrapper, used as u32 return */
+s32 fn_80123E70(u8* ptr, u16 idx);
 void fn_8011BEB4(void);
 void fn_8011F260(void);
 void fn_8012546C(void*);
@@ -5468,25 +5468,26 @@ extern void fn_80117514(void);
 extern void fn_8011791C(void);
 extern void fn_80119930(void);
 extern void fn_80119BD0(void);
-extern void fn_80119D90(void);
-extern void fn_80119DD0(void);
-extern void fn_80119E50(void);
-extern void fn_80119E90(void);
-extern u16 fn_80119ED0();
-extern void fn_80119F10(void);
-extern void fn_80119F50(void);
-extern void fn_8011C1D0();  /* K&R: asm void wrapper, returns void* */
-extern void fn_8011C220();  /* K&R: asm void wrapper, returns void* */
-extern void fn_8011C270(void);
+extern u8 fn_80119D90(u16 idx);
+extern u8 fn_80119DD0(u16 idx);
+extern u16 fn_80119E10(u16 idx);
+extern u8 fn_80119E50(u16 idx);
+extern u8 fn_80119E90(u16 idx);
+extern u16 fn_80119ED0(u16 idx);
+extern u8 fn_80119F10(u16 idx);
+extern u32 fn_80119F50(u16 idx);
+extern void fn_8011C1D0(u8* ptr, u32 val);
+extern void fn_8011C220(u8* ptr, u32 val);
+extern u32 fn_8011C270(u8* ptr);
 extern u8 fn_8011C588(u8* ptr, u16 idx);
-extern void fn_8011C2D0(void);
-extern void fn_8011C330();  /* K&R: asm void wrapper, returns void* */
-extern void fn_8011C380();  /* K&R: asm void wrapper, returns void* */
-extern void fn_8011C3D0();  /* K&R: asm void wrapper, returns void* */
+extern u32 fn_8011C2D0(u8* ptr);
+extern void fn_8011C330(u8* ptr, u32 val);
+extern void fn_8011C380(u8* ptr, u32 val);
+extern void fn_8011C3D0(u8* ptr, u32 val);
 extern void fn_8011C430(u8* ptr, u16 idx, u8 val);
-extern void fn_8011C450(void);
-extern void fn_8011C4B0(void);
-extern void fn_8011C510(void);
+extern u32 fn_8011C450(u8* ptr);
+extern u32 fn_8011C4B0(u8* ptr);
+extern u32 fn_8011C510(u8* ptr);
 extern void fn_8011F77C(void);
 extern void fn_80120C6C(void);
 extern s32 fn_80121ADC(void* a, u16 b);
@@ -13537,12 +13538,12 @@ void fn_8011DCC4(void) {
 /* 0x7C | fn_8011DD80 | call_clamp_store */
 void fn_8011DD80(u32 arg1, u32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
-    extern u32 fn_80123E70();
+    extern s32 fn_80123E70(u8* ptr, u16 idx);
     u8* result;
     u8 val;
     result = fn_8011F260(arg1, arg2, 0);
     if (result == NULL) { return; }
-    val = fn_80123E70(arg1, arg2);
+    val = fn_80123E70((u8*)arg1, (u16)arg2);
     if (val < maxVal) {
         maxVal = val;
     }
@@ -30016,148 +30017,276 @@ asm void fn_80117514(void) {
 void fn_80117514(void) { /* TODO */ }
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119D90(void) {
 #include "src/game/gs_field_world_fn_80119D90.inc"
 }
 #else
-void fn_80119D90(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80119D90(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return entry[0x4];
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119DD0(void) {
 #include "src/game/gs_field_world_fn_80119DD0.inc"
 }
 #else
-void fn_80119DD0(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80119DD0(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return entry[0x3];
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119E10(void) {
 #include "src/game/gs_field_world_fn_80119E10.inc"
 }
 #else
-void fn_80119E10(void) { /* TODO */ }
+#pragma optimization_level 4
+u16 fn_80119E10(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u16*)(entry + 0xa);
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119E50(void) {
 #include "src/game/gs_field_world_fn_80119E50.inc"
 }
 #else
-void fn_80119E50(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80119E50(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return entry[0x2];
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119E90(void) {
 #include "src/game/gs_field_world_fn_80119E90.inc"
 }
 #else
-void fn_80119E90(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80119E90(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return entry[0x1];
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm u16 fn_80119ED0() {
 #include "src/game/gs_field_world_fn_80119ED0.inc"
 }
 #else
-u16 fn_80119ED0() { return 0; }
+#pragma optimization_level 4
+u16 fn_80119ED0(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u16*)(entry + 0x8);
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119F10(void) {
 #include "src/game/gs_field_world_fn_80119F10.inc"
 }
 #else
-void fn_80119F10(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_80119F10(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return entry[0x0];
+}
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
-#if 1
+#if 0
 asm void fn_80119F50(void) {
 #include "src/game/gs_field_world_fn_80119F50.inc"
 }
 #else
-void fn_80119F50(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_80119F50(u16 idx) {
+    u8* entry;
+    if ((u32)idx >= lbl_80478B48) { entry = NULL; } else { entry = lbl_8035BBA8 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0x10);
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C1D0(void) {
 #include "src/game/gs_field_world_fn_8011C1D0.inc"
 }
 #else
-void fn_8011C1D0(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8011C1D0(u8* ptr, u32 val) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return; }
+    *(u32*)(entry + 0x10) = val;
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C220(void) {
 #include "src/game/gs_field_world_fn_8011C220.inc"
 }
 #else
-void fn_8011C220(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8011C220(u8* ptr, u32 val) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return; }
+    *(u32*)(entry + 0xc) = val;
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C270(void) {
 #include "src/game/gs_field_world_fn_8011C270.inc"
 }
 #else
-void fn_8011C270(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8011C270(u8* ptr) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0x10);
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C2D0(void) {
 #include "src/game/gs_field_world_fn_8011C2D0.inc"
 }
 #else
-void fn_8011C2D0(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8011C2D0(u8* ptr) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0xc);
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C330(void) {
 #include "src/game/gs_field_world_fn_8011C330.inc"
 }
 #else
-void fn_8011C330(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8011C330(u8* ptr, u32 val) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return; }
+    *(u32*)(entry + 0x8) = val;
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C380(void) {
 #include "src/game/gs_field_world_fn_8011C380.inc"
 }
 #else
-void fn_8011C380(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8011C380(u8* ptr, u32 val) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return; }
+    *(u32*)(entry + 0x4) = val;
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C3D0(void) {
 #include "src/game/gs_field_world_fn_8011C3D0.inc"
 }
 #else
-void fn_8011C3D0(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_8011C3D0(u8* ptr, u32 val) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return; }
+    *(u32*)(entry + 0x0) = val;
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C450(void) {
 #include "src/game/gs_field_world_fn_8011C450.inc"
 }
 #else
-void fn_8011C450(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8011C450(u8* ptr) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0x8);
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C4B0(void) {
 #include "src/game/gs_field_world_fn_8011C4B0.inc"
 }
 #else
-void fn_8011C4B0(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8011C4B0(u8* ptr) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0x4);
+}
 #endif
 extern u32 lbl_80478B50;  /* field obj count (SDA) */
-#if 1
+#if 0
 asm void fn_8011C510(void) {
 #include "src/game/gs_field_world_fn_8011C510.inc"
 }
 #else
-void fn_8011C510(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8011C510(u8* ptr) {
+    u16 idx; u8* entry;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)(ptr + 0x1c); }
+    if ((u32)idx >= lbl_80478B50) { entry = NULL; } else { entry = lbl_8035C430 + (u32)idx * 0x14; }
+    if (entry == NULL) { return 0; }
+    return *(u32*)(entry + 0x0);
+}
 #endif
 #if 0
 asm void fn_8011E1D4(void) {
@@ -30357,12 +30486,25 @@ u16 fn_8011E550(u8* ptr) {
 #endif
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 extern u32 lbl_80478F94;  /* obj data base (SDA) */
-#if 1
+#if 0
 asm void fn_8011E868(void) {
 #include "src/game/gs_field_world_fn_8011E868.inc"
 }
 #else
-void fn_8011E868(void) { /* TODO */ }
+#pragma optimization_level 4
+u8 fn_8011E868(u8* ptr) {
+    u16 idx; u8* entry; u8 flag;
+    if (ptr == NULL) { return 0; }
+    if (ptr == NULL) { idx = 0; } else { idx = *(u16*)ptr; }
+    if ((u32)idx >= *(u32*)lbl_80478F90) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80478F94 + (u32)idx * 0x11C;
+    }
+    if (entry == NULL) { flag = 0; } else { flag = entry[0x33]; }
+    if ((u8)flag == 0) { return 0; }
+    return ptr[0xcc];
+}
 #endif
 #if 0
 asm void fn_8011ED18(void) {
@@ -30415,21 +30557,35 @@ asm void fn_80120C6C(void) {
 #else
 void fn_80120C6C(void) { /* TODO */ }
 #endif
-extern void fn_80143B08(void);
-extern void fn_80143ABC(void);
-#if 1
+extern void* fn_80143B08(void* ptr);
+extern void fn_80143ABC(void* ptr, u8 val);
+#if 0
 asm void fn_80120D6C(void) {
 #include "src/game/gs_field_world_fn_80120D6C.inc"
 }
 #else
-void fn_80120D6C(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80120D6C(u8* ptr, void* arg2) {
+    u8 val; void* tmp;
+    if (ptr == NULL) { return -1; }
+    val = (u8)fn_8012640C(ptr, 0, 0xbf, 0);
+    tmp = fn_80143B08(arg2);
+    fn_80143ABC(tmp, val);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80121410(void) {
 #include "src/game/gs_field_world_fn_80121410.inc"
 }
 #else
-void fn_80121410(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80121410(u8* ptr) {
+    u16 val1; u16 val2;
+    if (ptr == NULL) { return 0; }
+    val1 = (u16)fn_8012640C(ptr, 0, 0x83, 0);
+    val2 = (u16)fn_8012640C(ptr, 0, 0x87, 0);
+    return (u8)(val1 == val2);
+}
 #endif
 #if 0
 asm void fn_80121574(void) {
@@ -30627,26 +30783,50 @@ u16 fn_80122B50(u8* ptr, u16 b) {
     return val;
 }
 #endif
-#if 1
+#if 0
 asm void fn_80123090(void) {
 #include "src/game/gs_field_world_fn_80123090.inc"
 }
 #else
-void fn_80123090(void) { /* TODO */ }
+#pragma optimization_level 4
+u16 fn_80123090(u8* ptr) {
+    extern u32 fn_80142CF4(u32 a, u16 b, u32 c, u32 d);
+    u16 val;
+    val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
+    if (val == 0) { return 0; }
+    return (u16)fn_80142CF4(0, val, 7, 0);
+}
 #endif
-#if 1
+#if 0
 asm void fn_80123E70(void) {
 #include "src/game/gs_field_world_fn_80123E70.inc"
 }
 #else
-void fn_80123E70(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80123E70(u8* ptr, u16 idx) {
+    extern u8 fn_8011BB6C(u16 type_id, u8 val);
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u16 c);
+    u32 sub; u16 val1;
+    if (ptr == NULL) { return 0; }
+    sub = (u16)idx + 4;
+    val1 = (u16)fn_8012640C(ptr, 0, 0x7f, (u16)sub);
+    fn_8011BB6C(val1, (u8)fn_8012640C(ptr, 0, 0x81, (u16)sub));
+}
 #endif
-#if 1
+#if 0
 asm void fn_80124978(void) {
 #include "src/game/gs_field_world_fn_80124978.inc"
 }
 #else
-void fn_80124978(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80124978(u8* ptr, u32 arg2) {
+    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u8 d);
+    u16 val1;
+    if (ptr == NULL) { return; }
+    val1 = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    if ((s32)fn_8012640C(0, val1, 0x17, 1) == 0) { arg2 = 0; }
+    fn_801254B4(ptr, 0, 0xb7, 0, (u8)arg2);
+}
 #endif
 extern void fn_80135708(void);
 #if 1
