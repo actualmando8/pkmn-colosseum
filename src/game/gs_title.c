@@ -308,59 +308,38 @@ void fn_8002464C(u32 arg1, u32 arg2) {
 }
 
 /* 0x80024698 | 0x4 -- nop */
-#if 1
+#if 0
 asm void fn_80024698(void) {
 #include "src/game/gs_title_fn_80024698.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_80024698(void) { }
 #endif
 
 /* 0x8002469C | 0x30 */
-extern void fn_800FA280(void);
-extern void fn_80132A38(void);
-#if 1
+extern void* fn_800FA280(u32);
+extern void fn_80132A38(s32, void*);
+#if 0
 asm void fn_8002469C(void) {
 #include "src/game/gs_title_fn_8002469C.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_8002469C(void) {
-    extern void fn_800FA280();
-    extern void fn_80132A38();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r3 = 0x3cdf;
-    fn_800FA280();
-    r4 = r3;
-    r3 = 0x37;
-    fn_80132A38();
-    return;
+    fn_80132A38(0x37, fn_800FA280(0x3cdf));
 }
 #endif
 
 /* 0x800246CC | 0x30 */
-#if 1
+#if 0
 asm void fn_800246CC(void) {
 #include "src/game/gs_title_fn_800246CC.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800246CC(void) {
-    extern void fn_800FA280();
-    extern void fn_80132A38();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r3 = 0x3ce4;
-    fn_800FA280();
-    r4 = r3;
-    r3 = 0x37;
-    fn_80132A38();
-    return;
+    fn_80132A38(0x37, fn_800FA280(0x3ce4));
 }
 #endif
 
@@ -2013,11 +1992,12 @@ void fn_800259B0(void) {
 #endif
 
 /* 0x80025A7C | 0x4 -- nop */
-#if 1
+#if 0
 asm void fn_80025A7C(void) {
 #include "src/game/gs_title_fn_80025A7C.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_80025A7C(void) { }
 #endif
 
@@ -2867,12 +2847,15 @@ void fn_80020618(void) { /* TODO */ }
 #endif
 
 /* fn_8002091C - 0x8002091C | size: 0x10 */
-#if 1
+#if 0
 asm void fn_8002091C(void) {
 #include "src/game/gs_title_fn_8002091C.inc"
 }
 #else
-void fn_8002091C(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_8002091C(void) {
+    return *(s32*)lbl_803A1FC8;
+}
 #endif
 
 /* fn_8002092C - 0x8002092C | size: 0x90 */
@@ -2912,31 +2895,58 @@ void fn_80020A4C(void) { /* TODO */ }
 #endif
 
 /* fn_80020ADC - 0x80020ADC | size: 0x58 */
-extern void fn_80166C74(void);
-#if 1
+extern u32 fn_80166C74(void);
+#if 0
 asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
 }
 #else
-void fn_80020ADC(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80020ADC(void* r3, u8* r4) {
+    s8 r0;
+    if (fn_80166C74() == 1) {
+        r0 = (s8)r4[4];
+        r0 = (s8)(r0 & ~2);
+        r4[4] = (u8)r0;
+    } else {
+        r0 = (s8)r4[4];
+        r0 = (s8)(r0 | 2);
+        r4[4] = (u8)r0;
+    }
+}
 #endif
 
 /* fn_80020B34 - 0x80020B34 | size: 0x58 */
-#if 1
+#if 0
 asm void fn_80020B34(void) {
 #include "src/game/gs_title_fn_80020B34.inc"
 }
 #else
-void fn_80020B34(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80020B34(void* r3, u8* r4) {
+    s8 r0;
+    if (fn_80166C74() != 1) {
+        r0 = (s8)r4[4];
+        r0 = (s8)(r0 & ~2);
+        r4[4] = (u8)r0;
+    } else {
+        r0 = (s8)r4[4];
+        r0 = (s8)(r0 | 2);
+        r4[4] = (u8)r0;
+    }
+}
 #endif
 
 /* fn_80020B8C - 0x80020B8C | size: 0x14 */
-#if 1
+#if 0
 asm void fn_80020B8C(void) {
 #include "src/game/gs_title_fn_80020B8C.inc"
 }
 #else
-void fn_80020B8C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80020B8C(void* r3, u8* r4) {
+    *(f32*)(r4 + 0x70) = *(f32*)(lbl_803A1FC8 + 0x10);
+}
 #endif
 
 /* fn_80020BA0 - 0x80020BA0 | size: 0xfc */
@@ -2953,10 +2963,10 @@ void fn_80020BA0(void) { /* TODO */ }
 /* fn_80020C9C - 0x80020C9C | size: 0x200 */
 extern void fn_801070F4(void);
 extern void fn_801D04E8(void);
-extern void fn_80106D3C(void);
+extern void fn_80106D3C(s32, s32, s32, s32);
 extern void fn_8001E074(void);
 extern void fn_801D0748(void);
-extern void fn_801069FC(void);
+extern void fn_801069FC(s32);
 extern void fn_80102568(void);
 extern u32 lbl_8047B86C;
 extern u32 lbl_8047B890;
@@ -3040,12 +3050,15 @@ void fn_800215C4(void) { /* TODO */ }
 #endif
 
 /* fn_80021624 - 0x80021624 | size: 0x20 */
-#if 1
+#if 0
 asm void fn_80021624(void) {
 #include "src/game/gs_title_fn_80021624.inc"
 }
 #else
-void fn_80021624(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80021624(void) {
+    fn_800210F0();
+}
 #endif
 
 /* fn_80021644 - 0x80021644 | size: 0x9c */
@@ -3073,12 +3086,12 @@ void fn_800216E8(void) { /* TODO */ }
 #endif
 
 /* fn_800218BC - 0x800218BC | size: 0x1e0 */
-extern void fn_80014118(void);
+extern void fn_80014118(s32, void*, void*);
 extern void fn_80123FBC(void);
 extern void fn_8011FC74(void);
 extern void fn_8011FC14(void);
-extern void fn_800141BC(void);
-extern void fn_80014198(void);
+extern s32 fn_800141BC(void*, s32);
+extern void fn_80014198(s32);
 extern u8 lbl_803A1B90[];
 extern u32 lbl_8047B8A0;
 #if 1
@@ -3090,12 +3103,31 @@ void fn_800218BC(void) { /* TODO */ }
 #endif
 
 /* fn_80021A9C - 0x80021A9C | size: 0x78 */
-#if 1
+#if 0
 asm void fn_80021A9C(void) {
 #include "src/game/gs_title_fn_80021A9C.inc"
 }
 #else
-void fn_80021A9C(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80021A9C(u32 r3, u32* r4) {
+    u8* r5;
+    s32 count;
+    r5 = lbl_803A1B90;
+    count = *(s32*)(lbl_803A1B90 + 0x40);
+    if (count > 0) {
+        do {
+            if (r3 == (u32)*(u16*)r5) {
+                *r4 = 0;
+                return 2;
+            }
+            r5 += 8;
+            count--;
+        } while (count != 0);
+    }
+    fn_80106D3C(2, 0x426a, 1, 0);
+    fn_801069FC(1);
+    return 1;
+}
 #endif
 
 /* fn_80021B14 - 0x80021B14 | size: 0x53c */
@@ -3159,12 +3191,34 @@ void fn_80022478(void) { /* TODO */ }
 extern u8 lbl_80266C54[];
 extern void fn_80023068(void);
 extern void fn_800232F0(void);
-#if 1
+#if 0
 asm void fn_80022720(void) {
 #include "src/game/gs_title_fn_80022720.inc"
 }
 #else
-void fn_80022720(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80022720(u32 r3, u32* r4) {
+    u32* r31;
+    u8* r30;
+    s32 r29;
+    u32 buf[10];
+    r31 = r4;
+    r30 = lbl_80266C54;
+    buf[0] = *(u32*)(r30 + 0x00); buf[1] = *(u32*)(r30 + 0x04);
+    buf[2] = *(u32*)(r30 + 0x08); buf[3] = *(u32*)(r30 + 0x0c);
+    buf[4] = *(u32*)(r30 + 0x10); buf[5] = *(u32*)(r30 + 0x14);
+    buf[6] = *(u32*)(r30 + 0x18); buf[7] = *(u32*)(r30 + 0x1c);
+    buf[8] = *(u32*)(r30 + 0x20); buf[9] = *(u32*)(r30 + 0x24);
+    r29 = 5;
+    if (r3 == (u32)*(u16*)((u8*)buf + 0x00)) { r29 = 0; }
+    else if (r3 == (u32)*(u16*)((u8*)buf + 0x08)) { r29 = 1; }
+    else if (r3 == (u32)*(u16*)((u8*)buf + 0x10)) { r29 = 2; }
+    else if (r3 == (u32)*(u16*)((u8*)buf + 0x18)) { r29 = 3; }
+    else if (r3 == (u32)*(u16*)((u8*)buf + 0x20)) { r29 = 4; }
+    fn_80106D3C(2, (s32)*(u32*)((u8*)buf + r29 * 8 + 4), 1, 0);
+    fn_801069FC(1);
+    *r31 = 0;
+}
 #endif
 
 /* fn_80022834 - 0x80022834 | size: 0x308 */
@@ -3206,13 +3260,32 @@ void fn_80022B3C(void) { /* TODO */ }
 #endif
 
 /* fn_80022E54 - 0x80022E54 | size: 0x90 */
-extern void fn_800190D8(void);
-#if 1
+extern void fn_800190D8(void*, s32);
+#if 0
 asm void fn_80022E54(void) {
 #include "src/game/gs_title_fn_80022E54.inc"
 }
 #else
-void fn_80022E54(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80022E54(void* r3, u32* r4) {
+    void* r29;
+    u32* r30;
+    s32 r31;
+    u32 sc, sd;
+    r29 = r3;
+    r30 = r4;
+    r31 = fn_800141BC(r29, 1);
+    if (r31 >= 0) {
+        fn_80014118(r31, &sc, &sd);
+    }
+    fn_80014198(r31);
+    if (r31 >= 0) {
+        fn_800190D8(r29, 0x59610);
+        *r30 = 1;
+        return 2;
+    }
+    return 1;
+}
 #endif
 
 /* fn_80022EE4 - 0x80022EE4 | size: 0x184 */
@@ -3298,39 +3371,55 @@ void fn_80023B9C(void) { /* TODO */ }
 #endif
 
 /* fn_80023DA8 - 0x80023DA8 | size: 0x3c */
-#if 1
+#if 0
 asm void fn_80023DA8(void) {
 #include "src/game/gs_title_fn_80023DA8.inc"
 }
 #else
-void fn_80023DA8(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80023DA8(void) {
+    fn_80106D3C(2, 0x44c6, 1, 0);
+    fn_801069FC(1);
+    return 1;
+}
 #endif
 
 /* fn_80023DE4 - 0x80023DE4 | size: 0x3c */
-#if 1
+#if 0
 asm void fn_80023DE4(void) {
 #include "src/game/gs_title_fn_80023DE4.inc"
 }
 #else
-void fn_80023DE4(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80023DE4(void) {
+    fn_80106D3C(2, 0x4261, 1, 0);
+    fn_801069FC(1);
+    return 1;
+}
 #endif
 
 /* fn_80023E20 - 0x80023E20 | size: 0x3c */
-#if 1
+#if 0
 asm void fn_80023E20(void) {
 #include "src/game/gs_title_fn_80023E20.inc"
 }
 #else
-void fn_80023E20(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80023E20(void) {
+    fn_80106D3C(2, 0x426a, 1, 0);
+    fn_801069FC(1);
+    return 1;
+}
 #endif
 
 /* fn_80023E5C - 0x80023E5C | size: 0x4 */
-#if 1
+#if 0
 asm void fn_80023E5C(void) {
 #include "src/game/gs_title_fn_80023E5C.inc"
 }
 #else
-void fn_80023E5C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80023E5C(void) { }
 #endif
 
 /* fn_80023E60 - 0x80023E60 | size: 0x300 */
