@@ -756,13 +756,56 @@ extern void fn_800EE0E8();
 extern void fn_800EE150(void);
 extern void fn_800EE20C();
 
-#if 1
+#if 0
 asm void fn_800E3604(void) {
 #include "src/game/gs_material_fn_800E3604.inc"
 }
 #else
-void fn_800E3604(void) {
-    /* GSmaterialApplyAll (0x15C bytes) */
+void fn_800E3604(u32 flags, u8 slot) {
+    u32 r29 = (u32)slot;
+    u32 r28 = flags & 0x10;
+    u32 r27 = flags & 0x80000;
+    u32 r26 = flags & 0x40000;
+    fn_801B25C4(0x7f);
+    {
+        void* r31 = fn_800D2584();
+        if (r31 != NULL && fn_80195A6C(*(void**)((u8*)r31 + 0xc)) != 0) {
+            u32 r25 = 0;
+            u32 r30 = 0;
+            fn_800DD174(*(void**)((u8*)r31 + 0xc));
+            while (r25 < lbl_8047AB78) {
+                void* r24 = (void*)(lbl_8047AB74 + r30);
+                u32 f = *(u32*)r24;
+                if ((f & 0x1) && (f & 0x40000000) && (f & 0x400400)) {
+                    u32 slot_bit = (f >> 9) & 1;
+                    if (slot_bit == r29) {
+                        void* r31mobj;
+                        fn_800E9148(r24, 1);
+                        if (*(u32*)r24 & 0x80) {
+                            r31mobj = *(void**)((u8*)r24 + 0xc);
+                        } else {
+                            r31mobj = *(void**)((u8*)r24 + 0x8);
+                        }
+                        if (r28) {
+                            fn_801A13CC(r31mobj, 0, 1, 0);
+                            fn_800D6A5C(*(void**)((u8*)r24 + 0x168), *(void**)((u8*)r24 + 0x16c));
+                        }
+                        if (r27) {
+                            fn_801A13CC(r31mobj, 0, 4, 0);
+                        }
+                        if (r26) {
+                            fn_801A13CC(r31mobj, 0, 2, 0);
+                        }
+                        fn_800E9148(r24, 0);
+                    }
+                }
+                r30 += 0x170;
+                r25++;
+            }
+            fn_80195A48();
+        }
+    }
+    fn_800D87AC(-1);
 }
 #endif
 
@@ -843,13 +886,88 @@ extern void fn_800EE828(void);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047AB74;
 extern u32 lbl_8047AB78;
-#if 1
+#if 0
 asm void fn_800E3928(void) {
 #include "src/game/gs_material_fn_800E3928.inc"
 }
 #else
 void fn_800E3928(void) {
-    /* GSmaterialUpdateColors (0x1E0 bytes) */
+    u32 r29;
+    u32 r30;
+    u32 r31;
+    u32 r28;
+    /* Pass 1: update color init flags */
+    r31 = 0;
+    r28 = 0;
+    while (r28 < lbl_8047AB78) {
+        void* r29p = (void*)(lbl_8047AB74 + r31);
+        u32 flags = *(u32*)r29p;
+        if (flags & 0x1) {
+            if (!(flags & 0x2)) {
+                /* bit 1 clear: clear 0x400000 */
+                flags &= ~0x400000u;
+                *(u32*)r29p = flags;
+            } else if (flags & 0x100000) {
+                /* bits 1 and 20 set: call fn_80191118 */
+                s32 res = ((s32(*)(void*))fn_80191118)((u8*)r29p + 0x4c);
+                if (res >= 0) {
+                    *(u32*)r29p |= 0x400000;
+                } else {
+                    *(u32*)r29p &= ~0x400000u;
+                }
+            } else {
+                /* bit 1 set, bit 20 clear: set 0x400000 */
+                *(u32*)r29p |= 0x400000;
+            }
+        }
+        r31 += 0x170;
+        r28++;
+    }
+    /* Pass 2: call fn_800ED1CC on entries with bits 0x400400 */
+    {
+        u32 mask = 0x400400;
+        r29 = 0;
+        r30 = 0;
+        while (r29 < lbl_8047AB78) {
+            void* entry = (void*)(lbl_8047AB74 + r30);
+            u32 flags = *(u32*)entry;
+            if ((flags & 0x1) && (flags & mask)) {
+                fn_800ED1CC(entry);
+            }
+            r30 += 0x170;
+            r29++;
+        }
+    }
+    /* Pass 3: call fn_800ED4D4, then z-depth update, then fn_80190E60 if needed */
+    r29 = 0;
+    r30 = 0;
+    while (r29 < lbl_8047AB78) {
+        void* r28p = (void*)(lbl_8047AB74 + r30);
+        if (*(u32*)r28p & 0x1) {
+            void* r31p;
+            fn_800ED4D4(r28p);
+            if (*(u32*)r28p & 0x80) {
+                memcpy((u8*)r28p + 0x3c, (u8*)r28p + 0x18, 0xc);
+            } else {
+                r31p = fn_800EE150(r28p, 1);
+                if (r31p == NULL) {
+                    memcpy((u8*)r28p + 0x3c, (u8*)r28p + 0x18, 0xc);
+                } else {
+                    fn_800EE3BC(r31p, (u8*)r28p + 0x3c, 0, 0);
+                    fn_800EE828(r31p);
+                    *(f32*)((u8*)r28p + 0x40) = *(f32*)((u8*)r28p + 0x40) - *(f32*)((u8*)r28p + 0x48);
+                }
+            }
+            {
+                u32 f2 = *(u32*)r28p;
+                if ((f2 & 0x400000) && (f2 & 0x200000)) {
+                    ((void(*)(void*))fn_80190E60)((u8*)r28p + 0x4c);
+                }
+            }
+        }
+        r30 += 0x170;
+        r29++;
+    }
 }
 #endif
 
