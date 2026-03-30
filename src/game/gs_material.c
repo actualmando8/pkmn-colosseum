@@ -724,8 +724,8 @@ extern s32 fn_800EA60C();
 extern void fn_800EA664();
 extern void fn_800EA6D4(void);
 extern void fn_800EA7E4();
-extern void fn_800EA820(void);
-extern void fn_800EA960(void);
+extern void fn_800EA820();
+extern void fn_800EA960();
 extern void fn_800EACD0(void);
 extern void fn_800EAFE4(void);
 extern void fn_800EB340(void);
@@ -1362,13 +1362,57 @@ void fn_800E5790(void* obj) {
 #endif
 
 /* fn_800E584C | Size: 0x12C */
-#if 1
+#if 0
 asm void fn_800E584C(void) {
 #include "src/game/gs_material_fn_800E584C.inc"
 }
 #else
-void fn_800E584C(void) {
-    /* GSmaterial internal (0x12C bytes) */
+void* fn_800E584C(void* entry, u32* outCount) {
+    if (*(u16*)((u8*)entry + 0x152) != 0) {
+        *outCount = *(u16*)((u8*)entry + 0x150);
+    } else {
+        s32 r26 = 0;
+        s32 r28 = ((u32(*)(void*))fn_800EE0E8)(entry);
+        s32 r29;
+        {
+            s32 r29i = 0;
+            while (r29i < r28) {
+                void* r27 = fn_800EE150(entry, r29i);
+                r26 += ((s32(*)(void*))fn_800EE758)(r27);
+                fn_800EE828(r27);
+                r29i++;
+            }
+        }
+        if (r26 != 0) {
+            u16 handle = ((u16(*)(s32))fn_800E3534)(r26 * 4);
+            r29 = handle;
+            if ((u16)r29 != 0) {
+                void** r25 = fn_800E27B0(handle);
+                *(void**)((u8*)entry + 0x14c) = r25;
+                *(u16*)((u8*)entry + 0x154) = (u16)r29;
+                *(u16*)((u8*)entry + 0x150) = (u16)r26;
+                {
+                    s32 r24 = 0;
+                    while (r24 < r28) {
+                        void* r23 = fn_800EE150(entry, r24);
+                        s32 r29j = ((s32(*)(void*))fn_800EE758)(r23);
+                        s32 r27i = 0;
+                        while (r27i < r29j) {
+                            *r25++ = fn_800EE6B4(r23, r27i);
+                            r27i++;
+                        }
+                        fn_800EE828(r23);
+                        r24++;
+                    }
+                }
+            } else {
+                r26 = 0;
+            }
+        }
+        *outCount = r26;
+    }
+    *(u16*)((u8*)entry + 0x152) = *(u16*)((u8*)entry + 0x152) + 1;
+    return *(void**)((u8*)entry + 0x14c);
 }
 #endif
 
@@ -1509,13 +1553,46 @@ void fn_800E5BE0(void) {
 #endif
 
 /* fn_800E5D40 | Size: 0xF4 */
-#if 1
+#if 0
 asm void fn_800E5D40(void) {
 #include "src/game/gs_material_fn_800E5D40.inc"
 }
 #else
-void fn_800E5D40(void) {
-    /* GSmaterial internal (0xF4 bytes) */
+void fn_800E5D40(void* obj) {
+    u16 count2 = *(u16*)((u8*)obj + 0x152);
+    if (count2 == 0) return;
+    {
+        void** r31 = *(void***)((u8*)obj + 0x14c);
+        s32 r30 = *(u16*)((u8*)obj + 0x150);
+        count2--;
+        *(u16*)((u8*)obj + 0x152) = count2;
+        if (*(u16*)((u8*)obj + 0x152) != 0) {
+            s32 r29 = 0;
+            while (r29 < r30) {
+                void* p = r31[r29];
+                if (p != NULL) { fn_800DF248(p, (void*)2); }
+                r29++;
+            }
+            return;
+        }
+        r30 = *(u16*)((u8*)obj + 0x150);
+        r31 = *(void***)((u8*)obj + 0x14c);
+        {
+            s32 r29 = 0;
+            while (r29 < r30) {
+                void* p = r31[r29];
+                if (p != NULL) { fn_800DF608(p); }
+                r29++;
+            }
+        }
+        {
+            u16 handle = *(u16*)((u8*)obj + 0x154);
+            if (handle != 0) { fn_800E24B0(handle); fn_800E209C(handle); }
+        }
+        *(u16*)((u8*)obj + 0x154) = 0;
+        *(u16*)((u8*)obj + 0x150) = 0;
+        *(u32*)((u8*)obj + 0x14c) = 0;
+    }
 }
 #endif
 
@@ -1552,13 +1629,46 @@ u32 fn_800E5FAC(void* p) {
 #endif
 
 /* fn_800E5FFC | Size: 0xF4 */
-#if 1
+#if 0
 asm void fn_800E5FFC(void) {
 #include "src/game/gs_material_fn_800E5FFC.inc"
 }
 #else
-void fn_800E5FFC(void) {
-    /* GSmaterial internal (0xF4 bytes) */
+void fn_800E5FFC(void* obj) {
+    u16 count2 = *(u16*)((u8*)obj + 0x152);
+    if (count2 == 0) return;
+    {
+        void** r31 = *(void***)((u8*)obj + 0x14c);
+        s32 r30 = *(u16*)((u8*)obj + 0x150);
+        count2--;
+        *(u16*)((u8*)obj + 0x152) = count2;
+        if (*(u16*)((u8*)obj + 0x152) != 0) {
+            s32 r29 = 0;
+            while (r29 < r30) {
+                void* p = r31[r29];
+                if (p != NULL) { fn_800DF248(p, (void*)4); }
+                r29++;
+            }
+            return;
+        }
+        r30 = *(u16*)((u8*)obj + 0x150);
+        r31 = *(void***)((u8*)obj + 0x14c);
+        {
+            s32 r29 = 0;
+            while (r29 < r30) {
+                void* p = r31[r29];
+                if (p != NULL) { fn_800DF608(p); }
+                r29++;
+            }
+        }
+        {
+            u16 handle = *(u16*)((u8*)obj + 0x154);
+            if (handle != 0) { fn_800E24B0(handle); fn_800E209C(handle); }
+        }
+        *(u16*)((u8*)obj + 0x154) = 0;
+        *(u16*)((u8*)obj + 0x150) = 0;
+        *(u32*)((u8*)obj + 0x14c) = 0;
+    }
 }
 #endif
 
@@ -2258,13 +2368,39 @@ void fn_800E9998(void) {
 #endif
 
 /* fn_800E9B2C | Size: 0x140 */
-#if 1
+#if 0
 asm void fn_800E9B2C(void) {
 #include "src/game/gs_material_fn_800E9B2C.inc"
 }
 #else
-void fn_800E9B2C(void) {
-    /* GSmaterial internal (0x140 bytes) */
+void fn_800E9B2C(void* entry, void* param) {
+    u32 r0 = *(u32*)entry & 0xFFCDD49Du;
+    *(u32*)entry = r0;
+    *(u32*)entry = *(u32*)entry | *(u32*)param;
+    fn_800E43A4(entry, (u8*)param + 0x4);
+    fn_800E4170(entry, (u8*)param + 0x10);
+    fn_800E407C(entry, (u8*)param + 0x1c);
+    if (*(u32*)param & 0x20000) {
+        *(u32*)entry ^= 0x20000;
+        fn_800E732C(entry, (u8*)param + 0x48, (u8*)param + 0x54, (u8*)param + 0x60);
+    }
+    *(s32*)((u8*)entry + 0x90) = -1;
+    *(s32*)((u8*)entry + 0xa8) = -1;
+    fn_800ECCA8(entry, *(u32*)((u8*)param + 0x28));
+    fn_800ECA78(entry, *(f32*)((u8*)param + 0x30));
+    fn_800EC9DC(entry, *(f32*)((u8*)param + 0x34));
+    fn_800ECB74(entry, *(u32*)((u8*)param + 0x40));
+    fn_800EC35C(entry, *(u32*)((u8*)param + 0x2c));
+    fn_800EC2A4(entry, *(f32*)((u8*)param + 0x38));
+    fn_800EC308(entry, *(f32*)((u8*)param + 0x3c));
+    fn_800EC208(entry, *(s32*)((u8*)param + 0x44));
+    if (*(u32*)param & 0x4000000) {
+        fn_800EC990(entry);
+    }
+    if (*(u32*)param & 0x2000000) {
+        fn_800EC1E4(entry);
+    }
+    fn_800ED1CC(entry);
 }
 #endif
 
@@ -2391,13 +2527,44 @@ void fn_800EA7E4(void* obj) {
 #endif
 
 /* fn_800EA820 | Size: 0x140 */
-#if 1
+#if 0
 asm void fn_800EA820(void) {
 #include "src/game/gs_material_fn_800EA820.inc"
 }
 #else
-void fn_800EA820(void) {
-    /* GSmaterial internal (0x140 bytes) */
+void fn_800EA820(void* entry, void* tex, u32 mask_shift, void* a4, void* a5, void* a6) {
+    u8 buf[12]; /* sp+8 */
+    u32 flags = *(u32*)((u8*)entry + 0x14);
+    if (!(flags & 0x10)) {
+        u32 r27 = flags & (mask_shift << 18);
+        if (r27 != 0) {
+            if (entry == NULL) {
+                fn_80196E10(lbl_8047CC00, 0x25d, lbl_8047CC08);
+            }
+            {
+                u32 f2 = *(u32*)((u8*)entry + 0x14);
+                s32 r3 = 0;
+                if (!(f2 & 0x800000)) {
+                    if (f2 & 0x40) { r3 = 1; }
+                }
+                if (r3 != 0) fn_8019D9DC(entry);
+            }
+            if (tex == NULL) {
+                fn_800E064C(lbl_804016A0);
+                tex = lbl_804016A0;
+            }
+            fn_80197B6C(entry, tex, buf);
+            if (r27 & 0x40000) {
+                fn_800EA960(entry, tex, buf, 1, a4, a5, a6);
+            }
+            if (r27 & 0x100000) {
+                fn_800EA960(entry, tex, buf, 4, a4, a5, a6);
+            }
+            if (r27 & 0x80000) {
+                fn_800EA960(entry, tex, buf, 2, a4, a5, a6);
+            }
+        }
+    }
 }
 #endif
 
