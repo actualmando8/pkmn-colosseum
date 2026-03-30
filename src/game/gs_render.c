@@ -426,12 +426,19 @@ asm void fn_800D5648(void) {
 void fn_800D5648(void) { /* TODO */ }
 #endif
 extern void fn_800D7230(void);
-#if 1
+#if 0
 asm void fn_800D56C0(void) {
 #include "src/game/gs_render_fn_800D56C0.inc"
 }
 #else
-void fn_800D56C0(void) { /* TODO */ }
+void fn_800D56C0(u8 val) {
+    if (!*(u8*)(lbl_8047AA80 + 0x47e) && *(u32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x23, 1, (u8)val);
+    } else {
+        *(u32*)(lbl_8047AA80 + 0x4a0) = (u32)fn_800D7230;
+        *(u8*)(lbl_8047AA80 + 0x4a4) = val;
+    }
+}
 #endif
 #if 1
 asm void fn_800D5724(void) {
@@ -517,19 +524,33 @@ asm void fn_800D5CB8(void) {
 #else
 void fn_800D5CB8(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_800D5D6C(void) {
 #include "src/game/gs_render_fn_800D5D6C.inc"
 }
 #else
-void fn_800D5D6C(void) { /* TODO */ }
+void fn_800D5D6C(u8 val) {
+    if (!*(u8*)(lbl_8047AA80 + 0x47e) && *(u32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x15, 1, (u8)val);
+    } else {
+        *(u32*)(lbl_8047AA80 + 0x4c4) = (u32)fn_800D73F8;
+        *(u8*)(lbl_8047AA80 + 0x4c8) = val;
+    }
+}
 #endif
-#if 1
+#if 0
 asm void fn_800D5DD0(void) {
 #include "src/game/gs_render_fn_800D5DD0.inc"
 }
 #else
-void fn_800D5DD0(void) { /* TODO */ }
+void fn_800D5DD0(u16 val) {
+    if (!*(u8*)(lbl_8047AA80 + 0x47e) && *(u32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x14, 1, (u16)val);
+    } else {
+        *(u32*)(lbl_8047AA80 + 0x4c4) = (u32)fn_800D740C;
+        *(u16*)(lbl_8047AA80 + 0x4cc) = val;
+    }
+}
 #endif
 #if 1
 asm void fn_800D5E34(void) {
@@ -1324,14 +1345,20 @@ asm void fn_800D9FB4(void) {
 #else
 void fn_800D9FB4(void) { /* TODO */ }
 #endif
-extern void fn_800B94F0(void);
+extern void fn_800B94F0(u32);
 extern u8 lbl_8031453C[];
-#if 1
+#if 0
 asm void fn_800DA028(void) {
 #include "src/game/gs_render_fn_800DA028.inc"
 }
 #else
-void fn_800DA028(void) { /* TODO */ }
+void fn_800DA028(u32 idx) {
+    if (*(u32*)lbl_8047AA80 == 1) { fn_800D4F98(0x32, 1, idx); }
+    else {
+        *(u32*)(lbl_8047AA80 + 0x428) = ((u32*)lbl_8031453C)[idx];
+        fn_800B94F0(*(u32*)(lbl_8047AA80 + 0x428));
+    }
+}
 #endif
 extern void fn_800BCFDC(void);
 #if 1
@@ -1481,12 +1508,18 @@ asm void fn_800DB988(void) {
 #else
 void fn_800DB988(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_800DB9F0(void) {
 #include "src/game/gs_render_fn_800DB9F0.inc"
 }
 #else
-void fn_800DB9F0(void) { /* TODO */ }
+void fn_800DB9F0(u32 idx, u8 a, u8 b) {
+    if (*(u32*)lbl_8047AA80 == 1) { fn_800D4F98(0x59, 3, idx, (u32)a, (u32)b); }
+    else {
+        lbl_80400B28[idx * 4 + 0x34d] = a;
+        lbl_80400B28[idx * 4 + 0x34e] = b;
+    }
+}
 #endif
 #if 0
 asm void fn_800DBA54(void) {
@@ -1781,13 +1814,19 @@ asm void fn_800DCC60(void) {
 #else
 void fn_800DCC60(u8* obj) { fn_801A49C0(*(u32*)((u8*)obj + 0xc)); }
 #endif
-extern void fn_801A4A48(void);
-#if 1
+extern void fn_801A4A48(u32, u8*);
+#if 0
 asm void fn_800DCC84(void) {
 #include "src/game/gs_render_fn_800DCC84.inc"
 }
 #else
-void fn_800DCC84(void) { /* TODO */ }
+void fn_800DCC84(u8* obj, f32* rgb) {
+    u8 tmp[4];
+    tmp[0] = (u8)(s32)rgb[0];
+    tmp[1] = (u8)(s32)rgb[1];
+    tmp[2] = (u8)(s32)rgb[2];
+    fn_801A4A48(*(u32*)(obj + 0xc), tmp);
+}
 #endif
 extern void fn_801A68F8(void);
 extern void fn_801A6910(void);
@@ -1996,15 +2035,17 @@ asm void fn_800DF11C(void) {
 #else
 void fn_800DF11C(u8* src, u8* dst) { dst[0] = src[0xc]; dst[1] = src[0xd]; dst[2] = src[0xe]; dst[3] = src[0xf]; }
 #endif
-extern void fn_801A6DDC(u32);
+extern void fn_801A6DDC(u32, ...);
 extern u32 lbl_8047CAD0;
 extern f32 lbl_8047CACC;
-#if 1
+#if 0
 asm void fn_800DF140(void) {
 #include "src/game/gs_render_fn_800DF140.inc"
 }
 #else
-void fn_800DF140(void) { /* TODO */ }
+void fn_800DF140(u8* obj) {
+    fn_801A6DDC(*(u32*)(obj + 0x8), (f32)obj[0x1] / lbl_8047CACC);
+}
 #endif
 extern f32 lbl_8047CACC;
 #if 0
@@ -2147,14 +2188,18 @@ asm void fn_800DF854(void) {
 #else
 void fn_800DF854(void) { /* TODO */ }
 #endif
-extern void fn_80193B30(void);
+extern void fn_80193B30(void*, void*, void*, void*, u32, u32);
 extern u8 lbl_8036CB30[];
-#if 1
+#if 0
 asm void fn_800DF8CC(void) {
 #include "src/game/gs_render_fn_800DF8CC.inc"
 }
 #else
-void fn_800DF8CC(void) { /* TODO */ }
+void fn_800DF8CC(void) {
+    fn_80193B30(lbl_80315490, lbl_8036CB30, (void*)lbl_802705C0, (void*)lbl_802705C0, 0x54, 0x24);
+    *(void**)&lbl_80315490[0x40] = (void*)fn_800DFE98;
+    *(void**)&lbl_80315490[0x44] = (void*)fn_800DF930;
+}
 #endif
 extern void fn_801B7C60(void);
 extern void fn_801B6DC0(void);
