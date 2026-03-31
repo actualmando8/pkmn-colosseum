@@ -57,9 +57,9 @@ extern const char lbl_80271038[]; /* "GSthread: Init OK, maximum of %d threads\n
 /* ===== Forward declarations for internal functions ===== */
 static void GStaskSchedulerThread(void);  /* fn_800FEA74 */
 extern void fn_800FEBA0(void);            /* GStaskSwapCallback */
-extern void fn_800F0F4C(void);            /* GSthread trampoline / entry wrapper */
-extern void fn_800AB150(void);
-extern void fn_800D0F44(void);
+extern void fn_800F0F4C(u32 arg);          /* GSthread trampoline / entry wrapper */
+extern void fn_800AB150(void* buf);
+extern u32 fn_800D0F44(u32 buttonIdx);
 extern void fn_800AB4FC(void);
 extern void fn_800E209C(void);
 extern void fn_800E24B0(void);
@@ -67,7 +67,7 @@ extern void fn_800E27B0(void);
 extern void fn_800E2C04(void);
 extern void fn_800E3534(void);
 extern void fn_80080ED8(void);
-extern void fn_800DBEB4(void);
+extern void fn_800DBEB4(u32 a, void* b);
 extern void fn_800D5CB8(void);
 extern void fn_800D61E4(void);
 extern void fn_800D6728(void);
@@ -80,12 +80,12 @@ extern void fn_800D88DC(void);
 extern void fn_800D9ED8(void);
 extern void fn_800DC1D4(void);
 extern void fn_800DE680(void);
-extern void fn_800EF504(void);
+extern void fn_800EF504(void* ctx);
 extern void fn_800EF548(void);
-extern void fn_801669BC(void);
+extern void fn_801669BC(u32 type);
 extern void fn_800EF5FC(void);
 extern void fn_800CDBE0(void);
-extern void fn_800D3088(void);
+extern u32 fn_800D3088(void);
 extern void fn_800DBF78(void);
 extern void fn_800DBFD4(void);
 extern void fn_800DC04C(void);
@@ -761,7 +761,7 @@ extern void fn_800F8654(void);
 extern void fn_800F8A54(void);
 extern void fn_800F915C(void);
 extern void fn_800F9210(void);
-extern void fn_800F92D4(void);
+extern u32 fn_800F92D4(u32 key);
 extern void fn_800F9318(void);
 extern void fn_800F9378(void);
 extern void fn_800F9418(void);
@@ -780,7 +780,7 @@ extern void fn_800FA1BC(void);
 extern void fn_800FA280(void);
 extern void fn_800FA314(void);
 extern void fn_800FA3D0(void);
-extern void fn_800FA444(void);
+extern u32 fn_800FA444(void* obj);
 extern void fn_800FAA98(void);
 extern void fn_800FAEF8(void);
 extern void fn_800FB43C(void);
@@ -794,28 +794,28 @@ extern void fn_800FBF74(void);
 extern void fn_800FC1D0(void);
 extern void fn_800FC244(void);
 extern void fn_800FC2A4(void);
-extern void fn_800FC2A8(void);
-extern void fn_800FC39C(void);
-extern s32 fn_800FC518(u32 val);
+extern void fn_800FC2A8(void* ptr);
+extern void* fn_800FC39C(void* ptr);
+extern void fn_800FC518(void);
 extern void fn_800FC528(void);
-extern void fn_800FC7E0(void);
+extern s32 fn_800FC7E0(void* entry, u8 type, u32 arg);
 extern void fn_800FD348(void);
 extern void fn_800FD69C(void);
-extern void fn_800FDF1C(void);
-extern s32 fn_800FDFE4(void);
-extern s32 fn_800FE010(void);
+extern void* fn_800FDF1C(void* obj, u32 key, void** outNode);
+extern s32 fn_800FDFE4(const void* str);
+extern s32 fn_800FE010(const void* str);
 extern void fn_800FE35C(void);
-extern void fn_800FE38C(void);
+extern void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2);
 extern void fn_800FE4D4(void);
-extern void fn_800FE6A0(f32 a, f32 b);
-extern void fn_800FE6AC(s16* outA, s16* outB);
-extern void fn_800FE6D0(s32 a, s32 b);
+extern void fn_800FE6A0(void);
+extern void fn_800FE6AC(void);
+extern void fn_800FE6D0(void);
 extern void fn_800FE6DC(void);
 extern void fn_800FE6F8(void);
-extern void fn_800FE714(void);
+extern void fn_800FE714(s32 taskId);
 extern void fn_800FE7A0(void);
-extern void fn_800FE834(void);
-extern void fn_800FE9B0(void);
+extern u32 fn_800FE834(u32 state, u8 priority, void* param, void* func);
+extern void fn_800FE9B0(u32 numTasks, u32 numQueues);
 extern void fn_800FEA74(void);
 
 /* 0x800F8268 | 0x1C0 */
@@ -827,8 +827,66 @@ asm void fn_800F8268(void) {
 #include "src/game/gs_thread_fn_800F8268.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800F8268(void) {
-    /* TODO: match -- 448 bytes at 0x800F8268 */
+    u8 pad[0x50];
+    u8* r31;
+    u8* r30;
+    u8* r28;
+    s32 r29;
+    u32 btnState;
+    s8 ax;
+
+    fn_800AB150(pad);
+    r31 = (u8*)&lbl_80401C10;
+    r30 = pad;
+    for (r29 = 0; r29 < 4; r29++) {
+        s32 target = r29 + 1;
+        if (*(s32*)r31 == target) {
+            r28 = r31;
+        } else {
+            r28 = r31 + 0x6C;
+            if (*(s32*)(r31 + 0x6C) != target) {
+                r28 += 0x6C;
+                if (*(s32*)(r28) != target) {
+                    r28 += 0x6C;
+                    if (*(s32*)(r28) != target) {
+                        r28 = NULL;
+                    }
+                }
+            }
+        }
+        if (r28 == NULL) goto next;
+        ax = (s8)r30[0xA];
+        if (ax == -1) {
+            btnState = fn_800D0F44((u32)r29);
+            if (btnState == 8) {
+                *(u32*)(r28 + 0xC) = 3;
+            } else if (btnState == 0x40) {
+                *(u32*)(r28 + 0xC) = 4;
+            }
+            memset(r28 + 0x18, 0, 0xC);
+            lbl_8047AC4C = lbl_8047AC4C | ((u32)0x80000000 >> (u32)r29);
+        } else if (ax >= 0 && ax < 1) {
+            if (*(u32*)(r28 + 0xC) == 3) {
+                btnState = fn_800D0F44((u32)r29);
+                if (btnState == 0x00900000) {
+                    *(u32*)(r28 + 0x4) = 0;
+                } else {
+                    *(u32*)(r28 + 0x4) = 2;
+                }
+                *(u32*)(r28 + 0xC) = 0;
+            }
+            r30[0x3] = (u8)(-(s8)r30[0x3]);
+            r30[0x5] = (u8)(-(s8)r30[0x5]);
+            memcpy(r28 + 0x18, r30, 0xC);
+            lbl_8047AC4C = lbl_8047AC4C & ~((u32)0x80000000 >> (u32)r29);
+        }
+next:
+        r30 += 0xC;
+    }
+    fn_800F8428();
+    lbl_8047AC48++;
 }
 #endif
 #pragma pop
@@ -887,8 +945,30 @@ asm void fn_800F915C(void) {
 #include "src/game/gs_thread_fn_800F915C.inc"
 }
 #else
-void fn_800F915C(void) {
-    /* TODO: match -- 180 bytes at 0x800F915C */
+#pragma optimization_level 4
+void fn_800F915C(u32 key) {
+    u8* entry;
+    u32 i;
+    u8 skip;
+
+    entry = (u8*)lbl_8047AC5C;
+    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
+        if (*(u32*)(entry + 0x4) == 0 || *(u32*)(entry + 0x8) != key) continue;
+        skip = 0;
+        if (*(u32*)(entry + 0x10) != 0) {
+            if ((u8)((u32 (*)(u32))(*(u32*)(entry + 0x10)))(*(u32*)(entry + 0xC)) == 0) {
+                skip = 1;
+            }
+        }
+        if (!skip) {
+            if (*(u16*)(entry + 0x0) != 0) {
+                GSmemLock(*(u16*)(entry + 0x0));
+                GSmemFree(*(u16*)(entry + 0x0));
+                *(u16*)(entry + 0x0) = 0;
+            }
+            *(u32*)(entry + 0x4) = 0;
+        }
+    }
 }
 #endif
 #pragma pop
@@ -902,8 +982,28 @@ asm void fn_800F9210(void) {
 #include "src/game/gs_thread_fn_800F9210.inc"
 }
 #else
-void fn_800F9210(void) {
-    /* TODO: match -- 196 bytes at 0x800F9210 */
+#pragma optimization_level 4
+void fn_800F9210(u32 key1, u32 key2) {
+    u8* entry;
+    u32 i;
+
+    entry = (u8*)lbl_8047AC5C;
+    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
+        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key1 && *(u32*)(entry + 0xC) == key2) {
+            if (*(u32*)(entry + 0x10) != 0) {
+                if ((u8)((u32 (*)(u32, u32, u32))(*(u32*)(entry + 0x10)))(*(u32*)(entry + 0x4), *(u32*)(entry + 0x8), *(u32*)(entry + 0xC)) == 0) {
+                    return;
+                }
+            }
+            if (*(u16*)(entry + 0x0) != 0) {
+                GSmemLock(*(u16*)(entry + 0x0));
+                GSmemFree(*(u16*)(entry + 0x0));
+                *(u16*)(entry + 0x0) = 0;
+            }
+            *(u32*)(entry + 0x4) = 0;
+            return;
+        }
+    }
 }
 #endif
 #pragma pop
@@ -912,13 +1012,22 @@ void fn_800F9210(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F92D4(void) {
 #include "src/game/gs_thread_fn_800F92D4.inc"
 }
 #else
-void fn_800F92D4(void) {
-    /* TODO: match -- 68 bytes at 0x800F92D4 */
+#pragma optimization_level 4
+u32 fn_800F92D4(u32 key) {
+    u8* entry;
+    u32 i;
+
+    entry = (u8*)lbl_8047AC5C;
+    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
+        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0xC) == key)
+            return *(u32*)(entry + 0x4);
+    }
+    return 0;
 }
 #endif
 #pragma pop
@@ -932,8 +1041,17 @@ asm void fn_800F9318(void) {
 #include "src/game/gs_thread_fn_800F9318.inc"
 }
 #else
-void fn_800F9318(void) {
-    /* TODO: match -- 96 bytes at 0x800F9318 */
+#pragma optimization_level 4
+u32 fn_800F9318(u32 key1, u32 key2) {
+    u8* entry;
+    u32 i;
+
+    entry = (u8*)lbl_8047AC5C;
+    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
+        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key1 && *(u32*)(entry + 0xC) == key2)
+            return *(u32*)(entry + 0x4);
+    }
+    return 0;
 }
 #endif
 #pragma pop
@@ -947,8 +1065,30 @@ asm void fn_800F9378(void) {
 #include "src/game/gs_thread_fn_800F9378.inc"
 }
 #else
-void fn_800F9378(void) {
-    /* TODO: match -- 160 bytes at 0x800F9378 */
+#pragma optimization_level 4
+void fn_800F9378(u32 fn, u32 key1, u32 key2, u32 val) {
+    u8* arr;
+    u8* p;
+    u32 i;
+
+    arr = (u8*)lbl_8047AC5C;
+    i = lbl_8047AC60;
+    p = arr;
+    for (; i > 0; i--, p += 0x14) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
+            return;
+    }
+    p = arr;
+    i = lbl_8047AC60;
+    for (; i > 0; i--, p += 0x14) {
+        if (*(u32*)(p + 0x4) == 0) break;
+    }
+    if (i == 0) return;
+    *(u16*)(p + 0x0) = 0;
+    *(u32*)(p + 0x4) = fn;
+    *(u32*)(p + 0x8) = key1;
+    *(u32*)(p + 0xC) = key2;
+    *(u32*)(p + 0x10) = val;
 }
 #endif
 #pragma pop
@@ -962,8 +1102,37 @@ asm void fn_800F9418(void) {
 #include "src/game/gs_thread_fn_800F9418.inc"
 }
 #else
-void fn_800F9418(void) {
-    /* TODO: match -- 300 bytes at 0x800F9418 */
+#pragma optimization_level 4
+void* fn_800F9418(u32 align, u32 size, u32 key1, u32 key2, u32 val) {
+    u8* arr;
+    u8* p;
+    u8* slot;
+    u32 i;
+    u32 count;
+
+    arr = (u8*)lbl_8047AC5C;
+    count = lbl_8047AC60;
+    p = arr;
+    for (i = count; i > 0; i--, p += 0x14) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
+            return NULL;
+    }
+    slot = arr;
+    for (i = count; i > 0; i--, slot += 0x14) {
+        if (*(u32*)(slot + 0x4) == 0) break;
+    }
+    if (i == 0) return NULL;
+    *(u16*)slot = (u16)GSmemAlloc(align, size);
+    if (*(u16*)slot == 0) return NULL;
+    *(u32*)(slot + 0x4) = (u32)GSmemGetPtr(*(u16*)slot);
+    if (*(u32*)(slot + 0x4) == 0) {
+        GSmemFree(*(u16*)slot);
+        return NULL;
+    }
+    *(u32*)(slot + 0x8) = key1;
+    *(u32*)(slot + 0xC) = key2;
+    *(u32*)(slot + 0x10) = val;
+    return (void*)*(u32*)(slot + 0x4);
 }
 #endif
 #pragma pop
@@ -977,8 +1146,37 @@ asm void fn_800F9544(void) {
 #include "src/game/gs_thread_fn_800F9544.inc"
 }
 #else
-void fn_800F9544(void) {
-    /* TODO: match -- 300 bytes at 0x800F9544 */
+#pragma optimization_level 4
+void* fn_800F9544(u32 size, u32 key1, u32 key2, u32 val) {
+    u8* arr;
+    u8* p;
+    u8* slot;
+    u32 i;
+    u32 count;
+
+    arr = (u8*)lbl_8047AC5C;
+    count = lbl_8047AC60;
+    p = arr;
+    for (i = count; i > 0; i--, p += 0x14) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
+            return NULL;
+    }
+    slot = arr;
+    for (i = count; i > 0; i--, slot += 0x14) {
+        if (*(u32*)(slot + 0x4) == 0) break;
+    }
+    if (i == 0) return NULL;
+    *(u16*)slot = (u16)GSmemAllocRaw(size);
+    if (*(u16*)slot == 0) return NULL;
+    *(u32*)(slot + 0x4) = (u32)GSmemGetPtr(*(u16*)slot);
+    if (*(u32*)(slot + 0x4) == 0) {
+        GSmemFree(*(u16*)slot);
+        return NULL;
+    }
+    *(u32*)(slot + 0x8) = key1;
+    *(u32*)(slot + 0xC) = key2;
+    *(u32*)(slot + 0x10) = val;
+    return (void*)*(u32*)(slot + 0x4);
 }
 #endif
 #pragma pop
@@ -992,8 +1190,21 @@ asm void fn_800F9670(void) {
 #include "src/game/gs_thread_fn_800F9670.inc"
 }
 #else
-void fn_800F9670(void) {
-    /* TODO: match -- 116 bytes at 0x800F9670 */
+#pragma optimization_level 4
+void fn_800F9670(u32 count) {
+    u32 handle;
+    u8* ptr;
+    u32 i;
+
+    lbl_8047AC60 = count;
+    handle = (u32)GSmemAllocRaw(count * 0x14);
+    lbl_8047AC58 = handle;
+    if ((handle & 0xFFFF) == 0) return;
+    ptr = (u8*)GSmemGetPtr(handle & 0xFFFF);
+    lbl_8047AC5C = (u32)ptr;
+    for (i = 0; i < count; i++, ptr += 0x14) {
+        *(u32*)(ptr + 0x4) = 0;
+    }
 }
 #endif
 #pragma pop
@@ -1022,8 +1233,56 @@ asm void fn_800F9AEC(void) {
 #include "src/game/gs_thread_fn_800F9AEC.inc"
 }
 #else
-void fn_800F9AEC(void) {
-    /* TODO: match -- 280 bytes at 0x800F9AEC */
+#pragma optimization_level 4
+u32 fn_800F9AEC(void* outbuf, u16* src, u32 mode) {
+    u8* out;
+    u16* table;
+    u32 count;
+    u16 ch;
+    u16* p;
+    u32 idx;
+
+    out = (u8*)outbuf;
+    count = 0;
+
+    if (mode == 1) {
+        if (src == NULL) return count;
+        table = (u16*)lbl_80271300;
+        ch = *src;
+        while (ch != 0) {
+            p = table;
+            for (idx = 0; idx < 0x100; idx++, p++) {
+                if (*p == ch) break;
+            }
+            if (idx == 0x100) idx = 0xb7;
+            if (out != NULL) {
+                *out = (u8)(idx & 0xFF);
+                out++;
+            }
+            count++;
+            src++;
+            ch = *src;
+        }
+    } else {
+        if (src == NULL) return count;
+        table = (u16*)lbl_80271500;
+        ch = *src;
+        while (ch != 0) {
+            p = table;
+            for (idx = 0; idx < 0x100; idx++, p++) {
+                if (*p == ch) break;
+            }
+            if (idx == 0x100) idx = 0xb7;
+            if (out != NULL) {
+                *out = (u8)(idx & 0xFF);
+                out++;
+            }
+            count++;
+            src++;
+            ch = *src;
+        }
+    }
+    return count;
 }
 #endif
 #pragma pop
@@ -1037,8 +1296,50 @@ asm void fn_800F9C04(void) {
 #include "src/game/gs_thread_fn_800F9C04.inc"
 }
 #else
-void fn_800F9C04(void) {
-    /* TODO: match -- 256 bytes at 0x800F9C04 */
+#pragma optimization_level 4
+u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
+    u16* out;
+    u16* table;
+    u32 total;
+    u8 b;
+
+    out = (u16*)outbuf;
+    total = 0;
+
+    if (mode == 1) {
+        if (src == NULL) {
+            if (out != NULL) *out = 0;
+            return total;
+        }
+        table = (u16*)lbl_80271300;
+        while (count > 0 && (b = *src) != 0xFF) {
+            if (out != NULL) {
+                *out = table[b];
+                out++;
+            }
+            total++;
+            src++;
+            count--;
+        }
+        if (out != NULL) *out = 0;
+    } else {
+        if (src == NULL) {
+            if (out != NULL) *out = 0;
+            return total;
+        }
+        table = (u16*)lbl_80271500;
+        while (count > 0 && (b = *src) != 0xFF) {
+            if (out != NULL) {
+                *out = table[b];
+                out++;
+            }
+            total++;
+            src++;
+            count--;
+        }
+        if (out != NULL) *out = 0;
+    }
+    return total;
 }
 #endif
 #pragma pop
@@ -1047,7 +1348,7 @@ void fn_800F9C04(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_800F9D04(void) {
 #include "src/game/gs_thread_fn_800F9D04.inc"
 }
@@ -1068,8 +1369,24 @@ asm void fn_800F9D24(void) {
 #include "src/game/gs_thread_fn_800F9D24.inc"
 }
 #else
-void fn_800F9D24(void) {
-    /* TODO: match -- 332 bytes at 0x800F9D24 */
+#pragma optimization_level 4
+void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
+    s32 r;
+    s32 i;
+
+    if (maxlen <= 0) return dst;
+    r = (fn_800FE010(src) + 1) >> 1;
+    if (r >= maxlen) r = maxlen - 1;
+    memcpy(dst, src, r * 2);
+    i = r;
+    r = maxlen - r;
+    if (r <= 0) return dst;
+    while (r > 0) {
+        dst[i] = 0;
+        i++;
+        r--;
+    }
+    return dst;
 }
 #endif
 #pragma pop
@@ -1083,8 +1400,17 @@ asm void fn_800F9E70(void) {
 #include "src/game/gs_thread_fn_800F9E70.inc"
 }
 #else
-void fn_800F9E70(void) {
-    /* TODO: match -- 116 bytes at 0x800F9E70 */
+#pragma optimization_level 4
+void* fn_800F9E70(void* dst, void* src) {
+    u32 n;
+    if (dst == NULL) return NULL;
+    if (src == NULL) {
+        *(u16*)dst = 0;
+        return dst;
+    }
+    n = fn_800FE010(src);
+    memcpy(dst, src, n);
+    return dst;
 }
 #endif
 #pragma pop
@@ -1098,8 +1424,81 @@ asm void fn_800F9EE4(void) {
 #include "src/game/gs_thread_fn_800F9EE4.inc"
 }
 #else
-void fn_800F9EE4(void) {
-    /* TODO: match -- 384 bytes at 0x800F9EE4 */
+#pragma optimization_level 4
+s32 fn_800F9EE4(void* str1, void* str2) {
+    s32 len1;
+    s32 len2;
+    u16* p1;
+    u16* p2;
+    u32 i;
+    u16 c1;
+    u16 c2;
+    s32 n;
+
+    len1 = fn_800FDFE4(str1);
+    len2 = fn_800FDFE4(str2);
+
+    if (len1 == len2) {
+        p1 = (u16*)str1;
+        p2 = (u16*)str2;
+        i = 0;
+        n = len1;
+        while (n > 0) {
+            c1 = *p1;
+            c2 = *p2;
+            if (c1 != c2) {
+                c1 = ((u16*)str1)[i];
+                c2 = ((u16*)str2)[i];
+                if (c1 > c2) return 1;
+                return -1;
+            }
+            p1++;
+            p2++;
+            i++;
+            n--;
+        }
+        return 0;
+    } else if (len1 > len2) {
+        p1 = (u16*)str2;
+        p2 = (u16*)str1;
+        i = 0;
+        n = len2;
+        while (n > 0) {
+            c1 = *p2;
+            c2 = *p1;
+            if (c1 != c2) {
+                c1 = ((u16*)str1)[i];
+                c2 = ((u16*)str2)[i];
+                if (c1 > c2) return 1;
+                return -1;
+            }
+            p1++;
+            p2++;
+            i++;
+            n--;
+        }
+        return 1;
+    } else {
+        p1 = (u16*)str2;
+        p2 = (u16*)str1;
+        i = 0;
+        n = len1;
+        while (n > 0) {
+            c1 = *p2;
+            c2 = *p1;
+            if (c1 != c2) {
+                c1 = ((u16*)str1)[i];
+                c2 = ((u16*)str2)[i];
+                if (c1 > c2) return 1;
+                return -1;
+            }
+            p1++;
+            p2++;
+            i++;
+            n--;
+        }
+        return -1;
+    }
 }
 #endif
 #pragma pop
@@ -1113,8 +1512,37 @@ asm void fn_800FA064(void) {
 #include "src/game/gs_thread_fn_800FA064.inc"
 }
 #else
-void fn_800FA064(void) {
-    /* TODO: match -- 252 bytes at 0x800FA064 */
+#pragma optimization_level 4
+void fn_800FA064(void* obj) {
+    u8* o;
+    u32 rv;
+    s16 r5;
+    u8 type;
+    f32 base;
+    f64 bias;
+
+    o = (u8*)obj;
+    if (*(s16*)(o + 0x18) == 0) return;
+    rv = fn_800FA444(*(void**)(o + 0x1C));
+    r5 = (s16)(rv >> 16);
+    type = *(u8*)(o + 0x4A);
+    base = *(f32*)(o + 0x4);
+    bias = lbl_8047CD10;
+
+    if (type == 0) {
+        *(f32*)(o + 0xC) = base;
+    } else if (type == 1) {
+        s16 target;
+        s32 diff;
+        target = *(s16*)(o + 0x18);
+        diff = (s32)(target - r5);
+        diff = (diff + (diff >> 31)) >> 1;
+        *(f32*)(o + 0xC) = base + (f32)((f64)diff - bias + bias);
+    } else if (type < 4) {
+        s16 target;
+        target = *(s16*)(o + 0x18);
+        *(f32*)(o + 0xC) = base + (f32)target - (f32)r5;
+    }
 }
 #endif
 #pragma pop
@@ -1128,8 +1556,20 @@ asm void fn_800FA160(void) {
 #include "src/game/gs_thread_fn_800FA160.inc"
 }
 #else
-void fn_800FA160(void) {
-    /* TODO: match -- 92 bytes at 0x800FA160 */
+#pragma optimization_level 4
+void fn_800FA160(void* obj) {
+    u8 clr[8];
+    u32 color;
+    u32 init;
+    init = lbl_8047CD04;
+    color = *(u32*)((u8*)obj + 0x24);
+    *(u32*)(&clr[4]) = init;
+    clr[4] = (u8)(color >> 24);
+    clr[5] = (u8)((color >> 16) & 0xFF);
+    clr[6] = (u8)((color >> 8) & 0xFF);
+    clr[7] = (u8)(color & 0xFF);
+    *(u32*)(&clr[0]) = *(u32*)(&clr[4]);
+    fn_800DBEB4(0, &clr[0]);
 }
 #endif
 #pragma pop
@@ -1143,8 +1583,42 @@ asm void fn_800FA1BC(void) {
 #include "src/game/gs_thread_fn_800FA1BC.inc"
 }
 #else
-void fn_800FA1BC(void) {
-    /* TODO: match -- 196 bytes at 0x800FA1BC */
+#pragma optimization_level 4
+void fn_800FA1BC(void* obj) {
+    u8* o;
+    u8* head;
+    u32 count;
+    u32 offset;
+    u8* arr;
+    u8* entry;
+    u16 val;
+
+    o = (u8*)obj;
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)(head + 0x4);
+    if ((s32)count <= 0) return;
+    offset = 0;
+    do {
+        arr = (u8*)*(u32*)(head + 0x24);
+        entry = arr + offset;
+        if (*(u16*)entry == *(u16*)(o + 0x20)) {
+            *(u8*)(o + 0x22) = entry[2];
+            *(u8*)(o + 0x23) = entry[3];
+            val = *(u16*)(o + 0x20);
+            if (val == 0) {
+                *(u8*)(o + 0x42) = 0xB;
+                return;
+            } else if (val == 1) {
+                *(u8*)(o + 0x42) = 6;
+                return;
+            } else {
+                *(s8*)(o + 0x42) = (s8)(s32)(lbl_8047CD20 * ((f64)(u32)entry[3] - lbl_8047CD28) + lbl_8047CD18);
+                return;
+            }
+        }
+        offset += 8;
+        count--;
+    } while (count > 0);
 }
 #endif
 #pragma pop
@@ -1158,8 +1632,46 @@ asm void fn_800FA280(void) {
 #include "src/game/gs_thread_fn_800FA280.inc"
 }
 #else
-void fn_800FA280(void) {
-    /* TODO: match -- 148 bytes at 0x800FA280 */
+#pragma optimization_level 4
+void* fn_800FA280(u32 key) {
+    u8* head;
+    u16 group;
+    u32 sub;
+    u8* node;
+    u32 lo;
+    u32 hi;
+    u32 mid;
+    u32 count;
+    u8* arr;
+    u32 val;
+
+    if (key == 0) return NULL;
+
+    head = (u8*)lbl_80478B08;
+    group = (u16)(key >> 20);
+    sub = key & 0xFFFFF;
+
+    node = (u8*)*(u32*)(head + 0x8);
+    while (node != NULL) {
+        if (*(u16*)(node + 0x0) == group) {
+            count = *(u16*)(node + 0x4);
+            arr = node + 0x10;
+            lo = 0;
+            hi = count;
+            while (lo < hi) {
+                mid = (lo + hi) >> 1;
+                val = *(u32*)(arr + mid * 8);
+                if (val == sub) {
+                    u32 offset = *(u32*)(arr + mid * 8 + 4);
+                    return node + offset;
+                }
+                if (val < sub) lo = mid + 1;
+                else hi = mid;
+            }
+        }
+        node = (u8*)*(u32*)(node + 0x8);
+    }
+    return NULL;
 }
 #endif
 #pragma pop
@@ -1173,8 +1685,49 @@ asm void fn_800FA314(void) {
 #include "src/game/gs_thread_fn_800FA314.inc"
 }
 #else
-void fn_800FA314(void) {
-    /* TODO: match -- 188 bytes at 0x800FA314 */
+#pragma optimization_level 4
+s32 fn_800FA314(u32 key) {
+    u8* head;
+    u16 group;
+    u32 sub;
+    u8* node;
+    u32 lo;
+    u32 hi;
+    u32 mid;
+    u32 count;
+    u8* arr;
+    u32 val;
+    void* result;
+
+    if (key == 0) return fn_800FDFE4(NULL);
+
+    head = (u8*)lbl_80478B08;
+    group = (u16)(key >> 20);
+    sub = key & 0xFFFFF;
+
+    node = (u8*)*(u32*)(head + 0x8);
+    result = NULL;
+    while (node != NULL) {
+        if (*(u16*)(node + 0x0) == group) {
+            count = *(u16*)(node + 0x4);
+            arr = node + 0x10;
+            lo = 0;
+            hi = count;
+            while (lo < hi) {
+                mid = (lo + hi) >> 1;
+                val = *(u32*)(arr + mid * 8);
+                if (val == sub) {
+                    u32 offset = *(u32*)(arr + mid * 8 + 4);
+                    result = node + offset;
+                    return fn_800FDFE4(result);
+                }
+                if (val < sub) lo = mid + 1;
+                else hi = mid;
+            }
+        }
+        node = (u8*)*(u32*)(node + 0x8);
+    }
+    return fn_800FDFE4(NULL);
 }
 #endif
 #pragma pop
@@ -1188,8 +1741,24 @@ asm void fn_800FA3D0(void) {
 #include "src/game/gs_thread_fn_800FA3D0.inc"
 }
 #else
-void fn_800FA3D0(void) {
-    /* TODO: match -- 116 bytes at 0x800FA3D0 */
+#pragma optimization_level 4
+s32 fn_800FA3D0(u32 key) {
+    u8* head;
+    u32 count;
+    u8* entry;
+    u8 i;
+
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)head;
+
+    for (i = 0; (u32)(i & 0xFF) < count; i++) {
+        entry = (u8*)*(u32*)(head + 0x20) + (u32)(i & 0xFF) * 0x68;
+        if (*(u8*)(entry + 0x0) != 0 && *(u32*)(entry + 0x1C) == key) {
+            if (*(u8*)(entry + 0x0) == 1) return 1;
+            return 0;
+        }
+    }
+    return 0;
 }
 #endif
 #pragma pop
@@ -1199,11 +1768,11 @@ void fn_800FA3D0(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FA444(void) {
+asm u32 fn_800FA444(void* obj) {
 #include "src/game/gs_thread_fn_800FA444.inc"
 }
 #else
-void fn_800FA444(void) {
+u32 fn_800FA444(void* obj) {
     /* TODO: match -- 1620 bytes at 0x800FA444 */
 }
 #endif
@@ -1308,8 +1877,35 @@ asm void fn_800FBD88(void) {
 #include "src/game/gs_thread_fn_800FBD88.inc"
 }
 #else
-void fn_800FBD88(void) {
-    /* TODO: match -- 244 bytes at 0x800FBD88 */
+#pragma optimization_level 4
+void fn_800FBD88(u32 key) {
+    u8* head;
+    u32 count;
+    u8* entry;
+    u8 i;
+    u8 type;
+    u32 r3;
+
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)head;
+    entry = NULL;
+    for (i = 0; (u32)(i & 0xFF) < count; i++) {
+        u8* e = (u8*)*(u32*)(head + 0x20) + (u32)(i & 0xFF) * 0x68;
+        if (*(u8*)(e + 0x0) != 0 && *(u32*)(e + 0x1C) == key) {
+            entry = e;
+            break;
+        }
+    }
+    if (entry == NULL) return;
+    type = *(u8*)(entry + 0x3);
+    r3 = 0;
+    if (type == 1) r3 = 0x57;
+    else if (type == 2) r3 = 0x58;
+    else if (type == 3) r3 = 0x59;
+    else if (type == 4) r3 = 0x497;
+    else if (type == 5) r3 = 0x498;
+    if (r3 != 0) fn_801669BC(r3);
+    *(u8*)(entry + 0x0) = 0;
 }
 #endif
 #pragma pop
@@ -1323,8 +1919,25 @@ asm void fn_800FBE7C(void) {
 #include "src/game/gs_thread_fn_800FBE7C.inc"
 }
 #else
-void fn_800FBE7C(void) {
-    /* TODO: match -- 148 bytes at 0x800FBE7C */
+#pragma optimization_level 4
+s32 fn_800FBE7C(u32 key, u32 r4arg) {
+    u8* head;
+    u32 count;
+    u8* entry;
+    u8 i;
+
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)head;
+    entry = NULL;
+    for (i = 0; (u32)(i & 0xFF) < count; i++) {
+        u8* e = (u8*)*(u32*)(head + 0x20) + (u32)(i & 0xFF) * 0x68;
+        if (*(u8*)(e + 0x0) != 0 && *(u32*)(e + 0x1C) == key) {
+            entry = e;
+            break;
+        }
+    }
+    if (entry == NULL) return -1;
+    return fn_800FC7E0(entry, *(u8*)(entry + 0x44), r4arg);
 }
 #endif
 #pragma pop
@@ -1338,8 +1951,22 @@ asm void fn_800FBF10(void) {
 #include "src/game/gs_thread_fn_800FBF10.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800FBF10(void) {
-    /* TODO: match -- 100 bytes at 0x800FBF10 */
+    u8* head;
+    s8 idx;
+    void* ctx;
+
+    head = (u8*)lbl_80478B08;
+    idx = *(s8*)(head + 0x1D);
+    ctx = *(void**)(head + (u32)(idx * 4) + 0xC);
+    fn_800EF504(ctx);
+    head = (u8*)lbl_80478B08;
+    *(u16*)(head + 0x18) = 2;
+    head = (u8*)lbl_80478B08;
+    *(u16*)(head + 0x1A) = 1;
+    head = (u8*)lbl_80478B08;
+    *(s8*)(head + 0x1D) = *(s8*)(head + 0x1D) ^ 1;
 }
 #endif
 #pragma pop
@@ -1368,8 +1995,24 @@ asm void fn_800FC1D0(void) {
 #include "src/game/gs_thread_fn_800FC1D0.inc"
 }
 #else
-void fn_800FC1D0(void) {
-    /* TODO: match -- 116 bytes at 0x800FC1D0 */
+#pragma optimization_level 4
+s32 fn_800FC1D0(u32* item) {
+    u32* head;
+    u32* p;
+
+    head = (u32*)lbl_80478B08;
+    p = (u32*)head[2];
+    if (p == NULL) return -1;
+    while (p != NULL) {
+        if (p == item) {
+            if (p[3] != 0) ((u32*)p[3])[2] = p[2];
+            else head[2] = p[2];
+            if (p[2] != 0) ((u32*)p[2])[3] = p[3];
+            return 0;
+        }
+        p = (u32*)p[2];
+    }
+    return 0;
 }
 #endif
 #pragma pop
@@ -1383,14 +2026,35 @@ asm void fn_800FC244(void) {
 #include "src/game/gs_thread_fn_800FC244.inc"
 }
 #else
-void fn_800FC244(void) {
-    /* TODO: match -- 96 bytes at 0x800FC244 */
+#pragma optimization_level 4
+void fn_800FC244(u32* item) {
+    u32* head;
+    u32* p;
+
+    head = (u32*)lbl_80478B08;
+    p = (u32*)head[2];
+    if (p == NULL) {
+        head[2] = (u32)item;
+        item[2] = 0;
+        item[3] = 0;
+        return;
+    }
+    while (1) {
+        if (p == item) return;
+        if (p[2] == 0) {
+            p[2] = (u32)item;
+            item[2] = 0;
+            item[3] = (u32)p;
+            return;
+        }
+        p = (u32*)p[2];
+    }
 }
 #endif
 #pragma pop
 
 /* 0x800FC2A4 | 0x4 | void_stub */
-#if 0
+#if 1
 asm void fn_800FC2A4(void) {
 #include "src/game/gs_thread_fn_800FC2A4.inc"
 }
@@ -1404,12 +2068,69 @@ void fn_800FC2A4(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FC2A8(void) {
+asm void fn_800FC2A8(void* ptr) {
 #include "src/game/gs_thread_fn_800FC2A8.inc"
 }
 #else
-void fn_800FC2A8(void) {
-    /* TODO: match -- 244 bytes at 0x800FC2A8 */
+#pragma optimization_level 4
+void fn_800FC2A8(void* ptr) {
+    u8* p;
+    u8* head;
+    u8* entry;
+    u8* node;
+    u8* nodeNext;
+    u8* nodePrev;
+    u16 count;
+    u16 idx;
+    u32 offset;
+    u16 needle;
+
+    p = (u8*)ptr;
+tail:
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)(head + 0x4);
+    idx = 0;
+    offset = 0;
+    entry = NULL;
+    while (count > 0) {
+        entry = (u8*)*(u32*)(head + 0x24) + offset;
+        if (*(u32*)(entry + 0x4) != 0) {
+            needle = *(u16*)p;
+            if (*(u16*)entry == needle) break;
+        }
+        offset += 8;
+        idx++;
+        count--;
+        entry = NULL;
+    }
+    if (entry != NULL) {
+        node = (u8*)*(u32*)(entry + 0x4);
+        while (node != NULL) {
+            if (node == p + 8) {
+                nodeNext = (u8*)*(u32*)(node + 0x8);
+                nodePrev = (u8*)*(u32*)(node + 0xC);
+                if (nodePrev == NULL && nodeNext == NULL) {
+                    *(u16*)entry = 0xFFFF;
+                    *(u32*)(entry + 0x4) = 0;
+                } else {
+                    if (nodePrev != NULL) {
+                        *(u32*)(nodePrev + 0x8) = (u32)nodeNext;
+                    } else {
+                        *(u32*)(entry + 0x4) = (u32)nodeNext;
+                    }
+                    if (nodeNext != NULL) {
+                        *(u32*)(nodeNext + 0xC) = (u32)nodePrev;
+                    }
+                }
+                break;
+            }
+            node = (u8*)*(u32*)(node + 0x8);
+        }
+    }
+    if (*(u32*)(p + 0x4) != 0) {
+        p += *(u32*)(p + 0x4);
+        goto tail;
+    }
 }
 #endif
 #pragma pop
@@ -1419,12 +2140,88 @@ void fn_800FC2A8(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FC39C(void) {
+asm void* fn_800FC39C(void* ptr) {
 #include "src/game/gs_thread_fn_800FC39C.inc"
 }
 #else
-void fn_800FC39C(void) {
-    /* TODO: match -- 380 bytes at 0x800FC39C */
+#pragma optimization_level 4
+void* fn_800FC39C(void* ptr) {
+    u8* p;
+    u8* orig;
+    u8* head;
+    u8* entry;
+    u8* node;
+    u8* node2;
+    u16 key;
+    u16 count;
+    u16 idx;
+    u32 offset;
+
+    orig = (u8*)ptr;
+    p = orig;
+loop:
+    key = *(u16*)p;
+    if (key == 0xFFFF) return NULL;
+
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)(head + 0x4);
+    idx = 0;
+    offset = 0;
+    entry = NULL;
+    while (count > 0) {
+        entry = (u8*)*(u32*)(head + 0x24) + offset;
+        if (*(u32*)(entry + 0x4) != 0) {
+            if (*(u16*)entry == key) break;
+        }
+        offset += 8;
+        idx++;
+        count--;
+        entry = NULL;
+    }
+    if (entry == NULL) {
+        /* No matching occupied slot. Find free slot for new key. */
+        count = *(u16*)(head + 0x4);
+        idx = 0;
+        offset = 0;
+        entry = NULL;
+        while (count > 0) {
+            entry = (u8*)*(u32*)(head + 0x24) + offset;
+            if (*(u32*)(entry + 0x4) == 0) {
+                /* Insert into free slot */
+                *(u32*)(entry + 0x0) = *(u32*)(p + 0x0);
+                *(u32*)(entry + 0x4) = (u32)(p + 0x8);
+                *(u32*)(p + 0x8 + 0x8) = 0;
+                *(u32*)(p + 0x8 + 0xC) = 0;
+                break;
+            }
+            offset += 8;
+            idx++;
+            count--;
+            entry = NULL;
+        }
+        if (entry == NULL) {
+            fn_800DD970((const char*)lbl_8027177C, *(u16*)p);
+        }
+    } else {
+        /* Found occupied slot with matching key; insert node into list */
+        node = p + 8;
+        node2 = (u8*)*(u32*)(entry + 0x4);
+        while (1) {
+            if (node2 == node) return NULL;
+            if (*(u32*)(node2 + 0x8) == 0) {
+                *(u32*)(node2 + 0x8) = (u32)node;
+                *(u32*)(node + 0x8) = 0;
+                *(u32*)(node + 0xC) = (u32)node2;
+                break;
+            }
+            node2 = (u8*)*(u32*)(node2 + 0x8);
+        }
+    }
+    if (*(u32*)(p + 0x4) != 0) {
+        p += *(u32*)(p + 0x4);
+        goto loop;
+    }
+    return orig;
 }
 #endif
 #pragma pop
@@ -1433,7 +2230,7 @@ void fn_800FC39C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_800FC518(void) {
 #include "src/game/gs_thread_fn_800FC518.inc"
 }
@@ -1466,12 +2263,13 @@ void fn_800FC528(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FC7E0(void) {
+asm s32 fn_800FC7E0(void* entry, u8 type, u32 arg) {
 #include "src/game/gs_thread_fn_800FC7E0.inc"
 }
 #else
-void fn_800FC7E0(void) {
+s32 fn_800FC7E0(void* entry, u8 type, u32 arg) {
     /* TODO: match -- 2920 bytes at 0x800FC7E0 */
+    return 0;
 }
 #endif
 #pragma pop
@@ -1511,12 +2309,62 @@ void fn_800FD69C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FDF1C(void) {
+asm void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
 #include "src/game/gs_thread_fn_800FDF1C.inc"
 }
 #else
-void fn_800FDF1C(void) {
-    /* TODO: match -- 200 bytes at 0x800FDF1C */
+#pragma optimization_level 4
+void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
+    u8* head;
+    u32 count;
+    u32 offset;
+    u32 idx;
+    u8* entry;
+    u8* e;
+    u8* node;
+    u32 lo;
+    u32 hi;
+    u32 mid;
+    u16 nodeCount;
+    u8* arr;
+    u16 ek;
+
+    head = (u8*)lbl_80478B08;
+    count = *(u16*)(head + 0x4);
+    offset = 0;
+    idx = 0;
+    entry = NULL;
+    while ((s32)count > 0 && idx < count) {
+        e = (u8*)*(u32*)(head + 0x24) + offset;
+        if (*(u16*)e == *(u16*)((u8*)obj + 0x20)) {
+            entry = e;
+            break;
+        }
+        offset += 8;
+        idx++;
+    }
+    if (idx == count) return NULL;
+
+    node = (u8*)*(u32*)(entry + 0x4);
+    key = key & 0xFFFF;
+    while (node != NULL) {
+        nodeCount = *(u16*)node;
+        arr = node + 0x10;
+        lo = 0;
+        hi = nodeCount;
+        while (lo < hi) {
+            mid = (lo + hi) >> 1;
+            ek = *(u16*)(arr + mid * 8);
+            if (ek == (u16)key) {
+                if (outNode != NULL) { *outNode = (void*)node; }
+                return arr + mid * 8;
+            }
+            if (ek < (u16)key) lo = mid + 1;
+            else hi = mid;
+        }
+        node = (u8*)*(u32*)(node + 0x8);
+    }
+    return NULL;
 }
 #endif
 #pragma pop
@@ -1526,14 +2374,14 @@ void fn_800FDF1C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FDFE4(void) {
+asm s32 fn_800FDFE4(const void* str) {
 #include "src/game/gs_thread_fn_800FDFE4.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_800FDFE4(void) {
+s32 fn_800FDFE4(const void* str) {
     s32 r;
-    r = fn_800FE010();
+    r = fn_800FE010(str);
     return ((u32)(r + 1) >> 1) - 1;
 }
 #endif
@@ -1544,11 +2392,11 @@ s32 fn_800FDFE4(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm s32 fn_800FE010(void) {
+asm s32 fn_800FE010(const void* str) {
 #include "src/game/gs_thread_fn_800FE010.inc"
 }
 #else
-s32 fn_800FE010(void) {
+s32 fn_800FE010(const void* str) {
     /* TODO: match -- 844 bytes at 0x800FE010 */
     return 0;
 }
@@ -1564,6 +2412,7 @@ asm void fn_800FE35C(void) {
 #include "src/game/gs_thread_fn_800FE35C.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800FE35C(void) {
     fn_800D9D68(0, 0, 0x27F, 0x1DF);
 }
@@ -1575,12 +2424,35 @@ void fn_800FE35C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FE38C(void) {
+asm void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 #include "src/game/gs_thread_fn_800FE38C.inc"
 }
 #else
-void fn_800FE38C(void) {
-    /* TODO: match -- 328 bytes at 0x800FE38C */
+#pragma optimization_level 4
+void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
+    s32 ax, ay, bx, by;
+    f32 scale_x, scale_y;
+    s32 cx1, cy1, cx2, cy2;
+
+    ax = (s32)(*(s16*)&lbl_8047AC70) + x1;
+    ay = (s32)(*(s16*)&lbl_8047AC72) + y1;
+    bx = ax + x2;
+    by = ay + y2;
+    scale_x = *(f32*)&lbl_80478B10;
+    scale_y = *(f32*)&lbl_80478B14;
+    cx1 = (s32)((f32)ax * scale_x);
+    cy1 = (s32)((f32)ay * scale_y);
+    cx2 = (s32)((f32)bx * scale_x);
+    cy2 = (s32)((f32)by * scale_y);
+    if (cx1 >= 0x280) cx1 = 0x27F;
+    if (cy1 >= 0x1E0) cy1 = 0x1DF;
+    if (cx2 >= 0x280) cx2 = 0x27F;
+    if (cy2 >= 0x1E0) cy2 = 0x1DF;
+    if (cx1 < 0) cx1 = 0;
+    if (cy1 < 0) cy1 = 0;
+    if (cx2 < 0) cx2 = 0;
+    if (cy2 < 0) cy2 = 0;
+    fn_800D9D68((u32)cx1, (u32)cy1, (u32)cx2, (u32)cy2);
 }
 #endif
 #pragma pop
@@ -1604,7 +2476,7 @@ void fn_800FE4D4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_800FE6A0(void) {
 #include "src/game/gs_thread_fn_800FE6A0.inc"
 }
@@ -1621,7 +2493,7 @@ void fn_800FE6A0(f32 a, f32 b) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_800FE6AC(void) {
 #include "src/game/gs_thread_fn_800FE6AC.inc"
 }
@@ -1642,7 +2514,7 @@ void fn_800FE6AC(s16* outA, s16* outB) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_800FE6D0(void) {
 #include "src/game/gs_thread_fn_800FE6D0.inc"
 }
@@ -1664,6 +2536,7 @@ asm void fn_800FE6DC(void) {
 #include "src/game/gs_thread_fn_800FE6DC.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800FE6DC(s32 taskId) {
     ((u8*)lbl_8047AC7C)[(taskId - 1) * 0x18 + 0xD] = 0;
 }
@@ -1679,6 +2552,7 @@ asm void fn_800FE6F8(void) {
 #include "src/game/gs_thread_fn_800FE6F8.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800FE6F8(s32 taskId) {
     ((u8*)lbl_8047AC7C)[(taskId - 1) * 0x18 + 0xD] = 1;
 }
@@ -1690,12 +2564,25 @@ void fn_800FE6F8(s32 taskId) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FE714(void) {
+asm void fn_800FE714(s32 taskId) {
 #include "src/game/gs_thread_fn_800FE714.inc"
 }
 #else
-void fn_800FE714(void) {
-    /* TODO: match -- 140 bytes at 0x800FE714 */
+#pragma optimization_level 4
+void fn_800FE714(s32 taskId) {
+    u32 offset;
+    u8* task;
+
+    offset = (u32)(taskId - 1) * 0x18;
+    task = (u8*)lbl_8047AC7C + offset;
+    OSDisableInterrupts();
+    if (*(u32*)(task + 0x0) != 0) *(u32*)(*(u32*)(task + 0x0) + 0x4) = *(u32*)(task + 0x4);
+    if (*(u32*)(task + 0x4) != 0) *(u32*)(*(u32*)(task + 0x4) + 0x0) = *(u32*)(task + 0x0);
+    if (lbl_8047AC98 == *(u32*)task) lbl_8047AC98 = *(u32*)(task + 0x4);
+    *(u32*)(task + 0x0) = 0;
+    *(u32*)(task + 0x4) = 0;
+    OSRestoreInterrupts();
+    *(u32*)(task + 0x8) = 0;
 }
 #endif
 #pragma pop
@@ -1709,8 +2596,22 @@ asm void fn_800FE7A0(void) {
 #include "src/game/gs_thread_fn_800FE7A0.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800FE7A0(void) {
-    /* TODO: match -- 148 bytes at 0x800FE7A0 */
+    u32* task;
+    u32* next;
+    u32 taskId;
+    task = (u32*)lbl_8047AC98;
+    while (task != NULL) {
+        next = (u32*)task[1];
+        if (task[2] == 1 && ((u8*)task)[0xD] == 0) {
+            lbl_8047AC94 = (u32)task;
+            taskId = ((u32)task - lbl_8047AC7C) / 0x18 + 1;
+            ((void (*)(u32, void*))task[5])(taskId, (void*)task[4]);
+        }
+        task = next;
+    }
+    lbl_8047AC94 = 0;
 }
 #endif
 #pragma pop
@@ -1720,12 +2621,67 @@ void fn_800FE7A0(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FE834(void) {
+asm u32 fn_800FE834(u32 state, u8 priority, void* param, void* func) {
 #include "src/game/gs_thread_fn_800FE834.inc"
 }
 #else
-void fn_800FE834(void) {
-    /* TODO: match -- 380 bytes at 0x800FE834 */
+#pragma optimization_level 4
+u32 fn_800FE834(u32 state, u8 priority, void* param, void* func) {
+    u8* task;
+    u32 count;
+    u32 i;
+    u8* curr;
+    u8* prev;
+
+    if (state == 2) {
+        task = (u8*)lbl_8047AC7C + lbl_8047AC80 * 0x18;
+        count = lbl_8047AC84;
+    } else {
+        task = (u8*)lbl_8047AC7C;
+        count = lbl_8047AC80;
+    }
+    for (i = count; i > 0; i--) {
+        if (*(u32*)(task + 0x8) == 0) goto found;
+        task += 0x18;
+    }
+    return 0;
+found:
+    *(u32*)(task + 0x0) = 0;
+    *(u32*)(task + 0x4) = 0;
+    *(u32*)(task + 0x8) = state;
+    *(u8*)(task + 0xC) = priority;
+    *(u8*)(task + 0xD) = 0;
+    *(u32*)(task + 0x10) = (u32)param;
+    *(u32*)(task + 0x14) = (u32)func;
+    if (lbl_8047AC98 == 0) {
+        lbl_8047AC98 = (u32)task;
+    } else {
+        OSDisableInterrupts();
+        if (state == 2) {
+            *(u32*)(task + 0x4) = lbl_8047AC9C;
+            lbl_8047AC9C = (u32)task;
+        } else {
+            curr = (u8*)lbl_8047AC98;
+            while (*(u32*)(curr + 0x4) != 0) {
+                if (*(u8*)(curr + 0xC) >= priority) break;
+                curr = (u8*)*(u32*)(curr + 0x4);
+            }
+            if (*(u32*)(curr + 0x4) == 0 && *(u8*)(curr + 0xC) < priority) {
+                *(u32*)(task + 0x0) = (u32)curr;
+                *(u32*)(task + 0x4) = 0;
+                *(u32*)(curr + 0x4) = (u32)task;
+            } else {
+                prev = (u8*)*(u32*)(curr + 0x0);
+                if (prev != NULL) *(u32*)(prev + 0x4) = (u32)task;
+                *(u32*)(task + 0x0) = *(u32*)(curr + 0x0);
+                *(u32*)(task + 0x4) = (u32)curr;
+                *(u32*)(curr + 0x0) = (u32)task;
+                if (lbl_8047AC98 == (u32)curr) lbl_8047AC98 = (u32)task;
+            }
+        }
+        OSRestoreInterrupts();
+    }
+    return ((u32)task - lbl_8047AC7C) / 0x18 + 1;
 }
 #endif
 #pragma pop
@@ -1735,12 +2691,39 @@ void fn_800FE834(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_800FE9B0(void) {
+asm void fn_800FE9B0(u32 numTasks, u32 numQueues) {
 #include "src/game/gs_thread_fn_800FE9B0.inc"
 }
 #else
-void fn_800FE9B0(void) {
-    /* TODO: match -- 196 bytes at 0x800FE9B0 */
+#pragma optimization_level 4
+void fn_800FE9B0(u32 numTasks, u32 numQueues) {
+    u32 total;
+    u32 i;
+    u32 offset;
+    u16 handle;
+
+    total = numTasks + numQueues;
+    lbl_8047AC80 = numTasks;
+    lbl_8047AC84 = numQueues;
+    lbl_8047AC88 = total;
+    lbl_8047AC94 = 0;
+    handle = GSmemAllocRaw(total * 0x18);
+    lbl_8047AC78 = handle;
+    if ((u16)handle == 0) return;
+    lbl_8047AC7C = (u32)GSmemGetPtr(handle);
+    offset = 8;
+    i = 0;
+    while (i < total) {
+        *(u32*)(lbl_8047AC7C + offset) = 0;
+        offset += 0x18;
+        i++;
+    }
+    handle = GSmemAllocRaw(0x2000);
+    lbl_8047AC8C = handle;
+    lbl_8047AC90 = (u32)GSmemGetPtr(handle);
+    fn_800A263C((void*)fn_800FEA74, NULL,
+                (void*)(lbl_8047AC90 + 0x1FFC), 0x1FFC);
+    fn_800D30A0((void*)fn_800FEBA0);
 }
 #endif
 #pragma pop
@@ -1754,8 +2737,54 @@ asm void fn_800FEA74(void) {
 #include "src/game/gs_thread_fn_800FEA74.inc"
 }
 #else
-void fn_800FEA74(void) {
-    /* TODO: match -- 300 bytes at 0x800FEA74 */
+#pragma optimization_level 4
+static void fn_800FEA74(void) {
+    u32* task;
+    u32* next;
+    u32* pend;
+    u32* next_pend;
+    u8* curr;
+    u8* prev;
+    u32 taskId;
+
+    for (;;) {
+        task = (u32*)lbl_8047AC98;
+        while (task != NULL) {
+            next = (u32*)task[1];
+            if (task[2] == 2 && ((u8*)task)[0xD] == 0) {
+                lbl_8047AC94 = (u32)task;
+                taskId = ((u32)task - lbl_8047AC7C) / 0x18 + 1;
+                ((void(*)(u32, void*))task[5])(taskId, (void*)task[4]);
+            }
+            task = next;
+        }
+        lbl_8047AC94 = 0;
+        OSDisableInterrupts();
+        pend = (u32*)lbl_8047AC9C;
+        while (pend != NULL) {
+            next_pend = (u32*)pend[1];
+            curr = (u8*)lbl_8047AC98;
+            while (*(u32*)(curr + 0x4) != 0) {
+                if (*(u8*)(curr + 0xC) >= *(u8*)((u8*)pend + 0xC)) break;
+                curr = (u8*)*(u32*)(curr + 0x4);
+            }
+            if (*(u32*)(curr + 0x4) == 0 && *(u8*)(curr + 0xC) < *(u8*)((u8*)pend + 0xC)) {
+                *(u32*)((u8*)pend + 0x0) = (u32)curr;
+                *(u32*)((u8*)pend + 0x4) = 0;
+                *(u32*)(curr + 0x4) = (u32)pend;
+            } else {
+                prev = (u8*)*(u32*)(curr + 0x0);
+                if (prev != NULL) *(u32*)(prev + 0x4) = (u32)pend;
+                *(u32*)((u8*)pend + 0x0) = *(u32*)(curr + 0x0);
+                *(u32*)((u8*)pend + 0x4) = (u32)curr;
+                *(u32*)(curr + 0x0) = (u32)pend;
+                if (lbl_8047AC98 == (u32)curr) lbl_8047AC98 = (u32)pend;
+            }
+            pend = next_pend;
+        }
+        lbl_8047AC9C = 0;
+        OSRestoreInterrupts();
+    }
 }
 #endif
 #pragma pop
@@ -1795,13 +2824,21 @@ asm void fn_800F106C(void) {
 #include "src/game/gs_thread_fn_800F106C.inc"
 }
 #else
-void fn_800F106C(void) {
-    /* TODO: match -- 124 bytes at 0x800F106C */
+#pragma optimization_level 4
+u32 fn_800F106C(void) {
+    u32 (*f)(u32,u32,u32,u32,u32,u32,u32,u32,f32,f32,f32,f32,f32,f32,f32,f32);
+    f32* fa;
+    u32* ia;
+    f = (u32(*)(u32,u32,u32,u32,u32,u32,u32,u32,f32,f32,f32,f32,f32,f32,f32,f32))lbl_8047AC38;
+    fa = (f32*)lbl_8047AC3C;
+    ia = (u32*)lbl_8047AC40;
+    return f(ia[0],ia[1],ia[2],ia[3],ia[4],ia[5],ia[6],ia[7],
+             fa[0],fa[1],fa[2],fa[3],fa[4],fa[5],fa[6],fa[7]);
 }
 #endif
 
 /* 0x800F10E8 | 0x2E8 */
-extern void fn_800DD38C(void);
+extern void fn_800DD38C(const char* fmt, ...);
 extern u8 lbl_80271068[];
 extern u32 lbl_80478B00;
 extern u32 lbl_8047AC38;
@@ -1815,8 +2852,113 @@ asm void fn_800F10E8(void) {
 #include "src/game/gs_thread_fn_800F10E8.inc"
 }
 #else
-void fn_800F10E8(void) {
-    /* TODO: match -- 744 bytes at 0x800F10E8 */
+#pragma optimization_level 4
+s32 fn_800F10E8(void* obj) {
+    u8* p;
+    u32 r31;
+    u32 r30;
+    u32 r29;
+    u8* r28;
+    u8* baseArr;
+    u8* entry;
+    u32 stackVal0;
+    u32 stackVal1;
+    u32 n;
+    u32 stackBase;
+    s32 i;
+    u32 floatIdx;
+    u32 intIdx;
+
+    p = (u8*)obj;
+    /* read opcode u16 from stream, advance ptr+2 */
+    r31 = (u32)*(u16*)(*(u32*)(p+0x14));
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+    r31 = (u32)*(u16*)(*(u32*)(p+0x14));
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+
+    /* push current stack top */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = *(u32*)(p+0x1C);
+    }
+    /* push r31 */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = r31;
+    }
+
+    /* compute stack base = count - r31 - 3, update 0x1c */
+    r30 = 0;
+    stackBase = *(u32*)(p+0x28) - r31 - 3;
+    *(u32*)(p+0x1C) = stackBase;
+
+    /* look up function in node table */
+    entry = (u8*)*(u32*)((u8*)*(u32*)lbl_80478B00 + 0x10) + stackBase * 0xC;
+    lbl_8047AC38 = *(u32*)(entry + 0x0);
+    if (lbl_8047AC38 == 0) goto skip_call;
+
+    /* clear float/int arg buffers */
+    memset(lbl_80401BD8, 0, 0x20);
+    memset(lbl_80401BB8, 0, 0x20);
+
+    /* count args = min(count - stackBase - 3, 8) */
+    n = *(u32*)(p+0x28) - stackBase - 3;
+    if (n > 8) n = 8;
+
+    floatIdx = 0;
+    intIdx = 0;
+    for (i = 0; (u32)i < n; i++) {
+        if (*(u8*)(entry + 0x4 + (u32)i) == 2) {
+            /* float arg */
+            *(f32*)((u8*)lbl_80401BB8 + floatIdx) = *(f32*)(p + 0x6C + (stackBase + (u32)i + 1)*4);
+            floatIdx += 4;
+        } else {
+            /* int arg */
+            *(u32*)((u8*)lbl_80401BD8 + intIdx) = *(u32*)(p + 0x6C + (stackBase + (u32)i + 1)*4);
+            intIdx += 4;
+        }
+    }
+    lbl_8047AC3C = (u32)lbl_80401BB8;
+    lbl_8047AC40 = (u32)lbl_80401BD8;
+    r30 = fn_800F106C();
+
+skip_call:
+    /* store return value on stack at stackBase */
+    *(u32*)(p + 0x68 + *(u32*)(p+0x1C)*4) = r30;
+
+    /* pop to stackVal1 (pop once) */
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal1 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+
+    /* pop to stackVal0 */
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal0 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal0 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+
+    /* restore 0x1c and loop popping stackVal0 times */
+    *(u32*)(p+0x1C) = stackVal0;
+    r28 = 0;
+    for (i = 0; i < (s32)stackVal1; i++) {
+        if (*(u32*)(p+0x28) <= 0) {
+            fn_800DD38C((const char*)lbl_8027107C);
+        } else {
+            *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        }
+    }
+    return 1;
 }
 #endif
 
@@ -1827,13 +2969,114 @@ asm void fn_800F13D0(void) {
 #include "src/game/gs_thread_fn_800F13D0.inc"
 }
 #else
-void fn_800F13D0(void) {
-    /* TODO: match -- 752 bytes at 0x800F13D0 */
+#pragma optimization_level 4
+s32 fn_800F13D0(void* obj) {
+    u8* p;
+    u32 r29;
+    u32 r30;
+    u32 r28;
+    u32 stackVal0;
+    u32 stackVal1;
+    s32 r28b;
+    u8* errStr;
+
+    p = (u8*)obj;
+    /* read two u16 from stream */
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+    r29 = (u32)*(u16*)(*(u32*)(p+0x14));
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+
+    /* push 0x1C and r29 to stack */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = *(u32*)(p+0x1C);
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+    }
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = r29;
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+    }
+
+    /* stackBase = count - (r29 + 2) */
+    *(u32*)(p+0x1C) = *(u32*)(p+0x28) - (r29 + 2);
+    r28 = *(u32*)(p + 0x6C + *(u32*)(p+0x1C)*4);
+    *(u8*)(p+0x4) = 2;
+    r30 = 0;
+
+    for (;;) {
+        if (r30 >= r28) break;
+        /* state check */
+        if (*(u8*)(p+0x4) == 4) *(u8*)(p+0x4) = 3;
+        if (*(u8*)(p+0x4) == 3) {
+            /* pop stackVal1 */
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)lbl_8027107C);
+                stackVal1 = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+            /* pop stackVal0 */
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)lbl_8027107C);
+                stackVal0 = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                stackVal0 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+            errStr = (u8*)lbl_8027107C;
+            r28b = 0;
+            *(u32*)(p+0x1C) = stackVal0;
+            while (r28b < (s32)stackVal1) {
+                if (*(u32*)(p+0x28) <= 0) {
+                    fn_800DD38C((const char*)errStr);
+                } else {
+                    *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                }
+                r28b++;
+            }
+            return 0;
+        }
+        fn_800F0308();
+        r30 += fn_800D3088();
+    }
+
+    /* exit loop: state=1, pop twice, drain */
+    *(u8*)(p+0x4) = 1;
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal1 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal0 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal0 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+    *(u32*)(p+0x1C) = stackVal0;
+    r28b = 0;
+    errStr = (u8*)lbl_8027107C;
+    while (r28b < (s32)stackVal1) {
+        if (*(u32*)(p+0x28) <= 0) {
+            fn_800DD38C((const char*)errStr);
+        } else {
+            *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        }
+        r28b++;
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F16C0 | 0x34C */
-extern void fn_800C8520(void);
+extern s32 fn_800C8520(u8* buf, const char* fmt, ...);
 extern u8 lbl_80401AB8[];
 extern u8 lbl_80401A78[];
 extern u8 lbl_8047CCB8[];
@@ -1842,8 +3085,135 @@ asm void fn_800F16C0(void) {
 #include "src/game/gs_thread_fn_800F16C0.inc"
 }
 #else
-void fn_800F16C0(void) {
-    /* TODO: match -- 844 bytes at 0x800F16C0 */
+#pragma optimization_level 4
+s32 fn_800F16C0(void* obj) {
+    u8* p;
+    u32 r30;
+    u8* r26;
+    u8* r27;
+    u32 r28;
+    s32 r29;
+    u32 r27val;
+    u32 stackVal0;
+    u32 stackVal1;
+    s32 r28b;
+    u8* errStr;
+    u8* outEnd;
+    u8 ch;
+    s8 sch;
+    u8 fmtBuf[4];
+    u32 fmtLen;
+    u32 argVal;
+
+    p = (u8*)obj;
+    /* read two u16 from stream */
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+    r30 = (u32)*(u16*)(*(u32*)(p+0x14));
+    *(u32*)(p+0x14) = *(u32*)(p+0x14) + 2;
+
+    /* push 0x1C and r30 to stack */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = *(u32*)(p+0x1C);
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+    }
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4) = r30;
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+    }
+
+    /* stackBase = count - (r30 + 2) */
+    *(u32*)(p+0x1C) = *(u32*)(p+0x28) - (r30 + 2);
+    r26 = lbl_80401AB8;
+    r28 = 1;
+    r27val = *(u32*)(p + 0x6C + *(u32*)(p+0x1C)*4);
+    outEnd = lbl_80401AB8 + 0xFF;
+    r27 = (u8*)r27val;
+
+    for (;;) {
+        ch = *r27;
+        sch = (s8)ch;
+        if (sch == 0) break;
+        if (sch == 0x25) { /* '%' */
+            argVal = *(u32*)(p + 0x6C + (*(u32*)(p+0x1C) + r28)*4);
+            r28++;
+            fmtLen = 0;
+            for (;;) {
+                lbl_80401A78[fmtLen] = *r27;
+                fmtLen++;
+                ch = *r27;
+                sch = (s8)ch;
+                if (sch == 'd' || sch == 'x' || sch == 'c') {
+                    lbl_80401A78[fmtLen] = 0;
+                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, argVal);
+                    r26 += r29;
+                    break;
+                } else if (sch == 'f') {
+                    lbl_80401A78[fmtLen] = 0;
+                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, *(f32*)&argVal);
+                    r26 += r29;
+                    break;
+                } else if (sch == 's') {
+                    lbl_80401A78[fmtLen] = 0;
+                    r29 = fn_800C8520(r26, (const char*)lbl_80401A78, argVal);
+                    r26 += r29;
+                    break;
+                } else if (sch == 0) {
+                    break;
+                }
+                r27++;
+            }
+        } else if (sch == 0x5C) { /* '\' */
+            if ((s8)r27[1] == 'n') {
+                r29 = fn_800C8520(r26, (const char*)lbl_8047CCB8);
+                r27++;
+                r26 += r29;
+            } else {
+                *r26 = ch;
+                r26++;
+            }
+        } else {
+            *r26 = ch;
+            r26++;
+        }
+        r27++;
+        if (r26 >= outEnd) break;
+    }
+
+    /* null-terminate and print */
+    *r26 = 0;
+    fn_800DD970((const char*)lbl_80401AB8);
+
+    /* pop twice, drain */
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal1 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+    if (*(u32*)(p+0x28) <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        stackVal0 = *(u32*)(p+0x6C);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        stackVal0 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+    }
+    *(u32*)(p+0x1C) = stackVal0;
+    errStr = (u8*)lbl_8027107C;
+    r28b = 0;
+    while (r28b < (s32)stackVal1) {
+        if (*(u32*)(p+0x28) <= 0) {
+            fn_800DD38C((const char*)errStr);
+        } else {
+            *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+        }
+        r28b++;
+    }
+    return 1;
 }
 #endif
 
@@ -1905,8 +3275,93 @@ asm void fn_800F27D4(void) {
 #include "src/game/gs_thread_fn_800F27D4.inc"
 }
 #else
-void fn_800F27D4(void) {
-    /* TODO: match -- 1044 bytes at 0x800F27D4 */
+#pragma optimization_level 4
+s32 fn_800F27D4(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* NEQ */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = (val2 != val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 != f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 != f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 != f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1918,8 +3373,93 @@ asm void fn_800F2BE8(void) {
 #include "src/game/gs_thread_fn_800F2BE8.inc"
 }
 #else
-void fn_800F2BE8(void) {
-    /* TODO: match -- 1040 bytes at 0x800F2BE8 */
+#pragma optimization_level 4
+s32 fn_800F2BE8(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* EQ */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = (val2 == val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 == f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 == f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 == f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1931,8 +3471,93 @@ asm void fn_800F2FF8(void) {
 #include "src/game/gs_thread_fn_800F2FF8.inc"
 }
 #else
-void fn_800F2FF8(void) {
-    /* TODO: match -- 1056 bytes at 0x800F2FF8 */
+#pragma optimization_level 4
+s32 fn_800F2FF8(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* GE: result=1 when (s32)val2 >= (s32)val1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = ((s32)val2 >= (s32)val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 >= f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 >= f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 >= f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1944,8 +3569,93 @@ asm void fn_800F3418(void) {
 #include "src/game/gs_thread_fn_800F3418.inc"
 }
 #else
-void fn_800F3418(void) {
-    /* TODO: match -- 1048 bytes at 0x800F3418 */
+#pragma optimization_level 4
+s32 fn_800F3418(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* GT: result=1 when (s32)val2 > (s32)val1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = ((s32)val2 > (s32)val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 > f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 > f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 > f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1957,8 +3667,93 @@ asm void fn_800F3830(void) {
 #include "src/game/gs_thread_fn_800F3830.inc"
 }
 #else
-void fn_800F3830(void) {
-    /* TODO: match -- 1056 bytes at 0x800F3830 */
+#pragma optimization_level 4
+s32 fn_800F3830(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* LE: result=1 when (s32)val2 <= (s32)val1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = ((s32)val2 <= (s32)val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 <= f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 <= f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 <= f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1970,8 +3765,93 @@ asm void fn_800F3C50(void) {
 #include "src/game/gs_thread_fn_800F3C50.inc"
 }
 #else
-void fn_800F3C50(void) {
-    /* TODO: match -- 1048 bytes at 0x800F3C50 */
+#pragma optimization_level 4
+s32 fn_800F3C50(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* LT: result=1 when (s32)val2 < (s32)val1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = ((s32)val2 < (s32)val1) ? 1 : 0;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            result = (f1 < f0) ? 1 : 0;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            result = (f2 < f0) ? 1 : 0;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            result = (f1 < f0) ? 1 : 0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1983,8 +3863,93 @@ asm void fn_800F4068(void) {
 #include "src/game/gs_thread_fn_800F4068.inc"
 }
 #else
-void fn_800F4068(void) {
-    /* TODO: match -- 984 bytes at 0x800F4068 */
+#pragma optimization_level 4
+s32 fn_800F4068(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* SUB: op2 - op1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = val2 - val1;
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 tmp = f1 - f0; result = *(u32*)&tmp;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            f32 tmp = f2 - f0; result = *(u32*)&tmp;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 tmp = f1 - f0; result = *(u32*)&tmp;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -1996,8 +3961,150 @@ asm void fn_800F4440(void) {
 #include "src/game/gs_thread_fn_800F4440.inc"
 }
 #else
-void fn_800F4440(void) {
-    /* TODO: match -- 984 bytes at 0x800F4440 */
+#pragma optimization_level 4
+s32 fn_800F4440(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 r4;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+
+    /* read 2 operand bytes */
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp;
+        sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp;
+        sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+
+    /* resolve op1 (r28) */
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)(r31+0x14));
+                val1 = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) {
+                    val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                } else {
+                    val1 = *(u32*)(p+0x18) + idx*4;
+                }
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) {
+                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                } else {
+                    rawptr = *(u32*)(p+0x18) + idx*4;
+                }
+                if (r30 & 0x100) {
+                    val1 = rawptr;
+                } else {
+                    val1 = *(u32*)rawptr;
+                }
+            }
+        }
+    }
+
+    /* resolve op2 (r29) */
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)(r31+0x14));
+                val2 = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) {
+                    val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                } else {
+                    val2 = *(u32*)(p+0x18) + idx*4;
+                }
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) {
+                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                } else {
+                    rawptr = *(u32*)(p+0x18) + idx*4;
+                }
+                if (r30 & 0x100) {
+                    val2 = rawptr;
+                } else {
+                    val2 = *(u32*)rawptr;
+                }
+            }
+        }
+    }
+
+    /* compute: ADD */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            /* int + int */
+            result = val2 + val1;
+        } else {
+            /* int val2 + float val1 */
+            f32 f1 = (f32)(s32)val2;
+            f32 f0 = *(f32*)&val1;
+            result = *(u32*)&(f32){f0 + f1}; /* fix */
+            {
+                f32 tmp = f0 + f1;
+                result = *(u32*)&tmp;
+            }
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            /* float val2 + int val1 */
+            f32 f0 = *(f32*)&val2;
+            f32 f1 = (f32)(s32)val1;
+            f32 tmp = f0 + f1;
+            result = *(u32*)&tmp;
+        } else {
+            /* float + float */
+            f32 f1 = *(f32*)&val2;
+            f32 f0 = *(f32*)&val1;
+            f32 tmp = f1 + f0;
+            result = *(u32*)&tmp;
+        }
+    }
+
+    /* push result */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)r31);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result;
+    }
+    return 1;
 }
 #endif
 
@@ -2010,8 +4117,95 @@ asm void fn_800F4818(void) {
 #include "src/game/gs_thread_fn_800F4818.inc"
 }
 #else
-void fn_800F4818(void) {
-    /* TODO: match -- 1056 bytes at 0x800F4818 */
+#pragma optimization_level 4
+s32 fn_800F4818(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* MOD: op2 % op1, op1 must be nonzero */
+    if (val1 == 0) {
+        fn_800DD38C((const char*)(r31+0xD8));
+        result = 0;
+    } else {
+        if ((r29 & 0x3F) == 2) {
+            if ((r28 & 0x3F) == 2) {
+                result = (u32)((s32)val2 % (s32)val1);
+            } else {
+                f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+                fn_800CE318();
+                result = *(u32*)&f0;
+            }
+        } else {
+            f32 f2 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            fn_800CE318();
+            result = *(u32*)&f0;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -2023,8 +4217,98 @@ asm void fn_800F4C38(void) {
 #include "src/game/gs_thread_fn_800F4C38.inc"
 }
 #else
-void fn_800F4C38(void) {
-    /* TODO: match -- 1012 bytes at 0x800F4C38 */
+#pragma optimization_level 4
+s32 fn_800F4C38(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* DIV: op2 / op1, op1 must be nonzero */
+    if (val1 == 0) {
+        fn_800DD38C((const char*)(r31+0xD8));
+        result = 0;
+    } else {
+        if ((r29 & 0x3F) == 2) {
+            if ((r28 & 0x3F) == 2) {
+                result = (u32)((s32)val2 / (s32)val1);
+            } else {
+                f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+                f32 tmp = f1 / f0; result = *(u32*)&tmp;
+            }
+        } else {
+            if ((r28 & 0x3F) == 2) {
+                f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+                f32 tmp = f2 / f0; result = *(u32*)&tmp;
+            } else {
+                f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+                f32 tmp = f1 / f0; result = *(u32*)&tmp;
+            }
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -2036,8 +4320,93 @@ asm void fn_800F502C(void) {
 #include "src/game/gs_thread_fn_800F502C.inc"
 }
 #else
-void fn_800F502C(void) {
-    /* TODO: match -- 984 bytes at 0x800F502C */
+#pragma optimization_level 4
+s32 fn_800F502C(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* MUL: op2 * op1 */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = (u32)((s32)val2 * (s32)val1);
+        } else {
+            f32 f1 = (f32)(s32)val2; f32 f0 = *(f32*)&val1;
+            f32 tmp = f1 * f0; result = *(u32*)&tmp;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            f32 f2 = *(f32*)&val2; f32 f0 = (f32)(s32)val1;
+            f32 tmp = f2 * f0; result = *(u32*)&tmp;
+        } else {
+            f32 f1 = *(f32*)&val2; f32 f0 = *(f32*)&val1;
+            f32 tmp = f1 * f0; result = *(u32*)&tmp;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -2048,20 +4417,169 @@ asm void fn_800F5404(void) {
 #include "src/game/gs_thread_fn_800F5404.inc"
 }
 #else
-void fn_800F5404(void) {
-    /* TODO: match -- 472 bytes at 0x800F5404 */
+#pragma optimization_level 4
+s32 fn_800F5404(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r30;
+    u32 r29;
+    u32 r4;
+    u32 result;
+    u32 def;
+    u32 idx;
+    u32 ptr;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    r29 = p - p; /* obj, keep p */
+    r29 = (u32)p;
+
+    /* read 1 byte operand descriptor */
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r4 = (u32)*sp;
+        *(u32*)(p+0x14) = (u32)(sp+1);
+    }
+    def = lbl_8047E710;
+
+    if (r4 == 0) {
+        /* invalid operand */
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r4 & 0xFFFF));
+        result = def;
+    } else {
+        r30 = r4 & 0xFFFF;
+        if (r4 & 0x80) {
+            /* pop from stack */
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)(r31+0x14));
+                result = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                result = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+        } else {
+            /* index-based address resolution */
+            idx = r30 & 0x3F; /* clear upper bits */
+            if (r30 & 0x20) {
+                if (r30 & 0x40) {
+                    /* local stack relative, store address */
+                    result = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx) * 4);
+                } else {
+                    /* external array, store address */
+                    result = *(u32*)(p+0x18) + idx * 4;
+                }
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) {
+                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx) * 4);
+                } else {
+                    rawptr = *(u32*)(p+0x18) + idx * 4;
+                }
+                if (r30 & 0x100) {
+                    result = rawptr;
+                } else {
+                    result = *(u32*)rawptr;
+                }
+            }
+        }
+    }
+
+    /* push result to stack */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)r31);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result;
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F55DC | 0x214 */
-extern u32 lbl_8047E710;
 #if 1
 asm void fn_800F55DC(void) {
 #include "src/game/gs_thread_fn_800F55DC.inc"
 }
 #else
-void fn_800F55DC(void) {
-    /* TODO: match -- 532 bytes at 0x800F55DC */
+#pragma optimization_level 4
+s32 fn_800F55DC(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r30;
+    u32 r29;
+    u32 r4;
+    u32 result;
+    u32 def;
+    u32 idx;
+    u32 negResult;
+    f32 fval;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+
+    /* read 1 byte operand descriptor */
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r29 = (u32)*sp;
+        *(u32*)(p+0x14) = (u32)(sp+1);
+    }
+    def = lbl_8047E710;
+
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        result = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) {
+                fn_800DD38C((const char*)(r31+0x14));
+                result = *(u32*)(p+0x6C);
+            } else {
+                *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1;
+                result = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4);
+            }
+        } else {
+            u32 idx2 = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) {
+                    result = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx2)*4);
+                } else {
+                    result = *(u32*)(p+0x18) + idx2*4;
+                }
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) {
+                    rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx2)*4);
+                } else {
+                    rawptr = *(u32*)(p+0x18) + idx2*4;
+                }
+                if (r30 & 0x100) {
+                    result = rawptr;
+                } else {
+                    result = *(u32*)rawptr;
+                }
+            }
+        }
+    }
+
+    /* negate based on type (bits 0-5 of r29) */
+    if ((r29 & 0x3F) == 2) {
+        /* integer negate */
+        negResult = (u32)(-(s32)result);
+    } else {
+        /* float negate */
+        fval = -(*(f32*)&result);
+        negResult = *(u32*)&fval;
+    }
+
+    /* push negated result */
+    if (*(u32*)(p+0x28) > 0x40) {
+        fn_800DD38C((const char*)r31);
+    } else {
+        *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1;
+        *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = negResult;
+    }
+    return 1;
 }
 #endif
 
@@ -2110,8 +4628,90 @@ asm void fn_800F5EEC(void) {
 #include "src/game/gs_thread_fn_800F5EEC.inc"
 }
 #else
-void fn_800F5EEC(void) {
-    /* TODO: match -- 976 bytes at 0x800F5EEC */
+#pragma optimization_level 4
+s32 fn_800F5EEC(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* OR */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = val2 | val1;
+        } else {
+            result = val2 | (u32)(s32)*(f32*)&val1;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            result = (u32)(s32)*(f32*)&val2 | val1;
+        } else {
+            result = (u32)(s32)*(f32*)&val2 | (u32)(s32)*(f32*)&val1;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
@@ -2122,35 +4722,156 @@ asm void fn_800F62BC(void) {
 #include "src/game/gs_thread_fn_800F62BC.inc"
 }
 #else
-void fn_800F62BC(void) {
-    /* TODO: match -- 976 bytes at 0x800F62BC */
+#pragma optimization_level 4
+s32 fn_800F62BC(void* obj) {
+    u8* p;
+    u8* r31;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 def;
+    u32 val1;
+    u32 val2;
+    u32 result;
+
+    p = (u8*)obj;
+    r31 = (u8*)lbl_80271068;
+    {
+        u8* sp = (u8*)*(u32*)(p+0x14);
+        r28 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+        r29 = (u32)*sp; sp++;
+        *(u32*)(p+0x14) = (u32)sp;
+    }
+    def = lbl_8047E710;
+    if (r28 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r28 & 0xFFFF));
+        val1 = def;
+    } else {
+        r30 = r28 & 0xFFFF;
+        if (r28 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val1 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val1 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val1 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val1 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val1 = rawptr;
+                else val1 = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (r29 == 0) {
+        fn_800DD38C((const char*)(r31+0x28), (u32)(r29 & 0xFFFF));
+        val2 = def;
+    } else {
+        r30 = r29 & 0xFFFF;
+        if (r29 & 0x80) {
+            if (*(u32*)(p+0x28) <= 0) { fn_800DD38C((const char*)(r31+0x14)); val2 = *(u32*)(p+0x6C); }
+            else { *(u32*)(p+0x28) = *(u32*)(p+0x28) - 1; val2 = *(u32*)(p + 0x6C + *(u32*)(p+0x28)*4); }
+        } else {
+            u32 idx = r30 & 0x3F;
+            if (r30 & 0x20) {
+                if (r30 & 0x40) val2 = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else val2 = *(u32*)(p+0x18) + idx*4;
+            } else {
+                u32 rawptr;
+                if (r30 & 0x40) rawptr = (u32)(p + 0x6C + (*(u32*)(p+0x1C) + idx)*4);
+                else rawptr = *(u32*)(p+0x18) + idx*4;
+                if (r30 & 0x100) val2 = rawptr;
+                else val2 = *(u32*)rawptr;
+            }
+        }
+    }
+    /* AND */
+    if ((r29 & 0x3F) == 2) {
+        if ((r28 & 0x3F) == 2) {
+            result = val2 & val1;
+        } else {
+            result = val2 & (u32)(s32)*(f32*)&val1;
+        }
+    } else {
+        if ((r28 & 0x3F) == 2) {
+            result = (u32)(s32)*(f32*)&val2 & val1;
+        } else {
+            result = (u32)(s32)*(f32*)&val2 & (u32)(s32)*(f32*)&val1;
+        }
+    }
+    if (*(u32*)(p+0x28) > 0x40) { fn_800DD38C((const char*)r31); }
+    else { *(u32*)(p+0x28) = *(u32*)(p+0x28) + 1; *(u32*)(p + 0x6C + (*(u32*)(p+0x28)-1)*4) = result; }
+    return 1;
 }
 #endif
 
 /* 0x800F668C | 0x80 */
 #if 1
-asm void fn_800F668C(void) {
+asm s32 fn_800F668C(void* obj) {
 #include "src/game/gs_thread_fn_800F668C.inc"
 }
 #else
-void fn_800F668C(void) {
-    /* TODO: match -- 128 bytes at 0x800F668C */
+#pragma optimization_level 4
+s32 fn_800F668C(void* obj) {
+    u8* p;
+    u8* ptr;
+    u32 count;
+    u32 val;
+
+    p = (u8*)obj;
+    ptr = (u8*)*(u32*)(p + 0x14) + 1;
+    *(u32*)(p + 0x14) = (u32)ptr;
+    count = *(u32*)(p + 0x28);
+    val = *(u32*)ptr;
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x28) = count + 1;
+        *(u32*)(p + 0x6C + count * 4) = val;
+    }
+    *(u32*)(p + 0x14) = (u32)ptr + 4;
+    return 1;
 }
 #endif
 
 /* 0x800F670C | 0xA0 */
 #if 1
-asm void fn_800F670C(void) {
+asm s32 fn_800F670C(void* obj) {
 #include "src/game/gs_thread_fn_800F670C.inc"
 }
 #else
-void fn_800F670C(void) {
-    /* TODO: match -- 160 bytes at 0x800F670C */
+#pragma optimization_level 4
+s32 fn_800F670C(void* obj) {
+    u8* p;
+    u32 count;
+    u32 val;
+
+    p = (u8*)obj;
+    count = *(u32*)(p + 0x28);
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        val = *(u32*)(p + 0x6C);
+    } else {
+        count--;
+        *(u32*)(p + 0x28) = count;
+        val = *(u32*)(p + 0x6C + count * 4);
+    }
+    if (val == 0) {
+        u32 ptr = *(u32*)(p + 0x14);
+        *(u32*)(p + 0x14) = *(u32*)(p + 0x0) + *(u32*)ptr;
+    } else {
+        *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 4;
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F67AC | 0x1C */
-#if 0
+#if 1
 asm void fn_800F67AC(void) {
 #include "src/game/gs_thread_fn_800F67AC.inc"
 }
@@ -2165,51 +4886,202 @@ s32 fn_800F67AC(u32* ptr) {
 
 /* 0x800F67C8 | 0x184 */
 #if 1
-asm void fn_800F67C8(void) {
+asm s32 fn_800F67C8(void* obj) {
 #include "src/game/gs_thread_fn_800F67C8.inc"
 }
 #else
-void fn_800F67C8(void) {
-    /* TODO: match -- 388 bytes at 0x800F67C8 */
+#pragma optimization_level 4
+s32 fn_800F67C8(void* obj) {
+    u8* p;
+    u32 count;
+    u32 val1;
+    u32 val2;
+    u32 val3;
+    u32 i;
+
+    p = (u8*)obj;
+
+    /* Pop 1 (into val1) */
+    count = *(u32*)(p + 0x28);
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        val1 = *(u32*)(p + 0x6C);
+    } else {
+        count--;
+        *(u32*)(p + 0x28) = count;
+        val1 = *(u32*)(p + 0x6C + count * 4);
+    }
+
+    /* Pop 2 (into val2) → store to obj->0x1C */
+    count = *(u32*)(p + 0x28);
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        val2 = *(u32*)(p + 0x6C);
+    } else {
+        count--;
+        *(u32*)(p + 0x28) = count;
+        val2 = *(u32*)(p + 0x6C + count * 4);
+    }
+    *(u32*)(p + 0x1C) = val2;
+
+    /* Pop 3 (return address) → store to obj->0x14 */
+    count = *(u32*)(p + 0x28);
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)lbl_8027107C);
+        val3 = *(u32*)(p + 0x6C);
+    } else {
+        count--;
+        *(u32*)(p + 0x28) = count;
+        val3 = *(u32*)(p + 0x6C + count * 4);
+    }
+    *(u32*)(p + 0x14) = val3;
+
+    /* Drain val1 entries from stack */
+    for (i = 0; i < val1; i++) {
+        count = *(u32*)(p + 0x28);
+        if ((s32)count <= 0) {
+            fn_800DD38C((const char*)lbl_8027107C);
+        } else {
+            *(u32*)(p + 0x28) = count - 1;
+        }
+    }
+
+    if (*(u32*)(p + 0x14) == 0) {
+        *(u8*)(p + 0x4) = 3;
+        return 0;
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F694C | 0x168 */
 extern u8 lbl_8027115C[];
 #if 1
-asm void fn_800F694C(void) {
+asm s32 fn_800F694C(void* obj) {
 #include "src/game/gs_thread_fn_800F694C.inc"
 }
 #else
-void fn_800F694C(void) {
-    /* TODO: match -- 360 bytes at 0x800F694C */
+#pragma optimization_level 4
+s32 fn_800F694C(void* obj) {
+    u8* p;
+    u8* ptr;
+    u32 funcIdx;
+    u16 argCount;
+    u16 stackBase;
+    u32 count;
+    u8* head;
+
+    p = (u8*)obj;
+    ptr = (u8*)*(u32*)(p + 0x14);
+    funcIdx = *(u32*)ptr;
+    ptr += 4;
+    *(u32*)(p + 0x14) = (u32)ptr;
+    argCount = *(u16*)ptr;
+    ptr += 2;
+    *(u32*)(p + 0x14) = (u32)ptr;
+    stackBase = *(u16*)ptr;
+    ptr += 2;
+    *(u32*)(p + 0x14) = (u32)ptr;
+
+    /* Push current ptr (return address) */
+    count = *(u32*)(p + 0x28);
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        ptr = (u8*)*(u32*)(p + 0x14);
+        *(u32*)(p + 0x28) = count + 1;
+        *(u32*)(p + 0x6C + count * 4) = (u32)ptr;
+    }
+
+    /* Push obj->0x1C */
+    count = *(u32*)(p + 0x28);
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x28) = count + 1;
+        *(u32*)(p + 0x6C + count * 4) = *(u32*)(p + 0x1C);
+    }
+
+    /* Push stackBase (argCount) */
+    count = *(u32*)(p + 0x28);
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x28) = count + 1;
+        *(u32*)(p + 0x6C + count * 4) = (u32)stackBase;
+    }
+
+    /* Update obj->0x1C = obj->0x28 - (argCount + stackBase + 3) */
+    *(u32*)(p + 0x1C) = *(u32*)(p + 0x28) - ((u32)argCount + (u32)stackBase + 3);
+
+    /* Look up jump target via funcIdx in head table */
+    head = (u8*)*(u32*)(p + 0x0);
+    if (funcIdx >= (u32)*(u16*)(head + 0x4)) {
+        fn_800DD38C((const char*)lbl_8027115C, funcIdx);
+    } else {
+        *(u32*)(p + 0x14) = (u32)head + *(u32*)(head + funcIdx * 4 + 0x18);
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F6AB4 | 0xA0 */
 #if 1
-asm void fn_800F6AB4(void) {
+asm s32 fn_800F6AB4(void* obj) {
 #include "src/game/gs_thread_fn_800F6AB4.inc"
 }
 #else
-void fn_800F6AB4(void) {
-    /* TODO: match -- 160 bytes at 0x800F6AB4 */
+#pragma optimization_level 4
+s32 fn_800F6AB4(void* obj) {
+    u8* p;
+    u8* ptr;
+    u16 n;
+    u32 count;
+    u32 i;
+
+    p = (u8*)obj;
+    ptr = (u8*)*(u32*)(p + 0x14) + 1;
+    *(u32*)(p + 0x14) = (u32)ptr;
+    n = *(u16*)ptr;
+    ptr += 2;
+    *(u32*)(p + 0x14) = (u32)ptr;
+    for (i = 0; i < (u32)n; i++) {
+        count = *(u32*)(p + 0x28);
+        if ((s32)count <= 0) {
+            fn_800DD38C((const char*)lbl_8027107C);
+        } else {
+            *(u32*)(p + 0x28) = count - 1;
+        }
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F6B54 | 0x58 */
 #if 1
-asm void fn_800F6B54(void) {
+asm s32 fn_800F6B54(void* obj) {
 #include "src/game/gs_thread_fn_800F6B54.inc"
 }
 #else
-void fn_800F6B54(void) {
-    /* TODO: match -- 88 bytes at 0x800F6B54 */
+#pragma optimization_level 4
+s32 fn_800F6B54(void* obj) {
+    u8* p;
+    u32 count;
+
+    p = (u8*)obj;
+    count = *(u32*)(p + 0x28);
+    if (count > 0x40) {
+        fn_800DD38C((const char*)lbl_80271068);
+    } else {
+        *(u32*)(p + 0x28) = count + 1;
+        *(u32*)(p + 0x6C + count * 4) = (u32)-1;
+    }
+    return 1;
 }
 #endif
 
 /* 0x800F6BAC | 0x10 */
-#if 0
+#if 1
 asm void fn_800F6BAC(void) {
 #include "src/game/gs_thread_fn_800F6BAC.inc"
 }
@@ -2222,7 +5094,7 @@ s32 fn_800F6BAC(u8* ptr) {
 #endif
 
 /* 0x800F6BBC | 0x8 */
-#if 0
+#if 1
 asm void fn_800F6BBC(void) {
 #include "src/game/gs_thread_fn_800F6BBC.inc"
 }
@@ -2236,12 +5108,66 @@ s32 fn_800F6BBC(void) {
 /* 0x800F6BC4 | 0x154 */
 extern u8 lbl_803155D0[];
 #if 1
-asm void fn_800F6BC4(void) {
+asm void fn_800F6BC4(void* obj) {
 #include "src/game/gs_thread_fn_800F6BC4.inc"
 }
 #else
-void fn_800F6BC4(void) {
-    /* TODO: match -- 340 bytes at 0x800F6BC4 */
+#pragma optimization_level 4
+void fn_800F6BC4(void* obj) {
+    u8* p;
+    u8* strBase;
+    u8 state;
+    u8 opcode;
+    void (*dispatch)(void*);
+    u32 count;
+    u32 val;
+    u32 delay;
+
+    p = (u8*)obj;
+    strBase = lbl_80271068;
+    for (;;) {
+        state = *(u8*)(p + 0x4);
+        if (state == 0) {
+            fn_800DD970((const char*)(strBase + 0x120), *(u32*)(p + 0x8));
+            goto done;
+        }
+        if (state == 3) {
+            *(u8*)(p + 0x4) = 0;
+            goto done;
+        }
+        /* Advance ptr by 1 and fetch opcode */
+        *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 1;
+        opcode = *(u8*)*(u32*)(p + 0x14);
+        if (opcode >= 0x26) {
+            fn_800DD38C((const char*)(strBase + 0x150));
+        } else {
+            dispatch = (void (*)(void*))*(u32*)((u8*)lbl_803155D0 + (opcode & 0xFF) * 4);
+            if (dispatch != NULL) {
+                dispatch(obj);
+            }
+        }
+        delay = *(u32*)(p + 0x28);
+        if ((s32)delay <= 0) continue;
+        delay--;
+        while (delay > 0) delay--;
+    }
+done:
+    if (*(u8*)(p + 0x4) == 4) {
+        *(u8*)(p + 0x4) = 0;
+    }
+    count = *(u32*)(p + 0x28);
+    if ((s32)count > 0) {
+        count--;
+        *(u32*)(p + 0x28) = count;
+        val = *(u32*)(p + 0x6C + count * 4);
+    } else {
+        fn_800DD38C((const char*)(strBase + 0x14));
+        val = *(u32*)(p + 0x6C);
+    }
+    {
+        void (*cb)(void*, u32) = (void (*)(void*, u32))*(u32*)(p + 0x10);
+        if (cb != NULL) cb(obj, val);
+    }
 }
 #endif
 
@@ -2261,12 +5187,43 @@ void fn_800F6D18(void) {
 /* 0x800F7068 | 0xA0 */
 extern u32 lbl_80478B00;
 #if 1
-asm void fn_800F7068(void) {
+asm s32 fn_800F7068(u16 key, u8 flag) {
 #include "src/game/gs_thread_fn_800F7068.inc"
 }
 #else
-void fn_800F7068(void) {
-    /* TODO: match -- 160 bytes at 0x800F7068 */
+#pragma optimization_level 4
+s32 fn_800F7068(u16 key, u8 flag) {
+    u8* head;
+    u16 count;
+    u8* entry;
+    u8* e;
+    u32 offset;
+    u32 k;
+    u32 f;
+
+    k = (u32)(u16)key;
+    f = (u32)(u8)flag;
+    for (;;) {
+        head = (u8*)lbl_80478B00;
+        count = *(u16*)head;
+        offset = 0;
+        entry = NULL;
+        while (count > 0) {
+            e = (u8*)*(u32*)(head + 0xC) + offset;
+            if (*(u8*)(e + 0x4) != 0 && (u32)*(u16*)(e + 0x6) == k) {
+                entry = e;
+                break;
+            }
+            offset += 0x16C;
+            count--;
+        }
+        if (entry == NULL) return 0;
+        if (f != 0) {
+            fn_800F0308();
+        } else {
+            return 1;
+        }
+    }
 }
 #endif
 extern u32 lbl_8047AC00;
@@ -2274,37 +5231,169 @@ extern u32 lbl_8047AC04;
 extern u32 lbl_8047AC0C;
 extern u32 lbl_8047AC08;
 #if 1
-asm void fn_800F0F4C(void) {
+asm void fn_800F0F4C(u32 arg) {
 #include "src/game/gs_thread_fn_800F0F4C.inc"
 }
 #else
-void fn_800F0F4C(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_800F0F4C(u32 arg) {
+    u8* obj;
+
+    obj = (u8*)lbl_8047AC00;
+    *(u32*)(obj + 0x18) = arg;
+    if (*(u8*)(obj + 0x17) == 1) {
+        if ((u32)obj == lbl_8047AC00 || (u32)obj == lbl_8047AC04) {
+            *(u8*)(obj + 0x15) = 1;
+            if ((u32)obj == lbl_8047AC04) {
+                lbl_8047AC0C = 1;
+            }
+        } else {
+            *(u8*)(obj + 0x14) = 0;
+            *(u8*)(obj + 0x8) = 0;
+            if (*(u32*)(obj + 0x0) != 0) *(u32*)(*(u32*)(obj+0x0)+0x4) = *(u32*)(obj+0x4);
+            if (*(u32*)(obj + 0x4) != 0) *(u32*)(*(u32*)(obj+0x4)+0x0) = *(u32*)(obj+0x0);
+            if (lbl_8047AC08 == (u32)obj) lbl_8047AC08 = *(u32*)(obj+0x4);
+            GSmemFree(*(u16*)(obj + 0x20));
+            GSmemFree(*(u16*)(obj + 0x22));
+        }
+    } else {
+        *(u8*)(obj + 0x15) = 1;
+        *(u8*)(obj + 0x14) = 0;
+        if (*(u32*)(obj + 0x0) != 0) *(u32*)(*(u32*)(obj+0x0)+0x4) = *(u32*)(obj+0x4);
+        if (*(u32*)(obj + 0x4) != 0) *(u32*)(*(u32*)(obj+0x4)+0x0) = *(u32*)(obj+0x0);
+        if (lbl_8047AC08 == (u32)obj) lbl_8047AC08 = *(u32*)(obj+0x4);
+        lbl_8047AC0C = 1;
+    }
+    fn_800F0308();
+}
 #endif
 extern u32 lbl_80478B00;
 #if 1
-asm void fn_800F7108(void) {
+asm u32 fn_800F7108(u16 key) {
 #include "src/game/gs_thread_fn_800F7108.inc"
 }
 #else
-void fn_800F7108(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_800F7108(u16 key) {
+    u8* head;
+    u16 count;
+    u8* entry;
+    u8* e;
+    u32 offset;
+    u32 k;
+
+    k = (u32)(u16)key;
+    head = (u8*)lbl_80478B00;
+    count = *(u16*)head;
+    offset = 0;
+    entry = NULL;
+    while (count > 0) {
+        e = (u8*)*(u32*)(head + 0xC) + offset;
+        if (*(u8*)(e + 0x4) != 0 && (u32)*(u16*)(e + 0x6) == k) {
+            entry = e;
+            break;
+        }
+        offset += 0x16C;
+        count--;
+    }
+    if (entry == NULL) return 0;
+    return *(u32*)(entry + 0xC);
+}
 #endif
-extern void fn_800F0374(void);
-extern void fn_800F05A0(void);
+extern u32 fn_800F0374(u32 ctx);
+extern void fn_800F05A0(u32 ctx);
 extern u32 lbl_80478B00;
 #if 1
-asm void fn_800F716C(void) {
+asm u32 fn_800F716C(u32 key) {
 #include "src/game/gs_thread_fn_800F716C.inc"
 }
 #else
-void fn_800F716C(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_800F716C(u32 key) {
+    u8* head;
+    u8* head2;
+    u8* entry;
+    u8* e;
+    u16 total;
+    u16 total2;
+    u32 offset;
+    u32 offset2;
+    u16 subkey;
+    u32 i;
+
+    i = 0;
+    offset = 0;
+    for (;;) {
+        head = (u8*)lbl_80478B00;
+        total = *(u16*)head;
+        if ((s32)i >= (s32)total) break;
+        entry = (u8*)*(u32*)(head + 0xC) + offset;
+        if (*(u8*)(entry + 0x4) != 0 && *(u32*)(entry + 0xC) != 0) {
+            if (fn_800F0374(*(u32*)(entry + 0xC)) == key) {
+                head2 = (u8*)lbl_80478B00;
+                subkey = *(u16*)(entry + 0x6);
+                total2 = *(u16*)head2;
+                offset2 = 0;
+                e = NULL;
+                while (total2 > 0) {
+                    e = (u8*)*(u32*)(head2 + 0xC) + offset2;
+                    if (*(u8*)(e + 0x4) != 0 && *(u16*)(e + 0x6) == subkey) break;
+                    offset2 += 0x16C;
+                    total2--;
+                    e = NULL;
+                }
+                if (e != NULL) {
+                    *(u8*)(e + 0x4) = 4;
+                    if (*(u32*)(e + 0xC) != 0) {
+                        fn_800F05A0(*(u32*)(e + 0xC));
+                        *(u32*)(e + 0xC) = 0;
+                    }
+                }
+            }
+        }
+        offset += 0x16C;
+        i++;
+    }
+    return 0;
+}
 #endif
 extern u32 lbl_80478B00;
 #if 1
-asm void fn_800F7274(void) {
+asm u32 fn_800F7274(u16 key) {
 #include "src/game/gs_thread_fn_800F7274.inc"
 }
 #else
-void fn_800F7274(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_800F7274(u16 key) {
+    u8* head;
+    u16 count;
+    u8* entry;
+    u8* e;
+    u32 offset;
+    u32 k;
+
+    k = (u32)(u16)key;
+    head = (u8*)lbl_80478B00;
+    count = *(u16*)head;
+    offset = 0;
+    entry = NULL;
+    while (count > 0) {
+        e = (u8*)*(u32*)(head + 0xC) + offset;
+        if (*(u8*)(e + 0x4) != 0 && (u32)*(u16*)(e + 0x6) == k) {
+            entry = e;
+            break;
+        }
+        offset += 0x16C;
+        count--;
+    }
+    if (entry == NULL) return 0;
+    *(u8*)(entry + 0x4) = 4;
+    if (*(u32*)(entry + 0xC) != 0) {
+        fn_800F05A0(*(u32*)(entry + 0xC));
+        *(u32*)(entry + 0xC) = 0;
+    }
+    return 0;
+}
 #endif
 extern void fn_800FF560(void);
 extern void fn_800F07A8(void);
