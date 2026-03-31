@@ -1,7 +1,7 @@
 {
   "default": {
     "compiler": "GC/1.3",
-    "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off"
+    "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw on"
   },
   "overrides": {
     "src/crt/string.c": {
