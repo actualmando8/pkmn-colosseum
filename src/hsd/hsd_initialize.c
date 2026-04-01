@@ -75,7 +75,7 @@ asm void fn_8019C6FC(void) {
 }
 #else
 void fn_8019C6FC(void) {
-    /* TODO: match -- 12 bytes at 0x8019C6FC */
+    /* TODO: match -- 12 bytes at 0x8019C6FC -- sets CR0 to (lbl_8047B294 == 3), no r3 return */
 }
 #endif
 #pragma pop
@@ -100,7 +100,8 @@ asm void fn_8019C708(void) {
 #pragma optimization_level 4
 void fn_8019C708(u32 arg) {
     u8* p;
-    u32 tmp;
+    u16 a;
+    u16 b;
 
     p = lbl_80466BC0;
     lbl_8047B294 = arg;
@@ -109,7 +110,9 @@ void fn_8019C708(u32 arg) {
     } else {
         fn_800BCEF4(lbl_8047B27C, 0);
     }
-    fn_800BD07C(p[0x18], ((u16)(*(u16*)(p + 0x8) - *(u16*)(p + 0x10))) >> 31);
+    a = *(u16*)(p + 0x8);
+    b = *(u16*)(p + 0x10);
+    fn_800BD07C(p[0x18], (u32)(a - b) >> 31);
     if (lbl_8047B290 != 0) {
         if (lbl_8047B290 & 1) {
             fn_800B856C();
@@ -145,19 +148,19 @@ u32 fn_8019C7B0(void) {
 #pragma optimizewithasm off
 extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
-#if 1
+#if 0
 asm void fn_8019C7B8(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B8.inc"
 }
 #else
+#pragma peephole off
+#pragma optimization_level 4
 s32 fn_8019C7B8(u32 addr) {
-    if (lbl_8047B268 > addr) {
-        return 0;
+    s32 result = 0;
+    if (lbl_8047B268 <= addr && addr < lbl_8047B26C) {
+        result = 1;
     }
-    if (addr >= lbl_8047B26C) {
-        return 0;
-    }
-    return 1;
+    return result;
 }
 #endif
 #pragma pop

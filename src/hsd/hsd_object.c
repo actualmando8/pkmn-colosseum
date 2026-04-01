@@ -82,7 +82,7 @@ void fn_80191118(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_800E01F4(void* vec, f32 x, f32 y, f32 z);
 extern void fn_800E0168(void* dst, void* max, void* min);
-#if 1
+#if 0
 asm void fn_80191358(void) {
 #include "src/hsd/hsd_object_fn_80191358.inc"
 }

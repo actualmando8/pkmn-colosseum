@@ -247,12 +247,21 @@ void fn_8019158C(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_801AE50C(void* aobj);
 extern void fn_801C25E4(void* aobj);
-#if 1
+#if 0
 asm void fn_801915D4(void) {
 #include "src/hsd/hsd_wobj_fn_801915D4.inc"
 }
 #else
-void fn_801915D4(void) { /* TODO */ }
+#pragma optimization_level 4
+extern u8 lbl_8036C5F0[];
+void fn_801915D4(HSD_WObj* wobj) {
+    fn_801AE50C(wobj->robj);
+    fn_801C25E4(wobj->aobj);
+    {
+        u32* parent_info = *(u32**)(lbl_8036C5F0 + 0x14);
+        ((void (*)(HSD_WObj*))parent_info[0x30 / 4])(wobj);
+    }
+}
 #endif
 #pragma pop
 
@@ -290,7 +299,7 @@ void fn_80191688(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_80191788(void) {
 #include "src/hsd/hsd_wobj_fn_80191788.inc"
 }
@@ -334,7 +343,7 @@ void fn_801917D0(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void* fn_801AE5E8(void* desc);
 extern void fn_801AEBE4(void* robj, void* desc);
-#if 0
+#if 1
 asm void fn_8019189C(void) {
 #include "src/hsd/hsd_wobj_fn_8019189C.inc"
 }
@@ -374,7 +383,7 @@ void fn_8019189C(HSD_WObj* wobj, WObjDesc189C* desc) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 0
+#if 1
 asm void fn_8019194C(void) {
 #include "src/hsd/hsd_wobj_fn_8019194C.inc"
 }
@@ -447,7 +456,7 @@ void fn_80191A34(void) { /* TODO */ }
 extern void fn_801AFE68(void* robj, void* robj_desc);
 extern void* fn_801C2670(void* aobj_desc);
 typedef struct { void* aobj_desc; void* robj_desc; } WObjADesc;
-#if 0
+#if 1
 asm void fn_80191DCC(void) {
 #include "src/hsd/hsd_wobj_fn_80191DCC.inc"
 }
@@ -475,7 +484,7 @@ void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
 #pragma optimizewithasm off
 extern void fn_801AFEFC(void* robj, f32 frame);
 extern void fn_801C29C4(void* aobj, f32 frame);
-#if 0
+#if 1
 asm void fn_80191E38(void) {
 #include "src/hsd/hsd_wobj_fn_80191E38.inc"
 }
@@ -534,7 +543,7 @@ typedef struct {
     u32 result_offset;  /* 0x00 */
     u32 key_offset;     /* 0x04 */
 } WObjTablePair;
-#if 0
+#if 1
 asm void fn_80191ECC(void) {
 #include "src/hsd/hsd_wobj_fn_80191ECC.inc"
 }
@@ -581,7 +590,7 @@ typedef struct {
     u8* raw_data;  /* 0x40 */
 } WObjTableFull;
 extern const char lbl_802744A8[];
-#if 0
+#if 1
 asm void fn_80191F64(void) {
 #include "src/hsd/hsd_wobj_fn_80191F64.inc"
 }

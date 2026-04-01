@@ -306,8 +306,8 @@ asm void fn_801A6D08(void) {
 #else
 void fn_801A6D08(HSD_MObj* mobj) {
     if (mobj != NULL) {
-        HSD_CLASS_METHOD(mobj)->init((HSD_Class*) mobj);
         HSD_CLASS_METHOD(mobj)->release((HSD_Class*) mobj);
+        HSD_CLASS_METHOD(mobj)->destroy((HSD_Class*) mobj);
     }
 }
 #endif

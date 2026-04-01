@@ -213,7 +213,7 @@ void fn_8019B948(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_80193828(void);
-extern void fn_80196E10(void);
+extern void fn_80196E10(const char* file, s32 line, const char* msg);
 extern void fn_800BD768(void);
 extern void* memset(void* dst, int val, u32 n);
 extern u8 lbl_8047DA74[];
@@ -337,7 +337,7 @@ void* fn_8019C128(u32* table, u32 key, u32* found) {
 #pragma optimizewithasm off
 extern void fn_801AA498(void* list, void* data);
 extern u8 lbl_8046553C[];
-#if 0
+#if 1
 asm void fn_8019C1B0(void) {
 #include "src/hsd/hsd_fog_fn_8019C1B0.inc"
 }
