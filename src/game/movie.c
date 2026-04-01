@@ -511,20 +511,74 @@ void fn_80036210(void) {
 #endif
 
 /* fn_80036240 - 0x80036240 | size: 0x120 */
-extern void fn_8017B1AC(void);
-extern void fn_800F7AF0(void);
-extern void fn_800F7BC4(void);
-extern void fn_801E1810(void);
-extern void fn_801E16D0(void);
-extern void fn_80166A28(void);
-extern void fn_8016597C(void);
+extern s32 fn_8017B1AC();
+extern u32 fn_800F7AF0(u32);
+extern u32 fn_800F7BC4(u32);
+extern void fn_801E1810();
+extern s32 fn_801E16D0();
+extern void fn_80166A28(u32);
+extern void fn_8016597C(u32, u32, u32, u32);
 extern u8 lbl_802E50E0[];
-#if 1
+#if 0
 asm void fn_80036240(void) {
 #include "src/game/movie_fn_80036240.inc"
 }
 #else
-void fn_80036240(void) { /* TODO - 93.1% match, branch pattern issue */ }
+#pragma optimization_level 4
+void fn_80036240(void) {
+    u32 r30;
+    u32 r31;
+    s32 r3;
+    u32 r0;
+    u8* r30_tbl;
+
+    r30 = 0;
+    goto loop_check;
+
+    loop_body:
+    r3 = fn_8017B1AC();
+    if (r3 == 0xb || r3 == 0x5) {
+        fn_800F0308();
+        goto loop_check;
+    }
+    r31 = fn_800F7AF0(1);
+    r3 = fn_800F7BC4(1);
+    r0 = (r3 & r31) & 0x1300;
+    if (r0 != 0) {
+        fn_801E1810();
+        goto loop_exit;
+    }
+    r31 = r30;
+    if (r30 < 0x21) {
+        r3 = fn_801E16D0();
+        if (r3 >= 0) {
+            r30_tbl = lbl_802E50E0 + r30 * 6;
+            if (r3 >= (s32)*(u16*)(r30_tbl + 0x0)) {
+    r0 = *(u16*)(r30_tbl + 0x2);
+    if (r0 != 0) {
+        fn_80166A28(r0);
+    }
+    r0 = *(u16*)(r30_tbl + 0x4);
+    if (r0 != 0) {
+        fn_80166A28(r0);
+    }
+    r31 = r31 + 1;
+            }
+        }
+    }
+    r30 = r31;
+    fn_800F0308();
+
+    loop_check:
+    r3 = fn_801E1874();
+    if ((u8)r3 == 1) goto loop_body;
+
+    loop_exit:
+    fn_8016597C(1, 0x3e8, 0, 0x7f);
+    fn_800FF58C(0x384);
+    fn_8011288C(0, 0x5960008);
+}
+#pragma peephole reset
 #endif
 
 /* fn_80036360 - 0x80036360 | size: 0x50 */

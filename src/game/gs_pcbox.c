@@ -4918,12 +4918,45 @@ extern u8 lbl_80266C10[];
 extern u32 lbl_8047B7A4;
 extern u32 lbl_8047A300;
 extern u32 lbl_8047B7A0;
-#if 1
+#if 0
 asm void fn_80019118(void) {
 #include "src/game/gs_pcbox_fn_80019118.inc"
 }
 #else
-void fn_80019118(void) { /* TODO */ }
+/* Matching trick: use if/else (not ternary) for cmpw+bne branch pattern;
+   declare r30 as u8 to get clrlwi r0,r30,24 + cmplwi (not record form) */
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_80019118(u8* a, u8* b) {
+    u32 sp[4];
+    u8* r4;
+    s32 r7;
+    u32 r0;
+    u32 r30;
+    s32 r4_val;
+
+    r4 = *(u8**)(a + 0x60);
+    sp[0] = *(u32*)(lbl_80266C10 + 0x0);
+    sp[1] = *(u32*)(lbl_80266C10 + 0x4);
+    sp[2] = *(u32*)(lbl_80266C10 + 0x8);
+    sp[3] = *(u32*)(lbl_80266C10 + 0xC);
+    r7 = (s32)(s8)a[0x95] + (s32)(4 - *(u32*)(r4 + 0xC));
+    if (r7 < 0 || r7 >= 4) return 0;
+    r0 = sp[r7];
+    r4_val = (s32)(s16)*(s16*)(b + 0x6);
+    if (r4_val == (s32)r0) {
+        r30 = 1;
+    } else {
+        r30 = 0;
+    }
+    fn_80109220(b, r30);
+    if ((u8)r30 != 0) {
+        r0 = (s32)(*(f32*)&lbl_8047B7A0 * (*(f32*)&lbl_8047B7A4 - *(f32*)&lbl_8047A300));
+        *(u8*)(b + 0x67) = r0;
+    }
+    return 0;
+}
+#pragma peephole reset
 #endif
 
 /* fn_80019204 - 0x80019204 | size: 0xa4 */

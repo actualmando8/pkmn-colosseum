@@ -1881,7 +1881,7 @@ asm void fn_800DA100(void) {
 #include "src/game/gs_render_fn_800DA100.inc"
 }
 #else
-void fn_800DA100(void) { /* TODO */ }
+void fn_800DA100(void) { /* TODO */}
 #endif
 extern void fn_800BCE88(u32, u32, u32);
 extern void fn_800BCEBC(u32);
@@ -2539,12 +2539,40 @@ void fn_800DCCF0(u8* obj, s32 mode) {
     *(s32*)(obj + 4) = mode;
 }
 #endif
-#if 1
+#if 0
 asm void fn_800DCD98(void) {
 #include "src/game/gs_render_fn_800DCD98.inc"
 }
 #else
-void fn_800DCD98(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_800DCD98(u8* r3arg) {
+    u8* r31;
+    u8* r30;
+    u16 r4;
+    s32 r0;
+
+    r30 = r3arg;
+    r31 = *(u8**)(r3arg + 0xc);
+    if (r31 != NULL) {
+        r4 = *(u16*)(r31 + 0x4);
+        r0 = (r4 == (u16)-1);
+        if (r0 == 0) {
+            *(u16*)(r31 + 0x4) = r4 - 1;
+            r0 = (r4 == 0);
+        }
+        if (r0 != 0) {
+            if (r31 != NULL) {
+                u32* vtbl;
+                vtbl = *(u32**)r31;
+                ((void(*)(u8*))vtbl[0x30/4])(r31);
+                vtbl = *(u32**)r31;
+                ((void(*)(u8*))vtbl[0x34/4])(r31);
+            }
+        }
+    }
+    *(u8*)(r30 + 0x1) = 0;
+    *(u8*)(r30 + 0x0) = 0;
+}
 #endif
 extern u32 fn_801A4344(void);
 extern u32 lbl_8047AAF0;
