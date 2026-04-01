@@ -1,231 +1,172 @@
-# Matching Guide for Pokemon Colosseum (GPXE01)
+# CW GC/1.3 Matching Guide — Pokémon Colosseum
 
-## Compiler: MetroWerks CodeWarrior GC 1.2.5n
+Practical techniques for achieving 100% instruction-level matches against
+the original Pokémon Colosseum DOL compiled with Metrowerks CodeWarrior
+for GameCube.
 
-This document covers the correct compiler flags, common pitfalls, and
-techniques for writing C code that matches the original mwcceppc output.
+## Compiler Configuration
+
+```
+-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int
+-warn off -use_lmw_stmw on -sdata 8 -sdata2 8
+```
+
+### Flag notes
+| Flag | Why |
+|------|-----|
+| `-use_lmw_stmw on` | Inline stmw/lmw for 4+ callee-saved regs (matches target) |
+| `-sdata 8 -sdata2 8` | Restore small-data thresholds stripped by -nodefaults |
+| `-O4,p` | Full optimization with peephole. Use `#pragma peephole off` per-function when needed |
 
 ---
 
-## Compiler Flags
+## Register Allocation
 
-### Default flags (most translation units)
+CW GC/1.3 at -O4 assigns callee-saved registers (r31 down to r14) by
+**variable weight** = (number of uses) * (loop nesting depth factor).
 
-```
--O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off
-```
+### Rules
+1. **Highest-weight variable -> r31**, second -> r30, etc.
+2. Function parameters saved early get high weight (usually r3->r31, r4->r30)
+3. Variables inside loops get much higher weight than outside
+4. Declaration order matters when weights are tied
+5. Variables in inner `{ }` blocks may use volatile regs (r0, r3-r12) if their
+   lifetime doesn't cross a function call
 
-| Flag | Purpose |
-|------|---------|
-| `-O4,p` | Full optimization with peephole. This is the standard for Dolphin SDK and game code. |
-| `-nodefaults` | Do not pull in default libraries. |
-| `-proc gekko` | Target the Gekko (GameCube) processor. |
-| `-fp hard` | Hardware floating point. |
-| `-Cpp_exceptions off` | Disable C++ exception handling (smaller code). |
-| `-enum int` | Enums are always `int`-sized (4 bytes). |
-| `-warn off` | Suppress all warnings so compilation does not abort on implicit conversions. |
-
-### Per-module overrides
-
-No per-module flag overrides have been confirmed yet. Candidates to investigate:
-
-- **CRT modules** (`src/crt/`): May use `-O4,s` (optimize for size) instead of `-O4,p`.
-- **TRK modules** (`src/trk/`): Pure-asm files may need `-O0` or no optimization.
-- **HSD modules** (`src/hsd/`): Adapted from Melee's sysdolphin; may match at `-O4,p`.
-
-### Flag meanings
-
-| Optimization | Description |
-|-------------|-------------|
-| `-O0` | No optimization. Useful for debugging; rarely matches release code. |
-| `-O1` | Minimal optimization. |
-| `-O2` | Standard optimization. |
-| `-O4,p` | Full optimization + peephole. Most common for GCN titles. |
-| `-O4,s` | Full optimization + size preference. Used for some CRT/library code. |
+### Controlling allocation
+- Declare variables in weight order, not source order
+- Remove unused declarations -- they shift ALL register numbering
+- Use inner `{ }` blocks to prevent callee-saved allocation for short-lived vars
+- If a param is only used once, don't save it to a local -- CW may keep it in r3/r4
 
 ---
 
-## Common Compilation Pitfalls
+## Branch Patterns
 
-### 1. C89 mode (no declarations after statements)
+### `beq+b` vs `bne` (UNSOLVABLE from C)
+CW sometimes generates a 2-instruction `beq @skip; b @target` where the
+target binary has a 1-instruction `bne @target`. This is a code generation
+pattern, not fixable by negating conditions, `#pragma peephole off`,
+restructuring if/else, or using gotos. Functions at 95-98% with only this
+mismatch are effectively matched.
 
-MWCC for GCN enforces C89. Variable declarations **must** appear at the
-start of a block, before any statements.
-
-**Wrong (C99):**
+### `mr.` vs `mr` + `cmplwi`
 ```c
-int x = get_value();
-int y = x + 1;       /* ERROR: declaration after statement */
+// Generates mr. (record form) -- 1 instruction:
+if ((ptr = fn()) != NULL)
+
+// Generates mr + cmplwi -- 2 instructions:
+ptr = fn();
+if (ptr != NULL)
 ```
-
-**Correct (C89):**
-```c
-int x;
-int y;
-x = get_value();
-y = x + 1;
-```
-
-Or wrap in a new block scope:
-```c
-int x = get_value();
-{
-    int y = x + 1;
-    /* ... */
-}
-```
-
-### 2. Inline assembly syntax
-
-MWCC uses `asm { ... }` for inline assembly, not GCC-style `__asm__`.
-
-- `asm void FunctionName(void) { nofralloc ... }` for full-asm functions.
-- `asm { sync }` for single inline instructions in C code.
-- Use `opword 0xNNNNNNNN` to emit raw instruction words (not `.long`).
-- Labels use `@name` prefix for local labels: `@skip:`, `@done:`.
-
-**Bare `sync;` outside asm is illegal.** Use `asm { sync }` instead.
-
-### 3. Section pragmas
-
-Use `#pragma section "name"` followed by `__declspec(section "name")`.
-Section names with a leading dot (`.dtors`) may not work directly; use
-`".dtors$10"` or similar suffixed names.
-
-### 4. Forward declarations for asm functions
-
-If an asm function B is referenced by an earlier asm function A via
-`b FunctionB`, you must forward-declare B:
-
-```c
-asm void FunctionB(void);  /* forward declaration */
-
-asm void FunctionA(void) {
-    nofralloc
-    b FunctionB
-}
-
-asm void FunctionB(void) {
-    nofralloc
-    blr
-}
-```
-
-### 5. Implicit function declarations
-
-MWCC infers `int (...)` for undeclared functions. If you later declare the
-function with a different return type or parameter list, the compiler emits
-a "redeclared" error. Always add `extern` declarations before first use.
-
-### 6. SPR names in inline assembly
-
-Not all PowerPC SPR names are recognized by MWCC. Known issues:
-
-| Symbolic Name | Use numeric SPR instead |
-|--------------|------------------------|
-| `TBL_R` | `268` |
-| `TBU_R` | `269` |
-| `TBL_W` | `284` |
-| `TBU_W` | `285` |
-| `USDA` | `947` |
-| `mftbl` | `mfspr rN, 268` |
-| `mftbu` | `mfspr rN, 269` |
-| `mttbl` | `mtspr 284, rN` |
-| `mttbu` | `mtspr 285, rN` |
-| `mfpvr` | `mfspr rN, PVR` |
-| `mtpvr` | PVR is read-only; use `nop` |
-
-### 7. va_list / stdarg.h
-
-MWCC for GCN does not ship `<stdarg.h>`. Define va_list manually:
-
-```c
-typedef struct __va_list_struct {
-    u8  gpr;
-    u8  fpr;
-    u16 padding;
-    u32* overflow_arg_area;
-    u32* reg_save_area;
-} __va_list_struct;
-typedef __va_list_struct va_list[1];
-#define va_start(ap, last) __builtin_va_start(ap, last)
-#define va_end(ap)         ((void)0)
-```
-
-### 8. Header include ordering
-
-Always include `dolphin/os/OSContext.h` before headers that use `OSContext*`
-in typedefs (e.g., `dolphin/si/SI.h`, `dolphin/exi/EXI.h`). If a typedef
-references `OSContext*` but the struct is not yet defined, the compiler
-treats it as `int` and subsequent casts fail.
-
-### 9. extern declarations inside function bodies
-
-MWCC does not allow `extern` declarations inside a function body if the
-function has already been implicitly declared. Move all extern declarations
-to file scope.
 
 ---
 
-## Tips for Matching mwcceppc Output
+## Signed vs Unsigned Comparisons
 
-### Register allocation
+The C variable type controls the compare instruction:
+- `u32 x` -> `cmplwi` (unsigned)
+- `s32 x` -> `cmpwi` (signed)
+- `u16 x` -> `cmplwi` after `clrlwi` (zero-extend)
+- `s16 x` -> `cmpwi` after `extsh` (sign-extend)
 
-MWCC assigns registers in a predictable pattern:
-- Arguments arrive in r3-r10 (GPR) and f1-f8 (FPR).
-- Local variables are allocated starting from r31 downward (r31, r30, r29...).
-- The stack frame uses `stwu r1, -N(r1)` / `addi r1, r1, N`.
-
-### Loop patterns
-
-MWCC tends to:
-- Use `bdnz` for counted loops when the trip count is known.
-- Place the loop condition test at the bottom (`do { ... } while (cond)`
-  compiles more directly than `while (cond) { ... }`).
-
-### Volatile pointers
-
-Hardware register accesses must use `volatile`. Without it, the compiler
-may reorder or eliminate reads/writes:
-
+### Special: `(u16)-1` equality check
 ```c
-#define REG_BASE ((volatile u32*)0xCC006800)
+if (val == (u16)-1)  // Branchless: subf/cntlzw/srwi pattern
+if (val == 0xFFFF)   // Different: cmplwi r3, 0xFFFF
 ```
 
-### Struct member ordering
+---
 
-The order of struct members affects code generation. MWCC may generate
-different load/store sequences depending on field offsets. When matching,
-ensure struct layouts exactly match the original binary's expectations.
+## Float Operations
 
-### Comparison patterns
+### Type declarations
+Float globals MUST be declared with correct float type:
+- `extern f32 lbl_XXX;` for lfs/stfs access
+- `extern f64 lbl_XXX;` for lfd/stfd access
+- `extern u32 lbl_XXX;` is WRONG -- generates lwz, not lfs
 
-- `if (x == 0)` and `if (!x)` may generate different code.
-- `if (x != NULL)` vs `if (x)` can differ in branch direction.
-- Cast comparisons carefully: `(u32)x < (u32)y` vs `(s32)x < (s32)y`
-  generate `cmplw` vs `cmpw`.
+### Integer-to-float conversion
+- `(f64)(u32)value` -> xoris/stw/lfd/fsubs trick (unsigned)
+- `(f64)(s32)value` -> different conversion (signed)
+- `(f32)(s32)value` -> different from `(f32)value`
 
-### Function pointer casts
-
-When passing function pointers, ensure the typedef matches exactly.
-MWCC is strict about function pointer type compatibility and will not
-implicitly convert between different function pointer types.
+### Float register allocation
+FP callee-saved regs (f14-f31) are assigned by first-use order, not
+declaration order. Reorder float operations to match.
 
 ---
 
-## Build Pipeline
+## SDA (Small Data Area) Addressing
 
-1. **Compile**: `python tools/compile_check.py src/path/to/file.c`
-2. **Compile all**: `python tools/compile_check.py --all`
-3. **Match test**: `python tools/match_test.py FunctionName`
-4. **Scan file**: `python tools/match_test.py --scan src/path/to/file.c`
-5. **Interactive diff**: `python tools/compile_check.py src/file.c --diff --symbol FuncName`
+### Scalar vs array declarations
+- `extern u32 lbl_XXXX;` -> `la lbl(r13)` or `la lbl(r2)` -- 1 instruction (SDA)
+- `extern u8 lbl_XXXX[];` -> `lis/addi` pair -- 2 instructions, NEVER gets SDA
+
+### String pointers in SDA2
+```c
+extern char lbl_XXXX;   // Declare as char scalar
+&lbl_XXXX                // Address-of gets SDA reloc
+```
 
 ---
 
-## Current Status
+## Peephole Optimizer
 
-- **Total source files**: 79
-- **Compiling**: 79/79 (100%)
-- **Compiler version**: MetroWerks CodeWarrior GC 1.2.5n
-- **Default flags**: `-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off`
+### `#pragma peephole off`
+Use when prologue instruction order differs (li before stw) or when
+branch pair optimization causes mismatches. Add before function, restore after:
+```c
+#pragma peephole off
+void fn_XXXXXXXX(void) { ... }
+#pragma peephole on
+```
+
+### Keep peephole ON when
+- `srwi.` (record form) needed -- requires peephole to combine shift + compare
+
+---
+
+## Common Mismatch -> Fix Mapping
+
+| Mismatch | Fix |
+|----------|-----|
+| Wrong register (r30 vs r29) | Reorder variable declarations |
+| `cmplwi` vs `cmpwi` | Change variable to `u32` vs `s32` |
+| `clrlwi` before `stb` | Use `u8` variable or cast `(u8)` |
+| Extra `extsb` / `extsh` | Remove unnecessary `(s8)` / `(s16)` cast |
+| `lis/addi` vs `la lbl(r2)` | Change `extern u8[]` to `extern u32` scalar |
+| `mr` + `cmplwi` vs `mr.` | Use `if ((p = fn()) != NULL)` combined pattern |
+| Missing `frsp` | Add explicit `(f32)` cast |
+| `li r0, X` reordered | Try `#pragma peephole off` |
+| `beq+b` vs `bne` | UNSOLVABLE -- accept 2-instruction mismatch |
+
+---
+
+## Debugging: Get Instruction-Level Diff
+
+```bash
+./tools/objdiff-cli.exe diff \
+  -1 build/GC6E01/obj/auto_01_800055E0_text.o \
+  -2 build/GC6E01/base/game/FILENAME.o \
+  -o diff_out.json --format json fn_XXXXXXXX
+
+python -c "
+import json
+with open('diff_out.json') as f:
+    d = json.load(f)
+left_ins = right_ins = []
+for sym in d['left'].get('symbols',[]):
+    if sym.get('name') == 'fn_XXXXXXXX':
+        left_ins = [ins.get('instruction',{}).get('formatted','') for ins in sym.get('instructions',[])]
+for sym in d['right'].get('symbols',[]):
+    if sym.get('name') == 'fn_XXXXXXXX':
+        right_ins = [ins.get('instruction',{}).get('formatted','') for ins in sym.get('instructions',[])]
+for i in range(max(len(left_ins), len(right_ins))):
+    l = left_ins[i] if i < len(left_ins) else ''
+    r = right_ins[i] if i < len(right_ins) else ''
+    if l != r:
+        print(f'{i:3d} L: {l}')
+        print(f'    R: {r}')
+"
+```
