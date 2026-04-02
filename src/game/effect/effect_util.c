@@ -138,18 +138,18 @@ extern u32 fn_80136050(u32 index);
 extern u32 fn_80135FF8(u32 index);
 extern s32 fn_80135FBC(u32 index, u32 subIndex);
 extern u32 fn_80136024(u32 index);
-extern void fn_801026A4();
+extern void fn_801026A4(u32, ...);
 extern void fn_80132834(void* table, u32 stride, u32 count, u32 type);
 extern void fn_80132A38(void);
 extern void fn_801338A4(void);
 extern void fn_80133B50(void);
-extern void fn_80133BE4(void);
+extern u8 fn_80133BE4(void);
 extern void fn_80133C3C(void);
-extern void fn_80133E1C(void);
+extern u32 fn_80133E1C(void);
 extern void fn_80134164(void);
 extern u32 fn_80134274(void);
-extern void fn_801342B8(void);
-extern void fn_80134304(void);
+extern s32 fn_801342B8(void);
+extern u32 fn_80134304(void);
 extern void fn_80135338(void*);
 extern void fn_801353C0(void*, u8, u8, u8, u8);
 extern void fn_80135708(void*);
@@ -166,12 +166,12 @@ extern void fn_80135B5C(void* ptr, f32 val);
 extern void fn_80135B6C(void* ptr, u32 val);
 extern void fn_80135B7C(void* ptr, u32 val);
 extern void fn_80135BA0(void* ptr, u32 val);
-extern void fn_80135C10(void);
+extern f32 fn_80135C10(void* ptr);
 extern void fn_80135C90(u32 arg1, u32 arg2);
 extern void fn_80135CE8(void*);
 extern void fn_8013613C(void);
 
-#if 1
+#if 0
 asm void fn_801316A8(void) {
 #include "src/game/effect/effect_util_fn_801316A8.inc"
 }
@@ -220,28 +220,32 @@ u32 fn_80131768(void* obj) {
 extern u8  lbl_80426FF0[];
 extern u32 lbl_8047AE94;
 extern u32 lbl_8047AE94;
-#if 1
+#if 0
 asm void fn_80131794(void) {
 #include "src/game/effect/effect_util_fn_80131794.inc"
 }
 #else
+#pragma peephole off
 void fn_80131794(void) {
     fn_80132834(lbl_80426FF0, 0x10, lbl_8047AE94, 4);
 }
+#pragma peephole on
 #endif
 
 /* 0x801317C8 | 0x34 -- fn_80132834(lbl_80427010, 0x10, lbl_8047AE68, 5) */
 extern u8  lbl_80427010[];
 extern u32 lbl_8047AE68;
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_801317C8(void) {
 #include "src/game/effect/effect_util_fn_801317C8.inc"
 }
 #else
+#pragma peephole off
 void fn_801317C8(void) {
     fn_80132834(lbl_80427010, 0x10, lbl_8047AE68, 5);
 }
+#pragma peephole on
 #endif
 
 /* 0x801317FC | 0x28 -- calls fn_8011E778(lbl_8047AE90) then fn_8011E760 */
@@ -249,7 +253,7 @@ extern u16  lbl_8047AE90;
 extern void fn_8011E778(u16 handle);
 extern void fn_8011E760(void);
 extern u16  lbl_8047AE90;
-#if 1
+#if 0
 asm void fn_801317FC(void) {
 #include "src/game/effect/effect_util_fn_801317FC.inc"
 }
@@ -419,93 +423,107 @@ void fn_8013182C(void) {
 extern u8 lbl_80427070[];
 extern u32 lbl_8047AE80;
 extern u32 lbl_8047AE80;
-#if 1
+#if 0
 asm void fn_80131A34(void) {
 #include "src/game/effect/effect_util_fn_80131A34.inc"
 }
 #else
+#pragma peephole off
 void fn_80131A34(void) {
     fn_80132834(lbl_80427070, 0x10, lbl_8047AE80, 4);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131A68 | 0x34 -- fn_80132834(lbl_80427090, 0x10, lbl_8047AE6C, 2) */
 extern u8 lbl_80427090[];
 extern u32 lbl_8047AE6C;
 extern u32 lbl_8047AE6C;
-#if 1
+#if 0
 asm void fn_80131A68(void) {
 #include "src/game/effect/effect_util_fn_80131A68.inc"
 }
 #else
+#pragma peephole off
 void fn_80131A68(void) {
     fn_80132834(lbl_80427090, 0x10, lbl_8047AE6C, 2);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131A9C | 0x34 -- fn_80132834(lbl_804270B0, 0x10, lbl_8047AE68, 2) */
 extern u8 lbl_804270B0[];
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_80131A9C(void) {
 #include "src/game/effect/effect_util_fn_80131A9C.inc"
 }
 #else
+#pragma peephole off
 void fn_80131A9C(void) {
     fn_80132834(lbl_804270B0, 0x10, lbl_8047AE68, 2);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131AD0 | 0x34 -- fn_80132834(lbl_804270D0, 0x10, lbl_8047AE68, 3) */
 extern u8 lbl_804270D0[];
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_80131AD0(void) {
 #include "src/game/effect/effect_util_fn_80131AD0.inc"
 }
 #else
+#pragma peephole off
 void fn_80131AD0(void) {
     fn_80132834(lbl_804270D0, 0x10, lbl_8047AE68, 3);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131B04 | 0x34 -- fn_80132834(lbl_804270F0, 0x10, lbl_8047AE68, 3) */
 extern u8 lbl_804270F0[];
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_80131B04(void) {
 #include "src/game/effect/effect_util_fn_80131B04.inc"
 }
 #else
+#pragma peephole off
 void fn_80131B04(void) {
     fn_80132834(lbl_804270F0, 0x10, lbl_8047AE68, 3);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131B38 | 0x34 -- fn_80132834(lbl_80427110, 0x10, lbl_8047AE6C, 1) */
 extern u8 lbl_80427110[];
 extern u32 lbl_8047AE6C;
-#if 1
+#if 0
 asm void fn_80131B38(void) {
 #include "src/game/effect/effect_util_fn_80131B38.inc"
 }
 #else
+#pragma peephole off
 void fn_80131B38(void) {
     fn_80132834(lbl_80427110, 0x10, lbl_8047AE6C, 1);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131B6C | 0x34 -- fn_80132834(lbl_80427130, 0x10, lbl_8047AE68, 1) */
 extern u8 lbl_80427130[];
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_80131B6C(void) {
 #include "src/game/effect/effect_util_fn_80131B6C.inc"
 }
 #else
+#pragma peephole off
 void fn_80131B6C(void) {
     fn_80132834(lbl_80427130, 0x10, lbl_8047AE68, 1);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131BA0 | 0x8 | return_const */
@@ -544,79 +562,91 @@ u32 fn_80131BF0(void) { return lbl_8047AE20; }
 /* 0x80131BF8 | 0x28 -- fn_80131CE8(lbl_8047AE4C, 2) */
 extern u32 lbl_8047AE4C;
 extern u32 lbl_8047AE4C;
-#if 1
+#if 0
 asm void fn_80131BF8(void) {
 #include "src/game/effect/effect_util_fn_80131BF8.inc"
 }
 #else
+#pragma peephole off
 void fn_80131BF8(void) {
     fn_80131CE8(lbl_8047AE4C, 2);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131C20 | 0x28 -- fn_80131CE8(lbl_8047AE48, 1) */
 extern u32 lbl_8047AE48;
 extern u32 lbl_8047AE48;
-#if 1
+#if 0
 asm void fn_80131C20(void) {
 #include "src/game/effect/effect_util_fn_80131C20.inc"
 }
 #else
+#pragma peephole off
 void fn_80131C20(void) {
     fn_80131CE8(lbl_8047AE48, 1);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131C48 | 0x28 -- fn_80131CE8(lbl_8047AE44, 0) */
 extern u32 lbl_8047AE44;
 extern u32 lbl_8047AE44;
-#if 1
+#if 0
 asm void fn_80131C48(void) {
 #include "src/game/effect/effect_util_fn_80131C48.inc"
 }
 #else
+#pragma peephole off
 void fn_80131C48(void) {
     fn_80131CE8(lbl_8047AE44, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131C70 | 0x28 -- fn_80131CE8(lbl_8047AE1C, 2) */
 extern u32 lbl_8047AE1C;
 extern u32 lbl_8047AE1C;
-#if 1
+#if 0
 asm void fn_80131C70(void) {
 #include "src/game/effect/effect_util_fn_80131C70.inc"
 }
 #else
+#pragma peephole off
 void fn_80131C70(void) {
     fn_80131CE8(lbl_8047AE1C, 2);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131C98 | 0x28 -- fn_80131CE8(lbl_8047AE18, 1) */
 extern u32 lbl_8047AE18;
 extern u32 lbl_8047AE18;
-#if 1
+#if 0
 asm void fn_80131C98(void) {
 #include "src/game/effect/effect_util_fn_80131C98.inc"
 }
 #else
+#pragma peephole off
 void fn_80131C98(void) {
     fn_80131CE8(lbl_8047AE18, 1);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131CC0 | 0x28 -- fn_80131CE8(lbl_8047AE14, 0) */
 extern u32 lbl_8047AE14;
 extern u32 lbl_8047AE14;
-#if 1
+#if 0
 asm void fn_80131CC0(void) {
 #include "src/game/effect/effect_util_fn_80131CC0.inc"
 }
 #else
+#pragma peephole off
 void fn_80131CC0(void) {
     fn_80131CE8(lbl_8047AE14, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x80131CE8 | 0x21C */
@@ -798,15 +828,15 @@ void fn_80131F04(void) {
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
+    u32 result;
+    u32 flag;
     u32 val = lbl_8047AE10;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
+    result = fn_801F4354(0, val);
+    flag = (u32)(fn_801F18DC(0) & 0xFF);
 
     if (flag == 1 && result != 0) {
-        u32 info = fn_801F8100(result);
-        fn_80132A38(0x4D, info);
-        info = fn_802037DC(val);
-        fn_80132A38(0x57, info);
+        fn_80132A38(0x4D, fn_801F8100(result));
+        fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
@@ -985,15 +1015,17 @@ extern u16  lbl_8047AE7C;
 extern void fn_8011CA34(u16 handle);
 extern void fn_8011CA1C(void);
 extern u16  lbl_8047AE7C;
-#if 1
+#if 0
 asm void fn_8013226C(void) {
 #include "src/game/effect/effect_util_fn_8013226C.inc"
 }
 #else
+#pragma peephole off
 void fn_8013226C(void) {
     fn_8011CA34(lbl_8047AE7C);
     fn_8011CA1C();
 }
+#pragma peephole on
 #endif
 
 /* 0x80132294 | 0x8 | sda_getter */
@@ -1008,27 +1040,31 @@ u32 fn_801322A4(void) { return lbl_8047AE70; }
 /* 0x801322AC | 0x34 -- fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0) */
 extern u8 lbl_80427150[];
 extern u32 lbl_8047AE6C;
-#if 1
+#if 0
 asm void fn_801322AC(void) {
 #include "src/game/effect/effect_util_fn_801322AC.inc"
 }
 #else
+#pragma peephole off
 void fn_801322AC(void) {
     fn_80132834(lbl_80427150, 0x10, lbl_8047AE6C, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x801322E0 | 0x34 -- fn_80132834(lbl_80427170, 0x10, lbl_8047AE68, 0) */
 extern u8 lbl_80427170[];
 extern u32 lbl_8047AE68;
-#if 1
+#if 0
 asm void fn_801322E0(void) {
 #include "src/game/effect/effect_util_fn_801322E0.inc"
 }
 #else
+#pragma peephole off
 void fn_801322E0(void) {
     fn_80132834(lbl_80427170, 0x10, lbl_8047AE68, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x80132314 | 0x8 | sda_getter */
@@ -1044,28 +1080,32 @@ u32 fn_80132324(void) { return lbl_8047AE5C; }
 extern u8  lbl_80427190[];
 extern u32 lbl_8047AE58;
 extern u32 lbl_8047AE58;
-#if 1
+#if 0
 asm void fn_8013232C(void) {
 #include "src/game/effect/effect_util_fn_8013232C.inc"
 }
 #else
+#pragma peephole off
 void fn_8013232C(void) {
     fn_80132834(lbl_80427190, 0x10, lbl_8047AE58, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x80132360 | 0x34 -- fn_80132834(lbl_804271B0, 0x10, lbl_8047AE54, 0) */
 extern u8  lbl_804271B0[];
 extern u32 lbl_8047AE54;
 extern u32 lbl_8047AE54;
-#if 1
+#if 0
 asm void fn_80132360(void) {
 #include "src/game/effect/effect_util_fn_80132360.inc"
 }
 #else
+#pragma peephole off
 void fn_80132360(void) {
     fn_80132834(lbl_804271B0, 0x10, lbl_8047AE54, 0);
 }
+#pragma peephole on
 #endif
 
 /* 0x80132394 | 0x34 -- calls fn_801440A0(lbl_8047AE52) then fn_80144088, default to 0x2B6E */
@@ -1190,45 +1230,28 @@ u32 fn_80132690(void* obj) {
 }
 
 /* 0x8013275C | 0x84 */
-#if 1
+#if 0
 asm void fn_8013275C(void) {
 #include "src/game/effect/effect_util_fn_8013275C.inc"
 }
 #else
-void fn_8013275C(void) {
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    r0 = *(u8*)((u8*)r31 + 0x44);
-    r0 = r0 & 0x00000002;
-    if ((s32)r0 != (s32)0x0) {
-        r0 = 0x1;
-        *(u8*)((u8*)r31 + 0x45) = r0;
+#pragma peephole off
+u32 fn_8013275C(void* obj) {
+    u8* p = (u8*)obj;
+    if (p[0x44] & 0x02) {
+        p[0x45] = 1;
     }
-    r3 = 0xa;
-    ((void(*)(void))fn_80102620)();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x0) {
-        r0 = 0x0;
-        *(u8*)((u8*)r31 + 0x45) = r0;
+    if ((u32)(fn_80102620(0x0A) & 0xFF) != 0) {
+        p[0x45] = 0;
     }
-    r0 = *(u8*)((u8*)r31 + 0x45);
-    if (r0 != (u32)0x0) {
-        r0 = 0x0;
-        *(u8*)((u8*)r31 + 0x45) = r0;
+    if (p[0x45] != 0) {
+        p[0x45] = 0;
     } else {
-
-        r3 = *(u32*)((u8*)r31 + 0x30);
-        *(u32*)((u8*)r31 + 0x30) = r0;
+        *(u32*)(p + 0x30) = *(u32*)(p + 0x30) - 3;
     }
-    r3 = 0x1;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    return 1;
 }
+#pragma peephole on
 #endif
 
 /* 0x80132834 | 0x204 */
@@ -1587,7 +1610,7 @@ extern u32 lbl_8047AE60;
 extern u32 lbl_8047AE64;
 extern u32 lbl_8047AE88;
 extern u32 lbl_8047AE8C;
-#if 1
+#if 0
 asm void fn_80132C48(void) {
 #include "src/game/effect/effect_util_fn_80132C48.inc"
 }
@@ -2069,14 +2092,17 @@ u32 fn_801333AC(s32 arg) {
 
 /* 0x58 | fn_80133450 | call_sequence */
 extern u32 lbl_80478820;
-#if 1
+#if 0
 asm void fn_80133450(void) {
 #include "src/game/effect/effect_util_fn_80133450.inc"
 }
 #else
-void fn_80133450(void) {
-    fn_801026A4();
-    fn_80102510(0);
+u32 fn_80133450(void) {
+    *(u8*)&lbl_80478820 = 0;
+    fn_801026A4(5, 0, 0, 0, 1, 0);
+    fn_80102510(5);
+    *(u8*)&lbl_80478820 = 1;
+    return 0;
 }
 #endif
 
@@ -2225,7 +2251,7 @@ u32 fn_801337B0(void) {
 extern u8   lbl_8047AED1;
 extern u32  lbl_80478848;
 extern u8   lbl_8047AED1;
-#if 1
+#if 0
 asm void fn_801337E4(void) {
 #include "src/game/effect/effect_util_fn_801337E4.inc"
 }
@@ -2246,47 +2272,26 @@ asm void fn_80133810(void) {
 #include "src/game/effect/effect_util_fn_80133810.inc"
 }
 #else
-void fn_80133810(void) {
-    extern u32 lbl_80478F88;
-    extern void fn_801338A4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r12 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r31 = r3;
-    r12 = lbl_80478F88;
-    if (r12 == (u32)0x0) {
-        r3 = 0x0;
+#pragma peephole off
+void fn_80133810(u8 flag) {
+    extern s32 fn_801338A4(u32);
+    u32 (*fp)(void);
+    u32 result;
+    fp = (u32 (*)(void))lbl_80478F88;
+    if (fp == NULL) {
+        result = 0;
     } else {
-
-        ctr_fn = (void(*)(void))r12;
-        ctr_fn();
+        result = fp();
     }
-    if (r3 == (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-    r0 = *(u8*)&lbl_8047AED0;
-    if (r0 == (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-    r3 = *(u32*)&lbl_80478848;
-    ((void(*)(void))fn_80102620)();
-    r3 = r3 & 0xFF;
-    r0 = -r3;
-    r0 = r0 | r3;
-    /* srwi. r0, r0, 31 */;
-    if (r0 != (u32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-    *(u8*)&lbl_8047AED1 = r31;
+    if (result == 0) { return; }
+    if (lbl_8047AED0 == 0) { return; }
+    { u8 active = fn_80102620(lbl_80478848); if (active) { return; } }
+    lbl_8047AED1 = flag;
     do {
-        r3 = 0x0;
-        fn_801338A4();
-        if ((s32)r3 < (s32)0x0) { r31 = *(u32*)(sp + 0xC); return; }
-        r0 = *(u8*)&lbl_8047AED1;
-    } while (r0 == (u32)0x1);
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
+        if (fn_801338A4(0) < 0) { return; }
+    } while (lbl_8047AED1 == 1);
 }
+#pragma peephole on
 #endif
 
 /* 0x801338A4 | 0x2AC */
@@ -2303,7 +2308,7 @@ void fn_801338A4(void) {
     extern u32 lbl_80478F88;
     extern u32 lbl_80478F8C;
     extern u32 lbl_8047AEDC;
-    extern void fn_801026A4();
+    extern void fn_801026A4(u32, ...);
     extern void fn_801338A4();
     extern void fn_80133C3C();
     extern void fn_80133E6C();
@@ -2962,67 +2967,32 @@ asm void fn_80134164(void) {
 #include "src/game/effect/effect_util_fn_80134164.inc"
 }
 #else
-void fn_80134164(void) {
-    extern u32 lbl_80478F88;
-    extern u32 lbl_80478F8C;
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r12 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+s32 fn_80134164(s32 idx) {
+    s32 count;
+    u8* result;
 
-    /* mr. r31, r3 */;
-    if ((s32)r0 > (s32)0) {
-        r12 = lbl_80478F88;
-        if (r12 == (u32)0x0) {
-            r3 = 0x0;
-        } else {
+    if (idx <= 0) { return 0; }
 
-            ctr_fn = (void(*)(void))r12;
-            ctr_fn();
-        }
-        if ((s32)r3 <= (s32)r31) {
-        }
-        r3 = 0x0;
-        r31 = *(u32*)(sp + 0xC);
-        return;
-        }
-    r12 = lbl_80478F8C;
-    if (r12 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = r31;
-        ctr_fn = (void(*)(void))r12;
-        ctr_fn();
+    {
+        s32 (*fp)(void) = (s32 (*)(void))lbl_80478F88;
+        if (fp == NULL) { count = 0; } else { count = fp(); }
     }
-    if (r3 == (u32)0x0) {
-        r31 = 0x0;
-    } else {
+    if (count <= idx) { return 0; }
 
-        r31 = *(s16*)((u8*)r3 + 0x2);
+    {
+        u8* (*fp)(s32) = (u8* (*)(s32))lbl_80478F8C;
+        if (fp == NULL) { result = NULL; } else { result = fp(idx); }
     }
-    r0 = (s16)r31;
-    if (r3 > (u32)0x0) {
-        r12 = lbl_80478F88;
-        if (r12 == (u32)0x0) {
-            r3 = 0x0;
-        } else {
+    if (result == NULL) { idx = 0; } else { idx = *(s16*)(result + 0x2); }
 
-            ctr_fn = (void(*)(void))r12;
-            ctr_fn();
-        }
-        r0 = (s16)r31;
-        if ((s32)r3 <= (s32)r0) {
-        }
-        r31 = 0x0;
-        }
-    r3 = r31;
-
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    if ((s16)idx <= 0) {
+        idx = 0;
+    } else {
+        s32 (*fp)(void) = (s32 (*)(void))lbl_80478F88;
+        if (fp == NULL) { count = 0; } else { count = fp(); }
+        if (count <= (s16)idx) { idx = 0; }
+    }
+    return idx;
 }
 #endif
 
@@ -3043,29 +3013,17 @@ s32 fn_80134258(void* obj) {
 
 /* 0x80134304 | 0x38 */
 extern u32 lbl_80478F88;
-#if 1
-asm void fn_80134304(void) {
+#if 0
+asm u32 fn_80134304(void) {
 #include "src/game/effect/effect_util_fn_80134304.inc"
 }
 #else
-void fn_80134304(void) {
-    extern u32 lbl_80478F88;
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r12 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r12 = lbl_80478F88;
-    if (r12 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        ctr_fn = (void(*)(void))r12;
-        ctr_fn();
+u32 fn_80134304(void) {
+    u32 (*fp)(void) = (u32 (*)(void))lbl_80478F88;
+    if (fp == NULL) {
+        return 0;
     }
-    return;
+    return fp();
 }
 #endif
 
@@ -4117,23 +4075,16 @@ u32 fn_80135BF8(void* ptr) {
 
 /* 0x80135C10 | 0x18 */
 extern f32 lbl_8047D110;
-#if 1
-asm void fn_80135C10(void) {
+#if 0
+asm f32 fn_80135C10(void* ptr) {
 #include "src/game/effect/effect_util_fn_80135C10.inc"
 }
 #else
-void fn_80135C10(void) {
-    extern f32 lbl_8047D110;
-    u32 r0 = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-
-    if (r3 != (u32)0x0) {
-        f1 = *(f32*)((u8*)r3 + 0x18);
-        return;
+f32 fn_80135C10(void* ptr) {
+    if (ptr != NULL) {
+        return *(f32*)((u8*)ptr + 0x18);
     }
-    f1 = lbl_8047D110;
-    return;
+    return lbl_8047D110;
 }
 #endif
 
@@ -4155,21 +4106,8 @@ asm void fn_80135C58(void) {
 #include "src/game/effect/effect_util_fn_80135C58.inc"
 }
 #else
-void fn_80135C58(void) {
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r0 = 0;
-
-    /* mr. r4, r3 */;
-    if ((s32)r0 != (s32)0) {
-        r3 = *(u32*)((u8*)r4 + 0x0);
-        r4 = *(u32*)((u8*)r4 + 0x4);
-        return;
-    }
-    r4 = 0x0;
-    r3 = 0x0;
-    return;
-}
+/* Returns r3:r4 pair - cannot easily match in C */
+void fn_80135C58(void) { }
 #endif
 
 /* 0x80135C78 | 24 bytes | beq_default_getter */
@@ -4424,34 +4362,16 @@ void fn_80135E44(void) {
 /* 0x80135F58 | 0x38 */
 extern u32 lbl_80478B90;
 extern u8 lbl_80363B78[];
-#if 1
+#if 0
 asm void fn_80135F58(void) {
 #include "src/game/effect/effect_util_fn_80135F58.inc"
 }
 #else
-void fn_80135F58(void) {
-    extern u8 lbl_80363B78[];
-    extern u32 lbl_80478B90;
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-
-    r0 = lbl_80478B90;
-    if (r3 > r0) { r3 = 0x0; return; }
-    if (r4 > (u32)0x8) {
-
-        r3 = 0x0;
-        return;
+u32 fn_80135F58(u32 index, u32 sub) {
+    if (index > lbl_80478B90 || sub > 8) {
+        return 0;
     }
-    r5 = (u32)lbl_80363B78;
-    r6 = r3 << 4;
-    r3 = (u32)lbl_80363B78;
-    r0 = r4 << 1;
-    r3 = r3 + r6;
-    r3 = *(u16*)(r3 + r0);
-    return;
+    return *(u16*)(lbl_80363B78 + index * 0x10 + sub * 2);
 }
 #endif
 
@@ -5580,23 +5500,47 @@ void fn_801364A8(void) {
     return;
 }
 #endif
-extern void fn_801666BC(void);
+extern s32 fn_801666BC(u16);
 extern u16 lbl_8047AEA4;
-#if 1
+#if 0
 asm void fn_80131588(void) {
 #include "src/game/effect/effect_util_fn_80131588.inc"
 }
 #else
-void fn_80131588(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_80131588(void* obj) {
+    u8* p = (u8*)obj;
+    if (p[0x01] == 0) {
+        u16 handle = lbl_8047AEA4;
+        if (handle == 0) {
+            return 0;
+        }
+        if (fn_801666BC(handle) == 2) {
+            *(u32*)(p + 0x30) = *(u32*)(p + 0x30) - 3;
+        }
+    }
+    return 1;
+}
+#pragma peephole on
 #endif
-extern void fn_80165A20(void);
+extern void fn_80165A20(u16, u32, u32);
 extern u16 lbl_8047AEA4;
-#if 1
+#if 0
 asm void fn_801315EC(void) {
 #include "src/game/effect/effect_util_fn_801315EC.inc"
 }
 #else
-void fn_801315EC(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_801315EC(void* obj) {
+    if (*(u8*)((u8*)obj + 0x01) == 0) {
+        u16 handle = lbl_8047AEA4;
+        if (handle != 0) {
+            fn_80165A20(handle, 0, 0xFF);
+        }
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 extern void fn_800FA064(void);
 #if 0
@@ -5691,13 +5635,18 @@ s32 fn_8013264C(void* obj) {
     return 0;
 }
 #endif
-extern u32 lbl_8047D0E0;
+extern f64 lbl_8047D0E0;
 #if 1
 asm void fn_801327E0(void) {
 #include "src/game/effect/effect_util_fn_801327E0.inc"
 }
 #else
-void fn_801327E0(void) { /* TODO */ }
+u32 fn_801327E0(void* obj) {
+    u8* p = (u8*)obj;
+    *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
+    *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * (f32)((s32)(u8)p[0x23] + (s32)(s8)p[0x42]);
+    return 0;
+}
 #endif
 #if 0
 asm void fn_80132F7C(void) {
@@ -5716,18 +5665,31 @@ u32 fn_80132F7C(void) {
 #endif
 extern void fn_801E1810(void);
 extern void fn_800F0308(void);
-extern void fn_801E1874(void);
-extern void fn_8010264C(void);
-extern void fn_800C8520(void);
-extern void fn_801E189C(void);
+extern u8 fn_801E1874(void);
+extern s32 fn_8010264C(u32, u32);
+extern void fn_800C8520(u8*, u8*, ...);
+extern void fn_801E189C(u8*, u32);
 extern u8 lbl_80272AA8[];
-extern u8 lbl_8047D0E8[];
-#if 1
+extern u8 lbl_8047D0E8[4];
+#if 0
 asm void fn_80132FD8(void) {
 #include "src/game/effect/effect_util_fn_80132FD8.inc"
 }
 #else
-void fn_80132FD8(void) { /* TODO */ }
+u32 fn_80132FD8(void) {
+    u8 buf[0x18];
+    s32 id;
+    while ((u32)(fn_801E1874() & 0xFF) == 1) {
+        fn_801E1810();
+        fn_800F0308();
+    }
+    id = fn_8010264C(2, 1);
+    if (id != -1) {
+        fn_800C8520(buf, lbl_80272AA8, lbl_8047D0E8, id);
+        fn_801E189C(buf, 0);
+    }
+    return 0;
+}
 #endif
 #if 0
 asm void fn_8013327C(void) {
@@ -5822,20 +5784,55 @@ u32 fn_801335D4(void) {
 }
 #endif
 extern u32 lbl_80478F8C;
-#if 1
-asm void fn_80133BE4(void) {
+#if 0
+asm u8 fn_80133BE4(void) {
 #include "src/game/effect/effect_util_fn_80133BE4.inc"
 }
 #else
-void fn_80133BE4(void) { /* TODO */ }
+u8 fn_80133BE4(void) {
+    u8* result;
+    u32 ret;
+    fn_80133E6C();
+    {
+        u8* (*fp)(void) = (u8* (*)(void))lbl_80478F8C;
+        if (fp == NULL) {
+            result = NULL;
+        } else {
+            result = fp();
+        }
+    }
+    if (result == NULL) {
+        ret = 1;
+    } else {
+        ret = (*result >> 7) & 1;
+    }
+    return (u8)ret;
+}
 #endif
 extern u32 lbl_80478F8C;
-#if 1
+#if 0
 asm void fn_80133E1C(void) {
 #include "src/game/effect/effect_util_fn_80133E1C.inc"
 }
 #else
-void fn_80133E1C(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_80133E1C(void) {
+    u8* result;
+    fn_80133E6C();
+    {
+        u8* (*fp)(void) = (u8* (*)(void))lbl_80478F8C;
+        if (fp == NULL) {
+            result = NULL;
+        } else {
+            result = fp();
+        }
+    }
+    if (result == NULL) {
+        return 0;
+    }
+    return *(u32*)(result + 0x4);
+}
+#pragma peephole on
 #endif
 #if 0
 asm void fn_80134274(void) {
@@ -5853,12 +5850,24 @@ u32 fn_80134274(void) {
 }
 #endif
 extern u32 lbl_80478F8C;
-#if 1
+#if 0
 asm void fn_801342B8(void) {
 #include "src/game/effect/effect_util_fn_801342B8.inc"
 }
 #else
-void fn_801342B8(void) { /* TODO */ }
+s32 fn_801342B8(void) {
+    u8* (*fp)(void) = (u8* (*)(void))lbl_80478F8C;
+    u8* result;
+    if (fp == NULL) {
+        result = NULL;
+    } else {
+        result = fp();
+    }
+    if (result == NULL) {
+        return 0;
+    }
+    return *(s16*)(result + 0x2);
+}
 #endif
 #if 0
 asm void fn_80134768(void) {
@@ -5893,42 +5902,97 @@ void* fn_80134A98(void* base, s8 index) {
 }
 #endif
 extern u32 lbl_80478B98;  /* effect count (SDA) */
-#if 1
+#if 0
 asm void fn_80136368(void) {
 #include "src/game/effect/effect_util_fn_80136368.inc"
 }
 #else
-void fn_80136368(void) { /* TODO */ }
+u32 fn_80136368(u16 index) {
+    u8* entry;
+    if ((u32)index > lbl_80478B98) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80363B88 + (u32)index * 0x18;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u32*)(entry + 0x8);
+}
 #endif
 extern u32 lbl_80478B98;  /* effect count (SDA) */
-#if 1
+#if 0
 asm void fn_801363A8(void) {
 #include "src/game/effect/effect_util_fn_801363A8.inc"
 }
 #else
-void fn_801363A8(void) { /* TODO */ }
+u32 fn_801363A8(u16 index) {
+    u8* entry;
+    if ((u32)index > lbl_80478B98) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80363B88 + (u32)index * 0x18;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u8*)(entry + 0x0);
+}
 #endif
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
-#if 1
+#if 0
 asm void fn_801363E8(void) {
 #include "src/game/effect/effect_util_fn_801363E8.inc"
 }
 #else
-void fn_801363E8(void) { /* TODO */ }
+u32 fn_801363E8(u16 index) {
+    u8* entry;
+    if ((u32)index > lbl_80478BA0) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u16*)(entry + 0x4);
+}
 #endif
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
-#if 1
+#if 0
 asm void fn_80136428(void) {
 #include "src/game/effect/effect_util_fn_80136428.inc"
 }
 #else
-void fn_80136428(void) { /* TODO */ }
+u32 fn_80136428(u16 index) {
+    u8* entry;
+    if ((u32)index > lbl_80478BA0) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u8*)(entry + 0x0);
+}
 #endif
 extern u32 lbl_80478BA0;  /* trace count (SDA) */
-#if 1
+#if 0
 asm void fn_80136468(void) {
 #include "src/game/effect/effect_util_fn_80136468.inc"
 }
 #else
-void fn_80136468(void) { /* TODO */ }
+u32 fn_80136468(u16 index) {
+    u8* entry;
+    if ((u32)index > lbl_80478BA0) {
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80363C00 + (u32)index * 0xC;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u16*)(entry + 0x2);
+}
 #endif
