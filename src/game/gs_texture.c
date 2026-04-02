@@ -1089,12 +1089,15 @@ asm void fn_800F0308(void) {
 void fn_800F0308(void) { /* TODO */ }
 #endif
 extern u32 lbl_8047AC0C;
-#if 1
+#if 0
 asm void fn_800F0424(void) {
 #include "src/game/gs_texture_fn_800F0424.inc"
 }
 #else
-void fn_800F0424(void) { /* TODO */ }
+void fn_800F0424(GSThread* thr) {
+    thr->suspended = 0;
+    *(u8*)&lbl_8047AC0C = 1;
+}
 #endif
 void fn_800F0438(void) { /* TODO */ }
 void fn_800F0448(void) { /* TODO */ }

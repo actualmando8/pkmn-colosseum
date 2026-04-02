@@ -596,17 +596,18 @@ asm void fn_8017F6B4(void) {
 #include "src/game/fsys/fsys_load_fn_8017F6B4.inc"
 }
 #else
-u32 fn_8017F6B4(u32 a, u32 b) {
+void* fn_8017F6B4(u32 a, u32 b, u32 c) {
     void* block;
-    void (*cb)(void);
+    void* p;
+    u32 unused = 0;
 
-    block = fn_800F9318(b, a);
-    cb = *(void(**)(void))((u8*)block + 0x38);
-    if (cb != NULL) {
-        cb();
+    block = fn_800F9318(b, c);
+    p = block;
+    if (*(void(**)(void))((u8*)p + 0x38) != NULL) {
+        (*(void(**)(void))((u8*)p + 0x38))();
     }
-    fn_8009EFE4(block);
-    return 1;
+    fn_8009EFE4(p);
+    return (void*)1;
 }
 #endif
 
@@ -989,11 +990,9 @@ asm void fn_801808E4(void) {
 }
 #else
 void fn_801808E4(DVDQueueEntry* entry) {
-    void (*cb)(void*, void*);
-
-    cb = (void(*)(void*,void*))entry->callback;
-    if (cb != NULL) {
-        cb(entry->srcPtr, entry->dstPtr);
+    entry->mode = 0;
+    if (entry->callback != NULL) {
+        entry->callback(entry->flag34, entry->callbackArg);
     }
     entry->state = 0;
     DCFlushRange(entry->srcPtr, entry->size);

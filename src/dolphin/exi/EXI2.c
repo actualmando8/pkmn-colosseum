@@ -202,7 +202,7 @@ asm void fn_800CEBB8(void) {
 }
 #else
 void fn_800CEBB8(u32* pendingPtr, void* callback) {
-    BOOL enabled;
+    s32 enabled;
     enabled = OSDisableInterrupts();
     lbl_8047AA38 = (u32)&lbl_8047AA3C;
     *pendingPtr = lbl_8047AA38;

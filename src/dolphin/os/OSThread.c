@@ -152,12 +152,14 @@ void OSInitThreadQueue(OSThreadQueue* queue) {
     queue->head = queue->tail = NULL;
 }
 
-#if 1
+#if 0
 asm void fn_800A13F8(void) {
 #include "src/dolphin/os/OSThread_fn_800A13F8.inc"
 }
 #else
-void fn_800A13F8(void) { /* TODO */ }
+OSThread* fn_800A13F8(void) {
+    return OS_CURRENT_THREAD;
+}
 #endif
 
 OSThread* OSGetCurrentThread(void) {
@@ -372,12 +374,16 @@ void __OSReschedule(void) {
     }
 }
 
-#if 1
+#if 0
 asm void fn_800A1990(void) {
 #include "src/dolphin/os/OSThread_fn_800A1990.inc"
 }
 #else
-void fn_800A1990(void) { /* TODO */ }
+void fn_800A1990(void) {
+    BOOL enabled = OSDisableInterrupts();
+    SelectThread(1);
+    OSRestoreInterrupts(enabled);
+}
 #endif
 extern void fn_8009BD84(void);
 extern OSErrorHandler __OSErrorTable[];
@@ -491,7 +497,7 @@ void OSCancelThread(OSThread* thread) {
     OSRestoreInterrupts(enabled);
 }
 
-extern void fn_800A238C(void);
+extern void fn_800A238C(OSThreadQueue* queue);
 extern void fn_800A1528(void);
 extern s32 fn_800A14EC(OSThread* thread);
 extern void fn_800A1484(OSThread* thread);
@@ -516,26 +522,66 @@ asm void fn_800A221C(void) {
 #else
 void fn_800A221C(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_800A238C(void) {
 #include "src/dolphin/os/OSThread_fn_800A238C.inc"
 }
 #else
-void fn_800A238C(void) { /* TODO */ }
+void fn_800A238C(OSThreadQueue* queue) {
+    BOOL enabled = OSDisableInterrupts();
+    OSThread* currentThread = OS_CURRENT_THREAD;
+
+    currentThread->state = 4;
+    currentThread->queue = queue;
+    ENQUEUE_THREAD_PRIO(currentThread, queue, link);
+    RunQueueHint_8047A764 = 1;
+    __OSReschedule();
+    OSRestoreInterrupts(enabled);
+}
 #endif
-#if 1
+#if 0
 asm void fn_800A2478(void) {
 #include "src/dolphin/os/OSThread_fn_800A2478.inc"
 }
 #else
-void fn_800A2478(void) { /* TODO */ }
+void fn_800A2478(OSThreadQueue* queue) {
+    BOOL enabled = OSDisableInterrupts();
+
+    while (queue->head) {
+        OSThread* thread = queue->head;
+
+        DEQUEUE_HEAD(thread, queue, link);
+
+        thread->state = 1;
+        if (thread->suspend <= 0) {
+            SetRun(thread);
+        }
+    }
+    __OSReschedule();
+    OSRestoreInterrupts(enabled);
+}
 #endif
 #if 1
 asm void fn_800A257C(void) {
 #include "src/dolphin/os/OSThread_fn_800A257C.inc"
 }
 #else
-void fn_800A257C(void) { /* TODO */ }
+BOOL fn_800A257C(OSThread* thread, s32 priority) {
+    BOOL enabled;
+
+    if ((priority < 0) || (priority > 31)) {
+        return FALSE;
+    }
+    enabled = OSDisableInterrupts();
+
+    if (thread->base != priority) {
+        thread->base = priority;
+        UpdatePriority(thread);
+        __OSReschedule();
+    }
+    OSRestoreInterrupts(enabled);
+    return TRUE;
+}
 #endif
 #if 1
 asm void fn_800A263C(void) {

@@ -272,7 +272,7 @@ BOOL fn_800A48DC(DVDCBCallback callback) {
     StopAtNextInt_8047A780 = 0;
 
     /* Send seek command 0xE0000000 */
-    *(volatile u32*)0xCC006008 = 0xE0000000;
+    DVD_CMD = 0xE0000000;
 
     /* Start command */
     DVD_CONTROL = 0x1;

@@ -47,6 +47,10 @@
     "src/dolphin/dvd/DVDQueue.c": {
       "compiler": "GC/1.2.5n",
       "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/exi/EXI2.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     }
   }
 }
