@@ -389,8 +389,8 @@ s32 fn_80026700(void* r3, u8* r4) {
 #endif
 
 /* fn_80026740 - 0x80026740 | size: 0x90 */
-extern u32 lbl_8047B938;
-extern u32 lbl_8047B934;
+extern f32 lbl_8047B938;
+extern f32 lbl_8047B934;
 #if 1
 asm void fn_80026740(void) {
 #include "src/game/gs_worldmap_fn_80026740.inc"
@@ -400,8 +400,8 @@ void fn_80026740(void) { /* TODO */ }
 #endif
 
 /* fn_800267D0 - 0x800267D0 | size: 0x90 */
-extern u32 lbl_8047B938;
-extern u32 lbl_8047B934;
+extern f32 lbl_8047B938;
+extern f32 lbl_8047B934;
 #if 1
 asm void fn_800267D0(void) {
 #include "src/game/gs_worldmap_fn_800267D0.inc"
@@ -411,8 +411,8 @@ void fn_800267D0(void) { /* TODO */ }
 #endif
 
 /* fn_80026860 - 0x80026860 | size: 0x90 */
-extern u32 lbl_8047B938;
-extern u32 lbl_8047B934;
+extern f32 lbl_8047B938;
+extern f32 lbl_8047B934;
 #if 1
 asm void fn_80026860(void) {
 #include "src/game/gs_worldmap_fn_80026860.inc"
@@ -427,8 +427,8 @@ extern u32 fn_800FA444(u32);
 extern void fn_800FB680(s32, s32, s32, u32);
 extern s32 fn_800FA314(void*);
 extern void* fn_800FA280(u32);
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_800268F0(void) {
 #include "src/game/gs_worldmap_fn_800268F0.inc"
@@ -438,8 +438,8 @@ void fn_800268F0(void) { /* TODO */ }
 #endif
 
 /* fn_80026B44 - 0x80026B44 | size: 0x254 */
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_80026B44(void) {
 #include "src/game/gs_worldmap_fn_80026B44.inc"
@@ -449,8 +449,8 @@ void fn_80026B44(void) { /* TODO */ }
 #endif
 
 /* fn_80026D98 - 0x80026D98 | size: 0x254 */
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_80026D98(void) {
 #include "src/game/gs_worldmap_fn_80026D98.inc"
@@ -463,11 +463,11 @@ void fn_80026D98(void) { /* TODO */ }
 extern u32 lbl_8047B928;
 extern u32 lbl_8047B92C;
 extern u8 lbl_802EF0A8[];
-extern u32 lbl_8047B948;
-extern u32 lbl_8047B93C;
-extern u32 lbl_8047B940;
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f64 lbl_8047B948;
+extern f32 lbl_8047B93C;
+extern f32 lbl_8047B940;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_80026FEC(void) {
 #include "src/game/gs_worldmap_fn_80026FEC.inc"
@@ -479,11 +479,11 @@ void fn_80026FEC(void) { /* TODO */ }
 /* fn_8002717C - 0x8002717C | size: 0x190 */
 extern u32 lbl_8047B928;
 extern u32 lbl_8047B92C;
-extern u32 lbl_8047B948;
-extern u32 lbl_8047B93C;
-extern u32 lbl_8047B940;
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f64 lbl_8047B948;
+extern f32 lbl_8047B93C;
+extern f32 lbl_8047B940;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_8002717C(void) {
 #include "src/game/gs_worldmap_fn_8002717C.inc"
@@ -495,11 +495,11 @@ void fn_8002717C(void) { /* TODO */ }
 /* fn_8002730C - 0x8002730C | size: 0x190 */
 extern u32 lbl_8047B928;
 extern u32 lbl_8047B92C;
-extern u32 lbl_8047B948;
-extern u32 lbl_8047B93C;
-extern u32 lbl_8047B940;
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B938;
+extern f64 lbl_8047B948;
+extern f32 lbl_8047B93C;
+extern f32 lbl_8047B940;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_8002730C(void) {
 #include "src/game/gs_worldmap_fn_8002730C.inc"
@@ -509,11 +509,11 @@ void fn_8002730C(void) { /* TODO */ }
 #endif
 
 /* fn_8002749C - 0x8002749C | size: 0x158 */
-extern u32 lbl_8047B948;
-extern u32 lbl_8047B93C;
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B940;
-extern u32 lbl_8047B938;
+extern f64 lbl_8047B948;
+extern f32 lbl_8047B93C;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B940;
+extern f32 lbl_8047B938;
 #if 1
 asm void fn_8002749C(void) {
 #include "src/game/gs_worldmap_fn_8002749C.inc"
@@ -646,7 +646,57 @@ asm void fn_80027960(void) {
 #include "src/game/gs_worldmap_fn_80027960.inc"
 }
 #else
-void fn_80027960(void) { /* TODO */ }
+u16 fn_80027960_TODO(u16 r26, s32 r27) {
+    u32* r29;
+    u16* r5;
+    s32 r28, r30, r31, r4;
+    r28 = 0;
+    r31 = 0;
+    do {
+        u32 ptr;
+        r29 = (u32*)lbl_8047B920;
+        ptr = r29[r28];
+        if (ptr == 0) goto next;
+        r30 = fn_800FA314((void*)ptr);
+        r5 = (u16*)((u8*)fn_800FA280(r29[r28]) + 2);
+        r4 = 1;
+        if (r30 > 1) {
+            s32 ctr = r30 >> 1;
+            do {
+                if (*r5 == r26) break;
+                r4 += 2;
+                r5 += 2;
+            } while (--ctr);
+        }
+        if (r4 < r30) goto found;
+    next:
+        r28++;
+        r31 += 4;
+    } while (r28 < 2);
+
+found:
+    if (r28 >= 2) r28 = 0;
+    if (r28 == r27) return r26;
+    if (r28 == 1) {
+        r26 = *(r5 - 1);
+    }
+    if (r27 == 0) return r26;
+    r30 = r27 << 2;
+    r29 = (u32*)lbl_8047B920;
+    r31 = fn_800FA314((void*)r29[r27]);
+    r5 = (u16*)fn_800FA280(r29[r27]);
+    r4 = 0;
+    if (r31 > 0) {
+        s32 ctr = (r31 + 1) >> 1;
+        do {
+            if (*r5 == r26) break;
+            r4 += 2;
+            r5 += 2;
+        } while (--ctr);
+    }
+    if (r4 < r31) return *(r5 + 1);
+    return 0;
+}
 #endif
 
 /* fn_80027AA4 - 0x80027AA4 | size: 0x2b4 */
@@ -671,9 +721,9 @@ void fn_80027D58(void) { /* TODO */ }
 
 /* fn_800280FC - 0x800280FC | size: 0xf4 */
 extern void fn_801080CC(void*, s32);
-extern u32 lbl_8047B930;
-extern u32 lbl_8047B950;
-extern u32 lbl_8047B934;
+extern f32 lbl_8047B930;
+extern f32 lbl_8047B950;
+extern f32 lbl_8047B934;
 #if 1
 asm void fn_800280FC(void) {
 #include "src/game/gs_worldmap_fn_800280FC.inc"
@@ -702,7 +752,7 @@ extern void fn_8001E074(void);
 extern void fn_801069FC(void);
 extern void fn_80102510(void);
 extern void fn_80102428(void);
-extern u32 lbl_8047B930;
+extern f32 lbl_8047B930;
 extern u8 lbl_8047A3D4[];
 extern u8 lbl_8047A3D0[];
 extern u8 lbl_8047A3CC[];
@@ -836,46 +886,102 @@ s32 fn_80028588(void* r3) {
 #endif
 
 /* fn_80028620 - 0x80028620 | size: 0x108 */
-extern void fn_80109934(void);
-extern void fn_800D888C(void);
-extern void fn_800D88DC(void);
-extern void fn_800D7820(void);
-extern void fn_800D85D4(void);
-extern void fn_800D6A00(void);
-extern void fn_800D67BC(void);
-extern void fn_800D61E4(void);
-extern void fn_800D5CB8(void);
-extern void fn_800D59B8(void);
+extern void* fn_80109934(void*);
+extern void fn_800D888C(s32);
+extern void fn_800D88DC(s32);
+extern void fn_800D7820(void*);
+extern void fn_800D85D4(s32, void*);
+extern void fn_800D6A00(s32);
+extern void fn_800D67BC(s32);
+extern void fn_800D61E4(s32, s32);
+extern void fn_800D5CB8(s32, s32, s32, s32, s32);
+extern void fn_800D59B8(s32, f32, f32);
 extern void fn_800D6728(void);
 extern u8 lbl_803A2094[];
 extern u8 lbl_80314F98[];
-extern u32 lbl_8047B930;
-extern u32 lbl_8047B934;
-#if 1
+extern f32 lbl_8047B930;
+extern f32 lbl_8047B934;
+#if 0
 asm void fn_80028620(void) {
 #include "src/game/gs_worldmap_fn_80028620.inc"
 }
 #else
-void fn_80028620(void) { /* TODO */ }
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_80028620(void* r3, u8* r4) {
+    void* r31;
+    u8* r30;
+    r30 = r4;
+    r3 = *(void**)((u8*)r3 + 0x60);
+    if (*(s32*)r3 == 2) {
+        return 0;
+    }
+    r31 = fn_80109934(lbl_803A2094);
+    if (r31 != (void*)0) {
+        fn_800D888C(4);
+        fn_800D88DC(3);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, r31);
+        fn_800D6A00(7);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047B930, lbl_8047B930);
+        fn_800D61E4((s32)*(s16*)(r30 + 0x54), (s32)*(s16*)(r30 + 0x56));
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047B934, lbl_8047B934);
+        fn_800D6728();
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_80028728 - 0x80028728 | size: 0x108 */
-extern u32 lbl_8047B930;
-extern u32 lbl_8047B934;
-#if 1
+extern f32 lbl_8047B930;
+extern f32 lbl_8047B934;
+#if 0
 asm void fn_80028728(void) {
 #include "src/game/gs_worldmap_fn_80028728.inc"
 }
 #else
-void fn_80028728(void) { /* TODO */ }
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_80028728(void* r3, u8* r4) {
+    void* r31;
+    u8* r30;
+    r30 = r4;
+    r3 = *(void**)((u8*)r3 + 0x60);
+    if (*(s32*)r3 != 2) {
+        return 0;
+    }
+    r31 = fn_80109934(lbl_803A2094);
+    if (r31 != (void*)0) {
+        fn_800D888C(4);
+        fn_800D88DC(3);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, r31);
+        fn_800D6A00(7);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047B930, lbl_8047B930);
+        fn_800D61E4((s32)*(s16*)(r30 + 0x54), (s32)*(s16*)(r30 + 0x56));
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047B934, lbl_8047B934);
+        fn_800D6728();
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_80028830 - 0x80028830 | size: 0x118 */
 extern void fn_8005D858(void);
 extern void fn_80104160(void);
 extern u8 lbl_803A20DC[];
-extern u32 lbl_8047B948;
-extern u32 lbl_8047B940;
+extern f64 lbl_8047B948;
+extern f32 lbl_8047B940;
 #if 1
 asm void fn_80028830(void) {
 #include "src/game/gs_worldmap_fn_80028830.inc"
@@ -886,16 +992,16 @@ void fn_80028830(void) { /* TODO */ }
 
 /* fn_80028948 - 0x80028948 | size: 0x674 */
 extern void fn_800E0BE4(void);
-extern u32 lbl_8047B958;
-extern u32 lbl_8047B95C;
-extern u32 lbl_8047B960;
-extern u32 lbl_8047B964;
-extern u32 lbl_8047B968;
-extern u32 lbl_8047B930;
-extern u32 lbl_8047B970;
-extern u32 lbl_8047B96C;
-extern u32 lbl_8047B934;
-extern u32 lbl_8047B954;
+extern f32 lbl_8047B958;
+extern f32 lbl_8047B95C;
+extern f32 lbl_8047B960;
+extern f32 lbl_8047B964;
+extern f32 lbl_8047B968;
+extern f32 lbl_8047B930;
+extern f32 lbl_8047B970;
+extern f32 lbl_8047B96C;
+extern f32 lbl_8047B934;
+extern f32 lbl_8047B954;
 #if 1
 asm void fn_80028948(void) {
 #include "src/game/gs_worldmap_fn_80028948.inc"
@@ -926,7 +1032,7 @@ extern void fn_800FF660(void);
 extern void fn_8011288C(s32, u32);
 extern u32 lbl_804788A0;
 extern u8 lbl_80266DC0[];
-extern u32 lbl_8047B940;
+extern f32 lbl_8047B940;
 #if 1
 asm void fn_80028FBC(void) {
 #include "src/game/gs_worldmap_fn_80028FBC.inc"
@@ -1605,36 +1711,80 @@ s32 fn_8002B03C(void* r3) {
 
 /* fn_8002B088 - 0x8002B088 | size: 0x34 */
 extern u32 lbl_8047A3E4;
-#if 1
+#if 0
 asm void fn_8002B088(void) {
 #include "src/game/gs_worldmap_fn_8002B088.inc"
 }
 #else
-void fn_8002B088(void) { /* TODO */ }
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8002B088(void) {
+    fn_800FB680(0, 0, -1, lbl_8047A3E4);
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8002B0BC - 0x8002B0BC | size: 0x78 */
-extern u32 lbl_8047B97C;
-extern u32 lbl_8047A3E8;
-extern u32 lbl_8047B978;
-#if 1
+extern f32 lbl_8047B97C;
+extern f32 lbl_8047A3E8;
+extern f32 lbl_8047B978;
+#if 0
 asm void fn_8002B0BC(void) {
 #include "src/game/gs_worldmap_fn_8002B0BC.inc"
 }
 #else
-void fn_8002B0BC(void) { /* TODO */ }
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8002B0BC(void* r3, u8* r4) {
+    u16 hv;
+    u8* ctx;
+    u8 pad[8];
+    hv = *(u16*)((u8*)r3 + 0x94);
+    ctx = *(u8**)((u8*)r3 + 0x60);
+    *(u16*)pad = hv;
+    if ((s8)pad[0] + 0xa < *(s32*)(ctx + 0x8) + 1) {
+        if (*(u16*)(*(void**)ctx) == 0) {
+            r4[0x67] = (lbl_8047B97C - lbl_8047A3E8) * lbl_8047B978;
+            goto end;
+        }
+    }
+    r4[0x67] = 0;
+end:
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8002B134 - 0x8002B134 | size: 0x6c */
-extern u32 lbl_8047B97C;
-extern u32 lbl_8047A3E8;
-extern u32 lbl_8047B978;
-#if 1
+extern f32 lbl_8047B97C;
+extern f32 lbl_8047A3E8;
+extern f32 lbl_8047B978;
+#if 0
 asm void fn_8002B134(void) {
 #include "src/game/gs_worldmap_fn_8002B134.inc"
 }
 #else
-void fn_8002B134(void) { /* TODO */ }
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8002B134(void* r3, u8* r4) {
+    u16 hv;
+    void* ctx;
+    u8 pad[8];
+    hv = *(u16*)((u8*)r3 + 0x94);
+    ctx = *(void**)((u8*)r3 + 0x60);
+    *(u16*)pad = hv;
+    if ((s8)pad[0] > 0) {
+        if (*(u16*)(*(void**)ctx) == 0) {
+            r4[0x67] = (lbl_8047B97C - lbl_8047A3E8) * lbl_8047B978;
+            goto end;
+        }
+    }
+    r4[0x67] = 0;
+end:
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8002B1A0 - 0x8002B1A0 | size: 0x26c */
@@ -1643,7 +1793,7 @@ extern void fn_80144088(void);
 extern void fn_80143FFC(void);
 extern void fn_80143FE4(void);
 extern void fn_800FE35C(void);
-extern u32 lbl_8047B980;
+extern f32 lbl_8047B980;
 #if 1
 asm void fn_8002B1A0(void) {
 #include "src/game/gs_worldmap_fn_8002B1A0.inc"
@@ -1654,11 +1804,11 @@ void fn_8002B1A0(void) { /* TODO */ }
 
 /* fn_8002B40C - 0x8002B40C | size: 0x188 */
 extern u8 lbl_802E4F68[];
-extern u32 lbl_8047B998;
-extern u32 lbl_8047B984;
-extern u32 lbl_8047B988;
-extern u32 lbl_8047B98C;
-extern u32 lbl_8047B990;
+extern f64 lbl_8047B998;
+extern f32 lbl_8047B984;
+extern f32 lbl_8047B988;
+extern f32 lbl_8047B98C;
+extern f32 lbl_8047B990;
 #if 1
 asm void fn_8002B40C(void) {
 #include "src/game/gs_worldmap_fn_8002B40C.inc"
@@ -1670,13 +1820,13 @@ void fn_8002B40C(void) { /* TODO */ }
 /* fn_8002B594 - 0x8002B594 | size: 0x2ec */
 extern void fn_800CDBE0(void);
 extern void fn_800CE148(void);
-extern u32 lbl_8047B980;
-extern u32 lbl_8047B97C;
-extern u32 lbl_8047B998;
-extern u32 lbl_8047B98C;
-extern u32 lbl_8047B9A0;
-extern u32 lbl_8047B9A4;
-extern u32 lbl_8047B9A8;
+extern f32 lbl_8047B980;
+extern f32 lbl_8047B97C;
+extern f64 lbl_8047B998;
+extern f32 lbl_8047B98C;
+extern f32 lbl_8047B9A0;
+extern f32 lbl_8047B9A4;
+extern f32 lbl_8047B9A8;
 #if 1
 asm void fn_8002B594(void) {
 #include "src/game/gs_worldmap_fn_8002B594.inc"
@@ -1688,16 +1838,16 @@ void fn_8002B594(void) { /* TODO */ }
 /* fn_8002B880 - 0x8002B880 | size: 0x468 */
 extern void fn_800FE6D0(void);
 extern void fn_800FE4D4(void);
-extern u32 lbl_8047B998;
-extern u32 lbl_8047B98C;
-extern u32 lbl_8047B9A0;
-extern u32 lbl_8047B9A4;
-extern u32 lbl_8047A3F0;
-extern u32 lbl_8047B978;
-extern u32 lbl_8047B9AC;
-extern u32 lbl_8047B97C;
-extern u32 lbl_8047B9B0;
-extern u32 lbl_8047B9B4;
+extern f64 lbl_8047B998;
+extern f32 lbl_8047B98C;
+extern f32 lbl_8047B9A0;
+extern f32 lbl_8047B9A4;
+extern f32 lbl_8047A3F0;
+extern f32 lbl_8047B978;
+extern f32 lbl_8047B9AC;
+extern f32 lbl_8047B97C;
+extern f32 lbl_8047B9B0;
+extern f32 lbl_8047B9B4;
 #if 1
 asm void fn_8002B880(void) {
 #include "src/game/gs_worldmap_fn_8002B880.inc"
@@ -1752,9 +1902,9 @@ s32 fn_8002BCE8(void* r3, u8* r4) {
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c */
 extern void fn_80143F84(void);
-extern u32 lbl_8047B980;
-extern u32 lbl_8047B9B8;
-extern u32 lbl_8047B9BC;
+extern f32 lbl_8047B980;
+extern f32 lbl_8047B9B8;
+extern f32 lbl_8047B9BC;
 extern u32 lbl_8047A3E4;
 #if 1
 asm void fn_8002BE08(void) {
@@ -1805,11 +1955,11 @@ s32 fn_8002C014(void* r3) {
 #endif
 
 /* fn_8002C0E4 - 0x8002C0E4 | size: 0x1a0 */
-extern u32 lbl_8047B980;
-extern u32 lbl_8047B9C0;
-extern u32 lbl_8047B9C4;
-extern u32 lbl_8047B97C;
-extern u32 lbl_8047B9C8;
+extern f32 lbl_8047B980;
+extern f32 lbl_8047B9C0;
+extern f32 lbl_8047B9C4;
+extern f32 lbl_8047B97C;
+extern f32 lbl_8047B9C8;
 #if 1
 asm void fn_8002C0E4(void) {
 #include "src/game/gs_worldmap_fn_8002C0E4.inc"
@@ -1899,7 +2049,7 @@ extern void fn_800E3534(void);
 extern void fn_800E27B0(void);
 extern void fn_800E24B0(void);
 extern void fn_800E209C(void);
-extern u8 lbl_8047A3FC[];
+extern u32 lbl_8047A3FC;
 extern u32 lbl_80478E54;
 extern u32 lbl_8047A3DC;
 #if 1
@@ -1923,12 +2073,12 @@ void fn_8002D91C(void) { /* TODO */ }
 
 /* fn_8002DC6C - 0x8002DC6C | size: 0xb8 */
 extern void fn_801D23C0(void);
-extern void fn_800D37CC(void);
-extern void fn_8010206C(void);
-extern void fn_8019075C(void);
-extern void fn_80102038(void);
-extern u32 lbl_8047B998;
-extern u32 lbl_8047B9CC;
+extern u32 fn_800D37CC(void);
+extern void fn_8010206C(f32);
+extern void fn_8019075C(s32, s32);
+extern void fn_80102038(f32);
+extern f64 lbl_8047B998;
+extern f32 lbl_8047B9CC;
 #if 1
 asm void fn_8002DC6C(void) {
 #include "src/game/gs_worldmap_fn_8002DC6C.inc"
@@ -1976,10 +2126,10 @@ extern void fn_800E4014(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A40C;
 extern u32 lbl_8047A420;
-extern u32 lbl_8047B9D0;
+extern f32 lbl_8047B9D0;
 extern u32 lbl_8047A41C;
 extern u32 lbl_8047A418;
-extern u32 lbl_8047B9D4;
+extern f32 lbl_8047B9D4;
 extern u32 lbl_8047A408;
 extern u32 lbl_8047A414;
 extern u32 lbl_8047A42C;
@@ -2001,8 +2151,8 @@ extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
 extern u32 lbl_8047A414;
 extern u32 lbl_8047A41C;
-extern u32 lbl_8047B9D0;
-extern u32 lbl_8047B9D8;
+extern f32 lbl_8047B9D0;
+extern f32 lbl_8047B9D8;
 extern u32 lbl_8047A42C;
 #if 1
 asm void fn_8002E26C(void) {
@@ -2020,7 +2170,7 @@ extern void fn_80073A44(void);
 extern void fn_8017B1AC(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-extern u32 lbl_8047B9D0;
+extern f32 lbl_8047B9D0;
 extern u32 lbl_8047A42C;
 extern u32 lbl_8047A428;
 extern u32 lbl_8047A410;
@@ -2043,13 +2193,13 @@ extern void fn_8011E8DC(void);
 extern void fn_8012640C(void);
 extern u32 lbl_8047A428;
 extern u8 lbl_803A2688[];
-extern u32 lbl_8047B9D4;
-extern u32 lbl_8047B9E0;
-extern u32 lbl_8047B9E8;
-extern u32 lbl_8047B9DC;
+extern f32 lbl_8047B9D4;
+extern f64 lbl_8047B9E0;
+extern f64 lbl_8047B9E8;
+extern f32 lbl_8047B9DC;
 extern u32 lbl_8047A42C;
 extern u32 lbl_8047A420;
-extern u32 lbl_8047B9D0;
+extern f32 lbl_8047B9D0;
 #if 1
 asm void fn_8002EA5C(void) {
 #include "src/game/gs_worldmap_fn_8002EA5C.inc"
@@ -2065,10 +2215,10 @@ extern void fn_801043A4(void);
 extern void fn_801023E4(void);
 extern void fn_80102004(void);
 extern u32 lbl_8047A428;
-extern u32 lbl_8047B9D4;
-extern u32 lbl_8047B9E0;
-extern u32 lbl_8047B9E8;
-extern u32 lbl_8047B9DC;
+extern f32 lbl_8047B9D4;
+extern f64 lbl_8047B9E0;
+extern f64 lbl_8047B9E8;
+extern f32 lbl_8047B9DC;
 extern u32 lbl_8047A42C;
 #if 1
 asm void fn_8002EE74(void) {
@@ -2098,10 +2248,10 @@ void fn_8002F284(void) { /* TODO */ }
 extern void fn_8014402C(void);
 extern void fn_8011ED68(void);
 extern u32 lbl_8047A428;
-extern u32 lbl_8047B9D4;
-extern u32 lbl_8047B9E0;
-extern u32 lbl_8047B9E8;
-extern u32 lbl_8047B9DC;
+extern f32 lbl_8047B9D4;
+extern f64 lbl_8047B9E0;
+extern f64 lbl_8047B9E8;
+extern f32 lbl_8047B9DC;
 extern u32 lbl_8047A42C;
 extern u32 lbl_8047A410;
 extern u32 lbl_8047A424;
