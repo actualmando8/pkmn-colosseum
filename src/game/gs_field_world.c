@@ -5492,12 +5492,12 @@ extern void fn_8011F77C(void);
 extern void fn_80120C6C(void);
 extern s32 fn_80121ADC(void* a, u16 b);
 extern void fn_801237B8(void);
-extern void fn_80123CD4(void);
+extern u32 fn_80123CD4(u8* ptr, u32 arg2);
 extern void fn_80124A60(u8* ptr);
 extern void fn_80128300(void);
 extern void fn_80128524(void);
 extern void fn_80129094(void);
-extern void fn_801294C4(void);
+extern void fn_801294C4(u8* ptr, u32 offset);
 extern void fn_80129A78(void);
 extern void fn_8012A08C(void);
 extern void fn_8012A1A4(void);
@@ -8126,11 +8126,12 @@ void fn_80117E58(void) {
 /* 0x48 | fn_80118020 | single_call_straight */
 extern void fn_800FF4D4(void);
 extern u32 lbl_802727C8[];
-#if 1
+#if 0
 asm void fn_80118020(void) {
 #include "src/game/gs_field_world_fn_80118020.inc"
 }
 #else
+#pragma peephole off
 void fn_80118020(void) {
     extern void fn_800FF4D4(void* ptr, u32 val);
     u32 local[3];
@@ -8139,6 +8140,7 @@ void fn_80118020(void) {
     local[2] = lbl_802727C8[2];
     fn_800FF4D4(local, 1);
 }
+#pragma peephole on
 #endif
 /* 0x80118070 | 0x90 */
 extern u32 lbl_8047AD88;
@@ -14915,7 +14917,7 @@ void fn_8011FBCC(u8* ptr, f32 f1) {
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
-#if 1
+#if 0
 asm void fn_8011FC14(void) {
 #include "src/game/gs_field_world_fn_8011FC14.inc"
 }
@@ -14924,18 +14926,13 @@ f32 fn_8011FC14(u8* ptr) {
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
     u32 val;
     u32 sp[2];
-    f32 f1;
-    f64 dv;
-    f64 f2;
+    f32 result;
     if (ptr == NULL) { return lbl_8047CFF0; }
     val = fn_8012640C(ptr, 0, 0xc5, 0);
-    val ^= 0x80000000;
-    sp[1] = val;
-    f2 = lbl_8047D008;
+    sp[1] = val ^ 0x80000000;
     sp[0] = 0x43300000;
-    dv = *(f64*)sp;
-    f1 = (f32)(dv - f2);
-    return f1 / lbl_8047CFF4;
+    result = *(f64*)sp - lbl_8047D008;
+    return result / lbl_8047CFF4;
 }
 #endif
 /* 0x8011FC74 | 0x30 */
@@ -17786,95 +17783,41 @@ void fn_801231A4(void) {
 /* 0x801232E0 | 0x88 */
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
-#if 1
+#if 0
 asm void fn_801232E0(void) {
 #include "src/game/gs_field_world_fn_801232E0.inc"
 }
 #else
-void fn_801232E0(void) {
-    extern u32 fn_8012640C();
-    extern void fn_801EE958();
-    extern void fn_801EEB34();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r30 = r4;
-    if ((s32)r0 != (s32)0) {
-        r4 = 0x0;
-        r5 = 0xc2;
-        r6 = 0x0;
-        fn_8012640C();
-        r0 = r3 & 0xFF;
-        if ((s32)r0 != (s32)0) {
-            r3 = r31;
-            r4 = 0x0;
-            r5 = 0xc3;
-            r6 = 0x0;
-            fn_8012640C();
-            r31 = r3 & 0xFFFF;
-            r4 = 0x1;
-            r3 = r31;
-            fn_801EE958();
-            r0 = r30 & 0xFF;
-            if ((s32)r0 != (s32)0) {
-                r3 = r31;
-                r4 = 0x1;
-                fn_801EEB34();
-    }
-    }
-    }
-    return;
+void fn_801232E0(u8* ptr, u8 flag) {
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+    extern void fn_801EE958(u16 val, u32 a);
+    extern void fn_801EEB34(u16 val, u32 a);
+    u16 val;
+    if (ptr == NULL) { return; }
+    if ((u8)fn_8012640C(ptr, 0, 0xc2, 0) == 0) { return; }
+    val = (u16)fn_8012640C(ptr, 0, 0xc3, 0);
+    fn_801EE958(val, 1);
+    if ((u8)flag == 0) { return; }
+    fn_801EEB34(val, 1);
 }
 #endif
 /* 0x80123368 | 0x8C */
 extern void fn_8025FF9C(void);
-#if 1
+#if 0
 asm void fn_80123368(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
 }
 #else
-void fn_80123368(void) {
-    extern void fn_801254B4();
-    extern u32 fn_8012640C();
-    extern void fn_8025FF9C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r31 = r4;
-    if ((s32)r0 != (s32)0) {
-        r4 = 0x0;
-        r5 = 0x6e;
-        r6 = 0x0;
-        fn_8012640C();
-        r4 = r30;
-        r3 = 0x0;
-        fn_8025FF9C();
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0x62;
-        r6 = 0x0;
-        r7 = 0x1;
-        fn_801254B4();
-        r0 = r31 & 0xFF;
-        if ((s32)r0 != (s32)0) {
-            r3 = r30;
-            r4 = 0x0;
-            r5 = 0x63;
-            r6 = 0x0;
-            r7 = 0x1;
-            fn_801254B4();
-        }
-    }
-    return;
+void fn_80123368(u8* ptr, u8 flag) {
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
+    if (ptr == NULL) { return; }
+    fn_8012640C(ptr, 0, 0x6e, 0);
+    fn_8025FF9C(0, ptr);
+    fn_801254B4(ptr, 0, 0x62, 0, 1);
+    if ((u8)flag == 0) { return; }
+    fn_801254B4(ptr, 0, 0x63, 0, 1);
 }
 #endif
 /* 0x801233F4 | 0x190 */
@@ -18486,42 +18429,16 @@ void fn_80123C54(void* ptr, u32 idx, u32 arg) {
     /* depends on fn_8011F260 signature -- will convert with fn_8011F260 */
 }
 /* 0x80123CD4 | 0x84 */
-#if 1
+#if 0
 asm void fn_80123CD4(void) {
 #include "src/game/gs_field_world_fn_80123CD4.inc"
 }
 #else
-void fn_80123CD4(void) {
-    extern u32 fn_8012640C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r31 = r4;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-        return;
-    }
-    r6 = r31;
-    r4 = 0x0;
-    r5 = 0x7f;
-    fn_8012640C();
-    if ((s32)r3 == (s32)0x0) {
-        r3 = 0x0;
-        return;
-    }
-    r3 = r30;
-    r6 = r31;
-    r4 = 0x0;
-    r5 = 0x7f;
-    fn_8012640C();
-    r4 = 0x163 - r3;
-    r0 = r4 | r0;
-    r3 = (u32)r0 >> 31;
-    return;
+u32 fn_80123CD4(u8* ptr, u32 arg2) {
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+    if (ptr == NULL) { return 0; }
+    if ((s32)fn_8012640C(ptr, 0, 0x7f, arg2) == 0) { return 0; }
+    return fn_8012640C(ptr, 0, 0x7f, arg2) != 0x163;
 }
 #endif
 /* 0x80123D58 | 0x118 */
@@ -21481,7 +21398,7 @@ void fn_80129474(u8* ptr, u32 offset) {
 }
 #endif
 /* 0x50 | fn_801294C4 | call_sequence */
-#if 1
+#if 0
 asm void fn_801294C4(void) {
 #include "src/game/gs_field_world_fn_801294C4.inc"
 }
@@ -21489,7 +21406,8 @@ asm void fn_801294C4(void) {
 void fn_801294C4(u8* ptr, u32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
-    fn_8012A450(ptr, 0xc, fn_8012A5B0(ptr, 0xc, 0) + offset);
+    u32 val = fn_8012A5B0(ptr, 0xc, 0) + offset;
+    fn_8012A450(ptr, 0xc, val);
 }
 #endif
 /* 0x80129514 | 0x88 */
@@ -21735,17 +21653,18 @@ void fn_80129718(void) {
 }
 #endif
 /* 0x68 | fn_801297D8 | guarded_call */
-#if 1
+#if 0
 asm void fn_801297D8(void) {
 #include "src/game/gs_field_world_fn_801297D8.inc"
 }
 #else
-void fn_801297D8(void) {
-    if (0 /* guard r4 == 0 */) { return; }
-    if (0 /* guard r5 == 0 */) { return; }
-    if (0 /* guard r6 == 0 */) { return; }
-    if (0 /* guard r7 == 0 */) { return; }
-    fn_8012A5B0();
+u32 fn_801297D8(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
+    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    if (out_a != NULL) { *out_a = 0xa; }
+    if (out_b != NULL) { *out_b = 1; }
+    if (out_c != NULL) { *out_c = 0; }
+    if (out_d != NULL) { *out_d = 1; }
+    return fn_8012A5B0(ptr, 0xa, 0);
 }
 #endif
 /* 0x78 | fn_80129840 | generic */
@@ -30049,12 +29968,24 @@ u32 fn_80116FE0(u8* ptr, void* obj) {
     return 1;
 }
 #endif
-#if 1
+#if 0
 asm void fn_801170A4(void) {
 #include "src/game/gs_field_world_fn_801170A4.inc"
 }
 #else
-void fn_801170A4(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_801170A4(u8* arg1, u32 arg2) {
+    extern void* fn_800FF56C(void);
+    extern void* fn_80115C48(void* a);
+    extern u8* fn_80115A80(void* a);
+    extern u32 fn_80115684(void* a, u32 b);
+    void* temp;
+    if (arg1 == NULL) { return 0; }
+    temp = fn_80115C48(fn_800FF56C());
+    if (arg1 != fn_80115A80(temp)) { return 0; }
+    return fn_80115684(temp, arg2);
+}
+#pragma peephole on
 #endif
 extern void fn_800E0020(void);
 extern u32 lbl_8047AD68;
@@ -30744,12 +30675,19 @@ s32 fn_80121ADC(void* a, u16 b) {
     return fn_8011B67C(a, b);
 }
 #endif
-#if 1
+#if 0
 asm void fn_80122334(void) {
 #include "src/game/gs_field_world_fn_80122334.inc"
 }
 #else
-void fn_80122334(void) { /* TODO */ }
+u8 fn_80122334(u32 val) {
+    u32 s;
+    s = (val >> 12) & 0x30;
+    s = (s & 0xFFFFFF3Fu) | ((val >> 18) & 0xC0);
+    s = (s & 0xFFFFFFF3u) | ((val >> 6) & 0x0C);
+    s = (s & 0xFFFFFFFCu) | (val & 0x03);
+    return (u8)(s % 28);
+}
 #endif
 #if 0
 asm void fn_801229F4(void) {
@@ -31154,12 +31092,18 @@ asm u32 fn_8012640C(void) {
 #else
 u32 fn_8012640C(void) { /* TODO */ return 0; }
 #endif
-#if 1
+#if 0
 asm void fn_8012A130(void) {
 #include "src/game/gs_field_world_fn_8012A130.inc"
 }
 #else
-void fn_8012A130(void) { /* TODO */ }
+u32 fn_8012A130(u8* ptr) {
+    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    extern s32 fn_800F9EE4(u32 val, u16* out);
+    u16 local = 0;
+    if (fn_800F9EE4(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
+    return fn_8012A5B0(ptr, 0xb, 0) != 2;
+}
 #endif
 extern void fn_801885C4(void);
 extern void fn_800A3B7C(void);
@@ -31188,21 +31132,55 @@ void fn_8012CA84(void) { /* TODO */ }
 #endif
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
-#if 1
+#if 0
 asm void fn_8012D2BC(void) {
 #include "src/game/gs_field_world_fn_8012D2BC.inc"
 }
 #else
-void fn_8012D2BC(void) { /* TODO */ }
+void fn_8012D2BC(u32 param) {
+    extern u8 lbl_80426BD0[];
+    extern void* fn_800F9318(u32 a, u32 b);
+    extern void fn_800E3D6C(void* a, u32 b);
+    s32 idx;
+    u32 table[2];
+    u32 val;
+    void* result;
+
+    idx = *(s32*)lbl_80426BD0;
+    table[0] = *(u32*)&lbl_8047D030;
+    table[1] = *(u32*)&lbl_8047D034;
+    if (idx >= 0 && idx < 2) {
+        val = table[idx];
+    }
+    result = fn_800F9318(0, val);
+    fn_800E3D6C(result, param);
+}
 #endif
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
-#if 1
+#if 0
 asm void fn_8012D32C(void) {
 #include "src/game/gs_field_world_fn_8012D32C.inc"
 }
 #else
-void fn_8012D32C(void) { /* TODO */ }
+void fn_8012D32C(u32 param) {
+    extern u8 lbl_80426BD0[];
+    extern void* fn_800F9318(u32 a, u32 b);
+    extern void fn_800E3D98(void* a, u32 b);
+    s32 idx;
+    u32 table[2];
+    u32 val;
+    void* result;
+
+    idx = *(s32*)lbl_80426BD0;
+    table[0] = *(u32*)&lbl_8047D030;
+    table[1] = *(u32*)&lbl_8047D034;
+    if (idx >= 0 && idx < 2) {
+        val = table[idx];
+    }
+    result = fn_800F9318(0, val);
+    fn_800E3D98(result, param);
+}
 #endif
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
