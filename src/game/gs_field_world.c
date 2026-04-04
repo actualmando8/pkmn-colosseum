@@ -10296,115 +10296,70 @@ void fn_8011A0A8(void) {
 }
 #endif
 /* 0x8011A280 | 0x164 */
-#if 1
+#if 0
 asm void fn_8011A280(void) {
 #include "src/game/gs_field_world_fn_8011A280.inc"
 }
 #else
-void fn_8011A280(void) {
-    extern void fn_80119E90();
-    extern void fn_80119ED0();
-    extern void fn_80119F10();
-    extern void fn_80119FA0();
-    extern void fn_8011A090();
-    extern void fn_80135E44();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    if ((s32)r0 == (s32)0) return;
-    do {
-        if ((s32)r0 == (s32)0) {
-            r0 = 0x0;
-            break;
-        }
-        r3 = r30;
-        fn_80119E90();
-        r28 = r3 & 0xFF;
-        r3 = r30;
-        fn_80119F10();
-        r27 = r3;
-        r3 = r30;
-        fn_80119ED0();
-        r6 = r3;
-        r3 = r27;
-        r4 = r29;
-        r5 = 0x0;
-        r7 = 0x0;
-        fn_80135E44();
-        if (r3 == (u32)0x0) {
-            r27 = 0x0;
-        } else {
-            /* clrlslwi r0, r28, 16, 4 */;
-            r27 = r3 + r0;
-        }
-        if (r27 == (u32)0x0) {
-            r0 = 0x0;
-            break;
-        }
-        { u32 _flag;
-        if (r27 == (u32)0x0) {
-            _flag = 0x0;
-        } else {
-            r3 = r27;
-            fn_8011A090();
-            r0 = r3 & 0xFFFF;
-            if (r27 == (u32)0x0) {
-                _flag = 0x0;
-            } else {
-                _flag = 0x1;
-            }
-        }
-        _flag = _flag & 0xFF;
-        if (_flag == (u32)0x1) {
-            r3 = r27;
-            fn_8011A090();
-            r3 = r3 & 0xFFFF;
-            r0 = r30 & 0xFFFF;
-            if (r0 == (u32)r3) {
-                r0 = 0x1;
-                break;
-            }
-        }
-        }
-        r0 = 0x0;
-    } while (0);
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)r3) return;
-    r3 = r30;
-    fn_80119E90();
-    r27 = r3 & 0xFF;
-    r3 = r30;
-    fn_80119F10();
-    r28 = r3;
-    r3 = r30;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-        /* clrlslwi r0, r27, 16, 4 */;
-        r3 = r3 + r0;
+void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
+    extern u8 fn_80119E90(u16 val);
+    extern u8* fn_80119F10(u16 val);
+    extern u32 fn_80119ED0(u16 val);
+    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u16 fn_8011A090(u8* ptr);
+    extern void fn_80119FA0(u8* ptr, u32 val);
+    u8* base;
+    u16 idx;
+    u8 flag;
+
+    if (arg2 == 0) { goto exit; }
+    if (arg2 != 0) { goto body_start; }
+    flag = 0; goto flag_check;
+body_start:
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto offset_calc; }
+    base = NULL;
+    goto check_base;
+offset_calc:
+    base = base + idx * 16;
+check_base:
+    if (base == NULL) {
+        flag = 0;
+        goto flag_check;
     }
-    if (r3 == (u32)0x0) return;
-    r4 = r31;
-    fn_80119FA0();
+    if (base != NULL) { goto a090_check; }
+    flag = 0; goto inner_flag_check;
+a090_check:
+    if ((u16)fn_8011A090(base) == 0) { flag = 0; goto inner_flag_check; }
+    flag = 1;
+inner_flag_check:
+    if ((u8)flag == 1) {
+        if ((u16)fn_8011A090(base) == arg2) {
+            flag = 1;
+            goto flag_check;
+        }
+    }
+    flag = 0;
+flag_check:
+    if ((u8)flag == 0) { goto exit; }
+
+    /* Phase 2 */
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto p2_offset; }
+    base = NULL;
+    goto p2_check;
+p2_offset:
+    base = base + idx * 16;
+p2_check:
+    if (base != NULL) {
+        fn_80119FA0(base, arg3);
+    }
+
+exit:
     return;
 }
 #endif
@@ -10522,115 +10477,70 @@ s32 fn_8011A3E4(void* obj, u16 val) {
     return;
 }
 /* 0x8011A570 | 0x164 */
-#if 1
+#if 0
 asm void fn_8011A570(void) {
 #include "src/game/gs_field_world_fn_8011A570.inc"
 }
 #else
-void fn_8011A570(void) {
-    extern void fn_80119E90();
-    extern void fn_80119ED0();
-    extern void fn_80119F10();
-    extern void fn_80119F90();
-    extern void fn_8011A090();
-    extern void fn_80135E44();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    if ((s32)r0 == (s32)0) return;
-    do {
-    if ((s32)r0 == (s32)0) {
-        r0 = 0x0;
-        break;
+void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
+    extern u8 fn_80119E90(u16 val);
+    extern u8* fn_80119F10(u16 val);
+    extern u32 fn_80119ED0(u16 val);
+    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u16 fn_8011A090(u8* ptr);
+    extern void fn_80119F90(u8* ptr, u32 val);
+    u8* base;
+    u16 idx;
+    u8 flag;
+
+    if (arg2 == 0) { goto exit; }
+    if (arg2 != 0) { goto body_start; }
+    flag = 0; goto flag_check;
+body_start:
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto offset_calc; }
+    base = NULL;
+    goto check_base;
+offset_calc:
+    base = base + idx * 16;
+check_base:
+    if (base == NULL) {
+        flag = 0;
+        goto flag_check;
     }
-    r3 = r30;
-    fn_80119E90();
-    r28 = r3 & 0xFF;
-    r3 = r30;
-    fn_80119F10();
-    r27 = r3;
-    r3 = r30;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r27 = 0x0;
-    } else {
-        /* clrlslwi r0, r28, 16, 4 */;
-        r27 = r3 + r0;
-    }
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        break;
-    }
-    { u32 _flag;
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        _flag = 0x0;
-    }
-    r3 = r27;
-    fn_8011A090();
-    r0 = r3 & 0xFFFF;
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        _flag = 0x0;
-    }
-    _flag = 0x1;
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        fn_8011A090();
-        r3 = r3 & 0xFFFF;
-        r0 = r30 & 0xFFFF;
-        if (r0 == (u32)r3) {
-            r0 = 0x1;
-            break;
+    if (base != NULL) { goto a090_check; }
+    flag = 0; goto inner_flag_check;
+a090_check:
+    if ((u16)fn_8011A090(base) == 0) { flag = 0; goto inner_flag_check; }
+    flag = 1;
+inner_flag_check:
+    if ((u8)flag == 1) {
+        if ((u16)fn_8011A090(base) == arg2) {
+            flag = 1;
+            goto flag_check;
         }
     }
-    r0 = 0x0;
+    flag = 0;
+flag_check:
+    if ((u8)flag == 0) { goto exit; }
+
+    /* Phase 2 */
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto p2_offset; }
+    base = NULL;
+    goto p2_check;
+p2_offset:
+    base = base + idx * 16;
+p2_check:
+    if (base != NULL) {
+        fn_80119F90(base, arg3);
     }
-} while (0);
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)r3) return;
-    r3 = r30;
-    fn_80119E90();
-    r27 = r3 & 0xFF;
-    r3 = r30;
-    fn_80119F10();
-    r28 = r3;
-    r3 = r30;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-        /* clrlslwi r0, r27, 16, 4 */;
-        r3 = r3 + r0;
-    }
-    if (r3 == (u32)0x0) return;
-    r4 = r31;
-    fn_80119F90();
+
+exit:
     return;
 }
 #endif
@@ -10861,115 +10771,70 @@ s32 fn_8011A860(void* obj, u16 val) {
     return;
 }
 /* 0x8011A9EC | 0x164 */
-#if 1
+#if 0
 asm void fn_8011A9EC(void) {
 #include "src/game/gs_field_world_fn_8011A9EC.inc"
 }
 #else
-void fn_8011A9EC(void) {
-    extern void fn_80119E90();
-    extern void fn_80119ED0();
-    extern void fn_80119F10();
-    extern void fn_80119FD0();
-    extern void fn_8011A090();
-    extern void fn_80135E44();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
-    r30 = r4;
-    r29 = r3;
-    r31 = r5;
-    if ((s32)r0 == (s32)0) return;
-    do {
-    if ((s32)r0 == (s32)0) {
-        r0 = 0x0;
-        break;
+void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
+    extern u8 fn_80119E90(u16 val);
+    extern u8* fn_80119F10(u16 val);
+    extern u32 fn_80119ED0(u16 val);
+    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u16 fn_8011A090(u8* ptr);
+    extern void fn_80119FD0(u8* ptr, u32 val);
+    u8* base;
+    u16 idx;
+    u8 flag;
+
+    if (arg2 == 0) { goto exit; }
+    if (arg2 != 0) { goto body_start; }
+    flag = 0; goto flag_check;
+body_start:
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto offset_calc; }
+    base = NULL;
+    goto check_base;
+offset_calc:
+    base = base + idx * 16;
+check_base:
+    if (base == NULL) {
+        flag = 0;
+        goto flag_check;
     }
-    r3 = r30;
-    fn_80119E90();
-    r28 = r3 & 0xFF;
-    r3 = r30;
-    fn_80119F10();
-    r27 = r3;
-    r3 = r30;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r27;
-    r4 = r29;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r27 = 0x0;
-    } else {
-        /* clrlslwi r0, r28, 16, 4 */;
-        r27 = r3 + r0;
-    }
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        break;
-    }
-    { u32 _flag;
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        _flag = 0x0;
-    }
-    r3 = r27;
-    fn_8011A090();
-    r0 = r3 & 0xFFFF;
-    if (r27 == (u32)0x0) {
-        r0 = 0x0;
-        _flag = 0x0;
-    }
-    _flag = 0x1;
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r27;
-        fn_8011A090();
-        r3 = r3 & 0xFFFF;
-        r0 = r30 & 0xFFFF;
-        if (r0 == (u32)r3) {
-            r0 = 0x1;
-            break;
+    if (base != NULL) { goto a090_check; }
+    flag = 0; goto inner_flag_check;
+a090_check:
+    if ((u16)fn_8011A090(base) == 0) { flag = 0; goto inner_flag_check; }
+    flag = 1;
+inner_flag_check:
+    if ((u8)flag == 1) {
+        if ((u16)fn_8011A090(base) == arg2) {
+            flag = 1;
+            goto flag_check;
         }
     }
-    r0 = 0x0;
+    flag = 0;
+flag_check:
+    if ((u8)flag == 0) { goto exit; }
+
+    /* Phase 2 */
+    idx = fn_80119E90(arg2);
+    base = fn_80119F10(arg2);
+    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    if (base != NULL) { goto p2_offset; }
+    base = NULL;
+    goto p2_check;
+p2_offset:
+    base = base + idx * 16;
+p2_check:
+    if (base != NULL) {
+        fn_80119FD0(base, arg3);
     }
-} while (0);
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)r3) return;
-    r3 = r30;
-    fn_80119E90();
-    r27 = r3 & 0xFF;
-    r3 = r30;
-    fn_80119F10();
-    r28 = r3;
-    r3 = r30;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r28;
-    r4 = r29;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-        /* clrlslwi r0, r27, 16, 4 */;
-        r3 = r3 + r0;
-    }
-    if (r3 == (u32)0x0) return;
-    r4 = r31;
-    fn_80119FD0();
+
+exit:
     return;
 }
 #endif
@@ -18936,55 +18801,22 @@ void fn_801249F8(u8* ptr, u16 count) {
 }
 #endif
 /* 0x80125238 | 0xA8 */
-#if 1
+#if 0
 asm void fn_80125238(void) {
 #include "src/game/gs_field_world_fn_80125238.inc"
 }
 #else
-void fn_80125238(void) {
-    extern void fn_8011B950();
-    extern void fn_801254B4();
-    extern u32 fn_8012640C();
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r31 = 0;
-    r4 = 0x0;
-    r5 = 0xc3;
-    r6 = 0x0;
-    r7 = 0x0;
-    r31 = r3;
-    fn_801254B4();
-    if (r31 != (u32)0x0) {
-        r3 = r31;
-        r4 = 0x0;
-        r5 = 0xc5;
-        r6 = 0x0;
-        r7 = -0x64;
-        fn_801254B4();
+void fn_80125238(u8* ptr) {
+    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    extern void fn_8011B950(u8* a, u32 b);
+    fn_801254B4(ptr, 0, 0xc3, 0, 0);
+    if (ptr != NULL) {
+        fn_801254B4(ptr, 0, 0xc5, 0, (u32)-100);
     }
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xc6;
-    r6 = 0x0;
-    r7 = 0x0;
-    fn_801254B4();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xc7;
-    r6 = 0x0;
-    r7 = 0x0;
-    fn_801254B4();
-    r3 = r31;
-    r4 = 0x0;
-    r5 = 0xc8;
-    r6 = 0x0;
-    fn_8012640C();
-    r4 = 0x1;
-    fn_8011B950();
-    return;
+    fn_801254B4(ptr, 0, 0xc6, 0, 0);
+    fn_801254B4(ptr, 0, 0xc7, 0, 0);
+    fn_8011B950((u8*)fn_8012640C(ptr, 0, 0xc8, 0), 1);
 }
 #endif
 /* 0x801252E0 | 0x34 */
