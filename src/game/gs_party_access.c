@@ -300,28 +300,78 @@ s32 fn_8000BE08(void) {
 /* fn_8000BE74 - 0x8000BE74 | size: 0x12c */
 extern u32 fn_800F7BC4(u32 a);
 extern u32 fn_8001E3E0(u32 a, u32* b);
-extern void fn_80113828(void);
-extern u8 lbl_802E28F0[];
-#if 1
+extern void fn_80113828(u32 a, u32 b);
+extern u32 lbl_802E28F0[];
+#if 0
 asm void fn_8000BE74(void) {
 #include "src/game/gs_party_access_fn_8000BE74.inc"
 }
 #else
-void fn_8000BE74(void) { /* TODO */ }
+#pragma peephole off
+s32 fn_8000BE74(s32 arg) {
+    u32 local;
+    u32 *p;
+    s32 idx;
+    local = 0;
+    if ((fn_800F7BC4(1) & 0x20) != 0) {
+        if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
+    }
+    for (p = lbl_802E28F0, idx = 0; idx < 0x99; p += 2, idx++) {
+        if (arg == (s32)p[0]) {
+            switch (arg) {
+                case 0x63: local = 0xb; break;
+                case 0x64: local = 0xa; break;
+                case 0x65: local = 0x8; break;
+                case 0x66: local = 0xd; break;
+                case 0x67: local = 0x0; break;
+                case 0x68: local = 0x0; break;
+                default: break;
+            }
+            fn_80113828(lbl_802E28F0[idx * 2 + 1], local);
+            goto done;
+        }
+    }
+done:
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000BFA0 - 0x8000BFA0 | size: 0xcc */
-extern void fn_800FF52C(void);
-extern void fn_80166A28(void);
-extern void fn_800FAEF8(void);
+extern u8 fn_800FF52C(void);
+extern void fn_80166A28(u32 a);
+extern void fn_800FAEF8(u32 a, u32 b, s32 c, ...);
 extern void fn_800F0308(void);
-extern u8 lbl_802666B0[];
-#if 1
+extern u32 lbl_802666B0[];
+#if 0
 asm void fn_8000BFA0(void) {
 #include "src/game/gs_party_access_fn_8000BFA0.inc"
 }
 #else
-void fn_8000BFA0(void) { /* TODO */ }
+#pragma peephole off
+s32 fn_8000BFA0(void) {
+    u32 local;
+    u32 *rodata;
+    s32 i;
+    if (fn_800FF52C() != 0) {
+        fn_80166A28(0x26);
+        i = 0;
+        rodata = lbl_802666B0;
+        do {
+            fn_800FAEF8(0xc8, 0xf0, -1, rodata);
+            fn_800F0308();
+            i++;
+        } while (i < 0xf);
+        return 0;
+    }
+    if ((fn_800F7BC4(1) & 0x20) != 0) {
+        if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
+        fn_80113828(local, 0);
+        return 0;
+    }
+    return 1;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C06C - 0x8000C06C | size: 0x70 */
@@ -797,8 +847,8 @@ extern u32 lbl_80478E24;
 extern u32 lbl_80478E28;
 extern u32 lbl_80478E2C;
 extern u32 lbl_80266770[];
-extern u32 lbl_80266700;
-extern u32 lbl_802666E0;
+extern u32 lbl_80266700[];
+extern u32 lbl_802666E0[];
 extern f32 lbl_8047B6E8;
 
 #pragma peephole off
