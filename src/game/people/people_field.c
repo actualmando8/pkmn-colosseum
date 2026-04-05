@@ -993,10 +993,11 @@ extern void fn_8014A280(void);
 extern void fn_80158CD4(void);
 extern void fn_8015A950(void);
 extern void fn_8015AAA0(void);
-extern void fn_8015D44C(void);
+extern void fn_8015D44C(u8* ptr);
 extern void fn_8015D4EC(void);
-extern void fn_8015D54C(void);
-extern void fn_8015D5F4(void);
+extern void fn_8015D54C(u8* ptr);
+extern void fn_8015D5F4(u8* ptr);
+extern u8 lbl_80447E60[];
 extern void fn_8015D7D0(void);
 extern void fn_801629A4(void);
 extern void fn_801629D0(void);
@@ -1059,12 +1060,19 @@ void fn_80162370(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162428(void) {
 #include "src/game/people/people_field_fn_80162428.inc"
 }
 #else
-void fn_80162428(void) { /* TODO */ }
+void fn_80162428(void) {
+    fn_80164360();
+    fn_80164204();
+    fn_8015A870();
+    fn_801640E4();
+    fn_80164328();
+    fn_80164324();
+}
 #endif
 extern u8  lbl_8047B050;
 extern u32 lbl_8047B028;
@@ -1214,14 +1222,18 @@ void fn_801628B4(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801628C8(void) {
 #include "src/game/people/people_field_fn_801628C8.inc"
 }
 #else
-void fn_801628C8(void) { /* TODO */ }
+void fn_801628C8(u32 index) {
+    u32 offset = index * 0xF4;
+    ((u8*)lbl_8047B024 + offset)[0xD4] = lbl_8047B050;
+    fn_8015D44C((u8*)lbl_8047B024 + offset);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1335,25 +1347,29 @@ void fn_80162D8C(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162DAC(void) {
 #include "src/game/people/people_field_fn_80162DAC.inc"
 }
 #else
-void fn_80162DAC(void) { /* TODO */ }
+void fn_80162DAC(u8 index) {
+    fn_8015D54C(&lbl_80447E60[(u8)index * 0xBC]);
+}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162DE0(void) {
 #include "src/game/people/people_field_fn_80162DE0.inc"
 }
 #else
-void fn_80162DE0(void) { /* TODO */ }
+void fn_80162DE0(u8 index) {
+    fn_8015D5F4(&lbl_80447E60[(u8)index * 0xBC]);
+}
 #endif
 #pragma pop
 #pragma push
