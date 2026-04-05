@@ -155,12 +155,14 @@ asm void fn_8000BAB8(void) {
 #include "src/game/gs_party_access_fn_8000BAB8.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000BAB8(void) {
     s32 val = fn_8010264C(2, 1);
     if (val == -1) { return 0; }
     fn_801293FC(0, val);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000BB00 - 0x8000BB00 | size: 0x48 */
@@ -170,12 +172,14 @@ asm void fn_8000BB00(void) {
 #include "src/game/gs_party_access_fn_8000BB00.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000BB00(void) {
     s32 val = fn_8010264C(2, 1);
     if (val == -1) { return 0; }
     fn_801294C4(0, val);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000BB48 - 0x8000BB48 | size: 0xa4 */
@@ -382,10 +386,12 @@ asm void fn_8000C210(void) {
 #include "src/game/gs_party_access_fn_8000C210.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C210(void) {
     fn_801E1170();
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C234 - 0x8000C234 | size: 0x24 */
@@ -395,10 +401,12 @@ asm void fn_8000C234(void) {
 #include "src/game/gs_party_access_fn_8000C234.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C234(void) {
     fn_801E118C();
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C258 - 0x8000C258 | size: 0x24 */
@@ -408,10 +416,12 @@ asm void fn_8000C258(void) {
 #include "src/game/gs_party_access_fn_8000C258.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C258(void) {
     fn_801E11B0();
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C27C - 0x8000C27C | size: 0x24 */
@@ -421,10 +431,12 @@ asm void fn_8000C27C(void) {
 #include "src/game/gs_party_access_fn_8000C27C.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C27C(void) {
     fn_801E119C();
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C2A0 - 0x8000C2A0 | size: 0x3c */
@@ -435,10 +447,12 @@ asm void fn_8000C2A0(void) {
 #include "src/game/gs_party_access_fn_8000C2A0.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C2A0(void) {
     fn_801E11D4((u8)((u8)fn_801E11CC() == 0), lbl_8047A298);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C2DC - 0x8000C2DC | size: 0x3c */
@@ -450,6 +464,7 @@ asm void fn_8000C2DC(void) {
 #include "src/game/gs_party_access_fn_8000C2DC.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C2DC(void) {
     if ((u8)fn_801E11E8() == 0) {
         fn_801E1258();
@@ -458,6 +473,7 @@ u32 fn_8000C2DC(void) {
     }
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C328 - 0x8000C328 | size: 0x30 */
@@ -467,10 +483,12 @@ asm void fn_8000C328(void) {
 #include "src/game/gs_party_access_fn_8000C328.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C328(void) {
     fn_801D0748(0xc, 2, 0);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C358 - 0x8000C358 | size: 0x4c */
@@ -481,12 +499,14 @@ asm void fn_8000C358(void) {
 #include "src/game/gs_party_access_fn_8000C358.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C358(void) {
     fn_801D0748(2, 2, 0);
     fn_80106D3C(2, 0x17a7, 1, 1);
     fn_801069FC(1);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C3A4 - 0x8000C3A4 | size: 0x30 */
@@ -495,10 +515,12 @@ asm void fn_8000C3A4(void) {
 #include "src/game/gs_party_access_fn_8000C3A4.inc"
 }
 #else
+#pragma peephole off
 u32 fn_8000C3A4(void) {
     fn_801D0748(0xb, 2, 0);
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8000C3D4 - 0x8000C3D4 | size: 0xcc */
