@@ -320,12 +320,26 @@ extern u32 fn_80102620(s32);
 extern void fn_80102510(s32);
 extern void fn_801026A4(s32, ...);
 extern void fn_80102868(s32, s32, s32);
-#if 1
+#if 0
 asm void fn_8000C06C(void) {
 #include "src/game/gs_party_access_fn_8000C06C.inc"
 }
 #else
-void fn_8000C06C(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C06C(void) {
+    extern u32 fn_80102620(u32 a);
+    extern void fn_80102510(u32 a);
+    extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
+    extern void fn_80102868(u32 a, u32 b, u32 c);
+    if ((u8)fn_80102620(8) != 0) {
+        fn_80102510(8);
+    } else {
+        fn_801026A4(8, 0, 0, 0, 1, 0);
+        fn_80102868(8, 0x17c, 0x20);
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C0DC - 0x8000C0DC | size: 0x68 */
@@ -357,26 +371,66 @@ void fn_8000C0DC(void) {
 
 /* fn_8000C144 - 0x8000C144 | size: 0x64 */
 extern u32 fn_801E11CC(void);
-extern void fn_801E11D4(u8 a, u8 b);
+extern void fn_801E11D4(u32 a, u8 b);
 extern u8 lbl_8047A298;
 extern u8 lbl_8047A299;
-#if 1
+#if 0
 asm void fn_8000C144(void) {
 #include "src/game/gs_party_access_fn_8000C144.inc"
 }
 #else
-void fn_8000C144(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C144(void) {
+    extern u32 fn_80175FFC(void);
+    extern void fn_80176004(void);
+    extern u32 fn_801E11CC(void);
+    extern void fn_801E11D4(u32 a, u8 b);
+    extern u8 lbl_8047A298;
+    extern u8 lbl_8047A299;
+    if (lbl_8047A298 == 0) {
+        lbl_8047A299 = 1;
+        lbl_8047A298 = 1;
+    } else {
+        lbl_8047A298 = 0;
+        if ((u8)fn_80175FFC() == 1) {
+            fn_80176004();
+        }
+    }
+    fn_801E11D4(fn_801E11CC(), lbl_8047A298);
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C1A8 - 0x8000C1A8 | size: 0x68 */
 extern u8 lbl_8047A298;
 extern u8 lbl_8047A299;
-#if 1
+#if 0
 asm void fn_8000C1A8(void) {
 #include "src/game/gs_party_access_fn_8000C1A8.inc"
 }
 #else
-void fn_8000C1A8(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C1A8(void) {
+    extern u32 fn_80175FFC(void);
+    extern void fn_80176004(void);
+    extern u32 fn_801E11CC(void);
+    extern void fn_801E11D4(u32 a, u8 b);
+    extern u8 lbl_8047A298;
+    extern u8 lbl_8047A299;
+    if (lbl_8047A298 == 0) {
+        lbl_8047A299 = 0;
+        lbl_8047A298 = 1;
+    } else {
+        lbl_8047A298 = 0;
+        if ((u8)fn_80175FFC() == 1) {
+            fn_80176004();
+        }
+    }
+    fn_801E11D4(fn_801E11CC(), lbl_8047A298);
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C210 - 0x8000C210 | size: 0x24 */
@@ -441,7 +495,7 @@ u32 fn_8000C27C(void) {
 
 /* fn_8000C2A0 - 0x8000C2A0 | size: 0x3c */
 extern u32 fn_801E11CC(void);
-extern void fn_801E11D4(u8 a, u8 b);
+extern void fn_801E11D4(u32 a, u8 b);
 #if 0
 asm void fn_8000C2A0(void) {
 #include "src/game/gs_party_access_fn_8000C2A0.inc"
@@ -552,12 +606,26 @@ void fn_8000C4A0(void) { /* TODO */ }
 #endif
 
 /* fn_8000C518 - 0x8000C518 | size: 0x70 */
-#if 1
+#if 0
 asm void fn_8000C518(void) {
 #include "src/game/gs_party_access_fn_8000C518.inc"
 }
 #else
-void fn_8000C518(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C518(void) {
+    extern u32 fn_80102620(u32 a);
+    extern void fn_80102510(u32 a);
+    extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
+    extern void fn_80102868(u32 a, u32 b, u32 c);
+    if ((u8)fn_80102620(0xc) != 0) {
+        fn_80102510(0xc);
+    } else {
+        fn_801026A4(0xc, 0, 0, 0, 1, 0);
+        fn_80102868(0xc, 0x190, 0x28);
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C588 - 0x8000C588 | size: 0x9c */
@@ -577,22 +645,48 @@ void fn_8000C588(void) { /* TODO */ }
 #endif
 
 /* fn_8000C624 - 0x8000C624 | size: 0x64 */
-extern void fn_80166D18(void);
-#if 1
+extern void fn_80166D18(u32 a, u32 b, u32 c, u32 d);
+#if 0
 asm void fn_8000C624(void) {
 #include "src/game/gs_party_access_fn_8000C624.inc"
 }
 #else
-void fn_8000C624(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C624(s32 arg) {
+    extern void fn_80166D18(u32 a, u32 b, u32 c, u32 d);
+    switch (arg) {
+    case 0xd3:
+        fn_80166D18(0x7f, 0, 0, 1);
+        break;
+    case 0xd4:
+        fn_80166D18(0, 0, 0, 1);
+        break;
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C688 - 0x8000C688 | size: 0x64 */
-#if 1
+#if 0
 asm void fn_8000C688(void) {
 #include "src/game/gs_party_access_fn_8000C688.inc"
 }
 #else
-void fn_8000C688(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000C688(s32 arg) {
+    extern void fn_80166D18(u32 a, u32 b, u32 c, u32 d);
+    switch (arg) {
+    case 0xd1:
+        fn_80166D18(0x7f, 0, 1, 0);
+        break;
+    case 0xd2:
+        fn_80166D18(0, 0, 1, 0);
+        break;
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C6EC - 0x8000C6EC | size: 0x9c */
