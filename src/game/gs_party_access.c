@@ -995,7 +995,7 @@ asm void fn_8000CAA4(void) {
 #include "src/game/gs_party_access_fn_8000CAA4.inc"
 }
 #else
-void fn_8000CAA4(void) { /* TODO */ }
+void fn_8000CAA4(void) { /* TODO - extlwi/rlwimi bitfield toggle, codegen-sensitive */ }
 #endif
 
 /* fn_8000CAD0 - 0x8000CAD0 | size: 0x2c */
