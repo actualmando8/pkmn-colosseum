@@ -184,17 +184,26 @@ u32 fn_8000BB00(void) {
 
 /* fn_8000BB48 - 0x8000BB48 | size: 0xa4 */
 extern u32 fn_801EF63C(void);
-extern void fn_80124A60(void);
+extern void fn_80124A60(u8* a);
 extern s32 fn_800096B4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
-extern void fn_80129F20(void);
-extern u32 lbl_80478840;
+extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
+extern u8 lbl_80478840;
 extern u8 lbl_803A1A48[];
-#if 1
+#if 0
 asm void fn_8000BB48(void) {
 #include "src/game/gs_party_access_fn_8000BB48.inc"
 }
 #else
-void fn_8000BB48(void) { /* TODO */ }
+s32 fn_8000BB48(void) {
+    if ((u8)fn_801EF63C() == 1) { return -1; }
+    if (lbl_80478840 != 0) {
+        fn_80124A60(lbl_803A1A48);
+        lbl_80478840 = 0;
+    }
+    if (fn_800096B4((u32)lbl_803A1A48, 0, 0, 0, 0, 0) < 0) { return -1; }
+    fn_80129F20(0, lbl_803A1A48, 0, 4, 1);
+    return -1;
+}
 #endif
 
 /* fn_8000BBEC - 0x8000BBEC | size: 0x6c */
@@ -289,8 +298,8 @@ s32 fn_8000BE08(void) {
 #endif
 
 /* fn_8000BE74 - 0x8000BE74 | size: 0x12c */
-extern void fn_800F7BC4(void);
-extern void fn_8001E3E0(void);
+extern u32 fn_800F7BC4(u32 a);
+extern u32 fn_8001E3E0(u32 a, u32* b);
 extern void fn_80113828(void);
 extern u8 lbl_802E28F0[];
 #if 1
@@ -594,16 +603,30 @@ void fn_8000C3D4(void) { /* TODO */ }
 #endif
 
 /* fn_8000C4A0 - 0x8000C4A0 | size: 0x78 */
-extern void fn_801067E8(void);
+extern u32 fn_800F7BC4(u32 a);
+extern u32 fn_8001E3E0(u32 a, u32* b);
+extern void fn_801067E8(u32 a, u32 b, u32 c);
 extern void fn_8001D7E4(void);
-extern void fn_801065B8(void);
-#if 1
+extern void fn_801065B8(u32 a);
+#pragma peephole off
+#if 0
 asm void fn_8000C4A0(void) {
 #include "src/game/gs_party_access_fn_8000C4A0.inc"
 }
 #else
-void fn_8000C4A0(void) { /* TODO */ }
+s32 fn_8000C4A0(void) {
+    u32 local;
+    if ((fn_800F7BC4(1) & 0x20) == 0) { goto ret1; }
+    if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
+    fn_801067E8(local, 1, 0);
+    fn_8001D7E4();
+    fn_801065B8(1);
+    return 0;
+ret1:
+    return 1;
+}
 #endif
+#pragma peephole on
 
 /* fn_8000C518 - 0x8000C518 | size: 0x70 */
 #if 0
@@ -629,20 +652,36 @@ u32 fn_8000C518(void) {
 #endif
 
 /* fn_8000C588 - 0x8000C588 | size: 0x9c */
-extern void fn_800FF56C(void);
-extern void fn_80115C48(void);
-extern void fn_801174C4(void);
+extern void* fn_800FF56C(void);
+extern void* fn_80115C48(void* a);
+extern u32 fn_801174C4(void);
 extern void fn_80117500(void);
-extern void fn_800FEC34(void);
+extern void fn_800FEC34(u32 a);
 extern void fn_801174F4(void);
-extern void fn_800FECB8(void);
-#if 1
+extern void fn_800FECB8(u32 a);
+#pragma peephole off
+#if 0
 asm void fn_8000C588(void) {
 #include "src/game/gs_party_access_fn_8000C588.inc"
 }
 #else
-void fn_8000C588(void) { /* TODO */ }
+u32 fn_8000C588(void) {
+    u8* obj = (u8*)fn_80115C48(fn_800FF56C());
+    if ((u8)fn_80102620(0xa) != 0) {
+        if ((u8)fn_801174C4() != 0) {
+            fn_80117500();
+        }
+        fn_80102510(0xa);
+        fn_800FEC34(*(u32*)(obj + 0x34));
+    } else {
+        fn_801174F4();
+        fn_801026A4(0xa, 0, 0, 0, 0, 0);
+        fn_800FECB8(*(u32*)(obj + 0x34));
+    }
+    return 0;
+}
 #endif
+#pragma peephole on
 
 /* fn_8000C624 - 0x8000C624 | size: 0x64 */
 extern void fn_80166D18(u32 a, u32 b, u32 c, u32 d);
@@ -690,18 +729,42 @@ u32 fn_8000C688(s32 arg) {
 #endif
 
 /* fn_8000C6EC - 0x8000C6EC | size: 0x9c */
-extern void fn_801666BC(void);
-extern void fn_80166B18(void);
-extern void fn_801659FC(void);
+extern s32 fn_8010264C(u32 a, u32 b);
+extern u32 fn_801666BC(u16 a);
+extern void fn_80166B18(u16 a);
+extern void fn_801659FC(u16 a, u32 b, u32 c);
 extern u32 lbl_80478E18;
 extern u32 lbl_80478E1C;
-#if 1
+#pragma peephole off
+#if 0
 asm void fn_8000C6EC(void) {
 #include "src/game/gs_party_access_fn_8000C6EC.inc"
 }
 #else
-void fn_8000C6EC(void) { /* TODO */ }
+s32 fn_8000C6EC(void) {
+    s32 val;
+    u16 entry;
+    s32 check;
+    goto loop_check;
+loop_body:
+    if ((u32)val >= *(u32*)(u32)lbl_80478E18) { goto loop_check; }
+    entry = *(u16*)(lbl_80478E1C + (u32)val * 2);
+    check = (s32)fn_801666BC(entry);
+    if (check == 0) { goto do_else; }
+    if (check < 0) { goto do_else; }
+    if (check >= 4) { goto do_else; }
+    fn_80166B18(entry);
+    goto loop_check;
+do_else:
+    fn_801659FC(entry, 0, 0x7f);
+loop_check:
+    val = fn_8010264C(2, 1);
+    if (val != -1) { goto loop_body; }
+    fn_80102510(2);
+    return -1;
+}
 #endif
+#pragma peephole on
 
 /* ===== New externs for decompiled functions ===== */
 extern void fn_80266320(void);
@@ -716,8 +779,8 @@ extern void fn_800FF660(void);
 extern u32 fn_800FF560(void);
 extern void fn_800F07A8(s32, u32, s32, s32, s32, void*);
 extern u32 fn_80129280(s32, s32);
-extern void fn_8012AC08(u32, s32);
-extern u32 fn_80123FBC(void);
+extern u32 fn_8012AC08(u32, s32);
+extern u32 fn_80123FBC(u32);
 extern void fn_80097A38(u32, s32);
 extern void fn_800FF730(u32);
 extern void fn_8001BDF4(s32, s32, s32);
@@ -905,13 +968,23 @@ s32 fn_8000CE18(void) {
 
 /* fn_8000CE5C - 0x8000CE5C | size: 0x74 */
 /* GSparty_ApplyDamage -- get party slot, validate, call fn_80097A38 */
-#if 1
+#pragma peephole off
+#if 0
 asm void fn_8000CE5C(void) {
 #include "src/game/gs_party_access_fn_8000CE5C.inc"
 }
 #else
-void fn_8000CE5C(void) { /* TODO */ }
+u32 fn_8000CE5C(void) {
+    u32 val;
+    val = fn_80129280(0, 2);
+    if (val == 0) { return 0; }
+    val = fn_8012AC08(val, 0);
+    if ((u8)fn_80123FBC(val) == 0) { return 0; }
+    fn_80097A38(val, 0x25);
+    return 0;
+}
 #endif
+#pragma peephole on
 
 /* fn_8000CED0 - 0x8000CED0 | size: 0x28 */
 /* GSparty_IsAlive */
@@ -922,13 +995,28 @@ s32 fn_8000CED0(void) {
 
 /* fn_8000CEF8 - 0x8000CEF8 | size: 0x70 */
 /* GSparty_FullHeal -- switch on r3 input */
-#if 1
+#pragma peephole off
+#if 0
 asm void fn_8000CEF8(void) {
 #include "src/game/gs_party_access_fn_8000CEF8.inc"
 }
 #else
-void fn_8000CEF8(void) { /* TODO */ }
+u32 fn_8000CEF8(s32 arg) {
+    switch (arg) {
+        case 0x110:
+            fn_8001BDF4(1, 0, 0);
+            break;
+        case 0x111:
+            fn_8001BDF4(2, 0, 0);
+            break;
+        default:
+            fn_8001BDF4(2, 0, 0);
+            break;
+    }
+    return 0;
+}
 #endif
+#pragma peephole on
 
 /* fn_8000CF68 - 0x8000CF68 | size: 0xf4 */
 /* GSparty_GetBattleStats -- search table for match, call fn_8002DC6C */
