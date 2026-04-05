@@ -777,7 +777,7 @@ extern void fn_80190528(u32);
 extern void fn_800884BC(u32, u32, u32);
 extern void fn_800FF660(void);
 extern u32 fn_800FF560(void);
-extern void fn_800F07A8(s32, u32, s32, s32, s32, void*);
+extern u32 fn_800F07A8(s32, u32, s32, s32, s32, u32);
 extern u32 fn_80129280(s32, s32);
 extern u32 fn_8012AC08(u32, s32);
 extern u32 fn_80123FBC(u32);
@@ -796,40 +796,133 @@ extern u32 lbl_80478E20;
 extern u32 lbl_80478E24;
 extern u32 lbl_80478E28;
 extern u32 lbl_80478E2C;
-extern u32 lbl_80266770;
+extern u32 lbl_80266770[];
 extern u32 lbl_80266700;
 extern u32 lbl_802666E0;
 extern f32 lbl_8047B6E8;
 
+#pragma peephole off
 /* fn_8000C788 - 0x8000C788 | size: 0x9c */
 /* GSparty_SetCondition -- loop: get index, check bounds, check condition range, set */
-#if 1
+#if 0
 asm void fn_8000C788(void) {
 #include "src/game/gs_party_access_fn_8000C788.inc"
 }
 #else
-void fn_8000C788(void) { /* TODO */ }
+s32 fn_8000C788(void) {
+    s32 val;
+    u16 entry;
+    s32 check;
+    goto loop_check;
+loop_body:
+    if ((u32)val >= *(u32*)(u32)lbl_80478E10) { goto loop_check; }
+    entry = *(u16*)((u32)lbl_80478E14 + (u32)val * 2);
+    check = (s32)fn_801666BC(entry);
+    if (check == 0) { goto do_else; }
+    if (check < 0) { goto do_else; }
+    if (check >= 4) { goto do_else; }
+    fn_80166B18(entry);
+    goto loop_check;
+do_else:
+    fn_801659FC(entry, 0, 0x7f);
+loop_check:
+    val = fn_8010264C(2, 1);
+    if (val != -1) { goto loop_body; }
+    fn_80102510(2);
+    return -1;
+}
 #endif
 
 /* fn_8000C824 - 0x8000C824 | size: 0x108 */
 /* GSparty_GetRibbon -- loop with inner loop over ribbon array */
-#if 1
+#if 0
 asm void fn_8000C824(void) {
 #include "src/game/gs_party_access_fn_8000C824.inc"
 }
 #else
-void fn_8000C824(void) { /* TODO */ }
+s32 fn_8000C824(void) {
+    s32 val;
+    u16 entry;
+    s32 check;
+    u32 joff, j;
+    goto loop_check;
+loop_body:
+    if ((u32)val >= *(u32*)(u32)lbl_80478E20) { goto loop_check; }
+    j = 0; joff = 0;
+    goto inner_check;
+inner_body:
+    if ((s32)val == (s32)j) { goto inner_next; }
+    check = (s32)fn_801666BC(*(u16*)((u32)lbl_80478E24 + joff));
+    if (check >= 4) { goto inner_next; }
+    if (check >= 1) { goto do_call824; } else { goto inner_next; }
+do_call824:
+    fn_80166B18(*(u16*)((u32)lbl_80478E24 + joff));
+inner_next:
+    joff += 2; j++;
+inner_check:
+    if (j < *(u32*)(u32)lbl_80478E20) { goto inner_body; }
+    entry = *(u16*)((u32)lbl_80478E24 + (u32)val * 2);
+    check = (s32)fn_801666BC(entry);
+    if (check == 0) { goto do_else; }
+    if (check < 0) { goto do_else; }
+    if (check >= 4) { goto do_else; }
+    fn_80166B18(entry);
+    goto loop_check;
+do_else:
+    fn_801659FC(entry, 0, 0x7f);
+loop_check:
+    val = fn_8010264C(2, 1);
+    if (val != -1) { goto loop_body; }
+    fn_80102510(2);
+    return -1;
+}
 #endif
 
 /* fn_8000C92C - 0x8000C92C | size: 0x108 */
 /* GSparty_SetRibbon -- loop with inner loop, different SDA globals */
-#if 1
+#if 0
 asm void fn_8000C92C(void) {
 #include "src/game/gs_party_access_fn_8000C92C.inc"
 }
 #else
-void fn_8000C92C(void) { /* TODO */ }
+s32 fn_8000C92C(void) {
+    s32 val;
+    u16 entry;
+    s32 check;
+    u32 joff, j;
+    goto loop_check;
+loop_body:
+    if ((u32)val >= *(u32*)(u32)lbl_80478E28) { goto loop_check; }
+    j = 0; joff = 0;
+    goto inner_check;
+inner_body:
+    if ((s32)val == (s32)j) { goto inner_next; }
+    check = (s32)fn_801666BC(*(u16*)((u32)lbl_80478E2C + joff));
+    if (check >= 4) { goto inner_next; }
+    if (check >= 1) { goto do_call92c; } else { goto inner_next; }
+do_call92c:
+    fn_80166B18(*(u16*)((u32)lbl_80478E2C + joff));
+inner_next:
+    joff += 2; j++;
+inner_check:
+    if (j < *(u32*)(u32)lbl_80478E28) { goto inner_body; }
+    entry = *(u16*)((u32)lbl_80478E2C + (u32)val * 2);
+    check = (s32)fn_801666BC(entry);
+    if (check == 0) { goto do_else; }
+    if (check < 0) { goto do_else; }
+    if (check >= 4) { goto do_else; }
+    fn_80166B18(entry);
+    goto loop_check;
+do_else:
+    fn_80165A20(entry, 0, 0x7f);
+loop_check:
+    val = fn_8010264C(2, 1);
+    if (val != -1) { goto loop_body; }
+    fn_80102510(2);
+    return -1;
+}
 #endif
+#pragma peephole on
 
 #pragma peephole off
 /* fn_8000CA34 - 0x8000CA34 | size: 0x70 */
@@ -890,12 +983,35 @@ void fn_8000CB54(void) {
 
 /* fn_8000CB74 - 0x8000CB74 | size: 0xc8 */
 /* GSparty_GetShadowGauge -- load table, search, call fn_800F07A8 + fn_800F0654 */
-#if 1
+#if 0
 asm void fn_8000CB74(void) {
 #include "src/game/gs_party_access_fn_8000CB74.inc"
 }
 #else
-void fn_8000CB74(void) { /* TODO */ }
+u32 fn_8000CB74(u32 arg) {
+    u32 table[6];
+    u32 idx = 0;
+    u32 val;
+    u32 r;
+    u32 *p = lbl_80266770;
+    table[0] = p[0];
+    table[1] = p[1];
+    table[2] = p[2];
+    table[3] = p[3];
+    table[4] = p[4];
+    table[5] = p[5];
+    if ((s32)arg == (s32)table[0]) { goto idx_done; }
+    idx = 1;
+    if ((s32)arg == (s32)table[2]) { goto idx_done; }
+    idx = 2;
+    if ((s32)arg == (s32)table[4]) { goto idx_done; }
+    idx = 3;
+idx_done:
+    val = table[idx * 2 + 1];
+    r = fn_800F07A8(1, fn_800FF560(), 0x4000, 1, 1, (u32)(void(*)(void))fn_8000CB54);
+    fn_800F0654(r, 1, val);
+    return 0;
+}
 #endif
 
 /* fn_8000CC3C - 0x8000CC3C | size: 0x24 */
@@ -962,7 +1078,7 @@ void fn_8000CD50(void) { /* TODO */ }
 s32 fn_8000CE18(void) {
     u32 r;
     r = (u32)fn_800FF560();
-    fn_800F07A8(1, r, 0x4000, 1, 1, (void*)fn_8000CD50);
+    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)fn_8000CD50);
     return 0;
 }
 
