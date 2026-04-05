@@ -1186,22 +1186,97 @@ u32 fn_8000CEF8(s32 arg) {
 
 /* fn_8000CF68 - 0x8000CF68 | size: 0xf4 */
 /* GSparty_GetBattleStats -- search table for match, call fn_8002DC6C */
-#if 1
+#if 0
 asm void fn_8000CF68(void) {
 #include "src/game/gs_party_access_fn_8000CF68.inc"
 }
 #else
-void fn_8000CF68(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000CF68(u32 arg) {
+    u32 local[28];
+    u32 val;
+    {
+        u32 *s = lbl_80266700 - 1;
+        u32 *d = local - 1;
+        s32 ctr = 14;
+        do {
+            d[1] = s[1];
+            d[2] = s[2];
+            s += 2;
+            d += 2;
+        } while (--ctr != 0);
+    }
+    {
+        u32 *p = local;
+        u32 idx = 0;
+        u32 ctr = 2;
+        do {
+            if ((s32)arg == (s32)p[0]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[2]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[4]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[6]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[8]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[10]) { goto idx_done; }
+            idx++;
+            if ((s32)arg == (s32)p[12]) { goto idx_done; }
+            p += 14;
+            idx++;
+        } while (--ctr != 0);
+    idx_done:
+        if ((s32)idx >= 14) {
+            return 0;
+        }
+        val = local[idx * 2 + 1];
+    }
+    fn_8002DC6C(val);
+    return 0;
+}
+#pragma peephole reset
 #endif
 
 /* fn_8000D05C - 0x8000D05C | size: 0xc0 */
 /* GSparty_CalcStatModifiers -- table lookup with struct copy */
-#if 1
+#if 0
 asm void fn_8000D05C(void) {
 #include "src/game/gs_party_access_fn_8000D05C.inc"
 }
 #else
-void fn_8000D05C(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000D05C(u32 arg) {
+    u32 table[8];
+    u32 idx = 0;
+    u32 val;
+    u32 *p = lbl_802666E0;
+    table[0] = p[0];
+    table[1] = p[1];
+    table[2] = p[2];
+    table[3] = p[3];
+    table[4] = p[4];
+    table[5] = p[5];
+    table[6] = p[6];
+    table[7] = p[7];
+    if ((s32)arg == (s32)table[0]) { goto idx_done; }
+    idx = 1;
+    if ((s32)arg == (s32)table[2]) { goto idx_done; }
+    idx = 2;
+    if ((s32)arg == (s32)table[4]) { goto idx_done; }
+    idx = 3;
+    if ((s32)arg == (s32)table[6]) { goto idx_done; }
+    idx = 4;
+idx_done:
+    if ((s32)idx >= 4) {
+        return 0;
+    }
+    val = table[idx * 2 + 1];
+    fn_80029760(val, 0);
+    return 0;
+}
+#pragma peephole reset
 #endif
 
 /* fn_8000D11C - 0x8000D11C | size: 0x38 */
