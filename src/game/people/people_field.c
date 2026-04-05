@@ -805,83 +805,118 @@ u32 fn_801616F4(u8* obj) {
     return fn_80161134(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8016173C(void) {
 #include "src/game/people/people_field_fn_8016173C.inc"
 }
 #else
-void fn_8016173C(void) { /* TODO */ }
+/* bit 26 (0x20), offset 0x2ec, motion at 0x2cc */
+u32 fn_8016173C(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x20)) {
+        return *(u16*)(obj + 0x2ec);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x20u;
+    return fn_80161134(obj, obj + 0x2cc, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80161784(void) {
 #include "src/game/people/people_field_fn_80161784.inc"
 }
 #else
-void fn_80161784(void) { /* TODO */ }
+/* bit 25 (0x40), offset 0x310, motion at 0x2f0 */
+u32 fn_80161784(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x40)) {
+        return *(u16*)(obj + 0x310);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x40u;
+    return fn_80161134(obj, obj + 0x2f0, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801617CC(void) {
 #include "src/game/people/people_field_fn_801617CC.inc"
 }
 #else
-void fn_801617CC(void) { /* TODO */ }
+/* bit 23 (0x100), offset 0x358, motion at 0x338 */
+u32 fn_801617CC(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x100)) {
+        return *(u16*)(obj + 0x358);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x100u;
+    return fn_80161134(obj, obj + 0x338, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80161814(void) {
 #include "src/game/people/people_field_fn_80161814.inc"
 }
 #else
-void fn_80161814(void) { /* TODO */ }
+/* bit 22 (0x200), offset 0x37c, motion at 0x35c */
+u32 fn_80161814(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x200)) {
+        return *(u16*)(obj + 0x37c);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x200u;
+    return fn_80161134(obj, obj + 0x35c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8016185C(void) {
 #include "src/game/people/people_field_fn_8016185C.inc"
 }
 #else
-void fn_8016185C(void) { /* TODO */ }
+/* bit 21 (0x400), offset 0x3a0, motion at 0x380 */
+u32 fn_8016185C(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x400)) {
+        return *(u16*)(obj + 0x3a0);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x400u;
+    return fn_80161134(obj, obj + 0x380, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801618A4(void) {
 #include "src/game/people/people_field_fn_801618A4.inc"
 }
 #else
-void fn_801618A4(void) { /* TODO */ }
+/* bit 20 (0x800), offset 0x3c4, motion at 0x3a4 */
+u32 fn_801618A4(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x800)) {
+        return *(u16*)(obj + 0x3c4);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x800u;
+    return fn_80161134(obj, obj + 0x3a4, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801618EC(void) {
 #include "src/game/people/people_field_fn_801618EC.inc"
 }
 #else
-void fn_801618EC(void) { /* TODO */ }
+/* bit 19 (0x1000), offset 0x3e8, motion at 0x3c8 */
+u32 fn_801618EC(u8* obj) {
+    u32 flags;
+    flags = *(u32*)(obj + 0x214);
+    if (!(flags & 0x1000)) {
+        return *(u16*)(obj + 0x3e8);
+    }
+    *(u32*)(obj + 0x214) = flags & ~0x1000u;
+    return fn_80161134(obj, obj + 0x3c8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+}
 #endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
