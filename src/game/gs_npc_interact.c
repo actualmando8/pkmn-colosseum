@@ -203,40 +203,26 @@ u8 fn_8000DAA8(void) {
  * ========================================================================= */
 
 /* 0x800111C4 | 0x24 -- small accessor */
-extern void fn_80089F78();
-#if 1
+extern void fn_80089F78(u32, u32, u32, u32);
+#if 0
 asm void fn_800111C4(void) {
 #include "src/game/gs_npc_interact_fn_800111C4.inc"
 }
 #else
-void fn_800111C4(void) {
-    extern void fn_80089F78();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r6 = 0;
-
-    r6 = 0x0;
-    fn_80089F78();
-    return;
-}
+#pragma peephole off
+void fn_800111C4(u32 a, u32 b, u32 c) { fn_80089F78(a, b, c, 0); }
+#pragma peephole on
 #endif
 
 /* 0x800111E8 | 0x24 -- small accessor */
-#if 1
+#if 0
 asm void fn_800111E8(void) {
 #include "src/game/gs_npc_interact_fn_800111E8.inc"
 }
 #else
-void fn_800111E8(void) {
-    extern void fn_80089F78();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r6 = 0;
-
-    r6 = 0x1;
-    fn_80089F78();
-    return;
-}
+#pragma peephole off
+void fn_800111E8(u32 a, u32 b, u32 c) { fn_80089F78(a, b, c, 1); }
+#pragma peephole on
 #endif
 
 /* 0x7C | fn_8001120C | nullcheck_call_flag */
@@ -1792,17 +1778,23 @@ void fn_8000D710(void) { /* TODO */ }
 #endif
 
 /* fn_8000DAB0 - 0x8000DAB0 | size: 0x38 */
-extern void fn_8010264C(void);
-extern void fn_800F0384(void);
+extern u32 fn_8010264C(u32, u32);
+extern void fn_800F0384(u32);
 extern u32 lbl_8047A2A4;
-extern u32 lbl_8047A2B0;
 extern u32 lbl_8047A2A8;
-#if 1
+extern u32 lbl_8047A2B0;
+#if 0
 asm void fn_8000DAB0(void) {
 #include "src/game/gs_npc_interact_fn_8000DAB0.inc"
 }
 #else
-void fn_8000DAB0(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000DAB0(void) {
+    lbl_8047A2B0 = fn_8010264C(lbl_8047A2A4, 1);
+    fn_800F0384(lbl_8047A2A8);
+    return lbl_8047A2B0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000DAE8 - 0x8000DAE8 | size: 0x1a0 */
@@ -1831,57 +1823,69 @@ void fn_8000DC88(void) { /* TODO */ }
 #endif
 
 /* fn_8000DD0C - 0x8000DD0C | size: 0x24 */
-#if 1
+#if 0
 asm void fn_8000DD0C(void) {
 #include "src/game/gs_npc_interact_fn_8000DD0C.inc"
 }
 #else
-void fn_8000DD0C(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000DD0C(void) { return fn_80102620(0x10a); }
+#pragma peephole on
 #endif
 
 /* fn_8000DD30 - 0x8000DD30 | size: 0x2c */
-#if 1
+#if 0
 asm void fn_8000DD30(void) {
 #include "src/game/gs_npc_interact_fn_8000DD30.inc"
 }
 #else
-void fn_8000DD30(void) { /* TODO */ }
+#pragma peephole off
+void fn_8000DD30(void) { fn_80102568(0x10a, 0, 0); }
+#pragma peephole on
 #endif
 
 /* fn_8000DD5C - 0x8000DD5C | size: 0x3c */
-#if 1
+#if 0
 asm void fn_8000DD5C(void) {
 #include "src/game/gs_npc_interact_fn_8000DD5C.inc"
 }
 #else
-void fn_8000DD5C(void) { /* TODO */ }
+#pragma peephole off
+void fn_8000DD5C(void) { fn_801026A4(0x10a, -1, 0, 0, 0, 0); }
+#pragma peephole on
 #endif
 
 /* fn_8000DD98 - 0x8000DD98 | size: 0x24 */
-#if 1
+#if 0
 asm void fn_8000DD98(void) {
 #include "src/game/gs_npc_interact_fn_8000DD98.inc"
 }
 #else
-void fn_8000DD98(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000DD98(void) { return fn_80102620(0x10b); }
+#pragma peephole on
 #endif
 
 /* fn_8000DDBC - 0x8000DDBC | size: 0x2c */
-#if 1
+#if 0
 asm void fn_8000DDBC(void) {
 #include "src/game/gs_npc_interact_fn_8000DDBC.inc"
 }
 #else
-void fn_8000DDBC(void) { /* TODO */ }
+#pragma peephole off
+void fn_8000DDBC(void) { fn_80102568(0x10b, 0, 0); }
+#pragma peephole on
 #endif
 
 /* fn_8000DDE8 - 0x8000DDE8 | size: 0x3c */
-#if 1
+#if 0
 asm void fn_8000DDE8(void) {
 #include "src/game/gs_npc_interact_fn_8000DDE8.inc"
 }
 #else
-void fn_8000DDE8(void) { /* TODO */ }
+#pragma peephole off
+void fn_8000DDE8(void) { fn_801026A4(0x10b, -1, 0, 0, 0, 0); }
+#pragma peephole on
 #endif
 
 /* fn_8000DE24 - 0x8000DE24 | size: 0xa0 */
@@ -1925,12 +1929,12 @@ void fn_8000E204(void) { /* TODO */ }
 #endif
 
 /* fn_8000E28C - 0x8000E28C | size: 0x4 */
-#if 1
+#if 0
 asm void fn_8000E28C(void) {
 #include "src/game/gs_npc_interact_fn_8000E28C.inc"
 }
 #else
-void fn_8000E28C(void) { /* TODO */ }
+void fn_8000E28C(void) {}
 #endif
 
 /* fn_8000EA10 - 0x8000EA10 | size: 0x324 */
@@ -1967,12 +1971,19 @@ void fn_8000ED34(void) { /* TODO */ }
 #endif
 
 /* fn_8000F310 - 0x8000F310 | size: 0x4c */
-#if 1
+#if 0
 asm void fn_8000F310(void) {
 #include "src/game/gs_npc_interact_fn_8000F310.inc"
 }
 #else
-void fn_8000F310(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000F310(u32 arg) {
+    fn_801040D0((void*)arg, 0);
+    fn_801040D0((void*)arg, 1);
+    fn_801040D0((void*)arg, 2);
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000F35C - 0x8000F35C | size: 0xa4 */
