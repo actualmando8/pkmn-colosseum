@@ -364,14 +364,14 @@ void fn_80194258(void) { /* TODO */ }
 
 /* 0x801942B8 | 0x8 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801942B8(void) {
 #include "src/hsd/hsd_cobj_fn_801942B8.inc"
 }
 #else
-void fn_801942B8(void) { /* TODO */ }
+u32 fn_801942B8(void) { extern u32 lbl_8047B234; return lbl_8047B234; }
 #endif
 #pragma pop
 
@@ -442,14 +442,14 @@ void fn_801943A0(void) { /* TODO */ }
 
 /* 0x801943BC | 0x10 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801943BC(void) {
 #include "src/hsd/hsd_cobj_fn_801943BC.inc"
 }
 #else
-void fn_801943BC(void) { /* TODO */ }
+void fn_801943BC(u8* ptr, u8 val) { if (ptr == NULL) return; ptr[0x50] = val; }
 #endif
 #pragma pop
 
@@ -507,14 +507,14 @@ void fn_801944A4(void) { /* TODO */ }
 
 /* 0x801944C0 | 0x10 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801944C0(void) {
 #include "src/hsd/hsd_cobj_fn_801944C0.inc"
 }
 #else
-void fn_801944C0(void) { /* TODO */ }
+void fn_801944C0(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x3C) = val; }
 #endif
 #pragma pop
 
@@ -533,14 +533,14 @@ void fn_801944D0(void) { /* TODO */ }
 
 /* 0x801944E8 | 0x10 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801944E8(void) {
 #include "src/hsd/hsd_cobj_fn_801944E8.inc"
 }
 #else
-void fn_801944E8(void) { /* TODO */ }
+void fn_801944E8(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x38) = val; }
 #endif
 #pragma pop
 
@@ -648,7 +648,7 @@ extern void fn_800A3ADC(void);
 extern void fn_800CE59C(void);
 extern void fn_800CE718(void);
 extern void fn_80194C2C(void);
-extern void fn_80194D94(void);
+extern void fn_80194D94(u8*);
 extern void fn_8019513C(void);
 extern void fn_80195590(void);
 extern void fn_80195904(void);
@@ -691,15 +691,15 @@ extern void fn_80196E10(void);
 
 /* 0x80194CC4 | 0x30 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80195F0C(void);
-#if 1
+extern void fn_80195F0C(u8*);
+#if 0
 asm void fn_80194CC4(void) {
 #include "src/hsd/hsd_cobj_fn_80194CC4.inc"
 }
 #else
-void fn_80194CC4(void) { /* TODO */ }
+u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
 #endif
 #pragma pop
 
@@ -734,14 +734,14 @@ void fn_80194D60(void) { /* TODO */ }
 
 /* 0x80194D94 | 0x10 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80194D94(void) {
 #include "src/hsd/hsd_cobj_fn_80194D94.inc"
 }
 #else
-void fn_80194D94(void) { /* TODO */ }
+void fn_80194D94(u8* ptr) { *(u32*)(ptr + 0x8) |= 0xC0000000; }
 #endif
 #pragma pop
 
@@ -881,16 +881,16 @@ void fn_801959DC(void) { /* TODO */ }
 
 /* 0x80195A48 | 0x24 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 extern void fn_801975FC(void);
 extern void fn_801974A8(void);
-#if 1
+#if 0
 asm void fn_80195A48(void) {
 #include "src/hsd/hsd_cobj_fn_80195A48.inc"
 }
 #else
-void fn_80195A48(void) { /* TODO */ }
+void fn_80195A48(void) { fn_801975FC(); fn_801974A8(); }
 #endif
 #pragma pop
 
@@ -924,11 +924,11 @@ void fn_80195A6C(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_801950D0(void);
 #if 1
-asm void fn_80195F0C(void) {
+asm void fn_80195F0C(u8* ptr) {
 #include "src/hsd/hsd_cobj_fn_80195F0C.inc"
 }
 #else
-void fn_80195F0C(void) { /* TODO */ }
+void fn_80195F0C(u8* ptr) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -1165,14 +1165,14 @@ void fn_8019731C(void) { /* TODO */ }
 
 /* 0x8019733C | 0x8 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019733C(void) {
 #include "src/hsd/hsd_cobj_fn_8019733C.inc"
 }
 #else
-void fn_8019733C(void) { /* TODO */ }
+void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 #endif
 #pragma pop
 
