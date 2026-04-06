@@ -505,7 +505,7 @@ extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
 
 /* External functions referenced from asm wrappers */
-extern void fn_80164488(void);
+extern u32 fn_80164488(u8* ptr);
 
 /* Model system */
 extern void  fn_800EE150(void* model, u32 param);
@@ -597,40 +597,41 @@ s32 fn_801522E0(u16* a, u16* b) {
 }
 #endif
 extern u8 lbl_80438CF8[];
-extern u8 lbl_8047AF7C[];
+extern u8 lbl_8047AF7C[8];
 extern u16 lbl_8047AFA8;
 extern u32 lbl_8047AF78;
-#if 1
+#if 0
 asm void fn_801522F0(void) {
 #include "src/game/people/people_field_fn_801522F0.inc"
 }
 #else
-u32 fn_801522F0(u16 key) {
+u32 fn_801522F0(u16 arg) {
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
-    *(u16*)(lbl_8047AF7C + 4) = key;
+    *(u16*)(lbl_8047AF7C + 4) = arg;
     result = fn_80162118(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
     lbl_8047AF78 = (u32)result;
-    if (result == NULL) return 0;
-    return *(u32*)result;
+    if (result != NULL) { return *(u32*)result; }
+    return 0;
 }
 #endif
 extern u8 lbl_804378F8[];
-extern u8 lbl_8047AF70[];
+extern u8 lbl_8047AF70[8];
 extern u16 lbl_8047AFA6;
 extern u32 lbl_8047AF6C;
-#if 1
+#if 0
 asm void fn_8015234C(void) {
 #include "src/game/people/people_field_fn_8015234C.inc"
 }
 #else
-u32 fn_8015234C(u16 key) {
-    /* calls fn_80162118 (same-TU asm) - cannot be matched with C */
+u32 fn_8015234C(u16 arg) {
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
-    *(u16*)(lbl_8047AF70 + 4) = key;
-    result = 0;
+    *(u16*)(lbl_8047AF70 + 4) = arg;
+    result = fn_80162118(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
     lbl_8047AF6C = (u32)result;
-    if (result == NULL) return 0;
-    return *(u32*)result;
+    if (result != NULL) { return *(u32*)result; }
+    return 0;
 }
 #endif
 #if 0
@@ -646,16 +647,21 @@ extern u8 lbl_80445F18[];
 extern u8 lbl_804380F8[];
 extern u16 lbl_8047AFA4;
 extern u32 lbl_8047AF68;
-#if 1
+#if 0
 asm void fn_801523B8(void) {
 #include "src/game/people/people_field_fn_801523B8.inc"
 }
 #else
-u32 fn_801523B8(u16 key, u16* out) {
-    /* calls fn_80162118 (same-TU asm) - cannot be matched with C */
+u32 fn_801523B8(u16 arg, u16* out) {
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
-    *(u16*)(lbl_80445F18 + 4) = key;
-    (void)out;
+    *(u16*)(lbl_80445F18 + 4) = arg;
+    result = fn_80162118(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
+    lbl_8047AF68 = (u32)result;
+    if (result != NULL) {
+        *out = *(u16*)((u8*)result + 6);
+        return *(u32*)(u32)lbl_8047AF68;
+    }
     return 0;
 }
 #endif
@@ -1961,17 +1967,20 @@ asm void fn_8016442C(void) {
 void fn_8016442C(void) { /* TODO */ }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_80164488(void) {
-#include "src/game/people/people_field_fn_80164488.inc"
+u32 fn_80164488(u8* ptr) {
+    extern void fn_80164A2C(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    ptr[0x1C4] = 1;
+    fn_80164A2C(
+        *(f32*)(ptr + 0x1C8),
+        *(f32*)(ptr + 0x1D0),
+        *(f32*)(ptr + 0x1CC),
+        *(f32*)(ptr + 0x1D4),
+        *(f32*)(ptr + 0x1D8),
+        *(f32*)(ptr + 0x1DC)
+    );
+    ptr[0x1C4] = 0;
+    return 1;
 }
-#else
-void fn_80164488(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
