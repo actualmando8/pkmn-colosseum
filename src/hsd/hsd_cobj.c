@@ -292,7 +292,7 @@ void fn_80193CD0(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void);
+extern void fn_80196E10(const char*, u32, const char*);
 extern void fn_801A84F0(void);
 extern void fn_801C25E4(void);
 #if 1
@@ -306,15 +306,26 @@ void fn_80193D30(void) { /* TODO */ }
 
 /* 0x80193EC8 | 0x7C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80191628(void);
-#if 1
+extern void* fn_80191628(void);
+#if 0
 asm void fn_80193EC8(void) {
 #include "src/hsd/hsd_cobj_fn_80193EC8.inc"
 }
 #else
-void fn_80193EC8(void) { /* TODO */ }
+int fn_80193EC8(HSD_CObj* cobj) {
+    extern HSD_CObjInfo lbl_8036C678;
+    HSD_ClassInfo* info = HSD_CLASS_INFO(&lbl_8036C678);
+    int result = (int)info->head.parent->alloc((HSD_ClassInfo*)cobj);
+    if (result < 0) return result;
+    if (cobj != NULL) {
+        cobj->flags |= 0xC0000000;
+    }
+    cobj->eyepos = fn_80191628();
+    cobj->interest = fn_80191628();
+    return 0;
+}
 #endif
 #pragma pop
 
@@ -715,8 +726,8 @@ extern void fn_80194C2C(void);
 extern void fn_80194D94(u8*);
 extern void fn_8019513C(void);
 extern void fn_80195590(void);
-extern void fn_80195904(void);
-extern void fn_801959DC(void);
+extern void fn_80195904(HSD_CObj*, void*);
+extern void fn_801959DC(HSD_CObj*, void*);
 #if 1
 asm void fn_801947C8(void) {
 #include "src/hsd/hsd_cobj_fn_801947C8.inc"
@@ -740,18 +751,18 @@ void fn_80194C2C(void) { /* TODO */ }
 #pragma pop
 
 /* WP-0061 external references */
-extern void fn_80191688(void);
-extern void fn_80191788(void);
+extern void fn_80191688(HSD_WObj*, void*);
+extern void fn_80191788(HSD_WObj*, void*);
 extern void fn_80191DCC(void);
 extern void fn_80191E38(void);
 extern void fn_80191E88(void);
-extern void fn_801919EC(void);
+extern void fn_801919EC(HSD_WObj*);
 extern void fn_801C25E4(void);
 extern void fn_801C2670(void);
-extern void fn_801C27F4(void);
+extern void fn_801C27F4(void*, void*, void*);
 extern void fn_801C29C4(void);
 /* WP-0061 forward declarations (defined later in same TU) */
-extern void fn_80196E10(void);
+extern void fn_80196E10(const char*, u32, const char*);
 
 /* 0x80194CC4 | 0x30 */
 #pragma push
@@ -769,16 +780,27 @@ u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
 
 /* 0x80194CF4 | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_800A2EB4(void);
-extern void fn_801A8524(void);
-#if 1
+extern f32* fn_801A8524(void);
+extern void fn_800A2EB4(f32*, f32*);
+#if 0
 asm void fn_80194CF4(void) {
 #include "src/hsd/hsd_cobj_fn_80194CF4.inc"
 }
 #else
-void fn_80194CF4(void) { /* TODO */ }
+f32* fn_80194CF4(HSD_CObj* cobj) {
+    if (cobj->flags & 0x80000000) {
+        if (cobj->proj_mtx == NULL) {
+            cobj->proj_mtx = fn_801A8524();
+        }
+        fn_800A2EB4(cobj->view_mtx[0], cobj->proj_mtx);
+        if (cobj != NULL) {
+            cobj->flags &= ~0x80000000;
+        }
+    }
+    return cobj->proj_mtx;
+}
 #endif
 #pragma pop
 
@@ -823,8 +845,8 @@ extern void fn_800A3A9C(void);
 extern void fn_800A3ADC(void);
 extern void fn_800A3B7C(void);
 extern void fn_800CE2D8(void);
-extern void fn_80191688(void);
-extern void fn_80196E10(void);
+extern void fn_80191688(HSD_WObj*, void*);
+extern void fn_80196E10(const char*, u32, const char*);
 #if 1
 asm void fn_80194DA4(void) {
 #include "src/hsd/hsd_cobj_fn_80194DA4.inc"
@@ -891,57 +913,74 @@ void fn_80195794(void) { /* TODO */ }
 #endif
 #pragma pop
 
+extern char lbl_8047D958;
+extern char lbl_8047D960;
+
 /* 0x80195898 | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80191788(void);
-#if 1
+#if 0
 asm void fn_80195898(void) {
 #include "src/hsd/hsd_cobj_fn_80195898.inc"
 }
 #else
-void fn_80195898(void) { /* TODO */ }
+void fn_80195898(HSD_CObj* cobj, void* arg) {
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x324, &lbl_8047D960);
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    fn_80191788(cobj->eyepos, arg);
+}
 #endif
 #pragma pop
 
 /* 0x80195904 | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80191688(void);
-#if 1
+#if 0
 asm void fn_80195904(void) {
 #include "src/hsd/hsd_cobj_fn_80195904.inc"
 }
 #else
-void fn_80195904(void) { /* TODO */ }
+void fn_80195904(HSD_CObj* cobj, void* arg) {
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x318, &lbl_8047D960);
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    fn_80191688(cobj->eyepos, arg);
+}
 #endif
 #pragma pop
 
 /* 0x80195970 | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80195970(void) {
 #include "src/hsd/hsd_cobj_fn_80195970.inc"
 }
 #else
-void fn_80195970(void) { /* TODO */ }
+void fn_80195970(HSD_CObj* cobj, void* arg) {
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x30c, &lbl_8047D960);
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    fn_80191788(cobj->interest, arg);
+}
 #endif
 #pragma pop
 
 /* 0x801959DC | 0x6C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801959DC(void) {
 #include "src/hsd/hsd_cobj_fn_801959DC.inc"
 }
 #else
-void fn_801959DC(void) { /* TODO */ }
+void fn_801959DC(HSD_CObj* cobj, void* arg) {
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x300, &lbl_8047D960);
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    fn_80191688(cobj->interest, arg);
+}
 #endif
 #pragma pop
 
@@ -1040,15 +1079,19 @@ void fn_80196698(void) { /* TODO */ }
 
 /* 0x801966FC | 0x50 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_801C27F4(void);
-#if 1
+#if 0
 asm void fn_801966FC(void) {
 #include "src/hsd/hsd_cobj_fn_801966FC.inc"
 }
 #else
-void fn_801966FC(void) { /* TODO */ }
+void fn_801966FC(HSD_CObj* cobj) {
+    if (!cobj) return;
+    fn_801C27F4(cobj->aobj, cobj, ((HSD_CObjInfo*)cobj->parent.parent.class_info)->load);
+    fn_801919EC(cobj->eyepos);
+    fn_801919EC(cobj->interest);
+}
 #endif
 #pragma pop
 
@@ -1160,11 +1203,11 @@ void fn_80196D78(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_80196E10(void) {
+asm void fn_80196E10(const char*, u32, const char*) {
 #include "src/hsd/hsd_cobj_fn_80196E10.inc"
 }
 #else
-void fn_80196E10(void) { /* TODO */ }
+void fn_80196E10(const char*, u32, const char*) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -1273,14 +1316,25 @@ void fn_8019733C(u32 val) { extern u32 lbl_8047B240; lbl_8047B240 = val; }
 
 /* 0x801975FC | 0x54 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80197650(void);
-#if 1
+extern u32 fn_80197650(u32, u32, u32);
+#if 0
 asm void fn_801975FC(void) {
 #include "src/hsd/hsd_cobj_fn_801975FC.inc"
 }
 #else
-void fn_801975FC(void) { /* TODO */ }
+void fn_801975FC(void) {
+    extern s32 lbl_8047B248;
+    extern u32 lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern u32 lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    u32 tmp;
+    if (lbl_8047B248 == 0) return;
+    tmp = fn_80197650(lbl_8047B250, lbl_8047B254, 0x3c);
+    lbl_8047B250 = tmp;
+    lbl_8047B258 = fn_80197650(lbl_8047B258, lbl_8047B25C, 0x40);
+}
 #endif
 #pragma pop
