@@ -277,14 +277,23 @@ static void CObjInfoInit(void)
 
 /* 0x80193CD0 | 0x60 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80193CD0(void) {
 #include "src/hsd/hsd_cobj_fn_80193CD0.inc"
 }
 #else
-void fn_80193CD0(void) { /* TODO */ }
+void fn_80193CD0(u8* ptr) {
+    extern u32 lbl_8047B230;
+    extern u32 lbl_8047B234;
+    extern u8 lbl_8036C678[];
+    u32 class_info;
+    if (ptr == (u8*)lbl_8047B230) { lbl_8047B230 = 0; }
+    if (ptr == lbl_8036C678) { lbl_8047B234 = 0; }
+    class_info = *(u32*)(lbl_8036C678 + 0x14);
+    ((void(*)(u8*))*(u32*)(class_info + 0x38))(ptr);
+}
 #endif
 #pragma pop
 
@@ -1011,7 +1020,7 @@ extern void fn_800BD7A0(void);
 extern void fn_800C46B0(void);
 extern void fn_801960C4(void);
 extern void fn_801963E0(void);
-extern void fn_80196D78(void);
+extern void fn_80196D78(const char*, u32, const char*);
 extern void fn_80197400(void);
 extern void fn_8019C7B0(void);
 #if 1
@@ -1124,14 +1133,28 @@ void fn_80196B10(void) { /* TODO */ }
 
 /* 0x80196BB8 | 0x84 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80196BB8(void) {
 #include "src/hsd/hsd_cobj_fn_80196BB8.inc"
 }
 #else
-void fn_80196BB8(void) { /* TODO */ }
+void fn_80196BB8(u8* ptr) {
+    extern void fn_801C25E4(u32);
+    extern void fn_80191E88(u32);
+    extern void fn_80196E10(const char*, u32, const char*);
+    extern char lbl_8047D958;
+    extern char lbl_8047D960;
+    if (!ptr) { return; }
+    if (!ptr) { return; }
+    fn_801C25E4(*(u32*)(ptr + 0x84));
+    *(u32*)(ptr + 0x84) = 0;
+    if (!ptr) { fn_80196E10(&lbl_8047D958, 0x2E8, &lbl_8047D960); }
+    fn_80191E88(*(u32*)(ptr + 0x24));
+    if (!ptr) { fn_80196E10(&lbl_8047D958, 0x2D0, &lbl_8047D960); }
+    fn_80191E88(*(u32*)(ptr + 0x28));
+}
 #endif
 #pragma pop
 
@@ -1186,28 +1209,51 @@ void fn_80196CE0(void) { /* TODO */ }
 
 /* 0x80196D78 | 0x98 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_800060F0(void);
-#if 1
+extern void fn_800060F0(const char*, u32, const char*, ...);
+extern void fn_80196CE0(void);
+extern void OSReport(const char* fmt, ...);
+extern char lbl_802746A0[];
+extern char lbl_80465080[];
+#if 0
 asm void fn_80196D78(void) {
 #include "src/hsd/hsd_cobj_fn_80196D78.inc"
 }
 #else
-void fn_80196D78(void) { /* TODO */ }
+void fn_80196D78(const char* file, u32 line, const char* expr) {
+    extern u32 lbl_8047B238;
+    if (lbl_8047B238 != 0) {
+        fn_80196CE0();
+        OSReport(lbl_802746A0, expr, file, line);
+        ((void(*)(char*, ...))lbl_8047B238)(lbl_80465080);
+    }
+    fn_800060F0(file, line, expr);
+}
 #endif
 #pragma pop
 
 /* 0x80196E10 | 0xA4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+extern char lbl_802746B8[];
+extern char lbl_8047D9D8;
+#if 0
 asm void fn_80196E10(const char*, u32, const char*) {
 #include "src/hsd/hsd_cobj_fn_80196E10.inc"
 }
 #else
-void fn_80196E10(const char*, u32, const char*) { /* TODO */ }
+void fn_80196E10(const char* file, u32 line, const char* expr) {
+    extern u32 lbl_8047B238;
+    OSReport(lbl_802746B8, expr);
+    if (lbl_8047B238 != 0) {
+        fn_80196CE0();
+        OSReport(lbl_802746A0, &lbl_8047D9D8, file, line);
+        ((void(*)(char*, ...))lbl_8047B238)(lbl_80465080);
+    }
+    fn_800060F0(file, line, &lbl_8047D9D8);
+}
 #endif
 #pragma pop
 
