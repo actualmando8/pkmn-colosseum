@@ -906,132 +906,74 @@ void fn_80011A1C(void) {
 #endif
 
 /* 0x78 | fn_80011B4C | generic */
-extern void fn_80104704();
-extern void fn_801040A0();
+extern u32 fn_80104704(u32 a);
+extern u32 fn_801040A0(u32 a);
 u32 fn_80011B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_80104704();
-    fn_801040A0();
+    fn_80104704(arg1);
+    fn_801040A0(arg1);
     fn_800F0308();
     return 1;
 }
 
 /* 0x80011BC4 | 0xB4 */
-extern void fn_80104704();
-extern void fn_80103FE4();
-extern void fn_801040A0();
-extern void fn_80166A28();
-#if 1
+extern u32 fn_80103FE4(u32 a);
+extern void fn_80166A28(u32 val);
+#if 0
 asm void fn_80011BC4(void) {
 #include "src/game/gs_npc_interact_fn_80011BC4.inc"
 }
 #else
-void fn_80011BC4(void) {
-    extern void fn_80103FE4();
-    extern void fn_801040A0();
-    extern void fn_80104704();
-    extern void fn_80166A28();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r29 = r4;
-    fn_80104704();
-    r30 = r3;
-    if (r30 != 0) {
-        fn_80103FE4();
-        r31 = r3;
-        r3 = r30;
-        fn_801040A0();
-        tmp = *(u32*)((u8*)r31 + 0x20);
-        if (r29 > tmp) {
-            tmp = r29 - tmp;
-        } else {
-
-            tmp = tmp - r29;
-        }
-        r4 = tmp * 0x64;
-        tmp = *(u32*)((u8*)r31 + 0x1C);
-        tmp = (u32)r4 / (u32)tmp;
-        tmp = (s16)tmp;
-        *(u16*)((u8*)r3 + 0xC) = tmp;
-        tmp = *(s16*)((u8*)r3 + 0xC);
-        if ((s32)tmp < 0xf) {
-            tmp = 0xf;
-            *(u16*)((u8*)r3 + 0xC) = tmp;
-        }
-        r4 = *(u32*)((u8*)r31 + 0x20);
-        tmp = 0x0;
-        *(u32*)((u8*)r3 + 0x8) = r4;
-        *(u32*)((u8*)r31 + 0x20) = r29;
-        *(u16*)((u8*)r3 + 0xE) = tmp;
-        r3 = 0x4d0;
-        fn_80166A28();
-    }
-    return;
+void fn_80011BC4(u32 arg1, u32 target) {
+    u32 ptr;
+    u32 state;
+    u32 data;
+    u32 current;
+    u32 diff;
+    if (!(ptr = fn_80104704(arg1))) { return; }
+    state = fn_80103FE4(ptr);
+    data = fn_801040A0(ptr);
+    current = *(u32*)(state + 0x20);
+    diff = (target > current) ? target - current : current - target;
+    *(s16*)(data + 0xc) = (s16)(diff * 100 / *(u32*)(state + 0x1c));
+    if (*(s16*)(data + 0xc) < 0xf) { *(s16*)(data + 0xc) = 0xf; }
+    *(u32*)(data + 0x8) = current;
+    *(u32*)(state + 0x20) = target;
+    *(s16*)(data + 0xe) = 0;
+    fn_80166A28(0x4d0);
 }
 #endif
 
 /* 0x78 | fn_80011C78 | generic */
 u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    fn_80104704();
-    fn_801040A0();
+    fn_80104704(arg1);
+    fn_801040A0(arg1);
     fn_800F0308();
     return 1;
 }
 
 /* 0x80011CF0 | 0xAC */
-#if 1
+#if 0
 asm void fn_80011CF0(void) {
 #include "src/game/gs_npc_interact_fn_80011CF0.inc"
 }
 #else
-void fn_80011CF0(void) {
-    extern void fn_80103FE4();
-    extern void fn_801040A0();
-    extern void fn_80104704();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r29 = r4;
-    fn_80104704();
-    r30 = r3;
-    if (r30 != 0) {
-        fn_80103FE4();
-        r31 = r3;
-        r3 = r30;
-        fn_801040A0();
-        tmp = *(s16*)((u8*)r31 + 0x1A);
-        r4 = (s16)r29;
-        tmp = tmp - r4;
-        if ((s32)tmp < 0) {
-            tmp = -tmp;
-        }
-        r4 = tmp * 0x64;
-        tmp = *(s16*)((u8*)r31 + 0x18);
-        tmp = (s32)r4 / (s32)tmp;
-        tmp = (s16)tmp;
-        *(u16*)((u8*)r3 + 0x2) = tmp;
-        tmp = *(s16*)((u8*)r3 + 0x2);
-        if ((s32)tmp <= 0) {
-            tmp = 0x1;
-            *(u16*)((u8*)r3 + 0x2) = tmp;
-        }
-        r4 = *(s16*)((u8*)r31 + 0x1A);
-        tmp = 0x0;
-        *(u16*)((u8*)r3 + 0x0) = r4;
-        *(u16*)((u8*)r31 + 0x1A) = r29;
-        *(u16*)((u8*)r3 + 0x4) = tmp;
-    }
-    return;
+void fn_80011CF0(u32 arg1, s16 target) {
+    u32 ptr;
+    u32 state;
+    u32 data;
+    s16 current;
+    s32 diff;
+    if (!(ptr = fn_80104704(arg1))) { return; }
+    state = fn_80103FE4(ptr);
+    data = fn_801040A0(ptr);
+    current = *(s16*)(state + 0x1a);
+    diff = current - (s16)target;
+    if (diff < 0) { diff = -diff; }
+    *(s16*)(data + 2) = (s16)((diff * 100) / *(s16*)(state + 0x18));
+    if (*(s16*)(data + 2) <= 0) { *(s16*)(data + 2) = 1; }
+    *(s16*)(data + 0) = current;
+    *(s16*)(state + 0x1a) = target;
+    *(s16*)(data + 4) = 0;
 }
 #endif
 
@@ -1814,12 +1756,27 @@ void fn_8000DAE8(void) { /* TODO */ }
 extern void fn_80265B74(void);
 extern void fn_801040B8(void);
 extern void fn_8026595C(void);
-#if 1
+#if 0
 asm void fn_8000DC88(void) {
 #include "src/game/gs_npc_interact_fn_8000DC88.inc"
 }
 #else
-void fn_8000DC88(void) { /* TODO */ }
+#pragma peephole off
+u32 fn_8000DC88(u8* ptr) {
+    extern f64 fn_80265B74(void);
+    extern f64 fn_8026595C(void);
+    extern void fn_801040B8(u8* a, u32 b, s32 c);
+    switch (*(s32*)(ptr + 4)) {
+        case 0x10a:
+            fn_801040B8(ptr, 0, (s32)fn_80265B74());
+            break;
+        case 0x10b:
+            fn_801040B8(ptr, 0, (s32)fn_8026595C());
+            break;
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000DD0C - 0x8000DD0C | size: 0x24 */
@@ -1890,12 +1847,35 @@ void fn_8000DDE8(void) { fn_801026A4(0x10b, -1, 0, 0, 0, 0); }
 
 /* fn_8000DE24 - 0x8000DE24 | size: 0xa0 */
 extern void fn_80102ED4(void);
-#if 1
+#if 0
 asm void fn_8000DE24(void) {
 #include "src/game/gs_npc_interact_fn_8000DE24.inc"
 }
 #else
-void fn_8000DE24(void) { /* TODO */ }
+void fn_8000DE24(u8* ptr) {
+    extern void fn_80102ED4(u8* a);
+    extern u8 fn_801F18DC(s32 a);
+    extern u8 fn_801F1700(s32 a);
+    extern u8 fn_80265924(void);
+    extern u16 fn_801EF634(void);
+    u8 flag;
+    fn_80102ED4(ptr);
+    if ((u8)fn_801F18DC(0)) {
+        if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) {
+            flag = 1;
+        } else if ((u16)fn_801EF634() == 1) {
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+    } else {
+        flag = 0;
+    }
+    if (flag) {
+        ptr[0x98] = 1;
+        ptr[0x99] = 1;
+    }
+}
 #endif
 
 /* fn_8000DEC4 - 0x8000DEC4 | size: 0x12c */
