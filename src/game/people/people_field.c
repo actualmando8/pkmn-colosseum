@@ -1513,7 +1513,7 @@ void fn_80163030(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_80163050(void) {
@@ -1549,7 +1549,7 @@ void fn_801630E4(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_80163104(void) {
@@ -1711,7 +1711,7 @@ void fn_80163798(void) { fn_800ACB44(); }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 extern u32 lbl_8047B06C;
 extern u32 lbl_8047B070;
@@ -1994,7 +1994,7 @@ void fn_80164400(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_8016442C(void) {
