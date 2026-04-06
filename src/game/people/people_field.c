@@ -1019,7 +1019,6 @@ extern u32  fn_800AE92C(void);
 extern void fn_800AE93C(void);
 extern void fn_800CE358(void);
 extern void fn_8015B250(void);
-extern void fn_801642AC(void);
 extern void fn_80164520(void);
 extern void fn_80164A2C(void);
 extern void fn_801652DC(u32 a, u32 b, u32 c, u8* d);
@@ -1063,6 +1062,7 @@ extern void fn_80164324(void);
 extern void fn_80164328(void);
 extern void fn_80164360(void);
 extern void fn_801642F8(void);
+extern u32 fn_801642AC(void);
 extern void fn_801643D8(void);
 extern void fn_80164400(void);
 #pragma push
@@ -1077,14 +1077,18 @@ void fn_801621BC(u32* ptr) { *ptr <<= 8; }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801621CC(void) {
 #include "src/game/people/people_field_fn_801621CC.inc"
 }
 #else
-void fn_801621CC(void) { /* TODO */ }
+void fn_801621CC(u32* ptr, u32 divisor) {
+    extern u32 fn_8014A280(u32 a);
+    u32 result = fn_8014A280(divisor);
+    *ptr = ((*ptr << 16) / result * 0x3E8) >> 5;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1344,14 +1348,18 @@ void fn_80162A58(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162D18(void) {
 #include "src/game/people/people_field_fn_80162D18.inc"
 }
 #else
-void fn_80162D18(void) { /* TODO */ }
+void fn_80162D18(u32 index) {
+    extern u32 lbl_8047B024;
+    extern void fn_8015D4EC(u8* ptr);
+    fn_8015D4EC((u8*)lbl_8047B024 + index * 0xF4);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1923,25 +1931,40 @@ void fn_80164238(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801642AC(void) {
 #include "src/game/people/people_field_fn_801642AC.inc"
 }
 #else
-void fn_801642AC(void) { /* TODO */ }
+u32 fn_801642AC(void) {
+    extern u32 OSGetTick(void);
+    extern u32 lbl_8047B08C;
+    u32 tick = OSGetTick();
+    u32 bus_clock = *(volatile u32*)0x800000F8;
+    u32 magic = 0x431CDE83u;
+    u32 prev = lbl_8047B08C;
+    u32 divisor = __mulhwu(magic, bus_clock >> 2) >> 15;
+    return ((tick - prev) << 3) / divisor;
+}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801642F8(void) {
 #include "src/game/people/people_field_fn_801642F8.inc"
 }
 #else
-void fn_801642F8(void) { /* TODO */ }
+void fn_801642F8(void) {
+    extern u32 OSDisableInterrupts(void);
+    extern u32 lbl_8047B080;
+    extern u16 lbl_8047B084;
+    lbl_8047B080 = OSDisableInterrupts();
+    lbl_8047B084 = 1;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1993,25 +2016,32 @@ u32 fn_801643B8(void) { return OSEnableInterrupts(); }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801643D8(void) {
 #include "src/game/people/people_field_fn_801643D8.inc"
 }
 #else
-void fn_801643D8(void) { /* TODO */ }
+void fn_801643D8(void) {
+    extern u32 lbl_8047B054;
+    ((void(*)(void))lbl_8047B054)();
+}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80164400(void) {
 #include "src/game/people/people_field_fn_80164400.inc"
 }
 #else
-void fn_80164400(void) { /* TODO */ }
+void fn_80164400(void) {
+    extern u32 lbl_8047B054;
+    u32* base = &lbl_8047B054;
+    ((void(*)(void))base[1])();
+}
 #endif
 #pragma pop
 #pragma push
@@ -2047,14 +2077,25 @@ u32 fn_80164488(u8* ptr) {
     return 1;
 }
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801644E0(void) {
 #include "src/game/people/people_field_fn_801644E0.inc"
 }
 #else
-void fn_801644E0(void) { /* TODO */ }
+void fn_801644E0(u8* ptr) {
+    extern void fn_80164520(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    ptr[0x1C4] = 0;
+    fn_80164520(
+        *(f32*)(ptr + 0x1C8),
+        *(f32*)(ptr + 0x1D0),
+        *(f32*)(ptr + 0x1CC),
+        *(f32*)(ptr + 0x1D4),
+        *(f32*)(ptr + 0x1D8),
+        *(f32*)(ptr + 0x1DC)
+    );
+}
 #endif
 #pragma pop
 #pragma push
