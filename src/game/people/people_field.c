@@ -1822,14 +1822,29 @@ void fn_80163F88(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163F98(void) {
 #include "src/game/people/people_field_fn_80163F98.inc"
 }
 #else
-void fn_80163F98(void) { /* TODO */ }
+void fn_80163F98(void) {
+    extern u32 lbl_8047B094;
+    extern u32 lbl_8047B090;
+    extern u32 lbl_8047B0A4;
+    lbl_8047B098 = 1;
+    if (lbl_8047B094 != 0) {
+        lbl_8047B094 = 0;
+        if (lbl_8047B090 == 0) {
+            lbl_8047B090 = 1;
+            OSEnableInterrupts();
+            ((void(*)(void))lbl_8047B0A4)();
+            OSDisableInterrupts();
+            lbl_8047B090 = 0;
+        }
+    }
+}
 #endif
 #pragma pop
 #pragma push
