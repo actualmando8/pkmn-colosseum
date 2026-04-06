@@ -1022,14 +1022,14 @@ extern void fn_8015B250(void);
 extern void fn_801642AC(void);
 extern void fn_80164520(void);
 extern void fn_80164A2C(void);
-extern void fn_801652DC(void);
+extern void fn_801652DC(u32 a, u32 b, u32 c, u8* d);
 extern void fn_8009B300(void);
 extern void fn_800AC02C(u32 a);
 extern void fn_800AC070(void);
 extern void fn_800ACB44(void);
 extern void fn_800ACB4C(void);
 extern void fn_800AE630(void);
-extern void fn_800AE78C(void);
+extern u32  fn_800AE78C(void);
 extern void fn_8014A280(void);
 extern void fn_80158CD4(void);
 extern void fn_8015A950(void);
@@ -1047,7 +1047,7 @@ extern void fn_801632B4(void);
 extern void fn_80163490(void);
 extern void fn_801634A8(void);
 extern void fn_80163794(void);
-extern void fn_801637B8(void);
+extern void fn_801637B8(u8* ptr, u32 size);
 extern void fn_80163810(void);
 extern void fn_80163BCC(void);
 extern void fn_80163BE4(void);
@@ -1515,12 +1515,26 @@ void fn_80163030(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163050(void) {
 #include "src/game/people/people_field_fn_80163050.inc"
 }
 #else
-void fn_80163050(void) { /* TODO */ }
+void fn_80163050(u32** src, u32* out) {
+    extern u32 fn_80163810(u32 a, u32 b);
+    u32 val = *(u32*)((u8*)*src + 4);
+    u32 type = val >> 24;
+    u32 payload = val & 0xFFFFFF;
+    switch (type) {
+        case 0: case 1: case 4: case 5:
+            payload = ((payload + 13) / 28) & ~7u;
+            break;
+        case 2:
+            payload = payload << 1;
+            break;
+    }
+    *out = fn_80163810(*out, payload);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1537,12 +1551,26 @@ void fn_801630E4(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163104(void) {
 #include "src/game/people/people_field_fn_80163104.inc"
 }
 #else
-void fn_80163104(void) { /* TODO */ }
+void fn_80163104(u8* src, u8* dest) {
+    extern void fn_80163BCC(u8* a, u32 b);
+    u32 val = *(u32*)(src + 4);
+    u32 type = val >> 24;
+    u32 payload = val & 0xFFFFFF;
+    switch (type) {
+        case 0: case 1: case 4: case 5:
+            payload = ((payload + 13) / 28) & ~7u;
+            break;
+        case 2:
+            payload = payload << 1;
+            break;
+    }
+    fn_80163BCC(dest, payload);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1685,12 +1713,21 @@ void fn_80163798(void) { fn_800ACB44(); }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+extern u32 lbl_8047B06C;
+extern u32 lbl_8047B070;
+#if 0
 asm void fn_801637B8(void) {
 #include "src/game/people/people_field_fn_801637B8.inc"
 }
 #else
-void fn_801637B8(void) { /* TODO */ }
+void fn_801637B8(u8* ptr, u32 size) {
+    u32 aligned;
+    if (ptr) {
+        aligned = (size + 0x1f) & ~0x1fu;
+        lbl_8047B06C = aligned >= fn_800AE78C() ? aligned : fn_800AE78C();
+    }
+    lbl_8047B070 = (u32)ptr;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1959,12 +1996,19 @@ void fn_80164400(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8016442C(void) {
 #include "src/game/people/people_field_fn_8016442C.inc"
 }
 #else
-void fn_8016442C(void) { /* TODO */ }
+void fn_8016442C(u8 type, u32* data, u8* obj) {
+    switch (type) {
+        case 0:
+            if (obj[0x1C4] != 0) { break; }
+            fn_801652DC(data[0], data[1], data[2], obj);
+            break;
+    }
+}
 #endif
 #pragma pop
 u32 fn_80164488(u8* ptr) {
