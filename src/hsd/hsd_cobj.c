@@ -351,14 +351,24 @@ void fn_80194010(void) { /* TODO */ }
 
 /* 0x80194258 | 0x60 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80194258(void) {
 #include "src/hsd/hsd_cobj_fn_80194258.inc"
 }
 #else
-void fn_80194258(void) { /* TODO */ }
+void* fn_80194258(void) {
+    extern u32 lbl_8047B230;
+    extern const char lbl_8047D958[];
+    extern const char lbl_8047D960[];
+    typedef void* (*fn_80193828_t)(void*);
+    typedef void (*fn_80196E10_t)(const char*, int, const char*);
+    void* arg = lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)0x8037C678;
+    void* result = ((fn_80193828_t)fn_80193828)(arg);
+    if (result == NULL) ((fn_80196E10_t)fn_80196E10)(lbl_8047D958, 0x7A4, lbl_8047D960);
+    return result;
+}
 #endif
 #pragma pop
 
@@ -377,66 +387,97 @@ u32 fn_801942B8(void) { extern u32 lbl_8047B234; return lbl_8047B234; }
 
 /* 0x801942C0 | 0x5C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801942C0(void) {
 #include "src/hsd/hsd_cobj_fn_801942C0.inc"
 }
 #else
-void fn_801942C0(void) { /* TODO */ }
+void fn_801942C0(u8* ptr, f32* a, f32* b, f32* c, f32* d) {
+    if (ptr == NULL) return;
+    if (ptr[0x50] != 3) return;
+    if (a != NULL) *(f32*)a = *(f32*)(ptr + 0x40);
+    if (b != NULL) *(f32*)b = *(f32*)(ptr + 0x44);
+    if (c != NULL) *(f32*)c = *(f32*)(ptr + 0x48);
+    if (d != NULL) *(f32*)d = *(f32*)(ptr + 0x4C);
+}
 #endif
 #pragma pop
 
 /* 0x8019431C | 0x3C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019431C(void) {
 #include "src/hsd/hsd_cobj_fn_8019431C.inc"
 }
 #else
-void fn_8019431C(void) { /* TODO */ }
+void fn_8019431C(u8* ptr, f32* a, f32* b) {
+    if (ptr == NULL) return;
+    if (ptr[0x50] != 1) return;
+    if (a != NULL) *(f32*)a = *(f32*)(ptr + 0x40);
+    if (b != NULL) *(f32*)b = *(f32*)(ptr + 0x44);
+}
 #endif
 #pragma pop
 
 /* 0x80194358 | 0x24 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80194358(void) {
 #include "src/hsd/hsd_cobj_fn_80194358.inc"
 }
 #else
-void fn_80194358(void) { /* TODO */ }
+void fn_80194358(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+    if (ptr == NULL) return;
+    ptr[0x50] = 3;
+    *(f32*)(ptr + 0x40) = f1;
+    *(f32*)(ptr + 0x44) = f2;
+    *(f32*)(ptr + 0x48) = f3;
+    *(f32*)(ptr + 0x4C) = f4;
+}
 #endif
 #pragma pop
 
 /* 0x8019437C | 0x24 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019437C(void) {
 #include "src/hsd/hsd_cobj_fn_8019437C.inc"
 }
 #else
-void fn_8019437C(void) { /* TODO */ }
+void fn_8019437C(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+    if (ptr == NULL) return;
+    ptr[0x50] = 2;
+    *(f32*)(ptr + 0x40) = f1;
+    *(f32*)(ptr + 0x44) = f2;
+    *(f32*)(ptr + 0x48) = f3;
+    *(f32*)(ptr + 0x4C) = f4;
+}
 #endif
 #pragma pop
 
 /* 0x801943A0 | 0x1C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801943A0(void) {
 #include "src/hsd/hsd_cobj_fn_801943A0.inc"
 }
 #else
-void fn_801943A0(void) { /* TODO */ }
+void fn_801943A0(u8* ptr, f32 f1, f32 f2) {
+    if (ptr == NULL) return;
+    ptr[0x50] = 1;
+    *(f32*)(ptr + 0x40) = f1;
+    *(f32*)(ptr + 0x44) = f2;
+}
 #endif
 #pragma pop
 
@@ -455,27 +496,36 @@ void fn_801943BC(u8* ptr, u8 val) { if (ptr == NULL) return; ptr[0x50] = val; }
 
 /* 0x801943CC | 0x18 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801943CC(void) {
 #include "src/hsd/hsd_cobj_fn_801943CC.inc"
 }
 #else
-void fn_801943CC(void) { /* TODO */ }
+u8 fn_801943CC(u8* ptr) {
+    if (ptr == NULL) return 1;
+    return ptr[0x50];
+}
 #endif
 #pragma pop
 
 /* 0x801943E4 | 0x1C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801943E4(void) {
 #include "src/hsd/hsd_cobj_fn_801943E4.inc"
 }
 #else
-void fn_801943E4(void) { /* TODO */ }
+void fn_801943E4(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+    if (ptr == NULL) return;
+    *(f32*)(ptr + 0x0C) = f1;
+    *(f32*)(ptr + 0x10) = f2;
+    *(f32*)(ptr + 0x14) = f3;
+    *(f32*)(ptr + 0x18) = f4;
+}
 #endif
 #pragma pop
 
@@ -494,14 +544,20 @@ void fn_80194400(void) { /* TODO */ }
 
 /* 0x801944A4 | 0x1C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801944A4(void) {
 #include "src/hsd/hsd_cobj_fn_801944A4.inc"
 }
 #else
-void fn_801944A4(void) { /* TODO */ }
+void fn_801944A4(u8* ptr, u16 a, u16 b, u16 c, u16 d) {
+    if (ptr == NULL) return;
+    *(u16*)(ptr + 0x1C) = a;
+    *(u16*)(ptr + 0x1E) = b;
+    *(u16*)(ptr + 0x20) = c;
+    *(u16*)(ptr + 0x22) = d;
+}
 #endif
 #pragma pop
 
@@ -520,14 +576,18 @@ void fn_801944C0(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x3C
 
 /* 0x801944D0 | 0x18 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801944D0(void) {
 #include "src/hsd/hsd_cobj_fn_801944D0.inc"
 }
 #else
-void fn_801944D0(void) { /* TODO */ }
+f32 fn_801944D0(u8* ptr) {
+    extern f32 lbl_8047D978;
+    if (ptr == NULL) return lbl_8047D978;
+    return *(f32*)(ptr + 0x3C);
+}
 #endif
 #pragma pop
 
@@ -546,14 +606,18 @@ void fn_801944E8(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x38
 
 /* 0x801944F8 | 0x18 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801944F8(void) {
 #include "src/hsd/hsd_cobj_fn_801944F8.inc"
 }
 #else
-void fn_801944F8(void) { /* TODO */ }
+f32 fn_801944F8(u8* ptr) {
+    extern f32 lbl_8047D978;
+    if (ptr == NULL) return lbl_8047D978;
+    return *(f32*)(ptr + 0x38);
+}
 #endif
 #pragma pop
 
@@ -720,15 +784,17 @@ void fn_80194CF4(void) { /* TODO */ }
 
 /* 0x80194D60 | 0x34 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_800A2D64(void);
-#if 1
+extern void fn_800A2D64(void*, void*);
+#if 0
 asm void fn_80194D60(void) {
 #include "src/hsd/hsd_cobj_fn_80194D60.inc"
 }
 #else
-void fn_80194D60(void) { /* TODO */ }
+void fn_80194D60(u8* ptr, void* arg2) {
+    fn_800A2D64(fn_80194CC4(ptr), arg2);
+}
 #endif
 #pragma pop
 
@@ -1028,14 +1094,18 @@ void fn_80196BB8(void) { /* TODO */ }
 
 /* 0x80196C3C | 0x18 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80196C3C(void) {
 #include "src/hsd/hsd_cobj_fn_80196C3C.inc"
 }
 #else
-void fn_80196C3C(void) { /* TODO */ }
+void fn_80196C3C(u8* ptr) {
+    extern u32 lbl_80478C58;
+    if (ptr == NULL) ptr = (u8*)0x80196C54;
+    lbl_80478C58 = (u32)ptr;
+}
 #endif
 #pragma pop
 
@@ -1100,14 +1170,31 @@ void fn_80196E10(void) { /* TODO */ }
 
 /* 0x80196EB4 | 0x44 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80196EB4(void) {
 #include "src/hsd/hsd_cobj_fn_80196EB4.inc"
 }
 #else
-void fn_80196EB4(void) { /* TODO */ }
+void fn_80196EB4(void) {
+    extern u32 lbl_8047B24C;
+    extern u32 lbl_8047B250;
+    extern u32 lbl_8047B254;
+    extern u32 lbl_8047B258;
+    extern u32 lbl_8047B25C;
+    extern u32 lbl_80478C64;
+    extern u32 lbl_80478C68;
+    extern u32 lbl_80478C6C;
+    lbl_8047B24C = 0;
+    lbl_80478C64 = (u32)&lbl_8047B24C;
+    lbl_8047B250 = 0;
+    lbl_80478C68 = (u32)&lbl_8047B250;
+    lbl_8047B254 = 0;
+    lbl_8047B258 = 0;
+    lbl_80478C6C = (u32)&lbl_8047B258;
+    lbl_8047B25C = 0;
+}
 #endif
 #pragma pop
 
@@ -1152,14 +1239,22 @@ void fn_80196EF8(void) { /* TODO */ }
 
 /* 0x8019731C | 0x20 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019731C(void) {
 #include "src/hsd/hsd_cobj_fn_8019731C.inc"
 }
 #else
-void fn_8019731C(void) { /* TODO */ }
+void fn_8019731C(u8 a, u8 b, u8 c, u8 d) {
+    extern u8 lbl_80478C60;
+    u8* p;
+    lbl_80478C60 = a;
+    p = &lbl_80478C60;
+    p[1] = b;
+    p[2] = c;
+    p[3] = d;
+}
 #endif
 #pragma pop
 
