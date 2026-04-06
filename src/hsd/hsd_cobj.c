@@ -340,16 +340,50 @@ int fn_80193EC8(HSD_CObj* cobj) {
 
 /* 0x80193F44 | 0xCC */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80193748(void);
-extern void fn_80193828(void);
-#if 1
+extern HSD_ClassInfo* fn_80193748(const char*);
+extern void* fn_80193828(void*);
+#if 0
 asm void fn_80193F44(void) {
 #include "src/hsd/hsd_cobj_fn_80193F44.inc"
 }
 #else
-void fn_80193F44(void) { /* TODO */ }
+void* fn_80193F44(u8* ptr) {
+    extern u32 lbl_8047B230;
+    extern u8 lbl_8036C678[];
+    extern char lbl_8047D958;
+    extern char lbl_8047D960;
+    void* cobj_result;
+    u32 tmp;
+    HSD_ClassInfo* info;
+    if (ptr == NULL) return NULL;
+    tmp = *(u32*)ptr;
+    if (tmp == 0) goto default_alloc;
+    info = fn_80193748(*(const char**)ptr);
+    if (info != 0) goto do_alloc_from_info;
+default_alloc:
+    if (lbl_8047B230 != 0) {
+        cobj_result = fn_80193828((void*)lbl_8047B230);
+    } else {
+        cobj_result = fn_80193828((void*)lbl_8036C678);
+    }
+    if (cobj_result == NULL) {
+        fn_80196E10(&lbl_8047D958, 0x7a4, &lbl_8047D960);
+    }
+    goto setup;
+do_alloc_from_info:
+    cobj_result = fn_80193828(info);
+    if (cobj_result == NULL) {
+        fn_80196E10(&lbl_8047D958, 0x7f9, &lbl_8047D960);
+    }
+setup:
+    {
+        void** vtable = *(void***)cobj_result;
+        ((void(*)(void*, u8*))vtable[0x3c / 4])(cobj_result, ptr);
+    }
+    return cobj_result;
+}
 #endif
 #pragma pop
 
@@ -1119,15 +1153,32 @@ void fn_8019674C(void) { /* TODO */ }
 
 /* 0x80196B10 | 0xA8 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 extern void fn_801C2670(void);
-#if 1
+#if 0
 asm void fn_80196B10(void) {
 #include "src/hsd/hsd_cobj_fn_80196B10.inc"
 }
 #else
-void fn_80196B10(void) { /* TODO */ }
+void fn_80196B10(u8* cobj, u8* aobj_info) {
+    extern void fn_801C25E4(u32);
+    extern u32 fn_801C2670(u32);
+    extern void fn_80191DCC(u32, u32);
+    extern void fn_80196E10(const char*, u32, const char*);
+    extern char lbl_8047D958;
+    extern char lbl_8047D960;
+    if (cobj == NULL) return;
+    if (aobj_info == NULL) return;
+    if (*(u32*)(cobj + 0x84) != 0) {
+        fn_801C25E4(*(u32*)(cobj + 0x84));
+    }
+    *(u32*)(cobj + 0x84) = fn_801C2670(*(u32*)aobj_info);
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    fn_80191DCC(*(u32*)(cobj + 0x24), *(u32*)(aobj_info + 0x4));
+    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    fn_80191DCC(*(u32*)(cobj + 0x28), *(u32*)(aobj_info + 0x8));
+}
 #endif
 #pragma pop
 
@@ -1177,19 +1228,29 @@ void fn_80196C3C(u8* ptr) {
 
 /* 0x80196C54 | 0x8C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 extern void _savefpr_26(void);
 extern void _restfpr_26(void);
 extern void fn_800AA2F0(void);
 extern void fn_800BD640(void);
 extern void fn_800BD744(void);
-#if 1
+#if 0
 asm void fn_80196C54(void) {
 #include "src/hsd/hsd_cobj_fn_80196C54.inc"
 }
 #else
-void fn_80196C54(void) { /* TODO */ }
+void fn_80196C54(int flag, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) {
+    extern void fn_800AA2F0(void);
+    extern void fn_800BD640(f32, f32, f32, f32, f32, f32);
+    extern void fn_800BD744(f32, f32, f32, f32, f32, f32);
+    if (flag != 0) {
+        fn_800AA2F0();
+        fn_800BD640(a, b, c, d, e, f);
+    } else {
+        fn_800BD744(a, b, c, d, e, f);
+    }
+}
 #endif
 #pragma pop
 
