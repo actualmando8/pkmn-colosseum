@@ -637,19 +637,48 @@ u32 fn_8000C3A4(void) {
 #endif
 
 /* fn_8000C3D4 - 0x8000C3D4 | size: 0xcc */
-extern void fn_801C41C8(void);
-extern void fn_801C40F0(void);
-extern void fn_80105FF8(void);
-extern void fn_80106080(void);
-extern void fn_80105FB0(void);
-extern void fn_80132A38(void);
-extern u32 lbl_8047B6E0;
-#if 1
+extern void fn_801C41C8(u32 a, f32 b);
+extern void fn_801C40F0(u32 a);
+extern void fn_80105FF8(u32 a, u32 b, u32 c);
+extern void fn_80106080(u32 a);
+extern void fn_80105FB0(u32 a);
+extern void fn_80132A38(u32 a, u32 b);
+extern f32 lbl_8047B6E0;
+#if 0
 asm void fn_8000C3D4(void) {
 #include "src/game/gs_party_access_fn_8000C3D4.inc"
 }
 #else
-void fn_8000C3D4(void) { /* TODO */ }
+#pragma peephole off
+s32 fn_8000C3D4(u32 arg1, u32 type) {
+    switch (type) {
+    case 0:
+        fn_801C41C8(3, lbl_8047B6E0);
+        fn_801C40F0(1);
+        fn_80105FF8(0x44c5, 1, 0);
+        fn_801069FC(1);
+        fn_801C41C8(2, lbl_8047B6E0);
+        fn_801C40F0(1);
+        break;
+    case 1:
+        fn_80106080(1);
+        fn_80105FB0(1);
+        break;
+    case 2:
+        fn_800F0308();
+        fn_800F0308();
+        fn_800F0308();
+        fn_80106080(0);
+        fn_800F0308();
+        fn_800F0308();
+        break;
+    case 3:
+        fn_80132A38(0x31, 0x7da);
+        break;
+    }
+    return 0;
+}
+#pragma peephole on
 #endif
 
 /* fn_8000C4A0 - 0x8000C4A0 | size: 0x78 */
@@ -1115,12 +1144,27 @@ s32 fn_8000CD20(void) {
 
 /* fn_8000CD50 - 0x8000CD50 | size: 0xc8 */
 /* GSparty_GetStatusFull -- complex multi-call with float arg */
-#if 1
+#if 0
 asm void fn_8000CD50(void) {
 #include "src/game/gs_party_access_fn_8000CD50.inc"
 }
 #else
-void fn_8000CD50(void) { /* TODO */ }
+void fn_8000CD50(void) {
+    u32 val1, val2;
+    struct { u32 buf[5]; u16 a; u16 b; } locals;
+
+    val1 = fn_8012A5B0(NULL, 3, 0);
+    if ((u8)fn_80123FBC(val1) == 0) { return; }
+    val2 = fn_8012A5B0(NULL, 3, 1);
+    if ((u8)fn_80123FBC(val2) == 0) { return; }
+    fn_801C41C8(3, lbl_8047B6E8);
+    fn_801C40F0(1);
+    locals.a = 1;
+    locals.b = 2;
+    fn_8026132C(val1, val2, 1, &locals.a, 2, locals.buf);
+    fn_801C41C8(2, lbl_8047B6E8);
+    fn_801C40F0(1);
+}
 #endif
 
 /* fn_8000CE18 - 0x8000CE18 | size: 0x44 */
