@@ -796,7 +796,7 @@ extern void fn_800FC244(void);
 extern void fn_800FC2A4(void);
 extern void fn_800FC2A8(void* ptr);
 extern void* fn_800FC39C(void* ptr);
-extern void fn_800FC518(void);
+extern s32 fn_800FC518(u32 val);
 extern void fn_800FC528(void);
 extern s32 fn_800FC7E0(void* entry, u8 type, u32 arg);
 extern void fn_800FD348(void);
@@ -807,11 +807,11 @@ extern s32 fn_800FE010(const void* str);
 extern void fn_800FE35C(void);
 extern void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2);
 extern void fn_800FE4D4(void);
-extern void fn_800FE6A0(void);
-extern void fn_800FE6AC(void);
-extern void fn_800FE6D0(void);
-extern void fn_800FE6DC(void);
-extern void fn_800FE6F8(void);
+extern void fn_800FE6A0(f32 a, f32 b);
+extern void fn_800FE6AC(s16* outA, s16* outB);
+extern void fn_800FE6D0(s32 a, s32 b);
+extern void fn_800FE6DC(u32 taskId);
+extern void fn_800FE6F8(u32 taskId);
 extern void fn_800FE714(s32 taskId);
 extern void fn_800FE7A0(void);
 extern u32 fn_800FE834(u32 state, u8 priority, void* param, void* func);
@@ -1348,7 +1348,7 @@ u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9D04(void) {
 #include "src/game/gs_thread_fn_800F9D04.inc"
 }
@@ -2054,7 +2054,7 @@ void fn_800FC244(u32* item) {
 #pragma pop
 
 /* 0x800FC2A4 | 0x4 | void_stub */
-#if 1
+#if 0
 asm void fn_800FC2A4(void) {
 #include "src/game/gs_thread_fn_800FC2A4.inc"
 }
@@ -2230,7 +2230,7 @@ loop:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FC518(void) {
 #include "src/game/gs_thread_fn_800FC518.inc"
 }
@@ -2407,15 +2407,17 @@ s32 fn_800FE010(const void* str) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE35C(void) {
 #include "src/game/gs_thread_fn_800FE35C.inc"
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_800FE35C(void) {
     fn_800D9D68(0, 0, 0x27F, 0x1DF);
 }
+#pragma scheduling on
 #endif
 #pragma pop
 
@@ -2476,7 +2478,7 @@ void fn_800FE4D4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE6A0(void) {
 #include "src/game/gs_thread_fn_800FE6A0.inc"
 }
@@ -2493,7 +2495,7 @@ void fn_800FE6A0(f32 a, f32 b) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE6AC(void) {
 #include "src/game/gs_thread_fn_800FE6AC.inc"
 }
@@ -2514,7 +2516,7 @@ void fn_800FE6AC(s16* outA, s16* outB) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE6D0(void) {
 #include "src/game/gs_thread_fn_800FE6D0.inc"
 }
@@ -2531,14 +2533,15 @@ void fn_800FE6D0(s32 a, s32 b) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE6DC(void) {
 #include "src/game/gs_thread_fn_800FE6DC.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_800FE6DC(s32 taskId) {
-    ((u8*)lbl_8047AC7C)[(taskId - 1) * 0x18 + 0xD] = 0;
+void fn_800FE6DC(u32 taskId) {
+    u32 idx = taskId - 1;
+    ((u8*)lbl_8047AC7C)[idx * 0x18 + 0xD] = 0;
 }
 #endif
 #pragma pop
@@ -2547,14 +2550,15 @@ void fn_800FE6DC(s32 taskId) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE6F8(void) {
 #include "src/game/gs_thread_fn_800FE6F8.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_800FE6F8(s32 taskId) {
-    ((u8*)lbl_8047AC7C)[(taskId - 1) * 0x18 + 0xD] = 1;
+void fn_800FE6F8(u32 taskId) {
+    u32 idx = taskId - 1;
+    ((u8*)lbl_8047AC7C)[idx * 0x18 + 0xD] = 1;
 }
 #endif
 #pragma pop
@@ -4871,7 +4875,7 @@ s32 fn_800F670C(void* obj) {
 #endif
 
 /* 0x800F67AC | 0x1C */
-#if 1
+#if 0
 asm void fn_800F67AC(void) {
 #include "src/game/gs_thread_fn_800F67AC.inc"
 }
@@ -5081,7 +5085,7 @@ s32 fn_800F6B54(void* obj) {
 #endif
 
 /* 0x800F6BAC | 0x10 */
-#if 1
+#if 0
 asm void fn_800F6BAC(void) {
 #include "src/game/gs_thread_fn_800F6BAC.inc"
 }
@@ -5094,7 +5098,7 @@ s32 fn_800F6BAC(u8* ptr) {
 #endif
 
 /* 0x800F6BBC | 0x8 */
-#if 1
+#if 0
 asm void fn_800F6BBC(void) {
 #include "src/game/gs_thread_fn_800F6BBC.inc"
 }
