@@ -196,7 +196,7 @@ extern u32 lbl_8047AC48;
 extern u32 lbl_8047AC4C;
 extern u32 lbl_8047AC50;
 extern u32 lbl_8047AC54;
-extern u32 lbl_8047AC58;
+extern u16 lbl_8047AC58;
 extern u32 lbl_8047AC5C;
 extern u32 lbl_8047AC60;
 extern u32 lbl_8047AC64;
@@ -766,7 +766,7 @@ extern void fn_800F9318(void);
 extern void fn_800F9378(void);
 extern void fn_800F9418(void);
 extern void fn_800F9544(void);
-extern void fn_800F9670(void);
+extern void fn_800F9670(u32 count);
 extern void fn_800F96E4(void);
 extern void fn_800F9AEC(void);
 extern void fn_800F9C04(void);
@@ -775,7 +775,7 @@ extern void fn_800F9D24(void);
 extern u8* fn_800F9E70(u8* dst, u8* src);
 extern void fn_800F9EE4(void);
 extern void fn_800FA064(void);
-extern void fn_800FA160(void);
+extern void fn_800FA160(void* obj);
 extern void fn_800FA1BC(void);
 extern void fn_800FA280(void);
 extern void fn_800FA314(void);
@@ -1185,25 +1185,29 @@ void* fn_800F9544(u32 size, u32 key1, u32 key2, u32 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9670(void) {
 #include "src/game/gs_thread_fn_800F9670.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 2
 void fn_800F9670(u32 count) {
-    u32 handle;
-    u8* ptr;
+    u16 handle;
+    u32 off;
     u32 i;
 
     lbl_8047AC60 = count;
-    handle = (u32)GSmemAllocRaw(count * 0x14);
+    handle = GSmemAllocRaw(count * 0x14);
     lbl_8047AC58 = handle;
     if ((handle & 0xFFFF) == 0) return;
-    ptr = (u8*)GSmemGetPtr(handle & 0xFFFF);
-    lbl_8047AC5C = (u32)ptr;
-    for (i = 0; i < count; i++, ptr += 0x14) {
-        *(u32*)(ptr + 0x4) = 0;
+    lbl_8047AC5C = (u32)GSmemGetPtr(handle);
+    off = 0;
+    i = 0;
+    while (i < lbl_8047AC60) {
+        u32 storeoff = off + 0x4;
+        off += 0x14;
+        i++;
+        *(u32*)(lbl_8047AC5C + storeoff) = 0;
     }
 }
 #endif
@@ -1548,18 +1552,17 @@ void fn_800FA064(void* obj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA160(void) {
 #include "src/game/gs_thread_fn_800FA160.inc"
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void fn_800FA160(void* obj) {
     u8 clr[8];
-    u32 color;
-    u32 init;
-    init = lbl_8047CD04;
-    color = *(u32*)((u8*)obj + 0x24);
+    u32 init = lbl_8047CD04;
+    u32 color = *(u32*)((u8*)obj + 0x24);
     *(u32*)(&clr[4]) = init;
     clr[4] = (u8)(color >> 24);
     clr[5] = (u8)((color >> 16) & 0xFF);
@@ -1568,6 +1571,7 @@ void fn_800FA160(void* obj) {
     *(u32*)(&clr[0]) = *(u32*)(&clr[4]);
     fn_800DBEB4(0, &clr[0]);
 }
+#pragma peephole on
 #endif
 #pragma pop
 
@@ -2595,7 +2599,7 @@ void fn_800FE714(u32 taskId) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE7A0(void) {
 #include "src/game/gs_thread_fn_800FE7A0.inc"
 }
@@ -4814,30 +4818,27 @@ s32 fn_800F62BC(void* obj) {
 #endif
 
 /* 0x800F668C | 0x80 */
-#if 1
+#if 0
 asm s32 fn_800F668C(void* obj) {
 #include "src/game/gs_thread_fn_800F668C.inc"
 }
 #else
 #pragma optimization_level 4
 s32 fn_800F668C(void* obj) {
-    u8* p;
-    u8* ptr;
-    u32 count;
+    u8* p = (u8*)obj;
+    s32 count;
     u32 val;
 
-    p = (u8*)obj;
-    ptr = (u8*)*(u32*)(p + 0x14) + 1;
-    *(u32*)(p + 0x14) = (u32)ptr;
-    count = *(u32*)(p + 0x28);
-    val = *(u32*)ptr;
+    *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 1;
+    count = *(s32*)(p + 0x28);
+    val = *(u32*)*(u32*)(p + 0x14);
     if (count > 0x40) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
-        *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = val;
+        *(s32*)(p + 0x28) = count + 1;
+        *(u32*)((u8*)p + count * 4 + 0x6C) = val;
     }
-    *(u32*)(p + 0x14) = (u32)ptr + 4;
+    *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 4;
     return 1;
 }
 #endif
