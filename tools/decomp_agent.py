@@ -114,19 +114,26 @@ def call_ollama(prompt, model=None):
 def call_codex(prompt):
     """Send prompt to Codex CLI for processing."""
     import tempfile
-    # Write prompt to temp file
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-        f.write(prompt)
-        prompt_file = f.name
+    output_file = RESULTS_DIR / "_codex_output.txt"
 
     try:
+        # Write prompt to temp file to avoid encoding issues
+        prompt_file = RESULTS_DIR / "_codex_prompt.txt"
+        prompt_file.write_text(prompt, encoding="utf-8")
+
         result = subprocess.run(
-            [CODEX_CMD, "--quiet", "--approval-mode", "full-auto",
-             "-m", "o4-mini",
-             prompt],
+            [CODEX_CMD, "exec",
+             "--ephemeral",
+             "-o", str(output_file),
+             f"Read the file {prompt_file} and follow the instructions in it. Output ONLY the C89 function code."],
             capture_output=True, text=True, cwd=str(ROOT),
-            timeout=180
+            timeout=180,
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"}
         )
+        if output_file.exists():
+            response = output_file.read_text(encoding="utf-8", errors="replace")
+            output_file.unlink()
+            return response
         return result.stdout if result.stdout else result.stderr
     except subprocess.TimeoutExpired:
         print("Codex timed out")
@@ -134,8 +141,6 @@ def call_codex(prompt):
     except Exception as e:
         print(f"Codex error: {e}")
         return None
-    finally:
-        os.unlink(prompt_file)
 
 
 def extract_c_code(response):
@@ -169,18 +174,65 @@ def extract_c_code(response):
     return None
 
 
-def apply_result(fn_name, c_code, wrapper_info):
-    """Apply the decompiled C code to the source file, replacing the asm wrapper."""
-    c_file = ROOT / wrapper_info["file"]
-    content = c_file.read_text(encoding="utf-8", errors="replace")
-    lines = content.split("\n")
-    ln = wrapper_info["line_number"] - 1  # 0-indexed
+def normalize_c_code(c_code, fn_name):
+    """Normalize model output to project conventions."""
+    # Type replacements (stdint -> project types)
+    replacements = [
+        ("uint32_t", "u32"), ("uint16_t", "u16"), ("uint8_t", "u8"),
+        ("int32_t", "s32"), ("int16_t", "s16"), ("int8_t", "s8"),
+        ("uintptr_t", "u32"), ("intptr_t", "s32"),
+        ("size_t", "u32"), ("bool", "u32"),
+        ("NULL", "(void*)0"),  # some models use NULL without include
+    ]
+    for old, new in replacements:
+        c_code = c_code.replace(old, new)
 
-    # Find the full #if 1 ... #endif block
-    if_start = ln
+    # Remove #include lines (project headers are handled elsewhere)
+    lines = c_code.split("\n")
+    lines = [l for l in lines if not l.strip().startswith("#include")]
+
+    # Remove __attribute__ annotations
+    c_code = "\n".join(lines)
+    c_code = re.sub(r'__attribute__\s*\([^)]*\)', '', c_code)
+
+    # Fix NULL → 0 for pointer contexts (CW prefers literal 0)
+    # But keep (void*)0 → just use 0
+    c_code = c_code.replace("(void*)0", "0")
+
+    return c_code.strip()
+
+
+def find_wrapper_block(lines, fn_name, start_hint):
+    """Find the full #if 1 ... #endif block for a function.
+    Returns (if_start, endif_line, pragma_start, pragma_end) or None."""
+
+    # Search around the hint for the #if 1 line
+    search_start = max(0, start_hint - 5)
+    search_end = min(len(lines), start_hint + 5)
+
+    if_start = None
+    for i in range(search_start, search_end):
+        if lines[i].strip() == "#if 1":
+            # Verify next line contains the function name
+            if i + 1 < len(lines) and fn_name in lines[i + 1]:
+                if_start = i
+                break
+
+    if if_start is None:
+        # Broader search: find #if 1 followed by asm void fn_name
+        for i in range(max(0, start_hint - 20), min(len(lines), start_hint + 20)):
+            if lines[i].strip() == "#if 1":
+                if i + 1 < len(lines) and fn_name in lines[i + 1]:
+                    if_start = i
+                    break
+
+    if if_start is None:
+        return None
+
+    # Find matching #endif (search up to 100 lines for long #else blocks)
     endif_line = None
     depth = 0
-    for i in range(if_start, min(len(lines), if_start + 30)):
+    for i in range(if_start, min(len(lines), if_start + 100)):
         stripped = lines[i].strip()
         if stripped.startswith("#if"):
             depth += 1
@@ -191,34 +243,71 @@ def apply_result(fn_name, c_code, wrapper_info):
                 break
 
     if endif_line is None:
-        print(f"Could not find #endif for {fn_name}")
-        return False
+        return None
 
-    # Find pragma push before the #if 1
+    # Find pragma push/pop boundaries
     pragma_start = if_start
-    for i in range(if_start - 1, max(0, if_start - 6), -1):
+    for i in range(if_start - 1, max(0, if_start - 8), -1):
         stripped = lines[i].strip()
-        if stripped in ("#pragma push", "#pragma pop"):
-            break
-        if stripped.startswith("#pragma"):
+        if stripped == "#pragma push":
             pragma_start = i
+            break
+        if stripped == "#pragma pop" or not stripped.startswith("#pragma"):
+            # Hit a pop or non-pragma line, stop
+            break
+        # Accumulate pragma lines (optimization_level, optimizewithasm)
+        pragma_start = i
 
-    # Find pragma pop after #endif
     pragma_end = endif_line
     if endif_line + 1 < len(lines) and lines[endif_line + 1].strip() == "#pragma pop":
         pragma_end = endif_line + 1
 
-    # Replace the block
-    # Keep any externs that were before the #if 1
+    return (if_start, endif_line, pragma_start, pragma_end)
+
+
+def collect_existing_externs(lines, block_start):
+    """Collect extern declarations in the 10 lines before the block."""
     externs = []
-    for i in range(max(0, if_start - 10), if_start):
+    for i in range(max(0, block_start - 10), block_start):
         stripped = lines[i].strip()
-        if stripped.startswith("extern ") and stripped not in [l.strip() for l in lines[:i]]:
-            externs.append(lines[i])
+        if stripped.startswith("extern "):
+            externs.append(stripped)
+    return externs
 
-    replacement = c_code
 
-    new_lines = lines[:pragma_start] + [replacement] + lines[pragma_end + 1:]
+def apply_result(fn_name, c_code, wrapper_info):
+    """Apply the decompiled C code to the source file, replacing the asm wrapper."""
+    c_file = ROOT / wrapper_info["file"]
+    content = c_file.read_text(encoding="utf-8", errors="replace")
+    lines = content.split("\n")
+    ln = wrapper_info["line_number"] - 1  # 0-indexed
+
+    # Normalize model output
+    c_code = normalize_c_code(c_code, fn_name)
+
+    # Find the wrapper block
+    block = find_wrapper_block(lines, fn_name, ln)
+    if block is None:
+        print(f"Could not find wrapper block for {fn_name} near line {ln+1}")
+        return False
+
+    if_start, endif_line, pragma_start, pragma_end = block
+
+    # Collect existing externs (keep them, don't duplicate)
+    existing_externs = collect_existing_externs(lines, pragma_start)
+
+    # Remove extern lines from c_code if they already exist in the file
+    c_lines = c_code.split("\n")
+    filtered_lines = []
+    for cl in c_lines:
+        stripped = cl.strip()
+        if stripped.startswith("extern ") and stripped.rstrip(";") + ";" in [e.rstrip(";") + ";" for e in existing_externs]:
+            continue  # skip duplicate extern
+        filtered_lines.append(cl)
+    c_code = "\n".join(filtered_lines)
+
+    # Build replacement
+    new_lines = lines[:pragma_start] + [c_code] + lines[pragma_end + 1:]
     c_file.write_text("\n".join(new_lines), encoding="utf-8")
     return True
 

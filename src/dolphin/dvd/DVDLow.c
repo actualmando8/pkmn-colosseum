@@ -337,7 +337,7 @@ BOOL fn_800A4C80(void) {
 #endif
 
 /* fn_800A4C94 - 0x800A4C94 | size: 0x18 */
-#if 1
+#if 0
 asm void fn_800A4C94(void) {
 #include "src/dolphin/dvd/DVDLow_fn_800A4C94.inc"
 }
