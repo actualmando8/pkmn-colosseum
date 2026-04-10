@@ -747,13 +747,9 @@ void fn_8017B4BC(void) { /* TODO: match -- 232 bytes at 0x8017B4BC */ }
 #endif
 
 /* 0x8017B5A4 | 0x1C */
-#if 1
-asm void fn_8017B5A4(void) {
-#include "src/game/fsys/fsys_file_fn_8017B5A4.inc"
+u32 fn_8017B5A4(u32 val) {
+    return (val >> 9) & 0x3F;
 }
-#else
-void fn_8017B5A4(void) { /* TODO: match -- 28 bytes at 0x8017B5A4 */ }
-#endif
 
 /* 0x8017B5C0 | 0xF8 */
 extern void fn_8017BD34(void);

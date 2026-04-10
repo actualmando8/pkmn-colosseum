@@ -158,7 +158,107 @@ def release_lock(fn_name):
         lock_file.unlink()
 
 
-def generate_prompt(wrapper):
+def detect_pattern(inc_content):
+    """Detect common asm patterns to select the best few-shot example."""
+    lines = [l.strip() for l in inc_content.strip().split("\n")
+             if l.strip() and not l.strip().startswith("nofralloc")]
+
+    has_bl = any("bl " in l and "blr" not in l for l in lines)
+    has_lfs = any("lfs " in l for l in lines)
+    has_stw_sda = any(re.search(r'stw r\d+,.*\(r13\)', l) for l in lines)
+    has_lwz_sda = any(re.search(r'lwz r\d+,.*\(r13\)', l) for l in lines)
+    has_stwu = any("stwu " in l for l in lines)
+    has_lfs_r2 = any(re.search(r'lfs f\d+,.*\(r2\)', l) for l in lines)
+    has_cmplwi_0 = any("cmplwi" in l and "0x0" in l for l in lines)
+    has_clrrwi = any("clrrwi" in l for l in lines)
+    sda_loads = sum(1 for l in lines if re.search(r'lwz r\d+,.*\(r13\)', l))
+
+    # Thunk: just stwu/mflr + bl + epilogue
+    if has_stwu and has_bl and len(lines) <= 8:
+        return "thunk"
+    # Float return from sdata2
+    if has_lfs_r2 and not has_bl and len(lines) <= 4:
+        return "float_return"
+    # Conditional float getter
+    if has_cmplwi_0 and has_lfs:
+        return "conditional_float"
+    # Simple getter (load from global pointer)
+    if has_lwz_sda and not has_stw_sda and not has_bl and len(lines) <= 5:
+        return "getter"
+    # Simple setter
+    if has_stw_sda and not has_bl and len(lines) <= 5:
+        return "setter"
+    # Dual store (same value to two globals)
+    if has_stw_sda and lines.count(lines[0]) == 1 and sda_loads == 0 and len(lines) <= 5:
+        return "dual_store"
+    # Output parameters
+    if has_lwz_sda and "0x0(r3)" in inc_content and "0x0(r4)" in inc_content:
+        return "output_params"
+    # Block-scoped double load
+    if sda_loads >= 2:
+        return "double_load"
+    # Aligned arithmetic
+    if has_clrrwi:
+        return "aligned_math"
+
+    return "generic"
+
+
+PATTERN_EXAMPLES = {
+    "thunk": """## Relevant Example: Pass-Through Thunk
+ASM: stwu/mflr/bl fn_XXX/lwz/mtlr/addi/blr
+C: `extern void fn_XXX(void); void fn_YYY(void) { fn_XXX(); }`
+The prologue/epilogue is just call overhead. No pragmas needed.""",
+
+    "float_return": """## Relevant Example: sdata2 Float Return
+ASM: lfs f1, OFFSET(r2) / blr
+C: `extern f32 lbl_XXXXXXXX; f32 fn(void) { return lbl_XXXXXXXX; }`
+CRITICAL: NEVER use float literals (0.0f, 1.0f). ALWAYS use extern label.
+Compute address: SDA2_BASE(0x804836A0) + sign_extend(offset).""",
+
+    "conditional_float": """## Relevant Example: Conditional Float Getter
+ASM: cmplwi r3,0 / beq @null / lfs f1,OFFSET(r3) / blr / @null: lfs f1,OFFSET(r2) / blr
+C:
+```c
+extern f32 lbl_XXXXXXXX;
+f32 fn(u8* ptr) {
+    if (ptr != NULL) { return *(f32*)(ptr + OFFSET); }
+    return lbl_XXXXXXXX;
+}
+```""",
+
+    "getter": """## Relevant Example: Global Pointer Getter
+ASM: lwz r3, sym(r13) / lwz r3, OFFSET(r3) / blr
+C: `extern u32 sym; u32 fn(void) { return *(u32*)((u8*)sym + OFFSET); }`""",
+
+    "setter": """## Relevant Example: Global Pointer Setter
+ASM: lwz r4, sym(r13) / stw r3, OFFSET(r4) / blr
+C: `extern u32 sym; void fn(u32 val) { *(u32*)((u8*)sym + OFFSET) = val; }`""",
+
+    "output_params": """## Relevant Example: Output Parameters
+ASM: lwz r0, sym1(r13) / stw r0, 0(r3) / lwz r0, sym2(r13) / stw r0, 0(r4) / blr
+C: `void fn(u32* out1, u32* out2) { *out1 = sym1; *out2 = sym2; }`""",
+
+    "double_load": """## Relevant Example: Block-Scoped Double Global Load
+When asm loads a global from r13 TWICE (two separate lwz of same symbol),
+use separate { } blocks to prevent CW from CSE-ing them:
+```c
+void fn(u32 idx, u32 v1, u32 v2) {
+    extern u32 g;
+    u32 off = idx * SIZE;
+    { u8* p = (u8*)g + off; *(u32*)(p + 0x94) = v1; }
+    { u8* p = (u8*)g + off; *(u32*)(p + 0x98) = v2; }
+}
+```""",
+
+    "aligned_math": """## Relevant Example: Aligned Size Math
+clrrwi rD, rS, 5 = (value) & ~0x1F (align down to 32)
+addi + clrrwi = (value + 0x1F) & ~0x1F (round UP to 32)
+subf rD, rA, rB = rB - rA (note reversed operands!)""",
+}
+
+
+def generate_prompt(wrapper, retry_diff=None):
     """Generate a self-contained decomp prompt for a single function."""
     inc_path = ROOT / wrapper["inc_file"]
     if not inc_path.exists():
@@ -175,39 +275,76 @@ def generate_prompt(wrapper):
     context_end = min(len(c_lines), ln + 20)
     context = "\n".join(c_lines[context_start:context_end])
 
-    prompt = f"""You are decompiling a GameCube (PowerPC) function for Pokemon Colosseum.
-Convert the following PPC assembly into matching C89 code.
+    # Detect pattern and get relevant example
+    pattern = detect_pattern(inc_content)
+    example = PATTERN_EXAMPLES.get(pattern, "")
 
-RULES:
+    # Compute SDA addresses for any r13/r2 references
+    sda_hints = []
+    for m in re.finditer(r'(?:lwz|stw|lfs|lbz|lhz|sth|stb)\s+r\d+,\s*(-?\d+)\(r13\)', inc_content):
+        offset = int(m.group(1))
+        addr = SDA_BASE + offset
+        sda_hints.append(f"  r13 offset {offset} -> 0x{addr:08X} (look up lbl_{{:08X}} in symbols)")
+    for m in re.finditer(r'(?:lfs|lfd)\s+f\d+,\s*(-?\d+)\(r2\)', inc_content):
+        offset = int(m.group(1))
+        addr = SDA2_BASE + offset
+        sda_hints.append(f"  r2 offset {offset} -> 0x{addr:08X} (sdata2 float, use extern f32 lbl_{{:08X}})")
+    sda_section = "\n".join(sda_hints) if sda_hints else "  (none)"
+
+    # Build retry section if this is a second attempt
+    retry_section = ""
+    if retry_diff:
+        retry_section = f"""
+PREVIOUS ATTEMPT FAILED. Here is the instruction diff (LEFT=target, RIGHT=yours):
+```
+{retry_diff}
+```
+Fix the mismatches. Common fixes:
+- Wrong register → reorder declarations or change variable types
+- Extra li instructions → remove unnecessary pragmas, let O4 CSE
+- lis/addi vs SDA → change extern u8[] to extern u32 scalar
+- Wrong stack frame → try different #pragma optimization_level or compiler version
+"""
+
+    prompt = f"""You are decompiling a GameCube (PowerPC) function for Pokemon Colosseum.
+Convert the following PPC assembly into byte-matching C89 code.
+
+CRITICAL RULES:
 - C89 only: ALL declarations before statements in each block
-- Use block scoping {{ }} when the asm loads a global twice
-- Do NOT use float literals (0.0f) for sdata2 returns — use extern f32 lbl_XXXXXXXX
-- extern labels for sdata globals: compute from SDA_BASE=0x80480820 (r13) or SDA2_BASE=0x804836A0 (r2)
-- Signed 16-bit offset: if raw >= 0x8000, offset = raw - 0x10000
-- Look up symbol names in the surrounding context or use lbl_XXXXXXXX format
-- The function must compile with: mwcceppc -O4,p -proc gekko -fp hard -enum int
-- Output ONLY the C function replacement (no asm wrapper, no #if blocks)
+- Use block scoping {{ }} when the asm loads the SAME global from r13 twice
+- NEVER use float literals (0.0f) for sdata2 returns — use `extern f32 lbl_XXXXXXXX;`
+- SDA_BASE = 0x80480820 (r13), SDA2_BASE = 0x804836A0 (r2)
+- Signed 16-bit offset: if raw >= 0x8000, subtract 0x10000
+- Leaf functions (nofralloc, no bl) should NOT have pragmas — use default O4
+- Thunks (stwu/mflr/bl/epilogue) are just: `extern void target(); void fn() {{ target(); }}`
+- `subf rD, rA, rB` means rD = rB - rA (reversed!)
+- `clrrwi rD, rS, N` means rD = rS & ~((1<<N)-1)
+- `extrwi rD, rS, n, b` extracts n bits starting at bit b
+- Output ONLY the C function + needed externs. No asm, no #if blocks, no explanation.
+
+{example}
 
 FUNCTION: {wrapper['function']}
 FILE: {wrapper['file']}
-SIZE: {wrapper['asm_lines']} asm instructions
+DETECTED PATTERN: {pattern}
 
 ASSEMBLY ({wrapper['inc_file']}):
 ```
 {inc_content}
 ```
 
+SDA ADDRESS HINTS:
+{sda_section}
+
 SURROUNDING C CONTEXT:
 ```c
 {context}
 ```
 
-PRAGMAS IN EFFECT: {', '.join(wrapper['pragmas']) if wrapper['pragmas'] else 'default (none)'}
-
-Write the C89 replacement function. Include any needed extern declarations.
-Remember: leaf functions (nofralloc, no bl calls) should NOT have pragmas — use default O4.
-Functions with stwu/mflr prologue that just call one function are simple thunks: void fn(void) {{ other_fn(); }}
-"""
+PRAGMAS ON WRAPPER: {', '.join(wrapper['pragmas']) if wrapper['pragmas'] else 'default (none)'}
+NOTE: Wrapper pragmas are often WRONG for the C replacement. Most leaf functions match at default O4.
+{retry_section}
+Write the matching C89 function."""
     return prompt
 
 

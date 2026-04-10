@@ -1179,17 +1179,11 @@ asm void fn_80162464(void) {
 u8 fn_80162464(void) { return lbl_8047B050; }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8016246C(void) {
-#include "src/game/people/people_field_fn_8016246C.inc"
+extern u32 lbl_8047B024;
+u32 fn_8016246C(u32 index) {
+    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
+    return *(u8*)(elem + 0xEC) != 0;
 }
-#else
-void fn_8016246C(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

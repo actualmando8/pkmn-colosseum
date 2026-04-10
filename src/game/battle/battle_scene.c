@@ -425,15 +425,12 @@ s32 fn_801D0080(void);
 void fn_801D0090(s32 phase);
 void fn_801D0AA0(s32 seqID);
 void fn_801D0AFC(s32 seqID);
-#if 1
-asm void fn_801C673C(void) {
-#include "src/game/battle/battle_scene_fn_801C673C.inc"
-}
-#else
+extern void fn_800D9ED8(u32);
+#pragma peephole off
 void fn_801C673C(void) {
-    /* Reset camera to default battle view */
+    fn_800D9ED8(0);
 }
-#endif
+#pragma peephole on
 
 /**
  * fn_801C6760 - Camera shake effect.

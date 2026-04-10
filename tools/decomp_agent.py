@@ -30,7 +30,7 @@ RESULTS_DIR = WORK_DIR / "results"
 
 OLLAMA_HOST = "10.0.0.3"
 OLLAMA_PORT = 11434
-OLLAMA_MODEL = "qwen2.5-coder:7b"
+OLLAMA_MODEL = "qwen2.5-coder:32b"  # 7b too small, copies asm literally
 
 CODEX_CMD = "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
 
@@ -249,8 +249,39 @@ def verify_function(fn_name, c_file_path):
         return f"partial_{pct:.0f}", output
 
 
-def process_function(fn_name, backend="ollama"):
-    """Process a single function: generate prompt, call model, apply, verify."""
+def get_instruction_diff(fn_name, obj_path):
+    """Get human-readable instruction diff via objdiff."""
+    diff_file = RESULTS_DIR / f"{fn_name}_diff.json"
+    try:
+        subprocess.run([
+            str(ROOT / "tools" / "objdiff-cli.exe"), "diff",
+            "-1", str(ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"),
+            "-2", str(ROOT / "build" / "GC6E01" / "base" / obj_path),
+            "-o", str(diff_file), "--format", "json", fn_name
+        ], capture_output=True, timeout=30, cwd=str(ROOT))
+
+        data = json.loads(diff_file.read_text())
+        lines = []
+        for side_name in ["left", "right"]:
+            side = data.get(side_name, {})
+            for sym in side.get("symbols", []):
+                if sym.get("name") == fn_name:
+                    label = "TARGET" if side_name == "left" else "YOURS"
+                    lines.append(f"=== {label} ===")
+                    for i, e in enumerate(sym.get("instructions", [])):
+                        inst = e.get("instruction", {})
+                        dk = e.get("diff_kind", "")
+                        fmt = inst.get("formatted", "")
+                        marker = "!!" if dk and dk != "NONE" else "  "
+                        lines.append(f"  {i:3d} {marker} {fmt}")
+                    break
+        return "\n".join(lines)
+    except Exception as e:
+        return f"(diff unavailable: {e})"
+
+
+def process_function(fn_name, backend="ollama", max_retries=3):
+    """Process a single function with retry-on-failure and diff feedback."""
     ensure_dirs()
     queue = load_queue()
 
@@ -270,91 +301,102 @@ def process_function(fn_name, backend="ollama"):
 
     print(f"\n{'='*50}")
     print(f"Processing: {fn_name} ({wrapper['asm_lines']} lines, {wrapper['tier']})")
-    print(f"Backend: {backend}")
+    print(f"Backend: {backend}, max retries: {max_retries}")
     print(f"{'='*50}")
 
-    # Generate prompt
-    from decomp_scheduler import generate_prompt
-    prompt = generate_prompt(wrapper)
-    if not prompt:
-        print(f"Could not generate prompt for {fn_name}")
-        release_lock(fn_name)
-        return False
-
-    # Save prompt
-    (PROMPTS_DIR / f"{fn_name}.txt").write_text(prompt)
-
-    # Call model
-    print(f"Calling {backend}...")
-    if backend == "ollama":
-        response = call_ollama(prompt)
-    elif backend == "codex":
-        response = call_codex(prompt)
-    else:
-        print(f"Unknown backend: {backend}")
-        release_lock(fn_name)
-        return False
-
-    if not response:
-        print(f"No response from {backend}")
-        release_lock(fn_name)
-        return False
-
-    # Save raw response
-    (RESULTS_DIR / f"{fn_name}_response.txt").write_text(response)
-
-    # Extract C code
-    c_code = extract_c_code(response)
-    if not c_code:
-        print(f"Could not extract C code from response")
-        release_lock(fn_name)
-        return False
-
-    (RESULTS_DIR / f"{fn_name}_code.c").write_text(c_code)
-    print(f"Extracted C code ({len(c_code)} chars)")
-
-    # Back up original file
+    # Back up original file ONCE
     c_file = ROOT / wrapper["file"]
     backup = RESULTS_DIR / f"{fn_name}_backup.c"
     backup.write_text(c_file.read_text(encoding="utf-8", errors="replace"))
 
-    # Apply
-    print(f"Applying to {wrapper['file']}...")
-    if not apply_result(fn_name, c_code, wrapper):
-        print("Failed to apply result")
-        # Restore backup
+    from decomp_scheduler import generate_prompt
+
+    retry_diff = None
+    best_status = "none"
+
+    for attempt in range(1, max_retries + 1):
+        print(f"\n--- Attempt {attempt}/{max_retries} ---")
+
+        # Restore from backup before each attempt
         c_file.write_text(backup.read_text())
-        release_lock(fn_name)
-        return False
 
-    # Verify
-    print("Verifying...")
-    status, output = verify_function(fn_name, wrapper["file"])
+        # Generate prompt (with diff feedback on retries)
+        prompt = generate_prompt(wrapper, retry_diff=retry_diff)
+        if not prompt:
+            print(f"Could not generate prompt for {fn_name}")
+            break
 
-    if status == "match":
-        print(f"\n*** {fn_name} MATCHED 100%! ***")
-        progress = load_progress()
-        if fn_name not in progress["completed"]:
-            progress["completed"].append(fn_name)
-        save_progress(progress)
-        release_lock(fn_name)
-        return True
-    else:
-        print(f"\n{fn_name}: {status}")
-        print("Reverting to backup...")
-        c_file.write_text(backup.read_text())
-        release_lock(fn_name)
+        (PROMPTS_DIR / f"{fn_name}_attempt{attempt}.txt").write_text(prompt, encoding="utf-8")
 
-        # Save failure info
-        progress = load_progress()
-        progress["failed"].append({
-            "function": fn_name,
-            "status": status,
-            "backend": backend,
-            "time": time.time(),
-        })
-        save_progress(progress)
-        return False
+        # Call model
+        print(f"Calling {backend}...")
+        if backend == "ollama":
+            response = call_ollama(prompt)
+        elif backend == "codex":
+            response = call_codex(prompt)
+        else:
+            print(f"Unknown backend: {backend}")
+            break
+
+        if not response:
+            print(f"No response from {backend}")
+            continue
+
+        (RESULTS_DIR / f"{fn_name}_response_{attempt}.txt").write_text(response, encoding="utf-8")
+
+        # Extract C code
+        c_code = extract_c_code(response)
+        if not c_code:
+            print(f"Could not extract C code from response")
+            continue
+
+        (RESULTS_DIR / f"{fn_name}_code_{attempt}.c").write_text(c_code, encoding="utf-8")
+        print(f"Extracted C code ({len(c_code)} chars)")
+
+        # Apply
+        c_file.write_text(backup.read_text())  # fresh restore
+        if not apply_result(fn_name, c_code, wrapper):
+            print("Failed to apply result")
+            continue
+
+        # Verify
+        print("Verifying...")
+        status, output = verify_function(fn_name, wrapper["file"])
+
+        if status == "match":
+            print(f"\n*** {fn_name} MATCHED 100% on attempt {attempt}! ***")
+            progress = load_progress()
+            if fn_name not in progress["completed"]:
+                progress["completed"].append(fn_name)
+            save_progress(progress)
+            release_lock(fn_name)
+            return True
+
+        print(f"Attempt {attempt}: {status}")
+        best_status = status
+
+        # Get diff for retry feedback
+        obj_rel = wrapper["file"].replace("src/", "").replace(".c", ".o")
+        retry_diff = get_instruction_diff(fn_name, obj_rel)
+        if retry_diff:
+            (RESULTS_DIR / f"{fn_name}_diff_{attempt}.txt").write_text(retry_diff, encoding="utf-8")
+            print(f"Got instruction diff for retry feedback")
+
+    # All retries exhausted
+    print(f"\n{fn_name}: best result was {best_status} after {max_retries} attempts")
+    print("Reverting to backup...")
+    c_file.write_text(backup.read_text())
+    release_lock(fn_name)
+
+    progress = load_progress()
+    progress["failed"].append({
+        "function": fn_name,
+        "status": best_status,
+        "backend": backend,
+        "time": time.time(),
+    })
+    save_progress(progress)
+    return False
 
 
 def cmd_run(args):
