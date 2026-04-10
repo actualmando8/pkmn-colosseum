@@ -480,24 +480,14 @@ void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
 
 /* 0x80191E38 | 0x50 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 extern void fn_801AFEFC(void* robj, f32 frame);
 extern void fn_801C29C4(void* aobj, f32 frame);
-#if 1
-asm void fn_80191E38(void) {
-#include "src/hsd/hsd_wobj_fn_80191E38.inc"
-}
-#else
-#pragma optimization_level 4
 void fn_80191E38(HSD_WObj* wobj, f32 frame) {
     if (wobj != NULL) {
         fn_801C29C4(wobj->aobj, frame);
         fn_801AFEFC(wobj->robj, frame);
     }
 }
-#endif
-#pragma pop
 
 /* 0x80191E88 | 0x44 */
 #pragma push
