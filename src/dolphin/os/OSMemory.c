@@ -40,13 +40,14 @@ void __OSModuleInit(void) {
 }
 
 extern void OSInitThreadQueue();
-#if 1
-asm void fn_8009F1D0(void) {
-#include "src/dolphin/os/OSMemory_fn_8009F1D0.inc"
+void fn_8009F1D0(u8* ptr, u32 val1, u32 val2) {
+    OSInitThreadQueue(ptr);
+    OSInitThreadQueue(ptr + 0x8);
+    *(u32*)(ptr + 0x10) = val1;
+    *(u32*)(ptr + 0x14) = val2;
+    *(u32*)(ptr + 0x18) = 0;
+    *(u32*)(ptr + 0x1C) = 0;
 }
-#else
-void fn_8009F1D0(void) { /* TODO */ }
-#endif
 
 static void MEMIntrruptHandler(s16 interrupt, OSContext* context) {
     volatile u16* mi = (volatile u16*)0xCC004000;

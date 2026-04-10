@@ -992,12 +992,18 @@ extern u32 lbl_80478BF0;
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162070(void) {
 #include "src/game/people/people_field_fn_80162070.inc"
 }
 #else
-void fn_80162070(void) { /* TODO */ }
+u32 fn_80162070(void) {
+    u32 temp;
+
+    temp = lbl_80478BF0 * 0xA8351D63;
+    lbl_80478BF0 = temp;
+    return (temp >> 10) & 0xFFFF;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1334,17 +1340,15 @@ void fn_801628C8(u32 index) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_80162904(void) {
-#include "src/game/people/people_field_fn_80162904.inc"
+extern u32 lbl_8047B024;
+extern u8 lbl_8047B050;
+void fn_80162904(u32 index) {
+    u32* p;
+    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
+    elem += (u32)lbl_8047B050 << 2;
+    p = (u32*)(elem + 0x24);
+    *p |= 0x40;
 }
-#else
-void fn_80162904(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -1681,17 +1685,16 @@ asm void fn_801631C0(void) {
 void fn_801631C0(void) { lbl_8047B014 = 0; }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_801631CC(void) {
-#include "src/game/people/people_field_fn_801631CC.inc"
+extern u32 lbl_8047B024;
+
+u32 fn_801631CC(u32 index) {
+    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
+    if (*(u8*)(elem + 0xEC) == 0) {
+        return -1;
+    } else {
+        return *(u32*)(elem + 0xE8);
+    }
 }
-#else
-void fn_801631CC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 2
 #if 0
@@ -1732,12 +1735,18 @@ void fn_801632B4(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern u8 lbl_8044FB90[];
-#if 1
+#if 0
 asm void fn_80163490(void) {
 #include "src/game/people/people_field_fn_80163490.inc"
 }
 #else
-void fn_80163490(void) { /* TODO */ }
+void fn_80163490(void) {
+    u8* ptr;
+
+    ptr = lbl_8044FB90;
+    while (ptr[0x281] != 0) {
+    }
+}
 #endif
 #pragma pop
 #pragma push
