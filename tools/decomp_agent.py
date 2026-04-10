@@ -30,7 +30,9 @@ RESULTS_DIR = WORK_DIR / "results"
 
 OLLAMA_HOST = "10.0.0.3"
 OLLAMA_PORT = 11434
-OLLAMA_MODEL = "qwen2.5-coder:14b"
+OLLAMA_MODEL = "qwen2.5-coder:7b"
+
+CODEX_CMD = "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
 
 
 def ensure_dirs():
@@ -107,6 +109,33 @@ def call_ollama(prompt, model=None):
     except Exception as e:
         print(f"Ollama error: {e}")
         return None
+
+
+def call_codex(prompt):
+    """Send prompt to Codex CLI for processing."""
+    import tempfile
+    # Write prompt to temp file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        f.write(prompt)
+        prompt_file = f.name
+
+    try:
+        result = subprocess.run(
+            [CODEX_CMD, "--quiet", "--approval-mode", "full-auto",
+             "-m", "o4-mini",
+             prompt],
+            capture_output=True, text=True, cwd=str(ROOT),
+            timeout=180
+        )
+        return result.stdout if result.stdout else result.stderr
+    except subprocess.TimeoutExpired:
+        print("Codex timed out")
+        return None
+    except Exception as e:
+        print(f"Codex error: {e}")
+        return None
+    finally:
+        os.unlink(prompt_file)
 
 
 def extract_c_code(response):
@@ -259,6 +288,8 @@ def process_function(fn_name, backend="ollama"):
     print(f"Calling {backend}...")
     if backend == "ollama":
         response = call_ollama(prompt)
+    elif backend == "codex":
+        response = call_codex(prompt)
     else:
         print(f"Unknown backend: {backend}")
         release_lock(fn_name)
@@ -363,7 +394,7 @@ def cmd_run(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Decomp Agent Runner")
-    parser.add_argument("--backend", choices=["ollama", "opencode"],
+    parser.add_argument("--backend", choices=["ollama", "codex", "opencode"],
                        default="ollama", help="Model backend")
     parser.add_argument("--function", metavar="FN", help="Process a specific function")
     parser.add_argument("--tier", choices=["simple", "medium", "complex", "hard"],

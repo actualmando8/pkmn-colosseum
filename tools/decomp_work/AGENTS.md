@@ -54,9 +54,9 @@ Co-Authored-By: <agent name>
 
 | Tier | ASM Lines | Route To |
 |------|-----------|----------|
-| simple | 2-10 | Ollama (qwen2.5-coder:7b) or OpenCode free models |
-| medium | 11-30 | Ollama or Claude |
-| complex | 31-80 | Claude only |
+| simple | 2-10 | Ollama (qwen2.5-coder:7b), Codex (o4-mini), or OpenCode free models |
+| medium | 11-30 | Codex (o4-mini), Ollama, or Claude |
+| complex | 31-80 | Codex or Claude |
 | hard | 80+ | Claude only |
 
 ## Key Techniques Reference
