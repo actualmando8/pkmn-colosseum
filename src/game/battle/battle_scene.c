@@ -1455,15 +1455,12 @@ void fn_801D0314(s32 arg0) {
  * fn_801D036C - Scene transition helper B.
  * Address: 0x801D036C | Size: 0x30
  */
-#if 1
-asm void fn_801D036C(void) {
-#include "src/game/battle/battle_scene_fn_801D036C.inc"
-}
-#else
+extern void fn_800E2C04();
+extern void fn_800E27B0(void);
 void fn_801D036C(void) {
-    /* Transition helper B */
+    fn_800E2C04(0x20000 - 0x2030, 0x20);
+    fn_800E27B0();
 }
-#endif
 
 /**
  * fn_801D039C - Scene model pool update.

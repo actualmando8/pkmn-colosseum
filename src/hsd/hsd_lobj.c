@@ -270,23 +270,16 @@ void fn_801A4440(void) {}
 
 /* 0x801A48B0 | 0x44 */
 extern void fn_80191688();
-#if 1
-asm void fn_801A48B0(void) {
-#include "src/hsd/hsd_lobj_fn_801A48B0.inc"
-}
-#else
-#pragma optimization_level 4
 /* HSD_LObjGetInterestPosition */
 s32 fn_801A48B0(HSD_LObj* lobj) {
     if (lobj != NULL) {
-        if (lobj->interest != NULL) {
-            fn_80191688(lobj->interest);
+        if (*(u32*)((u8*)lobj + 0x1C) != 0) {
+            fn_80191688(*(void**)((u8*)lobj + 0x1C));
             return 1;
         }
     }
     return 0;
 }
-#endif
 
 /* 0x801A48F4 | 0x88 */
 extern void* fn_80191628();
