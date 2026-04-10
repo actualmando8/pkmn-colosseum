@@ -705,17 +705,10 @@ u32 fn_8017D408(void) { return 1; }
 
 /* WP-0054: restored asm wrappers */
 extern void fn_80167E34(void);
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8017B1AC(void) {
-#include "src/game/gs_scene_fn_8017B1AC.inc"
+extern void fn_80167E34(void);
+void fn_8017B1AC(void) {
+    fn_80167E34();
 }
-#else
-void fn_8017B1AC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

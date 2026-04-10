@@ -1174,28 +1174,19 @@ u32 fn_8018F4AC(void* p) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8018F5B4(void) {
-#include "src/game/people/people_fn_8018F5B4.inc"
+extern f32 lbl_8047D8A8;
+f32 fn_8018F5B4(u8* ptr) {
+    if (ptr != NULL) {
+        return *(f32*)(ptr + 0x14);
+    }
+    return lbl_8047D8A8;
 }
-#else
-void fn_8018F5B4(void) { /* TODO */ }
-#endif
-#pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8018F5CC(void) {
-#include "src/game/people/people_fn_8018F5CC.inc"
+f32 fn_8018F5CC(u8* ptr) {
+    if (ptr != NULL) {
+        return *(f32*)(ptr + 0x10);
+    }
+    return lbl_8047D8A8;
 }
-#else
-void fn_8018F5CC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

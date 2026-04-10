@@ -469,15 +469,10 @@ u8 fn_801C68D4(void) {
  * fn_801C6908 - Camera clear shake.
  * Address: 0x801C6908 | Size: 0x20
  */
-#if 1
-asm void fn_801C6908(void) {
-#include "src/game/battle/battle_scene_fn_801C6908.inc"
-}
-#else
+extern void fn_800E0C04(void);
 void fn_801C6908(void) {
-    /* Clear camera shake state */
+    fn_800E0C04();
 }
-#endif
 
 /**
  * fn_801C6928 - Camera get mode flags.
@@ -841,15 +836,10 @@ void fn_801CA5C4(s32 effectID, f32 x, f32 y, f32 z) {
  * fn_801CA708 - Scene effect clear all.
  * Address: 0x801CA708 | Size: 0x20
  */
-#if 1
-asm void fn_801CA708(void) {
-#include "src/game/battle/battle_scene_fn_801CA708.inc"
-}
-#else
+extern void fn_8025D164(void);
 void fn_801CA708(void) {
-    /* Clear all active scene effects */
+    fn_8025D164();
 }
-#endif
 
 /**
  * fn_801CA728 - Scene effect render pass.
@@ -877,15 +867,10 @@ u32 fn_801CA7AC(void) {
  * fn_801CA7CC - Scene increment render frame.
  * Address: 0x801CA7CC | Size: 0x20
  */
-#if 1
-asm void fn_801CA7CC(void) {
-#include "src/game/battle/battle_scene_fn_801CA7CC.inc"
-}
-#else
+extern void fn_8006ADEC(void);
 void fn_801CA7CC(void) {
-    /* Increment render frame counter */
+    fn_8006ADEC();
 }
-#endif
 
 /**
  * fn_801CA7EC - Scene render layer configuration.

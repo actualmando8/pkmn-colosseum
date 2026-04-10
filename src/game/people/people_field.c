@@ -1065,7 +1065,7 @@ extern void fn_801634A8(void);
 extern void fn_80163794(void);
 extern void fn_801637B8(u8* ptr, u32 size);
 extern void fn_80163810(void);
-extern void fn_80163BCC(void);
+extern void fn_80163BCC(u8* a, u32 b);
 extern void fn_80163BE4(void);
 extern void fn_80163CA8(void);
 extern void fn_80163DB0(void);
@@ -1668,20 +1668,14 @@ asm void fn_801631A8(void) {
 void fn_801631A8(void) {}
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 extern u32 lbl_8047B054;
 extern u32 lbl_8047B058;
 extern u32 lbl_8047B014;
-#if 1
-asm void fn_801631AC(void) {
-#include "src/game/people/people_field_fn_801631AC.inc"
+#pragma push
+void fn_801631AC(u32* src) {
+    lbl_8047B054 = src[0];
+    lbl_8047B058 = src[1];
 }
-#else
-void fn_801631AC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -1817,18 +1811,10 @@ asm void fn_80163810(void) {
 void fn_80163810(void) { /* TODO */ }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 extern u32 lbl_8047B078;
-#if 1
-asm void fn_80163BCC(void) {
-#include "src/game/people/people_field_fn_80163BCC.inc"
+void fn_80163BCC(u8* unused, u32 size) {
+    lbl_8047B078 -= (size + 0x1F) & ~0x1F;
 }
-#else
-void fn_80163BCC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
