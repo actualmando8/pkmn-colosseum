@@ -361,11 +361,6 @@ void fn_801A4A48(HSD_LObj* lobj, u32* color) {
 
 /* 0x801A4A54 | 0x70 */
 extern void jumptable_8036CA64();
-#if 1
-asm void fn_801A4A54(void) {
-#include "src/hsd/hsd_lobj_fn_801A4A54.inc"
-}
-#else
 /* GXLightIndex to GXLightID bitmask */
 u32 fn_801A4A54(u32 idx) {
     if (idx > 8) return 0;
@@ -382,7 +377,6 @@ u32 fn_801A4A54(u32 idx) {
     }
     return 0;
 }
-#endif
 
 /* 0x801A4AC4 | 0x3C */
 extern u32 lbl_8047B2B4;
