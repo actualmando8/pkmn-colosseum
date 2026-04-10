@@ -30,7 +30,7 @@ RESULTS_DIR = WORK_DIR / "results"
 
 OLLAMA_HOST = "10.0.0.3"
 OLLAMA_PORT = 11434
-OLLAMA_MODEL = "deepseek-coder-v2:16b"  # Best benchmark score, 14s/fn avg
+OLLAMA_MODEL = "codestral:22b"  # Best benchmark: 100% structural, 5.4s/fn
 
 CODEX_CMD = "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
 

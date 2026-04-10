@@ -1,0 +1,141 @@
+{
+  "model": "codestral:22b",
+  "timestamp": 1775812834.0342484,
+  "total_time": 70.3,
+  "results": [
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D3094",
+      "time": 44.8,
+      "response": " ```c\nextern u32 lbl_8047AA80;\nu32 fn_800D3094(void) {\n    return *(u32*)((u8*)lbl_8047AA80 + 0x4C);\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D30A0",
+      "time": 1.6,
+      "response": " ```c\nextern u32 lbl_8047AA80;\nvoid fn_800D30A0(u32 val) {\n    *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_801AE000",
+      "time": 1.4,
+      "response": " ```c\n#include <ultra64.h>\n\nextern f32 lbl_8047DD60;\nf32 fn_801AE000(void) {\n    return lbl_8047DD60;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_80163F88",
+      "time": 2.0,
+      "response": " ```c\nextern u32 lbl_8047B098;\nextern u32 lbl_8047B088;\nvoid fn_80163F88(void) {\n    lbl_8047B098 = 1;\n    lbl_8047B088 = 1;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800140FC",
+      "time": 2.3,
+      "response": " ```c\nextern u32 lbl_8047A2F8;\nextern u32 lbl_8047A2F4;\nvoid fn_800140FC(u32* out1, u32* out2) {\n    *out1 = lbl_8047A2F8;\n    *out2 = lbl_8047A2F4;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800F75FC",
+      "time": 2.3,
+      "response": " ```c\n#include <stdint.h>\n\nextern uint32_t lbl_80478B00;  // Assuming this is a global variable based on the context provided\n\nvoid fn_800F75FC(uint32_t value) {\n    *(volatile uint32_t*)((uint8_t*)lbl_80478B00 + 0x10) = value;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C6908",
+      "time": 1.2,
+      "response": " ```c\nextern void fn_800E0C04(void);\nvoid fn_801C6908(void) {\n    fn_800E0C04();\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C673C",
+      "time": 1.3,
+      "response": " ```c\nextern void fn_800D9ED8(u32);\nvoid fn_801C673C(void) {\n    fn_800D9ED8(0);\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5B4",
+      "time": 2.0,
+      "response": " ```c\nextern f32 lbl_8047D8A8;\nf32 fn_8018F5B4(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x14);\n    }\n    return lbl_8047D8A8;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5CC",
+      "time": 2.0,
+      "response": " ```c\nextern f32 lbl_8047D8A8;\nf32 fn_8018F5CC(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x10);\n    }\n    return lbl_8047D8A8;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_block_scope": false,
+      "function": "fn_80162858",
+      "time": 5.6,
+      "response": " Here is the C89 replacement function for the given PowerPC assembly:\n\n```c\n#include <stdint.h>\n\nextern uint32_t lbl_8047B024;\n\nvoid fn_80162858(uint32_t index, uint32_t val1, uint32_t val2) {\n    uint32_t offset = index * 0xF4;\n    uint8_t* elem = (uint8_t*)lbl_8047B024 + offset;\n    *(uint32_t*)(elem + 0x94) = val1;\n    *(uint32_t*)(elem + 0x98) = val2;\n}\n```\n\nThis function takes three parameters: `index`, `val1`, and `val2`. It calculates an offset by multiplying the index with 0xF4. Then, it",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_80163BCC",
+      "time": 2.5,
+      "response": " ```c\n#include <stdint.h>\n\nextern int32_t lbl_8047B078;\n\nvoid fn_80163BCC(uint8_t* a, uint32_t b) {\n    int32_t temp = (b + 0x1F) & ~((1<<5)-1);\n    lbl_8047B078 -= temp;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_8017B1AC",
+      "time": 1.4,
+      "response": " ```c\nextern void fn_80167E34(void);\nvoid fn_8017B1AC(void) {\n    fn_80167E34();\n}\n```",
+      "status": "PASS"
+    }
+  ]
+}

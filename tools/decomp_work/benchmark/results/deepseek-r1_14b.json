@@ -1,0 +1,140 @@
+{
+  "model": "deepseek-r1:14b",
+  "timestamp": 1775812639.4661922,
+  "total_time": 232.1,
+  "results": [
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D3094",
+      "time": 34.8,
+      "response": "```c\nextern u32 lbl_8047AA80;\nu32 fn_800D3094(void) {\n    return *(u32*)((u8*)lbl_8047AA80 + 0x4C);\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D30A0",
+      "time": 9.2,
+      "response": "extern u32 lbl_8047AA80;\nvoid fn_800D30A0(u32 val) {\n    *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;\n}",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_801AE000",
+      "time": 5.1,
+      "response": "```c\nextern f32 lbl_8047DD60;\nf32 fn_801AE000(void) {\n    return lbl_8047DD60;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_80163F88",
+      "time": 6.5,
+      "response": "```c\nextern u32 lbl_8047B098;\nextern u32 lbl_8047B088;\n\nvoid fn_80163F88(void) {\n    lbl_8047B098 = 1;\n    lbl_8047B088 = 1;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800140FC",
+      "time": 9.8,
+      "response": "```\nextern u32 lbl_8047A2F8;\nextern u32 lbl_8047A2F4;\n\nvoid fn_800140FC(u32* out1, u32* out2) {\n    *out1 = lbl_8047A2F8;\n    *out2 = lbl_8047A2F4;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": false,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": false,
+      "function": "fn_800F75FC",
+      "time": 29.2,
+      "response": "",
+      "status": "FAIL"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C6908",
+      "time": 9.2,
+      "response": "```c\nextern void fn_800E0C04(void);\nvoid fn_801C6908(void) {\n    fn_800E0C04();\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C673C",
+      "time": 10.3,
+      "response": "extern void fn_800D9ED8(u32);\nvoid fn_801C673C(void) {\n    fn_800D9ED8(0);\n}",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5B4",
+      "time": 19.1,
+      "response": "extern f32 lbl_8047D8A8;\nf32 fn_8018F5B4(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x14);\n    }\n    return lbl_8047D8A8;\n}",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5CC",
+      "time": 31.1,
+      "response": "```\nextern f32 lbl_8047D8A8;\nf32 fn_8018F5CC(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x10);\n    }\n    return lbl_8047D8A8;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": false,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": false,
+      "function": "fn_80162858",
+      "time": 29.7,
+      "response": "",
+      "status": "FAIL"
+    },
+    {
+      "extracted": false,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": false,
+      "function": "fn_80163BCC",
+      "time": 29.4,
+      "response": "",
+      "status": "FAIL"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_8017B1AC",
+      "time": 8.8,
+      "response": "```c\nextern void fn_80167E34(void);\nvoid fn_8017B1AC(void) {\n    fn_80167E34();\n}\n```",
+      "status": "PASS"
+    }
+  ]
+}
