@@ -1113,10 +1113,16 @@ void fn_8017E09C(void) { /* TODO: match -- 316 bytes at 0x8017E09C */ }
 /* WP-0010 stubs */
 
 /* 0x8017F25C | 0x68 */
-#if 1
-asm void fn_8017F25C(void) {
-#include "src/game/fsys/fsys_file_fn_8017F25C.inc"
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+void fn_8017F25C(s32 param1, u8* param2) {
+    u32 enabled = OSDisableInterrupts();
+    if (param1 == 1) {
+        *(u32*)(param2 + 0x48) = 0xA2;
+    } else {
+        *(u32*)(param2 + 0x48) = 0x98;
+    }
+    OSRestoreInterrupts(enabled);
 }
-#else
-void fn_8017F25C(void) { /* TODO: match -- 104 bytes at 0x8017F25C */ }
-#endif
+#pragma pop
