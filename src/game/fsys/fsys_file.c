@@ -893,20 +893,25 @@ void fn_8017C6E0(void) { /* TODO: match -- 428 bytes at 0x8017C6E0 */ }
 
 /* 0x8017C894 | 0x2C */
 extern void fn_8017D8F8();
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
 s32 fn_8017C894(u32 arg) {
     fn_8017D8F8(arg);
     return 0;
 }
+#pragma pop
 
 /* 0x8017C8C8 | 0x2C */
 extern void fn_8017D92C();
-#if 1
-asm void fn_8017C8C8(void) {
-#include "src/game/fsys/fsys_file_fn_8017C8C8.inc"
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+s32 fn_8017C8C8(u32 arg) {
+    fn_8017D92C(arg);
+    return 0;
 }
-#else
-void fn_8017C8C8(void) { /* TODO: match -- 44 bytes at 0x8017C8C8 */ }
-#endif
+#pragma pop
 
 /* 0x8017C8FC | 0x580 */
 extern void fn_80179FA4(void);
@@ -964,14 +969,15 @@ u32 fn_8017D3A0(FSYSSlot* slot) {
 #endif
 
 /* 0x8017D3D4 | 0x2C */
-extern void fn_8017DB74(void);
-#if 1
-asm void fn_8017D3D4(void) {
-#include "src/game/fsys/fsys_file_fn_8017D3D4.inc"
+extern void fn_8017DB74();
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+s32 fn_8017D3D4(u32 arg) {
+    fn_8017DB74(arg);
+    return 0;
 }
-#else
-void fn_8017D3D4(void) { /* TODO: match -- 44 bytes at 0x8017D3D4 */ }
-#endif
+#pragma pop
 
 /* 0x8017D624 | 0x68 */
 extern u32 lbl_8047B1B8;
