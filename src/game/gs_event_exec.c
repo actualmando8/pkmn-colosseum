@@ -319,13 +319,11 @@ void fn_80014118(void) { /* TODO */ }
 
 /* fn_80014198 - 0x80014198 | size: 0x24 */
 extern u32 lbl_8047A2EC;
-#if 1
-asm void fn_80014198(void) {
-#include "src/game/gs_event_exec_fn_80014198.inc"
+extern void fn_8001B184(void);
+void fn_80014198(u32 val) {
+    lbl_8047A2EC = val;
+    fn_8001B184();
 }
-#else
-void fn_80014198(void) { /* TODO */ }
-#endif
 
 /* fn_800141BC - 0x800141BC | size: 0x78 */
 extern void fn_8001BD3C(void);
@@ -371,13 +369,13 @@ void fn_80014398(void) { /* TODO */ }
 #endif
 
 /* fn_80014550 - 0x80014550 | size: 0x24 */
-#if 1
-asm void fn_80014550(void) {
-#include "src/game/gs_event_exec_fn_80014550.inc"
+s32 fn_80014550(u8* src_struct, u8* dst) {
+    u8* src = *(u8**)(src_struct + 0x60);
+    dst[0x64] = src[0];
+    dst[0x65] = src[1];
+    dst[0x66] = src[2];
+    return 0;
 }
-#else
-void fn_80014550(void) { /* TODO */ }
-#endif
 
 /* fn_80014574 - 0x80014574 | size: 0x4d4 */
 extern void fn_80166A50(void);
