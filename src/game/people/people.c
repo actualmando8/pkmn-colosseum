@@ -1221,17 +1221,14 @@ void* fn_8018F6B4(void* p) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8018F6CC(void) {
-#include "src/game/people/people_fn_8018F6CC.inc"
+extern u32 lbl_80478E78;
+extern u32 lbl_80478E7C;
+u8* fn_8018F6CC(u32 index) {
+    if (index >= *(u32*)lbl_80478E78) {
+        return (u8*)0;
+    }
+    return (u8*)lbl_80478E7C + index * 0x2C;
 }
-#else
-void fn_8018F6CC(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

@@ -893,13 +893,10 @@ void fn_8017C6E0(void) { /* TODO: match -- 428 bytes at 0x8017C6E0 */ }
 
 /* 0x8017C894 | 0x2C */
 extern void fn_8017D8F8();
-#if 1
-asm void fn_8017C894(void) {
-#include "src/game/fsys/fsys_file_fn_8017C894.inc"
+s32 fn_8017C894(u32 arg) {
+    fn_8017D8F8(arg);
+    return 0;
 }
-#else
-void fn_8017C894(void) { /* TODO: match -- 44 bytes at 0x8017C894 */ }
-#endif
 
 /* 0x8017C8C8 | 0x2C */
 extern void fn_8017D92C();
