@@ -482,16 +482,22 @@ void hsdForgetClassLibrary(const char* library_name)
 }
 
 /* 0x80193A1C | 0x3C */
+extern u32 lbl_8047B224;
+extern u32 lbl_8047B220;
+extern u32 lbl_8047B228;
+extern u8 lbl_8036C638[64];
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-#if 1
-asm void fn_80193A1C(void) {
-#include "src/hsd/hsd_class_fn_80193A1C.inc"
+void fn_80193A1C(HSD_ClassInfo* info) {
+    info->head.nb_exist = 0;
+    info->head.nb_peak = 0;
+    if (info == (HSD_ClassInfo*)lbl_8036C638) {
+        lbl_8047B224 = 0;
+        lbl_8047B220 = 0;
+        lbl_8047B228 = 0;
+    }
 }
-#else
-void fn_80193A1C(void) { /* TODO */ }
-#endif
 #pragma pop
 
 /* 0x80193A58 | 0x30 */

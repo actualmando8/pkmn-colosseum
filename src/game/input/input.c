@@ -720,13 +720,10 @@ u8 fn_800F7994(s32 padId, s32 mode) {
 }
 
 extern u8* lbl_80478B00;
-#if 1
-asm void fn_800F75FC(void) {
-#include "src/game/input/input_fn_800F75FC.inc"
+s32 fn_800F75FC(u32 val) {
+    *(u32*)(lbl_80478B00 + 0x10) = val;
+    return 0;
 }
-#else
-void fn_800F75FC(void) { /* TODO */ }
-#endif
 extern u8* lbl_80478B00;
 #if 1
 asm void fn_800F76E4(void) {

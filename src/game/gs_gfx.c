@@ -33,6 +33,10 @@
 #include "dolphin/types.h"
 #include "game/gs_gfx.h"
 
+#ifdef PCPORT
+extern void GXCopyDisp(void* dest, u8 clear);
+#endif
+
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
 extern u16   GSmemAllocRaw(u32 size);                  /* fn_800E3534 */
@@ -137,6 +141,10 @@ void GSgfxSwapBuffers(u32 flag) {
 
     /* Toggle the XFB index for double buffering */
     gsGfxState->xfbIndex ^= 1;
+
+#ifdef PCPORT
+    GXCopyDisp(NULL, (u8)(flag != 0));
+#endif
 
     /* The assembly then calls VICopyXFB, GXCopyDisp, etc.
      * to perform the actual buffer swap.  We leave these
@@ -343,7 +351,7 @@ void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
     gsGfxState->lightMask = 0;
     /* Zero fields 0x24-0x44 */
     {
-        u32* p = (u32*)((u32)gsGfxState + 0x24);
+        u32* p = gsGfxState->reserved;
         u32 i;
         for (i = 0; i < 9; i++) {
             p[i] = 0;
@@ -451,24 +459,37 @@ void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
     fn_800D9F40(0);                 /* fog disabled */
 
     /* Print success message */
+#ifdef PCPORT
+    fn_800DD970(lbl_80270388, (void*)gsGfxState, 0x5A0);
+#else
     fn_800DD970(lbl_80270388, (u32)gsGfxState, 0x5A0);
-}
-extern u32 lbl_8047AA80;
-#if 1
-asm void fn_800D3094(void) {
-#include "src/game/gs_gfx_fn_800D3094.inc"
-}
-#else
-void fn_800D3094(void) { /* TODO */ }
 #endif
-extern u32 lbl_8047AA80;
-#if 1
-asm void fn_800D30A0(void) {
-#include "src/game/gs_gfx_fn_800D30A0.inc"
 }
-#else
-void fn_800D30A0(void) { /* TODO */ }
+
+#ifdef PCPORT
+void fn_800D3074(u32 enable) { GSgfxEnableRendering(enable); }
+u32 fn_800D3088(void) { return GSgfxGetTickCount(); }
+void fn_800D30F0(u32 flag) { GSgfxSwapBuffers(flag); }
+void fn_800D361C(u8 mode) { GSgfxSetDrawMode(mode); }
+u32 fn_800D37CC(void) { return GSgfxGetFrameCount(); }
+void fn_800D37D4(u32 mode, u32 tvFormat, u32 field0,
+                 u32 field1, u32 xfbMode, u32 aaMode) {
+    GSgfxSetVideoMode(mode, tvFormat, field0, field1, xfbMode, aaMode);
+}
+void fn_800D39E0(u32 memSize, u32 fifoSize, u32 mtxDepth,
+                 u32 lightCount, u32 numBufs, u32 dlSize) {
+    GSgfxInit(memSize, fifoSize, mtxDepth, lightCount, numBufs, dlSize);
+}
 #endif
+
+#ifndef PCPORT
+extern u32 lbl_8047AA80;
+u32 fn_800D3094(void) {
+    return *(u32*)((u8*)lbl_8047AA80 + 0x4C);
+}
+void fn_800D30A0(u32 val) {
+    *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;
+}
 extern void fn_800D4F98(void);
 extern void fn_800B8920(void);
 extern u32 lbl_8047AA80;
@@ -540,3 +561,4 @@ asm void fn_800D377C(void) {
 #else
 void fn_800D377C(void) { /* TODO */ }
 #endif
+#endif /* !PCPORT */

@@ -51,6 +51,14 @@
     "src/dolphin/exi/EXI2.c": {
       "compiler": "GC/1.2.5n",
       "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/dolphin/dvd/DVDFsExtras.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
+    },
+    "src/hsd/hsd_class.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "HSD library compiled with CW GC/1.2.5n"
     }
   }
 }

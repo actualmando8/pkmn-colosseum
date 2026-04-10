@@ -37145,7 +37145,7 @@ void fn_8025EF58(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8025F2AC(void) {
 #include "src/game/colosseum_battle_fn_8025F2AC.inc"
 }

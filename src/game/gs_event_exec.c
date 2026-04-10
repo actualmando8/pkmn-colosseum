@@ -297,13 +297,10 @@ void fn_80013F80(void) { /* TODO */ }
 /* fn_800140FC - 0x800140FC | size: 0x14 */
 extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2F4;
-#if 1
-asm void fn_800140FC(void) {
-#include "src/game/gs_event_exec_fn_800140FC.inc"
+void fn_800140FC(u32* out1, u32* out2) {
+    *out1 = lbl_8047A2F8;
+    *out2 = lbl_8047A2F4;
 }
-#else
-void fn_800140FC(void) { /* TODO */ }
-#endif
 
 /* fn_80014118 - 0x80014118 | size: 0x80 */
 extern void fn_801FCE60(void);

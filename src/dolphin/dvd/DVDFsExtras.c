@@ -304,18 +304,36 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
 extern u32 lbl_8047A838;
 extern u32 bb2_8047A83C;
 extern u32 idTmp_8047A840;
-extern void fn_800A73B4(void);
+extern void fn_800A73B4();
 extern void DVDReset();
+extern BOOL DVDReadDiskID();
 /* 0x800A839C | 0xD8 */
-#if 1
-asm void cb(void) {
-#include "src/dolphin/dvd/DVDFsExtras_cb.inc"
+void cb(s32 result, DVDCommandBlock* cmdBlock) {
+    if (result > 0) {
+        switch (lbl_8047A838) {
+        case 0:
+            lbl_8047A838 = 1;
+            fn_800A73B4(cmdBlock, bb2_8047A83C, 0x20, 0x420, cb);
+            break;
+        case 1: {
+            u8* bb2 = (u8*)bb2_8047A83C;
+            u32 size;
+            lbl_8047A838 = 2;
+            size = *(u32*)(bb2 + 0x8);
+            fn_800A73B4(cmdBlock, *(u32*)(bb2 + 0x10), (size + 0x1F) & ~0x1F, *(u32*)(bb2 + 0x4), cb);
+            break;
+        }
+        }
+    } else {
+        if (result != -1) {
+            if (result == -4) {
+                lbl_8047A838 = 0;
+                DVDReset();
+                DVDReadDiskID(cmdBlock, idTmp_8047A840, cb);
+            }
+        }
+    }
 }
-#else
-void cb(void) {
-    /* TODO: match -- 0xD8 bytes at 0x800A839C */
-}
-#endif
 
 /* fn_800A7F80 - 0x800A7F80 | size: 0x60
  * Unlink a node from a doubly-linked list with interrupt protection.

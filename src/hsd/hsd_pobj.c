@@ -191,14 +191,7 @@ static void PObjInfoInit(void)
 }
 
 /* 0x801AE000 | 0x8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_801AE000(void) {
-#include "src/hsd/hsd_pobj_ext_fn_801AE000.inc"
+extern f32 lbl_8047DD60;
+f32 fn_801AE000(void) {
+    return lbl_8047DD60;
 }
-#else
-void fn_801AE000(void) { /* TODO */ }
-#endif
-#pragma pop
