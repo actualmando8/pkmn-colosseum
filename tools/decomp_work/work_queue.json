@@ -208,22 +208,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_80014198",
-    "file": "src/game/gs_event_exec.c",
-    "inc_file": "src/game/gs_event_exec_fn_80014198.inc",
-    "asm_lines": 9,
-    "tier": "simple",
-    "line_number": 322,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_800141BC",
     "file": "src/game/gs_event_exec.c",
     "inc_file": "src/game/gs_event_exec_fn_800141BC.inc",
     "asm_lines": 33,
     "tier": "complex",
-    "line_number": 334,
+    "line_number": 332,
     "pragmas": [],
     "status": "pending"
   },
@@ -233,7 +223,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014234.inc",
     "asm_lines": 65,
     "tier": "complex",
-    "line_number": 344,
+    "line_number": 342,
     "pragmas": [],
     "status": "pending"
   },
@@ -243,7 +233,7 @@
     "inc_file": "src/game/gs_event_exec_fn_8001431C.inc",
     "asm_lines": 33,
     "tier": "complex",
-    "line_number": 354,
+    "line_number": 352,
     "pragmas": [],
     "status": "pending"
   },
@@ -253,17 +243,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014398.inc",
     "asm_lines": 120,
     "tier": "hard",
-    "line_number": 365,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_80014550",
-    "file": "src/game/gs_event_exec.c",
-    "inc_file": "src/game/gs_event_exec_fn_80014550.inc",
-    "asm_lines": 9,
-    "tier": "simple",
-    "line_number": 374,
+    "line_number": 363,
     "pragmas": [],
     "status": "pending"
   },
@@ -273,7 +253,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014574.inc",
     "asm_lines": 330,
     "tier": "hard",
-    "line_number": 385,
+    "line_number": 383,
     "pragmas": [],
     "status": "pending"
   },
@@ -283,7 +263,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014A48.inc",
     "asm_lines": 42,
     "tier": "complex",
-    "line_number": 394,
+    "line_number": 392,
     "pragmas": [],
     "status": "pending"
   },
@@ -293,7 +273,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014AE4.inc",
     "asm_lines": 51,
     "tier": "complex",
-    "line_number": 407,
+    "line_number": 405,
     "pragmas": [],
     "status": "pending"
   },
@@ -303,7 +283,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014BA0.inc",
     "asm_lines": 43,
     "tier": "complex",
-    "line_number": 417,
+    "line_number": 415,
     "pragmas": [],
     "status": "pending"
   },
@@ -313,7 +293,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014C38.inc",
     "asm_lines": 63,
     "tier": "complex",
-    "line_number": 427,
+    "line_number": 425,
     "pragmas": [],
     "status": "pending"
   },
@@ -323,7 +303,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014D1C.inc",
     "asm_lines": 80,
     "tier": "complex",
-    "line_number": 437,
+    "line_number": 435,
     "pragmas": [],
     "status": "pending"
   },
@@ -333,7 +313,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014E50.inc",
     "asm_lines": 68,
     "tier": "complex",
-    "line_number": 446,
+    "line_number": 444,
     "pragmas": [],
     "status": "pending"
   },
@@ -343,7 +323,7 @@
     "inc_file": "src/game/gs_event_exec_fn_80014F48.inc",
     "asm_lines": 58,
     "tier": "complex",
-    "line_number": 459,
+    "line_number": 457,
     "pragmas": [],
     "status": "pending"
   },
@@ -1328,16 +1308,6 @@
     "status": "pending"
   },
   {
-    "function": "fn_800D377C",
-    "file": "src/game/gs_gfx.c",
-    "inc_file": "src/game/gs_gfx_fn_800D377C.inc",
-    "asm_lines": 23,
-    "tier": "medium",
-    "line_number": 557,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_800E3604",
     "file": "src/game/gs_material.c",
     "inc_file": "src/game/gs_material_fn_800E3604.inc",
@@ -2126,22 +2096,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_80017764",
-    "file": "src/game/gs_pokemon_summary.c",
-    "inc_file": "src/game/gs_pokemon_summary_fn_80017764.inc",
-    "asm_lines": 12,
-    "tier": "medium",
-    "line_number": 362,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_80017790",
     "file": "src/game/gs_pokemon_summary.c",
     "inc_file": "src/game/gs_pokemon_summary_fn_80017790.inc",
     "asm_lines": 57,
     "tier": "complex",
-    "line_number": 371,
+    "line_number": 372,
     "pragmas": [],
     "status": "pending"
   },
@@ -2151,27 +2111,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_80017868.inc",
     "asm_lines": 35,
     "tier": "complex",
-    "line_number": 383,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_800178EC",
-    "file": "src/game/gs_pokemon_summary.c",
-    "inc_file": "src/game/gs_pokemon_summary_fn_800178EC.inc",
-    "asm_lines": 12,
-    "tier": "medium",
-    "line_number": 393,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_80017914",
-    "file": "src/game/gs_pokemon_summary.c",
-    "inc_file": "src/game/gs_pokemon_summary_fn_80017914.inc",
-    "asm_lines": 12,
-    "tier": "medium",
-    "line_number": 403,
+    "line_number": 384,
     "pragmas": [],
     "status": "pending"
   },
@@ -2181,7 +2121,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_8001793C.inc",
     "asm_lines": 21,
     "tier": "medium",
-    "line_number": 412,
+    "line_number": 414,
     "pragmas": [],
     "status": "pending"
   },
@@ -2191,7 +2131,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_80017990.inc",
     "asm_lines": 33,
     "tier": "complex",
-    "line_number": 421,
+    "line_number": 423,
     "pragmas": [],
     "status": "pending"
   },
@@ -2201,7 +2141,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_80017A0C.inc",
     "asm_lines": 187,
     "tier": "hard",
-    "line_number": 445,
+    "line_number": 447,
     "pragmas": [],
     "status": "pending"
   },
@@ -2211,7 +2151,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_80017CB8.inc",
     "asm_lines": 133,
     "tier": "hard",
-    "line_number": 457,
+    "line_number": 459,
     "pragmas": [],
     "status": "pending"
   },
@@ -2221,7 +2161,7 @@
     "inc_file": "src/game/gs_pokemon_summary_fn_80017E8C.inc",
     "asm_lines": 229,
     "tier": "hard",
-    "line_number": 480,
+    "line_number": 482,
     "pragmas": [],
     "status": "pending"
   },
@@ -5398,26 +5338,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_801947A8",
-    "file": "src/hsd/hsd_cobj.c",
-    "inc_file": "src/hsd/hsd_cobj_fn_801947A8.inc",
-    "asm_lines": 9,
-    "tier": "simple",
-    "line_number": 748,
-    "pragmas": [
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
     "function": "fn_801947C8",
     "file": "src/hsd/hsd_cobj.c",
     "inc_file": "src/hsd/hsd_cobj_fn_801947C8.inc",
     "asm_lines": 303,
     "tier": "hard",
-    "line_number": 774,
+    "line_number": 769,
     "pragmas": [],
     "status": "pending"
   },
@@ -5427,7 +5353,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80194C2C.inc",
     "asm_lines": 42,
     "tier": "complex",
-    "line_number": 787,
+    "line_number": 782,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5441,7 +5367,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80194DA4.inc",
     "asm_lines": 226,
     "tier": "hard",
-    "line_number": 893,
+    "line_number": 888,
     "pragmas": [],
     "status": "pending"
   },
@@ -5451,7 +5377,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_801950D0.inc",
     "asm_lines": 31,
     "tier": "complex",
-    "line_number": 907,
+    "line_number": 902,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5465,7 +5391,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_8019513C.inc",
     "asm_lines": 308,
     "tier": "hard",
-    "line_number": 923,
+    "line_number": 918,
     "pragmas": [
       "#pragma optimization_level 0",
       "#pragma optimizewithasm off"
@@ -5478,7 +5404,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80195590.inc",
     "asm_lines": 143,
     "tier": "hard",
-    "line_number": 937,
+    "line_number": 932,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5492,7 +5418,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80195794.inc",
     "asm_lines": 73,
     "tier": "complex",
-    "line_number": 950,
+    "line_number": 945,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5506,7 +5432,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80195A6C.inc",
     "asm_lines": 317,
     "tier": "hard",
-    "line_number": 1060,
+    "line_number": 1055,
     "pragmas": [],
     "status": "pending"
   },
@@ -5516,7 +5442,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_801960C4.inc",
     "asm_lines": 210,
     "tier": "hard",
-    "line_number": 1087,
+    "line_number": 1082,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5530,7 +5456,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_801963E0.inc",
     "asm_lines": 185,
     "tier": "hard",
-    "line_number": 1100,
+    "line_number": 1095,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5544,7 +5470,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80196698.inc",
     "asm_lines": 26,
     "tier": "medium",
-    "line_number": 1114,
+    "line_number": 1109,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5558,7 +5484,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_8019674C.inc",
     "asm_lines": 266,
     "tier": "hard",
-    "line_number": 1145,
+    "line_number": 1140,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5572,7 +5498,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80196CE0.inc",
     "asm_lines": 38,
     "tier": "complex",
-    "line_number": 1262,
+    "line_number": 1257,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5586,7 +5512,7 @@
     "inc_file": "src/hsd/hsd_cobj_fn_80196EF8.inc",
     "asm_lines": 269,
     "tier": "hard",
-    "line_number": 1381,
+    "line_number": 1376,
     "pragmas": [],
     "status": "pending"
   },
@@ -5619,22 +5545,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_8019B808",
-    "file": "src/hsd/hsd_fog.c",
-    "inc_file": "src/hsd/hsd_fog_fn_8019B808.inc",
-    "asm_lines": 27,
-    "tier": "medium",
-    "line_number": 160,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_8019B874",
     "file": "src/hsd/hsd_fog.c",
     "inc_file": "src/hsd/hsd_fog_fn_8019B874.inc",
     "asm_lines": 56,
     "tier": "complex",
-    "line_number": 181,
+    "line_number": 171,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5648,7 +5564,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019B948.inc",
     "asm_lines": 157,
     "tier": "hard",
-    "line_number": 200,
+    "line_number": 190,
     "pragmas": [
       "#pragma optimizewithasm off"
     ],
@@ -5660,7 +5576,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019BB78.inc",
     "asm_lines": 113,
     "tier": "hard",
-    "line_number": 223,
+    "line_number": 213,
     "pragmas": [],
     "status": "pending"
   },
@@ -5670,7 +5586,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019BD18.inc",
     "asm_lines": 200,
     "tier": "hard",
-    "line_number": 254,
+    "line_number": 244,
     "pragmas": [],
     "status": "pending"
   },
@@ -5680,7 +5596,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019BFE8.inc",
     "asm_lines": 77,
     "tier": "complex",
-    "line_number": 271,
+    "line_number": 261,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5694,7 +5610,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019C128.inc",
     "asm_lines": 40,
     "tier": "complex",
-    "line_number": 302,
+    "line_number": 292,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5708,7 +5624,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019C1B0.inc",
     "asm_lines": 52,
     "tier": "complex",
-    "line_number": 340,
+    "line_number": 330,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -5722,7 +5638,7 @@
     "inc_file": "src/hsd/hsd_fog_fn_8019C264.inc",
     "asm_lines": 68,
     "tier": "complex",
-    "line_number": 383,
+    "line_number": 373,
     "pragmas": [
       "#pragma optimization_level 0",
       "#pragma optimizewithasm off"
@@ -5754,22 +5670,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_8019C7E0",
-    "file": "src/hsd/hsd_initialize.c",
-    "inc_file": "src/hsd/hsd_initialize_fn_8019C7E0.inc",
-    "asm_lines": 30,
-    "tier": "medium",
-    "line_number": 180,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_8019C978",
     "file": "src/hsd/hsd_initialize.c",
     "inc_file": "src/hsd/hsd_initialize_fn_8019C978.inc",
     "asm_lines": 131,
     "tier": "hard",
-    "line_number": 297,
+    "line_number": 298,
     "pragmas": [],
     "status": "pending"
   },
@@ -6079,22 +5985,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_801A48B0",
-    "file": "src/hsd/hsd_lobj.c",
-    "inc_file": "src/hsd/hsd_lobj_fn_801A48B0.inc",
-    "asm_lines": 19,
-    "tier": "medium",
-    "line_number": 273,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_801A48F4",
     "file": "src/hsd/hsd_lobj.c",
     "inc_file": "src/hsd/hsd_lobj_fn_801A48F4.inc",
     "asm_lines": 36,
     "tier": "complex",
-    "line_number": 297,
+    "line_number": 290,
     "pragmas": [],
     "status": "pending"
   },
@@ -6104,7 +6000,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A497C.inc",
     "asm_lines": 19,
     "tier": "medium",
-    "line_number": 318,
+    "line_number": 311,
     "pragmas": [],
     "status": "pending"
   },
@@ -6114,17 +6010,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A49C0.inc",
     "asm_lines": 36,
     "tier": "complex",
-    "line_number": 338,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_801A4A54",
-    "file": "src/hsd/hsd_lobj.c",
-    "inc_file": "src/hsd/hsd_lobj_fn_801A4A54.inc",
-    "asm_lines": 29,
-    "tier": "medium",
-    "line_number": 371,
+    "line_number": 331,
     "pragmas": [],
     "status": "pending"
   },
@@ -6134,7 +6020,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A4AC4.inc",
     "asm_lines": 18,
     "tier": "medium",
-    "line_number": 396,
+    "line_number": 383,
     "pragmas": [],
     "status": "pending"
   },
@@ -6144,7 +6030,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A4B00.inc",
     "asm_lines": 156,
     "tier": "hard",
-    "line_number": 419,
+    "line_number": 406,
     "pragmas": [],
     "status": "pending"
   },
@@ -6154,7 +6040,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A4D20.inc",
     "asm_lines": 162,
     "tier": "hard",
-    "line_number": 432,
+    "line_number": 419,
     "pragmas": [],
     "status": "pending"
   },
@@ -6164,7 +6050,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A4F54.inc",
     "asm_lines": 1007,
     "tier": "hard",
-    "line_number": 471,
+    "line_number": 458,
     "pragmas": [],
     "status": "pending"
   },
@@ -6174,7 +6060,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A6098.inc",
     "asm_lines": 99,
     "tier": "hard",
-    "line_number": 483,
+    "line_number": 470,
     "pragmas": [],
     "status": "pending"
   },
@@ -6184,7 +6070,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A620C.inc",
     "asm_lines": 96,
     "tier": "hard",
-    "line_number": 494,
+    "line_number": 481,
     "pragmas": [],
     "status": "pending"
   },
@@ -6194,7 +6080,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A6494.inc",
     "asm_lines": 160,
     "tier": "hard",
-    "line_number": 550,
+    "line_number": 537,
     "pragmas": [],
     "status": "pending"
   },
@@ -6204,7 +6090,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A66E0.inc",
     "asm_lines": 54,
     "tier": "complex",
-    "line_number": 560,
+    "line_number": 547,
     "pragmas": [],
     "status": "pending"
   },
@@ -6214,7 +6100,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A678C.inc",
     "asm_lines": 13,
     "tier": "medium",
-    "line_number": 569,
+    "line_number": 556,
     "pragmas": [],
     "status": "pending"
   },
@@ -6224,7 +6110,7 @@
     "inc_file": "src/hsd/hsd_lobj_fn_801A67BC.inc",
     "asm_lines": 85,
     "tier": "hard",
-    "line_number": 583,
+    "line_number": 570,
     "pragmas": [],
     "status": "pending"
   },
@@ -6502,26 +6388,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_80191E38",
-    "file": "src/hsd/hsd_wobj.c",
-    "inc_file": "src/hsd/hsd_wobj_fn_80191E38.inc",
-    "asm_lines": 21,
-    "tier": "medium",
-    "line_number": 487,
-    "pragmas": [
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
     "function": "fn_80191ECC",
     "file": "src/hsd/hsd_wobj.c",
     "inc_file": "src/hsd/hsd_wobj_fn_80191ECC.inc",
     "asm_lines": 42,
     "tier": "complex",
-    "line_number": 546,
+    "line_number": 536,
     "pragmas": [],
     "status": "pending"
   },
@@ -6531,7 +6403,7 @@
     "inc_file": "src/hsd/hsd_wobj_fn_80191F64.inc",
     "asm_lines": 106,
     "tier": "hard",
-    "line_number": 593,
+    "line_number": 583,
     "pragmas": [],
     "status": "pending"
   },
@@ -6542,26 +6414,6 @@
     "asm_lines": 12,
     "tier": "medium",
     "line_number": 327,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_80003488",
-    "file": "src/init/__start.c",
-    "inc_file": "src/init/__start_fn_80003488.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 336,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_800053E0",
-    "file": "src/init/__start.c",
-    "inc_file": "src/init/__start_fn_800053E0.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 346,
     "pragmas": [],
     "status": "pending"
   },
@@ -6676,16 +6528,6 @@
     "status": "pending"
   },
   {
-    "function": "fn_800A4C94",
-    "file": "src/dolphin/dvd/DVDLow.c",
-    "inc_file": "src/dolphin/dvd/DVDLow_fn_800A4C94.inc",
-    "asm_lines": 6,
-    "tier": "simple",
-    "line_number": 340,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_800CEFBC",
     "file": "src/dolphin/exi/EXI2.c",
     "inc_file": "src/dolphin/exi/EXI2_fn_800CEFBC.inc",
@@ -6784,22 +6626,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_8009F1D0",
-    "file": "src/dolphin/os/OSMemory.c",
-    "inc_file": "src/dolphin/os/OSMemory_fn_8009F1D0.inc",
-    "asm_lines": 24,
-    "tier": "medium",
-    "line_number": 43,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_8009F488",
     "file": "src/dolphin/os/OSMemory.c",
     "inc_file": "src/dolphin/os/OSMemory_fn_8009F488.inc",
     "asm_lines": 51,
     "tier": "complex",
-    "line_number": 72,
+    "line_number": 73,
     "pragmas": [],
     "status": "pending"
   },
@@ -7054,22 +6886,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_801C673C",
-    "file": "src/game/battle/battle_scene.c",
-    "inc_file": "src/game/battle/battle_scene_fn_801C673C.inc",
-    "asm_lines": 9,
-    "tier": "simple",
-    "line_number": 428,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_801C680C",
     "file": "src/game/battle/battle_scene.c",
     "inc_file": "src/game/battle/battle_scene_fn_801C680C.inc",
     "asm_lines": 50,
     "tier": "complex",
-    "line_number": 450,
+    "line_number": 447,
     "pragmas": [],
     "status": "pending"
   },
@@ -7079,7 +6901,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801C71B0.inc",
     "asm_lines": 286,
     "tier": "hard",
-    "line_number": 556,
+    "line_number": 553,
     "pragmas": [],
     "status": "pending"
   },
@@ -7089,7 +6911,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801C9910.inc",
     "asm_lines": 158,
     "tier": "hard",
-    "line_number": 709,
+    "line_number": 706,
     "pragmas": [],
     "status": "pending"
   },
@@ -7099,7 +6921,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801C9F5C.inc",
     "asm_lines": 277,
     "tier": "hard",
-    "line_number": 787,
+    "line_number": 784,
     "pragmas": [],
     "status": "pending"
   },
@@ -7109,7 +6931,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CA4F8.inc",
     "asm_lines": 53,
     "tier": "complex",
-    "line_number": 817,
+    "line_number": 814,
     "pragmas": [],
     "status": "pending"
   },
@@ -7119,7 +6941,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CA728.inc",
     "asm_lines": 33,
     "tier": "complex",
-    "line_number": 848,
+    "line_number": 845,
     "pragmas": [],
     "status": "pending"
   },
@@ -7129,7 +6951,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CB078.inc",
     "asm_lines": 38,
     "tier": "complex",
-    "line_number": 1076,
+    "line_number": 1073,
     "pragmas": [],
     "status": "pending"
   },
@@ -7139,7 +6961,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CB59C.inc",
     "asm_lines": 36,
     "tier": "complex",
-    "line_number": 1186,
+    "line_number": 1183,
     "pragmas": [],
     "status": "pending"
   },
@@ -7149,7 +6971,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CBBAC.inc",
     "asm_lines": 81,
     "tier": "hard",
-    "line_number": 1284,
+    "line_number": 1281,
     "pragmas": [],
     "status": "pending"
   },
@@ -7159,7 +6981,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CBF64.inc",
     "asm_lines": 282,
     "tier": "hard",
-    "line_number": 1314,
+    "line_number": 1311,
     "pragmas": [],
     "status": "pending"
   },
@@ -7169,7 +6991,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CC380.inc",
     "asm_lines": 1505,
     "tier": "hard",
-    "line_number": 1332,
+    "line_number": 1329,
     "pragmas": [],
     "status": "pending"
   },
@@ -7179,7 +7001,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CDB04.inc",
     "asm_lines": 1720,
     "tier": "hard",
-    "line_number": 1350,
+    "line_number": 1347,
     "pragmas": [],
     "status": "pending"
   },
@@ -7189,7 +7011,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CF320.inc",
     "asm_lines": 152,
     "tier": "hard",
-    "line_number": 1366,
+    "line_number": 1363,
     "pragmas": [],
     "status": "pending"
   },
@@ -7199,7 +7021,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CF568.inc",
     "asm_lines": 170,
     "tier": "hard",
-    "line_number": 1380,
+    "line_number": 1377,
     "pragmas": [],
     "status": "pending"
   },
@@ -7209,7 +7031,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CF7E4.inc",
     "asm_lines": 131,
     "tier": "hard",
-    "line_number": 1394,
+    "line_number": 1391,
     "pragmas": [],
     "status": "pending"
   },
@@ -7219,7 +7041,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CF9C8.inc",
     "asm_lines": 224,
     "tier": "hard",
-    "line_number": 1408,
+    "line_number": 1405,
     "pragmas": [],
     "status": "pending"
   },
@@ -7229,17 +7051,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801CFD08.inc",
     "asm_lines": 242,
     "tier": "hard",
-    "line_number": 1423,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_801D036C",
-    "file": "src/game/battle/battle_scene.c",
-    "inc_file": "src/game/battle/battle_scene_fn_801D036C.inc",
-    "asm_lines": 12,
-    "tier": "medium",
-    "line_number": 1461,
+    "line_number": 1420,
     "pragmas": [],
     "status": "pending"
   },
@@ -7249,7 +7061,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801D039C.inc",
     "asm_lines": 56,
     "tier": "complex",
-    "line_number": 1475,
+    "line_number": 1469,
     "pragmas": [],
     "status": "pending"
   },
@@ -7259,7 +7071,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801D055C.inc",
     "asm_lines": 133,
     "tier": "hard",
-    "line_number": 1521,
+    "line_number": 1515,
     "pragmas": [],
     "status": "pending"
   },
@@ -7269,7 +7081,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801D0C30.inc",
     "asm_lines": 113,
     "tier": "hard",
-    "line_number": 1575,
+    "line_number": 1569,
     "pragmas": [],
     "status": "pending"
   },
@@ -7279,7 +7091,7 @@
     "inc_file": "src/game/battle/battle_scene_fn_801D0DB0.inc",
     "asm_lines": 385,
     "tier": "hard",
-    "line_number": 1591,
+    "line_number": 1585,
     "pragmas": [],
     "status": "pending"
   },
@@ -8458,22 +8270,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_8017B5A4",
-    "file": "src/game/fsys/fsys_file.c",
-    "inc_file": "src/game/fsys/fsys_file_fn_8017B5A4.inc",
-    "asm_lines": 7,
-    "tier": "simple",
-    "line_number": 750,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
     "function": "fn_8017B5C0",
     "file": "src/game/fsys/fsys_file.c",
     "inc_file": "src/game/fsys/fsys_file_fn_8017B5C0.inc",
     "asm_lines": 66,
     "tier": "complex",
-    "line_number": 764,
+    "line_number": 760,
     "pragmas": [],
     "status": "pending"
   },
@@ -8483,7 +8285,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017B6B8.inc",
     "asm_lines": 330,
     "tier": "hard",
-    "line_number": 778,
+    "line_number": 774,
     "pragmas": [],
     "status": "pending"
   },
@@ -8493,7 +8295,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017BD34.inc",
     "asm_lines": 185,
     "tier": "hard",
-    "line_number": 789,
+    "line_number": 785,
     "pragmas": [],
     "status": "pending"
   },
@@ -8503,7 +8305,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C008.inc",
     "asm_lines": 28,
     "tier": "medium",
-    "line_number": 799,
+    "line_number": 795,
     "pragmas": [],
     "status": "pending"
   },
@@ -8513,7 +8315,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C074.inc",
     "asm_lines": 97,
     "tier": "hard",
-    "line_number": 809,
+    "line_number": 805,
     "pragmas": [],
     "status": "pending"
   },
@@ -8523,7 +8325,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C1D8.inc",
     "asm_lines": 123,
     "tier": "hard",
-    "line_number": 819,
+    "line_number": 815,
     "pragmas": [],
     "status": "pending"
   },
@@ -8533,7 +8335,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C39C.inc",
     "asm_lines": 34,
     "tier": "complex",
-    "line_number": 828,
+    "line_number": 824,
     "pragmas": [],
     "status": "pending"
   },
@@ -8543,7 +8345,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C414.inc",
     "asm_lines": 98,
     "tier": "hard",
-    "line_number": 840,
+    "line_number": 836,
     "pragmas": [],
     "status": "pending"
   },
@@ -8553,7 +8355,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C5B8.inc",
     "asm_lines": 82,
     "tier": "hard",
-    "line_number": 880,
+    "line_number": 876,
     "pragmas": [],
     "status": "pending"
   },
@@ -8563,27 +8365,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C6E0.inc",
     "asm_lines": 119,
     "tier": "hard",
-    "line_number": 890,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8017C894",
-    "file": "src/game/fsys/fsys_file.c",
-    "inc_file": "src/game/fsys/fsys_file_fn_8017C894.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 900,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8017C8C8",
-    "file": "src/game/fsys/fsys_file.c",
-    "inc_file": "src/game/fsys/fsys_file_fn_8017C8C8.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 910,
+    "line_number": 886,
     "pragmas": [],
     "status": "pending"
   },
@@ -8593,8 +8375,10 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017C8FC.inc",
     "asm_lines": 385,
     "tier": "hard",
-    "line_number": 920,
-    "pragmas": [],
+    "line_number": 918,
+    "pragmas": [
+      "#pragma pop"
+    ],
     "status": "pending"
   },
   {
@@ -8603,7 +8387,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017CE7C.inc",
     "asm_lines": 21,
     "tier": "medium",
-    "line_number": 931,
+    "line_number": 929,
     "pragmas": [],
     "status": "pending"
   },
@@ -8613,17 +8397,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017CED8.inc",
     "asm_lines": 341,
     "tier": "hard",
-    "line_number": 946,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8017D3D4",
-    "file": "src/game/fsys/fsys_file.c",
-    "inc_file": "src/game/fsys/fsys_file_fn_8017D3D4.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 975,
+    "line_number": 944,
     "pragmas": [],
     "status": "pending"
   },
@@ -8633,8 +8407,10 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017D624.inc",
     "asm_lines": 28,
     "tier": "medium",
-    "line_number": 986,
-    "pragmas": [],
+    "line_number": 985,
+    "pragmas": [
+      "#pragma pop"
+    ],
     "status": "pending"
   },
   {
@@ -8643,7 +8419,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017D68C.inc",
     "asm_lines": 107,
     "tier": "hard",
-    "line_number": 997,
+    "line_number": 996,
     "pragmas": [],
     "status": "pending"
   },
@@ -8653,7 +8429,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017D800.inc",
     "asm_lines": 72,
     "tier": "complex",
-    "line_number": 1011,
+    "line_number": 1010,
     "pragmas": [],
     "status": "pending"
   },
@@ -8663,7 +8439,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017D960.inc",
     "asm_lines": 100,
     "tier": "hard",
-    "line_number": 1048,
+    "line_number": 1047,
     "pragmas": [],
     "status": "pending"
   },
@@ -8673,7 +8449,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017DAB8.inc",
     "asm_lines": 54,
     "tier": "complex",
-    "line_number": 1057,
+    "line_number": 1056,
     "pragmas": [],
     "status": "pending"
   },
@@ -8683,7 +8459,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017DB74.inc",
     "asm_lines": 225,
     "tier": "hard",
-    "line_number": 1068,
+    "line_number": 1067,
     "pragmas": [],
     "status": "pending"
   },
@@ -8693,7 +8469,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017DEA4.inc",
     "asm_lines": 45,
     "tier": "complex",
-    "line_number": 1079,
+    "line_number": 1078,
     "pragmas": [],
     "status": "pending"
   },
@@ -8703,7 +8479,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017DF4C.inc",
     "asm_lines": 44,
     "tier": "complex",
-    "line_number": 1088,
+    "line_number": 1087,
     "pragmas": [],
     "status": "pending"
   },
@@ -8713,7 +8489,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017DFF4.inc",
     "asm_lines": 44,
     "tier": "complex",
-    "line_number": 1097,
+    "line_number": 1096,
     "pragmas": [],
     "status": "pending"
   },
@@ -8723,17 +8499,7 @@
     "inc_file": "src/game/fsys/fsys_file_fn_8017E09C.inc",
     "asm_lines": 83,
     "tier": "hard",
-    "line_number": 1106,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8017F25C",
-    "file": "src/game/fsys/fsys_file.c",
-    "inc_file": "src/game/fsys/fsys_file_fn_8017F25C.inc",
-    "asm_lines": 28,
-    "tier": "medium",
-    "line_number": 1117,
+    "line_number": 1105,
     "pragmas": [],
     "status": "pending"
   },
@@ -9352,44 +9118,13 @@
     "status": "pending"
   },
   {
-    "function": "fn_8018F470",
-    "file": "src/game/people/people.c",
-    "inc_file": "src/game/people/people_fn_8018F470.inc",
-    "asm_lines": 9,
-    "tier": "simple",
-    "line_number": 1135,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8018F6CC",
-    "file": "src/game/people/people.c",
-    "inc_file": "src/game/people/people_fn_8018F6CC.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 1227,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
     "function": "fn_8018F730",
     "file": "src/game/people/people.c",
     "inc_file": "src/game/people/people_fn_8018F730.inc",
     "asm_lines": 27,
     "tier": "medium",
-    "line_number": 1238,
+    "line_number": 1233,
     "pragmas": [
-      "#pragma pop",
       "#pragma push",
       "#pragma optimization_level 0",
       "#pragma optimizewithasm off"
@@ -9402,7 +9137,7 @@
     "inc_file": "src/game/people/people_fn_8018F788.inc",
     "asm_lines": 68,
     "tier": "complex",
-    "line_number": 1249,
+    "line_number": 1244,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9417,7 +9152,7 @@
     "inc_file": "src/game/people/people_fn_8018F87C.inc",
     "asm_lines": 194,
     "tier": "hard",
-    "line_number": 1260,
+    "line_number": 1255,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9661,27 +9396,12 @@
     "status": "pending"
   },
   {
-    "function": "fn_80162070",
-    "file": "src/game/people/people_field.c",
-    "inc_file": "src/game/people/people_field_fn_80162070.inc",
-    "asm_lines": 7,
-    "tier": "simple",
-    "line_number": 995,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
     "function": "fn_8016208C",
     "file": "src/game/people/people_field.c",
     "inc_file": "src/game/people/people_field_fn_8016208C.inc",
     "asm_lines": 38,
     "tier": "complex",
-    "line_number": 1006,
+    "line_number": 1012,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9696,22 +9416,7 @@
     "inc_file": "src/game/people/people_field_fn_80162118.inc",
     "asm_lines": 47,
     "tier": "complex",
-    "line_number": 1017,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
-    "function": "fn_8016246C",
-    "file": "src/game/people/people_field.c",
-    "inc_file": "src/game/people/people_field_fn_8016246C.inc",
-    "asm_lines": 8,
-    "tier": "simple",
-    "line_number": 1185,
+    "line_number": 1023,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9766,29 +9471,13 @@
     "status": "pending"
   },
   {
-    "function": "fn_80162904",
-    "file": "src/game/people/people_field.c",
-    "inc_file": "src/game/people/people_field_fn_80162904.inc",
-    "asm_lines": 10,
-    "tier": "simple",
-    "line_number": 1346,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
     "function": "fn_8016292C",
     "file": "src/game/people/people_field.c",
     "inc_file": "src/game/people/people_field_fn_8016292C.inc",
     "asm_lines": 32,
     "tier": "complex",
-    "line_number": 1357,
+    "line_number": 1355,
     "pragmas": [
-      "#pragma pop",
       "#pragma push",
       "#pragma optimization_level 0",
       "#pragma optimizewithasm off"
@@ -9801,7 +9490,7 @@
     "inc_file": "src/game/people/people_field_fn_801629A4.inc",
     "asm_lines": 11,
     "tier": "medium",
-    "line_number": 1368,
+    "line_number": 1366,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9816,7 +9505,7 @@
     "inc_file": "src/game/people/people_field_fn_801629D0.inc",
     "asm_lines": 11,
     "tier": "medium",
-    "line_number": 1379,
+    "line_number": 1377,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9831,7 +9520,7 @@
     "inc_file": "src/game/people/people_field_fn_801629FC.inc",
     "asm_lines": 24,
     "tier": "medium",
-    "line_number": 1390,
+    "line_number": 1388,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9846,7 +9535,7 @@
     "inc_file": "src/game/people/people_field_fn_80162A58.inc",
     "asm_lines": 186,
     "tier": "hard",
-    "line_number": 1401,
+    "line_number": 1399,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9861,7 +9550,7 @@
     "inc_file": "src/game/people/people_field_fn_80162D44.inc",
     "asm_lines": 10,
     "tier": "simple",
-    "line_number": 1427,
+    "line_number": 1425,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9876,7 +9565,7 @@
     "inc_file": "src/game/people/people_field_fn_80162E14.inc",
     "asm_lines": 46,
     "tier": "complex",
-    "line_number": 1486,
+    "line_number": 1484,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9891,7 +9580,7 @@
     "inc_file": "src/game/people/people_field_fn_80162EB8.inc",
     "asm_lines": 36,
     "tier": "complex",
-    "line_number": 1497,
+    "line_number": 1495,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9906,22 +9595,7 @@
     "inc_file": "src/game/people/people_field_fn_80162FB0.inc",
     "asm_lines": 23,
     "tier": "medium",
-    "line_number": 1555,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
-    "function": "fn_801631CC",
-    "file": "src/game/people/people_field.c",
-    "inc_file": "src/game/people/people_field_fn_801631CC.inc",
-    "asm_lines": 11,
-    "tier": "medium",
-    "line_number": 1693,
+    "line_number": 1553,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9936,7 +9610,7 @@
     "inc_file": "src/game/people/people_field_fn_80163214.inc",
     "asm_lines": 43,
     "tier": "complex",
-    "line_number": 1718,
+    "line_number": 1715,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9951,22 +9625,7 @@
     "inc_file": "src/game/people/people_field_fn_801632B4.inc",
     "asm_lines": 123,
     "tier": "hard",
-    "line_number": 1729,
-    "pragmas": [
-      "#pragma pop",
-      "#pragma push",
-      "#pragma optimization_level 0",
-      "#pragma optimizewithasm off"
-    ],
-    "status": "pending"
-  },
-  {
-    "function": "fn_80163490",
-    "file": "src/game/people/people_field.c",
-    "inc_file": "src/game/people/people_field_fn_80163490.inc",
-    "asm_lines": 7,
-    "tier": "simple",
-    "line_number": 1741,
+    "line_number": 1726,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9981,7 +9640,7 @@
     "inc_file": "src/game/people/people_field_fn_801634A8.inc",
     "asm_lines": 192,
     "tier": "hard",
-    "line_number": 1752,
+    "line_number": 1755,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -9996,7 +9655,7 @@
     "inc_file": "src/game/people/people_field_fn_80163810.inc",
     "asm_lines": 250,
     "tier": "hard",
-    "line_number": 1806,
+    "line_number": 1809,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10011,7 +9670,7 @@
     "inc_file": "src/game/people/people_field_fn_80163BE4.inc",
     "asm_lines": 52,
     "tier": "complex",
-    "line_number": 1821,
+    "line_number": 1824,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -10025,7 +9684,7 @@
     "inc_file": "src/game/people/people_field_fn_80163CA8.inc",
     "asm_lines": 76,
     "tier": "complex",
-    "line_number": 1832,
+    "line_number": 1835,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10040,7 +9699,7 @@
     "inc_file": "src/game/people/people_field_fn_80163DB0.inc",
     "asm_lines": 15,
     "tier": "medium",
-    "line_number": 1843,
+    "line_number": 1846,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10055,7 +9714,7 @@
     "inc_file": "src/game/people/people_field_fn_80163DE8.inc",
     "asm_lines": 75,
     "tier": "complex",
-    "line_number": 1854,
+    "line_number": 1857,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10070,7 +9729,7 @@
     "inc_file": "src/game/people/people_field_fn_80164118.inc",
     "asm_lines": 12,
     "tier": "medium",
-    "line_number": 1962,
+    "line_number": 1965,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -10084,7 +9743,7 @@
     "inc_file": "src/game/people/people_field_fn_80164238.inc",
     "asm_lines": 31,
     "tier": "complex",
-    "line_number": 2016,
+    "line_number": 2019,
     "pragmas": [
       "#pragma push",
       "#pragma optimization_level 0",
@@ -10098,7 +9757,7 @@
     "inc_file": "src/game/people/people_field_fn_80164520.inc",
     "asm_lines": 349,
     "tier": "hard",
-    "line_number": 2195,
+    "line_number": 2198,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10113,7 +9772,7 @@
     "inc_file": "src/game/people/people_field_fn_80164A2C.inc",
     "asm_lines": 144,
     "tier": "hard",
-    "line_number": 2206,
+    "line_number": 2209,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10128,7 +9787,7 @@
     "inc_file": "src/game/people/people_field_fn_80164C40.inc",
     "asm_lines": 101,
     "tier": "hard",
-    "line_number": 2217,
+    "line_number": 2220,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10143,7 +9802,7 @@
     "inc_file": "src/game/people/people_field_fn_80164DD0.inc",
     "asm_lines": 352,
     "tier": "hard",
-    "line_number": 2228,
+    "line_number": 2231,
     "pragmas": [
       "#pragma pop",
       "#pragma push",
@@ -10799,16 +10458,6 @@
     "asm_lines": 50,
     "tier": "complex",
     "line_number": 17548,
-    "pragmas": [],
-    "status": "pending"
-  },
-  {
-    "function": "fn_80069048",
-    "file": "src/game/ui/ui_core.c",
-    "inc_file": "src/game/ui/ui_core_fn_80069048.inc",
-    "asm_lines": 5,
-    "tier": "simple",
-    "line_number": 17615,
     "pragmas": [],
     "status": "pending"
   },
