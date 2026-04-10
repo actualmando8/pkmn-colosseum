@@ -1,0 +1,141 @@
+{
+  "model": "qwen2.5-coder:7b",
+  "timestamp": 1775802632.0898452,
+  "total_time": 17.1,
+  "results": [
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D3094",
+      "time": 2.4,
+      "response": "```c\nextern u32 lbl_8047AA80;\n\nu32 fn_800D3094(void) {\n    return *(u32*)((u8*)lbl_8047AA80 + 0x4C);\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800D30A0",
+      "time": 0.6,
+      "response": "```c\nextern u32 lbl_8047AA80;\n\nvoid fn_800D30A0(u32 val) {\n    *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_801AE000",
+      "time": 0.5,
+      "response": "```c\nextern f32 lbl_8047DD60;\n\nf32 fn_801AE000(void) {\n    return lbl_8047DD60;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_80163F88",
+      "time": 0.8,
+      "response": "```c\nextern u32 lbl_8047B098;\nextern u32 lbl_8047B088;\n\nvoid fn_80163F88(void) {\n    lbl_8047B098 = 1;\n    lbl_8047B088 = 1;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800140FC",
+      "time": 0.9,
+      "response": "```c\nextern u32 lbl_8047A2F8;\nextern u32 lbl_8047A2F4;\n\nvoid fn_800140FC(u32* out1, u32* out2) {\n    *out1 = lbl_8047A2F8;\n    *out2 = lbl_8047A2F4;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_800F75FC",
+      "time": 0.7,
+      "response": "```c\nextern u32 lbl_80478B00;\n\nvoid fn_800F75FC(void) {\n    u32* ptr = (u32*)((u8*)lbl_80478B00 + 0x10);\n    *ptr = 0;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C6908",
+      "time": 0.5,
+      "response": "```c\nextern void fn_800E0C04(void);\n\nvoid fn_801C6908(void) {\n    fn_800E0C04();\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_801C673C",
+      "time": 0.6,
+      "response": "```c\nextern void fn_800D9ED8(u32);\n\nvoid fn_801C673C(void) {\n    fn_800D9ED8(0);\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5B4",
+      "time": 0.8,
+      "response": "```c\nextern f32 lbl_8047D8A8;\n\nf32 fn_8018F5B4(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x14);\n    }\n    return lbl_8047D8A8;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_extern_float": true,
+      "function": "fn_8018F5CC",
+      "time": 6.1,
+      "response": "```c\nextern f32 lbl_8047D8A8;\n\nf32 fn_8018F5CC(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x10);\n    }\n    return lbl_8047D8A8;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "uses_block_scope": true,
+      "function": "fn_80162858",
+      "time": 1.4,
+      "response": "```c\nextern u32 lbl_8047B024;\n\nvoid fn_80162858(u32 index, u32 val1, u32 val2) {\n    u32 offset = index * 0xF4;\n    {\n        u8* elem1 = (u8*)lbl_8047B024 + offset;\n        *(u32*)(elem1 + 0x94) = val1;\n    }\n    {\n        u8* elem2 = (u8*)lbl_8047B024 + offset;\n        *(u32*)(elem2 + 0x98) = val2;\n    }\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_80163BCC",
+      "time": 1.2,
+      "response": "```c\nextern u32 lbl_8047B078;\n\nvoid fn_80163BCC(u8* a, u32 b) {\n    u32 temp = *(u32*)((u8*)lbl_8047B078 - 22440);\n    temp &= ~((1 << 5) - 1);\n    temp -= b;\n    *(u32*)((u8*)lbl_8047B078 - 22440) = temp;\n}\n```",
+      "status": "PASS"
+    },
+    {
+      "extracted": true,
+      "compile": false,
+      "match_pct": 0.0,
+      "correct_structure": true,
+      "function": "fn_8017B1AC",
+      "time": 0.6,
+      "response": "```c\nextern void fn_80167E34(void);\n\nvoid fn_8017B1AC(void) {\n    fn_80167E34();\n}\n```",
+      "status": "PASS"
+    }
+  ]
+}

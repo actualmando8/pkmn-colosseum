@@ -1,0 +1,67 @@
+[
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    lwz r3, lbl_8047AA80(r13)\n    lwz r3, 0x4c(r3)\n    blr\n",
+    "output": "extern u32 lbl_8047AA80;\nu32 fn_800D3094(void) {\n    return *(u32*)((u8*)lbl_8047AA80 + 0x4C);\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    lwz r4, lbl_8047AA80(r13)\n    stw r3, 0x48(r4)\n    blr\n",
+    "output": "extern u32 lbl_8047AA80;\nvoid fn_800D30A0(u32 val) {\n    *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 801AE000 001AB000  C0 22 A6 C0 */\tlfs f1, -22848(r2)\n/* 801AE004 001AB004  4E 80 00 20 */\tblr\n",
+    "output": "extern f32 lbl_8047DD60;\nf32 fn_801AE000(void) {\n    return lbl_8047DD60;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 80163F88 00160F88  38 00 00 01 */\tli r0, 0x1\n/* 80163F8C 00160F8C  90 0D A8 78 */\tstw r0, -22408(r13)\n/* 80163F90 00160F90  90 0D A8 68 */\tstw r0, -22424(r13)\n/* 80163F94 00160F94  4E 80 00 20 */\tblr\n",
+    "output": "extern u32 lbl_8047B098;\nextern u32 lbl_8047B088;\nvoid fn_80163F88(void) {\n    lbl_8047B098 = 1;\n    lbl_8047B088 = 1;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    lwz r0, lbl_8047A2F8(r13)\n    stw r0, 0x0(r3)\n    lwz r0, lbl_8047A2F4(r13)\n    stw r0, 0x0(r4)\n    blr\n",
+    "output": "extern u32 lbl_8047A2F8;\nextern u32 lbl_8047A2F4;\nvoid fn_800140FC(u32* out1, u32* out2) {\n    *out1 = lbl_8047A2F8;\n    *out2 = lbl_8047A2F4;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    lwz r4, lbl_80478B00(r13)\n    stw r3, 0x10(r4)\n    li r3, 0x0\n    blr\n",
+    "output": "extern u8* lbl_80478B00;\ns32 fn_800F75FC(u32 val) {\n    *(u32*)(lbl_80478B00 + 0x10) = val;\n    return 0;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    stwu r1, -0x10(r1)\n    mflr r0\n    stw r0, 0x14(r1)\n    bl fn_800E0C04\n    lwz r0, 0x14(r1)\n    mtlr r0\n    addi r1, r1, 0x10\n    blr\n",
+    "output": "extern void fn_800E0C04(void);\nvoid fn_801C6908(void) {\n    fn_800E0C04();\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n    stwu r1, -0x10(r1)\n    mflr r0\n    stw r0, 0x14(r1)\n    li r3, 0x0\n    bl fn_800D9ED8\n    lwz r0, 0x14(r1)\n    mtlr r0\n    addi r1, r1, 0x10\n    blr\n",
+    "output": "extern void fn_800D9ED8(u32);\n#pragma peephole off\nvoid fn_801C673C(void) {\n    fn_800D9ED8(0);\n}\n#pragma peephole on"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 8018F5B4 0018C5B4  28 03 00 00 */\tcmplwi r3, 0x0\n/* 8018F5B8 0018C5B8  41 82 00 0C */\tbeq @L_8018F5C4\n/* 8018F5BC 0018C5BC  C0 23 00 14 */\tlfs f1, 0x14(r3)\n/* 8018F5C0 0018C5C0  4E 80 00 20 */\tblr\n@L_8018F5C4:\n/* 8018F5C4 0018C5C4  C0 22 A2 08 */\tlfs f1, -24056(r2)\n/* 8018F5C8 0018C5C8  4E 80 00 20 */\tblr\n",
+    "output": "extern f32 lbl_8047D8A8;\nf32 fn_8018F5B4(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x14);\n    }\n    return lbl_8047D8A8;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 8018F5CC 0018C5CC  28 03 00 00 */\tcmplwi r3, 0x0\n/* 8018F5D0 0018C5D0  41 82 00 0C */\tbeq @L_8018F5DC\n/* 8018F5D4 0018C5D4  C0 23 00 10 */\tlfs f1, 0x10(r3)\n/* 8018F5D8 0018C5D8  4E 80 00 20 */\tblr\n@L_8018F5DC:\n/* 8018F5DC 0018C5DC  C0 22 A2 08 */\tlfs f1, -24056(r2)\n/* 8018F5E0 0018C5E0  4E 80 00 20 */\tblr\n",
+    "output": "extern f32 lbl_8047D8A8;\nf32 fn_8018F5CC(u8* ptr) {\n    if (ptr != NULL) {\n        return *(f32*)(ptr + 0x10);\n    }\n    return lbl_8047D8A8;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 80162858 0015F858  1C C3 00 F4 */\tmulli r6, r3, 0xf4\n/* 8016285C 0015F85C  80 0D A8 04 */\tlwz r0, -22524(r13)\n/* 80162860 0015F860  7C 60 32 14 */\tadd r3, r0, r6\n/* 80162864 0015F864  90 83 00 94 */\tstw r4, 0x94(r3)\n/* 80162868 0015F868  80 0D A8 04 */\tlwz r0, -22524(r13)\n/* 8016286C 0015F86C  7C 60 32 14 */\tadd r3, r0, r6\n/* 80162870 0015F870  90 A3 00 98 */\tstw r5, 0x98(r3)\n/* 80162874 0015F874  4E 80 00 20 */\tblr\n",
+    "output": "void fn_80162858(u32 index, u32 val1, u32 val2) {\n    extern u32 lbl_8047B024;\n    u32 offset = index * 0xF4;\n    {\n        u8* elem1 = (u8*)lbl_8047B024 + offset;\n        *(u32*)(elem1 + 0x94) = val1;\n    }\n    {\n        u8* elem2 = (u8*)lbl_8047B024 + offset;\n        *(u32*)(elem2 + 0x98) = val2;\n    }\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 80163BCC 00160BCC  38 64 00 1F */\taddi r3, r4, 0x1f\n/* 80163BD0 00160BD0  80 0D A8 58 */\tlwz r0, -22440(r13)\n/* 80163BD4 00160BD4  54 63 00 34 */\tclrrwi r3, r3, 5\n/* 80163BD8 00160BD8  7C 03 00 50 */\tsubf r0, r3, r0\n/* 80163BDC 00160BDC  90 0D A8 58 */\tstw r0, -22440(r13)\n/* 80163BE0 00160BE0  4E 80 00 20 */\tblr\n",
+    "output": "extern u32 lbl_8047B078;\nvoid fn_80163BCC(u8* unused, u32 size) {\n    lbl_8047B078 -= (size + 0x1F) & ~0x1F;\n}"
+  },
+  {
+    "instruction": "Convert this GameCube PowerPC assembly to matching C89 code. Use extern labels for SDA globals (r13-relative). Never use float literals for sdata2 returns. Output only the C function with needed externs.",
+    "input": "    nofralloc\n/* 8017B1AC 001781AC  94 21 FF F0 */\tstwu r1, -0x10(r1)\n/* 8017B1B0 001781B0  7C 08 02 A6 */\tmflr r0\n/* 8017B1B4 001781B4  90 01 00 14 */\tstw r0, 0x14(r1)\n/* 8017B1B8 001781B8  4B FE CC 7D */\tbl fn_80167E34\n/* 8017B1BC 001781BC  80 01 00 14 */\tlwz r0, 0x14(r1)\n/* 8017B1C0 001781C0  7C 08 03 A6 */\tmtlr r0\n/* 8017B1C4 001781C4  38 21 00 10 */\taddi r1, r1, 0x10\n/* 8017B1C8 001781C8  4E 80 00 20 */\tblr\n",
+    "output": "extern void fn_80167E34(void);\nvoid fn_8017B1AC(void) {\n    fn_80167E34();\n}"
+  }
+]
