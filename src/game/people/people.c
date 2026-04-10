@@ -1129,17 +1129,15 @@ asm void fn_8018F30C(void) {
 void fn_8018F30C(void) { /* TODO */ }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_8018F470(void) {
-#include "src/game/people/people_fn_8018F470.inc"
+extern u32 sdaBase_0x8018A690[8];
+
+u32 fn_8018F470(u32 r3) {
+    if (r3 < 2) {
+        return sdaBase_0x8018A690[r3];
+    } else {
+        return 0;
+    }
 }
-#else
-void fn_8018F470(void) { /* TODO */ }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

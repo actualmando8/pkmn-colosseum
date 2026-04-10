@@ -4,11 +4,11 @@
 **Date:** 2026-04-09
 **Goal:** Decompile all 1,022 remaining asm wrappers to 100% byte-match
 
-> Update (2026-04-10, `codex-rescue-d`): verified 9 additional wrapper
+> Update (2026-04-10, `codex-rescue-d`): verified 10 additional wrapper
 > removals in this branch-local overnight lane:
 > `fn_800301A8`, `fn_800301AC`, `fn_80030370`, `fn_8003037C`,
 > `fn_80030428`, `fn_80069048`, `fn_80176684`, `fn_8017669C`,
-> `fn_80177A38`.
+> `fn_80177A38`, `fn_8018F470`.
 > Branch-local scheduler state after rescan: 1,038 remaining wrappers and 26
 > simple-tier wrappers. Current productive pattern is targeted manual rescue in
 > isolated worktrees; bulk Ollama generation is still high-noise/compile-error.
