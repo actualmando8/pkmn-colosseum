@@ -359,13 +359,14 @@ void fn_80017028(void) { /* TODO */ }
 /* fn_80017764 - 0x80017764 | size: 0x2c */
 extern void fn_80102ED4(void);
 extern u32 lbl_8047A2E8;
-#if 1
-asm void fn_80017764(void) {
-#include "src/game/gs_pokemon_summary_fn_80017764.inc"
+extern u32 lbl_8047A2E8;
+extern void fn_80102ED4(void);
+
+void fn_80017764(void) {
+    if ((s32)lbl_8047A2E8 < 0) {
+        fn_80102ED4();
+    }
 }
-#else
-void fn_80017764(void) { /* TODO */ }
-#endif
 
 /* fn_80017790 - 0x80017790 | size: 0xd8 */
 #if 1
@@ -390,23 +391,24 @@ void fn_80017868(void) { /* TODO */ }
 
 /* fn_800178EC - 0x800178EC | size: 0x28 */
 extern u32 lbl_8047A2E0;
-#if 1
-asm void fn_800178EC(void) {
-#include "src/game/gs_pokemon_summary_fn_800178EC.inc"
+s32 fn_800178EC(u32 unused, u8* ptr) {
+    if ((s32)lbl_8047A2E0 != 3) {
+        *(u8*)(ptr + 0x67) = 0;
+    } else {
+        *(u8*)(ptr + 0x67) = 0xCC;
+    }
+    return 0;
 }
-#else
-void fn_800178EC(void) { /* TODO */ }
-#endif
 
 /* fn_80017914 - 0x80017914 | size: 0x28 */
-extern u32 lbl_8047A2E0;
-#if 1
-asm void fn_80017914(void) {
-#include "src/game/gs_pokemon_summary_fn_80017914.inc"
+s32 fn_80017914(u32 unused, u8* ptr) {
+    if ((s32)lbl_8047A2E0 != 3) {
+        *(u8*)(ptr + 0x67) = 0;
+    } else {
+        *(u8*)(ptr + 0x67) = 0xFF;
+    }
+    return 0;
 }
-#else
-void fn_80017914(void) { /* TODO */ }
-#endif
 
 /* fn_8001793C - 0x8001793C | size: 0x54 */
 #if 1
