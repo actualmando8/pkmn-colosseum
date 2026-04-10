@@ -373,24 +373,16 @@ void fn_80176658(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
-asm void fn_80176684(void) {
-#include "src/game/gs_scene_fn_80176684.inc"
+f32 fn_80176684(void) {
+    return *(f32*)((u8*)lbl_80478C40 + 0x14);
 }
-#else
-void fn_80176684(void) { /* TODO */ }
-#endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
-asm void fn_8017669C(void) {
-#include "src/game/gs_scene_fn_8017669C.inc"
+f32 fn_8017669C(void) {
+    return *(f32*)((u8*)lbl_80478C40 + 0x40);
 }
-#else
-void fn_8017669C(void) { /* TODO */ }
-#endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
@@ -582,13 +574,9 @@ void fn_801779CC(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
-asm void fn_80177A38(void) {
-#include "src/game/gs_scene_fn_80177A38.inc"
+u8 fn_80177A38(void) {
+    return *(u8*)lbl_80478C40;
 }
-#else
-void fn_80177A38(void) { /* TODO */ }
-#endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
