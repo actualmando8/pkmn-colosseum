@@ -156,22 +156,12 @@ extern void fn_8019B948(void);
 extern u8 lbl_8036C7E8[];
 extern u8 lbl_8036CC00[];
 extern u8 lbl_802747B8[];
-extern u8 lbl_8047DA60[];
-#if 1
-asm void fn_8019B808(void) {
-#include "src/hsd/hsd_fog_fn_8019B808.inc"
-}
-#else
-#pragma optimization_level 4
+extern u8 lbl_8047DA60;
 void fn_8019B808(void) {
-    void** base;
-    fn_80193B30(lbl_8036C7E8, lbl_8036CC00, lbl_802747B8, lbl_8047DA60, 0x40, 0x20);
-    base = (void**)lbl_8036C7E8;
-    base[0x30/4] = (void*)fn_8019B874;
-    base[0x3c/4] = (void*)fn_8019B948;
+    fn_80193B30(lbl_8036C7E8, lbl_8036CC00, lbl_802747B8, &lbl_8047DA60, 0x40, 0x20);
+    ((void**)lbl_8036C7E8)[0x30/4] = (void*)fn_8019B874;
+    ((void**)lbl_8036C7E8)[0x3c/4] = (void*)fn_8019B948;
 }
-#endif
-#pragma pop
 
 /* 0x8019B874 | 0xD4 */
 #pragma push
