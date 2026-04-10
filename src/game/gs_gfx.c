@@ -554,11 +554,15 @@ asm void fn_800D36B4(void) {
 #else
 void fn_800D36B4(void) { /* TODO */ }
 #endif
-#if 1
-asm void fn_800D377C(void) {
-#include "src/game/gs_gfx_fn_800D377C.inc"
+extern void fn_8019C690();
+void fn_800D377C(s32 mode) {
+    switch (mode) {
+    case 1:
+        fn_8019C690(0, 0);
+        break;
+    case 2:
+        fn_8019C690(1, 0);
+        break;
+    }
 }
-#else
-void fn_800D377C(void) { /* TODO */ }
-#endif
 #endif /* !PCPORT */
