@@ -1,0 +1,71 @@
+{
+  "model": "kimi-k2-turbo-preview",
+  "results": [
+    {
+      "fn": "fn_800D3094",
+      "status": "PASS",
+      "time": 1.6697752475738525
+    },
+    {
+      "fn": "fn_800D30A0",
+      "status": "PASS",
+      "time": 1.7596421241760254
+    },
+    {
+      "fn": "fn_801AE000",
+      "status": "PASS",
+      "time": 1.2937705516815186
+    },
+    {
+      "fn": "fn_80163F88",
+      "status": "PASS",
+      "time": 1.921849012374878
+    },
+    {
+      "fn": "fn_800140FC",
+      "status": "PASS",
+      "time": 2.5259649753570557
+    },
+    {
+      "fn": "fn_800F75FC",
+      "status": "PASS",
+      "time": 2.028794765472412
+    },
+    {
+      "fn": "fn_801C6908",
+      "status": "PASS",
+      "time": 1.4526777267456055
+    },
+    {
+      "fn": "fn_801C673C",
+      "status": "PASS",
+      "time": 1.4464948177337646
+    },
+    {
+      "fn": "fn_8018F5B4",
+      "status": "PASS",
+      "time": 1.9689397811889648
+    },
+    {
+      "fn": "fn_8018F5CC",
+      "status": "PASS",
+      "time": 1.939013957977295
+    },
+    {
+      "fn": "fn_80162858",
+      "status": "PASS",
+      "time": 3.024787187576294
+    },
+    {
+      "fn": "fn_80163BCC",
+      "status": "PASS",
+      "time": 2.08079195022583
+    },
+    {
+      "fn": "fn_8017B1AC",
+      "status": "PASS",
+      "time": 1.4240226745605469
+    }
+  ],
+  "total_time": 24.536524772644043
+}
