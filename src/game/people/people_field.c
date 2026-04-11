@@ -1062,8 +1062,8 @@ extern void fn_8015D54C(u8* ptr);
 extern void fn_8015D5F4(u8* ptr);
 extern u8 lbl_80447E60[];
 extern void fn_8015D7D0(void);
-extern void fn_801629A4(void);
-extern void fn_801629D0(void);
+extern void fn_801629A4(u32 index, u8 value);
+extern void fn_801629D0(u32 index, u8 value);
 extern void fn_801629FC(void);
 extern void fn_801632B4(void);
 extern void fn_80163490(void);
@@ -1363,16 +1363,16 @@ void fn_8016292C(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801629A4(void) {
 #include "src/game/people/people_field_fn_801629A4.inc"
 }
 #else
 void fn_801629A4(u32 index, u8 value) {
     extern u32 lbl_8047B024;
-    extern u16* lbl_80478BF8;
+    extern u16 lbl_80478BF8;
     u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCC) = lbl_80478BF8[(u8)value];
+    *(u16*)(elem + 0xCC) = (&lbl_80478BF8)[(u8)value];
     *(u32*)(elem + 0x24) |= 0x100;
 }
 #endif
@@ -1380,16 +1380,16 @@ void fn_801629A4(u32 index, u8 value) {
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801629D0(void) {
 #include "src/game/people/people_field_fn_801629D0.inc"
 }
 #else
 void fn_801629D0(u32 index, u8 value) {
     extern u32 lbl_8047B024;
-    extern u16* lbl_80478C00;
+    extern u16 lbl_80478C00;
     u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCE) = lbl_80478C00[(u8)value];
+    *(u16*)(elem + 0xCE) = (&lbl_80478C00)[(u8)value];
     *(u32*)(elem + 0x24) |= 0x80;
 }
 #endif

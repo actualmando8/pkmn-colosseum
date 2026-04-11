@@ -2856,16 +2856,12 @@ asm void fn_800205C8(void) {
 #include "src/game/gs_title_fn_800205C8.inc"
 }
 #else
-#pragma scheduling off
 void fn_800205C8(u8* obj) {
-    extern u32 lbl_8047A350;
-    extern u32 lbl_80478880[];
     u32 idx;
     u8 byte;
-    
     idx = lbl_8047A350;
     byte = obj[0x8b];
-    fn_800FB680(0, 0, (s32)byte | (s16)(-0x100), (u32)((u8*)&lbl_80478880 + (idx * 4)));
+    fn_800FB680(0, 0, byte | (s32)-0x100, (&lbl_80478880)[idx]);
 }
 #endif
 
