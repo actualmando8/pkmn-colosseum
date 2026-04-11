@@ -149,7 +149,7 @@ extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
 
 /* Effect system core */
-extern u16   fn_80131428(void* callbacks, u16 dataSize);  /* GSEffectAllocSlot */
+extern u32   fn_80131428(void* callbacks, u16 dataSize);  /* GSEffectAllocSlot */
 extern void  fn_80131200(u32 effectId,
                           GSEffectStartFunc startFunc,
                           GSEffectStopFunc  destroyFunc,
@@ -472,17 +472,19 @@ asm void fn_801387C0(void* ptr, u32 delta) {
 }
 #else
 u32 fn_801387C0(void* ptr, u32 delta) {
-    u32 max;
-    if (ptr == NULL) { goto fail; }
-    max = *(u16*)((u8*)ptr + 0x12);
-    if (max == 0) { goto work; }
-    if (*(u16*)((u8*)ptr + 0x10) >= max) { goto fail; }
-work:
+    u16 limit;
+    if (ptr == NULL) {
+        return 0;
+    }
+    limit = *(u16*)((u8*)ptr + 0x12);
+    if (limit != 0) {
+        if (*(u16*)((u8*)ptr + 0x10) >= limit) {
+            return 0;
+        }
+    }
     fn_80138838(ptr, 0);
     *(u16*)((u8*)ptr + 0x10) = *(u16*)((u8*)ptr + 0x10) + delta;
     return 1;
-fail:
-    return 0;
 }
 #endif
 extern void fn_800E0BE4(void);
@@ -507,12 +509,26 @@ asm void fn_80138838(void* ptr, u32 b) {
 #else
 void fn_80138838(void* ptr, u32 b) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80138B00(void) {
 #include "src/game/effect/effect_visual_fn_80138B00.inc"
 }
 #else
-void fn_80138B00(void) { /* TODO */ }
+u32 fn_80138B00(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x4c);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_80138B74,
+            (GSEffectStartFunc)fn_80138CCC,
+            (GSEffectStopFunc)fn_80138BBC,
+            0,
+            (GSEffectUpdateFunc)fn_80138DE4,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 extern void fn_800F9210(u32 a, u32 b);
 #if 0
@@ -597,12 +613,26 @@ asm void fn_80139378(void) {
 #else
 void fn_80139378(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80139820(void) {
 #include "src/game/effect/effect_visual_fn_80139820.inc"
 }
 #else
-void fn_80139820(void) { /* TODO */ }
+u32 fn_80139820(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x60);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_80139898,
+            (GSEffectStartFunc)fn_80139D10,
+            (GSEffectStopFunc)fn_801398E0,
+            0,
+            (GSEffectUpdateFunc)fn_80139AC4,
+            (GSEffectRenderFunc)fn_80139934);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 0
 asm void fn_80139898(void* ptr) {
@@ -695,12 +725,26 @@ asm void fn_8013A1D4(void) {
 #else
 void fn_8013A1D4(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013A42C(void) {
 #include "src/game/effect/effect_visual_fn_8013A42C.inc"
 }
 #else
-void fn_8013A42C(void) { /* TODO */ }
+u32 fn_8013A42C(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x24);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            0,
+            (GSEffectStartFunc)fn_8013A49C,
+            0,
+            0,
+            (GSEffectUpdateFunc)fn_8013AA8C,
+            (GSEffectRenderFunc)fn_8013A520);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 extern u8 lbl_80272D90[];
 extern u8 lbl_80272DF4[];
@@ -759,12 +803,26 @@ u32 fn_8013AA8C(void* ptr, u16 delta) {
     return 0;
 }
 #endif
-#if 1
+#if 0
 asm void fn_8013AABC(void) {
 #include "src/game/effect/effect_visual_fn_8013AABC.inc"
 }
 #else
-void fn_8013AABC(void) { /* TODO */ }
+u32 fn_8013AABC(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x5c);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_8013B034,
+            (GSEffectStartFunc)fn_8013B158,
+            (GSEffectStopFunc)fn_8013B0A0,
+            (void*)fn_8013AD68,
+            (GSEffectUpdateFunc)fn_8013AD9C,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 0
 asm u32 fn_8013AB34(void* ptr) {
@@ -882,12 +940,26 @@ asm void fn_8013B268(void) {
 #else
 void fn_8013B268(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013B490(void) {
 #include "src/game/effect/effect_visual_fn_8013B490.inc"
 }
 #else
-void fn_8013B490(void) { /* TODO */ }
+u32 fn_8013B490(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0xd0);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_8013B504,
+            (GSEffectStartFunc)fn_8013B5E4,
+            (GSEffectStopFunc)fn_8013B558,
+            0,
+            (GSEffectUpdateFunc)fn_8013B85C,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 0
 asm u32 fn_8013B504(void* ptr) {
@@ -1004,12 +1076,26 @@ asm void fn_8013C074(void) {
 #else
 void fn_8013C074(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013C5A0(void) {
 #include "src/game/effect/effect_visual_fn_8013C5A0.inc"
 }
 #else
-void fn_8013C5A0(void) { /* TODO */ }
+u32 fn_8013C5A0(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0xac);
+    if (effectId) {
+        fn_80131200(effectId,
+            0,
+            (GSEffectStopFunc)fn_8013C614,
+            (GSEffectStartFunc)fn_8013C718,
+            (GSEffectStopFunc)fn_8013C670,
+            0,
+            (GSEffectUpdateFunc)fn_8013CA48,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 0
 asm u32 fn_8013C614(void* ptr) {
@@ -1119,12 +1205,26 @@ u32 fn_8013D604(void* ptr, u32 val, f32 f1, f32 f2) {
     return 0;
 }
 #endif
-#if 1
+#if 0
 asm void fn_8013D6B8(void) {
 #include "src/game/effect/effect_visual_fn_8013D6B8.inc"
 }
 #else
-void fn_8013D6B8(void) { /* TODO */ }
+u32 fn_8013D6B8(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x18);
+    if (effectId) {
+        fn_80131200(effectId,
+            (GSEffectStartFunc)fn_8013D804,
+            (GSEffectStopFunc)fn_8013D730,
+            (GSEffectStartFunc)fn_8013D908,
+            (GSEffectStopFunc)fn_8013D7CC,
+            0,
+            (GSEffectUpdateFunc)fn_8013D984,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 extern u32 lbl_8047AEE0;
 extern u16 lbl_8047AEE4;
@@ -1296,12 +1396,26 @@ u32 fn_8013DB64(void* ptr, u32 val, f32 f1, f32 f2) {
     return 0;
 }
 #endif
-#if 1
+#if 0
 asm void fn_8013DC18(void) {
 #include "src/game/effect/effect_visual_fn_8013DC18.inc"
 }
 #else
-void fn_8013DC18(void) { /* TODO */ }
+u32 fn_8013DC18(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x20);
+    if (effectId) {
+        fn_80131200(effectId,
+            (GSEffectStartFunc)fn_8013DD10,
+            (GSEffectStopFunc)fn_8013DC94,
+            (GSEffectStartFunc)fn_8013DDCC,
+            (GSEffectStopFunc)fn_8013DD7C,
+            0,
+            (GSEffectUpdateFunc)fn_8013E470,
+            (GSEffectRenderFunc)fn_8013DE6C);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 0
 asm u32 fn_8013DC94(void* ptr) {
@@ -1428,12 +1542,26 @@ asm void fn_8013E470(void) {
 #else
 void fn_8013E470(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013E4D4(void) {
 #include "src/game/effect/effect_visual_fn_8013E4D4.inc"
 }
 #else
-void fn_8013E4D4(void) { /* TODO */ }
+u32 fn_8013E4D4(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x34);
+    if (effectId) {
+        fn_80131200(effectId,
+            (GSEffectStartFunc)fn_8013E5AC,
+            (GSEffectStopFunc)fn_8013E54C,
+            (GSEffectStartFunc)fn_8013E658,
+            0,
+            0,
+            (GSEffectUpdateFunc)fn_8013E8A4,
+            (GSEffectRenderFunc)fn_8013E6C4);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 1
 asm void fn_8013E54C(void) {
@@ -1520,12 +1648,26 @@ asm void fn_8013EA44(void) {
 #else
 void fn_8013EA44(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013F000(void) {
 #include "src/game/effect/effect_visual_fn_8013F000.inc"
 }
 #else
-void fn_8013F000(void) { /* TODO */ }
+u32 fn_8013F000(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0xb4);
+    if (effectId) {
+        fn_80131200(effectId,
+            (GSEffectStartFunc)fn_8013F114,
+            (GSEffectStopFunc)fn_8013F078,
+            (GSEffectStartFunc)fn_8013F344,
+            0,
+            0,
+            (GSEffectUpdateFunc)fn_8013F80C,
+            (GSEffectRenderFunc)fn_8013F410);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 extern void fn_800D75F4(void);
 extern u32 lbl_8047AEE8;
@@ -1623,12 +1765,26 @@ asm void fn_8013F97C(void) {
 #else
 void fn_8013F97C(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013FBE0(void) {
 #include "src/game/effect/effect_visual_fn_8013FBE0.inc"
 }
 #else
-void fn_8013FBE0(void) { /* TODO */ }
+u32 fn_8013FBE0(void* callbacks) {
+    u32 effectId = fn_80131428(callbacks, 0x24);
+    if (effectId) {
+        fn_80131200(effectId,
+            (GSEffectStartFunc)fn_8013FCC4,
+            (GSEffectStopFunc)fn_8013FC58,
+            (GSEffectStartFunc)fn_8013FDD0,
+            (GSEffectStopFunc)fn_8013FD68,
+            0,
+            (GSEffectUpdateFunc)fn_8013FF0C,
+            0);
+        fn_8013139C(effectId, 0);
+    }
+    return effectId;
+}
 #endif
 #if 1
 asm void fn_8013FC58(void) {
