@@ -5,6 +5,12 @@
 **Status:** IN PROGRESS — 854/1,734 decompiled (49.3%), 880 remaining
 **Updated:** 2026-04-01
 
+> Audit note (2026-04-02): The matching techniques below are still useful, but
+> the progress counts in this document were already stale by the time of the
+> audit, and this repo targets `GC6E01` rather than `GPXE01`. See
+> [status_audit.md](status_audit.md) for the current repo-backed status
+> summary.
+
 ---
 
 ## Overall Progress

@@ -45,8 +45,8 @@ TIER_LIMITS = {
 }
 
 TIER_BACKENDS = {
-    TIER_SIMPLE: ["ollama", "opencode", "claude"],
-    TIER_MEDIUM: ["ollama", "claude"],
+    TIER_SIMPLE: ["ollama", "kimi", "opencode", "claude"],
+    TIER_MEDIUM: ["ollama", "kimi", "claude"],
     TIER_COMPLEX: ["claude"],
     TIER_HARD: ["claude"],
 }

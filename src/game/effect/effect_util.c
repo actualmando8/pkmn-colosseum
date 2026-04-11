@@ -885,22 +885,20 @@ asm void fn_80131FF4(void) {
 }
 #else
 void fn_80131FF4(void) {
-    extern u32 lbl_8047ADE0;
     extern void fn_800FA280(u32);
     extern void fn_80132A38(u32, u32);
     extern u32 fn_801F18DC(u32);
     extern u32 fn_801F4354(u32, u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
+    u32 result;
+    u32 flag;
     u32 val = lbl_8047ADE0;
-    u32 result = fn_801F4354(0, val);
-    u32 flag = fn_801F18DC(0) & 0xFF;
-
+    result = fn_801F4354(0, val);
+    flag = (u32)(fn_801F18DC(0) & 0xFF);
     if (flag == 1 && result != 0) {
-        u32 info = fn_801F8100(result);
-        fn_80132A38(0x4D, info);
-        info = fn_802037DC(val);
-        fn_80132A38(0x57, info);
+        fn_80132A38(0x4D, fn_801F8100(result));
+        fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
@@ -2285,7 +2283,7 @@ void fn_80133810(u8 flag) {
     }
     if (result == 0) { return; }
     if (lbl_8047AED0 == 0) { return; }
-    { u8 active = fn_80102620(lbl_80478848); if (active) { return; } }
+    if (fn_80102620(lbl_80478848)) { return; }
     lbl_8047AED1 = flag;
     do {
         if (fn_801338A4(0) < 0) { return; }

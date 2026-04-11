@@ -14,7 +14,9 @@
 #else
 
 #include "os_shim.h"
+#include "pcport_window.h"
 
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,8 +52,25 @@ static u32 g_interruptsEnabled = 1;
 /** VI black screen flag */
 static BOOL g_viBlack = 0;
 
+/** Active host window provided by the bootstrap */
+static GLFWwindow* g_hostWindow = NULL;
+
+/** Last configured VI dimensions */
+static int g_viWidth = 640;
+static int g_viHeight = 480;
+
 /** Initialized flag */
 static int g_osInitialized = 0;
+
+/* Display descriptor backing storage is provided by the gs_gfx host support
+ * layer when that path is linked into the bootstrap.
+ */
+extern u8 lbl_80466BC0[];
+
+static void UpdateDisplayDescriptor(int width, int height) {
+    *(u16*)(lbl_80466BC0 + 4) = (u16)width;
+    *(u16*)(lbl_80466BC0 + 6) = (u16)height;
+}
 
 /* =========================================================================
  * Initialization / Shutdown
@@ -88,7 +107,11 @@ void OSInit_PC(void) {
     g_schedulerDisableCount = 0;
     g_interruptsEnabled = 1;
     g_viBlack = 0;
+    g_viWidth = 640;
+    g_viHeight = 480;
     g_osInitialized = 1;
+
+    UpdateDisplayDescriptor(g_viWidth, g_viHeight);
 
     printf("[os_shim] OSInit_PC: Arena %p - %p (%d bytes)\n",
            g_arenaLo, g_arenaHi, OS_ARENA_SIZE);
@@ -102,6 +125,26 @@ void OSShutdown_PC(void) {
     g_arenaLo = NULL;
     g_arenaHi = NULL;
     g_osInitialized = 0;
+}
+
+void PCPort_SetHostWindow(GLFWwindow* window) {
+    g_hostWindow = window;
+}
+
+GLFWwindow* PCPort_GetHostWindow(void) {
+    return g_hostWindow;
+}
+
+int PCPort_GetVideoWidth(void) {
+    return g_viWidth;
+}
+
+int PCPort_GetVideoHeight(void) {
+    return g_viHeight;
+}
+
+int PCPort_IsVideoBlack(void) {
+    return g_viBlack != 0;
 }
 
 /* =========================================================================
@@ -256,6 +299,16 @@ u32 OSDisableInterrupts_PC(void) {
     return prev;
 }
 
+BOOL OSDisableInterrupts(void) {
+    return (BOOL)OSDisableInterrupts_PC();
+}
+
+BOOL OSEnableInterrupts(void) {
+    BOOL prev = (BOOL)g_interruptsEnabled;
+    g_interruptsEnabled = 1;
+    return prev;
+}
+
 void OSRestoreInterrupts_PC(u32 prev) {
     g_interruptsEnabled = prev;
 
@@ -269,6 +322,12 @@ void OSRestoreInterrupts_PC(u32 prev) {
      *     #endif
      * }
      */
+}
+
+BOOL OSRestoreInterrupts(BOOL level) {
+    BOOL prev = (BOOL)g_interruptsEnabled;
+    OSRestoreInterrupts_PC((u32)level);
+    return prev;
 }
 
 s32 OSDisableScheduler_PC(void) {
@@ -287,31 +346,25 @@ s32 OSEnableScheduler_PC(void) {
  * ========================================================================= */
 
 void VIConfigure_PC(void* mode) {
-    (void)mode;
+    int width = 640;
+    int height = 480;
 
-    /* TODO: Phase 3a -- Configure window size from video mode
-     *
-     * The game sets up NTSC (640x480) or PAL (640x576) modes.
-     * Map to GLFW window creation:
-     *
-     * int width = 640, height = 480;
-     * // Parse mode to get resolution
-     * // For widescreen: width = 854
-     *
-     * if (g_window == NULL) {
-     *     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-     *     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-     *     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-     *     g_window = glfwCreateWindow(width, height,
-     *                                 "Pokemon Colosseum", NULL, NULL);
-     *     glfwMakeContextCurrent(g_window);
-     *     glfwSwapInterval(1); // VSync
-     * } else {
-     *     glfwSetWindowSize(g_window, width, height);
-     * }
-     */
+    if (mode != NULL) {
+        u8* modeBytes = (u8*)mode;
+        u16 modeWidth = *(u16*)(modeBytes + 4);
+        u16 modeHeight = *(u16*)(modeBytes + 6);
 
-    printf("[os_shim] VIConfigure_PC stub\n");
+        if (modeWidth != 0) {
+            width = modeWidth;
+        }
+        if (modeHeight != 0) {
+            height = modeHeight;
+        }
+    }
+
+    g_viWidth = width;
+    g_viHeight = height;
+    UpdateDisplayDescriptor(width, height);
 }
 
 void VISetNextFrameBuffer_PC(void* fb) {
@@ -320,40 +373,21 @@ void VISetNextFrameBuffer_PC(void* fb) {
 }
 
 void VIWaitForRetrace_PC(void) {
-    /* TODO: Phase 3a -- VSync wait
-     *
-     * If using glfwSwapInterval(1), VSync is handled by glfwSwapBuffers.
-     * This function can be a no-op, or it can poll glfwGetTime to
-     * maintain a consistent 60fps frame rate:
-     *
-     * static double lastFrame = 0;
-     * double targetFrameTime = 1.0 / 60.0;
-     * double now = glfwGetTime();
-     * double elapsed = now - lastFrame;
-     * if (elapsed < targetFrameTime) {
-     *     // Sleep for the remaining time
-     *     double sleepTime = targetFrameTime - elapsed;
-     *     usleep((int)(sleepTime * 1000000));
-     * }
-     * lastFrame = glfwGetTime();
-     */
+    PCPort_RunPreRetraceCallback();
+
+    if (g_hostWindow != NULL) {
+        glfwPollEvents();
+    }
 }
 
 void VIFlush_PC(void) {
-    /* No-op on PC */
+    if (g_hostWindow != NULL) {
+        glfwSetWindowSize(g_hostWindow, g_viWidth, g_viHeight);
+    }
 }
 
 void VISetBlack_PC(BOOL black) {
     g_viBlack = black;
-
-    /* TODO: Phase 3a -- Set black screen flag
-     *
-     * When black is TRUE, the main render loop should:
-     *   glClearColor(0, 0, 0, 1);
-     *   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-     *   glfwSwapBuffers(g_window);
-     * instead of rendering the scene.
-     */
 }
 
 

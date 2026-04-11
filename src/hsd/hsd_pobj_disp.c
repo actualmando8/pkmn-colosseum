@@ -13,6 +13,72 @@
  */
 
 #include "dolphin/types.h"
+
+#ifdef PCPORT
+
+#include "hsd/hsd_pobj.h"
+
+extern void GXSetVtxDesc(u32 attr, u32 type);
+extern void GXSetVtxAttrFmt(u32 vtxfmt, u32 attr, u32 cnt, u32 type, u8 frac);
+extern void GXSetArray(u32 attr, void* base, u8 stride);
+extern void GXClearVtxDesc(void);
+
+void fn_801AA35C(HSD_VtxDescList* verts) {
+    HSD_VtxDescList* v;
+
+    if (verts == NULL) {
+        return;
+    }
+
+    GXClearVtxDesc();
+
+    for (v = verts; v->attr != 0xFF; ++v) {
+        GXSetVtxDesc(v->attr, v->attr_type);
+
+        if (v->attr_type != 0) {
+            GXSetVtxAttrFmt(0, v->attr, v->comp_cnt, v->comp_type, v->frac);
+
+            if ((v->attr_type == 2 || v->attr_type == 3) &&
+                v->vertex != NULL) {
+                GXSetArray(v->attr, v->vertex, v->stride);
+            }
+        }
+    }
+}
+
+void fn_801AA498(u32 attr, u32 cnt, u32 type, u8 frac) {
+    GXSetVtxAttrFmt(0, attr, cnt, type, frac);
+}
+
+void fn_801AA4CC(HSD_VtxDescList* verts) {
+    HSD_VtxDescList* v;
+
+    if (verts == NULL) {
+        return;
+    }
+
+    for (v = verts; v->attr != 0xFF; ++v) {
+        if ((v->attr_type == 2 || v->attr_type == 3) &&
+            v->vertex != NULL) {
+            GXSetArray(v->attr, v->vertex, v->stride);
+        }
+    }
+}
+
+void fn_801AA538(u32 attr, void* base, u8 stride) {
+    GXSetArray(attr, base, stride);
+}
+
+void fn_801AA568(HSD_PObj* pobj) {
+    if (pobj == NULL || pobj->verts == NULL) {
+        return;
+    }
+
+    fn_801AA35C(pobj->verts);
+}
+
+#else
+
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_pobj.h"
@@ -723,3 +789,5 @@ void fn_801ADE50(u32 num_texcoords) {
 void fn_801ADF54(u32 num_tex) {
     /* Load texture matrices to GX */
 }
+
+#endif /* PCPORT */

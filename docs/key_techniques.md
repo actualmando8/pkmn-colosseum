@@ -4,7 +4,7 @@ Everything we've learned about matching Metrowerks CodeWarrior GC output
 byte-for-byte against the original Pokémon Colosseum DOL. This document
 is a living reference — update it as new patterns are discovered.
 
-**Last updated:** 2026-04-09
+**Last updated:** 2026-04-11
 
 ---
 
@@ -423,6 +423,11 @@ void fn(u32* out1, u32* out2) {
 | Float literal mismatch | Use `extern f32 lbl_XXX` instead of `0.0f` |
 | `li` not reused across stores | Remove `#pragma optimization_level 0` |
 | Two `li r0,0` vs one | Use block scoping to prevent CSE |
+| Division result differs | See Section 14: division magic |
+| Thunk instruction reordered | `#pragma scheduling off` around thunk |
+| Branch direction inverted after goto | Remove goto — CW O4,p inverts conditions |
+| `(-r)\|r` operand order wrong | See Section 14: nonzero-test idiom |
+| Pointer addressing (SDA vs lis/addi) | `extern u16*` (SDA) vs `extern u16[]` (lis/addi) |
 
 ---
 
@@ -488,3 +493,99 @@ signed = raw - 0x10000 if raw >= 0x8000 else raw
 addr = SDA_BASE + signed  # or SDA2_BASE for r2
 # Then: grep addr in config/GC6E01/symbols.txt
 ```
+
+---
+
+## 14. New Patterns (discovered 2026-04-11)
+
+### Division magic: `/7*4` vs `/28`
+
+CW generates **different division algorithms** for these mathematically equivalent expressions:
+
+```c
+(x / 7) * 4   // CW: multiply-high magic number for /7, then shift for *4
+x / 28        // CW: different multiply-high magic number for /28
+```
+
+If the asm shows a specific magic multiplier, match the exact expression form — do not
+simplify or factor the arithmetic. Inspect the magic constant to determine which form
+the original used.
+
+### `#pragma scheduling off` for thunk instruction ordering
+
+When a thunk (`bl target` wrapper) has its instructions reordered relative to the
+surrounding code, add:
+
+```c
+#pragma scheduling off
+void fn_XXXXXXXX(void) { target(); }
+#pragma scheduling on
+```
+
+This prevents the peephole/scheduler from moving the `bl` instruction relative to
+prologue/epilogue stores. Usually needed when the thunk is the only instruction
+and the scheduler tries to hoist/sink it.
+
+### Null-check branch direction: `if(ptr){return x;} return 0;`
+
+CW O4,p prefers **null-check branches that fall through to the null case**:
+
+```c
+// Generates: beq @null_case (fall through), then return x path
+if (ptr) {
+    return x;
+}
+return 0;
+
+// WRONG — generates inverted branch:
+if (!ptr) {
+    return 0;
+}
+return x;
+```
+
+The branch direction in the asm tells you which form the original used. `beq @skip`
+over the return-value block means the `if(ptr){return x;}` form.
+
+### `(-r)|r` nonzero-test idiom — operand order matters
+
+CW generates `neg rD, rA; or rD, rD, rA` for a nonzero test that produces 0 or -1.
+The operand order in the `or` is always `(negated, original)` — do not swap them:
+
+```c
+// Correct: produces CW's (-r)|r
+s32 nonzero = (-(s32)val) | (s32)val;
+
+// Wrong operand order — generates or rD, rA, rD instead:
+s32 nonzero = (s32)val | (-(s32)val);
+```
+
+### `extern u16*` vs `extern u16[]` — pointer vs array addressing
+
+These two declarations generate **completely different addressing code**:
+
+```c
+extern u16 *lbl_XXXX;   // Pointer stored in sdata2 — single lwz from r2
+extern u16  lbl_XXXX[]; // Array — lis/addi absolute address pair
+```
+
+When the asm loads a 16-bit pointer via `lwz rN, offset(r2)` (one instruction),
+use `extern u16 *lbl_XXXX`. When the asm uses `lis/addi` or `lis/la`, use the
+array form. Mixing these is a common source of relocation mismatches.
+
+### `beq+blr` vs `bne+skip` — known CW O4 gap
+
+When the target has `bne @skip; blr` and our code generates `beq @done; b @skip; @done: blr`,
+this is a known CW O4 peephole gap that **cannot be closed from C**. Accept a
+2-instruction mismatch for functions that are otherwise 100% correct.
+
+### `goto` makes CW codegen WORSE at O4,p
+
+Using `goto` in C source causes CW -O4,p to:
+- Invert branch conditions (`bne` becomes `beq`)
+- Reorder epilogue stores
+- Generate redundant moves
+
+**Never use `goto` to match branch patterns.** Rewrite as structured control flow
+(`if/else`, `while`, `do/while`) even if it looks less obvious. The optimizer
+handles structured flow better than explicit jumps.

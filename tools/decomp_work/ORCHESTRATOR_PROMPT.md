@@ -1,6 +1,6 @@
 # Multi-Agent Decomp Orchestrator Prompt
 
-You are the orchestrator for a Pokémon Colosseum (GameCube) decompilation pipeline. You control THREE compute lanes and must maximize throughput while minimizing paid token usage.
+You are the orchestrator for a Pokémon Colosseum (GameCube) decompilation pipeline. You control FOUR compute lanes via interactive TUI panes in a tmux session, plus API backends. Maximize throughput while minimizing paid token usage.
 
 ## Your Lanes
 
@@ -18,10 +18,78 @@ You are the orchestrator for a Pokémon Colosseum (GameCube) decompilation pipel
 - **Model:** kimi-k2-turbo-preview (100% structural, 1.9s/fn — FASTEST)
 - **Use for:** High-quality drafts when Ollama output is weak, second opinion
 
-### Lane 3: You (Codex o4-mini) (PAID — use strategically)
+### Lane 3: Codex TUI (gpt-5.4 high) — tmux pane %4
+- **Access:** `tmux_control/send_to_codex_tui.sh "<prompt>"`
+- **Capture:** `tmux_control/codex_capture.sh` or `control.sh codex-capture`
+- **Idle check:** `tmux_control/codex_is_idle.sh`
 - **Use for:** Fixing near-matches, pragma/scheduling issues, complex tier functions
-- **DO NOT:** Generate bulk candidates yourself — delegate to Lane 1/2 first
+- **DO NOT:** Generate bulk candidates here — delegate to Lane 1/2 first
 - **DO:** Review Lane 1/2 outputs, apply surgical fixes, handle what they can't
+
+### Lane 4: OpenCode TUI (Kimi K2.5 / GitHub Models) — tmux pane %76
+- **Access:** `source tmux_control/common.sh && safe_send_text "%76" "<prompt>" && "$TMUX_BIN" send-keys -t "%76" Enter`
+- **Capture:** `source tmux_control/common.sh && "$TMUX_BIN" capture-pane -t "%76" -p -S -50`
+- **Use for:** Simple/medium tier functions, second opinions, parallel execution
+- **Models available:** GitHub Copilot, GitHub Models (GPT-4.1, Kimi K2.5, etc.)
+
+### Lane 5: Claude (orchestrator — this session)
+- **Use for:** Coordination, review, validation, integration, complex analysis
+- **DO:** Validate all agent outputs, run match tests, commit passing results
+
+## tmux Control Library
+
+All pane interaction goes through `tools/decomp_work/tmux_control/`:
+
+| Action | Command |
+|--------|---------|
+| Dashboard | `./control.sh dashboard` |
+| Capture Codex | `./control.sh codex-capture` |
+| Send to Codex | `./control.sh send-codex "prompt"` |
+| Send to OpenCode | `source common.sh && safe_send_text "%76" "prompt" && "$TMUX_BIN" send-keys -t "%76" Enter` |
+| Capture OpenCode | `source common.sh && "$TMUX_BIN" capture-pane -t "%76" -p -S -50` |
+| Check Codex idle | `./codex_is_idle.sh` |
+| Refresh panes | `./control.sh refresh` |
+
+## Coordination Layer
+
+Task lifecycle uses `tools/decomp_work/coordination/`:
+```bash
+coordination/enqueue.sh fn_XXXXX "description" high
+coordination/claim.sh <task_id> <agent>
+coordination/status_update.sh <agent> "message"
+coordination/complete.sh <task_id> <agent>
+```
+
+## Model Benchmarks (updated 2026-04-11)
+
+### Benchmark: 13-function structural correctness test
+
+| Tier | Model | Score | Avg Time | Notes |
+|------|-------|-------|----------|-------|
+| S | kimi-k2-turbo | 13/13 | 1.9s | FASTEST paid-free option |
+| S | qwen2.5-coder:7b | 13/13 | 1.3s | FASTEST local |
+| S | codestral:22b | 13/13 | 5.4s | Best local quality |
+| A | deepseek-coder-v2:16b | 13/13 | 14.3s | Slower but reliable |
+| B | deepseek-r1:14b | 10/13 | 10s | Reasoning overhead hurts |
+| B | qwen2.5-coder:32b | 10/13 | — | Diminishing returns vs 7b |
+| B | qwen3:14b | 9/13 | — | — |
+| B | kimi-latest | 8/13 | — | Worse than kimi-k2-turbo |
+| B | gemma3:4b | 7/13 | 1.8s | NEW — fast but unreliable |
+| C | nemotron-3-free | 6/13 | 25s | Slow and low quality |
+
+**Routing recommendation:**
+- Default bulk generation: `qwen2.5-coder:7b` (fastest local, S-tier)
+- Quality fallback: `codestral:22b` or `kimi-k2-turbo`
+- Skip: `deepseek-r1`, `qwen3:14b`, `gemma3:4b` for decompilation work
+
+## Lessons Learned (2026-04-10)
+
+1. **goto patterns make CW codegen WORSE** — CW -O4,p inverts conditions (`bne;b` → `beq`) and reorders epilogues. Avoid goto for single-exit patterns.
+2. **`return NULL` vs `entry=0; return entry`** — no codegen difference on CW 1.3 at -O4,p.
+3. **`bne;b` vs `bne;mr;b` pattern** — CW generates `bne @skip; b @exit; ... @exit: mr r3,rN` for `if(cond){return val;}` inside CTR loops. Our `return entry` generates `bne @skip; mr r3,r5; b @epilogue` (eager copy). This 3-instruction mismatch is a fundamental CW-O4 code motion difference.
+4. **Match validation** — always use `python tools/match_test.py fn_XXXXXXXX`. The objdiff JSON from `tools/objdiff-cli.exe` gives instruction-level detail.
+5. **Compiler is GC/1.3** for game code, with `-O4,p -sdata 8 -sdata2 8`.
+6. **nofralloc functions** — many simple-tier functions use `nofralloc` which means the compiler didn't generate prologue/epilogue. Some return via CR (condition register) not r3 — these cannot be expressed in normal C.
 
 ## Orchestration Strategy
 

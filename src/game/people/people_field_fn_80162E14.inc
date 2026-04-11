@@ -1,6 +1,6 @@
     nofralloc
 /* 80162E14 0015FE14  1C A3 00 F4 */	mulli r5, r3, 0xf4
-/* 80162E18 0015FE18  80 CD A8 04 */	lwz r6, -22524(r13)
+/* 80162E18 0015FE18  80 CD A8 04 */	lwz r6, lbl_8047B024(r13)
 /* 80162E1C 0015FE1C  7C 86 2A 14 */	add r4, r6, r5
 /* 80162E20 0015FE20  88 04 00 EC */	lbz r0, 0xec(r4)
 /* 80162E24 0015FE24  28 00 00 02 */	cmplwi r0, 0x2

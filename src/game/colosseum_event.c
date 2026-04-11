@@ -2671,17 +2671,40 @@ void fn_80204970(void)
   }
   return;
 }
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_802040E8(void) {
-#include "src/game/colosseum_event_fn_802040E8.inc"
+#pragma peephole off
+void* fn_802040E8(void) {
+    extern void* fn_8012640C();
+    extern u32 fn_80119ED0();
+    extern u32 fn_80121ADC();
+    extern void* fn_8011B67C();
+    extern void* fn_801230E0();
+    void* alloc2;
+    void* alloc1;
+    u32 r0;
+
+    if ((alloc1 = fn_8012640C(0, 0, 0xD6, 0)) != 0) {
+        alloc2 = fn_8012640C(0, 0, 0xCC, 0);
+    } else {
+        alloc2 = 0;
+    }
+    if (alloc2 == 0) {
+        return 0;
+    }
+    if ((u16)(u32)fn_80119ED0(0x3D) == 0x7C ||
+        (u16)(u32)fn_80119ED0(0x3D) == 0xC8) {
+        r0 = fn_80121ADC(alloc1 ? fn_8012640C(alloc1, 0, 0xCC, 0) : 0, 0x3D);
+    } else {
+        r0 = fn_80119ED0(0x3D);
+        if ((u16)r0 != 0xCD) {
+            return 0;
+        }
+        r0 = (u32)fn_8011B67C(alloc1, 0x3D);
+    }
+    if ((u8)r0 == 1) {
+        return 0;
+    }
+    return fn_801230E0(alloc2);
 }
-#else
-void fn_802040E8(void) { /* TODO */ }
-#endif
-#pragma pop
 
 /* fn_80204A10 | Size: 0x4C | Check if trainer slot is active */
 u8 fn_80204A10(u32 slotId) {
@@ -2935,7 +2958,14 @@ asm void fn_802050F4(void) {
 #include "src/game/colosseum_event_fn_802050F4.inc"
 }
 #else
-void fn_802050F4(void) { /* TODO */ }
+void* fn_802050F4(void* ctx) {
+    extern void* fn_8012640C();
+    extern void* fn_801F0928();
+    if (fn_8012640C(ctx, 0, 0xFE, 0) == 0) {
+        return (void*)-0x80;
+    }
+    return fn_801F0928(fn_8012640C(ctx, 0, 0xFE, 0));
+}
 #endif
 #pragma pop
 
@@ -2949,17 +2979,16 @@ u16 fn_80205134(void* ctx) {
     return (u16)fn_8011BEB4(resolved, 0, 0x30, 0);
 }
 
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_80205184(void) {
-#include "src/game/colosseum_event_fn_80205184.inc"
+u16 fn_80205184(void* ctx) {
+    extern void* fn_8012640C();
+    extern u32 fn_8011BEB4();
+    void* resolved;
+    resolved = fn_8012640C(ctx, 0, 0xD9, 0);
+    if (resolved == 0) {
+        return 0;
+    }
+    return (u16)fn_8011BEB4(resolved, 0, 0x28, 0);
 }
-#else
-void fn_80205184(void) { /* TODO */ }
-#endif
-#pragma pop
 
 /* fn_802051D4 | Size: 0x50 | Get field 0x27 from resolved 0xD9, default 0 */
 u16 fn_802051D4(void* ctx) {
@@ -3424,17 +3453,17 @@ s16 fn_80205B2C(void* ctx) {
     return (s16)(u32)fn_8012640C(hop1, 0, 0xCE, 0);
 }
 
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 1
-asm void fn_80205B8C(void) {
-#include "src/game/colosseum_event_fn_80205B8C.inc"
+void* fn_80205B8C(void* ctx) {
+    extern void* fn_8012640C();
+    if (ctx == 0) {
+        return 0;
+    }
+    ctx = fn_8012640C(ctx, 0, 0xD6, 0);
+    if (ctx == 0) {
+        return 0;
+    }
+    return fn_8012640C(ctx, 0, 0xCC, 0);
 }
-#else
-void fn_80205B8C(void) { /* TODO */ }
-#endif
-#pragma pop
 
 /* 0x80205BE8 | size: 0x3C | small */
 void* fn_80205BE8(void* ctx) {

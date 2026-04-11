@@ -18,6 +18,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -31,6 +32,8 @@ RESULTS_DIR = WORK_DIR / "results"
 OLLAMA_HOST = "10.0.0.3"
 OLLAMA_PORT = 11434
 OLLAMA_MODEL = "codestral:22b"  # Best benchmark: 100% structural, 5.4s/fn
+KIMI_URL = "https://api.moonshot.ai/v1/chat/completions"
+KIMI_MODEL = "kimi-k2-turbo-preview"
 
 CODEX_CMD = "C:/Users/douglaswhittingham/AppData/Roaming/npm/codex.cmd"
 
@@ -86,7 +89,6 @@ def release_lock(fn_name):
 
 def call_ollama(prompt, model=None):
     """Send prompt to Ollama on the GPU machine."""
-    import urllib.request
     model = model or OLLAMA_MODEL
 
     url = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}/api/generate"
@@ -108,6 +110,41 @@ def call_ollama(prompt, model=None):
             return result.get("response", "")
     except Exception as e:
         print(f"Ollama error: {e}")
+        return None
+
+
+def call_kimi(prompt, model=None):
+    """Send prompt to Moonshot Kimi using an environment-provided API key."""
+    model = model or os.environ.get("MOONSHOT_MODEL", KIMI_MODEL)
+    api_key = (
+        os.environ.get("MOONSHOT_API_KEY")
+        or os.environ.get("KIMI_API_KEY")
+    )
+    if not api_key:
+        print("Kimi error: set MOONSHOT_API_KEY or KIMI_API_KEY in the environment")
+        return None
+
+    payload = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+        "max_tokens": 2048,
+    }).encode()
+    req = urllib.request.Request(
+        KIMI_URL,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            result = json.loads(resp.read())
+            return result["choices"][0]["message"]["content"]
+    except Exception as e:
+        print(f"Kimi error: {e}")
         return None
 
 
@@ -421,6 +458,8 @@ def process_function(fn_name, backend="ollama", max_retries=3):
         print(f"Calling {backend}...")
         if backend == "ollama":
             response = call_ollama(prompt)
+        elif backend == "kimi":
+            response = call_kimi(prompt)
         elif backend == "codex":
             response = call_codex(prompt)
         else:
@@ -525,7 +564,7 @@ def cmd_run(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Decomp Agent Runner")
-    parser.add_argument("--backend", choices=["ollama", "codex", "opencode"],
+    parser.add_argument("--backend", choices=["ollama", "kimi", "codex", "opencode"],
                        default="ollama", help="Model backend")
     parser.add_argument("--function", metavar="FN", help="Process a specific function")
     parser.add_argument("--tier", choices=["simple", "medium", "complex", "hard"],

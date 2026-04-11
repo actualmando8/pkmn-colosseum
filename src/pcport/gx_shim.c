@@ -19,16 +19,21 @@
 #else
 
 #include "gx_shim.h"
+#include "pcport_window.h"
 #include "gx_tev.h"
 #include "gx_texture.h"
 
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <string.h>
 
-/* TODO: Include OpenGL headers when build system is ready
- * #include <glad/glad.h>
- * #include <GLFW/glfw3.h>
- */
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
+#ifndef GL_MIRRORED_REPEAT
+#define GL_MIRRORED_REPEAT 0x8370
+#endif
 
 /* =========================================================================
  * Internal state tracking
@@ -101,57 +106,375 @@ typedef struct {
 } GXImmVertex;
 
 static GXImmVertex g_immVertices[GX_IMM_VTX_MAX];
+static GXImmVertex g_immExpandedVertices[(GX_IMM_VTX_MAX * 3) / 2];
+static GXImmVertex g_modulatedVertices[(GX_IMM_VTX_MAX * 3) / 2];
 static u32 g_immVertexCount = 0;
 static GXPrimitive g_immPrimType;
 static u16 g_immExpectedVerts = 0;
+static u32 g_currentMtxId = 0;
+static GXDrawDoneCallback g_drawDoneCallback = (GXDrawDoneCallback)0;
+static GXGamma g_dispCopyGamma = GX_GM_1_0;
+static int g_gxInitialized = 0;
+static u32 g_lastSubmittedVertexCount = 0;
+static u32 g_lastExpandedVertexCount = 0;
+static GXPrimitive g_lastSubmittedPrimitive = GX_POINTS;
+static f32 g_vertexAlphaScale = 1.0f;
+static GLuint g_boundTextureId = 0;
+static GXTexMapID g_boundTextureMap = GX_TEXMAP_NULL;
+static u8 g_numTexGens = 0;
+
+typedef struct {
+    u32 magic;
+    u32 glTexId;
+    u16 width;
+    u16 height;
+    u32 format;
+    u8 wrapS;
+    u8 wrapT;
+    u8 mipmap;
+    u8 reserved;
+} GXHostTexObj;
+
+enum {
+    GX_HOST_TEXOBJ_MAGIC = 0x50435458u
+};
+
+typedef struct {
+    GXAttrType type;
+    void* base;
+    u8 stride;
+} GXVtxDescState;
+
+typedef struct {
+    GXCompCnt compCnt;
+    GXCompType compType;
+    u8 frac;
+} GXVtxAttrFmtState;
+
+#define GX_ATTR_STATE_MAX (GX_VA_TEX7 + 1)
+#define GX_VTXFMT_STATE_MAX (GX_VTXFMT7 + 1)
+
+static GXVtxDescState g_vtxDescState[GX_ATTR_STATE_MAX];
+static GXVtxAttrFmtState g_vtxFmtState[GX_VTXFMT_STATE_MAX][GX_ATTR_STATE_MAX];
+
+static u16 GXReadBE16(const u8* src) {
+    return (u16)(((u16)src[0] << 8) | src[1]);
+}
+
+static int GXGetIndexByteCount(GXAttrType type) {
+    switch (type) {
+        case GX_INDEX8:
+            return 1;
+        case GX_INDEX16:
+            return 2;
+        default:
+            return 0;
+    }
+}
+
+static int GXIsSupportedDisplayListAttr(GXAttr attr) {
+    return attr == GX_VA_POS || attr == GX_VA_CLR0 ||
+           attr == GX_VA_TEX0 || attr == GX_VA_TEX1;
+}
+
+static int GXAttrMatchesActiveTexCoord(GXAttr attr) {
+    GXTexCoordID coord = g_tevState.stages[0].texCoordId;
+
+    if (coord == GX_TEXCOORD1) {
+        return attr == GX_VA_TEX1;
+    }
+
+    return attr == GX_VA_TEX0;
+}
+
+static f32 GXReadNumericComponent(const void* src, GXCompType type, u8 frac) {
+    f32 scale = 1.0f;
+
+    if (frac != 0) {
+        scale = 1.0f / (f32)(1u << frac);
+    }
+
+    switch (type) {
+        case GX_U8:
+            return (f32)(*(const u8*)src) * scale;
+        case GX_S8:
+            return (f32)(*(const s8*)src) * scale;
+        case GX_U16:
+            return (f32)(*(const u16*)src) * scale;
+        case GX_S16:
+            return (f32)(*(const s16*)src) * scale;
+        case GX_F32:
+        default: {
+            f32 value;
+            memcpy(&value, src, sizeof(value));
+            return value;
+        }
+    }
+}
+
+static u32 GXGetCompTypeSize(GXCompType type) {
+    if (type == GX_RGB8) {
+        return 1;
+    }
+
+    switch (type) {
+        case GX_U8:
+        case GX_S8:
+            return 1;
+        case GX_U16:
+        case GX_S16:
+            return 2;
+        case GX_F32:
+        case GX_RGBA8:
+        default:
+            return 4;
+    }
+}
+
+static int GXDecodeIndexedAttr(const u8** cursor, const u8* end,
+                               GXVtxFmt vtxfmt, GXAttr attr,
+                               GXImmVertex* out) {
+    const GXVtxDescState* desc = &g_vtxDescState[attr];
+    const GXVtxAttrFmtState* fmt = &g_vtxFmtState[vtxfmt][attr];
+    u32 index = 0;
+    const u8* base;
+
+    if (desc->type == GX_NONE) {
+        return 1;
+    }
+
+    if (!GXIsSupportedDisplayListAttr(attr)) {
+        return 0;
+    }
+
+    if (desc->base == NULL || desc->stride == 0) {
+        return 0;
+    }
+
+    if (desc->type == GX_INDEX8) {
+        if ((*cursor + 1) > end) {
+            return 0;
+        }
+        index = (*cursor)[0];
+        *cursor += 1;
+    } else if (desc->type == GX_INDEX16) {
+        if ((*cursor + 2) > end) {
+            return 0;
+        }
+        index = GXReadBE16(*cursor);
+        *cursor += 2;
+    } else {
+        return 0;
+    }
+
+    base = (const u8*)desc->base + (index * desc->stride);
+
+    switch (attr) {
+        case GX_VA_POS:
+            out->pos[0] = GXReadNumericComponent(base + 0, fmt->compType, fmt->frac);
+            out->pos[1] = GXReadNumericComponent(base + GXGetCompTypeSize(fmt->compType), fmt->compType, fmt->frac);
+            if (fmt->compCnt == GX_POS_XYZ) {
+                out->pos[2] = GXReadNumericComponent(base + (GXGetCompTypeSize(fmt->compType) * 2), fmt->compType, fmt->frac);
+            } else {
+                out->pos[2] = 0.0f;
+            }
+            break;
+        case GX_VA_CLR0:
+            if (fmt->compType == GX_RGBA8) {
+                out->color[0] = base[0];
+                out->color[1] = base[1];
+                out->color[2] = base[2];
+                out->color[3] = base[3];
+            } else if (fmt->compType == GX_RGB8) {
+                out->color[0] = base[0];
+                out->color[1] = base[1];
+                out->color[2] = base[2];
+                out->color[3] = 0xFF;
+            } else {
+                return 0;
+            }
+            break;
+        case GX_VA_TEX0:
+        case GX_VA_TEX1:
+            if (GXAttrMatchesActiveTexCoord(attr)) {
+                out->texcoord[0] = GXReadNumericComponent(base + 0, fmt->compType, fmt->frac);
+                if (fmt->compCnt == GX_TEX_ST) {
+                    out->texcoord[1] = GXReadNumericComponent(base + GXGetCompTypeSize(fmt->compType), fmt->compType, fmt->frac);
+                } else {
+                    out->texcoord[1] = 0.0f;
+                }
+            }
+            break;
+        default:
+            return 0;
+    }
+
+    return 1;
+}
+
+static void GXEnsureCurrentContext(void) {
+    GLFWwindow* window = PCPort_GetHostWindow();
+
+    if (window == NULL) {
+        return;
+    }
+
+    if (glfwGetCurrentContext() != window) {
+        glfwMakeContextCurrent(window);
+    }
+}
+
+static void GXLoadMatrixMode(GLenum mode, const f32 matrix[4][4]) {
+    GLfloat glMatrix[16];
+    int row;
+    int col;
+
+    GXEnsureCurrentContext();
+
+    for (col = 0; col < 4; ++col) {
+        for (row = 0; row < 4; ++row) {
+            glMatrix[(col * 4) + row] = matrix[row][col];
+        }
+    }
+
+    glMatrixMode(mode);
+    glLoadMatrixf(glMatrix);
+}
+
+static void GXApplyProjectionMatrix(void) {
+    GXLoadMatrixMode(GL_PROJECTION, g_projMatrix);
+}
+
+static void GXApplyModelViewMatrix(const Mtx mtx) {
+    f32 expanded[4][4] = {
+        { mtx[0][0], mtx[0][1], mtx[0][2], mtx[0][3] },
+        { mtx[1][0], mtx[1][1], mtx[1][2], mtx[1][3] },
+        { mtx[2][0], mtx[2][1], mtx[2][2], mtx[2][3] },
+        { 0.0f,      0.0f,      0.0f,      1.0f }
+    };
+
+    GXLoadMatrixMode(GL_MODELVIEW, expanded);
+}
+
+static GXHostTexObj* GXGetHostTexObj(GXTexObj* obj) {
+    return (GXHostTexObj*)(void*)obj;
+}
+
+static const GXHostTexObj* GXGetConstHostTexObj(const GXTexObj* obj) {
+    return (const GXHostTexObj*)(const void*)obj;
+}
+
+static GLenum GXTranslateWrapMode(GXTexWrapMode mode) {
+    switch (mode) {
+        case GX_REPEAT:
+            return GL_REPEAT;
+        case GX_MIRROR:
+            return GL_MIRRORED_REPEAT;
+        case GX_CLAMP:
+        default:
+            return GL_CLAMP_TO_EDGE;
+    }
+}
+
+static GLenum GXTranslateMagFilter(GXTexFilter filter) {
+    return filter == GX_NEAR ? GL_NEAREST : GL_LINEAR;
+}
+
+static GLenum GXTranslateMinFilter(GXTexFilter filter, GXBool mipmap) {
+    if (!mipmap) {
+        return GXTranslateMagFilter(filter);
+    }
+
+    switch (filter) {
+        case GX_NEAR:
+        case GX_NEAR_MIP_NEAR:
+        case GX_NEAR_MIP_LIN:
+            return GL_NEAREST_MIPMAP_NEAREST;
+        case GX_LINEAR:
+        case GX_LIN_MIP_NEAR:
+        case GX_LIN_MIP_LIN:
+        default:
+            return GL_LINEAR_MIPMAP_LINEAR;
+    }
+}
+
+static GLenum GXTranslateTevModeToEnvMode(GXTevMode mode) {
+    switch (mode) {
+        case GX_REPLACE:
+            return GL_REPLACE;
+        case GX_DECAL:
+            return GL_DECAL;
+        case GX_BLEND:
+            return GL_BLEND;
+        case GX_MODULATE:
+        default:
+            return GL_MODULATE;
+    }
+}
 
 /* =========================================================================
  * 1. Initialization and FIFO
  * ========================================================================= */
 
 void GXInit(void* base, u32 size) {
+    GLFWwindow* window;
+
     (void)base; (void)size;
-    /* TODO: Phase 3a -- Initialize OpenGL 3.3 context
-     *
-     * 1. Verify that GLFW has already created a window + GL context
-     *    (this should be done in pcport_main.c before GXInit is called)
-     * 2. Call gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)
-     * 3. Set default GL state:
-     *    - glEnable(GL_DEPTH_TEST)
-     *    - glDepthFunc(GL_LEQUAL)
-     *    - glEnable(GL_BLEND)
-     *    - glBlendFunc(GL_ONE, GL_ONE) -- default additive blend
-     *    - glEnable(GL_CULL_FACE)
-     *    - glFrontFace(GL_CW) -- GCN uses clockwise winding
-     * 4. Initialize the TEV shader cache (gx_tev_init())
-     * 5. Create the immediate-mode VBO/VAO for GXBegin/GXEnd
-     * 6. Initialize texture decode tables
-     */
 
     memset(&g_tevState, 0, sizeof(g_tevState));
+    memset(g_vtxDescState, 0, sizeof(g_vtxDescState));
+    memset(g_vtxFmtState, 0, sizeof(g_vtxFmtState));
     g_numTevStages = 1;
     g_immVertexCount = 0;
+    g_currentMtxId = 0;
+    g_drawDoneCallback = (GXDrawDoneCallback)0;
+    g_dispCopyGamma = GX_GM_1_0;
+    g_gxInitialized = 1;
+    g_vertexAlphaScale = 1.0f;
+    g_boundTextureId = 0;
+    g_boundTextureMap = GX_TEXMAP_NULL;
+    g_numTexGens = 0;
+    g_tevState.numTexGens = 0;
+    g_tevState.stages[0].tevMode = GX_PASSCLR;
 
-    printf("[gx_shim] GXInit stub -- OpenGL init goes here\n");
+    window = PCPort_GetHostWindow();
+    if (window == NULL) {
+        printf("[gx_shim] GXInit host state initialized without a window\n");
+        return;
+    }
+
+    if (glfwGetCurrentContext() != window) {
+        glfwMakeContextCurrent(window);
+    }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    printf("[gx_shim] GXInit configured host GL defaults\n");
 }
 
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
-    (void)cb;
-    /* TODO: No-op on PC -- OpenGL is synchronous.
-     * The game's GSgfx_DrawDoneCallback just sets a flag;
-     * on PC we can set it immediately or ignore it.
-     */
-    return (GXDrawDoneCallback)0;
+    GXDrawDoneCallback prev = g_drawDoneCallback;
+    g_drawDoneCallback = cb;
+    return prev;
 }
 
 void GXSetDispCopyGamma(GXGamma gamma) {
-    (void)gamma;
-    /* TODO: Phase 3h -- Gamma correction
-     * If using an sRGB framebuffer: glEnable(GL_FRAMEBUFFER_SRGB)
-     * Otherwise: apply gamma in a post-processing pass
-     * The game always sets gamma=GX_GM_1_0 (linear), so this is
-     * usually a no-op.
-     */
+    g_dispCopyGamma = gamma;
 }
 
 /* =========================================================================
@@ -160,6 +483,12 @@ void GXSetDispCopyGamma(GXGamma gamma) {
 
 void GXSetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht,
                    f32 nearZ, f32 farZ) {
+    GLFWwindow* window;
+    int fbWidth;
+    int fbHeight;
+    int x;
+    int y;
+
     g_viewportX = xOrig;
     g_viewportY = yOrig;
     g_viewportW = wd;
@@ -167,22 +496,26 @@ void GXSetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht,
     g_viewportNear = nearZ;
     g_viewportFar = farZ;
 
-    /* TODO: Phase 3a -- Translate to OpenGL
-     *
-     * GCN viewport origin is top-left; OpenGL origin is bottom-left.
-     * Convert: glViewport((GLint)xOrig,
-     *                     (GLint)(framebufferHeight - yOrig - ht),
-     *                     (GLsizei)wd, (GLsizei)ht);
-     * glDepthRange(nearZ, farZ);
-     *
-     * Note: GCN depth range is [0,1], same as GL default.
-     * For widescreen support, scale wd by the aspect ratio override.
-     */
+    window = PCPort_GetHostWindow();
+    if (window == NULL) {
+        return;
+    }
+
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    x = (int)xOrig;
+    y = fbHeight - (int)(yOrig + ht);
+    if (y < 0) {
+        y = 0;
+    }
+
+    glViewport(x, y, (int)wd, (int)ht);
+    glDepthRange((GLdouble)nearZ, (GLdouble)farZ);
 }
 
 void GXSetProjection(Mtx44 mtx, GXProjectionType type) {
     g_projType = type;
     memcpy(g_projMatrix, mtx, sizeof(g_projMatrix));
+    GXApplyProjectionMatrix();
 
     /* TODO: Phase 3b -- Upload projection matrix
      *
@@ -200,18 +533,29 @@ void GXSetProjection(Mtx44 mtx, GXProjectionType type) {
 }
 
 void GXSetScissor(u32 xOrig, u32 yOrig, u32 wd, u32 ht) {
+    GLFWwindow* window;
+    int fbWidth;
+    int fbHeight;
+    int y;
+
     g_scissorX = xOrig;
     g_scissorY = yOrig;
     g_scissorW = wd;
     g_scissorH = ht;
 
-    /* TODO: Phase 3a -- Translate to OpenGL
-     *
-     * glEnable(GL_SCISSOR_TEST);
-     * glScissor(xOrig, framebufferHeight - yOrig - ht, wd, ht);
-     *
-     * Same Y-flip as viewport.
-     */
+    window = PCPort_GetHostWindow();
+    if (window == NULL) {
+        return;
+    }
+
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    y = fbHeight - (int)(yOrig + ht);
+    if (y < 0) {
+        y = 0;
+    }
+
+    glEnable(GL_SCISSOR_TEST);
+    glScissor((int)xOrig, y, (int)wd, (int)ht);
 }
 
 /* =========================================================================
@@ -221,6 +565,7 @@ void GXSetScissor(u32 xOrig, u32 yOrig, u32 wd, u32 ht) {
 void GXLoadPosMtxImm(Mtx mtx, u32 id) {
     if (id >= 10) return;
     memcpy(g_posMtx[id], mtx, sizeof(Mtx));
+    GXApplyModelViewMatrix(mtx);
 
     /* TODO: Phase 3b -- Upload modelview matrix
      *
@@ -247,6 +592,52 @@ void GXLoadNrmMtxImm(Mtx mtx, u32 id) {
      *
      * Only the upper 3x3 is used for normals.
      */
+}
+
+void GXSetCurrentMtx(u32 id) {
+    g_currentMtxId = id;
+}
+
+void GXSetVtxDesc(GXAttr attr, GXAttrType type) {
+    if (attr >= GX_ATTR_STATE_MAX) {
+        return;
+    }
+
+    g_vtxDescState[attr].type = type;
+}
+
+void GXClearVtxDesc(void) {
+    memset(g_vtxDescState, 0, sizeof(g_vtxDescState));
+}
+
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr,
+                     GXCompCnt cnt, GXCompType type, u8 frac) {
+    if (vtxfmt >= GX_VTXFMT_STATE_MAX || attr >= GX_ATTR_STATE_MAX) {
+        return;
+    }
+
+    g_vtxFmtState[vtxfmt][attr].compCnt = cnt;
+    g_vtxFmtState[vtxfmt][attr].compType = type;
+    g_vtxFmtState[vtxfmt][attr].frac = frac;
+}
+
+void GXSetArray(GXAttr attr, void* base, u8 stride) {
+    if (attr >= GX_ATTR_STATE_MAX) {
+        return;
+    }
+
+    g_vtxDescState[attr].base = base;
+    g_vtxDescState[attr].stride = stride;
+}
+
+void GXHostSetVertexAlphaScale(f32 alphaScale) {
+    if (alphaScale < 0.0f) {
+        alphaScale = 0.0f;
+    } else if (alphaScale > 1.0f) {
+        alphaScale = 1.0f;
+    }
+
+    g_vertexAlphaScale = alphaScale;
 }
 
 /* =========================================================================
@@ -414,39 +805,43 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord,
 
 void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor,
                     GXBlendFactor dst_factor, GXLogicOp op) {
+    GLenum src = GL_ONE;
+    GLenum dst = GL_ONE;
+
     g_blendType = type;
     g_blendSrc = src_factor;
     g_blendDst = dst_factor;
     g_blendLogicOp = op;
 
-    /* TODO: Phase 3e -- Translate to OpenGL blend state
-     *
-     * if (type == GX_BM_NONE) {
-     *     glDisable(GL_BLEND);
-     * } else if (type == GX_BM_BLEND) {
-     *     glEnable(GL_BLEND);
-     *     glBlendFunc(translateBlendFactor(src_factor),
-     *                 translateBlendFactor(dst_factor));
-     *     glBlendEquation(GL_FUNC_ADD);
-     * } else if (type == GX_BM_SUBTRACT) {
-     *     glEnable(GL_BLEND);
-     *     glBlendFunc(GL_ONE, GL_ONE);
-     *     glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
-     * } else if (type == GX_BM_LOGIC) {
-     *     // Logic ops are not available in GL core profile.
-     *     // Approximate with blend or implement in fragment shader.
-     * }
-     *
-     * GX blend factor -> GL blend factor mapping:
-     *   GX_BL_ZERO        -> GL_ZERO
-     *   GX_BL_ONE         -> GL_ONE
-     *   GX_BL_SRCCLR      -> GL_SRC_COLOR
-     *   GX_BL_INVSRCCLR   -> GL_ONE_MINUS_SRC_COLOR
-     *   GX_BL_SRCALPHA    -> GL_SRC_ALPHA
-     *   GX_BL_INVSRCALPHA -> GL_ONE_MINUS_SRC_ALPHA
-     *   GX_BL_DSTALPHA    -> GL_DST_ALPHA
-     *   GX_BL_INVDSTALPHA -> GL_ONE_MINUS_DST_ALPHA
-     */
+    switch (src_factor) {
+        case GX_BL_ZERO: src = GL_ZERO; break;
+        case GX_BL_ONE: src = GL_ONE; break;
+        case GX_BL_SRCCLR: src = GL_SRC_COLOR; break;
+        case GX_BL_INVSRCCLR: src = GL_ONE_MINUS_SRC_COLOR; break;
+        case GX_BL_SRCALPHA: src = GL_SRC_ALPHA; break;
+        case GX_BL_INVSRCALPHA: src = GL_ONE_MINUS_SRC_ALPHA; break;
+        case GX_BL_DSTALPHA: src = GL_DST_ALPHA; break;
+        case GX_BL_INVDSTALPHA: src = GL_ONE_MINUS_DST_ALPHA; break;
+    }
+
+    switch (dst_factor) {
+        case GX_BL_ZERO: dst = GL_ZERO; break;
+        case GX_BL_ONE: dst = GL_ONE; break;
+        case GX_BL_SRCCLR: dst = GL_SRC_COLOR; break;
+        case GX_BL_INVSRCCLR: dst = GL_ONE_MINUS_SRC_COLOR; break;
+        case GX_BL_SRCALPHA: dst = GL_SRC_ALPHA; break;
+        case GX_BL_INVSRCALPHA: dst = GL_ONE_MINUS_SRC_ALPHA; break;
+        case GX_BL_DSTALPHA: dst = GL_DST_ALPHA; break;
+        case GX_BL_INVDSTALPHA: dst = GL_ONE_MINUS_DST_ALPHA; break;
+    }
+
+    if (type == GX_BM_NONE) {
+        glDisable(GL_BLEND);
+        return;
+    }
+
+    glEnable(GL_BLEND);
+    glBlendFunc(src, dst);
 }
 
 void GXSetAlphaCompare(GXCompare comp0, u8 ref0,
@@ -480,17 +875,27 @@ void GXSetZMode(GXBool compare_enable, GXCompare func,
     g_zFunc = func;
     g_zUpdate = update_enable;
 
-    /* TODO: Phase 3e -- Translate to OpenGL depth state
-     *
-     * if (compare_enable) {
-     *     glEnable(GL_DEPTH_TEST);
-     *     glDepthFunc(translateCompare(func));
-     *     // GX_NEVER->GL_NEVER, GX_LESS->GL_LESS, GX_LEQUAL->GL_LEQUAL, etc.
-     * } else {
-     *     glDisable(GL_DEPTH_TEST);
-     * }
-     * glDepthMask(update_enable ? GL_TRUE : GL_FALSE);
-     */
+    if (compare_enable) {
+        GLenum depthFunc = GL_LEQUAL;
+
+        switch (func) {
+            case GX_NEVER: depthFunc = GL_NEVER; break;
+            case GX_LESS: depthFunc = GL_LESS; break;
+            case GX_EQUAL: depthFunc = GL_EQUAL; break;
+            case GX_LEQUAL: depthFunc = GL_LEQUAL; break;
+            case GX_GREATER: depthFunc = GL_GREATER; break;
+            case GX_NEQUAL: depthFunc = GL_NOTEQUAL; break;
+            case GX_GEQUAL: depthFunc = GL_GEQUAL; break;
+            case GX_ALWAYS: depthFunc = GL_ALWAYS; break;
+        }
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(depthFunc);
+    } else {
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    glDepthMask(update_enable ? GL_TRUE : GL_FALSE);
 }
 
 void GXSetZCompLoc(GXBool before_tex) {
@@ -540,22 +945,20 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz,
 void GXSetCullMode(GXCullMode mode) {
     g_cullMode = mode;
 
-    /* TODO: Phase 3a -- Translate to OpenGL cull state
-     *
-     * if (mode == GX_CULL_NONE) {
-     *     glDisable(GL_CULL_FACE);
-     * } else {
-     *     glEnable(GL_CULL_FACE);
-     *     // GCN front face is CW; GL default is CCW.
-     *     // With glFrontFace(GL_CW):
-     *     if (mode == GX_CULL_FRONT)
-     *         glCullFace(GL_FRONT);
-     *     else if (mode == GX_CULL_BACK)
-     *         glCullFace(GL_BACK);
-     *     else // GX_CULL_ALL
-     *         glCullFace(GL_FRONT_AND_BACK);
-     * }
-     */
+    if (mode == GX_CULL_NONE) {
+        glDisable(GL_CULL_FACE);
+        return;
+    }
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    if (mode == GX_CULL_FRONT) {
+        glCullFace(GL_FRONT);
+    } else if (mode == GX_CULL_BACK) {
+        glCullFace(GL_BACK);
+    } else {
+        glCullFace(GL_FRONT_AND_BACK);
+    }
 }
 
 void GXSetChanCtrl(GXChannelID chan, GXBool enable,
@@ -607,32 +1010,126 @@ void GXSetChanMatColor(GXChannelID chan, GXColor color) {
  * 5. Texture State
  * ========================================================================= */
 
+void GXHostClearTextureBinding(void) {
+    g_boundTextureId = 0;
+    g_boundTextureMap = GX_TEXMAP_NULL;
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+}
+
+static int GXUploadHostTexture(GXTexObj* obj,
+                               u16 width,
+                               u16 height,
+                               GXTexFmt format,
+                               GXTexWrapMode wrap_s,
+                               GXTexWrapMode wrap_t,
+                               GXBool mipmap,
+                               GLenum glInternalFormat,
+                               GLenum glFormat,
+                               GLenum glType,
+                               const void* pixels) {
+    GXHostTexObj* hostObj;
+
+    if (obj == NULL || pixels == NULL || width == 0 || height == 0) {
+        return 0;
+    }
+
+    GXEnsureCurrentContext();
+    hostObj = GXGetHostTexObj(obj);
+
+    glGenTextures(1, &hostObj->glTexId);
+    if (hostObj->glTexId == 0) {
+        memset(obj, 0, sizeof(*obj));
+        return 0;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    (GLint)GXTranslateWrapMode(wrap_s));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                    (GLint)GXTranslateWrapMode(wrap_t));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    (GLint)GXTranslateMinFilter(GX_LINEAR, mipmap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    (GLint)GXTranslateMagFilter(GX_LINEAR));
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 (GLint)glInternalFormat,
+                 width,
+                 height,
+                 0,
+                 glFormat,
+                 glType,
+                 pixels);
+    hostObj->magic = GX_HOST_TEXOBJ_MAGIC;
+    hostObj->width = width;
+    hostObj->height = height;
+    hostObj->format = format;
+    hostObj->wrapS = (u8)wrap_s;
+    hostObj->wrapT = (u8)wrap_t;
+    hostObj->mipmap = (u8)mipmap;
+    return 1;
+}
+
 void GXInitTexObj(GXTexObj* obj, void* image,
                   u16 width, u16 height, GXTexFmt format,
                   GXTexWrapMode wrap_s, GXTexWrapMode wrap_t,
                   GXBool mipmap) {
-    (void)obj; (void)image; (void)width; (void)height;
-    (void)format; (void)wrap_s; (void)wrap_t; (void)mipmap;
+    GXDecodedTexture decoded;
 
-    /* TODO: Phase 3d -- Create OpenGL texture
-     *
-     * 1. Generate a GL texture name: glGenTextures(1, &texId)
-     * 2. Store texId inside the GXTexObj (reuse the opaque 32 bytes)
-     * 3. Decode the GCN texture data from 'image':
-     *    - De-tile/de-swizzle from GCN tiled format to linear
-     *    - Convert from GXTexFmt to RGBA8 using gx_texture_decode()
-     * 4. Upload to GL:
-     *    glBindTexture(GL_TEXTURE_2D, texId);
-     *    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
-     *                 GL_RGBA, GL_UNSIGNED_BYTE, decodedData);
-     * 5. Set wrap modes:
-     *    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-     *                    translateWrapMode(wrap_s));
-     *    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-     *                    translateWrapMode(wrap_t));
-     * 6. Set filter modes (from mipmap flag):
-     *    if (mipmap) glGenerateMipmap(GL_TEXTURE_2D);
-     */
+    if (obj == NULL || image == NULL || width == 0 || height == 0) {
+        return;
+    }
+
+    memset(&decoded, 0, sizeof(decoded));
+    memset(obj, 0, sizeof(*obj));
+
+    if (gx_texture_decode(image,
+                          width,
+                          height,
+                          format,
+                          NULL,
+                          (GXTlutFmt)0,
+                          0,
+                          &decoded) != 0) {
+        return;
+    }
+    GXUploadHostTexture(obj,
+                        width,
+                        height,
+                        format,
+                        wrap_s,
+                        wrap_t,
+                        mipmap,
+                        decoded.glInternalFormat,
+                        decoded.glFormat,
+                        decoded.glType,
+                        decoded.data);
+    gx_texture_free(&decoded);
+}
+
+void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
+                           u16 width, u16 height,
+                           GXTexWrapMode wrap_s, GXTexWrapMode wrap_t) {
+    if (obj == NULL || rgba == NULL) {
+        return;
+    }
+
+    memset(obj, 0, sizeof(*obj));
+    GXUploadHostTexture(obj,
+                        width,
+                        height,
+                        GX_TF_RGBA8,
+                        wrap_s,
+                        wrap_t,
+                        GX_FALSE,
+                        GL_RGBA8,
+                        GL_RGBA,
+                        GL_UNSIGNED_BYTE,
+                        rgba);
 }
 
 void GXInitTlutObj(GXTlutObj* obj, void* lut,
@@ -653,15 +1150,23 @@ void GXInitTlutObj(GXTlutObj* obj, void* lut,
 }
 
 void GXLoadTexObj(GXTexObj* obj, GXTexMapID id) {
-    (void)obj; (void)id;
+    const GXHostTexObj* hostObj;
 
-    /* TODO: Phase 3d -- Bind texture to a TEV stage
-     *
-     * u32 texId = extractGLTexId(obj);
-     * glActiveTexture(GL_TEXTURE0 + id);
-     * glBindTexture(GL_TEXTURE_2D, texId);
-     * glUniform1i(u_tex_loc[id], id);
-     */
+    if (obj == NULL || id == GX_TEXMAP_NULL) {
+        GXHostClearTextureBinding();
+        return;
+    }
+
+    hostObj = GXGetConstHostTexObj(obj);
+    if (hostObj->magic != GX_HOST_TEXOBJ_MAGIC || hostObj->glTexId == 0) {
+        GXHostClearTextureBinding();
+        return;
+    }
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    g_boundTextureId = hostObj->glTexId;
+    g_boundTextureMap = id;
 }
 
 void GXInvalidateTexAll(void) {
@@ -776,8 +1281,137 @@ void GXLoadLightObj(GXLightObj* obj, GXLightID id) {
  * 7. Draw Commands
  * ========================================================================= */
 
+static int GXSubmitVertices(GXPrimitive primType,
+                            const GXImmVertex* sourceVertices,
+                            u32 sourceCount,
+                            u32* outExpandedCount) {
+    GLenum glPrim;
+    GXTevMode tevMode = (GXTevMode)g_tevState.stages[0].tevMode;
+    const GXImmVertex* drawVertices = sourceVertices;
+    u32 drawCount = sourceCount;
+    u32 i;
+    int useTexture;
+
+    if (outExpandedCount != NULL) {
+        *outExpandedCount = 0;
+    }
+
+    GXEnsureCurrentContext();
+    glReadBuffer(GL_BACK);
+
+    switch (primType) {
+        case GX_QUADS:
+            glPrim = GL_TRIANGLES;
+            if ((drawCount % 4) != 0 || drawCount == 0) {
+                return 0;
+            }
+            if (((drawCount / 4) * 6) >
+                (sizeof(g_immExpandedVertices) / sizeof(g_immExpandedVertices[0]))) {
+                return 0;
+            }
+            for (i = 0; i < drawCount; i += 4) {
+                u32 out = (i / 4) * 6;
+
+                g_immExpandedVertices[out + 0] = sourceVertices[i + 0];
+                g_immExpandedVertices[out + 1] = sourceVertices[i + 1];
+                g_immExpandedVertices[out + 2] = sourceVertices[i + 2];
+                g_immExpandedVertices[out + 3] = sourceVertices[i + 0];
+                g_immExpandedVertices[out + 4] = sourceVertices[i + 2];
+                g_immExpandedVertices[out + 5] = sourceVertices[i + 3];
+            }
+            drawVertices = g_immExpandedVertices;
+            drawCount = (drawCount / 4) * 6;
+            break;
+        case GX_TRIANGLES:
+            glPrim = GL_TRIANGLES;
+            break;
+        case GX_TRIANGLESTRIP:
+            glPrim = GL_TRIANGLE_STRIP;
+            break;
+        case GX_LINES:
+            glPrim = GL_LINES;
+            break;
+        case GX_LINESTRIP:
+            glPrim = GL_LINE_STRIP;
+            break;
+        case GX_POINTS:
+            glPrim = GL_POINTS;
+            break;
+        default:
+            return 0;
+    }
+
+    if (outExpandedCount != NULL) {
+        *outExpandedCount = drawCount;
+    }
+
+    if (g_vertexAlphaScale < 0.999f || g_vertexAlphaScale > 1.001f) {
+        if (drawCount > (sizeof(g_modulatedVertices) / sizeof(g_modulatedVertices[0]))) {
+            return 0;
+        }
+
+        memcpy(g_modulatedVertices,
+               drawVertices,
+               (size_t)drawCount * sizeof(g_modulatedVertices[0]));
+        for (i = 0; i < drawCount; ++i) {
+            u32 scaledAlpha =
+                (u32)(((f32)g_modulatedVertices[i].color[3] * g_vertexAlphaScale) + 0.5f);
+
+            if (scaledAlpha > 255u) {
+                scaledAlpha = 255u;
+            }
+            g_modulatedVertices[i].color[3] = (u8)scaledAlpha;
+        }
+
+        drawVertices = g_modulatedVertices;
+    }
+
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
+    useTexture = g_boundTextureId != 0 &&
+                 g_numTexGens != 0 &&
+                 tevMode != GX_PASSCLR;
+    if (useTexture) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, g_boundTextureId);
+        glTexEnvi(GL_TEXTURE_ENV,
+                  GL_TEXTURE_ENV_MODE,
+                  (GLint)GXTranslateTevModeToEnvMode(tevMode));
+    } else {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_TEXTURE_2D);
+    }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(3, GL_FLOAT, sizeof(GXImmVertex), &drawVertices[0].pos[0]);
+    glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(GXImmVertex), &drawVertices[0].color[0]);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(GXImmVertex), &drawVertices[0].texcoord[0]);
+    glDrawArrays(glPrim, 0, (GLsizei)drawCount);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glFlush();
+    return 1;
+}
+
+static int GXHasUnsupportedDisplayListAttr(void) {
+    u32 attr;
+
+    for (attr = 0; attr < GX_ATTR_STATE_MAX; ++attr) {
+        if (g_vtxDescState[attr].type != GX_NONE &&
+            !GXIsSupportedDisplayListAttr((GXAttr)attr)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts) {
     (void)vtxfmt;
+    GXEnsureCurrentContext();
+    glDrawBuffer(GL_BACK);
     g_immPrimType = type;
     g_immExpectedVerts = nverts;
     g_immVertexCount = 0;
@@ -796,6 +1430,19 @@ void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts) {
 }
 
 void GXEnd(void) {
+    u32 expandedCount = 0;
+
+    GXEnsureCurrentContext();
+    g_lastSubmittedVertexCount = g_immVertexCount;
+    g_lastSubmittedPrimitive = g_immPrimType;
+    if (!GXSubmitVertices(g_immPrimType, g_immVertices, g_immVertexCount,
+                          &expandedCount)) {
+        g_immVertexCount = 0;
+        g_immExpectedVerts = 0;
+        return;
+    }
+    g_lastExpandedVertexCount = expandedCount;
+
     /* TODO: Phase 3b -- Flush immediate-mode vertices to OpenGL
      *
      * 1. Upload g_immVertices[0..g_immVertexCount-1] to the dynamic VBO:
@@ -860,24 +1507,99 @@ void GXTexCoord2f32(f32 s, f32 t) {
 }
 
 void GXCallDisplayList(void* list, u32 nbytes) {
-    (void)list; (void)nbytes;
+    const GXHostDisplayList* hostList;
+    const u8* cursor;
+    const u8* end;
+    u32 totalSubmitted = 0;
+    u32 totalExpanded = 0;
+    GXPrimitive lastPrimitive = GX_POINTS;
+    u32 i;
 
-    /* TODO: Phase 3b -- Execute pre-built display list
-     *
-     * On GCN, display lists are pre-compiled GPU command buffers.
-     * For the PC port, they have been pre-parsed at load time
-     * (in HSD_PObjLoadDesc) into VBO/VAO objects.
-     *
-     * Look up the pre-built VBO/VAO for this display list pointer:
-     *   GLDisplayList* dl = gx_displaylist_find(list);
-     *   if (dl) {
-     *       glBindVertexArray(dl->vao);
-     *       glDrawArrays(dl->primType, 0, dl->vertexCount);
-     *   }
-     *
-     * For display lists not yet pre-parsed, fall back to runtime
-     * parsing (slower, but handles edge cases).
-     */
+    GXEnsureCurrentContext();
+
+    if (list == NULL || nbytes == 0) {
+        return;
+    }
+
+    hostList = (const GXHostDisplayList*)list;
+    if (nbytes >= sizeof(GXHostDisplayList) &&
+        hostList->magic == GX_HOST_DISPLAY_LIST_MAGIC &&
+        hostList->vertices != NULL && hostList->vertexCount != 0) {
+        u32 expandedCount = 0;
+
+        g_lastSubmittedVertexCount = hostList->vertexCount;
+        g_lastSubmittedPrimitive = (GXPrimitive)hostList->primitive;
+        if (!GXSubmitVertices((GXPrimitive)hostList->primitive,
+                              (const GXImmVertex*)hostList->vertices,
+                              hostList->vertexCount,
+                              &expandedCount)) {
+            return;
+        }
+        g_lastExpandedVertexCount = expandedCount;
+        return;
+    }
+
+    if (GXHasUnsupportedDisplayListAttr()) {
+        return;
+    }
+
+    cursor = (const u8*)list;
+    end = cursor + nbytes;
+
+    while (cursor < end) {
+        u8 cmd;
+        GXPrimitive primType;
+        GXVtxFmt vtxfmt;
+        u16 vertexCount;
+        u32 expandedCount = 0;
+
+        if ((end - cursor) < 3) {
+            return;
+        }
+
+        cmd = *cursor++;
+        primType = (GXPrimitive)(cmd & 0xF8);
+        vtxfmt = (GXVtxFmt)(cmd & 0x07);
+        vertexCount = GXReadBE16(cursor);
+        cursor += 2;
+
+        if (vertexCount == 0 || vertexCount > GX_IMM_VTX_MAX ||
+            vtxfmt >= GX_VTXFMT_STATE_MAX) {
+            return;
+        }
+
+        for (i = 0; i < vertexCount; ++i) {
+            GXImmVertex vertex;
+
+            memset(&vertex, 0, sizeof(vertex));
+            vertex.color[0] = 0xFF;
+            vertex.color[1] = 0xFF;
+            vertex.color[2] = 0xFF;
+            vertex.color[3] = 0xFF;
+
+            if (!GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_POS, &vertex) ||
+                !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_CLR0, &vertex) ||
+                !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX0, &vertex) ||
+                !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX1, &vertex)) {
+                return;
+            }
+
+            g_immVertices[i] = vertex;
+        }
+
+        if (!GXSubmitVertices(primType, g_immVertices, vertexCount,
+                              &expandedCount)) {
+            return;
+        }
+
+        totalSubmitted += vertexCount;
+        totalExpanded += expandedCount;
+        lastPrimitive = primType;
+    }
+
+    g_lastSubmittedVertexCount = totalSubmitted;
+    g_lastExpandedVertexCount = totalExpanded;
+    g_lastSubmittedPrimitive = lastPrimitive;
 }
 
 /* =========================================================================
@@ -885,18 +1607,33 @@ void GXCallDisplayList(void* list, u32 nbytes) {
  * ========================================================================= */
 
 void GXCopyDisp(void* dest, GXBool clear) {
-    (void)dest; (void)clear;
+    GLFWwindow* window;
 
-    /* TODO: Phase 3f -- Swap framebuffers
-     *
-     * This is the end-of-frame operation:
-     *   glfwSwapBuffers(g_window);
-     *
-     * If clear==GX_TRUE, clear the back buffer after swap:
-     *   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-     *
-     * The 'dest' parameter is the XFB address on GCN; ignored on PC.
-     */
+    (void)dest;
+
+    window = PCPort_GetHostWindow();
+    if (window == NULL || !g_gxInitialized) {
+        return;
+    }
+
+    GXEnsureCurrentContext();
+
+    if (PCPort_IsVideoBlack()) {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    glfwSwapBuffers(window);
+
+    if (g_drawDoneCallback != (GXDrawDoneCallback)0) {
+        g_drawDoneCallback();
+    }
+
+    if (clear) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    glfwPollEvents();
 }
 
 void GXSetCopyFilter(GXBool aa, u8 sample_pattern[12][2],
@@ -931,14 +1668,21 @@ void GXSetNumChans(u8 nChans) {
 }
 
 void GXSetNumTexGens(u8 nTexGens) {
-    (void)nTexGens;
+    g_numTexGens = nTexGens;
+    g_tevState.numTexGens = nTexGens;
+    g_tevState.dirty = 1;
+}
 
-    /* TODO: Phase 3c -- Configure texture coordinate generation
-     *
-     * Set a uniform or shader variant key for the number of
-     * active texture coordinate generators. This affects how
-     * many texcoord varyings are passed to the fragment shader.
-     */
+u32 GXHostGetLastSubmittedVertexCount(void) {
+    return g_lastSubmittedVertexCount;
+}
+
+u32 GXHostGetLastExpandedVertexCount(void) {
+    return g_lastExpandedVertexCount;
+}
+
+u32 GXHostGetLastSubmittedPrimitive(void) {
+    return (u32)g_lastSubmittedPrimitive;
 }
 
 

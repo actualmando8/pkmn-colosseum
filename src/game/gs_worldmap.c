@@ -200,6 +200,7 @@ s32 fn_800263B0(void* r3, u8* r4) {
 #endif
 
 /* fn_8002641C - 0x8002641C | size: 0x5c */
+#pragma scheduling off
 #if 0
 asm void fn_8002641C(void) {
 #include "src/game/gs_worldmap_fn_8002641C.inc"
@@ -1757,6 +1758,7 @@ end:
 #endif
 
 /* fn_8002B134 - 0x8002B134 | size: 0x6c */
+#pragma scheduling off
 extern f32 lbl_8047B97C;
 extern f32 lbl_8047A3E8;
 extern f32 lbl_8047B978;

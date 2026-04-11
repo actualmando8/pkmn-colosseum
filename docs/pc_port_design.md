@@ -1,8 +1,14 @@
 # Pokemon Colosseum PC Port -- GX-to-OpenGL Translation Layer Design
 
-**Status:** Phase 3 Design (pre-implementation)
+**Status:** Phase 3 design + scaffolding (pcport sources and CMake scaffold
+exist, but the shim/native build remain stub-heavy)
 **Target:** OpenGL 3.3 Core Profile, GLSL 330
 **Date:** 2026-03-19
+
+> Audit note (2026-04-02): `src/pcport/` and the pcport `CMakeLists.txt`
+> scaffold now exist, but `GAME_SOURCES` and `HSD_SOURCES` are still empty and
+> the shim files are still TODO-heavy stubs. See
+> [status_audit.md](status_audit.md) for the current repo-backed status summary.
 
 ---
 
@@ -460,9 +466,9 @@ The HSD PEDesc provides per-material blend overrides (`src_factor`, `dst_factor`
 
 ## 7. HSD Integration Points
 
-The HSD (HAL SysDolphin) library is fully decompiled (227 functions matching).
-This is the primary rendering abstraction and the best place to insert the
-GL shim.
+The HSD (HAL SysDolphin) library is still mixed C + asm-backed wrappers in the
+current tree. It is still the primary rendering abstraction and the best place
+to insert the GL shim.
 
 ### 7.1 Rendering Call Chain
 
@@ -533,7 +539,7 @@ ideas from the encounter/aurora library:
 +-------------------+
         |
 +-------------------+
-|   HSD Library     |  Unchanged (227 matching functions)
+|   HSD Library     |  Mixed C + asm-backed wrappers
 |   (hsd_*.c)       |
 +-------------------+
         |
@@ -779,8 +785,9 @@ equivalents like vgmstream) can handle this conversion.
 
 ### 10.1 Current Input Architecture
 
-The input system is fully decompiled and matching (20 functions in input.c).
-It wraps the Dolphin SDK PAD functions:
+The input system has source coverage in `input.c`, but the current tree still
+retains active asm-backed wrappers there. It wraps the Dolphin SDK PAD
+functions:
 
 **SDK functions called:**
 - `PADRead(PADStatus[4])` -- read all 4 controllers

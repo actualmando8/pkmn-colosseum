@@ -84,6 +84,399 @@
  * Address range: 0x800D3E4C - 0x800E202C (56KB, 278 functions)
  */
 
+#ifdef PCPORT
+
+#include "dolphin/types.h"
+#include <string.h>
+
+typedef f32 Mtx44[4][4];
+
+typedef struct {
+    u32 reserved;
+    const void* displayList;
+    u32 displayListSize;
+    u32 pipelineId;
+    u32 totalVerts;
+    u32 totalPrims;
+} PCPortGSDrawObject;
+
+enum {
+    PCPORT_GX_ORTHOGRAPHIC = 1,
+    PCPORT_GX_BM_NONE = 0,
+    PCPORT_GX_BM_BLEND = 1,
+    PCPORT_GX_BL_ZERO = 0,
+    PCPORT_GX_BL_ONE = 1,
+    PCPORT_GX_BL_SRCALPHA = 4,
+    PCPORT_GX_BL_INVSRCALPHA = 5,
+    PCPORT_GX_LO_COPY = 3,
+    PCPORT_GX_LEQUAL = 3,
+    PCPORT_GX_ALWAYS = 7,
+    PCPORT_GX_TEVSTAGE0 = 0,
+    PCPORT_GX_PASSCLR = 4,
+    PCPORT_GX_CULL_NONE = 0,
+    PCPORT_GX_VTXFMT0 = 0,
+    PCPORT_GX_QUADS = 0x80
+};
+
+typedef struct {
+    u8 configured;
+    u8 hasBlend;
+    u8 hasZMode;
+    u8 hasAlphaCompare;
+    u8 zEnable;
+    u8 zUpdate;
+    u32 blendType;
+    u32 blendSrc;
+    u32 blendDst;
+    u32 blendOp;
+    u32 zFunc;
+    u32 alphaComp0;
+    u8 alphaRef0;
+    u32 alphaOp;
+    u32 alphaComp1;
+    u8 alphaRef1;
+    u8 hasTexture;
+    u8 numTexGens;
+    u8 tevMode;
+    u8 textureCoordId;
+    u8 textureMapId;
+    const void* textureObject;
+    f32 alphaScale;
+} PCPortPipelineState;
+
+#define PCPORT_PIPELINE_STATE_MAX 8
+
+extern void GXSetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht,
+                          f32 nearZ, f32 farZ);
+extern void GXSetProjection(Mtx44 mtx, u32 type);
+extern void GXLoadPosMtxImm(f32 mtx[3][4], u32 id);
+extern void GXSetScissor(u32 xOrig, u32 yOrig, u32 wd, u32 ht);
+extern void GXSetCullMode(u32 mode);
+extern void GXSetBlendMode(u32 type, u32 src_factor, u32 dst_factor, u32 op);
+extern void GXSetAlphaCompare(u32 comp0, u8 ref0, u32 op, u32 comp1, u8 ref1);
+extern void GXSetZMode(u8 compare_enable, u32 func, u8 update_enable);
+extern void GXSetTevOp(u32 stage, u32 mode);
+extern void GXSetTevOrder(u32 stage, u32 coord, u32 map, u32 color);
+extern void GXSetNumTexGens(u8 nTexGens);
+extern void GXLoadTexObj(void* obj, u32 id);
+extern void GXBegin(u32 type, u32 vtxfmt, u16 nverts);
+extern void GXEnd(void);
+extern void GXPosition3f32(f32 x, f32 y, f32 z);
+extern void GXColor4u8(u8 r, u8 g, u8 b, u8 a);
+extern void GXTexCoord2f32(f32 s, f32 t);
+extern void GXHostClearTextureBinding(void);
+extern void GXHostSetVertexAlphaScale(f32 alphaScale);
+extern void fn_800BD0FC(void* list, u32 nbytes);
+extern u8 lbl_804001F0[];
+
+static u32 g_pcportPreRetraceCount;
+static u32 g_pcportVisibleFrameCount;
+static u32 g_pcportRenderMask = 0xFFFFFFFFu;
+static u32 g_pcportPipelineMask = 0xFFFFFFFFu;
+static u8 g_pcportRenderLayerCurrent;
+static u8 g_pcportRenderLayerTarget;
+static PCPortPipelineState g_pcportPipelineStates[PCPORT_PIPELINE_STATE_MAX];
+u8 lbl_8047AA91;
+
+static void GSgfxHostBuildOrthoProjection(Mtx44 projection,
+                                          f32 width, f32 height,
+                                          f32 nearZ, f32 farZ) {
+    f32 safeWidth = width;
+    f32 safeHeight = height;
+    f32 safeRange = farZ - nearZ;
+    int row;
+    int col;
+
+    if (safeWidth == 0.0f) {
+        safeWidth = 1.0f;
+    }
+    if (safeHeight == 0.0f) {
+        safeHeight = 1.0f;
+    }
+    if (safeRange == 0.0f) {
+        safeRange = 1.0f;
+    }
+
+    for (row = 0; row < 4; ++row) {
+        for (col = 0; col < 4; ++col) {
+            projection[row][col] = 0.0f;
+        }
+    }
+
+    projection[0][0] = 2.0f / safeWidth;
+    projection[0][3] = -1.0f;
+    projection[1][1] = -2.0f / safeHeight;
+    projection[1][3] = 1.0f;
+    projection[2][2] = 1.0f / safeRange;
+    projection[2][3] = -nearZ / safeRange;
+    projection[3][3] = 1.0f;
+}
+
+void GSgfx_PreRetraceCallback(s32 flag, f32 p1, f32 p2,
+                              f32 p3, f32 p4, f32 p5, f32 p6) {
+    Mtx44 projection;
+
+    (void)flag;
+
+    GSgfxHostBuildOrthoProjection(projection, p3, p4, p5, p6);
+    GXSetViewport(p1, p2, p3, p4, p5, p6);
+    GXSetProjection(projection, PCPORT_GX_ORTHOGRAPHIC);
+    ++g_pcportPreRetraceCount;
+}
+
+void GSgfx_DrawDoneCallback(void) {
+    lbl_8047AA91 = 1;
+}
+
+void fn_800D9D68(u32 x1, u32 y1, u32 x2, u32 y2) {
+    GXSetScissor(x1, y1, (x2 - x1) + 1, (y2 - y1) + 1);
+}
+
+void fn_800D6A5C(u32 a, u32 b) {
+    *(u32*)(lbl_804001F0 + 0xc) += a;
+    *(u32*)(lbl_804001F0 + 0x4) += b;
+}
+
+static PCPortPipelineState* GSgfxHostGetPipelineState(u32 pipelineId) {
+    if (pipelineId >= PCPORT_PIPELINE_STATE_MAX) {
+        return NULL;
+    }
+
+    return &g_pcportPipelineStates[pipelineId];
+}
+
+void GSgfxHostClearPipelineState(u32 pipelineId) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    memset(state, 0, sizeof(*state));
+    state->alphaScale = 1.0f;
+}
+
+void GSgfxHostSetPipelineBlend(u32 pipelineId,
+                               u32 type,
+                               u32 src_factor,
+                               u32 dst_factor,
+                               u32 op) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    state->configured = 1;
+    state->hasBlend = 1;
+    state->blendType = type;
+    state->blendSrc = src_factor;
+    state->blendDst = dst_factor;
+    state->blendOp = op;
+}
+
+void GSgfxHostSetPipelineZ(u32 pipelineId,
+                           u8 compare_enable,
+                           u32 func,
+                           u8 update_enable) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    state->configured = 1;
+    state->hasZMode = 1;
+    state->zEnable = compare_enable;
+    state->zFunc = func;
+    state->zUpdate = update_enable;
+}
+
+void GSgfxHostSetPipelineAlphaCompare(u32 pipelineId,
+                                      u32 comp0,
+                                      u8 ref0,
+                                      u32 op,
+                                      u32 comp1,
+                                      u8 ref1) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    state->configured = 1;
+    state->hasAlphaCompare = 1;
+    state->alphaComp0 = comp0;
+    state->alphaRef0 = ref0;
+    state->alphaOp = op;
+    state->alphaComp1 = comp1;
+    state->alphaRef1 = ref1;
+}
+
+void GSgfxHostSetPipelineAlphaScale(u32 pipelineId, f32 alphaScale) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    state->configured = 1;
+    state->alphaScale = alphaScale;
+}
+
+void GSgfxHostSetPipelineTexture(u32 pipelineId,
+                                 const void* textureObject,
+                                 u8 numTexGens,
+                                 u8 tevMode,
+                                 u8 textureCoordId,
+                                 u8 textureMapId) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    if (state == NULL) {
+        return;
+    }
+
+    state->configured = 1;
+    state->hasTexture = textureObject != NULL;
+    state->textureObject = textureObject;
+    state->numTexGens = numTexGens;
+    state->tevMode = tevMode;
+    state->textureCoordId = textureCoordId;
+    state->textureMapId = textureMapId;
+}
+
+void fn_800D7A70(u32 pipelineId) {
+    (void)pipelineId;
+}
+
+void fn_800D892C(u32 pipelineId) {
+    PCPortPipelineState* state = GSgfxHostGetPipelineState(pipelineId);
+
+    GXHostSetVertexAlphaScale(1.0f);
+    GXHostClearTextureBinding();
+    GXSetNumTexGens(0);
+    GXSetTevOp(PCPORT_GX_TEVSTAGE0, PCPORT_GX_PASSCLR);
+    if (state == NULL || !state->configured) {
+        return;
+    }
+
+    GXHostSetVertexAlphaScale(state->alphaScale);
+    if (state->hasBlend) {
+        GXSetBlendMode(state->blendType,
+                       state->blendSrc,
+                       state->blendDst,
+                       state->blendOp);
+    }
+    if (state->hasZMode) {
+        GXSetZMode(state->zEnable, state->zFunc, state->zUpdate);
+    }
+    if (state->hasAlphaCompare) {
+        GXSetAlphaCompare(state->alphaComp0,
+                          state->alphaRef0,
+                          state->alphaOp,
+                          state->alphaComp1,
+                          state->alphaRef1);
+    }
+    if (state->hasTexture && state->textureObject != NULL) {
+        GXSetNumTexGens(state->numTexGens);
+        GXSetTevOp(PCPORT_GX_TEVSTAGE0, state->tevMode);
+        GXSetTevOrder(PCPORT_GX_TEVSTAGE0,
+                      state->textureCoordId,
+                      state->textureMapId,
+                      0);
+        GXLoadTexObj((void*)state->textureObject, state->textureMapId);
+    }
+}
+
+void fn_800DAD10(void* objArg) {
+    PCPortGSDrawObject* obj = (PCPortGSDrawObject*)objArg;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    if (g_pcportRenderLayerCurrent == g_pcportRenderLayerTarget &&
+        (g_pcportRenderMask & g_pcportPipelineMask) != 0 &&
+        obj->displayList != NULL && obj->displayListSize != 0) {
+        fn_800D7A70(obj->pipelineId);
+        fn_800D892C(obj->pipelineId);
+        fn_800BD0FC((void*)obj->displayList, obj->displayListSize);
+        fn_800D6A5C(obj->totalVerts, obj->totalPrims);
+    }
+}
+
+void GSgfx_BeginFrame(void) {
+    static const f32 identity[3][4] = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f }
+    };
+    static const Mtx44 clipProjection = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f }
+    };
+
+    GXSetViewport(0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 1.0f);
+    GXSetProjection((f32 (*)[4])clipProjection, PCPORT_GX_ORTHOGRAPHIC);
+    GXLoadPosMtxImm((f32 (*)[4])identity, 0);
+    GXSetCullMode(PCPORT_GX_CULL_NONE);
+    GXSetBlendMode(PCPORT_GX_BM_NONE,
+                   PCPORT_GX_BL_ONE,
+                   PCPORT_GX_BL_ZERO,
+                   PCPORT_GX_LO_COPY);
+    GXSetZMode(0, PCPORT_GX_ALWAYS, 0);
+
+    GXBegin(PCPORT_GX_QUADS, PCPORT_GX_VTXFMT0, 4);
+
+    GXColor4u8(0x30, 0xD5, 0x5E, 0xFF);
+    GXPosition3f32(-1.0f, -1.0f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+
+    GXColor4u8(0x30, 0xD5, 0x5E, 0xFF);
+    GXPosition3f32(1.0f, -1.0f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+
+    GXColor4u8(0x30, 0xD5, 0x5E, 0xFF);
+    GXPosition3f32(1.0f, 1.0f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+
+    GXColor4u8(0x30, 0xD5, 0x5E, 0xFF);
+    GXPosition3f32(-1.0f, 1.0f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+
+    GXEnd();
+    ++g_pcportVisibleFrameCount;
+}
+
+u32 GSgfxHostGetPreRetraceCount(void) {
+    return g_pcportPreRetraceCount;
+}
+
+u8 GSgfxHostGetDrawDoneFlag(void) {
+    return lbl_8047AA91;
+}
+
+u32 GSgfxHostGetVisibleFrameCount(void) {
+    return g_pcportVisibleFrameCount;
+}
+
+void fn_800D3EC4(s32 flag, f32 p1, f32 p2,
+                 f32 p3, f32 p4, f32 p5, f32 p6) {
+    GSgfx_PreRetraceCallback(flag, p1, p2, p3, p4, p5, p6);
+}
+
+void fn_800D3F50(void) {
+    GSgfx_DrawDoneCallback();
+}
+
+void fn_800D3FA4(void) {
+    GSgfx_BeginFrame();
+}
+
+#else
+
 #include "dolphin/types.h"
 
 /* ===== External SDK / engine functions ===== */
@@ -369,9 +762,9 @@ extern void fn_800DFABC(void);
 extern s32 fn_800DFE98(u8*);
 extern void fn_800E0290(void*, void*, void*);
 extern void fn_800E02C4(void*);
-extern void fn_800E02E8(void*);
-extern void fn_800E032C(void*);
-extern void fn_800E0370(void*);
+extern void fn_800E02E8(void*, f32);
+extern void fn_800E032C(void*, f32);
+extern void fn_800E0370(void*, f32);
 extern void fn_800E03E8(void*, f32, f32, f32);
 extern void fn_800E0628(void*, void*);
 extern void fn_800E064C(void*);
@@ -600,19 +993,71 @@ void fn_800D5BA0(u32 idx, u32 val) {
     }
 }
 #endif
-#if 1
+#if 0
 asm void fn_800D5C18(void) {
 #include "src/game/gs_render_fn_800D5C18.inc"
 }
 #else
-void fn_800D5C18(void) { /* TODO */ }
+void fn_800D5C18(u32 idx, u8 a, u8 b, u8 c) {
+    u32 state = lbl_8047AA80;
+    u32 off;
+    if (!*(u8*)(state + 0x47e) && *(s32*)state == 1) {
+        fn_800D4F98(0x17, 4, idx, (u32)a, (u32)b, (u32)c);
+    } else {
+        off = idx * 0xc;
+        {
+            u32 s = lbl_8047AA80;
+            *(u32*)(s + 0x4e0 + idx * 4) = (u32)fn_800D7398;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4e8 + off) = a;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4e9 + off) = b;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4ea + off) = c;
+        }
+    }
+}
 #endif
-#if 1
+#if 0
 asm void fn_800D5CB8(void) {
 #include "src/game/gs_render_fn_800D5CB8.inc"
 }
 #else
-void fn_800D5CB8(void) { /* TODO - similar to fn_800D5C18 */ }
+void fn_800D5CB8(u32 idx, u8 a, u8 b, u8 c, u8 d) {
+    u32 state = lbl_8047AA80;
+    u32 off;
+    if (!*(u8*)(state + 0x47e) && *(s32*)state == 1) {
+        fn_800D4F98(0x16, 5, idx, (u32)a, (u32)b, (u32)c, (u32)d);
+    } else {
+        off = idx * 0xc;
+        {
+            u32 s = lbl_8047AA80;
+            *(u32*)(s + 0x4e0 + idx * 4) = (u32)fn_800D73C4;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4e8 + off) = a;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4e9 + off) = b;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4ea + off) = c;
+        }
+        {
+            u32 s = lbl_8047AA80;
+            *(u8*)(s + 0x4eb + off) = d;
+        }
+    }
+}
 #endif
 #if 0
 asm void fn_800D5D6C(void) {
@@ -1398,7 +1843,25 @@ asm void fn_800D7D90(void) {
 #include "src/game/gs_render_fn_800D7D90.inc"
 }
 #else
-void fn_800D7D90(void) { /* TODO */ }
+void fn_800D7D90(u8 idx, void* src) {
+    void* r30;
+    u32 r31;
+    r30 = src;
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x43, 0x11, (u32)idx, r30);
+    } else {
+        r31 = (u32)idx;
+        if (r31 > 9) {
+            fn_800DD970(lbl_80270440);
+        } else {
+            fn_800BD4B4((u32)r30, *(u32*)((u8*)lbl_80314610 + (u32)idx * 4));
+            fn_800E0628((void*)(lbl_80400948 + r31 * 0x30), r30);
+            if (r31 == 9) {
+                lbl_8047AAC8 = 1;
+            }
+        }
+    }
+}
 #endif
 extern u32 lbl_8047AAC0;
 extern u32 lbl_8047AAC4;
@@ -1551,12 +2014,31 @@ void fn_800D81EC(f32 a, f32 b, f32 c) {
 #endif
 extern u32 lbl_8047AAC0;
 extern u8 lbl_8047AAC8;
-#if 1
+#if 0
 asm void fn_800D8284(void) {
 #include "src/game/gs_render_fn_800D8284.inc"
 }
 #else
-void fn_800D8284(void) { /* TODO */ }
+void fn_800D8284(f32 a, f32 b, f32 c) {
+    f32 f30;
+    f32 f31;
+    u32 r31;
+    f30 = b;
+    f31 = c;
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x3c, 0xd, a, f30, f31);
+    } else {
+        fn_800E0370((void*)lbl_8047AAC0, a);
+        fn_800E032C((void*)lbl_8047AAC0, f30);
+        fn_800E02E8((void*)lbl_8047AAC0, f31);
+        r31 = *(u32*)(lbl_80314610 + 0x24);
+        fn_800BD4B4(lbl_8047AAC0, r31);
+        fn_800BD504(lbl_8047AAC0, r31);
+        fn_800BD554(r31);
+        fn_800E0628((void*)(lbl_80400948 + 0x1b0), (void*)lbl_8047AAC0);
+        lbl_8047AAC8 = 0;
+    }
+}
 #endif
 extern u32 lbl_8047AAC0;
 extern u8 lbl_8047AAC8;
@@ -1615,7 +2097,7 @@ void fn_800D83E4(u32 count) {
     }
 }
 #endif
-extern void fn_800B857C(u32, u32, u32, u32, u32, u32);
+extern void fn_800B857C(u32, u32, u32, u32, u32, u32, u32);
 extern void fn_800BD58C(void);
 extern u8 lbl_80314404[];
 extern u8 lbl_80314454[];
@@ -1651,7 +2133,41 @@ asm void fn_800D87AC(void) {
 #include "src/game/gs_render_fn_800D87AC.inc"
 }
 #else
-void fn_800D87AC(void) { /* TODO */ }
+void fn_800D87AC(u32 mask) {
+    u32 r27;
+    s32 r28;
+    s32 r29;
+    s32 r30;
+    s32 r31;
+    r27 = mask;
+    *(u32*)(lbl_8047AA80 + 0x414) |= r27;
+    if (r27 & 2) {
+        r30 = 0;
+        r29 = (s32)(u32)lbl_80314404;
+        r28 = 0;
+        r31 = r30;
+        do {
+            *(u32*)(lbl_8047AA80 + 0x28 + r30) = (u32)r31;
+            fn_800B857C(*(u32*)r29, 1, r28 + 4, 1, 0x3c, 0, 0x7d);
+            r28++;
+            r29 += 4;
+            r30 += 4;
+        } while (r28 < 8);
+    }
+    if (r27 & 4) {
+        r29 = 0;
+        r31 = r29;
+        do {
+            if (*(u8*)(lbl_8047AA80 + 0x25c + r29)) {
+                *(u8*)(lbl_8047AA80 + 0x25c + r29) = (u8)r31;
+                fn_800BBC34((u32)r29);
+            }
+            r29++;
+        } while (r29 < 0x10);
+        *(u8*)(lbl_8047AA80 + 0x3ac) = 0;
+        fn_800BBC0C(0);
+    }
+}
 #endif
 #if 0
 asm void fn_800D888C(void) {
@@ -1873,15 +2389,33 @@ void fn_800DA08C(u32 val) {
     }
 }
 #endif
-extern void fn_800BC618(void);
+extern void fn_800BC618(u32, u8, u32, u32, u8);
 extern u8 lbl_8031457C[];
 extern u8 lbl_8031456C[];
-#if 1
+#if 0
 asm void fn_800DA100(void) {
 #include "src/game/gs_render_fn_800DA100.inc"
 }
 #else
-void fn_800DA100(void) { /* TODO */}
+void fn_800DA100(s32 enable, s32 comp0, u8 ref0, s32 op, s32 comp1, u8 ref1) {
+    u32 state = lbl_8047AA80;
+    if (*(s32*)state == 1) {
+        fn_800D4F98(0x30, 6, enable, comp0, (u32)ref0, op, comp1, (u32)ref1);
+    } else {
+        if (enable == 1) {
+            *(u8*)(state + 0x425) = 1;
+        } else if (enable == 0) {
+            *(u8*)(state + 0x425) = 0;
+        }
+        if (*(u8*)(lbl_8047AA80 + 0x425) == 0) {
+            fn_800BC618(7, 0, 1, 7, 0);
+        } else {
+            fn_800BC618(((u32*)lbl_8031457C)[comp0], ref0,
+                        ((u32*)lbl_8031456C)[op],
+                        ((u32*)lbl_8031457C)[comp1], ref1);
+        }
+    }
+}
 #endif
 extern void fn_800BCE88(u32, u32, u32);
 extern void fn_800BCEBC(u32);
@@ -2027,23 +2561,101 @@ void fn_800DAD10(u32 obj) {
     }
 }
 #endif
-extern void fn_800E2AF8(void);
-#if 1
+extern void fn_800E2AF8(u16);
+#if 0
 asm void fn_800DADB4(void) {
 #include "src/game/gs_render_fn_800DADB4.inc"
 }
 #else
-void fn_800DADB4(void) { /* TODO */ }
+u32 fn_800DADB4(void) {
+    u32 state; u32 obj; u32 wptr; u32 aligned; u32 limit; u32 size; u32 rem; u32 i;
+    state = lbl_8047AA80;
+    if (!*(u8*)(state + 0x47e)) { return 0; }
+    obj = *(u32*)(state + 0x480);
+    wptr = *(u32*)(state + 0x484);
+    aligned = (wptr + 0x1f) & ~0x1f;
+    limit = *(u32*)(obj + 0x4) + *(u32*)(obj + 0x8);
+    if (aligned > limit || *(u8*)(obj + 0x1) != 0) {
+        fn_800E24B0(*(u16*)(obj + 0x2));
+        fn_800E209C(*(u16*)(obj + 0x2));
+        return 0;
+    }
+    size = aligned - wptr;
+    if (size != 0) {
+        i = size >> 3;
+        if (i != 0) {
+            do {
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+            } while (--i);
+        }
+        rem = size & 7;
+        if (rem != 0) {
+            do {
+                { u32 s = lbl_8047AA80; u32 p = *(u32*)(s + 0x484); *(u32*)(s + 0x484) = p + 1; *(u8*)p = 0; }
+            } while (--rem);
+        }
+    }
+    *(u32*)(obj + 0x8) = aligned - *(u32*)(obj + 0x4);
+    fn_800E2AF8(*(u16*)(obj + 0x2));
+    DCFlushRange((void*)*(u32*)(obj + 0x4), *(u32*)(obj + 0x8));
+    { u32 s = lbl_8047AA80; *(u8*)(s + 0x47e) = 0; }
+    { u32 s = lbl_8047AA80; *(u32*)(s + 0x480) = 0; }
+    { u32 s = lbl_8047AA80; *(u32*)(s + 0x484) = 0; }
+    return obj;
+}
 #endif
-extern void fn_800E2C04(void);
+extern u16 fn_800E2C04(u32, u32);
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
-#if 1
+#if 0
 asm void fn_800DAF60(void) {
 #include "src/game/gs_render_fn_800DAF60.inc"
 }
 #else
-void fn_800DAF60(void) { /* TODO */ }
+u32 fn_800DAF60(u32 a, u32 b) {
+    u32 r29; u32 r30; u32 r31;
+    u32 count;
+    r29 = a; r30 = b;
+    {
+        u32 s = lbl_8047AA80;
+        if (*(u8*)(s + 0x47e) == 1) { return 0; }
+        if (*(u8*)(s + 0x49f) == 1) { return 0; }
+    }
+    count = lbl_8047AAD8;
+    r31 = lbl_8047AAD4;
+    if (count > 0) {
+        do {
+            if (*(u8*)r31 == 0) { break; }
+            r31 += 0x18;
+        } while (--count);
+    }
+    if (count == 0) { r31 = 0; }
+    if (r31 == 0) { return 0; }
+    *(u8*)(r31 + 0x0) = 1;
+    *(u8*)(r31 + 0x1) = 0;
+    *(u32*)(r31 + 0x10) = 0;
+    *(u32*)(r31 + 0x14) = 0;
+    *(u16*)(r31 + 0x2) = fn_800E2C04(r30, 0x20);
+    if (*(u16*)(r31 + 0x2) == 0) { return 0; }
+    *(u32*)(r31 + 0x8) = r30;
+    *(u32*)(r31 + 0x4) = (u32)fn_800E27B0(*(u16*)(r31 + 0x2));
+    if (*(u32*)(r31 + 0x4) == 0) {
+        fn_800E209C(*(u16*)(r31 + 0x2));
+        return 0;
+    }
+    *(u32*)(r31 + 0xc) = r29;
+    { u32 s = lbl_8047AA80; *(u8*)(s + 0x47e) = 1; }
+    { u32 s = lbl_8047AA80; *(u32*)(s + 0x480) = r31; }
+    { u32 s = lbl_8047AA80; *(u32*)(s + 0x484) = *(u32*)(r31 + 0x4); }
+    return 1;
+}
 #endif
 #if 1
 asm void fn_800DB098(void) {
@@ -2965,7 +3577,34 @@ asm void fn_800DF7A4(void) {
 #include "src/game/gs_render_fn_800DF7A4.inc"
 }
 #else
-void fn_800DF7A4(void) { /* TODO */ }
+u8* fn_800DF7A4(void) {
+    u32 count;
+    u8* p;
+    count = lbl_8047AB20;
+    p = (u8*)lbl_8047AB1C;
+    for (; count != 0; count--) {
+        if (p[0] == 0) goto found;
+        p += 0x40;
+    }
+    p = 0;
+    found:
+    if (p == 0) {
+        fn_800DD970(lbl_8027056C);
+        return 0;
+    }
+    p[0] = 1;
+    *(u32*)(p + 0x3c) = 0xFEFEFEFE;
+    *(u16*)(p + 0x2) = 0;
+    *(u32*)(p + 0x10) = 0;
+    *(u32*)(p + 0x14) = 1;
+    *(u32*)(p + 0x18) = 2;
+    *(u32*)(p + 0x1c) = 3;
+    *(u32*)(p + 0x28) = 0;
+    *(u32*)(p + 0x20) = 0;
+    *(u32*)(p + 0x24) = 0;
+    *(u32*)(p + 0x38) = 0xFEFEFEFE;
+    return p;
+}
 #endif
 extern void fn_801A7CFC(void*);
 extern u32 lbl_8047AB20;
@@ -3226,21 +3865,21 @@ asm void fn_800E02E8(void* obj) {
 #include "src/game/gs_render_fn_800E02E8.inc"
 }
 #else
-void fn_800E02E8(void* obj) { u8 tmp[0x38]; fn_800A3074(tmp, 0x5a); fn_800A2D98(obj, tmp, obj); }
+void fn_800E02E8(void* obj, f32 angle) { u8 tmp[0x38]; fn_800A3074(tmp, 0x5a); fn_800A2D98(obj, tmp, obj); }
 #endif
 #if 0
 asm void fn_800E032C(void* obj) {
 #include "src/game/gs_render_fn_800E032C.inc"
 }
 #else
-void fn_800E032C(void* obj) { u8 tmp[0x38]; fn_800A3074(tmp, 0x59); fn_800A2D98(obj, tmp, obj); }
+void fn_800E032C(void* obj, f32 angle) { u8 tmp[0x38]; fn_800A3074(tmp, 0x59); fn_800A2D98(obj, tmp, obj); }
 #endif
 #if 0
 asm void fn_800E0370(void* obj) {
 #include "src/game/gs_render_fn_800E0370.inc"
 }
 #else
-void fn_800E0370(void* obj) { u8 tmp[0x38]; fn_800A3074(tmp, 0x58); fn_800A2D98(obj, tmp, obj); }
+void fn_800E0370(void* obj, f32 angle) { u8 tmp[0x38]; fn_800A3074(tmp, 0x58); fn_800A2D98(obj, tmp, obj); }
 #endif
 extern void fn_800A32E8(void*, void*, f32, f32, f32);
 #if 0
@@ -3582,3 +4221,5 @@ asm void fn_800E0E14(void) {
 #else
 void fn_800E0E14(void) { /* TODO */ }
 #endif
+
+#endif /* PCPORT */

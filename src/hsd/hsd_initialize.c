@@ -177,12 +177,15 @@ extern u32 lbl_8047B270;
 extern u32 lbl_8047B274;
 extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
-#if 1
-asm void fn_8019C7E0(void) {
-#include "src/hsd/hsd_initialize_fn_8019C7E0.inc"
-}
-#else
-#pragma optimization_level 4
+extern void fn_8009AC3C(u32 xfb);
+extern u32 fn_8009ABD0(u32 a, u32 b);
+extern void fn_8009AB50(u32 xfb);
+extern u32 lbl_80478C70;
+extern u32 lbl_8047B270;
+extern u32 lbl_8047B274;
+extern u32 lbl_8047B268;
+extern u32 lbl_8047B26C;
+
 void fn_8019C7E0(void) {
     fn_8009AC3C(lbl_80478C70);
     if (lbl_8047B270 != 0 && lbl_8047B274 != 0) {
@@ -194,8 +197,6 @@ void fn_8019C7E0(void) {
     lbl_80478C70 = fn_8009ABD0(lbl_8047B268, lbl_8047B26C);
     fn_8009AB50(lbl_80478C70);
 }
-#endif
-#pragma pop
 
 /* 0x8019C854 | 0x48 */
 #pragma push

@@ -490,15 +490,23 @@ u32 fn_800D3094(void) {
 void fn_800D30A0(u32 val) {
     *(u32*)((u8*)lbl_8047AA80 + 0x48) = val;
 }
-extern void fn_800D4F98(void);
+extern void fn_800D4F98(s32 arg0, ...);
 extern void fn_800B8920(void);
 extern u32 lbl_8047AA80;
-#if 1
+#if 0
 asm void fn_800D30AC(void) {
 #include "src/game/gs_gfx_fn_800D30AC.inc"
 }
 #else
-void fn_800D30AC(void) { /* TODO */ }
+void fn_800D30AC(void) {
+    u8* state = (u8*)lbl_8047AA80;
+
+    if (*(s32*)(state + 0x0) == 1) {
+        fn_800D4F98(4, 0);
+    } else {
+        fn_800B8920();
+    }
+}
 #endif
 extern void fn_800B8D10(void);
 extern void fn_800A1990(void);

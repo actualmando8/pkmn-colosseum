@@ -42,6 +42,73 @@ static u16 read_be16(const u8* p) {
     return (u16)((p[0] << 8) | p[1]);
 }
 
+static u32 read_be32(const u8* p) {
+    return ((u32)p[0] << 24) |
+           ((u32)p[1] << 16) |
+           ((u32)p[2] << 8) |
+           (u32)p[3];
+}
+
+static u8 expand_5_to_8(u32 value) {
+    return (u8)((value << 3) | (value >> 2));
+}
+
+static u8 expand_6_to_8(u32 value) {
+    return (u8)((value << 2) | (value >> 4));
+}
+
+static void decode_rgb565(u16 value, u8 outRgba[4]) {
+    outRgba[0] = expand_5_to_8((value >> 11) & 0x1Fu);
+    outRgba[1] = expand_6_to_8((value >> 5) & 0x3Fu);
+    outRgba[2] = expand_5_to_8(value & 0x1Fu);
+    outRgba[3] = 0xFF;
+}
+
+static void decode_dxt1_block(const u8* srcBlock,
+                              u8* dstRgba,
+                              u32 dstStride) {
+    u16 color0 = read_be16(srcBlock + 0);
+    u16 color1 = read_be16(srcBlock + 2);
+    u32 indices = read_be32(srcBlock + 4);
+    u8 palette[4][4];
+    u32 y;
+    u32 x;
+
+    decode_rgb565(color0, palette[0]);
+    decode_rgb565(color1, palette[1]);
+
+    if (color0 > color1) {
+        for (x = 0; x < 3u; ++x) {
+            palette[2][x] =
+                (u8)((((u32)palette[0][x] * 2u) + (u32)palette[1][x]) / 3u);
+            palette[3][x] =
+                (u8)(((u32)palette[0][x] + ((u32)palette[1][x] * 2u)) / 3u);
+        }
+        palette[2][3] = 0xFF;
+        palette[3][3] = 0xFF;
+    } else {
+        for (x = 0; x < 3u; ++x) {
+            palette[2][x] =
+                (u8)((((u32)palette[0][x]) + (u32)palette[1][x]) / 2u);
+            palette[3][x] = 0u;
+        }
+        palette[2][3] = 0xFF;
+        palette[3][3] = 0x00;
+    }
+
+    for (y = 0; y < 4u; ++y) {
+        for (x = 0; x < 4u; ++x) {
+            u32 code = (indices >> (2u * ((y * 4u) + x))) & 0x3u;
+            u8* dst = dstRgba + (y * dstStride) + (x * 4u);
+
+            dst[0] = palette[code][0];
+            dst[1] = palette[code][1];
+            dst[2] = palette[code][2];
+            dst[3] = palette[code][3];
+        }
+    }
+}
+
 /* =========================================================================
  * TLUT (palette) decode
  * ========================================================================= */
@@ -168,33 +235,58 @@ s32 gx_texture_decode_I4(const void* src, u16 w, u16 h,
 
 s32 gx_texture_decode_I8(const void* src, u16 w, u16 h,
                          GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode I8 (8-bit intensity)
-     *
-     * Tile layout: 8x4 texels per tile, 8 bits per texel
-     * Each tile is 32 bytes (8*4 = 32)
-     *
-     * Algorithm:
-     * for each tile (x, y):
-     *   for each row r in [0,3]:
-     *     for each column c in [0,7]:
-     *       out[(tileY*4+r)*w + (tileX*8+c)] = src[tileOffset + r*8 + c]
-     *
-     * Output: GL_R8 format, swizzle mode RRRR
-     */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 7u) / 8u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
     memset(out->data, 0, out->dataSize);
-    out->glInternalFormat = GL_R8;
-    out->glFormat = GL_RED;
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 8u; ++col) {
+                    u32 dstX = (tileX * 8u) + col;
+                    u8 intensity;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+
+                    intensity = tileSrc[(row * 8u) + col];
+                    dstPixel = out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    dstPixel[0] = intensity;
+                    dstPixel[1] = intensity;
+                    dstPixel[2] = intensity;
+                    dstPixel[3] = 0xFF;
+                }
+            }
+        }
+    }
+
+    out->glInternalFormat = GL_RGBA8;
+    out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;
     out->isCompressed = 0;
-    out->swizzleMode = GX_TEX_SWIZZLE_RRRR;
+    out->swizzleMode = GX_TEX_SWIZZLE_RGBA;
     return 0;
 }
 
@@ -440,44 +532,54 @@ s32 gx_texture_decode_CI8(const void* src, u16 w, u16 h,
 
 s32 gx_texture_decode_CMPR(const void* src, u16 w, u16 h,
                            GXDecodedTexture* out) {
-    (void)src;
+    const u8* srcBytes = (const u8*)src;
+    u32 macroTilesX = (w + 7u) / 8u;
+    u32 macroTilesY = (h + 7u) / 8u;
+    u32 macroY;
+    u32 macroX;
+    u32 subBlock;
 
-    /* TODO: Phase 3d -- Decode CMPR (DXT1-like compressed)
-     *
-     * GCN CMPR = DXT1 with two differences:
-     * 1. Sub-block order: within each 8x8 macro tile, the four 4x4
-     *    DXT1 blocks are stored in a Z-order (top-left, top-right,
-     *    bottom-left, bottom-right).
-     * 2. Byte order: GCN is big-endian; DXT1 on PC is little-endian.
-     *    The two 16-bit color endpoints need byte-swapping.
-     *    The 32-bit index block also needs byte-swapping.
-     *
-     * Algorithm:
-     * for each 8x8 macro tile:
-     *   for each of the 4 sub-blocks (in Z-order):
-     *     Read 8 bytes (DXT1 block)
-     *     Byte-swap the two 16-bit color values
-     *     Byte-swap the 32-bit index value
-     *     Write to output in linear DXT1 block order
-     *
-     * Output: GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
-     * Upload via glCompressedTexImage2D
-     *
-     * Compressed size = (width/4) * (height/4) * 8 bytes per block
-     */
-
-    u32 blocksX = (w + 3) / 4;
-    u32 blocksY = (h + 3) / 4;
     out->width = w;
     out->height = h;
-    out->dataSize = blocksX * blocksY * 8;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
     memset(out->data, 0, out->dataSize);
-    out->glInternalFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-    out->glFormat = 0; /* not used for compressed */
-    out->glType = 0;   /* not used for compressed */
-    out->isCompressed = 1;
+
+    for (macroY = 0; macroY < macroTilesY; ++macroY) {
+        for (macroX = 0; macroX < macroTilesX; ++macroX) {
+            const u8* macroSrc =
+                srcBytes + (((macroY * macroTilesX) + macroX) * 32u);
+
+            for (subBlock = 0; subBlock < 4u; ++subBlock) {
+                u32 blockX = (macroX * 8u) + ((subBlock & 1u) * 4u);
+                u32 blockY = (macroY * 8u) + ((subBlock >> 1u) * 4u);
+                u8 blockPixels[4 * 4 * 4];
+                u32 row;
+
+                decode_dxt1_block(macroSrc + (subBlock * 8u),
+                                  blockPixels,
+                                  4u * 4u);
+
+                for (row = 0; row < 4u; ++row) {
+                    u32 dstY = blockY + row;
+
+                    if (dstY >= h || blockX >= w) {
+                        continue;
+                    }
+
+                    memcpy(out->data + (((dstY * (u32)w) + blockX) * 4u),
+                           blockPixels + (row * 4u * 4u),
+                           ((blockX + 4u) <= w ? 4u : (u32)w - blockX) * 4u);
+                }
+            }
+        }
+    }
+
+    out->glInternalFormat = GL_RGBA8;
+    out->glFormat = GL_RGBA;
+    out->glType = GL_UNSIGNED_BYTE;
+    out->isCompressed = 0;
     out->swizzleMode = GX_TEX_SWIZZLE_RGBA;
     return 0;
 }

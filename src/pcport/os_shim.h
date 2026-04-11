@@ -271,6 +271,11 @@ u32 OSDisableInterrupts_PC(void);
  */
 void OSRestoreInterrupts_PC(u32 prev);
 
+/* Thin SDK-name wrappers used by decompiled host-compiled translation units. */
+BOOL OSDisableInterrupts(void);
+BOOL OSEnableInterrupts(void);
+BOOL OSRestoreInterrupts(BOOL level);
+
 /**
  * OSDisableScheduler_PC -- Disable the thread scheduler.
  *

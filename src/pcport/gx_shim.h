@@ -143,6 +143,62 @@ typedef enum {
     GX_VTXFMT7
 } GXVtxFmt;
 
+/* GXAttr */
+typedef enum {
+    GX_VA_PNMTXIDX = 0,
+    GX_VA_TEX0MTXIDX = 1,
+    GX_VA_TEX1MTXIDX = 2,
+    GX_VA_TEX2MTXIDX = 3,
+    GX_VA_TEX3MTXIDX = 4,
+    GX_VA_TEX4MTXIDX = 5,
+    GX_VA_TEX5MTXIDX = 6,
+    GX_VA_TEX6MTXIDX = 7,
+    GX_VA_TEX7MTXIDX = 8,
+    GX_VA_POS = 9,
+    GX_VA_NRM = 10,
+    GX_VA_CLR0 = 11,
+    GX_VA_CLR1 = 12,
+    GX_VA_TEX0 = 13,
+    GX_VA_TEX1 = 14,
+    GX_VA_TEX2 = 15,
+    GX_VA_TEX3 = 16,
+    GX_VA_TEX4 = 17,
+    GX_VA_TEX5 = 18,
+    GX_VA_TEX6 = 19,
+    GX_VA_TEX7 = 20,
+    GX_VA_NULL = 0xFF
+} GXAttr;
+
+/* GXAttrType */
+typedef enum {
+    GX_NONE = 0,
+    GX_DIRECT = 1,
+    GX_INDEX8 = 2,
+    GX_INDEX16 = 3
+} GXAttrType;
+
+/* GXCompCnt */
+typedef enum {
+    GX_POS_XY = 0,
+    GX_POS_XYZ = 1,
+    GX_NRM_XYZ = 0,
+    GX_CLR_RGB = 0,
+    GX_CLR_RGBA = 1,
+    GX_TEX_S = 0,
+    GX_TEX_ST = 1
+} GXCompCnt;
+
+/* GXCompType */
+typedef enum {
+    GX_U8 = 0,
+    GX_S8 = 1,
+    GX_U16 = 2,
+    GX_S16 = 3,
+    GX_F32 = 4,
+    GX_RGB8 = 1,
+    GX_RGBA8 = 5
+} GXCompType;
+
 /* GXCullMode */
 typedef enum {
     GX_CULL_NONE  = 0,
@@ -485,6 +541,38 @@ void GXSetScissor(u32 xOrig, u32 yOrig, u32 wd, u32 ht);
 void GXLoadPosMtxImm(Mtx mtx, u32 id);
 
 /**
+ * GXSetCurrentMtx -- Select the current position matrix slot.
+ * Called from HSD PObj rendering.
+ * PC port: Tracks the active matrix slot.
+ */
+void GXSetCurrentMtx(u32 id);
+
+/**
+ * GXSetVtxDesc -- Set a vertex attribute descriptor type.
+ * Called from HSD PObj descriptor setup.
+ */
+void GXSetVtxDesc(GXAttr attr, GXAttrType type);
+
+/**
+ * GXClearVtxDesc -- Clear all vertex attribute descriptors.
+ * Called from HSD PObj descriptor setup.
+ */
+void GXClearVtxDesc(void);
+
+/**
+ * GXSetVtxAttrFmt -- Set a vertex attribute format entry.
+ * Called from HSD PObj descriptor setup.
+ */
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr,
+                     GXCompCnt cnt, GXCompType type, u8 frac);
+
+/**
+ * GXSetArray -- Set the base pointer and stride for an indexed vertex array.
+ * Called from HSD PObj descriptor setup.
+ */
+void GXSetArray(GXAttr attr, void* base, u8 stride);
+
+/**
  * GXLoadNrmMtxImm -- Load a 3x3 normal matrix (from a 3x4 Mtx).
  * Called from the pipeline for lighting normal transforms.
  * PC port: Upload to u_normalMatrix uniform (inverse transpose of MV).
@@ -640,6 +728,14 @@ void GXInitTexObj(GXTexObj* obj, void* image,
                   GXBool mipmap);
 
 /**
+ * GXHostInitTexObjRGBA8 -- Host-only texture upload from linear RGBA8 pixels.
+ * Used by narrow archive/TEV smoke paths after CPU-side interpretation.
+ */
+void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
+                           u16 width, u16 height,
+                           GXTexWrapMode wrap_s, GXTexWrapMode wrap_t);
+
+/**
  * GXInitTlutObj -- Initialize a TLUT (palette) object.
  * Called from GStextureCreate, GStextureSetupFromTPL (fn_800BB050).
  * PC port: Decode TLUT on CPU (no GL equivalent needed).
@@ -766,6 +862,23 @@ void GXTexCoord2f32(f32 s, f32 t);
  * Called from GSgfx_DrawDispatch (fn_800E1544).
  * PC port: glDrawArrays from pre-built static VBO.
  */
+typedef struct {
+    f32 pos[3];
+    u8 color[4];
+    f32 texcoord[2];
+} GXHostDisplayListVertex;
+
+typedef struct {
+    u32 magic;
+    u32 primitive;
+    u32 vertexCount;
+    const GXHostDisplayListVertex* vertices;
+} GXHostDisplayList;
+
+enum {
+    GX_HOST_DISPLAY_LIST_MAGIC = 0x5043444Cu
+};
+
 void GXCallDisplayList(void* list, u32 nbytes);
 
 /* --- 8. Framebuffer / Copy (Section 1.8) --- */
@@ -803,6 +916,18 @@ void GXSetNumChans(u8 nChans);
  * PC port: Configure texcoord generation in vertex shader.
  */
 void GXSetNumTexGens(u8 nTexGens);
+
+/**
+ * GXHostSetVertexAlphaScale -- Host-only color alpha modulation for narrow
+ * material-backed smoke paths.
+ */
+void GXHostSetVertexAlphaScale(f32 alphaScale);
+
+/**
+ * GXHostClearTextureBinding -- Host-only reset for the narrow texture bridge.
+ * Clears the currently bound texture and disables texcoord generation state.
+ */
+void GXHostClearTextureBinding(void);
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,8 @@ typedef s64 OSTime;
 typedef s32 OSHeapHandle;
 
 /* Size type for memory operations */
+#ifdef __MWERKS__
 typedef u32 size_t;
+#endif
 
 #endif /* DOLPHIN_TYPES_H */

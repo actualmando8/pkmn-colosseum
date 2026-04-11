@@ -5,6 +5,10 @@
 **Current:** ~3,000 verified (~35%)
 **Remaining:** ~5,600 unverified
 
+> Audit note (2026-04-02): Treat this as a historical planning snapshot. The
+> March 2026 counts above are not authoritative for the current tree. See
+> [status_audit.md](status_audit.md) for the current repo-backed status summary.
+
 ## Priority Order
 
 ### Phase 1: Quick Wins (+1,400 functions, ~2 weeks)

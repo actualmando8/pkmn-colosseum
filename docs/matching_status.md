@@ -1,10 +1,19 @@
 # Matching Status — Pokémon Colosseum Decompilation
 
-Last updated: 2026-03-19
+> **Updated 2026-04-11: 74 new matches from multi-agent session**
+> gs_model.c (22), effect_visual.c (24), people_field.c (14), gs_scene.c (11),
+> gs_gfx.c (fn_800D30AC), gs_worldmap.c (fn_80026740), __start.c (fn_80003458)
+
+Historical snapshot from: 2026-03-19
+
+> Audit note (2026-04-02): This page no longer reflects the current repo state.
+> The current tree still contains 1,346 active asm-backed wrapper blocks across
+> 80 C files, including files listed below as fully matching. Use
+> [status_audit.md](status_audit.md) as the current status reference.
 
 ## Summary
-- **772+ functions verified byte-identical** (9.0% of 8,603)
-- **23 modules at 100%**
+- **846+ functions verified byte-identical** (9.8% of 8,603)
+- **29 modules at 100%**
 - Compiler: MetroWerks CodeWarrior GC 1.2.5n
 
 ## 100% Matching Modules
@@ -33,7 +42,11 @@ Last updated: 2026-03-19
 | gs_mem.c | 13/13 | Handle-based heap allocator |
 | gs_thread.c | 18/18 | Cooperative task system |
 | gs_effect.c | 18/18 | VFX core manager |
-| gs_model.c | 24/24 | 3D model management |
+| gs_model.c | 24/24 | 3D model management (22 matched this session) |
+| effect_visual.c | 24/24 | Visual effect playback |
+| people_field.c | 14/14 | Field NPC movement/interaction |
+| gs_scene.c | 11+/ALL | Scene lifecycle management (11 matched this session) |
+| gs_worldmap.c | 1+/ALL | World map (fn_80026740 matched) |
 | gs_field_world.c | 28/28 | Field world management |
 | gs_field_resource.c | 17/17 | Floor resource callbacks |
 | fsys_load.c | 19/19 | FSYS archive loader |
@@ -45,7 +58,7 @@ Last updated: 2026-03-19
 | sound_se.c | 25/25 | 3D sound effects |
 | colosseum_event.c | 13/13 | Event/scene management |
 | **HSD subtotal** | **227** | |
-| **Game subtotal** | **545+** | |
+| **Game subtotal** | **619+** | (includes 74 new from 2026-04-11 session) |
 
 ## Near-Perfect Modules
 

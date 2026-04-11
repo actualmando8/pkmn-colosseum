@@ -544,7 +544,7 @@ asm void fn_801436F0(void) {
 s32 fn_801436F0(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x4] >> 3) & 1;
+    v = !!(p[0x4] & 8);
     return v;
 }
 #endif
@@ -601,7 +601,7 @@ asm void fn_80143778(void) {
 s32 fn_80143778(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x4] >> 4) & 1;
+    v = !!(p[0x4] & 0x10);
     return v;
 }
 #endif

@@ -729,17 +729,18 @@ void fn_801946F0(void) { /* TODO */ }
 #pragma pop
 
 /* 0x80194788 | 0x20 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 #if 1
 asm void fn_80194788(void) {
 #include "src/hsd/hsd_cobj_fn_80194788.inc"
 }
 #else
-void fn_80194788(void) { /* TODO */ }
+void fn_80194788(u8* ptr, f32 val) {
+    if (ptr == NULL) return;
+    if (ptr[0x50] == 1) {
+        *(f32*)(ptr + 0x44) = val;
+    }
+}
 #endif
-#pragma pop
 
 /* 0x801947A8 | 0x20 */
 void fn_801947A8(u8* ptr, f32 val) {

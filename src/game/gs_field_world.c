@@ -5541,10 +5541,23 @@ asm void fn_80115BD8(void) {
 #include "src/game/gs_field_world_fn_80115BD8.inc"
 }
 #else
-void fn_80115BD8(void) {
+void* fn_80115BD8(void) {
     /* refs: lbl_802726D4, lbl_8035B8A0, lbl_80478FB8, lbl_80478FBC */
-    fn_800FF56C();
-    fn_800DD970("");
+    void* floorId;
+    u8* entry;
+    u32 count;
+
+    floorId = fn_800FF56C();
+    entry = (u8*)lbl_80478FBC;
+    for (count = *(u32*)lbl_80478FB8; count != 0; count--) {
+        if (*(u32*)(entry + 0xC) == (u32)floorId) {
+            return entry;
+        }
+        entry += 0x4C;
+    }
+    fn_800DD970((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
+    entry = (u8*)0;
+    return (void*)entry;
 }
 #endif
 /* 0x80115CB4 | 0xB0 */

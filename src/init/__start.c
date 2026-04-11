@@ -329,27 +329,27 @@ asm void fn_80003458(void) {
 #include "src/init/__start_fn_80003458.inc"
 }
 #else
-void fn_80003458(void) { /* TODO: match */ }
+u32 fn_80003458(u32 arg) {
+    fn_800C0DA8();
+    return arg;
+}
 #endif
 
 /* fn_80003488 - 0x80003488 | size: 0x24 */
-#if 1
-asm void fn_80003488(void) {
-#include "src/init/__start_fn_80003488.inc"
+void fn_80003488(u8 *src, u8 *dst, int len) {
+    while (len-- > 0) {
+        *dst++ = *src++;
+    }
 }
-#else
-void fn_80003488(void) { /* TODO: match */ }
-#endif
 
 /* fn_800053E0 - 0x800053E0 | size: 0x2c */
 extern void OSResetSystem(int, int, int);
-#if 1
-asm void fn_800053E0(void) {
-#include "src/init/__start_fn_800053E0.inc"
+void fn_800053E0(void) {
+    int r3 = 0;
+    int r4 = 0;
+    int r5 = 0;
+    OSResetSystem(r3, r4, r5);
 }
-#else
-void fn_800053E0(void) { /* TODO: match */ }
-#endif
 
 /* memset - 0x8000540C | size: 0x30 */
 

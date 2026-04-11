@@ -357,7 +357,7 @@ u32* fn_801A6DC4(u32* node) {
 #endif
 
 /* 0x801A6DDC | 0x24 */
-#if 1
+#if 0
 asm void fn_801A6DDC(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DDC.inc"
 }
