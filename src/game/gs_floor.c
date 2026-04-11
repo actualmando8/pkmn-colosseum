@@ -1200,8 +1200,8 @@ void fn_800FF788(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FF81C(void) {
-    /* TODO: match -- 12 bytes at 0x800FF81C */
+void fn_800FF81C(void* tablePtr, u32 tableCount) {
+    /* TODO: match -- 12 bytes at 0x800FF81C (static name mismatch) */
 }
 #pragma pop
 
