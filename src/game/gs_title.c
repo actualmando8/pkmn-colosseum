@@ -3414,7 +3414,7 @@ void fn_8002217C(void) { /* TODO */ }
 /* fn_80022478 - 0x80022478 | size: 0x2a8 */
 extern void jumptable_802E4F00();
 extern u8 lbl_80478888[];
-extern void fn_80023068(void);
+extern s32 fn_80023068(u32, u32*);
 extern void fn_800232F0(void);
 extern void fn_80023760(void);
 #if 1
@@ -3508,7 +3508,7 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
 
 /* fn_80022720 - 0x80022720 | size: 0x114 */
 extern u8 lbl_80266C54[];
-extern void fn_80023068(void);
+extern s32 fn_80023068(u32, u32*);
 extern void fn_800232F0(void);
 #if 0
 asm void fn_80022720(void) {
@@ -3864,7 +3864,79 @@ asm void fn_80023068(void) {
 #include "src/game/gs_title_fn_80023068.inc"
 }
 #else
-void fn_80023068(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80023068(u32 arg0, u32* arg1) {
+    u8 name_buf[0x84];
+    u8 text_buf[0x108];
+    s32 blocked;
+    s32 mode;
+    s32 slot;
+    s32 sc;
+    s32 sd;
+    s32 effect;
+    s32 sound_index;
+
+    blocked = 0;
+    for (;;) {
+        slot = fn_800141BC((void*)arg0, 1);
+        if (slot < 0) {
+            break;
+        }
+        fn_80014118(slot, &sc, &sd);
+        if ((u8)((u32 (*)(s32, s32))fn_80121ADC)(sc, 0x3E) != 0) {
+            blocked = 1;
+            break;
+        }
+        mode = ((s32 (*)(s32))fn_80019B48)((s8)slot);
+        ((void (*)(void))fn_80019B1C)();
+        if (mode >= 0) {
+            break;
+        }
+    }
+
+    if (slot >= 0) {
+        if (blocked != 0) {
+            fn_80132A38(0x32, ((void* (*)(s32))fn_8011F4F0)(sc));
+            fn_80106D3C(2, 0x424D, 1, 0);
+            fn_801069FC(1);
+            effect = 0;
+        } else {
+            effect = ((s32 (*)(void*, s32, s32, u16, s32))fn_80144574)(text_buf, sc, sd, (u16)arg0, (u8)mode);
+            if ((s16)effect > 0) {
+                if (arg0 == *(u16*)(lbl_80266DB0 + 0x0)) {
+                    sound_index = 0;
+                } else if (arg0 == *(u16*)(lbl_80266DB0 + 0x2)) {
+                    sound_index = 1;
+                } else if (arg0 == *(u16*)(lbl_80266DB0 + 0x4)) {
+                    sound_index = 2;
+                } else if (arg0 == *(u16*)(lbl_80266DB0 + 0x6)) {
+                    sound_index = 3;
+                } else if (arg0 == *(u16*)(lbl_80266DB0 + 0x8)) {
+                    sound_index = 4;
+                } else {
+                    sound_index = 5;
+                }
+                if (sound_index < 5) {
+                    ((void (*)(s32, s32, s32, s32))fn_80166A50)(0x466, 0, 0xFF, 0);
+                } else {
+                    ((void (*)(s32, s32, s32, s32))fn_80166A50)(0x465, 0, 0xFF, 0);
+                }
+                ((void (*)(void))fn_8001D378)();
+            }
+            ((void (*)(u8*, s32, u8*, s32, s32))fn_800216E8)(name_buf, 0x40, text_buf, effect, sc);
+            fn_80132A38(0x4D, name_buf);
+            fn_80106D3C(2, 0xE0, 1, 0);
+            fn_801069FC(1);
+        }
+    }
+
+    fn_80014198(slot);
+    if (slot >= 0 && (s16)effect > 0) {
+        *arg1 = 1;
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 /* fn_80023274 - 0x80023274 | size: 0x7c */
