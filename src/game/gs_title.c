@@ -2959,14 +2959,40 @@ void fn_80020B8C(void* r3, u8* r4) {
 #endif
 
 /* fn_80020BA0 - 0x80020BA0 | size: 0xfc */
-extern void fn_801040F0(void);
+extern void fn_801040F0(s32, s32, void*, s32, s32);
+extern s32 fn_80135168(s32, s32);
 extern u8 lbl_802EF0A8[];
-#if 1
+#if 0
 asm void fn_80020BA0(void) {
 #include "src/game/gs_title_fn_80020BA0.inc"
 }
 #else
-void fn_80020BA0(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80020BA0(void* arg0, u8* arg1) {
+    u8* ptr;
+    s16 x;
+    s16 y;
+
+    if (fn_80166C74() == 0) {
+        ptr = lbl_802EF0A8 + 0x8FF0;
+    } else {
+        ptr = lbl_802EF0A8 + 0x900C;
+    }
+
+    x = *(s16*)(ptr + 2) - *(s16*)(arg1 + 0x50);
+    y = *(s16*)(ptr + 4) - *(s16*)(arg1 + 0x52);
+    fn_801040F0(x, y, arg0, 0x192, 0);
+
+    if (fn_80135168(0, 9) == 1) {
+        ptr = lbl_802EF0A8 + 0x8FD4;
+    } else {
+        ptr = lbl_802EF0A8 + 0x8FB8;
+    }
+
+    x = *(s16*)(ptr + 2) - *(s16*)(arg1 + 0x50);
+    y = *(s16*)(ptr + 4) - *(s16*)(arg1 + 0x52);
+    fn_801040F0(x, y, arg0, 0x192, 0);
+}
 #endif
 
 /* fn_80020C9C - 0x80020C9C | size: 0x200 */
@@ -3545,4 +3571,3 @@ asm void fn_80024308(void) {
 #else
 void fn_80024308(void) { /* TODO */ }
 #endif
-
