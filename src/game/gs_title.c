@@ -3241,20 +3241,21 @@ asm void fn_80021A9C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 s32 fn_80021A9C(u32 r3, u32* r4) {
     u8* r5;
     s32 count;
+    s32 ret;
+
     r5 = lbl_803A1B90;
     count = *(s32*)(lbl_803A1B90 + 0x40);
-    if (count > 0) {
-        do {
-            if (r3 == (u32)*(u16*)r5) {
-                *r4 = 0;
-                return 2;
-            }
-            r5 += 8;
-            count--;
-        } while (count != 0);
+    for (; count > 0; count--) {
+        if (r3 == (u32)*(u16*)r5) {
+            ret = 2;
+            *r4 = 0;
+            return ret;
+        }
+        r5 += 8;
     }
     fn_80106D3C(2, 0x426a, 1, 0);
     fn_801069FC(1);
