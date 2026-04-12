@@ -3285,7 +3285,7 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
 
 /* fn_800218BC - 0x800218BC | size: 0x1e0 */
 extern void fn_80014118(s32, void*, void*);
-extern void fn_80123FBC(void);
+extern s32 fn_80123FBC(s32);
 extern void fn_8011FC74(void);
 extern void fn_8011FC14(void);
 extern s32 fn_800141BC(void*, s32);
@@ -3347,52 +3347,52 @@ void fn_80021B14(void) { /* TODO */ }
 #endif
 
 /* fn_80022050 - 0x80022050 | size: 0x12c */
-extern void fn_801347E0(void);
-extern void fn_801347E8(void);
-extern void fn_800140FC(void);
-extern void fn_801F7EF0(void);
+extern s32 fn_801347E0(void);
+extern s32 fn_801347E8(s32, s8);
+extern void fn_800140FC(s32*, s32*);
+extern s32 fn_801F7EF0(s32);
 extern void fn_80023968(void);
-#if 1
+#if 0
 asm void fn_80022050(void) {
 #include "src/game/gs_title_fn_80022050.inc"
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_80022050(s32 arg0, s32* arg1) {
-    s32 sp8;
-    s32 spC;
-    s32 sp10;
     s32 sp14;
+    s32 sp10;
+    s32 spC;
+    s32 sp8;
     s32 valid_count;
     s32 i;
-    s32 count;
 
     valid_count = 0;
     i = 0;
     while (i < 6) {
         fn_80014118(i, &spC, &sp8);
-        if ((u8)((s32 (*)(s32))fn_80123FBC)(spC) != 0) {
+        if ((u8)fn_80123FBC(spC) != 0) {
             valid_count++;
         }
         i++;
     }
     if (valid_count >= 6) {
-        count = (s8)((s32 (*)(void))fn_801347E0)();
+        valid_count = (s8)fn_801347E0();
         i = 0;
-        while (i < count) {
-            if ((s8)((s32 (*)(s32, s8))fn_801347E8)(0, (s8)i) > 0) {
+        while (i < valid_count) {
+            if ((s8)fn_801347E8(0, (s8)i) > 0) {
                 break;
             }
             i++;
         }
-        if (i >= count) {
+        if (i >= valid_count) {
             fn_80106D3C(2, 0x4416, 1, 0);
             fn_801069FC(1);
             return 1;
         }
     }
-    ((void (*)(s32*, s32*))fn_800140FC)(&sp14, &sp10);
-    if ((u8)((s32 (*)(s32))fn_801F7EF0)(sp10) != 0) {
+    fn_800140FC(&sp14, &sp10);
+    if ((u8)fn_801F7EF0(sp10) != 0) {
         fn_80106D3C(2, 0x426d, 1, 0);
         fn_801069FC(1);
         return 1;
