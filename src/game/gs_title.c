@@ -1994,7 +1994,7 @@ extern f32 lbl_8047A3A4;
 extern f32 lbl_8047B8E4;
 extern f32 lbl_8047B8C8;
 extern void fn_80025C1C(void);
-#if 1
+#if 0
 asm void fn_80025A80(void) {
 #include "src/game/gs_title_fn_80025A80.inc"
 }
