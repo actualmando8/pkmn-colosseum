@@ -359,7 +359,7 @@ extern f32 lbl_8047B8DC;
 extern u32 lbl_8047A36C;
 extern u8 lbl_802E4F58[];
 extern u32 lbl_80478DE0;
-#if 1
+#if 0
 asm void fn_800246FC(void) {
 #include "src/game/gs_title_fn_800246FC.inc"
 }
@@ -613,7 +613,7 @@ extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern f32 lbl_8047B8A8;
 extern f32 lbl_8047B8DC;
-#if 1
+#if 0
 asm void fn_80024A2C(void) {
 #include "src/game/gs_title_fn_80024A2C.inc"
 }
@@ -727,7 +727,7 @@ void fn_80024A2C(void) {
 extern u32 lbl_8047A36C;
 extern u32 lbl_80478DDC;
 extern u32 lbl_80478DD8;
-#if 1
+#if 0
 asm void fn_80024BA4(void) {
 #include "src/game/gs_title_fn_80024BA4.inc"
 }
@@ -948,7 +948,7 @@ extern u32 lbl_8047A368;
 extern f64 lbl_8047B8B8;
 extern f32 lbl_8047A374;
 extern f32 lbl_8047B8E0;
-#if 1
+#if 0
 asm void fn_80024F2C(void) {
 #include "src/game/gs_title_fn_80024F2C.inc"
 }
@@ -1066,7 +1066,7 @@ extern u32 lbl_8047A368;
 extern f64 lbl_8047B8B8;
 extern f32 lbl_8047A374;
 extern f32 lbl_8047B8E0;
-#if 1
+#if 0
 asm void fn_8002509C(void) {
 #include "src/game/gs_title_fn_8002509C.inc"
 }
@@ -1184,7 +1184,7 @@ extern u32 lbl_8047A368;
 extern f64 lbl_8047B8B8;
 extern f32 lbl_8047A374;
 extern f32 lbl_8047B8E0;
-#if 1
+#if 0
 asm void fn_8002520C(void) {
 #include "src/game/gs_title_fn_8002520C.inc"
 }
@@ -1299,7 +1299,7 @@ extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
 extern u32 lbl_8047A368;
-#if 1
+#if 0
 asm void fn_8002537C(void) {
 #include "src/game/gs_title_fn_8002537C.inc"
 }
@@ -1391,7 +1391,7 @@ extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
 extern u32 lbl_8047A368;
-#if 1
+#if 0
 asm void fn_80025490(void) {
 #include "src/game/gs_title_fn_80025490.inc"
 }
@@ -1497,7 +1497,7 @@ extern f32 lbl_8047B8B0;
 extern f32 lbl_8047B8E8;
 extern u32 lbl_8047A388;
 extern u32 lbl_8047A38C;
-#if 1
+#if 0
 asm void fn_800255A4(void) {
 #include "src/game/gs_title_fn_800255A4.inc"
 }
@@ -2160,7 +2160,7 @@ extern f32 lbl_8047B8F4;
 extern u8 lbl_80314AE8[];
 extern f32 lbl_8047B90C;
 extern f32 lbl_8047B910;
-#if 1
+#if 0
 asm void fn_80025C1C(void) {
 #include "src/game/gs_title_fn_80025C1C.inc"
 }
@@ -2453,7 +2453,7 @@ extern f64 lbl_8047B8B8;
 extern f32 lbl_8047B8E4;
 extern f64 lbl_8047B8D0;
 extern f32 lbl_8047B900;
-#if 1
+#if 0
 asm void fn_80025F84(void) {
 #include "src/game/gs_title_fn_80025F84.inc"
 }
@@ -2846,7 +2846,7 @@ s32 fn_8002091C(void) {
 extern f32 lbl_8047B874;
 extern f32 lbl_8047B88C;
 extern f32 lbl_8047B888;
-#if 1
+#if 0
 asm void fn_8002092C(void) {
 #include "src/game/gs_title_fn_8002092C.inc"
 }
@@ -2870,7 +2870,7 @@ void fn_8002092C(void* r3, u8* r4) {
 extern f32 lbl_8047B874;
 extern f32 lbl_8047B88C;
 extern f32 lbl_8047B888;
-#if 1
+#if 0
 asm void fn_800209BC(void) {
 #include "src/game/gs_title_fn_800209BC.inc"
 }
@@ -2896,7 +2896,7 @@ void fn_800209BC(void* r3, u8* r4) {
 extern f32 lbl_8047B874;
 extern f32 lbl_8047B88C;
 extern f32 lbl_8047B888;
-#if 1
+#if 0
 asm void fn_80020A4C(void) {
 #include "src/game/gs_title_fn_80020A4C.inc"
 }
@@ -2962,7 +2962,7 @@ void fn_80020B8C(void* r3, u8* r4) {
 extern void fn_801040F0(s32, s32, void*, s32, s32);
 extern s32 fn_80135168(s32, s32);
 extern u8 lbl_802EF0A8[];
-#if 1
+#if 0
 asm void fn_80020BA0(void) {
 #include "src/game/gs_title_fn_80020BA0.inc"
 }
