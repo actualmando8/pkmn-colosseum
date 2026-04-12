@@ -3568,7 +3568,96 @@ asm void fn_80022834(void) {
 #include "src/game/gs_title_fn_80022834.inc"
 }
 #else
-void fn_80022834(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80022834(u32 arg0, u32* arg1) {
+    s32 slot;
+    s32 sc;
+    s32 sd;
+    void* handle;
+    u32 status;
+    u32 value16;
+    s32 state;
+    s32 i;
+    s32 result;
+    u8 type_byte;
+
+    handle = ((void* (*)(u32))fn_801440A0)((u16)arg0);
+    status = (u8)((u32 (*)(void*))fn_80143F24)(handle);
+    value16 = (u16)((u32 (*)(u32))fn_80143EF0)(status);
+
+    ((void (*)(u32, u32, u32, u32))fn_80166A50)(0x4CB, 0, 0xFF, 0);
+    type_byte = (u8)((u32 (*)(void*))fn_80143E88)(handle);
+    if (type_byte != 0xFF) {
+        result = 0x4260;
+    } else {
+        result = 0x4265;
+    }
+
+    fn_80132A38(0x39, (void*)(u16)value16);
+    fn_80106D3C(2, result, 1, 0);
+    fn_801069FC(1);
+    fn_80106D3C(2, 0x426B, 1, 0);
+
+    state = (s8)fn_8001E074(0, -1, -1, 0);
+    fn_801069FC(1);
+    if (state == 0 || state == 1) {
+        return 1;
+    }
+
+    slot = fn_800141BC((void*)arg0, 1);
+    if (slot >= 0) {
+        fn_80014118(slot, &sc, &sd);
+        if ((u8)((u32 (*)(u32))fn_8011FC74)(sc) != 0) {
+            fn_80106D3C(2, 0x424C, 1, 0);
+            fn_801069FC(1);
+            result = 0;
+        } else {
+            value16 = (u16)((u32 (*)(u32))fn_80143EF0)(status);
+            for (i = 0; i < 4; i++) {
+                if (value16 == (u16)((u32 (*)(u32, u32))fn_8011F228)(sc, (u16)i)) {
+                    break;
+                }
+            }
+            if (i < 4) {
+                fn_80132A38(0x32, (void*)((u32 (*)(u32))fn_8011F4F0)(sc));
+                fn_80132A38(0x39, (void*)(u16)value16);
+                fn_80106D3C(2, 0x4244, 1, 0);
+                fn_801069FC(1);
+                result = 0;
+            } else {
+                ((void (*)(u32))fn_8011F5C8)(sc);
+                ((void (*)(void))fn_8011E778)();
+                if ((u8)((u32 (*)(u32, u32))fn_8011E2AC)(status, sc) == 0) {
+                    fn_80132A38(0x32, (void*)((u32 (*)(u32))fn_8011F4F0)(sc));
+                    fn_80132A38(0x39, (void*)(u16)value16);
+                    fn_80106D3C(2, 0x423F, 1, 0);
+                    fn_801069FC(1);
+                    result = 0;
+                } else {
+                    result = ((s32 (*)(u32, u32, void*, u32, void*, u32))fn_802600E4)(sc, (u16)value16, &type_byte, 1, fn_80023274, 0);
+                    if (result != 0) {
+                        ((void (*)(u32, u32, u8))fn_80123D58)(sc, (u16)value16, type_byte);
+                        ((void (*)(u32))fn_80123090)(sc);
+                        ((void (*)(u32, u32, u32))fn_80122370)(sc, ((u32 (*)(u32))fn_80123090)(sc), 4);
+                    }
+                }
+            }
+        }
+    } else {
+        result = 0;
+    }
+
+    fn_80014198(slot);
+    if (slot >= 0 && result != 0) {
+        if (type_byte != 0xFF) {
+            *arg1 = 0;
+        } else {
+            *arg1 = 1;
+        }
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 /* fn_80022B3C - 0x80022B3C | size: 0x318 */
@@ -3584,7 +3673,154 @@ asm void fn_80022B3C(void) {
 #include "src/game/gs_title_fn_80022B3C.inc"
 }
 #else
-void fn_80022B3C(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling off
+s32 fn_80022B3C(s32 arg0, s32 arg1) {
+    s32 sp8;
+    s32 spC;
+    s32 sp10;
+    s32 sp14;
+    s32 sp18;
+    s32 sp1C;
+    s32 sp20;
+    s32 sp24;
+    s32 sp28;
+    s32 sp2C;
+    s32 temp_r28;
+    s32 temp_r29;
+    s32 temp_r30;
+    s32 temp_r31;
+    s32 result;
+    s32 i;
+    s32 count;
+    f32 f0;
+    void* data_ptr;
+
+    data_ptr = &lbl_80266C30;
+    temp_r30 = arg0;
+    
+    /* Copy data from structure */
+    sp10 = *(s32*)data_ptr;
+    sp14 = *(s32*)((u8*)data_ptr + 4);
+    sp18 = *(s32*)((u8*)data_ptr + 8);
+    sp1C = *(s32*)((u8*)data_ptr + 0xC);
+    sp20 = *(s32*)((u8*)data_ptr + 0x10);
+    sp24 = *(s32*)((u8*)data_ptr + 0x14);
+    sp28 = *(s32*)((u8*)data_ptr + 0x18);
+    sp2C = *(s32*)((u8*)data_ptr + 0x1C);
+    
+    fn_80014118(&spC, &sp8);
+    result = fn_80123FBC(spC);
+    
+    if ((result & 0xFF000000) == 0) {
+        return 1;
+    }
+    
+    /* Determine particle type */
+    temp_r29 = 0;
+    result = temp_r30 & 0xFFFF;
+    
+    if (result == (u16)sp10) {
+        temp_r29 = 0;
+    } else if (result == (u16)sp1C) {
+        temp_r29 = 1;
+    } else if (result == (u16)sp28) {
+        temp_r29 = 2;
+    } else {
+        temp_r29 = 3;
+    }
+    
+    if (temp_r29 >= 3) {
+        return 1;
+    }
+    
+    /* Play particle sound effects */
+    fn_8011F4F0(spC);
+    fn_80132A38(0x32, result);
+    fn_80132A38(0x2D, temp_r30);
+    
+    result = *(s32*)((u8*)(&sp10) + temp_r29 * 0xC);
+    fn_80106D3C(2, result, 1, 0);
+    fn_801069FC(1);
+    
+    /* Check if particle system is available */
+    if (fn_80135168(0, 9) == 0) {
+        /* Wait for particle system with timeout */
+        for (i = 0; i < 2; i++) {
+            fn_800F78A4(1, 0, 0xFF, 0x15, 0);
+            count = 0;
+            
+            while (count < 0x3C) {
+                fn_800F0308();
+                count += fn_800D3088();
+            }
+        }
+        
+        /* Additional wait */
+        fn_800F78A4(1, 0, 0xFF, 0x30, 0);
+        count = 0;
+        
+        while (count < 0x60) {
+            fn_800F0308();
+            count += fn_800D3088();
+        }
+    }
+    
+    /* Validate and process particle */
+    temp_r29 = spC;
+    if (temp_r29 == 0) {
+        return 0;
+    }
+    
+    result = fn_80123FBC(temp_r29);
+    if ((result & 0xFF000000) == 0) {
+        return 0;
+    }
+    
+    fn_8011F5C8(temp_r29);
+    fn_8011E778();
+    
+    result = fn_8011E15C();
+    if (result == 0) {
+        temp_r29 = 0;
+    } else {
+        temp_r29 = result & 0xFFFF;
+        fn_80166A28(temp_r29);
+    }
+    
+    /* Wait for particle completion */
+    while (fn_801666BC(temp_r29) == 2) {
+        fn_800F0308();
+    }
+    
+    /* Update particle state */
+    fn_8011F4F0(spC);
+    result = fn_80121ADC(spC, 0x3E);
+    
+    if ((result & 0xFF000000) != 0) {
+        fn_80121B4C(spC, 0x3E);
+        fn_80106D3C(2, 0x4277, 1, 0);
+        fn_801069FC(1);
+    }
+    
+    /* Final particle processing */
+    fn_8011FC14(spC);
+    f0 = lbl_8047B8A0;
+    
+    if (f1 > f0) {
+        fn_8011F910(spC, temp_r30 & 0xFFFF, 4);
+        fn_8011F4F0(spC);
+        result = fn_80121ADC(spC, 0x3E);
+        
+        if ((result & 0xFF000000) != 0) {
+            result = *(s32*)((u8*)(&sp10) + temp_r29 * 0xC);
+            fn_80106D3C(2, result, 1, 0);
+            fn_801069FC(1);
+        }
+    }
+    
+    return 1;
+}
 #endif
 
 /* fn_80022E54 - 0x80022E54 | size: 0x90 */
