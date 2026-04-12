@@ -2921,13 +2921,19 @@ void fn_80020A4C(void* r3, u8* r4) {
 /* fn_80020ADC - 0x80020ADC | size: 0x58 */
 #pragma scheduling off
 extern u32 fn_80166C74(void);
-#if 1
+#if 0
 asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80020ADC(void) { /* TODO */ }
+void fn_80020ADC(void* r3, u8* r4) {
+    if (fn_80166C74() != 1) {
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
+    } else {
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
+    }
+}
 #endif
 
 /* fn_80020B34 - 0x80020B34 | size: 0x58 */
@@ -4014,7 +4020,80 @@ asm void fn_80023B9C(void) {
 #include "src/game/gs_title_fn_80023B9C.inc"
 }
 #else
-void fn_80023B9C(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling off
+s32 fn_80023B9C(u32 arg0, u32* arg1) {
+    u8 state_buf[0x110];
+    u8 text_buf[0x100];
+    u8 name_buf[0x40];
+    s32 result;
+    s32 slot;
+    s32 effect;
+    s32 sc;
+    s32 sd;
+    u32 species;
+    u32 msg;
+    s32 r28 = 0;
+    
+    result = fn_800141BC((void*)arg0, 1);
+    result = fn_80014118(&state_buf[12], &text_buf[8]);
+    
+    if (result >= 0) {
+        if (fn_80121ADC(result, 0x3E) == 0) {
+            species = (u32)(u16)arg0;
+            slot = fn_80144574(&state_buf[28], &text_buf[0xA0], species, 0, 0);
+            
+            if (slot > 0) {
+                u16* bgm_table = (u16*)lbl_80266DB0;
+                s32 match_index = 5;
+                
+                for (s32 i = 0; i < 5; i++) {
+                    if (species == bgm_table[i]) {
+                        match_index = i;
+                        break;
+                    }
+                }
+                
+                if (match_index < 5) {
+                    msg = 0x466;
+                } else {
+                    msg = 0x465;
+                }
+                
+                fn_80166A50(0x466, 0, 0xFF, 0);
+                fn_8001D378();
+            }
+            
+            fn_800216E8(&state_buf[28], slot, &text_buf[0xA0], 0x40);
+            fn_80132A38(0x4D, &state_buf[28]);
+            fn_80106D3C(2, 0x4D, 1, 0);
+            fn_801069FC(1);
+        } else {
+            result = fn_8011F4F0(result);
+            fn_80132A38(0x32, result);
+            fn_80106D3C(2, 0x424D, 1, 0);
+            fn_801069FC(1);
+            r28 = 0;
+        }
+    }
+    
+    result = fn_80014198(result);
+    
+    if (result >= 0 && r28 > 0) {
+        if (arg0 < 0x2C) {
+            if (arg0 >= 0x27) {
+                arg1[0] = 0;
+            } else {
+                arg1[0] = 1;
+            }
+        } else {
+            arg1[0] = 1;
+        }
+        return 0;
+    }
+    
+    return 1;
+}
 #endif
 
 /* fn_80023DA8 - 0x80023DA8 | size: 0x3c */
