@@ -2448,7 +2448,7 @@ extern u8 lbl_803A31E8[];
 extern u8 lbl_80314F98[];
 extern f32 lbl_8047B9D4;
 extern f32 lbl_8047B9F0;
-#if 1
+#if 0
 asm void fn_80030C14(void) {
 #include "src/game/gs_npc_event_fn_80030C14.inc"
 }
