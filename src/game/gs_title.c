@@ -3010,15 +3010,10 @@ asm void fn_80020B34(void) {
 #else
 #pragma optimization_level 4
 void fn_80020B34(void* r3, u8* r4) {
-    s8 r0;
-    if (fn_80166C74() != 1) {
-        r0 = (s8)r4[4];
-        r0 = (s8)(r0 & ~2);
-        r4[4] = (u8)r0;
+    if (fn_80166C74() == 1) {
+        r4[4] = (u8)(s8)(r4[4] | 2);
     } else {
-        r0 = (s8)r4[4];
-        r0 = (s8)(r0 | 2);
-        r4[4] = (u8)r0;
+        r4[4] = (u8)(s8)(r4[4] & ~2);
     }
 }
 #endif
@@ -3453,7 +3448,9 @@ asm void fn_80023274(void) {
 #include "src/game/gs_title_fn_80023274.inc"
 }
 #else
+#pragma peephole off
 #pragma optimization_level 4
+#pragma scheduling off
 s32 fn_80023274(s32 r3, s32 r4) {
     s32 result;
 
@@ -3467,6 +3464,7 @@ s32 fn_80023274(s32 r3, s32 r4) {
     fn_801C40F0(1);
     return (s8)result;
 }
+#pragma peephole on
 #endif
 
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
