@@ -358,12 +358,23 @@ void fn_80176030(u32 param) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80176068(void) {
 #include "src/game/gs_scene_fn_80176068.inc"
 }
 #else
-void fn_80176068(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80176068(u8* ptr) {
+    u16 handle;
+    if (ptr != NULL) {
+        handle = *(u16*)(ptr + 0x22);
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+        handle = *(u16*)(ptr + 0x20);
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+}
 #endif
 #pragma pop
 #if 0
