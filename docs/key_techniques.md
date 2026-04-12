@@ -23,6 +23,11 @@ is a living reference — update it as new patterns are discovered.
 11. [Common Mismatches](#11-common-mismatches)
 12. [Workflow](#12-workflow)
 13. [Tools Reference](#13-tools-reference)
+14. [New Patterns (Apr 10)](#14-new-patterns-discovered-2026-04-11)
+15. [SDA Array Access — Scalar + Address-Of](#15-sda-array-access--scalar--address-of-pattern-session-5)
+16. [Return Type Affects Register Masking](#16-return-type-affects-register-masking-session-5)
+17. [Function Pointer Casts](#17-function-pointer-casts-for-callback-registration-session-5)
+18. [Batch Decompilation Strategies](#18-batch-decompilation-strategies-session-5)
 
 ---
 
@@ -428,6 +433,10 @@ void fn(u32* out1, u32* out2) {
 | Branch direction inverted after goto | Remove goto — CW O4,p inverts conditions |
 | `(-r)\|r` operand order wrong | See Section 14: nonzero-test idiom |
 | Pointer addressing (SDA vs lis/addi) | `extern u16*` (SDA) vs `extern u16[]` (lis/addi) |
+| `li @sda21` vs `lwz @sda21` for array base | Use `extern u16 lbl;` + `(&lbl)[i]` (see Section 15) |
+| `clrlwi.` vs `mr.` after function call | Return type is u16, change to u32 (see Section 16) |
+| Function pointer type mismatch | Add explicit cast: `(GSEffectStartFunc)fn_name` |
+| Forward decl `void()` conflicts with C params | Update forward extern to match C signature |
 
 ---
 
@@ -589,3 +598,127 @@ Using `goto` in C source causes CW -O4,p to:
 **Never use `goto` to match branch patterns.** Rewrite as structured control flow
 (`if/else`, `while`, `do/while`) even if it looks less obvious. The optimizer
 handles structured flow better than explicit jumps.
+
+---
+
+## 15. SDA Array Access — Scalar + Address-Of Pattern (Session 5)
+
+When the asm accesses an SDA-resident array using `li rN, label@sda21` (compute
+address) followed by `lhzx`/`lwzx` (indexed load), the extern must be a **scalar**
+with address-of, not a pointer or array:
+
+```c
+// WRONG — generates lwz (loads pointer value, not address):
+extern u16 *lbl_80478BF8;
+result = lbl_80478BF8[index];
+
+// WRONG — generates lis+addi (absolute addressing):
+extern u16 lbl_80478BF8[];
+result = lbl_80478BF8[index];
+
+// RIGHT — generates li rN, label@sda21 (SDA address computation):
+extern u16 lbl_80478BF8;
+result = (&lbl_80478BF8)[index];
+```
+
+**Key distinction:**
+| Declaration | Asm generated | When to use |
+|------------|--------------|-------------|
+| `extern u16 lbl;` + `(&lbl)[i]` | `li rN, lbl@sda21` + `lhzx` | Array data IN the SDA |
+| `extern u16* lbl;` + `lbl[i]` | `lwz rN, lbl@sda21` + `lhzx` | Pointer TO array stored in SDA |
+| `extern u16 lbl[];` + `lbl[i]` | `lis rN, lbl@ha` + `addi` | Array NOT in SDA |
+
+---
+
+## 16. Return Type Affects Register Masking (Session 5)
+
+If an extern function returns `u16` but the asm uses `mr.` (no zero-extension),
+CW is inserting a `clrlwi` instruction to mask the upper 16 bits. Fix by
+declaring the return type as `u32`:
+
+```c
+// WRONG — generates clrlwi. (zero-extend u16 to u32):
+extern u16 fn_80131428(void* cb, u16 size);
+u32 id = fn_80131428(cb, 0x18);  // clrlwi. r31, r3, 16
+
+// RIGHT — no mask, generates mr. directly:
+extern u32 fn_80131428(void* cb, u16 size);
+u32 id = fn_80131428(cb, 0x18);  // mr. r31, r3
+```
+
+The `clrlwi` vs `mr.` also cascades into register allocation — fixing the
+return type often fixes seemingly unrelated register numbering mismatches
+downstream.
+
+---
+
+## 17. Function Pointer Casts for Callback Registration (Session 5)
+
+When passing function pointers to a registration function with typed parameters,
+explicit casts are required even with `-warn off`:
+
+```c
+// Compile error without casts:
+fn_80131200(id, fn_start, fn_stop, fn_trigger, ...);
+
+// Correct — cast each function pointer:
+fn_80131200(id,
+    (GSEffectStartFunc)fn_start,
+    (GSEffectStopFunc)fn_stop,
+    (GSEffectStartFunc)fn_trigger,
+    (GSEffectStopFunc)fn_stop2,
+    0,
+    (GSEffectUpdateFunc)fn_update,
+    (GSEffectRenderFunc)fn_render);
+```
+
+Function pointer casts are compile-time only — they do NOT change the generated
+`lis`/`addi` instruction sequence. Safe to use freely.
+
+---
+
+## 18. Batch Decompilation Strategies (Session 5)
+
+### Template-based batching
+
+When multiple functions follow the same pattern (e.g., all 12 GSEffect Start
+functions call alloc → register callbacks → reset), extract the parameters
+from each .inc file and generate C code from a template. This session matched
+**11 functions in one batch** using this approach.
+
+### Flip-and-test pipeline
+
+For functions with existing C attempts in `#else` blocks:
+1. Flip `#if 1` to `#if 0`
+2. Run `match_test.py`
+3. If 100%, keep. If not, revert.
+4. Automate with a Python script for bulk testing.
+
+This approach found **17 matches in gs_npc_event.c** — all from existing C code
+that was already correct but never activated.
+
+### Extern redeclaration for local scope
+
+When a function needs a different extern signature than what's declared globally
+(e.g., adding a parameter the global extern omits), use a block-local extern:
+
+```c
+void fn_80140138(u8* ptr) {
+    extern void fn_800DF608(void* handle);  // Override global void() decl
+    if (*(u32*)(ptr) != 0) {
+        fn_800DF608(*(void**)(ptr));
+        *(u32*)(ptr) = 0;
+    }
+}
+```
+
+### Forward declaration conflicts
+
+When flipping asm → C, the C function signature may differ from the forward
+`extern void fn_XXX(void);` declared earlier (which was only for the asm wrapper).
+Update the forward declaration to match the C signature:
+
+```c
+// Before: extern void fn_801629A4(void);        // for asm wrapper
+// After:  extern void fn_801629A4(u32 idx, u8 val);  // match C params
+```
