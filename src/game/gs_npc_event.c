@@ -140,7 +140,7 @@ extern void  fn_800FB680(s32, s32, u32, u16);
 
 /* 0x80031188 | 0xA0 */
 extern u8 lbl_803A2688[];
-#if 1
+#if 0
 asm void fn_80031188(void) {
 #include "src/game/gs_npc_event_fn_80031188.inc"
 }
@@ -789,7 +789,7 @@ L_80031A00:
 /* 0x54 | fn_80031A1C | generic */
 /* fn_80031A1C - 0x80031A1C | size: 0x54 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031A1C(void) {
 #include "src/game/gs_npc_event_fn_80031A1C.inc"
 }
@@ -813,7 +813,7 @@ void fn_80031A1C(void* r3, void* r4) {
 /* 0x50 | fn_80031A70 | generic */
 /* fn_80031A70 - 0x80031A70 | size: 0x50 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031A70(void) {
 #include "src/game/gs_npc_event_fn_80031A70.inc"
 }
@@ -840,7 +840,7 @@ void fn_80031A70(void* r3, void* r4) {
 /* 0x50 | fn_80031AC0 | generic */
 /* fn_80031AC0 - 0x80031AC0 | size: 0x50 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031AC0(void) {
 #include "src/game/gs_npc_event_fn_80031AC0.inc"
 }
@@ -869,7 +869,7 @@ extern void fn_800F0308(void);
 extern u32 fn_8010B560(void);
 extern void fn_801CB9D8(u32);
 extern u32 lbl_8047A418;
-#if 1
+#if 0
 asm void fn_80031B10(void) {
 #include "src/game/gs_npc_event_fn_80031B10.inc"
 }
@@ -2343,7 +2343,7 @@ void fn_8003037C(u32 r3, u32* r4) {
 #endif
 
 /* fn_80030388 - 0x80030388 | size: 0xa0 */
-#if 1
+#if 0
 asm void fn_80030388(void) {
 #include "src/game/gs_npc_event_fn_80030388.inc"
 }
