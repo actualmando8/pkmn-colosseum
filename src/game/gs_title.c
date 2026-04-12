@@ -3355,7 +3355,60 @@ asm void fn_80022050(void) {
 #include "src/game/gs_title_fn_80022050.inc"
 }
 #else
-void fn_80022050(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling off
+s32 fn_80022050(s32 arg0, s32* arg1) {
+    s32 sp8;
+    s32 spC;
+    s32 sp10;
+    s32 sp14;
+    s32 valid_count;
+    s32 index;
+    s32 result;
+    s32 i;
+
+    valid_count = 0;
+    index = 0;
+    
+    for (i = 0; i < 6; i++) {
+        fn_80014118(&spC, &sp8);
+        result = fn_80123FBC(spC);
+        if ((result & 0xFF000000) != 0) {
+            valid_count++;
+        }
+    }
+    
+    if (valid_count < 6) {
+        for (i = 0; i < valid_count; i++) {
+            result = fn_801347E8(0, i);
+            if (result > 0) {
+                break;
+            }
+        }
+        
+        if (i >= valid_count) {
+            fn_80106D3C(2, 0x4416, 1, 0);
+            fn_801069FC(1);
+            return 1;
+        }
+    } else {
+        fn_80106D3C(2, 0x4416, 1, 0);
+        fn_801069FC(1);
+        return 1;
+    }
+    
+    fn_800140FC(&sp14, &sp10);
+    result = fn_801F7EF0(sp10);
+    
+    if ((result & 0xFF000000) == 0) {
+        *arg1 = 0;
+        return 0;
+    } else {
+        fn_80106D3C(2, 0x426D, 1, 0);
+        fn_801069FC(1);
+        return 1;
+    }
+}
 #endif
 
 /* fn_8002217C - 0x8002217C | size: 0x2fc */
@@ -3556,7 +3609,74 @@ asm void fn_80023760(void) {
 #include "src/game/gs_title_fn_80023760.inc"
 }
 #else
-void fn_80023760(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_80023760(u32 arg0, u32* arg1) {
+    u8 buf[0x80];
+    u16 entries[5];
+    s32 total;
+    s32 slot;
+    s32 count;
+    s32 effect;
+    u32 sc;
+    u32 sd;
+    u32 species;
+    u32 msg;
+
+    total = 0;
+    fn_800141BC((void*)arg0, 0);
+    for (slot = 0; slot < 6; slot++) {
+        fn_80014118(slot, &sc, &sd);
+        if ((u8)fn_80123FBC(sc) != 0) {
+            if ((s32)fn_8012640C(sc, 0, 0x83, 0) <= 0) {
+                if ((u8)fn_80121ADC(sc, 0x3E) == 0) {
+                    effect = fn_80144574(buf, sc, sd, (u16)arg0, 0);
+                    if ((s16)effect > 0) {
+                        memcpy(entries, lbl_80266DB0, sizeof(entries));
+                        count = 0;
+                        if (arg0 == entries[0]) {
+                            count = 0;
+                        } else if (arg0 == entries[1]) {
+                            count = 1;
+                        } else if (arg0 == entries[2]) {
+                            count = 2;
+                        } else if (arg0 == entries[3]) {
+                            count = 3;
+                        } else if (arg0 == entries[4]) {
+                            count = 4;
+                        } else {
+                            count = 5;
+                        }
+                        if (count < 5) {
+                            species = 0x466;
+                        } else {
+                            species = 0x465;
+                        }
+                        fn_80166A50(species, 0, 0xFF, 0);
+                        fn_8001D378();
+                        fn_800216E8(buf, 0x40, (u8*)sd, effect, sc);
+                        fn_80132A38(0x4D, buf);
+                        fn_80106D3C(2, 0xE0, 1, 0);
+                        fn_801069FC(1);
+                        total = (u16)(total + effect);
+                    }
+                }
+            }
+        }
+    }
+    if ((u16)total == 0) {
+        fn_80106D3C(2, 0x4261, 1, 0);
+        fn_801069FC(1);
+        effect = -1;
+    } else {
+        effect = 1;
+    }
+    fn_80014198(-1);
+    if (effect < 0) {
+        return 1;
+    }
+    *arg1 = 1;
+    return 0;
+}
 #endif
 
 /* fn_80023968 - 0x80023968 | size: 0x234 */
