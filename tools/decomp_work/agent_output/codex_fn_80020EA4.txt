@@ -1,0 +1,9 @@
+fn_80020EA4 Analysis (from Codex):
+- Menu state router function
+- Checks lbl_8047A360[1] (offset 4) for values 4, 5
+- Branch 1 (value 4): indexed table lookup via lbl_802E4EF0
+- Branch 2 (not 4 or 5): direct global value via lbl_802E4ED8
+- Both call fn_800FB680(0, -8, arg0[0x8B] | -0x100, table_entry)
+- BUG: current C code uses idx | -0x100 in first branch, should be arg0[0x8B] | -0x100
+- la r3, label = &label in C
+- Already at 97.7% max (relocation gap confirmed by subagent)

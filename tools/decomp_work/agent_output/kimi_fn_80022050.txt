@@ -1,0 +1,109 @@
+# fn_80022050 Register Allocation Analysis
+
+## Function Overview
+fn_80022050 is a 84-line function that implements an options menu state machine with complex loop logic and sound effect scheduling.
+
+## Register Allocation Pattern Analysis
+
+### Assembly Register Usage:
+- **r29**: Saved parameter r4 (second argument) - line 8: 
+- **r30**: Initialized to 0, used as loop counter/valid_count - line 9: 
+- **r31**: Initialized to 0, used as loop counter i - line 10: 
+
+### Key Register Allocation Decisions:
+
+1. **r31 for i (loop counter)**: The target assembly places the primary loop counter in r31
+   - Used in:  (line 12),  (line 23)
+   - This is the main iteration variable for the outer loop
+
+2. **r30 for valid_count**: The target places the valid count accumulator in r30
+   - Used in:  (line 21), comparison operations
+   - This tracks valid entries found
+
+3. **r29 for saved parameter**: Preserves the second argument for later use
+   - Used throughout the function for various operations
+
+## CW Register Allocation Determinants
+
+### Callee-Saved Register Priority:
+The CodeWarrior compiler uses this priority for callee-saved registers (r14-r31):
+1. **r31**: Highest priority - used for most frequently accessed variables
+2. **r30**: Second highest - used for secondary frequently accessed variables
+3. **r29**: Third highest - used for less frequently accessed variables
+
+### Allocation Decision Factors:
+
+1. **Loop Frequency**: Variables used in loops get higher priority registers
+   -  (r31) is used in the main outer loop (lines 11-25)
+   -  (r30) is used in the inner validation logic
+
+2. **Access Pattern**: Variables with more complex access patterns get higher priority
+   -  is used as an index and parameter in multiple function calls
+   -  is only incremented and compared
+
+3. **Lifetime**: Variables with longer lifetimes get higher priority
+   - Both  and  span the entire function
+   - Both are used in multiple control flow paths
+
+## Why Target Puts i in r31, valid_count in r30
+
+### CodeWarrior Heuristics:
+
+1. **Primary vs Secondary Loop Variables**: 
+   -  is the primary loop counter (outer loop, more iterations)
+   -  is secondary (inner logic, fewer operations)
+
+2. **Parameter Usage Frequency**:
+   -  is used as a parameter in multiple function calls: , 
+   -  is only used for counting and comparison
+
+3. **Register Pressure Analysis**:
+   - CW compiler recognizes that  needs to be in the highest priority register
+   -  can tolerate being in the second-highest priority register
+
+## Our Code vs Target Difference
+
+### The Issue:
+Our implementation likely has:
+-  in r31 (highest priority)
+-  in r30 (second priority)
+
+### Root Cause:
+This suggests our register allocation doesn't follow CW's heuristics for:
+1. Loop variable importance ranking
+2. Parameter usage frequency analysis
+3. Access pattern complexity weighting
+
+## Recommendations
+
+### For 100% Match:
+1. **Swap register assignments**: Put  in r31,  in r30
+2. **Follow CW priority**: Use r31 for primary loop variables
+3. **Match access patterns**: Ensure variable usage frequency matches target
+
+### General CW Register Allocation Rules:
+1. **Primary loop counters → r31**
+2. **Secondary accumulators → r30**
+3. **Saved parameters → r29**
+4. **Complex expressions → r28, r27, etc.**
+
+## Technical Details
+
+### Register Save Order (lines 5-7):
+
+
+This save order reflects the CW compiler's register priority assignment.
+
+### Parameter Preservation (line 8):
+
+
+r29 is used for parameter preservation, consistent with CW's third-tier priority.
+
+## Conclusion
+
+The CodeWarrior compiler's register allocation for fn_80022050 follows a clear hierarchy:
+- **r31**: Primary loop counter (most important)
+- **r30**: Secondary accumulator (important)
+- **r29**: Parameter preservation (less important)
+
+To achieve 100% assembly matching, we must replicate this exact register assignment pattern rather than using arbitrary allocation.

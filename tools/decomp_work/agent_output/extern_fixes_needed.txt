@@ -1,0 +1,18 @@
+# gs_title.c Extern Fixes Needed
+# These placeholder externs block C decompilation of remaining functions.
+# Must be updated to correct signatures:
+
+# Current (wrong) → Correct (from asm analysis)
+extern void fn_8011FC74(void);      → extern u8 fn_8011FC74(s32);
+extern void fn_80144574(void);      → extern s16 fn_80144574(void*, s32, s32, u16, s32);
+extern void fn_80128A64(void);      → extern s32 fn_80128A64(s32, s32, u16, void*, void*);
+extern void fn_801096F8(void);      → extern void fn_801096F8(s32);
+extern void fn_8012805C(void);      → extern void fn_8012805C(s32, s32, u16, void*, s32, s32, s32, s32);
+extern void fn_80121ADC(void);      → extern s32 fn_80121ADC(s32, s32);
+extern void fn_80166A50(void);      → extern void fn_80166A50(s32, s32, s32, s32);
+extern void fn_8001E074(void);      → extern s32 fn_8001E074(s32, s32, s32, s32);
+extern void fn_801D0748(void);      → extern void fn_801D0748(s32, s32, s32);
+extern void fn_80166CC0(void);      → extern s32 fn_80166CC0(s32);
+
+# Strategy: Update ALL externs at once, then batch-flip remaining functions.
+# This must be done carefully to not break existing #if 0 functions.
