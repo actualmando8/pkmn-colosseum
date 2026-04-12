@@ -1861,12 +1861,22 @@ asm void fn_8013FF0C(void) {
 #else
 void fn_8013FF0C(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_80140138(void) {
 #include "src/game/effect/effect_visual_fn_80140138.inc"
 }
 #else
-void fn_80140138(void) { /* TODO */ }
+void fn_80140138(u8* ptr) {
+    extern void fn_800DF608(void* handle);
+    if (*(u32*)(ptr) != 0) {
+        fn_800DF608(*(void**)(ptr));
+        *(u32*)(ptr) = 0;
+    }
+    if (*(u32*)(ptr + 0x4) != 0) {
+        fn_800EF5A4(*(void**)(ptr + 0x4));
+        *(u32*)(ptr + 0x4) = 0;
+    }
+}
 #endif
 extern void fn_801402AC(void);
 extern void fn_800DF028(void);
