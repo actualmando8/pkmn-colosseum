@@ -2787,11 +2787,7 @@ asm void fn_800205C8(void) {
 }
 #else
 void fn_800205C8(u8* obj) {
-    u32 idx;
-    u8 byte;
-    idx = lbl_8047A350;
-    byte = obj[0x8b];
-    fn_800FB680(0, 0, byte | (s32)-0x100, (&lbl_80478880)[idx]);
+    fn_800FB680(0, 0, obj[0x8b] | (s32)-0x100, (&lbl_80478880)[lbl_8047A350]);
 }
 #endif
 
@@ -3362,58 +3358,47 @@ asm void fn_80022050(void) {
 }
 #else
 #pragma optimization_level 4
-#pragma scheduling off
 s32 fn_80022050(s32 arg0, s32* arg1) {
     s32 sp8;
     s32 spC;
     s32 sp10;
     s32 sp14;
     s32 valid_count;
-    s32 index;
-    s32 result;
     s32 i;
+    s32 count;
 
     valid_count = 0;
-    index = 0;
-    
-    for (i = 0; i < 6; i++) {
-        fn_80014118(&spC, &sp8);
-        result = fn_80123FBC(spC);
-        if ((result & 0xFF000000) != 0) {
+    i = 0;
+    while (i < 6) {
+        fn_80014118(i, &spC, &sp8);
+        if ((u8)((s32 (*)(s32))fn_80123FBC)(spC) != 0) {
             valid_count++;
         }
+        i++;
     }
-    
-    if (valid_count < 6) {
-        for (i = 0; i < valid_count; i++) {
-            result = fn_801347E8(0, i);
-            if (result > 0) {
+    if (valid_count >= 6) {
+        count = (s8)((s32 (*)(void))fn_801347E0)();
+        i = 0;
+        while (i < count) {
+            if ((s8)((s32 (*)(s32, s8))fn_801347E8)(0, (s8)i) > 0) {
                 break;
             }
+            i++;
         }
-        
-        if (i >= valid_count) {
+        if (i >= count) {
             fn_80106D3C(2, 0x4416, 1, 0);
             fn_801069FC(1);
             return 1;
         }
-    } else {
-        fn_80106D3C(2, 0x4416, 1, 0);
+    }
+    ((void (*)(s32*, s32*))fn_800140FC)(&sp14, &sp10);
+    if ((u8)((s32 (*)(s32))fn_801F7EF0)(sp10) != 0) {
+        fn_80106D3C(2, 0x426d, 1, 0);
         fn_801069FC(1);
         return 1;
     }
-    
-    fn_800140FC(&sp14, &sp10);
-    result = fn_801F7EF0(sp10);
-    
-    if ((result & 0xFF000000) == 0) {
-        *arg1 = 0;
-        return 0;
-    } else {
-        fn_80106D3C(2, 0x426D, 1, 0);
-        fn_801069FC(1);
-        return 1;
-    }
+    *arg1 = 0;
+    return 0;
 }
 #endif
 
