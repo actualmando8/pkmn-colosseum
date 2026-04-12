@@ -326,6 +326,7 @@ asm void fn_8002469C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_8002469C(void) {
     fn_80132A38(0x37, fn_800FA280(0x3cdf));
 }
@@ -338,6 +339,7 @@ asm void fn_800246CC(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_800246CC(void) {
     fn_80132A38(0x37, fn_800FA280(0x3ce4));
 }
@@ -1549,7 +1551,7 @@ L_80025570:
 #endif
 
 /* 0x800255A4 | 0x18C */
-extern void fn_801C41C8(s32, f32);
+extern void fn_801C41C8(f32, s32);
 extern void fn_801657F8(void);
 extern void fn_800D37CC(void);
 extern void fn_801653C4(void);
@@ -2924,16 +2926,14 @@ asm void fn_8002092C(void) {
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    u8* r31;
-    r31 = r4;
     f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
-    *(f32*)(r31 + 0x6c) = f0;
-    *(f32*)(r31 + 0x68) = f0;
+    *(f32*)(r4 + 0x6c) = f0;
+    *(f32*)(r4 + 0x68) = f0;
     if (*(s32*)lbl_803A1FC8 == 2) {
-        r31[4] = (u8)(s8)((s8)r31[4] | 2);
+        r4[4] = (u8)((s8)r4[4] | 2);
     } else {
-        r31[4] = (u8)(s8)((s8)r31[4] & ~2);
+        r4[4] = (u8)((s8)r4[4] & ~2);
     }
 }
 #endif
@@ -2993,24 +2993,13 @@ void fn_80020A4C(void* r3, u8* r4) {
 /* fn_80020ADC - 0x80020ADC | size: 0x58 */
 #pragma scheduling off
 extern u32 fn_80166C74(void);
-#if 0
+#if 1
 asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80020ADC(void* r3, u8* r4) {
-    s8 r0;
-    if (fn_80166C74() == 1) {
-        r0 = (s8)r4[4];
-        r0 = (s8)(r0 & ~2);
-        r4[4] = (u8)r0;
-    } else {
-        r0 = (s8)r4[4];
-        r0 = (s8)(r0 | 2);
-        r4[4] = (u8)r0;
-    }
-}
+void fn_80020ADC(void) { /* TODO */ }
 #endif
 
 /* fn_80020B34 - 0x80020B34 | size: 0x58 */
@@ -3463,22 +3452,20 @@ asm void fn_80023274(void) {
 #include "src/game/gs_title_fn_80023274.inc"
 }
 #else
-#pragma peephole off
 #pragma optimization_level 4
 s32 fn_80023274(s32 r3, s32 r4) {
     s32 result;
 
-    fn_801C41C8(3, lbl_8047B8A4);
+    fn_801C41C8(lbl_8047B8A4, 3);
     fn_801C40F0(1);
     result = fn_80097B04(r3, r4);
     if (result >= 4) {
         result = -1;
     }
-    fn_801C41C8(2, lbl_8047B8A4);
+    fn_801C41C8(lbl_8047B8A4, 2);
     fn_801C40F0(1);
     return (s8)result;
 }
-#pragma peephole on
 #endif
 
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
