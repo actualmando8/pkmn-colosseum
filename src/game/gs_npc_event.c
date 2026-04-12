@@ -1385,7 +1385,7 @@ void fn_800324A0(void) { /* TODO: register allocation + constant loading */ }
 
 /* 0x80032564 | 0x28 */
 extern void fn_800FF730(s32);
-#if 1
+#if 0
 asm void fn_80032564(void) {
 #include "src/game/gs_npc_event_fn_80032564.inc"
 }
@@ -2303,7 +2303,7 @@ void fn_800330B8(void) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_800301A8 - 0x800301A8 | size: 0x4 */
-#if 1
+#if 0
 asm void fn_800301A8(void) {
 #include "src/game/gs_npc_event_fn_800301A8.inc"
 }
@@ -2312,7 +2312,7 @@ void fn_800301A8(void) { }
 #endif
 
 /* fn_800301AC - 0x800301AC | size: 0x4 */
-#if 1
+#if 0
 asm void fn_800301AC(void) {
 #include "src/game/gs_npc_event_fn_800301AC.inc"
 }
@@ -2321,7 +2321,7 @@ void fn_800301AC(void) { }
 #endif
 
 /* fn_80030370 - 0x80030370 | size: 0xc */
-#if 1
+#if 0
 asm void fn_80030370(void) {
 #include "src/game/gs_npc_event_fn_80030370.inc"
 }
@@ -2332,7 +2332,7 @@ void fn_80030370(u32 r3, u32* r4) {
 #endif
 
 /* fn_8003037C - 0x8003037C | size: 0xc */
-#if 1
+#if 0
 asm void fn_8003037C(void) {
 #include "src/game/gs_npc_event_fn_8003037C.inc"
 }
@@ -2370,7 +2370,7 @@ void fn_80030388(u8* r3, u8* r4) {
 #endif
 
 /* fn_80030428 - 0x80030428 | size: 0x4 */
-#if 1
+#if 0
 asm void fn_80030428(void) {
 #include "src/game/gs_npc_event_fn_80030428.inc"
 }
@@ -2506,7 +2506,7 @@ void fn_80030F0C(void) { /* TODO */ }
 
 /* fn_800347B8 - 0x800347B8 | size: 0xc */
 extern u32 lbl_8047A440;
-#if 1
+#if 0
 asm void fn_800347B8(void) {
 #include "src/game/gs_npc_event_fn_800347B8.inc"
 }
@@ -2518,7 +2518,7 @@ void fn_800347B8(void) {
 
 /* fn_800347C4 - 0x800347C4 | size: 0x24 */
 extern void fn_80166A28(s32);
-#if 1
+#if 0
 asm void fn_800347C4(void) {
 #include "src/game/gs_npc_event_fn_800347C4.inc"
 }
@@ -2529,7 +2529,7 @@ void fn_800347C4(void) {
 #endif
 
 /* fn_800347E8 - 0x800347E8 | size: 0x24 */
-#if 1
+#if 0
 asm void fn_800347E8(void) {
 #include "src/game/gs_npc_event_fn_800347E8.inc"
 }
@@ -2540,7 +2540,7 @@ void fn_800347E8(void) {
 #endif
 
 /* fn_8003480C - 0x8003480C | size: 0x24 */
-#if 1
+#if 0
 asm void fn_8003480C(void) {
 #include "src/game/gs_npc_event_fn_8003480C.inc"
 }
