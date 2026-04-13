@@ -3209,7 +3209,7 @@ void fn_80021644(void) {
 
 /* fn_800216E8 - 0x800216E8 | size: 0x1d4 */
 extern void fn_800F96E4(void);
-extern void fn_8011F4F0(void);
+extern void* fn_8011F4F0(s32);
 extern u8 lbl_80266C7C[];
 #if 1
 asm void fn_800216E8(void) {
@@ -3330,9 +3330,9 @@ s32 fn_80021A9C(u32 r3, u32* r4) {
 extern void fn_80142EF8(void);
 extern void fn_801431AC(void);
 extern void fn_80014110(void);
-extern void fn_80121ADC(void);
+extern s32 fn_80121ADC(s32, s32);
 extern s16 fn_80144574(void*, s32, s32, u16, s32);
-extern void fn_80166A50(void);
+extern void fn_80166A50(s32, s32, s32, s32);
 extern void fn_8001D378(void);
 extern u8 lbl_80478890[];
 extern u8 lbl_80266DB0[];
@@ -3857,7 +3857,7 @@ void fn_80022EE4(void) { /* TODO */ }
 #endif
 
 /* fn_80023068 - 0x80023068 | size: 0x20c */
-extern void fn_80019B48(void);
+extern s32 fn_80019B48(s32);
 extern void fn_80019B1C(void);
 #if 1
 asm void fn_80023068(void) {
