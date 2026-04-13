@@ -3414,7 +3414,7 @@ void fn_8002217C(void) { /* TODO */ }
 /* fn_80022478 - 0x80022478 | size: 0x2a8 */
 extern void jumptable_802E4F00();
 extern u8 lbl_80478888[];
-extern s32 fn_80023068(u32, u32*);
+extern void fn_80023068(void);
 extern void fn_800232F0(void);
 extern void fn_80023760(void);
 #if 1
@@ -3508,7 +3508,7 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
 
 /* fn_80022720 - 0x80022720 | size: 0x114 */
 extern u8 lbl_80266C54[];
-extern s32 fn_80023068(u32, u32*);
+extern void fn_80023068(void);
 extern void fn_800232F0(void);
 #if 0
 asm void fn_80022720(void) {
