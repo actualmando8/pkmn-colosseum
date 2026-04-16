@@ -2410,6 +2410,7 @@ asm void fn_80025F74(void) {
 #include "src/game/gs_title_fn_80025F74.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 s32 fn_80025F74(void) {
     lbl_8047A3A8 = 1;
@@ -2764,7 +2765,7 @@ asm void fn_8002058C(void) {
 #include "src/game/gs_title_fn_8002058C.inc"
 }
 #else
-#pragma peephole off
+#pragma scheduling on
 #pragma optimization_level 4
 void fn_8002058C(void) {
     lbl_8047A32C = 0;
@@ -2774,7 +2775,6 @@ void fn_8002058C(void) {
         fn_800F0308();
     }
 }
-#pragma peephole on
 #endif
 
 /* fn_800205C8 - 0x800205C8 | size: 0x44 */
@@ -2915,13 +2915,13 @@ void fn_80020A4C(void* r3, u8* r4) {
 #endif
 
 /* fn_80020ADC - 0x80020ADC | size: 0x58 */
-#pragma scheduling off
 extern u32 fn_80166C74(void);
 #if 0
 asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 void fn_80020ADC(void* r3, u8* r4) {
     if (fn_80166C74() != 1) {
@@ -3848,12 +3848,55 @@ extern s32 fn_80128A64(s32, s32, u16, void*, void*);
 extern void fn_801096F8(s32);
 extern void fn_8012805C(s32, s32, u16, void*, s32, s32, s32, s32);
 extern f32 lbl_8047B8A4;
-#if 1
+#if 0
 asm void fn_80022EE4(void) {
 #include "src/game/gs_title_fn_80022EE4.inc"
 }
 #else
-void fn_80022EE4(void) { /* TODO */ }
+#pragma scheduling on
+#pragma optimization_level 4
+s32 fn_80022EE4(u32 arg0, u32* arg1) {
+    extern s32 fn_80144574(void*, s32, s32, u16, s32);
+    u8 text_buf[0x100];
+    s32 slot;
+    s32 effect;
+    s32 sc;
+    s32 sd;
+    u16 sp8;
+    u32 spC;
+
+    slot = fn_800141BC((void*)arg0, 1);
+    if (slot >= 0) {
+        fn_80014118(slot, &sc, &sd);
+        if ((u8)fn_8011FC74(sc) == 0) {
+            effect = fn_80144574(text_buf, sc, sd, (u16)arg0, 0);
+            if ((s16)effect <= 0) {
+                fn_80106D3C(2, 0x4261, 1, 0);
+                fn_801069FC(1);
+            }
+        } else {
+            fn_80106D3C(2, 0x424C, 1, 0);
+            fn_801069FC(1);
+        }
+    }
+
+    fn_80014198(slot);
+
+    if (slot >= 0 && (s16)effect > 0) {
+        effect = fn_80128A64(sc, 1, (u16)arg0, &sp8, &spC);
+        fn_801C41C8(lbl_8047B8A4, 3);
+        fn_801C40F0(1);
+        fn_801096F8(0);
+        fn_8012805C(sc, effect, sp8, &spC, 0, 1, 0, 0);
+        fn_801096F8(1);
+        fn_801C41C8(lbl_8047B8A4, 2);
+        fn_801C40F0(1);
+        *arg1 = 1;
+        return 0;
+    }
+
+    return 1;
+}
 #endif
 
 /* fn_80023068 - 0x80023068 | size: 0x20c */
@@ -3947,9 +3990,8 @@ asm void fn_80023274(void) {
 #include "src/game/gs_title_fn_80023274.inc"
 }
 #else
-#pragma peephole off
+#pragma scheduling on
 #pragma optimization_level 4
-#pragma scheduling off
 s32 fn_80023274(s32 r3, s32 r4) {
     s32 result;
 
