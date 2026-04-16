@@ -2847,6 +2847,7 @@ asm void fn_8002092C(void) {
 #include "src/game/gs_title_fn_8002092C.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
@@ -2855,9 +2856,9 @@ void fn_8002092C(void* r3, u8* r4) {
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
     if (*(s32*)lbl_803A1FC8 == 2) {
-        r4[4] = (u8)((s8)r4[4] | 2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
-        r4[4] = (u8)((s8)r4[4] & ~2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
     }
 }
 #endif
@@ -2871,19 +2872,18 @@ asm void fn_800209BC(void) {
 #include "src/game/gs_title_fn_800209BC.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_800209BC(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    u8* r31;
-    r31 = r4;
     f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
-    *(f32*)(r31 + 0x6c) = f0;
-    *(f32*)(r31 + 0x68) = f0;
+    *(f32*)(r4 + 0x6c) = f0;
+    *(f32*)(r4 + 0x68) = f0;
     if (*(s32*)lbl_803A1FC8 == 1) {
-        r31[4] = (u8)(s8)((s8)r31[4] | 2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
-        r31[4] = (u8)(s8)((s8)r31[4] & ~2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
     }
 }
 #endif
@@ -2897,19 +2897,18 @@ asm void fn_80020A4C(void) {
 #include "src/game/gs_title_fn_80020A4C.inc"
 }
 #else
+#pragma optimization_level 4
 void fn_80020A4C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    u8* r31;
-    r31 = r4;
     f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
-    *(f32*)(r31 + 0x6c) = f0;
-    *(f32*)(r31 + 0x68) = f0;
+    *(f32*)(r4 + 0x6c) = f0;
+    *(f32*)(r4 + 0x68) = f0;
     if (*(s32*)lbl_803A1FC8 == 0) {
-        r31[4] = (u8)(s8)((s8)r31[4] | 2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
-        r31[4] = (u8)(s8)((s8)r31[4] & ~2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
     }
 }
 #endif
@@ -2938,12 +2937,13 @@ asm void fn_80020B34(void) {
 #include "src/game/gs_title_fn_80020B34.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 void fn_80020B34(void* r3, u8* r4) {
     if (fn_80166C74() == 1) {
-        r4[4] = (u8)(s8)(r4[4] | 2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
     } else {
-        r4[4] = (u8)(s8)(r4[4] & ~2);
+        *(s8*)(r4 + 4) = *(s8*)(r4 + 4) & ~2;
     }
 }
 #endif
