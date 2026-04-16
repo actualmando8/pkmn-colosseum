@@ -1,0 +1,31 @@
+Analyze the PowerPC assembly for function fn_80023068 (size 0x20c bytes, target file src/game/gs_title.c from Pokemon Colosseum GCN decomp).
+
+Asm file: tools/decomp_work/relay/fn_80023068_asm.s
+
+Task: Produce a clean, semantically-correct C translation for CodeWarrior 1.3 (-O4,p -fp hard). Do NOT try to byte-match — focus on correct semantics and readable C.
+
+Known context from the codebase (already matched callees):
+- extern s32 fn_800141BC(void*, s32);      // acquire/lock slot
+- extern void fn_80014118(s32, void*, void*); // read slot data into two outputs
+- extern void fn_80014198(s32);             // release slot
+- extern u8 fn_80121ADC(s32, s32);          // query flag
+- extern s32 fn_80019B48(s32);              // mode-related
+- extern void fn_80019B1C(void);
+- extern s32 fn_80144574(void*, s32, s32, u16, s32);  // note: target treats return as s32 raw
+- extern void fn_800216E8(void*, s32, void*, s32, s32);
+- extern void fn_80132A38(s32, void*);
+- extern void fn_80106D3C(s32, s32, s32, s32);
+- extern void fn_801069FC(s32);
+- extern void* fn_8011F4F0(s32);
+- extern void fn_80166A50(s32, s32, s32, s32);
+- extern void fn_8001D378(void);
+- extern u8 lbl_80266DB0[];
+
+Similar matched function fn_80022EE4 used pattern: s32 fn(u32 arg0, u32* arg1); acquire slot via fn_800141BC((void*)arg0,1); read with fn_80014118(slot, &sc, &sd); check fn_8011FC74(sc); then do work; fn_80014198(slot); success path sets *arg1=1 returns 0 else returns 1.
+
+Please return ONLY:
+1. Inferred signature (with types).
+2. Short explanation of control flow (bullet points).
+3. Candidate C body (inside braces).
+
+Keep output under 120 lines total. Do NOT include ifdef/asm wrappers, just the function body.

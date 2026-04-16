@@ -1,0 +1,22 @@
+Third-party review for Pokemon Colosseum GCN decomp function fn_80023068 (gs_title.c, size 0x20C, CodeWarrior 1.3 -O4,p). Read these three files:
+
+1. tools/decomp_work/relay/fn_80023068_asm.s — target assembly
+2. tools/decomp_work/relay/kimi_fn_80023068_result.md — GLM-5.1's initial analysis
+3. tools/decomp_work/relay/codex_fn_80023068_review.md — Codex's review with corrections
+
+A sibling function fn_80022EE4 was just matched 100% with `#pragma scheduling on` and local `extern s32 fn_80144574(void*, s32, s32, u16, s32);` to prevent extsh folding. Example pattern in src/game/gs_title.c around line 3856.
+
+Your job: produce the FINAL C to paste into src/game/gs_title.c, considering match-sensitive CW codegen. Focus on:
+
+- Correct pragma stack (scheduling on? peephole? optimization_level 4?)
+- Proper local extern for fn_80144574 if needed
+- Stack-buffer sizing (Codex said name_buf[0x84], text_buf[0x108])
+- Whether to use memcpy or raw (u16*) casts for lbl_80266DB0 (note: the direct *(u16*)(lbl_80266DB0 + offset) pattern is already used in fn_80022478 at line 3469-3473 of gs_title.c, which matches)
+- Any remaining match-sensitive traps
+
+Write the final answer to tools/decomp_work/relay/claude_fn_80023068_final.md with:
+- section "## Final C (ready to paste)"
+- section "## Rationale for key decisions"
+- section "## Expected match risk (high/medium/low)"
+
+Under 180 lines. Be specific and concrete, no hedging.
