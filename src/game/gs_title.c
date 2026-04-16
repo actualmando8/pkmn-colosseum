@@ -2969,42 +2969,24 @@ asm void fn_80020BA0(void) {
 #include "src/game/gs_title_fn_80020BA0.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 void fn_80020BA0(void* arg0, u8* arg1) {
-    u8* base;
-    u8* ptr;
-    s16 objx;
-    s16 objy;
-    s16 tblx;
-    s16 tbly;
-    s32 flag;
+    s16* ptr;
 
-    base = lbl_802EF0A8;
-    flag = fn_80166C74();
-    if (flag == 0) {
-        ptr = base + 0x8FF0;
+    if (fn_80166C74() == 0) {
+        ptr = (s16*)(lbl_802EF0A8 + 0x8FF0);
     } else {
-        ptr = base + 0x900C;
+        ptr = (s16*)(lbl_802EF0A8 + 0x900C);
     }
+    fn_801040F0((s16)(ptr[1] - *(s16*)(arg1 + 0x50)), (s16)(ptr[2] - *(s16*)(arg1 + 0x52)), arg0, 0x192, 0);
 
-    objx = *(s16*)(arg1 + 0x50);
-    tblx = *(s16*)(ptr + 2);
-    objy = *(s16*)(arg1 + 0x52);
-    tbly = *(s16*)(ptr + 4);
-    fn_801040F0((s16)(tblx - objx), (s16)(tbly - objy), arg0, 0x192, 0);
-
-    flag = fn_80135168(0, 9);
-    if (flag == 1) {
-        ptr = base + 0x8FD4;
+    if (fn_80135168(0, 9) == 1) {
+        ptr = (s16*)(lbl_802EF0A8 + 0x8FD4);
     } else {
-        ptr = base + 0x8FB8;
+        ptr = (s16*)(lbl_802EF0A8 + 0x8FB8);
     }
-
-    objx = *(s16*)(arg1 + 0x50);
-    tblx = *(s16*)(ptr + 2);
-    objy = *(s16*)(arg1 + 0x52);
-    tbly = *(s16*)(ptr + 4);
-    fn_801040F0((s16)(tblx - objx), (s16)(tbly - objy), arg0, 0x192, 0);
+    fn_801040F0((s16)(ptr[1] - *(s16*)(arg1 + 0x50)), (s16)(ptr[2] - *(s16*)(arg1 + 0x52)), arg0, 0x192, 0);
 }
 #endif
 
