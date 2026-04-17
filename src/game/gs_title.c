@@ -2691,17 +2691,14 @@ asm void fn_80022720(void) {
 #pragma optimization_level 4
 #pragma scheduling on
 s32 fn_80022720(u32 arg0, u32* arg1) {
-    u8* base;
+    u32 *src;
     s32 iVar1;
     u32 buf[10];
 
-    base = lbl_80266C54;
-    buf[0] = *(u32*)(base + 0x00); buf[1] = *(u32*)(base + 0x04);
-    buf[2] = *(u32*)(base + 0x08); buf[3] = *(u32*)(base + 0x0c);
-    buf[4] = *(u32*)(base + 0x10); buf[5] = *(u32*)(base + 0x14);
-    buf[6] = *(u32*)(base + 0x18); buf[7] = *(u32*)(base + 0x1c);
-    buf[8] = *(u32*)(base + 0x20); buf[9] = *(u32*)(base + 0x24);
+    src = (u32*)lbl_80266C54;
     iVar1 = 0;
+    buf[0] = src[0]; buf[1] = src[1]; buf[2] = src[2]; buf[3] = src[3]; buf[4] = src[4];
+    buf[5] = src[5]; buf[6] = src[6]; buf[7] = src[7]; buf[8] = src[8]; buf[9] = src[9];
     if ((((arg0 != *(u16*)((u8*)buf + 0x00)) && (iVar1 = 1, arg0 != *(u16*)((u8*)buf + 0x08))) &&
          (iVar1 = 2, arg0 != *(u16*)((u8*)buf + 0x10))) &&
         ((iVar1 = 3, arg0 != *(u16*)((u8*)buf + 0x18)) &&
