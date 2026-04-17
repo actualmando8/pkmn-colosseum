@@ -152,10 +152,10 @@ void fn_800129A8(void) { /* TODO */ }
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
 extern void fn_801040D0(void);
 extern void fn_8005D9E4(void);
-extern void fn_800FA444(void);
+extern s32  fn_800FA444(s32);
 extern void fn_8001E644(void);
 extern void fn_8001EA98(void);
-extern void fn_800FB680(void);
+extern void fn_800FB680(s32, s32, s32, s32);
 extern void fn_801040F0(void);
 #if 1
 asm void fn_80012B94(void) {
@@ -197,7 +197,7 @@ void fn_80012FB0(void) { /* TODO */ }
 
 /* fn_8001329C - 0x8001329C | size: 0x3cc */
 extern void fn_8001EC08(void);
-extern void fn_80132A38(void);
+extern void fn_80132A38(s32, s32);
 extern void jumptable_802E4D90();
 #if 1
 asm void fn_8001329C(void) {
@@ -358,12 +358,21 @@ void fn_80014234(void) { /* TODO */ }
 
 /* fn_8001431C - 0x8001431C | size: 0x7c */
 extern u32 lbl_8047A2FC;
-#if 1
+#if 0
 asm void fn_8001431C(void) {
 #include "src/game/gs_event_exec_fn_8001431C.inc"
 }
 #else
-void fn_8001431C(void) { /* TODO */ }
+s32 fn_8001431C(void* arg0, u8* arg1) {
+    void* p = *(void**)((u8*)arg0 + 0x60);
+    s32 count = *(s32*)((u8*)p + 0x10);
+    s32 rand;
+    if (count <= 0) return 0;
+    fn_80132A38(0x50, count * (s32)lbl_8047A2FC);
+    rand = fn_800FA444(0x151);
+    fn_800FB680(*(s16*)(arg1 + 0x54) - (s32)(s16)((u32)rand >> 16), 0, -1, 0x151);
+    return 0;
+}
 #endif
 
 /* fn_80014398 - 0x80014398 | size: 0x1b8 */
