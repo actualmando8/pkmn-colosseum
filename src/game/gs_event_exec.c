@@ -429,13 +429,39 @@ void fn_80014AE4(void) { /* TODO */ }
 #endif
 
 /* fn_80014BA0 - 0x80014BA0 | size: 0x98 */
-extern u8 lbl_80266BB0[];
-#if 1
+extern s32 lbl_80266BB0[];
+#if 0
 asm void fn_80014BA0(void) {
 #include "src/game/gs_event_exec_fn_80014BA0.inc"
 }
 #else
-void fn_80014BA0(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_80014BA0(u8* ctx, u8* tgt) {
+    s32 tbl[5];
+    s32 idx;
+    u8 value;
+    u8* p;
+
+    p = *(u8**)(ctx + 0x60);
+    tbl[0] = lbl_80266BB0[0];
+    tbl[1] = lbl_80266BB0[1];
+    tbl[2] = lbl_80266BB0[2];
+    tbl[3] = lbl_80266BB0[3];
+    tbl[4] = lbl_80266BB0[4];
+    idx = (s32)(s8)ctx[0x95] + (5 - *(s32*)(p + 8));
+    if (idx < 0 || idx >= 5) {
+        return 0;
+    }
+    if (*(s16*)(tgt + 6) == tbl[idx]) {
+        value = 0xFF;
+    } else {
+        value = 0;
+    }
+    tgt[0x67] = value;
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80014C38 - 0x80014C38 | size: 0xe4 */
@@ -479,4 +505,3 @@ asm void fn_80014F48(void) {
 #else
 void fn_80014F48(void) { /* TODO */ }
 #endif
-
