@@ -525,14 +525,46 @@ s32 fn_80014BA0(u8* ctx, u8* tgt) {
 #endif
 
 /* fn_80014C38 - 0x80014C38 | size: 0xe4 */
-extern u8 lbl_80266B9C[];
-#if 1
-asm void fn_80014C38(void) {
-#include "src/game/gs_event_exec_fn_80014C38.inc"
+extern s32 lbl_80266B9C[];
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 fn_80014C38(u8* ctx, u8* tgt) {
+    void* p  = *(void**)(ctx + 0x60);
+    s32* tbl = lbl_80266B9C;
+    s32 k0 = tbl[0];
+    s32 k1 = tbl[1];
+    s32 k2 = tbl[2];
+    s32 k3 = tbl[3];
+    s32 k4 = tbl[4];
+    s32 species = *(s16*)(tgt + 0x6);
+    s32 idx0 = 0;
+    s32 base;
+    s32 idx;
+    u8* inner;
+    s32 flag;
+    if (species != k0) {
+        idx0 = 1;
+        if (species != k1) {
+            idx0 = 2;
+            if (species != k2) {
+                idx0 = 3;
+                if (species != k3) {
+                    idx0 = 4;
+                    if (species != k4) idx0 = 5;
+                }
+            }
+        }
+    }
+    base = *(s32*)((u8*)p + 0x8);
+    idx = idx0 - (5 - base);
+    if (idx < 0 || idx >= base) return 0;
+    inner = (u8*)((*(u8**)((u8*)p + 0x4)) + idx * 0xC);
+    flag  = (*(u16*)(inner + 0x8)) & 1;
+    fn_800FB680(0, 0, flag ? 0x7f7f7fff : -1, *(s32*)inner);
+    return 0;
 }
-#else
-void fn_80014C38(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014D1C - 0x80014D1C | size: 0x134 */
 extern u8 lbl_802E4DB0[];
