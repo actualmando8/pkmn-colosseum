@@ -17,7 +17,7 @@ throughput.
 - **Compiler:** `tools/mwcc_compiler/GC/1.3/mwcceppc.exe` (CW 1.3) is the default for game/. Per-file overrides in `config/GC6E01/compile_config.json`.
 - **Build target:** `build/GC6E01/obj/auto_01_800055E0_text.o` is the byte-truth.
 - **Match tool:** `python3 tools/match_scan.py fn_XXXXXXXX [...]`
-- **Per-file scan:** `python3 tools/scan_all_files.py` (lists all game .o files by match%).
+- **Per-file scan:** `python3 tools/scan_all_files.py` returns 0% for every file — that's expected (objdiff-cli's section match needs symbol-set parity which game .o files don't have vs the full target.o). Use the **asm-active count proxy** below (counts `#if 1` + `asm void fn_` patterns) instead — that's the real metric.
 - **Compile + diff:** `python3 tools/compile_check.py src/game/<file>.c`
 - **Full diff:** `./tools/objdiff-cli.exe diff -1 build/GC6E01/obj/auto_01_800055E0_text.o -2 build/GC6E01/base/game/<file>.o -o - --format json -c ppc.calculatePoolRelocations=false fn_XXXXXXXX`
 
