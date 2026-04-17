@@ -3133,30 +3133,30 @@ asm void fn_80022720(void) {
 }
 #else
 #pragma optimization_level 4
-#pragma scheduling off
-void fn_80022720(u32 r3, u32* r4) {
-    u32* r31;
-    u8* r30;
-    s32 r29;
-    u32 buf[10];
-    r31 = r4;
-    r30 = lbl_80266C54;
-    buf[0] = *(u32*)(r30 + 0x00); buf[1] = *(u32*)(r30 + 0x04);
-    buf[2] = *(u32*)(r30 + 0x08); buf[3] = *(u32*)(r30 + 0x0c);
-    buf[4] = *(u32*)(r30 + 0x10); buf[5] = *(u32*)(r30 + 0x14);
-    buf[6] = *(u32*)(r30 + 0x18); buf[7] = *(u32*)(r30 + 0x1c);
-    buf[8] = *(u32*)(r30 + 0x20); buf[9] = *(u32*)(r30 + 0x24);
-    r29 = 5;
-    if (r3 == (u32)*(u16*)((u8*)buf + 0x00)) { r29 = 0; }
-    else if (r3 == (u32)*(u16*)((u8*)buf + 0x08)) { r29 = 1; }
-    else if (r3 == (u32)*(u16*)((u8*)buf + 0x10)) { r29 = 2; }
-    else if (r3 == (u32)*(u16*)((u8*)buf + 0x18)) { r29 = 3; }
-    else if (r3 == (u32)*(u16*)((u8*)buf + 0x20)) { r29 = 4; }
-    fn_80106D3C(2, (s32)*(u32*)((u8*)buf + r29 * 8 + 4), 1, 0);
-    fn_801069FC(1);
-    *r31 = 0;
-}
 #pragma scheduling on
+s32 fn_80022720(u32 arg0, u32* arg1) {
+    u8* base;
+    s32 iVar1;
+    u32 buf[10];
+
+    base = lbl_80266C54;
+    buf[0] = *(u32*)(base + 0x00); buf[1] = *(u32*)(base + 0x04);
+    buf[2] = *(u32*)(base + 0x08); buf[3] = *(u32*)(base + 0x0c);
+    buf[4] = *(u32*)(base + 0x10); buf[5] = *(u32*)(base + 0x14);
+    buf[6] = *(u32*)(base + 0x18); buf[7] = *(u32*)(base + 0x1c);
+    buf[8] = *(u32*)(base + 0x20); buf[9] = *(u32*)(base + 0x24);
+    iVar1 = 0;
+    if ((((arg0 != *(u16*)((u8*)buf + 0x00)) && (iVar1 = 1, arg0 != *(u16*)((u8*)buf + 0x08))) &&
+         (iVar1 = 2, arg0 != *(u16*)((u8*)buf + 0x10))) &&
+        ((iVar1 = 3, arg0 != *(u16*)((u8*)buf + 0x18)) &&
+         (iVar1 = 4, arg0 != *(u16*)((u8*)buf + 0x20)))) {
+        iVar1 = 5;
+    }
+    fn_80106D3C(2, (s32)*(u32*)((u8*)buf + iVar1 * 8 + 4), 1, 0);
+    fn_801069FC(1);
+    *arg1 = 0;
+    return 0;
+}
 #endif
 
 /* fn_80022834 - 0x80022834 | size: 0x308 */
