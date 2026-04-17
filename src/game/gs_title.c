@@ -635,14 +635,14 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
     node = fn_8005D934(*(s16*)(node + 4));
     offset = 0;
     while (1) {
-        if ((((u32)node[0] >> 6) & 1) != 0) {
+        if ((((u32)node[0] >> 7) & 1) != 0) {
             if (index == offset) {
                 found = node;
                 break;
             }
             offset++;
         }
-        if ((((u32)node[0] >> 5) & 1) == 0) {
+        if ((((u32)node[0] >> 6) & 1) == 0) {
             node = fn_8005D934(*(s16*)(node + 0x18));
         } else {
             found = 0;
