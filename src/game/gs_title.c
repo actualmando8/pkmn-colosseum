@@ -3182,28 +3182,31 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
     s32 sp10;
     s32 spC;
     s32 sp8;
-    s32 valid_count;
-    s32 i;
+    s32 iVar4;
+    s32 iVar3;
+    s8 cVar1;
+    s8 cVar2;
 
-    valid_count = 0;
-    i = 0;
-    while (i < 6) {
-        fn_80014118(i, &spC, &sp8);
+    iVar3 = 0;
+    iVar4 = 0;
+    do {
+        fn_80014118(iVar4, &spC, &sp8);
         if ((u8)fn_80123FBC(spC) != 0) {
-            valid_count++;
+            iVar3 = iVar3 + 1;
         }
-        i++;
-    }
-    if (valid_count >= 6) {
-        valid_count = (s8)fn_801347E0();
-        i = 0;
-        while (i < valid_count) {
-            if ((s8)fn_801347E8(0, (s8)i) > 0) {
+        iVar4 = iVar4 + 1;
+    } while (iVar4 < 6);
+    if (iVar3 >= 6) {
+        cVar1 = fn_801347E0();
+        iVar3 = 0;
+        while (iVar3 < cVar1) {
+            cVar2 = fn_801347E8(0, (s8)iVar3);
+            if (cVar2 > 0) {
                 break;
             }
-            i++;
+            iVar3 = iVar3 + 1;
         }
-        if (i >= valid_count) {
+        if (iVar3 >= cVar1) {
             fn_80106D3C(2, 0x4416, 1, 0);
             fn_801069FC(1);
             return 1;

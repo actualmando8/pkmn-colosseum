@@ -1,0 +1,64 @@
+{
+  "dol_path": "C:/Users/douglaswhittingham/gamecube-decomp/disc-extract-dump/sys/main.dol",
+  "entry": 2147496276,
+  "bss_addr": 2151261952,
+  "bss_size": 933944,
+  "sections": [
+    {
+      "name": "text0",
+      "kind": "text",
+      "base_addr": 2147496192,
+      "size": 9440,
+      "file": "text0.bin"
+    },
+    {
+      "name": "text1",
+      "kind": "text",
+      "base_addr": 2147505632,
+      "size": 2493824,
+      "file": "text1.bin"
+    },
+    {
+      "name": "data0",
+      "kind": "data",
+      "base_addr": 2149999456,
+      "size": 32,
+      "file": "data0.bin"
+    },
+    {
+      "name": "data1",
+      "kind": "data",
+      "base_addr": 2149999488,
+      "size": 32,
+      "file": "data1.bin"
+    },
+    {
+      "name": "data2",
+      "kind": "data",
+      "base_addr": 2149999520,
+      "size": 82272,
+      "file": "data2.bin"
+    },
+    {
+      "name": "data3",
+      "kind": "data",
+      "base_addr": 2150081792,
+      "size": 1180128,
+      "file": "data3.bin"
+    },
+    {
+      "name": "data4",
+      "kind": "data",
+      "base_addr": 2152171552,
+      "size": 1440,
+      "file": "data4.bin"
+    },
+    {
+      "name": "data5",
+      "kind": "data",
+      "base_addr": 2152183456,
+      "size": 12384,
+      "file": "data5.bin"
+    }
+  ]
+}
