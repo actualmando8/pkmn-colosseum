@@ -268,7 +268,7 @@ void fn_80013A18(void) { /* TODO */ }
 extern void fn_801440A0(void);
 extern void fn_80143E88(void);
 extern void fn_80144014(void);
-extern void fn_80102568(void);
+extern void fn_80102568(s32, s32, s32);
 extern void fn_8001BCEC(void);
 extern void fn_8001B184(void);
 extern u32 lbl_8047A2F8;
@@ -326,16 +326,25 @@ void fn_80014198(u32 val) {
 }
 
 /* fn_800141BC - 0x800141BC | size: 0x78 */
-extern void fn_8001BD3C(void);
-extern u32 lbl_8047A2E0;
-extern u32 lbl_8047A2F4;
-#if 1
-asm void fn_800141BC(void) {
-#include "src/game/gs_event_exec_fn_800141BC.inc"
+extern s32 fn_8001BD3C(s32 mode, u8 a, u16 b, u32 p);
+#pragma push
+#pragma peephole off
+s32 fn_800141BC(s32 arg0, s32 arg1) {
+    s32 mode;
+    s32 result;
+    fn_80102568(0x59, 0, 1);
+    if ((s32)lbl_8047A2E0 == 1) {
+        mode = 4;
+    } else {
+        mode = 3;
+    }
+    result = fn_8001BD3C(mode, (u8)arg1, arg0, lbl_8047A2F4);
+    if (arg1 == 0) {
+        result = -1;
+    }
+    return result;
 }
-#else
-void fn_800141BC(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014234 - 0x80014234 | size: 0xe8 */
 extern u8 lbl_80266B58[];
