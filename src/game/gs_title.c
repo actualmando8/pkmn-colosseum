@@ -3207,6 +3207,7 @@ asm void fn_80021A9C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_80021A9C(u32 r3, u32* r4) {
     u8* r5;
     s32 count;
