@@ -2766,6 +2766,7 @@ asm void fn_8002092C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma fp_contract on
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
