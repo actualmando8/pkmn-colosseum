@@ -734,15 +734,14 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48;
-    f32 local_44;
+    f32 local_48[2];
 
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(&local_48, lbl_803A2058, lbl_803A204C);
-        unaff_r31 = (s32)local_44;
-        unaff_r28 = (s32)local_48;
+        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        unaff_r31 = (s32)local_48[1];
+        unaff_r28 = (s32)local_48[0];
         break;
     case 0:
     default:
@@ -805,15 +804,14 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48;
-    f32 local_44;
+    f32 local_48[2];
 
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(&local_48, lbl_803A2058, lbl_803A204C);
-        unaff_r31 = (s32)local_44;
-        unaff_r28 = (s32)local_48;
+        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        unaff_r31 = (s32)local_48[1];
+        unaff_r28 = (s32)local_48[0];
         break;
     case 0:
     default:
@@ -876,15 +874,14 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48;
-    f32 local_44;
+    f32 local_48[2];
 
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(&local_48, lbl_803A2058, lbl_803A204C);
-        unaff_r31 = (s32)local_44;
-        unaff_r28 = (s32)local_48;
+        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        unaff_r31 = (s32)local_48[1];
+        unaff_r28 = (s32)local_48[0];
         break;
     case 0:
     default:
@@ -947,15 +944,14 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48;
-    f32 local_44;
+    f32 local_48[2];
 
     switch ((s32)lbl_8047A370) {
     case 1:
         fn_800E0CA0((f64)lbl_80478898);
-        fn_800E090C(&local_48, lbl_803A2058, lbl_803A204C);
-        unaff_r31 = (s32)local_44;
-        unaff_r28 = (s32)local_48;
+        fn_800E090C(local_48, lbl_803A2058, lbl_803A204C);
+        unaff_r31 = (s32)local_48[1];
+        unaff_r28 = (s32)local_48[0];
         break;
     case 0:
     default:
