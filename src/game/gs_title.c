@@ -809,7 +809,8 @@ asm void fn_80024DBC(void) {
 #include "src/game/gs_title_fn_80024DBC.inc"
 }
 #else
-#pragma scheduling off
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 void fn_80024DBC(u8* arg0, u8* arg1) {
     f32 pos[2];
@@ -818,12 +819,10 @@ void fn_80024DBC(u8* arg0, u8* arg1) {
     u32 r27;
     s32 r29;
     u8* node;
-    f32 t;
 
     switch ((s32)lbl_8047A370) {
     case 1:
-        t = fn_800E0CA0(lbl_80478898);
-        fn_800E090C(pos, lbl_803A2058, lbl_803A204C, t);
+        fn_800E090C(pos, lbl_803A2058, lbl_803A204C, fn_800E0CA0(lbl_80478898));
         r28 = (s32)pos[0];
         r31 = (s32)pos[1];
         break;
@@ -834,19 +833,19 @@ void fn_80024DBC(u8* arg0, u8* arg1) {
             node = (u8*)fn_8005D934(*(s16*)(node + 4));
             r29 = 0;
             while (1) {
-                if (((*(u8*)node >> 7) & 1) != 0) {
+                if ((*(u8*)node >> 7) & 1) {
                     if (r27 == (u32)r29) {
                         break;
                     }
                     r29++;
                 }
-                if (((*(u8*)node >> 6) & 1) != 0) {
-                    node = NULL;
+                if ((*(u8*)node >> 6) & 1) {
+                    node = (u8*)0;
                     break;
                 }
                 node = (u8*)fn_8005D934(*(s16*)(node + 0x18));
             }
-            if (node != NULL) {
+            if (node != (u8*)0) {
                 r28 = *(s16*)(node + 2);
                 r31 = *(s16*)(node + 4);
             }
