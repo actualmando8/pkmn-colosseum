@@ -407,16 +407,41 @@ void fn_80014A48(void) { /* TODO */ }
 #endif
 
 /* fn_80014AE4 - 0x80014AE4 | size: 0xbc */
-extern u8 lbl_80266BC4[];
-extern u32 lbl_8047B744;
-extern u32 lbl_8047A2C0;
-extern u32 lbl_8047B740;
-#if 1
+extern s32 lbl_80266BC4[];
+extern f32 lbl_8047B744;
+extern f32 lbl_8047A2C0;
+extern f32 lbl_8047B740;
+#if 0
 asm void fn_80014AE4(void) {
 #include "src/game/gs_event_exec_fn_80014AE4.inc"
 }
 #else
-void fn_80014AE4(void) { /* TODO */ }
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+s32 fn_80014AE4(u8* ctx, u8* tgt) {
+    s32 tbl[5];
+    s32 idx;
+    void* p = *(void**)(ctx + 0x60);
+    s32 base = *(s32*)((u8*)p + 0x8);
+    tbl[0] = lbl_80266BC4[0];
+    tbl[1] = lbl_80266BC4[1];
+    tbl[2] = lbl_80266BC4[2];
+    tbl[3] = lbl_80266BC4[3];
+    tbl[4] = lbl_80266BC4[4];
+    idx = (s32)(s8)ctx[0x95] + (5 - base);
+    if (idx < 0 || idx >= 5) return 0;
+    if (*(s16*)(tgt + 0x6) != tbl[idx]) {
+        tgt[0x67] = 0;
+        return 0;
+    }
+    {
+        f32 f = lbl_8047B740 * (lbl_8047B744 - lbl_8047A2C0);
+        tgt[0x67] = (u8)(s32)f;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80014BA0 - 0x80014BA0 | size: 0x98 */
@@ -459,10 +484,10 @@ void fn_80014E50(void) { /* TODO */ }
 #endif
 
 /* fn_80014F48 - 0x80014F48 | size: 0xd4 */
-extern u32 lbl_8047B748;
-extern u32 lbl_8047A2C0;
-extern u32 lbl_8047B74C;
-extern u32 lbl_8047B744;
+extern f32 lbl_8047B748;
+extern f32 lbl_8047A2C0;
+extern f32 lbl_8047B74C;
+extern f32 lbl_8047B744;
 #if 1
 asm void fn_80014F48(void) {
 #include "src/game/gs_event_exec_fn_80014F48.inc"
