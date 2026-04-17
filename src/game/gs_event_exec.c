@@ -634,14 +634,46 @@ s32 fn_80014C38(u8* ctx, u8* tgt) {
 #pragma pop
 
 /* fn_80014D1C - 0x80014D1C | size: 0x134 */
-extern u8 lbl_802E4DB0[];
-#if 1
-asm void fn_80014D1C(void) {
-#include "src/game/gs_event_exec_fn_80014D1C.inc"
+typedef struct { s32 key; s16 a; s16 b; s32 flag; } PurEntry;
+extern PurEntry lbl_802E4DB0[];
+#pragma push
+#pragma peephole off
+s32 fn_80014D1C(u8* ctx, u8* tgt) {
+    u8* p;
+    s32 species;
+    s32 count;
+    s32 idx;
+    s32 delta;
+    PurEntry* e;
+
+    p = *(u8**)(ctx + 0x60);
+    species = *(s16*)(tgt + 6);
+    if (species != 0x223) {
+        tgt[0x64] = p[0];
+        tgt[0x65] = p[1];
+        tgt[0x66] = p[2];
+    }
+    count = *(s32*)(p + 8);
+    if (count < 5) {
+        idx = 0;
+        if ((((species != lbl_802E4DB0[0].key) && (idx = 1, species != lbl_802E4DB0[1].key)) &&
+             ((idx = 2, species != lbl_802E4DB0[2].key) && (idx = 3, species != lbl_802E4DB0[3].key))) &&
+            (((idx = 4, species != lbl_802E4DB0[4].key) && (idx = 5, species != lbl_802E4DB0[5].key)) &&
+             ((idx = 6, species != lbl_802E4DB0[6].key) && (idx = 7, species != lbl_802E4DB0[7].key)))) {
+            idx = 8;
+        }
+        if (idx < 8) {
+            e = &lbl_802E4DB0[idx];
+            delta = 5 - count;
+            *(s16*)(tgt + 0x52) = (s16)(delta * 0x1F + e->a);
+            if (e->flag != 0) {
+                *(s16*)(tgt + 0x56) = (s16)(e->b - delta);
+            }
+        }
+    }
+    return 0;
 }
-#else
-void fn_80014D1C(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014E50 - 0x80014E50 | size: 0xf8 */
 #if 1
