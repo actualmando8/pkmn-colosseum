@@ -618,108 +618,65 @@ asm void fn_80024A2C(void) {
 #include "src/game/gs_title_fn_80024A2C.inc"
 }
 #else
-void fn_80024A2C(void) {
-    extern f32 lbl_80478898;
+#pragma optimization_level 4
+#pragma scheduling off
+void fn_80024A2C(u8* arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A368;
-    extern u32 lbl_8047A370;
-    extern f32 lbl_8047B8A8;
-    extern f32 lbl_8047B8DC;
-    extern void fn_8005D934();
-    extern void fn_8005DA18();
-    extern void fn_801902E0();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
+    extern u8* fn_8005D934(s32);
+    extern u8* fn_8005DA18(u32);
+    u8* node;
+    u8* found;
+    s32 index;
+    s32 offset;
 
-    r31 = r4;
-    r30 = lbl_8047A368;
-    r3 = *(u32*)((u8*)r3 + 0x4);
-    fn_8005DA18();
-    r3 = *(s16*)((u8*)r3 + 0x4);
-    fn_8005D934();
-    r29 = 0x0;
+    index = lbl_8047A368;
+    node = fn_8005DA18(*(u32*)(arg0 + 4));
+    node = fn_8005D934(*(s16*)(node + 4));
+    offset = 0;
     while (1) {
-        tmp = *(u8*)((u8*)r3 + 0x0);
-        /* extrwi tmp, tmp, 1, 24 */;
-        if (tmp != 0) {
-            if ((s32)r30 == (s32)r29) {
-                r29 = r3;
+        if ((((u32)node[0] >> 6) & 1) != 0) {
+            if (index == offset) {
+                found = node;
                 break;
             }
-            r29 = r29 + 0x1;
+            offset++;
         }
-        tmp = *(u8*)((u8*)r3 + 0x0);
-        /* extrwi tmp, tmp, 1, 25 */;
-        if (tmp != 0) {
-            r29 = 0x0;
+        if ((((u32)node[0] >> 5) & 1) == 0) {
+            node = fn_8005D934(*(s16*)(node + 0x18));
+        } else {
+            found = 0;
             break;
         }
-        r3 = *(s16*)((u8*)r3 + 0x18);
-        fn_8005D934();
     }
-    r30 = 0x0;
-    r28 = r30;
-    while (1) {
-        r3 = lbl_80478DD8;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r30 >= tmp) { r30 = 0x0; break; }
-        r3 = lbl_80478DDC;
-        tmp = r28 + 0x8;
-        r3 = *(u32*)(r3 + tmp);
-        fn_8005D934();
-        if (r29 == r3) break;
-        r28 = r28 + 0x10;
-        r30 = r30 + 0x1;
-    }
-    tmp = lbl_8047A370;
-    if ((s32)tmp == 1) {
-        f1 = lbl_80478898;
-        f0 = lbl_8047B8A8;
-        f2 = lbl_8047B8DC;
-        f0 = f1 / f0;
-        f0 = f2 * f0;
-        f0 = (f64)(s32)f0;
-        *(u8*)((u8*)r31 + 0x67) = tmp;
-    } else {
-        tmp = 0xff;
-        *(u8*)((u8*)r31 + 0x67) = tmp;
-    }
-    r3 = lbl_80478DD8;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if (r30 >= tmp) return;
-    tmp = lbl_80478DDC;
-    r28 = r30 << 4;
-    r3 = tmp + r28;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    if (tmp == 0x66) {
-        r3 = 0x45d;
-        fn_801902E0();
-        tmp = r3 & 0xFF;
-        if (tmp != 0) {
-            r3 = 0xC5F0000;
-            tmp = r3 + 0x1200;
-        } else {
-            tmp = lbl_80478DDC;
-            r3 = tmp + r28;
-            tmp = *(u32*)((u8*)r3 + 0xC);
-        }
-    } else {
-        tmp = lbl_80478DDC;
-        r3 = tmp + r28;
-        tmp = *(u32*)((u8*)r3 + 0xC);
-    }
-    *(u32*)((u8*)r31 + 0x58) = tmp;
 
-    return;
+    index = 0;
+    offset = 0;
+    while ((u32)index < *(u32*)lbl_80478DD8) {
+        if (found == fn_8005D934(*(u32*)(lbl_80478DDC + offset + 8))) {
+            break;
+        }
+        offset += 0x10;
+        index++;
+    }
+    if ((u32)index >= *(u32*)lbl_80478DD8) {
+        index = 0;
+    }
+
+    if ((s32)lbl_8047A370 == 1) {
+        arg1[0x67] = (u8)(s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
+    } else {
+        arg1[0x67] = 0xFF;
+    }
+
+    if ((u32)index < *(u32*)lbl_80478DD8) {
+        offset = index << 4;
+        if (*(u32*)(lbl_80478DDC + offset + 4) == 0x66 && (u8)fn_801902E0((void*)0x45D) != 0) {
+            *(u32*)(arg1 + 0x58) = 0x0C5F1200;
+        } else {
+            *(u32*)(arg1 + 0x58) = *(u32*)(lbl_80478DDC + offset + 0xC);
+        }
+    }
 }
 #endif
 
@@ -732,91 +689,61 @@ asm void fn_80024BA4(void) {
 #include "src/game/gs_title_fn_80024BA4.inc"
 }
 #else
-void fn_80024BA4(void) {
+#pragma optimization_level 4
+#pragma scheduling off
+void fn_80024BA4(u8* arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A36C;
-    extern void fn_8005D934();
-    extern void fn_8005DA18();
-    extern void fn_801902E0();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern u8* fn_8005D934(s32);
+    extern u8* fn_8005DA18(u32);
+    extern u32 fn_801902E0(s32);
+    u8* node;
+    u8* found;
+    s32 count;
+    s32 entry_index;
+    s32 offset;
+    u32 value;
 
-    r31 = r4;
-    r30 = lbl_8047A36C;
-    r3 = *(u32*)((u8*)r3 + 0x4);
-    fn_8005DA18();
-    r3 = *(s16*)((u8*)r3 + 0x4);
-    fn_8005D934();
-    r29 = 0x0;
-L_80024BDC:
-    tmp = *(u8*)((u8*)r3 + 0x0);
-    /* extrwi tmp, tmp, 1, 24 */;
-    if (tmp != 0) {
-        if ((s32)r30 == (s32)r29) {
-            r29 = r3;
-            goto L_80024C20;
+    found = (u8*)0;
+    node = fn_8005DA18(*(u32*)(arg0 + 4));
+    node = fn_8005D934(*(s16*)(node + 4));
+    count = 0;
+    for (;;) {
+        if (*(s8*)(node + 0) < 0) {
+            if ((s32)lbl_8047A36C == count) {
+                found = node;
+                break;
+            }
+            count++;
         }
-        r29 = r29 + 0x1;
-    }
-    tmp = *(u8*)((u8*)r3 + 0x0);
-    /* extrwi tmp, tmp, 1, 25 */;
-    if (tmp == 0) {
-        r3 = *(s16*)((u8*)r3 + 0x18);
-        fn_8005D934();
-        goto L_80024BDC;
-    }
-    r29 = 0x0;
-L_80024C20:
-    r30 = 0x0;
-    r28 = r30;
-    while (1) {
-        r3 = lbl_80478DD8;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r30 >= tmp) break;
-        r3 = lbl_80478DDC;
-        tmp = r28 + 0x8;
-        r3 = *(u32*)(r3 + tmp);
-        fn_8005D934();
-        if (r29 == r3) {
+        if (*(s8*)(node + 0) >= 0) {
+            node = fn_8005D934(*(s16*)(node + 0x18));
+        } else {
+            found = (u8*)0;
             break;
         }
-        r28 = r28 + 0x10;
-        r30 = r30 + 0x1;
-
     }
-    r30 = 0x0;
 
-    r3 = lbl_80478DD8;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    if (r30 >= tmp) return;
-    tmp = lbl_80478DDC;
-    r28 = r30 << 4;
-    r3 = tmp + r28;
-    tmp = *(u32*)((u8*)r3 + 0x4);
-    do {
-        if (tmp != 0x66) break;
-        r3 = 0x45d;
-        fn_801902E0();
-        tmp = r3 & 0xFF;
-        if (tmp == 0) break;
-        r3 = 0xC5F0000;
-        tmp = r3 + 0x1200;
-        break;
-    } while (0);
+    entry_index = 0;
+    offset = 0;
+    while ((u32)entry_index < *(u32*)lbl_80478DD8) {
+        if (found == fn_8005D934(*(u32*)(lbl_80478DDC + offset + 8)))
+            break;
+        offset += 0x10;
+        entry_index++;
+    }
+    if ((u32)entry_index >= *(u32*)lbl_80478DD8)
+        entry_index = 0;
 
-    tmp = lbl_80478DDC;
-    r3 = tmp + r28;
-    tmp = *(u32*)((u8*)r3 + 0xC);
-
-    *(u32*)((u8*)r31 + 0x58) = tmp;
-
-    return;
+    if ((u32)entry_index < *(u32*)lbl_80478DD8) {
+        value = *(u32*)(lbl_80478DDC + offset + 0xC);
+        if (*(u32*)(lbl_80478DDC + offset + 0x4) == 0x66) {
+            if ((fn_801902E0(0x45D) & 0xFF) != 0) {
+                value = 0xC5F1200;
+            }
+        }
+        *(u32*)(arg1 + 0x58) = value;
+    }
 }
 #endif
 
