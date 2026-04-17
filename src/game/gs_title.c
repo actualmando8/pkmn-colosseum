@@ -569,22 +569,18 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
         }
     }
 
-    index = 0;
     offset = 0;
-    while ((u32)index < *(u32*)lbl_80478DD8) {
+    for (index = 0; (u32)index < *(u32*)lbl_80478DD8; index++) {
         if (found == fn_8005D934(*(u32*)(lbl_80478DDC + offset + 8))) {
-            break;
+            goto LAB_80024aec;
         }
         offset += 0x10;
-        index++;
     }
-    if ((u32)index >= *(u32*)lbl_80478DD8) {
-        index = 0;
-    }
-
+    index = 0;
+LAB_80024aec:
     switch ((s32)lbl_8047A370) {
     case 1:
-        arg1[0x67] = (u8)(s32)((lbl_80478898 / lbl_8047B8A8) * lbl_8047B8DC) & 0xFF;
+        arg1[0x67] = (u8)(s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
         break;
     default:
         arg1[0x67] = 0xFF;
