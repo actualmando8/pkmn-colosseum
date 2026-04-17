@@ -1759,6 +1759,7 @@ asm void fn_800259B0(void) {
 #include "src/game/gs_title_fn_800259B0.inc"
 }
 #else
+#pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
 void fn_800259B0(void) {
