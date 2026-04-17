@@ -123,6 +123,58 @@
  *   lbl_8047B858: Camera target X
  *   lbl_8047B85C: Camera target Y
  *   lbl_8047B860: Camera target Z
+ *
+ * --------------------------------------------------------------------------
+ * XD-decomp cross-reference (TeamOrre/xd-decomp Pokemon XD: Gale of Darkness)
+ *   Pokemon XD is the direct sequel built on the same Genius Sonority engine.
+ *   XD's `game/menuTitle.cpp` (0x800A3150 - 0x800A423C, 0x10EC bytes) is the
+ *   probable original-name analogue of THIS file's title-screen functions.
+ *   XD is C++; Colosseum is C. Sizes differ because Colosseum's title is
+ *   richer (camera fly-through, intro sequence, autodemo recording).
+ *
+ *   XD title symbols (selected, by behavior, NOT by byte match):
+ *     menuTitleInit              0x104   - title screen initialization
+ *     menuTitleMain              0x050   - per-frame main loop
+ *     menuTitleFunc              0x0D8   - state dispatch
+ *     menuTitle                  0x330   - top-level driver
+ *     menuTitleHook              0x074
+ *     menuTitleButton            0x07C
+ *     menuTitleNormalButton      0x074
+ *     menuTitleCursorAnime       0x0DC   - cursor blink/animation (~ fn_80024CDC)
+ *     menuTitleCursorAnimeMain   0x07C
+ *     menuTitleOpenSelectAnime   0x038
+ *     menuTitleCloseSelectAnime  0x038
+ *     menuTitlePlayBGM           0x040
+ *     menuTitlePlayBGMWait       0x090
+ *     menuTitleExit              0x074
+ *     menuTitleSetSE             0x028
+ *     menuTitleBattleSelectFree  0x034
+ *     menuTitleBattlePreReadCheck 0x034
+ *     menuTitlePreReadWait       0x030
+ *     menuTitleReadWazaSelectMenu 0x038
+ *     menuTitleSetStartStatus    0x008
+ *     menuTitleClose2            0x054
+ *     menuTitleOpenMenu          0x044
+ *     menuTitleGetSelect / SetSelect  0x018 each
+ *     menuTitlePreReadFightRegWzxData 0x058
+ *     menuTitleOptionCtrl        0x0DC   - in separate menuTitleOption.cpp
+ *     menuTitleOptionCursorControl 0x16C
+ *
+ *   HSD (HAL Sonata Driver) helpers used by both games:
+ *     HSD_JObjSetupMatrix, HSD_JObjMtxIsDirty, modelIntpJObj*,
+ *     cameraGetFrameCount, lightGetFrameCount, _modelLoad
+ *
+ *   Original-name candidates for our extern fn_XXXXXXXX:
+ *     fn_8005D934 / fn_8005DA18 -- linked-list/menu accessors
+ *     fn_800D3088 / fn_800D37CC -- frame timing (returns u32/s32 ticks)
+ *     fn_800E0CA0 / fn_800E090C -- vec3 transform helpers
+ *     fn_800FA280 / fn_80132A38 -- message/window callbacks
+ *     fn_80106D3C / fn_801069FC -- text print + wait
+ *     fn_801902E0 -- config flag check (returns u8)
+ *     fn_80165A20 / fn_801657F8 -- audio sequence control
+ *     fn_801C40F0 / fn_801C41C8 -- BGM volume/fade
+ *
+ * --------------------------------------------------------------------------
  */
 
 #include "dolphin/types.h"
