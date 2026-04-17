@@ -201,7 +201,7 @@ s32 fn_80012D20(u8* ctx) {
 #pragma pop
 
 /* fn_80012E18 - 0x80012E18 | size: 0x198 */
-extern void fn_80105624(void);
+extern u8* fn_80105624(void);
 #if 1
 asm void fn_80012E18(void) {
 #include "src/game/gs_event_exec_fn_80012E18.inc"
@@ -676,13 +676,50 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
 #pragma pop
 
 /* fn_80014E50 - 0x80014E50 | size: 0xf8 */
-#if 1
-asm void fn_80014E50(void) {
-#include "src/game/gs_event_exec_fn_80014E50.inc"
+#pragma push
+#pragma peephole off
+s32 fn_80014E50(u8* ctx) {
+    u8* p = *(u8**)(ctx + 0x60);
+    u8* state = fn_80105624();
+    s32 count;
+    s32 slot;
+    s32 new_slot;
+    u8* inner;
+
+    if ((*(volatile u16*)(state + 6) & 2) != 0) {
+        count = *(s32*)(p + 8);
+        slot  = (s32)(s8)ctx[0x95];
+        new_slot = slot + 1;
+        if (new_slot >= count) {
+            new_slot = count - 1;
+        }
+        inner = *(u8**)(p + 4);
+        if ((*(u16*)(inner + new_slot * 0xC + 8) & 1) != 0) {
+            new_slot++;
+            if (new_slot >= count) {
+                new_slot = slot;
+            }
+        }
+        ctx[0x95] = (s8)new_slot;
+    }
+    if ((*(volatile u16*)(state + 6) & 1) != 0) {
+        slot  = (s32)(s8)ctx[0x95];
+        new_slot = slot - 1;
+        if (new_slot < 0) {
+            new_slot = 0;
+        }
+        inner = *(u8**)(p + 4);
+        if ((*(u16*)(inner + new_slot * 0xC + 8) & 1) != 0) {
+            new_slot--;
+            if (new_slot < 0) {
+                new_slot = slot;
+            }
+        }
+        ctx[0x95] = (s8)new_slot;
+    }
+    return 0;
 }
-#else
-void fn_80014E50(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014F48 - 0x80014F48 | size: 0xd4 */
 extern f32 lbl_8047B748;
