@@ -643,11 +643,11 @@ LAB_80024c20:
     uVar7 = 0;
 LAB_80024c64:
     if (uVar7 < *(u32*)lbl_80478DD8) {
-        if (*(s32*)(lbl_80478DDC + uVar7 * 0x10 + 4) == 0x66 &&
-            (u8)fn_801902E0(0x45D) != 0) {
+        u8 *entry = (u8*)lbl_80478DDC + (uVar7 << 4);
+        if (*(s32*)(entry + 4) == 0x66 && (u8)fn_801902E0(0x45D) != 0) {
             *(u32*)(arg1 + 0x58) = 0x0C5F1200;
         } else {
-            *(u32*)(arg1 + 0x58) = *(u32*)(lbl_80478DDC + uVar7 * 0x10 + 0xC);
+            *(u32*)(arg1 + 0x58) = *(u32*)(entry + 0xC);
         }
     }
 }
