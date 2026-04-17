@@ -580,7 +580,7 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
 LAB_80024aec:
     switch ((s32)lbl_8047A370) {
     case 1:
-        arg1[0x67] = (u8)(s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
+        arg1[0x67] = (s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
         break;
     default:
         arg1[0x67] = 0xFF;
