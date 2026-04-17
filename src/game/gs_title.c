@@ -1636,7 +1636,7 @@ asm void fn_80025A80(void) {
 #include "src/game/gs_title_fn_80025A80.inc"
 }
 #else
-void fn_80025A80(void) {
+s32 fn_80025A80(s32 param_1) {
     extern u8 lbl_803A204C[];
     extern u32 lbl_8047A388;
     extern f32 lbl_8047A3A0;
@@ -1652,126 +1652,44 @@ void fn_80025A80(void) {
     extern f32 lbl_8047B8FC;
     extern f32 lbl_8047B904;
     extern f32 lbl_8047B908;
-    extern void fn_80025C1C();
-    extern void fn_800D9B58();
-    extern void fn_800D9ED8();
-    extern void fn_800DA028();
-    extern void fn_800DA100();
-    extern void fn_800DA1E8();
-    extern void fn_800DA2BC();
-    extern void fn_800DA4C4();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f5 = 0.0f;
+    extern void fn_80025C1C(f32, f32, f32, s32, s32, s32, f32*);
+    extern void fn_800D9B58(f32, f32, f32, f32);
+    extern void fn_800D9ED8(s32);
+    extern void fn_800DA028(s32);
+    extern void fn_800DA100(s32, s32, s32, s32, s32, s32);
+    extern void fn_800DA1E8(s32, s32, s32);
+    extern void fn_800DA2BC(s32, s32, s32);
+    extern void fn_800DA4C4(s32, s32, s32);
+    f32 local_18[3];
 
-    r31 = r3;
-    f1 = lbl_8047B8AC;
-    f3 = lbl_8047B8F8;
-    f2 = f1;
-    f4 = lbl_8047B8FC;
-    fn_800D9B58();
-    r3 = 0x1;
-    r4 = 0x6;
-    r5 = 0x7;
-    fn_800DA4C4();
-    r3 = 0x1;
-    r4 = 0x1;
-    r5 = 0x0;
-    fn_800DA2BC();
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x1;
-    fn_800DA1E8();
-    r3 = 0x0;
-    r4 = 0x7;
-    r5 = 0x0;
-    r6 = 0x1;
-    r7 = 0x7;
-    r8 = 0x0;
-    fn_800DA100();
-    r3 = 0x0;
-    fn_800DA028();
-    r3 = 0x1;
-    fn_800D9ED8();
-    f1 = lbl_8047B8F0;
-    r3 = r31;
-    f2 = lbl_8047B8F4;
-    r6 = (u32)sp + 0x8;
-    f0 = lbl_8047B8AC;
-    r4 = 0x1;
-    *(f32*)(sp + 0x8) = f1;
-    r5 = 0x0;
-    f1 = lbl_8047A3A0;
-    *(f32*)(sp + 0xC) = f2;
-    f2 = lbl_8047B8B0;
-    *(f32*)(sp + 0x10) = f0;
-    f3 = lbl_8047B904;
-    fn_80025C1C();
-    f2 = lbl_8047A3A0;
-    f1 = lbl_8047B908;
-    f0 = lbl_8047B8AC;
-    f1 = f2 - f1;
-    lbl_8047A3A0 = f1;
-    if (f1 < f0) {
-        lbl_8047A3A0 = f0;
-    }
-    r3 = (u32)lbl_803A204C;
-    f0 = lbl_8047B8AC;
-    r3 = (u32)lbl_803A204C;
-    f4 = lbl_8047B8E0;
-    f2 = *(f32*)((u8*)r3 + 0x0);
-    r6 = (u32)sp + 0x8;
-    f1 = *(f32*)((u8*)r3 + 0x4);
-    r4 = 0x1;
-    f3 = f4 + f2;
-    f5 = lbl_8047B8F8;
-    f1 = f4 + f1;
-    f2 = lbl_8047B8FC;
-    *(f32*)(sp + 0x10) = f0;
-    r5 = 0x1;
-    f3 = f5 - f3;
-    r3 = lbl_8047A388;
-    f0 = f2 - f1;
-    f1 = lbl_8047A3A4;
-    f2 = lbl_8047B8B0;
-    *(f32*)(sp + 0x8) = f3;
-    f3 = lbl_8047B8E4;
-    *(f32*)(sp + 0xC) = f0;
-    fn_80025C1C();
-    f2 = lbl_8047A3A4;
-    f1 = lbl_8047B8C8;
-    f0 = lbl_8047B8AC;
-    f1 = f2 - f1;
-    lbl_8047A3A4 = f1;
-    if (f1 < f0) {
-        lbl_8047A3A4 = f0;
-    }
-    f0 = lbl_8047A3A4;
-    f1 = lbl_8047B8AC;
-    /* cror eq, lt, eq */;
-    if (f0 == f1) {
-        f0 = lbl_8047A3A0;
-        /* cror eq, lt, eq */;
-        if (f0 == f1) {
-            r3 = 0x0;
-            return;
-    }
-    }
-    r3 = 0x1;
+    fn_800D9B58(lbl_8047B8AC, lbl_8047B8AC, lbl_8047B8F8, lbl_8047B8FC);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA1E8(0, 1, 1);
+    fn_800DA100(0, 7, 0, 1, 7, 0);
+    fn_800DA028(0);
+    fn_800D9ED8(1);
 
-    return;
+    local_18[0] = lbl_8047B8F0;
+    local_18[1] = lbl_8047B8F4;
+    local_18[2] = lbl_8047B8AC;
+    fn_80025C1C(lbl_8047A3A0, lbl_8047B8B0, lbl_8047B904, param_1, 1, 0, local_18);
+
+    lbl_8047A3A0 = lbl_8047A3A0 - lbl_8047B908;
+    if (lbl_8047A3A0 < lbl_8047B8AC) lbl_8047A3A0 = lbl_8047B8AC;
+
+    local_18[0] = lbl_8047B8F8 - (lbl_8047B8E0 + ((f32*)lbl_803A204C)[0]);
+    local_18[1] = lbl_8047B8FC - (lbl_8047B8E0 + ((f32*)lbl_803A204C)[1]);
+    local_18[2] = lbl_8047B8AC;
+    fn_80025C1C(lbl_8047A3A4, lbl_8047B8B0, lbl_8047B8E4, (s32)lbl_8047A388, 1, 1, local_18);
+
+    lbl_8047A3A4 = lbl_8047A3A4 - lbl_8047B8C8;
+    if (lbl_8047A3A4 < lbl_8047B8AC) lbl_8047A3A4 = lbl_8047B8AC;
+
+    if (lbl_8047A3A4 > lbl_8047B8AC || lbl_8047A3A0 > lbl_8047B8AC) {
+        return 1;
+    }
+    return 0;
 }
 #endif
 
