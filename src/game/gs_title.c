@@ -403,14 +403,14 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                     node = fn_8005D934(*(s16*)(node + 4));
                     count = 0;
                     while (1) {
-                        if ((((u32)node[0] >> 7) & 1) != 0) {
+                        if ((((u32)*(volatile u8*)node >> 7) & 1) != 0) {
                             if (table_index == count) {
                                 found = node;
                                 break;
                             }
                             count++;
                         }
-                        if ((((u32)node[0] >> 6) & 1) == 0) {
+                        if ((((u32)*(volatile u8*)node >> 6) & 1) == 0) {
                             node = fn_8005D934(*(s16*)(node + 0x18));
                         } else {
                             found = 0;
@@ -436,14 +436,14 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                     node = fn_8005D934(*(s16*)(node + 4));
                     count = 0;
                     while (1) {
-                        if ((((u32)node[0] >> 7) & 1) != 0) {
+                        if ((((u32)*(volatile u8*)node >> 7) & 1) != 0) {
                             if (table_index == count) {
                                 found = node;
                                 break;
                             }
                             count++;
                         }
-                        if ((((u32)node[0] >> 6) & 1) == 0) {
+                        if ((((u32)*(volatile u8*)node >> 6) & 1) == 0) {
                             node = fn_8005D934(*(s16*)(node + 0x18));
                         } else {
                             found = 0;
@@ -471,14 +471,14 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                 node = fn_8005D934(*(s16*)(node + 4));
                 count = 0;
                 while (1) {
-                    if ((((u32)node[0] >> 7) & 1) != 0) {
+                    if ((((u32)*(volatile u8*)node >> 7) & 1) != 0) {
                         if (table_index == count) {
                             found = node;
                             break;
                         }
                         count++;
                     }
-                    if ((((u32)node[0] >> 6) & 1) == 0) {
+                    if ((((u32)*(volatile u8*)node >> 6) & 1) == 0) {
                         node = fn_8005D934(*(s16*)(node + 0x18));
                     } else {
                         found = 0;
@@ -554,14 +554,14 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
     node = fn_8005D934(*(s16*)(node + 4));
     offset = 0;
     while (1) {
-        if ((((u32)node[0] >> 7) & 1) != 0) {
+        if ((((u32)*(volatile u8*)node >> 7) & 1) != 0) {
             if (index == offset) {
                 found = node;
                 break;
             }
             offset++;
         }
-        if ((((u32)node[0] >> 6) & 1) == 0) {
+        if ((((u32)*(volatile u8*)node >> 6) & 1) == 0) {
             node = fn_8005D934(*(s16*)(node + 0x18));
         } else {
             found = 0;
@@ -625,11 +625,11 @@ void fn_80024BA4(s32 arg0, u8* arg1) {
     pbVar3 = fn_8005D934(*(s16*)((u8*)fn_8005DA18(*(u32*)(arg0 + 4)) + 4));
     iVar2 = 0;
     while (1) {
-        if (((u32)*pbVar3 >> 7) & 1) {
+        if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
             if (iVar6 == iVar2) goto LAB_80024c20;
             iVar2 = iVar2 + 1;
         }
-        if (((u32)*pbVar3 >> 6) & 1) break;
+        if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
         pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
     }
     pbVar3 = (u8*)0;
@@ -752,11 +752,11 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
-                if (((u32)*pbVar3 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
                     if (uVar4 == uVar5) goto LAB_80024E94;
                     uVar5 = uVar5 + 1;
                 }
-                if (((u32)*pbVar3 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
                 pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
             }
             pbVar3 = (u8*)0;
@@ -823,11 +823,11 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
-                if (((u32)*pbVar3 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
                     if (uVar4 == uVar5) goto LAB_80025004;
                     uVar5 = uVar5 + 1;
                 }
-                if (((u32)*pbVar3 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
                 pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
             }
             pbVar3 = (u8*)0;
@@ -894,11 +894,11 @@ void fn_8002509C(s32 arg0, u8* arg1) {
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
-                if (((u32)*pbVar3 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
                     if (uVar4 == uVar5) goto LAB_80025174;
                     uVar5 = uVar5 + 1;
                 }
-                if (((u32)*pbVar3 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
                 pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
             }
             pbVar3 = (u8*)0;
@@ -965,11 +965,11 @@ void fn_8002520C(s32 arg0, u8* arg1) {
             pbVar3 = fn_8005D934(*(s16*)(iVar2 + 4));
             uVar5 = 0;
             while (1) {
-                if (((u32)*pbVar3 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
                     if (uVar4 == uVar5) goto LAB_800252E4;
                     uVar5 = uVar5 + 1;
                 }
-                if (((u32)*pbVar3 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
                 pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
             }
             pbVar3 = (u8*)0;
@@ -1028,11 +1028,11 @@ void fn_8002537C(s32 arg0, u8* arg1) {
             pbVar2 = fn_8005D934(*(s16*)(iVar1 + 4));
             uVar4 = 0;
             while (1) {
-                if (((u32)*pbVar2 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar2 >> 7) & 1) {
                     if (uVar3 == uVar4) goto LAB_80025450;
                     uVar4 = uVar4 + 1;
                 }
-                if (((u32)*pbVar2 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar2 >> 6) & 1) break;
                 pbVar2 = fn_8005D934(*(s16*)(pbVar2 + 0x18));
             }
             pbVar2 = (u8*)0;
@@ -1090,11 +1090,11 @@ void fn_80025490(s32 arg0, u8* arg1) {
             pbVar2 = fn_8005D934(*(s16*)(iVar1 + 4));
             uVar4 = 0;
             while (1) {
-                if (((u32)*pbVar2 >> 7) & 1) {
+                if (((u32)*(volatile u8*)pbVar2 >> 7) & 1) {
                     if (uVar3 == uVar4) goto LAB_80025564;
                     uVar4 = uVar4 + 1;
                 }
-                if (((u32)*pbVar2 >> 6) & 1) break;
+                if (((u32)*(volatile u8*)pbVar2 >> 6) & 1) break;
                 pbVar2 = fn_8005D934(*(s16*)(pbVar2 + 0x18));
             }
             pbVar2 = (u8*)0;
