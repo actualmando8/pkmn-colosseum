@@ -397,7 +397,31 @@ void fn_800246CC(void) {
 }
 #endif
 
-/* 0x800246FC | 0x330 */
+/* 0x800246FC | 0x330
+ *
+ * fn_800246FC -- XD analogue: menuTitle (the top-level 0x330 driver).
+ *
+ * Walks an array of menu slot records at lbl_80478DE4 (count in lbl_80478DE0,
+ * stride 0x28). For each slot whose condition passes (slot entry == 0 OR
+ * fn_801902E0(entry) returns non-zero), it performs three passes of the
+ * linked-list walk + lookup table scan:
+ *   case 1/subcase 1 (lbl_8047A370 == 1 && lbl_80478898 > lbl_8047B8D8):
+ *       uses lbl_8047A368 as target index; alpha = lbl_8047B8DC * ((t-b)/b)
+ *   case 1/subcase 2 (lbl_8047A370 == 1 && lbl_80478898 <= lbl_8047B8D8):
+ *       uses lbl_8047A36C as target index; alpha = lbl_8047B8DC * ((b-t)/b)
+ *   default (lbl_8047A370 != 1):
+ *       uses lbl_8047A368; alpha = 0xFF (fully opaque)
+ * After matching, writes alpha to arg1[0x67] and invokes fn_80132A38(0x37,..)
+ * with a value pulled from lbl_80478DE4 indexed by lbl_802E4F58[table_index].
+ *
+ * The three inner blocks are deliberate duplicates (not a helper) -- matches
+ * target asm exactly via goto LAB_XXX pattern (not break), which emits the
+ * bne+b branch pair CW uses when the loop has a jump-table-style exit.
+ *
+ * Status: 91.6% matched. Remaining diffs: 7 non-volatile reg allocation
+ * (uses r25-r31 vs target r27-r31 - we have 2 extra locals) + one extra
+ * clrlwi from the (u8)fn_801902E0 cast on ret.
+ */
 extern void* fn_8005DA18(s32);
 extern void* fn_8005D934(u32);
 extern u32 lbl_80478DE4;
@@ -566,7 +590,19 @@ void fn_800246FC(u8* arg0, u8* arg1) {
 }
 #endif
 
-/* 0x80024A2C | 0x178 */
+/* 0x80024A2C | 0x178
+ *
+ * fn_80024A2C -- simplified version of fn_800246FC (one inner block only).
+ * Walks the linked list to find the node whose counter-position matches
+ * lbl_8047A368, then scans lbl_80478DDC[] for a matching pbVar3 and writes
+ * either alpha computed via the fade curve OR 0xFF into arg1[0x67]. If the
+ * table lookup succeeds, writes the corresponding entry value to arg1[0x58]
+ * (special-cased to 0xC5F1200 when the entry id is 0x66 and fn_801902E0(0x45D)
+ * returns non-zero - likely an "override" for a specific menu option).
+ *
+ * Status: 90.7% matched. Remaining diffs: register allocation swap
+ * (lbl_8047A368 -> r28 vs target r30) + bne+b vs beq pattern.
+ */
 extern u32 lbl_8047A368;
 extern u32 lbl_80478DDC;
 extern u32 lbl_80478DD8;
@@ -641,7 +677,19 @@ LAB_80024aec:
 }
 #endif
 
-/* 0x80024BA4 | 0x138 */
+/* 0x80024BA4 | 0x138
+ *
+ * fn_80024BA4 -- same linked-list walk as fn_80024A2C, but without the alpha
+ * computation. Just finds the menu item matching lbl_8047A36C and writes the
+ * entry payload to arg1[0x58] (with the 0x66 + fn_801902E0(0x45D) override).
+ *
+ * Likely corresponds to a menu cursor hover-highlight update:
+ *   arg0 = menu context, arg1 = cursor/sprite target receiving the entry
+ *
+ * Status: 85.8% matched. Remaining diffs: pbVar3 saved to r29 non-volatile
+ * (target keeps it in r3 volatile via call-return chaining - CW-scheduler
+ * quirk we cannot force from source).
+ */
 extern u32 lbl_8047A36C;
 extern u32 lbl_80478DDC;
 extern u32 lbl_80478DD8;
@@ -696,7 +744,23 @@ LAB_80024c64:
 }
 #endif
 
-/* 0x80024CDC | 0xE0 */
+/* 0x80024CDC | 0xE0
+ *
+ * fn_80024CDC -- XD analogue: menuTitleCursorAnime (0xDC, close size match).
+ * Animates a pulsing cursor/icon by:
+ *   1. Copying position from lbl_8047A390 (cursor source) plus 8px offset
+ *      into arg1[0x50]/arg1[0x52] (dst x/y, only when lbl_8047A390 set).
+ *   2. Computing iVar4 = speed * tickCounter + currentAlpha.
+ *   3. Clamping iVar4 to [0x40, 0xFF] and flipping lbl_8047A37C (speed)
+ *      sign when hitting either rail - classic ping-pong animation.
+ *   4. Writing clamped alpha back to arg1[0x67].
+ *
+ * Status: 99.3% matched. Remaining diffs: 8 register-allocation choices
+ * (target reuses r31 across bVar1 to iVar4 lifetime, we use r0 for iVar4)
+ * plus 2 anonymous @NNN@sda21 constants (target binds to named lbl_8047B8D0
+ * / lbl_8047B8B8). Both are deep CW internal heuristics; source-level
+ * tricks cannot force them.
+ */
 extern u32 fn_800D3088(void);
 extern u32 lbl_8047A390;
 extern f64 lbl_8047B8D0;
@@ -738,7 +802,24 @@ void fn_80024CDC(s32 arg0, u8* arg1) {
 }
 #endif
 
-/* 0x80024DBC | 0x170 */
+/* 0x80024DBC | 0x170
+ *
+ * fn_80024DBC -- one of four "twin" functions. Fade-aware position writer.
+ *   - case 1 (lbl_8047A370 == 1): call fn_800E0CA0(fade_amt) + fn_800E090C
+ *     to interpolate a float-pair position into local_48[0..1]; convert to int.
+ *   - default: linked-list walk to find the menu item at lbl_8047A368,
+ *     pull its x (pbVar3+2) and y (pbVar3+4) shorts.
+ * Then writes (s16)(base_x + float(x) + offset) to arg1[0x50]/[0x52].
+ *
+ * The four twin functions differ only in the sign applied to each axis:
+ *   fn_80024DBC: +x +y
+ *   fn_80024F2C: +x -y
+ *   fn_8002509C: -x +y
+ *   fn_8002520C: -x -y
+ *
+ * Status: 96.6% matched. Remaining diffs: @NNN@sda21 anonymous f64 bias
+ * constants vs target lbl_8047B8B8@sda21 named refs.
+ */
 extern f32 fn_800E0CA0(f32);
 extern void fn_800E090C(void*, void*, void*, f32);
 extern u32 lbl_8047A370;
@@ -815,7 +896,14 @@ LAB_80024E94:
 }
 #endif
 
-/* 0x80024F2C | 0x170 */
+/* 0x80024F2C | 0x170
+ *
+ * fn_80024F2C -- twin of fn_80024DBC, using +offset on x and -offset on y.
+ * Same structure: case-1 calls fn_800E090C to interpolate, default walks list.
+ * See fn_80024DBC doc for full semantics.
+ *
+ * Status: 94.9% matched. Same SDA2 anonymous-constant blocker.
+ */
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
@@ -885,7 +973,13 @@ LAB_80025004:
 }
 #endif
 
-/* 0x8002509C | 0x170 */
+/* 0x8002509C | 0x170
+ *
+ * fn_8002509C -- twin of fn_80024DBC. Uses -offset on x, +offset on y.
+ * See fn_80024DBC doc.
+ *
+ * Status: 92.4% matched. Same SDA2 anonymous-constant blocker.
+ */
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
@@ -955,7 +1049,13 @@ LAB_80025174:
 }
 #endif
 
-/* 0x8002520C | 0x170 */
+/* 0x8002520C | 0x170
+ *
+ * fn_8002520C -- twin of fn_80024DBC. Uses -offset on BOTH x and y.
+ * See fn_80024DBC doc.
+ *
+ * Status: 90.5% matched. Same SDA2 anonymous-constant blocker.
+ */
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
@@ -1025,7 +1125,19 @@ LAB_800252E4:
 }
 #endif
 
-/* 0x8002537C | 0x114 */
+/* 0x8002537C | 0x114
+ *
+ * fn_8002537C -- single-axis position writer. Writes (s16)(x + 0xf) to
+ * arg1[0x50] and 0 to arg1[0x52]. Only returns an X coord; Y is always 0,
+ * meaning this is likely for horizontal-slider cursors.
+ *
+ * case 1: fn_800E090C returns a pair, use local_28[0] (x)
+ * default: linked-list walk, read pbVar2[2] (the x short of a menu item)
+ *
+ * Status: 98.4% matched. Remaining 2 diffs: bne+b vs beq pattern in the
+ * counter-match check. CW 1.3 optimizer collapses explicit goto-pair
+ * source back into beq.
+ */
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
@@ -1087,7 +1199,16 @@ LAB_80025450:
 }
 #endif
 
-/* 0x80025490 | 0x114 */
+/* 0x80025490 | 0x114
+ *
+ * fn_80025490 -- exact twin of fn_8002537C but returns the Y coord (into
+ * arg1[0x52]) with X always 0. Same code structure.
+ *
+ * case 1: use local_24[1] (local_24[0+4] offset)
+ * default: read pbVar2[4] (y short, 2 bytes after x at pbVar2[2])
+ *
+ * Status: 98.4% matched. Same bne+b vs beq CW arcana.
+ */
 extern u32 lbl_8047A370;
 extern f32 lbl_80478898;
 extern u32 lbl_80478DD8;
@@ -1149,7 +1270,30 @@ LAB_80025564:
 }
 #endif
 
-/* 0x800255A4 | 0x18C */
+/* 0x800255A4 | 0x18C
+ *
+ * fn_800255A4 -- title-screen audio/timing update driven by lbl_8047A384.
+ *   IF title active (lbl_8047A384 != 0):
+ *     fn_801C41C8(lbl_8047B8E4, 3)     -- set BGM volume fade target
+ *     fn_801657F8(0x449, 0)            -- play SE cue
+ *     while (accumulator < limit) {    -- time-based integration loop
+ *       fn_800F0308();                 -- frame advance
+ *       accumulator += (f32)fn_800D3088() / (f32)(s32)fn_800D37CC();
+ *     }
+ *     fn_801653C4(); fn_801656F8(0x7d0, 0)
+ *   ELSE:
+ *     fn_801C41C8(lbl_8047B8E8, 3)     -- different fade curve
+ *     fn_801653C4(); fn_801656F8(0x1f4, 0)
+ *   Check sound channels 0xbd and 0xc3; stop them if still active.
+ *   If lbl_8047A388/38C particle handles set, free them via fn_800EF5A4.
+ *
+ * fn_800D37CC returns s32 (signed ticks; negative if paused).
+ * fn_800D3088 returns u32 (absolute frame count).
+ *
+ * Status: 92.9% matched. Remaining diffs are FP register-allocator
+ * choices (we allocate f28-f31, target uses f27-f31 - target hoists
+ * one extra bias we cannot easily force).
+ */
 extern void fn_801C41C8(f32, s32);
 extern void fn_801657F8(void);
 extern void fn_800D37CC(void);
@@ -1584,7 +1728,25 @@ asm void fn_80025A7C(void) {
 void fn_80025A7C(void) { }
 #endif
 
-/* 0x80025A80 | 0x19C */
+/* 0x80025A80 | 0x19C
+ *
+ * fn_80025A80(s32 param_1) -> s32 -- cursor quad rendering + decay.
+ *   1. Set up GX state (fn_800D9B58/A4C4/A2BC/A1E8/A100/A028/9ED8) for
+ *      blended additive rendering with channel configuration.
+ *   2. Call fn_80025C1C twice to draw two blended quads:
+ *        first at the cursor current position using lbl_8047A3A0 (x scale)
+ *        second at offset from lbl_803A204C[0,1] using lbl_8047A3A4 (y scale)
+ *   3. Decay both scales:
+ *        lbl_8047A3A0 -= lbl_8047B908; clamp >= 0
+ *        lbl_8047A3A4 -= lbl_8047B8C8; clamp >= 0
+ *   4. Return 1 if either scale is still > 0 (quad still visible), else 0.
+ *
+ * Used by fn_800DC390 as a particle callback; re-registered until it
+ * returns 0 (fully faded).
+ *
+ * Status: 90.6% matched. Remaining diffs: FP register swaps in the
+ * call-arg plumbing between fn_80025C1C calls.
+ */
 extern void fn_800D9B58(void);
 extern void fn_800DA4C4(void);
 extern void fn_800DA2BC(void);
@@ -1669,7 +1831,34 @@ s32 fn_80025A80(s32 param_1) {
 }
 #endif
 
-/* 0x80025C1C | 0x358 */
+/* 0x80025C1C | 0x358
+ *
+ * fn_80025C1C(f32 rot, f32 size, f32 uv_ext, s32 tex, s32 flag_a,
+ *             s32 flag_b, f32 *pos)  -- GX quad render primitive.
+ *
+ *   1. Build two vec3s (vec_a, vec_b) based on flag_a (1 = symmetric scale,
+ *      else diagonal). Call fn_800E0CA0(rot) + fn_800E090C to combine them
+ *      into a rotated offset vector at result_1.
+ *   2. Multiply result_1.x by lbl_8047B8DC (alpha) and store as scaled.
+ *   3. Build second vec3 pair based on flag_b, call fn_800E0CA0+090C again,
+ *      feed through fn_800E042C to get transformed coords into result_2.
+ *   4. Third set: combine pos[0], pos[1] with lbl_8047B8F0/F4 UV corners,
+ *      via fn_800E0CA0+090C+fn_800E03B4 for the inverse transform.
+ *   5. Set GX render state (TEV stage 3, prim TRIANGLE_FAN count 4):
+ *        fn_800D88DC(3), fn_800D888C(4), fn_800D6A00(4),
+ *        fn_800D7820(lbl_80314AE8), fn_800D85D4(0, tex), fn_800D67BC(4)
+ *   6. Emit 4 vertices forming a textured quad. Each vertex:
+ *        fn_800DFF98(vert_out, result_2, uv_corner)  -- compute position
+ *        fn_800D6680(vert.x, vert.y, vert.z)         -- write pos
+ *        fn_800D5CB8(0, 0xff, 0xff, 0xff, scaled)    -- RGBA color
+ *        fn_800D59B8(0, u, v)                        -- UV
+ *      4 UV corners: (0,0) (1,0) (0,1) (1,1) via lbl_8047B8AC/B8B0.
+ *   7. fn_800D6728() to flush the primitive.
+ *
+ * Status: 94.8% matched. Remaining diffs are FP register allocation inside
+ * the vertex emission loop (4 similar call chains get slightly different
+ * register assignments per iteration).
+ */
 extern void fn_800E042C(void);
 extern void fn_800E03B4(void);
 extern void fn_800D88DC(void);
@@ -1806,7 +1995,32 @@ s32 fn_80025F74(void) {
 }
 #endif
 
-/* 0x80025F84 | 0x3EC */
+/* 0x80025F84 | 0x3EC
+ *
+ * fn_80025F84 -- title splash setup (called once when title first shown).
+ *   1. Activate 3 sprite handles 0xC6A1000/1001/1002 (fn_801CB954 activate=1).
+ *   2. Pick an intro texture based on fn_801902E0(0x3E5):
+ *        ret == 1: use 0xC6B1000 variant
+ *        else:     use 0xC6C1000 variant
+ *      Load it via fn_801CBA0C + fn_801CB954(activate=0).
+ *   3. Set up TEV/sprite chain via fn_80113F48 + fn_800F9318 composition:
+ *        fn_800E3C94, fn_800E9108(2), fn_800E8FE8, fn_800E900C(1, &obj_c),
+ *        fn_800E8FA0(0x280, 0x1E0)  -- viewport 640x480
+ *        fn_800E3C08, fn_800E3C00(4)
+ *      Activates tex handle, binds 0xC6A1000 slot 0, pushes animation.
+ *      Stores handle in lbl_8047A384 (title active flag).
+ *   4. Per lbl_8047A380 (debug flag?), pick one of two frame-sequence tables
+ *      (lbl_80478DEC + idx*0x10), read 2 u32s, advance index (wrap > 9).
+ *   5. Reset cursor scales: lbl_8047A3A4 = lbl_8047A3A0 = lbl_8047B8A8 (0).
+ *   6. Register fn_80025A80 as a particle callback (fn_800DC390).
+ *   7. Start BGM via fn_80176E0C, then run two timing delay loops
+ *      (fn_800F0308 + fn_800D3088 accumulator vs 1 or 0xAE target).
+ *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
+ *      fade-in loop using fn_800C46B0 for FP-to-int conversion.
+ *
+ * Status: 96.1% matched. Remaining diffs: register allocation inside the
+ * texture-select if/else (uses r28 for tex, target uses r29+r30 pair).
+ */
 extern void fn_801CBA0C(void);
 extern void fn_80113F48(void);
 extern void fn_800F9318(void);
@@ -2731,7 +2945,30 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
 }
 #endif
 
-/* fn_80022720 - 0x80022720 | size: 0x114 */
+/* fn_80022720 - 0x80022720 | size: 0x114
+ *
+ * fn_80022720(u32 arg0, u32* arg1) -> s32  -- error-report dispatcher for
+ * name-entry validation. Loads a 10-entry u16+u32 table starting at
+ * lbl_80266C54 (each entry: 2-byte id, 2-byte pad, 4-byte msg id), then
+ * sequentially compares arg0 against the 5 header u16s (offsets 0, 8, 16,
+ * 24, 32) to find a matching row index. If no match, defaults to row 5
+ * (the generic error).
+ *
+ * Source form uses Ghidra comma-chain idiom so iVar1 increments per
+ * failed compare:
+ *   iVar1 = 0;
+ *   if (!(a != h0 && (iVar1=1, a != h1) && (iVar1=2, a != h2) && ...))
+ *     iVar1 = 5;
+ *
+ * Calls fn_80106D3C(2, msg_from_row_iVar1, 1, 0) then fn_801069FC(1) to
+ * print the error message, writes 0 to *arg1, returns 0.
+ *
+ * Status: 70.5% matched. Blocker: target asm batches ALL 10 lwz loads
+ * first THEN ALL stw stores; our CW compile interleaves load-store-load-
+ * store. This is CW 1.3 scheduler behavior we have not been able to
+ * force from source (tried u32* src, temp-var pair hoist, array init
+ * syntax, scheduling pragmas).
+ */
 extern u8 lbl_80266C54[];
 extern void fn_80023068(void);
 extern void fn_800232F0(void);
