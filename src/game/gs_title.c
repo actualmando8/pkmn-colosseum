@@ -674,7 +674,8 @@ asm void fn_80024CDC(void) {
 }
 #else
 #pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
+#pragma fp_contract on
 void fn_80024CDC(s32 r3, u8* r4) {
     u8* r30;
     s32 r31;
@@ -690,7 +691,7 @@ void fn_80024CDC(s32 r3, u8* r4) {
     r31 = *(u8*)(r30 + 0x67);
     r3 = fn_800D3088();
     f3 = lbl_8047A37C;
-    f0 = (f32)((f64)r31 + f3 * (f64)r3);
+    f0 = f3 * (f32)(u32)r3 + (f32)r31;
     r31 = (s32)f0;
 
     if (r31 < 0x40) {
