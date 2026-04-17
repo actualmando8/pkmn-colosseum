@@ -3419,6 +3419,7 @@ asm void fn_80022720(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_80022720(u32 r3, u32* r4) {
     u32* r31;
     u8* r30;
@@ -3441,6 +3442,7 @@ void fn_80022720(u32 r3, u32* r4) {
     fn_801069FC(1);
     *r31 = 0;
 }
+#pragma scheduling on
 #endif
 
 /* fn_80022834 - 0x80022834 | size: 0x308 */
