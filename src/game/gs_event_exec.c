@@ -348,13 +348,48 @@ s32 fn_800141BC(s32 arg0, s32 arg1) {
 
 /* fn_80014234 - 0x80014234 | size: 0xe8 */
 extern u8 lbl_80266B58[];
-#if 1
-asm void fn_80014234(void) {
-#include "src/game/gs_event_exec_fn_80014234.inc"
+
+typedef struct {
+    s32 key;
+    u8* inner;
+    s32 count;
+} EvTbl;
+
+typedef struct {
+    s32 _0;
+    s32 species_a;
+    s32 species_b;
+} EvEntry;
+
+#pragma push
+#pragma peephole off
+s32 fn_80014234(u8* ctx, u8* tgt) {
+    EvTbl* tbl = (EvTbl*)lbl_80266B58;
+    u8* p      = *(u8**)(ctx + 0x60);
+    s32 key    = *(s32*)(p + 4);
+    s32 idx    = 0;
+    s32 slot;
+    s32 species;
+    EvEntry* e;
+
+    if ((((key != tbl[0].key) && (idx = 1, key != tbl[1].key)) &&
+         (idx = 2, key != tbl[2].key)) &&
+        (idx = 3, key != tbl[3].key)) {
+        idx = 4;
+    }
+    if (idx >= 4) return 0;
+    slot = (s32)(s8)ctx[0x95];
+    if (slot < 0 || slot >= ((EvTbl*)lbl_80266B58)[idx].count) return 0;
+    e = &((EvEntry*)((EvTbl*)lbl_80266B58)[idx].inner)[slot];
+    species = *(s16*)(tgt + 0x6);
+    if (e->species_a == species || e->species_b == species) {
+        tgt[0x67] = 0xFF;
+    } else {
+        tgt[0x67] = 0;
+    }
+    return 0;
 }
-#else
-void fn_80014234(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_8001431C - 0x8001431C | size: 0x7c */
 extern u32 lbl_8047A2FC;
