@@ -395,7 +395,8 @@ void fn_800246FC(u8* arg0, u8* arg1) {
     while (slot < *(u32*)lbl_80478DE0) {
         if (*(u32*)(lbl_80478DE4 + slot_offset) == 0 ||
             (u8)fn_801902E0((void*)*(u32*)(lbl_80478DE4 + slot_offset)) != 0) {
-            if ((s32)lbl_8047A370 == 1) {
+            switch ((s32)lbl_8047A370) {
+            case 1:
                 if (lbl_80478898 > lbl_8047B8D8) {
                     table_index = lbl_8047A368;
                     node = fn_8005DA18(*(u32*)(arg0 + 4));
@@ -463,7 +464,8 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                     }
                     alpha = (u32)(s32)(lbl_8047B8DC * ((lbl_8047B8D8 - lbl_80478898) / lbl_8047B8D8));
                 }
-            } else {
+                break;
+            default:
                 table_index = lbl_8047A368;
                 node = fn_8005DA18(*(u32*)(arg0 + 4));
                 node = fn_8005D934(*(s16*)(node + 4));
@@ -496,6 +498,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
                     table_index = 0;
                 }
                 alpha = 0xFF;
+                break;
             }
 
             arg1[0x67] = (u8)alpha;
