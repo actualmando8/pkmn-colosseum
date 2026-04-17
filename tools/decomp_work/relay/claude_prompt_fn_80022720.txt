@@ -1,0 +1,22 @@
+Fix fn_80022720 (0x114 bytes, currently 10.1% match, C-active #if 0 block in src/game/gs_title.c). Per file header, this is "GStitle_CameraFlythrough".
+
+Task:
+1. Read the current C for fn_80022720 in src/game/gs_title.c (grep "fn_80022720 - 0x" to locate)
+2. Extract target asm: `python3 tools/_extract_asm.py fn_80022720` (or save to tools/decomp_work/relay/fn_80022720_asm.s)
+3. Identify what's wrong
+4. Produce corrected C
+
+Known patterns in this file:
+- Matched functions use `#pragma scheduling on` + `#pragma optimization_level 4`
+- Slot-lock pattern: s32 slot=fn_800141BC(arg, 1); fn_80014118(slot, &sc, &sd); work; fn_80014198(slot); see fn_80022EE4 at ~line 3856 for reference
+- For fn_80144574, use a LOCAL extern with s32 return (not s16) to prevent extsh fold: `extern s32 fn_80144574(void*, s32, s32, u16, s32);`
+- For fn_800216E8, use LOCAL extern: `extern void fn_800216E8(void*, s32, void*, s32, s32);` (file-level asm proto is void)
+- Byte access: `*(s8*)(ptr + N) | 2` style, not `ptr[N] | 2`
+- Avoid redundant r31 aliasing in the C body — pass args directly
+
+Write final C + rationale to tools/decomp_work/relay/claude_fn_80022720_final.md with sections:
+- Final C (ready to paste)
+- What changed from the current attempt
+- Expected match risk (high/medium/low)
+
+Keep under 150 lines. Be specific.
