@@ -3468,91 +3468,109 @@ asm void fn_80022834(void) {
 #include "src/game/gs_title_fn_80022834.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 s32 fn_80022834(u32 arg0, u32* arg1) {
+    extern void* fn_801440A0(u32);
+    extern u32 fn_80143F24(void*);
+    extern u32 fn_80143EF0(u32);
+    extern u32 fn_80143E88(void*);
+    extern s32 fn_8001E074(s32, s32, s32, s32);
+    extern u32 fn_8011F228(s32, u32);
+    extern void fn_8011F5C8(s32);
+    extern s32 fn_8011E778(void);
+    extern u8 fn_8011E2AC(s32, s32);
+    extern s32 fn_802600E4(s32, u32, void*, s32, void*, s32);
+    extern void fn_80123D58(s32, u32, u32);
+    extern u32 fn_80123090(s32);
+    extern void fn_80122370(s32, u32, s32);
+
+    void* handle;
+    u8 status;
+    u32 value16;
+    s32 type_byte;
+    s32 msg;
+    s32 state;
+    s32 action;
     s32 slot;
     s32 sc;
     s32 sd;
-    void* handle;
-    u32 status;
-    u32 value16;
-    s32 state;
+    s32 effect;
     s32 i;
-    s32 result;
-    u8 type_byte;
+    u8 buf;
 
-    handle = ((void* (*)(u32))fn_801440A0)((u16)arg0);
-    status = (u8)((u32 (*)(void*))fn_80143F24)(handle);
-    value16 = (u16)((u32 (*)(u32))fn_80143EF0)(status);
-
-    ((void (*)(u32, u32, u32, u32))fn_80166A50)(0x4CB, 0, 0xFF, 0);
-    type_byte = (u8)((u32 (*)(void*))fn_80143E88)(handle);
-    if (type_byte != 0xFF) {
-        result = 0x4260;
+    handle = fn_801440A0((u16)arg0);
+    status = (u8)fn_80143F24(handle);
+    value16 = (u16)fn_80143EF0(status);
+    fn_80166A50(0x4CB, 0, 0xFF, 0);
+    type_byte = fn_80143E88(handle);
+    if ((u8)type_byte != 0xFF) {
+        msg = 0x4260;
     } else {
-        result = 0x4265;
+        msg = 0x4265;
     }
-
-    fn_80132A38(0x39, (void*)(u16)value16);
-    fn_80106D3C(2, result, 1, 0);
+    fn_80132A38(0x39, (void*)value16);
+    fn_80106D3C(2, msg, 1, 0);
     fn_801069FC(1);
     fn_80106D3C(2, 0x426B, 1, 0);
-
     state = (s8)fn_8001E074(0, -1, -1, 0);
     fn_801069FC(1);
-    if (state == 0 || state == 1) {
+    switch (state) {
+    case 0:  action = 0; break;
+    case 1:  action = 1; break;
+    default: action = 2; break;
+    }
+    if (action == 1 || action == 2) {
         return 1;
     }
 
     slot = fn_800141BC((void*)arg0, 1);
     if (slot >= 0) {
         fn_80014118(slot, &sc, &sd);
-        if ((u8)((u32 (*)(u32))fn_8011FC74)(sc) != 0) {
+        if (fn_8011FC74(sc) != 0) {
             fn_80106D3C(2, 0x424C, 1, 0);
             fn_801069FC(1);
-            result = 0;
+            effect = 0;
         } else {
-            value16 = (u16)((u32 (*)(u32))fn_80143EF0)(status);
+            value16 = fn_80143EF0(status);
             for (i = 0; i < 4; i++) {
-                if (value16 == (u16)((u32 (*)(u32, u32))fn_8011F228)(sc, (u16)i)) {
+                if ((u16)value16 == (u16)fn_8011F228(sc, (u16)i)) {
                     break;
                 }
             }
             if (i < 4) {
-                fn_80132A38(0x32, (void*)((u32 (*)(u32))fn_8011F4F0)(sc));
+                fn_80132A38(0x32, fn_8011F4F0(sc));
                 fn_80132A38(0x39, (void*)(u16)value16);
                 fn_80106D3C(2, 0x4244, 1, 0);
                 fn_801069FC(1);
-                result = 0;
+                effect = 0;
             } else {
-                ((void (*)(u32))fn_8011F5C8)(sc);
-                ((void (*)(void))fn_8011E778)();
-                if ((u8)((u32 (*)(u32, u32))fn_8011E2AC)(status, sc) == 0) {
-                    fn_80132A38(0x32, (void*)((u32 (*)(u32))fn_8011F4F0)(sc));
+                fn_8011F5C8(sc);
+                if (fn_8011E2AC(fn_8011E778(), status) == 0) {
+                    fn_80132A38(0x32, fn_8011F4F0(sc));
                     fn_80132A38(0x39, (void*)(u16)value16);
                     fn_80106D3C(2, 0x423F, 1, 0);
                     fn_801069FC(1);
-                    result = 0;
+                    effect = 0;
                 } else {
-                    result = ((s32 (*)(u32, u32, void*, u32, void*, u32))fn_802600E4)(sc, (u16)value16, &type_byte, 1, fn_80023274, 0);
-                    if (result != 0) {
-                        ((void (*)(u32, u32, u8))fn_80123D58)(sc, (u16)value16, type_byte);
-                        ((void (*)(u32))fn_80123090)(sc);
-                        ((void (*)(u32, u32, u32))fn_80122370)(sc, ((u32 (*)(u32))fn_80123090)(sc), 4);
+                    effect = fn_802600E4(sc, value16, &buf, 1, fn_80023274, 0);
+                    if (effect != 0) {
+                        fn_80123D58(sc, buf, (u16)value16);
+                        fn_80122370(sc, fn_80123090(sc), 4);
                     }
                 }
             }
         }
     } else {
-        result = 0;
+        effect = 0;
     }
 
     fn_80014198(slot);
-    if (slot >= 0 && result != 0) {
-        if (type_byte != 0xFF) {
-            *arg1 = 0;
-        } else {
+    if (slot >= 0 && effect != 0) {
+        if ((u8)type_byte == 0xFF) {
             *arg1 = 1;
+        } else {
+            *arg1 = 0;
         }
         return 0;
     }

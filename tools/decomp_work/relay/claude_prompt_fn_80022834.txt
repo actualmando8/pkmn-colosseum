@@ -1,0 +1,20 @@
+Decompile fn_80022834 (0x308 bytes, currently asm-active #if 1 in src/game/gs_title.c, CW 1.3 -O4,p).
+
+This is likely a slot-lock pattern function (based on size and location between matched fn_80022720 and fn_80022B3C). Asm at tools/decomp_work/relay/fn_80022834_asm.s.
+
+Reference matched pattern: fn_80022EE4 at line ~3840 (in src/game/gs_title.c) uses:
+- `#pragma scheduling on` + `#pragma optimization_level 4`
+- `extern s32 fn_80144574(void*, s32, s32, u16, s32);` LOCAL extern to prevent extsh fold
+- Signature `s32 fn(u32 arg0, u32* arg1);`
+- slot = fn_800141BC((void*)arg0, 1); fn_80014118(slot, &sc, &sd); ... fn_80014198(slot); success sets *arg1=1, returns 0; else returns 1
+
+Also sibling fn_80022478 (line ~3335, already has C but in #if 1 asm-active) shows the exact shape — read that for reference structure.
+
+Note the existing #else body for fn_80022834 already has a C attempt — read it, that's the starting point. Problems likely include: function-pointer casts `((void* (*)(u32))fn_X)` that perturb scheduling; missing local externs.
+
+Write to tools/decomp_work/relay/claude_fn_80022834_final.md:
+- Final C body (ready to paste into #else, with flip #if 1 → #if 0)
+- Which forward declarations need updating (grep for `extern void fn_80022834` in the file)
+- Expected match risk
+
+Under 200 lines. Be specific.

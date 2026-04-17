@@ -1,0 +1,19 @@
+Fix fn_800259B0 (0xcc bytes, currently 31.4% match, C-active #if 0 in src/game/gs_title.c, CW 1.3 -O4,p).
+
+This is an init function that writes many SDA labels. Asm at tools/decomp_work/relay/fn_800259B0_asm.s.
+
+Read:
+1. Current C (grep "asm void fn_800259B0" in src/game/gs_title.c) — likely has pseudo-register style
+2. Target asm
+
+Produce rewritten C. Known patterns for this file:
+- #pragma optimization_level 4 + try #pragma scheduling off first
+- Direct typed writes like `lbl_8047A368 = 0; lbl_8047A36C = 0; lbl_80478898 = lbl_8047B8A8;`
+- For array writes (stfs f2, 0x0(r6) / 0x4(r6) / 0x8(r6) to lbl_803A2058): `*(f32*)(&lbl_803A2058[0]) = v; *(f32*)(&lbl_803A2058[4]) = v;` or use typed array access
+
+Write to tools/decomp_work/relay/codex_fn_800259B0_result.md:
+- Final C body
+- What was wrong
+- Required pragmas
+
+Keep under 150 lines.
