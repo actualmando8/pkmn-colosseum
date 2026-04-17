@@ -1990,10 +1990,11 @@ void fn_80025F84(void) {
     fn_801CB954(0xC6A1002, 1);
     if (fn_801902E0(0x3e5) == 1) {
         tex = fn_801CBA0C(0xC6B1000);
+        fn_801CB954(tex, 0);
     } else {
         tex = fn_801CBA0C(0xC6C1000);
+        fn_801CB954(tex, 0);
     }
-    fn_801CB954(tex, 0);
 
     obj_a = fn_800F9318(fn_80113F48(), tex);
     fn_800E3C94(obj_a, 0);
