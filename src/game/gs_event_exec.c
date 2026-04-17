@@ -135,7 +135,7 @@ u32 fn_80014110(void) {
 
 /* fn_800129A8 - 0x800129A8 | size: 0x1ec */
 extern void fn_801040A0(void);
-extern void fn_80103FFC(void);
+extern void* fn_80103FFC(void*, s32);
 extern void fn_80103FE4(void);
 extern void fn_80104704(void);
 extern void fn_80103F74(void);
@@ -150,7 +150,7 @@ void fn_800129A8(void) { /* TODO */ }
 #endif
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
-extern void fn_801040D0(void);
+extern void* fn_801040D0(void*, s32);
 extern void fn_8005D9E4(void);
 extern s32  fn_800FA444(s32);
 extern void fn_8001E644(void);
@@ -167,13 +167,38 @@ void fn_80012B94(void) { /* TODO */ }
 
 /* fn_80012D20 - 0x80012D20 | size: 0xf8 */
 extern void fn_801080CC(s32, s32);
-#if 1
-asm void fn_80012D20(void) {
-#include "src/game/gs_event_exec_fn_80012D20.inc"
+#pragma push
+#pragma peephole off
+s32 fn_80012D20(u8* ctx) {
+    void* src;
+    s32   size;
+    void* buf;
+    switch ((s32)(s8)ctx[1]) {
+    case 0:
+        if ((s32)(s8)ctx[2] == 0) {
+            src  = fn_801040D0(ctx, 1);
+            size = (s32)fn_801040D0(ctx, 2) << 2;
+            buf  = fn_80103FFC(ctx, size);
+            if (buf != 0) {
+                memcpy(buf, src, size);
+            }
+            fn_801080CC(*(s32*)(ctx + 4), 0x26);
+            ctx[2] = 1;
+        }
+        break;
+    case 3:
+        if ((s32)(s8)ctx[2] == 0) {
+            fn_801080CC(*(s32*)(ctx + 4), 0x2a);
+            ctx[2] = 1;
+        }
+        break;
+    case 5:
+    default:
+        break;
+    }
+    return 0;
 }
-#else
-void fn_80012D20(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80012E18 - 0x80012E18 | size: 0x198 */
 extern void fn_80105624(void);
