@@ -166,7 +166,7 @@ void fn_80012B94(void) { /* TODO */ }
 #endif
 
 /* fn_80012D20 - 0x80012D20 | size: 0xf8 */
-extern void fn_801080CC(void);
+extern void fn_801080CC(s32, s32);
 #if 1
 asm void fn_80012D20(void) {
 #include "src/game/gs_event_exec_fn_80012D20.inc"
@@ -303,19 +303,28 @@ void fn_800140FC(u32* out1, u32* out2) {
 }
 
 /* fn_80014118 - 0x80014118 | size: 0x80 */
-extern void fn_801FCE60(void);
-extern void fn_80205BE8(void);
-extern void fn_8012A5B0(void);
+extern s32 fn_801FCE60(u32, u16);
+extern s32 fn_80205BE8(void);
+extern s32 fn_8012A5B0(u32, s32, u16);
 extern u32 lbl_8047A2E0;
 extern u32 lbl_8047A2F4;
 extern u32 lbl_8047A2F8;
-#if 1
-asm void fn_80014118(void) {
-#include "src/game/gs_event_exec_fn_80014118.inc"
+#pragma push
+#pragma peephole off
+void fn_80014118(s32 arg, s32* out1, s32* out2) {
+    s32 val;
+    s32 other;
+    if ((s32)lbl_8047A2E0 == 1) {
+        other = fn_801FCE60(lbl_8047A2F4, (u16)arg);
+        val   = fn_80205BE8();
+    } else {
+        val   = fn_8012A5B0(lbl_8047A2F8, 3, (u16)arg);
+        other = 0;
+    }
+    *out1 = val;
+    *out2 = other;
 }
-#else
-void fn_80014118(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014198 - 0x80014198 | size: 0x24 */
 extern u32 lbl_8047A2EC;
@@ -442,13 +451,27 @@ void fn_80014574(void) { /* TODO */ }
 #endif
 
 /* fn_80014A48 - 0x80014A48 | size: 0x9c */
-#if 1
-asm void fn_80014A48(void) {
-#include "src/game/gs_event_exec_fn_80014A48.inc"
+#pragma push
+#pragma peephole off
+s32 fn_80014A48(u8* ctx) {
+    u8* p = *(u8**)(ctx + 0x60);
+    switch ((s32)(s8)ctx[0x1]) {
+    case 0:
+        if ((s32)(s8)ctx[0x2] == 0) {
+            fn_801080CC(*(s32*)(p + 0x4), 0x6e);
+            ctx[0x2] = 1;
+        }
+        break;
+    case 3:
+        if ((s32)(s8)ctx[0x2] == 0) {
+            fn_801080CC(*(s32*)(p + 0x4), 0x72);
+            ctx[0x2] = 1;
+        }
+        break;
+    }
+    return 0;
 }
-#else
-void fn_80014A48(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014AE4 - 0x80014AE4 | size: 0xbc */
 extern s32 lbl_80266BC4[];
