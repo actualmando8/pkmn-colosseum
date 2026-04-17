@@ -734,7 +734,7 @@ void fn_80024DBC(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48[2];
+    f32 local_48[4];
 
     switch ((s32)lbl_8047A370) {
     case 1:
@@ -804,7 +804,7 @@ void fn_80024F2C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48[2];
+    f32 local_48[4];
 
     switch ((s32)lbl_8047A370) {
     case 1:
@@ -874,7 +874,7 @@ void fn_8002509C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48[2];
+    f32 local_48[4];
 
     switch ((s32)lbl_8047A370) {
     case 1:
@@ -944,7 +944,7 @@ void fn_8002520C(s32 arg0, u8* arg1) {
     s32 unaff_r28;
     s32 uVar4;
     s32 unaff_r31;
-    f32 local_48[2];
+    f32 local_48[4];
 
     switch ((s32)lbl_8047A370) {
     case 1:
