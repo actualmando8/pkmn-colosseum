@@ -394,7 +394,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
     slot_offset = 0;
     while (slot < *(u32*)lbl_80478DE0) {
         if (*(u32*)(lbl_80478DE4 + slot_offset) == 0 ||
-            (u8)fn_801902E0((void*)*(u32*)(lbl_80478DE4 + slot_offset)) == 0) {
+            (u8)fn_801902E0((void*)*(u32*)(lbl_80478DE4 + slot_offset)) != 0) {
             if ((s32)lbl_8047A370 == 1) {
                 if (lbl_80478898 > lbl_8047B8D8) {
                     table_index = lbl_8047A368;
@@ -542,6 +542,7 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
     extern u8* fn_8005DA18(u32);
     u8* node;
     u8* found;
+    u8* ptr;
     s32 index;
     s32 offset;
 
@@ -578,18 +579,21 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
         index = 0;
     }
 
-    if ((s32)lbl_8047A370 == 1) {
-        arg1[0x67] = (u8)(s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
-    } else {
+    switch ((s32)lbl_8047A370) {
+    case 1:
+        arg1[0x67] = (u8)(s32)((lbl_80478898 / lbl_8047B8A8) * lbl_8047B8DC) & 0xFF;
+        break;
+    default:
         arg1[0x67] = 0xFF;
+        break;
     }
 
     if ((u32)index < *(u32*)lbl_80478DD8) {
-        offset = index << 4;
-        if (*(u32*)(lbl_80478DDC + offset + 4) == 0x66 && (u8)fn_801902E0((void*)0x45D) != 0) {
+        ptr = (u8*)&lbl_80478DDC + (index << 4);
+        if (*(u32*)(ptr + 4) == 0x66 && (u8)fn_801902E0((void*)0x45D) != 0) {
             *(u32*)(arg1 + 0x58) = 0x0C5F1200;
         } else {
-            *(u32*)(arg1 + 0x58) = *(u32*)(lbl_80478DDC + offset + 0xC);
+            *(u32*)(arg1 + 0x58) = *(u32*)(ptr + 0xC);
         }
     }
 }
