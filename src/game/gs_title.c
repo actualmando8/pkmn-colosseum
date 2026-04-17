@@ -3817,7 +3817,7 @@ s32 fn_80022E54(void* r3, u32* r4) {
     }
     fn_80014198(r31);
     if (r31 >= 0) {
-        fn_800190D8(r29, 0x59610);
+        fn_800190D8(r29, 0x5960010);
         *r30 = 1;
         return 2;
     }
@@ -4178,6 +4178,7 @@ asm void fn_80023DA8(void) {
 #include "src/game/gs_title_fn_80023DA8.inc"
 }
 #else
+#pragma scheduling off
 #pragma optimization_level 4
 s32 fn_80023DA8(void) {
     fn_80106D3C(2, 0x44c6, 1, 0);
@@ -4192,6 +4193,7 @@ asm void fn_80023DE4(void) {
 #include "src/game/gs_title_fn_80023DE4.inc"
 }
 #else
+#pragma scheduling off
 #pragma optimization_level 4
 s32 fn_80023DE4(void) {
     fn_80106D3C(2, 0x4261, 1, 0);
@@ -4206,6 +4208,7 @@ asm void fn_80023E20(void) {
 #include "src/game/gs_title_fn_80023E20.inc"
 }
 #else
+#pragma scheduling off
 #pragma optimization_level 4
 s32 fn_80023E20(void) {
     fn_80106D3C(2, 0x426a, 1, 0);
