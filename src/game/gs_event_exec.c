@@ -208,14 +208,33 @@ void fn_8001329C(void) { /* TODO */ }
 #endif
 
 /* fn_80013668 - 0x80013668 | size: 0xdc */
-extern void fn_80107ED8(void);
-#if 1
-asm void fn_80013668(void) {
-#include "src/game/gs_event_exec_fn_80013668.inc"
+extern u8 fn_80107ED8(s32, s32);
+#pragma push
+#pragma peephole off
+s32 fn_80013668(u8* ctx) {
+    s32 flag = 0;
+    switch ((s32)(s8)ctx[1]) {
+    case 0:
+        if ((s32)(s8)ctx[2] == 0) flag = 1;
+        if ((u8)fn_80107ED8(*(s32*)(ctx + 4), 0x2a) == 1) flag = 1;
+        if ((u8)flag != 0) {
+            fn_801080CC(*(s32*)(ctx + 4), 0x26);
+            ctx[2] = 1;
+        }
+        break;
+    case 3:
+        if ((s32)(s8)ctx[2] == 0) {
+            fn_801080CC(*(s32*)(ctx + 4), 0x2a);
+            ctx[2] = 1;
+        }
+        break;
+    case 5:
+    default:
+        break;
+    }
+    return 0;
 }
-#else
-void fn_80013668(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_8001374C - 0x8001374C | size: 0x168 */
 extern void fn_80129BC8(void);
@@ -610,13 +629,33 @@ void fn_80014E50(void) { /* TODO */ }
 
 /* fn_80014F48 - 0x80014F48 | size: 0xd4 */
 extern f32 lbl_8047B748;
-extern f32 lbl_8047A2C0;
 extern f32 lbl_8047B74C;
-extern f32 lbl_8047B744;
-#if 1
-asm void fn_80014F48(void) {
-#include "src/game/gs_event_exec_fn_80014F48.inc"
+#pragma push
+#pragma peephole off
+s32 fn_80014F48(u8* ctx) {
+    f32 tmp;
+    switch ((s32)(s8)ctx[1]) {
+    case 0:
+        if ((s32)(s8)ctx[2] == 0) {
+            fn_801080CC(0x5a, 0x66);
+            lbl_8047A2C0 = lbl_8047B748;
+            ctx[2] = 1;
+        }
+        break;
+    case 2:
+        tmp = lbl_8047A2C0 + lbl_8047B74C;
+        lbl_8047A2C0 = tmp;
+        if (tmp > lbl_8047B744) {
+            lbl_8047A2C0 = lbl_8047B748;
+        }
+        break;
+    case 3:
+        if ((s32)(s8)ctx[2] == 0) {
+            fn_801080CC(0x5a, 0x6a);
+            ctx[2] = 1;
+        }
+        break;
+    }
+    return 0;
 }
-#else
-void fn_80014F48(void) { /* TODO */ }
-#endif
+#pragma pop
