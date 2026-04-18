@@ -2183,39 +2183,46 @@ void fn_8001047C(u8* arg1) {
 #pragma pop
 #endif
 
-/* fn_80010588 - 0x80010588 | size: 0x11c — species-to-kind dispatch with table entry call */
+/* fn_80010588 - 0x80010588 | size: 0x11c */
 #if 0
 asm void fn_80010588(void) {
 #include "src/game/gs_npc_interact_fn_80010588.inc"
 }
 #else
-void fn_80010588(u8* ctx, u8* tgt) {
-    u8* tbl;
-    u8* info;
-    s16 key;
-    s32 kind = 0;
+#pragma push
+#pragma peephole off
+void fn_80010588(u8* arg1, u8* arg2) {
+    void* participant;
+    void* npc_data;
+    s32 idx;
+    s16 npc_id;
     u8* entry;
-    s32 field4;
     s32 result;
-    tbl  = (u8*)fn_80103FE4((u32)ctx);
-    info = (u8*)fn_801040A0((u32)ctx);
-    key = *(s16*)(tgt + 6);
-    if (key == 0xC6) kind = 2;
-    else if (key >= 0xC6) { if (key < 0xC8) kind = 3; }
-    else if (key == 0xC4) kind = 0;
-    else if (key >= 0xC4) kind = 1;
-    if ((s32)(s8)info[0x2] == kind) {
-        fn_801040F0(0, 0, ctx, 0x49, 0);
-        fn_801040F0(0, 0, ctx, 0x4a, 0);
+    participant = (void*)fn_80103FE4((u32)arg1);
+    npc_data = (void*)fn_801040A0((u32)arg1);
+    npc_id = *(s16*)(arg2 + 6);
+    idx = 0;
+    if (npc_id == 0xC4) {
+        idx = 0;
+    } else if (npc_id == 0xC5) {
+        idx = 1;
+    } else if (npc_id == 0xC6) {
+        idx = 2;
+    } else if (npc_id == 0xC7) {
+        idx = 3;
     }
-    entry = tbl + kind * 0xC;
-    field4 = *(s32*)(entry + 4);
-    if (field4 != 0) {
-        fn_80132A38(0x37, field4);
-        result = (s32)fn_8001D834(ctx, tgt);
-        fn_800FB680(0, 0, result, 0xe7, 0);
+    if ((s8)*((u8*)npc_data + 2) == idx) {
+        fn_801040F0(0, 0, arg1, 0x49, 0);
+        fn_801040F0(0, 0, arg1, 0x4A, 0);
+    }
+    entry = (u8*)participant + idx * 0xc;
+    if (*(u32*)(entry + 4) != 0) {
+        fn_80132A38(0x37, *(u32*)(entry + 4));
+        result = (s32)fn_8001D834(arg1, arg2);
+        fn_800FB680(0, 0, result, 0xE7, 0);
     }
 }
+#pragma pop
 #endif
 
 /* fn_800106A4 - 0x800106A4 | size: 0x1a0 */
@@ -2249,13 +2256,61 @@ void fn_800109A0(void) { /* TODO */ }
 #endif
 
 /* fn_80010B30 - 0x80010B30 | size: 0x168 */
-extern void fn_801046C8(void);
-#if 1
+#if 0
 asm void fn_80010B30(void) {
 #include "src/game/gs_npc_interact_fn_80010B30.inc"
 }
 #else
-void fn_80010B30(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+u32 fn_80010B30(u8* arg) {
+    extern void* fn_80103FFC(u8* a, u32 size);
+    extern void* fn_80103FE4(u8* a);
+    extern s32 fn_801022B8(u32 val);
+    extern void fn_801046C8(u8* a, s32 id);
+    extern void fn_8005D8F8(s32 id);
+    void* entry;
+    void* participant;
+    s32 trainer_id;
+    if ((s8)arg[1] == 0) {
+        entry = fn_80103FFC(arg, 0x18);
+        if (entry != NULL) {
+            memcpy(entry, *(void**)(arg + 0x60), 0x18);
+        }
+        if (*(u8*)((u8*)entry + 0x16) != 0) {
+            fn_801046C8(arg, 0xB6);
+            *(s32*)(arg + 0x4C) = 0x13D;
+            fn_801046C8(arg, 0xB8);
+            *(s32*)(arg + 0x4C) = 0x140;
+            fn_8005D8F8(0xB8);
+        } else {
+            fn_801046C8(arg, 0xB6);
+            *(s32*)(arg + 0x4C) = 0x13F;
+            fn_801046C8(arg, 0xB8);
+            *(s32*)(arg + 0x4C) = 0;
+            fn_8005D8F8(0xB8);
+        }
+    }
+    participant = fn_80103FE4(arg);
+    trainer_id = fn_801022B8(*(u32*)(arg + 4));
+    if (trainer_id == 0xB5) {
+        *(s32*)(arg + 0x80) = 0;
+    } else if (trainer_id == 0xB6) {
+        if (*(u8*)((u8*)participant + 0x16) != 0) {
+            *(s32*)(arg + 0x80) = 1;
+        } else {
+            *(s32*)(arg + 0x80) = 3;
+        }
+    } else if (trainer_id == 0xB7) {
+        *(s32*)(arg + 0x80) = 2;
+    } else if (trainer_id == 0xB8) {
+        *(s32*)(arg + 0x80) = 3;
+    } else {
+        *(s32*)(arg + 0x80) = -1;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80010C98 - 0x80010C98 | size: 0x52c */
