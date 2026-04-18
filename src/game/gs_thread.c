@@ -759,27 +759,13 @@ extern void fn_800F8268(void);
 extern void fn_800F8428(void);
 extern void fn_800F8654(void);
 extern void fn_800F8A54(void);
-extern void fn_800F915C(void);
-extern void fn_800F9210(void);
 extern u32 fn_800F92D4(u32 key);
-extern void fn_800F9318(void);
-extern void fn_800F9378(void);
-extern void fn_800F9418(void);
-extern void fn_800F9544(void);
 extern void fn_800F9670(u32 count);
 extern void fn_800F96E4(void);
 extern void fn_800F9AEC(void);
-extern void fn_800F9C04(void);
 extern void fn_800F9D04(void);
-extern void fn_800F9D24(void);
 extern u8* fn_800F9E70(u8* dst, u8* src);
-extern void fn_800F9EE4(void);
-extern void fn_800FA064(void);
 extern void fn_800FA160(void* obj);
-extern void fn_800FA1BC(void);
-extern void fn_800FA280(void);
-extern void fn_800FA314(void);
-extern void fn_800FA3D0(void);
 extern u32 fn_800FA444(void* obj);
 extern void fn_800FAA98(void);
 extern void fn_800FAEF8(void);
@@ -787,12 +773,8 @@ extern void fn_800FB43C(void);
 extern void fn_800FB680(void);
 extern void fn_800FB8C8(void);
 extern void fn_800FBB34(void);
-extern void fn_800FBD88(void);
-extern void fn_800FBE7C(void);
 extern void fn_800FBF10(void);
 extern void fn_800FBF74(void);
-extern void fn_800FC1D0(void);
-extern void fn_800FC244(void);
 extern void fn_800FC2A4(void);
 extern void fn_800FC2A8(void* ptr);
 extern void* fn_800FC39C(void* ptr);
@@ -822,7 +804,7 @@ extern void fn_800FEA74(void);
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F8268(void) {
 #include "src/game/gs_thread_fn_800F8268.inc"
 }
@@ -940,7 +922,7 @@ void fn_800F8A54(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F915C(void) {
 #include "src/game/gs_thread_fn_800F915C.inc"
 }
@@ -977,7 +959,7 @@ void fn_800F915C(u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9210(void) {
 #include "src/game/gs_thread_fn_800F9210.inc"
 }
@@ -1036,11 +1018,13 @@ u32 fn_800F92D4(u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9318(void) {
 #include "src/game/gs_thread_fn_800F9318.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 2
 u32 fn_800F9318(u32 key1, u32 key2) {
     u8* entry;
@@ -1053,6 +1037,7 @@ u32 fn_800F9318(u32 key1, u32 key2) {
     }
     return 0;
 }
+#pragma pop
 #endif
 #pragma pop
 
@@ -1060,7 +1045,7 @@ u32 fn_800F9318(u32 key1, u32 key2) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9378(void) {
 #include "src/game/gs_thread_fn_800F9378.inc"
 }
@@ -1097,7 +1082,7 @@ void fn_800F9378(u32 fn, u32 key1, u32 key2, u32 val) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9418(void) {
 #include "src/game/gs_thread_fn_800F9418.inc"
 }
@@ -1141,7 +1126,7 @@ void* fn_800F9418(u32 align, u32 size, u32 key1, u32 key2, u32 val) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9544(void) {
 #include "src/game/gs_thread_fn_800F9544.inc"
 }
@@ -1295,7 +1280,7 @@ u32 fn_800F9AEC(void* outbuf, u16* src, u32 mode) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9C04(void) {
 #include "src/game/gs_thread_fn_800F9C04.inc"
 }
@@ -1368,11 +1353,13 @@ void fn_800F9D04(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9D24(void) {
 #include "src/game/gs_thread_fn_800F9D24.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 2
 void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
     s32 r;
@@ -1392,6 +1379,7 @@ void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
     }
     return dst;
 }
+#pragma pop
 #endif
 #pragma pop
 
@@ -1420,7 +1408,7 @@ u8* fn_800F9E70(u8* dst, u8* src) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9EE4(void) {
 #include "src/game/gs_thread_fn_800F9EE4.inc"
 }
@@ -1508,7 +1496,7 @@ s32 fn_800F9EE4(void* str1, void* str2) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA064(void) {
 #include "src/game/gs_thread_fn_800FA064.inc"
 }
@@ -1579,7 +1567,7 @@ void fn_800FA160(void* obj) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA1BC(void) {
 #include "src/game/gs_thread_fn_800FA1BC.inc"
 }
@@ -1628,7 +1616,7 @@ void fn_800FA1BC(void* obj) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA280(void) {
 #include "src/game/gs_thread_fn_800FA280.inc"
 }
@@ -1681,7 +1669,7 @@ void* fn_800FA280(u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA314(void) {
 #include "src/game/gs_thread_fn_800FA314.inc"
 }
@@ -1737,7 +1725,7 @@ s32 fn_800FA314(u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FA3D0(void) {
 #include "src/game/gs_thread_fn_800FA3D0.inc"
 }
@@ -1873,7 +1861,7 @@ void fn_800FBB34(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FBD88(void) {
 #include "src/game/gs_thread_fn_800FBD88.inc"
 }
@@ -1915,7 +1903,7 @@ void fn_800FBD88(u32 key) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FBE7C(void) {
 #include "src/game/gs_thread_fn_800FBE7C.inc"
 }
@@ -1989,7 +1977,7 @@ void fn_800FBF74(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FC1D0(void) {
 #include "src/game/gs_thread_fn_800FC1D0.inc"
 }
@@ -2020,7 +2008,7 @@ s32 fn_800FC1D0(u32* item) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FC244(void) {
 #include "src/game/gs_thread_fn_800FC244.inc"
 }
