@@ -6,11 +6,11 @@ Legend: `[ ]`=pending `[G]`=GLM-planned `[C]`=Codex-implemented `[X]`=Claude-mer
 
 | # | Function | File | Size | Status |
 |---|---|---|---|---|
-| 1 | fn_800307A8 | gs_npc_event.c | 83 lines | `[ ]` |
+| 1 | fn_800307A8 | gs_npc_event.c | 83 lines | `[C]` |
 | 2 | fn_800318D8 | gs_npc_event.c | 93 lines | `[ ]` |
 | 3 | fn_800308D4 | gs_npc_event.c | 100 lines | `[ ]` |
 | 4 | fn_80030A44 | gs_npc_event.c | 129 lines | `[ ]` |
-| 5 | fn_80030D34 | gs_npc_event.c | 132 lines | `[ ]` |
+| 5 | fn_80030D34 | gs_npc_event.c | 132 lines | `[C]` |
 | 6 | fn_80032ED8 | gs_npc_event.c | 132 lines | `[ ]` |
 | 7 | fn_80030574 | gs_npc_event.c | 161 lines | `[ ]` |
 | 8 | fn_80031404 | gs_npc_event.c | 165 lines | `[ ]` |
