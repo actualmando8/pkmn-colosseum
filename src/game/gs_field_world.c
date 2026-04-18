@@ -27858,12 +27858,22 @@ s32 fn_80115E04(u32 index, u16 val, u8 byte) {
 extern u32 lbl_8047CFC0;
 extern u32 lbl_8047CFC8;
 extern u32 lbl_8047CFC4;
-#if 1
+#if 0
 asm void fn_80116F68(void) {
 #include "src/game/gs_field_world_fn_80116F68.inc"
 }
 #else
-void fn_80116F68(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_80116F68(void* a, void* b) {
+    if (a == 0) return 0;
+    if (b == 0) return 0;
+    fn_800E01F4(b, *(f32*)&lbl_8047CFC0,
+                *(f32*)&lbl_8047CFC4 * (f32)(s32)*(s16*)((u8*)a + 4),
+                *(f32*)&lbl_8047CFC0);
+    return 1;
+}
+#pragma pop
 #endif
 #if 0
 asm void fn_80116FE0(void) {
