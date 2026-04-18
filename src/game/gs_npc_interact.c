@@ -585,63 +585,18 @@ L_80011500:
 }
 #endif
 
-/* 0x80011700 | 0xBC */
-#if 1
+/* 0x80011700 | 0xBC — clear 4 event flags referenced by input arg */
+#if 0
 asm void fn_80011700(void) {
 #include "src/game/gs_npc_interact_fn_80011700.inc"
 }
 #else
-void fn_80011700(void) {
-    extern void fn_80102568();
-    extern void fn_80102620();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f7 = 0.0f;
-    f32 f9 = 0.0f;
-
-    r31 = r3;
-    r3 = 0x4c;
-    fn_80102620();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r5 = r31;
-        r3 = 0x4c;
-        r4 = 0x0;
-        fn_80102568();
-    }
-    r3 = 0xf9;
-    fn_80102620();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r5 = r31;
-        r3 = 0xf9;
-        r4 = 0x0;
-        fn_80102568();
-    }
-    r3 = 0xfa;
-    fn_80102620();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r5 = r31;
-        r3 = 0xfa;
-        r4 = 0x0;
-        fn_80102568();
-    }
-    r3 = 0xf7;
-    fn_80102620();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r5 = r31;
-        r3 = 0xf7;
-        r4 = 0x0;
-        fn_80102568();
-    }
-    r3 = 0x0;
-    return;
+s32 fn_80011700(s32 arg) {
+    if ((u8)fn_80102620(0x4c) != 0) fn_80102568(0x4c, 0, arg);
+    if ((u8)fn_80102620(0xf9) != 0) fn_80102568(0xf9, 0, arg);
+    if ((u8)fn_80102620(0xfa) != 0) fn_80102568(0xfa, 0, arg);
+    if ((u8)fn_80102620(0xf7) != 0) fn_80102568(0xf7, 0, arg);
+    return 0;
 }
 #endif
 
