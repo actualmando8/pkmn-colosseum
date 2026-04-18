@@ -1136,37 +1136,31 @@ extern void fn_80109220(u32 a, u8 b);
 extern u32 lbl_8047A4A8;
 /* Count alive entries; if count+1 > threshold, enable.
  * r27=p, r28=threshold, r29=total, r30=i, r31=count. 71.1% - regalloc. */
-#if 1
+#if 0
 asm void fn_8003956C(u32 unused, u8* p) {
 #include "src/game/scene_init_fn_8003956C.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma push
+#pragma peephole off
 u32 fn_8003956C(u32 unused, u8* p) {
     s32 count;
     s32 i;
-    u32 total;
+    u16 total;
     u32 threshold;
 
     count = 0;
     threshold = lbl_8047A4A8 + 8;
-    total = (u32)(u16)fn_801347D0(0);
+    total = (u16)fn_801347D0(0);
     for (i = 0; i < (s32)total; i++) {
         if ((u8)fn_801429E8(fn_80134768(0, (s16)i)) != 0) {
             count++;
         }
     }
-    {
-        u8 enable;
-        if ((s32)threshold >= count + 1) {
-            enable = 0;
-        } else {
-            enable = 1;
-        }
-        fn_80109220((u32)p, enable);
-    }
+    fn_80109220((u32)p, (u8)((s32)threshold < count + 1));
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80039604 - 0x80039604 | size: 0x40 */
@@ -7433,4 +7427,3 @@ void fn_800599AC(u32 param) {
 }
 #pragma peephole on
 #endif
-
