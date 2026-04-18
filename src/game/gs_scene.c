@@ -911,7 +911,7 @@ u32 fn_80177A44(u32 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80179E04(void) {
 #include "src/game/gs_scene_fn_80179E04.inc"
 }
@@ -938,7 +938,7 @@ void fn_80179E04(void* dst) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80179EA4(void) {
 #include "src/game/gs_scene_fn_80179EA4.inc"
 }
