@@ -1721,7 +1721,7 @@ extern u8 lbl_8047A286;
 extern u8 lbl_8047A280;
 extern u16 lbl_8047A282;
 extern u8 lbl_8047882E;
-#if 1
+#if 0
 asm void fn_80007B30(void) {
 #include "src/game/gs_task_fn_80007B30.inc"
 }
