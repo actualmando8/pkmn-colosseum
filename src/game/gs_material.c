@@ -756,7 +756,7 @@ extern u32 fn_800EE0E8(void*);
 extern void* fn_800EE150(void* entry, u32 param);
 extern void fn_800EE20C();
 
-#if 1
+#if 0
 asm void fn_800E3604(void) {
 #include "src/game/gs_material_fn_800E3604.inc"
 }
@@ -3006,7 +3006,7 @@ u32 fn_800E6DC0(void* p) {
 /* fn_800E6DCC -- TEV descriptor builder | Size: 0x4C4 */
 extern u32 lbl_8047CBAC;
 extern u8 lbl_80270E6C[];
-#if 1
+#if 0
 asm void fn_800E6DCC(void) {
 #include "src/game/gs_material_fn_800E6DCC.inc"
 }
