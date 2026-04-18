@@ -236,7 +236,7 @@ extern f32 lbl_8047BA58;
 extern f32 lbl_8047BA5C;
 /* BSS lbl_803A6498 state machine.
  * r30=p (param r4), r31=local var. 96.7% match - beq/b vs bne peephole (3 insns). */
-#if 1
+#if 0
 asm void fn_80037180(void) {
 #include "src/game/scene_init_fn_80037180.inc"
 }
@@ -943,7 +943,7 @@ extern f64 lbl_8047BA88;
 extern f32 lbl_8047A494;
 /* Infinite loop: compute ratio of progress/tick as f32.
  * 85.7% match - f29/f30 register swap for bias constants. */
-#if 1
+#if 0
 asm void fn_80038990(void) {
 #include "src/game/scene_init_fn_80038990.inc"
 }
