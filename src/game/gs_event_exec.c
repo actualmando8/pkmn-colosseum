@@ -262,21 +262,59 @@ s32 fn_80013668(u8* ctx) {
 #pragma pop
 
 /* fn_8001374C - 0x8001374C | size: 0x168 */
-extern void fn_80129BC8(void);
-extern void fn_801297D8(void);
-extern void fn_801429E8(void);
-extern void fn_80143C68(void);
-extern void fn_80129A78(void);
-extern void fn_8012959C(void);
+extern void* fn_80129BC8(u32, u8, void*, s32, s32, s32);
+extern void* fn_801297D8(u32, void*, s32, s32, s32);
+extern u8  fn_801429E8(void*);
+extern s32 fn_80143C68(void*);
+extern s32 fn_80129A78(u32, s32, s32, s32);
+extern void fn_8012959C(u32, s32, s32, s16);
 extern u8 lbl_80266918[];
 extern u32 lbl_8047A2F8;
-#if 1
-asm void fn_8001374C(void) {
-#include "src/game/gs_event_exec_fn_8001374C.inc"
+#pragma push
+#pragma peephole off
+s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
+    s32   buf[5];
+    u8*   entry;
+    s32   flag;
+    void* list;
+    s32   idx;
+    s32   i;
+    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    flag  = *(s32*)(entry + 4);
+    idx = -1;
+    i = 0;
+
+    if (flag >= 0) {
+        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+    } else {
+        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+    }
+    while (i < *(u16*)buf) {
+        if (fn_801429E8(list)) {
+            idx++;
+            if (idx >= target_n) {
+                idx = fn_80143C68(list);
+                goto after;
+            }
+        }
+        i++;
+        list = (u8*)list + 4;
+    }
+    idx = 0;
+after:
+    if (fn_80129A78(lbl_8047A2F8, idx, 1, -1) > 0) {
+        fn_80106D3C(2, 0x4263, 1, 0);
+        fn_801069FC(1);
+    } else {
+        fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
+        fn_80132A38(0x2d, (u16)idx);
+        fn_80106D3C(2, 0x4268, 1, 0);
+        fn_801069FC(1);
+    }
+    *out = 0;
+    return 0;
 }
-#else
-void fn_8001374C(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_800138B4 - 0x800138B4 | size: 0x164 */
 extern void fn_80129718(void);
