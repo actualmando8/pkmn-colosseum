@@ -2254,7 +2254,7 @@ void fn_8002058C(void) {
 extern void fn_800FB680(u32 a, u32 b, s32 c, u32 d);
 extern u32 lbl_8047A350;
 extern u32 lbl_80478880;
-#if 1
+#if 0
 asm void fn_800205C8(void) {
 #include "src/game/gs_title_fn_800205C8.inc"
 }
@@ -2487,7 +2487,7 @@ void fn_80020C9C(void) { /* TODO */ }
 extern u32 lbl_8047A360;
 extern u32 lbl_802E4EF0[];
 extern u32 lbl_802E4ED8[];
-#if 1
+#if 0
 asm void fn_80020EA4(void) {
 #include "src/game/gs_title_fn_80020EA4.inc"
 }
@@ -4026,7 +4026,7 @@ extern f32 lbl_80478898;
 extern f32 lbl_8047B8AC;
 extern u32 lbl_8047A36C;
 extern u32 lbl_8047A368;
-#if 1
+#if 0
 asm void fn_80024308(void) {
 #include "src/game/gs_title_fn_80024308.inc"
 }
