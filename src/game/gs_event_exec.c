@@ -676,15 +676,68 @@ s32 fn_8001431C(void* arg0, u8* arg1) {
 #endif
 
 /* fn_80014398 - 0x80014398 | size: 0x1b8 */
-extern void fn_800FB8C8(void);
-extern u32 lbl_8047A2FC;
-#if 1
-asm void fn_80014398(void) {
-#include "src/game/gs_event_exec_fn_80014398.inc"
+extern void fn_800FB8C8(s32, s32, s16, s16, s32, s32);
+#pragma push
+#pragma peephole off
+s32 fn_80014398(u8* ctx, u8* arg1) {
+    u8* p = *(u8**)(ctx + 0x60);
+    s32 key = *(s32*)(p + 4);
+    s32 idx = 0;
+    s32 idx2 = 0;
+    s32 cnt;
+    s32 species;
+    u8* inner;
+    s32 iv;
+    s32 cnt2;
+    s32 i;
+    s32 tmp;
+    EvTbl* tbl = (EvTbl*)lbl_80266B58;
+
+    if ((((key != tbl[0].key) && (idx = 1, key != tbl[1].key)) &&
+         (idx = 2, key != tbl[2].key)) &&
+        (idx = 3, key != tbl[3].key)) {
+        idx = 4;
+    }
+    if (idx >= 4) return 0;
+
+    inner = tbl[idx].inner;
+    cnt   = tbl[idx].count;
+    species = *(s16*)(arg1 + 6);
+    if (cnt > 0) {
+        do {
+            if (*(s32*)inner == species) break;
+            idx2++;
+            inner += 0xC;
+        } while (idx2 < cnt);
+    }
+    if (idx2 >= tbl[idx].count) return 0;
+
+    iv = 1;
+    cnt2 = 0;
+    if ((cnt - idx2) - 1 > 0) {
+        if ((cnt - idx2) - 1 > 8) {
+            s32 adj = (cnt - idx2) - 9;
+            s32 iters = (adj + 7) >> 3;
+            if (adj > 0) {
+                for (i = 0; i < iters; i++) {
+                    iv  *= 100000000;
+                    cnt2 += 8;
+                }
+            }
+        }
+        if (cnt2 < (cnt - idx2) - 1) {
+            s32 rem = ((cnt - idx2) - 1) - cnt2;
+            for (i = 0; i < rem; i++) {
+                iv *= 10;
+            }
+        }
+    }
+    tmp = (s32)lbl_8047A2FC / iv;
+    fn_80132A38(0x34, tmp - (tmp / 10) * 10);
+    fn_800FB8C8(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), -1, 0xC9);
+    return 0;
 }
-#else
-void fn_80014398(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80014550 - 0x80014550 | size: 0x24 */
 s32 fn_80014550(u8* src_struct, u8* dst) {
