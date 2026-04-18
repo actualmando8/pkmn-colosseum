@@ -88,7 +88,7 @@ extern u16   fn_80143FFC(void);               /* Get display field count */
 /* Text rendering */
 extern void  fn_80132A38(s32 paramId, s32 value);
 extern u32   fn_800FA444(s32 resourceId);
-extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color, u16 resourceId);
+extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color);
 
 /* Math/rendering helpers */
 extern void  fn_800E0CA0(f32 angle);          /* Set camera rotation */
@@ -109,12 +109,19 @@ extern f32   gStickDeflection;    /* lbl_8047A2D0 */
 
 /* fn_8001501C - 0x8001501C | size: 0x34 */
 extern u32 lbl_8047A2DC;
-#if 1
+#if 0
 asm void fn_8001501C(void) {
 #include "src/game/gs_pokemon_summary_fn_8001501C.inc"
 }
 #else
-void fn_8001501C(void) { /* TODO */ }
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+s32 fn_8001501C(void) {
+    fn_800FB680(0, 0, -1, lbl_8047A2DC);
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80015050 - 0x80015050 | size: 0x94 */
