@@ -8911,7 +8911,7 @@ s32 fn_80118DA8(u8* ptr) {
 }
 /* 0x80118DE0 | 0xAC */
 extern void fn_80169104(void);
-#if 1
+#if 0
 asm void fn_80118DE0(void) {
 #include "src/game/gs_field_world_fn_80118DE0.inc"
 }
@@ -25611,7 +25611,7 @@ u32 fn_8012F11C(s32 idx) {
 /* 0x8012F150 | 0xAC */
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
-#if 1
+#if 0
 asm void fn_8012F150(void) {
 #include "src/game/gs_field_world_fn_8012F150.inc"
 }

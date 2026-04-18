@@ -95,6 +95,11 @@ for i, (start, end, fn, original_block) in enumerate(blocks):
     flipped_text = pattern.sub(
         lambda m: '#if 0\n' + m.group(1) + '#else\n' + m.group(2) + '#endif',
         text, count=1)
+    # Remove any `extern void fn_X(void);` earlier in the file — the stub's own
+    # signature will be the authoritative one after the flip. Keep other extern
+    # shapes (e.g. typed forward decls) intact.
+    void_extern = re.compile(r'^extern void ' + re.escape(fn) + r'\(void\);\s*\n', re.MULTILINE)
+    flipped_text = void_extern.sub('', flipped_text)
     save(flipped_text)
 
     # Remove stale .o so compile is fresh
@@ -110,13 +115,51 @@ for i, (start, end, fn, original_block) in enumerate(blocks):
         continue
 
     pct = run_match(fn)
-    if pct >= 50.0:
+    if pct >= 40.0:
         kept.append((fn, pct))
         print(f'  [{i+1}/{len(blocks)}] {fn}  KEEP {pct:.1f}%')
+        continue
+
+    # Below 50% — try pragma variants before giving up.
+    best_pct = pct
+    best_text = load()
+    baseline_text = load()
+    for pragma_label, pragma_lines in [
+        ('peephole off', '#pragma push\n#pragma peephole off\n'),
+        ('scheduling off', '#pragma push\n#pragma scheduling off\n'),
+        ('peephole+scheduling off', '#pragma push\n#pragma peephole off\n#pragma scheduling off\n'),
+    ]:
+        # Restore baseline then wrap the C body with pragmas.
+        save(baseline_text)
+        # Re-match the flipped block
+        flipped_block_pattern = re.compile(
+            r'(#if 0\s*\nasm void ' + re.escape(fn) + r'\(void\) \{\s*\n#include "[^"]+"\s*\n\}\s*\n)'
+            r'(#else\s*\n)(.*?)(#endif)',
+            re.DOTALL)
+        fm = flipped_block_pattern.search(baseline_text)
+        if not fm:
+            continue
+        wrapped = pragma_lines + fm.group(3) + '#pragma pop\n'
+        new_text = baseline_text[:fm.start(3)] + wrapped + baseline_text[fm.end(3):]
+        save(new_text)
+        try: os.remove(f'build/GC6E01/base/game/{stem}.o')
+        except FileNotFoundError: pass
+        if not run_compile():
+            continue
+        candidate_pct = run_match(fn)
+        if candidate_pct > best_pct:
+            best_pct = candidate_pct
+            best_text = load()
+            print(f'      + {pragma_label}: {candidate_pct:.1f}%')
+
+    if best_pct >= 40.0:
+        save(best_text)
+        kept.append((fn, best_pct))
+        print(f'  [{i+1}/{len(blocks)}] {fn}  KEEP {best_pct:.1f}% (with pragma tuning)')
     else:
-        save(text)  # revert
-        reverted.append((fn, f'match only {pct:.1f}%'))
-        print(f'  [{i+1}/{len(blocks)}] {fn}  REVERT ({pct:.1f}%)')
+        save(text)  # revert to pre-flip state
+        reverted.append((fn, f'best match {best_pct:.1f}%'))
+        print(f'  [{i+1}/{len(blocks)}] {fn}  REVERT ({best_pct:.1f}%)')
 
 print()
 print(f'=== Summary ===')
