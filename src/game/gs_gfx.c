@@ -531,9 +531,6 @@ asm void fn_800D3190(void) {
 #include "src/game/gs_gfx_fn_800D3190.inc"
 }
 #else
-#pragma push
-#pragma scheduling off
-#pragma peephole off
 void fn_800D3190(void) {
     u32* state;
     u32 sc;
@@ -654,7 +651,6 @@ void fn_800D3190(void) {
         timing[0x38 / 4] += tick - startTick;
     } while (r29count-- != 0);
 }
-#pragma pop
 #endif
 extern void fn_800D13C4(void* a);
 extern void fn_800DC874(void* a);
