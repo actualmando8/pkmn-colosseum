@@ -1662,7 +1662,7 @@ u32 fn_8000DAB0(void) {
 #endif
 
 /* fn_8000DAE8 - 0x8000DAE8 | size: 0x1a0 */
-extern void fn_8001D834(void);
+extern void* fn_8001D834(void*, void*);
 extern void fn_800FBB34(void);
 extern u8 lbl_802E4B98[];
 extern u8 lbl_803A1B80[];
@@ -2183,13 +2183,39 @@ void fn_8001047C(u8* arg1) {
 #pragma pop
 #endif
 
-/* fn_80010588 - 0x80010588 | size: 0x11c */
-#if 1
+/* fn_80010588 - 0x80010588 | size: 0x11c — species-to-kind dispatch with table entry call */
+#if 0
 asm void fn_80010588(void) {
 #include "src/game/gs_npc_interact_fn_80010588.inc"
 }
 #else
-void fn_80010588(void) { /* TODO */ }
+void fn_80010588(u8* ctx, u8* tgt) {
+    u8* tbl;
+    u8* info;
+    s16 key;
+    s32 kind = 0;
+    u8* entry;
+    s32 field4;
+    s32 result;
+    tbl  = (u8*)fn_80103FE4((u32)ctx);
+    info = (u8*)fn_801040A0((u32)ctx);
+    key = *(s16*)(tgt + 6);
+    if (key == 0xC6) kind = 2;
+    else if (key >= 0xC6) { if (key < 0xC8) kind = 3; }
+    else if (key == 0xC4) kind = 0;
+    else if (key >= 0xC4) kind = 1;
+    if ((s32)(s8)info[0x2] == kind) {
+        fn_801040F0(0, 0, ctx, 0x49, 0);
+        fn_801040F0(0, 0, ctx, 0x4a, 0);
+    }
+    entry = tbl + kind * 0xC;
+    field4 = *(s32*)(entry + 4);
+    if (field4 != 0) {
+        fn_80132A38(0x37, field4);
+        result = (s32)fn_8001D834(ctx, tgt);
+        fn_800FB680(0, 0, result, 0xe7, 0);
+    }
+}
 #endif
 
 /* fn_800106A4 - 0x800106A4 | size: 0x1a0 */
