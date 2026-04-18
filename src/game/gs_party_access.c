@@ -1018,41 +1018,48 @@ s32 fn_8000CA34(void) {
     return 0;
 }
 
-/* fn_8000CAA4 - 0x8000CAA4 | size: 0x2c */
-#if 1
-asm void fn_8000CAA4(void) {
-#include "src/game/gs_party_access_fn_8000CAA4.inc"
-}
-#else
-void fn_8000CAA4(void) { /* TODO - extlwi/rlwimi bitfield toggle, codegen-sensitive */ }
-#endif
+typedef struct {
+    u8 b80 : 1;
+    u8 b40 : 1;
+    u8 b20 : 1;
+    u8 b10 : 1;
+    u8 b08 : 1;
+    u8 b04 : 1;
+    u8 b02 : 1;
+    u8 b01 : 1;
+} PartyFlags8;
 
-/* fn_8000CAD0 - 0x8000CAD0 | size: 0x2c */
-#if 1
-asm void fn_8000CAD0(void) {
-#include "src/game/gs_party_access_fn_8000CAD0.inc"
-}
-#else
-void fn_8000CAD0(void) { /* TODO */ }
-#endif
+#pragma push
+#pragma peephole off
 
-/* fn_8000CAFC - 0x8000CAFC | size: 0x2c */
-#if 1
-asm void fn_8000CAFC(void) {
-#include "src/game/gs_party_access_fn_8000CAFC.inc"
+/* fn_8000CAA4 - 0x8000CAA4 | size: 0x2c — toggles bit 3 (0x10) of lbl_804673F8[0x8] */
+s32 fn_8000CAA4(void) {
+    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    p->b10 ^= 1;
+    return 0;
 }
-#else
-void fn_8000CAFC(void) { /* TODO */ }
-#endif
 
-/* fn_8000CB28 - 0x8000CB28 | size: 0x2c */
-#if 1
-asm void fn_8000CB28(void) {
-#include "src/game/gs_party_access_fn_8000CB28.inc"
+/* fn_8000CAD0 - 0x8000CAD0 | size: 0x2c — toggles bit 2 (0x20) */
+s32 fn_8000CAD0(void) {
+    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    p->b20 ^= 1;
+    return 0;
 }
-#else
-void fn_8000CB28(void) { /* TODO */ }
-#endif
+
+/* fn_8000CAFC - 0x8000CAFC | size: 0x2c — toggles bit 1 (0x40) */
+s32 fn_8000CAFC(void) {
+    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    p->b40 ^= 1;
+    return 0;
+}
+
+/* fn_8000CB28 - 0x8000CB28 | size: 0x2c — toggles bit 0 (0x80) */
+s32 fn_8000CB28(void) {
+    PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
+    p->b80 ^= 1;
+    return 0;
+}
+#pragma pop
 
 /* fn_8000CB54 - 0x8000CB54 | size: 0x20 */
 /* GSparty_IsShadow -- tail call to fn_80266320 */
