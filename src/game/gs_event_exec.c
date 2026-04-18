@@ -734,18 +734,20 @@ typedef struct {
 #pragma push
 #pragma peephole off
 s32 fn_80014234(u8* ctx, u8* tgt) {
-    EvTbl* tbl = (EvTbl*)lbl_80266B58;
-    u8* p      = *(u8**)(ctx + 0x60);
-    s32 key    = *(s32*)(p + 4);
-    s32 idx    = 0;
+    u8* walk;
+    u8* p;
+    s32 key;
+    s32 idx;
     s32 slot;
     s32 species;
     EvEntry* e;
 
-    if ((((key != tbl[0].key) && (idx = 1, key != tbl[1].key)) &&
-         (idx = 2, key != tbl[2].key)) &&
-        (idx = 3, key != tbl[3].key)) {
-        idx = 4;
+    p    = *(u8**)(ctx + 0x60);
+    walk = lbl_80266B58;
+    key  = *(s32*)(p + 4);
+    for (idx = 0; idx < 4; idx++) {
+        if (key == *(s32*)walk) break;
+        walk += 0xc;
     }
     if (idx >= 4) return 0;
     slot = (s32)(s8)ctx[0x95];
@@ -968,12 +970,11 @@ extern s32 lbl_80266B9C[];
 #pragma peephole off
 s32 fn_80014C38(u8* ctx, u8* tgt) {
     void* p  = *(void**)(ctx + 0x60);
-    s32* tbl = lbl_80266B9C;
-    s32 k0 = tbl[0];
-    s32 k1 = tbl[1];
-    s32 k2 = tbl[2];
-    s32 k3 = tbl[3];
-    s32 k4 = tbl[4];
+    s32 k0 = lbl_80266B9C[0];
+    s32 k1 = lbl_80266B9C[1];
+    s32 k2 = lbl_80266B9C[2];
+    s32 k3 = lbl_80266B9C[3];
+    s32 k4 = lbl_80266B9C[4];
     s32 species = *(s16*)(tgt + 0x6);
     s32 idx0 = 0;
     s32 base;
