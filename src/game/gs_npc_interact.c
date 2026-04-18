@@ -1879,12 +1879,50 @@ void fn_8000DE24(u8* ptr) {
 #endif
 
 /* fn_8000DEC4 - 0x8000DEC4 | size: 0x12c */
-#if 1
+#if 0
 asm void fn_8000DEC4(void) {
 #include "src/game/gs_npc_interact_fn_8000DEC4.inc"
 }
 #else
-void fn_8000DEC4(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_8000DEC4(u8* arg1, u8* arg2) {
+    extern void* fn_801040D0(u8* a, u32 b);
+    extern void fn_80109220(u8* a, u32 b);
+    u8* entry;
+    s32 i;
+    entry = (u8*)fn_801040D0(arg1, 0);
+    for (i = 0; i < 2; i++) {
+        s32 value;
+        s16 npc_id;
+        switch (*(s32*)(entry + 4)) {
+            case 0x45: value = 0x125C; break;
+            case 0x46: value = 0x125E; break;
+            case 0x47: value = 0x12BE; break;
+            case 0x48: value = 0x125D; break;
+            default: value = 0; break;
+        }
+        npc_id = *(s16*)(arg2 + 6);
+        if (value == npc_id) {
+            fn_80109220(arg2, 1);
+            return;
+        }
+        switch (*(s32*)(entry + 0xC)) {
+            case 0x45: value = 0x125C; break;
+            case 0x46: value = 0x125E; break;
+            case 0x47: value = 0x12BE; break;
+            case 0x48: value = 0x125D; break;
+            default: value = 0; break;
+        }
+        if (value == npc_id) {
+            fn_80109220(arg2, 1);
+            return;
+        }
+        entry += 0x10;
+    }
+    fn_80109220(arg2, 0);
+}
+#pragma pop
 #endif
 
 /* fn_8000DFF0 - 0x8000DFF0 | size: 0x214 */
@@ -2051,12 +2089,58 @@ u32 fn_8000FDD8(u8* ptr) {
 #endif
 
 /* fn_8000FE38 - 0x8000FE38 | size: 0x118 */
-#if 1
+#if 0
 asm void fn_8000FE38(void) {
 #include "src/game/gs_npc_interact_fn_8000FE38.inc"
 }
 #else
-void fn_8000FE38(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_8000FE38(u8* arg1) {
+    extern void* fn_80105624(void);
+    extern u8 fn_801F18DC(s32 a);
+    extern u8 fn_801F1700(s32 a);
+    extern u8 fn_80265924(void);
+    extern u16 fn_801EF634(void);
+    void* data;
+    u16 flags;
+    s32 flag_val;
+    u8 flag;
+    data = fn_80105624();
+    flags = *(u16*)((u8*)data + 4);
+    flag_val = -1;
+    if (flags & (1 << 4)) {
+        flag_val = 0;
+    } else if (flags & (1 << 5)) {
+        flag_val = 2;
+    } else if (flags & (1 << 11)) {
+        flag_val = 3;
+    } else if (flags & (1 << 9)) {
+        arg1[0x98] = 1;
+        arg1[0x99] = 1;
+        *(s32*)(arg1 + 0x80) = -1;
+    }
+    if (flag_val >= 0) {
+        arg1[0x98] = 1;
+        *(s32*)(arg1 + 0x80) = flag_val;
+    }
+    if ((u8)fn_801F18DC(0) != 0) {
+        if ((u8)fn_801F1700(0) == 1 && (u8)fn_80265924() == 1) {
+            flag = 1;
+        } else if ((u16)fn_801EF634() == 1) {
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+    } else {
+        flag = 0;
+    }
+    if (flag) {
+        arg1[0x98] = 1;
+        arg1[0x99] = 1;
+    }
+}
+#pragma pop
 #endif
 
 /* fn_8000FF50 - 0x8000FF50 | size: 0x58 */
@@ -2130,12 +2214,51 @@ void fn_80010294(void) { /* TODO */ }
 #endif
 
 /* fn_8001047C - 0x8001047C | size: 0x10c */
-#if 1
+#if 0
 asm void fn_8001047C(void) {
 #include "src/game/gs_npc_interact_fn_8001047C.inc"
 }
 #else
-void fn_8001047C(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_8001047C(u8* arg1) {
+    extern void* fn_80103FE4(u8* a);
+    extern u32 fn_80104530(u32 val);
+    extern void* fn_80205B8C(void* obj);
+    extern u32 fn_8012640C(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
+    extern void fn_80132A38(s32 p1, s32 val);
+    extern void fn_801040F0(s32 p1, s32 p2, u8* p3, u16 p4, s32 p5);
+    void* participant;
+    u32 npc_data;
+    s16 idx;
+    s32 r30;
+    u16 battle_result;
+    u16 val;
+    s32 temp;
+    participant = fn_80103FE4(arg1);
+    npc_data = fn_80104530(*(u32*)(arg1 + 4));
+    idx = (s16)(npc_data >> 16);
+    temp = (s8)(idx & 0xFF);
+    if (temp < 0 || temp >= 4) return;
+    r30 = temp * 0xc;
+    if (*(u32*)((u8*)participant + r30 + 4) == 0) return;
+    battle_result = 0;
+    if (fn_80205B8C(*(void**)((u8*)participant + 0x40)) != 0) {
+        battle_result = (u16)fn_8012640C(0, 0x7f, 0, 0, (s8)(*(u8*)(arg1 + 0x95)), 0);
+    }
+    val = 0;
+    if (battle_result == 0 || battle_result == 0x164) {
+        val = 0;
+    } else if (battle_result < 0x166) {
+        val = 0x5d;
+    } else {
+        val = *(u16*)((u8*)participant + r30 + 0xc);
+    }
+    if ((u16)val != 0) {
+        fn_801040F0(0, 2, arg1, val, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80010588 - 0x80010588 | size: 0x11c */
