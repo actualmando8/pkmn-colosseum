@@ -512,46 +512,263 @@ extern void fn_800B8D10(void);
 extern void fn_800A1990(void);
 extern void fn_8019C6FC(void);
 extern void fn_800DC560(void);
-extern void fn_801BF8A0(void);
+extern void fn_801BF8A0(s32 a);
 extern void fn_801E16F0(void);
 extern void fn_801BF6AC(void);
-extern void fn_800EF1E8(void);
+extern void fn_800EF1E8(void* a, s32 b);
 extern void fn_800B8E74(void);
 extern void fn_800BB29C(void);
-extern void fn_800D1070(void);
-extern void fn_800DC6D8(void);
-extern void fn_800E3884(void);
-extern void fn_801181B0(void);
-extern void OSGetTick();
+extern void fn_800D1070(void* a);
+extern void fn_800DC6D8(void* a);
+extern void fn_800E3884(void* a, s32 b);
+extern void fn_801181B0(s32 a);
+extern u32 OSGetTick(void);
 extern u32 lbl_8047AA80;
-extern u32 lbl_8047AA91;
-extern u32 lbl_8047AA90;
-#if 1
+extern u8 lbl_8047AA91;
+extern u8 lbl_8047AA90;
+#if 0
 asm void fn_800D3190(void) {
 #include "src/game/gs_gfx_fn_800D3190.inc"
 }
 #else
-void fn_800D3190(void) { /* TODO */ }
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+void fn_800D3190(void) {
+    u32* state;
+    u32 sc;
+    u32 startTick;
+    u32* r31ptr;
+    u8 r30;
+    u32 tick;
+    u32 div;
+    u32* timing;
+    u32 r29count;
+    u8 r29b;
+    u32* s4;
+
+    state = (u32*)lbl_8047AA80;
+    sc = state[0xC / 4];
+    if ((u32)(sc + 0x01020000U) == 0xFEFEU) {
+        return;
+    }
+
+    lbl_8047AA91 = 0;
+    fn_800B8920();
+    fn_800B8D10();
+    startTick = OSGetTick();
+    r31ptr = (u32*)0x80000000;
+    r30 = 1;
+
+    while (lbl_8047AA91 == 0) {
+        fn_800A1990();
+        if (lbl_8047AA91 == 0) {
+            tick = OSGetTick();
+            div = (tick - startTick) / (r31ptr[0xF8 / 4] >> 2);
+            if (div > 3) {
+                lbl_8047AA91 = r30;
+            }
+        }
+    }
+
+    fn_8019C6FC();
+
+    s4 = (u32*)lbl_8047AA80;
+    sc = s4[0xC / 4];
+    r29b = 1;
+    if (sc != 0) {
+        if ((u32)(sc + 0x01020000U) != 0xFEFEU) {
+            if (((u8*)s4)[0x49D] == 0) {
+                fn_800DC560();
+                fn_801BF8A0(0);
+                fn_801E16F0();
+                fn_801BF6AC();
+            } else {
+                if (sc != 0) {
+                    fn_800EF1E8((void*)sc, 1);
+                    r29b = 0;
+                }
+            }
+            ((u8*)lbl_8047AA80)[0x49D] = 1;
+            if (r29b != 0) {
+                fn_800B8E74();
+                if (*(u32*)((u8*)lbl_8047AA80 + 0xC) != 0) {
+                    fn_800BB29C();
+                }
+            }
+        }
+    } else {
+        /* @L_800D32A8: shuffle timing counters */
+        timing = (u32*)&lbl_804001F0;
+        {
+            u32 t10 = timing[0x10 / 4];
+            u32 t4  = timing[0x4 / 4];
+            u32 tC  = timing[0xC / 4];
+            timing[0x10 / 4] = t10 + 1;
+            timing[0x0 / 4]  = t4;
+            timing[0x8 / 4]  = tC;
+            timing[0x4 / 4]  = 0;
+            timing[0xC / 4]  = 0;
+        }
+    }
+
+    /* Store sentinel 0xFEFEFEFE in state->0xC */
+    *(u32*)((u8*)lbl_8047AA80 + 0xC) = 0xFEFEFEFEU;
+
+    if (lbl_8047AA90 == 0) {
+        return;
+    }
+
+    /* fn_800D1070 timing — reload sub ptr each time */
+    startTick = OSGetTick();
+    fn_800D1070((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+    tick = OSGetTick();
+    timing = (u32*)&lbl_804001F0;
+    timing[0x2C / 4] += tick - startTick;
+
+    /* fn_800DC6D8 timing */
+    startTick = OSGetTick();
+    fn_800DC6D8((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+    tick = OSGetTick();
+    timing[0x30 / 4] += tick - startTick;
+
+    /* fn_800E3884 timing (pass 0) */
+    startTick = OSGetTick();
+    fn_800E3884((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54), 0);
+    tick = OSGetTick();
+    timing[0x34 / 4] += tick - startTick;
+
+    r29count = *(u32*)((u8*)lbl_8047AA80 + 0x54);
+    timing[0x38 / 4] = 0;
+
+    /* inner count loop */
+    do {
+        startTick = OSGetTick();
+        fn_800E3884((void*)1, 1);
+        tick = OSGetTick();
+        timing[0x34 / 4] += tick - startTick;
+
+        startTick = OSGetTick();
+        fn_801181B0(1);
+        tick = OSGetTick();
+        timing[0x38 / 4] += tick - startTick;
+    } while (r29count-- != 0);
+}
+#pragma pop
 #endif
-extern void fn_800D13C4(void);
-extern void fn_800DC874(void);
-extern void fn_800E3928(void);
-extern void fn_801183EC(void);
+extern void fn_800D13C4(void* a);
+extern void fn_800DC874(void* a);
+extern void fn_800E3928(void* a);
+extern void fn_801183EC(void* a);
 extern void fn_800E8684(void);
-extern void fn_8019C708(void);
-extern void fn_8019731C(void);
-extern void fn_80196EF8(void);
+extern void fn_8019C708(s32 a);
+extern void fn_8019731C(u8 a, u8 b, u8 c, u8 d);
+extern void fn_80196EF8(s32 a, s32 b, s32 c, f32 d, f32 e, f32 f, f32 g, f32 h);
 extern u32 lbl_8047AA80;
-extern u32 lbl_8047AA90;
-extern u32 lbl_8047CA00;
-extern u32 lbl_8047CA08;
-extern u32 lbl_8047CA04;
-#if 1
+extern u8 lbl_8047AA90;
+extern f32 lbl_8047CA00;
+extern f32 lbl_8047CA08;
+extern f32 lbl_8047CA04;
+#if 0
 asm void fn_800D3410(void) {
 #include "src/game/gs_gfx_fn_800D3410.inc"
 }
 #else
-void fn_800D3410(void) { /* TODO */ }
+void fn_800D3410(void* arg0, u8 arg1) {
+    u32* state;
+    u32 sc;
+    u8 r30;
+    u32 startTick;
+    u32 tick;
+
+    state = (u32*)lbl_8047AA80;
+    sc = state[0xC / 4];
+
+    if ((u32)(sc + 0x01020000U) == 0xFEFEU) {
+        /* sentinel matched — store arg0 into state->0xC and process sub-block */
+        state[0xC / 4] = (u32)arg0;
+        r30 = 0;
+
+        {
+            u32* s4 = (u32*)lbl_8047AA80;
+            sc = s4[0xC / 4];
+            if ((u32)(sc + 0x01020000U) != 0xFEFEU) {
+                if (((u8*)s4)[0x49D] == 0) {
+                    fn_800DC560();
+                    fn_801BF8A0(0);
+                    fn_801E16F0();
+                    fn_801BF6AC();
+                } else {
+                    if (sc != 0) {
+                        fn_800EF1E8((void*)sc, 1);
+                        r30 = 0;
+                    }
+                }
+                ((u8*)lbl_8047AA80)[0x49D] = 1;
+                if (r30 != 0) {
+                    fn_800B8E74();
+                    if (*(u32*)((u8*)lbl_8047AA80 + 0xC) != 0) {
+                        fn_800BB29C();
+                    }
+                }
+            }
+        }
+    }
+
+    /* store arg1 into lbl_8047AA90 (SDA21 var) */
+    lbl_8047AA90 = arg1;
+
+    if (arg1 != 0) {
+        /* reload state sub ptr and timing base inline each call (matches target) */
+        startTick = OSGetTick();
+        fn_800D13C4((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+        tick = OSGetTick();
+        ((u32*)&lbl_804001F0)[0x2C / 4] = tick - startTick;
+
+        startTick = OSGetTick();
+        fn_800DC874((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+        tick = OSGetTick();
+        ((u32*)&lbl_804001F0)[0x30 / 4] = tick - startTick;
+
+        startTick = OSGetTick();
+        fn_800E3928((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+        tick = OSGetTick();
+        ((u32*)&lbl_804001F0)[0x34 / 4] = tick - startTick;
+
+        startTick = OSGetTick();
+        fn_801183EC((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
+        tick = OSGetTick();
+        ((u32*)&lbl_804001F0)[0x38 / 4] = tick - startTick;
+    }
+
+    if (arg0 == 0) {
+        startTick = OSGetTick();
+        fn_800E8684();
+        tick = OSGetTick();
+        ((u32*)&lbl_804001F0)[0x3C / 4] = tick - startTick;
+
+        fn_8019C708(0);
+
+        if (((u8*)lbl_8047AA80)[0x19] != 0) {
+            fn_8019731C(
+                ((u8*)lbl_8047AA80)[0x1C],
+                ((u8*)lbl_8047AA80)[0x1D],
+                ((u8*)lbl_8047AA80)[0x1E],
+                ((u8*)lbl_8047AA80)[0x1F]
+            );
+            fn_80196EF8(1, 1, 0,
+                lbl_8047CA00,
+                lbl_8047CA08,
+                lbl_8047CA00,
+                lbl_8047CA04,
+                lbl_8047CA00);
+        }
+
+        ((u8*)lbl_8047AA80)[0x49D] = 0;
+    } else {
+        fn_8019C708(3);
+    }
+}
 #endif
 extern f32 lbl_8047C9F0;
 #pragma push
