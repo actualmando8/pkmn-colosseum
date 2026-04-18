@@ -411,21 +411,43 @@ s32 fn_80017914(u32 unused, u8* ptr) {
 }
 
 /* fn_8001793C - 0x8001793C | size: 0x54 */
-#if 1
+#if 0
 asm void fn_8001793C(void) {
 #include "src/game/gs_pokemon_summary_fn_8001793C.inc"
 }
 #else
-void fn_8001793C(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_8001793C(u8* src, u8* dst) {
+    dst[0x64] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C];
+    dst[0x65] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 1];
+    dst[0x66] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 2];
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80017990 - 0x80017990 | size: 0x7c */
-#if 1
+#if 0
 asm void fn_80017990(void) {
 #include "src/game/gs_pokemon_summary_fn_80017990.inc"
 }
 #else
-void fn_80017990(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_80017990(u8* src, u8* dst) {
+    s32 idx = (s32)(s8)src[0x95];
+    if ((s32)*(s16*)(dst + 6) == *(s32*)(&lbl_80266918[idx * 0x4C + 0x10])) {
+        dst[0x64] = lbl_80266918[idx * 0x4C];
+        dst[0x65] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 1];
+        dst[0x66] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 2];
+        dst[0x67] = 0xFF;
+    } else {
+        dst[0x67] = 0;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80017A0C - 0x80017A0C | size: 0x2ac */
