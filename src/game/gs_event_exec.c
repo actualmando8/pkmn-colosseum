@@ -1016,6 +1016,7 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
     s32 idx;
     s32 delta;
     PurEntry* e;
+    u8* walk;
 
     p = *(u8**)(ctx + 0x60);
     species = *(s16*)(tgt + 6);
@@ -1026,12 +1027,10 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
     }
     count = *(s32*)(p + 8);
     if (count < 5) {
-        idx = 0;
-        if ((((species != lbl_802E4DB0[0].key) && (idx = 1, species != lbl_802E4DB0[1].key)) &&
-             ((idx = 2, species != lbl_802E4DB0[2].key) && (idx = 3, species != lbl_802E4DB0[3].key))) &&
-            (((idx = 4, species != lbl_802E4DB0[4].key) && (idx = 5, species != lbl_802E4DB0[5].key)) &&
-             ((idx = 6, species != lbl_802E4DB0[6].key) && (idx = 7, species != lbl_802E4DB0[7].key)))) {
-            idx = 8;
+        walk = (u8*)lbl_802E4DB0;
+        for (idx = 0; idx < 8; idx++) {
+            if (species == *(s32*)walk) break;
+            walk += 0xc;
         }
         if (idx < 8) {
             e = &lbl_802E4DB0[idx];
