@@ -605,77 +605,12 @@ extern u8 lbl_8047A47C;
 extern f32 lbl_8047BA6C;
 extern f32 lbl_8047BA68;
 extern f32 lbl_8047BA70;
-#if 0
+#if 1
 asm void fn_800379E8(void) {
 #include "src/game/scene_init_fn_800379E8.inc"
 }
 #else
-#pragma push
-#pragma fp_contract on
-void fn_800379E8(u32 unused, u8* p) {
-    f32 f31;
-    f32 rate;
-    f32 current;
-    f32 target;
-    f32 accum;
-
-    current = lbl_8047A484;
-    f31 = current - *(f32*)(lbl_802E52B8 + 0xC);
-    if (f31 < lbl_8047BA58) {
-        f31 += lbl_8047BA60;
-    }
-    if (f31 >= lbl_8047BA60 || f31 == lbl_8047BA60) {
-        f31 -= lbl_8047BA60;
-    }
-    fn_80105624();
-    rate = lbl_8047BA64 * lbl_8047A494;
-    current = lbl_8047A484;
-    target = lbl_8047A488;
-    if (current != target) {
-        accum = target - current;
-        if (accum < lbl_8047BA58) {
-            rate = -rate;
-        }
-        lbl_8047A48C = rate;
-        accum = rate;
-        current += accum;
-        if (current >= lbl_8047BA60 || current == lbl_8047BA60) {
-            current -= lbl_8047BA60;
-        }
-        lbl_8047A484 = current;
-        if (current < lbl_8047BA58) {
-            current += lbl_8047BA60;
-            lbl_8047A484 = current;
-        }
-        accum = lbl_8047A484 - target;
-        if (accum > lbl_8047BA58) {
-            /* nothing - keep positive */;
-        } else {
-            accum = -accum;
-        }
-        if (rate <= lbl_8047BA58) {
-            rate = -rate;
-        }
-        if (accum < rate) {
-            lbl_8047A484 = target;
-            lbl_8047A48C = lbl_8047BA58;
-        }
-    } else {
-        s8 dir_cur = (s8)lbl_8047A47D;
-        s8 dir_prev = (s8)lbl_8047A47C;
-        if (dir_cur != dir_prev) {
-            if ((s8)(dir_cur - dir_prev) > 0) {
-                lbl_8047A48C = -rate;
-            } else {
-                lbl_8047A48C = rate;
-            }
-            lbl_8047A47D = lbl_8047A47C;
-        }
-    }
-    *(s16*)(p + 0x50) = (s16)(s32)(lbl_8047BA6C * (f32)fn_800CE148(f31) + lbl_8047BA68);
-    *(s16*)(p + 0x52) = (s16)(s32)(lbl_8047BA6C * (f32)fn_800CDBE0(f31) + lbl_8047BA70);
-}
-#pragma pop
+void fn_800379E8(void) { /* TODO - 58.3% best */ }
 #endif
 
 /* fn_80037BB0 - 0x80037BB0 | size: 0x1c8 */
