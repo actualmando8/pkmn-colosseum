@@ -195,7 +195,7 @@ s32 fn_800129A8(u8* ctx) {
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
 extern void* fn_801040D0(void*, s32);
-extern void fn_8005D9E4(void);
+extern u8 fn_8005D9E4(s32);
 extern s32  fn_800FA444(s32);
 extern void fn_8001E644(void);
 extern void fn_8001EA98(void);
@@ -246,13 +246,62 @@ s32 fn_80012D20(u8* ctx) {
 
 /* fn_80012E18 - 0x80012E18 | size: 0x198 */
 extern u8* fn_80105624(void);
-#if 1
-asm void fn_80012E18(void) {
-#include "src/game/gs_event_exec_fn_80012E18.inc"
+#pragma push
+#pragma peephole off
+s32 fn_80012E18(u8* ctx) {
+    u8* state;
+    u32 bits;
+    s32 v1;
+    s32 v2;
+    s32 maxv, minv;
+    u8  hi, lo;
+    u16 pair;
+    u8  saved_hi, saved_lo;
+    state = fn_80105624();
+    bits = *(u16*)(state + 6);
+    v1 = (s32)(s8)(s32)fn_801040D0(ctx, 2);
+    v2 = (s32)(s8)(s32)fn_8005D9E4(*(s32*)(ctx + 4));
+    if (v1 < v2) {
+        maxv = v2;
+        minv = v1;
+    } else {
+        maxv = v1;
+        minv = v2;
+    }
+    pair = *(u16*)(ctx + 0x94);
+    hi = (u8)(pair >> 8);
+    lo = (u8)pair;
+    if ((bits & 1) != 0) {
+        lo = (u8)(lo - 1);
+    } else if ((bits & 2) != 0) {
+        lo = (u8)(lo + 1);
+    }
+    if ((s8)lo < 0) {
+        saved_hi = hi;
+        saved_lo = lo;
+        lo = 0;
+        hi = (u8)(saved_hi + (s8)saved_lo);
+        if ((s8)hi < 0) {
+            lo = (u8)(minv - 1);
+            hi = (u8)(maxv - minv);
+        }
+    } else {
+        if ((s32)(s8)lo >= minv) {
+            saved_lo = lo;
+            saved_hi = hi;
+            lo = (u8)(minv - 1);
+            hi = (u8)(saved_hi + (saved_lo - (minv - 1)));
+            if ((s32)(s8)hi + (s32)(s8)lo >= maxv) {
+                hi = 0;
+                lo = 0;
+            }
+        }
+    }
+    *(u16*)(ctx + 0x94) = (u16)((u16)hi << 8 | lo);
+    *(s32*)(ctx + 0x80) = (s32)(s8)hi + (s32)(s8)lo;
+    return 0;
 }
-#else
-void fn_80012E18(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80012FB0 - 0x80012FB0 | size: 0x2ec */
 extern void fn_801040B8(void);
