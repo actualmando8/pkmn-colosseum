@@ -134,20 +134,64 @@ u32 fn_80014110(void) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_800129A8 - 0x800129A8 | size: 0x1ec */
-extern void fn_801040A0(void);
+extern u8*  fn_801040A0(void);
 extern void* fn_80103FFC(void*, s32);
-extern void fn_80103FE4(void);
-extern void fn_80104704(void);
-extern void fn_80103F74(void);
-extern void fn_801669BC(void);
+extern void fn_80103FE4(void*);
+extern u8   fn_80104704(s32);
+extern void fn_80103F74(s32, s32, s32);
+extern void fn_801669BC(s32);
 extern void* memcpy(void* dst, const void* src, u32 n);
-#if 1
-asm void fn_800129A8(void) {
-#include "src/game/gs_event_exec_fn_800129A8.inc"
+#pragma push
+#pragma peephole off
+s32 fn_800129A8(u8* ctx) {
+    u8* p;
+    s32 id;
+    s32 kind;
+    void* buf;
+    p = fn_801040A0();
+    if ((s32)(s8)ctx[1] == 0) {
+        buf = fn_80103FFC(ctx, 0x30);
+        if (buf != 0) memcpy(buf, *(void**)(ctx + 0x60), 0x30);
+    }
+    fn_80103FE4(ctx);
+    if ((s32)(s8)ctx[1] == 0) {
+        id = *(s32*)(ctx + 4);
+        kind = 0;
+        if (fn_80104704(id) != 0) {
+            if (id == 0x49) kind = 0x538;
+            else if (id >= 0x49) { if (id < 0x4b) kind = 0x540; }
+            else if (id >= 0x47) kind = 0x540;
+            else if (id >= 0x45) kind = 0x538;
+            fn_80103F74(id, kind, 0);
+        }
+        id = *(s32*)(ctx + 4);
+        kind = 0;
+        if (fn_80104704(id) != 0) {
+            if (id == 0x49) kind = 0x539;
+            else if (id >= 0x49) { if (id < 0x4b) kind = 0x541; }
+            else if (id >= 0x47) kind = 0x541;
+            else if (id >= 0x45) kind = 0x539;
+            fn_80103F74(id, kind, 0);
+        }
+    }
+    if (*(s16*)(p + 2) != 0) {
+        *(s16*)(p + 4) += 1;
+        if (*(s16*)(p + 4) > *(s16*)(p + 2)) {
+            *(s16*)(p + 2) = 0;
+        }
+    }
+    if (*(s16*)(p + 0xC) != 0) {
+        *(s16*)(p + 0xE) += 1;
+        if (*(s16*)(p + 0xE) > *(s16*)(p + 0xC)) {
+            *(s16*)(p + 0xC) = 0;
+            fn_801669BC(0x4d0);
+        }
+    }
+    *(u16*)(p + 6) += 1;
+    *(u16*)(p + 6) = (u16)(*(u16*)(p + 6) % 1200);
+    return 0;
 }
-#else
-void fn_800129A8(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
 extern void* fn_801040D0(void*, s32);
