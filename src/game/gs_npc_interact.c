@@ -2214,12 +2214,51 @@ void fn_80010294(void) { /* TODO */ }
 #endif
 
 /* fn_8001047C - 0x8001047C | size: 0x10c */
-#if 1
+#if 0
 asm void fn_8001047C(void) {
 #include "src/game/gs_npc_interact_fn_8001047C.inc"
 }
 #else
-void fn_8001047C(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_8001047C(u8* arg1) {
+    extern void* fn_80103FE4(u8* a);
+    extern u32 fn_80104530(u32 val);
+    extern void* fn_80205B8C(void* obj);
+    extern u32 fn_8012640C(s32 p1, s32 p2, s32 p3, s32 p4, u16 p5, s32 p6);
+    extern void fn_80132A38(s32 p1, s32 val);
+    extern void fn_801040F0(s32 p1, s32 p2, u8* p3, u16 p4, s32 p5);
+    void* participant;
+    u32 npc_data;
+    s16 idx;
+    s32 r30;
+    u16 battle_result;
+    u16 val;
+    s32 temp;
+    participant = fn_80103FE4(arg1);
+    npc_data = fn_80104530(*(u32*)(arg1 + 4));
+    idx = (s16)(npc_data >> 16);
+    temp = (s8)(idx & 0xFF);
+    if (temp < 0 || temp >= 4) return;
+    r30 = temp * 0xc;
+    if (*(u32*)((u8*)participant + r30 + 4) == 0) return;
+    battle_result = 0;
+    if (fn_80205B8C(*(void**)((u8*)participant + 0x40)) != 0) {
+        battle_result = (u16)fn_8012640C(0, 0x7f, 0, 0, (s8)(*(u8*)(arg1 + 0x95)), 0);
+    }
+    val = 0;
+    if (battle_result == 0 || battle_result == 0x164) {
+        val = 0;
+    } else if (battle_result < 0x166) {
+        val = 0x5d;
+    } else {
+        val = *(u16*)((u8*)participant + r30 + 0xc);
+    }
+    if ((u16)val != 0) {
+        fn_801040F0(0, 2, arg1, val, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80010588 - 0x80010588 | size: 0x11c */
