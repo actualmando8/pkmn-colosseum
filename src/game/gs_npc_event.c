@@ -173,144 +173,49 @@ extern void fn_80109220(void*, s32);
 extern void fn_80123FBC(void);
 extern void fn_80075FEC(void);
 extern u8 lbl_80266E90[];
-#if 1
+#if 0
 asm void fn_80031228(void) {
 #include "src/game/gs_npc_event_fn_80031228.inc"
 }
 #else
-void fn_80031228(void) {
-    extern u8 lbl_80266E90[];
-    extern u8 lbl_803A2688[];
-    extern void fn_80075FEC();
-    extern void fn_80109220();
-    extern void fn_8010B718();
-    extern void fn_8011E850();
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+#pragma push
+#pragma peephole off
+void fn_80031228(u8* arg0, u8* arg1) {
+    u8* table;
+    s32 kind;
+    s32 arg;
+    s32 i;
+    void* obj;
 
-    r30 = r3;
-    r31 = r4;
-    r3 = (u32)lbl_80266E90;
-    r29 = 0x0;
-    r4 = (u32)lbl_80266E90;
-    r6 = 0x0;
-    r7 = 0x0;
-    r5 = 0x0;
-    tmp = 0x2;
-    ctr_fn = (void(*)(void))tmp;
-    do {
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
+    table = lbl_80266E90;
+    kind = 0;
+    arg = 0;
+    for (i = 0; i < 12; i++) {
+        if (*(s16*)(arg1 + 0x6) == *(u16*)(table + 0x2)) {
+            kind = *(u8*)(table + 0x0);
+            arg = *(u8*)(table + 0x1);
         }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r5 = r5 + 0x5;
-    } while (--ctr != 0);
-    if ((s32)r6 != 2) {
-        if ((s32)r6 >= 2) goto L_80031360;
-        if ((s32)r6 < 1) {
-            goto L_80031360;
-        }
-        r5 = r7 & 0xFFFF;
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
+        table += 0x12;
+    }
 
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+    }
+
+    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+        ((void (*)(u8*, u8*, void*))fn_8010B718)(arg0, arg1, obj);
+        fn_80109220(arg1, 1);
+    } else if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 && ((u8 (*)(void))fn_80075FEC)() == 1) {
+        ((void (*)(u8*, u8*, void*))fn_8010B718)(arg0, arg1, obj);
+        fn_80109220(arg1, 1);
     } else {
-        r3 = (u32)lbl_803A2688;
-        r5 = r7 & 0xFFFF;
-        r3 = (u32)lbl_803A2688;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
+        fn_80109220(arg1, 0);
     }
-L_80031360:
-    r3 = r29;
-    fn_8011E850();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = r30;
-        r4 = r31;
-        r5 = r29;
-        fn_8010B718();
-        r3 = r31;
-        r4 = 0x1;
-        fn_80109220();
-        return;
-    }
-    r3 = r29;
-    fn_80123FBC();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = r29;
-        fn_80075FEC();
-        tmp = r3 & 0xFF;
-        if (tmp == 1) {
-            r3 = r30;
-            r4 = r31;
-            r5 = r29;
-            fn_8010B718();
-            r3 = r31;
-            r4 = 0x1;
-            fn_80109220();
-            return;
-    }
-    }
-    r3 = r31;
-    r4 = 0x0;
-    fn_80109220();
-
-    return;
 }
+#pragma pop
 #endif
 
 /* 0x80031404 | 0x244 */
