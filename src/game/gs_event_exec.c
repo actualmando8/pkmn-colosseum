@@ -443,17 +443,68 @@ after:
 #pragma pop
 
 /* fn_80013F80 - 0x80013F80 | size: 0x17c */
-extern void fn_80143DE4(void);
-extern void fn_80143DCC(void);
-extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2E0;
-#if 1
-asm void fn_80013F80(void) {
-#include "src/game/gs_event_exec_fn_80013F80.inc"
+typedef s32 (*MusicFp)(u16, s32*);
+extern MusicFp fn_80143DE4(void);
+extern MusicFp fn_80143DCC(void);
+#pragma push
+#pragma peephole off
+s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
+    s32   buf[5];
+    u8*   entry;
+    s32   flag;
+    void* list;
+    s32   idx;
+    s32   i;
+    MusicFp fp;
+    s32   r;
+    s32   retval;
+    u16   id;
+    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    flag  = *(s32*)(entry + 4);
+    idx = -1;
+    i = 0;
+    if (flag >= 0) {
+        list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
+    } else {
+        list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
+    }
+    while (i < *(u16*)buf) {
+        if (fn_801429E8(list)) {
+            idx++;
+            if (idx >= target_n) {
+                idx = fn_80143C68(list);
+                goto after;
+            }
+        }
+        i++;
+        list = (u8*)list + 4;
+    }
+    idx = 0;
+after:
+    id = (u16)idx;
+    fn_801440A0(id);
+    if ((s32)lbl_8047A2E0 != 0) {
+        fp = fn_80143DCC();
+    } else {
+        fp = fn_80143DE4();
+    }
+    if (fp == 0) {
+        fn_80106D3C(2, 0x4261, 1, 0);
+        fn_801069FC(1);
+        *out = 0;
+        return 3;
+    }
+    r = fp(id, out);
+    switch (r) {
+    case 0: retval = 0; break;
+    case 1: retval = 3; break;
+    case 2: retval = 4; break;
+    default: retval = 0; break;
+    }
+    return retval;
 }
-#else
-void fn_80013F80(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_800140FC - 0x800140FC | size: 0x14 */
 extern u32 lbl_8047A2F8;
