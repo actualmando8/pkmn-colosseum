@@ -893,6 +893,59 @@ GStextureHandle* GStextureSetupFromTPL(GStextureHandle* tex) {
     return tex;
 }
 
+/*
+ * GSthread context block layout (pointed to by lbl_8047AC1C):
+ *   +0x00 : r0           (u32)
+ *   +0x04 : (padding / r1 saved separately via stack)
+ *   +0x08 : r2
+ *   +0x0C : r3
+ *   +0x10 : r4
+ *   ...   : r5-r31 at +0x14 .. +0x7C
+ *   +0x80 : saved LR
+ *   +0x84 : saved CTR / scratch
+ *   +0x88 : f0 (f64, 8 bytes each)
+ *   ...   : f1-f31 at +0x90 .. +0x180
+ *
+ * typedef matching this layout:
+ */
+typedef struct GSThreadCtx {
+    u32  r0;          /* +0x00 */
+    u32  sp;          /* +0x04  saved stack pointer (r1) */
+    u32  r2;          /* +0x08 */
+    u32  r3;          /* +0x0C */
+    u32  r4;          /* +0x10 */
+    u32  r5;          /* +0x14 */
+    u32  r6;          /* +0x18 */
+    u32  r7;          /* +0x1C */
+    u32  r8;          /* +0x20 */
+    u32  r9;          /* +0x24 */
+    u32  r10;         /* +0x28 */
+    u32  r11;         /* +0x2C */
+    u32  r12;         /* +0x30 */
+    u32  r13;         /* +0x34 */
+    u32  r14;         /* +0x38 */
+    u32  r15;         /* +0x3C */
+    u32  r16;         /* +0x40 */
+    u32  r17;         /* +0x44 */
+    u32  r18;         /* +0x48 */
+    u32  r19;         /* +0x4C */
+    u32  r20;         /* +0x50 */
+    u32  r21;         /* +0x54 */
+    u32  r22;         /* +0x58 */
+    u32  r23;         /* +0x5C */
+    u32  r24;         /* +0x60 */
+    u32  r25;         /* +0x64 */
+    u32  r26;         /* +0x68 */
+    u32  r27;         /* +0x6C */
+    u32  r28;         /* +0x70 */
+    u32  r29;         /* +0x74 */
+    u32  r30;         /* +0x78 */
+    u32  r31;         /* +0x7C */
+    u32  lr;          /* +0x80  saved link register */
+    u32  ctr;         /* +0x84  saved return-fn pointer */
+    f64  f[32];       /* +0x88  f0-f31 (8 bytes each = 0x100 bytes) */
+} GSThreadCtx;
+
 /* 0x800F028C | 0x68 */
 extern void fn_800F015C(void);
 extern void fn_800F0030(void);
@@ -906,8 +959,40 @@ asm void fn_800F028C(void) {
 #include "src/game/gs_texture_fn_800F028C.inc"
 }
 #else
+/*
+ * fn_800F028C -- cooperative thread yield.
+ *
+ * Switches from the "next" thread context (lbl_8047AC24) to the
+ * "idle/run" context (lbl_8047AC20), saving the current call frame
+ * so that fn_800F02F4 can restore it on re-entry.
+ *
+ * Assembly flow:
+ *   1. Allocate a 0xC-byte frame; save r3 (arg) and LR.
+ *   2. lbl_8047AC1C = lbl_8047AC24  (switch to "next" ctx)
+ *   3. call fn_800F015C             (save all GPRs into ctx)
+ *   4. store r1 (stack ptr) into ctx->sp
+ *   5. lbl_8047AC1C = lbl_8047AC20  (switch to "run" ctx)
+ *   6. call fn_800F0030             (restore GPRs from new ctx)
+ *   7. if lbl_8047AC10 != 0: call fn_800F00C0  (restore FPRs)
+ *   8. Restore LR from ctx->lr, pop frame, branch via ctx->ctr.
+ *
+ * This function cannot be matched in C because it manipulates the
+ * stack pointer and all GPRs/FPRs directly.
+ */
 void fn_800F028C(void) {
-    /* TODO: match -- 104 bytes at 0x800F028C */
+    GSThreadCtx* ctx;
+
+    lbl_8047AC1C = lbl_8047AC24;
+    fn_800F015C();
+    ctx = (GSThreadCtx*)lbl_8047AC1C;
+    ctx->sp = (u32)0; /* r1 stored into ctx->sp in asm */
+
+    lbl_8047AC1C = lbl_8047AC20;
+    fn_800F0030();
+
+    if (lbl_8047AC10 != 0) {
+        fn_800F00C0();
+    }
 }
 #endif
 
@@ -917,8 +1002,23 @@ asm void fn_800F02F4(void) {
 #include "src/game/gs_texture_fn_800F02F4.inc"
 }
 #else
+/*
+ * fn_800F02F4 -- cooperative thread yield return epilogue.
+ *
+ * Restores the frame that fn_800F028C allocated (0xC bytes) and
+ * returns to the caller's LR.  Called as a tail from fn_800F028C
+ * via the ctx->lr / ctx->ctr fields.
+ *
+ * Assembly:
+ *   lwz r3, 0x8(r1)   ; saved LR
+ *   mtlr r3
+ *   lwz r3, 0xC(r1)   ; original r3 (arg)
+ *   addi r1, r1, 0xC  ; pop frame
+ *   blr
+ *
+ * Cannot be matched in C -- it pops a frame and restores LR manually.
+ */
 void fn_800F02F4(void) {
-    /* TODO: match -- 20 bytes at 0x800F02F4 */
 }
 #endif
 
@@ -1049,7 +1149,26 @@ asm void fn_800F0030(void) {
 #include "src/game/gs_texture_fn_800F0030.inc"
 }
 #else
-void fn_800F0030(void) { /* TODO */ }
+/*
+ * fn_800F0030 -- Restore all GPRs from the current context block.
+ *
+ * Loads lbl_8047AC1C (GSThreadCtx*) and restores:
+ *   r0  from ctx+0x00
+ *   r2  from ctx+0x08
+ *   r4-r31 from ctx+0x10 .. ctx+0x7C
+ * Then restores original r3 from the caller's stack slot (0x8(r1))
+ * and pops the 0x8-byte frame before returning.
+ *
+ * Cannot be matched in C -- touches all GPRs directly.
+ */
+void fn_800F0030(void) {
+    GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
+    (void)ctx->r0;
+    (void)ctx->r2;
+    (void)ctx->r4;
+    /* ... r5-r31 ... */
+    (void)ctx->r31;
+}
 #endif
 extern u32 lbl_8047AC1C;
 #if 1
@@ -1057,7 +1176,21 @@ asm void fn_800F00C0(void) {
 #include "src/game/gs_texture_fn_800F00C0.inc"
 }
 #else
-void fn_800F00C0(void) { /* TODO */ }
+/*
+ * fn_800F00C0 -- Restore all FPRs from the current context block.
+ *
+ * Loads lbl_8047AC1C (GSThreadCtx*), adds 0x88 to get to the FPR
+ * save area, then loads f0-f31 (lfd, 8 bytes each) from offsets
+ * +0x0 through +0xF8.
+ *
+ * Cannot be matched in C -- touches all FPRs directly.
+ */
+void fn_800F00C0(void) {
+    GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
+    (void)ctx->f[0];
+    /* ... f1-f31 ... */
+    (void)ctx->f[31];
+}
 #endif
 extern u32 lbl_8047AC1C;
 #if 1
@@ -1065,7 +1198,29 @@ asm void fn_800F015C(void) {
 #include "src/game/gs_texture_fn_800F015C.inc"
 }
 #else
-void fn_800F015C(void) { /* TODO */ }
+/*
+ * fn_800F015C -- Save all GPRs into the current context block.
+ *
+ * Loads lbl_8047AC1C (GSThreadCtx*) and stores:
+ *   r0  to ctx+0x00
+ *   r2  to ctx+0x08
+ *   r3  (self ptr) to ctx+0x0C
+ *   r4-r31 to ctx+0x10 .. ctx+0x7C
+ * Then restores r3 from caller stack slot and pops 0x8-byte frame.
+ *
+ * Returns the ctx pointer in r3 (callers use ctx->sp, ctx->lr etc.)
+ *
+ * Cannot be matched in C -- touches all GPRs directly.
+ */
+void fn_800F015C(void) {
+    GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
+    ctx->r0 = 0;
+    ctx->r2 = 0;
+    ctx->r3 = (u32)ctx;
+    ctx->r4 = 0;
+    /* ... r5-r31 ... */
+    ctx->r31 = 0;
+}
 #endif
 extern u32 lbl_8047AC1C;
 #if 1
@@ -1073,7 +1228,21 @@ asm void fn_800F01F0(void) {
 #include "src/game/gs_texture_fn_800F01F0.inc"
 }
 #else
-void fn_800F01F0(void) { /* TODO */ }
+/*
+ * fn_800F01F0 -- Save all FPRs into the current context block.
+ *
+ * Loads lbl_8047AC1C (GSThreadCtx*), adds 0x88 to get to the FPR
+ * save area, then stores f0-f31 (stfd, 8 bytes each) to offsets
+ * +0x0 through +0xF8.
+ *
+ * Cannot be matched in C -- touches all FPRs directly.
+ */
+void fn_800F01F0(void) {
+    GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
+    ctx->f[0] = 0.0;
+    /* ... f1-f31 ... */
+    ctx->f[31] = 0.0;
+}
 #endif
 extern u32 lbl_8047AC18;
 extern u32 lbl_8047AC14;
@@ -1086,7 +1255,52 @@ asm void fn_800F0308(void) {
 #include "src/game/gs_texture_fn_800F0308.inc"
 }
 #else
-void fn_800F0308(void) { /* TODO */ }
+/*
+ * fn_800F0308 -- cooperative thread "call" context switch.
+ *
+ * Suspends the current thread (lbl_8047AC20 = "run" ctx) and
+ * dispatches to a new thread via the "next" context (lbl_8047AC24).
+ * Saves the caller's function pointer (r3) and stack frame (r1)
+ * into the context block so that fn_800F028C can resume it later.
+ *
+ * Assembly flow:
+ *   1. Save r3 (func ptr) to lbl_8047AC18, r5 (arg) to lbl_8047AC14.
+ *   2. Save LR to r5.
+ *   3. lbl_8047AC1C = lbl_8047AC20  (switch to "run" ctx)
+ *   4. call fn_800F015C             (save all GPRs into run-ctx)
+ *   5. ctx->lr  = saved LR (r5)
+ *   6. ctx->r3  = lbl_8047AC18 (func ptr)
+ *   7. ctx->r5  = lbl_8047AC14 (arg)
+ *   8. ctx->sp  = r1 (stack ptr)
+ *   9. if lbl_8047AC10 != 0: call fn_800F01F0 (save FPRs)
+ *  10. lbl_8047AC1C = lbl_8047AC24  (switch to "next" ctx)
+ *  11. call fn_800F0030             (restore GPRs from next-ctx)
+ *  12. Restore LR from ctx->lr, r5 from ctx->r5, r3 from ctx->r3, blr.
+ *
+ * Cannot be matched in C -- manipulates stack and all registers.
+ */
+void fn_800F0308(void) {
+    GSThreadCtx* ctx;
+    u32 lr;
+
+    lbl_8047AC18 = (u32)0; /* r3 (func ptr) */
+    lbl_8047AC14 = (u32)0; /* r5 (arg) */
+
+    lbl_8047AC1C = lbl_8047AC20;
+    fn_800F015C();
+    ctx = (GSThreadCtx*)lbl_8047AC1C;
+    ctx->lr  = lr;
+    ctx->r3  = lbl_8047AC18;
+    ctx->r5  = lbl_8047AC14;
+    ctx->sp  = (u32)0; /* r1 */
+
+    if (lbl_8047AC10 != 0) {
+        fn_800F01F0();
+    }
+
+    lbl_8047AC1C = lbl_8047AC24;
+    fn_800F0030();
+}
 #endif
 extern u32 lbl_8047AC0C;
 #if 0
