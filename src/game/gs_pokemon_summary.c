@@ -125,14 +125,27 @@ s32 fn_8001501C(void) {
 #endif
 
 /* fn_80015050 - 0x80015050 | size: 0x94 */
-extern void fn_80103E68(void);
+extern u32 fn_80103E68(u32 a);
 extern u8 lbl_80266918[];
-#if 1
+#if 0
 asm void fn_80015050(void) {
 #include "src/game/gs_pokemon_summary_fn_80015050.inc"
 }
 #else
-void fn_80015050(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+typedef s32 (*DrawHandlerFn)(u8*, u8*, s16*);
+s32 fn_80015050(u8* src, u8* param) {
+    u8* entry = &lbl_80266918[(s32)(s8)src[0x95] * 0x4C];
+    DrawHandlerFn fp = *(DrawHandlerFn*)(entry + 0x18);
+    u16 tmp;
+    if (fp != NULL) {
+        tmp = fn_80103E68((u16)*(u32*)(entry + 0x1C)) >> 16;
+        return fp(src, param, (s16*)&tmp);
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_800150E4 - 0x800150E4 | size: 0x290 */
