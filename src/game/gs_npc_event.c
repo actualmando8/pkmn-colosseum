@@ -2405,12 +2405,59 @@ void fn_80030C14(void* r3, u8* r4) {
 
 /* fn_80030D34 - 0x80030D34 | size: 0x1d8 */
 extern void fn_8011F1A0(void);
-#if 1
+#if 0
 asm void fn_80030D34(void) {
 #include "src/game/gs_npc_event_fn_80030D34.inc"
 }
 #else
-void fn_80030D34(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_80030D34(u8* arg0, u8* arg1) {
+    u8* table;
+    s32 kind;
+    s32 arg;
+    s32 i;
+    s32 side;
+    void* obj;
+
+    table = lbl_80266E90;
+    kind = 0;
+    arg = 0;
+    for (i = 0; i < 12; i++) {
+        if (*(s16*)(arg1 + 0x6) == *(u16*)(table + 0x8)) {
+            kind = *(u8*)(table + 0x0);
+            arg = *(u8*)(table + 0x1);
+        }
+        table += 0x12;
+    }
+
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+    }
+
+    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+        if (side != 0) {
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 &&
+               ((u8 (*)(void))fn_80075FEC)() == 1) {
+        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+        if (side != 0) {
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else {
+        fn_80109220(arg1, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80030F0C - 0x80030F0C | size: 0x27c */
