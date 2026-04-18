@@ -2298,12 +2298,43 @@ void fn_80030574(void) { /* TODO */ }
 /* fn_800307A8 - 0x800307A8 | size: 0x12c */
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-#if 1
+#if 0
 asm void fn_800307A8(void) {
 #include "src/game/gs_npc_event_fn_800307A8.inc"
 }
 #else
-void fn_800307A8(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800307A8(u8* arg0, u8* arg1) {
+    u32 combined;
+    s32 kind;
+    void* obj;
+
+    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
+    kind = 0;
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x2)) {
+        kind = *(u16*)(lbl_80266F68 + 0x0);
+    }
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x16)) {
+        kind = *(u16*)(lbl_80266F68 + 0x14);
+    }
+
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+    }
+
+    if (obj != 0) {
+        fn_80132A38(0x2F, ((u8 (*)(void*, s32, s32, s32))fn_8012640C)(obj, 0, 0x7A, 0));
+        fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0x4414);
+        fn_80109220(arg1, 1);
+    } else {
+        fn_80109220(arg1, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_800308D4 - 0x800308D4 | size: 0x170 */
