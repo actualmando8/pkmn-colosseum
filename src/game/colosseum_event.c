@@ -106,7 +106,7 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  fn_801230E0(void);
-extern void  fn_801F0928(void);
+extern void* fn_801F0928(void* p);
 extern void  fn_8011BEB4(void);
 
 /* SDA table pointers for event data arrays */
@@ -2951,20 +2951,17 @@ int fn_8020505C(void)
   return iVar1;
 }
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_802050F4(void) {
 #include "src/game/colosseum_event_fn_802050F4.inc"
 }
 #else
 void* fn_802050F4(void* ctx) {
-    extern void* fn_8012640C();
-    extern void* fn_801F0928();
-    if (fn_8012640C(ctx, 0, 0xFE, 0) == 0) {
-        return (void*)-0x80;
-    }
-    return fn_801F0928(fn_8012640C(ctx, 0, 0xFE, 0));
+    void* p = fn_8012640C(ctx, 0, 0xFE, 0);
+    if (p == 0) return (void*)-0x80;
+    return fn_801F0928(p);
 }
 #endif
 #pragma pop
