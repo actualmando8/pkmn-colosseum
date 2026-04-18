@@ -136,7 +136,7 @@ u32 fn_80014110(void) {
 /* fn_800129A8 - 0x800129A8 | size: 0x1ec */
 extern u8*  fn_801040A0(void);
 extern void* fn_80103FFC(void*, s32);
-extern void fn_80103FE4(void*);
+extern void* fn_80103FE4(void*);
 extern u8   fn_80104704(s32);
 extern void fn_80103F74(s32, s32, s32);
 extern void fn_801669BC(s32);
@@ -195,19 +195,75 @@ s32 fn_800129A8(u8* ctx) {
 
 /* fn_80012B94 - 0x80012B94 | size: 0x18c */
 extern void* fn_801040D0(void*, s32);
-extern u8 fn_8005D9E4(s32);
-extern s32  fn_800FA444(s32);
-extern void fn_8001E644(void);
-extern void fn_8001EA98(void);
-extern void fn_800FB680(s32, s32, s32, s32);
-extern void fn_801040F0(void);
-#if 1
-asm void fn_80012B94(void) {
-#include "src/game/gs_event_exec_fn_80012B94.inc"
+extern s32   fn_800FA444(s32);
+extern void  fn_800FB680(s32, s32, s32, s32);
+extern void fn_8001E644(s32, s32, s32, s32, u8);
+extern void fn_8001EA98(s32, s32, s32, s32);
+extern void fn_801040F0(s32, s16, void*, s32, s32);
+#pragma push
+#pragma peephole off
+s32 fn_80012B94(u8* ctx) {
+    u8   cmd;
+    u8*  arr;
+    s32  count;
+    s32  cap;
+    u8*  iter;
+    s32  i;
+    s32  max_hi;
+    s32  sum_lo;
+    s32  rng;
+    s32  val;
+    s32  delay;
+    s32  acc;
+    cmd   = (u8)(s32)fn_801040D0(ctx, 0);
+    arr   = (u8*)fn_80103FE4(ctx);
+    count = (s32)(s8)(s32)fn_801040D0(ctx, 2);
+    cap   = (s32)(u8)fn_8005D9E4(*(s32*)(ctx + 4));
+    if (count > cap) count = cap;
+
+    max_hi = 0;
+    sum_lo = 0;
+    iter = arr;
+    i = 0;
+    while (i < count) {
+        rng = fn_800FA444(*(s32*)iter);
+        if (max_hi < (s32)((u32)rng >> 16)) {
+            max_hi = (s32)((u32)rng >> 16);
+        }
+        sum_lo += (s32)(rng & 0xFFFF);
+        iter += 4;
+        i++;
+        sum_lo += 2;
+    }
+
+    if ((s32)cmd == 0x7f) {
+        fn_8001EA98(0, 0, max_hi + 0x20, sum_lo);
+    } else if ((s32)cmd < 2 && (s32)cmd >= 0) {
+        fn_8001E644(0, 0, max_hi + 0x20, sum_lo, ctx[0x8B]);
+    }
+
+    iter = arr;
+    acc = 1;
+    i = 0;
+    while (i < count) {
+        val = *(s32*)iter;
+        if (val != 0) {
+            rng = fn_800FA444(val);
+            fn_800FB680(0x20, acc, -1, val);
+            delay = (s32)(rng & 0xFFFF) + 2;
+        } else {
+            delay = 0x14;
+        }
+        if ((s32)(s8)ctx[0x95] == i) {
+            fn_801040F0(0x20, (s16)acc, ctx, 0x157, 0);
+        }
+        acc += delay;
+        iter += 4;
+        i++;
+    }
+    return 0;
 }
-#else
-void fn_80012B94(void) { /* TODO */ }
-#endif
+#pragma pop
 
 /* fn_80012D20 - 0x80012D20 | size: 0xf8 */
 extern void fn_801080CC(s32, s32);
