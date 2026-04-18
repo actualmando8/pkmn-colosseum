@@ -1,177 +1,156 @@
-# New Session: Apply gs_title.c Pipeline to Other Source Files
+# New Session — Continue Decompilation Project
 
-You are taking over a Pokémon Colosseum (GPXE01) byte-match decompilation project.
-The previous session pushed `src/game/gs_title.c` from ~66% avg to **92.23% avg**
-across 15 functions using a Ghidra → CW pipeline. **gs_title.c is now considered
-done** (the remaining 1-8% gaps are CW 1.3 codegen ceilings — see "DONE" section).
+You are picking up a Pokémon Colosseum (GPXE01) asm→C byte-match decompilation project. The previous session landed a lot of progress; this handoff has everything you need to resume cleanly.
 
-Your job: **apply the same pipeline to other src/game/*.c files**, leveraging
-multiple models in parallel (especially the free/local ones) to maximize
-throughput.
+## Current state (2026-04-18)
 
----
+- **Master HEAD** is clean and green. Run `git log --oneline -5` to see the last commits.
+- **`asm-active` functions across `src/game/*.c`**: **373**
+- Progress over the last few sessions: **~75 functions converted** from asm wrappers to matching C (from 448 → 373).
+- Top-matching files are in great shape (gs_title, gs_scene complete; gs_event_exec 21/25 converted). The remaining bulk is in:
+  - `gs_field_world.c` (88 asm-active) — biggest file, lots of hard stubs
+  - `scene_init.c` (56)
+  - `gs_worldmap.c` (46)
+  - `gs_render.c` (43)
+  - `gs_thread.c` (34)
+  - `gs_npc_interact.c` (22)
+  - `gs_pokemon_summary.c` (23 — all TODO stubs, needs fresh C)
+  - `gs_title.c` (19)
+  - `gs_npc_event.c` (9)
 
-## Project orientation
+## What's set up
 
-- **Repo root:** `C:/Users/douglaswhittingham/pkmn-colosseum`
-- **Compiler:** `tools/mwcc_compiler/GC/1.3/mwcceppc.exe` (CW 1.3) is the default for game/. Per-file overrides in `config/GC6E01/compile_config.json`.
-- **Build target:** `build/GC6E01/obj/auto_01_800055E0_text.o` is the byte-truth.
-- **Match tool:** `python3 tools/match_scan.py fn_XXXXXXXX [...]`
-- **Per-file scan:** `python3 tools/scan_all_files.py` returns 0% for every file — that's expected (objdiff-cli's section match needs symbol-set parity which game .o files don't have vs the full target.o). Use the **asm-active count proxy** below (counts `#if 1` + `asm void fn_` patterns) instead — that's the real metric.
-- **Compile + diff:** `python3 tools/compile_check.py src/game/<file>.c`
-- **Full diff:** `./tools/objdiff-cli.exe diff -1 build/GC6E01/obj/auto_01_800055E0_text.o -2 build/GC6E01/base/game/<file>.o -o - --format json -c ppc.calculatePoolRelocations=false fn_XXXXXXXX`
+### Queue system (`tools/decomp_work/queue/`)
+- **`QUEUE.md`** — manifest of 65 briefs ordered by asm size
+- **`WORKFLOW.md`** — the pipeline spec (GLM plans → Codex implements → Claude merges)
+- **`CLAUDE_OVERNIGHT.md`** — cycle instructions for future Claude sessions
+- **`fn_XXXXXXXX.md`** — per-function brief files; each has GLM Plan / Codex Input / Claude Review sections
+- **`generate_queue.py`** — regenerates briefs; rerun after completing a batch
 
-## Pipeline (READ THIS FIRST)
+### Batch-flip tool (`tools/batch_flip_stubs.py`)
+- Automatically flips `#if 1 / asm / #else / <real C stub> / #endif` blocks to `#if 0`
+- Auto-removes conflicting `extern void fn_X(void);` declarations
+- Tries pragma variants (`peephole off`, `scheduling off`, combo) if initial flip <40%
+- Usage: `python3 tools/batch_flip_stubs.py <file_stem>`
+- Already exhausted on: gs_thread (18+18=36 wins), gs_render (5), gs_material (2), gs_title (3), gs_field_world (6), gs_scene (5). Most files now show "Found 0 candidate stubs".
 
-The full Ghidra→CW recipe is in **`tools/decomp_work/CLAUDE.md`** with 7 documented quirks. Critical excerpts:
+### Other tools
+- `python3 tools/compile_check.py src/game/<file>.c` — compile one file
+- `python3 tools/match_scan_file.py <stem> fn_XXX [...]` — per-function match%
+- `./tools/objdiff-cli.exe diff -1 build/GC6E01/obj/auto_01_800055E0_text.o -2 build/GC6E01/base/game/<file>.o -o - --format json -c ppc.calculatePoolRelocations=false fn_XXX` — full diff
 
-1. **Quirk 1:** `switch (x) { case 1: ...; case 0: default: ...; }` — the redundant `case 0:` produces the dead `cmpwi r0, 0` CW emits.
-2. **Quirk 2:** declare local as `s32 unaff_rN;` and apply `(s16)` cast at USE site for explicit `extsh` before xor (not at assignment).
-3. **Quirk 3:** `f32 local[4]` array (not separate `f32 a; f32 b;`) eliminates spurious `f31` save spill (~+5% per function).
-4. **Quirk 4:** `((u32)*ptr >> N) & 1` produces target's `extrwi`; `(s8)*ptr < 0` produces wrong `extsb+cmpwi`.
-5. **Quirk 5:** Nested call expressions (`fn_X(fn_Y(...))`) keep the intermediate pointer in r3 (volatile), avoiding non-volatile spill.
-6. **Quirk 6 (NEW THIS SESSION):** `*(volatile u8*)ptr` cast prevents CW from caching byte loads in r4 across multiple bit tests in linked-list walks (+1-2% per walk).
-7. **Quirk 7:** Nested `!=` chain with comma operator: `if (a != X0 && (iv=1, a != X1) && (iv=2, a != X2) && ...) iv = N;` — CW emits the progressive `li rN, i` sequence target uses for table-of-IDs lookups.
+### Stop-hook beep
+`.claude/settings.local.json` has a Stop hook that plays two quick beeps (`[console]::beep`) when you finish responding. Keep it.
 
-Plus discovered after CLAUDE.md was last updated:
-- **`(s16)` outer cast** on f32 expression assigned to `*(s16*)` memory: avoids extra `extsh` before `sth` that the more obvious `(s32)` cast emits (+1-2%).
-- **goto LAB_XXX inside for/while loop** instead of `break`: emits target's `bne+b` pair instead of `beq` (+2-5%).
-- **Duplicate fn calls in if/else branches** (e.g., `if (cond) { ...; fn(x); } else { ...; fn(x); }` not `if(cond) ...else...; fn(x);`) — matches target's per-branch register-allocation choices (+1-2%).
+### Worktrees
+Currently there are 2 worktrees left for external agents:
+- `C:/Users/douglaswhittingham/pkmn-colosseum-wt/npc-event` (branch `wt-npc-event`, Codex used it)
+- `C:/Users/douglaswhittingham/pkmn-colosseum-wt/npc-interact` (branch `wt-npc-interact`, GLM used it)
 
-## Available agents/models
+Both worktrees have their own queue copy and compiled tools. Either:
+1. Keep them and re-dispatch Codex/GLM to continue, OR
+2. Remove them if you plan to work solo: `git worktree remove <path> --force && git branch -D wt-<name>`
 
-Run **multiple in parallel via tmux**. Use `tools/decomp_work/tmux_control/control.sh` for Codex/GLM panes; spawn additional agents via `Task` tool for Claude executors.
+## Session playbook (all learnings)
 
-### Tier 1 (perfect 13/13 on benchmark — use first):
-- **codestral:22b** (local ollama, free, slowest at ~30s/fn but most accurate)
-- **deepseek-coder-v2:16b** (local ollama, free)
-- **kimi-k2-turbo-preview** (Moonshot, paid but fast)
-- **qwen2.5-coder:7b** (local ollama, free, FAST)
+### Core patterns that WORK
+1. **`#pragma push / #pragma peephole off / #pragma pop`** around each converted function. Defeats CW 1.3's branchless `subfic/cntlzw/srwi/addi` lowering of adjacent-value ternaries and `extsb.`/`cmpwi` collapse.
+2. **Switch cases in NUMERIC ORDER** in source (case 0 first, then case 3, etc.) — CW emits the switch dispatch as a comparison tree but case BODIES follow source order.
+3. **Initialize variables BEFORE the dispatch**, not inside case 0 (matches prologue order).
+4. **Single-return style** preferred over multi-early-return with blr.
+5. **Type externs properly**: `extern s32 fn_X(s32)` not `extern void fn_X(void)`. GREP first; don't duplicate. If a `void fn_X(void)` decl already exists in the file, update it to match your new usage.
+6. **Bitfield structs** (`u8 bit:1` at byte offset) match CW's `extlwi/rlwimi` bit-toggle idiom better than `^= MASK`. See `gs_party_access.c::fn_8000CAA4` for the pattern.
+7. **For-loop pointer-walk**: `for (idx=0; idx<N; idx++) { if (*p == key) break; p += 0xC; }` forces CW to emit `addi p, p, 0xC; lwz r0, 0(p)` instead of folded indexed loads. Key for Quirk 7 table searches. See `gs_event_exec.c::fn_80014234`.
+8. **Comma-operator `!=` chain** for Quirk 7 when pointer-walk isn't ideal:
+   `if ((((key != tbl[0].k) && (idx=1, key != tbl[1].k)) && (idx=2, key != tbl[2].k))) idx = 3;`
+9. **`(s32)(s8)ctx[N]`** for signed byte read (emits `lbz; extsb`).
+10. **`(volatile u16*)` cast** to force CW to reload a global between two bit extractions (vs CSE'ing them).
+11. **`#pragma optimization_level 4`** (not `0`) for existing stubs in `gs_scene.c` / `gs_render.c` — changes reg allocation to match target.
 
-### Tier 2 (10/13 — viable for simpler functions):
-- **deepseek-r1:14b** (local, free)
-- **qwen2.5-coder:32b** (local, free, slow)
-- **qwen3:14b** (local, free)
+### Common failure modes — AVOID
+- Duplicate extern decls → "identifier redeclared" compile error. Always grep first.
+- Destructive edits that remove working code. Only change what's needed.
+- Pseudo-code scraps (`u8 sp[0x20]; u32 r3 = 0; ctr_fn = ...`) — these never compile. Either write real C or leave the asm wrapper.
+- Regressing already-matched functions. ALWAYS regression-check 3-5 matched functions in the same file before committing a change.
 
-### Tier 3 (uncertain):
-- **opencode/nemotron-3-super-free** (6/13, free)
-- **moonshot/kimi-latest** (8/13, paid)
-- **GLM-5.1** in opencode pane (good for review/iteration)
-- **Codex GPT-5.4** in tmux pane 0:0.4 (great for cross-checking)
+### Regression-safe merge protocol
+Before every commit / merge:
+1. `rm -f build/GC6E01/base/game/<stem>.o` (force fresh compile)
+2. `python3 tools/compile_check.py src/game/<stem>.c` — must pass
+3. `python3 tools/match_scan_file.py <stem> fn_A fn_B fn_C` — all previously-matching peers must stay ≥ their prior match%
+4. If any drop, revert the offending change.
 
-### AVOID:
-- opencode/gpt-5-nano (0/13)
-- opencode/minimax-m2.5-free (0/13)
-- ollama-proxmox/gemma3:4b (7/13, slow + mediocre)
+## Work remaining (ordered by ROI)
 
-### Run benchmarks via:
+### Low-hanging fruit
+- **`gs_pokemon_summary.c` — 23 asm-active with TODO stubs**. These need fresh C written. Any simple ones (byte accessors etc) could land quickly.
+- **`gs_field_world.c` reverted candidates** — some stubs hit 30-45% match. Manual tuning (pragma combos, pointer-walks) could push a few over 60%.
+- **gs_title.c remaining 19** — jump-table-heavy; harder.
+
+### Medium effort
+- `gs_render.c` (43 remaining), `scene_init.c` (56), `gs_worldmap.c` (46) — lots of small-to-medium asm functions. Some may have existing stubs my batch tool missed due to regex filters.
+
+### Requires new C writing (no stubs exist)
+- `gs_npc_event.c` (9 remaining biggest functions)
+- `gs_npc_interact.c` (22 remaining)
+- `gs_material.c` (9 remaining)
+
+### Hard / skip for now
+- `fn_80014574` (gs_event_exec, 0x4D4) — huge cutscene function
+- `fn_80013A18` (gs_event_exec, 0x3E4) — huge camera function
+- `fn_8001329C` (gs_event_exec, 0x3CC) — has jump-table switch, very hard
+- `fn_80012FB0` (gs_event_exec, 0x2EC) — 64-bit saturating math
+- Anything using jump tables (lwzx + bctr pattern)
+
+## Typical session flow
+
 ```bash
-python3 tools/decomp_work/benchmark/bench_opencode.py <model_name>
-```
-
-## Workflow per file
-
-For each target `src/game/<name>.c`:
-
-1. **Confirm it's a candidate** (run `python3 tools/scan_all_files.py` and pick from the bottom of the list — lowest match% has the most potential gain).
-
-2. **Generate Ghidra decomps** for any unmatched functions in that file (most should already exist in `tools/decomp_work/ghidra_out/`). If missing, run:
-   ```bash
-   bash tools/ghidra/run_headless.sh
-   # then export specific addresses via tools/ghidra/scripts/ExportDecomp.java
-   ```
-
-3. **Spawn parallel agents** (1 per function, distribute across the model tiers above). Each gets:
-   - The function's address + size
-   - Ghidra C output
-   - Target asm inc file (`src/game/<name>_fn_XXXXXXXX.inc`)
-   - The 7 CW quirks from `tools/decomp_work/CLAUDE.md`
-   - Constraint: don't touch other functions, must keep compile green, must not regress.
-
-4. **Verify each result** by patching into the .c file, running `python3 tools/compile_check.py src/game/<name>.c` then `python3 tools/match_scan.py fn_XXXXXXXX`. If the new code regresses, revert.
-
-5. **Commit per-function** with message `<name>: fn_XXXXXXXX X.X%->Y.Y% via <approach>`.
-
-6. **Stop pushing a function once at ≥99% OR after 5+ source variants fail**. The remaining 1-2% is usually CW reg-alloc that source can't fix.
-
-## Don't touch (DONE):
-
-- **`src/game/gs_title.c`** — 92.23% avg, 15 functions, ceiling reached. The doc blocks at the top of the file explain every remaining diff. Touching it risks regression for no gain.
-- The 7 named quirks in `tools/decomp_work/CLAUDE.md` are reference; do not edit unless adding a NEW discovered quirk.
-
-## File state at session handoff
-
-- Avg match across 15 prior-unmatched gs_title functions: **92.23%**
-- Latest commit: `git log --oneline -1`
-- Pending items in `tools/decomp_work/relay/` are review artifacts; safe to ignore unless cross-referencing.
-- `.gitattributes` was set with `core.autocrlf=input` — file editing should be stable now (no more "file modified since read" stalls).
-
-## Top targets (ranked by asm-active function count)
-
-Run this anytime to refresh the list:
-```bash
-python3 -c "
-import os, re
-counts = []
+# 1. Status
+python3 -c "import os,re;t=0
 for f in sorted(os.listdir('src/game')):
     if not f.endswith('.c'): continue
-    with open(f'src/game/{f}', 'r', errors='ignore') as fp:
-        c = fp.read()
-    asm_active = len(re.findall(r'#if 1\s*\nasm void fn_', c))
-    if asm_active > 0:
-        counts.append((asm_active, os.path.getsize(f'src/game/{f}'), f))
-counts.sort(reverse=True)
-for a, s, f in counts[:25]:
-    print(f'{a:4d} asm-active  {s:7d}b  {f}')
-"
+    c=open(f'src/game/{f}','rb').read().decode('latin-1')
+    t+=len(re.findall(r'#if 1\s*\nasm void fn_',c))
+print(f'asm-active: {t}')"
+
+git log --oneline -5
+
+# 2. Pick a small function from a target file
+grep -B1 "^asm void fn_" src/game/<stem>.c | grep "#if 1" -A1
+
+# 3. Read its .inc, write matching C, wrap with pragma push/peephole off/pop
+# 4. Compile + measure + regression-check + commit
 ```
 
-Current ranking (snapshot at handoff):
-```
-asm-active  size      file                       difficulty (heuristic)
-   94        712 KB   gs_field_world.c           HUGE — multi-week push
-   71        153 KB   gs_thread.c                HIGH-DENSITY (best ROI per file?)
-   58        192 KB   scene_init.c
-   48        121 KB   gs_render.c                FP/GX-heavy, like gs_title
-   46         60 KB   gs_worldmap.c              MID-SIZE, good first target
-   28         56 KB   gs_npc_interact.c          MID-SIZE, good first target
-   25         14 KB   gs_event_exec.c            SMALL, fast wins
-   23         15 KB   gs_pokemon_summary.c       SMALL, fast wins
-   18         69 KB   gs_npc_event.c
-   11        207 KB   gs_material.c              big file, only 11 left
-    7         34 KB   gs_texture.c               SMALL, fast wins
-    6        162 KB   gs_pcbox.c
-    6         26 KB   gs_scene.c
-    4         36 KB   gs_party_access.c
-    3         64 KB   gs_task.c
-    3         20 KB   movie.c
-    3         20 KB   gs_gfx.c
-```
+## Things I learned you may need
 
-**Recommended first targets** (small → large):
-1. `gs_event_exec.c` (25 asm, 14KB) — quick wins to validate pipeline
-2. `gs_pokemon_summary.c` (23 asm, 15KB) — small, easy
-3. `gs_texture.c` (7 asm, 34KB) — texture fns likely simple HSD wrappers
-4. `gs_worldmap.c` (46 asm, 60KB) — first medium-effort file
-5. `gs_thread.c` (71 asm, 153KB) — high density once ramped up
+- Reported "regressions" often mean the `.o` file is stale. Always `rm -f build/GC6E01/base/game/<stem>.o` before re-matching.
+- The pokedex dashboard (`tools/decomp_work/pokedex_dashboard.sh`) reads these stale caches too — if it shows a regression, try rebuilding the file first.
+- `gs_texture.c` 7 asm-active functions are LEGITIMATE assembly primitives (GC thread context switch, full 32-GPR+32-FPR save/restore). They CANNOT be expressed in C — leave them as asm.
+- `colosseum_event.c` has 1 remaining function (fn_802050F4 at 74.7%). Good enough.
+- `pokemon.c` has 1 remaining function (fn_801F54A4 at 871 lines — skip, too big).
 
-**Avoid for first session:**
-- `gs_field_world.c` (94 asm, 712KB) — too big for one session
-- `colosseum_event.c` / `colosseum_battle.c` / `colosseum_script.c` — game-script files, rarely byte-match without huge investment
+## Model routing advice
 
-## Tmux setup
+- **Claude Opus 4.7** (me) — complex function analysis, merging, regression-checking, architecture. Best for the medium-hard functions where pattern-matching from asm matters.
+- **Codex GPT-5.4** (tmux pane %8) — fast, good at iteration on pragma combos and bitfield variants. Burns API credits quickly; have usage limit issues around 3-5am Pacific.
+- **GLM-5.1** (tmux pane %7) — decent at planning / pseudo-code translation; API has intermittent server errors. Works best as a planner writing to queue briefs.
+- **gemma3:4b on proxmox** — benchmarked at 7/13, mediocre. Not recommended for hard functions but can handle trivial accessors.
 
-The decomp tmux session has these panes:
-- pane `0:0.0` — status bar (don't touch)
-- pane `0:0.1` — main agent (you/Claude Code)
-- pane `0:0.3` — GLM-5.1 (opencode) — good for reviews
-- pane `0:0.4` — Codex GPT-5.4 — good for first drafts
+## Saved memories (read these first)
 
-To send a prompt: `tmux send-keys -t %7 "your prompt" Enter` for GLM, `%8` for Codex.
-**IMPORTANT:** send the full prompt as a single send-keys call to avoid the "Please" truncation bug.
+- `feedback_peephole_local_pragma.md` — the pragma peephole-off trick
+- `feedback_gs_event_exec_pipeline.md` — all patterns discovered in the gs_event_exec push
+- `feedback_pragma_combos.md` — combos beyond single pragmas
+- `feedback_nopeephole_flag.md` — file-level `-opt nopeephole` as an alternative
+- `feedback_fp_contract.md` — fmadds fusion via `#pragma fp_contract on`
+- `feedback_scheduling_pragma.md` — `#pragma scheduling on` for instruction scheduling matches
 
-## Success criterion for the new session
+## First prompt suggestions for a fresh session
 
-Push avg match% across 1-3 additional game files from <X>% to ≥80%, with
-zero regression on previously-matched functions (including all of
-gs_title.c's 15 documented near-misses).
+- "Resume decomp work, pick the next small easy function and knock it out."
+- "Run `python3 tools/batch_flip_stubs.py gs_pokemon_summary` and commit any wins."
+- "Convert fn_XXXXXXXX from src/game/YYY.c."
+- "Write 3 new simple accessor functions in gs_pokemon_summary.c — there are lots of small byte-getter patterns."
+
+Good luck — the boulder keeps rolling.
