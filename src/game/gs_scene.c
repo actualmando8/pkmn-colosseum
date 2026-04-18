@@ -852,7 +852,7 @@ void fn_80177984(void* src) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801779B0(void) {
 #include "src/game/gs_scene_fn_801779B0.inc"
 }
@@ -867,7 +867,7 @@ void fn_801779B0(u32 a, u32 b, u32 c) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801779CC(void) {
 #include "src/game/gs_scene_fn_801779CC.inc"
 }
@@ -893,20 +893,17 @@ u32 fn_80177A38(void) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80177A44(void) {
 #include "src/game/gs_scene_fn_80177A44.inc"
 }
 #else
 u32 fn_80177A44(u32 val) {
-    u8* p = (u8*)lbl_80478C40;
-    u32 old = *p;
-    if (old == (u8)val) {
-        return val;
-    }
-    *p = (u8)val;
+    u32 old = *(u8*)lbl_80478C40;
+    if (old == (u8)val) return val;
+    *(u8*)lbl_80478C40 = val;
     return old;
 }
 #endif
