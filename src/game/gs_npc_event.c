@@ -2015,13 +2015,13 @@ extern void fn_800896D0(void);
 extern void fn_801FCB40(void);
 extern void fn_801FCC3C(void);
 extern void fn_801FCA2C(void);
-extern void fn_801FC794(void);
+extern void fn_801FC794(s32, u16);
 extern void fn_801CA5C4(void);
 extern void fn_801653C4(void);
 extern void fn_80165A20(void);
 extern u32 lbl_8047A444;
 extern u8 lbl_8047A439;
-extern void fn_800330B8(void);
+extern void fn_800330B8(s32, u8*);
 #if 1
 asm void fn_80032ED8(void) {
 #include "src/game/gs_npc_event_fn_80032ED8.inc"
@@ -2031,7 +2031,7 @@ void fn_80032ED8(void) {
     extern u8 lbl_803A3334[];
     extern u8 lbl_8047A439;
     extern u32 lbl_8047A444;
-    extern void fn_800330B8();
+    extern void fn_800330B8(s32, u8*);
     extern void fn_800896D0();
     extern void fn_800896D8();
     extern void fn_800896E0();
@@ -2040,7 +2040,7 @@ void fn_80032ED8(void) {
     extern void fn_80165A20();
     extern void fn_80176E0C();
     extern void fn_801CA5C4();
-    extern void fn_801FC794();
+    extern void fn_801FC794(s32, u16);
     extern void fn_801FCA2C();
     extern void fn_801FCAFC();
     extern void fn_801FCB40();
@@ -2187,148 +2187,60 @@ void fn_80032ED8(void) {
 #endif
 
 /* 0x800330B8 | 0x1C0 */
-extern void fn_801FC828(void);
-extern void fn_801FC7B4(void);
-extern void fn_801EEE6C(void);
-extern void fn_801FC7D4(void);
-extern void fn_801FC744(void);
-extern void fn_801FC784(void);
-extern void fn_801FC7A4(void);
-extern void fn_801FC808(void);
-extern void fn_801FC7E4(void);
-extern void fn_801FC6F4(void);
-extern void fn_801FC6E4(void);
-extern void fn_801FC6D4(void);
-extern void fn_801FC694(void);
-extern void fn_801FC684(void);
-#if 1
+extern void fn_801FC828(s32, s32);
+extern void fn_801FC7B4(s32, u8);
+extern void fn_801EEE6C(u8, u8);
+extern void fn_801FC7D4(s32, u8);
+extern void fn_801FC744(s32, u32, u16);
+extern void fn_801FC784(s32, u16);
+extern void fn_801FC7A4(s32, u8);
+extern void fn_801FC808(s32, s32, u8);
+extern void fn_801FC7E4(s32, s32, s16);
+extern void fn_801FC6F4(s32, s16);
+extern void fn_801FC6E4(s32, u8);
+extern void fn_801FC6D4(s32, u8);
+extern void fn_801FC694(s32, u8);
+extern void fn_801FC684(s32, u8);
+#if 0
 asm void fn_800330B8(void) {
 #include "src/game/gs_npc_event_fn_800330B8.inc"
 }
 #else
-void fn_800330B8(void) {
-    extern void fn_801EEE6C();
-    extern void fn_801FC684();
-    extern void fn_801FC694();
-    extern void fn_801FC6D4();
-    extern void fn_801FC6E4();
-    extern void fn_801FC6F4();
-    extern void fn_801FC744();
-    extern void fn_801FC784();
-    extern void fn_801FC794();
-    extern void fn_801FC7A4();
-    extern void fn_801FC7B4();
-    extern void fn_801FC7D4();
-    extern void fn_801FC7E4();
-    extern void fn_801FC808();
-    extern void fn_801FC828();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_800330B8(s32 arg0, u8* arg1) {
+    s32 i;
+    u8* walk;
 
-    r28 = r3;
-    r29 = r4;
-    r4 = *(u16*)((u8*)r29 + 0x0);
-    fn_801FC794();
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC828();
-    r4 = *(u8*)((u8*)r29 + 0x2);
-    r3 = r28;
-    fn_801FC7B4();
-    r3 = *(u8*)((u8*)r29 + 0x2);
-    if (r3 != 0) {
-        r4 = *(u8*)((u8*)r29 + 0x28);
-        fn_801EEE6C();
+    fn_801FC794(arg0, *(u16*)(arg1 + 0x0));
+    fn_801FC828(arg0, 0);
+    fn_801FC7B4(arg0, *(u8*)(arg1 + 0x2));
+    if (*(u8*)(arg1 + 0x2) != 0) {
+        fn_801EEE6C(*(u8*)(arg1 + 0x2), *(u8*)(arg1 + 0x28));
     }
-    r4 = *(u8*)((u8*)r29 + 0x3);
-    r3 = r28;
-    fn_801FC7D4();
-    r31 = r29;
-    r30 = 0x0;
-    do {
-        r5 = *(u16*)((u8*)r31 + 0x4);
-        r3 = r28;
-        r4 = r30 & 0xFF;
-        fn_801FC744();
-        r31 = r31 + 0x2;
-        r30 = r30 + 0x1;
-    } while ((s32)r30 < 4);
-    r4 = *(u16*)((u8*)r29 + 0xC);
-    r3 = r28;
-    fn_801FC784();
-    r4 = *(u8*)((u8*)r29 + 0xE);
-    r3 = r28;
-    fn_801FC7A4();
-    r5 = *(u8*)((u8*)r29 + 0xF);
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x10);
-    r3 = r28;
-    r4 = 0x1;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x11);
-    r3 = r28;
-    r4 = 0x2;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x12);
-    r3 = r28;
-    r4 = 0x3;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x13);
-    r3 = r28;
-    r4 = 0x4;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x14);
-    r3 = r28;
-    r4 = 0x5;
-    fn_801FC808();
-    r5 = *(s16*)((u8*)r29 + 0x16);
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x18);
-    r3 = r28;
-    r4 = 0x1;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1A);
-    r3 = r28;
-    r4 = 0x2;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1C);
-    r3 = r28;
-    r4 = 0x3;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1E);
-    r3 = r28;
-    r4 = 0x4;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x20);
-    r3 = r28;
-    r4 = 0x5;
-    fn_801FC7E4();
-    r4 = *(s16*)((u8*)r29 + 0x22);
-    r3 = r28;
-    fn_801FC6F4();
-    r4 = *(u8*)((u8*)r29 + 0x24);
-    r3 = r28;
-    fn_801FC6E4();
-    r4 = *(u8*)((u8*)r29 + 0x25);
-    r3 = r28;
-    fn_801FC6D4();
-    r4 = *(u8*)((u8*)r29 + 0x26);
-    r3 = r28;
-    fn_801FC694();
-    r4 = *(u8*)((u8*)r29 + 0x27);
-    r3 = r28;
-    fn_801FC684();
+    fn_801FC7D4(arg0, *(u8*)(arg1 + 0x3));
+    walk = arg1;
+    for (i = 0; i < 4; i++) {
+        fn_801FC744(arg0, (u8)i, *(u16*)(walk + 0x4));
+        walk += 2;
+    }
+    fn_801FC784(arg0, *(u16*)(arg1 + 0xC));
+    fn_801FC7A4(arg0, *(u8*)(arg1 + 0xE));
+    fn_801FC808(arg0, 0, *(u8*)(arg1 + 0xF));
+    fn_801FC808(arg0, 1, *(u8*)(arg1 + 0x10));
+    fn_801FC808(arg0, 2, *(u8*)(arg1 + 0x11));
+    fn_801FC808(arg0, 3, *(u8*)(arg1 + 0x12));
+    fn_801FC808(arg0, 4, *(u8*)(arg1 + 0x13));
+    fn_801FC808(arg0, 5, *(u8*)(arg1 + 0x14));
+    fn_801FC7E4(arg0, 0, *(s16*)(arg1 + 0x16));
+    fn_801FC7E4(arg0, 1, *(s16*)(arg1 + 0x18));
+    fn_801FC7E4(arg0, 2, *(s16*)(arg1 + 0x1A));
+    fn_801FC7E4(arg0, 3, *(s16*)(arg1 + 0x1C));
+    fn_801FC7E4(arg0, 4, *(s16*)(arg1 + 0x1E));
+    fn_801FC7E4(arg0, 5, *(s16*)(arg1 + 0x20));
+    fn_801FC6F4(arg0, *(s16*)(arg1 + 0x22));
+    fn_801FC6E4(arg0, *(u8*)(arg1 + 0x24));
+    fn_801FC6D4(arg0, *(u8*)(arg1 + 0x25));
+    fn_801FC694(arg0, *(u8*)(arg1 + 0x26));
+    fn_801FC684(arg0, *(u8*)(arg1 + 0x27));
     return;
 }
 #endif
