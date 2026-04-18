@@ -1012,12 +1012,67 @@ void fn_80038A0C(void) { /* TODO */ }
 extern u8 lbl_80267060[];
 /* Search lbl_80267060 (8 x 0x18-byte entries) for matching scene ID.
  * CW unrolls the search into 8 compare-and-branch blocks. */
-#if 1
+#if 0
 asm void fn_80038E74(void) {
 #include "src/game/scene_init_fn_80038E74.inc"
 }
 #else
-void fn_80038E74(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+u32 fn_80038E74(u32 unused, u8* p) {
+    s32 idx;
+    s32 type;
+    u8* tbl;
+    u8* param;
+
+    type = *(s16*)(p + 6);
+    tbl = lbl_80267060;
+    idx = 0;
+    if (type != *(s32*)(tbl + 0)) {
+        idx = 1;
+        if (type != *(s32*)(tbl + 0x18)) {
+            idx = 2;
+            if (type != *(s32*)(tbl + 0x30)) {
+                idx = 3;
+                if (type != *(s32*)(tbl + 0x48)) {
+                    idx = 4;
+                    if (type != *(s32*)(tbl + 0x60)) {
+                        idx = 5;
+                        if (type != *(s32*)(tbl + 0x78)) {
+                            idx = 6;
+                            if (type != *(s32*)(tbl + 0x90)) {
+                                idx = 7;
+                                if (type != *(s32*)(tbl + 0xA8)) {
+                                    idx = 8;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (idx >= 8) {
+        return 0;
+    }
+    param = lbl_803A65B0 + idx * 0xc;
+    *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(param + 0));
+    *(s16*)(p + 0x52) = (s16)(s32)(*(f32*)(param + 4));
+    *(u8*)(p + 0x67) = (u8)(s32)(*(f32*)(param + 8));
+    if (*(u8*)(tbl + idx * 0x18 + 0x14) != 0) {
+        if (*(s16*)(p + 6) == (s16)fn_801022B8(0x24)) {
+            *(u8*)(p + 0x64) = 0xFF;
+            *(u8*)(p + 0x65) = 0xFF;
+            *(u8*)(p + 0x66) = 0xFF;
+        } else {
+            *(u8*)(p + 0x64) = 0x46;
+            *(u8*)(p + 0x65) = 0x8F;
+            *(u8*)(p + 0x66) = 0xB4;
+        }
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80039004 - 0x80039004 | size: 0x78 */
