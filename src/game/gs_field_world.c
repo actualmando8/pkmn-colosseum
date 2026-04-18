@@ -5463,7 +5463,7 @@ extern u8 lbl_8035B8A0[];
 /* Forward declarations for self-referencing asm blocks */
 extern void* fn_801155CC();
 extern u32 fn_80115A80();
-extern void fn_80115C48(void);
+extern void* fn_80115C48(u32 key);
 extern void fn_80117514(void);
 extern void fn_8011791C(void);
 extern void fn_80119930(void);
@@ -27809,12 +27809,25 @@ u8 fn_80115B90(u8* ptr) {
 #endif
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
-#if 1
+#if 0
 asm void fn_80115C48(void) {
 #include "src/game/gs_field_world_fn_80115C48.inc"
 }
 #else
-void fn_80115C48(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+void* fn_80115C48(u32 key) {
+    u8* p = (u8*)lbl_80478FBC;
+    u32 i;
+    for (i = *(u32*)lbl_80478FB8; i != 0; i--) {
+        if (*(u32*)(p + 0xC) == key) return p;
+        p += 0x4C;
+    }
+    fn_800DD970((char*)lbl_802726D4, lbl_8035B8A0);
+    return 0;
+}
+#pragma pop
 #endif
 extern u32 lbl_80478EB8;
 extern u8 lbl_8035BB70[];
