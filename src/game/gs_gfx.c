@@ -553,15 +553,26 @@ asm void fn_800D3410(void) {
 #else
 void fn_800D3410(void) { /* TODO */ }
 #endif
-extern u32 lbl_8047C9F0;
-extern u32 lbl_8047AA80;
-#if 1
-asm void fn_800D36B4(void) {
-#include "src/game/gs_gfx_fn_800D36B4.inc"
+extern f32 lbl_8047C9F0;
+#pragma push
+#pragma peephole off
+void fn_800D36B4(f32* in) {
+    f32 s = lbl_8047C9F0;
+    s32 b0 = (s32)(s * in[0]);
+    s32 b1 = (s32)(s * in[1]);
+    s32 b2 = (s32)(s * in[2]);
+    s32 b3 = (s32)(s * in[3]);
+    ((u8*)lbl_8047AA80)[0x19] = 1;
+    ((u8*)lbl_8047AA80)[0x1c] = b0;
+    ((u8*)lbl_8047AA80)[0x1d] = b1;
+    ((u8*)lbl_8047AA80)[0x1e] = b2;
+    ((u8*)lbl_8047AA80)[0x1f] = b3;
+    if (((u8*)lbl_8047AA80)[0x1c] == 0 && ((u8*)lbl_8047AA80)[0x1d] == 0 &&
+        ((u8*)lbl_8047AA80)[0x1e] == 0 && ((u8*)lbl_8047AA80)[0x1f] == 0) {
+        ((u8*)lbl_8047AA80)[0x19] = 0;
+    }
 }
-#else
-void fn_800D36B4(void) { /* TODO */ }
-#endif
+#pragma pop
 extern void fn_8019C690();
 void fn_800D377C(s32 mode) {
     switch (mode) {
