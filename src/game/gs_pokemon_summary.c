@@ -267,12 +267,24 @@ extern u32 lbl_8047A2D8;
 extern u32 lbl_8047B744;
 extern u32 lbl_8047A2C4;
 extern u32 lbl_8047B740;
-#if 1
+#if 0
 asm void fn_80016618(void) {
 #include "src/game/gs_pokemon_summary_fn_80016618.inc"
 }
 #else
-void fn_80016618(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+s32 fn_80016618(u8* src, u8* dst) {
+    u16 tmp;
+    tmp = (u16)(fn_80103E68((u16)*(u32*)(&lbl_80266918[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
+    if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
+        dst[0x67] = (u8)(s32)(*(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4));
+    } else {
+        dst[0x67] = 0;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_800166BC - 0x800166BC | size: 0x114 */
