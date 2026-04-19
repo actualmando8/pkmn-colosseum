@@ -1742,28 +1742,28 @@ asm void fn_800D7894(void) {
 #pragma push
 #pragma peephole off
 u8* fn_800D7894(void) {
+    u32 i;
     u8* p = (u8*)lbl_8047AAAC;
-    s32 i;
-    for (i = (s32)lbl_8047AAB0; i > 0; i--) {
+    for (i = 0; i < lbl_8047AAB0; i++) {
         if (*p == 0) {
-            u32 next;
             *p = 1;
-            *(u32*)(p + 4) = *(u32*)(&lbl_803144D0[lbl_8047AAB4 * 4]);
-            next = lbl_8047AAB4 + 1;
-            if (next >= 8) next = 0;
-            lbl_8047AAB4 = next;
-            p[0x08] = 0;
+            *(u32*)(p + 4) = *(u32*)(lbl_803144D0 + lbl_8047AAB4 * 4);
+            lbl_8047AAB4++;
+            if (lbl_8047AAB4 >= 8) {
+                lbl_8047AAB4 = 0;
+            }
+            p[0x8] = 0;
             p[0x24] = 0;
             p[0x40] = 0;
-            p[0x5C] = 0;
+            p[0x5c] = 0;
             p[0x78] = 0;
             p[0x94] = 0;
-            p[0xB0] = 0;
-            p[0xCC] = 0;
-            p[0xE8] = 0;
+            p[0xb0] = 0;
+            p[0xcc] = 0;
+            p[0xe8] = 0;
             p[0x104] = 0;
             p[0x120] = 0;
-            p[0x13C] = 0;
+            p[0x13c] = 0;
             p[0x158] = 0;
             p[0x174] = 0;
             return p;
