@@ -10,10 +10,15 @@ compile_check.py + match_scan_file.py.
 """
 from __future__ import annotations
 
+import io
 import re
 import sys
 from pathlib import Path
 from dataclasses import dataclass, field
+
+# Force UTF-8 stdout on Windows (default cp1252 chokes on → ≥ etc.)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 
 @dataclass

@@ -18,7 +18,24 @@
 
 ## Recommendation
 
-**For byte-match decomp on RTX 3090: use `qwen2.5-coder:32b` only.** No other local model on the 3090 produced usable output on a "known-tractable" function.
+**For byte-match decomp on RTX 3090: use `qwen2.5-coder:32b` only** — and only on SIMPLE functions (<0x100 bytes, no float wrap loops, no multi-branch dispatchers). See failure case below.
+
+## Follow-up: qwen degrades on complex functions (2026-04-18, 20:57)
+
+Ran qwen2.5-coder:32b on `fn_800166BC` (gs_pokemon_summary, 0x12C bytes — float wrap loops + multi-path setup). Same build_prompt.py pipeline.
+
+**Result: FAIL.** Qwen produced asm-pseudocode, not real C:
+```
+stwu(r1, -0x30);
+mflr(r0);
+stw(r0, 0x34(r1));
+mulli(r3, r4, 0x1f);
+```
+It literally translated asm instructions as C function calls instead of doing semantic reconstruction. Gave up on the do-while float wrap loops entirely.
+
+**Interpretation**: qwen-32B can do simple semantic lifts (fn_80115C48 table-walk → 95%) but collapses to literal translation when the control flow gets complex (4+ branches + float wrap + struct init). Similar failure mode to smaller models, just at a higher complexity threshold.
+
+**Implication**: qwen auto-pipeline works for ~30% of remaining candidates (the simple ones). The hard 70% still need Opus-level pattern recognition.
 
 Next steps for improvement:
 1. **Teach qwen2.5-coder:32b the for-init inlining rule better** — maybe add a stronger hint in CW_QUIRKS.md about "NEVER hoist count into local — keep in for()".
