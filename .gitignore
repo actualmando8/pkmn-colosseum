@@ -2,6 +2,11 @@
 .idea/
 .vs/
 
+# Secrets — API keys for cloud model benchmarking
+openrouterkey.txt
+*_apikey.txt
+*.key
+
 # Caches
 __pycache__/
 .mypy_cache/

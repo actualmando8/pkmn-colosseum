@@ -69,11 +69,23 @@ def _swap_else_block(stem: str, fn: str, c_body: str) -> bool:
     return True
 
 
-def _revert(stem: str) -> None:
-    subprocess.run(
-        ["git", "checkout", f"src/game/{stem}.c"],
-        cwd=REPO_ROOT, capture_output=True
-    )
+def _revert(stem: str, original_text: str | None = None) -> None:
+    """Restore src/game/<stem>.c to its prior state.
+
+    Prefers `git checkout` when the working tree is git-tracked; falls back
+    to writing back the captured snapshot. The 3090 reward host is NOT a
+    git repo, so the snapshot path is the durable one.
+    """
+    c_path = REPO_ROOT / "src" / "game" / f"{stem}.c"
+    if (REPO_ROOT / ".git").exists():
+        result = subprocess.run(
+            ["git", "checkout", f"src/game/{stem}.c"],
+            cwd=REPO_ROOT, capture_output=True
+        )
+        if result.returncode == 0:
+            return
+    if original_text is not None:
+        c_path.write_text(original_text, encoding="latin-1")
 
 
 def _compile(stem: str) -> bool:
@@ -101,18 +113,24 @@ def _match_pct(stem: str, fn: str) -> float:
 def compute_reward(stem: str, fn: str, c_body: str) -> Tuple[float, float, bool]:
     """Returns (reward, match_pct, ok). Reward in [0,1]. ok=False on compile failure."""
     lock = _acquire_lock()
+    c_path = REPO_ROOT / "src" / "game" / f"{stem}.c"
+    original_text = c_path.read_text(encoding="latin-1") if c_path.exists() else None
     try:
-        swapped = _swap_else_block(stem, fn, c_body)
-        if not swapped:
-            _revert(stem)
-            return 0.0, 0.0, False
-        ok = _compile(stem)
-        if not ok:
-            _revert(stem)
-            return 0.0, 0.0, False
-        pct = _match_pct(stem, fn)
-        _revert(stem)
-        return pct / 100.0, pct, True
+        try:
+            swapped = _swap_else_block(stem, fn, c_body)
+            if not swapped:
+                return 0.0, 0.0, False
+            ok = _compile(stem)
+            if not ok:
+                return 0.0, 0.0, False
+            pct = _match_pct(stem, fn)
+            return pct / 100.0, pct, True
+        finally:
+            # Always restore the .c file regardless of compile timeout/crash.
+            # Without this, subprocess.TimeoutExpired (e.g. on a stuck CW
+            # compile) leaves the working tree mutated and breaks the next
+            # reward eval.
+            _revert(stem, original_text)
     finally:
         _release_lock(lock)
 

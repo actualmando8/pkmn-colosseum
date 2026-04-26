@@ -1,72 +1,87 @@
-# Local model benchmark — fn_80115C48 (2026-04-18)
+# Model benchmarking — 2026-04-25 (post-expert-prompt)
 
-**Target function**: `fn_80115C48` in `gs_field_world.c` — a known-tractable table-walk with mtctr/bdnz pattern. Human Opus hits 100%.
+## TL;DR
 
-**Prompt**: assembled via `tools/decomp_work/build_prompt.py gs_field_world fn_80115C48` (12KB prompt containing CW_QUIRKS.md + pattern detector output + existing externs + raw asm).
+Switching from the **compact** prompt (~2KB) to the **expert** prompt (~24KB) flipped
+results from **0/8 PASS across all cloud models** to **7/8 PASS for both Kimi K2.6 and
+DeepSeek V4-pro** on the hard `gs_field_world.c` benchmark suite. The expert prompt
+inlines `CW_QUIRKS.md`, `few_shot_examples.md`, `REFERENCE_PROJECTS.md`, peer functions
+from the same TU, and all existing externs (~24KB / ~6k tokens per call).
 
-**Hardware**: RTX 3090 (24GB), ollama.
+**Recommended primary for complex decomp: `deepseek/deepseek-v4-pro` or `moonshot/kimi-k2.6`.**
+Both 7/8 PASS, ~69% mean match. Tie-breaker: cost — Kimi K2.6 is faster (68s vs 78s) and
+on Moonshot's tier the user already has access; V4-pro is reasoning-mode (better on the
+hardest function) at higher per-call cost.
 
-## Results
+**Recommended cheap/fast baseline: `deepseek/deepseek-v4-flash`** with `thinking: disabled`.
+6/8 PASS at 36s total — half the wall time, 1/3 the cost. Use this for first-shot drafts
+that Opus/Kimi can repair.
 
-| Model | Size | Result | Notes |
-|---|---|---|---|
-| **qwen2.5-coder:32b** | 19GB | **95.0% ✓** | Clean C, followed prompt format, all externs correct. Missed 5% because it hoisted `count` out of the for-init (suppressing mtctr/bdnz). |
-| codestral:22b | 12GB | ✗ | Invented a format string for fn_800DD970; wrong struct stride math (`index*6 + 15` makes no sense); tagged code block "python" instead of "c". |
-| deepseek-coder-v2:16b | 8.9GB | ✗ | Emitted inline PPC assembly mixed into C. Fundamentally misunderstood the task. |
-| deepseek-r1:14b | 9GB | ✗ | Only placeholder stubs (`// process something`, `// do something`). Never produced complete code. |
-| qwen2.5-coder:7b | 4.7GB | ✗ | Literal `lbl_COUNT` in code (didn't substitute from prompt); wrong offsets. |
+## Expert-prompt single-shot leaderboard (gs_field_world, 8 functions)
 
-## Recommendation
+| Model | PASS | mean% | total time | notes |
+|---|---|---|---|---|
+| `moonshot/kimi-k2.6` | **7/8** | 68.7% | 68s | Best on fn_801233F4 (89.5%) |
+| `deepseek/deepseek-v4-pro` | **7/8** | 68.9% | 78s | Best on fn_801231A4 (95.9%); reasoning model |
+| `deepseek/deepseek-v4-flash` | 6/8 | 59.8% | 36s | Fastest + cheapest; misses fn_801231A4 |
+| `openrouter/qwen/qwen3.6-plus` | 2/8 | 18.8% | 357s | Rate-limited after 2 calls; not viable in production |
 
-**For byte-match decomp on RTX 3090: use `qwen2.5-coder:32b` only** — and only on SIMPLE functions (<0x100 bytes, no float wrap loops, no multi-branch dispatchers). See failure case below.
+## Per-function match%
 
-## Follow-up: qwen degrades on complex functions (2026-04-18, 20:57)
+| Function | V4-flash | V4-pro | Kimi K2.6 | Qwen 3.6+ | best |
+|---|---|---|---|---|---|
+| `fn_8011BA0C` | 91.3% | 85.9% | 91.3% | 91.3% | 91.3% (3-way tie) |
+| `fn_80120B00` | 43.7% | 43.7% | 40.4% | 58.7% | Qwen 58.7% |
+| `fn_80120C6C` | 0% | 0% | 0% | 0% | 0% (stuck — none compile) |
+| `fn_80122BC0` | 77.1% | 72.1% | 55.0% | 0% | V4-flash 77.1% |
+| `fn_801231A4` | 0% | 95.9% | 95.1% | 0% | V4-pro 95.9% |
+| `fn_801233F4` | 86.7% | 80.1% | 89.5% | 0% | Kimi 89.5% |
+| `fn_80125390` | 88.6% | 82.3% | 87.2% | 0% | V4-flash 88.6% |
+| `fn_80129F20` | 91.2% | 91.2% | 91.2% | 0% | 91.2% (3-way tie) |
 
-Ran qwen2.5-coder:32b on `fn_800166BC` (gs_pokemon_summary, 0x12C bytes — float wrap loops + multi-path setup). Same build_prompt.py pipeline.
+## Key insights
 
-**Result: FAIL.** Qwen produced asm-pseudocode, not real C:
-```
-stwu(r1, -0x30);
-mflr(r0);
-stw(r0, 0x34(r1));
-mulli(r3, r4, 0x1f);
-```
-It literally translated asm instructions as C function calls instead of doing semantic reconstruction. Gave up on the do-while float wrap loops entirely.
+1. **Reasoning models matter for complex multi-state functions.** `fn_801231A4`
+   (return-with-state-flag pattern) hits 95% on V4-pro and Kimi K2.6 (both reasoning) but
+   0% on V4-flash with thinking disabled. V4-flash with thinking enabled would likely
+   recover this — pre-condition: bump `max_tokens` to ≥4096.
+2. **fn_80120C6C is unanimously stuck at 0%.** Probably an idiom none of the cloud
+   models understand from the available context. Candidate for human-Opus or
+   best-of-N + repair.
+3. **Qwen 3.6 Plus on OpenRouter is rate-limited.** After the second function it
+   stalled out (0.0s "no-code" responses). Not usable for production benchmarking.
+4. **Cost is dominated by prompt-cache hit ratio.** DeepSeek API auto-caches matching
+   prefixes; we observed 8576 / 8668 = 99% prompt cache hit on V4-flash. At V4 pricing
+   (~$0.27/M input, ~$1.10/M output), the entire 8-function sweep cost <$0.01.
 
-**Interpretation**: qwen-32B can do simple semantic lifts (fn_80115C48 table-walk → 95%) but collapses to literal translation when the control flow gets complex (4+ branches + float wrap + struct init). Similar failure mode to smaller models, just at a higher complexity threshold.
+## Infrastructure changes that unlocked the result
 
-**Implication**: qwen auto-pipeline works for ~30% of remaining candidates (the simple ones). The hard 70% still need Opus-level pattern recognition.
+1. **`reward_fn.py` revert fix** — replaced `git checkout` with file-snapshot revert.
+   The 3090 working tree at `/storage/finetune/pkmn-colosseum` has no `.git/`, so
+   reverts were silently failing, leaving each .c file mutated after the first call.
+   This is the single biggest reason all prior cloud benchmarks were 0/8.
+2. **`bench_opencode.py`** — added `thinking: {type: "disabled"}` for DeepSeek V4
+   models (otherwise a 1024 max_tokens budget is fully consumed by `reasoning_content`
+   with empty `content`). Also added `reasoning_content` fallback for any thinking
+   model whose final content slot is empty.
+3. **Expert prompt suite** — `make_expert_suite.py` produces ~24KB-per-test prompts
+   that include CW_QUIRKS, few_shot_examples, REFERENCE_PROJECTS, peer functions, and
+   externs. The compact prompt (~2KB) gave 0/8.
 
-Next steps for improvement:
-1. **Teach qwen2.5-coder:32b the for-init inlining rule better** — maybe add a stronger hint in CW_QUIRKS.md about "NEVER hoist count into local — keep in for()".
-2. **Try Ollama with lower temperature** (ollama run -temperature 0.1) for more deterministic output.
-3. **Try 5-shot prompting**: include 2-3 already-matched examples (fn_80115C48 100% + fn_8001501C 100%) as reference before the target function.
+## Routing matrix (all confirmed working 2026-04-25)
 
-## Recommended pipeline
+| Surface | Provider config | Status |
+|---|---|---|
+| DeepSeek V4 Flash (direct) | `deepseek/deepseek-v4-flash` | ✅ — uses `openrouterkey.txt:deepseek` |
+| DeepSeek V4 Pro (direct) | `deepseek/deepseek-v4-pro` | ✅ |
+| DeepSeek V4 Flash (via OpenRouter) | `openrouter/deepseek/deepseek-v4-flash` | ✅ — uses `openrouterkey.txt:openrouter` |
+| Kimi K2.6 (Moonshot direct) | `moonshot/kimi-k2.6` | ✅ |
+| Qwen 3.6 Plus (via OpenRouter) | `openrouter/qwen/qwen3.6-plus` | ⚠️ rate-limited |
+| Local DeepSeek V4 (3090) | n/a | ❌ V4 weights not available locally; deepseek-coder-v2:16b is the largest fit and was previously verified non-functional |
 
-```bash
-# Generate prompt
-python3 tools/decomp_work/build_prompt.py <stem> <fn> > /tmp/prompt.md
-scp /tmp/prompt.md douglaswhittingham@10.0.0.3:/tmp/prompt.md
+## Historical: archived compact-prompt baseline (for reference)
 
-# Run model (remove ANSI escape codes)
-ssh douglaswhittingham@10.0.0.3 "cat /tmp/prompt.md | ollama run qwen2.5-coder:32b 2>&1 | sed 's/\x1b\[[0-9;?]*[a-zA-Z]//g' | tr -d '\r'" > /tmp/reply.txt
-
-# Extract the C block
-awk '/```c|```$/{p=!p;next}p' /tmp/reply.txt > /tmp/reply.c
-
-# Paste into src/game/<stem>.c #else block, compile, measure
-```
-
-Time per function: ~60-90 seconds for qwen2.5-coder:32b on 3090 (one-time model load + ~30s generation).
-
-## Broader implications
-
-The **pipeline works** — with the right prompt (CW_QUIRKS + detector hints + externs + asm), a local model produces usable output. This unblocks parallel throughput without Opus tokens.
-
-**Workflow going forward:**
-1. Claude Opus (this session) → picks candidate + verifies/merges
-2. qwen2.5-coder:32b on 3090 → drafts C from the built prompt (free, ~60s)
-3. Claude Opus → reads draft, fixes for-init/pragma issues, runs match, commits or reverts
-
-This is dramatically cheaper than "Opus writes everything from scratch" and more reliable than "Codex with minimal context".
+The same 8-function suite under the **compact** prompt (~2KB) — pre-expert-prompt — gave
+**0/8 PASS** for `moonshot/kimi-k2.6` and `llamacpp-proxmox/qwen3.6-35b-a3b`. Output was
+plausible but never compiled — register-name variables, hallucinated jumptables, missing
+externs. The richer prompt closes that gap dramatically.
