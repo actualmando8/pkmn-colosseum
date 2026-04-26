@@ -3934,7 +3934,7 @@ extern f32 lbl_8047B8AC;
 extern u32 lbl_8047A390;
 extern f32 lbl_8047B8B0;
 extern u8 lbl_8047A380;
-extern void fn_80024160(void);
+extern void fn_80024160(u8*, void*, u16*, u8*);
 #if 1
 asm void fn_80023E60(void) {
 #include "src/game/gs_title_fn_80023E60.inc"
@@ -4099,35 +4099,32 @@ extern u32 lbl_8047A368;
 extern u32 lbl_80478DF4;
 extern u32 lbl_80478DF0;
 #if 1
-asm void fn_80024160(void) {
+asm void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 #include "src/game/gs_title_fn_80024160.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
-    u8 mask;
-    u8* current;
-    u8* active;
-    u8* candidate;
-    u8* entry;
-    s32 active_index;
-    s32 entry_index;
     s32 chain_index;
+    s32 active_index;
+    s32 offset;
+    s32 visible_index;
+    u8 mask;
+    u8* active;
+    s32 entry_index;
+    u8* current;
+    u8* candidate;
+    s32 v;
 
     (void)arg1;
+    v = *arg2;
     mask = 0;
-    if ((*arg2 & 0x0001) != 0) {
-        mask |= 0x01;
-    }
-    if ((*arg2 & 0x0002) != 0) {
-        mask |= 0x04;
-    }
-    if ((*arg2 & 0x0004) != 0) {
-        mask |= 0x08;
-    }
-    if ((*arg2 & 0x0008) != 0) {
-        mask |= 0x02;
-    }
+    if ((v & 0x1) != 0) mask |= 0x1;
+    if ((v & 0x2) != 0) mask |= 0x4;
+    if ((v & 0x4) != 0) mask |= 0x8;
+    if ((v & 0x8) != 0) mask |= 0x2;
 
     if (mask != 0) {
         active_index = lbl_8047A368;
@@ -4135,14 +4132,14 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
         current = fn_8005D934(*(s16*)(current + 4));
         chain_index = 0;
         while (1) {
-            if ((current[0] & 0x80) != 0) {
+            if (((u32)*(volatile u8*)current >> 7) & 1) {
                 if (active_index == chain_index) {
                     active = current;
                     break;
                 }
                 chain_index++;
             }
-            if ((current[0] & 0x40) == 0) {
+            if ((((u32)*(volatile u8*)current >> 6) & 1) == 0) {
                 current = fn_8005D934(*(s16*)(current + 0x18));
             } else {
                 active = 0;
@@ -4150,35 +4147,39 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
             }
         }
 
+        mask = (u8)mask;
         entry_index = 0;
-        chain_index = 0;
+        offset = 0;
         while ((u32)entry_index < *(u32*)lbl_80478DF0) {
+            visible_index = 0;
             candidate = fn_8005D934(*(s16*)(arg3 + 4));
-            chain_index = 0;
-            while (candidate != 0) {
-                if ((candidate[0] & 0x80) != 0) {
-                    entry = (u8*)(lbl_80478DF4 + chain_index);
-                    if ((entry[0] & mask) == mask) {
-                        if (fn_8005D934(*(u32*)(entry + 4)) == active) {
-                            if (fn_8005D934(*(u32*)(entry + 8)) == candidate) {
-                                arg0[0x95] = (u8)chain_index;
+            while (1) {
+                if (candidate == 0) {
+                    break;
+                }
+                if (((u32)*(volatile u8*)candidate >> 7) & 1) {
+                    if ((*(u8*)(lbl_80478DF4 + offset) & mask) == mask) {
+                        if (fn_8005D934(*(u32*)(lbl_80478DF4 + offset + 4)) == active) {
+                            if (fn_8005D934(*(u32*)(lbl_80478DF4 + offset + 8)) == candidate) {
+                                arg0[0x95] = (u8)visible_index;
                                 return;
                             }
                         }
                     }
-                    chain_index++;
+                    visible_index++;
                 }
-                if ((candidate[0] & 0x40) == 0) {
+                if ((((u32)*(volatile u8*)candidate >> 6) & 1) == 0) {
                     candidate = fn_8005D934(*(s16*)(candidate + 0x18));
                 } else {
                     break;
                 }
             }
+            offset += 0xC;
             entry_index++;
-            chain_index += 0x0C;
         }
     }
 }
+#pragma pop
 #endif
 
 /* fn_80024308 - 0x80024308 | size: 0x130 */

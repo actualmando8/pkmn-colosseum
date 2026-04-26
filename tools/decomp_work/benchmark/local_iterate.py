@@ -29,14 +29,14 @@ def swap_else(stem: str, fn: str, c_body: str) -> tuple[bool, str]:
     c_path = REPO / "src" / "game" / f"{stem}.c"
     text = c_path.read_text(encoding="latin-1")
     pattern = re.compile(
-        r"(#if\s+1\s*\nasm void " + re.escape(fn) + r"\(void\)\s*\{[^}]*\})\s*\n"
+        r"(#if\s+1\s*\nasm void " + re.escape(fn) + r"\([^)]*\)\s*\{[^}]*\})\s*\n"
         r"(#else\s*\n)(.*?)(#endif)",
         re.S,
     )
     m = pattern.search(text)
     if not m:
         pattern2 = re.compile(
-            r"(#if\s+0\s*\nasm void " + re.escape(fn) + r"\(void\)\s*\{[^}]*\})\s*\n"
+            r"(#if\s+0\s*\nasm void " + re.escape(fn) + r"\([^)]*\)\s*\{[^}]*\})\s*\n"
             r"(#else\s*\n)(.*?)(#endif)",
             re.S,
         )
