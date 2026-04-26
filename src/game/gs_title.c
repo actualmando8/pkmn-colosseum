@@ -3790,7 +3790,7 @@ extern f32 lbl_8047B8AC;
 extern u32 lbl_8047A390;
 extern f32 lbl_8047B8B0;
 extern u8 lbl_8047A380;
-extern void fn_80024160(void);
+extern void fn_80024160(u8*, void*, u16*, u8*);
 #if 1
 asm void fn_80023E60(void) {
 #include "src/game/gs_title_fn_80023E60.inc"
