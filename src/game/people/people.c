@@ -1129,7 +1129,7 @@ asm void fn_8018F30C(void) {
 void fn_8018F30C(void) { /* TODO */ }
 #endif
 #pragma pop
-extern u32 sdaBase_0x8018A690[8];
+extern u32 sdaBase_0x8018A690[8]; // assuming this array is defined elsewhere
 
 u32 fn_8018F470(u32 r3) {
     if (r3 < 2) {

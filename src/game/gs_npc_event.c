@@ -98,7 +98,7 @@ extern void  fn_800D6728(void);                    /* Commit render state */
 extern void* fn_80109934(void* data);              /* Get model from data */
 extern s32   fn_8012A5B0(void* partyData, s32 slot, s32 p3);
 extern void  fn_80132A38(s32 paramId, s32 value);
-extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color, u16 modelId);
+extern void  fn_800FB680(s32, s32, u32, u16);
 
 /* Event queue */
 /* The event queue is a simple array-based queue where fn_80030170 pops
@@ -140,378 +140,148 @@ extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color, u16 modelId);
 
 /* 0x80031188 | 0xA0 */
 extern u8 lbl_803A2688[];
-#if 1
+#if 0
 asm void fn_80031188(void) {
 #include "src/game/gs_npc_event_fn_80031188.inc"
 }
 #else
-void fn_80031188(void) {
-    extern u8 lbl_803A2688[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-    f32 f6 = 0.0f;
-
-    r5 = *(u32*)((u8*)r4 + 0x64);
-    tmp = *(s16*)((u8*)r4 + 0x6);
-    r4 = r5 & (0xa140 << 16);
-    r3 = *(u8*)((u8*)r3 + 0x8B);
-    r31 = r4 | r3;
-    if ((s32)tmp != 0xf6b) {
-        if ((s32)tmp >= 0xf6b) return;
-        if ((s32)tmp < 0xf6a) {
-            return;
+#pragma peephole off
+void fn_80031188(u8* r3, u8* r4) {
+    u32 flags = *(u32*)(r4 + 0x64);
+    s32 evtype = *(s16*)(r4 + 0x6);
+    u32 combined = (flags & 0xa1400000) | *(u8*)(r3 + 0x8b);
+    switch (evtype) {
+    case 0xF6B:
+        fn_800FB680(0, 0, combined, 0x4412);
+        break;
+    case 0xF6A:
+        {
+            s32 val = fn_8012A5B0((void*)lbl_803A2688, 1, 0);
+            fn_80132A38(0x4D, val);
+            fn_800FB680(0, 0, combined, 0x4413);
         }
-        r5 = r31;
-        r3 = 0x0;
-        r4 = 0x0;
-        r6 = 0x4412;
-        ((void(*)(void))fn_800FB680)();
-        return;
-        }
-    r3 = (u32)lbl_803A2688;
-    r4 = 0x1;
-    r3 = (u32)lbl_803A2688;
-    r5 = 0x0;
-    ((void(*)(void))fn_8012A5B0)();
-    tmp = r3;
-    r3 = 0x4d;
-    r4 = tmp;
-    ((void(*)(void))fn_80132A38)();
-    r5 = r31;
-    r3 = 0x0;
-    r4 = 0x0;
-    r6 = 0x4413;
-    ((void(*)(void))fn_800FB680)();
-
-    return;
+        break;
+    }
 }
+#pragma peephole on
 #endif
 
 /* 0x80031228 | 0x1DC */
 extern void fn_8011E850(void);
 extern void fn_8010B718(void);
-extern void fn_80109220(void);
+extern void fn_80109220(void*, s32);
 extern void fn_80123FBC(void);
 extern void fn_80075FEC(void);
 extern u8 lbl_80266E90[];
-#if 1
+#if 0
 asm void fn_80031228(void) {
 #include "src/game/gs_npc_event_fn_80031228.inc"
 }
 #else
-void fn_80031228(void) {
-    extern u8 lbl_80266E90[];
-    extern u8 lbl_803A2688[];
-    extern void fn_80075FEC();
-    extern void fn_80109220();
-    extern void fn_8010B718();
-    extern void fn_8011E850();
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+#pragma push
+#pragma peephole off
+void fn_80031228(u8* arg0, u8* arg1) {
+    u8* table;
+    s32 kind;
+    s32 arg;
+    s32 i;
+    void* obj;
 
-    r30 = r3;
-    r31 = r4;
-    r3 = (u32)lbl_80266E90;
-    r29 = 0x0;
-    r4 = (u32)lbl_80266E90;
-    r6 = 0x0;
-    r7 = 0x0;
-    r5 = 0x0;
-    tmp = 0x2;
-    ctr_fn = (void(*)(void))tmp;
-    do {
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
+    table = lbl_80266E90;
+    kind = 0;
+    arg = 0;
+    for (i = 0; i < 12; i++) {
+        if (*(s16*)(arg1 + 0x6) == *(u16*)(table + 0x2)) {
+            kind = *(u8*)(table + 0x0);
+            arg = *(u8*)(table + 0x1);
         }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r31 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0x2);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r5 = r5 + 0x5;
-    } while (--ctr != 0);
-    if ((s32)r6 != 2) {
-        if ((s32)r6 >= 2) goto L_80031360;
-        if ((s32)r6 < 1) {
-            goto L_80031360;
-        }
-        r5 = r7 & 0xFFFF;
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
+        table += 0x12;
+    }
 
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+    }
+
+    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+        ((void (*)(u8*, u8*, void*))fn_8010B718)(arg0, arg1, obj);
+        fn_80109220(arg1, 1);
+    } else if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 && ((u8 (*)(void))fn_80075FEC)() == 1) {
+        ((void (*)(u8*, u8*, void*))fn_8010B718)(arg0, arg1, obj);
+        fn_80109220(arg1, 1);
     } else {
-        r3 = (u32)lbl_803A2688;
-        r5 = r7 & 0xFFFF;
-        r3 = (u32)lbl_803A2688;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
+        fn_80109220(arg1, 0);
     }
-L_80031360:
-    r3 = r29;
-    fn_8011E850();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = r30;
-        r4 = r31;
-        r5 = r29;
-        fn_8010B718();
-        r3 = r31;
-        r4 = 0x1;
-        fn_80109220();
-        return;
-    }
-    r3 = r29;
-    fn_80123FBC();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = r29;
-        fn_80075FEC();
-        tmp = r3 & 0xFF;
-        if (tmp == 1) {
-            r3 = r30;
-            r4 = r31;
-            r5 = r29;
-            fn_8010B718();
-            r3 = r31;
-            r4 = 0x1;
-            fn_80109220();
-            return;
-    }
-    }
-    r3 = r31;
-    r4 = 0x0;
-    fn_80109220();
-
-    return;
 }
+#pragma pop
 #endif
 
 /* 0x80031404 | 0x244 */
 extern void fn_8001DA60(void);
 extern void fn_8011E8DC(void);
 extern void fn_800FA280(void);
-#if 1
+#if 0
 asm void fn_80031404(void) {
 #include "src/game/gs_npc_event_fn_80031404.inc"
 }
 #else
-void fn_80031404(void) {
-    extern u8 lbl_80266E90[];
-    extern u8 lbl_803A2688[];
-    extern void fn_8001DA60();
-    extern void fn_80075FEC();
-    extern void fn_800FA280();
-    extern void fn_80109220();
-    extern void fn_8011E8DC();
-    extern void fn_80123FBC();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+#pragma push
+#pragma peephole off
+void fn_80031404(u8* arg0, u8* arg1) {
+    u8* table;
+    u32 combined;
+    s32 kind;
+    s32 arg;
+    s32 i;
+    void* obj;
+    s32 msg;
 
-    r30 = r4;
-    r5 = *(u32*)((u8*)r30 + 0x64);
-    r4 = (u32)lbl_80266E90;
-    tmp = *(u8*)((u8*)r3 + 0x8B);
-    r4 = (u32)lbl_80266E90;
-    /* clrrwi r3, r5, 8 */;
-    r29 = 0x0;
-    r6 = 0x0;
-    r7 = 0x0;
-    r31 = r3 | tmp;
-    r5 = 0x0;
-    tmp = 0x2;
-    ctr_fn = (void(*)(void))tmp;
-    do {
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
+    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
+    table = lbl_80266E90;
+    kind = 0;
+    arg = 0;
+    for (i = 0; i < 12; i++) {
+        if (*(s16*)(arg1 + 0x6) == *(u16*)(table + 0xC)) {
+            kind = *(u8*)(table + 0x0);
+            arg = *(u8*)(table + 0x1);
         }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r3 = *(s16*)((u8*)r30 + 0x6);
-        tmp = *(u16*)((u8*)r4 + 0xC);
-        if ((s32)r3 == (s32)tmp) {
-            r6 = *(u8*)((u8*)r4 + 0x0);
-            r7 = *(u8*)((u8*)r4 + 0x1);
-        }
-        r4 = r4 + 0x12;
-        r5 = r5 + 0x5;
-    } while (--ctr != 0);
-    if ((s32)r6 != 2) {
-        if ((s32)r6 >= 2) goto L_8003154C;
-        if ((s32)r6 < 1) {
-            goto L_8003154C;
-        }
-        r5 = r7 & 0xFFFF;
-        r3 = 0x0;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
-
-    } else {
-        r3 = (u32)lbl_803A2688;
-        r5 = r7 & 0xFFFF;
-        r3 = (u32)lbl_803A2688;
-        r4 = 0x3;
-        ((void(*)(void))fn_8012A5B0)();
-        r29 = r3;
+        table += 0x12;
     }
-L_8003154C:
-    r3 = r29;
-    fn_80123FBC();
-    tmp = r3 & 0xFF;
-    do {
-        if (tmp == 0) break;
-        r3 = r29;
-        fn_80075FEC();
-        tmp = r3 & 0xFF;
-        if (tmp != 1) break;
-        r3 = r29;
-        fn_8001DA60();
-        tmp = r3 & 0xFF;
-        do {
-            if ((s32)tmp != 1) {
-                if ((s32)tmp < 1) {
-                    if ((s32)tmp < 0) {
-                        continue;
-                    }
-                    continue;
-                    }
-                r28 = 0xd67;
-                break;
-            }
-            r28 = 0xd68;
-            break;
 
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+    }
 
-        } while (0);
-
-        r3 = r29;
-        fn_8011E8DC();
-        tmp = r3 & 0xFF;
-        if (tmp == 1) {
-            r28 = 0x0;
+    if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 &&
+        ((u8 (*)(void))fn_80075FEC)() == 1) {
+        msg = ((u8 (*)(void*))fn_8001DA60)(obj);
+        if (msg == 0) {
+            msg = 0xD67;
+        } else if (msg == 1) {
+            msg = 0xD68;
+        } else {
+            msg = 0;
         }
-        if (r28 != 0) {
-            r3 = r28;
-            fn_800FA280();
-            r4 = r3;
-            r3 = 0x37;
-            ((void(*)(void))fn_80132A38)();
-            r5 = r31;
-            r3 = 0x2;
-            r4 = 0x0;
-            r6 = 0xcf;
-            ((void(*)(void))fn_800FB680)();
-            r3 = r30;
-            r4 = 0x1;
-            fn_80109220();
-            return;
+        if (((u8 (*)(void*))fn_8011E8DC)(obj) == 1) {
+            msg = 0;
         }
-        r3 = r30;
-        r4 = 0x0;
-        fn_80109220();
-        return;
-    } while (0);
-
-    r3 = r30;
-    r4 = 0x0;
-    fn_80109220();
-
-    return;
+        if (msg != 0) {
+            fn_80132A38(0x37, ((s32 (*)(s32))fn_800FA280)(msg));
+            fn_800FB680(2, 0, combined, 0xCF);
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else {
+        fn_80109220(arg1, 0);
+    }
 }
+#pragma pop
 #endif
 
 /* 0x80031648 | 0x290 */
@@ -707,186 +477,139 @@ L_80031778:
 }
 #endif
 
-/* 0x800318D8 | 0x144 */
+/* 0x800318D8 | 0x144 — scan 12-entry table for matching species, dispatch to fn_80109220 */
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-#if 1
+extern u8  lbl_80266E90[];
+#if 0
 asm void fn_800318D8(void) {
 #include "src/game/gs_npc_event_fn_800318D8.inc"
 }
 #else
-void fn_800318D8(void) {
-    extern u8 lbl_80266E90[];
-    extern u32 lbl_8047A420;
-    extern u32 lbl_8047A424;
-    extern void fn_80109220();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r3 = (u32)lbl_80266E90;
-    r7 = 0x0;
-    r5 = (u32)lbl_80266E90;
-    r8 = 0x0;
-    r6 = 0x0;
-    tmp = 0x2;
-    ctr_fn = (void(*)(void))tmp;
-    do {
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r3 = *(s16*)((u8*)r4 + 0x6);
-        tmp = *(u16*)((u8*)r5 + 0xE);
-        if ((s32)r3 == (s32)tmp) {
-            r7 = *(u8*)((u8*)r5 + 0x0);
-            r8 = *(u8*)((u8*)r5 + 0x1);
-        }
-        r5 = r5 + 0x12;
-        r6 = r6 + 0x5;
-    } while (--ctr != 0);
-    if ((s32)r7 != 2) {
-        if ((s32)r7 >= 2) goto L_80031A00;
-        if ((s32)r7 < 1) {
-            goto L_80031A00;
-        }
-        tmp = lbl_8047A424;
-        if ((s32)tmp == (s32)r8) {
-            r3 = r4;
-            r4 = 0x1;
-            fn_80109220();
-            return;
-        }
-        tmp = lbl_8047A420;
-        if ((s32)tmp == (s32)r8) {
-            r3 = r4;
-            r4 = 0x1;
-            fn_80109220();
-            return;
+void fn_800318D8(s32 _unused, u8* tgt) {
+    u8* p = lbl_80266E90;
+    s32 group = 0;
+    s32 sub   = 0;
+    s16 key   = *(s16*)(tgt + 6);
+    s32 i;
+    for (i = 0; i < 2; i++) {
+        s32 j;
+        for (j = 0; j < 6; j++) {
+            if ((s32)key == (s32)*(u16*)(p + 0xe)) {
+                group = p[0];
+                sub   = p[1];
+            }
+            p += 0x12;
         }
     }
-L_80031A00:
-    r3 = r4;
-    r4 = 0x0;
-    fn_80109220();
-
-    return;
+    if (group == 1 && (s32)lbl_8047A424 == sub) {
+        fn_80109220(tgt, 1);
+        return;
+    }
+    if (group == 2 && (s32)lbl_8047A420 == sub) {
+        fn_80109220(tgt, 1);
+        return;
+    }
+    fn_80109220(tgt, 0);
 }
 #endif
 
 /* 0x54 | fn_80031A1C | generic */
 /* fn_80031A1C - 0x80031A1C | size: 0x54 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031A1C(void) {
 #include "src/game/gs_npc_event_fn_80031A1C.inc"
 }
 #else
-void fn_80031A1C(void) {
-    /* refs: lbl_8047A42C */
-    fn_80109220();
-    fn_80109220();
+#pragma peephole off
+void fn_80031A1C(void* r3, void* r4) {
+    s32 val = (s32)lbl_8047A42C;
+    switch (val) {
+    case 7:
+    case 2:
+        fn_80109220(r4, 1);
+        break;
+    default:
+        fn_80109220(r4, 0);
+        break;
+    }
 }
+#pragma peephole on
 #endif
 
 /* 0x50 | fn_80031A70 | generic */
 /* fn_80031A70 - 0x80031A70 | size: 0x50 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031A70(void) {
 #include "src/game/gs_npc_event_fn_80031A70.inc"
 }
 #else
-void fn_80031A70(void) {
-    /* refs: lbl_8047A42C */
-    fn_80109220();
-    fn_80109220();
+#pragma peephole off
+void fn_80031A70(void* r3, void* r4) {
+    s32 val = (s32)lbl_8047A42C;
+    switch (val) {
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+        fn_80109220(r4, 1);
+        break;
+    default:
+        fn_80109220(r4, 0);
+        break;
+    }
 }
+#pragma peephole on
 #endif
 
 /* 0x50 | fn_80031AC0 | generic */
 /* fn_80031AC0 - 0x80031AC0 | size: 0x50 */
 extern u32 lbl_8047A42C;
-#if 1
+#if 0
 asm void fn_80031AC0(void) {
 #include "src/game/gs_npc_event_fn_80031AC0.inc"
 }
 #else
-void fn_80031AC0(void) {
-    /* refs: lbl_8047A42C */
-    fn_80109220();
-    fn_80109220();
+#pragma peephole off
+void fn_80031AC0(void* r3, void* r4) {
+    s32 val = (s32)lbl_8047A42C;
+    switch (val) {
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        fn_80109220(r4, 1);
+        break;
+    default:
+        fn_80109220(r4, 0);
+        break;
+    }
 }
+#pragma peephole on
 #endif
 
 /* 0x80031B10 | 0x3C */
 extern void fn_800F0308(void);
-extern void fn_8010B560(void);
-extern void fn_801CB9D8(void);
+extern u32 fn_8010B560(void);
+extern void fn_801CB9D8(u32);
 extern u32 lbl_8047A418;
-#if 1
+#if 0
 asm void fn_80031B10(void) {
 #include "src/game/gs_npc_event_fn_80031B10.inc"
 }
 #else
+#pragma peephole off
 void fn_80031B10(void) {
-    extern u32 lbl_8047A418;
-    extern void fn_800F0308();
-    extern void fn_8010B560();
-    extern void fn_801CB9D8();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    while (1) {
-        fn_8010B560();
-        tmp = r3 & 0xFF;
-        if (tmp == 0) break;
+    while ((u8)fn_8010B560() != 0) {
         fn_800F0308();
-
     }
-    r3 = lbl_8047A418;
-    fn_801CB9D8();
-    return;
+    fn_801CB9D8(lbl_8047A418);
 }
+#pragma peephole on
 #endif
 
 /* 0x80031B4C | 0x954 */
@@ -1362,13 +1085,13 @@ L_80032484:
 #endif
 
 /* 0x800324A0 | 0xC4 */
-extern void fn_80112260(void);
-extern void fn_80113F48(void);
-extern void fn_801CBA0C(void);
-extern void fn_800F9318(void);
-extern void fn_80176E0C(void);
-extern void fn_80177A44(void);
-extern void fn_801CB7C4(void);
+extern void fn_80112260(s32);
+extern u32  fn_80113F48(void);
+extern u32  fn_801CBA0C(u32);
+extern u32  fn_800F9318(u32);
+extern void fn_80176E0C(s32, u32, s32, s32);
+extern void fn_80177A44(s32);
+extern void fn_801CB7C4(u32);
 extern u8 lbl_8047A408;
 extern u32 lbl_8047A42C;
 extern u8 lbl_8047A409;
@@ -1380,102 +1103,60 @@ extern u8 lbl_8047A41C;
 extern u8 lbl_8047A40A;
 extern u32 lbl_8047A418;
 extern u32 lbl_8047A414;
-#if 1
+#if 0
 asm void fn_800324A0(void) {
 #include "src/game/gs_npc_event_fn_800324A0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_800324A0(void) {
-    extern u8 lbl_8047A408;
-    extern u8 lbl_8047A409;
-    extern u8 lbl_8047A40A;
-    extern u8 lbl_8047A410;
-    extern u32 lbl_8047A414;
-    extern u32 lbl_8047A418;
-    extern u8 lbl_8047A41C;
-    extern u32 lbl_8047A420;
-    extern u32 lbl_8047A424;
-    extern u32 lbl_8047A428;
-    extern u32 lbl_8047A42C;
-    extern void fn_800F9318();
-    extern void fn_80112260();
-    extern void fn_80113F48();
-    extern void fn_80176E0C();
-    extern void fn_80177A44();
-    extern void fn_801CB7C4();
-    extern void fn_801CBA0C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    u32 value;
+    u32 handle;
+    s32 minus_one;
+    s32 zero;
+    s32 one;
 
-    r3 = 0x0;
-    fn_80112260();
-    tmp = lbl_8047A408;
-    if (tmp != 0) {
-        tmp = 0x0;
-        lbl_8047A408 = tmp;
+    fn_80112260(0);
+    if (lbl_8047A408 != 0) {
+        lbl_8047A408 = 0;
     } else {
-
-        r3 = 0x1;
-        tmp = -0x1;
-        r4 = 0x0;
-        lbl_8047A42C = r3;
-        lbl_8047A409 = r4;
-        lbl_8047A428 = tmp;
-        lbl_8047A424 = tmp;
-        lbl_8047A420 = tmp;
-        lbl_8047A410 = r3;
-        lbl_8047A41C = r3;
-        lbl_8047A40A = r3;
-        fn_80113F48();
-        r4 = 0xFFE0000;
-        r31 = r3;
-        r3 = r4 + 0x1000;
-        fn_801CBA0C();
-        r4 = r3;
-        r3 = r31;
-        lbl_8047A418 = r4;
-        fn_800F9318();
-        lbl_8047A414 = r3;
-        r3 = 0xFFF0000;
-        r4 = r3 + 0x1800;
-        r3 = 0x37c;
-        r5 = 0x0;
-        r6 = 0x1;
-        fn_80176E0C();
-        r3 = 0x4;
-        fn_80177A44();
-        r3 = 0x10B10000;
-        r3 = r3 + 0x1000;
-        fn_801CB7C4();
+        one = 1;
+        minus_one = -1;
+        zero = 0;
+        lbl_8047A42C = one;
+        lbl_8047A409 = zero;
+        lbl_8047A428 = minus_one;
+        lbl_8047A424 = minus_one;
+        lbl_8047A420 = minus_one;
+        lbl_8047A410 = one;
+        lbl_8047A41C = one;
+        lbl_8047A40A = one;
+        handle = fn_80113F48();
+        value = fn_801CBA0C(0x0FFE1000);
+        lbl_8047A418 = value;
+        lbl_8047A414 = fn_800F9318(handle);
+        fn_80176E0C(0x37C, 0x0FFF1800, 0, 1);
+        fn_80177A44(4);
+        fn_801CB7C4(0x10B11000);
     }
-    return;
 }
+#pragma pop
 #endif
 
 /* 0x80032564 | 0x28 */
-extern void fn_800FF730(void);
-#if 1
+extern void fn_800FF730(s32);
+#if 0
 asm void fn_80032564(void) {
 #include "src/game/gs_npc_event_fn_80032564.inc"
 }
 #else
+#pragma peephole off
 void fn_80032564(void) {
-    extern void fn_800F0308();
-    extern void fn_800FF730();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    r3 = 0x394;
-    fn_800FF730();
+    fn_800FF730(0x394);
     fn_800F0308();
-    return;
 }
+#pragma peephole on
 #endif
 
 /* 0x8003258C | 0x270 */
@@ -2062,13 +1743,13 @@ extern void fn_800896D0(void);
 extern void fn_801FCB40(void);
 extern void fn_801FCC3C(void);
 extern void fn_801FCA2C(void);
-extern void fn_801FC794(void);
+extern void fn_801FC794(s32, u16);
 extern void fn_801CA5C4(void);
 extern void fn_801653C4(void);
 extern void fn_80165A20(void);
 extern u32 lbl_8047A444;
 extern u8 lbl_8047A439;
-extern void fn_800330B8(void);
+extern void fn_800330B8(s32, u8*);
 #if 1
 asm void fn_80032ED8(void) {
 #include "src/game/gs_npc_event_fn_80032ED8.inc"
@@ -2078,7 +1759,7 @@ void fn_80032ED8(void) {
     extern u8 lbl_803A3334[];
     extern u8 lbl_8047A439;
     extern u32 lbl_8047A444;
-    extern void fn_800330B8();
+    extern void fn_800330B8(s32, u8*);
     extern void fn_800896D0();
     extern void fn_800896D8();
     extern void fn_800896E0();
@@ -2087,7 +1768,7 @@ void fn_80032ED8(void) {
     extern void fn_80165A20();
     extern void fn_80176E0C();
     extern void fn_801CA5C4();
-    extern void fn_801FC794();
+    extern void fn_801FC794(s32, u16);
     extern void fn_801FCA2C();
     extern void fn_801FCAFC();
     extern void fn_801FCB40();
@@ -2234,148 +1915,60 @@ void fn_80032ED8(void) {
 #endif
 
 /* 0x800330B8 | 0x1C0 */
-extern void fn_801FC828(void);
-extern void fn_801FC7B4(void);
-extern void fn_801EEE6C(void);
-extern void fn_801FC7D4(void);
-extern void fn_801FC744(void);
-extern void fn_801FC784(void);
-extern void fn_801FC7A4(void);
-extern void fn_801FC808(void);
-extern void fn_801FC7E4(void);
-extern void fn_801FC6F4(void);
-extern void fn_801FC6E4(void);
-extern void fn_801FC6D4(void);
-extern void fn_801FC694(void);
-extern void fn_801FC684(void);
-#if 1
+extern void fn_801FC828(s32, s32);
+extern void fn_801FC7B4(s32, u8);
+extern void fn_801EEE6C(u8, u8);
+extern void fn_801FC7D4(s32, u8);
+extern void fn_801FC744(s32, u32, u16);
+extern void fn_801FC784(s32, u16);
+extern void fn_801FC7A4(s32, u8);
+extern void fn_801FC808(s32, s32, u8);
+extern void fn_801FC7E4(s32, s32, s16);
+extern void fn_801FC6F4(s32, s16);
+extern void fn_801FC6E4(s32, u8);
+extern void fn_801FC6D4(s32, u8);
+extern void fn_801FC694(s32, u8);
+extern void fn_801FC684(s32, u8);
+#if 0
 asm void fn_800330B8(void) {
 #include "src/game/gs_npc_event_fn_800330B8.inc"
 }
 #else
-void fn_800330B8(void) {
-    extern void fn_801EEE6C();
-    extern void fn_801FC684();
-    extern void fn_801FC694();
-    extern void fn_801FC6D4();
-    extern void fn_801FC6E4();
-    extern void fn_801FC6F4();
-    extern void fn_801FC744();
-    extern void fn_801FC784();
-    extern void fn_801FC794();
-    extern void fn_801FC7A4();
-    extern void fn_801FC7B4();
-    extern void fn_801FC7D4();
-    extern void fn_801FC7E4();
-    extern void fn_801FC808();
-    extern void fn_801FC828();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_800330B8(s32 arg0, u8* arg1) {
+    s32 i;
+    u8* walk;
 
-    r28 = r3;
-    r29 = r4;
-    r4 = *(u16*)((u8*)r29 + 0x0);
-    fn_801FC794();
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC828();
-    r4 = *(u8*)((u8*)r29 + 0x2);
-    r3 = r28;
-    fn_801FC7B4();
-    r3 = *(u8*)((u8*)r29 + 0x2);
-    if (r3 != 0) {
-        r4 = *(u8*)((u8*)r29 + 0x28);
-        fn_801EEE6C();
+    fn_801FC794(arg0, *(u16*)(arg1 + 0x0));
+    fn_801FC828(arg0, 0);
+    fn_801FC7B4(arg0, *(u8*)(arg1 + 0x2));
+    if (*(u8*)(arg1 + 0x2) != 0) {
+        fn_801EEE6C(*(u8*)(arg1 + 0x2), *(u8*)(arg1 + 0x28));
     }
-    r4 = *(u8*)((u8*)r29 + 0x3);
-    r3 = r28;
-    fn_801FC7D4();
-    r31 = r29;
-    r30 = 0x0;
-    do {
-        r5 = *(u16*)((u8*)r31 + 0x4);
-        r3 = r28;
-        r4 = r30 & 0xFF;
-        fn_801FC744();
-        r31 = r31 + 0x2;
-        r30 = r30 + 0x1;
-    } while ((s32)r30 < 4);
-    r4 = *(u16*)((u8*)r29 + 0xC);
-    r3 = r28;
-    fn_801FC784();
-    r4 = *(u8*)((u8*)r29 + 0xE);
-    r3 = r28;
-    fn_801FC7A4();
-    r5 = *(u8*)((u8*)r29 + 0xF);
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x10);
-    r3 = r28;
-    r4 = 0x1;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x11);
-    r3 = r28;
-    r4 = 0x2;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x12);
-    r3 = r28;
-    r4 = 0x3;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x13);
-    r3 = r28;
-    r4 = 0x4;
-    fn_801FC808();
-    r5 = *(u8*)((u8*)r29 + 0x14);
-    r3 = r28;
-    r4 = 0x5;
-    fn_801FC808();
-    r5 = *(s16*)((u8*)r29 + 0x16);
-    r3 = r28;
-    r4 = 0x0;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x18);
-    r3 = r28;
-    r4 = 0x1;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1A);
-    r3 = r28;
-    r4 = 0x2;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1C);
-    r3 = r28;
-    r4 = 0x3;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x1E);
-    r3 = r28;
-    r4 = 0x4;
-    fn_801FC7E4();
-    r5 = *(s16*)((u8*)r29 + 0x20);
-    r3 = r28;
-    r4 = 0x5;
-    fn_801FC7E4();
-    r4 = *(s16*)((u8*)r29 + 0x22);
-    r3 = r28;
-    fn_801FC6F4();
-    r4 = *(u8*)((u8*)r29 + 0x24);
-    r3 = r28;
-    fn_801FC6E4();
-    r4 = *(u8*)((u8*)r29 + 0x25);
-    r3 = r28;
-    fn_801FC6D4();
-    r4 = *(u8*)((u8*)r29 + 0x26);
-    r3 = r28;
-    fn_801FC694();
-    r4 = *(u8*)((u8*)r29 + 0x27);
-    r3 = r28;
-    fn_801FC684();
+    fn_801FC7D4(arg0, *(u8*)(arg1 + 0x3));
+    walk = arg1;
+    for (i = 0; i < 4; i++) {
+        fn_801FC744(arg0, (u8)i, *(u16*)(walk + 0x4));
+        walk += 2;
+    }
+    fn_801FC784(arg0, *(u16*)(arg1 + 0xC));
+    fn_801FC7A4(arg0, *(u8*)(arg1 + 0xE));
+    fn_801FC808(arg0, 0, *(u8*)(arg1 + 0xF));
+    fn_801FC808(arg0, 1, *(u8*)(arg1 + 0x10));
+    fn_801FC808(arg0, 2, *(u8*)(arg1 + 0x11));
+    fn_801FC808(arg0, 3, *(u8*)(arg1 + 0x12));
+    fn_801FC808(arg0, 4, *(u8*)(arg1 + 0x13));
+    fn_801FC808(arg0, 5, *(u8*)(arg1 + 0x14));
+    fn_801FC7E4(arg0, 0, *(s16*)(arg1 + 0x16));
+    fn_801FC7E4(arg0, 1, *(s16*)(arg1 + 0x18));
+    fn_801FC7E4(arg0, 2, *(s16*)(arg1 + 0x1A));
+    fn_801FC7E4(arg0, 3, *(s16*)(arg1 + 0x1C));
+    fn_801FC7E4(arg0, 4, *(s16*)(arg1 + 0x1E));
+    fn_801FC7E4(arg0, 5, *(s16*)(arg1 + 0x20));
+    fn_801FC6F4(arg0, *(s16*)(arg1 + 0x22));
+    fn_801FC6E4(arg0, *(u8*)(arg1 + 0x24));
+    fn_801FC6D4(arg0, *(u8*)(arg1 + 0x25));
+    fn_801FC694(arg0, *(u8*)(arg1 + 0x26));
+    fn_801FC684(arg0, *(u8*)(arg1 + 0x27));
     return;
 }
 #endif
@@ -2383,32 +1976,80 @@ void fn_800330B8(void) {
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_800301A8 - 0x800301A8 | size: 0x4 */
-void fn_800301A8(void) {}
+#if 0
+asm void fn_800301A8(void) {
+#include "src/game/gs_npc_event_fn_800301A8.inc"
+}
+#else
+void fn_800301A8(void) { }
+#endif
 
 /* fn_800301AC - 0x800301AC | size: 0x4 */
-void fn_800301AC(void) {}
+#if 0
+asm void fn_800301AC(void) {
+#include "src/game/gs_npc_event_fn_800301AC.inc"
+}
+#else
+void fn_800301AC(void) { }
+#endif
 
 /* fn_80030370 - 0x80030370 | size: 0xc */
-void fn_80030370(void* unused, u8* obj) {
-    *(u32*)(obj + 0x4C) = 0x43E3;
+#if 0
+asm void fn_80030370(void) {
+#include "src/game/gs_npc_event_fn_80030370.inc"
 }
+#else
+void fn_80030370(u32 r3, u32* r4) {
+    r4[0x4C / 4] = 0x43E3;
+}
+#endif
 
 /* fn_8003037C - 0x8003037C | size: 0xc */
-void fn_8003037C(void* unused, u8* obj) {
-    *(u32*)(obj + 0x4C) = 0x43E2;
+#if 0
+asm void fn_8003037C(void) {
+#include "src/game/gs_npc_event_fn_8003037C.inc"
 }
+#else
+void fn_8003037C(u32 r3, u32* r4) {
+    r4[0x4C / 4] = 0x43E2;
+}
+#endif
 
 /* fn_80030388 - 0x80030388 | size: 0xa0 */
-#if 1
+#if 0
 asm void fn_80030388(void) {
 #include "src/game/gs_npc_event_fn_80030388.inc"
 }
 #else
-void fn_80030388(void) { /* TODO */ }
+#pragma peephole off
+void fn_80030388(u8* r3, u8* r4) {
+    u32 flags = *(u32*)(r4 + 0x64);
+    s32 evtype = *(s16*)(r4 + 0x6);
+    u32 combined = (flags & 0xa1400000) | *(u8*)(r3 + 0x8b);
+    switch (evtype) {
+    case 0x10CB:
+        fn_800FB680(0, 0, combined, 0x4412);
+        break;
+    case 0x10CA:
+        {
+            s32 val = fn_8012A5B0((void*)lbl_803A2688, 1, 0);
+            fn_80132A38(0x4D, val);
+            fn_800FB680(0, 0, combined, 0x4413);
+        }
+        break;
+    }
+}
+#pragma peephole on
 #endif
 
 /* fn_80030428 - 0x80030428 | size: 0x4 */
-void fn_80030428(void) {}
+#if 0
+asm void fn_80030428(void) {
+#include "src/game/gs_npc_event_fn_80030428.inc"
+}
+#else
+void fn_80030428(void) { }
+#endif
 
 /* fn_8003042C - 0x8003042C | size: 0x148 */
 extern void fn_801230E0(void);
@@ -2417,18 +2058,56 @@ extern void fn_80144088(void);
 extern u8 lbl_80266F68[];
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-#if 1
+#if 0
 asm void fn_8003042C(void) {
 #include "src/game/gs_npc_event_fn_8003042C.inc"
 }
 #else
-void fn_8003042C(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_8003042C(u8* arg0, u8* arg1) {
+    u32 combined;
+    s32 kind;
+    void* obj;
+
+    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
+    kind = 0;
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x12)) {
+        kind = *(u16*)(lbl_80266F68 + 0x0);
+    }
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x26)) {
+        kind = *(u16*)(lbl_80266F68 + 0x14);
+    }
+
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+    }
+
+    if (obj != 0) {
+        if (((u16 (*)(void*))fn_801230E0)(obj) != 0) {
+            fn_801440A0();
+            fn_80144088();
+            fn_80132A38(0x37, ((s32 (*)(void))fn_800FA280)());
+            fn_800FB680(0, 0, combined, 0xE7);
+            *(u32*)(arg1 + 0x4C) = 0;
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else {
+        fn_80109220(arg1, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80030574 - 0x80030574 | size: 0x234 */
 extern void fn_80123CD4(void);
 extern void fn_8011BEB4(void);
-extern void fn_800FBB34(void);
+extern void fn_800FBB34(s32, s32, s32, s32, u32, u16);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
 #if 1
@@ -2442,12 +2121,43 @@ void fn_80030574(void) { /* TODO */ }
 /* fn_800307A8 - 0x800307A8 | size: 0x12c */
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-#if 1
+#if 0
 asm void fn_800307A8(void) {
 #include "src/game/gs_npc_event_fn_800307A8.inc"
 }
 #else
-void fn_800307A8(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800307A8(u8* arg0, u8* arg1) {
+    u32 combined;
+    s32 kind;
+    void* obj;
+
+    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
+    kind = 0;
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x2)) {
+        kind = *(u16*)(lbl_80266F68 + 0x0);
+    }
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x16)) {
+        kind = *(u16*)(lbl_80266F68 + 0x14);
+    }
+
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+    }
+
+    if (obj != 0) {
+        fn_80132A38(0x2F, ((u8 (*)(void*, s32, s32, s32))fn_8012640C)(obj, 0, 0x7A, 0));
+        fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0x4414);
+        fn_80109220(arg1, 1);
+    } else {
+        fn_80109220(arg1, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_800308D4 - 0x800308D4 | size: 0x170 */
@@ -2479,23 +2189,98 @@ extern u8 lbl_803A3230[];
 extern u8 lbl_803A31E8[];
 extern u8 lbl_80314F98[];
 extern f32 lbl_8047B9D4;
-extern u32 lbl_8047B9F0;
-#if 1
+extern f32 lbl_8047B9F0;
+#if 0
 asm void fn_80030C14(void) {
 #include "src/game/gs_npc_event_fn_80030C14.inc"
 }
 #else
-void fn_80030C14(void) { /* TODO */ }
+#pragma peephole off
+void fn_80030C14(void* r3, u8* r4) {
+    void* model = NULL;
+    s32 evtype = *(s16*)(r4 + 0x6);
+    switch (evtype) {
+    case 0x10CC:
+        model = fn_80109934(lbl_803A3230);
+        break;
+    case 0x10CD:
+        model = fn_80109934(lbl_803A31E8);
+        break;
+    }
+    if (model != NULL) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, model);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047B9D4, lbl_8047B9D4);
+        fn_800D61E4(*(s16*)(r4 + 0x54), *(s16*)(r4 + 0x56));
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047B9F0, lbl_8047B9F0);
+        fn_800D6728();
+    }
+}
+#pragma peephole on
 #endif
 
 /* fn_80030D34 - 0x80030D34 | size: 0x1d8 */
 extern void fn_8011F1A0(void);
-#if 1
+#if 0
 asm void fn_80030D34(void) {
 #include "src/game/gs_npc_event_fn_80030D34.inc"
 }
 #else
-void fn_80030D34(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_80030D34(u8* arg0, u8* arg1) {
+    u8* table;
+    s32 kind;
+    s32 arg;
+    s32 i;
+    s32 side;
+    void* obj;
+
+    table = lbl_80266E90;
+    kind = 0;
+    arg = 0;
+    for (i = 0; i < 12; i++) {
+        if (*(s16*)(arg1 + 0x6) == *(u16*)(table + 0x8)) {
+            kind = *(u8*)(table + 0x0);
+            arg = *(u8*)(table + 0x1);
+        }
+        table += 0x12;
+    }
+
+    obj = 0;
+    if (kind == 1) {
+        obj = (void*)fn_8012A5B0(0, 3, (u16)arg);
+    } else if (kind == 2) {
+        obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)arg);
+    }
+
+    if (((u8 (*)(void*))fn_8011E850)(obj) != 0) {
+        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+        if (side != 0) {
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else if (((u8 (*)(void*))fn_80123FBC)(obj) != 0 &&
+               ((u8 (*)(void))fn_80075FEC)() == 1) {
+        side = ((u16 (*)(void*))fn_8011F1A0)(obj);
+        if (side != 0) {
+            fn_80109220(arg1, 1);
+        } else {
+            fn_80109220(arg1, 0);
+        }
+    } else {
+        fn_80109220(arg1, 0);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80030F0C - 0x80030F0C | size: 0x27c */
@@ -2510,48 +2295,70 @@ void fn_80030F0C(void) { /* TODO */ }
 
 /* fn_800347B8 - 0x800347B8 | size: 0xc */
 extern u32 lbl_8047A440;
-#if 1
+#if 0
 asm void fn_800347B8(void) {
 #include "src/game/gs_npc_event_fn_800347B8.inc"
 }
 #else
-void fn_800347B8(void) { /* TODO */ }
+void fn_800347B8(void) {
+    *(u8*)&lbl_8047A440 = 1;
+}
 #endif
 
 /* fn_800347C4 - 0x800347C4 | size: 0x24 */
-extern void fn_80166A28(void);
-#if 1
+extern void fn_80166A28(s32);
+#if 0
 asm void fn_800347C4(void) {
 #include "src/game/gs_npc_event_fn_800347C4.inc"
 }
 #else
-void fn_800347C4(void) { /* TODO */ }
+void fn_800347C4(void) {
+    fn_80166A28(0x26);
+}
 #endif
 
 /* fn_800347E8 - 0x800347E8 | size: 0x24 */
-#if 1
+#if 0
 asm void fn_800347E8(void) {
 #include "src/game/gs_npc_event_fn_800347E8.inc"
 }
 #else
-void fn_800347E8(void) { /* TODO */ }
+void fn_800347E8(void) {
+    fn_80166A28(0x26);
+}
 #endif
 
 /* fn_8003480C - 0x8003480C | size: 0x24 */
-#if 1
+#if 0
 asm void fn_8003480C(void) {
 #include "src/game/gs_npc_event_fn_8003480C.inc"
 }
 #else
-void fn_8003480C(void) { /* TODO */ }
+void fn_8003480C(void) {
+    fn_80166A28(0x26);
+}
 #endif
 
 /* fn_80034DC0 - 0x80034DC0 | size: 0x78 */
 extern u32 lbl_8047A44C;
-#if 1
+#if 0
 asm void fn_80034DC0(void) {
 #include "src/game/gs_npc_event_fn_80034DC0.inc"
 }
 #else
-void fn_80034DC0(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_80034DC0(u8* arg0, u8* arg1) {
+    u32 byte;
+    s32 mask;
+    s32 combined;
+
+    byte = *(u8*)(arg0 + 0x8B);
+    mask = -0x100;
+    combined = byte | mask;
+    fn_800FB680(0, 0, combined, 0x3CC8);
+    fn_80132A38(0x34, lbl_8047A44C);
+    fn_800FBB34(0, 0, *(s16*)(arg1 + 0x54), *(s16*)(arg1 + 0x56), combined, 0x3CC9);
+}
+#pragma pop
 #endif
