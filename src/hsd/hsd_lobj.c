@@ -287,7 +287,7 @@ extern void fn_80193748(void);
 extern void fn_80193828(void);
 extern void fn_80196E10();
 extern u32 lbl_8047B2B0;
-extern u8 lbl_8047DBB8[];
+extern char lbl_8047DBB8;
 extern u8 lbl_8047DBC0[];
 extern u8 lbl_8047DBC4[];
 #if 1
@@ -330,7 +330,7 @@ extern void* fn_80191628();
 extern void fn_80191788();
 extern u8 lbl_8047DBCC[];
 extern u8 lbl_80274DB8[];
-extern u8 lbl_8047DBB8[];
+extern char lbl_8047DBB8;
 #if 1
 asm void fn_801A48F4(void) {
 #include "src/hsd/hsd_lobj_fn_801A48F4.inc"
@@ -497,7 +497,7 @@ extern u8 lbl_80274D64[];
 extern u8 lbl_80478AC8[];
 extern u32 lbl_8047DBF0;
 extern u32 lbl_8047DBEC;
-extern u8 lbl_8047DBD4[];
+extern char lbl_8047DBD4;
 extern u32 lbl_8047DBF8;
 extern u32 lbl_8047DBFC;
 #if 1
@@ -612,12 +612,58 @@ HSD_LObj* fn_801A678C(s32 idx) {
 #endif
 
 /* 0x801A67BC | 0x114 */
-#if 1
+#if 0
 asm void fn_801A67BC(void) {
 #include "src/hsd/hsd_lobj_fn_801A67BC.inc"
 }
 #else
-void fn_801A67BC(void) {}
+HSD_LObj* fn_801A67BC(s32 light_id)
+{
+    s32 index;
+
+    switch (light_id) {
+        case 1:
+            index = 0;
+            break;
+        case 2:
+            index = 1;
+            break;
+        case 4:
+            index = 2;
+            break;
+        case 8:
+            index = 3;
+            break;
+        case 0x10:
+            index = 4;
+            break;
+        case 0x20:
+            index = 5;
+            break;
+        case 0x40:
+            index = 6;
+            break;
+        case 0x80:
+            index = 7;
+            break;
+        case 0x100:
+            index = 8;
+            break;
+        default:
+            fn_80196E10(&lbl_8047DBB8, 0x4A1, &lbl_8047DBD4);
+            break;
+    }
+
+    {
+        s32 checked;
+
+        checked = index;
+        if (checked >= 0 && checked < 9) {
+            return *(HSD_LObj**)(lbl_804655E0 + checked * 4);
+        }
+    }
+    return NULL;
+}
 #endif
 
 /* 0x801A68D0 | 0x8 */
