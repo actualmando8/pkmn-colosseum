@@ -3603,45 +3603,57 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
 
     blocked = 0;
     for (;;) {
-        slot = fn_800141BC((void*)arg0, 1);
-        if (slot < 0) {
-            break;
-        }
+            { extern s32 fn_800141BC(void*, s32);
+              slot = fn_800141BC((void*)arg0, 1);
+            }
+        if (slot < 0) break;
+        
         fn_80014118(slot, &sc, &sd);
-        if ((u8)fn_80121ADC(sc, 0x3E) != 0) {
-            blocked = 1;
-            break;
-        }
-        mode = fn_80019B48((s8)slot);
-        fn_80019B1C();
-        if (mode >= 0) {
-            break;
+        
+        { extern u8 fn_80121ADC(s32, s32);
+          if (((u8)fn_80121ADC(sc, 0x3E) & 0xFF) == 0) {
+              mode = fn_80019B48((s8)slot);
+              fn_80019B1C();
+              if (mode >= 0) break;
+          } else {
+              blocked = 1;
+              break;
+          }
         }
     }
 
     if (slot >= 0) {
-        if (blocked != 0) {
-            fn_80132A38(0x32, fn_8011F4F0(sc));
+        if (((s8)blocked & 0xFF) != 0) {
+            fn_80132A38(0x32, (void*)fn_8011F4F0(sc));
             fn_80106D3C(2, 0x424D, 1, 0);
             fn_801069FC(1);
             effect = 0;
         } else {
-            effect = fn_80144574(text_buf, sc, sd, (u16)arg0, (u8)mode);
+            { extern s32 fn_80144574(void*, s32, s32, u16, s32);
+              effect = fn_80144574(text_buf, sc, sd, (u16)arg0, (u8)mode);
+            }
+            
             if ((s16)effect > 0) {
                 s32 sound_id;
-                if (arg0 == *(u16*)(lbl_80266DB0 + 0x0) ||
-                    arg0 == *(u16*)(lbl_80266DB0 + 0x2) ||
-                    arg0 == *(u16*)(lbl_80266DB0 + 0x4) ||
-                    arg0 == *(u16*)(lbl_80266DB0 + 0x6) ||
-                    arg0 == *(u16*)(lbl_80266DB0 + 0x8)) {
-                    sound_id = 0x466;
-                } else {
-                    sound_id = 0x465;
+                {
+                    u16* bgm_table = (u16*)lbl_80266DB0;
+                    if (arg0 == bgm_table[0] ||
+                        arg0 == bgm_table[1] ||
+                        arg0 == bgm_table[2] ||
+                        arg0 == bgm_table[3] ||
+                        arg0 == bgm_table[4]) {
+                        sound_id = 0x466;
+                    } else {
+                        sound_id = 0x465;
+                    }
                 }
                 fn_80166A50(sound_id, 0, 0xFF, 0);
                 fn_8001D378();
             }
-            fn_800216E8(name_buf, 0x40, text_buf, effect, sc);
+            
+            { extern void fn_800216E8(void*, s32, void*, s32, s32);
+              fn_800216E8(name_buf, 0x40, text_buf, effect, sc);
+            }
             fn_80132A38(0x4D, name_buf);
             fn_80106D3C(2, 0xE0, 1, 0);
             fn_801069FC(1);
