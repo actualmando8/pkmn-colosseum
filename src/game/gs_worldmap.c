@@ -1403,12 +1403,102 @@ void fn_80029AC8(s32 r3, u16 r4, u16 r5, void* r6) {
 /* fn_80029CC0 - 0x80029CC0 | size: 0x234 */
 extern void fn_80142A88(void*, s32);
 extern s32 fn_800849B4(s32, s32, s32, void*);
-#if 1
+typedef struct WorldMapEntry {
+    u16 id;
+    u16 qty;
+} WorldMapEntry;
+typedef struct WorldMapBuf {
+    u32 a;
+    u32 b;
+    u32 c;
+    u16 d;
+    u16 count;
+    WorldMapEntry items[48];
+} WorldMapBuf;
+#if 0
 asm void fn_80029CC0(void) {
 #include "src/game/gs_worldmap_fn_80029CC0.inc"
 }
 #else
-void fn_80029CC0(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 4
+#pragma peephole off
+#pragma scheduling on
+s32 fn_80029CC0(u8* r30) {
+    WorldMapBuf buf;
+    s32 i;
+    s16 idx;
+    u16 cnt;
+    u16 id;
+    u16 qty;
+    void* slot;
+    u16 v;
+    u16 cur;
+    u16 delta;
+    u16 give;
+    s32 j;
+    s16 jj;
+
+    fn_80142A88(r30, 0xeb);
+    fn_80142A88(r30 + 0x3ac, 0xeb);
+    *(u32*)(r30 + 0x758) = 0;
+    *(u32*)(r30 + 0x75c) = 0;
+    if (fn_800849B4(0, 0x40, 0, &buf) < 0) {
+        return 0;
+    }
+    for (i = 0; i < buf.count; i++) {
+        id = buf.items[i].id;
+        if (id == 0) continue;
+        qty = buf.items[i].qty;
+        idx = (s16)i;
+        cnt = buf.count;
+        if (idx < -1) continue;
+        if (idx >= (s32)cnt) continue;
+        if (idx != -1) {
+            if (idx >= 0 && idx < (s32)cnt) {
+                slot = (void*)(r30 + ((s32)idx << 2));
+                v = (u16)fn_80143C68(slot);
+                if (v != id && v != 0) continue;
+                if (v == 0) {
+                    fn_80143B80(slot, id);
+                    cur = 0;
+                } else {
+                    cur = (u16)fn_80143C50(slot);
+                }
+                delta = (u16)(0x3e7 - cur);
+                give = (delta >= qty) ? qty : delta;
+                fn_80143B70(slot, (u16)(cur + give));
+            }
+        } else {
+            for (j = 0; j < (s32)cnt && qty != 0; j++) {
+                jj = (s16)j;
+                qty = (u16)qty;
+                if (jj >= 0 && jj < (s32)cnt) {
+                    slot = (void*)(r30 + ((s32)jj << 2));
+                    v = (u16)fn_80143C68(slot);
+                    if (v != id && v != 0) continue;
+                    if (v == 0) {
+                        fn_80143B80(slot, id);
+                        cur = 0;
+                    } else {
+                        cur = (u16)fn_80143C50(slot);
+                    }
+                    delta = (u16)(0x3e7 - cur);
+                    give = (delta >= qty) ? qty : delta;
+                    fn_80143B70(slot, (u16)(cur + give));
+                    qty = (u16)(qty - give);
+                }
+            }
+        }
+    }
+    *(u32*)(r30 + 0x758) = *(u32*)((u8*)&buf + 0);
+    *(u32*)(r30 + 0x75c) = *(u32*)((u8*)&buf + 4);
+    *(u8*)(r30 + 0x760) = 0;
+    *(u32*)(r30 + 0x764) = *(u32*)((u8*)&buf + 8);
+    *(u16*)(r30 + 0x768) = buf.count;
+    return 1;
+}
+#pragma pop
 #endif
 
 /* fn_80029EF4 - 0x80029EF4 | size: 0xb8 */
