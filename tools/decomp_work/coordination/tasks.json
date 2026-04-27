@@ -3213,10 +3213,10 @@
     "function": "fn_8003F040",
     "description": "Match fn_8003F040 in scene_init.c (190 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-20",
+    "completed_at": "2026-04-27T17:32:17Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3225,7 +3225,8 @@
       "line_number": 2199,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "final_match_pct": 95.3
     }
   },
   {
@@ -4147,7 +4148,7 @@
     "function": "fn_801A4344",
     "description": "Match fn_801A4344 in hsd_lobj.c (72 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "claimed",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
     "completed_at": null,
@@ -4160,6 +4161,11 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 89.4,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -4167,10 +4173,10 @@
     "function": "fn_801A67BC",
     "description": "Match fn_801A67BC in hsd_lobj.c (86 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T17:28:53Z",
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
       "stem": "hsd_lobj",
@@ -4180,6 +4186,10 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 96.5,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -4187,9 +4197,9 @@
     "function": "fn_801A620C",
     "description": "Match fn_801A620C in hsd_lobj.c (97 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
