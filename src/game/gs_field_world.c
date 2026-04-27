@@ -16694,91 +16694,51 @@ u16 fn_80123110(u8* ptr, u32 arg2, u8 flag) {
 }
 #endif
 /* 0x801231A4 | 0x13C */
-extern void fn_80131574(void);
-#if 1
+extern u32 fn_80131574(u32);
+#if 0
 asm void fn_801231A4(void) {
 #include "src/game/gs_field_world_fn_801231A4.inc"
 }
 #else
-void fn_801231A4(void) {
-    extern u32 fn_8012640C();
-    extern void fn_80131574();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x2;
-        return;
+u8 fn_801231A4(u8* ptr)
+{
+    u32 count;
+    u16 threshold;
+    u16 wanted;
+    s32 result;
+
+    if (ptr == NULL) {
+        return 2;
     }
-    r4 = 0x0;
-    r5 = 0x6f;
-    r6 = 0x0;
-    fn_8012640C();
-    r31 = r3;
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x6e;
-    r6 = 0x0;
-    fn_8012640C();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x13;
-    r6 = 0x0;
-    fn_8012640C();
-    r30 = r3 & 0xFFFF;
-    if (r29 == (u32)0x0) {
-        r3 = 0x2;
+
+    count = fn_8012640C(ptr, 0, 0x6F, 0);
+    threshold = (u16)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x13, 0);
+    if (ptr == NULL) {
+        result = 2;
     } else {
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x6e;
-    r6 = 0x0;
-    fn_8012640C();
-    r4 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r5 = 0x13;
-    r6 = 0x0;
-    fn_8012640C();
-    r29 = r3 & 0xFFFF;
-    r3 = 0x0;
-    fn_80131574();
-    r0 = r3 & 0xFF;
-    if ((s32)r29 == (s32)r0) {
-        r3 = 0x0;
-    } else {
-    r3 = 0x1;
-    fn_80131574();
-    r0 = r3 & 0xFF;
-    if ((s32)r29 == (s32)r0) {
-        r3 = 0x1;
-    } else {
-    r3 = 0x2;
-    fn_80131574();
-    r0 = r3 & 0xFF;
-    if ((s32)r29 == (s32)r0) {
-        r3 = 0x2;
-    } else {
-    r3 = -0x1;
+        wanted = (u16)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x13, 0);
+        if ((s32)wanted == (s32)(u8)fn_80131574(0)) {
+            result = 0;
+        } else if ((s32)wanted == (s32)(u8)fn_80131574(1)) {
+            result = 1;
+        } else if ((s32)wanted == (s32)(u8)fn_80131574(2)) {
+            result = 2;
+        } else {
+            result = -1;
+        }
     }
+    if ((s8)result >= 0) {
+        goto done;
     }
+    if (threshold <= (u8)count) {
+        goto zero;
     }
-    }
-    r0 = (s8)r3;
-    if ((s32)r29 >= (s32)r0) { r3 = r3 & 0xFF; return; }
-    r0 = r31 & 0xFF;
-    if (r30 > r0) {
-        r3 = 0x1;
-        r3 = r3 & 0xFF;
-        return;
-    }
-    r3 = 0x0;
-    r3 = r3 & 0xFF;
-    return;
+    result = 1;
+    goto done;
+zero:
+    result = 0;
+done:
+    return (u8)result;
 }
 #endif
 /* 0x801232E0 | 0x88 */
