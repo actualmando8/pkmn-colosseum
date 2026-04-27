@@ -3317,10 +3317,10 @@
     "function": "fn_8003AFDC",
     "description": "Match fn_8003AFDC in scene_init.c (206 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-24",
+    "completed_at": "2026-04-27T18:52:41.207936Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3329,7 +3329,13 @@
       "line_number": 1584,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "match_pct": 92.1
+    },
+    "claimed_at": "2026-04-27T18:21:38.793808Z",
+    "result": {
+      "pct": 92.1,
+      "model": "opus-sub-24"
     }
   },
   {
@@ -6192,10 +6198,10 @@
     "function": "fn_8012F008",
     "description": "Match fn_8012F008 in gs_field_world.c (83 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "claimed",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
-    "completed_at": null,
+    "completed_at": "2026-04-27T18:21:45Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6205,6 +6211,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 94.9,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6212,10 +6222,10 @@
     "function": "fn_80117D14",
     "description": "Match fn_80117D14 in gs_field_world.c (84 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:25:09Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6225,6 +6235,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 98.5,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6232,9 +6246,9 @@
     "function": "fn_8012BCA4",
     "description": "Match fn_8012BCA4 in gs_field_world.c (88 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_field_world.c",
@@ -6245,6 +6259,11 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 82.0,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -6252,10 +6271,10 @@
     "function": "fn_80116D30",
     "description": "Match fn_80116D30 in gs_field_world.c (89 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:36:41Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6265,6 +6284,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 90.9,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6272,10 +6295,10 @@
     "function": "fn_801231A4",
     "description": "Match fn_801231A4 in gs_field_world.c (89 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:41:15Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6285,6 +6308,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 99.2,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6292,10 +6319,10 @@
     "function": "fn_8012A450",
     "description": "Match fn_8012A450 in gs_field_world.c (92 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:45:42Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6305,6 +6332,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 94.5,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6312,9 +6343,9 @@
     "function": "fn_801171C8",
     "description": "Match fn_801171C8 in gs_field_world.c (95 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_field_world.c",
