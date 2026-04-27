@@ -49,9 +49,9 @@
     "function": "fn_80026860",
     "description": "Match fn_80026860 in gs_worldmap.c (40 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "moonshot-kimi-2",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -1121,9 +1121,9 @@
     "function": "fn_8013208C",
     "description": "Match fn_8013208C in effect_util.c (41 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "deepseek-v4-flash",
     "completed_at": null,
     "meta": {
       "file": "src/game/effect/effect_util.c",
@@ -5140,9 +5140,9 @@
     "function": "fn_80010294",
     "description": "Match fn_80010294 in gs_npc_interact.c (130 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "opus-sub-E",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_npc_interact.c",
@@ -5153,6 +5153,11 @@
       "file_pct": 29.5,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct_subagent": 100,
+      "pct_parent": 42.9,
+      "reason": "parent-verify-mismatch"
     }
   },
   {
@@ -8114,9 +8119,9 @@
     "function": "fn_8005D4AC",
     "description": "Match fn_8005D4AC in ui_core.c (21 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T19:12:31Z",
-    "claimed_by": null,
+    "claimed_by": "moonshot-kimi-1",
     "completed_at": null,
     "meta": {
       "file": "src/game/ui/ui_core.c",
@@ -8594,7 +8599,7 @@
     "function": "fn_8005D3D0",
     "description": "Match fn_8005D3D0 in ui_core.c (63 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T19:12:31Z",
     "claimed_by": null,
     "completed_at": null,
@@ -8607,6 +8612,11 @@
       "file_pct": 10.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "best_pct": 0.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
     }
   },
   {
