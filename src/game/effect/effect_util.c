@@ -815,25 +815,24 @@ extern void fn_801F8100(void);
 extern void fn_802037DC(void);
 extern void fn_800FA280(void);
 extern u32 lbl_8047AE10;
-#if 1
+#if 0
 asm void fn_80131F04(void) {
 #include "src/game/effect/effect_util_fn_80131F04.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80131F04(void) {
     extern u32 lbl_8047AE10;
-    extern void fn_800FA280(u32);
-    extern void fn_80132A38(u32, u32);
-    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
-    u32 result;
-    u32 flag;
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800FA280(u32);
     u32 val = lbl_8047AE10;
-    result = fn_801F4354(0, val);
-    flag = (u32)(fn_801F18DC(0) & 0xFF);
-
+    u32 result = fn_801F4354(0, val);
+    u32 flag = fn_801F18DC(0) & 0xFF;
     if (flag == 1 && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
@@ -842,6 +841,7 @@ void fn_80131F04(void) {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #endif
 
 /* 0x80131F9C | 0x8 | sda_getter */
@@ -879,23 +879,24 @@ u32 fn_80131FEC(void) { return lbl_8047ADE4; }
 
 /* 0x80131FF4 | 0x98 */
 extern u32 lbl_8047ADE0;
-#if 1
+#if 0
 asm void fn_80131FF4(void) {
 #include "src/game/effect/effect_util_fn_80131FF4.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80131FF4(void) {
-    extern void fn_800FA280(u32);
-    extern void fn_80132A38(u32, u32);
-    extern u32 fn_801F18DC(u32);
+    extern u32 lbl_8047ADE0;
     extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
-    u32 result;
-    u32 flag;
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800FA280(u32);
     u32 val = lbl_8047ADE0;
-    result = fn_801F4354(0, val);
-    flag = (u32)(fn_801F18DC(0) & 0xFF);
+    u32 result = fn_801F4354(0, val);
+    u32 flag = fn_801F18DC(0) & 0xFF;
     if (flag == 1 && result != 0) {
         fn_80132A38(0x4D, fn_801F8100(result));
         fn_80132A38(0x57, fn_802037DC(val));
@@ -904,99 +905,100 @@ void fn_80131FF4(void) {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #endif
 
 /* 0x8013208C | 0x98 */
 extern u32 lbl_8047ADDC;
-#if 1
+#if 0
 asm void fn_8013208C(void) {
 #include "src/game/effect/effect_util_fn_8013208C.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_8013208C(void) {
     extern u32 lbl_8047ADDC;
-    extern void fn_800FA280(u32);
-    extern void fn_80132A38(u32, u32);
-    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800FA280(u32);
     u32 val = lbl_8047ADDC;
     u32 result = fn_801F4354(0, val);
     u32 flag = fn_801F18DC(0) & 0xFF;
-
     if (flag == 1 && result != 0) {
-        u32 info = fn_801F8100(result);
-        fn_80132A38(0x4D, info);
-        info = fn_802037DC(val);
-        fn_80132A38(0x57, info);
+        fn_80132A38(0x4D, fn_801F8100(result));
+        fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #endif
 
 /* 0x80132124 | 0x98 */
 extern u32 lbl_8047ADD8;
-#if 1
+#if 0
 asm void fn_80132124(void) {
 #include "src/game/effect/effect_util_fn_80132124.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80132124(void) {
     extern u32 lbl_8047ADD8;
-    extern void fn_800FA280(u32);
-    extern void fn_80132A38(u32, u32);
-    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800FA280(u32);
     u32 val = lbl_8047ADD8;
     u32 result = fn_801F4354(0, val);
     u32 flag = fn_801F18DC(0) & 0xFF;
-
     if (flag == 1 && result != 0) {
-        u32 info = fn_801F8100(result);
-        fn_80132A38(0x4D, info);
-        info = fn_802037DC(val);
-        fn_80132A38(0x57, info);
+        fn_80132A38(0x4D, fn_801F8100(result));
+        fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #endif
 
 /* 0x801321BC | 0x98 */
 extern u32 lbl_8047ADD4;
-#if 1
+#if 0
 asm void fn_801321BC(void) {
 #include "src/game/effect/effect_util_fn_801321BC.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_801321BC(void) {
     extern u32 lbl_8047ADD4;
-    extern void fn_800FA280(u32);
-    extern void fn_80132A38(u32, u32);
-    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F4354(u32, u32);
+    extern u32 fn_801F18DC(u32);
     extern u32 fn_801F8100(u32);
     extern u32 fn_802037DC(u32);
+    extern void fn_80132A38(u32, u32);
+    extern void fn_800FA280(u32);
     u32 val = lbl_8047ADD4;
     u32 result = fn_801F4354(0, val);
     u32 flag = fn_801F18DC(0) & 0xFF;
-
     if (flag == 1 && result != 0) {
-        u32 info = fn_801F8100(result);
-        fn_80132A38(0x4D, info);
-        info = fn_802037DC(val);
-        fn_80132A38(0x57, info);
+        fn_80132A38(0x4D, fn_801F8100(result));
+        fn_80132A38(0x57, fn_802037DC(val));
         fn_800FA280(0x7721);
     } else {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #endif
 
 /* 0x80132254 | 0x8 | sda_getter */
