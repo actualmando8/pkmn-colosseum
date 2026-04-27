@@ -2997,9 +2997,9 @@
     "function": "fn_800379E8",
     "description": "Match fn_800379E8 in scene_init.c (128 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/scene_init.c",
@@ -3234,10 +3234,10 @@
     "function": "fn_80044378",
     "description": "Match fn_80044378 in scene_init.c (193 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-21",
+    "completed_at": "2026-04-27T17:51:52Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3247,6 +3247,12 @@
       "file_pct": 17.1,
       "model_tier": "opus",
       "difficulty": "complex"
+    },
+    "claimed_at": "2026-04-27T17:34:04Z",
+    "result": {
+      "pct": 91.7,
+      "model": "opus-sub-21",
+      "commit_sha": "4b3667c411716c6ec26796b63ba3e75331f94574"
     }
   },
   {
@@ -3254,10 +3260,10 @@
     "function": "fn_8003CF38",
     "description": "Match fn_8003CF38 in scene_init.c (198 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-22",
+    "completed_at": "2026-04-27T16:30:00Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3267,6 +3273,11 @@
       "file_pct": 17.1,
       "model_tier": "opus",
       "difficulty": "complex"
+    },
+    "claimed_at": "2026-04-27T16:00:00Z",
+    "result": {
+      "pct": 90.3,
+      "model": "opus-sub-22"
     }
   },
   {
@@ -4197,10 +4208,10 @@
     "function": "fn_801A620C",
     "description": "Match fn_801A620C in hsd_lobj.c (97 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "claimed",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
-    "completed_at": null,
+    "completed_at": "2026-04-27T17:37:30Z",
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
       "stem": "hsd_lobj",
@@ -4210,6 +4221,10 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 92.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -4217,9 +4232,9 @@
     "function": "fn_801A6098",
     "description": "Match fn_801A6098 in hsd_lobj.c (100 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
@@ -4230,6 +4245,11 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 83.4,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -4237,10 +4257,10 @@
     "function": "fn_801A40F8",
     "description": "Match fn_801A40F8 in hsd_lobj.c (104 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T17:57:25Z",
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
       "stem": "hsd_lobj",
@@ -4250,6 +4270,10 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 93.3,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -7272,10 +7296,10 @@
     "function": "fn_800DB758",
     "description": "Match fn_800DB758 in gs_render.c (81 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:01:55Z",
     "meta": {
       "file": "src/game/gs_render.c",
       "stem": "gs_render",
@@ -7285,6 +7309,10 @@
       "file_pct": 48.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 91.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
