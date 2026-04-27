@@ -61,7 +61,7 @@ extern void fn_800F0F4C(u32 arg);          /* GSthread trampoline / entry wrappe
 extern void fn_800AB150(void* buf);
 extern u32 fn_800D0F44(u32 buttonIdx);
 extern void fn_800AB4FC(void);
-extern void fn_800E209C(void);
+extern void fn_800E209C(u16 handle);
 extern void fn_800E24B0(void);
 extern void fn_800E27B0(void);
 extern void fn_800E2C04(void);
@@ -5208,7 +5208,7 @@ extern u32 lbl_8047AC00;
 extern u32 lbl_8047AC04;
 extern u32 lbl_8047AC0C;
 extern u32 lbl_8047AC08;
-#if 1
+#if 0
 asm void fn_800F0F4C(u32 arg) {
 #include "src/game/gs_thread_fn_800F0F4C.inc"
 }
@@ -5223,7 +5223,7 @@ void fn_800F0F4C(u32 arg) {
         if ((u32)obj == lbl_8047AC00 || (u32)obj == lbl_8047AC04) {
             *(u8*)(obj + 0x15) = 1;
             if ((u32)obj == lbl_8047AC04) {
-                lbl_8047AC0C = 1;
+                *(u8*)&lbl_8047AC0C = 1;
             }
         } else {
             *(u8*)(obj + 0x14) = 0;
@@ -5231,8 +5231,8 @@ void fn_800F0F4C(u32 arg) {
             if (*(u32*)(obj + 0x0) != 0) *(u32*)(*(u32*)(obj+0x0)+0x4) = *(u32*)(obj+0x4);
             if (*(u32*)(obj + 0x4) != 0) *(u32*)(*(u32*)(obj+0x4)+0x0) = *(u32*)(obj+0x0);
             if (lbl_8047AC08 == (u32)obj) lbl_8047AC08 = *(u32*)(obj+0x4);
-            GSmemFree(*(u16*)(obj + 0x20));
-            GSmemFree(*(u16*)(obj + 0x22));
+            fn_800E209C(*(u16*)(obj + 0x20));
+            fn_800E209C(*(u16*)(obj + 0x22));
         }
     } else {
         *(u8*)(obj + 0x15) = 1;
@@ -5240,7 +5240,7 @@ void fn_800F0F4C(u32 arg) {
         if (*(u32*)(obj + 0x0) != 0) *(u32*)(*(u32*)(obj+0x0)+0x4) = *(u32*)(obj+0x4);
         if (*(u32*)(obj + 0x4) != 0) *(u32*)(*(u32*)(obj+0x4)+0x0) = *(u32*)(obj+0x0);
         if (lbl_8047AC08 == (u32)obj) lbl_8047AC08 = *(u32*)(obj+0x4);
-        lbl_8047AC0C = 1;
+        *(u8*)&lbl_8047AC0C = 1;
     }
     fn_800F0308();
 }
