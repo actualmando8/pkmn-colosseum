@@ -5226,7 +5226,7 @@ void fn_8011F260(void);
 void fn_8012546C(void*);
 void fn_8012795C(void);
 void fn_80129BC8(void);
-void fn_8012A450(void);
+void fn_8012A450();
 void fn_8012A5B0(void);
 /* 0x70 | fn_80114CA8 | alloc_wrapper */
 extern void* fn_800F9418();  /* K&R: called with 5 args, returns void* */
@@ -5522,7 +5522,7 @@ extern u16 fn_8011E3B4(u8* ptr, u16 idx);
 extern u8 fn_8011E3FC(u8* ptr, u16 idx);
 extern void fn_8011F260(void);
 extern void fn_80129BC8(void);
-extern void fn_8012A450(void);
+extern void fn_8012A450();
 extern void fn_8012A5B0(void);
 extern void fn_8012C660(void);
 extern void* fn_8012AC08(u8* ptr, u16 idx);
@@ -20655,113 +20655,78 @@ void fn_8012A248(void) {
 #endif
 /* 0x8012A450 | 0x160 */
 extern void jumptable_803634F0();
-#if 1
+#if 0
 asm void fn_8012A450(void) {
 #include "src/game/gs_field_world_fn_8012A450.inc"
 }
 #else
-void fn_8012A450(void) {
-    extern void fn_80129280();
-    extern void fn_8012A774();
-    extern void fn_8012A7B4();
-    extern void fn_8012A7DC();
-    extern void fn_8012A824();
-    extern void fn_8012A86C();
-    extern void fn_8012A89C();
-    extern void fn_8012A9AC();
-    extern void fn_8012A9BC();
-    extern void fn_8012A9CC();
-    extern void fn_8012A9DC();
-    extern void fn_8012A9EC();
-    extern void fn_8012A9FC();
-    extern void fn_8012AA0C();
-    extern void fn_8012AA1C();
-    extern void fn_8012AA44();
-    extern void fn_8012AA54();
-    extern void fn_8012AA64();
-    extern u8 jumptable_803634F0[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    r0 = r4 & 0xFFFF;
-    r31 = r5;
-    r30 = r4;
-    if ((s32)r0 == (s32)0) return;
-    if (r0 >= (u32)0x1a) {
-        return;
+void fn_8012A450(u8* ptr, u32 selector, u32 value) {
+    extern u32 fn_80129280(u8*, u16);
+    u16 sel = (u16)selector;
+
+    if (sel == 0) { return; }
+    if (sel >= 0x1A) { return; }
+
+    if (ptr == NULL) {
+        ptr = (u8*)fn_80129280(NULL, 0);
+        if (ptr == NULL) { return; }
+        ptr = (u8*)fn_80129280(ptr, 2);
+        if (ptr == NULL) { return; }
     }
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        r4 = 0x0;
-        fn_80129280();
-        if (r3 == (u32)0x0) return;
-        r4 = 0x2;
-        fn_80129280();
-        if (r3 == (u32)0x0) return;
+
+    switch (sel) {
+    case 1:
+        fn_8012AA64(ptr, (void*)value);
+        break;
+    case 2:
+        fn_8012AA54(ptr, value);
+        break;
+    case 3:
+        fn_8012AA44(ptr, (u8)value);
+        break;
+    case 4:
+        fn_8012A86C(ptr, value);
+        break;
+    case 5:
+        fn_8012A824(ptr, value);
+        break;
+    case 6:
+        fn_8012A7DC(ptr, value);
+        break;
+    case 7:
+        fn_8012AA1C(ptr, (u8)value);
+        break;
+    case 8:
+        fn_8012AA0C(ptr, (u8)value);
+        break;
+    case 9:
+        fn_8012A9FC(ptr, (u8)value);
+        break;
+    case 10:
+        fn_8012A9EC(ptr, (u8)value);
+        break;
+    case 11:
+        fn_8012A9DC(ptr, (u8)value);
+        break;
+    case 12:
+        fn_8012A9CC(ptr, (u8)value);
+        break;
+    case 13:
+        fn_8012A9BC(ptr, (u8)value);
+        break;
+    case 14:
+        fn_8012A9AC(ptr, (u8)value);
+        break;
+    case 15:
+        fn_8012A89C(ptr, (void*)value);
+        break;
+    case 16:
+        fn_8012A7B4(ptr, (u8)value);
+        break;
+    case 17:
+        fn_8012A774(ptr, (u8)value);
+        break;
     }
-    r0 = r30 & 0xFFFF;
-    if (r0 > (u32)0x19) return;
-    r4 = (u32)jumptable_803634F0;
-    r0 = r0 << 2;
-    r4 = (u32)jumptable_803634F0;
-    r0 = *(u32*)(r4 + r0);
-    ctr_fn = (void(*)(void))r0;
-    /* indirect jump via ctr */;
-    r4 = r31;
-    fn_8012AA64();
-    return;
-    r4 = r31;
-    fn_8012AA54();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012AA44();
-    return;
-    r4 = r31;
-    fn_8012A86C();
-    return;
-    r4 = r31;
-    fn_8012A824();
-    return;
-    r4 = r31;
-    fn_8012A7DC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012AA1C();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012AA0C();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9FC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9EC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9DC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9CC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9BC();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A9AC();
-    return;
-    r4 = r31;
-    fn_8012A89C();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A7B4();
-    return;
-    r4 = r31 & 0xFF;
-    fn_8012A774();
-    return;
 }
 #endif
 /* 0x8012A5B0 | 0x1C4 */
