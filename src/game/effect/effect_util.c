@@ -132,7 +132,7 @@ extern u8 fn_80135AB8(void* ptr);
 extern u8 fn_80135AA0(void* ptr);
 extern u8 fn_80135A88(void* ptr);
 extern u8 fn_80135A70(void* ptr);
-extern u32 fn_80135028(void);
+extern u32 fn_80135028();
 extern u32 fn_80135F90(u32 index);
 extern u32 fn_80136050(u32 index);
 extern u32 fn_80135FF8(u32 index);
@@ -2267,11 +2267,12 @@ extern u32 lbl_80478F88;
 extern u8 lbl_8047AED0;
 extern u32  lbl_80478848;
 extern u8   lbl_8047AED1;
-#if 1
+#if 0
 asm void fn_80133810(void) {
 #include "src/game/effect/effect_util_fn_80133810.inc"
 }
 #else
+#pragma push
 #pragma peephole off
 void fn_80133810(u8 flag) {
     extern s32 fn_801338A4(u32);
@@ -2283,15 +2284,23 @@ void fn_80133810(u8 flag) {
     } else {
         result = fp();
     }
-    if (result == 0) { return; }
-    if (lbl_8047AED0 == 0) { return; }
-    if (fn_80102620(lbl_80478848)) { return; }
+    if (result == 0) {
+        return;
+    }
+    if (lbl_8047AED0 == 0) {
+        return;
+    }
+    if (fn_80102620(lbl_80478848)) {
+        return;
+    }
     lbl_8047AED1 = flag;
     do {
-        if (fn_801338A4(0) < 0) { return; }
+        if (fn_801338A4(0) < 0) {
+            return;
+        }
     } while (lbl_8047AED1 == 1);
 }
-#pragma peephole on
+#pragma pop
 #endif
 
 /* 0x801338A4 | 0x2AC */
@@ -3500,7 +3509,7 @@ void fn_80135024(void) {
 #endif
 
 /* 0x80135028 | 0x8 | return_const */
-u32 fn_80135028(void) { return 0; }
+u32 fn_80135028() { return 0; }
 
 /* 0x80135030 | 0x138 */
 extern void jumptable_80363A70();
@@ -4258,104 +4267,44 @@ void fn_80135D10(void) {
 #endif
 
 /* 0x80135E44 | 0x114 */
-extern u16 fn_80142CF4(void*, u32, u32, u32);
-extern void fn_8012A5B0(void);
-extern void fn_8012640C(void);
-extern void fn_8011BEB4(void);
-extern void fn_801F54A4(void);
-extern void fn_801F76B8(void);
-extern void fn_801FB1C0(void);
+extern u32 fn_80142CF4();
+extern u32 fn_8012A5B0();
+extern u32 fn_8012640C();
+extern u32 fn_8011BEB4();
+extern u32 fn_801F54A4();
+extern u32 fn_801F76B8();
+extern u32 fn_801FB1C0();
 extern void jumptable_80363AF0();
-#if 1
+#if 0
 asm void fn_80135E44(void) {
 #include "src/game/effect/effect_util_fn_80135E44.inc"
 }
 #else
-void fn_80135E44(void) {
-    extern void fn_8011BEB4();
-    extern void fn_8012640C();
-    extern void fn_8012A5B0();
-    extern void fn_80135028();
-    extern void fn_80135938();
-    extern void fn_80142CF4();
-    extern void fn_801F54A4();
-    extern void fn_801F76B8();
-    extern void fn_801FB1C0();
-    extern u8 jumptable_80363AF0[];
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r0 = r3 & 0xFF;
-    if (r0 <= (u32)0x9) {
-        r3 = (u32)jumptable_80363AF0;
-        r0 = r0 << 2;
-        r3 = (u32)jumptable_80363AF0;
-        r0 = *(u32*)(r3 + r0);
-        ctr_fn = (void(*)(void))r0;
-        /* indirect jump via ctr */;
-        r3 = 0x0;
-        return;
-        r3 = r4;
-        r4 = r6;
-        fn_80135938();
-        return;
-        r3 = r4;
-        r4 = r6;
-        r5 = r7;
-        fn_80135028();
-        return;
-        r3 = r4;
-        r4 = r6;
-        r5 = r7;
-        fn_8012A5B0();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_80142CF4();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_8012640C();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_8011BEB4();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_801F54A4();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_801F76B8();
-        return;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        fn_801FB1C0();
-        return;
+u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+    switch ((u8)kind) {
+    case 0:
+        return 0;
+    case 1:
+        return fn_80135938((void*)arg1, (u16)arg3);
+    case 2:
+        return fn_80135028(arg1, arg3, arg4);
+    case 3:
+        return fn_8012A5B0(arg1, arg3, arg4);
+    case 4:
+        return fn_80142CF4(arg1, arg2, arg3, arg4);
+    case 5:
+        return fn_8012640C(arg1, arg2, arg3, arg4);
+    case 6:
+        return fn_8011BEB4(arg1, arg2, arg3, arg4);
+    case 7:
+        return fn_801F54A4(arg1, arg2, arg3, arg4);
+    case 8:
+        return fn_801F76B8(arg1, arg2, arg3, arg4);
+    case 9:
+        return fn_801FB1C0(arg1, arg2, arg3, arg4);
+    default:
+        return 0;
     }
-    r3 = 0x0;
-
-    return;
 }
 #endif
 
