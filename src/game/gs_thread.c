@@ -75,7 +75,7 @@ extern void fn_800D67BC(void);
 extern void fn_800D6A00(void);
 extern void fn_800D7820(void);
 extern void fn_800D85D4(void);
-extern void fn_800D888C(void);
+extern void fn_800D888C(u32 mask);
 extern void fn_800D88DC(void);
 extern void fn_800D9ED8(void);
 extern void fn_800DC1D4(void);
@@ -97,17 +97,17 @@ extern void fn_80166A28(void);
 extern void fn_800D59B8(void);
 extern void fn_800D5BA0(void);
 extern void fn_800D9D68(u16 a, u16 b, u16 c, u16 d);
-extern void fn_800CE220(void);
-extern void fn_800D7FE4(void);
+extern f64 fn_800CE220(void);
+extern void fn_800D7FE4(void* mtx);
 extern void fn_800D834C(void);
-extern void fn_800D9BD0(void);
-extern void fn_800DA028(void);
-extern void fn_800DA100(void);
-extern void fn_800DA1E8(void);
-extern void fn_800DA2BC(void);
-extern void fn_800DA4C4(void);
-extern void fn_800E01F4(void);
-extern void fn_800E0218(void);
+extern void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d);
+extern void fn_800DA028(s32 a);
+extern void fn_800DA100(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
+extern void fn_800DA1E8(s32 a, s32 b, s32 c);
+extern void fn_800DA2BC(s32 a, s32 b, s32 c);
+extern void fn_800DA4C4(s32 a, s32 b, s32 c);
+extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
+extern void fn_800E0218(void* dst, void* a, void* b, void* c);
 extern void* memset(void* dest, int val, u32 n);
 extern void* memcpy(void* dst, const void* src, u32 n);
 
@@ -2483,13 +2483,51 @@ void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE4D4(void) {
 #include "src/game/gs_thread_fn_800FE4D4.inc"
 }
 #else
+#pragma optimization_level 2
 void fn_800FE4D4(void) {
-    /* TODO: match -- 460 bytes at 0x800FE4D4 */
+    f32 v0[3];
+    f32 v1[3];
+    f32 v2[3];
+    f32 mtx[12];
+    f32 sx;
+    f32 sy;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 t;
+
+    sx = lbl_8047CD58 / *(f32*)&lbl_80478B10;
+    sy = lbl_8047CD5C / *(f32*)&lbl_80478B14;
+    x = sx * lbl_8047CD60;
+    y = sy * lbl_8047CD60;
+    t = (f32)fn_800CE220();
+    z = y / t;
+
+    fn_800E01F4(v0,
+                x - (f32)(s32)*(s16*)&lbl_8047AC70,
+                y - (f32)(s32)*(s16*)&lbl_8047AC72,
+                z);
+    fn_800E01F4(v1,
+                x - (f32)(s32)*(s16*)&lbl_8047AC70,
+                y - (f32)(s32)*(s16*)&lbl_8047AC72,
+                lbl_8047CD68);
+    fn_800E01F4(v2, lbl_8047CD68, lbl_8047CD6C, lbl_8047CD68);
+    fn_800E0218(mtx, v0, v2, v1);
+
+    fn_800D9BD0(lbl_8047CD70, -(sx / sy), lbl_8047CD74, lbl_8047CD78);
+    fn_800D834C();
+    fn_800D7FE4(mtx);
+    fn_800DA4C4(1, 6, 7);
+    fn_800D888C(0x80000000);
+    fn_800DA2BC(2, 2, 1);
+    fn_800DA100(0, 7, 0, 1, 7, 0);
+    fn_800DA1E8(0, 2, 0);
+    fn_800DA028(0);
 }
 #endif
 #pragma pop
