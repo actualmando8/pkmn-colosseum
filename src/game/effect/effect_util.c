@@ -4374,77 +4374,53 @@ u32 fn_80136050(u32 index) {
 }
 
 /* 0x80136078 | 0xC4 */
-#if 1
+#if 0
 asm void fn_80136078(void) {
 #include "src/game/effect/effect_util_fn_80136078.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80136078(void) {
-    extern void fn_80135F58();
-    extern void fn_80135F90();
-    extern void fn_8013613C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    extern void fn_80135F58(void);
+    extern void fn_80135F90(void);
+    extern void fn_8013613C(void);
+    u32 r26;
+    u32 r27;
+    u32 r28;
+    u32 r29;
+    u32 r30;
+    u32 r31;
+    u32 r0;
 
-    /* mr. r29, r6 */;
-    r26 = r3;
-    r27 = r4;
-    r28 = r5;
-    if ((s32)r0 != (s32)0) {
+    r29 = 0;
+    r26 = 0;
+    r27 = 0;
+    r28 = 0;
+    if (r29 != 0) {
         fn_8013613C();
     } else {
-
-        r6 = 0x0;
         fn_8013613C();
     }
-    r3 = r26;
-    fn_80135F90();
-    r31 = r3 & 0xFFFF;
-    if ((s32)r0 == (s32)0) return;
-    r30 = 0x0;
-    while (1) {
-        r0 = r30 & 0xFFFF;
-        if (r0 >= (u32)0x8) break;
-        r3 = r31;
-        r4 = r30 & 0xFFFF;
-        fn_80135F58();
-        r0 = r3 & 0xFFFF;
-        do {
-            if ((s32)r0 == (s32)0) break;
-            if (r29 != (u32)0x0) {
-                r4 = r30 & 0xFFFF;
-                r3 = r26;
-                r0 = r4 + 0x1;
-                r4 = r27;
-                r0 = r0 << 2;
-                r5 = r28;
-                r6 = r29 + r0;
-                fn_8013613C();
-                break;
+    r31 = fn_80135F90();
+    r31 &= 0xFFFF;
+    if (r31 == 0) goto end;
+    r30 = 0;
+    do {
+        r0 = fn_80135F58(r31, r30 & 0xFFFF);
+        r0 &= 0xFFFF;
+        if (r0 != 0) {
+            if (r29 != 0) {
+                fn_8013613C(r26, r27, r28, r29 + ((r30 & 0xFFFF) + 1) * 4);
+            } else {
+                fn_8013613C(r26, r27, r28, 0);
             }
-            r3 = r26;
-            r4 = r27;
-            r5 = r28;
-            r6 = 0x0;
-            fn_8013613C();
-        } while (0);
-        r30 = r30 + 0x1;
-
-    }
-
-    return;
+        }
+        r30++;
+    } while ((r30 & 0xFFFF) < 8);
+end:;
 }
+#pragma pop
 #endif
 
 /* 0x8013613C | 0x22C */

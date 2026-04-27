@@ -23,8 +23,18 @@ if len(sys.argv) < 3:
     sys.exit(2)
 
 stem = sys.argv[1]
-BASE = fr'build\GC6E01\base\game\{stem}.o'
 syms = sys.argv[2:]
+
+def _resolve_base(stem):
+    for sub in ('game', 'hsd', 'game/effect', 'game/ui', 'game/fsys',
+                'game/battle', 'game/people', 'dolphin/os', 'dolphin/vi',
+                'dolphin/dvd', 'dolphin/exi', 'init', 'crt'):
+        p = fr'build\GC6E01\base\{sub.replace("/", chr(92))}\{stem}.o'
+        if os.path.exists(p):
+            return p
+    return fr'build\GC6E01\base\game\{stem}.o'
+
+BASE = _resolve_base(stem)
 
 for s in syms:
     r = subprocess.run(
