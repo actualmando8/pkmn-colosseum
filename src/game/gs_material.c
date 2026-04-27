@@ -4215,7 +4215,7 @@ extern u32 lbl_8047CC18;
 extern u32 lbl_8047CC10;
 extern u32 lbl_8047CC1C;
 extern u32 lbl_8047CC20;
-#if 1
+#if 0
 asm void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
 #include "src/game/gs_material_fn_800EAFE4.inc"
 }
@@ -4224,16 +4224,16 @@ void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
     f32 mtxStack[12];
     f32 mtxBuf[12];
     f32 mtxTmp[12];
-    u8* assertStr;
     void* ret;
     void* xform;
     void* node;
     void* nodeData;
     void* texObj;
     u8* mtxPtr;
-    u8* outPtr;
+    u8* assertStr;
     f32 threshold;
     s32 i;
+    u8* outPtr;
 
     assertStr = lbl_80270EB8;
     ret = fn_8019F01C(obj);
