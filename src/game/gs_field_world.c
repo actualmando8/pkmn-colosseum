@@ -11074,130 +11074,72 @@ s32 fn_8011B130(void* obj, u16 val) {
     return;
 }
 /* 0x8011B2C0 | 0x184 */
-extern void fn_80101AC4(void);
-#if 1
+extern s32 fn_80101AC4(u32);
+#if 0
 asm void fn_8011B2C0(void) {
 #include "src/game/gs_field_world_fn_8011B2C0.inc"
 }
 #else
-void fn_8011B2C0(void) {
-    extern void fn_80101AC4();
-    extern void fn_80119D90();
-    extern void fn_80119DD0();
-    extern void fn_80119E50();
-    extern void fn_80119E90();
-    extern void fn_80119ED0();
-    extern void fn_80119F10();
-    extern void fn_80119F90();
-    extern void fn_80119FA0();
-    extern void fn_80119FB0();
-    extern void fn_80119FC0();
-    extern void fn_80119FD0();
-    extern void fn_80119FE0();
-    extern void fn_80119FF0();
-    extern void fn_8011A030();
-    extern void fn_80135E44();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
-    r27 = r4;
-    r31 = r3;
-    r28 = r5;
-    if ((s32)r0 != (s32)0) {
-        r3 = r27;
-        fn_80119E90();
-        r30 = r3 & 0xFF;
-        r3 = r27;
-        fn_80119F10();
-        r29 = r3;
-        r3 = r27;
-        fn_80119ED0();
-        r6 = r3;
-        r3 = r29;
-        r4 = r31;
-        r5 = 0x0;
-        r7 = 0x0;
-        fn_80135E44();
-        if (r3 == (u32)0x0) {
-            r29 = 0x0;
-        } else {
-            /* clrlslwi r0, r30, 16, 4 */;
-            r29 = r3 + r0;
+void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
+    extern u8 fn_80119D90(u16 idx);
+    extern u8 fn_80119DD0(u16 idx);
+    extern u8 fn_80119E50(u16 idx);
+    extern u8 fn_80119E90(u16 idx);
+    extern u16 fn_80119ED0(u16 idx);
+    extern u8 fn_80119F10(u16 idx);
+    extern void fn_80119F90(u8* ptr, u16 val);
+    extern void fn_80119FA0(u8* ptr, u32 val);
+    extern void fn_80119FB0(u8* ptr, u8 val);
+    extern void fn_80119FC0(u8* ptr, u8 val);
+    extern void fn_80119FD0(u8* ptr, u8 val);
+    extern void fn_80119FE0(u8* ptr, u16 val);
+    extern void fn_80119FF0(u8* ptr, u16 val);
+    extern u8 fn_8011A030(u8* ptr);
+    extern u8* fn_80135E44(u32 a, void* b, u32 c, u32 d, u32 e);
+    u32 idx;
+    u8 type;
+    u32 old_count;
+    u32 selector;
+    u32 span;
+    u8* elem;
+
+    if (id == 0) { return; }
+
+    idx = (u8)fn_80119E90(id);
+    selector = fn_80119F10(id);
+    span = fn_80119ED0(id);
+    elem = fn_80135E44(selector, obj, 0, span, 0);
+    if (elem != NULL) {
+        elem += (u16)idx << 4;
+    }
+    if (elem == NULL) { return; }
+
+    type = fn_80119E50(id);
+    if (type == 4) {
+        old_count = fn_8011A030(elem);
+    } else {
+        old_count = 0;
+    }
+    if (elem != NULL) {
+        fn_80119FF0(elem, 0);
+        fn_80119FE0(elem, 0);
+        fn_80119FD0(elem, 0);
+        fn_80119FC0(elem, 0);
+        fn_80119FB0(elem, 0);
+        fn_80119FA0(elem, 0);
+        fn_80119F90(elem, 0);
+    }
+    fn_80119FF0(elem, id);
+    fn_80119FE0(elem, arg3);
+    fn_80119FD0(elem, (s8)fn_80101AC4(fn_80119D90(id)));
+    if (type == 4) {
+        u32 count = old_count + 1;
+        u8 limit = fn_80119DD0(id);
+        if (limit < (u8)count) {
+            count = limit;
         }
-        if (r29 != (u32)0x0) {
-            r3 = r27;
-            fn_80119E50();
-            r30 = r3;
-            r0 = r3 & 0xFF;
-            if (r0 == (u32)0x4) {
-                r3 = r29;
-                fn_8011A030();
-                r31 = r3;
-            } else {
-                r31 = 0x0;
-            }
-            if (r29 != (u32)0x0) {
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FF0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FE0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FD0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FC0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FB0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119FA0();
-                r3 = r29;
-                r4 = 0x0;
-                fn_80119F90();
-            }
-            r3 = r29;
-            r4 = r27;
-            fn_80119FF0();
-            r3 = r29;
-            r4 = r28;
-            fn_80119FE0();
-            r3 = r27;
-            fn_80119D90();
-            r3 = r3 & 0xFF;
-            fn_80101AC4();
-            r4 = (s8)r3;
-            r3 = r29;
-            fn_80119FD0();
-            r0 = r30 & 0xFF;
-            if (r0 == (u32)0x4) {
-                r3 = r27;
-                r30 = r31 + 0x1;
-                fn_80119DD0();
-                r0 = r30 & 0xFF;
-                r4 = r3 & 0xFF;
-                if (r4 < r0) {
-                    r30 = r3;
-                }
-                r3 = r29;
-                r4 = r30;
-                fn_80119FB0();
+        fn_80119FB0(elem, count);
     }
-    }
-    }
-    return;
 }
 #endif
 /* 0x8011B444 | 0x238 */
