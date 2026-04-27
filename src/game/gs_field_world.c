@@ -7368,7 +7368,7 @@ void fn_801176C8(void) {
 #endif
 /* 0x8011791C | 0x1B8 */
 extern void* fn_800D2584();
-extern void fn_800E01D0(void);
+extern void fn_800E01D0();
 extern u32 lbl_804083D0;
 extern u8 lbl_802727B8[];
 #if 1
@@ -7890,10 +7890,10 @@ void fn_80118104(u32 a, u8 b) {
 #endif
 /* 0x801181B0 | 0x23C */
 extern void fn_801694A8(void* ptr);
-extern void fn_801695FC(void);
-extern void fn_800EC160(void);
-extern void fn_80169484(void);
-extern void fn_80175A1C(void);
+extern void fn_801695FC();
+extern void fn_800EC160();
+extern void fn_80169484();
+extern void fn_80175A1C();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 #if 1
@@ -8528,127 +8528,74 @@ void fn_80118874(void) {
 }
 #endif
 /* 0x80118A68 | 0x1B8 */
-#if 1
+#if 0
 asm void fn_80118A68(void) {
 #include "src/game/gs_field_world_fn_80118A68.inc"
 }
 #else
-void fn_80118A68(void) {
-    extern void fn_800E01D0();
-    extern void fn_800EC160();
-    extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-    r0 = r4 & 0xFF;
-    r31 = r3;
-    if (r0 == (u32)0x1) {
-        r4 = *(u32*)((u8*)r31 + 0x10);
-        r3 = *(u16*)((u8*)r4 + 0x18);
-        r4 = *(u8*)((u8*)r4 + 0x15);
-        fn_801695FC();
+void fn_80118A68(u8* obj, u32 notify) {
+    u32 i;
+    u8* model;
+    u8* base;
+    u8* scan;
+    volatile u32* active;
+
+    if ((notify & 0xFF) == 1) {
+        model = *(u8**)(obj + 0x10);
+        fn_801695FC(*(u16*)(model + 0x18), model[0x15]);
     }
-    r0 = *(u32*)((u8*)r31 + 0x44);
-    if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
-        r3 = *(u32*)((u8*)r31 + 0x48);
-        r4 = 0x0;
-        fn_800EC160();
-        r0 = 0x0;
-        *(u32*)((u8*)r31 + 0x48) = r0;
-        *(u32*)((u8*)r31 + 0x4C) = r0;
-        *(u8*)((u8*)r31 + 0x6) = r0;
-        *(u8*)((u8*)r31 + 0x5) = r0;
-        r3 = *(u32*)((u8*)r31 + 0x10);
-        fn_80169484();
-        r0 = 0x0;
-        *(u32*)((u8*)r31 + 0x44) = r0;
-        r0 = *(u32*)((u8*)r31 + 0x44);
-        if ((s32)r0 == (s32)0x0) {
-            r3 = r31 + 0x14;
-            r4 = r31 + 0x50;
-            fn_800E01D0();
-            f0 = *(f32*)((u8*)r31 + 0x50);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x20) = f0;
-            f0 = *(f32*)((u8*)r31 + 0x54);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x24) = f0;
-            f0 = *(f32*)((u8*)r31 + 0x58);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x28) = f0;
+
+    active = (volatile u32*)(obj + 0x44);
+    if (*active != 0 && *active != 0) {
+        fn_800EC160(*(u32*)(obj + 0x48), 0);
+        *(u32*)(obj + 0x48) = 0;
+        *(u32*)(obj + 0x4C) = 0;
+        obj[6] = 0;
+        obj[5] = 0;
+        fn_80169484(*(u32*)(obj + 0x10));
+        *active = 0;
+
+        if (*active == 0) {
+            fn_800E01D0(obj + 0x14, obj + 0x50);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x20) = *(f32*)(obj + 0x50);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x24) = *(f32*)(obj + 0x54);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x28) = *(f32*)(obj + 0x58);
         } else {
-            r3 = r31 + 0x50;
-            r4 = r3;
-            fn_800E01D0();
+            fn_800E01D0(obj + 0x50, obj + 0x50);
         }
-        r0 = *(u32*)((u8*)r31 + 0x44);
-        if ((s32)r0 == (s32)0x0) {
-            r3 = r31 + 0x20;
-            r4 = r31 + 0x5c;
-            fn_800E01D0();
-            f0 = *(f32*)((u8*)r31 + 0x5C);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x8C) = f0;
-            f0 = *(f32*)((u8*)r31 + 0x60);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x90) = f0;
-            f0 = *(f32*)((u8*)r31 + 0x64);
-            r3 = *(u32*)((u8*)r31 + 0x10);
-            *(f32*)((u8*)r3 + 0x94) = f0;
+
+        if (*active == 0) {
+            fn_800E01D0(obj + 0x20, obj + 0x5C);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x8C) = *(f32*)(obj + 0x5C);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x90) = *(f32*)(obj + 0x60);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x94) = *(f32*)(obj + 0x64);
         } else {
-            r3 = r31 + 0x5c;
-            r4 = r3;
-            fn_800E01D0();
+            fn_800E01D0(obj + 0x5C, obj + 0x5C);
         }
-        r0 = *(u32*)((u8*)r31 + 0x44);
-        if ((s32)r0 == (s32)0x0) {
-        r3 = r31 + 0x2c;
-        r4 = r31 + 0x68;
-        fn_800E01D0();
-        f0 = *(f32*)((u8*)r31 + 0x68);
-        r3 = *(u32*)((u8*)r31 + 0x10);
-        *(f32*)((u8*)r3 + 0x98) = f0;
-        f0 = *(f32*)((u8*)r31 + 0x6C);
-        r3 = *(u32*)((u8*)r31 + 0x10);
-        *(f32*)((u8*)r3 + 0x9C) = f0;
-        f0 = *(f32*)((u8*)r31 + 0x70);
-        r3 = *(u32*)((u8*)r31 + 0x10);
-        *(f32*)((u8*)r3 + 0xA0) = f0;
-    } else {
-    r3 = r31 + 0x68;
-    r4 = r3;
-    fn_800E01D0();
+
+        if (*active == 0) {
+            fn_800E01D0(obj + 0x2C, obj + 0x68);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x98) = *(f32*)(obj + 0x68);
+            *(f32*)(*(u8**)(obj + 0x10) + 0x9C) = *(f32*)(obj + 0x6C);
+            *(f32*)(*(u8**)(obj + 0x10) + 0xA0) = *(f32*)(obj + 0x70);
+        } else {
+            fn_800E01D0(obj + 0x68, obj + 0x68);
+        }
     }
-    r3 = *(u32*)((u8*)r31 + 0x10);
-    fn_80175A1C();
-    r5 = *(u32*)((u8*)r31 + 0xC);
-    r0 = 0x40;
-    r3 = 0x0;
-    r4 = r5;
-    ctr_fn = (void(*)(void))r0;
-    do {
-    r0 = *(u32*)((u8*)r4 + 0x8);
-    if (r0 == (u32)r31) {
-        r0 = r3 << 2;
-        r4 = 0x0;
-        r3 = r5 + r0;
-        *(u32*)((u8*)r3 + 0x8) = r4;
-        break;
+
+    fn_80175A1C(*(u32*)(obj + 0x10));
+
+    base = *(u8**)(obj + 0x0C);
+    scan = base;
+    for (i = 0; i < 0x40; i++) {
+        if (*(u32*)(scan + 8) == (u32)obj) {
+            *(u32*)(base + (i << 2) + 8) = 0;
+            break;
+        }
+        scan += 4;
     }
-    r4 = r4 + 0x4;
-    r3 = r3 + 0x1;
-    } while (--ctr != 0);
-    r0 = 0x0;
-    *(u8*)((u8*)r31 + 0x0) = r0;
-    }
-    return;
+
+    obj[0] = 0;
 }
 #endif
 /* 0x68 | fn_80118C20 | guarded_call */
