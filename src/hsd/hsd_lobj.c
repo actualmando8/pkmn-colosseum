@@ -219,7 +219,7 @@ asm void fn_801A4098(void) {
 extern u32 lbl_8047B2B0;
 extern u32 lbl_8047B2B4;
 extern u8 lbl_8036CA20[];
-extern void fn_801C25E4(void);
+extern void fn_801C25E4(HSD_AObj*);
 void fn_801A4098(void* param) {
     if (param == (void*)lbl_8047B2B0) {
         lbl_8047B2B0 = 0;
@@ -238,13 +238,18 @@ void fn_801A4098(void* param) {
 #endif
 
 /* 0x801A40F8 | 0x174 */
-extern void fn_801C25E4();
-#if 1
+#if 0
 asm void fn_801A40F8(void) {
 #include "src/hsd/hsd_lobj_fn_801A40F8.inc"
 }
 #else
-void fn_801A40F8(void) {}
+void fn_801A40F8(HSD_LObj* lobj)
+{
+    fn_801C25E4(lobj->aobj);
+    HSD_WObjUnref(lobj != NULL ? lobj->position : NULL);
+    HSD_WObjUnref(lobj != NULL ? lobj->interest : NULL);
+    HSD_OBJECT_PARENT_INFO(&hsdLObj)->release((HSD_Class*) lobj);
+}
 #endif
 
 /* 0x801A426C | 0xD8 */
