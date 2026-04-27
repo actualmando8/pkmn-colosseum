@@ -209,9 +209,9 @@
     "function": "fn_8002B40C",
     "description": "Match fn_8002B40C in gs_worldmap.c (109 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -222,6 +222,11 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 0.0,
+      "model": "codex/gpt-5.5",
+      "reason": "asm-fallback-workaround-not-real-C"
     }
   },
   {
@@ -229,10 +234,10 @@
     "function": "fn_8002AB40",
     "description": "Match fn_8002AB40 in gs_worldmap.c (110 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T15:04:41Z",
     "meta": {
       "file": "src/game/gs_worldmap.c",
       "stem": "gs_worldmap",
@@ -242,6 +247,10 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 96.5,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -249,10 +258,10 @@
     "function": "fn_8002ACB8",
     "description": "Match fn_8002ACB8 in gs_worldmap.c (112 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T15:07:52Z",
     "meta": {
       "file": "src/game/gs_worldmap.c",
       "stem": "gs_worldmap",
@@ -262,6 +271,10 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 96.7,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -269,9 +282,9 @@
     "function": "fn_8002C0E4",
     "description": "Match fn_8002C0E4 in gs_worldmap.c (113 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -282,6 +295,11 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 0.0,
+      "model": "codex/gpt-5.5",
+      "reason": "asm-fallback-workaround"
     }
   },
   {
@@ -289,9 +307,9 @@
     "function": "fn_8002E26C",
     "description": "Match fn_8002E26C in gs_worldmap.c (126 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -302,6 +320,11 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 0.0,
+      "model": "codex/gpt-5.5",
+      "reason": "asm-fallback-workaround"
     }
   },
   {
@@ -309,9 +332,9 @@
     "function": "fn_8002DD24",
     "description": "Match fn_8002DD24 in gs_worldmap.c (135 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -322,6 +345,11 @@
       "file_pct": 3.2,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 83.4,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -360,7 +388,11 @@
     "claimed_by": "opus-sub-11",
     "claimed_at": "2026-04-27T14:00:00Z",
     "completed_at": "2026-04-27T14:30:00Z",
-    "result": {"pct": 90.4, "model": "opus-sub-11", "commit_sha": "2ecb2fe51f7df7b4a0fce661cd2452b58e98e4d7"},
+    "result": {
+      "pct": 90.4,
+      "model": "opus-sub-11",
+      "commit_sha": "2ecb2fe51f7df7b4a0fce661cd2452b58e98e4d7"
+    },
     "meta": {
       "file": "src/game/gs_worldmap.c",
       "stem": "gs_worldmap",
@@ -377,10 +409,17 @@
     "function": "fn_800268F0",
     "description": "Match fn_800268F0 in gs_worldmap.c (164 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-12",
+    "claimed_at": "2026-04-27T15:00:00Z",
+    "completed_at": "2026-04-27T15:30:00Z",
+    "result": {
+      "pct": 88.6,
+      "model": "opus-sub-12",
+      "commit_sha": null,
+      "notes": "Reached 88.6% with peephole off + scheduling on, slwi-4 base/idx form, ternary flag pattern, srwi-31. Register allocation drift: target r24/walker, r28/&buf, r29/ypos, r30/ctx, r31/counter \u00e2\u20ac\u201d mine got r28/walker, r27/&buf, r24/ypos, r30/ctx, r29/counter. Plus oris+ori vs li -0x100; or for bg-color mask. ~9 byte fixes needed for 90%, all are reg-name-only mismatches. Reverted to asm wrapper."
+    },
     "meta": {
       "file": "src/game/gs_worldmap.c",
       "stem": "gs_worldmap",
@@ -397,10 +436,10 @@
     "function": "fn_80026B44",
     "description": "Match fn_80026B44 in gs_worldmap.c (164 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-14",
+    "completed_at": "2026-04-27T05:50:00Z",
     "meta": {
       "file": "src/game/gs_worldmap.c",
       "stem": "gs_worldmap",
@@ -409,7 +448,9 @@
       "line_number": 444,
       "file_pct": 3.2,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "result_pct": 66.4,
+      "failure_reason": "regalloc/peephole structural mismatch \u2014 best 66.4% after peephole off pragma; reverted"
     }
   },
   {
@@ -1683,10 +1724,10 @@
     "function": "fn_800F0F4C",
     "description": "Match fn_800F0F4C in gs_thread.c (83 asm lines, tier=codex)",
     "priority": "high",
-    "status": "claimed",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
-    "completed_at": null,
+    "completed_at": "2026-04-27T13:57:24Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1696,6 +1737,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 100.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1703,10 +1748,10 @@
     "function": "fn_800F9AEC",
     "description": "Match fn_800F9AEC in gs_thread.c (90 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:05:44Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1716,6 +1761,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 92.4,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1723,10 +1772,10 @@
     "function": "fn_800FE38C",
     "description": "Match fn_800FE38C in gs_thread.c (91 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:12:29Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1736,6 +1785,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 99.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1743,10 +1796,10 @@
     "function": "fn_800F6BC4",
     "description": "Match fn_800F6BC4 in gs_thread.c (97 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:18:15Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1756,6 +1809,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 91.7,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1763,10 +1820,10 @@
     "function": "fn_800F694C",
     "description": "Match fn_800F694C in gs_thread.c (99 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:22:57Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1776,6 +1833,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 90.1,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1783,10 +1844,10 @@
     "function": "fn_800F67C8",
     "description": "Match fn_800F67C8 in gs_thread.c (110 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:28:39Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1796,6 +1857,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 92.3,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1803,10 +1868,10 @@
     "function": "fn_800FE834",
     "description": "Match fn_800FE834 in gs_thread.c (113 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:34:54Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1816,6 +1881,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 91.7,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1823,10 +1892,10 @@
     "function": "fn_800FE4D4",
     "description": "Match fn_800FE4D4 in gs_thread.c (116 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:39:10Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1836,6 +1905,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 98.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -1843,10 +1916,10 @@
     "function": "fn_800F7434",
     "description": "Match fn_800F7434 in gs_thread.c (128 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T14:43:52Z",
     "meta": {
       "file": "src/game/gs_thread.c",
       "stem": "gs_thread",
@@ -1856,6 +1929,10 @@
       "file_pct": 14.3,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 95.2,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -2623,10 +2700,10 @@
     "function": "fn_8017C5B8",
     "description": "Match fn_8017C5B8 in fsys_file.c (83 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T15:57:32Z",
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
       "stem": "fsys_file",
@@ -2636,6 +2713,10 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 90.3,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -2643,9 +2724,9 @@
     "function": "fn_8017E09C",
     "description": "Match fn_8017E09C in fsys_file.c (84 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
@@ -2656,6 +2737,11 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 71.2,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -2663,9 +2749,9 @@
     "function": "fn_8017C074",
     "description": "Match fn_8017C074 in fsys_file.c (98 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
@@ -2676,6 +2762,11 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 69.8,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -2683,10 +2774,10 @@
     "function": "fn_8017C414",
     "description": "Match fn_8017C414 in fsys_file.c (99 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T16:24:03Z",
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
       "stem": "fsys_file",
@@ -2696,6 +2787,10 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 93.2,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -2703,9 +2798,9 @@
     "function": "fn_8017D960",
     "description": "Match fn_8017D960 in fsys_file.c (101 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
@@ -2716,6 +2811,11 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 77.8,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -2723,10 +2823,10 @@
     "function": "fn_8017D68C",
     "description": "Match fn_8017D68C in fsys_file.c (108 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T16:38:56Z",
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
       "stem": "fsys_file",
@@ -2736,6 +2836,10 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 91.5,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -2743,9 +2847,9 @@
     "function": "fn_8017C6E0",
     "description": "Match fn_8017C6E0 in fsys_file.c (120 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
@@ -2756,6 +2860,11 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 77.0,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -2763,9 +2872,9 @@
     "function": "fn_8017C1D8",
     "description": "Match fn_8017C1D8 in fsys_file.c (124 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/fsys/fsys_file.c",
@@ -2963,10 +3072,16 @@
     "function": "fn_80056854",
     "description": "Match fn_80056854 in scene_init.c (152 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-13",
+    "claimed_at": "2026-04-27T16:00:00Z",
+    "completed_at": "2026-04-27T16:30:00Z",
+    "result": {
+      "pct": 91.8,
+      "model": "opus-sub-13",
+      "commit_sha": "fb742a780baa4c1930b00360aab233517b268401"
+    },
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -2983,9 +3098,9 @@
     "function": "fn_8004D34C",
     "description": "Match fn_8004D34C in scene_init.c (159 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "opus-sub-15",
     "completed_at": null,
     "meta": {
       "file": "src/game/scene_init.c",
@@ -2996,17 +3111,20 @@
       "file_pct": 17.1,
       "model_tier": "opus",
       "difficulty": "complex"
-    }
+    },
+    "claimed_at": "2026-04-27T15:52:59Z",
+    "failed_reason": "opus-sub-15: peaked 89.7% in 5+ iters; r29/r31 reg alloc + stack offset shifts could not be coerced. Reverted.",
+    "failed_at": "2026-04-27T16:15:53Z"
   },
   {
     "id": "task-1777292470-0142",
     "function": "fn_80041BD0",
     "description": "Match fn_80041BD0 in scene_init.c (166 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-16",
+    "completed_at": "2026-04-27T16:31:37Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3015,18 +3133,20 @@
       "line_number": 2573,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
-    }
+      "difficulty": "complex",
+      "failure_note": "opus-sub-16: peaked 82.6% (5 iter); reg-alloc shift (cur->r27 vs r31) + clrlwi 16/24 mismatch + ternary collapse. Reverted."
+    },
+    "claimed_at": "2026-04-27T16:17:34Z"
   },
   {
     "id": "task-1777292470-0143",
     "function": "fn_8004B598",
     "description": "Match fn_8004B598 in scene_init.c (168 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-17",
+    "completed_at": "2026-04-27T16:47:07Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3035,7 +3155,8 @@
       "line_number": 3195,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "match_pct": 98.7
     }
   },
   {

@@ -3192,12 +3192,87 @@ void fn_8004B278(void) { /* TODO */ }
 extern u8 lbl_80267190[];
 extern u32 lbl_8047BDF0;
 extern u32 lbl_8047BDAC;
-#if 1
+#if 0
 asm void fn_8004B598(void) {
 #include "src/game/scene_init_fn_8004B598.inc"
 }
 #else
-void fn_8004B598(void) { /* TODO */ }
+void fn_8004B598(s32 unused, u8* ctx, s32 mode) {
+    u32 buf[3];
+    u8 b;
+    s32 sel;
+    f32* arr;
+    s16* tbl;
+
+    buf[0] = ((u32*)lbl_80267190)[0];
+    buf[1] = ((u32*)lbl_80267190)[1];
+    buf[2] = ((u32*)lbl_80267190)[2];
+
+    switch (mode) {
+    case 0x6e7:
+    case 0x75d:
+    case 0x760:
+    case 0x763:
+        *(u32*)(lbl_803A6A60 + 0x44) = 0;
+        break;
+    case 0x6e8:
+    case 0x75e:
+    case 0x761:
+    case 0x764:
+        *(u32*)(lbl_803A6A60 + 0x44) = 1;
+        break;
+    case 0x6e9:
+    case 0x75f:
+    case 0x762:
+    case 0x765:
+        *(u32*)(lbl_803A6A60 + 0x44) = 2;
+        break;
+    }
+
+    {
+        u8 saved;
+        b = lbl_803A6A60[0];
+        if ((s8)b < 0) {
+            saved = lbl_803A6A60[0x48];
+        } else {
+            saved = b;
+            lbl_803A6A60[0x48] = b;
+        }
+        sel = (s8)saved;
+    }
+
+    switch (sel) {
+    case 0:
+        tbl = (s16*)(lbl_802EF0A8 + (*(u32*)(lbl_803A6A60 + 0x44) + 0x6e7) * 0x1c);
+        break;
+    case 1:
+        tbl = (s16*)(lbl_802EF0A8 + (*(u32*)(lbl_803A6A60 + 0x44) + 0x75d) * 0x1c);
+        break;
+    case 2:
+        tbl = (s16*)(lbl_802EF0A8 + (*(u32*)(lbl_803A6A60 + 0x44) + 0x760) * 0x1c);
+        break;
+    case 3:
+        tbl = (s16*)(lbl_802EF0A8 + (*(u32*)(lbl_803A6A60 + 0x44) + 0x763) * 0x1c);
+        break;
+    default:
+        tbl = (s16*)(lbl_802EF0A8 + 0xC144);
+        break;
+    }
+
+    arr = (f32*)(lbl_803A6A60 + 0xc);
+    arr[*(u32*)(lbl_803A6A60 + 0x44)] =
+        arr[*(u32*)(lbl_803A6A60 + 0x44)]
+        + *(f32*)(lbl_803A6A60 + 0x8) * (*(f32*)&lbl_8047BDF0 / *(f32*)&buf[*(u32*)(lbl_803A6A60 + 0x44)]);
+    if (arr[*(u32*)(lbl_803A6A60 + 0x44)] > *(f32*)&lbl_8047BDF0) {
+        arr[*(u32*)(lbl_803A6A60 + 0x44)] = arr[*(u32*)(lbl_803A6A60 + 0x44)] - *(f32*)&lbl_8047BDF0;
+    }
+    if (arr[*(u32*)(lbl_803A6A60 + 0x44)] < *(f32*)&lbl_8047BDAC) {
+        arr[*(u32*)(lbl_803A6A60 + 0x44)] += *(f32*)&lbl_8047BDF0;
+    }
+    *(f32*)(ctx + 0x70) = arr[*(u32*)(lbl_803A6A60 + 0x44)];
+    *(s16*)(ctx + 0x50) = tbl[1];
+    *(s16*)(ctx + 0x52) = tbl[2];
+}
 #endif
 
 /* fn_8004B7EC - 0x8004B7EC | size: 0x5cc */
