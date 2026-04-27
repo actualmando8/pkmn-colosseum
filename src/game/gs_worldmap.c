@@ -1982,12 +1982,66 @@ s32 fn_8002AB40(void* r3, u8* r4) {
 /* fn_8002ACB8 - 0x8002ACB8 | size: 0x18c */
 extern u32 lbl_8047A660;
 extern u32 lbl_8047A664;
-#if 1
+#if 0
 asm void fn_8002ACB8(void) {
 #include "src/game/gs_worldmap_fn_8002ACB8.inc"
 }
 #else
-void fn_8002ACB8(void) { /* TODO */ }
+#pragma optimization_level 4
+s32 fn_8002ACB8(void* r3, u8* r4) {
+    u8* ctx;
+    u32 value;
+    u32 text_id;
+    s32 x;
+
+    ctx = *(u8**)((u8*)r3 + 0x60);
+
+    if ((ctx[0x1D] & 1) != 0) {
+        r4[0x67] = 0;
+        return 0;
+    }
+
+    if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
+        value = (u32)fn_8012A5B0(0, 0xC, 0);
+        fn_80132A38(0x50, (void*)value);
+        text_id = 0x151;
+        x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(u16)(fn_800FA444(text_id) >> 16);
+        fn_800FB680(x, 0, -1, text_id);
+        return 0;
+    }
+
+    switch ((s32)(u32)ctx[0x1C]) {
+    case 2:
+        value = (u32)fn_8012A5B0(0, 0xD, 0);
+        break;
+    case 3:
+        if (ctx + 0x20 != NULL) {
+            if ((s32)lbl_8047A660 > 0) {
+                *(u32*)(ctx + 0x778) += lbl_8047A660;
+                *(u32*)(ctx + 0x77C) += lbl_8047A660;
+                lbl_8047A660 = 0;
+            }
+            if ((s32)lbl_8047A664 > 0) {
+                *(u32*)(ctx + 0x778) = 0;
+                *(u32*)(ctx + 0x77C) = 0;
+                lbl_8047A664 = 0;
+            }
+            value = *(u32*)(ctx + 0x778);
+        } else {
+            value = 0;
+        }
+        break;
+    default:
+        value = (u32)fn_8012A5B0(0, 0xD, 0);
+        break;
+    }
+
+    fn_80132A38(0x50, (void*)value);
+    text_id = 0x153;
+    x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(u16)(fn_800FA444(text_id) >> 16);
+    fn_800FB680(x + 6, 0, -1, text_id);
+    return 0;
+}
 #endif
 
 /* fn_8002AE44 - 0x8002AE44 | size: 0x24 */
