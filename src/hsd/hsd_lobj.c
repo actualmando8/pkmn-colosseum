@@ -248,14 +248,38 @@ void fn_801A40F8(void) {}
 #endif
 
 /* 0x801A426C | 0xD8 */
-extern void fn_801C2670(void);
-extern void fn_80191DCC(void);
-#if 1
+extern HSD_AObj* fn_801C2670(HSD_AObjDesc*);
+extern void fn_80191DCC(HSD_WObj*, HSD_WObjAnim*);
+#if 0
 asm void fn_801A426C(void) {
 #include "src/hsd/hsd_lobj_fn_801A426C.inc"
 }
 #else
-void fn_801A426C(void) {}
+void fn_801A426C(HSD_LObj* lobj, HSD_LightAnim* lanim)
+{
+    HSD_LObj* l;
+    HSD_LightAnim* a;
+
+    if (lobj == NULL) {
+        return;
+    }
+    l = lobj;
+    a = lanim;
+    while (l != NULL) {
+        if (l != NULL && a != NULL) {
+            if (*(volatile u32*)((u8*)l + 0x48) != 0) {
+                fn_801C25E4(l->aobj);
+            }
+            l->aobj = fn_801C2670(a->aobjdesc);
+            fn_80191DCC(l != NULL ? l->position : NULL,
+                        a->position_anim);
+            fn_80191DCC(l != NULL ? l->interest : NULL,
+                        a->interest_anim);
+        }
+        l = l != NULL ? l->next : NULL;
+        a = a != NULL ? a->next : NULL;
+    }
+}
 #endif
 
 /* 0x801A4344 | 0xFC */
