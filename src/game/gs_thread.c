@@ -96,7 +96,7 @@ extern void fn_801040F0(void);
 extern void fn_80166A28(void);
 extern void fn_800D59B8(void);
 extern void fn_800D5BA0(void);
-extern void fn_800D9D68(s32 a, s32 b, s32 c, s32 d);
+extern void fn_800D9D68(u16 a, u16 b, u16 c, u16 d);
 extern void fn_800CE220(void);
 extern void fn_800D7FE4(void);
 extern void fn_800D834C(void);
@@ -2441,12 +2441,14 @@ void fn_800FE35C(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 #include "src/game/gs_thread_fn_800FE38C.inc"
 }
 #else
 #pragma optimization_level 2
+#pragma scheduling on
+#pragma peephole off
 void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
     s32 ax, ay, bx, by;
     f32 scale_x, scale_y;
@@ -2470,7 +2472,7 @@ void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
     if (cy1 < 0) cy1 = 0;
     if (cx2 < 0) cx2 = 0;
     if (cy2 < 0) cy2 = 0;
-    fn_800D9D68((u32)cx1, (u32)cy1, (u32)cx2, (u32)cy2);
+    fn_800D9D68(cx1, cy1, cx2, cy2);
 }
 #endif
 #pragma pop
