@@ -476,8 +476,8 @@ extern void fn_800BA198(void);
 extern void fn_800BA440(void);
 extern void fn_800BA344(void);
 extern void fn_800BA1B4(void);
-extern void fn_800A3A9C(void);
-extern void fn_800A3ADC(void);
+extern void fn_800A3A9C(void*, void*, void*);
+extern void fn_800A3ADC(void*, void*);
 extern void fn_800A3820(void);
 extern void fn_800BA424(void);
 extern void fn_800BA44C(void);
@@ -523,12 +523,63 @@ void fn_801A6098(void) {}
 /* 0x801A620C | 0x164 */
 extern u32 lbl_8047DBE8;
 extern u32 lbl_8047DBE4;
-#if 1
+#if 0
 asm void fn_801A620C(void) {
 #include "src/hsd/hsd_lobj_fn_801A620C.inc"
 }
 #else
-void fn_801A620C(void) {}
+void fn_801A620C(HSD_LObj* lobj, f32* out)
+{
+    u32 pos[3];
+    u32 interest[3];
+    s32 invalid;
+
+    pos[0] = *(u32*)&lbl_80274D58[0];
+    pos[1] = *(u32*)&lbl_80274D58[4];
+    pos[2] = *(u32*)&lbl_80274D58[8];
+    interest[0] = *(u32*)&lbl_80274D64[0];
+    interest[1] = *(u32*)&lbl_80274D64[4];
+    interest[2] = *(u32*)&lbl_80274D64[8];
+
+    if (lobj != NULL) {
+        if (lobj != NULL && *(volatile u32*)((u8*)lobj + 0x18) != 0) {
+            fn_80191688(lobj->position, pos);
+        }
+        if (lobj != NULL && *(volatile u32*)((u8*)lobj + 0x1C) != 0) {
+            fn_80191688(lobj->interest, interest);
+        }
+        fn_800A3A9C(interest, pos, out);
+
+        if (out == NULL) {
+            goto invalid_vec;
+        }
+        if (out != NULL) {
+            goto check_vec;
+        }
+    invalid_vec:
+        invalid = -1;
+        goto checked_vec;
+    check_vec:
+        if (__fabs(out[0]) <= *(volatile f32*)&lbl_80478AC8 &&
+            __fabs(out[1]) <= *(volatile f32*)&lbl_80478AC8 &&
+            __fabs(out[2]) <= *(volatile f32*)&lbl_80478AC8) {
+            invalid = -1;
+        } else {
+            fn_800A3ADC(out, out);
+            invalid = 0;
+        }
+
+    checked_vec:
+        if (invalid != 0) {
+            f32 x = *(f32*)&lbl_8047DBE8;
+            f32 y = *(f32*)&lbl_8047DBE8;
+            f32 z = *(f32*)&lbl_8047DBE4;
+            out[0] = x;
+            out[1] = y;
+            out[2] = z;
+        }
+    }
+}
 #endif
 
 /* 0x801A6370 | 0x98 */
