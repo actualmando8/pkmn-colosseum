@@ -2997,7 +2997,7 @@
     "function": "fn_800379E8",
     "description": "Match fn_800379E8 in scene_init.c (128 asm lines, tier=codex)",
     "priority": "high",
-    "status": "claimed",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
     "completed_at": null,
@@ -3010,6 +3010,11 @@
       "file_pct": 17.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 78.6,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -3017,9 +3022,9 @@
     "function": "fn_80037BB0",
     "description": "Match fn_80037BB0 in scene_init.c (128 asm lines, tier=codex)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/scene_init.c",
@@ -3030,6 +3035,11 @@
       "file_pct": 17.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 78.6,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -3285,10 +3295,10 @@
     "function": "fn_800492CC",
     "description": "Match fn_800492CC in scene_init.c (203 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "matched",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-23",
+    "completed_at": 1777314000,
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3297,8 +3307,10 @@
       "line_number": 3124,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
-    }
+      "difficulty": "complex",
+      "match_pct": 95.7
+    },
+    "claimed_at": 1777313133
   },
   {
     "id": "task-1777292470-0150",
@@ -6180,9 +6192,9 @@
     "function": "fn_8012F008",
     "description": "Match fn_8012F008 in gs_field_world.c (83 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_field_world.c",
