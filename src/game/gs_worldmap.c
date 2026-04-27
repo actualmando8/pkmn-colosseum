@@ -1497,12 +1497,48 @@ u32 fn_80029FAC(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
 /* fn_8002A0B8 - 0x8002A0B8 | size: 0x10c */
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E3C;
-#if 1
+#if 0
 asm void fn_8002A0B8(void) {
 #include "src/game/gs_worldmap_fn_8002A0B8.inc"
 }
 #else
-void fn_8002A0B8(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
+    WorldMapVaListArray list;
+    s32 r31;
+    s32 r30;
+    s32 r29;
+    u8* r28;
+    u8* map;
+    u8* table;
+    s32 idx;
+    s32 offset;
+
+    *(u32*)list = 0x04000000;
+    list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
+    list[0].reg_save_area = (u32*)((u8*)list - 0x60);
+    idx = r4 << 2;
+    map = (u8*)lbl_80478E54;
+    r31 = r5 << 2;
+    table = (u8*)lbl_80478E3C;
+    r30 = 1;
+    offset = map[idx] * 0x3c;
+    *r3 = table[offset];
+    r28 = table + offset + 4;
+    while (r6 >= 0) {
+        if (r30 != 0) {
+            r29 = r6;
+            r30 = 0;
+        } else {
+            r30 = 1;
+            fn_80132A38(r29, (void*)r6);
+        }
+        r6 = *(s32*)__va_arg(list, 1);
+    }
+    return *(u32*)(r28 + r31);
+}
 #endif
 
 /* fn_8002A1C4 - 0x8002A1C4 | size: 0x108 */
