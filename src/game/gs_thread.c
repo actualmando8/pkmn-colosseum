@@ -762,7 +762,7 @@ extern void fn_800F8A54(void);
 extern u32 fn_800F92D4(u32 key);
 extern void fn_800F9670(u32 count);
 extern void fn_800F96E4(void);
-extern void fn_800F9AEC(void);
+extern u32 fn_800F9AEC(void* outbuf, u16* src, s32 mode);
 extern void fn_800F9D04(void);
 extern u8* fn_800F9E70(u8* dst, u8* src);
 extern void fn_800FA160(void* obj);
@@ -1217,60 +1217,97 @@ void fn_800F96E4(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800F9AEC(void) {
 #include "src/game/gs_thread_fn_800F9AEC.inc"
 }
 #else
 #pragma optimization_level 2
-u32 fn_800F9AEC(void* outbuf, u16* src, u32 mode) {
+u32 fn_800F9AEC(void* outbuf, u16* src, s32 mode) {
     u8* out;
-    u16* table;
-    u32 count;
-    u16 ch;
-    u16* p;
-    u32 idx;
+    register u16* table;
+    register s32 idx;
+    register u32 count;
+    register u16* p;
+    register u32 ch;
+    u32 outch;
 
     out = (u8*)outbuf;
-    count = 0;
 
-    if (mode == 1) {
-        if (src == NULL) return count;
-        table = (u16*)lbl_80271300;
-        ch = *src;
-        while (ch != 0) {
-            p = table;
-            for (idx = 0; idx < 0x100; idx++, p++) {
-                if (*p == ch) break;
-            }
-            if (idx == 0x100) idx = 0xb7;
-            if (out != NULL) {
-                *out = (u8)(idx & 0xFF);
-                out++;
-            }
-            count++;
-            src++;
-            ch = *src;
-        }
-    } else {
-        if (src == NULL) return count;
-        table = (u16*)lbl_80271500;
-        ch = *src;
-        while (ch != 0) {
-            p = table;
-            for (idx = 0; idx < 0x100; idx++, p++) {
-                if (*p == ch) break;
-            }
-            if (idx == 0x100) idx = 0xb7;
-            if (out != NULL) {
-                *out = (u8)(idx & 0xFF);
-                out++;
-            }
-            count++;
-            src++;
-            ch = *src;
-        }
+    switch (mode) {
+    case 1:
+        break;
+    case 7:
+    case 9:
+    default:
+        goto use_second_table;
     }
+
+    count = 0;
+    if (src != NULL) goto first_have_src;
+    goto done_first;
+first_have_src:
+        table = (u16*)lbl_80271300;
+        goto first_cond;
+first_loop:
+        p = table;
+        idx = 0;
+        goto first_scan_check;
+first_scan_next:
+        idx++;
+        p++;
+        if (idx >= 0x100) {
+            idx = 0xb7;
+            goto first_found;
+        }
+first_scan_check:
+        if ((u32)ch != *p) goto first_scan_next;
+first_found:
+        if (out != NULL) {
+            outch = (u8)idx;
+            *out = outch;
+            out++;
+        }
+        count++;
+        src++;
+first_cond:
+        ch = *src;
+        if (ch != 0) goto first_loop;
+done_first:
+    return count;
+
+use_second_table:
+    count = 0;
+    if (src != NULL) goto second_have_src;
+    goto done_second;
+second_have_src:
+    table = (u16*)lbl_80271500;
+    goto second_cond;
+second_loop:
+    p = table;
+    idx = 0;
+    goto second_scan_check;
+second_scan_next:
+    idx++;
+    p++;
+    if (idx >= 0x100) {
+        idx = 0xb7;
+        goto second_found;
+    }
+second_scan_check:
+    if ((u32)ch != *p) goto second_scan_next;
+second_found:
+    if (out != NULL) {
+        outch = (u8)idx;
+        *out = outch;
+        out++;
+    }
+    count++;
+    src++;
+second_cond:
+    ch = *src;
+    if (ch != 0) goto second_loop;
+done_second:
     return count;
 }
 #endif
