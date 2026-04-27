@@ -2054,23 +2054,22 @@ void fn_800FC2A4(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_800FC2A8(void* ptr) {
 #include "src/game/gs_thread_fn_800FC2A8.inc"
 }
 #else
-#pragma optimization_level 2
+#pragma optimization_level 4
+#pragma scheduling on
 void fn_800FC2A8(void* ptr) {
     u8* p;
-    u8* head;
-    u8* entry;
-    u8* node;
-    u8* nodeNext;
-    u8* nodePrev;
-    u16 count;
-    u16 idx;
-    u32 offset;
-    u16 needle;
+    register s32 offset;
+    register u8* head;
+    register s32 count;
+    register u8* entry;
+    register u8* nodePrev;
+    register u8* node;
+    register s32 idx;
 
     p = (u8*)ptr;
 tail:
@@ -2078,35 +2077,28 @@ tail:
     count = *(u16*)(head + 0x4);
     idx = 0;
     offset = 0;
-    entry = NULL;
-    while (count > 0) {
+    for (; idx < count; offset += 8, idx++) {
         entry = (u8*)*(u32*)(head + 0x24) + offset;
         if (*(u32*)(entry + 0x4) != 0) {
-            needle = *(u16*)p;
-            if (*(u16*)entry == needle) break;
+            if (*(u16*)entry == *(u16*)p) break;
         }
-        offset += 8;
-        idx++;
-        count--;
-        entry = NULL;
     }
-    if (entry != NULL) {
+    if (idx != count) {
         node = (u8*)*(u32*)(entry + 0x4);
         while (node != NULL) {
             if (node == p + 8) {
-                nodeNext = (u8*)*(u32*)(node + 0x8);
                 nodePrev = (u8*)*(u32*)(node + 0xC);
-                if (nodePrev == NULL && nodeNext == NULL) {
+                if (nodePrev == NULL && *(u32*)(node + 0x8) == 0) {
                     *(u16*)entry = 0xFFFF;
                     *(u32*)(entry + 0x4) = 0;
                 } else {
                     if (nodePrev != NULL) {
-                        *(u32*)(nodePrev + 0x8) = (u32)nodeNext;
+                        *(u32*)(nodePrev + 0x8) = *(u32*)(node + 0x8);
                     } else {
-                        *(u32*)(entry + 0x4) = (u32)nodeNext;
+                        *(u32*)(entry + 0x4) = *(u32*)(node + 0x8);
                     }
-                    if (nodeNext != NULL) {
-                        *(u32*)(nodeNext + 0xC) = (u32)nodePrev;
+                    if (*(u32*)(node + 0x8) != 0) {
+                        *(u32*)(*(u32*)(node + 0x8) + 0xC) = *(u32*)(node + 0xC);
                     }
                 }
                 break;
