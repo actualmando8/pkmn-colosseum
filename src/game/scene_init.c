@@ -875,7 +875,7 @@ extern u8 fn_8004DFCC(u8 a);
 extern void fn_800473E0(u8* entry);
 extern u8 fn_8004BDEC(void);
 extern u8 fn_8004BDFC(void);
-extern void fn_800492CC(void);
+extern void fn_800492CC(u8* a, u8* b);
 extern u32 fn_80043728(u32 unused, u32 mode, u16 flags);
 extern void fn_800484A4(void);
 extern void fn_80042658(u32 a, u32 b);
@@ -3002,12 +3002,92 @@ extern f32 lbl_8047BCF4;
 extern u32 lbl_8047A4E0;
 extern u32 lbl_8047A4E4;
 extern u32 lbl_8047A4E8;
-#if 1
+/* fn_800492CC, fn_8011F5C8, fn_8011E778, fn_8011E760 already declared above */
+#if 0
 asm void fn_80044378(void) {
 #include "src/game/scene_init_fn_80044378.inc"
 }
 #else
-void fn_80044378(void) { /* TODO */ }
+#pragma optimization_level 4
+void fn_80044378(u8* ctx, u8* p) {
+    u8* base;
+    s16 val;
+    u8* entry;
+    s32 i;
+    s32 byte_off;
+    f32 fstep;
+    f32 fy;
+    u32 r25;
+    u32 r26;
+    u32 r27;
+    u32 r3v;
+    val = *(s16*)(p + 6);
+    if (val == 0x12b2) {
+        ctx[0x8b] = (u8)(s32)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x54));
+    } else {
+        ctx[0x8b] = (u8)(s32)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x4c));
+    }
+    val = *(s16*)(p + 6);
+    switch (val) {
+        case 0xd46:
+        case 0x12b2:
+        case 0x31d:
+        case 0x31e:
+            return;
+        case 0x119b:
+            if ((s8)fn_8004BDEC() != 1) return;
+            if ((s8)fn_8004BDFC() < 1) return;
+            fn_800492CC(ctx, p);
+            return;
+        case 0x76d:
+            fn_80132A38(0x34, fn_8025FEE4(0));
+            return;
+    }
+    entry = (u8*)lbl_802EF0A8 + val * 0x1c;
+    fn_800FE38C(
+        (s32)*(s16*)((u8*)lbl_802EF0A8 + 0x5712) - (s32)*(s16*)(entry + 2),
+        (s32)*(s16*)((u8*)lbl_802EF0A8 + 0x5714) - (s32)*(s16*)(entry + 4),
+        (s32)*(s16*)((u8*)lbl_802EF0A8 + 0x5716),
+        (s32)*(s16*)((u8*)lbl_802EF0A8 + 0x5718));
+    base = (u8*)lbl_803A6818;
+    fy = *(f32*)(base + 0x30);
+    byte_off = 0;
+    fstep = lbl_8047BCF4;
+    for (i = 0; i < (s32)*(u16*)&lbl_8047A4E8; i++) {
+        if (i >= *(s32*)(base + 0x8) - 1 && i <= *(s32*)(base + 0xc) + 1) {
+            r25 = lbl_8047A4E0;
+            if (r25 != 0) {
+                r27 = (u32)*(u16*)((u8*)lbl_8047A4E4 + byte_off);
+                if (r27 >= 0x8000) {
+                    r27 = r27 & 0x3fff;
+                }
+                fn_801240C4(r25, r27 & 0xFFFF, 0xa, fn_80135938(0, 1));
+                r26 = fn_8025FDDC(0, r27);
+                r27 = fn_8025FD34(0, r27);
+                fn_8011DFE0(r25, r26);
+                fn_8011DF90(r25, r27);
+                r3v = lbl_8047A4E0;
+            } else {
+                r3v = 0;
+            }
+            if (r3v != 0) {
+                fn_8011F5C8();
+                fn_8011E778();
+                r3v = fn_800FA280(fn_8011E760());
+            } else {
+                r3v = 0;
+            }
+            if (r3v == 0) {
+                r3v = fn_800FA280(1);
+            }
+            fn_80132A38(0x37, r3v);
+            fn_800FB680(0, (s32)fy - 2, (s32)ctx[0x8b] | -0x100, 0xe7);
+        }
+        fy += fstep;
+        byte_off += 2;
+    }
+    fn_800FE35C();
+}
 #endif
 
 /* fn_80046168 - 0x80046168 | size: 0x1164 */
@@ -3239,11 +3319,11 @@ extern f32 lbl_8047BCA0;
 extern f32 lbl_8047BC94;
 extern f32 lbl_8047BCBC;
 #if 1
-asm void fn_800492CC(void) {
+asm void fn_800492CC(u8* a, u8* b) {
 #include "src/game/scene_init_fn_800492CC.inc"
 }
 #else
-void fn_800492CC(void) { /* TODO */ }
+void fn_800492CC(u8* a, u8* b) { /* TODO */ }
 #endif
 
 /* fn_8004A47C - 0x8004A47C | size: 0x32c */
