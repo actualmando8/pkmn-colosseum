@@ -273,7 +273,8 @@ void GStaskInit(u32 numTasks, u32 numQueues) {
     u32 total;
     u32 allocSize;
     u16 handle;
-    u32 i;
+    s32 i;
+    s32 loopCount;
     u32 offset;
 
     total = numTasks + numQueues;
@@ -340,7 +341,8 @@ u32 GStaskCreate(u32 state, u8 priority, void* param, void* func) {
     GSTask* task;
     GSTask* search;
     u32 count;
-    u32 i;
+    s32 i;
+    s32 loopCount;
 
     /* Choose search range based on state */
     if (state == GSTASK_DEFERRED) {
@@ -4904,7 +4906,7 @@ s32 fn_800F67AC(u32* ptr) {
 #endif
 
 /* 0x800F67C8 | 0x184 */
-#if 1
+#if 0
 asm s32 fn_800F67C8(void* obj) {
 #include "src/game/gs_thread_fn_800F67C8.inc"
 }
@@ -4912,56 +4914,64 @@ asm s32 fn_800F67C8(void* obj) {
 #pragma optimization_level 2
 s32 fn_800F67C8(void* obj) {
     u8* p;
-    u32 count;
-    u32 val1;
-    u32 val2;
-    u32 val3;
-    u32 i;
+    s32 count;
+    volatile u32 val1;
+    volatile u32 val2;
+    volatile u32 val3;
+    s32 i;
+    s32 loopCount;
+    const char* errStr;
+    u8* stackPtr;
 
     p = (u8*)obj;
 
     /* Pop 1 (into val1) */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
         val1 = *(u32*)(p + 0x6C);
     } else {
-        count--;
-        *(u32*)(p + 0x28) = count;
-        val1 = *(u32*)(p + 0x6C + count * 4);
+        count = count - 1;
+        *(s32*)(p + 0x28) = count;
+        stackPtr = p + count * 4;
+        val1 = *(u32*)(stackPtr + 0x6C);
     }
 
     /* Pop 2 (into val2) → store to obj->0x1C */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
         val2 = *(u32*)(p + 0x6C);
     } else {
-        count--;
-        *(u32*)(p + 0x28) = count;
-        val2 = *(u32*)(p + 0x6C + count * 4);
+        count = count - 1;
+        *(s32*)(p + 0x28) = count;
+        stackPtr = p + count * 4;
+        val2 = *(u32*)(stackPtr + 0x6C);
     }
     *(u32*)(p + 0x1C) = val2;
 
     /* Pop 3 (return address) → store to obj->0x14 */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
     if ((s32)count <= 0) {
         fn_800DD38C((const char*)lbl_8027107C);
         val3 = *(u32*)(p + 0x6C);
     } else {
-        count--;
-        *(u32*)(p + 0x28) = count;
-        val3 = *(u32*)(p + 0x6C + count * 4);
+        count = count - 1;
+        *(s32*)(p + 0x28) = count;
+        stackPtr = p + count * 4;
+        val3 = *(u32*)(stackPtr + 0x6C);
     }
     *(u32*)(p + 0x14) = val3;
 
     /* Drain val1 entries from stack */
-    for (i = 0; i < val1; i++) {
-        count = *(u32*)(p + 0x28);
+    loopCount = val1;
+    errStr = (const char*)lbl_8027107C;
+    for (i = 0; i < loopCount; i++) {
+        count = *(s32*)(p + 0x28);
         if ((s32)count <= 0) {
-            fn_800DD38C((const char*)lbl_8027107C);
+            fn_800DD38C(errStr);
         } else {
-            *(u32*)(p + 0x28) = count - 1;
+            *(s32*)(p + 0x28) = count - 1;
         }
     }
 
