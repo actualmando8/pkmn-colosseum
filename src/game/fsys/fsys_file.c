@@ -830,15 +830,64 @@ void fn_8017C39C(void) { /* TODO: match -- 120 bytes at 0x8017C39C */ }
 #endif
 
 /* 0x8017C414 | 0x154 */
-extern void fn_8017A624(void);
-extern u32 OSDisableInterrupts();
-extern void OSRestoreInterrupts();
-#if 1
+extern u32 fn_8017A624(void*);
+extern u32 OSDisableInterrupts(void);
+extern void OSRestoreInterrupts(u32);
+#if 0
 asm void fn_8017C414(void) {
 #include "src/game/fsys/fsys_file_fn_8017C414.inc"
 }
 #else
-void fn_8017C414(void) { /* TODO: match -- 340 bytes at 0x8017C414 */ }
+#pragma optimization_level 4
+u32 fn_8017C414(void* arg) {
+    u32 enabled;
+    FSYSManager* mgr;
+    FSYSSlot* slot;
+
+    if (fn_8017A624(arg) != 0) {
+        enabled = OSDisableInterrupts();
+        mgr = (FSYSManager*)lbl_80453FEC;
+        slot = mgr->activeSlot;
+
+        switch (slot->status) {
+            case 1:
+                slot->status = 2;
+                break;
+            case 3:
+                slot->status = 4;
+                break;
+            case 0x65:
+                slot->status = 0x96;
+                break;
+            case 0xC8:
+                slot->status = 0xC9;
+                break;
+            case 0x12F:
+                slot->status = 0x130;
+                break;
+            case 0x190:
+                slot->status = 0x191;
+                break;
+            case 2:
+            case 4:
+            case 0x64:
+            case 0xC9:
+            case 0x12D:
+                break;
+            default:
+                slot->status = 0x3E8;
+                slot->archiveHandle = 1;
+                break;
+        }
+
+        if (slot->tocBuffer != NULL) {
+            fn_80167E64((u32)slot->tocBuffer);
+            slot->tocBuffer = NULL;
+        }
+        OSRestoreInterrupts(enabled);
+    }
+    return 1;
+}
 #endif
 
 /* 0x8017C580 | 0x10 */
