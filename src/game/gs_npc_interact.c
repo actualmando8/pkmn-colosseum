@@ -2226,12 +2226,79 @@ void fn_80010588(u8* arg1, u8* arg2) {
 #endif
 
 /* fn_800106A4 - 0x800106A4 | size: 0x1a0 */
-#if 1
+#if 0
 asm void fn_800106A4(void) {
 #include "src/game/gs_npc_interact_fn_800106A4.inc"
 }
 #else
-void fn_800106A4(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800106A4(u8* arg1, u8* arg2) {
+    extern u32 fn_80103FE4(u8* a);
+    extern u32 fn_801040A0(u8* a);
+    extern u32 fn_801040D0(u8* a, s32 b);
+    extern void fn_80132A38(s32 p1, s32 val);
+    extern void* fn_8001D834(u8* a, u8* b);
+    extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
+    extern void* fn_802037DC(void* a);
+    void* participant;
+    void* npc_data;
+    u32 r30;
+    s16 npc_id;
+    s32 sub;
+    s32 val;
+    u8* p1;
+    u32 t1;
+    u32 t2;
+    npc_id = *(s16*)(arg2 + 6);
+    r30 = 0;
+    switch (npc_id) {
+    case 0xb4:
+        t1 = fn_80103FE4(arg1);
+        fn_80132A38(0x37, (s32)t1);
+        r30 = 0xcf;
+        break;
+    case 0x11cd:
+        t2 = fn_80103FE4(arg1);
+        fn_80132A38(0x36, (s32)t2);
+        r30 = 0x196;
+        break;
+    case 0xc1:
+        participant = (void*)fn_80103FE4(arg1);
+        npc_data = (void*)fn_801040A0(arg1);
+        sub = (s32)*(u8*)npc_data;
+        switch (sub) {
+        case 0:
+            fn_80132A38(0x36, *(s32*)participant);
+            r30 = 0x196;
+            break;
+        case 1:
+            r30 = 0x199;
+            break;
+        }
+        break;
+    case 0x11d8:
+        r30 = 0x196;
+        val = (s32)*(u32*)(arg1 + 4);
+        if (val == 0xf7) {
+            fn_80132A38(0x36, *(s32*)fn_80103FE4(arg1));
+        } else if (val == 0xf8) {
+            p1 = (u8*)fn_801040D0(arg1, 1);
+            if ((u8)fn_801040D0(arg1, 2) != 0) {
+                fn_80132A38(0x36, (s32)fn_802037DC(p1));
+            } else {
+                r30 = 0x1a9;
+            }
+        } else {
+            return;
+        }
+        break;
+    }
+    if (r30 != 0) {
+        fn_800FB680(0, -2, (s32)fn_8001D834(arg1, arg2), r30);
+    }
+}
+#pragma pop
 #endif
 
 /* fn_80010844 - 0x80010844 | size: 0x15c */
