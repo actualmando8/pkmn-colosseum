@@ -1027,17 +1027,67 @@ s32 fn_80028728(void* r3, u8* r4) {
 #endif
 
 /* fn_80028830 - 0x80028830 | size: 0x118 */
-extern void fn_8005D858(void);
-extern void fn_80104160(void);
+extern void* fn_8005D858(s32);
+extern void fn_80104160(s32, s32, s32, s32, u32, void*, s32, s32);
 extern u8 lbl_803A20DC[];
 extern f64 lbl_8047B948;
 extern f32 lbl_8047B940;
-#if 1
+typedef struct WorldMapOverlay {
+    s32 active;
+    f32 x;
+    f32 y;
+    f32 scale;
+    f32 unused10;
+    u32 color;
+    u8 alpha;
+    u8 pad19[3];
+    f32 timer;
+    f32 lifetime;
+} WorldMapOverlay;
+#if 0
 asm void fn_80028830(void) {
 #include "src/game/gs_worldmap_fn_80028830.inc"
 }
 #else
-void fn_80028830(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+#pragma fp_contract on
+s32 fn_80028830(void* r3) {
+    void* r27;
+    register s32 r29;
+    register s32 r28;
+    register WorldMapOverlay* r31;
+    register s32 r30;
+    f32 sx;
+    f32 sy;
+    s32 x0;
+    s32 y0;
+    s32 x1;
+    s32 y1;
+
+    r27 = r3;
+    r29 = *(s16*)((u8*)fn_8005D858(0x98) + 0xc);
+    r28 = *(s16*)((u8*)fn_8005D858(0x98) + 0xe);
+    r31 = (WorldMapOverlay*)lbl_803A20DC;
+    r30 = 0;
+    while (r30 < 0x1e) {
+        if (r31->active != 0) {
+            sx = (f32)r29 * r31->scale;
+            sy = (f32)r28 * r31->scale;
+            x1 = (s32)(lbl_8047B940 + sx);
+            x0 = (s32)(lbl_8047B940 + (r31->x - sx * lbl_8047B940));
+            y1 = (s32)(lbl_8047B940 + sy);
+            y0 = (s32)(lbl_8047B940 + (r31->y - sy * lbl_8047B940));
+            fn_80104160(x0, y0, x1, y1, r31->color | r31->alpha, r27, 0x98, 0);
+        }
+        r31++;
+        r30++;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_80028948 - 0x80028948 | size: 0x674 */
