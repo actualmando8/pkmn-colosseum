@@ -6829,102 +6829,62 @@ L_80116D14: ;
 }
 #endif
 /* 0x80116D30 | 0x13C */
-extern void fn_801141F8(void);
-extern void fn_801CA9F8(void);
-extern void fn_800F7434(void);
+extern void fn_801141F8();
+extern void fn_801CA9F8();
+extern void fn_800F7434();
 extern u8 lbl_80272708[];
 extern u32 lbl_80478EC4;
 extern u32 lbl_80478EC0;
-#if 1
+#if 0
 asm void fn_80116D30(void) {
 #include "src/game/gs_field_world_fn_80116D30.inc"
 }
 #else
-void fn_80116D30(void) {
-    extern u8 lbl_80272708[];
-    extern u32 lbl_80478EC0;
-    extern u32 lbl_80478EC4;
-    extern void fn_800F7434();
-    extern void fn_801141F8();
-    extern void fn_801CA9F8();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r26 = r3;
-    r29 = r4;
-    r5 = (u32)lbl_80272708;
-    r31 = (u32)lbl_80272708;
-    fn_801141F8();
-    r28 = (s8)r26;
-    switch ((s32)r28) {
-    case 0x1:
-        r4 = r29;
-        r3 = r31 + 0x14;
-        ((void(*)(void))fn_800DD970)();
+void fn_80116D30(u32 kind, u32 arg)
+{
+    s32 skind;
+    u32 floor;
+    u32 i;
+    u32 offset;
+    u8* rec;
+    u8* text;
+
+    text = lbl_80272708;
+    fn_801141F8(kind, arg, text);
+    skind = (s8)kind;
+
+    switch (skind) {
+    case 1:
+        fn_800DD970((const char*)(text + 0x14), arg);
         break;
-    case 0x2:
-        r4 = r29;
-        r3 = r31 + 0x28;
-        ((void(*)(void))fn_800DD970)();
+    case 2:
+        fn_800DD970((const char*)(text + 0x28), arg);
         break;
-    case 0x3:
-        r4 = r29;
-        r3 = r31 + 0x3c;
-        ((void(*)(void))fn_800DD970)();
+    case 3:
+        fn_800DD970((const char*)(text + 0x3C), arg);
         break;
-    case 0x4:
-        r4 = r29;
-        r3 = r31 + 0x50;
-        ((void(*)(void))fn_800DD970)();
-        break;
-    default:
+    case 4:
+        fn_800DD970((const char*)(text + 0x50), arg);
         break;
     }
-    ((void(*)(void))fn_800FF56C)();
-    r31 = r3;
-    r26 = 0x0;
-    r30 = 0x0;
-    while (1) {
-        r3 = lbl_80478EC0;
-        r0 = *(u32*)((u8*)r3 + 0x0);
-        if (r26 >= (u32)r0) break;
-        r0 = lbl_80478EC4;
-        r27 = r0 + r30;
-        r0 = *(u16*)((u8*)r27 + 0x2);
-        if (r0 == (u32)r31) {
-            r0 = *(u8*)((u8*)r27 + 0x0);
-            if ((s32)r0 == (s32)r28) {
-                r0 = *(u32*)((u8*)r27 + 0x4);
-                if (r0 == (u32)r29) {
-                    r0 = *(u32*)((u8*)r27 + 0x8);
-                    if (r0 != (u32)0x0) {
-                        r3 = r29;
-                        fn_801CA9F8();
-                        r3 = *(u32*)((u8*)r27 + 0x8);
-                        r4 = 0x4;
-                        r5 = *(u32*)((u8*)r27 + 0xC);
-                        r6 = *(u32*)((u8*)r27 + 0x10);
-                        r7 = *(u32*)((u8*)r27 + 0x14);
-                        r8 = *(u32*)((u8*)r27 + 0x18);
-                        fn_800F7434();
-                    }
-                }
-            }
+
+    floor = (u32)fn_800FF56C();
+    i = 0;
+    offset = 0;
+    while (i < *(u32*)lbl_80478EC0) {
+        rec = (u8*)(lbl_80478EC4 + offset);
+        if (*(u16*)(rec + 2) == floor &&
+            (s32)*(u8*)rec == skind &&
+            *(u32*)(rec + 4) == arg &&
+            *(u32*)(rec + 8) != 0) {
+            fn_801CA9F8(arg);
+            fn_800F7434(*(u32*)(rec + 8), 4, *(u32*)(rec + 0xC),
+                        *(u32*)(rec + 0x10), *(u32*)(rec + 0x14),
+                        *(u32*)(rec + 0x18));
         }
-        r30 = r30 + 0x1c;
-        r26 = r26 + 0x1;
+        offset += 0x1C;
+        i++;
     }
-    return;
 }
 #endif
 /* 0x80116E6C | 0x18 */
