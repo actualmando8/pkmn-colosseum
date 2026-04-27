@@ -1902,12 +1902,81 @@ s32 fn_8002AB00(void* r3, u8* r4) {
 extern u8 lbl_80266E80[];
 extern u32 lbl_804788F0;
 extern u8 lbl_802E61D8[];
-#if 1
+#if 0
 asm void fn_8002AB40(void) {
 #include "src/game/gs_worldmap_fn_8002AB40.inc"
 }
 #else
-void fn_8002AB40(void) { /* TODO */ }
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
+s32 fn_8002AB40(void* r3, u8* r4) {
+    u8* ctx;
+    u32 table[4];
+    u32 value;
+    s32 idx;
+    u32* limit;
+    u32 count;
+
+    ctx = *(u8**)((u8*)r3 + 0x60);
+    table[0] = *(u32*)(lbl_80266E80 + 0x0);
+    table[1] = *(u32*)(lbl_80266E80 + 0x4);
+    table[2] = *(u32*)(lbl_80266E80 + 0x8);
+    table[3] = *(u32*)(lbl_80266E80 + 0xC);
+
+    if ((ctx[0x1D] & 1) != 0) {
+        r4[0x67] = 0;
+        return 0;
+    }
+
+    if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
+        r4[0x67] = 0;
+        return 0;
+    }
+
+    switch ((s32)(u32)ctx[0x1C]) {
+    case 2:
+        value = (u32)fn_8012A5B0(0, 0xE, 0);
+        break;
+    case 3:
+        if (ctx + 0x20 != NULL) {
+            value = *(u32*)(ctx + 0x77C);
+        } else {
+            value = 0;
+        }
+        break;
+    default:
+        value = (u32)fn_8012A5B0(0, 0xE, 0);
+        break;
+    }
+
+    idx = lbl_804788F0 - 1;
+    limit = (u32*)(lbl_802E61D8 + idx * 4);
+    count = idx + 1;
+    if (idx >= 0) {
+        for (; count != 0; count--) {
+            if (*limit <= value) {
+                break;
+            }
+            limit--;
+            idx--;
+        }
+    }
+    if (idx < 0) {
+        idx = 0;
+    }
+    if (idx >= 4) {
+        idx = 3;
+    }
+
+    if ((s32)*(s16*)(r4 + 0x6) == (s32)table[idx]) {
+        r4[0x67] = 0xFF;
+    } else {
+        r4[0x67] = 0;
+    }
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_8002ACB8 - 0x8002ACB8 | size: 0x18c */
