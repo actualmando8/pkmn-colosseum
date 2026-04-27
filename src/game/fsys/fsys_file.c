@@ -917,7 +917,7 @@ u32 fn_8017C5A0(FSYSSlot* slot) {
 #endif
 
 /* 0x8017C5B8 | 0x128 */
-extern void fn_8017D68C();
+extern FSYSFileHandle* fn_8017D68C(FSYSSlot*);
 extern u32 fn_8017F928();
 extern void fn_80180694();
 extern u32 lbl_8047B1B8;
@@ -1037,7 +1037,7 @@ void fn_8017CE7C(void) { /* TODO: match -- 76 bytes at 0x8017CE7C */ }
 #endif
 
 /* 0x8017CED8 | 0x4C8 */
-extern void fn_8017D68C();
+extern FSYSFileHandle* fn_8017D68C(FSYSSlot*);
 extern void fn_8017FA5C(void);
 extern void fn_8017F800(void);
 extern void fn_80180450(void);
@@ -1095,12 +1095,76 @@ void fn_8017D624(void) { /* TODO: match -- 104 bytes at 0x8017D624 */ }
 /* 0x8017D68C | 0x174 */
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;
-#if 1
+#if 0
 asm void fn_8017D68C(void) {
 #include "src/game/fsys/fsys_file_fn_8017D68C.inc"
 }
 #else
-void fn_8017D68C(void) { /* TODO: match -- 372 bytes at 0x8017D68C */ }
+#pragma optimization_level 0
+FSYSFileHandle* fn_8017D68C(FSYSSlot* slot) {
+    FSYSFileHandle* table;
+    FSYSFileHandle* src;
+    FSYSFileHandle* dst;
+    FSYSFileHandle saved;
+    s32 foundIndex;
+    s32 i;
+    s32 handleID;
+
+    foundIndex = -1;
+    table = (FSYSFileHandle*)lbl_8047B1B8;
+    handleID = slot->field_08;
+    if (slot->field_10 & 0x40000000) {
+        return NULL;
+    }
+
+    i = 0;
+    while (i < 0x64) {
+        if (table->handleID == handleID) {
+            foundIndex = i;
+            memcpy(&saved, (void*)table, 8);
+            break;
+        }
+        table++;
+        i++;
+    }
+
+    if (foundIndex >= 0) {
+        table = (FSYSFileHandle*)lbl_8047B1B8;
+        i = 0;
+        while (i < (s32)lbl_8047B1BC - 1) {
+            if (i >= foundIndex) {
+                src = &table[i + 1];
+                dst = &table[i];
+                dst->handleID = src->handleID;
+                dst->userData = src->userData;
+            }
+            i++;
+        }
+        table[i].handleID = saved.handleID;
+        table[i].userData = saved.userData;
+        table = &table[i];
+    } else {
+        table = (FSYSFileHandle*)lbl_8047B1B8;
+        if ((s32)lbl_8047B1BC == 0x64) {
+            i = 0;
+            while (i < 0x63) {
+                src = &table[i + 1];
+                dst = &table[i];
+                dst->handleID = src->handleID;
+                dst->userData = src->userData;
+                i++;
+            }
+            lbl_8047B1BC = lbl_8047B1BC - 1;
+        }
+        i = lbl_8047B1BC;
+        lbl_8047B1BC = i + 1;
+        table = &((FSYSFileHandle*)lbl_8047B1B8)[i];
+        table->handleID = handleID;
+        table->userData = 0;
+    }
+
+    return table;
+}
 #endif
 
 /* 0x8017D800 | 0xF8 */
