@@ -1878,18 +1878,18 @@ u32 fn_8013308C(void) {
 }
 
 /* 0x801330C8 | 0x150 */
-extern void fn_800D88DC(void);
-extern void fn_800D888C(void);
-extern void fn_800D9B58(void);
-extern void fn_800DA4C4(void);
-extern void fn_800DA2BC(void);
-extern void fn_800DA1E8(void);
-extern void fn_800DA028(void);
-extern void fn_800D6A00(void);
-extern void fn_800D7820(void);
-extern void fn_800D67BC(void);
-extern void fn_800D6680(void);
-extern void fn_800D5CB8(void);
+extern void fn_800D88DC(u32);
+extern void fn_800D888C(u32);
+extern void fn_800D9B58(f32, f32, f32, f32);
+extern void fn_800DA4C4(u32, u32, u32);
+extern void fn_800DA2BC(u32, u32, u32);
+extern void fn_800DA1E8(u32, u32, u32);
+extern void fn_800DA028(u32);
+extern void fn_800D6A00(u32);
+extern void fn_800D7820(u32);
+extern void fn_800D67BC(u32);
+extern void fn_800D6680(f32, f32, f32);
+extern void fn_800D5CB8(u32, u32, u32, u32, u32);
 extern void fn_800D6728(void);
 extern f32 lbl_8047D0F0;
 extern f32 lbl_8047D0F4;
@@ -1899,125 +1899,32 @@ extern f32 lbl_8047D0FC;
 extern u8 lbl_80478AC4[];
 extern f32 lbl_8047D100;
 extern f32 lbl_8047D104;
-#if 1
+#if 0
 asm void fn_801330C8(void) {
 #include "src/game/effect/effect_util_fn_801330C8.inc"
 }
 #else
-void fn_801330C8(void) {
-    extern u8 lbl_80478AC0[];
-    extern u8 lbl_80478AC4[];
-    extern f32 lbl_8047D0F0;
-    extern f32 lbl_8047D0F4;
-    extern f32 lbl_8047D0F8;
-    extern f32 lbl_8047D0FC;
-    extern f32 lbl_8047D100;
-    extern f32 lbl_8047D104;
-    extern void fn_800D5CB8();
-    extern void fn_800D6680();
-    extern void fn_800D6728();
-    extern void fn_800D67BC();
-    extern void fn_800D6A00();
-    extern void fn_800D7820();
-    extern void fn_800D888C();
-    extern void fn_800D88DC();
-    extern void fn_800D9B58();
-    extern void fn_800DA028();
-    extern void fn_800DA1E8();
-    extern void fn_800DA2BC();
-    extern void fn_800DA4C4();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
-
-    r3 = 0x1;
-    fn_800D88DC();
-    r3 = 0x6;
-    fn_800D888C();
-    f1 = lbl_8047D0F0;
-    f3 = lbl_8047D0F4;
-    f2 = f1;
-    f4 = lbl_8047D0F8;
-    fn_800D9B58();
-    r3 = 0x0;
-    r4 = 0x6;
-    r5 = 0x7;
-    fn_800DA4C4();
-    r3 = 0x1;
-    r4 = 0x1;
-    r5 = 0x0;
-    fn_800DA2BC();
-    r3 = 0x0;
-    r4 = 0x1;
-    r5 = 0x1;
-    fn_800DA1E8();
-    r3 = 0x0;
-    fn_800DA028();
-    r3 = 0x4;
-    fn_800D6A00();
-    r3 = 0x0;
-    fn_800D7820();
-    r3 = 0x3;
-    fn_800D67BC();
-    r3 = (u32)lbl_80478AC0;
-    f1 = lbl_8047D0FC;
-    f0 = *(f32*)lbl_80478AC0;
-    f3 = lbl_8047D0F0;
-    f2 = -f0;
-    fn_800D6680();
-    r3 = 0x0;
-    r4 = 0xff;
-    r5 = 0x80;
-    r6 = 0x40;
-    r7 = 0x0;
-    fn_800D5CB8();
-    r3 = (u32)lbl_80478AC4;
-    f2 = lbl_8047D100;
-    f3 = lbl_8047D0F0;
-    f1 = *(f32*)lbl_80478AC4;
-    fn_800D6680();
-    r3 = 0x0;
-    r4 = 0x40;
-    r5 = 0xff;
-    r6 = 0x0;
-    r7 = 0x0;
-    fn_800D5CB8();
-    r3 = (u32)lbl_80478AC4;
-    f1 = lbl_8047D104;
-    f3 = lbl_8047D0F0;
-    f2 = *(f32*)lbl_80478AC4;
-    fn_800D6680();
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x40;
-    r6 = 0xff;
-    r7 = 0x0;
-    fn_800D5CB8();
-    r3 = (u32)lbl_80478AC0;
-    f1 = lbl_8047D0FC;
-    f0 = *(f32*)lbl_80478AC0;
-    f3 = lbl_8047D0F0;
-    f2 = -f0;
-    fn_800D6680();
-    r3 = 0x0;
-    r4 = 0xff;
-    r5 = 0x80;
-    r6 = 0x40;
-    r7 = 0x0;
-    fn_800D5CB8();
+u32 fn_801330C8(void) {
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D9B58(lbl_8047D0F0, lbl_8047D0F0, lbl_8047D0F4, lbl_8047D0F8);
+    fn_800DA4C4(0, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA1E8(0, 1, 1);
+    fn_800DA028(0);
+    fn_800D6A00(4);
+    fn_800D7820(0);
+    fn_800D67BC(3);
+    fn_800D6680(lbl_8047D0FC, -*(f32*)lbl_80478AC0, lbl_8047D0F0);
+    fn_800D5CB8(0, 0xFF, 0x80, 0x40, 0);
+    fn_800D6680(*(f32*)lbl_80478AC4, lbl_8047D100, lbl_8047D0F0);
+    fn_800D5CB8(0, 0x40, 0xFF, 0, 0);
+    fn_800D6680(lbl_8047D104, *(f32*)lbl_80478AC4, lbl_8047D0F0);
+    fn_800D5CB8(0, 0, 0x40, 0xFF, 0);
+    fn_800D6680(lbl_8047D0FC, -*(f32*)lbl_80478AC0, lbl_8047D0F0);
+    fn_800D5CB8(0, 0xFF, 0x80, 0x40, 0);
     fn_800D6728();
-    r3 = 0x0;
-    return;
+    return 0;
 }
 #endif
 
@@ -4374,7 +4281,7 @@ u32 fn_80136050(u32 index) {
 }
 
 /* 0x80136078 | 0xC4 */
-#if 0
+#if 1
 asm void fn_80136078(void) {
 #include "src/game/effect/effect_util_fn_80136078.inc"
 }
