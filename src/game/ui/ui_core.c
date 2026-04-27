@@ -451,7 +451,7 @@ void fn_800689FC(void);
 void fn_80068BB0(void);
 void fn_80068DBC(void);
 void fn_80068F84(void);
-void fn_80069048(void);
+u8 fn_80069048(void);
 void fn_8006905C(void);
 void fn_80069220(void);
 void fn_800693A4(void);
@@ -5293,7 +5293,7 @@ asm void fn_8005DFC8(void) {
 #else
 void fn_8005DFC8(void) {
     extern void fn_80060A28();
-    extern void fn_80069048();
+    extern u8 fn_80069048(void);
     extern void fn_800D3088();
     extern void fn_800D37CC();
     extern void fn_801080CC();
@@ -17612,14 +17612,9 @@ void fn_80068F84(void) {
 
 
 /* 0x80069048 | size: 0x14 */
-#if 1
-asm void fn_80069048(void) {
-#include "src/game/ui/ui_core_fn_80069048.inc"
+u8 fn_80069048(void) {
+    return *(volatile u8*)((u32)&lbl_803A9F08 + 0x10000 - 0x327C);
 }
-#else
-void fn_80069048(void) {
-}
-#endif
 
 /* 0x8006905C | size: 0x1C4 */
 #if 1
@@ -18433,4 +18428,3 @@ s32 fn_80069A08(s32 a, s32 b, s32 c, s32 d) {
     return 0;
 }
 #endif
-

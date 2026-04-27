@@ -366,9 +366,11 @@ void fn_801A6DDC(HSD_MObj* mobj, f32 val) {
     if (mobj == NULL) {
         return;
     }
-    if (mobj->mat == NULL) {
-        return;
+    if (mobj->mat != NULL) {
+        goto ok;
     }
+    return;
+ok:
     mobj->mat->alpha = val;
 }
 #endif
