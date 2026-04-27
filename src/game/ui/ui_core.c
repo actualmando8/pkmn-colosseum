@@ -17064,14 +17064,14 @@ void fn_80068418(u8* p, s32 v) {
 
 
 /* 0x80068738 | size: 0x5C */
-#if 1
+#if 0
 asm s32 fn_80068738(void) {
 #include "src/game/ui/ui_core_fn_80068738.inc"
 }
 #else
 #pragma push
-#pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
+#pragma peephole off
 s32 fn_80068738(void) {
     u8 *ptr;
     s32 i;
