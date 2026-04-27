@@ -725,12 +725,61 @@ extern void fn_801080CC(void*, s32);
 extern f32 lbl_8047B930;
 extern f32 lbl_8047B950;
 extern f32 lbl_8047B934;
-#if 1
+#if 0
 asm void fn_800280FC(void) {
 #include "src/game/gs_worldmap_fn_800280FC.inc"
 }
 #else
-void fn_800280FC(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma peephole off
+s32 fn_800280FC(void* r3) {
+    u8* r30;
+    u8* r31;
+    f32* fptr;
+    f32 f0;
+    f32 f1;
+    f32 f2;
+    s32 state;
+    s32 flag;
+    u8 one;
+    u8 stateByte;
+
+    r30 = (u8*)r3;
+    stateByte = *(volatile u8*)(r30 + 1);
+    r31 = *(u8**)(r30 + 0x60);
+    state = (s32)(s8)stateByte;
+    switch (state) {
+    case 0:
+        flag = (s32)(s8)*(volatile u8*)(r30 + 2);
+        if (flag == 0) {
+            fn_801080CC(*(void**)(r30 + 4), 0x56);
+            one = 1;
+            **(f32**)(r31 + 0x30) = lbl_8047B930;
+            r30[2] = one;
+        }
+        break;
+    case 2:
+        fptr = *(f32**)(r31 + 0x30);
+        f0 = lbl_8047B950;
+        f2 = *fptr;
+        f1 = lbl_8047B934;
+        f0 = f2 + f0;
+        *fptr = f0;
+        if (f0 >= f1) {
+            fptr = *(f32**)(r31 + 0x30);
+            *fptr = *fptr - f1;
+        }
+        break;
+    case 3:
+        flag = (s32)(s8)*(volatile u8*)(r30 + 2);
+        if (flag == 0) {
+            fn_801080CC(*(void**)(r30 + 4), 0x5a);
+            r30[2] = 1;
+        }
+        break;
+    }
+    return 0;
+}
 #endif
 
 /* fn_800281F0 - 0x800281F0 | size: 0x4 */
@@ -2264,4 +2313,3 @@ asm void fn_8002F79C(void) {
 #else
 void fn_8002F79C(void) { /* TODO */ }
 #endif
-
