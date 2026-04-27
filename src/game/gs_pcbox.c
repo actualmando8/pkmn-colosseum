@@ -5709,12 +5709,90 @@ extern void fn_8010206C();
 extern void fn_80102038();
 extern u32 lbl_8047B7B8;
 extern u32 lbl_8047B7C4;
-#if 1
+#if 0
 asm void fn_8001BAC4(void) {
 #include "src/game/gs_pcbox_fn_8001BAC4.inc"
 }
 #else
-void fn_8001BAC4(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+u32 fn_8001BAC4(u32 a0, u8 a1, u8 a2, u16 a3, u32 a4, u8 a5) {
+    extern u8 lbl_803A1D40[];
+    extern u32 fn_800D37CC(void);
+    extern void fn_8019075C();
+    extern void fn_800FF730();
+    extern void fn_8011288C();
+    extern void fn_800F0308();
+    extern void fn_8001B1EC();
+    s32 v;
+
+    *(u8*)(lbl_803A1D40 + 0x0) = a0;
+    *(u8*)(lbl_803A1D40 + 0x10) = a1;
+    *(u8*)(lbl_803A1D40 + 0x11) = a2;
+    *(u16*)(lbl_803A1D40 + 0x12) = a3;
+    *(u32*)(lbl_803A1D40 + 0xC) = a4;
+    *(u8*)(lbl_803A1D40 + 0x1) = a5;
+    *(u32*)(lbl_803A1D40 + 0x1C) = 0;
+    *(u8*)(lbl_803A1D40 + 0x15) = 1;
+
+    switch ((s32)(u8)a0) {
+    case 2:
+    case 4:
+        *(u32*)(lbl_803A1D40 + 0x8) = 1;
+        break;
+    case 3:
+    default:
+        *(u32*)(lbl_803A1D40 + 0x8) = 0;
+        break;
+    }
+
+    v = (s32)*(u8*)(lbl_803A1D40 + 0x0);
+    switch (v) {
+    case 2:
+        if ((u16)a3 != 0) {
+            *(u8*)(lbl_803A1D40 + 0x2) = 1;
+            *(u8*)(lbl_803A1D40 + 0x3) = 1;
+            goto BBDC;
+        }
+        *(u8*)(lbl_803A1D40 + 0x2) = 1;
+        *(u8*)(lbl_803A1D40 + 0x3) = 1;
+        *(u8*)(lbl_803A1D40 + 0x15) = 0;
+        goto BBDC;
+    case 1:
+        *(u8*)(lbl_803A1D40 + 0x2) = 1;
+        *(u8*)(lbl_803A1D40 + 0x3) = 0;
+        goto BC20;
+    case 3:
+    case 4:
+    case 5:
+        *(u8*)(lbl_803A1D40 + 0x2) = 0;
+        *(u8*)(lbl_803A1D40 + 0x3) = 0;
+        goto BC20;
+    default:
+        break;
+    }
+BBDC:
+    fn_8010206C(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
+    *(u8*)(lbl_803A1D40 + 0x2) = 1;
+    *(u8*)(lbl_803A1D40 + 0x3) = 2;
+BC20:
+    if (*(u8*)(lbl_803A1D40 + 0x2) == 1) {
+        fn_8019075C(1, 1);
+        fn_800FF730(0x38f);
+        if (*(u8*)(lbl_803A1D40 + 0x3) != 1) {
+            fn_8011288C(0, 0);
+        }
+        fn_800F0308();
+        if (*(u8*)(lbl_803A1D40 + 0x3) == 2) {
+            fn_80102038(*(f32*)&lbl_8047B7C4 / (f32)(u32)fn_800D37CC());
+        }
+    } else {
+        fn_8001B1EC(a0, (u16)a3, a4);
+    }
+    *(u8*)(lbl_803A1D40 + 0x4) = 1;
+    return *(u32*)(lbl_803A1D40 + 0x1C);
+}
+#pragma pop
 #endif
 
 /* fn_8001BCEC - 0x8001BCEC | size: 0x50 */
