@@ -798,7 +798,7 @@ extern void fn_800FE6DC(u32 taskId);
 extern void fn_800FE6F8(u32 taskId);
 extern void fn_800FE714(u32 taskId);
 extern void fn_800FE7A0(void);
-extern u32 fn_800FE834(u32 state, u8 priority, void* param, void* func);
+extern u32 fn_800FE834(s32 state, u8 priority, void* param, void* func);
 extern void fn_800FE9B0(u32 numTasks, u32 numQueues);
 extern void fn_800FEA74(void);
 
@@ -2649,18 +2649,20 @@ void fn_800FE7A0(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-#if 1
-asm u32 fn_800FE834(u32 state, u8 priority, void* param, void* func) {
+#if 0
+asm u32 fn_800FE834(s32 state, u8 priority, void* param, void* func) {
 #include "src/game/gs_thread_fn_800FE834.inc"
 }
 #else
 #pragma optimization_level 2
-u32 fn_800FE834(u32 state, u8 priority, void* param, void* func) {
+#pragma scheduling on
+u32 fn_800FE834(s32 state, u8 priority, void* param, void* func) {
     u8* task;
     u32 count;
     u32 i;
     u8* curr;
     u8* prev;
+    u8* next;
 
     if (state == 2) {
         task = (u8*)lbl_8047AC7C + lbl_8047AC80 * 0x18;
@@ -2669,12 +2671,19 @@ u32 fn_800FE834(u32 state, u8 priority, void* param, void* func) {
         task = (u8*)lbl_8047AC7C;
         count = lbl_8047AC80;
     }
-    for (i = count; i > 0; i--) {
-        if (*(u32*)(task + 0x8) == 0) goto found;
-        task += 0x18;
+    i = count;
+    if (i != 0) {
+        do {
+            if (*(s32*)(task + 0x8) == 0) goto found;
+            task += 0x18;
+            i--;
+        } while (i != 0);
     }
-    return 0;
+    task = NULL;
 found:
+    if (task == NULL) {
+        return 0;
+    }
     *(u32*)(task + 0x0) = 0;
     *(u32*)(task + 0x4) = 0;
     *(u32*)(task + 0x8) = state;
@@ -2686,16 +2695,18 @@ found:
         lbl_8047AC98 = (u32)task;
     } else {
         OSDisableInterrupts();
-        if (state == 2) {
+        if (*(s32*)(task + 0x8) == 2) {
             *(u32*)(task + 0x4) = lbl_8047AC9C;
             lbl_8047AC9C = (u32)task;
         } else {
             curr = (u8*)lbl_8047AC98;
-            while (*(u32*)(curr + 0x4) != 0) {
-                if (*(u8*)(curr + 0xC) >= priority) break;
-                curr = (u8*)*(u32*)(curr + 0x4);
+            for (;;) {
+                next = (u8*)*(u32*)(curr + 0x4);
+                if (next == NULL) break;
+                if ((u32)*(u8*)(curr + 0xC) >= (u32)*(u8*)(task + 0xC)) break;
+                curr = next;
             }
-            if (*(u32*)(curr + 0x4) == 0 && *(u8*)(curr + 0xC) < priority) {
+            if (next == NULL && (u32)*(u8*)(curr + 0xC) < (u32)*(u8*)(task + 0xC)) {
                 *(u32*)(task + 0x0) = (u32)curr;
                 *(u32*)(task + 0x4) = 0;
                 *(u32*)(curr + 0x4) = (u32)task;
