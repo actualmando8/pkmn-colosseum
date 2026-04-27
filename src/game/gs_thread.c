@@ -5152,12 +5152,13 @@ done:
 extern void __va_arg();
 extern u32 lbl_80478B00;
 #if 1
-asm void fn_800F6D18(void) {
+asm void* fn_800F6D18(void* callback, u32 arg, void* list) {
 #include "src/game/gs_thread_fn_800F6D18.inc"
 }
 #else
-void fn_800F6D18(void) {
+void* fn_800F6D18(void* callback, u32 arg, void* list) {
     /* TODO: match -- 848 bytes at 0x800F6D18 */
+    return 0;
 }
 #endif
 
@@ -5372,17 +5373,52 @@ u32 fn_800F7274(u16 key) {
     return 0;
 }
 #endif
-extern void fn_800FF560(void);
-extern void fn_800F07A8(void);
-extern void fn_800F0654(void);
+extern u32 fn_800FF560(void);
+extern void* fn_800F07A8(u32, u32, u32, u32, u32, void*);
+extern void fn_800F0654(void*, s32, ...);
 extern u8 lbl_80271294[];
 extern u8 lbl_80315668[];
-#if 1
-asm void fn_800F7318(void) {
+typedef struct ThreadVaList {
+    u8 gpr;
+    u8 fpr;
+    u16 padding;
+    u32* overflow_arg_area;
+    u32* reg_save_area;
+} ThreadVaList;
+typedef ThreadVaList ThreadVaListArray[1];
+#if 0
+asm u32 fn_800F7318(void) {
 #include "src/game/gs_thread_fn_800F7318.inc"
 }
 #else
-void fn_800F7318(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling on
+u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...) {
+    ThreadVaListArray list;
+    register void* listPtr;
+    u8* entry;
+    void* thread;
+    u32 current;
+
+    *(u32*)list = 0x06000000;
+    list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
+    list[0].reg_save_area = (u32*)((u8*)list - 0x60);
+    listPtr = list;
+    entry = fn_800F6D18(callback, r8, listPtr);
+    current = fn_800FF560();
+    if (entry == NULL) {
+        return 0;
+    }
+    thread = fn_800F07A8(r27, current, r28, 1, r29, fn_800F6BC4);
+    if (thread != NULL) {
+        *(void**)(entry + 0xC) = thread;
+        *(u32*)(entry + 0x10) = r30;
+        fn_800F0654(thread, 1, entry);
+    } else {
+        fn_800DD970((const char*)lbl_80271294, lbl_80315668);
+    }
+    return *(u16*)(entry + 0x6);
+}
 #endif
 #if 1
 asm void fn_800F7434(void) {
