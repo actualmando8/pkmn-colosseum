@@ -2872,7 +2872,7 @@
     "function": "fn_8017C1D8",
     "description": "Match fn_8017C1D8 in fsys_file.c (124 asm lines, tier=codex)",
     "priority": "high",
-    "status": "claimed",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
     "completed_at": null,
@@ -2885,6 +2885,11 @@
       "file_pct": 16.1,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 89.2,
+      "model": "codex/gpt-5.5",
+      "reason": "sub-90"
     }
   },
   {
@@ -3164,10 +3169,13 @@
     "function": "fn_80039644",
     "description": "Match fn_80039644 in scene_init.c (185 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "opus-sub-18",
+    "claimed_at": "2026-04-27T16:50:00Z",
     "completed_at": null,
+    "failed_at": "2026-04-27T17:30:00Z",
+    "failed_reason": "opus-sub-18: peaked 81.9% in 5 iter; CW inlines fn_80143C68/fn_80143C50 calls inside the alive-entry walk instead of post-loop null-check pattern target uses. Reg alloc shifts r19+ vs target r18+ (target uses 14 regs r18-r31, mine 13 r19-r31). Add operand swap and lbl_8047A4BC cmpwi/cmplwi could not be coerced. Reverted.",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3184,10 +3192,10 @@
     "function": "fn_8004E510",
     "description": "Match fn_8004E510 in scene_init.c (186 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-19",
+    "completed_at": "2026-04-27T17:18:45Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3196,7 +3204,8 @@
       "line_number": 4599,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "match_pct": 91.2
     }
   },
   {
@@ -4114,10 +4123,10 @@
     "function": "fn_801A426C",
     "description": "Match fn_801A426C in hsd_lobj.c (67 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T17:06:54Z",
     "meta": {
       "file": "src/hsd/hsd_lobj.c",
       "stem": "hsd_lobj",
@@ -4127,6 +4136,10 @@
       "file_pct": 28.6,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 100.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -4134,9 +4147,9 @@
     "function": "fn_801A4344",
     "description": "Match fn_801A4344 in hsd_lobj.c (72 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/hsd/hsd_lobj.c",

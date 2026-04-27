@@ -4671,12 +4671,116 @@ s32 fn_8004E440(u8* ctx, u8* p) {
 extern u8 fn_8017B07C();
 extern f32 lbl_8047BE48;
 extern f32 lbl_8047BE4C;
-#if 1
+#if 0
 asm void fn_8004E510(void) {
 #include "src/game/scene_init_fn_8004E510.inc"
 }
 #else
-void fn_8004E510(void) { /* TODO */ }
+s32 fn_8004E510(u8* ctx, u8* p) {
+    u8* subctx;
+    u32 obj;
+    u32 obj2;
+    u32 obj3;
+    u32 r25;
+    s32 count;
+    s32 count2;
+    s32 i;
+    s32 total;
+    s32 total2;
+    u32 r31;
+    u32 r23;
+    u32 ptr;
+    s32 ok;
+
+    subctx = *(u8**)(ctx + 0x60);
+    ptr = *(u32*)(subctx + 4);
+    if (fn_8017B2CC(fn_801D16F0(ptr)) == 1) {
+        ok = 0;
+    } else {
+        ok = 1;
+    }
+    if (ok != 0) {
+        obj = fn_801D16F0(ptr);
+        total = fn_8017B448();
+        count = 0;
+        i = 0;
+        while (i < total) {
+            fn_8017B4BC(obj, i);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+            i++;
+        }
+    } else {
+        count = -1;
+    }
+    if (count <= 0) {
+        return 0;
+    }
+    r25 = *(u32*)(*(u32*)(subctx + 8));
+    ptr = *(u32*)(subctx + 4);
+    if (fn_8017B2CC(fn_801D16F0(ptr)) == 1) {
+        ok = 0;
+    } else {
+        ok = 1;
+    }
+    if (ok != 0) {
+        obj2 = fn_801D16F0(ptr);
+        total2 = fn_8017B448();
+        count2 = 0;
+        i = 0;
+        while (i < total2) {
+            fn_8017B4BC(obj2, i);
+            if (fn_8017B5A4() == 9) {
+                count2++;
+            }
+            i++;
+        }
+    } else {
+        count2 = -1;
+    }
+    if (count2 <= (s32)r25) {
+        r31 = -1;
+    } else {
+        obj3 = fn_801D16F0(ptr);
+        count = 0;
+        i = 0;
+        while (i < total2) {
+            r31 = fn_8017B4BC(obj3, i);
+            if (fn_8017B5A4() == 9) {
+                if ((u32)count >= r25) break;
+                count++;
+            }
+            i++;
+        }
+    }
+    if (r31 == -1) {
+        return 0;
+    }
+    if (fn_801D16F0(*(u32*)(subctx + 4)) == 0) {
+        return 0;
+    }
+    if (fn_8017B07C(/* r3 */ 0, r31) == 0) {
+        return 0;
+    }
+    r23 = fn_800F92D4(r31);
+    if (r23 == 0) {
+        return 0;
+    }
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    fn_800D85D4(0, r23);
+    fn_800D6A00(7);
+    fn_800D67BC(2);
+    fn_800D61E4(0, 0);
+    fn_800D5BA0(0, -1);
+    fn_800D59B8(0, lbl_8047BE48, lbl_8047BE48);
+    fn_800D61E4(*(s16*)(p + 0x54), *(s16*)(p + 0x56));
+    fn_800D5BA0(0, -1);
+    fn_800D59B8(0, lbl_8047BE4C, lbl_8047BE4C);
+    fn_800D6728();
+    return 0;
+}
 #endif
 
 /* fn_8004E790 - 0x8004E790 | size: 0x10c */
