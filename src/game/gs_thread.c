@@ -5524,10 +5524,82 @@ u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...)
     return *(u16*)(entry + 0x6);
 }
 #endif
-#if 1
-asm void fn_800F7434(void) {
+#if 0
+asm u32 fn_800F7434(void* callback, u32 arg, ...) {
 #include "src/game/gs_thread_fn_800F7434.inc"
 }
 #else
-void fn_800F7434(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling on
+u32 fn_800F7434(void* callback, u32 arg, ...) {
+    ThreadVaListArray list;
+    register void* listPtr;
+    u8* entry;
+    u8* strBase;
+    u8* ip;
+    u32 state;
+    u32 opcode;
+    void (*dispatch)(void*);
+    u32 count;
+    volatile u32 ret;
+    volatile u32 val;
+    u32 delay;
+
+    strBase = lbl_80271068;
+    *(u32*)list = 0x02000000;
+    list[0].overflow_arg_area = (u32*)((u8*)list + 0x28);
+    list[0].reg_save_area = (u32*)((u8*)list - 0x68);
+    listPtr = list;
+    entry = fn_800F6D18(callback, arg, listPtr);
+    if (entry == NULL) {
+        return 0;
+    }
+
+    for (;;) {
+        state = (u32)*(u8*)(entry + 0x4);
+        if (state == 0) {
+            fn_800DD970((const char*)(strBase + 0x120), *(u32*)(entry + 0x8));
+            goto done;
+        }
+        if (state == 3) {
+            *(u8*)(entry + 0x4) = 0;
+            goto done;
+        }
+        ip = (u8*)*(u32*)(entry + 0x14);
+        *(u32*)(entry + 0x14) = (u32)(ip + 1);
+        opcode = (u32)*ip;
+        if (opcode >= 0x26) {
+            fn_800DD38C((const char*)(strBase + 0x150));
+        } else {
+            dispatch = (void (*)(void*))*(u32*)((u8*)lbl_803155D0 + (opcode & 0xFF) * 4);
+            if (dispatch != NULL) {
+                dispatch(entry);
+            }
+        }
+        delay = *(u32*)(entry + 0x28);
+        if ((s32)delay > 0) {
+            for (delay--; (s32)delay >= 0; delay--) {
+            }
+        }
+    }
+done:
+    if (*(u8*)(entry + 0x4) == 4) {
+        *(u8*)(entry + 0x4) = 0;
+    }
+    count = *(u32*)(entry + 0x28);
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)(strBase + 0x14));
+        val = *(u32*)(entry + 0x6C);
+    } else {
+        count--;
+        *(u32*)(entry + 0x28) = count;
+        val = *(u32*)(entry + 0x6C + count * 4);
+    }
+    {
+        void (*cb)(void*, u32) = (void (*)(void*, u32))*(u32*)(entry + 0x10);
+        ret = val;
+        if (cb != NULL) cb(entry, val);
+    }
+    return ret;
+}
 #endif
