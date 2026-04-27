@@ -4975,7 +4975,7 @@ s32 fn_800F67C8(void* obj) {
 
 /* 0x800F694C | 0x168 */
 extern u8 lbl_8027115C[];
-#if 1
+#if 0
 asm s32 fn_800F694C(void* obj) {
 #include "src/game/gs_thread_fn_800F694C.inc"
 }
@@ -4985,44 +4985,45 @@ s32 fn_800F694C(void* obj) {
     u8* p;
     u8* ptr;
     u32 funcIdx;
-    u16 argCount;
-    u16 stackBase;
-    u32 count;
+    u32 argCount;
+    u32 stackBase;
+    s32 count;
+    u32 value;
     u8* head;
 
     p = (u8*)obj;
-    ptr = (u8*)*(u32*)(p + 0x14);
+    ptr = (u8*)*(volatile u32*)(p + 0x14);
     funcIdx = *(u32*)ptr;
-    ptr += 4;
-    *(u32*)(p + 0x14) = (u32)ptr;
+    *(volatile u32*)(p + 0x14) = (u32)(ptr + 4);
+    ptr = (u8*)*(volatile u32*)(p + 0x14);
     argCount = *(u16*)ptr;
-    ptr += 2;
-    *(u32*)(p + 0x14) = (u32)ptr;
+    *(volatile u32*)(p + 0x14) = (u32)(ptr + 2);
+    ptr = (u8*)*(volatile u32*)(p + 0x14);
     stackBase = *(u16*)ptr;
-    ptr += 2;
-    *(u32*)(p + 0x14) = (u32)ptr;
+    *(volatile u32*)(p + 0x14) = (u32)(ptr + 2);
 
     /* Push current ptr (return address) */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
+    value = *(u32*)(p + 0x14);
     if (count > 0x40) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
-        ptr = (u8*)*(u32*)(p + 0x14);
         *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = (u32)ptr;
+        *(u32*)(p + 0x6C + count * 4) = value;
     }
 
     /* Push obj->0x1C */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
+    value = *(u32*)(p + 0x1C);
     if (count > 0x40) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
         *(u32*)(p + 0x28) = count + 1;
-        *(u32*)(p + 0x6C + count * 4) = *(u32*)(p + 0x1C);
+        *(u32*)(p + 0x6C + count * 4) = value;
     }
 
     /* Push stackBase (argCount) */
-    count = *(u32*)(p + 0x28);
+    count = *(s32*)(p + 0x28);
     if (count > 0x40) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
