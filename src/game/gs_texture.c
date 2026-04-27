@@ -1223,7 +1223,7 @@ void fn_800F015C(void) {
 }
 #endif
 extern u32 lbl_8047AC1C;
-#if 1
+#if 0
 asm void fn_800F01F0(void) {
 #include "src/game/gs_texture_fn_800F01F0.inc"
 }
@@ -1234,14 +1234,42 @@ asm void fn_800F01F0(void) {
  * Loads lbl_8047AC1C (GSThreadCtx*), adds 0x88 to get to the FPR
  * save area, then stores f0-f31 (stfd, 8 bytes each) to offsets
  * +0x0 through +0xF8.
- *
- * Cannot be matched in C -- touches all FPRs directly.
  */
-void fn_800F01F0(void) {
+void fn_800F01F0(u32 arg) {
     GSThreadCtx* ctx = (GSThreadCtx*)lbl_8047AC1C;
-    ctx->f[0] = 0.0;
-    /* ... f1-f31 ... */
-    ctx->f[31] = 0.0;
+    f64 src = *(f64*)&arg;
+    ctx->f[0]  = src;
+    ctx->f[1]  = src;
+    ctx->f[2]  = src;
+    ctx->f[3]  = src;
+    ctx->f[4]  = src;
+    ctx->f[5]  = src;
+    ctx->f[6]  = src;
+    ctx->f[7]  = src;
+    ctx->f[8]  = src;
+    ctx->f[9]  = src;
+    ctx->f[10] = src;
+    ctx->f[11] = src;
+    ctx->f[12] = src;
+    ctx->f[13] = src;
+    ctx->f[14] = src;
+    ctx->f[15] = src;
+    ctx->f[16] = src;
+    ctx->f[17] = src;
+    ctx->f[18] = src;
+    ctx->f[19] = src;
+    ctx->f[20] = src;
+    ctx->f[21] = src;
+    ctx->f[22] = src;
+    ctx->f[23] = src;
+    ctx->f[24] = src;
+    ctx->f[25] = src;
+    ctx->f[26] = src;
+    ctx->f[27] = src;
+    ctx->f[28] = src;
+    ctx->f[29] = src;
+    ctx->f[30] = src;
+    ctx->f[31] = src;
 }
 #endif
 extern u32 lbl_8047AC18;
