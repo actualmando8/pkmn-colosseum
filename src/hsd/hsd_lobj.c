@@ -209,12 +209,32 @@ static void LObjInfoInit(void)
 extern u32 lbl_8047B2B0;
 extern u8 lbl_8036CA20[];
 extern u32 lbl_8047B2B4;
-#if 1
+#if 0
 asm void fn_801A4098(void) {
 #include "src/hsd/hsd_lobj_fn_801A4098.inc"
 }
 #else
-void fn_801A4098(void) {}
+#pragma push
+#pragma peephole off
+extern u32 lbl_8047B2B0;
+extern u32 lbl_8047B2B4;
+extern u8 lbl_8036CA20[];
+extern void fn_801C25E4(void);
+void fn_801A4098(void* param) {
+    if (param == (void*)lbl_8047B2B0) {
+        lbl_8047B2B0 = 0;
+    }
+    if (param == (void*)lbl_8036CA20) {
+        lbl_8047B2B4 = 0;
+    }
+    {
+        void* ptr = (void*)lbl_8036CA20;
+        void* vtable = *(void**)((u8*)ptr + 0x14);
+        void (*func)(void) = *(void(**)(void))((u8*)vtable + 0x38);
+        func();
+    }
+}
+#pragma pop
 #endif
 
 /* 0x801A40F8 | 0x174 */
@@ -308,22 +328,23 @@ void fn_801A48F4(HSD_LObj* lobj, void* desc) {
 #endif
 
 /* 0x801A497C | 0x44 */
-#if 1
+#if 0
 asm void fn_801A497C(void) {
 #include "src/hsd/hsd_lobj_fn_801A497C.inc"
 }
 #else
-#pragma optimization_level 4
-/* HSD_LObjGetPositionPosition */
+#pragma push
+#pragma peephole off
 s32 fn_801A497C(HSD_LObj* lobj) {
     if (lobj != NULL) {
-        if (lobj->position != NULL) {
-            fn_80191688(lobj->position);
+        if (*(u32*)((u8*)lobj + 0x18) != 0) {
+            fn_80191688(*(void**)((u8*)lobj + 0x18));
             return 1;
         }
     }
     return 0;
 }
+#pragma pop
 #endif
 
 /* 0x801A49C0 | 0x88 */
