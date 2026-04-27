@@ -2153,16 +2153,82 @@ s32 fn_8002BCE8(void* r3, u8* r4) {
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c */
 extern void fn_80143F84(void);
-extern f32 lbl_8047B980;
 extern f32 lbl_8047B9B8;
 extern f32 lbl_8047B9BC;
 extern u32 lbl_8047A3E4;
-#if 1
+#if 0
 asm void fn_8002BE08(void) {
 #include "src/game/gs_worldmap_fn_8002BE08.inc"
 }
 #else
-void fn_8002BE08(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+u32 fn_8002BE08(u8* arg0) {
+    u8* ctx;
+    u16* state;
+    s32 sum;
+    u32 r3val;
+    s32 limit;
+
+    ctx = *(u8**)(arg0 + 0x60);
+    state = fn_80105624();
+    if (lbl_8047B980 != *(f32*)(*(u32*)(ctx + 0xc))) {
+        return 0;
+    }
+    limit = *(s32*)(ctx + 0x8) + 1;
+    if ((state[2] | state[4]) & 0x2) {
+        ++arg0[0x95];
+        if ((s32)((s8)arg0[0x95] + (s8)arg0[0x94]) >= limit) {
+            --arg0[0x95];
+        } else {
+            if ((s8)arg0[0x95] >= 0xa) {
+                ++arg0[0x94];
+                --arg0[0x95];
+                *(s32*)(*(u32*)(ctx + 0x14)) = 1;
+            } else {
+                *(s32*)(*(u32*)(ctx + 0x14)) = 0;
+            }
+            *(f32*)(*(u32*)(ctx + 0xc)) = lbl_8047B9B8;
+        }
+    }
+    if ((state[2] | state[4]) & 0x1) {
+        if ((s8)arg0[0x95] > 0 || (s8)arg0[0x94] > 0) {
+            s32 t = (s8)(arg0[0x95] - 1);
+            arg0[0x95] = (u8)t;
+            if (t < 0) {
+                arg0[0x95] = 0;
+                --arg0[0x94];
+                *(s32*)(*(u32*)(ctx + 0x14)) = 1;
+            } else {
+                *(s32*)(*(u32*)(ctx + 0x14)) = 0;
+            }
+            *(f32*)(*(u32*)(ctx + 0xc)) = lbl_8047B9BC;
+        }
+    }
+    sum = (s32)(s8)arg0[0x94] + (s32)(s8)arg0[0x95];
+    if (sum < 0 || sum >= *(s32*)(ctx + 0x8)) {
+        r3val = 0;
+    } else {
+        r3val = ((u16*)(*(u32*)(ctx + 0x4)))[sum];
+    }
+    if ((u16)r3val != 0) {
+        fn_801440A0((u16)r3val);
+        fn_80143F84();
+    } else {
+        u8 b = ctx[0x1c];
+        if (b == 0 || b == 1) {
+            r3val = 0x2b2d;
+        } else if (ctx[0x1d] & 1) {
+            r3val = 0x2b46;
+        } else {
+            r3val = 0x2b37;
+        }
+    }
+    lbl_8047A3E4 = r3val;
+    return 0;
+}
+#pragma pop
 #endif
 
 /* fn_8002C014 - 0x8002C014 | size: 0xd0 */
