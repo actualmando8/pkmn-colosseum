@@ -753,7 +753,7 @@ extern void fn_800D7A70(u32);
 extern void fn_800DA6F0(void);
 extern void fn_800DA880(void);
 extern void fn_800DB098(void);
-extern void fn_800DB758(void);
+extern void fn_800DB758(u32);
 extern void fn_800DD128(u8*);
 extern void fn_800DE09C(void);
 extern void fn_800DE128(void);
@@ -2698,12 +2698,65 @@ asm void fn_800DB098(void) {
 void fn_800DB098(void) { /* TODO */ }
 #endif
 extern void jumptable_80315364();
-#if 1
+#if 0
 asm void fn_800DB758(void) {
 #include "src/game/gs_render_fn_800DB758.inc"
 }
 #else
-void fn_800DB758(void) { /* TODO */ }
+void fn_800DB758(u32 vertCount)
+{
+    u32 state;
+    u32 obj;
+    u8* p;
+
+    state = lbl_8047AA80;
+    if (*(s32*)(state + 0x488) == 7) {
+        vertCount = (vertCount & 0x7FFF) << 1;
+    }
+
+    obj = *(u32*)(state + 0x480);
+    fn_800D6A80(vertCount, *(u32*)(state + 0x488),
+                (u32*)(obj + 0x10), (u32*)(obj + 0x14));
+
+    state = lbl_8047AA80;
+    switch (*(u32*)(state + 0x488)) {
+        case 0:
+            *(u8*)*(u32*)(state + 0x484) = 0xB8;
+            break;
+        case 1:
+            *(u8*)*(u32*)(state + 0x484) = 0xA8;
+            break;
+        case 2:
+            *(u8*)*(u32*)(state + 0x484) = 0xB0;
+            break;
+        case 3:
+            *(u8*)*(u32*)(state + 0x484) = 0x90;
+            break;
+        case 4:
+            *(u8*)*(u32*)(state + 0x484) = 0x98;
+            break;
+        case 5:
+            *(u8*)*(u32*)(state + 0x484) = 0xA0;
+            break;
+        case 6:
+        case 7:
+            *(u8*)*(u32*)(state + 0x484) = 0x80;
+            break;
+    }
+
+    state = lbl_8047AA80;
+    p = *(u8**)(state + 0x484);
+    *(u32*)(state + 0x484) = (u32)(p + 1);
+    obj = *(u32*)(state + 0x480);
+    *p |= *(u8*)(*(u32*)(obj + 0xC) + 7);
+
+    state = lbl_8047AA80;
+    p = *(u8**)(state + 0x484);
+    *(u16*)p = (u16)vertCount;
+    p += 2;
+    state = lbl_8047AA80;
+    *(u32*)(state + 0x484) = (u32)p;
+}
 #endif
 #if 0
 asm void fn_800DB900(void) {
@@ -3287,12 +3340,93 @@ extern void fn_801A4D20(void);
 extern void fn_801A4F54(void);
 extern u32 lbl_8047AAEC;
 extern u32 lbl_8047AAF0;
-#if 1
+#if 0
 asm void fn_800DD174(void) {
 #include "src/game/gs_render_fn_800DD174.inc"
 }
 #else
-void fn_800DD174(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+void fn_800DD174(void* arg) {
+    extern void fn_801A4B00(s32);
+    extern void fn_801A4D20(void*);
+    extern void fn_801A4F54(void*);
+    extern u32 lbl_8047AAEC;
+    extern u32 lbl_8047AAF0;
+    u32 r3;
+    u32 r4;
+    u32 r5;
+    u32 r6;
+    u32 r7;
+    u32 r8;
+    u32 r0;
+
+    fn_801A4B00(0);
+    {
+        r5 = lbl_8047AAEC;
+        r3 = 0;
+        r0 = lbl_8047AAF0;
+        r4 = r5;
+        for (;;) {
+            if ((s32)r0 <= 0) break;
+            r0--;
+            {
+                u8 tmp0 = ((u8*)r4)[0];
+                if (tmp0 == 1) {
+                    u8 tmp1 = ((u8*)r4)[1];
+                    if (tmp1 != 0) {
+                        goto FOUND;
+                    }
+                }
+            }
+            r4 += 0x74;
+            r3++;
+        }
+    }
+    r3 = -1;
+FOUND:
+    if ((s32)r3 != -1) {
+        r6 = r3 * 0x74;
+        r7 = r3 + 1;
+        r4 = r7 * 0x74;
+        r5 = r5 + r6;
+        goto LOOP2_CHECK;
+        do {
+            {
+                r0 = lbl_8047AAEC;
+                r8 = r0 + r4;
+                {
+                    u8 tmp0 = ((u8*)r8)[0];
+                    if (tmp0 == 1) {
+                        u8 tmp1 = ((u8*)r8)[1];
+                        if (tmp1 != 0) {
+                            r3 = *(u32*)(r5 + 0xc);
+                            r5 = r8;
+                            r0 = *(u32*)(r8 + 0xc);
+                            *(u32*)(r3 + 0xc) = r0;
+                        }
+                    }
+                }
+            }
+            r4 += 0x74;
+            r7++;
+        LOOP2_CHECK:
+            r0 = lbl_8047AAF0;
+        } while (r7 < r0);
+        {
+            r3 = *(u32*)(r5 + 0xc);
+            r0 = 0;
+            *(u32*)(r3 + 0xc) = r0;
+            r0 = lbl_8047AAEC;
+            r3 = r0 + r6;
+            r3 = *(u32*)(r3 + 0xc);
+            fn_801A4D20((void*)r3);
+        }
+    }
+    fn_801A4F54(arg);
+}
+#pragma pop
 #endif
 extern u32 lbl_8047AAF8;
 extern u32 lbl_8047AB08;
@@ -4078,12 +4212,33 @@ asm void fn_800E076C(void) {
 #else
 void fn_800E076C(f32* dst, f32* src) { dst[0] = src[0]; dst[1] = src[1]; dst[2] = src[2]; dst[3] = src[3]; }
 #endif
-#if 1
+#if 0
 asm void fn_800E0790(void) {
 #include "src/game/gs_render_fn_800E0790.inc"
 }
 #else
-void fn_800E0790(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800E0790(void) {
+    __asm {
+        li r3, 0x4
+        stw r0, 0x14(r1)
+        oris r3, r3, 0x4
+        mtspr GQR2, r3
+        li r3, 0x5
+        oris r3, r3, 0x5
+        mtspr GQR3, r3
+        li r3, 0x6
+        oris r3, r3, 0x6
+        mtspr GQR4, r3
+        li r3, 0x7
+        oris r3, r3, 0x7
+        mtspr GQR5, r3
+    }
+    fn_800E0C78();
+    fn_800E0D24();
+}
+#pragma pop
 #endif
 extern u32 lbl_8047CAE4;
 extern u32 lbl_8047CAE0;
