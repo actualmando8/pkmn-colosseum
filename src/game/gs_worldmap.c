@@ -799,7 +799,7 @@ extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_80106D3C(void);
 extern void fn_8001E074(void);
-extern void fn_801069FC(void);
+extern void fn_801069FC(s32);
 extern void fn_80102510(void);
 extern void fn_80102428(void);
 extern f32 lbl_8047B930;
@@ -1389,7 +1389,7 @@ void fn_80029EF4(void* r3, s32 r4, s32 r5, u8 r6, void* r7) {
 #endif
 
 /* fn_80029FAC - 0x80029FAC | size: 0x10c */
-extern void __va_arg();
+extern void* __va_arg(void*, s32);
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E4C;
 #if 1
@@ -1412,15 +1412,58 @@ void fn_8002A0B8(void) { /* TODO */ }
 #endif
 
 /* fn_8002A1C4 - 0x8002A1C4 | size: 0x108 */
-extern void fn_80106ADC(void);
+extern void fn_80106ADC(s32, u32, s32, s32, u8);
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E4C;
-#if 1
+typedef struct WorldMapVaList {
+    u8 gpr;
+    u8 fpr;
+    u16 padding;
+    u32* overflow_arg_area;
+    u32* reg_save_area;
+} WorldMapVaList;
+typedef WorldMapVaList WorldMapVaListArray[1];
+#if 0
 asm void fn_8002A1C4(void) {
 #include "src/game/gs_worldmap_fn_8002A1C4.inc"
 }
 #else
-void fn_8002A1C4(void) { /* TODO */ }
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+void fn_8002A1C4(s32 r3, s32 r4, s32 r5, ...) {
+    WorldMapVaListArray list;
+    s32 r31;
+    s32 r30;
+    s32 r29;
+    u8* r28;
+    u8* map;
+    s32 idx;
+    u8 r27;
+
+    *(u32*)list = 0x03000000;
+    list[0].overflow_arg_area = (u32*)((u8*)list + 0x30);
+    list[0].reg_save_area = (u32*)((u8*)list - 0x60);
+    idx = r3 << 2;
+    map = (u8*)lbl_80478E54;
+    r31 = r4 << 2;
+    r28 = (u8*)lbl_80478E4C + map[idx] * 0x4c;
+    r27 = r28[0];
+    r28 += 4;
+    r30 = 1;
+    while (r5 >= 0) {
+        if (r30 != 0) {
+            r29 = r5;
+            r30 = 0;
+        } else {
+            r30 = 1;
+            fn_80132A38(r29, (void*)r5);
+        }
+        r5 = *(s32*)__va_arg(list, 1);
+    }
+    fn_80106ADC(2, *(u32*)(r28 + r31), 1, 0, r27);
+    fn_801069FC(1);
+}
 #endif
 
 /* fn_8002A2CC - 0x8002A2CC | size: 0x108 */
