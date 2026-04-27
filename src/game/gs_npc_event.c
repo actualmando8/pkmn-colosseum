@@ -635,13 +635,13 @@ extern void fn_8002F284(void);
 extern void fn_8002EE74(void);
 extern void fn_80103CC0(void);
 extern void fn_80102004(void);
-extern void fn_80106D3C(void);
+extern void fn_80106D3C(s32, s32, s32, s32);
 extern void fn_8002EA5C(void);
 extern void fn_8002E460(void);
 extern void fn_8010264C(void);
 extern void fn_8010A5BC(void);
 extern void fn_80109C88(void);
-extern void fn_801069FC(void);
+extern void fn_801069FC(s32);
 extern void fn_8002E26C(void);
 extern void fn_8010A420(void);
 extern void fn_8011D904(void);
@@ -1160,8 +1160,10 @@ void fn_80032564(void) {
 #endif
 
 /* 0x8003258C | 0x270 */
-extern void fn_80166AB8(void);
-extern void fn_801293FC(void);
+extern void fn_80166AB8(s32, s32, s32);
+extern void fn_801293FC(s32, s32);
+extern void fn_80106D3C(s32, s32, s32, s32);
+extern void fn_801069FC(s32);
 extern void jumptable_802E4FE0();
 extern u32 lbl_8047A450;
 extern u32 lbl_8047A458;
@@ -1173,11 +1175,13 @@ asm void fn_8003258C(void) {
 #include "src/game/gs_npc_event_fn_8003258C.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_8003258C(void) {
     s32 ctr;
     s32 r31;
 
-    if (lbl_8047A450 != (u32)-1) {
+    if ((s32)lbl_8047A450 != -1) {
         lbl_8047A450 = lbl_8047A450 + 1;
     }
     ctr = (s32)lbl_8047A450;
@@ -1188,67 +1192,67 @@ void fn_8003258C(void) {
     if (lbl_8047A44A != 0) {
         lbl_8047A44A = 0;
         if ((u32)ctr < 0x1e) {
-            switch (ctr) {
-            case 9:
+            switch (ctr - 6) {
+            case 3:
                 r31 = 0x4b0;
                 break;
-            case 18:
+            case 12:
                 r31 = 0x960;
                 break;
-            case 24:
+            case 18:
                 r31 = 0x12c0;
                 break;
+            case 0:
+            case 1:
+            case 2:
+            case 4:
+            case 5:
             case 6:
             case 7:
             case 8:
+            case 9:
             case 10:
             case 11:
-            case 12:
             case 13:
             case 14:
             case 15:
             case 16:
             case 17:
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-            case 23:
                 r31 = 0x258;
                 break;
             default:
                 r31 = 0x258;
                 break;
             }
-            ((void (*)(s32, s32, s32))fn_80166AB8)(0x3cc, 0, 0);
-            ((void (*)(s32, s32))fn_801293FC)(0, r31);
+            fn_80166AB8(0x3cc, 0, 0);
+            fn_801293FC(0, r31);
             fn_80132A38(0x2f, r31);
-            ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b60, 1, 0);
-            ((void (*)(s32))fn_801069FC)(1);
+            fn_80106D3C(8, 0x3b60, 1, 0);
+            fn_801069FC(1);
         } else {
             switch (ctr) {
             case 0x1e:
-                ((void (*)(s32, s32, s32))fn_80166AB8)(0x3cc, 0, 0);
-                ((void (*)(s32, s32))fn_801293FC)(0, 0x2580);
+                fn_80166AB8(0x3cc, 0, 0);
+                fn_801293FC(0, 0x2580);
                 fn_80132A38(0x2f, 0x2580);
-                ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b8c, 1, 0);
-                ((void (*)(s32))fn_801069FC)(1);
+                fn_80106D3C(8, 0x3b8c, 1, 0);
+                fn_801069FC(1);
                 break;
             case 0x3c:
-                ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b8f, 1, 0);
-                ((void (*)(s32))fn_801069FC)(1);
+                fn_80106D3C(8, 0x3b8f, 1, 0);
+                fn_801069FC(1);
                 break;
             case 0x5a:
-                ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b53, 1, 0);
-                ((void (*)(s32))fn_801069FC)(1);
+                fn_80106D3C(8, 0x3b53, 1, 0);
+                fn_801069FC(1);
                 break;
             case 0x78:
-                ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b56, 1, 0);
-                ((void (*)(s32))fn_801069FC)(1);
+                fn_80106D3C(8, 0x3b56, 1, 0);
+                fn_801069FC(1);
                 break;
             case 0x96:
-                ((void (*)(s32, s32, s32, s32))fn_80106D3C)(8, 0x3b59, 1, 0);
-                ((void (*)(s32))fn_801069FC)(1);
+                fn_80106D3C(8, 0x3b59, 1, 0);
+                fn_801069FC(1);
                 break;
             }
         }
@@ -1271,6 +1275,7 @@ void fn_8003258C(void) {
     }
     lbl_8047A458 = 5;
 }
+#pragma pop
 #endif
 
 /* 0x800327FC | 0x6DC */
@@ -2137,83 +2142,69 @@ extern void fn_8011E778(void);
 extern void fn_8011E760(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
-#if 1
+#if 0
 asm void fn_800308D4(void) {
 #include "src/game/gs_npc_event_fn_800308D4.inc"
 }
 #else
-void fn_800308D4(void) { /* TODO */ }
-#endif
-
-/* fn_80030A44 - 0x80030A44 | size: 0x1d0 */
-extern u32 lbl_8047A424;
-extern u32 lbl_8047A420;
-#if 0
-asm void fn_80030A44(void) {
-#include "src/game/gs_npc_event_fn_80030A44.inc"
-}
-#else
 #pragma push
 #pragma peephole off
-void fn_80030A44(u8* arg0, u8* arg1) {
-    extern s32 fn_8011F4F0(void* o);
-    extern u8  fn_80123FBC(void* o);
-    extern u8  fn_80075FEC(void* o);
-    extern u8  fn_8001DA60(void* o);
+void fn_800308D4(u8* arg0, u8* arg1) {
+    extern u16 fn_8012640C(void* obj, s32 a, s32 b, s32 c);
+    extern s32 fn_8011E778(s32 v);
+    extern s32 fn_8011E760(s32 v);
     extern s32 fn_800FA444(s32 m);
     extern s32 fn_800FA280(s32 m);
-    u32 combined;
+    s32 hi;
     s32 kind;
+    u32 combined;
     void* obj;
-    s32 msg;
-    s32 hb;
-
-    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
-    kind = 0;
-    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x4)) {
-        kind = *(u16*)(lbl_80266F68 + 0x0);
-    }
-    if (*(s16*)(arg1 + 0x6) == *(u16*)(lbl_80266F68 + 0x18)) {
-        kind = *(u16*)(lbl_80266F68 + 0x14);
-    }
+    u8* tbl;
 
     obj = 0;
-    if (kind == 1) {
+    kind = 0;
+    combined = (*(u32*)(arg1 + 0x64) & ~0xFF) | *(u8*)(arg0 + 0x8B);
+    tbl = lbl_80266F68;
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(tbl + 0x6)) {
+        kind = *(u16*)(tbl + 0x0);
+    }
+    tbl += 0x14;
+    if (*(s16*)(arg1 + 0x6) == *(u16*)(tbl + 0x6)) {
+        kind = *(u16*)(tbl + 0x0);
+    }
+
+    switch (kind) {
+    case 1:
         obj = (void*)fn_8012A5B0(0, 3, (u16)lbl_8047A424);
-    } else if (kind == 2) {
+        break;
+    case 2:
         obj = (void*)fn_8012A5B0(lbl_803A2688, 3, (u16)lbl_8047A420);
+        break;
     }
 
     if (obj != 0) {
-        fn_80132A38(0x37, fn_8011F4F0(obj));
-        fn_800FB680(0, 0, combined, 0xE7);
+        hi = (s16)((u32)fn_800FA444(0x2BD4) >> 16);
+        fn_800FB680(0, 0, combined, 0x2BD4);
+        fn_80132A38(0x37, fn_800FA280(fn_8011E760(fn_8011E778(fn_8012640C(obj, 0, 0x6E, 0)))));
+        fn_800FB680(hi, 0, combined, 0xE7);
+        *(u32*)(arg1 + 0x4C) = 0;
         fn_80109220(arg1, 1);
-        if (fn_80123FBC(obj) != 0 && fn_80075FEC(obj) == 1) {
-            msg = fn_8001DA60(obj);
-            switch (msg) {
-            case 0:
-                msg = 0xD67;
-                break;
-            case 1:
-                msg = 0xD68;
-                break;
-            case 3:
-            default:
-                msg = 0;
-                break;
-            }
-            if (msg != 0) {
-                hb = fn_800FA444(0xE7);
-                hb = (u16)(s16)((u32)hb >> 16);
-                fn_80132A38(0x37, fn_800FA280(msg));
-                fn_800FB680(hb + 2, 0, combined, 0xCF);
-            }
-        }
     } else {
         fn_80109220(arg1, 0);
     }
 }
 #pragma pop
+#endif
+
+/* fn_80030A44 - 0x80030A44 | size: 0x1d0 */
+extern u32 lbl_8047A424;
+extern u32 lbl_8047A420;
+#if 1
+asm void fn_80030A44(void) {
+#include "src/game/gs_npc_event_fn_80030A44.inc"
+}
+#else
+void fn_80030A44(void) { /* TODO */ }
 #endif
 
 /* fn_80030C14 - 0x80030C14 | size: 0x120 */
