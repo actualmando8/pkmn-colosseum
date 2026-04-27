@@ -753,7 +753,7 @@ u32 fn_8017B5A4(u32 val) {
 
 /* 0x8017B5C0 | 0xF8 */
 extern void fn_8017BD34(void);
-extern void fn_8017F794(void);
+extern u32 fn_8017F794();
 extern void fn_8017F728(void);
 extern void fn_8017A814(void);
 extern void fn_80180584(void);
@@ -868,17 +868,70 @@ u32 fn_8017C5A0(FSYSSlot* slot) {
 #endif
 
 /* 0x8017C5B8 | 0x128 */
-extern void fn_8017D68C(void);
-extern void fn_8017F928(void);
-extern void fn_80180694(void);
+extern void fn_8017D68C();
+extern u32 fn_8017F928();
+extern void fn_80180694();
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;
-#if 1
+#if 0
 asm void fn_8017C5B8(void) {
 #include "src/game/fsys/fsys_file_fn_8017C5B8.inc"
 }
 #else
-void fn_8017C5B8(void) { /* TODO: match -- 296 bytes at 0x8017C5B8 */ }
+#pragma optimization_level 4
+u32 fn_8017C5B8(FSYSSlot* slot) {
+    u8* archive;
+    u32 fileIndex;
+    u8* entry;
+    u32* firstTable;
+    u32* entryTable;
+    u32 result;
+    u32 size;
+    u8* subEntry;
+    FSYSFileHandle* handleEntry;
+    s32 i;
+    volatile u32 saveResult;
+
+    archive = slot->archiveData;
+    fileIndex = slot->archiveSize;
+    if (archive != NULL) {
+        firstTable = (u32*)(archive + *(u32*)(archive + 0x18));
+        entryTable = (u32*)(archive + *firstTable);
+        entry = archive + entryTable[fileIndex];
+    } else {
+        entry = NULL;
+    }
+
+    subEntry = (u8*)slot->fileIndex;
+    result = (u32)fn_8017F794(slot->fileHandle, *(u32*)(entry + 0x20), *(u32*)entry);
+    if (result == 0) {
+        size = *(u32*)(entry + 0x14);
+        result = (u32)fn_8017F928(size, slot->fileHandle, *(u32*)(entry + 0x20), *(u32*)entry);
+        if (result == 0) {
+            slot->status = 0x98;
+        } else {
+            if ((s32)slot->loadMode == 3) {
+                fn_8017D68C(slot);
+                handleEntry = (FSYSFileHandle*)lbl_8047B1B8;
+                i = 0;
+                while (i < (s32)*(volatile u32*)&lbl_8047B1BC) {
+                    if (handleEntry->handleID == (s32)slot->field_08) {
+                        break;
+                    }
+                    handleEntry++;
+                    i++;
+                }
+            }
+            slot->status = 0x97;
+            fn_80180694(*(void**)(subEntry + 4), result, size, fn_8017F25C, slot);
+        }
+    } else {
+        slot->status = 0x98;
+    }
+
+    saveResult = result;
+    return 1;
+}
 #endif
 
 /* 0x8017C6E0 | 0x1AC */
@@ -935,7 +988,7 @@ void fn_8017CE7C(void) { /* TODO: match -- 76 bytes at 0x8017CE7C */ }
 #endif
 
 /* 0x8017CED8 | 0x4C8 */
-extern void fn_8017D68C(void);
+extern void fn_8017D68C();
 extern void fn_8017FA5C(void);
 extern void fn_8017F800(void);
 extern void fn_80180450(void);
