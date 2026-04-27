@@ -4,9 +4,9 @@
     "function": "fn_80026740",
     "description": "Match fn_80026740 in gs_worldmap.c (40 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "moonshot-kimi-2",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -17,6 +17,11 @@
       "file_pct": 3.2,
       "model_tier": "deepseek",
       "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 57.4,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
     }
   },
   {
@@ -24,9 +29,9 @@
     "function": "fn_800267D0",
     "description": "Match fn_800267D0 in gs_worldmap.c (40 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "moonshot-kimi-2",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_worldmap.c",
@@ -1021,9 +1026,9 @@
     "function": "fn_80135C58",
     "description": "Match fn_80135C58 in effect_util.c (10 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "deepseek-v4-flash",
     "completed_at": null,
     "meta": {
       "file": "src/game/effect/effect_util.c",
@@ -1034,6 +1039,11 @@
       "file_pct": 12.2,
       "model_tier": "deepseek",
       "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 66.2,
+      "best_model": "deepseek/deepseek-v4-flash",
+      "reason": "below-threshold"
     }
   },
   {
@@ -1041,9 +1051,9 @@
     "function": "fn_801327E0",
     "description": "Match fn_801327E0 in effect_util.c (22 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "deepseek-v4-flash",
     "completed_at": null,
     "meta": {
       "file": "src/game/effect/effect_util.c",
@@ -1054,6 +1064,11 @@
       "file_pct": 12.2,
       "model_tier": "deepseek",
       "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 65.4,
+      "best_model": "deepseek/deepseek-v4-flash",
+      "reason": "below-threshold"
     }
   },
   {
@@ -1061,10 +1076,10 @@
     "function": "fn_80131F04",
     "description": "Match fn_80131F04 in effect_util.c (41 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "deepseek-v4-flash",
+    "completed_at": "2026-04-27T19:19:09Z",
     "meta": {
       "file": "src/game/effect/effect_util.c",
       "stem": "effect_util",
@@ -1074,6 +1089,11 @@
       "file_pct": 12.2,
       "model_tier": "deepseek",
       "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 96.3,
+      "local_pct": 96.3,
+      "best_model": "deepseek/deepseek-v4-flash"
     }
   },
   {
@@ -1081,9 +1101,9 @@
     "function": "fn_80131FF4",
     "description": "Match fn_80131FF4 in effect_util.c (41 asm lines, tier=deepseek)",
     "priority": "high",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "deepseek-v4-flash",
     "completed_at": null,
     "meta": {
       "file": "src/game/effect/effect_util.c",
@@ -3343,9 +3363,9 @@
     "function": "fn_80058AF0",
     "description": "Match fn_80058AF0 in scene_init.c (206 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "failed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "opus-sub-25",
     "completed_at": null,
     "meta": {
       "file": "src/game/scene_init.c",
@@ -3355,7 +3375,8 @@
       "line_number": 7276,
       "file_pct": 17.1,
       "model_tier": "opus",
-      "difficulty": "complex"
+      "difficulty": "complex",
+      "failure_reason": "best 83.5% after 5 iters; struct-copy unroll mismatch (subic./bne vs mtctr/bdnz) and reg alloc"
     }
   },
   {
@@ -3363,10 +3384,10 @@
     "function": "fn_8004CF78",
     "description": "Match fn_8004CF78 in scene_init.c (209 asm lines, tier=opus)",
     "priority": "high",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "opus-sub-26",
+    "completed_at": "2026-04-27T19:19:14Z",
     "meta": {
       "file": "src/game/scene_init.c",
       "stem": "scene_init",
@@ -3376,6 +3397,10 @@
       "file_pct": 17.1,
       "model_tier": "opus",
       "difficulty": "complex"
+    },
+    "result": {
+      "pct": 93.0,
+      "model": "opus-sub"
     }
   },
   {
@@ -6343,10 +6368,10 @@
     "function": "fn_801171C8",
     "description": "Match fn_801171C8 in gs_field_world.c (95 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "claimed",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
     "claimed_by": "codex",
-    "completed_at": null,
+    "completed_at": "2026-04-27T18:55:06Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6356,6 +6381,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 96.2,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6363,10 +6392,10 @@
     "function": "fn_80120B00",
     "description": "Match fn_80120B00 in gs_field_world.c (95 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T18:58:04Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6376,6 +6405,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 98.0,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6383,10 +6416,10 @@
     "function": "fn_80129F20",
     "description": "Match fn_80129F20 in gs_field_world.c (101 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T19:01:09Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6396,6 +6429,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 91.4,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6403,10 +6440,10 @@
     "function": "fn_8011B2C0",
     "description": "Match fn_8011B2C0 in gs_field_world.c (105 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "completed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
-    "completed_at": null,
+    "claimed_by": "codex",
+    "completed_at": "2026-04-27T19:06:14Z",
     "meta": {
       "file": "src/game/gs_field_world.c",
       "stem": "gs_field_world",
@@ -6416,6 +6453,10 @@
       "file_pct": 37.0,
       "model_tier": "codex",
       "difficulty": "medium"
+    },
+    "result": {
+      "pct": 93.2,
+      "model": "codex/gpt-5.5"
     }
   },
   {
@@ -6423,9 +6464,9 @@
     "function": "fn_80117330",
     "description": "Match fn_80117330 in gs_field_world.c (107 asm lines, tier=codex)",
     "priority": "normal",
-    "status": "queued",
+    "status": "claimed",
     "created": "2026-04-27T12:21:10Z",
-    "claimed_by": null,
+    "claimed_by": "codex",
     "completed_at": null,
     "meta": {
       "file": "src/game/gs_field_world.c",
@@ -7951,6 +7992,2186 @@
       "best_pct": 0.0,
       "best_model": "moonshot/kimi-k2.6",
       "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0000",
+    "function": "fn_8002749C",
+    "description": "Match fn_8002749C in gs_worldmap.c (89 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_worldmap.c",
+      "stem": "gs_worldmap",
+      "inc": "src/game/gs_worldmap_fn_8002749C.inc",
+      "asm_lines": 89,
+      "line_number": 518,
+      "file_pct": 3.2,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0001",
+    "function": "fn_800697C4",
+    "description": "Match fn_800697C4 in ui_core.c (13 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "completed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-1",
+    "completed_at": "2026-04-27T19:15:03Z",
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_800697C4.inc",
+      "asm_lines": 13,
+      "line_number": 18226,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 100.0,
+      "local_pct": 100.0,
+      "best_model": "moonshot/kimi-k2.6"
+    }
+  },
+  {
+    "id": "task-1777317151-0002",
+    "function": "fn_8005D8F8",
+    "description": "Match fn_8005D8F8 in ui_core.c (18 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-1",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D8F8.inc",
+      "asm_lines": 18,
+      "line_number": 4738,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 74.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0003",
+    "function": "fn_80061028",
+    "description": "Match fn_80061028 in ui_core.c (18 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-1",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80061028.inc",
+      "asm_lines": 18,
+      "line_number": 8718,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 0.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0004",
+    "function": "fn_80061B74",
+    "description": "Match fn_80061B74 in ui_core.c (20 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "claimed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-1",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80061B74.inc",
+      "asm_lines": 20,
+      "line_number": 9627,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0005",
+    "function": "fn_8005D4AC",
+    "description": "Match fn_8005D4AC in ui_core.c (21 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D4AC.inc",
+      "asm_lines": 21,
+      "line_number": 4375,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0006",
+    "function": "fn_8005D4F4",
+    "description": "Match fn_8005D4F4 in ui_core.c (21 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D4F4.inc",
+      "asm_lines": 21,
+      "line_number": 4390,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0007",
+    "function": "fn_8005D53C",
+    "description": "Match fn_8005D53C in ui_core.c (21 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D53C.inc",
+      "asm_lines": 21,
+      "line_number": 4405,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0008",
+    "function": "fn_8005D584",
+    "description": "Match fn_8005D584 in ui_core.c (21 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D584.inc",
+      "asm_lines": 21,
+      "line_number": 4420,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0009",
+    "function": "fn_8005D0DC",
+    "description": "Match fn_8005D0DC in ui_core.c (23 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D0DC.inc",
+      "asm_lines": 23,
+      "line_number": 4055,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0010",
+    "function": "fn_8005D130",
+    "description": "Match fn_8005D130 in ui_core.c (23 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D130.inc",
+      "asm_lines": 23,
+      "line_number": 4079,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0011",
+    "function": "fn_80068738",
+    "description": "Match fn_80068738 in ui_core.c (25 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80068738.inc",
+      "asm_lines": 25,
+      "line_number": 17067,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0012",
+    "function": "fn_80069A08",
+    "description": "Match fn_80069A08 in ui_core.c (25 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80069A08.inc",
+      "asm_lines": 25,
+      "line_number": 18416,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0013",
+    "function": "fn_8005D738",
+    "description": "Match fn_8005D738 in ui_core.c (27 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D738.inc",
+      "asm_lines": 27,
+      "line_number": 4565,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0014",
+    "function": "fn_8005DBC4",
+    "description": "Match fn_8005DBC4 in ui_core.c (27 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005DBC4.inc",
+      "asm_lines": 27,
+      "line_number": 4969,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0015",
+    "function": "fn_80064378",
+    "description": "Match fn_80064378 in ui_core.c (27 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80064378.inc",
+      "asm_lines": 27,
+      "line_number": 12556,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0016",
+    "function": "fn_800609B4",
+    "description": "Match fn_800609B4 in ui_core.c (30 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_800609B4.inc",
+      "asm_lines": 30,
+      "line_number": 8241,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0017",
+    "function": "fn_8005D798",
+    "description": "Match fn_8005D798 in ui_core.c (32 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D798.inc",
+      "asm_lines": 32,
+      "line_number": 4602,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0018",
+    "function": "fn_8005D26C",
+    "description": "Match fn_8005D26C in ui_core.c (35 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D26C.inc",
+      "asm_lines": 35,
+      "line_number": 4180,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0019",
+    "function": "fn_8005D6A8",
+    "description": "Match fn_8005D6A8 in ui_core.c (39 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D6A8.inc",
+      "asm_lines": 39,
+      "line_number": 4512,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0020",
+    "function": "fn_8005DC24",
+    "description": "Match fn_8005DC24 in ui_core.c (43 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005DC24.inc",
+      "asm_lines": 43,
+      "line_number": 5011,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0021",
+    "function": "fn_8005E750",
+    "description": "Match fn_8005E750 in ui_core.c (43 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005E750.inc",
+      "asm_lines": 43,
+      "line_number": 5811,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0022",
+    "function": "fn_8005E690",
+    "description": "Match fn_8005E690 in ui_core.c (46 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005E690.inc",
+      "asm_lines": 46,
+      "line_number": 5750,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0023",
+    "function": "fn_8005CCD0",
+    "description": "Match fn_8005CCD0 in ui_core.c (49 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005CCD0.inc",
+      "asm_lines": 49,
+      "line_number": 3717,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0024",
+    "function": "fn_80062284",
+    "description": "Match fn_80062284 in ui_core.c (49 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80062284.inc",
+      "asm_lines": 49,
+      "line_number": 10152,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0025",
+    "function": "fn_80068F84",
+    "description": "Match fn_80068F84 in ui_core.c (51 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80068F84.inc",
+      "asm_lines": 51,
+      "line_number": 17548,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0026",
+    "function": "fn_80069944",
+    "description": "Match fn_80069944 in ui_core.c (51 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80069944.inc",
+      "asm_lines": 51,
+      "line_number": 18349,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0027",
+    "function": "fn_8005DEE8",
+    "description": "Match fn_8005DEE8 in ui_core.c (60 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005DEE8.inc",
+      "asm_lines": 60,
+      "line_number": 5219,
+      "file_pct": 10.6,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0028",
+    "function": "fn_800608C4",
+    "description": "Match fn_800608C4 in ui_core.c (62 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_800608C4.inc",
+      "asm_lines": 62,
+      "line_number": 8160,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0029",
+    "function": "fn_8005D3D0",
+    "description": "Match fn_8005D3D0 in ui_core.c (63 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D3D0.inc",
+      "asm_lines": 63,
+      "line_number": 4303,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0030",
+    "function": "fn_8005D5CC",
+    "description": "Match fn_8005D5CC in ui_core.c (64 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D5CC.inc",
+      "asm_lines": 64,
+      "line_number": 4435,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0031",
+    "function": "fn_8005D184",
+    "description": "Match fn_8005D184 in ui_core.c (66 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D184.inc",
+      "asm_lines": 66,
+      "line_number": 4103,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0032",
+    "function": "fn_8005D2E8",
+    "description": "Match fn_8005D2E8 in ui_core.c (66 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_8005D2E8.inc",
+      "asm_lines": 66,
+      "line_number": 4226,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0033",
+    "function": "fn_80065628",
+    "description": "Match fn_80065628 in ui_core.c (75 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80065628.inc",
+      "asm_lines": 75,
+      "line_number": 13803,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0034",
+    "function": "fn_80065730",
+    "description": "Match fn_80065730 in ui_core.c (75 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80065730.inc",
+      "asm_lines": 75,
+      "line_number": 13862,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0035",
+    "function": "fn_80065838",
+    "description": "Match fn_80065838 in ui_core.c (75 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80065838.inc",
+      "asm_lines": 75,
+      "line_number": 13925,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0036",
+    "function": "fn_80065940",
+    "description": "Match fn_80065940 in ui_core.c (75 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80065940.inc",
+      "asm_lines": 75,
+      "line_number": 13988,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0037",
+    "function": "fn_80062834",
+    "description": "Match fn_80062834 in ui_core.c (78 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80062834.inc",
+      "asm_lines": 78,
+      "line_number": 10577,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0038",
+    "function": "fn_80060EF4",
+    "description": "Match fn_80060EF4 in ui_core.c (82 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80060EF4.inc",
+      "asm_lines": 82,
+      "line_number": 8628,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0039",
+    "function": "fn_80068794",
+    "description": "Match fn_80068794 in ui_core.c (83 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_80068794.inc",
+      "asm_lines": 83,
+      "line_number": 17093,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0040",
+    "function": "fn_800688C4",
+    "description": "Match fn_800688C4 in ui_core.c (85 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/ui/ui_core.c",
+      "stem": "ui_core",
+      "inc": "src/game/ui/ui_core_fn_800688C4.inc",
+      "asm_lines": 85,
+      "line_number": 17186,
+      "file_pct": 10.6,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0041",
+    "function": "fn_80136078",
+    "description": "Match fn_80136078 in effect_util.c (57 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/effect/effect_util.c",
+      "stem": "effect_util",
+      "inc": "src/game/effect/effect_util_fn_80136078.inc",
+      "asm_lines": 57,
+      "line_number": 4442,
+      "file_pct": 12.2,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0042",
+    "function": "fn_80017790",
+    "description": "Match fn_80017790 in gs_pokemon_summary.c (58 asm lines, tier=deepseek)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80017790.inc",
+      "asm_lines": 58,
+      "line_number": 404,
+      "file_pct": 13.0,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    },
+    "result": {
+      "best_pct": 77.5,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0043",
+    "function": "fn_800166BC",
+    "description": "Match fn_800166BC in gs_pokemon_summary.c (75 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800166BC.inc",
+      "asm_lines": 75,
+      "line_number": 298,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    },
+    "result": {
+      "best_pct": 0.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0044",
+    "function": "fn_80016F14",
+    "description": "Match fn_80016F14 in gs_pokemon_summary.c (77 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80016F14.inc",
+      "asm_lines": 77,
+      "line_number": 355,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    },
+    "result": {
+      "best_pct": 100.0,
+      "local_pct": 0.0,
+      "reason": "local-disagrees-compile-or-no-match"
+    }
+  },
+  {
+    "id": "task-1777317151-0045",
+    "function": "fn_800164D0",
+    "description": "Match fn_800164D0 in gs_pokemon_summary.c (90 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800164D0.inc",
+      "asm_lines": 90,
+      "line_number": 257,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    },
+    "result": {
+      "best_pct": 0.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0046",
+    "function": "fn_80016348",
+    "description": "Match fn_80016348 in gs_pokemon_summary.c (104 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "failed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80016348.inc",
+      "asm_lines": 104,
+      "line_number": 243,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    },
+    "result": {
+      "best_pct": 0.0,
+      "best_model": "moonshot/kimi-k2.6",
+      "reason": "below-threshold"
+    }
+  },
+  {
+    "id": "task-1777317151-0047",
+    "function": "fn_800161B0",
+    "description": "Match fn_800161B0 in gs_pokemon_summary.c (109 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "claimed",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": "moonshot-kimi-2",
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800161B0.inc",
+      "asm_lines": 109,
+      "line_number": 231,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0048",
+    "function": "fn_80017CB8",
+    "description": "Match fn_80017CB8 in gs_pokemon_summary.c (134 asm lines, tier=codex)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80017CB8.inc",
+      "asm_lines": 134,
+      "line_number": 523,
+      "file_pct": 13.0,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0049",
+    "function": "fn_80015374",
+    "description": "Match fn_80015374 in gs_pokemon_summary.c (163 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80015374.inc",
+      "asm_lines": 163,
+      "line_number": 171,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0050",
+    "function": "fn_800150E4",
+    "description": "Match fn_800150E4 in gs_pokemon_summary.c (185 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800150E4.inc",
+      "asm_lines": 185,
+      "line_number": 158,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0051",
+    "function": "fn_80017A0C",
+    "description": "Match fn_80017A0C in gs_pokemon_summary.c (188 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80017A0C.inc",
+      "asm_lines": 188,
+      "line_number": 511,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0052",
+    "function": "fn_800167D0",
+    "description": "Match fn_800167D0 in gs_pokemon_summary.c (197 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800167D0.inc",
+      "asm_lines": 197,
+      "line_number": 317,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0053",
+    "function": "fn_80017E8C",
+    "description": "Match fn_80017E8C in gs_pokemon_summary.c (230 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80017E8C.inc",
+      "asm_lines": 230,
+      "line_number": 546,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0054",
+    "function": "fn_80015E3C",
+    "description": "Match fn_80015E3C in gs_pokemon_summary.c (248 asm lines, tier=opus)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80015E3C.inc",
+      "asm_lines": 248,
+      "line_number": 216,
+      "file_pct": 13.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0055",
+    "function": "fn_800155B0",
+    "description": "Match fn_800155B0 in gs_pokemon_summary.c (286 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800155B0.inc",
+      "asm_lines": 286,
+      "line_number": 185,
+      "file_pct": 13.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0056",
+    "function": "fn_80016ABC",
+    "description": "Match fn_80016ABC in gs_pokemon_summary.c (300 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80016ABC.inc",
+      "asm_lines": 300,
+      "line_number": 342,
+      "file_pct": 13.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0057",
+    "function": "fn_800159BC",
+    "description": "Match fn_800159BC in gs_pokemon_summary.c (319 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_800159BC.inc",
+      "asm_lines": 319,
+      "line_number": 203,
+      "file_pct": 13.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0058",
+    "function": "fn_80017028",
+    "description": "Match fn_80017028 in gs_pokemon_summary.c (519 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_pokemon_summary.c",
+      "stem": "gs_pokemon_summary",
+      "inc": "src/game/gs_pokemon_summary_fn_80017028.inc",
+      "asm_lines": 519,
+      "line_number": 383,
+      "file_pct": 13.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0059",
+    "function": "fn_800F0A74",
+    "description": "Match fn_800F0A74 in gs_thread.c (355 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_thread.c",
+      "stem": "gs_thread",
+      "inc": "src/game/gs_thread_fn_800F0A74.inc",
+      "asm_lines": 355,
+      "line_number": 2886,
+      "file_pct": 14.3,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0060",
+    "function": "fn_800FA444",
+    "description": "Match fn_800FA444 in gs_thread.c (453 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_thread.c",
+      "stem": "gs_thread",
+      "inc": "src/game/gs_thread_fn_800FA444.inc",
+      "asm_lines": 453,
+      "line_number": 1798,
+      "file_pct": 14.3,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0061",
+    "function": "fn_800F8A54",
+    "description": "Match fn_800F8A54 in gs_thread.c (519 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_thread.c",
+      "stem": "gs_thread",
+      "inc": "src/game/gs_thread_fn_800F8A54.inc",
+      "asm_lines": 519,
+      "line_number": 912,
+      "file_pct": 14.3,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0062",
+    "function": "fn_800FD69C",
+    "description": "Match fn_800FD69C in gs_thread.c (564 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_thread.c",
+      "stem": "gs_thread",
+      "inc": "src/game/gs_thread_fn_800FD69C.inc",
+      "asm_lines": 564,
+      "line_number": 2314,
+      "file_pct": 14.3,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0063",
+    "function": "fn_800FC7E0",
+    "description": "Match fn_800FC7E0 in gs_thread.c (806 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_thread.c",
+      "stem": "gs_thread",
+      "inc": "src/game/gs_thread_fn_800FC7E0.inc",
+      "asm_lines": 806,
+      "line_number": 2283,
+      "file_pct": 14.3,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0064",
+    "function": "fn_8003DC54",
+    "description": "Match fn_8003DC54 in scene_init.c (512 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_8003DC54.inc",
+      "asm_lines": 512,
+      "line_number": 2375,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0065",
+    "function": "fn_80051710",
+    "description": "Match fn_80051710 in scene_init.c (513 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_80051710.inc",
+      "asm_lines": 513,
+      "line_number": 5604,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0066",
+    "function": "fn_80047CC0",
+    "description": "Match fn_80047CC0 in scene_init.c (552 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_80047CC0.inc",
+      "asm_lines": 552,
+      "line_number": 3444,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0067",
+    "function": "fn_80041E48",
+    "description": "Match fn_80041E48 in scene_init.c (576 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_80041E48.inc",
+      "asm_lines": 576,
+      "line_number": 2915,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0068",
+    "function": "fn_80048918",
+    "description": "Match fn_80048918 in scene_init.c (651 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_80048918.inc",
+      "asm_lines": 651,
+      "line_number": 3508,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0069",
+    "function": "fn_800411FC",
+    "description": "Match fn_800411FC in scene_init.c (657 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_800411FC.inc",
+      "asm_lines": 657,
+      "line_number": 2862,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0070",
+    "function": "fn_8004FE3C",
+    "description": "Match fn_8004FE3C in scene_init.c (720 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_8004FE3C.inc",
+      "asm_lines": 720,
+      "line_number": 5594,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0071",
+    "function": "fn_8004EDCC",
+    "description": "Match fn_8004EDCC in scene_init.c (760 asm lines, tier=kimi)",
+    "priority": "high",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/scene_init.c",
+      "stem": "scene_init",
+      "inc": "src/game/scene_init_fn_8004EDCC.inc",
+      "asm_lines": 760,
+      "line_number": 5576,
+      "file_pct": 17.1,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0072",
+    "function": "fn_80194788",
+    "description": "Match fn_80194788 in hsd_cobj.c (10 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194788.inc",
+      "asm_lines": 10,
+      "line_number": 732,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0073",
+    "function": "fn_80196698",
+    "description": "Match fn_80196698 in hsd_cobj.c (27 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80196698.inc",
+      "asm_lines": 27,
+      "line_number": 1110,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0074",
+    "function": "fn_801950D0",
+    "description": "Match fn_801950D0 in hsd_cobj.c (32 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801950D0.inc",
+      "asm_lines": 32,
+      "line_number": 903,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0075",
+    "function": "fn_80196CE0",
+    "description": "Match fn_80196CE0 in hsd_cobj.c (39 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80196CE0.inc",
+      "asm_lines": 39,
+      "line_number": 1258,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0076",
+    "function": "fn_80194400",
+    "description": "Match fn_80194400 in hsd_cobj.c (43 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194400.inc",
+      "asm_lines": 43,
+      "line_number": 590,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0077",
+    "function": "fn_80194C2C",
+    "description": "Match fn_80194C2C in hsd_cobj.c (43 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194C2C.inc",
+      "asm_lines": 43,
+      "line_number": 783,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0078",
+    "function": "fn_801946F0",
+    "description": "Match fn_801946F0 in hsd_cobj.c (46 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801946F0.inc",
+      "asm_lines": 46,
+      "line_number": 722,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0079",
+    "function": "fn_80194654",
+    "description": "Match fn_80194654 in hsd_cobj.c (47 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194654.inc",
+      "asm_lines": 47,
+      "line_number": 709,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0080",
+    "function": "fn_80194510",
+    "description": "Match fn_80194510 in hsd_cobj.c (48 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194510.inc",
+      "asm_lines": 48,
+      "line_number": 683,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0081",
+    "function": "fn_801945B0",
+    "description": "Match fn_801945B0 in hsd_cobj.c (49 asm lines, tier=deepseek)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801945B0.inc",
+      "asm_lines": 49,
+      "line_number": 696,
+      "file_pct": 30.8,
+      "model_tier": "deepseek",
+      "difficulty": "simple"
+    }
+  },
+  {
+    "id": "task-1777317151-0082",
+    "function": "fn_80195794",
+    "description": "Match fn_80195794 in hsd_cobj.c (74 asm lines, tier=codex)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80195794.inc",
+      "asm_lines": 74,
+      "line_number": 946,
+      "file_pct": 30.8,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0083",
+    "function": "fn_80193D30",
+    "description": "Match fn_80193D30 in hsd_cobj.c (112 asm lines, tier=codex)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80193D30.inc",
+      "asm_lines": 112,
+      "line_number": 307,
+      "file_pct": 30.8,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0084",
+    "function": "fn_80195F0C",
+    "description": "Match fn_80195F0C in hsd_cobj.c (122 asm lines, tier=codex)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80195F0C.inc",
+      "asm_lines": 122,
+      "line_number": 1070,
+      "file_pct": 30.8,
+      "model_tier": "codex",
+      "difficulty": "medium"
+    }
+  },
+  {
+    "id": "task-1777317151-0085",
+    "function": "fn_80195590",
+    "description": "Match fn_80195590 in hsd_cobj.c (144 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80195590.inc",
+      "asm_lines": 144,
+      "line_number": 933,
+      "file_pct": 30.8,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0086",
+    "function": "fn_80194010",
+    "description": "Match fn_80194010 in hsd_cobj.c (161 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194010.inc",
+      "asm_lines": 161,
+      "line_number": 397,
+      "file_pct": 30.8,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0087",
+    "function": "fn_801963E0",
+    "description": "Match fn_801963E0 in hsd_cobj.c (186 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801963E0.inc",
+      "asm_lines": 186,
+      "line_number": 1096,
+      "file_pct": 30.8,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0088",
+    "function": "fn_801960C4",
+    "description": "Match fn_801960C4 in hsd_cobj.c (211 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801960C4.inc",
+      "asm_lines": 211,
+      "line_number": 1083,
+      "file_pct": 30.8,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0089",
+    "function": "fn_80194DA4",
+    "description": "Match fn_80194DA4 in hsd_cobj.c (227 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80194DA4.inc",
+      "asm_lines": 227,
+      "line_number": 889,
+      "file_pct": 30.8,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0090",
+    "function": "fn_8019674C",
+    "description": "Match fn_8019674C in hsd_cobj.c (267 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_8019674C.inc",
+      "asm_lines": 267,
+      "line_number": 1141,
+      "file_pct": 30.8,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0091",
+    "function": "fn_80196EF8",
+    "description": "Match fn_80196EF8 in hsd_cobj.c (270 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80196EF8.inc",
+      "asm_lines": 270,
+      "line_number": 1377,
+      "file_pct": 30.8,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0092",
+    "function": "fn_801947C8",
+    "description": "Match fn_801947C8 in hsd_cobj.c (304 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_801947C8.inc",
+      "asm_lines": 304,
+      "line_number": 770,
+      "file_pct": 30.8,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0093",
+    "function": "fn_8019513C",
+    "description": "Match fn_8019513C in hsd_cobj.c (309 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_8019513C.inc",
+      "asm_lines": 309,
+      "line_number": 919,
+      "file_pct": 30.8,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0094",
+    "function": "fn_80195A6C",
+    "description": "Match fn_80195A6C in hsd_cobj.c (318 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/hsd/hsd_cobj.c",
+      "stem": "hsd_cobj",
+      "inc": "src/hsd/hsd_cobj_fn_80195A6C.inc",
+      "asm_lines": 318,
+      "line_number": 1056,
+      "file_pct": 30.8,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0095",
+    "function": "fn_80128300",
+    "description": "Match fn_80128300 in gs_field_world.c (148 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_80128300.inc",
+      "asm_lines": 148,
+      "line_number": 18467,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0096",
+    "function": "fn_8012F40C",
+    "description": "Match fn_8012F40C in gs_field_world.c (152 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_8012F40C.inc",
+      "asm_lines": 152,
+      "line_number": 25313,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0097",
+    "function": "fn_8012F1FC",
+    "description": "Match fn_8012F1FC in gs_field_world.c (154 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_8012F1FC.inc",
+      "asm_lines": 154,
+      "line_number": 25164,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0098",
+    "function": "fn_8011F260",
+    "description": "Match fn_8011F260 in gs_field_world.c (155 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_8011F260.inc",
+      "asm_lines": 155,
+      "line_number": 13564,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0099",
+    "function": "fn_801176C8",
+    "description": "Match fn_801176C8 in gs_field_world.c (160 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_801176C8.inc",
+      "asm_lines": 160,
+      "line_number": 7195,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0100",
+    "function": "fn_801181B0",
+    "description": "Match fn_801181B0 in gs_field_world.c (160 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_801181B0.inc",
+      "asm_lines": 160,
+      "line_number": 7892,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0101",
+    "function": "fn_80128E38",
+    "description": "Match fn_80128E38 in gs_field_world.c (162 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_80128E38.inc",
+      "asm_lines": 162,
+      "line_number": 19300,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0102",
+    "function": "fn_80128A64",
+    "description": "Match fn_80128A64 in gs_field_world.c (178 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_80128A64.inc",
+      "asm_lines": 178,
+      "line_number": 19035,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0103",
+    "function": "fn_801195AC",
+    "description": "Match fn_801195AC in gs_field_world.c (179 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_801195AC.inc",
+      "asm_lines": 179,
+      "line_number": 9217,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0104",
+    "function": "fn_8012086C",
+    "description": "Match fn_8012086C in gs_field_world.c (187 asm lines, tier=opus)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_field_world.c",
+      "stem": "gs_field_world",
+      "inc": "src/game/gs_field_world_fn_8012086C.inc",
+      "asm_lines": 187,
+      "line_number": 15021,
+      "file_pct": 37.0,
+      "model_tier": "opus",
+      "difficulty": "complex"
+    }
+  },
+  {
+    "id": "task-1777317151-0105",
+    "function": "fn_800D6B00",
+    "description": "Match fn_800D6B00 in gs_render.c (490 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_render.c",
+      "stem": "gs_render",
+      "inc": "src/game/gs_render_fn_800D6B00.inc",
+      "asm_lines": 490,
+      "line_number": 1427,
+      "file_pct": 48.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
+    }
+  },
+  {
+    "id": "task-1777317151-0106",
+    "function": "fn_800E0E14",
+    "description": "Match fn_800E0E14 in gs_render.c (520 asm lines, tier=kimi)",
+    "priority": "normal",
+    "status": "queued",
+    "created": "2026-04-27T19:12:31Z",
+    "claimed_by": null,
+    "completed_at": null,
+    "meta": {
+      "file": "src/game/gs_render.c",
+      "stem": "gs_render",
+      "inc": "src/game/gs_render_fn_800E0E14.inc",
+      "asm_lines": 520,
+      "line_number": 4405,
+      "file_pct": 48.0,
+      "model_tier": "kimi",
+      "difficulty": "huge"
     }
   }
 ]
