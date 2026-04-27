@@ -5464,7 +5464,6 @@ extern u8 lbl_8035B8A0[];
 extern void* fn_801155CC();
 extern u32 fn_80115A80();
 extern void* fn_80115C48(u32 key);
-extern void fn_80117514(void);
 extern void fn_8011791C(void);
 extern void fn_80119930(void);
 extern void fn_80119BD0(void);
@@ -5522,6 +5521,7 @@ extern u16 fn_8011E3B4(u8* ptr, u16 idx);
 extern u8 fn_8011E3FC(u8* ptr, u16 idx);
 extern void fn_8011F260(void);
 extern void fn_80129BC8(void);
+extern u8 fn_80117514();
 extern void fn_8012A450();
 extern void fn_8012A5B0(void);
 extern void fn_8012C660(void);
@@ -7002,11 +7002,11 @@ void fn_80117164(void) {
 }
 #endif
 /* 0x801171C8 | 0x168 */
-extern void fn_80177A38(void);
-extern void fn_80176868(void);
-extern void fn_801767E0(void);
-extern void fn_80176758(void);
-extern void fn_80177908(void);
+extern u8 fn_80177A38(void);
+extern void fn_80176868(f32);
+extern void fn_801767E0(f32);
+extern void fn_80176758(f32);
+extern void fn_80177908(void*);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
@@ -7016,125 +7016,78 @@ extern f32 lbl_8047AD7C;
 extern u8 lbl_8047AD70;
 extern f32 lbl_8047CFD8;
 extern f32 lbl_8047CFD4;
-#if 1
+#pragma push
+#pragma fp_contract on
+#if 0
 asm void fn_801171C8(void) {
 #include "src/game/gs_field_world_fn_801171C8.inc"
 }
 #else
 void fn_801171C8(void) {
-    extern f32 lbl_8047AD74;
-    extern f32 lbl_8047AD78;
-    extern f32 lbl_8047AD7C;
-    extern f32 lbl_8047CFD4;
-    extern f32 lbl_8047CFD8;
-    extern void fn_80117514();
-    extern void fn_80176758();
-    extern void fn_801767E0();
-    extern void fn_80176868();
-    extern void fn_80177908();
-    extern void fn_80177A38();
-    extern u8 lbl_8047AD70;
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
-    f32 f5 = 0.0f;
-    f32 f6 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
-    *(f64*)(sp + 0x30) = f31;
-    /* psq_st f31, 0x38((u32)sp), 0, qr0 */;
-    *(f64*)(sp + 0x20) = f30;
-    /* psq_st f30, 0x28((u32)sp), 0, qr0 */;
-    r0 = *(u8*)&lbl_8047AD71;
-    if (r0 != (u32)0x0) {
-        fn_80177A38();
-        r0 = r3 & 0xFF;
-        if (r0 == (u32)0x0) {
-            r0 = lbl_8047AD68;
-            if (r0 != (u32)0x0) {
-                if (r0 == (u32)0x1) {
-                r3 = lbl_8047AD6C;
-                f30 = *(f32*)((u8*)r3 + 0x14);
-                f31 = *(f32*)((u8*)r3 + 0xC);
-                f1 = *(f32*)((u8*)r3 + 0x10);
-                fn_80176868();
-                f1 = f31;
-                fn_801767E0();
-                f1 = f30;
-                fn_80176758();
-                } else {
-    r3 = (u32)sp + 0x14;
-    fn_80177908();
-    f2 = lbl_8047AD74;
-    r3 = (u32)sp + 0x14;
-    f1 = lbl_8047AD78;
-    r4 = (u32)sp + 0xc;
-    f0 = lbl_8047AD7C;
-    r5 = (u32)sp + 0x10;
-    *(f32*)(sp + 0xC) = f2;
-    r6 = (u32)sp + 0x8;
-    *(f32*)(sp + 0x10) = f1;
-    *(f32*)(sp + 0x8) = f0;
-    fn_80117514();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x0) {
-        r0 = *(u8*)&lbl_8047AD70;
-        if (r0 != (u32)0x0) {
-            f3 = lbl_8047CFD8;
-            f2 = *(f32*)(sp + 0xC);
-            f1 = *(f32*)(sp + 0x10);
-            f0 = *(f32*)(sp + 0x8);
-            f4 = f3 * f2;
-            f2 = f3 * f1;
-            f6 = lbl_8047CFD4;
-            f5 = lbl_8047AD74;
+    u8 pos[0xC];
+    f32 y;
+    f32 x;
+    f32 z;
+
+    if (lbl_8047AD71 == 0) { return; }
+    if (fn_80177A38() != 0) { return; }
+    if (lbl_8047AD68 == 0) { return; }
+
+    if (lbl_8047AD68 == 1) {
+        f32* ptr = (f32*)lbl_8047AD6C;
+        f32 direct_x;
+        f32 direct_z;
+        direct_z = ptr[5];
+        direct_x = ptr[3];
+        fn_80176868(ptr[4]);
+        fn_801767E0(direct_x);
+        fn_80176758(direct_z);
+        return;
+    }
+
+    fn_80177908(pos);
+    x = lbl_8047AD74;
+    y = lbl_8047AD78;
+    z = lbl_8047AD7C;
+    if (fn_80117514(pos, &x, &y, &z) == 0) { return; }
+
+    if (lbl_8047AD70 != 0) {
+        f32 f3 = lbl_8047CFD8;
+        f32 f2 = x;
+        f32 f1 = y;
+        f32 f0 = z;
+        f32 f4 = f3 * f2;
+        f2 = f3 * f1;
+        {
+            f32 f6 = lbl_8047CFD4;
+            f32 f5 = lbl_8047AD74;
             f0 = f3 * f0;
             f3 = lbl_8047AD78;
             f1 = lbl_8047AD7C;
             f4 = f6 * f5 + f4;
             f2 = f6 * f3 + f2;
             f0 = f6 * f1 + f0;
-            lbl_8047AD74 = f4;
-            lbl_8047AD78 = f2;
-            lbl_8047AD7C = f0;
-        } else {
-            f2 = *(f32*)(sp + 0xC);
-            r0 = 0x1;
-            f1 = *(f32*)(sp + 0x10);
-            f0 = *(f32*)(sp + 0x8);
-            lbl_8047AD74 = f2;
-            lbl_8047AD78 = f1;
-            lbl_8047AD7C = f0;
-            *(u8*)&lbl_8047AD70 = r0;
         }
-        f31 = lbl_8047AD7C;
-        f30 = lbl_8047AD78;
-        f1 = lbl_8047AD74;
-        fn_80176868();
-        f1 = f30;
-        fn_801767E0();
-        f1 = f31;
-        fn_80176758();
+        lbl_8047AD74 = f4;
+        lbl_8047AD78 = f2;
+        lbl_8047AD7C = f0;
+    } else {
+        lbl_8047AD74 = x;
+        lbl_8047AD78 = y;
+        lbl_8047AD7C = z;
+        lbl_8047AD70 = 1;
     }
-                }
+
+    {
+        f32 out_y = lbl_8047AD78;
+        f32 out_z = lbl_8047AD7C;
+        fn_80176868(lbl_8047AD74);
+        fn_801767E0(out_y);
+        fn_80176758(out_z);
     }
-    }
-    }
-    /* psq_l f31, 0x38((u32)sp), 0, qr0 */;
-    f31 = *(f64*)(sp + 0x30);
-    /* psq_l f30, 0x28((u32)sp), 0, qr0 */;
-    f30 = *(f64*)(sp + 0x20);
-    return;
 }
 #endif
+#pragma pop
 /* 0x80117330 | 0x194 */
 extern void* fn_800F9318();
 extern void fn_800E3D98(void);
@@ -27731,11 +27684,11 @@ extern f32 lbl_8047CFD0;
 extern f32 lbl_8047CFDC;
 extern f32 lbl_8047CFE0;
 #if 1
-asm void fn_80117514(void) {
+asm u8 fn_80117514(void) {
 #include "src/game/gs_field_world_fn_80117514.inc"
 }
 #else
-void fn_80117514(void) { /* TODO */ }
+u8 fn_80117514(void) { /* TODO */ }
 #endif
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
 #if 0
