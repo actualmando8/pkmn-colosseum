@@ -4156,113 +4156,65 @@ void fn_80135CE8(void* ptr) {
 #endif
 
 /* 0x80135D10 | 0x134 */
-extern void fn_8012A450(void);
-extern void fn_80142B24(void);
-extern void fn_801254B4(void);
-extern void fn_8011BBD8(void);
-extern void fn_801F4C14(void);
-extern void fn_801F75F8(void);
-extern void fn_801FAA58(void);
+extern u32 fn_8012A450();
+extern u32 fn_80142B24();
+extern u32 fn_801254B4();
+extern u32 fn_8011BBD8();
+extern u32 fn_801F4C14();
+extern u32 fn_801F75F8();
+extern u32 fn_801FAA58();
 extern void jumptable_80363AC8();
-#if 1
+#if 0
 asm void fn_80135D10(void) {
 #include "src/game/effect/effect_util_fn_80135D10.inc"
 }
 #else
-void fn_80135D10(void) {
-    extern void fn_8011BBD8();
-    extern void fn_801254B4();
-    extern void fn_8012A450();
-    extern void fn_80135024();
-    extern void fn_8013583C();
-    extern void fn_80142B24();
-    extern void fn_801F4C14();
-    extern void fn_801F75F8();
-    extern void fn_801FAA58();
-    extern u8 jumptable_80363AC8[];
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+    extern u32 fn_8011BBD8();
+    extern u32 fn_801254B4();
+    extern u32 fn_8012A450();
+    extern u32 fn_80135024();
+    extern u32 fn_8013583C();
+    extern u32 fn_80142B24();
+    extern u32 fn_801F4C14();
+    extern u32 fn_801F75F8();
+    extern u32 fn_801FAA58();
+    u32 result = 0;
 
-    r0 = r3 & 0xFF;
-    r31 = 0x0;
-    do {
-        if (r0 > (u32)0x9) break;
-        r3 = (u32)jumptable_80363AC8;
-        r0 = r0 << 2;
-        r3 = (u32)jumptable_80363AC8;
-        r0 = *(u32*)(r3 + r0);
-        ctr_fn = (void(*)(void))r0;
-        /* indirect jump via ctr */;
-        r3 = r4;
-        r4 = r6;
-        r5 = r8;
-        fn_8013583C();
+    switch ((u8)kind) {
+    case 0:
         break;
-        r3 = r4;
-        r4 = r6;
-        r5 = r8;
-        fn_80135024();
+    case 1:
+        fn_8013583C(arg1, arg3, arg5);
         break;
-        r3 = r4;
-        r4 = r6;
-        r5 = r8;
-        fn_8012A450();
+    case 2:
+        fn_80135024(arg1, arg3, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_80142B24();
+    case 3:
+        fn_8012A450(arg1, arg3, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_801254B4();
+    case 4:
+        fn_80142B24(arg1, arg2, arg3, arg4, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_8011BBD8();
+    case 5:
+        fn_801254B4(arg1, arg2, arg3, arg4, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_801F4C14();
-        r31 = r3;
+    case 6:
+        fn_8011BBD8(arg1, arg2, arg3, arg4, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_801F75F8();
+    case 7:
+        result = fn_801F4C14(arg1, arg2, arg3, arg4, arg5);
         break;
-        r3 = r4;
-        r4 = r5;
-        r5 = r6;
-        r6 = r7;
-        r7 = r8;
-        fn_801FAA58();
-    } while (0);
-    r3 = r31;
-    r31 = *(u32*)(sp + 0xC);
-    return;
+    case 8:
+        fn_801F75F8(arg1, arg2, arg3, arg4, arg5);
+        break;
+    case 9:
+        fn_801FAA58(arg1, arg2, arg3, arg4, arg5);
+        break;
+    default:
+        break;
+    }
+    return result;
 }
 #endif
 
