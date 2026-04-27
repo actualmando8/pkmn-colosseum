@@ -4243,12 +4243,40 @@ void fn_800E0790(void) {
 extern u32 lbl_8047CAE4;
 extern u32 lbl_8047CAE0;
 extern u32 lbl_8047CAE8;
-#if 1
+#if 0
 asm void fn_800E07E4(void) {
 #include "src/game/gs_render_fn_800E07E4.inc"
 }
 #else
-void fn_800E07E4(void) { /* TODO */ }
+void fn_800E07E4(void* dst, void* pts, f32 t) {
+    f32 t2;
+    f32 omt;
+    f32 omt2;
+    f32 scratch[3];
+
+    if (t < *(f32*)&lbl_8047CAE4) {
+        t = *(f32*)&lbl_8047CAE4;
+    }
+    if (t > *(f32*)&lbl_8047CAE0) {
+        t = *(f32*)&lbl_8047CAE0;
+    }
+    t2 = t * t;
+    omt = *(volatile f32*)&lbl_8047CAE0 - t;
+    omt2 = omt * omt;
+    fn_800E013C(dst, pts, omt2 * omt);
+    {
+        f32 w = *(f32*)&lbl_8047CAE8 * t;
+        fn_800E013C(scratch, (u8*)pts + 0x18, w * omt2);
+    }
+    fn_800E019C(dst, dst, scratch);
+    {
+        f32 w = *(f32*)&lbl_8047CAE8 * t2;
+        fn_800E013C(scratch, (u8*)pts + 0x24, w * omt);
+    }
+    fn_800E019C(dst, dst, scratch);
+    fn_800E013C(scratch, (u8*)pts + 0xc, t2 * t);
+    fn_800E019C(dst, dst, scratch);
+}
 #endif
 extern f32 lbl_8047CAF0;
 extern f32 lbl_8047CAF4;
