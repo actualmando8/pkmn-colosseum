@@ -5123,26 +5123,28 @@ s32 fn_800F6BBC(void) {
 
 /* 0x800F6BC4 | 0x154 */
 extern u8 lbl_803155D0[];
-#if 1
-asm void fn_800F6BC4(void* obj) {
+#if 0
+asm u32 fn_800F6BC4(void* obj) {
 #include "src/game/gs_thread_fn_800F6BC4.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800F6BC4(void* obj) {
+u32 fn_800F6BC4(void* obj) {
     u8* p;
     u8* strBase;
-    u8 state;
-    u8 opcode;
+    u8* ip;
+    u32 state;
+    u32 opcode;
     void (*dispatch)(void*);
     u32 count;
-    u32 val;
+    volatile u32 ret;
+    volatile u32 val;
     u32 delay;
 
     p = (u8*)obj;
     strBase = lbl_80271068;
     for (;;) {
-        state = *(u8*)(p + 0x4);
+        state = (u32)*(u8*)(p + 0x4);
         if (state == 0) {
             fn_800DD970((const char*)(strBase + 0x120), *(u32*)(p + 0x8));
             goto done;
@@ -5151,9 +5153,9 @@ void fn_800F6BC4(void* obj) {
             *(u8*)(p + 0x4) = 0;
             goto done;
         }
-        /* Advance ptr by 1 and fetch opcode */
-        *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 1;
-        opcode = *(u8*)*(u32*)(p + 0x14);
+        ip = (u8*)*(u32*)(p + 0x14);
+        *(u32*)(p + 0x14) = (u32)(ip + 1);
+        opcode = (u32)*ip;
         if (opcode >= 0x26) {
             fn_800DD38C((const char*)(strBase + 0x150));
         } else {
@@ -5163,27 +5165,30 @@ void fn_800F6BC4(void* obj) {
             }
         }
         delay = *(u32*)(p + 0x28);
-        if ((s32)delay <= 0) continue;
-        delay--;
-        while (delay > 0) delay--;
+        if ((s32)delay > 0) {
+            for (delay--; (s32)delay >= 0; delay--) {
+            }
+        }
     }
 done:
     if (*(u8*)(p + 0x4) == 4) {
         *(u8*)(p + 0x4) = 0;
     }
     count = *(u32*)(p + 0x28);
-    if ((s32)count > 0) {
+    if ((s32)count <= 0) {
+        fn_800DD38C((const char*)(strBase + 0x14));
+        val = *(u32*)(p + 0x6C);
+    } else {
         count--;
         *(u32*)(p + 0x28) = count;
         val = *(u32*)(p + 0x6C + count * 4);
-    } else {
-        fn_800DD38C((const char*)(strBase + 0x14));
-        val = *(u32*)(p + 0x6C);
     }
     {
         void (*cb)(void*, u32) = (void (*)(void*, u32))*(u32*)(p + 0x10);
+        ret = val;
         if (cb != NULL) cb(obj, val);
     }
+    return ret;
 }
 #endif
 
