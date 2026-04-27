@@ -16610,11 +16610,13 @@ do {
 }
 #endif
 /* 0x80122BC0 | 0xA4 */
-#if 1
+#if 0
 asm void fn_80122BC0(void) {
 #include "src/game/gs_field_world_fn_80122BC0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80122BC0(void) {
     extern u32 fn_8012640C();
     u32 r0 = 0;
@@ -16625,37 +16627,40 @@ void fn_80122BC0(void) {
     u32 r29 = 0;
     u32 r30 = 0;
     u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
+
+    clrlwi(r0, r4, 16);
     r30 = r4;
     r29 = r3;
-    if ((s32)r0 == (s32)0) {
+    if ((s32)r0 != (s32)0) {
+        if (r29 != (u32)0x0) {
+            r4 = 0x0;
+            r5 = 0x83;
+            r6 = 0x0;
+            fn_8012640C();
+            clrlwi(r31, r3, 16);
+            r3 = r29;
+            r4 = 0x0;
+            r5 = 0x87;
+            r6 = 0x0;
+            fn_8012640C();
+            clrlwi(r3, r3, 16);
+            clrlwi(r0, r30, 16);
+            divw(r0, r3, r0);
+            srwi(r3, r31, 31);
+            srawi(r4, r0, 31);
+            subfc(r0, r31, r0);
+            adde(r0, r4, r3);
+            clrlwi(r3, r0, 24);
+        } else {
+            r3 = 0x0;
+            return;
+        }
+    } else {
         r3 = 0x0;
         return;
     }
-    if (r29 == (u32)0x0) {
-        r3 = 0x0;
-        return;
-    }
-    r4 = 0x0;
-    r5 = 0x83;
-    r6 = 0x0;
-    fn_8012640C();
-    r31 = r3 & 0xFFFF;
-    r3 = r29;
-    r4 = 0x0;
-    r5 = 0x87;
-    r6 = 0x0;
-    fn_8012640C();
-    r3 = r3 & 0xFFFF;
-    r0 = r30 & 0xFFFF;
-    r0 = (s32)r3 / (s32)r0;
-    r3 = (u32)r31 >> 31;
-    r4 = (s32)r0 >> 31;
-    r0 = r0 - r31;
-    r0 = r4 + r3; /* +carry */;
-    r3 = r0 & 0xFF;
-    return;
 }
+#pragma pop
 #endif
 /* 0x80122C64 | 0x178 */
 #if 0
@@ -25523,82 +25528,54 @@ L_8012EF94: ;
 }
 #endif
 /* 0x8012F008 | 0x114 */
-extern void fn_80188AF4(void);
-extern void fn_80188F78(void);
+extern void fn_80188AF4(u32, u32);
+extern void fn_80188F78(u32, u32);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
-#if 1
+#if 0
 asm void fn_8012F008(void) {
 #include "src/game/gs_field_world_fn_8012F008.inc"
 }
 #else
-void fn_8012F008(void) {
-    extern f32 lbl_8047D030;
-    extern f32 lbl_8047D034;
-    extern void fn_80188AF4();
-    extern void fn_80188F78();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    if ((s32)r0 >= (s32)0 && (s32)r31 < (s32)0x2) {
-    if ((s32)r3 >= (s32)0x0 && (s32)r3 < (s32)0x2) {
-    r4 = (u32)&lbl_80426BD0;
-    r0 = r3 << 5;
-    r4 = (u32)&lbl_80426BD0;
-    r4 = r4 + r0;
-    r0 = *(u16*)((u8*)r4 + 0x4);
-    r0 = r0 & 0x1;
-    if ((s32)r3 == (s32)0x2) {
-        r0 = 0x0;
+u32 fn_8012F008(s32 idx, s32 state)
+{
+    u32 values[2];
+    u32 value;
+    u8* entry;
+    u32 valid;
+
+    if (state < 0 || state >= 2) {
+        return 0;
+    }
+
+    if (idx < 0 || idx >= 2) {
+        valid = 0;
     } else {
-    r0 = 0x1;
+        if ((*(u16*)(lbl_80426BD0 + idx * 0x20 + 4) & 1) != 0) {
+            valid = 1;
+        } else {
+            valid = 0;
+        }
     }
-    } else {
-    r0 = 0x0;
+    if ((valid & 0xFF) == 0) {
+        return 0;
     }
-    r0 = r0 & 0xFF;
-    if ((s32)r3 == (s32)0x2) {
-        r3 = 0x0;
-    } else {
-    r4 = lbl_8047D030;
-    r0 = lbl_8047D034;
-    *(u32*)(sp + 0xC) = r0;
-    if (((s32)r3 >= (s32)0x0) && ((s32)r3 < (s32)0x2)) {
-        r0 = r3 << 2;
-        r4 = (u32)sp + 0x8;
-        r29 = *(u32*)(r4 + r0);
+
+    values[0] = *(u32*)&lbl_8047D030;
+    values[1] = *(u32*)&lbl_8047D034;
+    if (idx >= 0 && idx < 2) {
+        value = values[idx];
     }
-    r4 = (u32)&lbl_80426BD0;
-    r0 = r3 << 5;
-    r3 = (u32)&lbl_80426BD0;
-    r30 = r3 + r0;
-    r0 = *(u32*)((u8*)r30 + 0xC);
-    if ((s32)r0 != (s32)0x1) {
-    } else {
-        r4 = r29;
-        r3 = 0x0;
-        fn_80188AF4();
+
+    entry = lbl_80426BD0 + idx * 0x20;
+    if (*(s32*)(entry + 0xC) == 1) {
+        fn_80188AF4(0, value);
     }
-    if ((s32)r31 != (s32)0x1) {
-    } else {
-        r4 = r29;
-        r3 = 0x0;
-        fn_80188F78();
+    if (state == 1) {
+        fn_80188F78(0, value);
     }
-    *(u32*)((u8*)r30 + 0x0) = r31;
-    r3 = 0x1;
-    }
-    } else {
-    r3 = 0x0;
-    }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+    *(u32*)(entry + 0xC) = state;
+    return 1;
 }
 #endif
 /* 0x8012F11C | 0x34 */
