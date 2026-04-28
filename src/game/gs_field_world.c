@@ -14440,137 +14440,62 @@ extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
-#if 1
+#if 0
 asm void fn_801202CC(void) {
 #include "src/game/gs_field_world_fn_801202CC.inc"
 }
 #else
-void fn_801202CC(void) {
-    extern f32 lbl_8047CFF0;
-    extern f32 lbl_8047CFF4;
-    extern f64 lbl_8047D008;
-    extern f64 lbl_8047D010;
-    extern void fn_8011CE44();
-    extern void fn_8011CE74();
-    extern u32 fn_8012640C();
-    extern void fn_801EEEB8();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    r5 = 0x7a;
-    r6 = 0x0;
-    r31 = r4;
-    r4 = 0x0;
-    r30 = r3;
-    fn_8012640C();
-    r28 = r3 & 0xFF;
-    if (r30 == (u32)0x0) {
-        r29 = 0x0;
+void fn_801202CC(u8* ptr, u8* out) {
+    extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
+    extern void* fn_8011CE74(u8 idx);
+    extern u32 fn_8011CE44(void* ptr, u8 idx);
+    u8 idx;
+    u32 base;
+    void* table;
+    u32 next;
+    u32 sp[2];
+    u32 val;
+    f32 scale;
+
+    idx = (u8)fn_8012640C(ptr, 0, 0x7A, 0);
+    if (ptr == NULL) {
+        base = 0;
     } else {
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0x6e;
-        r6 = 0x0;
-        fn_8012640C();
-        r4 = r3 & 0xFFFF;
-        r3 = 0x0;
-        r5 = 0x11;
-        r6 = 0x0;
-        fn_8012640C();
-        r3 = r3 & 0xFF;
-        fn_8011CE74();
-        if (r3 == (u32)0x0) {
-            r3 = 0x0;
+        table = fn_8011CE74((u8)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x11, 0));
+        if (table == NULL) {
+            base = 0;
         } else {
-            r4 = r28;
-            fn_8011CE44();
+            base = fn_8011CE44(table, idx);
         }
-        r29 = r3;
     }
-    r3 = r30;
-    r4 = 0x0;
-    r5 = 0xc2;
-    r6 = 0x0;
-    fn_8012640C();
-    r0 = r3 & 0xFF;
-    if (r3 == (u32)0x0) {
-        if (r30 != (u32)0x0) {
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0x6e;
-        r6 = 0x0;
-        fn_8012640C();
-        r4 = r3 & 0xFFFF;
-        r3 = 0x0;
-        r5 = 0x11;
-        r6 = 0x0;
-        fn_8012640C();
-        r3 = r3 & 0xFF;
-        fn_8011CE74();
-        if (r3 != (u32)0x0) {
-        r0 = r28 + 0x1;
-        r4 = r0 & 0xFF;
-        fn_8011CE44();
+
+    if ((u8)fn_8012640C(ptr, 0, 0xC2, 0) == 0) {
+        if (ptr == NULL) {
+            next = 0;
+        } else {
+            table = fn_8011CE74((u8)fn_8012640C(0, (u16)fn_8012640C(ptr, 0, 0x6E, 0), 0x11, 0));
+            if (table == NULL) {
+                next = 0;
+            } else {
+                next = fn_8011CE44(table, (u8)(idx + 1));
+            }
         }
-        }
-        r0 = r3 - r29;
-        r3 = r30;
-        *(u32*)((u8*)r31 + 0x1C) = r0;
-        r4 = 0x0;
-        r5 = 0x79;
-        r6 = 0x0;
-        fn_8012640C();
-        r0 = r3 - r29;
-        *(u32*)((u8*)r31 + 0x20) = r0;
+        *(u32*)(out + 0x1C) = next - base;
+        *(u32*)(out + 0x20) = fn_8012640C(ptr, 0, 0x79, 0) - base;
     } else {
-    r3 = r30;
-    r4 = 0x0;
-    r5 = 0xc3;
-    r6 = 0x0;
-    fn_8012640C();
-    r3 = r3 & 0xFFFF;
-    fn_801EEEB8();
-    r3 = r3 & 0xFFFF;
-    r0 = (0x4330 << 16);
-    f1 = lbl_8047D010;
-    *(u32*)(sp + 0x8) = r0;
-    f0 = *(f64*)(sp + 0x8);
-    f0 = f0 - f1;
-    *(f32*)((u8*)r31 + 0x1C) = f0;
-    if (r30 == (u32)0x0) {
-        f0 = lbl_8047CFF0;
-    } else {
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0xc5;
-        r6 = 0x0;
-        fn_8012640C();
-        /* xoris r3, r3, 0x8000 */;
-        r0 = (0x4330 << 16);
-        f2 = lbl_8047D008;
-        *(u32*)(sp + 0x8) = r0;
-        f0 = lbl_8047CFF4;
-        f1 = *(f64*)(sp + 0x8);
-        f1 = f1 - f2;
-        f0 = f1 / f0;
+        val = (u16)(u32)fn_801EEEB8((u16)fn_8012640C(ptr, 0, 0xC3, 0));
+        sp[0] = 0x43300000;
+        sp[1] = val;
+        *(f32*)(out + 0x1C) = *(f64*)sp - lbl_8047D010;
+        if (ptr == NULL) {
+            scale = lbl_8047CFF0;
+        } else {
+            sp[0] = 0x43300000;
+            sp[1] = fn_8012640C(ptr, 0, 0xC5, 0) ^ 0x80000000;
+            scale = (*(f64*)sp - lbl_8047D008) / lbl_8047CFF4;
+        }
+        *(f32*)(out + 0x20) = scale;
     }
-    *(f32*)((u8*)r31 + 0x20) = f0;
-    }
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    r28 = *(u32*)(sp + 0x10);
-    return;
 }
 #endif
 /* 0x801204A8 | 0x1CC */
