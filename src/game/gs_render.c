@@ -3849,12 +3849,59 @@ s32 fn_800DFE98(u8* obj) {
     return r;
 }
 #endif
-#if 1
+#if 0
 asm void fn_800DFEEC(void) {
 #include "src/game/gs_render_fn_800DFEEC.inc"
 }
 #else
-void fn_800DFEEC(void) { /* TODO */ }
+#pragma push
+#pragma fp_contract on
+void fn_800DFEEC(f32* r3, f32* r4, f32* r5) {
+    f32 f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
+    f6 = r5[1];
+    f12 = r4[1];
+    f10 = r5[2];
+    f11 = r4[0];
+    f0 = f6 * f12;
+    f5 = r5[0];
+    f2 = f10 * f12;
+    f8 = r4[2];
+    f1 = f6 * f11;
+    f9 = r4[3];
+    f0 = f5 * f11 + f0;
+    f3 = f5 * f9 + f2;
+    f2 = f5 * f8;
+    f7 = f10 * f8 + f0;
+    f1 = f10 * f9 + f1;
+    f4 = -(f6 * f8 - f3);
+    f0 = f11 * f7;
+    f2 = f6 * f9 + f2;
+    f6 = -(f5 * f12 - f1);
+    f0 = f9 * f4 + f0;
+    f5 = -(f10 * f11 - f2);
+    f0 = f12 * f6 + f0;
+    f0 = -(f8 * f5 - f0);
+    r3[0] = f0;
+    f0 = r4[1];
+    f1 = r4[3];
+    f0 = f0 * f7;
+    f2 = r4[2];
+    f3 = r4[0];
+    f0 = f1 * f5 + f0;
+    f0 = f2 * f4 + f0;
+    f0 = -(f3 * f6 - f0);
+    r3[1] = f0;
+    f0 = r4[2];
+    f1 = r4[3];
+    f0 = f0 * f7;
+    f2 = r4[0];
+    f3 = r4[1];
+    f0 = f1 * f6 + f0;
+    f0 = f2 * f5 + f0;
+    f0 = -(f3 * f4 - f0);
+    r3[2] = f0;
+}
+#pragma pop
 #endif
 extern void fn_800A37CC(void*, void*, void*);
 #if 0
