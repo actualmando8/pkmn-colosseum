@@ -11185,137 +11185,81 @@ s32 fn_8011B67C(void* obj, u16 val) {
     return;
 }
 /* 0x8011B788 | 0x1C8 */
-#if 1
+#if 0
 asm void fn_8011B788(void) {
 #include "src/game/gs_field_world_fn_8011B788.inc"
 }
 #else
-void fn_8011B788(void) {
-    extern void fn_80119E90();
-    extern void fn_80119ED0();
-    extern void fn_80119F10();
-    extern void fn_80119F90();
-    extern void fn_80119FA0();
-    extern void fn_80119FB0();
-    extern void fn_80119FC0();
-    extern void fn_80119FD0();
-    extern void fn_80119FE0();
-    extern void fn_80119FF0();
-    extern void fn_8011A090();
-    extern void fn_80135E44();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r4 & 0xFFFF;
-    r31 = r4;
-    r30 = r3;
-    if ((s32)r0 == (s32)0) return;
-    if ((s32)r0 != (s32)0) {
-    r3 = r31;
-    fn_80119E90();
-    r29 = r3 & 0xFF;
-    r3 = r31;
-    fn_80119F10();
-    r28 = r3;
-    r3 = r31;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r28;
-    r4 = r30;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r28 = 0x0;
-    } else {
-        /* clrlslwi r0, r29, 16, 4 */;
-        r28 = r3 + r0;
+void fn_8011B788(void* obj, u16 id) {
+    extern u8 fn_80119E90(u16 val);
+    extern u8* fn_80119F10(u16 val);
+    extern u32 fn_80119ED0(u16 val);
+    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u16 fn_8011A090(u8* ptr);
+    extern void fn_80119FF0(u8* ptr, u32 val);
+    extern void fn_80119FE0(u8* ptr, u32 val);
+    extern void fn_80119FD0(u8* ptr, u32 val);
+    extern void fn_80119FC0(u8* ptr, u32 val);
+    extern void fn_80119FB0(u8* ptr, u32 val);
+    extern void fn_80119FA0(u8* ptr, u32 val);
+    extern void fn_80119F90(u8* ptr, u32 val);
+    u8* base;
+    u16 idx;
+    u8 flag;
+
+    if (id == 0) { goto exit; }
+    if (id != 0) { goto body_start; }
+    flag = 0; goto flag_check;
+body_start:
+    idx = fn_80119E90(id);
+    base = fn_80119F10(id);
+    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    if (base != NULL) { goto offset_calc; }
+    base = NULL;
+    goto check_base;
+offset_calc:
+    base = base + idx * 16;
+check_base:
+    if (base == NULL) {
+        flag = 0;
+        goto flag_check;
     }
-    if (r28 == (u32)0x0) {
-        r0 = 0x0;
-    } else {
-    if (r28 == (u32)0x0) {
-        r0 = 0x0;
-    } else {
-    r3 = r28;
-    fn_8011A090();
-    r0 = r3 & 0xFFFF;
-    if (r28 == (u32)0x0) {
-        r0 = 0x0;
-    } else {
-    r0 = 0x1;
-    }
-    }
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r28;
-        fn_8011A090();
-        r3 = r3 & 0xFFFF;
-        r0 = r31 & 0xFFFF;
-        if (r0 == (u32)r3) {
-            r0 = 0x1;
-        } else {
-    r0 = 0x0;
+    if (base != NULL) { goto a090_check; }
+    flag = 0; goto inner_flag_check;
+a090_check:
+    if ((u16)fn_8011A090(base) == 0) { flag = 0; goto inner_flag_check; }
+    flag = 1;
+inner_flag_check:
+    if ((u8)flag == 1) {
+        if ((u16)fn_8011A090(base) == id) {
+            flag = 1;
+            goto flag_check;
         }
-    } else {
-    r0 = 0x0;
     }
-    }
-    } else {
-    r0 = 0x0;
-    }
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)r3) return;
-    r3 = r31;
-    fn_80119E90();
-    r28 = r3 & 0xFF;
-    r3 = r31;
-    fn_80119F10();
-    r29 = r3;
-    r3 = r31;
-    fn_80119ED0();
-    r6 = r3;
-    r3 = r29;
-    r4 = r30;
-    r5 = 0x0;
-    r7 = 0x0;
-    fn_80135E44();
-    if (r3 == (u32)0x0) {
-        r30 = 0x0;
-    } else {
-        /* clrlslwi r0, r28, 16, 4 */;
-        r30 = r3 + r0;
-    }
-    if (r30 == (u32)0x0) return;
-    if (r30 == (u32)0x0) return;
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FF0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FE0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FD0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FC0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FB0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119FA0();
-    r3 = r30;
-    r4 = 0x0;
-    fn_80119F90();
+    flag = 0;
+flag_check:
+    if ((u8)flag == 0) { goto exit; }
+
+    idx = fn_80119E90(id);
+    base = fn_80119F10(id);
+    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    if (base != NULL) { goto p2_offset; }
+    base = NULL;
+    goto p2_check;
+p2_offset:
+    base = base + idx * 16;
+p2_check:
+    if (base == NULL) { goto exit; }
+    if (base == NULL) { goto exit; }
+    fn_80119FF0(base, 0);
+    fn_80119FE0(base, 0);
+    fn_80119FD0(base, 0);
+    fn_80119FC0(base, 0);
+    fn_80119FB0(base, 0);
+    fn_80119FA0(base, 0);
+    fn_80119F90(base, 0);
+
+exit:
     return;
 }
 #endif
