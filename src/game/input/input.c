@@ -997,10 +997,73 @@ extern u32 lbl_8047AC48;
 extern u32 lbl_8047CCD0;
 extern u32 lbl_8047AC4C;
 extern u32 lbl_8047AC50;
-#if 1
+#if 0
 asm void fn_800F8138(void) {
 #include "src/game/input/input_fn_800F8138.inc"
 }
 #else
-void fn_800F8138(void) { /* TODO */ }
+#pragma push
+#pragma scheduling on
+void fn_800F8138(void) {
+    extern u8 lbl_80401C10[];
+    extern u32 lbl_8047AC48;
+    extern u32 lbl_8047CCD0;
+    extern u32 lbl_8047AC4C;
+    extern u32 lbl_8047AC50;
+    extern void fn_800ABCF4(s32);
+    extern void fn_800AAF38(void);
+    extern void fn_800AB4FC(void*);
+    extern void fn_800AAE34(u32);
+    extern void fn_800ABF5C(void*);
+    extern void SISetSamplingRate(s32);
+    u8* base;
+    u8* pad;
+    u32* arr1c0;
+    u32* arr1b0;
+    s32 i;
+    f32 zero_f;
+
+    lbl_8047AC48 = 0;
+    base = lbl_80401C10;
+    lbl_8047AC4C = 0xF0000000;
+    pad = base;
+    zero_f = *(f32*)&lbl_8047CCD0;
+    arr1c0 = (u32*)(base + 0x1c0);
+    arr1b0 = (u32*)(base + 0x1b0);
+    lbl_8047AC50 = 0;
+
+    for (i = 0; i < 4; i++) {
+        *(u32*)(pad + 0x00) = 0;
+        *(u32*)(pad + 0x08) = 0;
+        *(u32*)(pad + 0x0C) = 3;
+        *(u8*) (pad + 0x10) = 0;
+        *(u32*)(pad + 0x14) = 0;
+        *(u32*)(pad + 0x30) = 0;
+        memset(pad + 0x18, 0, 12);
+        memset(pad + 0x24, 0, 12);
+        *(u8*) (pad + 0x34) = 0;
+        *(u8*) (pad + 0x35) = 0;
+        *(u8*) (pad + 0x36) = 0;
+        *(u8*) (pad + 0x37) = 0;
+        *(f32*)(pad + 0x48) = zero_f;
+        *(f32*)(pad + 0x4C) = zero_f;
+        *(f32*)(pad + 0x50) = zero_f;
+        *(f32*)(pad + 0x54) = zero_f;
+        *(u32*)(pad + 0x5C) = 3;
+        *(u32*)(pad + 0x60) = 0;
+        *(u32*)(pad + 0x64) = 0;
+        *(u8*) (pad + 0x68) = 0;
+        pad += 0x6c;
+        *arr1c0++ = 2;
+        *arr1b0++ = 0;
+    }
+
+    fn_800ABCF4(0);
+    fn_800AAF38();
+    fn_800AB4FC(base + 0x1c0);
+    fn_800AAE34(lbl_8047AC4C);
+    SISetSamplingRate(0xb);
+    fn_800ABF5C((void*)fn_800F8268);
+}
+#pragma pop
 #endif
