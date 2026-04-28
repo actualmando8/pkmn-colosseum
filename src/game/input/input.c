@@ -773,17 +773,15 @@ asm void fn_800F7A08(void) {
 }
 #else
 u32 fn_800F7A08(s32 key, s32 sel) {
-    u8* p = &lbl_80401C10[0];
-    u8* nul = NULL;
-    if (*(s32*)p != key) {
-        if (*(s32*)(p += 0x6c) != key) {
-            if (*(s32*)(p += 0x6c) != key) {
-                if (*(s32*)(p += 0x6c) != key) {
-                    p = nul;
-                }
-            }
-        }
+    u8* p;
+    u32 i;
+    p = &lbl_80401C10[0];
+    for (i = 0; i < 4; i++) {
+        if (*(s32*)p == key) goto found;
+        p += 0x6c;
     }
+    p = NULL;
+found:
     if (p == NULL) return 0;
     if (sel == 1) return *(u8*)(p + 0x59);
     return *(u8*)(p + 0x27);
@@ -839,14 +837,13 @@ u32 fn_800F7B5C(s32 padId) {
     return ~(u32)*(u16*)(pad + 0x24);
 }
 #endif
-#if 1
+#if 0
 asm void fn_800F7BC4(void) {
 #include "src/game/input/input_fn_800F7BC4.inc"
 }
 #else
 #pragma push
-#pragma scheduling on
-#pragma peephole off
+#pragma optimization_level 3
 u16 fn_800F7BC4(s32 padId) {
     extern u8 lbl_80401C10[];
     u8* pad = &lbl_80401C10[0];
