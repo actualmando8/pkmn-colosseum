@@ -5268,37 +5268,34 @@ void* fn_800F6D18(void* callback, u32 arg, void* list) {
 
 /* 0x800F7068 | 0xA0 */
 extern u32 lbl_80478B00;
-#if 1
+#if 0
 asm s32 fn_800F7068(u16 key, u8 flag) {
 #include "src/game/gs_thread_fn_800F7068.inc"
 }
 #else
-#pragma optimization_level 2
 s32 fn_800F7068(u16 key, u8 flag) {
-    u8* head;
-    u16 count;
+    u32 k = (u32)(u16)key;
+    u32 f = (u32)(u8)flag;
     u8* entry;
-    u8* e;
     u32 offset;
-    u32 k;
-    u32 f;
+    u8* head;
+    s32 i;
 
-    k = (u32)(u16)key;
-    f = (u32)(u8)flag;
     for (;;) {
         head = (u8*)lbl_80478B00;
-        count = *(u16*)head;
         offset = 0;
-        entry = NULL;
-        while (count > 0) {
-            e = (u8*)*(u32*)(head + 0xC) + offset;
-            if (*(u8*)(e + 0x4) != 0 && (u32)*(u16*)(e + 0x6) == k) {
-                entry = e;
-                break;
-            }
-            offset += 0x16C;
-            count--;
+        i = (s32)*(u16*)head;
+        if (i > 0) {
+            do {
+                entry = (u8*)*(u32*)(head + 0xC) + offset;
+                if (*(u8*)(entry + 0x4) != 0 && (u32)*(u16*)(entry + 0x6) == k) {
+                    goto found;
+                }
+                offset += 0x16C;
+            } while (--i != 0);
         }
+        entry = NULL;
+    found:
         if (entry == NULL) return 0;
         if (f != 0) {
             fn_800F0308();
