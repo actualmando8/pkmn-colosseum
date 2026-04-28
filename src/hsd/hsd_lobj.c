@@ -333,27 +333,30 @@ s32 fn_801A48B0(HSD_LObj* lobj) {
 /* 0x801A48F4 | 0x88 */
 extern void* fn_80191628();
 extern void fn_80191788();
-extern u8 lbl_8047DBCC[];
+extern char lbl_8047DBCC;
 extern u8 lbl_80274DB8[];
 extern char lbl_8047DBB8;
-#if 1
+#if 0
 asm void fn_801A48F4(void) {
 #include "src/hsd/hsd_lobj_fn_801A48F4.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 /* HSD_LObjSetInterestWObjDesc */
 void fn_801A48F4(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
-        fn_80196E10(lbl_8047DBB8, 0x58c, lbl_8047DBCC);
+        fn_80196E10(&lbl_8047DBB8, 0x58c, &lbl_8047DBCC);
     }
     if (lobj->interest == NULL) {
         lobj->interest = fn_80191628();
         if (lobj->interest == NULL) {
-            fn_80196E10(lbl_8047DBB8, 0x58f, lbl_80274DB8);
+            fn_80196E10(&lbl_8047DBB8, 0x58f, lbl_80274DB8);
         }
     }
     fn_80191788(lobj->interest, desc);
 }
+#pragma pop
 #endif
 
 /* 0x801A497C | 0x44 */
