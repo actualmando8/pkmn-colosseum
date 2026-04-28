@@ -4735,24 +4735,22 @@ s32 fn_8005D8B8(u32 idx) {
 
 
 /* 0x8005D8F8 | size: 0x3C */
-#if 1
+#if 0
 asm void fn_8005D8F8(u32 idx, u32 val) {
 #include "src/game/ui/ui_core_fn_8005D8F8.inc"
 }
 #else
+typedef struct { u8 b7:1; u8 rest:7; } UiBits_8005D8F8;
 #pragma optimization_level 4
 void fn_8005D8F8(u32 idx, u32 val) {
-    u8* ptr;
-    u32 tmp;
+    UiBits_8005D8F8* ptr;
     if (idx >= *(u32*)&lbl_80478968) {
-        ptr = (u8*)0;
+        ptr = (UiBits_8005D8F8*)0;
     } else {
-        ptr = &lbl_802EF0A8[idx * 0x1C];
+        ptr = (UiBits_8005D8F8*)&lbl_802EF0A8[idx * 0x1C];
     }
-    if (ptr == (u8*)0) return;
-    tmp = ptr[0];
-    tmp = (tmp & ~0x80u) | ((val << 7) & 0x80u);
-    ptr[0] = (u8)tmp;
+    if (ptr == (UiBits_8005D8F8*)0) return;
+    ptr->b7 = (u8)val;
 }
 #endif
 
