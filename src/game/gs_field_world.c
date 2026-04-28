@@ -14633,138 +14633,62 @@ void fn_801202CC(void) {
 extern void fn_800FA280(void);
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
-#if 1
+#if 0
 asm void fn_801204A8(void) {
 #include "src/game/gs_field_world_fn_801204A8.inc"
 }
 #else
-void fn_801204A8(void) {
-    extern void fn_800FA280();
-    extern void fn_8010C46C();
-    extern void fn_8010C4D4();
-    extern void fn_8011BB6C();
-    extern void fn_8011BEB4();
+void fn_801204A8(u8* ptr, u8* out) {
+    extern u32 fn_800FA280();
+    extern u32 fn_8010C46C();
+    extern u32 fn_8010C4D4();
+    extern u32 fn_8011BB6C();
+    extern u32 fn_8011BEB4();
     extern u32 fn_8012640C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r5 = 0x48;
-    r31 = r4;
-    r30 = r3;
-    r4 = 0x0;
-    r3 = r31;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r3 = r30;
-    r4 = 0x0;
-    r5 = 0x77;
-    r6 = 0x0;
-    fn_8012640C();
-    *(u32*)((u8*)r31 + 0x0) = r3;
-    r26 = 0x0;
-    while (r0 = r26 & 0xFF, r0 < (u32)0x4) {
+    u8 i;
+    u8 valid;
+    u32 slot2;
+    u16 id;
+    u16 resolved;
+    u16 extra;
+    u32 byte;
+    u8* slot;
 
-    r29 = r26 & 0xFF;
-    r3 = r29 * 0xc;
-    r25 = r3 + 0x4;
-    r25 = r31 + r25;
-    if (r30 == (u32)0x0) {
-        r0 = 0x0;
-    } else {
-    r3 = r30;
-    r6 = r29;
-    r4 = 0x0;
-    r5 = 0x7f;
-    fn_8012640C();
-    if ((s32)r3 == (s32)0x0) {
-        r0 = 0x0;
-    } else {
-    r3 = r30;
-    r6 = r29;
-    r4 = 0x0;
-    r5 = 0x7f;
-    fn_8012640C();
-    if ((s32)r3 == (s32)0x163) {
-        r0 = 0x0;
-    } else {
-    r0 = 0x1;
-    }
-    }
-    }
-    r0 = r0 & 0xFF;
-    if ((s32)r3 == (s32)0x163) {
-        r0 = 0x0;
-        *(u32*)((u8*)r25 + 0x0) = r0;
-        *(u32*)((u8*)r25 + 0x4) = r0;
-        *(u8*)((u8*)r25 + 0xA) = r0;
-        *(u8*)((u8*)r25 + 0xB) = r0;
-    } else {
-        r28 = r26 & 0xFF;
-        r3 = r30;
-        r6 = r28;
-        r4 = 0x0;
-        r5 = 0x7f;
-        fn_8012640C();
-        r27 = r3 & 0xFFFF;
-        r3 = 0x0;
-        r4 = r27;
-        r5 = 0x3;
-        r6 = 0x0;
-        fn_8011BEB4();
-        r29 = r3 & 0xFFFF;
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x1;
-        r6 = 0x0;
-        fn_8011BEB4();
-        fn_800FA280();
-        *(u32*)((u8*)r25 + 0x0) = r3;
-        r3 = r29;
-        fn_8010C4D4();
-        fn_800FA280();
-        *(u32*)((u8*)r25 + 0x4) = r3;
-        r3 = r29;
-        fn_8010C46C();
-        *(u16*)((u8*)r25 + 0x8) = r3;
-        if (r30 == (u32)0x0) {
-            r3 = 0x0;
+    memset(out, 0, 0x48);
+    *(u32*)out = fn_8012640C(ptr, 0, 0x77, 0);
+    for (i = 0; i < 4; i++) {
+        slot = out + i * 0xC + 4;
+        if (ptr == NULL) {
+            valid = 0;
+        } else if ((s32)fn_8012640C(ptr, 0, 0x7F, i) == 0) {
+            valid = 0;
+        } else if ((s32)fn_8012640C(ptr, 0, 0x7F, i) == 0x163) {
+            valid = 0;
         } else {
-            r27 = r28 + 0x4;
-            r3 = r30;
-            r6 = r27 & 0xFFFF;
-            r4 = 0x0;
-            r5 = 0x7f;
-            fn_8012640C();
-            r29 = r3 & 0xFFFF;
-            r3 = r30;
-            r6 = r27 & 0xFFFF;
-            r4 = 0x0;
-            r5 = 0x81;
-            fn_8012640C();
-            r4 = r3 & 0xFF;
-            r3 = r29;
-            fn_8011BB6C();
+            valid = 1;
         }
-        *(u8*)((u8*)r25 + 0xA) = r3;
-        r3 = r30;
-        r6 = r28;
-        r4 = 0x0;
-        r5 = 0x80;
-        fn_8012640C();
-        *(u8*)((u8*)r25 + 0xB) = r3;
+        if (valid == 0) {
+            *(u32*)(slot + 0x0) = 0;
+            *(u32*)(slot + 0x4) = 0;
+            *(u8*)(slot + 0xA) = 0;
+            *(u8*)(slot + 0xB) = 0;
+        } else {
+            id = (u16)fn_8012640C(ptr, 0, 0x7F, i);
+            resolved = (u16)fn_8011BEB4(0, id, 3, 0);
+            *(u32*)(slot + 0x0) = fn_800FA280(fn_8011BEB4(0, id, 1, 0));
+            *(u32*)(slot + 0x4) = fn_800FA280(fn_8010C4D4(resolved));
+            *(u16*)(slot + 0x8) = (u16)fn_8010C46C(resolved);
+            if (ptr == NULL) {
+                byte = 0;
+            } else {
+                slot2 = i + 4;
+                extra = (u16)fn_8012640C(ptr, 0, 0x7F, slot2);
+                byte = fn_8011BB6C(extra, (u8)fn_8012640C(ptr, 0, 0x81, slot2));
+            }
+            *(u8*)(slot + 0xA) = byte;
+            *(u8*)(slot + 0xB) = (u8)fn_8012640C(ptr, 0, 0x80, i);
+        }
     }
-    r26 = r26 + 0x1;
-    }
-
-    return;
 }
 #endif
 /* 0x80120674 | 0x1F8 */
