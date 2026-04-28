@@ -725,12 +725,34 @@ s32 fn_800F75FC(u32 val) {
     return 0;
 }
 extern u8* lbl_80478B00;
-#if 1
+#if 0
 asm void fn_800F76E4(void) {
 #include "src/game/input/input_fn_800F76E4.inc"
 }
 #else
-void fn_800F76E4(void) { /* TODO */ }
+void fn_800F76E4(u8* arg) {
+    extern u8* lbl_80478B00;
+    u8* head;
+    u32 i;
+    u32* tbl;
+    u32 off;
+
+    *(u32*)(arg + 0x14) = 0;
+    head = (u8*)*(u32*)(lbl_80478B00 + 0x8);
+    if (head == NULL) {
+        *(u32*)(lbl_80478B00 + 0x8) = (u32)arg;
+    } else {
+        *(u32*)(lbl_80478B00 + 0x8) = (u32)arg;
+        *(u32*)(arg + 0x14) = (u32)head;
+    }
+    if (*(u8*)(arg + 0xa) != 0) return;
+    tbl = (u32*)(arg + *(u32*)(arg + 0xc));
+    for (i = 0; (s32)i < (s32)*(u16*)(arg + 0x6); i++) {
+        u32 r = *tbl++;
+        *(u32*)(arg + r) += (u32)arg;
+    }
+    *(u8*)(arg + 0xa) = 1;
+}
 #endif
 extern void fn_800E3534(void);
 extern void fn_800DD38C(void);
@@ -745,12 +767,27 @@ asm void fn_800F7758(void) {
 void fn_800F7758(void) { /* TODO */ }
 #endif
 extern u8 lbl_80401C10[];
-#if 1
+#if 0
 asm void fn_800F7A08(void) {
 #include "src/game/input/input_fn_800F7A08.inc"
 }
 #else
-void fn_800F7A08(void) { /* TODO */ }
+u32 fn_800F7A08(s32 key, s32 sel) {
+    u8* p = &lbl_80401C10[0];
+    u8* nul = NULL;
+    if (*(s32*)p == key) goto found;
+    p += 0x6c;
+    if (*(s32*)p == key) goto found;
+    p += 0x6c;
+    if (*(s32*)p == key) goto found;
+    p += 0x6c;
+    if (*(s32*)p == key) goto found;
+    p = nul;
+found:
+    if (p == NULL) return 0;
+    if (sel == 1) return *(u8*)(p + 0x59);
+    return *(u8*)(p + 0x27);
+}
 #endif
 #if 1
 asm void fn_800F7A7C(void) {
@@ -759,19 +796,44 @@ asm void fn_800F7A7C(void) {
 #else
 void fn_800F7A7C(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_800F7AF0(void) {
 #include "src/game/input/input_fn_800F7AF0.inc"
 }
 #else
-void fn_800F7AF0(void) { /* TODO */ }
+u32 fn_800F7AF0(s32 padId) {
+    extern u8 lbl_80401C10[];
+    u8* pad = lbl_80401C10;
+
+    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found */ }
+    else { pad = NULL; }
+
+    if (pad == NULL) { return 0; }
+    return (u32)(*(u16*)(pad + 0x24)) ^ *(u32*)(pad + 0x30);
+}
 #endif
-#if 1
+#if 0
 asm void fn_800F7B5C(void) {
 #include "src/game/input/input_fn_800F7B5C.inc"
 }
 #else
-void fn_800F7B5C(void) { /* TODO */ }
+u16 fn_800F7B5C(s32 padId) {
+    extern u8 lbl_80401C10[];
+    u8* pad = lbl_80401C10;
+
+    if (*(s32*)(pad + 0x00) == padId) { /* found at slot 0 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 1 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 2 */ }
+    else if (*(s32*)(pad + 0x6C) == padId) { /* found at slot 3 */ }
+    else { pad = NULL; }
+
+    if (pad == NULL) { return 0; }
+
+    return ~*(u16*)(pad + 0x24);
+}
 #endif
 #if 1
 asm void fn_800F7BC4(void) {
@@ -788,20 +850,62 @@ asm void fn_800F7C28(void) {
 void fn_800F7C28(void) { /* TODO */ }
 #endif
 extern u32 lbl_8047CCC8;
-#if 1
+#if 0
 asm void fn_800F7C8C(void) {
 #include "src/game/input/input_fn_800F7C8C.inc"
 }
 #else
-void fn_800F7C8C(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800F7C8C(s32 padId, s8 stickX, s8 stickY) {
+    extern u8 lbl_80401C10[];
+    u8* pad = &lbl_80401C10[0];
+    u8* nul = NULL;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad = nul;
+found:
+    if (pad == NULL) return;
+    *(s8*)(pad + 0x36) = stickX;
+    *(s8*)(pad + 0x37) = stickY;
+    *(f32*)(pad + 0x50) = (f32)(s32)stickX;
+    *(f32*)(pad + 0x54) = (f32)(s32)stickY;
+}
+#pragma pop
 #endif
 extern u32 lbl_8047CCC8;
-#if 1
+#if 0
 asm void fn_800F7D38(void) {
 #include "src/game/input/input_fn_800F7D38.inc"
 }
 #else
-void fn_800F7D38(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_800F7D38(s32 padId, s8 stickX, s8 stickY) {
+    extern u8 lbl_80401C10[];
+    u8* pad = &lbl_80401C10[0];
+    u8* nul = NULL;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad += 0x6c;
+    if (*(s32*)pad == padId) goto found;
+    pad = nul;
+found:
+    if (pad == NULL) return;
+    *(s8*)(pad + 0x34) = stickX;
+    *(s8*)(pad + 0x35) = stickY;
+    *(f32*)(pad + 0x48) = (f32)(s32)stickX;
+    *(f32*)(pad + 0x4c) = (f32)(s32)stickY;
+}
+#pragma pop
 #endif
 #if 1
 asm void fn_800F7DE4(void) {
