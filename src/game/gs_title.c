@@ -2899,12 +2899,12 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     f32 thresh;
     void* sp_c;
     s32 sp_8;
-    s32 i;
+    s32 count;
     s32 idx;
     s32 ok;
     s32 ctr;
     u8* p;
-    s32 count;
+    s32 i;
 
     p = lbl_803A1B90;
     for (count = *(s32*)(p + 0x40), ctr = count, i = 0; ctr > 0; ctr--) {
