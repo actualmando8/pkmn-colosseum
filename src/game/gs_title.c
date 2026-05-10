@@ -4012,12 +4012,8 @@ s32 fn_80023E60(u8* arg0) {
     s32 target;
     s32 found;
     u8* p;
-    f32 sp08;
-    f32 sp0C;
-    f32 sp10;
-    f32 sp14;
-    f32 sp18;
-    f32 sp1C;
+    f32 sp14[3];
+    f32 sp08[3];
     f32 cmpval;
 
     if ((s32)lbl_8047A370 == 1) {
@@ -4091,14 +4087,14 @@ MATCH2:
             f32 ref_x = *(f32*)(lbl_803A204C + 0);
             f32 ref_y = *(f32*)(lbl_803A204C + 4);
             cmpval = lbl_8047B8AC;
-            sp14 = ref_x - (f32)(s32)(*(s16*)(r5 + 2));
-            sp18 = ref_y - (f32)(s32)(*(s16*)(r5 + 4));
-            if (cmpval != sp14 || cmpval != sp18) {
-                fn_800E0060(&sp08, &sp14);
-                sp18 = lbl_8047B8AC;
-                sp14 = lbl_8047B8B0;
-                sp1C = lbl_8047B8AC;
-                if (fn_800E0000(&sp14, &sp08) < lbl_8047B8AC) {
+            sp14[0] = ref_x - (f32)(s32)(*(s16*)(r5 + 2));
+            sp14[1] = ref_y - (f32)(s32)(*(s16*)(r5 + 4));
+            if (cmpval != sp14[0] || cmpval != sp14[1]) {
+                fn_800E0060(sp08, sp14);
+                sp14[1] = lbl_8047B8AC;
+                sp14[0] = lbl_8047B8B0;
+                sp14[2] = lbl_8047B8AC;
+                if (fn_800E0000(sp14, sp08) < lbl_8047B8AC) {
                     lbl_8047A380 = 1;
                 } else {
                     lbl_8047A380 = 0;
