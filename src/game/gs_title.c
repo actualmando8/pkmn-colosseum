@@ -1323,9 +1323,11 @@ LAB_80025564:
  * fn_800D37CC returns s32 (signed ticks; negative if paused).
  * fn_800D3088 returns u32 (absolute frame count).
  *
- * Status: 92.9% matched. Remaining diffs are FP register-allocator
- * choices (we allocate f28-f31, target uses f27-f31 - target hoists
- * one extra bias we cannot easily force).
+ * Status: 97.5% matched. Remaining 8 diffs are register-numbering
+ * (limit ends up in f28 vs target f31) and anonymous @257/@255 bias
+ * constants vs named lbl_8047B8B8/lbl_8047B8D0 (unfixable without
+ * explicit manual int-to-float idiom). Frame size 0x70 now correct.
+ * fn_801653C4 chains into fn_801656F8 (3 args).
  */
 extern void fn_801C41C8(f32, s32);
 extern void fn_801657F8(void);
@@ -1364,27 +1366,27 @@ void fn_800255A4(void) {
     extern void fn_800F0308(void);
     extern u8 fn_80102620(s32);
     extern void fn_80102510(s32);
-    extern void fn_801653C4(void);
-    extern void fn_801656F8(s32, s32);
+    extern u32 fn_801653C4(void);
+    extern void fn_801656F8(u32, s32, s32);
     extern void fn_801657F8(s32, s32);
     extern void fn_801C40F0(s32);
     extern void fn_801C41C8(f32, s32);
+    f32 limit;
     f32 accum;
 
     if (lbl_8047A384 != 0) {
         fn_801C41C8(lbl_8047B8E4, 3);
         fn_801657F8(0x449, 0);
         accum = lbl_8047B8AC;
-        while (accum < lbl_8047B8B0) {
+        limit = lbl_8047B8B0;
+        while (accum < limit) {
             fn_800F0308();
             accum = accum + (f32)fn_800D3088() / (f32)fn_800D37CC();
         }
-        fn_801653C4();
-        fn_801656F8(0x7d0, 0);
+        fn_801656F8(fn_801653C4(), 0x7d0, 0);
     } else {
         fn_801C41C8(lbl_8047B8E8, 3);
-        fn_801653C4();
-        fn_801656F8(0x1f4, 0);
+        fn_801656F8(fn_801653C4(), 0x1f4, 0);
     }
     fn_801C40F0(1);
     if (fn_80102620(0xbd) == 1) fn_80102510(0xbd);
