@@ -2264,9 +2264,11 @@ asm void fn_800205C8(void) {
 }
 #else
 #pragma push
-#pragma optimization_level 2
+#pragma optimization_level 1
 void fn_800205C8(u8* obj) {
-    fn_800FB680(0, 0, obj[0x8b] | (s32)-0x100, (&lbl_80478880)[lbl_8047A350]);
+    s32 mask = (s32)-0x100;
+    u32 b = obj[0x8b];
+    fn_800FB680(0, 0, mask | b, (&lbl_80478880)[lbl_8047A350]);
 }
 #pragma pop
 #endif
