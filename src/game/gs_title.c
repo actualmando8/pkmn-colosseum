@@ -1980,8 +1980,11 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
     fn_800E090C(result_1, vec_b, vec_a);
     fn_800E042C(result_2, result_1);
 
-    vec_a[0] = arg_r6[0]; vec_a[1] = arg_r6[1]; vec_a[2] = lbl_8047B8AC;
-    vec_b[0] = lbl_8047B8F0; vec_b[1] = lbl_8047B8F4; vec_b[2] = lbl_8047B8AC;
+    {
+        f32 bf0 = lbl_8047B8F0, bf4 = lbl_8047B8F4, bac = lbl_8047B8AC;
+        vec_b[0] = bf0; vec_b[1] = bf4; vec_b[2] = bac;
+        vec_a[0] = arg_r6[0]; vec_a[1] = arg_r6[1]; vec_a[2] = bac;
+    }
     fn_800E0CA0(arg_f1);
     fn_800E090C(result_1, vec_b, vec_a);
     fn_800E03B4(result_2, result_1);
