@@ -615,8 +615,11 @@ asm void fn_80024A2C(void) {
 #include "src/game/gs_title_fn_80024A2C.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
+#pragma peephole off
+#pragma fp_contract on
 void fn_80024A2C(u8* arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A368;
@@ -675,6 +678,7 @@ LAB_80024aec:
         }
     }
 }
+#pragma pop
 #endif
 
 /* 0x80024BA4 | 0x138
