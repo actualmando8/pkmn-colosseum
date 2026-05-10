@@ -2578,7 +2578,7 @@ asm void fn_80020EA4(void) {
 }
 #else
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 2
 void fn_80020EA4(u8* r3, u8* r4) {
     u8* r31;
     u8 byte;
