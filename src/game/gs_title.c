@@ -2265,7 +2265,7 @@ asm void fn_800205C8(void) {
 void fn_800205C8(u8* obj) {
     s32 mask = (s32)-0x100;
     u32 b = obj[0x8b];
-    fn_800FB680(0, 0, mask | b, (&lbl_80478880)[lbl_8047A350]);
+    fn_800FB680(0, 0, b | mask, (&lbl_80478880)[lbl_8047A350]);
 }
 #pragma pop
 #endif
