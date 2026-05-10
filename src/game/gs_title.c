@@ -2864,7 +2864,6 @@ asm void fn_800218BC(void) {
 #else
 #pragma push
 #pragma peephole off
-#pragma optimization_level 4
 s32 fn_800218BC(u32 arg0, u32* arg1) {
     extern f32 fn_8011FC14(void*);
     extern void fn_80106D3C(s32, s32, s32, s32);
@@ -2880,9 +2879,7 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     s32 count;
 
     p = lbl_803A1B90;
-    i = 0;
-    count = *(s32*)(p + 0x40);
-    for (ctr = count; ctr != 0; ctr--) {
+    for (count = *(s32*)(p + 0x40), ctr = count, i = 0; ctr > 0; ctr--) {
         if (arg0 == *(u16*)p) break;
         p += 8;
         i++;
@@ -2909,9 +2906,9 @@ s32 fn_800218BC(u32 arg0, u32* arg1) {
     }
 
     idx = fn_800141BC((void*)arg0, 1);
-    ok = 0;
     if (idx >= 0) {
         fn_80014118(idx, &sp_c, &sp_8);
+        ok = 0;
         if (fn_8011FC74((s32)sp_c) != 0) {
             if (fn_8011FC14(sp_c) > *(f32*)&lbl_8047B8A0) ok = 1;
         }
