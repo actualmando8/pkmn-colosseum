@@ -2580,22 +2580,25 @@ asm void fn_80020EA4(void) {
 #include "src/game/gs_title_fn_80020EA4.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
 void fn_80020EA4(u8* r3, u8* r4) {
     u8* r31;
-    s32 idx;
+    u8 byte;
     r31 = r3;
     if ((s32)(&lbl_8047A360)[1] == 4) {
         if (fn_8002091C() >= 0) {
-            idx = fn_8002091C();
-            fn_800FB680(0, -8, (s32)(r31[0x8b] | -0x100), lbl_802E4EF0[idx]);
+            byte = r31[0x8b];
+            fn_800FB680(0, -8, byte | (s32)-0x100, lbl_802E4EF0[fn_8002091C()]);
         }
     } else if ((s32)(&lbl_8047A360)[1] != 5) {
         if ((s32)lbl_8047A360 >= 0) {
-            fn_800FB680(0, -8, (s32)(r31[0x8b] | -0x100), lbl_802E4ED8[(s32)lbl_8047A360]);
+            byte = r31[0x8b];
+            fn_800FB680(0, -8, byte | (s32)-0x100, lbl_802E4ED8[(s32)lbl_8047A360]);
         }
     }
 }
+#pragma pop
 #endif
 
 /* fn_80020F54 - 0x80020F54 | size: 0x19c */
