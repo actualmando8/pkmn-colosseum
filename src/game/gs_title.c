@@ -4204,9 +4204,11 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 
 /* fn_80024308 - 0x80024308 | size: 0x130
  *
- * Status: 98.9% matched. Remaining: reg-alloc choice in second branch
- * (f0/f1/f2/f3 ordering), plus 2 anonymous @NNN@sda21 f64 magic constants
- * for u32->f32 conversion (target binds them to lbl_8047B8D0; CW heuristic).
+ * Status: 99.1% matched. Remaining: reg-alloc choice in second branch
+ * (f0/f1/f2 ordering: B8C8 in f1 vs f2, stack in f2 vs f0, B8898 in f0 vs f1),
+ * plus 2 anonymous @NNN@sda21 f64 magic constants for u32->f32 conversion
+ * (CW heuristic; target uses lbl_8047B8D0 name).
+ * Second branch: separate f3=(f32)(u32)fn_800D3088() to avoid __cvt_fp2unsigned.
  */
 extern u32 lbl_8047A370;
 extern f64 lbl_8047B8D0;
@@ -4267,7 +4269,8 @@ s32 fn_80024308(u8* arg0) {
     }
 
     if ((s32)lbl_8047A370 == 1) {
-        f1 = lbl_80478898 - lbl_8047B8C8 * (f32)(u32)fn_800D3088();
+        f3 = (f32)(u32)fn_800D3088();
+        f1 = lbl_80478898 - lbl_8047B8C8 * f3;
         lbl_80478898 = f1;
         if (f1 < lbl_8047B8AC) {
             lbl_80478898 = lbl_8047B8AC;
