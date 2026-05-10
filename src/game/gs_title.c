@@ -2053,8 +2053,9 @@ s32 fn_80025F74(void) {
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
  *      fade-in loop using fn_800C46B0 for FP-to-int conversion.
  *
- * Status: 96.1% matched. Remaining diffs: register allocation inside the
- * texture-select if/else (uses r28 for tex, target uses r29+r30 pair).
+ * Status: 99.1% matched (#pragma optimization_level 2). Remaining diffs:
+ * register allocation (frame_a/b in table section, first timing loop delay),
+ * and anonymous f64 bias constants (lbl_8047B8B8/B8D0, unfixable per CW heuristic).
  */
 extern void fn_801CBA0C(void);
 extern void fn_80113F48(void);
@@ -2096,6 +2097,7 @@ asm void fn_80025F84(void) {
 #include "src/game/gs_title_fn_80025F84.inc"
 }
 #else
+#pragma optimization_level 2
 void fn_80025F84(void) {
     extern u8 lbl_803A2040[];
     extern u32 lbl_80478DEC;
@@ -2138,9 +2140,10 @@ void fn_80025F84(void) {
     extern u32 fn_801CBA0C(u32);
     extern s32 fn_80025A80(s32);
     u32 obj_a, obj_b, obj_c, obj_d, obj_e;
+    u32 frame_a, frame_b;
     u32 tex;
-    u32 delay;
     u32 elapsed;
+    u32 delay;
     s32 tick;
 
     fn_801CB954(0xC6A1000, 1);
@@ -2149,9 +2152,11 @@ void fn_80025F84(void) {
     if (fn_801902E0(0x3e5) == 1) {
         tex = fn_801CBA0C(0xC6B1000);
         fn_801CB954(tex, 0);
+        frame_a = 0;
     } else {
         tex = fn_801CBA0C(0xC6C1000);
         fn_801CB954(tex, 0);
+        frame_a = 0;
     }
 
     obj_a = fn_800F9318(fn_80113F48(), tex);
@@ -2171,13 +2176,12 @@ void fn_80025F84(void) {
     fn_800E3C00(fn_800F9318(fn_80113F48(), tex), 4);
     fn_801CB954(tex, 1);
     fn_801CB61C(tex, 0xC6A1000, 0);
-    fn_801CB834(tex, 0, 0, 1);
+    fn_801CB834(tex, frame_a, 0, 1);
     fn_80165A20(0x449, 0, 0xff);
     lbl_8047A384 = tex;
 
     {
         s32 idx, frame_offset;
-        u32 frame_a, frame_b;
         if (lbl_8047A380 == 0) {
             idx = (s32)lbl_8047A394 + 1;
             frame_offset = (s32)lbl_80478DEC + (s32)lbl_8047A394 * 0x10;
@@ -2203,7 +2207,7 @@ void fn_80025F84(void) {
         tick = fn_800D37CC();
         if (tick == 0x32) {
             delay = fn_800C46B0((f64)lbl_8047B914);
-            if (delay == 0) delay = 1;
+            if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
             fn_800F0308();
@@ -2214,7 +2218,7 @@ void fn_80025F84(void) {
         tick = fn_800D37CC();
         if (tick == 0x32) {
             delay = fn_800C46B0((f64)lbl_8047B918);
-            if (delay == 0) delay = 1;
+            if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
             fn_800F0308();
@@ -2224,7 +2228,7 @@ void fn_80025F84(void) {
 
     *(f32*)lbl_803A2040 = lbl_8047B8F0;
     *(f32*)(lbl_803A2040 + 4) = lbl_8047B8F4;
-    *(f32*)(lbl_803A2040 + 8) = lbl_8047B8A8;
+    *(f32*)(lbl_803A2040 + 8) = lbl_8047B8AC;
     lbl_8047A39C = fn_800F9318(fn_80113F48(), lbl_8047A384);
     lbl_8047A3A4 = lbl_8047B8A8;
 
@@ -2233,7 +2237,7 @@ void fn_80025F84(void) {
         tick = fn_800D37CC();
         if (tick == 0x32) {
             delay = fn_800C46B0((f64)((f32)delay / lbl_8047B900));
-            if (delay == 0) delay = 1;
+            if (delay < 1) delay = 1;
         }
     }
     for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
