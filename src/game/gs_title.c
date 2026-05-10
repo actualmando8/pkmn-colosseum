@@ -912,8 +912,8 @@ LAB_80024E94:
     /* xoris + stw magic f64 pattern for int-to-float conversion. */
     /* Outer (s16) cast (not (s32)!) avoids an extra pre-store    */
     /* extsh that target doesn't emit.                            */
-    *(s16*)(arg1 + 0x50) = (s16)(lbl_8047B8E0 + (f32)(s32)(s16)unaff_r28 + lbl_8047A374);
-    *(s16*)(arg1 + 0x52) = (s16)(lbl_8047B8E0 + (f32)(s32)(s16)unaff_r31 + lbl_8047A374);
+    *(s16*)(arg1 + 0x50) = (s16)(lbl_8047B8E0 + ((f32)(s32)(s16)unaff_r28 + lbl_8047A374));
+    *(s16*)(arg1 + 0x52) = (s16)(lbl_8047B8E0 + ((f32)(s32)(s16)unaff_r31 + lbl_8047A374));
 }
 #endif
 
