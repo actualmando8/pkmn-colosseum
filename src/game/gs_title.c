@@ -3171,24 +3171,19 @@ asm void fn_80022720(void) {
 }
 #else
 #pragma optimization_level 4
-#pragma scheduling on
+#pragma scheduling off
 s32 fn_80022720(u32 arg0, u32* arg1) {
-    u32 *src;
     s32 iVar1;
+    u32 *src;
+    u32 t0, t1, t2, t3, t4, t5, t6, t7, t8, t9;
     u32 buf[10];
 
     src = (u32*)lbl_80266C54;
     iVar1 = 0;
-    /* Copy 10 words from static table into stack buf. Target     */
-    /* batches ALL loads then ALL stores; CW 1.3 interleaves ours */
-    /* (71% match stuck here - scheduler quirk we cannot force).  */
-    buf[0] = src[0]; buf[1] = src[1]; buf[2] = src[2]; buf[3] = src[3]; buf[4] = src[4];
-    buf[5] = src[5]; buf[6] = src[6]; buf[7] = src[7]; buf[8] = src[8]; buf[9] = src[9];
-    /* Ghidra's nested != chain with comma operator: iVar1 counts */
-    /* how many headers were tested. Each && left-operand assigns */
-    /* the next candidate index. If all 5 fail, iVar1 = 5.        */
-    /* Equivalent to: if (arg0==h[0]) iVar1=0; else if (arg0==h[1])*/
-    /* iVar1=1; ... else iVar1=5; -- but emits shorter asm.       */
+    t0 = src[0]; t1 = src[1]; t2 = src[2]; t3 = src[3]; t4 = src[4];
+    t5 = src[5]; t6 = src[6]; t7 = src[7]; t8 = src[8]; t9 = src[9];
+    buf[0] = t0; buf[1] = t1; buf[2] = t2; buf[3] = t3; buf[4] = t4;
+    buf[5] = t5; buf[6] = t6; buf[7] = t7; buf[8] = t8; buf[9] = t9;
     if ((((arg0 != *(u16*)((u8*)buf + 0x00)) && (iVar1 = 1, arg0 != *(u16*)((u8*)buf + 0x08))) &&
          (iVar1 = 2, arg0 != *(u16*)((u8*)buf + 0x10))) &&
         ((iVar1 = 3, arg0 != *(u16*)((u8*)buf + 0x18)) &&
