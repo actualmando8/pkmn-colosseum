@@ -3519,7 +3519,9 @@ asm void fn_80022E54(void) {
 #include "src/game/gs_title_fn_80022E54.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma scheduling on
 s32 fn_80022E54(void* r3, u32* r4) {
     void* r29;
     u32* r30;
@@ -3539,6 +3541,7 @@ s32 fn_80022E54(void* r3, u32* r4) {
     }
     return 1;
 }
+#pragma pop
 #endif
 
 /* fn_80022EE4 - 0x80022EE4 | size: 0x184 */
