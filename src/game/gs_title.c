@@ -440,6 +440,8 @@ asm void fn_800246FC(void) {
 #include "src/game/gs_title_fn_800246FC.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
 void fn_800246FC(u8* arg0, u8* arg1) {
     extern u8 lbl_802E4F58[];
     extern f32 lbl_80478898;
@@ -588,6 +590,7 @@ void fn_800246FC(u8* arg0, u8* arg1) {
 
     fn_80132A38(0x37, fn_800FA280(1));
 }
+#pragma pop
 #endif
 
 /* 0x80024A2C | 0x178
@@ -4001,9 +4004,9 @@ s32 fn_80023E60(u8* arg0) {
     extern f32 fn_800E0000(f32*, f32*);
     extern void fn_80165A20(s32, s32, s32);
     extern f64 lbl_8047B8B8;
-    /* nonvol alloc: r31=arg0, r29=DA18 result (use 'da18' first), r30=104318 result */
-    u8* da18;
+    /* nonvol alloc: r31=arg0, r30=DA18 result (called first), r29=104318 result (called second) */
     u8* r104318;
+    u8* da18;
     u16* temp_r5;
     s32 result;
     s32 target;
