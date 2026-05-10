@@ -3848,9 +3848,6 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
     register s32 match_index;
     s32 sound_id;
     void* msg;
-    u32 tmp0;
-    u32 tmp1;
-    u16 tmp2;
 
     species = arg0;
     out = arg1;
@@ -3860,18 +3857,15 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
         if ((u8)fn_80121ADC(sc, 0x3E) == 0) {
             effect = fn_80144574(text_buf, sc, sd, (u16)species, 0);
             if ((s16)effect > 0) {
-                tmp0 = *(u32*)(lbl_80266DB0 + 0);
-                tmp1 = *(u32*)(lbl_80266DB0 + 4);
-                tmp2 = *(u16*)(lbl_80266DB0 + 8);
-                *(u32*)&entries[0] = tmp0;
-                *(u32*)&entries[2] = tmp1;
-                entries[4] = tmp2;
+                *(u32*)&entries[0] = *(u32*)(lbl_80266DB0 + 0);
+                *(u32*)&entries[2] = *(u32*)(lbl_80266DB0 + 4);
+                entries[4] = *(u16*)(lbl_80266DB0 + 8);
 
                 match_index = 0;
                 if ((((species != entries[0]) && (match_index = 1, species != entries[1])) &&
                      (match_index = 2, species != entries[2])) &&
                     ((match_index = 3, species != entries[3]) &&
-                     (match_index = 4, species != tmp2))) {
+                     (match_index = 4, species != entries[4]))) {
                     match_index = 5;
                 }
                 if (match_index < 5) {
@@ -3897,15 +3891,15 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
     fn_80014198(slot);
 
     if (slot >= 0 && (s16)effect > 0) {
-        if ((s32)species < 0x2C) {
-            if ((s32)species >= 0x27) {
-                *out = 0;
-            } else {
-                *out = 1;
-            }
-        } else {
-            *out = 1;
-        }
+        if ((s32)species >= 0x2C) goto species_store_one;
+        if ((s32)species >= 0x27) goto species_store_zero;
+        goto species_store_one;
+species_store_zero:
+        *out = 0;
+        goto ret_zero;
+species_store_one:
+        *out = 1;
+ret_zero:
         return 0;
     }
 
