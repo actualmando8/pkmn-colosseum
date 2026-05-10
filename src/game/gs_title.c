@@ -703,56 +703,53 @@ asm void fn_80024BA4(void) {
 }
 #else
 #pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
 void fn_80024BA4(s32 arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A36C;
     extern u8* fn_8005D934(s32);
     extern u8* fn_8005DA18(u32);
     extern u32 fn_801902E0(s32);
+    /* Declaration order: iVar6->r30, iVar29->r29, uVar7->r28 (shared with iVar6 dead).
+     * iVar2->r28 (overlaps uVar7 but not iVar6). pbVar3 saved for loop-1. */
+    s32 iVar6;
+    s32 iVar29;
+    u32 uVar7;
+    s32 iVar2;
     u8* pbVar3;
     u8* pbVar4;
-    s32 iVar2;
-    s32 iVar6;
-    u32 uVar7;
 
     iVar6 = (s32)lbl_8047A36C;
-    /* Nested call expr keeps intermediate ptr in r3 (volatile)   */
-    /* rather than spilling to a non-volatile save. Target does   */
-    /* the same via fn_8005D934(*(s16*)(fn_8005DA18(..) + 4))     */
     pbVar3 = fn_8005D934(*(s16*)((u8*)fn_8005DA18(*(u32*)(arg0 + 4)) + 4));
-    iVar2 = 0;
+    iVar29 = 0;
     while (1) {
-        /* bit 7 = "has-data" flag. `volatile` cast prevents CW  */
-        /* from caching the byte load in r4 across both tests -  */
-        /* target re-loads via lbz r0 each iteration.            */
         if (((u32)*(volatile u8*)pbVar3 >> 7) & 1) {
-            if (iVar6 == iVar2) goto LAB_80024c20;
-            iVar2 = iVar2 + 1;
+            if (iVar6 != iVar29) {
+                iVar29 = iVar29 + 1;
+            } else {
+                goto LAB_80024c20;
+            }
         }
-        /* bit 6 = "end-of-list" flag. If set, walk terminates.  */
         if (((u32)*(volatile u8*)pbVar3 >> 6) & 1) break;
-        /* Follow sibling link (s16 offset at +0x18). Re-assigning */
-        /* pbVar3 from the call return lets CW chain r3 without    */
-        /* an extra `mr r29, r3` save.                             */
         pbVar3 = fn_8005D934(*(s16*)(pbVar3 + 0x18));
     }
-    pbVar3 = (u8*)0;
+    iVar29 = 0;
 LAB_80024c20:
+    uVar7 = 0;
     iVar2 = 0;
-    /* `goto LAB_` inside for loop emits target's `bne + b` pair. */
-    /* Using `break` here instead gives CW `beq LAB_80024c64`     */
-    /* which is semantically same but costs 1-2% match.           */
-    for (uVar7 = 0; uVar7 < *(u32*)lbl_80478DD8; uVar7++) {
+    for (; uVar7 < *(u32*)lbl_80478DD8; uVar7++) {
         pbVar4 = fn_8005D934(*(u32*)(lbl_80478DDC + iVar2 + 8));
-        if (pbVar3 == pbVar4) goto LAB_80024c64;
-        iVar2 = iVar2 + 0x10;
+        if ((u8*)iVar29 != pbVar4) {
+            iVar2 = iVar2 + 0x10;
+        } else {
+            goto LAB_80024c64;
+        }
     }
-    uVar7 = 0;    /* natural loop exit: no match; reset index    */
+    uVar7 = 0;
 LAB_80024c64:
     if (uVar7 < *(u32*)lbl_80478DD8) {
         u8 *entry = (u8*)lbl_80478DDC + (uVar7 << 4);
-        if (*(s32*)(entry + 4) == 0x66 && (u8)fn_801902E0(0x45D) != 0) {
+        if (*(u32*)(entry + 4) == 0x66 && (u8)fn_801902E0(0x45D) != 0) {
             *(u32*)(arg1 + 0x58) = 0x0C5F1200;
         } else {
             *(u32*)(arg1 + 0x58) = *(u32*)(entry + 0xC);
