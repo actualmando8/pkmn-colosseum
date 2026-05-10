@@ -656,7 +656,8 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
 
     offset = 0;
     for (index = 0; (u32)index < *(u32*)lbl_80478DD8; index++) {
-        if (found == fn_8005D934(*(u32*)(lbl_80478DDC + offset + 8))) {
+        node = fn_8005D934(*(u32*)(lbl_80478DDC + offset + 8));
+        if (found == node) {
             goto LAB_80024aec;
         }
         offset += 0x10;
@@ -665,7 +666,7 @@ void fn_80024A2C(u8* arg0, u8* arg1) {
 LAB_80024aec:
     switch ((s32)lbl_8047A370) {
     case 1:
-        arg1[0x67] = (s32)(lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8));
+        arg1[0x67] = lbl_8047B8DC * (lbl_80478898 / lbl_8047B8A8);
         break;
     default:
         arg1[0x67] = 0xFF;
@@ -673,12 +674,14 @@ LAB_80024aec:
     }
 
     if ((u32)index < *(u32*)lbl_80478DD8) {
-        ptr = (u8*)&lbl_80478DDC + (index << 4);
+        u32 val;
+        ptr = (u8*)lbl_80478DDC + (index << 4);
         if (*(u32*)(ptr + 4) == 0x66 && (u8)fn_801902E0((void*)0x45D) != 0) {
-            *(u32*)(arg1 + 0x58) = 0x0C5F1200;
+            val = 0x0C5F1200;
         } else {
-            *(u32*)(arg1 + 0x58) = *(u32*)(ptr + 0xC);
+            val = *(u32*)(ptr + 0xC);
         }
+        *(u32*)(arg1 + 0x58) = val;
     }
 }
 #pragma pop
