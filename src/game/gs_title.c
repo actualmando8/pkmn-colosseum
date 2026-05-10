@@ -2259,9 +2259,12 @@ asm void fn_800205C8(void) {
 #include "src/game/gs_title_fn_800205C8.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 void fn_800205C8(u8* obj) {
     fn_800FB680(0, 0, obj[0x8b] | (s32)-0x100, (&lbl_80478880)[lbl_8047A350]);
 }
+#pragma pop
 #endif
 
 /* fn_8002060C - 0x8002060C | size: 0xc */
@@ -3803,7 +3806,7 @@ asm void fn_80023B9C(void) {
 #else
 #pragma push
 #pragma peephole off
-#pragma scheduling off
+#pragma scheduling on
 #pragma optimization_level 4
 s32 fn_80023B9C(u32 arg0, u32* arg1) {
     extern void fn_800216E8(void*, s32, void*, s32, s32);
