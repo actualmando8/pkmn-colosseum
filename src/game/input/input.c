@@ -767,7 +767,7 @@ asm void fn_800F7758(void) {
 void fn_800F7758(void) { /* TODO */ }
 #endif
 extern u8 lbl_80401C10[];
-#if 0
+#if 1
 asm void fn_800F7A08(void) {
 #include "src/game/input/input_fn_800F7A08.inc"
 }
@@ -837,7 +837,7 @@ u32 fn_800F7B5C(s32 padId) {
     return ~(u32)*(u16*)(pad + 0x24);
 }
 #endif
-#if 0
+#if 1
 asm void fn_800F7BC4(void) {
 #include "src/game/input/input_fn_800F7BC4.inc"
 }
