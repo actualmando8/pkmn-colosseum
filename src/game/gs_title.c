@@ -4178,7 +4178,12 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 #pragma pop
 #endif
 
-/* fn_80024308 - 0x80024308 | size: 0x130 */
+/* fn_80024308 - 0x80024308 | size: 0x130
+ *
+ * Status: 98.9% matched. Remaining: reg-alloc choice in second branch
+ * (f0/f1/f2/f3 ordering), plus 2 anonymous @NNN@sda21 f64 magic constants
+ * for u32->f32 conversion (target binds them to lbl_8047B8D0; CW heuristic).
+ */
 extern u32 lbl_8047A370;
 extern f64 lbl_8047B8D0;
 extern f32 lbl_8047A378;
@@ -4195,15 +4200,20 @@ asm void fn_80024308(void) {
 #include "src/game/gs_title_fn_80024308.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma scheduling on
+#pragma fp_contract on
+#pragma peephole off
 s32 fn_80024308(u8* arg0) {
+    extern u8* fn_80105624(void);
     u8* ctx;
     f32 f0;
     f32 f1;
     f32 f2;
     f32 f3;
 
-    ctx = ((u8* (*)(void))fn_80105624)();
+    ctx = fn_80105624();
     if (arg0 != 0) {
         if ((s32)lbl_8047A370 != 1) {
             if ((*(u16*)(ctx + 4) & 0x10) != 0) {
@@ -4216,8 +4226,8 @@ s32 fn_80024308(u8* arg0) {
         }
     }
 
-    f3 = lbl_8047A378;
     f2 = (f32)(u32)fn_800D3088();
+    f3 = lbl_8047A378;
     f0 = f3 * f2 + lbl_8047A374;
     lbl_8047A374 = f0;
     f1 = *(f32*)&lbl_8047B8C0;
@@ -4243,4 +4253,5 @@ s32 fn_80024308(u8* arg0) {
     }
     return 0;
 }
+#pragma pop
 #endif
