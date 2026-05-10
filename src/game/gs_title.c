@@ -739,21 +739,20 @@ LAB_80024c20:
     iVar2 = 0;
     for (; uVar7 < *(u32*)lbl_80478DD8; uVar7++) {
         pbVar4 = fn_8005D934(*(u32*)(lbl_80478DDC + iVar2 + 8));
-        if ((u8*)iVar29 != pbVar4) {
-            iVar2 = iVar2 + 0x10;
-        } else {
-            goto LAB_80024c64;
-        }
+        if ((u8*)iVar29 == pbVar4) goto LAB_80024c64;
+        iVar2 = iVar2 + 0x10;
     }
     uVar7 = 0;
 LAB_80024c64:
     if (uVar7 < *(u32*)lbl_80478DD8) {
         u8 *entry = (u8*)lbl_80478DDC + (uVar7 << 4);
+        u32 val;
         if (*(u32*)(entry + 4) == 0x66 && (u8)fn_801902E0(0x45D) != 0) {
-            *(u32*)(arg1 + 0x58) = 0x0C5F1200;
+            val = 0x0C5F1200;
         } else {
-            *(u32*)(arg1 + 0x58) = *(u32*)(entry + 0xC);
+            val = *(u32*)(entry + 0xC);
         }
+        *(u32*)(arg1 + 0x58) = val;
     }
 }
 #endif
