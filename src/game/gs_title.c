@@ -3844,13 +3844,13 @@ s32 fn_80023B9C(u32 arg0, u32* arg1) {
     extern void fn_800216E8(void*, s32, void*, s32, s32);
     u32 sc;
     u32 sd;
-    u16 entries[5];
+    volatile u16 entries[5];
     u8 text_buf[0x100];
     u8 name_buf[0x84];
+    register u32* out;
+    register u32 species;
     register s32 slot;
     register s32 effect;
-    register u32 species;
-    register u32* out;
     register s32 match_index;
     s32 sound_id;
     void* msg;
