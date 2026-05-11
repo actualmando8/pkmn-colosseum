@@ -14205,8 +14205,8 @@ f32 fn_8011FC14(u8* ptr) {
 #endif
 /* 0x8011FC74 | 0x30 */
 u8 fn_8011FC74(u32 arg) {
-    /* depends on fn_8012640C signature */
-    return 0;
+    extern u32 fn_8012640C(u32 a, u32 b, u32 c, u32 d);
+    return (u8)fn_8012640C(arg, 0, 0xC2, 0);
 }
 /* 0x8011FCA4 | 0x124 */
 extern void* fn_801EEEB8();
@@ -16291,8 +16291,8 @@ u16 fn_80122FF4(u8* ptr) {
 #endif
 /* 0x801230E0 | 0x30 */
 u16 fn_801230E0(u32 arg) {
-    /* depends on fn_8012640C signature */
-    return 0;
+    extern u32 fn_8012640C(u32 a, u32 b, u32 c, u32 d);
+    return (u16)fn_8012640C(arg, 0, 0x82, 0);
 }
 /* 0x80123110 | 0x94 */
 #if 0
