@@ -12335,185 +12335,254 @@ void fn_8011D504(u8* ptr, u8 val) {
 /* 0x8011D58C | 36 bytes | compound_setter */
 void fn_8011D58C(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0xC) = val;
 }
 /* 0x8011D5B0 | 36 bytes | compound_setter */
 void fn_8011D5B0(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0xB) = val;
 }
 /* 0x8011D5D4 | 36 bytes | compound_setter */
 void fn_8011D5D4(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0xA) = val;
 }
 /* 0x8011D5F8 | 36 bytes | compound_setter */
 void fn_8011D5F8(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x9) = val;
 }
 /* 0x8011D61C | 36 bytes | compound_setter */
 void fn_8011D61C(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x8) = val;
 }
 /* 0x8011D640 | 36 bytes | compound_setter */
 void fn_8011D640(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x7) = val;
 }
 /* 0x8011D664 | 36 bytes | compound_setter */
 void fn_8011D664(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x6) = val;
 }
 /* 0x8011D688 | 36 bytes | compound_setter */
 void fn_8011D688(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x5) = val;
 }
 /* 0x8011D6AC | 36 bytes | compound_setter */
 void fn_8011D6AC(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D6D0 | 36 bytes | compound_setter */
 void fn_8011D6D0(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D6F4 | 36 bytes | compound_setter */
 void fn_8011D6F4(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D718 | 36 bytes | compound_setter */
 void fn_8011D718(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D73C | 36 bytes | compound_setter */
 void fn_8011D73C(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xBD;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xBD;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D770 | 36 bytes | compound_setter */
 void fn_8011D770(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB7;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB7;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D794 | 36 bytes | compound_setter */
 void fn_8011D794(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB7;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB7;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D7B8 | 36 bytes | compound_setter */
 void fn_8011D7B8(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB7;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB7;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D7DC | 36 bytes | compound_setter */
 void fn_8011D7DC(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB7;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB7;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D800 | 36 bytes | compound_setter */
 void fn_8011D800(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB7;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB7;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D824 | 36 bytes | compound_setter */
 void fn_8011D824(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB2;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB2;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x4) = val;
 }
 /* 0x8011D848 | 36 bytes | compound_setter */
 void fn_8011D848(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB2;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB2;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x3) = val;
 }
 /* 0x8011D86C | 36 bytes | compound_setter */
 void fn_8011D86C(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB2;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB2;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x2) = val;
 }
 /* 0x8011D890 | 36 bytes | compound_setter */
 void fn_8011D890(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB2;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB2;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x1) = val;
 }
 /* 0x8011D8B4 | 36 bytes | compound_setter */
 void fn_8011D8B4(void* ptr, u8 val) {
     void* sub;
-    if (ptr == NULL) { return; }
-    sub = (u8*)ptr + 0xB2;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = (u8*)ptr + 0xB2;
+    }
+    if (sub == NULL) return;
     *(u8*)((u8*)sub + 0x0) = val;
 }
 /* 0x8011D8D8 | 0x1C */
