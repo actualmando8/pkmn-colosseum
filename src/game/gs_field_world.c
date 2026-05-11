@@ -70,7 +70,7 @@ extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 extern u32 lbl_80478F94;  /* obj data base (SDA) */
 /* Field subsystems -- forward declarations (defined below) */
 u32  fn_80115094(void);
-void fn_80115A38(u32 entry);
+u32 fn_80115A38(u8* entry);
 void fn_80117C84(void);
 void fn_8012546C(void* ptr);
 /* ===== String constants (rodata) ===== */
@@ -5453,11 +5453,13 @@ void fn_80115584(void* obj, u32 val) {
     *(u32*)((u8*)obj + 0x8) = val;
 }
 /* 0xfn_80115A38 | global_cond_call */
-void fn_80115A38(u32 entry) {
+u32 fn_80115A38(u8* entry) {
     extern u8 lbl_8035B91C[];
     if (entry == 0) {
-        fn_800DD970((const char*)&lbl_80272608, (const char*)lbl_8035B91C);
+        fn_800DD970(lbl_80272608, (const char*)lbl_8035B91C);
+        return 0;
     }
+    return *(u32*)(entry + 0x4);
 }
 /* 0x70 | fn_80115BD8 | generic */
 extern u32 lbl_80478FB8;
@@ -5572,50 +5574,37 @@ asm void fn_80115CB4(void) {
 #include "src/game/gs_field_world_fn_80115CB4.inc"
 }
 #else
-void fn_80115CB4(void) {
+#pragma push
+#pragma peephole off
+void* fn_80115CB4(u32 param) {
     extern u32 lbl_80478EB8;
     extern u32 lbl_80478EBC;
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r27 = 0;
+    u32 r4 = param & 0x7FFF0000;
+    u32 r31;
+    u8* r30 = (u8*)0;
+    u32 r29;
     u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r4 = r3 & 0x7FFF0000;
-    r30 = 0x0;
-    /* subis r0, r4, 0x7fff */;
-    r28 = 0x0;
-    if (r0 != (u32)0x0) {
-        r3 = 0x0;
-        return;
+    u32 r27;
+    if ((u32)(r4 - 0x7FFF0000) != 0) {
+        return (void*)0;
     }
-    r27 = r3 & 0x1FF;
-    r29 = 0x0;
-    r31 = 0x0;
-    while (r3 = lbl_80478EB8, r0 = *(u32*)((u8*)r3 + 0x0), r29 < r0) {
-        r0 = lbl_80478EBC;
-        r30 = r0 + r31;
-        ((void(*)(void))fn_800FF56C)();
-        r0 = *(u16*)((u8*)r30 + 0x4);
-        if (r0 == (u32)r3) {
-            r0 = r28;
-            r28 = r28 + 0x1;
-            if (r27 == (u32)r0) break;
+    r27 = param & 0x1FF;
+    r29 = 0;
+    r31 = 0;
+    while (r29 < *(u32*)lbl_80478EB8) {
+        r30 = (u8*)lbl_80478EBC + r31;
+        if (*(u16*)(r30 + 0x4) == (u32)fn_800FF56C()) {
+            if (r27 == r28++) break;
         }
         r31 = r31 + 0x1c;
         r29 = r29 + 0x1;
     }
-    r3 = lbl_80478EB8;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if (r29 == (u32)r0) {
-        r3 = 0x0;
-        return;
+    if (r29 == *(u32*)lbl_80478EB8) {
+        return (void*)0;
     }
-    r3 = r30;
-    return;
+    return (void*)r30;
 }
+#pragma pop
 #endif
 /* 0x80115D64 | 0xA0 */
 extern void fn_80113F48(void);
@@ -5627,34 +5616,22 @@ asm void fn_80115D64(void) {
 #include "src/game/gs_field_world_fn_80115D64.inc"
 }
 #else
-void fn_80115D64(void) {
+#pragma push
+#pragma peephole off
+void fn_80115D64(u32 r25, u32 r26) {
     extern u32 lbl_80478EB8;
     extern u32 lbl_80478EBC;
-    extern void fn_80113F48();
+    extern void* fn_80113F48();
     extern void fn_8018C1E8();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
+    u32 r27;
     u32 r28 = 0;
     u32 r29 = 0;
-    u32 r30 = 0;
+    u8* r30 = (u8*)0;
     u32 r31 = 0;
-    r25 = r3;
-    r26 = r4;
-    r28 = 0x0;
-    r29 = 0x0;
-    r31 = 0x0;
-    while (r3 = lbl_80478EB8, r0 = *(u32*)((u8*)r3 + 0x0), r29 < r0) {
-        r0 = lbl_80478EBC;
-        r30 = r0 + r31;
-        ((void(*)(void))fn_800FF56C)();
-        r0 = *(u16*)((u8*)r30 + 0x4);
-        if (r0 == (u32)r3) {
-            if (r29 == (u32)r25) {
+    while (r29 < *(u32*)lbl_80478EB8) {
+        r30 = (u8*)lbl_80478EBC + r31;
+        if (*(u16*)(r30 + 0x4) == (u32)fn_800FF56C()) {
+            if (r29 == r25) {
                 r27 = r28 | (0x7fff << 16);
                 break;
             }
@@ -5663,16 +5640,11 @@ void fn_80115D64(void) {
         r31 = r31 + 0x1c;
         r29 = r29 + 0x1;
     }
-    r3 = lbl_80478EB8;
-    r0 = *(u32*)((u8*)r3 + 0x0);
-    if (r29 != (u32)r0) {
-        fn_80113F48();
-        r4 = r27;
-        r5 = r26;
-        fn_8018C1E8();
+    if (r29 != *(u32*)lbl_80478EB8) {
+        fn_8018C1E8(fn_80113F48(), r27, r26);
     }
-    return;
 }
+#pragma pop
 #endif
 /* 0x80115E6C | 0x2F8 */
 extern void fn_801653CC(void);
@@ -24568,59 +24540,29 @@ asm void fn_8012F150(void) {
 #include "src/game/gs_field_world_fn_8012F150.inc"
 }
 #else
-void fn_8012F150(void) {
-    extern f32 lbl_8047D038;
-    extern f32 lbl_8047D0D4;
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    if ((s32)r3 < (s32)0x0) { r3 = 0x0; return; }
-    if ((s32)r3 >= (s32)0x2) {
-        r3 = 0x0;
-        return;
-    }
-    r4 = (u32)&lbl_80426BD0;
-    r0 = *(u32*)&lbl_80426BD0;
-    if ((s32)r3 == (s32)r0) {
-        r3 = 0x0;
-        return;
-    }
-    r0 = r3 << 5;
+s32 fn_8012F150(s32 idx) {
+    f32 f1, f2;
+    u32 r5;
+    if (idx < 0 || idx >= 2) return 0;
+    if (idx == (s32)*(u32*)lbl_80426BD0) return 0;
     f1 = lbl_8047D038;
-    r3 = r4 + r0;
+    *(u16*)(lbl_80426BD0 + ((u32)idx << 5) + 4) &= 0xFFFE;
     f2 = lbl_8047D0D4;
-    r0 = *(u16*)((u8*)r3 + 0x4);
-    r5 = 0x0;
-    r0 = r0 & 0x0000FFFE;
-    *(u16*)((u8*)r3 + 0x4) = r0;
-    r0 = *(u32*)((u8*)r4 + 0x0);
-    r0 = r0 << 5;
-    r3 = r4 + r0;
-    *(f32*)((u8*)r3 + 0x8) = f1;
-    r0 = *(u16*)((u8*)r4 + 0x4);
-    r0 = r0 & 0x1;
-    if ((s32)r3 != (s32)r0) {
-        r0 = *(u32*)((u8*)r4 + 0x0);
-        if ((s32)r0 != (s32)r5) {
-            *(f32*)((u8*)r4 + 0x8) = f2;
+    *(f32*)(lbl_80426BD0 + (*(u32*)lbl_80426BD0 << 5) + 8) = f1;
+    r5 = 0;
+    if (*(u16*)(lbl_80426BD0 + 4) & 1) {
+        if (*(u32*)lbl_80426BD0 != r5) {
+            *(f32*)(lbl_80426BD0 + 8) = f2;
             f2 = f2 + f2;
+        }
     }
+    r5 = 1;
+    if (*(u16*)(lbl_80426BD0 + 0x24) & 1) {
+        if (*(u32*)lbl_80426BD0 != r5) {
+            *(f32*)(lbl_80426BD0 + 0x28) = f2;
+        }
     }
-    r0 = *(u16*)((u8*)r4 + 0x24);
-    r3 = r4 + 0x20;
-    r5 = 0x1;
-    r0 = r0 & 0x1;
-    if ((s32)r0 != (s32)r5) {
-        r0 = *(u32*)((u8*)r4 + 0x0);
-        if ((s32)r0 != (s32)r5) {
-            *(f32*)((u8*)r3 + 0x8) = f2;
-    }
-    }
-    r3 = 0x1;
-    return;
+    return 1;
 }
 #endif
 /* 0x8012F1FC | 0x210 */
