@@ -7527,7 +7527,8 @@ void fn_8011791C(void) {
 #endif
 /* 0x80117AD4 | 16 bytes | global_getter */
 u32 fn_80117AD4(void) {
-    return *(u32*)((u8*)lbl_804083D0 + 0x10);
+    extern u8 lbl_804083D0[];
+    return *(u32*)(lbl_804083D0 + 0x10);
 }
 /* 0x80117AE4 | 0x1A0 */
 extern void fn_800E5550(void);
