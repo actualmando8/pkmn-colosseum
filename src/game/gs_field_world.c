@@ -15281,7 +15281,13 @@ void fn_80121B4C(void* obj, u32 arg2) {
     }
 }
 /* 0x64 | fn_80121BB4 | generic -- depends on fn_8011F5FC signature */
-void fn_80121BB4(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+void fn_80121BB4(u32* arg1, u32* arg2) {
+    u32 tmp[0x4e];
+    if (arg1 == NULL) { return; }
+    if (arg2 == NULL) { return; }
+    fn_8011F5FC(tmp, arg1);
+    fn_8011F5FC(arg1, arg2);
+    fn_8011F5FC(arg2, tmp);
 }
 /* 0x80121C18 | 0x428 */
 extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);
@@ -16880,7 +16886,17 @@ s32 fn_80123B5C(u8* ptr, u16 target) {
 #endif
 /* 0x80 | fn_80123C54 | generic */
 void fn_80123C54(void* ptr, u32 idx, u32 arg) {
-    /* depends on fn_8011F260 signature -- will convert with fn_8011F260 */
+    extern u32* fn_8011F260(void* a, u32 b, u32 c);
+    extern void fn_8011F5E0(u32* dst, u32* src);
+    u32 tmp;
+    u32* val1;
+    u32* val2;
+    if (ptr == NULL) { return; }
+    val1 = fn_8011F260(ptr, idx, 0);
+    val2 = fn_8011F260(ptr, arg, 0);
+    fn_8011F5E0(&tmp, val1);
+    fn_8011F5E0(val1, val2);
+    fn_8011F5E0(val2, &tmp);
 }
 /* 0x80123CD4 | 0x84 */
 #if 0
@@ -17591,8 +17607,10 @@ void fn_80125238(u8* ptr) {
 }
 #endif
 /* 0x801252E0 | 0x34 */
-void fn_801252E0(u32 arg) {
-    /* depends on fn_8012640C + fn_8011B950 signatures */
+void fn_801252E0(u8* ptr) {
+    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    extern void fn_8011B950(u8* a, u32 b);
+    fn_8011B950((u8*)fn_8012640C(ptr, 0, 0x7c, 0), 1);
 }
 /* 0x7C | fn_80125314 | generic */
 void fn_80125314(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
