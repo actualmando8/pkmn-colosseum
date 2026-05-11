@@ -5345,15 +5345,16 @@ u32 fn_80115274(u32 val) {
     return (val & 0x7FFF0000U) | 0x1000;
 }
 /* 0x80115280 | 0x10C */
+#pragma push
+#pragma peephole off
 u32 fn_80115280(void* ptr) {
-    extern char lbl_80272608;
-    extern char lbl_8027262C;
-    extern char lbl_8035BB50;
+    extern const char lbl_80272608[];
+    extern const char lbl_8027262C[];
+    extern u8 lbl_8035BB50[];
     u32* data;
-    u32 count;
-    u32 i;
+    u32 count = 0;
     if (ptr == NULL) {
-        fn_800DD970(&lbl_80272608, &lbl_8035BB50);
+        fn_800DD970(lbl_80272608, lbl_8035BB50);
         return 0;
     }
     data = *(u32**)((u8*)ptr + 0x10);
@@ -5362,17 +5363,20 @@ u32 fn_80115280(void* ptr) {
     }
     data = *(u32**)data;
     if (data == NULL) {
-        fn_800DD970(&lbl_8027262C, &lbl_8035BB50);
+        fn_800DD970(lbl_8027262C, lbl_8035BB50);
         return 0;
     }
-    count = 0;
-    for (i = 2; i < 10; i++) {
-        if (data[i] != 0) {
-            count++;
-        }
-    }
+    if (data[2] != 0) { count++; }
+    if (data[3] != 0) { count++; }
+    if (data[4] != 0) { count++; }
+    if (data[5] != 0) { count++; }
+    if (data[6] != 0) { count++; }
+    if (data[7] != 0) { count++; }
+    if (data[8] != 0) { count++; }
+    if (data[9] != 0) { count++; }
     return count;
 }
+#pragma pop
 /* 0x8011538C | 0xA0 */
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
