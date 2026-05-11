@@ -8631,9 +8631,15 @@ void fn_80118A68(u8* obj, u32 notify) {
 #endif
 /* 0x68 | fn_80118C20 | guarded_call */
 extern void fn_80169034();  /* K&R: called with 0 or 1 args */
-void fn_80118C20(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    if (0 /* guard r3 == 0 */) { return; }
-    fn_80169034();
+void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
+    u8* scan = arg1;
+    u32 i = 0;
+    for (i = 0; i < 0x40; i++, scan += 4) {
+        void* entry = *(void**)(scan + 8);
+        if (entry) {
+            fn_80169034(*(void**)((u8*)entry + 0x10), arg2);
+        }
+    }
 }
 /* 0x80118C88 | 36 bytes | load_then_call */
 void fn_80118C88(void* obj) {
@@ -8680,61 +8686,43 @@ asm void fn_80118DE0(void) {
 #include "src/game/gs_field_world_fn_80118DE0.inc"
 }
 #else
-void fn_80118DE0(void) {
+void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
     extern void fn_800E01D0();
     extern void fn_80169104();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    r31 = r6;
-    r30 = r5;
-    r29 = r4;
-    r28 = r3;
-    r0 = *(u32*)((u8*)r3 + 0x44);
-    if ((s32)r0 == (s32)0x0) {
-        r3 = r28 + 0x2c;
-        fn_800E01D0();
-        f0 = *(f32*)((u8*)r29 + 0x0);
-        r3 = *(u32*)((u8*)r28 + 0x10);
-        *(f32*)((u8*)r3 + 0x98) = f0;
-        f0 = *(f32*)((u8*)r29 + 0x4);
-        r3 = *(u32*)((u8*)r28 + 0x10);
-        *(f32*)((u8*)r3 + 0x9C) = f0;
-        f0 = *(f32*)((u8*)r29 + 0x8);
-        r3 = *(u32*)((u8*)r28 + 0x10);
-        *(f32*)((u8*)r3 + 0xA0) = f0;
+    if ((s32)*(u32*)(arg1 + 0x44) == 0) {
+        fn_800E01D0(arg1 + 0x2c);
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x98) = arg2[0];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x9c) = arg2[1];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0xa0) = arg2[2];
     } else {
-        r3 = r28 + 0x68;
-        fn_800E01D0();
+        fn_800E01D0(arg1 + 0x68);
     }
-    r0 = r30 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = *(u32*)((u8*)r28 + 0x10);
-        r4 = r29;
-        r5 = r31;
-        fn_80169104();
+    if ((arg3 & 0xFF) == 1) {
+        fn_80169104(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
     }
-    return;
 }
 #endif
 /* 0x78 | fn_80118E8C | two_call_arg_check */
-void fn_80118E8C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    if (arg1 != 0) { return; }
-    fn_800E01D0();
-    fn_800E01D0();
+void fn_80118E8C(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5) {
+    if ((s32)*(u32*)(arg1 + 0x44) == 0) {
+        fn_800E01D0(arg1 + 0x20);
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x8c) = arg2[0];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x90) = arg2[1];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x94) = arg2[2];
+    } else {
+        fn_800E01D0(arg1 + 0x5c);
+    }
 }
 /* 0x78 | fn_80118F04 | two_call_arg_check */
-void fn_80118F04(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    if (arg1 != 0) { return; }
-    fn_800E01D0();
-    fn_800E01D0();
+void fn_80118F04(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5) {
+    if ((s32)*(u32*)(arg1 + 0x44) == 0) {
+        fn_800E01D0(arg1 + 0x14);
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x20) = arg2[0];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x24) = arg2[1];
+        *(f32*)(*(u8**)(arg1 + 0x10) + 0x28) = arg2[2];
+    } else {
+        fn_800E01D0(arg1 + 0x50);
+    }
 }
 /* 0x80118F7C | 0x34 */
 void fn_80118F7C(u8* obj, void* arg) {
