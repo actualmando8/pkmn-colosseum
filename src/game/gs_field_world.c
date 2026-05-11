@@ -17169,10 +17169,12 @@ void fn_801252E0(u8* ptr) {
     fn_8011B950((u8*)fn_8012640C(ptr, 0, 0x7c, 0), 1);
 }
 /* 0x7C | fn_80125314 | generic */
-void fn_80125314(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_801254B4();
-    fn_801254B4();
-    fn_801254B4();
+void fn_80125314(u8* ptr, u32 arg2) {
+    extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
+    if (ptr == NULL) { return; }
+    fn_801254B4(ptr, 0, 0x7f, arg2, 0);
+    fn_801254B4(ptr, 0, 0x80, arg2, 0);
+    fn_801254B4(ptr, 0, 0x81, arg2, 0);
 }
 /* 0x80125390 | 0x94 */
 #if 1
@@ -19291,11 +19293,18 @@ u32 fn_801297D8(u8* ptr, u16* out_a, u16* out_b, u8* out_c, u8* out_d) {
 }
 #endif
 /* 0x78 | fn_80129840 | generic */
-void fn_80129840(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
-    extern void fn_80123FBC();
-    fn_8012A5B0();
-    fn_80123FBC();
-    fn_80120674();
+void fn_80129840(u8* arg1) {
+    extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
+    extern u8 fn_80123FBC(u32 a);
+    extern void fn_80120674(u32 a);
+    u32 result;
+    u32 i;
+    for (i = 0; (u16)i < 6; i++) {
+        result = fn_8012A5B0(arg1, 3, i);
+        if (fn_80123FBC(result)) {
+            fn_80120674(result);
+        }
+    }
 }
 /* 0x801298B8 | 0x90 */
 extern void fn_80140588(void);
@@ -19318,9 +19327,16 @@ s32 fn_801298B8(u8* ptr, u32 arg2) {
 }
 #endif
 /* 0x80 | fn_80129948 | generic */
-void fn_80129948(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7) {
-    fn_80129BC8();
-    fn_80140A9C();
+void fn_80129948(u8* arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5, u32 arg6, u32 arg7) {
+    extern void* fn_80129BC8(u8* a, u32 b, u16* c, u32 d, u32 e, u32 f);
+    extern void fn_80140A9C(u8* a, u8* b);
+    u16 local_8;
+    u8* result;
+    result = (u8*)fn_80129BC8(arg1, arg2, &local_8, 0, 0, 0);
+    if (result == NULL) { return; }
+    if ((u16)arg3 >= local_8) { return; }
+    if ((u16)arg4 >= local_8) { return; }
+    fn_80140A9C(result + (u16)arg3 * 4, result + (u16)arg4 * 4);
 }
 /* 0x801299C8 | 0xB0 */
 #if 0
