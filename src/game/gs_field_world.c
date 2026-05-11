@@ -6956,7 +6956,10 @@ void* fn_80117070(u8* ptr) {
 }
 /* 0x8011711C | 0x38 */
 void fn_8011711C(u32 arg) {
-    /* depends on fn_80115C48/fn_80115684 signatures */
+    extern void* fn_800FF56C(void);
+    extern void* fn_80115C48(u32 key);
+    extern void* fn_80115684(void* a, u32 b);
+    fn_80115684(fn_80115C48((u32)fn_800FF56C()), arg);
 }
 /* 0x80117154 | 16 bytes | multi_sda_store */
 extern u32 lbl_8047AD68;
