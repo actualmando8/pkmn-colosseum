@@ -26902,6 +26902,8 @@ asm void fn_80115768(void) {
 #include "src/game/gs_field_world_fn_80115768.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115768(u8* ptr) {
     if (ptr == NULL) {
@@ -26910,6 +26912,7 @@ u32 fn_80115768(u8* ptr) {
     }
     return *(u32*)(ptr + 0x44);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035BA10[];
 #if 0
@@ -26917,6 +26920,8 @@ asm void fn_801157B0(void) {
 #include "src/game/gs_field_world_fn_801157B0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_801157B0(u8* ptr) {
     if (ptr == NULL) {
@@ -26925,6 +26930,7 @@ u32 fn_801157B0(u8* ptr) {
     }
     return *(u32*)(ptr + 0x40);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B9F8[];
 #if 0
@@ -26932,6 +26938,8 @@ asm void fn_801157F8(void) {
 #include "src/game/gs_field_world_fn_801157F8.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_801157F8(u8* ptr) {
     if (ptr == NULL) {
@@ -26940,6 +26948,7 @@ u32 fn_801157F8(u8* ptr) {
     }
     return *(u32*)(ptr + 0x3C);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B9DC[];
 #if 0
@@ -26947,6 +26956,8 @@ asm void fn_80115840(void) {
 #include "src/game/gs_field_world_fn_80115840.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115840(u8* ptr) {
     if (ptr == NULL) {
@@ -26955,6 +26966,7 @@ u32 fn_80115840(u8* ptr) {
     }
     return *(u32*)(ptr + 0x24);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B9C0[];
 #if 0
@@ -26962,6 +26974,8 @@ asm void fn_80115888(void) {
 #include "src/game/gs_field_world_fn_80115888.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115888(u8* ptr) {
     if (ptr == NULL) {
@@ -26970,6 +26984,7 @@ u32 fn_80115888(u8* ptr) {
     }
     return *(u32*)(ptr + 0x38);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B9A4[];
 #if 0
@@ -26977,6 +26992,8 @@ asm void fn_801158D0(void) {
 #include "src/game/gs_field_world_fn_801158D0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_801158D0(u8* ptr) {
     if (ptr == NULL) {
@@ -26985,6 +27002,7 @@ u32 fn_801158D0(u8* ptr) {
     }
     return *(u32*)(ptr + 0x34);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B988[];
 #if 0
