@@ -4223,7 +4223,7 @@ asm void fn_80024308(void) {
 }
 #else
 #pragma push
-#pragma optimization_level 4
+#pragma optimization_level 2
 #pragma scheduling on
 #pragma fp_contract on
 #pragma peephole off
