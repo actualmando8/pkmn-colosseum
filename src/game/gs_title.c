@@ -1865,7 +1865,7 @@ s32 fn_80025A80(s32 param_1) {
     lbl_8047A3A4 = lbl_8047A3A4 - lbl_8047B8C8;
     if (lbl_8047A3A4 < lbl_8047B8AC) lbl_8047A3A4 = lbl_8047B8AC;
 
-    if (lbl_8047A3A4 <= lbl_8047B8AC && lbl_8047A3A0 <= lbl_8047B8AC) {
+    if (lbl_8047A3A4 <= *(volatile f32*)&lbl_8047B8AC && lbl_8047A3A0 <= lbl_8047B8AC) {
         return 0;
     }
     return 1;
