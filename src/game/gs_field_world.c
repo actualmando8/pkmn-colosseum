@@ -6954,10 +6954,16 @@ u32 fn_80117054(u8* ptr) {
 }
 /* 0x80117070 | 0x34 */
 extern void* fn_8018F6CC(u16);
+#pragma push
+#pragma scheduling off
 void* fn_80117070(u8* ptr) {
-    if (ptr == NULL) { return NULL; }
-    return fn_8018F6CC(*(u16*)(&ptr[0x6]));
+    void* sub = NULL;
+    if (ptr != NULL) {
+        sub = fn_8018F6CC(*(u16*)(&ptr[0x6]));
+    }
+    return sub;
 }
+#pragma pop
 /* 0x8011711C | 0x38 */
 void fn_8011711C(u32 arg) {
     extern void* fn_800FF56C(void);
