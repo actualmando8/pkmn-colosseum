@@ -10968,8 +10968,11 @@ void fn_8011BAC0(void) {
 }
 #endif
 /* 0x6C | fn_8011BB6C | single_call_straight */
-void fn_8011BB6C(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    fn_8011BEB4();
+u8 fn_8011BB6C(u32 arg1, u8 arg2) {
+    extern u8 fn_8011BEB4(u32 a, u32 b, u32 c, u32 d);
+    u8 r = fn_8011BEB4(0, arg1, 2, 0);
+    u8 a2 = arg2;
+    return (u8)(r + a2 * (r * 20) / 100);
 }
 /* 0x8011BBD8 | 0x2DC */
 extern void fn_8020A154(void);
@@ -11527,11 +11530,14 @@ u32 fn_8011CA60(u8* ptr) {
 /* 0x8011CAB8 | 0x28 */
 extern u32 lbl_80478E68;
 extern u32 lbl_80478E6C;
+#pragma push
+#pragma peephole off
 void* fn_8011CAB8(u16 idx) {
     u32* hdr = (u32*)lbl_80478E68;
     if (idx >= hdr[0]) { return NULL; }
     return (u8*)lbl_80478E6C + idx;
 }
+#pragma pop
 /* 0x8011CAE0 | 0x30 */
 s8 fn_8011CAE0(u8* ptr, u8 idx) {
     if (ptr == NULL) { return 0; }
