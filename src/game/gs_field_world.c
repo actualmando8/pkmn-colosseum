@@ -27046,6 +27046,8 @@ asm void fn_80115918(void) {
 #include "src/game/gs_field_world_fn_80115918.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115918(u8* ptr) {
     if (ptr == NULL) {
@@ -27054,6 +27056,7 @@ u32 fn_80115918(u8* ptr) {
     }
     return *(u32*)(ptr + 0x30);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B96C[];
 #if 0
@@ -27061,6 +27064,8 @@ asm void fn_80115960(void) {
 #include "src/game/gs_field_world_fn_80115960.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115960(u8* ptr) {
     if (ptr == NULL) {
@@ -27069,6 +27074,7 @@ u32 fn_80115960(u8* ptr) {
     }
     return *(u32*)(ptr + 0x2C);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B950[];
 #if 0
@@ -27076,6 +27082,8 @@ asm void fn_801159A8(void) {
 #include "src/game/gs_field_world_fn_801159A8.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_801159A8(u8* ptr) {
     if (ptr == NULL) {
@@ -27084,6 +27092,7 @@ u32 fn_801159A8(u8* ptr) {
     }
     return *(u32*)(ptr + 0x28);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B938[];
 #if 0
@@ -27091,6 +27100,8 @@ asm void fn_801159F0(void) {
 #include "src/game/gs_field_world_fn_801159F0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_801159F0(u8* ptr) {
     if (ptr == NULL) {
@@ -27099,6 +27110,7 @@ u32 fn_801159F0(u8* ptr) {
     }
     return *(u32*)(ptr + 0x0C);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B904[];
 #if 0
@@ -27106,6 +27118,8 @@ asm void fn_80115A80(void) {
 #include "src/game/gs_field_world_fn_80115A80.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115A80(u8* ptr) {
     if (ptr == NULL) {
@@ -27114,6 +27128,7 @@ u32 fn_80115A80(u8* ptr) {
     }
     return *(u32*)(ptr + 0x4);
 }
+#pragma pop
 #endif
 extern u16 fn_801EF624();
 extern u8 lbl_8035B8E8[];
@@ -27147,6 +27162,8 @@ asm void fn_80115B48(void) {
 #include "src/game/gs_field_world_fn_80115B48.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115B48(u8* ptr) {
     if (ptr == NULL) {
@@ -27155,6 +27172,7 @@ u32 fn_80115B48(u8* ptr) {
     }
     return *(u32*)(ptr + 0x8);
 }
+#pragma pop
 #endif
 extern u8 lbl_8035B8B4[];
 #if 0
@@ -27162,6 +27180,8 @@ asm void fn_80115B90(void) {
 #include "src/game/gs_field_world_fn_80115B90.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 u8 fn_80115B90(u8* ptr) {
     if (ptr == NULL) {
@@ -27170,6 +27190,7 @@ u8 fn_80115B90(u8* ptr) {
     }
     return *(u8*)(ptr + 0x1);
 }
+#pragma pop
 #endif
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
