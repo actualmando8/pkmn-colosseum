@@ -5244,41 +5244,41 @@ extern u8 fn_800FF548(void);
 extern u32 fn_80115124();  /* K&R: asm void wrapper, used as function pointer */
 extern u32 fn_80115170();  /* K&R: asm void wrapper, used as function pointer */
 extern u32 fn_801151BC();  /* K&R: asm void wrapper, used as function pointer */
+#pragma push
+#pragma peephole off
 void* fn_80114D6C(void* owner, u32 param, u32 alloc_size) {
-    u32 aligned;
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
-    aligned = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, param, (u32)fn_80115124);
+    alloc_size = (alloc_size + 0x1F) & ~0x1F;
+    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115124);
     if (mem == NULL) {
-        fn_800DD970(lbl_80272520, aligned);
+        fn_800DD970(lbl_80272520, alloc_size);
     }
     return mem;
 }
 /* 0x80114E78 | 0xA0 */
 void* fn_80114E78(void* owner, u32 param, u32 alloc_size) {
-    u32 aligned;
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
-    aligned = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, param, (u32)fn_80115170);
+    alloc_size = (alloc_size + 0x1F) & ~0x1F;
+    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_80115170);
     if (mem == NULL) {
-        fn_800DD970(lbl_8027255C, aligned);
+        fn_800DD970(lbl_8027255C, alloc_size);
     }
     return mem;
 }
 /* 0x80114F84 | 0xA0 */
 void* fn_80114F84(void* owner, u32 param, u32 alloc_size) {
-    u32 aligned;
     void* mem;
     if ((u8)fn_800FF548() != 0) { return NULL; }
-    aligned = (alloc_size + 0x1F) & ~0x1F;
-    mem = (void*)fn_800F9418(aligned, 0x20, (u32)owner, param, (u32)fn_801151BC);
+    alloc_size = (alloc_size + 0x1F) & ~0x1F;
+    mem = (void*)fn_800F9418(alloc_size, 0x20, (u32)owner, param, (u32)fn_801151BC);
     if (mem == NULL) {
-        fn_800DD970(lbl_80272594, aligned);
+        fn_800DD970(lbl_80272594, alloc_size);
     }
     return mem;
 }
+#pragma pop
 /* 0x80115094 | 0x24 | call_return_const */
 #pragma push
 #pragma scheduling off
