@@ -12613,108 +12613,144 @@ void fn_8011D904(u8* ptr, u16 val) {
 /* 0x8011D924 | 0x34 */
 void fn_8011D924(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0xA) = val;
 }
 /* 0x8011D958 | 0x34 */
 void fn_8011D958(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0x8) = val;
 }
 /* 0x8011D98C | 0x34 */
 void fn_8011D98C(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0x6) = val;
 }
 /* 0x8011D9C0 | 0x34 */
 void fn_8011D9C0(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0x4) = val;
 }
 /* 0x8011D9F4 | 0x34 */
 void fn_8011D9F4(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0x2) = val;
 }
 /* 0x8011DA28 | 0x34 */
 void fn_8011DA28(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0xA4;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0xA4;
+    }
+    if (sub == NULL) return;
     if (val > 0x1F) { val = 0x1F; }
     *(u16*)(sub + 0x0) = val;
 }
 /* 0x8011DA5C | 0x34 */
 void fn_8011DA5C(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0xA) = val;
 }
 /* 0x8011DA90 | 0x34 */
 void fn_8011DA90(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0x8) = val;
 }
 /* 0x8011DAC4 | 0x34 */
 void fn_8011DAC4(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0x6) = val;
 }
 /* 0x8011DAF8 | 0x34 */
 void fn_8011DAF8(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0x4) = val;
 }
 /* 0x8011DB2C | 0x34 */
 void fn_8011DB2C(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0x2) = val;
 }
 /* 0x8011DB60 | 0x34 */
 void fn_8011DB60(u8* ptr, u16 val) {
     u8* sub;
-    if (ptr == NULL) { return; }
-    sub = ptr + 0x98;
-    if (sub == NULL) { return; }
+    if (ptr == NULL) {
+        sub = NULL;
+    } else {
+        sub = ptr + 0x98;
+    }
+    if (sub == NULL) return;
     if (val > 0xFF) { val = 0xFF; }
     *(u16*)(sub + 0x0) = val;
 }
