@@ -26283,6 +26283,7 @@ asm void fn_80114D18(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void* fn_80114D18(u32 a, u32 b) {
     void* result;
 
@@ -26293,6 +26294,7 @@ void* fn_80114D18(u32 a, u32 b) {
     }
     return result;
 }
+#pragma peephole reset
 #endif
 extern void fn_800FC39C();
 #if 0
