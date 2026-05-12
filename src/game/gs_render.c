@@ -3653,19 +3653,14 @@ asm void fn_800DEFC8(void) {
 #else
 void fn_800DEFC8(u8* obj) {
     u32 sentinel = *(u32*)(obj + 0x38);
-    u8* ptr1;
-    u32 old;
-    u32 new_val;
     u8* target;
     u32 prev;
     if ((u32)(sentinel + 0x01020000) == 0xfefe) return;
     fn_800B8DF4(sentinel);
-    ptr1 = *(u8**)(obj + 0x8);
-    old = *(u32*)(ptr1 + 0x8 + 0x58 - 0x8);
-    new_val = sentinel;
-    target = *(u8**)(ptr1 + 0x8);
+    sentinel = *(u32*)(obj + 0x38);
+    target = *(u8**)(*(u8**)(obj + 0x8) + 0x8);
     prev = *(u32*)(target + 0x58);
-    *(u32*)(target + 0x58) = new_val;
+    *(u32*)(target + 0x58) = sentinel;
     fn_801BBD3C(prev);
     *(u32*)(obj + 0x38) = 0xfefefefe;
 }
@@ -3691,7 +3686,7 @@ asm void fn_800DF11C(void) {
 void fn_800DF11C(u8* src, u8* dst) { dst[0] = src[0xc]; dst[1] = src[0xd]; dst[2] = src[0xe]; dst[3] = src[0xf]; }
 #endif
 extern void fn_801A6DDC(u32, ...);
-extern u32 lbl_8047CAD0;
+extern f64 lbl_8047CAD0;
 extern f32 lbl_8047CACC;
 #if 0
 asm void fn_800DF140(void) {
@@ -3699,6 +3694,7 @@ asm void fn_800DF140(void) {
 }
 #else
 void fn_800DF140(u8* obj) {
+    extern void fn_801A6DDC(u32, f32);
     fn_801A6DDC(*(u32*)(obj + 0x8), (f32)obj[0x1] / lbl_8047CACC);
 }
 #endif
@@ -3769,13 +3765,16 @@ asm void fn_800DF384(void) {
 }
 #else
 void fn_800DF384(u8* obj, u32 flags) {
-    u16 cur_flags = *(u16*)(obj + 0x2);
-    u8* ptr = *(u8**)(obj + 0x8);
-    u32 new_bits = flags & ~cur_flags;
+    u32 new_bits;
+    u8* ptr;
+    u16 cur;
+    cur = *(u16*)(obj + 0x2);
+    ptr = *(u8**)(obj + 0x8);
+    new_bits = flags & ~cur;
     if (!new_bits) return;
     *(u8**)(ptr + 0x20) = obj;
-    if (new_bits & (1 << 29)) fn_800DFABC();
-    *(u16*)(obj + 0x2) = cur_flags | new_bits;
+    if (new_bits & (1 << 2)) fn_800DFABC();
+    *(u16*)(obj + 0x2) = *(u16*)(obj + 0x2) | new_bits;
     fn_801A6FF0(ptr);
 }
 #endif
