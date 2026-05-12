@@ -51,6 +51,7 @@ extern void fn_800E0518(void* a, f32 b);
 extern void fn_800E04F4(void* a, f32 b);
 extern void fn_800E05C0(void* a, f32 b, f32 c, f32 d);
 extern void fn_800E0290(void* a, void* b, void* c);
+extern void* fn_800E0264(void* dst, void* src);
 extern void fn_800E0678(void* a, f32 b, f32 c, f32 d, f32 e);
 extern void fn_800E0698(void* a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 extern void fn_80195904(void* jobj, void* data);
@@ -85,6 +86,8 @@ extern u16 lbl_8047AA68;  /* render obj array low16 tag */
 extern u32 lbl_8047AA6C;  /* render obj array base pointer */
 extern f32 lbl_8047C994;  /* SDA float constant */
 extern f32 lbl_8047C9C0;  /* SDA float constant */
+extern f32 lbl_80478ACC;   /* f32 threshold constant, abs accessed via lis/lfs */
+extern double lbl_8047C9A0; /* double 1.0 constant, SDA2 */
 extern u8 lbl_804001B0[0x40]; /* light state buffer (.bss) */
 extern s32  fn_800D37CC(void);
 extern void fn_800D7FE4(void* obj);
@@ -314,24 +317,60 @@ void* fn_800D1A70(void* lightSet) {
 #pragma pop
 
 /* ==================================================================
- * fn_800D1B3C - GS render: model instance create
+ * fn_800D1B3C - GS render: update transform and return matrix ptr
  * Address: 0x800D1B3C, Size: 0x1C4
+ * Updates transform (same 3-way logic as fn_800D1D00), then
+ * calls fn_800E0264(obj+0xc4, obj+0x94). Returns obj+0xc4.
  * ================================================================== */
-void* fn_800D1B3C(void* modelData, u32 flags) {
-    /* Create a model instance from model data:
-     * 1. Allocate instance structure
-     * 2. Load JObj hierarchy
-     * 3. Set default transform
-     * 4. Return instance handle
-     */
-    return NULL;
+void* fn_800D1B3C(void* obj) {
+    if (*(u8*)((u8*)obj + 0x2) != 0) {
+        if (*(u8*)((u8*)obj + 0x4) != 0) {
+            fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+            fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+            fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+            fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        } else if (*(u8*)((u8*)obj + 0x1) == 1) {
+            f32 tmp[3];
+            fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
+            {
+                f32 ax = tmp[0];
+                if (ax < lbl_8047C998) ax = -ax;
+                if (ax < lbl_80478ACC) {
+                    f32 ay = tmp[1];
+                    if (ay < lbl_8047C998) ay = -ay;
+                    if (ay < lbl_80478ACC) {
+                        f32 az = tmp[2];
+                        if (az < lbl_8047C998) az = -az;
+                        if (az < lbl_80478ACC) {
+                            f32 v = *(f32*)((u8*)obj + 0x100);
+                            *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
+                        }
+                    }
+                }
+            }
+            fn_800E0218((u8*)obj + 0x94, (u8*)obj + 0x70, (u8*)obj + 0xf4, (u8*)obj + 0x100);
+        } else {
+            f32 tmp1[3][4];
+            f32 tmp2[3][4];
+            f32 tmp3[3][4];
+            fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+            fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
+            fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+            fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp3);
+        }
+        *(u8*)((u8*)obj + 0x2) = 0;
+        fn_800E0264((u8*)obj + 0xc4, (u8*)obj + 0x94);
+    }
+    return (u8*)obj + 0xc4;
 }
 
 /* ==================================================================
  * fn_800D1D00 - GS render: update object transform from animation
  * Address: 0x800D1D00, Size: 0x1B8
  * ================================================================== */
-extern f32 lbl_8047C9AC;  /* float constant from literal pool at -30004(r3) where r3=-32696<<16 */
 void fn_800D1D00(void* obj) {
     if (*(u8*)((u8*)obj + 0x2) == 0) {
         return;
@@ -346,16 +385,16 @@ void fn_800D1D00(void* obj) {
         fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
         {
             f32 ax = tmp[0];
-            f32 ay = tmp[1];
-            f32 az = tmp[2];
-            if (ax < 0.0f) ax = -ax;
-            if (ax < lbl_8047C9AC) {
-                if (ay < 0.0f) ay = -ay;
-                if (ay < lbl_8047C9AC) {
-                    if (az < 0.0f) az = -az;
-                    if (az < lbl_8047C9AC) {
+            if (ax < lbl_8047C998) ax = -ax;
+            if (ax < lbl_80478ACC) {
+                f32 ay = tmp[1];
+                if (ay < lbl_8047C998) ay = -ay;
+                if (ay < lbl_80478ACC) {
+                    f32 az = tmp[2];
+                    if (az < lbl_8047C998) az = -az;
+                    if (az < lbl_80478ACC) {
                         f32 v = *(f32*)((u8*)obj + 0x100);
-                        *(f32*)((u8*)obj + 0x100) = (f32)(v + (double)1.0);
+                        *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
                     }
                 }
             }
@@ -365,7 +404,6 @@ void fn_800D1D00(void* obj) {
         f32 tmp1[3][4];
         f32 tmp2[3][4];
         f32 tmp3[3][4];
-        f32 tmp4[3];
         fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
         fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
         fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
@@ -503,18 +541,50 @@ u32 fn_800D2584(void) {
 }
 
 /* ==================================================================
- * fn_800D258C - GS render: effect render setup
+ * fn_800D258C - GS render: set current render obj, update transform
  * Address: 0x800D258C, Size: 0x1AC
+ * Sets lbl_8047AA74 to obj, then updates transform (same logic as fn_800D1D00).
  * ================================================================== */
-void fn_800D258C(void* effectCtx) {
-    if (effectCtx == NULL) {
-        return;
+void fn_800D258C(void* obj) {
+    lbl_8047AA74 = (u32)obj;
+    if (*(u8*)((u8*)obj + 0x4) != 0) {
+        fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+        fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+    } else if (*(u8*)((u8*)obj + 0x1) == 1) {
+        f32 tmp[3];
+        fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
+        {
+            f32 ax = tmp[0];
+            if (ax < lbl_8047C998) ax = -ax;
+            if (ax < lbl_80478ACC) {
+                f32 ay = tmp[1];
+                if (ay < lbl_8047C998) ay = -ay;
+                if (ay < lbl_80478ACC) {
+                    f32 az = tmp[2];
+                    if (az < lbl_8047C998) az = -az;
+                    if (az < lbl_80478ACC) {
+                        f32 v = *(f32*)((u8*)obj + 0x100);
+                        *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
+                    }
+                }
+            }
+        }
+        fn_800E0218((u8*)obj + 0x94, (u8*)obj + 0x70, (u8*)obj + 0xf4, (u8*)obj + 0x100);
+    } else {
+        f32 tmp1[3][4];
+        f32 tmp2[3][4];
+        f32 tmp3[3][4];
+        fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+        fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
+        fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+        fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
+        fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
+        fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
+        fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp3);
     }
-    /* Set up GX state for particle/effect rendering:
-     * - Additive blending
-     * - No depth write
-     * - Billboard matrix
-     */
+    *(u8*)((u8*)obj + 0x2) = 0;
 }
 
 /* ==================================================================
@@ -565,16 +635,16 @@ void fn_800D2AD4(u32 count) {
     if ((u16)raw != 0) {
         u32 off;
         u32 i;
-        u32 zero;
+        u8 zero;
         lbl_8047AA6C = fn_800E27B0((u32)(u16)raw);
         off = 0;
-        zero = off;
+        zero = (u8)off;
         i = 0;
-        do {
-            *(u8*)((u8*)lbl_8047AA6C + off) = (u8)zero;
+        while (i < lbl_8047AA70) {
+            *(u8*)((u8*)lbl_8047AA6C + off) = zero;
             off += 0x128;
             i++;
-        } while (i < lbl_8047AA70);
+        }
     }
 }
 #pragma pop
