@@ -5385,22 +5385,25 @@ extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
 extern u8 lbl_8035BB30[];
 extern u8 lbl_8035BB50[];
-void* fn_8011538C(void* ptr) {
+#pragma push
+#pragma peephole off
+void* fn_8011538C(void* ptr, u32 idx) {
     void* p1;
-    void* p2;
     if (ptr == NULL) {
         fn_800DD970(lbl_80272608, lbl_8035BB30);
         return NULL;
     }
     p1 = *(void**)((u8*)ptr + 0x10);
     if (p1 == NULL) { return NULL; }
-    p2 = *(void**)((u8*)p1 + 0x4);
-    if (p2 == NULL) {
+    if (idx >= 8) { return NULL; }
+    p1 = *(void**)p1;
+    if (p1 == NULL) {
         fn_800DD970(lbl_8027262C, lbl_8035BB30);
         return NULL;
     }
-    return p2;
+    return *(void**)((u8*)p1 + idx * 4 + 8);
 }
+#pragma pop
 /* 0x8011542C | 0x88 */
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
