@@ -3706,7 +3706,9 @@ asm void fn_800DF188(void) {
 #include "src/game/gs_render_fn_800DF188.inc"
 }
 #else
-void fn_800DF188(u8* obj) { obj[0x1] = (u8)(s32)(lbl_8047CACC * *(f32*)(*(u32*)((u8*)obj + 0x8) + 0xc)); }
+#pragma scheduling off
+void fn_800DF188(u8* obj) { f32 scale = lbl_8047CACC; obj[0x1] = (u8)(s32)(scale * *(f32*)(*(u32*)(*(u32*)((u8*)obj + 0x8) + 0xc) + 0xc)); }
+#pragma scheduling on
 #endif
 #if 0
 asm void fn_800DF1B8(void) {
@@ -3914,9 +3916,11 @@ void fn_800DF854(u32 count) {
     handle = fn_800E3534(count * 0x40);
     lbl_8047AB18 = handle;
     if (handle) {
-        u32 i = 0, off = 0;
+        u32 off;
+        u32 i;
         lbl_8047AB1C = (u32)fn_800E27B0(handle);
-        do { ((u8*)lbl_8047AB1C)[off] = 0; off += 0x40; i++; } while (i < lbl_8047AB20);
+        off = 0; i = 0;
+        while (i < lbl_8047AB20) { i++; ((u8*)lbl_8047AB1C)[off] = 0; off += 0x40; }
         fn_801A7CFC(lbl_80315490);
     }
 }
