@@ -293,15 +293,19 @@ asm void fn_800265C0(void) {
 #include "src/game/gs_worldmap_fn_800265C0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_800265C0(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 7) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 7) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026600 - 0x80026600 | size: 0x40 */
@@ -310,15 +314,19 @@ asm void fn_80026600(void) {
 #include "src/game/gs_worldmap_fn_80026600.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_80026600(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 8) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 8) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026640 - 0x80026640 | size: 0x40 */
@@ -327,15 +335,19 @@ asm void fn_80026640(void) {
 #include "src/game/gs_worldmap_fn_80026640.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_80026640(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 0xa) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 0xa) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026680 - 0x80026680 | size: 0x40 */
@@ -344,15 +356,19 @@ asm void fn_80026680(void) {
 #include "src/game/gs_worldmap_fn_80026680.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_80026680(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 7) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 7) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_800266C0 - 0x800266C0 | size: 0x40 */
@@ -361,15 +377,19 @@ asm void fn_800266C0(void) {
 #include "src/game/gs_worldmap_fn_800266C0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_800266C0(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 8) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 8) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026700 - 0x80026700 | size: 0x40 */
@@ -378,15 +398,19 @@ asm void fn_80026700(void) {
 #include "src/game/gs_worldmap_fn_80026700.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_80026700(void* r3, u8* r4) {
     void* ctx;
-    u32* entry;
+    s32* entry;
     ctx = *(void**)((u8*)r3 + 0x60);
-    entry = (u32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
-    r4[0x67] = (entry[1] == 0xa) ? 0xff : 0;
+    entry = (s32*)(lbl_80266DD8 + (*(s32*)((u8*)ctx + 0x1c) << 4));
+    if (entry[1] == 0xa) r4[0x67] = 0xff;
+    else r4[0x67] = 0;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80026740 - 0x80026740 | size: 0x90 */
