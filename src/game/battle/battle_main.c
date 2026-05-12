@@ -57,6 +57,8 @@
 
 #include "game/battle/battle.h"
 
+#pragma use_lmw_stmw on
+
 /* =========================================================================
  * External function declarations (auto-generated names)
  * ========================================================================= */
@@ -435,90 +437,38 @@ u8 fn_801EF63C(void) {
 
 /* 0x801EF02C | size: 0x54 | small */
 void fn_801EF02C(void) {
-    extern void fn_801EE440();
-    extern void fn_801EE468();
-    extern void fn_801EECD8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    fn_801EE468();
-    r31 = r3 & 0xFFFF;
-    r30 = 0x0;
-    while (1) {
-        r0 = r30 & 0xFFFF;
-        if (r0 >= r31) break;
-        r3 = r30;
-        fn_801EE440();
-        r4 = 0x1;
-        fn_801EECD8();
-        r30 = r30 + 0x1;
-
-
+    extern void* fn_801EE440(u16 idx);
+    extern u16 fn_801EE468(void);
+    extern void fn_801EECD8(void* a, u32 b);
+    u16 count = fn_801EE468();
+    u16 i;
+    for (i = 0; i < count; i++) {
+        fn_801EECD8(fn_801EE440(i), 1);
     }
-    return;
 }
 
 /* 0x801EF080 | size: 0x54 | small */
 void fn_801EF080(void) {
-    extern void fn_801EE440();
-    extern void fn_801EE468();
-    extern void fn_801EEB34();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    fn_801EE468();
-    r31 = r3 & 0xFFFF;
-    r30 = 0x0;
-    while (1) {
-        tmp = r30 & 0xFFFF;
-        if (tmp >= r31) break;
-        r3 = r30;
-        fn_801EE440();
-        r4 = 0x1;
-        fn_801EEB34();
-        r30 = r30 + 0x1;
-
-
+    extern void* fn_801EE440(u16 idx);
+    extern u16 fn_801EE468(void);
+    extern void fn_801EEB34(void* a, u32 b);
+    u16 count = fn_801EE468();
+    u16 i;
+    for (i = 0; i < count; i++) {
+        fn_801EEB34(fn_801EE440(i), 1);
     }
-    return;
 }
 
 /* 0x801EF0D4 | size: 0x54 | small */
 void fn_801EF0D4(void) {
-    extern void fn_801EE440();
-    extern void fn_801EE468();
-    extern void fn_801EE958();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    fn_801EE468();
-    r31 = r3 & 0xFFFF;
-    r30 = 0x0;
-    while (1) {
-        tmp = r30 & 0xFFFF;
-        if (tmp >= r31) break;
-        r3 = r30;
-        fn_801EE440();
-        r4 = 0x1;
-        fn_801EE958();
-        r30 = r30 + 0x1;
-
-
+    extern void* fn_801EE440(u16 idx);
+    extern u16 fn_801EE468(void);
+    extern void fn_801EE958(void* a, u32 b);
+    u16 count = fn_801EE468();
+    u16 i;
+    for (i = 0; i < count; i++) {
+        fn_801EE958(fn_801EE440(i), 1);
     }
-    return;
 }
 
 /* 0x801EF128 | size: 0xBC | medium */
@@ -589,71 +539,31 @@ void* fn_801EF1E4(void* data) {
 }
 
 /* 0x801EF214 | size: 0x60 | small */
-void fn_801EF214(void) {
+u32 fn_801EF214(void) {
     extern u32 lbl_80478F68;
-    extern void fn_801EEC74();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = 0x0;
-    r31 = 0x1;
-    while (1) {
-        r3 = lbl_80478F68;
-        r4 = r31 & 0xFFFF;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r4 >= tmp) break;
-        r3 = r31;
-        fn_801EEC74();
-        tmp = r3 & 0xFF;
-        if ((s32)tmp != 0) {
-            r30 = r30 + 0x1;
+    extern u8 fn_801EEC74(u16 idx);
+    u16 i;
+    u32 count = 0;
+    for (i = 1; i < *(u32*)((u8*)lbl_80478F68 + 0x0); i++) {
+        if (fn_801EEC74(i) != 0) {
+            count++;
         }
-        r31 = r31 + 0x1;
-
-
-
-
     }
-    r3 = r30;
-    return;
+    return count;
 }
 
 /* 0x801EF274 | size: 0x60 | small */
-void fn_801EF274(void) {
+u32 fn_801EF274(void) {
     extern u32 lbl_80478F68;
-    extern void fn_801EEAD0();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r30 = 0x0;
-    r31 = 0x1;
-    while (1) {
-        r3 = lbl_80478F68;
-        r4 = r31 & 0xFFFF;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r4 >= tmp) break;
-        r3 = r31;
-        fn_801EEAD0();
-        tmp = r3 & 0xFF;
-        if ((s32)tmp != 0) {
-            r30 = r30 + 0x1;
+    extern u8 fn_801EEAD0(u16 idx);
+    u16 i;
+    u32 count = 0;
+    for (i = 1; i < *(u32*)((u8*)lbl_80478F68 + 0x0); i++) {
+        if (fn_801EEAD0(i) != 0) {
+            count++;
         }
-        r31 = r31 + 0x1;
-
-
-
-
     }
-    r3 = r30;
-    return;
+    return count;
 }
 
 /* 0x801EF2D4 | size: 0xA0 | medium */
@@ -834,7 +744,12 @@ void fn_801EF758(void) {
 }
 
 /* 0x801EF7B4 | size: 0x10 | tiny */
-void fn_801EF7B4(void) { }
+void fn_801EF7B4(void) {
+    extern u8 lbl_8047B5E0;
+    extern u8 lbl_8047B5E1;
+    lbl_8047B5E0 = 0;
+    lbl_8047B5E1 = 0;
+}
 
 /* 0x801EF7C4 | size: 0x130 | medium */
 void fn_801EF7C4(void) {
@@ -1367,25 +1282,16 @@ void fn_801EFA08(void) {
 }
 
 /* 0x801EFFC4 | size: 0x48 | small */
-void fn_801EFFC4(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    /* mr. r30, r3 */;
-    if ((s32)tmp != 0) {
-        r31 = 0x0;
-        while (r31 < r30) {
-
-            ((void(*)(void))fn_800F0308)();
-            ((void(*)(void))fn_800D3088)();
-            r31 = r31 + r3;
-
+void fn_801EFFC4(u32 count) {
+    extern u32 fn_800D3088(void);
+    u32 i;
+    if (count != 0) {
+        i = 0;
+        while (i < count) {
+            fn_800F0308();
+            i += fn_800D3088();
         }
     }
-    return;
 }
 
 
