@@ -3315,10 +3315,15 @@ asm void fn_800DCC84(void) {
 }
 #else
 void fn_800DCC84(u8* obj, f32* rgb) {
+    u8 t[4];
     u8 tmp[4];
-    tmp[0] = (u8)(s32)rgb[0];
-    tmp[1] = (u8)(s32)rgb[1];
-    tmp[2] = (u8)(s32)rgb[2];
+    f32 r = rgb[0];
+    f32 g = rgb[1];
+    f32 b = rgb[2];
+    t[0] = (u8)(s32)r;
+    t[1] = (u8)(s32)g;
+    t[2] = (u8)(s32)b;
+    *(u32*)tmp = *(u32*)t;
     fn_801A4A48(*(u32*)(obj + 0xc), tmp);
 }
 #endif
@@ -3421,8 +3426,11 @@ void fn_800DD0B8(u32 count) {
     handle = fn_800E3534(count * 0x74);
     lbl_8047AAE8 = handle;
     if (handle) {
-        u32 i = 0, off = 0;
+        u32 i;
+        u32 off;
         lbl_8047AAEC = (u32)fn_800E27B0(handle);
+        i = 0;
+        off = 0;
         do {
             ((u8*)lbl_8047AAEC)[off] = 0;
             off += 0x74;
