@@ -26339,6 +26339,8 @@ asm void fn_80115024(void) {
 #include "src/game/gs_field_world_fn_80115024.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_80115024(u32 a, u32 b, u32 size) {
     void* result;
@@ -26349,6 +26351,7 @@ void* fn_80115024(u32 a, u32 b, u32 size) {
     }
     return result;
 }
+#pragma pop
 #endif
 extern u8 fn_800FF554(void);
 extern void fn_800F760C();
