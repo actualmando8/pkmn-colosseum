@@ -24559,24 +24559,19 @@ asm void fn_8012F150(void) {
 #else
 s32 fn_8012F150(s32 idx) {
     f32 f1, f2;
-    u32 r5;
+    s32 i;
     if (idx < 0 || idx >= 2) return 0;
     if (idx == (s32)*(u32*)lbl_80426BD0) return 0;
     f1 = lbl_8047D038;
     *(u16*)(lbl_80426BD0 + ((u32)idx << 5) + 4) &= 0xFFFE;
     f2 = lbl_8047D0D4;
     *(f32*)(lbl_80426BD0 + (*(u32*)lbl_80426BD0 << 5) + 8) = f1;
-    r5 = 0;
-    if (*(u16*)(lbl_80426BD0 + 4) & 1) {
-        if (*(u32*)lbl_80426BD0 != r5) {
-            *(f32*)(lbl_80426BD0 + 8) = f2;
-            f2 = f2 + f2;
-        }
-    }
-    r5 = 1;
-    if (*(u16*)(lbl_80426BD0 + 0x24) & 1) {
-        if (*(u32*)lbl_80426BD0 != r5) {
-            *(f32*)(lbl_80426BD0 + 0x28) = f2;
+    for (i = 0; i < 2; i++) {
+        if (*(u16*)(lbl_80426BD0 + (u32)i * 0x20 + 4) & 1) {
+            if ((s32)*(u32*)lbl_80426BD0 != i) {
+                *(f32*)(lbl_80426BD0 + (u32)i * 0x20 + 8) = f2;
+                f2 = f2 + f2;
+            }
         }
     }
     return 1;
