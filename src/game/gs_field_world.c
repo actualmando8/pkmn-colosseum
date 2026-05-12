@@ -16091,18 +16091,19 @@ s32 fn_8012361C(u8* ptr, u8 target, u8* buf_ptr, u8* counter_ptr) {
     if (ptr == NULL) { return -2; }
     if (ptr != NULL && counter_ptr == NULL) {
         result = 0;
-    } else {
-        val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
-        target = (u8)target;
-        while (*counter_ptr < 0x14) {
-            if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)target) {
-                result = (u16)fn_8012640C(NULL, val, 0x1e, *counter_ptr);
-                break;
-            }
-            (*counter_ptr)++;
-        }
-        if (*counter_ptr >= 0x14) { result = 0; }
+        goto _check;
     }
+    val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    target = (u8)target;
+    while (*counter_ptr < 0x14) {
+        if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)target) {
+            result = (u16)fn_8012640C(NULL, val, 0x1e, *counter_ptr);
+            goto _check;
+        }
+        (*counter_ptr)++;
+    }
+    result = 0;
+_check:
     if ((u16)result == 0) { return -3; }
     return fn_801237B8(ptr, result, buf_ptr);
 }
@@ -16118,8 +16119,9 @@ u16 fn_801236F8(u8* ptr, u8 arg2, u8* counter_ptr) {
     u16 val;
     if (ptr == NULL || counter_ptr == NULL) { return 0; }
     val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
+    arg2 = (u8)arg2;
     while (*counter_ptr < 0x14) {
-        if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)(u8)arg2) {
+        if ((s32)fn_8012640C(NULL, val, 0x1d, *counter_ptr) == (s32)arg2) {
             return (u16)fn_8012640C(NULL, val, 0x1e, *counter_ptr);
         }
         (*counter_ptr)++;
