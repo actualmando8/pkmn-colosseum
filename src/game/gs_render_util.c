@@ -66,7 +66,7 @@ extern void fn_80194400(void* jobj, void* rect);
 extern void fn_8019431C(void* jobj, void* outA, void* outB);
 extern f32  fn_801944F8(void* jobj);
 extern f32  fn_801944D0(void* jobj);
-extern void fn_801942C0(void* outA, void* outB, void* outC, void* outD);
+extern void fn_801942C0(void* jobj, void* outA, void* outB, void* outC, void* outD);
 extern void* fn_80194CC4(void* jobj);
 extern void fn_80196BB8(void* jobj);
 extern void fn_80196B10(void* jobj, void* ptr);
@@ -76,6 +76,16 @@ extern void fn_801C027C(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
 extern void fn_801C028C(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
 extern void fn_80196E10(const char* file, u32 line, const char* msg);
+extern f32 lbl_8047C990;     /* SDA float: animation step increment */
+extern char lbl_8047C9DC[] __attribute__((section(".sdata2")));  /* SDA2 string: assert filename */
+extern char lbl_8047C9E4[] __attribute__((section(".sdata2")));  /* SDA2 string: assert condition */
+extern u32 fn_800E3534(u32 size);   /* memory allocate, returns ptr as u32 */
+extern u32 fn_800E27B0(u32 handle); /* map handle to object ptr */
+extern u16 lbl_8047AA68;  /* render obj array low16 tag */
+extern u32 lbl_8047AA6C;  /* render obj array base pointer */
+extern f32 lbl_8047C994;  /* SDA float constant */
+extern f32 lbl_8047C9C0;  /* SDA float constant */
+extern u8 lbl_804001B0[0x40]; /* light state buffer (.bss) */
 extern s32  fn_800D37CC(void);
 extern void fn_800D7FE4(void* obj);
 extern void fn_800D834C(void);
@@ -179,13 +189,17 @@ void fn_800D173C(void* obj) {
  * fn_800D1798 - GS render: advance object animation by speed
  * Address: 0x800D1798, Size: 0xC0
  * ================================================================== */
+#pragma push
+#pragma scheduling on
 void fn_800D1798(void* obj) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
+        f32 speed;
         *(u8*)((u8*)obj + 0x4) = 1;
         *(u8*)((u8*)obj + 0x124) = 0;
         *(u8*)((u8*)obj + 0x125) = 1;
+        speed = *(f32*)((u8*)obj + 0x11c);
         if (*(u8*)((u8*)obj + 0x3) != 0) {
-            *(f32*)((u8*)obj + 0x11c) = *(f32*)((u8*)obj + 0x11c);
+            *(f32*)((u8*)obj + 0x11c) = speed;
             fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
             fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
             fn_801966FC(*(void**)((u8*)obj + 0xc));
@@ -193,6 +207,7 @@ void fn_800D1798(void* obj) {
         }
     }
 }
+#pragma pop
 
 /* ==================================================================
  * fn_800D1858 - GS render: set object fields 0x10c and 0x114
@@ -238,6 +253,8 @@ void fn_800D18FC(void* obj, f32 fov) {
  * ================================================================== */
 extern f32 lbl_8047C998;   /* SDA float 0.0 constant */
 extern f32 lbl_8047AA78;   /* SDA float temp for fn_800D1984 */
+#pragma push
+#pragma scheduling on
 void fn_800D1984(void* obj, u32 frame_idx) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         fn_80196BB8(*(void**)((u8*)obj + 0xc));
@@ -247,11 +264,12 @@ void fn_800D1984(void* obj, u32 frame_idx) {
                 (*(void***)((u8*)*(void**)((u8*)obj + 0x8) + 4))[*(u32*)((u8*)obj + 0x114)]);
             fn_80196698(*(void**)((u8*)obj + 0xc), lbl_8047C998);
             lbl_8047AA78 = lbl_8047C998;
-            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (double)0.0, (u32)0);
+            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, lbl_8047C998, (u32)0);
             *(f32*)((u8*)obj + 0x120) = lbl_8047AA78;
         }
     }
 }
+#pragma pop
 
 /* ==================================================================
  * fn_800D1A38 - GS render: get object active flag (field_0x4)
@@ -270,19 +288,30 @@ void fn_800D1A40(void* obj, void* dest) {
 }
 
 /* ==================================================================
- * fn_800D1A70 - GS render: full light setup
+ * fn_800D1A70 - GS render: setup viewport/projection from JObj
  * Address: 0x800D1A70, Size: 0xCC
+ * Sets up light/camera data from a JObj, writes to lbl_804001B0.
+ * Returns pointer to lbl_804001B0.
  * ================================================================== */
-void fn_800D1A70(void* lightSet) {
-    if (lightSet == NULL) {
-        return;
+#pragma push
+#pragma scheduling on
+void* fn_800D1A70(void* lightSet) {
+    f32 x, z;
+    f32 out3, out2, out1, out0;
+    void* jobj = *(void**)((u8*)lightSet + 0xc);
+    if (*(u8*)((u8*)jobj + 0x50) == 1) {
+        f32 w, h;
+        fn_8019431C(jobj, &x, &z);
+        w = fn_801944F8(*(void**)((u8*)lightSet + 0xc));
+        h = fn_801944D0(*(void**)((u8*)lightSet + 0xc));
+        fn_800E0678(lbl_804001B0, x, z, w, h);
+    } else {
+        fn_801942C0(jobj, &out2, &out0, &out3, &out1);
+        fn_800E0698(lbl_804001B0, out2, out0, out3, out1, lbl_8047C994, lbl_8047C9C0);
     }
-    /* Configure all lights from a light set:
-     * - Ambient light color
-     * - Directional/point lights
-     * - Light attenuation
-     */
+    return lbl_804001B0;
 }
+#pragma pop
 
 /* ==================================================================
  * fn_800D1B3C - GS render: model instance create
@@ -520,22 +549,47 @@ void fn_800D29A0(void) {
 }
 
 /* ==================================================================
- * fn_800D2AD4 - GS render: fog setup
+ * fn_800D2AD4 - GS render: init render object array
  * Address: 0x800D2AD4, Size: 0x70
+ * #pragma scheduling on required for correct instruction order
+ * Allocates and zero-initializes an array of count render objects
+ * (each 0x128 bytes). Stores array ptr to lbl_8047AA6C.
  * ================================================================== */
-void fn_800D2AD4(u32 fogType, f32 startZ, f32 endZ,
-                  u8 r, u8 g, u8 b) {
-    /* Configure GX fog:
-     * GXSetFog(fogType, startZ, endZ, nearZ, farZ, color)
-     */
+#pragma push
+#pragma scheduling on
+void fn_800D2AD4(u32 count) {
+    u32 raw;
+    lbl_8047AA70 = count;
+    raw = fn_800E3534(count * 0x128);
+    lbl_8047AA68 = (u16)raw;
+    if ((u16)raw != 0) {
+        u32 off;
+        u32 i;
+        u32 zero;
+        lbl_8047AA6C = fn_800E27B0((u32)(u16)raw);
+        off = 0;
+        zero = off;
+        i = 0;
+        do {
+            *(u8*)((u8*)lbl_8047AA6C + off) = (u8)zero;
+            off += 0x128;
+            i++;
+        } while (i < lbl_8047AA70);
+    }
 }
+#pragma pop
 
 /* ==================================================================
- * fn_800D2B44 - GS render: fog disable
+ * fn_800D2B44 - GS render: animation step callback
  * Address: 0x800D2B44, Size: 0x4C
+ * Called by fn_801C028C as a callback with the JObj*.
+ * Accumulates animation step into lbl_8047AA78.
  * ================================================================== */
 void fn_800D2B44(void* obj) {
-    /* Disable fog: GXSetFog(GX_FOG_NONE, ...) */
+    if (!obj) {
+        fn_80196E10(lbl_8047C9DC, 0xab, lbl_8047C9E4);
+    }
+    lbl_8047AA78 = lbl_8047C990 + *(f32*)((u8*)obj + 0xc);
 }
 
 /* ==================================================================
