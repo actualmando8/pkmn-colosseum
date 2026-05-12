@@ -21363,16 +21363,15 @@ asm void fn_8012BDE0(void) {
 #include "src/game/gs_field_world_fn_8012BDE0.inc"
 }
 #else
-void fn_8012BDE0(void) {
+#pragma push
+#pragma optimization_level 1
+u32 fn_8012BDE0(u32 r3, u32 r4) {
     u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
     u32 r7 = 0;
     r5 = (u32)&lbl_80426BD0;
     r7 = 0x0;
-    r5 = (u32)&lbl_80426BD0;
     r0 = *(u32*)((u8*)r5 + 0x140);
     if (r0 != (u32)0x0) {
         r5 = r5 + 0x8;
@@ -21412,8 +21411,7 @@ void fn_8012BDE0(void) {
     }
     }
     if ((s32)r7 >= (s32)0x8) {
-        r3 = -0x1;
-        return;
+        return (u32)-0x1;
     }
     r5 = (u32)&lbl_80426BD0;
     r6 = r7 << 3;
@@ -21422,8 +21420,9 @@ void fn_8012BDE0(void) {
     *(u32*)((u8*)r5 + 0x140) = r3;
     r3 = r7;
     *(u32*)((u8*)r5 + 0x144) = r4;
-    return;
+    return r3;
 }
+#pragma pop
 #endif
 /* 0x8012BEB4 | 0x200 */
 extern void fn_800D3088(void);

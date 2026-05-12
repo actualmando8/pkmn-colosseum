@@ -1337,7 +1337,7 @@ void fn_8012361C(void);
 void fn_80123FBC(void);
 void fn_80124A60(void);
 void fn_80125424(void);
-void fn_8012BDE0(void);
+u32 fn_8012BDE0(u32, u32);
 void fn_8014E9B4(void);
 void fn_8014EE40(void);
 void fn_8014F2DC(void);
