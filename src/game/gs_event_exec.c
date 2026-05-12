@@ -920,7 +920,7 @@ s32 fn_80014AE4(u8* ctx, u8* tgt) {
     }
     {
         f32 f = lbl_8047B740 * (lbl_8047B744 - lbl_8047A2C0);
-        tgt[0x67] = (u8)(s32)f;
+        tgt[0x67] = f;
     }
     return 0;
 }
@@ -969,14 +969,14 @@ extern s32 lbl_80266B9C[];
 #pragma scheduling off
 #pragma peephole off
 s32 fn_80014C38(u8* ctx, u8* tgt) {
-    void* p  = *(void**)(ctx + 0x60);
+    u8* p = *(u8**)(ctx + 0x60);
     s32 k0 = lbl_80266B9C[0];
     s32 k1 = lbl_80266B9C[1];
     s32 k2 = lbl_80266B9C[2];
     s32 k3 = lbl_80266B9C[3];
     s32 k4 = lbl_80266B9C[4];
-    s32 species = *(s16*)(tgt + 0x6);
     s32 idx0 = 0;
+    s32 species = *(s16*)(tgt + 0x6);
     s32 base;
     s32 idx;
     u8* inner;
@@ -994,10 +994,10 @@ s32 fn_80014C38(u8* ctx, u8* tgt) {
             }
         }
     }
-    base = *(s32*)((u8*)p + 0x8);
+    base = *(s32*)(p + 0x8);
     idx = idx0 - (5 - base);
     if (idx < 0 || idx >= base) return 0;
-    inner = (u8*)((*(u8**)((u8*)p + 0x4)) + idx * 0xC);
+    inner = *(u8**)(p + 0x4) + idx * 0xC;
     flag  = (*(u16*)(inner + 0x8)) & 1;
     fn_800FB680(0, 0, flag ? 0x7f7f7fff : -1, *(s32*)inner);
     return 0;
@@ -1011,16 +1011,13 @@ extern PurEntry lbl_802E4DB0[];
 #pragma peephole off
 s32 fn_80014D1C(u8* ctx, u8* tgt) {
     u8* p;
-    s32 species;
-    s32 count;
     s32 idx;
+    s32 count;
     s32 delta;
-    PurEntry* e;
     u8* walk;
 
     p = *(u8**)(ctx + 0x60);
-    species = *(s16*)(tgt + 6);
-    if (species != 0x223) {
+    if (*(s16*)(tgt + 6) != 0x223) {
         tgt[0x64] = p[0];
         tgt[0x65] = p[1];
         tgt[0x66] = p[2];
@@ -1029,15 +1026,14 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
     if (count < 5) {
         walk = (u8*)lbl_802E4DB0;
         for (idx = 0; idx < 8; idx++) {
-            if (species == *(s32*)walk) break;
+            if (*(s16*)(tgt + 6) == *(s32*)walk) break;
             walk += 0xc;
         }
         if (idx < 8) {
-            e = &lbl_802E4DB0[idx];
             delta = 5 - count;
-            *(s16*)(tgt + 0x52) = (s16)(delta * 0x1F + e->a);
-            if (e->flag != 0) {
-                *(s16*)(tgt + 0x56) = (s16)(e->b - delta);
+            *(s16*)(tgt + 0x52) = (s16)(delta * 0x1F + lbl_802E4DB0[idx].a);
+            if (lbl_802E4DB0[idx].flag != 0) {
+                *(s16*)(tgt + 0x56) = (s16)(lbl_802E4DB0[idx].b - delta);
             }
         }
     }
@@ -1049,15 +1045,18 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
 #pragma push
 #pragma peephole off
 s32 fn_80014E50(u8* ctx) {
-    u8* p = *(u8**)(ctx + 0x60);
-    u8* state = fn_80105624();
+    u8* state;
+    u8* p;
     s32 count;
     s32 slot;
     s32 new_slot;
     u8* inner;
 
+    p     = *(u8**)(ctx + 0x60);
+    state = fn_80105624();
+    count = *(s32*)(p + 8);
+
     if ((*(volatile u16*)(state + 6) & 2) != 0) {
-        count = *(s32*)(p + 8);
         slot  = (s32)(s8)ctx[0x95];
         new_slot = slot + 1;
         if (new_slot >= count) {
