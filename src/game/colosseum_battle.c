@@ -39656,21 +39656,15 @@ u32 fn_80264D58(u32 r3,u32 r4,u32 r5)
 /* Address: 0x802612D0 | Size: 0x5C | Ghidra import */
 
 void fn_802612D0(void)
-
 {
-    extern u32 _DAT_804787e0;
-    extern u32 _DAT_804787e4;
-    extern u32 _DAT_804787e8;
-    extern u32 _DAT_804787ec;
-    extern u32 _DAT_804787f0;
-    extern u32 _DAT_804787f4;
-    extern u32 _DAT_804787f8;
-  _DAT_804787f8 =
-       fn_80260EBC(_DAT_804787e0,_DAT_804787e4,_DAT_804787e8,(u16*)_DAT_804787f0,_DAT_804787ec,
-                    (u8*)_DAT_804787f4);
-  fn_800FF660();
-  fn_8011288C(0,0);
-  return;
+    extern u32 lbl_804787E0[];
+    extern u32 fn_80260EBC();
+    extern void fn_800FF660();
+    extern void fn_8011288C();
+    u32 *base = lbl_804787E0;
+    base[6] = fn_80260EBC(base[0], base[1], base[2], (u16*)base[4], base[3], (u8*)base[5]);
+    fn_800FF660();
+    fn_8011288C(0, 0);
 }
 
 /* Address: 0x802600E4 | Size: 0x378 | Ghidra import */
