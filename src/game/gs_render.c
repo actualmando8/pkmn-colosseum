@@ -1976,9 +1976,9 @@ asm void fn_800D7D10(void) {
 }
 #else
 void fn_800D7D10(u8 idx, void* src) {
-    if (*(u32*)lbl_8047AA80 == 1) { fn_800D4F98(0x44, 2, (u32)idx, src); }
-    else if (idx <= 9) { fn_800E0628(src, &lbl_80400948[idx * 0x30]); }
-    else { fn_800DD970(lbl_80270440); }
+    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x44, 2, (u32)idx, src); }
+    else if (idx > 9) { fn_800DD970(lbl_80270440); }
+    else { fn_800E0628(src, &lbl_80400948[idx * 0x30]); }
 }
 #endif
 extern u8 lbl_8047AAC8;
