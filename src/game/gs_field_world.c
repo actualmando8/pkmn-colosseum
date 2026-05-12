@@ -27548,6 +27548,7 @@ asm void fn_80122334(void) {
 #include "src/game/gs_field_world_fn_80122334.inc"
 }
 #else
+#pragma optimization_level 1
 u8 fn_80122334(u32 val) {
     u32 s;
     s = (val >> 12) & 0x30;
@@ -27556,6 +27557,7 @@ u8 fn_80122334(u32 val) {
     s = (s & 0xFFFFFFFCu) | (val & 0x03);
     return (u8)(s % 28);
 }
+#pragma optimization_level reset
 #endif
 #if 0
 asm void fn_801229F4(void) {
