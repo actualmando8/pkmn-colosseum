@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Scan every compiled .o and emit a progress report.
+
+Walks `build/GC6E01/base/**/*.o`, runs objdiff-cli against the unified target,
+and aggregates match% by file. Output is JSON-compatible with
+https://decomp.dev's project source schema (loose adaptation).
+
+Usage:
+    python3 tools/progress.py                       # text summary to stdout
+    python3 tools/progress.py --json report.json    # JSON output
+    python3 tools/progress.py --threshold 100       # only count 100% as matched
+
+The badge URL on decomp.dev reads from a hosted report.json. To wire that up
+you'd register the repo at https://decomp.dev/new and have CI push report.json
+to a known location, then the README shield syntax becomes:
+    [![Progress]](https://decomp.dev/<user>/<repo>.svg)
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
+BASE_DIR = ROOT / "build" / "GC6E01" / "base"
+OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+
+
+def diff_one(base_o: Path) -> dict:
+    out = subprocess.run(
+        [
+            str(OBJDIFF), "diff",
+            "-1", str(TARGET_O),
+            "-2", str(base_o),
+            "-o", "-",
+            "--format", "json",
+            "-c", "ppc.calculatePoolRelocations=false",
+        ],
+        capture_output=True, text=True,
+    )
+    if out.returncode != 0:
+        return {"error": out.stderr[:200], "functions": []}
+    j = json.loads(out.stdout)
+    funcs = []
+    for s in j.get("right", {}).get("symbols", []):
+        if s.get("kind") != "SYMBOL_FUNCTION":
+            continue
+        name = s.get("name", "")
+        if not name.startswith("fn_"):
+            continue
+        pct = s.get("match_percent")
+        size_raw = s.get("size", 0)
+        try:
+            size = int(size_raw, 0) if isinstance(size_raw, str) else int(size_raw)
+        except (TypeError, ValueError):
+            size = 0
+        if pct is not None:
+            funcs.append({"name": name, "match": pct, "size": size})
+    return {"functions": funcs}
+
+
+def collect() -> dict:
+    files = {}
+    for o in sorted(BASE_DIR.rglob("*.o")):
+        rel = o.relative_to(BASE_DIR).as_posix()
+        d = diff_one(o)
+        funcs = d.get("functions", [])
+        if not funcs:
+            continue
+        matched = sum(1 for f in funcs if f["match"] >= 100)
+        matched_bytes = sum(f["size"] for f in funcs if f["match"] >= 100)
+        total_bytes = sum(f["size"] for f in funcs)
+        files[rel] = {
+            "functions": len(funcs),
+            "matched": matched,
+            "total_bytes": total_bytes,
+            "matched_bytes": matched_bytes,
+            "match_pct": (100.0 * matched / len(funcs)) if funcs else 0.0,
+            "bytes_pct": (100.0 * matched_bytes / total_bytes) if total_bytes else 0.0,
+        }
+    return files
+
+
+def summarize(files: dict) -> dict:
+    total_fns = sum(f["functions"] for f in files.values())
+    matched_fns = sum(f["matched"] for f in files.values())
+    total_bytes = sum(f["total_bytes"] for f in files.values())
+    matched_bytes = sum(f["matched_bytes"] for f in files.values())
+    return {
+        "total_functions": total_fns,
+        "matched_functions": matched_fns,
+        "match_pct": (100.0 * matched_fns / total_fns) if total_fns else 0.0,
+        "total_bytes": total_bytes,
+        "matched_bytes": matched_bytes,
+        "bytes_pct": (100.0 * matched_bytes / total_bytes) if total_bytes else 0.0,
+    }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--json", help="Write full report to this path")
+    ap.add_argument("--no-files", action="store_true",
+                    help="Skip per-file breakdown in text output")
+    args = ap.parse_args()
+
+    if not TARGET_O.exists():
+        sys.exit(f"target .o missing: {TARGET_O}")
+    if not BASE_DIR.exists():
+        sys.exit(f"build dir missing: {BASE_DIR}")
+
+    files = collect()
+    overall = summarize(files)
+
+    report = {
+        "schema": "pkmn-colosseum/progress/v1",
+        "overall": overall,
+        "files": files,
+    }
+    if args.json:
+        Path(args.json).write_text(json.dumps(report, indent=2), encoding="utf-8")
+        print(f"wrote {args.json}")
+
+    # Text summary
+    print(f"Overall: {overall['matched_functions']}/{overall['total_functions']} "
+          f"functions ({overall['match_pct']:.2f}%), "
+          f"{overall['matched_bytes']:,}/{overall['total_bytes']:,} bytes "
+          f"({overall['bytes_pct']:.2f}%)")
+
+    if not args.no_files:
+        print()
+        # Sort by inverse match pct (worst first) for actionability
+        sorted_files = sorted(files.items(), key=lambda kv: kv[1]["match_pct"])
+        for rel, f in sorted_files:
+            if f["functions"] == 0:
+                continue
+            print(f"  {f['match_pct']:5.1f}%  {f['matched']}/{f['functions']:>4d}  "
+                  f"{f['matched_bytes']:>8,}/{f['total_bytes']:<8,}B  {rel}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
