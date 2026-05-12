@@ -1,0 +1,32 @@
+# Keep the build context lean. The image bakes its own toolchain;
+# nothing in the local checkout is needed at build time except this
+# file. Source and tools are mounted at runtime, not copied at build.
+
+# Toolchain dirs that should never be inside the image build context
+tools/mwcc_compiler/
+tools/objdiff-cli.exe
+tools/dtk.exe
+
+# Build artifacts
+build/
+.omc/
+.omx/
+
+# Worktrees and git internals
+.git/
+G:/
+
+# Large generated files
+**/*.o
+**/*.obj
+**/*.zip
+**/*.7z
+**/*.iso
+**/*.rvz
+
+# Editor/system noise
+.vscode/
+.idea/
+.DS_Store
+*.swp
+Thumbs.db
