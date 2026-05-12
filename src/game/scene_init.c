@@ -92,6 +92,7 @@ extern const u8 lbl_80267050[];  /* Shift-JIS: "読み出しエラー\n" (Read E
 /* CW struct copy helpers: triggers register-blast copy pattern */
 typedef struct { u32 data[14]; } Tbl14;
 typedef struct { u32 data[56]; } Tbl56;
+typedef struct { u32 data[78]; } Tbl78;
 
 /*
  * Functions in this translation unit (49 total):
@@ -6087,7 +6088,7 @@ s32 fn_800544A8(u8* ctx) {
 
 /* fn_8005464C - 0x8005464C | size: 0x24 */
 extern f32 lbl_8047A54C;
-extern u32 lbl_8047BE8C;
+extern f32 lbl_8047BE8C;
 #if 0
 asm void fn_8005464C(void) {
 #include "src/game/scene_init_fn_8005464C.inc"
@@ -6095,7 +6096,7 @@ asm void fn_8005464C(void) {
 #else
 #pragma optimization_level 4
 u32 fn_8005464C(void) {
-    return lbl_8047A54C < lbl_8047BE8C;
+    return !(lbl_8047A54C >= lbl_8047BE8C);
 }
 #endif
 
@@ -6891,7 +6892,7 @@ void fn_80056610(u8* p) {
 
 /* fn_800566B4 - 0x800566B4 | size: 0x24 */
 extern f32 lbl_8047A570;
-extern u32 lbl_8047BEC4;
+extern f32 lbl_8047BEC4;
 #if 0
 asm void fn_800566B4(void) {
 #include "src/game/scene_init_fn_800566B4.inc"
@@ -6899,7 +6900,7 @@ asm void fn_800566B4(void) {
 #else
 #pragma optimization_level 4
 u32 fn_800566B4(void) {
-    return lbl_8047A570 < lbl_8047BEC4;
+    return !(lbl_8047A570 >= lbl_8047BEC4);
 }
 #endif
 
@@ -7349,12 +7350,7 @@ asm void fn_80057458(void) {
 #pragma optimization_level 4
 void fn_80057458(u8* src) {
     s32 next = (s32)(*(u32*)(lbl_803A9768 + 0x278) + 1) % 2;
-    u32* dst = (u32*)(lbl_803A9768 + next * 0x138 + 8);
-    u32* s = (u32*)src;
-    u32 i;
-    for (i = 0; i < 0x4E; i++) {
-        dst[i] = s[i];
-    }
+    *(Tbl78*)(lbl_803A9768 + next * 0x138 + 8) = *(Tbl78*)src;
 }
 #endif
 
@@ -7393,12 +7389,7 @@ asm void fn_800574FC(void) {
 #pragma optimization_level 4
 void fn_800574FC(u8* src) {
     u32 slot = *(u32*)(lbl_803A9768 + 0x278);
-    u32* dst = (u32*)(lbl_803A9768 + slot * 0x138 + 8);
-    u32* s = (u32*)src;
-    u32 i;
-    for (i = 0; i < 0x4E; i++) {
-        dst[i] = s[i];
-    }
+    *(Tbl78*)(lbl_803A9768 + slot * 0x138 + 8) = *(Tbl78*)src;
 }
 #endif
 
@@ -7413,27 +7404,31 @@ asm void fn_80057538(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 u32 fn_80057538(void) {
-    u32 state;
+    s32 state;
     u32 field4;
     s32 count;
     Tbl14 tbl;
     u16 id;
+    u8* tbl_base;
 
-    state = *(u32*)(lbl_803A9768);
-    if (state == 6) {
-        if ((u8)fn_80107170(0xa0, 0x76e) != 0) { return 0; }
-        if ((u8)fn_80107170(0xa0, 0x77e) != 0) { return 0; }
+    state = *(s32*)(lbl_803A9768);
+    if (state != 6) {
+        count = *(s32*)(lbl_80267698 + state * 4);
+        if (count <= 0) { return 1; }
+        field4 = *(u32*)(lbl_803A9768 + 4);
+        tbl_base = lbl_802676B4;
+        tbl = *(Tbl14*)tbl_base;
+        id = (u16)tbl.data[(state * 2 + (field4 != 0 ? 1 : 0))];
+        if ((u8)fn_80107170(0xa0, id) != 0) { return 0; }
         return 1;
     }
-    count = *(s32*)(lbl_80267698 + state * 4);
-    if (count <= 0) { return 1; }
-    field4 = *(u32*)(lbl_803A9768 + 4);
-    tbl = *(Tbl14*)lbl_802676B4;
-    id = (u16)tbl.data[(state * 2 + (field4 != 0 ? 1 : 0))];
-    if ((u8)fn_80107170(0xa0, id) != 0) { return 0; }
+    if ((u8)fn_80107170(0xa0, 0x76e) != 0) { return 0; }
+    if ((u8)fn_80107170(0xa0, 0x77e) != 0) { return 0; }
     return 1;
 }
+#pragma peephole on
 #endif
 
 /* fn_80057694 - 0x80057694 | size: 0x10 */
@@ -7633,29 +7628,24 @@ asm void fn_80057A64(s32 a, s32 b) {
 #pragma optimization_level 4
 void fn_80057A64(u8* state, u32 b) {
     u8* base;
-    s32 i;
+    s32 i = 0;
 
     base = (u8*)lbl_803A9768;
-    *(u32*)(base + 0x278) = 0;
+    *(u32*)(base + 0x278) = i;
     *(u32*)(base + 4) = b;
-    for (i = 0; i < 2; i++) {
+    while (i < 2) {
         fn_80124A60(base + 8);
         base += 0x138;
+        i++;
     }
     if (state != NULL) {
-        u32* dst;
-        u32* src;
         base = (u8*)lbl_803A9768;
         *(u32*)(base + 0) = 3;
-        dst = (u32*)(base + 4);
-        src = (u32*)state;
-        for (i = 0; i < 0x4E; i++) {
-            dst[i] = src[i];
-        }
+        *(Tbl78*)(base + 8) = *(Tbl78*)state;
     }
     lbl_8047A58C = lbl_8047BF00;
     lbl_8047A588 = lbl_8047BEF4;
-    fn_801026A4(0xa0, 0x1f, 0, 0, 0, 0, 0);
+    fn_801026A4(0xa0, 0x1f, 0, 0, 0, 0);
 }
 #endif
 
