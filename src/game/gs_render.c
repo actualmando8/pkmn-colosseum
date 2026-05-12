@@ -4079,7 +4079,7 @@ asm void fn_800E008C(void) {
 void fn_800E008C(void) { fn_800A3B38(); }
 #endif
 extern void fn_800A3AC0(void*, void*, f32);
-extern f32 lbl_8047CAD8;
+extern const f32 lbl_8047CAD8;
 #if 0
 asm void fn_800E00AC(void) {
 #include "src/game/gs_render_fn_800E00AC.inc"
@@ -4150,7 +4150,7 @@ asm void fn_800E0204(void) {
 #include "src/game/gs_render_fn_800E0204.inc"
 }
 #else
-void fn_800E0204(f32* arr) { arr[0] = lbl_8047CADC; arr[1] = lbl_8047CADC; arr[2] = lbl_8047CADC; }
+void fn_800E0204(f32* arr) { f32 v = lbl_8047CADC; arr[0] = v; arr[1] = v; arr[2] = v; }
 #endif
 extern void fn_800A3458(void);
 #if 0
