@@ -554,18 +554,20 @@ asm void fn_800275F4(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_800275F4(void* r3) {
-    void* r22;
+    s32 r31;     /* x_acc */
+    s32 r30;     /* byte_off */
+    u8* r29;     /* inner_ptr */
+    s32 r28;     /* y_acc */
+    u8* r27;     /* base_ptr */
+    u16* r26;    /* pbuf */
+    s32 r25;     /* item */
+    s32 r24;     /* outer_ctr */
+    s32 r23;     /* loc_idx */
+    void* r22;   /* self */
+    void* r21;   /* entry_ptr */
     u8* ctx;
-    u8* r27;
-    void* r29;
-    s32 r23;
-    s32 r24;
-    s32 r25;
-    s32 r28;
-    s32 r30;
-    s32 r31;
-    void* r21;
     u8* arr;
     u16 buf[2];
     u16 r6;
@@ -576,28 +578,32 @@ s32 fn_800275F4(void* r3) {
     r24 = 0;
     r28 = 0;
     r27 = lbl_80266E18 + r23 * 0x18;
+    r26 = buf;
     while (r24 < 4) {
         r31 = 0;
-        r29 = (void*)(r27 + 8);
+        r29 = r27 + 8;
         r30 = 0;
         r25 = 0;
-        for (;;) {
-            if (r23 < 0 || r23 >= 2) { r6 = 0; break; }
-            if (r24 < 0 || r24 >= 4) { r6 = 0; break; }
-            r21 = *(void**)r29;
-            r0 = fn_800FA314(r21);
-            if (r25 < 0 || r25 >= r0) { r6 = 0; break; }
-            arr = (u8*)fn_800FA280((u32)r21); r6 = *(u16*)(arr + r30);
-            if (r6 == 0) { break; }
-            buf[0] = r6; buf[1] = 0;
-            fn_80132A38(0x37, buf);
+        r6 = 0;
+        goto inner_check;
+        while (r6 != 0) {
+            r26[0] = r6; r26[1] = 0;
+            fn_80132A38(0x37, r26);
             r0 = (s32)(s16)(u16)((u32)fn_800FA444(0xce) >> 16);
             r0 = (0x1b - r0);
-            r0 = (r0 + (r0 >> 31)) >> 1;
+            r0 = (r0 + (s32)((u32)r0 >> 31)) >> 1;
             fn_800FB680(r31 + r0, r28, (s32)((u8*)r22)[0x8b] | (s32)(-0x100), 0xce);
             r31 += 0x1b;
             r30 += 2;
             r25++;
+        inner_check:
+            if (r23 < 0 || r23 >= 2) { r6 = 0; continue; }
+            if (r24 < 0 || r24 >= 4) { r6 = 0; continue; }
+            r21 = *(void**)r29;
+            r0 = fn_800FA314(r21);
+            if (r25 < 0 || r25 >= r0) { r6 = 0; continue; }
+            arr = (u8*)fn_800FA280((u32)r21);
+            r6 = *(u16*)(arr + r30);
         }
         r28 += 0x23;
         r27 += 4;
@@ -605,6 +611,7 @@ s32 fn_800275F4(void* r3) {
     }
     return 0;
 }
+#pragma peephole on
 #endif
 
 /* fn_8002777C - 0x8002777C | size: 0x3c */
@@ -2097,7 +2104,11 @@ s32 fn_8002AE68(void* r3, u8* r4) {
     u8 v;
     ctx = *(void**)((u8*)r3 + 0x60);
     v = ((u8*)ctx)[0x1c];
-    r4[0x67] = (v == 0 || v == 1) ? 0xcc : 0;
+    if (v == 0 || v == 1) {
+        r4[0x67] = 0xcc;
+    } else {
+        r4[0x67] = 0;
+    }
     return 0;
 }
 #endif
