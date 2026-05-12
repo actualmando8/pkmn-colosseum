@@ -36429,36 +36429,33 @@ void fn_8025DCBC(int *param)
 
 /* Address: 0x8025DD14 | Size: 0x98 | Ghidra import */
 void fn_8025DD14(int *r3)
-
 {
     extern int fn_801653BC();
     extern int fn_801653C4();
     extern int fn_801656D8();
-  int iVar1;
-  int iVar2;
-  int iVar3;
-  int iVar4;
-  
-  iVar1 = fn_801653C4();
-  if (iVar1 == 0) {
-    iVar2 = 0;
-  }
-  else {
-    iVar2 = fn_801656D8();
-    fn_80165A20(1,0x32,0xff);
-  }
-  iVar3 = fn_801653BC();
-  if (iVar3 == 0) {
-    iVar4 = 0;
-  }
-  else {
-    iVar4 = fn_801656D8();
-  }
-  *r3 = iVar1;
-  r3[1] = iVar3;
-  r3[2] = iVar2;
-  r3[3] = iVar4;
-  return;
+    extern void fn_80165A20();
+    int iVar1;
+    int iVar2;
+    int iVar3;
+    int iVar4;
+
+    iVar1 = fn_801653C4();
+    if (iVar1 != 0) {
+        iVar2 = fn_801656D8();
+        fn_80165A20(1, 0x32, 0xff);
+    } else {
+        iVar2 = 0;
+    }
+    iVar3 = fn_801653BC();
+    if (iVar3 != 0) {
+        iVar4 = fn_801656D8();
+    } else {
+        iVar4 = 0;
+    }
+    *r3 = iVar1;
+    r3[1] = iVar3;
+    r3[2] = iVar2;
+    r3[3] = iVar4;
 }
 
 /* Address: 0x8025DDAC | Size: 0x48 | Ghidra import */
@@ -37650,21 +37647,16 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
 }
 
 /* Address: 0x8025FE84 | Size: 0x60 | Ghidra import */
-short fn_8025FE84(short *r3,u32 r4)
-
+u16 fn_8025FE84(u16 *r3, u32 r4)
 {
-  short sVar1;
-  
-  if (r3 == (short *)0x0) {
-    r3 = (short *)fn_80129280(0,0xc);
-  }
-  if (*r3 == 0) {
-    sVar1 = 0;
-  }
-  else {
-    sVar1 = r3[(r4 & 0xffff) * 6 + 2];
-  }
-  return sVar1;
+    extern void *fn_80129280();
+    if (r3 == (u16 *)0) {
+        r3 = (u16 *)fn_80129280(0, 0xc);
+    }
+    if (*r3 != 0) {
+        r3 = (u16 *)((u8 *)r3 + (r4 & 0xFFFF) * 12);
+    }
+    return *(u16 *)((u8 *)r3 + 4);
 }
 
 /* Address: 0x8025FEE4 | Size: 0x34 | Ghidra import */
@@ -38518,7 +38510,7 @@ u32 fn_80261CBC(u32 r3,u32 r4)
   u32 uVar2;
   s8 cVar5;
   u32 uVar6;
-  
+
   iVar1 = fn_801F02AC(2,r3,r4);
   if (iVar1 == 0) {
     uVar6 = 0;
