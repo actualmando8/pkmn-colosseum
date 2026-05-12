@@ -5230,15 +5230,18 @@ void fn_8012A450();
 void fn_8012A5B0(void);
 /* 0x70 | fn_80114CA8 | alloc_wrapper */
 extern void* fn_800F9418();  /* K&R: called with 5 args, returns void* */
+#pragma push
+#pragma peephole off
 void* fn_80114CA8(void* owner, u32 param, u32 alloc_size) {
-    u32 aligned = (alloc_size + 0x1F) & ~0x1F;
-    void* mem = (void*)fn_800F9418(aligned + 0x60, 0x20, (u32)owner, (u32)param, 0);
+    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
+    void* mem = (void*)fn_800F9418(total, 0x20, (u32)owner, (u32)param, 0);
     if (mem == NULL) {
-        fn_800DD970("");
+        fn_800DD970(lbl_802724E8, total);
         return NULL;
     }
     return (u8*)mem + 0x60;
 }
+#pragma pop
 /* 0x80114D6C | 0xA0 */
 extern u8 fn_800FF548(void);
 extern u32 fn_80115124();  /* K&R: asm void wrapper, used as function pointer */
