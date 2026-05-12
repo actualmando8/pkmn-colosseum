@@ -75,6 +75,7 @@ extern void fn_80196698(void* jobj, f32 val);
 extern void fn_801966FC(void* jobj);
 extern void fn_801C027C(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
+extern f32 lbl_8047C9B0;     /* SDA float: fov scaling constant */
 extern void fn_801C028C(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
 extern void fn_80196E10(const char* file, u32 line, const char* msg);
 extern f32 lbl_8047C990;     /* SDA float: animation step increment */
@@ -87,6 +88,8 @@ extern u32 lbl_8047AA6C;  /* render obj array base pointer */
 extern f32 lbl_8047C994;  /* SDA float constant */
 extern f32 lbl_8047C9C0;  /* SDA float constant */
 extern f32 lbl_80478ACC;   /* f32 threshold constant, abs accessed via lis/lfs */
+extern f32 lbl_8047C998;   /* SDA float 0.0 constant */
+extern f32 lbl_8047AA78;   /* SDA float temp */
 extern double lbl_8047C9A0; /* double 1.0 constant, SDA2 */
 extern u8 lbl_804001B0[0x40]; /* light state buffer (.bss) */
 extern s32  fn_800D37CC(void);
@@ -94,6 +97,26 @@ extern void fn_800D7FE4(void* obj);
 extern void fn_800D834C(void);
 extern void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d);
 extern void fn_800D9B58(f32 a, f32 b, f32 c, f32 d);
+extern void* fn_80193F44(void* modelSub);
+extern char lbl_8047C9C4[] __attribute__((section(".sdata2")));
+extern char lbl_8047C9CC[] __attribute__((section(".sdata2")));
+extern f32 lbl_8047C9D4;   /* SDA float constant */
+extern f32 lbl_8047C9D8;   /* SDA float constant */
+extern u32 lbl_8047AA8C;   /* SDA pointer: current lighting state */
+extern f32 lbl_8047C9F0;   /* SDA2 float scaling constant */
+extern double lbl_8047C9F8; /* SDA2 double constant */
+extern f32 lbl_8047CA00;   /* SDA2 float constant */
+extern f32 lbl_8047CA04;   /* SDA2 float constant */
+extern f32 lbl_8047CA08;   /* SDA2 float constant */
+extern f32 lbl_8047CA0C;   /* SDA2 float constant */
+extern u32 lbl_80270350[4]; /* .rodata array */
+extern void* fn_800D7BF8(u32 idx);
+extern void fn_800DFF98(void* out, void* sphere, void* ray);
+extern void fn_800BD16C(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
+extern void* fn_8019BB78(void* ctx);
+extern void fn_8019BD18(u32 zero);
+extern void fn_8016EA88(void);
+extern void fn_8016EB30(void);
 
 /* Forward declarations for functions defined later in this file */
 void fn_800D2B44(void* obj);
@@ -108,12 +131,106 @@ void fn_800D104C(void) {
 }
 
 /* ==================================================================
- * fn_800D1070 - GS render utility: full render setup
+ * fn_800D1070 - GS render utility: per-frame render object update
  * Address: 0x800D1070, Size: 0x354
- * Sets up the complete rendering pipeline for a frame:
- * view matrix, projection, viewport, and GX state.
+ * Updates all active render objects: advances animation, updates transforms.
  * ================================================================== */
-void fn_800D1070(void) {
+void fn_800D1070(f32 dtUnk) {
+    u32 byteOff;
+    u32 idx;
+    byteOff = 0;
+    idx = 0;
+    while (idx < lbl_8047AA70) {
+        void* obj = (u8*)lbl_8047AA6C + byteOff;
+        if (*(u8*)((u8*)obj + 0x0) == 1) {
+            if (*(u8*)((u8*)obj + 0x4) == 1) {
+                s8 animDir;
+                f32 speed;
+                f32 lastFrame;
+                f32 fov;
+                s32 mode;
+                fn_800E01D0((u8*)obj + 0x7c, (u8*)obj + 0x70);
+                fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
+                fn_801966FC(*(void**)((u8*)obj + 0xc));
+                fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+                fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+                fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+                animDir = *(s8*)((u8*)obj + 0x125);
+                fov = *(f32*)((u8*)obj + 0x118);
+                lastFrame = *(f32*)((u8*)obj + 0x120);
+                speed = *(f32*)((u8*)obj + 0x11c);
+                mode = *(s32*)((u8*)obj + 0x10c);
+                {
+                    f32 animStep = fov * (f32)dtUnk;
+                    f32 threshold = lastFrame - lbl_8047C990;
+                    if (animDir == -1) {
+                        *(f32*)((u8*)obj + 0x11c) = speed - animStep;
+                    } else if (animDir == 1) {
+                        *(f32*)((u8*)obj + 0x11c) = speed + animStep;
+                    }
+                    speed = *(f32*)((u8*)obj + 0x11c);
+                    if (mode == 1) {
+                        if (speed >= threshold) {
+                            *(s8*)((u8*)obj + 0x125) = -1;
+                        } else if (speed <= lbl_8047C998) {
+                            *(s8*)((u8*)obj + 0x125) = 1;
+                        }
+                    } else if (mode == 0) {
+                        f32 thr2 = threshold - lbl_8047C994;
+                        if (speed >= thr2) {
+                            *(u8*)((u8*)obj + 0x124) = 1;
+                            *(s8*)((u8*)obj + 0x125) = 0;
+                            *(f32*)((u8*)obj + 0x11c) = thr2;
+                        }
+                    } else if (mode >= 2 && mode < 3) {
+                        /* mode 2: no extra action */
+                    }
+                }
+                *(u8*)((u8*)obj + 0x2) = 1;
+            }
+            /* transform update */
+            if (*(u8*)((u8*)obj + 0x4) != 0) {
+                fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+                fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+                fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+                fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+            } else if (*(u8*)((u8*)obj + 0x1) == 1) {
+                f32 tmp[3];
+                fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
+                {
+                    f32 ax = tmp[0];
+                    if (ax < lbl_8047C998) ax = -ax;
+                    if (ax < lbl_80478ACC) {
+                        f32 ay = tmp[1];
+                        if (ay < lbl_8047C998) ay = -ay;
+                        if (ay < lbl_80478ACC) {
+                            f32 az = tmp[2];
+                            if (az < lbl_8047C998) az = -az;
+                            if (az < lbl_80478ACC) {
+                                f32 v = *(f32*)((u8*)obj + 0x100);
+                                *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
+                            }
+                        }
+                    }
+                }
+                fn_800E0218((u8*)obj + 0x94, (u8*)obj + 0x70, (u8*)obj + 0xf4, (u8*)obj + 0x100);
+            } else {
+                f32 tmp1[3][4];
+                f32 tmp2[3][4];
+                f32 tmp3[3][4];
+                fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+                fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
+                fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+                fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
+                fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
+                fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
+                fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp3);
+            }
+            *(u8*)((u8*)obj + 0x2) = 0;
+        }
+        byteOff += 0x128;
+        idx++;
+    }
 }
 
 /* ==================================================================
@@ -125,19 +242,68 @@ void fn_800D13C4(void) {
 }
 
 /* ==================================================================
- * fn_800D13C8 - GS render: model render with transform
+ * fn_800D13C8 - GS render: copy saved state into render object
  * Address: 0x800D13C8, Size: 0x2AC
- * Renders a model with a given world transform matrix.
+ * Copies state from src (saved snapshot) into dst (render object).
  * ================================================================== */
-void fn_800D13C8(void* model, f32 mtx[3][4]) {
-    if (model == NULL) {
+void fn_800D13C8(void* dst, void* src) {
+    f32 fov;
+    fn_800E01D0((u8*)dst + 0x70, (u8*)src + 0x4);
+    fn_800E01D0((u8*)dst + 0x7c, (u8*)src + 0x10);
+    fn_800E01D0((u8*)dst + 0x88, (u8*)src + 0x1c);
+    fn_800E0628((u8*)dst + 0x94, (u8*)src + 0x28);
+    fn_800E0628((u8*)dst + 0xc4, (u8*)src + 0x58);
+    fn_800E01D0((u8*)dst + 0xf4, (u8*)src + 0x88);
+    fn_800E01D0((u8*)dst + 0x100, (u8*)src + 0x94);
+    *(u8*)((u8*)dst + 0x124) = *(u8*)((u8*)src + 0x1);
+    if (*(u8*)((u8*)src + 0x1) != 0) {
         return;
     }
-
-    /* 1. Concatenate world matrix with view matrix */
-    /* 2. Load model-view matrix to GX */
-    /* 3. Set up material state */
-    /* 4. Dispatch display lists */
+    if (*(u8*)((u8*)src + 0x0) == 0) {
+        return;
+    }
+    {
+        u32 frameIdx = *(u32*)((u8*)src + 0xa4);
+        if (*(u8*)((u8*)dst + 0x3) != 0) {
+            fn_80196BB8(*(void**)((u8*)dst + 0xc));
+            if (frameIdx <= *(u32*)((u8*)dst + 0x110)) {
+                *(u32*)((u8*)dst + 0x114) = frameIdx;
+                fn_80196B10(*(void**)((u8*)dst + 0xc),
+                    ((void***)((u8*)*(void**)((u8*)dst + 0x8) + 4))[0][*(u32*)((u8*)dst + 0x114)]);
+                fn_80196698(*(void**)((u8*)dst + 0xc), lbl_8047C998);
+                lbl_8047AA78 = lbl_8047C998;
+                fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+                *(f32*)((u8*)dst + 0x120) = lbl_8047AA78;
+            }
+        }
+        *(u32*)((u8*)dst + 0x10c) = *(u32*)((u8*)src + 0xa0);
+        fov = *(f32*)((u8*)src + 0xa8);
+        if (*(u8*)((u8*)dst + 0x3) != 0) {
+            if (fn_800D37CC() == 0x32) {
+                fov *= lbl_8047C9B0;
+            }
+            *(f32*)((u8*)dst + 0x118) = fov;
+            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+        }
+        if (*(u8*)((u8*)dst + 0x3) != 0) {
+            *(f32*)((u8*)dst + 0x11c) = *(f32*)((u8*)src + 0xac);
+            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+            fn_801966FC(*(void**)((u8*)dst + 0xc));
+            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+        }
+        if (*(u8*)((u8*)dst + 0x3) != 0) {
+            *(u8*)((u8*)dst + 0x4) = 1;
+            *(u8*)((u8*)dst + 0x124) = 0;
+            *(u8*)((u8*)dst + 0x125) = 1;
+        }
+        if (*(u8*)((u8*)dst + 0x3) != 0) {
+            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+            fn_801966FC(*(void**)((u8*)dst + 0xc));
+            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+        }
+    }
 }
 
 /* ==================================================================
@@ -238,7 +404,6 @@ void fn_800D1860(void* obj, f32 speed) {
  * fn_800D18FC - GS render: set object fov angle (field 0x118)
  * Address: 0x800D18FC, Size: 0x88
  * ================================================================== */
-extern f32 lbl_8047C9B0;  /* scaling constant for fov conversion */
 void fn_800D18FC(void* obj, f32 fov) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         s32 mode = fn_800D37CC();
@@ -254,8 +419,6 @@ void fn_800D18FC(void* obj, f32 fov) {
  * fn_800D1984 - GS render: set object animation frame index
  * Address: 0x800D1984, Size: 0xB4
  * ================================================================== */
-extern f32 lbl_8047C998;   /* SDA float 0.0 constant */
-extern f32 lbl_8047AA78;   /* SDA float temp for fn_800D1984 */
 #pragma push
 #pragma scheduling on
 void fn_800D1984(void* obj, u32 frame_idx) {
@@ -267,7 +430,7 @@ void fn_800D1984(void* obj, u32 frame_idx) {
                 (*(void***)((u8*)*(void**)((u8*)obj + 0x8) + 4))[*(u32*)((u8*)obj + 0x114)]);
             fn_80196698(*(void**)((u8*)obj + 0xc), lbl_8047C998);
             lbl_8047AA78 = lbl_8047C998;
-            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, lbl_8047C998, (u32)0);
+            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
             *(f32*)((u8*)obj + 0x120) = lbl_8047AA78;
         }
     }
@@ -530,6 +693,93 @@ void fn_800D21C8(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
  * Address: 0x800D2248, Size: 0x33C
  * ================================================================== */
 void fn_800D2248(void) {
+    void* obj = (void*)lbl_8047AA74;
+    void* jobj;
+    if (obj == 0) {
+        return;
+    }
+    if (*(u8*)((u8*)obj + 0x4) != 0) {
+        f32 x, z, w, h;
+        jobj = *(void**)((u8*)obj + 0xc);
+        if (jobj == 0) {
+            fn_80196E10(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
+        }
+        *(u32*)((u8*)jobj + 0x8) &= ~0x4u;
+        fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
+        w = fn_801944F8(*(void**)((u8*)obj + 0xc));
+        h = fn_801944D0(*(void**)((u8*)obj + 0xc));
+        fn_800D9BD0(x, z, w, h);
+        fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+        fn_800D834C();
+        fn_800D7FE4((u8*)obj + 0x94);
+        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+        fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        return;
+    }
+    jobj = *(void**)((u8*)obj + 0xc);
+    if (*(u8*)((u8*)jobj + 0x50) != 1) {
+        f32 a, b, c, d;
+        fn_801942C0(jobj, &b, &d, &a, &c);
+        fn_800D9B58(b, d, a, c);
+        fn_800D834C();
+        return;
+    }
+    if (*(u8*)((u8*)obj + 0x2) != 0) {
+        if (*(u8*)((u8*)obj + 0x4) != 0) {
+            fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+            fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+            fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+            fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        } else if (*(u8*)((u8*)obj + 0x1) == 1) {
+            f32 tmp[3];
+            fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
+            {
+                f32 ax = tmp[0];
+                if (ax < lbl_8047C998) ax = -ax;
+                if (ax < lbl_80478ACC) {
+                    f32 ay = tmp[1];
+                    if (ay < lbl_8047C998) ay = -ay;
+                    if (ay < lbl_80478ACC) {
+                        f32 az = tmp[2];
+                        if (az < lbl_8047C998) az = -az;
+                        if (az < lbl_80478ACC) {
+                            f32 v = *(f32*)((u8*)obj + 0x100);
+                            *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
+                        }
+                    }
+                }
+            }
+            fn_800E0218((u8*)obj + 0x94, (u8*)obj + 0x70, (u8*)obj + 0xf4, (u8*)obj + 0x100);
+        } else {
+            f32 tmp1[3][4];
+            f32 tmp2[3][4];
+            f32 tmp3[3][4];
+            fn_800E053C((u8*)obj + 0x94, -*(f32*)((u8*)obj + 0x88));
+            fn_800E0518(tmp1, -*(f32*)((u8*)obj + 0x8c));
+            fn_800E04F4(tmp2, -*(f32*)((u8*)obj + 0x90));
+            fn_800E05C0(tmp3, -*(f32*)((u8*)obj + 0x70), -*(f32*)((u8*)obj + 0x74), -*(f32*)((u8*)obj + 0x78));
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp1);
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp2);
+            fn_800E0290((u8*)obj + 0x94, (u8*)obj + 0x94, tmp3);
+        }
+        *(u8*)((u8*)obj + 0x2) = 0;
+    }
+    {
+        f32 x, z, w, h;
+        jobj = *(void**)((u8*)obj + 0xc);
+        if (jobj == 0) {
+            fn_80196E10(lbl_8047C9C4, 0x1a2, lbl_8047C9CC);
+        }
+        *(u32*)((u8*)jobj + 0x8) |= 0x80000002u;
+        fn_800A2D64((u8*)obj + 0x94, (u8*)jobj + 0x54);
+        fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
+        w = fn_801944F8(*(void**)((u8*)obj + 0xc));
+        h = fn_801944D0(*(void**)((u8*)obj + 0xc));
+        fn_800D9BD0(x, z, w, h);
+        fn_800D834C();
+        fn_800D7FE4((u8*)obj + 0x94);
+    }
 }
 
 /* ==================================================================
@@ -591,31 +841,159 @@ void fn_800D258C(void* obj) {
  * fn_800D2738 - GS render: effect render cleanup
  * Address: 0x800D2738, Size: 0xC4
  * ================================================================== */
-void fn_800D2738(void) {
-    /* Restore GX state after effect rendering */
+void fn_800D2738(void* obj) {
+    void* jobj;
+    if ((void*)lbl_8047AA74 == obj) {
+        lbl_8047AA74 = (u32)0;
+    }
+    jobj = *(void**)((u8*)obj + 0xc);
+    if (jobj != 0) {
+        u16 ref = *(u16*)((u8*)jobj + 0x4);
+        if ((u16)(0xffffu - ref) != 0) {
+            *(u16*)((u8*)jobj + 0x4) = ref - 1;
+            if (ref != 0) {
+                if (jobj != 0) {
+                    void** vtable = *(void***)jobj;
+                    ((void(*)(void*))vtable[0xc])(jobj);
+                    vtable = *(void***)jobj;
+                    ((void(*)(void*))vtable[0xd])(jobj);
+                }
+            }
+        }
+    }
+    *(u8*)((u8*)obj + 0x0) = 0;
 }
 
 /* ==================================================================
- * fn_800D27FC - GS render: shadow volume setup
+ * fn_800D27FC - GS render: find free slot and init with model data
  * Address: 0x800D27FC, Size: 0x1A4
  * ================================================================== */
-void fn_800D27FC(void* shadowCtx) {
-    if (shadowCtx == NULL) {
-        return;
+void* fn_800D27FC(void* model) {
+    u32 i;
+    void* slot;
+    u32 count = lbl_8047AA70;
+    slot = (void*)lbl_8047AA6C;
+    for (i = 0; i < count; i++) {
+        if (*(u8*)slot == 0) {
+            goto found;
+        }
+        slot = (u8*)slot + 0x128;
     }
-    /* Set up GX state for shadow volume rendering:
-     * - Stencil buffer configuration
-     * - Special blend mode
-     * - Depth test configuration
-     */
+    slot = 0;
+found:
+    if (slot == 0) {
+        return 0;
+    }
+    *(void**)((u8*)slot + 0x8) = model;
+    *(void**)((u8*)slot + 0xc) = fn_80193F44(*(void**)((u8*)*(void**)((u8*)slot + 0x8) + 0x0));
+    *(u8*)((u8*)slot + 0x0) = 1;
+    *(u8*)((u8*)slot + 0x4) = 0;
+    if (*(void**)((u8*)*(void**)((u8*)slot + 0x8) + 0x4) != 0) {
+        *(u8*)((u8*)slot + 0x3) = 1;
+        *(f32*)((u8*)slot + 0x118) = lbl_8047C990;
+        *(u32*)((u8*)slot + 0x10c) = 1;
+        *(u8*)((u8*)slot + 0x124) = 0;
+        *(u32*)((u8*)slot + 0x110) = 0;
+        while (((void***)((u8*)*(void**)((u8*)slot + 0x8) + 0x4))[0][*(u32*)((u8*)slot + 0x110)] != 0) {
+            *(u32*)((u8*)slot + 0x110) = *(u32*)((u8*)slot + 0x110) + 1;
+        }
+        if (*(u8*)((u8*)slot + 0x3) != 0) {
+            fn_80196BB8(*(void**)((u8*)slot + 0xc));
+            if ((s32)*(u32*)((u8*)slot + 0x110) >= 0) {
+                *(u32*)((u8*)slot + 0x114) = 0;
+                fn_80196B10(*(void**)((u8*)slot + 0xc),
+                    ((void***)((u8*)*(void**)((u8*)slot + 0x8) + 4))[0][*(u32*)((u8*)slot + 0x114)]);
+                fn_80196698(*(void**)((u8*)slot + 0xc), lbl_8047C998);
+                lbl_8047AA78 = lbl_8047C998;
+                {
+                    lis_r3_fn_800D2B44:
+                    fn_801C028C(*(void**)((u8*)slot + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+                }
+                *(f32*)((u8*)slot + 0x120) = lbl_8047AA78;
+            }
+        }
+    } else {
+        u32 one_local = 1;
+        u32 zero_local = 0;
+        *(u8*)((u8*)slot + 0x3) = 0;
+        *(u8*)((u8*)slot + 0x0) = one_local;
+        *(u8*)((u8*)slot + 0x1) = zero_local;
+        fn_800E01D0((u8*)slot + 0x70, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x24) + 0xc);
+        fn_800E01D0((u8*)slot + 0x100, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x28) + 0xc);
+    }
+    return slot;
 }
 
 /* ==================================================================
- * fn_800D29A0 - GS render: shadow volume cleanup
+ * fn_800D29A0 - GS render: find free slot and init with defaults
  * Address: 0x800D29A0, Size: 0x134
  * ================================================================== */
-void fn_800D29A0(void) {
-    /* Restore GX state after shadow volume rendering */
+void* fn_800D29A0(void) {
+    u32 count = lbl_8047AA70;
+    void* slot = (void*)lbl_8047AA6C;
+    u32 zero;
+    f32 f_0;
+    u32 one;
+    f32 f_c990;
+    u32 w;
+    u32 h;
+    {
+        u32 i;
+        for (i = 0; i < count; i++) {
+            if (*(u8*)slot != 0) {
+                slot = (u8*)slot + 0x128;
+            } else {
+                goto found;
+            }
+        }
+    }
+    slot = 0;
+found:
+    if (slot == 0) {
+        return 0;
+    }
+    zero = 0;
+    f_0 = lbl_8047C998;
+    one = 1;
+    f_c990 = lbl_8047C990;
+    w = 0x280;
+    h = 0x1e0;
+    *(u32*)((u8*)slot + 0x10) = zero;
+    *(f32*)((u8*)slot + 0x14) = f_0;
+    *(f32*)((u8*)slot + 0x18) = f_0;
+    *(f32*)((u8*)slot + 0x1c) = f_0;
+    *(u32*)((u8*)slot + 0x20) = zero;
+    *(u32*)((u8*)slot + 0x24) = zero;
+    *(f32*)((u8*)slot + 0x28) = f_0;
+    *(f32*)((u8*)slot + 0x2c) = f_0;
+    *(f32*)((u8*)slot + 0x30) = f_c990;
+    *(u32*)((u8*)slot + 0x34) = zero;
+    *(u32*)((u8*)slot + 0x38) = zero;
+    *(u16*)((u8*)slot + 0x3c) = (u16)zero;
+    *(u16*)((u8*)slot + 0x3e) = (u16)one;
+    *(u16*)((u8*)slot + 0x40) = (u16)zero;
+    *(u16*)((u8*)slot + 0x42) = (u16)w;
+    *(u16*)((u8*)slot + 0x44) = (u16)zero;
+    *(u16*)((u8*)slot + 0x46) = (u16)h;
+    *(u16*)((u8*)slot + 0x48) = (u16)zero;
+    *(u16*)((u8*)slot + 0x4a) = (u16)w;
+    *(u16*)((u8*)slot + 0x4c) = (u16)zero;
+    *(u16*)((u8*)slot + 0x4e) = (u16)h;
+    *(u32*)((u8*)slot + 0x50) = (u32)((u8*)slot + 0x10);
+    *(u32*)((u8*)slot + 0x54) = (u32)((u8*)slot + 0x24);
+    *(f32*)((u8*)slot + 0x58) = f_0;
+    *(u32*)((u8*)slot + 0x5c) = zero;
+    *(f32*)((u8*)slot + 0x60) = lbl_8047C994;
+    *(f32*)((u8*)slot + 0x64) = lbl_8047C9C0;
+    *(f32*)((u8*)slot + 0x68) = lbl_8047C9D4;
+    *(f32*)((u8*)slot + 0x6c) = lbl_8047C9D8;
+    *(void**)((u8*)slot + 0xc) = fn_80193F44((u8*)slot + 0x38);
+    *(u8*)((u8*)slot + 0x0) = (u8)one;
+    *(u8*)((u8*)slot + 0x1) = (u8)zero;
+    *(u8*)((u8*)slot + 0x4) = (u8)zero;
+    *(u8*)((u8*)slot + 0x3) = (u8)zero;
+    *(u32*)((u8*)slot + 0x8) = zero;
+    return slot;
 }
 
 /* ==================================================================
@@ -663,45 +1041,173 @@ void fn_800D2B44(void* obj) {
 }
 
 /* ==================================================================
- * fn_800D2B90 - GS render: post-processing setup
+ * fn_800D2B90 - GS render: set current lighting context
  * Address: 0x800D2B90, Size: 0x258
  * ================================================================== */
-void fn_800D2B90(void* ppCtx) {
-    if (ppCtx == NULL) {
+void fn_800D2B90(void* arg1) {
+    u32 savedColors[4];
+    void* prevLight;
+    savedColors[0] = lbl_80270350[0];
+    savedColors[1] = lbl_80270350[1];
+    savedColors[2] = lbl_80270350[2];
+    savedColors[3] = lbl_80270350[3];
+    prevLight = (void*)lbl_8047AA8C;
+    if (prevLight != 0) {
+        u16 ref = *(u16*)((u8*)prevLight + 0x4);
+        if (ref != 0xffff) {
+            *(u16*)((u8*)prevLight + 0x4) = ref - 1;
+            if (ref != 0) {
+                if (prevLight != 0) {
+                    void** vtable = *(void***)prevLight;
+                    ((void(*)(void*))vtable[0xc])(prevLight);
+                    vtable = *(void***)prevLight;
+                    ((void(*)(void*))vtable[0xd])(prevLight);
+                }
+            }
+        }
+        lbl_8047AA8C = 0;
+    }
+    if (arg1 == 0) {
+        fn_8019BD18(0);
+        fn_8016EA88();
         return;
     }
-    /* Set up GX state for post-processing effects:
-     * - Copy texture from framebuffer
-     * - Set up fullscreen quad
-     * - Configure TEV for post-process effect
-     */
+    {
+        void* state = fn_8019BB78(arg1);
+        lbl_8047AA8C = (u32)state;
+    }
+    fn_8016EB30();
+    {
+        u8 r = *(u8*)((u8*)arg1 + 0x10);
+        u8 g = *(u8*)((u8*)arg1 + 0x11);
+        u8 b2 = *(u8*)((u8*)arg1 + 0x12);
+        u8 a = *(u8*)((u8*)arg1 + 0x13);
+        f32 scale = lbl_8047C9F0;
+        f32 fr, fg, fb2, fa;
+        fr = (f32)(r + 0x4330 * 65536) - (f32)lbl_8047C9F8;
+        fg = (f32)(g + 0x4330 * 65536) - (f32)lbl_8047C9F8;
+        fb2 = (f32)(b2 + 0x4330 * 65536) - (f32)lbl_8047C9F8;
+        fa = (f32)(a + 0x4330 * 65536) - (f32)lbl_8047C9F8;
+        fr = fr / scale;
+        fg = fg / scale;
+        fb2 = fb2 / scale;
+        fa = fa / scale;
+        *(u8*)((u8*)lbl_8047AA80 + 0x1c) = (u8)(u32)(fr * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1d) = (u8)(u32)(fg * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1e) = (u8)(u32)(fb2 * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1f) = (u8)(u32)(fa * scale);
+        if (*(u8*)((u8*)lbl_8047AA80 + 0x1c) == 0 &&
+            *(u8*)((u8*)lbl_8047AA80 + 0x1d) == 0 &&
+            *(u8*)((u8*)lbl_8047AA80 + 0x1e) == 0 &&
+            *(u8*)((u8*)lbl_8047AA80 + 0x1f) == 0) {
+            *(u8*)((u8*)lbl_8047AA80 + 0x19) = 0;
+        }
+    }
 }
 
 /* ==================================================================
- * fn_800D2DE8 - GS render: copy to texture
+ * fn_800D2DE8 - GS render: sphere/ray intersection loop
  * Address: 0x800D2DE8, Size: 0x14C
  * ================================================================== */
-void fn_800D2DE8(void* destTex, u32 x, u32 y, u32 w, u32 h) {
-    /* Copy framebuffer region to a texture:
-     * GXSetTexCopySrc(x, y, w, h)
-     * GXSetTexCopyDst(w, h, format, mipmap)
-     * GXCopyTex(destTex, GX_FALSE)
-     */
+s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
+    void* sphere;
+    void* model;
+    sphere = fn_800D7BF8(0);
+    model = fn_800D7BF8(2);
+    if (sphere == 0 || model == 0) {
+        return 0;
+    }
+    {
+        f32 center[7];
+        f32 radii[6];
+        u32 i;
+        s32 result;
+        center[0] = lbl_8047CA00;
+        center[1] = *(f32*)((u8*)model + 0x0);
+        center[2] = *(f32*)((u8*)model + 0x8);
+        center[3] = *(f32*)((u8*)model + 0x14);
+        center[4] = *(f32*)((u8*)model + 0x18);
+        center[5] = *(f32*)((u8*)model + 0x28);
+        center[6] = *(f32*)((u8*)model + 0x2c);
+        radii[0] = lbl_8047CA00;
+        radii[1] = lbl_8047CA00;
+        radii[2] = lbl_8047CA04;
+        radii[3] = lbl_8047CA08;
+        radii[4] = lbl_8047CA00;
+        radii[5] = lbl_8047CA0C;
+        result = 2;
+        i = 0;
+        while (i < count) {
+            f32 test[3];
+            fn_800DFF98(test, sphere, arg1);
+            if (test[2] >= *(f32*)((u8*)model + 0x2c)) {
+                f32 val = lbl_8047CA0C;
+                result = 3;
+                *(f32*)((u8*)arg2 + 0x8) = val;
+                *(f32*)((u8*)arg2 + 0x4) = val;
+                *(f32*)((u8*)arg2 + 0x0) = val;
+            } else {
+                fn_800BD16C(sphere,
+                    center,
+                    radii,
+                    *(f32*)((u8*)arg1 + 0x0),
+                    *(f32*)((u8*)arg1 + 0x4),
+                    *(f32*)((u8*)arg1 + 0x8),
+                    arg2,
+                    (u8*)arg2 + 0x4,
+                    (u8*)arg2 + 0x8);
+            }
+            i++;
+            arg1 = (u8*)arg1 + 0xc;
+            arg2 = (u8*)arg2 + 0xc;
+        }
+        return result;
+    }
 }
 
 /* ==================================================================
- * fn_800D2F34 - GS render: render to texture setup
+ * fn_800D2F34 - GS render: single sphere/ray intersection
  * Address: 0x800D2F34, Size: 0x128
  * ================================================================== */
-void fn_800D2F34(void* renderTex, u32 w, u32 h) {
-    if (renderTex == NULL) {
-        return;
+s32 fn_800D2F34(void* arg1, void* arg2) {
+    f32 center[7];
+    f32 radii[6];
+    f32 testOut[3];
+    void* sphere = fn_800D7BF8(0);
+    void* model = fn_800D7BF8(2);
+    if (sphere == 0 || model == 0) {
+        return 0;
     }
-    /* Configure rendering to a texture target:
-     * 1. Set viewport to texture dimensions
-     * 2. Configure copy source
-     * 3. Set up special projection for RTT
-     */
+    fn_800DFF98(testOut, sphere, arg1);
+    {
+        f32 model2c = *(f32*)((u8*)model + 0x2c);
+        if (testOut[2] >= model2c) {
+            return 1;
+        }
+        center[0] = lbl_8047CA00;
+        center[1] = *(f32*)((u8*)model + 0x0);
+        center[2] = *(f32*)((u8*)model + 0x8);
+        center[3] = *(f32*)((u8*)model + 0x14);
+        center[4] = *(f32*)((u8*)model + 0x18);
+        center[5] = *(f32*)((u8*)model + 0x28);
+        center[6] = model2c;
+    }
+    radii[0] = lbl_8047CA00;
+    radii[1] = lbl_8047CA00;
+    radii[2] = lbl_8047CA04;
+    radii[3] = lbl_8047CA08;
+    radii[4] = lbl_8047CA00;
+    radii[5] = lbl_8047CA0C;
+    fn_800BD16C(sphere,
+        center,
+        radii,
+        *(f32*)((u8*)arg1 + 0x0),
+        *(f32*)((u8*)arg1 + 0x4),
+        *(f32*)((u8*)arg1 + 0x8),
+        arg2,
+        (u8*)arg2 + 0x4,
+        (u8*)arg2 + 0x8);
+    return 2;
 }
 
 /* ==================================================================
