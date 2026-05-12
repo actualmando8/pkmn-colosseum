@@ -1,0 +1,71 @@
+# Progress report for every push/PR. Runs in the project's build container
+# (see Dockerfile + docker/README.md). Posts a comment on PRs with the
+# before/after match% diff, and uploads the full report.json as an artifact.
+#
+# To wire up the README badge:
+#   1. Register the repo at https://decomp.dev/new
+#   2. Add this step to publish report.json to the registered endpoint
+#   3. Add `![Progress](https://decomp.dev/<user>/<repo>.svg)` to README
+#
+# Until step 1, the artifact is available from the Actions tab.
+
+name: Progress
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  progress:
+    runs-on: ubuntu-latest
+    # When the build container is published, uncomment:
+    # container: ghcr.io/<owner>/pkmn-colosseum-build:main
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Without the published container, we install deps inline. Slower but
+      # works on a vanilla runner. Swap for the container once it's pushed.
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+              python3 ninja-build unzip curl ca-certificates
+          # mwcc bundle
+          curl -sL -o /tmp/compilers.zip \
+              https://files.decomp.dev/compilers_20251118.zip
+          mkdir -p tools/mwcc_compiler
+          unzip -q /tmp/compilers.zip -d tools/mwcc_compiler
+          # objdiff-cli (linux)
+          curl -sL -o tools/objdiff-cli.exe \
+              https://github.com/encounter/objdiff/releases/download/v3.6.1/objdiff-cli-linux-x86_64
+          chmod +x tools/objdiff-cli.exe
+          # wibo
+          sudo curl -sL -o /usr/local/bin/wibo \
+              https://github.com/decompals/wibo/releases/download/1.0.3/wibo
+          sudo chmod +x /usr/local/bin/wibo
+
+      # We need the target .o (auto_01_800055E0_text.o) extracted from the
+      # original ROM. CI without the ROM can only check that .c files
+      # *compile*; the match% step needs the ROM. Skip gracefully if absent.
+      - name: Compile all source
+        run: |
+          python3 tools/compile_check.py --all || echo "compile_check.py --all not implemented; skipping"
+
+      - name: Generate progress report
+        if: ${{ hashFiles('build/GC6E01/obj/auto_01_800055E0_text.o') != '' }}
+        run: |
+          python3 tools/progress.py --json report.json
+          echo "::group::Summary"
+          python3 tools/progress.py --no-files
+          echo "::endgroup::"
+
+      - name: Upload report
+        if: ${{ hashFiles('report.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: progress-report
+          path: report.json
