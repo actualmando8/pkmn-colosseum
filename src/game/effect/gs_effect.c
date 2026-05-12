@@ -42,10 +42,12 @@ extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
 extern u16   GSmemAllocRaw(u32 size);                    /* fn_800E3534 */
 extern void* GSmemGetPtr(u16 handle);                    /* fn_800E27B0 */
 extern void* GSmemLock(u16 handle);                      /* fn_800E24B0 */
+extern void  fn_800E24B0(u16 handle);                    /* GSmemLock (raw) */
 extern void  GSmemFree(u16 handle);                      /* fn_800E209C */
+extern void  fn_800E209C(u16 handle);                    /* GSmemFree (raw) */
 extern u32   GStaskRegister(u32 type, u32 priority,
                              void* param, void* func);   /* fn_800FE834 */
-extern u32   GSgfxGetTickCount(void);                    /* fn_800D3088 */
+extern u32   fn_800D3088(void);                          /* GSgfxGetTickCount */
 extern void  fn_801E12A0(void);                          /* battle VFX init */
 extern void  memset(void* dst, u32 val, u32 size);
 extern void  memcpy(void* dst, void* src, u32 size);
@@ -53,40 +55,32 @@ extern void  memcpy(void* dst, void* src, u32 size);
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80272A58[]; /* "GSeffect: Cannot trigger effect..." */
 
-/* ===== Index lookup globals ===== */
-extern u8 lbl_803635C0[];  /* effect table (BSS) */
+/* ===== Global state ===== */
+extern u8 lbl_803635C0[];              /* master effect globals, 0x18 bytes */
+#define gsEffectGlobals (*(GSEffectGlobals*)(void*)lbl_803635C0)
 
 /* Forward declarations for converted functions */
-void fn_80130CE0(void);
-void fn_80130F04(u32 arg1, u32 arg2);
+void fn_80130CE0(u16 maxEffects);
+void fn_80130F04(void);
 void fn_80130F68(void);
-void fn_80131010(void);
-void fn_801310A8(u32* out1);
-void fn_8013111C(void);
-void fn_80131200(u32* out1);
-void fn_80131268(void);
-void fn_8013139C(void);
-void fn_80131428(void);
+void fn_80131010(u32 effectId);
+BOOL fn_801310A8(u32 effectId);
+BOOL fn_8013111C(u32 effectId);
+void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
+                 GSEffectStopFunc destroyFunc,
+                 GSEffectStartFunc triggerFunc,
+                 GSEffectStopFunc stopFunc,
+                 void* extraParam,
+                 GSEffectUpdateFunc updateFunc,
+                 GSEffectRenderFunc renderFunc);
+void fn_80131268(u32 effectId);
+void fn_8013139C(u32 effectId);
+u16 fn_80131428(void* callbacks, u16 dataSize);
 
 
 
 /* ===== Global state ===== */
-
-/*
- * The master effect globals at lbl_803635C0.
- * Layout (0x18 bytes):
- *   0x00: u32  maxEffects
- *   0x04: u16  memHandle
- *   0x06: u16  (pad)
- *   0x08: GSEffectInstance*  freeListHead
- *   0x0C: void*              instanceTable (raw pointer from GSmemGetPtr)
- *   0x10: GSEffectInstance*  activeListHead
- *   0x14: u32  reserved
- */
-static GSEffectGlobals gsEffectGlobals;  /* @data lbl_803635C0 */
-
-/* Task handle for the render callback (stored at lbl_8047ADC0 via sda21) */
-static u32 gsEffectRenderTaskHandle;     /* @sda21 lbl_8047ADC0 */
+extern u32 lbl_8047ADC0;
 
 /* -----------------------------------------------------------------------
  * Internal helper: look up an effect by ID.
@@ -189,7 +183,7 @@ static void effectRenderTask(void) {
     u32 tickCount;
 
     cur = gsEffectGlobals.activeListHead;
-    tickCount = GSgfxGetTickCount();
+    tickCount = fn_800D3088();
 
     while (cur != NULL) {
         if (cur->updateFunc != NULL && cur->state == GSEFFECT_STATE_ACTIVE) {
@@ -290,8 +284,7 @@ void GSEffectInit(u16 maxEffects) {
     /* Register per-frame task callbacks:
      * Render task at priority 0x7F (runs first, draws effects)
      * Update task at priority 0x80 (runs second, updates logic) */
-    gsEffectRenderTaskHandle = GStaskRegister(1, 0x7F, 0,
-                                               (void*)effectRenderTask);
+    GStaskRegister(1, 0x7F, 0, (void*)effectRenderTask);
 
     /* Initialise battle VFX subsystem */
     fn_801E12A0();
@@ -741,516 +734,413 @@ u16 GSEffectAllocSlot(void* callbacks, u16 dataSize) {
     return slot->id;
 }
 
-/* ===================================================================
- * Generated: 0 pattern-matched + 10 stubs
- * Range: 0x80130CE0 - 0x8013151C
- * =================================================================== */
+/* =======================================================================
+ * fn_80130CE0 / GSEffectInit
+ * Address: 0x80130CE0, Size: 0x224
+ * ======================================================================= */
+void fn_80130CE0(u16 maxEffects) {
+    u32 tableSize;
+    u16 memHandle;
+    GSEffectInstance* table;
+    GSEffectInstance* entry;
+    u16 cnt;
+    GSEffectGlobals* g = (GSEffectGlobals*)(void*)lbl_803635C0;
 
-/* 0x80130CE0 | 0x224 */
-void fn_80130CE0(void) {
-    extern u32 lbl_8047ADC0;
-    extern void fn_800E27B0();
-    extern void fn_800E3534();
-    extern void fn_800FE834();
-    extern void fn_80130F04();
-    extern void fn_80130F68();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
-    u32 r12 = 0;
-    u32 r23 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+    tableSize = (u32)maxEffects * sizeof(GSEffectInstance);
 
-    r25 = r3 & 0xFFFF;
-    r23 = r25 * 0x34;
-    r31 = r3;
-    r3 = r23;
-    fn_800E3534();
-    r4 = (u32)&lbl_803635C0;
-    tmp = r3 & 0xFFFF;
-    r4 = (u32)&lbl_803635C0;
-    *(u16*)((u8*)r4 + 0x4) = r3;
-    if ((s32)tmp != 0) {
-    r3 = tmp;
-    fn_800E27B0();
-    r4 = (u32)&lbl_803635C0;
-    r24 = r3;
-    r4 = (u32)&lbl_803635C0;
-    r5 = r23;
-    *(u32*)((u8*)r4 + 0xC) = r24;
-    r4 = 0x0;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r3 = (u32)&lbl_803635C0;
-    r4 = r24 + 0x34;
-    r5 = (u32)&lbl_803635C0;
-    tmp = 0x1;
-    *(u32*)((u8*)r5 + 0x8) = r24;
-    r5 = 0x0;
-    *(u32*)((u8*)r24 + 0x30) = r5;
-    r5 = 0x1;
-    *(u32*)((u8*)r24 + 0x2C) = r4;
-    *(u16*)((u8*)r24 + 0x0) = tmp;
-    if ((s32)r3 > 1) {
-        if ((s32)tmp > 8) {
-        while (1) {
-            r7 = r5 & 0xFFFF;
-            if ((s32)r7 >= (s32)r23) break;
-            tmp = r7 + 0x1;
-            *(u32*)((u8*)r4 + 0x30) = r6;
-            r24 = r4 + 0x34;
-            r25 = r4 + 0x68;
-            r26 = r5 + 0x2;
-            *(u32*)((u8*)r4 + 0x2C) = r24;
-            r27 = r4 + 0x9c;
-            r28 = r5 + 0x3;
-            r29 = r4 + 0xd0;
-            *(u16*)((u8*)r4 + 0x0) = tmp;
-            r30 = r5 + 0x4;
-            r12 = r4 + 0x104;
-            r11 = r5 + 0x5;
-            *(u32*)((u8*)r4 + 0x64) = r4;
-            r10 = r4 + 0x138;
-            r9 = r5 + 0x6;
-            r8 = r4 + 0x16c;
-            *(u32*)((u8*)r4 + 0x60) = r25;
-            r7 = r5 + 0x7;
-            tmp = r5 + 0x8;
-            r6 = r4 + 0x1a0;
-            *(u16*)((u8*)r4 + 0x34) = r26;
-            r5 = r5 + 0x8;
-            *(u32*)((u8*)r4 + 0x98) = r24;
-            *(u32*)((u8*)r4 + 0x94) = r27;
-            *(u16*)((u8*)r4 + 0x68) = r28;
-            *(u32*)((u8*)r4 + 0xCC) = r25;
-            *(u32*)((u8*)r4 + 0xC8) = r29;
-            *(u16*)((u8*)r4 + 0x9C) = r30;
-            *(u32*)((u8*)r4 + 0x100) = r27;
-            *(u32*)((u8*)r4 + 0xFC) = r12;
-            *(u16*)((u8*)r4 + 0xD0) = r11;
-            *(u32*)((u8*)r4 + 0x134) = r29;
-            *(u32*)((u8*)r4 + 0x130) = r10;
-            *(u16*)((u8*)r4 + 0x104) = r9;
-            *(u32*)((u8*)r4 + 0x168) = r12;
-            *(u32*)((u8*)r4 + 0x164) = r8;
-            *(u16*)((u8*)r4 + 0x138) = r7;
-            *(u32*)((u8*)r4 + 0x19C) = r10;
-            *(u32*)((u8*)r4 + 0x198) = r6;
-            *(u16*)((u8*)r4 + 0x16C) = tmp;
-            r4 = r4 + 0x1a0;
+    memHandle = GSmemAllocRaw(tableSize);
+    g->memHandle = memHandle;
 
-
-        }
-        }
-        /* Single-entry loop for remaining entries */
-        r7 = r5 & 0xFFFF;
-        while ((s32)r7 < (s32)r3) {
-            tmp = r7 + 0x1;
-            *(u32*)((u8*)r4 + 0x30) = r6;
-            r6 = r4 + 0x34;
-            r5 = r5 + 0x1;
-            *(u32*)((u8*)r4 + 0x2C) = r6;
-            *(u16*)((u8*)r4 + 0x0) = tmp;
-            r4 = r4 + 0x34;
-            r7 = r5 & 0xFFFF;
-        }
-    }
-    r6 = 0x0;
-    *(u32*)((u8*)r4 + 0x30) = tmp;
-    r5 = -0x1;
-    r3 = (u32)&lbl_803635C0;
-    tmp = r31 & 0xFFFF;
-    *(u32*)((u8*)r4 + 0x2C) = r6;
-    *(u16*)((u8*)r4 + 0x0) = r31;
-    *(u32*)((u8*)r4 + 0x4) = r5;
-    *(u32*)&lbl_803635C0 = tmp;
+    if (memHandle == 0) {
+        g->instanceTable = NULL;
+        g->freeListHead = NULL;
+        g->maxEffects = 0;
     } else {
-        tmp = 0x0;
-        *(u32*)((u8*)r4 + 0xC) = tmp;
-        *(u32*)((u8*)r4 + 0x8) = tmp;
-        *(u32*)((u8*)r4 + 0x0) = tmp;
+        table = (GSEffectInstance*)GSmemGetPtr(memHandle);
+        g->instanceTable = table;
+        memset(table, 0, tableSize);
+
+        g->freeListHead = table;
+
+        table[0].prev = NULL;
+        table[0].next = &table[1];
+        table[0].id = 1;
+
+        for (cnt = 1; cnt < maxEffects - 1; cnt++) {
+            entry = &table[cnt];
+            entry->prev = &table[cnt - 1];
+            entry->next = &table[cnt + 1];
+            entry->id = cnt + 1;
+        }
+
+        entry = &table[maxEffects - 1];
+        entry->prev = &table[maxEffects - 2];
+        entry->next = NULL;
+        entry->id = maxEffects;
+        entry->state = GSEFFECT_STATE_UNINIT;
+
+        g->maxEffects = (u32)maxEffects;
     }
-    r4 = (u32)&lbl_803635C0;
-    r3 = (u32)fn_80130F68;
-    r4 = (u32)&lbl_803635C0;
-    tmp = 0x0;
-    *(u32*)((u8*)r4 + 0x10) = tmp;
-    r6 = (u32)fn_80130F68;
-    r3 = 0x1;
-    r4 = 0x7f;
-    r5 = 0x0;
-    fn_800FE834();
-    lbl_8047ADC0 = r3;
-    ((void(*)(void))fn_801E12A0)();
-    r4 = (u32)fn_80130F04;
-    r3 = 0x1;
-    r6 = (u32)fn_80130F04;
-    r5 = 0x0;
-    r4 = 0x80;
-    fn_800FE834();
-    return;
+
+    g->activeListHead = NULL;
+
+    lbl_8047ADC0 = GStaskRegister(1, 0x7F, 0, (void*)fn_80130F68);
+
+    fn_801E12A0();
+
+    GStaskRegister(1, 0x80, 0, (void*)fn_80130F04);
 }
 
-/* 0x64 | fn_80130F04 | framed_no_calls */
-void fn_80130F04(u32 arg1, u32 arg2) {
-    /* data manipulation using stack locals */
+/* =======================================================================
+ * fn_80130F04 / effectUpdateTask
+ * Address: 0x80130F04, Size: 0x64
+ * ======================================================================= */
+void fn_80130F04(void) {
+    GSEffectInstance* cur;
+
+    cur = ((GSEffectGlobals*)(void*)lbl_803635C0)->activeListHead;
+    while (cur != NULL) {
+        if (cur->renderFunc != NULL && cur->state == GSEFFECT_STATE_ACTIVE) {
+            cur->renderFunc(cur->userData);
+        }
+        cur = cur->next;
+    }
 }
 
-/* 0x80130F68 | 0xA8 */
+/* =======================================================================
+ * fn_80130F68 / effectRenderTask
+ * Address: 0x80130F68, Size: 0xA8
+ * ======================================================================= */
 void fn_80130F68(void) {
-    extern void fn_800D3088();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+    GSEffectInstance* cur;
+    u32 tick;
 
-    r3 = (u32)&lbl_803635C0;
-    r3 = (u32)&lbl_803635C0;
-    r30 = *(u32*)((u8*)r3 + 0x10);
-    fn_800D3088();
-    r31 = 0x1;
-    r29 = r3;
-    while (r30 != 0) {
+    cur = ((GSEffectGlobals*)(void*)lbl_803635C0)->activeListHead;
+    tick = fn_800D3088();
 
-        r12 = *(u32*)((u8*)r30 + 0x18);
-        if (r12 != 0) {
-            tmp = *(u32*)((u8*)r30 + 0x4);
-            if ((s32)tmp == 2) {
-                r4 = r29;
-                r3 = *(u32*)((u8*)r30 + 0x24);
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
-                if (r3 == 0) {
-                    *(u32*)((u8*)r30 + 0x4) = r31;
-                    r12 = *(u32*)((u8*)r30 + 0x14);
-                    if (r12 != 0) {
-                        r3 = *(u32*)((u8*)r30 + 0x24);
-                        ctr_fn = (void(*)(void))r12;
-                        ctr_fn();
-        }
-        }
-        }
-        }
-        r30 = *(u32*)((u8*)r30 + 0x2C);
-
-    }
-    return;
-}
-
-/* 0x80131010 | 0x98 */
-void fn_80131010(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    if (r3 != 0) {
-        r4 = (u32)&lbl_803635C0;
-        r4 = (u32)&lbl_803635C0;
-        tmp = *(u32*)((u8*)r4 + 0x0);
-        if (r3 <= tmp) {
-            r3 = *(u32*)((u8*)r4 + 0xC);
-            tmp = tmp * 0x34;
-            r3 = r3 + tmp;
-            tmp = *(u32*)((u8*)r3 + 0x4);
-            if ((s32)tmp == (s32)-0x1) r3 = 0x0;
-        } else {
-            r3 = 0x0;
-        }
-    }
-    if (r3 != 0) {
-        tmp = *(u32*)((u8*)r3 + 0x4);
-        r12 = *(u32*)((u8*)r3 + 0x14);
-        if ((s32)tmp != 0) {
-            if ((s32)tmp != 1) {
-                tmp = 0x1;
-                *(u32*)((u8*)r3 + 0x4) = tmp;
-                if (r12 != 0) {
-                    r3 = *(u32*)((u8*)r3 + 0x24);
-                    ctr_fn = (void(*)(void))r12;
-                    ctr_fn();
-    }
-    }
-    }
-    }
-    return;
-}
-
-/* 0x74 | fn_801310A8 | leaf_multi_output */
-void fn_801310A8(u32* out1) {
-    if (out1 != NULL) { *out1 = *(u32*)((u8*)lbl_803635C0 + 0); }
-}
-
-/* 0x8013111C | 0xE4 */
-void fn_8013111C(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r31 = 0x0;
-    if (r3 != 0) {
-        r4 = (u32)&lbl_803635C0;
-        r4 = (u32)&lbl_803635C0;
-        tmp = *(u32*)((u8*)r4 + 0x0);
-        if (r3 <= tmp) {
-            r3 = *(u32*)((u8*)r4 + 0xC);
-            tmp = tmp * 0x34;
-            r31 = r3 + tmp;
-            tmp = *(u32*)((u8*)r31 + 0x4);
-            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
-        }
-    }
-    if (r31 == 0) { r3 = 0x0; return; }
-    tmp = *(u32*)((u8*)r31 + 0x4);
-    if ((s32)tmp != 0) {
-        r12 = *(u32*)((u8*)r31 + 0x10);
-        tmp = 0x2;
-        *(u32*)((u8*)r31 + 0x4) = tmp;
-        if (r12 == 0) { r3 = 0x0; return; }
-        r3 = *(u32*)((u8*)r31 + 0x24);
-        ctr_fn = (void(*)(void))r12;
-        ctr_fn();
-        if (r3 == 0) {
-            r12 = *(u32*)((u8*)r31 + 0x14);
-            tmp = 0x1;
-            *(u32*)((u8*)r31 + 0x4) = tmp;
-            if (r12 != 0) {
-                r3 = *(u32*)((u8*)r31 + 0x24);
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
+    while (cur != NULL) {
+        if (cur->updateFunc != NULL && cur->state == GSEFFECT_STATE_ACTIVE) {
+            if ((u32)((GSEffectStartFunc)cur->updateFunc)(cur->userData, tick) == 0) {
+                cur->state = GSEFFECT_STATE_STOPPING;
+                if (cur->stopFunc != NULL) {
+                    cur->stopFunc(cur->userData);
+                }
             }
-            r3 = 0x0;
-            return;
         }
-        r3 = 0x1;
+        cur = cur->next;
+    }
+}
+
+/* =======================================================================
+ * fn_80131010 / GSEffectStop
+ * Address: 0x80131010, Size: 0x98
+ * ======================================================================= */
+void fn_80131010(u32 effectId) {
+    GSEffectInstance* inst;
+    GSEffectGlobals* g;
+
+    if (effectId == 0) {
         return;
     }
-    r3 = (u32)&lbl_80272A58;
-    r3 = (u32)&lbl_80272A58;
-    ((void(*)(void))fn_800DD970)();
-
-    r3 = 0x0;
-
-    return;
-}
-
-/* 0x68 | fn_80131200 | leaf_multi_output */
-void fn_80131200(u32* out1) {
-    if (out1 != NULL) { *out1 = *(u32*)((u8*)lbl_803635C0 + 0); }
-}
-
-/* 0x80131268 | 0x134 */
-void fn_80131268(void) {
-    extern void fn_800E209C();
-    extern void fn_800E24B0();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r31 = 0x0;
-    if (r3 != 0) {
-        r4 = (u32)&lbl_803635C0;
-        r4 = (u32)&lbl_803635C0;
-        tmp = *(u32*)((u8*)r4 + 0x0);
-        if (r3 <= tmp) {
-            r3 = *(u32*)((u8*)r4 + 0xC);
-            tmp = tmp * 0x34;
-            r31 = r3 + tmp;
-            tmp = *(u32*)((u8*)r31 + 0x4);
-            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
         }
     }
-    if (r31 != 0) {
-        tmp = *(u32*)((u8*)r31 + 0x4);
-        r30 = *(u32*)((u8*)r31 + 0x30);
-        r29 = *(u32*)((u8*)r31 + 0x2C);
-        if ((s32)tmp != 0) {
-            if ((s32)tmp != 1) {
-                r12 = *(u32*)((u8*)r31 + 0x14);
-                if (r12 != 0) {
-                    r3 = *(u32*)((u8*)r31 + 0x24);
-                    ctr_fn = (void(*)(void))r12;
-                    ctr_fn();
-            }
-            }
-            r12 = *(u32*)((u8*)r31 + 0xC);
-            if (r12 != 0) {
-                r3 = *(u32*)((u8*)r31 + 0x24);
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
-            }
-            tmp = -0x1;
-            *(u32*)((u8*)r31 + 0x4) = tmp;
-        }
-        if (r30 != 0) {
-            *(u32*)((u8*)r30 + 0x2C) = r29;
-        } else {
-
-            r3 = (u32)&lbl_803635C0;
-            r3 = (u32)&lbl_803635C0;
-            *(u32*)((u8*)r3 + 0x10) = r29;
-        }
-        if (r29 != 0) {
-            *(u32*)((u8*)r29 + 0x30) = r30;
-        }
-        tmp = 0x0;
-        r3 = (u32)&lbl_803635C0;
-        *(u32*)((u8*)r31 + 0x30) = tmp;
-        r3 = (u32)&lbl_803635C0;
-        tmp = *(u32*)((u8*)r3 + 0x8);
-        *(u32*)((u8*)r31 + 0x2C) = tmp;
-        r4 = *(u32*)((u8*)r3 + 0x8);
-        if (r4 != 0) {
-            *(u32*)((u8*)r4 + 0x30) = r31;
-        }
-        *(u32*)((u8*)r3 + 0x8) = r31;
-        r3 = *(u16*)((u8*)r31 + 0x28);
-        fn_800E24B0();
-        r3 = *(u16*)((u8*)r31 + 0x28);
-        fn_800E209C();
-    }
-    return;
-}
-
-/* 0x8013139C | 0x8C */
-void fn_8013139C(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r31 = 0x0;
-    if (r3 != 0) {
-        r5 = (u32)&lbl_803635C0;
-        r5 = (u32)&lbl_803635C0;
-        tmp = *(u32*)((u8*)r5 + 0x0);
-        if (r3 <= tmp) {
-            r3 = *(u32*)((u8*)r5 + 0xC);
-            tmp = tmp * 0x34;
-            r31 = r3 + tmp;
-            tmp = *(u32*)((u8*)r31 + 0x4);
-            if ((s32)tmp == (s32)-0x1) r31 = 0x0;
-        }
-    }
-    if (r31 != 0) {
-        r12 = *(u32*)((u8*)r31 + 0x8);
-        if (r12 != 0) {
-            r3 = *(u32*)((u8*)r31 + 0x24);
-            ctr_fn = (void(*)(void))r12;
-            ctr_fn();
-        }
-        tmp = 0x1;
-        *(u32*)((u8*)r31 + 0x4) = tmp;
-    }
-    return;
-}
-
-/* 0x80131428 | 0xF4 */
-void fn_80131428(void) {
-    extern void fn_800E27B0();
-    extern void fn_800E3534();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r5 = (u32)&lbl_803635C0;
-    r30 = (u32)&lbl_803635C0;
-    r24 = r3;
-    r25 = r4;
-    r28 = *(u32*)((u8*)r30 + 0x8);
-    if (r28 != 0) {
-        r29 = r25 & 0xFFFF;
-        r27 = *(u16*)((u8*)r28 + 0x0);
-        r3 = r29;
-        fn_800E3534();
-        tmp = r3 & 0xFFFF;
-        r31 = r3;
-        if (r28 == 0) {
-            r3 = 0x0;
-            return;
-        }
-        fn_800E27B0();
-        r4 = *(u32*)((u8*)r28 + 0x2C);
-        r26 = r3;
-        *(u32*)((u8*)r30 + 0x8) = r4;
-        if (r4 != 0) {
-            tmp = 0x0;
-            *(u32*)((u8*)r4 + 0x30) = tmp;
-        }
-        r3 = r28;
-        r4 = 0x0;
-        r5 = 0x34;
-        memset((void*)r3, (int)r4, (u32)r5);
-        r3 = (u32)&lbl_803635C0;
-        *(u16*)((u8*)r28 + 0x0) = r27;
-        r6 = (u32)&lbl_803635C0;
-        r3 = *(u32*)((u8*)r6 + 0x10);
-        if (r3 != 0) {
-            *(u32*)((u8*)r3 + 0x30) = r28;
-        }
-        r5 = *(u32*)((u8*)r6 + 0x10);
-        tmp = 0x0;
-        r3 = r26;
-        r4 = r24;
-        *(u32*)((u8*)r28 + 0x2C) = r5;
-        r5 = r29;
-        *(u32*)((u8*)r6 + 0x10) = r28;
-        *(u32*)((u8*)r28 + 0x30) = tmp;
-        *(u16*)((u8*)r28 + 0x28) = r31;
-        *(u32*)((u8*)r28 + 0x24) = r26;
-        memcpy((void*)r3, (void*)r4, (u32)r5);
-        *(u16*)((u8*)r28 + 0x2) = r25;
-        tmp = 0x0;
-        *(u32*)((u8*)r28 + 0x4) = tmp;
-        r3 = *(u16*)((u8*)r28 + 0x0);
+    inst = NULL;
+_got_inst:
+    if (inst == NULL) {
         return;
     }
-    r3 = 0x0;
+    {
+        s32 state = inst->state;
+        GSEffectStopFunc stopFn = inst->stopFunc;
+        if (state == GSEFFECT_STATE_IDLE) {
+            return;
+        }
+        if (state == GSEFFECT_STATE_STOPPING) {
+            return;
+        }
+        inst->state = GSEFFECT_STATE_STOPPING;
+        if (stopFn != NULL) {
+            stopFn(inst->userData);
+        }
+    }
+}
 
-    return;
+/* =======================================================================
+ * fn_801310A8 / GSEffectIsActive
+ * Address: 0x801310A8, Size: 0x74
+ * ======================================================================= */
+BOOL fn_801310A8(u32 effectId) {
+    GSEffectInstance* inst;
+    GSEffectGlobals* g;
+
+    if (effectId == 0) {
+        return FALSE;
+    }
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
+        }
+    }
+    inst = NULL;
+_got_inst:
+    if (inst == NULL) {
+        return FALSE;
+    }
+    {
+        s32 state = inst->state;
+        if (state == GSEFFECT_STATE_UNINIT) {
+            return FALSE;
+        }
+        if (state == GSEFFECT_STATE_IDLE) {
+            return FALSE;
+        }
+        return (BOOL)(state != GSEFFECT_STATE_STOPPING);
+    }
+}
+
+/* =======================================================================
+ * fn_8013111C / GSEffectTrigger
+ * Address: 0x8013111C, Size: 0xE4
+ * ======================================================================= */
+BOOL fn_8013111C(u32 effectId) {
+    GSEffectInstance* inst;
+    GSEffectGlobals* g;
+
+    inst = NULL;
+    if (effectId == 0) {
+        goto _null_check;
+    }
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
+        }
+    }
+    inst = NULL;
+_null_check:
+    if (inst == NULL) {
+        return FALSE;
+    }
+_got_inst:
+    if (inst->state == GSEFFECT_STATE_IDLE) {
+        goto _print_error;
+    }
+    inst->state = GSEFFECT_STATE_ACTIVE;
+    if (inst->triggerFunc == NULL) {
+        return FALSE;
+    }
+    if ((u32)inst->triggerFunc(inst->userData, 0) != 0) {
+        return TRUE;
+    }
+    inst->state = GSEFFECT_STATE_STOPPING;
+    if (inst->stopFunc != NULL) {
+        inst->stopFunc(inst->userData);
+    }
+    return FALSE;
+_print_error:
+    fn_800DD970(lbl_80272A58, effectId);
+    return FALSE;
+}
+
+/* =======================================================================
+ * fn_80131200 / GSEffectRegister
+ * Address: 0x80131200, Size: 0x68
+ * ======================================================================= */
+void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
+                 GSEffectStopFunc destroyFunc,
+                 GSEffectStartFunc triggerFunc,
+                 GSEffectStopFunc stopFunc,
+                 void* extraParam,
+                 GSEffectUpdateFunc updateFunc,
+                 GSEffectRenderFunc renderFunc) {
+    GSEffectInstance* inst;
+    GSEffectGlobals* g;
+
+    if (effectId == 0) {
+        return;
+    }
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
+        }
+    }
+    inst = NULL;
+_got_inst:
+    if (inst == NULL) {
+        return;
+    }
+
+    inst->startFunc   = startFunc;
+    inst->destroyFunc = destroyFunc;
+    inst->triggerFunc = triggerFunc;
+    inst->stopFunc    = stopFunc;
+    inst->extraParam  = extraParam;
+    inst->updateFunc  = updateFunc;
+    inst->renderFunc  = renderFunc;
+}
+
+/* =======================================================================
+ * fn_80131268 / GSEffectFree
+ * Address: 0x80131268, Size: 0x134
+ * ======================================================================= */
+void fn_80131268(u32 effectId) {
+    GSEffectInstance* inst;
+    GSEffectInstance* prevInst;
+    GSEffectInstance* nextInst;
+    GSEffectGlobals* g;
+
+    inst = NULL;
+    if (effectId == 0) {
+        goto _null_check;
+    }
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
+        }
+    }
+    inst = NULL;
+_null_check:
+    if (inst == NULL) {
+        return;
+    }
+_got_inst:
+    prevInst = inst->prev;
+    nextInst = inst->next;
+
+    if (inst->state != GSEFFECT_STATE_IDLE) {
+        if (inst->state != GSEFFECT_STATE_STOPPING) {
+            if (inst->stopFunc != NULL) {
+                inst->stopFunc(inst->userData);
+            }
+        }
+        if (inst->destroyFunc != NULL) {
+            inst->destroyFunc(inst->userData);
+        }
+        inst->state = GSEFFECT_STATE_UNINIT;
+    }
+
+    {
+        GSEffectGlobals* gf = (GSEffectGlobals*)(void*)lbl_803635C0;
+        if (prevInst != NULL) {
+            prevInst->next = nextInst;
+        } else {
+            gf->activeListHead = nextInst;
+        }
+
+        if (nextInst != NULL) {
+            nextInst->prev = prevInst;
+        }
+
+        inst->prev = NULL;
+        inst->next = gf->freeListHead;
+        if (gf->freeListHead != NULL) {
+            gf->freeListHead->prev = inst;
+        }
+        gf->freeListHead = inst;
+    }
+
+    fn_800E24B0(inst->memHandle);
+    fn_800E209C(inst->memHandle);
+}
+
+/* =======================================================================
+ * fn_8013139C / GSEffectResetState
+ * Address: 0x8013139C, Size: 0x8C
+ * ======================================================================= */
+void fn_8013139C(u32 effectId) {
+    GSEffectInstance* inst;
+    GSEffectGlobals* g;
+
+    if (effectId == 0) {
+        return;
+    }
+    g = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (effectId <= g->maxEffects) {
+        inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                                   (effectId - 1) * sizeof(GSEffectInstance));
+        if (inst->state != GSEFFECT_STATE_UNINIT) {
+            goto _got_inst;
+        }
+    }
+    inst = NULL;
+    if (inst == NULL) {
+        return;
+    }
+_got_inst:
+    if (inst->startFunc != NULL) {
+        ((GSEffectStopFunc)inst->startFunc)(inst->userData);
+    }
+    inst->state = GSEFFECT_STATE_STOPPING;
+}
+
+/* =======================================================================
+ * fn_80131428 / GSEffectAllocSlot
+ * Address: 0x80131428, Size: 0xF4
+ * ======================================================================= */
+u16 fn_80131428(void* callbacks, u16 dataSize) {
+    GSEffectGlobals* globals;
+    void* cbArg;
+    u16 cbSize;
+    GSEffectInstance* slot;
+    void* userData;
+    u16 savedId;
+    u16 memHandle;
+    GSEffectInstance* oldHead;
+
+    globals = (GSEffectGlobals*)(void*)lbl_803635C0;
+    cbArg = callbacks;
+    cbSize = dataSize;
+    slot = globals->freeListHead;
+    if (slot == NULL) {
+        return 0;
+    }
+
+    savedId = slot->id;
+    memHandle = GSmemAllocRaw((u32)cbSize);
+    if (memHandle == 0) {
+        return 0;
+    }
+
+    userData = GSmemGetPtr(memHandle);
+
+    globals->freeListHead = slot->next;
+    if (slot->next != NULL) {
+        slot->next->prev = NULL;
+    }
+
+    memset(slot, 0, sizeof(GSEffectInstance));
+    slot->id = savedId;
+
+    oldHead = globals->activeListHead;
+    if (oldHead != NULL) {
+        oldHead->prev = slot;
+    }
+    slot->next = oldHead;
+    globals->activeListHead = slot;
+    slot->prev = NULL;
+    slot->memHandle = memHandle;
+    slot->userData = userData;
+
+    memcpy(userData, cbArg, (u32)cbSize);
+    slot->dataSize = dataSize;
+    slot->state = GSEFFECT_STATE_IDLE;
+
+    return slot->id;
 }
