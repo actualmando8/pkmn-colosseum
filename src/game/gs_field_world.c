@@ -27371,7 +27371,7 @@ void* fn_8011ED18(u8* ptr) {
     if (ptr == NULL) {
         return NULL;
     }
-    val = (ptr != NULL) ? *(u16*)(ptr + 0xD8) : 0;
+    val = (ptr == NULL) ? 0 : *(u16*)(ptr + 0xD8);
     if ((u16)val == 0) {
         return NULL;
     }
@@ -27391,11 +27391,11 @@ u32 fn_8011ED68(u8* ptr) {
     if (ptr == NULL) {
         return 0;
     }
-    val = (ptr != NULL) ? *(u16*)(ptr + 0xD8) : 0;
+    val = (ptr == NULL) ? 0 : *(u16*)(ptr + 0xD8);
     if ((u16)val == 0) {
         return 0;
     }
-    val2 = (ptr != NULL) ? *(s32*)(ptr + 0xDC) : 0;
+    val2 = (ptr == NULL) ? 0 : *(s32*)(ptr + 0xDC);
     if (val2 < 0) {
         return 0;
     }
