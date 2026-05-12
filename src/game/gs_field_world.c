@@ -5443,21 +5443,31 @@ void* fn_801154B4(void* ptr) {
     return *(void**)p2;
 }
 /* 0x48 | fn_8011553C | nullcheck_store */
+extern const char lbl_80272658[];
+extern u8 lbl_8035BAD8[];
+#pragma push
+#pragma peephole off
 void fn_8011553C(void* obj, u32 val) {
     if (obj == NULL) {
-        fn_800DD970("");
+        fn_800DD970(lbl_80272658, lbl_8035BAD8, val);
         return;
     }
     *(u32*)((u8*)obj + 0x34) = val;
 }
+#pragma pop
 /* 0x48 | fn_80115584 | nullcheck_store */
+extern const char lbl_80272680[];
+extern u8 lbl_8035BABC[];
+#pragma push
+#pragma peephole off
 void fn_80115584(void* obj, u32 val) {
     if (obj == NULL) {
-        fn_800DD970("");
+        fn_800DD970(lbl_80272680, lbl_8035BABC, val);
         return;
     }
     *(u32*)((u8*)obj + 0x8) = val;
 }
+#pragma pop
 /* 0xfn_80115A38 | global_cond_call */
 u32 fn_80115A38(u8* entry) {
     extern u8 lbl_8035B91C[];
