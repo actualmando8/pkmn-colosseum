@@ -1525,7 +1525,18 @@ asm void fn_800D7398(void) {
 #include "src/game/gs_render_fn_800D7398.inc"
 }
 #else
-void fn_800D7398(u32 idx) { u32 base = lbl_8047AA80 + idx*12; *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4e8); *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4e9); *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4ea); }
+void fn_800D7398(u32 idx) {
+    u8 b;
+    u8 c;
+    u8 a;
+    u32 base = lbl_8047AA80 + idx*12;
+    c = *(u8*)(base + 0x4ea);
+    b = *(u8*)(base + 0x4e9);
+    a = *(u8*)(base + 0x4e8);
+    *(volatile u8*)0xCC008000 = a;
+    *(volatile u8*)0xCC008000 = b;
+    *(volatile u8*)0xCC008000 = c;
+}
 #endif
 extern u32 lbl_8047AA80;
 #if 0
@@ -1533,7 +1544,21 @@ asm void fn_800D73C4(void) {
 #include "src/game/gs_render_fn_800D73C4.inc"
 }
 #else
-void fn_800D73C4(u32 idx) { u32 base = lbl_8047AA80 + idx*12; *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4e8); *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4e9); *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4ea); *(volatile u8*)0xCC008000 = *(u8*)(base + 0x4eb); }
+void fn_800D73C4(u32 idx) {
+    u8 b;
+    u8 c;
+    u8 d;
+    u8 a;
+    u32 base = lbl_8047AA80 + idx*12;
+    d = *(u8*)(base + 0x4eb);
+    c = *(u8*)(base + 0x4ea);
+    b = *(u8*)(base + 0x4e9);
+    a = *(u8*)(base + 0x4e8);
+    *(volatile u8*)0xCC008000 = a;
+    *(volatile u8*)0xCC008000 = b;
+    *(volatile u8*)0xCC008000 = c;
+    *(volatile u8*)0xCC008000 = d;
+}
 #endif
 extern u32 lbl_8047AA80;
 #if 0
