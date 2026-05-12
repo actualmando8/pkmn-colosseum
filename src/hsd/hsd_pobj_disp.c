@@ -1,793 +1,799 @@
 /**
  * @file hsd_pobj_disp.c
- * @brief HSD PObj display, vertex setup, and shape animation rendering.
+ * @brief HSD PObj - polygon object lifecycle, memory management,
+ *        and animation dispatch.
  *
  * Address range: 0x801AA35C - 0x801ADF54
- * Contains the PObj rendering pipeline: vertex descriptor setup,
- * display list dispatch, skinning (rigid/envelope), shape animation
- * blending, and GX state management for primitive rendering.
  *
- * This is separate from hsd_pobj.c which handles the object lifecycle.
- *
- * Decompiled from Melee src/sysdolphin/baselib/pobj.c (display portion)
+ * Decompiled from Melee src/sysdolphin/baselib/pobj.c
  */
 
 #include "dolphin/types.h"
-
-#ifdef PCPORT
-
-#include "hsd/hsd_pobj.h"
-
-extern void GXSetVtxDesc(u32 attr, u32 type);
-extern void GXSetVtxAttrFmt(u32 vtxfmt, u32 attr, u32 cnt, u32 type, u8 frac);
-extern void GXSetArray(u32 attr, void* base, u8 stride);
-extern void GXClearVtxDesc(void);
-
-void fn_801AA35C(HSD_VtxDescList* verts) {
-    HSD_VtxDescList* v;
-
-    if (verts == NULL) {
-        return;
-    }
-
-    GXClearVtxDesc();
-
-    for (v = verts; v->attr != 0xFF; ++v) {
-        GXSetVtxDesc(v->attr, v->attr_type);
-
-        if (v->attr_type != 0) {
-            GXSetVtxAttrFmt(0, v->attr, v->comp_cnt, v->comp_type, v->frac);
-
-            if ((v->attr_type == 2 || v->attr_type == 3) &&
-                v->vertex != NULL) {
-                GXSetArray(v->attr, v->vertex, v->stride);
-            }
-        }
-    }
-}
-
-void fn_801AA498(u32 attr, u32 cnt, u32 type, u8 frac) {
-    GXSetVtxAttrFmt(0, attr, cnt, type, frac);
-}
-
-void fn_801AA4CC(HSD_VtxDescList* verts) {
-    HSD_VtxDescList* v;
-
-    if (verts == NULL) {
-        return;
-    }
-
-    for (v = verts; v->attr != 0xFF; ++v) {
-        if ((v->attr_type == 2 || v->attr_type == 3) &&
-            v->vertex != NULL) {
-            GXSetArray(v->attr, v->vertex, v->stride);
-        }
-    }
-}
-
-void fn_801AA538(u32 attr, void* base, u8 stride) {
-    GXSetArray(attr, base, stride);
-}
-
-void fn_801AA568(HSD_PObj* pobj) {
-    if (pobj == NULL || pobj->verts == NULL) {
-        return;
-    }
-
-    fn_801AA35C(pobj->verts);
-}
-
-#else
-
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_pobj.h"
 #include "hsd/hsd_mobj.h"
 
-/* GX external declarations */
-extern void GXSetVtxDesc(u32 attr, u32 type);
-extern void GXSetVtxAttrFmt(u32 vtxfmt, u32 attr, u32 cnt, u32 type, u8 frac);
-extern void GXSetArray(u32 attr, void* base, u8 stride);
-extern void GXClearVtxDesc(void);
-extern void GXCallDisplayList(void* list, u32 nbytes);
-extern void GXSetCurrentMtx(u32 id);
-extern void GXLoadPosMtxImm(f32 mtx[3][4], u32 id);
-extern void GXLoadNrmMtxImm(f32 mtx[3][4], u32 id);
-extern void GXSetCullMode(u32 mode);
-extern void GXSetNumTexGens(u8 num);
+/* =========================================================================
+ * External function declarations
+ * ========================================================================= */
 
-/* Internal render state */
-static u32 pobj_render_flags;
-static u32 pobj_cull_mode;
+extern void* fn_801A6928(s32 size);          /* HSD_MemAlloc */
+extern void  fn_801A6960(void* ptr);          /* HSD_MemFree  */
+/* fn_801A6990: virtual dispatch, returns s32 result via r3 */
+extern s32   fn_801A6990(void* obj);
+extern void  fn_80196E10(const char* file, u32 line, const char* msg);
+extern void  fn_80196D78(const char* file, u32 line, const char* msg);
+extern void* memset(void* dst, int val, u32 size);
+extern void* memcpy(void* dst, const void* src, u32 size);
+extern void  fn_800B7D3C(void);
+extern s32   fn_801BF138(u32 val);
+extern void  fn_80193B30(void* classDesc, void* parentClass, void* name,
+                          void* sdata2name, u32 classInfoSize, u32 classSize);
+extern void* fn_80193748(const char* name);
+extern void* fn_80193828(void* classInfo);
+extern void* fn_80193B10(s32 size);
+extern void  fn_801C27F4(void* aobj, void* pobj, void* method);
+extern void  fn_801C25E4(void* aobj);
+extern void* fn_801C2670(void* ptr);
+extern void  fn_801C29C4(f32 val, void* aobj);
+extern void  fn_801A053C(void* ptr);
+extern void* fn_801A3E64(void* ptr);
+extern void* fn_801A3F48(void);
+extern void* fn_8019C128(void* desc, s32 a, s32 b);
+extern void* fn_8019F01C(void* obj);
+extern void  fn_8019D9DC(void* jobj);
+extern void  fn_80193AF0(void* cls, s32 size);
+extern void  fn_801BE490(s32 a, s32 b);
+extern void  fn_800BD554(s32 a);
+extern void  fn_800BD4B4(void* mtx, s32 a);
+extern void  fn_800BD504(void* mtx, s32 a);
+extern void  fn_800BD58C(void* mtx, s32 a, s32 b);
+extern void  fn_800A2FAC(void* pobj, void* mtx);
+extern void  fn_800A2D64(void* pobj, void* mtx);
+extern void  fn_800A2D98(void* dst, void* src, void* dst2);
+extern void  fn_801A85F0(f32 weight, void* src, void* dst, void* dst2);
+extern void  fn_801BBF28(s32 idx);
+extern void* fn_801BF098(s32 idx);
+extern void  fn_800B84E0(u32 type, void* data, u32 stride, u8 frac);
+extern void  fn_800B7874(u32 type, u32 comptype);
+extern void  fn_800B7D74(u32 type, u32 comptype, void* data, u32 stride,
+                          u8 frac);
+extern void  fn_800BD0FC(void* display, u32 nbytes);
+extern void  fn_801B2878(s32 cullmode);
+extern s32   fn_8019C6EC(s32 val);
+extern f32   fn_800CE298(void);
+extern f32   fn_800CE148(f32 x);
+extern f32   fn_800CDBE0(f32 x);
+extern void* fn_8019F01C(void* obj);
 
-/* Forward declarations for display dispatch functions */
-void fn_801AA8BC(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
-void fn_801AABB4(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
-void fn_801AAEA8(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
-void fn_801AB67C(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4], u32 rendermode);
+/* =========================================================================
+ * Static global state (maps to sbss symbols accessed via r13)
+ * ========================================================================= */
 
-/* ========================================================================= */
-/*  Vertex descriptor and attribute setup                                    */
-/* ========================================================================= */
+static void* lbl_8047B2E0;   /* free-list pool chain head */
+static void* lbl_8047B2E8;   /* default class info pointer */
+static void* lbl_8047B2EC;   /* active normal desc pointer */
+static void* lbl_8047B2F0;   /* active color desc pointer */
+static void* lbl_8047B2F4;   /* normal count */
+static void* lbl_8047B2F8;   /* color count */
+static u32   lbl_8047B2FC;   /* display list current marker */
+static void* lbl_8047B300;   /* display list end marker */
+static void* lbl_8047B308;   /* active texture desc */
+static u32   lbl_8047B30C;   /* texture count */
 
-/*
- * HSD_PObjSetupVtxDesc - 0x801AA35C | Size: 0x13C
- * Set up GX vertex attribute table from a VtxDescList.
- * Walks the descriptor list and configures GX vertex attributes.
- */
-void fn_801AA35C(HSD_VtxDescList* verts) {
-    HSD_VtxDescList* v;
+/* sdata - extern because other TUs reference them */
+extern void* lbl_80478C90;   /* RNG default state instance */
+extern void* lbl_80478C94;   /* RNG current state pointer  */
 
-    if (verts == NULL) {
-        return;
+/* data section labels */
+extern u8 lbl_8036C638[];
+extern u8 lbl_8036CC00[];
+extern u8 lbl_8036CC40[];
+extern u8 lbl_8036CBF0[];
+extern u8 lbl_8036CCD0[];
+
+/* bss labels */
+extern u8 lbl_80465678[];
+extern u8 lbl_80465688[];
+
+/* sdata2 string constants */
+extern const char lbl_8047DC98[];
+extern const char lbl_8047DCA0[];
+extern const char lbl_8047DCA8[];
+extern const char lbl_8047DCB0[];
+extern const char lbl_8047DCB8[];
+extern const char lbl_8047DCC4[];
+extern const char lbl_8047DCCC[];
+extern const char lbl_8047DCD8[];
+extern const char lbl_8047DD10[];
+extern const char lbl_8047DD50[];
+extern const char lbl_8047DD58[];
+
+/* sdata2 float constants */
+extern const f32 lbl_8047DCC0;
+extern const f32 lbl_8047DCD4;
+extern const f32 lbl_8047DD18;
+extern const f32 lbl_8047DD1C;
+extern const f32 lbl_8047DD20;
+extern const f32 lbl_8047DD38;
+extern const f32 lbl_8047DD40;
+extern const f32 lbl_8047DD78;
+extern const double lbl_8047DD00;
+extern const double lbl_8047DD08;
+extern const double lbl_8047DD28;
+extern const double lbl_8047DD30;
+extern const double lbl_8047DD48;
+
+/* rodata labels */
+extern u8 lbl_80274E90[];
+extern u8 lbl_80274EC8[];
+extern u8 lbl_80274EE0[];
+extern u8 lbl_80274EF8[];
+extern u8 lbl_80274F04[];
+extern u8 lbl_8027503C[];
+extern u8 lbl_8027506C[];
+extern u8 lbl_80275084[];
+extern u8 lbl_802750B4[];
+
+/* forward declarations */
+void fn_801AA788(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
+void fn_801AA6D0(void* pobj);
+void fn_801AA8BC(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
+void fn_801AABB4(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
+void fn_801AD354(void* pobj_ptr, void* desc);
+void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr);
+void fn_801AB67C(void* pobj);
+
+/* =========================================================================
+ * 0x801AA35C | size: 0x13C  -- Initialize free-list memory pool
+ * ========================================================================= */
+void fn_801AA35C(void* list, u32 size, u32 alignment)
+{
+    void* p = list;
+
+    if (p == NULL) {
+        fn_80196E10((const char*)lbl_80274E90, 0x1ae, lbl_8047DC98);
     }
 
-    GXClearVtxDesc();
+    if (lbl_8047B2E0 != NULL) {
+        void** slot = (void**)&lbl_8047B2E0;
+        while (*slot != NULL) {
+            if (*slot == p) {
+                *slot = *(void**)((u8*)*slot + 0x28);
+                break;
+            }
+            slot = (void**)((u8*)*slot + 0x28);
+        }
+    } else {
+        lbl_8047B2E0 = NULL;
+    }
 
-    for (v = verts; v->attr != 0xFF; v++) {
-        GXSetVtxDesc(v->attr, v->attr_type);
+    memset(p, 0, 0x2c);
+    *(s32*)((u8*)p + 0x14) = -1;
+    *(u32*)((u8*)p + 0x18) = 0;
+    *(s32*)((u8*)p + 0x1c) = -1;
 
-        if (v->attr_type != 0) { /* not NONE */
-            GXSetVtxAttrFmt(0, v->attr, v->comp_cnt, v->comp_type, v->frac);
+    if (size > 0x20) {
+        fn_80196E10((const char*)lbl_80274E90, 0x1b9,
+                    (const char*)lbl_80274E90 + 0xc);
+    }
+    fn_801BF138(size);
+    if (fn_801BF138(size) != 1) {
+        fn_80196E10((const char*)lbl_80274E90, 0x1ba,
+                    (const char*)lbl_80274E90 + 0x18);
+    }
 
-            if (v->attr_type == 2 || v->attr_type == 3) { /* INDEX8 or INDEX16 */
-                if (v->vertex != NULL) {
-                    GXSetArray(v->attr, v->vertex, v->stride);
+    *(u32*)((u8*)p + 0x24) = size;
+    *(u32*)((u8*)p + 0x20) = (size + alignment - 1) & ~(alignment - 1);
+    *(void**)((u8*)p + 0x28) = lbl_8047B2E0;
+    lbl_8047B2E0 = p;
+}
+
+/* =========================================================================
+ * 0x801AA498 | size: 0x34  -- Return item to pool / decrement count
+ * ========================================================================= */
+void fn_801AA498(void* list, void* data)
+{
+    void* l = list;
+    *(u32*)((u8*)l + 0x8) = *(u32*)((u8*)l + 0x8) - 1;
+    fn_801A6960(data);
+}
+
+/* =========================================================================
+ * 0x801AA4CC | size: 0x6C  -- Allocate from pool
+ * ========================================================================= */
+void* fn_801AA4CC(void* list)
+{
+    void* l = list;
+
+    if (*(u8*)l & 0x80) {
+        if (*(u32*)((u8*)l + 0x8) >= *(u32*)((u8*)l + 0x14)) {
+            return NULL;
+        }
+    }
+
+    *(u32*)((u8*)l + 0x8) += 1;
+    if (*(u32*)((u8*)l + 0x8) > *(u32*)((u8*)l + 0x10)) {
+        *(u32*)((u8*)l + 0x10) = *(u32*)((u8*)l + 0x8);
+    }
+
+    return fn_801A6928(*(u32*)((u8*)l + 0x20));
+}
+
+/* =========================================================================
+ * 0x801AA538 | size: 0x30
+ * Store r4 at [0] and [4], r3 at [8] and [0xC] of lbl_8036CBF0
+ * ========================================================================= */
+void fn_801AA538(void* a, void* b)
+{
+    *(void**)((u8*)lbl_8036CBF0 + 0x0) = b;
+    *(void**)((u8*)lbl_8036CBF0 + 0x4) = b;
+    *(void**)((u8*)lbl_8036CBF0 + 0x8) = a;
+    *(void**)((u8*)lbl_8036CBF0 + 0xc) = a;
+}
+
+/* =========================================================================
+ * 0x801AA568 | size: 0x44  -- PObj class info init (small)
+ * Calls fn_80193B30 to register lbl_8036CC00 class
+ * ========================================================================= */
+void fn_801AA568(void)
+{
+    fn_80193B30(lbl_8036CC00, lbl_8036C638, lbl_80274EC8,
+                (void*)lbl_8047DCA0, 0x3c, 0x8);
+}
+
+/* =========================================================================
+ * 0x801AA5AC | size: 0x5C  -- Increment reference count in GX array
+ * fn_801AA5AC(idx)
+ * ========================================================================= */
+void fn_801AA5AC(s32 idx)
+{
+    s32 i = idx;
+    if (i >= 0x20) {
+        fn_80196E10(lbl_8047DCA8, 0xa4, lbl_8047DCB0);
+    }
+    {
+        u32* entry = (u32*)((u8*)lbl_8036CC40 + (u32)i * 4);
+        entry[4] = entry[4] + 1;
+    }
+}
+
+/* =========================================================================
+ * 0x801AA608 | size: 0xC8  -- PObj class info init (main)
+ * Calls fn_80193B30 to register lbl_8036CCD0 and installs vtable
+ * ========================================================================= */
+void fn_801AA608(void)
+{
+    fn_80193B30(lbl_8036CCD0, lbl_8036C638, lbl_80274EE0,
+                lbl_80274EF8, 0x4c, 0x1c);
+
+    *(void**)((u8*)lbl_8036CCD0 + 0x30) = (void*)fn_801AA788;
+    *(void**)((u8*)lbl_8036CCD0 + 0x38) = (void*)fn_801AA6D0;
+    *(void**)((u8*)lbl_8036CCD0 + 0x3c) = (void*)fn_801AA8BC;
+    *(void**)((u8*)lbl_8036CCD0 + 0x40) = (void*)fn_801AABB4;
+    *(void**)((u8*)lbl_8036CCD0 + 0x44) = (void*)fn_801AD354;
+    *(void**)((u8*)lbl_8036CCD0 + 0x48) = (void*)fn_801AD678;
+}
+
+/* =========================================================================
+ * 0x801AA6D0 | size: 0xB8  -- PObj remove
+ * ========================================================================= */
+void fn_801AA6D0(void* pobj)
+{
+    void* p = pobj;
+
+    if (p == lbl_8047B2E8) {
+        lbl_8047B2E8 = NULL;
+    }
+
+    if (p == (void*)lbl_8036CCD0) {
+        s32 r;
+
+        r = fn_801A6990(lbl_8047B2EC);
+        if (r != 0) {
+            lbl_8047B2EC = NULL;
+            lbl_8047B2F4 = NULL;
+        }
+
+        r = fn_801A6990(lbl_8047B2F0);
+        if (r != 0) {
+            lbl_8047B2F0 = NULL;
+            lbl_8047B2F8 = NULL;
+        }
+
+        lbl_8047B2FC = 0;
+        lbl_8047B300 = NULL;
+    }
+
+    {
+        void** ci = *(void***)((u8*)lbl_8036CCD0 + 0x14);
+        ((void(*)(void*))ci[0x38/4])(p);
+    }
+}
+
+/* =========================================================================
+ * 0x801AA788 | size: 0x134  -- PObj display dispatch
+ * ========================================================================= */
+void fn_801AA788(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
+{
+    void* p = pobj;
+    void* pp = p;
+
+    if (*(void**)((u8*)p + 0x18) != NULL) {
+        fn_801C25E4(*(void**)((u8*)pp + 0x18));
+    }
+
+    {
+        u16 flags = *(u16*)((u8*)pp + 0xc);
+        u32 skintype = (u32)(flags & 0x3000);
+
+        switch (skintype) {
+        case 0x0000:
+        {
+            void* dl = *(void**)((u8*)pp + 0x14);
+            if (dl == NULL) goto dispatch;
+            {
+                u16 fl = *(u16*)((u8*)dl + 0x0);
+                if (fl & 0x2) {
+                    fn_801A6960(*(void**)((u8*)dl + 0x1c));
+                    if (dl != NULL) {
+                        fn_80193AF0(dl, 0x20);
+                    }
+                    goto dispatch;
                 }
             }
+            {
+                void* cur = dl;
+                while (cur != NULL) {
+                    void* nxt = *(void**)((u8*)cur + 0x4);
+                    fn_801A053C(*(void**)((u8*)cur + 0x4));
+                    if (cur != NULL) {
+                        fn_80193AF0(cur, 0xc);
+                    }
+                    cur = nxt;
+                }
+            }
+            {
+                void* r = fn_801A3E64(dl);
+                if (r == NULL) goto dispatch;
+            }
+            goto dispatch;
         }
-    }
-}
 
-/*
- * HSD_PObjSetVtxAttrFmt - 0x801AA498 | Size: 0x34
- * Set a single vertex attribute format entry.
- */
-void fn_801AA498(u32 attr, u32 cnt, u32 type, u8 frac) {
-    GXSetVtxAttrFmt(0, attr, cnt, type, frac);
-}
+        case 0x1000:
+        {
+            void* shapeset = *(void**)((u8*)pp + 0x14);
+            if (shapeset == NULL) goto dispatch;
+            fn_801A053C(shapeset);
+            goto call_dispatch;
+        }
 
-/*
- * HSD_PObjInitVtxDesc - 0x801AA4CC | Size: 0x6C
- * Initialize vertex descriptor array from a list.
- */
-void fn_801AA4CC(HSD_VtxDescList* verts) {
-    HSD_VtxDescList* v;
-
-    if (verts == NULL) {
-        return;
-    }
-
-    for (v = verts; v->attr != 0xFF; v++) {
-        if (v->attr_type == 2 || v->attr_type == 3) {
-            if (v->vertex != NULL) {
-                GXSetArray(v->attr, v->vertex, v->stride);
+        case 0x2000:
+        {
+            void* envlist = *(void**)((u8*)pp + 0x14);
+            if (envlist == NULL) goto dispatch;
+            {
+                void* cur = envlist;
+                while (cur != NULL) {
+                    void* nxt  = *(void**)((u8*)cur + 0x4);
+                    void* data = *(void**)((u8*)cur + 0x0);
+                    fn_801A053C(*(void**)((u8*)cur + 0x4));
+                    if (cur != NULL) {
+                        fn_80193AF0(cur, 0xc);
+                    }
+                    cur = data;
+                }
+            }
+            {
+                void* r = fn_801A3E64(envlist);
+                if (r == NULL) goto dispatch;
             }
         }
-    }
-}
+        /* fallthrough */
 
-/*
- * HSD_PObjSetArrayPtr - 0x801AA538 | Size: 0x30
- * Set a GX vertex attribute array pointer.
- */
-void fn_801AA538(u32 attr, void* base, u8 stride) {
-    GXSetArray(attr, base, stride);
-}
-
-/*
- * HSD_PObjConfigVtxFmt - 0x801AA568 | Size: 0x44
- * Configure vertex format for display.
- */
-void fn_801AA568(HSD_PObj* pobj) {
-    if (pobj == NULL || pobj->verts == NULL) {
-        return;
-    }
-    fn_801AA35C(pobj->verts);
-}
-
-/*
- * HSD_PObjFinalizeVtxDesc - 0x801AA5AC | Size: 0x5C
- * Finalize vertex descriptor setup after all attributes configured.
- */
-void fn_801AA5AC(HSD_PObj* pobj) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    /* Validate vertex descriptor list */
-    if (pobj->verts == NULL) {
-        return;
-    }
-
-    /* Set the current vertex format group */
-    /* The vertex descriptor is now ready for display list processing */
-}
-
-/* ========================================================================= */
-/*  PObj initialization and class methods                                    */
-/* ========================================================================= */
-
-/*
- * HSD_PObjInit - 0x801AA608 | Size: 0xC8
- * PObj class info initialization.
- */
-void fn_801AA608(void) {
-    /* Initialize the PObj class info vtable:
-     * - Set disp method
-     * - Set setup_mtx method
-     * - Set load method
-     * - Initialize parent class
-     */
-}
-
-/*
- * HSD_PObjSetupCallback - 0x801AA6D0 | Size: 0xB8
- * PObj setup callback - configure GX state for rendering.
- */
-void fn_801AA6D0(HSD_PObj* pobj, u32 rendermode) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    /* Configure GX state based on render mode:
-     * - Set cull mode
-     * - Configure vertex format
-     * - Set up position/normal matrix
-     */
-    pobj_render_flags = rendermode;
-}
-
-/*
- * HSD_PObjDispEntry - 0x801AA788 | Size: 0x134
- * PObj display entry point - dispatch based on skinning type.
- */
-void fn_801AA788(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
-                  u32 rendermode) {
-    u32 type;
-
-    if (pobj == NULL) {
-        return;
-    }
-
-    type = pobj->flags & 0x3000;
-
-    switch (type >> 12) {
-    case 0:
-        /* No skinning - rigid with identity */
-        fn_801AA8BC(pobj, vmtx, pmtx, rendermode);
-        break;
-    case 1:
-        /* Rigid skinning - single joint */
-        fn_801AABB4(pobj, vmtx, pmtx, rendermode);
-        break;
-    case 2:
-        /* Envelope skinning - multi-joint weighted */
-        fn_801AAEA8(pobj, vmtx, pmtx, rendermode);
-        break;
-    case 3:
-        /* Shape animation */
-        fn_801AB67C(pobj, vmtx, pmtx, rendermode);
-        break;
-    }
-}
-
-/* ========================================================================= */
-/*  Rigid skinning (single joint matrix)                                     */
-/* ========================================================================= */
-
-/*
- * HSD_PObjDispRigid - 0x801AA8BC | Size: 0x2F8
- * Rigid skin display - sets up single-joint matrix and calls GX.
- */
-void fn_801AA8BC(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
-                  u32 rendermode) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    /* 1. Set up vertex descriptor */
-    fn_801AA35C(pobj->verts);
-
-    /* 2. Load position matrix */
-    if (vmtx != NULL) {
-        GXLoadPosMtxImm(vmtx, 0);
-        GXSetCurrentMtx(0);
-    }
-
-    /* 3. Load normal matrix */
-    if (pmtx != NULL) {
-        GXLoadNrmMtxImm(pmtx, 0);
-    }
-
-    /* 4. Set cull mode */
-    GXSetCullMode(pobj_cull_mode);
-
-    /* 5. Call display list */
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
-    }
-}
-
-/*
- * HSD_PObjDispRigidAlt - 0x801AABB4 | Size: 0x2F4
- * Rigid skin display variant - alternate matrix path.
- */
-void fn_801AABB4(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
-                  u32 rendermode) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    /* Similar to fn_801AA8BC but uses the JObj's world matrix
-     * instead of the passed-in matrix */
-
-    fn_801AA35C(pobj->verts);
-
-    if (pobj->u.jobj != NULL) {
-        /* Get world matrix from joint */
-        /* GXLoadPosMtxImm(jobj->world_mtx, 0) */
-    } else if (vmtx != NULL) {
-        GXLoadPosMtxImm(vmtx, 0);
-    }
-    GXSetCurrentMtx(0);
-
-    GXSetCullMode(pobj_cull_mode);
-
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
-    }
-}
-
-/* ========================================================================= */
-/*  Envelope skinning (multi-joint weighted)                                 */
-/* ========================================================================= */
-
-/*
- * HSD_PObjSetupEnvelope - 0x801AAEA8 | Size: 0x3C8
- * Envelope skin setup - compute weighted joint matrices.
- * Iterates the envelope list, blends joint matrices by weight,
- * and loads them to GX position/normal matrix slots.
- */
-void fn_801AAEA8(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
-                  u32 rendermode) {
-    HSD_SList* env_list;
-    u32 mtx_idx;
-
-    if (pobj == NULL) {
-        return;
-    }
-
-    fn_801AA35C(pobj->verts);
-
-    env_list = pobj->u.envelope_list;
-    mtx_idx = 0;
-
-    while (env_list != NULL && mtx_idx < 10) {
-        HSD_Envelope* env = (HSD_Envelope*)env_list->data;
-
-        while (env != NULL) {
-            /* Accumulate weighted matrix from envelope joints */
-            /* result_mtx += env->weight * env->jobj->world_mtx */
-            env = env->next;
-        }
-
-        /* Load blended matrix to GX slot */
-        /* GXLoadPosMtxImm(blended_mtx, mtx_idx * 3) */
-        mtx_idx++;
-        env_list = env_list->next;
-    }
-
-    GXSetCullMode(pobj_cull_mode);
-
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
-    }
-}
-
-/*
- * HSD_PObjDispEnvelope - 0x801AB270 | Size: 0x2C8
- * Envelope skin display - dispatch display list with blended matrices.
- */
-void fn_801AB270(HSD_PObj* pobj, u32 rendermode) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    GXSetCullMode(pobj_cull_mode);
-
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
-    }
-}
-
-/*
- * HSD_PObjEnvMtxAccum - 0x801AB538 | Size: 0xC0
- * Envelope matrix accumulation helper.
- * Accumulates weighted matrices for multi-joint skinning.
- */
-void fn_801AB538(f32 dst[3][4], f32 src[3][4], f32 weight) {
-    u32 i, j;
-
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 4; j++) {
-            dst[i][j] += src[i][j] * weight;
+        default:
+            goto dispatch;
         }
     }
-}
 
-/* ========================================================================= */
-/*  Shape animation display                                                  */
-/* ========================================================================= */
-
-/*
- * HSD_ShapeAnimGetWeight - 0x801AB5F8 | Size: 0x44
- * Get the current blend weight from the shape animation AObj.
- */
-f32 fn_801AB5F8(HSD_ShapeSet* shape_set) {
-    if (shape_set == NULL) {
-        return 0.0f;
+call_dispatch:
+dispatch:
+    {
+        void** ci = *(void***)((u8*)lbl_8036CCD0 + 0x14);
+        ((void(*)(void*))ci[0x30/4])(p);
     }
-    return shape_set->blend.bl;
 }
 
-/*
- * HSD_ShapeAnimInitBlend - 0x801AB63C | Size: 0x40
- * Initialize the shape animation blend state.
- */
-void fn_801AB63C(HSD_ShapeSet* shape_set) {
-    if (shape_set == NULL) {
-        return;
+/* =========================================================================
+ * 0x801AA8BC | size: 0x2F8  -- Rigid skin display
+ * ========================================================================= */
+void fn_801AA8BC(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
+{
+    /* stub - complex asm */
+}
+
+/* =========================================================================
+ * 0x801AABB4 | size: 0x2F4  -- Rigid skin (indexed)
+ * ========================================================================= */
+void fn_801AABB4(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
+{
+    /* stub - complex asm */
+}
+
+/* =========================================================================
+ * 0x801AAEA8 | size: 0x3C8  -- Envelope skin display
+ * ========================================================================= */
+void fn_801AAEA8(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
+{
+    /* stub - complex asm */
+}
+
+/* =========================================================================
+ * 0x801AB270 | size: 0x2C8  -- Envelope direct display
+ * ========================================================================= */
+void fn_801AB270(void* pobj, void* vmtx, void* pmtx, u32 rendermode)
+{
+    /* stub - complex asm */
+}
+
+/* =========================================================================
+ * 0x801AB538 | size: 0xC0  -- Set entry in 2-slot array
+ * fn_801AB538(idx, ptr1, ptr2)
+ * ========================================================================= */
+void fn_801AB538(s32 idx, void* ptr1, void* ptr2)
+{
+    s32 i = idx;
+    if (i >= 2) return;
+    if (i < 0) goto do_store;
+    if (i < 2) return;
+do_store:
+    *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x0) = ptr1;
+    *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x4) = ptr2;
+}
+
+/* =========================================================================
+ * 0x801AB5F8 | size: 0x44  -- Set entry in 2-slot array (void*, s32)
+ * fn_801AB5F8(idx, ptr, val)
+ * ========================================================================= */
+void fn_801AB5F8(s32 idx, void* ptr, s32 val)
+{
+    s32 i = idx;
+    if (i >= 2) return;
+    if (i < 0) goto do_store;
+    if (i < 2) return;
+do_store:
+    *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x0) = ptr;
+    *(s32*)  ((u8*)lbl_80465678 + (u32)i * 8 + 0x4) = val;
+}
+
+/* =========================================================================
+ * 0x801AB63C | size: 0x40  -- Init all 2 entries in array
+ * fn_801AB63C(ptr, val)
+ * ========================================================================= */
+void fn_801AB63C(void* ptr, s32 val)
+{
+    s32 i = 0;
+    do {
+        *(void**)((u8*)lbl_80465678 + (u32)i * 8 + 0x0) = ptr;
+        *(s32*)  ((u8*)lbl_80465678 + (u32)i * 8 + 0x4) = val;
+        i++;
+    } while (i < 2);
+}
+
+/* =========================================================================
+ * 0x801AB67C | size: 0x758  -- PObj shape animation display
+ * ========================================================================= */
+void fn_801AB67C(void* pobj)
+{
+    /* stub - complex asm */
+}
+
+/* =========================================================================
+ * 0x801ABDD4 | size: 0x424
+ * ========================================================================= */
+void fn_801ABDD4(void)
+{
+}
+
+/* =========================================================================
+ * 0x801AC1F8 | size: 0x2C4
+ * ========================================================================= */
+void fn_801AC1F8(void)
+{
+}
+
+/* =========================================================================
+ * 0x801AC4BC | size: 0x460
+ * ========================================================================= */
+void fn_801AC4BC(void)
+{
+}
+
+/* =========================================================================
+ * 0x801AC91C | size: 0x460
+ * ========================================================================= */
+void fn_801AC91C(void)
+{
+}
+
+/* =========================================================================
+ * 0x801ACD7C | size: 0x30  -- Draw sync + clear display list state
+ * ========================================================================= */
+void fn_801ACD7C(void)
+{
+    fn_800B7D3C();
+    lbl_8047B2FC = 0;
+    lbl_8047B300 = NULL;
+}
+
+/* =========================================================================
+ * 0x801ACDAC | size: 0x298
+ * ========================================================================= */
+void fn_801ACDAC(void)
+{
+}
+
+/* =========================================================================
+ * 0x801AD044 | size: 0x1D0
+ * ========================================================================= */
+void fn_801AD044(void* pobj, void* desc)
+{
+}
+
+/* =========================================================================
+ * 0x801AD214 | size: 0x74  -- Walk pobj list, call vtable[0x30] + [0x34]
+ * ========================================================================= */
+void fn_801AD214(void* pobj)
+{
+    void* cur = pobj;
+
+    while (cur != NULL) {
+        void* next = *(void**)((u8*)cur + 0x4);
+        if (cur != NULL) {
+            void** vtbl = *(void***)cur;
+            ((void(*)(void*))vtbl[0x30 / 4])(cur);
+            vtbl = *(void***)cur;
+            ((void(*)(void*))vtbl[0x34 / 4])(cur);
+        }
+        cur = next;
     }
-    shape_set->blend.bl = 0.0f;
 }
 
-/*
- * HSD_ShapeAnimBlendVerts - 0x801AB67C | Size: 0x758
- * Main vertex morph interpolation routine.
- * Interpolates between base and target vertex positions
- * based on the blend weight from the AObj.
- * This is one of the largest functions because it handles
- * all vertex component types and counts.
- */
-void fn_801AB67C(HSD_PObj* pobj, f32 vmtx[3][4], f32 pmtx[3][4],
-                  u32 rendermode) {
-    HSD_ShapeSet* ss;
-    f32 blend;
+/* =========================================================================
+ * 0x801AD288 | size: 0xCC  -- PObj load from descriptor
+ * ========================================================================= */
+void* fn_801AD288(void* desc)
+{
+    void* d = desc;
+    void* p;
+
+    if (d == NULL) {
+        return NULL;
+    }
+
+    if (*(u32*)d != 0) {
+        void* info = fn_80193748((const char*)*(u32*)d);
+        if (info != NULL) {
+            p = fn_80193828(info);
+            if (p == NULL) {
+                fn_80196E10(lbl_8047DCB8, 0x2a9, lbl_8047DD10);
+            }
+            goto load;
+        }
+    }
+
+    if (lbl_8047B2E8 != NULL) {
+        p = lbl_8047B2E8;
+    } else {
+        p = fn_80193828(lbl_8036CCD0);
+        if (p == NULL) {
+            fn_80196E10(lbl_8047DCB8, 0x247, lbl_8047DD10);
+        }
+    }
+
+load:
+    {
+        void** vtbl = *(void***)p;
+        ((void(*)(void*, void*))vtbl[0x44 / 4])(p, d);
+    }
+    return p;
+}
+
+/* =========================================================================
+ * 0x801AD354 | size: 0x2C8
+ * ========================================================================= */
+void fn_801AD354(void* pobj_ptr, void* desc)
+{
+}
+
+/* =========================================================================
+ * 0x801AD61C | size: 0x5C  -- Walk pobj list, call reqAnim
+ * fn_801AD61C(pobj)
+ * ========================================================================= */
+void fn_801AD61C(void* pobj)
+{
+    void* cur;
 
     if (pobj == NULL) {
         return;
     }
 
-    ss = pobj->u.shape_set;
-    if (ss == NULL) {
-        /* Fall back to rigid rendering */
-        fn_801AA8BC(pobj, vmtx, pmtx, rendermode);
-        return;
-    }
-
-    blend = ss->blend.bl;
-
-    /* Set up vertex descriptor for morphed vertices */
-    fn_801AA35C(pobj->verts);
-
-    /* Load position matrix */
-    if (vmtx != NULL) {
-        GXLoadPosMtxImm(vmtx, 0);
-        GXSetCurrentMtx(0);
-    }
-
-    /* Interpolate vertex positions and submit to GX
-     * For each vertex in the display list:
-     *   result = base_pos * (1 - blend) + target_pos * blend
-     */
-
-    GXSetCullMode(pobj_cull_mode);
-
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
+    cur = pobj;
+    while (cur != NULL) {
+        if (cur != NULL) {
+            void** vtbl = *(void***)cur;
+            fn_801C27F4(*(void**)((u8*)cur + 0x18), cur, vtbl[0x48 / 4]);
+        }
+        cur = *(void**)((u8*)cur + 0x4);
     }
 }
 
-/*
- * HSD_ShapeAnimBlendNormals - 0x801ABDD4 | Size: 0x424
- * Normal morph interpolation.
- * Similar to vertex blending but for normal vectors.
- * Includes renormalization after interpolation.
- */
-void fn_801ABDD4(HSD_ShapeSet* ss, f32 blend) {
-    if (ss == NULL) {
-        return;
+/* =========================================================================
+ * 0x801AD678 | size: 0x4C  -- Set shape blend weight
+ * fn_801AD678(pobj, idx, f32* weight_ptr)
+ * ========================================================================= */
+void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr)
+{
+    void* p = pobj;
+
+    if (p == NULL) return;
+
+    {
+        u16 flags = *(u16*)((u8*)p + 0xc);
+        if ((flags & 0x3000) != 0x1000) return;
     }
 
-    /* For each normal in the shape set:
-     *   result_normal = normalize(base_nrm * (1 - blend) + target_nrm * blend)
-     */
+    {
+        void* shapeset = *(void**)((u8*)p + 0x14);
+        u16 ssflags = *(u16*)shapeset;
+        f32 w = *weight_ptr;
+
+        if (ssflags & 0x2) {
+            f32* arr = *(f32**)((u8*)shapeset + 0x1c);
+            arr[idx - 2] = w;
+        } else {
+            *(f32*)((u8*)shapeset + 0x1c) = w;
+        }
+    }
 }
 
-/*
- * HSD_ShapeAnimDisp - 0x801AC1F8 | Size: 0x2C4
- * Display dispatch with morphed vertices.
- */
-void fn_801AC1F8(HSD_PObj* pobj, f32 vmtx[3][4], u32 rendermode) {
+/* =========================================================================
+ * 0x801AD6C4 | size: 0x74  -- Walk pobj list, call anim
+ * fn_801AD6C4(f32 val, pobj, flags)
+ * ========================================================================= */
+void fn_801AD6C4(f32 val, void* pobj, u32 flags)
+{
+    void* cur;
+
     if (pobj == NULL) {
         return;
     }
 
-    fn_801AA35C(pobj->verts);
-
-    if (vmtx != NULL) {
-        GXLoadPosMtxImm(vmtx, 0);
-        GXSetCurrentMtx(0);
-    }
-
-    GXSetCullMode(pobj_cull_mode);
-
-    if (pobj->display != NULL && pobj->n_display > 0) {
-        GXCallDisplayList(pobj->display, pobj->n_display);
+    cur = pobj;
+    while (cur != NULL) {
+        if (cur != NULL) {
+            if (flags & 0x8) {
+                fn_801C29C4(val, *(void**)((u8*)cur + 0x18));
+            }
+        }
+        cur = *(void**)((u8*)cur + 0x4);
     }
 }
 
-/* ========================================================================= */
-/*  Display list call / GX submit                                            */
-/* ========================================================================= */
+/* =========================================================================
+ * 0x801AD738 | size: 0x94
+ * ========================================================================= */
+void fn_801AD738(void* pobj, void* animlist)
+{
+    void* p = pobj;
+    void* al = animlist;
 
-/*
- * HSD_PObjCallDL - 0x801AC4BC | Size: 0x460
- * GX CallDisplayList wrapper with cull mode setup.
- * Handles front-face culling and double-sided rendering.
- */
-void fn_801AC4BC(HSD_PObj* pobj, u32 rendermode) {
-    if (pobj == NULL || pobj->display == NULL) {
-        return;
-    }
+    if (p == NULL || al == NULL) return;
 
-    /* Set cull mode based on render flags */
-    if (rendermode & 0x4) {
-        GXSetCullMode(0); /* NONE */
-    } else if (rendermode & 0x8) {
-        GXSetCullMode(1); /* FRONT */
-    } else {
-        GXSetCullMode(2); /* BACK */
-    }
-
-    GXCallDisplayList(pobj->display, pobj->n_display);
-}
-
-/*
- * HSD_PObjCallDLAlt - 0x801AC91C | Size: 0x460
- * GX CallDisplayList variant with alternate cull mode.
- */
-void fn_801AC91C(HSD_PObj* pobj, u32 rendermode) {
-    if (pobj == NULL || pobj->display == NULL) {
-        return;
-    }
-
-    /* Alternate cull mode for back-face pass */
-    if (rendermode & 0x4) {
-        GXSetCullMode(0); /* NONE */
-    } else {
-        GXSetCullMode(1); /* FRONT (reversed) */
-    }
-
-    GXCallDisplayList(pobj->display, pobj->n_display);
-}
-
-/*
- * HSD_PObjDLHelper - 0x801ACD7C | Size: 0x30
- * Small display list setup helper.
- */
-void fn_801ACD7C(void* dl, u32 size) {
-    if (dl != NULL && size > 0) {
-        GXCallDisplayList(dl, size);
+    while (p != NULL) {
+        if (*(void**)((u8*)p + 0x18) != NULL) {
+            fn_801C25E4(*(void**)((u8*)p + 0x18));
+        }
+        *(void**)((u8*)p + 0x18) = fn_801C2670(*(void**)((u8*)al + 0x4));
+        if (al == NULL) {
+            al = NULL;
+        } else {
+            al = *(void**)al;
+        }
+        p = *(void**)((u8*)p + 0x4);
     }
 }
 
-/*
- * HSD_PObjCallDLValidated - 0x801ACDAC | Size: 0x298
- * Display list call with vertex count validation.
- */
-void fn_801ACDAC(HSD_PObj* pobj) {
-    if (pobj == NULL) {
-        return;
-    }
-
-    if (pobj->display == NULL || pobj->n_display == 0) {
-        return;
-    }
-
-    /* Validate the display list size is reasonable */
-    if (pobj->n_display > 0x100000) {
-        /* Display list too large, skip */
-        return;
-    }
-
-    GXCallDisplayList(pobj->display, pobj->n_display);
+/* =========================================================================
+ * 0x801AD7CC | size: 0x2E0  -- Quaternion slerp
+ * ========================================================================= */
+s32 fn_801AD7CC(f32* q1, f32* q2, f32 t, f32* out)
+{
+    return 1;
 }
 
-/* ========================================================================= */
-/*  Matrix and position management                                           */
-/* ========================================================================= */
-
-/*
- * HSD_PObjLoadPosMtx - 0x801AD044 | Size: 0x1D0
- * Load position matrices for GX from indexed matrix arrays.
- */
-void fn_801AD044(f32 mtx[3][4], u32 idx) {
-    GXLoadPosMtxImm(mtx, idx * 3);
+/* =========================================================================
+ * 0x801ADAAC | size: 0x15C  -- Quaternion multiply / normalize
+ * ========================================================================= */
+void fn_801ADAAC(f32* q1, f32* q2, f32* out)
+{
 }
 
-/*
- * HSD_PObjLoadNrmMtx - 0x801AD214 | Size: 0x74
- * Load a normal matrix to GX.
- */
-void fn_801AD214(f32 mtx[3][4], u32 idx) {
-    GXLoadNrmMtxImm(mtx, idx * 3);
-}
-
-/*
- * HSD_PObjMtxPosSetup - 0x801AD288 | Size: 0xCC
- * GX matrix position setup for a single joint.
- */
-void fn_801AD288(f32 vmtx[3][4], f32 pmtx[3][4], u32 idx) {
-    if (vmtx != NULL) {
-        GXLoadPosMtxImm(vmtx, idx * 3);
-    }
-    if (pmtx != NULL) {
-        GXLoadNrmMtxImm(pmtx, idx * 3);
-    }
-    GXSetCurrentMtx(idx * 3);
-}
-
-/*
- * HSD_PObjEnvPosSetup - 0x801AD354 | Size: 0x2C8
- * Multi-matrix envelope position setup.
- * Loads multiple weighted matrices for envelope skinning.
- */
-void fn_801AD354(HSD_SList* env_list, u32 start_idx) {
-    u32 idx;
-
-    if (env_list == NULL) {
-        return;
-    }
-
-    idx = start_idx;
-    while (env_list != NULL && idx < 10) {
-        /* Load this envelope's blended matrix */
-        idx++;
-        env_list = env_list->next;
+/* =========================================================================
+ * 0x801ADC08 | size: 0x34  -- Deactivate RNG state
+ * ========================================================================= */
+void fn_801ADC08(void)
+{
+    s32 r = fn_801A6990(lbl_80478C94);
+    if (r != 0) {
+        lbl_80478C94 = &lbl_80478C90;
     }
 }
 
-/* ========================================================================= */
-/*  Render state management                                                  */
-/* ========================================================================= */
+/* =========================================================================
+ * 0x801ADC3C | size: 0x40  -- LCG next, scaled return
+ * fn_801ADC3C(s32 scale) -> s32
+ * ========================================================================= */
+s32 fn_801ADC3C(s32 scale)
+{
+    u32* state = (u32*)lbl_80478C94;
+    *state = *state * 0x343fd + 0x269EC3;
+    return (s32)((s32)(scale * (s32)(*state >> 16)) >> 16);
+}
 
-/*
- * HSD_PObjSetRenderFlag - 0x801AD61C | Size: 0x5C
- * Set a render state flag.
- */
-void fn_801AD61C(u32 flag, BOOL enable) {
-    if (enable) {
-        pobj_render_flags |= flag;
-    } else {
-        pobj_render_flags &= ~flag;
+/* =========================================================================
+ * 0x801ADC7C | size: 0x5C  -- LCG next, float return
+ * fn_801ADC7C() -> f32
+ * ========================================================================= */
+f32 fn_801ADC7C(void)
+{
+    u32* state = (u32*)lbl_80478C94;
+    *state = *state * 0x343fd + 0x269EC3;
+    return (f32)(*state >> 16) / lbl_8047DD40;
+}
+
+/* =========================================================================
+ * 0x801ADCD8 | size: 0x34  -- LCG next, u16 return
+ * fn_801ADCD8() -> u32
+ * ========================================================================= */
+u32 fn_801ADCD8(void)
+{
+    u32* state = (u32*)lbl_80478C94;
+    *state = *state * 0x343fd + 0x269EC3;
+    return *state >> 16;
+}
+
+/* =========================================================================
+ * 0x801ADD0C | size: 0x3C  -- Deactivate texture anim state
+ * ========================================================================= */
+void fn_801ADD0C(void)
+{
+    s32 r = fn_801A6990(lbl_8047B308);
+    if (r != 0) {
+        lbl_8047B308 = NULL;
+        lbl_8047B30C = 0;
     }
 }
 
-/*
- * HSD_PObjGetRenderFlag - 0x801AD678 | Size: 0x4C
- * Get a render state flag.
- */
-BOOL fn_801AD678(u32 flag) {
-    return (pobj_render_flags & flag) != 0;
+/* =========================================================================
+ * 0x801ADD48 | size: 0x108
+ * ========================================================================= */
+void fn_801ADD48(void* out, void* desc)
+{
 }
 
-/*
- * HSD_PObjConfigRenderPass - 0x801AD6C4 | Size: 0x74
- * Configure render pass state.
- */
-void fn_801AD6C4(u32 pass, u32 flags) {
-    pobj_render_flags = flags;
-    pobj_cull_mode = (flags & 0xC) >> 2;
+/* =========================================================================
+ * 0x801ADE50 | size: 0x104
+ * ========================================================================= */
+void fn_801ADE50(void* out, void* desc)
+{
 }
 
-/*
- * HSD_PObjApplyRenderState - 0x801AD738 | Size: 0x94
- * Apply the current render state to GX.
- */
-void fn_801AD738(void) {
-    GXSetCullMode(pobj_cull_mode);
+/* =========================================================================
+ * 0x801ADF54 | size: 0xAC
+ * ========================================================================= */
+void* fn_801ADF54(void* desc)
+{
+    return NULL;
 }
-
-/*
- * HSD_PObjFullRenderSetup - 0x801AD7CC | Size: 0x2E0
- * Full render state setup for a material pass.
- * Configures all GX state needed for rendering a material:
- * blend mode, depth test, alpha test, cull mode, etc.
- */
-void fn_801AD7CC(u32 rendermode) {
-    /* Configure GX state:
-     * - GXSetBlendMode based on rendermode
-     * - GXSetZMode based on rendermode
-     * - GXSetAlphaCompare if alpha test needed
-     * - GXSetCullMode based on rendermode
-     * - GXSetDstAlpha if needed
-     */
-    pobj_render_flags = rendermode;
-
-    if (rendermode & 0x4) {
-        GXSetCullMode(0); /* NONE */
-    } else {
-        GXSetCullMode(2); /* BACK */
-    }
-}
-
-/*
- * HSD_PObjRenderCleanup - 0x801ADAAC | Size: 0x15C
- * Render state cleanup after material pass.
- */
-void fn_801ADAAC(void) {
-    /* Reset GX state:
-     * - Restore default blend mode
-     * - Restore default depth test
-     * - Restore default cull mode
-     */
-    GXSetCullMode(2); /* BACK */
-    pobj_render_flags = 0;
-}
-
-/* ========================================================================= */
-/*  GX texture state helpers                                                 */
-/* ========================================================================= */
-
-/* 0x801ADC08 | Size: 0x34 */
-void fn_801ADC08(u32 num_texgens) {
-    GXSetNumTexGens((u8)num_texgens);
-}
-
-/* 0x801ADC3C | Size: 0x40 */
-void fn_801ADC3C(u32 texmap, u32 enable) {
-    /* Enable/disable a texture map slot */
-}
-
-/* 0x801ADC7C | Size: 0x5C */
-void fn_801ADC7C(u32 stage, u32 texcoord, u32 texmap) {
-    /* Set TEV stage texture order */
-}
-
-/* 0x801ADCD8 | Size: 0x34 */
-void fn_801ADCD8(u32 texcoord, u32 src) {
-    /* Set texture coordinate generation source */
-}
-
-/* 0x801ADD0C | Size: 0x3C */
-void fn_801ADD0C(u32 texcoord, u32 mtx) {
-    /* Set texture coordinate generation matrix */
-}
-
-/*
- * HSD_PObjTexBindState - 0x801ADD48 | Size: 0x108
- * Configure texture binding state for rendering.
- */
-void fn_801ADD48(u32 num_tex, u32 tex_flags) {
-    GXSetNumTexGens((u8)num_tex);
-}
-
-/*
- * HSD_PObjTexCoordGenSetup - 0x801ADE50 | Size: 0x104
- * Set up texture coordinate generation for all active textures.
- */
-void fn_801ADE50(u32 num_texcoords) {
-    /* Configure GXSetTexCoordGen for each active texcoord */
-}
-
-/*
- * HSD_PObjTexMtxSetup - 0x801ADF54 | Size: 0xAC
- * Set up texture matrices for rendering.
- */
-void fn_801ADF54(u32 num_tex) {
-    /* Load texture matrices to GX */
-}
-
-#endif /* PCPORT */
