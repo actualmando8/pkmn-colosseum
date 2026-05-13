@@ -95,7 +95,7 @@ extern u32   fn_800BE31C(void);    /* rand or tick */
 extern u32   fn_800B8FD8(void*);   /* register fn, returns handle */
 extern void  fn_800BD91C(s32, s32);
 extern void  fn_800B8C58(s32);
-extern void  fn_800DC390(u32, void*, void*, s32, s32);
+extern void  fn_800DC390(u32, void*, void*);
 extern u32   fn_800EF5FC(s32, s32, s32, s32, s32);
 extern u32   fn_800EC1BC(u32);
 extern void  fn_800ECCA8(u32, u32);
@@ -358,7 +358,7 @@ extern void  fn_801045A8(void* p, u8 flags);
 extern void  fn_80104160(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    fn_80109664(u8 param);
 extern void  fn_801096AC(f32 f1, f32 f2);
-extern u8    fn_8010977C(u8 param);
+extern u8    fn_8010977C(u32 param);
 extern void  fn_80109764(void);
 extern u32   fn_801046B8(void);
 extern void* fn_80105624(void);
@@ -462,6 +462,8 @@ void fn_80102014(void) {
 #pragma pop
 
 /* 0x80102038 | 0x34 */
+#pragma push
+#pragma scheduling off
 void fn_80102038(f32 f1) {
     f32 f2;
     f2 = f1;
@@ -469,6 +471,7 @@ void fn_80102038(f32 f1) {
     fn_80109664(1);
     fn_80109764();
 }
+#pragma pop
 
 /* 0x8010206C | 0x54 */
 void fn_8010206C(f32 param) {
@@ -616,6 +619,8 @@ s32 fn_801023E4(void* p) {
 }
 
 /* 0x80102428 | 0x98 */
+#pragma push
+#pragma peephole off
 s32 fn_80102428(void* p, u8 flag) {
     void* r31 = p;
     if ((u8)flag != 0) {
@@ -636,6 +641,7 @@ s32 fn_80102428(void* p, u8 flag) {
     }
     return 0;
 }
+#pragma pop
 
 /* 0x801024C0 | 0x28 */
 #pragma push
@@ -730,24 +736,25 @@ void fn_80102868(void* p, s16 a, s16 b) {
 }
 
 /* 0x80102ED4 | 0x64 */
+#pragma push
+#pragma peephole off
 void fn_80102ED4(void* p) {
     void* r31;
     if ((r31 = p) == (void*)0) { return; }
     {
         void* base = fn_80105624();
         u16 r3 = *(u16*)((u8*)base + 0x4);
-        u32 bits = (u32)r3;
-        /* bit 27 from MSB = bit 4 from LSB */
-        if ((bits >> 4) & 1) {
+        s32 bits = (s32)r3;
+        if (bits & 0x10) {
             *(u8*)((u8*)r31 + 0x98) = 1;
         }
-        /* bit 26 from MSB = bit 5 from LSB */
-        if ((bits >> 5) & 1) {
+        if (bits & 0x20) {
             *(u8*)((u8*)r31 + 0x98) = 1;
             *(u8*)((u8*)r31 + 0x99) = 1;
         }
     }
 }
+#pragma pop
 
 /* 0x80103484 | 0x58 */
 #pragma push
@@ -891,6 +898,8 @@ void* fn_80103FE4(void* ptr) {
 }
 
 /* 0x80103FFC | 0xA4 */
+#pragma push
+#pragma peephole off
 void* fn_80103FFC(void* p, s32 size) {
     s32 r31 = size;
     void* r30 = p;
@@ -913,6 +922,7 @@ void* fn_80103FFC(void* p, s32 size) {
     }
     return *(void**)((u8*)r30 + 0xb0);
 }
+#pragma pop
 
 /* 0x801040A0 | 0x18 */
 void* fn_801040A0(void* ptr) {
@@ -1579,8 +1589,10 @@ void fn_80109764(void) {
 }
 
 /* 0x8010977C | 0x94 */
-u8 fn_8010977C(u8 param) {
-    u8 r31 = (u8)param;
+#pragma push
+#pragma peephole off
+u8 fn_8010977C(u32 param) {
+    u32 r31 = param;
     lbl_8047AD24 = 0;
     lbl_8047AD28 = lbl_8047AD28;  /* read */
     lbl_8047AD21 = 1;
@@ -1591,13 +1603,18 @@ u8 fn_8010977C(u8 param) {
     lbl_8047AD34 = lbl_8047CE50;
     lbl_8047AD38 = lbl_8047CE50;
     lbl_8047AD3C = lbl_8047CE50;
-    fn_800DC390(lbl_8047AD28, fn_80109884, (void*)0, 0, 0);
-    /* wait loop */
-    while (r31 != 0 && lbl_8047AD20 == 0) {
-        fn_800F0308();
-    }
-    return (u8)lbl_8047AD20;
+    fn_800DC390(lbl_8047AD28, fn_80109884, (void*)0);
+    r31 = (u8)r31;
+    goto check;
+loop:
+    if ((u8)lbl_8047AD20 != 0) { goto done; }
+    fn_800F0308();
+check:
+    if (r31 != 0) { goto loop; }
+done:
+    return (u8)*(u32*)&lbl_8047AD20;
 }
+#pragma pop
 
 /* 0x80109810 | 0x74 */
 void fn_80109810(void) {
