@@ -91,6 +91,7 @@ extern f32 lbl_80478ACC;   /* f32 threshold constant, abs accessed via lis/lfs *
 extern f32 lbl_8047C998;   /* SDA float 0.0 constant */
 extern f32 lbl_8047AA78;   /* SDA float temp */
 extern double lbl_8047C9A0; /* double 1.0 constant, SDA2 */
+extern double lbl_8047C9A8; /* SDA2 double: 4503599627370496.0 (int-to-float bias, 0x4330000000000000) */
 extern u8 lbl_804001B0[0x40]; /* light state buffer (.bss) */
 extern s32  fn_800D37CC(void);
 extern void fn_800D7FE4(void* obj);
@@ -135,7 +136,7 @@ void fn_800D104C(void) {
  * Address: 0x800D1070, Size: 0x354
  * Updates all active render objects: advances animation, updates transforms.
  * ================================================================== */
-void fn_800D1070(f32 dtUnk) {
+void fn_800D1070(u32 dtUnk) {
     u32 byteOff;
     u32 idx;
     byteOff = 0;
@@ -913,11 +914,9 @@ found:
             }
         }
     } else {
-        u32 one_local = 1;
-        u32 zero_local = 0;
         *(u8*)((u8*)slot + 0x3) = 0;
-        *(u8*)((u8*)slot + 0x0) = one_local;
-        *(u8*)((u8*)slot + 0x1) = zero_local;
+        *(u8*)((u8*)slot + 0x0) = 1;
+        *(u8*)((u8*)slot + 0x1) = 0;
         fn_800E01D0((u8*)slot + 0x70, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x24) + 0xc);
         fn_800E01D0((u8*)slot + 0x100, (u8*)*(void**)((u8*)*(void**)((u8*)slot + 0xc) + 0x28) + 0xc);
     }
@@ -931,10 +930,14 @@ found:
 void* fn_800D29A0(void) {
     u32 count = lbl_8047AA70;
     void* slot = (void*)lbl_8047AA6C;
-    u32 zero;
-    f32 f_0;
-    u32 one;
+    f32 f_c9d8;
+    f32 f_c9d4;
+    f32 f_c9c0;
+    f32 f_c994;
     f32 f_c990;
+    f32 f_0;
+    u32 zero;
+    u32 one;
     u32 w;
     u32 h;
     {
@@ -958,35 +961,43 @@ found:
     f_c990 = lbl_8047C990;
     w = 0x280;
     h = 0x1e0;
-    *(u32*)((u8*)slot + 0x10) = zero;
-    *(f32*)((u8*)slot + 0x14) = f_0;
-    *(f32*)((u8*)slot + 0x18) = f_0;
-    *(f32*)((u8*)slot + 0x1c) = f_0;
-    *(u32*)((u8*)slot + 0x20) = zero;
-    *(u32*)((u8*)slot + 0x24) = zero;
-    *(f32*)((u8*)slot + 0x28) = f_0;
-    *(f32*)((u8*)slot + 0x2c) = f_0;
-    *(f32*)((u8*)slot + 0x30) = f_c990;
-    *(u32*)((u8*)slot + 0x34) = zero;
-    *(u32*)((u8*)slot + 0x38) = zero;
-    *(u16*)((u8*)slot + 0x3c) = (u16)zero;
-    *(u16*)((u8*)slot + 0x3e) = (u16)one;
-    *(u16*)((u8*)slot + 0x40) = (u16)zero;
-    *(u16*)((u8*)slot + 0x42) = (u16)w;
-    *(u16*)((u8*)slot + 0x44) = (u16)zero;
-    *(u16*)((u8*)slot + 0x46) = (u16)h;
-    *(u16*)((u8*)slot + 0x48) = (u16)zero;
-    *(u16*)((u8*)slot + 0x4a) = (u16)w;
-    *(u16*)((u8*)slot + 0x4c) = (u16)zero;
-    *(u16*)((u8*)slot + 0x4e) = (u16)h;
-    *(u32*)((u8*)slot + 0x50) = (u32)((u8*)slot + 0x10);
-    *(u32*)((u8*)slot + 0x54) = (u32)((u8*)slot + 0x24);
-    *(f32*)((u8*)slot + 0x58) = f_0;
-    *(u32*)((u8*)slot + 0x5c) = zero;
-    *(f32*)((u8*)slot + 0x60) = lbl_8047C994;
-    *(f32*)((u8*)slot + 0x64) = lbl_8047C9C0;
-    *(f32*)((u8*)slot + 0x68) = lbl_8047C9D4;
-    *(f32*)((u8*)slot + 0x6c) = lbl_8047C9D8;
+    f_c994 = lbl_8047C994;
+    f_c9c0 = lbl_8047C9C0;
+    f_c9d4 = lbl_8047C9D4;
+    f_c9d8 = lbl_8047C9D8;
+    {
+        u32 ptr10 = (u32)((u8*)slot + 0x10);
+        u32 ptr24 = (u32)((u8*)slot + 0x24);
+        *(u32*)((u8*)slot + 0x10) = zero;
+        *(f32*)((u8*)slot + 0x14) = f_0;
+        *(f32*)((u8*)slot + 0x18) = f_0;
+        *(f32*)((u8*)slot + 0x1c) = f_0;
+        *(u32*)((u8*)slot + 0x20) = zero;
+        *(u32*)((u8*)slot + 0x24) = zero;
+        *(f32*)((u8*)slot + 0x28) = f_0;
+        *(f32*)((u8*)slot + 0x2c) = f_0;
+        *(f32*)((u8*)slot + 0x30) = f_c990;
+        *(u32*)((u8*)slot + 0x34) = zero;
+        *(u32*)((u8*)slot + 0x38) = zero;
+        *(u16*)((u8*)slot + 0x3c) = (u16)zero;
+        *(u16*)((u8*)slot + 0x3e) = (u16)one;
+        *(u16*)((u8*)slot + 0x40) = (u16)zero;
+        *(u16*)((u8*)slot + 0x42) = (u16)w;
+        *(u16*)((u8*)slot + 0x44) = (u16)zero;
+        *(u16*)((u8*)slot + 0x46) = (u16)h;
+        *(u16*)((u8*)slot + 0x48) = (u16)zero;
+        *(u16*)((u8*)slot + 0x4a) = (u16)w;
+        *(u16*)((u8*)slot + 0x4c) = (u16)zero;
+        *(u16*)((u8*)slot + 0x4e) = (u16)h;
+        *(u32*)((u8*)slot + 0x50) = ptr10;
+        *(u32*)((u8*)slot + 0x54) = ptr24;
+        *(f32*)((u8*)slot + 0x58) = f_0;
+        *(u32*)((u8*)slot + 0x5c) = zero;
+    }
+    *(f32*)((u8*)slot + 0x60) = f_c994;
+    *(f32*)((u8*)slot + 0x64) = f_c9c0;
+    *(f32*)((u8*)slot + 0x68) = f_c9d4;
+    *(f32*)((u8*)slot + 0x6c) = f_c9d8;
     *(void**)((u8*)slot + 0xc) = fn_80193F44((u8*)slot + 0x38);
     *(u8*)((u8*)slot + 0x0) = (u8)one;
     *(u8*)((u8*)slot + 0x1) = (u8)zero;
