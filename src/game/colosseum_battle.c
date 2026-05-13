@@ -36617,12 +36617,13 @@ u32 fn_8025E0B0(int *r3,u32 r4,u16 *r5,int r6)
 
 {
     extern u32 fn_8011F5B0();
-  short sVar4;
+  u16 sVar4;
   u32 uVar1;
   u32 uVar2;
+  u32 iResult;
   int iVar3;
-  s8 cVar5;
-  
+  u8 cVar5;
+
   sVar4 = (int)fn_8012640C(r4,0,0x6e,0);
   if (sVar4 == 0) {
     uVar1 = 0;
@@ -36635,9 +36636,9 @@ u32 fn_8025E0B0(int *r3,u32 r4,u16 *r5,int r6)
     else {
       uVar1 = fn_8011F5B0(r4);
       uVar2 = (int)fn_8012640C(r4,0,0xc1,0);
-      iVar3 = fn_801DE190(sVar4,uVar1,(-uVar2 | uVar2) >> 0x1f);
-      *r3 = iVar3;
-      if (iVar3 == 0) {
+      iResult = fn_801DE190(sVar4,uVar1,(-uVar2 | uVar2) >> 0x1f);
+      *r3 = iResult;
+      if (iResult == 0) {
         uVar1 = 0;
       }
       else {
@@ -38456,13 +38457,13 @@ LAB_0025e8fc:
 u32 fn_80261BEC(u32 r3,u32 r4,u8 *r5)
 
 {
-  int iVar1;
+  u32 iVar1;
   u32 uVar2;
   u16 uVar4;
-  short sVar5;
+  u16 sVar5;
   u32 uVar3;
-  s8 cVar6;
-  
+  u8 cVar6;
+
   iVar1 = fn_801F02AC(2,r3,r4);
   if (iVar1 == 0) {
     uVar2 = 0;
@@ -38495,11 +38496,11 @@ u32 fn_80261BEC(u32 r3,u32 r4,u8 *r5)
 u32 fn_80261CBC(u32 r3,u32 r4)
 
 {
-  int iVar1;
+  u32 iVar1;
   u16 uVar3;
-  short sVar4;
+  u16 sVar4;
   u32 uVar2;
-  s8 cVar5;
+  u8 cVar5;
   u32 uVar6;
 
   iVar1 = fn_801F02AC(2,r3,r4);
@@ -38535,9 +38536,9 @@ u32 fn_80261D8C(u32 r3, u32 r4)
 {
     extern int fn_801F7954();
     extern void fn_801026A4(u32, u32, u32, u32, u32, u32, ...);
-    int iVar1;
+    u32 iVar1;
     u16 uVar3;
-    short sVar4;
+    u16 sVar4;
     u32 uVar2;
     u32 uVar5;
     u32 local_28;
@@ -38574,10 +38575,10 @@ u32 fn_80261D8C(u32 r3, u32 r4)
 int fn_80261EF8(u32 r3,u32 r4)
 
 {
-  int iVar1;
+  u32 iVar1;
   u32 uVar2;
   u16 uVar4;
-  short sVar5;
+  u16 sVar5;
   u32 uVar3;
   
   iVar1 = fn_801F02AC(2,r3,r4);
@@ -38610,13 +38611,13 @@ int fn_80261EF8(u32 r3,u32 r4)
 u32 fn_80261FB4(u32 r3,u32 r4)
 
 {
-  int iVar1;
+  u32 iVar1;
   u16 uVar3;
-  short sVar4;
+  u16 sVar4;
   u32 uVar2;
-  s8 cVar5;
+  u8 cVar5;
   u32 uVar6;
-  
+
   iVar1 = fn_801F02AC(2,r3,r4);
   if (iVar1 == 0) {
     uVar6 = 0;
@@ -38652,14 +38653,14 @@ u32 fn_80262084(u32 r3,u32 r4,char *r5)
     extern int fn_801FE168();
   u32 *puVar1;
   u32 uVar2;
-  s8 cVar7;
-  int iVar3;
+  u8 cVar7;
+  u32 iVar3;
   u16 uVar5;
-  short sVar6;
+  u16 sVar6;
   u32 uVar4;
   u32 *puVar8;
   u32 *puVar9;
-  s8 cVar10;
+  u8 cVar10;
   u32 uVar11;
   u32 uStack_7c;
   u32 local_78 [10];
@@ -39218,46 +39219,50 @@ void fn_80265F94(int r3)
 
 /* Address: 0x80266250 | Size: 0xD0 | Ghidra import */
 void fn_80266250(void)
-
 {
     extern int fn_800FF660();
     extern u32 lbl_8047B680;
-  int iVar1;
-  u8 uVar3;
-  int iVar2;
-  u8 uVar4;
+    extern int fn_801653BC();
+    extern int fn_801653C4();
+    extern u32 fn_801656D8();
+    extern void fn_80165A20();
+    extern void fn_801657D0();
+    extern void fn_801659FC();
+    extern void fn_801DADC0();
+    extern void fn_801DAC90();
+    extern void fn_80265F94();
+    u32 iVar1;
+    u32 uVar3;
+    u32 iVar2;
+    u32 uVar4;
+    u32 uVar5;
 
-  u32 uVar5;
-  
-  uVar5 = lbl_8047B680;
-  iVar1 = fn_801653C4();
-  if (iVar1 == 0) {
-    uVar3 = 0;
-  }
-  else {
-    uVar3 = fn_801656D8();
-    fn_80165A20(1,0x32,0xff);
-  }
-  iVar2 = fn_801653BC();
-  if (iVar2 == 0) {
-    uVar4 = 0;
-  }
-  else {
-    uVar4 = fn_801656D8();
-    fn_801657D0(0x32);
-  }
-  fn_801DADC0(1);
-  fn_80265F94(uVar5);
-  fn_801DAC90();
-  if (iVar1 != 0) {
-    fn_80165A20(iVar1,0x32,uVar3);
-  }
-  if (iVar2 != 0) {
-    fn_801659FC(iVar2,0x32,uVar4);
-  }
-  fn_800FF660();
-  fn_8011288C(0,0x5960008);
-  return;
+    uVar5 = lbl_8047B680;
+    iVar1 = fn_801653C4();
+    if (iVar1 != 0) {
+        uVar3 = fn_801656D8();
+        fn_80165A20(1, 0x32, 0xff);
+    } else {
+        uVar3 = 0;
+    }
+    iVar2 = fn_801653BC();
+    if (iVar2 != 0) {
+        uVar4 = fn_801656D8();
+        fn_801657D0(0x32);
+    } else {
+        uVar4 = 0;
+    }
+    fn_801DADC0(1);
+    fn_80265F94(uVar5);
+    fn_801DAC90();
+    if (iVar1 != 0) {
+        fn_80165A20(iVar1, 0x32, uVar3);
+    }
+    if (iVar2 != 0) {
+        fn_801659FC(iVar2, 0x32, uVar4);
+    }
+    fn_800FF660();
+    fn_8011288C(0, 0x5960008);
 }
 /* Address: 0x8025E3B0 | Size: 0x184 | Ghidra import */
 
