@@ -705,7 +705,7 @@ void fn_800D2248(void) {
         if (jobj == 0) {
             fn_80196E10(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
         }
-        *(u32*)((u8*)jobj + 0x8) &= ~0x4u;
+        *(u32*)((u8*)jobj + 0x8) &= ~0x2u;
         fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
         w = fn_801944F8(*(void**)((u8*)obj + 0xc));
         h = fn_801944D0(*(void**)((u8*)obj + 0xc));
@@ -1055,6 +1055,8 @@ void fn_800D2B44(void* obj) {
  * fn_800D2B90 - GS render: set current lighting context
  * Address: 0x800D2B90, Size: 0x258
  * ================================================================== */
+#pragma push
+#pragma optimization_level 2
 void fn_800D2B90(void* arg1) {
     u32 savedColors[4];
     void* prevLight;
@@ -1095,18 +1097,19 @@ void fn_800D2B90(void* arg1) {
         u8 a = *(u8*)((u8*)arg1 + 0x13);
         f32 scale = lbl_8047C9F0;
         f32 fr, fg, fb2, fa;
-        fr = (f32)(r + 0x4330 * 65536) - (f32)lbl_8047C9F8;
-        fg = (f32)(g + 0x4330 * 65536) - (f32)lbl_8047C9F8;
-        fb2 = (f32)(b2 + 0x4330 * 65536) - (f32)lbl_8047C9F8;
-        fa = (f32)(a + 0x4330 * 65536) - (f32)lbl_8047C9F8;
+        fr = (f32)r;
+        fg = (f32)g;
+        fb2 = (f32)b2;
+        fa = (f32)a;
         fr = fr / scale;
         fg = fg / scale;
         fb2 = fb2 / scale;
         fa = fa / scale;
-        *(u8*)((u8*)lbl_8047AA80 + 0x1c) = (u8)(u32)(fr * scale);
-        *(u8*)((u8*)lbl_8047AA80 + 0x1d) = (u8)(u32)(fg * scale);
-        *(u8*)((u8*)lbl_8047AA80 + 0x1e) = (u8)(u32)(fb2 * scale);
-        *(u8*)((u8*)lbl_8047AA80 + 0x1f) = (u8)(u32)(fa * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x19) = 1;
+        *(u8*)((u8*)lbl_8047AA80 + 0x1c) = (u8)(s32)(fr * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1d) = (u8)(s32)(fg * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1e) = (u8)(s32)(fb2 * scale);
+        *(u8*)((u8*)lbl_8047AA80 + 0x1f) = (u8)(s32)(fa * scale);
         if (*(u8*)((u8*)lbl_8047AA80 + 0x1c) == 0 &&
             *(u8*)((u8*)lbl_8047AA80 + 0x1d) == 0 &&
             *(u8*)((u8*)lbl_8047AA80 + 0x1e) == 0 &&
@@ -1115,6 +1118,7 @@ void fn_800D2B90(void* arg1) {
         }
     }
 }
+#pragma pop
 
 /* ==================================================================
  * fn_800D2DE8 - GS render: sphere/ray intersection loop
