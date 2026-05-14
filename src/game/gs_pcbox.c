@@ -4795,29 +4795,28 @@ asm void fn_80019070(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80019070(u16 species) {
-    u32* base;
-    u32 ctr;
+    u8* r4;
     u32 r7;
     u32 r6;
-    u16 r0;
     u8* r5;
-    base = (u32*)lbl_803A1B90;
+    u32 ctr;
+    r4 = lbl_803A1B90;
     r7 = (u32)-1;
     r6 = 0;
-    ctr = *(u32*)(lbl_803A1B90 + 0x40);
-    r5 = lbl_803A1B90;
+    ctr = *(u32*)(r4 + 0x40);
+    r5 = r4;
+    species = (u16)species;
     if ((s32)ctr > 0) {
         do {
-            r0 = *(u16*)r5;
-            if ((u16)species == r0) {
+            if (species == *(u16*)r5) {
                 r7 = *(u32*)(lbl_803A1B90 + r6 * 8 + 4);
                 break;
             }
             r5 += 8;
             r6 += 1;
-        } while (--ctr != 0);
+        } while (--ctr);
     }
-    *(u32*)(lbl_803A1B90 + 0x40) = 0;
+    *(u32*)(r4 + 0x40) = 0;
     return r7;
 }
 #endif
