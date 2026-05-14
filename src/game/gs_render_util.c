@@ -844,7 +844,7 @@ void fn_800D258C(void* obj) {
  * ================================================================== */
 void fn_800D2738(void* obj) {
     void* jobj;
-    if ((void*)lbl_8047AA74 == obj) {
+    if (obj == (void*)lbl_8047AA74) {
         lbl_8047AA74 = (u32)0;
     }
     jobj = *(void**)((u8*)obj + 0xc);
