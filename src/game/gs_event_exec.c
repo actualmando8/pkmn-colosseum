@@ -1033,7 +1033,7 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
             delta = 5 - count;
             *(s16*)(tgt + 0x52) = (s16)(delta * 0x1F + lbl_802E4DB0[idx].a);
             if (lbl_802E4DB0[idx].flag != 0) {
-                *(s16*)(tgt + 0x56) = (s16)(lbl_802E4DB0[idx].b - delta);
+                *(s16*)(tgt + 0x56) = (s16)(lbl_802E4DB0[idx].b - delta * 0x1F);
             }
         }
     }
