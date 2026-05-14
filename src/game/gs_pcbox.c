@@ -146,7 +146,7 @@ extern void* memset(void* dst, int val, u32 n);
 extern u8 lbl_803A1D40[];
 extern u8 lbl_803A1C20[];
 extern u8 lbl_802E4EB8[];
-extern void fn_8001E074(void);
+extern s8 fn_8001E074(u8, s16, s16, u32);
 #if 0
 asm void fn_8001C064(void) {
 #include "src/game/gs_pcbox_fn_8001C064.inc"
@@ -156,7 +156,7 @@ void fn_8001C064(void) {
     extern u8 lbl_802E4EB8[];
     extern u8 lbl_803A1C20[];
     extern u8 lbl_803A1D40[];
-    extern void fn_8001E074();
+    extern s8 fn_8001E074(u8, s16, s16, u32);
     extern void fn_8006AEEC();
     extern void fn_80106D3C();
     extern void fn_8011FDC8();
@@ -408,8 +408,7 @@ do {
         r4 = -0x1;
         r5 = -0x1;
         r6 = 0x0;
-        fn_8001E074();
-        r24 = (s8)r3;
+        r24 = fn_8001E074((u8)r3, (s16)r4, (s16)r5, (u32)r6);
         r3 = 0x1;
         ((void(*)(void))fn_801069FC)();
         if ((s32)r24 != 0) {
@@ -693,7 +692,7 @@ extern s32 fn_801022B8();
 extern u32 fn_800F0308(void);
 extern void fn_801070F4(void);
 extern void fn_80121BB4(void);
-extern void fn_8001E074(void);
+extern s8 fn_8001E074(u8, s16, s16, u32);
 extern u32 fn_80019064(void);
 extern void fn_80018F54();
 extern void fn_8001D718(void);
@@ -2369,15 +2368,18 @@ void fn_8001DACC(void) {
 
 /* 0x64 | fn_8001DFA8 | generic_call_check_store */
 /* fn_8001DFA8 - 0x8001DFA8 | size: 0x64 */
-void fn_8001DFA8(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
-    void* result = (void*)fn_8005D8B8(arg1);
-    if (result == NULL) { return; }
-    /* store to offset 0x66 */
-    /* store to offset 0x65 */
-    /* store to offset 0x64 */
-    /* store to offset 0x66 */
-    /* store to offset 0x65 */
-    /* store to offset 0x64 */
+s32 fn_8001DFA8(u32 arg1, u8* arg2) {
+    extern u8 fn_8005D8B8(s16);
+    if (fn_8005D8B8(*(s16*)(arg2 + 0x6)) != 0) {
+        *(u8*)(arg2 + 0x66) = 0xff;
+        *(u8*)(arg2 + 0x65) = 0xff;
+        *(u8*)(arg2 + 0x64) = 0xff;
+    } else {
+        *(u8*)(arg2 + 0x66) = 0x80;
+        *(u8*)(arg2 + 0x65) = 0x80;
+        *(u8*)(arg2 + 0x64) = 0x80;
+    }
+    return 0;
 }
 
 /* 0x68 | fn_8001E00C | call_sequence */
@@ -2387,11 +2389,18 @@ asm void fn_8001E00C(void) {
 #include "src/game/gs_pcbox_fn_8001E00C.inc"
 }
 #else
-void fn_8001E00C(void) {
-    fn_801046B8();
-    fn_801026A4();
-    fn_80102568();
+#pragma push
+#pragma peephole off
+s32 fn_8001E00C(u32 sp8) {
+    extern void* fn_801046B8();
+    extern s32 fn_801026A4(s32, ...);
+    extern void fn_80102568(s32, s32, s32);
+    s32 r31;
+    r31 = fn_801026A4(0x43, fn_801046B8(), &sp8, 0, 1, 0);
+    fn_80102568(0x43, 0, 1);
+    return r31;
 }
+#pragma pop
 #endif
 
 /* 0x8001E3E0 | 0xD4 */
@@ -5166,19 +5175,19 @@ asm void fn_80019938(void) {
 #else
 #pragma optimization_level 4
 void fn_80019938(u8* a, u8* b) {
-    extern void fn_80132A38();
-    extern void fn_800FB680();
+    extern void fn_80132A38(s32, u32);
+    extern void fn_800FB680(s32, s32, s32, u32);
     u8* base;
     s16 r0;
     u32 r4;
     u32 r4v;
-    base = (u8*)((u32(*)(void))fn_80103FE4)();
+    base = fn_80103FE4();
     r0 = *(s16*)(b + 0x6);
+    r4 = 0x0;
     if (r0 == (s16)0xe93) r4 = 0x0;
     else if (r0 == (s16)0xe94) r4 = 0x1;
     else if (r0 == (s16)0xe95) r4 = 0x2;
     else if (r0 == (s16)0xe96) r4 = 0x3;
-    else r4 = 0x0;
     base = base + r4 * 0xc;
     r4v = *(u32*)(base + 0x4);
     if (r4v == 0) return;
@@ -6094,36 +6103,28 @@ asm void fn_8001E074(void) {
 }
 #else
 #pragma optimization_level 4
-void fn_8001E074(void) {
-    extern void fn_801046B8();
-    extern void fn_801026A4();
-    extern void fn_80102868();
-    extern void fn_801045A8();
-    extern void fn_801043A4();
-    extern void fn_80102568();
+s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
+    extern void* fn_801046B8();
+    extern s32 fn_801026A4(s32, ...);
+    extern void fn_80102868(s32, s16, s16);
+    extern void fn_801045A8(s32, s32);
+    extern u32 fn_801043A4(s32);
+    extern void fn_80102568(s32, s32, s32);
     u32 sp8;
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
+    s16 r30;
     s16 r31;
-    s32 r28;
-    s32 r29;
-    s32 r30;
-    sp8 = r6;
-    r28 = (s32)(s16)(u16)r4;
-    r29 = (s32)(s16)(u16)r5;
-    if ((s32)r6 == 0) sp8 = 1;
-    if ((u8)r3 == 0x0) r31 = 0x11;
-    else if ((u8)r3 == 0x1) r31 = 0x12;
-    else r31 = 0x44;
-    fn_801046B8();
-    fn_801026A4((s32)r31, r4, &sp8, 0, 0, 0, 0);
-    if (r28 >= 0 && r29 >= 0) fn_80102868((s32)r31, r28, r29);
+    sp8 = arg4;
+    if (arg4 != 0) sp8 = 1;
+    if ((u8)arg1 == 0x0) r30 = 0x11;
+    else if ((u8)arg1 == 0x1) r30 = 0x12;
+    else r30 = 0x44;
+    r31 = r30;
+    fn_801026A4((s32)r31, fn_801046B8(), &sp8, 0, 0, 0);
+    if (arg2 >= 0 && arg3 >= 0) fn_80102868((s32)r31, arg2, arg3);
     fn_801045A8((s32)r31, 0x1);
-    fn_801043A4((s32)r31);
-    r30 = (s8)(s32)r3;
+    r30 = (s8)fn_801043A4((s32)r31);
     fn_80102568((s32)r31, 0x0, 0x1);
+    return (s8)r30;
 }
 #endif
 
