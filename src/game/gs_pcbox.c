@@ -4819,15 +4819,17 @@ asm void fn_800190D8(void) {
 #include "src/game/gs_pcbox_fn_800190D8.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
 void fn_800190D8(u16 species, u32 data) {
-    u32 count;
+    s32 count;
     count = *(u32*)(lbl_803A1B90 + 0x40);
     if (count >= 0x8) return;
-    *(u16*)(lbl_803A1B90 + count * 8) = species;
-    *(u32*)(lbl_803A1B90 + count * 8 + 4) = data;
-    *(u32*)(lbl_803A1B90 + 0x40) = count + 1;
+    *(u16*)(lbl_803A1B90 + *(s32*)(lbl_803A1B90 + 0x40) * 8) = species;
+    *(u32*)(lbl_803A1B90 + *(s32*)(lbl_803A1B90 + 0x40) * 8 + 4) = data;
+    *(u32*)(lbl_803A1B90 + 0x40) = *(s32*)(lbl_803A1B90 + 0x40) + 1;
 }
+#pragma pop
 #endif
 
 /* fn_80019118 - 0x80019118 | size: 0xec */
@@ -5842,9 +5844,12 @@ asm void fn_8001BD80(void) {
 #include "src/game/gs_pcbox_fn_8001BD80.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 void fn_8001BD80(u8 a, u8 b, u32 c, u32 d) {
     extern u8 lbl_803A1D40[];
+    extern void fn_8001BAC4(u32, u32, u32, u32, u32, u32);
     if (a == 0x1) {
         *(u8*)(lbl_803A1D40 + 0x4) = 0x0;
     } else {
@@ -5853,6 +5858,7 @@ void fn_8001BD80(u8 a, u8 b, u32 c, u32 d) {
     *(u32*)(lbl_803A1D40 + 0x18) = d;
     fn_8001BAC4(0x2, 0x0, 0x0, (u16)(u8)b, c, 0x1);
 }
+#pragma pop
 #endif
 
 /* fn_8001BDF4 - 0x8001BDF4 | size: 0x44 */
