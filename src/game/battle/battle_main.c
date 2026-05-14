@@ -129,7 +129,15 @@ extern void fn_80265C84(void);
 extern void fn_80265C10(void);
 
 /* Sound check */
-extern void fn_801F54A4(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
+extern s32 fn_801F54A4(s32 a, s32 b, s32 c, s32 d); /* check/setup sound */
+
+/* Battle poké-slot helpers */
+extern void* fn_801F47B4(s32 a, u16 b);                    /* get battle slot ptr */
+extern void* fn_801F7258(void* a, u16 b);                  /* get slot member ptr */
+extern void* fn_801FB1C0(void* a, s32 b, s32 c, s32 d);   /* get checked handle */
+extern void  fn_801DA4E8(void* a, void* b);                /* dispatch event */
+extern void* fn_801F981C(void* a, u16 b);                  /* get item ptr */
+extern void* fn_8012640C(void* a, s32 b, s32 c, s32 d);   /* check item handle */
 
 /* =========================================================================
  * External data (BSS, SDA21-relative)
@@ -752,80 +760,34 @@ void fn_801EF7B4(void) {
 }
 
 /* 0x801EF7C4 | size: 0x130 | medium */
-void fn_801EF7C4(void) {
-    extern void fn_8012640C();
-    extern void fn_801DA4E8();
-    extern void fn_801F47B4();
-    extern void fn_801F7258();
-    extern void fn_801F981C();
-    extern void fn_801FB1C0();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+void fn_801EF7C4(void* arg) {
+    void *r31;
+    u16 r30, r29, r28, r27, r26;
+    void *r25;
+    void *_h;
 
-    r4 = 0x0;
-    r5 = 0x14;
-    r6 = 0x0;
-    r24 = r3;
-    r3 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x16;
-    r6 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
-    r27 = r3 & 0xFFFF;
-    r3 = 0x0;
-    r4 = 0x0;
-    r5 = 0x18;
-    r6 = 0x0;
-    ((void(*)(void))fn_801F54A4)();
-    r26 = r3 & 0xFFFF;
-    for (r28 = 0x0; (r28 & 0xFFFF) < 2; r28 = r28 + 0x1) {
-        r4 = r28;
-        r3 = 0x0;
-        fn_801F47B4();
-        /* mr. r31, r3 */;
-        if ((s32)tmp != 0) {
-            for (r30 = 0x0; (r30 & 0xFFFF) < r27; r30 = r30 + 0x1) {
-                r3 = r31;
-                r4 = r30;
-                fn_801F7258();
-                /* mr. r25, r3 */;
-                if ((s32)tmp == 0) continue;
-                r4 = 0x0;
-                r5 = 0x4c;
-                r6 = 0x0;
-                fn_801FB1C0();
-                if (r3 == 0) continue;
-                r4 = r24;
-                fn_801DA4E8();
-                for (r29 = 0x0; (r29 & 0xFFFF) < r26; r29 = r29 + 0x1) {
-                    r3 = r25;
-                    r4 = r29;
-                    fn_801F981C();
-                    if (r3 != 0) {
-                        r4 = 0x0;
-                        r5 = 0xee;
-                        r6 = 0x0;
-                        fn_8012640C();
-                        if (r3 != 0) {
-                            r4 = r24;
-                            fn_801DA4E8();
-                        }
-                    }
-                }
+    fn_801F54A4(0, 0, 0x14, 0);
+    r27 = fn_801F54A4(0, 0, 0x16, 0);
+    r26 = fn_801F54A4(0, 0, 0x18, 0);
+
+    for (r28 = 0; (u16)r28 < 2; r28++) {
+        r31 = fn_801F47B4(0, r28);
+        if (r31 == 0) continue;
+
+        for (r30 = 0; (u16)r30 < r27; r30++) {
+            r25 = fn_801F7258(r31, r30);
+            if (r25 == 0) continue;
+
+            _h = fn_801FB1C0(r25, 0, 0x4c, 0);
+            if (_h == 0) continue;
+            fn_801DA4E8(_h, arg);
+
+            for (r29 = 0; (u16)r29 < r26; r29++) {
+                _h = fn_801F981C(r25, r29);
+                if (_h == 0) continue;
+                _h = fn_8012640C(_h, 0, 0xee, 0);
+                if (_h == 0) continue;
+                fn_801DA4E8(_h, arg);
             }
         }
     }
