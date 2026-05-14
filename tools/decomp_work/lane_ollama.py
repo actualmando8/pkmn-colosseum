@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Lane 1: Ollama bulk generation (FREE — RTX 3090 + local CPU)"""
-import json, re, sys, time, urllib.request
+import json, os, re, sys, time, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent.parent
@@ -11,7 +11,7 @@ OLLAMA_LOCAL = "http://localhost:11434/api/generate"
 GPU_MODEL = "codestral:22b"
 LOCAL_MODEL = "qwen3:32b"
 KIMI_URL = "https://api.moonshot.ai/v1/chat/completions"
-KIMI_KEY = "sk-l70mzNdoCUzIQAcKC0WMEVEiXJzEV6ecSQYjvvhJ55IY7eHY"
+KIMI_KEY = os.environ.get("KIMI_API_KEY", "")
 
 QUEUE = ROOT / "tools" / "decomp_work" / "work_queue.json"
 CANDIDATES = ROOT / "tools" / "decomp_work" / "candidates"

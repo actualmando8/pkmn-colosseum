@@ -14,7 +14,7 @@ You are the orchestrator for a Pokémon Colosseum (GameCube) decompilation pipel
 
 ### Lane 2: Kimi K2.5 via Moonshot API (FREE, daily limited)
 - **API:** https://api.moonshot.ai/v1/chat/completions
-- **Key:** sk-l70mzNdoCUzIQAcKC0WMEVEiXJzEV6ecSQYjvvhJ55IY7eHY
+- **Key:** read from `$KIMI_API_KEY` environment variable
 - **Model:** kimi-k2-turbo-preview (100% structural, 1.9s/fn — FASTEST)
 - **Use for:** High-quality drafts when Ollama output is weak, second opinion
 
@@ -142,13 +142,13 @@ Run `python tools/decomp_scheduler.py --scan` to get the current queue.
 Here's how to process a batch efficiently:
 
 ```python
-import urllib.request, json, subprocess, re, time
+import os, urllib.request, json, subprocess, re, time
 from pathlib import Path
 
 ROOT = Path(".")
 OLLAMA = "http://10.0.0.3:11434/api/generate"
 KIMI = "https://api.moonshot.ai/v1/chat/completions"
-KIMI_KEY = "sk-l70mzNdoCUzIQAcKC0WMEVEiXJzEV6ecSQYjvvhJ55IY7eHY"
+KIMI_KEY = os.environ.get("KIMI_API_KEY", "")
 
 def call_ollama(prompt, model="codestral:22b"):
     payload = json.dumps({"model": model, "prompt": prompt, "stream": False,
