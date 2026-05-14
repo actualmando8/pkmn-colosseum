@@ -5257,11 +5257,14 @@ asm void fn_80019B1C(void) {
 #include "src/game/gs_pcbox_fn_80019B1C.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_80019B1C(void) {
     extern void fn_80102568();
     fn_80102568(0x42, 0x0, 0x1);
 }
+#pragma pop
 #endif
 
 /* fn_80019B48 - 0x80019B48 | size: 0x214 */
