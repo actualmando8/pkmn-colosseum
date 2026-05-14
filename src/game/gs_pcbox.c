@@ -5806,13 +5806,16 @@ asm void fn_8001BCEC(void) {
 #include "src/game/gs_pcbox_fn_8001BCEC.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 void fn_8001BCEC(u32 a, u32 b, u32 c, u32 d) {
     extern u8 lbl_803A1D40[];
-    typedef void(*BAC4fn)(u32,u32,u32,u32,u32,u32);
+    extern void fn_8001BAC4(u32, u32, u32, u32, u32, u32);
     *(u8*)(lbl_803A1D40 + 0x4) = 0x1;
-    ((BAC4fn)fn_8001BAC4)(0x5, a, b, c, d, 0x1);
+    fn_8001BAC4(0x5, a, b, c, d, 0x1);
 }
+#pragma pop
 #endif
 
 /* fn_8001BD3C - 0x8001BD3C | size: 0x44 */
