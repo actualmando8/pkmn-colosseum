@@ -357,18 +357,20 @@ asm void fn_800373C8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void fn_800373C8(u8* ctx, u8* p) {
     s32 v;
     v = (s32)*(f32*)(lbl_803A654C + 0x58);
     if ((s16)v < -(s16)0xff) { v = -(s32)0xff; }
     p[0x67] = (u8)(v + 0xff);
-    *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A64EC + 0x54) + *(f32*)(lbl_803A654C + 0x58));
+    *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A64EC + 0x54) + *(f32*)(lbl_803A654C + 0x58));
     if ((s8)ctx[0x95] == 3) {
         p[0x64] = 0xff; p[0x65] = 0xff; p[0x66] = 0xff;
     } else {
         p[0x64] = 0x46; p[0x65] = 0x8f; p[0x66] = 0xb4;
     }
 }
+#pragma peephole on
 #endif
 
 /* fn_80037468 - 0x80037468 | size: 0xa0 */
@@ -378,18 +380,20 @@ asm void fn_80037468(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void fn_80037468(u8* ctx, u8* p) {
     s32 v;
     v = (s32)*(f32*)(lbl_803A654C + 0x40);
     if ((s16)v < -(s16)0xff) { v = -(s32)0xff; }
     p[0x67] = (u8)(v + 0xff);
-    *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A64EC + 0x3c) + *(f32*)(lbl_803A654C + 0x40));
+    *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A64EC + 0x3c) + *(f32*)(lbl_803A654C + 0x40));
     if ((s8)ctx[0x95] == 2) {
         p[0x64] = 0xff; p[0x65] = 0xff; p[0x66] = 0xff;
     } else {
         p[0x64] = 0x46; p[0x65] = 0x8f; p[0x66] = 0xb4;
     }
 }
+#pragma peephole on
 #endif
 
 /* fn_80037508 - 0x80037508 | size: 0xa0 */
@@ -399,18 +403,20 @@ asm void fn_80037508(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void fn_80037508(u8* ctx, u8* p) {
     s32 v;
     v = (s32)*(f32*)(lbl_803A654C + 0x28);
     if ((s16)v < -(s16)0xff) { v = -(s32)0xff; }
     p[0x67] = (u8)(v + 0xff);
-    *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A64EC + 0x24) + *(f32*)(lbl_803A654C + 0x28));
+    *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A64EC + 0x24) + *(f32*)(lbl_803A654C + 0x28));
     if ((s8)ctx[0x95] == 1) {
         p[0x64] = 0xff; p[0x65] = 0xff; p[0x66] = 0xff;
     } else {
         p[0x64] = 0x46; p[0x65] = 0x8f; p[0x66] = 0xb4;
     }
 }
+#pragma peephole on
 #endif
 
 /* fn_800375A8 - 0x800375A8 | size: 0xa0 */
@@ -420,18 +426,20 @@ asm void fn_800375A8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma peephole off
 void fn_800375A8(u8* ctx, u8* p) {
     s32 v;
     v = (s32)*(f32*)(lbl_803A654C + 0x10);
     if ((s16)v < -(s16)0xff) { v = -(s32)0xff; }
     p[0x67] = (u8)(v + 0xff);
-    *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A64EC + 0x0c) + *(f32*)(lbl_803A654C + 0x10));
+    *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A64EC + 0x0c) + *(f32*)(lbl_803A654C + 0x10));
     if ((s8)ctx[0x95] == 0) {
         p[0x64] = 0xff; p[0x65] = 0xff; p[0x66] = 0xff;
     } else {
         p[0x64] = 0x46; p[0x65] = 0x8f; p[0x66] = 0xb4;
     }
 }
+#pragma peephole on
 #endif
 
 /* fn_80037648 - 0x80037648 | size: 0x80 */
@@ -923,6 +931,7 @@ asm void fn_800388C4(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_800388C4(void) {
     fn_80102568(0x19, 0, 1);
     fn_80102568(0x1a, 0, 1);
@@ -936,6 +945,7 @@ void fn_800388C4(void) {
     fn_80102568(0x23, 0, 1);
     fn_80102568(0x1d, 0, 1);
 }
+#pragma scheduling on
 #endif
 
 /* fn_80038990 - 0x80038990 | size: 0x70 */
