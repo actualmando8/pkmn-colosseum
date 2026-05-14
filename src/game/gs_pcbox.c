@@ -5596,6 +5596,7 @@ s32 fn_8001AF44(s32 ctx) {
     u32 result;
     s32 i;
     u8* iter;
+    s32 byte_off;
 
     result = fn_801040D0(ctx, 0);
     if (result == 0) return 0;
@@ -5603,7 +5604,7 @@ s32 fn_8001AF44(s32 ctx) {
     if ((s8)*((u8*)ctx + 1) == 0) {
         *((s8*)ctx + 0x97) = -1;
         if ((s8)*((u8*)ctx + 2) == 0) {
-            s32 byte_off = 0;
+            byte_off = 0;
             iter = (u8*)result;
             for (i = 0; i < 6; i++) {
                 s16 sy, sx;
@@ -5634,7 +5635,7 @@ s32 fn_8001AF44(s32 ctx) {
         }
     } else if ((s8)*((u8*)ctx + 1) == 3) {
         if ((s8)*((u8*)ctx + 2) == 0) {
-            s32 byte_off = 0;
+            byte_off = 0;
             for (i = 0; i < 6; i++) {
                 s16 sy, sx;
                 s16 npcId;
