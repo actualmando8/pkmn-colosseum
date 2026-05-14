@@ -4951,8 +4951,7 @@ s32 fn_80019118(u8* a, u8* b) {
     }
     fn_80109220(b, r30);
     if ((u8)r30 != 0) {
-        r0 = (s32)(*(f32*)&lbl_8047B7A0 * (*(f32*)&lbl_8047B7A4 - *(f32*)&lbl_8047A300));
-        *(u8*)(b + 0x67) = r0;
+        *(u8*)(b + 0x67) = (s32)(*(f32*)&lbl_8047B7A0 * (*(f32*)&lbl_8047B7A4 - *(f32*)&lbl_8047A300));
     }
     return 0;
 }
@@ -6185,16 +6184,16 @@ asm void fn_8001E184(void) {
 #pragma optimization_level 4
 s32 fn_8001E184(void) {
     extern void* fn_801046B8();
-    extern void fn_801026A4();
+    extern void fn_801026A4(s32, ...);
     extern void fn_801045A8();
     extern u32 fn_801043A4();
     extern void fn_80102568();
     u32 sp8;
-    s32 r31;
+    s8 r31;
     sp8 = 0;
     fn_801026A4(0x12, fn_801046B8(), &sp8, 0, 0, 0);
     fn_801045A8(0x12, 0x1);
-    r31 = (s8)(s32)fn_801043A4(0x12);
+    r31 = (s8)fn_801043A4(0x12);
     fn_80102568(0x12, 0x0, 0x1);
     return r31;
 }
@@ -6206,11 +6205,14 @@ asm void fn_8001E200(void) {
 #include "src/game/gs_pcbox_fn_8001E200.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma scheduling on
 void fn_8001E200(void) {
     extern void fn_80102510();
     fn_80102510(0x2);
 }
+#pragma pop
 #endif
 
 /* fn_8001E224 - 0x8001E224 | size: 0xe0 */
@@ -6219,23 +6221,24 @@ asm void fn_8001E224(void) {
 #include "src/game/gs_pcbox_fn_8001E224.inc"
 }
 #else
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     extern void* fn_801046B8();
-    extern void fn_801026A4();
+    extern void fn_801026A4(s32, ...);
     extern void fn_80102868();
     extern void fn_801045A8();
     extern void fn_801043A4();
     extern u8* fn_80104704();
     extern void fn_80102510();
-    u32 sp8;
     void* r4;
     u8* r3;
     s32 r31;
-    sp8 = 0;
+    u8 c_val;
     r31 = 0;
     r4 = fn_801046B8();
-    fn_801026A4(0x2, r4, &sp8, 0, 0, 0, 0x3, a, (u32)c);
+    c_val = c;
+    fn_801026A4(0x2, r4, 0, 0, 0, 0x3, a, c_val, 0);
     fn_80102868(0x2, d, e);
     fn_801045A8(0x2, 0x1);
     fn_801043A4(0x2);
@@ -6247,6 +6250,7 @@ s32 fn_8001E224(void* a, u32* b, u8 c, void* d, void* e, u8 f) {
     }
     return r31;
 }
+#pragma peephole reset
 #endif
 
 /* fn_8001E304 - 0x8001E304 | size: 0xdc */
