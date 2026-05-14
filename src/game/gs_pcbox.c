@@ -6046,17 +6046,20 @@ asm void fn_8001DA60(void) {
 #include "src/game/gs_pcbox_fn_8001DA60.inc"
 }
 #else
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_8001DA60(void* a) {
+    extern u8 fn_80123FBC();
     extern u32 fn_8011F5C8();
     extern u32 fn_801231A4();
     u32 r3;
-    r3 = ((u32(*)(void))fn_80123FBC)();
+    r3 = fn_80123FBC();
     if ((r3 & 0xFF) == 0) return (s32)0xFF;
     r3 = fn_8011F5C8(a);
     if ((r3 & 0xFFFF) == 0x1d || (r3 & 0xFFFF) == 0x20) return 0x2;
     return (s32)fn_801231A4(a);
 }
+#pragma peephole reset
 #endif
 
 /* fn_8001E074 - 0x8001E074 | size: 0x110 */
