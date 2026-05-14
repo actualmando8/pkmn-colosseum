@@ -430,14 +430,13 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     s32   i;
     entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
-    idx = -1;
-    i = 0;
-
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
     }
+    idx = -1;
+    i = 0;
     while (i < *(u16*)buf) {
         if (fn_801429E8(list)) {
             idx++;
@@ -454,13 +453,14 @@ after:
     if (fn_80129A78(lbl_8047A2F8, idx, 1, -1) > 0) {
         fn_80106D3C(2, 0x4263, 1, 0);
         fn_801069FC(1);
+        *out = 0;
     } else {
         fn_8012959C(lbl_8047A2F8, idx, 1, (s16)target_n);
         fn_80132A38(0x2d, (u16)idx);
         fn_80106D3C(2, 0x4268, 1, 0);
         fn_801069FC(1);
+        *out = 0;
     }
-    *out = 0;
     return 0;
 }
 #pragma pop
