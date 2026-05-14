@@ -5593,7 +5593,7 @@ s32 fn_8001AF44(s32 ctx) {
     extern u8 lbl_803A1D40[];
     extern u8 lbl_802E4E58[];
     extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
-    s32 result;
+    u32 result;
     s32 i;
     u8* iter;
 
@@ -5606,7 +5606,7 @@ s32 fn_8001AF44(s32 ctx) {
             s32 byte_off = 0;
             iter = (u8*)result;
             for (i = 0; i < 6; i++) {
-                u16 sx, sy;
+                s16 sy, sx;
                 s16 npcId;
                 u8* slot;
                 s32 state;
@@ -5621,9 +5621,9 @@ s32 fn_8001AF44(s32 ctx) {
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 npcId = *(s16*)(slot + byte_off);
-                fn_8005D95C(npcId, &sx, &sy);
-                if ((s32)(s16)sx <= 0xfa) state = 0x11e;
-                else state = 0x116;
+                fn_8005D95C(npcId, (u16*)&sx, (u16*)&sy);
+                if (sx > 0xfa) state = 0x116;
+                else state = 0x11e;
                 fn_801080CC((void*)(s32)npcId, state);
 
                 byte_off += 8;
@@ -5636,16 +5636,16 @@ s32 fn_8001AF44(s32 ctx) {
         if ((s8)*((u8*)ctx + 2) == 0) {
             s32 byte_off = 0;
             for (i = 0; i < 6; i++) {
-                u16 sx, sy;
+                s16 sy, sx;
                 s16 npcId;
                 u8* slot;
                 s32 state;
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
                 npcId = *(s16*)(slot + byte_off);
-                fn_8005D95C(npcId, &sx, &sy);
-                if ((s32)(s16)sx <= 0xfa) state = 0x122;
-                else state = 0x11a;
+                fn_8005D95C(npcId, (u16*)&sx, (u16*)&sy);
+                if (sx > 0xfa) state = 0x11a;
+                else state = 0x122;
                 fn_801080CC((void*)(s32)npcId, state);
 
                 byte_off += 8;
@@ -5666,7 +5666,9 @@ asm void fn_8001B184(void) {
 #include "src/game/gs_pcbox_fn_8001B184.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma scheduling off
 void fn_8001B184(void) {
     extern u8 lbl_803A1D40[];
     extern void fn_80102568();
@@ -5680,6 +5682,7 @@ void fn_8001B184(void) {
         fn_800F0308();
     }
 }
+#pragma pop
 #endif
 
 /* fn_8001B1EC - 0x8001B1EC | size: 0x8d8 */
