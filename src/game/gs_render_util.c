@@ -1195,8 +1195,9 @@ s32 fn_800D2F34(void* arg1, void* arg2) {
     }
     fn_800DFF98(testOut, sphere, arg1);
     {
+        f32 t = *(volatile f32*)&testOut[2];
         f32 model2c = *(f32*)((u8*)model + 0x2c);
-        if (testOut[2] >= model2c) {
+        if (t >= model2c) {
             return 1;
         }
         center[0] = lbl_8047CA00;
