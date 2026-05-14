@@ -479,13 +479,13 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
     s32   i;
     entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
-    idx = -1;
-    i = 0;
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
     }
+    idx = -1;
+    i = 0;
     while (i < *(u16*)buf) {
         if (fn_801429E8(list)) {
             idx++;
@@ -550,13 +550,13 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     s32   x;
     entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
-    idx = -1;
-    i = 0;
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
     }
+    idx = -1;
+    i = 0;
     while (i < *(u16*)buf) {
         if (fn_801429E8(list)) {
             idx++;
@@ -570,7 +570,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     }
     idx = 0;
 after:
-    fn_801440A0((u16)idx);
+    fn_801440A0(idx);
     if (fn_80143E88() != 0xFF) {
         fn_80132A38(0x2d, (u16)idx);
         fn_80106D3C(2, 0x4262, 1, 0);
@@ -578,7 +578,7 @@ after:
         *out = 0;
         return 0;
     }
-    fn_801440A0((u16)idx);
+    fn_801440A0(idx);
     x = (u8)fn_80144014();
     fn_80102568(0x59, 0, 1);
     lbl_8047A2EC = fn_8001BCEC((u8)x, (u8)target_n, idx, 0);
@@ -611,13 +611,13 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
     u16   id;
     entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
-    idx = -1;
-    i = 0;
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
     } else {
         list = fn_801297D8(lbl_8047A2F8, buf, 0, 0, 0);
     }
+    idx = -1;
+    i = 0;
     while (i < *(u16*)buf) {
         if (fn_801429E8(list)) {
             idx++;
@@ -633,10 +633,10 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
 after:
     id = (u16)idx;
     fn_801440A0(id);
-    if ((s32)lbl_8047A2E0 != 0) {
-        fp = fn_80143DCC();
-    } else {
+    if ((s32)lbl_8047A2E0 == 0) {
         fp = fn_80143DE4();
+    } else {
+        fp = fn_80143DCC();
     }
     if (fp == 0) {
         fn_80106D3C(2, 0x4261, 1, 0);
@@ -1069,7 +1069,7 @@ s32 fn_80014E50(u8* ctx) {
                 new_slot = slot;
             }
         }
-        ctx[0x95] = (s8)new_slot;
+        *(s8*)(ctx + 0x95) = new_slot;
     }
     if ((*(volatile u16*)(state + 6) & 1) != 0) {
         slot  = (s32)(s8)ctx[0x95];
@@ -1084,7 +1084,7 @@ s32 fn_80014E50(u8* ctx) {
                 new_slot = slot;
             }
         }
-        ctx[0x95] = (s8)new_slot;
+        *(s8*)(ctx + 0x95) = new_slot;
     }
     return 0;
 }
