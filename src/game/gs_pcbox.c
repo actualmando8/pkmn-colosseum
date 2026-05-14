@@ -5536,13 +5536,18 @@ asm void fn_8001AA98(void) {
 #include "src/game/gs_pcbox_fn_8001AA98.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 void fn_8001AA98(u8* a) {
     extern u8 lbl_803A1D40[];
     extern u32 fn_80105624();
     extern u32 fn_801022B8();
-    u32 r3;
+    extern void fn_80166A28(u32);
+    extern void fn_80102ED4(u8*);
+    s32 r3;
     u32 r31;
+    u32 r3b;
     r31 = 0;
     if (*(u8*)(lbl_803A1D40 + 0x1) == 0) {
         *(u8*)(a + 0x98) = 0x1;
@@ -5551,22 +5556,23 @@ void fn_8001AA98(u8* a) {
     r3 = fn_80105624();
     r3 = *(u16*)((u8*)r3 + 0x4);
     if ((r3 & 0x10) != 0) {
-        r3 = fn_801022B8(*(u32*)(a + 0x4));
-        if ((r3 & 0xFFFF) == 0x3b6) r31 = 1;
+        r3b = fn_801022B8(*(u32*)(a + 0x4));
+        if ((r3b & 0xFFFF) == 0x3b6) r31 = 1;
     } else if ((r3 & 0x20) != 0) {
         r31 = 1;
     }
-    if (r31 != 0) {
+    if ((u8)r31 != 0) {
         if (*(u8*)(lbl_803A1D40 + 0x15) == 0) {
-            ((void(*)(u32))fn_80166A28)(0x26);
+            fn_80166A28(0x26);
             return;
         }
         *(u8*)(a + 0x98) = 0x1;
         *(u8*)(a + 0x99) = 0x1;
         return;
     }
-    ((void(*)(u8*))fn_80102ED4)(a);
+    fn_80102ED4(a);
 }
+#pragma pop
 #endif
 
 /* fn_8001AB70 - 0x8001AB70 | size: 0x3d4 */
