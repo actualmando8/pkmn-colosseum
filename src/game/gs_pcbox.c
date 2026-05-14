@@ -2439,77 +2439,28 @@ asm void fn_8001E4B4(void) {
 #include "src/game/gs_pcbox_fn_8001E4B4.inc"
 }
 #else
-void fn_8001E4B4(void) {
-    extern u8 lbl_80314E08[];
-    extern void fn_800D5CB8();
-    extern void fn_800D61E4();
+#pragma optimization_level 4
+void fn_8001E4B4(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f) {
+    extern void fn_800D5CB8(s32, s32, s32, s32, s32);
+    extern void fn_800D61E4(s32, s32);
     extern void fn_800D6728();
-    extern void fn_800D67BC();
-    extern void fn_800D6A00();
-    extern void fn_800D7820();
-    extern void fn_800D888C();
-    extern void fn_800D88DC();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r26 = r3;
-    r27 = r4;
-    r28 = r5;
-    r29 = r6;
-    r30 = r7;
-    r31 = r8;
-    r3 = 0x1;
-    fn_800D88DC();
-    r3 = 0x6;
-    fn_800D888C();
-    r3 = 0x3;
-    fn_800D6A00();
-    r3 = (u32)lbl_80314E08;
-    r3 = (u32)lbl_80314E08;
-    fn_800D7820();
-    r3 = 0x3;
-    fn_800D67BC();
-    r3 = (s16)r26;
-    r4 = (s16)r27;
-    fn_800D61E4();
-    r3 = 0x0;
-    r4 = 0xff;
-    r5 = 0xff;
-    r6 = 0xff;
-    r7 = 0xff;
-    fn_800D5CB8();
-    r3 = (s16)r28;
-    r4 = (s16)r29;
-    fn_800D61E4();
-    r3 = 0x0;
-    r4 = 0xff;
-    r5 = 0xff;
-    r6 = 0xff;
-    r7 = 0xff;
-    fn_800D5CB8();
-    r3 = (s16)r30;
-    r4 = (s16)r31;
-    fn_800D61E4();
-    r3 = 0x0;
-    r4 = 0xff;
-    r5 = 0xff;
-    r6 = 0xff;
-    r7 = 0xff;
-    fn_800D5CB8();
+    extern void fn_800D67BC(s32);
+    extern void fn_800D6A00(s32);
+    extern void fn_800D7820(u8*);
+    extern void fn_800D888C(s32);
+    extern void fn_800D88DC(s32);
+    fn_800D88DC(0x1);
+    fn_800D888C(0x6);
+    fn_800D6A00(0x3);
+    fn_800D7820(lbl_80314E08);
+    fn_800D67BC(0x3);
+    fn_800D61E4((s16)a, (s16)b);
+    fn_800D5CB8(0x0, 0xff, 0xff, 0xff, 0xff);
+    fn_800D61E4((s16)c, (s16)d);
+    fn_800D5CB8(0x0, 0xff, 0xff, 0xff, 0xff);
+    fn_800D61E4((s16)e, (s16)f);
+    fn_800D5CB8(0x0, 0xff, 0xff, 0xff, 0xff);
     fn_800D6728();
-    return;
 }
 #endif
 
