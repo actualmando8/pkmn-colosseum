@@ -2400,69 +2400,36 @@ asm void fn_8001E3E0(void) {
 #include "src/game/gs_pcbox_fn_8001E3E0.inc"
 }
 #else
-void fn_8001E3E0(void) {
-    extern void fn_80102510();
-    extern void fn_801026A4();
+#pragma peephole off
+#pragma optimization_level 4
+s32 fn_8001E3E0(void* a, u32* b) {
+    extern void* fn_801046B8();
+    extern void fn_801026A4(s32, ...);
     extern void fn_80102868();
     extern void fn_801043A4();
     extern void fn_801045A8();
-    extern void fn_801046B8();
-    extern void fn_80104704();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    r29 = r3;
-    r30 = r4;
-    r31 = 0x0;
-    fn_801046B8();
-    tmp = 0x0;
-    r4 = r3;
-    *(u32*)(sp + 0x8) = tmp;
-    r9 = r29;
-    r3 = 0x2;
-    r5 = 0x0;
-    r6 = 0x0;
-    r7 = 0x0;
-    r8 = 0x3;
-    r10 = 0x1;
-    fn_801026A4();
-    r3 = 0x2;
-    r4 = 0x32;
-    r5 = 0x3c;
-    fn_80102868();
-    r3 = 0x2;
-    r4 = 0x1;
-    fn_801045A8();
-    r3 = 0x2;
-    fn_801043A4();
-    r3 = 0x2;
-    fn_80104704();
+    extern u8* fn_80104704();
+    extern void fn_80102510();
+    void* r4_tmp;
+    u8* r3;
+    s32 r31;
+    void* a_save;
+    r31 = 0;
+    r4_tmp = fn_801046B8();
+    a_save = a;
+    fn_801026A4(0x2, r4_tmp, 0, 0, 0, 0x3, a_save, 0x1, 0);
+    fn_80102868(0x2, 0x32, 0x3c);
+    fn_801045A8(0x2, 0x1);
+    fn_801043A4(0x2);
+    r3 = fn_80104704(0x2);
     if (r3 != 0) {
-        if (r30 != 0) {
-            tmp = *(u32*)((u8*)r3 + 0x80);
-            *(u32*)((u8*)r30 + 0x0) = tmp;
-        }
-        tmp = *(u8*)((u8*)r3 + 0x99);
-        if (tmp == 0) {
-            r31 = 0x1;
-        }
-        r3 = 0x2;
-        fn_80102510();
+        if (b != 0) *b = *(u32*)(r3 + 0x80);
+        if (*(u8*)(r3 + 0x99) == 0) r31 = 1;
+        fn_80102510(0x2);
     }
-    r3 = r31;
-    return;
+    return r31;
 }
+#pragma peephole reset
 #endif
 
 /* 0x8001E4B4 | 0xD8 */
