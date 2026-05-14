@@ -5067,34 +5067,37 @@ asm void fn_800195E0(void) {
 #include "src/game/gs_pcbox_fn_800195E0.inc"
 }
 #else
+#pragma peephole off
 #pragma optimization_level 4
 s32 fn_800195E0(u8* a) {
-    extern void fn_80105624();
+    extern u8* fn_80105624();
     u8* r3;
     u8* r30;
     u32 r31;
-    u32 r5;
-    u32 r0;
+    s32 r5;
+    s32 r0;
     s32 r4;
     r30 = a;
     r31 = *(u32*)(a + 0x60);
-    r3 = (u8*)((u8*(*)(void))fn_80105624)();
-    r5 = *(u32*)((u8*)r31 + 0xC);
+    r3 = fn_80105624();
+    r5 = *(s32*)((u8*)r31 + 0xC);
     r0 = *(u16*)(r3 + 0x6) & 0x2;
     if (r0 != 0) {
         r4 = (s32)(s8)*(u8*)(r30 + 0x95);
-        r0 = (u32)(r4 + 1);
-        if ((s32)r0 >= (s32)r5) r0 = r5 - 1;
-        *(u8*)(r30 + 0x95) = (u8)(s8)(s32)r0;
+        r0 = r4 + 1;
+        if (r0 >= r5) r0 = r5 - 1;
+        *(s8*)(r30 + 0x95) = (s8)r0;
     }
     r0 = *(u16*)(r3 + 0x6) & 0x1;
     if (r0 != 0) {
-        r4 = (s32)(s8)*(u8*)(r30 + 0x95) - 1;
-        if (r4 < 0) r4 = 0;
-        *(u8*)(r30 + 0x95) = (u8)(s8)r4;
+        r4 = (s32)(s8)*(u8*)(r30 + 0x95);
+        r0 = r4 - 1;
+        if (r0 < 0) r0 = 0;
+        *(s8*)(r30 + 0x95) = (s8)r0;
     }
     return 0;
 }
+#pragma peephole reset
 #endif
 
 /* fn_80019680 - 0x80019680 | size: 0xd4 */
