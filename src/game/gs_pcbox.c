@@ -6207,7 +6207,7 @@ asm void fn_8001E200(void) {
 #else
 #pragma push
 #pragma optimization_level 4
-#pragma scheduling on
+#pragma scheduling off
 void fn_8001E200(void) {
     extern void fn_80102510();
     fn_80102510(0x2);
