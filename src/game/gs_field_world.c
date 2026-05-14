@@ -15889,7 +15889,7 @@ u8 fn_801231A4(u8* ptr)
     if ((s8)result >= 0) {
         goto done;
     }
-    if (threshold <= (u8)count) {
+    if ((u16)threshold <= (u16)(u8)count) {
         goto zero;
     }
     result = 1;
@@ -19181,7 +19181,7 @@ asm void fn_80129514(void) {
 #include "src/game/gs_field_world_fn_80129514.inc"
 }
 #else
-void fn_80129514(u8* ptr, u16 arg2, u16 arg3) {
+void fn_80129514(u8* ptr, s32 arg2, s32 arg3) {
     extern void* fn_8012A5B0(u8* a, u32 b, u32 c);
     extern void fn_80140A9C(u8* a, u8* b);
     u16 local;
@@ -19257,7 +19257,7 @@ u32 fn_80129718(u8* ptr, u32 arg2) {
     if (&local_8 != NULL) { local_8 = 1; }
     val = fn_8012A5B0(ptr, 0xa, 0);
     if (val == NULL) { return 0; }
-    if (fn_80142368(val, local_a, arg2, 1, local_8) != 0) { return 1; }
+    if ((u32)fn_80142368(val, local_a, arg2, 1, local_8) != 0) { return 1; }
     return fn_80142368(val, local_a, arg2, 2, local_8) != 0;
 }
 #endif
@@ -27161,7 +27161,7 @@ asm void fn_8011E1D4(void) {
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E1D4(u8* ptr, u16 idx) {
+u8 fn_8011E1D4(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -27183,7 +27183,7 @@ asm void fn_8011E21C(void) {
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E21C(u8* ptr, u16 idx) {
+u16 fn_8011E21C(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -27205,7 +27205,7 @@ asm void fn_8011E264(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_8011E264(u8* ptr, u16 idx) {
+u32 fn_8011E264(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -27227,7 +27227,7 @@ asm void fn_8011E2DC(void) {
 }
 #else
 #pragma optimization_level 4
-u16 fn_8011E2DC(u8* ptr, u16 idx) {
+u16 fn_8011E2DC(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
@@ -27249,7 +27249,7 @@ asm void fn_8011E324(void) {
 }
 #else
 #pragma optimization_level 4
-u8 fn_8011E324(u8* ptr, u16 idx) {
+u8 fn_8011E324(u8* ptr, s32 idx) {
     u8* elem;
 
     if (ptr == NULL) {
