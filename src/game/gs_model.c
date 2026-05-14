@@ -1687,9 +1687,9 @@ void* fn_80109290(void* root) {
             if (flag == 0) {
                 memset(r31, 0, 0x78);
                 *(u8*)((u8*)r31 + 0x4) = 7;
-                *(s32*)((u8*)r31 + 0x64) = -1;
                 *(f32*)((u8*)r31 + 0x68) = lbl_8047CE3C;
                 *(f32*)((u8*)r31 + 0x6c) = lbl_8047CE3C;
+                *(s32*)((u8*)r31 + 0x64) = -1;
                 /* insert into list rooted at r30 */
                 {
                     void* cur = r30;
