@@ -76,6 +76,8 @@ u8 fn_80131574(u32 idx) {
 }
 
 /* 0x80131630 | 0x30 -- read byte from stream, store extsb to obj+0x43 if flag set */
+#pragma push
+#pragma optimization_level 2
 u32 fn_80131630(void* obj) {
     u8* stream;
     if (*(u8*)((u8*)obj + 0x01) != 0) {
@@ -86,8 +88,11 @@ u32 fn_80131630(void* obj) {
     *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
     return 0;
 }
+#pragma pop
 
 /* 0x80131660 | 0x30 -- read byte from stream, store extsb to obj+0x42 if flag set */
+#pragma push
+#pragma optimization_level 2
 u32 fn_80131660(void* obj) {
     u8* stream;
     if (*(u8*)((u8*)obj + 0x01) != 0) {
@@ -98,6 +103,7 @@ u32 fn_80131660(void* obj) {
     *(u32*)((u8*)obj + 0x30) = (u32)(stream + 1);
     return 0;
 }
+#pragma pop
 
 /* 0x80131690 | 16 bytes | set_field_return */
 u32 fn_80131690(void* obj) {
@@ -822,6 +828,8 @@ asm void fn_80131F04(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 void fn_80131F04(void) {
     extern u32 lbl_8047AE10;
     extern u32 fn_801F4354(u32, u32);
@@ -841,6 +849,7 @@ void fn_80131F04(void) {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #pragma pop
 #endif
 
@@ -886,6 +895,8 @@ asm void fn_80131FF4(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 void fn_80131FF4(void) {
     extern u32 lbl_8047ADE0;
     extern u32 fn_801F4354(u32, u32);
@@ -906,6 +917,7 @@ void fn_80131FF4(void) {
     }
 }
 #pragma pop
+#pragma pop
 #endif
 
 /* 0x8013208C | 0x98 */
@@ -917,6 +929,8 @@ asm void fn_8013208C(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 void fn_8013208C(void) {
     extern u32 lbl_8047ADDC;
     extern u32 fn_801F4354(u32, u32);
@@ -937,6 +951,7 @@ void fn_8013208C(void) {
     }
 }
 #pragma pop
+#pragma pop
 #endif
 
 /* 0x80132124 | 0x98 */
@@ -948,6 +963,8 @@ asm void fn_80132124(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 void fn_80132124(void) {
     extern u32 lbl_8047ADD8;
     extern u32 fn_801F4354(u32, u32);
@@ -968,6 +985,7 @@ void fn_80132124(void) {
     }
 }
 #pragma pop
+#pragma pop
 #endif
 
 /* 0x801321BC | 0x98 */
@@ -979,6 +997,8 @@ asm void fn_801321BC(void) {
 #else
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 void fn_801321BC(void) {
     extern u32 lbl_8047ADD4;
     extern u32 fn_801F4354(u32, u32);
@@ -998,6 +1018,7 @@ void fn_801321BC(void) {
         fn_802037DC(val);
     }
 }
+#pragma pop
 #pragma pop
 #endif
 
@@ -1454,6 +1475,8 @@ asm void fn_80132A38(void) {
 #include "src/game/effect/effect_util_fn_80132A38.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80132A38(u32 id, u32 value) {
     switch (id) {
     case 0x0D: lbl_8047AE50 = (u16)value; return;
@@ -1516,6 +1539,7 @@ void fn_80132A38(u32 id, u32 value) {
     case 0x5D: lbl_8047AE4C = value; return;
     }
 }
+#pragma pop
 #endif
 
 /* 0x80132C48 | 36 bytes | multi_sda_store */
@@ -3719,6 +3743,8 @@ asm void fn_8013583C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma optimization_level 1
 void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
     void* base; u16 et;
     et = effect_type & 0xFFFF;
@@ -3740,6 +3766,7 @@ void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
         default: break;
     }
 }
+#pragma pop
 #endif
 
 /* 0x80135938 | 0xF8 */
@@ -3749,6 +3776,8 @@ asm void fn_80135938(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma optimization_level 1
 u8 fn_80135938(void* ptr, u16 effect_type) {
     void* base; u16 et;
     et = effect_type & 0xFFFF;
@@ -3772,6 +3801,7 @@ u8 fn_80135938(void* ptr, u16 effect_type) {
         default: return 0;
     }
 }
+#pragma pop
 #endif
 
 /* 0x80135A30 | 0x10 | nc_setter */
@@ -5281,6 +5311,8 @@ asm void fn_80131714(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80131714(void* obj) {
     extern void fn_800FA064(void*);
     u8* p = (u8*)obj;
@@ -5294,6 +5326,7 @@ s32 fn_80131714(void* obj) {
     *(u32*)(p + 0x30) = (u32)(stream + 1);
     return 0;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80132454(void) {
@@ -5336,6 +5369,8 @@ asm void fn_80132570(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80132570(void* obj) {
     extern void fn_800FA160(void*);
     u8* p = (u8*)obj;
@@ -5349,6 +5384,7 @@ s32 fn_80132570(void* obj) {
     *(u32*)(p + 0x30) = (u32)(stream + 4);
     return 0;
 }
+#pragma pop
 #endif
 extern void fn_800FAA98(void);
 #if 0
@@ -5357,6 +5393,8 @@ asm void fn_8013264C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_8013264C(void* obj) {
     extern void fn_800FAA98(void*);
     u8* p = (u8*)obj;
@@ -5366,6 +5404,7 @@ s32 fn_8013264C(void* obj) {
     p[0x4b] = 1;
     return 0;
 }
+#pragma pop
 #endif
 extern f64 lbl_8047D0E0;
 #if 1
