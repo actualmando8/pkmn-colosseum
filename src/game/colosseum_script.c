@@ -1982,6 +1982,8 @@ ctx = (void*)((void*)((u32)(u32)ctx + (0x1 << 16)));
  * ------------------------------------------------------------------- */
 
 /* Address: 0x80222110 | Size: 0xdc | Ghidra import */
+#pragma push
+#pragma peephole off
 u32 fn_80222110(void)
 
 {
@@ -2030,6 +2032,7 @@ u32 fn_80222110(void)
   }
   return 0x3c;
 }
+#pragma pop
 /* Address: 0x802221EC | Size: 0x108 | Ghidra import */
 void fn_802221EC(void)
 
@@ -2747,6 +2750,8 @@ void fn_80222C44(void)
   return;
 }
 /* Address: 0x80222EF0 | Size: 0x1cc | Ghidra import */
+#pragma push
+#pragma peephole off
 u32 fn_80222EF0(void)
 
 {
@@ -2810,6 +2815,7 @@ u32 fn_80222EF0(void)
   }
   return 1;
 }
+#pragma pop
 /* Address: 0x802230BC | Size: 0x238 | Ghidra import */
 u32 fn_802230BC(void)
 
@@ -23203,6 +23209,8 @@ void fn_8021AB18(void)
   return;
 }
 /* Address: 0x8021AB9C | Size: 0x80 | Ghidra import */
+#pragma push
+#pragma optimization_level 2
 void fn_8021AB9C(void)
 
 {
@@ -23221,6 +23229,7 @@ void fn_8021AB9C(void)
   *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 1;
   return;
 }
+#pragma pop
 /* Address: 0x8021AC1C | Size: 0x390 | Ghidra import */
 void fn_8021AC1C(void)
 
