@@ -5524,7 +5524,7 @@ asm void fn_8013356C(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_8013356C(u32 arg1, u32 arg2) {
+u32 fn_8013356C(u32 arg1, s32 arg2) {
     extern u32 fn_8012F11C(s32);
     extern void fn_8012F150(s32);
     extern void fn_8012F1FC(s32);
