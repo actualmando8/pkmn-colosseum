@@ -269,6 +269,8 @@ s32 fn_80012B94(u8* ctx) {
 extern void fn_801080CC(s32, s32);
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 1
 s32 fn_80012D20(u8* ctx) {
     void* src;
     s32   size;
@@ -298,6 +300,7 @@ s32 fn_80012D20(u8* ctx) {
     }
     return 0;
 }
+#pragma pop
 #pragma pop
 
 /* fn_80012E18 - 0x80012E18 | size: 0x198 */
@@ -421,6 +424,8 @@ extern u8 lbl_80266918[];
 extern u32 lbl_8047A2F8;
 #pragma push
 #pragma peephole off
+#pragma push
+#pragma optimization_level 2
 s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     s32   buf[5];
     u8*   entry;
@@ -463,6 +468,7 @@ after:
     }
     return 0;
 }
+#pragma pop
 #pragma pop
 
 /* fn_800138B4 - 0x800138B4 | size: 0x164 */
