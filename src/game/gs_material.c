@@ -1362,7 +1362,7 @@ void fn_800E465C(void* entry, u8 r4) {
         }
     }
     /* Section 2: entry+0x12c → mobj+0x1c/20/24 */
-    if (*(u32*)((u8*)entry + 0x114) == 0) {
+    if (*(s32*)((u8*)entry + 0x114) == 0) {
         fn_800E01D0((u8*)entry + 0x24, (u8*)entry + 0x12c);
         r30 = *(void**)((u8*)entry + 0x8);
         {
