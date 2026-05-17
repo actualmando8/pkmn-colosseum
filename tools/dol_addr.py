@@ -40,6 +40,15 @@ def off_to_va(off, dol_path=DOL):
     return None
 
 
+def va_to_off(va, dol_path=DOL):
+    """Runtime VA -> DOL file offset (inverse), or None if unmapped.
+    Used to locate a fn_<VA> in raw_decompilation.c (keyed by FUN_<off>)."""
+    for o, a, s in _load(dol_path):
+        if a <= va < a + s:
+            return o + (va - a)
+    return None
+
+
 def normalize_addresses(funcs, dol_path=DOL):
     """In-place: rewrite each func.address (file off -> VA) and rename
     FUN_<off>/fn_<off> -> fn_<VA> so the rest of the pipeline (TU
