@@ -23,6 +23,8 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE_DIR = ROOT / "build" / "GC6E01" / "base"
@@ -30,36 +32,14 @@ OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 
 
 def diff_one(base_o: Path) -> dict:
-    out = subprocess.run(
-        [
-            str(OBJDIFF), "diff",
-            "-1", str(TARGET_O),
-            "-2", str(base_o),
-            "-o", "-",
-            "--format", "json",
-            "-c", "ppc.calculatePoolRelocations=false",
-        ],
-        capture_output=True, text=True,
-    )
-    if out.returncode != 0:
-        return {"error": out.stderr[:200], "functions": []}
-    j = json.loads(out.stdout)
-    funcs = []
-    for s in j.get("right", {}).get("symbols", []):
-        if s.get("kind") != "SYMBOL_FUNCTION":
-            continue
-        name = s.get("name", "")
-        if not name.startswith("fn_"):
-            continue
-        pct = s.get("match_percent")
-        size_raw = s.get("size", 0)
-        try:
-            size = int(size_raw, 0) if isinstance(size_raw, str) else int(size_raw)
-        except (TypeError, ValueError):
-            size = 0
-        if pct is not None:
-            funcs.append({"name": name, "match": pct, "size": size})
-    return {"functions": funcs}
+    try:
+        import measure_cache
+        cached = measure_cache.diff_funcs(TARGET_O, base_o)
+    except Exception:
+        cached = None
+    if cached is None:
+        return {"error": "objdiff failed", "functions": []}
+    return {"functions": cached}
 
 
 def collect() -> dict:
@@ -138,6 +118,11 @@ def main() -> int:
                 continue
             print(f"  {f['match_pct']:5.1f}%  {f['matched']}/{f['functions']:>4d}  "
                   f"{f['matched_bytes']:>8,}/{f['total_bytes']:<8,}B  {rel}")
+    try:
+        import measure_cache
+        measure_cache.flush()
+    except Exception:
+        pass
     return 0
 
 

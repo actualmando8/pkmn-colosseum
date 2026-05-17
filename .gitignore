@@ -60,3 +60,4 @@ dolphin-2603a-x64/
 *.exe
 *.orig
 *.pre
+build/.measure_cache.json
