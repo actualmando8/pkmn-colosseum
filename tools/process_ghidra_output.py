@@ -364,6 +364,14 @@ def assign_functions_to_tus(
     sorted_tus = sorted(tus, key=lambda t: t.start_addr)
     result: dict[str, list[GhidraFunction]] = {}
 
+    # Fallback resolver: the richer splits_refined.txt map (78.8% coverage
+    # vs link_order's partial set). Keeps __unassigned__ only for true GAPs.
+    try:
+        from gen_func_tu_map import tu_for_address
+    except Exception:
+        def tu_for_address(_a):
+            return None
+
     for func in functions:
         assigned = False
         for tu in sorted_tus:
@@ -372,7 +380,8 @@ def assign_functions_to_tus(
                 assigned = True
                 break
         if not assigned:
-            result.setdefault("__unassigned__", []).append(func)
+            src = tu_for_address(func.address)
+            result.setdefault(src or "__unassigned__", []).append(func)
 
     # Sort functions within each TU by address.
     for path in result:
