@@ -96,6 +96,30 @@ def splice(lines, sig_idx, close_idx, new_text):
     return out
 
 
+def _rewrite_fn_task(payload):
+    """Top-level picklable worker: sweep one function's rewrite variants
+    in isolation. payload = (orig_text, name, cat, si, ci, b0, src_path).
+    Returns (name, cat, b0, best_pct, best_label, best_text, si, ci)."""
+    orig_text, name, cat, si, ci, b0, src_path = payload
+    lines = orig_text.splitlines(keepends=True)
+    body = span_text(lines, si, ci)
+    best_pct, best_label, best_text = b0, None, None
+    for k, (label, new_body) in enumerate(variants_for(cat, body)):
+        if new_body == body:
+            continue
+        trial = "".join(splice(lines, si, ci, new_body))
+        m = automatch.measure_isolated(trial, src_path, [name],
+                                       f"ar_{name}_{k}")
+        if m is None:
+            continue
+        pct = m.get(name, 0.0)
+        if pct > best_pct + 1e-6:
+            best_pct, best_label, best_text = pct, label, new_body
+        if best_pct >= 100.0:
+            break
+    return (name, cat, b0, best_pct, best_label, best_text, si, ci)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("source")
@@ -104,6 +128,8 @@ def main():
     ap.add_argument("--symbol")
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--report")
+    ap.add_argument("--jobs", "-j", type=int, default=1,
+                    help="parallel workers (isolated temp builds)")
     args = ap.parse_args()
 
     src = Path(args.source)
@@ -149,37 +175,56 @@ def main():
     results = []
     t0 = time.time()
 
-    for idx, (b0, name, cat) in enumerate(targets, 1):
+    work = []
+    for (b0, name, cat) in targets:
         loc = automatch.find_fn_def(lines, name)
         if loc is None:
-            print(f"  [{idx}/{len(targets)}] {name} -- no C body, skip")
+            print(f"  {name} -- no C body, skip")
             continue
-        si, ci = loc
-        body = span_text(lines, si, ci)
-        best_pct, best_label, best_text = b0, None, None
+        work.append((b0, name, cat, loc[0], loc[1]))
 
-        for label, new_body in variants_for(cat, body):
-            if new_body == body:
-                continue
-            trial = splice(lines, si, ci, new_body)
-            automatch.write_src(src, "".join(trial))
-            m = automatch.measure(src, [name])
-            if m is None:
-                continue
-            pct = m.get(name, 0.0)
-            if pct > best_pct + 1e-6:
-                best_pct, best_label, best_text = pct, label, new_body
-            if best_pct >= 100.0:
-                break
-
-        automatch.write_src(src, original)  # restore pristine
-        tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
-            if best_label else "no change"
-        print(f"  [{idx}/{len(targets)}] {name} [{cat}] {b0:.2f}% -> "
-              f"{best_pct:.2f}%  ({tag})"
-              + (f"  via {best_label}" if best_label else ""))
-        results.append((name, cat, b0, best_pct, best_label, best_text,
-                        si, ci))
+    if args.jobs > 1 and work:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        payloads = [(original, n, cat, si, ci, b0, str(src))
+                    for (b0, n, cat, si, ci) in work]
+        done = 0
+        with ProcessPoolExecutor(max_workers=args.jobs) as ex:
+            futs = [ex.submit(_rewrite_fn_task, p) for p in payloads]
+            for fut in as_completed(futs):
+                r = fut.result()
+                name, cat, b0, bp, lbl = r[0], r[1], r[2], r[3], r[4]
+                done += 1
+                tag = ("=100" if bp >= 100 else f"+{bp - b0:.2f}") \
+                    if lbl else "no change"
+                print(f"  [{done}/{len(payloads)}] {name} [{cat}] "
+                      f"{b0:.2f}% -> {bp:.2f}%  ({tag})"
+                      + (f"  via {lbl}" if lbl else ""))
+                results.append(r)
+    else:
+        for idx, (b0, name, cat, si, ci) in enumerate(work, 1):
+            body = span_text(lines, si, ci)
+            best_pct, best_label, best_text = b0, None, None
+            for label, new_body in variants_for(cat, body):
+                if new_body == body:
+                    continue
+                trial = splice(lines, si, ci, new_body)
+                automatch.write_src(src, "".join(trial))
+                m = automatch.measure(src, [name])
+                if m is None:
+                    continue
+                pct = m.get(name, 0.0)
+                if pct > best_pct + 1e-6:
+                    best_pct, best_label, best_text = pct, label, new_body
+                if best_pct >= 100.0:
+                    break
+            automatch.write_src(src, original)  # restore pristine
+            tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
+                if best_label else "no change"
+            print(f"  [{idx}/{len(work)}] {name} [{cat}] {b0:.2f}% -> "
+                  f"{best_pct:.2f}%  ({tag})"
+                  + (f"  via {best_label}" if best_label else ""))
+            results.append((name, cat, b0, best_pct, best_label, best_text,
+                            si, ci))
 
     if args.apply:
         wins = [r for r in results if r[4] and r[3] > r[2] + 1e-6]

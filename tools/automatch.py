@@ -174,6 +174,75 @@ def measure(src_path, symbols):
     return {s: out.get(s, 0.0) for s in symbols} if symbols else out
 
 
+_ISO_CACHE = {}
+
+
+def measure_isolated(content, src_path, symbols, tag):
+    """Compile `content` (full file text) to a private temp .o and objdiff
+    just `symbols`. No shared state — safe to run from many processes at
+    once. Returns {sym: pct} or None on compile failure."""
+    import tempfile
+    sp = Path(src_path).resolve()
+    key = str(sp)
+    if key not in _ISO_CACHE:
+        ver = compile_check.get_file_compiler_version(sp)
+        _ISO_CACHE[key] = (str(compile_check.get_compiler(ver)),
+                           compile_check.get_file_cflags(sp))
+    compiler, cflags = _ISO_CACHE[key]
+    td = Path(tempfile.gettempdir())
+    tc = td / f"am_{tag}.c"
+    to = td / f"am_{tag}.o"
+    try:
+        with open(tc, "w", encoding="utf-8", newline="") as f:
+            f.write(content)
+        r = subprocess.run([compiler, "-c", "-o", str(to), *cflags, str(tc)],
+                           capture_output=True, text=True, cwd=str(ROOT))
+        if r.returncode != 0 or not to.exists():
+            return None
+        d = subprocess.run(
+            [str(OBJDIFF), "diff", "-1", str(TARGET_O), "-2", str(to),
+             "-o", "-", "--format", "json",
+             "-c", "ppc.calculatePoolRelocations=false"],
+            capture_output=True, text=True, cwd=str(ROOT))
+        if d.returncode != 0:
+            return None
+        j = json.loads(d.stdout)
+        out = {}
+        for s in j.get("right", {}).get("symbols", []):
+            if s.get("kind") == "SYMBOL_FUNCTION":
+                out[s.get("name", "")] = s.get("match_percent", 0.0)
+        return {s: out.get(s, 0.0) for s in symbols} if symbols else out
+    finally:
+        for p in (tc, to):
+            try:
+                p.unlink()
+            except OSError:
+                pass
+
+
+def _sweep_fn_task(payload):
+    """Top-level (picklable) worker: sweep one function's pragma variants
+    in isolation. payload = (orig_text, name, sig_idx, close_idx, b0,
+    src_path, variants). Returns (name, b0, best_pct, best_variant)."""
+    orig_text, name, si, ci, b0, src_path, variants = payload
+    lines = orig_text.splitlines(keepends=True)
+    best_pct, best_var = b0, None
+    for k, variant in enumerate(variants):
+        if not variant:
+            continue
+        trial = "".join(wrap_block(lines, si, ci, variant))
+        m = measure_isolated(trial, src_path, [name],
+                             f"{name}_{k}")
+        if m is None:
+            continue
+        pct = m.get(name, 0.0)
+        if pct > best_pct + 1e-6:
+            best_pct, best_var = pct, variant
+        if best_pct >= 100.0:
+            break
+    return (name, b0, best_pct, best_var)
+
+
 def matched_count(pcts):
     return sum(1 for v in pcts.values() if v >= 100.0)
 
@@ -202,6 +271,9 @@ def main():
     ap.add_argument("--apply", action="store_true",
                     help="write winning pragmas (default: dry run)")
     ap.add_argument("--report", help="write a markdown report here")
+    ap.add_argument("--jobs", "-j", type=int, default=1,
+                    help="parallel workers (isolated temp builds). "
+                         "N>1 sweeps functions concurrently.")
     args = ap.parse_args()
 
     src = Path(args.source)
@@ -233,39 +305,57 @@ def main():
     results = []  # (name, base%, best%, best_variant)
     t0 = time.time()
 
-    for idx, name in enumerate(targets, 1):
+    # Build the work list (skip no-body functions up front).
+    work = []
+    for name in targets:
         loc = find_fn_def(lines, name)
         if loc is None:
-            print(f"  [{idx}/{len(targets)}] {name} — no C body found, skip")
+            print(f"  {name} — no C body found, skip")
             results.append((name, base.get(name, 0.0),
                             base.get(name, 0.0), None))
             continue
-        sig_idx, close_idx = loc
-        b0 = base[name]
-        best_pct, best_var = b0, None
+        work.append((name, loc[0], loc[1], base[name]))
 
-        for variant in PRAGMA_VARIANTS:
-            if not variant:
-                continue  # baseline already known
-            trial = wrap_block(lines, sig_idx, close_idx, variant)
-            write_src(src, "".join(trial))
-            m = measure(src, [name])
-            if m is None:
-                continue
-            pct = m.get(name, 0.0)
-            if pct > best_pct + 1e-6:
-                best_pct, best_var = pct, variant
-            if best_pct >= 100.0:
-                break
-
-        # restore pristine file before next function
-        write_src(src, original)
-        tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
-            if best_var else "no change"
-        print(f"  [{idx}/{len(targets)}] {name} {b0:.2f}% -> "
-              f"{best_pct:.2f}%  ({tag})"
-              + (f"  {best_var}" if best_var else ""))
-        results.append((name, b0, best_pct, best_var))
+    if args.jobs > 1 and work:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        payloads = [(original, n, si, ci, b0, str(src), PRAGMA_VARIANTS)
+                    for (n, si, ci, b0) in work]
+        done = 0
+        with ProcessPoolExecutor(max_workers=args.jobs) as ex:
+            futs = {ex.submit(_sweep_fn_task, p): p[1] for p in payloads}
+            for fut in as_completed(futs):
+                name, b0, best_pct, best_var = fut.result()
+                done += 1
+                tag = ("=100" if best_pct >= 100
+                       else f"+{best_pct - b0:.2f}") \
+                    if best_var else "no change"
+                print(f"  [{done}/{len(payloads)}] {name} {b0:.2f}% -> "
+                      f"{best_pct:.2f}%  ({tag})"
+                      + (f"  {best_var}" if best_var else ""))
+                results.append((name, b0, best_pct, best_var))
+    else:
+        for idx, (name, sig_idx, close_idx, b0) in enumerate(work, 1):
+            best_pct, best_var = b0, None
+            for variant in PRAGMA_VARIANTS:
+                if not variant:
+                    continue
+                trial = wrap_block(lines, sig_idx, close_idx, variant)
+                write_src(src, "".join(trial))
+                m = measure(src, [name])
+                if m is None:
+                    continue
+                pct = m.get(name, 0.0)
+                if pct > best_pct + 1e-6:
+                    best_pct, best_var = pct, variant
+                if best_pct >= 100.0:
+                    break
+            write_src(src, original)  # restore pristine
+            tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
+                if best_var else "no change"
+            print(f"  [{idx}/{len(work)}] {name} {b0:.2f}% -> "
+                  f"{best_pct:.2f}%  ({tag})"
+                  + (f"  {best_var}" if best_var else ""))
+            results.append((name, b0, best_pct, best_var))
 
     # Apply phase: re-insert every winning variant, then verify no regression.
     if args.apply:
