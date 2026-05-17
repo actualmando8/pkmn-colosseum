@@ -1,0 +1,70 @@
+# Anti-fraud + compile gate. Runs on every push/PR, independent of the
+# ROM (no target .o needed): rejects truth-file edits, asm-wrapper
+# #if 0->#if 1 re-activation flips, and verifies touched .c files still
+# compile. This makes the manual pre-cherry-pick audit permanent and is a
+# public-readiness requirement.
+
+name: Verify
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  fraud-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need parent commits for the diff range
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine range
+        id: rng
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "range=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "range=${{ github.event.before }}..${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Anti-fraud gate (verify_commit.py)
+        run: |
+          python3 tools/verify_commit.py --range "${{ steps.rng.outputs.range }}"
+
+  compile-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain (mwcc + wibo)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+              python3 unzip curl ca-certificates
+          curl -sL -o /tmp/c.zip https://files.decomp.dev/compilers_20251118.zip
+          mkdir -p tools/mwcc_compiler
+          unzip -q /tmp/c.zip -d tools/mwcc_compiler
+          sudo curl -sL -o /usr/local/bin/wibo \
+              https://github.com/decompals/wibo/releases/download/1.0.3/wibo
+          sudo chmod +x /usr/local/bin/wibo
+
+      - name: Compile changed .c files
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          [ -z "$base" ] && base="${{ github.event.before }}"
+          changed=$(git diff --name-only "$base" "${{ github.sha }}" -- 'src/**/*.c' || true)
+          if [ -z "$changed" ]; then echo "no .c changes"; exit 0; fi
+          rc=0
+          for f in $changed; do
+            [ -f "$f" ] || continue
+            echo "::group::compile $f"
+            python3 tools/compile_check.py "$f" || rc=1
+            echo "::endgroup::"
+          done
+          exit $rc
