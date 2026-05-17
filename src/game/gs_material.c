@@ -1329,7 +1329,7 @@ void fn_800E465C(void* entry, u8 r4) {
     *(u32*)((u8*)entry + 0x114) = 0;
     if (!r4) return;
     /* Section 1: entry+0x120 → mobj+0x38/3c/40 */
-    if (*(u32*)((u8*)entry + 0x114) == 0) {
+    if (*(s32*)((u8*)entry + 0x114) == 0) {
         fn_800E01D0((u8*)entry + 0x18, (u8*)entry + 0x120);
         r30 = *(void**)((u8*)entry + 0x8);
         if (r30 == NULL) fn_80196E10(lbl_8047CB60, 0x3a9, lbl_8047CB68);
