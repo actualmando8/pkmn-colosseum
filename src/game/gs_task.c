@@ -1222,12 +1222,15 @@ asm void fn_80007154(void) {
 #include "src/game/gs_task_fn_80007154.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_80007154(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 5);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_800071AC - 0x800071AC | size: 0x58 */
@@ -1236,12 +1239,15 @@ asm void fn_800071AC(void) {
 #include "src/game/gs_task_fn_800071AC.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_800071AC(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 4);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_80007204 - 0x80007204 | size: 0x58 */
@@ -1250,12 +1256,15 @@ asm void fn_80007204(void) {
 #include "src/game/gs_task_fn_80007204.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_80007204(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 3);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_8000725C - 0x8000725C | size: 0x58 */
@@ -1264,12 +1273,15 @@ asm void fn_8000725C(void) {
 #include "src/game/gs_task_fn_8000725C.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_8000725C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 2);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_800072B4 - 0x800072B4 | size: 0x58 */
@@ -1278,12 +1290,15 @@ asm void fn_800072B4(void) {
 #include "src/game/gs_task_fn_800072B4.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_800072B4(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 1);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_8000730C - 0x8000730C | size: 0x58 */
@@ -1292,12 +1307,15 @@ asm void fn_8000730C(void) {
 #include "src/game/gs_task_fn_8000730C.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_8000730C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 0);
     if (lbl_8047A27C == 0) return -1;
     return fn_80007364();
 }
+#pragma pop
 #endif
 
 /* fn_80007364 - 0x80007364 | size: 0x2f8 */
