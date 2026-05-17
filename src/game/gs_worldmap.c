@@ -926,6 +926,8 @@ asm void fn_80028534(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma scheduling on
 void fn_80028534(void* r3) {
     u8* r31;
     u16* pad;
@@ -937,6 +939,7 @@ void fn_80028534(void* r3) {
         }
     }
 }
+#pragma pop
 #endif
 
 /* fn_80028588 - 0x80028588 | size: 0x98 */
@@ -1794,7 +1797,7 @@ s32 fn_8002A400(void* r3, u8* r4) {
         id = 0x151;
     }
     ret = fn_800FA444(id);
-    fn_800FB680((s32)(s16)*(u16*)(r30 + 0x54) - (s32)(ret >> 16), 0, -1, id);
+    fn_800FB680((s32)(s16)*(s16*)(r30 + 0x54) - (s32)(ret >> 16), 0, -1, id);
     return 0;
 }
 #endif
@@ -1947,7 +1950,7 @@ s32 fn_8002AB40(void* r3, u8* r4) {
     u32 value;
     s32 idx;
     u32* limit;
-    u32 count;
+    s32 count;
 
     ctx = *(u8**)((u8*)r3 + 0x60);
     table[0] = *(u32*)(lbl_80266E80 + 0x0);

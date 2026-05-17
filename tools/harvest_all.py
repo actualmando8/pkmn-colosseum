@@ -86,6 +86,11 @@ def main():
     ap.add_argument("--band", nargs=2, type=float, default=[85.0, 99.99])
     ap.add_argument("--min-near", type=int, default=3)
     ap.add_argument("--max-files", type=int, default=99)
+    ap.add_argument("--max-fns", type=int, default=25,
+                    help="per-file function cap passed to harvest.py. "
+                         "Default 25 keeps each file's harvest inside the "
+                         "10-min background-task cap; the loop re-runs to "
+                         "chip remaining functions over cycles.")
     ap.add_argument("--budget", type=int, default=7200,
                     help="wall-clock seconds; stop starting files past it")
     ap.add_argument("--skip", action="append", default=[],
@@ -130,7 +135,8 @@ def main():
         r = subprocess.run(
             [PY, str(ROOT / "tools" / "harvest.py"), src,
              "--band", str(args.band[0]), str(args.band[1]),
-             "--jobs", str(args.jobs)],
+             "--jobs", str(args.jobs),
+             "--max-fns", str(args.max_fns)],
             cwd=str(ROOT))
         done += 1
         print(f"[harvest-all] {src} exit {r.returncode} "

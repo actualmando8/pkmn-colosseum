@@ -159,6 +159,8 @@ def main():
     ap.add_argument("--report")
     ap.add_argument("--jobs", "-j", type=int, default=1,
                     help="parallel workers (isolated temp builds)")
+    ap.add_argument("--max-fns", type=int, default=0,
+                    help="cap rewrite-class targets this run (0 = no cap)")
     args = ap.parse_args()
 
     src = Path(args.source)
@@ -197,6 +199,9 @@ def main():
         if cat in ("signed-compare", "redundant-extend"):
             targets.append((pct, name, cat))
     targets.sort(key=lambda t: -t[0])
+    if args.max_fns and len(targets) > args.max_fns:
+        targets = targets[:args.max_fns]
+        print(f"[autorewrite] capped to {args.max_fns} this run")
     print(f"[autorewrite] {len(targets)} rewrite-class targets "
           f"(signed-compare / redundant-extend)")
 

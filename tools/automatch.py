@@ -274,6 +274,10 @@ def main():
     ap.add_argument("--jobs", "-j", type=int, default=1,
                     help="parallel workers (isolated temp builds). "
                          "N>1 sweeps functions concurrently.")
+    ap.add_argument("--max-fns", type=int, default=0,
+                    help="cap functions swept this run (0 = no cap). "
+                         "Bounds wall-time so a loop iteration finishes "
+                         "inside the background-task cap.")
     args = ap.parse_args()
 
     src = Path(args.source)
@@ -297,6 +301,9 @@ def main():
             (n for n, p in base.items() if lo <= p < hi),
             key=lambda n: -base[n],
         )
+    if args.max_fns and len(targets) > args.max_fns:
+        targets = targets[:args.max_fns]
+        print(f"[automatch] capped to {args.max_fns} functions this run")
     print(f"[automatch] {len(targets)} near-miss targets in band "
           f"{args.band[0]}-{args.band[1]}%")
 

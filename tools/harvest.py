@@ -81,8 +81,13 @@ def main():
     ap.add_argument("source")
     ap.add_argument("--band", nargs=2, type=float, default=[85.0, 99.99])
     ap.add_argument("--jobs", "-j", type=int, default=4)
+    ap.add_argument("--max-fns", type=int, default=0,
+                    help="cap functions per stage (0 = no cap); keeps a "
+                         "loop iteration inside the background-task cap")
     ap.add_argument("--no-commit", action="store_true")
     args = ap.parse_args()
+
+    cap = (["--max-fns", str(args.max_fns)] if args.max_fns else [])
 
     src = args.source
     b0 = matched(src)
@@ -95,11 +100,11 @@ def main():
 
     committed = []
     # 2. pragma sweep
-    if run_stage("automatch.py", src, args.band, args.jobs):
+    if run_stage("automatch.py", src, args.band, args.jobs, cap):
         if args.no_commit or commit_if_clean(src, "automatch"):
             committed.append("automatch")
     # 3. mechanical rewrites
-    if run_stage("autorewrite.py", src, args.band, args.jobs):
+    if run_stage("autorewrite.py", src, args.band, args.jobs, cap):
         if args.no_commit or commit_if_clean(src, "autorewrite"):
             committed.append("autorewrite")
 
