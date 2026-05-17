@@ -992,6 +992,8 @@ asm void fn_80028620(void) {
 #else
 #pragma peephole off
 #pragma optimization_level 4
+#pragma push
+#pragma scheduling on
 s32 fn_80028620(void* r3, u8* r4) {
     void* r31;
     u8* r30;
@@ -1018,6 +1020,7 @@ s32 fn_80028620(void* r3, u8* r4) {
     }
     return 0;
 }
+#pragma pop
 #pragma peephole on
 #endif
 
@@ -1031,6 +1034,8 @@ asm void fn_80028728(void) {
 #else
 #pragma peephole off
 #pragma optimization_level 4
+#pragma push
+#pragma scheduling on
 s32 fn_80028728(void* r3, u8* r4) {
     void* r31;
     u8* r30;
@@ -1057,6 +1062,7 @@ s32 fn_80028728(void* r3, u8* r4) {
     }
     return 0;
 }
+#pragma pop
 #pragma peephole on
 #endif
 
