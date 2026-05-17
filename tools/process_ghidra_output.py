@@ -487,6 +487,18 @@ def main():
           f"({sum(1 for f in functions if not f.failed)} decompiled, "
           f"{sum(1 for f in functions if f.failed)} failed)")
 
+    # Ghidra exported DOL *file offsets*, not runtime VAs (it didn't use
+    # the GameCube loader). Translate off->VA and rename FUN_<off> ->
+    # fn_<VA> so TU assignment / skip / import see real addresses.
+    try:
+        from dol_addr import normalize_addresses
+        before = len(functions)
+        functions = normalize_addresses(functions)
+        print(f"  Normalized DOL offset->VA: {len(functions)} mapped "
+              f"({before - len(functions)} outside any section, dropped)")
+    except Exception as e:
+        print(f"  WARNING: DOL address normalization skipped: {e}")
+
     # 2. Clean up each function.
     print("Applying cleanup passes ...")
     functions = [clean_function(f) for f in functions]
