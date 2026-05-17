@@ -109,7 +109,7 @@ def main():
     src = Path(args.source)
     if not src.is_absolute():
         src = ROOT / src
-    original = src.read_text(encoding="utf-8", errors="replace")
+    original = automatch.read_src(src)
 
     print(f"[autorewrite] baseline compile of {src.name} ...")
     base = automatch.measure(src, None)
@@ -162,7 +162,7 @@ def main():
             if new_body == body:
                 continue
             trial = splice(lines, si, ci, new_body)
-            src.write_text("".join(trial), encoding="utf-8")
+            automatch.write_src(src, "".join(trial))
             m = automatch.measure(src, [name])
             if m is None:
                 continue
@@ -172,7 +172,7 @@ def main():
             if best_pct >= 100.0:
                 break
 
-        src.write_text(original, encoding="utf-8")  # restore pristine
+        automatch.write_src(src, original)  # restore pristine
         tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
             if best_label else "no change"
         print(f"  [{idx}/{len(targets)}] {name} [{cat}] {b0:.2f}% -> "
@@ -192,10 +192,10 @@ def main():
                     continue
                 s2, c2 = loc
                 cur = "".join(splice(ls, s2, c2, txt))
-            src.write_text(cur, encoding="utf-8")
+            automatch.write_src(src, cur)
             final = automatch.measure(src, None)
             if final is None or automatch.matched_count(final) < base_matched:
-                src.write_text(original, encoding="utf-8")
+                automatch.write_src(src, original)
                 print("[autorewrite] APPLY REVERTED -- net regression")
             else:
                 print(f"[autorewrite] APPLIED {len(wins)} wins. "

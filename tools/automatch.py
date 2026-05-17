@@ -41,6 +41,19 @@ ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 
+
+def read_src(p):
+    """Read preserving exact line endings (no CRLF<->LF translation)."""
+    with open(p, "r", encoding="utf-8", errors="replace", newline="") as f:
+        return f.read()
+
+
+def write_src(p, s):
+    """Write verbatim — no newline translation, so round-trips are
+    byte-exact and win-commits aren't polluted with CRLF->LF noise."""
+    with open(p, "w", encoding="utf-8", newline="") as f:
+        f.write(s)
+
 sys.path.insert(0, str(ROOT / "tools"))
 import compile_check  # noqa: E402  (reuse its compile + path logic)
 
@@ -169,12 +182,13 @@ def wrap_block(lines, sig_idx, close_idx, pragmas):
     """Return a new line list with push/pragmas around [sig_idx, close_idx]."""
     if not pragmas:
         return list(lines)
+    nl = "\r\n" if (lines and lines[0].endswith("\r\n")) else "\n"
     new = list(lines)
-    block = ["#pragma push\n"] + [p + "\n" for p in pragmas]
+    block = [f"#pragma push{nl}"] + [p + nl for p in pragmas]
     new[sig_idx:sig_idx] = block
     # close_idx shifts by len(block)
     ins_at = close_idx + len(block) + 1
-    new[ins_at:ins_at] = ["#pragma pop\n"]
+    new[ins_at:ins_at] = [f"#pragma pop{nl}"]
     return new
 
 
@@ -193,7 +207,7 @@ def main():
     src = Path(args.source)
     if not src.is_absolute():
         src = ROOT / src
-    original = src.read_text(encoding="utf-8", errors="replace")
+    original = read_src(src)
 
     # Baseline measurement of every function in the file.
     print(f"[automatch] baseline compile of {src.name} ...")
@@ -234,7 +248,7 @@ def main():
             if not variant:
                 continue  # baseline already known
             trial = wrap_block(lines, sig_idx, close_idx, variant)
-            src.write_text("".join(trial), encoding="utf-8")
+            write_src(src, "".join(trial))
             m = measure(src, [name])
             if m is None:
                 continue
@@ -245,7 +259,7 @@ def main():
                 break
 
         # restore pristine file before next function
-        src.write_text(original, encoding="utf-8")
+        write_src(src, original)
         tag = ("=100" if best_pct >= 100 else f"+{best_pct - b0:.2f}") \
             if best_var else "no change"
         print(f"  [{idx}/{len(targets)}] {name} {b0:.2f}% -> "
@@ -265,10 +279,10 @@ def main():
                     continue
                 si, ci = loc
                 cur_text = "".join(wrap_block(ls, si, ci, variant))
-            src.write_text(cur_text, encoding="utf-8")
+            write_src(src, cur_text)
             final = measure(src, None)
             if final is None or matched_count(final) < base_matched:
-                src.write_text(original, encoding="utf-8")
+                write_src(src, original)
                 print("[automatch] APPLY REVERTED — net regression detected")
             else:
                 print(f"[automatch] APPLIED {len(wins)} wins. "
