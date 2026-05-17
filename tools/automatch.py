@@ -65,87 +65,80 @@ PRAGMA_VARIANTS = [
      "#pragma scheduling on"],
 ]
 
-FN_HEADER_RE = re.compile(r"^/\*\s*(fn_[0-9A-Fa-f]+)\s*-\s*0x", re.M)
+def find_fn_def(lines, name):
+    """Locate a function's C definition by name, format-agnostic.
 
-
-class Block:
-    """One function region: header comment .. next header comment (or EOF)."""
-
-    def __init__(self, name, start, end, lines):
-        self.name = name
-        self.start = start          # line index of /* fn_ ... */ header
-        self.end = end              # exclusive
-        self.lines = lines          # reference to the file's line list
-
-    def find_c_def(self):
-        """Return (sig_idx, body_close_idx) for the active C definition.
-
-        Skips any `#if 0 ... #else` asm-wrapper region. body_close_idx is the
-        line containing the function's final closing brace at column 0.
-        Returns None if no plain C body is found (e.g. pure asm stub).
-        """
-        i = self.start
-        in_if0 = False
-        sig_idx = None
-        while i < self.end:
-            ln = self.lines[i]
-            s = ln.strip()
-            if s.startswith("#if 0"):
-                in_if0 = True
-            elif s.startswith("#else") and in_if0:
-                in_if0 = False
-            elif s.startswith("#endif"):
-                in_if0 = False
-            elif not in_if0 and re.match(
-                r"^[A-Za-z_].*\b" + re.escape(self.name) + r"\s*\(", ln
-            ) and "asm " not in ln and "#include" not in ln:
-                sig_idx = i
-                break
+    Returns (sig_idx, close_idx): the line index of the signature and of the
+    line holding the body's final closing brace. Works whether the file uses
+    `/* fn_X - 0x.. */` headers, `/* Address: 0x.. | Ghidra import */`
+    headers, or no headers at all; signature and `{` may be on separate
+    lines (K&R style). Skips `#if 0 .. #else` asm-wrapper regions and
+    `;`-terminated prototypes. Returns None if no plain C body exists.
+    """
+    pat = re.compile(r"\b" + re.escape(name) + r"\s*\(")
+    in_if0 = False
+    n = len(lines)
+    i = 0
+    while i < n:
+        s = lines[i].strip()
+        if s.startswith("#if 0"):
+            in_if0 = True
             i += 1
-        if sig_idx is None:
+            continue
+        if s.startswith("#else") or s.startswith("#endif"):
+            in_if0 = False
+            i += 1
+            continue
+        if (not in_if0 and pat.search(lines[i])
+                and "asm " not in lines[i]
+                and "#include" not in lines[i]
+                and not lines[i].lstrip().startswith(("/*", "*", "//"))
+                and re.match(r"^[A-Za-z_][\w \t\*]*$",
+                             lines[i].split(name)[0])):
+            # Accumulate from the signature line until the first top-level
+            # '{' (definition) or ';' (prototype), whichever comes first.
+            sig = ""
+            end_line = i
+            decided = None
+            for t in range(i, n):
+                sig += lines[t]
+                end_line = t
+                bpos = sig.find("{")
+                spos = sig.find(";")
+                if bpos != -1 and (spos == -1 or bpos < spos):
+                    decided = "def"
+                    break
+                if spos != -1 and (bpos == -1 or spos < bpos):
+                    decided = "proto"
+                    break
+            if decided != "def":
+                i = end_line + 1
+                continue
+            # brace-match from the line containing the first '{'
+            open_line = end_line
+            for t in range(i, n):
+                if "{" in lines[t]:
+                    open_line = t
+                    break
+            depth = 0
+            seen = False
+            for t in range(open_line, n):
+                for ch in lines[t]:
+                    if ch == "{":
+                        depth += 1
+                        seen = True
+                    elif ch == "}":
+                        depth -= 1
+                if seen and depth == 0:
+                    return (i, t)
             return None
-        # Find the matching closing brace at column 0 (top-level).
-        depth = 0
-        seen_open = False
-        j = sig_idx
-        while j < self.end:
-            for ch in self.lines[j]:
-                if ch == "{":
-                    depth += 1
-                    seen_open = True
-                elif ch == "}":
-                    depth -= 1
-            if seen_open and depth == 0:
-                return (sig_idx, j)
-            j += 1
-        return None
+        i += 1
+    return None
 
 
-def parse_blocks(text):
-    lines = text.splitlines(keepends=True)
-    heads = [(m.start(), m.group(1)) for m in FN_HEADER_RE.finditer(text)]
-    # Map char offset -> line index.
-    offs, acc = [], 0
-    for ln in lines:
-        offs.append(acc)
-        acc += len(ln)
-
-    def line_of(charpos):
-        lo, hi = 0, len(offs) - 1
-        while lo < hi:
-            mid = (lo + hi + 1) // 2
-            if offs[mid] <= charpos:
-                lo = mid
-            else:
-                hi = mid - 1
-        return lo
-
-    blocks = []
-    for k, (cpos, name) in enumerate(heads):
-        start = line_of(cpos)
-        end = line_of(heads[k + 1][0]) if k + 1 < len(heads) else len(lines)
-        blocks.append(Block(name, start, end, lines))
-    return lines, blocks
+def list_fn_names(text):
+    """All fn_XXXXXXXX names that have a C definition in the file."""
+    return sorted(set(re.findall(r"\b(fn_[0-9A-Fa-f]{8})\s*\(", text)))
 
 
 def measure(src_path, symbols):
@@ -221,20 +214,18 @@ def main():
     print(f"[automatch] {len(targets)} near-miss targets in band "
           f"{args.band[0]}-{args.band[1]}%")
 
-    lines, blocks = parse_blocks(original)
-    by_name = {b.name: b for b in blocks}
+    lines = original.splitlines(keepends=True)
 
     results = []  # (name, base%, best%, best_variant)
-    accepted = 0
     t0 = time.time()
 
     for idx, name in enumerate(targets, 1):
-        blk = by_name.get(name)
-        if blk is None:
-            continue
-        loc = blk.find_c_def()
+        loc = find_fn_def(lines, name)
         if loc is None:
-            continue  # pure asm stub, nothing to sweep
+            print(f"  [{idx}/{len(targets)}] {name} — no C body found, skip")
+            results.append((name, base.get(name, 0.0),
+                            base.get(name, 0.0), None))
+            continue
         sig_idx, close_idx = loc
         b0 = base[name]
         best_pct, best_var = b0, None
@@ -266,12 +257,10 @@ def main():
     if args.apply:
         wins = [(n, v) for (n, b, p, v) in results if v and p > b + 1e-6]
         if wins:
-            cur, _ = parse_blocks(original)
             cur_text = original
             for name, variant in wins:
-                ls, bs = parse_blocks(cur_text)
-                bn = {b.name: b for b in bs}[name]
-                loc = bn.find_c_def()
+                ls = cur_text.splitlines(keepends=True)
+                loc = find_fn_def(ls, name)
                 if loc is None:
                     continue
                 si, ci = loc
