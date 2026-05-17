@@ -42,16 +42,35 @@ of every function. Use it as a **lookup reference**, not a bulk import:
   `python tools/ghidra_batch_decompile.py` (~3 min, reuses analyzed
   project).
 
-## Prerequisite for useful bulk import (future work)
+## RESOLVED 2026-05-17 — pipeline repaired (two structural bugs fixed)
 
-Bulk Ghidra import only becomes valuable after a **function→TU split map**
-exists (same blocker as `docs/tu_split.md`). Needed:
+1. **Function→TU map built**: `tools/gen_func_tu_map.py` →
+   `config/GC6E01/func_tu_map.json`. Joins symbols.txt (addr/fn) with
+   splits_refined.txt (188 addr-ranges → src). 8603 fns, 78.8% attributed
+   (KNOWN 5788 + LIKELY 992), 1809 true GAP. `tu_for_address()` wired into
+   `process_ghidra_output.py` as the fallback past sparse link_order.txt.
 
-1. Per-address → source-file mapping (from `.file` symbols / splits /
-   link order).
-2. `process_ghidra_output.py` to group by that map instead of
-   `__unassigned__`.
-3. Then per-TU import lands functions in the correct file with correct
-   symbol order, expanding the *measured* near-miss surface.
+2. **DOL offset bug fixed**: Ghidra had exported DOL *file offsets*, not
+   VAs (FUN_00000340 == VA 0x80003340). `tools/dol_addr.py`
+   `normalize_addresses()` translates off→VA and renames FUN_<off> →
+   fn_<VA>, applied right after parse.
 
-Until then: Ghidra output is a per-function reference only.
+Result: `__unassigned__` collapsed **7481 → ~0** functions; staged output
+now correctly grouped into 73 real TU files. Import dry-run is sane:
+**326 new / 461 skipped** (was 7753 / 650 garbage).
+
+## Remaining barrier: raw stubs don't compile (inherent, not structural)
+
+Scoped `--apply --compile-check` proof on `src/dolphin/os/PPCArch.c`
+(+20 new, 0 skip): wrote, then **COMPILE FAIL** — raw Ghidra C has
+unresolved types/externs. This is normal decomp reality: Ghidra output is
+a *starting point* needing per-function cleanup (LLM/manual), not
+drop-in compilable bulk.
+
+**So:** bulk `ghidra_import.py --apply` still must NOT be run (it would
+break every file it touches). But the staged, correctly-mapped,
+correctly-addressed output under `build/ghidra_output/src/<tu>/` is now
+high-quality **per-function starting material**: an agent assigned
+fn_800XXXXX can pull its real Ghidra C from the correct TU file and
+clean just that one function. This is the intended use; the map made it
+possible.
