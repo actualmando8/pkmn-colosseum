@@ -2368,6 +2368,8 @@ void fn_8001DACC(void) {
 
 /* 0x64 | fn_8001DFA8 | generic_call_check_store */
 /* fn_8001DFA8 - 0x8001DFA8 | size: 0x64 */
+#pragma push
+#pragma peephole off
 s32 fn_8001DFA8(u32 arg1, u8* arg2) {
     extern u8 fn_8005D8B8(s16);
     if (fn_8005D8B8(*(s16*)(arg2 + 0x6)) != 0) {
@@ -2381,6 +2383,7 @@ s32 fn_8001DFA8(u32 arg1, u8* arg2) {
     }
     return 0;
 }
+#pragma pop
 
 /* 0x68 | fn_8001E00C | call_sequence */
 /* fn_8001E00C - 0x8001E00C | size: 0x68 */
@@ -6136,6 +6139,8 @@ asm void fn_8001E184(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_8001E184(void) {
     extern void* fn_801046B8();
     extern void fn_801026A4(s32, ...);
@@ -6151,6 +6156,7 @@ s32 fn_8001E184(void) {
     fn_80102568(0x12, 0x0, 0x1);
     return r31;
 }
+#pragma pop
 #endif
 
 /* fn_8001E200 - 0x8001E200 | size: 0x24 */
