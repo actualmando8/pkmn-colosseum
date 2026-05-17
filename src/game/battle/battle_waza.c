@@ -408,6 +408,8 @@ BOOL fn_801D1E50(s32 seqHandle) {
  * Gets party via fn_80129280(0, 0xA), bounds-checks idx against party+0x400,
  * returns u16 at party[idx*2].
  */
+#pragma push
+#pragma peephole off
 s32 fn_801D1F0C(s32 idx) {
     void* party;
     u16 count;
@@ -417,6 +419,7 @@ s32 fn_801D1F0C(s32 idx) {
     if (idx >= (s32)count) return -1;
     return *(u16*)((u8*)party + idx * 2);
 }
+#pragma pop
 
 /**
  * fn_801D1F7C - Waza get active effect count from party+0x400.
