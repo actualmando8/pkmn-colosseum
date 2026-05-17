@@ -2771,6 +2771,8 @@ void* fn_801F90C4(void* arg0, void* arg1) {
 }
 
 /* 0x801F9130 | size: 0x10C */
+#pragma push
+#pragma optimization_level 2
 void fn_801F9130(void* unused, void* trainer, void* pokemon) {
     extern u8 lbl_80375CA8[];
     extern u32 fn_801F0134(void* ptr, void* pokemon);
@@ -2799,6 +2801,7 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
     sp8 = 0;
     fn_80204F6C(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fn_801F0134(trainer, pokemon), (u32)i);
 }
+#pragma pop
 
 /* 0x801F923C | size: 0x1BC */
 u32 fn_801F923C(void* context, void* param) {
