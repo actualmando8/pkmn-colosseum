@@ -54,21 +54,50 @@ EXTEND_COLLAPSE = [
     (re.compile(r"\(char\)\s*\(int\)"), "(char)"),
 ]
 
+# Explicit cast flips (NOT pointer-deref — `(s32)x`, not `*(s32*)x`).
+# `(s32)` is not a substring of `*(s32*)` so these never collide with
+# PTR_FLIPS.
+CAST_FLIPS = [
+    ("(u32)", "(s32)"), ("(s32)", "(u32)"),
+    ("(u16)", "(s16)"), ("(s16)", "(u16)"),
+    ("(u8)", "(s8)"), ("(s8)", "(u8)"),
+]
+
+# Signedness flip of a single declaration / parameter / return type:
+# a type keyword immediately followed by an identifier (decl context).
+DECL_FLIP = re.compile(
+    r"\b(s32|u32|s16|u16|s8|u8)(\s+[A-Za-z_]\w*\s*[;,=)])")
+_DECL_SWAP = {"s32": "u32", "u32": "s32", "s16": "u16", "u16": "s16",
+              "s8": "u8", "u8": "s8"}
+
 
 def variants_for(category, body):
     """Yield (label, new_body) candidates for a diffclass category."""
     if category == "signed-compare":
-        # whole-function flips first
+        # 1. pointer-deref flips (whole-fn then per-site) — proven path
         for a, b in PTR_FLIPS:
             if a in body:
                 yield (f"all {a}->{b}", body.replace(a, b))
-        # then one-site-at-a-time (handles mixed signedness in one fn)
         for a, b in PTR_FLIPS:
             n = body.count(a)
             if n > 1:
                 for i in range(n):
                     yield (f"{a}->{b} #site{i+1}",
                            _replace_nth(body, a, b, i))
+        # 2. explicit cast flips — per-occurrence (non-pointer subclass)
+        for a, b in CAST_FLIPS:
+            n = body.count(a)
+            for i in range(n):
+                yield (f"cast {a}->{b} #site{i+1}",
+                       _replace_nth(body, a, b, i))
+        # 3. declaration / return-type signedness flips — per-site
+        decls = list(DECL_FLIP.finditer(body))
+        for i, m in enumerate(decls):
+            t = m.group(1)
+            new = (body[:m.start()] + _DECL_SWAP[t] + m.group(2)
+                   + body[m.end():])
+            yield (f"decl {t}->{_DECL_SWAP[t]}{m.group(2).strip()} "
+                   f"#site{i+1}", new)
     elif category == "redundant-extend":
         for rx, repl in EXTEND_COLLAPSE:
             if rx.search(body):
