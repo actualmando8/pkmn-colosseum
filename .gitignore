@@ -61,3 +61,4 @@ dolphin-2603a-x64/
 *.orig
 *.pre
 build/.measure_cache.json
+build/.harvest_cursor.json

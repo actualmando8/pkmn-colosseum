@@ -101,20 +101,38 @@ def main():
     busy = worktree_busy_files()
     files = near_miss_files(args.min_near, args.band)
 
-    plan = []
+    # Eligible list (filters applied) BEFORE max_files truncation.
+    eligible = []
     for near, src in files:
-        rels = src
         if any(s in src for s in args.skip):
             continue
         if Path(src).name in {Path(b).name for b in busy} or src in busy:
-            print(f"[harvest-all] skip (worktree busy): {src}")
             continue
-        if git("status", "--porcelain", "--", rels).stdout.strip():
-            print(f"[harvest-all] skip (dirty): {src}")
+        if git("status", "--porcelain", "--", src).stdout.strip():
             continue
-        plan.append((near, src))
-        if len(plan) >= args.max_files:
-            break
+        eligible.append((near, src))
+
+    # Rotation cursor: a bounded loop with --max-files 1 + worst-first
+    # would re-sweep the single worst file forever. Persist the last
+    # file swept and start the next run AFTER it, so consecutive loop
+    # iterations walk the whole near-miss set (wrapping) instead of
+    # spinning on a dead slice.
+    import json as _json
+    cur_f = ROOT / "build" / ".harvest_cursor.json"
+    last = ""
+    try:
+        last = _json.loads(cur_f.read_text()).get("last", "")
+    except (OSError, ValueError):
+        pass
+    srcs = [s for _, s in eligible]
+    if last in srcs:
+        i = srcs.index(last) + 1
+        eligible = eligible[i:] + eligible[:i]
+
+    plan = eligible[:args.max_files]
+    if plan:
+        cur_f.parent.mkdir(parents=True, exist_ok=True)
+        cur_f.write_text(_json.dumps({"last": plan[-1][1]}))
 
     print(f"[harvest-all] {len(plan)} files queued "
           f"(band {args.band[0]}-{args.band[1]}, >= {args.min_near} "
