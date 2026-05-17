@@ -1016,6 +1016,8 @@ found:
  * ================================================================== */
 #pragma push
 #pragma scheduling on
+#pragma push
+#pragma optimization_level 1
 void fn_800D2AD4(u32 count) {
     u32 raw;
     lbl_8047AA70 = count;
@@ -1036,6 +1038,7 @@ void fn_800D2AD4(u32 count) {
         }
     }
 }
+#pragma pop
 #pragma pop
 
 /* ==================================================================
