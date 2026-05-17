@@ -6575,7 +6575,7 @@ void* fn_800551CC(void* dflt, s32 dir, u32* state) {
     s8 slot;
 
     slot = (s8)state[1];
-    if (*(u32*)state != 0) {
+    if (*(s32*)state != 0) {
         return dflt;
     }
     if (dir == 1) {
@@ -8130,7 +8130,7 @@ void* fn_80058F40(void* dflt, s32 dir, u32* state) {
     s32 i;
     void* found;
 
-    if (*(u32*)state != 0) {
+    if (*(s32*)state != 0) {
         return dflt;
     }
     if (dir == 1) {
