@@ -900,11 +900,14 @@ asm void fn_801779B0(void) {
 #include "src/game/gs_scene_fn_801779B0.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801779B0(u32 a, u32 b, u32 c) {
     *(u32*)((u8*)lbl_80478C40 + 0x34) = a;
     *(u32*)((u8*)lbl_80478C40 + 0x38) = b;
     *(u32*)((u8*)lbl_80478C40 + 0x3C) = c;
 }
+#pragma pop
 #endif
 #pragma pop
 #pragma push
@@ -915,11 +918,14 @@ asm void fn_801779CC(void) {
 #include "src/game/gs_scene_fn_801779CC.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801779CC(u32 a, u32 b) {
     *(u32*)((u8*)lbl_80478C40 + 0x34) = a;
     *(u32*)((u8*)lbl_80478C40 + 0x38) = b;
     *(u32*)((u8*)lbl_80478C40 + 0x3C) = (u32)-1;
 }
+#pragma pop
 #endif
 #pragma pop
 #pragma push
@@ -963,6 +969,8 @@ asm void fn_80179E04(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
+#pragma push
+#pragma optimization_level 1
 void fn_80179E04(void* dst) {
     void* ptr;
     void* handle;
@@ -976,6 +984,7 @@ void fn_80179E04(void* dst) {
     memcpy(dst, lbl_80478C40, 0xFC);
     fn_800D1674(handle, (u8*)dst + 0xFC);
 }
+#pragma pop
 #pragma pop
 #endif
 #pragma push
