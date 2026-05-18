@@ -6884,7 +6884,7 @@ void fn_80116E6C(u8* ptr, u8 val) {
     u8 tmp;
     if (ptr == NULL) { return; }
     tmp = ptr[0];
-    tmp = (u8)((tmp & ~0x80) | ((val & 1) << 7));
+    tmp = (u8)(((val & 1) << 7) | (tmp & ~0x80));
     ptr[0] = tmp;
 }
 /* 0x80116E84 | 0x2C */
@@ -7545,7 +7545,7 @@ asm void fn_80117AE4(void) {
 #include "src/game/gs_field_world_fn_80117AE4.inc"
 }
 #else
-void fn_80117AE4(u32 arg1) {
+u8 fn_80117AE4(u32 arg1) {
     extern u32 fn_80113F48(void);
     extern void* fn_800F9318(u32 a, u32 b);
     extern void fn_800E5550(void* a);
@@ -7591,13 +7591,13 @@ void fn_80117AE4(u32 arg1) {
     }
     if (!found) {
         lbl_8047AD88 = 0;
-        return;
+        return 0;
     }
 
     lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
     if (lbl_8047AD8C == 0) {
         lbl_8047AD88 = 0;
-        return;
+        return 0;
     }
     lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     fn_800E4014((void*)lbl_8047AD90, 0);
@@ -7607,7 +7607,7 @@ void fn_80117AE4(u32 arg1) {
     lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
     fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = arg1;
-    return;
+    return 1;
 }
 #endif
 #pragma pop
@@ -26452,6 +26452,7 @@ asm void fn_80115684(void) {
 void* fn_80115684(u8* ptr, u32 idx) {
     void* sub;
     void* arr;
+    void* inner;
 
     if (ptr == NULL) {
         fn_800DD970(lbl_80272608, lbl_8035BA60);
@@ -26462,7 +26463,8 @@ void* fn_80115684(u8* ptr, u32 idx) {
         return NULL;
     }
     arr = *(void**)sub;
-    if (idx >= *(u32*)arr) {
+    inner = *(void**)arr;
+    if (idx >= *(u32*)inner) {
         return NULL;
     }
     return (u8*)*(void**)((u8*)sub + 4) + idx * 0x24;
