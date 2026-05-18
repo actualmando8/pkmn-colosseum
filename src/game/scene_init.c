@@ -4370,9 +4370,9 @@ asm void fn_8004CF78(void) {
 #pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
-void fn_8004CF78(u8* p) {
-    u16 tmp;
+u32 fn_8004CF78(u8* p) {
     u16 packed;
+    u16 tmp;
     u8* ctx;
     s32 r3;
 
@@ -4458,6 +4458,7 @@ void fn_8004CF78(u8* p) {
     tmp = packed;
     fn_80103EAC(0xa, &tmp);
     *(u16*)(p + 0x94) = packed;
+    return 0;
 }
 #pragma pop
 #endif
@@ -8238,6 +8239,9 @@ asm void fn_80058F40(void) {
 #include "src/game/scene_init_fn_80058F40.inc"
 }
 #else
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
 void* fn_80058F40(void* dflt, s32 dir, u32* state) {
     s32 i;
     void* found;
@@ -8275,6 +8279,8 @@ void* fn_80058F40(void* dflt, s32 dir, u32* state) {
     }
     return dflt;
 }
+#pragma peephole on
+#pragma scheduling off
 #endif
 
 /* fn_800599AC - 0x800599AC | size: 0x230 */
