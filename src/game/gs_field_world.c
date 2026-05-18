@@ -15692,52 +15692,22 @@ asm void fn_80122BC0(void) {
 #include "src/game/gs_field_world_fn_80122BC0.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-void fn_80122BC0(void) {
-    extern u32 fn_8012640C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma optimization_level 4
+u8 fn_80122BC0(u8* ptr, s32 b) {
+    extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
+    s32 val1;
+    s32 val2;
 
-    clrlwi(r0, r4, 16);
-    r30 = r4;
-    r29 = r3;
-    if ((s32)r0 != (s32)0) {
-        if (r29 != (u32)0x0) {
-            r4 = 0x0;
-            r5 = 0x83;
-            r6 = 0x0;
-            fn_8012640C();
-            clrlwi(r31, r3, 16);
-            r3 = r29;
-            r4 = 0x0;
-            r5 = 0x87;
-            r6 = 0x0;
-            fn_8012640C();
-            clrlwi(r3, r3, 16);
-            clrlwi(r0, r30, 16);
-            divw(r0, r3, r0);
-            srwi(r3, r31, 31);
-            srawi(r4, r0, 31);
-            subfc(r0, r31, r0);
-            adde(r0, r4, r3);
-            clrlwi(r3, r0, 24);
-        } else {
-            r3 = 0x0;
-            return;
-        }
-    } else {
-        r3 = 0x0;
-        return;
+    if (!(u16)b) {
+        return 0;
     }
+    if (ptr == NULL) {
+        return 0;
+    }
+    val1 = (s32)(u16)fn_8012640C(ptr, 0, 0x83, 0);
+    val2 = (s32)(u16)fn_8012640C(ptr, 0, 0x87, 0);
+    return (u8)((s32)val2 / (s32)(u16)b >= val1);
 }
-#pragma pop
 #endif
 /* 0x80122C64 | 0x178 */
 #if 0
