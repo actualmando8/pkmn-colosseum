@@ -4134,7 +4134,7 @@ u32 fn_80206A04(void)
   u32 uVar1;
   short sVar3;
   int iVar2;
-  s8 cVar4;
+  u8 cVar4;
   
   if (r3 == 0) {
     uVar1 = 0;
@@ -8429,7 +8429,7 @@ u32 fn_8020E7AC(void)
 
 {
     int r3;
-    u16 r4;
+    s16 r4;
     short r5;
 
     extern void fn_801FBD84();
