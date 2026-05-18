@@ -7038,6 +7038,7 @@ extern f32 lbl_8047CFD8;
 extern f32 lbl_8047CFD4;
 #pragma push
 #pragma fp_contract on
+#pragma peephole off
 #if 0
 asm void fn_801171C8(void) {
 #include "src/game/gs_field_world_fn_801171C8.inc"
@@ -7534,6 +7535,8 @@ extern u32 lbl_8047AD90;
 extern u32 lbl_8047AD94;
 extern u32 lbl_8047AD80;
 extern u32 lbl_8047AD84;
+#pragma push
+#pragma peephole off
 #if 0
 asm void fn_80117AE4(void) {
 #include "src/game/gs_field_world_fn_80117AE4.inc"
@@ -7552,15 +7555,13 @@ void fn_80117AE4(u32 arg1) {
     extern void fn_800ECCA8(void* a, u32 b);
     extern void fn_800EC990(void* a);
     extern void fn_800E563C(void* a, void* b);
-    u8* ptr;
     u32 count;
     u8 found;
 
     if ((s32)lbl_80478B40 == (s32)arg1) { return; }
 
-    ptr = (u8*)lbl_8047AD88;
-    if (ptr != NULL) {
-        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)));
+    if (lbl_8047AD88 != 0) {
+        fn_800E5550(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)));
         if (lbl_8047AD8C != 0) {
             fn_800EF5A4((void*)lbl_8047AD8C);
             lbl_8047AD8C = 0;
@@ -7590,23 +7591,23 @@ void fn_80117AE4(u32 arg1) {
         return;
     }
 
-    ptr = (u8*)lbl_8047AD88;
-    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)(ptr + 0), *(u16*)(ptr + 2), 0x44, 0, 0);
+    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
     if (lbl_8047AD8C == 0) {
         lbl_8047AD88 = 0;
         return;
     }
-    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)(ptr + 0xc));
+    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     fn_800E4014((void*)lbl_8047AD90, 0);
     fn_800EC188((void*)lbl_8047AD90, 1);
-    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)(ptr + 0x10));
+    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
-    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)(ptr + 0x14));
-    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)), (void*)lbl_8047AD8C);
+    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
+    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = arg1;
     return;
 }
 #endif
+#pragma pop
 /* 0x80117C84 | 0x90 */
 extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD8C;
@@ -7725,6 +7726,8 @@ extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD8C;
 extern u32 lbl_8047AD90;
 extern u32 lbl_8047AD94;
+#pragma push
+#pragma peephole off
 #if 0
 asm void fn_80117E58(void) {
 #include "src/game/gs_field_world_fn_80117E58.inc"
@@ -7788,22 +7791,22 @@ void fn_80117E58(void* arg) {
         return;
     }
 
-    ptr = (u8*)lbl_8047AD88;
-    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)(ptr + 0), *(u16*)(ptr + 2), 0x44, 0, 0);
+    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
     if (lbl_8047AD8C == 0) {
         lbl_8047AD88 = 0;
         return;
     }
-    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)(ptr + 0xc));
+    lbl_8047AD90 = (u32)fn_80113D34(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0xc));
     fn_800E4014((void*)lbl_8047AD90, 0);
     fn_800EC188((void*)lbl_8047AD90, 1);
-    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)(ptr + 0x10));
+    fn_800ECCA8((void*)lbl_8047AD90, *(u32*)((u8*)lbl_8047AD88 + 0x10));
     fn_800EC990((void*)lbl_8047AD90);
-    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)(ptr + 0x14));
-    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)(ptr + 8)), (void*)lbl_8047AD8C);
+    lbl_8047AD94 = (u32)fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 0x14));
+    fn_800E563C(fn_800F9318(fn_80113F48(), *(u32*)((u8*)lbl_8047AD88 + 8)), (void*)lbl_8047AD8C);
     lbl_80478B40 = 0;
 }
 #endif
+#pragma pop
 /* 0x48 | fn_80118020 | single_call_straight */
 extern void fn_800FF4D4(void);
 extern u32 lbl_802727C8[];
@@ -27387,7 +27390,7 @@ asm void fn_8011ED18(void) {
 #else
 #pragma optimization_level 4
 void* fn_8011ED18(u8* ptr) {
-    u16 val;
+    u32 val;
 
     if (ptr == NULL) {
         return NULL;
