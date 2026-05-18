@@ -2451,6 +2451,8 @@ asm void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 #pragma optimization_level 2
 #pragma scheduling on
 #pragma peephole off
+#pragma push
+#pragma optimization_level 3
 void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
     s32 ax, ay, bx, by;
     f32 scale_x, scale_y;
@@ -2476,6 +2478,7 @@ void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
     if (cy2 < 0) cy2 = 0;
     fn_800D9D68(cx1, cy1, cx2, cy2);
 }
+#pragma pop
 #endif
 #pragma pop
 
@@ -4947,11 +4950,14 @@ asm void fn_800F67AC(void) {
 }
 #else
 #pragma optimization_level 2
+#pragma push
+#pragma optimization_level 3
 s32 fn_800F67AC(u32* ptr) {
     u32* p = (u32*)ptr[5];
     ptr[5] = ptr[0] + *p;
     return 1;
 }
+#pragma pop
 #endif
 
 /* 0x800F67C8 | 0x184 */
@@ -5494,6 +5500,8 @@ asm u32 fn_800F7318(void) {
 #else
 #pragma optimization_level 4
 #pragma scheduling on
+#pragma push
+#pragma optimization_level 1
 u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...) {
     ThreadVaListArray list;
     register void* listPtr;
@@ -5520,6 +5528,7 @@ u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...)
     }
     return *(u16*)(entry + 0x6);
 }
+#pragma pop
 #endif
 #if 0
 asm u32 fn_800F7434(void* callback, u32 arg, ...) {
