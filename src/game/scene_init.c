@@ -896,7 +896,7 @@ extern void fn_800473E0(u8* entry);
 extern u8 fn_8004BDEC(void);
 extern u8 fn_8004BDFC(void);
 extern void fn_800492CC(u8* a, u8* b);
-extern u32 fn_80043728(u32 unused, u32 mode, u16 flags);
+extern u32 fn_80043728(u32 unused, s32 mode, u16 flags);
 extern void fn_800484A4(void);
 extern void fn_80042658(u32 a, u32 b);
 extern void fn_800439BC(void* a);
@@ -1882,7 +1882,7 @@ void fn_8003B6D0(u8* ctx) {
     u32 r30;
     u32 r0;
     base = (u8*)lbl_803A6748;
-    ctx[0x8b] = (u8)(s32)(lbl_8047BAC0 * *(f32*)(base + 0x44));
+    ctx[0x8b] = (u8)(lbl_8047BAC0 * *(f32*)(base + 0x44));
     r0 = *(u32*)base;
     r28 = (u32)(u16)*(u16*)((u8*)lbl_8047A4D4 + r0 * 4 + 2);
     r30 = 0;
@@ -2039,7 +2039,7 @@ asm void fn_8003C21C(void) {
 #else
 #pragma optimization_level 4
 void fn_8003C21C(u8* p) {
-    p[0x8b] = (u8)(s32)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
+    p[0x8b] = (u8)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
 }
 #endif
 
@@ -2104,7 +2104,7 @@ void fn_8003C728(u8* ctx, u8* p) {
 
 /* fn_8003C7C0 - 0x8003C7C0 | size: 0x65c */
 extern void fn_80124410(void);
-extern void fn_80166AB8(void);
+extern void fn_80166AB8(u32 a, u32 b, u32 c);
 extern void fn_80109C88(void);
 extern void fn_801EEDEC(void);
 extern u32 fn_800E202C(u32 a);
@@ -2998,7 +2998,7 @@ asm void fn_80043728(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
+u32 fn_80043728(u32 unused, s32 mode, u16 flags) {
     u16 f;
     u8* base;
     base = (u8*)lbl_803A6818;
@@ -3011,7 +3011,7 @@ u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
         if (total == 0) goto done;
         if (*(s32*)(base + 0x0) >= (s32)(total - 1)) goto done;
         *(u32*)(base + 0x0) = *(u32*)(base + 0x0) + 1;
-        fn_80166A50(0x23, 0, 0, 0);
+        fn_80166AB8(0x23, 0, 0);
         {
             u8* b = (u8*)lbl_803A6818;
             *(f32*)(b + 0x38) = *(f32*)(b + 0x38) - lbl_8047BCF4;
@@ -3024,7 +3024,7 @@ u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
         if (total == 0) goto done;
         if (*(s32*)(base + 0x0) <= 0) goto done;
         *(u32*)(base + 0x0) = *(u32*)(base + 0x0) - 1;
-        fn_80166A50(0x23, 0, 0, 0);
+        fn_80166AB8(0x23, 0, 0);
         {
             u8* b = (u8*)lbl_803A6818;
             *(f32*)(b + 0x38) = *(f32*)(b + 0x38) + lbl_8047BCF4;
@@ -3055,7 +3055,7 @@ u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
             *(f32*)(base + 0x38) = *(f32*)(base + 0x38) - lbl_8047BCF8;
             *(u32*)(base + 0x8) = *(u32*)(base + 0x8) + 0xa;
             *(u32*)(base + 0xc) = *(u32*)(base + 0xc) + 0xa;
-            fn_80166A50(0x23, 0, 0, 0);
+            fn_80166AB8(0x23, 0, 0);
         }
     } else if (f & 4) {
         /* page up */
@@ -3073,10 +3073,10 @@ u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
             *(f32*)(base + 0x38) = lbl_8047BC94;
             if (field0 != 0) {
                 *(u32*)(base + 0x8) = (u32)-5;
-                if (total < 5) {
-                    *(u32*)(base + 0xc) = (u32)total;
-                } else {
+                if (total >= 5) {
                     *(u32*)(base + 0xc) = 5;
+                } else {
+                    *(u32*)(base + 0xc) = (u32)total;
                 }
                 *(u32*)(lbl_803A6818 + 0x10) = (u32)total;
             }
@@ -3084,7 +3084,7 @@ u32 fn_80043728(u32 unused, u32 mode, u16 flags) {
             *(f32*)(base + 0x38) = *(f32*)(base + 0x38) + lbl_8047BCF8;
             *(u32*)(base + 0x8) = *(u32*)(base + 0x8) - 0xa;
             *(u32*)(base + 0xc) = *(u32*)(base + 0xc) - 0xa;
-            fn_80166A50(0x23, 0, 0, 0);
+            fn_80166AB8(0x23, 0, 0);
         }
     }
 
@@ -4059,6 +4059,7 @@ asm void fn_8004C4A4(void) {
 #include "src/game/scene_init_fn_8004C4A4.inc"
 }
 #else
+#pragma fp_contract on
 #pragma optimization_level 4
 u32 fn_8004C4A4(u8* ctx, u8* p) {
     u8* r30;
@@ -4072,13 +4073,14 @@ u32 fn_8004C4A4(u8* ctx, u8* p) {
     }
     if (*(s16*)(p + 6) == 0x444) {
         s32 val = *(s32*)(r30 + 4);
-        *(s16*)(p + 0x50) = (s16)(s32)(lbl_8047BE08 * *(f32*)(*(u32*)r30) + (f32)val);
+        *(s16*)(p + 0x50) = (s16)(lbl_8047BE08 * *(f32*)(*(u32*)r30) + (f32)val);
     } else {
         s32 val = *(s32*)(r30 + 8);
-        *(s16*)(p + 0x50) = (s16)(s32)(lbl_8047BE0C * *(f32*)(*(u32*)r30) + (f32)val);
+        *(s16*)(p + 0x50) = (s16)(lbl_8047BE0C * *(f32*)(*(u32*)r30) + (f32)val);
     }
     return 0;
 }
+#pragma fp_contract off
 #endif
 
 /* fn_8004C5B0 - 0x8004C5B0 | size: 0x110 */
@@ -5498,6 +5500,7 @@ asm void fn_8004E8E0(void) {
 #include "src/game/scene_init_fn_8004E8E0.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_8004E8E0(u8* p) {
     u8* r4;
@@ -5512,11 +5515,12 @@ u32 fn_8004E8E0(u8* p) {
     case 2:
         {
             f32 f0;
+            f32 f1 = lbl_8047BE4C;
             f32* fp = (f32*)(*(u32*)r4);
             f0 = *fp + lbl_8047BE50;
             *fp = f0;
-            if (f0 >= lbl_8047BE4C) {
-                *fp = *fp - lbl_8047BE4C;
+            if (f0 >= f1) {
+                *fp = *fp - f1;
             }
         }
         break;
@@ -5529,6 +5533,7 @@ u32 fn_8004E8E0(u8* p) {
     }
     return 0;
 }
+#pragma scheduling off
 #endif
 
 /* fn_8004E9C0 - 0x8004E9C0 | size: 0x11c */
@@ -6434,6 +6439,9 @@ asm void fn_80054C44(void) {
 #include "src/game/scene_init_fn_80054C44.inc"
 }
 #else
+#pragma push
+#pragma peephole off
+#pragma optimization_level 4
 u32 fn_80054C44(u8* ctx) {
     u8* input;
     u16 buttons;
@@ -6442,10 +6450,10 @@ u32 fn_80054C44(u8* ctx) {
     u8* ptr;
 
     input = (u8*)fn_80105624();
-    if (fn_800573C0() != 0) { return 0; }
-    if (fn_800566E8() != 0) { return 0; }
+    if ((s32)fn_800573C0() != 0) { return 0; }
+    if ((s32)fn_800566E8() != 0) { return 0; }
     if (*(u16*)(input + 6) & 0xC0) {
-        if (fn_80057694() != 0) {
+        if ((s32)fn_80057694() != 0) {
             fn_800576A4(0);
         } else {
             fn_800576A4(1);
@@ -6515,6 +6523,7 @@ u32 fn_80054C44(u8* ctx) {
     }
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80054E7C - 0x80054E7C | size: 0x4c */
