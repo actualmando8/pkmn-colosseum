@@ -353,6 +353,8 @@ extern u32 lbl_80478B38;
  *
  * Address: 0x8000857C  Size: 0x5C (92 bytes)
  * ======================================================================= */
+#pragma push
+#pragma peephole off
 void* fn_8000857C(u32 id)
 {
     if (id == 9) {
@@ -367,6 +369,7 @@ void* fn_8000857C(u32 id)
         return fn_800FA280((u32)fn_8010C4D4(idx));
     }
 }
+#pragma pop
 
 /* =======================================================================
  * fn_800087FC -- GStask_LookupEventById
@@ -1169,6 +1172,8 @@ asm void fn_80007088(void) {
 #include "src/game/gs_task_fn_80007088.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_80007088(void) {
     if (fn_801EF63C() == 0) {
         return -1;
@@ -1177,6 +1182,7 @@ s32 fn_80007088(void) {
     fn_801337E4();
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_800070CC - 0x800070CC | size: 0x44 */
@@ -1186,6 +1192,8 @@ asm void fn_800070CC(void) {
 #include "src/game/gs_task_fn_800070CC.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_800070CC(void) {
     if (fn_801EF63C() == 0) {
         return -1;
@@ -1194,6 +1202,7 @@ s32 fn_800070CC(void) {
     fn_801337E4();
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80007110 - 0x80007110 | size: 0x44 */
@@ -1202,6 +1211,8 @@ asm void fn_80007110(void) {
 #include "src/game/gs_task_fn_80007110.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 s32 fn_80007110(void) {
     if (fn_801EF63C() == 0) {
         return -1;
@@ -1210,6 +1221,7 @@ s32 fn_80007110(void) {
     fn_801337E4();
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80007154 - 0x80007154 | size: 0x58 */
@@ -2102,11 +2114,14 @@ asm void fn_800083FC(void) {
 #include "src/game/gs_task_fn_800083FC.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void* fn_800083FC(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id >= 0x163) return fn_800FA280(0xEB63);
     return fn_800FA280((u32)fn_8011BEB4(0, (u16)id, 1, 0));
 }
+#pragma pop
 #endif
 
 /* fn_80008460 - 0x80008460 | size: 0x60 */
