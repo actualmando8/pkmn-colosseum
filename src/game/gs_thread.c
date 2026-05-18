@@ -5200,7 +5200,7 @@ u32 fn_800F6BC4(void* obj) {
     u8* strBase;
     u8* ip;
     u32 state;
-    u32 opcode;
+    s32 opcode;
     void (*dispatch)(void*);
     u32 count;
     volatile u32 ret;
