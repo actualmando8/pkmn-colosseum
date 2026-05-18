@@ -427,6 +427,8 @@ asm void fn_801992D8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma optimization_level 1
 HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
 {
     HSD_DObj* dobj;
@@ -457,6 +459,7 @@ HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
     }
     return dobj;
 }
+#pragma pop
 #endif
 #pragma pop
 
@@ -477,6 +480,8 @@ asm void fn_801993A4(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma optimization_level 1
 static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
 {
     void* desc;
@@ -540,6 +545,7 @@ static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
     }
     return 0;
 }
+#pragma pop
 #endif
 #pragma pop
 
