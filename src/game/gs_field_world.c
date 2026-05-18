@@ -6963,11 +6963,12 @@ extern void* fn_8018F6CC(u16);
 #pragma push
 #pragma scheduling off
 void* fn_80117070(u8* ptr) {
-    void* sub = NULL;
-    if (ptr != NULL) {
-        sub = fn_8018F6CC(*(u16*)(&ptr[0x6]));
-    }
+    void* sub;
+    if (ptr == NULL) { goto ret_null; }
+    sub = fn_8018F6CC(*(u16*)(&ptr[0x6]));
     return sub;
+ret_null:
+    return NULL;
 }
 #pragma pop
 /* 0x8011711C | 0x38 */
@@ -7182,7 +7183,7 @@ void fn_80117330(f32 arg) {
 }
 #endif
 /* 0x801174C4 | 0x28 */
-u8 fn_801174C4(void) {
+u32 fn_801174C4(void) {
     u8 result = 0;
     if (lbl_8047AD68 != 0 && lbl_8047AD6C != 0) {
         result = 1;
@@ -8557,14 +8558,14 @@ void fn_80118A68(u8* obj, u32 notify) {
     u8* model;
     u8* base;
     u8* scan;
-    volatile u32* active;
+    s32* active;
 
     if ((notify & 0xFF) == 1) {
         model = *(u8**)(obj + 0x10);
         fn_801695FC(*(u16*)(model + 0x18), model[0x15]);
     }
 
-    active = (volatile u32*)(obj + 0x44);
+    active = (s32*)(obj + 0x44);
     if (*active != 0 && *active != 0) {
         fn_800EC160(*(u32*)(obj + 0x48), 0);
         *(u32*)(obj + 0x48) = 0;
@@ -12421,14 +12422,14 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
 }
 #endif
 /* 0x7C | fn_8011DD80 | call_clamp_store */
-void fn_8011DD80(u32 arg1, u32 arg2, u8 maxVal) {
+void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
-    extern s32 fn_80123E70(u8* ptr, u16 idx);
+    extern s32 fn_80123E70(u8* ptr, s32 idx);
     u8* result;
     u8 val;
     result = fn_8011F260(arg1, arg2, 0);
     if (result == NULL) { return; }
-    val = fn_80123E70((u8*)arg1, (u16)arg2);
+    val = fn_80123E70((u8*)arg1, arg2);
     if (val < maxVal) {
         maxVal = val;
     }
@@ -26843,6 +26844,8 @@ asm void fn_80116FE0(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 u32 fn_80116FE0(u8* ptr, void* obj) {
     if (ptr == NULL) {
         return 0;
@@ -26853,6 +26856,7 @@ u32 fn_80116FE0(u8* ptr, void* obj) {
     fn_800E01F4(obj, *(f32*)(ptr + 0x18), *(f32*)(ptr + 0x1C), *(f32*)(ptr + 0x20));
     return 1;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801170A4(void) {
