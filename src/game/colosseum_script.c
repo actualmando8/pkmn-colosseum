@@ -5346,7 +5346,7 @@ u32 fn_80228DAC(void)
   u32 bVar1;
   u16 uVar8;
   short sVar9;
-  s8 cVar11;
+  u8 cVar11;
   short sVar10;
   u32 uVar2;
   u32 uVar3;
@@ -7308,7 +7308,7 @@ void fn_8022E6F0(void)
     extern void fn_8026246C();
     extern void fn_802624CC();
     extern void fn_802653FC();
-  s8 cVar8;
+  u8 cVar8;
   u32 uVar1;
   u32 uVar2;
   u16 uVar6;
@@ -11927,7 +11927,7 @@ u32 fn_8023793C(void)
     extern u32 fn_80207B8C();
   u32 uVar1;
   u16 uVar2;
-  s8 cVar5;
+  u8 cVar5;
   u16 uVar3;
   u16 uVar4;
   u32 uVar6;
@@ -12534,7 +12534,7 @@ int fn_802389D4(void)
   u16 uVar4;
   u32 uVar1;
   u16 uVar5;
-  s8 cVar7;
+  u8 cVar7;
   short sVar6;
   int iVar2;
   int iVar8;
@@ -12585,7 +12585,7 @@ u32 fn_80238B0C(void)
   u32 uVar1;
   u16 uVar4;
   u32 uVar2;
-  s8 cVar8;
+  u8 cVar8;
   u16 uVar5;
   u16 uVar6;
   u16 uVar7;
@@ -20514,7 +20514,7 @@ void fn_80216550(void)
     extern void fn_8020248C();
     extern s8 fn_802025B8();
   u32 uVar1;
-  s8 cVar2;
+  u8 cVar2;
 
   uVar1 = fn_801F025C(0x11,0);
   cVar2 = fn_802025B8(uVar1,0x24);
@@ -20618,7 +20618,7 @@ void fn_80216804(void)
     extern s8 fn_802025B8();
     extern u32 lbl_8047B618;
   u32 uVar1;
-  s8 cVar2;
+  u8 cVar2;
 
   uVar1 = fn_801F025C(0x11,0);
   if (((lbl_8047B618 & 0x2000000) != 0) &&
@@ -20978,7 +20978,7 @@ void fn_802171BC(void)
     extern void fn_8020248C();
     extern s8 fn_802025B8();
   u32 uVar1;
-  s8 cVar2;
+  u8 cVar2;
 
   uVar1 = fn_801F025C(0x11,0);
   cVar2 = fn_802025B8(uVar1,0x1a);
@@ -21602,7 +21602,7 @@ void fn_80218270(void)
     extern void fn_8020248C();
     extern s8 fn_802025B8();
   u32 uVar1;
-  s8 cVar2;
+  u8 cVar2;
 
   uVar1 = fn_801F025C(0x12,0);
   cVar2 = fn_802025B8(uVar1,0x19);
@@ -24581,7 +24581,7 @@ void fn_8021D010(void)
     extern u32 fn_80205B8C();
   u32 uVar1;
   u32 uVar2;
-  s8 cVar3;
+  u8 cVar3;
 
   uVar1 = fn_801F025C(0x11,0);
   uVar2 = fn_80205B8C();
@@ -25509,7 +25509,7 @@ void fn_8021E754(void)
     extern int fn_80203E7C();
     extern s8 fn_80206A04();
   u16 uVar8;
-  s8 cVar10;
+  u8 cVar10;
   int iVar1;
   int iVar2;
   u32 uVar3;
