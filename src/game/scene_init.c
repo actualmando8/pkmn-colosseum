@@ -4527,6 +4527,7 @@ asm void fn_8004D5EC(void) {
 #include "src/game/scene_init_fn_8004D5EC.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_8004D5EC(u8* p, u32 q) {
     u32 v;
@@ -4544,6 +4545,7 @@ u32 fn_8004D5EC(u8* p, u32 q) {
     fn_80109220(q, val);
     return 0;
 }
+#pragma scheduling off
 #endif
 
 /* fn_8004D64C - 0x8004D64C | size: 0x60 */
@@ -4552,6 +4554,7 @@ asm void fn_8004D64C(void) {
 #include "src/game/scene_init_fn_8004D64C.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_8004D64C(u8* p, u32 q) {
     u32 v;
@@ -4569,6 +4572,7 @@ u32 fn_8004D64C(u8* p, u32 q) {
     fn_80109220(q, val);
     return 0;
 }
+#pragma scheduling off
 #endif
 
 /* fn_8004D6AC - 0x8004D6AC | size: 0x44 */
@@ -4608,8 +4612,7 @@ u32 fn_8004D6F0(u8* p, u8* q) {
     v = *(u32*)(p + 0x60);
     v = *(u32*)v;
     v = *(u32*)v;
-    fn_8004BE40((s32)v);
-    result = fn_801D1A88(0);
+    result = fn_801D1A88(fn_8004BE40((s32)v));
     if (result != 0) {
         fn_80132A38(0x37, fn_800FA280());
         *(u32*)(q + 0x4c) = 0xe7;
@@ -4636,8 +4639,7 @@ u32 fn_8004D760(u8* p, u8* q) {
     v = *(u32*)(p + 0x60);
     v = *(u32*)v;
     v = *(u32*)v;
-    fn_8004BE40((s32)v);
-    result = fn_801D1ACC(0);
+    result = fn_801D1ACC(fn_8004BE40((s32)v));
     if (result != 0) {
         fn_80132A38(0x37, fn_800FA280());
         *(u32*)(q + 0x4c) = 0xe7;
@@ -4872,8 +4874,8 @@ asm s32 fn_8004DC18(u32 a) {
 #else
 #pragma optimization_level 4
 s32 fn_8004DC18(u32 a) {
-    u32 saved;
     u32 changed;
+    u32 saved;
     s32 result;
 
     saved = a;
@@ -5434,6 +5436,7 @@ asm void fn_8004E89C(void) {
 #include "src/game/scene_init_fn_8004E89C.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 void fn_8004E89C(u8* p) {
     u8* ctx;
@@ -5443,6 +5446,7 @@ void fn_8004E89C(u8* p) {
         fn_80102ED4(p);
     }
 }
+#pragma scheduling off
 #endif
 
 /* fn_8004E8E0 - 0x8004E8E0 | size: 0xe0 */
@@ -5863,6 +5867,7 @@ asm void fn_80053C00(void) {
 #include "src/game/scene_init_fn_80053C00.inc"
 }
 #else
+#pragma scheduling on
 #pragma peephole off
 #pragma optimization_level 4
 u32 fn_80053C00(u8* p, u8* q) {
@@ -5881,6 +5886,7 @@ u32 fn_80053C00(u8* p, u8* q) {
     return 0;
 }
 #pragma peephole on
+#pragma scheduling off
 #endif
 
 /* fn_80053C84 - 0x80053C84 | size: 0x64 */
@@ -6261,7 +6267,7 @@ asm void fn_800549F0(void) {
 #else
 #pragma optimization_level 4
 u32 fn_800549F0(u8* p, u32 q) {
-    if (*(u32*)(*(u32*)(p + 0x60) + 4) != 2) {
+    if (*(s32*)(*(u32*)(p + 0x60) + 4) != 2) {
         fn_80109220(q, 0);
     }
     return 0;
@@ -6276,7 +6282,7 @@ asm void fn_80054A2C(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80054A2C(u8* p, u32 q) {
-    if (*(u32*)(*(u32*)(p + 0x60) + 4) != 1) {
+    if (*(s32*)(*(u32*)(p + 0x60) + 4) != 1) {
         fn_80109220(q, 0);
     }
     return 0;
@@ -6291,7 +6297,7 @@ asm void fn_80054A68(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80054A68(u8* p, u32 q) {
-    if (*(u32*)(*(u32*)(p + 0x60) + 4) != 0) {
+    if (*(s32*)(*(u32*)(p + 0x60) + 4) != 0) {
         fn_80109220(q, 0);
     }
     return 0;
@@ -6306,7 +6312,7 @@ asm void fn_80054AA4(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80054AA4(u8* p, u32 q) {
-    if (*(u32*)(*(u32*)(p + 0x60)) == 0) {
+    if (*(s32*)(*(u32*)(p + 0x60)) == 0) {
         fn_80109220(q, 0);
     }
     return 0;
@@ -6321,7 +6327,7 @@ asm void fn_80054AE0(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80054AE0(u8* p, u32 q) {
-    if (*(u32*)(*(u32*)(p + 0x60)) != 0) {
+    if (*(s32*)(*(u32*)(p + 0x60)) != 0) {
         fn_80109220(q, 0);
     }
     return 0;
@@ -6673,15 +6679,15 @@ asm void fn_80055B98(void) {
 #include "src/game/scene_init_fn_80055B98.inc"
 }
 #else
+#pragma scheduling on
+#pragma optimization_level 4
+#pragma peephole off
 void fn_80055B98(s32 idx) {
     fn_801026A4(0x10e, 0x1f, 0, 0, 0, 0);
     fn_80056B74(idx, 1);
-    do {
-        if (fn_80055E38(idx) != 0) {
-            break;
-        }
+    while ((s32)fn_80055E38(idx) == 0) {
         fn_800F0308();
-    } while (1);
+    }
     fn_80054760(0, 1);
     fn_80057A64(0, 0);
     fn_800558B8();
@@ -6689,6 +6695,8 @@ void fn_80055B98(s32 idx) {
     fn_8005471C();
     fn_80056A80();
 }
+#pragma peephole on
+#pragma scheduling off
 #endif
 
 /* fn_80055C2C - 0x80055C2C | size: 0xa8 */
