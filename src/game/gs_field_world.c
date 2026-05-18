@@ -7133,6 +7133,8 @@ asm void fn_80117330(void) {
 #include "src/game/gs_field_world_fn_80117330.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void fn_80117330(f32 arg) {
     extern u8 fn_80177A38(void);
     extern void fn_80177908(void*);
@@ -7182,6 +7184,7 @@ void fn_80117330(f32 arg) {
     fn_80177574(0, rot, arg);
     fn_80177478(0, &mat[0xC], arg);
 }
+#pragma pop
 #endif
 /* 0x801174C4 | 0x28 */
 u32 fn_801174C4(void) {
@@ -26312,6 +26315,8 @@ asm void fn_80114E0C(void) {
 #include "src/game/gs_field_world_fn_80114E0C.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_80114E0C(u32 a, u32 b) {
     void* result;
@@ -26325,6 +26330,7 @@ void* fn_80114E0C(u32 a, u32 b) {
     }
     return result;
 }
+#pragma pop
 #endif
 extern void fn_800FC244();
 #if 0
@@ -26332,6 +26338,8 @@ asm void fn_80114F18(void) {
 #include "src/game/gs_field_world_fn_80114F18.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_80114F18(u32 a, u32 b) {
     void* result;
@@ -26345,6 +26353,7 @@ void* fn_80114F18(u32 a, u32 b) {
     }
     return result;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80115024(void) {
