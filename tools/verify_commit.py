@@ -51,8 +51,10 @@ TRUTH_DENY = [
 
 
 def git(*args):
-    return subprocess.run(["git", "-C", str(ROOT), *args],
-                           capture_output=True, text=True).stdout
+    # bytes + utf-8/replace: source diffs contain non-cp1252 bytes that
+    # would crash text=True decoding on Windows and silently pass the gate.
+    r = subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True)
+    return r.stdout.decode("utf-8", errors="replace")
 
 
 def changed_files(rng):
@@ -130,6 +132,57 @@ def remeasure(spec):
     return (True, f"{fn}: {actual:.2f}% >= claimed {claimed}% OK")
 
 
+def _file_at(ref, path):
+    """File contents at a git ref, or None if absent. Reads bytes and
+    decodes utf-8/replace — source files contain non-cp1252 bytes
+    (e.g. 0x81), and text=True would crash the decode on Windows,
+    silently making every file un-checkable."""
+    r = subprocess.run(["git", "-C", str(ROOT), "show", f"{ref}:{path}"],
+                        capture_output=True)
+    if r.returncode != 0:
+        return None
+    return r.stdout.decode("utf-8", errors="replace")
+
+
+def _matched_in(content, path):
+    """Isolated-compile `content` as `path`, return #fn_ symbols @100%
+    (or None if it doesn't compile)."""
+    import automatch
+    tag = "vc_" + re.sub(r"\W", "_", path)
+    m = automatch.measure_isolated(content, ROOT / path, None, tag)
+    if m is None:
+        return None
+    return sum(1 for k, v in m.items()
+               if k.startswith("fn_") and v >= 100.0)
+
+
+def check_file_regression(parent, head):
+    """For every changed src/**/*.c, recompile parent vs head and reject
+    on a whole-file matched-count drop. This catches localized edits that
+    fix the target fn but regress neighbours (the w2/scene_init class) —
+    which --measure (claimed-fns-only) cannot see."""
+    out = git("diff", "--name-only", parent, head)
+    msgs = []
+    for f in out.splitlines():
+        f = f.strip()
+        if not (f.startswith("src/") and f.endswith(".c")):
+            continue
+        pc = _file_at(parent, f)
+        hc = _file_at(head, f)
+        if pc is None or hc is None:
+            continue  # added/removed file — nothing to regress
+        pm = _matched_in(pc, f)
+        hm = _matched_in(hc, f)
+        if pm is None or hm is None:
+            continue  # compile failure handled elsewhere
+        tag = "OK" if hm >= pm else "REGRESSED"
+        print(f"  [{tag}] {f}: {pm} -> {hm} @100%")
+        if hm < pm:
+            msgs.append(f"{f}: whole-file matched {pm}->{hm} "
+                        f"(net -{pm - hm})")
+    return msgs
+
+
 def main():
     ap = argparse.ArgumentParser()
     g = ap.add_mutually_exclusive_group()
@@ -137,18 +190,28 @@ def main():
     g.add_argument("--commit", help="single commit sha")
     ap.add_argument("--measure", action="append", default=[],
                     help="src.c:fn:CLAIMED% — re-measure claim (repeatable)")
+    ap.add_argument("--no-regression-check", action="store_true",
+                    help="skip the whole-file non-regression rebuild "
+                         "(default: enabled — recompiles each changed .c)")
     args = ap.parse_args()
 
     if args.commit:
         rng = f"{args.commit}~1..{args.commit}"
+        parent, head = f"{args.commit}~1", args.commit
     elif args.range:
         rng = args.range
+        parent, head = (rng.split("..", 1) + ["HEAD"])[:2]
     else:
         rng = "HEAD~1..HEAD"
+        parent, head = "HEAD~1", "HEAD"
 
     files = changed_files(rng)
     diff = diff_text(rng)
     violations = []
+
+    if not args.no_regression_check:
+        violations += ["WHOLE-FILE REGRESSION: " + m
+                       for m in check_file_regression(parent, head)]
 
     bad_truth = check_truth_files(files)
     if bad_truth:
