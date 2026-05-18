@@ -5062,15 +5062,15 @@ u8 fn_8004DFCC(u8 a) {
     }
     fn_80102510(0x76);
     fn_80102428(0x76, 1);
-    snd = fn_801D1650(lbl_8047A524);
+    snd = fn_801D1650((u32)(u8)lbl_8047A524);
     if (snd != 0) {
         fn_801669E4(snd, 0, 0);
     }
-    snd = fn_801D1650(lbl_8047A524);
+    snd = fn_801D1650((u32)(u8)lbl_8047A524);
     if (snd != 0) {
         fn_801666BC();
     }
-    snd = fn_801D1650(lbl_8047A524);
+    snd = fn_801D1650((u32)(u8)lbl_8047A524);
     if (snd != 0) {
         fn_80166B18();
     }
@@ -5833,7 +5833,6 @@ asm void fn_80053C00(void) {
 #include "src/game/scene_init_fn_80053C00.inc"
 }
 #else
-#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80053C00(u8* p, u8* q) {
     u16 v;
@@ -5850,7 +5849,6 @@ u32 fn_80053C00(u8* p, u8* q) {
     *(u32*)(q + 0x4c) = 0;
     return 0;
 }
-#pragma peephole on
 #endif
 
 /* fn_80053C84 - 0x80053C84 | size: 0x64 */
@@ -5959,7 +5957,6 @@ asm void fn_80053E7C(void) {
 #include "src/game/scene_init_fn_80053E7C.inc"
 }
 #else
-#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_80053E7C(u8* p) {
     if (fn_80057270() == 0) {
@@ -5969,7 +5966,6 @@ u32 fn_80053E7C(u8* p) {
     fn_800FB680(0, 0, -1, 0xe7);
     return 0;
 }
-#pragma scheduling off
 #endif
 
 /* fn_80053ED8 - 0x80053ED8 | size: 0x548 */
@@ -7731,13 +7727,11 @@ asm void fn_80057DE8(void) {
 #include "src/game/scene_init_fn_80057DE8.inc"
 }
 #else
-#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80057DE8(u32 a) {
     if ((u8)fn_80123FBC((void*)a) == 0) { return 0; }
     return (u8)fn_8011FC74(a) != 0 ? 1 : 0;
 }
-#pragma peephole on
 #endif
 
 /* fn_80057E40 - 0x80057E40 | size: 0x30 */
