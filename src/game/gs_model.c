@@ -590,7 +590,7 @@ void* fn_801022B8(void* p, u32 target) {
         void* result = (void*)0;
         do {
             void* node = fn_8005D934(r30);
-            if ((*(u8*)node >> 7) & 1) {
+            if ((*(s8*)node >> 7) & 1) {
                 if (r29b == r31) {
                     return (void*)(s32)(s16)r30;
                 }
