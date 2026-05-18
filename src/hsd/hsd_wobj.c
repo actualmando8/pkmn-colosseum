@@ -482,12 +482,15 @@ void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
 #pragma push
 extern void fn_801AFEFC(void* robj, f32 frame);
 extern void fn_801C29C4(void* aobj, f32 frame);
+#pragma push
+#pragma optimization_level 1
 void fn_80191E38(HSD_WObj* wobj, f32 frame) {
     if (wobj != NULL) {
         fn_801C29C4(wobj->aobj, frame);
         fn_801AFEFC(wobj->robj, frame);
     }
 }
+#pragma pop
 
 /* 0x80191E88 | 0x44 */
 #pragma push
