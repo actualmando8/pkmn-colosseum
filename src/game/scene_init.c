@@ -4622,13 +4622,15 @@ asm void fn_8004D6F0(void) {
 u32 fn_8004D6F0(u8* p, u8* q) {
     u32 v;
     u32 result;
+    u32 fa;
 
     v = *(u32*)(p + 0x60);
     v = *(u32*)v;
     v = *(u32*)v;
     result = fn_801D1A88(fn_8004BE40((s32)v));
     if (result != 0) {
-        fn_80132A38(0x37, fn_800FA280());
+        fa = fn_800FA280();
+        fn_80132A38(0x37, fa);
         *(u32*)(q + 0x4c) = 0xe7;
     } else {
         *(u32*)(q + 0x4c) = 0;
@@ -4649,13 +4651,15 @@ asm void fn_8004D760(void) {
 u32 fn_8004D760(u8* p, u8* q) {
     u32 v;
     u32 result;
+    u32 fa;
 
     v = *(u32*)(p + 0x60);
     v = *(u32*)v;
     v = *(u32*)v;
     result = fn_801D1ACC(fn_8004BE40((s32)v));
     if (result != 0) {
-        fn_80132A38(0x37, fn_800FA280());
+        fa = fn_800FA280();
+        fn_80132A38(0x37, fa);
         *(u32*)(q + 0x4c) = 0xe7;
     } else {
         *(u32*)(q + 0x4c) = 0;
@@ -5940,6 +5944,9 @@ asm void fn_80053CE8(void) {
 #include "src/game/scene_init_fn_80053CE8.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80053CE8(u8* p, u8* q) {
     u32 val;
@@ -5953,11 +5960,15 @@ u32 fn_80053CE8(u8* p, u8* q) {
         case 1:
             val = 0xd68;
             break;
+        case 2:
+        case 3:
+            break;
         }
     }
     *(u32*)(q + 0x4c) = val;
     return 0;
 }
+#pragma pop
 #endif
 
 /* fn_80053D64 - 0x80053D64 | size: 0x70 */
@@ -6023,10 +6034,12 @@ asm void fn_80053E7C(void) {
 #pragma scheduling on
 #pragma optimization_level 4
 u32 fn_80053E7C(u8* p) {
+    u32 v;
     if (fn_80057270() == 0) {
         return 0;
     }
-    fn_80132A38(0x37, fn_8011F4F0());
+    v = fn_8011F4F0();
+    fn_80132A38(0x37, v);
     fn_800FB680(0, 0, -1, 0xe7);
     return 0;
 }
@@ -6580,6 +6593,9 @@ asm void fn_800550B4(void) {
 #include "src/game/scene_init_fn_800550B4.inc"
 }
 #else
+#pragma peephole off
+#pragma optimization_level 2
+#pragma scheduling on
 s32 fn_800550B4(u8* ctx) {
     s32 flag;
     u8* ptr;
@@ -6598,7 +6614,7 @@ s32 fn_800550B4(u8* ctx) {
     case 2:
         fn_80057948();
         fn_80056854();
-        if ((u32)fn_801046B8() == *(u32*)(ctx + 4)) {
+        if ((s32)fn_801046B8() == *(s32*)(ctx + 4)) {
             fn_80054EC8(ctx);
         }
         break;
@@ -6610,6 +6626,7 @@ s32 fn_800550B4(u8* ctx) {
     }
     return 0;
 }
+#pragma scheduling off
 #endif
 
 /* fn_80055194 - 0x80055194 | size: 0x38 */
