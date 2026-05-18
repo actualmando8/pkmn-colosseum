@@ -60,3 +60,25 @@ Agents are hypothesis-testers, not explorers. They read
 
 ~125 deterministically-attackable functions in 5 files alone. The
 dominant AUTO class is `signed-compare`.
+
+## 2026-05-17 — CRITICAL: manual-LLM agents need whole-file non-regression check
+
+w2/scene_init incident: a HINT agent made its 10 target functions 100%
+(each independently `verify_commit --measure`-verified) but the commit
+NET REGRESSED the file 107→101 — it broke >=16 OTHER functions in
+scene_init while fixing 10. Reverted (commits bd3140a, 7861c12).
+
+Root cause: automatch/autorewrite have a whole-file matched-count guard
+with auto-revert. **Manual LLM-agent edits do NOT** — `verify_commit
+--measure` only checks the *claimed* functions, never the rest of the
+file. A localized edit (pragma scope, decl reorder) can shift codegen
+for neighbours.
+
+MANDATORY going forward:
+- Agent prompts MUST require: after edits, measure the WHOLE file's
+  matched-count and confirm it is >= the pre-edit baseline; revert if not.
+- Harden verify_commit.py: for each changed .c, recompile and compare
+  whole-file matched-count vs the parent commit; REJECT on any net drop.
+  (This would have auto-caught w2.) — highest-priority gate improvement.
+- Parent MUST rebuild cherry-picked files before quoting any aggregate
+  (progress.py reads stale .o; only per-file rebuild gives truth).
