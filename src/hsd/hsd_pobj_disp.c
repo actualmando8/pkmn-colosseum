@@ -203,6 +203,8 @@ void fn_801AA498(void* list, void* data)
 /* =========================================================================
  * 0x801AA4CC | size: 0x6C  -- Allocate from pool
  * ========================================================================= */
+#pragma push
+#pragma optimization_level 1
 void* fn_801AA4CC(void* list)
 {
     void* l = list;
@@ -220,6 +222,7 @@ void* fn_801AA4CC(void* list)
 
     return fn_801A6928(*(u32*)((u8*)l + 0x20));
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AA538 | size: 0x30
@@ -279,6 +282,8 @@ void fn_801AA608(void)
 /* =========================================================================
  * 0x801AA6D0 | size: 0xB8  -- PObj remove
  * ========================================================================= */
+#pragma push
+#pragma optimization_level 1
 void fn_801AA6D0(void* pobj)
 {
     void* p = pobj;
@@ -311,6 +316,7 @@ void fn_801AA6D0(void* pobj)
         ((void(*)(void*))ci[0x38/4])(p);
     }
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AA788 | size: 0x134  -- PObj display dispatch
@@ -520,12 +526,15 @@ void fn_801AC91C(void)
 /* =========================================================================
  * 0x801ACD7C | size: 0x30  -- Draw sync + clear display list state
  * ========================================================================= */
+#pragma push
+#pragma optimization_level 1
 void fn_801ACD7C(void)
 {
     fn_800B7D3C();
     lbl_8047B2FC = 0;
     lbl_8047B300 = NULL;
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801ACDAC | size: 0x298
@@ -544,6 +553,8 @@ void fn_801AD044(void* pobj, void* desc)
 /* =========================================================================
  * 0x801AD214 | size: 0x74  -- Walk pobj list, call vtable[0x30] + [0x34]
  * ========================================================================= */
+#pragma push
+#pragma peephole off
 void fn_801AD214(void* pobj)
 {
     void* cur = pobj;
@@ -559,6 +570,7 @@ void fn_801AD214(void* pobj)
         cur = next;
     }
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AD288 | size: 0xCC  -- PObj load from descriptor
@@ -767,6 +779,8 @@ u32 fn_801ADCD8(void)
 /* =========================================================================
  * 0x801ADD0C | size: 0x3C  -- Deactivate texture anim state
  * ========================================================================= */
+#pragma push
+#pragma optimization_level 1
 void fn_801ADD0C(void)
 {
     s32 r = fn_801A6990(lbl_8047B308);
@@ -775,6 +789,7 @@ void fn_801ADD0C(void)
         lbl_8047B30C = 0;
     }
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801ADD48 | size: 0x108
