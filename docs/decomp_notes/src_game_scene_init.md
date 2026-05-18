@@ -16,7 +16,12 @@ produces. Generalizes beyond this file — file under "float→short store"
 pattern.
 
 ## Blocked near-misses
-None identified yet.
+
+- **fn_80037180** @ 96.7% — `branch-layout`
+  - Symptom: target has `cmpwi; beq @then; b @else` (2 branches) but CW emits `cmpwi; bne @else` (1 branch) regardless of if/else structure.
+  - Tried: `#pragma peephole off` (keeps at 96.7%), peephole on (92.4%), goto-based restructure with peephole off (still 96.7%), temp var + goto.
+  - Next leads: unknown — possibly requires a TU-split or forcing CW to place else block before then block via some other means.
+  - Last attempt: 2026-05-17 by w2
 
 ## Untouched near-misses
 Per recon 2026-05-13, 87 near-misses in this file. Top candidates:
@@ -32,3 +37,10 @@ Per recon 2026-05-13, 87 near-misses in this file. Top candidates:
 ## Session log
 
 - **2026-05-14 (w10)** — 5 new 100%s via `#pragma peephole off` + direct `(s16)f32` cast. Pattern works for any "f32 → s16 store" function.
+
+- **2026-05-17 (w2)** — 4 new 100%s via HINT-class analysis:
+  - **fn_8004DFCC** (92.39% → 100%): Remove `(u8)` cast on `lbl_8047A524` in the three `fn_801D1650()` calls. The cast forced extra `clrlwi` instructions that target didn't have.
+  - **fn_80053C00** (96.30% → 100%): `#pragma peephole off` before function. Target used `clrlwi r0; cmplwi r0, 0` (2 instrs) instead of `clrlwi. r3` (1 instr with record bit).
+  - **fn_80057DE8** (95.23% → 100%): `#pragma peephole off`. Same `clrlwi.` vs `clrlwi; cmplwi` pattern on u8 return from `fn_80123FBC`.
+  - **fn_80053E7C** (95.43% → 100%): `#pragma scheduling on`. Target used `mr r0, r3; li r3, 0x37; mr r4, r0` pattern (scheduler-generated r0 temp) vs our direct `mr r4, r3; li r3, 0x37`.
+  - Blocked near-miss: **fn_80037180** remains at 96.7% — branch-layout mismatch: target has `beq @then; b @else` but CW with peephole off generates `bne @else`. Neither goto-restructure nor scheduling changes fix it. New technique needed.
