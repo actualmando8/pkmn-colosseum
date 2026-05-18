@@ -10266,8 +10266,8 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
     extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FC0(u8* ptr, u32 val);
-    u16 idx;
     u8* base;
+    u16 idx;
     u8 flag;
 
     if (arg2 == 0) { goto exit; }
@@ -10452,8 +10452,8 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
     extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FB0(u8* ptr, u8 val);
-    u16 idx;
     u8* base;
+    u16 idx;
     u8 flag;
 
     if (arg2 == 0) { goto exit; }
@@ -11889,7 +11889,7 @@ void fn_8011D504(u8* ptr, u8 val) {
     } else {
         idx = *(u16*)(ptr + 0x0);
     }
-    if (idx >= lbl_80478F90) {
+    if (idx >= *(u32*)lbl_80478F90) {
         entry = NULL;
     } else {
         entry = (u8*)lbl_80478F94 + (u32)idx * 0x11C;
@@ -26712,6 +26712,8 @@ asm void fn_80115AC8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 u8 fn_80115AC8(u8* ptr) {
     u8 val;
 
@@ -26728,6 +26730,7 @@ u8 fn_80115AC8(u8* ptr) {
     val = (ptr[0] >> 5) & 7;
     return val;
 }
+#pragma pop
 #endif
 extern const char lbl_802726AC[];
 extern const char lbl_8035B8CC[];
