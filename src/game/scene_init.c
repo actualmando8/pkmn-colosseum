@@ -1196,7 +1196,7 @@ asm void fn_80039604(void) {
 #else
 #pragma optimization_level 4
 u32 fn_80039604(u32 unused, u32 a) {
-    fn_80109220(a, lbl_8047A4A8 > 0 ? 1 : 0);
+    fn_80109220(a, (s32)lbl_8047A4A8 > 0 ? 1 : 0);
     return 0;
 }
 #endif
@@ -4784,13 +4784,13 @@ asm void fn_8004D9C0(void) {
 #pragma scheduling on
 #pragma optimization_level 4
 u32 fn_8004D9C0(u32 a) {
-    u32 r31;
+    u32 pptr;
     s32 r30;
     s32 result;
     lbl_8047A518 = a;
-    r31 = (u32)&lbl_8047A518;
+    pptr = (u32)&lbl_8047A518;
     for (;;) {
-        result = fn_801026A4(0x74, (u32)fn_801046B8(), 0, 0, 1, 1, (u32)&r31);
+        result = fn_801026A4(0x74, (u32)fn_801046B8(), 0, 0, 1, 1, (u32)&pptr);
         if (result == -1) { break; }
         r30 = fn_8004BE40((s32)lbl_8047A518);
         if (fn_801D16F0() == 0) { continue; }
@@ -6652,6 +6652,8 @@ asm void fn_80055194(void) {
 #include "src/game/scene_init_fn_80055194.inc"
 }
 #else
+#pragma peephole off
+#pragma optimization_level 4
 u32 fn_80055194(u32* out, s32 index) {
     u8* entry;
     if (index < 0 || index >= 0x20) {
@@ -6661,6 +6663,7 @@ u32 fn_80055194(u32* out, s32 index) {
     *out = *(u32*)(entry + 8);
     return *(u32*)(entry + 4);
 }
+#pragma peephole on
 #endif
 
 /* fn_800551CC - 0x800551CC | size: 0x108 */
