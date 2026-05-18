@@ -51,3 +51,43 @@ Control flow restructure: moved secondary flags checks (`if !(flags & 0x2000)`, 
 - `git diff --name-only`: only `src/game/gs_material.c`
 - No `*_fn_*.inc` files modified
 - No `#if 0` → `#if 1` flips
+
+## Session: May 17 2026 (continued)
+
+### Functions matched to 100%
+
+#### fn_800E4AC0 (98.51% → 100%)
+Two fixes:
+1. Split combined `if (*(s32*)((u8*)entry + 0x114) != 0 || r5 == 0) return;` into two separate `if` statements.
+2. Inverted condition: `if (r7 != 1)` → `if (r7 == 1)` to match target's `bne @fn_800E01D0; [fall-through fn_800E01F4]` pattern (r7==1 → fn_800E01F4 via fall-through; r7!=1 → fn_800E01D0 via taken branch).
+
+#### fn_800EA820 (98.62% → 100%)
+Null check control flow restructure:
+- Changed `if (entry == NULL) goto _null_err; goto _skip_null_err;` to `if (entry == NULL) goto _end; if (entry != NULL) goto _skip_null_err;`.
+- Moved `_end:` label to right BEFORE the tex-null check (not after all processing), so when entry==NULL execution bypasses only the `fn_8019D9DC` active-check block and still runs the tex check + fn_80197B6C calls.
+- This generates the target's `beq @L_800EA8A4; bne @L_800EA878` pair with L_800EA8A4 at the tex-check entry.
+
+### Functions improved (not yet 100%)
+
+#### fn_800EAFE4 (95.81% → 96.02%)
+Partial register allocation improvement:
+- Removed separate `void* ret` and `void* xform` — merged into `texObj` (ret=fn_8019F01C() initially, then texObj in loop). This matches target's r24 reuse.
+- Removed separate `u8* mtxPtr` — replaced with `texObj` reuse and `void* tex` block-local.
+- Swapped inner block variable declarations `s32 check; u32 flags` (check before flags) to match target's `li r3, 0` ordering.
+- Remaining 49 diffs: param register permutation (r25/r26/r27 for obj/dst/output) + other reg allocation; stuck.
+
+#### fn_800E465C (88.96% → 89.16%)
+- Changed Section 3 condition from `*(u32*)` to `*(s32*)` cast at `entry + 0x114` (all three sections now use signed compare).
+- Remaining issues: frame size mismatch (0x30 vs target 0x20), extra callee-saved r29, many structural diffs.
+
+### Functions NOT changed (baseline maintained)
+- fn_800E7290 (99.69%): 2-diff stw store order — scheduling on + 0x4-before-0x0 source order reaches 99.69%; swapping to 0x0-before-0x4 makes worse; stuck.
+- fn_800E3604 (99.37%): 10-diff reg-alloc permutation (r29/r30/r31 for slotMatch/offset/mobj); removing animFlag/envFlag/shadowFlag made worse; stuck.
+- fn_800E8EFC (94.07%): prologue `addi r0; mr r30` vs `addi r30` — scheduling off made much worse; stuck.
+- fn_800E8FA0 (94.17%): peephole-bgtlr BLOCKED.
+- fn_800E5550/638C/65CC/68D8 (98.92%): reg-alloc permutation r29/r30 for count/i; declaration order changes don't help; stuck.
+
+### Anti-fraud verification
+- `git diff --name-only`: only `src/game/gs_material.c` and `docs/decomp_notes/src_game_gs_material.md`
+- No `*_fn_*.inc` files modified
+- No `#if 0` → `#if 1` flips
