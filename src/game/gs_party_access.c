@@ -349,6 +349,8 @@ asm void fn_8000BFA0(void) {
 }
 #else
 #pragma peephole off
+#pragma push
+#pragma scheduling off
 s32 fn_8000BFA0(void) {
     u32 local;
     u32 *rodata;
@@ -371,6 +373,7 @@ s32 fn_8000BFA0(void) {
     }
     return 1;
 }
+#pragma pop
 #pragma peephole on
 #endif
 
