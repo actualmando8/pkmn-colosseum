@@ -82,3 +82,20 @@ MANDATORY going forward:
   (This would have auto-caught w2.) — highest-priority gate improvement.
 - Parent MUST rebuild cherry-picked files before quoting any aggregate
   (progress.py reads stale .o; only per-file rebuild gives truth).
+
+## 2026-05-17 — verify_commit hardened + cp1252 bug fixed (VALIDATED)
+
+verify_commit.py now has check_file_regression: isolated-recompiles each
+changed src/.c parent-vs-head and REJECTS on whole-file matched-count
+drop. Found+fixed a latent cp1252 decode crash (text=True on source
+bytes like 0x81) that had made every file un-checkable.
+
+Validated: `verify_commit --range ae2db37..7861c12` → `[REGRESSED]
+scene_init.c 107->101` → REJECTED.
+
+MANDATORY cherry-pick protocol for manual-LLM (HINT) agents:
+  python tools/verify_commit.py --range <master-before-agent>..<agentHEAD>
+Run over the FULL agent range, NOT per-commit (cumulative regressions
+span an agent's commit series, as w2 did). Only cherry-pick if it
+prints "clean". Deterministic loop (automatch/autorewrite) already has
+its own whole-file guard and is exempt.
