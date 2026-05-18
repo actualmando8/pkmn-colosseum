@@ -731,12 +731,15 @@ s32 fn_80102620(s32 param) {
 }
 
 /* 0x8010264C | 0x58 */
+#pragma push
+#pragma peephole off
 void fn_8010264C(void* p, void* q) {
     void* r30 = p;
     void* r31 = q;
     u32 r3 = fn_801046B8();
     fn_801026A4(r30, r3, 0, 0, r31, 0);
 }
+#pragma pop
 
 /* 0x801026A4 | 0x1C4 */
 #pragma push
@@ -898,6 +901,8 @@ void fn_80103EF4(void) {
 }
 
 /* 0x80103F74 | 0x70 */
+#pragma push
+#pragma peephole off
 void fn_80103F74(void* head, u16 key, u32 data) {
     u32 r29 = data;
     if (head == (void*)0) { return; }
@@ -913,6 +918,7 @@ void fn_80103F74(void* head, u16 key, u32 data) {
         }
     }
 }
+#pragma pop
 
 /* 0x80103FE4 | 0x18 */
 void* fn_80103FE4(void* ptr) {
@@ -1415,6 +1421,8 @@ s32 fn_80107ED8(s32 r3, u16 r30) {
 /* 0x80107F38 | 0x194 */
 #pragma push
 #pragma optimization_level 2
+#pragma push
+#pragma optimization_level 1
 void fn_80107F38(s32 param, u32 key) {
     u32 r28 = key;
     void* r3 = fn_80104704(param);
@@ -1464,6 +1472,7 @@ void fn_80107F38(s32 param, u32 key) {
         }
     }
 }
+#pragma pop
 #pragma pop
 
 /* 0x801080CC | 0x12C */
@@ -1631,6 +1640,8 @@ void fn_80108518(void) {
 #pragma pop
 
 /* 0x801091F4 | 0x2C | nc_getter_s8 -- returns 1 if bit 1 of ptr[0x4] is set */
+#pragma push
+#pragma peephole off
 s32 fn_801091F4(void* ptr) {
     if (ptr == (void*)0) { return 0; }
     {
@@ -1640,6 +1651,7 @@ s32 fn_801091F4(void* ptr) {
         return (u32)(neg | r3) >> 31;
     }
 }
+#pragma pop
 
 /* 0x80109220 | 0x3C */
 #pragma push
