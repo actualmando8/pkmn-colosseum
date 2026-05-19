@@ -1771,7 +1771,7 @@ u32 fn_802207D4(void)
     extern s8 fn_801FECD4();
     extern void fn_8020147C();
   short sVar1;
-  s8 cVar2;
+  u8 cVar2;
   
   sVar1 = (int)fn_8012640C(r3,0,0xfb,0);
   if (sVar1 != 0) {
@@ -7313,7 +7313,7 @@ void fn_8022E6F0(void)
   u32 uVar2;
   u16 uVar6;
   int iVar3;
-  s8 cVar9;
+  u8 cVar9;
   short sVar7;
   u32 uVar4;
   u32 uVar5;
@@ -12784,7 +12784,7 @@ u8 fn_80239154(void)
     extern u32 fn_8011BEB4();
     extern u32 fn_801FB1C0();
   u16 uVar1;
-  s8 cVar2;
+  u8 cVar2;
   u8 uVar3;
   
   uVar1 = fn_801FB1C0(r3,0,0x43,0);
@@ -16189,7 +16189,7 @@ u32 fn_8023CE60(void)
   u16 uVar2;
   u16 uVar3;
   short sVar4;
-  s8 cVar5;
+  u8 cVar5;
   u32 uVar1;
   u32 uVar6;
   
@@ -16234,7 +16234,7 @@ u32 fn_8023CFDC(void)
   u16 uVar2;
   u16 uVar3;
   short sVar4;
-  s8 cVar5;
+  u8 cVar5;
   u32 uVar1;
   u32 uVar6;
   
@@ -23140,7 +23140,7 @@ void fn_8021A984(void)
   u32 uVar2;
   short sVar3;
   s8 cVar5;
-  s8 cVar6;
+  u8 cVar6;
   u16 uVar4;
 
   uVar4 = 0;
@@ -25227,7 +25227,7 @@ void fn_8021DE4C(void)
     extern s8 fn_801FECD4();
     extern void fn_8020147C();
   u32 uVar1;
-  s8 cVar2;
+  u8 cVar2;
 
   uVar1 = fn_801F025C(*(u8 *)(*(int *)(lbl_8047B610) + 1),0);
   fn_8020147C(uVar1,0,0,1);
@@ -26055,7 +26055,7 @@ void fn_8021F458(void)
   u32 uVar2;
   u32 uVar3;
   s8 cVar6;
-  s8 cVar7;
+  u8 cVar7;
   int iVar4;
 
   uVar5 = fn_801F54A4(0,0,0x14,0);
