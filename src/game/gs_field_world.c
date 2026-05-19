@@ -5408,6 +5408,9 @@ void* fn_8011538C(void* ptr, u32 idx) {
 extern const char lbl_80272608[];
 extern const char lbl_8027262C[];
 extern u8 lbl_8035BB10[];
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 void* fn_8011542C(void* ptr) {
     void* p1;
     void* p2;
@@ -5424,8 +5427,12 @@ void* fn_8011542C(void* ptr) {
     }
     return *(void**)((u8*)p2 + 0x4);
 }
+#pragma pop
 /* 0x801154B4 | 0x88 */
 extern u8 lbl_8035BAF4[];
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 void* fn_801154B4(void* ptr) {
     void* p1;
     void* p2;
@@ -5442,6 +5449,7 @@ void* fn_801154B4(void* ptr) {
     }
     return *(void**)p2;
 }
+#pragma pop
 /* 0x48 | fn_8011553C | nullcheck_store */
 extern const char lbl_80272658[];
 extern u8 lbl_8035BAD8[];
@@ -5469,6 +5477,9 @@ void fn_80115584(void* obj, u32 val) {
 }
 #pragma pop
 /* 0xfn_80115A38 | global_cond_call */
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 u32 fn_80115A38(u8* entry) {
     extern u8 lbl_8035B91C[];
     if (entry == 0) {
@@ -5477,6 +5488,7 @@ u32 fn_80115A38(u8* entry) {
     }
     return *(u32*)(entry + 0x4);
 }
+#pragma pop
 /* 0x70 | fn_80115BD8 | generic */
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
@@ -8615,7 +8627,7 @@ void fn_80118A68(u8* obj, u32 notify) {
     scan = base;
     for (i = 0; i < 0x40; i++) {
         if (*(u32*)(scan + 8) == (u32)obj) {
-            *(u32*)(base + (i << 2) + 8) = 0;
+            *(u32*)(scan + 8) = 0;
             break;
         }
         scan += 4;
@@ -12428,8 +12440,6 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
 }
 #endif
 /* 0x7C | fn_8011DD80 | call_clamp_store */
-#pragma push
-#pragma optimization_level 1
 void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
     extern s32 fn_80123E70(u8* ptr, s32 idx);
@@ -12443,7 +12453,6 @@ void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     }
     *(u8*)(result + 0x2) = maxVal;
 }
-#pragma pop
 /* 0x8011DDFC | 0x3C */
 void fn_8011DDFC(void* ctx, u32 p1, u32 value) {
     extern void* fn_8011F260();
@@ -16051,7 +16060,7 @@ u32 fn_80123584(u8* ptr, u32 arg2) {
     target = (u8)arg2;
     i = 0;
     while ((u8)i < 0x14) {
-        if ((s32)fn_8012640C(NULL, val, 0x1d, (u8)i) == (s32)target) { break; }
+        if ((s32)fn_8012640C(NULL, val, 0x1d, i & 0xFF) == (s32)target) { break; }
         i++;
     }
     return i;
@@ -19592,7 +19601,7 @@ u32 fn_8012A08C(u8* ptr, void* arg2) {
     if (arg2 == NULL) { return 6; }
     i = 0;
     while ((u8)i < 6) {
-        val = fn_8012A5B0(ptr, 3, (u8)i);
+        val = fn_8012A5B0(ptr, 3, i & 0xFF);
         if ((u8)fn_80123FBC(val) != 1) {
             fn_8011F5FC(val, arg2);
             return i;
@@ -26409,6 +26418,9 @@ asm void fn_801155CC(void) {
 #include "src/game/gs_field_world_fn_801155CC.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_801155CC(u8* ptr) {
     void* sub;
@@ -26423,6 +26435,7 @@ void* fn_801155CC(u8* ptr) {
     }
     return *(void**)sub;
 }
+#pragma pop
 #endif
 extern u8 lbl_8035BA7C[];
 #if 0
@@ -26430,6 +26443,9 @@ asm void fn_80115628(void) {
 #include "src/game/gs_field_world_fn_80115628.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_80115628(u8* ptr) {
     void* sub;
@@ -26444,6 +26460,7 @@ void* fn_80115628(u8* ptr) {
     }
     return *(void**)sub;
 }
+#pragma pop
 #endif
 extern u8 lbl_8035BA60[];
 #if 0
@@ -26451,11 +26468,13 @@ asm void fn_80115684(void) {
 #include "src/game/gs_field_world_fn_80115684.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 void* fn_80115684(u8* ptr, u32 idx) {
     void* sub;
     void* arr;
-    void* inner;
 
     if (ptr == NULL) {
         fn_800DD970(lbl_80272608, lbl_8035BA60);
@@ -26466,12 +26485,12 @@ void* fn_80115684(u8* ptr, u32 idx) {
         return NULL;
     }
     arr = *(void**)sub;
-    inner = *(void**)arr;
-    if (idx >= *(u32*)inner) {
+    if (idx >= *(u32*)*(void**)arr) {
         return NULL;
     }
-    return (u8*)*(void**)((u8*)sub + 4) + idx * 0x24;
+    return (u8*)*(void**)((u8*)arr + 4) + idx * 0x24;
 }
+#pragma pop
 #endif
 extern u8 lbl_8035BA48[];
 #if 0
@@ -26479,6 +26498,9 @@ asm void fn_80115704(void) {
 #include "src/game/gs_field_world_fn_80115704.inc"
 }
 #else
+#pragma push
+#pragma scheduling on
+#pragma peephole off
 #pragma optimization_level 4
 u32 fn_80115704(u8* ptr) {
     void* sub;
@@ -26493,6 +26515,7 @@ u32 fn_80115704(u8* ptr) {
     }
     return *(u32*)*(u32*)*(u32*)sub;
 }
+#pragma pop
 #endif
 extern u8 lbl_8035BA2C[];
 #if 0
