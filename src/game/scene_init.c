@@ -2364,7 +2364,7 @@ void fn_8003D818(void) {
     count = 0;
     i = 0;
     while ((u16)i < (u16)fn_8025FEE4(0)) {
-        *(u16*)((u8*)lbl_8047A4E4 + (u16)i * 2) = fn_8025FE84(0, i);
+        *(u16*)((u8*)lbl_8047A4E4 + i * 2) = fn_8025FE84(0, i);
         count++;
         i++;
     }
@@ -7417,6 +7417,7 @@ asm void fn_800573C0(void) {
 #include "src/game/scene_init_fn_800573C0.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_800573C0(void) {
     s32 v;
@@ -7851,13 +7852,13 @@ asm void fn_80057DE8(void) {
 #include "src/game/scene_init_fn_80057DE8.inc"
 }
 #else
-#pragma peephole off
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_80057DE8(u32 a) {
     if ((u8)fn_80123FBC((void*)a) == 0) { return 0; }
     return (u8)fn_8011FC74(a) != 0 ? 1 : 0;
 }
-#pragma peephole on
+#pragma scheduling off
 #endif
 
 /* fn_80057E40 - 0x80057E40 | size: 0x30 */
@@ -8189,6 +8190,8 @@ asm void fn_80058DCC(void) {
 #include "src/game/scene_init_fn_80058DCC.inc"
 }
 #else
+#pragma scheduling on
+#pragma peephole off
 s32 fn_80058DCC(u8* ctx) {
     s32 i;
     u8* ptr;
@@ -8200,10 +8203,10 @@ s32 fn_80058DCC(u8* ctx) {
         if ((s8)ctx[2] == 0) {
             ctx[2] = 1;
         }
-        if (*(u32*)subctx != 0) {
+        if (*(s32*)subctx != 0) {
             i = 0;
             while (i < 6) {
-                if ((u8)fn_80123FBC(fn_8012A5B0(0, 3, (u16)i)) != 0) {
+                if ((u8)fn_80123FBC(fn_8012A5B0(0, 3, (u16)i)) == 0) {
                     break;
                 }
                 i++;
@@ -8212,15 +8215,15 @@ s32 fn_80058DCC(u8* ctx) {
                 i = -1;
             }
             if (i >= 0) {
-                ctx[0x95] = (u8)(s8)i;
+                *(s8*)(ctx + 0x95) = (s8)i;
             }
         }
         ptr = fn_80104318(ctx);
         fn_80057830(*(s16*)(ptr + 2), *(s16*)(ptr + 4), 0);
         break;
     case 2:
-        if ((u32)fn_801046B8() == *(u32*)(ctx + 4)) {
-            if (fn_80058AF0(ctx) == 0) {
+        if ((s32)fn_801046B8() == *(s32*)(ctx + 4)) {
+            if ((s32)fn_80058AF0(ctx) == 0) {
                 ctx[0x98] = 1;
                 ctx[0x99] = 1;
             }
@@ -8234,6 +8237,8 @@ s32 fn_80058DCC(u8* ctx) {
     }
     return 0;
 }
+#pragma scheduling off
+#pragma peephole on
 #endif
 
 /* fn_80058F08 - 0x80058F08 | size: 0x38 */
