@@ -12445,7 +12445,7 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
 /* 0x7C | fn_8011DD80 | call_clamp_store */
 void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
-    extern s32 fn_80123E70(u8* ptr, s32 idx);
+    extern u8 fn_80123E70(u8* ptr, s32 idx);
     u8* result;
     u8 val;
     result = fn_8011F260(arg1, arg2, 0);
