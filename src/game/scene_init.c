@@ -1579,7 +1579,7 @@ asm void fn_8003AE84(void) {
 #include "src/game/scene_init_fn_8003AE84.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 0
 u32 fn_8003AE84(void) {
     s32 result;
 
@@ -2054,7 +2054,7 @@ asm void fn_8003C24C(void) {
 void fn_8003C24C(u8* ctx, u8* p) {
     s16 field6 = *(s16*)(p + 6);
     if (field6 != 0x2e3 && field6 >= 0x2e2 && field6 < 0x2e5) {
-        ctx[0x8b] = (u8)(s32)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
+        ctx[0x8b] = (u8)(lbl_8047BAC0 * *(f32*)(lbl_803A6748 + 0x44));
     } else {
         fn_8003C2B8();
     }
@@ -3253,9 +3253,9 @@ void fn_80044378(u8* ctx, u8* p) {
     u32 r3v;
     val = *(s16*)(p + 6);
     if (val == 0x12b2) {
-        ctx[0x8b] = (u8)(s32)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x54));
+        ctx[0x8b] = (u8)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x54));
     } else {
-        ctx[0x8b] = (u8)(s32)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x4c));
+        ctx[0x8b] = (u8)(lbl_8047BCA0 * *(f32*)((u8*)lbl_803A6818 + 0x4c));
     }
     val = *(s16*)(p + 6);
     switch (val) {
@@ -3822,10 +3822,10 @@ asm void fn_8004BDB8(void) {
 #pragma optimization_level 4
 void fn_8004BDB8(s8 a, s8 b) {
     if (a >= 0) {
-        lbl_803A6A60[1] = (u8)a;
+        *(s8*)(lbl_803A6A60 + 1) = a;
     }
     if (b >= 0) {
-        lbl_803A6A60[1] = (u8)b;
+        *(s8*)(lbl_803A6A60 + 1) = b;
     }
 }
 #endif
@@ -4990,7 +4990,7 @@ extern void fn_801654E0(u32 a, u32 b, u32 c);
 extern void fn_80166B3C(u32 a, u32 b, u32 c);
 extern s32 fn_801D1618(void);
 extern void fn_801669E4(u32 a, u32 b, u32 c);
-extern u32 lbl_8047A520;
+extern s32 lbl_8047A520;
 extern u8 lbl_8047A524;
 extern u32 lbl_8047A52C;
 extern u32 lbl_8047A528;
@@ -4999,6 +4999,7 @@ asm void fn_8004DDC0(void) {
 #include "src/game/scene_init_fn_8004DDC0.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_8004DDC0(u8* ctx) {
     u8* r30;
@@ -5047,6 +5048,7 @@ u32 fn_8004DDC0(u8* ctx) {
     }
     return 0;
 }
+#pragma scheduling off
 #endif
 
 /* fn_8004DF34 - 0x8004DF34 | size: 0x98 */
@@ -8240,12 +8242,14 @@ asm void fn_80058F08(void) {
 #include "src/game/scene_init_fn_80058F08.inc"
 }
 #else
+#pragma scheduling on
 #pragma optimization_level 4
 u32 fn_80058F08(u32* out, s32 idx) {
     if (idx < 0 || idx >= 7) { return 2; }
     *out = *(u32*)(lbl_802677D0 + idx * 0x10 + 0x8);
     return *(u32*)(lbl_802677D0 + idx * 0x10 + 0x4);
 }
+#pragma scheduling off
 #endif
 
 /* fn_80058F40 - 0x80058F40 | size: 0xf4 */
