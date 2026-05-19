@@ -12428,6 +12428,8 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
 }
 #endif
 /* 0x7C | fn_8011DD80 | call_clamp_store */
+#pragma push
+#pragma optimization_level 1
 void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     extern void* fn_8011F260();
     extern s32 fn_80123E70(u8* ptr, s32 idx);
@@ -12441,6 +12443,7 @@ void fn_8011DD80(u32 arg1, s32 arg2, u8 maxVal) {
     }
     *(u8*)(result + 0x2) = maxVal;
 }
+#pragma pop
 /* 0x8011DDFC | 0x3C */
 void fn_8011DDFC(void* ctx, u32 p1, u32 value) {
     extern void* fn_8011F260();
