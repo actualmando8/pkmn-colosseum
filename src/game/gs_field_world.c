@@ -5401,7 +5401,8 @@ void* fn_8011538C(void* ptr, u32 idx) {
         fn_800DD970(lbl_8027262C, lbl_8035BB30);
         return NULL;
     }
-    return *(void**)((u8*)p1 + idx * 4 + 8);
+    (u8*)p1 += idx * 4;
+    return *(void**)((u8*)p1 + 8);
 }
 #pragma pop
 /* 0x8011542C | 0x88 */
@@ -11619,7 +11620,8 @@ void fn_8011CED0(u8* ptr, u16 idx, u8 val) {
 void fn_8011CEF0(u8* ptr, u16 idx, u16 val) {
     if (ptr == NULL) { return; }
     if (idx >= 8) { return; }
-    *(u16*)(&ptr[idx * 2 + 0x74]) = val;
+    ptr += idx * 2;
+    *(u16*)(&ptr[0x74]) = val;
 }
 /* 0x8011CF44 | 0x2C */
 extern void fn_8019075C(u32);
@@ -11758,7 +11760,8 @@ void fn_8011D22C(u8* ptr, u16 idx, u8 val) {
 void fn_8011D24C(u8* ptr, u16 idx, u16 val) {
     if (ptr == NULL) { return; }
     if (idx >= 2) { return; }
-    *(u16*)(&ptr[idx * 2 + 0x70]) = val;
+    ptr += idx * 2;
+    *(u16*)(&ptr[0x70]) = val;
 }
 /* 0x8011D2C0 | 36 bytes | compound_setter */
 void fn_8011D2C0(void* ptr, u16 val) {
@@ -12433,7 +12436,7 @@ void fn_8011DCC4(u8* ptr, u32 arg2, u8 arg3) {
     if ((u8)arg3 > 3) { arg3 = 3; }
     if ((u8)fn_80123CD4(ptr, arg2) == 1) {
         u8* tmp = fn_8011F260(ptr, arg2, 1);
-        u32 val = tmp ? *(u16*)tmp : 0;
+        u32 val = tmp == NULL ? 0 : *(u16*)tmp;
         if ((u8)fn_8011CA04(fn_8011CA34(val)) <= 4) { return; }
     }
     result[3] = arg3;
@@ -12505,7 +12508,8 @@ u8 fn_8011E048(u8* ptr, u16 idx) {
 u16 fn_8011E078(u8* ptr, u16 idx) {
     if (ptr == NULL) { return 0; }
     if (idx >= 8) { return 0; }
-    return *(u16*)(&ptr[idx * 2 + 0x74]);
+    ptr += idx * 2;
+    return *(u16*)(&ptr[0x74]);
 }
 /* 0x8011E0F4 | 0x34 */
 extern void* fn_801906A0(u32);
@@ -14617,7 +14621,7 @@ void fn_80120B00(u8* ptr, u16* out1, u16* out2) {
     u16 val2 = (u16)((s32)(lo * 0xF) / 0x3F + 1);
 
     if ((u8)val2 >= 9) {
-        val2 = (u16)((u8)val2 + 1);
+        val2 = (u8)val2 + 1;
     }
     if (out1 != NULL) {
         *out1 = val1;
@@ -24533,9 +24537,12 @@ u32 fn_8012F008(s32 idx, s32 state)
 #endif
 /* 0x8012F11C | 0x34 */
 u32 fn_8012F11C(s32 idx) {
+    u8* ptr;
     u16 val;
     if (idx < 0 || idx >= 2) { return 0; }
-    val = *(u16*)(lbl_80426BD0 + (u32)idx * 32 + 4);
+    ptr = (u8*)lbl_80426BD0;
+    ptr += (u32)idx * 32;
+    val = *(u16*)(ptr + 4);
     return (u32)(val & 1);
 }
 /* 0x8012F150 | 0xAC */
