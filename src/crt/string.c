@@ -4,6 +4,10 @@
  * MetroWerks CodeWarrior CRT string functions for GameCube (PowerPC).
  */
 
+/* MSL word-at-a-time null-byte detection magic (MSL_Common/Src/string.c). */
+#define K1 0x80808080
+#define K2 0xFEFEFEFF
+
 /*
  * strlen - Compute the length of a null-terminated string.
  *
@@ -38,149 +42,124 @@ u32 strlen(const char* str) {
  *             or NULL if c is not found. If c is '\0', returns
  *             a pointer to the terminating null byte.
  */
+/* Imported from MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
 char* strchr(const char* str, int c) {
-    char* p = (char*)str - 1;
-    u8 ch = (u8)c;
-    u8 cur;
+    const u8* p = (u8*)str - 1;
+    u32 chr = (c & 0xFF);
 
-    while ((cur = (u8)*++p) != 0) {
-        if (cur == ch) {
-            return p;
+    u32 ch;
+    while (ch = *++p) {
+        if (ch == chr) {
+            return (char*)p;
         }
     }
 
-    if (ch == 0) {
-        return p;
-    }
-    return NULL;
+    return chr ? NULL : (char*)p;
 }
+
 
 /* ========================================================== */
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800CA7BC - 0x800CA7BC | size: 0x40 */
-/*
- * strncmp - Compare at most n characters of two strings.
- *
- * 0x800CA7BC | size: 0x40
- */
-s32 strncmp(const char* s1, const char* s2, u32 n) {
-    u32 i;
-    for (i = 0; i < n; i++) {
-        u8 c1 = *(const u8*)s1;
-        u8 c2 = *(const u8*)s2;
-        if (c1 != c2) {
-            return (s32)c1 - (s32)c2;
+/* strncmp = fn_800CA7BC @ 0x800CA7BC (size 0x40). MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
+int strncmp(const char* str1, const char* str2, size_t n) {
+    const u8* p1 = (u8*)str1 - 1;
+    const u8* p2 = (u8*)str2 - 1;
+    u32 c1, c2;
+
+    n++;
+    while (--n) {
+        if ((c1 = *++p1) != (c2 = *++p2)) {
+            return c1 - c2;
+        } else if (c1 == 0) {
+            break;
         }
-        if (c1 == 0) {
-            return 0;
-        }
-        s1++;
-        s2++;
     }
+
     return 0;
 }
 
-/* fn_800CA7FC - 0x800CA7FC | size: 0x128 */
-void fn_800CA7FC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
 
-    r5 = *(u8*)((u8*)r3 + 0x0);
-    tmp = *(u8*)((u8*)r4 + 0x0);
-    /* subf. tmp, tmp, r5 */;
-    if ((s32)tmp != 0) {
-        r3 = tmp;
-        return;
+/* strcmp @ 0x800CA7FC (size 0x128). MSL_C/MSL_Common/Src/string.c (zeldaret/tww); CW 1.3. Verified 100%. */
+int fn_800CA7FC(const char* str1, const char* str2) {
+    register u8* left = (u8*)str1;
+    register u8* right = (u8*)str2;
+    u32 align, l1, r1, x;
+
+    l1 = *left;
+    r1 = *right;
+    if (l1 - r1) {
+        return l1 - r1;
     }
-    tmp = r4 & 0x3;
-    r6 = r3 & 0x3;
-    if (tmp == r6) {
-    if (r6 != 0) {
-        if (r5 == 0) {
-            r3 = 0x0;
-            return;
-        }
-        tmp = 0x3 - r6;
-        ctr_fn = (void(*)(void))tmp;
-        if (tmp != 0) {
-            do {
-                r5 = *(u8*)((u8*)r3 + 0x1);
-                tmp = *(u8*)((u8*)r4 + 0x1);
-                /* subf. tmp, tmp, r5 */;
-                if (tmp != 0) {
-                    r3 = tmp;
-                    return;
-                }
-                if (r5 == 0) {
-                    r3 = 0x0;
-                    return;
-                }
-            } while (--ctr != 0);
-        }
-        r3 = r3 + 0x1;
-        r4 = r4 + 0x1;
+
+    if ((align = ((int)left & 3)) != ((int)right & 3)) {
+        goto bytecopy;
     }
-    /* Word-at-a-time comparison loop */
-    while (1) {
-        r7 = *(u32*)((u8*)r3 + 0x0);
-        r5 = 0x80810000;
-        r8 = *(u32*)((u8*)r4 + 0x0);
-        /* subis r5, r7, 0x101 */;
-        /* and. tmp, tmp, r6 */;
-        if (r5 != 0) break;  /* null byte found */
-        if (r7 != r8) {
-            r3 = -0x1;
-            if ((u32)r7 <= (u32)r8) return;
-            r3 = 0x1;
-            return;
+
+    if (align) {
+        if (l1 == 0) {
+            return 0;
         }
-        r3 = r3 + 0x4;
-        r4 = r4 + 0x4;
-        r7 = *(u32*)((u8*)r3 + 0x0);
-        r8 = *(u32*)((u8*)r4 + 0x0);
-        /* subis r5, r7, 0x101 */;
-        /* and. tmp, tmp, r6 */;
-        if (r5 != 0) break;
-        if (r7 != r8) {
-            r3 = -0x1;
-            if ((u32)r7 <= (u32)r8) return;
-            r3 = 0x1;
-            return;
+        for (align = 3 - align; align; align--) {
+            l1 = *(++left);
+            r1 = *(++right);
+            if (l1 - r1) {
+                return l1 - r1;
+            }
+            if (l1 == 0) {
+                return 0;
+            }
         }
-        r3 = r3 + 0x4;
-        r4 = r4 + 0x4;
+        left++;
+        right++;
     }
-    /* Null found in word - compare byte by byte */
-    r5 = *(u8*)((u8*)r3 + 0x0);
-    tmp = *(u8*)((u8*)r4 + 0x0);
-    /* subf. tmp, tmp, r5 */;
-    if (r7 != r8) {
-        r3 = tmp;
-        return;
+
+    l1 = *(int*)left;
+    r1 = *(int*)right;
+    x = l1 + K2;
+    if (x & K1) {
+        goto adjust;
     }
-    } /* end aligned case */
-    /* Byte-at-a-time comparison for tail (also handles unaligned case) */
-    while (r5 != 0) {
-        r5 = *(u8*)((u8*)r3 + 0x1);
-        tmp = *(u8*)((u8*)r4 + 0x1);
-        /* subf. tmp, tmp, r5 */;
-        if (r5 != 0) {
-            r3 = tmp;
-            return;
+
+    while (l1 == r1) {
+        l1 = *(++((int*)(left)));
+        r1 = *(++((int*)(right)));
+        x = l1 + K2;
+        if (x & K1) {
+            goto adjust;
         }
     }
-    r3 = 0x0;
-    return;
+
+    if (l1 > r1) {
+        return 1;
+    }
+    return -1;
+
+adjust:
+    l1 = *left;
+    r1 = *right;
+    if (l1 - r1) {
+        return l1 - r1;
+    }
+
+bytecopy:
+    if (l1 == 0) {
+        return 0;
+    }
+
+    do {
+        l1 = *(++left);
+        r1 = *(++right);
+        if (l1 - r1) {
+            return l1 - r1;
+        }
+        if (l1 == 0) {
+            return 0;
+        }
+    } while (1);
 }
+
 
 /*
  * strncpy - Copy at most n characters from src to dst.

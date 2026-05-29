@@ -9,10 +9,6 @@
       "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8 -opt nopeephole",
       "comment": "Title screen uses nopeephole to preserve extsh-before-sth and cross-loop register bindings"
     },
-    "src/crt/string.c": {
-      "compiler": "GC/1.2.5n",
-      "comment": "String functions use CW 1.2.5n (blrl pattern, not bctrl)"
-    },
     "src/crt/__init_cpp_exceptions.c": {
       "compiler": "GC/1.2.5n",
       "comment": "C++ exception init uses CW 1.2.5n"
