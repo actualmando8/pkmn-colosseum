@@ -126,9 +126,9 @@ s32 fn_80088F58(void);
 s32 fn_80088F74(void);
 s32 fn_80088F88(void);
 void fn_80088FA4(void);
-s32 fn_80088FF8(void);
-void fn_80089028(void);
-void fn_80089030(void);
+s32 fn_80088FF8(s32 a, s32 b);
+s32 fn_80089028(void);
+void fn_80089030(u8 x);
 
 /* ===== Function implementations ===== */
 
@@ -5773,16 +5773,24 @@ void fn_80088FA4(void) {
 }
 
 /* 0x80088FF8 | size: 0x30 */
-s32 fn_80088FF8(void) {
-    fn_80089030();
+#pragma push
+#pragma peephole off
+s32 fn_80088FF8(s32 a, s32 b) {
+    fn_80089030(b == 0);
     return 0;
 }
+#pragma pop
 
 /* 0x80089028 | size: 0x8 */
-void fn_80089028(void) {
+s32 fn_80089028(void) {
+    return lbl_80478958;
 }
 
 /* 0x80089030 | size: 0x18 */
-void fn_80089030(void) {
+#pragma push
+#pragma peephole off
+void fn_80089030(u8 x) {
+    lbl_80478958 = (x == 0);
 }
+#pragma pop
 
