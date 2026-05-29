@@ -873,20 +873,16 @@ void fn_80034EF0(void) {
 }
 
 /* 0x80034F84 | 0x2C */
+#pragma push
+#pragma peephole off
 void fn_80034F84(void) {
     extern u8 lbl_803A3288[];
-    extern void fn_80132A38();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
+    extern void fn_80132A38(s32 r3, u32 r4);
 
-    r4 = (u32)lbl_803A3288;
-    r3 = 0x37;
-    r4 = (u32)lbl_803A3288;
-    fn_80132A38();
+    fn_80132A38(0x37, (u32)lbl_803A3288);
     return;
 }
+#pragma pop
 
 /* 0x80034FB0 | 0x4 -- nop/blr */
 void fn_80034FB0(void) { }
@@ -1858,55 +1854,49 @@ void fn_80035C48(void) {
 }
 
 /* 0x80035D70 | 0x30 */
+#pragma push
+#pragma peephole off
 void fn_80035D70(void) {
     extern u8 lbl_8047A439;
     extern void fn_800F0308();
-    extern void fn_800FF730();
-    u8 sp[0x10];
+    extern void fn_800FF730(s32 r3);
     u32 tmp = 0;
-    u32 r3 = 0;
 
     tmp = 0x1;
-    r3 = 0x393;
     lbl_8047A439 = tmp;
-    fn_800FF730();
+    fn_800FF730(0x393);
     fn_800F0308();
     return;
 }
+#pragma pop
 
 /* 0x80035DA0 | 0x34 */
+#pragma push
+#pragma peephole off
 void fn_80035DA0(void) {
     extern u8 lbl_8047A439;
     extern void fn_800F0308();
-    extern void fn_80113828();
-    u8 sp[0x10];
+    extern void fn_80113828(s32 r3, s32 r4);
     u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
 
     tmp = 0x0;
-    r3 = 0x393;
     lbl_8047A439 = tmp;
-    r4 = 0x0;
-    fn_80113828();
+    fn_80113828(0x393, 0x0);
     fn_800F0308();
     return;
 }
+#pragma pop
 
 /* 0x80035DD4 | 0x30 */
+#pragma push
+#pragma peephole off
 void fn_80035DD4(void) {
     extern f32 lbl_8047BA30;
-    extern void fn_801C40F0();
-    extern void fn_801C41C8();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
+    extern void fn_801C40F0(s32 r3);
+    extern void fn_801C41C8(s32 r3, f32 f1);
 
-    f1 = lbl_8047BA30;
-    r3 = 0x3;
-    fn_801C41C8();
-    r3 = 0x1;
-    fn_801C40F0();
+    fn_801C41C8(0x3, lbl_8047BA30);
+    fn_801C40F0(0x1);
     return;
 }
+#pragma pop
