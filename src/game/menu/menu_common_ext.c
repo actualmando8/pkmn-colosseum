@@ -493,10 +493,14 @@ void fn_80071644(void) {
 }
 
 /* 0x8007169C | size: 0x2C */
+#pragma push
+#pragma peephole off
 s32 fn_8007169C(void) {
-    fn_80113828();
+    extern void fn_80113828(s32, s32);
+    fn_80113828(0x385, 0);
     return 0;
 }
+#pragma pop
 
 /* 0x800716C8 | size: 0x20 */
 s32 fn_800716C8(void) {
@@ -1593,7 +1597,8 @@ void fn_80072548(void) {
 
 /* 0x80072684 | size: 0x24 */
 void fn_80072684(void) {
-    fn_800A1F94();
+    extern void fn_800A1F94(u32);
+    fn_800A1F94(*(u32*)&lbl_8047A600);
 }
 
 /* 0x800726A8 | size: 0x358 */
