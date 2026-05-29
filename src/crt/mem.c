@@ -7,6 +7,19 @@
  * implemented by MetroWerks for the GameCube platform.
  */
 
+/* MSL mem_funcs.c word-copy macros (cast-as-lvalue is a MetroWerks extension). */
+#define cps ((unsigned char*)src)
+#define cpd ((unsigned char*)dst)
+#define lps ((unsigned long*)src)
+#define lpd ((unsigned long*)dst)
+#define deref_auto_inc(p) *++(p)
+
+/* MSL mem_funcs.c word-copy helpers (memmove dispatches to these by address). */
+void fn_800C8240(void* dst, const void* src, size_t n); /* __copy_longs_rev_unaligned */
+void fn_800C82EC(void* dst, const void* src, size_t n); /* __copy_longs_unaligned */
+void fn_800C83AC(void* dst, const void* src, size_t n); /* __copy_longs_rev_aligned */
+void fn_800C8454(void* dst, const void* src, size_t n); /* __copy_longs_aligned */
+
 void __fill_mem(void* dest, int val, u32 count);
 
 /*
@@ -187,321 +200,272 @@ void* memchr(const void* src, int val, u32 count) {
 /* ========================================================== */
 
 /* fn_800C8174 - 0x800C8174 | size: 0xCC */
-void fn_800C8174(void) {
-    extern void fn_800C8240();
-    extern void fn_800C82EC();
-    extern void fn_800C83AC();
-    extern void fn_800C8454();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r31 = 0;
+/* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
+void* fn_800C8174(void* dst, const void* src, size_t n) {
+    u8* csrc;
+    u8* cdst;
 
-    r31 = r3;
-    r6 = r31 ^ r4;
-    tmp = __cntlzw(r6);
-    tmp = r31 << tmp;
-    r7 = (u32)tmp >> 31;
-    if (r5 >= 0x20) {
-        tmp = r6 & 0x3;
-        if (r5 != 0x20) {
-            if ((s32)r7 == 0) {
-                fn_800C82EC();
-                r3 = r31;
-                return;
+    int reverse = (u32)src < (u32)dst;
+
+    if (n >= 32) {
+        if (((u32)dst ^ (u32)src) & 3) {
+            if (!reverse) {
+                fn_800C82EC(dst, src, n);
+            } else {
+                fn_800C8240(dst, src, n);
             }
-            fn_800C8240();
-            r3 = r31;
-            return;
+        } else {
+            if (!reverse) {
+                fn_800C8454(dst, src, n);
+            } else {
+                fn_800C83AC(dst, src, n);
+            }
         }
-        if ((s32)r7 == 0) {
-            fn_800C8454();
-            r3 = r31;
-            return;
+
+        return dst;
+    } else {
+        if (!reverse) {
+            csrc = ((u8*)src) - 1;
+            cdst = ((u8*)dst) - 1;
+            n++;
+
+            while (--n > 0) {
+                *++cdst = *++csrc;
+            }
+        } else {
+            csrc = (u8*)src + n;
+            cdst = (u8*)dst + n;
+            n++;
+
+            while (--n > 0) {
+                *--cdst = *--csrc;
+            }
         }
-        fn_800C83AC();
-
-        r3 = r31;
-        return;
-    }
-    if ((s32)r7 == 0) {
-        r5 = r5 + 0x1;
-        while (1) {
-            /* subic. r5, r5, 0x1 */;
-            if ((s32)r7 == 0) break;
-            tmp = *(u8*)((u8*)r3 + 0x1);
-            r4 += 1; *(u8*)r4 = tmp;
-
-
-        }
-        r3 = r31;
-        return;
-    }
-    r3 = r4 + r5;
-    r4 = r31 + r5;
-    r5 = r5 + 0x1;
-    while (1) {
-        /* subic. r5, r5, 0x1 */;
-        if ((s32)r7 == 0) break;
-        tmp = *(u8*)((u8*)r3 + (-1));
-        r4 += -1; *(u8*)r4 = tmp;
-
-
     }
 
-    r3 = r31;
-
-    return;
+    return dst;
 }
+
 
 /* fn_800C8240 - 0x800C8240 | size: 0xAC */
-void fn_800C8240(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
+/* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
+void fn_800C8240(void* dst, const void* src, size_t n) {
+    u32 i, v1, v2;
+    u32 src_offset, left_shift, right_shift;
 
-    r11 = r3 + r5;
-    r10 = r4 + r5;
-    r3 = r11 & 0x3;
-    if ((s32)tmp != 0) {
-        r5 = r5 - r3;
-        do {
-            tmp = *(u8*)((u8*)r10 + (-1));
-            /* subic. r3, r3, 0x1 */;
-            r11 += -1; *(u8*)r11 = tmp;
-        } while ((s32)tmp != 0);
+    cps = ((u8*)src) + n;
+    cpd = ((u8*)dst) + n;
+
+    i = ((u32)cpd) & 3;
+
+    if (i) {
+        n -= i;
+
+        do
+            *--cpd = *--cps;
+        while (--i);
     }
-    r7 = r10 & 0x3;
-    r9 = 0x20 - r8;
-    r6 = (u32)r5 >> 3;
-    tmp = 0x4 - r7;
-    r10 = r10 + tmp;
-    r4 = *(u32*)((u8*)r10 + (-4));
+
+    src_offset = ((u32)cps) & 3;
+
+    left_shift = src_offset << 3;
+    right_shift = 32 - left_shift;
+
+    cps += 4 - src_offset;
+
+    i = n >> 3;
+
+    v1 = *--lps;
+
     do {
-        tmp = *(u32*)((u8*)r10 + (-4));
-        r3 = (u32)r4 >> r9;
-        /* subic. r6, r6, 0x1 */;
-        r4 = tmp << r8;
-        tmp = (u32)tmp >> r9;
-        r3 = r4 | r3;
-        *(u32*)((u8*)r11 + (-4)) = r3;
-        r4 = *(u32*)((u8*)r10 + (-8));
-        r3 = r4 << r8;
-        tmp = r3 | tmp;
-        r11 += -8; *(u32*)r11 = tmp;
-    } while ((s32)tmp != 0);
-    tmp = r5 & 0x00000004;
-    if ((s32)tmp != 0) {
-        r3 = *(u32*)((u8*)r10 + (-4));
-        tmp = (u32)r4 >> r9;
-        r3 = r3 << r8;
-        tmp = r3 | tmp;
-        r11 += -4; *(u32*)r11 = tmp;
+        v2 = *--lps;
+        *--lpd = (v2 << left_shift) | (v1 >> right_shift);
+        v1 = *--lps;
+        *--lpd = (v1 << left_shift) | (v2 >> right_shift);
+    } while (--i);
+
+    if (n & 4) {
+        v2 = *--lps;
+        *--lpd = (v2 << left_shift) | (v1 >> right_shift);
     }
-    r5 = r5 & 0x3;
-    if ((s32)tmp == (s32)0) return;
-    r10 = r10 + r7;
-    do {
-        tmp = *(u8*)((u8*)r10 + (-1));
-        /* subic. r5, r5, 0x1 */;
-        r11 += -1; *(u8*)r11 = tmp;
-    } while ((s32)tmp != 0);
+
+    n &= 3;
+
+    if (n) {
+        cps += src_offset;
+        do
+            *--cpd = *--cps;
+        while (--n);
+    }
+
     return;
 }
+
 
 /* fn_800C82EC - 0x800C82EC | size: 0xC0 */
-void fn_800C82EC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r11 = 0;
+/* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
+void fn_800C82EC(void* dst, const void* src, size_t n) {
+    u32 i, v1, v2;
+    u32 src_offset, left_shift, right_shift;
 
-    tmp = -r3;
-    r6 = tmp & 0x3;
-    if ((s32)tmp != 0) {
-        r5 = r5 - r6;
-        do {
-            tmp = *(u8*)((u8*)r8 + 0x1);
-            /* subic. r6, r6, 0x1 */;
-            r3 += 1; *(u8*)r3 = tmp;
-        } while ((s32)tmp != 0);
+    i = (-(u32)dst) & 3;
+
+    cps = ((u8*)src) - 1;
+    cpd = ((u8*)dst) - 1;
+
+    if (i) {
+        n -= i;
+
+        do
+            deref_auto_inc(cpd) = deref_auto_inc(cps);
+        while (--i);
     }
-    tmp = r8 + 0x1;
-    r9 = tmp & 0x3;
-    r7 = (u32)r5 >> 3;
-    r8 = r8 - r9;
-    r4 = *(u32*)((u8*)r8 + 0x1);
-    r11 = 0x20 - r10;
+
+    src_offset = ((u32)(cps + 1)) & 3;
+
+    left_shift = src_offset << 3;
+    right_shift = 32 - left_shift;
+
+    cps -= src_offset;
+
+    lps = ((u32*)(cps + 1)) - 1;
+    lpd = ((u32*)(cpd + 1)) - 1;
+
+    i = n >> 3;
+
+    v1 = deref_auto_inc(lps);
+
     do {
-        r3 = *(u32*)((u8*)r8 + 0x4);
-        r4 = r4 << r10;
-        /* subic. r7, r7, 0x1 */;
-        tmp = (u32)r3 >> r11;
-        r3 = r3 << r10;
-        tmp = r4 | tmp;
-        *(u32*)((u8*)r6 + 0x4) = tmp;
-        r4 = *(u32*)((u8*)r8 + 0x8);
-        tmp = (u32)r4 >> r11;
-        tmp = r3 | tmp;
-        r6 += 8; *(u32*)r6 = tmp;
-    } while ((s32)tmp != 0);
-    tmp = r5 & 0x00000004;
-    if ((s32)tmp != 0) {
-        tmp = *(u32*)((u8*)r8 + 0x4);
-        r3 = r4 << r10;
-        tmp = (u32)tmp >> r11;
-        tmp = r3 | tmp;
-        r6 += 4; *(u32*)r6 = tmp;
+        v2 = deref_auto_inc(lps);
+        deref_auto_inc(lpd) = (v1 << left_shift) | (v2 >> right_shift);
+        v1 = deref_auto_inc(lps);
+        deref_auto_inc(lpd) = (v2 << left_shift) | (v1 >> right_shift);
+    } while (--i);
+
+    if (n & 4) {
+        v2 = deref_auto_inc(lps);
+        deref_auto_inc(lpd) = (v1 << left_shift) | (v2 >> right_shift);
     }
-    r5 = r5 & 0x3;
-    r4 = r8 + 0x3;
-    r3 = r6 + 0x3;
-    if ((s32)tmp == (s32)0) return;
-    tmp = 0x4 - r9;
-    r4 = r4 - tmp;
-    do {
-        tmp = *(u8*)((u8*)r4 + 0x1);
-        /* subic. r5, r5, 0x1 */;
-        r3 += 1; *(u8*)r3 = tmp;
-    } while ((s32)tmp != 0);
+
+    cps = ((u8*)(lps + 1)) - 1;
+    cpd = ((u8*)(lpd + 1)) - 1;
+
+    n &= 3;
+
+    if (n) {
+        cps -= 4 - src_offset;
+        do
+            deref_auto_inc(cpd) = deref_auto_inc(cps);
+        while (--n);
+    }
+
     return;
 }
+
 
 /* fn_800C83AC - 0x800C83AC | size: 0xA8 */
-void fn_800C83AC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+/* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
+void fn_800C83AC(void* dst, const void* src, size_t n) {
+    u32 i;
 
-    r7 = r3 + r5;
-    r6 = r4 + r5;
-    r3 = r7 & 0x3;
-    if ((s32)tmp != 0) {
-        r5 = r5 - r3;
-        do {
-            tmp = *(u8*)((u8*)r6 + (-1));
-            /* subic. r3, r3, 0x1 */;
-            r7 += -1; *(u8*)r7 = tmp;
-        } while ((s32)tmp != 0);
+    cps = ((u8*)src) + n;
+    cpd = ((u8*)dst) + n;
+
+    i = ((u32)cpd) & 3;
+
+    if (i) {
+        n -= i;
+
+        do
+            *--cpd = *--cps;
+        while (--i);
     }
-    /* srwi. r4, r5, 5 */;
-    if ((s32)tmp != 0) {
+
+    i = n >> 5;
+
+    if (i)
         do {
-            r3 = *(u32*)((u8*)r6 + (-4));
-            /* subic. r4, r4, 0x1 */;
-            tmp = *(u32*)((u8*)r6 + (-8));
-            *(u32*)((u8*)r7 + (-4)) = r3;
-            r3 = *(u32*)((u8*)r6 + (-12));
-            *(u32*)((u8*)r7 + (-8)) = tmp;
-            tmp = *(u32*)((u8*)r6 + (-16));
-            *(u32*)((u8*)r7 + (-12)) = r3;
-            r3 = *(u32*)((u8*)r6 + (-20));
-            *(u32*)((u8*)r7 + (-16)) = tmp;
-            tmp = *(u32*)((u8*)r6 + (-24));
-            *(u32*)((u8*)r7 + (-20)) = r3;
-            r3 = *(u32*)((u8*)r6 + (-28));
-            *(u32*)((u8*)r7 + (-24)) = tmp;
-            tmp = *(u32*)((u8*)r6 + (-32));
-            *(u32*)((u8*)r7 + (-28)) = r3;
-            r7 += -32; *(u32*)r7 = tmp;
-        } while ((s32)tmp != 0);
-    }
-    /* extrwi. r3, r5, 3, 27 */;
-    if ((s32)tmp != 0) {
-        do {
-            tmp = *(u32*)((u8*)r6 + (-4));
-            /* subic. r3, r3, 0x1 */;
-            r7 += -4; *(u32*)r7 = tmp;
-        } while ((s32)tmp != 0);
-    }
-    r5 = r5 & 0x3;
-    if ((s32)tmp == (s32)0) return;
-    do {
-        tmp = *(u8*)((u8*)r6 + (-1));
-        /* subic. r5, r5, 0x1 */;
-        r7 += -1; *(u8*)r7 = tmp;
-    } while ((s32)tmp != 0);
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+            *--lpd = *--lps;
+        } while (--i);
+
+    i = (n & 31) >> 2;
+
+    if (i)
+        do
+            *--lpd = *--lps;
+        while (--i);
+
+    n &= 3;
+
+    if (n)
+        do
+            *--cpd = *--cps;
+        while (--n);
+
     return;
 }
+
 
 /* fn_800C8454 - 0x800C8454 | size: 0xBC */
-void fn_800C8454(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
+/* MSL mem.c/mem_funcs.c (zeldaret/tww); CW 2.0. Verified 100%. */
+void fn_800C8454(void* dst, const void* src, size_t n) {
+    u32 i;
 
-    tmp = -r3;
-    r6 = tmp & 0x3;
-    if ((s32)tmp != 0) {
-        r5 = r5 - r6;
-        do {
-            tmp = *(u8*)((u8*)r4 + 0x1);
-            /* subic. r6, r6, 0x1 */;
-            r3 += 1; *(u8*)r3 = tmp;
-        } while ((s32)tmp != 0);
+    i = (-(u32)dst) & 3;
+
+    cps = ((u8*)src) - 1;
+    cpd = ((u8*)dst) - 1;
+
+    if (i) {
+        n -= i;
+
+        do
+            deref_auto_inc(cpd) = deref_auto_inc(cps);
+        while (--i);
     }
-    /* srwi. r6, r5, 5 */;
-    if ((s32)tmp != 0) {
+
+    lps = ((u32*)(cps + 1)) - 1;
+    lpd = ((u32*)(cpd + 1)) - 1;
+
+    i = n >> 5;
+
+    if (i)
         do {
-            r3 = *(u32*)((u8*)r7 + 0x4);
-            /* subic. r6, r6, 0x1 */;
-            tmp = *(u32*)((u8*)r7 + 0x8);
-            *(u32*)((u8*)r4 + 0x4) = r3;
-            r3 = *(u32*)((u8*)r7 + 0xC);
-            *(u32*)((u8*)r4 + 0x8) = tmp;
-            tmp = *(u32*)((u8*)r7 + 0x10);
-            *(u32*)((u8*)r4 + 0xC) = r3;
-            r3 = *(u32*)((u8*)r7 + 0x14);
-            *(u32*)((u8*)r4 + 0x10) = tmp;
-            tmp = *(u32*)((u8*)r7 + 0x18);
-            *(u32*)((u8*)r4 + 0x14) = r3;
-            r3 = *(u32*)((u8*)r7 + 0x1C);
-            *(u32*)((u8*)r4 + 0x18) = tmp;
-            tmp = *(u32*)((u8*)r7 + 0x20);
-            *(u32*)((u8*)r4 + 0x1C) = r3;
-            r4 += 32; *(u32*)r4 = tmp;
-        } while ((s32)tmp != 0);
-    }
-    /* extrwi. r3, r5, 3, 27 */;
-    if ((s32)tmp != 0) {
-        do {
-            tmp = *(u32*)((u8*)r7 + 0x4);
-            /* subic. r3, r3, 0x1 */;
-            r4 += 4; *(u32*)r4 = tmp;
-        } while ((s32)tmp != 0);
-    }
-    r5 = r5 & 0x3;
-    r6 = r7 + 0x3;
-    r3 = r4 + 0x3;
-    if ((s32)tmp == (s32)0) return;
-    do {
-        tmp = *(u8*)((u8*)r6 + 0x1);
-        /* subic. r5, r5, 0x1 */;
-        r3 += 1; *(u8*)r3 = tmp;
-    } while ((s32)tmp != 0);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+        } while (--i);
+
+    i = (n & 31) >> 2;
+
+    if (i)
+        do
+            deref_auto_inc(lpd) = deref_auto_inc(lps);
+        while (--i);
+
+    cps = ((u8*)(lps + 1)) - 1;
+    cpd = ((u8*)(lpd + 1)) - 1;
+
+    n &= 3;
+
+    if (n)
+        do
+            deref_auto_inc(cpd) = deref_auto_inc(cps);
+        while (--n);
+
     return;
 }
+
 

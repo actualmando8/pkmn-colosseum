@@ -13,6 +13,10 @@
       "compiler": "GC/1.2.5n",
       "comment": "C++ exception init uses CW 1.2.5n"
     },
+    "src/crt/mem.c": {
+      "compiler": "GC/2.0",
+      "comment": "MSL mem.c/mem_funcs.c (memmove + __copy_longs_*) match only at CW 2.0; string.c is 1.3 — MSL/CRT was built per-file with different CW versions"
+    },
     "src/dolphin/os/OSContext.c": {
       "compiler": "GC/1.2.5n",
       "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
