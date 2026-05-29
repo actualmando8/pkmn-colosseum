@@ -3021,7 +3021,7 @@ void fn_800DBEB4(u32 idx, u32* src) {
         u32 tmp = *src;
         fn_800D4F98(0x50, 0x14, idx, &tmp);
     } else {
-        *(s32*)&lbl_80400B28[idx * 4 + 0x1ec] = *src;
+        *(s32*)(lbl_80400B28 + idx * 4 + 0x1ec) = *src;
     }
 }
 #endif
