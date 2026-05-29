@@ -476,7 +476,8 @@ void fn_801C6908(void) {
  * Address: 0x801C6928 | Size: 0xC
  */
 u8 fn_801C6928(void) {
-    return 0;
+    extern u8 lbl_8047B3B0;
+    lbl_8047B3B0 = 1;
 }
 
 /* =========================================================================
@@ -945,8 +946,9 @@ void fn_801CA9BC(s32 layer, f32 opacity) {
  * fn_801CA9F0 - Scene get global state flag.
  * Address: 0x801CA9F0 | Size: 0x8
  */
-u8 fn_801CA9F0(void) {
-    return 0;
+s32 fn_801CA9F0(void) {
+    extern u32 lbl_80478CB0;
+    return lbl_80478CB0;
 }
 
 /**
@@ -1255,7 +1257,8 @@ void fn_801CBA0C(f32 speed) {
  * Address: 0x801CBA84 | Size: 0xC
  */
 u8 fn_801CBA84(void) {
-    return 0;
+    extern u8 lbl_8047B3C8;
+    lbl_8047B3C8 = 0;
 }
 
 /**
