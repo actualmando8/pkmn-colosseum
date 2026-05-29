@@ -609,8 +609,8 @@ u32 fn_800EEA50(u32 ptr) {
     u32 diff;
     u32 lz;
 
-    base = lbl_8047ABE0 & 0xF;
-    ptr = ptr & 0xF;
+    base = lbl_8047ABE0 & 0xF0000000;
+    ptr = ptr & 0xF0000000;
     diff = base - ptr;
     lz = __cntlzw(diff);
     return (lz >> 5) & 0xFF;
