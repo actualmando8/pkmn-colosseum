@@ -375,7 +375,7 @@ u32 fn_800EE7E0(void* outerP) {
     innerP = *(void***)((u8*)outerP + 8);
     flags = *(u32*)((u8*)innerP + 0x14);
 
-    if (flags & 0x4020) {
+    if (((u32)__cntlzw(flags & 0x4020) >> 5) == 0) {
         val = 0;
     } else {
         sub = *(void***)((u8*)innerP + 0x18);
@@ -386,7 +386,7 @@ u32 fn_800EE7E0(void* outerP) {
         }
     }
 
-    return (val == 0) ? 1 : 0;
+    return (__cntlzw(0 - val) >> 5) & 0xFF;
 }
 #endif
 
