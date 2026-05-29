@@ -17,42 +17,25 @@ void fn_800FEBA0(void) {
     extern u32 lbl_8047AC7C;
     extern u32 lbl_8047AC94;
     extern u32 lbl_8047AC98;
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+    u8 *p;
+    u8 *next;
+    void (*cb)(u32, u32);
+    u32 idx;
 
-    r3 = 0xAAAB0000;
-    r4 = lbl_8047AC98;
-    while (r4 != 0) {
-
-        tmp = *(u32*)((u8*)r4 + 0x8);
-        r30 = *(u32*)((u8*)r4 + 0x4);
-        if ((s32)tmp == 3) {
-            tmp = *(u8*)((u8*)r4 + 0xD);
-            if (tmp == 0) {
-                tmp = lbl_8047AC7C;
-                lbl_8047AC94 = r4;
-                tmp = r4 - tmp;
-                tmp = (u32)((u64)r31 * (u64)tmp >> 32);
-                r12 = *(u32*)((u8*)r4 + 0x14);
-                r4 = *(u32*)((u8*)r4 + 0x10);
-                r3 = (u32)tmp >> 4;
-                r3 = r3 + 0x1;
-                ctr_fn = (void(*)(void))r12;
-                ctr_fn();
+    p = (u8*)lbl_8047AC98;
+    while (p != 0) {
+        next = (u8*)*(u32*)(p + 0x4);
+        if ((s32)*(u32*)(p + 0x8) == 3) {
+            if (*(u8*)(p + 0xD) == 0) {
+                lbl_8047AC94 = (u32)p;
+                idx = ((u32)p - lbl_8047AC7C) / 0x18;
+                cb = (void(*)(u32, u32))*(u32*)(p + 0x14);
+                cb(idx + 1, *(u32*)(p + 0x10));
+            }
         }
-        }
-        r4 = r30;
-
+        p = next;
     }
-    tmp = 0x0;
-    lbl_8047AC94 = tmp;
-    return;
+    lbl_8047AC94 = 0;
 }
 
 /* 0x800FEC34 | 0x84 */
