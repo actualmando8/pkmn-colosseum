@@ -688,66 +688,40 @@ void fn_801EF644(void) {
 }
 
 /* 0x801EF6FC | size: 0x5C | small */
-void fn_801EF6FC(void) {
+void fn_801EF6FC(u8 a) {
     extern u8 lbl_8047B5E1;
-    extern void fn_801EF624();
-    extern void fn_8020DD44();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+    extern u16 fn_801EF624(void);
+    extern u32 fn_8020DD44(void);
+    extern void fn_801659FC(u32 r3, u32 r4, u32 r5);
+    u32 r3;
 
-    tmp = lbl_8047B5E1;
-    if (tmp != 1) {
-        tmp = r3 & 0xFF;
-        if (tmp != 1) {
-            fn_801EF624();
-            tmp = r3 & 0xFFFF;
-            if (tmp != 1) {
-                fn_8020DD44();
-                if (r3 != 0) {
-                    r4 = 0x3e8;
-                    r5 = 0xff;
-                    ((void(*)(void))fn_801659FC)();
-                }
-                tmp = 0x1;
-                lbl_8047B5E1 = tmp;
+    if (lbl_8047B5E1 == 1) return;
+    if (a == 0) return;
+    if (fn_801EF624() == 0) return;
+    r3 = fn_8020DD44();
+    if (r3 != 0) {
+        fn_801659FC(r3, 0x3e8, 0xff);
     }
-    }
-    }
+    lbl_8047B5E1 = 1;
     return;
 }
 
 /* 0x801EF758 | size: 0x5C | small */
-void fn_801EF758(void) {
+void fn_801EF758(u8 a) {
     extern u8 lbl_8047B5E0;
-    extern void fn_801EF624();
-    extern void fn_8020DD80();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+    extern u16 fn_801EF624(void);
+    extern u32 fn_8020DD80(void);
+    extern void fn_80165A20(u32 r3, u32 r4, u32 r5);
+    u32 r3;
 
-    tmp = lbl_8047B5E0;
-    if (tmp != 1) {
-        tmp = r3 & 0xFF;
-        if (tmp != 1) {
-            fn_801EF624();
-            tmp = r3 & 0xFFFF;
-            if (tmp != 1) {
-                fn_8020DD80();
-                if (r3 != 0) {
-                    r4 = 0x0;
-                    r5 = 0xff;
-                    ((void(*)(void))fn_80165A20)();
-                }
-                tmp = 0x1;
-                lbl_8047B5E0 = tmp;
+    if (lbl_8047B5E0 == 1) return;
+    if (a == 0) return;
+    if (fn_801EF624() == 0) return;
+    r3 = fn_8020DD80();
+    if (r3 != 0) {
+        fn_80165A20(r3, 0x0, 0xff);
     }
-    }
-    }
+    lbl_8047B5E0 = 1;
     return;
 }
 
