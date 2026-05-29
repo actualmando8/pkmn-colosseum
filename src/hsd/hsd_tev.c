@@ -302,12 +302,15 @@ void fn_801B26F8(void) {
 extern u8 lbl_8047B351;
 extern u8 lbl_8047B350;
 extern s32 lbl_8047B34C;
+#pragma push
+#pragma optimization_level 1
 void fn_801B2718(void) {
     lbl_8047B351 = 0;
     lbl_8047B350 = 0;
     lbl_8047B34C = -1;
     lbl_8047B351 = 0xFF;
 }
+#pragma pop
 
 /*
  * HSD_TevLookupReg - 0x801B273C | Size: 0x50
@@ -550,6 +553,8 @@ void fn_801B3174(void) {
  */
 extern void fn_800BBC34(s32 stage);
 extern void fn_800BBC0C(s32 val);
+#pragma push
+#pragma optimization_level 2
 void fn_801B31A4(void) {
     s32 i;
     for (i = 0; i < 16; i++) {
@@ -558,6 +563,7 @@ void fn_801B31A4(void) {
     fn_800BBC0C(0);
     lbl_8047B370 = 0;
 }
+#pragma pop
 
 /*
  * HSD_TExpAllocReg - 0x801B31F4 | Size: 0x64
