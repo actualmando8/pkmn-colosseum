@@ -484,25 +484,29 @@ void fn_8010206C(f32 param) {
 }
 
 /* 0x801020C0 | 0x78 */
+#pragma push
+#pragma peephole off
 s32 fn_801020C0(void) {
-    void* r3 = fn_8005DA18();
     s32 r31 = 0;
+    void* r3 = fn_8005DA18();
     if (r3 == (void*)0) { return 0; }
     {
-        s16 r0 = *(s16*)((u8*)r3 + 0x4);
+        s32 r0 = (s16)*(s16*)((u8*)r3 + 0x4);
         do {
-            void* node = fn_8005D934(r0);
-            u8 flags = *(u8*)node;
-            if ((flags >> 7) & 1) {
+            void* node = fn_8005D934((s16)r0);
+            if (((u32)*(volatile u8*)node >> 7) & 1) {
                 r31++;
             }
-            if ((flags >> 6) & 1) {
-                return r31;
+            if (((u32)*(volatile u8*)node >> 6) & 1) {
+                goto _ret_r31;
             }
-            r0 = *(s16*)((u8*)node + 0x18);
+            r0 = (s16)*(s16*)((u8*)node + 0x18);
         } while (1);
     }
+_ret_r31:
+    return r31;
 }
+#pragma pop
 
 /* 0x80102138 | 0xC0 */
 #pragma push
@@ -512,26 +516,28 @@ s32 fn_80102138(void* unused, u32 param) {
     void* r3 = fn_8005DA18();
     if (r3 == (void*)0) { return -3; }
     {
-        s32 r31 = *(s16*)((u8*)r3 + 0x4);
+        s32 r31 = (s16)*(s16*)((u8*)r3 + 0x4);
         s32 r30 = 0;
     loop:
         {
-            void* node = fn_8005D934((s32)(s16)r31);
-            if ((s32)(s16)r31 == (s32)r29) {
-                if ((*(u8*)node >> 7) & 1) {
+            void* node = fn_8005D934((s16)r31);
+            if ((u32)(s16)r31 == (u32)r29) {
+                if (((u32)*(volatile u8*)node >> 7) & 1) {
                     return r30;
                 }
                 return -1;
             }
-            if ((*(u8*)node >> 7) & 1) {
+            if (((u32)*(volatile u8*)node >> 7) & 1) {
                 r30++;
             }
-            if ((*(u8*)node >> 6) & 1) {
-                return -2;
+            if (((u32)*(volatile u8*)node >> 6) & 1) {
+                goto _ret_m2;
             }
-            r31 = *(s16*)((u8*)node + 0x18);
+            r31 = (s16)*(s16*)((u8*)node + 0x18);
             goto loop;
         }
+    _ret_m2:
+        return -2;
     }
 }
 #pragma pop
@@ -585,22 +591,24 @@ void* fn_801022B8(void* p, u32 target) {
     { extern void* fn_8005DA18(void*); r3 = fn_8005DA18(r29); }
     if (r3 == (void*)0) { return (void*)0; }
     {
-        s16 r30 = *(s16*)((u8*)r3 + 0x4);
+        s32 r30 = (s16)*(s16*)((u8*)r3 + 0x4);
         s32 r29b = 0;
         void* result = (void*)0;
         do {
-            void* node = fn_8005D934(r30);
-            if ((*(s8*)node >> 7) & 1) {
+            void* node = fn_8005D934((s16)r30);
+            if (((u32)*(volatile u8*)node >> 7) & 1) {
                 if (r29b == r31) {
                     return (void*)(s32)(s16)r30;
                 }
                 r29b++;
             }
-            if ((*(u8*)node >> 6) & 1) {
-                return (void*)0;
+            if (((u32)*(volatile u8*)node >> 6) & 1) {
+                goto _ret0_loop;
             }
-            r30 = *(s16*)((u8*)node + 0x18);
+            r30 = (s16)*(s16*)((u8*)node + 0x18);
         } while (1);
+    _ret0_loop:
+        return (void*)0;
         (void)result;
     }
     (void)r29;
@@ -736,8 +744,7 @@ s32 fn_80102620(s32 param) {
 void fn_8010264C(void* p, void* q) {
     void* r30 = p;
     void* r31 = q;
-    u32 r3 = fn_801046B8();
-    fn_801026A4(r30, r3, 0, 0, r31, 0);
+    fn_801026A4(r30, fn_801046B8(), 0, 0, r31, 0);
 }
 #pragma pop
 
@@ -1397,26 +1404,36 @@ void fn_801071D0(void) {
 #pragma pop
 
 /* 0x80107E78 | 0x60 */
+#pragma push
+#pragma peephole off
 s32 fn_80107E78(void* r3, s32 r4, u16 r30) {
     void* r31 = fn_801046C8(r3, r4);
-    if (r31 == (void*)0) { return 0; }
+    if (r31 == (void*)0) { goto _ret0; }
     {
         void* r3b = fn_8005D830((u32)(u16)r30);
-        if (*(void**)((u8*)r31 + 0xc) != r3b) { return 0; }
+        if (*(void**)((u8*)r31 + 0xc) != r3b) { goto _ret0; }
         return 1;
     }
+_ret0:
+    return 0;
 }
+#pragma pop
 
 /* 0x80107ED8 | 0x60 */
+#pragma push
+#pragma peephole off
 s32 fn_80107ED8(s32 r3, u16 r30) {
     void* r31 = fn_80104704(r3);
-    if (r31 == (void*)0) { return 0; }
+    if (r31 == (void*)0) { goto _ret0; }
     {
         void* r3b = fn_8005D830((u32)(u16)r30);
-        if (*(void**)((u8*)r31 + 0x24) != r3b) { return 0; }
+        if (*(void**)((u8*)r31 + 0x24) != r3b) { goto _ret0; }
         return 1;
     }
+_ret0:
+    return 0;
 }
+#pragma pop
 
 /* 0x80107F38 | 0x194 */
 #pragma push
@@ -1670,20 +1687,22 @@ void fn_80109220(void* node, u32 enable) {
 #pragma pop
 
 /* 0x8010925C | 0x34 */
+#pragma push
+#pragma peephole off
 void fn_8010925C(void* head) {
     if (head == (void*)0) { return; }
     {
-        void* r5 = head;
         u8 r0 = 0;
-        while (1) {
-            void* r4 = *(void**)r5;
-            if (r4 == (void*)0) { break; }
+        void* r4;
+        void* r5 = head;
+        while ((r4 = *(void**)r5) != (void*)0) {
             *(u8*)((u8*)r4 + 0x4) = r0;
-            r5 = r4;
+            r5 = *(void**)r5;
         }
         *(u32*)head = 0;
     }
 }
+#pragma pop
 
 /* 0x80109290 | 0xC8 */
 #pragma push
