@@ -1547,7 +1547,7 @@ asm void fn_800E4D18(void) {
 }
 #else
 void fn_800E4D18(GSmaterialEntry* entry) {
-    ((void(*)(GSmaterialEntry*, u32))fn_800E51A4)(entry, entry->flags);
+    fn_800E51A4(entry, (void*)entry->flags);
 }
 #endif
 
@@ -2092,7 +2092,10 @@ u32 fn_800E5978(void* p) {
     if (ptr == NULL) {
         return 0;
     }
-    return ((u32(*)(void*))fn_800DF240)(ptr) & 1;
+    {
+        extern u32 fn_800DF240(void*);
+        return fn_800DF240(ptr) & 1;
+    }
 }
 #endif
 
@@ -2383,7 +2386,10 @@ u32 fn_800E5FAC(void* p) {
     if (ptr == NULL) {
         return 0;
     }
-    return (((u32(*)(void*))fn_800DF240)(ptr) >> 2) & 1;
+    {
+        extern u32 fn_800DF240(void*);
+        return (fn_800DF240(ptr) >> 2) & 1;
+    }
 }
 #endif
 
@@ -3560,9 +3566,9 @@ asm void fn_800E9288(void) {
 void fn_800E9288(GSmaterialEntry* entry) {
     u16 handle = *(u16*)((u8*)entry + 0x164);
     if (handle != 0) {
-        ((void*(*)(u16))fn_800E24B0)(handle);
+        fn_800E24B0(handle);
         handle = *(u16*)((u8*)entry + 0x164);
-        ((void(*)(u16))fn_800E209C)(handle);
+        fn_800E209C(handle);
         *(u16*)((u8*)entry + 0x164) = 0;
         *(u32*)((u8*)entry + 0x158) = 0;
         *(u32*)((u8*)entry + 0x15c) = 0;
@@ -3816,8 +3822,9 @@ asm void fn_800E9E34(void) {
 }
 #else
 void fn_800E9E34(GSmaterialEntry* entry, void* a, void* b, void* c) {
+    extern void fn_800E9E90(void*, u32, u32, void*, void*, void*);
     void* mobj = fn_800E5188(entry);
-    ((void(*)(void*, u32, u32, void*, void*, void*))fn_800E9E90)(mobj, 0, 7, a, b, c);
+    fn_800E9E90(mobj, 0, 7, a, b, c);
 }
 #endif
 
@@ -4741,8 +4748,8 @@ asm void fn_800EC0E8(void) {
 void fn_800EC0E8(GSmaterialEntry* entry) {
     u32 flags = entry->flags;
     if (!(flags & 0x10000) || !(flags & 0x1000)) {
-        ((void(*)(GSmaterialEntry*))fn_800ED1CC)(entry);
-        ((void(*)(GSmaterialEntry*))fn_800ED4D4)(entry);
+        fn_800ED1CC(entry);
+        fn_800ED4D4(entry);
     }
 }
 #endif
