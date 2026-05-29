@@ -661,14 +661,14 @@ void fn_80199654(HSD_DObj* dobj, void* matanim, void* shapeanim) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u32 lbl_8047AA44;
+extern u32 lbl_8047B264;
 #if 0
 asm void fn_80199704(void) {
 #include "src/hsd/hsd_dobj_fn_80199704.inc"
 }
 #else
 void fn_80199704(u32 val) {
-    lbl_8047AA44 = val;
+    lbl_8047B264 = val;
 }
 #endif
 #pragma pop
