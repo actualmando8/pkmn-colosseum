@@ -62,3 +62,61 @@ dolphin-2603a-x64/
 *.pre
 build/.measure_cache.json
 build/.harvest_cursor.json
+tools/decomp_work/reports/
+tools/decomp_work/lane_manifest.json
+tools/decomp_work/lane_manifest.json.tmp
+
+# Root-level scratch diff/match JSON dumps (regenerable by pipeline tools)
+/_diff*.json
+/diff_*.json
+/diff_cache_*.json
+/tmp_diff*.json
+/tmp_*.json
+/match_*.json
+/_objdiff_*.json
+/scratch_*.json
+/gfw_*.json
+/fn_*_diff.json
+/fn_*_current_diff.json
+/fn_*_report.json
+/diff_iter*.json
+/diff_one.json
+/diff_a08.json
+
+# Root-level stray object/assembly files (build artifacts in wrong place)
+/*.s
+/*.obj
+/NUL.obj
+/nul
+
+# Root-level scratch output files
+/_diff*.out
+/_objdump_input.err
+/compiler_comparison_results.json
+
+# Tools scratch diff/match JSON in tools/
+tools/_diff_*.json
+tools/_fn_*_diff.json
+tools/diff_*.json
+
+# Tools scratch text result dumps
+tools/*_source.txt
+tools/fn_*_source.txt
+tools/col_*.txt
+tools/cc_*.txt
+tools/compile_*.txt
+tools/match_*.txt
+tools/_*.txt
+
+# Tools scratch .c/.o experiments (codegen experiments, not source)
+tools/_*.c
+tools/_*.o
+
+# Attic (moved dead code, never commit)
+tools/attic/
+
+# Secrets — additional key file patterns
+deepseek*.txt
+*_key.txt
+*key*.txt
+!requirements.txt
