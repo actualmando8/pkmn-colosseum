@@ -929,11 +929,11 @@ asm void fn_800D59B8(void) {
 #else
 void fn_800D59B8(u32 idx, f32 x, f32 y) {
     u32 state = lbl_8047AA80;
-    if (!*(u8*)(state + 0x47e) && *(u32*)state == 1) { fn_800D4F98(0x1c, 0xf); }
+    if (!*(u8*)(state + 0x47e) && *(s32*)state == 1) { fn_800D4F98(0x1c, 0xf, idx, x, y); }
     else {
         *(u32*)(state + 0x500 + idx * 4) = (u32)fn_800D7304;
-        *(f32*)(state + 0x528 + idx * 16) = x;
-        *(f32*)(state + 0x52c + idx * 16) = y;
+        *(f32*)(lbl_8047AA80 + 0x528 + idx * 16) = x;
+        *(f32*)(lbl_8047AA80 + 0x52c + idx * 16) = y;
     }
 }
 #endif
@@ -2499,7 +2499,7 @@ asm void fn_800D9FB4(void) {
 #include "src/game/gs_render_fn_800D9FB4.inc"
 }
 #else
-void fn_800D9FB4(u32 val) {
+void fn_800D9FB4(s32 val) {
     u32 state = lbl_8047AA80;
     if (*(s32*)state == 1) { fn_800D4F98(0x33, 1, val); }
     else {
@@ -2530,7 +2530,7 @@ asm void fn_800DA08C(void) {
 #include "src/game/gs_render_fn_800DA08C.inc"
 }
 #else
-void fn_800DA08C(u32 val) {
+void fn_800DA08C(s32 val) {
     u32 state = lbl_8047AA80;
     if (*(s32*)state == 1) { fn_800D4F98(0x31, 1, val); }
     else {
@@ -2603,7 +2603,7 @@ asm void fn_800DA3B0(void) {
 #include "src/game/gs_render_fn_800DA3B0.inc"
 }
 #else
-void fn_800DA3B0(u32 val, u8 b) {
+void fn_800DA3B0(s32 val, u8 b) {
     u32 state = lbl_8047AA80;
     if (*(s32*)state == 1) { fn_800D4F98(0x2d, 2, val, (u32)b); }
     else {
@@ -3743,7 +3743,10 @@ asm void fn_800DF21C(void) {
 #include "src/game/gs_render_fn_800DF21C.inc"
 }
 #else
-void fn_800DF21C(u8* obj) { fn_801A6DDC(*(u32*)((u8*)obj + 0x8)); }
+void fn_800DF21C(u8* obj) {
+    extern void fn_801A6DDC(u32);
+    fn_801A6DDC(*(u32*)((u8*)obj + 0x8));
+}
 #endif
 #if 0
 asm void fn_800DF240(void) {
@@ -4483,11 +4486,14 @@ asm void fn_800E09B4(void) {
 #include "src/game/gs_render_fn_800E09B4.inc"
 }
 #else
+#pragma push
+#pragma fp_contract on
 f32 fn_800E09B4(f32 start, f32 end, f32 t) {
     if (t <= lbl_8047CAF0) return start;
     if (t >= lbl_8047CAF4) return end;
     return t * (end - start) + start;
 }
+#pragma pop
 #endif
 extern u32 lbl_8047CB00;
 extern u32 lbl_8047CAF8;
@@ -4568,6 +4574,8 @@ asm void fn_800E0CA0(void) {
 #include "src/game/gs_render_fn_800E0CA0.inc"
 }
 #else
+#pragma push
+#pragma fp_contract on
 f32 fn_800E0CA0(f32 x) {
     f32 scale;
     f32 tmp;
@@ -4583,6 +4591,7 @@ f32 fn_800E0CA0(f32 x) {
     x = lbl_8047CB34 * x + lbl_8047CB30;
     return scale * lbl_804011B8[fn_800C46B0(x)];
 }
+#pragma pop
 #endif
 extern void fn_800CDBE0(void);
 extern f32 lbl_8047CB38;
