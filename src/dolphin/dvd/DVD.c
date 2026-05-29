@@ -111,31 +111,22 @@ void DVDInit(void) {
  * DVDReadDiskID - Read the disk ID from the DVD
  * 0x800A7484 | size: 0xD4
  */
-BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback) {
+static inline BOOL issueCommand(s32 prio, DVDCommandBlock* block) {
     BOOL enabled;
     BOOL result;
 
-    block->command = 5;
-    block->addr = diskID;
-    block->length = 0x20;
-    block->offset = 0;
-    block->transferredSize = 0;
-    block->callback = callback;
-
-    /* Auto-invalidate DCache if necessary */
-    if (autoInvalidation_804789CC) {
-        u32 cmd = block->command;
-        if (cmd == 1 || (cmd >= 4 && cmd <= 5) || cmd == 14) {
-            DCInvalidateRange(block->addr, block->length);
-        }
+    if (autoInvalidation_804789CC != 0 &&
+        (block->command == 1 || block->command == 4 ||
+         block->command == 5 || block->command == 14)) {
+        DCInvalidateRange(block->addr, block->length);
     }
 
     enabled = OSDisableInterrupts();
     block->state = 2; /* STATE_WAITING */
 
-    result = __DVDPushWaitingQueue(2, block);
+    result = __DVDPushWaitingQueue(prio, block);
 
-    if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
+    if (executing_8047A7E8 == NULL && (s32)PauseFlag_8047A7F4 == 0) {
         stateReady();
     }
 
@@ -143,38 +134,33 @@ BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback call
     return result;
 }
 
+BOOL DVDReadDiskID(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback) {
+    BOOL idle;
+
+    block->command = 5;
+    block->addr = diskID;
+    block->length = 0x20;
+    block->offset = 0;
+    block->transferredSize = 0;
+    block->callback = callback;
+    idle = issueCommand(2, block);
+    return idle;
+}
+
 /*
  * DVDInquiryAsync - Send an inquiry command to the DVD drive
  * 0x800A7614 | size: 0xD0
  */
 BOOL DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback) {
-    BOOL enabled;
-    BOOL result;
+    BOOL idle;
 
     block->command = 14;
     block->addr = info;
     block->length = 0x20;
     block->transferredSize = 0;
     block->callback = callback;
-
-    if (autoInvalidation_804789CC) {
-        u32 cmd = block->command;
-        if (cmd == 1 || (cmd >= 4 && cmd <= 5) || cmd == 14) {
-            DCInvalidateRange(block->addr, block->length);
-        }
-    }
-
-    enabled = OSDisableInterrupts();
-    block->state = 2;
-
-    result = __DVDPushWaitingQueue(2, block);
-
-    if (executing_8047A7E8 == NULL && PauseFlag_8047A7F4 == 0) {
-        stateReady();
-    }
-
-    OSRestoreInterrupts(enabled);
-    return result;
+    idle = issueCommand(2, block);
+    return idle;
 }
 
 /*
