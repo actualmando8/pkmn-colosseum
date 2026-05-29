@@ -99,7 +99,7 @@ extern u8 lbl_80465688[];
 
 /* sdata2 string constants */
 extern const char lbl_8047DC98[];
-extern const char lbl_8047DCA0[];
+extern const char lbl_8047DCA0;
 extern const char lbl_8047DCA8[];
 extern const char lbl_8047DCB0[];
 extern const char lbl_8047DCB8[];
@@ -209,7 +209,7 @@ void* fn_801AA4CC(void* list)
 {
     void* l = list;
 
-    if (*(u8*)l & 0x80) {
+    if ((*(u8*)l & 0x80) >> 7) {
         if (*(u32*)((u8*)l + 0x8) >= *(u32*)((u8*)l + 0x14)) {
             return NULL;
         }
@@ -243,7 +243,7 @@ void fn_801AA538(void* a, void* b)
 void fn_801AA568(void)
 {
     fn_80193B30(lbl_8036CC00, lbl_8036C638, lbl_80274EC8,
-                (void*)lbl_8047DCA0, 0x3c, 0x8);
+                (void*)&lbl_8047DCA0, 0x3c, 0x8);
 }
 
 /* =========================================================================
@@ -557,10 +557,11 @@ void fn_801AD044(void* pobj, void* desc)
 #pragma peephole off
 void fn_801AD214(void* pobj)
 {
+    void* next;
     void* cur = pobj;
 
     while (cur != NULL) {
-        void* next = *(void**)((u8*)cur + 0x4);
+        next = *(void**)((u8*)cur + 0x4);
         if (cur != NULL) {
             void** vtbl = *(void***)cur;
             ((void(*)(void*))vtbl[0x30 / 4])(cur);
@@ -659,13 +660,12 @@ void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr)
     {
         void* shapeset = *(void**)((u8*)p + 0x14);
         u16 ssflags = *(u16*)shapeset;
-        f32 w = *weight_ptr;
 
         if (ssflags & 0x2) {
             f32* arr = *(f32**)((u8*)shapeset + 0x1c);
-            arr[idx - 2] = w;
+            arr[idx - 2] = *weight_ptr;
         } else {
-            *(f32*)((u8*)shapeset + 0x1c) = w;
+            *(f32*)((u8*)shapeset + 0x1c) = *weight_ptr;
         }
     }
 }
