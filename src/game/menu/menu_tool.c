@@ -100,7 +100,7 @@ void fn_80074324(void);
 void fn_80074360(void);
 void fn_800745B4(void);
 void fn_8007480C(void);
-void fn_80075390(void);
+s32 fn_80075390(void);
 void fn_800753D0(void);
 void fn_80075518(void);
 s32 fn_80075638(void);
@@ -3008,26 +3008,21 @@ void fn_8007480C(void) {
 }
 
 /* 0x80075390 | size: 0x40 */
-void fn_80075390(void) {
-    extern void fn_80075638();
+#pragma push
+#pragma peephole off
+s32 fn_80075390(void) {
+    extern u8 fn_80075638();
     extern void fn_8007565C();
     extern void fn_800756C8();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
 
-    fn_80075638();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
+    if ((u8)fn_80075638() != 0) {
         fn_8007565C();
     } else {
-
-        r3 = 0x3;
-        fn_800756C8();
+        fn_800756C8(0x3);
     }
-    r3 = 0x0;
-    return;
+    return 0;
 }
+#pragma pop
 
 /* 0x800753D0 | size: 0x148 */
 void fn_800753D0(void) {
@@ -3186,10 +3181,13 @@ void fn_80075518(void) {
 }
 
 /* 0x80075638 | size: 0x24 */
+#pragma push
+#pragma scheduling off
 s32 fn_80075638(void) {
-    fn_80102620();
-    return 0;
+    extern s32 fn_80102620(s32);
+    return fn_80102620(0xd8);
 }
+#pragma pop
 
 /* 0x8007565C | size: 0x6C */
 void fn_8007565C(void) {
@@ -3305,6 +3303,7 @@ void fn_800756C8(void) {
 
 /* 0x800757F0 | size: 0x2C */
 void fn_800757F0(void) {
-    fn_801CB9D8();
+    fn_801CB9D8(*(u32*)&lbl_8047A5D0);
+    *(u32*)&lbl_8047A5D0 = 0;
 }
 
