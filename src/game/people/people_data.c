@@ -541,12 +541,15 @@ asm void fn_801436F0(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801436F0(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = !!(p[0x4] & 8);
+    v = !!((p[0x4] >> 3) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143718(void) {
@@ -598,12 +601,15 @@ asm void fn_80143778(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143778(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = !!(p[0x4] & 0x10);
+    v = !!((p[0x4] >> 4) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801437A0(void) {
@@ -622,12 +628,15 @@ asm void fn_801437B8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801437B8(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x4] >> 5) & 1;
+    v = !!((p[0x4] >> 5) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801437E0(void) {
@@ -646,12 +655,15 @@ asm void fn_801437F8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801437F8(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x4] >> 6) & 1;
+    v = !!((p[0x4] >> 6) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143820(void) {
@@ -681,12 +693,15 @@ asm void fn_80143850(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143850(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x4] >> 7) & 1;
+    v = !!((p[0x4] >> 7) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143878(void) {
@@ -694,12 +709,15 @@ asm void fn_80143878(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143878(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = p[0x3] & 1;
+    v = !!(p[0x3] & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801438A0(void) {
@@ -707,12 +725,15 @@ asm void fn_801438A0(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801438A0(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 1) & 1;
+    v = !!((p[0x3] >> 1) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801438C8(void) {
@@ -720,12 +741,15 @@ asm void fn_801438C8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801438C8(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 2) & 1;
+    v = !!((p[0x3] >> 2) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801438F0(void) {
@@ -733,12 +757,15 @@ asm void fn_801438F0(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_801438F0(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 3) & 1;
+    v = !!((p[0x3] >> 3) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143918(void) {
@@ -746,12 +773,15 @@ asm void fn_80143918(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143918(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 4) & 1;
+    v = !!((p[0x3] >> 4) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143940(void) {
@@ -759,12 +789,15 @@ asm void fn_80143940(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143940(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 5) & 1;
+    v = !!((p[0x3] >> 5) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143968(void) {
@@ -772,12 +805,15 @@ asm void fn_80143968(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143968(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 6) & 1;
+    v = !!((p[0x3] >> 6) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143990(void) {
@@ -785,12 +821,15 @@ asm void fn_80143990(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143990(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x3] >> 7) & 1;
+    v = !!((p[0x3] >> 7) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_801439B8(void) {
@@ -853,12 +892,15 @@ asm void fn_80143A44(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143A44(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x0] >> 5) & 1;
+    v = !!((p[0x0] >> 5) & 1);
     return v;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_80143A6C(void) {
@@ -866,12 +908,15 @@ asm void fn_80143A6C(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma push
+#pragma peephole off
 s32 fn_80143A6C(u8* p) {
     s32 v;
     if (p == NULL) return 0;
-    v = (p[0x0] >> 7) & 1;
+    v = !!((p[0x0] >> 7) & 1);
     return v;
 }
+#pragma pop
 #endif
 extern u32 lbl_80478BE0;
 extern u8 lbl_80368630[];
@@ -895,7 +940,7 @@ asm void fn_80143ABC(void) {
 #pragma optimization_level 4
 s8 fn_80143ABC(u8* p, u16 idx) {
     if (p == NULL) return 0;
-    if ((idx & 0xFFFF) >= 0x19) return 0;
+    if ((u32)(idx & 0xFFFF) >= 0x19) return 0;
     return (s8)(p[idx + 4]);
 }
 #endif
