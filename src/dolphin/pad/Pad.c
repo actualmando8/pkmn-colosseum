@@ -562,17 +562,20 @@ void fn_800ACA80(PADStatus* status) {
 }
 
 /*
- * fn_800ACB44 - Empty function
+ * fn_800ACB44 - Returns a constant.
  * 0x800ACB44 | size: 0x8
  */
-void fn_800ACB44(void) {
+u32 fn_800ACB44(void) {
+    return 0x4000;
 }
 
 /*
- * fn_800ACB4C - Empty function
+ * fn_800ACB4C - Returns a global.
  * 0x800ACB4C | size: 0x8
  */
-void fn_800ACB4C(void) {
+u32 fn_800ACB4C(void) {
+    extern u32 lbl_8047A90C;
+    return lbl_8047A90C;
 }
 
 /*
@@ -694,8 +697,10 @@ void fn_800AE630(s32 chan, u32 type, SICallback callback) {
     OSRestoreInterrupts(enabled);
 }
 
-/* fn_800AE78C - Empty stub | 0x800AE78C | size: 0x8 */
-void fn_800AE78C(void) {
+/* fn_800AE78C - Returns a global | 0x800AE78C | size: 0x8 */
+u32 fn_800AE78C(void) {
+    extern u32 lbl_8047A948;
+    return lbl_8047A948;
 }
 
 /* fn_800AE794 - SIGetChannelStatus | 0x800AE794 | size: 0x10 */
@@ -959,8 +964,10 @@ void fn_800B00C0(s32 chan) {
     /* Process SI response data for channel */
 }
 
-/* fn_800B016C - Empty function | 0x800B016C | size: 0x8 */
-void fn_800B016C(void) {
+/* fn_800B016C - Returns a global | 0x800B016C | size: 0x8 */
+u32 fn_800B016C(void) {
+    extern u16 lbl_8047A970;
+    return lbl_8047A970;
 }
 
 /* fn_800B0174 - SISetPollingRate | 0x800B0174 | size: 0x38 */
@@ -1084,8 +1091,9 @@ void fn_800B19A4(void) {
     /* Medium function (0x64 bytes) */
 }
 
-/* fn_800B1A08 - 0x800B1A08 | size: 0x8 */
-void fn_800B1A08(void) {
+/* fn_800B1A08 - Returns word at offset 0x88 | 0x800B1A08 | size: 0x8 */
+u32 fn_800B1A08(u8* p) {
+    return *(u32*)(p + 0x88);
 }
 
 /* fn_800B1A10 - 0x800B1A10 | size: 0xD4 */
@@ -1113,8 +1121,9 @@ void fn_800B1D60(void) {
     /* SI/PAD helper (0xAC bytes) */
 }
 
-/* fn_800B1E0C - 0x800B1E0C | size: 0x8 */
-void fn_800B1E0C(void) {
+/* fn_800B1E0C - Returns word at offset 0x84 | 0x800B1E0C | size: 0x8 */
+u32 fn_800B1E0C(u8* p) {
+    return *(u32*)(p + 0x84);
 }
 
 /* fn_800B1E14 - 0x800B1E14 | size: 0xD0 */
@@ -1247,8 +1256,9 @@ void fn_800B45E8(void) {
     /* Medium function (0x54 bytes) */
 }
 
-/* fn_800B463C - 0x800B463C | size: 0x8 */
-void fn_800B463C(void) {
+/* fn_800B463C - Returns zero | 0x800B463C | size: 0x8 */
+u32 fn_800B463C(void) {
+    return 0;
 }
 
 /* fn_800B4644 - 0x800B4644 | size: 0x130 */
