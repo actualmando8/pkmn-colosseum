@@ -214,8 +214,9 @@ f32 fn_801D15D0(void* entry) {
  * fn_801D1618 - Waza get entry active flag.
  * Address: 0x801D1618 | Size: 0x8
  */
-u8 fn_801D1618(void) {
-    return 0;
+extern u32 lbl_80478CB8;
+u32 fn_801D1618(void) {
+    return lbl_80478CB8;
 }
 
 /**
@@ -299,11 +300,11 @@ void fn_801D19A4(s32 seqHandle, f32 speed) {
  * Bounds-checks idx against lbl_80478E98->count, then
  * returns entry[idx*0x2C + 0x14] from lbl_80478E9C.
  */
-extern u32 lbl_80478E98; /* waza context pointer */
+extern u32* lbl_80478E98; /* waza context pointer */
 extern u32 lbl_80478E9C; /* waza entry array pointer */
 u32 fn_801D1A44(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
@@ -318,7 +319,7 @@ u32 fn_801D1A44(s32 idx) {
  */
 u32 fn_801D1A88(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
@@ -333,7 +334,7 @@ u32 fn_801D1A88(s32 idx) {
  */
 u32 fn_801D1ACC(s32 idx) {
     void* entry;
-    if (idx < 0 || (u32)idx >= lbl_80478E98) {
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
         entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
@@ -347,10 +348,13 @@ u32 fn_801D1ACC(s32 idx) {
  * Address: 0x801D1B10 | Size: 0x3C
  * Calls fn_80129280(0, 0xA), stores (handle & 0xFF) to result+0x442.
  */
-void fn_801D1B10(u8 val) {
+#pragma push
+#pragma peephole off
+void fn_801D1B10(s32 handle) {
     void* party = (void*)fn_80129280(0, 0x0A);
-    *(u8*)((u8*)party + 0x442) = val;
+    *(u8*)((u8*)party + 0x442) = (u8)handle;
 }
+#pragma pop
 
 /**
  * fn_801D1B4C - Waza get byte from battle party at offset 0x442.
@@ -414,9 +418,12 @@ s32 fn_801D1F0C(s32 idx) {
     void* party;
     u16 count;
     party = (void*)fn_80129280(0, 0x0A);
-    if (idx < 0) return -1;
+    if (idx < 0) goto neg1;
     count = *(u16*)((u8*)(void*)fn_80129280(0, 0x0A) + 0x400);
-    if (idx >= (s32)count) return -1;
+    if (idx < (s32)count) goto load;
+neg1:
+    return -1;
+load:
     return *(u16*)((u8*)party + idx * 2);
 }
 #pragma pop
@@ -1278,16 +1285,18 @@ void fn_801DB3F8(void* seqData) {
  * fn_801DB848 - Waza data get move count.
  * Address: 0x801DB848 | Size: 0x8
  */
+extern s32 lbl_8047B418;
 s32 fn_801DB848(void) {
-    return 0;
+    return lbl_8047B418;
 }
 
 /**
  * fn_801DB850 - Waza data get entry count for move.
  * Address: 0x801DB850 | Size: 0x8
  */
+extern s32 lbl_8047B414;
 s32 fn_801DB850(s32 moveID) {
-    return 0;
+    return lbl_8047B414;
 }
 
 /**
