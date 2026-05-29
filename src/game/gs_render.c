@@ -1126,7 +1126,7 @@ asm void fn_800D5F34(void) {
 #else
 void fn_800D5F34(f32 x, f32 y, f32 z) {
     if (!*(u8*)(lbl_8047AA80 + 0x47e) && *(s32*)lbl_8047AA80 == 1) {
-        fn_800D4F98(0x11, 0xd);
+        fn_800D4F98(0x11, 0xd, x);
     } else {
         *(s32*)(lbl_8047AA80 + 0x4c4) = (u32)fn_800D7468;
         *(f32*)(lbl_8047AA80 + 0x4d4) = x;
@@ -2401,7 +2401,7 @@ asm void fn_800D9B58(void) {
 }
 #else
 void fn_800D9B58(f32 a, f32 b, f32 c, f32 d) {
-    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x3a, 0xe); }
+    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x3a, 0xe, a); }
     else {
         u8 tmp[0x48];
         fn_800E0698(tmp, b, d, a, c, lbl_8047CA50, lbl_8047CA54);
