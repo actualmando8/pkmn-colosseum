@@ -3240,10 +3240,8 @@ void fn_800E7290(void* entry, void* out) {
         if (r31 == NULL) fn_80196E10(&lbl_8047CB9C, 0x3e4, &lbl_8047CBA4);
         if (out == NULL) fn_80196E10(&lbl_8047CB9C, 0x3e5, lbl_80270E60);
         {
-            u32 t = *(u32*)((u8*)r31 + 0x38);
-            *(u32*)((u8*)out + 0x4) = *(u32*)((u8*)r31 + 0x3c);
-            *(u32*)((u8*)out + 0x0) = t;
-            *(u32*)((u8*)out + 0x8) = *(u32*)((u8*)r31 + 0x40);
+            struct s3w { u32 a, b, c; };
+            *(struct s3w*)out = *(struct s3w*)((u8*)r31 + 0x38);
         }
     } else {
         fn_800E0204(out);
