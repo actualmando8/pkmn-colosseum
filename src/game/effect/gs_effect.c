@@ -840,16 +840,20 @@ void fn_80131010(u32 effectId) {
     GSEffectGlobals* g;
 
     if (effectId == 0) {
-        return;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
 _got_inst:
     if (inst == NULL) {
@@ -880,31 +884,37 @@ BOOL fn_801310A8(u32 effectId) {
     GSEffectGlobals* g;
 
     if (effectId == 0) {
-        return FALSE;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
 _got_inst:
     if (inst == NULL) {
-        return FALSE;
+        goto _ret0;
     }
-    {
-        s32 state = inst->state;
-        if (state == GSEFFECT_STATE_UNINIT) {
-            return FALSE;
-        }
-        if (state == GSEFFECT_STATE_IDLE) {
-            return FALSE;
-        }
-        return (BOOL)(state != GSEFFECT_STATE_STOPPING);
+    if (inst->state == GSEFFECT_STATE_UNINIT) {
+        goto _ret0;
     }
+    if (inst->state == GSEFFECT_STATE_IDLE) {
+        goto _ret0;
+    }
+    if (inst->state == GSEFFECT_STATE_STOPPING) {
+        goto _ret0;
+    }
+    return TRUE;
+_ret0:
+    return FALSE;
 }
 
 /* =======================================================================
@@ -914,42 +924,52 @@ _got_inst:
 BOOL fn_8013111C(u32 effectId) {
     GSEffectInstance* inst;
     GSEffectGlobals* g;
+    GSEffectStartFunc trigFn;
+    GSEffectStopFunc stopFn;
 
     inst = NULL;
     if (effectId == 0) {
-        goto _null_check;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
-_null_check:
-    if (inst == NULL) {
-        return FALSE;
-    }
 _got_inst:
+    if (inst == NULL) {
+        goto _final0;
+    }
     if (inst->state == GSEFFECT_STATE_IDLE) {
         goto _print_error;
     }
+    trigFn = inst->triggerFunc;
     inst->state = GSEFFECT_STATE_ACTIVE;
-    if (inst->triggerFunc == NULL) {
-        return FALSE;
+    if (trigFn == NULL) {
+        goto _final0;
     }
-    if ((u32)inst->triggerFunc(inst->userData, 0) != 0) {
-        return TRUE;
+    if ((u32)((BOOL(*)(void*))trigFn)(inst->userData) != 0) {
+        goto _ret1;
     }
+    stopFn = inst->stopFunc;
     inst->state = GSEFFECT_STATE_STOPPING;
-    if (inst->stopFunc != NULL) {
-        inst->stopFunc(inst->userData);
+    if (stopFn != NULL) {
+        stopFn(inst->userData);
     }
     return FALSE;
+_ret1:
+    return TRUE;
 _print_error:
-    fn_800DD970(lbl_80272A58, effectId);
+    fn_800DD970(lbl_80272A58);
+_final0:
     return FALSE;
 }
 
@@ -968,16 +988,20 @@ void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
     GSEffectGlobals* g;
 
     if (effectId == 0) {
-        return;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
 _got_inst:
     if (inst == NULL) {
@@ -1005,22 +1029,25 @@ void fn_80131268(u32 effectId) {
 
     inst = NULL;
     if (effectId == 0) {
-        goto _null_check;
+        goto _null;
     }
     g = (GSEffectGlobals*)(void*)lbl_803635C0;
-    if (effectId <= g->maxEffects) {
-        inst = (GSEffectInstance*)((u8*)g->instanceTable +
-                                   (effectId - 1) * sizeof(GSEffectInstance));
-        if (inst->state != GSEFFECT_STATE_UNINIT) {
-            goto _got_inst;
-        }
+    if (effectId > g->maxEffects) {
+        goto _null;
     }
+    inst = (GSEffectInstance*)((u8*)g->instanceTable +
+                               (effectId - 1) * sizeof(GSEffectInstance));
+    switch (inst->state) {
+    case GSEFFECT_STATE_UNINIT:
+        goto _null;
+    }
+    goto _got_inst;
+_null:
     inst = NULL;
-_null_check:
+_got_inst:
     if (inst == NULL) {
         return;
     }
-_got_inst:
     prevInst = inst->prev;
     nextInst = inst->next;
 
@@ -1036,19 +1063,19 @@ _got_inst:
         inst->state = GSEFFECT_STATE_UNINIT;
     }
 
+    if (prevInst != NULL) {
+        prevInst->next = nextInst;
+    } else {
+        ((GSEffectGlobals*)(void*)lbl_803635C0)->activeListHead = nextInst;
+    }
+
+    if (nextInst != NULL) {
+        nextInst->prev = prevInst;
+    }
+
+    inst->prev = NULL;
     {
         GSEffectGlobals* gf = (GSEffectGlobals*)(void*)lbl_803635C0;
-        if (prevInst != NULL) {
-            prevInst->next = nextInst;
-        } else {
-            gf->activeListHead = nextInst;
-        }
-
-        if (nextInst != NULL) {
-            nextInst->prev = prevInst;
-        }
-
-        inst->prev = NULL;
         inst->next = gf->freeListHead;
         if (gf->freeListHead != NULL) {
             gf->freeListHead->prev = inst;
@@ -1099,26 +1126,28 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
     void* cbArg;
     u16 cbSize;
     GSEffectInstance* slot;
-    void* userData;
     u16 savedId;
+    void* userData;
     u16 memHandle;
-    GSEffectInstance* oldHead;
+    GSEffectGlobals* ga;
+    extern u16 fn_800E3534(u32 size);
+    extern void* fn_800E27B0(u16 handle);
 
     globals = (GSEffectGlobals*)(void*)lbl_803635C0;
     cbArg = callbacks;
     cbSize = dataSize;
     slot = globals->freeListHead;
     if (slot == NULL) {
-        return 0;
+        goto _retNull;
     }
 
     savedId = slot->id;
-    memHandle = GSmemAllocRaw((u32)cbSize);
+    memHandle = fn_800E3534((u32)cbSize);
     if (memHandle == 0) {
         return 0;
     }
 
-    userData = GSmemGetPtr(memHandle);
+    userData = fn_800E27B0(memHandle);
 
     globals->freeListHead = slot->next;
     if (slot->next != NULL) {
@@ -1128,12 +1157,12 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
     memset(slot, 0, sizeof(GSEffectInstance));
     slot->id = savedId;
 
-    oldHead = globals->activeListHead;
-    if (oldHead != NULL) {
-        oldHead->prev = slot;
+    ga = (GSEffectGlobals*)(void*)lbl_803635C0;
+    if (ga->activeListHead != NULL) {
+        ga->activeListHead->prev = slot;
     }
-    slot->next = oldHead;
-    globals->activeListHead = slot;
+    slot->next = ga->activeListHead;
+    ga->activeListHead = slot;
     slot->prev = NULL;
     slot->memHandle = memHandle;
     slot->userData = userData;
@@ -1143,4 +1172,6 @@ u16 fn_80131428(void* callbacks, u16 dataSize) {
     slot->state = GSEFFECT_STATE_IDLE;
 
     return slot->id;
+_retNull:
+    return 0;
 }
