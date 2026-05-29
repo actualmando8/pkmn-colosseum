@@ -268,6 +268,63 @@ def find_conflicts(externs):
 
 
 # ---------------------------------------------------------------------------
+# Programmatic API (used by import_reference.py and batch drivers)
+# ---------------------------------------------------------------------------
+
+def lookup_decl(name, db=None):
+    """Return the curated canonical signature string for `name`, or None.
+
+    import_reference.py routes externs through this so a staged import reuses
+    the project's agreed declaration instead of inventing a fresh one.
+    """
+    db = db if db is not None else load_db()
+    sym = db.get("symbols", {}).get(name)
+    if sym and sym.get("signature"):
+        return sym["signature"]
+    return None
+
+
+def name_to_addr(name, db=None):
+    """Return the '0x........' address for a symbol name (DB first, then map)."""
+    db = db if db is not None else load_db()
+    sym = db.get("symbols", {}).get(name)
+    if sym and sym.get("addr"):
+        return sym["addr"]
+    for e in parse_symbols_txt():
+        if e["name"] == name or e.get("proposed") == name:
+            return e["addr"]
+    return None
+
+
+def addr_to_name(addr, db=None):
+    """Return the symbol name defined at a given address ('0xXXXXXXXX')."""
+    want = "0x" + str(addr).lower().replace("0x", "").rjust(8, "0").upper()
+    db = db if db is not None else load_db()
+    for nm, sym in db.get("symbols", {}).items():
+        if sym.get("addr") == want:
+            return nm
+    return None
+
+
+def funcs_in_range(lo, hi, db=None):
+    """Return [(addr_int, name, size_int)] for function symbols in [lo, hi)."""
+    db = db if db is not None else load_db()
+    out = []
+    for nm, sym in db.get("symbols", {}).items():
+        if sym.get("kind") != "function":
+            continue
+        a = sym.get("addr")
+        if not a:
+            continue
+        ai = int(a, 16)
+        if lo <= ai < hi:
+            sz = int(sym["size"], 16) if sym.get("size") else 0
+            out.append((ai, nm, sz))
+    out.sort()
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Subcommands
 # ---------------------------------------------------------------------------
 

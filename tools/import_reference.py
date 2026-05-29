@@ -224,14 +224,12 @@ FUNC_HEADER_RE = re.compile(
 )
 
 
-def extract_function(text: str, name: str | None) -> tuple[str, str]:
-    """Return (func_name, full_function_text) by brace matching."""
+def _enumerate_functions(text: str) -> list:
+    """Return [(name, full_function_text)] for every top-level function."""
+    out = []
     for m in FUNC_HEADER_RE.finditer(text):
         fname = m.group("name")
-        if name and fname != name:
-            continue
         start = m.start()
-        # brace match from the opening { of the body
         i = text.index("{", m.end() - 1)
         depth = 0
         j = i
@@ -241,10 +239,35 @@ def extract_function(text: str, name: str | None) -> tuple[str, str]:
             elif text[j] == "}":
                 depth -= 1
                 if depth == 0:
-                    return fname, text[start:j + 1]
+                    out.append((fname, text[start:j + 1]))
+                    break
             j += 1
-        raise ValueError("unbalanced braces extracting %s" % fname)
-    raise ValueError("function %s not found in reference" % (name or "<first>"))
+    return out
+
+
+def extract_function(text: str, name: str | None) -> tuple[str, str]:
+    """Return (func_name, full_function_text) by brace matching.
+
+    `name` selects the reference function to pull. If it is not present in the
+    reference but the reference defines exactly one function, that sole function
+    is used (this is the common case: a one-function reference snippet staged
+    under a target `fn_XXXX` name). Otherwise we error and list what's available
+    so the caller can pass the right --ref-func.
+    """
+    funcs = _enumerate_functions(text)
+    if not funcs:
+        raise ValueError("no function definition found in reference")
+    if name:
+        for fname, body in funcs:
+            if fname == name:
+                return fname, body
+        if len(funcs) == 1:
+            return funcs[0]
+        available = ", ".join(f[0] for f in funcs)
+        raise ValueError(
+            "function %s not found in reference; available: %s "
+            "(pass --ref-func to choose)" % (name, available))
+    return funcs[0]
 
 
 def normalize(ref_text: str, func: str | None):
@@ -349,12 +372,16 @@ def make_banner(func: str, source: str, notes: list) -> str:
     return "\n".join(lines)
 
 
-def stage(target: Path, func: str, ref_text: str, source: str, dry_run: bool):
+def stage(target: Path, func: str, ref_text: str, source: str, dry_run: bool,
+          ref_func: str | None = None):
     refuse_inc(target)
     if not target.exists():
         raise SystemExit("target does not exist: %s" % target)
 
-    fname, normalized, notes = normalize(ref_text, func)
+    # `func` is the TARGET symbol name (often a fn_XXXX address symbol).
+    # `ref_func` selects which function to pull from the reference; default to
+    # the sole reference function (handled in extract_function).
+    fname, normalized, notes = normalize(ref_text, ref_func)
     if fname != func:
         notes.append("reference function name was '%s'; staging as '%s'"
                      % (fname, func))
@@ -416,6 +443,11 @@ def main():
     s.add_argument("--func", required=True)
     s.add_argument("--ref")
     s.add_argument("--ref-text")
+    s.add_argument("--ref-func",
+                   help="name of the function to pull FROM the reference "
+                        "(default: the sole function in the reference). Use when "
+                        "the reference defines several functions and --func is the "
+                        "target's fn_XXXX symbol name.")
     s.add_argument("--source", required=True,
                    help="human-readable provenance, e.g. 'zeldaret/tww string.c'")
     s.add_argument("--dry-run", action="store_true")
@@ -435,7 +467,8 @@ def main():
         target = Path(args.target)
         if not target.is_absolute():
             target = PROJECT_ROOT / target
-        stage(target, args.func, load_ref(args), args.source, args.dry_run)
+        stage(target, args.func, load_ref(args), args.source, args.dry_run,
+              ref_func=args.ref_func)
 
 
 if __name__ == "__main__":
