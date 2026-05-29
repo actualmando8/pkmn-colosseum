@@ -5867,7 +5867,7 @@ void fn_8001BD80(u8 a, u8 b, u32 c, u32 d) {
         *(u8*)(lbl_803A1D40 + 0x4) = 0x1;
     }
     *(u32*)(lbl_803A1D40 + 0x18) = d;
-    fn_8001BAC4(0x2, 0x0, 0x0, (u16)(u8)b, c, 0x1);
+    fn_8001BAC4(0x2, 0x0, 0x0, b, c, 0x1);
 }
 #pragma pop
 #endif
