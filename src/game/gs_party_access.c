@@ -1022,14 +1022,14 @@ s32 fn_8000CA34(void) {
 }
 
 typedef struct {
-    u8 b80 : 1;
-    u8 b40 : 1;
-    u8 b20 : 1;
-    u8 b10 : 1;
-    u8 b08 : 1;
-    u8 b04 : 1;
-    u8 b02 : 1;
-    u8 b01 : 1;
+    s8 b80 : 1;
+    s8 b40 : 1;
+    s8 b20 : 1;
+    s8 b10 : 1;
+    s8 b08 : 1;
+    s8 b04 : 1;
+    s8 b02 : 1;
+    s8 b01 : 1;
 } PartyFlags8;
 
 #pragma push
