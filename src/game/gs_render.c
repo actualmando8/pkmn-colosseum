@@ -2415,8 +2415,8 @@ asm void fn_800D9BD0(void) {
 #include "src/game/gs_render_fn_800D9BD0.inc"
 }
 #else
-void fn_800D9BD0(void) {
-    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x39, 0xe); }
+void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d) {
+    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x39, 0xe, a); }
     else { u8 tmp[0x48]; fn_800E0678(tmp); fn_800BD2E0(tmp, 0); }
 }
 #endif
