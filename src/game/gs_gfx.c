@@ -709,7 +709,6 @@ void fn_800D3410(void* arg0, u8 arg1) {
                 }
             }
         }
-    }
 
     /* store arg1 into lbl_8047AA90 (SDA21 var) */
     lbl_8047AA90 = arg1;
@@ -763,6 +762,7 @@ void fn_800D3410(void* arg0, u8 arg1) {
         ((u8*)lbl_8047AA80)[0x49D] = 0;
     } else {
         fn_8019C708(3);
+    }
     }
 }
 #endif
