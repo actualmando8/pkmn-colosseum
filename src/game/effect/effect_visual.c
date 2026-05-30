@@ -161,7 +161,7 @@ extern void  fn_80131200(u32 effectId,
 extern void  fn_8013139C(u32 effectId, u32 param);        /* GSEffectResetState */
 
 /* Floor resource system */
-extern void* fn_800F9318(u16 group, u16 model);
+extern void* fn_800F9318(u32 group, u32 model);
 
 /* Matrix / vector operations */
 extern void  fn_800E3D98(void* dst, void* src);
@@ -387,24 +387,24 @@ extern void fn_8013D984(void);
 extern u32 fn_8013DC94(void* ptr);
 extern u32 fn_8013DD10(void* ptr);
 extern u32 fn_8013DD7C(void* ptr);
-extern void fn_8013DDCC(void);
+extern u32 fn_8013DDCC(void* ptr);
 extern void fn_8013DE6C(void);
 extern void fn_8013E258(void);
-extern void fn_8013E470(void);
+extern u32 fn_8013E470(void* ptr, u32 delta);
 extern void fn_8013E54C(void);
 extern void fn_8013E5AC(void);
 extern u32 fn_8013E658(void* ptr);
 extern void fn_8013E6C4(void);
 extern void fn_8013E8A4(void);
 extern void fn_8013EA44(void);
-extern void fn_8013F078(void);
+extern u32 fn_8013F078(void* ptr);
 extern void fn_8013F114(void);
 extern void fn_8013F344(void);
 extern void fn_8013F410(void);
 extern void fn_8013F80C(void);
 extern void fn_8013F97C(void);
-extern void fn_8013FC58(void);
-extern void fn_8013FCC4(void);
+extern u32 fn_8013FC58(void* ptr);
+extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
 extern void fn_8013FDD0(void);
 extern void fn_8013FF0C(void);
@@ -1481,15 +1481,33 @@ u32 fn_8013DD7C(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800DC390(void);
-extern void fn_800E584C(void);
+extern void fn_800DC390(void* handle, void* callback, void* ctx);
+extern void* fn_800E584C(void* a, void* b);
 extern u8 lbl_80272F70[];
-#if 1
+#if 0
 asm void fn_8013DDCC(void) {
 #include "src/game/effect/effect_visual_fn_8013DDCC.inc"
 }
 #else
-void fn_8013DDCC(void) { /* TODO */ }
+u32 fn_8013DDCC(void* ptr) {
+    if (ptr) {
+        *(u32*)((u8*)ptr + 0x18) = *(u32*)((u8*)ptr + 0x14);
+        *(u32*)((u8*)ptr + 0x1c) = 0;
+        if (*(s32*)((u8*)ptr + 0x10) != 0) {
+            if (*(void**)((u8*)ptr + 0xc) != NULL) {
+                fn_800DC390(*(void**)((u8*)ptr + 0xc), (void*)fn_8013E258, ptr);
+                return 1;
+            }
+        } else {
+            if (*(void**)ptr != NULL) {
+                *(void**)((u8*)ptr + 0x4) = fn_800E584C(*(void**)ptr, (u8*)ptr + 0x8);
+                return 1;
+            }
+        }
+    }
+    fn_800DD970((const char*)lbl_80272F70);
+    return 0;
+}
 #endif
 extern void fn_800EC960(void);
 extern void fn_800D3068(void);
@@ -1535,12 +1553,33 @@ asm void fn_8013E258(void) {
 #else
 void fn_8013E258(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_8013E470(void) {
 #include "src/game/effect/effect_visual_fn_8013E470.inc"
 }
 #else
-void fn_8013E470(void) { /* TODO */ }
+u32 fn_8013E470(void* ptr, u32 delta) {
+    void* node;
+    if (ptr == NULL) {
+        goto ret0;
+    }
+    node = *(void**)((u8*)ptr + 0x18);
+    if (node == NULL) {
+        goto ret0;
+    }
+    while (*(u32*)((u8*)ptr + 0x1c) >= *(u32*)((u8*)node + 0x8)) {
+        *(u32*)((u8*)ptr + 0x1c) -= *(u32*)((u8*)node + 0x8);
+        node = *(void**)((u8*)node + 0x10);
+        *(void**)((u8*)ptr + 0x18) = node;
+        if (node == NULL) {
+            return 0;
+        }
+    }
+    *(u32*)((u8*)ptr + 0x1c) += delta;
+    return 1;
+ret0:
+    return 0;
+}
 #endif
 #if 0
 asm void fn_8013E4D4(void) {
@@ -1669,15 +1708,37 @@ u32 fn_8013F000(void* callbacks) {
     return effectId;
 }
 #endif
-extern void fn_800D75F4(void);
+extern void fn_800D75F4(void* a);
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047AEEC;
-#if 1
+#if 0
 asm void fn_8013F078(void) {
 #include "src/game/effect/effect_visual_fn_8013F078.inc"
 }
 #else
-void fn_8013F078(void) { /* TODO */ }
+u32 fn_8013F078(void* ptr) {
+    if (ptr) {
+        fn_800B8DF4();
+        fn_800B856C();
+        if (*(void**)((u8*)ptr + 0x4) != NULL) {
+            fn_800EF5A4(*(void**)((u8*)ptr + 0x4));
+            *(u32*)((u8*)ptr + 0x4) = 0;
+        }
+        if (*(void**)ptr != NULL) {
+            fn_800D75F4(*(void**)ptr);
+            *(u32*)ptr = 0;
+        }
+        if (lbl_8047AEE8 != 0) {
+            *(u16*)&lbl_8047AEEC = *(u16*)&lbl_8047AEEC - 1;
+            if (*(u16*)&lbl_8047AEEC == 0) {
+                fn_800B8DF4();
+                fn_800EF5A4((void*)lbl_8047AEE8);
+                lbl_8047AEE8 = 0;
+            }
+        }
+    }
+    return 1;
+}
 #endif
 extern void fn_800D7894(void);
 extern void fn_800D7868(void);
@@ -1786,20 +1847,52 @@ u32 fn_8013FBE0(void* callbacks) {
     return effectId;
 }
 #endif
-#if 1
+#if 0
 asm void fn_8013FC58(void) {
 #include "src/game/effect/effect_visual_fn_8013FC58.inc"
 }
 #else
-void fn_8013FC58(void) { /* TODO */ }
+u32 fn_8013FC58(void* ptr) {
+    if (ptr) {
+        if (*(u32*)((u8*)ptr + 0x10) != 0) {
+            fn_800F9210(*(u32*)ptr, *(u32*)((u8*)ptr + 0x8));
+            fn_800F9210(*(u32*)ptr, *(u32*)((u8*)ptr + 0x4));
+        }
+        if (*(u32*)((u8*)ptr + 0x14) != 0) {
+            fn_800F9210(*(u32*)ptr, *(u32*)((u8*)ptr + 0xc));
+        }
+    }
+    return 1;
+}
 #endif
-extern void fn_801195AC(void);
-#if 1
+extern void* fn_801195AC(void* a);
+#if 0
 asm void fn_8013FCC4(void) {
 #include "src/game/effect/effect_visual_fn_8013FCC4.inc"
 }
 #else
-void fn_8013FCC4(void) { /* TODO */ }
+u32 fn_8013FCC4(void* ptr) {
+    void* res;
+    if (ptr) {
+        if (*(u32*)((u8*)ptr + 0x4) != 0 && *(u32*)((u8*)ptr + 0x8) != 0) {
+            *(void**)((u8*)ptr + 0x10) = fn_800F9318(*(u32*)ptr, *(u32*)((u8*)ptr + 0x8));
+        } else {
+            *(void**)((u8*)ptr + 0x10) = NULL;
+        }
+        if (*(u32*)((u8*)ptr + 0xc) != 0) {
+            res = fn_800F9318(*(u32*)ptr, *(u32*)((u8*)ptr + 0xc));
+            if (res != NULL) {
+                *(void**)((u8*)ptr + 0x14) = fn_801195AC(res);
+            } else {
+                *(void**)((u8*)ptr + 0x14) = NULL;
+            }
+        } else {
+            *(void**)((u8*)ptr + 0x14) = NULL;
+        }
+        return 1;
+    }
+    return 0;
+}
 #endif
 extern void fn_80118874(void* a, u32 b);
 extern void fn_800EC96C(void* a);
