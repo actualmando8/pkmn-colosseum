@@ -217,12 +217,18 @@ char* strcpy(char* dst, const char* src) {
 
 /* fn_800CAA3C - 0x800CAA3C | size: 0x1C
  * wcscpy - Copy a wide character string from src to dst.
+ * MSL_C/MSL_Common/Src/wchar_io.c (CW pattern); CW 1.3.
  */
-void fn_800CAA3C(u16* dst, const u16* src) {
+u16* fn_800CAA3C(u16* dst, const u16* src) {
+    const u16* s = src - 1;
+    u16* d = dst - 1;
+    u16 c;
+
     do {
-        src++;
-        dst++;
-        *dst = *src;
-    } while (*src != 0);
+        c = *++s;
+        *++d = c;
+    } while (c != 0);
+
+    return dst;
 }
 
