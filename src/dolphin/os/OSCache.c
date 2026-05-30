@@ -4,6 +4,8 @@
 #include "dolphin/os/PPCArch.h"
 #include "dolphin/db/DB.h"
 
+#define HID2 920
+
 /*
  * OSCache.c - Data cache, instruction cache, and L2 cache management.
  *
