@@ -1182,13 +1182,26 @@ void fn_801CB530(s32 slot, u32 statusCondition) {
  * fn_801CB59C - Scene status icon update.
  * Address: 0x801CB59C | Size: 0x80
  */
-#if 1
+#if 0
 asm void fn_801CB59C(void) {
 #include "src/game/battle/battle_scene_fn_801CB59C.inc"
 }
 #else
-void fn_801CB59C(void) {
-    /* TODO: Status icon update (0x80 bytes) */
+u32 fn_801CB59C(void* param) {
+    extern void* fn_80113F48();
+    extern u32 fn_8018D998();
+    extern void* fn_800F9318();
+    void* obj = fn_80113F48(param);
+    if (fn_8018D998(obj, param)) {
+        fn_80184470(obj, param);
+    } else {
+        void* r = fn_800F9318(obj, param);
+        if (r == NULL) {
+            return 0;
+        }
+        fn_800E465C(r, 1);
+    }
+    return 1;
 }
 #endif
 
