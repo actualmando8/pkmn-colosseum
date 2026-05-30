@@ -275,7 +275,7 @@ void fn_801A6C34(void* obj) {
 extern void fn_80196E10(void* file, s32 line, void* msg);
 extern u32 lbl_8047DC18;
 extern u32 lbl_8047DC20;
-#if 1
+#if 0
 asm void fn_801A6CA4(void) {
 #include "src/hsd/hsd_mobj_fn_801A6CA4.inc"
 }
@@ -293,7 +293,7 @@ void fn_801A6CA4(void* obj) {
         }
         node = *(void**)((u8*)node + 8);
     }
-    *(u32*)((u8*)obj + 8) = lbl_8047B2DC;
+    *(u32*)((u8*)obj + 8) = *(volatile u32*)&lbl_8047B2DC;
     lbl_8047B2DC = (u32)obj;
 }
 #endif
