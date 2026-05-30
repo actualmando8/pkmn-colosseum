@@ -2335,9 +2335,12 @@ asm void fn_800347C4(void) {
 #include "src/game/gs_npc_event_fn_800347C4.inc"
 }
 #else
+#pragma push
+#pragma scheduling off
 void fn_800347C4(void) {
     fn_80166A28(0x26);
 }
+#pragma pop
 #endif
 
 /* fn_800347E8 - 0x800347E8 | size: 0x24 */
@@ -2346,9 +2349,12 @@ asm void fn_800347E8(void) {
 #include "src/game/gs_npc_event_fn_800347E8.inc"
 }
 #else
+#pragma push
+#pragma scheduling off
 void fn_800347E8(void) {
     fn_80166A28(0x26);
 }
+#pragma pop
 #endif
 
 /* fn_8003480C - 0x8003480C | size: 0x24 */
@@ -2357,9 +2363,12 @@ asm void fn_8003480C(void) {
 #include "src/game/gs_npc_event_fn_8003480C.inc"
 }
 #else
+#pragma push
+#pragma scheduling off
 void fn_8003480C(void) {
     fn_80166A28(0x26);
 }
+#pragma pop
 #endif
 
 /* fn_80034DC0 - 0x80034DC0 | size: 0x78 */
