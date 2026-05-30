@@ -729,16 +729,17 @@ void fn_801946F0(void) { /* TODO */ }
 #pragma pop
 
 /* 0x80194788 | 0x20 */
-#if 1
+#if 0
 asm void fn_80194788(void) {
 #include "src/hsd/hsd_cobj_fn_80194788.inc"
 }
 #else
-void fn_80194788(u8* ptr, f32 val) {
-    if (ptr == NULL) return;
-    if (ptr[0x50] == 1) {
-        *(f32*)(ptr + 0x44) = val;
+void fn_80194788(HSD_CObj* cobj, f32 val)
+{
+    if (cobj == NULL || cobj->projection_type != 1) {
+        return;
     }
+    cobj->projection_param.perspective.aspect = val;
 }
 #endif
 
@@ -793,13 +794,13 @@ void fn_80194C2C(void) { /* TODO */ }
 extern void fn_80191688(HSD_WObj*, void*);
 extern void fn_80191788(HSD_WObj*, void*);
 extern void fn_80191DCC(void);
-extern void fn_80191E38(void);
+extern void fn_80191E38(HSD_WObj*, f32);
 extern void fn_80191E88(void);
 extern void fn_801919EC(HSD_WObj*);
 extern void fn_801C25E4(void);
 extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
-extern void fn_801C29C4(void);
+extern void fn_801C29C4(void*, f32);
 /* WP-0061 forward declarations (defined later in same TU) */
 extern void fn_80196E10(const char*, u32, const char*);
 
@@ -1106,10 +1107,15 @@ void fn_801963E0(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801C29C4(void);
+extern void fn_801C29C4(void*, f32);
 #if 1
-asm void fn_80196698(void) {
-#include "src/hsd/hsd_cobj_fn_80196698.inc"
+void fn_80196698(HSD_CObj* cobj, f32 frame)
+{
+    if ((cobj = cobj) && cobj) {
+        fn_801C29C4(cobj->aobj, frame);
+        fn_80191E38(cobj->eyepos, frame);
+        fn_80191E38(cobj->interest, frame);
+    }
 }
 #else
 void fn_80196698(void) { /* TODO */ }
