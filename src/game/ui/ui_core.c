@@ -4640,7 +4640,7 @@ void fn_8005D798(void) {
 
 
 /* 0x8005D7F8 | size: 0x38 */
-#if 1
+#if 0
 asm void* fn_8005D7F8(u32 idx) {
 #include "src/game/ui/ui_core_fn_8005D7F8.inc"
 }
@@ -4651,7 +4651,7 @@ void* fn_8005D7F8(u32 idx) {
     if (base == (u8*)0) {
         return (void*)0;
     }
-    if (idx >= *(u32*)&lbl_80478E90) {
+    if (idx >= *(*(u32**)&lbl_80478E90)) {
         return (void*)0;
     }
     return base + idx * 0xA;
