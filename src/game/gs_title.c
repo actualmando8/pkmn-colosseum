@@ -3915,7 +3915,7 @@ ret_zero:
 #endif
 
 /* fn_80023DA8 - 0x80023DA8 | size: 0x3c */
-#if 1
+#if 0
 asm void fn_80023DA8(void) {
 #include "src/game/gs_title_fn_80023DA8.inc"
 }
