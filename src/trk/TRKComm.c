@@ -263,10 +263,10 @@ u32 fn_800C3A40(u32 unused, u32 length, u32* addrPtr) {
     }
 
     addrBuf = *addrPtr;
-    result = fn_800C29F0(0xD0, 1, &addrBuf, length) & 0xFF;
+    result = fn_800C29F0(0xD0, 1, &addrBuf, length);
     *addrPtr = addrBuf;
 
-    switch (result) {
+    switch (result & 0xFF) {
     case 0:
         return 0;
     case 2:
@@ -300,10 +300,10 @@ u32 fn_800C3AFC(u32 unused, u32 length, u32* addrPtr) {
     }
 
     addrBuf = *addrPtr;
-    result = fn_800C29F0(0xD1, 0, &addrBuf, length) & 0xFF;
+    result = fn_800C29F0(0xD1, 0, &addrBuf, length);
     *addrPtr = addrBuf;
 
-    switch (result) {
+    switch (result & 0xFF) {
     case 0:
         return 0;
     case 2:
