@@ -381,7 +381,7 @@ s32 fn_801A497C(HSD_LObj* lobj) {
 
 /* 0x801A49C0 | 0x88 */
 extern u8 lbl_80274DC8[];
-#if 1
+#if 0
 asm void fn_801A49C0(void) {
 #include "src/hsd/hsd_lobj_fn_801A49C0.inc"
 }
@@ -389,12 +389,12 @@ asm void fn_801A49C0(void) {
 /* HSD_LObjSetPositionWObjDesc */
 void fn_801A49C0(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
-        fn_80196E10(lbl_8047DBB8, 0x568, lbl_8047DBCC);
+        fn_80196E10(&lbl_8047DBB8, 0x568, &lbl_8047DBCC);
     }
     if (lobj->position == NULL) {
         lobj->position = fn_80191628();
         if (lobj->position == NULL) {
-            fn_80196E10(lbl_8047DBB8, 0x56b, lbl_80274DC8);
+            fn_80196E10(&lbl_8047DBB8, 0x56b, lbl_80274DC8);
         }
     }
     fn_80191788(lobj->position, desc);
@@ -433,23 +433,28 @@ u32 fn_801A4A54(u32 idx) {
 
 /* 0x801A4AC4 | 0x3C */
 extern u32 lbl_8047B2B4;
-#if 1
+#if 0
 asm void fn_801A4AC4(void) {
 #include "src/hsd/hsd_lobj_fn_801A4AC4.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 /* Find active light by type */
 HSD_LObj* fn_801A4AC4(u32 type) {
+    void* data;
     HSD_SList* p;
     type &= 3;
     for (p = (HSD_SList*) lbl_8047B2B4; p != NULL; p = p->next) {
-        HSD_LObj* lobj = (HSD_LObj*) p->data;
-        if ((lobj->flags & 3) == type) {
-            return lobj;
+        data = ((volatile HSD_SList*) p)->data;
+        if (type != (((HSD_LObj*) data)->flags & 3)) {
+            continue;
         }
+        return (HSD_LObj*) ((volatile HSD_SList*) p)->data;
     }
     return NULL;
 }
+#pragma pop
 #endif
 
 /* 0x801A4B00 | 0x220 */
@@ -657,16 +662,21 @@ void fn_801A66E0(void) {}
 #endif
 
 /* 0x801A678C | 0x30 */
-#if 1
+#if 0
 asm void fn_801A678C(void) {
 #include "src/hsd/hsd_lobj_fn_801A678C.inc"
 }
 #else
 /* Get active light by index from lbl_804655E0 table */
 extern u8 lbl_804655E0[];
+#pragma optimization_level 1
 HSD_LObj* fn_801A678C(s32 idx) {
-    if (idx < 0 || idx >= 8) return NULL;
-    return ((HSD_LObj**) lbl_804655E0)[idx];
+    if (idx >= 0) {
+        if (idx < 8) {
+            return *(HSD_LObj**)(lbl_804655E0 + idx * 4);
+        }
+    }
+    return NULL;
 }
 #endif
 
