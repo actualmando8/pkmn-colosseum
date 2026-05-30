@@ -82,43 +82,15 @@ void ReserveEXI2Port(void) {
 /* ========================================================== */
 
 /* fn_800C3588 - 0x800C3588 | size: 0x3C */
-void fn_800C3588(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r5 = (u32)gDBCommTable;
-    r5 = (u32)gDBCommTable;
-    r12 = *(u32*)((u8*)r5 + 0x14);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    tmp = -r3;
-    tmp = tmp | r3;
-    r3 = (s32)tmp >> 31;
-    return;
+int fn_800C3588(int a, int b) {
+    s32 ret = ((int (**)(int, int))gDBCommTable)[5](a, b);
+    return (s32)((u32)-ret | (u32)ret) >> 31;
 }
 
 /* fn_800C35C4 - 0x800C35C4 | size: 0x3C */
-void fn_800C35C4(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r5 = 0;
-    u32 r12 = 0;
-    void (*ctr_fn)(void) = 0;
-
-    r5 = (u32)gDBCommTable;
-    r5 = (u32)gDBCommTable;
-    r12 = *(u32*)((u8*)r5 + 0x10);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    tmp = -r3;
-    tmp = tmp | r3;
-    r3 = (s32)tmp >> 31;
-    return;
+int fn_800C35C4(int a, int b) {
+    s32 ret = ((int (**)(int, int))gDBCommTable)[4](a, b);
+    return (s32)((u32)-ret | (u32)ret) >> 31;
 }
 
 /* fn_800C3600 - 0x800C3600 | size: 0x30 */
