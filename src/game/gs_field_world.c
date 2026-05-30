@@ -5535,7 +5535,7 @@ extern void fn_801294C4(u8* ptr, u32 offset);
 extern s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
 extern u32 fn_8012A08C(u8* ptr, void* arg2);
 extern void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3);
-extern void fn_8012A248(void);
+extern void fn_8012A248();
 extern void fn_8012A7DC();  /* K&R: typed impl or conflict */
 extern void fn_8012A824();  /* K&R: typed impl or conflict */
 extern void fn_8012A86C();  /* K&R: typed impl or conflict */
@@ -19637,145 +19637,43 @@ void fn_8012A1A4(u8* ptr, u32 arg2, u8 arg3) {
 #endif
 /* 0x8012A248 | 0x208 */
 extern void fn_80142A88(void);
-#if 1
+#if 0
 asm void fn_8012A248(void) {
 #include "src/game/gs_field_world_fn_8012A248.inc"
 }
 #else
-void fn_8012A248(void) {
-    extern void fn_801249F8();
-    extern void fn_8012A450();
-    extern void fn_8012A5B0();
-    extern void fn_80142A88();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r4 = 0x1;
-    r0 = 0x0;
-    r31 = (u32)sp + 0x8;
-    r5 = r31;
-    r30 = r3;
-    *(u16*)(sp + 0x8) = r0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x2;
-    r5 = 0x0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x3;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x6;
-    fn_801249F8();
-    r3 = r30;
-    r4 = 0x4;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x14;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x5;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x2b;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x6;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x10;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x7;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x40;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x8;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x2e;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x9;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0x3;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0xb;
-    r5 = 0x2;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0xc;
-    r5 = 0x0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0xd;
-    r5 = 0x0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0xe;
-    r5 = 0x0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0xf;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x10;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x11;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x12;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x13;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x14;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x15;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x16;
-    r5 = 0x1;
-    fn_8012A450();
-    r3 = r30;
-    r5 = r31;
-    r4 = 0x17;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0x18;
-    r5 = 0x0;
-    fn_8012A450();
-    r3 = r30;
-    r4 = 0xa;
-    r5 = 0x0;
-    fn_8012A5B0();
-    r4 = 0xa;
-    fn_80142A88();
-    r3 = r30;
-    r4 = 0x19;
-    r5 = 0x0;
-    fn_8012A450();
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    return;
+void fn_8012A248(u8* ptr) {
+    extern void fn_8012A450(u8* p, u32 a, u32 b);
+    extern u8* fn_8012A5B0(u8* p, u32 a, u32 b);
+    extern void fn_801249F8(u8* p, u16 count);
+    extern void fn_80142A88(u8* p, u32 v);
+    u16 local = 0;
+
+    fn_8012A450(ptr, 1, (u32)&local);
+    fn_8012A450(ptr, 2, 0);
+    fn_801249F8(fn_8012A5B0(ptr, 3, 0), 6);
+    fn_80142A88(fn_8012A5B0(ptr, 4, 0), 0x14);
+    fn_80142A88(fn_8012A5B0(ptr, 5, 0), 0x2b);
+    fn_80142A88(fn_8012A5B0(ptr, 6, 0), 0x10);
+    fn_80142A88(fn_8012A5B0(ptr, 7, 0), 0x40);
+    fn_80142A88(fn_8012A5B0(ptr, 8, 0), 0x2e);
+    fn_80142A88(fn_8012A5B0(ptr, 9, 0), 0x3);
+    fn_8012A450(ptr, 0xb, 2);
+    fn_8012A450(ptr, 0xc, 0);
+    fn_8012A450(ptr, 0xd, 0);
+    fn_8012A450(ptr, 0xe, 0);
+    fn_8012A450(ptr, 0xf, 1);
+    fn_8012A450(ptr, 0x10, 1);
+    fn_8012A450(ptr, 0x11, 1);
+    fn_8012A450(ptr, 0x12, 1);
+    fn_8012A450(ptr, 0x13, 1);
+    fn_8012A450(ptr, 0x14, 1);
+    fn_8012A450(ptr, 0x15, 1);
+    fn_8012A450(ptr, 0x16, 1);
+    fn_8012A450(ptr, 0x17, (u32)&local);
+    fn_8012A450(ptr, 0x18, 0);
+    fn_80142A88(fn_8012A5B0(ptr, 0xa, 0), 0xa);
+    fn_8012A450(ptr, 0x19, 0);
 }
 #endif
 /* 0x8012A450 | 0x160 */
