@@ -10745,7 +10745,7 @@ s32 fn_8011B67C(void* obj, u16 val) {
 
     if (val == 0) { return 0; }
     idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    base = (0, fn_80119F10(val));
     base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
