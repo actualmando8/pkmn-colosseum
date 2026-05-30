@@ -64,6 +64,14 @@
     "src/hsd/hsd_class.c": {
       "compiler": "GC/1.2.5n",
       "comment": "HSD library compiled with CW GC/1.2.5n"
+    },
+    "src/crt/exit.c": {
+      "compiler": "GC/1.3.2",
+      "comment": "MSL exit.c (alloc.c __pool_free/deallocate_* + ansi_files __flush_all) match at CW 1.3.2; parent-verified no-regression vs 1.3 (7->8 total matched, +4 targets)"
+    },
+    "src/dolphin/dvd/DVDFs.c": {
+      "compiler": "GC/1.2.5n",
+      "comment": "Dolphin SDK dvdfs compiled with CW GC/1.2.5n (like DVD/DVDLow/DVDQueue); parent-verified no-regression vs 1.3 (1->6 total matched)"
     }
   }
 }

@@ -174,345 +174,346 @@ void fn_800C4F34(void* handler) {
     __end_critical_region(1);
 }
 
-/* fn_800C4FA4 - 0x800C4FA4 | size: 0x58 */
-void fn_800C4FA4(void) {
-    extern void fn_800C4FFC();
-    extern void fn_800C5154();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+/* ----------------------------------------------------------------
+ * MSL MSL_C alloc.c — variable / fixed pool deallocator.
+ * Genuine MetroWerks Standard Library source, wired to Colosseum's
+ * own symbol names (fn_800C4FA4 = __pool_free,
+ * fn_800C4FFC = deallocate_from_fixed_pools,
+ * fn_800C5154 = deallocate_from_var_pools, fn_800C4D8C = __sys_free).
+ * ---------------------------------------------------------------- */
 
-    if (r4 == 0) return;
-    r5 = *(u32*)((u8*)r4 + (-4));
-    tmp = r5 & 0x1;
-    if (r4 == 0) {
-        r5 = *(u32*)((u8*)r5 + 0x8);
-    } else {
+typedef struct Block {
+    struct Block* prev;
+    struct Block* next;
+    unsigned long max_size;
+    unsigned long size;
+} Block;
 
-        tmp = *(u32*)((u8*)r4 + (-8));
-        /* clrrwi r5, tmp, 3 */;
+typedef struct SubBlock {
+    unsigned long size;
+    Block* block;
+    struct SubBlock* prev;
+    struct SubBlock* next;
+} SubBlock;
+
+struct FixSubBlock;
+
+typedef struct FixBlock {
+    struct FixBlock* prev_;
+    struct FixBlock* next_;
+    unsigned long client_size_;
+    struct FixSubBlock* start_;
+    unsigned long n_allocated_;
+} FixBlock;
+
+typedef struct FixSubBlock {
+    FixBlock* block_;
+    struct FixSubBlock* next_;
+} FixSubBlock;
+
+typedef struct FixStart {
+    FixBlock* tail_;
+    FixBlock* head_;
+} FixStart;
+
+typedef struct __mem_pool_obj {
+    Block* start_;
+    FixStart fix_start[6];
+} __mem_pool_obj;
+
+/* fix_pool_sizes table lives at a fixed ROM data address (lbl_8026FEE8):
+ * {4, 12, 20, 36, 52, 68}. Reference the genuine label so the relocation
+ * targets the original data symbol rather than a fresh local copy. */
+extern const unsigned long lbl_8026FEE8[];
+#define fix_pool_sizes lbl_8026FEE8
+
+extern void fn_800C4D8C(void* bp);    /* __sys_free */
+
+#define SubBlock_size(ths) ((ths)->size & 0xFFFFFFF8)
+#define SubBlock_block(ths) ((Block*)((unsigned long)((ths)->block) & ~0x1))
+#define Block_size(ths) ((ths)->size & 0xFFFFFFF8)
+#define Block_start(ths) (*(SubBlock**)((char*)(ths) + Block_size((ths)) - sizeof(unsigned long)))
+
+#define SubBlock_set_free(ths)                                                                     \
+    unsigned long this_size = SubBlock_size((ths));                                                \
+    (ths)->size &= ~0x2;                                                                           \
+    *(unsigned long*)((char*)(ths) + this_size) &= ~0x4;                                           \
+    *(unsigned long*)((char*)(ths) + this_size - sizeof(unsigned long)) = this_size
+
+#define SubBlock_is_free(ths) !((ths)->size & 2)
+#define SubBlock_set_size(ths, sz)                                                                 \
+    (ths)->size &= ~0xFFFFFFF8;                                                                    \
+    (ths)->size |= (sz) & 0xFFFFFFF8;                                                              \
+    if (SubBlock_is_free((ths)))                                                                   \
+    *(unsigned long*)((char*)(ths) + (sz) - sizeof(unsigned long)) = (sz)
+
+#define SubBlock_from_pointer(ptr) ((SubBlock*)((char*)(ptr)-8))
+#define FixSubBlock_from_pointer(ptr) ((FixSubBlock*)((char*)(ptr)-4))
+
+#define FixBlock_client_size(ths) ((ths)->client_size_)
+#define FixSubBlock_size(ths) (FixBlock_client_size((ths)->block_))
+
+#define classify(ptr) (*(unsigned long*)((char*)(ptr) - sizeof(unsigned long)) & 1)
+#define __msize_inline(ptr)                                                                        \
+    (!classify(ptr) ? FixSubBlock_size(FixSubBlock_from_pointer(ptr)) :                            \
+                      SubBlock_size(SubBlock_from_pointer(ptr)) - 8)
+
+#define Block_empty(ths)                                                                           \
+    (_sb = (SubBlock*)((char*)(ths) + 16)),                                                        \
+        SubBlock_is_free(_sb) && SubBlock_size(_sb) == Block_size((ths)) - 24
+
+static inline SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
+    unsigned long prevsz;
+    SubBlock* p;
+
+    if (!(ths->size & 0x04)) {
+        prevsz = *(unsigned long*)((char*)ths - sizeof(unsigned long));
+        if (prevsz & 0x2)
+            return ths;
+        p = (SubBlock*)((char*)ths - prevsz);
+        SubBlock_set_size(p, prevsz + SubBlock_size(ths));
+
+        if (*start == ths)
+            *start = (*start)->next;
+        ths->next->prev = ths->prev;
+        ths->next->prev->next = ths->next;
+        return p;
     }
-    if (r5 <= 0x44) {
-        fn_800C4FFC();
+    return ths;
+}
+
+static inline void SubBlock_merge_next(SubBlock* pBlock, SubBlock** pStart) {
+    SubBlock* next_sub_block;
+    unsigned long this_cur_size;
+
+    next_sub_block = (SubBlock*)((char*)pBlock + (pBlock->size & 0xFFFFFFF8));
+
+    if (!(next_sub_block->size & 2)) {
+        this_cur_size = (pBlock->size & 0xFFFFFFF8) + (next_sub_block->size & 0xFFFFFFF8);
+
+        pBlock->size &= ~0xFFFFFFF8;
+        pBlock->size |= this_cur_size & 0xFFFFFFF8;
+
+        if (!(pBlock->size & 2)) {
+            *(unsigned long*)((char*)(pBlock) + (this_cur_size)-4) = (this_cur_size);
+        }
+
+        if (!(pBlock->size & 2)) {
+            *(unsigned long*)((char*)pBlock + this_cur_size) &= ~4;
+        } else {
+            *(unsigned long*)((char*)pBlock + this_cur_size) |= 4;
+        }
+
+        if (*pStart == next_sub_block) {
+            *pStart = (*pStart)->next;
+        }
+
+        if (*pStart == next_sub_block) {
+            *pStart = 0;
+        }
+
+        next_sub_block->next->prev = next_sub_block->prev;
+        next_sub_block->prev->next = next_sub_block->next;
+    }
+}
+
+static inline void Block_link(Block* ths, SubBlock* sb) {
+    SubBlock** st;
+    SubBlock_set_free(sb);
+    st = &Block_start(ths);
+
+    if (*st != 0) {
+        sb->prev = (*st)->prev;
+        sb->prev->next = sb;
+        sb->next = *st;
+        (*st)->prev = sb;
+        *st = sb;
+        *st = SubBlock_merge_prev(*st, st);
+        SubBlock_merge_next(*st, st);
+    } else {
+        *st = sb;
+        sb->prev = sb;
+        sb->next = sb;
+    }
+    if (ths->max_size < SubBlock_size(*st))
+        ths->max_size = SubBlock_size(*st);
+}
+
+static inline Block* __unlink(__mem_pool_obj* pool_obj, Block* bp) {
+    Block* result = bp->next;
+    if (result == bp) {
+        result = 0;
+    }
+
+    if (pool_obj->start_ == bp) {
+        pool_obj->start_ = result;
+    }
+
+    if (result != 0) {
+        result->prev = bp->prev;
+        result->prev->next = result;
+    }
+
+    bp->next = 0;
+    bp->prev = 0;
+    return result;
+}
+
+void fn_800C4FFC(__mem_pool_obj* pool_obj, void* ptr, unsigned long size);
+void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr);
+
+/* fn_800C4FA4 - 0x800C4FA4 | size: 0x58 — __pool_free */
+void fn_800C4FA4(void* pool, void* ptr) {
+    __mem_pool_obj* pool_obj;
+    unsigned long size;
+
+    if (ptr == 0) {
         return;
     }
-    fn_800C5154();
 
-    return;
-}
+    pool_obj = (__mem_pool_obj*)pool;
+    size = __msize_inline(ptr);
 
-/* fn_800C4FFC - 0x800C4FFC | size: 0x158 */
-void fn_800C4FFC(void) {
-    extern u8 lbl_8026FEE8[];
-    extern void fn_800C5154();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-
-    r6 = (u32)lbl_8026FEE8;
-    r7 = 0x0;
-    r6 = (u32)lbl_8026FEE8;
-    while (1) {
-        tmp = *(u32*)((u8*)r6 + 0x0);
-        if (r5 <= tmp) break;
-        r6 = r6 + 0x4;
-        r7 = r7 + 0x1;
-
-
-    }
-    r5 = r7 << 3;
-    r4 = *(u32*)((u8*)r4 + (-4));
-    r5 = r5 + 0x4;
-    r5 = r3 + r5;
-    tmp = *(u32*)((u8*)r4 + 0xC);
-    if (tmp == 0) {
-        r6 = *(u32*)((u8*)r5 + 0x4);
-        if (r6 != r4) {
-            tmp = *(u32*)((u8*)r5 + 0x0);
-            if (tmp == r4) {
-                tmp = *(u32*)((u8*)r6 + 0x0);
-                *(u32*)((u8*)r5 + 0x4) = tmp;
-                r6 = *(u32*)((u8*)r5 + 0x0);
-                tmp = *(u32*)((u8*)r6 + 0x0);
-                *(u32*)((u8*)r5 + 0x0) = tmp;
-            } else {
-                tmp = *(u32*)((u8*)r4 + 0x4);
-                r6 = *(u32*)((u8*)r4 + 0x0);
-                *(u32*)((u8*)r6 + 0x4) = tmp;
-                tmp = *(u32*)((u8*)r4 + 0x0);
-                r6 = *(u32*)((u8*)r4 + 0x4);
-                *(u32*)((u8*)r6 + 0x0) = tmp;
-                tmp = *(u32*)((u8*)r5 + 0x4);
-                *(u32*)((u8*)r4 + 0x4) = tmp;
-                r6 = *(u32*)((u8*)r4 + 0x4);
-                tmp = *(u32*)((u8*)r6 + 0x0);
-                *(u32*)((u8*)r4 + 0x0) = tmp;
-                r6 = *(u32*)((u8*)r4 + 0x0);
-                *(u32*)((u8*)r6 + 0x4) = r4;
-                r6 = *(u32*)((u8*)r4 + 0x4);
-                *(u32*)((u8*)r6 + 0x0) = r4;
-                *(u32*)((u8*)r5 + 0x4) = r4;
-            }
-        }
-    }
-    /* L_800C50BC */
-    tmp = *(u32*)((u8*)r4 + 0xC);
-    *(u32*)((u8*)r8 + 0x4) = tmp;
-    *(u32*)((u8*)r4 + 0xC) = r8;
-    r6 = *(u32*)((u8*)r4 + 0x10);
-    /* subic. tmp, r6, 0x1 */;
-    *(u32*)((u8*)r4 + 0x10) = tmp;
-    if (tmp == r4) {
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        if (tmp == r4) {
-            tmp = *(u32*)((u8*)r4 + 0x4);
-            *(u32*)((u8*)r5 + 0x4) = tmp;
-        }
-        tmp = *(u32*)((u8*)r5 + 0x0);
-        if (tmp == r4) {
-            tmp = *(u32*)((u8*)r4 + 0x0);
-            *(u32*)((u8*)r5 + 0x0) = tmp;
-        }
-        tmp = *(u32*)((u8*)r4 + 0x4);
-        r6 = *(u32*)((u8*)r4 + 0x0);
-        *(u32*)((u8*)r6 + 0x4) = tmp;
-        tmp = *(u32*)((u8*)r4 + 0x0);
-        r6 = *(u32*)((u8*)r4 + 0x4);
-        *(u32*)((u8*)r6 + 0x0) = tmp;
-        tmp = *(u32*)((u8*)r5 + 0x4);
-        if (tmp == r4) {
-            tmp = 0x0;
-            *(u32*)((u8*)r5 + 0x4) = tmp;
-        }
-        tmp = *(u32*)((u8*)r5 + 0x0);
-        if (tmp == r4) {
-            tmp = 0x0;
-            *(u32*)((u8*)r5 + 0x0) = tmp;
-        }
-        fn_800C5154();
-    }
-    return;
-}
-
-/* fn_800C5154 - 0x800C5154 | size: 0x294 */
-void fn_800C5154(void) {
-    extern void fn_800C4D8C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-
-    r4 = *(u32*)((u8*)r4 + (-8));
-    r5 = *(u32*)((u8*)r8 + 0x4);
-    tmp = r4 & 0xFFFFFFFD;
-    /* clrrwi r6, r4, 3 */;
-    *(u32*)((u8*)r8 + 0x0) = tmp;
-    r7 = r8 + r6;
-    /* clrrwi r4, r5, 1 */;
-    tmp = *(u32*)((u8*)r7 + 0x0);
-    tmp = tmp & 0xFFFFFFFB;
-    *(u32*)((u8*)r7 + 0x0) = tmp;
-    *(u32*)((u8*)r7 + (-4)) = r6;
-    tmp = *(u32*)((u8*)r4 + 0xC);
-    /* clrrwi r5, tmp, 3 */;
-    r5 = *(u32*)(r4 + tmp);
-    if (r5 == 0) {
-        /* L_800C5330: empty free list - initialize */
-        *(u32*)(r4 + tmp) = r8;
-        *(u32*)((u8*)r8 + 0x8) = r8;
-        *(u32*)((u8*)r8 + 0xC) = r8;
+    if (size <= 68) {
+        fn_800C4FFC(pool_obj, ptr, size);
     } else {
-        r5 = *(u32*)((u8*)r5 + 0x8);
-        *(u32*)((u8*)r8 + 0x8) = r5;
-        r5 = *(u32*)((u8*)r8 + 0x8);
-        *(u32*)((u8*)r5 + 0xC) = r8;
-        r5 = *(u32*)(r4 + tmp);
-        *(u32*)((u8*)r8 + 0xC) = r5;
-        r5 = *(u32*)(r4 + tmp);
-        *(u32*)((u8*)r5 + 0x8) = r8;
-        *(u32*)(r4 + tmp) = r8;
-        r9 = *(u32*)(r4 + tmp);
-        r5 = *(u32*)((u8*)r9 + 0x0);
-        r5 = r5 & 0x00000004;
-        if (r5 != 0) {
-            /* L_800C526C: prev block in use, no coalesce */
-            r7 = r9;
-        } else {
-            r8 = *(u32*)((u8*)r9 + (-4));
-            r5 = r8 & 0x00000002;
-            if (r5 != 0) {
-                /* boundary tag set, no prev coalesce */
-                r7 = r9;
-            } else {
-                /* L_800C51F0: coalesce with previous block */
-                r7 = r9 - r8;
-                r5 = *(u32*)((u8*)r7 + 0x0);
-                r5 = r5 & 0x7;
-                *(u32*)((u8*)r7 + 0x0) = r5;
-                r5 = *(u32*)((u8*)r9 + 0x0);
-                r6 = *(u32*)((u8*)r7 + 0x0);
-                /* clrrwi r5, r5, 3 */;
-                r5 = r8 + r5;
-                /* clrrwi r5, r5, 3 */;
-                r5 = r6 | r5;
-                *(u32*)((u8*)r7 + 0x0) = r5;
-                r5 = *(u32*)((u8*)r7 + 0x0);
-                r5 = r5 & 0x00000002;
-                if (r5 == 0) {
-                    r5 = *(u32*)((u8*)r9 + 0x0);
-                    /* clrrwi r5, r5, 3 */;
-                    r6 = r8 + r5;
-                    *(u32*)(r7 + r5) = r6;
-                }
-                r5 = *(u32*)(r4 + tmp);
-                if (r5 == r9) {
-                    r5 = *(u32*)((u8*)r5 + 0xC);
-                    *(u32*)(r4 + tmp) = r5;
-                }
-                r6 = *(u32*)((u8*)r9 + 0x8);
-                r5 = *(u32*)((u8*)r9 + 0xC);
-                *(u32*)((u8*)r5 + 0x8) = r6;
-                r6 = *(u32*)((u8*)r9 + 0xC);
-                r5 = *(u32*)((u8*)r6 + 0x8);
-                *(u32*)((u8*)r5 + 0xC) = r6;
-            }
-        }
-        /* L_800C5270 */
-        *(u32*)(r4 + tmp) = r7;
-        r9 = *(u32*)(r4 + tmp);
-        r6 = *(u32*)((u8*)r9 + 0x0);
-        /* clrrwi r10, r6, 3 */;
-        r8 = r9 + r10;
-        r7 = *(u32*)((u8*)r8 + 0x0);
-        r5 = r7 & 0x00000002;
-        if (r5 == r9) {
-            /* coalesce with next block */
-            r5 = r6 & 0x7;
-            /* clrrwi r6, r7, 3 */;
-            *(u32*)((u8*)r9 + 0x0) = r5;
-            r7 = r10 + r6;
-            /* clrrwi r5, r7, 3 */;
-            r6 = *(u32*)((u8*)r9 + 0x0);
-            r5 = r6 | r5;
-            *(u32*)((u8*)r9 + 0x0) = r5;
-            r5 = *(u32*)((u8*)r9 + 0x0);
-            r5 = r5 & 0x00000002;
-            if (r5 == r9) {
-                *(u32*)(r9 + r5) = r7;
-            }
-            r5 = *(u32*)((u8*)r9 + 0x0);
-            r5 = r5 & 0x00000002;
-            if (r5 == r9) {
-                r5 = *(u32*)(r9 + r7);
-                r5 = r5 & 0xFFFFFFFB;
-                *(u32*)(r9 + r7) = r5;
-            } else {
-                r5 = *(u32*)(r9 + r7);
-                r5 = r5 | 0x4;
-                *(u32*)(r9 + r7) = r5;
-            }
-            r5 = *(u32*)(r4 + tmp);
-            if (r5 == r8) {
-                r5 = *(u32*)((u8*)r5 + 0xC);
-                *(u32*)(r4 + tmp) = r5;
-            }
-            r5 = *(u32*)(r4 + tmp);
-            if (r5 == r8) {
-                r5 = 0x0;
-                *(u32*)(r4 + tmp) = r5;
-            }
-            r6 = *(u32*)((u8*)r8 + 0x8);
-            r5 = *(u32*)((u8*)r8 + 0xC);
-            *(u32*)((u8*)r5 + 0x8) = r6;
-            r6 = *(u32*)((u8*)r8 + 0xC);
-            r5 = *(u32*)((u8*)r8 + 0x8);
-            *(u32*)((u8*)r5 + 0xC) = r6;
-        }
+        fn_800C5154(pool_obj, ptr);
     }
-    /* L_800C533C */
-    r5 = *(u32*)(r4 + tmp);
-    r6 = *(u32*)((u8*)r4 + 0x8);
-    tmp = *(u32*)((u8*)r5 + 0x0);
-    /* clrrwi tmp, tmp, 3 */;
-    if (r6 < tmp) {
-        *(u32*)((u8*)r4 + 0x8) = tmp;
-    }
-    r5 = *(u32*)((u8*)r4 + 0x10);
-    r7 = 0x0;
-    tmp = r5 & 0x00000002;
-    if (r6 == tmp) {
-        tmp = *(u32*)((u8*)r4 + 0xC);
-        /* clrrwi r6, r5, 3 */;
-        /* clrrwi r5, tmp, 3 */;
-        if (r6 == tmp) {
-            r7 = 0x1;
-    }
-    }
-    if ((s32)r7 != 0) {
-        r5 = *(u32*)((u8*)r4 + 0x4);
-        if (r5 == r4) {
-            r5 = 0x0;
-        }
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (tmp == r4) {
-            *(u32*)((u8*)r3 + 0x0) = r5;
-        }
-        if (r5 != 0) {
-            tmp = *(u32*)((u8*)r4 + 0x0);
-            *(u32*)((u8*)r5 + 0x0) = tmp;
-            r3 = *(u32*)((u8*)r5 + 0x0);
-            *(u32*)((u8*)r3 + 0x4) = r5;
-        }
-        tmp = 0x0;
-        r3 = r4;
-        *(u32*)((u8*)r4 + 0x4) = tmp;
-        *(u32*)((u8*)r4 + 0x0) = tmp;
-        fn_800C4D8C();
-    }
-    return;
 }
 
-/* fn_800C53E8 - 0x800C53E8 | size: 0x70 */
-void fn_800C53E8(void) {
-    extern void fn_800C7904();
-    extern u8 __files[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* fn_800C4FFC - 0x800C4FFC | size: 0x158 — deallocate_from_fixed_pools */
+void fn_800C4FFC(__mem_pool_obj* pool_obj, void* ptr, unsigned long size) {
+    unsigned long i = 0;
+    FixSubBlock* p;
+    FixBlock* b;
+    FixStart* fs;
 
-    r3 = (u32)__files;
-    tmp = (u32)__files;
-    r31 = 0x0;
-    r30 = tmp;
-    while (r30 != 0) {
-
-        tmp = *(u16*)((u8*)r30 + 0x4);
-        /* extrwi. tmp, tmp, 3, 23 */;
-        if ((s32)tmp != 0) {
-            r3 = r30;
-            fn_800C7904();
-            if ((s32)r3 != 0) {
-                r31 = -0x1;
-        }
-        }
-        r30 = *(u32*)((u8*)r30 + 0x4C);
-
+    while (size > fix_pool_sizes[i]) {
+        ++i;
     }
-    r3 = r31;
-    return;
+
+    fs = &pool_obj->fix_start[i];
+    p = FixSubBlock_from_pointer(ptr);
+    b = p->block_;
+
+    if (b->start_ == 0 && fs->head_ != b) {
+        if (fs->tail_ == b) {
+            fs->head_ = fs->head_->prev_;
+            fs->tail_ = fs->tail_->prev_;
+        } else {
+            b->prev_->next_ = b->next_;
+            b->next_->prev_ = b->prev_;
+            b->next_ = fs->head_;
+            b->prev_ = b->next_->prev_;
+            b->prev_->next_ = b;
+            b->next_->prev_ = b;
+            fs->head_ = b;
+        }
+    }
+
+    p->next_ = b->start_;
+    b->start_ = p;
+
+    if (--b->n_allocated_ == 0) {
+        if (fs->head_ == b) {
+            fs->head_ = b->next_;
+        }
+
+        if (fs->tail_ == b) {
+            fs->tail_ = b->prev_;
+        }
+
+        b->prev_->next_ = b->next_;
+        b->next_->prev_ = b->prev_;
+
+        if (fs->head_ == b) {
+            fs->head_ = 0;
+        }
+
+        if (fs->tail_ == b) {
+            fs->tail_ = 0;
+        }
+
+        fn_800C5154(pool_obj, b);
+    }
+}
+
+/* fn_800C5154 - 0x800C5154 | size: 0x294 — deallocate_from_var_pools */
+void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr) {
+    SubBlock* sb = SubBlock_from_pointer(ptr);
+    SubBlock* _sb;
+
+    Block* bp = SubBlock_block(sb);
+    Block_link(bp, sb);
+
+    if (Block_empty(bp)) {
+        __unlink(pool_obj, bp);
+        fn_800C4D8C(bp);
+    }
+}
+
+/* ----------------------------------------------------------------
+ * MSL MSL_C ansi_files.c — __flush_all.
+ * Walks the __files FILE list and fflush()es every open file.
+ * (fn_800C7904 = fflush; FILE layout from MSL ansi_files.h.)
+ * ---------------------------------------------------------------- */
+
+enum __file_kinds {
+    __closed_file,
+    __disk_file,
+    __console_file,
+    __unavailable_file
+};
+
+typedef struct _file_modes {
+    unsigned int open_mode : 2;
+    unsigned int io_mode : 3;
+    unsigned int buffer_mode : 2;
+    unsigned int file_kind : 3;
+    unsigned int file_orientation : 2;
+    unsigned int binary_io : 1;
+} file_modes;
+
+typedef struct _MSL_FILE {
+    /* 0x00 */ unsigned long handle;
+    /* 0x04 */ file_modes file_mode;
+    /* 0x08 */ unsigned long file_state;
+    /* 0x0C */ unsigned char is_dynamically_allocated;
+    /* 0x0D */ char char_buffer;
+    /* 0x0E */ char char_buffer_overflow;
+    /* 0x0F */ char ungetc_buffer[2];
+    /* 0x12 */ unsigned short ungetc_wide_buffer[2];
+    /* 0x18 */ unsigned long position;
+    /* 0x1C */ unsigned char* buffer;
+    /* 0x20 */ unsigned long buffer_size;
+    /* 0x24 */ unsigned char* buffer_ptr;
+    /* 0x28 */ unsigned long buffer_length;
+    /* 0x2C */ unsigned long buffer_alignment;
+    /* 0x30 */ unsigned long save_buffer_length;
+    /* 0x34 */ unsigned long buffer_position;
+    /* 0x38 */ void* position_fn;
+    /* 0x3C */ void* read_fn;
+    /* 0x40 */ void* write_fn;
+    /* 0x44 */ void* close_fn;
+    /* 0x48 */ void* idle_fn;
+    /* 0x4C */ struct _MSL_FILE* next_file;
+} MSL_FILE;
+
+extern MSL_FILE __files;        /* &__files._stdin == &__files */
+extern int fn_800C7904(MSL_FILE* file);   /* fflush */
+
+/* fn_800C53E8 - 0x800C53E8 | size: 0x70 — __flush_all */
+unsigned int fn_800C53E8(void) {
+    unsigned int ret = 0;
+    MSL_FILE* file = &__files;
+
+    while (file) {
+        if (file->file_mode.file_kind != __closed_file && fn_800C7904(file)) {
+            ret = -1;
+        }
+        file = file->next_file;
+    }
+
+    return ret;
 }
 

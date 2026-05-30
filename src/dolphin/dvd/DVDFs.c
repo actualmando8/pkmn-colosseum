@@ -12,15 +12,16 @@
 /* Boot info / disc header at 0x80000000 */
 #define BOOT_INFO       ((u32*)0x80000000)
 
-/* SDA-relative globals */
-static u32* BootInfo;           /* 0x8047A7C8 */
-static u32* FstStart;           /* 0x8047A7CC */
-static u32* FstStringStart;     /* 0x8047A7D0 */
-static u32  MaxEntryNum;        /* 0x8047A7D4 */
+/*
+ * SDA-relative globals. The target's data symbols carry an address suffix
+ * (e.g. FstStart_8047A7CC); the stub functions below already reference them
+ * by that name, so the definitions use the suffixed names to match.
+ */
+static u32* BootInfo_8047A7C8;       /* 0x8047A7C8 */
+static u32* FstStart_8047A7CC;       /* 0x8047A7CC */
+static u32* FstStringStart_8047A7D0; /* 0x8047A7D0 */
+static u32  MaxEntryNum_8047A7D4;    /* 0x8047A7D4 */
 
-/* SDA symbol aliases used by stub functions */
-extern u32 FstStart_8047A7CC;
-extern u32 FstStringStart_8047A7D0;
 extern u32 __DVDLongFileNameFlag;
 
 /*
@@ -36,20 +37,19 @@ extern u32 __DVDLongFileNameFlag;
  *   word 2: file_length or num_entries (for root: total entries)
  */
 void __DVDFSInit(void) {
-    BootInfo = BOOT_INFO;
+    BootInfo_8047A7C8 = BOOT_INFO;
 
     /* FST start address is at offset 0x38 in boot info */
-    FstStart = (u32*)BootInfo[0x38 / 4];
+    FstStart_8047A7CC = (u32*)BootInfo_8047A7C8[0x38 / 4];
 
-    if (FstStart == NULL) {
-        return;
+    if (FstStart_8047A7CC) {
+        /* Root entry's third word contains the total number of entries */
+        MaxEntryNum_8047A7D4 = FstStart_8047A7CC[2];
+
+        /* String table immediately follows the FST entries */
+        FstStringStart_8047A7D0 =
+            (u32*)((u8*)FstStart_8047A7CC + MaxEntryNum_8047A7D4 * 12);
     }
-
-    /* Root entry's third word contains the total number of entries */
-    MaxEntryNum = FstStart[2];
-
-    /* String table immediately follows the FST entries */
-    FstStringStart = (u32*)((u8*)FstStart + MaxEntryNum * 12);
 }
 
 /* ========================================================== */
@@ -339,15 +339,13 @@ void fn_800A501C(void) {
     return;
 }
 
-/* fn_800A50E4 - 0x800A50E4 | size: 0x24 */
-void fn_800A50E4(void) {
-    extern void fn_800A7AFC();
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    fn_800A7AFC();
-    r3 = 0x1;
-    return;
+/* fn_800A50E4 - 0x800A50E4 | size: 0x24
+ * DVDClose - cancel any pending command on the file, then report success.
+ */
+int fn_800A50E4(DVDFileInfo* fileInfo) {
+    extern void fn_800A7AFC(DVDCommandBlock* block);
+    fn_800A7AFC(&fileInfo->cb);
+    return 1;
 }
 
 /* fn_800A5108 - 0x800A5108 | size: 0x160 */
@@ -565,13 +563,11 @@ void fn_800A532C(void) {
 }
 
 /* fn_800A53EC - 0x800A53EC | size: 0x30
- * DVDCommandCallback - Invoke the user callback stored in the
- * command block at offset 0x38, if non-NULL.
+ * cbForSeekAsync - forward the result to the file's user callback.
  */
-void fn_800A53EC(s32 result, u8* cmdBlock) {
-    void (*callback)(s32, u8*) = (void (*)(s32, u8*))*(u32*)(cmdBlock + 0x38);
-    if (callback != NULL) {
-        callback(result, cmdBlock);
+void fn_800A53EC(s32 result, DVDFileInfo* fileInfo) {
+    if (fileInfo->callback) {
+        (fileInfo->callback)(result, (DVDCommandBlock*)fileInfo);
     }
 }
 
@@ -662,16 +658,13 @@ while (1) {
     return;
 }
 
-/* fn_800A5534 - 0x800A5534 | size: 0x24 */
+/* fn_800A5534 - 0x800A5534 | size: 0x24
+ * cbForReadSync - wake the DVD-FS wait thread once the read completes.
+ */
 void fn_800A5534(void) {
-    extern void fn_800A2478();
-    extern u8 __DVDThreadQueue[];
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    r3 = (u32)__DVDThreadQueue;
-    fn_800A2478();
-    return;
+    extern void fn_800A2478(void* queue);
+    extern u8 __DVDThreadQueue[8];
+    fn_800A2478(&__DVDThreadQueue);
 }
 
 /* fn_800A5558 - 0x800A5558 | size: 0x98 */
@@ -718,13 +711,11 @@ void fn_800A5558(void) {
 }
 
 /* fn_800A55F0 - 0x800A55F0 | size: 0x30
- * DVDCommandCallback2 - Same as fn_800A53EC, invoke user callback
- * at offset 0x38 if non-NULL.
+ * cbForPrepareStreamAsync - forward the result to the file's user callback.
  */
-void fn_800A55F0(s32 result, u8* cmdBlock) {
-    void (*callback)(s32, u8*) = (void (*)(s32, u8*))*(u32*)(cmdBlock + 0x38);
-    if (callback != NULL) {
-        callback(result, cmdBlock);
+void fn_800A55F0(s32 result, DVDFileInfo* fileInfo) {
+    if (fileInfo->callback) {
+        (fileInfo->callback)(result, (DVDCommandBlock*)fileInfo);
     }
 }
 
