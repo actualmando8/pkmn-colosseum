@@ -733,9 +733,9 @@ asm void fn_800F76E4(void) {
 void fn_800F76E4(u8* arg) {
     extern u8* lbl_80478B00;
     u8* head;
-    u32 i;
-    u32* tbl;
     u32 off;
+    u32* tbl;
+    s32 i;
 
     *(u32*)(arg + 0x14) = 0;
     head = (u8*)*(u32*)(lbl_80478B00 + 0x8);
@@ -747,9 +747,12 @@ void fn_800F76E4(u8* arg) {
     }
     if (*(u8*)(arg + 0xa) != 0) return;
     tbl = (u32*)(arg + *(u32*)(arg + 0xc));
-    for (i = 0; (s32)i < (s32)*(u16*)(arg + 0x6); i++) {
-        u32 r = *tbl++;
-        *(u32*)(arg + r) += (u32)arg;
+    i = 0;
+    while (i < (s32)*(u16*)(arg + 0x6)) {
+        off = *tbl;
+        tbl += 1;
+        i += 1;
+        *(u32*)(arg + off) += (u32)arg;
     }
     *(u8*)(arg + 0xa) = 1;
 }
@@ -884,18 +887,26 @@ asm void fn_800F7C8C(void) {
 }
 #else
 #pragma push
-#pragma peephole off
+#pragma optimization_level 3
 void fn_800F7C8C(s32 padId, s8 stickX, s8 stickY) {
     extern u8 lbl_80401C10[];
     u8* pad = &lbl_80401C10[0];
     u8* nul = NULL;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try1;
+    goto found;
+try1:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try2;
+    goto found;
+try2:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try3;
+    goto found;
+try3:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto miss;
+    goto found;
+miss:
     pad = nul;
 found:
     if (pad == NULL) return;
@@ -913,18 +924,26 @@ asm void fn_800F7D38(void) {
 }
 #else
 #pragma push
-#pragma peephole off
+#pragma optimization_level 3
 void fn_800F7D38(s32 padId, s8 stickX, s8 stickY) {
     extern u8 lbl_80401C10[];
     u8* pad = &lbl_80401C10[0];
     u8* nul = NULL;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try1;
+    goto found;
+try1:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try2;
+    goto found;
+try2:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto try3;
+    goto found;
+try3:
     pad += 0x6c;
-    if (*(s32*)pad == padId) goto found;
+    if (*(s32*)pad != padId) goto miss;
+    goto found;
+miss:
     pad = nul;
 found:
     if (pad == NULL) return;
