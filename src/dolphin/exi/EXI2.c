@@ -148,15 +148,24 @@ void fn_800CE7DC(void) {}
  * Reads data from EXI channel 2.
  * 0x800CEA3C | size: 0x8C
  */
-#if 1
+#if 0
 asm void fn_800CEA3C(void) {
 #include "src/dolphin/exi/EXI2_fn_800CEA3C.inc"
 }
 #else
+#pragma push
+#pragma peephole on
 s32 fn_800CEA3C(void* buf, s32 len) {
-    /* TODO: match -- EXI2 read function */
+    s32 enabled;
+    enabled = OSDisableInterrupts();
+    fn_800CEE34(((lbl_8047AA30 & 0x10000) ? 0x1000 : 0) + 0x1E000, buf,
+                (len + 3) & ~3);
+    lbl_8047AA34 = 0;
+    lbl_8047AA3C = 0;
+    OSRestoreInterrupts(enabled);
     return 0;
 }
+#pragma pop
 #endif
 
 /*
@@ -164,12 +173,34 @@ s32 fn_800CEA3C(void* buf, s32 len) {
  * Checks for available data on EXI channel 2.
  * 0x800CEAC8 | size: 0x9C
  */
-#if 1
+#if 0
 asm void fn_800CEAC8(void) {
 #include "src/dolphin/exi/EXI2_fn_800CEAC8.inc"
 }
 #else
-void fn_800CEAC8(void) {}
+#pragma push
+#pragma peephole on
+u32 fn_800CEAC8(void) {
+    s32 enabled;
+    u32 resp;
+    lbl_8047AA3C = 0;
+    if ((s32)lbl_8047AA34 == 0) {
+        enabled = OSDisableInterrupts();
+        fn_800CECAC(&resp);
+        if (resp & 1) {
+            fn_800CEF10(&resp);
+            resp &= 0x1FFFFFFF;
+            if ((resp & 0x1F000000) == 0x1F000000) {
+                lbl_8047AA30 = resp;
+                lbl_8047AA34 = resp & 0x7FFF;
+                lbl_8047AA3C = 1;
+            }
+        }
+        OSRestoreInterrupts(enabled);
+    }
+    return lbl_8047AA34;
+}
+#pragma pop
 #endif
 
 /*
