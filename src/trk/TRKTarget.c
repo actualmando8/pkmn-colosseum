@@ -326,193 +326,113 @@ s32 TRKTargetContinue(void) {
 /* ========================================================== */
 
 /* fn_800C1310 - 0x800C1310 | size: 0x18 */
-void fn_800C1310(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    r3 = (u32)gTRKState;
-    tmp = 0x1;
-    r4 = (u32)gTRKState;
-    r3 = 0x0;
-    *(u32*)((u8*)r4 + 0x98) = tmp;
-    return;
+s32 fn_800C1310(void) {
+    *(s32*)&gTRKState[0x98] = 1;
+    return 0;
 }
 
 /* fn_800C1548 - 0x800C1548 | size: 0x10 */
-void fn_800C1548(void) {
-    u32 r3 = 0;
-
-    r3 = (u32)gTRKCPUState;
-    r3 = (u32)gTRKCPUState;
-    r3 = *(u32*)((u8*)r3 + 0x80);
-    return;
+s32 fn_800C1548(void) {
+    return *(s32*)&gTRKCPUState[0x80];
 }
 
 /* fn_800C1558 - 0x800C1558 | size: 0xB8 */
-void fn_800C1558(void) {
+s32 fn_800C1558(u32 rangeStart, u32 rangeEnd, s32 c) {
     extern u8 lbl_8026FB70[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
-    f32 f8 = 0.0f;
+    u8* bpInfo;
+    u8* cpuState;
+    s32 bpType;
+    u32 msr;
 
-    if ((s32)r5 != 0) {
-        r3 = 0x703;
-        return;
+    if (c != 0) {
+        return 0x703;
     }
-    r6 = (u32)&lbl_80313834;
-    r5 = (u32)lbl_8026FB70;
-    r31 = (u32)&lbl_80313834;
-    r6 = 0x1;
-    *(u32*)((u8*)r31 + 0xC) = r3;
-    tmp = (u32)lbl_8026FB70;
-    r3 = 0x1;
-    *(u32*)((u8*)r31 + 0x10) = r4;
-    r4 = tmp;
-    *(u32*)((u8*)r31 + 0x4) = r6;
-    *(u32*)((u8*)r31 + 0x0) = r6;
-    ((void(*)(void))MWTRACE)();
-    r3 = (u32)gTRKCPUState;
-    r4 = *(u32*)((u8*)r31 + 0x4);
-    r3 = (u32)gTRKCPUState;
-    tmp = *(u32*)((u8*)r3 + 0x1F8);
-    tmp = tmp | 0x400;
-    *(u32*)((u8*)r3 + 0x1F8) = tmp;
+    bpInfo = lbl_80313834;
+    *(u32*)&bpInfo[0xC] = rangeStart;
+    *(u32*)&bpInfo[0x10] = rangeEnd;
+    *(s32*)&bpInfo[0x4] = 1;
+    *(s32*)&bpInfo[0x0] = 1;
 
-    if ((s32)r4 == 0 || (s32)r4 == 0x10) {
-        r3 = (u32)&lbl_80313834;
-        r4 = (u32)&lbl_80313834;
-        r3 = *(u32*)((u8*)r4 + 0x8);
-        *(u32*)((u8*)r4 + 0x8) = tmp;
+    MWTRACE(1, (const char*)lbl_8026FB70);
+
+    cpuState = gTRKCPUState;
+    bpType = *(s32*)&bpInfo[0x4];
+    msr = *(u32*)&cpuState[0x1F8];
+    msr |= 0x400;
+    *(u32*)&cpuState[0x1F8] = msr;
+
+    if (bpType == 0 || bpType == 0x10) {
+        *(u32*)&lbl_80313834[0x8] = *(u32*)&lbl_80313834[0x8] - 1;
     }
-    r3 = (u32)gTRKState;
-    tmp = 0x0;
-    r4 = (u32)gTRKState;
-    r3 = 0x0;
-    *(u32*)((u8*)r4 + 0x98) = tmp;
-
-    return;
+    *(s32*)&gTRKState[0x98] = 0;
+    return 0;
 }
 
 /* fn_800C1610 - 0x800C1610 | size: 0xAC */
-void fn_800C1610(void) {
+s32 fn_800C1610(u32 count, s32 c) {
     extern u8 lbl_8026FB70[];
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f8 = 0.0f;
+    u8* bpInfo;
+    u8* cpuState;
+    s32 bpType;
+    u32 msr;
 
-    if ((s32)r4 != 0) {
-        r3 = 0x703;
-        return;
+    if (c != 0) {
+        return 0x703;
     }
-    r5 = (u32)&lbl_80313834;
-    r4 = (u32)lbl_8026FB70;
-    r31 = (u32)&lbl_80313834;
-    tmp = 0x1;
-    r5 = 0x0;
-    *(u32*)((u8*)r31 + 0x8) = r3;
-    r4 = (u32)lbl_8026FB70;
-    r3 = 0x1;
-    *(u32*)((u8*)r31 + 0x4) = r5;
-    *(u32*)((u8*)r31 + 0x0) = tmp;
-    ((void(*)(void))MWTRACE)();
-    r3 = (u32)gTRKCPUState;
-    r4 = *(u32*)((u8*)r31 + 0x4);
-    r3 = (u32)gTRKCPUState;
-    tmp = *(u32*)((u8*)r3 + 0x1F8);
-    tmp = tmp | 0x400;
-    *(u32*)((u8*)r3 + 0x1F8) = tmp;
+    bpInfo = lbl_80313834;
+    *(u32*)&bpInfo[0x8] = count;
+    *(s32*)&bpInfo[0x4] = 0;
+    *(s32*)&bpInfo[0x0] = 1;
 
-    if ((s32)r4 == 0 && (s32)r4 != 0x10) {
+    MWTRACE(1, (const char*)lbl_8026FB70);
 
-        r3 = *(u32*)((u8*)r31 + 0x8);
-        *(u32*)((u8*)r31 + 0x8) = tmp;
+    cpuState = gTRKCPUState;
+    bpType = *(s32*)&bpInfo[0x4];
+    msr = *(u32*)&cpuState[0x1F8];
+    msr |= 0x400;
+    *(u32*)&cpuState[0x1F8] = msr;
+
+    if (bpType == 0 || bpType == 0x10) {
+        *(u32*)&bpInfo[0x8] = *(u32*)&bpInfo[0x8] - 1;
     }
-    r3 = (u32)gTRKState;
-    tmp = 0x0;
-    r4 = (u32)gTRKState;
-    r3 = 0x0;
-    *(u32*)((u8*)r4 + 0x98) = tmp;
-
-    return;
+    *(s32*)&gTRKState[0x98] = 0;
+    return 0;
 }
 
 /* fn_800C16BC - 0x800C16BC | size: 0x84 */
-void fn_800C16BC(void) {
-    extern void fn_800BEBB0();
-    u8 sp[0x60];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+void fn_800C16BC(s32 arg) {
+    extern void fn_800BEBB0(s32 a, void* buf, u32 len);
+    u8 buf[0x40];
+    s32 result;
+    u32 dataword;
 
-    r4 = 0x0;
-    r5 = 0x40;
-    r31 = r3;
-    r3 = (u32)sp + 0xc;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r3 = (u32)gTRKExceptionStatus_80313824;
-    r5 = 0x40;
-    r4 = *(u32*)gTRKExceptionStatus_80313824;
-    tmp = 0x91;
-    r3 = (u32)sp + 0x8;
-    *(u8*)(sp + 0x10) = tmp;
-    ((void(*)(void))fn_800C25B0)();
-    r3 = (u32)gTRKExceptionStatus_80313824;
-    r4 = (u32)gTRKExceptionStatus_80313824;
-    r3 = r31;
-    tmp = *(u16*)((u8*)r4 + 0x8);
-    r4 = (u32)sp + 0xc;
-    r5 = 0x40;
-    *(u32*)(sp + 0x1C) = tmp;
-    fn_800BEBB0();
-    return;
+    memset(buf, 0, 0x40);
+    dataword = *(u32*)gTRKExceptionStatus_80313824;
+    *(u32*)&buf[0x0] = 0x40;
+    buf[0x4] = 0x91;
+    *(u32*)&buf[0x8] = dataword;
+    fn_800C25B0((u8*)&result, dataword);
+    *(u32*)&buf[0xC] = result;
+    *(u32*)&buf[0x10] = *(u16*)&gTRKExceptionStatus_80313824[0x8];
+    fn_800BEBB0(arg, buf, 0x40);
 }
 
 /* fn_800C1740 - 0x800C1740 | size: 0x8C */
-void fn_800C1740(void) {
-    extern void fn_800BEBB0();
-    u8 sp[0x60];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-    f32 f8 = 0.0f;
+void fn_800C1740(s32 arg) {
+    extern void fn_800BEBB0(s32 a, void* buf, u32 len);
+    u8 buf[0x40];
+    s32 result;
+    u32 dataword;
 
-    r4 = 0x0;
-    r5 = 0x40;
-    r31 = r3;
-    r3 = (u32)sp + 0xc;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r3 = (u32)gTRKCPUState;
-    r5 = 0x40;
-    r3 = (u32)gTRKCPUState;
-    tmp = 0x90;
-    r4 = *(u32*)((u8*)r3 + 0x80);
-    r3 = (u32)sp + 0x8;
-    *(u8*)(sp + 0x10) = tmp;
-    ((void(*)(void))fn_800C25B0)();
-    r3 = (u32)gTRKCPUState;
-    r4 = (u32)gTRKCPUState;
-    r3 = r31;
-    tmp = *(u32*)((u8*)r4 + 0x2F8);
-    r4 = (u32)sp + 0xc;
-    r5 = 0x40;
-    tmp = tmp & 0xFFFF;
-    *(u32*)(sp + 0x1C) = tmp;
-    fn_800BEBB0();
-    return;
+    memset(buf, 0, 0x40);
+    dataword = *(u32*)&gTRKCPUState[0x80];
+    *(u32*)&buf[0x0] = 0x40;
+    buf[0x4] = 0x90;
+    *(u32*)&buf[0x8] = dataword;
+    fn_800C25B0((u8*)&result, dataword);
+    *(u32*)&buf[0xC] = result;
+    *(u32*)&buf[0x10] = *(u32*)&gTRKCPUState[0x2F8] & 0xFFFF;
+    fn_800BEBB0(arg, buf, 0x40);
 }
 
 /* fn_800C1A08 - 0x800C1A08 | size: 0x438 */
