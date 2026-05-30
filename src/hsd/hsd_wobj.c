@@ -21,7 +21,7 @@ static void WObjInfoInit(void);
 
 HSD_WObjInfo hsdWObj = { WObjInfoInit };
 
-static HSD_ClassInfo* default_class = NULL;
+static HSD_ClassInfo* lbl_8047B218 = NULL;
 
 /* ========================================================================= */
 /*  Animation                                                                */
@@ -101,7 +101,7 @@ void HSD_WObjSetDefaultClass(HSD_ClassInfo* info)
     if (info) {
         HSD_ASSERT(221, hsdIsDescendantOf(info, &hsdWObj));
     }
-    default_class = info;
+    lbl_8047B218 = info;
 }
 
 /* ========================================================================= */
@@ -193,7 +193,7 @@ void HSD_WObjGetPosition(HSD_WObj* wobj, f32* x, f32* y, f32* z)
 HSD_WObj* HSD_WObjAlloc(void)
 {
     HSD_WObj* wobj = (HSD_WObj*) hsdNew(
-        default_class ? default_class : &hsdWObj.parent.parent);
+        lbl_8047B218 ? lbl_8047B218 : &hsdWObj.parent.parent);
     HSD_ASSERT(591, wobj);
     return wobj;
 }
@@ -212,8 +212,8 @@ static void WObjRelease(HSD_Class* o)
 
 static void WObjAmnesia(HSD_ClassInfo* info)
 {
-    if (info == HSD_CLASS_INFO(default_class)) {
-        default_class = NULL;
+    if (info == HSD_CLASS_INFO(lbl_8047B218)) {
+        lbl_8047B218 = NULL;
     }
     HSD_OBJECT_PARENT_INFO(&hsdWObj)->amnesia(info);
 }
@@ -230,11 +230,18 @@ static void WObjInfoInit(void)
 
 /* 0x8019158C | 0x48 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 1
-asm void fn_8019158C(void) {
-#include "src/hsd/hsd_wobj_fn_8019158C.inc"
+#pragma optimization_level 4
+void fn_8019158C(HSD_Class* o)
+{
+    extern u8 lbl_8036C5F0[];
+
+    if (o == (HSD_Class*) lbl_8047B218) {
+        lbl_8047B218 = NULL;
+    }
+    ((HSD_ClassInfo*) *(u32*) (lbl_8036C5F0 + 0x14))->destroy(o);
 }
 #else
 void fn_8019158C(void) { /* TODO */ }
@@ -252,7 +259,7 @@ asm void fn_801915D4(void) {
 #include "src/hsd/hsd_wobj_fn_801915D4.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 1
 extern u8 lbl_8036C5F0[];
 void fn_801915D4(HSD_WObj* wobj) {
     fn_801AE50C(wobj->robj);
@@ -269,14 +276,30 @@ void fn_801915D4(HSD_WObj* wobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80193828(void);
-extern void fn_80196E10(void);
-#if 1
+extern void* fn_80193828(void*);
+extern void fn_80196E10(const char*, u32, const char*);
+extern const char lbl_8047D8C8[7];
+extern const char lbl_8047D8D0[5];
+#if 0
 asm void fn_80191628(void) {
 #include "src/hsd/hsd_wobj_fn_80191628.inc"
 }
 #else
-void fn_80191628(void) { /* TODO */ }
+#pragma optimization_level 1
+HSD_WObj* fn_80191628(void)
+{
+    extern u8 lbl_8036C5F0[];
+    HSD_WObj* wobj;
+
+    if ((wobj = (HSD_WObj*) fn_80193828(
+        (*(HSD_ClassInfo* volatile*) &lbl_8047B218 != NULL)
+            ? lbl_8047B218
+            : (HSD_ClassInfo*) lbl_8036C5F0)) == NULL)
+    {
+        fn_80196E10(lbl_8047D8C8, 0x257, lbl_8047D8D0);
+    }
+    return wobj;
+}
 #endif
 #pragma pop
 
@@ -389,28 +412,7 @@ asm void fn_8019194C(void) {
 }
 #else
 #pragma optimization_level 4
-typedef struct {
-    u32 pad0;
-    f32 x;
-    f32 y;
-    f32 z;
-    void* robj_desc;
-} WObjDesc194C;
-int fn_8019194C(HSD_WObj* wobj, WObjDesc194C* desc) {
-    if (wobj != NULL && (u32)desc + 4 != 0) {
-        wobj->pos_x = desc->x;
-        wobj->pos_y = desc->y;
-        wobj->pos_z = desc->z;
-        wobj->flags |= 0x2;
-        wobj->flags &= ~0x1;
-        if (wobj->robj != NULL) {
-            fn_801AE50C(wobj->robj);
-        }
-        wobj->robj = (HSD_RObj*) fn_801AE5E8(desc->robj_desc);
-        fn_801AEBE4(wobj->robj, desc->robj_desc);
-    }
-    return 0;
-}
+void fn_8019194C(void) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -456,7 +458,7 @@ void fn_80191A34(void) { /* TODO */ }
 extern void fn_801AFE68(void* robj, void* robj_desc);
 extern void* fn_801C2670(void* aobj_desc);
 typedef struct { void* aobj_desc; void* robj_desc; } WObjADesc;
-#if 1
+#if 0
 asm void fn_80191DCC(void) {
 #include "src/hsd/hsd_wobj_fn_80191DCC.inc"
 }
@@ -469,7 +471,7 @@ void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
     if (desc == NULL) {
         return;
     }
-    if (wobj->aobj != NULL) {
+    if (*(volatile u32*) ((u8*) wobj + 0x18) != 0) {
         fn_801C25E4(wobj->aobj);
     }
     wobj->aobj = (HSD_AObj*) fn_801C2670(desc->aobj_desc);
