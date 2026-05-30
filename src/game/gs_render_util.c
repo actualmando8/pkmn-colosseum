@@ -1128,7 +1128,12 @@ void fn_800D2B90(void* arg1) {
  * Address: 0x800D2DE8, Size: 0x14C
  * ================================================================== */
 s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
+    u32 n = count;
     void* sphere;
+    u32 i;
+    void* rays = arg1;
+    void* out = arg2;
+    s32 result;
     void* model;
     sphere = fn_800D7BF8(0);
     model = fn_800D7BF8(2);
@@ -1138,8 +1143,6 @@ s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
     {
         f32 center[7];
         f32 radii[6];
-        u32 i;
-        s32 result;
         center[0] = lbl_8047CA00;
         center[1] = *(f32*)((u8*)model + 0x0);
         center[2] = *(f32*)((u8*)model + 0x8);
@@ -1155,29 +1158,29 @@ s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
         radii[5] = lbl_8047CA0C;
         result = 2;
         i = 0;
-        while (i < count) {
+        while (i < n) {
             f32 test[3];
-            fn_800DFF98(test, sphere, arg1);
+            fn_800DFF98(test, sphere, rays);
             if (test[2] >= *(f32*)((u8*)model + 0x2c)) {
                 f32 val = lbl_8047CA0C;
                 result = 3;
-                *(f32*)((u8*)arg2 + 0x8) = val;
-                *(f32*)((u8*)arg2 + 0x4) = val;
-                *(f32*)((u8*)arg2 + 0x0) = val;
+                *(f32*)((u8*)out + 0x8) = val;
+                *(f32*)((u8*)out + 0x4) = val;
+                *(f32*)((u8*)out + 0x0) = val;
             } else {
                 fn_800BD16C(sphere,
                     center,
                     radii,
-                    *(f32*)((u8*)arg1 + 0x0),
-                    *(f32*)((u8*)arg1 + 0x4),
-                    *(f32*)((u8*)arg1 + 0x8),
-                    arg2,
-                    (u8*)arg2 + 0x4,
-                    (u8*)arg2 + 0x8);
+                    *(f32*)((u8*)rays + 0x0),
+                    *(f32*)((u8*)rays + 0x4),
+                    *(f32*)((u8*)rays + 0x8),
+                    out,
+                    (u8*)out + 0x4,
+                    (u8*)out + 0x8);
             }
             i++;
-            arg1 = (u8*)arg1 + 0xc;
-            arg2 = (u8*)arg2 + 0xc;
+            rays = (u8*)rays + 0xc;
+            out = (u8*)out + 0xc;
         }
         return result;
     }
