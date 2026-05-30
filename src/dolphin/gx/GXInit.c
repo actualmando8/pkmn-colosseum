@@ -206,11 +206,15 @@ void fn_800B760C(void) {
 }
 
 /* fn_800B770C - 0x800B770C | size: 0x8 -- GX Misc / PE / draw sync */
-void fn_800B770C(void) {
+u32 fn_800B770C(void) {
+    extern u32 lbl_8047A9A0;
+    return lbl_8047A9A0;
 }
 
 /* fn_800B7714 - 0x800B7714 | size: 0x8 -- GX Misc / PE / draw sync */
-void fn_800B7714(void) {
+u32 fn_800B7714(void) {
+    extern u32 lbl_8047A9A4;
+    return lbl_8047A9A4;
 }
 
 /* fn_800B771C - 0x800B771C | size: 0x158 -- GX Misc / PE / draw sync */
@@ -574,7 +578,8 @@ void fn_800BAE34(void) {
 }
 
 /* fn_800BAE5C - 0x800BAE5C | size: 0x8 -- GX Geometry / vertex descriptor */
-void fn_800BAE5C(void) {
+u32 fn_800BAE5C(void* p) {
+    return *(u32*)((u8*)p + 0x14);
 }
 
 /* fn_800BAE64 - 0x800BAE64 | size: 0x198 -- GX Texture / TMEM */
