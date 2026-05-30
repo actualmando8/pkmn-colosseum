@@ -1221,6 +1221,8 @@ void* fn_8018F6B4(void* p) {
 #pragma pop
 extern u32 lbl_80478E78;
 extern u32 lbl_80478E7C;
+extern s32 lbl_8047B1F8;
+extern PeopleEntry* lbl_8047B200;
 u8* fn_8018F6CC(u32 index) {
     if (index >= *(u32*)lbl_80478E78) {
         return (u8*)0;
@@ -1230,12 +1232,34 @@ u8* fn_8018F6CC(u32 index) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8018F730(void) {
 #include "src/game/people/people_fn_8018F730.inc"
 }
 #else
-void fn_8018F730(void) { /* TODO */ }
+#pragma optimization_level 4
+u32 fn_8018F730(void) {
+    PeopleEntry* current;
+    PeopleEntry* entry = lbl_8047B200;
+    s32 count = lbl_8047B1F8;
+    u32 total;
+    s32 i;
+
+    total = 0;
+    for (i = 0; i < count; i++) {
+        if (i < 0 || count <= i) {
+            current = NULL;
+        } else {
+            current = entry;
+        }
+        if (current->active != 0) {
+            total += PEOPLE_SPAWN_DATA_SIZE;
+        }
+        entry = (PeopleEntry*)((u8*)entry + PEOPLE_ENTRY_SIZE);
+    }
+
+    return total;
+}
 #endif
 #pragma pop
 #pragma push
