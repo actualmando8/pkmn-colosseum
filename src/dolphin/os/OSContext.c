@@ -331,6 +331,8 @@ _restore_spr:
 #pragma pop
 
 /* OSClearContext */
+#pragma push
+#pragma peephole off
 void OSClearContext(OSContext* context) {
     context->mode  = 0;
     context->state = 0;
@@ -339,6 +341,7 @@ void OSClearContext(OSContext* context) {
         OS_FPUCONTEXT = NULL;
     }
 }
+#pragma pop
 
 /* OSDumpContext */
 void OSDumpContext(OSContext* context) {
