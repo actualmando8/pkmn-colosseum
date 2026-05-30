@@ -806,7 +806,7 @@ s32 fn_800280FC(void* r3) {
     case 2:
         fptr = *(f32**)(r31 + 0x30);
         f0 = lbl_8047B950;
-        f2 = *fptr;
+        f2 = *(volatile f32*)fptr;
         f1 = lbl_8047B934;
         f0 = f2 + f0;
         *fptr = f0;
@@ -2092,12 +2092,11 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
     }
 
     if (ctx[0x1C] == 0 || ctx[0x1C] == 1) {
-        value = (u32)fn_8012A5B0(0, 0xC, 0);
-        fn_80132A38(0x50, (void*)value);
+        fn_80132A38(0x50, fn_8012A5B0(0, 0xC, 0));
         text_id = 0x151;
         x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(fn_800FA444(text_id) >> 16);
         fn_800FB680(x, 0, -1, text_id);
-        return 0;
+        goto done;
     }
 
     switch ((s32)(u32)ctx[0x1C]) {
@@ -2130,6 +2129,7 @@ s32 fn_8002ACB8(void* r3, u8* r4) {
     text_id = 0x153;
     x = (s32)*(s16*)(r4 + 0x54) - (s32)(s16)(fn_800FA444(text_id) >> 16);
     fn_800FB680(x + 6, 0, -1, text_id);
+done:
     return 0;
 }
 #endif
