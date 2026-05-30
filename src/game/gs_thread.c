@@ -778,7 +778,7 @@ extern void fn_800FBB34(void);
 extern void fn_800FBF10(void);
 extern void fn_800FBF74(void);
 extern void fn_800FC2A4(void);
-extern void fn_800FC2A8(void* ptr);
+extern u32 fn_800FC2A8(void* ptr);
 extern void* fn_800FC39C(void* ptr);
 extern s32 fn_800FC518(u32 val);
 extern void fn_800FC528(void);
@@ -2100,7 +2100,7 @@ asm void fn_800FC2A8(void* ptr) {
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-void fn_800FC2A8(void* ptr) {
+u32 fn_800FC2A8(void* ptr) {
     u8* p;
     register s32 offset;
     register u8* head;
@@ -2149,6 +2149,7 @@ tail:
         p += *(u32*)(p + 0x4);
         goto tail;
     }
+    return 0;
 }
 #endif
 #pragma pop
