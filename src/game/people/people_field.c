@@ -1207,7 +1207,8 @@ u8 fn_80162464(void) { return lbl_8047B050; }
 #pragma pop
 extern u32 lbl_8047B024;
 u32 fn_8016246C(u32 index) {
-    return *(u8*)((u8*)lbl_8047B024 + index * 0xF4 + 0xEC) != 0;
+    u8 (*entries)[0xF4] = (u8 (*)[0xF4])lbl_8047B024;
+    return entries[index][0xEC] != 0;
 }
 #pragma push
 #pragma optimization_level 0
@@ -1508,8 +1509,9 @@ asm void fn_80162DAC(void) {
 #include "src/game/people/people_field_fn_80162DAC.inc"
 }
 #else
-void fn_80162DAC(u8 index) {
-    fn_8015D54C(&lbl_80447E60[index * 0xBC]);
+void fn_80162DAC(u8 index, u32 arg1) {
+    extern void fn_8015D54C(u8*, u32);
+    fn_8015D54C(&lbl_80447E60[index * 0xBC], arg1);
 }
 #endif
 #pragma pop
@@ -1521,8 +1523,9 @@ asm void fn_80162DE0(void) {
 #include "src/game/people/people_field_fn_80162DE0.inc"
 }
 #else
-void fn_80162DE0(u8 index) {
-    fn_8015D5F4(&lbl_80447E60[index * 0xBC]);
+void fn_80162DE0(u8 index, u32 arg1) {
+    extern void fn_8015D5F4(u8*, u32);
+    fn_8015D5F4(&lbl_80447E60[index * 0xBC], arg1);
 }
 #endif
 #pragma pop
@@ -2080,9 +2083,9 @@ u32 fn_80164148(u32 d) {
     fn_800AE93C(lbl_804504A0);
     lbl_8047B088 = 0;
     fn_80164328();
-    if (lbl_8047B088 != 0) {
-        fn_80164360();
+    while (*(volatile u32*)&lbl_8047B088 == 0) {
     }
+    fn_80164360();
     return 1;
 }
 #endif
@@ -2128,12 +2131,16 @@ asm void fn_801642AC(void) {
 u32 fn_801642AC(void) {
     extern u32 OSGetTick(void);
     extern u32 lbl_8047B08C;
-    u32 tick = OSGetTick();
-    u32 bus_clock = *(volatile u32*)0x800000F8;
-    u32 prev = lbl_8047B08C;
-    u32 divisor = __mulhwu(0x431BDE83u, bus_clock >> 2) >> 15;
-    tick -= prev;
-    return (tick << 3) / divisor;
+    u32 tick;
+    u32 divisor;
+    u32 prev;
+    tick = OSGetTick();
+    divisor = *(volatile u32*)0x800000F8;
+    prev = lbl_8047B08C;
+    divisor = __mulhwu(0x431BDE83u, divisor >> 2);
+    tick = tick - prev;
+    tick = tick << 3;
+    return tick / (divisor >> 15);
 }
 #endif
 #pragma pop
