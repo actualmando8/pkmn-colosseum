@@ -1028,12 +1028,20 @@ void fn_8017C8FC(void) { /* TODO: match -- 1408 bytes at 0x8017C8FC */ }
 /* 0x8017CE7C | 0x4C */
 extern void fn_8017D960();
 extern void fn_8017DAB8();
-#if 1
+#if 0
 asm void fn_8017CE7C(void) {
 #include "src/game/fsys/fsys_file_fn_8017CE7C.inc"
 }
 #else
-void fn_8017CE7C(void) { /* TODO: match -- 76 bytes at 0x8017CE7C */ }
+#pragma optimization_level 0
+u32 fn_8017CE7C(FSYSSlot* slot) {
+    if ((s32)slot->loadMode == 3) {
+        fn_8017D960(slot);
+    } else {
+        fn_8017DAB8(slot);
+    }
+    return 1;
+}
 #endif
 
 /* 0x8017CED8 | 0x4C8 */
@@ -1084,12 +1092,23 @@ s32 fn_8017D3D4(u32 arg) {
 /* 0x8017D624 | 0x68 */
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;
-#if 1
+extern void fn_8017F800();
+#if 0
 asm void fn_8017D624(void) {
 #include "src/game/fsys/fsys_file_fn_8017D624.inc"
 }
 #else
-void fn_8017D624(void) { /* TODO: match -- 104 bytes at 0x8017D624 */ }
+#pragma optimization_level 0
+void fn_8017D624(void) {
+    FSYSFileHandle* table = (FSYSFileHandle*)lbl_8047B1B8;
+    s32 i;
+
+    for (i = 0; i < (s32)lbl_8047B1BC; i++) {
+        fn_8017F800(table[i].handleID);
+        table[i].handleID = -1;
+    }
+    lbl_8047B1BC = 0;
+}
 #endif
 
 /* 0x8017D68C | 0x174 */
