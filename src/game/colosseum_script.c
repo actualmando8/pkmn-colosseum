@@ -22965,10 +22965,10 @@ void fn_8021A984(void)
     extern u32 fn_80203B5C();
     extern u8 fn_802062FC();
     extern u8 fn_80207AE0();
-  u16 uVar4;
   u32 uVar1;
   u32 uVar2;
   u32 sVar3;
+  u32 uVar4;
   u8 cVar6;
   u8 cVar5;
 
@@ -22990,7 +22990,7 @@ void fn_8021A984(void)
         if ((sVar3 & 0xffff) != 8) {
           cVar6 = fn_802026E4(uVar1,0x20);
           if ((cVar6 == 0) && (cVar6 = fn_802026E4(uVar1,0x21), cVar6 == 0)) {
-            uVar4 = fn_80203B5C(uVar1,0x10);
+            uVar4 = fn_80203B5C(uVar1,0x10) & 0xffff;
             goto LAB_00217a84;
           }
         }
@@ -23004,7 +23004,7 @@ LAB_00217a84:
     if (cVar5 == 0) {
       cVar5 = fn_802026E4(uVar1,0x20);
       if ((cVar5 == 0) && (cVar5 = fn_802026E4(uVar1,0x21), cVar5 == 0)) {
-        uVar4 = fn_80203B5C(uVar1,0x10);
+        uVar4 = fn_80203B5C(uVar1,0x10) & 0xffff;
         goto LAB_00217ae0;
       }
     }
