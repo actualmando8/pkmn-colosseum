@@ -5744,18 +5744,20 @@ asm void fn_80134274(void) {
 #else
 #pragma optimization_level 4
 #pragma push
-#pragma peephole off
+#pragma scheduling on
 u32 fn_80134274(void) {
+    int new_var;
     extern u32 fn_800057A8(void);
     s32 val = (s32)fn_800057A8();
     if (val == 1) goto _ret2;
     if (val >= 1) goto _chk3;
+    new_var = 2;
     goto _ret2;
 _chk3:
     if (val >= 3) goto _ret2;
     return 0x115;
 _ret2:
-    return 2;
+    return new_var;
 }
 #pragma pop
 #endif

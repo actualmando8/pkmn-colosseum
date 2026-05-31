@@ -1285,7 +1285,7 @@ void fn_8018F87C(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
 asm void fn_8018FC50(void) {

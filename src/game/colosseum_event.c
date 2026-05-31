@@ -7029,19 +7029,25 @@ u32 fn_8020BFA0(void* ctx) {
 
 /* 0x8020C0C0 | size: 0x24 | small */
 /* fn_8020C0C0 | Size: 0x24 | Call fn_8022D084 and return 1 */
+#pragma push
+#pragma peephole on
 s32 fn_8020C0C0(void) {
     extern void fn_8022D084(void);
     fn_8022D084();
     return 1;
 }
+#pragma pop
 
 /* 0x8020C0E4 | size: 0x24 | small */
 /* fn_8020C0E4 | Size: 0x24 | Call fn_8022E410 and return 1 */
+#pragma push
+#pragma peephole on
 s32 fn_8020C0E4(void) {
     extern void fn_8022E410(void);
     fn_8022E410();
     return 1;
 }
+#pragma pop
 
 /* fn_8020C108 | Size: 0x54 | Apply effect with optional data parameter */
 s32 fn_8020C108(void* ctx, u32 unused, u8* data) {
