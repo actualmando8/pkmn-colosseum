@@ -345,10 +345,11 @@ asm void fn_80140A9C(void) {
 #else
 #pragma optimization_level 4
 void fn_80140A9C(u32* a, u32* b) {
+    volatile u32 new_var;
     u32 tmp;
     if (a == NULL) return;
     if (b == NULL) return;
-    tmp = *a;
+    tmp = (new_var = *a);
     *a = *b;
     *b = tmp;
 }
