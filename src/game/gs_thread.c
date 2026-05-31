@@ -2397,7 +2397,7 @@ asm s32 fn_800FDFE4(const void* str) {
 #include "src/game/gs_thread_fn_800FDFE4.inc"
 }
 #else
-#pragma optimization_level 2
+#pragma optimization_level 4
 s32 fn_800FDFE4(const void* str) {
     s32 r;
     r = fn_800FE010(str);
