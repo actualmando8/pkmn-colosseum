@@ -100,11 +100,14 @@ extern u32   fn_8001E200(u32 msgBank, u32 msgId);
 extern void fn_800FF730(u32);
 extern void fn_8011288C(u32, u32);
 
+#pragma push
+#pragma peephole off
 void fn_8004BE0C(void) {
     fn_800FF730(0x392);
     fn_8011288C(0, 0);
     fn_800F0308();
 }
+#pragma pop
 
 /* 0x8004C120 | size: 0x1B8 */
 asm void fn_8004C120(void) { nofralloc

@@ -2057,10 +2057,12 @@ asm void fn_80143ABC(void) {
 }
 #else
 int fn_80143ABC(void* obj, u32 index) {
+    s8* new_var;
     u32 masked_index;
     if (obj == NULL) return 0;
     masked_index = (u16)index;
     if (masked_index >= 0x19) return 0;
-    return (int)(s8)*((s8*)obj + masked_index + 4);
+    new_var = (s8*)obj;
+    return (int)(s8)*(new_var + masked_index + 4);
 }
 #endif
