@@ -2169,11 +2169,14 @@ asm void fn_800084C0(void) {
 #include "src/game/gs_task_fn_800084C0.inc"
 }
 #else
+#pragma push
+#pragma peephole off
 void* fn_800084C0(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id > 0xb) return fn_800FA280(0xEB63);
     return fn_800FA280((u32)fn_8011BA0C((u8)id));
 }
+#pragma pop
 #endif
 
 /* fn_80008518 - 0x80008518 | size: 0x64 */
