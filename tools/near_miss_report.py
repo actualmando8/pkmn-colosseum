@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """List functions at 80-99.99% match, sorted by file. Easy-win candidates."""
 import json
-import subprocess
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -9,11 +9,13 @@ ROOT = Path(__file__).resolve().parent.parent
 TARGET = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE = ROOT / "build" / "GC6E01" / "base"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+sys.path.insert(0, str(ROOT / "tools"))
+from headless_subprocess import run as run_tool  # noqa: E402
 
 near = defaultdict(list)
 for o in sorted(BASE.rglob("*.o")):
     rel = o.relative_to(BASE).as_posix()
-    r = subprocess.run(
+    r = run_tool(
         [str(OBJDIFF), "diff", "-1", str(TARGET), "-2", str(o), "-o", "-",
          "--format", "json", "-c", "ppc.calculatePoolRelocations=false"],
         capture_output=True, text=True,

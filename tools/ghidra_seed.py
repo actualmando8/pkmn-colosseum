@@ -32,6 +32,7 @@ OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 sys.path.insert(0, str(ROOT / "tools"))
 import compile_check          # noqa: E402
 from dol_addr import va_to_off  # noqa: E402
+from headless_subprocess import run as run_tool  # noqa: E402
 
 HDR = re.compile(r"/\*\s*[-=]+\s*(FUN_[0-9A-Fa-f]+|fn_[0-9A-Fa-f]+)\s+"
                  r"addr=0x([0-9A-Fa-f]+)\s+size=0x([0-9A-Fa-f]+)")
@@ -62,7 +63,7 @@ def file_targets(src, max_pct):
     base_o = compile_check.source_to_base_obj(Path(src).resolve())
     if not base_o.exists():
         compile_check.compile_source(Path(src).resolve())
-    r = subprocess.run(
+    r = run_tool(
         [str(OBJDIFF), "diff", "-1", str(TARGET_O), "-2", str(base_o),
          "-o", "-", "--format", "json",
          "-c", "ppc.calculatePoolRelocations=false"],

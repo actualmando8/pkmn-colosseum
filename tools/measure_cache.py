@@ -12,12 +12,14 @@ only the objects that actually changed.
 """
 
 import json
-import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 CACHE = ROOT / "build" / ".measure_cache.json"
+sys.path.insert(0, str(ROOT / "tools"))
+from headless_subprocess import run as run_tool  # noqa: E402
 
 _MEM = None
 
@@ -44,7 +46,7 @@ def flush():
 
 
 def _run_objdiff(target_o: Path, base_o: Path):
-    out = subprocess.run(
+    out = run_tool(
         [str(OBJDIFF), "diff", "-1", str(target_o), "-2", str(base_o),
          "-o", "-", "--format", "json",
          "-c", "ppc.calculatePoolRelocations=false"],

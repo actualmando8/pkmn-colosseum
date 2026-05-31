@@ -20,9 +20,12 @@ where <relative_path> mirrors the source file path under src/.
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+from headless_subprocess import run as run_headless
 
 # ============================================================================
 # Project layout
@@ -42,6 +45,11 @@ MWCC_DEFAULT = MWCC_BASE / "mwcceppc.exe"
 MWCC_GC_DIR = MWCC_BASE / "GC"
 OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
 OBJDIFF_JSON = PROJECT_ROOT / "objdiff.json"
+
+
+def run_tool(cmd, **kwargs):
+    """Run a tool subprocess without opening extra windows on Windows."""
+    return run_headless(cmd, **kwargs)
 
 # ============================================================================
 # Compile configuration (loaded from compile_config.json)
@@ -247,7 +255,9 @@ def find_target_obj(src_path: Path) -> Path:
                 if unit_name == rel_str or unit_name.endswith("/" + stem):
                     target = unit.get("target_path")
                     if target:
-                        return PROJECT_ROOT / target
+                        candidate = PROJECT_ROOT / target
+                        if candidate.exists():
+                            return candidate
         except (json.JSONDecodeError, KeyError):
             pass
 
@@ -335,7 +345,7 @@ def compile_source(src_path: Path, compiler_version: str = None,
         print(f"  Command:  {' '.join(cmd)}")
         print(f"  Output:   {out_obj}")
 
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(PROJECT_ROOT))
+    result = run_tool(cmd, capture_output=True, text=True, cwd=str(PROJECT_ROOT))
 
     if result.returncode != 0:
         print(f"COMPILE FAILED (exit code {result.returncode})")
@@ -363,9 +373,201 @@ def compile_source(src_path: Path, compiler_version: str = None,
 # Diffing with objdiff-cli
 # ============================================================================
 
-def run_diff(src_path: Path, symbol: str = None, compiler_version: str = None,
-             verbose: bool = False):
-    """Compile a source file and diff it against the target object."""
+
+OBJDIFF_CONFIG = "ppc.calculatePoolRelocations=false"
+
+
+def _run_objdiff_json(target_obj: Path, base_obj: Path, symbol: str = None,
+                      timeout: int = 120) -> dict:
+    """Run objdiff in non-interactive JSON mode."""
+    cmd = [
+        str(OBJDIFF_CLI), "diff",
+        "-1", str(target_obj),
+        "-2", str(base_obj),
+        "-o", "-",
+        "--format", "json",
+        "-c", OBJDIFF_CONFIG,
+    ]
+    if symbol:
+        cmd.append(symbol)
+
+    result = run_tool(
+        cmd, capture_output=True, text=True, cwd=str(PROJECT_ROOT),
+        timeout=timeout,
+    )
+    if result.returncode != 0:
+        print(f"objdiff error: {result.stderr}")
+        return None
+
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def _summarize_symbol(diff_json: dict, symbol: str) -> dict:
+    """Extract one symbol's match summary from objdiff JSON."""
+    result = {
+        "match_percent": 0.0,
+        "total_instructions": 0,
+        "matched_instructions": 0,
+        "mismatches": 0,
+        "symbol_found": False,
+    }
+    if not diff_json:
+        return result
+
+    for entry in diff_json.get("right", {}).get("symbols", []):
+        if entry.get("name") != symbol:
+            continue
+        if entry.get("kind") not in (None, "SYMBOL_FUNCTION"):
+            continue
+
+        result["symbol_found"] = True
+        instructions = entry.get("instructions", [])
+        if instructions:
+            matched = 0
+            for instr in instructions:
+                diff_kind = instr.get("diff_kind")
+                if diff_kind is None or diff_kind == "DIFF_NONE":
+                    matched += 1
+            total = len(instructions)
+            result["total_instructions"] = total
+            result["matched_instructions"] = matched
+            result["mismatches"] = total - matched
+            result["match_percent"] = (
+                100.0 * matched / total if total else 0.0
+            )
+        else:
+            result["match_percent"] = entry.get("match_percent", 0.0)
+        return result
+
+    return result
+
+
+def _list_function_symbols(diff_json: dict) -> list:
+    """Return function symbols present on the compiled/right side."""
+    out = []
+    if not diff_json:
+        return out
+    for entry in diff_json.get("right", {}).get("symbols", []):
+        name = entry.get("name", "")
+        kind = entry.get("kind")
+        if not name or name.startswith("[") or kind == "SYMBOL_SECTION":
+            continue
+        if kind and kind != "SYMBOL_FUNCTION":
+            continue
+        if entry.get("instructions"):
+            out.append(name)
+    return out
+
+
+def _active_source_lines(src_path: Path) -> list:
+    """Return source lines active under the local #if 0/#if 1 wrapper style."""
+    lines = src_path.read_text(errors="ignore").splitlines()
+    active_stack = [True]
+    frames = []
+    active_lines = []
+
+    for line_no, line in enumerate(lines, start=1):
+        stripped = line.strip()
+        if stripped.startswith("#if "):
+            expr = stripped[3:].strip()
+            parent_active = active_stack[-1]
+            if expr == "0":
+                cond_active = False
+            elif expr == "1":
+                cond_active = True
+            else:
+                cond_active = parent_active
+            frames.append((parent_active, cond_active))
+            active_stack.append(parent_active and cond_active)
+            continue
+        if stripped == "#else" and frames:
+            parent_active, cond_active = frames[-1]
+            active_stack[-1] = parent_active and not cond_active
+            continue
+        if stripped == "#endif" and frames:
+            frames.pop()
+            active_stack.pop()
+            continue
+        if active_stack[-1]:
+            active_lines.append((line_no, line))
+
+    return active_lines
+
+
+def _active_asm_symbols(src_path: Path, symbols: list) -> list:
+    """Return requested symbols whose active definition is still an asm wrapper."""
+    wanted = set(symbols or [])
+    if not wanted:
+        return []
+
+    patterns = {
+        symbol: re.compile(rf"^\s*asm\b.*\b{re.escape(symbol)}\s*\(")
+        for symbol in wanted
+    }
+    active_asm = []
+    for _, line in _active_source_lines(src_path):
+        for symbol, pattern in patterns.items():
+            if pattern.search(line):
+                active_asm.append(symbol)
+    return sorted(set(active_asm))
+
+
+def _active_c_symbols(src_path: Path, symbols: list) -> list:
+    """Return requested symbols that have an active non-asm function body."""
+    wanted = set(symbols or [])
+    if not wanted:
+        return []
+
+    active_lines = _active_source_lines(src_path)
+    found = set()
+    for idx, (_, line) in enumerate(active_lines):
+        stripped = line.strip()
+        if (not stripped or stripped.startswith("extern ")
+                or stripped.startswith("asm ") or stripped.startswith("typedef ")):
+            continue
+
+        for symbol in wanted:
+            if symbol in found or not re.search(rf"\b{re.escape(symbol)}\s*\(", stripped):
+                continue
+            if ";" in stripped:
+                continue
+            if "{" in stripped:
+                found.add(symbol)
+                continue
+
+            for _, next_line in active_lines[idx + 1:]:
+                next_stripped = next_line.strip()
+                if not next_stripped:
+                    continue
+                if next_stripped.startswith("#pragma"):
+                    continue
+                if next_stripped.startswith("{"):
+                    found.add(symbol)
+                break
+
+    return sorted(found)
+
+
+def run_diff_interactive(src_path: Path, symbol: str = None,
+                         compiler_version: str = None,
+                         verbose: bool = False):
+    """Compile a source file and open objdiff's interactive TUI."""
+    if os.environ.get("PKMN_ALLOW_INTERACTIVE_OBJD") != "1":
+        print(
+            "ERROR: interactive objdiff is disabled for automation. "
+            "Set PKMN_ALLOW_INTERACTIVE_OBJD=1 to open the TUI explicitly."
+        )
+        return 1
+    if os.name == "nt" and os.environ.get("PKMN_ALLOW_WINDOW_POPUPS") != "1":
+        print(
+            "ERROR: interactive objdiff windows are disabled on Windows. "
+            "Set PKMN_ALLOW_WINDOW_POPUPS=1 only when you explicitly want a popup."
+        )
+        return 1
+
     base_obj = compile_source(src_path, compiler_version=compiler_version,
                               verbose=verbose)
     target_obj = find_target_obj(src_path)
@@ -398,6 +600,102 @@ def run_diff(src_path: Path, symbol: str = None, compiler_version: str = None,
     return result.returncode
 
 
+def run_diff_symbols(src_path: Path, symbols: list = None,
+                     compiler_version: str = None, whole_file: bool = False,
+                     verbose: bool = False, timeout: int = 120) -> dict:
+    """Compile once, then measure one or more symbols non-interactively.
+
+    By default this runs one objdiff JSON pass per requested symbol after a
+    single compile. Use `whole_file=True` to run one full-object objdiff pass
+    and parse all symbols from that JSON.
+    """
+    symbols = list(symbols or [])
+    base_obj = compile_source(src_path, compiler_version=compiler_version,
+                              verbose=verbose)
+    target_obj = find_target_obj(src_path)
+
+    result = {
+        "source": str(src_path),
+        "target_obj": str(target_obj),
+        "base_obj": str(base_obj),
+        "symbols": {},
+        "active_asm_symbols": _active_asm_symbols(src_path, symbols),
+        "active_c_symbols": _active_c_symbols(src_path, symbols),
+        "error": None,
+    }
+
+    if not target_obj.exists():
+        result["error"] = f"target object not found: {target_obj}"
+        return result
+    if not OBJDIFF_CLI.exists():
+        result["error"] = f"objdiff-cli not found: {OBJDIFF_CLI}"
+        return result
+
+    if whole_file or not symbols:
+        diff_json = _run_objdiff_json(target_obj, base_obj, timeout=timeout)
+        if diff_json is None:
+            result["error"] = "objdiff failed"
+            return result
+        if not symbols:
+            symbols = _list_function_symbols(diff_json)
+        for symbol in symbols:
+            result["symbols"][symbol] = _summarize_symbol(diff_json, symbol)
+        return result
+
+    for symbol in symbols:
+        diff_json = _run_objdiff_json(
+            target_obj, base_obj, symbol=symbol, timeout=timeout,
+        )
+        if diff_json is None:
+            result["symbols"][symbol] = {
+                "match_percent": 0.0,
+                "total_instructions": 0,
+                "matched_instructions": 0,
+                "mismatches": 0,
+                "symbol_found": False,
+                "error": "objdiff failed",
+            }
+            continue
+        result["symbols"][symbol] = _summarize_symbol(diff_json, symbol)
+
+    return result
+
+
+def print_diff_summary(result: dict) -> None:
+    """Print a compact non-interactive objdiff summary."""
+    if result.get("error"):
+        print(f"ERROR: {result['error']}")
+        return
+    print(f"Source: {Path(result['source']).relative_to(PROJECT_ROOT)}")
+    print(f"Base:   {Path(result['base_obj']).relative_to(PROJECT_ROOT)}")
+    print(f"Target: {Path(result['target_obj']).relative_to(PROJECT_ROOT)}")
+    print()
+    print(f"{'Function':<35} {'Match':>9} {'Instr':>11} {'Mismatches':>11}")
+    print(f"{'-'*35} {'-'*9} {'-'*11} {'-'*11}")
+    for symbol, info in result["symbols"].items():
+        if not info.get("symbol_found"):
+            match = "NO-MATCH"
+            instr = "-"
+            mismatches = "-"
+        else:
+            match = f"{info['match_percent']:.4f}%"
+            instr = (f"{info['matched_instructions']}/"
+                     f"{info['total_instructions']}")
+            mismatches = str(info["mismatches"])
+        print(f"{symbol:<35} {match:>9} {instr:>11} {mismatches:>11}")
+
+
+def run_diff(src_path: Path, symbol: str = None, compiler_version: str = None,
+             verbose: bool = False):
+    """Compile a source file and print a non-interactive objdiff summary."""
+    symbols = [symbol] if symbol else []
+    result = run_diff_symbols(src_path, symbols=symbols,
+                              compiler_version=compiler_version,
+                              whole_file=not symbols, verbose=verbose)
+    print_diff_summary(result)
+    return 1 if result.get("error") else 0
+
+
 def run_diff_json(src_path: Path, symbol: str = None,
                   compiler_version: str = None) -> dict:
     """Compile and diff, returning JSON results for programmatic use."""
@@ -413,12 +711,13 @@ def run_diff_json(src_path: Path, symbol: str = None,
         "-2", str(base_obj),
         "-o", "-",
         "--format", "json",
+        "-c", OBJDIFF_CONFIG,
     ]
     if symbol:
         cmd.append(symbol)
 
-    result = subprocess.run(cmd, capture_output=True, text=True,
-                            cwd=str(PROJECT_ROOT))
+    result = run_tool(cmd, capture_output=True, text=True,
+                      cwd=str(PROJECT_ROOT))
     if result.returncode != 0:
         print(f"objdiff error: {result.stderr}")
         return None
@@ -475,6 +774,8 @@ Examples:
   python tools/compile_check.py src/game/main.c
   python tools/compile_check.py src/game/main.c --diff
   python tools/compile_check.py src/game/main.c --diff --symbol main
+  python tools/compile_check.py src/game/main.c --diff --symbols fn_A fn_B
+  python tools/compile_check.py src/game/main.c --diff --interactive
   python tools/compile_check.py src/game/main.c --compiler-version 1.1
   python tools/compile_check.py --all
         """,
@@ -490,11 +791,36 @@ Examples:
     )
     parser.add_argument(
         "--diff", action="store_true",
-        help="After compiling, run objdiff-cli interactively"
+        help="After compiling, print a non-interactive objdiff summary"
+    )
+    parser.add_argument(
+        "--interactive", action="store_true",
+        help="With --diff, open objdiff-cli's interactive TUI"
     )
     parser.add_argument(
         "--symbol", "-s",
         help="Specific function symbol to diff"
+    )
+    parser.add_argument(
+        "--symbols", nargs="+",
+        help="Specific function symbols to diff after a single compile"
+    )
+    parser.add_argument(
+        "--whole-file", action="store_true",
+        help="With --diff, use one full-object objdiff JSON pass"
+    )
+    parser.add_argument(
+        "--json", action="store_true",
+        help="With --diff, print machine-readable JSON"
+    )
+    parser.add_argument(
+        "--require-match", action="store_true",
+        help="With --diff and symbols, exit nonzero unless all symbols are "
+             "100%% active C matches"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=120,
+        help="Objdiff timeout in seconds for non-interactive --diff"
     )
     parser.add_argument(
         "--compiler-version", "-cv", default=None,
@@ -522,9 +848,56 @@ Examples:
         src_path = PROJECT_ROOT / src_path
 
     if args.diff:
-        return run_diff(src_path, symbol=args.symbol,
-                        compiler_version=args.compiler_version,
-                        verbose=args.verbose)
+        if args.interactive:
+            return run_diff_interactive(
+                src_path, symbol=args.symbol,
+                compiler_version=args.compiler_version,
+                verbose=args.verbose,
+            )
+
+        symbols = []
+        if args.symbol:
+            symbols.append(args.symbol)
+        if args.symbols:
+            symbols.extend(args.symbols)
+
+        result = run_diff_symbols(
+            src_path, symbols=symbols, compiler_version=args.compiler_version,
+            whole_file=args.whole_file or not symbols, verbose=args.verbose,
+            timeout=args.timeout,
+        )
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print_diff_summary(result)
+
+        if result.get("error"):
+            return 1
+        if args.require_match and symbols:
+            active_asm_symbols = result.get("active_asm_symbols", [])
+            if active_asm_symbols:
+                joined = ", ".join(active_asm_symbols)
+                print(
+                    "ERROR: --require-match refuses active asm wrappers: "
+                    f"{joined}"
+                )
+                return 1
+            missing_active_c = sorted(
+                set(symbols) - set(result.get("active_c_symbols", []))
+            )
+            if missing_active_c:
+                joined = ", ".join(missing_active_c)
+                print(
+                    "ERROR: --require-match requires active C definitions: "
+                    f"{joined}"
+                )
+                return 1
+            for info in result["symbols"].values():
+                if (not info.get("symbol_found")
+                        or info.get("match_percent") != 100.0
+                        or info.get("mismatches") != 0):
+                    return 1
+        return 0
     else:
         compile_source(src_path, compiler_version=args.compiler_version,
                        verbose=args.verbose)

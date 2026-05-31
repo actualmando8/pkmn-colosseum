@@ -217,6 +217,45 @@ CW GC/1.3 at -O4 assigns callee-saved registers (r31 down to r14) by
 | Short-lived var in callee-save | Use inner `{ }` block to keep it in volatile reg |
 | Param used only once | Don't save to local — CW keeps it in r3/r4 |
 
+### Two layers — REG-ALLOC vs SCHEDULING (2026-05-28 research)
+
+A near-miss in a loop function is usually NOT one problem but TWO independent
+layers. Separate them before grinding:
+
+**Layer 1 — register assignment (which var → r31/r30/r29…). SOMETIMES controllable.**
+For **genuinely tied-weight** loop variables, the saved register is assigned by
+order of first definition — reordering declarations can shift the map. Worked on
+fn_800E5790 (single-loop pointer walk): declaring `ptr, i, n` produced the target's
+map (ptr=r31, counter=r29, bound=r30).
+
+⚠️ **BUT the lever is UNRELIABLE — it is often completely inert.** On fn_800E3604
+(pure register permutation, 87/87 instr, 10 reg-only diffs) declaration reordering
+AND a live-range split BOTH produced byte-identical output — zero effect. There the
+allocation is **weight-dominated**: CW gave r31 to the loop pointer (5 uses), but
+the TARGET gave r31 to a loop-INVARIANT compare value (1 use) that inherits r31 from
+a dead pre-loop variable's range. That coloring choice is NOT reachable from C. So:
+try declaration reorder, but if the diff is byte-identical after, the allocator is
+weight/interference-pinned and the lever won't move it — stop.
+
+**Layer 2 — instruction scheduling (ORDER of independent ops: the prologue loads,
+the loop's `addi` increments). NOT reliably controllable from C.**
+Even with Layer-1 correct, CW's scheduler may order independent ops differently
+from the target — e.g. it increments the loop COUNTER before the POINTER (to
+shorten the path to the exit `cmpw`), whereas the target increments the POINTER
+first (pipelining the next-iter load). `#pragma scheduling off` makes it globally
+WORSE, not better. No source lever reliably flips it.
+
+**The killer tension:** declaration order drives BOTH the register assignment AND
+the prologue load order — and the target frequently wants them OPPOSITE. Declaring
+`ptr` first gives `ptr=r31` (good) but then CW schedules the `ptr` load LAST in the
+prologue, while the target loads it FIRST. You can satisfy reg-alloc OR load-order
+via declaration order, not both. This is why the index→pointer loop families
+(gs_material fn_800E5550 twins ×4, fn_800E5790; gs_field_world idx/base clusters)
+get stuck at ~85-99% — the registers can be made right, but the residual
+scheduler ordering can't. **Triage rule:** if after fixing Layer 1 the only
+remaining diffs are reordered-but-otherwise-identical independent instructions,
+it's a Layer-2 scheduler wall — stop, it won't reach 100% from C.
+
 ---
 
 ## 6. SDA / Small Data Area

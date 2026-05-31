@@ -38,7 +38,7 @@ sys.path.insert(0, str(TOOLS_DIR))
 from compile_check import (
     compile_source, source_to_base_obj, find_target_obj,
     run_diff_json, DEFAULT_COMPILER_VERSION, get_file_compiler_version,
-    PROJECT_ROOT as _
+    PROJECT_ROOT as _, run_tool
 )
 from match_test import (
     parse_symbols, extract_match_info, Symbol
@@ -134,7 +134,7 @@ def scan_one_file(src_path: Path, symbols: list) -> dict:
             sym.name,
         ]
         try:
-            res = subprocess.run(
+            res = run_tool(
                 cmd, capture_output=True, text=True,
                 cwd=str(PROJECT_ROOT), timeout=60
             )

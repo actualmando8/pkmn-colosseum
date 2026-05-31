@@ -7,13 +7,15 @@ generates self-contained decomp prompts, and routes to the appropriate
 model backend (free cloud, local GPU, or Claude).
 
 Usage:
-    python tools/decomp_scheduler.py --scan          # Scan and classify all wrappers
+    python tools/decomp_scheduler.py --scan          # Scan wrappers; write report only
+    python tools/decomp_scheduler.py --scan --update-queue  # Rewrite work_queue.json
     python tools/decomp_scheduler.py --generate N    # Generate N task prompts
     python tools/decomp_scheduler.py --status        # Show progress
     python tools/decomp_scheduler.py --verify FILE   # Verify a decompiled function
 """
 
 import argparse
+import datetime
 import json
 import os
 import re
@@ -27,6 +29,7 @@ QUEUE_FILE = WORK_DIR / "work_queue.json"
 PROGRESS_FILE = WORK_DIR / "progress.json"
 LOCK_DIR = WORK_DIR / "locks"
 PROMPTS_DIR = WORK_DIR / "prompts"
+REPORTS_DIR = WORK_DIR / "reports"
 
 SDA_BASE = 0x80480820
 SDA2_BASE = 0x804836A0
@@ -53,7 +56,7 @@ TIER_BACKENDS = {
 
 
 def ensure_dirs():
-    for d in [WORK_DIR, LOCK_DIR, PROMPTS_DIR]:
+    for d in [WORK_DIR, LOCK_DIR, PROMPTS_DIR, REPORTS_DIR]:
         d.mkdir(parents=True, exist_ok=True)
 
 
@@ -142,6 +145,34 @@ def load_queue():
 
 def save_queue(queue):
     QUEUE_FILE.write_text(json.dumps(queue, indent=2))
+
+
+def save_scan_report(wrappers, report_path=None):
+    """Write scan output to a separate report file, not the work queue."""
+    if report_path:
+        path = Path(report_path)
+        if not path.is_absolute():
+            path = ROOT / path
+    else:
+        stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        path = REPORTS_DIR / f"work_queue_scan-{stamp}.json"
+
+    by_tier = {}
+    by_file = {}
+    for w in wrappers:
+        by_tier[w["tier"]] = by_tier.get(w["tier"], 0) + 1
+        by_file[w["file"]] = by_file.get(w["file"], 0) + 1
+
+    report = {
+        "generated_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        "total_remaining_wrappers": len(wrappers),
+        "by_tier": by_tier,
+        "by_file": dict(sorted(by_file.items(), key=lambda kv: (-kv[1], kv[0]))),
+        "wrappers": wrappers,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return path
 
 
 def acquire_lock(fn_name):
@@ -358,7 +389,9 @@ def cmd_scan(args):
     completed_fns = set(progress["completed"])
     wrappers = [w for w in wrappers if w["function"] not in completed_fns]
 
-    save_queue(wrappers)
+    report_path = save_scan_report(wrappers, args.report)
+    if args.update_queue:
+        save_queue(wrappers)
 
     # Print summary
     by_tier = {}
@@ -371,6 +404,11 @@ def cmd_scan(args):
     print(f"DECOMP WORK QUEUE SCAN")
     print(f"{'='*60}")
     print(f"Total remaining wrappers: {len(wrappers)}")
+    print(f"Report: {report_path.relative_to(ROOT)}")
+    if args.update_queue:
+        print(f"Queue updated: {QUEUE_FILE.relative_to(ROOT)}")
+    else:
+        print("Queue not updated. Pass --update-queue to rewrite work_queue.json.")
     print()
     print("By complexity tier:")
     for tier in [TIER_SIMPLE, TIER_MEDIUM, TIER_COMPLEX, TIER_HARD]:
@@ -510,6 +548,14 @@ def cmd_status(args):
 def main():
     parser = argparse.ArgumentParser(description="Decomp Task Scheduler")
     parser.add_argument("--scan", action="store_true", help="Scan and classify all wrappers")
+    parser.add_argument(
+        "--report",
+        help="Write --scan JSON report here (default: tools/decomp_work/reports/...)"
+    )
+    parser.add_argument(
+        "--update-queue", action="store_true",
+        help="With --scan, rewrite tools/decomp_work/work_queue.json"
+    )
     parser.add_argument("--generate", type=int, metavar="N", help="Generate N task prompts")
     parser.add_argument("--tier", choices=["simple", "medium", "complex", "hard"],
                        help="Tier for --generate (default: simple)")

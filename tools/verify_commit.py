@@ -37,6 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 sys.path.insert(0, str(ROOT / "tools"))
+from headless_subprocess import run as run_tool  # noqa: E402
 
 # Files a match-improvement commit may NEVER modify.
 TRUTH_DENY = [
@@ -111,7 +112,7 @@ def remeasure(spec):
         base_o = compile_check.compile_source(src_path)
     except SystemExit:
         return (False, f"{fn}: compile FAILED (claimed {claimed}%)")
-    r = subprocess.run(
+    r = run_tool(
         [str(OBJDIFF), "diff", "-1", str(TARGET_O), "-2", str(base_o),
          "-o", "-", "--format", "json",
          "-c", "ppc.calculatePoolRelocations=false"],

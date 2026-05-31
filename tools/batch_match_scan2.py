@@ -25,6 +25,7 @@ OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
 
 sys.path.insert(0, str(TOOLS_DIR))
 from compile_check import compile_source, find_target_obj
+from headless_subprocess import run as run_tool
 
 
 def scan_file(src_path: Path) -> dict:
@@ -62,7 +63,7 @@ def scan_file(src_path: Path) -> dict:
     ]
 
     try:
-        res = subprocess.run(
+        res = run_tool(
             cmd, capture_output=True, text=True,
             cwd=str(PROJECT_ROOT), timeout=180,
         )

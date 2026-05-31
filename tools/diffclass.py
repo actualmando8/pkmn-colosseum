@@ -35,6 +35,7 @@ OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 
 sys.path.insert(0, str(ROOT / "tools"))
 import compile_check  # noqa: E402
+from headless_subprocess import run as run_tool  # noqa: E402
 
 REG = re.compile(r"\b[rf]\d+\b")
 ANON_SDA = re.compile(r"@\d+@sda21|@\d+@(ha|l)\b")
@@ -151,7 +152,7 @@ def fetch(src_path, compile_first):
     base_o = compile_check.source_to_base_obj(Path(src_path).resolve())
     if not base_o.exists():
         sys.exit(f"base .o missing: {base_o} -- run with --compile")
-    r = subprocess.run(
+    r = run_tool(
         [str(OBJDIFF), "diff", "-1", str(TARGET_O), "-2", str(base_o),
          "-o", "-", "--format", "json",
          "-c", "ppc.calculatePoolRelocations=false"],

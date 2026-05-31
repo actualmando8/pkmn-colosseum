@@ -21,6 +21,7 @@ Source file mappings come from objdiff.json and source file annotations.
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -35,6 +36,7 @@ OBJ_DIR = BUILD_DIR / "obj"
 SRC_DIR = PROJECT_ROOT / "src"
 CONFIG_DIR = PROJECT_ROOT / "config" / "GC6E01"
 TOOLS_DIR = PROJECT_ROOT / "tools"
+REPORTS_DIR = PROJECT_ROOT / "tools" / "decomp_work" / "reports"
 
 SYMBOLS_TXT = CONFIG_DIR / "symbols.txt"
 OBJDIFF_CLI = TOOLS_DIR / "objdiff-cli.exe"
@@ -45,7 +47,7 @@ sys.path.insert(0, str(TOOLS_DIR))
 from compile_check import (
     compile_source, source_to_base_obj, find_target_obj,
     run_diff_json, DEFAULT_COMPILER_VERSION, get_file_compiler_version,
-    PROJECT_ROOT as _
+    run_tool, PROJECT_ROOT as _
 )
 
 # ============================================================================
@@ -403,15 +405,15 @@ def test_function(symbol_query: str, compiler_version: str = None,
         "-2", str(base_obj),
         "-o", "-",
         "--format", "json",
+        "-c", "ppc.calculatePoolRelocations=false",
         sym.name,
     ]
 
     if verbose:
         print(f"  Command: {' '.join(cmd)}")
 
-    import subprocess
-    result = subprocess.run(cmd, capture_output=True, text=True,
-                            cwd=str(PROJECT_ROOT))
+    result = run_tool(cmd, capture_output=True, text=True,
+                      cwd=str(PROJECT_ROOT))
 
     if result.returncode != 0:
         # objdiff may fail if symbol isn't in the base .o, which is expected
@@ -426,9 +428,10 @@ def test_function(symbol_query: str, compiler_version: str = None,
             "-2", str(base_obj),
             "-o", "-",
             "--format", "json",
+            "-c", "ppc.calculatePoolRelocations=false",
         ]
-        result = subprocess.run(cmd_nosym, capture_output=True, text=True,
-                                cwd=str(PROJECT_ROOT))
+        result = run_tool(cmd_nosym, capture_output=True, text=True,
+                          cwd=str(PROJECT_ROOT))
 
     diff_json = None
     if result.returncode == 0 and result.stdout.strip():
@@ -479,7 +482,9 @@ def test_function(symbol_query: str, compiler_version: str = None,
 
 
 def scan_source_file(src_path: Path, compiler_version: str = None,
-                     verbose: bool = False):
+                     verbose: bool = False, max_symbols: int = 40,
+                     allow_long_scan: bool = False, report: str = None,
+                     timeout: int = 60):
     """Compile a source file and test all functions defined in it."""
     src_path = Path(src_path).resolve()
     if not src_path.exists():
@@ -537,6 +542,10 @@ def scan_source_file(src_path: Path, compiler_version: str = None,
     print(f"Source: {src_path.relative_to(PROJECT_ROOT)}")
     print(f"Compiler: GC/{effective_version}")
     print(f"Functions found: {len(file_symbols)}")
+    if max_symbols and len(file_symbols) > max_symbols and not allow_long_scan:
+        print(f"Scan capped at {max_symbols} functions to avoid long runs.")
+        print("Pass --allow-long-scan to scan the entire file.")
+        file_symbols = file_symbols[:max_symbols]
     print()
 
     # Compile once
@@ -551,19 +560,26 @@ def scan_source_file(src_path: Path, compiler_version: str = None,
     # Test each function
     results = []
     for sym in file_symbols:
-        import subprocess
+        info = {"name": sym.name, "address": sym.address, "size": sym.size}
         cmd = [
             str(OBJDIFF_CLI), "diff",
             "-1", str(target_obj),
             "-2", str(base_obj),
             "-o", "-",
             "--format", "json",
+            "-c", "ppc.calculatePoolRelocations=false",
             sym.name,
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True,
-                             cwd=str(PROJECT_ROOT))
-
-        info = {"name": sym.name, "address": sym.address, "size": sym.size}
+        try:
+            res = run_tool(
+                cmd, capture_output=True, text=True,
+                cwd=str(PROJECT_ROOT), timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            info["match_percent"] = -1
+            info["error"] = "objdiff_timeout"
+            results.append(info)
+            continue
 
         if res.returncode == 0 and res.stdout.strip():
             try:
@@ -601,6 +617,23 @@ def scan_source_file(src_path: Path, compiler_version: str = None,
 
     print(f"\n  Total: {total_matched}/{total_tested} functions matching "
           f"({len(results)} in file)")
+
+    if report:
+        report_path = Path(report)
+        if report == "AUTO":
+            safe = "_".join(src_path.relative_to(PROJECT_ROOT).with_suffix("").parts)
+            report_path = REPORTS_DIR / f"match_test_scan_{safe}.json"
+        elif not report_path.is_absolute():
+            report_path = PROJECT_ROOT / report_path
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "source": str(src_path.relative_to(PROJECT_ROOT)).replace("\\", "/"),
+            "compiler": f"GC/{effective_version}",
+            "functions_found": len(file_symbols),
+            "results": results,
+        }
+        report_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        print(f"  Report: {report_path.relative_to(PROJECT_ROOT)}")
 
 
 # ============================================================================
@@ -676,6 +709,7 @@ Examples:
   python tools/match_test.py fn_800056C4           # Test by auto-name
   python tools/match_test.py SetPauseFlag -v       # Verbose output
   python tools/match_test.py --scan src/game/main.c  # Test all functions in file
+  python tools/match_test.py --scan src/game/main.c --report
   python tools/match_test.py --list                # List all symbols
   python tools/match_test.py --list --functions    # List only functions
   python tools/match_test.py --list-sources        # Show source -> address map
@@ -690,6 +724,22 @@ Examples:
     parser.add_argument(
         "--scan",
         help="Compile a source file and test all its functions"
+    )
+    parser.add_argument(
+        "--max-scan-symbols", type=int, default=40,
+        help="Default cap for --scan to avoid long runs (default: 40)"
+    )
+    parser.add_argument(
+        "--allow-long-scan", action="store_true",
+        help="Allow --scan to test more than --max-scan-symbols functions"
+    )
+    parser.add_argument(
+        "--report", nargs="?", const="AUTO",
+        help="With --scan, write a JSON report; omit value for default reports dir"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=60,
+        help="Per-symbol objdiff timeout in seconds"
     )
     parser.add_argument(
         "--list", action="store_true",
@@ -732,7 +782,11 @@ Examples:
         if not scan_path.is_absolute():
             scan_path = PROJECT_ROOT / scan_path
         scan_source_file(scan_path, compiler_version=args.compiler_version,
-                         verbose=args.verbose)
+                         verbose=args.verbose,
+                         max_symbols=args.max_scan_symbols,
+                         allow_long_scan=args.allow_long_scan,
+                         report=args.report,
+                         timeout=args.timeout)
         return 0
 
     if not args.symbol:

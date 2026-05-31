@@ -1,65 +1,93 @@
 #!/usr/bin/env python3
-"""Scan match percentage for functions in any src/game/<file>.c.
+"""Scan match percentage for selected functions in one source file.
 
 Usage:
-  python3 tools/match_scan_file.py <file_stem> fn_XXXXX [fn_YYYYY ...]
+  python tools/match_scan_file.py <file_stem_or_path> fn_XXXXX [fn_YYYYY ...]
+  python tools/match_scan_file.py src/game/gs_render.c fn_800DF21C --report out.json
 
-Example:
-  python3 tools/match_scan_file.py gs_event_exec fn_800141BC fn_80014234
+The scanner compiles the source file once, then runs non-interactive objdiff
+JSON for the requested symbols. This avoids stale object reads and avoids the
+interactive objdiff TUI.
 """
-import subprocess
+
+import argparse
 import json
-import os
 import sys
 from pathlib import Path
 
-os.chdir(Path(__file__).resolve().parent.parent)
+ROOT = Path(__file__).resolve().parent.parent
+SRC_DIR = ROOT / "src"
+REPORTS_DIR = ROOT / "tools" / "decomp_work" / "reports"
 
-CLI = r'tools\objdiff-cli.exe'
-TARGET = r'build\GC6E01\obj\auto_01_800055E0_text.o'
+sys.path.insert(0, str(ROOT / "tools"))
+import compile_check  # noqa: E402
 
-if len(sys.argv) < 3:
-    print(__doc__)
-    sys.exit(2)
 
-stem = sys.argv[1]
-syms = sys.argv[2:]
+def resolve_source(name: str) -> Path:
+    """Resolve a file stem or source path to a tracked source file."""
+    p = Path(name)
+    if not p.is_absolute():
+        p = ROOT / p
+    if p.exists():
+        return p
 
-def _resolve_base(stem):
-    for sub in ('game', 'hsd', 'game/effect', 'game/ui', 'game/fsys',
-                'game/battle', 'game/people', 'dolphin/os', 'dolphin/vi',
-                'dolphin/dvd', 'dolphin/exi', 'init', 'crt'):
-        p = fr'build\GC6E01\base\{sub.replace("/", chr(92))}\{stem}.o'
-        if os.path.exists(p):
-            return p
-    return fr'build\GC6E01\base\game\{stem}.o'
+    stem = Path(name).stem
+    matches = sorted(SRC_DIR.rglob(f"{stem}.c"))
+    if matches:
+        return matches[0]
 
-BASE = _resolve_base(stem)
+    raise SystemExit(f"ERROR: cannot resolve source file from {name!r}")
 
-for s in syms:
-    r = subprocess.run(
-        [CLI, 'diff', '-1', TARGET, '-2', BASE, '-o', '-',
-         '--format', 'json', '-c', 'ppc.calculatePoolRelocations=false', s],
-        capture_output=True, text=True, shell=False
+
+def default_report_path(src_path: Path) -> Path:
+    rel = src_path.relative_to(ROOT).with_suffix("")
+    safe = "_".join(rel.parts)
+    return REPORTS_DIR / f"match_scan_{safe}.json"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("source", help="Source path or file stem")
+    parser.add_argument("symbols", nargs="+", help="Function symbols to scan")
+    parser.add_argument(
+        "--report", nargs="?", const="AUTO",
+        help="Write a JSON report. Omit value for tools/decomp_work/reports/."
     )
-    if r.returncode == 0 and r.stdout.strip():
-        try:
-            d = json.loads(r.stdout)
-            pct = None
-            for side in ('right', 'left'):
-                for sym in d.get(side, {}).get('symbols', []):
-                    if sym.get('name') == s and sym.get('kind') == 'SYMBOL_FUNCTION':
-                        mp = sym.get('match_percent')
-                        if mp is not None:
-                            pct = mp
-                            break
-                if pct is not None:
-                    break
-            if pct is None:
-                print(f'  NO-MATCH {s}')
-            else:
-                print(f'{pct:6.1f}%  {s}')
-        except Exception as e:
-            print(f'  ERR {s}: {e} :: {r.stdout[:200]}')
-    else:
-        print(f'  FAIL {s}: rc={r.returncode} stderr={r.stderr[:120]}')
+    parser.add_argument(
+        "--whole-file", action="store_true",
+        help="Use one full-object objdiff JSON pass instead of per-symbol passes"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=120,
+        help="Objdiff timeout in seconds"
+    )
+    args = parser.parse_args()
+
+    src_path = resolve_source(args.source)
+    result = compile_check.run_diff_symbols(
+        src_path, symbols=args.symbols, whole_file=args.whole_file,
+        timeout=args.timeout,
+    )
+
+    for symbol in args.symbols:
+        info = result["symbols"].get(symbol, {})
+        if result.get("error"):
+            print(f"  ERR {symbol}: {result['error']}")
+        elif not info.get("symbol_found"):
+            print(f"  NO-MATCH {symbol}")
+        else:
+            print(f"{info['match_percent']:6.1f}%  {symbol}")
+
+    if args.report:
+        report_path = default_report_path(src_path) if args.report == "AUTO" else Path(args.report)
+        if not report_path.is_absolute():
+            report_path = ROOT / report_path
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+        print(f"report: {report_path.relative_to(ROOT)}")
+
+    return 1 if result.get("error") else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

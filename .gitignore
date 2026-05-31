@@ -120,3 +120,12 @@ deepseek*.txt
 *_key.txt
 *key*.txt
 !requirements.txt
+
+# decomp-permuter harness: external clones + per-run artifacts (scripts ARE tracked)
+tools/decomp_work/refs/
+tools/decomp_work/permuter/dirs/
+tools/decomp_work/permuter/logs/
+tools/decomp_work/permuter/wins/
+tools/decomp_work/permuter/scratch/
+tools/decomp_work/permuter/*.prag.c
+tools/decomp_work/permuter/*_pp.c
