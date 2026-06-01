@@ -185,6 +185,21 @@ void gx_tev_set_proj_matrix(const f32 m[4][4]);
 void gx_tev_set_modelview_matrix(const f32 m[3][4]);
 
 /**
+ * gx_tev_set_normal_matrix -- Record the current 3x4 normal matrix.
+ * @param m  Row-major 3x4 matrix; the upper-left 3x3 is uploaded as the
+ *           u_normalMatrix mat3 used to transform vertex normals.
+ */
+void gx_tev_set_normal_matrix(const f32 m[3][4]);
+
+/**
+ * gx_tev_set_lighting_enabled -- Toggle directional vertex lighting.
+ * @param enabled  Non-zero applies the hardcoded directional lambert to the
+ *                 final fragment RGB (alpha unchanged); zero leaves fragments
+ *                 full-bright (used for 2D overlays).
+ */
+void gx_tev_set_lighting_enabled(int enabled);
+
+/**
  * gx_tev_set_tev_color -- Record a TEV color register (GX_TEVREG0..2 / PREV).
  * @param id     0..3 (GXTevRegID).
  * @param r,g,b,a  8-bit channel values.

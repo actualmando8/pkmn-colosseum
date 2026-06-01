@@ -59,6 +59,7 @@ static u32 g_cacheMisses = 0;
 typedef struct {
     f32 proj[4][4];        /* row-major 4x4 projection */
     f32 modelView[3][4];   /* row-major 3x4 modelview */
+    f32 normalMatrix[3][4];/* row-major 3x4 normal matrix (upper 3x3 used) */
 
     f32 tevColor[4][4];    /* PREV/REG0..2, normalized RGBA */
     f32 konstColor[4][4];  /* K0..K3, normalized RGBA */
@@ -70,6 +71,8 @@ typedef struct {
     s32 alphaOp;
 
     f32 vertexAlphaScale;
+
+    s32 lightingEnabled;   /* 1 = apply directional lambert; 0 = full bright */
 } GXTevRenderState;
 
 static GXTevRenderState g_rs;
@@ -93,19 +96,28 @@ static const char* VERTEX_SHADER_SOURCE =
     "layout(location = 0) in vec3 a_position;\n"
     "layout(location = 1) in vec4 a_color0;\n"
     "layout(location = 2) in vec2 a_texcoord0;\n"
+    /* a_normal (location 3) is optional: the host vertex layout (GXTevVertex)
+     * does not carry a normal, so this attribute is disabled and reads its
+     * generic default. The default is set to (0,0,1) by the submit path so the
+     * v_normal varying is well-defined; per-fragment face normals are derived
+     * from v_viewPos in the fragment shader. */
+    "layout(location = 3) in vec3 a_normal;\n"
     "\n"
     "uniform mat4 u_projMatrix;\n"
     "uniform mat4 u_modelViewMatrix;\n"
+    "uniform mat3 u_normalMatrix;\n"
     "\n"
     "out vec4 v_color0;\n"
     "out vec2 v_texcoord0;\n"
     "out vec2 v_texcoord1;\n"
     "out vec3 v_viewPos;\n"
+    "out vec3 v_normal;\n"
     "\n"
     "void main() {\n"
     "    vec4 viewPos = u_modelViewMatrix * vec4(a_position, 1.0);\n"
     "    gl_Position = u_projMatrix * viewPos;\n"
     "    v_viewPos = viewPos.xyz;\n"
+    "    v_normal = u_normalMatrix * a_normal;\n"
     "    v_color0 = a_color0;\n"
     "    v_texcoord0 = a_texcoord0;\n"
     "    v_texcoord1 = a_texcoord0;\n"
@@ -323,13 +335,20 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "uniform float u_alphaRef0;\n"
         "uniform float u_alphaRef1;\n"
         "uniform int  u_alphaOp;\n"
+        "uniform int  u_lightingEnabled;\n"
         "\n"
         "in vec4 v_color0;\n"
         "in vec2 v_texcoord0;\n"
         "in vec2 v_texcoord1;\n"
         "in vec3 v_viewPos;\n"
+        "in vec3 v_normal;\n"
         "\n"
         "out vec4 fragColor;\n"
+        "\n"
+        /* Hardcoded directional light (view space). A high front-ish key light;
+         * ambient keeps unlit faces from going fully black. */
+        "const vec3  c_lightDir     = normalize(vec3(0.3, 0.7, 0.6));\n"
+        "const float c_lightAmbient = 0.30;\n"
         "\n"
         "bool tevCompare(int comp, float val, float ref) {\n"
         "    if (comp == 0) return false;\n"        /* NEVER */
@@ -474,6 +493,28 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "    if (!alphaPass) discard;\n"
         "\n"
         "    fragColor = prev;\n"
+        "\n"
+        /* Directional vertex lighting. The host geometry path does not carry a
+         * usable per-vertex normal (the scene PObjs submit POS+CLR+TEX only), so
+         * reconstruct a flat per-face normal from the screen-space derivatives of
+         * the view-space position. Cross(dFdx, dFdy) is the face normal in view
+         * space; orient it toward the camera (+Z) so front faces are lit. The
+         * lambert term shades each pillar face by its angle to the light, giving
+         * the otherwise flat-tan geometry visible 3D form. 2D overlays leave
+         * u_lightingEnabled == 0, so they stay full-bright. */
+        "    if (u_lightingEnabled != 0) {\n"
+        "        vec3 dpdx = dFdx(v_viewPos);\n"
+        "        vec3 dpdy = dFdy(v_viewPos);\n"
+        "        vec3 faceN = cross(dpdx, dpdy);\n"
+        "        float fl = length(faceN);\n"
+        "        if (fl > 1e-6) {\n"
+        "            faceN /= fl;\n"
+        "            if (faceN.z < 0.0) faceN = -faceN;\n"  /* face the camera */
+        "            float ndl = max(0.0, dot(faceN, c_lightDir));\n"
+        "            float lambert = c_lightAmbient + (1.0 - c_lightAmbient) * ndl;\n"
+        "            fragColor.rgb *= lambert;\n"
+        "        }\n"
+        "    }\n"
         "}\n");
 
     return (s32)pos;
@@ -558,9 +599,10 @@ static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
     entry->loc_alphaRef1  = glGetUniformLocation(p, "u_alphaRef1");
     entry->loc_alphaOp    = glGetUniformLocation(p, "u_alphaOp");
 
-    /* Reuse a spare slot for host-only uniforms. */
+    /* Reuse spare fog slots for host-only uniforms. */
     entry->loc_fogEnable = glGetUniformLocation(p, "u_hasTexture");
     entry->loc_fogType   = glGetUniformLocation(p, "u_vertexAlphaScale");
+    entry->loc_fogStart  = glGetUniformLocation(p, "u_lightingEnabled");
 }
 
 /* =========================================================================
@@ -599,7 +641,9 @@ void gx_tev_init(void) {
     /* Identity matrices so a draw before any matrix upload is still visible. */
     g_rs.proj[0][0] = g_rs.proj[1][1] = g_rs.proj[2][2] = g_rs.proj[3][3] = 1.0f;
     g_rs.modelView[0][0] = g_rs.modelView[1][1] = g_rs.modelView[2][2] = 1.0f;
+    g_rs.normalMatrix[0][0] = g_rs.normalMatrix[1][1] = g_rs.normalMatrix[2][2] = 1.0f;
     g_rs.vertexAlphaScale = 1.0f;
+    g_rs.lightingEnabled = 0;
     g_rs.alphaComp0 = GX_ALWAYS;
     g_rs.alphaComp1 = GX_ALWAYS;
     g_rs.alphaOp = GX_AOP_AND;
@@ -735,6 +779,18 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
         glUniformMatrix4fv(entry->loc_modelViewMatrix, 1, GL_TRUE, mv);
     }
 
+    /* --- Normal matrix (upper-left 3x3 of the normal/modelview matrix) --- */
+    if (entry->loc_normalMatrix >= 0) {
+        GLfloat nm[9];
+        int r, c;
+        for (r = 0; r < 3; ++r) {
+            for (c = 0; c < 3; ++c) {
+                nm[r * 3 + c] = g_rs.normalMatrix[r][c];
+            }
+        }
+        glUniformMatrix3fv(entry->loc_normalMatrix, 1, GL_TRUE, nm);
+    }
+
     /* --- TEV color + konst register arrays --- */
     if (entry->loc_tevColor[0] >= 0) {
         glUniform4fv(entry->loc_tevColor[0], 4, (const GLfloat*)&g_rs.tevColor[0][0]);
@@ -754,8 +810,10 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
     if (entry->loc_alphaRef1  >= 0) glUniform1f(entry->loc_alphaRef1, g_rs.alphaRef1);
     if (entry->loc_alphaOp    >= 0) glUniform1i(entry->loc_alphaOp, g_rs.alphaOp);
 
-    /* --- Host-only uniforms (vertex alpha scale lives in loc_fogType) --- */
+    /* --- Host-only uniforms (vertex alpha scale lives in loc_fogType,
+     *     lighting-enabled flag lives in loc_fogStart) --- */
     if (entry->loc_fogType >= 0) glUniform1f(entry->loc_fogType, g_rs.vertexAlphaScale);
+    if (entry->loc_fogStart >= 0) glUniform1i(entry->loc_fogStart, g_rs.lightingEnabled);
 }
 
 /* =========================================================================
@@ -768,6 +826,14 @@ void gx_tev_set_proj_matrix(const f32 m[4][4]) {
 
 void gx_tev_set_modelview_matrix(const f32 m[3][4]) {
     memcpy(g_rs.modelView, m, sizeof(g_rs.modelView));
+}
+
+void gx_tev_set_normal_matrix(const f32 m[3][4]) {
+    memcpy(g_rs.normalMatrix, m, sizeof(g_rs.normalMatrix));
+}
+
+void gx_tev_set_lighting_enabled(int enabled) {
+    g_rs.lightingEnabled = enabled ? 1 : 0;
 }
 
 void gx_tev_set_tev_color(u32 id, u8 r, u8 g, u8 b, u8 a) {
@@ -832,6 +898,13 @@ static void tev_ensure_gl_objects(void) {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
                           (GLsizei)sizeof(GXTevVertex),
                           (const void*)(3 * sizeof(f32) + 4 * sizeof(u8)));
+
+    /* loc 3: a_normal -- the host vertex layout carries no normal, so this
+     * attribute stays disabled and supplies a constant default of (0,0,1).
+     * Per-face lighting is reconstructed from view-space derivatives in the
+     * fragment shader; this default just keeps v_normal well-defined. */
+    glDisableVertexAttribArray(3);
+    glVertexAttrib3f(3, 0.0f, 0.0f, 1.0f);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

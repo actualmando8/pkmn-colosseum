@@ -984,6 +984,15 @@ void GXHostSetVertexAlphaScale(f32 alphaScale);
  */
 void GXHostClearTextureBinding(void);
 
+/**
+ * GXHostSetLightingEnabled -- Host-only toggle for directional vertex lighting.
+ * When enabled (non-zero), the modern TEV->GLSL path shades each fragment by a
+ * hardcoded directional lambert (reconstructed from view-space derivatives) so
+ * 3D scene geometry gets visible face shading. 2D overlays leave it disabled to
+ * stay full-bright. Affects only the modern shader draw path.
+ */
+void GXHostSetLightingEnabled(GXBool enabled);
+
 #ifdef __cplusplus
 }
 #endif

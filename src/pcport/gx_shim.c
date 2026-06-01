@@ -154,6 +154,7 @@ static u32 g_lastSubmittedVertexCount = 0;
 static u32 g_lastExpandedVertexCount = 0;
 static GXPrimitive g_lastSubmittedPrimitive = GX_POINTS;
 static f32 g_vertexAlphaScale = 1.0f;
+static int g_lightingEnabled = 0;
 static GLuint g_boundTextureId = 0;
 static GXTexMapID g_boundTextureMap = GX_TEXMAP_NULL;
 static u8 g_numTexGens = 0;
@@ -485,6 +486,7 @@ void GXInit(void* base, u32 size) {
     g_dispCopyGamma = GX_GM_1_0;
     g_gxInitialized = 1;
     g_vertexAlphaScale = 1.0f;
+    g_lightingEnabled = 0;
     g_boundTextureId = 0;
     g_boundTextureMap = GX_TEXMAP_NULL;
     g_numTexGens = 0;
@@ -672,15 +674,18 @@ void GXLoadNrmMtxImm(Mtx mtx, u32 id) {
     if (id >= 10) return;
     memcpy(g_nrmMtx[id], mtx, sizeof(Mtx));
 
-    /* TODO: Phase 3b -- Upload normal matrix
+    /* Phase 3b -- Upload normal matrix.
      *
-     * The normal matrix should be the inverse transpose of the
-     * modelview matrix (upper 3x3). GX provides it pre-computed.
-     *   glUniformMatrix3fv(u_normalMatrix_loc, 1, GL_TRUE,
-     *                       (GLfloat*)mtx);
-     *
-     * Only the upper 3x3 is used for normals.
-     */
+     * GX supplies the normal matrix pre-computed (inverse transpose of the
+     * modelview upper 3x3). Record it for the modern TEV->GLSL path; only the
+     * upper-left 3x3 is consumed as the u_normalMatrix mat3 in the vertex
+     * shader. The actual per-face lambert is reconstructed from view-space
+     * derivatives in the fragment shader (the host geometry path carries no
+     * per-vertex normal), so this keeps the u_normalMatrix plumbing correct
+     * for any future normal-bearing geometry. */
+    if (g_tevPathReady && id == g_currentMtxId) {
+        gx_tev_set_normal_matrix(g_nrmMtx[id]);
+    }
 }
 
 void GXSetCurrentMtx(u32 id) {
@@ -727,6 +732,10 @@ void GXHostSetVertexAlphaScale(f32 alphaScale) {
     }
 
     g_vertexAlphaScale = alphaScale;
+}
+
+void GXHostSetLightingEnabled(GXBool enabled) {
+    g_lightingEnabled = enabled ? 1 : 0;
 }
 
 /* =========================================================================
@@ -1546,6 +1555,11 @@ static int GXSubmitViaShader(GLenum glPrim,
     gx_tev_set_proj_matrix(g_projMatrix);
     currentMtx = (g_currentMtxId < 10) ? g_currentMtxId : 0;
     gx_tev_set_modelview_matrix(g_posMtx[currentMtx]);
+    gx_tev_set_normal_matrix(g_nrmMtx[currentMtx]);
+
+    /* Directional lighting gate: only geometry that opted in (3D scene draws)
+     * is shaded; 2D overlays leave it off so they stay full-bright. */
+    gx_tev_set_lighting_enabled(g_lightingEnabled);
 
     /* TEV color + konst registers (PREV/REG0..2, K0..K3). */
     {

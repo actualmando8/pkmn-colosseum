@@ -493,6 +493,8 @@ static void BeginMenuOverlay(void) {
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXHostSetVertexAlphaScale(1.0f);
+    /* 2D overlays (sky/logo/PRESS START/copyright) are unlit and full-bright. */
+    GXHostSetLightingEnabled(GX_FALSE);
 }
 
 /* Draw a textured quad at a screen-space rectangle (origin top-left, 640x480),
@@ -4607,8 +4609,16 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                 if (!((haveTexture == 0 && haveMaterial &&
                        translatedMaterial.alpha < 0.01f) ||
                       isLogoTex)) {
+                    /* Enable directional lighting for the 3D scene geometry so
+                     * each pillar face is shaded by its angle to the light and
+                     * the otherwise flat-tan ruins gain visible 3D form. The 2D
+                     * overlays (BeginMenuOverlay) leave lighting disabled, so
+                     * they stay full-bright. Disabled again right after the draw
+                     * to keep the gate tightly scoped to scene geometry. */
                     fn_801AA568(&translatedPObj.pobj);
+                    GXHostSetLightingEnabled(GX_TRUE);
                     fn_800DAD10((void*)&drawObject);
+                    GXHostSetLightingEnabled(GX_FALSE);
                     stats->drawn++;
                 } else {
                     stats->skipped++;
