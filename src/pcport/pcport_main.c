@@ -4562,15 +4562,38 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         ++vtx;
                     }
                 }
-                fn_801AA568(&translatedPObj.pobj);
-                fn_800DAD10((void*)&drawObject);
+                /* Skip the demo's full-screen fade/flash overlay: a tiny
+                 * material-only quad pinned just in front of the camera
+                 * (camera-space z near 0, while real scene geometry sits at
+                 * z < -100). Statically it is an opaque white quad that covers
+                 * the whole title scene; in-game it is an animated alpha fade
+                 * that ends fully transparent. */
+                if (!(haveTexture == 0 &&
+                      translatedPObj.totalSubmittedVertices <= 6u &&
+                      modelViewMatrix[2][3] > -50.0f)) {
+                    fn_801AA568(&translatedPObj.pobj);
+                    fn_800DAD10((void*)&drawObject);
+                    stats->drawn++;
+                } else {
+                    stats->skipped++;
+                }
 
                 if (haveTexture) {
                     GXHostClearTextureBinding();
                     GSgfxHostClearPipelineState(PCPORT_REAL_TEXTURED_PIPELINE);
                 }
 
-                stats->drawn++;
+                {
+                    static int rjtDbg = -1;
+                    if (rjtDbg < 0) {
+                        rjtDbg = (getenv("PCPORT_RENDER_DEBUG") != NULL) ? 1 : 0;
+                    }
+                    if (rjtDbg && stats->dobjs <= 40u) {
+                        printf("[rjt] pobj#%u %s verts=%u z=%.1f\n",
+                               stats->dobjs, haveTexture ? "TEX" : "MAT",
+                               drawObject.totalVerts, modelViewMatrix[2][3]);
+                    }
+                }
             } else {
                 stats->skipped++;
             }
