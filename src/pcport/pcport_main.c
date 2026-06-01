@@ -4842,10 +4842,11 @@ static int RunMenuScene(GLFWwindow* window) {
         frameCap = PCPORT_WINDOW_FRAMES;
     }
     dumpRequested = getenv("PCPORT_DUMP") != NULL;
-    /* logo_demo's 3D scene renders as an animated-demo flash statically, so by
-     * default we draw a 2D sky/sand backdrop instead of its joint tree. Set
-     * PCPORT_RENDER_3D=1 to render the raw 3D scene (for debugging it). */
-    render3D = getenv("PCPORT_RENDER_3D") != NULL;
+    /* Default to rendering the real 3D title scene (desert/ruins + the textured
+     * geometry, texture x diffuse modulated, demo fade + logo billboards
+     * skipped). Set PCPORT_NO_RENDER_3D=1 to fall back to the flat 2D sky
+     * backdrop instead. */
+    render3D = getenv("PCPORT_NO_RENDER_3D") == NULL;
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
 
