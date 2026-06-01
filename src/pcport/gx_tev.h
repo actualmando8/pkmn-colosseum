@@ -146,8 +146,110 @@ typedef struct GXTevShaderEntry {
 } GXTevShaderEntry;
 
 /* =========================================================================
+ * Modern (GL 3.3 core) render path
+ *
+ * The functions below replace the legacy fixed-function GL_MODULATE draw
+ * path with a real TEV->GLSL pipeline: a hash-cached generated program, a
+ * shared VAO/VBO, and uniform uploads driven from the current GX state.
+ *
+ * gx_shim.c drives this by:
+ *   1. Pushing the current GX state into a GXTevRenderState (the setters
+ *      below), and
+ *   2. Calling gx_tev_submit() with the accumulated immediate-mode vertices.
+ *
+ * The vertex layout (GXTevVertex) is binary-compatible with the shim's
+ * immediate-mode GXImmVertex (pos[3] f32, color[4] u8, texcoord[2] f32) so
+ * the existing vertex buffer can be passed straight through.
+ * ========================================================================= */
+
+/** Vertex layout for the modern submit path. Matches gx_shim.c GXImmVertex. */
+typedef struct GXTevVertex {
+    f32 pos[3];
+    u8  color[4];
+    f32 texcoord[2];
+} GXTevVertex;
+
+/**
+ * gx_tev_set_proj_matrix -- Record the current 4x4 projection matrix.
+ * @param m  Row-major 4x4 matrix (GCN Mtx44 convention).
+ *
+ * The matrix is stored row-major; the modern path transposes it for GL and
+ * applies the GCN->GL clip-space Z remap when uploading.
+ */
+void gx_tev_set_proj_matrix(const f32 m[4][4]);
+
+/**
+ * gx_tev_set_modelview_matrix -- Record the current 3x4 modelview matrix.
+ * @param m  Row-major 3x4 matrix (GCN Mtx convention).
+ */
+void gx_tev_set_modelview_matrix(const f32 m[3][4]);
+
+/**
+ * gx_tev_set_tev_color -- Record a TEV color register (GX_TEVREG0..2 / PREV).
+ * @param id     0..3 (GXTevRegID).
+ * @param r,g,b,a  8-bit channel values.
+ */
+void gx_tev_set_tev_color(u32 id, u8 r, u8 g, u8 b, u8 a);
+
+/**
+ * gx_tev_set_konst_color -- Record a TEV konstant color register.
+ * @param id     0..3 (GXTevRegID).
+ * @param r,g,b,a  8-bit channel values.
+ */
+void gx_tev_set_konst_color(u32 id, u8 r, u8 g, u8 b, u8 a);
+
+/**
+ * gx_tev_set_alpha_compare -- Record the alpha-test state for shader discard.
+ */
+void gx_tev_set_alpha_compare(u8 comp0, u8 ref0, u8 op, u8 comp1, u8 ref1);
+
+/**
+ * gx_tev_set_vertex_alpha_scale -- Host-only per-draw vertex alpha modulation.
+ * @param scale  [0,1] multiplier applied to vertex color alpha in the shader.
+ */
+void gx_tev_set_vertex_alpha_scale(f32 scale);
+
+/**
+ * gx_tev_submit -- Compile/look up the program for the given TEV state, bind
+ * it, upload vertices to the shared VBO, and draw.
+ *
+ * @param state     Current TEV state snapshot (cache key + shader source).
+ * @param glPrim    GL primitive enum (GL_TRIANGLES, GL_TRIANGLE_STRIP, ...).
+ * @param verts     Pointer to vertex array (GXTevVertex layout).
+ * @param count     Number of vertices.
+ * @param glTexId   Bound GL texture name (0 = none).
+ * @param hasTexture Non-zero if the active stage samples a texture.
+ * @return 1 on success, 0 on failure (cache full, no program, bad args).
+ */
+int gx_tev_submit(const GXTevState* state, u32 glPrim,
+                  const GXTevVertex* verts, u32 count,
+                  u32 glTexId, int hasTexture);
+
+/* =========================================================================
  * Public API
  * ========================================================================= */
+
+/**
+ * gx_tev_ensure_loaded -- Load GLAD (once) and initialize the TEV shader path.
+ *
+ * gx_shim.c uses the legacy system GL pulled in by GLFW and must NOT include
+ * <glad/glad.h> (it conflicts there). This entry point keeps all GLAD usage
+ * inside gx_tev.c: on first call it runs gladLoadGL() to resolve the modern
+ * (core 3.3) entry points, then calls gx_tev_init(). Subsequent calls are
+ * cheap no-ops.
+ *
+ * Must be called after a GL context is current (e.g. from GXInit).
+ *
+ * @return 1 if the modern GL path is available, 0 if GLAD failed to load.
+ */
+int gx_tev_ensure_loaded(void);
+
+/**
+ * gx_tev_unbind -- Unbind the shader program / VAO so a subsequent legacy
+ * fixed-function draw in gx_shim.c is not affected by leftover modern-GL
+ * state. Safe to call even if the modern path was never used.
+ */
+void gx_tev_unbind(void);
 
 /**
  * gx_tev_init -- Initialize the TEV shader cache.

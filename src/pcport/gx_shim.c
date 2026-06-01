@@ -48,6 +48,41 @@ static GXTevState g_tevState;
 /** Number of active TEV stages */
 static u8 g_numTevStages = 1;
 
+/* -------------------------------------------------------------------------
+ * Extended per-stage TEV state.
+ *
+ * The shared GXTevStageState (gx_tev.h, owned elsewhere) has no fields for
+ * konst color/alpha selection, swap tables, or indirect texturing. The PC
+ * port keeps these here so the gx_tev/draw path can read them via the
+ * GXHost* accessors below without touching the shared struct.
+ * ------------------------------------------------------------------------- */
+
+/** Per-stage konst color selector (GXTevKColorSel) */
+static u8 g_tevKColorSel[GX_MAX_TEVSTAGE];
+
+/** Per-stage konst alpha selector (GXTevKAlphaSel) */
+static u8 g_tevKAlphaSel[GX_MAX_TEVSTAGE];
+
+/** Swap-mode tables: [table id][R,G,B,A] channel selectors */
+#define GX_TEV_SWAP_TABLE_COUNT 4
+static u8 g_tevSwapTable[GX_TEV_SWAP_TABLE_COUNT][4];
+
+/** Per-stage indirect texturing parameters (stored, applied as no-op) */
+typedef struct {
+    u8 active;
+    u8 indStage;
+    u8 format;
+    u8 biasSel;
+    u8 mtxSel;
+    u8 wrapS;
+    u8 wrapT;
+    u8 addPrev;
+    u8 utcLod;
+    u8 alphaSel;
+} GXTevIndirectState;
+
+static GXTevIndirectState g_tevIndirect[GX_MAX_TEVSTAGE];
+
 /** Current projection matrix */
 static f32 g_projMatrix[4][4];
 static GXProjectionType g_projType;
@@ -123,6 +158,9 @@ static GLuint g_boundTextureId = 0;
 static GXTexMapID g_boundTextureMap = GX_TEXMAP_NULL;
 static u8 g_numTexGens = 0;
 
+/** Set when GLAD loaded and the modern TEV->GLSL draw path is usable. */
+static int g_tevPathReady = 0;
+
 typedef struct {
     u32 magic;
     u32 glTexId;
@@ -132,7 +170,9 @@ typedef struct {
     u8 wrapS;
     u8 wrapT;
     u8 mipmap;
-    u8 reserved;
+    u8 minFilt;   /* GXTexFilter for GL_TEXTURE_MIN_FILTER */
+    u8 magFilt;   /* GXTexFilter for GL_TEXTURE_MAG_FILTER */
+    u8 reserved[3];
 } GXHostTexObj;
 
 enum {
@@ -424,6 +464,20 @@ void GXInit(void* base, u32 size) {
     memset(&g_tevState, 0, sizeof(g_tevState));
     memset(g_vtxDescState, 0, sizeof(g_vtxDescState));
     memset(g_vtxFmtState, 0, sizeof(g_vtxFmtState));
+    memset(g_tevKColorSel, 0, sizeof(g_tevKColorSel));
+    memset(g_tevKAlphaSel, 0, sizeof(g_tevKAlphaSel));
+    memset(g_tevIndirect, 0, sizeof(g_tevIndirect));
+    {
+        u32 swapTableIndex;
+        /* Default identity swap tables: R->R, G->G, B->B, A->A. */
+        for (swapTableIndex = 0; swapTableIndex < GX_TEV_SWAP_TABLE_COUNT;
+             ++swapTableIndex) {
+            g_tevSwapTable[swapTableIndex][0] = 0;
+            g_tevSwapTable[swapTableIndex][1] = 1;
+            g_tevSwapTable[swapTableIndex][2] = 2;
+            g_tevSwapTable[swapTableIndex][3] = 3;
+        }
+    }
     g_numTevStages = 1;
     g_immVertexCount = 0;
     g_currentMtxId = 0;
@@ -437,6 +491,35 @@ void GXInit(void* base, u32 size) {
     g_tevState.numTexGens = 0;
     g_tevState.stages[0].tevMode = GX_PASSCLR;
 
+    /* Default alpha compare to "always pass". GX hardware powers up with the
+     * alpha test effectively disabled, and the legacy fixed-function draw did
+     * no alpha testing. The modern shader path honors alpha compare, so the
+     * zero-initialized default (GX_NEVER/GX_NEVER/AND) would discard every
+     * fragment. Match the hardware/legacy default instead. */
+    g_alphaComp0 = GX_ALWAYS;
+    g_alphaComp1 = GX_ALWAYS;
+    g_alphaOp = GX_AOP_AND;
+    g_alphaRef0 = 0;
+    g_alphaRef1 = 0;
+
+    /* Default matrices to identity. The legacy fixed-function path relied on
+     * the GL matrix stack being identity until GXSetProjection/GXLoadPosMtxImm
+     * were called; the modern shader path reads g_projMatrix/g_posMtx directly,
+     * so they must start as identity (not zero) or pre-matrix draws (e.g. the
+     * full-screen background quad) collapse to a point and render nothing. */
+    memset(g_projMatrix, 0, sizeof(g_projMatrix));
+    g_projMatrix[0][0] = g_projMatrix[1][1] =
+        g_projMatrix[2][2] = g_projMatrix[3][3] = 1.0f;
+    {
+        u32 m;
+        for (m = 0; m < 10; ++m) {
+            memset(g_posMtx[m], 0, sizeof(g_posMtx[m]));
+            memset(g_nrmMtx[m], 0, sizeof(g_nrmMtx[m]));
+            g_posMtx[m][0][0] = g_posMtx[m][1][1] = g_posMtx[m][2][2] = 1.0f;
+            g_nrmMtx[m][0][0] = g_nrmMtx[m][1][1] = g_nrmMtx[m][2][2] = 1.0f;
+        }
+    }
+
     window = PCPort_GetHostWindow();
     if (window == NULL) {
         printf("[gx_shim] GXInit host state initialized without a window\n");
@@ -446,6 +529,12 @@ void GXInit(void* base, u32 size) {
     if (glfwGetCurrentContext() != window) {
         glfwMakeContextCurrent(window);
     }
+
+    /* Load GLAD + initialize the TEV->GLSL shader path now that the GL context
+     * is current. All modern-GL usage stays inside gx_tev.c; this is a no-op on
+     * subsequent GXInit calls. If it fails, GXSubmitVertices falls back to the
+     * legacy fixed-function draw below. */
+    g_tevPathReady = gx_tev_ensure_loaded();
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -803,6 +892,63 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord,
     g_tevState.dirty = 1;
 }
 
+void GXSetTevKColorSel(GXTevStageID stage, u32 sel) {
+    if ((u32)stage >= GX_MAX_TEVSTAGE) return;
+
+    /* Records which konst color (or konst-color component) this stage reads
+     * when a colorIn slot is GX_CC_KONST. Consumed by the TEV shader path
+     * via GXHostGetTevKColorSel. */
+    g_tevKColorSel[stage] = (u8)sel;
+    g_tevState.dirty = 1;
+}
+
+void GXSetTevKAlphaSel(GXTevStageID stage, u32 sel) {
+    if ((u32)stage >= GX_MAX_TEVSTAGE) return;
+
+    /* Records which konst alpha (or konst-alpha component) this stage reads
+     * when an alphaIn slot is GX_CA_KONST. Consumed by the TEV shader path
+     * via GXHostGetTevKAlphaSel. */
+    g_tevKAlphaSel[stage] = (u8)sel;
+    g_tevState.dirty = 1;
+}
+
+void GXSetTevSwapModeTable(u32 id, u32 r, u32 g, u32 b, u32 a) {
+    if (id >= GX_TEV_SWAP_TABLE_COUNT) return;
+
+    /* Stores the RGBA channel-swap selectors for swap table 'id'. The TEV
+     * path reads these to remap ras/tex channels before combining. Stored
+     * functionally; the default identity table (R,G,B,A) is a pass-through. */
+    g_tevSwapTable[id][0] = (u8)r;
+    g_tevSwapTable[id][1] = (u8)g;
+    g_tevSwapTable[id][2] = (u8)b;
+    g_tevSwapTable[id][3] = (u8)a;
+    g_tevState.dirty = 1;
+}
+
+void GXSetTevIndirect(GXTevStageID stage, u32 ind_stage, u32 format,
+                      u32 bias_sel, u32 mtx_sel, u32 wrap_s, u32 wrap_t,
+                      u32 add_prev, u32 utc_lod, u32 alpha_sel) {
+    GXTevIndirectState* ind;
+
+    if ((u32)stage >= GX_MAX_TEVSTAGE) return;
+
+    /* Functional no-op: indirect texturing (bump/distortion) is not yet
+     * emulated on the GL path. The parameters are recorded so the draw path
+     * can later detect that a stage requested indirect lookups. */
+    ind = &g_tevIndirect[stage];
+    ind->active = 1;
+    ind->indStage = (u8)ind_stage;
+    ind->format = (u8)format;
+    ind->biasSel = (u8)bias_sel;
+    ind->mtxSel = (u8)mtx_sel;
+    ind->wrapS = (u8)wrap_s;
+    ind->wrapT = (u8)wrap_t;
+    ind->addPrev = (u8)add_prev;
+    ind->utcLod = (u8)utc_lod;
+    ind->alphaSel = (u8)alpha_sel;
+    g_tevState.dirty = 1;
+}
+
 void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor,
                     GXBlendFactor dst_factor, GXLogicOp op) {
     GLenum src = GL_ONE;
@@ -1071,6 +1217,8 @@ static int GXUploadHostTexture(GXTexObj* obj,
     hostObj->wrapS = (u8)wrap_s;
     hostObj->wrapT = (u8)wrap_t;
     hostObj->mipmap = (u8)mipmap;
+    hostObj->minFilt = (u8)GX_LINEAR;
+    hostObj->magFilt = (u8)GX_LINEAR;
     return 1;
 }
 
@@ -1130,6 +1278,99 @@ void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
                         GL_RGBA,
                         GL_UNSIGNED_BYTE,
                         rgba);
+}
+
+void GXInitTexObjFilterMode(GXTexObj* obj, GXTexFilter min_filt,
+                            GXTexFilter mag_filt) {
+    GXHostTexObj* hostObj;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    hostObj = GXGetHostTexObj(obj);
+    if (hostObj->magic != GX_HOST_TEXOBJ_MAGIC || hostObj->glTexId == 0) {
+        return;
+    }
+
+    hostObj->minFilt = (u8)min_filt;
+    hostObj->magFilt = (u8)mag_filt;
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    (GLint)GXTranslateMinFilter(min_filt,
+                                                (GXBool)hostObj->mipmap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    (GLint)GXTranslateMagFilter(mag_filt));
+    glBindTexture(GL_TEXTURE_2D, g_boundTextureId);
+}
+
+void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
+                     f32 min_lod, f32 max_lod, f32 lod_bias,
+                     GXBool bias_clamp, GXBool do_edge_lod, u8 max_aniso) {
+    GXHostTexObj* hostObj;
+
+    (void)bias_clamp;
+    (void)do_edge_lod;
+    (void)max_aniso;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    hostObj = GXGetHostTexObj(obj);
+    if (hostObj->magic != GX_HOST_TEXOBJ_MAGIC || hostObj->glTexId == 0) {
+        return;
+    }
+
+    hostObj->minFilt = (u8)min_filt;
+    hostObj->magFilt = (u8)mag_filt;
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    (GLint)GXTranslateMinFilter(min_filt,
+                                                (GXBool)hostObj->mipmap));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    (GLint)GXTranslateMagFilter(mag_filt));
+#ifdef GL_TEXTURE_MIN_LOD
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, (GLfloat)min_lod);
+#endif
+#ifdef GL_TEXTURE_MAX_LOD
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, (GLfloat)max_lod);
+#endif
+#ifdef GL_TEXTURE_LOD_BIAS
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, (GLfloat)lod_bias);
+#else
+    (void)lod_bias;
+#endif
+    glBindTexture(GL_TEXTURE_2D, g_boundTextureId);
+}
+
+void GXInitTexObjWrapMode(GXTexObj* obj, GXTexWrapMode wrap_s,
+                          GXTexWrapMode wrap_t) {
+    GXHostTexObj* hostObj;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    hostObj = GXGetHostTexObj(obj);
+    if (hostObj->magic != GX_HOST_TEXOBJ_MAGIC || hostObj->glTexId == 0) {
+        return;
+    }
+
+    hostObj->wrapS = (u8)wrap_s;
+    hostObj->wrapT = (u8)wrap_t;
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    (GLint)GXTranslateWrapMode(wrap_s));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                    (GLint)GXTranslateWrapMode(wrap_t));
+    glBindTexture(GL_TEXTURE_2D, g_boundTextureId);
 }
 
 void GXInitTlutObj(GXTlutObj* obj, void* lut,
@@ -1281,6 +1522,75 @@ void GXLoadLightObj(GXLightObj* obj, GXLightID id) {
  * 7. Draw Commands
  * ========================================================================= */
 
+/*
+ * Push the tracked GX state into the gx_tev shader backend and draw via the
+ * modern TEV->GLSL path. Returns 1 on success, 0 if the shader path is not
+ * ready or gx_tev_submit failed (caller then falls back to fixed-function).
+ *
+ * 'drawVertices'/'drawCount' are the already-expanded (quad->tri) immediate
+ * vertices; the GXImmVertex layout is binary-compatible with GXTevVertex.
+ */
+static int GXSubmitViaShader(GLenum glPrim,
+                             const GXImmVertex* drawVertices,
+                             u32 drawCount,
+                             GXTevMode tevMode) {
+    u32 currentMtx;
+    int useTexture;
+    int submitted;
+
+    if (!g_tevPathReady) {
+        return 0;
+    }
+
+    /* Matrices: projection + the active modelview slot (g_currentMtxId). */
+    gx_tev_set_proj_matrix(g_projMatrix);
+    currentMtx = (g_currentMtxId < 10) ? g_currentMtxId : 0;
+    gx_tev_set_modelview_matrix(g_posMtx[currentMtx]);
+
+    /* TEV color + konst registers (PREV/REG0..2, K0..K3). */
+    {
+        u32 i;
+        for (i = 0; i < 4; ++i) {
+            gx_tev_set_tev_color(i, g_tevColorRegs[i].r, g_tevColorRegs[i].g,
+                                 g_tevColorRegs[i].b, g_tevColorRegs[i].a);
+            gx_tev_set_konst_color(i, g_tevKonstRegs[i].r, g_tevKonstRegs[i].g,
+                                   g_tevKonstRegs[i].b, g_tevKonstRegs[i].a);
+        }
+    }
+
+    /* Alpha compare (shader discard) + host vertex alpha scale.
+     *
+     * The legacy fixed-function draw path never implemented alpha testing
+     * (Phase-3e TODO), so it always rendered. The GSgfx host render state for
+     * these draws carries the uninitialized default comp0=GX_NEVER (paired with
+     * op=AND, comp1=GX_LESS), which is a statically "never pass" test. Honoring
+     * a literal GX_NEVER would discard every fragment and render a black frame,
+     * regressing the working render. A real GX_NEVER is meaningless on console
+     * too, so its only source here is the uninitialized state; substitute
+     * GX_ALWAYS so the whole test becomes a no-op. The uninitialized GSgfx
+     * default is the pair (comp0=GX_NEVER, comp1=GX_LESS), which always
+     * discards; keying off comp0==GX_NEVER disables both comparators. Genuine
+     * alpha tests (GX_GREATER, GX_GEQUAL, GX_LESS, etc. used for cutout
+     * textures) leave comp0 as a real comparator and are fully honored. */
+    if (g_alphaComp0 == GX_NEVER) {
+        gx_tev_set_alpha_compare((u8)GX_ALWAYS, 0, (u8)GX_AOP_AND,
+                                 (u8)GX_ALWAYS, 0);
+    } else {
+        gx_tev_set_alpha_compare((u8)g_alphaComp0, g_alphaRef0, (u8)g_alphaOp,
+                                 (u8)g_alphaComp1, g_alphaRef1);
+    }
+    gx_tev_set_vertex_alpha_scale(g_vertexAlphaScale);
+
+    useTexture = g_boundTextureId != 0 &&
+                 g_numTexGens != 0 &&
+                 tevMode != GX_PASSCLR;
+
+    submitted = gx_tev_submit(&g_tevState, (u32)glPrim,
+                              (const GXTevVertex*)drawVertices, drawCount,
+                              (u32)g_boundTextureId, useTexture);
+    return submitted;
+}
+
 static int GXSubmitVertices(GXPrimitive primType,
                             const GXImmVertex* sourceVertices,
                             u32 sourceCount,
@@ -1343,6 +1653,23 @@ static int GXSubmitVertices(GXPrimitive primType,
 
     if (outExpandedCount != NULL) {
         *outExpandedCount = drawCount;
+    }
+
+    /* Modern TEV->GLSL path. The shader applies the vertex alpha scale itself
+     * (u_vertexAlphaScale), so feed it the expanded-but-unmodulated vertices.
+     * On success we are done; otherwise fall through to the legacy
+     * fixed-function draw below (which pre-modulates alpha on the CPU). */
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
+    if (GXSubmitViaShader(glPrim, drawVertices, drawCount, tevMode)) {
+        glFlush();
+        return 1;
+    }
+
+    /* Legacy fixed-function fallback. Drop any modern-GL program/VAO binding
+     * left by a prior shader draw so fixed-function rendering is unaffected. */
+    if (g_tevPathReady) {
+        gx_tev_unbind();
     }
 
     if (g_vertexAlphaScale < 0.999f || g_vertexAlphaScale > 1.001f) {
@@ -1683,6 +2010,20 @@ u32 GXHostGetLastExpandedVertexCount(void) {
 
 u32 GXHostGetLastSubmittedPrimitive(void) {
     return (u32)g_lastSubmittedPrimitive;
+}
+
+u32 GXHostGetTevKColorSel(u32 stage) {
+    if (stage >= GX_MAX_TEVSTAGE) {
+        return 0;
+    }
+    return g_tevKColorSel[stage];
+}
+
+u32 GXHostGetTevKAlphaSel(u32 stage) {
+    if (stage >= GX_MAX_TEVSTAGE) {
+        return 0;
+    }
+    return g_tevKAlphaSel[stage];
 }
 
 

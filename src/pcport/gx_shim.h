@@ -648,6 +648,36 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord,
                    GXTexMapID map, GXChannelID color);
 
 /**
+ * GXSetTevKColorSel -- Select the konst color source for a TEV stage.
+ * Called from HSD TEV setup (hsd_tev.c).
+ * PC port: store the K-color selection per stage (consumed by the TEV path).
+ */
+void GXSetTevKColorSel(GXTevStageID stage, u32 sel);
+
+/**
+ * GXSetTevKAlphaSel -- Select the konst alpha source for a TEV stage.
+ * Called from HSD TEV setup (hsd_tev.c).
+ * PC port: store the K-alpha selection per stage (consumed by the TEV path).
+ */
+void GXSetTevKAlphaSel(GXTevStageID stage, u32 sel);
+
+/**
+ * GXSetTevSwapModeTable -- Define a color-channel swap table entry.
+ * Called from HSD TEV setup (hsd_tev.c).
+ * PC port: store the per-table RGBA channel selectors (functional no-op store).
+ */
+void GXSetTevSwapModeTable(u32 id, u32 r, u32 g, u32 b, u32 a);
+
+/**
+ * GXSetTevIndirect -- Configure indirect texturing for a TEV stage.
+ * Called from HSD TEV setup (hsd_tev.c).
+ * PC port: store the indirect parameters per stage (functional no-op store).
+ */
+void GXSetTevIndirect(GXTevStageID stage, u32 ind_stage, u32 format,
+                      u32 bias_sel, u32 mtx_sel, u32 wrap_s, u32 wrap_t,
+                      u32 add_prev, u32 utc_lod, u32 alpha_sel);
+
+/**
  * GXSetBlendMode -- Set the blending mode.
  * Called from GSgfx_ConfigureBlend (fn_800DA2BC).
  * PC port: glBlendFunc + glBlendEquation.
@@ -734,6 +764,31 @@ void GXInitTexObj(GXTexObj* obj, void* image,
 void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
                            u16 width, u16 height,
                            GXTexWrapMode wrap_s, GXTexWrapMode wrap_t);
+
+/**
+ * GXInitTexObjFilterMode -- Override the min/mag filter on a texture object.
+ * Called from HSD TObj setup (hsd_tobj_ext.c, hsd_texp.c).
+ * PC port: re-apply GL_TEXTURE_MIN/MAG_FILTER to the object's GL texture.
+ */
+void GXInitTexObjFilterMode(GXTexObj* obj, GXTexFilter min_filt,
+                            GXTexFilter mag_filt);
+
+/**
+ * GXInitTexObjLOD -- Set LOD / mipmap filtering parameters on a texture object.
+ * Called from HSD TObj mipmap setup (hsd_tobj_ext.c, hsd_texp.c).
+ * PC port: apply GL_TEXTURE_MIN/MAG_FILTER + MIN/MAX_LOD + LOD_BIAS.
+ */
+void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
+                     f32 min_lod, f32 max_lod, f32 lod_bias,
+                     GXBool bias_clamp, GXBool do_edge_lod, u8 max_aniso);
+
+/**
+ * GXInitTexObjWrapMode -- Override the S/T wrap mode on a texture object.
+ * Called from HSD TObj setup (hsd_tobj_ext.c, hsd_texp.c).
+ * PC port: re-apply GL_TEXTURE_WRAP_S/T to the object's GL texture.
+ */
+void GXInitTexObjWrapMode(GXTexObj* obj, GXTexWrapMode wrap_s,
+                          GXTexWrapMode wrap_t);
 
 /**
  * GXInitTlutObj -- Initialize a TLUT (palette) object.
