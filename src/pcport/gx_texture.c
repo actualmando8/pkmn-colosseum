@@ -115,28 +115,39 @@ static void decode_dxt1_block(const u8* srcBlock,
 
 void gx_tlut_decode_entry(u16 entry, GXTlutFmt fmt,
                           u8* outR, u8* outG, u8* outB, u8* outA) {
-    /* TODO: Phase 3d -- Decode a single TLUT palette entry
-     *
-     * GX_TL_IA8:
-     *   High byte = intensity (I), low byte = alpha (A)
-     *   *outR = *outG = *outB = (entry >> 8) & 0xFF;
-     *   *outA = entry & 0xFF;
-     *
-     * GX_TL_RGB565:
-     *   5 bits red, 6 bits green, 5 bits blue
-     *   *outR = ((entry >> 11) & 0x1F) * 255 / 31;
-     *   *outG = ((entry >> 5) & 0x3F) * 255 / 63;
-     *   *outB = (entry & 0x1F) * 255 / 31;
-     *   *outA = 255;
-     *
-     * GX_TL_RGB5A3:
-     *   If MSB=1: 5 bits R, 5 bits G, 5 bits B, A=255
-     *   If MSB=0: 4 bits R, 4 bits G, 4 bits B, 3 bits A
-     *   (same decode as RGB5A3 texture format)
-     */
-
-    (void)entry; (void)fmt;
-    *outR = 0; *outG = 0; *outB = 0; *outA = 255;
+    /* Decode a single 16-bit big-endian TLUT palette entry to RGBA bytes.
+     * Mirrors decode_title.py tlut_rgba() / _rgb565() / _rgb5a3(). */
+    switch (fmt) {
+        case GX_TL_IA8: {
+            u8 i = (u8)((entry >> 8) & 0xFFu);
+            *outR = i; *outG = i; *outB = i;
+            *outA = (u8)(entry & 0xFFu);
+            break;
+        }
+        case GX_TL_RGB565:
+            *outR = expand_5_to_8((entry >> 11) & 0x1Fu);
+            *outG = expand_6_to_8((entry >> 5) & 0x3Fu);
+            *outB = expand_5_to_8(entry & 0x1Fu);
+            *outA = 0xFF;
+            break;
+        case GX_TL_RGB5A3:
+        default:
+            if (entry & 0x8000u) {
+                /* RGB555, opaque */
+                *outR = expand_5_to_8((entry >> 10) & 0x1Fu);
+                *outG = expand_5_to_8((entry >> 5) & 0x1Fu);
+                *outB = expand_5_to_8(entry & 0x1Fu);
+                *outA = 0xFF;
+            } else {
+                /* RGB4A3 */
+                u32 a3 = (entry >> 12) & 0x07u;
+                *outR = (u8)(((entry >> 8) & 0x0Fu) * 0x11u);
+                *outG = (u8)(((entry >> 4) & 0x0Fu) * 0x11u);
+                *outB = (u8)((entry & 0x0Fu) * 0x11u);
+                *outA = (u8)((a3 << 5) | (a3 << 2) | (a3 >> 1));
+            }
+            break;
+    }
 }
 
 u8 gx_texture_get_swizzle_mode(GXTexFmt format) {
@@ -527,32 +538,78 @@ s32 gx_texture_decode_RGBA8(const void* src, u16 w, u16 h,
 s32 gx_texture_decode_CI4(const void* src, u16 w, u16 h,
                           const void* tlut, GXTlutFmt tlutFmt,
                           GXDecodedTexture* out) {
-    (void)src; (void)tlut; (void)tlutFmt;
+    const u8* srcBytes = (const u8*)src;
+    const u8* tlutBytes = (const u8*)tlut;
+    u32 tilesX = ((u32)w + 7u) / 8u;
+    u32 tilesY = ((u32)h + 7u) / 8u;
+    u32 tileY;
+    u32 tileX;
 
-    /* TODO: Phase 3d -- Decode CI4 (4-bit color index via palette)
-     *
-     * Tile layout: 8x8 texels per tile, 4 bits per texel
-     * Same tile format as I4, but each value is a palette index.
-     *
-     * Algorithm:
-     * for each texel:
-     *   u8 index = (byte >> nibbleShift) & 0x0F
-     *   u16 paletteEntry = read_be16(&tlut[index * 2])
-     *   gx_tlut_decode_entry(paletteEntry, tlutFmt, &r, &g, &b, &a)
-     *   out[pixel*4+0] = r
-     *   out[pixel*4+1] = g
-     *   out[pixel*4+2] = b
-     *   out[pixel*4+3] = a
-     *
-     * Output: GL_RGBA8
-     */
-
+    /* CI4: 8x8 texels per tile, 32 bytes per tile, 4 bits per texel.
+     * High nibble = even column, low nibble = odd column (same as I4).
+     * Each nibble is a palette index into the TLUT. */
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 4;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
-    memset(out->data, 0xFF, out->dataSize);
+    memset(out->data, 0, out->dataSize);
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 srcIndex = 0u;
+            u32 row;
+
+            for (row = 0; row < 8u; ++row) {
+                u32 dstY = (tileY * 8u) + row;
+                u32 col;
+
+                for (col = 0; col < 8u; col += 2u) {
+                    u8 byteVal = tileSrc[srcIndex++];
+                    u8 idx0 = (u8)((byteVal >> 4) & 0x0Fu);
+                    u8 idx1 = (u8)(byteVal & 0x0Fu);
+                    u32 dstX0 = (tileX * 8u) + col;
+                    u32 dstX1 = dstX0 + 1u;
+
+                    if (dstY >= h) {
+                        continue;
+                    }
+
+                    if (dstX0 < w) {
+                        u8* dstPixel =
+                            out->data + ((((u32)dstY * (u32)w) + dstX0) * 4u);
+                        if (tlutBytes) {
+                            gx_tlut_decode_entry(
+                                read_be16(tlutBytes + ((u32)idx0 * 2u)),
+                                tlutFmt, &dstPixel[0], &dstPixel[1],
+                                &dstPixel[2], &dstPixel[3]);
+                        } else {
+                            u8 g = (u8)(idx0 * 0x11u);
+                            dstPixel[0] = g; dstPixel[1] = g;
+                            dstPixel[2] = g; dstPixel[3] = 0xFF;
+                        }
+                    }
+                    if (dstX1 < w) {
+                        u8* dstPixel =
+                            out->data + ((((u32)dstY * (u32)w) + dstX1) * 4u);
+                        if (tlutBytes) {
+                            gx_tlut_decode_entry(
+                                read_be16(tlutBytes + ((u32)idx1 * 2u)),
+                                tlutFmt, &dstPixel[0], &dstPixel[1],
+                                &dstPixel[2], &dstPixel[3]);
+                        } else {
+                            u8 g = (u8)(idx1 * 0x11u);
+                            dstPixel[0] = g; dstPixel[1] = g;
+                            dstPixel[2] = g; dstPixel[3] = 0xFF;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     out->glInternalFormat = GL_RGBA8;
     out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;
@@ -564,28 +621,61 @@ s32 gx_texture_decode_CI4(const void* src, u16 w, u16 h,
 s32 gx_texture_decode_CI8(const void* src, u16 w, u16 h,
                           const void* tlut, GXTlutFmt tlutFmt,
                           GXDecodedTexture* out) {
-    (void)src; (void)tlut; (void)tlutFmt;
+    const u8* srcBytes = (const u8*)src;
+    const u8* tlutBytes = (const u8*)tlut;
+    u32 tilesX = ((u32)w + 7u) / 8u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
-    /* TODO: Phase 3d -- Decode CI8 (8-bit color index via palette)
-     *
-     * Tile layout: 8x4 texels per tile, 8 bits per texel
-     * Same tile format as I8, but each byte is a palette index.
-     *
-     * Algorithm:
-     * for each texel:
-     *   u8 index = src[tileOffset + r*8 + c]
-     *   u16 paletteEntry = read_be16(&tlut[index * 2])
-     *   gx_tlut_decode_entry(paletteEntry, tlutFmt, &r, &g, &b, &a)
-     *
-     * Output: GL_RGBA8
-     */
-
+    /* CI8: 8x4 texels per tile, 32 bytes per tile, 1 byte index per texel
+     * (same tile walk as I8). Each byte is a palette index into the TLUT. */
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 4;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
-    memset(out->data, 0xFF, out->dataSize);
+    memset(out->data, 0, out->dataSize);
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 8u; ++col) {
+                    u32 dstX = (tileX * 8u) + col;
+                    u8 idx;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+
+                    idx = tileSrc[(row * 8u) + col];
+                    dstPixel = out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    if (tlutBytes) {
+                        gx_tlut_decode_entry(
+                            read_be16(tlutBytes + ((u32)idx * 2u)),
+                            tlutFmt, &dstPixel[0], &dstPixel[1],
+                            &dstPixel[2], &dstPixel[3]);
+                    } else {
+                        dstPixel[0] = idx; dstPixel[1] = idx;
+                        dstPixel[2] = idx; dstPixel[3] = 0xFF;
+                    }
+                }
+            }
+        }
+    }
+
     out->glInternalFormat = GL_RGBA8;
     out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;

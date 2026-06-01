@@ -227,6 +227,8 @@ static BOOL IsNoTevDirectSampleFormat(u32 textureFormat) {
     switch (textureFormat) {
     case GX_TF_CMPR:
     case GX_TF_RGBA8:
+    case GX_TF_C4:  /* CI4 (palettized) */
+    case GX_TF_C8:  /* CI8 (palettized) */
         return TRUE;
     default:
         return FALSE;
@@ -239,8 +241,13 @@ static u8 ClassifyTextureExpStageKind(const PCPortTranslatedTexture* texture,
         return PCPORT_TEXP_STAGE_NONE;
     }
 
+    /* A directly-sampleable format (CMPR/RGBA8/CI4/CI8) is a plain texture
+     * stage. A non-NULL TEV is fine as long as it is NOT the special I8
+     * colour-ramp kind: the generic TEV just selects a blend mode, which the
+     * pipeline already applies via tevMode. Requiring tevArchiveOffset==0 here
+     * is what rejected the RGBA8/palettized ground/ruins nodes (they carry a
+     * plain modulate TEV) and left them rendering as a flat material colour. */
     if (IsNoTevDirectSampleFormat(texture->format) &&
-        texture->tevArchiveOffset == 0u &&
         texture->tev.kind == PCPORT_TRANSLATED_TEV_NONE) {
         return PCPORT_TEXP_STAGE_DIRECT_SAMPLE;
     }
@@ -1558,8 +1565,18 @@ static BOOL TranslateTextureFromArchiveCommon(const PCPortHSDArchive* archive,
     tlutOffset = ReadBE32(archive->storage + tobjArchiveOffset + 0x50);
     outTexture->tevArchiveOffset = tevOffset;
 
-    if (tlutOffset != 0u ||
-        outTexture->width == 0u || outTexture->height == 0u ||
+    /* tobj+0x50 points at an HSD TlutDesc (NOT the palette data directly):
+     *   { u32 lutDataOffset@0x00; u32 fmt@0x04 (GXTlutFmt);
+     *     u32 name@0x08; u16 n_entries@0x0C }
+     * Capture it so palettized (CI4/CI8) textures can be decoded. */
+    if (tlutOffset != 0u && IsArchiveRangeValid(archive, tlutOffset, 0x10u)) {
+        outTexture->tlutArchiveOffset =
+            ReadBE32(archive->storage + tlutOffset + 0x00);
+        outTexture->tlutFmt = ReadBE32(archive->storage + tlutOffset + 0x04);
+        outTexture->tlutEntries = ReadBE16(archive->storage + tlutOffset + 0x0C);
+    }
+
+    if (outTexture->width == 0u || outTexture->height == 0u ||
         (tevOffset != 0u && !IsArchiveRangeValid(archive, tevOffset, 1u)) ||
         !IsArchiveRangeValid(archive, imageDataOffset, 1u)) {
         return FALSE;
@@ -1747,6 +1764,9 @@ static BOOL DecodeTextureToRGBA(const PCPortHSDArchive* archive,
                                 u8** outPixels,
                                 u32* outSize) {
     GXDecodedTexture decoded;
+    const void* tlutData = NULL;
+    GXTlutFmt tlutFmt = GX_TL_IA8;
+    u16 tlutEntries = 0u;
 
     if (outPixels == NULL || outSize == NULL) {
         return FALSE;
@@ -1761,14 +1781,24 @@ static BOOL DecodeTextureToRGBA(const PCPortHSDArchive* archive,
         return FALSE;
     }
 
+    /* Palettized (CI4/CI8) textures carry a TLUT (palette). Point the decoder
+     * at the captured palette data so the index->RGBA lookup resolves; for
+     * non-palettized formats the TLUT args stay NULL/0. */
+    if (texture->tlutArchiveOffset != 0u &&
+        IsArchiveRangeValid(archive, texture->tlutArchiveOffset, 1u)) {
+        tlutData = archive->storage + texture->tlutArchiveOffset;
+        tlutFmt = (GXTlutFmt)texture->tlutFmt;
+        tlutEntries = texture->tlutEntries;
+    }
+
     memset(&decoded, 0, sizeof(decoded));
     if (gx_texture_decode(archive->storage + texture->imageDataArchiveOffset,
                           texture->width,
                           texture->height,
                           (GXTexFmt)texture->format,
-                          NULL,
-                          GX_TL_IA8,
-                          0,
+                          tlutData,
+                          tlutFmt,
+                          tlutEntries,
                           &decoded) != 0 ||
         decoded.data == NULL ||
         decoded.isCompressed != 0u) {
@@ -1846,35 +1876,36 @@ BOOL PCPort_BakeTextureRGBAFromArchiveBE(const PCPortHSDArchive* archive,
         return FALSE;
     }
 
-    if (texture->tev.kind == PCPORT_TRANSLATED_TEV_NONE &&
-        texture->tevArchiveOffset == 0u) {
-        return DecodeTextureToRGBA(archive, texture, outPixels, outSize);
+    /* I8 colour-ramp TEV: bake the ramp into RGBA. */
+    if (texture->tev.kind == PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP &&
+        texture->format == GX_TF_I8) {
+        totalSize = (u32)texture->width * (u32)texture->height * 4u;
+        if (totalSize == 0u) {
+            return FALSE;
+        }
+
+        pixels = (u8*)malloc((size_t)totalSize);
+        if (pixels == NULL) {
+            return FALSE;
+        }
+
+        DecodeI8RampTexture(archive->storage + texture->imageDataArchiveOffset,
+                            texture->width,
+                            texture->height,
+                            texture->tev.rampLight,
+                            texture->tev.rampDark,
+                            pixels);
+        *outPixels = pixels;
+        *outSize = totalSize;
+        return TRUE;
     }
 
-    if (texture->tev.kind != PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP ||
-        texture->format != GX_TF_I8) {
-        return FALSE;
-    }
-
-    totalSize = (u32)texture->width * (u32)texture->height * 4u;
-    if (totalSize == 0u) {
-        return FALSE;
-    }
-
-    pixels = (u8*)malloc((size_t)totalSize);
-    if (pixels == NULL) {
-        return FALSE;
-    }
-
-    DecodeI8RampTexture(archive->storage + texture->imageDataArchiveOffset,
-                        texture->width,
-                        texture->height,
-                        texture->tev.rampLight,
-                        texture->tev.rampDark,
-                        pixels);
-    *outPixels = pixels;
-    *outSize = totalSize;
-    return TRUE;
+    /* Any other texture (no TEV, or a generic non-ramp TEV stage) is a plain
+     * sampled texture: decode its native GX format directly. The pipeline's
+     * tevMode (REPLACE/PASS/MODULATE) applies the colour blend, so a non-NULL
+     * TEV node here is NOT a reason to fall back to a flat material -- that is
+     * what left the RGBA8/palettized ground/ruins nodes rendering gray. */
+    return DecodeTextureToRGBA(archive, texture, outPixels, outSize);
 }
 
 BOOL PCPort_BakeTextureExpRGBAFromArchiveBE(const PCPortHSDArchive* archive,

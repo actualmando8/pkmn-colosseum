@@ -122,6 +122,9 @@ typedef struct {
     u8 tevMode;
     PCPortTranslatedTev tev;
     f32 blending;
+    u32 tlutArchiveOffset; /* archive offset of the palette (lut) data, 0 if none */
+    u32 tlutFmt;           /* GXTlutFmt of the palette entries */
+    u16 tlutEntries;       /* number of palette entries */
 } PCPortTranslatedTexture;
 
 typedef enum {
