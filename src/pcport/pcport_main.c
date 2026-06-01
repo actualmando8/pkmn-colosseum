@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /*
  * Minimal bridge to one decompiled Dolphin SDK TU. This avoids pulling in
@@ -4562,15 +4563,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         ++vtx;
                     }
                 }
-                /* Skip the demo's full-screen fade/flash overlay: a tiny
-                 * material-only quad pinned just in front of the camera
-                 * (camera-space z near 0, while real scene geometry sits at
-                 * z < -100). Statically it is an opaque white quad that covers
-                 * the whole title scene; in-game it is an animated alpha fade
-                 * that ends fully transparent. */
-                if (!(haveTexture == 0 &&
-                      translatedPObj.totalSubmittedVertices <= 6u &&
-                      modelViewMatrix[2][3] > -50.0f)) {
+                /* Skip the demo's full-screen fade/flash overlay: a material-
+                 * only quad whose material alpha is ~0 (fully transparent).
+                 * In-game it is an animated alpha fade that ends transparent;
+                 * drawn opaque it would cover the whole title scene. Keying on
+                 * alpha (not camera-space position) is camera-independent. */
+                if (!(haveTexture == 0 && haveMaterial &&
+                      translatedMaterial.alpha < 0.01f)) {
                     fn_801AA568(&translatedPObj.pobj);
                     fn_800DAD10((void*)&drawObject);
                     stats->drawn++;
@@ -4620,6 +4619,38 @@ static void RenderJointTree(const PCPortHSDArchive* a,
     if (nextOffset != 0u && nextOffset != joint) {
         RenderJointTree(a, rootJoint, nextOffset, cam, pipelineId, stats);
     }
+}
+
+/* World->camera 3x4 view matrix (GameCube convention: camera looks down -Z)
+ * from eye/interest/up, used to override a scene camera with a known pose. */
+static void BuildViewMatrixLookAt(const f32 eye[3], const f32 interest[3],
+                                  const f32 up[3], f32 outView[3][4]) {
+    f32 zx = eye[0] - interest[0];
+    f32 zy = eye[1] - interest[1];
+    f32 zz = eye[2] - interest[2];
+    f32 zl = (f32)sqrt((double)((zx * zx) + (zy * zy) + (zz * zz)));
+    f32 xx, xy, xz, xl, yx, yy, yz;
+
+    if (zl < 1e-6f) { zl = 1.0f; }
+    zx /= zl; zy /= zl; zz /= zl;
+
+    xx = (up[1] * zz) - (up[2] * zy);
+    xy = (up[2] * zx) - (up[0] * zz);
+    xz = (up[0] * zy) - (up[1] * zx);
+    xl = (f32)sqrt((double)((xx * xx) + (xy * xy) + (xz * xz)));
+    if (xl < 1e-6f) { xl = 1.0f; }
+    xx /= xl; xy /= xl; xz /= xl;
+
+    yx = (zy * xz) - (zz * xy);
+    yy = (zz * xx) - (zx * xz);
+    yz = (zx * xy) - (zy * xx);
+
+    outView[0][0] = xx; outView[0][1] = xy; outView[0][2] = xz;
+    outView[0][3] = -((xx * eye[0]) + (xy * eye[1]) + (xz * eye[2]));
+    outView[1][0] = yx; outView[1][1] = yy; outView[1][2] = yz;
+    outView[1][3] = -((yx * eye[0]) + (yy * eye[1]) + (yz * eye[2]));
+    outView[2][0] = zx; outView[2][1] = zy; outView[2][2] = zz;
+    outView[2][3] = -((zx * eye[0]) + (zy * eye[1]) + (zz * eye[2]));
 }
 
 /*
@@ -4719,6 +4750,21 @@ static int RunMenuScene(GLFWwindow* window) {
                 sceneOffset,
                 cameraDescOffset);
         goto cleanup;
+    }
+
+    /* Replace logo_demo's embedded flythrough-START camera (interest looks down
+     * and close, which frames the scene zoomed-in) with the title END pose held
+     * by cam_logo_demo_stop: same eye, but the interest looks ACROSS the desert
+     * at eye level. These are the end-frame values of cam_logo_demo_stop's
+     * (all-constant) camera animation. The archive's projection (fov 45, near/
+     * far) is kept. PCPORT_NO_TITLE_CAM disables it (use the raw scene camera). */
+    if (getenv("PCPORT_NO_TITLE_CAM") == NULL) {
+        static const f32 titleEye[3] = { 0.0f, 38.905f, 409.812f };
+        static const f32 titleInt[3] = { 0.0f, 39.6514f, 1.5625f };
+        static const f32 titleUp[3]  = { 0.0f, 1.0f, 0.0f };
+
+        BuildViewMatrixLookAt(titleEye, titleInt, titleUp,
+                              translatedCamera.viewMatrix);
     }
 
     sceneJointListOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x00);
