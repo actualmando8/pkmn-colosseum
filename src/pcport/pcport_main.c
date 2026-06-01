@@ -81,6 +81,15 @@ unsigned long CurrTvMode = 0;
 #define PCPORT_GX_OUTSIDE_Y   40
 #define PCPORT_REAL_CONTENT_ARCHIVE "orig/GC6E01/disc/files/topmenu.fsys"
 #define PCPORT_REAL_CONTENT_MEMBER  "menu_bg00"
+
+/* Static "Pokemon Colosseum" title wordmark: title.fsys -> member logo_demo
+ * (HSD archive), texture index 01 = RGBA8 540x224 at decompressed-archive
+ * offset 0xAC2E0. Drawn as an alpha-blended 2D overlay over menu_bg00. */
+#define PCPORT_LOGO_ARCHIVE      "orig/GC6E01/disc/files/title.fsys"
+#define PCPORT_LOGO_MEMBER       "logo_demo"
+#define PCPORT_LOGO_IMAGE_OFFSET 0xAC2E0u
+#define PCPORT_LOGO_WIDTH        540
+#define PCPORT_LOGO_HEIGHT       224
 #define PCPORT_PDA_MENU_ARCHIVE     "orig/GC6E01/disc/files/pda_menu.fsys"
 #define PCPORT_PDA2_BG_MEMBER       "pda2_bg"
 #define PCPORT_SERIALIZED_JOINT_SIZE 0x40u
@@ -425,6 +434,71 @@ static void SubmitFullScreenGXQuad(unsigned char r,
     GXColor4u8(r, g, b, a);
     GXPosition3f32(-1.0f, 1.0f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
+
+    GXEnd();
+}
+
+/* Draw the static title logo as an alpha-blended 2D overlay quad, composited
+ * on top of whatever 3D scene was just rendered. Resets all the per-frame 3D
+ * camera state (viewport/scissor/projection/modelview/depth) to a full-screen
+ * orthographic identity so the quad is neither clipped to the camera scissor
+ * nor depth-killed against the background. */
+static void DrawLogoOverlay(GXTexObj* logoTex) {
+    static Mtx44 orthoProjection = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f }
+    };
+    static Mtx identityModelView = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f }
+    };
+    /* NDC placement: top-centre, preserving the logo's 540:224 pixel aspect on
+     * the 640x480 viewport (1 NDC-x = 320px, 1 NDC-y = 240px). */
+    const f32 halfW = 0.62f;
+    const f32 halfH = halfW * ((f32)PCPORT_LOGO_HEIGHT / (f32)PCPORT_LOGO_WIDTH)
+                            * (640.0f / 480.0f);
+    const f32 yTop = 0.90f;
+    const f32 yBot = yTop - (2.0f * halfH);
+
+    GXSetViewport(0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 1.0f);
+    GXSetScissor(0u, 0u, 640u, 480u);
+    GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
+    GXLoadPosMtxImm(identityModelView, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
+
+    /* Textured: one texgen + MODULATE so the white vertex colour passes the
+     * sampled texel through unchanged. The immediate path only samples the
+     * bound texture when numTexGens != 0 and the TEV mode is not PASSCLR. */
+    GXSetNumTexGens(1);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXLoadTexObj(logoTex, GX_TEXMAP0);
+    GXHostSetVertexAlphaScale(1.0f);
+
+    /* Quad. Texcoord t=0 at the TOP of the image (higher NDC y) so it renders
+     * upright; white vertex colour keeps the texture's own colours. */
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+
+    GXColor4u8(255, 255, 255, 255);
+    GXPosition3f32(-halfW, yBot, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+
+    GXColor4u8(255, 255, 255, 255);
+    GXPosition3f32(halfW, yBot, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+
+    GXColor4u8(255, 255, 255, 255);
+    GXPosition3f32(halfW, yTop, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+
+    GXColor4u8(255, 255, 255, 255);
+    GXPosition3f32(-halfW, yTop, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
 
     GXEnd();
 }
@@ -4482,9 +4556,18 @@ static int RunMenuScene(GLFWwindow* window) {
     int dumpRequested;
     int ok = 0;
     const char* menuMember;
+    PCPortHSDArchive logoArchive;
+    u8* logoData = NULL;
+    u32 logoSize = 0;
+    u8* logoPixels = NULL;
+    u32 logoPxSize = 0;
+    GXTexObj logoTex;
+    int haveLogo = 0;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
+    memset(&logoArchive, 0, sizeof(logoArchive));
+    memset(&logoTex, 0, sizeof(logoTex));
 
     /* default to the top-menu background; env PCPORT_MENU_MEMBER renders any
      * topmenu.fsys scene member (e.g. ken_b1) with the same scene-graph walk. */
@@ -4565,6 +4648,35 @@ static int RunMenuScene(GLFWwindow* window) {
            frameCap,
            dumpRequested);
 
+    /* Load + bake + upload the static title logo once (GL context + GSgfxInit
+     * are ready here). The decompressor fix in real_content_host.c is required
+     * for logo_demo (a strongly-compressed v0102 member) to load at all. */
+    if (PCPort_LoadFsysMember(PCPORT_LOGO_ARCHIVE, PCPORT_LOGO_MEMBER,
+                              &logoData, &logoSize) &&
+        PCPort_HSDArchiveParseBE(&logoArchive, logoData, logoSize)) {
+        PCPortTranslatedTexture logoDesc;
+
+        memset(&logoDesc, 0, sizeof(logoDesc));
+        logoDesc.imageDataArchiveOffset = PCPORT_LOGO_IMAGE_OFFSET;
+        logoDesc.format = GX_TF_RGBA8;
+        logoDesc.width = PCPORT_LOGO_WIDTH;
+        logoDesc.height = PCPORT_LOGO_HEIGHT;
+
+        if (PCPort_BakeTextureRGBAFromArchiveBE(&logoArchive, &logoDesc,
+                                                &logoPixels, &logoPxSize)) {
+            GXHostInitTexObjRGBA8(&logoTex, logoPixels,
+                                  PCPORT_LOGO_WIDTH, PCPORT_LOGO_HEIGHT,
+                                  GX_CLAMP, GX_CLAMP);
+            haveLogo = 1;
+            printf("[pcport_bootstrap] Title logo loaded (%dx%d, %u bytes)\n",
+                   PCPORT_LOGO_WIDTH, PCPORT_LOGO_HEIGHT, logoPxSize);
+        }
+    }
+    if (!haveLogo) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Title logo unavailable (continuing without it)\n");
+    }
+
     for (frame = 0; frame < frameCap; ++frame) {
         MenuTreeStats stats;
 
@@ -4597,6 +4709,11 @@ static int RunMenuScene(GLFWwindow* window) {
                         (int)PCPORT_REAL_MATERIAL_PIPELINE,
                         &stats);
 
+        /* Composite the static title logo on top of the 3D background. */
+        if (haveLogo) {
+            DrawLogoOverlay(&logoTex);
+        }
+
         /* On the final frame, capture the framebuffer (BMP dump happens inside
          * ReadBackbufferImage via DumpFramebufferBMP when PCPORT_DUMP is set)
          * before presenting. */
@@ -4627,6 +4744,9 @@ static int RunMenuScene(GLFWwindow* window) {
 cleanup:
     PCPort_HSDArchiveDestroy(&archive);
     PCPort_FreeBuffer(memberData);
+    PCPort_HSDArchiveDestroy(&logoArchive);
+    PCPort_FreeBuffer(logoData);
+    PCPort_FreeBuffer(logoPixels);
     return ok;
 }
 

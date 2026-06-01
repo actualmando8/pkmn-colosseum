@@ -426,32 +426,55 @@ s32 gx_texture_decode_RGB5A3(const void* src, u16 w, u16 h,
 
 s32 gx_texture_decode_RGBA8(const void* src, u16 w, u16 h,
                             GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode RGBA8 (32-bit, interleaved AR/GB tiles)
-     *
-     * Tile layout: 4x4 texels per tile, 64 bytes per tile
-     * Each tile stores two 32-byte cache lines:
-     *   Cache line 0: AR values (16 texels * 2 bytes = 32)
-     *   Cache line 1: GB values (16 texels * 2 bytes = 32)
-     *
-     * For each texel within a tile:
-     *   a = arData[row*4 + col]   (from cache line 0)
-     *   r = arData[row*4 + col + 1]
-     *   g = gbData[row*4 + col]   (from cache line 1)
-     *   b = gbData[row*4 + col + 1]
-     *
-     * De-interleave and write to linear RGBA output.
-     *
-     * Output: GL_RGBA8
-     */
+    /* RGBA8 ("RGBA32"): 4x4 texels per tile, 64 bytes per tile. The tile is
+     * two 32-byte groups: first 32 bytes are AR pairs (A,R per texel), next 32
+     * are GB pairs (G,B per texel). Texel index k = row*4 + col, stride 2. */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 3u) / 4u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 4;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
-    memset(out->data, 0xFF, out->dataSize);
+    memset(out->data, 0, out->dataSize);
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* arData = srcBytes + (((tileY * tilesX) + tileX) * 64u);
+            const u8* gbData = arData + 32u;
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 4u; ++col) {
+                    u32 dstX = (tileX * 4u) + col;
+                    u32 k = (row * 4u) + col;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+
+                    dstPixel = out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    dstPixel[0] = arData[(k * 2u) + 1u]; /* R */
+                    dstPixel[1] = gbData[(k * 2u) + 0u]; /* G */
+                    dstPixel[2] = gbData[(k * 2u) + 1u]; /* B */
+                    dstPixel[3] = arData[(k * 2u) + 0u]; /* A */
+                }
+            }
+        }
+    }
+
     out->glInternalFormat = GL_RGBA8;
     out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;

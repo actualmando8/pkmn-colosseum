@@ -979,9 +979,17 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
     }
 
     dataOffset = ReadBE32(fsysData + entryOffset + 0x04);
+    /* entry+0x08 is the DECOMPRESSED size for LZSS members (and equals the
+     * on-disk size for stored members). The true on-disk byte count of a
+     * compressed member lives in its LZSS header (dataOffset+0x08), so the
+     * up-front check only requires the header word to be in range; each branch
+     * below validates the real on-disk length. Bounds-checking against
+     * compressedSize here falsely rejected strongly-compressed members
+     * (e.g. title.fsys:logo_demo, decompressed 0x15BC6B). */
     compressedSize = ReadBE32(fsysData + entryOffset + 0x08);
 
-    if (dataOffset >= fsysSize || dataOffset + compressedSize > fsysSize) {
+    if (dataOffset >= fsysSize ||
+        dataOffset + PCPORT_LZSS_HEADER_SIZE > fsysSize) {
         free(fsysData);
         return FALSE;
     }
@@ -990,15 +998,11 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
         u32 lzssOutputSize;
         u32 lzssInputSize;
 
-        if (compressedSize < PCPORT_LZSS_HEADER_SIZE) {
-            free(fsysData);
-            return FALSE;
-        }
-
         lzssOutputSize = ReadBE32(fsysData + dataOffset + 0x04);
         lzssInputSize = ReadBE32(fsysData + dataOffset + 0x08);
-        if (lzssOutputSize == 0 || lzssInputSize > compressedSize ||
-            lzssInputSize < PCPORT_LZSS_HEADER_SIZE) {
+        if (lzssOutputSize == 0 ||
+            lzssInputSize < PCPORT_LZSS_HEADER_SIZE ||
+            dataOffset + lzssInputSize > fsysSize) {
             free(fsysData);
             return FALSE;
         }
@@ -1020,6 +1024,11 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
         *outSize = lzssOutputSize;
     } else {
         u32 copySize = compressedSize;
+
+        if (dataOffset + copySize > fsysSize) {
+            free(fsysData);
+            return FALSE;
+        }
 
         output = (u8*)malloc((size_t)copySize);
         if (output == NULL) {
