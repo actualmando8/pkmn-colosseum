@@ -4481,12 +4481,20 @@ static int RunMenuScene(GLFWwindow* window) {
     int frame;
     int dumpRequested;
     int ok = 0;
+    const char* menuMember;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
 
+    /* default to the top-menu background; env PCPORT_MENU_MEMBER renders any
+     * topmenu.fsys scene member (e.g. ken_b1) with the same scene-graph walk. */
+    menuMember = getenv("PCPORT_MENU_MEMBER");
+    if (menuMember == NULL || menuMember[0] == '\0') {
+        menuMember = PCPORT_REAL_CONTENT_MEMBER;
+    }
+
     if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE,
-                               PCPORT_REAL_CONTENT_MEMBER,
+                               menuMember,
                                &memberData,
                                &memberSize)) {
         fprintf(stderr,
