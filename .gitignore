@@ -36,7 +36,9 @@ ctx.*
 *.ctx
 
 # Generated configs
-objdiff.json
+# Note: objdiff.json is hand-maintained (per-unit mappings) and IS tracked —
+# the objdiff GUI and decomp.dev both need it. configure.py only writes a stub
+# when it is absent and never overwrites it.
 compile_commands.json
 
 # Toolchain binaries

@@ -1,5 +1,10 @@
 # Pokémon Colosseum decompilation (GC6E01 / GPXE01)
 
+[![Progress](https://decomp.dev/dougchansan/pkmn-colosseum.svg)](https://decomp.dev/dougchansan/pkmn-colosseum)
+
+> The progress badge activates once the repo is registered at
+> [decomp.dev/manage/new](https://decomp.dev/manage/new).
+
 A work-in-progress matching decompilation of the GameCube game **Pokémon
 Colosseum** (NTSC-U: `GC6E01`). The goal is byte-identical reproduction of the
 original `main.dol` from C source, using the same Metrowerks CodeWarrior
@@ -71,7 +76,9 @@ docs/
 
 ## Contributing
 
-If you want to push a function from `X%` to `100%`:
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for full setup, the per-function
+workflow, the objdiff GUI, and the rules that keep the match honest. In short,
+to push a function from `X%` to `100%`:
 
 1. Pick a file from `python tools/progress.py` (worst-match files printed first).
 2. Run `python tools/decompctx.py src/path/to/file.c` to get a `ctx.c` you
@@ -101,9 +108,10 @@ Tooling and methodology lifted from established GCN/Wii decomps:
 ## License
 
 The decompiled C source in this repository is released under the [MIT
-license](LICENSE). The Pokémon Colosseum game, its assets, and the
-CodeWarrior toolchain are property of their respective copyright holders —
-this project does not redistribute any of that material.
+license](LICENSE) (scope details in [NOTICE](NOTICE)). The Pokémon Colosseum
+game, its assets, and the CodeWarrior toolchain are property of their
+respective copyright holders — this project does not redistribute any of that
+material.
 
 ## Disclaimer
 
