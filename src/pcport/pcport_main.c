@@ -4254,6 +4254,8 @@ typedef struct {
     unsigned int dobjs;
     unsigned int drawn;
     unsigned int skipped;
+    unsigned int textured;
+    unsigned int materialOnly;
 } MenuTreeStats;
 
 /*
@@ -4261,10 +4263,18 @@ typedef struct {
  * stopping at the first renderable PObjDesc, walk every joint (child at
  * joint+0x08, sibling at joint+0x0C), every DObj on each joint (list head at
  * joint+0x10, next at dobj+0x00), and draw each DObj's PObj (dobj+0x0C) with
- * the material-only translate+draw template proven in RunRealSceneSlice2Smoke.
+ * the translate+draw template proven in RunRealSceneSlice2/3/4Smoke.
  * Every archive read is range-guarded so a malformed/missing node is skipped,
- * never dereferenced. Material-only: textured nodes fall back to the material
- * pipeline (no texture upload) so flat-shaded geometry still renders.
+ * never dereferenced. Each PObj is drawn TEXTURED when its material (MObj at
+ * dobj+0x08) carries a texture (TObj at mobj+0x08) that the host translators
+ * understand: the TObj chain is translated (PCPort_TranslateTextureExpFromArchiveBE),
+ * baked to RGBA (PCPort_BakeTextureExpRGBAFromArchiveBE) and uploaded
+ * (GXHostInitTexObjRGBA8) then bound through ConfigureTranslatedTexturedPipeline --
+ * the exact path proven by the slice-3/slice-4 textured smokes but with NO
+ * byte-exact format asserts. On ANY failure (no TObj, unsupported format, range
+ * fail, translate/bake fail) the node falls back to the material-only pipeline
+ * so flat-shaded geometry still renders and nothing aborts. Per-node baked
+ * buffers are freed and the texture binding is cleared after every draw.
  */
 static void RenderJointTree(const PCPortHSDArchive* a,
                             u32 rootJoint,
@@ -4293,14 +4303,23 @@ static void RenderJointTree(const PCPortHSDArchive* a,
             PCPortTranslatedPObj translatedPObj;
             PCPortTranslatedJointTransform translatedJoint;
             PCPortTranslatedMaterial translatedMaterial;
+            PCPortTranslatedTextureExp translatedTextureExp;
             PCPortGSDrawObject drawObject;
+            GXTexObj nodeTextureObject;
             f32 modelViewMatrix[3][4];
+            u8* bakedPixels = NULL;
+            u32 bakedSize = 0u;
+            u32 tobjOffset = 0u;
+            u32 textureMapId = 0u;
             int haveMaterial = 0;
+            int haveTexture = 0;
 
             memset(&translatedPObj, 0, sizeof(translatedPObj));
             memset(&translatedJoint, 0, sizeof(translatedJoint));
             memset(&translatedMaterial, 0, sizeof(translatedMaterial));
+            memset(&translatedTextureExp, 0, sizeof(translatedTextureExp));
             memset(&drawObject, 0, sizeof(drawObject));
+            memset(&nodeTextureObject, 0, sizeof(nodeTextureObject));
 
             if (PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &translatedPObj) &&
                 PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint,
@@ -4310,15 +4329,71 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         a, mobjOffset, &translatedMaterial);
                 }
 
+                /* Textured path: the MObj->TObj link lives at mobj+0x08 (same
+                 * read the slice-3/slice-4 smokes use) and the texture-map id at
+                 * tobj+0x08. Translate the TObj chain (PCPort_TranslateTextureExpFromArchiveBE)
+                 * and bake it to a linear RGBA buffer (PCPort_BakeTextureExpRGBAFromArchiveBE,
+                 * the slice-4 template) which the bake function fills for the
+                 * I8-ramp / I8-ramp+mask families AND, for plain non-TEV nodes,
+                 * by decoding the native GX format (CMPR/RGBA8/I8/...) through
+                 * DecodeTextureToRGBA. The RGBA is uploaded with GXHostInitTexObjRGBA8
+                 * and bound through ConfigureTranslatedTexturedPipeline -- exactly
+                 * the path proven by RunRealSceneSlice4Smoke (129-colour textured
+                 * bg) but with NO byte-exact texture-shape asserts. On ANY failure
+                 * (no link, range fail, unsupported format, translate/bake fail,
+                 * zero extent) haveTexture stays 0 and the node falls back to the
+                 * material-only pipeline so flat-shaded geometry still renders.
+                 * Never aborts. */
+                if (haveMaterial && ArchiveRangeValid(a, mobjOffset, 0x0Cu)) {
+                    tobjOffset =
+                        PCPort_ReadBigEndianU32(a->storage + mobjOffset + 0x08);
+                    if (ArchiveRangeValid(a, tobjOffset, 0x0Cu) &&
+                        PCPort_TranslateTextureExpFromArchiveBE(
+                            a, tobjOffset, &translatedTextureExp) &&
+                        translatedTextureExp.stageCount != 0u &&
+                        translatedTextureExp.stages[0].texture.width != 0u &&
+                        translatedTextureExp.stages[0].texture.height != 0u &&
+                        PCPort_BakeTextureExpRGBAFromArchiveBE(
+                            a, &translatedTextureExp, &bakedPixels, &bakedSize) &&
+                        bakedPixels != NULL) {
+                        const PCPortTranslatedTexture* baseTexture =
+                            &translatedTextureExp.stages[0].texture;
+
+                        textureMapId = PCPort_ReadBigEndianU32(
+                            a->storage + tobjOffset + 0x08);
+                        GXHostInitTexObjRGBA8(
+                            &nodeTextureObject,
+                            bakedPixels,
+                            baseTexture->width,
+                            baseTexture->height,
+                            (GXTexWrapMode)baseTexture->wrapS,
+                            (GXTexWrapMode)baseTexture->wrapT);
+                        haveTexture = 1;
+                    }
+                }
+
                 drawObject.displayList = translatedPObj.pobj.display;
                 drawObject.displayListSize = translatedPObj.pobj.n_display;
-                drawObject.pipelineId = (unsigned int)pipelineId;
+                drawObject.pipelineId =
+                    haveTexture ? PCPORT_REAL_TEXTURED_PIPELINE
+                                : (unsigned int)pipelineId;
                 drawObject.totalVerts = translatedPObj.totalSubmittedVertices;
                 drawObject.totalPrims = translatedPObj.totalPrimitiveCommands;
 
-                ConfigureTranslatedMaterialPipeline(
-                    (unsigned int)pipelineId,
-                    haveMaterial ? &translatedMaterial : NULL);
+                if (haveTexture) {
+                    ConfigureTranslatedTexturedPipeline(
+                        PCPORT_REAL_TEXTURED_PIPELINE,
+                        &translatedMaterial,
+                        &translatedTextureExp.stages[0].texture,
+                        &nodeTextureObject,
+                        (unsigned char)textureMapId);
+                    stats->textured++;
+                } else {
+                    ConfigureTranslatedMaterialPipeline(
+                        (unsigned int)pipelineId,
+                        haveMaterial ? &translatedMaterial : NULL);
+                    stats->materialOnly++;
+                }
                 GXHostSetVertexAlphaScale(1.0f);
 
                 ConcatAffineMtx(cam->viewMatrix,
@@ -4326,14 +4401,42 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                                 modelViewMatrix);
                 GXLoadPosMtxImm(modelViewMatrix, 0);
                 GXSetCurrentMtx(0);
+                /* Apply this PObj's vertex descriptor + arrays to the GX shim so
+                 * the indexed display-list replay (fn_800BD0FC -> GXCallDisplayList)
+                 * decodes real positions, colours AND texcoords for this node.
+                 * Without this the shim's g_vtxDescState stays unset and every
+                 * replayed vertex collapses to the origin with degenerate (0,0)
+                 * texcoords -- which is why textured nodes previously rendered as
+                 * a flat material colour. The translated arrays live on the
+                 * PObj's verts list (LE, host-resident); the list is GX_VA_NULL
+                 * terminated. */
+                if (translatedPObj.pobj.verts != NULL) {
+                    HSD_VtxDescList* vtx = translatedPObj.pobj.verts;
+
+                    GXClearVtxDesc();
+                    while (vtx->attr != GX_VA_NULL) {
+                        GXSetVtxDesc((GXAttr)vtx->attr, (GXAttrType)vtx->attr_type);
+                        GXSetVtxAttrFmt(GX_VTXFMT0, (GXAttr)vtx->attr,
+                                        (GXCompCnt)vtx->comp_cnt,
+                                        (GXCompType)vtx->comp_type, vtx->frac);
+                        GXSetArray((GXAttr)vtx->attr, vtx->vertex, (u8)vtx->stride);
+                        ++vtx;
+                    }
+                }
                 fn_801AA568(&translatedPObj.pobj);
                 fn_800DAD10((void*)&drawObject);
+
+                if (haveTexture) {
+                    GXHostClearTextureBinding();
+                    GSgfxHostClearPipelineState(PCPORT_REAL_TEXTURED_PIPELINE);
+                }
 
                 stats->drawn++;
             } else {
                 stats->skipped++;
             }
 
+            PCPort_FreeBuffer(bakedPixels);
             PCPort_DestroyTranslatedPObj(&translatedPObj);
         } else {
             stats->skipped++;
@@ -4497,15 +4600,19 @@ static int RunMenuScene(GLFWwindow* window) {
         GSgfxSwapBuffers(1);
 
         if (frame == 0) {
-            printf("[pcport_bootstrap] Menu scene frame 0 walked (joints=%u dobjs=%u drawn=%u skipped=%u)\n",
+            printf("[pcport_bootstrap] Menu scene frame 0 walked (joints=%u dobjs=%u drawn=%u skipped=%u textured=%u materialOnly=%u)\n",
                    stats.joints,
                    stats.dobjs,
                    stats.drawn,
-                   stats.skipped);
+                   stats.skipped,
+                   stats.textured,
+                   stats.materialOnly);
         }
     }
 
+    GSgfxHostClearPipelineState(PCPORT_REAL_TEXTURED_PIPELINE);
     GSgfxHostClearPipelineState(PCPORT_REAL_MATERIAL_PIPELINE);
+    GXHostClearTextureBinding();
     GXHostSetVertexAlphaScale(1.0f);
     ok = 1;
 
