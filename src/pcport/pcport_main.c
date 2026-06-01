@@ -4247,6 +4247,274 @@ static int RunGSgfxSmoke(void) {
     return 1;
 }
 
+/* Counters threaded through the recursive menu-scene draw walk so the caller
+ * can report coverage (PCPORT-only diagnostic state). */
+typedef struct {
+    unsigned int joints;
+    unsigned int dobjs;
+    unsigned int drawn;
+    unsigned int skipped;
+} MenuTreeStats;
+
+/*
+ * Generalization of ResolveFirstRenderablePObjDescFromJoint: instead of
+ * stopping at the first renderable PObjDesc, walk every joint (child at
+ * joint+0x08, sibling at joint+0x0C), every DObj on each joint (list head at
+ * joint+0x10, next at dobj+0x00), and draw each DObj's PObj (dobj+0x0C) with
+ * the material-only translate+draw template proven in RunRealSceneSlice2Smoke.
+ * Every archive read is range-guarded so a malformed/missing node is skipped,
+ * never dereferenced. Material-only: textured nodes fall back to the material
+ * pipeline (no texture upload) so flat-shaded geometry still renders.
+ */
+static void RenderJointTree(const PCPortHSDArchive* a,
+                            u32 rootJoint,
+                            u32 joint,
+                            const PCPortTranslatedCamera* cam,
+                            int pipelineId,
+                            MenuTreeStats* stats) {
+    u32 dobjOffset;
+    u32 childOffset;
+    u32 nextOffset;
+
+    if (!ArchiveRangeValid(a, joint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        return;
+    }
+    stats->joints++;
+
+    dobjOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x10);
+    while (dobjOffset != 0u &&
+           ArchiveRangeValid(a, dobjOffset, PCPORT_SERIALIZED_DOBJ_SIZE)) {
+        u32 pobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x0C);
+        u32 mobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x08);
+
+        stats->dobjs++;
+
+        if (ArchiveRangeValid(a, pobjOffset, PCPORT_SERIALIZED_POBJ_SIZE)) {
+            PCPortTranslatedPObj translatedPObj;
+            PCPortTranslatedJointTransform translatedJoint;
+            PCPortTranslatedMaterial translatedMaterial;
+            PCPortGSDrawObject drawObject;
+            f32 modelViewMatrix[3][4];
+            int haveMaterial = 0;
+
+            memset(&translatedPObj, 0, sizeof(translatedPObj));
+            memset(&translatedJoint, 0, sizeof(translatedJoint));
+            memset(&translatedMaterial, 0, sizeof(translatedMaterial));
+            memset(&drawObject, 0, sizeof(drawObject));
+
+            if (PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &translatedPObj) &&
+                PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint,
+                                                     &translatedJoint)) {
+                if (ArchiveRangeValid(a, mobjOffset, 0x4u)) {
+                    haveMaterial = PCPort_TranslateMaterialFromArchiveBE(
+                        a, mobjOffset, &translatedMaterial);
+                }
+
+                drawObject.displayList = translatedPObj.pobj.display;
+                drawObject.displayListSize = translatedPObj.pobj.n_display;
+                drawObject.pipelineId = (unsigned int)pipelineId;
+                drawObject.totalVerts = translatedPObj.totalSubmittedVertices;
+                drawObject.totalPrims = translatedPObj.totalPrimitiveCommands;
+
+                ConfigureTranslatedMaterialPipeline(
+                    (unsigned int)pipelineId,
+                    haveMaterial ? &translatedMaterial : NULL);
+                GXHostSetVertexAlphaScale(1.0f);
+
+                ConcatAffineMtx(cam->viewMatrix,
+                                translatedJoint.modelMatrix,
+                                modelViewMatrix);
+                GXLoadPosMtxImm(modelViewMatrix, 0);
+                GXSetCurrentMtx(0);
+                fn_801AA568(&translatedPObj.pobj);
+                fn_800DAD10((void*)&drawObject);
+
+                stats->drawn++;
+            } else {
+                stats->skipped++;
+            }
+
+            PCPort_DestroyTranslatedPObj(&translatedPObj);
+        } else {
+            stats->skipped++;
+        }
+
+        nextOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x00);
+        if (nextOffset == dobjOffset) {
+            break;
+        }
+        dobjOffset = nextOffset;
+    }
+
+    childOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x08);
+    if (childOffset != 0u && childOffset != joint) {
+        RenderJointTree(a, rootJoint, childOffset, cam, pipelineId, stats);
+    }
+
+    nextOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x0C);
+    if (nextOffset != 0u && nextOffset != joint) {
+        RenderJointTree(a, rootJoint, nextOffset, cam, pipelineId, stats);
+    }
+}
+
+/*
+ * Route B boot path: load+parse the top-menu scene once, then present its full
+ * joint tree every frame in a persistent (but headless-safe, capped) window
+ * loop. Reuses the resolve/camera/draw primitives proven by the slice smokes.
+ */
+static int RunMenuScene(GLFWwindow* window) {
+    PCPortHSDArchive archive;
+    PCPortTranslatedCamera translatedCamera;
+    u8* memberData = NULL;
+    u32 memberSize = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0;
+    u32 sceneBranchOffset;
+    u32 cameraDescOffset;
+    u32 sceneJointListOffset;
+    u32 rootJointOffset;
+    const char* capEnv;
+    int frameCap;
+    int frame;
+    int dumpRequested;
+    int ok = 0;
+
+    memset(&archive, 0, sizeof(archive));
+    memset(&translatedCamera, 0, sizeof(translatedCamera));
+
+    if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE,
+                               PCPORT_REAL_CONTENT_MEMBER,
+                               &memberData,
+                               &memberSize)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene load failed (%s:%s)\n",
+                PCPORT_REAL_CONTENT_ARCHIVE,
+                PCPORT_REAL_CONTENT_MEMBER);
+        goto cleanup;
+    }
+
+    if (!PCPort_HSDArchiveParseBE(&archive, memberData, memberSize)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene archive parse failed (%s:%s)\n",
+                PCPORT_REAL_CONTENT_ARCHIVE,
+                PCPORT_REAL_CONTENT_MEMBER);
+        goto cleanup;
+    }
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&archive,
+                                                             "scene_data",
+                                                             &sceneOffset);
+    if (sceneData == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene failed to resolve scene_data\n");
+        goto cleanup;
+    }
+
+    sceneBranchOffset = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&archive, sceneBranchOffset, 0x10u)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene branch offset was invalid (0x%X)\n",
+                sceneBranchOffset);
+        goto cleanup;
+    }
+
+    cameraDescOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x08);
+    if (!PCPort_TranslatePerspectiveCameraFromArchiveBE(&archive,
+                                                        cameraDescOffset,
+                                                        &translatedCamera)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene failed to translate camera (scene=0x%X camera=0x%X)\n",
+                sceneOffset,
+                cameraDescOffset);
+        goto cleanup;
+    }
+
+    sceneJointListOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x00);
+    rootJointOffset = PCPort_ReadBigEndianU32(archive.storage + sceneJointListOffset + 0x00);
+    if (!ArchiveRangeValid(&archive, rootJointOffset, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Menu scene root joint was invalid (0x%X)\n",
+                rootJointOffset);
+        goto cleanup;
+    }
+
+    capEnv = getenv("PCPORT_MENU_FRAMES");
+    frameCap = capEnv != NULL ? atoi(capEnv) : PCPORT_WINDOW_FRAMES;
+    if (frameCap <= 0) {
+        frameCap = PCPORT_WINDOW_FRAMES;
+    }
+    dumpRequested = getenv("PCPORT_DUMP") != NULL;
+
+    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+
+    printf("[pcport_bootstrap] Menu scene loaded (scene=0x%X camera=0x%X rootJoint=0x%X frameCap=%d dump=%d)\n",
+           sceneOffset,
+           cameraDescOffset,
+           rootJointOffset,
+           frameCap,
+           dumpRequested);
+
+    for (frame = 0; frame < frameCap; ++frame) {
+        MenuTreeStats stats;
+
+        if (window != NULL && glfwWindowShouldClose(window)) {
+            break;
+        }
+
+        memset(&stats, 0, sizeof(stats));
+
+        VIWaitForRetrace_PC();
+        ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        GSgfx_BeginFrame();
+
+        GXSetViewport((f32)translatedCamera.viewportLeft,
+                      (f32)translatedCamera.viewportTop,
+                      (f32)(translatedCamera.viewportRight - translatedCamera.viewportLeft),
+                      (f32)(translatedCamera.viewportBottom - translatedCamera.viewportTop),
+                      0.0f,
+                      1.0f);
+        GXSetScissor((u32)translatedCamera.scissorLeft,
+                     (u32)translatedCamera.scissorTop,
+                     (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
+                     (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
+        GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
+
+        RenderJointTree(&archive,
+                        rootJointOffset,
+                        rootJointOffset,
+                        &translatedCamera,
+                        (int)PCPORT_REAL_MATERIAL_PIPELINE,
+                        &stats);
+
+        /* On the final frame, capture the framebuffer (BMP dump happens inside
+         * ReadBackbufferImage via DumpFramebufferBMP when PCPORT_DUMP is set)
+         * before presenting. */
+        if (dumpRequested && frame == frameCap - 1) {
+            unsigned char* pixels = ReadBackbufferImage();
+            free(pixels);
+        }
+
+        GSgfxSwapBuffers(1);
+
+        if (frame == 0) {
+            printf("[pcport_bootstrap] Menu scene frame 0 walked (joints=%u dobjs=%u drawn=%u skipped=%u)\n",
+                   stats.joints,
+                   stats.dobjs,
+                   stats.drawn,
+                   stats.skipped);
+        }
+    }
+
+    GSgfxHostClearPipelineState(PCPORT_REAL_MATERIAL_PIPELINE);
+    GXHostSetVertexAlphaScale(1.0f);
+    ok = 1;
+
+cleanup:
+    PCPort_HSDArchiveDestroy(&archive);
+    PCPort_FreeBuffer(memberData);
+    return ok;
+}
+
 int main(int argc, char** argv) {
     int audioInitialized = 0;
     int runRealContentParserSmoke;
@@ -4267,6 +4535,7 @@ int main(int argc, char** argv) {
     int osInitialized = 0;
     int runGsGfxSmoke;
     int runWindowSmoke;
+    int runMenu;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -4292,6 +4561,7 @@ int main(int argc, char** argv) {
     runGSgfxVisibleSmoke = HasArg(argc, argv, "--gsgfx-visible-smoke");
     runGXPrimitiveSmoke = HasArg(argc, argv, "--gx-primitive-smoke");
     runGXScissorSmoke = HasArg(argc, argv, "--gx-scissor-smoke");
+    runMenu = HasArg(argc, argv, "--menu");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
 
@@ -4307,7 +4577,8 @@ int main(int argc, char** argv) {
         runGSgfxPObjSmoke ||
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
-        runGXPrimitiveSmoke || runGXScissorSmoke) {
+        runGXPrimitiveSmoke || runGXScissorSmoke ||
+        runMenu || argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
             return 1;
@@ -4500,6 +4771,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
+    } else if (runMenu || window != NULL) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] Menu scene requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunMenuScene(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Top-menu scene graph rendered through the existing game-owned draw bridge\n");
     } else {
         printf("[pcport_bootstrap] No game code, assets, or render loop started\n");
     }
