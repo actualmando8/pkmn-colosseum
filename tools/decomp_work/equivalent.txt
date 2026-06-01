@@ -1,0 +1,16 @@
+# Equivalent-function registry — the Pikmin2/TWW "Equivalent" tier for this project.
+#
+# A function listed here has REAL, CORRECT, decompiled C that does NOT byte-match
+# because it hits a confirmed, C-uncontrollable wall (see WALLS.md for the class).
+# It counts toward the C-converted axis and is a HARD-SKIP: do not re-grind it.
+#
+# Format: one `fn_XXXXXXXX` per line; everything after `#` is a comment.
+# Add a function here ONLY after it is logged in WALLS.md (class confirmed, or
+# tested-and-didn't-move). Read by tools/decomp_work/progress2.py.
+#
+# Kept OUT of config/GC6E01/ (build-truth dir) so no build glob can ingest it.
+
+fn_800E3604   # gs_material      — W1 data-flow-locked reg-alloc (live-range coalescing); 99.37%, inversion-tested, locked
+fn_80216650   # colosseum_script — W1 data-flow-locked reg-alloc; 99.14%, inversion-tested, locked
+fn_8022E6F0   # colosseum_script — W1 data-flow-locked reg-alloc; 99.50%, inversion-tested, locked
+fn_8023CE60   # colosseum_script — W1 param landed one saved-reg off (data-flow-locked); 98.26%, inversion-tested, locked
