@@ -388,34 +388,75 @@ s32 gx_texture_decode_RGB565(const void* src, u16 w, u16 h,
 
 s32 gx_texture_decode_RGB5A3(const void* src, u16 w, u16 h,
                              GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode RGB5A3 (16-bit, two modes)
-     *
-     * Tile layout: 4x4 texels per tile, 16 bits per texel
-     *
-     * For each texel (big-endian u16):
-     *   if (val & 0x8000) {  // MSB = 1 -> RGB555, opaque
-     *       r = ((val >> 10) & 0x1F) * 255 / 31
-     *       g = ((val >> 5) & 0x1F) * 255 / 31
-     *       b = (val & 0x1F) * 255 / 31
-     *       a = 255
-     *   } else {              // MSB = 0 -> RGBA4443
-     *       a = ((val >> 12) & 0x07) * 255 / 7
-     *       r = ((val >> 8) & 0x0F) * 255 / 15
-     *       g = ((val >> 4) & 0x0F) * 255 / 15
-     *       b = (val & 0x0F) * 255 / 15
-     *   }
-     *
-     * Output: GL_RGBA8
-     */
+    /* RGB5A3: 4x4 texels per tile, 32 bytes/tile, big-endian u16 per texel.
+     * MSB set -> RGB555 opaque; MSB clear -> RGB4A3 (3-bit alpha + 4:4:4). */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 3u) / 4u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 4;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
-    memset(out->data, 0xFF, out->dataSize);
+    memset(out->data, 0, out->dataSize);
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc = srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 4u; ++col) {
+                    u32 dstX = (tileX * 4u) + col;
+                    u32 k = (row * 4u) + col;
+                    u16 v;
+                    u8 r, g, b, a;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+
+                    v = (u16)(((u16)tileSrc[k * 2u] << 8) | tileSrc[(k * 2u) + 1u]);
+                    if (v & 0x8000u) {
+                        u8 r5 = (u8)((v >> 10) & 0x1Fu);
+                        u8 g5 = (u8)((v >> 5) & 0x1Fu);
+                        u8 b5 = (u8)(v & 0x1Fu);
+                        r = (u8)((r5 << 3) | (r5 >> 2));
+                        g = (u8)((g5 << 3) | (g5 >> 2));
+                        b = (u8)((b5 << 3) | (b5 >> 2));
+                        a = 0xFFu;
+                    } else {
+                        u8 a3 = (u8)((v >> 12) & 0x7u);
+                        u8 r4 = (u8)((v >> 8) & 0xFu);
+                        u8 g4 = (u8)((v >> 4) & 0xFu);
+                        u8 b4 = (u8)(v & 0xFu);
+                        r = (u8)((r4 << 4) | r4);
+                        g = (u8)((g4 << 4) | g4);
+                        b = (u8)((b4 << 4) | b4);
+                        a = (u8)((a3 << 5) | (a3 << 2) | (a3 >> 1));
+                    }
+
+                    dstPixel = out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    dstPixel[0] = r;
+                    dstPixel[1] = g;
+                    dstPixel[2] = b;
+                    dstPixel[3] = a;
+                }
+            }
+        }
+    }
+
     out->glInternalFormat = GL_RGBA8;
     out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;

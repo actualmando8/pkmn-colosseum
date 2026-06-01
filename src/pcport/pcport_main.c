@@ -1,6 +1,7 @@
 #include "audio_shim.h"
 #include "dvd_shim.h"
 #include "gx_shim.h"
+#include "gx_texture.h"
 #include "hsd/hsd_pobj.h"
 #include "os_shim.h"
 #include "pad_shim.h"
@@ -90,6 +91,11 @@ unsigned long CurrTvMode = 0;
 #define PCPORT_LOGO_IMAGE_OFFSET 0xAC2E0u
 #define PCPORT_LOGO_WIDTH        540
 #define PCPORT_LOGO_HEIGHT       224
+
+/* Title-screen 2D sprite sheet in topmenu.fsys: copyright lines + PRESS START
+ * (RGB5A3 428x122, a raw 0x80-header texture, not an HSD archive). UV bands:
+ * copyright block v0.016..0.549, PRESS START (teal) v0.574..0.721. */
+#define PCPORT_TITLE_PRESS_MEMBER "menu_018"
 #define PCPORT_PDA_MENU_ARCHIVE     "orig/GC6E01/disc/files/pda_menu.fsys"
 #define PCPORT_PDA2_BG_MEMBER       "pda2_bg"
 #define PCPORT_SERIALIZED_JOINT_SIZE 0x40u
@@ -443,7 +449,11 @@ static void SubmitFullScreenGXQuad(unsigned char r,
  * camera state (viewport/scissor/projection/modelview/depth) to a full-screen
  * orthographic identity so the quad is neither clipped to the camera scissor
  * nor depth-killed against the background. */
-static void DrawLogoOverlay(GXTexObj* logoTex) {
+/* Set up the full-screen 2D orthographic overlay state once per frame: reset
+ * the per-frame 3D camera viewport/scissor/projection/modelview, disable depth,
+ * enable alpha blend, and configure a single textured (MODULATE) TEV stage so
+ * the immediate path samples the bound texture. */
+static void BeginMenuOverlay(void) {
     static Mtx44 orthoProjection = {
         { 1.0f, 0.0f, 0.0f, 0.0f },
         { 0.0f, 1.0f, 0.0f, 0.0f },
@@ -455,13 +465,6 @@ static void DrawLogoOverlay(GXTexObj* logoTex) {
         { 0.0f, 1.0f, 0.0f, 0.0f },
         { 0.0f, 0.0f, 1.0f, 0.0f }
     };
-    /* NDC placement: top-centre, preserving the logo's 540:224 pixel aspect on
-     * the 640x480 viewport (1 NDC-x = 320px, 1 NDC-y = 240px). */
-    const f32 halfW = 0.62f;
-    const f32 halfH = halfW * ((f32)PCPORT_LOGO_HEIGHT / (f32)PCPORT_LOGO_WIDTH)
-                            * (640.0f / 480.0f);
-    const f32 yTop = 0.90f;
-    const f32 yBot = yTop - (2.0f * halfH);
 
     GXSetViewport(0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 1.0f);
     GXSetScissor(0u, 0u, 640u, 480u);
@@ -470,37 +473,84 @@ static void DrawLogoOverlay(GXTexObj* logoTex) {
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
-
-    /* Textured: one texgen + MODULATE so the white vertex colour passes the
-     * sampled texel through unchanged. The immediate path only samples the
-     * bound texture when numTexGens != 0 and the TEV mode is not PASSCLR. */
     GXSetNumTexGens(1);
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXLoadTexObj(logoTex, GX_TEXMAP0);
     GXHostSetVertexAlphaScale(1.0f);
+}
 
-    /* Quad. Texcoord t=0 at the TOP of the image (higher NDC y) so it renders
-     * upright; white vertex colour keeps the texture's own colours. */
+/* Draw a textured quad at a screen-space rectangle (origin top-left, 640x480),
+ * sampling the texture sub-rect [u0,v0]-[u1,v1]. v increases downward so the
+ * image renders upright. Call BeginMenuOverlay() first. White vertex colour
+ * passes the (MODULATE) texel through unchanged. */
+static void DrawTexturedScreenRect(GXTexObj* tex,
+                                   f32 sx, f32 sy, f32 sw, f32 sh,
+                                   f32 u0, f32 v0, f32 u1, f32 v1) {
+    f32 ndcL = ((sx) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcR = ((sx + sw) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcT = 1.0f - ((sy) / 480.0f) * 2.0f;
+    f32 ndcB = 1.0f - ((sy + sh) / 480.0f) * 2.0f;
+
+    GXLoadTexObj(tex, GX_TEXMAP0);
+
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
     GXColor4u8(255, 255, 255, 255);
-    GXPosition3f32(-halfW, yBot, 0.0f);
-    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(ndcL, ndcB, 0.0f);
+    GXTexCoord2f32(u0, v1);
 
     GXColor4u8(255, 255, 255, 255);
-    GXPosition3f32(halfW, yBot, 0.0f);
-    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(ndcR, ndcB, 0.0f);
+    GXTexCoord2f32(u1, v1);
 
     GXColor4u8(255, 255, 255, 255);
-    GXPosition3f32(halfW, yTop, 0.0f);
-    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(ndcR, ndcT, 0.0f);
+    GXTexCoord2f32(u1, v0);
 
     GXColor4u8(255, 255, 255, 255);
-    GXPosition3f32(-halfW, yTop, 0.0f);
-    GXTexCoord2f32(0.0f, 0.0f);
+    GXPosition3f32(ndcL, ndcT, 0.0f);
+    GXTexCoord2f32(u0, v0);
 
     GXEnd();
+}
+
+/* Load a raw topmenu sprite member (0x80-byte header: width@0, height@2 as
+ * big-endian u16, bpp marker@4 with 0x20=RGBA8 else RGB5A3; texels at +0x80),
+ * decode to RGBA, and upload as a host texture. Returns 1 on success. */
+static int LoadRawMenuTexObj(const char* member, GXTexObj* outTex) {
+    u8* data = NULL;
+    u32 size = 0;
+    GXDecodedTexture decoded;
+    u16 w;
+    u16 h;
+    u32 format;
+
+    if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE, member,
+                               &data, &size)) {
+        return 0;
+    }
+    if (size < 0x80u) {
+        PCPort_FreeBuffer(data);
+        return 0;
+    }
+
+    w = (u16)(((u16)data[0] << 8) | data[1]);
+    h = (u16)(((u16)data[2] << 8) | data[3]);
+    format = (data[4] == 0x20u) ? (u32)GX_TF_RGBA8 : (u32)GX_TF_RGB5A3;
+
+    memset(&decoded, 0, sizeof(decoded));
+    if (gx_texture_decode(data + 0x80, w, h, (GXTexFmt)format,
+                          NULL, GX_TL_IA8, 0, &decoded) != 0 ||
+        decoded.data == NULL) {
+        PCPort_FreeBuffer(data);
+        return 0;
+    }
+
+    memset(outTex, 0, sizeof(*outTex));
+    GXHostInitTexObjRGBA8(outTex, decoded.data, w, h, GX_CLAMP, GX_CLAMP);
+    gx_texture_free(&decoded);
+    PCPort_FreeBuffer(data);
+    return 1;
 }
 
 static int RunRawPrimitiveControl(void) {
@@ -4563,11 +4613,14 @@ static int RunMenuScene(GLFWwindow* window) {
     u32 logoPxSize = 0;
     GXTexObj logoTex;
     int haveLogo = 0;
+    GXTexObj menu018Tex;
+    int haveMenu018 = 0;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
     memset(&logoArchive, 0, sizeof(logoArchive));
     memset(&logoTex, 0, sizeof(logoTex));
+    memset(&menu018Tex, 0, sizeof(menu018Tex));
 
     /* default to the top-menu background; env PCPORT_MENU_MEMBER renders any
      * topmenu.fsys scene member (e.g. ken_b1) with the same scene-graph walk. */
@@ -4677,6 +4730,12 @@ static int RunMenuScene(GLFWwindow* window) {
                 "[pcport_bootstrap] Title logo unavailable (continuing without it)\n");
     }
 
+    /* Title-screen 2D overlay: copyright lines + PRESS START (raw RGB5A3 sprite). */
+    haveMenu018 = LoadRawMenuTexObj(PCPORT_TITLE_PRESS_MEMBER, &menu018Tex);
+    if (haveMenu018) {
+        printf("[pcport_bootstrap] Title overlay (PRESS START + copyright) loaded\n");
+    }
+
     for (frame = 0; frame < frameCap; ++frame) {
         MenuTreeStats stats;
 
@@ -4709,9 +4768,23 @@ static int RunMenuScene(GLFWwindow* window) {
                         (int)PCPORT_REAL_MATERIAL_PIPELINE,
                         &stats);
 
-        /* Composite the static title logo on top of the 3D background. */
-        if (haveLogo) {
-            DrawLogoOverlay(&logoTex);
+        /* Composite the 2D title overlay (logo + PRESS START + copyright) on
+         * top of the 3D background. */
+        if (haveLogo || haveMenu018) {
+            BeginMenuOverlay();
+            if (haveLogo) {
+                /* logo, top-centre (540:224 aspect) */
+                DrawTexturedScreenRect(&logoTex, 115.0f, 34.0f, 410.0f, 170.0f,
+                                       0.0f, 0.0f, 1.0f, 1.0f);
+            }
+            if (haveMenu018) {
+                /* PRESS START (teal band v0.574..0.721), centred below the logo */
+                DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
+                                       0.0f, 0.574f, 1.0f, 0.721f);
+                /* copyright block (v0.016..0.549), bottom-left */
+                DrawTexturedScreenRect(&menu018Tex, 28.0f, 392.0f, 300.0f, 58.0f,
+                                       0.0f, 0.016f, 1.0f, 0.549f);
+            }
         }
 
         /* On the final frame, capture the framebuffer (BMP dump happens inside
