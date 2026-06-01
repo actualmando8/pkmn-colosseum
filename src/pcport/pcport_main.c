@@ -96,6 +96,21 @@ unsigned long CurrTvMode = 0;
  * (RGB5A3 428x122, a raw 0x80-header texture, not an HSD archive). UV bands:
  * copyright block v0.016..0.549, PRESS START (teal) v0.574..0.721. */
 #define PCPORT_TITLE_PRESS_MEMBER "menu_018"
+
+/* The title-screen 3D scene (desert/ruins environment + the logo, all one HSD
+ * archive) is title.fsys:logo_demo. Its scene_data layout is byte-compatible
+ * with menu_bg00 and it carries a real perspective camera, so RunMenuScene
+ * renders it with just this archive/member swap. */
+#define PCPORT_TITLE_SCENE_ARCHIVE "orig/GC6E01/disc/files/title.fsys"
+#define PCPORT_TITLE_SCENE_MEMBER  "logo_demo"
+
+/* Sky/sand horizon backdrop texture inside title.fsys:logo_demo (CMPR 512x256
+ * at archive offset 0x14A8E0): blue sky + clouds fading to tan sand. Drawn as a
+ * full-screen 2D backdrop -- the reliable stand-in for the title scene's 3D
+ * environment, whose animated-demo geometry does not render statically yet. */
+#define PCPORT_TITLE_SKY_OFFSET 0x14A8E0u
+#define PCPORT_TITLE_SKY_WIDTH  512
+#define PCPORT_TITLE_SKY_HEIGHT 256
 #define PCPORT_PDA_MENU_ARCHIVE     "orig/GC6E01/disc/files/pda_menu.fsys"
 #define PCPORT_PDA2_BG_MEMBER       "pda2_bg"
 #define PCPORT_SERIALIZED_JOINT_SIZE 0x40u
@@ -4606,6 +4621,7 @@ static int RunMenuScene(GLFWwindow* window) {
     int dumpRequested;
     int ok = 0;
     const char* menuMember;
+    const char* sceneArchive;
     PCPortHSDArchive logoArchive;
     u8* logoData = NULL;
     u32 logoSize = 0;
@@ -4615,36 +4631,42 @@ static int RunMenuScene(GLFWwindow* window) {
     int haveLogo = 0;
     GXTexObj menu018Tex;
     int haveMenu018 = 0;
+    GXTexObj skyTex;
+    int haveSky = 0;
+    int render3D = 0;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
     memset(&logoArchive, 0, sizeof(logoArchive));
     memset(&logoTex, 0, sizeof(logoTex));
     memset(&menu018Tex, 0, sizeof(menu018Tex));
+    memset(&skyTex, 0, sizeof(skyTex));
 
-    /* default to the top-menu background; env PCPORT_MENU_MEMBER renders any
-     * topmenu.fsys scene member (e.g. ken_b1) with the same scene-graph walk. */
+    /* Default to the title scene (desert/ruins environment + logo) in
+     * title.fsys:logo_demo. Env overrides PCPORT_MENU_ARCHIVE / PCPORT_MENU_MEMBER
+     * select any other fsys scene member (e.g. topmenu.fsys / menu_bg00 for the
+     * post-start main-menu background). */
+    sceneArchive = getenv("PCPORT_MENU_ARCHIVE");
+    if (sceneArchive == NULL || sceneArchive[0] == '\0') {
+        sceneArchive = PCPORT_TITLE_SCENE_ARCHIVE;
+    }
     menuMember = getenv("PCPORT_MENU_MEMBER");
     if (menuMember == NULL || menuMember[0] == '\0') {
-        menuMember = PCPORT_REAL_CONTENT_MEMBER;
+        menuMember = PCPORT_TITLE_SCENE_MEMBER;
     }
 
-    if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE,
-                               menuMember,
-                               &memberData,
-                               &memberSize)) {
+    if (!PCPort_LoadFsysMember(sceneArchive, menuMember,
+                               &memberData, &memberSize)) {
         fprintf(stderr,
                 "[pcport_bootstrap] Menu scene load failed (%s:%s)\n",
-                PCPORT_REAL_CONTENT_ARCHIVE,
-                PCPORT_REAL_CONTENT_MEMBER);
+                sceneArchive, menuMember);
         goto cleanup;
     }
 
     if (!PCPort_HSDArchiveParseBE(&archive, memberData, memberSize)) {
         fprintf(stderr,
                 "[pcport_bootstrap] Menu scene archive parse failed (%s:%s)\n",
-                PCPORT_REAL_CONTENT_ARCHIVE,
-                PCPORT_REAL_CONTENT_MEMBER);
+                sceneArchive, menuMember);
         goto cleanup;
     }
 
@@ -4691,6 +4713,10 @@ static int RunMenuScene(GLFWwindow* window) {
         frameCap = PCPORT_WINDOW_FRAMES;
     }
     dumpRequested = getenv("PCPORT_DUMP") != NULL;
+    /* logo_demo's 3D scene renders as an animated-demo flash statically, so by
+     * default we draw a 2D sky/sand backdrop instead of its joint tree. Set
+     * PCPORT_RENDER_3D=1 to render the raw 3D scene (for debugging it). */
+    render3D = getenv("PCPORT_RENDER_3D") != NULL;
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
 
@@ -4736,6 +4762,29 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Title overlay (PRESS START + copyright) loaded\n");
     }
 
+    /* Bake the desert sky/sand backdrop (CMPR) from the title scene archive. */
+    if (!render3D) {
+        PCPortTranslatedTexture skyDesc;
+        u8* skyPixels = NULL;
+        u32 skyPxSize = 0;
+
+        memset(&skyDesc, 0, sizeof(skyDesc));
+        skyDesc.imageDataArchiveOffset = PCPORT_TITLE_SKY_OFFSET;
+        skyDesc.format = GX_TF_CMPR;
+        skyDesc.width = PCPORT_TITLE_SKY_WIDTH;
+        skyDesc.height = PCPORT_TITLE_SKY_HEIGHT;
+        if (PCPort_BakeTextureRGBAFromArchiveBE(&archive, &skyDesc,
+                                                &skyPixels, &skyPxSize)) {
+            GXHostInitTexObjRGBA8(&skyTex, skyPixels,
+                                  PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT,
+                                  GX_CLAMP, GX_CLAMP);
+            PCPort_FreeBuffer(skyPixels);
+            haveSky = 1;
+            printf("[pcport_bootstrap] Title sky backdrop loaded (%dx%d)\n",
+                   PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT);
+        }
+    }
+
     for (frame = 0; frame < frameCap; ++frame) {
         MenuTreeStats stats;
 
@@ -4749,29 +4798,35 @@ static int RunMenuScene(GLFWwindow* window) {
         ClearBackbuffer(0.0f, 0.0f, 0.0f);
         GSgfx_BeginFrame();
 
-        GXSetViewport((f32)translatedCamera.viewportLeft,
-                      (f32)translatedCamera.viewportTop,
-                      (f32)(translatedCamera.viewportRight - translatedCamera.viewportLeft),
-                      (f32)(translatedCamera.viewportBottom - translatedCamera.viewportTop),
-                      0.0f,
-                      1.0f);
-        GXSetScissor((u32)translatedCamera.scissorLeft,
-                     (u32)translatedCamera.scissorTop,
-                     (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
-                     (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
-        GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
+        if (render3D) {
+            GXSetViewport((f32)translatedCamera.viewportLeft,
+                          (f32)translatedCamera.viewportTop,
+                          (f32)(translatedCamera.viewportRight - translatedCamera.viewportLeft),
+                          (f32)(translatedCamera.viewportBottom - translatedCamera.viewportTop),
+                          0.0f,
+                          1.0f);
+            GXSetScissor((u32)translatedCamera.scissorLeft,
+                         (u32)translatedCamera.scissorTop,
+                         (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
+                         (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
+            GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
 
-        RenderJointTree(&archive,
-                        rootJointOffset,
-                        rootJointOffset,
-                        &translatedCamera,
-                        (int)PCPORT_REAL_MATERIAL_PIPELINE,
-                        &stats);
+            RenderJointTree(&archive,
+                            rootJointOffset,
+                            rootJointOffset,
+                            &translatedCamera,
+                            (int)PCPORT_REAL_MATERIAL_PIPELINE,
+                            &stats);
+        }
 
-        /* Composite the 2D title overlay (logo + PRESS START + copyright) on
-         * top of the 3D background. */
-        if (haveLogo || haveMenu018) {
+        /* Title screen: 2D sky/sand backdrop, then logo + PRESS START +
+         * copyright on top (the 3D scene is gated behind PCPORT_RENDER_3D). */
+        if (haveSky || haveLogo || haveMenu018) {
             BeginMenuOverlay();
+            if (haveSky) {
+                DrawTexturedScreenRect(&skyTex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                       0.0f, 0.0f, 1.0f, 1.0f);
+            }
             if (haveLogo) {
                 /* logo, top-centre (540:224 aspect) */
                 DrawTexturedScreenRect(&logoTex, 115.0f, 34.0f, 410.0f, 170.0f,
