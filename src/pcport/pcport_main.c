@@ -4501,9 +4501,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                             &translatedTextureExp.stages[0].texture;
 
                         /* The crisp logo is drawn by the 2D overlay; skip the
-                         * scene's own logo billboard so it isn't doubled. */
-                        isLogoTex = (baseTexture->imageDataArchiveOffset ==
-                                     PCPORT_LOGO_IMAGE_OFFSET);
+                         * scene's own logo billboard AND its two glow billboards
+                         * (810x336 @ 0x693E0/0x8AB60) so they don't ghost over
+                         * the crisp 2D logo. */
+                        isLogoTex =
+                            (baseTexture->imageDataArchiveOffset == PCPORT_LOGO_IMAGE_OFFSET ||
+                             baseTexture->imageDataArchiveOffset == 0x693E0u ||
+                             baseTexture->imageDataArchiveOffset == 0x8AB60u);
 
                         textureMapId = PCPort_ReadBigEndianU32(
                             a->storage + tobjOffset + 0x08);
@@ -4798,6 +4802,29 @@ static int RunMenuScene(GLFWwindow* window) {
 
         BuildViewMatrixLookAt(titleEye, titleInt, titleUp,
                               translatedCamera.viewMatrix);
+    }
+
+    /* Experimental manual camera: PCPORT_CAM_EYE / PCPORT_CAM_INT ("x,y,z") +
+     * optional PCPORT_CAM_UP override the view via look-at, for dialing in the
+     * framing. */
+    {
+        const char* ce = getenv("PCPORT_CAM_EYE");
+        const char* ci = getenv("PCPORT_CAM_INT");
+        const char* cu = getenv("PCPORT_CAM_UP");
+        if (ce != NULL && ci != NULL) {
+            f32 e[3] = { 0.0f, 0.0f, 0.0f };
+            f32 in[3] = { 0.0f, 0.0f, 0.0f };
+            f32 u[3] = { 0.0f, 1.0f, 0.0f };
+
+            sscanf(ce, "%f,%f,%f", &e[0], &e[1], &e[2]);
+            sscanf(ci, "%f,%f,%f", &in[0], &in[1], &in[2]);
+            if (cu != NULL) {
+                sscanf(cu, "%f,%f,%f", &u[0], &u[1], &u[2]);
+            }
+            BuildViewMatrixLookAt(e, in, u, translatedCamera.viewMatrix);
+            printf("[cam] override eye=(%.1f,%.1f,%.1f) int=(%.1f,%.1f,%.1f) up=(%.1f,%.1f,%.1f)\n",
+                   e[0], e[1], e[2], in[0], in[1], in[2], u[0], u[1], u[2]);
+        }
     }
 
     sceneJointListOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x00);
