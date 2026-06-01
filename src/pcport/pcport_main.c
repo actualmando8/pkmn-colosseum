@@ -4453,6 +4453,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
             u32 textureMapId = 0u;
             int haveMaterial = 0;
             int haveTexture = 0;
+            int isLogoTex = 0;
 
             memset(&translatedPObj, 0, sizeof(translatedPObj));
             memset(&translatedJoint, 0, sizeof(translatedJoint));
@@ -4498,6 +4499,11 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         bakedPixels != NULL) {
                         const PCPortTranslatedTexture* baseTexture =
                             &translatedTextureExp.stages[0].texture;
+
+                        /* The crisp logo is drawn by the 2D overlay; skip the
+                         * scene's own logo billboard so it isn't doubled. */
+                        isLogoTex = (baseTexture->imageDataArchiveOffset ==
+                                     PCPORT_LOGO_IMAGE_OFFSET);
 
                         textureMapId = PCPort_ReadBigEndianU32(
                             a->storage + tobjOffset + 0x08);
@@ -4594,8 +4600,9 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                  * In-game it is an animated alpha fade that ends transparent;
                  * drawn opaque it would cover the whole title scene. Keying on
                  * alpha (not camera-space position) is camera-independent. */
-                if (!(haveTexture == 0 && haveMaterial &&
-                      translatedMaterial.alpha < 0.01f)) {
+                if (!((haveTexture == 0 && haveMaterial &&
+                       translatedMaterial.alpha < 0.01f) ||
+                      isLogoTex)) {
                     fn_801AA568(&translatedPObj.pobj);
                     fn_800DAD10((void*)&drawObject);
                     stats->drawn++;
