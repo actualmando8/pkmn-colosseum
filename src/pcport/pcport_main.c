@@ -4625,9 +4625,11 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         rjtDbg = (getenv("PCPORT_RENDER_DEBUG") != NULL) ? 1 : 0;
                     }
                     if (rjtDbg && stats->dobjs <= 40u) {
-                        printf("[rjt] pobj#%u %s verts=%u z=%.1f\n",
+                        printf("[rjt] pobj#%u %s verts=%u cam=(%.0f,%.0f,%.0f)\n",
                                stats->dobjs, haveTexture ? "TEX" : "MAT",
-                               drawObject.totalVerts, modelViewMatrix[2][3]);
+                               drawObject.totalVerts,
+                               modelViewMatrix[0][3], modelViewMatrix[1][3],
+                               modelViewMatrix[2][3]);
                     }
                 }
             } else {
@@ -4940,6 +4942,9 @@ static int RunMenuScene(GLFWwindow* window) {
                          (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
                          (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
             GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
+            /* Depth-test the scene so the large ground plane does not paint over
+             * the standing ruin pillars (which are drawn before it). */
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
             RenderJointTree(&archive,
                             rootJointOffset,
