@@ -19,19 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This license applies only to the source code in this repository. It does NOT
-grant any rights to:
-
-  - The Pokemon Colosseum game ROM or any extracted game assets (text,
-    graphics, audio, level data, etc.) — these are the property of their
-    respective copyright holders (Nintendo, Genius Sonority, The Pokemon
-    Company).
-  - The Metrowerks CodeWarrior compiler toolchain — see Nintendo's SDK
-    license terms.
-
-Users must legally obtain the original game and compiler themselves. This
-project does not distribute, link, or otherwise enable redistribution of
-copyrighted material.

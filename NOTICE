@@ -1,0 +1,17 @@
+Scope of the MIT license
+=========================
+
+The MIT license in LICENSE applies only to the source code in this
+repository. It does NOT grant any rights to:
+
+  - The Pokémon Colosseum game ROM or any extracted game assets (text,
+    graphics, audio, level data, etc.) — these are the property of their
+    respective copyright holders (Nintendo, Genius Sonority, The Pokémon
+    Company).
+  - The Metrowerks CodeWarrior compiler toolchain — see Nintendo's SDK
+    license terms.
+
+Users must legally obtain the original game and compiler themselves. This
+project does not distribute, link, or otherwise enable redistribution of
+copyrighted material. No copyrighted game data, assets, or compiler
+binaries are committed to this repository.
