@@ -26,6 +26,7 @@ typedef struct {
     void* colorData;
     void* texcoordData;
     void* texcoord1Data;
+    void* normalData;
     u32 sourceArchiveOffset;
     u32 totalSubmittedVertices;
     u32 totalPrimitiveCommands;

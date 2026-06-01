@@ -77,6 +77,17 @@ the file:line and fn_ references below are confirmed. The four features are **NO
 #1 is a foundation the others structurally depend on; #4 is a large isolated project.
 
 ### ⭐ The single best FIRST increment (cheapest visible proof of interactivity, ~1 day)
+> **✅ DONE (2026-06-01, uncommitted in working tree).** `pad_shim.c`:
+> `PADShim_UpdateKeyboard` reads GLFW (`glfwGetKey`), keymap set in `PADShim_Init`
+> (Enter=START, Z=A, X=B, arrows=dpad, WASD/IJKL sticks). `pcport_main.c` `RunMenuScene`:
+> per-frame `PADRead` → host edge-detector `pressed = held & ~prev`; new `PCPortSceneState`
+> enum (TITLE→MAIN_MENU); START swaps the overlay logo+`menu_018` → `menu_033` panel; loop
+> un-capped (until `glfwWindowShouldClose`), `PCPORT_MENU_FRAMES`/`PCPORT_DUMP` keep the
+> headless path finite + vsync-paced; `PCPORT_DEBUG_START_FRAME=N` injects a one-frame START
+> for headless verification. Built clean (shim lib + `pcport_link.py` 37/0/LINKED OK),
+> screenshot-verified both states, adversarially reviewed (4 lenses, 0 confirmed defects).
+> **Next: (2) main-menu cursor** — see below.
+
 In `pad_shim.c` + `pcport_main.c`, do exactly three things:
 1. Implement `PADShim_UpdateKeyboard` (pad_shim.c:293) against **GLFW** (the file is scaffolded
    for SDL2 but the build links GLFW): `glfwGetKey(PCPort_GetHostWindow(), …)` →
@@ -103,6 +114,24 @@ and changes screen — the literal skeleton (`enum` state + input + present loop
   engine is a vsync-tied fibre scheduler with a broad extern closure — not worth it for boot/menu.
 
 ### (2) Main menu (Story / Battle / Options) — fold into #1. Effort: SMALL.
+> **✅ DONE (2026-06-01, uncommitted).** Composite built to match the real layout (user
+> reference screenshot): `menu_033` is a sprite SHEET — STORY card (v 0.00–0.40) blits screen-
+> left, BATTLE card (v 0.41–0.86) screen-right, OPTIONS pill (v 0.872–0.949) centre. `menu_032`
+> is the chrome sheet → the pointing-hand cursor (u 0.185–0.285, v 0.66–0.99) + the Quit button
+> (u 0–0.162, v 0.40–0.74). `kMainMenuItems[]` table holds the 6 items + hand positions; D-pad
+> up/down moves `menuCursor` (A logs select, B → title). Added `DrawSolidScreenRect` (GX_PASSCLR)
+> for the backdrop — REQUIRED because the game draw path leaves a **green EFB clear** that shows
+> through; an opaque quad covers it. `PCPORT_DEBUG_CURSOR=N` pins the cursor for headless capture.
+>
+> **Polish DONE (2026-06-01):** (a) real **blue-swirl background** = `topmenu.fsys:menu_bg00`
+> texture idx 00 (CMPR 640×480 @ archive offset 0x73C0), baked like the title sky and drawn full-
+> screen. (b) **Bitmap-font text system** — `tools/pcport_genfont.py` renders Consolas → an ASCII
+> alpha atlas header `src/pcport/pcport_font.h`; `pcport_main.c` `EnsureFontAtlas()` uploads it,
+> `DrawTextScreen`/`DrawTextWrapped` blit per-glyph quads (MODULATE-tinted). Reusable for the save
+> prompt etc. (c) **Bottom description box** (silver panel) shows the selected item's wrapped
+> description (per-item strings in `kMainMenuItems[]`). Font is Consolas, NOT the game's typeface,
+> and the box is a drawn panel, not the exact game sprite — functional, swap later if desired.
+
 - Assets already decoded: `topmenu.fsys:menu_033` (RGBA8 276×574 = STORY/Continue/New Game,
   BATTLE/Colosseum/Battle Now, OPTIONS), PNG at `build_pc/logo_probe/topmenu/`; menu_016/031/032.
 - In ST_MAIN_MENU: draw `menu_033` via `DrawTexturedScreenRect` + a cursor-highlight quad, move
@@ -111,6 +140,17 @@ and changes screen — the literal skeleton (`enum` state + input + present loop
   asset/draw facts are corroborated by the other three results; treat as a small known increment.)
 
 ### (3) Post-START save prompt (Yes/No + save-presence check). Effort: MEDIUM (pragmatic).
+> **✅ DONE (2026-06-01, uncommitted) as a menu-selection dialog layer.** New
+> `PCPORT_SCENE_DIALOG` state: A on a menu item opens a dialog over the dimmed menu.
+> `PCPort_SaveExists()` is the host save-presence check (fopen `PCPORT_SAVE_PATH`, default
+> `build_pc/colosseum.sav`, env-overridable; no GCI/SHA-1 — returns 0 → "no saved game data",
+> matching the game's fallback). CONTINUE/NEW GAME → Yes/No (when a save exists) or info;
+> QUIT → Yes actually `glfwSetWindowShouldClose`; Colosseum/BattleNow/Options → info "not yet
+> available". D-pad left/right picks Yes/No, A confirms, B cancels → back to menu. Rendered with
+> `DrawSolidScreenRect` (dim + panel) + the bitmap-font text. `PCPORT_DEBUG_A_FRAME=N` injects an
+> A press for headless capture. **Remaining:** actual save WRITE + loading real game state (no
+> game-state layer yet); the real game's dialog sprite/font.
+
 - **The save/card subsystem is a decomp BLACK BOX** — `fn_801E1300/0FB4/1274/1B2C/12A0` and
   `menuCB_SaveLoad.c` (`menuCBBios_SaveDataAvailable`) have **NO C and NO `.s`/`.inc`** in the
   tree. You cannot link or reference it; **reimplement host-side**.
@@ -125,6 +165,61 @@ and changes screen — the literal skeleton (`enum` state + input + present loop
   bake prompt strings as sprites or add a minimal bitmap font. Don't port `menu_dialog.c`.
 
 ### (4) Boot THP videos — LARGE, isolated; its own parallel track. Effort: MEDIUM (video-only).
+> **🔬 DECODER DONE + PROVEN IN-ENGINE (2026-06-01, uncommitted).** `src/pcport/thp_player.c`
+> (+ vendored `third_party/stb_image.h`) parses the THP container and decodes video frames to
+> RGBA. Verified on `movie/gs_logo.thp` (640×480, 130 frames, 29.97fps, video-only): walks ALL
+> 130 frames and decodes them; output matches a PIL reference within ±3/channel (IDCT rounding).
+> Frame 48 = the "GENIUS SONORITY" logo, decoded by the port's own code.
+> **THE KEY GOTCHA:** THP video frames are baseline JPEG (SOI/DQT/SOF0/DHT/SOS/EOI) BUT with the
+> standard `FF00` entropy byte-stuffing **OMITTED** (Nintendo space-saver). Stock JPEG decoders
+> (stb, libjpeg/PIL) fail "bad huffman code" on ~85% of frames (any literal 0xFF in the scan).
+> Fix = `thp_restuff()`: re-insert a 0x00 after every 0xFF in the scan region [post-SOS .. EOI],
+> append a fresh EOI, THEN decode with stb. Frame layout: `[nextSize][prevSize][videoSize]
+> [JPEG]` (+ one more size per extra component for audio THPs); next frame at `off + curSize`
+> (curSize starts = `firstFrameSize`, then = align32(nextSize)). Header: fps@0x10, numFrames@0x14,
+> firstFrameSize@0x18, componentDataOffset@0x20 (video w/h at +0x14/+0x18), movieDataOffset@0x28.
+> Verify with `pcport_bootstrap.exe --thp-smoke` (env `PCPORT_THP_FILE`/`PCPORT_THP_FRAME`/
+> `PCPORT_THP_OUT` → writes a PPM; pure decode, no GL).
+> **▶ PLAYBACK DONE (2026-06-01, uncommitted) — the boot videos play before the title.**
+> (1) `GXHostUpdateTexObjRGBA8` (gx_shim.c/.h) reuses one GL texture via glTexSubImage2D (no
+> per-frame leak). (2) `RunBootSequence(window)` (pcport_main.c, called from RunMenuScene after
+> GSgfxInit) plays gs_logo → tpc → openingdemo full-screen, paced to fps via `glfwGetTime`, START/A
+> skips a movie, window-close aborts; `PCPORT_NO_BOOT=1` skips, `PCPORT_BOOT_DUMP_FRAME=N` dumps a
+> boot frame for headless verify. (3) All 3 movies verified decoding incl. the 2-component audio
+> THPs (tpc 75f, openingdemo 1926f/64MB streamed — frame 240 = the real desert-ruins opening
+> scene); boot_f48 = GENIUS SONORITY through the GL path. **Video-only/muted** (ADPCM audio is a
+> later, separate add). NOTE: openingdemo is ~64s — skip with START/A. The full flow now runs:
+> boot videos → title → main menu → dialogs.
+>
+> **BOOT ORDER (corrected 2026-06-01): Nintendo → Pokémon → Genius Sonority → opening demo.**
+> The brand logos live in their own FSYS archives (NOT THP): `nintendo_logo.fsys:logo_nintendo`
+> and `genius_logo.fsys:logo_gs` are raw 0x80-header **CMPR 640×480** sprites (header `02 80 01 e0
+> 04`; marker 0x04 = CMPR); `pokemon_logo.fsys` is an `ar` of THP-decoder `.o` files (NOT an
+> image) so "Pokémon" uses `tpc.thp`. `RunBootSequence` plays a mixed list: a static logo
+> (`BootShowLogo` via `LoadFsysSpriteTexObj`, ~2.6s, skippable) then the THP movies (`BootPlayTHP`).
+> `LoadFsysSpriteTexObj(archive, member, &tex)` generalises `LoadRawMenuTexObj` (any fsys + CMPR).
+> Nintendo logo verified rendering via the GL path. (Genius also has a static `logo_gs`; the
+> animated `gs_logo.thp` is used for nicer motion.)
+>
+> **POLISH ROUND 2 (2026-06-01, uncommitted):**
+> - **CMPR decode bug FIXED** (`gx_texture.c` `decode_dxt1_block`): the 4×4 selector word is
+>   MSB-first (`2*(15-(y*4+x))`), was read LSB-first → diagonally-flipped blocks (invisible on
+>   gradients, speckled the Nintendo logo). Now crisp; improves ALL CMPR textures.
+> - **Save prompt** (`PCPORT_SCENE_SAVE_PROMPT`): START on the title now shows the memory-card
+>   message ("The Memory Card in Slot A has been read!") over the title before the menu, via the
+>   new shared `DrawDialogBox()` (dark teal panel + lighter border + white text, bottom-centre).
+> - **Dialog/description styling**: the menu description box + all dialogs now use the dark
+>   `DrawDialogBox` style (white text on dark teal), matching the real game.
+> - `PCPORT_DEBUG_A_FRAME=N` injects an A press (dismiss save prompt / open a dialog) for headless capture.
+>
+> **STILL OFF — the 3D title scene (deep, NOT done):** washed tan/grey desert; missing the blue
+> sky, the characters (Wes/Rui) + Umbreon/Espeon, and the columns. Frame stats: `dobjs=22 drawn=11
+> **skipped=11**` — half the title's display objects are skipped by `RenderJointTree` (likely the
+> character/Pokémon models — skinned/enveloped meshes the host path doesn't yet handle, or a
+> visibility/material gap). This is the deferred "tan-on-tan / missing geometry" issue; needs a
+> focused scene-graph/skinning investigation. The opening-demo "doesn't load" report = its
+> authentic ~7s black fade-in intro (it does decode + play; frame 240 = real scene).
+
 - **Key discovery: the orchestration + the ENTIRE THP player are already C-active.** Boot order
   in `src/game/movie.c`: `moviePlayGSLogo`(:410)→`moviePlayTPCLogo`(:420)→`moviePlayOpeningDemo`
   (:111); `movieWaitForFinish`(:82) is the per-movie blocking loop. The whole THP player/parser
@@ -189,8 +284,12 @@ of #1's host state machine — only revisit if the goal expands to authentic in-
    loop at :4930) + the 2D primitives (`BeginMenuOverlay`:472, `DrawTexturedScreenRect`:504,
    `LoadRawMenuTexObj`:538) + `pad_shim.c` (`PADShim_UpdateKeyboard`:293).
 2. Confirm the build still runs (`pcport_link.py` → `--menu` → `PCPORT_DUMP` BMP).
-3. Do the **⭐ single best first increment** in §3: GLFW input in `pad_shim.c` + host
-   edge-detector + un-cap the loop + START swaps `menu_018`→`menu_033`. Links no new TUs, ~1 day,
-   and yields the first real proof of interactivity.
-4. From there, grow it into the `RunGame(window)` host state machine (#1) → main menu (#2) →
-   save prompt (#3). THP video (#4) is a separate parallel track.
+3. ✅ **DONE** — the ⭐ first increment (GLFW input + edge-detector + un-capped loop +
+   START swaps `menu_018`→`menu_033`). See the ✅ note in §3. Working tree, uncommitted.
+4. ✅ **DONE** — the main-menu composite + navigable hand cursor (§3 #2). Matches the real
+   layout. Working tree, uncommitted.
+5. **NEXT options:** (a) main-menu polish — locate the blue-swirl background member + add the
+   bottom description box (needs baked strings or a minimal bitmap font, since the port has no
+   glyph renderer); (b) the post-START save prompt (§3 #3, host-reimpl — save subsystem is a
+   decomp black box); (c) THP boot videos (§3 #4, isolated parallel track). Grow `RunMenuScene`
+   into a named `RunGame(window)` state machine as more states (save prompt, modes) land.

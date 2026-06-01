@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
     u32 maxPosIndex;
+    u32 maxNormalIndex;
     u32 maxColorIndex;
     u32 maxTexcoordIndex;
     u32 maxTexcoord1Index;
@@ -434,6 +435,11 @@ static BOOL ScanDisplayListIndices(const u8* displayList,
                         stats->maxPosIndex = index;
                     }
                     break;
+                case GX_VA_NRM:
+                    if (index > stats->maxNormalIndex) {
+                        stats->maxNormalIndex = index;
+                    }
+                    break;
                 case GX_VA_CLR0:
                     if (index > stats->maxColorIndex) {
                         stats->maxColorIndex = index;
@@ -533,6 +539,15 @@ static BOOL TranslateVertexArray(const PCPortHSDArchive* archive,
         }
 
         outPObj->positionData = data;
+        desc->vertex = data;
+        return TRUE;
+
+    case GX_VA_NRM:
+        /* Normal (raw bytes already copied above). The host lights via face
+         * normals, so the per-vertex normal is not consumed at draw time -- the
+         * array only needs to exist (correctly sized) so the indexed display-list
+         * decode advances past the normal index and stays aligned. */
+        outPObj->normalData = data;
         desc->vertex = data;
         return TRUE;
 
@@ -1199,6 +1214,7 @@ void PCPort_DestroyTranslatedPObj(PCPortTranslatedPObj* pobj) {
     free(pobj->colorData);
     free(pobj->texcoordData);
     free(pobj->texcoord1Data);
+    free(pobj->normalData);
     memset(pobj, 0, sizeof(*pobj));
 }
 
@@ -1234,6 +1250,12 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
     if (nextOffset != 0u || serializedDisplayCount == 0u ||
         !IsArchiveRangeValid(archive, vertsOffset, PCPORT_SERIALIZED_VTXDESC_SIZE) ||
         displayOffset >= pobjArchiveOffset) {
+        if (getenv("PCPORT_SKIN_DEBUG") != NULL) {
+            fprintf(stderr,
+                    "[skin] pobj@0x%X flags=0x%04X type=%u early-reject next=0x%X dispCount=%u\n",
+                    pobjArchiveOffset, flags, (flags >> 12) & 3u,
+                    nextOffset, serializedDisplayCount);
+        }
         return FALSE;
     }
 
@@ -1260,11 +1282,20 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
         }
 
         if ((parsedVerts[entryCount].attr != GX_VA_POS &&
+             parsedVerts[entryCount].attr != GX_VA_NRM &&
              parsedVerts[entryCount].attr != GX_VA_CLR0 &&
              parsedVerts[entryCount].attr != GX_VA_TEX0 &&
              parsedVerts[entryCount].attr != GX_VA_TEX1) ||
             GetIndexByteCount(parsedVerts[entryCount].attr_type) == 0 ||
             parsedVerts[entryCount].stride == 0) {
+            if (getenv("PCPORT_SKIN_DEBUG") != NULL) {
+                fprintf(stderr,
+                        "[skin] pobj@0x%X flags=0x%04X type=%u reject attr=%u attr_type=%u stride=%u\n",
+                        pobjArchiveOffset, flags, (flags >> 12) & 3u,
+                        parsedVerts[entryCount].attr,
+                        parsedVerts[entryCount].attr_type,
+                        parsedVerts[entryCount].stride);
+            }
             PCPort_DestroyTranslatedPObj(outPObj);
             return FALSE;
         }
@@ -1303,6 +1334,9 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
         switch (outPObj->verts[i].attr) {
         case GX_VA_POS:
             usedCount = stats.maxPosIndex + 1u;
+            break;
+        case GX_VA_NRM:
+            usedCount = stats.maxNormalIndex + 1u;
             break;
         case GX_VA_CLR0:
             usedCount = stats.maxColorIndex + 1u;

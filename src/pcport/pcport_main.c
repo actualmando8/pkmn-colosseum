@@ -5,10 +5,13 @@
 #include "hsd/hsd_pobj.h"
 #include "os_shim.h"
 #include "pad_shim.h"
+#include "pcport_font.h"
 #include "pcport_window.h"
 #include "real_content_host.h"
+#include "thp_player.h"
 
 #include <GLFW/glfw3.h>
+#include <direct.h>   /* _chdir (host-only: locate the asset root at startup) */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -97,6 +100,27 @@ unsigned long CurrTvMode = 0;
  * (RGB5A3 428x122, a raw 0x80-header texture, not an HSD archive). UV bands:
  * copyright block v0.016..0.549, PRESS START (teal) v0.574..0.721. */
 #define PCPORT_TITLE_PRESS_MEMBER "menu_018"
+
+/* Main-menu panel sprite in topmenu.fsys: STORY MODE (Continue / New Game),
+ * BATTLE MODE (Colosseum Battle / Battle Now), OPTIONS. Raw 0x80-header RGBA8
+ * 276x574 sprite (same format as menu_018). Shown after START is pressed on the
+ * title screen -- the first interactive screen transition in the port. */
+#define PCPORT_MAIN_MENU_MEMBER   "menu_033"
+
+/* Main-menu chrome sprite sheet in topmenu.fsys (raw 0x80-header RGBA8 774x139):
+ * the pointing-hand cursor, the blue Quit button, grey buttons + the description
+ * box top edge. The hand cursor (UV u 0.19..0.28, v 0.66..0.99) is drawn to the
+ * left of the selected item; the Quit button is UV u 0.0..0.16, v 0.40..0.74. */
+#define PCPORT_TOPMENU_CHROME_MEMBER "menu_032"
+
+/* Main-menu blue-swirl background: topmenu.fsys member menu_bg00 (HSD archive),
+ * texture index 00 = CMPR 640x480 at decompressed-archive offset 0x73C0. Baked
+ * once and drawn full-screen behind the cards (covers the green GSgfx EFB clear
+ * with the real artwork instead of the flat-blue stand-in). */
+#define PCPORT_MENU_BG_MEMBER  "menu_bg00"
+#define PCPORT_MENU_BG_OFFSET  0x73C0u
+#define PCPORT_MENU_BG_WIDTH   640
+#define PCPORT_MENU_BG_HEIGHT  480
 
 /* The title-screen 3D scene (desert/ruins environment + the logo, all one HSD
  * archive) is title.fsys:logo_demo. Its scene_data layout is byte-compatible
@@ -532,6 +556,175 @@ static void DrawTexturedScreenRect(GXTexObj* tex,
     GXEnd();
 }
 
+/* Draw a solid-colour screen-space rect with no texture (GX_PASSCLR passes the
+ * vertex colour straight through). Used for the menu backdrop that covers the
+ * green GSgfx EFB clear, and as a cursor/highlight primitive. Restores the
+ * textured MODULATE TEV op afterwards so following textured draws are unaffected.
+ * Call BeginMenuOverlay() first (alpha blend + ortho state). */
+static void DrawSolidScreenRect(f32 sx, f32 sy, f32 sw, f32 sh,
+                                u8 r, u8 g, u8 b, u8 a) {
+    f32 ndcL = ((sx) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcR = ((sx + sw) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcT = 1.0f - ((sy) / 480.0f) * 2.0f;
+    f32 ndcB = 1.0f - ((sy + sh) / 480.0f) * 2.0f;
+
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXColor4u8(r, g, b, a);
+    GXPosition3f32(ndcL, ndcB, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXColor4u8(r, g, b, a);
+    GXPosition3f32(ndcR, ndcB, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXColor4u8(r, g, b, a);
+    GXPosition3f32(ndcR, ndcT, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXColor4u8(r, g, b, a);
+    GXPosition3f32(ndcL, ndcT, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+    GXEnd();
+
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+}
+
+/* Lazily-built ASCII font atlas: white glyphs with coverage alpha from
+ * pcport_font.h, uploaded once as an RGBA texture. The port has no native glyph
+ * renderer, so this gives reusable text for the menu/save-prompt/etc. */
+static GXTexObj g_fontTex;
+static int g_fontReady = 0;
+
+static void EnsureFontAtlas(void) {
+    int n;
+    int i;
+    u8* rgba;
+
+    if (g_fontReady) {
+        return;
+    }
+    n = PCPORT_FONT_ATLAS_W * PCPORT_FONT_ATLAS_H;
+    rgba = (u8*)malloc((size_t)n * 4u);
+    if (rgba == NULL) {
+        return;
+    }
+    for (i = 0; i < n; ++i) {
+        rgba[i * 4 + 0] = 255;
+        rgba[i * 4 + 1] = 255;
+        rgba[i * 4 + 2] = 255;
+        rgba[i * 4 + 3] = kPcportFontAlpha[i];
+    }
+    memset(&g_fontTex, 0, sizeof(g_fontTex));
+    GXHostInitTexObjRGBA8(&g_fontTex, rgba,
+                          PCPORT_FONT_ATLAS_W, PCPORT_FONT_ATLAS_H,
+                          GX_CLAMP, GX_CLAMP);
+    free(rgba);
+    g_fontReady = 1;
+}
+
+/* Draw one line of ASCII text at screen (x,y), each glyph gw x gh px, tinted
+ * (r,g,b,a) via MODULATE against the white atlas (monospace advance = gw).
+ * Call BeginMenuOverlay() + EnsureFontAtlas() first. */
+static void DrawTextScreen(f32 x, f32 y, f32 gw, f32 gh,
+                           u8 r, u8 g, u8 b, u8 a, const char* s) {
+    f32 cx = x;
+    f32 du = (f32)PCPORT_FONT_CELL_W / (f32)PCPORT_FONT_ATLAS_W;
+    f32 dv = (f32)PCPORT_FONT_CELL_H / (f32)PCPORT_FONT_ATLAS_H;
+
+    if (!g_fontReady || s == NULL) {
+        return;
+    }
+    GXLoadTexObj(&g_fontTex, GX_TEXMAP0);
+    for (; *s != '\0'; ++s) {
+        unsigned char ch = (unsigned char)*s;
+        int idx;
+        f32 u0, v0, u1, v1, ndcL, ndcR, ndcT, ndcB;
+
+        if (ch == ' ' || ch < (unsigned char)PCPORT_FONT_FIRST ||
+            ch > (unsigned char)PCPORT_FONT_LAST) {
+            cx += gw;
+            continue;
+        }
+        idx = (int)ch - PCPORT_FONT_FIRST;
+        u0 = (f32)(idx % PCPORT_FONT_COLS) * du;
+        v0 = (f32)(idx / PCPORT_FONT_COLS) * dv;
+        u1 = u0 + du;
+        v1 = v0 + dv;
+        ndcL = (cx / 640.0f) * 2.0f - 1.0f;
+        ndcR = ((cx + gw) / 640.0f) * 2.0f - 1.0f;
+        ndcT = 1.0f - (y / 480.0f) * 2.0f;
+        ndcB = 1.0f - ((y + gh) / 480.0f) * 2.0f;
+
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXColor4u8(r, g, b, a); GXPosition3f32(ndcL, ndcB, 0.0f); GXTexCoord2f32(u0, v1);
+        GXColor4u8(r, g, b, a); GXPosition3f32(ndcR, ndcB, 0.0f); GXTexCoord2f32(u1, v1);
+        GXColor4u8(r, g, b, a); GXPosition3f32(ndcR, ndcT, 0.0f); GXTexCoord2f32(u1, v0);
+        GXColor4u8(r, g, b, a); GXPosition3f32(ndcL, ndcT, 0.0f); GXTexCoord2f32(u0, v0);
+        GXEnd();
+        cx += gw;
+    }
+}
+
+/* Greedy word-wrap: draw `s` as up to maxLines lines of <= maxChars glyphs,
+ * starting at (x,y) with 1.2*gh line pitch. */
+static void DrawTextWrapped(f32 x, f32 y, f32 gw, f32 gh, int maxChars, int maxLines,
+                            u8 r, u8 g, u8 b, u8 a, const char* s) {
+    char line[128];
+    char word[80];
+    int lineLen = 0;
+    int wordLen = 0;
+    int lines = 0;
+    const char* p = s;
+    int done = 0;
+
+    if (s == NULL) {
+        return;
+    }
+    while (!done && lines < maxLines) {
+        char c = *p;
+        int flushWord = 0;
+        int atEnd = 0;
+
+        if (c == '\0') {
+            atEnd = 1;
+            flushWord = (wordLen > 0);
+        } else if (c == ' ') {
+            flushWord = 1;
+        } else if (wordLen < (int)sizeof(word) - 1) {
+            word[wordLen++] = c;
+        }
+
+        if (flushWord) {
+            int need = wordLen + (lineLen > 0 ? 1 : 0);
+            int i;
+
+            if (lineLen + need > maxChars && lineLen > 0) {
+                line[lineLen] = '\0';
+                DrawTextScreen(x, y + (f32)lines * gh * 1.2f, gw, gh, r, g, b, a, line);
+                lines++;
+                lineLen = 0;
+            }
+            if (lines < maxLines) {
+                if (lineLen > 0 && lineLen < (int)sizeof(line) - 1) {
+                    line[lineLen++] = ' ';
+                }
+                for (i = 0; i < wordLen && lineLen < (int)sizeof(line) - 1; ++i) {
+                    line[lineLen++] = word[i];
+                }
+            }
+            wordLen = 0;
+        }
+        if (atEnd) {
+            if (lineLen > 0 && lines < maxLines) {
+                line[lineLen] = '\0';
+                DrawTextScreen(x, y + (f32)lines * gh * 1.2f, gw, gh, r, g, b, a, line);
+            }
+            done = 1;
+        } else {
+            ++p;
+        }
+    }
+}
+
 /* Load a raw topmenu sprite member (0x80-byte header: width@0, height@2 as
  * big-endian u16, bpp marker@4 with 0x20=RGBA8 else RGB5A3; texels at +0x80),
  * decode to RGBA, and upload as a host texture. Returns 1 on success. */
@@ -555,6 +748,52 @@ static int LoadRawMenuTexObj(const char* member, GXTexObj* outTex) {
     w = (u16)(((u16)data[0] << 8) | data[1]);
     h = (u16)(((u16)data[2] << 8) | data[3]);
     format = (data[4] == 0x20u) ? (u32)GX_TF_RGBA8 : (u32)GX_TF_RGB5A3;
+
+    memset(&decoded, 0, sizeof(decoded));
+    if (gx_texture_decode(data + 0x80, w, h, (GXTexFmt)format,
+                          NULL, GX_TL_IA8, 0, &decoded) != 0 ||
+        decoded.data == NULL) {
+        PCPort_FreeBuffer(data);
+        return 0;
+    }
+
+    memset(outTex, 0, sizeof(*outTex));
+    GXHostInitTexObjRGBA8(outTex, decoded.data, w, h, GX_CLAMP, GX_CLAMP);
+    gx_texture_free(&decoded);
+    PCPort_FreeBuffer(data);
+    return 1;
+}
+
+/* Load a raw 0x80-header sprite from an arbitrary fsys archive, like
+ * LoadRawMenuTexObj but with a caller-chosen archive and CMPR support. The
+ * header byte at +4 marks the format: 0x20=RGBA8, 0x04=CMPR, else RGB5A3. Used
+ * for the boot logos (nintendo_logo.fsys:logo_nintendo etc. are CMPR 640x480). */
+static int LoadFsysSpriteTexObj(const char* archive, const char* member,
+                                GXTexObj* outTex) {
+    u8* data = NULL;
+    u32 size = 0;
+    GXDecodedTexture decoded;
+    u16 w;
+    u16 h;
+    u32 format;
+
+    if (!PCPort_LoadFsysMember(archive, member, &data, &size)) {
+        return 0;
+    }
+    if (size < 0x80u) {
+        PCPort_FreeBuffer(data);
+        return 0;
+    }
+
+    w = (u16)(((u16)data[0] << 8) | data[1]);
+    h = (u16)(((u16)data[2] << 8) | data[3]);
+    if (data[4] == 0x20u) {
+        format = (u32)GX_TF_RGBA8;
+    } else if (data[4] == 0x04u) {
+        format = (u32)GX_TF_CMPR;
+    } else {
+        format = (u32)GX_TF_RGB5A3;
+    }
 
     memset(&decoded, 0, sizeof(decoded));
     if (gx_texture_decode(data + 0x80, w, h, (GXTexFmt)format,
@@ -4703,9 +4942,311 @@ static void BuildViewMatrixLookAt(const f32 eye[3], const f32 interest[3],
 }
 
 /*
+ * Host front-end states. The seed of the RunGame() state machine: the title
+ * screen reacts to START by advancing to the main-menu panel. More states
+ * (save prompt, mode select) plug into this same enum + present loop.
+ */
+typedef enum PCPortSceneState {
+    PCPORT_SCENE_TITLE = 0,
+    PCPORT_SCENE_MAIN_MENU = 1,
+    PCPORT_SCENE_DIALOG = 2,
+    PCPORT_SCENE_SAVE_PROMPT = 3
+} PCPortSceneState;
+
+/* Draw a modal message box (dark teal panel + lighter border, white text) at the
+ * bottom centre, matching the real game's dialog style. Dims the screen behind.
+ * yesNo!=0 draws YES/NO with the selected option highlighted; else an [A] OK hint.
+ * Call BeginMenuOverlay() + EnsureFontAtlas() first. */
+static void DrawDialogBox(const char* text, int yesNo, int cursor) {
+    DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 480.0f, 0, 0, 0, 110);
+    DrawSolidScreenRect(72.0f, 300.0f, 496.0f, 138.0f, 96, 124, 142, 250);
+    DrawSolidScreenRect(78.0f, 306.0f, 484.0f, 126.0f, 24, 42, 56, 252);
+    DrawTextWrapped(98.0f, 320.0f, 11.0f, 17.0f, 36, 3, 228, 236, 244, 255, text);
+    if (yesNo) {
+        if (cursor == 0) {
+            DrawSolidScreenRect(196.0f, 398.0f, 70.0f, 28.0f, 250, 206, 92, 255);
+            DrawTextScreen(212.0f, 402.0f, 14.0f, 20.0f, 28, 38, 52, 255, "YES");
+            DrawTextScreen(372.0f, 402.0f, 14.0f, 20.0f, 200, 212, 224, 255, "NO");
+        } else {
+            DrawSolidScreenRect(360.0f, 398.0f, 56.0f, 28.0f, 250, 206, 92, 255);
+            DrawTextScreen(212.0f, 402.0f, 14.0f, 20.0f, 200, 212, 224, 255, "YES");
+            DrawTextScreen(372.0f, 402.0f, 14.0f, 20.0f, 28, 38, 52, 255, "NO");
+        }
+    } else {
+        DrawTextScreen(296.0f, 404.0f, 10.0f, 15.0f, 170, 185, 205, 255, "[A] OK");
+    }
+}
+
+/* What a dialog's confirm ("Yes" / A on an info box) does. */
+#define PCPORT_DLG_INFO      0   /* info only: A or B dismisses back to the menu */
+#define PCPORT_DLG_QUIT      1   /* Yes -> close the window */
+#define PCPORT_DLG_CONTINUE  2   /* Yes -> load saved game (not yet implemented) */
+#define PCPORT_DLG_NEWGAME   3   /* Yes -> start a new game (not yet implemented) */
+
+/* Host-side save-data presence check. The GC save / memory-card subsystem has
+ * no decompiled C (a black box), so save state is reimplemented host-side. For
+ * now this only tests whether a save blob exists at PCPORT_SAVE_PATH (env-
+ * overridable) -- no GCI container or SHA-1; matches the game's own "no save
+ * data" fallback when absent. */
+#define PCPORT_SAVE_PATH_DEFAULT "build_pc/colosseum.sav"
+static int PCPort_SaveExists(void) {
+    const char* path = getenv("PCPORT_SAVE_PATH");
+    FILE* f;
+
+    if (path == NULL || path[0] == '\0') {
+        path = PCPORT_SAVE_PATH_DEFAULT;
+    }
+    f = fopen(path, "rb");
+    if (f != NULL) {
+        fclose(f);
+        return 1;
+    }
+    return 0;
+}
+
+/* Main-menu selectable items, in D-pad up/down traversal order. handX/handY is
+ * the top-left screen position (640x480) of the pointing-hand cursor sprite for
+ * that item. Positions are tuned against the menu_033 card layout (STORY card
+ * left, BATTLE card right, OPTIONS + Quit buttons below). */
+typedef struct PCPortMenuItem {
+    f32 handX;
+    f32 handY;
+    const char* label;
+    const char* desc;
+} PCPortMenuItem;
+
+static const PCPortMenuItem kMainMenuItems[] = {
+    {  74.0f, 214.0f, "CONTINUE",         "Continue the Story Mode from where it was last saved." },
+    {  74.0f, 250.0f, "NEW GAME",         "Start a new Story Mode adventure from the beginning." },
+    { 372.0f, 214.0f, "COLOSSEUM BATTLE", "Take on the Colosseum tournaments and challenges." },
+    { 372.0f, 250.0f, "BATTLE NOW",       "Set up a quick custom battle with your own rules." },
+    { 312.0f, 326.0f, "OPTIONS",          "Adjust game settings such as rumble and sound." },
+    { 506.0f, 328.0f, "QUIT",             "Quit the game and return to the title screen." }
+};
+#define PCPORT_MENU_ITEM_COUNT ((int)(sizeof(kMainMenuItems) / sizeof(kMainMenuItems[0])))
+
+/* Show a single static boot logo (a raw 0x80-header fsys sprite) full-screen.
+ * Holds for `seconds` (paced via glfwGetTime), skippable on START/A. Returns 0 if
+ * the window was closed (abort the whole sequence), else 1. With dumpFrame>=0 it
+ * renders one frame, dumps, and returns (headless verification). prev carries the
+ * shared input edge-state across boot items. */
+static int BootShowLogo(GLFWwindow* window, const char* archive, const char* member,
+                        double seconds, int dumpFrame, u16* prev) {
+    GXTexObj tex;
+    PADStatus pads[4];
+    double start;
+
+    memset(&tex, 0, sizeof(tex));
+    memset(pads, 0, sizeof(pads));
+    if (!LoadFsysSpriteTexObj(archive, member, &tex)) {
+        fprintf(stderr, "[boot] logo load failed: %s:%s (skipping)\n", archive, member);
+        return 1;
+    }
+    printf("[boot] logo %s:%s\n", archive, member);
+
+    if (dumpFrame >= 0) {
+        ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        GSgfx_BeginFrame();
+        BeginMenuOverlay();
+        DrawTexturedScreenRect(&tex, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+        {
+            unsigned char* px = ReadBackbufferImage();
+            free(px);
+        }
+        GSgfxSwapBuffers(1);
+        return 1;
+    }
+
+    start = glfwGetTime();
+    for (;;) {
+        u16 held;
+        u16 pressed;
+
+        if (window != NULL && glfwWindowShouldClose(window)) {
+            return 0;
+        }
+        VIWaitForRetrace_PC();
+        PADRead(pads);
+        held = pads[0].button;
+        pressed = (u16)(held & ~(*prev));
+        *prev = held;
+        if (pressed & (GCN_PAD_BUTTON_START | GCN_PAD_BUTTON_A)) {
+            break;
+        }
+        if (glfwGetTime() - start >= seconds) {
+            break;
+        }
+        ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        GSgfx_BeginFrame();
+        BeginMenuOverlay();
+        DrawTexturedScreenRect(&tex, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+        GSgfxSwapBuffers(1);
+    }
+    return 1;
+}
+
+/* Play one THP movie full-screen, decoded by thp_player and presented via the 2D
+ * quad path. Paced to the movie's fps via glfwGetTime (frames held between vsyncs);
+ * START/A skips, window close returns 0. dumpFrame>=0 decodes to that frame, dumps,
+ * and returns (headless verification). */
+static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16* prev) {
+    PCPortTHP* thp = PCPortTHP_Open(path);
+    GXTexObj frameTex;
+    const unsigned char* rgba = NULL;
+    PADStatus pads[4];
+    int vw;
+    int vh;
+    int total;
+    int decoded = 0;
+    float fps;
+    double startTime;
+
+    if (thp == NULL) {
+        fprintf(stderr, "[boot] cannot open %s (skipping)\n", path);
+        return 1;
+    }
+    memset(&frameTex, 0, sizeof(frameTex));
+    memset(pads, 0, sizeof(pads));
+    vw = PCPortTHP_Width(thp);
+    vh = PCPortTHP_Height(thp);
+    total = PCPortTHP_FrameCount(thp);
+    fps = PCPortTHP_Fps(thp);
+    if (fps <= 0.0f) {
+        fps = 29.97f;
+    }
+    printf("[boot] playing %s (%dx%d, %d frames, %.2f fps)\n", path, vw, vh, total, fps);
+
+    if (dumpFrame >= 0) {
+        int f;
+        for (f = 0; f <= dumpFrame; ++f) {
+            if (!PCPortTHP_NextFrameRGBA(thp, &rgba)) {
+                break;
+            }
+        }
+        if (rgba != NULL) {
+            GXHostUpdateTexObjRGBA8(&frameTex, rgba, (u16)vw, (u16)vh);
+            ClearBackbuffer(0.0f, 0.0f, 0.0f);
+            GSgfx_BeginFrame();
+            BeginMenuOverlay();
+            DrawTexturedScreenRect(&frameTex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                   0.0f, 0.0f, 1.0f, 1.0f);
+            {
+                unsigned char* px = ReadBackbufferImage();
+                free(px);
+            }
+            GSgfxSwapBuffers(1);
+        }
+        PCPortTHP_Close(thp);
+        return 1;
+    }
+
+    startTime = glfwGetTime();
+    for (;;) {
+        double elapsed;
+        int wantFrame;
+        u16 held;
+        u16 pressed;
+
+        if (window != NULL && glfwWindowShouldClose(window)) {
+            PCPortTHP_Close(thp);
+            return 0;
+        }
+        VIWaitForRetrace_PC();
+        PADRead(pads);
+        held = pads[0].button;
+        pressed = (u16)(held & ~(*prev));
+        *prev = held;
+        if (pressed & (GCN_PAD_BUTTON_START | GCN_PAD_BUTTON_A)) {
+            break;
+        }
+        elapsed = glfwGetTime() - startTime;
+        wantFrame = (int)(elapsed * fps);
+        while (decoded <= wantFrame) {
+            if (!PCPortTHP_NextFrameRGBA(thp, &rgba)) {
+                rgba = NULL;
+                break;
+            }
+            GXHostUpdateTexObjRGBA8(&frameTex, rgba, (u16)vw, (u16)vh);
+            ++decoded;
+        }
+        if (rgba == NULL && decoded >= total) {
+            break;
+        }
+        ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        GSgfx_BeginFrame();
+        if (decoded > 0) {
+            BeginMenuOverlay();
+            DrawTexturedScreenRect(&frameTex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                   0.0f, 0.0f, 1.0f, 1.0f);
+        }
+        GSgfxSwapBuffers(1);
+    }
+    PCPortTHP_Close(thp);
+    return 1;
+}
+
+/*
+ * Boot sequence before the title: Nintendo logo (static) -> The Pokemon Company
+ * (tpc.thp) -> Genius Sonority (gs_logo.thp) -> opening demo (openingdemo.thp).
+ * Static logos come from the *_logo.fsys CMPR sprites; the rest are THP movies.
+ * START/A skips the current item; window close aborts. PCPORT_NO_BOOT=1 skips the
+ * whole sequence; PCPORT_BOOT_DUMP_FRAME=N dumps the first item (GL path) for
+ * headless verification. Must run after GSgfxInit.
+ */
+static int RunBootSequence(GLFWwindow* window) {
+    static const struct {
+        int isThp;
+        const char* archive;
+        const char* member;
+    } kBoot[] = {
+        { 0, "orig/GC6E01/disc/files/nintendo_logo.fsys", "logo_nintendo" },
+        { 1, "orig/GC6E01/disc/files/movie/tpc.thp",        NULL },
+        { 1, "orig/GC6E01/disc/files/movie/gs_logo.thp",    NULL },
+        { 1, "orig/GC6E01/disc/files/movie/openingdemo.thp", NULL }
+    };
+    int n = (int)(sizeof(kBoot) / sizeof(kBoot[0]));
+    int i;
+    u16 prev = 0;
+    int dumpFrame = -1;
+    const char* e;
+
+    if (getenv("PCPORT_NO_BOOT") != NULL) {
+        return 1;
+    }
+    e = getenv("PCPORT_BOOT_DUMP_FRAME");
+    if (e != NULL && e[0] != '\0') {
+        dumpFrame = atoi(e);
+    }
+
+    for (i = 0; i < n; ++i) {
+        int rc;
+        if (kBoot[i].isThp) {
+            rc = BootPlayTHP(window, kBoot[i].archive, dumpFrame, &prev);
+        } else {
+            rc = BootShowLogo(window, kBoot[i].archive, kBoot[i].member,
+                              2.6, dumpFrame, &prev);
+        }
+        if (rc == 0) {
+            GXHostClearTextureBinding();
+            return 0;  /* window closed during boot */
+        }
+        if (dumpFrame >= 0) {
+            GXHostClearTextureBinding();
+            return 1;  /* verification: rendered the first item, stop */
+        }
+    }
+
+    GXHostClearTextureBinding();
+    return 1;
+}
+
+/*
  * Route B boot path: load+parse the top-menu scene once, then present its full
- * joint tree every frame in a persistent (but headless-safe, capped) window
- * loop. Reuses the resolve/camera/draw primitives proven by the slice smokes.
+ * joint tree every frame in a persistent window loop. Reads the keyboard/pad
+ * each frame (host edge-detector) so START advances title -> main menu. The
+ * loop runs until the window is closed; an explicit PCPORT_MENU_FRAMES cap (or
+ * PCPORT_DUMP) keeps the headless screenshot path finite. Reuses the resolve/
+ * camera/draw primitives proven by the slice smokes.
  */
 static int RunMenuScene(GLFWwindow* window) {
     PCPortHSDArchive archive;
@@ -4734,16 +5275,48 @@ static int RunMenuScene(GLFWwindow* window) {
     int haveLogo = 0;
     GXTexObj menu018Tex;
     int haveMenu018 = 0;
+    GXTexObj menu033Tex;
+    int haveMenu033 = 0;
+    GXTexObj menu032Tex;
+    int haveMenu032 = 0;
+    int menuCursor = 0;
+    PCPortHSDArchive menuBgArchive;
+    u8* menuBgData = NULL;
+    u32 menuBgSize = 0;
+    GXTexObj menuBgTex;
+    int haveMenuBg = 0;
     GXTexObj skyTex;
     int haveSky = 0;
     int render3D = 0;
+    PADStatus pads[4];
+    u16 padHeld = 0;
+    u16 padPrev = 0;
+    u16 padPressed = 0;
+    PCPortSceneState sceneState = PCPORT_SCENE_TITLE;
+    int saveExists = 0;
+    int dialogKind = PCPORT_DLG_INFO;
+    int dialogYesNo = 0;
+    int dialogCursor = 0;
+    const char* dialogText = NULL;
+    int debugStartFrame = -1;
+    const char* debugStartEnv;
+    int debugCursor = -1;
+    const char* debugCursorEnv;
+    int debugAFrame = -1;
+    const char* debugAEnv;
+    int capExplicit;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
     memset(&logoArchive, 0, sizeof(logoArchive));
     memset(&logoTex, 0, sizeof(logoTex));
     memset(&menu018Tex, 0, sizeof(menu018Tex));
+    memset(&menu033Tex, 0, sizeof(menu033Tex));
+    memset(&menu032Tex, 0, sizeof(menu032Tex));
+    memset(&menuBgArchive, 0, sizeof(menuBgArchive));
+    memset(&menuBgTex, 0, sizeof(menuBgTex));
     memset(&skyTex, 0, sizeof(skyTex));
+    memset(pads, 0, sizeof(pads));
 
     /* Default to the title scene (desert/ruins environment + logo) in
      * title.fsys:logo_demo. Env overrides PCPORT_MENU_ARCHIVE / PCPORT_MENU_MEMBER
@@ -4848,12 +5421,49 @@ static int RunMenuScene(GLFWwindow* window) {
         goto cleanup;
     }
 
+    /* Loop cap policy: an explicit PCPORT_MENU_FRAMES (or a PCPORT_DUMP request)
+     * bounds the loop so the headless screenshot path stays finite; otherwise
+     * the loop is uncapped (frameCap==0) and runs until the window is closed --
+     * the interactive front-end. */
     capEnv = getenv("PCPORT_MENU_FRAMES");
-    frameCap = capEnv != NULL ? atoi(capEnv) : PCPORT_WINDOW_FRAMES;
-    if (frameCap <= 0) {
+    capExplicit = (capEnv != NULL && capEnv[0] != '\0');
+    frameCap = capExplicit ? atoi(capEnv) : 0;
+    if (capExplicit && frameCap <= 0) {
         frameCap = PCPORT_WINDOW_FRAMES;
     }
     dumpRequested = getenv("PCPORT_DUMP") != NULL;
+
+    /* Debug affordance: inject a one-frame START press at PCPORT_DEBUG_START_FRAME
+     * so the headless dump can exercise the real edge-detector + title->menu
+     * transition without a physical keypress. Parsed before the dump-cap fallback
+     * so the fallback can guarantee the loop runs long enough to reach it. */
+    debugStartEnv = getenv("PCPORT_DEBUG_START_FRAME");
+    if (debugStartEnv != NULL && debugStartEnv[0] != '\0') {
+        debugStartFrame = atoi(debugStartEnv);
+    }
+    /* Debug affordance: pin the main-menu cursor to a fixed item (overrides nav)
+     * so a headless dump can verify the hand-cursor position at any item. */
+    debugCursorEnv = getenv("PCPORT_DEBUG_CURSOR");
+    if (debugCursorEnv != NULL && debugCursorEnv[0] != '\0') {
+        debugCursor = atoi(debugCursorEnv);
+    }
+    /* Debug affordance: inject a one-frame A press at PCPORT_DEBUG_A_FRAME so a
+     * headless dump can open/confirm a dialog without a physical keypress. */
+    debugAEnv = getenv("PCPORT_DEBUG_A_FRAME");
+    if (debugAEnv != NULL && debugAEnv[0] != '\0') {
+        debugAFrame = atoi(debugAEnv);
+    }
+    saveExists = PCPort_SaveExists();
+
+    if (dumpRequested && frameCap <= 0) {
+        /* A dump needs a finite "last frame". Make the fallback cap late enough
+         * to both reach an injected debug START and capture the frame after it,
+         * else the dump would silently grab the pre-transition title. */
+        frameCap = PCPORT_GSGFX_SWAPS;
+        if (debugStartFrame >= 0 && debugStartFrame + 2 > frameCap) {
+            frameCap = debugStartFrame + 2;
+        }
+    }
     /* Default to rendering the real 3D title scene (desert/ruins + the textured
      * geometry, texture x diffuse modulated, demo fade + logo billboards
      * skipped). Set PCPORT_NO_RENDER_3D=1 to fall back to the flat 2D sky
@@ -4868,6 +5478,16 @@ static int RunMenuScene(GLFWwindow* window) {
            rootJointOffset,
            frameCap,
            dumpRequested);
+
+    /* Boot movies play first (skippable via PCPORT_NO_BOOT). */
+    if (!RunBootSequence(window)) {
+        ok = 1;  /* window closed during the boot sequence -> clean exit */
+        goto cleanup;
+    }
+    if (getenv("PCPORT_BOOT_DUMP_FRAME") != NULL) {
+        ok = 1;  /* boot frame captured for verification -> skip the title */
+        goto cleanup;
+    }
 
     /* Load + bake + upload the static title logo once (GL context + GSgfxInit
      * are ready here). The decompressor fix in real_content_host.c is required
@@ -4904,6 +5524,51 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Title overlay (PRESS START + copyright) loaded\n");
     }
 
+    /* Main-menu panel (shown after START). Loaded up front so the title->menu
+     * transition is instant. */
+    haveMenu033 = LoadRawMenuTexObj(PCPORT_MAIN_MENU_MEMBER, &menu033Tex);
+    if (haveMenu033) {
+        printf("[pcport_bootstrap] Main-menu panel (menu_033) loaded\n");
+    } else {
+        fprintf(stderr,
+                "[pcport_bootstrap] Main-menu panel unavailable (START keeps the title)\n");
+    }
+
+    /* Main-menu chrome sheet (hand cursor + Quit button). */
+    haveMenu032 = LoadRawMenuTexObj(PCPORT_TOPMENU_CHROME_MEMBER, &menu032Tex);
+    if (haveMenu032) {
+        printf("[pcport_bootstrap] Main-menu chrome (menu_032: hand cursor + Quit) loaded\n");
+    }
+
+    /* Bake the blue-swirl main-menu background (menu_bg00, CMPR 640x480). */
+    if (PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE, PCPORT_MENU_BG_MEMBER,
+                              &menuBgData, &menuBgSize) &&
+        PCPort_HSDArchiveParseBE(&menuBgArchive, menuBgData, menuBgSize)) {
+        PCPortTranslatedTexture bgDesc;
+        u8* bgPixels = NULL;
+        u32 bgPxSize = 0;
+
+        memset(&bgDesc, 0, sizeof(bgDesc));
+        bgDesc.imageDataArchiveOffset = PCPORT_MENU_BG_OFFSET;
+        bgDesc.format = GX_TF_CMPR;
+        bgDesc.width = PCPORT_MENU_BG_WIDTH;
+        bgDesc.height = PCPORT_MENU_BG_HEIGHT;
+        if (PCPort_BakeTextureRGBAFromArchiveBE(&menuBgArchive, &bgDesc,
+                                                &bgPixels, &bgPxSize)) {
+            GXHostInitTexObjRGBA8(&menuBgTex, bgPixels,
+                                  PCPORT_MENU_BG_WIDTH, PCPORT_MENU_BG_HEIGHT,
+                                  GX_CLAMP, GX_CLAMP);
+            PCPort_FreeBuffer(bgPixels);
+            haveMenuBg = 1;
+            printf("[pcport_bootstrap] Main-menu background (menu_bg00 swirl) baked (%dx%d)\n",
+                   PCPORT_MENU_BG_WIDTH, PCPORT_MENU_BG_HEIGHT);
+        }
+    }
+    if (!haveMenuBg) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Main-menu background unavailable (flat-blue stand-in)\n");
+    }
+
     /* Bake the desert sky/sand backdrop (CMPR) from the title scene archive. */
     if (!render3D) {
         PCPortTranslatedTexture skyDesc;
@@ -4927,20 +5592,151 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
 
-    for (frame = 0; frame < frameCap; ++frame) {
+    /* Build the ASCII font atlas once (GL context ready) for menu/prompt text. */
+    EnsureFontAtlas();
+
+    for (frame = 0; ; ++frame) {
         MenuTreeStats stats;
 
         if (window != NULL && glfwWindowShouldClose(window)) {
             break;
         }
+        if (frameCap > 0 && frame >= frameCap) {
+            break;
+        }
 
         memset(&stats, 0, sizeof(stats));
 
-        VIWaitForRetrace_PC();
-        ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        VIWaitForRetrace_PC();   /* pumps glfwPollEvents -> fresh key state */
+
+        /* Host input + edge detection: read the pad, derive this frame's
+         * newly-pressed buttons (held & ~prev), then advance the front-end. */
+        PADRead(pads);
+        padHeld = pads[0].button;
+        if (debugStartFrame >= 0 && frame == debugStartFrame) {
+            padHeld = (u16)(padHeld | GCN_PAD_BUTTON_START);
+        }
+        if (debugAFrame >= 0 && frame == debugAFrame) {
+            padHeld = (u16)(padHeld | GCN_PAD_BUTTON_A);
+        }
+        padPressed = (u16)(padHeld & ~padPrev);
+        padPrev = padHeld;
+
+        if (sceneState == PCPORT_SCENE_TITLE) {
+            if ((padPressed & GCN_PAD_BUTTON_START) && haveMenu033) {
+                /* The real game checks the memory card on START before the menu. */
+                sceneState = PCPORT_SCENE_SAVE_PROMPT;
+                printf("[pcport_bootstrap] START pressed (frame %d) -> save prompt\n",
+                       frame);
+            }
+        } else if (sceneState == PCPORT_SCENE_SAVE_PROMPT) {
+            if (padPressed & (GCN_PAD_BUTTON_START | GCN_PAD_BUTTON_A |
+                              GCN_PAD_BUTTON_B)) {
+                sceneState = PCPORT_SCENE_MAIN_MENU;
+                menuCursor = 0;
+                printf("[pcport_bootstrap] save prompt dismissed -> main menu\n");
+            }
+        } else if (sceneState == PCPORT_SCENE_MAIN_MENU) {
+            if (padPressed & GCN_PAD_BUTTON_DOWN) {
+                menuCursor = (menuCursor + 1) % PCPORT_MENU_ITEM_COUNT;
+            }
+            if (padPressed & GCN_PAD_BUTTON_UP) {
+                menuCursor = (menuCursor + PCPORT_MENU_ITEM_COUNT - 1) %
+                             PCPORT_MENU_ITEM_COUNT;
+            }
+            if (debugCursor >= 0) {
+                menuCursor = debugCursor % PCPORT_MENU_ITEM_COUNT; /* pin for headless capture */
+            }
+            if (padPressed & GCN_PAD_BUTTON_A) {
+                /* Open the dialog appropriate to the selected item. */
+                dialogCursor = 0;
+                switch (menuCursor) {
+                case 0: /* CONTINUE */
+                    if (saveExists) {
+                        dialogYesNo = 1; dialogKind = PCPORT_DLG_CONTINUE;
+                        dialogText = "Load the saved game and continue Story Mode?";
+                    } else {
+                        dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
+                        dialogText = "There is no saved game data to continue.";
+                    }
+                    break;
+                case 1: /* NEW GAME */
+                    if (saveExists) {
+                        dialogYesNo = 1; dialogKind = PCPORT_DLG_NEWGAME;
+                        dialogText = "A saved game already exists. Overwrite it and start a new adventure?";
+                    } else {
+                        dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
+                        dialogText = "A new adventure begins! (Story Mode is not yet playable in this port.)";
+                    }
+                    break;
+                case 2: /* COLOSSEUM BATTLE */
+                    dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
+                    dialogText = "Colosseum Battle is not yet available in this port.";
+                    break;
+                case 3: /* BATTLE NOW */
+                    dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
+                    dialogText = "Battle Now is not yet available in this port.";
+                    break;
+                case 4: /* OPTIONS */
+                    dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
+                    dialogText = "Options are not yet available in this port.";
+                    break;
+                default: /* QUIT */
+                    dialogYesNo = 1; dialogKind = PCPORT_DLG_QUIT;
+                    dialogText = "Quit the game?";
+                    break;
+                }
+                sceneState = PCPORT_SCENE_DIALOG;
+                printf("[pcport_bootstrap] Selected %s -> dialog\n",
+                       kMainMenuItems[menuCursor].label);
+            }
+            if (padPressed & GCN_PAD_BUTTON_B) {
+                sceneState = PCPORT_SCENE_TITLE;
+                printf("[pcport_bootstrap] B pressed -> back to title\n");
+            }
+        } else { /* PCPORT_SCENE_DIALOG */
+            if (dialogYesNo) {
+                if (padPressed & GCN_PAD_BUTTON_LEFT) {
+                    dialogCursor = 0; /* Yes */
+                }
+                if (padPressed & GCN_PAD_BUTTON_RIGHT) {
+                    dialogCursor = 1; /* No */
+                }
+                if (padPressed & GCN_PAD_BUTTON_A) {
+                    if (dialogCursor == 0) { /* Yes */
+                        if (dialogKind == PCPORT_DLG_QUIT) {
+                            if (window != NULL) {
+                                glfwSetWindowShouldClose(window, GLFW_TRUE);
+                            }
+                            printf("[pcport_bootstrap] Quit confirmed -> closing\n");
+                        } else {
+                            printf("[pcport_bootstrap] Confirmed (load/new-game not yet implemented)\n");
+                        }
+                    }
+                    sceneState = PCPORT_SCENE_MAIN_MENU;
+                }
+                if (padPressed & GCN_PAD_BUTTON_B) {
+                    sceneState = PCPORT_SCENE_MAIN_MENU;
+                }
+            } else { /* info box: A or B dismisses */
+                if (padPressed & (GCN_PAD_BUTTON_A | GCN_PAD_BUTTON_B)) {
+                    sceneState = PCPORT_SCENE_MAIN_MENU;
+                }
+            }
+        }
+
+        /* Blue backdrop for the main menu (the real game's swirl background is a
+         * separate topmenu.fsys member, not yet located -- placeholder for now);
+         * black behind the 3D title. */
+        if (sceneState == PCPORT_SCENE_MAIN_MENU) {
+            ClearBackbuffer(0.16f, 0.22f, 0.45f);
+        } else {
+            ClearBackbuffer(0.0f, 0.0f, 0.0f);
+        }
         GSgfx_BeginFrame();
 
-        if (render3D) {
+        if (render3D && (sceneState == PCPORT_SCENE_TITLE ||
+                         sceneState == PCPORT_SCENE_SAVE_PROMPT)) {
             GXSetViewport((f32)translatedCamera.viewportLeft,
                           (f32)translatedCamera.viewportTop,
                           (f32)(translatedCamera.viewportRight - translatedCamera.viewportLeft),
@@ -4964,33 +5760,90 @@ static int RunMenuScene(GLFWwindow* window) {
                             &stats);
         }
 
-        /* Title screen: 2D sky/sand backdrop, then logo + PRESS START +
-         * copyright on top (the 3D scene is gated behind PCPORT_RENDER_3D). */
-        if (haveSky || haveLogo || haveMenu018) {
+        /* 2D overlay, selected by the current front-end state. The sky/sand
+         * backdrop (when 3D is off) is shared by both states; the title draws
+         * logo + PRESS START + copyright, the main menu draws the menu_033
+         * panel. The 3D scene is gated behind PCPORT_RENDER_3D. */
+        if (haveSky || haveLogo || haveMenu018 || haveMenu033 || haveMenu032) {
             BeginMenuOverlay();
-            if (haveSky) {
-                DrawTexturedScreenRect(&skyTex, 0.0f, 0.0f, 640.0f, 480.0f,
-                                       0.0f, 0.0f, 1.0f, 1.0f);
-            }
-            if (haveLogo) {
-                /* logo, top-centre (540:224 aspect) */
-                DrawTexturedScreenRect(&logoTex, 115.0f, 34.0f, 410.0f, 170.0f,
-                                       0.0f, 0.0f, 1.0f, 1.0f);
-            }
-            if (haveMenu018) {
-                /* PRESS START (teal band v0.574..0.721), centred below the logo */
-                DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
-                                       0.0f, 0.574f, 1.0f, 0.721f);
-                /* copyright block (v0.016..0.549), bottom-left */
-                DrawTexturedScreenRect(&menu018Tex, 28.0f, 392.0f, 300.0f, 58.0f,
-                                       0.0f, 0.016f, 1.0f, 0.549f);
+            if (sceneState == PCPORT_SCENE_TITLE ||
+                sceneState == PCPORT_SCENE_SAVE_PROMPT) {
+                if (haveSky) {
+                    DrawTexturedScreenRect(&skyTex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                           0.0f, 0.0f, 1.0f, 1.0f);
+                }
+                if (haveLogo) {
+                    /* logo, top-centre (540:224 aspect) */
+                    DrawTexturedScreenRect(&logoTex, 115.0f, 34.0f, 410.0f, 170.0f,
+                                           0.0f, 0.0f, 1.0f, 1.0f);
+                }
+                if (haveMenu018) {
+                    /* PRESS START only on the title itself (not while the save
+                     * prompt is up), then the copyright block on both. */
+                    if (sceneState == PCPORT_SCENE_TITLE) {
+                        DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
+                                               0.0f, 0.574f, 1.0f, 0.721f);
+                    }
+                    /* copyright block (v0.016..0.549), bottom-left */
+                    DrawTexturedScreenRect(&menu018Tex, 28.0f, 392.0f, 300.0f, 58.0f,
+                                           0.0f, 0.016f, 1.0f, 0.549f);
+                }
+                /* Memory-card read prompt over the title (matches the real boot). */
+                if (sceneState == PCPORT_SCENE_SAVE_PROMPT) {
+                    DrawDialogBox("The Memory Card in Slot A has been read!", 0, 0);
+                }
+            } else { /* PCPORT_SCENE_MAIN_MENU: composite the real layout from the sheets */
+                /* Opaque backdrop FIRST -- the game's draw path leaves a green EFB
+                 * clear that shows through everywhere; this covers it. Use the real
+                 * menu_bg00 blue-swirl artwork when baked, else a flat-blue quad. */
+                if (haveMenuBg) {
+                    DrawTexturedScreenRect(&menuBgTex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                           0.0f, 0.0f, 1.0f, 1.0f);
+                } else {
+                    DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 480.0f, 28, 44, 92, 255);
+                }
+                if (haveMenu033) {
+                    /* STORY MODE card (sheet v 0.00-0.402) -> screen left (centred,
+                     * narrower so it isn't clipped at the window edge) */
+                    DrawTexturedScreenRect(&menu033Tex, 44.0f, 34.0f, 256.0f, 254.0f,
+                                           0.0f, 0.000f, 1.0f, 0.402f);
+                    /* BATTLE MODE card (sheet v 0.408-0.863) -> screen right */
+                    DrawTexturedScreenRect(&menu033Tex, 344.0f, 34.0f, 256.0f, 254.0f,
+                                           0.0f, 0.408f, 1.0f, 0.863f);
+                    /* OPTIONS green pill (sheet full pill u 0.015-0.875, v 0.872-0.949) */
+                    DrawTexturedScreenRect(&menu033Tex, 336.0f, 320.0f, 188.0f, 42.0f,
+                                           0.015f, 0.872f, 0.875f, 0.949f);
+                }
+                if (haveMenu032) {
+                    /* Quit button (chrome sheet u 0.0-0.162, v 0.40-0.74) */
+                    DrawTexturedScreenRect(&menu032Tex, 528.0f, 322.0f, 92.0f, 42.0f,
+                                           0.0f, 0.40f, 0.162f, 0.74f);
+                    /* pointing-hand cursor at the selected item (u 0.185-0.285, v 0.66-0.99) */
+                    DrawTexturedScreenRect(&menu032Tex,
+                                           kMainMenuItems[menuCursor].handX,
+                                           kMainMenuItems[menuCursor].handY,
+                                           48.0f, 38.0f,
+                                           0.185f, 0.66f, 0.285f, 0.99f);
+                }
+                /* Bottom description box: dark teal panel + lighter border with
+                 * white text for the selected item (matches the real game). */
+                DrawSolidScreenRect(46.0f, 380.0f, 548.0f, 84.0f, 96, 124, 142, 240);
+                DrawSolidScreenRect(50.0f, 384.0f, 540.0f, 76.0f, 26, 44, 58, 245);
+                DrawTextWrapped(68.0f, 400.0f, 12.0f, 18.0f, 40, 2,
+                                228, 236, 244, 255,
+                                kMainMenuItems[menuCursor].desc);
+
+                /* Selection dialog over the (dimmed) menu. */
+                if (sceneState == PCPORT_SCENE_DIALOG) {
+                    DrawDialogBox(dialogText, dialogYesNo, dialogCursor);
+                }
             }
         }
 
         /* On the final frame, capture the framebuffer (BMP dump happens inside
          * ReadBackbufferImage via DumpFramebufferBMP when PCPORT_DUMP is set)
          * before presenting. */
-        if (dumpRequested && frame == frameCap - 1) {
+        if (dumpRequested && frameCap > 0 && frame == frameCap - 1) {
             unsigned char* pixels = ReadBackbufferImage();
             free(pixels);
         }
@@ -5020,7 +5873,121 @@ cleanup:
     PCPort_HSDArchiveDestroy(&logoArchive);
     PCPort_FreeBuffer(logoData);
     PCPort_FreeBuffer(logoPixels);
+    PCPort_HSDArchiveDestroy(&menuBgArchive);
+    PCPort_FreeBuffer(menuBgData);
     return ok;
+}
+
+/* Make the working directory the asset root so the game's relative asset paths
+ * (orig/GC6E01/disc/files/...) resolve no matter where the exe is launched from
+ * (double-clicked, or run from build_pc/). Walks up from the exe's own directory
+ * looking for orig/GC6E01/disc/files/title.fsys and chdir()s there. */
+static void PCPort_ChdirToAssetRoot(const char* argv0) {
+    char dir[1024];
+    char probe[1152];
+    size_t len;
+    int i;
+    int slash;
+
+    if (argv0 == NULL) {
+        return;
+    }
+    len = strlen(argv0);
+    if (len == 0 || len >= sizeof(dir)) {
+        return;
+    }
+    memcpy(dir, argv0, len + 1);
+    slash = -1;
+    for (i = (int)len - 1; i >= 0; --i) {
+        if (dir[i] == '/' || dir[i] == '\\') {
+            slash = i;
+            break;
+        }
+    }
+    if (slash < 0) {
+        dir[0] = '.';
+        dir[1] = '\0';
+    } else {
+        dir[slash] = '\0';   /* directory containing the exe */
+    }
+
+    for (i = 0; i < 7; ++i) {
+        FILE* f;
+        size_t dl;
+
+        snprintf(probe, sizeof(probe),
+                 "%s/orig/GC6E01/disc/files/title.fsys", dir);
+        f = fopen(probe, "rb");
+        if (f != NULL) {
+            fclose(f);
+            if (_chdir(dir) == 0) {
+                printf("[pcport_bootstrap] asset root: %s\n", dir);
+            }
+            return;
+        }
+        dl = strlen(dir);
+        if (dl + 4 >= sizeof(dir)) {
+            return;
+        }
+        memcpy(dir + dl, "/..", 4);   /* go up one level */
+    }
+}
+
+/* THP decode smoke (no GL): decode one frame of a movie to RGBA via thp_player +
+ * stb_image and write it as a PPM, to verify the decode path in the host build
+ * independent of the GL present path. PCPORT_THP_FILE selects the movie (default
+ * gs_logo), PCPORT_THP_FRAME the frame index, PCPORT_THP_OUT the output path. */
+static int RunTHPSmoke(void) {
+    const char* path = getenv("PCPORT_THP_FILE");
+    const char* frameEnv = getenv("PCPORT_THP_FRAME");
+    const char* outPath = getenv("PCPORT_THP_OUT");
+    int wantFrame = (frameEnv != NULL && frameEnv[0] != '\0') ? atoi(frameEnv) : 0;
+    const unsigned char* rgba = NULL;
+    PCPortTHP* thp;
+    FILE* out;
+    int w;
+    int h;
+    int f;
+
+    if (path == NULL || path[0] == '\0') {
+        path = "orig/GC6E01/disc/files/movie/gs_logo.thp";
+    }
+    if (outPath == NULL || outPath[0] == '\0') {
+        outPath = "build_pc/thp_smoke.ppm";
+    }
+    thp = PCPortTHP_Open(path);
+    if (thp == NULL) {
+        fprintf(stderr, "[thp-smoke] failed to open %s\n", path);
+        return 0;
+    }
+    w = PCPortTHP_Width(thp);
+    h = PCPortTHP_Height(thp);
+    printf("[thp-smoke] %s: %dx%d, %d frames, %.2f fps\n",
+           path, w, h, PCPortTHP_FrameCount(thp), PCPortTHP_Fps(thp));
+    for (f = 0; f <= wantFrame; ++f) {
+        if (!PCPortTHP_NextFrameRGBA(thp, &rgba)) {
+            fprintf(stderr, "[thp-smoke] decode stopped before frame %d\n", wantFrame);
+            PCPortTHP_Close(thp);
+            return 0;
+        }
+    }
+    out = fopen(outPath, "wb");
+    if (out == NULL) {
+        fprintf(stderr, "[thp-smoke] cannot write %s\n", outPath);
+        PCPortTHP_Close(thp);
+        return 0;
+    }
+    {
+        int i;
+        fprintf(out, "P6\n%d %d\n255\n", w, h);
+        for (i = 0; i < w * h; ++i) {
+            fwrite(rgba + (size_t)i * 4, 1, 3, out); /* RGB, drop alpha */
+        }
+    }
+    fclose(out);
+    printf("[thp-smoke] wrote %s (frame %d, %dx%d)\n", outPath, wantFrame, w, h);
+    PCPortTHP_Close(thp);
+    return 1;
 }
 
 int main(int argc, char** argv) {
@@ -5072,6 +6039,16 @@ int main(int argc, char** argv) {
     runMenu = HasArg(argc, argv, "--menu");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
+
+    /* Resolve assets relative to the exe, so launching by double-click / from any
+     * directory works (assets are loaded via repo-relative paths). */
+    PCPort_ChdirToAssetRoot(argc > 0 ? argv[0] : NULL);
+
+    /* THP decode smoke: pure decode -> PPM, no window/GL. Verifies thp_player +
+     * stb_image in the host build. */
+    if (HasArg(argc, argv, "--thp-smoke")) {
+        return RunTHPSmoke() ? 0 : 1;
+    }
 
     if (runWindowSmoke || runGsGfxSmoke || runRealContentParserSmoke ||
         runRealSceneSlice4Smoke ||

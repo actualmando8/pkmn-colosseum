@@ -98,7 +98,10 @@ static void decode_dxt1_block(const u8* srcBlock,
 
     for (y = 0; y < 4u; ++y) {
         for (x = 0; x < 4u; ++x) {
-            u32 code = (indices >> (2u * ((y * 4u) + x))) & 0x3u;
+            /* GameCube/S3TC packs the 4x4 selector word MSB-first: pixel (0,0)
+             * uses the top two bits. (Reading LSB-first diagonally flips each
+             * block -- invisible on gradients, but speckles sharp edges.) */
+            u32 code = (indices >> (2u * (15u - ((y * 4u) + x)))) & 0x3u;
             u8* dst = dstRgba + (y * dstStride) + (x * 4u);
 
             dst[0] = palette[code][0];

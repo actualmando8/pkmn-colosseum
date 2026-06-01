@@ -214,7 +214,7 @@ static int GXGetIndexByteCount(GXAttrType type) {
 }
 
 static int GXIsSupportedDisplayListAttr(GXAttr attr) {
-    return attr == GX_VA_POS || attr == GX_VA_CLR0 ||
+    return attr == GX_VA_POS || attr == GX_VA_NRM || attr == GX_VA_CLR0 ||
            attr == GX_VA_TEX0 || attr == GX_VA_TEX1;
 }
 
@@ -345,6 +345,11 @@ static int GXDecodeIndexedAttr(const u8** cursor, const u8* end,
                     out->texcoord[1] = 0.0f;
                 }
             }
+            break;
+        case GX_VA_NRM:
+            /* The index is already consumed above; the host lights via face
+             * normals (screen-space derivatives), so the per-vertex normal is
+             * not used -- just keep the vertex stream aligned for skinned meshes. */
             break;
         default:
             return 0;
@@ -1289,6 +1294,32 @@ void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
                         rgba);
 }
 
+void GXHostUpdateTexObjRGBA8(GXTexObj* obj, const void* rgba,
+                             u16 width, u16 height) {
+    GXHostTexObj* hostObj;
+
+    if (obj == NULL || rgba == NULL || width == 0 || height == 0) {
+        return;
+    }
+    hostObj = GXGetHostTexObj(obj);
+
+    /* First use, dimension change, or a stale object -> (re)create the texture.
+     * Otherwise reuse the existing GL texture and just replace its pixels, so a
+     * per-frame video update does not leak one GL texture per frame. */
+    if (hostObj->magic != GX_HOST_TEXOBJ_MAGIC || hostObj->glTexId == 0 ||
+        hostObj->width != width || hostObj->height != height) {
+        GXHostInitTexObjRGBA8(obj, rgba, width, height, GX_CLAMP, GX_CLAMP);
+        return;
+    }
+
+    GXEnsureCurrentContext();
+    glBindTexture(GL_TEXTURE_2D, hostObj->glTexId);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                    GL_RGBA, GL_UNSIGNED_BYTE, rgba);
+    glBindTexture(GL_TEXTURE_2D, g_boundTextureId);
+}
+
 void GXInitTexObjFilterMode(GXTexObj* obj, GXTexFilter min_filt,
                             GXTexFilter mag_filt) {
     GXHostTexObj* hostObj;
@@ -1918,7 +1949,11 @@ void GXCallDisplayList(void* list, u32 nbytes) {
             vertex.color[2] = 0xFF;
             vertex.color[3] = 0xFF;
 
+            /* GC vertex-stream order: POS, NRM, CLR0, TEX0, TEX1. NRM must be
+             * decoded between POS and CLR0 or skinned meshes (which carry a
+             * normal index) desync the stream. */
             if (!GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_POS, &vertex) ||
+                !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_NRM, &vertex) ||
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_CLR0, &vertex) ||
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX0, &vertex) ||
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX1, &vertex)) {

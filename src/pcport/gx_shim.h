@@ -766,6 +766,14 @@ void GXHostInitTexObjRGBA8(GXTexObj* obj, const void* rgba,
                            GXTexWrapMode wrap_s, GXTexWrapMode wrap_t);
 
 /**
+ * GXHostUpdateTexObjRGBA8 -- replace an existing host texture's pixels in place
+ * (glTexSubImage2D) when the dimensions are unchanged, else (re)create it. Lets a
+ * video frame stream reuse one GL texture instead of leaking one per frame.
+ */
+void GXHostUpdateTexObjRGBA8(GXTexObj* obj, const void* rgba,
+                             u16 width, u16 height);
+
+/**
  * GXInitTexObjFilterMode -- Override the min/mag filter on a texture object.
  * Called from HSD TObj setup (hsd_tobj_ext.c, hsd_texp.c).
  * PC port: re-apply GL_TEXTURE_MIN/MAG_FILTER to the object's GL texture.
