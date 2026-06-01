@@ -4501,6 +4501,32 @@ static void RenderJointTree(const PCPortHSDArchive* a,
 
                         textureMapId = PCPort_ReadBigEndianU32(
                             a->storage + tobjOffset + 0x08);
+
+                        /* Modulate the baked texture by the material diffuse
+                         * colour (texture x diffuse). The desert ground/ruins
+                         * texture with a near-white haze/glow; their real stone/
+                         * sand tone is the material diffuse, so without this they
+                         * render washed-out at full brightness. White-diffuse
+                         * materials are left unchanged. */
+                        if (haveMaterial) {
+                            u32 dr = (translatedMaterial.diffuse >> 24) & 0xFFu;
+                            u32 dg = (translatedMaterial.diffuse >> 16) & 0xFFu;
+                            u32 db = (translatedMaterial.diffuse >> 8) & 0xFFu;
+                            if (dr != 0xFFu || dg != 0xFFu || db != 0xFFu) {
+                                u32 px = (u32)baseTexture->width *
+                                         (u32)baseTexture->height;
+                                u32 i;
+                                for (i = 0; i < px; ++i) {
+                                    bakedPixels[(i * 4u) + 0u] = (u8)(
+                                        (bakedPixels[(i * 4u) + 0u] * dr) / 255u);
+                                    bakedPixels[(i * 4u) + 1u] = (u8)(
+                                        (bakedPixels[(i * 4u) + 1u] * dg) / 255u);
+                                    bakedPixels[(i * 4u) + 2u] = (u8)(
+                                        (bakedPixels[(i * 4u) + 2u] * db) / 255u);
+                                }
+                            }
+                        }
+
                         GXHostInitTexObjRGBA8(
                             &nodeTextureObject,
                             bakedPixels,
