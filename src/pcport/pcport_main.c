@@ -226,6 +226,43 @@ static int ReadBackbufferPixelAt(int x, int y, unsigned char pixel[4]) {
     return pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0;
 }
 
+/* Dump an RGBA framebuffer to a 24-bit BMP when env PCPORT_DUMP is set. GL's
+ * bottom-up origin matches BMP's, so rows are written as-is. (PCPORT-only.) */
+static void DumpFramebufferBMP(const unsigned char* rgba, int w, int h) {
+    const char* path = getenv("PCPORT_DUMP");
+    FILE* f;
+    int rowsize, imgsize, x, y;
+    unsigned char hdr[54];
+    unsigned char* row;
+    unsigned int filesize;
+    if (path == NULL || rgba == NULL) return;
+    f = fopen(path, "wb");
+    if (f == NULL) return;
+    rowsize = (w * 3 + 3) & ~3;
+    imgsize = rowsize * h;
+    filesize = 54u + (unsigned int)imgsize;
+    memset(hdr, 0, sizeof(hdr));
+    hdr[0] = 'B'; hdr[1] = 'M';
+    hdr[2] = filesize & 0xff; hdr[3] = (filesize >> 8) & 0xff;
+    hdr[4] = (filesize >> 16) & 0xff; hdr[5] = (filesize >> 24) & 0xff;
+    hdr[10] = 54; hdr[14] = 40;
+    hdr[18] = w & 0xff; hdr[19] = (w >> 8) & 0xff;
+    hdr[22] = h & 0xff; hdr[23] = (h >> 8) & 0xff;
+    hdr[26] = 1; hdr[28] = 24;
+    fwrite(hdr, 1, 54, f);
+    row = (unsigned char*)malloc(rowsize);
+    for (y = 0; y < h; y++) {
+        memset(row, 0, rowsize);
+        for (x = 0; x < w; x++) {
+            const unsigned char* p = rgba + ((size_t)y * w + x) * 4;
+            row[x * 3 + 0] = p[2]; row[x * 3 + 1] = p[1]; row[x * 3 + 2] = p[0];
+        }
+        fwrite(row, 1, rowsize, f);
+    }
+    free(row);
+    fclose(f);
+}
+
 static unsigned char* ReadBackbufferImage(void) {
     size_t pixelCount = (size_t)PCPORT_WINDOW_WIDTH * (size_t)PCPORT_WINDOW_HEIGHT;
     size_t bufferSize = pixelCount * 4u;
@@ -243,6 +280,7 @@ static unsigned char* ReadBackbufferImage(void) {
                  GL_RGBA,
                  GL_UNSIGNED_BYTE,
                  pixels);
+    DumpFramebufferBMP(pixels, PCPORT_WINDOW_WIDTH, PCPORT_WINDOW_HEIGHT);
     return pixels;
 }
 

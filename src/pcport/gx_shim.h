@@ -31,10 +31,10 @@ extern "C" {
 
 typedef unsigned char  u8;
 typedef unsigned short u16;
-typedef unsigned int   u32;
-typedef signed char    s8;
+typedef unsigned long  u32;   /* match include/dolphin/types.h (long, not int) so */
+typedef signed char    s8;    /* strict compilers don't see a typedef redefinition */
 typedef signed short   s16;
-typedef signed int     s32;
+typedef signed long    s32;
 typedef float          f32;
 typedef int            BOOL;
 

@@ -31,6 +31,11 @@ build/
 .ninja_*
 build.ninja
 
+# PC port host build (CMake out-of-source dir + GLFW FetchContent clone) and the
+# generated GLAD loader — all regenerable via tools/pcport_build.ps1.
+build_pc/
+third_party/
+
 # decompctx output
 ctx.*
 *.ctx
