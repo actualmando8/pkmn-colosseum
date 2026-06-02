@@ -644,13 +644,13 @@ static int BuildSandWindTexture(GXTexObj* tex) {
             a = n * 0.25f + 0.5f;           /* ~0..1 */
             if (a < 0.0f) { a = 0.0f; }
             if (a > 1.0f) { a = 1.0f; }
-            a = a * a * a;                  /* sharpen -> wispy gaps */
+            a = a * a;                      /* soft wispy gaps (not too sharp) */
             a *= env;
 
-            px[o + 0] = 236;                /* warm sand */
-            px[o + 1] = 223;
-            px[o + 2] = 190;
-            px[o + 3] = (u8)(a * 52.0f);    /* max ~52/255 -> subtle */
+            px[o + 0] = 240;                /* warm pale sand */
+            px[o + 1] = 228;
+            px[o + 2] = 198;
+            px[o + 3] = (u8)(a * 30.0f);    /* max ~30/255 -> very subtle haze */
         }
     }
     memset(tex, 0, sizeof(*tex));
@@ -5648,8 +5648,9 @@ static int RunMenuScene(GLFWwindow* window) {
     GXTexObj windTex;              /* procedural sand-wind wisps, GX_REPEAT */
     int haveWind = 0;
     f32 cloudSpeed = 0.010f;       /* texture-units/sec the clouds drift left */
+    f32 cloudSpanX = 1.6f;         /* texture widths across the screen (>1 = smaller clouds) */
     f32 windSpeed = 0.060f;        /* texture-units/sec the sand-wind blows left */
-    f32 cloudBandH = 210.0f;       /* sky-band height in px (clouds fade out below) */
+    f32 cloudBandH = 190.0f;       /* sky-band height in px (clouds fade out below) */
     int cloudsEnabled = 1;
     int windEnabled = 1;
     double animTimeForced = -1.0;  /* PCPORT_ANIM_TIME pins the anim clock (headless) */
@@ -5978,6 +5979,8 @@ static int RunMenuScene(GLFWwindow* window) {
         if (e != NULL) { windSpeed = (f32)atof(e); }
         e = getenv("PCPORT_CLOUD_H");
         if (e != NULL) { f32 v = (f32)atof(e); if (v > 10.0f) { cloudBandH = v; } }
+        e = getenv("PCPORT_CLOUD_SPAN");
+        if (e != NULL) { f32 v = (f32)atof(e); if (v > 0.2f) { cloudSpanX = v; } }
         /* When set, drive the drift off a fixed clock instead of wall-time, so the
          * headless fast-loop (which advances glfwGetTime by ~nothing per frame)
          * can capture a chosen point in the animation deterministically. */
@@ -6277,16 +6280,19 @@ static int RunMenuScene(GLFWwindow* window) {
                     double animT = (animTimeForced >= 0.0)
                                        ? animTimeForced : glfwGetTime();
                     f32 cu0 = (f32)(animT * (double)cloudSpeed);
-                    f32 cu1 = cu0 + 1.0f;        /* one texture width across screen */
+                    f32 cu1 = cu0 + cloudSpanX;  /* >1 tile = smaller, less-stretched clouds */
                     f32 bandH = cloudBandH;
-                    f32 feat = 56.0f;
+                    f32 feat = 70.0f;            /* long fade into the warm-tan horizon */
                     f32 vMid;
+                    /* Slightly translucent so the 3D sky's blue reads through (softer,
+                     * matches the game's hazier sky than a hard texture replace). */
+                    u8 aMain = 232;
                     if (feat > bandH) { feat = bandH; }
                     vMid = (bandH - feat) / bandH;
                     DrawTexturedScreenRectA(&cloudTex, 0.0f, 0.0f, 640.0f, bandH - feat,
-                                            cu0, 0.0f, cu1, vMid, 255, 255);
+                                            cu0, 0.0f, cu1, vMid, aMain, aMain);
                     DrawTexturedScreenRectA(&cloudTex, 0.0f, bandH - feat, 640.0f, feat,
-                                            cu0, vMid, cu1, 1.0f, 255, 0);
+                                            cu0, vMid, cu1, 1.0f, aMain, 0);
                 }
                 /* Sand-wind: faint sandy wisps drifting left over the desert,
                  * feathered top and bottom so they sit subtly on the ground. */
