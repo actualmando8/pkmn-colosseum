@@ -212,13 +212,25 @@ and changes screen — the literal skeleton (`enum` state + input + present loop
 >   `DrawDialogBox` style (white text on dark teal), matching the real game.
 > - `PCPORT_DEBUG_A_FRAME=N` injects an A press (dismiss save prompt / open a dialog) for headless capture.
 >
-> **STILL OFF — the 3D title scene (deep, NOT done):** washed tan/grey desert; missing the blue
-> sky, the characters (Wes/Rui) + Umbreon/Espeon, and the columns. Frame stats: `dobjs=22 drawn=11
-> **skipped=11**` — half the title's display objects are skipped by `RenderJointTree` (likely the
-> character/Pokémon models — skinned/enveloped meshes the host path doesn't yet handle, or a
-> visibility/material gap). This is the deferred "tan-on-tan / missing geometry" issue; needs a
-> focused scene-graph/skinning investigation. The opening-demo "doesn't load" report = its
-> authentic ~7s black fade-in intro (it does decode + play; frame 240 = real scene).
+> **TITLE 3D SCENE + CAST — RESOLVED (2026-06-02, committed).** Two things were wrong:
+> (1) `RenderJointTree` read the DObj chain `next` from `dobj+0x00` (=class_name) instead of
+> `+0x04` → only the first mesh of each joint's chain drew (`dobjs 22→43`, drawn `11→35`). Fixed
+> → the FULL desert ruins (columns/boulders/rock layers) now render. (2) The posed "characters"
+> are NOT in `logo_demo` at all and NOT skinned — they're pre-rendered **2D cutouts** the title
+> composites over the desert and **cycles** through sets (set 1 = Wes/Rui/Umbreon/Espeon; others
+> = starters/legendaries). Cutouts are `title.fsys` `t_vs_*` members (0x80-header RGB5A3); set 1
+> = t_vs_c3 Wes / c4 Rui / c2 Umbreon (+ Espeon, which has no disc cutout → bundled as
+> `tools/pcport_assets/title_espeon.rgba`, extracted via a Dolphin texture dump). Implemented:
+> `kTitleCastSet1/2/3[]` + `kTitleSets[]` registry + idle-cycle timer in `RunMenuScene`
+> (`PCPORT_TITLE_SET=N` pins a set, `PCPORT_CYCLE_SECS` overrides interval). Placement extracted
+> by template-matching the cutouts against a clean Dolphin F9 frame (build_pc/logo_probe/
+> match_cutouts.py CLEAN=1; per-set rects via discover_set.py). Set 0 EXACT; sets 1-2 PROVISIONAL
+> (need an F9 shot of each + the missing starters dump-bridged like Espeon). Full title-cast
+> investigation in auto-memory `project_pc_port_title_characters`.
+> **STILL OPEN (title polish):** drifting-cloud scroll + sand-wind effect (not started); refine
+> cycling sets 1-2 to pixel-exact; minor logo-overlay size/pos nudge (real logo is a bit bigger/
+> lower than the 115,34,410,170 overlay). The opening-demo "doesn't load" report = its authentic
+> ~7s black fade-in intro (it does decode + play; frame 240 = real scene).
 
 - **Key discovery: the orchestration + the ENTIRE THP player are already C-active.** Boot order
   in `src/game/movie.c`: `moviePlayGSLogo`(:410)→`moviePlayTPCLogo`(:420)→`moviePlayOpeningDemo`

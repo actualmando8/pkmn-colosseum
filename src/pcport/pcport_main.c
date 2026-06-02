@@ -764,6 +764,51 @@ static int LoadRawMenuTexObj(const char* member, GXTexObj* outTex) {
     return 1;
 }
 
+/* Load a raw RGBA8 blob (BE u32 width, BE u32 height, then w*h*4 RGBA bytes) from
+ * a repo-relative file and upload it as a texture. Used for the title's Espeon
+ * cutout, whose on-disc source member isn't identifiable (loaded by numeric ID
+ * via still-ASM sprite code; texels not found in any fsys member or raw file by
+ * an exhaustive scan) -- so the authentic texture, extracted via a Dolphin
+ * texture dump and bundled at tools/pcport_assets/, stands in until/if the disc
+ * member is located. Returns 1 on success. */
+static int LoadRawRGBABlobTexObj(const char* path, GXTexObj* outTex) {
+    FILE* f = fopen(path, "rb");
+    unsigned char hdr[8];
+    u32 w, h, px;
+    u8* pixels;
+
+    if (f == NULL) {
+        return 0;
+    }
+    if (fread(hdr, 1, 8, f) != 8) {
+        fclose(f);
+        return 0;
+    }
+    w = ((u32)hdr[0] << 24) | ((u32)hdr[1] << 16) | ((u32)hdr[2] << 8) | hdr[3];
+    h = ((u32)hdr[4] << 24) | ((u32)hdr[5] << 16) | ((u32)hdr[6] << 8) | hdr[7];
+    if (w == 0u || h == 0u || w > 4096u || h > 4096u) {
+        fclose(f);
+        return 0;
+    }
+    px = w * h * 4u;
+    pixels = (u8*)malloc(px);
+    if (pixels == NULL) {
+        fclose(f);
+        return 0;
+    }
+    if (fread(pixels, 1, px, f) != px) {
+        free(pixels);
+        fclose(f);
+        return 0;
+    }
+    fclose(f);
+
+    memset(outTex, 0, sizeof(*outTex));
+    GXHostInitTexObjRGBA8(outTex, pixels, (u16)w, (u16)h, GX_CLAMP, GX_CLAMP);
+    free(pixels);
+    return 1;
+}
+
 /* Load a raw 0x80-header sprite from an arbitrary fsys archive, like
  * LoadRawMenuTexObj but with a caller-chosen archive and CMPR support. The
  * header byte at +4 marks the format: 0x20=RGBA8, 0x04=CMPR, else RGB5A3. Used
@@ -4845,7 +4890,46 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                  * In-game it is an animated alpha fade that ends transparent;
                  * drawn opaque it would cover the whole title scene. Keying on
                  * alpha (not camera-space position) is camera-independent. */
-                if (!((haveTexture == 0 && haveMaterial &&
+                int debugFlatChar = 0;
+                {
+                    static int isoChars = -1;
+                    static int isoLo = 6, isoHi = 9;
+                    if (isoChars < 0) {
+                        const char* e = getenv("PCPORT_ISOLATE_CHARS");
+                        isoChars = (e != NULL) ? 1 : 0;
+                        if (e != NULL && e[0] != '\0' && e[0] != '1') {
+                            /* "lo-hi" range, e.g. "6-9" or single "7" */
+                            int a = 0, b = 0;
+                            if (sscanf(e, "%d-%d", &a, &b) == 2) { isoLo = a; isoHi = b; }
+                            else if (sscanf(e, "%d", &a) == 1) { isoLo = isoHi = a; }
+                        }
+                    }
+                    if (isoChars) {
+                        if (stats->dobjs < (u32)isoLo || stats->dobjs > (u32)isoHi) {
+                            isLogoTex = 1; /* skip everything outside the range */
+                        } else if (getenv("PCPORT_ISOLATE_FLAT") != NULL) {
+                            debugFlatChar = 1; /* draw bright + unlit */
+                        }
+                    }
+                }
+                if (debugFlatChar) {
+                    /* Distinct bright flat colour per dobj, lighting OFF, so the
+                     * isolated mesh's silhouette + screen position is unambiguous. */
+                    static const u32 kDbgColors[4] = {
+                        0xFF3030FFu, 0x30FF30FFu, 0x3060FFFFu, 0xFFFF30FFu };
+                    PCPortTranslatedMaterial dbgMat;
+                    memset(&dbgMat, 0, sizeof(dbgMat));
+                    dbgMat.alpha = 1.0f;
+                    dbgMat.diffuse = kDbgColors[(stats->dobjs - (u32)6) & 3u];
+                    dbgMat.ambient = dbgMat.diffuse;
+                    ConfigureTranslatedMaterialPipeline((unsigned int)pipelineId, &dbgMat);
+                    GXHostSetVertexAlphaScale(1.0f);
+                    drawObject.pipelineId = (unsigned int)pipelineId;
+                    fn_801AA568(&translatedPObj.pobj);
+                    GXHostSetLightingEnabled(GX_FALSE);
+                    fn_800DAD10((void*)&drawObject);
+                    stats->drawn++;
+                } else if (!((haveTexture == 0 && haveMaterial &&
                        translatedMaterial.alpha < 0.01f) ||
                       isLogoTex)) {
                     /* Enable directional lighting for the 3D scene geometry so
@@ -4881,6 +4965,50 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                                modelViewMatrix[2][3]);
                     }
                 }
+
+                {
+                    static int skinDbg = -1;
+                    if (skinDbg < 0) {
+                        skinDbg = (getenv("PCPORT_SKIN_POSE_DEBUG") != NULL) ? 1 : 0;
+                    }
+                    if (skinDbg && stats->dobjs <= 40u) {
+                        u16 pflags = translatedPObj.pobj.flags;
+                        u32 ptype = (u32)((pflags >> 12) & 3u);
+                        u32 uField = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x14);
+                        /* dobj joint world-space origin (bind) */
+                        f32 djx = translatedJoint.modelMatrix[0][3];
+                        f32 djy = translatedJoint.modelMatrix[1][3];
+                        f32 djz = translatedJoint.modelMatrix[2][3];
+                        printf("[skinpose] pobj#%u flags=0x%04X type=%u verts=%u "
+                               "uField=0x%X dobjJoint@0x%X bind=(%.1f,%.1f,%.1f) "
+                               "aabbMin=(%.1f,%.1f,%.1f) aabbMax=(%.1f,%.1f,%.1f)",
+                               stats->dobjs, pflags, ptype,
+                               translatedPObj.totalSubmittedVertices,
+                               uField, joint, djx, djy, djz,
+                               translatedPObj.minPosition[0],
+                               translatedPObj.minPosition[1],
+                               translatedPObj.minPosition[2],
+                               translatedPObj.maxPosition[0],
+                               translatedPObj.maxPosition[1],
+                               translatedPObj.maxPosition[2]);
+                        if (uField != 0u &&
+                            ArchiveRangeValid(a, uField, PCPORT_SERIALIZED_JOINT_SIZE)) {
+                            PCPortTranslatedJointTransform skinJoint;
+                            memset(&skinJoint, 0, sizeof(skinJoint));
+                            if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint,
+                                                                     uField, &skinJoint)) {
+                                printf(" skinJoint@0x%X bind=(%.1f,%.1f,%.1f)",
+                                       uField,
+                                       skinJoint.modelMatrix[0][3],
+                                       skinJoint.modelMatrix[1][3],
+                                       skinJoint.modelMatrix[2][3]);
+                            } else {
+                                printf(" skinJoint@0x%X (chain-resolve FAILED)", uField);
+                            }
+                        }
+                        printf("\n");
+                    }
+                }
             } else {
                 stats->skipped++;
             }
@@ -4891,7 +5019,14 @@ static void RenderJointTree(const PCPortHSDArchive* a,
             stats->skipped++;
         }
 
-        nextOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x00);
+        /* Serialized HSD_DObjDesc layout: +0x00 class_name, +0x04 next,
+         * +0x08 mobj, +0x0C pobj (confirmed src/hsd/hsd_dobj.c:493 reads the
+         * next subdesc from +4, and the mobj/pobj reads above use +0x08/+0x0C).
+         * Reading "next" from +0x00 (class_name) only ever yielded the first
+         * dobj of each joint's chain -- the title's character body meshes are
+         * later dobjs in those chains, so the host saw 22/43 dobjs and the
+         * characters never drew. */
+        nextOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x04);
         if (nextOffset == dobjOffset) {
             break;
         }
@@ -5240,6 +5375,77 @@ static int RunBootSequence(GLFWwindow* window) {
     return 1;
 }
 
+/* --- Title-screen posed cast -------------------------------------------------
+ * The real title composites a set of pre-rendered 2D character/Pokemon cutouts
+ * over the desert scene and cycles between sets when idle. These are NOT 3D
+ * models (confirmed static in Dolphin) -- the existing 2D textured-quad path
+ * (DrawTexturedScreenRect) draws them directly. The cutouts live in
+ * `title.fsys` as `t_vs_*` members (0x80-header, format byte@4 = 0x10 = RGB5A3
+ * with a soft alpha edge); LoadFsysSpriteTexObj decodes them (non-0x20 -> RGB5A3).
+ * Identified set 1 ("c" group): t_vs_c3 = Wes, t_vs_c4 = Rui, t_vs_c2 = Umbreon
+ * (t_vs_c1 = Espeon is not in title.fsys -- the default-set 4th cutout is loaded
+ * from elsewhere; TBD, fail-loads gracefully until located). Reference layout:
+ * both humans lower-LEFT (facing right), both Pokemon lower-RIGHT (facing left).
+ * hflip swaps u0/u1 to mirror a cutout so it faces inward. */
+typedef struct PCPortTitleCastMember {
+    const char* member;     /* title.fsys member name */
+    f32 x, y, w, h;         /* screen-space rect (640x480, origin top-left) */
+    int hflip;              /* mirror horizontally (face inward) */
+    const char* blob;       /* repo-relative raw-RGBA fallback if member absent */
+} PCPortTitleCastMember;
+
+/* Entries are drawn IN ORDER (back-to-front), so the in-front cutout of an
+ * overlapping pair comes later. The t_vs art is authored already facing the
+ * correct title direction (native: Wes/Rui face right, Umbreon/Espeon face
+ * left) so hflip stays 0 -- the game does NOT mirror them. Rects measured
+ * against the Dolphin reference frame. Left pair: Rui behind, Wes in front;
+ * right pair: Umbreon behind, Espeon in front. */
+/* Rects EXTRACTED by template-matching each cutout (alpha-weighted, occlusion-
+ * masked, front-to-back) against a CLEAN borderless Dolphin F9 set-1 frame --
+ * build_pc/logo_probe/match_cutouts.py (CLEAN=1). Order is back-to-front. */
+static const PCPortTitleCastMember kTitleCastSet1[] = {
+    { "t_vs_c4",  40.0f, 254.0f, 139.0f, 221.0f, 0, NULL },  /* Rui : behind, right-of-Wes */
+    { "t_vs_c3",   4.0f, 262.0f, 133.0f, 214.0f, 0, NULL },  /* Wes : front, far-left      */
+    { "t_vs_c2", 456.0f, 254.0f, 163.0f, 220.0f, 0, NULL },  /* Umbreon : behind, left     */
+    /* Espeon: 135x192 RGB5A3, dumped from Dolphin (not found as a disc member);
+     * loaded from the bundled raw-RGBA blob. Front of the right pair. */
+    { "t_vs_c1", 508.0f, 292.0f, 129.0f, 184.0f, 0,
+      "tools/pcport_assets/title_espeon.rgba" },           /* Espeon : front, right */
+};
+#define PCPORT_TITLE_CAST_MAX 8
+#define PCPORT_TITLE_CAST_ARCHIVE "orig/GC6E01/disc/files/title.fsys"
+
+/* The real title cycles through several cast SETS while idle. Each set is a list
+ * of cutouts (back-to-front). Set 1 (protagonists) is template-matched against a
+ * clean F9 frame and is exact; the others are provisional placements from the
+ * t_vs group IDs + the corner layout, to be refined per-set with a clean F9 shot
+ * run through build_pc/logo_probe/discover_set.py. */
+static const PCPortTitleCastMember kTitleCastSet2[] = {  /* legendaries */
+    { "t_vs_a4",  70.0f, 288.0f, 139.0f, 140.0f, 0, NULL },  /* Kyogre  : behind, left  */
+    { "t_vs_a5", -10.0f, 276.0f, 190.0f, 196.0f, 0, NULL },  /* Groudon : front, left   */
+    { "t_vs_a3", 438.0f, 256.0f, 152.0f, 205.0f, 0, NULL },  /* Suicune : behind, right */
+    { "t_vs_a1", 504.0f, 300.0f, 128.0f, 159.0f, 0, NULL },  /* Raikou  : front, right  */
+};
+static const PCPortTitleCastMember kTitleCastSet3[] = {  /* starters (partial: only b2/b3 on disc) */
+    { "t_vs_b2",  20.0f, 280.0f, 170.0f, 167.0f, 0, NULL },  /* Meganium   : left  */
+    { "t_vs_b3", 470.0f, 286.0f, 135.0f, 188.0f, 0, NULL },  /* Feraligatr : right */
+};
+
+typedef struct PCPortTitleSet {
+    const PCPortTitleCastMember* members;
+    int count;
+    const char* name;
+} PCPortTitleSet;
+
+#define PCPORT_TITLE_SET_COUNT_(arr) ((int)(sizeof(arr)/sizeof((arr)[0])))
+static const PCPortTitleSet kTitleSets[] = {
+    { kTitleCastSet1, 4, "protagonists" },
+    { kTitleCastSet2, 4, "legendaries" },
+    { kTitleCastSet3, 2, "starters" },
+};
+#define PCPORT_TITLE_NUM_SETS ((int)(sizeof(kTitleSets)/sizeof(kTitleSets[0])))
+#define PCPORT_TITLE_MAX_SETS 8   /* array dim; must be >= number of kTitleSets entries */
+
 /*
  * Route B boot path: load+parse the top-menu scene once, then present its full
  * joint tree every frame in a persistent window loop. Reads the keyboard/pad
@@ -5287,6 +5493,14 @@ static int RunMenuScene(GLFWwindow* window) {
     int haveMenuBg = 0;
     GXTexObj skyTex;
     int haveSky = 0;
+    GXTexObj titleCastTex[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
+    int titleCastOk[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
+    int titleCastIdx;
+    int titleSetI;
+    int titleSetIndex = 0;
+    int titleSetForced = -1;       /* PCPORT_TITLE_SET=N pins a set (headless capture) */
+    double titleCycleSecs = 7.0;   /* PCPORT_CYCLE_SECS overrides */
+    double titleCycleStart = 0.0;
     int render3D = 0;
     PADStatus pads[4];
     u16 padHeld = 0;
@@ -5540,6 +5754,45 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Main-menu chrome (menu_032: hand cursor + Quit) loaded\n");
     }
 
+    /* Title posed cast: load EVERY set's cutouts once (RGBA8/RGB5A3, alpha).
+     * The title cycles through kTitleSets[] while idle. */
+    for (titleSetI = 0; titleSetI < PCPORT_TITLE_NUM_SETS; ++titleSetI) {
+        const PCPortTitleSet* set = &kTitleSets[titleSetI];
+        int cnt = set->count;
+        if (cnt > PCPORT_TITLE_CAST_MAX) {
+            cnt = PCPORT_TITLE_CAST_MAX;
+        }
+        for (titleCastIdx = 0; titleCastIdx < cnt; ++titleCastIdx) {
+            const PCPortTitleCastMember* cm = &set->members[titleCastIdx];
+            memset(&titleCastTex[titleSetI][titleCastIdx], 0,
+                   sizeof(titleCastTex[titleSetI][titleCastIdx]));
+            titleCastOk[titleSetI][titleCastIdx] = LoadFsysSpriteTexObj(
+                PCPORT_TITLE_CAST_ARCHIVE, cm->member,
+                &titleCastTex[titleSetI][titleCastIdx]);
+            if (!titleCastOk[titleSetI][titleCastIdx] && cm->blob != NULL) {
+                titleCastOk[titleSetI][titleCastIdx] = LoadRawRGBABlobTexObj(
+                    cm->blob, &titleCastTex[titleSetI][titleCastIdx]);
+            }
+            printf("[pcport_bootstrap] Title cast[%s] %s: %s\n",
+                   set->name, cm->member,
+                   titleCastOk[titleSetI][titleCastIdx] ? "loaded" : "FAILED");
+        }
+    }
+    {
+        const char* fs = getenv("PCPORT_TITLE_SET");
+        const char* cs = getenv("PCPORT_CYCLE_SECS");
+        if (fs != NULL) {
+            titleSetForced = atoi(fs);
+            if (titleSetForced >= 0 && titleSetForced < PCPORT_TITLE_NUM_SETS) {
+                titleSetIndex = titleSetForced;
+            }
+        }
+        if (cs != NULL) {
+            double v = atof(cs);
+            if (v > 0.5) { titleCycleSecs = v; }
+        }
+    }
+
     /* Bake the blue-swirl main-menu background (menu_bg00, CMPR 640x480). */
     if (PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE, PCPORT_MENU_BG_MEMBER,
                               &menuBgData, &menuBgSize) &&
@@ -5623,6 +5876,22 @@ static int RunMenuScene(GLFWwindow* window) {
         padPrev = padHeld;
 
         if (sceneState == PCPORT_SCENE_TITLE) {
+            /* Idle cast cycling: advance to the next set every titleCycleSecs of
+             * no input (like the real attract title). Any input resets the timer;
+             * PCPORT_TITLE_SET pins a set for headless capture. */
+            double nowT = glfwGetTime();
+            if (titleCycleStart == 0.0) {
+                titleCycleStart = nowT;
+            }
+            if (padPressed != 0) {
+                titleCycleStart = nowT;
+            } else if (titleSetForced < 0 &&
+                       (nowT - titleCycleStart) >= titleCycleSecs) {
+                titleSetIndex = (titleSetIndex + 1) % PCPORT_TITLE_NUM_SETS;
+                titleCycleStart = nowT;
+                printf("[pcport_bootstrap] title cast -> set %d (%s)\n",
+                       titleSetIndex, kTitleSets[titleSetIndex].name);
+            }
             if ((padPressed & GCN_PAD_BUTTON_START) && haveMenu033) {
                 /* The real game checks the memory card on START before the menu. */
                 sceneState = PCPORT_SCENE_SAVE_PROMPT;
@@ -5771,6 +6040,24 @@ static int RunMenuScene(GLFWwindow* window) {
                 if (haveSky) {
                     DrawTexturedScreenRect(&skyTex, 0.0f, 0.0f, 640.0f, 480.0f,
                                            0.0f, 0.0f, 1.0f, 1.0f);
+                }
+                /* Posed cast cutouts for the active cycling set, over the desert
+                 * but UNDER the logo (heads may tuck behind the centre logo). */
+                {
+                    const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
+                    int acnt = aset->count;
+                    if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }
+                    for (titleCastIdx = 0; titleCastIdx < acnt; ++titleCastIdx) {
+                        const PCPortTitleCastMember* cm = &aset->members[titleCastIdx];
+                        f32 cu0 = cm->hflip ? 1.0f : 0.0f;
+                        f32 cu1 = cm->hflip ? 0.0f : 1.0f;
+                        if (!titleCastOk[titleSetIndex][titleCastIdx]) {
+                            continue;
+                        }
+                        DrawTexturedScreenRect(&titleCastTex[titleSetIndex][titleCastIdx],
+                                               cm->x, cm->y, cm->w, cm->h,
+                                               cu0, 0.0f, cu1, 1.0f);
+                    }
                 }
                 if (haveLogo) {
                     /* logo, top-centre (540:224 aspect) */
