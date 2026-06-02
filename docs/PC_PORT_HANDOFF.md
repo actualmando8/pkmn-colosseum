@@ -227,10 +227,26 @@ and changes screen — the literal skeleton (`enum` state + input + present loop
 > match_cutouts.py CLEAN=1; per-set rects via discover_set.py). Set 0 EXACT; sets 1-2 PROVISIONAL
 > (need an F9 shot of each + the missing starters dump-bridged like Espeon). Full title-cast
 > investigation in auto-memory `project_pc_port_title_characters`.
-> **STILL OPEN (title polish):** drifting-cloud scroll + sand-wind effect (not started); refine
-> cycling sets 1-2 to pixel-exact; minor logo-overlay size/pos nudge (real logo is a bit bigger/
-> lower than the 115,34,410,170 overlay). The opening-demo "doesn't load" report = its authentic
-> ~7s black fade-in intro (it does decode + play; frame 240 = real scene).
+> **TITLE AMBIENT ANIMATIONS — DONE (2026-06-02, committed 441ee9a8).** The two drifting
+> effects are in: (1) **clouds** drift left across the sky, (2) a subtle **sand-wind** blows
+> across the desert. Both are self-contained 2D overlays in `RunMenuScene` (TITLE/SAVE_PROMPT
+> only), time-based off `glfwGetTime`. Clouds = the logo_demo sky texture (idx19, archive
+> 0x14A8E0) baked GX_REPEAT and U-scrolled, drawn as a sky band (opaque top + feathered bottom
+> via the new `DrawTexturedScreenRectA`); the texture is only ~seamless so `MakeSeamlessHoriz`
+> rolls columns by W/2 + heals the central seam → tiles cleanly under the scroll (no moving
+> vertical seam — confirmed at cu0≈2.7). Sand-wind = a procedural tileable wisp texture
+> (`BuildSandWindTexture`, integer-wavenumber sines + vertical envelope) scrolled subtly over
+> the desert. Verified vs the Dolphin reference (`build_pc/logo_probe/dolphin_set1_calib.png`):
+> clouds now visible+drifting (port previously showed flat blue), wind localized to the desert
+> (mean Δ ~2/255, sky Δ 0). Env tuning: `PCPORT_CLOUD_SPEED` (def 0.010), `PCPORT_WIND_SPEED`
+> (def 0.060), `PCPORT_CLOUD_H` (def 210), `PCPORT_NO_CLOUDS`, `PCPORT_NO_WIND`. Headless verify
+> affordances added: `PCPORT_ANIM_TIME=<s>` pins the anim clock (the headless loop runs ~20k fps
+> so wall-clock barely advances — this makes drift deterministic), `PCPORT_DUMP_SEQ=<base>` +
+> `PCPORT_DUMP_SEQ_EVERY=N` capture a within-run frame sequence.
+> **STILL OPEN (title polish):** refine cycling sets 1-2 to pixel-exact; minor logo-overlay
+> size/pos nudge (real logo is a bit bigger/lower than the 115,34,410,170 overlay). The
+> opening-demo "doesn't load" report = its authentic ~7s black fade-in intro (it does decode +
+> play; frame 240 = real scene).
 
 - **Key discovery: the orchestration + the ENTIRE THP player are already C-active.** Boot order
   in `src/game/movie.c`: `moviePlayGSLogo`(:410)→`moviePlayTPCLogo`(:420)→`moviePlayOpeningDemo`
