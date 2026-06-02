@@ -36,6 +36,9 @@ extern void GSgfxSwapBuffers(unsigned int flag);
 /* P-A engine-fibre spike (engine_spike.c). */
 extern int RunFibreSelfTest(void);
 extern int RunEngineSpike(GLFWwindow* window);
+/* P-B engine scheduler boot (engine_boot.c). */
+extern int RunSchedTest(void);
+extern int RunEngineBoot(GLFWwindow* window);
 extern unsigned int GSgfxGetFrameCount(void);
 extern unsigned int GSgfxHostGetPreRetraceCount(void);
 extern unsigned char GSgfxHostGetDrawDoneFlag(void);
@@ -6585,6 +6588,7 @@ int main(int argc, char** argv) {
     int runWindowSmoke;
     int runMenu;
     int runEngine;
+    int runEngineBoot;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -6612,6 +6616,7 @@ int main(int argc, char** argv) {
     runGXScissorSmoke = HasArg(argc, argv, "--gx-scissor-smoke");
     runMenu = HasArg(argc, argv, "--menu");
     runEngine = HasArg(argc, argv, "--engine");
+    runEngineBoot = HasArg(argc, argv, "--engine-boot");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
 
@@ -6631,6 +6636,11 @@ int main(int argc, char** argv) {
         return RunFibreSelfTest() ? 0 : 1;
     }
 
+    /* P-B: headless unit test of the host GStask/GSthread scheduler (gs_sched_host). */
+    if (HasArg(argc, argv, "--sched-test")) {
+        return RunSchedTest() ? 0 : 1;
+    }
+
     if (runWindowSmoke || runGsGfxSmoke || runRealContentParserSmoke ||
         runRealSceneSlice4Smoke ||
         runRealTevSceneSlice3Smoke ||
@@ -6644,7 +6654,7 @@ int main(int argc, char** argv) {
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
-        runMenu || runEngine || argc <= 1) {
+        runMenu || runEngine || runEngineBoot || argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
             return 1;
@@ -6837,6 +6847,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
+    } else if (runEngineBoot) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --engine-boot requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunEngineBoot(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Engine-boot: GStask/GSthread scheduler drove the frame loop\n");
     } else if (runEngine) {
         if (window == NULL) {
             fprintf(stderr,

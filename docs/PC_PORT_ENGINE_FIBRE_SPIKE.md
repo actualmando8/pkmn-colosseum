@@ -171,6 +171,59 @@ stand-ins, present via the existing path. That converts P-A's proven mechanism i
 
 ---
 
+## 6b. P-B increment 1 — the host GStask/GSthread scheduler (2026-06-02)
+
+Building on the P-A mechanism, P-B stands up the engine's **own** cooperative
+scheduler, host-reimplemented (not linked) per the §4 cascade finding.
+
+**`src/pcport/gs_sched_host.{h,c}`** — a faithful host reimplementation of
+`gs_thread.c`'s scheduler surface, using the **real** structs/enums from
+`include/game/gs_thread.h` (`GSTask` 0x18, `GSThread` 0x24, `GSTASK_FREE/ACTIVE/
+DEFERRED`) so it is a drop-in for engine callers:
+- **Task layer** (`GStaskInit`/`GStaskCreate`/`GStaskRun`) — reproduced *verbatim*
+  from the original C (priority-sorted linked-list insert, 1-based task IDs,
+  free-slot search over normal/deferred regions, the per-frame `GStaskRun` walk
+  that calls every `ACTIVE && !paused` task's `func(taskId, param)`). GSmem handle
+  allocation is replaced by static pools; everything else is identical. This is
+  the engine's *dominant per-frame mechanism* and is pure C — no asm.
+- **Thread layer** (`GSthreadInit`/`GSthreadCreate`) — each `GSthread` maps to a
+  host fibre (`os_thread_host`); `GSthreadYield` is the host equivalent of the
+  asm vsync-yield `fn_800F0308`; `GSthreadStepAll` resumes each thread's per-frame
+  slice. The GSmem stack/ctx + asm `fn_800F015C` context-init are replaced by the
+  fibre.
+- Exports `fn_` aliases (`fn_800FE9B0`/`834`/`7A0`, `fn_800F07A8`) so that when
+  real engine TUs are linked they bind to this host scheduler instead of the
+  `pcport_link.py` auto-stubs. (`fn_800F09D8` is deliberately **not** aliased —
+  the decomp annotations conflict on whether it is `GSthreadInit` or render-timing.)
+
+**Proof:**
+- `--sched-test` (headless) **PASSES**: priority-ordered task run `[2,3,1]` for
+  creation-order priorities `30,10,20`; correct 1-based IDs; `DEFERRED` tasks
+  skipped by `GStaskRun`; free-slot reuse on re-init; two fibre-backed `GSthread`s
+  each sliced exactly once per `GSthreadStepAll` for 5 steps.
+- `--engine-boot` (windowed, `src/pcport/engine_boot.c`) mirrors `main.c`'s
+  `GameInit` structure — `GSthreadInit(4)` + `GStaskInit(16,4)` (= the real
+  `fn_800FE9B0(0x10,0x4)`), three priority-ordered tasks (one driving the real
+  host present path `VIWaitForRetrace_PC → clear → GSgfxSwapBuffers`, exactly as
+  the real `TaskVBlank` does), and a main thread created like the real
+  `fn_800F07A8(0,0x3E8,0x4000,1,1,GameMainLoop)`. The engine's own main loop
+  `for(;;){ GSthreadStepAll(); GStaskRun(); }` ran **120 frames**: main-thread
+  work counter `1→120` (1:1 with frames), 3 tasks fired each frame, real present
+  path driven by the scheduler. Clean exit. `--menu`/`--fibre-test` unaffected.
+
+**What this proves:** the engine's *own* cooperative scheduler model (task table +
+thread fibres, semantically identical to `gs_thread.c`) now drives the host frame
+loop, with real present code executing under it as a registered task.
+
+**P-B increment 2 (next):** drive **real engine render** under these tasks — load
+`title.fsys:logo_demo` and run the real `RenderJointTree → fn_800DAD10` draw bridge
+inside the VBlank task (instead of the flat clear), so the engine scheduler is
+presenting the actual title scene. Then begin replacing host-stub task bodies with
+the real engine callbacks (`TaskVBlank → fn_80175F6C` world render, etc.),
+converting their still-asm leaves to functional C (Track D) as the call graph is
+walked. The deepest step — linking the real `main.c GameInit` with its ~60
+hardware-subsystem inits — remains gated on the GX-FIFO/VI/ARAM/DVD/DSP shims.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,
