@@ -35,7 +35,11 @@ jobs:
 
       - name: Anti-fraud gate (verify_commit.py)
         run: |
-          python3 tools/verify_commit.py --range "${{ steps.rng.outputs.range }}"
+          # --no-regression-check: this job is Python-only (no mwcc/objdiff toolchain),
+          # so skip the whole-file recompile/re-measure (it needs the compiler + the
+          # Windows objdiff-cli and can't run here). The truth-file-edit and
+          # asm-wrapper-flip anti-fraud checks below are pure-Python and still run.
+          python3 tools/verify_commit.py --range "${{ steps.rng.outputs.range }}" --no-regression-check
 
   compile-gate:
     runs-on: ubuntu-latest
