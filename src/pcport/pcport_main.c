@@ -281,10 +281,10 @@ static int ReadBackbufferPixelAt(int x, int y, unsigned char pixel[4]) {
     return pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0;
 }
 
-/* Dump an RGBA framebuffer to a 24-bit BMP when env PCPORT_DUMP is set. GL's
- * bottom-up origin matches BMP's, so rows are written as-is. (PCPORT-only.) */
-static void DumpFramebufferBMP(const unsigned char* rgba, int w, int h) {
-    const char* path = getenv("PCPORT_DUMP");
+/* Dump an RGBA framebuffer to a 24-bit BMP at an explicit path. GL's bottom-up
+ * origin matches BMP's, so rows are written as-is. (PCPORT-only.) */
+static void DumpFramebufferBMPTo(const unsigned char* rgba, int w, int h,
+                                 const char* path) {
     FILE* f;
     int rowsize, imgsize, x, y;
     unsigned char hdr[54];
@@ -316,6 +316,26 @@ static void DumpFramebufferBMP(const unsigned char* rgba, int w, int h) {
     }
     free(row);
     fclose(f);
+}
+
+/* Dump to the path in env PCPORT_DUMP (the single end-of-run screenshot). */
+static void DumpFramebufferBMP(const unsigned char* rgba, int w, int h) {
+    DumpFramebufferBMPTo(rgba, w, h, getenv("PCPORT_DUMP"));
+}
+
+/* Read the back buffer and write it straight to `path` (within-run sequence
+ * capture, used to verify the title's drifting animations headlessly). */
+static void DumpBackbufferTo(const char* path) {
+    unsigned char* px;
+    if (path == NULL) return;
+    px = (unsigned char*)malloc((size_t)PCPORT_WINDOW_WIDTH *
+                                (size_t)PCPORT_WINDOW_HEIGHT * 4u);
+    if (px == NULL) return;
+    glReadBuffer(GL_BACK);
+    glReadPixels(0, 0, PCPORT_WINDOW_WIDTH, PCPORT_WINDOW_HEIGHT,
+                 GL_RGBA, GL_UNSIGNED_BYTE, px);
+    DumpFramebufferBMPTo(px, PCPORT_WINDOW_WIDTH, PCPORT_WINDOW_HEIGHT, path);
+    free(px);
 }
 
 static unsigned char* ReadBackbufferImage(void) {
@@ -554,6 +574,136 @@ static void DrawTexturedScreenRect(GXTexObj* tex,
     GXTexCoord2f32(u0, v0);
 
     GXEnd();
+}
+
+/* Like DrawTexturedScreenRect but with a vertical alpha gradient: the top edge
+ * is modulated by aTop, the bottom edge by aBottom (linearly interpolated
+ * between). Lets a scrolling textured band (drifting clouds / sand-wind) feather
+ * into whatever was drawn beneath it instead of ending on a hard seam. The
+ * sampled texture's own alpha is multiplied by this gradient (MODULATE), so an
+ * opaque sky texture takes the gradient directly and a low-alpha wisp texture
+ * stays subtle. Call BeginMenuOverlay() first. */
+static void DrawTexturedScreenRectA(GXTexObj* tex,
+                                    f32 sx, f32 sy, f32 sw, f32 sh,
+                                    f32 u0, f32 v0, f32 u1, f32 v1,
+                                    u8 aTop, u8 aBottom) {
+    f32 ndcL = ((sx) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcR = ((sx + sw) / 640.0f) * 2.0f - 1.0f;
+    f32 ndcT = 1.0f - ((sy) / 480.0f) * 2.0f;
+    f32 ndcB = 1.0f - ((sy + sh) / 480.0f) * 2.0f;
+
+    GXLoadTexObj(tex, GX_TEXMAP0);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXColor4u8(255, 255, 255, aBottom);
+    GXPosition3f32(ndcL, ndcB, 0.0f);
+    GXTexCoord2f32(u0, v1);
+    GXColor4u8(255, 255, 255, aBottom);
+    GXPosition3f32(ndcR, ndcB, 0.0f);
+    GXTexCoord2f32(u1, v1);
+    GXColor4u8(255, 255, 255, aTop);
+    GXPosition3f32(ndcR, ndcT, 0.0f);
+    GXTexCoord2f32(u1, v0);
+    GXColor4u8(255, 255, 255, aTop);
+    GXPosition3f32(ndcL, ndcT, 0.0f);
+    GXTexCoord2f32(u0, v0);
+    GXEnd();
+}
+
+/* Synthesise a tileable "sand-wind" wisp texture: faint sandy horizontal streaks
+ * on a transparent ground, for the drifting desert-wind overlay on the title.
+ * The real game's wind is a particle/haze effect with no single source sprite,
+ * so this is a self-contained procedural stand-in. Horizontal wavenumbers are
+ * integers so the pattern tiles seamlessly under a GX_REPEAT scroll; a sin
+ * vertical envelope fades it out at the top/bottom edges. Returns 1 on success. */
+static int BuildSandWindTexture(GXTexObj* tex) {
+    enum { WIND_W = 256, WIND_H = 64 };
+    const f32 kPi = 3.14159265358979323846f;
+    u8* px;
+    int x;
+    int y;
+
+    px = (u8*)malloc((size_t)WIND_W * WIND_H * 4u);
+    if (px == NULL) {
+        return 0;
+    }
+    for (y = 0; y < WIND_H; ++y) {
+        f32 fy = (f32)y / (f32)(WIND_H - 1);
+        f32 env = sinf(kPi * fy);          /* 0 at edges, 1 mid -> soft band */
+        for (x = 0; x < WIND_W; ++x) {
+            f32 fx = (f32)x / (f32)WIND_W;  /* 0..1, period = full width */
+            f32 n;
+            f32 a;
+            int o = (y * WIND_W + x) * 4;
+
+            /* A few integer-wavenumber sines, phase-shifted by height, give long
+             * thin diagonal wisps that vary along their length. */
+            n  = sinf(2.0f * kPi * (2.0f * fx) + 1.3f + 2.0f * fy);
+            n += 0.6f * sinf(2.0f * kPi * (5.0f * fx) + 4.1f - 1.5f * fy);
+            n += 0.4f * sinf(2.0f * kPi * (9.0f * fx) + 0.7f + 3.0f * fy);
+            a = n * 0.25f + 0.5f;           /* ~0..1 */
+            if (a < 0.0f) { a = 0.0f; }
+            if (a > 1.0f) { a = 1.0f; }
+            a = a * a * a;                  /* sharpen -> wispy gaps */
+            a *= env;
+
+            px[o + 0] = 236;                /* warm sand */
+            px[o + 1] = 223;
+            px[o + 2] = 190;
+            px[o + 3] = (u8)(a * 52.0f);    /* max ~52/255 -> subtle */
+        }
+    }
+    memset(tex, 0, sizeof(*tex));
+    GXHostInitTexObjRGBA8(tex, px, WIND_W, WIND_H, GX_REPEAT, GX_CLAMP);
+    free(px);
+    return 1;
+}
+
+/* Make an RGBA image tile seamlessly left-to-right so it can be GX_REPEAT
+ * scrolled without a wrap seam. The title sky texture wraps a sky cylinder in
+ * the real game and is only ~seamless (its cloud edges don't quite line up), so
+ * a naive horizontal scroll shows a moving vertical seam. Fix: roll the columns
+ * by W/2 (the original left|right seam moves to the centre and the new outer
+ * edges, being interior-adjacent columns, join seamlessly), then linearly heal
+ * the now-central seam over a narrow band. Edits pixels in place. */
+static void MakeSeamlessHoriz(u8* px, int w, int h) {
+    int half = w / 2;
+    int band = 28;            /* heal half-width (px) around the central seam */
+    int x;
+    int y;
+    int c;
+    u8* tmp;
+
+    if (px == NULL || w < 4 || h < 1) {
+        return;
+    }
+    if (band > half - 1) { band = half - 1; }
+    tmp = (u8*)malloc((size_t)w * h * 4u);
+    if (tmp == NULL) {
+        return;
+    }
+    for (y = 0; y < h; ++y) {
+        for (x = 0; x < w; ++x) {
+            int sx = (x + half) % w;
+            for (c = 0; c < 4; ++c) {
+                tmp[(y * w + x) * 4 + c] = px[(y * w + sx) * 4 + c];
+            }
+        }
+    }
+    /* Linear-blend the central band [half-band, half+band) between its two
+     * endpoints, replacing the hard seam with a smooth ramp. */
+    for (y = 0; y < h; ++y) {
+        for (c = 0; c < 4; ++c) {
+            int lo = tmp[(y * w + (half - band)) * 4 + c];
+            int hi = tmp[(y * w + (half + band - 1)) * 4 + c];
+            for (x = half - band; x < half + band; ++x) {
+                f32 t = (f32)(x - (half - band)) / (f32)(2 * band - 1);
+                tmp[(y * w + x) * 4 + c] = (u8)((f32)lo + ((f32)hi - (f32)lo) * t);
+            }
+        }
+    }
+    memcpy(px, tmp, (size_t)w * h * 4u);
+    free(tmp);
 }
 
 /* Draw a solid-colour screen-space rect with no texture (GX_PASSCLR passes the
@@ -5493,6 +5643,16 @@ static int RunMenuScene(GLFWwindow* window) {
     int haveMenuBg = 0;
     GXTexObj skyTex;
     int haveSky = 0;
+    GXTexObj cloudTex;             /* idx19 sky band, GX_REPEAT for the drift scroll */
+    int haveCloud = 0;
+    GXTexObj windTex;              /* procedural sand-wind wisps, GX_REPEAT */
+    int haveWind = 0;
+    f32 cloudSpeed = 0.010f;       /* texture-units/sec the clouds drift left */
+    f32 windSpeed = 0.060f;        /* texture-units/sec the sand-wind blows left */
+    f32 cloudBandH = 210.0f;       /* sky-band height in px (clouds fade out below) */
+    int cloudsEnabled = 1;
+    int windEnabled = 1;
+    double animTimeForced = -1.0;  /* PCPORT_ANIM_TIME pins the anim clock (headless) */
     GXTexObj titleCastTex[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
     int titleCastOk[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
     int titleCastIdx;
@@ -5518,6 +5678,8 @@ static int RunMenuScene(GLFWwindow* window) {
     const char* debugCursorEnv;
     int debugAFrame = -1;
     const char* debugAEnv;
+    const char* seqBase = NULL;    /* PCPORT_DUMP_SEQ: within-run sequence capture */
+    int seqEvery = 10;
     int capExplicit;
 
     memset(&archive, 0, sizeof(archive));
@@ -5530,6 +5692,8 @@ static int RunMenuScene(GLFWwindow* window) {
     memset(&menuBgArchive, 0, sizeof(menuBgArchive));
     memset(&menuBgTex, 0, sizeof(menuBgTex));
     memset(&skyTex, 0, sizeof(skyTex));
+    memset(&cloudTex, 0, sizeof(cloudTex));
+    memset(&windTex, 0, sizeof(windTex));
     memset(pads, 0, sizeof(pads));
 
     /* Default to the title scene (desert/ruins environment + logo) in
@@ -5669,6 +5833,17 @@ static int RunMenuScene(GLFWwindow* window) {
     }
     saveExists = PCPort_SaveExists();
 
+    /* Debug affordance: PCPORT_DUMP_SEQ=<base> writes <base>_<frame>.bmp every
+     * PCPORT_DUMP_SEQ_EVERY frames (default 10) within a single run, so the title
+     * drift animations can be verified for actual motion from one process. */
+    seqBase = getenv("PCPORT_DUMP_SEQ");
+    if (seqBase != NULL && seqBase[0] != '\0') {
+        const char* ev = getenv("PCPORT_DUMP_SEQ_EVERY");
+        if (ev != NULL && atoi(ev) > 0) { seqEvery = atoi(ev); }
+    } else {
+        seqBase = NULL;
+    }
+
     if (dumpRequested && frameCap <= 0) {
         /* A dump needs a finite "last frame". Make the fallback cap late enough
          * to both reach an injected debug START and capture the frame after it,
@@ -5792,6 +5967,23 @@ static int RunMenuScene(GLFWwindow* window) {
             if (v > 0.5) { titleCycleSecs = v; }
         }
     }
+    {
+        /* Title ambient-animation tuning: cloud drift + sand-wind. */
+        const char* e;
+        if (getenv("PCPORT_NO_CLOUDS") != NULL) { cloudsEnabled = 0; }
+        if (getenv("PCPORT_NO_WIND") != NULL) { windEnabled = 0; }
+        e = getenv("PCPORT_CLOUD_SPEED");
+        if (e != NULL) { cloudSpeed = (f32)atof(e); }
+        e = getenv("PCPORT_WIND_SPEED");
+        if (e != NULL) { windSpeed = (f32)atof(e); }
+        e = getenv("PCPORT_CLOUD_H");
+        if (e != NULL) { f32 v = (f32)atof(e); if (v > 10.0f) { cloudBandH = v; } }
+        /* When set, drive the drift off a fixed clock instead of wall-time, so the
+         * headless fast-loop (which advances glfwGetTime by ~nothing per frame)
+         * can capture a chosen point in the animation deterministically. */
+        e = getenv("PCPORT_ANIM_TIME");
+        if (e != NULL) { animTimeForced = atof(e); }
+    }
 
     /* Bake the blue-swirl main-menu background (menu_bg00, CMPR 640x480). */
     if (PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE, PCPORT_MENU_BG_MEMBER,
@@ -5843,6 +6035,41 @@ static int RunMenuScene(GLFWwindow* window) {
             printf("[pcport_bootstrap] Title sky backdrop loaded (%dx%d)\n",
                    PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT);
         }
+    }
+
+    /* Drifting-cloud layer: the same sky texture (blue + clouds fading to tan),
+     * but uploaded GX_REPEAT on S so the title can scroll its U over time and the
+     * clouds wrap seamlessly. Drawn as a 2D band over the top sky region in the
+     * 3D title path (where the scene's own sky reads as flat blue), so the clouds
+     * are actually visible and animate. Baked regardless of render3D. */
+    if (cloudsEnabled) {
+        PCPortTranslatedTexture cloudDesc;
+        u8* cloudPixels = NULL;
+        u32 cloudPxSize = 0;
+
+        memset(&cloudDesc, 0, sizeof(cloudDesc));
+        cloudDesc.imageDataArchiveOffset = PCPORT_TITLE_SKY_OFFSET;
+        cloudDesc.format = GX_TF_CMPR;
+        cloudDesc.width = PCPORT_TITLE_SKY_WIDTH;
+        cloudDesc.height = PCPORT_TITLE_SKY_HEIGHT;
+        if (PCPort_BakeTextureRGBAFromArchiveBE(&archive, &cloudDesc,
+                                                &cloudPixels, &cloudPxSize)) {
+            MakeSeamlessHoriz(cloudPixels, PCPORT_TITLE_SKY_WIDTH,
+                              PCPORT_TITLE_SKY_HEIGHT);
+            GXHostInitTexObjRGBA8(&cloudTex, cloudPixels,
+                                  PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT,
+                                  GX_REPEAT, GX_CLAMP);
+            PCPort_FreeBuffer(cloudPixels);
+            haveCloud = 1;
+            printf("[pcport_bootstrap] Title drifting-cloud layer baked (%dx%d, repeat-S)\n",
+                   PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT);
+        }
+    }
+
+    /* Sand-wind layer: procedural tileable wisps, scrolled across the desert. */
+    if (windEnabled && BuildSandWindTexture(&windTex)) {
+        haveWind = 1;
+        printf("[pcport_bootstrap] Title sand-wind layer built (procedural wisps)\n");
     }
 
     /* Build the ASCII font atlas once (GL context ready) for menu/prompt text. */
@@ -6033,13 +6260,43 @@ static int RunMenuScene(GLFWwindow* window) {
          * backdrop (when 3D is off) is shared by both states; the title draws
          * logo + PRESS START + copyright, the main menu draws the menu_033
          * panel. The 3D scene is gated behind PCPORT_RENDER_3D. */
-        if (haveSky || haveLogo || haveMenu018 || haveMenu033 || haveMenu032) {
+        if (haveSky || haveCloud || haveWind || haveLogo ||
+            haveMenu018 || haveMenu033 || haveMenu032) {
             BeginMenuOverlay();
             if (sceneState == PCPORT_SCENE_TITLE ||
                 sceneState == PCPORT_SCENE_SAVE_PROMPT) {
                 if (haveSky) {
                     DrawTexturedScreenRect(&skyTex, 0.0f, 0.0f, 640.0f, 480.0f,
                                            0.0f, 0.0f, 1.0f, 1.0f);
+                }
+                /* Drifting clouds: scroll the sky band's U to the left over time
+                 * (GX_REPEAT wraps it). Drawn as an opaque upper band plus a lower
+                 * feather strip that fades into the 3D desert, so there is no hard
+                 * horizon seam. The texture's own tan-fading bottom helps the blend. */
+                if (haveCloud) {
+                    double animT = (animTimeForced >= 0.0)
+                                       ? animTimeForced : glfwGetTime();
+                    f32 cu0 = (f32)(animT * (double)cloudSpeed);
+                    f32 cu1 = cu0 + 1.0f;        /* one texture width across screen */
+                    f32 bandH = cloudBandH;
+                    f32 feat = 56.0f;
+                    f32 vMid;
+                    if (feat > bandH) { feat = bandH; }
+                    vMid = (bandH - feat) / bandH;
+                    DrawTexturedScreenRectA(&cloudTex, 0.0f, 0.0f, 640.0f, bandH - feat,
+                                            cu0, 0.0f, cu1, vMid, 255, 255);
+                    DrawTexturedScreenRectA(&cloudTex, 0.0f, bandH - feat, 640.0f, feat,
+                                            cu0, vMid, cu1, 1.0f, 255, 0);
+                }
+                /* Sand-wind: faint sandy wisps drifting left over the desert,
+                 * feathered top and bottom so they sit subtly on the ground. */
+                if (haveWind) {
+                    double animT = (animTimeForced >= 0.0)
+                                       ? animTimeForced : glfwGetTime();
+                    f32 wu0 = (f32)(animT * (double)windSpeed);
+                    f32 wu1 = wu0 + 2.5f;        /* tile ~2.5x for finer streaks */
+                    DrawTexturedScreenRectA(&windTex, 0.0f, 196.0f, 640.0f, 236.0f,
+                                            wu0, 0.0f, wu1, 1.0f, 255, 255);
                 }
                 /* Posed cast cutouts for the active cycling set, over the desert
                  * but UNDER the logo (heads may tuck behind the centre logo). */
@@ -6133,6 +6390,11 @@ static int RunMenuScene(GLFWwindow* window) {
         if (dumpRequested && frameCap > 0 && frame == frameCap - 1) {
             unsigned char* pixels = ReadBackbufferImage();
             free(pixels);
+        }
+        if (seqBase != NULL && (frame % seqEvery) == 0) {
+            char seqPath[1024];
+            snprintf(seqPath, sizeof(seqPath), "%s_%04d.bmp", seqBase, frame);
+            DumpBackbufferTo(seqPath);
         }
 
         GSgfxSwapBuffers(1);
