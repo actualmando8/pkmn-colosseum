@@ -5089,7 +5089,8 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                      * they stay full-bright. Disabled again right after the draw
                      * to keep the gate tightly scoped to scene geometry. */
                     fn_801AA568(&translatedPObj.pobj);
-                    GXHostSetLightingEnabled(GX_TRUE);
+                    GXHostSetLightingEnabled(getenv("PCPORT_SCENE_NOLIGHT") != NULL
+                                                 ? GX_FALSE : GX_TRUE);
                     fn_800DAD10((void*)&drawObject);
                     GXHostSetLightingEnabled(GX_FALSE);
                     stats->drawn++;
@@ -5107,10 +5108,17 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (rjtDbg < 0) {
                         rjtDbg = (getenv("PCPORT_RENDER_DEBUG") != NULL) ? 1 : 0;
                     }
-                    if (rjtDbg && stats->dobjs <= 40u) {
-                        printf("[rjt] pobj#%u %s verts=%u cam=(%.0f,%.0f,%.0f)\n",
+                    if (rjtDbg && stats->dobjs <= 44u) {
+                        const PCPortTranslatedTexture* bt =
+                            haveTexture ? &translatedTextureExp.stages[0].texture : NULL;
+                        printf("[rjt] pobj#%u %s verts=%u texOff=0x%X %ux%u fmt=%u diff=%08X alpha=%.2f cam=(%.0f,%.0f,%.0f)\n",
                                stats->dobjs, haveTexture ? "TEX" : "MAT",
                                drawObject.totalVerts,
+                               bt ? bt->imageDataArchiveOffset : 0u,
+                               bt ? bt->width : 0u, bt ? bt->height : 0u,
+                               bt ? (unsigned)bt->format : 0u,
+                               haveMaterial ? translatedMaterial.diffuse : 0u,
+                               haveMaterial ? translatedMaterial.alpha : -1.0f,
                                modelViewMatrix[0][3], modelViewMatrix[1][3],
                                modelViewMatrix[2][3]);
                     }
@@ -6247,6 +6255,13 @@ static int RunMenuScene(GLFWwindow* window) {
                          (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
                          (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
             GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
+            if (frame == 0 && getenv("PCPORT_RENDER_DEBUG") != NULL) {
+                printf("[cam] eye=(%.1f,%.1f,%.1f) interest=(%.1f,%.1f,%.1f) fov=%.1f aspect=%.2f near=%.2f far=%.2f\n",
+                       translatedCamera.eye[0], translatedCamera.eye[1], translatedCamera.eye[2],
+                       translatedCamera.interest[0], translatedCamera.interest[1], translatedCamera.interest[2],
+                       translatedCamera.fov, translatedCamera.aspect,
+                       translatedCamera.nearZ, translatedCamera.farZ);
+            }
             /* Depth-test the scene so the large ground plane does not paint over
              * the standing ruin pillars (which are drawn before it). */
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
