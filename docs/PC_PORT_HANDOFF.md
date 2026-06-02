@@ -279,11 +279,26 @@ of #1's host state machine — only revisit if the goal expands to authentic in-
 
 ## 4. Known issues / deferred
 
-- **Desert pillars are tan-on-tan / low-contrast.** They render (positions confirmed) but in
-  the port's reading they share the ground's haze texture (`0x293E0`) + diffuse (`B3B3B3`), so
-  there's no material difference for lighting to reveal. Real fix = texture-assignment (why
-  pillars resolve to the haze, not the sandstone `tex05/15/16`) + camera framing. **Deferred**,
-  lower priority than the flow.
+- **Desert ruins/pillars/rocks are MISSING on the title (deeper than first thought).**
+  Investigated 2026-06-02 (commit b716acbf adds the diagnostics). The visible "desert" is ONLY
+  the flat haze ground plane (pobj#31-37, tex `0x293E0` × grey `B3B3B3`) plus one dark angled
+  plane. The detailed **sandstone ruin meshes pobj#1-30** (correct CMPR column/rock textures,
+  white diffuse, `alpha=1.0`, 100s-1000s of verts) — AND the **sky dome pobj#5** (the 512x256
+  cloud texture `0x14A8E0`, which is why the 3D sky reads flat-blue and the 2D cloud overlay was
+  needed) — DRAW (counted in `drawn`) but rasterize **no visible pixels**. Ruled out: frustum
+  clip (far=32768), lighting (`PCPORT_SCENE_NOLIGHT` full-bright is identical), back-face cull,
+  material alpha (all 1.0), texture decode (the same textures decode fine for the 2D probes).
+  All of pobj#1-30 report the *same* joint origin `cam=(0,-40,-410)` while the offset planes
+  (#33/35/36/37) vary — so the remaining suspect is the **geometry transform / display-list
+  replay** (vertices collapsing/degenerate or mis-transformed) in the game-owned draw bridge
+  (`fn_800DAD10` / `PCPort_TranslatePObjFromArchiveBE` / `PCPort_TranslateJointChainToMatrixBE`).
+  Diagnostics to resume: `PCPORT_RENDER_DEBUG=1` (`[rjt]` per-pobj texOff/dims/fmt/diff/alpha +
+  `[cam]` near/far/fov), `PCPORT_ISOLATE_CHARS="lo-hi"` (+`PCPORT_ISOLATE_FLAT`),
+  `PCPORT_SCENE_NOLIGHT`. Next probe = dump the view/clip-space vertex bounds of a big detail
+  mesh (pobj#17 1599v or #29 802v) to see whether the geometry is degenerate or off-screen.
+  **Alternative (pragmatic):** since the whole title is already a 2D composite (cast = 2D
+  cutouts, logo/text/clouds = 2D), bake a faithful desert+ruins 2D backdrop like the clouds.
+  **Deferred** — a genuine multi-session 3D-geometry debug.
 - The title horizon has a slight diagonal (a built-in geometry tilt the game's camera
   compensates for). Minor.
 - No audio (audio_shim.c stubbed); no disc mount beyond loading named fsys members.
