@@ -14,13 +14,16 @@
 #else
 
 #include "pad_shim.h"
+#include "pcport_window.h"
 
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <string.h>
 
-/* TODO: Include SDL2 headers when build system is ready
- * #include <SDL2/SDL.h>
- */
+/* Keyboard input is read directly from GLFW (the build links GLFW, not SDL2).
+ * glfwPollEvents() is pumped every frame in VIWaitForRetrace_PC (os_shim.c), so
+ * glfwGetKey() returns fresh per-frame state with no extra polling here.
+ * The g_keymap fields hold GLFW key codes (GLFW_KEY_*), set in PADShim_Init. */
 
 /* =========================================================================
  * Internal state
@@ -209,31 +212,32 @@ void PADShim_Init(BOOL enableKeyboard) {
     memset(g_controllers, 0, sizeof(g_controllers));
     g_keyboardEnabled = enableKeyboard;
 
-    /* Set default keyboard mapping (from pc_port_design.md Section 10.4) */
-    /* TODO: Phase 3a -- Use actual SDL scancode values
-     *
-     * g_keymap.keyA = SDL_SCANCODE_Z;
-     * g_keymap.keyB = SDL_SCANCODE_X;
-     * g_keymap.keyX = SDL_SCANCODE_A;
-     * g_keymap.keyY = SDL_SCANCODE_S;
-     * g_keymap.keyStart = SDL_SCANCODE_RETURN;
-     * g_keymap.keyZ = SDL_SCANCODE_SPACE;
-     * g_keymap.keyL = SDL_SCANCODE_Q;
-     * g_keymap.keyR = SDL_SCANCODE_E;
-     * g_keymap.keyUp = SDL_SCANCODE_UP;
-     * g_keymap.keyDown = SDL_SCANCODE_DOWN;
-     * g_keymap.keyLeft = SDL_SCANCODE_LEFT;
-     * g_keymap.keyRight = SDL_SCANCODE_RIGHT;
-     * g_keymap.keyStickUp = SDL_SCANCODE_W;
-     * g_keymap.keyStickDown = SDL_SCANCODE_S; // conflicts with Y, needs adjustment
-     * g_keymap.keyStickLeft = SDL_SCANCODE_A;  // conflicts with X
-     * g_keymap.keyStickRight = SDL_SCANCODE_D;
-     * g_keymap.keyCStickUp = SDL_SCANCODE_I;
-     * g_keymap.keyCStickDown = SDL_SCANCODE_K;
-     * g_keymap.keyCStickLeft = SDL_SCANCODE_J;
-     * g_keymap.keyCStickRight = SDL_SCANCODE_L;
-     */
+    /* Default keyboard mapping (from pc_port_design.md Section 10.4), expressed
+     * as GLFW key codes. Face/trigger buttons: Z=A, X=B, A=X, S=Y, Enter=Start,
+     * Space=Z, Q/E=L/R. D-pad on the arrow keys, main stick on WASD, C-stick on
+     * IJKL. (W/A/S/D deliberately double as the stick per the GC default map; the
+     * menu flow drives off the D-pad arrows so the overlap is harmless.) */
     memset(&g_keymap, 0, sizeof(g_keymap));
+    g_keymap.keyA = GLFW_KEY_Z;
+    g_keymap.keyB = GLFW_KEY_X;
+    g_keymap.keyX = GLFW_KEY_A;
+    g_keymap.keyY = GLFW_KEY_S;
+    g_keymap.keyStart = GLFW_KEY_ENTER;
+    g_keymap.keyZ = GLFW_KEY_SPACE;
+    g_keymap.keyL = GLFW_KEY_Q;
+    g_keymap.keyR = GLFW_KEY_E;
+    g_keymap.keyUp = GLFW_KEY_UP;
+    g_keymap.keyDown = GLFW_KEY_DOWN;
+    g_keymap.keyLeft = GLFW_KEY_LEFT;
+    g_keymap.keyRight = GLFW_KEY_RIGHT;
+    g_keymap.keyStickUp = GLFW_KEY_W;
+    g_keymap.keyStickDown = GLFW_KEY_S;
+    g_keymap.keyStickLeft = GLFW_KEY_A;
+    g_keymap.keyStickRight = GLFW_KEY_D;
+    g_keymap.keyCStickUp = GLFW_KEY_I;
+    g_keymap.keyCStickDown = GLFW_KEY_K;
+    g_keymap.keyCStickLeft = GLFW_KEY_J;
+    g_keymap.keyCStickRight = GLFW_KEY_L;
 
     /* TODO: Phase 3a -- Initialize SDL GameController subsystem
      *
@@ -291,61 +295,68 @@ void PADShim_SetKeyboardMapping(u32 keyA, u32 keyB, u32 keyX, u32 keyY,
 }
 
 void PADShim_UpdateKeyboard(PADStatus* status) {
+    GLFWwindow* window;
+    u16 buttons;
+    s8 sx;
+    s8 sy;
+    s8 cx;
+    s8 cy;
+
     if (!status) return;
 
-    /* TODO: Phase 3a -- Read keyboard state and map to PADStatus
-     *
-     * const Uint8* keys = SDL_GetKeyboardState(NULL);
-     * u16 buttons = 0;
-     *
-     * if (keys[g_keymap.keyA]) buttons |= GCN_PAD_BUTTON_A;
-     * if (keys[g_keymap.keyB]) buttons |= GCN_PAD_BUTTON_B;
-     * if (keys[g_keymap.keyX]) buttons |= GCN_PAD_BUTTON_X;
-     * if (keys[g_keymap.keyY]) buttons |= GCN_PAD_BUTTON_Y;
-     * if (keys[g_keymap.keyStart]) buttons |= GCN_PAD_BUTTON_START;
-     * if (keys[g_keymap.keyZ]) buttons |= GCN_PAD_TRIGGER_Z;
-     * if (keys[g_keymap.keyL]) buttons |= GCN_PAD_TRIGGER_L;
-     * if (keys[g_keymap.keyR]) buttons |= GCN_PAD_TRIGGER_R;
-     *
-     * // D-pad from arrow keys
-     * if (keys[g_keymap.keyUp]) buttons |= GCN_PAD_BUTTON_UP;
-     * if (keys[g_keymap.keyDown]) buttons |= GCN_PAD_BUTTON_DOWN;
-     * if (keys[g_keymap.keyLeft]) buttons |= GCN_PAD_BUTTON_LEFT;
-     * if (keys[g_keymap.keyRight]) buttons |= GCN_PAD_BUTTON_RIGHT;
-     *
-     * status->button |= buttons;
-     *
-     * // Main stick from WASD
-     * s8 sx = 0, sy = 0;
-     * if (keys[g_keymap.keyStickLeft]) sx -= 80;
-     * if (keys[g_keymap.keyStickRight]) sx += 80;
-     * if (keys[g_keymap.keyStickUp]) sy += 80;
-     * if (keys[g_keymap.keyStickDown]) sy -= 80;
-     * if (sx != 0 || sy != 0) {
-     *     status->stickX = sx;
-     *     status->stickY = sy;
-     * }
-     *
-     * // C-stick from IJKL
-     * s8 cx = 0, cy = 0;
-     * if (keys[g_keymap.keyCStickLeft]) cx -= 80;
-     * if (keys[g_keymap.keyCStickRight]) cx += 80;
-     * if (keys[g_keymap.keyCStickUp]) cy += 80;
-     * if (keys[g_keymap.keyCStickDown]) cy -= 80;
-     * if (cx != 0 || cy != 0) {
-     *     status->substickX = cx;
-     *     status->substickY = cy;
-     * }
-     *
-     * // Analog triggers from keyboard -> full press (255)
-     * if (buttons & GCN_PAD_TRIGGER_L) status->triggerLeft = 255;
-     * if (buttons & GCN_PAD_TRIGGER_R) status->triggerRight = 255;
-     *
-     * status->err = 0; // keyboard is always "connected"
-     */
-
-    /* Stub: mark controller 0 as connected via keyboard */
+    /* Keyboard maps to player 1, which is treated as always "connected". */
     status->err = 0;
+
+    window = PCPort_GetHostWindow();
+    if (window == NULL) {
+        return; /* headless: no host window, so no key state to read */
+    }
+
+    buttons = 0;
+    if (glfwGetKey(window, (int)g_keymap.keyA) == GLFW_PRESS)     buttons |= GCN_PAD_BUTTON_A;
+    if (glfwGetKey(window, (int)g_keymap.keyB) == GLFW_PRESS)     buttons |= GCN_PAD_BUTTON_B;
+    if (glfwGetKey(window, (int)g_keymap.keyX) == GLFW_PRESS)     buttons |= GCN_PAD_BUTTON_X;
+    if (glfwGetKey(window, (int)g_keymap.keyY) == GLFW_PRESS)     buttons |= GCN_PAD_BUTTON_Y;
+    if (glfwGetKey(window, (int)g_keymap.keyStart) == GLFW_PRESS) buttons |= GCN_PAD_BUTTON_START;
+    if (glfwGetKey(window, (int)g_keymap.keyZ) == GLFW_PRESS)     buttons |= GCN_PAD_TRIGGER_Z;
+    if (glfwGetKey(window, (int)g_keymap.keyL) == GLFW_PRESS)     buttons |= GCN_PAD_TRIGGER_L;
+    if (glfwGetKey(window, (int)g_keymap.keyR) == GLFW_PRESS)     buttons |= GCN_PAD_TRIGGER_R;
+
+    /* D-pad from arrow keys */
+    if (glfwGetKey(window, (int)g_keymap.keyUp) == GLFW_PRESS)    buttons |= GCN_PAD_BUTTON_UP;
+    if (glfwGetKey(window, (int)g_keymap.keyDown) == GLFW_PRESS)  buttons |= GCN_PAD_BUTTON_DOWN;
+    if (glfwGetKey(window, (int)g_keymap.keyLeft) == GLFW_PRESS)  buttons |= GCN_PAD_BUTTON_LEFT;
+    if (glfwGetKey(window, (int)g_keymap.keyRight) == GLFW_PRESS) buttons |= GCN_PAD_BUTTON_RIGHT;
+
+    status->button |= buttons;
+
+    /* Main stick from WASD */
+    sx = 0;
+    sy = 0;
+    if (glfwGetKey(window, (int)g_keymap.keyStickLeft) == GLFW_PRESS)  sx = (s8)(sx - 80);
+    if (glfwGetKey(window, (int)g_keymap.keyStickRight) == GLFW_PRESS) sx = (s8)(sx + 80);
+    if (glfwGetKey(window, (int)g_keymap.keyStickUp) == GLFW_PRESS)    sy = (s8)(sy + 80);
+    if (glfwGetKey(window, (int)g_keymap.keyStickDown) == GLFW_PRESS)  sy = (s8)(sy - 80);
+    if (sx != 0 || sy != 0) {
+        status->stickX = sx;
+        status->stickY = sy;
+    }
+
+    /* C-stick from IJKL */
+    cx = 0;
+    cy = 0;
+    if (glfwGetKey(window, (int)g_keymap.keyCStickLeft) == GLFW_PRESS)  cx = (s8)(cx - 80);
+    if (glfwGetKey(window, (int)g_keymap.keyCStickRight) == GLFW_PRESS) cx = (s8)(cx + 80);
+    if (glfwGetKey(window, (int)g_keymap.keyCStickUp) == GLFW_PRESS)    cy = (s8)(cy + 80);
+    if (glfwGetKey(window, (int)g_keymap.keyCStickDown) == GLFW_PRESS)  cy = (s8)(cy - 80);
+    if (cx != 0 || cy != 0) {
+        status->substickX = cx;
+        status->substickY = cy;
+    }
+
+    /* Keyboard L/R -> full digital trigger press (255). */
+    if (buttons & GCN_PAD_TRIGGER_L) status->triggerLeft = 255;
+    if (buttons & GCN_PAD_TRIGGER_R) status->triggerRight = 255;
 }
 
 void PADShim_HandleControllerEvent(u32 eventType, s32 deviceId) {

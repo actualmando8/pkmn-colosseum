@@ -1,6 +1,6 @@
 /**
  * @file gx_tev.c
- * @brief TEV combiner to GLSL shader translation -- stub implementation.
+ * @brief TEV combiner to GLSL shader translation -- functional first pass.
  *
  * Translates GCN TEV combiner configurations into GLSL 330 fragment shaders.
  * Shaders are generated at runtime and cached by a hash of the TEV state.
@@ -11,12 +11,18 @@
  * combinations), most shaders will be compiled on first encounter and
  * then served from cache for the rest of the session.
  *
+ * This implementation replaces the legacy fixed-function GL_MODULATE draw
+ * path with a real programmable pipeline:
+ *   - GLSL 3.30 vertex + fragment shaders generated from GX TEV state.
+ *   - A hash-cached set of compiled/linked programs.
+ *   - A shared VAO/VBO modern submit path (gx_tev_submit).
+ *
  * References:
  *   - docs/pc_port_design.md Section 2 (TEV Combiner Translation)
  *   - docs/pc_port_design.md Section 2.4 (Preset Optimization)
  *   - gx_tev.h for data structures and API
  *
- * Phase 3 PC port scaffolding -- skeleton only.
+ * Phase 3 PC port -- functional first pass.
  */
 
 #ifdef __MWERKS__
@@ -25,12 +31,17 @@
 
 #include "gx_tev.h"
 
+#include <glad/glad.h>
+
 #include <stdio.h>
 #include <string.h>
 
-/* TODO: Include OpenGL headers when build system is ready
- * #include <glad/glad.h>
- */
+#ifndef GL_TRUE
+#define GL_TRUE 1
+#endif
+#ifndef GL_FALSE
+#define GL_FALSE 0
+#endif
 
 /* =========================================================================
  * Shader cache
@@ -42,37 +53,65 @@ static u32 g_cacheHits = 0;
 static u32 g_cacheMisses = 0;
 
 /* =========================================================================
- * Standard vertex shader source (shared across all TEV configurations)
- *
- * This is the template from pc_port_design.md Section 8.4, parameterized
- * by the number of active texcoord generators and color channels.
+ * Modern render state (mirror of the relevant GX state for uniform upload)
  * ========================================================================= */
 
-static const char* VERTEX_SHADER_TEMPLATE =
+typedef struct {
+    f32 proj[4][4];        /* row-major 4x4 projection */
+    f32 modelView[3][4];   /* row-major 3x4 modelview */
+    f32 normalMatrix[3][4];/* row-major 3x4 normal matrix (upper 3x3 used) */
+
+    f32 tevColor[4][4];    /* PREV/REG0..2, normalized RGBA */
+    f32 konstColor[4][4];  /* K0..K3, normalized RGBA */
+
+    s32 alphaComp0;
+    s32 alphaComp1;
+    f32 alphaRef0;
+    f32 alphaRef1;
+    s32 alphaOp;
+
+    f32 vertexAlphaScale;
+
+    s32 lightingEnabled;   /* 1 = apply directional lambert; 0 = full bright */
+} GXTevRenderState;
+
+static GXTevRenderState g_rs;
+
+/* =========================================================================
+ * GL resources for the modern submit path
+ * ========================================================================= */
+
+static GLuint g_vao = 0;
+static GLuint g_vbo = 0;
+static GLuint g_boundProgram = 0;
+static int    g_glReady = 0;
+
+/* =========================================================================
+ * Standard vertex shader source (shared across all TEV configurations)
+ * ========================================================================= */
+
+static const char* VERTEX_SHADER_SOURCE =
     "#version 330 core\n"
     "\n"
     "layout(location = 0) in vec3 a_position;\n"
-    "layout(location = 1) in vec3 a_normal;\n"
-    "layout(location = 2) in vec4 a_color0;\n"
-    "layout(location = 3) in vec4 a_color1;\n"
-    "layout(location = 4) in vec2 a_texcoord0;\n"
-    "layout(location = 5) in vec2 a_texcoord1;\n"
-    "layout(location = 6) in vec2 a_texcoord2;\n"
-    "layout(location = 7) in vec2 a_texcoord3;\n"
-    "layout(location = 8) in vec2 a_texcoord4;\n"
-    "layout(location = 9) in vec2 a_texcoord5;\n"
-    "layout(location = 10) in vec2 a_texcoord6;\n"
-    "layout(location = 11) in vec2 a_texcoord7;\n"
+    "layout(location = 1) in vec4 a_color0;\n"
+    "layout(location = 2) in vec2 a_texcoord0;\n"
+    /* a_normal (location 3) is optional: the host vertex layout (GXTevVertex)
+     * does not carry a normal, so this attribute is disabled and reads its
+     * generic default. The default is set to (0,0,1) by the submit path so the
+     * v_normal varying is well-defined; per-fragment face normals are derived
+     * from v_viewPos in the fragment shader. */
+    "layout(location = 3) in vec3 a_normal;\n"
     "\n"
     "uniform mat4 u_projMatrix;\n"
     "uniform mat4 u_modelViewMatrix;\n"
     "uniform mat3 u_normalMatrix;\n"
     "\n"
     "out vec4 v_color0;\n"
-    "out vec4 v_color1;\n"
-    "out vec2 v_texcoord[8];\n"
-    "out vec3 v_normal;\n"
+    "out vec2 v_texcoord0;\n"
+    "out vec2 v_texcoord1;\n"
     "out vec3 v_viewPos;\n"
+    "out vec3 v_normal;\n"
     "\n"
     "void main() {\n"
     "    vec4 viewPos = u_modelViewMatrix * vec4(a_position, 1.0);\n"
@@ -80,117 +119,517 @@ static const char* VERTEX_SHADER_TEMPLATE =
     "    v_viewPos = viewPos.xyz;\n"
     "    v_normal = u_normalMatrix * a_normal;\n"
     "    v_color0 = a_color0;\n"
-    "    v_color1 = a_color1;\n"
-    "    v_texcoord[0] = a_texcoord0;\n"
-    "    v_texcoord[1] = a_texcoord1;\n"
-    "    v_texcoord[2] = a_texcoord2;\n"
-    "    v_texcoord[3] = a_texcoord3;\n"
-    "    v_texcoord[4] = a_texcoord4;\n"
-    "    v_texcoord[5] = a_texcoord5;\n"
-    "    v_texcoord[6] = a_texcoord6;\n"
-    "    v_texcoord[7] = a_texcoord7;\n"
+    "    v_texcoord0 = a_texcoord0;\n"
+    "    v_texcoord1 = a_texcoord0;\n"
     "}\n";
 
 /* =========================================================================
- * Internal helpers
+ * Internal helpers: GLSL expression generation
  * ========================================================================= */
 
 /**
- * Emit GLSL code for a TEV color input source selection.
- * Returns a GLSL expression string for the given GXTevColorArg.
+ * Map a GXTevColorArg to a GLSL vec3 expression for the active stage.
+ * 'texName' is the GLSL variable holding the sampled texel (vec4).
  */
-static const char* tev_color_input_expr(u8 arg, u32 stage) {
-    (void)stage;
-
-    /* TODO: Phase 3c -- Map GXTevColorArg to GLSL expression
-     *
-     * GX_CC_CPREV  -> "prev.rgb"
-     * GX_CC_APREV  -> "vec3(prev.a)"
-     * GX_CC_C0     -> "u_tevColor[0].rgb"
-     * GX_CC_A0     -> "vec3(u_tevColor[0].a)"
-     * GX_CC_C1     -> "u_tevColor[1].rgb"
-     * GX_CC_A1     -> "vec3(u_tevColor[1].a)"
-     * GX_CC_C2     -> "u_tevColor[2].rgb"
-     * GX_CC_A2     -> "vec3(u_tevColor[2].a)"
-     * GX_CC_TEXC   -> "texSampleN.rgb"  (N = stage's texture)
-     * GX_CC_TEXA   -> "vec3(texSampleN.a)"
-     * GX_CC_RASC   -> "v_color0.rgb" (or v_color1 based on channel)
-     * GX_CC_RASA   -> "vec3(v_color0.a)"
-     * GX_CC_ONE    -> "vec3(1.0)"
-     * GX_CC_HALF   -> "vec3(0.5)"
-     * GX_CC_KONST  -> "u_tevKonst[ksel].rgb" (ksel per-stage config)
-     * GX_CC_ZERO   -> "vec3(0.0)"
-     */
-
+static const char* tev_color_input_expr(u8 arg) {
     switch (arg) {
-        case GX_CC_ZERO: return "vec3(0.0)";
-        case GX_CC_ONE:  return "vec3(1.0)";
-        case GX_CC_HALF: return "vec3(0.5)";
-        default:         return "vec3(0.0)"; /* placeholder */
+        case GX_CC_CPREV: return "prev.rgb";
+        case GX_CC_APREV: return "vec3(prev.a)";
+        case GX_CC_C0:    return "creg0.rgb";
+        case GX_CC_A0:    return "vec3(creg0.a)";
+        case GX_CC_C1:    return "creg1.rgb";
+        case GX_CC_A1:    return "vec3(creg1.a)";
+        case GX_CC_C2:    return "creg2.rgb";
+        case GX_CC_A2:    return "vec3(creg2.a)";
+        case GX_CC_TEXC:  return "texc.rgb";
+        case GX_CC_TEXA:  return "vec3(texc.a)";
+        case GX_CC_RASC:  return "rasc.rgb";
+        case GX_CC_RASA:  return "vec3(rasc.a)";
+        case GX_CC_ONE:   return "vec3(1.0)";
+        case GX_CC_HALF:  return "vec3(0.5)";
+        case GX_CC_KONST: return "konst.rgb";
+        case GX_CC_ZERO:
+        default:          return "vec3(0.0)";
     }
 }
 
 /**
- * Emit GLSL code for a TEV alpha input source selection.
+ * Map a GXTevAlphaArg to a GLSL float expression for the active stage.
  */
-static const char* tev_alpha_input_expr(u8 arg, u32 stage) {
-    (void)stage;
-
-    /* TODO: Phase 3c -- Map GXTevAlphaArg to GLSL expression
-     *
-     * GX_CA_APREV  -> "prev.a"
-     * GX_CA_A0     -> "u_tevColor[0].a"
-     * GX_CA_A1     -> "u_tevColor[1].a"
-     * GX_CA_A2     -> "u_tevColor[2].a"
-     * GX_CA_TEXA   -> "texSampleN.a"
-     * GX_CA_RASA   -> "v_color0.a"
-     * GX_CA_KONST  -> "u_tevKonst[ksel].a"
-     * GX_CA_ZERO   -> "0.0"
-     */
-
+static const char* tev_alpha_input_expr(u8 arg) {
     switch (arg) {
-        case GX_CA_ZERO: return "0.0";
-        default:         return "0.0"; /* placeholder */
+        case GX_CA_APREV: return "prev.a";
+        case GX_CA_A0:    return "creg0.a";
+        case GX_CA_A1:    return "creg1.a";
+        case GX_CA_A2:    return "creg2.a";
+        case GX_CA_TEXA:  return "texc.a";
+        case GX_CA_RASA:  return "rasc.a";
+        case GX_CA_KONST: return "konst.a";
+        case GX_CA_ZERO:
+        default:          return "0.0";
+    }
+}
+
+static const char* tev_scale_factor(u8 scale) {
+    switch (scale) {
+        case GX_CS_SCALE_2:  return "2.0";
+        case GX_CS_SCALE_4:  return "4.0";
+        case GX_CS_DIVIDE_2: return "0.5";
+        case GX_CS_SCALE_1:
+        default:             return "1.0";
+    }
+}
+
+static const char* tev_bias_value(u8 bias) {
+    switch (bias) {
+        case GX_TB_ADDHALF: return "0.5";
+        case GX_TB_SUBHALF: return "-0.5";
+        case GX_TB_ZERO:
+        default:            return "0.0";
+    }
+}
+
+/* Which GXTevReg this stage's output register name maps to. */
+static const char* tev_out_reg_name(u8 outReg) {
+    switch (outReg) {
+        case GX_TEVREG0: return "creg0";
+        case GX_TEVREG1: return "creg1";
+        case GX_TEVREG2: return "creg2";
+        case GX_TEVPREV:
+        default:         return "prev";
     }
 }
 
 /**
- * Emit GLSL code for the TEV combiner math operation.
+ * Resolve a stage to effective color/alpha inputs. For preset modes
+ * (GXSetTevOp) the inputs are synthesized; otherwise the explicit
+ * GXSetTevColorIn/AlphaIn arrays are used.
+ *
+ * On return the cIn[4]/aIn[4]/ops describe a normal (d + lerp(a,b,c)) stage.
  */
-static void tev_emit_combiner(char* buf, u32 bufSize,
-                              const char* a, const char* b,
-                              const char* c, const char* d,
-                              u8 op, u8 bias, u8 scale, u8 clamp,
-                              const char* swizzle) {
-    (void)buf; (void)bufSize;
-    (void)a; (void)b; (void)c; (void)d;
-    (void)op; (void)bias; (void)scale; (void)clamp; (void)swizzle;
+typedef struct {
+    u8 cIn[4];      /* a,b,c,d color args */
+    u8 aIn[4];      /* a,b,c,d alpha args */
+    u8 colorOp, colorBias, colorScale, colorClamp, colorOutReg;
+    u8 alphaOp, alphaBias, alphaScale, alphaClamp, alphaOutReg;
+} GXTevResolvedStage;
 
-    /* TODO: Phase 3c -- Generate the combiner equation in GLSL
-     *
-     * The TEV equation is:
-     *   result = (d (+/-) mix(a, b, c)) * scaleVal + biasVal
-     *
-     * For the standard GX_TEV_ADD operation:
-     *   "result.{swizzle} = (({d}) + mix({a}, {b}, {c})) * {scaleVal} + {biasVal};\n"
-     *
-     * For GX_TEV_SUB:
-     *   "result.{swizzle} = (({d}) - mix({a}, {b}, {c})) * {scaleVal} + {biasVal};\n"
-     *
-     * Scale values: 1x, 2x, 4x, /2
-     * Bias values:  0, +0.5, -0.5
-     *
-     * If clamp: "result.{swizzle} = clamp(result.{swizzle}, 0.0, 1.0);\n"
-     *
-     * Comparison operations (GX_TEV_COMP_*) need separate handling:
-     *   GX_TEV_COMP_R8_GT: "result.{sw} = ({d}) + (({a}.r > {b}.r) ? {c} : vec3(0.0));\n"
-     *   etc.
-     */
+static int tev_mode_is_preset(u8 mode) {
+    return mode == GX_MODULATE || mode == GX_DECAL || mode == GX_BLEND ||
+           mode == GX_REPLACE  || mode == GX_PASSCLR;
+}
+
+static void tev_resolve_stage(const GXTevStageState* s, GXTevResolvedStage* out) {
+    memset(out, 0, sizeof(*out));
+
+    /* Defaults for a passthrough ADD stage with no scale/bias and clamp on. */
+    out->colorOp = GX_TEV_ADD;
+    out->alphaOp = GX_TEV_ADD;
+    out->colorScale = GX_CS_SCALE_1;
+    out->alphaScale = GX_CS_SCALE_1;
+    out->colorBias = GX_TB_ZERO;
+    out->alphaBias = GX_TB_ZERO;
+    out->colorClamp = GX_TRUE;
+    out->alphaClamp = GX_TRUE;
+    out->colorOutReg = GX_TEVPREV;
+    out->alphaOutReg = GX_TEVPREV;
+
+    if (tev_mode_is_preset(s->tevMode)) {
+        /* Synthesize inputs from the GXSetTevOp preset. The TEV equation is
+         * out = d + lerp(a,b,c); presets pick a/b/c/d so that: */
+        switch (s->tevMode) {
+            case GX_MODULATE: /* color = ras*tex ; alpha = ras_a*tex_a */
+                out->cIn[0] = GX_CC_ZERO; out->cIn[1] = GX_CC_TEXC;
+                out->cIn[2] = GX_CC_RASC; out->cIn[3] = GX_CC_ZERO;
+                out->aIn[0] = GX_CA_ZERO; out->aIn[1] = GX_CA_TEXA;
+                out->aIn[2] = GX_CA_RASA; out->aIn[3] = GX_CA_ZERO;
+                break;
+            case GX_DECAL:    /* color = lerp(ras, tex, tex_a) ; alpha = ras_a */
+                out->cIn[0] = GX_CC_RASC; out->cIn[1] = GX_CC_TEXC;
+                out->cIn[2] = GX_CC_TEXA; out->cIn[3] = GX_CC_ZERO;
+                out->aIn[0] = GX_CA_ZERO; out->aIn[1] = GX_CA_ZERO;
+                out->aIn[2] = GX_CA_ZERO; out->aIn[3] = GX_CA_RASA;
+                break;
+            case GX_BLEND:    /* color = lerp(ras, tex, ras_a) ; alpha = ras_a*tex_a */
+                out->cIn[0] = GX_CC_RASC; out->cIn[1] = GX_CC_TEXC;
+                out->cIn[2] = GX_CC_RASA; out->cIn[3] = GX_CC_ZERO;
+                out->aIn[0] = GX_CA_ZERO; out->aIn[1] = GX_CA_TEXA;
+                out->aIn[2] = GX_CA_RASA; out->aIn[3] = GX_CA_ZERO;
+                break;
+            case GX_REPLACE:  /* color = tex ; alpha = tex_a */
+                out->cIn[0] = GX_CC_ZERO; out->cIn[1] = GX_CC_ZERO;
+                out->cIn[2] = GX_CC_ZERO; out->cIn[3] = GX_CC_TEXC;
+                out->aIn[0] = GX_CA_ZERO; out->aIn[1] = GX_CA_ZERO;
+                out->aIn[2] = GX_CA_ZERO; out->aIn[3] = GX_CA_TEXA;
+                break;
+            case GX_PASSCLR:  /* color = ras ; alpha = ras_a */
+            default:
+                out->cIn[0] = GX_CC_ZERO; out->cIn[1] = GX_CC_ZERO;
+                out->cIn[2] = GX_CC_ZERO; out->cIn[3] = GX_CC_RASC;
+                out->aIn[0] = GX_CA_ZERO; out->aIn[1] = GX_CA_ZERO;
+                out->aIn[2] = GX_CA_ZERO; out->aIn[3] = GX_CA_RASA;
+                break;
+        }
+        return;
+    }
+
+    /* Custom stage: use the explicit inputs and ops recorded from
+     * GXSetTevColorIn / GXSetTevAlphaIn / GXSetTevColorOp / GXSetTevAlphaOp. */
+    out->cIn[0] = s->colorIn[0]; out->cIn[1] = s->colorIn[1];
+    out->cIn[2] = s->colorIn[2]; out->cIn[3] = s->colorIn[3];
+    out->aIn[0] = s->alphaIn[0]; out->aIn[1] = s->alphaIn[1];
+    out->aIn[2] = s->alphaIn[2]; out->aIn[3] = s->alphaIn[3];
+
+    out->colorOp = s->colorOp;
+    out->colorBias = s->colorBias;
+    out->colorScale = s->colorScale;
+    out->colorClamp = s->colorClamp;
+    out->colorOutReg = s->colorOutReg;
+
+    out->alphaOp = s->alphaOp;
+    out->alphaBias = s->alphaBias;
+    out->alphaScale = s->alphaScale;
+    out->alphaClamp = s->alphaClamp;
+    out->alphaOutReg = s->alphaOutReg;
+}
+
+/* Bounded append helper: append 'src' to 'buf' (size 'cap'), tracking '*pos'. */
+static void tev_append(char* buf, u32 cap, u32* pos, const char* src) {
+    u32 i = 0;
+    while (src[i] != '\0' && (*pos + 1) < cap) {
+        buf[*pos] = src[i];
+        (*pos)++;
+        i++;
+    }
+    buf[*pos] = '\0';
 }
 
 /* =========================================================================
- * Public API implementation
+ * Fragment shader generation
  * ========================================================================= */
+
+s32 gx_tev_generate_fragment_shader(const GXTevState* state,
+                                    char* outBuf, u32 bufSize) {
+    u32 pos = 0;
+    u32 stageCount;
+    u32 i;
+    char line[512];
+
+    if (!state || !outBuf || bufSize == 0) return -1;
+
+    stageCount = state->numStages;
+    if (stageCount == 0) stageCount = 1;
+    if (stageCount > GX_TEV_MAX_STAGES) stageCount = GX_TEV_MAX_STAGES;
+
+    tev_append(outBuf, bufSize, &pos,
+        "#version 330 core\n"
+        "\n"
+        "uniform sampler2D u_tex0;\n"
+        "uniform sampler2D u_tex1;\n"
+        "uniform vec4 u_tevColor[4];\n"
+        "uniform vec4 u_tevKonst[4];\n"
+        "uniform int  u_hasTexture;\n"
+        "uniform float u_vertexAlphaScale;\n"
+        "uniform int  u_alphaComp0;\n"
+        "uniform int  u_alphaComp1;\n"
+        "uniform float u_alphaRef0;\n"
+        "uniform float u_alphaRef1;\n"
+        "uniform int  u_alphaOp;\n"
+        "uniform int  u_lightingEnabled;\n"
+        "\n"
+        "in vec4 v_color0;\n"
+        "in vec2 v_texcoord0;\n"
+        "in vec2 v_texcoord1;\n"
+        "in vec3 v_viewPos;\n"
+        "in vec3 v_normal;\n"
+        "\n"
+        "out vec4 fragColor;\n"
+        "\n"
+        /* Hardcoded directional light (view space). A high front-ish key light;
+         * ambient keeps unlit faces from going fully black. */
+        "const vec3  c_lightDir     = normalize(vec3(0.3, 0.7, 0.6));\n"
+        "const float c_lightAmbient = 0.30;\n"
+        "\n"
+        "bool tevCompare(int comp, float val, float ref) {\n"
+        "    if (comp == 0) return false;\n"        /* NEVER */
+        "    if (comp == 1) return val <  ref;\n"   /* LESS */
+        "    if (comp == 2) return val == ref;\n"   /* EQUAL */
+        "    if (comp == 3) return val <= ref;\n"   /* LEQUAL */
+        "    if (comp == 4) return val >  ref;\n"   /* GREATER */
+        "    if (comp == 5) return val != ref;\n"   /* NEQUAL */
+        "    if (comp == 6) return val >= ref;\n"   /* GEQUAL */
+        "    return true;\n"                        /* ALWAYS */
+        "}\n"
+        "\n"
+        "void main() {\n"
+        "    vec4 rasc  = vec4(v_color0.rgb, v_color0.a * u_vertexAlphaScale);\n"
+        "    vec4 prev  = rasc;\n"
+        "    vec4 creg0 = u_tevColor[1];\n"
+        "    vec4 creg1 = u_tevColor[2];\n"
+        "    vec4 creg2 = u_tevColor[3];\n"
+        "    vec4 texc  = vec4(1.0);\n"
+        "    vec4 konst = vec4(1.0);\n");
+
+    /* Emit each TEV stage. */
+    for (i = 0; i < stageCount; ++i) {
+        const GXTevStageState* s = &state->stages[i];
+        GXTevResolvedStage rs;
+        const char* outName;
+        const char* texCoordVar;
+        const char* texSampler;
+        int usesTexture;
+
+        tev_resolve_stage(s, &rs);
+
+        /* Determine whether this stage samples a texture. Presets DECAL/BLEND/
+         * REPLACE/MODULATE all sample; PASSCLR does not. Custom stages sample
+         * if any input references TEXC/TEXA. */
+        usesTexture = 0;
+        if (tev_mode_is_preset(s->tevMode)) {
+            usesTexture = (s->tevMode != GX_PASSCLR);
+        } else {
+            int k;
+            for (k = 0; k < 4; ++k) {
+                if (rs.cIn[k] == GX_CC_TEXC || rs.cIn[k] == GX_CC_TEXA) usesTexture = 1;
+                if (rs.aIn[k] == GX_CA_TEXA) usesTexture = 1;
+            }
+        }
+
+        /* Texcoord/sampler selection (texcoord1 maps to GX_TEXCOORD1). */
+        texCoordVar = (s->texCoordId == GX_TEXCOORD1) ? "v_texcoord1" : "v_texcoord0";
+        texSampler  = (s->texMapId == GX_TEXMAP1) ? "u_tex1" : "u_tex0";
+
+        snprintf(line, sizeof(line), "\n    // --- TEV stage %u ---\n", i);
+        tev_append(outBuf, bufSize, &pos, line);
+
+        if (usesTexture) {
+            /* When the bound texture is unavailable, fall back to white so the
+             * stage degrades to its rasterized contribution instead of black. */
+            snprintf(line, sizeof(line),
+                "    texc = (u_hasTexture != 0) ? texture(%s, %s) : vec4(1.0);\n",
+                texSampler, texCoordVar);
+            tev_append(outBuf, bufSize, &pos, line);
+        }
+
+        /* konst is the konstant color register; default K0 for first pass. */
+        tev_append(outBuf, bufSize, &pos, "    konst = u_tevKonst[0];\n");
+
+        outName = tev_out_reg_name(rs.colorOutReg);
+
+        /* --- Color combiner: out.rgb = (d + lerp(a,b,c)) * scale + bias --- */
+        if (rs.colorOp == GX_TEV_ADD || rs.colorOp == GX_TEV_SUB) {
+            const char* sign = (rs.colorOp == GX_TEV_SUB) ? "-" : "+";
+            snprintf(line, sizeof(line),
+                "    %s.rgb = ((%s) %s mix(%s, %s, %s)) * %s + vec3(%s);\n",
+                outName,
+                tev_color_input_expr(rs.cIn[3]), sign,
+                tev_color_input_expr(rs.cIn[0]),
+                tev_color_input_expr(rs.cIn[1]),
+                tev_color_input_expr(rs.cIn[2]),
+                tev_scale_factor(rs.colorScale),
+                tev_bias_value(rs.colorBias));
+            tev_append(outBuf, bufSize, &pos, line);
+        } else {
+            /* Comparison ops: out.rgb = d + ((a OP b) ? c : 0). Use the R
+             * channel as a representative comparison for the first pass. */
+            const char* cmp = (rs.colorOp & 1) ? "==" : ">";
+            snprintf(line, sizeof(line),
+                "    %s.rgb = (%s) + ((%s.r %s %s.r) ? (%s) : vec3(0.0));\n",
+                outName,
+                tev_color_input_expr(rs.cIn[3]),
+                tev_color_input_expr(rs.cIn[0]), cmp,
+                tev_color_input_expr(rs.cIn[1]),
+                tev_color_input_expr(rs.cIn[2]));
+            tev_append(outBuf, bufSize, &pos, line);
+        }
+        if (rs.colorClamp) {
+            snprintf(line, sizeof(line),
+                "    %s.rgb = clamp(%s.rgb, 0.0, 1.0);\n", outName, outName);
+            tev_append(outBuf, bufSize, &pos, line);
+        }
+
+        /* --- Alpha combiner --- */
+        outName = tev_out_reg_name(rs.alphaOutReg);
+        if (rs.alphaOp == GX_TEV_ADD || rs.alphaOp == GX_TEV_SUB) {
+            const char* sign = (rs.alphaOp == GX_TEV_SUB) ? "-" : "+";
+            snprintf(line, sizeof(line),
+                "    %s.a = ((%s) %s mix(%s, %s, %s)) * %s + (%s);\n",
+                outName,
+                tev_alpha_input_expr(rs.aIn[3]), sign,
+                tev_alpha_input_expr(rs.aIn[0]),
+                tev_alpha_input_expr(rs.aIn[1]),
+                tev_alpha_input_expr(rs.aIn[2]),
+                tev_scale_factor(rs.alphaScale),
+                tev_bias_value(rs.alphaBias));
+            tev_append(outBuf, bufSize, &pos, line);
+        } else {
+            const char* cmp = (rs.alphaOp & 1) ? "==" : ">";
+            snprintf(line, sizeof(line),
+                "    %s.a = (%s) + ((%s %s %s) ? (%s) : 0.0);\n",
+                outName,
+                tev_alpha_input_expr(rs.aIn[3]),
+                tev_alpha_input_expr(rs.aIn[0]), cmp,
+                tev_alpha_input_expr(rs.aIn[1]),
+                tev_alpha_input_expr(rs.aIn[2]));
+            tev_append(outBuf, bufSize, &pos, line);
+        }
+        if (rs.alphaClamp) {
+            snprintf(line, sizeof(line),
+                "    %s.a = clamp(%s.a, 0.0, 1.0);\n", outName, outName);
+            tev_append(outBuf, bufSize, &pos, line);
+        }
+    }
+
+    /* --- Alpha test (discard) --- */
+    tev_append(outBuf, bufSize, &pos,
+        "\n"
+        "    bool ap0 = tevCompare(u_alphaComp0, prev.a, u_alphaRef0);\n"
+        "    bool ap1 = tevCompare(u_alphaComp1, prev.a, u_alphaRef1);\n"
+        "    bool alphaPass;\n"
+        "    if (u_alphaOp == 0)      alphaPass = ap0 && ap1;\n"  /* AND */
+        "    else if (u_alphaOp == 1) alphaPass = ap0 || ap1;\n"  /* OR */
+        "    else if (u_alphaOp == 2) alphaPass = ap0 != ap1;\n"  /* XOR */
+        "    else                     alphaPass = ap0 == ap1;\n"  /* XNOR */
+        "    if (!alphaPass) discard;\n"
+        "\n"
+        "    fragColor = prev;\n"
+        "\n"
+        /* Directional vertex lighting. The host geometry path does not carry a
+         * usable per-vertex normal (the scene PObjs submit POS+CLR+TEX only), so
+         * reconstruct a flat per-face normal from the screen-space derivatives of
+         * the view-space position. Cross(dFdx, dFdy) is the face normal in view
+         * space; orient it toward the camera (+Z) so front faces are lit. The
+         * lambert term shades each pillar face by its angle to the light, giving
+         * the otherwise flat-tan geometry visible 3D form. 2D overlays leave
+         * u_lightingEnabled == 0, so they stay full-bright. */
+        "    if (u_lightingEnabled != 0) {\n"
+        "        vec3 dpdx = dFdx(v_viewPos);\n"
+        "        vec3 dpdy = dFdy(v_viewPos);\n"
+        "        vec3 faceN = cross(dpdx, dpdy);\n"
+        "        float fl = length(faceN);\n"
+        "        if (fl > 1e-6) {\n"
+        "            faceN /= fl;\n"
+        "            if (faceN.z < 0.0) faceN = -faceN;\n"  /* face the camera */
+        "            float ndl = max(0.0, dot(faceN, c_lightDir));\n"
+        "            float lambert = c_lightAmbient + (1.0 - c_lightAmbient) * ndl;\n"
+        "            fragColor.rgb *= lambert;\n"
+        "        }\n"
+        "    }\n"
+        "}\n");
+
+    return (s32)pos;
+}
+
+s32 gx_tev_generate_vertex_shader(u8 numTexGens, u8 numChans,
+                                  char* outBuf, u32 bufSize) {
+    s32 len;
+    (void)numTexGens; (void)numChans;
+
+    if (!outBuf || bufSize == 0) return -1;
+    len = snprintf(outBuf, bufSize, "%s", VERTEX_SHADER_SOURCE);
+    return len;
+}
+
+/* =========================================================================
+ * GL compile/link helpers
+ * ========================================================================= */
+
+static GLuint tev_compile_shader(GLenum type, const char* src) {
+    GLuint sh;
+    GLint status = GL_FALSE;
+
+    sh = glCreateShader(type);
+    if (sh == 0) return 0;
+
+    glShaderSource(sh, 1, &src, NULL);
+    glCompileShader(sh);
+    glGetShaderiv(sh, GL_COMPILE_STATUS, &status);
+    if (status != GL_TRUE) {
+        char log[1024];
+        GLsizei n = 0;
+        glGetShaderInfoLog(sh, (GLsizei)sizeof(log), &n, log);
+        log[(n < (GLsizei)sizeof(log)) ? n : (GLsizei)sizeof(log) - 1] = '\0';
+        printf("[gx_tev] %s shader compile failed:\n%s\n",
+               (type == GL_VERTEX_SHADER) ? "vertex" : "fragment", log);
+        glDeleteShader(sh);
+        return 0;
+    }
+    return sh;
+}
+
+static GLuint tev_link_program(GLuint vs, GLuint fs) {
+    GLuint prog;
+    GLint status = GL_FALSE;
+
+    prog = glCreateProgram();
+    if (prog == 0) return 0;
+
+    glAttachShader(prog, vs);
+    glAttachShader(prog, fs);
+    glLinkProgram(prog);
+    glGetProgramiv(prog, GL_LINK_STATUS, &status);
+    if (status != GL_TRUE) {
+        char log[1024];
+        GLsizei n = 0;
+        glGetProgramInfoLog(prog, (GLsizei)sizeof(log), &n, log);
+        log[(n < (GLsizei)sizeof(log)) ? n : (GLsizei)sizeof(log) - 1] = '\0';
+        printf("[gx_tev] program link failed:\n%s\n", log);
+        glDeleteProgram(prog);
+        return 0;
+    }
+    return prog;
+}
+
+static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
+    GLuint p = entry->glProgram;
+
+    entry->loc_projMatrix      = glGetUniformLocation(p, "u_projMatrix");
+    entry->loc_modelViewMatrix = glGetUniformLocation(p, "u_modelViewMatrix");
+    entry->loc_normalMatrix    = glGetUniformLocation(p, "u_normalMatrix");
+
+    entry->loc_tex[0] = glGetUniformLocation(p, "u_tex0");
+    entry->loc_tex[1] = glGetUniformLocation(p, "u_tex1");
+
+    entry->loc_tevColor[0] = glGetUniformLocation(p, "u_tevColor");
+    entry->loc_tevKonst[0] = glGetUniformLocation(p, "u_tevKonst");
+
+    entry->loc_alphaComp0 = glGetUniformLocation(p, "u_alphaComp0");
+    entry->loc_alphaComp1 = glGetUniformLocation(p, "u_alphaComp1");
+    entry->loc_alphaRef0  = glGetUniformLocation(p, "u_alphaRef0");
+    entry->loc_alphaRef1  = glGetUniformLocation(p, "u_alphaRef1");
+    entry->loc_alphaOp    = glGetUniformLocation(p, "u_alphaOp");
+
+    /* Reuse spare fog slots for host-only uniforms. */
+    entry->loc_fogEnable = glGetUniformLocation(p, "u_hasTexture");
+    entry->loc_fogType   = glGetUniformLocation(p, "u_vertexAlphaScale");
+    entry->loc_fogStart  = glGetUniformLocation(p, "u_lightingEnabled");
+}
+
+/* =========================================================================
+ * Public API: init / shutdown / hash
+ * ========================================================================= */
+
+int gx_tev_ensure_loaded(void) {
+    static int s_loaded = 0;
+    static int s_failed = 0;
+
+    if (s_loaded) return 1;
+    if (s_failed) return 0;
+
+    /* GLAD must be loaded once, after a GL context is current. gx_shim.c uses
+     * the legacy system GL pulled in by GLFW; the modern (core 3.3) entry
+     * points used by this file are NULL until GLAD resolves them. */
+    if (!gladLoadGL()) {
+        printf("[gx_tev] ERROR: gladLoadGL() failed -- modern GL path disabled\n");
+        s_failed = 1;
+        return 0;
+    }
+
+    gx_tev_init();
+    s_loaded = 1;
+    printf("[gx_tev] GLAD loaded; modern TEV shader path active\n");
+    return 1;
+}
 
 void gx_tev_init(void) {
     memset(g_shaderCache, 0, sizeof(g_shaderCache));
@@ -198,308 +637,323 @@ void gx_tev_init(void) {
     g_cacheHits = 0;
     g_cacheMisses = 0;
 
-    /* TODO: Phase 3c -- Compile the default passthrough shader
-     *
-     * The default shader (PASSCLR mode, 1 TEV stage) just passes
-     * through the rasterized vertex color:
-     *
-     *   fragColor = v_color0;
-     *
-     * Pre-compile this so that early rendering works even before
-     * the full TEV generator is complete.
-     */
+    memset(&g_rs, 0, sizeof(g_rs));
+    /* Identity matrices so a draw before any matrix upload is still visible. */
+    g_rs.proj[0][0] = g_rs.proj[1][1] = g_rs.proj[2][2] = g_rs.proj[3][3] = 1.0f;
+    g_rs.modelView[0][0] = g_rs.modelView[1][1] = g_rs.modelView[2][2] = 1.0f;
+    g_rs.normalMatrix[0][0] = g_rs.normalMatrix[1][1] = g_rs.normalMatrix[2][2] = 1.0f;
+    g_rs.vertexAlphaScale = 1.0f;
+    g_rs.lightingEnabled = 0;
+    g_rs.alphaComp0 = GX_ALWAYS;
+    g_rs.alphaComp1 = GX_ALWAYS;
+    g_rs.alphaOp = GX_AOP_AND;
+    {
+        u32 i;
+        for (i = 0; i < 4; ++i) {
+            g_rs.tevColor[i][0] = g_rs.tevColor[i][1] =
+                g_rs.tevColor[i][2] = g_rs.tevColor[i][3] = 0.0f;
+            g_rs.konstColor[i][0] = g_rs.konstColor[i][1] =
+                g_rs.konstColor[i][2] = g_rs.konstColor[i][3] = 1.0f;
+        }
+    }
 
     printf("[gx_tev] TEV shader cache initialized (max %d entries)\n",
            TEV_SHADER_CACHE_MAX);
 }
 
-void gx_tev_shutdown(void) {
-    /* TODO: Phase 3c -- Delete all cached GL shader programs
-     *
-     * for (u32 i = 0; i < g_shaderCacheCount; i++) {
-     *     if (g_shaderCache[i].valid) {
-     *         glDeleteProgram(g_shaderCache[i].glProgram);
-     *     }
-     * }
-     */
+void gx_tev_unbind(void) {
+    if (!g_glReady && g_boundProgram == 0) return;
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    g_boundProgram = 0;
+}
 
+void gx_tev_shutdown(void) {
+    u32 i;
+    for (i = 0; i < g_shaderCacheCount; ++i) {
+        if (g_shaderCache[i].valid && g_shaderCache[i].glProgram != 0) {
+            glDeleteProgram((GLuint)g_shaderCache[i].glProgram);
+        }
+    }
     memset(g_shaderCache, 0, sizeof(g_shaderCache));
     g_shaderCacheCount = 0;
+
+    if (g_vbo != 0) { glDeleteBuffers(1, &g_vbo); g_vbo = 0; }
+    if (g_vao != 0) { glDeleteVertexArrays(1, &g_vao); g_vao = 0; }
+    g_glReady = 0;
+    g_boundProgram = 0;
 }
 
 u32 gx_tev_hash(const GXTevState* state) {
-    /* TODO: Phase 3c -- Implement FNV-1a hash over TEV state
-     *
-     * Hash the relevant fields:
-     *   - numStages
-     *   - For each active stage: colorIn[], alphaIn[], colorOp, alphaOp,
-     *     colorScale, colorBias, alphaScale, alphaBias, texMapId, channelId
-     *   - alphaComp0, alphaComp1, alphaRef0, alphaRef1, alphaOp
-     *   - fogEnable
-     *
-     * FNV-1a:
-     *   u32 hash = 0x811c9dc5;
-     *   for each byte b in state:
-     *       hash ^= b;
-     *       hash *= 0x01000193;
-     *   return hash;
-     */
-
-    /* Placeholder: hash just the first few bytes */
     const u8* data = (const u8*)state;
     u32 hash = 0x811c9dc5u;
     u32 i;
     u32 len = sizeof(GXTevState);
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len; ++i) {
         hash ^= data[i];
         hash *= 0x01000193u;
     }
     return hash;
 }
 
+/* =========================================================================
+ * Public API: compile (real GL) + bind
+ * ========================================================================= */
+
 GXTevShaderEntry* gx_tev_compile(const GXTevState* state) {
     u32 hash = gx_tev_hash(state);
     u32 i;
+    char fragSrc[TEV_SHADER_SRC_MAX];
+    GLuint vs, fs, prog;
+    GXTevShaderEntry* entry;
 
-    /* Look up in cache */
-    for (i = 0; i < g_shaderCacheCount; i++) {
+    /* Cache lookup. */
+    for (i = 0; i < g_shaderCacheCount; ++i) {
         if (g_shaderCache[i].valid && g_shaderCache[i].stateHash == hash) {
             g_cacheHits++;
             return &g_shaderCache[i];
         }
     }
 
-    /* Cache miss -- generate and compile a new shader */
     g_cacheMisses++;
 
     if (g_shaderCacheCount >= TEV_SHADER_CACHE_MAX) {
-        printf("[gx_tev] ERROR: Shader cache full! Cannot compile new shader.\n");
+        printf("[gx_tev] ERROR: shader cache full (%d) -- cannot compile\n",
+               TEV_SHADER_CACHE_MAX);
         return (GXTevShaderEntry*)0;
     }
 
-    /* TODO: Phase 3c -- Generate and compile the shader
-     *
-     * 1. Generate fragment shader source:
-     *    char fragSrc[TEV_SHADER_SRC_MAX];
-     *    gx_tev_generate_fragment_shader(state, fragSrc, sizeof(fragSrc));
-     *
-     * 2. Compile fragment shader:
-     *    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-     *    glShaderSource(fs, 1, &fragSrc, NULL);
-     *    glCompileShader(fs);
-     *    // Check compile status, print errors
-     *
-     * 3. Compile vertex shader (using the static template):
-     *    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-     *    glShaderSource(vs, 1, &VERTEX_SHADER_TEMPLATE, NULL);
-     *    glCompileShader(vs);
-     *
-     * 4. Link program:
-     *    GLuint prog = glCreateProgram();
-     *    glAttachShader(prog, vs);
-     *    glAttachShader(prog, fs);
-     *    glLinkProgram(prog);
-     *    // Check link status
-     *
-     * 5. Cache uniform locations:
-     *    entry->loc_projMatrix = glGetUniformLocation(prog, "u_projMatrix");
-     *    entry->loc_modelViewMatrix = glGetUniformLocation(prog, "u_modelViewMatrix");
-     *    entry->loc_normalMatrix = glGetUniformLocation(prog, "u_normalMatrix");
-     *    for (int t = 0; t < 8; t++) {
-     *        char name[16]; sprintf(name, "u_tex[%d]", t);
-     *        entry->loc_tex[t] = glGetUniformLocation(prog, name);
-     *    }
-     *    // ... etc for all uniforms
-     *
-     * 6. Store in cache:
-     *    entry->glProgram = prog;
-     *    entry->stateHash = hash;
-     *    entry->valid = 1;
-     */
+    if (gx_tev_generate_fragment_shader(state, fragSrc, sizeof(fragSrc)) < 0) {
+        return (GXTevShaderEntry*)0;
+    }
 
-    GXTevShaderEntry* entry = &g_shaderCache[g_shaderCacheCount];
+    vs = tev_compile_shader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
+    if (vs == 0) return (GXTevShaderEntry*)0;
+
+    fs = tev_compile_shader(GL_FRAGMENT_SHADER, fragSrc);
+    if (fs == 0) { glDeleteShader(vs); return (GXTevShaderEntry*)0; }
+
+    prog = tev_link_program(vs, fs);
+    /* Shaders can be detached/deleted once linked. */
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    if (prog == 0) return (GXTevShaderEntry*)0;
+
+    entry = &g_shaderCache[g_shaderCacheCount];
     memset(entry, 0, sizeof(*entry));
     entry->stateHash = hash;
-    entry->glProgram = 0; /* placeholder -- filled in by GL compile */
+    entry->glProgram = (u32)prog;
     entry->valid = 1;
-
-    /* Set uniform locations to -1 (invalid) until actual GL compile */
-    entry->loc_projMatrix = -1;
-    entry->loc_modelViewMatrix = -1;
-    entry->loc_normalMatrix = -1;
-    for (i = 0; i < 8; i++) {
-        entry->loc_tex[i] = -1;
-        entry->loc_texSwizzle[i] = -1;
-    }
-    for (i = 0; i < 4; i++) {
-        entry->loc_tevColor[i] = -1;
-        entry->loc_tevKonst[i] = -1;
-    }
+    tev_cache_uniform_locations(entry);
 
     g_shaderCacheCount++;
     return entry;
 }
 
 void gx_tev_bind(const GXTevShaderEntry* entry) {
+    GLuint prog;
     if (!entry || !entry->valid) return;
 
-    /* TODO: Phase 3c -- Bind shader program and set uniforms
-     *
-     * glUseProgram(entry->glProgram);
-     *
-     * // Upload matrices
-     * if (entry->loc_projMatrix >= 0)
-     *     glUniformMatrix4fv(entry->loc_projMatrix, 1, GL_TRUE,
-     *                        (GLfloat*)g_projMatrix);
-     *
-     * if (entry->loc_modelViewMatrix >= 0)
-     *     glUniformMatrix4fv(entry->loc_modelViewMatrix, 1, GL_TRUE,
-     *                        (GLfloat*)g_posMtx[0]);
-     *
-     * // Upload TEV color registers
-     * for (int i = 0; i < 4; i++) {
-     *     if (entry->loc_tevColor[i] >= 0) {
-     *         glUniform4f(entry->loc_tevColor[i],
-     *                     g_tevColorRegs[i].r / 255.0f, ...);
-     *     }
-     * }
-     *
-     * // Upload texture sampler indices
-     * for (int i = 0; i < 8; i++) {
-     *     if (entry->loc_tex[i] >= 0)
-     *         glUniform1i(entry->loc_tex[i], i);
-     * }
-     *
-     * // Upload alpha test uniforms
-     * // Upload fog uniforms
-     */
+    prog = (GLuint)entry->glProgram;
+    if (prog != g_boundProgram) {
+        glUseProgram(prog);
+        g_boundProgram = prog;
+    }
+
+    /* --- Matrices (transpose row-major GCN -> column-major GL) --- */
+    if (entry->loc_projMatrix >= 0) {
+        glUniformMatrix4fv(entry->loc_projMatrix, 1, GL_TRUE,
+                           (const GLfloat*)&g_rs.proj[0][0]);
+    }
+    if (entry->loc_modelViewMatrix >= 0) {
+        /* Expand the 3x4 modelview to 4x4 (last row 0,0,0,1). */
+        GLfloat mv[16];
+        int r, c;
+        for (r = 0; r < 3; ++r) {
+            for (c = 0; c < 4; ++c) {
+                mv[r * 4 + c] = g_rs.modelView[r][c];
+            }
+        }
+        mv[12] = 0.0f; mv[13] = 0.0f; mv[14] = 0.0f; mv[15] = 1.0f;
+        glUniformMatrix4fv(entry->loc_modelViewMatrix, 1, GL_TRUE, mv);
+    }
+
+    /* --- Normal matrix (upper-left 3x3 of the normal/modelview matrix) --- */
+    if (entry->loc_normalMatrix >= 0) {
+        GLfloat nm[9];
+        int r, c;
+        for (r = 0; r < 3; ++r) {
+            for (c = 0; c < 3; ++c) {
+                nm[r * 3 + c] = g_rs.normalMatrix[r][c];
+            }
+        }
+        glUniformMatrix3fv(entry->loc_normalMatrix, 1, GL_TRUE, nm);
+    }
+
+    /* --- TEV color + konst register arrays --- */
+    if (entry->loc_tevColor[0] >= 0) {
+        glUniform4fv(entry->loc_tevColor[0], 4, (const GLfloat*)&g_rs.tevColor[0][0]);
+    }
+    if (entry->loc_tevKonst[0] >= 0) {
+        glUniform4fv(entry->loc_tevKonst[0], 4, (const GLfloat*)&g_rs.konstColor[0][0]);
+    }
+
+    /* --- Texture samplers (units 0 and 1) --- */
+    if (entry->loc_tex[0] >= 0) glUniform1i(entry->loc_tex[0], 0);
+    if (entry->loc_tex[1] >= 0) glUniform1i(entry->loc_tex[1], 1);
+
+    /* --- Alpha test --- */
+    if (entry->loc_alphaComp0 >= 0) glUniform1i(entry->loc_alphaComp0, g_rs.alphaComp0);
+    if (entry->loc_alphaComp1 >= 0) glUniform1i(entry->loc_alphaComp1, g_rs.alphaComp1);
+    if (entry->loc_alphaRef0  >= 0) glUniform1f(entry->loc_alphaRef0, g_rs.alphaRef0);
+    if (entry->loc_alphaRef1  >= 0) glUniform1f(entry->loc_alphaRef1, g_rs.alphaRef1);
+    if (entry->loc_alphaOp    >= 0) glUniform1i(entry->loc_alphaOp, g_rs.alphaOp);
+
+    /* --- Host-only uniforms (vertex alpha scale lives in loc_fogType,
+     *     lighting-enabled flag lives in loc_fogStart) --- */
+    if (entry->loc_fogType >= 0) glUniform1f(entry->loc_fogType, g_rs.vertexAlphaScale);
+    if (entry->loc_fogStart >= 0) glUniform1i(entry->loc_fogStart, g_rs.lightingEnabled);
 }
 
-s32 gx_tev_generate_fragment_shader(const GXTevState* state,
-                                    char* outBuf, u32 bufSize) {
-    if (!state || !outBuf || bufSize == 0) return -1;
+/* =========================================================================
+ * Public API: render state setters
+ * ========================================================================= */
 
-    /* TODO: Phase 3c -- Generate GLSL 330 fragment shader
-     *
-     * The generated shader follows this structure:
-     *
-     * #version 330 core
-     *
-     * // Uniforms
-     * uniform sampler2D u_tex[8];
-     * uniform vec4 u_tevColor[4];
-     * uniform vec4 u_tevKonst[4];
-     * uniform int u_texSwizzle[8];
-     * uniform int u_alphaComp0, u_alphaComp1;
-     * uniform float u_alphaRef0, u_alphaRef1;
-     * uniform int u_alphaOp;
-     * uniform int u_fogEnable;
-     * uniform float u_fogStart, u_fogEnd;
-     * uniform vec4 u_fogColor;
-     *
-     * // Inputs from vertex shader
-     * in vec4 v_color0;
-     * in vec4 v_color1;
-     * in vec2 v_texcoord[8];
-     * in vec3 v_viewPos;
-     *
-     * out vec4 fragColor;
-     *
-     * // Texture swizzle helper (for I/IA/A formats)
-     * vec4 applySwizzle(vec4 raw, int mode) {
-     *     if (mode == 1) return vec4(raw.r, raw.r, raw.r, raw.r); // I
-     *     if (mode == 2) return vec4(raw.r, raw.r, raw.r, raw.g); // IA
-     *     if (mode == 3) return vec4(1.0, 1.0, 1.0, raw.r);       // A
-     *     return raw; // RGBA
-     * }
-     *
-     * // Alpha test helper
-     * bool compareFunc(int comp, float val, float ref) {
-     *     if (comp == 0) return false;        // NEVER
-     *     if (comp == 1) return val < ref;    // LESS
-     *     if (comp == 2) return val == ref;   // EQUAL
-     *     if (comp == 3) return val <= ref;   // LEQUAL
-     *     if (comp == 4) return val > ref;    // GREATER
-     *     if (comp == 5) return val != ref;   // NEQUAL
-     *     if (comp == 6) return val >= ref;   // GEQUAL
-     *     return true;                         // ALWAYS (7)
-     * }
-     *
-     * void main() {
-     *     vec4 prev = v_color0;  // CPREV starts as rasterized color
-     *     vec4 reg0 = u_tevColor[0];
-     *     vec4 reg1 = u_tevColor[1];
-     *     vec4 reg2 = u_tevColor[2];
-     *
-     *     // --- TEV Stage 0 ---
-     *     [emit texture sample if stage uses a texture]
-     *     [emit color combiner: prev.rgb = ...]
-     *     [emit alpha combiner: prev.a = ...]
-     *
-     *     // --- TEV Stage 1..N-1 ---
-     *     [same pattern]
-     *
-     *     // --- Alpha test ---
-     *     bool pass0 = compareFunc(u_alphaComp0, prev.a, u_alphaRef0);
-     *     bool pass1 = compareFunc(u_alphaComp1, prev.a, u_alphaRef1);
-     *     bool alphaPass;
-     *     if (u_alphaOp == 0) alphaPass = pass0 && pass1;  // AND
-     *     else if (u_alphaOp == 1) alphaPass = pass0 || pass1;  // OR
-     *     else alphaPass = pass0 ^^ pass1;  // XOR
-     *     if (!alphaPass) discard;
-     *
-     *     // --- Fog ---
-     *     if (u_fogEnable != 0) {
-     *         float fogFactor = clamp((u_fogEnd - length(v_viewPos))
-     *                                / (u_fogEnd - u_fogStart), 0.0, 1.0);
-     *         prev.rgb = mix(u_fogColor.rgb, prev.rgb, fogFactor);
-     *     }
-     *
-     *     fragColor = prev;
-     * }
-     *
-     * For each TEV stage, call tev_color_input_expr / tev_alpha_input_expr
-     * for each input, then tev_emit_combiner for the operation.
-     */
-
-    /* Placeholder: emit a minimal passthrough shader */
-    s32 len = snprintf(outBuf, bufSize,
-        "#version 330 core\n"
-        "\n"
-        "uniform sampler2D u_tex[8];\n"
-        "uniform vec4 u_tevColor[4];\n"
-        "uniform vec4 u_tevKonst[4];\n"
-        "\n"
-        "in vec4 v_color0;\n"
-        "in vec4 v_color1;\n"
-        "in vec2 v_texcoord[8];\n"
-        "in vec3 v_viewPos;\n"
-        "\n"
-        "out vec4 fragColor;\n"
-        "\n"
-        "void main() {\n"
-        "    /* TODO: Generate TEV combiner stages here (%d stages) */\n"
-        "    fragColor = v_color0;\n"
-        "}\n",
-        state->numStages
-    );
-
-    return len;
+void gx_tev_set_proj_matrix(const f32 m[4][4]) {
+    memcpy(g_rs.proj, m, sizeof(g_rs.proj));
 }
 
-s32 gx_tev_generate_vertex_shader(u8 numTexGens, u8 numChans,
-                                  char* outBuf, u32 bufSize) {
-    (void)numTexGens; (void)numChans;
+void gx_tev_set_modelview_matrix(const f32 m[3][4]) {
+    memcpy(g_rs.modelView, m, sizeof(g_rs.modelView));
+}
 
-    /* TODO: Phase 3c -- Generate parameterized vertex shader
-     *
-     * For now, use the static template. In the future, generate
-     * vertex shaders that only pass through the texcoords and
-     * color channels that are actually used (optimization).
+void gx_tev_set_normal_matrix(const f32 m[3][4]) {
+    memcpy(g_rs.normalMatrix, m, sizeof(g_rs.normalMatrix));
+}
+
+void gx_tev_set_lighting_enabled(int enabled) {
+    g_rs.lightingEnabled = enabled ? 1 : 0;
+}
+
+void gx_tev_set_tev_color(u32 id, u8 r, u8 g, u8 b, u8 a) {
+    if (id > 3) return;
+    g_rs.tevColor[id][0] = (f32)r / 255.0f;
+    g_rs.tevColor[id][1] = (f32)g / 255.0f;
+    g_rs.tevColor[id][2] = (f32)b / 255.0f;
+    g_rs.tevColor[id][3] = (f32)a / 255.0f;
+}
+
+void gx_tev_set_konst_color(u32 id, u8 r, u8 g, u8 b, u8 a) {
+    if (id > 3) return;
+    g_rs.konstColor[id][0] = (f32)r / 255.0f;
+    g_rs.konstColor[id][1] = (f32)g / 255.0f;
+    g_rs.konstColor[id][2] = (f32)b / 255.0f;
+    g_rs.konstColor[id][3] = (f32)a / 255.0f;
+}
+
+void gx_tev_set_alpha_compare(u8 comp0, u8 ref0, u8 op, u8 comp1, u8 ref1) {
+    g_rs.alphaComp0 = (s32)comp0;
+    g_rs.alphaComp1 = (s32)comp1;
+    g_rs.alphaRef0 = (f32)ref0 / 255.0f;
+    g_rs.alphaRef1 = (f32)ref1 / 255.0f;
+    g_rs.alphaOp = (s32)op;
+}
+
+void gx_tev_set_vertex_alpha_scale(f32 scale) {
+    if (scale < 0.0f) scale = 0.0f;
+    if (scale > 1.0f) scale = 1.0f;
+    g_rs.vertexAlphaScale = scale;
+}
+
+/* =========================================================================
+ * Public API: modern submit path (VAO/VBO)
+ * ========================================================================= */
+
+static void tev_ensure_gl_objects(void) {
+    if (g_glReady) return;
+
+    glGenVertexArrays(1, &g_vao);
+    glGenBuffers(1, &g_vbo);
+
+    glBindVertexArray(g_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
+
+    /* Attribute layout mirrors GXTevVertex / GXImmVertex:
+     *   loc 0: position  (3 x f32)  offset 0
+     *   loc 1: color0    (4 x u8 normalized) offset 12
+     *   loc 2: texcoord0 (2 x f32)  offset 16
      */
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          (GLsizei)sizeof(GXTevVertex),
+                          (const void*)0);
 
-    s32 len = snprintf(outBuf, bufSize, "%s", VERTEX_SHADER_TEMPLATE);
-    return len;
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+                          (GLsizei)sizeof(GXTevVertex),
+                          (const void*)(3 * sizeof(f32)));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+                          (GLsizei)sizeof(GXTevVertex),
+                          (const void*)(3 * sizeof(f32) + 4 * sizeof(u8)));
+
+    /* loc 3: a_normal -- the host vertex layout carries no normal, so this
+     * attribute stays disabled and supplies a constant default of (0,0,1).
+     * Per-face lighting is reconstructed from view-space derivatives in the
+     * fragment shader; this default just keeps v_normal well-defined. */
+    glDisableVertexAttribArray(3);
+    glVertexAttrib3f(3, 0.0f, 0.0f, 1.0f);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    g_glReady = 1;
+}
+
+int gx_tev_submit(const GXTevState* state, u32 glPrim,
+                  const GXTevVertex* verts, u32 count,
+                  u32 glTexId, int hasTexture) {
+    GXTevShaderEntry* entry;
+    GLint hasTexLoc;
+
+    if (!state || !verts || count == 0) return 0;
+
+    entry = gx_tev_compile(state);
+    if (!entry || !entry->valid || entry->glProgram == 0) return 0;
+
+    tev_ensure_gl_objects();
+
+    /* Bind program + upload uniforms from the current render state. */
+    gx_tev_bind(entry);
+
+    /* Per-draw texture availability flag (loc_fogEnable holds u_hasTexture). */
+    hasTexLoc = entry->loc_fogEnable;
+    if (hasTexLoc >= 0) {
+        glUniform1i(hasTexLoc, (hasTexture && glTexId != 0) ? 1 : 0);
+    }
+
+    /* Bind the texture on unit 0 (and unit 1 mirrors it for single-tex draws). */
+    if (hasTexture && glTexId != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, (GLuint)glTexId);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, (GLuint)glTexId);
+        glActiveTexture(GL_TEXTURE0);
+    }
+
+    /* Upload vertices to the shared VBO and draw. */
+    glBindVertexArray(g_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 (GLsizeiptr)((size_t)count * sizeof(GXTevVertex)),
+                 verts, GL_STREAM_DRAW);
+
+    glDrawArrays((GLenum)glPrim, 0, (GLsizei)count);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    return 1;
 }
 
 void gx_tev_get_cache_stats(u32* outHits, u32* outMisses, u32* outTotal) {

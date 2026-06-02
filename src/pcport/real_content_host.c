@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
     u32 maxPosIndex;
+    u32 maxNormalIndex;
     u32 maxColorIndex;
     u32 maxTexcoordIndex;
     u32 maxTexcoord1Index;
@@ -227,6 +228,8 @@ static BOOL IsNoTevDirectSampleFormat(u32 textureFormat) {
     switch (textureFormat) {
     case GX_TF_CMPR:
     case GX_TF_RGBA8:
+    case GX_TF_C4:  /* CI4 (palettized) */
+    case GX_TF_C8:  /* CI8 (palettized) */
         return TRUE;
     default:
         return FALSE;
@@ -239,8 +242,13 @@ static u8 ClassifyTextureExpStageKind(const PCPortTranslatedTexture* texture,
         return PCPORT_TEXP_STAGE_NONE;
     }
 
+    /* A directly-sampleable format (CMPR/RGBA8/CI4/CI8) is a plain texture
+     * stage. A non-NULL TEV is fine as long as it is NOT the special I8
+     * colour-ramp kind: the generic TEV just selects a blend mode, which the
+     * pipeline already applies via tevMode. Requiring tevArchiveOffset==0 here
+     * is what rejected the RGBA8/palettized ground/ruins nodes (they carry a
+     * plain modulate TEV) and left them rendering as a flat material colour. */
     if (IsNoTevDirectSampleFormat(texture->format) &&
-        texture->tevArchiveOffset == 0u &&
         texture->tev.kind == PCPORT_TRANSLATED_TEV_NONE) {
         return PCPORT_TEXP_STAGE_DIRECT_SAMPLE;
     }
@@ -427,6 +435,11 @@ static BOOL ScanDisplayListIndices(const u8* displayList,
                         stats->maxPosIndex = index;
                     }
                     break;
+                case GX_VA_NRM:
+                    if (index > stats->maxNormalIndex) {
+                        stats->maxNormalIndex = index;
+                    }
+                    break;
                 case GX_VA_CLR0:
                     if (index > stats->maxColorIndex) {
                         stats->maxColorIndex = index;
@@ -526,6 +539,15 @@ static BOOL TranslateVertexArray(const PCPortHSDArchive* archive,
         }
 
         outPObj->positionData = data;
+        desc->vertex = data;
+        return TRUE;
+
+    case GX_VA_NRM:
+        /* Normal (raw bytes already copied above). The host lights via face
+         * normals, so the per-vertex normal is not consumed at draw time -- the
+         * array only needs to exist (correctly sized) so the indexed display-list
+         * decode advances past the normal index and stays aligned. */
+        outPObj->normalData = data;
         desc->vertex = data;
         return TRUE;
 
@@ -979,9 +1001,17 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
     }
 
     dataOffset = ReadBE32(fsysData + entryOffset + 0x04);
+    /* entry+0x08 is the DECOMPRESSED size for LZSS members (and equals the
+     * on-disk size for stored members). The true on-disk byte count of a
+     * compressed member lives in its LZSS header (dataOffset+0x08), so the
+     * up-front check only requires the header word to be in range; each branch
+     * below validates the real on-disk length. Bounds-checking against
+     * compressedSize here falsely rejected strongly-compressed members
+     * (e.g. title.fsys:logo_demo, decompressed 0x15BC6B). */
     compressedSize = ReadBE32(fsysData + entryOffset + 0x08);
 
-    if (dataOffset >= fsysSize || dataOffset + compressedSize > fsysSize) {
+    if (dataOffset >= fsysSize ||
+        dataOffset + PCPORT_LZSS_HEADER_SIZE > fsysSize) {
         free(fsysData);
         return FALSE;
     }
@@ -990,15 +1020,11 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
         u32 lzssOutputSize;
         u32 lzssInputSize;
 
-        if (compressedSize < PCPORT_LZSS_HEADER_SIZE) {
-            free(fsysData);
-            return FALSE;
-        }
-
         lzssOutputSize = ReadBE32(fsysData + dataOffset + 0x04);
         lzssInputSize = ReadBE32(fsysData + dataOffset + 0x08);
-        if (lzssOutputSize == 0 || lzssInputSize > compressedSize ||
-            lzssInputSize < PCPORT_LZSS_HEADER_SIZE) {
+        if (lzssOutputSize == 0 ||
+            lzssInputSize < PCPORT_LZSS_HEADER_SIZE ||
+            dataOffset + lzssInputSize > fsysSize) {
             free(fsysData);
             return FALSE;
         }
@@ -1020,6 +1046,11 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
         *outSize = lzssOutputSize;
     } else {
         u32 copySize = compressedSize;
+
+        if (dataOffset + copySize > fsysSize) {
+            free(fsysData);
+            return FALSE;
+        }
 
         output = (u8*)malloc((size_t)copySize);
         if (output == NULL) {
@@ -1183,6 +1214,7 @@ void PCPort_DestroyTranslatedPObj(PCPortTranslatedPObj* pobj) {
     free(pobj->colorData);
     free(pobj->texcoordData);
     free(pobj->texcoord1Data);
+    free(pobj->normalData);
     memset(pobj, 0, sizeof(*pobj));
 }
 
@@ -1218,6 +1250,12 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
     if (nextOffset != 0u || serializedDisplayCount == 0u ||
         !IsArchiveRangeValid(archive, vertsOffset, PCPORT_SERIALIZED_VTXDESC_SIZE) ||
         displayOffset >= pobjArchiveOffset) {
+        if (getenv("PCPORT_SKIN_DEBUG") != NULL) {
+            fprintf(stderr,
+                    "[skin] pobj@0x%X flags=0x%04X type=%u early-reject next=0x%X dispCount=%u\n",
+                    pobjArchiveOffset, flags, (flags >> 12) & 3u,
+                    nextOffset, serializedDisplayCount);
+        }
         return FALSE;
     }
 
@@ -1244,11 +1282,20 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
         }
 
         if ((parsedVerts[entryCount].attr != GX_VA_POS &&
+             parsedVerts[entryCount].attr != GX_VA_NRM &&
              parsedVerts[entryCount].attr != GX_VA_CLR0 &&
              parsedVerts[entryCount].attr != GX_VA_TEX0 &&
              parsedVerts[entryCount].attr != GX_VA_TEX1) ||
             GetIndexByteCount(parsedVerts[entryCount].attr_type) == 0 ||
             parsedVerts[entryCount].stride == 0) {
+            if (getenv("PCPORT_SKIN_DEBUG") != NULL) {
+                fprintf(stderr,
+                        "[skin] pobj@0x%X flags=0x%04X type=%u reject attr=%u attr_type=%u stride=%u\n",
+                        pobjArchiveOffset, flags, (flags >> 12) & 3u,
+                        parsedVerts[entryCount].attr,
+                        parsedVerts[entryCount].attr_type,
+                        parsedVerts[entryCount].stride);
+            }
             PCPort_DestroyTranslatedPObj(outPObj);
             return FALSE;
         }
@@ -1287,6 +1334,9 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
         switch (outPObj->verts[i].attr) {
         case GX_VA_POS:
             usedCount = stats.maxPosIndex + 1u;
+            break;
+        case GX_VA_NRM:
+            usedCount = stats.maxNormalIndex + 1u;
             break;
         case GX_VA_CLR0:
             usedCount = stats.maxColorIndex + 1u;
@@ -1549,8 +1599,18 @@ static BOOL TranslateTextureFromArchiveCommon(const PCPortHSDArchive* archive,
     tlutOffset = ReadBE32(archive->storage + tobjArchiveOffset + 0x50);
     outTexture->tevArchiveOffset = tevOffset;
 
-    if (tlutOffset != 0u ||
-        outTexture->width == 0u || outTexture->height == 0u ||
+    /* tobj+0x50 points at an HSD TlutDesc (NOT the palette data directly):
+     *   { u32 lutDataOffset@0x00; u32 fmt@0x04 (GXTlutFmt);
+     *     u32 name@0x08; u16 n_entries@0x0C }
+     * Capture it so palettized (CI4/CI8) textures can be decoded. */
+    if (tlutOffset != 0u && IsArchiveRangeValid(archive, tlutOffset, 0x10u)) {
+        outTexture->tlutArchiveOffset =
+            ReadBE32(archive->storage + tlutOffset + 0x00);
+        outTexture->tlutFmt = ReadBE32(archive->storage + tlutOffset + 0x04);
+        outTexture->tlutEntries = ReadBE16(archive->storage + tlutOffset + 0x0C);
+    }
+
+    if (outTexture->width == 0u || outTexture->height == 0u ||
         (tevOffset != 0u && !IsArchiveRangeValid(archive, tevOffset, 1u)) ||
         !IsArchiveRangeValid(archive, imageDataOffset, 1u)) {
         return FALSE;
@@ -1738,6 +1798,9 @@ static BOOL DecodeTextureToRGBA(const PCPortHSDArchive* archive,
                                 u8** outPixels,
                                 u32* outSize) {
     GXDecodedTexture decoded;
+    const void* tlutData = NULL;
+    GXTlutFmt tlutFmt = GX_TL_IA8;
+    u16 tlutEntries = 0u;
 
     if (outPixels == NULL || outSize == NULL) {
         return FALSE;
@@ -1752,14 +1815,24 @@ static BOOL DecodeTextureToRGBA(const PCPortHSDArchive* archive,
         return FALSE;
     }
 
+    /* Palettized (CI4/CI8) textures carry a TLUT (palette). Point the decoder
+     * at the captured palette data so the index->RGBA lookup resolves; for
+     * non-palettized formats the TLUT args stay NULL/0. */
+    if (texture->tlutArchiveOffset != 0u &&
+        IsArchiveRangeValid(archive, texture->tlutArchiveOffset, 1u)) {
+        tlutData = archive->storage + texture->tlutArchiveOffset;
+        tlutFmt = (GXTlutFmt)texture->tlutFmt;
+        tlutEntries = texture->tlutEntries;
+    }
+
     memset(&decoded, 0, sizeof(decoded));
     if (gx_texture_decode(archive->storage + texture->imageDataArchiveOffset,
                           texture->width,
                           texture->height,
                           (GXTexFmt)texture->format,
-                          NULL,
-                          GX_TL_IA8,
-                          0,
+                          tlutData,
+                          tlutFmt,
+                          tlutEntries,
                           &decoded) != 0 ||
         decoded.data == NULL ||
         decoded.isCompressed != 0u) {
@@ -1837,35 +1910,36 @@ BOOL PCPort_BakeTextureRGBAFromArchiveBE(const PCPortHSDArchive* archive,
         return FALSE;
     }
 
-    if (texture->tev.kind == PCPORT_TRANSLATED_TEV_NONE &&
-        texture->tevArchiveOffset == 0u) {
-        return DecodeTextureToRGBA(archive, texture, outPixels, outSize);
+    /* I8 colour-ramp TEV: bake the ramp into RGBA. */
+    if (texture->tev.kind == PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP &&
+        texture->format == GX_TF_I8) {
+        totalSize = (u32)texture->width * (u32)texture->height * 4u;
+        if (totalSize == 0u) {
+            return FALSE;
+        }
+
+        pixels = (u8*)malloc((size_t)totalSize);
+        if (pixels == NULL) {
+            return FALSE;
+        }
+
+        DecodeI8RampTexture(archive->storage + texture->imageDataArchiveOffset,
+                            texture->width,
+                            texture->height,
+                            texture->tev.rampLight,
+                            texture->tev.rampDark,
+                            pixels);
+        *outPixels = pixels;
+        *outSize = totalSize;
+        return TRUE;
     }
 
-    if (texture->tev.kind != PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP ||
-        texture->format != GX_TF_I8) {
-        return FALSE;
-    }
-
-    totalSize = (u32)texture->width * (u32)texture->height * 4u;
-    if (totalSize == 0u) {
-        return FALSE;
-    }
-
-    pixels = (u8*)malloc((size_t)totalSize);
-    if (pixels == NULL) {
-        return FALSE;
-    }
-
-    DecodeI8RampTexture(archive->storage + texture->imageDataArchiveOffset,
-                        texture->width,
-                        texture->height,
-                        texture->tev.rampLight,
-                        texture->tev.rampDark,
-                        pixels);
-    *outPixels = pixels;
-    *outSize = totalSize;
-    return TRUE;
+    /* Any other texture (no TEV, or a generic non-ramp TEV stage) is a plain
+     * sampled texture: decode its native GX format directly. The pipeline's
+     * tevMode (REPLACE/PASS/MODULATE) applies the colour blend, so a non-NULL
+     * TEV node here is NOT a reason to fall back to a flat material -- that is
+     * what left the RGBA8/palettized ground/ruins nodes rendering gray. */
+    return DecodeTextureToRGBA(archive, texture, outPixels, outSize);
 }
 
 BOOL PCPort_BakeTextureExpRGBAFromArchiveBE(const PCPortHSDArchive* archive,
