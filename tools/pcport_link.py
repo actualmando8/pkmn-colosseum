@@ -39,6 +39,8 @@ LIBS = [
 BOOT = ["src/pcport/pcport_main.c", "src/pcport/gs_gfx_host_support.c",
         "src/pcport/real_content_host.c", "src/pcport/hsd_host.c",
         "src/pcport/thp_player.c",
+        "src/pcport/os_thread_host.c", "src/pcport/engine_host.c",
+        "src/pcport/engine_spike.c",
         "src/dolphin/vi/VI.c",
         "src/dolphin/os/OSStateFlags.c", "src/trk/TRKUtil.c",
         "src/hsd/hsd_pobj_disp.c", "src/game/gs_gfx.c", "src/game/gs_render.c"]

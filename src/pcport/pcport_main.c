@@ -33,6 +33,9 @@ extern void GSgfxInit(unsigned int memSize, unsigned int fifoSize,
                       unsigned int numBufs, unsigned int dlSize);
 extern void GSgfx_BeginFrame(void);
 extern void GSgfxSwapBuffers(unsigned int flag);
+/* P-A engine-fibre spike (engine_spike.c). */
+extern int RunFibreSelfTest(void);
+extern int RunEngineSpike(GLFWwindow* window);
 extern unsigned int GSgfxGetFrameCount(void);
 extern unsigned int GSgfxHostGetPreRetraceCount(void);
 extern unsigned char GSgfxHostGetDrawDoneFlag(void);
@@ -6581,6 +6584,7 @@ int main(int argc, char** argv) {
     int runGsGfxSmoke;
     int runWindowSmoke;
     int runMenu;
+    int runEngine;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -6607,6 +6611,7 @@ int main(int argc, char** argv) {
     runGXPrimitiveSmoke = HasArg(argc, argv, "--gx-primitive-smoke");
     runGXScissorSmoke = HasArg(argc, argv, "--gx-scissor-smoke");
     runMenu = HasArg(argc, argv, "--menu");
+    runEngine = HasArg(argc, argv, "--engine");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
 
@@ -6618,6 +6623,12 @@ int main(int argc, char** argv) {
      * stb_image in the host build. */
     if (HasArg(argc, argv, "--thp-smoke")) {
         return RunTHPSmoke() ? 0 : 1;
+    }
+
+    /* P-A spike: headless cooperative-fibre scheduler self-test. No window/GL —
+     * proves the fn_800F0308 vsync-yield semantics run natively on host fibres. */
+    if (HasArg(argc, argv, "--fibre-test")) {
+        return RunFibreSelfTest() ? 0 : 1;
     }
 
     if (runWindowSmoke || runGsGfxSmoke || runRealContentParserSmoke ||
@@ -6633,7 +6644,7 @@ int main(int argc, char** argv) {
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
-        runMenu || argc <= 1) {
+        runMenu || runEngine || argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
             return 1;
@@ -6826,6 +6837,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
+    } else if (runEngine) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --engine requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunEngineSpike(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
     } else if (runMenu || window != NULL) {
         if (window == NULL) {
             fprintf(stderr,
