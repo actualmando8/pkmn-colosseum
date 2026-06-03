@@ -23,10 +23,10 @@ obtain:
 
 1. **An original Pokémon Colosseum disc image** (`GC6E01.iso` or `.gcm`).
    Place under `orig/GC6E01/`.
-2. **Metrowerks CodeWarrior for GameCube 1.3** (`mwcceppc.exe`). The Docker
-   image fetches the publicly mirrored bundle from `files.decomp.dev`. If
-   you build outside Docker, drop the toolchain under
-   `tools/mwcc_compiler/`.
+2. **Metrowerks CodeWarrior for GameCube** — `configure.py` downloads the
+   publicly mirrored compiler bundle from `files.decomp.dev` to `build/compilers`
+   automatically (the binaries are copyrighted and not committed). `decomp-toolkit`
+   is vendored at `tools/dtk.exe`.
 
 Without both, only `compile_check.py` works — the match% step needs the
 extracted target objects.
@@ -44,21 +44,25 @@ See [`docker/README.md`](docker/README.md) for details.
 ## Quick start (Windows, native)
 
 ```powershell
-# 1. Extract orig disc with dtk (not included)
-# 2. Place mwcceppc.exe under tools/mwcc_compiler/GC/1.3/
-python configure.py
-ninja
-python tools/progress.py
+# 1. Extract your orig disc to orig/GC6E01/ (dtk; not included)
+python configure.py            # auto-downloads dtk + the Metrowerks compilers to build/ (gitignored)
+ninja                          # split -> build -> link -> verify SHA-1 (reproduces main.dol byte-exact)
+python configure.py progress   # match% report
 ```
+
+The build follows the canonical [dtk-template](https://github.com/encounter/dtk-template)
+pipeline: decomp-toolkit splits your DOL into objects, matching C objects are
+substituted where declared, and the result is checked against `config/GC6E01/build.sha1`.
 
 ## Repository layout
 
 ```
-src/            C source — match targets
+src/            C source — the game's own decompiled C (match targets)
+pcport/         Ship-of-Harkinian-style native PC port (separate build; not the DOL)
 include/        Headers
-asm/            Unconverted assembly (shrinks over time)
-config/GC6E01/  Symbol map, splits, linker script
-build/          Output (gitignored)
+config/GC6E01/  config.yml, symbols.txt, splits, build.sha1
+build/          Output incl. regenerated asm + downloaded compilers (gitignored)
+asm/            Per-function disassembly — local only, gitignored (regenerate from your ROM)
 tools/          Build, diff, and match utilities
   progress.py            Per-file match% report
   decompctx.py           Flatten includes → ctx.c for decomp.me
