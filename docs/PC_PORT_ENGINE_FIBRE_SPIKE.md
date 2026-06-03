@@ -433,6 +433,23 @@ didn't translate so a default look-at is used (`PCPORT_CAM_EYE`/`_INT` tune it;
 then the WZX collision mesh + player update for actual walking (`gs_field_colquery`/
 `gs_colsys` cluster) — the first truly *playable* milestone.
 
+## 6i. P-C step 2 — interactive field exploration (free-fly camera) (2026-06-03)
+
+`--field` is now **interactive**: a free-fly camera you steer through the loaded map.
+Per frame it `PADRead`s the pad shim (GLFW keyboard) and updates a yaw/pitch + eye
+camera: W/S forward, A/D strafe (main stick = WASD), arrow keys turn/look (d-pad),
+C-stick (IJKL) looks, Z(=A) rise / X(=B) sink; the look-at view matrix is rebuilt and
+fed to the same `RenderJointTree` render. `PCPORT_FIELD_AUTOPAN=1` drifts the camera
+forward + pans for headless verification (verified: eye 0,90,330 -> 44,72,190, yaw
+0->0.60 over 50 frames, the dump showing a new in-room viewpoint). `PCPORT_CAM_EYE`
+sets the start position; `PCPORT_FIELD_ARCHIVE` picks the map.
+
+This makes the first overworld map **explorable** — the bridge from "renders" to
+"walkable". Only `RunFieldScene` changed (field-only; `--menu`/`--sched-test`/
+`--engine-boot` untouched). **Next:** a player avatar + the WZX collision mesh so
+movement is floor-clamped and wall-blocked (real walking), via the
+`gs_field_colquery`/`gs_colsys` cluster.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,

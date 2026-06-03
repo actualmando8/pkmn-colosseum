@@ -6792,7 +6792,14 @@ static int RunFieldScene(GLFWwindow* window) {
     const char* dumpPath = getenv("PCPORT_DUMP");
     int frameCap = (capEnv != NULL && atoi(capEnv) > 0) ? atoi(capEnv) : 0;
     int frame = 0;
+    int autopan = getenv("PCPORT_FIELD_AUTOPAN") != NULL;
     char path[512];
+    PADStatus pads[4];
+    /* Free-fly camera state. yaw=0 looks toward -Z (into the room). */
+    f32 eye[3] = { 0.0f, 90.0f, 300.0f };
+    f32 yaw = 0.0f, pitch = -0.12f;
+    const f32 MOVE = 5.0f, TURN = 0.035f, LOOK = 0.045f;
+    const f32 up[3] = { 0.0f, 1.0f, 0.0f };
 
     if (archive == NULL || archive[0] == '\0') {
         archive = "orig/GC6E01/disc/files/D1_garage_1F.fsys";
@@ -6806,13 +6813,59 @@ static int RunFieldScene(GLFWwindow* window) {
         return 0;
     }
 
+    { /* optional initial eye placement */
+        const char* ce = getenv("PCPORT_CAM_EYE");
+        if (ce != NULL) sscanf(ce, "%f,%f,%f", &eye[0], &eye[1], &eye[2]);
+    }
+    memset(pads, 0, sizeof(pads));
+    printf("[field] interactive free-fly: W/S forward, A/D strafe (sticks), arrows turn/look, "
+           "Z=A rise / X=B sink. Close window to quit.%s\n",
+           autopan ? " [AUTOPAN]" : "");
+
     while (!glfwWindowShouldClose(window)) {
-        VIWaitForRetrace_PC();
+        f32 fwd[3], right[3], interest[3], mv, st, sx, sy;
+        u16 btn;
+
+        VIWaitForRetrace_PC();          /* pumps glfwPollEvents -> fresh key state */
+        PADRead(pads);
+        btn = pads[0].button;
+        sx = (f32)pads[0].stickX / 112.0f;   /* A/D */
+        sy = (f32)pads[0].stickY / 112.0f;   /* W/S */
+
+        if (autopan) { sy = 0.6f; yaw += 0.012f; }  /* headless: drift forward + pan */
+
+        if (btn & GCN_PAD_BUTTON_LEFT)  yaw   -= TURN;
+        if (btn & GCN_PAD_BUTTON_RIGHT) yaw   += TURN;
+        if (btn & GCN_PAD_BUTTON_UP)    pitch += LOOK;
+        if (btn & GCN_PAD_BUTTON_DOWN)  pitch -= LOOK;
+        yaw   += (f32)pads[0].substickX / 112.0f * LOOK;   /* C-stick (IJKL) looks */
+        pitch += (f32)pads[0].substickY / 112.0f * LOOK;
+        if (pitch >  1.4f) pitch =  1.4f;
+        if (pitch < -1.4f) pitch = -1.4f;
+
+        fwd[0] =  sinf(yaw) * cosf(pitch);
+        fwd[1] =  sinf(pitch);
+        fwd[2] = -cosf(yaw) * cosf(pitch);
+        right[0] = cosf(yaw); right[1] = 0.0f; right[2] = sinf(yaw);
+
+        mv = sy * MOVE; st = sx * MOVE;
+        eye[0] += fwd[0] * mv + right[0] * st;
+        eye[1] += fwd[1] * mv;
+        eye[2] += fwd[2] * mv + right[2] * st;
+        if (btn & GCN_PAD_BUTTON_A) eye[1] += MOVE;
+        if (btn & GCN_PAD_BUTTON_B) eye[1] -= MOVE;
+
+        interest[0] = eye[0] + fwd[0];
+        interest[1] = eye[1] + fwd[1];
+        interest[2] = eye[2] + fwd[2];
+        BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
+
         PCPort_EngineTitleRenderFrame();   /* same scene_data -> RenderJointTree path */
         if (dumpPath != NULL && dumpPath[0] != '\0' &&
             (frameCap > 0 ? frame == frameCap - 1 : frame == 2)) {
             DumpBackbufferTo(dumpPath);
-            printf("[field] dumped frame %d to %s\n", frame, dumpPath);
+            printf("[field] dumped frame %d (eye=%.0f,%.0f,%.0f yaw=%.2f) to %s\n",
+                   frame, eye[0], eye[1], eye[2], yaw, dumpPath);
         }
         GSgfxSwapBuffers(0);
         frame++;
@@ -6820,7 +6873,8 @@ static int RunFieldScene(GLFWwindow* window) {
             break;
         }
     }
-    printf("[field] rendered %d frames\n", frame);
+    printf("[field] explored %d frames (final eye=%.0f,%.0f,%.0f yaw=%.2f)\n",
+           frame, eye[0], eye[1], eye[2], yaw);
     return 1;
 }
 
