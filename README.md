@@ -2,9 +2,6 @@
 
 [![Progress](https://decomp.dev/dougchansan/pkmn-colosseum.svg)](https://decomp.dev/dougchansan/pkmn-colosseum)
 
-> The progress badge activates once the repo is registered at
-> [decomp.dev/manage/new](https://decomp.dev/manage/new).
-
 A work-in-progress matching decompilation of the GameCube game **Pokémon
 Colosseum** (NTSC-U: `GC6E01`). The goal is byte-identical reproduction of the
 original `main.dol` from C source, using the same Metrowerks CodeWarrior
