@@ -51,6 +51,9 @@ HSD_CLEAN = ["hsd_fobj", "hsd_mobj_ext", "hsd_mtx", "hsd_pobj", "hsd_pobj_ext",
 HSD_GEN = ["hsd_dobj", "hsd_jobj", "hsd_mobj", "hsd_aobj", "hsd_lobj", "hsd_object",
            "hsd_class", "hsd_initialize", "hsd_wobj", "hsd_displayfunc",
            "hsd_render", "hsd_memory_ext", "hsd_util", "hsd_jobj_display", "hsd_cobj"]
+# Real game TUs compiled through pcport_gen (conflict fixes) — rel path under src/
+# (and build_pc/gen/), no .c. Track-D: host-link real engine code under the scheduler.
+GAME_GEN = ["game/battle/battle_main"]
 
 
 def compile_one(src, name):
@@ -61,7 +64,8 @@ def compile_one(src, name):
 
 
 def gen_hsd():
-    srcs = [f"src/hsd/{n}.c" for n in HSD_GEN]
+    srcs = ([f"src/hsd/{n}.c" for n in HSD_GEN] +
+            [f"src/{n}.c" for n in GAME_GEN])
     subprocess.run([sys.executable, "tools/pcport_gen.py", "--out-dir", "build_pc/gen", *srcs],
                    cwd=ROOT, capture_output=True)
 
@@ -111,6 +115,9 @@ def main():
         (objs.append(o) if o else failed.append((n, err)))
     for n in HSD_GEN:
         o, err = compile_one(GEN / f"hsd/{n}.c", n)
+        (objs.append(o) if o else failed.append((n, err)))
+    for n in GAME_GEN:
+        o, err = compile_one(GEN / f"{n}.c", Path(n).stem)
         (objs.append(o) if o else failed.append((n, err)))
     objs = [o for o in objs if o]
     print(f"compiled {len(objs)} objects; {len(failed)} failed to compile: "

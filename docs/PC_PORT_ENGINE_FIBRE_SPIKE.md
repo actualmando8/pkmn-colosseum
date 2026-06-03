@@ -289,6 +289,41 @@ inc1+inc2 already prove the scheduler + real *render* code run under host contro
 inc3 establishes that real *game-mode logic* is a Track-D march, not a single wiring
 step, and lays the `fn_800F0308` rail for it.
 
+## 6d. Track-D #1+#2 — a real engine function runs under the scheduler (2026-06-02)
+
+Executed the first two Track-D worklist items from §6c.
+
+**#1 — `battle_main.c` is now host-linked.** It is 100% C-active; the 6 conflicts
+were resolved in `pcport_gen.py` (no source edits — the generated copy only):
+- `fn_801659FC`/`fn_80165A20` → `FUNC_PROTO_KR` (arg-type-only conflict; K&R `()` is
+  compatible with the comment-bearing file-scope prototype + the 3-arg call sites).
+- `fn_80129280` → `FUNC_PROTO_RETYPE` to `void* fn_80129280()` (both decls disagreed
+  on return *and* args; K&R-args with one return unifies the 0-arg and 2-arg calls).
+- `fn_801EF634` → `FUNC_STUB_DROP` (redundant `void ()` stub clashing with the real
+  `u16 fn_801EF634(void)` definition that precedes it).
+- `fn_800D3088` + `lbl_80375CC8` → `TEXT_FIXUPS` (their file-scope decls carry
+  trailing comments, so the declaration regexes skip them; fixed textually —
+  `fn_800D3088` void→u32 return, `lbl_80375CC8` `void*`→`u8[]` data-object form).
+A new `GAME_GEN` list in `pcport_link.py` runs it through `pcport_gen` and compiles
+it. Link converges (undefs 187→259, all auto-stubbed); `--menu`/`--sched-test`/
+`--engine-boot` unaffected.
+
+**#2 — the real `fn_801EF644` (title attract-demo init) runs under the host
+scheduler.** With `PCPORT_REAL_TITLE_INIT=1`, `--engine-boot`'s main thread calls
+the **real decompiled `fn_801EF644(-1)`** (mirroring the title thread `fn_8002058C`)
+instead of the stand-in init. It executes and returns cleanly — **real engine code
+running on the host GStask/GSthread cooperative scheduler, with its `fn_800F0308`
+yields routed through `GSthreadYield`**. As predicted it is a no-op on host (its demo
+table `lbl_803752A0` + count `lbl_80478D10` auto-stub to zero), so it returns at the
+count check without entering the demo loop — but it proves the real function executes
+under the scheduler without crashing, and that the whole `battle_main.c` surface is
+host-callable.
+
+**Next (Track-D #2 stretch / #3):** boot the demo-table data (`lbl_80478D10`/
+`lbl_803752A0` — from the real `.data`/registration path) so `fn_801EF644` drives an
+actual attract demo rather than no-op; then `gs_model.c` + the `fn_80175F6C`
+world-render TU for the real `TaskVBlank`.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,

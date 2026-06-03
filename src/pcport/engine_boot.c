@@ -240,10 +240,25 @@ static void BootTaskMain(u32 taskId, void* param) {
     /* (real: debug-menu check, save/card state, particles, sound) */
 }
 
+/* Real engine title-init (battle_main.c, now host-linked via pcport_gen). KR decl
+ * so we can call it as the real title thread does: fn_801EF644(-1). */
+extern void fn_801EF644();
+
 /* Main thread — mirrors GameMainLoop (fn_80005AAC) / the title thread
- * fn_8002058C: an init slice, then cooperatively yield every frame. */
+ * fn_8002058C: `fn_801EF644(-1); for(;;) fn_800F0308();`. With PCPORT_REAL_TITLE_INIT
+ * the init slice runs the REAL decompiled fn_801EF644 under the host scheduler (its
+ * yields route through fn_800F0308 == GSthreadYield); on host its demo table
+ * (lbl_803752A0/count lbl_80478D10) is zero so it returns immediately — proving the
+ * real engine function EXECUTES under the scheduler without crashing. Default keeps
+ * the stand-in init. */
 static void BootMainThread(void) {
-    printf("[boot] main thread: init slice (stand-in for GameMainLoop)\n");
+    if (getenv("PCPORT_REAL_TITLE_INIT") != NULL) {
+        printf("[boot] main thread: calling REAL fn_801EF644(-1) (title init) under the scheduler\n");
+        fn_801EF644(-1);
+        printf("[boot] main thread: REAL fn_801EF644 returned (host demo table empty -> no-op, no crash)\n");
+    } else {
+        printf("[boot] main thread: init slice (stand-in for GameMainLoop)\n");
+    }
     for (;;) {
         g_mainThreadWork++;
         GSthreadYield();   /* == fn_800F0308 */

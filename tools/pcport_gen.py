@@ -71,6 +71,13 @@ EXTERN_UNIFY = {
 # site is accepted. `-Wstrict-prototypes` on `()` is a warning, silenced by -w.
 # Map: rel-path -> set of function names to neutralize to K&R prototypes.
 FUNC_PROTO_KR = {
+    "game/battle/battle_main.c": {
+        # Block-scoped decls re-type the args (u32,u32,u32) vs the file-scope
+        # prototypes' (s32,s32,s32); same void return. K&R `()` is compatible with
+        # the surviving (comment-bearing, regex-skipped) file-scope prototype, and
+        # accepts the 3-arg call sites. (sndPlay-with-fade / sndFade.)
+        "fn_801659FC", "fn_80165A20",
+    },
     "hsd/hsd_cobj.c": {
         # fn_80196E10 is the assert helper: callers pass the file/expr labels
         # inconsistently as `&lbl` (char(*)[]) and bare `lbl` (char*). No single data
@@ -91,6 +98,13 @@ FUNC_PROTO_KR = {
 # names are verified to have a surviving typed decl/definition in the same TU.
 # Map: rel-path -> set of function names whose arg-less stub prototypes are dropped.
 FUNC_STUB_DROP = {
+    "game/battle/battle_main.c": {
+        # fn_801EF634 has a real DEFINITION `u16 fn_801EF634(void)` (line 431) that
+        # precedes this redundant block-scoped `extern void fn_801EF634();` stub
+        # (line 828) and all its call sites; the void-return stub clashes with the
+        # u16 definition. Dropping it leaves the in-scope definition.
+        "fn_801EF634",
+    },
     "hsd/hsd_cobj.c": {
         "fn_801C25E4", "fn_801C2670", "fn_80191DCC", "fn_80191E88",
         "fn_800BD640", "fn_800BD744",
@@ -105,6 +119,14 @@ FUNC_STUB_DROP = {
 # match the real definition's signature so the forward decl and definition agree.
 # Map: rel-path -> { fn_name: canonical_prototype_without_trailing_semicolon }.
 FUNC_PROTO_RETYPE = {
+    "game/battle/battle_main.c": {
+        # Two block-scoped decls disagree on BOTH return and args: `void
+        # fn_80129280()` (line 485, called 0-arg) vs `void* fn_80129280(u32,u32)`
+        # (line 543, called as fn_80129280(0,0xF) with the result used). Retype both
+        # to the K&R-args `void* fn_80129280()`: a single consistent return (void*)
+        # with unspecified params, so BOTH the 0-arg and 2-arg call sites compile.
+        "fn_80129280": "void* fn_80129280()",
+    },
     "hsd/hsd_cobj.c": {
         # Referenced at file scope as `(u8*)fn_80196C54` before its definition; the def is
         # `void fn_80196C54(int, f32, f32, f32, f32, f32, f32)`. The `(void)` stub clashed
@@ -120,6 +142,20 @@ FUNC_PROTO_RETYPE = {
 # generated copy; the original byte-match source is never touched.
 # Map: rel-path -> list of (old, new) pairs.
 TEXT_FIXUPS = {
+    "game/battle/battle_main.c": [
+        # The file-scope `fn_800D3088` decl (line 79) has a void return but its
+        # block-scoped re-decl (line 1223) + call site (`i += fn_800D3088()`) use a
+        # u32 return. Line 79's trailing comment makes it regex-invisible to RETYPE,
+        # so fix the return here. Unique prefix (line 1223 is `extern u32 ...`).
+        ("extern void fn_800D3088(void);", "extern u32 fn_800D3088(void);"),
+        # The scene render table is a real data OBJECT: the code uses both
+        # `&lbl_80375CC8` (the table address) and `(u32)lbl_80375CC8`. The array
+        # form makes both correct (lbl == &lbl == table addr); the decomp's lone
+        # `void*` decl (line 324) was wrong. Its trailing comment makes it
+        # regex-invisible to EXTERN_UNIFY, so fix it textually (the block-scoped
+        # `extern u8 lbl_80375CC8[];` at line 817 already agrees).
+        ("extern void* lbl_80375CC8;", "extern u8 lbl_80375CC8[];"),
+    ],
     "hsd/hsd_jobj_display.c": [
         # Dead 0-arg call (after an unconditional `return`) to the clang builtin `memset`,
         # whose fixed 3-arg proto rejects it ("too few arguments"). Neutralize to a no-op.
