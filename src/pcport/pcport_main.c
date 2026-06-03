@@ -6609,6 +6609,11 @@ static PCPortHSDArchive       g_engTitleArchive;
 static PCPortTranslatedCamera g_engTitleCamera;
 static u32  g_engTitleRootJoint;
 static int  g_engTitleReady;
+/* Field mode: GSgfx_BeginFrame paints a green EFB clear-quad that, on a sparse field
+ * map, shows through where geometry doesn't cover (the title covers it with its sky/
+ * ground). In field mode we re-clear to a chosen background AFTER GSgfx_BeginFrame. */
+static int  g_engFieldMode;
+static f32  g_engFieldBg[3] = { 0.04f, 0.05f, 0.08f }; /* near-black; PCPORT_FIELD_BG overrides */
 
 int PCPort_EngineTitleSetup(void) {
     u8* memberData = NULL;
@@ -6624,6 +6629,7 @@ int PCPort_EngineTitleSetup(void) {
     if (g_engTitleReady) {
         return 1;
     }
+    g_engFieldMode = 0;   /* title covers the screen; keep the engine's own clear */
     memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
     memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
 
@@ -6693,6 +6699,13 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
     int haveCam = 0;
 
     g_engTitleReady = 0;
+    g_engFieldMode = 1;   /* re-clear GSgfx_BeginFrame's green EFB quad to the bg */
+    {
+        const char* bg = getenv("PCPORT_FIELD_BG");
+        if (bg != NULL) {
+            sscanf(bg, "%f,%f,%f", &g_engFieldBg[0], &g_engFieldBg[1], &g_engFieldBg[2]);
+        }
+    }
     memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
     memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
 
@@ -6888,6 +6901,11 @@ void PCPort_EngineTitleRenderFrame(void) {
     /* Same per-frame 3D sequence RunMenuScene uses for the title scene. */
     ClearBackbuffer(0.0f, 0.0f, 0.0f);
     GSgfx_BeginFrame();
+    /* Field maps don't cover the whole screen, so wipe GSgfx_BeginFrame's green EFB
+     * clear-quad to the chosen background before the geometry draws. */
+    if (g_engFieldMode) {
+        ClearBackbuffer(g_engFieldBg[0], g_engFieldBg[1], g_engFieldBg[2]);
+    }
 
     GXSetViewport((f32)g_engTitleCamera.viewportLeft,
                   (f32)g_engTitleCamera.viewportTop,

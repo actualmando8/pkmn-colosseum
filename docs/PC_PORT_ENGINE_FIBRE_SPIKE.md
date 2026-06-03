@@ -444,9 +444,19 @@ forward + pans for headless verification (verified: eye 0,90,330 -> 44,72,190, y
 0->0.60 over 50 frames, the dump showing a new in-room viewpoint). `PCPORT_CAM_EYE`
 sets the start position; `PCPORT_FIELD_ARCHIVE` picks the map.
 
+**Green background fixed.** `GSgfx_BeginFrame` (the real engine setup) paints a green
+EFB clear-quad (RGB 48,213,94) that the title covers with its sky/ground but a sparse
+field map doesn't — so it showed through. Since `src/game` is read-only, field mode
+(`g_engFieldMode`, set by `PCPort_EngineFieldSetup`) now **re-clears to a chosen
+background AFTER `GSgfx_BeginFrame`** (default near-black; `PCPORT_FIELD_BG="r,g,b"`
+overrides). The map now renders on a clean dark background (corner px 10,13,20 vs the
+old 48,213,94); the title path (`g_engFieldMode==0`) is untouched.
+
 This makes the first overworld map **explorable** — the bridge from "renders" to
-"walkable". Only `RunFieldScene` changed (field-only; `--menu`/`--sched-test`/
-`--engine-boot` untouched). **Next:** a player avatar + the WZX collision mesh so
+"walkable". Only the field path changed (`--menu`/`--sched-test`/`--engine-boot`
+untouched). Remaining field cosmetic: textures/materials still read washed-out (the
+material/TEV path doesn't fully apply on the map — same class as the title's tan-on-tan).
+**Next:** a player avatar + the WZX collision mesh so
 movement is floor-clamped and wall-blocked (real walking), via the
 `gs_field_colquery`/`gs_colsys` cluster.
 
