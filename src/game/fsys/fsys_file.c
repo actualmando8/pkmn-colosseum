@@ -728,12 +728,45 @@ void fn_8017B2CC(void) { /* TODO */ }
 /* 0x8017B448 | 0x74 */
 extern u32 lbl_8047B1B4;
 extern u8 lbl_80453FEC[];
-#if 1
+#if 0
 asm void fn_8017B448(void) {
 #include "src/game/fsys/fsys_file_fn_8017B448.inc"
 }
 #else
-void fn_8017B448(void) { /* TODO: match -- 116 bytes at 0x8017B448 */ }
+typedef struct fn8017B448_Node {
+    u8 _pad00[0x40];
+    u32* field40;   /* 0x40 -> ptr, deref +0xc */
+    u8 _pad44[0x48 - 0x44];
+    s32 field48;    /* 0x48 */
+    u8 _pad4c[0x5c - 0x4c];
+    s32 field5c;    /* 0x5c */
+    u8 _pad60[0xf8 - 0x60];
+    u32 fieldf8;    /* 0xf8 */
+} fn8017B448_Node;
+#define COUNT_8017B448 (*(volatile u32*)lbl_80453FEC)
+#pragma push
+#pragma optimization_level 0
+s32 fn_8017B448(u32 handle) {
+    u32 i;
+    fn8017B448_Node* node;
+    s32 value;
+    u32* ptr;
+    s32 result;
+
+    node = (fn8017B448_Node*)lbl_8047B1B4;
+    for (i = 0; i < COUNT_8017B448; node = (fn8017B448_Node*)((u8*)node + 0x140), i++) {
+        if (node->field48 != 0 && node->fieldf8 == handle && node->field5c != 0) {
+            ptr = node->field40;
+            value = ptr[3];
+            goto done;
+        }
+    }
+    value = -1;
+done:
+    result = value;
+    return result;
+}
+#pragma pop
 #endif
 
 /* 0x8017B4BC | 0xE8 */

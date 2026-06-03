@@ -555,7 +555,7 @@ void* fn_8017F3F8(u32 a, u32 b, u32 size) {
 #endif
 
 /* 0x8017F484 | 0x230 */
-extern void fn_8017F6B4(void);
+extern void* fn_8017F6B4(u32 a, u32 b, u32 c);
 extern u16 fn_800E2B00(u32 size, u32 align);
 extern void fn_800F9210(u32 a, u32 b);
 extern void fn_8009ED4C(void* p, u32 size);
@@ -591,11 +591,13 @@ void* fn_8017F484(u32 a, u32 b, u32 size) {
  * Then fn_8009EFE4(block). Return 1.
  */
 extern void fn_8009EFE4(void* p);
-#if 1
+#if 0
 asm void fn_8017F6B4(void) {
 #include "src/game/fsys/fsys_load_fn_8017F6B4.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 0
 void* fn_8017F6B4(u32 a, u32 b, u32 c) {
     void* block;
     void* p;
@@ -603,12 +605,13 @@ void* fn_8017F6B4(u32 a, u32 b, u32 c) {
 
     block = fn_800F9318(b, c);
     p = block;
-    if (*(void(**)(void))((u8*)p + 0x38) != NULL) {
+    if (*(void(**)(void))((u8*)p + 0x38)) {
         (*(void(**)(void))((u8*)p + 0x38))();
     }
     fn_8009EFE4(p);
     return (void*)1;
 }
+#pragma pop
 #endif
 
 /* 0x8017F728 | 0x6C
@@ -744,7 +747,7 @@ u32 fn_8017FA5C(void) {
  * Async DVD read request: write r3 data (r4 user, r5 size) to queue.
  * Waits (spin-loop) for completion.
  */
-extern void fn_801808E4(void);
+extern void fn_801808E4(DVDQueueEntry* entry);
 extern void fn_800AE630(void* p1, void* p2, u32 a, u32 b, void* cb, void* arg, void* src, void* dst, u32 size);
 extern u32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32 saved);
@@ -984,19 +987,23 @@ u32 fn_801808B4(DVDQueueEntry* entry) {
  * Clears entry->state to 0.
  * Calls DCFlushRange(entry->srcPtr, entry->size).
  */
-#if 1
+#if 0
 asm void fn_801808E4(void) {
 #include "src/game/fsys/fsys_load_fn_801808E4.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 0
 void fn_801808E4(DVDQueueEntry* entry) {
-    entry->mode = 0;
-    if (entry->callback != NULL) {
-        entry->callback(entry->flag34, entry->callbackArg);
+    DVDQueueEntry* p = entry;
+    p->mode = 0;
+    if (p->callback) {
+        ((void (*)(u32, u32))p->callback)(p->flag34, p->callbackArg);
     }
-    entry->state = 0;
-    DCFlushRange(entry->srcPtr, entry->size);
+    p->state = 0;
+    DCFlushRange(p->srcPtr, p->size);
 }
+#pragma pop
 #endif
 
 /* 0x8018094C | 0x248 */
