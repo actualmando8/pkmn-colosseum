@@ -124,6 +124,8 @@ typedef struct GXTevShaderEntry {
     s32 loc_projMatrix;
     s32 loc_modelViewMatrix;
     s32 loc_normalMatrix;
+    s32 loc_lightDir;       /* u_lightDir: view-space directional sun */
+    s32 loc_lightAmbient;   /* u_lightAmbient: floor brightness for unlit faces */
     s32 loc_tex[8];
     s32 loc_tevColor[4];
     s32 loc_tevKonst[4];
@@ -198,6 +200,16 @@ void gx_tev_set_normal_matrix(const f32 m[3][4]);
  *                 full-bright (used for 2D overlays).
  */
 void gx_tev_set_lighting_enabled(int enabled);
+
+/**
+ * gx_tev_set_light_params -- Set the directional sun used by the lambert pass.
+ * @param dx,dy,dz  View-space light direction (need not be normalized; the
+ *                  shader normalizes). Larger horizontal (x/z) components carve
+ *                  more side-shadow into vertical faces (e.g. ruin columns).
+ * @param ambient   Floor brightness [0..1] applied to fully-unlit faces; lower
+ *                  = more contrast. Tunable live via PCPORT_LIGHT_DIR/_AMB.
+ */
+void gx_tev_set_light_params(f32 dx, f32 dy, f32 dz, f32 ambient);
 
 /**
  * gx_tev_set_tev_color -- Record a TEV color register (GX_TEVREG0..2 / PREV).

@@ -1001,6 +1001,14 @@ void GXHostClearTextureBinding(void);
  */
 void GXHostSetLightingEnabled(GXBool enabled);
 
+/**
+ * GXHostSetLightParams -- Host-only override of the directional sun used by the
+ * lambert pass. dx/dy/dz is the view-space light direction (normalized in the
+ * shader); ambient [0..1] is the floor brightness for unlit faces (lower = more
+ * 3D contrast). Lets the scene tune ruin-column shading; see PCPORT_LIGHT_*.
+ */
+void GXHostSetLightParams(f32 dx, f32 dy, f32 dz, f32 ambient);
+
 #ifdef __cplusplus
 }
 #endif

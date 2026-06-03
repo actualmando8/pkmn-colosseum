@@ -73,6 +73,8 @@ typedef struct {
     f32 vertexAlphaScale;
 
     s32 lightingEnabled;   /* 1 = apply directional lambert; 0 = full bright */
+    f32 lightDir[3];       /* view-space sun direction (normalized in shader) */
+    f32 lightAmbient;      /* floor brightness for unlit faces [0..1] */
 } GXTevRenderState;
 
 static GXTevRenderState g_rs;
@@ -336,6 +338,8 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "uniform float u_alphaRef1;\n"
         "uniform int  u_alphaOp;\n"
         "uniform int  u_lightingEnabled;\n"
+        "uniform vec3 u_lightDir;\n"
+        "uniform float u_lightAmbient;\n"
         "\n"
         "in vec4 v_color0;\n"
         "in vec2 v_texcoord0;\n"
@@ -344,11 +348,6 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "in vec3 v_normal;\n"
         "\n"
         "out vec4 fragColor;\n"
-        "\n"
-        /* Hardcoded directional light (view space). A high front-ish key light;
-         * ambient keeps unlit faces from going fully black. */
-        "const vec3  c_lightDir     = normalize(vec3(0.3, 0.7, 0.6));\n"
-        "const float c_lightAmbient = 0.30;\n"
         "\n"
         "bool tevCompare(int comp, float val, float ref) {\n"
         "    if (comp == 0) return false;\n"        /* NEVER */
@@ -510,8 +509,9 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "        if (fl > 1e-6) {\n"
         "            faceN /= fl;\n"
         "            if (faceN.z < 0.0) faceN = -faceN;\n"  /* face the camera */
-        "            float ndl = max(0.0, dot(faceN, c_lightDir));\n"
-        "            float lambert = c_lightAmbient + (1.0 - c_lightAmbient) * ndl;\n"
+        "            vec3 L = normalize(u_lightDir);\n"
+        "            float ndl = max(0.0, dot(faceN, L));\n"
+        "            float lambert = u_lightAmbient + (1.0 - u_lightAmbient) * ndl;\n"
         "            fragColor.rgb *= lambert;\n"
         "        }\n"
         "    }\n"
@@ -586,6 +586,8 @@ static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
     entry->loc_projMatrix      = glGetUniformLocation(p, "u_projMatrix");
     entry->loc_modelViewMatrix = glGetUniformLocation(p, "u_modelViewMatrix");
     entry->loc_normalMatrix    = glGetUniformLocation(p, "u_normalMatrix");
+    entry->loc_lightDir        = glGetUniformLocation(p, "u_lightDir");
+    entry->loc_lightAmbient    = glGetUniformLocation(p, "u_lightAmbient");
 
     entry->loc_tex[0] = glGetUniformLocation(p, "u_tex0");
     entry->loc_tex[1] = glGetUniformLocation(p, "u_tex1");
@@ -644,6 +646,13 @@ void gx_tev_init(void) {
     g_rs.normalMatrix[0][0] = g_rs.normalMatrix[1][1] = g_rs.normalMatrix[2][2] = 1.0f;
     g_rs.vertexAlphaScale = 1.0f;
     g_rs.lightingEnabled = 0;
+    /* Default sun: from the upper-left-front, with strong horizontal (x/z) bite
+     * so vertical ruin faces split into lit/shadowed sides. Lower ambient than
+     * the old 0.30 flat fill so the 3D form reads. Tunable via PCPORT_LIGHT_*. */
+    g_rs.lightDir[0] = 0.55f;
+    g_rs.lightDir[1] = 0.50f;
+    g_rs.lightDir[2] = 0.55f;
+    g_rs.lightAmbient = 0.18f;
     g_rs.alphaComp0 = GX_ALWAYS;
     g_rs.alphaComp1 = GX_ALWAYS;
     g_rs.alphaOp = GX_AOP_AND;
@@ -814,6 +823,10 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
      *     lighting-enabled flag lives in loc_fogStart) --- */
     if (entry->loc_fogType >= 0) glUniform1f(entry->loc_fogType, g_rs.vertexAlphaScale);
     if (entry->loc_fogStart >= 0) glUniform1i(entry->loc_fogStart, g_rs.lightingEnabled);
+    if (entry->loc_lightDir >= 0)
+        glUniform3f(entry->loc_lightDir, g_rs.lightDir[0], g_rs.lightDir[1], g_rs.lightDir[2]);
+    if (entry->loc_lightAmbient >= 0)
+        glUniform1f(entry->loc_lightAmbient, g_rs.lightAmbient);
 }
 
 /* =========================================================================
@@ -834,6 +847,15 @@ void gx_tev_set_normal_matrix(const f32 m[3][4]) {
 
 void gx_tev_set_lighting_enabled(int enabled) {
     g_rs.lightingEnabled = enabled ? 1 : 0;
+}
+
+void gx_tev_set_light_params(f32 dx, f32 dy, f32 dz, f32 ambient) {
+    g_rs.lightDir[0] = dx;
+    g_rs.lightDir[1] = dy;
+    g_rs.lightDir[2] = dz;
+    if (ambient < 0.0f) ambient = 0.0f;
+    if (ambient > 1.0f) ambient = 1.0f;
+    g_rs.lightAmbient = ambient;
 }
 
 void gx_tev_set_tev_color(u32 id, u8 r, u8 g, u8 b, u8 a) {

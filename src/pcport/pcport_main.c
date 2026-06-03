@@ -4858,6 +4858,33 @@ typedef struct {
  * so flat-shaded geometry still renders and nothing aborts. Per-node baked
  * buffers are freed and the texture binding is cleared after every draw.
  */
+/* One-time env override of the directional sun used by scene lighting.
+ * PCPORT_LIGHT_DIR="x,y,z" (view space) and PCPORT_LIGHT_AMB=<0..1> tune the
+ * ruin-column shading without a rebuild; unset = the gx_tev built-in defaults. */
+static void PCPortApplyLightEnv(void) {
+    static int applied = 0;
+    const char* d;
+    const char* a;
+    if (applied) {
+        return;
+    }
+    applied = 1;
+    d = getenv("PCPORT_LIGHT_DIR");
+    a = getenv("PCPORT_LIGHT_AMB");
+    if (d != NULL || a != NULL) {
+        float dx = 0.55f, dy = 0.50f, dz = 0.55f, amb = 0.18f;
+        if (d != NULL) {
+            sscanf(d, "%f,%f,%f", &dx, &dy, &dz);
+        }
+        if (a != NULL) {
+            amb = (float)atof(a);
+        }
+        GXHostSetLightParams(dx, dy, dz, amb);
+        printf("[pcport_light] sun=(%.2f,%.2f,%.2f) ambient=%.2f\n",
+               dx, dy, dz, amb);
+    }
+}
+
 /* Cycle guard for RenderJointTree (see its body). Reset on the outermost call. */
 #define PCPORT_RJT_VISITED_MAX 16384
 static u32 g_rjtVisited[PCPORT_RJT_VISITED_MAX];
@@ -4882,6 +4909,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
      * call (g_rjtDepth 0->1). Children stay recursive (shallow); siblings loop. */
     if (g_rjtDepth++ == 0) {
         g_rjtVisitedCount = 0;
+        PCPortApplyLightEnv();
     }
     for (;;) {
 
@@ -4968,6 +4996,28 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         bakedPixels != NULL) {
                         const PCPortTranslatedTexture* baseTexture =
                             &translatedTextureExp.stages[0].texture;
+
+                        /* Diagnostic: PCPORT_DUMP_TEX=0x293E0 writes the raw
+                         * decoded (pre-diffuse-modulation) RGBA of the matching
+                         * texture once, so the actual sandstone detail can be
+                         * inspected apart from lighting. */
+                        {
+                            static int dumpedTex = 0;
+                            const char* dt = getenv("PCPORT_DUMP_TEX");
+                            if (dt != NULL && !dumpedTex &&
+                                baseTexture->imageDataArchiveOffset ==
+                                    (u32)strtoul(dt, NULL, 0)) {
+                                char tp[256];
+                                snprintf(tp, sizeof(tp), "build_pc/tex_%X.bmp",
+                                         baseTexture->imageDataArchiveOffset);
+                                DumpFramebufferBMPTo(bakedPixels,
+                                                     (int)baseTexture->width,
+                                                     (int)baseTexture->height, tp);
+                                dumpedTex = 1;
+                                printf("[texdump] wrote %s (%ux%u)\n", tp,
+                                       baseTexture->width, baseTexture->height);
+                            }
+                        }
 
                         /* The crisp logo is drawn by the 2D overlay; skip the
                          * scene's own logo billboard AND its two glow billboards
