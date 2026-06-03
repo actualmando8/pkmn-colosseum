@@ -32,6 +32,13 @@
 extern void VIWaitForRetrace_PC(void);
 extern void GSgfxSwapBuffers(unsigned int clear);
 
+/* Real title-scene render bridge (pcport_main.c) — loads logo_demo and renders
+ * the actual scene graph through the game's own draw path. */
+extern int  PCPort_EngineTitleSetup(void);
+extern int  PCPort_EngineTitleReady(void);
+extern void PCPort_EngineTitleRenderFrame(void);
+extern void PCPort_DumpBackbuffer(const char* path);
+
 /* ===================================================================
  * --sched-test : headless scheduler unit test
  * =================================================================== */
@@ -181,18 +188,40 @@ static unsigned long g_mainThreadWork;
 static int g_bootStop;
 
 /* Task 0xFF — mirrors the real TaskVBlank (fn_80005D80): drives the present.
- * The real one does GX render-state + fn_80175F6C world render + swap; here we
- * run the real host present path so the scheduler genuinely drives presentation. */
+ * The real one does GX render-state + fn_80175F6C world render + swap. Here the
+ * task renders the REAL title scene graph (RenderJointTree -> the game's own
+ * fn_800DAD10 draw bridge) when it loaded, so real engine render code runs under
+ * the scheduler; if the title assets are unavailable it falls back to a flat
+ * animated clear so the headless path still proves the loop. */
 static void BootTaskVBlank(u32 taskId, void* param) {
-    int frame = (int)g_bootFrame;
-    float r = 0.10f + 0.0025f * (float)(frame % 80);
-    float g = 0.14f;
-    float b = 0.28f;
     (void)taskId; (void)param;
 
     VIWaitForRetrace_PC();
-    glClearColor(r, g, b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (PCPort_EngineTitleReady()) {
+        PCPort_EngineTitleRenderFrame();   /* real title scene through the draw bridge */
+    } else {
+        int frame = (int)g_bootFrame;
+        glClearColor(0.10f + 0.0025f * (float)(frame % 80), 0.14f, 0.28f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    /* Headless verify: PCPORT_BOOT_DUMP=<path.bmp> dumps the backbuffer at frame
+     * PCPORT_BOOT_DUMP_FRAME (default 80), after render, before swap. */
+    {
+        const char* dumpPath = getenv("PCPORT_BOOT_DUMP");
+        if (dumpPath != NULL && dumpPath[0] != '\0') {
+            int dumpFrame = 80;
+            const char* df = getenv("PCPORT_BOOT_DUMP_FRAME");
+            if (df != NULL && atoi(df) >= 0) {
+                dumpFrame = atoi(df);
+            }
+            if ((int)g_bootFrame == dumpFrame) {
+                PCPort_DumpBackbuffer(dumpPath);
+                printf("[boot] dumped frame %lu to %s\n", g_bootFrame, dumpPath);
+            }
+        }
+    }
+
     GSgfxSwapBuffers(0);
 }
 
@@ -245,6 +274,12 @@ int RunEngineBoot(GLFWwindow* window) {
     if (GSthreadCreate(0, 0x3E8, 0x4000, 1, 1, (void*)BootMainThread) == NULL) {
         fprintf(stderr, "[boot] FAIL: GSthreadCreate(main)\n");
         return 0;
+    }
+
+    /* Load the real title scene so the VBlank task renders it through the game's
+     * own draw bridge. Falls back to a flat clear if assets are unavailable. */
+    if (!PCPort_EngineTitleSetup()) {
+        printf("[boot] title scene unavailable — VBlank task will flat-clear\n");
     }
 
     g_bootFrame = 0;

@@ -215,14 +215,24 @@ DEFERRED`) so it is a drop-in for engine callers:
 thread fibres, semantically identical to `gs_thread.c`) now drives the host frame
 loop, with real present code executing under it as a registered task.
 
-**P-B increment 2 (next):** drive **real engine render** under these tasks — load
-`title.fsys:logo_demo` and run the real `RenderJointTree → fn_800DAD10` draw bridge
-inside the VBlank task (instead of the flat clear), so the engine scheduler is
-presenting the actual title scene. Then begin replacing host-stub task bodies with
-the real engine callbacks (`TaskVBlank → fn_80175F6C` world render, etc.),
-converting their still-asm leaves to functional C (Track D) as the call graph is
-walked. The deepest step — linking the real `main.c GameInit` with its ~60
-hardware-subsystem inits — remains gated on the GX-FIFO/VI/ARAM/DVD/DSP shims.
+**P-B increment 2 — real title scene rendered under the scheduler (DONE).** The
+`--engine-boot` VBlank task now renders the **real** title scene graph through the
+game's own draw bridge: `PCPort_EngineTitleSetup` loads `title.fsys:logo_demo`,
+parses the HSD archive, resolves the scene camera + root joint (additive functions
+in `pcport_main.c` reusing the same static helpers as `RunMenuScene`, which is left
+untouched), and `PCPort_EngineTitleRenderFrame` runs `RenderJointTree → fn_800DAD10`
+each frame. `PCPORT_BOOT_DUMP=<bmp>` (frame `PCPORT_BOOT_DUMP_FRAME`, default 80)
+captures it: the dump shows the real desert/ruins title scene (sandstone walls,
+sky band, ground plane) — **the same scene-graph render `RunMenuScene` produces, now
+driven by the host GStask/GSthread scheduler's task** rather than a hand-coded loop.
+Falls back to a flat clear if assets are unavailable. `--menu`/`--sched-test`/
+`--fibre-test` unaffected.
+
+**P-B increment 3 (next):** begin replacing the host-stub task bodies with the real
+engine callbacks (`TaskVBlank → fn_80175F6C` world render, `TaskRetraceMain`,
+`TaskPadRead`), converting their still-asm leaves to functional C (Track D) as the
+call graph is walked. The deepest step — linking the real `main.c GameInit` with its
+~60 hardware-subsystem inits — remains gated on the GX-FIFO/VI/ARAM/DVD/DSP shims.
 
 ## 6. Constraints honored
 

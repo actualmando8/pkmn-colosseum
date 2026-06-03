@@ -6566,6 +6566,114 @@ static int RunTHPSmoke(void) {
     return 1;
 }
 
+/* ===================================================================
+ * P-B inc2: real title-scene render driven by the engine scheduler.
+ *
+ * Additive, self-contained title load + per-frame 3D render so a GStask callback
+ * (engine_boot.c BootTaskVBlank) can present the REAL title scene graph through
+ * the game's own draw bridge (RenderJointTree -> fn_800DAD10) — i.e. real engine
+ * render code executing under the host GStask/GSthread scheduler. RunMenuScene is
+ * left untouched; these reuse the same static helpers + camera/joint setup.
+ * =================================================================== */
+static PCPortHSDArchive       g_engTitleArchive;
+static PCPortTranslatedCamera g_engTitleCamera;
+static u32  g_engTitleRootJoint;
+static int  g_engTitleReady;
+
+int PCPort_EngineTitleSetup(void) {
+    u8* memberData = NULL;
+    u32 memberSize = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0;
+    u32 sceneBranchOffset, cameraDescOffset, sceneJointListOffset;
+    /* title END pose (cam_logo_demo_stop end-frame), same as RunMenuScene. */
+    static const f32 titleEye[3] = { 0.0f, 38.905f, 409.812f };
+    static const f32 titleInt[3] = { 0.0f, 39.6514f, 1.5625f };
+    static const f32 titleUp[3]  = { 0.0f, 1.0f, 0.0f };
+
+    if (g_engTitleReady) {
+        return 1;
+    }
+    memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
+    memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
+
+    if (!PCPort_LoadFsysMember(PCPORT_TITLE_SCENE_ARCHIVE, PCPORT_TITLE_SCENE_MEMBER,
+                               &memberData, &memberSize)) {
+        fprintf(stderr, "[boot] title scene load failed\n");
+        return 0;
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_engTitleArchive, memberData, memberSize)) {
+        fprintf(stderr, "[boot] title scene parse failed\n");
+        return 0;
+    }
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_engTitleArchive,
+                                                             "scene_data", &sceneOffset);
+    if (sceneData == NULL) {
+        fprintf(stderr, "[boot] title scene_data unresolved\n");
+        return 0;
+    }
+    sceneBranchOffset = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&g_engTitleArchive, sceneBranchOffset, 0x10u)) {
+        fprintf(stderr, "[boot] title scene branch invalid (0x%X)\n", sceneBranchOffset);
+        return 0;
+    }
+    cameraDescOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x08);
+    if (!PCPort_TranslatePerspectiveCameraFromArchiveBE(&g_engTitleArchive,
+                                                        cameraDescOffset, &g_engTitleCamera)) {
+        fprintf(stderr, "[boot] title camera translate failed\n");
+        return 0;
+    }
+    BuildViewMatrixLookAt(titleEye, titleInt, titleUp, g_engTitleCamera.viewMatrix);
+
+    sceneJointListOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x00);
+    g_engTitleRootJoint  = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneJointListOffset + 0x00);
+    if (!ArchiveRangeValid(&g_engTitleArchive, g_engTitleRootJoint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        fprintf(stderr, "[boot] title root joint invalid (0x%X)\n", g_engTitleRootJoint);
+        return 0;
+    }
+
+    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    g_engTitleReady = 1;
+    printf("[boot] title scene loaded for engine render (rootJoint=0x%X)\n", g_engTitleRootJoint);
+    return 1;
+}
+
+int PCPort_EngineTitleReady(void) {
+    return g_engTitleReady;
+}
+
+/* Public wrapper so engine_boot.c can dump the backbuffer for headless verify. */
+void PCPort_DumpBackbuffer(const char* path) {
+    DumpBackbufferTo(path);
+}
+
+void PCPort_EngineTitleRenderFrame(void) {
+    MenuTreeStats stats;
+    if (!g_engTitleReady) {
+        return;
+    }
+    memset(&stats, 0, sizeof(stats));
+
+    /* Same per-frame 3D sequence RunMenuScene uses for the title scene. */
+    ClearBackbuffer(0.0f, 0.0f, 0.0f);
+    GSgfx_BeginFrame();
+
+    GXSetViewport((f32)g_engTitleCamera.viewportLeft,
+                  (f32)g_engTitleCamera.viewportTop,
+                  (f32)(g_engTitleCamera.viewportRight - g_engTitleCamera.viewportLeft),
+                  (f32)(g_engTitleCamera.viewportBottom - g_engTitleCamera.viewportTop),
+                  0.0f, 1.0f);
+    GXSetScissor((u32)g_engTitleCamera.scissorLeft,
+                 (u32)g_engTitleCamera.scissorTop,
+                 (u32)(g_engTitleCamera.scissorRight - g_engTitleCamera.scissorLeft),
+                 (u32)(g_engTitleCamera.scissorBottom - g_engTitleCamera.scissorTop));
+    GXSetProjection(g_engTitleCamera.projectionMatrix, GX_PERSPECTIVE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+    RenderJointTree(&g_engTitleArchive, g_engTitleRootJoint, g_engTitleRootJoint,
+                    &g_engTitleCamera, (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+}
+
 int main(int argc, char** argv) {
     int audioInitialized = 0;
     int runRealContentParserSmoke;
