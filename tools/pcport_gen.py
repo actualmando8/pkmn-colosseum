@@ -46,6 +46,13 @@ PREAMBLE = {
     # fn_80129280 referenced but not declared in this TU; void* matches the
     # cast-to-void* + pointer-arith call sites (same form as battle_main.c).
     "game/battle/battle_waza.c": "void* fn_80129280();\n",
+    # Campaign Phase 1 (workflow wf_de8c288a): forward-decls for referenced-but-
+    # -undeclared functions (K&R, used-before-decl or no in-TU decl).
+    "game/gs_model.c":        "void fn_801074D4();\n",
+    "game/menu/menu_precine.c": "void fn_800FB680();\nvoid fn_800FBB34();\nvoid fn_80132A38();\nvoid fn_801C41C8();\n",
+    "game/script/psinterpret.c": "void fn_80196E10();\nvoid psSetCameraTracking();\nvoid fn_801A05EC();\nvoid fn_80172840();\nvoid fn_80172790();\nvoid fn_801726E0();\nvoid fn_80172630();\n",
+    "game/script/pslist.c":   "void* HSD_MemAlloc();\nvoid HSD_MemFree();\nvoid fn_80196E10();\n#include <string.h>\n",
+    "game/sound/sound_se.c":  "void fn_80164C40();\nvoid fn_80164DD0();\n",
 }
 
 # Per-file extern-unification: CodeWarrior tolerated the same data label being
@@ -81,6 +88,9 @@ EXTERN_UNIFY = {
 # site is accepted. `-Wstrict-prototypes` on `()` is a warning, silenced by -w.
 # Map: rel-path -> set of function names to neutralize to K&R prototypes.
 FUNC_PROTO_KR = {
+    # Campaign Phase 1 (workflow wf_de8c288a): arg-only conflicts on extern protos.
+    "game/menu/menu_exdisc2.c": { "fn_8007B114", "fn_8007B6D8" },
+    "game/menu/menu_middle.c":  { "fn_80070D84" },
     "game/battle/battle_main.c": {
         # Block-scoped decls re-type the args (u32,u32,u32) vs the file-scope
         # prototypes' (s32,s32,s32); same void return. K&R `()` is compatible with
@@ -108,6 +118,8 @@ FUNC_PROTO_KR = {
 # names are verified to have a surviving typed decl/definition in the same TU.
 # Map: rel-path -> set of function names whose arg-less stub prototypes are dropped.
 FUNC_STUB_DROP = {
+    # Campaign Phase 1 (workflow wf_de8c288a): redundant stub vs real in-TU def.
+    "game/menu/menu_tool.c": { "fn_80075638" },
     "game/battle/battle_main.c": {
         # fn_801EF634 has a real DEFINITION `u16 fn_801EF634(void)` (line 431) that
         # precedes this redundant block-scoped `extern void fn_801EF634();` stub
@@ -129,6 +141,42 @@ FUNC_STUB_DROP = {
 # match the real definition's signature so the forward decl and definition agree.
 # Map: rel-path -> { fn_name: canonical_prototype_without_trailing_semicolon }.
 FUNC_PROTO_RETYPE = {
+    # Campaign Phase 1 (workflow wf_de8c288a): unify return-type-conflicting protos.
+    "game/gba/gba_misc.c": {
+        "fn_80083BF8": "s32 fn_80083BF8()",
+        "fn_8008A99C": "s32 fn_8008A99C()",
+        "fn_801906A0": "s32 fn_801906A0()",
+    },
+    "game/menu/menu_carde_matrix.c": {
+        "fn_80104704": "void* fn_80104704()",
+        "fn_801040A0": "u32* fn_801040A0()",
+    },
+    "game/menu/menu_exdisc.c": {
+        "fn_8006B420": "u8* fn_8006B420()",
+        "fn_800C80D0": "s32 fn_800C80D0()",
+    },
+    "game/menu/menu_exdisc2.c": {
+        "fn_801C40F0": "s32 fn_801C40F0()",
+        "fn_800A7BCC": "void* fn_800A7BCC()",
+    },
+    "game/menu/menu_middle.c": {
+        "fn_8006AFC4": "s32 fn_8006AFC4()",
+        "fn_80129280": "u8 *fn_80129280()",
+    },
+    "game/menu/menu_precine.c": {
+        "fn_80132A38": "void fn_80132A38()",
+        "fn_801C41C8": "void fn_801C41C8()",
+    },
+    "game/menu/menu_tool.c": {
+        "fn_80102620": "s32 fn_80102620()",
+    },
+    "game/menu/menu_tool2.c": {
+        "fn_80190528": "s32 fn_80190528()",
+        "fn_801902E0": "s32 fn_801902E0()",
+        "fn_80102510": "s32 fn_80102510()",
+        "fn_80165A20": "s32 fn_80165A20()",
+        "fn_80075F4C": "s32 fn_80075F4C()",
+    },
     "game/battle/battle_main.c": {
         # Two block-scoped decls disagree on BOTH return and args: `void
         # fn_80129280()` (line 485, called 0-arg) vs `void* fn_80129280(u32,u32)`
@@ -152,6 +200,27 @@ FUNC_PROTO_RETYPE = {
 # generated copy; the original byte-match source is never touched.
 # Map: rel-path -> list of (old, new) pairs.
 TEXT_FIXUPS = {
+    # Campaign Phase 1 (workflow wf_de8c288a): neutralize non-extern forward decls
+    # the proto regexes (extern-only) miss, + one return-value cast.
+    "game/gs_model.c": [
+        ("extern void* fn_8005DA18(void);    /* linked list head */",
+         "extern void* fn_8005DA18();    /* linked list head */"),
+        ("extern void* fn_8005DA18(void*);", "extern void* fn_8005DA18();"),
+    ],
+    "game/late_game.c": [
+        ("void fn_80093F64(void);", "void fn_80093F64();"),
+    ],
+    "game/menu/menu_exdisc2.c": [
+        ("void fn_8007B114(void);", "void fn_8007B114();"),
+        ("void fn_8007B6D8(void);", "void fn_8007B6D8();"),
+    ],
+    "game/menu/menu_middle.c": [
+        ("void fn_80070D84(void);", "void fn_80070D84();"),
+        ("    return fn_80129280(0x0, 0xe);", "    return (s32)fn_80129280(0x0, 0xe);"),
+    ],
+    "game/menu/menu_tool.c": [
+        ("void fn_800756C8(void);", "void fn_800756C8();"),
+    ],
     # gs_dvd.c: the decompiled GSDVD_CloseHandle / GSDVD_Open DEFINITIONS are typed
     # s32 but their bodies have bare `return;` (dropped r3) — clang -Wreturn-mismatch
     # is a hard error. They are definitions (not extern decls) so the proto rewriters

@@ -59,7 +59,28 @@ GAME_GEN = ["game/battle/battle_main",
             # need the pcport_gen PREAMBLE/TEXT_FIXUPS entries added alongside.
             "game/gs_task_util", "game/gs_render_util", "game/gs_mem", "game/gs_dvd",
             "game/gs_flag", "game/gs_battle_setup", "game/battle/battle_waza",
-            "game/gs_colsys", "game/gs_field_resource", "game/gs_floor_data"]
+            "game/gs_colsys", "game/gs_field_resource", "game/gs_floor_data",
+            # Campaign Phase 1 (2026-06-02): all remaining 0-asm game TUs (47). The
+            # compile step filters; failures get pcport_gen fix-entries via workflow.
+            "game/battle/battle_grid", "game/data/common_rel",
+            "game/data/move_data", "game/data/pokemon_data", "game/effect/generator",
+            "game/effect/gs_effect", "game/effect/tracefx", "game/fsys/fsys_decomp",
+            "game/gba/gba_comm", "game/gba/gba_comm_ext", "game/gba/gba_conv",
+            "game/gba/gba_conv2", "game/gba/gba_misc", "game/gba/pokeconv",
+            "game/gs_field_colquery", "game/gs_floor", "game/gs_model", "game/late_game",
+            "game/menu/menu_battle", "game/menu/menu_carde", "game/menu/menu_carde_main",
+            "game/menu/menu_carde_matrix", "game/menu/menu_common", "game/menu/menu_common_ext",
+            "game/menu/menu_exdisc", "game/menu/menu_exdisc2", "game/menu/menu_middle",
+            "game/menu/menu_pokecoupon", "game/menu/menu_precine", "game/menu/menu_rule",
+            "game/menu/menu_tool", "game/menu/menu_tool2", "game/save/save",
+            "game/save/save_carde", "game/save/save_crypto", "game/save/save_data",
+            "game/script/psdisp", "game/script/pshelper", "game/script/psinterpret",
+            "game/script/pslist", "game/shadow/shadow", "game/shadow/shadow_data",
+            "game/sound/sound", "game/sound/sound_bgm", "game/sound/sound_se",
+            # NOTE: colosseum_script (165 retype + 79 ordered text-fixups, non-functional
+            # pseudo-register paths) + trainer (workflow couldn't resolve) DEFERRED —
+            # they stay auto-stubbed (= baseline, no loss). Off the title/boot path.
+            ]
 
 
 def compile_one(src, name):

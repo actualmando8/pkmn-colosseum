@@ -349,6 +349,32 @@ unaffected. `src/game` untouched — only the generated copies + `tools/pcport_*
 This is the foundational lane: every host-linked real TU shrinks the auto-stub
 closure and brings more real engine code onto the platform shim.
 
+## 6f. Campaign Phase 1 — host-link all 0-asm game TUs (2026-06-02)
+
+"Attack all remaining asm" (max-effort). Enumerated `src/game`: 102 TUs, 13 already
+linked, 89 unlinked = **47 0-asm + 42 asm-bearing**. Phase 1 took the 47 0-asm TUs,
+using the **link's compile step as the filter**: add all to `GAME_GEN`, let
+`pcport_link` report the compile failures, then fan out a workflow only on those.
+
+- 32/47 compiled **clean with zero fixes**.
+- A 15-agent workflow analyzed the 15 failures. **13 merged** (small fixes: a few
+  `FUNC_PROTO_RETYPE`/`FUNC_PROTO_KR`/`FUNC_STUB_DROP`/`TEXT_FIXUPS`/PREAMBLE each —
+  mostly return-type-unify on pseudo-register protos + forward-decls).
+- **2 deferred**: `colosseum_script` (25.7k-line pseudo-register script interpreter —
+  needed 165 retypes + 79 *ordered* text-fixups and the agent's own verdict was the
+  paths are "non-functional"; pure risk/bloat, off the title/boot path) and `trainer`
+  (workflow couldn't resolve). Both stay auto-stubbed = baseline, no loss.
+
+Result: **45/47 0-asm game TUs host-linked.** Build 99 objects, 0 failed; link
+converges (962 stubs). `--menu`/`--sched-test`/`--engine-boot` all unaffected.
+Running total of host-linked game TUs: 13 → **58**. `src/game` untouched (generated
+copies only). Phase 2 (the 42 asm-bearing TUs, `pcport_gen` flips their #if1-asm to
+#else C) is next, in chunks with per-chunk regression + bisection.
+
+**Method note for the campaign:** the workflow `args` payload arrives as a JSON
+*string*, not an array — the script must `JSON.parse` it (a `(args && args.length)`
+guard silently treats the string as the candidate list).
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,
