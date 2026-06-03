@@ -3,7 +3,7 @@
  * Verifies the P1 input+parse+relocate pipeline on REAL game data without the
  * full GL render link: FSYS member table -> LZSS decompress -> HSD archive
  * header -> relocation fixup -> public-symbol (root) resolution. Mirrors
- * src/pcport/real_content_host.c (PCPort_LoadFsysMember / DecompressLZSS /
+ * pcport/real_content_host.c (PCPort_LoadFsysMember / DecompressLZSS /
  * PCPort_HSDArchiveParseBE / PCPort_HSDArchiveGetPublicAddress) exactly.
  *
  * Build (32-bit, matches the port's pointer model):

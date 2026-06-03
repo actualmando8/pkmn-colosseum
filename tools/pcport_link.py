@@ -18,9 +18,9 @@ OBJ = ROOT / "build_pc" / "obj"
 GEN = ROOT / "build_pc" / "gen"
 OBJ.mkdir(parents=True, exist_ok=True)
 INC = ["-Iinclude", "-Iinclude/dolphin", "-Iinclude/game", "-Iinclude/hsd",
-       "-Isrc/pcport", "-Ithird_party", "-Ithird_party/glad/include",
+       "-Ipcport", "-Ithird_party", "-Ithird_party/glad/include",
        "-Ibuild_pc/_deps/glfw-src/include"]   # GLFW headers (FetchContent) + stb_image (third_party)
-COMPAT = ["-include", "src/pcport/pcport_compat.h"]
+COMPAT = ["-include", "pcport/pcport_compat.h"]
 # -fms-compatibility/-fms-extensions: emulate MSVC leniency (e.g. u32 = long-vs-int
 # typedef redefinitions the decomp+SDK headers disagree on) so the same TUs that
 # the CMake/MSVC build compiles also compile here.
@@ -36,12 +36,12 @@ LIBS = [
 ]
 
 # bootstrap sources (== CMake add_executable list)
-BOOT = ["src/pcport/pcport_main.c", "src/pcport/gs_gfx_host_support.c",
-        "src/pcport/real_content_host.c", "src/pcport/hsd_host.c",
-        "src/pcport/thp_player.c",
-        "src/pcport/os_thread_host.c", "src/pcport/engine_host.c",
-        "src/pcport/engine_spike.c", "src/pcport/gs_sched_host.c",
-        "src/pcport/engine_boot.c",
+BOOT = ["pcport/pcport_main.c", "pcport/gs_gfx_host_support.c",
+        "pcport/real_content_host.c", "pcport/hsd_host.c",
+        "pcport/thp_player.c",
+        "pcport/os_thread_host.c", "pcport/engine_host.c",
+        "pcport/engine_spike.c", "pcport/gs_sched_host.c",
+        "pcport/engine_boot.c",
         "src/dolphin/vi/VI.c",
         "src/dolphin/os/OSStateFlags.c", "src/trk/TRKUtil.c",
         "src/hsd/hsd_pobj_disp.c", "src/game/gs_gfx.c", "src/game/gs_render.c"]

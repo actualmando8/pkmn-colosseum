@@ -734,7 +734,7 @@ def run_diff_json(src_path: Path, symbol: str = None,
 
 def compile_all(compiler_version: str = None, verbose: bool = False):
     """Compile every .c/.cpp file under src/."""
-    # src/pcport/* is host PC-port code (built by the separate PCPORT CMake build,
+    # pcport/* is host PC-port code (built by the separate PCPORT CMake build,
     # not the GameCube/CodeWarrior matching toolchain) — exclude it from the gate.
     src_files = [p for p in (sorted(SRC_DIR.rglob("*.c")) + sorted(SRC_DIR.rglob("*.cpp")))
                  if "pcport" not in p.parts]
