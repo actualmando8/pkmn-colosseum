@@ -80,6 +80,22 @@ GAME_GEN = ["game/battle/battle_main",
             # NOTE: colosseum_script (165 retype + 79 ordered text-fixups, non-functional
             # pseudo-register paths) + trainer (workflow couldn't resolve) DEFERRED —
             # they stay auto-stubbed (= baseline, no loss). Off the title/boot path.
+            #
+            # Campaign Phase 2 (2026-06-02): asm-bearing TUs — pcport_gen flips their
+            # #if1-asm wrappers to the #else C (real decomp body -> real C; TODO -> stub).
+            # EXCLUDED (collide with host shims; would duplicate-define): main (two main()),
+            # gs_thread/gs_task (real GStask/GSthread vs gs_sched_host), gs_texture
+            # (fn_800F0308 + GX-FIFO). Host shims win via BOOT-before-GAME_GEN link order,
+            # but excluding avoids pulling their hardware closures.
+            # --- chunk 2a (asm-bearing): 7 host-linked (2 compiled free + 5 workflow-
+            # fixed). DEFERRED (pathological/unfixable, stay auto-stubbed = baseline):
+            # colosseum_event (124 fixes, pseudo-register), pokemon (111), colosseum_battle
+            # (73), + 8 the workflow couldn't resolve (colosseum_ui, menu_bag/msgbox/pokemon/
+            # shop/status, evolution, script_callback). The asm-bearing tail is real
+            # functional-decomp work, not link-flipping — see docs §6g.
+            "game/gs_particle", "game/movie", "game/pokemon/poke_detail",
+            "game/menu/menu_dialog", "game/gs_event_exec", "game/fsys/fsys_load",
+            "game/input/input",
             ]
 
 

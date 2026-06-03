@@ -53,6 +53,9 @@ PREAMBLE = {
     "game/script/psinterpret.c": "void fn_80196E10();\nvoid psSetCameraTracking();\nvoid fn_801A05EC();\nvoid fn_80172840();\nvoid fn_80172790();\nvoid fn_801726E0();\nvoid fn_80172630();\n",
     "game/script/pslist.c":   "void* HSD_MemAlloc();\nvoid HSD_MemFree();\nvoid fn_80196E10();\n#include <string.h>\n",
     "game/sound/sound_se.c":  "void fn_80164C40();\nvoid fn_80164DD0();\n",
+    # Campaign Phase 2 chunk 2a (workflow wf_ad563b5e): asm-bearing TUs.
+    "game/pokemon/poke_detail.c": "void fn_800F0308();\n",
+    "game/gs_event_exec.c":   "extern int fn_8005D9E4();\nextern unsigned int fn_80102568();\n",
 }
 
 # Per-file extern-unification: CodeWarrior tolerated the same data label being
@@ -91,6 +94,9 @@ FUNC_PROTO_KR = {
     # Campaign Phase 1 (workflow wf_de8c288a): arg-only conflicts on extern protos.
     "game/menu/menu_exdisc2.c": { "fn_8007B114", "fn_8007B6D8" },
     "game/menu/menu_middle.c":  { "fn_80070D84" },
+    # Campaign Phase 2 chunk 2a (workflow wf_ad563b5e):
+    "game/fsys/fsys_load.c": { "fn_801808E4" },
+    "game/input/input.c": { "fn_800DD38C", "fn_800ABCF4", "fn_800AB4FC", "fn_800AAE34", "fn_800ABF5C" },
     "game/battle/battle_main.c": {
         # Block-scoped decls re-type the args (u32,u32,u32) vs the file-scope
         # prototypes' (s32,s32,s32); same void return. K&R `()` is compatible with
@@ -141,6 +147,10 @@ FUNC_STUB_DROP = {
 # match the real definition's signature so the forward decl and definition agree.
 # Map: rel-path -> { fn_name: canonical_prototype_without_trailing_semicolon }.
 FUNC_PROTO_RETYPE = {
+    # Campaign Phase 2 chunk 2a (workflow wf_ad563b5e):
+    "game/fsys/fsys_load.c": {
+        "fn_8017F6B4": "void* fn_8017F6B4()",
+    },
     # Campaign Phase 1 (workflow wf_de8c288a): unify return-type-conflicting protos.
     "game/gba/gba_misc.c": {
         "fn_80083BF8": "s32 fn_80083BF8()",
@@ -200,6 +210,19 @@ FUNC_PROTO_RETYPE = {
 # generated copy; the original byte-match source is never touched.
 # Map: rel-path -> list of (old, new) pairs.
 TEXT_FIXUPS = {
+    # Campaign Phase 2 chunk 2a (workflow wf_ad563b5e): RAW asm blocks (not the
+    # #if1/#else form, so pcport_gen's flipper can't reach them) -> empty stubs;
+    # + one callback cast. These functions become stubs; the TU's real C links.
+    "game/pokemon/poke_detail.c": [
+        ('asm void fn_8004C120(void) { nofralloc\n    #include "asm/GC6E01/nonmatching/poke_detail/fn_8004C120.s"\n}', 'void fn_8004C120(void) {}'),
+    ],
+    "game/menu/menu_dialog.c": [
+        ('asm void fn_80057B34(void) { nofralloc\n    #include "asm/GC6E01/nonmatching/menu_dialog/fn_80057B34.s"\n}', 'void fn_80057B34(void) { }'),
+        ('asm void fn_80059034(void) { nofralloc\n    #include "asm/GC6E01/nonmatching/menu_dialog/fn_80059034.s"\n}', 'void fn_80059034(void) { }'),
+    ],
+    "game/fsys/fsys_load.c": [
+        ('        entry->callback(entry->flag34, entry->callbackArg);', '        ((void(*)(u32, u32))entry->callback)(entry->flag34, entry->callbackArg);'),
+    ],
     # Campaign Phase 1 (workflow wf_de8c288a): neutralize non-extern forward decls
     # the proto regexes (extern-only) miss, + one return-value cast.
     "game/gs_model.c": [

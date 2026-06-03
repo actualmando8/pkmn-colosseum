@@ -375,6 +375,33 @@ copies only). Phase 2 (the 42 asm-bearing TUs, `pcport_gen` flips their #if1-asm
 *string*, not an array — the script must `JSON.parse` it (a `(args && args.length)`
 guard silently treats the string as the candidate list).
 
+## 6g. Campaign Phase 2 — the asm-bearing tail is functional-decomp, not link-flipping
+
+Phase 2 took the 42 asm-bearing TUs (`pcport_gen` flips their `#if1`-asm to the
+`#else` C). Excluded 4 host-shim colliders up front (`main`, `gs_thread`, `gs_task`,
+`gs_texture`). Chunk 2a = the 18 low-asm TUs (1–17 asm). The data is decisive:
+
+- **2/18 compiled free** (`gs_particle`, `movie`).
+- A 16-agent workflow on the 16 failures yielded only **5 cleanly mergeable**
+  (`poke_detail`, `menu_dialog`, `gs_event_exec`, `fsys_load`, `input` — mostly
+  forward-decls + neutralizing a few RAW `asm{}` blocks, which aren't `#if1/#else`
+  so the flipper can't reach them, to empty stubs).
+- **3 pathological** (`colosseum_event` 124 fixes / `pokemon` 111 / `colosseum_battle`
+  73 — 10k-line pseudo-register decomps needing dozens of fragile ordered text-fixups
+  for *non-functional* code) and **8 unresolved** by the workflow.
+
+So chunk 2a netted **7 host-linked TUs** (→ 65 total); the other 11 stay auto-stubbed
+(= baseline). Contrast Phase 1's 0-asm TUs (32/47 free). **Conclusion: the remaining
+asm-bearing TUs are real per-function functional decomp** (PPC→C of the still-asm
+leaves), not something link-flipping or conflict-fixing can deliver — flipping mostly
+yields stubs, and the heavy TUs are fragile non-functional pseudo-register code. The
+foundational host-link campaign is therefore **complete at ~65 game TUs**; further
+gains require the months-scale Track-D decomp the roadmap always described, prioritized
+by the actual title/field/battle call graphs rather than swept wholesale.
+
+Build 106 objects, 0 failed; no regression. `src/game` untouched (generated copies +
+`tools/pcport_*` only).
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,
