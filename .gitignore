@@ -26,6 +26,12 @@ orig/*/*
 *.ciso
 *.rvz
 
+# Raw extracted game binary / disassembly artifacts (copyright — regenerate from
+# your own orig/ ROM; do not commit verbatim game data).
+tools/ghidra/dol_split/*.bin
+tools/ghidra/project/
+*.bin
+
 # Build artifacts
 build/
 .ninja_*

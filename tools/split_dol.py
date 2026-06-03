@@ -29,7 +29,13 @@ def main() -> int:
 
     dtk, config_path, out_dir = sys.argv[1], sys.argv[2], sys.argv[3]
 
-    rc = subprocess.run([dtk, "dol", "split", config_path, out_dir]).returncode
+    # --no-update: a build must not rewrite the tracked symbols.txt/splits.txt
+    # (dtk's in-place "update" churns them every run). Same as the legacy
+    # build_dol.sh; the template's getting_started notes --no-update is "for
+    # build systems". Detection still happens in-memory for the split.
+    rc = subprocess.run(
+        [dtk, "dol", "split", "--no-update", config_path, out_dir]
+    ).returncode
     if rc != 0:
         return rc
 
