@@ -141,6 +141,9 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 | `fn_80216650` | colosseum_script.c | W1 data-flow-locked reg-alloc | 99.14% | yes | inversion-tested, locked (`wf_invert`) |
 | `fn_8022E6F0` | colosseum_script.c | W1 data-flow-locked reg-alloc | 99.50% | yes | inversion-tested, locked (`wf_invert`) |
 | `fn_8023CE60` | colosseum_script.c | W1 param landed one saved-reg off (data-flow-locked) | 98.26% | yes | inversion-tested, locked (`wf_invert`) |
+| `fn_8019C128` | hsd_fog.c | W1 data-flow-locked reg-alloc (in CW's `%101` division-strength-reduction: magic const lands in r0 not r6) | 99.71% | no (asm-wrapper; C staged) | permuter best score 10 (~thousands of iters); 12 source forms swept (modulo local, inline, comma-op `(0,expr)`, hand u64 magic) all emit `mulhwu r6,r0,r4`; r0-vs-r6 is internal to the division-lowering pass |
+| `fn_80191788` | hsd_wobj.c | W2 instruction-codegen residual (negated null-check tail-merge: target `bne .L; blr` vs CW's merged `beqlr`) | ~94% | no (asm-wrapper; C staged) | body byte-EXACT via struct-copy `*(V3*)&dst=*(V3*)src`; permuter 840→300, never broke the merge; goto/flat-return/`&&`/peephole-off all stay merged |
+| `fn_8011BA0C` | gs_field_world.c | W6 relocation/jumptable NAME mismatch (external `jumptable_8035C260` unreproducible standalone) + range-check reg/prologue | ~91% | no (asm-wrapper; C staged) | dense `switch` (12 cases) matches; isolated compile emits internal `@18` label not the named external jumptable; permuter best 380, harness-unwinnable |
 
 ---
 
