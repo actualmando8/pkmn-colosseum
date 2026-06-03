@@ -460,6 +460,37 @@ material/TEV path doesn't fully apply on the map — same class as the title's t
 movement is floor-clamped and wall-blocked (real walking), via the
 `gs_field_colquery`/`gs_colsys` cluster.
 
+## 6j. Title camera pan-out (match GameCube intro) (2026-06-03)
+
+The GameCube title renders the desert ruins in 3D and pulls the camera OUT to the wide
+title view; the port jumped straight to the static end pose. Added a **one-shot intro
+pan** in `RunMenuScene`: each frame (over `panSecs`≈4.5, ease-out cubic) it lerps the
+camera eye/interest from a close/low start `(0,20,140)`→`(0,52,-70)` to the authentic
+wide title end `(0,38.9,409.8)`→`(0,39.65,1.56)` (`cam_logo_demo_stop`), then holds.
+`PCPORT_NO_PAN` disables; `PCPORT_PAN_SECS` sets duration; a manual `PCPORT_CAM_EYE`
+override suspends it. The clock is the existing title anim clock (`PCPORT_ANIM_TIME`
+pins it headless).
+
+**Honest finding from the camera data:** the real `cam_logo_demo_start` and
+`cam_logo_demo_stop` differ by only a ~10-unit eye dolly with the same look-target — the
+title scene's own GameCube camera move is subtle. The dramatic "fly through Orre" is the
+**opening-demo movie** (`openingdemo.thp`, which the port already plays before the title).
+So this pan is a slightly-more-cinematic pull-out anchored on the authentic end pose, not
+a 1:1 of the (nearly-static) real title camera.
+
+**Logo bounce-in (DONE).** Per a GameCube reference sequence the user captured (close-up
+up at a ruins column → pull out to the wide ruins → logo bounces in → cast/PRESS START
+follow), the foreground UI is now hidden during the pan and the logo **bounces in** after
+the camera settles: a back-out (overshoot) scale about the logo centre over ~0.55s once
+`aT >= panSecs`; cast + PRESS START + copyright appear ~0.45s later (`uiAfter`). During the
+pan only the 3D ruins show. `PCPORT_NO_PAN` makes everything immediate.
+
+Known remaining gaps: (1) the **ruins are low-contrast** (tan-on-tan) — the GameCube
+columns are crisp sandstone; a material/texture-assignment issue, separate from the camera.
+(2) The opening-demo movie should play as an **idle attract loop on the title** (not before
+it) and the **Nintendo logo should fade out** as well as in (boot-flow fixes, next). Only
+the title path changed; `--field`/`--sched-test`/`--engine-boot` untouched.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,

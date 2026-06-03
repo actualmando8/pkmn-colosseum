@@ -5651,6 +5651,19 @@ static const PCPortTitleSet kTitleSets[] = {
 static int RunMenuScene(GLFWwindow* window) {
     PCPortHSDArchive archive;
     PCPortTranslatedCamera translatedCamera;
+    /* Title intro camera pan-out (GameCube renders the ruins in 3D then pulls the
+     * camera out). One-shot: lerp eye/interest start->end over panSecs (ease-out),
+     * then hold the wide title end pose. PCPORT_NO_PAN disables; PCPORT_PAN_SECS sets
+     * the duration. The real cam_logo_demo_start/stop barely differ (a ~10u dolly --
+     * the dramatic Orre flythrough is the opening-demo movie), so this is a slightly
+     * more cinematic pull-out anchored on the authentic end pose. */
+    f32 panStartEye[3] = { 0.0f, 20.0f, 140.0f };
+    f32 panStartInt[3] = { 0.0f, 52.0f, -70.0f };
+    f32 panEndEye[3]   = { 0.0f, 38.905f, 409.812f };
+    f32 panEndInt[3]   = { 0.0f, 39.6514f, 1.5625f };
+    f32 panUp[3]       = { 0.0f, 1.0f, 0.0f };
+    int titlePanOn     = 0;
+    double panSecs     = 4.5;
     u8* memberData = NULL;
     u32 memberSize = 0;
     const u8* sceneData;
@@ -5810,6 +5823,12 @@ static int RunMenuScene(GLFWwindow* window) {
 
         BuildViewMatrixLookAt(titleEye, titleInt, titleUp,
                               translatedCamera.viewMatrix);
+        /* enable the intro pan-out (held at this end pose once it completes) */
+        if (getenv("PCPORT_NO_PAN") == NULL) {
+            const char* ps = getenv("PCPORT_PAN_SECS");
+            if (ps != NULL && atof(ps) > 0.0) panSecs = atof(ps);
+            titlePanOn = 1;
+        }
     }
 
     /* Experimental manual camera: PCPORT_CAM_EYE / PCPORT_CAM_INT ("x,y,z") +
@@ -6291,6 +6310,24 @@ static int RunMenuScene(GLFWwindow* window) {
                          (u32)(translatedCamera.scissorRight - translatedCamera.scissorLeft),
                          (u32)(translatedCamera.scissorBottom - translatedCamera.scissorTop));
             GXSetProjection(translatedCamera.projectionMatrix, GX_PERSPECTIVE);
+            /* Intro pan-out: ease the camera from the close start pose to the wide
+             * title end over panSecs, then hold. Disabled by PCPORT_NO_PAN or while a
+             * manual PCPORT_CAM_EYE override is active. */
+            if (titlePanOn && getenv("PCPORT_CAM_EYE") == NULL) {
+                double aT = (animTimeForced >= 0.0) ? animTimeForced : glfwGetTime();
+                double tt = aT / panSecs;
+                double e;
+                f32 ce[3], ci[3];
+                int k;
+                if (tt < 0.0) tt = 0.0;
+                if (tt > 1.0) tt = 1.0;
+                e = 1.0 - pow(1.0 - tt, 3.0);   /* ease-out cubic */
+                for (k = 0; k < 3; ++k) {
+                    ce[k] = panStartEye[k] + (f32)((panEndEye[k] - panStartEye[k]) * e);
+                    ci[k] = panStartInt[k] + (f32)((panEndInt[k] - panStartInt[k]) * e);
+                }
+                BuildViewMatrixLookAt(ce, ci, panUp, translatedCamera.viewMatrix);
+            }
             if (frame == 0 && getenv("PCPORT_RENDER_DEBUG") != NULL) {
                 printf("[cam] eye=(%.1f,%.1f,%.1f) interest=(%.1f,%.1f,%.1f) fov=%.1f aspect=%.2f near=%.2f far=%.2f\n",
                        translatedCamera.eye[0], translatedCamera.eye[1], translatedCamera.eye[2],
@@ -6358,36 +6395,55 @@ static int RunMenuScene(GLFWwindow* window) {
                 /* Posed cast cutouts for the active cycling set, over the desert
                  * but UNDER the logo (heads may tuck behind the centre logo). */
                 {
-                    const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
-                    int acnt = aset->count;
-                    if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }
-                    for (titleCastIdx = 0; titleCastIdx < acnt; ++titleCastIdx) {
-                        const PCPortTitleCastMember* cm = &aset->members[titleCastIdx];
-                        f32 cu0 = cm->hflip ? 1.0f : 0.0f;
-                        f32 cu1 = cm->hflip ? 0.0f : 1.0f;
-                        if (!titleCastOk[titleSetIndex][titleCastIdx]) {
-                            continue;
+                    /* GameCube intro: the foreground UI appears AFTER the camera
+                     * pan settles, and the Pokemon Colosseum logo BOUNCES in (scale
+                     * overshoot), then the cast + PRESS START follow. During the pan
+                     * only the 3D ruins show. PCPORT_NO_PAN -> everything immediate. */
+                    double aT = (animTimeForced >= 0.0) ? animTimeForced : glfwGetTime();
+                    int panDone = (!titlePanOn) || (aT >= panSecs);
+                    double bt = titlePanOn ? (aT - panSecs) / 0.55 : 1.0;
+                    double bp, logoScale;
+                    int uiAfter;
+                    if (bt < 0.0) bt = 0.0;
+                    if (bt > 1.0) bt = 1.0;
+                    bp = bt - 1.0;
+                    logoScale = 1.0 + 2.70158 * bp * bp * bp + 1.70158 * bp * bp; /* back-out overshoot */
+                    uiAfter = (!titlePanOn) || (aT >= panSecs + 0.45);
+
+                    /* cast cutouts (under the logo) -- appear once the logo lands */
+                    if (uiAfter) {
+                        const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
+                        int acnt = aset->count;
+                        if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }
+                        for (titleCastIdx = 0; titleCastIdx < acnt; ++titleCastIdx) {
+                            const PCPortTitleCastMember* cm = &aset->members[titleCastIdx];
+                            f32 cu0 = cm->hflip ? 1.0f : 0.0f;
+                            f32 cu1 = cm->hflip ? 0.0f : 1.0f;
+                            if (!titleCastOk[titleSetIndex][titleCastIdx]) {
+                                continue;
+                            }
+                            DrawTexturedScreenRect(&titleCastTex[titleSetIndex][titleCastIdx],
+                                                   cm->x, cm->y, cm->w, cm->h,
+                                                   cu0, 0.0f, cu1, 1.0f);
                         }
-                        DrawTexturedScreenRect(&titleCastTex[titleSetIndex][titleCastIdx],
-                                               cm->x, cm->y, cm->w, cm->h,
-                                               cu0, 0.0f, cu1, 1.0f);
                     }
-                }
-                if (haveLogo) {
-                    /* logo, top-centre (540:224 aspect) */
-                    DrawTexturedScreenRect(&logoTex, 115.0f, 34.0f, 410.0f, 170.0f,
-                                           0.0f, 0.0f, 1.0f, 1.0f);
-                }
-                if (haveMenu018) {
-                    /* PRESS START only on the title itself (not while the save
-                     * prompt is up), then the copyright block on both. */
-                    if (sceneState == PCPORT_SCENE_TITLE) {
-                        DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
-                                               0.0f, 0.574f, 1.0f, 0.721f);
+                    if (haveLogo && panDone) {
+                        /* logo, top-centre (115,34,410,170), bounce-scaled about its centre */
+                        f32 lw = (f32)(410.0 * logoScale);
+                        f32 lh = (f32)(170.0 * logoScale);
+                        f32 lx = (115.0f + 205.0f) - lw * 0.5f;
+                        f32 ly = (34.0f + 85.0f) - lh * 0.5f;
+                        DrawTexturedScreenRect(&logoTex, lx, ly, lw, lh,
+                                               0.0f, 0.0f, 1.0f, 1.0f);
                     }
-                    /* copyright block (v0.016..0.549), bottom-left */
-                    DrawTexturedScreenRect(&menu018Tex, 28.0f, 392.0f, 300.0f, 58.0f,
-                                           0.0f, 0.016f, 1.0f, 0.549f);
+                    if (haveMenu018 && uiAfter) {
+                        if (sceneState == PCPORT_SCENE_TITLE) {
+                            DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
+                                                   0.0f, 0.574f, 1.0f, 0.721f);
+                        }
+                        DrawTexturedScreenRect(&menu018Tex, 28.0f, 392.0f, 300.0f, 58.0f,
+                                               0.0f, 0.016f, 1.0f, 0.549f);
+                    }
                 }
                 /* Memory-card read prompt over the title (matches the real boot). */
                 if (sceneState == PCPORT_SCENE_SAVE_PROMPT) {
