@@ -1067,6 +1067,154 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
     return TRUE;
 }
 
+/* Decompress the FSYS member at `entryOffset` into a fresh malloc'd buffer.
+ * Returns the buffer (caller frees) + size, or NULL. Same per-member logic as
+ * PCPort_LoadFsysMember, used by the scene-member scan below. */
+static u8* DecompressMemberAt(const u8* fsysData, u32 fsysSize,
+                              u32 entryOffset, u32* outSize) {
+    u32 dataOffset = ReadBE32(fsysData + entryOffset + 0x04);
+    u32 storedSize = ReadBE32(fsysData + entryOffset + 0x08);
+    u8* output;
+
+    if (dataOffset >= fsysSize ||
+        dataOffset + PCPORT_LZSS_HEADER_SIZE > fsysSize) {
+        return NULL;
+    }
+    if (ReadBE32(fsysData + dataOffset) == PCPORT_LZSS_MAGIC) {
+        u32 outN = ReadBE32(fsysData + dataOffset + 0x04);
+        u32 inN  = ReadBE32(fsysData + dataOffset + 0x08);
+        if (outN == 0 || inN < PCPORT_LZSS_HEADER_SIZE ||
+            dataOffset + inN > fsysSize) {
+            return NULL;
+        }
+        output = (u8*)malloc((size_t)outN);
+        if (output == NULL) {
+            return NULL;
+        }
+        if (!DecompressLZSS(fsysData + dataOffset, inN, output, outN)) {
+            free(output);
+            return NULL;
+        }
+        *outSize = outN;
+        return output;
+    }
+    if (dataOffset + storedSize > fsysSize || storedSize == 0) {
+        return NULL;
+    }
+    output = (u8*)malloc((size_t)storedSize);
+    if (output == NULL) {
+        return NULL;
+    }
+    memcpy(output, fsysData + dataOffset, storedSize);
+    *outSize = storedSize;
+    return output;
+}
+
+/* True if `data` is an HSD archive (fileSize word == size) exposing public `sym`. */
+static BOOL HSDArchiveHasPublic(const u8* data, u32 size, const char* sym) {
+    u32 dataSize, nreloc, npub, next, pubOff, extOff, strOff, k;
+    if (size < 0x20 || ReadBE32(data) != size) {
+        return FALSE;
+    }
+    dataSize = ReadBE32(data + 0x04);
+    nreloc   = ReadBE32(data + 0x08);
+    npub     = ReadBE32(data + 0x0C);
+    next     = ReadBE32(data + 0x10);
+    pubOff = 0x20 + dataSize + nreloc * 4;
+    extOff = pubOff + npub * 8;
+    strOff = extOff + next * 8;
+    if (strOff > size) {
+        return FALSE;
+    }
+    for (k = 0; k < npub; ++k) {
+        u32 entryOff = pubOff + k * 8;
+        u32 key, nameOff;
+        if (entryOff + 8 > size) {
+            break;
+        }
+        key = ReadBE32(data + entryOff + 4);
+        nameOff = strOff + key;
+        if (nameOff >= size) {
+            continue;
+        }
+        if (strcmp((const char*)(data + nameOff), sym) == 0) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* Field-map .fsys archives contain MULTIPLE members of the same name; only one is
+ * the renderable HSD scene archive. Return the LARGEST member that is an HSD archive
+ * exposing a "scene_data" public symbol (the map geometry; smaller scene_data members
+ * are shared object sets like ippan_m_b1). Lets the field loader reuse the same
+ * scene_data -> RenderJointTree path as the title without knowing member indices. */
+BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize) {
+    u8* fsysData;
+    u32 fsysSize = 0;
+    u32 entryCount, stringTableOffset, entryTableOffset, i;
+    u8* best = NULL;
+    u32 bestSize = 0;
+
+    if (outData == NULL || outSize == NULL) {
+        return FALSE;
+    }
+    *outData = NULL;
+    *outSize = 0;
+
+    fsysData = LoadFileBytes(fsysPath, &fsysSize);
+    if (fsysData == NULL) {
+        return FALSE;
+    }
+    if (fsysSize < 0x20 || ReadBE32(fsysData) != PCPORT_FSYS_MAGIC) {
+        free(fsysData);
+        return FALSE;
+    }
+
+    entryCount = ReadBE32(fsysData + 0x08);
+    stringTableOffset = ReadBE32(fsysData + 0x18);
+    if (stringTableOffset + 4 > fsysSize) {
+        free(fsysData);
+        return FALSE;
+    }
+    entryTableOffset = ReadBE32(fsysData + stringTableOffset);
+    if (entryTableOffset >= fsysSize) {
+        free(fsysData);
+        return FALSE;
+    }
+
+    for (i = 0; i < entryCount; ++i) {
+        u32 entryOffset, memSize = 0;
+        u8* mem;
+        if (entryTableOffset + i * 4 + 4 > fsysSize) {
+            break;
+        }
+        entryOffset = ReadBE32(fsysData + entryTableOffset + (i * 4));
+        if (entryOffset + 0x28 > fsysSize) {
+            continue;
+        }
+        mem = DecompressMemberAt(fsysData, fsysSize, entryOffset, &memSize);
+        if (mem == NULL) {
+            continue;
+        }
+        if (memSize > bestSize && HSDArchiveHasPublic(mem, memSize, "scene_data")) {
+            free(best);
+            best = mem;
+            bestSize = memSize;
+        } else {
+            free(mem);
+        }
+    }
+
+    free(fsysData);
+    if (best == NULL) {
+        return FALSE;
+    }
+    *outData = best;
+    *outSize = bestSize;
+    return TRUE;
+}
+
 void PCPort_FreeBuffer(void* buffer) {
     free(buffer);
 }

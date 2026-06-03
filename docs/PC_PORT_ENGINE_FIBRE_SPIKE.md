@@ -402,6 +402,37 @@ by the actual title/field/battle call graphs rather than swept wholesale.
 Build 106 objects, 0 failed; no regression. `src/game` untouched (generated copies +
 `tools/pcport_*` only).
 
+## 6h. P-C step 1 — the first overworld map renders (2026-06-02)
+
+Pivoted from breadth (host-linking) to **depth toward playable**: rendering a real
+field/overworld map. The `--field` flag loads a map .fsys and draws it statically
+through the existing `scene_data -> RenderJointTree -> fn_800DAD10` path (the same
+bridge as the title). **`D1_garage_1F` (Wes's hideout, the game's start) renders** —
+the room interior (walls, floor, furniture) verified via `PCPORT_DUMP`.
+
+Two real findings made it work:
+1. **Field maps have duplicate-named members.** A map .fsys (e.g. `D1_garage_1F`)
+   has several members named after the file; only the largest is the renderable HSD
+   scene archive (others are small object sets like `ippan_m_b1`). New
+   `PCPort_LoadFsysSceneMember` (real_content_host.c) scans all members, decompresses
+   each, and returns the **largest member exposing a `scene_data` public symbol** — so
+   the field loader needs no member-index knowledge. The scene_data struct layout is
+   byte-identical to the title's (scene_data->branch; branch+0=jointList, +8=camera;
+   jointList+0=rootJoint), confirmed by probing both.
+2. **The field joint graph contains CYCLES.** It is small (~40 joints, depth 5) but has
+   shared sub-trees / back-references that overflowed `RenderJointTree`'s naive
+   recursion (STACK_OVERFLOW). Fixed: the sibling (`next`) chain now **iterates**
+   instead of recursing, and a **visited-set cycle guard** (reset on the outermost
+   call via a depth counter) skips already-drawn joints. Behaviorally identical for the
+   title (still joints=31/dobjs=43/drawn=35) — it's a pure robustness fix.
+
+`PCPort_EngineFieldSetup` reuses the title render statics; the map's embedded camera
+didn't translate so a default look-at is used (`PCPORT_CAM_EYE`/`_INT` tune it;
+`PCPORT_FIELD_ARCHIVE` picks the map). Build 106 obj/0 fail; `--menu`/`--sched-test`/
+`--engine-boot` unaffected. **Next P-C steps:** texture/material fidelity on the map,
+then the WZX collision mesh + player update for actual walking (`gs_field_colquery`/
+`gs_colsys` cluster) — the first truly *playable* milestone.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,

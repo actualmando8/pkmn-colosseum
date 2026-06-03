@@ -4858,6 +4858,12 @@ typedef struct {
  * so flat-shaded geometry still renders and nothing aborts. Per-node baked
  * buffers are freed and the texture binding is cleared after every draw.
  */
+/* Cycle guard for RenderJointTree (see its body). Reset on the outermost call. */
+#define PCPORT_RJT_VISITED_MAX 16384
+static u32 g_rjtVisited[PCPORT_RJT_VISITED_MAX];
+static int g_rjtVisitedCount;
+static int g_rjtDepth;
+
 static void RenderJointTree(const PCPortHSDArchive* a,
                             u32 rootJoint,
                             u32 joint,
@@ -4867,9 +4873,30 @@ static void RenderJointTree(const PCPortHSDArchive* a,
     u32 dobjOffset;
     u32 childOffset;
     u32 nextOffset;
+    int vi;
+
+    /* Sibling (next) chain iterates, not recurses. Plus a cycle guard: field-map
+     * joint graphs are small (~40 joints) but CONTAIN CYCLES (shared sub-trees /
+     * back-references) that as naive recursion overflowed the stack. Skip any
+     * joint already visited this walk; the visited set resets on the outermost
+     * call (g_rjtDepth 0->1). Children stay recursive (shallow); siblings loop. */
+    if (g_rjtDepth++ == 0) {
+        g_rjtVisitedCount = 0;
+    }
+    for (;;) {
 
     if (!ArchiveRangeValid(a, joint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        g_rjtDepth--;
         return;
+    }
+    for (vi = 0; vi < g_rjtVisitedCount; ++vi) {
+        if (g_rjtVisited[vi] == joint) {   /* cycle / shared node: stop */
+            g_rjtDepth--;
+            return;
+        }
+    }
+    if (g_rjtVisitedCount < PCPORT_RJT_VISITED_MAX) {
+        g_rjtVisited[g_rjtVisitedCount++] = joint;
     }
     stats->joints++;
 
@@ -5203,8 +5230,11 @@ static void RenderJointTree(const PCPortHSDArchive* a,
     }
 
     nextOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x0C);
-    if (nextOffset != 0u && nextOffset != joint) {
-        RenderJointTree(a, rootJoint, nextOffset, cam, pipelineId, stats);
+    if (nextOffset == 0u || nextOffset == joint) {
+        g_rjtDepth--;
+        return;
+    }
+    joint = nextOffset;   /* tail-iterate to the next sibling */
     }
 }
 
@@ -6647,6 +6677,153 @@ void PCPort_DumpBackbuffer(const char* path) {
     DumpBackbufferTo(path);
 }
 
+/* ---- P-C step 1: field/overworld map static render ----
+ * Field maps (D1_, D2_, M1_ ... .fsys) are HSD scene archives just like the title:
+ * the renderable geometry is the largest member exposing a "scene_data" public
+ * symbol. Load it into the SAME g_engTitle* state + reuse PCPort_EngineTitleRenderFrame
+ * so the existing RenderJointTree -> fn_800DAD10 path draws the map. This is the
+ * first step toward a walkable overworld (collision/WZX + player update come later). */
+void PCPort_EngineTitleRenderFrame(void); /* defined just below; reused for the field */
+int PCPort_EngineFieldSetup(const char* archivePath) {
+    u8* memberData = NULL;
+    u32 memberSize = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0;
+    u32 sceneBranchOffset, cameraDescOffset, sceneJointListOffset;
+    int haveCam = 0;
+
+    g_engTitleReady = 0;
+    memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
+    memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
+
+    if (!PCPort_LoadFsysSceneMember(archivePath, &memberData, &memberSize)) {
+        fprintf(stderr, "[field] no scene_data member in %s\n", archivePath);
+        return 0;
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_engTitleArchive, memberData, memberSize)) {
+        fprintf(stderr, "[field] archive parse failed (%s)\n", archivePath);
+        return 0;
+    }
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_engTitleArchive,
+                                                             "scene_data", &sceneOffset);
+    if (sceneData == NULL) {
+        fprintf(stderr, "[field] scene_data unresolved\n");
+        return 0;
+    }
+    sceneBranchOffset = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&g_engTitleArchive, sceneBranchOffset, 0x10u)) {
+        fprintf(stderr, "[field] scene branch invalid (0x%X)\n", sceneBranchOffset);
+        return 0;
+    }
+
+    /* Camera: try the map's embedded camera (scene branch +0x08, same layout as
+     * the title). If it doesn't resolve, synthesize a generous default look-at so
+     * something draws; PCPORT_CAM_EYE/INT/UP override either way (for framing). */
+    cameraDescOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x08);
+    if (cameraDescOffset != 0 &&
+        PCPort_TranslatePerspectiveCameraFromArchiveBE(&g_engTitleArchive,
+                                                       cameraDescOffset, &g_engTitleCamera)) {
+        haveCam = 1;
+    }
+    if (!haveCam) {
+        /* Default perspective + viewport for a bare map (no embedded camera). */
+        f32 eye[3] = { 0.0f, 250.0f, 600.0f };
+        f32 interest[3] = { 0.0f, 0.0f, 0.0f };
+        f32 up[3] = { 0.0f, 1.0f, 0.0f };
+        memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
+        g_engTitleCamera.viewportLeft = 0; g_engTitleCamera.viewportTop = 0;
+        g_engTitleCamera.viewportRight = (u16)PCPORT_WINDOW_WIDTH;
+        g_engTitleCamera.viewportBottom = (u16)PCPORT_WINDOW_HEIGHT;
+        g_engTitleCamera.scissorLeft = 0; g_engTitleCamera.scissorTop = 0;
+        g_engTitleCamera.scissorRight = (u16)PCPORT_WINDOW_WIDTH;
+        g_engTitleCamera.scissorBottom = (u16)PCPORT_WINDOW_HEIGHT;
+        /* Standard GX perspective (MTXPerspective form), GXSetProjection-ready. */
+        {
+            f32 aspect = (f32)PCPORT_WINDOW_WIDTH / (f32)PCPORT_WINDOW_HEIGHT;
+            f32 nz = 1.0f, fz = 20000.0f;
+            f32 cot = 1.0f / (f32)tan(45.0 * 0.5 * 3.14159265358979 / 180.0);
+            f32 (*m)[4] = g_engTitleCamera.projectionMatrix;
+            memset(m, 0, sizeof(g_engTitleCamera.projectionMatrix));
+            m[0][0] = cot / aspect;
+            m[1][1] = cot;
+            m[2][2] = fz / (nz - fz);
+            m[2][3] = (fz * nz) / (nz - fz);
+            m[3][2] = -1.0f;
+        }
+        BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
+        printf("[field] no embedded camera -> default look-at (tune with PCPORT_CAM_EYE/INT)\n");
+    }
+
+    /* PCPORT_CAM_EYE / PCPORT_CAM_INT (+ optional _UP) override the view (tuning). */
+    {
+        const char* ce = getenv("PCPORT_CAM_EYE");
+        const char* ci = getenv("PCPORT_CAM_INT");
+        const char* cu = getenv("PCPORT_CAM_UP");
+        if (ce != NULL && ci != NULL) {
+            f32 e[3] = {0,0,0}, in[3] = {0,0,0}, u[3] = {0,1,0};
+            sscanf(ce, "%f,%f,%f", &e[0], &e[1], &e[2]);
+            sscanf(ci, "%f,%f,%f", &in[0], &in[1], &in[2]);
+            if (cu != NULL) sscanf(cu, "%f,%f,%f", &u[0], &u[1], &u[2]);
+            BuildViewMatrixLookAt(e, in, u, g_engTitleCamera.viewMatrix);
+            printf("[field] camera override eye=(%.1f,%.1f,%.1f) int=(%.1f,%.1f,%.1f)\n",
+                   e[0], e[1], e[2], in[0], in[1], in[2]);
+        }
+    }
+
+    sceneJointListOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x00);
+    g_engTitleRootJoint  = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneJointListOffset + 0x00);
+    if (!ArchiveRangeValid(&g_engTitleArchive, g_engTitleRootJoint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        fprintf(stderr, "[field] root joint invalid (0x%X)\n", g_engTitleRootJoint);
+        return 0;
+    }
+
+    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    g_engTitleReady = 1;
+    printf("[field] map loaded for render: %s (scene member 0x%X bytes, rootJoint=0x%X, cam=%s)\n",
+           archivePath, memberSize, g_engTitleRootJoint, haveCam ? "embedded" : "default");
+    return 1;
+}
+
+/* --field: static field-map render loop. PCPORT_FIELD_ARCHIVE picks the map
+ * (default D1_garage_1F = Wes's hideout, the game's start). */
+static int RunFieldScene(GLFWwindow* window) {
+    const char* archive = getenv("PCPORT_FIELD_ARCHIVE");
+    const char* capEnv = getenv("PCPORT_MENU_FRAMES");
+    const char* dumpPath = getenv("PCPORT_DUMP");
+    int frameCap = (capEnv != NULL && atoi(capEnv) > 0) ? atoi(capEnv) : 0;
+    int frame = 0;
+    char path[512];
+
+    if (archive == NULL || archive[0] == '\0') {
+        archive = "orig/GC6E01/disc/files/D1_garage_1F.fsys";
+    } else if (strchr(archive, '/') == NULL && strchr(archive, '\\') == NULL) {
+        /* bare name -> resolve under the disc files dir */
+        snprintf(path, sizeof(path), "orig/GC6E01/disc/files/%s.fsys", archive);
+        archive = path;
+    }
+
+    if (!PCPort_EngineFieldSetup(archive)) {
+        return 0;
+    }
+
+    while (!glfwWindowShouldClose(window)) {
+        VIWaitForRetrace_PC();
+        PCPort_EngineTitleRenderFrame();   /* same scene_data -> RenderJointTree path */
+        if (dumpPath != NULL && dumpPath[0] != '\0' &&
+            (frameCap > 0 ? frame == frameCap - 1 : frame == 2)) {
+            DumpBackbufferTo(dumpPath);
+            printf("[field] dumped frame %d to %s\n", frame, dumpPath);
+        }
+        GSgfxSwapBuffers(0);
+        frame++;
+        if (frameCap > 0 && frame >= frameCap) {
+            break;
+        }
+    }
+    printf("[field] rendered %d frames\n", frame);
+    return 1;
+}
+
 void PCPort_EngineTitleRenderFrame(void) {
     MenuTreeStats stats;
     if (!g_engTitleReady) {
@@ -6697,6 +6874,7 @@ int main(int argc, char** argv) {
     int runMenu;
     int runEngine;
     int runEngineBoot;
+    int runField;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -6725,6 +6903,7 @@ int main(int argc, char** argv) {
     runMenu = HasArg(argc, argv, "--menu");
     runEngine = HasArg(argc, argv, "--engine");
     runEngineBoot = HasArg(argc, argv, "--engine-boot");
+    runField = HasArg(argc, argv, "--field");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
 
@@ -6762,7 +6941,7 @@ int main(int argc, char** argv) {
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
-        runMenu || runEngine || runEngineBoot || argc <= 1) {
+        runMenu || runEngine || runEngineBoot || runField || argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
             return 1;
@@ -6955,6 +7134,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
+    } else if (runField) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldScene(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field map rendered through the game-owned draw bridge\n");
     } else if (runEngineBoot) {
         if (window == NULL) {
             fprintf(stderr,
