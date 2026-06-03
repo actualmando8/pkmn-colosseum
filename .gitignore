@@ -26,6 +26,19 @@ orig/*/*
 *.ciso
 *.rvz
 
+# Raw extracted game binary / disassembly artifacts (copyright — regenerate from
+# your own orig/ ROM; do not commit verbatim game data).
+tools/ghidra/dol_split/*.bin
+tools/ghidra/project/
+*.bin
+
+# Per-function disassembly + nonmatching asm: kept LOCAL only, never on the public
+# repo (derived from the ROM, and not the canonical dtk-template format). The
+# canonical dtk build does not use these; if a ROM-regen tool is added later it
+# writes here. History is scrubbed of these paths separately.
+*.inc
+/asm/
+
 # Build artifacts
 build/
 .ninja_*

@@ -2,7 +2,7 @@
 """pcport_genfont.py -- generate an embedded ASCII bitmap-font atlas header.
 
 Renders printable ASCII (0x20..0x7E) with a system monospace TTF into a fixed
-16-column cell grid, and emits src/pcport/pcport_font.h: cell/atlas dimensions +
+16-column cell grid, and emits pcport/pcport_font.h: cell/atlas dimensions +
 a flat alpha-coverage array (one byte per atlas pixel). The PC port has no glyph
 renderer; pcport_main.c expands this to an RGBA (white + alpha) texture once and
 draws text by blitting per-glyph sub-rects (DrawTextScreen).

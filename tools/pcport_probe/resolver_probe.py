@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Bounds-safe reference for the HSD archive resolver — mirrors
-src/pcport/real_content_host.c (FSYS member load + LZSS + HSD archive parse +
+pcport/real_content_host.c (FSYS member load + LZSS + HSD archive parse +
 relocation + public-symbol resolution). Used to verify the P1 pipeline on real
 game data and to debug the native probe.
 

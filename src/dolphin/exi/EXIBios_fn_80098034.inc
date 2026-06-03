@@ -1,3 +1,0 @@
-    nofralloc
-    sc
-    blr

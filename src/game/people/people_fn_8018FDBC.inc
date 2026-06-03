@@ -1,6 +1,0 @@
-    nofralloc
-/* 8018FDBC 0018CDBC  38 00 00 00 */	li r0, 0x0
-/* 8018FDC0 0018CDC0  98 03 00 00 */	stb r0, 0x0(r3)
-/* 8018FDC4 0018CDC4  98 03 00 20 */	stb r0, 0x20(r3)
-/* 8018FDC8 0018CDC8  38 60 00 01 */	li r3, 0x1
-/* 8018FDCC 0018CDCC  4E 80 00 20 */	blr

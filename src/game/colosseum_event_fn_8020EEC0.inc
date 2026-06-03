@@ -1,6 +1,0 @@
-    nofralloc
-/* 8020EEC0 0020BEC0  88 0D AD E0 */	lbz r0, -21024(r13)
-/* 8020EEC4 0020BEC4  20 00 00 01 */	subfic r0, r0, 0x1
-/* 8020EEC8 0020BEC8  7C 00 00 34 */	cntlzw r0, r0
-/* 8020EECC 0020BECC  54 03 DE 3E */	extrwi r3, r0, 8, 19
-/* 8020EED0 0020BED0  4E 80 00 20 */	blr

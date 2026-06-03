@@ -67,12 +67,28 @@ def diff_text(rng):
     return git("diff", rng)
 
 
-def check_truth_files(files):
+def check_truth_files(rng):
+    """Flag truth files that are MODIFIED or ADDED — the forge case (editing the
+    ROM-truth bytes / config to fake a match).
+
+    DELETIONS and RENAMES are allowed: removing or moving a truth file cannot
+    forge a match. In particular the dtk-template migration intentionally DELETES
+    the committed per-function *.inc (copyright; regenerated from the ROM into
+    gitignored build/ instead) — that is not tampering. `git diff --name-status`
+    yields A / M / D / R<score> / C<score>; we reject only A and M.
+    """
+    out = git("diff", "--name-status", rng)
     bad = []
-    for f in files:
+    for line in out.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        status, path = parts[0], parts[-1]  # parts[-1] = new path for renames
+        if status[:1] not in ("A", "M"):    # allow D (delete), R (rename), C (copy)
+            continue
         for rx in TRUTH_DENY:
-            if rx.search(f):
-                bad.append(f)
+            if rx.search(path):
+                bad.append(f"{status} {path}")
                 break
     return bad
 
@@ -214,7 +230,7 @@ def main():
         violations += ["WHOLE-FILE REGRESSION: " + m
                        for m in check_file_regression(parent, head)]
 
-    bad_truth = check_truth_files(files)
+    bad_truth = check_truth_files(rng)
     if bad_truth:
         violations.append("TRUTH-FILE EDIT (forbidden): "
                           + ", ".join(bad_truth))

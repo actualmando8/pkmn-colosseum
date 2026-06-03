@@ -1,7 +1,0 @@
-    nofralloc
-/* 800DF1B8 000DC1B8  80 83 00 20 */	lwz r4, 0x20(r3)
-/* 800DF1BC 000DC1BC  28 04 00 00 */	cmplwi r4, 0x0
-/* 800DF1C0 000DC1C0  D0 23 00 34 */	stfs f1, 0x34(r3)
-/* 800DF1C4 000DC1C4  4D 82 00 20 */	beqlr
-/* 800DF1C8 000DC1C8  D0 24 00 50 */	stfs f1, 0x50(r4)
-/* 800DF1CC 000DC1CC  4E 80 00 20 */	blr
