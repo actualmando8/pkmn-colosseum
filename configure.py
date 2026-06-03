@@ -148,7 +148,10 @@ def _local(path: Path) -> Path:
 
 config.dtk_path = args.dtk or _local(Path("tools") / "dtk.exe")
 config.objdiff_path = args.objdiff or _local(Path("tools") / "objdiff-cli.exe")
-config.compilers_path = args.compilers or _local(Path("tools") / "mwcc_compiler")
+# Compilers (copyrighted Metrowerks binaries) are NOT vendored: left as None so
+# project.py downloads the pinned set (compilers_tag) to build/compilers — the
+# canonical dtk-template behavior. --compilers overrides for a local set.
+config.compilers_path = args.compilers
 
 # Project
 config.config_path = Path("config") / config.version / "config.yml"
