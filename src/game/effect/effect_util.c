@@ -4072,13 +4072,17 @@ _ret0:
 }
 
 /* 0x80135C58 | 0x20 */
-#if 1
+#if 0
 asm void fn_80135C58(void) {
 #include "src/game/effect/effect_util_fn_80135C58.inc"
 }
 #else
-/* Returns r3:r4 pair - cannot easily match in C */
-void fn_80135C58(void) { }
+/* Returns the r3:r4 pair (two words at *p) as a u64, or 0 if p is NULL.
+ * byte-match verified: 8/8 instrs vs target; decomp.me scratch O3Iat = 100%. */
+u64 fn_80135C58(u32* p) {
+    if (p) return *(u64*)p;
+    return 0;
+}
 #endif
 
 /* 0x80135C78 | 24 bytes | beq_default_getter */

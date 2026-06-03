@@ -370,7 +370,7 @@ s32 fn_8005D0B8(void);
 s32 fn_8005D0DC(void);
 s32 fn_8005D130(void);
 void fn_8005D184(void);
-void fn_8005D26C(void);
+s32  fn_8005D26C(void);
 void fn_8005D2E8(void);
 void fn_8005D3D0(void);
 s32 fn_8005D4AC(void* a, void* b);
@@ -379,8 +379,8 @@ s32 fn_8005D53C(void* a, void* b);
 s32 fn_8005D584(void* a, void* b);
 void fn_8005D5CC(void);
 void fn_8005D6A8(void);
-void fn_8005D738(void);
-void fn_8005D798(void);
+u8   fn_8005D738(u8 arg);
+u16  fn_8005D798(u8 *base, u8 sel);
 void* fn_8005D7F8(u32 idx);
 void* fn_8005D830(u32 idx);
 void* fn_8005D858(u32 idx);
@@ -393,7 +393,7 @@ void fn_8005D9AC(s32 idx, u16 val1, u16 val2);
 u8 fn_8005D9E4(s32 idx);
 void* fn_8005DA18(s32 idx);
 void fn_8005DA48(void);
-void fn_8005DBC4(void);
+s32  fn_8005DBC4(void);
 void fn_8005DC24(void);
 void fn_8005DCC4(void);
 void fn_8005DEE8(void);
@@ -4052,14 +4052,15 @@ s32 fn_8005D0B8(void) {
 #pragma pop
 
 /* 0x8005D0DC | size: 0x54 */
-#if 1
+#if 0
 asm s32 fn_8005D0DC(void) {
 #include "src/game/ui/ui_core_fn_8005D0DC.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
+#pragma peephole off
 s32 fn_8005D0DC(void) {
     s32 result;
 
@@ -4076,14 +4077,15 @@ s32 fn_8005D0DC(void) {
 
 
 /* 0x8005D130 | size: 0x54 */
-#if 1
+#if 0
 asm s32 fn_8005D130(void) {
 #include "src/game/ui/ui_core_fn_8005D130.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 4
-#pragma scheduling off
+#pragma scheduling on
+#pragma peephole off
 s32 fn_8005D130(void) {
     s32 result;
 
@@ -4177,48 +4179,29 @@ void fn_8005D184(void) {
 
 
 /* 0x8005D26C | size: 0x7C */
-#if 1
+#if 0
 asm void fn_8005D26C(void) {
 #include "src/game/ui/ui_core_fn_8005D26C.inc"
 }
 #else
-void fn_8005D26C(void) {
-    extern void fn_80102428();
-    extern void fn_80102510();
-    extern void fn_8010264C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    
-    r5 = *(u32*)&lbl_8047BF30;
-    r3 = 0x9e;
-    r0 = *(u32*)&lbl_8047BF34;
-    r4 = 0x1;
-    *(u32*)(sp + 0xC) = r0;
-    fn_8010264C();
-    r31 = r3;
-    r3 = 0x9e;
-    fn_80102510();
-    r3 = 0x9e;
-    r4 = 0x1;
-    fn_80102428();
-    if ((s32)r31 < (s32)-0x1) { r3 = 0x1; return; }
-    if ((s32)r31 >= (s32)0x2) {
-
-        r3 = 0x1;
-        return;
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+s32 fn_8005D26C(void) {
+    s32 r31;
+    u32 arr[2];
+    arr[0] = *(u32*)&lbl_8047BF30;
+    arr[1] = *(u32*)&lbl_8047BF34;
+    r31 = fn_8010264C(0x9e, 1);
+    fn_80102510(0x9e);
+    fn_80102428(0x9e, 1);
+    if (r31 < -1 || r31 >= 2) {
+        return 1;
     }
-    r0 = r31 << 2;
-    r3 = (u32)sp + 0x8;
-    r3 = *(u32*)(r3 + r0);
-
-    return;
+    return arr[r31];
 }
+#pragma pop
 #endif
 
 
@@ -4372,62 +4355,74 @@ void fn_8005D3D0(void) {
 
 
 /* 0x8005D4AC | size: 0x48 */
-#if 1
+#if 0
 asm s32 fn_8005D4AC(void* a, void* b) {
 #include "src/game/ui/ui_core_fn_8005D4AC.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_8005D4AC(void* a, void* b) {
     u8 val = (lbl_8047A5A8 & 0x8) ? 1 : 0;
     fn_80109220(b, val);
     return 0;
 }
+#pragma pop
 #endif
 
 
 /* 0x8005D4F4 | size: 0x48 */
-#if 1
+#if 0
 asm s32 fn_8005D4F4(void* a, void* b) {
 #include "src/game/ui/ui_core_fn_8005D4F4.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_8005D4F4(void* a, void* b) {
     u8 val = (lbl_8047A5A8 & 0x4) ? 1 : 0;
     fn_80109220(b, val);
     return 0;
 }
+#pragma pop
 #endif
 
 
 /* 0x8005D53C | size: 0x48 */
-#if 1
+#if 0
 asm s32 fn_8005D53C(void* a, void* b) {
 #include "src/game/ui/ui_core_fn_8005D53C.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_8005D53C(void* a, void* b) {
     u8 val = (lbl_8047A5A8 & 0x2) ? 1 : 0;
     fn_80109220(b, val);
     return 0;
 }
+#pragma pop
 #endif
 
 
 /* 0x8005D584 | size: 0x48 */
-#if 1
+#if 0
 asm s32 fn_8005D584(void* a, void* b) {
 #include "src/game/ui/ui_core_fn_8005D584.inc"
 }
 #else
+#pragma push
 #pragma optimization_level 4
+#pragma peephole off
 s32 fn_8005D584(void* a, void* b) {
     u8 val = (lbl_8047A5A8 & 0x1) ? 1 : 0;
     fn_80109220(b, val);
     return 0;
 }
+#pragma pop
 #endif
 
 
@@ -4562,79 +4557,49 @@ void fn_8005D6A8(void) {
 
 
 /* 0x8005D738 | size: 0x60 */
-#if 1
+#if 0
 asm void fn_8005D738(void) {
 #include "src/game/ui/ui_core_fn_8005D738.inc"
 }
 #else
-void fn_8005D738(void) {
-    extern void fn_80102428();
-    extern void fn_80102510();
-    extern void fn_8010264C();
-    u8 sp[0x10];
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    
-    *(u8*)&lbl_8047A5A8 = r3;
-    r3 = 0x9d;
-    r4 = 0x1;
-    fn_8010264C();
-    r31 = r3;
-    r3 = 0x9d;
-    fn_80102510();
-    r3 = 0x9d;
-    r4 = 0x1;
-    fn_80102428();
-    if ((s32)r31 == (s32)0x73d) {
-        r3 = *(u8*)&lbl_8047A5A8;
-    } else {
-
-        r3 = 0xff;
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+u8 fn_8005D738(u8 arg) {
+    s32 r31;
+    lbl_8047A5A8 = arg;
+    r31 = fn_8010264C(0x9d, 1);
+    fn_80102510(0x9d);
+    fn_80102428(0x9d, 1);
+    if (r31 == 0x73d) {
+        return lbl_8047A5A8;
     }
-    return;
+    return 0xff;
 }
+#pragma pop
 #endif
 
 
 /* 0x8005D798 | size: 0x60 */
-#if 1
+#if 0
 asm void fn_8005D798(void) {
 #include "src/game/ui/ui_core_fn_8005D798.inc"
 }
 #else
-void fn_8005D798(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-
-    
-    r0 = r4 & 0xFF;
-    r4 = 0x0;
-    if ((s32)r0 == (s32)0x1) {
-        r4 = *(u16*)((u8*)r3 + 0x4);
-        r3 = r4;
-        return;
-    } else if ((s32)r0 == (s32)0x2) {
-        r4 = *(u16*)((u8*)r3 + 0x6);
-        r3 = r4;
-        return;
-    } else if ((s32)r0 == (s32)0x3) {
-        r4 = *(u16*)((u8*)r3 + 0x8);
-        r3 = r4;
-        return;
-    } else if ((s32)r0 == (s32)0x4) {
-        r4 = *(u16*)((u8*)r3 + 0x0);
-        r3 = r4;
-        return;
-    } else if ((s32)r0 == (s32)0x5) {
-        r4 = *(u16*)((u8*)r3 + 0x2);
-        r3 = r4;
-        return;
+/* getter: select one of 5 u16 fields by (sel&0xFF) in 1..5 -> binary-search compare
+ * tree; 0 / out-of-range returns 0. byte-match verified via objdiff. */
+u16 fn_8005D798(u8 *base, u8 sel) {
+    u32 i = sel & 0xFF;
+    u16 r = 0;
+    switch (i) {
+    case 1: r = *(u16 *)(base + 0x4); break;
+    case 2: r = *(u16 *)(base + 0x6); break;
+    case 3: r = *(u16 *)(base + 0x8); break;
+    case 4: r = *(u16 *)(base + 0x0); break;
+    case 5: r = *(u16 *)(base + 0x2); break;
     }
-    r3 = r4;
-    return;
+    return r;
 }
 #endif
 
@@ -4964,44 +4929,26 @@ void fn_8005DA48(void) {
 
 
 /* 0x8005DBC4 | size: 0x60 */
-#if 1
+#if 0
 asm void fn_8005DBC4(void) {
 #include "src/game/ui/ui_core_fn_8005DBC4.inc"
 }
 #else
-void fn_8005DBC4(void) {
-    extern void fn_80102510();
-    extern void fn_80102620();
-    extern void fn_801026A4();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-
-    
-    r3 = 0xbb;
-    fn_80102620();
-    r0 = r3 & 0xFF;
-    if (r0 != (u32)0x0) {
-        r3 = 0xbb;
-        fn_80102510();
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
+#pragma peephole off
+s32 fn_8005DBC4(void) {
+    extern u8 fn_80102620(s32);
+    extern void fn_801026A4(s32, s32, s32, s32, s32, s32, ...);
+    if (fn_80102620(0xbb)) {
+        fn_80102510(0xbb);
     } else {
-
-        r3 = 0xbb;
-        r4 = 0x0;
-        r5 = 0x0;
-        r6 = 0x0;
-        r7 = 0x1;
-        r8 = 0x0;
-        /* crclr cr1eq */;
-        fn_801026A4();
+        fn_801026A4(0xbb, 0, 0, 0, 1, 0);
     }
-    r3 = 0x0;
-    return;
+    return 0;
 }
+#pragma pop
 #endif
 
 

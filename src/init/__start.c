@@ -324,7 +324,7 @@ _flush_loop:
 
 /* fn_80003458 - 0x80003458 | size: 0x30 */
 extern void fn_800C0DA8(void);
-#if 1
+#if 0
 asm void fn_80003458(void) {
 #include "src/init/__start_fn_80003458.inc"
 }

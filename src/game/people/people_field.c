@@ -1084,7 +1084,7 @@ extern u8 lbl_80447E60[];
 extern void fn_8015D7D0(void);
 extern void fn_801629A4(u32 index, u8 value);
 extern void fn_801629D0(u32 index, u8 value);
-extern void fn_801629FC(void);
+extern void fn_801629FC(u32 index, u8 flag);
 extern void fn_801632B4(void);
 extern void fn_80163490(void);
 extern void fn_801634A8(void);
@@ -1093,9 +1093,9 @@ extern void fn_801637B8(u8* ptr, u32 size);
 extern void fn_80163810(void);
 extern void fn_80163BCC(u8* a, u32 b);
 extern void fn_80163BE4(void);
-extern void fn_80163CA8(void);
+extern u8   fn_80163CA8();
 extern u32  fn_80163DB0(u32 idx, u32 *out);
-extern void fn_80163DE8(void);
+extern void fn_80163DE8();
 extern u32  fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a);
 extern void fn_801640C4(void);
 extern u32  fn_801640E4(void);
@@ -1426,14 +1426,29 @@ void fn_801629D0(u32 index, u8 value) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801629FC(void) {
 #include "src/game/people/people_field_fn_801629FC.inc"
 }
 #else
-void fn_801629FC(void) { /* TODO */ }
+/* peopleFieldMemSetup: flag==0 marks NPC slot active (set hi bit of +0xF0, +0xD0/+0xD2=0x10);
+ * else clears the hi bit. Base array lbl_8047B024 (stride 0xF4, same as fn_801629A4/D0) is
+ * re-read per access (volatile reinterpret) to match the target. byte-match verified 22/22. */
+void fn_801629FC(u32 index, u8 flag) {
+    typedef struct { u8 pad[0xD0]; u16 d0; u16 d2; u8 pad2[0x1C]; u32 f0; } NpcEntry;
+    extern u32 lbl_8047B024;
+#define PF (*(NpcEntry* volatile*)&lbl_8047B024)
+    if (flag == 0) {
+        PF[index].f0 |= 0x80000000;
+        PF[index].d0 = 0x10;
+        PF[index].d2 = 0x10;
+    } else {
+        PF[index].f0 &= ~0x80000000u;
+    }
+#undef PF
+}
 #endif
 #pragma pop
 #pragma push
@@ -1893,26 +1908,103 @@ extern u32 lbl_8047B078;
 void fn_80163BCC(u8* unused, u32 size) {
     lbl_8047B078 -= (size + 0x1F) & ~0x1F;
 }
+/* shared free-list node (stride 0x10) + heads; used by 80163BE4/CA8/DB0/DE8 */
+typedef struct PFNode { struct PFNode* next; u32 f4; u32 f8; u32 fc; } PFNode;
+extern PFNode lbl_80450098[];
+extern PFNode *lbl_8047B060, *lbl_8047B064, *lbl_8047B068;
+extern u32 lbl_8047B074, lbl_8047B07C;
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163BE4(void) {
 #include "src/game/people/people_field_fn_80163BE4.inc"
 }
 #else
-void fn_80163BE4(void) { /* TODO */ }
+/* peopleFieldMoveSetState: init the 0x40-entry free list (node[i].next=&node[i+1],
+ * tail NULL; head ptrs reset). byte-match verified via objdiff. */
+void fn_80163BE4(void) {
+    u32 i;
+    lbl_8047B068 = 0;
+    lbl_8047B064 = 0;
+    lbl_8047B060 = &lbl_80450098[0];
+    for (i = 1; i < 0x40; i++) {
+        lbl_80450098[i - 1].next = &lbl_80450098[i];
+    }
+    lbl_80450098[i - 1].next = 0;
+    lbl_8047B074 = lbl_8047B07C;
+}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163CA8(void) {
 #include "src/game/people/people_field_fn_80163CA8.inc"
 }
 #else
-void fn_80163CA8(void) { /* TODO */ }
+/* peopleFieldMoveApplyForce: best-fit allocator over the free list; returns the slot
+ * index (u8) or 0xFF. byte-match verified via objdiff. */
+u8 fn_80163CA8(u32 size) {
+    PFNode* node;
+    PFNode* prev;
+    PFNode* best;
+    u32 bestExcess;
+    u32 aligned;
+
+    aligned = (size + 0x1f) & ~0x1fu;
+    node = lbl_8047B064;
+    best = 0;
+    prev = 0;
+    bestExcess = (u32)-1;
+
+    while (node != 0) {
+        if (node->fc == aligned) {
+            best = node;
+            goto have_best;
+        }
+        if (node->fc > aligned) {
+            if (bestExcess > node->fc) {
+                best = node;
+                bestExcess = node->fc;
+            }
+        }
+        prev = node;
+        node = node->next;
+    }
+have_best:
+
+    if (best == 0) {
+        PFNode* fh = lbl_8047B060;
+        if (fh != 0) {
+            if ((u32)(lbl_8047B074 - aligned) >= lbl_8047B078) {
+                lbl_8047B060 = fh->next;
+                best = fh;
+                fh->fc = aligned;
+                fh->f8 = aligned;
+                lbl_8047B074 = lbl_8047B074 - aligned;
+                fh->f4 = lbl_8047B074;
+                fh->next = lbl_8047B068;
+                lbl_8047B068 = fh;
+            }
+        }
+    } else {
+        if (prev != 0) {
+            prev->next = best->next;
+        } else {
+            lbl_8047B064 = best->next;
+        }
+        best->f8 = aligned;
+        best->next = lbl_8047B068;
+        lbl_8047B068 = best;
+    }
+
+    if (best == 0) {
+        return 0xff;
+    }
+    return (u8)(best - lbl_80450098);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1923,8 +2015,6 @@ asm void fn_80163DB0(void) {
 #include "src/game/people/people_field_fn_80163DB0.inc"
 }
 #else
-typedef struct { u8 pad[4]; u32 f4; u32 f8; u8 pad2[4]; } Entry_0x10;
-extern Entry_0x10 lbl_80450098[];
 u32 fn_80163DB0(u32 idx, u32 *out) {
     if (out != 0) {
         *out = lbl_80450098[(u8)idx].f8;
@@ -1934,14 +2024,71 @@ u32 fn_80163DB0(u32 idx, u32 *out) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80163DE8(void) {
 #include "src/game/people/people_field_fn_80163DE8.inc"
 }
 #else
-void fn_80163DE8(void) { /* TODO */ }
+/* peopleFieldMoveCalcForce: unlink a block, and if it was the active one, recompute the
+ * min and recoalesce; else push to the other free list. byte-match verified via objdiff. */
+void fn_80163DE8(u32 idx) {
+    PFNode* blk;
+    PFNode* cur;
+    PFNode* prev;
+
+    blk = &lbl_80450098[(u8)idx];
+    cur = lbl_8047B068;
+    prev = 0;
+
+    while (cur != 0) {
+        if (cur == blk) {
+            if (prev != 0) {
+                prev->next = blk->next;
+            } else {
+                lbl_8047B068 = blk->next;
+            }
+            break;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+
+    if (blk->f4 == lbl_8047B074) {
+        u32 mn;
+        PFNode* scan;
+
+        blk->next = lbl_8047B060;
+        lbl_8047B060 = blk;
+
+        mn = (u32)-1;
+        scan = lbl_8047B068;
+        while (scan != 0) {
+            if (scan->f4 <= mn) {
+                mn = scan->f4;
+            }
+            scan = scan->next;
+        }
+
+        scan = lbl_8047B064;
+        while (scan != 0) {
+            PFNode* nx = scan->next;
+            if (scan->f4 < mn) {
+                lbl_8047B064 = scan->next;
+                scan->next = lbl_8047B060;
+                lbl_8047B060 = scan;
+            }
+            scan = nx;
+        }
+
+        lbl_8047B074 = (mn != (u32)-1) ? mn : lbl_8047B07C;
+        return;
+    }
+
+    blk->next = lbl_8047B064;
+    lbl_8047B064 = blk;
+}
 #endif
 #pragma pop
 #pragma push

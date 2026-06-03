@@ -679,13 +679,31 @@ f32 fn_801944F8(u8* ptr) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800CE220(void);
+extern double fn_800CE220(f32);
+extern f32 lbl_8047D978;
+extern f32 lbl_8047D97C;
+extern f32 lbl_8047D980;
 #if 1
 asm void fn_80194510(void) {
 #include "src/hsd/hsd_cobj_fn_80194510.inc"
 }
 #else
-void fn_80194510(void) { /* TODO */ }
+/* NEAR (W1 reg-permutation in tan-result FP chain): case1 keeps tan in f1, decomp evacuates to f2. */
+f32 fn_80194510(u8* ptr) {
+    if (ptr == NULL) {
+        return lbl_8047D978;
+    }
+    switch (ptr[0x50]) {
+    case 1:
+        return *(f32*)(ptr + 0x44) * (*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40))));
+    case 2:
+        return *(f32*)(ptr + 0x4C);
+    case 3:
+        return *(f32*)(ptr + 0x4C);
+    default:
+        return lbl_8047D978;
+    }
+}
 #endif
 #pragma pop
 
@@ -698,20 +716,49 @@ asm void fn_801945B0(void) {
 #include "src/hsd/hsd_cobj_fn_801945B0.inc"
 }
 #else
-void fn_801945B0(void) { /* TODO */ }
+/* NEAR (W1 reg-permutation in tan-result FP chain): case1 keeps tan in f1, decomp evacuates to f3. */
+f32 fn_801945B0(u8* ptr) {
+    if (ptr == NULL) {
+        return lbl_8047D978;
+    }
+    switch (ptr[0x50]) {
+    case 1:
+        return *(f32*)(ptr + 0x44) * (-*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40))));
+    case 2:
+        return *(f32*)(ptr + 0x48);
+    case 3:
+        return *(f32*)(ptr + 0x48);
+    default:
+        return lbl_8047D978;
+    }
+}
 #endif
 #pragma pop
 
 /* 0x80194654 | 0x9C */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80194654(void) {
 #include "src/hsd/hsd_cobj_fn_80194654.inc"
 }
 #else
-void fn_80194654(void) { /* TODO */ }
+f32 fn_80194654(u8* ptr) {
+    if (ptr == NULL) {
+        return lbl_8047D978;
+    }
+    switch (ptr[0x50]) {
+    case 1:
+        return -*(f32*)(ptr + 0x38) * (f32) fn_800CE220(lbl_8047D97C * (lbl_8047D980 * *(f32*)(ptr + 0x40)));
+    case 2:
+        return *(f32*)(ptr + 0x44);
+    case 3:
+        return *(f32*)(ptr + 0x44);
+    default:
+        return lbl_8047D978;
+    }
+}
 #endif
 #pragma pop
 

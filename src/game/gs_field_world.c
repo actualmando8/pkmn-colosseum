@@ -5523,7 +5523,7 @@ extern u32 fn_8011C450(u8* ptr);
 extern u32 fn_8011C4B0(u8* ptr);
 extern u32 fn_8011C510(u8* ptr);
 extern void fn_8011F77C(void);
-extern void fn_80120C6C(void);
+extern u32  fn_80120C6C(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
 extern void fn_801237B8(void);
 extern u32 fn_80123CD4(u8* ptr, u32 arg2);
@@ -17912,7 +17912,7 @@ void fn_80128300(void) {
     extern void fn_8011E778();
     extern void fn_8011F5C8();
     extern void fn_8011F5FC();
-    extern void fn_80120C6C();
+    extern u32 fn_80120C6C();
     extern void fn_801252E0();
     extern void fn_8012546C();
     extern void fn_801254B4();
@@ -18075,7 +18075,7 @@ void fn_80128524(void) {
     extern void fn_8011F4F0();
     extern void fn_8011F5C8();
     extern void fn_8011F5FC();
-    extern void fn_80120C6C();
+    extern u32 fn_80120C6C();
     extern void fn_80123110();
     extern void fn_801236F8();
     extern void fn_80123B5C();
@@ -27339,12 +27339,23 @@ u32 fn_8011ED68(u8* ptr) {
 }
 #endif
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
-#if 1
+#if 0
 asm void fn_80120C6C(void) {
 #include "src/game/gs_field_world_fn_80120C6C.inc"
 }
 #else
-void fn_80120C6C(void) { /* TODO */ }
+/* returns (obj-header[0] > key) after a fn_8012640C lookup; the obj-header ptr lbl_80478F90
+ * is re-read via volatile cast. byte-match verified via objdiff. */
+u32 fn_80120C6C(u32 a, u16 key) {
+    extern u32 fn_8012640C(u32 a, u16 key, u32 c, u32 d);
+    if ((u16)key == 0) {
+        return 0;
+    }
+    if (fn_8012640C(a, key, 1, 0) == 0) {
+        return 0;
+    }
+    return (*(u32* volatile*)&lbl_80478F90)[0] > key;
+}
 #endif
 extern void* fn_80143B08(void* ptr);
 extern void fn_80143ABC(void* ptr, u8 val);
