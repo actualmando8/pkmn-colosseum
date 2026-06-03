@@ -392,7 +392,7 @@ extern void fn_8013DE6C(void);
 extern void fn_8013E258(void);
 extern u32 fn_8013E470(void* ptr, u32 delta);
 extern void fn_8013E54C(void);
-extern void fn_8013E5AC(void);
+extern u32  fn_8013E5AC(u8* p);
 extern u32 fn_8013E658(void* ptr);
 extern void fn_8013E6C4(void);
 extern void fn_8013E8A4(void);
@@ -1609,14 +1609,33 @@ asm void fn_8013E54C(void) {
 #else
 void fn_8013E54C(void) { /* TODO */ }
 #endif
-extern void fn_800EF548(void);
-extern void fn_800EF504(void);
-#if 1
+#if 0
 asm void fn_8013E5AC(void) {
 #include "src/game/effect/effect_visual_fn_8013E5AC.inc"
 }
 #else
-void fn_8013E5AC(void) { /* TODO */ }
+u32 fn_8013E5AC(u8* p) {
+    extern u8 lbl_80466BC0[];
+    extern void* fn_800EF5FC(u32 a, u32 b, u32 size, u32 d, u32 e);
+    extern void* fn_800EF548(void* buf, u32 b);
+    extern void fn_800EF504(void* buf);
+    u8* tbl;
+    void* buf;
+    if (p != 0) {
+        tbl = lbl_80466BC0;
+        if (p[0x18] > 0x1e) {
+            p[0x18] = 0x1e;
+        }
+        buf = fn_800EF5FC(*(u16*)(tbl + 4), *(u16*)(tbl + 6), 0xa0, 0, 0);
+        if (buf != 0) {
+            *(void**)(p + 4) = buf;
+            memset(fn_800EF548(buf, 0), 0, *(u16*)(tbl + 4) * *(u16*)(tbl + 6));
+            fn_800EF504(buf);
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif
 extern u8 lbl_80272FA0[];
 #if 0

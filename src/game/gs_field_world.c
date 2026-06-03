@@ -10925,54 +10925,32 @@ void fn_8011BA0C(void) {
 }
 #endif
 /* 0x8011BAC0 | 0xAC */
-#if 1
+#if 0
 asm void fn_8011BAC0(void) {
 #include "src/game/gs_field_world_fn_8011BAC0.inc"
 }
 #else
-void fn_8011BAC0(void) {
-    extern void fn_8011BEB4();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    r0 = r3 & 0xFFFF;
-    r29 = r3;
-    if ((s32)r0 == (s32)0) {
-        if (r0 == (u32)0x163) {
-            if (r0 == (u32)0x165) {
-                r3 = 0x0;
-                return;
+/* key typed u32 so raw stays unmasked (mr r29,r3); dead k==0&&k==0x163&&k==0x165 chain
+ * reproduces the folded cmplwi sequence; 3-iter fn_8011BEB4 scan. byte-match verified. */
+u32 fn_8011BAC0(u32 key, u8 target) {
+    extern u8 fn_8011BEB4(u32 a, u32 b, u32 c, u32 d);
+    u32 raw = key;
+    u8 t;
+    u8 i;
+    u16 k = (u16)key;
+    if (k == 0 && k == 0x163 && k == 0x165) {
+        return 0;
     }
+    t = target;
+    if (t == 0) {
+        return 0;
     }
+    for (i = 0; i < 3; i++) {
+        if (t == fn_8011BEB4(0, raw, 0x1a, i)) {
+            return 1;
+        }
     }
-    r31 = r4 & 0xFF;
-    if (r0 == (u32)0x165) {
-        r3 = 0x0;
-        return;
-    }
-    r30 = 0x0;
-    while (r0 = r30 & 0xFF, r0 < (u32)0x3) {
-
-    r4 = r29;
-    r6 = r30 & 0xFF;
-    r3 = 0x0;
-    r5 = 0x1a;
-    fn_8011BEB4();
-    r0 = r3 & 0xFF;
-    if (r31 == (u32)r0) {
-        r3 = 0x1;
-        return;
-    }
-    r30 = r30 + 0x1;
-    }
-
-    r3 = 0x0;
-    return;
+    return 0;
 }
 #endif
 /* 0x6C | fn_8011BB6C | single_call_straight */
