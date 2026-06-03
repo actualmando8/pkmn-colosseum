@@ -146,11 +146,13 @@ config.wibo_tag = "1.0.3"
 def _local(path: Path) -> Path:
     return path if path.exists() else None
 
-config.dtk_path = args.dtk or _local(Path("tools") / "dtk.exe")
-config.objdiff_path = args.objdiff or _local(Path("tools") / "objdiff-cli.exe")
-# Compilers (copyrighted Metrowerks binaries) are NOT vendored: left as None so
-# project.py downloads the pinned set (compilers_tag) to build/compilers — the
-# canonical dtk-template behavior. --compilers overrides for a local set.
+# dtk, objdiff-cli and the Metrowerks compilers are all left unset so project.py
+# downloads the pinned, PLATFORM-APPROPRIATE binaries (dtk_tag / objdiff_tag /
+# compilers_tag) into build/ — the canonical dtk-template behavior, and what makes
+# the Linux CI work from the same config as Windows. --dtk/--objdiff/--compilers
+# override with a local copy.
+config.dtk_path = args.dtk
+config.objdiff_path = args.objdiff
 config.compilers_path = args.compilers
 
 # Project

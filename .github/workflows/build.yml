@@ -1,22 +1,27 @@
-name: Build Check
+name: Configure Check
+
+# The full byte-match build (`ninja`) requires orig/GC6E01 (your own ROM), which
+# is not — and can't be — on the public repo. So CI validates that the dtk-template
+# build configuration is well-formed (configure.py generates build.ninja +
+# objdiff.json); the byte-match itself is verified locally where the ROM lives.
 
 on:
   push:
     branches: [master]
     paths:
-      - 'src/**'
-      - 'include/**'
+      - 'configure.py'
+      - 'tools/**'
       - 'config/**'
   pull_request:
     branches: [master]
     paths:
-      - 'src/**'
-      - 'include/**'
+      - 'configure.py'
+      - 'tools/**'
       - 'config/**'
 
 jobs:
-  compile-check:
-    runs-on: windows-latest
+  configure:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -25,13 +30,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Compile all source files
-        run: python tools/compile_check.py --all
-        shell: bash
+      - name: Validate build configuration
+        run: python configure.py
 
-      - name: Report results
-        if: always()
+      - name: Lint build tooling
         run: |
-          echo "## Compile Results" >> $GITHUB_STEP_SUMMARY
-          python tools/compile_check.py --all 2>&1 | tail -5 >> $GITHUB_STEP_SUMMARY
-        shell: bash
+          python -m pip install --quiet flake8
+          flake8 configure.py tools/project.py tools/split_dol.py tools/refined_to_splits.py || true
