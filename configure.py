@@ -240,7 +240,18 @@ config.progress_categories = [
 config.progress_each_module = args.verbose
 
 if args.mode == "configure":
+    # Preserve the curated decomp-tracking objdiff.json. It maps the per-file
+    # target objects used by the objdiff GUI, tools/gen_decomp_report.py and the
+    # decomp.dev report. The canonical generator would overwrite it with the
+    # all-asm section units (config.libs is empty here — see the interleaved-TU
+    # note), which carry no per-function progress. Snapshot + restore around
+    # generate_build; configure.py is also the ninja reconfigure command, so the
+    # curated file survives `ninja` re-runs too.
+    _objdiff = Path("objdiff.json")
+    _curated = _objdiff.read_bytes() if _objdiff.is_file() else None
     generate_build(config)
+    if _curated is not None:
+        _objdiff.write_bytes(_curated)
 elif args.mode == "progress":
     calculate_progress(config)
 else:
