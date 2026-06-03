@@ -234,6 +234,61 @@ engine callbacks (`TaskVBlank → fn_80175F6C` world render, `TaskRetraceMain`,
 call graph is walked. The deepest step — linking the real `main.c GameInit` with its
 ~60 hardware-subsystem inits — remains gated on the GX-FIFO/VI/ARAM/DVD/DSP shims.
 
+## 6c. P-B increment 3 — the wall: real engine callbacks need Track-D (2026-06-02)
+
+inc3's goal was to replace the host-stub task/thread bodies in `--engine-boot` with
+the **real** engine callbacks (`TaskVBlank → fn_80175F6C` world render; the title
+thread `fn_8002058C → fn_801EF644` title-init). A thorough investigation found this
+is gated on Track-D functional decomp, for two compounding reasons:
+
+**(1) The real callbacks live in TUs that don't compile host-side, or no-op without
+booted data.**
+- **Title thread** `gs_title.c fn_8002058C` is C-active and trivial
+  (`fn_801EF644(-1); for(;;) fn_800F0308();`). Its real work is **`fn_801EF644`**
+  (title attract-demo init) in `battle/battle_main.c`. **Discovery: `battle_main.c`
+  is 100% C-active (0 asm wrappers)** — it is the most host-linkable real-engine TU,
+  blocked only by **6 named conflicts** (`fn_80129280`, `fn_800D3088`, `fn_801659FC`,
+  `fn_80165A20`, `fn_801EF634` — CW-tolerated extern redeclarations; and data label
+  `lbl_80375CC8` `u8[]` vs `void*`), all fixable with the existing `pcport_gen.py`
+  `FUNC_PROTO_KR`/`FUNC_STUB_DROP`/`EXTERN_UNIFY` machinery.
+  *But even linked, `fn_801EF644` no-ops*: it loops over the demo table
+  `lbl_803752A0` bounded by the count `lbl_80478D10`, both of which are auto-stubbed
+  to **zero** on host (the real values come from the data sections the real
+  `GameInit` would populate) → the count check breaks immediately. So linking it
+  proves the function *executes* under our scheduler, but does nothing observable.
+- **`TaskVBlank` render** `fn_80175F6C` (world/scene render) is still-asm and its TU
+  is not linked; the surrounding `TaskVBlank` GX-state calls (`fn_80101B90`/
+  `fn_80101D8C`/`fn_80101D5C`) live in **`gs_model.c`, which is not in the BOOT
+  link** (auto-stubbed). And `fn_80175F6C` only renders if the world/scene system
+  was booted by `GameMainLoop` (`fn_80179BEC` world init, etc.).
+- **`gs_thread.c`/`gs_title.c`** are asm-heavy (86 / many asm fns) — not host-
+  compilable as-is (the reason inc1 host-*reimplemented* the scheduler).
+
+**(2) Real per-frame engine LOGIC needs the real data + subsystem boot**, which needs
+the real `main.c GameInit` (~60 hardware-subsystem inits: GX-FIFO `0xCC008000`, VI,
+ARAM, DVD, DSP) — the deepest gated step.
+
+**What inc3 delivered (the enabler, safely):** `fn_800F0308` is now aliased host-side
+to **`GSthreadYield`** (`gs_sched_host.c`) — so the moment a real engine thread body
+is made host-linkable (Track D), its `for(;;) fn_800F0308()` loop yields through the
+host fibre scheduler instead of the auto-stub. It is a guarded no-op when no host
+scheduler fibre is live, so `--menu`/`--engine-boot`/`--sched-test` are unaffected
+(verified). No real TU was forced into the green build for a no-op result.
+
+**Track-D worklist for engine-hosting the title (ordered by tractability):**
+1. **`battle_main.c`** — add the 6 conflict fixes to `pcport_gen.py`, link it
+   (unlocks `fn_801EF644` + the battle system surface). Low effort; high unlock.
+2. **Boot the title demo data** — populate `lbl_80478D10`/`lbl_803752A0` (or call the
+   real registration path) so `fn_801EF644` drives a real attract demo, not a no-op.
+3. **`gs_model.c`** + the **`fn_80175F6C` world-render TU** — make host-compilable
+   (Track-D their asm leaves) so the real `TaskVBlank` render path runs.
+4. **`main.c GameInit`** — host-shim the ~60 hardware inits (GX-FIFO/VI/ARAM/DVD/DSP)
+   so the real boot chain executes end-to-end. The largest step.
+
+inc1+inc2 already prove the scheduler + real *render* code run under host control;
+inc3 establishes that real *game-mode logic* is a Track-D march, not a single wiring
+step, and lays the `fn_800F0308` rail for it.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,

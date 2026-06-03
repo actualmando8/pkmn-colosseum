@@ -366,6 +366,13 @@ GSThread* fn_800F07A8(u32 affinity, u32 priority, u32 stackSize,
                       u32 usesFPU, u32 autoStart, void* entryFunc) {
     return GSthreadCreate(affinity, priority, stackSize, usesFPU, autoStart, entryFunc);
 }
+/* fn_800F0308 — the per-frame vsync-yield the real engine thread bodies call
+ * (e.g. gs_title.c fn_8002058C's `for(;;) fn_800F0308();`). Aliased to the host
+ * GSthreadYield so that when a real engine TU is made host-linkable (Track D) and
+ * its thread runs on our scheduler, its yields route through the host fibre layer
+ * instead of the auto-stub. Safe no-op when no host scheduler fibre is live
+ * (GSthreadYield guards on g_schedFibre), so it does not affect the --menu path. */
+void fn_800F0308(void) { GSthreadYield(); }
 /* NOTE: fn_800F09D8 (GSthreadInit) is intentionally NOT aliased — the decomp
  * annotations conflict (main.c labels 0x800F09D8 as render-timing, gs_thread.c
  * as GSthreadInit). Call GSthreadInit() directly from host boot code instead. */
