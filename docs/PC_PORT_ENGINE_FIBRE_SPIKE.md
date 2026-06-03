@@ -485,11 +485,20 @@ the camera settles: a back-out (overshoot) scale about the logo centre over ~0.5
 `aT >= panSecs`; cast + PRESS START + copyright appear ~0.45s later (`uiAfter`). During the
 pan only the 3D ruins show. `PCPORT_NO_PAN` makes everything immediate.
 
-Known remaining gaps: (1) the **ruins are low-contrast** (tan-on-tan) — the GameCube
-columns are crisp sandstone; a material/texture-assignment issue, separate from the camera.
-(2) The opening-demo movie should play as an **idle attract loop on the title** (not before
-it) and the **Nintendo logo should fade out** as well as in (boot-flow fixes, next). Only
-the title path changed; `--field`/`--sched-test`/`--engine-boot` untouched.
+**Boot-flow fixes (DONE, per user corrections).** (1) The opening-demo movie is no longer
+played during boot — it's now a **title idle attract loop**: after `demoIdleSecs` (≈22s,
+`PCPORT_ATTRACT_SECS` / `PCPORT_NO_ATTRACT`) of no input on the title, `RunMenuScene` plays
+`openingdemo.thp` via `BootPlayTHP`, then returns to the title (input resets the timer).
+(2) **Boot logos fade in AND out** — `BootShowLogo` now draws via `DrawTexturedScreenRectA`
+with a time-based alpha (fade-in over 0.45s, hold, fade-out over 0.45s, over black). Boot
+is now Nintendo→TPC→Genius Sonority only.
+
+Known remaining gap: the **ruins are low-contrast** (tan-on-tan) — the GameCube columns are
+crisp sandstone; a per-mesh material/texture-assignment issue (the title's logo/cast/sky DO
+texture correctly, so the TEV path works — it's a map/pillar material-resolution gap),
+separate from the camera. Only the title/boot path changed; `--field`/`--sched-test`/
+`--engine-boot` untouched. (The boot/attract/fade are timing behaviors verified by a clean
+build + title-render smoke + no-crash; full visual check is interactive.)
 
 ## 6. Constraints honored
 

@@ -5402,14 +5402,30 @@ static int BootShowLogo(GLFWwindow* window, const char* archive, const char* mem
         if (pressed & (GCN_PAD_BUTTON_START | GCN_PAD_BUTTON_A)) {
             break;
         }
-        if (glfwGetTime() - start >= seconds) {
-            break;
+        {
+            /* Fade the logo IN over the first fadeDur, hold, then fade OUT over the
+             * last fadeDur (over black) -- the real boot logos fade both ways. */
+            double t = glfwGetTime() - start;
+            double fadeDur = 0.45;
+            double aIn  = t / fadeDur;
+            double aOut = (seconds - t) / fadeDur;
+            double a;
+            u8 ai;
+            if (t >= seconds) {
+                break;
+            }
+            if (aIn  > 1.0) aIn  = 1.0;
+            if (aOut > 1.0) aOut = 1.0;
+            if (aOut < 0.0) aOut = 0.0;
+            a = (aIn < aOut) ? aIn : aOut;
+            ai = (u8)(a * 255.0);
+            ClearBackbuffer(0.0f, 0.0f, 0.0f);
+            GSgfx_BeginFrame();
+            BeginMenuOverlay();
+            DrawTexturedScreenRectA(&tex, 0.0f, 0.0f, 640.0f, 480.0f,
+                                    0.0f, 0.0f, 1.0f, 1.0f, ai, ai);
+            GSgfxSwapBuffers(1);
         }
-        ClearBackbuffer(0.0f, 0.0f, 0.0f);
-        GSgfx_BeginFrame();
-        BeginMenuOverlay();
-        DrawTexturedScreenRect(&tex, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f);
-        GSgfxSwapBuffers(1);
     }
     return 1;
 }
@@ -5528,10 +5544,12 @@ static int RunBootSequence(GLFWwindow* window) {
         const char* archive;
         const char* member;
     } kBoot[] = {
+        /* Boot logos only. The opening-demo movie is NOT part of boot -- on the real
+         * game it plays as an attract loop AFTER idling on the title (see the title
+         * idle handler in RunMenuScene), not before the title. */
         { 0, "orig/GC6E01/disc/files/nintendo_logo.fsys", "logo_nintendo" },
         { 1, "orig/GC6E01/disc/files/movie/tpc.thp",        NULL },
-        { 1, "orig/GC6E01/disc/files/movie/gs_logo.thp",    NULL },
-        { 1, "orig/GC6E01/disc/files/movie/openingdemo.thp", NULL }
+        { 1, "orig/GC6E01/disc/files/movie/gs_logo.thp",    NULL }
     };
     int n = (int)(sizeof(kBoot) / sizeof(kBoot[0]));
     int i;
@@ -5719,6 +5737,8 @@ static int RunMenuScene(GLFWwindow* window) {
     int titleSetForced = -1;       /* PCPORT_TITLE_SET=N pins a set (headless capture) */
     double titleCycleSecs = 7.0;   /* PCPORT_CYCLE_SECS overrides */
     double titleCycleStart = 0.0;
+    double demoIdleStart = 0.0;    /* attract: idle this long on the title -> opening demo */
+    double demoIdleSecs = 22.0;    /* PCPORT_ATTRACT_SECS overrides; PCPORT_NO_ATTRACT off */
     int render3D = 0;
     PADStatus pads[4];
     u16 padHeld = 0;
@@ -6184,6 +6204,31 @@ static int RunMenuScene(GLFWwindow* window) {
                 titleCycleStart = nowT;
                 printf("[pcport_bootstrap] title cast -> set %d (%s)\n",
                        titleSetIndex, kTitleSets[titleSetIndex].name);
+            }
+
+            /* Attract loop: after a longer idle (no input) on the title, play the
+             * opening-demo movie, then return to the title -- this is where the
+             * real game shows the demo (NOT during boot). PCPORT_NO_ATTRACT off,
+             * PCPORT_ATTRACT_SECS sets the idle threshold. */
+            if (demoIdleStart == 0.0) {
+                const char* as = getenv("PCPORT_ATTRACT_SECS");
+                demoIdleStart = nowT;
+                if (as != NULL && atof(as) > 0.0) demoIdleSecs = atof(as);
+            }
+            if (padPressed != 0) {
+                demoIdleStart = nowT;
+            } else if (getenv("PCPORT_NO_ATTRACT") == NULL &&
+                       (nowT - demoIdleStart) >= demoIdleSecs) {
+                printf("[pcport_bootstrap] title idle %.0fs -> attract demo (openingdemo)\n",
+                       demoIdleSecs);
+                if (!BootPlayTHP(window,
+                        "orig/GC6E01/disc/files/movie/openingdemo.thp", -1, &padPrev)) {
+                    goto cleanup;   /* window closed during the demo */
+                }
+                GXHostClearTextureBinding();
+                demoIdleStart = glfwGetTime();
+                titleCycleStart = demoIdleStart;
+                padPrev = 0;
             }
             if ((padPressed & GCN_PAD_BUTTON_START) && haveMenu033) {
                 /* The real game checks the memory card on START before the menu. */
