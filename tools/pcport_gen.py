@@ -36,6 +36,16 @@ PREAMBLE = {
                                "extern void fn_80196E10();\nextern void fn_8019D9DC();\n"
                                "extern void fn_801AA498();\n"),
     "hsd/hsd_memory_ext.c":   "extern void fn_80196E10();\n",
+    # Track-D engine TUs (parallel-analysis workflow, 2026-06-02): forward-decls for
+    # functions used before their in-TU macro/decl, or referenced-but-not-declared.
+    # GSmemSplitBlock is called (lines 336/412) before its `#define ->fn_800E2DB0`
+    # appears (line 460); K&R forward decl, return u16 matches its assignment.
+    "game/gs_mem.c":          "unsigned short GSmemSplitBlock();\n",
+    # DVDInit + memset called without a decl (pcport_compat.h omits <string.h>).
+    "game/gs_dvd.c":          "void DVDInit();\nvoid* memset(void*, int, unsigned int);\n",
+    # fn_80129280 referenced but not declared in this TU; void* matches the
+    # cast-to-void* + pointer-arith call sites (same form as battle_main.c).
+    "game/battle/battle_waza.c": "void* fn_80129280();\n",
 }
 
 # Per-file extern-unification: CodeWarrior tolerated the same data label being
@@ -142,6 +152,17 @@ FUNC_PROTO_RETYPE = {
 # generated copy; the original byte-match source is never touched.
 # Map: rel-path -> list of (old, new) pairs.
 TEXT_FIXUPS = {
+    # gs_dvd.c: the decompiled GSDVD_CloseHandle / GSDVD_Open DEFINITIONS are typed
+    # s32 but their bodies have bare `return;` (dropped r3) — clang -Wreturn-mismatch
+    # is a hard error. They are definitions (not extern decls) so the proto rewriters
+    # don't reach them; fix the return type textually (void is correct — they return
+    # no value; cross-TU callers ignore return type at link).
+    "game/gs_dvd.c": [
+        ("s32 GSDVD_CloseHandle(u32 handleIndex, u32 mode) {",
+         "void GSDVD_CloseHandle(u32 handleIndex, u32 mode) {"),
+        ("s32 GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5) {",
+         "void GSDVD_Open(u32 slotIndex, u32 resId, void* callback, u32 param1, u32 param2, u32 param3, u32 param4, u32 param5) {"),
+    ],
     "game/battle/battle_main.c": [
         # The file-scope `fn_800D3088` decl (line 79) has a void return but its
         # block-scoped re-decl (line 1223) + call site (`i += fn_800D3088()`) use a

@@ -53,7 +53,13 @@ HSD_GEN = ["hsd_dobj", "hsd_jobj", "hsd_mobj", "hsd_aobj", "hsd_lobj", "hsd_obje
            "hsd_render", "hsd_memory_ext", "hsd_util", "hsd_jobj_display", "hsd_cobj"]
 # Real game TUs compiled through pcport_gen (conflict fixes) — rel path under src/
 # (and build_pc/gen/), no .c. Track-D: host-link real engine code under the scheduler.
-GAME_GEN = ["game/battle/battle_main"]
+GAME_GEN = ["game/battle/battle_main",
+            # Track-D parallel-analysis workflow (2026-06-02): 10 fully-C-active (0-asm)
+            # engine TUs made host-linkable. 7 compile clean; gs_mem/gs_dvd/battle_waza
+            # need the pcport_gen PREAMBLE/TEXT_FIXUPS entries added alongside.
+            "game/gs_task_util", "game/gs_render_util", "game/gs_mem", "game/gs_dvd",
+            "game/gs_flag", "game/gs_battle_setup", "game/battle/battle_waza",
+            "game/gs_colsys", "game/gs_field_resource", "game/gs_floor_data"]
 
 
 def compile_one(src, name):

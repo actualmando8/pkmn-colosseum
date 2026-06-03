@@ -324,6 +324,31 @@ host-callable.
 actual attract demo rather than no-op; then `gs_model.c` + the `fn_80175F6C`
 world-render TU for the real `TaskVBlank`.
 
+## 6e. Track-D foundational — 10 more engine TUs host-linked in parallel (2026-06-02)
+
+A **10-agent workflow** grew the host-linked real-engine surface from 1 game TU
+(`battle_main.c`) to **11**, by analyzing fully-C-active (0-asm) engine TUs in
+parallel — each agent classified its TU's host-compile conflicts into the
+`pcport_gen` mechanisms and verified a clean recompile, returning structured
+fix-entries that were merged in one pass.
+
+TUs added to `GAME_GEN`: `gs_task_util`, `gs_render_util`, `gs_mem`, `gs_dvd`,
+`gs_flag`, `gs_battle_setup`, `battle/battle_waza`, `gs_colsys`,
+`gs_field_resource`, `gs_floor_data`. **7 compiled clean with zero fixes**; the
+other 3 needed only:
+- `gs_mem` — PREAMBLE forward-decl (`GSmemSplitBlock` used before its in-TU macro).
+- `battle_waza` — PREAMBLE forward-decl (`fn_80129280`, the same void*-KR form as
+  `battle_main.c`).
+- `gs_dvd` — PREAMBLE (`DVDInit`/`memset`) + 2 TEXT_FIXUPS turning the bare-`return`
+  `GSDVD_CloseHandle`/`GSDVD_Open` *definitions* from `s32` to `void`
+  (-Wreturn-mismatch; the proto rewriters can't touch definition headers).
+
+Build: 54 objects, 0 failed; link converges (undefs 259→408, auto-stubbed).
+`--menu`/`--sched-test`/`--engine-boot` (incl. `PCPORT_REAL_TITLE_INIT`) all
+unaffected. `src/game` untouched — only the generated copies + `tools/pcport_*`.
+This is the foundational lane: every host-linked real TU shrinks the auto-stub
+closure and brings more real engine code onto the platform shim.
+
 ## 6. Constraints honored
 
 Edited only `src/pcport/**` + `tools/pcport_*` + this doc. No `*_fn_*.inc`,
