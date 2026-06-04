@@ -4953,6 +4953,45 @@ static int g_rjtDepth;
  * pipeline must already be configured by the caller. Returns 1 if it drew.
  * Gated by PCPORT_SKIN. */
 #define PCPORT_SKIN_MAX_SLOTS 32
+
+/* Read a big-endian f32 from the archive at byte offset off. */
+static f32 PCPortReadBEFloatAt(const PCPortHSDArchive* a, u32 off) {
+    union { u32 u; f32 f; } v;
+    v.u = PCPort_ReadBigEndianU32(a->storage + off);
+    return v.f;
+}
+
+/* out = A * B, where A and B are 3x4 affine matrices (implicit bottom row
+ * [0 0 0 1]). Matches PSMTXConcat(A, B). out may not alias A or B. */
+static void PCPortMulAffine3x4(const f32 A[3][4], const f32 B[3][4], f32 out[3][4]) {
+    int r, c;
+    for (r = 0; r < 3; ++r) {
+        for (c = 0; c < 3; ++c) {
+            out[r][c] = A[r][0]*B[0][c] + A[r][1]*B[1][c] + A[r][2]*B[2][c];
+        }
+        out[r][3] = A[r][0]*B[0][3] + A[r][1]*B[1][3] + A[r][2]*B[2][3] + A[r][3];
+    }
+}
+
+/* Read the per-joint inverse-bind ("envelope") matrix. In the serialized
+ * HSD_Joint, +0x38 is a big-endian archive pointer to a 3x4 BE-f32 matrix
+ * (48 bytes). Returns 1 and fills out on success; on a NULL/invalid pointer
+ * fills identity and returns 0. (Decomp: hsd_pobj_disp fn_801AAEA8 concats
+ * jobj->mtx with jobj->envelopemtx for the blended skinning matrix.) */
+static int PCPortReadJointInvBind(const PCPortHSDArchive* a, u32 jointOff,
+                                  f32 out[3][4]) {
+    u32 p = PCPort_ReadBigEndianU32(a->storage + jointOff + 0x38u);
+    int r, c;
+    if (p == 0u || !ArchiveRangeValid(a, p, 48u)) {
+        for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) out[r][c] = (r==c)?1.0f:0.0f;
+        return 0;
+    }
+    for (r = 0; r < 3; ++r)
+        for (c = 0; c < 4; ++c)
+            out[r][c] = PCPortReadBEFloatAt(a, p + (u32)(r*4+c)*4u);
+    return 1;
+}
+
 static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
 static int g_skinVtxPosN;
@@ -5001,10 +5040,37 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             w.u = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 4u);
             memset(&jt, 0, sizeof(jt));
             if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint, jobj, &jt)) {
+                /* GC skinning (hsd_pobj_disp fn_801AAEA8):
+                 *  - weight == 0  -> RIGID single bone: use jointWorld directly
+                 *    (no inverse-bind). This is the legs/boots/visor case.
+                 *  - weight != 0  -> BLENDED envelope: accumulate
+                 *    weight * (jointWorld * invBind). invBind cancels the bind-pose
+                 *    world transform so at bind pose the term is identity and the
+                 *    model-space vertex stays put. Omitting invBind was collapsing
+                 *    the coat onto the shoulder bones. */
                 f32 wt = (w.f != 0.0f) ? w.f : 1.0f;
-                for (r = 0; r < 3; ++r)
-                    for (c = 0; c < 4; ++c)
-                        M[r][c] += wt * jt.modelMatrix[r][c];
+                f32 invBind[3][4];
+                int hasInv = PCPortReadJointInvBind(a, jobj, invBind);
+                if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
+                    fprintf(stderr, "  [infl] slot %d jobj=0x%X w=%.3f hasInvBind=%d\n",
+                            slot, jobj, (double)w.f, hasInv);
+                }
+                /* Default (proven): accumulate weight*jointWorld -> legs/boots/
+                 * bands/visor correct. PCPORT_SKIN_INVBIND opts into the full GC
+                 * formula weight*(jointWorld*invBind) for non-zero-weight blended
+                 * influences (correct coat math, but the bone-local-vs-model-space
+                 * discriminator still needs work — it regresses the legs). */
+                if (getenv("PCPORT_SKIN_INVBIND") != NULL && w.f != 0.0f && hasInv) {
+                    f32 skinned[3][4];
+                    PCPortMulAffine3x4(jt.modelMatrix, invBind, skinned);
+                    for (r = 0; r < 3; ++r)
+                        for (c = 0; c < 4; ++c)
+                            M[r][c] += w.f * skinned[r][c];
+                } else {
+                    for (r = 0; r < 3; ++r)
+                        for (c = 0; c < 4; ++c)
+                            M[r][c] += wt * jt.modelMatrix[r][c];
+                }
                 any = 1;
             }
         }
