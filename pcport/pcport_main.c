@@ -4996,6 +4996,7 @@ static int PCPortReadJointInvBind(const PCPortHSDArchive* a, u32 jointOff,
 static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
 static int g_skinVtxPosN;
+static f32 g_skinHybridThresh2 = 49.0f; /* (7.0)^2; model-space-vert cutoff */
 static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
@@ -5129,6 +5130,15 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
     int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
     int dbgVtxPos  = (getenv("PCPORT_SKIN_VTXPOS") != NULL);
+    {
+        /* Model-space-vert threshold for the hybrid skin rule (see the submit
+         * loop). Default 7.0 units separates bone-local verts (small, near their
+         * bone) from model-space verts (near the ~17-unit model extent).
+         * PCPORT_SKIN_HYBRID_THRESH overrides; 0 disables the split. */
+        const char* htEnv = getenv("PCPORT_SKIN_HYBRID_THRESH");
+        f32 ht = (htEnv != NULL && htEnv[0]) ? (f32)atof(htEnv) : 7.0f;
+        g_skinHybridThresh2 = (ht <= 0.0f) ? 1.0e30f : (ht * ht);
+    }
     memset(g_skinHist, 0, sizeof(g_skinHist));
     g_skinHistOob = 0;
     g_skinVtxPosN = 0;
@@ -5294,6 +5304,18 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * an unresolved slot is identity, falling back to as-is.
                  * PCPORT_SKIN_NOMTX disables this for A/B comparison. */
                 if (dbgNoMtx) {
+                    GXPosition3f32(px, py, pz);
+                } else if (px*px + py*py + pz*pz > g_skinHybridThresh2) {
+                    /* HYBRID: a few verts per mesh carry MODEL-space coordinates
+                     * (large local magnitude == near the model's full extent, e.g.
+                     * Wes's hair tip / outstretched-arm verts at local y~11-14),
+                     * while the bulk are JOINT-LOCAL (small, near their bone).
+                     * Applying the bone's world matrix to a model-space vert
+                     * double-translates it, flinging it far (the spikes / missing
+                     * arm). Submit large-local verts as-is (their model position is
+                     * already correct at the bind pose); bone-local verts below get
+                     * the jointWorld transform. Threshold tunable via
+                     * PCPORT_SKIN_HYBRID_THRESH (0/unset disables the split). */
                     GXPosition3f32(px, py, pz);
                 } else {
                     f32 (*Mx)[4] = palette[curSlot];
