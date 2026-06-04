@@ -542,7 +542,8 @@ extern void fn_801621BC(u32* ptr);  /* peopleFieldUtilDispatch - same-TU asm wra
  * =================================================================== */
 
 extern void fn_8015210C(void);
-extern void fn_80162118(void);
+typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
+extern void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
 extern u32 lbl_8047AF98;
 extern u8 lbl_8047AF90[];
@@ -1038,14 +1039,38 @@ s32 fn_8016208C(u32 angle) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162118(void) {
 #include "src/game/people/people_field_fn_80162118.inc"
 }
 #else
-void fn_80162118(void) { /* TODO */ }
+void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
+    s32 lo, hi, mid;
+    s32 r;
+    u8* elem;
+
+    if (count != 0) {
+        lo = 1;
+        hi = count;
+        do {
+            mid = (lo + hi) >> 1;
+            elem = base + size * (mid - 1);
+            r = cmp(key, elem);
+            if (r == 0) {
+                return elem;
+            }
+            if (r < 0) {
+                hi = mid - 1;
+            }
+            if (((u32)r >> 31) == 0) {
+                lo = mid + 1;
+            }
+        } while (lo <= hi);
+    }
+    return 0;
+}
 #endif
 #pragma pop
 extern u32  OSEnableInterrupts(void);
