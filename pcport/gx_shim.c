@@ -611,6 +611,12 @@ void GXSetViewport(f32 xOrig, f32 yOrig, f32 wd, f32 ht,
 void GXSetProjection(Mtx44 mtx, GXProjectionType type) {
     g_projType = type;
     memcpy(g_projMatrix, mtx, sizeof(g_projMatrix));
+    if (getenv("PCPORT_PRIM_DEBUG") != NULL) {
+        fprintf(stderr, "[proj] type=%d row2=[%.5f %.5f %.5f %.5f] row3=[%.5f %.5f %.5f %.5f]\n",
+                (int)type, g_projMatrix[2][0], g_projMatrix[2][1], g_projMatrix[2][2],
+                g_projMatrix[2][3], g_projMatrix[3][0], g_projMatrix[3][1],
+                g_projMatrix[3][2], g_projMatrix[3][3]);
+    }
     GXApplyProjectionMatrix();
 
     /* TODO: Phase 3b -- Upload projection matrix
@@ -1687,6 +1693,9 @@ static int GXSubmitVertices(GXPrimitive primType,
         case GX_TRIANGLESTRIP:
             glPrim = GL_TRIANGLE_STRIP;
             break;
+        case GX_TRIANGLEFAN:
+            glPrim = GL_TRIANGLE_FAN;
+            break;
         case GX_LINES:
             glPrim = GL_LINES;
             break;
@@ -1890,6 +1899,12 @@ void GXCallDisplayList(void* list, u32 nbytes) {
     u32 totalExpanded = 0;
     GXPrimitive lastPrimitive = GX_POINTS;
     u32 i;
+    int dbgBounds = (getenv("PCPORT_PRIM_DEBUG") != NULL);
+    float mnx = 1e30f, mny = 1e30f, mnz = 1e30f;
+    float mxx = -1e30f, mxy = -1e30f, mxz = -1e30f;
+    float ndcMnX = 1e30f, ndcMnY = 1e30f, ndcMxX = -1e30f, ndcMxY = -1e30f;
+    float ndcMnZ = 1e30f, ndcMxZ = -1e30f;
+    int nBehind = 0, nOnScreen = 0, nZok = 0;
 
     GXEnsureCurrentContext();
 
@@ -1939,6 +1954,14 @@ void GXCallDisplayList(void* list, u32 nbytes) {
         vertexCount = GXReadBE16(cursor);
         cursor += 2;
 
+        if (getenv("PCPORT_PRIM_DEBUG") != NULL) {
+            static int n = 0;
+            if (n++ < 60) {
+                fprintf(stderr, "[prim] type=0x%02X count=%u\n",
+                        (unsigned)primType, (unsigned)vertexCount);
+            }
+        }
+
         if (vertexCount == 0 || vertexCount > GX_IMM_VTX_MAX ||
             vtxfmt >= GX_VTXFMT_STATE_MAX) {
             return;
@@ -1961,10 +1984,54 @@ void GXCallDisplayList(void* list, u32 nbytes) {
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_CLR0, &vertex) ||
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX0, &vertex) ||
                 !GXDecodeIndexedAttr(&cursor, end, vtxfmt, GX_VA_TEX1, &vertex)) {
+                if (getenv("PCPORT_PRIM_DEBUG") != NULL) {
+                    fprintf(stderr, "[prim] ABORT decode at vert %u/%u (cmd bytesLeft=%ld)\n",
+                            (unsigned)i, (unsigned)vertexCount, (long)(end - cursor));
+                }
                 return;
             }
 
+            if (dbgBounds) {
+                const f32 (*M)[4] = g_posMtx[g_currentMtxId];
+                const f32 (*P)[4] = g_projMatrix;
+                f32 cx, cy, cz, clx, cly, clw;
+                if (vertex.pos[0] < mnx) mnx = vertex.pos[0];
+                if (vertex.pos[1] < mny) mny = vertex.pos[1];
+                if (vertex.pos[2] < mnz) mnz = vertex.pos[2];
+                if (vertex.pos[0] > mxx) mxx = vertex.pos[0];
+                if (vertex.pos[1] > mxy) mxy = vertex.pos[1];
+                if (vertex.pos[2] > mxz) mxz = vertex.pos[2];
+                /* modelview (3x4) then projection (4x4) -> clip -> NDC */
+                cx = M[0][0]*vertex.pos[0]+M[0][1]*vertex.pos[1]+M[0][2]*vertex.pos[2]+M[0][3];
+                cy = M[1][0]*vertex.pos[0]+M[1][1]*vertex.pos[1]+M[1][2]*vertex.pos[2]+M[1][3];
+                cz = M[2][0]*vertex.pos[0]+M[2][1]*vertex.pos[1]+M[2][2]*vertex.pos[2]+M[2][3];
+                clx = P[0][0]*cx+P[0][1]*cy+P[0][2]*cz+P[0][3];
+                cly = P[1][0]*cx+P[1][1]*cy+P[1][2]*cz+P[1][3];
+                clw = P[3][0]*cx+P[3][1]*cy+P[3][2]*cz+P[3][3];
+                if (clw <= 0.0001f) {
+                    nBehind++;
+                } else {
+                    f32 clz = P[2][0]*cx+P[2][1]*cy+P[2][2]*cz+P[2][3];
+                    f32 nx = clx/clw, ny = cly/clw, nz = clz/clw;
+                    if (nx < ndcMnX) ndcMnX = nx;
+                    if (ny < ndcMnY) ndcMnY = ny;
+                    if (nx > ndcMxX) ndcMxX = nx;
+                    if (ny > ndcMxY) ndcMxY = ny;
+                    if (nz < ndcMnZ) ndcMnZ = nz;
+                    if (nz > ndcMxZ) ndcMxZ = nz;
+                    if (nx >= -1.0f && nx <= 1.0f && ny >= -1.0f && ny <= 1.0f) nOnScreen++;
+                    if (nz >= -1.0f && nz <= 1.0f) nZok++;
+                }
+            }
             g_immVertices[i] = vertex;
+        }
+
+        if (dbgBounds && totalSubmitted == 0 && vertexCount >= 4) {
+            fprintf(stderr, "[strip] cmd v0=(%.1f,%.1f,%.1f) v1=(%.1f,%.1f,%.1f) v2=(%.1f,%.1f,%.1f) v3=(%.1f,%.1f,%.1f)\n",
+                    g_immVertices[0].pos[0], g_immVertices[0].pos[1], g_immVertices[0].pos[2],
+                    g_immVertices[1].pos[0], g_immVertices[1].pos[1], g_immVertices[1].pos[2],
+                    g_immVertices[2].pos[0], g_immVertices[2].pos[1], g_immVertices[2].pos[2],
+                    g_immVertices[3].pos[0], g_immVertices[3].pos[1], g_immVertices[3].pos[2]);
         }
 
         if (!GXSubmitVertices(primType, g_immVertices, vertexCount,
@@ -1975,6 +2042,12 @@ void GXCallDisplayList(void* list, u32 nbytes) {
         totalSubmitted += vertexCount;
         totalExpanded += expandedCount;
         lastPrimitive = primType;
+    }
+
+    if (dbgBounds && totalSubmitted > 0) {
+        fprintf(stderr, "[dl] verts=%u onScreen=%d zOK=%d behind=%d ndcZ=[%.5f..%.5f] ndcXY=[%.2f,%.2f..%.2f,%.2f]\n",
+                (unsigned)totalSubmitted, nOnScreen, nZok, nBehind,
+                ndcMnZ, ndcMxZ, ndcMnX, ndcMnY, ndcMxX, ndcMxY);
     }
 
     g_lastSubmittedVertexCount = totalSubmitted;

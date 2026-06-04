@@ -465,6 +465,30 @@ static void ClearBackbuffer(float r, float g, float b) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/* For watching headless/capped visual tests: if PCPORT_HOLD_SECS is set, keep
+ * the window up (last rendered frame stays on the front buffer) for that many
+ * wall-clock seconds before the scene returns, so a human can see the result.
+ * Pumps events so the window stays responsive; closeable early. */
+static void HoldWindowOpen(GLFWwindow* window) {
+    const char* hs = getenv("PCPORT_HOLD_SECS");
+    double secs, start;
+    if (hs == NULL || window == NULL) {
+        return;
+    }
+    secs = atof(hs);
+    if (secs <= 0.0) {
+        return;
+    }
+    printf("[pcport] holding window open %.1fs (PCPORT_HOLD_SECS)\n", secs);
+    start = glfwGetTime();
+    while (glfwGetTime() - start < secs) {
+        if (glfwWindowShouldClose(window)) {
+            break;
+        }
+        glfwPollEvents();
+    }
+}
+
 static void LoadIdentityGXState(void) {
     static Mtx44 projection = {
         { 1.0f, 0.0f, 0.0f, 0.0f },
@@ -5145,6 +5169,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                             debugFlatChar = 1; /* draw bright + unlit */
                         }
                     }
+                    /* Geometry-vs-texture probe: draw every scene mesh as an
+                     * opaque solid (no texture, unlit). If the ruins APPEAR, the
+                     * geometry/display-list replay is fine and the bug is in the
+                     * textured (CMPR) path; if they stay invisible, it's geometry. */
+                    if (getenv("PCPORT_RUINS_SOLID") != NULL && !isLogoTex) {
+                        debugFlatChar = 1;
+                    }
                 }
                 if (debugFlatChar) {
                     /* Distinct bright flat colour per dobj, lighting OFF, so the
@@ -5175,6 +5206,15 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     fn_801AA568(&translatedPObj.pobj);
                     GXHostSetLightingEnabled(getenv("PCPORT_SCENE_NOLIGHT") != NULL
                                                  ? GX_FALSE : GX_TRUE);
+                    /* Debug: override the jobj-derived cull so backface-culled
+                     * (wrong-winding) geometry can be ruled in/out. fn_801AA568
+                     * sets cull from the jobj flags, so override AFTER it. */
+                    if (getenv("PCPORT_NO_CULL") != NULL) {
+                        GXSetCullMode(GX_CULL_NONE);
+                    }
+                    if (getenv("PCPORT_NO_ZTEST") != NULL) {
+                        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+                    }
                     fn_800DAD10((void*)&drawObject);
                     GXHostSetLightingEnabled(GX_FALSE);
                     stats->drawn++;
@@ -5195,16 +5235,50 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (rjtDbg && stats->dobjs <= 44u) {
                         const PCPortTranslatedTexture* bt =
                             haveTexture ? &translatedTextureExp.stages[0].texture : NULL;
-                        printf("[rjt] pobj#%u %s verts=%u texOff=0x%X %ux%u fmt=%u diff=%08X alpha=%.2f cam=(%.0f,%.0f,%.0f)\n",
+                        u32 posType = 0, posCnt = 0, posAttrType = 0, posStride = 0;
+                        if (translatedPObj.pobj.verts != NULL) {
+                            HSD_VtxDescList* v = translatedPObj.pobj.verts;
+                            while (v->attr != GX_VA_NULL) {
+                                if (v->attr == GX_VA_POS) {
+                                    posCnt = v->comp_cnt; posType = v->comp_type;
+                                    posAttrType = v->attr_type; posStride = v->stride;
+                                    break;
+                                }
+                                ++v;
+                            }
+                        }
+                        {
+                            /* Per-axis scale = length of each model-matrix basis row. */
+                            f32 (*M)[4] = translatedJoint.modelMatrix;
+                            f32 sx = sqrtf(M[0][0]*M[0][0]+M[0][1]*M[0][1]+M[0][2]*M[0][2]);
+                            f32 sy = sqrtf(M[1][0]*M[1][0]+M[1][1]*M[1][1]+M[1][2]*M[1][2]);
+                            f32 sz = sqrtf(M[2][0]*M[2][0]+M[2][1]*M[2][1]+M[2][2]*M[2][2]);
+                            printf("[rjt] pobj#%u %s verts=%u fmt=%u POS{attrType=%u stride=%u} bbox=[%.0f,%.0f,%.0f..%.0f,%.0f,%.0f] jointScale=(%.3f,%.3f,%.3f) cam=(%.0f,%.0f,%.0f)\n",
                                stats->dobjs, haveTexture ? "TEX" : "MAT",
                                drawObject.totalVerts,
-                               bt ? bt->imageDataArchiveOffset : 0u,
-                               bt ? bt->width : 0u, bt ? bt->height : 0u,
                                bt ? (unsigned)bt->format : 0u,
-                               haveMaterial ? translatedMaterial.diffuse : 0u,
-                               haveMaterial ? translatedMaterial.alpha : -1.0f,
+                               posAttrType, posStride,
+                               translatedPObj.minPosition[0], translatedPObj.minPosition[1],
+                               translatedPObj.minPosition[2], translatedPObj.maxPosition[0],
+                               translatedPObj.maxPosition[1], translatedPObj.maxPosition[2],
+                               sx, sy, sz,
                                modelViewMatrix[0][3], modelViewMatrix[1][3],
                                modelViewMatrix[2][3]);
+                        }
+                        (void)posCnt; (void)posType;
+                        if (getenv("PCPORT_VTXDESC") != NULL &&
+                            (stats->dobjs == 17u || stats->dobjs == 31u) &&
+                            translatedPObj.pobj.verts != NULL) {
+                            HSD_VtxDescList* v = translatedPObj.pobj.verts;
+                            printf("   [vtxdesc pobj#%u]", stats->dobjs);
+                            while (v->attr != GX_VA_NULL) {
+                                printf(" attr=%u(type=%u cnt=%u comp=%u frac=%u stride=%u)",
+                                       v->attr, v->attr_type, v->comp_cnt,
+                                       v->comp_type, v->frac, v->stride);
+                                ++v;
+                            }
+                            printf("\n");
+                        }
                     }
                 }
 
@@ -6423,6 +6497,17 @@ static int RunMenuScene(GLFWwindow* window) {
                     ci[k] = panStartInt[k] + (f32)((panEndInt[k] - panStartInt[k]) * e);
                 }
                 BuildViewMatrixLookAt(ce, ci, panUp, translatedCamera.viewMatrix);
+            } else if (getenv("PCPORT_CAM_EYE") != NULL) {
+                /* Manual title-camera override (debug): place eye + interest
+                 * freely, e.g. to frame the whole ruins volume. */
+                f32 ce[3] = { translatedCamera.eye[0], translatedCamera.eye[1],
+                              translatedCamera.eye[2] };
+                f32 ci[3] = { translatedCamera.interest[0], translatedCamera.interest[1],
+                              translatedCamera.interest[2] };
+                const char* ie = getenv("PCPORT_CAM_INT");
+                sscanf(getenv("PCPORT_CAM_EYE"), "%f,%f,%f", &ce[0], &ce[1], &ce[2]);
+                if (ie != NULL) sscanf(ie, "%f,%f,%f", &ci[0], &ci[1], &ci[2]);
+                BuildViewMatrixLookAt(ce, ci, panUp, translatedCamera.viewMatrix);
             }
             if (frame == 0 && getenv("PCPORT_RENDER_DEBUG") != NULL) {
                 printf("[cam] eye=(%.1f,%.1f,%.1f) interest=(%.1f,%.1f,%.1f) fov=%.1f aspect=%.2f near=%.2f far=%.2f\n",
@@ -6500,6 +6585,10 @@ static int RunMenuScene(GLFWwindow* window) {
                     double bt = titlePanOn ? (aT - panSecs) / 0.55 : 1.0;
                     double bp, logoScale;
                     int uiAfter;
+                    /* PCPORT_SCENE_ONLY: render just the 3D world (ruins/sand/clouds +
+                     * camera pan) -- suppress the 2D logo + cast cutouts + PRESS START,
+                     * so the 3D title scene can be developed against the Dolphin ref. */
+                    int sceneOnly = getenv("PCPORT_SCENE_ONLY") != NULL;
                     if (bt < 0.0) bt = 0.0;
                     if (bt > 1.0) bt = 1.0;
                     bp = bt - 1.0;
@@ -6507,7 +6596,7 @@ static int RunMenuScene(GLFWwindow* window) {
                     uiAfter = (!titlePanOn) || (aT >= panSecs + 0.45);
 
                     /* cast cutouts (under the logo) -- appear once the logo lands */
-                    if (uiAfter) {
+                    if (uiAfter && !sceneOnly) {
                         const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
                         int acnt = aset->count;
                         if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }
@@ -6523,7 +6612,7 @@ static int RunMenuScene(GLFWwindow* window) {
                                                    cu0, 0.0f, cu1, 1.0f);
                         }
                     }
-                    if (haveLogo && panDone) {
+                    if (haveLogo && panDone && !sceneOnly) {
                         /* logo, top-centre (115,34,410,170), bounce-scaled about its centre */
                         f32 lw = (f32)(410.0 * logoScale);
                         f32 lh = (f32)(170.0 * logoScale);
@@ -6532,7 +6621,7 @@ static int RunMenuScene(GLFWwindow* window) {
                         DrawTexturedScreenRect(&logoTex, lx, ly, lw, lh,
                                                0.0f, 0.0f, 1.0f, 1.0f);
                     }
-                    if (haveMenu018 && uiAfter) {
+                    if (haveMenu018 && uiAfter && !sceneOnly) {
                         if (sceneState == PCPORT_SCENE_TITLE) {
                             DrawTexturedScreenRect(&menu018Tex, 188.0f, 268.0f, 264.0f, 30.0f,
                                                    0.0f, 0.574f, 1.0f, 0.721f);
@@ -6626,6 +6715,7 @@ static int RunMenuScene(GLFWwindow* window) {
     ok = 1;
 
 cleanup:
+    HoldWindowOpen(window);
     PCPort_HSDArchiveDestroy(&archive);
     PCPort_FreeBuffer(memberData);
     PCPort_HSDArchiveDestroy(&logoArchive);
@@ -7182,6 +7272,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     }
     printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)\n",
            frame, ppos[0], ppos[1], ppos[2]);
+    HoldWindowOpen(window);
     return 1;
 }
 
@@ -7309,6 +7400,7 @@ static int RunFieldScene(GLFWwindow* window) {
     }
     printf("[field] explored %d frames (final eye=%.0f,%.0f,%.0f yaw=%.2f)\n",
            frame, eye[0], eye[1], eye[2], yaw);
+    HoldWindowOpen(window);
     return 1;
 }
 
