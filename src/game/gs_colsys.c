@@ -1893,8 +1893,8 @@ void fn_8010CA30(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010CBC0(void) {
-    /* TODO: match -- 16 bytes at 0x8010CBC0 */
+u32 fn_8010CBC0(void) {
+    return *(u32*)&lbl_80404C68;
 }
 #pragma pop
 

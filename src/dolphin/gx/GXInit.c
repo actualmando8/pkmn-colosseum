@@ -494,8 +494,13 @@ void fn_800BA160(void) {
 }
 
 /* fn_800BA198 - 0x800BA198 | size: 0x1C -- GX Geometry / vertex descriptor */
-void fn_800BA198(void) {
-    /* GX Geometry / vertex descriptor (0x1C bytes) */
+void fn_800BA198(u8* r3, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) {
+    *(f32*)(r3 + 0x10) = a;
+    *(f32*)(r3 + 0x14) = b;
+    *(f32*)(r3 + 0x18) = c;
+    *(f32*)(r3 + 0x1C) = d;
+    *(f32*)(r3 + 0x20) = e;
+    *(f32*)(r3 + 0x24) = f;
 }
 
 /* fn_800BA1B4 - 0x800BA1B4 | size: 0x190 -- GX Geometry / vertex descriptor */
@@ -516,8 +521,10 @@ void fn_800BA414(u8* r3, f32 f1, f32 f2, f32 f3) {
 }
 
 /* fn_800BA424 - 0x800BA424 | size: 0x1C -- GX Geometry / vertex descriptor */
-void fn_800BA424(void) {
-    /* GX Geometry / vertex descriptor (0x1C bytes) */
+void fn_800BA424(u8* r3, f32 a, f32 b, f32 c) {
+    *(f32*)(r3 + 0x34) = -a;
+    *(f32*)(r3 + 0x38) = -b;
+    *(f32*)(r3 + 0x3C) = -c;
 }
 
 /* fn_800BA440 - 0x800BA440 | size: 0xC -- GX Geometry / vertex descriptor */

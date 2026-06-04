@@ -2656,9 +2656,13 @@ void fn_801A3F48(void) {
 }
 
 /* 0x801A3FA4 | 0xC */
-void fn_801A3FA4(void) {
+extern u8 lbl_80465588[];
+extern u8 lbl_804655B4[];
+void* fn_801A3FA4(void) {
+    return lbl_80465588;
 }
 
 /* 0x801A3FB0 | 0xC */
-void fn_801A3FB0(void) {
+void* fn_801A3FB0(void) {
+    return lbl_804655B4;
 }
