@@ -1359,7 +1359,7 @@ extern void fn_80207B5C(void* ptr, u8 a, u16 b);
 extern void fn_80265754(void* ptr, u16 a);
 #if 1
 asm s32 fn_80007364(void) {
-#include "src/game/gs_task_fn_80007364.inc"
+#include "src/game/gs_task__dbgMenuFightFightPokemonSelectSub.inc"
 }
 #else
 #pragma peephole off

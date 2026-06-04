@@ -669,6 +669,8 @@ extern u32 lbl_8047A428;
 extern u8 lbl_8047A410;
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
+extern void menuSubOpenYesNo();
+extern void memoDataSet();
 #if 1
 asm void fn_80031B4C(void) {
 #include "src/game/gs_npc_event_fn_80031B4C.inc"

@@ -721,6 +721,8 @@ extern void fn_800E93B8(void);
 extern void* fn_800E9998(void*, void*, void*, void*);
 extern void fn_800E9E90(void);
 extern s32 HSD_JObjMtxIsDirty();
+extern void PSMTXConcat(void* A, void* B, void* AB);
+extern void PSMTXInverse(void* src, void* dst);
 extern void fn_800EA664();
 extern void fn_800EA6D4();
 extern void fn_800EA7E4();
@@ -3636,6 +3638,7 @@ void fn_800E9358(void* entry, u8 enable) {
 
 /* fn_800E93B8 -- SetupEnvMap | Size: 0x5E0 */
 extern f32 lbl_8047CBC0;
+extern double ceil(double);
 #if 1
 asm void fn_800E93B8(void) {
 #include "src/game/gs_material_fn_800E93B8.inc"

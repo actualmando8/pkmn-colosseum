@@ -5489,6 +5489,7 @@ extern void fn_801081F8(void);
 extern u32 lbl_8047A308;
 extern u32 lbl_8047B7B8;
 extern u32 lbl_8047B7B0;
+extern void menuSubCalcColor();
 #if 1
 asm void fn_80019F6C(void) {
 #include "src/game/gs_pcbox_fn_80019F6C.inc"
