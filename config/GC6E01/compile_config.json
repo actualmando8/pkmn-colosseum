@@ -4,6 +4,11 @@
     "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8"
   },
   "overrides": {
+    "src/game/people/people_field.c": {
+      "compiler": "GC/1.3",
+      "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw off -sdata 8 -sdata2 8",
+      "comment": "Target uses _savegpr_/_restgpr_ helpers (never stmw/lmw) for multi-reg save -> TU was built with -use_lmw_stmw off. Verified: switching off regresses 0/124 fns and byte-matches fn_80162118 (binary search, 8 saved regs)."
+    },
     "src/game/gs_title.c": {
       "compiler": "GC/1.3",
       "flags": "-O4,p -nodefaults -proc gekko -fp hard -Cpp_exceptions off -enum int -warn off -use_lmw_stmw on -sdata 8 -sdata2 8 -opt nopeephole",
