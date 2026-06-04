@@ -1554,13 +1554,24 @@ static void ConfigureTranslatedMaterialPipeline(unsigned int pipelineId,
     GSgfxHostSetPipelineAlphaScale(pipelineId, material->alpha);
     zUpdate = (unsigned char)((material->rendermode & PCPORT_RENDER_NO_ZUPDATE) == 0u);
 
-    if ((material->rendermode & PCPORT_RENDER_XLU) != 0u &&
-        material->hasPEDesc) {
-        GSgfxHostSetPipelineBlend(pipelineId,
-                                  material->peType,
-                                  material->peSrcFactor,
-                                  material->peDstFactor,
-                                  material->peLogicOp);
+    if ((material->rendermode & PCPORT_RENDER_XLU) != 0u) {
+        if (material->hasPEDesc) {
+            GSgfxHostSetPipelineBlend(pipelineId,
+                                      material->peType,
+                                      material->peSrcFactor,
+                                      material->peDstFactor,
+                                      material->peLogicOp);
+        } else {
+            /* XLU material with no explicit PEDesc -> the GX default translucent
+             * blend (GX_BM_BLEND, src=SRCALPHA, dst=INVSRCALPHA). Without this,
+             * XLU surfaces (e.g. the title's distance-haze planes, tex 0x293E0)
+             * rendered fully OPAQUE and occluded the desert ruins behind them. */
+            GSgfxHostSetPipelineBlend(pipelineId,
+                                      GX_BM_BLEND,
+                                      GX_BL_SRCALPHA,
+                                      GX_BL_INVSRCALPHA,
+                                      GX_LO_COPY);
+        }
     }
 
     GSgfxHostSetPipelineZ(pipelineId,
@@ -5052,6 +5063,28 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                             (baseTexture->imageDataArchiveOffset == PCPORT_LOGO_IMAGE_OFFSET ||
                              baseTexture->imageDataArchiveOffset == 0x693E0u ||
                              baseTexture->imageDataArchiveOffset == 0x8AB60u);
+                        /* Debug: PCPORT_SKIP_TEX=0xNNNNN skips every mesh using that
+                         * texture (e.g. 0x293E0 = the tan haze/ground planes) so the
+                         * geometry behind them can be inspected. */
+                        {
+                            const char* sk = getenv("PCPORT_SKIP_TEX");
+                            if (sk != NULL &&
+                                baseTexture->imageDataArchiveOffset ==
+                                    (u32)strtoul(sk, NULL, 0)) {
+                                isLogoTex = 1;
+                            }
+                        }
+                        if (getenv("PCPORT_HAZE_DEBUG") != NULL && haveMaterial) {
+                            printf("[mat] tex=0x%X rmode=0x%X xlu=%d hasPE=%d alpha=%.2f "
+                                   "peType=%u src=%u dst=%u zComp=%u aComp0=%u ref0=%u\n",
+                                   baseTexture->imageDataArchiveOffset,
+                                   translatedMaterial.rendermode,
+                                   (translatedMaterial.rendermode & PCPORT_RENDER_XLU) ? 1 : 0,
+                                   translatedMaterial.hasPEDesc, translatedMaterial.alpha,
+                                   translatedMaterial.peType, translatedMaterial.peSrcFactor,
+                                   translatedMaterial.peDstFactor, translatedMaterial.peZComp,
+                                   translatedMaterial.peAlphaComp0, translatedMaterial.peRef0);
+                        }
 
                         textureMapId = PCPort_ReadBigEndianU32(
                             a->storage + tobjOffset + 0x08);
