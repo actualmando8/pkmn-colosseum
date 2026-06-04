@@ -6341,7 +6341,12 @@ static int RunMenuScene(GLFWwindow* window) {
     /* HSD-pipeline bring-up: verify the BE->LE scene swizzle produces sane values
      * (root joint SRT, material colors/alpha, TObj) before wiring the real load. */
     if (getenv("PCPORT_HSD_SWIZ_TEST") != NULL) {
-        PCPort_HSDSwizzleSmoke(PCPORT_LOGO_ARCHIVE, PCPORT_LOGO_MEMBER);
+        /* PCPORT_SWIZ_ARCHIVE/PCPORT_SWIZ_MEMBER point the probe at any member
+         * (e.g. a people_archive character model) to inspect its HSD layout. */
+        const char* sa = getenv("PCPORT_SWIZ_ARCHIVE");
+        const char* sm = getenv("PCPORT_SWIZ_MEMBER");
+        PCPort_HSDSwizzleSmoke(sa != NULL ? sa : PCPORT_LOGO_ARCHIVE,
+                               sm != NULL ? sm : PCPORT_LOGO_MEMBER);
         ok = 1;
         goto cleanup;
     }
