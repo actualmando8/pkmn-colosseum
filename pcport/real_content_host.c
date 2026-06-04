@@ -1,6 +1,7 @@
 #include "real_content_host.h"
 #include "gx_shim.h"
 #include "gx_texture.h"
+#include "hsd/hsd_jobj.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -1705,6 +1706,24 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
                 }
             }
         }
+    }
+    /* Build the REAL HSD_JObj tree via the game's HSD_JObjLoadJoint + real
+     * HSD_*LoadDesc leaves, and count it (sanity: ~31 joints / 43 dobjs, no crash). */
+    {
+        HSD_JObj* root = HSD_JObjLoadJoint((HSD_Joint*)rootPtr);
+        HSD_JObj* stk[512]; int sp = 0, nj = 0, nd = 0, guard = 0;
+        if (root != NULL) {
+            stk[sp++] = root;
+            while (sp > 0 && guard < 100000) {
+                HSD_JObj* cur = stk[--sp];
+                ++guard; ++nj;
+                if (union_type_dobj(cur) && cur->u.dobj != NULL) ++nd;
+                if (cur->next != NULL && sp < 512) stk[sp++] = cur->next;
+                if (cur->child != NULL && sp < 512) stk[sp++] = cur->child;
+            }
+        }
+        printf("[hsd-swiz] HSD_JObjLoadJoint -> root=%p joints=%d dobjs=%d\n",
+               (void*)root, nj, nd);
     }
 done:
     PCPort_HSDArchiveDestroy(&archive);

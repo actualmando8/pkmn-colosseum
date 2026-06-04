@@ -43,6 +43,8 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_fobj.h"
 #include "hsd/hsd_jobj.h"
+#include "hsd/hsd_dobj.h"
+#include "hsd/hsd_robj.h"
 #include "hsd/hsd_forward.h"
 
 #include <stdlib.h>
@@ -77,6 +79,64 @@ void HSD_Free(void* ptr)
     if (ptr != NULL) {
         free(ptr);
     }
+}
+
+/* ========================================================================= */
+/*  HSD_JObjLoadJoint — build a live HSD_JObj tree from a HSD_Joint desc      */
+/* ========================================================================= */
+
+/* The real HSD_JObjLoadJoint is asm-only in the original (no decompiled C),
+ * so it would auto-stub to a NULL-returning no-op. This is a faithful host
+ * functional implementation of the standard HSD joint-tree load: it allocates
+ * each JObj via the real HSD_JObjAlloc, copies the joint's flags + S/R/T, loads
+ * the attached display object via the GAME'S real HSD_DObjLoadDesc (which loads
+ * the real MObj/PObj/TObj incl. their animation), recurses children + siblings,
+ * and marks the matrix dirty. All leaf work is the game's own code; this is just
+ * the recursive glue the asm function would otherwise perform. Building the real
+ * HSD_JObj tree is the prerequisite for running the game's HSD_JObjAnimAll
+ * (texture-matrix UV scroll = the title "sand") + its real render. */
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
+{
+    HSD_JObj* jobj;
+    HSD_JObj* c;
+
+    if (joint == NULL) {
+        return NULL;
+    }
+
+    jobj = HSD_JObjAlloc();
+    if (jobj == NULL) {
+        return NULL;
+    }
+
+    jobj->flags = joint->flags;
+    jobj->rotate_x = joint->rotation_x;
+    jobj->rotate_y = joint->rotation_y;
+    jobj->rotate_z = joint->rotation_z;
+    jobj->scale_x = joint->scale_x;
+    jobj->scale_y = joint->scale_y;
+    jobj->scale_z = joint->scale_z;
+    jobj->translate_x = joint->position_x;
+    jobj->translate_y = joint->position_y;
+    jobj->translate_z = joint->position_z;
+
+    if (union_type_dobj(joint) && joint->u.dobjdesc != NULL) {
+        jobj->u.dobj = HSD_DObjLoadDesc(joint->u.dobjdesc);
+    }
+    if (joint->robjdesc != NULL) {
+        jobj->robj = HSD_RObjLoadDesc(joint->robjdesc);
+    }
+
+    /* Children (with their full sibling chain), then set their parent. */
+    jobj->child = HSD_JObjLoadJoint(joint->child);
+    for (c = jobj->child; c != NULL; c = c->next) {
+        c->parent = jobj;
+    }
+    /* Siblings of this joint (parent set by the caller's child loop). */
+    jobj->next = HSD_JObjLoadJoint(joint->next);
+
+    HSD_JObjSetMtxDirty(jobj);
+    return jobj;
 }
 
 /* ========================================================================= */
