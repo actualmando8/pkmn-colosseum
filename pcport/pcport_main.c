@@ -4952,6 +4952,8 @@ static int g_rjtDepth;
  * pipeline must already be configured by the caller. Returns 1 if it drew.
  * Gated by PCPORT_SKIN. */
 #define PCPORT_SKIN_MAX_SLOTS 32
+static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
+static u32 g_skinHistOob;
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
                              const PCPortTranslatedCamera* cam,
@@ -5054,6 +5056,8 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     int dbgReplace = (getenv("PCPORT_SKIN_REPLACE") != NULL);
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
     int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
+    memset(g_skinHist, 0, sizeof(g_skinHist));
+    g_skinHistOob = 0;
 
     /* The character meshes carry a dark albedo (navy coat, black boots) that the
      * GameCube lit at runtime; we don't yet drive GX dynamic lights for the skin
@@ -5141,7 +5145,8 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                     haveCol = 1;
                 }
             }
-            if (curSlot >= (u32)slot) curSlot = 0u;
+            if (curSlot >= (u32)slot) { curSlot = 0u; ++g_skinHistOob; }
+            if (curSlot < PCPORT_SKIN_MAX_SLOTS) ++g_skinHist[curSlot];
             {
                 /* Envelope verts are stored in MODEL (bind-pose) space. The true
                  * skinning matrix is palette[slot] = jointWorld * invBind, which
@@ -5172,6 +5177,15 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
         }
         GXEnd();
+    }
+    if (getenv("PCPORT_SKIN_HIST") != NULL) {
+        int s; u32 tot = 0;
+        fprintf(stderr, "[skinhist] slots=%d oob=%u hist=", slot, g_skinHistOob);
+        for (s = 0; s < slot && s < PCPORT_SKIN_MAX_SLOTS; ++s) {
+            fprintf(stderr, "%u:%u ", s, g_skinHist[s]);
+            tot += g_skinHist[s];
+        }
+        fprintf(stderr, "(total=%u)\n", tot);
     }
     /* Restore neutral shading state so subsequent draws are unaffected. */
     GXHostSetExposure(1.0f);
