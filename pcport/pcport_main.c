@@ -5027,6 +5027,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
 
     if (envOff == 0u || tp->verts == NULL || dl == NULL ||
         !ArchiveRangeValid(a, envOff, 0x4u)) {
+        if (getenv("PCPORT_SKIN_BAIL") != NULL)
+            fprintf(stderr, "[skinbail] pobj@0x%X envOff=0x%X verts=%p dl=%p -> head check\n",
+                    pobjOffset, envOff, (void*)tp->verts, (void*)dl);
         return 0;
     }
     end = dl + tp->pobj.n_display;
@@ -5128,6 +5131,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         }
     }
     if (slot == 0) {
+        if (getenv("PCPORT_SKIN_BAIL") != NULL)
+            fprintf(stderr, "[skinbail] pobj@0x%X envOff=0x%X -> slot==0 (no valid envelope entry)\n",
+                    pobjOffset, envOff);
         return 0;
     }
 
@@ -5137,6 +5143,8 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         else if (v->attr == GX_VA_TEX0) texD = v;
     }
     if (posD == NULL) {
+        if (getenv("PCPORT_SKIN_BAIL") != NULL)
+            fprintf(stderr, "[skinbail] pobj@0x%X -> no POS vtx descriptor\n", pobjOffset);
         return 0;
     }
 
