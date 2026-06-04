@@ -25,12 +25,18 @@ extern FuncPtr _ctors[];
 __declspec(section ".dtors$10") void (*const __destroy_global_chain_reference)(void) =
     __destroy_global_chain;
 
-#if 1
+#if 0
 asm void __init_cpp(void) {
 #include "src/crt/__init_cpp_exceptions___init_cpp.inc"
 }
 #else
-void __init_cpp(void) { /* TODO */ }
+void __init_cpp(void) {
+    FuncPtr* p = _ctors;
+    while (*p != 0) {
+        (*p)();
+        p++;
+    }
+}
 #endif
 #if 0
 asm void _ExitProcess(void) {
