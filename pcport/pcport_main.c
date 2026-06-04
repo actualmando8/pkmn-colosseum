@@ -5001,6 +5001,12 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
         }
         if (!any) { M[0][0] = M[1][1] = M[2][2] = 1.0f; }
+        if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
+            fprintf(stderr,
+                "[skinpal] slot %d entry=0x%X resolved=%d  M row0=(%.2f %.2f %.2f | %.2f)\n",
+                slot, (unsigned)PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u),
+                any, M[0][0], M[0][1], M[0][2], M[0][3]);
+        }
     }
     if (slot == 0) {
         return 0;
@@ -5039,6 +5045,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
      * (model expects runtime lighting we don't yet drive)". */
     int dbgReplace = (getenv("PCPORT_SKIN_REPLACE") != NULL);
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
+    int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
 
     /* The character meshes carry a dark albedo (navy coat, black boots) that the
      * GameCube lit at runtime; we don't yet drive GX dynamic lights for the skin
@@ -5133,9 +5140,23 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * built ready for that.) Submitting jointWorld*pos directly was
                  * wrong -- it double-applied the bind transform and scattered the
                  * mesh. */
-                (void) curSlot;
                 if (dbgWhite || !haveCol) GXColor4u8(255,255,255,255); else GXColor4u8(cr, cg, cb, ca);
-                GXPosition3f32(px, py, pz);
+                /* Apply the per-vertex skinning matrix palette[curSlot]. For GS's
+                 * HSD variant the envelope verts are in JOINT-LOCAL space (not
+                 * pre-baked to model space), so the bone's world matrix must be
+                 * applied -- submitting as-is collapses single-bone meshes (hair,
+                 * accessories) into spikes. palette[curSlot] = Sum(w * jointWorld);
+                 * an unresolved slot is identity, falling back to as-is.
+                 * PCPORT_SKIN_NOMTX disables this for A/B comparison. */
+                if (dbgNoMtx) {
+                    GXPosition3f32(px, py, pz);
+                } else {
+                    f32 (*Mx)[4] = palette[curSlot];
+                    f32 wx = Mx[0][0]*px + Mx[0][1]*py + Mx[0][2]*pz + Mx[0][3];
+                    f32 wy = Mx[1][0]*px + Mx[1][1]*py + Mx[1][2]*pz + Mx[1][3];
+                    f32 wz = Mx[2][0]*px + Mx[2][1]*py + Mx[2][2]*pz + Mx[2][3];
+                    GXPosition3f32(wx, wy, wz);
+                }
                 GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
             }
         }
