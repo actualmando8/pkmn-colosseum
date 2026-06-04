@@ -27,6 +27,7 @@ typedef struct {
     u32 maxColorIndex;
     u32 maxTexcoordIndex;
     u32 maxTexcoord1Index;
+    u32 maxMatrixIndex;        /* highest GX_VA_PNMTXIDX value seen (skinning) */
     u32 totalSubmittedVertices;
     u32 totalPrimitiveCommands;
 } PCPortDisplayListStats;
@@ -418,9 +419,24 @@ static BOOL ScanDisplayListIndices(const u8* displayList,
 
         for (i = 0; i < vertexCount; ++i) {
             for (v = verts; v->attr != GX_VA_NULL; ++v) {
-                int indexSize = GetIndexByteCount(v->attr_type);
+                int indexSize;
                 u32 index;
 
+                /* PNMTXIDX is a 1-byte DIRECT matrix-palette index inline in the
+                 * display list (not an index into a vertex array): consume the
+                 * byte and track its max (palette size) for the skinning pass. */
+                if (v->attr == GX_VA_PNMTXIDX) {
+                    if ((u32)(end - cursor) < 1u) {
+                        return FALSE;
+                    }
+                    if ((u32)cursor[0] > stats->maxMatrixIndex) {
+                        stats->maxMatrixIndex = cursor[0];
+                    }
+                    cursor += 1;
+                    continue;
+                }
+
+                indexSize = GetIndexByteCount(v->attr_type);
                 if (indexSize == 0 || (u32)(end - cursor) < (u32)indexSize) {
                     return FALSE;
                 }
@@ -2192,6 +2208,16 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
             break;
         }
 
+        /* Skinned (envelope) meshes carry GX_VA_PNMTXIDX: a 1-byte DIRECT
+         * matrix-palette index inline per vertex, with NO source vertex array.
+         * Accept it (so the geometry translates instead of being rejected); the
+         * per-vertex matrix + envelope-palette transform are applied at render
+         * time. Rigid field meshes (type 0) never carry this attribute, so the
+         * proven rigid path is unaffected. */
+        if (parsedVerts[entryCount].attr == GX_VA_PNMTXIDX) {
+            continue;
+        }
+
         if ((parsedVerts[entryCount].attr != GX_VA_POS &&
              parsedVerts[entryCount].attr != GX_VA_NRM &&
              parsedVerts[entryCount].attr != GX_VA_CLR0 &&
@@ -2241,6 +2267,12 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
 
     for (i = 0; i < entryCount; ++i) {
         u32 usedCount;
+
+        /* PNMTXIDX has no source vertex array (inline DIRECT bytes); skip the
+         * array load for it. */
+        if (outPObj->verts[i].attr == GX_VA_PNMTXIDX) {
+            continue;
+        }
 
         switch (outPObj->verts[i].attr) {
         case GX_VA_POS:
