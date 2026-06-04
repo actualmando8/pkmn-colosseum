@@ -1,0 +1,3428 @@
+{
+ "lbl_80266420": {
+  "addr": "80266420",
+  "section": "rodata",
+  "text": "OS avail memory: %d\\n",
+  "n_pieces": 1
+ },
+ "lbl_80266448": {
+  "addr": "80266448",
+  "section": "rodata",
+  "text": "OS_ERROR_SYSTEM_RESET",
+  "n_pieces": 1
+ },
+ "lbl_80266460": {
+  "addr": "80266460",
+  "section": "rodata",
+  "text": "OS_ERROR_MACHINE_CHECK",
+  "n_pieces": 1
+ },
+ "lbl_80266478": {
+  "addr": "80266478",
+  "section": "rodata",
+  "text": "OS_ERROR_DSI",
+  "n_pieces": 1
+ },
+ "lbl_80266488": {
+  "addr": "80266488",
+  "section": "rodata",
+  "text": "OS_ERROR_ISI",
+  "n_pieces": 1
+ },
+ "lbl_80266498": {
+  "addr": "80266498",
+  "section": "rodata",
+  "text": "OS_ERROR_EXTERNAL_INTERRUPT",
+  "n_pieces": 1
+ },
+ "lbl_802664B4": {
+  "addr": "802664B4",
+  "section": "rodata",
+  "text": "OS_ERROR_ALIGNMENT",
+  "n_pieces": 1
+ },
+ "lbl_802664C8": {
+  "addr": "802664C8",
+  "section": "rodata",
+  "text": "OS_ERROR_PROGRAM",
+  "n_pieces": 1
+ },
+ "lbl_802664DC": {
+  "addr": "802664DC",
+  "section": "rodata",
+  "text": "OS_ERROR_FLOATING_POINT",
+  "n_pieces": 1
+ },
+ "lbl_802664F4": {
+  "addr": "802664F4",
+  "section": "rodata",
+  "text": "OS_ERROR_DECREMENTER",
+  "n_pieces": 1
+ },
+ "lbl_8026650C": {
+  "addr": "8026650C",
+  "section": "rodata",
+  "text": "OS_ERROR_SYSTEM_CALL",
+  "n_pieces": 1
+ },
+ "lbl_80266524": {
+  "addr": "80266524",
+  "section": "rodata",
+  "text": "OS_ERROR_TRACE",
+  "n_pieces": 1
+ },
+ "lbl_80266534": {
+  "addr": "80266534",
+  "section": "rodata",
+  "text": "OS_ERROR_PERFORMACE_MONITOR",
+  "n_pieces": 1
+ },
+ "lbl_80266550": {
+  "addr": "80266550",
+  "section": "rodata",
+  "text": "OS_ERROR_BREAKPOINT",
+  "n_pieces": 1
+ },
+ "lbl_80266564": {
+  "addr": "80266564",
+  "section": "rodata",
+  "text": "OS_ERROR_SYSTEM_INTERRUPT",
+  "n_pieces": 1
+ },
+ "lbl_80266580": {
+  "addr": "80266580",
+  "section": "rodata",
+  "text": "OS_ERROR_THERMAL_INTERRUPT",
+  "n_pieces": 1
+ },
+ "lbl_8026659C": {
+  "addr": "8026659C",
+  "section": "rodata",
+  "text": "OS_ERROR_PROTECTION",
+  "n_pieces": 1
+ },
+ "lbl_80266688": {
+  "addr": "80266688",
+  "section": "rodata",
+  "text": "[%4d]FLAG_%4d",
+  "n_pieces": 1
+ },
+ "lbl_80266FAC": {
+  "addr": "80266FAC",
+  "section": "rodata",
+  "text": "menuCardE.c",
+  "n_pieces": 1
+ },
+ "lbl_80266FB8": {
+  "addr": "80266FB8",
+  "section": "rodata",
+  "text": "_CARDE.card_type == CARDE_CARDTYPE_TRAINER",
+  "n_pieces": 1
+ },
+ "lbl_80266FE8": {
+  "addr": "80266FE8",
+  "section": "rodata",
+  "text": "movie/openingdemo.thp",
+  "n_pieces": 1
+ },
+ "lbl_80267000": {
+  "addr": "80267000",
+  "section": "rodata",
+  "text": "movie/staffroll.thp",
+  "n_pieces": 1
+ },
+ "lbl_80267014": {
+  "addr": "80267014",
+  "section": "rodata",
+  "text": "movie/autodemo01.thp",
+  "n_pieces": 1
+ },
+ "lbl_8026702C": {
+  "addr": "8026702C",
+  "section": "rodata",
+  "text": "movie/gs_logo.thp",
+  "n_pieces": 1
+ },
+ "lbl_80267040": {
+  "addr": "80267040",
+  "section": "rodata",
+  "text": "movie/tpc.thp",
+  "n_pieces": 1
+ },
+ "lbl_80267C94": {
+  "addr": "80267C94",
+  "section": "rodata",
+  "text": "menuCB_Battle.c",
+  "n_pieces": 1
+ },
+ "lbl_80267E70": {
+  "addr": "80267E70",
+  "section": "rodata",
+  "text": "0 <= eRuleType && _LENGTH(_CB.m_aRule) > eRuleType",
+  "n_pieces": 1
+ },
+ "lbl_80268708": {
+  "addr": "80268708",
+  "section": "rodata",
+  "text": "menuCB_Common.c",
+  "n_pieces": 1
+ },
+ "lbl_80268718": {
+  "addr": "80268718",
+  "section": "rodata",
+  "text": "0 < _CBC.m_nMenuStackDepth &&\\\"_menuPop():stack under.\\\"",
+  "n_pieces": 1
+ },
+ "lbl_80268750": {
+  "addr": "80268750",
+  "section": "rodata",
+  "text": "0 &&\\\"_menuPush(int eMenuID):stack over.\\\"",
+  "n_pieces": 1
+ },
+ "lbl_802688F8": {
+  "addr": "802688F8",
+  "section": "rodata",
+  "text": "menuToolBattle.c",
+  "n_pieces": 1
+ },
+ "lbl_8026890C": {
+  "addr": "8026890C",
+  "section": "rodata",
+  "text": "BATTLEMODE_BATTLEYAMA100 == _CB.m_eBattleMode",
+  "n_pieces": 1
+ },
+ "lbl_80268A48": {
+  "addr": "80268A48",
+  "section": "rodata",
+  "text": "menuCB_Rule.c",
+  "n_pieces": 1
+ },
+ "lbl_80268AB8": {
+  "addr": "80268AB8",
+  "section": "rodata",
+  "text": "menuExDiscShrine.c",
+  "n_pieces": 1
+ },
+ "lbl_80268AE0": {
+  "addr": "80268AE0",
+  "section": "rodata",
+  "text": "menuExDiscCoupon.c",
+  "n_pieces": 1
+ },
+ "lbl_80268AF8": {
+  "addr": "80268AF8",
+  "section": "rodata",
+  "text": "bg0thumbcode.bin",
+  "n_pieces": 1
+ },
+ "lbl_80268B0C": {
+  "addr": "80268B0C",
+  "section": "rodata",
+  "text": "bg1thumbcode.bin",
+  "n_pieces": 1
+ },
+ "lbl_80268B20": {
+  "addr": "80268B20",
+  "section": "rodata",
+  "text": "bg2thumbcode.bin",
+  "n_pieces": 1
+ },
+ "lbl_80268B38": {
+  "addr": "80268B38",
+  "section": "rodata",
+  "text": "menuPokeCoupon.c",
+  "n_pieces": 1
+ },
+ "lbl_80268B4C": {
+  "addr": "80268B4C",
+  "section": "rodata",
+  "text": "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer",
+  "n_pieces": 1
+ },
+ "lbl_80268D78": {
+  "addr": "80268D78",
+  "section": "rodata",
+  "text": "menuCardE_Matrix.c",
+  "n_pieces": 1
+ },
+ "lbl_80268D8C": {
+  "addr": "80268D8C",
+  "section": "rodata",
+  "text": "i < cem->m_seriesN",
+  "n_pieces": 1
+ },
+ "lbl_80268DA0": {
+  "addr": "80268DA0",
+  "section": "rodata",
+  "text": "!cem->m_isAnimating",
+  "n_pieces": 1
+ },
+ "lbl_80268DB4": {
+  "addr": "80268DB4",
+  "section": "rodata",
+  "text": "s[ANIM_cur]",
+  "n_pieces": 1
+ },
+ "lbl_8026F1C8": {
+  "addr": "8026F1C8",
+  "section": "rodata",
+  "text": "cardesavedata.c",
+  "n_pieces": 1
+ },
+ "lbl_8026F568": {
+  "addr": "8026F568",
+  "section": "rodata",
+  "text": "pokeconv.c",
+  "n_pieces": 1
+ },
+ "lbl_8026F574": {
+  "addr": "8026F574",
+  "section": "rodata",
+  "text": "cp->pc_items_num == 50 || cp->pc_items_num == 30",
+  "n_pieces": 1
+ },
+ "lbl_8026F5A8": {
+  "addr": "8026F5A8",
+  "section": "rodata",
+  "text": "gbaCommunication.c",
+  "n_pieces": 1
+ },
+ "lbl_8026F5E4": {
+  "addr": "8026F5E4",
+  "section": "rodata",
+  "text": "Ribbon Index: %d",
+  "n_pieces": 1
+ },
+ "\"@62_8026F610\"": {
+  "addr": "8026F610",
+  "section": "rodata",
+  "text": "MetroTRK for GAMECUBE v2.6",
+  "n_pieces": 1
+ },
+ "\"@154_8026F62C\"": {
+  "addr": "8026F62C",
+  "section": "rodata",
+  "text": "Initialize NUB\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026F640": {
+  "addr": "8026F640",
+  "section": "rodata",
+  "text": "MessageSend : cc_write returned %ld\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026F668": {
+  "addr": "8026F668",
+  "section": "rodata",
+  "text": "ERROR : No buffer available\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026F818": {
+  "addr": "8026F818",
+  "section": "rodata",
+  "text": "Dispatch command 0x%08x\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026F834": {
+  "addr": "8026F834",
+  "section": "rodata",
+  "text": "Dispatch complete err = %ld\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026F8B8": {
+  "addr": "8026F8B8",
+  "section": "rodata",
+  "text": "SendACK : Calling MessageSend\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FA34": {
+  "addr": "8026FA34",
+  "section": "rodata",
+  "text": "%02x ",
+  "n_pieces": 1
+ },
+ "lbl_8026FA3C": {
+  "addr": "8026FA3C",
+  "section": "rodata",
+  "text": "\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FB70": {
+  "addr": "8026FB70",
+  "section": "rodata",
+  "text": "TargetDoStep()\\n",
+  "n_pieces": 1
+ },
+ "\"@80_8026FB80\"": {
+  "addr": "8026FB80",
+  "section": "rodata",
+  "text": "TRK_Main \\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FCF4": {
+  "addr": "8026FCF4",
+  "section": "rodata",
+  "text": "Expected packet size : 0x%08x (%ld)\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FD1C": {
+  "addr": "8026FD1C",
+  "section": "rodata",
+  "text": "cc_read : error reading bytes from EXI2 %ld\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FD4C": {
+  "addr": "8026FD4C",
+  "section": "rodata",
+  "text": "CALLING EXI2_Init\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FD60": {
+  "addr": "8026FD60",
+  "section": "rodata",
+  "text": "DONE CALLING EXI2_Init\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FDD4": {
+  "addr": "8026FDD4",
+  "section": "rodata",
+  "text": "Expected packet size : 0x%08x (%ld)\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FDFC": {
+  "addr": "8026FDFC",
+  "section": "rodata",
+  "text": "cc_read : error reading bytes from EXI2 %ld\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FE2C": {
+  "addr": "8026FE2C",
+  "section": "rodata",
+  "text": "CALLING EXI2_Init\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FE40": {
+  "addr": "8026FE40",
+  "section": "rodata",
+  "text": "DONE CALLING EXI2_Init\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FE70": {
+  "addr": "8026FE70",
+  "section": "rodata",
+  "text": "GCN_Mem_Alloc.c : InitDefaultHeap. No Heap Available\\n",
+  "n_pieces": 1
+ },
+ "lbl_8026FEA8": {
+  "addr": "8026FEA8",
+  "section": "rodata",
+  "text": "Metrowerks CW runtime library initializing default heap\\n",
+  "n_pieces": 1
+ },
+ "\"@stringBase0_8026FFE0\"": {
+  "addr": "8026FFE0",
+  "section": "rodata",
+  "text": "-INF-infINFinf-NAN-nanNANnan",
+  "n_pieces": 9
+ },
+ "lbl_80270360": {
+  "addr": "80270360",
+  "section": "rodata",
+  "text": "GSgfx: unable to allocate gsgfx state!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270388": {
+  "addr": "80270388",
+  "section": "rodata",
+  "text": "GSgfx: Init OK, state located at %08Xh (size=%d)\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270440": {
+  "addr": "80270440",
+  "section": "rodata",
+  "text": "GSgfx: invalid matrix index\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270460": {
+  "addr": "80270460",
+  "section": "rodata",
+  "text": "GSgfx: matrix stack underflow!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270480": {
+  "addr": "80270480",
+  "section": "rodata",
+  "text": "GSgfx: matrix stack overflow!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802704A0": {
+  "addr": "802704A0",
+  "section": "rodata",
+  "text": "0123456789ABCDEF",
+  "n_pieces": 1
+ },
+ "lbl_80270528": {
+  "addr": "80270528",
+  "section": "rodata",
+  "text": "GSmaterialSetPEdescr: Warning: already using a custom description!\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027056C": {
+  "addr": "8027056C",
+  "section": "rodata",
+  "text": "GSmaterialCreate: Run out of materials. Increase materialcount at initialisation",
+  "n_pieces": 1
+ },
+ "lbl_802705C0": {
+  "addr": "802705C0",
+  "section": "rodata",
+  "text": "GSmaterial MObj",
+  "n_pieces": 1
+ },
+ "lbl_802705D0": {
+  "addr": "802705D0",
+  "section": "rodata",
+  "text": "GSmaterial: Unsupported texture format for environment map!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270610": {
+  "addr": "80270610",
+  "section": "rodata",
+  "text": "GSmaterial: Error creating environment map: no texture defined!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270D78": {
+  "addr": "80270D78",
+  "section": "rodata",
+  "text": "GSmem: Warning -- memory loss of %d bytes due to no block before allocation point %08X\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270DD0": {
+  "addr": "80270DD0",
+  "section": "rodata",
+  "text": "GSmem: Unable to locate block for updating\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270DFC": {
+  "addr": "80270DFC",
+  "section": "rodata",
+  "text": "GSmem: Init OK, using area %08Xh -> %08Xh\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270E28": {
+  "addr": "80270E28",
+  "section": "rodata",
+  "text": "!(jobj->flags & JOBJ_USE_QUATERNION)",
+  "n_pieces": 1
+ },
+ "lbl_80270E50": {
+  "addr": "80270E50",
+  "section": "rodata",
+  "text": "translate",
+  "n_pieces": 1
+ },
+ "lbl_80270E60": {
+  "addr": "80270E60",
+  "section": "rodata",
+  "text": "translate",
+  "n_pieces": 1
+ },
+ "lbl_80270E6C": {
+  "addr": "80270E6C",
+  "section": "rodata",
+  "text": "!(jobj->flags & JOBJ_USE_QUATERNION)",
+  "n_pieces": 1
+ },
+ "lbl_80270E98": {
+  "addr": "80270E98",
+  "section": "rodata",
+  "text": "shadow.h",
+  "n_pieces": 1
+ },
+ "lbl_80270EA8": {
+  "addr": "80270EA8",
+  "section": "rodata",
+  "text": "translate",
+  "n_pieces": 1
+ },
+ "lbl_80270EE8": {
+  "addr": "80270EE8",
+  "section": "rodata",
+  "text": "!(jobj->flags & JOBJ_USE_QUATERNION)",
+  "n_pieces": 1
+ },
+ "lbl_80270F10": {
+  "addr": "80270F10",
+  "section": "rodata",
+  "text": "GSpart: part is already registered for rotation\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270F44": {
+  "addr": "80270F44",
+  "section": "rodata",
+  "text": "GSpart: model has too many registered rotations\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270F78": {
+  "addr": "80270F78",
+  "section": "rodata",
+  "text": "GSpart: child node too deep\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270F98": {
+  "addr": "80270F98",
+  "section": "rodata",
+  "text": "GStexture: invalid texture format\\n",
+  "n_pieces": 1
+ },
+ "lbl_80270FBC": {
+  "addr": "80270FBC",
+  "section": "rodata",
+  "text": "GStexture: warning -- texture size adjusted from [%d,%d] to [%d,%d]\\n",
+  "n_pieces": 1
+ },
+ "lbl_80271008": {
+  "addr": "80271008",
+  "section": "rodata",
+  "text": "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\\n",
+  "n_pieces": 1
+ },
+ "lbl_80271038": {
+  "addr": "80271038",
+  "section": "rodata",
+  "text": "GSthread: Init OK, maximum of %d threads\\n",
+  "n_pieces": 1
+ },
+ "lbl_80271068": {
+  "addr": "80271068",
+  "section": "rodata",
+  "text": "Stack overflow.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802717D4": {
+  "addr": "802717D4",
+  "section": "rodata",
+  "text": "_msgGetSize() failed.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802717F0": {
+  "addr": "802717F0",
+  "section": "rodata",
+  "text": "GSfloorOpen: cannot find floor %d\\n",
+  "n_pieces": 1
+ },
+ "lbl_802719C4": {
+  "addr": "802719C4",
+  "section": "rodata",
+  "text": "loadParticle(): loading...\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272050": {
+  "addr": "80272050",
+  "section": "rodata",
+  "text": "GScolsys2Draw : can't alloc display list memory.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802720B0": {
+  "addr": "802720B0",
+  "section": "rodata",
+  "text": "scene_data",
+  "n_pieces": 1
+ },
+ "lbl_80272200": {
+  "addr": "80272200",
+  "section": "rodata",
+  "text": "floorReadGFLPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272238": {
+  "addr": "80272238",
+  "section": "rodata",
+  "text": "ERROR: Over Sound Buffer! snd_res_id=%d buffer size=%d\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272270": {
+  "addr": "80272270",
+  "section": "rodata",
+  "text": "floorReadParticlePreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_802722AC": {
+  "addr": "802722AC",
+  "section": "rodata",
+  "text": "scene_data",
+  "n_pieces": 1
+ },
+ "lbl_802722B8": {
+  "addr": "802722B8",
+  "section": "rodata",
+  "text": "floorReadWZXPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_802722F0": {
+  "addr": "802722F0",
+  "section": "rodata",
+  "text": "floorReadPKXPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027235C": {
+  "addr": "8027235C",
+  "section": "rodata",
+  "text": "floorReadTexPreFunc(): can't alloc %d bytes of memory \\n",
+  "n_pieces": 1
+ },
+ "lbl_80272428": {
+  "addr": "80272428",
+  "section": "rodata",
+  "text": "floorReadCameraPreFunc: can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_802724E8": {
+  "addr": "802724E8",
+  "section": "rodata",
+  "text": "floorReadMapPreFunc: can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272520": {
+  "addr": "80272520",
+  "section": "rodata",
+  "text": "floorReadScriptPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027255C": {
+  "addr": "8027255C",
+  "section": "rodata",
+  "text": "floorReadFontPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272594": {
+  "addr": "80272594",
+  "section": "rodata",
+  "text": "floorReadMsgPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_802725CC": {
+  "addr": "802725CC",
+  "section": "rodata",
+  "text": "floorReadNormalPreFunc(): can't alloc %d bytes of memory\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272770": {
+  "addr": "80272770",
+  "section": "rodata",
+  "text": "floorUpdateFieldCamera: error updating field camera - divide by zero!",
+  "n_pieces": 1
+ },
+ "lbl_80272A58": {
+  "addr": "80272A58",
+  "section": "rodata",
+  "text": "GSeffect: Cannot trigger effect - instance uninitialised: effect ID %d.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272AA8": {
+  "addr": "80272AA8",
+  "section": "rodata",
+  "text": "%s/test%04d.thp",
+  "n_pieces": 1
+ },
+ "lbl_80272AB8": {
+  "addr": "80272AB8",
+  "section": "rodata",
+  "text": "Largest block increased by %d bytes\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272AE0": {
+  "addr": "80272AE0",
+  "section": "rodata",
+  "text": "GSmem state OK\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272AF0": {
+  "addr": "80272AF0",
+  "section": "rodata",
+  "text": "GSmem state broken!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272B08": {
+  "addr": "80272B08",
+  "section": "rodata",
+  "text": "tracefxStartEffect: Could not start trail effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272C30": {
+  "addr": "80272C30",
+  "section": "rodata",
+  "text": "leaffxStartEffect: Could not start leaf effect - invalid leaf model: groupRes %d, modelRes %d!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272C90": {
+  "addr": "80272C90",
+  "section": "rodata",
+  "text": "leaffxStartEffect: Could not start leaf effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272CC4": {
+  "addr": "80272CC4",
+  "section": "rodata",
+  "text": "_leaffxGenerateLeafData: Could not create leaf clone model.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272D08": {
+  "addr": "80272D08",
+  "section": "rodata",
+  "text": "leaffxStartEffect: Could not start lightning effect - not enough memory!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272D54": {
+  "addr": "80272D54",
+  "section": "rodata",
+  "text": "leaffxStartEffect: Could not start lightning effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272D90": {
+  "addr": "80272D90",
+  "section": "rodata",
+  "text": "electronStartEffect: Could not start electron effect - invalid model: groupRes %d, modelRes %d!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272DF4": {
+  "addr": "80272DF4",
+  "section": "rodata",
+  "text": "leaffxStartEffect: Could not start electron effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272E30": {
+  "addr": "80272E30",
+  "section": "rodata",
+  "text": "filterStart: Could not start filter effect - invalid filter!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272E70": {
+  "addr": "80272E70",
+  "section": "rodata",
+  "text": "filterStart: Could not start filter effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272EA0": {
+  "addr": "80272EA0",
+  "section": "rodata",
+  "text": "surfEffectStart: Could not start wave effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272ED0": {
+  "addr": "80272ED0",
+  "section": "rodata",
+  "text": "seaEffectStart: Could not start sea effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272F00": {
+  "addr": "80272F00",
+  "section": "rodata",
+  "text": "envMapEffectInit: Could not initialise env map effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272F38": {
+  "addr": "80272F38",
+  "section": "rodata",
+  "text": "envMapEffectStart: Could not start env map effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272F70": {
+  "addr": "80272F70",
+  "section": "rodata",
+  "text": "blurEffectStart: Could not start blur effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272FA0": {
+  "addr": "80272FA0",
+  "section": "rodata",
+  "text": "auraEffectStart: Could not start aura effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80272FD0": {
+  "addr": "80272FD0",
+  "section": "rodata",
+  "text": "translate",
+  "n_pieces": 1
+ },
+ "lbl_80272FE0": {
+  "addr": "80272FE0",
+  "section": "rodata",
+  "text": "distortionEffectStart: Could not start distortion effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027301C": {
+  "addr": "8027301C",
+  "section": "rodata",
+  "text": "_distortionEffectUpdateMatrices: Could not project points on screen",
+  "n_pieces": 1
+ },
+ "lbl_80273078": {
+  "addr": "80273078",
+  "section": "rodata",
+  "text": "billboardEffectStart: Could not start billboard effect!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802730B8": {
+  "addr": "802730B8",
+  "section": "rodata",
+  "text": "Failed to create Patchiru texture\\n",
+  "n_pieces": 1
+ },
+ "lbl_80273548": {
+  "addr": "80273548",
+  "section": "rodata",
+  "text": "ERROR: can't open WAVE ID = %d\\n",
+  "n_pieces": 1
+ },
+ "lbl_80273568": {
+  "addr": "80273568",
+  "section": "rodata",
+  "text": "ERROR: can't open WAVE File = %s\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027358C": {
+  "addr": "8027358C",
+  "section": "rodata",
+  "text": "soundStop: Warning! BGM cannot be stopped.(snd_id=%d)\\n",
+  "n_pieces": 1
+ },
+ "lbl_802735C4": {
+  "addr": "802735C4",
+  "section": "rodata",
+  "text": "ERROR(sound.c): invalid file_info number snd_id=%d\\n",
+  "n_pieces": 1
+ },
+ "lbl_802736CC": {
+  "addr": "802736CC",
+  "section": "rodata",
+  "text": "ERROR: Can't Read Group(%d)\\n\\n",
+  "n_pieces": 1
+ },
+ "lbl_802736F0": {
+  "addr": "802736F0",
+  "section": "rodata",
+  "text": "GSsndGetStatus:Forced termination SE=%d\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027371C": {
+  "addr": "8027371C",
+  "section": "rodata",
+  "text": "GSsndGetStatus:Forced termination BGM=%d\\n",
+  "n_pieces": 1
+ },
+ "lbl_80273748": {
+  "addr": "80273748",
+  "section": "rodata",
+  "text": "_sndCheckSndWorkALL:Start\\n",
+  "n_pieces": 1
+ },
+ "lbl_80273764": {
+  "addr": "80273764",
+  "section": "rodata",
+  "text": "_sndCheckSndWorkALL:End\\n",
+  "n_pieces": 1
+ },
+ "lbl_80273780": {
+  "addr": "80273780",
+  "section": "rodata",
+  "text": "[GSDVD_ERROR_STATE_COVEROPEN_WAIT]  status = %d\\n",
+  "n_pieces": 1
+ },
+ "lbl_802737B8": {
+  "addr": "802737B8",
+  "section": "rodata",
+  "text": "pslist.c",
+  "n_pieces": 1
+ },
+ "lbl_80273820": {
+  "addr": "80273820",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_80273968": {
+  "addr": "80273968",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_80273974": {
+  "addr": "80273974",
+  "section": "rodata",
+  "text": "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+  "n_pieces": 1
+ },
+ "lbl_802739A0": {
+  "addr": "802739A0",
+  "section": "rodata",
+  "text": "psinterpret.c",
+  "n_pieces": 1
+ },
+ "lbl_802739B0": {
+  "addr": "802739B0",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_802739BC": {
+  "addr": "802739BC",
+  "section": "rodata",
+  "text": "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+  "n_pieces": 1
+ },
+ "lbl_802739E4": {
+  "addr": "802739E4",
+  "section": "rodata",
+  "text": "generator.c",
+  "n_pieces": 1
+ },
+ "lbl_802739F0": {
+  "addr": "802739F0",
+  "section": "rodata",
+  "text": "psCamera",
+  "n_pieces": 1
+ },
+ "lbl_80273A00": {
+  "addr": "80273A00",
+  "section": "rodata",
+  "text": "gs%04d.xfb",
+  "n_pieces": 1
+ },
+ "lbl_80273F70": {
+  "addr": "80273F70",
+  "section": "rodata",
+  "text": "gsfsys.toc",
+  "n_pieces": 1
+ },
+ "lbl_80273F80": {
+  "addr": "80273F80",
+  "section": "rodata",
+  "text": "s1_out.fsys",
+  "n_pieces": 1
+ },
+ "lbl_80273FD8": {
+  "addr": "80273FD8",
+  "section": "rodata",
+  "text": "Warining: people[%d,%d] group is different!!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802741F8": {
+  "addr": "802741F8",
+  "section": "rodata",
+  "text": "ERROR[GSflagSet]:Initialization has not finished.\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027422C": {
+  "addr": "8027422C",
+  "section": "rodata",
+  "text": "ERROR[GSflagSet]:Overflow BitValue FlagID=%d Value=%d (%d BitLength=%d)>(Limit=%dBit).\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274284": {
+  "addr": "80274284",
+  "section": "rodata",
+  "text": "ERROR[GSflagGet]:Initialization has not finished.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274468": {
+  "addr": "80274468",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274480": {
+  "addr": "80274480",
+  "section": "rodata",
+  "text": "had_wobj",
+  "n_pieces": 1
+ },
+ "lbl_8027448C": {
+  "addr": "8027448C",
+  "section": "rodata",
+  "text": "wobj->aobj",
+  "n_pieces": 1
+ },
+ "lbl_80274498": {
+  "addr": "80274498",
+  "section": "rodata",
+  "text": "jp->u.spline",
+  "n_pieces": 1
+ },
+ "lbl_802744A8": {
+  "addr": "802744A8",
+  "section": "rodata",
+  "text": "HSD_ArchiveParse: byte-order mismatch! Please check data format\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274590": {
+  "addr": "80274590",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_802745A8": {
+  "addr": "802745A8",
+  "section": "rodata",
+  "text": "hsd_class",
+  "n_pieces": 1
+ },
+ "lbl_802745B4": {
+  "addr": "802745B4",
+  "section": "rodata",
+  "text": "class_info->head.obj_size >= parent_info->head.obj_size",
+  "n_pieces": 1
+ },
+ "lbl_802745EC": {
+  "addr": "802745EC",
+  "section": "rodata",
+  "text": "class_info->head.info_size >= parent_info->head.info_size",
+  "n_pieces": 1
+ },
+ "lbl_80274628": {
+  "addr": "80274628",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274640": {
+  "addr": "80274640",
+  "section": "rodata",
+  "text": "hsd_cobj",
+  "n_pieces": 1
+ },
+ "lbl_8027464C": {
+  "addr": "8027464C",
+  "section": "rodata",
+  "text": "illegal up vector.",
+  "n_pieces": 1
+ },
+ "lbl_80274660": {
+  "addr": "80274660",
+  "section": "rodata",
+  "text": "cobj->eyepos",
+  "n_pieces": 1
+ },
+ "lbl_80274670": {
+  "addr": "80274670",
+  "section": "rodata",
+  "text": "cobj->interest",
+  "n_pieces": 1
+ },
+ "lbl_80274680": {
+  "addr": "80274680",
+  "section": "rodata",
+  "text": "unkown type of render pass.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802746A0": {
+  "addr": "802746A0",
+  "section": "rodata",
+  "text": "%s in %s on line %d.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802746B8": {
+  "addr": "802746B8",
+  "section": "rodata",
+  "text": "assertion \\\"%s\\\" failed",
+  "n_pieces": 1
+ },
+ "lbl_802746DC": {
+  "addr": "802746DC",
+  "section": "rodata",
+  "text": "displayfunc.c",
+  "n_pieces": 1
+ },
+ "lbl_802746EC": {
+  "addr": "802746EC",
+  "section": "rodata",
+  "text": "unkown type of billboard.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274708": {
+  "addr": "80274708",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274720": {
+  "addr": "80274720",
+  "section": "rodata",
+  "text": "hsd_dobj",
+  "n_pieces": 1
+ },
+ "lbl_8027472C": {
+  "addr": "8027472C",
+  "section": "rodata",
+  "text": "mobj has unexpected blending flags (0x%x).",
+  "n_pieces": 1
+ },
+ "lbl_80274758": {
+  "addr": "80274758",
+  "section": "rodata",
+  "text": "fobj: alloc",
+  "n_pieces": 1
+ },
+ "lbl_80274764": {
+  "addr": "80274764",
+  "section": "rodata",
+  "text": "st == FOBJ_LOAD_WAIT",
+  "n_pieces": 1
+ },
+ "lbl_8027477C": {
+  "addr": "8027477C",
+  "section": "rodata",
+  "text": "st == FOBJ_LOAD_DATA0 || st == FOBJ_LOAD_DATA",
+  "n_pieces": 1
+ },
+ "lbl_802747AC": {
+  "addr": "802747AC",
+  "section": "rodata",
+  "text": "fobj: free",
+  "n_pieces": 1
+ },
+ "lbl_802747B8": {
+  "addr": "802747B8",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_802747D0": {
+  "addr": "802747D0",
+  "section": "rodata",
+  "text": "hsd_fogadj",
+  "n_pieces": 1
+ },
+ "lbl_802747DC": {
+  "addr": "802747DC",
+  "section": "rodata",
+  "text": "You must specify CObj first.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274800": {
+  "addr": "80274800",
+  "section": "rodata",
+  "text": "idx < hash->table_size",
+  "n_pieces": 1
+ },
+ "lbl_802749E4": {
+  "addr": "802749E4",
+  "section": "rodata",
+  "text": "initialize.c",
+  "n_pieces": 1
+ },
+ "lbl_80274AD0": {
+  "addr": "80274AD0",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274AE8": {
+  "addr": "80274AE8",
+  "section": "rodata",
+  "text": "hsd_jobj",
+  "n_pieces": 1
+ },
+ "lbl_80274AF4": {
+  "addr": "80274AF4",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_80274B00": {
+  "addr": "80274B00",
+  "section": "rodata",
+  "text": "HSD_OBJ(o)->ref_count_individual != 0",
+  "n_pieces": 1
+ },
+ "lbl_80274B28": {
+  "addr": "80274B28",
+  "section": "rodata",
+  "text": "can not find specified jobj. maybe jobj tree is broken.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274D44": {
+  "addr": "80274D44",
+  "section": "rodata",
+  "text": "jobj->parent",
+  "n_pieces": 1
+ },
+ "lbl_80274D70": {
+  "addr": "80274D70",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274D88": {
+  "addr": "80274D88",
+  "section": "rodata",
+  "text": "hsd_lobj",
+  "n_pieces": 1
+ },
+ "lbl_80274D94": {
+  "addr": "80274D94",
+  "section": "rodata",
+  "text": "unexpected lightdesc flags (%x)\\n",
+  "n_pieces": 1
+ },
+ "lbl_80274DB8": {
+  "addr": "80274DB8",
+  "section": "rodata",
+  "text": "lobj->interest",
+  "n_pieces": 1
+ },
+ "lbl_80274DC8": {
+  "addr": "80274DC8",
+  "section": "rodata",
+  "text": "lobj->position",
+  "n_pieces": 1
+ },
+ "lbl_80274DD8": {
+  "addr": "80274DD8",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_80274DE4": {
+  "addr": "80274DE4",
+  "section": "rodata",
+  "text": "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+  "n_pieces": 1
+ },
+ "lbl_80274E10": {
+  "addr": "80274E10",
+  "section": "rodata",
+  "text": "memory.c",
+  "n_pieces": 1
+ },
+ "lbl_80274E1C": {
+  "addr": "80274E1C",
+  "section": "rodata",
+  "text": "size == sizeof(__mem_cb)",
+  "n_pieces": 1
+ },
+ "lbl_80274E38": {
+  "addr": "80274E38",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274E50": {
+  "addr": "80274E50",
+  "section": "rodata",
+  "text": "hsd_mobj",
+  "n_pieces": 1
+ },
+ "lbl_80274E5C": {
+  "addr": "80274E5C",
+  "section": "rodata",
+  "text": "mobj->tevdesc",
+  "n_pieces": 1
+ },
+ "lbl_80274E6C": {
+  "addr": "80274E6C",
+  "section": "rodata",
+  "text": "hsdIsDescendantOf(info, &hsdMObj)",
+  "n_pieces": 1
+ },
+ "lbl_80274EC8": {
+  "addr": "80274EC8",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274EE0": {
+  "addr": "80274EE0",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80274EF8": {
+  "addr": "80274EF8",
+  "section": "rodata",
+  "text": "hsd_pobj",
+  "n_pieces": 1
+ },
+ "lbl_8027503C": {
+  "addr": "8027503C",
+  "section": "rodata",
+  "text": "shape_set->normal_desc->comp_cnt == GX_NRM_XYZ",
+  "n_pieces": 1
+ },
+ "lbl_8027506C": {
+  "addr": "8027506C",
+  "section": "rodata",
+  "text": "unexpected normal type.",
+  "n_pieces": 1
+ },
+ "lbl_80275084": {
+  "addr": "80275084",
+  "section": "rodata",
+  "text": "shape_set->vertex_desc->comp_cnt == GX_POS_XYZ",
+  "n_pieces": 1
+ },
+ "lbl_8027527C": {
+  "addr": "8027527C",
+  "section": "rodata",
+  "text": "robj: alloc",
+  "n_pieces": 1
+ },
+ "lbl_802752B4": {
+  "addr": "802752B4",
+  "section": "rodata",
+  "text": "rp->u.jobj",
+  "n_pieces": 1
+ },
+ "lbl_802752C0": {
+  "addr": "802752C0",
+  "section": "rodata",
+  "text": "shadow.c",
+  "n_pieces": 1
+ },
+ "lbl_80275314": {
+  "addr": "80275314",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_802753A8": {
+  "addr": "802753A8",
+  "section": "rodata",
+  "text": "texp_list",
+  "n_pieces": 1
+ },
+ "lbl_802753B4": {
+  "addr": "802753B4",
+  "section": "rodata",
+  "text": "val >= 0",
+  "n_pieces": 1
+ },
+ "lbl_802753C0": {
+  "addr": "802753C0",
+  "section": "rodata",
+  "text": "clist->type == HSD_TE_CNST",
+  "n_pieces": 1
+ },
+ "lbl_802755D0": {
+  "addr": "802755D0",
+  "section": "rodata",
+  "text": "texp->cnst.ctype == type",
+  "n_pieces": 1
+ },
+ "lbl_80275638": {
+  "addr": "80275638",
+  "section": "rodata",
+  "text": "sysdolphin_base_library",
+  "n_pieces": 1
+ },
+ "lbl_80275650": {
+  "addr": "80275650",
+  "section": "rodata",
+  "text": "hsd_tobj",
+  "n_pieces": 1
+ },
+ "lbl_8027565C": {
+  "addr": "8027565C",
+  "section": "rodata",
+  "text": "texmtx index exceed hardware limit (%d).\\n",
+  "n_pieces": 1
+ },
+ "lbl_80275688": {
+  "addr": "80275688",
+  "section": "rodata",
+  "text": "imagedesc",
+  "n_pieces": 1
+ },
+ "lbl_80275694": {
+  "addr": "80275694",
+  "section": "rodata",
+  "text": "imagedesc->image_ptr",
+  "n_pieces": 1
+ },
+ "lbl_802756AC": {
+  "addr": "802756AC",
+  "section": "rodata",
+  "text": "unexpected texmap id.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802756C4": {
+  "addr": "802756C4",
+  "section": "rodata",
+  "text": "tobj->repeat_s && tobj->repeat_t",
+  "n_pieces": 1
+ },
+ "lbl_802756E8": {
+  "addr": "802756E8",
+  "section": "rodata",
+  "text": "tobj->imagetbl",
+  "n_pieces": 1
+ },
+ "lbl_8027575C": {
+  "addr": "8027575C",
+  "section": "rodata",
+  "text": "unexpected type of render pass.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80275780": {
+  "addr": "80275780",
+  "section": "rodata",
+  "text": "unexpected argument format.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802757A0": {
+  "addr": "802757A0",
+  "section": "rodata",
+  "text": "unexpected type of object.\\n",
+  "n_pieces": 1
+ },
+ "lbl_802757BC": {
+  "addr": "802757BC",
+  "section": "rodata",
+  "text": "object.h",
+  "n_pieces": 1
+ },
+ "lbl_802757C8": {
+  "addr": "802757C8",
+  "section": "rodata",
+  "text": "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF",
+  "n_pieces": 1
+ },
+ "lbl_802757FC": {
+  "addr": "802757FC",
+  "section": "rodata",
+  "text": "scene_data",
+  "n_pieces": 1
+ },
+ "lbl_80275808": {
+  "addr": "80275808",
+  "section": "rodata",
+  "text": "battleGridReplacePokemon: NULL argument",
+  "n_pieces": 1
+ },
+ "lbl_80275830": {
+  "addr": "80275830",
+  "section": "rodata",
+  "text": "battleGridReplaceTrainer: NULL argument!",
+  "n_pieces": 1
+ },
+ "lbl_80275860": {
+  "addr": "80275860",
+  "section": "rodata",
+  "text": "Warning: fadeFluid c parm. Limit Over!! -> 0.0f < %f < %f\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279470": {
+  "addr": "80279470",
+  "section": "rodata",
+  "text": "SLOW MOTION",
+  "n_pieces": 1
+ },
+ "lbl_80279588": {
+  "addr": "80279588",
+  "section": "rodata",
+  "text": "wazaSequenceEntryStop: Invalid Data Type!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802795B4": {
+  "addr": "802795B4",
+  "section": "rodata",
+  "text": "wazaSequenceEntryUpdate: Invalid Data Type!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802795E4": {
+  "addr": "802795E4",
+  "section": "rodata",
+  "text": "wazaSequenceEntryStart: Invalid Data Type!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279610": {
+  "addr": "80279610",
+  "section": "rodata",
+  "text": "wazaSequenceEntryStart: Failed to start sequence entry!\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027964C": {
+  "addr": "8027964C",
+  "section": "rodata",
+  "text": "scene_data",
+  "n_pieces": 1
+ },
+ "lbl_80279658": {
+  "addr": "80279658",
+  "section": "rodata",
+  "text": "_wazaSequenceParticleEntryStart: Some error occured here\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279694": {
+  "addr": "80279694",
+  "section": "rodata",
+  "text": "_wazaSequenceModelEntryStart: Some error occured here\\n",
+  "n_pieces": 1
+ },
+ "lbl_802796CC": {
+  "addr": "802796CC",
+  "section": "rodata",
+  "text": "wazaSequenceEntryStart: Some error occured here\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279700": {
+  "addr": "80279700",
+  "section": "rodata",
+  "text": "Waza Viewer: Cannot attach to a model that hasn't started yet\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279740": {
+  "addr": "80279740",
+  "section": "rodata",
+  "text": "wazaSequencePokemonMotionStart: Failed to start pokemon motion!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802798F0": {
+  "addr": "802798F0",
+  "section": "rodata",
+  "text": "wazaSequenceUpdate: Could not start sequence entry!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279928": {
+  "addr": "80279928",
+  "section": "rodata",
+  "text": "wazaSequenceUpdate: Could not stop sequence entry!\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027995C": {
+  "addr": "8027995C",
+  "section": "rodata",
+  "text": "Error freeing entry memory!\\n",
+  "n_pieces": 1
+ },
+ "lbl_8027997C": {
+  "addr": "8027997C",
+  "section": "rodata",
+  "text": "Error Loading Waza file!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279998": {
+  "addr": "80279998",
+  "section": "rodata",
+  "text": "sequenceLoad: Error Loading Sequence file!\\n",
+  "n_pieces": 1
+ },
+ "lbl_802799D8": {
+  "addr": "802799D8",
+  "section": "rodata",
+  "text": "_eyeTexAnimEnded: Wrong action value!\\n",
+  "n_pieces": 1
+ },
+ "lbl_80279BD8": {
+  "addr": "80279BD8",
+  "section": "rodata",
+  "text": "---------- fight end !! ---------- \\n",
+  "n_pieces": 1
+ },
+ "lbl_80279C00": {
+  "addr": "80279C00",
+  "section": "rodata",
+  "text": "---------- fight start !! ---------- \\n",
+  "n_pieces": 1
+ },
+ "lbl_802E4B78": {
+  "addr": "802E4B78",
+  "section": "data",
+  "text": "menuPokemonCheckPokemonChange",
+  "n_pieces": 1
+ },
+ "\"@1_8030FFA0\"": {
+  "addr": "8030FFA0",
+  "section": "data",
+  "text": "<< Dolphin SDK - OS\\trelease build: Mar 17 2003 04:20:41 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "\"@69_803105B0\"": {
+  "addr": "803105B0",
+  "section": "data",
+  "text": ">>> L2 INVALIDATE : SHOULD NEVER HAPPEN\\n",
+  "n_pieces": 1
+ },
+ "\"@74_80310994\"": {
+  "addr": "80310994",
+  "section": "data",
+  "text": "FPU-unavailable handler installed\\n",
+  "n_pieces": 1
+ },
+ "\"@13_803109B8\"": {
+  "addr": "803109B8",
+  "section": "data",
+  "text": " in \\\"%s\\\" on line %d.\\n",
+  "n_pieces": 1
+ },
+ "lbl_80311818": {
+  "addr": "80311818",
+  "section": "data",
+  "text": "OSLink: unknown relocation type %3d\\n",
+  "n_pieces": 1
+ },
+ "lbl_80311840": {
+  "addr": "80311840",
+  "section": "data",
+  "text": "OSUnlink: unknown relocation type %3d\\n",
+  "n_pieces": 1
+ },
+ "lbl_803118D8": {
+  "addr": "803118D8",
+  "section": "data",
+  "text": "DBExceptionDestination\\n",
+  "n_pieces": 1
+ },
+ "lbl_803118F0": {
+  "addr": "803118F0",
+  "section": "data",
+  "text": "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specified directory or file (%s) doesn't match standard 8.3 format. This is a temporary restriction and will be removed soon\\n",
+  "n_pieces": 1
+ },
+ "lbl_803119B8": {
+  "addr": "803119B8",
+  "section": "data",
+  "text": "Warning: DVDOpen(): file '%s' was not found under %s.\\n",
+  "n_pieces": 1
+ },
+ "lbl_803119F0": {
+  "addr": "803119F0",
+  "section": "data",
+  "text": "DVDReadAsync(): specified area is out of the file  ",
+  "n_pieces": 1
+ },
+ "lbl_80311A24": {
+  "addr": "80311A24",
+  "section": "data",
+  "text": "DVDRead(): specified area is out of the file  ",
+  "n_pieces": 1
+ },
+ "lbl_80311A54": {
+  "addr": "80311A54",
+  "section": "data",
+  "text": "DVDSeek(): offset is out of the file  ",
+  "n_pieces": 1
+ },
+ "lbl_80311A80": {
+  "addr": "80311A80",
+  "section": "data",
+  "text": "<< Dolphin SDK - DVD\\trelease build: Oct 29 2002 09:56:49 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "\"@18_80311AC8\"": {
+  "addr": "80311AC8",
+  "section": "data",
+  "text": "load fst\\n",
+  "n_pieces": 1
+ },
+ "lbl_80311AD4": {
+  "addr": "80311AD4",
+  "section": "data",
+  "text": "DVDChangeDisk(): FST in the new disc is too big.   ",
+  "n_pieces": 1
+ },
+ "lbl_80311CB8": {
+  "addr": "80311CB8",
+  "section": "data",
+  "text": "\\n\\n\\nAn error has occurred.\\nTurn the power off and refer to the\\nNintendo GameCube Instruction Booklet\\nfor further instructions.",
+  "n_pieces": 1
+ },
+ "lbl_80311DB8": {
+  "addr": "80311DB8",
+  "section": "data",
+  "text": "\\n\\n\\nEin Fehler ist aufgetreten.\\nBitte schalten Sie den NINTENDO GAMECUBE\\naus und lesen Sie die Bedienungsanleitung,\\num weitere Informationen zu erhalten.",
+  "n_pieces": 1
+ },
+ "lbl_80311FEC": {
+  "addr": "80311FEC",
+  "section": "data",
+  "text": "\\n\\n\\nEr is een fout opgetreden.\\nZet de NINTENDO GAMECUBE uit en\\nraadpleeg de handleiding van de\\nNintendo GameCube voor nadere\\ninstructies.",
+  "n_pieces": 1
+ },
+ "\"@36_80312078\"": {
+  "addr": "80312078",
+  "section": "data",
+  "text": "  Game Name ... %c%c%c%c\\n",
+  "n_pieces": 1
+ },
+ "lbl_803124B8": {
+  "addr": "803124B8",
+  "section": "data",
+  "text": "<< Dolphin SDK - PAD\\trelease build: Sep  5 2002 05:34:02 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_80312510": {
+  "addr": "80312510",
+  "section": "data",
+  "text": "<< Dolphin SDK - AI\\trelease build: Sep  5 2002 05:34:25 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_80312558": {
+  "addr": "80312558",
+  "section": "data",
+  "text": "<< Dolphin SDK - AR\\trelease build: Sep  5 2002 05:34:27 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_803125A0": {
+  "addr": "803125A0",
+  "section": "data",
+  "text": "<< Dolphin SDK - ARQ\\trelease build: Sep  5 2002 05:34:29 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_803127A8": {
+  "addr": "803127A8",
+  "section": "data",
+  "text": "<< Dolphin SDK - CARD\\trelease build: Sep  5 2002 05:35:20 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_803129A0": {
+  "addr": "803129A0",
+  "section": "data",
+  "text": "<< Dolphin SDK - GX\\trelease build: Feb  7 2003 04:01:13 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_80313F48": {
+  "addr": "80313F48",
+  "section": "data",
+  "text": "<< Dolphin SDK - SI\\trelease build: Sep  5 2002 05:33:08 (0x2301) >>",
+  "n_pieces": 1
+ },
+ "lbl_80315668": {
+  "addr": "80315668",
+  "section": "data",
+  "text": "_vmThreadCreate",
+  "n_pieces": 1
+ },
+ "lbl_80315678": {
+  "addr": "80315678",
+  "section": "data",
+  "text": "_msgCallCtrlFunc",
+  "n_pieces": 1
+ },
+ "lbl_8035B060": {
+  "addr": "8035B060",
+  "section": "data",
+  "text": "menuCloseSync",
+  "n_pieces": 1
+ },
+ "lbl_8035B070": {
+  "addr": "8035B070",
+  "section": "data",
+  "text": "windowCheckCursor",
+  "n_pieces": 1
+ },
+ "lbl_8035B3F0": {
+  "addr": "8035B3F0",
+  "section": "data",
+  "text": "winSpriteInit",
+  "n_pieces": 1
+ },
+ "lbl_8035B448": {
+  "addr": "8035B448",
+  "section": "data",
+  "text": "menuModelInit",
+  "n_pieces": 1
+ },
+ "lbl_8035B458": {
+  "addr": "8035B458",
+  "section": "data",
+  "text": "menuModelTerm",
+  "n_pieces": 1
+ },
+ "lbl_8035B4E8": {
+  "addr": "8035B4E8",
+  "section": "data",
+  "text": "_menuFaceBiosGetPtr",
+  "n_pieces": 1
+ },
+ "lbl_8035B868": {
+  "addr": "8035B868",
+  "section": "data",
+  "text": "floorOpenObject",
+  "n_pieces": 1
+ },
+ "lbl_8035B878": {
+  "addr": "8035B878",
+  "section": "data",
+  "text": "floorInitMap",
+  "n_pieces": 1
+ },
+ "lbl_8035B888": {
+  "addr": "8035B888",
+  "section": "data",
+  "text": "_floorInitCharacters",
+  "n_pieces": 1
+ },
+ "lbl_8035B8A0": {
+  "addr": "8035B8A0",
+  "section": "data",
+  "text": "floorDataBiosGetPtr",
+  "n_pieces": 1
+ },
+ "lbl_8035B8B4": {
+  "addr": "8035B8B4",
+  "section": "data",
+  "text": "floorDataBiosGetArea",
+  "n_pieces": 1
+ },
+ "lbl_8035B8CC": {
+  "addr": "8035B8CC",
+  "section": "data",
+  "text": "floorDataBiosGetMapResID",
+  "n_pieces": 1
+ },
+ "lbl_8035B8E8": {
+  "addr": "8035B8E8",
+  "section": "data",
+  "text": "floorDataBiosGetFloorKind",
+  "n_pieces": 1
+ },
+ "lbl_8035B904": {
+  "addr": "8035B904",
+  "section": "data",
+  "text": "floorDataBiosGetGroupID",
+  "n_pieces": 1
+ },
+ "lbl_8035B91C": {
+  "addr": "8035B91C",
+  "section": "data",
+  "text": "floorDataBiosGetFileGroupID",
+  "n_pieces": 1
+ },
+ "lbl_8035B938": {
+  "addr": "8035B938",
+  "section": "data",
+  "text": "floorDataBiosGetFloorID",
+  "n_pieces": 1
+ },
+ "lbl_8035B950": {
+  "addr": "8035B950",
+  "section": "data",
+  "text": "floorDataBiosGetSoundSctID",
+  "n_pieces": 1
+ },
+ "lbl_8035B96C": {
+  "addr": "8035B96C",
+  "section": "data",
+  "text": "floorDataBiosGetModifySctID",
+  "n_pieces": 1
+ },
+ "lbl_8035B988": {
+  "addr": "8035B988",
+  "section": "data",
+  "text": "floorDataBiosGetPreSctID",
+  "n_pieces": 1
+ },
+ "lbl_8035B9A4": {
+  "addr": "8035B9A4",
+  "section": "data",
+  "text": "floorDataBiosGetMainSctID",
+  "n_pieces": 1
+ },
+ "lbl_8035B9C0": {
+  "addr": "8035B9C0",
+  "section": "data",
+  "text": "floorDataBiosGetPostSctID",
+  "n_pieces": 1
+ },
+ "lbl_8035B9DC": {
+  "addr": "8035B9DC",
+  "section": "data",
+  "text": "floorDataBiosGetPlaceName",
+  "n_pieces": 1
+ },
+ "lbl_8035B9F8": {
+  "addr": "8035B9F8",
+  "section": "data",
+  "text": "floorDataBiosGetPreFunc",
+  "n_pieces": 1
+ },
+ "lbl_8035BA10": {
+  "addr": "8035BA10",
+  "section": "data",
+  "text": "floorDataBiosGetMainFunc",
+  "n_pieces": 1
+ },
+ "lbl_8035BA2C": {
+  "addr": "8035BA2C",
+  "section": "data",
+  "text": "floorDataBiosGetPostFunc",
+  "n_pieces": 1
+ },
+ "lbl_8035BA48": {
+  "addr": "8035BA48",
+  "section": "data",
+  "text": "floorDataBiosGetCharNum",
+  "n_pieces": 1
+ },
+ "lbl_8035BA60": {
+  "addr": "8035BA60",
+  "section": "data",
+  "text": "floorDataBiosGetCharInfo",
+  "n_pieces": 1
+ },
+ "lbl_8035BA7C": {
+  "addr": "8035BA7C",
+  "section": "data",
+  "text": "floorDataBiosGetPosListPtr",
+  "n_pieces": 1
+ },
+ "lbl_8035BA98": {
+  "addr": "8035BA98",
+  "section": "data",
+  "text": "floorDataBiosGetFieldCameraListPtr",
+  "n_pieces": 1
+ },
+ "lbl_8035BABC": {
+  "addr": "8035BABC",
+  "section": "data",
+  "text": "floorDataBiosSetMapResID",
+  "n_pieces": 1
+ },
+ "lbl_8035BAD8": {
+  "addr": "8035BAD8",
+  "section": "data",
+  "text": "floorDataBiosSetMainSctID",
+  "n_pieces": 1
+ },
+ "lbl_8035BAF4": {
+  "addr": "8035BAF4",
+  "section": "data",
+  "text": "floorDataBiosGetSunResID",
+  "n_pieces": 1
+ },
+ "lbl_8035BB10": {
+  "addr": "8035BB10",
+  "section": "data",
+  "text": "floorDataBiosGetShadowLightID",
+  "n_pieces": 1
+ },
+ "lbl_8035BB30": {
+  "addr": "8035BB30",
+  "section": "data",
+  "text": "floorDataBiosGetShadowReciveID",
+  "n_pieces": 1
+ },
+ "lbl_8035BB50": {
+  "addr": "8035BB50",
+  "section": "data",
+  "text": "floorDataBiosGetShadowReciveNum",
+  "n_pieces": 1
+ },
+ "lbl_8035BB70": {
+  "addr": "8035BB70",
+  "section": "data",
+  "text": "floorEventChangeTresure",
+  "n_pieces": 1
+ },
+ "lbl_8036C4E8": {
+  "addr": "8036C4E8",
+  "section": "data",
+  "text": "peopleOpenSub",
+  "n_pieces": 1
+ },
+ "lbl_8036C4F8": {
+  "addr": "8036C4F8",
+  "section": "data",
+  "text": "peopleWaitSyncMotion",
+  "n_pieces": 1
+ },
+ "lbl_8036C510": {
+  "addr": "8036C510",
+  "section": "data",
+  "text": "peopleWaitSyncMotionBlend",
+  "n_pieces": 1
+ },
+ "lbl_8036C52C": {
+  "addr": "8036C52C",
+  "section": "data",
+  "text": "peopleMoveCheck",
+  "n_pieces": 1
+ },
+ "lbl_8036DCA8": {
+  "addr": "8036DCA8",
+  "section": "data",
+  "text": "scriptExecTask",
+  "n_pieces": 1
+ },
+ "lbl_803751F0": {
+  "addr": "803751F0",
+  "section": "data",
+  "text": "<< Dolphin SDK - THP\\trelease build: Aug 27 2002 20:42:01 >>",
+  "n_pieces": 1
+ },
+ "lbl_803799ED": {
+  "addr": "803799ED",
+  "section": "data",
+  "text": "c",
+  "n_pieces": 1
+ },
+ "lbl_8039A690": {
+  "addr": "8039A690",
+  "section": "data",
+  "text": "tableResBiosGetResPtr",
+  "n_pieces": 1
+ },
+ "lbl_8039A6C8": {
+  "addr": "8039A6C8",
+  "section": "data",
+  "text": "charNameBiosGetPtr",
+  "n_pieces": 1
+ },
+ "\"@97_80478974\"": {
+  "addr": "80478974",
+  "section": "data",
+  "text": "%08x\\n",
+  "n_pieces": 1
+ },
+ "lbl_8047897C": {
+  "addr": "8047897C",
+  "section": "data",
+  "text": "%s\\n",
+  "n_pieces": 1
+ },
+ "\"@76_80478994\"": {
+  "addr": "80478994",
+  "section": "data",
+  "text": "\\n",
+  "n_pieces": 1
+ },
+ "lbl_80478998": {
+  "addr": "80478998",
+  "section": "data",
+  "text": "%s\\n",
+  "n_pieces": 1
+ },
+ "lbl_804789C0": {
+  "addr": "804789C0",
+  "section": "data",
+  "text": "dvdfs.c",
+  "n_pieces": 1
+ },
+ "lbl_804789D4": {
+  "addr": "804789D4",
+  "section": "data",
+  "text": "dvd.c",
+  "n_pieces": 1
+ },
+ "\"@35_804789E8\"": {
+  "addr": "804789E8",
+  "section": "data",
+  "text": "\\n",
+  "n_pieces": 1
+ },
+ "\"@40_804789EC\"": {
+  "addr": "804789EC",
+  "section": "data",
+  "text": "OFF",
+  "n_pieces": 1
+ },
+ "\"@41_804789F0\"": {
+  "addr": "804789F0",
+  "section": "data",
+  "text": "ON",
+  "n_pieces": 1
+ },
+ "lbl_804789FC": {
+  "addr": "804789FC",
+  "section": "data",
+  "text": "vi.c",
+  "n_pieces": 1
+ },
+ "lbl_80478A20": {
+  "addr": "80478A20",
+  "section": "data",
+  "text": "A",
+  "n_pieces": 1
+ },
+ "lbl_80478A24": {
+  "addr": "80478A24",
+  "section": "data",
+  "text": "B",
+  "n_pieces": 1
+ },
+ "lbl_8047B6B8": {
+  "addr": "8047B6B8",
+  "section": "data",
+  "text": "error.c",
+  "n_pieces": 1
+ },
+ "lbl_8047B6C0": {
+  "addr": "8047B6C0",
+  "section": "data",
+  "text": "%s:\\n",
+  "n_pieces": 1
+ },
+ "lbl_8047B6C8": {
+  "addr": "8047B6C8",
+  "section": "data",
+  "text": "%d",
+  "n_pieces": 1
+ },
+ "lbl_8047BA20": {
+  "addr": "8047BA20",
+  "section": "data",
+  "text": "false",
+  "n_pieces": 1
+ },
+ "lbl_8047BB08": {
+  "addr": "8047BB08",
+  "section": "data",
+  "text": "A",
+  "n_pieces": 1
+ },
+ "lbl_8047BB0C": {
+  "addr": "8047BB0C",
+  "section": "data",
+  "text": "B",
+  "n_pieces": 1
+ },
+ "lbl_8047BB10": {
+  "addr": "8047BB10",
+  "section": "data",
+  "text": "C",
+  "n_pieces": 1
+ },
+ "lbl_8047BB18": {
+  "addr": "8047BB18",
+  "section": "data",
+  "text": "D",
+  "n_pieces": 1
+ },
+ "lbl_8047BB1C": {
+  "addr": "8047BB1C",
+  "section": "data",
+  "text": "E",
+  "n_pieces": 1
+ },
+ "lbl_8047BB20": {
+  "addr": "8047BB20",
+  "section": "data",
+  "text": "F",
+  "n_pieces": 1
+ },
+ "lbl_8047BB24": {
+  "addr": "8047BB24",
+  "section": "data",
+  "text": "G",
+  "n_pieces": 1
+ },
+ "lbl_8047BB28": {
+  "addr": "8047BB28",
+  "section": "data",
+  "text": "H",
+  "n_pieces": 1
+ },
+ "lbl_8047BB2C": {
+  "addr": "8047BB2C",
+  "section": "data",
+  "text": "I",
+  "n_pieces": 1
+ },
+ "lbl_8047BB30": {
+  "addr": "8047BB30",
+  "section": "data",
+  "text": "J",
+  "n_pieces": 1
+ },
+ "lbl_8047BB34": {
+  "addr": "8047BB34",
+  "section": "data",
+  "text": "K",
+  "n_pieces": 1
+ },
+ "lbl_8047BB38": {
+  "addr": "8047BB38",
+  "section": "data",
+  "text": "L",
+  "n_pieces": 1
+ },
+ "lbl_8047BB50": {
+  "addr": "8047BB50",
+  "section": "data",
+  "text": "M",
+  "n_pieces": 1
+ },
+ "lbl_8047BB54": {
+  "addr": "8047BB54",
+  "section": "data",
+  "text": "N",
+  "n_pieces": 1
+ },
+ "lbl_8047BB58": {
+  "addr": "8047BB58",
+  "section": "data",
+  "text": "O",
+  "n_pieces": 1
+ },
+ "lbl_8047BB5C": {
+  "addr": "8047BB5C",
+  "section": "data",
+  "text": "P",
+  "n_pieces": 1
+ },
+ "lbl_8047BB60": {
+  "addr": "8047BB60",
+  "section": "data",
+  "text": "Q",
+  "n_pieces": 1
+ },
+ "lbl_8047BB64": {
+  "addr": "8047BB64",
+  "section": "data",
+  "text": "R",
+  "n_pieces": 1
+ },
+ "lbl_8047BB90": {
+  "addr": "8047BB90",
+  "section": "data",
+  "text": "S",
+  "n_pieces": 1
+ },
+ "lbl_8047BB94": {
+  "addr": "8047BB94",
+  "section": "data",
+  "text": "T",
+  "n_pieces": 1
+ },
+ "lbl_8047BB98": {
+  "addr": "8047BB98",
+  "section": "data",
+  "text": "U",
+  "n_pieces": 1
+ },
+ "lbl_8047BB9C": {
+  "addr": "8047BB9C",
+  "section": "data",
+  "text": "V",
+  "n_pieces": 1
+ },
+ "lbl_8047BBA0": {
+  "addr": "8047BBA0",
+  "section": "data",
+  "text": "W",
+  "n_pieces": 1
+ },
+ "lbl_8047BBA4": {
+  "addr": "8047BBA4",
+  "section": "data",
+  "text": "X",
+  "n_pieces": 1
+ },
+ "lbl_8047BBA8": {
+  "addr": "8047BBA8",
+  "section": "data",
+  "text": "Y",
+  "n_pieces": 1
+ },
+ "lbl_8047BBAC": {
+  "addr": "8047BBAC",
+  "section": "data",
+  "text": "Z",
+  "n_pieces": 1
+ },
+ "lbl_8047BF1C": {
+  "addr": "8047BF1C",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047BF20": {
+  "addr": "8047BF20",
+  "section": "data",
+  "text": "p",
+  "n_pieces": 1
+ },
+ "lbl_8047BF24": {
+  "addr": "8047BF24",
+  "section": "data",
+  "text": "pt",
+  "n_pieces": 1
+ },
+ "lbl_8047BF28": {
+  "addr": "8047BF28",
+  "section": "data",
+  "text": "handle",
+  "n_pieces": 1
+ },
+ "lbl_8047C030": {
+  "addr": "8047C030",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047C040": {
+  "addr": "8047C040",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047C064": {
+  "addr": "8047C064",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047C068": {
+  "addr": "8047C068",
+  "section": "data",
+  "text": "Lv%d",
+  "n_pieces": 1
+ },
+ "lbl_8047C070": {
+  "addr": "8047C070",
+  "section": "data",
+  "text": "Lv???",
+  "n_pieces": 1
+ },
+ "lbl_8047C090": {
+  "addr": "8047C090",
+  "section": "data",
+  "text": "handle",
+  "n_pieces": 1
+ },
+ "lbl_8047C0D0": {
+  "addr": "8047C0D0",
+  "section": "data",
+  "text": "D.D.D0",
+  "n_pieces": 1
+ },
+ "lbl_8047C0E8": {
+  "addr": "8047C0E8",
+  "section": "data",
+  "text": "celebi",
+  "n_pieces": 1
+ },
+ "lbl_8047C10C": {
+  "addr": "8047C10C",
+  "section": "data",
+  "text": "pikachu",
+  "n_pieces": 1
+ },
+ "lbl_8047C140": {
+  "addr": "8047C140",
+  "section": "data",
+  "text": "handle",
+  "n_pieces": 1
+ },
+ "lbl_8047C178": {
+  "addr": "8047C178",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047C180": {
+  "addr": "8047C180",
+  "section": "data",
+  "text": "series",
+  "n_pieces": 1
+ },
+ "lbl_8047C188": {
+  "addr": "8047C188",
+  "section": "data",
+  "text": "lv",
+  "n_pieces": 1
+ },
+ "lbl_8047C198": {
+  "addr": "8047C198",
+  "section": "data",
+  "text": "handle",
+  "n_pieces": 1
+ },
+ "lbl_8047C1A0": {
+  "addr": "8047C1A0",
+  "section": "data",
+  "text": "pWin",
+  "n_pieces": 1
+ },
+ "lbl_8047C1E8": {
+  "addr": "8047C1E8",
+  "section": "data",
+  "text": "handle",
+  "n_pieces": 1
+ },
+ "lbl_8047C9C4": {
+  "addr": "8047C9C4",
+  "section": "data",
+  "text": "cobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047C9CC": {
+  "addr": "8047C9CC",
+  "section": "data",
+  "text": "cobj",
+  "n_pieces": 1
+ },
+ "lbl_8047C9DC": {
+  "addr": "8047C9DC",
+  "section": "data",
+  "text": "aobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047C9E4": {
+  "addr": "8047C9E4",
+  "section": "data",
+  "text": "aobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CA90": {
+  "addr": "8047CA90",
+  "section": "data",
+  "text": "aobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CA98": {
+  "addr": "8047CA98",
+  "section": "data",
+  "text": "aobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CAA0": {
+  "addr": "8047CAA0",
+  "section": "data",
+  "text": "(float)",
+  "n_pieces": 1
+ },
+ "lbl_8047CAA8": {
+  "addr": "8047CAA8",
+  "section": "data",
+  "text": "(null)",
+  "n_pieces": 1
+ },
+ "lbl_8047CB60": {
+  "addr": "8047CB60",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CB68": {
+  "addr": "8047CB68",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CB70": {
+  "addr": "8047CB70",
+  "section": "data",
+  "text": "scale",
+  "n_pieces": 1
+ },
+ "lbl_8047CB78": {
+  "addr": "8047CB78",
+  "section": "data",
+  "text": "mtx",
+  "n_pieces": 1
+ },
+ "lbl_8047CB9C": {
+  "addr": "8047CB9C",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CBA4": {
+  "addr": "8047CBA4",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CBAC": {
+  "addr": "8047CBAC",
+  "section": "data",
+  "text": "scale",
+  "n_pieces": 1
+ },
+ "lbl_8047CBD8": {
+  "addr": "8047CBD8",
+  "section": "data",
+  "text": "shadow",
+  "n_pieces": 1
+ },
+ "lbl_8047CBE8": {
+  "addr": "8047CBE8",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CBF0": {
+  "addr": "8047CBF0",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CBF8": {
+  "addr": "8047CBF8",
+  "section": "data",
+  "text": "scale",
+  "n_pieces": 1
+ },
+ "lbl_8047CC00": {
+  "addr": "8047CC00",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CC08": {
+  "addr": "8047CC08",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CC10": {
+  "addr": "8047CC10",
+  "section": "data",
+  "text": "parse.c",
+  "n_pieces": 1
+ },
+ "lbl_8047CC20": {
+  "addr": "8047CC20",
+  "section": "data",
+  "text": "jp->mtx",
+  "n_pieces": 1
+ },
+ "lbl_8047CC2C": {
+  "addr": "8047CC2C",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CC34": {
+  "addr": "8047CC34",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CC40": {
+  "addr": "8047CC40",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CC48": {
+  "addr": "8047CC48",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CC68": {
+  "addr": "8047CC68",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CC70": {
+  "addr": "8047CC70",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CC90": {
+  "addr": "8047CC90",
+  "section": "data",
+  "text": "aobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CC98": {
+  "addr": "8047CC98",
+  "section": "data",
+  "text": "aobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CCA0": {
+  "addr": "8047CCA0",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047CCA8": {
+  "addr": "8047CCA8",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047CCB8": {
+  "addr": "8047CCB8",
+  "section": "data",
+  "text": "\\n",
+  "n_pieces": 1
+ },
+ "lbl_8047D0E8": {
+  "addr": "8047D0E8",
+  "section": "data",
+  "text": "movie",
+  "n_pieces": 1
+ },
+ "lbl_8047D2E0": {
+  "addr": "8047D2E0",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047D2E8": {
+  "addr": "8047D2E8",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D2F0": {
+  "addr": "8047D2F0",
+  "section": "data",
+  "text": "scale",
+  "n_pieces": 1
+ },
+ "lbl_8047D578": {
+  "addr": "8047D578",
+  "section": "data",
+  "text": "GC6J",
+  "n_pieces": 1
+ },
+ "lbl_8047D580": {
+  "addr": "8047D580",
+  "section": "data",
+  "text": "01",
+  "n_pieces": 1
+ },
+ "lbl_8047D584": {
+  "addr": "8047D584",
+  "section": "data",
+  "text": "GSdvd.c",
+  "n_pieces": 1
+ },
+ "lbl_8047D58C": {
+  "addr": "8047D58C",
+  "section": "data",
+  "text": "FALSE",
+  "n_pieces": 1
+ },
+ "lbl_8047D594": {
+  "addr": "8047D594",
+  "section": "data",
+  "text": "GC6E",
+  "n_pieces": 1
+ },
+ "lbl_8047D5D4": {
+  "addr": "8047D5D4",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047D628": {
+  "addr": "8047D628",
+  "section": "data",
+  "text": "lastPP",
+  "n_pieces": 1
+ },
+ "lbl_8047D670": {
+  "addr": "8047D670",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047D678": {
+  "addr": "8047D678",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D6E0": {
+  "addr": "8047D6E0",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047D6E8": {
+  "addr": "8047D6E8",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D790": {
+  "addr": "8047D790",
+  "section": "data",
+  "text": "%s.fsys",
+  "n_pieces": 1
+ },
+ "lbl_8047D8C8": {
+  "addr": "8047D8C8",
+  "section": "data",
+  "text": "wobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047D8D0": {
+  "addr": "8047D8D0",
+  "section": "data",
+  "text": "wobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D8D8": {
+  "addr": "8047D8D8",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047D8E0": {
+  "addr": "8047D8E0",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D904": {
+  "addr": "8047D904",
+  "section": "data",
+  "text": "jp",
+  "n_pieces": 1
+ },
+ "lbl_8047D910": {
+  "addr": "8047D910",
+  "section": "data",
+  "text": "stack",
+  "n_pieces": 1
+ },
+ "lbl_8047D950": {
+  "addr": "8047D950",
+  "section": "data",
+  "text": "class.c",
+  "n_pieces": 1
+ },
+ "lbl_8047D958": {
+  "addr": "8047D958",
+  "section": "data",
+  "text": "cobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047D960": {
+  "addr": "8047D960",
+  "section": "data",
+  "text": "cobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D968": {
+  "addr": "8047D968",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047D9E0": {
+  "addr": "8047D9E0",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047D9E8": {
+  "addr": "8047D9E8",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047D9F0": {
+  "addr": "8047D9F0",
+  "section": "data",
+  "text": "x",
+  "n_pieces": 1
+ },
+ "lbl_8047DA18": {
+  "addr": "8047DA18",
+  "section": "data",
+  "text": "dobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DA20": {
+  "addr": "8047DA20",
+  "section": "data",
+  "text": "dobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DA30": {
+  "addr": "8047DA30",
+  "section": "data",
+  "text": "fobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DA38": {
+  "addr": "8047DA38",
+  "section": "data",
+  "text": "new",
+  "n_pieces": 1
+ },
+ "lbl_8047DA60": {
+  "addr": "8047DA60",
+  "section": "data",
+  "text": "hsd_fog",
+  "n_pieces": 1
+ },
+ "lbl_8047DA74": {
+  "addr": "8047DA74",
+  "section": "data",
+  "text": "fog.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DA7C": {
+  "addr": "8047DA7C",
+  "section": "data",
+  "text": "adj",
+  "n_pieces": 1
+ },
+ "lbl_8047DA80": {
+  "addr": "8047DA80",
+  "section": "data",
+  "text": "fog",
+  "n_pieces": 1
+ },
+ "lbl_8047DA98": {
+  "addr": "8047DA98",
+  "section": "data",
+  "text": "hash.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DAA0": {
+  "addr": "8047DAA0",
+  "section": "data",
+  "text": "id.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DAA8": {
+  "addr": "8047DAA8",
+  "section": "data",
+  "text": "entry",
+  "n_pieces": 1
+ },
+ "lbl_8047DAB0": {
+  "addr": "8047DAB0",
+  "section": "data",
+  "text": "aobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DAB8": {
+  "addr": "8047DAB8",
+  "section": "data",
+  "text": "fobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DAC0": {
+  "addr": "8047DAC0",
+  "section": "data",
+  "text": "id",
+  "n_pieces": 1
+ },
+ "lbl_8047DAC4": {
+  "addr": "8047DAC4",
+  "section": "data",
+  "text": "slist",
+  "n_pieces": 1
+ },
+ "lbl_8047DACC": {
+  "addr": "8047DACC",
+  "section": "data",
+  "text": "dlist",
+  "n_pieces": 1
+ },
+ "lbl_8047DAD4": {
+  "addr": "8047DAD4",
+  "section": "data",
+  "text": "vec",
+  "n_pieces": 1
+ },
+ "lbl_8047DAD8": {
+  "addr": "8047DAD8",
+  "section": "data",
+  "text": "mtx",
+  "n_pieces": 1
+ },
+ "lbl_8047DADC": {
+  "addr": "8047DADC",
+  "section": "data",
+  "text": "robj",
+  "n_pieces": 1
+ },
+ "lbl_8047DAE4": {
+  "addr": "8047DAE4",
+  "section": "data",
+  "text": "rval",
+  "n_pieces": 1
+ },
+ "lbl_8047DAEC": {
+  "addr": "8047DAEC",
+  "section": "data",
+  "text": "shadow",
+  "n_pieces": 1
+ },
+ "lbl_8047DAF4": {
+  "addr": "8047DAF4",
+  "section": "data",
+  "text": "render",
+  "n_pieces": 1
+ },
+ "lbl_8047DAFC": {
+  "addr": "8047DAFC",
+  "section": "data",
+  "text": "chan",
+  "n_pieces": 1
+ },
+ "lbl_8047DB04": {
+  "addr": "8047DB04",
+  "section": "data",
+  "text": "tevreg",
+  "n_pieces": 1
+ },
+ "lbl_8047DB0C": {
+  "addr": "8047DB0C",
+  "section": "data",
+  "text": "addr",
+  "n_pieces": 1
+ },
+ "lbl_8047DB20": {
+  "addr": "8047DB20",
+  "section": "data",
+  "text": "jobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DB28": {
+  "addr": "8047DB28",
+  "section": "data",
+  "text": "prev",
+  "n_pieces": 1
+ },
+ "lbl_8047DB34": {
+  "addr": "8047DB34",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047DB3C": {
+  "addr": "8047DB3C",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DB68": {
+  "addr": "8047DB68",
+  "section": "data",
+  "text": "eff",
+  "n_pieces": 1
+ },
+ "lbl_8047DB6C": {
+  "addr": "8047DB6C",
+  "section": "data",
+  "text": "robj",
+  "n_pieces": 1
+ },
+ "lbl_8047DB88": {
+  "addr": "8047DB88",
+  "section": "data",
+  "text": "jp",
+  "n_pieces": 1
+ },
+ "lbl_8047DBA0": {
+  "addr": "8047DBA0",
+  "section": "data",
+  "text": "list.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DBA8": {
+  "addr": "8047DBA8",
+  "section": "data",
+  "text": "prev",
+  "n_pieces": 1
+ },
+ "lbl_8047DBB0": {
+  "addr": "8047DBB0",
+  "section": "data",
+  "text": "list",
+  "n_pieces": 1
+ },
+ "lbl_8047DBB8": {
+  "addr": "8047DBB8",
+  "section": "data",
+  "text": "lobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DBC0": {
+  "addr": "8047DBC0",
+  "section": "data",
+  "text": "new",
+  "n_pieces": 1
+ },
+ "lbl_8047DBC4": {
+  "addr": "8047DBC4",
+  "section": "data",
+  "text": "*p",
+  "n_pieces": 1
+ },
+ "lbl_8047DBCC": {
+  "addr": "8047DBCC",
+  "section": "data",
+  "text": "lobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DBD4": {
+  "addr": "8047DBD4",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DBD8": {
+  "addr": "8047DBD8",
+  "section": "data",
+  "text": "lobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047DC18": {
+  "addr": "8047DC18",
+  "section": "data",
+  "text": "mobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DC20": {
+  "addr": "8047DC20",
+  "section": "data",
+  "text": "tobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DC28": {
+  "addr": "8047DC28",
+  "section": "data",
+  "text": "mat",
+  "n_pieces": 1
+ },
+ "lbl_8047DC30": {
+  "addr": "8047DC30",
+  "section": "data",
+  "text": "mobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DC38": {
+  "addr": "8047DC38",
+  "section": "data",
+  "text": "list",
+  "n_pieces": 1
+ },
+ "lbl_8047DC48": {
+  "addr": "8047DC48",
+  "section": "data",
+  "text": "mtx.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DC50": {
+  "addr": "8047DC50",
+  "section": "data",
+  "text": "mtx",
+  "n_pieces": 1
+ },
+ "lbl_8047DC54": {
+  "addr": "8047DC54",
+  "section": "data",
+  "text": "vec",
+  "n_pieces": 1
+ },
+ "lbl_8047DC98": {
+  "addr": "8047DC98",
+  "section": "data",
+  "text": "data",
+  "n_pieces": 1
+ },
+ "lbl_8047DCA0": {
+  "addr": "8047DCA0",
+  "section": "data",
+  "text": "hsd_obj",
+  "n_pieces": 1
+ },
+ "lbl_8047DCA8": {
+  "addr": "8047DCA8",
+  "section": "data",
+  "text": "perf.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DCB0": {
+  "addr": "8047DCB0",
+  "section": "data",
+  "text": "n < 32",
+  "n_pieces": 1
+ },
+ "lbl_8047DCB8": {
+  "addr": "8047DCB8",
+  "section": "data",
+  "text": "pobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DCC4": {
+  "addr": "8047DCC4",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047DCCC": {
+  "addr": "8047DCCC",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DCD8": {
+  "addr": "8047DCD8",
+  "section": "data",
+  "text": "jp->mtx",
+  "n_pieces": 1
+ },
+ "lbl_8047DCE0": {
+  "addr": "8047DCE0",
+  "section": "data",
+  "text": "obj",
+  "n_pieces": 1
+ },
+ "lbl_8047DCE4": {
+  "addr": "8047DCE4",
+  "section": "data",
+  "text": "mark",
+  "n_pieces": 1
+ },
+ "lbl_8047DD10": {
+  "addr": "8047DD10",
+  "section": "data",
+  "text": "pobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DD50": {
+  "addr": "8047DD50",
+  "section": "data",
+  "text": "robj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DD58": {
+  "addr": "8047DD58",
+  "section": "data",
+  "text": "rvalue",
+  "n_pieces": 1
+ },
+ "lbl_8047DD68": {
+  "addr": "8047DD68",
+  "section": "data",
+  "text": "jobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DD70": {
+  "addr": "8047DD70",
+  "section": "data",
+  "text": "jobj.h",
+  "n_pieces": 1
+ },
+ "lbl_8047DD80": {
+  "addr": "8047DD80",
+  "section": "data",
+  "text": "new",
+  "n_pieces": 1
+ },
+ "lbl_8047DD90": {
+  "addr": "8047DD90",
+  "section": "data",
+  "text": "obj",
+  "n_pieces": 1
+ },
+ "lbl_8047DDB8": {
+  "addr": "8047DDB8",
+  "section": "data",
+  "text": "rect",
+  "n_pieces": 1
+ },
+ "lbl_8047DDCC": {
+  "addr": "8047DDCC",
+  "section": "data",
+  "text": "shadow",
+  "n_pieces": 1
+ },
+ "lbl_8047DDD4": {
+  "addr": "8047DDD4",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DDE0": {
+  "addr": "8047DDE0",
+  "section": "data",
+  "text": "lobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DE60": {
+  "addr": "8047DE60",
+  "section": "data",
+  "text": "tev.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DE68": {
+  "addr": "8047DE68",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DE70": {
+  "addr": "8047DE70",
+  "section": "data",
+  "text": "texp.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DE78": {
+  "addr": "8047DE78",
+  "section": "data",
+  "text": "tevdesc",
+  "n_pieces": 1
+ },
+ "lbl_8047DE90": {
+  "addr": "8047DE90",
+  "section": "data",
+  "text": "texp",
+  "n_pieces": 1
+ },
+ "lbl_8047DE98": {
+  "addr": "8047DE98",
+  "section": "data",
+  "text": "desc",
+  "n_pieces": 1
+ },
+ "lbl_8047DEA0": {
+  "addr": "8047DEA0",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DEA8": {
+  "addr": "8047DEA8",
+  "section": "data",
+  "text": "l < num",
+  "n_pieces": 1
+ },
+ "lbl_8047DEB0": {
+  "addr": "8047DEB0",
+  "section": "data",
+  "text": "tobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DEB8": {
+  "addr": "8047DEB8",
+  "section": "data",
+  "text": "idesc",
+  "n_pieces": 1
+ },
+ "lbl_8047DEC0": {
+  "addr": "8047DEC0",
+  "section": "data",
+  "text": "tev",
+  "n_pieces": 1
+ },
+ "lbl_8047DEC4": {
+  "addr": "8047DEC4",
+  "section": "data",
+  "text": "tlut",
+  "n_pieces": 1
+ },
+ "lbl_8047DECC": {
+  "addr": "8047DECC",
+  "section": "data",
+  "text": "new",
+  "n_pieces": 1
+ },
+ "lbl_8047DED0": {
+  "addr": "8047DED0",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DEE8": {
+  "addr": "8047DEE8",
+  "section": "data",
+  "text": "cobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DF10": {
+  "addr": "8047DF10",
+  "section": "data",
+  "text": "tobj",
+  "n_pieces": 1
+ },
+ "lbl_8047DF20": {
+  "addr": "8047DF20",
+  "section": "data",
+  "text": "util.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DF28": {
+  "addr": "8047DF28",
+  "section": "data",
+  "text": "0",
+  "n_pieces": 1
+ },
+ "lbl_8047DF30": {
+  "addr": "8047DF30",
+  "section": "data",
+  "text": "video.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DF40": {
+  "addr": "8047DF40",
+  "section": "data",
+  "text": "aobj.c",
+  "n_pieces": 1
+ },
+ "lbl_8047DF48": {
+  "addr": "8047DF48",
+  "section": "data",
+  "text": "obj",
+  "n_pieces": 1
+ },
+ "lbl_8047DF4C": {
+  "addr": "8047DF4C",
+  "section": "data",
+  "text": "new",
+  "n_pieces": 1
+ },
+ "lbl_8047E2F4": {
+  "addr": "8047E2F4",
+  "section": "data",
+  "text": "STEP",
+  "n_pieces": 1
+ },
+ "lbl_8047E2FC": {
+  "addr": "8047E2FC",
+  "section": "data",
+  "text": "PAUSED",
+  "n_pieces": 1
+ },
+ "lbl_8047E304": {
+  "addr": "8047E304",
+  "section": "data",
+  "text": "PLAYING",
+  "n_pieces": 1
+ },
+ "lbl_8047E458": {
+  "addr": "8047E458",
+  "section": "data",
+  "text": "???",
+  "n_pieces": 1
+ },
+ "lbl_8047E45C": {
+  "addr": "8047E45C",
+  "section": "data",
+  "text": "Pause",
+  "n_pieces": 1
+ },
+ "lbl_8047E464": {
+  "addr": "8047E464",
+  "section": "data",
+  "text": "Play",
+  "n_pieces": 1
+ },
+ "lbl_8047E46C": {
+  "addr": "8047E46C",
+  "section": "data",
+  "text": "SStep",
+  "n_pieces": 1
+ },
+ "lbl_8047E474": {
+  "addr": "8047E474",
+  "section": "data",
+  "text": "Slow",
+  "n_pieces": 1
+ },
+ "lbl_8047E4AC": {
+  "addr": "8047E4AC",
+  "section": "data",
+  "text": "THP",
+  "n_pieces": 1
+ }
+}

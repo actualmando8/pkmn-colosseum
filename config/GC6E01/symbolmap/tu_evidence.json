@@ -1,0 +1,424 @@
+{
+ "match": [
+  {
+   "range": "0x80033278",
+   "end": "0x80034280",
+   "status": "KNOWN",
+   "assigned": "src/game/menu/menu_carde.c",
+   "votes": {
+    "menuCardE.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80069a60",
+   "end": "0x80069c0c",
+   "status": "KNOWN",
+   "assigned": "src/game/menu/menu_battle.c",
+   "votes": {
+    "menuCB_Battle.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8007109c",
+   "end": "0x8007162c",
+   "status": "KNOWN",
+   "assigned": "src/game/menu/menu_common.c",
+   "votes": {
+    "menuCB_Common.c": 5
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8007581c",
+   "end": "0x80075a34",
+   "status": "LIKELY",
+   "assigned": "src/game/menu/menu_tool_battle.c",
+   "votes": {
+    "menuToolBattle.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x800767b8",
+   "end": "0x80077a5c",
+   "status": "LIKELY",
+   "assigned": "src/game/menu/menu_rule.c",
+   "votes": {
+    "menuCB_Rule.c": 4
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80077ed4",
+   "end": "0x80078390",
+   "status": "LIKELY",
+   "assigned": "src/game/menu/menu_exdisc_shrine.c",
+   "votes": {
+    "menuExDiscShrine.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x800792d8",
+   "end": "0x800798e8",
+   "status": "LIKELY",
+   "assigned": "src/game/menu/menu_exdisc_coupon.c",
+   "votes": {
+    "menuExDiscCoupon.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8007c2c0",
+   "end": "0x8007c300",
+   "status": "KNOWN",
+   "assigned": "src/game/menu/menu_pokecoupon.c",
+   "votes": {
+    "menuPokeCoupon.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8007c300",
+   "end": "0x8007fd64",
+   "status": "LIKELY",
+   "assigned": "src/game/menu/menu_carde_matrix.c",
+   "votes": {
+    "menuCardE_Matrix.c": 4
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80082650",
+   "end": "0x80083af4",
+   "status": "KNOWN",
+   "assigned": "src/game/save/save_data.c",
+   "votes": {
+    "cardesavedata.c": 11
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80089048",
+   "end": "0x800895a4",
+   "status": "KNOWN",
+   "assigned": "src/game/gba/pokeconv.c",
+   "votes": {
+    "pokeconv.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80092c90",
+   "end": "0x800937f4",
+   "status": "KNOWN",
+   "assigned": "src/game/gba/gba_comm.c",
+   "votes": {
+    "gbaCommunication.c": 6
+   },
+   "note": ""
+  },
+  {
+   "range": "0x800a5624",
+   "end": "0x800a7820",
+   "status": "KNOWN",
+   "assigned": "src/dolphin/dvd/DVD.c",
+   "votes": {
+    "dvd.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80167040",
+   "end": "0x80168c64",
+   "status": "KNOWN",
+   "assigned": "src/game/gs_dvd.c",
+   "votes": {
+    "GSdvd.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80168c64",
+   "end": "0x80169104",
+   "status": "KNOWN",
+   "assigned": "src/game/script/pslist.c",
+   "votes": {
+    "pslist.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8016f430",
+   "end": "0x80172630",
+   "status": "KNOWN",
+   "assigned": "src/game/script/psinterpret.c",
+   "votes": {
+    "psinterpret.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8017424c",
+   "end": "0x8017572c",
+   "status": "KNOWN",
+   "assigned": "src/game/effect/generator.c",
+   "votes": {
+    "generator.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801914f4",
+   "end": "0x801920e4",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_wobj.c",
+   "votes": {
+    "wobj.c": 3
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801938fc",
+   "end": "0x80193c24",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_class.c",
+   "votes": {
+    "class.c": 1
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80193c24",
+   "end": "0x80197a64",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_cobj.c",
+   "votes": {
+    "cobj.c": 18
+   },
+   "note": ""
+  },
+  {
+   "range": "0x80197a64",
+   "end": "0x80198f7c",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_displayfunc.c",
+   "votes": {
+    "displayfunc.c": 2
+   },
+   "note": ""
+  },
+  {
+   "range": "0x8019c690",
+   "end": "0x8019ce50",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_initialize.c",
+   "votes": {
+    "initialize.c": 4
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801a4000",
+   "end": "0x801a69c0",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_lobj.c",
+   "votes": {
+    "lobj.c": 7
+   },
+   "note": ""
+  },
+  {
+   "range": "0x801b019c",
+   "end": "0x801b1730",
+   "status": "LIKELY",
+   "assigned": "src/hsd/hsd_shadow.c",
+   "votes": {
+    "shadow.c": 10
+   },
+   "note": ""
+  }
+ ],
+ "relabel": [
+  {
+   "range": "0x800055e0",
+   "end": "0x80006630",
+   "status": "KNOWN",
+   "assigned": "src/game/main.c",
+   "votes": {
+    "error.c": 2
+   },
+   "note": "assigned main.c but code is error.c"
+  },
+  {
+   "range": "0x801bf138",
+   "end": "0x801c0000",
+   "status": "LIKELY",
+   "assigned": "src/hsd/hsd_robj.c",
+   "votes": {
+    "video.c": 3
+   },
+   "note": "assigned hsd_robj.c but code is video.c"
+  }
+ ],
+ "split": [
+  {
+   "range": "0x80198f7c",
+   "end": "0x8019b7c0",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_dobj.c",
+   "votes": {
+    "dobj.c": 2,
+    "fobj.c": 4
+   },
+   "note": "also holds: fobj.c"
+  },
+  {
+   "range": "0x8019b7c0",
+   "end": "0x8019c690",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_fog.c",
+   "votes": {
+    "fog.c": 2,
+    "hash.c": 1,
+    "id.c": 1
+   },
+   "note": "also holds: hash.c, id.c"
+  },
+  {
+   "range": "0x8019ce50",
+   "end": "0x801a4000",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_jobj.c",
+   "votes": {
+    "jobj.c": 13,
+    "list.c": 2
+   },
+   "note": "also holds: list.c"
+  },
+  {
+   "range": "0x801a6a34",
+   "end": "0x801aa608",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_mobj.c",
+   "votes": {
+    "mobj.c": 6,
+    "mtx.c": 2,
+    "perf.c": 1
+   },
+   "note": "also holds: mtx.c, perf.c"
+  },
+  {
+   "range": "0x801aa608",
+   "end": "0x801b019c",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_pobj.c",
+   "votes": {
+    "pobj.c": 10,
+    "robj.c": 12
+   },
+   "note": "also holds: robj.c"
+  },
+  {
+   "range": "0x801bbac8",
+   "end": "0x801bf138",
+   "status": "KNOWN",
+   "assigned": "src/hsd/hsd_tobj.c",
+   "votes": {
+    "tobj.c": 14,
+    "util.c": 1
+   },
+   "note": "also holds: util.c"
+  }
+ ],
+ "gap_attribution": [
+  {
+   "cfile": "texp.c",
+   "count": 15,
+   "lo": "0x801b4300",
+   "hi": "0x801b7178",
+   "fns": [
+    "fn_801B4300",
+    "fn_801B4614",
+    "fn_801B4B5C",
+    "fn_801B50C0",
+    "fn_801B5E40",
+    "fn_801B5F08",
+    "fn_801B600C",
+    "fn_801B64EC",
+    "fn_801B65F0",
+    "fn_801B6CD8",
+    "fn_801B6DC0",
+    "fn_801B6E74",
+    "fn_801B6F5C",
+    "fn_801B707C",
+    "fn_801B7178"
+   ]
+  },
+  {
+   "cfile": "tev.c",
+   "count": 5,
+   "lo": "0x801b3338",
+   "hi": "0x801b3998",
+   "fns": [
+    "fn_801B3338",
+    "fn_801B3408",
+    "fn_801B37A0",
+    "fn_801B38C0",
+    "fn_801B3998"
+   ]
+  },
+  {
+   "cfile": "dvdfs.c",
+   "count": 4,
+   "lo": "0x800a4d28",
+   "hi": "0x800a5558",
+   "fns": [
+    "fn_800A4D28",
+    "fn_800A532C",
+    "fn_800A541C",
+    "fn_800A5558"
+   ]
+  },
+  {
+   "cfile": "aobj.c",
+   "count": 3,
+   "lo": "0x801c028c",
+   "hi": "0x801c2670",
+   "fns": [
+    "fn_801C028C",
+    "fn_801C0F20",
+    "fn_801C2670"
+   ]
+  },
+  {
+   "cfile": "vi.c",
+   "count": 1,
+   "lo": "0x800a94ac",
+   "hi": "0x800a94ac",
+   "fns": [
+    "fn_800A94AC"
+   ]
+  },
+  {
+   "cfile": "parse.c",
+   "count": 1,
+   "lo": "0x800eafe4",
+   "hi": "0x800eafe4",
+   "fns": [
+    "fn_800EAFE4"
+   ]
+  },
+  {
+   "cfile": "memory.c",
+   "count": 1,
+   "lo": "0x801a69c0",
+   "hi": "0x801a69c0",
+   "fns": [
+    "fn_801A69C0"
+   ]
+  }
+ ]
+}
