@@ -44,7 +44,7 @@ typedef struct {
 #define PCPORT_SERIALIZED_IMAGEDESC_SIZE 0x18u
 #define PCPORT_SERIALIZED_TEV_SIZE     0x40u
 #define PCPORT_MAX_VTXDESC_ENTRIES     16u
-#define PCPORT_MAX_JOINT_PATH          16u
+#define PCPORT_MAX_JOINT_PATH          64u
 
 #define PCPORT_TEX_COLORMAP_MASK      (0x0Fu << 16)
 #define PCPORT_TEX_COLORMAP_MODULATE  (4u << 16)
