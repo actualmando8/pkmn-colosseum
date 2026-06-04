@@ -265,7 +265,7 @@ void fn_800B84E0(void) {
 
 /* fn_800B856C - 0x800B856C | size: 0x10 -- GX Misc / PE / draw sync */
 void fn_800B856C(void) {
-    /* Simple accessor (0x10 bytes) */
+    *(u8*)0xCC008000 = 0x48;
 }
 
 /* fn_800B857C - 0x800B857C | size: 0x2D0 -- GX Misc / PE / draw sync */
