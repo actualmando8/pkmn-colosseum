@@ -6,10 +6,10 @@
  * Stub implementations for function coverage.
  */
 
-/* fflush - 0x800C7904 | size: 0x138 */
-void fflush(void) {
+/* fn_800C7904 - 0x800C7904 | size: 0x138 */
+void fn_800C7904(void) {
     extern void fn_800C53E8();
-    extern void ftell();
+    extern void fn_800C7ED4();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -66,7 +66,7 @@ void fflush(void) {
     } else {
 
         r3 = r31;
-        ftell();
+        fn_800C7ED4();
         r30 = r3;
     }
     r3 = r31;
@@ -91,11 +91,11 @@ void fflush(void) {
     return;
 }
 
-/* fclose - 0x800C7A3C | size: 0x1BC */
-void fclose(void) {
+/* fn_800C7A3C - 0x800C7A3C | size: 0x1BC */
+void fn_800C7A3C(void) {
     extern void fn_800C4F34();
     extern void fn_800C53E8();
-    extern void ftell();
+    extern void fn_800C7ED4();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -156,7 +156,7 @@ void fclose(void) {
                         r30 = 0x0;
                     } else {
                         r3 = r31;
-                        ftell();
+                        fn_800C7ED4();
                         r30 = r3;
                     }
                     r3 = r31;
@@ -208,8 +208,8 @@ void fclose(void) {
     return;
 }
 
-/* _fseek - 0x800C7C64 | size: 0x270 */
-void _fseek(void) {
+/* fn_800C7C64 - 0x800C7C64 | size: 0x270 */
+void fn_800C7C64(void) {
     extern u32 lbl_8047AA10;
     u8 sp[0x20];
     u32 tmp = 0;
@@ -407,8 +407,8 @@ void _fseek(void) {
     return;
 }
 
-/* ftell - 0x800C7ED4 | size: 0xE4 */
-void ftell(void) {
+/* fn_800C7ED4 - 0x800C7ED4 | size: 0xE4 */
+void fn_800C7ED4(void) {
     extern u32 lbl_8047AA10;
     u8 sp[0x10];
     u32 tmp = 0;

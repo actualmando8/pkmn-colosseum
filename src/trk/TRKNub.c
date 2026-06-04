@@ -14,10 +14,10 @@ extern void fn_800C0CC8(void* mutex);  /* TRKAcquireMutex */
 extern void fn_800C0CD0(void* mutex);  /* TRKInitializeMutex */
 extern void fn_800BEEB4(s32 idx);      /* TRKReleaseBuffer */
 extern void fn_800BE464(void* event, s32 type); /* TRKConstructEvent */
-extern s32  TRKPostEvent(void* event);  /* TRKPostEvent */
+extern s32  fn_800BE47C(void* event);  /* TRKPostEvent */
 extern void fn_80003488(void* dst, const void* src, u32 size);
 extern void fn_800BF080(void);         /* TRKTerminateSerialHandler */
-extern s32  TRKTestForPacket(void);         /* TRKProcessInput */
+extern s32  fn_800BF1FC(void);         /* TRKProcessInput */
 extern void fn_800BEE44(void);         /* TRKResetBuffer */
 
 extern void MWTRACE(s32 level, const char* fmt, ...);

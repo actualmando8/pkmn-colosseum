@@ -67,7 +67,7 @@ extern void fn_800AC440(void* arAddr);   /* ARInit / ARQInit */
 
 /* --- Graphics init --- */
 extern void fn_800DDF54(u32 xfbSize, u32 numXfbs);   /* GXInit or framebuffer setup */
-extern void GSscratchInit(u32 unused);                   /* VI init */
+extern void fn_800EEDF8(u32 unused);                   /* VI init */
 
 /* --- Game-specific init called from main --- */
 extern void fn_80167FA4(int argc, char** argv, u32 flag); /* GameArgsParse */
@@ -197,11 +197,11 @@ extern void* tableResBiosGetResPtr(u32 id);  /* Load relocatable module (REL) by
 extern void fn_801664F0(void* color); /* Set clear/background color */
 extern void fn_800F9378(void* work, u32 time, u32 numFrames, u32 arg); /* Thread wait/schedule */
 
-extern u32  OSGetResetButtonState(void);    /* OSGetResetButtonState */
+extern u32  fn_800A03B4(void);    /* OSGetResetButtonState */
 extern void fn_80166E44(void);    /* Screen fade to black */
 extern void fn_800AAE34(u32 mask);/* VISetBlack / video blank */
 extern void fn_800AA204(u32 flag);/* VIFlush */
-extern void VIFlush(void);    /* VIWaitForRetrace */
+extern void fn_800AA068(void);    /* VIWaitForRetrace */
 extern void fn_800A880C(u32 a);   /* AISetDSPSampleRate */
 extern void fn_800A8850(u32 a);   /* AIStopDMA */
 extern void fn_800A263C(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
@@ -392,7 +392,7 @@ int main(int argc, char** argv) {
     fn_800DDF54(0x10000, 1);
 
     /* Initialize video interface */
-    GSscratchInit(0);
+    fn_800EEDF8(0);
 
     /* Parse command-line arguments (from disc header / apploader) */
     fn_80167FA4(argc, argv, 1);
@@ -844,18 +844,18 @@ static void GameMainLoop(void) {
 static void TaskResetHandler(void) {
     if (lbl_80478DCA == 0) {
         /* Button not yet latched - check if pressed */
-        if (OSGetResetButtonState() == 1) {
+        if (fn_800A03B4() == 1) {
             lbl_80478DCA = 1; /* latch the reset press */
         }
     } else {
         /* Button was latched - wait for release */
-        if (OSGetResetButtonState() == 0) {
+        if (fn_800A03B4() == 0) {
             /* Released. Only reset if init is complete. */
             if (lbl_80478DC9 == 1) {
                 fn_80166E44();           /* Fade screen to black */
                 fn_800AAE34(0xF000);     /* VISetBlack */
                 fn_800AA204(1);          /* VIFlush */
-                VIFlush();           /* VIWaitForRetrace */
+                fn_800AA068();           /* VIWaitForRetrace */
                 fn_800A880C(0);          /* Stop DSP sample rate */
                 fn_800A8850(0);          /* Stop DMA */
                 fn_800A263C(0, 0, 0, 0); /* Clean up threads */

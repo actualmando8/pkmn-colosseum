@@ -11,7 +11,7 @@
  * copying the new DOL to memory and jumping to it.
  *
  * Matches: 0x800A03B4 - 0x800A064C (first function in the gap)
- *   OSGetResetButtonState (0x298) - __OSReboot
+ *   fn_800A03B4 (0x298) - __OSReboot
  */
 
 extern void DCFlushRange(void* addr, u32 size);
@@ -70,17 +70,17 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
 /* fn_800A064C - 0x800A064C | size: 0x60
  * Reads data into a buffer structure at Scb_803FB840.
- * Calls WriteSram to fill remaining space at offset 0x40,
+ * Calls fn_800A06AC to fill remaining space at offset 0x40,
  * then updates the length field.
  */
 void fn_800A064C(void) {
-    extern u32 WriteSram(u8* dst, u32 addr, u32 len);
+    extern u32 fn_800A06AC(u8* dst, u32 addr, u32 len);
     u8* base = (u8*)(u32)Scb_803FB840;
     u32 offset;
     u32 result;
 
     offset = *(u32*)(base + 0x40);
-    result = WriteSram(base + offset, offset, 0x40 - offset);
+    result = fn_800A06AC(base + offset, offset, 0x40 - offset);
     *(u32*)(base + 0x4C) = result;
 
     if (*(s32*)(base + 0x4C) != 0) {
@@ -88,12 +88,12 @@ void fn_800A064C(void) {
     }
 }
 
-/* WriteSram - 0x800A06AC | size: 0x118
+/* fn_800A06AC - 0x800A06AC | size: 0x118
  * EXI read helper - reads data from an EXI device (SRAM/RTC).
  * Locks EXI channel 0, selects device 1, sends an address command,
  * reads data, and returns success/failure.
  */
-u32 WriteSram(u8* dst, u32 addr, u32 len) {
+u32 fn_800A06AC(u8* dst, u32 addr, u32 len) {
     extern BOOL fn_80098368(s32 chan, u8* buf, u32 len, s32 mode);
     u8 cmdBuf[0x20];
     u32 err;

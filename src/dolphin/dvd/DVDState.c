@@ -12,12 +12,12 @@
  * Matches: 0x800A7820 - 0x800A7DE8
  *   fn_800A7820 (0x10) - DVDPause / small getter
  *   fn_800A7830 (0x50) - DVDResume / small setter
- *   DVDCancelAsync (0x27C) - __DVDDequeueWaitingQueue or DVDCancel
+ *   fn_800A7880 (0x27C) - __DVDDequeueWaitingQueue or DVDCancel
  *   fn_800A7AFC (0xAC) - DVDGetCommandBlockStatus
  *   fn_800A7BA8 (0x24) - DVDGetDriveInfo helper
  *   fn_800A7BCC (0x08) - stub/nop
- *   DVDCheckDisk (0xF8) - __DVDStoreCoverCallback
- *   __DVDPrepareResetAsync (0x11C) - __DVDCheckCoverState
+ *   fn_800A7BD4 (0xF8) - __DVDStoreCoverCallback
+ *   fn_800A7CCC (0x11C) - __DVDCheckCoverState
  */
 
 extern void OSReport(const char* fmt, ...);

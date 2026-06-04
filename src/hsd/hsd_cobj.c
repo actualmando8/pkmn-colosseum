@@ -870,7 +870,7 @@ u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 extern f32* fn_801A8524(void);
-extern void PSMTXInverse(f32*, f32*);
+extern void fn_800A2EB4(f32*, f32*);
 #if 0
 asm void fn_80194CF4(void) {
 #include "src/hsd/hsd_cobj_fn_80194CF4.inc"
@@ -881,7 +881,7 @@ f32* fn_80194CF4(HSD_CObj* cobj) {
         if (cobj->proj_mtx == NULL) {
             cobj->proj_mtx = fn_801A8524();
         }
-        PSMTXInverse(cobj->view_mtx[0], cobj->proj_mtx);
+        fn_800A2EB4(cobj->view_mtx[0], cobj->proj_mtx);
         if (cobj != NULL) {
             cobj->flags &= ~0x80000000;
         }
@@ -926,7 +926,7 @@ void fn_80194D94(u8* ptr) { *(u32*)(ptr + 0x8) |= 0xC0000000; }
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
 extern void fn_800A3244(void);
-extern void C_MTXLookAt(void);
+extern void fn_800A3458(void);
 extern void fn_800A3820(void);
 extern void fn_800A3A9C(void);
 extern void fn_800A3ADC(void);
@@ -1091,7 +1091,7 @@ void fn_80195A48(void) { fn_801975FC(); fn_801974A8(); }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_800A3874(void);
-extern void C_MTXPerspective(void);
+extern void fn_800A3910(void);
 extern void fn_800A39E0(void);
 extern void fn_800BD2E0(void);
 extern void fn_800BD7A0(void);
@@ -1308,7 +1308,7 @@ void fn_80196C54(int flag, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void OSFillFPUContext(void);
+extern void fn_8009C1B4(void);
 #if 1
 asm void fn_80196CE0(void) {
 #include "src/hsd/hsd_cobj_fn_80196CE0.inc"

@@ -48,7 +48,7 @@
  * 5. Handle special float cases (NaN, denorm, inf) for the magnitude.
  * 6. Build a 3x3 rotation matrix from rotX/rotY/rotZ:
  *    - fn_800A3074: build axis-angle rotation matrices
- *    - PSMTXConcat: multiply matrices
+ *    - fn_800A2D98: multiply matrices
  *    - fn_800A3ADC: normalize matrix column vectors
  * 7. If controlFlags bit 17 set (camera-tracking mode):
  *    - Assert "psCamera" object exists (via lbl_8047B190)
@@ -69,7 +69,7 @@
 /* ===== External functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);          /* OSReport / GSlog */
 extern void  fn_800A2D38(void* mtxOut);                  /* MTXIdentity */
-extern void  PSMTXConcat(void* mtxOut, void* mtxA,
+extern void  fn_800A2D98(void* mtxOut, void* mtxA,
                           void* mtxB);                   /* MTXConcat */
 extern void  fn_800A3074(f32 angle, void* mtxOut,
                           u32 axis);                     /* MTXRotAxis */
@@ -77,8 +77,8 @@ extern void  fn_800A3ADC(void* mtx3x3,
                           void* mtxNormalized);          /* MTXNormalize */
 extern void  fn_800A3B9C(void* vecA, void* vecB,
                           void* crossOut);               /* VECCross */
-extern void  sin(f32 angle);                     /* sinf -> f1 */
-extern void  cos(f32 angle);                     /* cosf -> f1 */
+extern void  fn_800CE148(f32 angle);                     /* sinf -> f1 */
+extern void  fn_800CDBE0(f32 angle);                     /* cosf -> f1 */
 extern f64   fn_800CE2D8(f32 y, f32 x);                 /* atan2f */
 extern void  fn_801950D0(void* cameraObj,
                           void* outMtx);                 /* camera get matrix */
@@ -273,10 +273,10 @@ void generatorMain(void* gen) {
         fn_800A3074(gw->rotZ, mtxRotZ, 0x5A);
 
         /* Combine: result = rotY * rotX */
-        PSMTXConcat(mtxRotY, mtxRotX, mtxRotX);
+        fn_800A2D98(mtxRotY, mtxRotX, mtxRotX);
 
         /* Combine: result = rotZ * (rotY * rotX) */
-        PSMTXConcat(mtxRotZ, mtxRotX, mtxRotX);
+        fn_800A2D98(mtxRotZ, mtxRotX, mtxRotX);
 
         /* Extract the forward direction (column 0) */
         dirVec[0] = mtxRotX[0];   /* mtx[0][0] at sp+0x10C */
@@ -396,9 +396,9 @@ void generatorMain(void* gen) {
         }
 
         /* Compute sin/cos for pitch */
-        sin(pitchAngle);
+        fn_800CE148(pitchAngle);
         /* sinPitch stored; cosPitch computed next */
-        cos(pitchAngle);
+        fn_800CDBE0(pitchAngle);
 
         /* Compute yaw angle (azimuth):
          * The horizontal components (X, Z) determine the heading. */
@@ -414,8 +414,8 @@ void generatorMain(void* gen) {
             yawAngle = (f32)fn_800CE2D8(normVelX, horizMag);
         }
 
-        sin(yawAngle);
-        cos(yawAngle);
+        fn_800CE148(yawAngle);
+        fn_800CDBE0(yawAngle);
 
         /* Build yaw and pitch rotation matrices, combine with result */
         /* (The actual assembly builds these inline using the computed

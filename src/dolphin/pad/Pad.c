@@ -18,11 +18,11 @@
  *   fn_800AC070 (0x88) - PADRead
  *   fn_800AC0F8 (0x18) - PADSetSamplingCallback
  *   fn_800AC110 (0x18) - PADGetSpec
- *   AISetStreamPlayState (0xD8) - PADOriginCallback
+ *   fn_800AC128 (0xD8) - PADOriginCallback
  *   fn_800AC200 (0x10) - PADOriginUpdateCallback
  *   fn_800AC210 (0xE0) - PADProbeCallback
  *   fn_800AC2F0 (0x14) - PADTypeAndStatusCallback
- *   __AI_set_stream_sample_rate (0xD4) - PADReceiveCheckCallback
+ *   fn_800AC304 (0xD4) - PADReceiveCheckCallback
  *   ... and many more PAD internal functions
  */
 
@@ -413,11 +413,11 @@ void fn_800AC5AC(s32 chan) {
 }
 
 /*
- * __AIDHandler - PADProbeCallback extended
+ * fn_800AC628 - PADProbeCallback extended
  * 0x800AC628 | size: 0xAC
  * Extended probe callback that handles type detection.
  */
-static void __AIDHandler(s32 chan, u32 error, OSContext* context) {
+static void fn_800AC628(s32 chan, u32 error, OSContext* context) {
     u32 chanBit;
 
     chanBit = 0x80000000 >> (24 + chan);
@@ -449,11 +449,11 @@ static void fn_800AC6D4(s32 chan, u32 error, OSContext* context) {
 }
 
 /*
- * __AI_SRC_INIT - PADControlMotorImpl
+ * fn_800AC72C - PADControlMotorImpl
  * 0x800AC72C | size: 0x1E4
  * Full motor control implementation with SI transfer.
  */
-void __AI_SRC_INIT(s32 chan, u32 command) {
+void fn_800AC72C(s32 chan, u32 command) {
     BOOL enabled;
     u32 chanBit;
 
@@ -620,7 +620,7 @@ u32 fn_800ACBEC(void) {
 }
 
 /*
- * __ARChecksize - PADReset internal (large)
+ * fn_800ACBFC - PADReset internal (large)
  * 0x800ACBFC | size: 0x17F4
  *
  * This is the full PAD reset state machine -- the largest function in the
@@ -629,16 +629,16 @@ u32 fn_800ACBEC(void) {
  * and deep SI hardware interaction, it remains a stub pending further
  * Ghidra analysis of the SI transfer sequences.
  */
-void __ARChecksize(void) {
+void fn_800ACBFC(void) {
     /* Large PAD reset state machine -- requires SI transfer chain analysis */
 }
 
 /*
- * __ARQServiceQueueLo - PADRecalibrate internal
+ * fn_800AE3F0 - PADRecalibrate internal
  * 0x800AE3F0 | size: 0x100
  * Issues recalibration commands to specified controllers.
  */
-void __ARQServiceQueueLo(u32 mask) {
+void fn_800AE3F0(u32 mask) {
     s32 chan;
     u32 chanBit;
     BOOL enabled;
@@ -670,8 +670,8 @@ void fn_800AE4F0(void) {
 /* internals that share this translation unit.                 */
 /* ========================================================== */
 
-/* __ARQInterruptServiceRoutine - SITransferHelper | 0x800AE4F4 | size: 0xCC */
-void __ARQInterruptServiceRoutine(s32 chan, void* output, u32 outputBytes, void* input, u32 inputBytes, SICallback callback) {
+/* fn_800AE4F4 - SITransferHelper | 0x800AE4F4 | size: 0xCC */
+void fn_800AE4F4(s32 chan, void* output, u32 outputBytes, void* input, u32 inputBytes, SICallback callback) {
     SITransfer(chan, output, outputBytes, input, inputBytes, callback, OSMicrosecondsToTicks(65));
 }
 
@@ -683,8 +683,8 @@ void fn_800AE5C0(u32 poll) {
     OSRestoreInterrupts(enabled);
 }
 
-/* ARQPostRequest - SITransferConfig | 0x800AE630 | size: 0x15C */
-void ARQPostRequest(s32 chan, u32 type, SICallback callback) {
+/* fn_800AE630 - SITransferConfig | 0x800AE630 | size: 0x15C */
+void fn_800AE630(s32 chan, u32 type, SICallback callback) {
     BOOL enabled;
     u32 chanBit;
 
@@ -725,8 +725,8 @@ BOOL fn_800AE7CC(s32 chan) {
     return (type != 0) ? TRUE : FALSE;
 }
 
-/* DSPInit - SISetSamplingConfig | 0x800AE7E0 | size: 0xC4 */
-void DSPInit(u32 x, u32 y) {
+/* fn_800AE7E0 - SISetSamplingConfig | 0x800AE7E0 | size: 0xC4 */
+void fn_800AE7E0(u32 x, u32 y) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -767,27 +767,27 @@ BOOL fn_800AE9AC(s32 chan, void* data) {
     return result;
 }
 
-/* __DSPHandler - SITransferSequence | 0x800AE9FC | size: 0x424 */
-void __DSPHandler(void) {
+/* fn_800AE9FC - SITransferSequence | 0x800AE9FC | size: 0x424 */
+void fn_800AE9FC(void) {
     /* Large SI transfer sequencer -- handles multi-channel polling,
      * command dispatch, and response collection. Requires detailed
      * SI register analysis. */
 }
 
-/* __DSP_exec_task - SICallbackDispatch | 0x800AEE20 | size: 0x1A0 */
-void __DSP_exec_task(s32 chan, u32 error) {
+/* fn_800AEE20 - SICallbackDispatch | 0x800AEE20 | size: 0x1A0 */
+void fn_800AEE20(s32 chan, u32 error) {
     /* SI callback dispatch -- routes SI completion events to
      * the appropriate registered callback for each channel. */
 }
 
-/* __DSP_boot_task - SIInterruptHandler | 0x800AEFC0 | size: 0x18C */
-void __DSP_boot_task(s32 interrupt, OSContext* context) {
+/* fn_800AEFC0 - SIInterruptHandler | 0x800AEFC0 | size: 0x18C */
+void fn_800AEFC0(s32 interrupt, OSContext* context) {
     /* SI transfer completion interrupt handler. Reads SI status,
      * collects response data, and dispatches callbacks. */
 }
 
-/* __DSP_insert_task - SITypeDetect | 0x800AF14C | size: 0xA0 */
-u32 __DSP_insert_task(s32 chan) {
+/* fn_800AF14C - SITypeDetect | 0x800AF14C | size: 0xA0 */
+u32 fn_800AF14C(s32 chan) {
     u32 type;
     BOOL enabled;
 
@@ -812,14 +812,14 @@ BOOL fn_800AF1EC(s32 chan) {
 void fn_800AF280(void) {
 }
 
-/* __CARDExtHandler - SISetTypeCallback | 0x800AF284 | size: 0xD8 */
-void __CARDExtHandler(s32 chan, SITypeAndStatusCallback callback) {
+/* fn_800AF284 - SISetTypeCallback | 0x800AF284 | size: 0xD8 */
+void fn_800AF284(s32 chan, SITypeAndStatusCallback callback) {
     /* Registers a type-and-status callback for a specific channel.
      * Used by PAD probing to detect controller connections. */
 }
 
-/* __CARDExiHandler - SITransferInit | 0x800AF35C | size: 0x118 */
-void __CARDExiHandler(s32 chan, u32 command) {
+/* fn_800AF35C - SITransferInit | 0x800AF35C | size: 0x118 */
+void fn_800AF35C(s32 chan, u32 command) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -828,8 +828,8 @@ void __CARDExiHandler(s32 chan, u32 command) {
     OSRestoreInterrupts(enabled);
 }
 
-/* __CARDTxHandler - SIReadResponse | 0x800AF474 | size: 0xA8 */
-void __CARDTxHandler(s32 chan, void* data, u32 size) {
+/* fn_800AF474 - SIReadResponse | 0x800AF474 | size: 0xA8 */
+void fn_800AF474(s32 chan, void* data, u32 size) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -847,8 +847,8 @@ BOOL fn_800AF51C(s32 chan, void* output, u32 outputLen, void* input, u32 inputLe
     return result;
 }
 
-/* __CARDEnableInterrupt - SIPollController | 0x800AF5A0 | size: 0xC0 */
-void __CARDEnableInterrupt(s32 chan) {
+/* fn_800AF5A0 - SIPollController | 0x800AF5A0 | size: 0xC0 */
+void fn_800AF5A0(s32 chan) {
     u32 chanBit;
     BOOL enabled;
 
@@ -868,8 +868,8 @@ void fn_800AF660(s32 chan, u32 config) {
     OSRestoreInterrupts(enabled);
 }
 
-/* __CARDClearStatus - SIGetTypeSync | 0x800AF750 | size: 0xAC */
-u32 __CARDClearStatus(s32 chan) {
+/* fn_800AF750 - SIGetTypeSync | 0x800AF750 | size: 0xAC */
+u32 fn_800AF750(s32 chan) {
     u32 type;
     BOOL enabled;
 
@@ -882,8 +882,8 @@ u32 __CARDClearStatus(s32 chan) {
     return type;
 }
 
-/* TimeoutHandler - SIReadOrigin | 0x800AF7FC | size: 0xA4 */
-void TimeoutHandler(s32 chan, PADOrigin* origin) {
+/* fn_800AF7FC - SIReadOrigin | 0x800AF7FC | size: 0xA4 */
+void fn_800AF7FC(s32 chan, PADOrigin* origin) {
     u32 data[3];
 
     if (SIGetResponse(chan, data)) {
@@ -904,8 +904,8 @@ void fn_800AF8A0(PADStatus* status, s32 chan) {
      * stick, substick, and trigger values. */
 }
 
-/* UnlockedCallback - SIGetOriginFromResponse | 0x800AFACC | size: 0x110 */
-void UnlockedCallback(s32 chan) {
+/* fn_800AFACC - SIGetOriginFromResponse | 0x800AFACC | size: 0x110 */
+void fn_800AFACC(s32 chan) {
     /* Reads SI origin response and stores into Origin[chan].
      * Part of the controller initialization sequence. */
 }
@@ -920,8 +920,8 @@ void fn_800AFBDC(s32 chan) {
      * 5. Enable polling */
 }
 
-/* __CARDReadSegment - SIResetController | 0x800AFD90 | size: 0x134 */
-void __CARDReadSegment(s32 chan) {
+/* fn_800AFD90 - SIResetController | 0x800AFD90 | size: 0x134 */
+void fn_800AFD90(s32 chan) {
     /* Resets a controller channel:
      * 1. Disable polling for channel
      * 2. Send reset command
@@ -951,8 +951,8 @@ void fn_800AFFE0(s32 chan, u32 error) {
     OSRestoreInterrupts(enabled);
 }
 
-/* CARDInit - SIProcessResponse | 0x800B00C0 | size: 0xAC */
-void CARDInit(s32 chan) {
+/* fn_800B00C0 - SIProcessResponse | 0x800B00C0 | size: 0xAC */
+void fn_800B00C0(s32 chan) {
     u32 chanBit;
 
     chanBit = 0x80000000 >> (24 + chan);
@@ -989,8 +989,8 @@ void fn_800B01C4(void) {
     OSRestoreInterrupts(enabled);
 }
 
-/* __CARDGetControlBlock - SITransferAndWait | 0x800B023C | size: 0xB8 */
-BOOL __CARDGetControlBlock(s32 chan, void* output, u32 outLen, void* input, u32 inLen) {
+/* fn_800B023C - SITransferAndWait | 0x800B023C | size: 0xB8 */
+BOOL fn_800B023C(s32 chan, void* output, u32 outLen, void* input, u32 inLen) {
     BOOL result;
 
     result = SITransfer(chan, output, outLen, input, inLen, NULL, OSMicrosecondsToTicks(65));
@@ -1013,8 +1013,8 @@ void fn_800B0358(s32 chan, u32 command) {
     SITransferCommands();
 }
 
-/* CARDFreeBlocks - SIConfigurePolling | 0x800B0388 | size: 0x150 */
-void CARDFreeBlocks(u32 config) {
+/* fn_800B0388 - SIConfigurePolling | 0x800B0388 | size: 0x150 */
+void fn_800B0388(u32 config) {
     s32 chan;
     BOOL enabled;
 
@@ -1036,8 +1036,8 @@ BOOL fn_800B04D8(s32 chan, void* data) {
     return SIGetResponse(chan, data);
 }
 
-/* bitrev - SITransferConfig2 | 0x800B0528 | size: 0x16C */
-void bitrev(s32 chan, u32 command, SICallback callback) {
+/* fn_800B0528 - SITransferConfig2 | 0x800B0528 | size: 0x16C */
+void fn_800B0528(s32 chan, u32 command, SICallback callback) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -1046,18 +1046,18 @@ void bitrev(s32 chan, u32 command, SICallback callback) {
     OSRestoreInterrupts(enabled);
 }
 
-/* ReadArrayUnlock - SIInitChannels | 0x800B0694 | size: 0x144 */
-void ReadArrayUnlock(void) {
+/* fn_800B0694 - SIInitChannels | 0x800B0694 | size: 0x144 */
+void fn_800B0694(void) {
     /* Initializes all 4 SI channels for controller polling. */
 }
 
-/* DummyLen - 0x800B07D8 | size: 0xC4 */
-void DummyLen(void) {
+/* fn_800B07D8 - 0x800B07D8 | size: 0xC4 */
+void fn_800B07D8(void) {
     /* SI/PAD helper (0xC4 bytes) */
 }
 
-/* __CARDUnlock - 0x800B089C | size: 0xB58 */
-void __CARDUnlock(void) {
+/* fn_800B089C - 0x800B089C | size: 0xB58 */
+void fn_800B089C(void) {
     /* Large SI/PAD function (0xB58 bytes) -- requires Ghidra analysis */
 }
 
@@ -1066,8 +1066,8 @@ void fn_800B13F4(void) {
     /* Medium function (0x70 bytes) */
 }
 
-/* DoneCallback - 0x800B1464 | size: 0x324 */
-void DoneCallback(void) {
+/* fn_800B1464 - 0x800B1464 | size: 0x324 */
+void fn_800B1464(void) {
     /* Large SI/PAD function (0x324 bytes) -- requires Ghidra analysis */
 }
 
@@ -1106,8 +1106,8 @@ void fn_800B1AE4(void) {
     /* SI/PAD helper (0xC8 bytes) */
 }
 
-/* __CARDAllocBlock - 0x800B1BAC | size: 0x118 */
-void __CARDAllocBlock(void) {
+/* fn_800B1BAC - 0x800B1BAC | size: 0x118 */
+void fn_800B1BAC(void) {
     /* SI/PAD helper (0x118 bytes) */
 }
 
@@ -1116,8 +1116,8 @@ void fn_800B1CC4(void) {
     /* SI/PAD helper (0x9C bytes) */
 }
 
-/* __CARDUpdateFatBlock - 0x800B1D60 | size: 0xAC */
-void __CARDUpdateFatBlock(void) {
+/* fn_800B1D60 - 0x800B1D60 | size: 0xAC */
+void fn_800B1D60(void) {
     /* SI/PAD helper (0xAC bytes) */
 }
 
@@ -1136,28 +1136,28 @@ void fn_800B1EE4(void) {
     /* SI/PAD helper (0xC8 bytes) */
 }
 
-/* __CARDUpdateDir - 0x800B1FAC | size: 0xC4 */
-void __CARDUpdateDir(void) {
+/* fn_800B1FAC - 0x800B1FAC | size: 0xC4 */
+void fn_800B1FAC(void) {
     /* SI/PAD helper (0xC4 bytes) */
 }
 
-/* __CARDCheckSum - 0x800B2070 | size: 0x1B0 */
-void __CARDCheckSum(void) {
+/* fn_800B2070 - 0x800B2070 | size: 0x1B0 */
+void fn_800B2070(void) {
     /* SI/PAD helper (0x1B0 bytes) */
 }
 
-/* VerifyID - 0x800B2220 | size: 0x284 */
-void VerifyID(void) {
+/* fn_800B2220 - 0x800B2220 | size: 0x284 */
+void fn_800B2220(void) {
     /* Large SI/PAD function (0x284 bytes) -- requires Ghidra analysis */
 }
 
-/* VerifyDir - 0x800B24A4 | size: 0x240 */
-void VerifyDir(void) {
+/* fn_800B24A4 - 0x800B24A4 | size: 0x240 */
+void fn_800B24A4(void) {
     /* Large SI/PAD function (0x240 bytes) -- requires Ghidra analysis */
 }
 
-/* VerifyFAT - 0x800B26E4 | size: 0x284 */
-void VerifyFAT(void) {
+/* fn_800B26E4 - 0x800B26E4 | size: 0x284 */
+void fn_800B26E4(void) {
     /* Large SI/PAD function (0x284 bytes) -- requires Ghidra analysis */
 }
 
@@ -1166,8 +1166,8 @@ void fn_800B2968(void) {
     /* SI/PAD helper (0x8C bytes) */
 }
 
-/* CARDCheckExAsync - 0x800B29F4 | size: 0x590 */
-void CARDCheckExAsync(void) {
+/* fn_800B29F4 - 0x800B29F4 | size: 0x590 */
+void fn_800B29F4(void) {
     /* Large SI/PAD function (0x590 bytes) -- requires Ghidra analysis */
 }
 
@@ -1176,13 +1176,13 @@ void fn_800B2F84(void) {
     /* Medium function (0x28 bytes) */
 }
 
-/* IsCard - 0x800B2FAC | size: 0xCC */
-void IsCard(void) {
+/* fn_800B2FAC - 0x800B2FAC | size: 0xCC */
+void fn_800B2FAC(void) {
     /* SI/PAD helper (0xCC bytes) */
 }
 
-/* CARDProbeEx - 0x800B3078 | size: 0x17C */
-void CARDProbeEx(void) {
+/* fn_800B3078 - 0x800B3078 | size: 0x17C */
+void fn_800B3078(void) {
     /* SI/PAD helper (0x17C bytes) */
 }
 
@@ -1191,13 +1191,13 @@ void fn_800B31F4(void) {
     /* Large SI/PAD function (0x410 bytes) -- requires Ghidra analysis */
 }
 
-/* __CARDMountCallback - 0x800B3604 | size: 0x138 */
-void __CARDMountCallback(void) {
+/* fn_800B3604 - 0x800B3604 | size: 0x138 */
+void fn_800B3604(void) {
     /* SI/PAD helper (0x138 bytes) */
 }
 
-/* CARDMountAsync - 0x800B373C | size: 0x1A0 */
-void CARDMountAsync(void) {
+/* fn_800B373C - 0x800B373C | size: 0x1A0 */
+void fn_800B373C(void) {
     /* SI/PAD helper (0x1A0 bytes) */
 }
 
@@ -1206,18 +1206,18 @@ void fn_800B38DC(void) {
     /* SI/PAD helper (0x9C bytes) */
 }
 
-/* CARDUnmount - 0x800B3978 | size: 0xAC */
-void CARDUnmount(void) {
+/* fn_800B3978 - 0x800B3978 | size: 0xAC */
+void fn_800B3978(void) {
     /* SI/PAD helper (0xAC bytes) */
 }
 
-/* FormatCallback - 0x800B3A24 | size: 0x144 */
-void FormatCallback(void) {
+/* fn_800B3A24 - 0x800B3A24 | size: 0x144 */
+void fn_800B3A24(void) {
     /* SI/PAD helper (0x144 bytes) */
 }
 
-/* __CARDFormatRegionAsync - 0x800B3B68 | size: 0x658 */
-void __CARDFormatRegionAsync(void) {
+/* fn_800B3B68 - 0x800B3B68 | size: 0x658 */
+void fn_800B3B68(void) {
     /* Large SI/PAD function (0x658 bytes) -- requires Ghidra analysis */
 }
 
@@ -1261,23 +1261,23 @@ u32 fn_800B463C(void) {
     return 0;
 }
 
-/* CreateCallbackFat - 0x800B4644 | size: 0x130 */
-void CreateCallbackFat(void) {
+/* fn_800B4644 - 0x800B4644 | size: 0x130 */
+void fn_800B4644(void) {
     /* SI/PAD helper (0x130 bytes) */
 }
 
-/* CARDCreateAsync - 0x800B4774 | size: 0x220 */
-void CARDCreateAsync(void) {
+/* fn_800B4774 - 0x800B4774 | size: 0x220 */
+void fn_800B4774(void) {
     /* Large SI/PAD function (0x220 bytes) -- requires Ghidra analysis */
 }
 
-/* __CARDSeek - 0x800B4994 | size: 0x1B8 */
-void __CARDSeek(void) {
+/* fn_800B4994 - 0x800B4994 | size: 0x1B8 */
+void fn_800B4994(void) {
     /* SI/PAD helper (0x1B8 bytes) */
 }
 
-/* ReadCallback - 0x800B4B4C | size: 0x130 */
-void ReadCallback(void) {
+/* fn_800B4B4C - 0x800B4B4C | size: 0x130 */
+void fn_800B4B4C(void) {
     /* SI/PAD helper (0x130 bytes) */
 }
 
@@ -1291,33 +1291,33 @@ void fn_800B4DC4(void) {
     /* SI/PAD helper (0x8C bytes) */
 }
 
-/* WriteCallback - 0x800B4E50 | size: 0x170 */
-void WriteCallback(void) {
+/* fn_800B4E50 - 0x800B4E50 | size: 0x170 */
+void fn_800B4E50(void) {
     /* SI/PAD helper (0x170 bytes) */
 }
 
-/* EraseCallback - 0x800B4FC0 | size: 0xB0 */
-void EraseCallback(void) {
+/* fn_800B4FC0 - 0x800B4FC0 | size: 0xB0 */
+void fn_800B4FC0(void) {
     /* SI/PAD helper (0xB0 bytes) */
 }
 
-/* CARDWriteAsync - 0x800B5070 | size: 0x114 */
-void CARDWriteAsync(void) {
+/* fn_800B5070 - 0x800B5070 | size: 0x114 */
+void fn_800B5070(void) {
     /* SI/PAD helper (0x114 bytes) */
 }
 
-/* DeleteCallback - 0x800B5184 | size: 0xA4 */
-void DeleteCallback(void) {
+/* fn_800B5184 - 0x800B5184 | size: 0xA4 */
+void fn_800B5184(void) {
     /* SI/PAD helper (0xA4 bytes) */
 }
 
-/* CARDDeleteAsync - 0x800B5228 | size: 0x110 */
-void CARDDeleteAsync(void) {
+/* fn_800B5228 - 0x800B5228 | size: 0x110 */
+void fn_800B5228(void) {
     /* SI/PAD helper (0x110 bytes) */
 }
 
-/* UpdateIconOffsets - 0x800B5338 | size: 0x1F8 */
-void UpdateIconOffsets(void) {
+/* fn_800B5338 - 0x800B5338 | size: 0x1F8 */
+void fn_800B5338(void) {
     /* SI/PAD helper (0x1F8 bytes) */
 }
 
@@ -1326,8 +1326,8 @@ void fn_800B5530(void) {
     /* SI/PAD helper (0x12C bytes) */
 }
 
-/* CARDSetStatusAsync - 0x800B565C | size: 0x174 */
-void CARDSetStatusAsync(void) {
+/* fn_800B565C - 0x800B565C | size: 0x174 */
+void fn_800B565C(void) {
     /* SI/PAD helper (0x174 bytes) */
 }
 
@@ -1341,8 +1341,8 @@ void fn_800B588C(void) {
     /* Large SI/PAD function (0x254 bytes) -- requires Ghidra analysis */
 }
 
-/* CARDGetSerialNo - 0x800B5AE0 | size: 0xC4 */
-void CARDGetSerialNo(void) {
+/* fn_800B5AE0 - 0x800B5AE0 | size: 0xC4 */
+void fn_800B5AE0(void) {
     /* SI/PAD helper (0xC4 bytes) */
 }
 
@@ -1366,8 +1366,8 @@ void fn_800B5CD8(void) {
     /* Medium function (0x24 bytes) */
 }
 
-/* __GXShutdown_800C6260 - 0x800B5CFC | size: 0x190 */
-void __GXShutdown_800C6260(void) {
+/* fn_800B5CFC - 0x800B5CFC | size: 0x190 */
+void fn_800B5CFC(void) {
     /* SI/PAD helper (0x190 bytes) */
 }
 

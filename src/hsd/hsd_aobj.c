@@ -144,9 +144,9 @@ void HSD_AObjFree(HSD_AObj* aobj)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void OSReport(const char* fmt, ...);
-extern void atan(void);
-extern void cos(void);
-extern void sin(void);
+extern void fn_800CD85C(void);
+extern void fn_800CDBE0(void);
+extern void fn_800CE148(void);
 extern void fn_800CE220(void);
 extern void fn_800CE298(void);
 extern void fn_800CE2B8(void);

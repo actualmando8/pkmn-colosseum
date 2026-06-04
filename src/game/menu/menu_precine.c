@@ -33,7 +33,7 @@ void fn_80034280(void) {
     extern void fn_801069FC();
     extern void fn_80106D3C();
     extern void fn_80166A28();
-    extern void GBAInit();
+    extern void fn_8025F350();
     extern u8 jumptable_802E504C[];
     u8 sp[0x80];
     u32 tmp = 0;
@@ -54,7 +54,7 @@ void fn_80034280(void) {
     void (*ctr_fn)(void) = 0;
 
     r28 = -0x1;
-    GBAInit();
+    fn_8025F350();
     r3 = 0x0;
     fn_8007B090();
     tmp = 0x0;
@@ -1768,7 +1768,7 @@ void fn_80035C48(void) {
     extern u32 lbl_8047A458;
     extern void fn_80083AF4();
     extern void fn_80083BF8();
-    extern void GScharLenCpy();
+    extern void fn_800F9D24();
     extern void fn_800FA280();
     extern void fn_80113F48();
     extern void fn_80129280();
@@ -1824,7 +1824,7 @@ void fn_80035C48(void) {
         r4 = r3;
         r3 = (u32)lbl_803A3288;
         r5 = 0x50;
-        GScharLenCpy();
+        fn_800F9D24();
         r3 = (u32)lbl_803A3288;
         tmp = 0x0;
         r4 = (u32)lbl_803A3288;

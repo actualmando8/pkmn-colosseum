@@ -311,12 +311,12 @@ while (1) {
 /* fn_800C56A4 - 0x800C56A4 | size: 0x3B4 */
 void fn_800C56A4(void) {
     extern f64 lbl_8047C400;
-    extern void __cvt_dbl_usll();
+    extern void fn_800C4CC0();
     extern void fn_800C5A58();
     extern void fn_800C71DC();
     extern void fn_800CDDFC();
-    extern void ldexp();
-    extern void modf();
+    extern void fn_800CDE88();
+    extern void fn_800CE04C();
     u8 sp[0xB0];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -499,10 +499,10 @@ L_800C5924:
     fn_800C5A58();
     f1 = f31;
     r3 = r26;
-    ldexp();
+    fn_800CDE88();
     r3 = (u32)sp + 0x30;
-    modf();
-    __cvt_dbl_usll();
+    fn_800CE04C();
+    fn_800C4CC0();
     r28 = 0x0;
     r27 = r3;
     r26 = r4;

@@ -10,7 +10,7 @@
  * for the exception system and provide error-related helpers.
  *
  * Matches: 0x8009C1B0 - 0x8009C2E0
- *   OSFillFPUContext (0x12C) - OSFillFPUContext or OSInitContext
+ *   fn_8009C1B4 (0x12C) - OSFillFPUContext or OSInitContext
  */
 
 extern void OSReport(const char* fmt, ...);

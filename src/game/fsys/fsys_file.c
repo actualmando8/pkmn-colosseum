@@ -29,7 +29,7 @@ extern void  fn_800E209C(u16 handle);
 extern u16   fn_800E202C(void* ptr);
 
 /* DVD / file operations */
-extern void  strcpy(void* dst, const void* src);
+extern void  fn_800CA968(void* dst, const void* src);
 extern u32   fn_80167F28(const char* path);
 extern u32   fn_80167E5C(u32 fileInfo);
 extern void  fn_80167E64(u32 fileInfo);
@@ -503,7 +503,7 @@ void FSYSBeginLoad(FSYSSlot* slot, u32 fileHandle,
 
     /* Format the filename as "%s.fsys" */
     fn_800C8520(nameBuf, "%s.fsys", tocName);
-    strcpy(slot->filename, nameBuf);
+    fn_800CA968(slot->filename, nameBuf);
 
     /* Check if another slot is already actively loading */
     if (mgr->activeSlot != NULL) {
@@ -568,7 +568,7 @@ state_loaded:
 
     /* Format filename and set up for re-load */
     fn_800C8520(nameBuf, "%s.fsys", tocName);
-    strcpy(slot->filename, nameBuf);
+    fn_800CA968(slot->filename, nameBuf);
 
     /* Check if loading is blocked */
     if (mgr->activeSlot != NULL) {

@@ -21,7 +21,7 @@ extern void fn_800A19CC();
 extern void fn_800A1E54();
 extern void fn_800A1F94();
 extern void fn_800A257C();
-extern void strcpy();
+extern void fn_800CA968();
 extern void fn_800E202C();
 extern void fn_800E209C();
 extern void fn_800E24B0();
@@ -635,11 +635,11 @@ void fn_800932F0(void) {
         r4 = r30;
         r3 = r27 + 0x4344;
         *(u32*)((u8*)r27 + 0x433C) = tmp;
-        ((void(*)(void))strcpy)();
+        ((void(*)(void))fn_800CA968)();
         if (r31 != 0) {
             r4 = r31;
             r3 = r27 + 0x43c4;
-            ((void(*)(void))strcpy)();
+            ((void(*)(void))fn_800CA968)();
         } else {
             /* L_800934A0 */
             tmp = 0x0;

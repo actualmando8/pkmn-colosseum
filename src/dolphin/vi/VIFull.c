@@ -71,8 +71,8 @@ static void setScalingRegs(u16 panelWidth, u16 dispWidth);
 
 /* Forward declarations for asm wrappers (used before definition in same TU) */
 extern void fn_800AB5B4(s32 spec);
-extern void SPEC0_MakeStatus(void);
-extern void SPEC1_MakeStatus(void);
+extern void fn_800AB614(void);
+extern void fn_800AB788(void);
 extern void fn_800AB8FC(void);
 
 /*
@@ -92,7 +92,7 @@ u32 VIGetCurrentLine(void) {
 }
 
 /*
- * UpdateOrigin - VIGetRetraceCount.
+ * fn_800AA4D4 - VIGetRetraceCount.
  * 0x800AA4D4 | size: 0x1A4
  */
 u32 VIGetRetraceCount(void) {
@@ -100,7 +100,7 @@ u32 VIGetRetraceCount(void) {
 }
 
 /*
- * PADOriginCallback - VIInit.
+ * fn_800AA678 - VIInit.
  * 0x800AA678 | size: 0xC4
  *
  * Initializes the Video Interface hardware.
@@ -342,17 +342,17 @@ u32 fn_800AA498(void) {
 }
 #endif
 
-/* UpdateOrigin - 0x800AA4D4 | size: 0x1A4 */
+/* fn_800AA4D4 - 0x800AA4D4 | size: 0x1A4 */
 extern u32 SIGetType(s32 chan);
 extern u8 lbl_803FC5E0[];
 extern u32 lbl_80478A14;
 extern u32 lbl_80478A10;
 #if 1
-asm void UpdateOrigin(void) {
-#include "src/dolphin/vi/VIFull_UpdateOrigin.inc"
+asm void fn_800AA4D4(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA4D4.inc"
 }
 #else
-void UpdateOrigin(s32 chan) {
+void fn_800AA4D4(s32 chan) {
     u8* base;
     u32 mode;
     u32 chanBit;
@@ -399,12 +399,12 @@ void UpdateOrigin(s32 chan) {
 }
 #endif
 
-/* PADOriginCallback - 0x800AA678 | size: 0xC4 */
+/* fn_800AA678 - 0x800AA678 | size: 0xC4 */
 extern void fn_800D05A4(u32 chan, void* buf);
 extern void fn_800D0338(u32 chan, u32 cmd);
 extern void fn_800D03C8(u32 mask);
 extern void fn_800D0CBC(u32 chan, void* callback);
-extern void UpdateOrigin();
+extern void fn_800AA4D4();
 extern void PADTypeAndStatusCallback(void);
 extern void* memset(void* dst, int val, u32 n);
 extern u32 lbl_80478A0C;
@@ -413,18 +413,18 @@ extern u32 lbl_80478A14;
 extern u32 lbl_8047A8A8;
 extern u8 lbl_803FC5E0[];
 #if 1
-asm void PADOriginCallback(void) {
-#include "src/dolphin/vi/VIFull_PADOriginCallback.inc"
+asm void fn_800AA678(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA678.inc"
 }
 #else
-void PADOriginCallback(u32 chan, u32 status) {
+void fn_800AA678(u32 chan, u32 status) {
     u32 buf[4];
     u32 curChan;
     u32 pending;
     u32 nextChan;
 
     if ((status & 0xF) == 0) {
-        UpdateOrigin(lbl_80478A0C);
+        fn_800AA4D4(lbl_80478A0C);
         curChan = lbl_80478A0C;
         lbl_8047A8A4 |= (0x80000000u >> curChan);
         fn_800D05A4(curChan, buf);
@@ -462,7 +462,7 @@ void fn_800AA73C(s32 chan, s32 status) {
     chanBit = 0x80000000u >> chan;
     if (lbl_8047A8A4 & chanBit) {
         if (!(status & 0xF)) {
-            UpdateOrigin(chan);
+            fn_800AA4D4(chan);
         }
         if (status & 0x8) {
             intr = OSDisableInterrupts();
@@ -479,18 +479,18 @@ void fn_800AA73C(s32 chan, s32 status) {
 }
 #endif
 
-/* PADProbeCallback - 0x800AA7FC | size: 0xD8 */
+/* fn_800AA7FC - 0x800AA7FC | size: 0xD8 */
 extern u32 lbl_80478A0C;
 extern u32 lbl_8047A8A4;
 extern u32 lbl_80478A14;
 extern u32 lbl_8047A8B0;
 extern u32 lbl_8047A8A8;
 #if 1
-asm void PADProbeCallback(void) {
-#include "src/dolphin/vi/VIFull_PADProbeCallback.inc"
+asm void fn_800AA7FC(void) {
+#include "src/dolphin/vi/VIFull_fn_800AA7FC.inc"
 }
 #else
-void PADProbeCallback(void) {
+void fn_800AA7FC(void) {
     u8 sp[0x30];
     extern u8 lbl_803FC5E0[];
     extern u32 lbl_80478A0C;
@@ -591,8 +591,8 @@ void PADTypeAndStatusCallback(void) {
     extern void fn_800D03C8();
     extern void fn_800D05A4();
     extern void fn_800D0CBC();
-    extern void PADOriginCallback();
-    extern void PADProbeCallback();
+    extern void fn_800AA678();
+    extern void fn_800AA7FC();
     extern void PADTypeAndStatusCallback();
     u32 tmp = 0;
     u32 r3 = 0;
@@ -711,9 +711,9 @@ void PADTypeAndStatusCallback(void) {
         }
         if (r5 != 0) {
             tmp = r29 * 0xc;
-            r3 = (u32)PADOriginCallback;
+            r3 = (u32)fn_800AA678;
             r6 = r30 + tmp;
-            r8 = (u32)PADOriginCallback;
+            r8 = (u32)fn_800AA678;
             r3 = r29 + 0x0;
             r4 = (u32)lbl_80478A24;
             r5 = 0x3;
@@ -725,9 +725,9 @@ void PADTypeAndStatusCallback(void) {
             goto L_800AAB7C;
         }
         tmp = r29 * 0xc;
-        r3 = (u32)PADOriginCallback;
+        r3 = (u32)fn_800AA678;
         r6 = r30 + tmp;
-        r8 = (u32)PADOriginCallback;
+        r8 = (u32)fn_800AA678;
         r3 = r29 + 0x0;
         r4 = (u32)lbl_80478A20;
         r5 = 0x1;
@@ -748,9 +748,9 @@ void PADTypeAndStatusCallback(void) {
             tmp = r6 & 0x40000000;
             if (r5 != 0) {
                 tmp = r29 * 0xc;
-                r3 = (u32)PADOriginCallback;
+                r3 = (u32)fn_800AA678;
                 r6 = r30 + tmp;
-                r8 = (u32)PADOriginCallback;
+                r8 = (u32)fn_800AA678;
                 r3 = r29 + 0x0;
                 r4 = (u32)lbl_80478A20;
                 r5 = 0x1;
@@ -762,10 +762,10 @@ void PADTypeAndStatusCallback(void) {
                 goto L_800AAB7C;
             }
             tmp = r29 * 0xc;
-            r3 = (u32)PADProbeCallback;
+            r3 = (u32)fn_800AA7FC;
             r4 = r30 + r4;
             r6 = r30 + tmp;
-            r8 = (u32)PADProbeCallback;
+            r8 = (u32)fn_800AA7FC;
             r3 = r29 + 0x0;
             r5 = 0x3;
             r7 = 0x8;
@@ -1639,10 +1639,10 @@ void fn_800AB5B4(s32 spec) {
     __PADSpec = 0;
     switch (spec) {
     case 0:
-        lbl_80478A1C = (u32)SPEC0_MakeStatus;
+        lbl_80478A1C = (u32)fn_800AB614;
         break;
     case 1:
-        lbl_80478A1C = (u32)SPEC1_MakeStatus;
+        lbl_80478A1C = (u32)fn_800AB788;
         break;
     case 2:
     case 3:
@@ -1655,13 +1655,13 @@ void fn_800AB5B4(s32 spec) {
 }
 #endif
 
-/* SPEC0_MakeStatus - 0x800AB614 | size: 0x174 */
+/* fn_800AB614 - 0x800AB614 | size: 0x174 */
 #if 1
-asm void SPEC0_MakeStatus(void) {
-#include "src/dolphin/vi/VIFull_SPEC0_MakeStatus.inc"
+asm void fn_800AB614(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB614.inc"
 }
 #else
-void SPEC0_MakeStatus(void) {
+void fn_800AB614(void) {
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -1769,13 +1769,13 @@ void SPEC0_MakeStatus(void) {
 }
 #endif
 
-/* SPEC1_MakeStatus - 0x800AB788 | size: 0x174 */
+/* fn_800AB788 - 0x800AB788 | size: 0x174 */
 #if 1
-asm void SPEC1_MakeStatus(void) {
-#include "src/dolphin/vi/VIFull_SPEC1_MakeStatus.inc"
+asm void fn_800AB788(void) {
+#include "src/dolphin/vi/VIFull_fn_800AB788.inc"
 }
 #else
-void SPEC1_MakeStatus(void) {
+void fn_800AB788(void) {
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;

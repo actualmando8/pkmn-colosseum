@@ -87,8 +87,8 @@ extern void  fn_800D2B90(u32 param);                     /* GS renderer set floo
 
 /* Script / NPC / Sound / VFX */
 extern void  fn_800F915C(void);                          /* Particle cleanup */
-extern void  psRemoveParticle(void);                          /* Script cleanup */
-extern void  psRemoveGenerator(void);                          /* Generator cleanup */
+extern void  fn_80169DF8(void);                          /* Script cleanup */
+extern void  fn_80175B94(void);                          /* Generator cleanup */
 extern void  fn_8016AAAC(void);                          /* Script system reset */
 extern void  fn_800E8EFC(void);                          /* Material cleanup */
 extern void  fn_8018DB04(u32 param);                     /* People system notify */
@@ -568,8 +568,8 @@ void GSfloorThreadMain(void)
 
             /* Clean up subsystems */
             fn_800F915C();   /* Particle cleanup */
-            psRemoveParticle();   /* Script cleanup */
-            psRemoveGenerator();   /* Generator cleanup */
+            fn_80169DF8();   /* Script cleanup */
+            fn_80175B94();   /* Generator cleanup */
             fn_8016AAAC();   /* Script system reset */
             fn_800E8EFC();   /* Material cleanup */
 

@@ -56,7 +56,7 @@
  *
  * Calls into:
  *   fn_80123FBC: Pokemon party validation
- *   gamedataGetStatus: Get trainer data by ID
+ *   fn_80135938: Get trainer data by ID
  *   fn_801240C4: Set battle parameter
  *   fn_80123EF0: Configure battle participants
  *   fn_8012640C: Get battle field/arena ID
@@ -70,7 +70,7 @@
 
 /* Battle system */
 extern u8   fn_80123FBC(void* partyData);
-extern void gamedataGetStatus(s32 slot, s32 count);
+extern void fn_80135938(s32 slot, s32 count);
 extern void fn_801240C4(void* partyData, s32 paramId, s32 value);
 extern void fn_80123EF0(void* partyData, s32 p1, s32 p2, s32 p3, s32 p4, s32 p5);
 extern u16  fn_8012640C(void* partyData, s32 p1, s32 p2, s32 p3);

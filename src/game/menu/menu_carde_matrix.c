@@ -23,7 +23,7 @@ extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
 extern void fn_800F0308();
-extern void GScharLenCpy();
+extern void fn_800F9D24();
 extern void fn_801040A0();
 extern void fn_801040D0();
 extern void fn_801046B8();
@@ -646,12 +646,12 @@ void fn_8007CAB0(void) {
 void fn_8007CB54(u32 arg) {
     extern void* fn_80104704(u32 id);
     extern u32* fn_801040A0(void* obj);
-    extern void GScharLenCpy(u32 p, u32 arg, u32 size);
+    extern void fn_800F9D24(u32 p, u32 arg, u32 size);
     u32 p;
 
     p = *fn_801040A0(fn_80104704(0xa6));
     if (p != 0) {
-        GScharLenCpy(p, arg, 0x50);
+        fn_800F9D24(p, arg, 0x50);
         *(u16*)(p + 0x9E) = 0;
     }
     return;

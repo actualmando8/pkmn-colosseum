@@ -25,7 +25,7 @@
  *   fn_8010CC04 (GScolsys2_Reset)
  *   fn_8010CC54 (GScolsys2_Finalize)
  *   fn_8010CD6C (GScolsys2_Cleanup)
- *   _offsetCCD__FP12CCD_FILEHEAD (GScolsys2_RelocateWZX)
+ *   fn_8010CE04 (GScolsys2_RelocateWZX)
  *   fn_8010CFE4 (GScolsys2_LoadWZX)
  *   fn_8010D038 (GScolsys2_PopLayer)
  *   fn_8010D064 (GScolsys2_Init)
@@ -33,8 +33,8 @@
  *   fn_8010D20C (GScolsys2_DrawTriGroup)
  *   GScolsys2Draw (GScolsys2_Draw)
  *   fn_8010D8D4 (GScolsys2_DrawActive)
- *   GScolsys2WalkGetLayer (GScolsys2_FindNearestGround)
- *   getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec (GScolsys2_TriangleBoundsCheck)
+ *   fn_8010DE00 (GScolsys2_FindNearestGround)
+ *   fn_8010DEF0 (GScolsys2_TriangleBoundsCheck)
  *
  * Debug strings:
  *   "GScolsys2Draw : can't alloc display list memory."
@@ -69,7 +69,7 @@ extern void  fn_800C8710(const char* fmt, ...);         /* OSPanic / printf */
 /* Matrix / vector math helpers */
 extern void  fn_800A2D38(void);                         /* MTXIdentity or push */
 extern void  fn_800A2D64(void* mtxA, void* mtxB);      /* MTXConcat */
-extern void  PSMTXConcat(void* mtxDst, void* mtxSrc, void* mtxDst2); /* MTXMultVec */
+extern void  fn_800A2D98(void* mtxDst, void* mtxSrc, void* mtxDst2); /* MTXMultVec */
 extern void  fn_800A3244(void* mtxDst, void* mtxSrc, f32 scale);     /* MTXScaleApply */
 extern void  fn_800A32E8(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTransApply */
 extern void  fn_800A335C(void* mtxDst, void* mtxSrc, f32 tx, f32 ty, f32 tz); /* MTXTranslate */
@@ -650,14 +650,14 @@ s32 GScolsys2_BuildTransform(void* outMtx, u32 triIndex)
         f32* row = &identityMtx[axis * 3];
 
         fn_800A3244(tempMtx, row, angle);
-        PSMTXConcat(tempMtx, concatMtx, concatMtx);
+        fn_800A2D98(tempMtx, concatMtx, concatMtx);
     }
 
     /* Compute final concatenated matrix */
     fn_800A2D64(concatMtx, outMtx);
 
     /* Apply translation */
-    PSMTXConcat(outMtx, outMtx, outMtx);
+    fn_800A2D98(outMtx, outMtx, outMtx);
 
     return 1;
 }
@@ -715,11 +715,11 @@ s32 GScolsys2_BuildInverseTransform(void* outMtx, u32 triIndex)
         f32* row = &identityMtx[axis * 3];
 
         fn_800A3244(tempMtx, row, angle);
-        PSMTXConcat(tempMtx, concatMtx, concatMtx);
+        fn_800A2D98(tempMtx, concatMtx, concatMtx);
     }
 
     fn_800A2D64(concatMtx, outMtx);
-    PSMTXConcat(outMtx, outMtx, outMtx);
+    fn_800A2D98(outMtx, outMtx, outMtx);
 
     /* Apply translation offset from entry+0x00 */
     fn_800A32E8(outMtx, outMtx,
@@ -875,7 +875,7 @@ void GScolsys2_Cleanup(void)
 }
 
 /* ===================================================================
- * _offsetCCD__FP12CCD_FILEHEAD -- GScolsys2_RelocateWZX
+ * fn_8010CE04 -- GScolsys2_RelocateWZX
  *
  * Relocates all internal pointers in a WZX collision data block.
  *
@@ -1564,7 +1564,7 @@ void GScolsys2_DrawActive(void)
 }
 
 /* ===================================================================
- * GScolsys2WalkGetLayer -- GScolsys2_FindNearestGround
+ * fn_8010DE00 -- GScolsys2_FindNearestGround
  *
  * Finds the nearest ground triangle below a given position.
  *
@@ -1633,7 +1633,7 @@ s32 GScolsys2_FindNearestGround(Vec3f* pos, u8* outFloorType, u8* outAttribute)
 }
 
 /* ===================================================================
- * getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec -- GScolsys2_TriangleBoundsCheck
+ * fn_8010DEF0 -- GScolsys2_TriangleBoundsCheck
  *
  * Tests whether a 2D point (X, Z) falls within a collision triangle's
  * bounding box and passes all three edge cross-product tests.
@@ -1938,7 +1938,7 @@ void fn_8010CD6C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void _offsetCCD__FP12CCD_FILEHEAD(void) {
+void fn_8010CE04(void) {
     /* TODO: match -- 480 bytes at 0x8010CE04 */
 }
 #pragma pop
@@ -2010,7 +2010,7 @@ void fn_8010D8D4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GScolsys2WalkGetLayer(void) {
+void fn_8010DE00(void) {
     /* TODO: match -- 240 bytes at 0x8010DE00 */
 }
 #pragma pop
@@ -2019,7 +2019,7 @@ void GScolsys2WalkGetLayer(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec(void) {
+void fn_8010DEF0(void) {
     /* TODO: match -- 584 bytes at 0x8010DEF0 */
 }
 #pragma pop

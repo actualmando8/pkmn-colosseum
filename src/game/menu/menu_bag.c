@@ -68,7 +68,7 @@ extern u8    lbl_803A6AB0[];   /* Bag item cache (0x2B38 bytes) */
  * fn_80050844  0xECC  Bag main update loop (3788 bytes, msg switch 0x5BC-0xFEC)
  * fn_80051710  0x728  Pocket switching handler (1832 bytes)
  * fn_80051E38  0x122C Item use/give/toss processor (4652 bytes)
- * dbgMenuFightTrainerDataStatusInputDigit  0x0AC  Bag cleanup
+ * fn_80053064  0x0AC  Bag cleanup
  */
 
 

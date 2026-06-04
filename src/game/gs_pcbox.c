@@ -146,7 +146,7 @@ extern void* memset(void* dst, int val, u32 n);
 extern u8 lbl_803A1D40[];
 extern u8 lbl_803A1C20[];
 extern u8 lbl_802E4EB8[];
-extern s8 menuSubOpenYesNo(u8, s16, s16, u32);
+extern s8 fn_8001E074(u8, s16, s16, u32);
 #if 0
 asm void fn_8001C064(void) {
 #include "src/game/gs_pcbox_fn_8001C064.inc"
@@ -156,7 +156,7 @@ void fn_8001C064(void) {
     extern u8 lbl_802E4EB8[];
     extern u8 lbl_803A1C20[];
     extern u8 lbl_803A1D40[];
-    extern s8 menuSubOpenYesNo(u8, s16, s16, u32);
+    extern s8 fn_8001E074(u8, s16, s16, u32);
     extern void fn_8006AEEC();
     extern void fn_80106D3C();
     extern void fn_8011FDC8();
@@ -408,7 +408,7 @@ do {
         r4 = -0x1;
         r5 = -0x1;
         r6 = 0x0;
-        r24 = menuSubOpenYesNo((u8)r3, (s16)r4, (s16)r5, (u32)r6);
+        r24 = fn_8001E074((u8)r3, (s16)r4, (s16)r5, (u32)r6);
         r3 = 0x1;
         ((void(*)(void))fn_801069FC)();
         if ((s32)r24 != 0) {
@@ -692,7 +692,7 @@ extern s32 fn_801022B8();
 extern u32 fn_800F0308(void);
 extern void fn_801070F4(void);
 extern void fn_80121BB4(void);
-extern s8 menuSubOpenYesNo(u8, s16, s16, u32);
+extern s8 fn_8001E074(u8, s16, s16, u32);
 extern u32 fn_80019064(void);
 extern void fn_80018F54();
 extern void fn_8001D718(void);
@@ -1829,11 +1829,11 @@ u32 fn_8001D7E4(void) {
 
 /* 0x8001D834 | 0xB4 */
 #if 0
-asm void menuSubCalcColor(void) {
-#include "src/game/gs_pcbox_menuSubCalcColor.inc"
+asm void fn_8001D834(void) {
+#include "src/game/gs_pcbox_fn_8001D834.inc"
 }
 #else
-void menuSubCalcColor(void) {
+void fn_8001D834(void) {
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -1965,15 +1965,15 @@ extern void fn_8011F5C8(void);
 extern void fn_8011E778(void);
 extern void fn_8011E760(void);
 extern void fn_800FA280(void);
-extern void GScharCmp(void);
+extern void fn_800F9EE4(void);
 extern void fn_801231A4(void);
 #if 0
-asm void menuSubGetPokemonSexForFightDisp(void) {
-#include "src/game/gs_pcbox_menuSubGetPokemonSexForFightDisp.inc"
+asm void fn_8001D994(void) {
+#include "src/game/gs_pcbox_fn_8001D994.inc"
 }
 #else
-void menuSubGetPokemonSexForFightDisp(void) {
-    extern void GScharCmp();
+void fn_8001D994(void) {
+    extern void fn_800F9EE4();
     extern void fn_800FA280();
     extern void fn_8011E760();
     extern void fn_8011E778();
@@ -2022,7 +2022,7 @@ void menuSubGetPokemonSexForFightDisp(void) {
         r6 = 0x0;
         fn_8012640C();
         r4 = r31;
-        GScharCmp();
+        fn_800F9EE4();
         if ((s32)r3 != 0) break;
         r3 = 0x2;
         return;
@@ -2886,8 +2886,8 @@ void fn_8001EA98(void) {
 #endif
 
 /* 0x8001EC08 | 0x370 */
-extern void sin(void);
-extern void cos(void);
+extern void fn_800CE148(void);
+extern void fn_800CDBE0(void);
 extern void _savefpr_26(void);
 extern void _restfpr_26(void);
 extern u8 lbl_803A1D60[];
@@ -2909,8 +2909,8 @@ void fn_8001EC08(void) {
     extern f64 lbl_8047B7F0;
     extern f64 lbl_8047B7F8;
     extern f64 lbl_8047B800;
-    extern void cos();
-    extern void sin();
+    extern void fn_800CDBE0();
+    extern void fn_800CE148();
     extern void fn_800D5BA0();
     extern void fn_800D61E4();
     extern void fn_800D6728();
@@ -3008,13 +3008,13 @@ void fn_8001EC08(void) {
         f0 = f28 * f0;
         f26 = f0 * f30;
         f1 = f26;
-        sin();
+        fn_800CE148();
         f0 = f0 - f29;
         f0 = f31 * f1 + f0;
         f1 = f26;
         f0 = (f64)(s32)f0;
         *(u16*)((u8*)r26 + 0x0) = tmp;
-        cos();
+        fn_800CDBE0();
         tmp = 0x0;
         f0 = f0 - f29;
         f0 = f31 * f1 + f0;
@@ -3022,13 +3022,13 @@ void fn_8001EC08(void) {
         f0 = (f64)(s32)f0;
         *(u16*)((u8*)r26 + 0x2) = r3;
         *(u32*)((u8*)r26 + 0x4) = tmp;
-        sin();
+        fn_800CE148();
         f0 = f0 - f29;
         f0 = f27 * f1 + f0;
         f1 = f26;
         f0 = (f64)(s32)f0;
         *(u16*)((u8*)r25 + 0x0) = tmp;
-        cos();
+        fn_800CDBE0();
         tmp = (s32)r21 >> 3;
         r3 = r27 + 0x0;
         tmp = tmp << 3;
@@ -3459,7 +3459,7 @@ void fn_8001F304(void) {
     extern f32 lbl_8047B840;
     extern f32 lbl_8047B844;
     extern f32 lbl_8047B848;
-    extern void sin();
+    extern void fn_800CE148();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -3545,7 +3545,7 @@ void fn_8001F304(void) {
                     }
                     f0 = f1 * f0;
                     f1 = f2 * f0;
-                    sin();
+                    fn_800CE148();
                     f3 = (f32)f1;
                     f2 = lbl_8047B844;
                     f1 = lbl_8047B840;
@@ -4926,7 +4926,7 @@ extern u32 fn_80144088(u32 a);
 extern void fn_800FB680(void);
 extern u32 fn_80144014(u32 a);
 extern u32 fn_800FA444(u32 a);
-extern void itemGetStatus(void);
+extern void fn_80142CF4(void);
 extern u8 lbl_80266BF0[];
 #if 0
 asm void fn_800192A8(void) {
@@ -4998,7 +4998,7 @@ s32 fn_800192A8(u8* a, u8* b) {
         r31_acc = 0;
         while ((s32)r30 < (s32)(u16)sp_8) {
             if (fn_801429E8((void*)r29) != 0) {
-                if (((u32(*)(u32,u32,u32,u32))itemGetStatus)((u32)r29, 0, 0x1b, 0) == r28b) {
+                if (((u32(*)(u32,u32,u32,u32))fn_80142CF4)((u32)r29, 0, 0x1b, 0) == r28b) {
                     r31_acc += (u32)fn_80143C50((void*)r29);
                 }
             }
@@ -6100,14 +6100,14 @@ s32 fn_8001DA60(void* a) {
 #pragma peephole reset
 #endif
 
-/* menuSubOpenYesNo - 0x8001E074 | size: 0x110 */
+/* fn_8001E074 - 0x8001E074 | size: 0x110 */
 #if 0
-asm void menuSubOpenYesNo(void) {
-#include "src/game/gs_pcbox_menuSubOpenYesNo.inc"
+asm void fn_8001E074(void) {
+#include "src/game/gs_pcbox_fn_8001E074.inc"
 }
 #else
 #pragma optimization_level 4
-s8 menuSubOpenYesNo(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
+s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
     extern void* fn_801046B8();
     extern s32 fn_801026A4(s32, ...);
     extern void fn_80102868(s32, s16, s16);

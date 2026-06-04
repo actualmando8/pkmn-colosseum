@@ -455,7 +455,7 @@ void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr) {
 /* ----------------------------------------------------------------
  * MSL MSL_C ansi_files.c — __flush_all.
  * Walks the __files FILE list and fflush()es every open file.
- * (fflush = fflush; FILE layout from MSL ansi_files.h.)
+ * (fn_800C7904 = fflush; FILE layout from MSL ansi_files.h.)
  * ---------------------------------------------------------------- */
 
 enum __file_kinds {
@@ -500,7 +500,7 @@ typedef struct _MSL_FILE {
 } MSL_FILE;
 
 extern MSL_FILE __files;        /* &__files._stdin == &__files */
-extern int fflush(MSL_FILE* file);   /* fflush */
+extern int fn_800C7904(MSL_FILE* file);   /* fflush */
 
 /* fn_800C53E8 - 0x800C53E8 | size: 0x70 — __flush_all */
 unsigned int fn_800C53E8(void) {
@@ -508,7 +508,7 @@ unsigned int fn_800C53E8(void) {
     MSL_FILE* file = &__files;
 
     while (file) {
-        if (file->file_mode.file_kind != __closed_file && fflush(file)) {
+        if (file->file_mode.file_kind != __closed_file && fn_800C7904(file)) {
             ret = -1;
         }
         file = file->next_file;

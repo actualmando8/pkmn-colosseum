@@ -9,11 +9,11 @@
  *   fn_8010EFE4 (GSfield_LinePlaneTest)
  *   fn_8010F188 (GSfield_ArcTest)
  *   fn_8010F320 (GSfield_ArcTestReverse)
- *   GScolsys2UtilGetCpPlaneLine (GSfield_PointInBounds)
- *   GScolsys2UtilGetCpLinePoint (GSfield_TriangleBarycentric)
+ *   fn_8010F4B8 (GSfield_PointInBounds)
+ *   fn_8010F5A4 (GSfield_TriangleBarycentric)
  *   fn_8010F6A0 (GSfield_GetNearestTriangle)
- *   GScolsy2UtilChkInTri (GSfield_FindGroundHeight)
- *   GScolsy2UtilGetCpPlanePoint (GSfield_QueryGroundType)
+ *   fn_8010F71C (GSfield_FindGroundHeight)
+ *   fn_8010FA54 (GSfield_QueryGroundType)
  *   fn_8010FAF4 (GSfield_MultiRayCast)
  *   fn_8010FDF8 (GSfield_RayTriangleIntersect)
  *   fn_8010FFC4 (GSfield_SegmentTriTest)
@@ -45,7 +45,7 @@
  *   fn_80112FEC (GSfield_AddObject)
  *   fn_80113248 (GSfield_RemoveObject)
  *   fn_801134E4 (GSfield_MoveObject)
- *   floorChangePos (GSfield_SetObjectVisible)
+ *   fn_80113778 (GSfield_SetObjectVisible)
  *   fn_80113828 (GSfield_GetObjectPosition)
  *   fn_8011388C (GSfield_SetObjectPosition)
  *   fn_8011392C (GSfield_GetObjectRotX)
@@ -82,7 +82,7 @@
  *   - Heavy use of fn_800A37CC (MTXMultVec3) for coordinate transforms
  *   - Calls to fn_8010C7BC (GScolsys2_QueryTriVisible) for per-tri checks
  *   - Calls to fn_8010CA30 / fn_8010C8D0 for forward/inverse transforms
- *   - Calls to getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec (GScolsys2_TriangleBoundsCheck)
+ *   - Calls to fn_8010DEF0 (GScolsys2_TriangleBoundsCheck)
  *   - Float comparisons with parametric t values (ray intersection)
  *   - Iteration over triangle vertex arrays (stride 0x34 per triangle)
  *   - Result arrays capped at 8 entries (GSFIELD_MAX_QUERY_RESULTS)
@@ -108,7 +108,7 @@ extern void* fn_8010CBC0(void);                         /* GScolsys2_GetWZXData 
 extern s32   fn_8010C7BC(u32 triIdx, void* outFlag);    /* GScolsys2_QueryTriVisible */
 extern void  fn_8010CA30(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildInverseTransform */
 extern void  fn_8010C8D0(void* mtxOut, u32 layerIdx);   /* GScolsys2_BuildTransform */
-extern s32   getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec(void* result, void* origin,
+extern s32   fn_8010DEF0(void* result, void* origin,
                           void* verts, void* normal);    /* GScolsys2_TriangleBoundsCheck */
 
 /* ===== String constants (rodata) ===== */
@@ -143,7 +143,7 @@ extern u8 lbl_80404C68[];  /* GScolsys2 collision state */
 s32 GSfield_RayCast(void* origin, void* direction) {
     /* TODO: match -- 824 bytes at 0x8010E138 */
     /* Calls: fn_8010CBC0, fn_8010C7BC, fn_8010CA30, fn_8010C8D0,
-     *        fn_800A37CC, getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec */
+     *        fn_800A37CC, fn_8010DEF0 */
 }
 #pragma pop
 
@@ -206,7 +206,7 @@ s32 GSfield_ArcTest(void* center, f32 radius, void* result) {
 #pragma pop
 
 /* ==================================================================
- * GScolsy2UtilChkInTri -- GSfield_FindGroundHeight
+ * fn_8010F71C -- GSfield_FindGroundHeight
  *
  * Find the ground height at a given XZ position by casting a
  * vertical ray downward. 824 bytes.
@@ -301,7 +301,7 @@ void fn_8010F320(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GScolsys2UtilGetCpPlaneLine(void) {
+void fn_8010F4B8(void) {
     /* TODO: match -- 236 bytes at 0x8010F4B8 */
 }
 #pragma pop
@@ -310,7 +310,7 @@ void GScolsys2UtilGetCpPlaneLine(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GScolsys2UtilGetCpLinePoint(void) {
+void fn_8010F5A4(void) {
     /* TODO: match -- 252 bytes at 0x8010F5A4 */
 }
 #pragma pop
@@ -328,7 +328,7 @@ void fn_8010F6A0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GScolsy2UtilGetCpPlanePoint(void) {
+void fn_8010FA54(void) {
     /* TODO: match -- 160 bytes at 0x8010FA54 */
 }
 #pragma pop
@@ -583,7 +583,7 @@ void fn_801134E4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void floorChangePos(void) {
+void fn_80113778(void) {
     /* TODO: match -- 176 bytes at 0x80113778 */
 }
 #pragma pop

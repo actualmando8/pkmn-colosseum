@@ -95,7 +95,7 @@ extern u32   fn_800BE31C(void);    /* rand or tick */
 extern u32   fn_800B8FD8(void*);   /* register fn, returns handle */
 extern void  fn_800BD91C(s32, s32);
 extern void  fn_800B8C58(s32);
-extern void  GSgfxBeginBackFBCapture(u32, void*, void*);
+extern void  fn_800DC390(u32, void*, void*);
 extern u32   fn_800EF5FC(s32, s32, s32, s32, s32);
 extern u32   fn_800EC1BC(u32);
 extern void  fn_800ECCA8(u32, u32);
@@ -809,7 +809,7 @@ void fn_80103484(void* p, void* q) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void _menuGetAgbKeyInfo__FlPUs(void) {
+void fn_801034DC(void) {
     /* TODO: match -- 312 bytes at 0x801034DC */
 }
 #pragma pop
@@ -1707,7 +1707,7 @@ void fn_8010925C(void* head) {
 /* 0x80109290 | 0xC8 */
 #pragma push
 #pragma peephole off
-void* winSpriteAdd(void* root) {
+void* fn_80109290(void* root) {
     void* r30 = root;
     if (r30 == (void*)0) { return (void*)0; }
     {
@@ -1854,7 +1854,7 @@ u8 fn_8010977C(u32 param) {
     lbl_8047AD34 = lbl_8047CE50;
     lbl_8047AD38 = lbl_8047CE50;
     lbl_8047AD3C = lbl_8047CE50;
-    GSgfxBeginBackFBCapture(lbl_8047AD28, fn_80109884, (void*)0);
+    fn_800DC390(lbl_8047AD28, fn_80109884, (void*)0);
     r31 = (u8)r31;
     goto check;
 loop:
@@ -1893,7 +1893,7 @@ s32 fn_80109884(void) {
 /* 0x80109894 | 0xA0 */
 #pragma push
 #pragma peephole off
-s32 menuModelSetMotion(void* p, u32 val) {
+s32 fn_80109894(void* p, u32 val) {
     void* r31 = p;
     if (r31 == (void*)0) { return 0; }
     if (*(u8*)((u8*)r31 + 0x1) != 0) {

@@ -28,48 +28,48 @@
  *     Secondary spawn processing. Handles additional NPC setup tasks
  *     like walk path configuration and interaction zones.
  *   fn_80146E88 (0x64 bytes)   -- peopleFieldSpawnFinalize
- *   seqPause (0x27C bytes)  -- peopleFieldSpawnMotion
+ *   fn_80146EEC (0x27C bytes)  -- peopleFieldSpawnMotion
  *     Configure motion/animation for a newly spawned NPC.
  *
  * 0x80147168 - 0x8014ABE8: People movement & camera (0x3A80 bytes)
- *   seqStop (0x2B0 bytes)  -- peopleFieldMoveToTarget
+ *   fn_80147168 (0x2B0 bytes)  -- peopleFieldMoveToTarget
  *     Move an NPC toward a target position with interpolation.
- *   seqSpeed (0xE4 bytes)   -- peopleFieldCalcDirection
+ *   fn_80147418 (0xE4 bytes)   -- peopleFieldCalcDirection
  *     Calculate facing direction toward target.
- *   seqContinue (0x108 bytes)  -- peopleFieldUpdateFacing
- *   seqMute (0xBC bytes)   -- peopleFieldCheckCollision
- *   seqVolume (0x1CC bytes)  -- peopleFieldMoveWalkPath
- *   seqCrossFade (0xB58 bytes)  -- peopleFieldCameraCutscene
+ *   fn_801474FC (0x108 bytes)  -- peopleFieldUpdateFacing
+ *   fn_80147604 (0xBC bytes)   -- peopleFieldCheckCollision
+ *   fn_801476C0 (0x1CC bytes)  -- peopleFieldMoveWalkPath
+ *   fn_8014788C (0xB58 bytes)  -- peopleFieldCameraCutscene
  *     Large camera control function for cutscene NPC movement.
  *     Manages camera tracking of NPCs during scripted sequences.
- *   GenerateNextTrackEvent (0x218 bytes)  -- peopleFieldCameraHelper
+ *   fn_801483E4 (0x218 bytes)  -- peopleFieldCameraHelper
  *   fn_801485FC (0xA94 bytes)  -- peopleFieldCameraMain
  *     Main camera positioning logic for field NPCs.
- *   InitTrackEvents (0x174 bytes)  -- peopleFieldCameraBlend
- *   HandleTrackEvents (0x49C bytes)  -- peopleFieldCameraTarget
+ *   fn_80149090 (0x174 bytes)  -- peopleFieldCameraBlend
+ *   fn_80149204 (0x49C bytes)  -- peopleFieldCameraTarget
  *     Camera target tracking -- follows an NPC as the camera target.
  *   fn_801496A0 (0x9F4 bytes)  -- peopleFieldCameraUpdate
  *     Per-frame camera update when tracking NPCs.
- *   seqInit (0x1A8 bytes)  -- peopleFieldCameraReset
+ *   fn_8014A094 (0x1A8 bytes)  -- peopleFieldCameraReset
  *   fn_8014A23C (0x44 bytes)   -- peopleFieldCameraGetState
  *   fn_8014A280 (0x34 bytes)   -- peopleFieldCameraSetState
  *   fn_8014A2B4 (0x78 bytes)   -- peopleFieldCameraInit
- *   do_voice_portamento (0x2A0 bytes)  -- peopleFieldCameraSetup
- *   StartLayer (0x3C0 bytes)  -- peopleFieldCameraAnimate
- *   StartKeymap (0x25C bytes)  -- peopleFieldCameraInterp
+ *   fn_8014A32C (0x2A0 bytes)  -- peopleFieldCameraSetup
+ *   fn_8014A5CC (0x3C0 bytes)  -- peopleFieldCameraAnimate
+ *   fn_8014A98C (0x25C bytes)  -- peopleFieldCameraInterp
  *   fn_8014ABE8 (0x45C bytes)  -- peopleFieldCameraFinalize
  *
  * 0x8014B044 - 0x8014CF30: People animation system (0x1EEC bytes)
- *   LowPrecisionHandler (0x744 bytes)  -- peopleFieldAnimUpdate
+ *   fn_8014B044 (0x744 bytes)  -- peopleFieldAnimUpdate
  *     Per-frame animation update. Blends walk/run/idle animations
  *     based on NPC movement state.
  *   fn_8014B788 (0x6FC bytes)  -- peopleFieldAnimBlend
  *     Animation blending between two motion sequences.
- *   synthAddJob (0x150 bytes)  -- peopleFieldAnimSetRate
+ *   fn_8014BE84 (0x150 bytes)  -- peopleFieldAnimSetRate
  *   fn_8014BFD4 (0x64 bytes)   -- peopleFieldAnimGetFrame
  *   fn_8014C038 (0x44 bytes)   -- peopleFieldAnimSetFrame
  *   fn_8014C07C (0x28 bytes)   -- peopleFieldAnimGetLoop
- *   synthHandle (0x510 bytes)  -- peopleFieldAnimApply
+ *   fn_8014C0A4 (0x510 bytes)  -- peopleFieldAnimApply
  *     Apply animation data to model joints.
  *   fn_8014C5B4 (0x34 bytes)   -- peopleFieldAnimHelper1
  *   fn_8014C5E8 (0xC8 bytes)   -- peopleFieldAnimHelper2
@@ -78,7 +78,7 @@
  *   fn_8014C878 (0x84 bytes)   -- peopleFieldAnimHelper5
  *   fn_8014C8FC (0x88 bytes)   -- peopleFieldAnimHelper6
  *
- *   synthVolume (0x530 bytes)  -- peopleFieldScriptCommand
+ *   fn_8014C984 (0x530 bytes)  -- peopleFieldScriptCommand
  *     Script command handler for NPC control. Processes script bytecodes
  *     (0xFA=walk, 0xFB=stop, 0xFC=run, 0xFD=face, 0xFE=wait, 0xFF=anim).
  *     Called from fn_801621BC (script dispatch). Iterates over all NPC
@@ -90,7 +90,7 @@
  *   fn_8014CF30 (0xD0 bytes)   -- peopleFieldScriptSetup
  *
  * 0x8014D000 - 0x8014E7CC: People field init & state (0x17CC bytes)
- *   synthInit (0x574 bytes)  -- peopleFieldSystemInit
+ *   fn_8014D000 (0x574 bytes)  -- peopleFieldSystemInit
  *     Initialize the entire field people subsystem. Allocates the NPC
  *     work array (struct size 0x404 per slot, count passed as parameter).
  *     Sets up global state in sbss (lbl_8047AF44-lbl_8047AF5C).
@@ -115,8 +115,8 @@
  *   fn_8014D8C0 (0x8 bytes)    -- getFieldWorkScale (returns immediately)
  *   fn_8014D8C8 (0x60 bytes)   -- setFieldWorkScale
  *   fn_8014D928 (0x94 bytes)   -- setFieldWorkMotion
- *   sndOutputMode (0xEC bytes)   -- setFieldWorkMotionBlend
- *   sndSetAuxProcessingCallbacks (0x158 bytes)  -- setFieldWorkMotionFull
+ *   fn_8014D9BC (0xEC bytes)   -- setFieldWorkMotionBlend
+ *   fn_8014DAA8 (0x158 bytes)  -- setFieldWorkMotionFull
  *   fn_8014DC00 (0xA8 bytes)   -- getFieldWorkMotionFrame
  *   fn_8014DCA8 (0xF0 bytes)   -- setFieldWorkMotionFrame
  *   fn_8014DD98 (0x20 bytes)   -- getFieldWorkState1
@@ -127,7 +127,7 @@
  *     Large per-frame update that processes all active NPC slots.
  *   fn_8014E7CC (0x4 bytes)    -- nop / placeholder
  *   fn_8014E7D0 (0x84 bytes)   -- peopleFieldCheckActive
- *   GetPrivateIndex (0x160 bytes)  -- peopleFieldActivate
+ *   fn_8014E854 (0x160 bytes)  -- peopleFieldActivate
  *
  * 0x8014E9B4 - 0x80152AF8: People rendering system (0x4144 bytes)
  *   fn_8014E9B4 (0x2E4 bytes)  -- peopleFieldRenderSetup
@@ -135,66 +135,66 @@
  *     (3 external callers in the 0x801E2xxx range).
  *   fn_8014EC98 (0x34 bytes)   -- peopleFieldRenderHelper1
  *   fn_8014ECCC (0x44 bytes)   -- peopleFieldRenderHelper2
- *   streamOutputModeChanged (0x130 bytes)  -- peopleFieldRenderHelper3
+ *   fn_8014ED10 (0x130 bytes)  -- peopleFieldRenderHelper3
  *   fn_8014EE40 (0x458 bytes)  -- peopleFieldRenderMain
  *     Main NPC rendering function. Submits model draw commands.
  *   fn_8014F298 (0x44 bytes)   -- peopleFieldRenderFinalize
  *   fn_8014F2DC (0x55C bytes)  -- peopleFieldRenderModel
  *     Detailed model rendering with material and texture setup.
- *   sndStreamFree (0x6D4 bytes)  -- peopleFieldRenderComplex
+ *   fn_8014F838 (0x6D4 bytes)  -- peopleFieldRenderComplex
  *     Complex NPC rendering with shadows and reflections.
  *     Called from script event handlers (0x801E34F0, 0x801E3F54).
- *   sndStreamActivate (0x658 bytes)  -- peopleFieldRenderShadow
- *   sndStreamDeactivate (0x714 bytes)  -- peopleFieldRenderLighting
- *   dataInsertKeymap (0x1F0 bytes)  -- peopleFieldRenderMaterial
+ *   fn_8014FF0C (0x658 bytes)  -- peopleFieldRenderShadow
+ *   fn_80150564 (0x714 bytes)  -- peopleFieldRenderLighting
+ *   fn_80150C78 (0x1F0 bytes)  -- peopleFieldRenderMaterial
  *   fn_80150E68 (0x17C bytes)  -- peopleFieldRenderTexture
- *   dataInsertLayer (0x248 bytes)  -- peopleFieldRenderMatrix
- *   dataRemoveLayer (0x1C4 bytes)  -- peopleFieldRenderJoints
- *   dataInsertCurve (0x204 bytes)  -- peopleFieldRenderBones
+ *   fn_80150FE4 (0x248 bytes)  -- peopleFieldRenderMatrix
+ *   fn_8015122C (0x1C4 bytes)  -- peopleFieldRenderJoints
+ *   fn_801513F0 (0x204 bytes)  -- peopleFieldRenderBones
  *   fn_801515F4 (0x17C bytes)  -- peopleFieldRenderSkin
  *   fn_80151770 (0x188 bytes)  -- peopleFieldRenderFace
  *   fn_801518F8 (0xD8 bytes)   -- peopleFieldRenderExpression
  *   fn_801519D0 (0x98 bytes)   -- peopleFieldRenderEyes
  *   fn_80151A68 (0x11C bytes)  -- peopleFieldRenderMouth
  *   fn_80151B84 (0x304 bytes)  -- peopleFieldRenderCloth
- *   dataRemoveMacro (0x284 bytes)  -- peopleFieldRenderHair
+ *   fn_80151E88 (0x284 bytes)  -- peopleFieldRenderHair
  *   fn_8015210C - fn_80152434  -- render sub-helpers (8 small funcs)
  *   fn_80152444 (0x9C bytes)   -- peopleFieldRenderSubmit
- *   dataInit (0xE4 bytes)   -- peopleFieldRenderFlush
+ *   fn_801524E0 (0xE4 bytes)   -- peopleFieldRenderFlush
  *   fn_801525C4 (0x20 bytes)   -- peopleFieldRenderGetState
- *   mcmdWait (0x2F0 bytes)  -- peopleFieldRenderSetState
+ *   fn_801525E4 (0x2F0 bytes)  -- peopleFieldRenderSetState
  *
  * 0x801528D4 - 0x80155078: People pathfinding & walk (0x27A4 bytes)
- *   mcmdGosub (0xD0 bytes)   -- peopleFieldPathInit
- *   mcmdLoop (0x154 bytes)  -- peopleFieldPathSetTarget
+ *   fn_801528D4 (0xD0 bytes)   -- peopleFieldPathInit
+ *   fn_801529A4 (0x154 bytes)  -- peopleFieldPathSetTarget
  *   fn_80152AF8 (0x18C bytes)  -- peopleFieldPathCalcRoute
- *   mcmdAddKey (0xD8 bytes)   -- peopleFieldPathUpdate
+ *   fn_80152C84 (0xD8 bytes)   -- peopleFieldPathUpdate
  *   fn_80152D5C (0x1FC bytes)  -- peopleFieldPathFollow
- *   mcmdVibrato (0x17C bytes)  -- peopleFieldPathInterp
- *   DoSetPitch (0x1A0 bytes)  -- peopleFieldPathSmooth
- *   mcmdSetADSR (0x258 bytes)  -- peopleFieldPathCollide
- *   mcmdSetADSRFromCtrl (0x12C bytes)  -- peopleFieldPathAvoid
- *   mcmdSetPitchADSR (0x27C bytes)  -- peopleFieldPathWalk
+ *   fn_80152F58 (0x17C bytes)  -- peopleFieldPathInterp
+ *   fn_801530D4 (0x1A0 bytes)  -- peopleFieldPathSmooth
+ *   fn_80153274 (0x258 bytes)  -- peopleFieldPathCollide
+ *   fn_801534CC (0x12C bytes)  -- peopleFieldPathAvoid
+ *   fn_801535F8 (0x27C bytes)  -- peopleFieldPathWalk
  *   fn_80153874 (0x9C bytes)   -- peopleFieldPathRun
  *   fn_80153910 (0x9C bytes)   -- peopleFieldPathStop
- *   mcmdScaleVolume (0x134 bytes)  -- peopleFieldPathTurn
- *   mcmdEnvelope (0x130 bytes)  -- peopleFieldPathFace
- *   mcmdFadeIn (0x13C bytes)  -- peopleFieldPathAlign
- *   mcmdRandomKey (0x19C bytes)  -- peopleFieldPathEval
- *   fn_80153EE8 - mcmdPortamento  -- Walk path node evaluators
+ *   fn_801539AC (0x134 bytes)  -- peopleFieldPathTurn
+ *   fn_80153AE0 (0x130 bytes)  -- peopleFieldPathFace
+ *   fn_80153C10 (0x13C bytes)  -- peopleFieldPathAlign
+ *   fn_80153D4C (0x19C bytes)  -- peopleFieldPathEval
+ *   fn_80153EE8 - fn_80154F14  -- Walk path node evaluators
  *     13 functions of identical size 0x104 each (fn_80153EE8 through
  *     fn_80154B18), plus 3 larger variants (fn_80154C1C 0x17C,
- *     fn_80154D98 0x17C, mcmdPortamento 0x164).
+ *     fn_80154D98 0x17C, fn_80154F14 0x164).
  *     These appear to be walk path node type handlers, one per node type.
  *     The repetitive 0x104-byte size suggests a vtable-like dispatch.
  *
  * 0x80155078 - 0x80158BB4: People interaction & talk (0x3B3C bytes)
  *   fn_80155078 (0x68 bytes)   -- peopleFieldInteractInit
- *   mcmdVarCalculation (0x220 bytes)  -- peopleFieldInteractCheck
- *   mcmdIfVarCompare (0x14C bytes)  -- peopleFieldInteractStart
- *   mcmdSendMessage (0x244 bytes)  -- peopleFieldInteractProcess
+ *   fn_801550E0 (0x220 bytes)  -- peopleFieldInteractCheck
+ *   fn_80155300 (0x14C bytes)  -- peopleFieldInteractStart
+ *   fn_8015544C (0x244 bytes)  -- peopleFieldInteractProcess
  *   fn_80155690 (0x80 bytes)   -- peopleFieldInteractEnd
- *   mcmdSetKeyGroup (0xDC bytes)   -- peopleFieldInteractSetup
+ *   fn_80155710 (0xDC bytes)   -- peopleFieldInteractSetup
  *
  *   fn_801557EC (0xF58 bytes)  -- peopleFieldResetState
  *     Very large function (3,928 bytes). Resets an NPC's full state:
@@ -205,51 +205,51 @@
  *     This is the NPC "soft reset" for when an NPC returns to idle.
  *
  *   fn_80156744 (0x150 bytes)  -- peopleFieldTalkSetup
- *   macSampleEndNotify (0xAC bytes)   -- peopleFieldTalkCheck
- *   macSetExternalKeyoff (0xF0 bytes)   -- peopleFieldTalkStart
- *   macSetPedalState (0x108 bytes)  -- peopleFieldTalkProcess
- *   TimeQueueAdd (0xA4 bytes)   -- peopleFieldTalkEnd
- *   macMakeActive (0x108 bytes)  -- peopleFieldTalkFacing
- *   macMakeInactive (0xFC bytes)   -- peopleFieldTalkDistance
+ *   fn_80156894 (0xAC bytes)   -- peopleFieldTalkCheck
+ *   fn_80156940 (0xF0 bytes)   -- peopleFieldTalkStart
+ *   fn_80156A30 (0x108 bytes)  -- peopleFieldTalkProcess
+ *   fn_80156B38 (0xA4 bytes)   -- peopleFieldTalkEnd
+ *   fn_80156BDC (0x108 bytes)  -- peopleFieldTalkFacing
+ *   fn_80156CE4 (0xFC bytes)   -- peopleFieldTalkDistance
  *   fn_80156DE0 (0x438 bytes)  -- peopleFieldTalkMain
  *     Main talk processing -- checks distance, angle, and initiates
  *     the NPC talk sequence.
  *
  * 0x80157218 - 0x801589FC: People model helpers (0x17E4 bytes)
  *   fn_80157218 (0x68 bytes)   -- peopleFieldModelInit
- *   vidInit (0xE0 bytes)   -- peopleFieldModelLoad
+ *   fn_80157280 (0xE0 bytes)   -- peopleFieldModelLoad
  *   fn_80157360 (0x350 bytes)  -- peopleFieldModelSetup
  *   fn_801576B0 (0x14 bytes)   -- peopleFieldModelGetPtr
  *   fn_801576C4 (0x104 bytes)  -- peopleFieldModelApplyTransform
  *   fn_801577C8 (0x50 bytes)   -- peopleFieldModelSetAnim
- *   voiceSetPriority (0x24C bytes)  -- peopleFieldModelAnimUpdate
+ *   fn_80157818 (0x24C bytes)  -- peopleFieldModelAnimUpdate
  *   fn_80157A64 (0x460 bytes)  -- peopleFieldModelAnimBlend
- *   voiceFree (0x1C4 bytes)  -- peopleFieldModelAnimSmooth
- *   synthInitAllocationAids (0x2A0 bytes)  -- peopleFieldModelRender
+ *   fn_80157EC4 (0x1C4 bytes)  -- peopleFieldModelAnimSmooth
+ *   fn_80158088 (0x2A0 bytes)  -- peopleFieldModelRender
  *   fn_80158328 (0xFC bytes)   -- peopleFieldModelShadow
- *   voiceUnblock (0x218 bytes)  -- peopleFieldModelLighting
- *   voiceKill (0x234 bytes)  -- peopleFieldModelMaterial
- *   voiceKillSound (0xC4 bytes)   -- peopleFieldModelTexture
+ *   fn_80158424 (0x218 bytes)  -- peopleFieldModelLighting
+ *   fn_8015863C (0x234 bytes)  -- peopleFieldModelMaterial
+ *   fn_80158870 (0xC4 bytes)   -- peopleFieldModelTexture
  *   fn_80158934 (0x74 bytes)   -- peopleFieldModelGetJoint
  *   fn_801589A8 (0x54 bytes)   -- peopleFieldModelResetAnim
  *   fn_801589FC (0x74 bytes)   -- peopleFieldModelGetBone
  *
  * 0x80158A70 - 0x80159C48: People collision & floor (0x11D8 bytes)
- *   voiceInitLastStarted (0x144 bytes)  -- peopleFieldCollisionInit
+ *   fn_80158A70 (0x144 bytes)  -- peopleFieldCollisionInit
  *   fn_80158BB4 (0x3C bytes)   -- peopleFieldCollisionGetPtr
- *   sndGetPitch (0xE4 bytes)   -- peopleFieldCollisionUpdate
+ *   fn_80158BF0 (0xE4 bytes)   -- peopleFieldCollisionUpdate
  *   fn_80158CD4 (0x58 bytes)   -- peopleFieldCollisionTest
- *   salChangeADSRState (0x26C bytes)  -- peopleFieldCollisionSolve
+ *   fn_80158D2C (0x26C bytes)  -- peopleFieldCollisionSolve
  *   fn_80158F98 (0x28 bytes)   -- peopleFieldFloorGetHeight
- *   adsrStartRelease (0x150 bytes)  -- peopleFieldFloorSnap
- *   adsrRelease (0x168 bytes)  -- peopleFieldFloorUpdate
- *   adsrHandle (0x198 bytes)  -- peopleFieldFloorCollide
+ *   fn_80158FC0 (0x150 bytes)  -- peopleFieldFloorSnap
+ *   fn_80159110 (0x168 bytes)  -- peopleFieldFloorUpdate
+ *   fn_80159278 (0x198 bytes)  -- peopleFieldFloorCollide
  *   fn_80159410 (0x84 bytes)   -- peopleFieldFloorGetNormal
- *   vsInit (0xBC bytes)   -- peopleFieldFloorSetElevation
+ *   fn_80159494 (0xBC bytes)   -- peopleFieldFloorSetElevation
  *   fn_80159550 (0x248 bytes)  -- peopleFieldFloorCalcSlope
- *   vsSampleEndNotify (0xA8 bytes)   -- peopleFieldFloorGetRegion
+ *   fn_80159798 (0xA8 bytes)   -- peopleFieldFloorGetRegion
  *   fn_80159840 (0x1F8 bytes)  -- peopleFieldFloorRegionCheck
- *   vsSampleUpdates (0x210 bytes)  -- peopleFieldFloorBoundary
+ *   fn_80159A38 (0x210 bytes)  -- peopleFieldFloorBoundary
  *
  * 0x80159C48 - 0x8015D408: People script integration (0x37C0 bytes)
  *   fn_80159C48 (0xC bytes)    -- peopleFieldScriptNop
@@ -258,17 +258,17 @@
  *   fn_80159EF0 (0x32C bytes)  -- peopleFieldScriptSetVar
  *   fn_8015A21C (0x14C bytes)  -- peopleFieldScriptCommand2
  *   fn_8015A368 (0x11C bytes)  -- peopleFieldScriptTrigger
- *   salInitDspCtrl (0x3B4 bytes)  -- peopleFieldScriptProcess
+ *   fn_8015A484 (0x3B4 bytes)  -- peopleFieldScriptProcess
  *   fn_8015A838 (0x38 bytes)   -- peopleFieldScriptHelper1
- *   salExitDspCtrl (0xE0 bytes)   -- peopleFieldScriptHelper2
- *   salActivateStudio (0x150 bytes)  -- peopleFieldScriptHelper3
+ *   fn_8015A870 (0xE0 bytes)   -- peopleFieldScriptHelper2
+ *   fn_8015A950 (0x150 bytes)  -- peopleFieldScriptHelper3
  *   fn_8015AAA0 (0x20 bytes)   -- peopleFieldScriptHelper4
- *   salCheckVolErrorAndResetDelta (0xF4 bytes)   -- peopleFieldScriptHelper5
+ *   fn_8015AAC0 (0xF4 bytes)   -- peopleFieldScriptHelper5
  *   fn_8015ABB4 (0x48 bytes)   -- peopleFieldScriptHelper6
  *   fn_8015ABFC (0x74 bytes)   -- peopleFieldScriptHelper7
- *   DoDepopFade (0xAC bytes)   -- peopleFieldScriptHelper8
+ *   fn_8015AC70 (0xAC bytes)   -- peopleFieldScriptHelper8
  *   fn_8015AD1C (0x2DC bytes)  -- peopleFieldScriptDispatch
- *   SortVoices (0x258 bytes)  -- peopleFieldScriptEval
+ *   fn_8015AFF8 (0x258 bytes)  -- peopleFieldScriptEval
  *   fn_8015B250 (0x21B8 bytes) -- peopleFieldScriptMain
  *     Enormous function (8,632 bytes -- the second-largest in the range).
  *     Main script processing loop for NPC behavior. Processes a wide
@@ -276,12 +276,12 @@
  *
  * 0x8015D408 - 0x8015FFA0: People rendering pipeline (0x2B98 bytes)
  *   fn_8015D408 (0x44 bytes)   -- peopleFieldRenderPipeInit
- *   salActivateVoice (0xA0 bytes)   -- peopleFieldRenderPipeSetup
+ *   fn_8015D44C (0xA0 bytes)   -- peopleFieldRenderPipeSetup
  *   fn_8015D4EC (0x60 bytes)   -- peopleFieldRenderPipeHelper
  *   fn_8015D54C (0xA8 bytes)   -- peopleFieldRenderPipeConfig
  *   fn_8015D5F4 (0x84 bytes)   -- peopleFieldRenderPipeGetState
- *   salHandleAuxProcessing (0x158 bytes)  -- peopleFieldRenderPipeApply
- *   salCalcVolume (0x6F0 bytes)  -- peopleFieldRenderPipeCalc
+ *   fn_8015D678 (0x158 bytes)  -- peopleFieldRenderPipeApply
+ *   fn_8015D7D0 (0x6F0 bytes)  -- peopleFieldRenderPipeCalc
  *     Path interpolation calculation for NPC movement rendering.
  *   fn_8015DEC0 (0x4B4 bytes)  -- peopleFieldRenderPipeProcess
  *   fn_8015E374 (0x51C bytes)  -- peopleFieldRenderPipeSubmit
@@ -301,23 +301,23 @@
  *
  * 0x8015FFD4 - 0x80161934: People motion system (0x1960 bytes)
  *   fn_8015FFD4 (0x8 bytes)    -- peopleFieldMotionNop
- *   salApplyMatrix (0xAC bytes)   -- peopleFieldMotionInit
- *   salNormalizeVector (0xB4 bytes)   -- peopleFieldMotionSetup
+ *   fn_8015FFDC (0xAC bytes)   -- peopleFieldMotionInit
+ *   fn_80160088 (0xB4 bytes)   -- peopleFieldMotionSetup
  *   fn_8016013C (0x64 bytes)   -- peopleFieldMotionGetType
- *   salInvertMatrix (0x1FC bytes)  -- peopleFieldMotionApply
+ *   fn_801601A0 (0x1FC bytes)  -- peopleFieldMotionApply
  *   fn_8016039C (0x24 bytes)   -- peopleFieldMotionGetFrame
  *   fn_801603C0 (0x608 bytes)  -- peopleFieldMotionUpdate
  *     Large motion update: processes walk/run/idle state transitions.
- *   inpSetMidiCtrl14 (0x124 bytes)  -- peopleFieldMotionBlend
- *   inpResetMidiCtrl (0xF0 bytes)   -- peopleFieldMotionSmooth
- *   inpGetMidiCtrl (0x2C4 bytes)  -- peopleFieldMotionInterp
+ *   fn_801609C8 (0x124 bytes)  -- peopleFieldMotionBlend
+ *   fn_80160AEC (0xF0 bytes)   -- peopleFieldMotionSmooth
+ *   fn_80160BDC (0x2C4 bytes)  -- peopleFieldMotionInterp
  *   fn_80160EA0 (0x34 bytes)   -- peopleFieldMotionHelper1
  *   fn_80160ED4 (0x3C bytes)   -- peopleFieldMotionHelper2
  *   fn_80160F10 (0x98 bytes)   -- peopleFieldMotionHelper3
- *   inpFXCopyCtrl (0x114 bytes)  -- peopleFieldMotionHelper4
+ *   fn_80160FA8 (0x114 bytes)  -- peopleFieldMotionHelper4
  *   fn_801610BC (0x3C bytes)   -- peopleFieldMotionLookup
  *   fn_801610F8 (0x3C bytes)   -- peopleFieldMotionLookup2
- *   _GetInputValue (0x4A0 bytes)  -- peopleFieldMotionMain
+ *   fn_80161134 (0x4A0 bytes)  -- peopleFieldMotionMain
  *     Large motion processing function.
  *
  *   fn_801615D4 - fn_801618EC  -- Motion type handlers (12 functions)
@@ -331,18 +331,18 @@
  *   fn_80161A9C (0x284 bytes)  -- peopleFieldUtilInit
  *     Utility initialization for NPC field data.
  *   fn_80161D20 (0x70 bytes)   -- peopleFieldUtilHelper1
- *   inpGetExCtrl (0xFC bytes)   -- peopleFieldUtilHelper2
- *   inpSetExCtrl (0x1E4 bytes)  -- peopleFieldUtilProcess
+ *   fn_80161D90 (0xFC bytes)   -- peopleFieldUtilHelper2
+ *   fn_80161E8C (0x1E4 bytes)  -- peopleFieldUtilProcess
  *   fn_80162070 (0x1C bytes)   -- peopleFieldUtilGetPtr
  *   fn_8016208C (0x8C bytes)   -- peopleFieldUtilSetup
- *   sndBSearch (0xA4 bytes)   -- peopleFieldUtilConfig
+ *   fn_80162118 (0xA4 bytes)   -- peopleFieldUtilConfig
  *   fn_801621BC (0x10 bytes)   -- peopleFieldUtilDispatch
- *     Script dispatch entry point. Called from synthVolume.
+ *     Script dispatch entry point. Called from fn_8014C984.
  *   fn_801621CC (0x48 bytes)   -- peopleFieldUtilHelper3
  *   fn_80162214 (0x8 bytes)    -- peopleFieldUtilNop
  *
  * 0x8016221C - 0x801652DC: People state & memory management (0x30C0 bytes)
- *   snd_handle_irq (0x154 bytes)  -- peopleFieldStateInit
+ *   fn_8016221C (0x154 bytes)  -- peopleFieldStateInit
  *   fn_80162370 (0xB8 bytes)   -- peopleFieldStateSetup
  *   fn_80162428 (0x34 bytes)   -- peopleFieldStateGet
  *   fn_8016245C (0x8 bytes)    -- peopleFieldStateNop1
@@ -350,9 +350,9 @@
  *   fn_8016246C (0x20 bytes)   -- peopleFieldStateHelper1
  *   fn_8016248C (0x8 bytes)    -- peopleFieldStateNop3
  *   fn_80162494 (0x14 bytes)   -- peopleFieldStateHelper2
- *   hwInitSamplePlayback (0x1B4 bytes)  -- peopleFieldStateProcess
+ *   fn_801624A8 (0x1B4 bytes)  -- peopleFieldStateProcess
  *   fn_8016265C (0x50 bytes)   -- peopleFieldStateSwitch
- *   hwSetADSR (0x1AC bytes)  -- peopleFieldStateMain
+ *   fn_801626AC (0x1AC bytes)  -- peopleFieldStateMain
  *   fn_80162858 (0x20 bytes)   -- peopleFieldMemGetCount
  *   fn_80162878 (0x14 bytes)   -- peopleFieldMemGetSize
  *   fn_8016288C (0x14 bytes)   -- peopleFieldMemGetBase
@@ -364,10 +364,10 @@
  *   fn_801629A4 (0x2C bytes)   -- peopleFieldMemHelper1
  *   fn_801629D0 (0x2C bytes)   -- peopleFieldMemHelper2
  *   fn_801629FC (0x5C bytes)   -- peopleFieldMemSetup
- *   hwSetVolume (0x2C0 bytes)  -- peopleFieldMoveApply
+ *   fn_80162A58 (0x2C0 bytes)  -- peopleFieldMoveApply
  *     Applies NPC movement with interpolation. Uses struct size 0xF4,
  *     accesses fields at 0xE5, 0xEF, 0xF0, 0x4C-0x50. Calls into
- *     salCalcVolume for path calculation.
+ *     fn_8015D7D0 for path calculation.
  *   fn_80162D18 (0x2C bytes)   -- peopleFieldMoveHelper1
  *   fn_80162D44 (0x28 bytes)   -- peopleFieldMoveHelper2
  *   fn_80162D6C (0x20 bytes)   -- peopleFieldMoveHelper3
@@ -392,8 +392,8 @@
  *   fn_801631C0 (0xC bytes)    -- peopleFieldMoveGet7
  *   fn_801631CC (0x28 bytes)   -- peopleFieldMoveSet7
  *   fn_801631F4 (0x20 bytes)   -- peopleFieldMoveGet8
- *   aramQueueCallback (0xA0 bytes)   -- peopleFieldMoveEval
- *   aramUploadData (0x1DC bytes)  -- peopleFieldMoveMain
+ *   fn_80163214 (0xA0 bytes)   -- peopleFieldMoveEval
+ *   fn_801632B4 (0x1DC bytes)  -- peopleFieldMoveMain
  *   fn_80163490 (0x18 bytes)   -- peopleFieldMoveQuery
  *   fn_801634A8 (0x2EC bytes)  -- peopleFieldMoveFinal
  *   fn_80163794 (0x4 bytes)    -- nop
@@ -401,14 +401,14 @@
  *   fn_801637B8 (0x58 bytes)   -- peopleFieldMoveSetTarget
  *   fn_80163810 (0x3BC bytes)  -- peopleFieldMoveUpdate
  *   fn_80163BCC (0x18 bytes)   -- peopleFieldMoveGetState
- *   InitStreamBuffers (0xC4 bytes)   -- peopleFieldMoveSetState
+ *   fn_80163BE4 (0xC4 bytes)   -- peopleFieldMoveSetState
  *   fn_80163CA8 (0x108 bytes)  -- peopleFieldMoveApplyForce
  *   fn_80163DB0 (0x38 bytes)   -- peopleFieldMoveGetForce
- *   aramFreeStreamBuffer (0xF8 bytes)   -- peopleFieldMoveCalcForce
- *   salCallback (0xA8 bytes)   -- peopleFieldMoveCalcFriction
+ *   fn_80163DE8 (0xF8 bytes)   -- peopleFieldMoveCalcForce
+ *   fn_80163EE0 (0xA8 bytes)   -- peopleFieldMoveCalcFriction
  *   fn_80163F88 (0x10 bytes)   -- peopleFieldMoveGetFriction
  *   fn_80163F98 (0x64 bytes)   -- peopleFieldMoveSetFriction
- *   salInitAi (0xC8 bytes)   -- peopleFieldMoveApplyGravity
+ *   fn_80163FFC (0xC8 bytes)   -- peopleFieldMoveApplyGravity
  *   fn_801640C4 (0x20 bytes)   -- peopleFieldMoveGetGravity
  *   fn_801640E4 (0x34 bytes)   -- peopleFieldMoveSetGravity
  *   fn_80164118 (0x30 bytes)   -- peopleFieldMoveGetVelocity
@@ -423,16 +423,16 @@
  *   fn_80164398 (0x20 bytes)   -- peopleFieldMoveHelper11
  *   fn_801643B8 (0x20 bytes)   -- peopleFieldMoveHelper12
  *   fn_801643D8 (0x28 bytes)   -- peopleFieldMemAllocBuf
- *     Allocates the NPC state buffer. Called from synthInit.
+ *     Allocates the NPC state buffer. Called from fn_8014D000.
  *   fn_80164400 (0x2C bytes)   -- peopleFieldMemFreeBuf
  *   fn_8016442C (0x5C bytes)   -- peopleFieldMemResize
  *   fn_80164488 (0x58 bytes)   -- peopleFieldMemQuery
  *   fn_801644E0 (0x40 bytes)   -- peopleFieldMemValidate
- *   ReverbHICreate (0x50C bytes)  -- peopleFieldAnimMain
+ *   fn_80164520 (0x50C bytes)  -- peopleFieldAnimMain
  *     NPC animation main processing for field rendering.
- *   ReverbHIModify (0x214 bytes)  -- peopleFieldAnimProcess
+ *   fn_80164A2C (0x214 bytes)  -- peopleFieldAnimProcess
  *   fn_80164C40 (0x190 bytes)  -- peopleFieldAnimBlendFinal
- *   HandleReverb (0x50C bytes)  -- peopleFieldAnimInterp
+ *   fn_80164DD0 (0x50C bytes)  -- peopleFieldAnimInterp
  *     Animation interpolation for smooth NPC movement. Accesses struct
  *     fields up to offset 0x1A4. This is the last function in the range.
  *
@@ -440,7 +440,7 @@
  * FIELD PEOPLE WORK STRUCT (0x404 bytes per slot)
  * ============================================================
  *
- * Recovered from synthInit (init loop) and fn_801557EC (reset):
+ * Recovered from fn_8014D000 (init loop) and fn_801557EC (reset):
  *
  *   0x000-0x0F3: Core NPC state data
  *   0x0F4: s32   entityID (-1 = unassigned)
@@ -486,7 +486,7 @@
  *   lbl_8047AF4C -- u32 (cleared by init)
  *   lbl_8047AF58 -- u32 (cleared by init)
  *   lbl_8047AF5C -- u32 (cleared by init)
- *   lbl_8047B024 -- void* (used by hwSetVolume)
+ *   lbl_8047B024 -- void* (used by fn_80162A58)
  */
 
 #include "dolphin/types.h"
@@ -528,7 +528,7 @@ extern void  fn_800E4014(void* param);
 
 /* People data layer (people_data.c) */
 extern void* fn_801440A0(u16 index);   /* peopleFieldGetByIndex */
-extern void* itemGetStatus(u32 a, u32 b, u32 c, u32 d);  /* peopleFieldAlloc */
+extern void* fn_80142CF4(u32 a, u32 b, u32 c, u32 d);  /* peopleFieldAlloc */
 extern void  fn_801429E8(void* entry);  /* peopleFieldGetEntry */
 extern void  fn_80142984(u32 id);       /* peopleFieldGetByID */
 
@@ -543,7 +543,7 @@ extern void fn_801621BC(u32* ptr);  /* peopleFieldUtilDispatch - same-TU asm wra
 
 extern void fn_8015210C(void);
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
-extern void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
+extern void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
 extern u32 lbl_8047AF98;
 extern u8 lbl_8047AF90[];
@@ -607,10 +607,10 @@ asm void fn_801522F0(void) {
 }
 #else
 u32 fn_801522F0(u16 arg) {
-    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF7C + 4) = arg;
-    result = sndBSearch(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
+    result = fn_80162118(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
     lbl_8047AF78 = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -626,10 +626,10 @@ asm void fn_8015234C(void) {
 }
 #else
 u32 fn_8015234C(u16 arg) {
-    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF70 + 4) = arg;
-    result = sndBSearch(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
+    result = fn_80162118(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
     lbl_8047AF6C = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -654,10 +654,10 @@ asm void fn_801523B8(void) {
 }
 #else
 u32 fn_801523B8(u16 arg, u16* out) {
-    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_80445F18 + 4) = arg;
-    result = sndBSearch(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
+    result = fn_80162118(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
     lbl_8047AF68 = (u32)result;
     if (result != NULL) {
         *out = *(u16*)((u8*)result + 6);
@@ -746,14 +746,14 @@ asm void fn_80154A14(void) {
 void fn_80154A14(void) {}
 #endif
 
-extern u32 _GetInputValue(u8* obj, u8* motionBase, u32 p1, u32 p2);
+extern u32 fn_80161134(u8* obj, u8* motionBase, u32 p1, u32 p2);
 #if 0
 asm void fn_8016161C(void) {
 #include "src/game/people/people_field_fn_8016161C.inc"
 }
 #else
 /* If flags bit 30 (0x2) is CLEAR: return halfword at 0x25c.
- * If SET: clear bit 30, call _GetInputValue with motion data, return its result. */
+ * If SET: clear bit 30, call fn_80161134 with motion data, return its result. */
 u32 fn_8016161C(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
@@ -761,7 +761,7 @@ u32 fn_8016161C(u8* obj) {
         return *(u16*)(obj + 0x25c);
     }
     *(u32*)(obj + 0x214) = flags & ~0x2u;
-    return _GetInputValue(obj, obj + 0x23c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x23c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -777,7 +777,7 @@ u32 fn_80161664(u8* obj) {
         return *(u16*)(obj + 0x280);
     }
     *(u32*)(obj + 0x214) = flags & ~0x4u;
-    return _GetInputValue(obj, obj + 0x260, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x260, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -793,7 +793,7 @@ u32 fn_801616AC(u8* obj) {
         return *(u16*)(obj + 0x2a4);
     }
     *(u32*)(obj + 0x214) = flags & ~0x8u;
-    return _GetInputValue(obj, obj + 0x284, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x284, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -809,7 +809,7 @@ u32 fn_801616F4(u8* obj) {
         return *(u16*)(obj + 0x2c8);
     }
     *(u32*)(obj + 0x214) = flags & ~0x10u;
-    return _GetInputValue(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -825,7 +825,7 @@ u32 fn_8016173C(u8* obj) {
         return *(u16*)(obj + 0x2ec);
     }
     *(u32*)(obj + 0x214) = flags & ~0x20u;
-    return _GetInputValue(obj, obj + 0x2cc, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x2cc, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -841,7 +841,7 @@ u32 fn_80161784(u8* obj) {
         return *(u16*)(obj + 0x310);
     }
     *(u32*)(obj + 0x214) = flags & ~0x40u;
-    return _GetInputValue(obj, obj + 0x2f0, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x2f0, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -857,7 +857,7 @@ u32 fn_801617CC(u8* obj) {
         return *(u16*)(obj + 0x358);
     }
     *(u32*)(obj + 0x214) = flags & ~0x100u;
-    return _GetInputValue(obj, obj + 0x338, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x338, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -873,7 +873,7 @@ u32 fn_80161814(u8* obj) {
         return *(u16*)(obj + 0x37c);
     }
     *(u32*)(obj + 0x214) = flags & ~0x200u;
-    return _GetInputValue(obj, obj + 0x35c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x35c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -889,7 +889,7 @@ u32 fn_8016185C(u8* obj) {
         return *(u16*)(obj + 0x3a0);
     }
     *(u32*)(obj + 0x214) = flags & ~0x400u;
-    return _GetInputValue(obj, obj + 0x380, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x380, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -905,7 +905,7 @@ u32 fn_801618A4(u8* obj) {
         return *(u16*)(obj + 0x3c4);
     }
     *(u32*)(obj + 0x214) = flags & ~0x800u;
-    return _GetInputValue(obj, obj + 0x3a4, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x3a4, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -921,7 +921,7 @@ u32 fn_801618EC(u8* obj) {
         return *(u16*)(obj + 0x3e8);
     }
     *(u32*)(obj + 0x214) = flags & ~0x1000u;
-    return _GetInputValue(obj, obj + 0x3c8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return fn_80161134(obj, obj + 0x3c8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #pragma push
@@ -945,7 +945,7 @@ u32 fn_801619E8(u8 idx, u8 r4, u32 r5, u32 r6) {
         row[(u8)r5] = t1 & ~t2;
     }
     if (nonzero) {
-        return _GetInputValue(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24, r5, r6);
+        return fn_80161134(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24, r5, r6);
     } else {
         return *(u16*)(lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24 + 0x20);
     }
@@ -978,30 +978,30 @@ u32 fn_80161D20(u32 r3) {
 }
 #endif
 #pragma pop
-extern void inpGetMidiCtrl(void);
+extern void fn_80160BDC(void);
 extern void fn_801603C0(void);
-extern u32  salInitDspCtrl(u32 a, u32 b, u32 c);
-extern void salExitDspCtrl(void);
+extern u32  fn_8015A484(u32 a, u32 b, u32 c);
+extern void fn_8015A870(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void inpGetExCtrl(void) {
-#include "src/game/people/people_field_inpGetExCtrl.inc"
+asm void fn_80161D90(void) {
+#include "src/game/people/people_field_fn_80161D90.inc"
 }
 #else
-void inpGetExCtrl(void) { /* TODO */ }
+void fn_80161D90(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void inpSetExCtrl(void) {
-#include "src/game/people/people_field_inpSetExCtrl.inc"
+asm void fn_80161E8C(void) {
+#include "src/game/people/people_field_fn_80161E8C.inc"
 }
 #else
-void inpSetExCtrl(void) { /* TODO */ }
+void fn_80161E8C(void) { /* TODO */ }
 #endif
 #pragma pop
 extern u32 lbl_80478BF0;
@@ -1057,11 +1057,11 @@ s32 fn_8016208C(u32 angle) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void sndBSearch(void) {
-#include "src/game/people/people_field_sndBSearch.inc"
+asm void fn_80162118(void) {
+#include "src/game/people/people_field_fn_80162118.inc"
 }
 #else
-void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
+void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
     s32 lo, hi, mid;
     s32 r;
     u8* elem;
@@ -1095,48 +1095,48 @@ extern void fn_800AC0F8(void);
 extern void fn_800AC110(void);
 extern u32  fn_800AE794(void);
 extern void fn_800AE7CC(u32 a);
-extern void DSPInit(void);
+extern void fn_800AE7E0(void);
 extern void fn_800AE8A4(void);
 extern void fn_800AE8EC(void);
 extern u32  fn_800AE92C(void);
 extern void fn_800AE93C(u8* ptr);
 extern void fn_800CE358(void);
 extern void fn_8015B250(u32, u32);
-extern void ReverbHICreate(void);
-extern void ReverbHIModify(void);
-extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
+extern void fn_80164520(void);
+extern void fn_80164A2C(void);
+extern void fn_801652DC(u32 a, u32 b, u32 c, u8* d);
 extern void fn_8009B300(void);
 extern void fn_800AC02C(u32 a);
 extern void fn_800AC070(u8* ptr, u32 size);
 extern void fn_800ACB44(void);
 extern void fn_800ACB4C(void);
-extern void ARQPostRequest(void);
+extern void fn_800AE630(void);
 extern u32  fn_800AE78C(void);
 extern void fn_8014A280(void);
 extern void fn_80158CD4(void);
-extern void salActivateStudio(void);
+extern void fn_8015A950(void);
 extern void fn_8015AAA0(void);
-extern void salActivateVoice(u8* ptr);
+extern void fn_8015D44C(u8* ptr);
 extern void fn_8015D4EC(void);
 extern void fn_8015D54C(u8* ptr);
 extern void fn_8015D5F4(u8* ptr);
 extern u8 lbl_80447E60[];
-extern void salCalcVolume(void);
+extern void fn_8015D7D0(void);
 extern void fn_801629A4(u32 index, u8 value);
 extern void fn_801629D0(u32 index, u8 value);
 extern void fn_801629FC(u32 index, u8 flag);
-extern void aramUploadData(void);
+extern void fn_801632B4(void);
 extern void fn_80163490(void);
 extern void fn_801634A8(void);
 extern void fn_80163794(void);
 extern void fn_801637B8(u8* ptr, u32 size);
 extern void fn_80163810(void);
 extern void fn_80163BCC(u8* a, u32 b);
-extern void InitStreamBuffers(void);
+extern void fn_80163BE4(void);
 extern u8   fn_80163CA8();
 extern u32  fn_80163DB0(u32 idx, u32 *out);
-extern void aramFreeStreamBuffer();
-extern u32  salInitAi(u32(*fnptr)(void), u32 d, u32 a);
+extern void fn_80163DE8();
+extern u32  fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a);
 extern void fn_801640C4(void);
 extern u32  fn_801640E4(void);
 extern u32  fn_80164148(u32 d);
@@ -1184,15 +1184,15 @@ asm void fn_80162370(void) {
 #else
 extern u8  lbl_8047B05E;
 extern u8  lbl_8047B05F;
-extern u32 snd_handle_irq(void);
+extern u32 fn_8016221C(void);
 u32 fn_80162370(u32 a, u8 b, u8 c, u32 d) {
     extern u32 lbl_8047B028;
     fn_801642F8();
     lbl_8047B05F = 0;
     lbl_8047B05E = 0;
     lbl_8047B028 = 0;
-    if (salInitAi(snd_handle_irq, d, a) != 0
-     && salInitDspCtrl(b, c, (u32)(d & 1)) != 0
+    if (fn_80163FFC(fn_8016221C, d, a) != 0
+     && fn_8015A484(b, c, (u32)(d & 1)) != 0
      && fn_80164148(d) != 0) {
         fn_80164328();
         fn_801640C4();
@@ -1213,7 +1213,7 @@ asm void fn_80162428(void) {
 void fn_80162428(void) {
     fn_80164360();
     fn_80164204();
-    salExitDspCtrl();
+    fn_8015A870();
     fn_801640E4();
     fn_80164328();
     fn_80164324();
@@ -1279,11 +1279,11 @@ void fn_80162494(u32 index, u32 val) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void hwInitSamplePlayback(void) {
-#include "src/game/people/people_field_hwInitSamplePlayback.inc"
+asm void fn_801624A8(void) {
+#include "src/game/people/people_field_fn_801624A8.inc"
 }
 #else
-void hwInitSamplePlayback(void) { /* TODO */ }
+void fn_801624A8(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
@@ -1312,11 +1312,11 @@ void fn_8016265C(u32 index) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void hwSetADSR(void) {
-#include "src/game/people/people_field_hwSetADSR.inc"
+asm void fn_801626AC(void) {
+#include "src/game/people/people_field_fn_801626AC.inc"
 }
 #else
-void hwSetADSR(void) { /* TODO */ }
+void fn_801626AC(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
@@ -1407,7 +1407,7 @@ asm void fn_801628C8(void) {
 void fn_801628C8(u32 index) {
     u32 offset = index * 0xF4;
     ((u8*)lbl_8047B024 + offset)[0xD4] = lbl_8047B050;
-    salActivateVoice((u8*)lbl_8047B024 + offset);
+    fn_8015D44C((u8*)lbl_8047B024 + offset);
 }
 #endif
 #pragma pop
@@ -1495,11 +1495,11 @@ void fn_801629FC(u32 index, u8 flag) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void hwSetVolume(void) {
-#include "src/game/people/people_field_hwSetVolume.inc"
+asm void fn_80162A58(void) {
+#include "src/game/people/people_field_fn_80162A58.inc"
 }
 #else
-void hwSetVolume(void) { /* TODO */ }
+void fn_80162A58(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
@@ -1542,7 +1542,7 @@ asm void fn_80162D6C(void) {
 #include "src/game/people/people_field_fn_80162D6C.inc"
 }
 #else
-void fn_80162D6C(void) { salActivateStudio(); }
+void fn_80162D6C(void) { fn_8015A950(); }
 #endif
 #pragma pop
 #pragma push
@@ -1625,7 +1625,7 @@ asm void fn_80162F68(void) {
 #include "src/game/people/people_field_fn_80162F68.inc"
 }
 #else
-void fn_80162F68(void) { aramFreeStreamBuffer(); }
+void fn_80162F68(void) { fn_80163DE8(); }
 #endif
 #pragma pop
 #pragma push
@@ -1821,13 +1821,13 @@ u32 fn_801631F4(u32 index) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void aramQueueCallback(void) {
-#include "src/game/people/people_field_aramQueueCallback.inc"
+asm void fn_80163214(void) {
+#include "src/game/people/people_field_fn_80163214.inc"
 }
 #else
 extern u8 lbl_8044FB90[];
 extern u8 lbl_8044FE14[];
-void aramQueueCallback(void *arg) {
+void fn_80163214(void *arg) {
     u8 *tbl;
     u32 i;
     if (*(u32*)((u8*)arg + 0xc) == 1) {
@@ -1852,11 +1852,11 @@ void aramQueueCallback(void *arg) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void aramUploadData(void) {
-#include "src/game/people/people_field_aramUploadData.inc"
+asm void fn_801632B4(void) {
+#include "src/game/people/people_field_fn_801632B4.inc"
 }
 #else
-void aramUploadData(void) { /* TODO */ }
+void fn_801632B4(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
@@ -1957,13 +1957,13 @@ extern u32 lbl_8047B074, lbl_8047B07C;
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void InitStreamBuffers(void) {
-#include "src/game/people/people_field_InitStreamBuffers.inc"
+asm void fn_80163BE4(void) {
+#include "src/game/people/people_field_fn_80163BE4.inc"
 }
 #else
 /* peopleFieldMoveSetState: init the 0x40-entry free list (node[i].next=&node[i+1],
  * tail NULL; head ptrs reset). byte-match verified via objdiff. */
-void InitStreamBuffers(void) {
+void fn_80163BE4(void) {
     u32 i;
     lbl_8047B068 = 0;
     lbl_8047B064 = 0;
@@ -2067,13 +2067,13 @@ u32 fn_80163DB0(u32 idx, u32 *out) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void aramFreeStreamBuffer(void) {
-#include "src/game/people/people_field_aramFreeStreamBuffer.inc"
+asm void fn_80163DE8(void) {
+#include "src/game/people/people_field_fn_80163DE8.inc"
 }
 #else
 /* peopleFieldMoveCalcForce: unlink a block, and if it was the active one, recompute the
  * min and recoalesce; else push to the other free list. byte-match verified via objdiff. */
-void aramFreeStreamBuffer(u32 idx) {
+void fn_80163DE8(u32 idx) {
     PFNode* blk;
     PFNode* cur;
     PFNode* prev;
@@ -2135,8 +2135,8 @@ void aramFreeStreamBuffer(u32 idx) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void salCallback(void) {
-#include "src/game/people/people_field_salCallback.inc"
+asm void fn_80163EE0(void) {
+#include "src/game/people/people_field_fn_80163EE0.inc"
 }
 #else
 extern u8  lbl_8047B0A0;
@@ -2146,7 +2146,7 @@ extern u32 lbl_8047B098;
 extern u32 lbl_8047B094;
 extern u32 lbl_8047B090;
 extern u32 lbl_8047B0A4;
-void salCallback(void) {
+void fn_80163EE0(void) {
     int counter = ((int)lbl_8047B0A0 + 1) % 4;
     u8* ptr = (u8*)(lbl_8047B09C + 0x80000000u) + (u8)counter * 0x280;
     lbl_8047B0A0 = counter;
@@ -2200,11 +2200,11 @@ void fn_80163F98(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
-#include "src/game/people/people_field_salInitAi.inc"
+asm u32 fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a) {
+#include "src/game/people/people_field_fn_80163FFC.inc"
 }
 #else
-u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) { return 0; }
+u32 fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a) { return 0; }
 #endif
 #pragma pop
 #pragma push
@@ -2266,7 +2266,7 @@ u32 fn_80164148(u32 d) {
     *(u32*)(s + 0x30) = 0;
     *(u32*)(s + 0x34) = 0;
     *(u32*)(s + 0x04) = 0;
-    DSPInit();
+    fn_800AE7E0();
     fn_800AE93C(lbl_804504A0);
     lbl_8047B088 = 0;
     fn_80164328();
@@ -2443,7 +2443,7 @@ void fn_8016442C(u8 type, u32* data, u8* obj) {
     switch (type) {
         case 0:
             if (obj[0x1C4] != 0) { break; }
-            ReverbHICallback(data[0], data[1], data[2], obj);
+            fn_801652DC(data[0], data[1], data[2], obj);
             break;
         case 1:
             break;
@@ -2452,9 +2452,9 @@ void fn_8016442C(u8 type, u32* data, u8* obj) {
 #endif
 #pragma pop
 u32 fn_80164488(u8* ptr) {
-    extern void ReverbHIModify(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    extern void fn_80164A2C(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 1;
-    ReverbHIModify(
+    fn_80164A2C(
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -2474,9 +2474,9 @@ asm void fn_801644E0(void) {
 }
 #else
 void fn_801644E0(u8* ptr) {
-    extern void ReverbHICreate(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    extern void fn_80164520(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 0;
-    ReverbHICreate(
+    fn_80164520(
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -2491,22 +2491,22 @@ void fn_801644E0(u8* ptr) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void ReverbHICreate(void) {
-#include "src/game/people/people_field_ReverbHICreate.inc"
+asm void fn_80164520(void) {
+#include "src/game/people/people_field_fn_80164520.inc"
 }
 #else
-void ReverbHICreate(void) { /* TODO */ }
+void fn_80164520(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void ReverbHIModify(void) {
-#include "src/game/people/people_field_ReverbHIModify.inc"
+asm void fn_80164A2C(void) {
+#include "src/game/people/people_field_fn_80164A2C.inc"
 }
 #else
-void ReverbHIModify(void) { /* TODO */ }
+void fn_80164A2C(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
@@ -2524,10 +2524,10 @@ void fn_80164C40(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void HandleReverb(void) {
-#include "src/game/people/people_field_HandleReverb.inc"
+asm void fn_80164DD0(void) {
+#include "src/game/people/people_field_fn_80164DD0.inc"
 }
 #else
-void HandleReverb(void) { /* TODO */ }
+void fn_80164DD0(void) { /* TODO */ }
 #endif
 #pragma pop

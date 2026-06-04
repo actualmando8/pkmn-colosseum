@@ -304,8 +304,8 @@ void fn_800166BC(void) { /* TODO */ }
 #endif
 
 /* fn_800167D0 - 0x800167D0 | size: 0x2ec */
-extern void cos(void);
-extern void sin(void);
+extern void fn_800CDBE0(void);
+extern void fn_800CE148(void);
 extern void fn_80104160(void);
 extern u32 lbl_8047B748;
 extern u32 lbl_8047B744;

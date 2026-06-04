@@ -33,7 +33,7 @@ extern void fn_800A13F8();
 extern void fn_800A1990();
 extern void fn_800A257C();
 extern void fn_800C46B0();
-extern void __cvt_dbl_usll();
+extern void fn_800C4CC0();
 extern void fn_800D59B8();
 extern void fn_800D5CB8();
 extern void fn_800D61E4();
@@ -46,7 +46,7 @@ extern void fn_800D888C();
 extern void fn_800D88DC();
 extern void fn_800F0308();
 extern void fn_800F9318();
-extern void GScharCmp();
+extern void fn_800F9EE4();
 extern void fn_800FA280();
 extern void fn_800FA444();
 extern void fn_800FAEF8();
@@ -247,7 +247,7 @@ while (1) {
             *(u32*)(sp + 0x35C) = r0;
             f0 = f0 - f31;
             f1 = f30 * f0;
-            ((void(*)(void))__cvt_dbl_usll)();
+            ((void(*)(void))fn_800C4CC0)();
             if ((s32)r4 <= (s32)r25) {
                 r3 = (0x2 << 16);
                 r30 = r3 + 0x2;
@@ -2262,7 +2262,7 @@ void fn_8009567C(void) {
     extern void fn_8012AC3C();
     extern void fn_8012AC54();
     extern void fn_80132A38();
-    extern void gamedataGetStatus();
+    extern void fn_80135938();
     extern void fn_801906A0();
     extern void fn_801F2A7C();
     extern void fn_801FCEAC();
@@ -2531,7 +2531,7 @@ L_80095790:
                     r6 = 0x0;
                     fn_8012640C();
                     r4 = 0x2;
-                    gamedataGetStatus();
+                    fn_80135938();
                     tmp = r3 & 0xFF;
                     if (tmp != 0xb) {
                         tmp = 0x0;
@@ -2588,7 +2588,7 @@ L_80095790:
                         fn_8012640C();
                         r4 = r3;
                         r3 = r26;
-                        ((void(*)(void))GScharCmp)();
+                        ((void(*)(void))fn_800F9EE4)();
                         if ((s32)r3 == 0) {
                             tmp = 0x1;
                             break;
@@ -2649,7 +2649,7 @@ L_80095790:
                 r6 = 0x0;
                 fn_8012640C();
                 r4 = 0x2;
-                gamedataGetStatus();
+                fn_80135938();
                 tmp = r3 & 0xFF;
                 if (tmp != 0xb) {
                     tmp = 0x0;
@@ -2706,7 +2706,7 @@ L_80095790:
                     fn_8012640C();
                     r4 = r3;
                     r3 = r24;
-                    ((void(*)(void))GScharCmp)();
+                    ((void(*)(void))fn_800F9EE4)();
                     if ((s32)r3 == 0) {
                         tmp = 0x1;
                         break;
@@ -2746,7 +2746,7 @@ L_80095790:
                 r6 = 0x0;
                 fn_8012640C();
                 r4 = 0x2;
-                gamedataGetStatus();
+                fn_80135938();
                 tmp = r3 & 0xFF;
                 if ((s32)tmp != 0xb) {
                     if ((s32)tmp >= 0xb) break;
@@ -2769,7 +2769,7 @@ L_80095790:
                         r6 = 0x0;
                         fn_8012640C();
                         r4 = r25;
-                        ((void(*)(void))GScharCmp)();
+                        ((void(*)(void))fn_800F9EE4)();
                         if ((s32)r3 == 0) {
                             tmp = 0x1;
                             goto L_80095E10;

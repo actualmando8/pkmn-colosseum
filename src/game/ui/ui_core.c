@@ -10,7 +10,7 @@
 
 /* ===== External function declarations ===== */
 extern void fn_8001DA60();
-extern void menuSubOpenYesNo();
+extern void fn_8001E074();
 extern void fn_8001E58C();
 extern void fn_8002D91C();
 extern void fn_800347B8();
@@ -113,7 +113,7 @@ extern void fn_800F9210();
 extern void fn_800F92D4();
 extern void fn_800F9318();
 extern void fn_800F9E70();
-extern void GScharCmp();
+extern void fn_800F9EE4();
 extern void fn_800FA280();
 extern void fn_800FA444();
 extern void fn_800FAEF8();
@@ -155,7 +155,7 @@ extern void fn_80109934();
 extern void fn_8010B01C();
 extern void fn_8010B9E8();
 extern void fn_8010BBB8();
-extern void floorChangePos();
+extern void fn_80113778();
 extern void fn_80113828();
 extern void fn_80113F48();
 extern void fn_801176C8();
@@ -394,9 +394,9 @@ u8 fn_8005D9E4(s32 idx);
 void* fn_8005DA18(s32 idx);
 void fn_8005DA48(void);
 s32  fn_8005DBC4(void);
-void dbgMenuFieldCameraChangeDisp(void);
+void fn_8005DC24(void);
 void fn_8005DCC4(void);
-void menuDbgItemCreate(void);
+void fn_8005DEE8(void);
 void fn_8005DFC8(void);
 void fn_8005E690(void);
 void fn_8005E730(void);
@@ -423,7 +423,7 @@ void fn_80061D34(void);
 void fn_80061F6C(void);
 void fn_80062284(void);
 void fn_80062334(void);
-void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void);
+void fn_800626CC(void);
 void fn_80062834(void);
 void fn_80062948(void);
 void fn_80062AB4(void);
@@ -480,7 +480,7 @@ void fn_80059BDC(void) {
     extern void fn_80093574();
     extern void fn_800F0308();
     extern void fn_800F7EF8();
-    extern void GScharCmp();
+    extern void fn_800F9EE4();
     extern void fn_800FF540();
     extern void fn_801022B8();
     extern void fn_80102510();
@@ -495,7 +495,7 @@ void fn_80059BDC(void) {
     extern void fn_801069FC();
     extern void fn_80106D3C();
     extern void fn_80108518();
-    extern void floorChangePos();
+    extern void fn_80113778();
     extern void fn_80113828();
     extern void fn_80129280();
     extern void fn_80129384();
@@ -1618,7 +1618,7 @@ void fn_80059BDC(void) {
                     r4 = 0x3c;
                     r5 = 0x9e;
                     r6 = 0x1;
-                    ((void(*)(void))menuSubOpenYesNo)();
+                    ((void(*)(void))fn_8001E074)();
                     r22 = (s8)r3;
                     r3 = 0x1;
                     fn_801069FC();
@@ -2614,7 +2614,7 @@ void fn_80059BDC(void) {
                 r4 = 0x3c;
                 r5 = 0x9e;
                 r6 = 0x0;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
             }
             if ((s32)r0 == (s32)0x0) {
@@ -3403,7 +3403,7 @@ void fn_80059BDC(void) {
                     r4 = 0x3c;
                     r5 = 0x9e;
                     r6 = 0x0;
-                    ((void(*)(void))menuSubOpenYesNo)();
+                    ((void(*)(void))fn_8001E074)();
                     r0 = (s8)r3;
                     if ((s32)r0 == (s32)0x0) {
                         fn_80088D84();
@@ -3419,7 +3419,7 @@ void fn_80059BDC(void) {
                     r4 = 0x3c;
                     r5 = 0x9e;
                     r6 = 0x1;
-                    ((void(*)(void))menuSubOpenYesNo)();
+                    ((void(*)(void))fn_8001E074)();
                     r0 = (s8)r3;
                     if ((s32)r0 != (s32)0x0) goto L_8005C7E0;
                     r4 = r22;
@@ -3437,7 +3437,7 @@ void fn_80059BDC(void) {
                 r4 = 0x3c;
                 r5 = 0x9e;
                 r6 = 0x0;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
                 if ((s32)r0 == (s32)0x0) {
                     r3 = *(u32*)&lbl_8047A5A0;
@@ -3464,7 +3464,7 @@ void fn_80059BDC(void) {
                         r3 = r4 + 0x1660;
                         fn_8012AC54();
                         r4 = r24;
-                        GScharCmp();
+                        fn_800F9EE4();
                     }
                     if ((s32)r3 == (s32)0x0) {
                         r3 = 0x7;
@@ -3523,7 +3523,7 @@ void fn_80059BDC(void) {
                 r4 = 0x3c;
                 r5 = 0x9e;
                 r6 = 0x1;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
                 if ((s32)r0 != (s32)0x0) goto L_8005C868;
                 L_8005CA18: ;
@@ -3543,7 +3543,7 @@ void fn_80059BDC(void) {
                     r4 = 0x3c;
                     r5 = 0x9e;
                     r6 = 0x0;
-                    ((void(*)(void))menuSubOpenYesNo)();
+                    ((void(*)(void))fn_8001E074)();
                     r0 = (s8)r3;
                     if ((s32)r0 != (s32)0x0) break;
                     ((void(*)(void))fn_80088C60)();
@@ -3657,7 +3657,7 @@ void fn_80059BDC(void) {
         f2 = f30;
         r4 = r28;
         f3 = f29;
-        floorChangePos();
+        fn_80113778();
 
     } else {
     if (r29 == (u32)0x0) {
@@ -4954,11 +4954,11 @@ s32 fn_8005DBC4(void) {
 
 /* 0x8005DC24 | size: 0xA0 */
 #if 1
-asm void dbgMenuFieldCameraChangeDisp(void) {
-#include "src/game/ui/ui_core_dbgMenuFieldCameraChangeDisp.inc"
+asm void fn_8005DC24(void) {
+#include "src/game/ui/ui_core_fn_8005DC24.inc"
 }
 #else
-void dbgMenuFieldCameraChangeDisp(void) {
+void fn_8005DC24(void) {
     extern void fn_800FF56C();
     extern void fn_80102620();
     extern void fn_801026A4();
@@ -5162,11 +5162,11 @@ void fn_8005DCC4(void) {
 
 /* 0x8005DEE8 | size: 0xE0 */
 #if 1
-asm void menuDbgItemCreate(void) {
-#include "src/game/ui/ui_core_menuDbgItemCreate.inc"
+asm void fn_8005DEE8(void) {
+#include "src/game/ui/ui_core_fn_8005DEE8.inc"
 }
 #else
-void menuDbgItemCreate(void) {
+void fn_8005DEE8(void) {
     extern void menuCloseSync();
     extern void fn_80102510();
     extern void fn_80102568();
@@ -5245,7 +5245,7 @@ void fn_8005DFC8(void) {
     extern void fn_801666BC();
     extern void fn_8017B000();
     extern void fn_8025DA88();
-    extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl();
+    extern void fn_800626CC();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5334,9 +5334,9 @@ void fn_8005DFC8(void) {
 
                 r3 = 0x5c3;
             }
-            r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
+            r5 = (u32)fn_800626CC;
             r4 = 0x0;
-            r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
+            r5 = (u32)fn_800626CC;
             r6 = 0x0;
             r7 = 0x0;
             fn_8017B000();
@@ -10411,17 +10411,17 @@ void fn_80062334(void) {
 
 /* 0x800626CC | size: 0x168 */
 #if 1
-asm void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void) {
-#include "src/game/ui/ui_core__menuCBBattleStartDispTrainerTexCallBack__FlPvl.inc"
+asm void fn_800626CC(void) {
+#include "src/game/ui/ui_core_fn_800626CC.inc"
 }
 #else
-void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void) {
+void fn_800626CC(void) {
     extern void fn_800F92D4();
     extern void fn_8017B000();
     extern void fn_8025D2D4();
     extern void fn_8025D364();
     extern void fn_8025DA88();
-    extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl();
+    extern void fn_800626CC();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -10499,9 +10499,9 @@ void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void) {
         *(u32*)((u8*)r29 + 0x0) = r3;
         r0 = *(u32*)((u8*)r29 + 0x0);
         if (r0 == (u32)0x0) {
-        r4 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
+        r4 = (u32)fn_800626CC;
         r3 = r27;
-        r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
+        r5 = (u32)fn_800626CC;
         r6 = r29;
         r4 = r28;
         r7 = r28;
@@ -11411,7 +11411,7 @@ void fn_80063060(void) {
             r3 = 0x0;
             /* lha r5, lbl_80478922(r13) */;
             r6 = 0x1;
-            ((void(*)(void))menuSubOpenYesNo)();
+            ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
             r3 = 0x1;
             fn_801069FC();
@@ -11434,7 +11434,7 @@ void fn_80063060(void) {
             r3 = 0x0;
             /* lha r5, lbl_80478922(r13) */;
             r6 = 0x0;
-            ((void(*)(void))menuSubOpenYesNo)();
+            ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
             r3 = 0x1;
             fn_801069FC();
@@ -11459,7 +11459,7 @@ void fn_80063060(void) {
             r3 = 0x0;
             /* lha r5, lbl_80478922(r13) */;
             r6 = 0x1;
-            ((void(*)(void))menuSubOpenYesNo)();
+            ((void(*)(void))fn_8001E074)();
             r16 = (s8)r3;
             r3 = 0x1;
             fn_801069FC();
@@ -11517,7 +11517,7 @@ void fn_80063060(void) {
                 r3 = 0x0;
                 /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x0;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
                 if ((s32)r0 == (s32)0x0) {
                     r27 = 0x105;
@@ -11535,7 +11535,7 @@ void fn_80063060(void) {
                 r3 = 0x0;
                 /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x1;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
                 if ((s32)r0 == (s32)0x0) {
                     r27 = 0xac;
@@ -11553,7 +11553,7 @@ void fn_80063060(void) {
                 r3 = 0x0;
                 /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x0;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r16 = (s8)r3;
                 r3 = 0x1;
                 fn_801069FC();
@@ -11578,7 +11578,7 @@ void fn_80063060(void) {
                 r3 = 0x0;
                 /* lha r5, lbl_80478922(r13) */;
                 r6 = 0x1;
-                ((void(*)(void))menuSubOpenYesNo)();
+                ((void(*)(void))fn_8001E074)();
                 r0 = (s8)r3;
                 if ((s32)r0 == (s32)0x0) {
                     r3 = 0x0;

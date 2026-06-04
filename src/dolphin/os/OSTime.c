@@ -169,8 +169,8 @@ void fn_800A27FC(void) {
 /* fn_800A2998 - 0x800A2998 | size: 0x204 */
 void fn_800A2998(void) {
     extern void fn_800A27FC();
-    extern void __div2i();
-    extern void __mod2i();
+    extern void fn_800C4928();
+    extern void fn_800C4B44();
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -195,7 +195,7 @@ void fn_800A2998(void) {
     r4 = r30;
     r6 = (u32)tmp >> 2;
     r5 = 0x0;
-    __mod2i();
+    fn_800C4B44();
     r26 = r3;
     r5 = 0x0;
     r25 = r4;
@@ -224,10 +224,10 @@ void fn_800A2998(void) {
     r4 = r25 * r4;
     r3 = r3 + tmp;
     r5 = 0x0;
-    __div2i();
+    fn_800C4928();
     r5 = 0x0;
     r6 = 0x3e8;
-    __mod2i();
+    fn_800C4B44();
     *(u32*)((u8*)r31 + 0x24) = r4;
     r3 = 0x10620000;
     r5 = r3 + 0x4dd3;
@@ -238,10 +238,10 @@ void fn_800A2998(void) {
     tmp = (u32)((u64)r5 * (u64)tmp >> 32);
     r6 = (u32)tmp >> 6;
     r5 = 0x0;
-    __div2i();
+    fn_800C4928();
     r5 = 0x0;
     r6 = 0x3e8;
-    __mod2i();
+    fn_800C4B44();
     *(u32*)((u8*)r31 + 0x20) = r4;
     r30 = r30 - r25;
     r29 = r29 - r26; /* -borrow */;
@@ -252,10 +252,10 @@ void fn_800A2998(void) {
     r6 = (u32)tmp >> 2;
     r4 = r30;
     r5 = 0x0;
-    __div2i();
+    fn_800C4928();
     r6 = r25;
     r5 = 0x0;
-    __div2i();
+    fn_800C4928();
     r5 = 0xB0000;
     tmp = *(u32*)((u8*)r27 + 0xF8);
     r5 = r5 + 0x2575;
@@ -265,10 +265,10 @@ void fn_800A2998(void) {
     r3 = r29;
     r4 = r30;
     r5 = 0x0;
-    __div2i();
+    fn_800C4928();
     r6 = r25;
     r5 = 0x0;
-    __mod2i();
+    fn_800C4B44();
     r27 = r4;
     if ((s32)r27 < 0) {
         r27 = r27 + (0x1 << 16);

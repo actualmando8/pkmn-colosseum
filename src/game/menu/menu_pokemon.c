@@ -48,7 +48,7 @@ extern u32   menuCloseSync(u32 a);                /* scene property get */
 extern void  fn_80109220(u32 obj, u8 visible);  /* model visibility set */
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d); /* sound trigger */
 extern void  fn_80132A38(u32 effectId, u32 param);     /* effect trigger */
-extern void  gamedataGetStatus(u32 a, u32 b);         /* effect alloc */
+extern void  fn_80135938(u32 a, u32 b);         /* effect alloc */
 extern void  fn_801240C4(void* obj, u16 species, u32 form); /* people set species */
 extern void* fn_80123FBC(void* obj);            /* people get */
 extern void  fn_8012640C(void* obj);            /* people field update */
@@ -75,7 +75,7 @@ extern void* fn_801FBFBC(u16 species);             /* Species base data get */
 /* ===== Text / Messages ===== */
 extern void* fn_8001E224(u32 msgBank, u32 msgId);  /* Message string get A */
 extern u32   fn_8001E200(u32 msgBank, u32 msgId);  /* Message string get B */
-extern s8    menuSubOpenYesNo(u32 a, u32 b, u32 c, u32 d); /* Input wait / text input */
+extern s8    fn_8001E074(u32 a, u32 b, u32 c, u32 d); /* Input wait / text input */
 
 /* ===== Battle system ===== */
 extern void  fn_801D1F7C(u32 a);           /* Battle data accessor */

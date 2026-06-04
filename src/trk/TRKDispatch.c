@@ -11,14 +11,14 @@ extern void MWTRACE(s32 level, const char* fmt, ...);
 extern void fn_800BEE44(void);  /* TRKResetBuffer */
 
 /* Command handler functions - each takes a buffer pointer and returns error */
-extern s32 TRKDoSetOption(void* buffer);  /* cmd 0x00: Ping */
-extern s32 TRKDoStop(void* buffer);  /* cmd 0x01: Connect */
-extern s32 TRKDoStep(void* buffer);  /* cmd 0x02: Disconnect */
-extern s32 TRKDoContinue(void* buffer);  /* cmd 0x03: Reset */
+extern s32 fn_800BF53C(void* buffer);  /* cmd 0x00: Ping */
+extern s32 fn_800BF5E4(void* buffer);  /* cmd 0x01: Connect */
+extern s32 fn_800BF68C(void* buffer);  /* cmd 0x02: Disconnect */
+extern s32 fn_800BF8AC(void* buffer);  /* cmd 0x03: Reset */
 extern s32 SendACK(void* buffer);  /* cmd 0x04: Versions */
-extern s32 TRKDoReadRegisters(void* buffer);  /* cmd 0x05: SupportMask */
-extern s32 TRKDoWriteMemory(void* buffer);  /* cmd 0x06: CPUType */
-extern s32 TRKDoReadMemory(void* buffer);  /* cmd 0x07: ReadMemory */
+extern s32 fn_800BFBEC(void* buffer);  /* cmd 0x05: SupportMask */
+extern s32 fn_800BFECC(void* buffer);  /* cmd 0x06: CPUType */
+extern s32 fn_800C0108(void* buffer);  /* cmd 0x07: ReadMemory */
 extern s32 fn_800C034C(void* buffer);  /* cmd 0x08: WriteMemory */
 extern s32 fn_800C0354(void* buffer);  /* cmd 0x09: ReadRegisters */
 extern s32 fn_800C035C(void* buffer);  /* cmd 0x0A: WriteRegisters */
@@ -46,28 +46,28 @@ s32 TRKDispatchMessage(void* buffer) {
 
     switch (cmd) {
         case 0x00: /* Ping */
-            result = TRKDoSetOption(buffer);
+            result = fn_800BF53C(buffer);
             break;
         case 0x01: /* Connect */
-            result = TRKDoStop(buffer);
+            result = fn_800BF5E4(buffer);
             break;
         case 0x02: /* Disconnect */
-            result = TRKDoStep(buffer);
+            result = fn_800BF68C(buffer);
             break;
         case 0x03: /* Reset */
-            result = TRKDoContinue(buffer);
+            result = fn_800BF8AC(buffer);
             break;
         case 0x04: /* Versions */
             result = SendACK(buffer);
             break;
         case 0x05: /* SupportMask */
-            result = TRKDoReadRegisters(buffer);
+            result = fn_800BFBEC(buffer);
             break;
         case 0x06: /* CPUType */
-            result = TRKDoWriteMemory(buffer);
+            result = fn_800BFECC(buffer);
             break;
         case 0x07: /* ReadMemory */
-            result = TRKDoReadMemory(buffer);
+            result = fn_800C0108(buffer);
             break;
         case 0x08: /* WriteMemory */
             result = fn_800C034C(buffer);
@@ -169,7 +169,7 @@ void fn_800C08C0(void) {
     extern void MessageSend();
     extern void fn_800BEEB4();
     extern void fn_800BF14C();
-    extern void TRKTestForPacket();
+    extern void fn_800BF1FC();
     extern void fn_800C0504();
     u8 sp[0x40];
     u32 tmp = 0;
@@ -216,7 +216,7 @@ void fn_800C08C0(void) {
             r28 = 0x0;
         }
         while (1) {
-            TRKTestForPacket();
+            fn_800BF1FC();
             *(u32*)((u8*)r22 + 0x0) = r3;
             r3 = *(u32*)((u8*)r22 + 0x0);
             if ((s32)r3 != (s32)-0x1) break;

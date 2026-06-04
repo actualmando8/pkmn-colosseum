@@ -13,27 +13,27 @@
  * Matches: 0x800A2D38 - 0x800A3EB0
  *   fn_800A2D38 (0x2C) - DVDConvertEntrynumToPath helper
  *   fn_800A2D64 (0x34) - DVDConvertEntrynumToPath helper 2
- *   PSMTXConcat (0xCC) - DVDConvertEntrynumToPath
+ *   fn_800A2D98 (0xCC) - DVDConvertEntrynumToPath
  *   fn_800A2E64 (0x50) - DVD path helper
- *   PSMTXInverse (0xF8) - DVDReadAbsAsyncPrio
- *   PSMTXInvXpose (0xC8) - DVDReadAbsAsyncForBS
+ *   fn_800A2EB4 (0xF8) - DVDReadAbsAsyncPrio
+ *   fn_800A2FAC (0xC8) - DVDReadAbsAsyncForBS
  *   fn_800A3074 (0x70) - DVDReadDiskIDAsync
- *   PSMTXRotTrig (0xB0) - cbForReadAsync
- *   __PSMTXRotAxisRadInternal (0xB0) - cbForSeekAsync
+ *   fn_800A30E4 (0xB0) - cbForReadAsync
+ *   fn_800A3194 (0xB0) - cbForSeekAsync
  *   fn_800A3244 (0x70) - DVDSeekAbsAsyncPrio
  *   fn_800A32B4 (0x34) - DVDGetTransferredSize
  *   fn_800A32E8 (0x4C) - DVDGetCurrentDiskID
  *   fn_800A3334 (0x28) - DVDGetFSTLocation
  *   fn_800A335C (0x58) - DVDSetAutoFatalMessaging
- *   PSMTXQuat (0xA4) - DVDSetAutoInvalidation
- *   C_MTXLookAt (0x18C) - __DVDGetCoverRegCallback
+ *   fn_800A33B4 (0xA4) - DVDSetAutoInvalidation
+ *   fn_800A3458 (0x18C) - __DVDGetCoverRegCallback
  *   fn_800A35E4 (0x94) - __DVDPrepareResetCallback
- *   C_MTXLightPerspective (0xCC) - __DVDClearCoverInterrupt
+ *   fn_800A3678 (0xCC) - __DVDClearCoverInterrupt
  *   fn_800A3744 (0x88) - __DVDGetCoverStatus
  *   fn_800A37CC (0x54) - __DVDGetPreviousCoverStatus
  *   fn_800A3820 (0x54) - __DVDDisableCoverInterrupt
  *   fn_800A3874 (0x9C) - __DVDResetCoverCallback
- *   C_MTXPerspective (0xD0) - __DVDUnrecoverableError
+ *   fn_800A3910 (0xD0) - __DVDUnrecoverableError
  *   fn_800A39E0 (0x98) - DVDSetUserData
  *   fn_800A3A78 (0x24) - DVDGetUserData
  *   fn_800A3A9C (0x24) - (getter)
@@ -47,7 +47,7 @@
  *   fn_800A3C00 (0x54) - DVDStopStreamAtEndAsync
  *   fn_800A3C54 (0x5C) - DVDGetStreamErrorStatusAsync
  *   fn_800A3CB0 (0x8C) - DVDGetStreamPlayAddrAsync
- *   C_QUATSlerp (0x174) - DVDGetStreamStartAddrAsync
+ *   fn_800A3D3C (0x174) - DVDGetStreamStartAddrAsync
  *   ... up to 0x800A3EB0
  */
 

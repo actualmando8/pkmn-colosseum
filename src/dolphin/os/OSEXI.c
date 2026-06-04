@@ -13,7 +13,7 @@
  *   fn_8009E7A8 (0x04) - __OSGetRTC stub / return
  *   fn_8009E7AC (0x04) - (nop)
  *   OSLink (0x2BC) - __OSReadROM (read from IPL font ROM via EXI)
- *   Link (0x2E0) - __OSGetRTC / __OSSetRTC (RTC access via EXI)
+ *   fn_8009EA6C (0x2E0) - __OSGetRTC / __OSSetRTC (RTC access via EXI)
  *   fn_8009ED4C (0x24)  - (helper)
  *   fn_8009ED70 (0x3C)  - (helper)
  *   OSUnlink (0x238) - __OSReadFontROM
@@ -108,7 +108,7 @@ BOOL __OSGetRTC(u32* rtc) {
 
 /*
  * __OSSetRTC - Set the Real-Time Clock value via EXI.
- * Part of Link block.
+ * Part of fn_8009EA6C block.
  */
 BOOL __OSSetRTC(u32 rtc) {
     BOOL result = FALSE;

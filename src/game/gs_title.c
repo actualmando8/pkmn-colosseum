@@ -1411,7 +1411,7 @@ extern void fn_801026A4(void);
 extern void fn_8011394C(void);
 extern void fn_800D3074(void);
 extern void fn_800EF5FC(void);
-extern void GSgfxBeginBackFBCapture(void);
+extern void fn_800DC390(void);
 extern void fn_8010264C(void);
 extern u32 lbl_80478DDC;
 extern u32 lbl_8047A368;
@@ -1437,7 +1437,7 @@ void fn_80025730(void) {
     extern void fn_8005D8F8();
     extern void fn_8005D934();
     extern void fn_800D3074();
-    extern void GSgfxBeginBackFBCapture();
+    extern void fn_800DC390();
     extern void fn_800EF5FC();
     extern void fn_80102510();
     extern void fn_8010264C();
@@ -1594,7 +1594,7 @@ L_80025910:
         lbl_8047A388 = r3;
         r4 = (u32)fn_80025F74;
         r5 = 0x0;
-        GSgfxBeginBackFBCapture();
+        fn_800DC390();
         while (1) {
             tmp = lbl_8047A3A8;
             if (tmp != 0) break;
@@ -1782,7 +1782,7 @@ void fn_80025A7C(void) { }
  *        lbl_8047A3A4 -= lbl_8047B8C8; clamp >= 0
  *   4. Return 1 if either scale is still > 0 (quad still visible), else 0.
  *
- * Used by GSgfxBeginBackFBCapture as a particle callback; re-registered until it
+ * Used by fn_800DC390 as a particle callback; re-registered until it
  * returns 0 (fully faded).
  *
  * Status: 90.6% matched. Remaining diffs: FP register swaps in the
@@ -2056,7 +2056,7 @@ s32 fn_80025F74(void) {
  *   4. Per lbl_8047A380 (debug flag?), pick one of two frame-sequence tables
  *      (lbl_80478DEC + idx*0x10), read 2 u32s, advance index (wrap > 9).
  *   5. Reset cursor scales: lbl_8047A3A4 = lbl_8047A3A0 = lbl_8047B8A8 (0).
- *   6. Register fn_80025A80 as a particle callback (GSgfxBeginBackFBCapture).
+ *   6. Register fn_80025A80 as a particle callback (fn_800DC390).
  *   7. Start BGM via fn_80176E0C, then run two timing delay loops
  *      (fn_800F0308 + fn_800D3088 accumulator vs 1 or 0xAE target).
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
@@ -2128,7 +2128,7 @@ void fn_80025F84(void) {
     extern u32 fn_800C46B0(f64);
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
-    extern void GSgfxBeginBackFBCapture(u32, void*, s32);
+    extern void fn_800DC390(u32, void*, s32);
     extern void fn_800E3C00(u32, s32);
     extern void fn_800E3C08(u32, u32);
     extern void fn_800E3C94(u32, s32);
@@ -2209,7 +2209,7 @@ void fn_80025F84(void) {
         lbl_8047A3A4 = lbl_8047B8A8;
         lbl_8047A3A0 = lbl_8047B8A8;
         lbl_8047A38C = fn_800EF5FC(0, 0, 0x44, 0, 0);
-        GSgfxBeginBackFBCapture(lbl_8047A38C, (void*)fn_80025A80, 0);
+        fn_800DC390(lbl_8047A38C, (void*)fn_80025A80, 0);
         fn_80176E0C(fn_80113F48(), frame_b, 0, 0);
 
         delay = 1;
@@ -2312,7 +2312,7 @@ void fn_8002060C(void) {
 /* fn_80020618 - 0x80020618 | size: 0x304 */
 extern void fn_80105624(void);
 extern s32 fn_80135168(s32, s32);
-extern f64 sin(f32);
+extern f64 fn_800CE148(f32);
 extern void fn_80166CC0(void);
 extern void fn_800F78A4(void);
 extern void fn_80135030(void);
@@ -2357,7 +2357,7 @@ asm void fn_8002092C(void) {
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
@@ -2382,7 +2382,7 @@ asm void fn_800209BC(void) {
 void fn_800209BC(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
@@ -2407,7 +2407,7 @@ asm void fn_80020A4C(void) {
 void fn_80020A4C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
@@ -2500,7 +2500,7 @@ void fn_80020BA0(void* arg0, u8* arg1) {
 extern void fn_801070F4(void);
 extern void fn_801D04E8(void);
 extern void fn_80106D3C(s32, s32, s32, s32);
-extern void menuSubOpenYesNo(void);
+extern void fn_8001E074(void);
 extern void fn_801D0748(void);
 extern void fn_801069FC(s32);
 extern void fn_80102568(s32, s32, s32);
@@ -2526,7 +2526,7 @@ void fn_80020C9C(void) {
     extern void fn_80135030(s32, s32, s32);
     extern u8 fn_801D04E8(void);
     extern void fn_80106D3C(s32, s32, s32, s32);
-    extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
+    extern u8 fn_8001E074(s32, s32, s32, s32);
     extern void fn_801D0748(s32, s32, s32);
     extern void fn_801069FC(s32);
     extern void fn_80102568(s32, s32, s32);
@@ -2579,7 +2579,7 @@ void fn_80020C9C(void) {
             if (fn_80135168(0, 9) != fmt) {
                 if (fn_801D04E8() != 0) {
                     fn_80106D3C(1, 0x3D82, 1, 0);
-                    if ((s8)menuSubOpenYesNo(0, 0x3C, 0xAA, 1) == 0) {
+                    if ((s8)fn_8001E074(0, 0x3C, 0xAA, 1) == 0) {
                         fn_801D0748(7, 2, 0);
                     }
                     fn_801069FC(1);
@@ -2720,7 +2720,7 @@ extern void fn_8010A5BC(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);
-extern void menuModelSetMotion(void);
+extern void fn_80109894(void);
 extern void fn_80005748(void);
 extern void fn_801EF274(void);
 extern void fn_80113FE8(void);
@@ -2983,8 +2983,8 @@ s32 fn_80021A9C(u32 r3, u32* r4) {
 #endif
 
 /* fn_80021B14 - 0x80021B14 | size: 0x53c */
-extern void itemParamConvertOrigFormat(void);
-extern void itemParamGetRecoverType(void);
+extern void fn_80142EF8(void);
+extern void fn_801431AC(void);
 extern void fn_80014110(void);
 extern s32 fn_80121ADC(s32, s32);
 extern s16 fn_80144574(void*, s32, s32, u16, s32);
@@ -3004,7 +3004,7 @@ void fn_80021B14(void) { /* TODO */ }
 
 /* fn_80022050 - 0x80022050 | size: 0x12c */
 extern s32 fn_801347E0(void);
-extern s32 pcboxGetPokemonBoxNbEmptySlot(s32, s8);
+extern s32 fn_801347E8(s32, s8);
 extern void fn_800140FC(s32*, s32*);
 extern s32 fn_801F7EF0(s32);
 extern void fn_80023968(void);
@@ -3038,7 +3038,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
         cVar1 = fn_801347E0();
         iVar3 = 0;
         while (iVar3 < cVar1) {
-            cVar2 = pcboxGetPokemonBoxNbEmptySlot(0, (s8)iVar3);
+            cVar2 = fn_801347E8(0, (s8)iVar3);
             if (cVar2 > 0) {
                 break;
             }
@@ -3094,8 +3094,8 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
     s32 sd;
     s32 sound_id;
 
-    ((void(*)(u8*, u8*))itemParamConvertOrigFormat)(state_buf, lbl_80478888);
-    sel = ((s32(*)(u8*))itemParamGetRecoverType)(state_buf);
+    ((void(*)(u8*, u8*))fn_80142EF8)(state_buf, lbl_80478888);
+    sel = ((s32(*)(u8*))fn_801431AC)(state_buf);
     if ((u32)sel > 0x15) {
         fn_80106D3C(2, 0x426A, 1, 0);
         fn_801069FC(1);
@@ -3255,7 +3255,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern u32 fn_80143F24(void*);
     extern u32 fn_80143EF0(u32);
     extern u32 fn_80143E88(void*);
-    extern s32 menuSubOpenYesNo(s32, s32, s32, s32);
+    extern s32 fn_8001E074(s32, s32, s32, s32);
     extern u32 fn_8011F228(s32, u32);
     extern void fn_8011F5C8(s32);
     extern s32 fn_8011E778(void);
@@ -3293,7 +3293,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     fn_80106D3C(2, msg, 1, 0);
     fn_801069FC(1);
     fn_80106D3C(2, 0x426B, 1, 0);
-    state = (s8)menuSubOpenYesNo(0, -1, -1, 0);
+    state = (s8)fn_8001E074(0, -1, -1, 0);
     fn_801069FC(1);
     switch (state) {
     case 0:  action = 0; break;

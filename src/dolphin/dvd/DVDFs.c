@@ -672,7 +672,7 @@ void fn_800A5558(void) {
     extern u8 lbl_80311A54[];
     extern u8 lbl_804789C0[];
     extern void fn_800060F0();
-    extern void DVDSeekAbsAsyncPrio();
+    extern void fn_800A72E8();
     extern void fn_800A55F0();
     u32 tmp = 0;
     u32 r3 = 0;
@@ -705,7 +705,7 @@ void fn_800A5558(void) {
     r3 = r28 + 0x0;
     r6 = r31 + 0x0;
     r4 = tmp + r29;
-    DVDSeekAbsAsyncPrio();
+    fn_800A72E8();
     r3 = 0x1;
     return;
 }

@@ -27,7 +27,7 @@ extern u32 __OSLastInterruptSrr0;
 extern void __OSDispatchInterrupt(u8 exception, OSContext* context);
 
 /* __OSSetInterruptMask - translates OS interrupt bits to hardware register writes.
- * This is SetInterruptMask in the disassembly, a large function that maps OS-level
+ * This is fn_8009E02C in the disassembly, a large function that maps OS-level
  * interrupt mask bits to the appropriate PI/DSP/AI/SI/EXI hardware registers.
  * Takes the changed mask bits and the combined global mask, returns remaining
  * unprocessed bits.

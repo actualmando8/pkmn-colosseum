@@ -129,14 +129,14 @@
  *      creates reflection texture, configures indirect TEV stages.
  *    - fn_800E9998: UpdateEnvMap (0x194 bytes)
  *      Per-frame env-map matrix update from camera view.
- *    - GSmodelPopState: EnvMap texcoord (0x140 bytes)
+ *    - fn_800E9B2C: EnvMap texcoord (0x140 bytes)
  *    - fn_800E9C6C: EnvMap TEV stage (0x1C8 bytes)
  *    - fn_800E9E34: EnvMap helper (0x5C bytes)
  *    - fn_800E9E90: EnvMap pipeline (0x77C bytes)
  *      Large environment map rendering pipeline.
  *
  * 9. GX state emission / render pipeline (0x800EA60C - 0x800EE2C8)
- *    - fn_800EA60C: GX state query (0x58 bytes)
+ *    - HSD_JObjMtxIsDirty: GX state query (0x58 bytes)
  *    - fn_800EA664: GX state helper (0x70 bytes)
  *    - fn_800EA6D4: BindTextureToStage (0x110 bytes)
  *    - fn_800EA7E4: Helper (0x3C bytes)
@@ -153,7 +153,7 @@
  *    - fn_800EB5A0: GX command batch (0x140 bytes)
  *    - fn_800EB6E0: Texture setup (0x224 bytes)
  *    - fn_800EB904: Large render setup (0x5E8 bytes)
- *    - _modelSetRotateEulerToQuatAll__FP9_HSD_JObj: Render config (0x1FC bytes)
+ *    - fn_800EBEEC: Render config (0x1FC bytes)
  *    - fn_800EC0E8: SetAlpha (0x4C bytes)
  *    - fn_800EC134: UpdateMObjColor (0x20 bytes)
  *    - fn_800EC154: GetMObjPtr (0xC bytes)
@@ -233,7 +233,7 @@
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* fn_800D2584(void);                        /* HSD_StartRender (acquire context) */
 extern void  fn_800D87AC(s32 mode);                    /* GSgfx_SetInternalMode */
-extern void  GSlightSetupLights(void* renderObj);              /* HSD render dispatch */
+extern void  fn_800DD174(void* renderObj);              /* HSD render dispatch */
 extern void  fn_800D6A5C(void* callbackA, void* callbackB); /* callback dispatch */
 
 /* GSmem */
@@ -720,7 +720,7 @@ extern void fn_800E9358(void*, u8);
 extern void fn_800E93B8(void);
 extern void* fn_800E9998(void*, void*, void*, void*);
 extern void fn_800E9E90(void);
-extern s32 fn_800EA60C();
+extern s32 HSD_JObjMtxIsDirty();
 extern void fn_800EA664();
 extern void fn_800EA6D4();
 extern void fn_800EA7E4();
@@ -732,7 +732,7 @@ extern void fn_800EB340(void* entry);
 extern void fn_800EB414();
 extern void fn_800EB6E0(void*, void*, void*, void*, f64);
 extern void fn_800EB904(void);
-extern void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void*);
+extern void fn_800EBEEC(void*);
 extern void fn_800EC1E4();
 extern void fn_800EC208();
 extern void fn_800EC2A4(void*, f32);
@@ -773,7 +773,7 @@ void fn_800E3604(u32 flags, u8 slot) {
     fn_801B25C4(0x7f);
     if ((mobj = fn_800D2584()) != NULL) {
         if (fn_80195A6C(*(void**)((u8*)mobj + 0xc)) != 0) {
-            GSlightSetupLights(*(void**)((u8*)mobj + 0xc));
+            fn_800DD174(*(void**)((u8*)mobj + 0xc));
             slotMatch = (u8)slot;
             animFlag = flags & 0x10;
             envFlag = flags & 0x1000;
@@ -829,7 +829,7 @@ void fn_800E3760(void* entry, u32 r4) {
         void* r31 = fn_800D2584();
         if (r31 != NULL) {
             if (fn_80195A6C(*(void**)((u8*)r31 + 0xc)) != 0) {
-                GSlightSetupLights(*(void**)((u8*)r31 + 0xc));
+                fn_800DD174(*(void**)((u8*)r31 + 0xc));
                 fn_800E9148(entry, 1);
                 {
                     void* mobj;
@@ -2834,7 +2834,7 @@ void fn_800E68D8(void* obj) {
 
 /* fn_800E69C4 | Size: 0x15C */
 extern void fn_800DF3F0(void);
-extern void GSmaterialSetFlags(void);
+extern void fn_800DF550(void);
 #if 0
 asm void fn_800E69C4(void) {
 #include "src/game/gs_material_fn_800E69C4.inc"
@@ -2886,7 +2886,7 @@ void fn_800E69C4(void* entry, s32 param) {
             void* p = r25[r23];
             if (p != NULL) {
                 s32 r3 = ((s32(*)(void*))fn_800DF3F0)(p);
-                ((void(*)(void*, s32))GSmaterialSetFlags)(p, param | r3);
+                ((void(*)(void*, s32))fn_800DF550)(p, param | r3);
             }
             r23++;
             r25++;
@@ -3299,7 +3299,7 @@ void fn_800E85E8(void* obj) {
 
 /* fn_800E8684 -- LIGHTING SETUP | Size: 0x878 */
 extern void fn_80190E34(void* obj, f32* out);
-extern void ceil(void);
+extern void fn_800CDA74(void);
 extern void fn_800C46B0(void);
 extern void fn_801B06DC(u32 val);
 extern void fn_801B07D4(void);
@@ -3677,7 +3677,7 @@ void* fn_800E9998(void* r26, void* r27, void* r28, void* r29) {
                     f32 f0 = f2 / lbl_8047CBC0;
                     f1 = f1 * f0;
                 }
-                r3_lod = ((s32(*)(f64))ceil)((f64)f1);
+                r3_lod = ((s32(*)(f64))fn_800CDA74)((f64)f1);
                 r3_lod = ((s32(*)(s32))fn_800C46B0)(r3_lod);
             } else {
                 r3_lod = 0;
@@ -3729,13 +3729,13 @@ void* fn_800E9998(void* r26, void* r27, void* r28, void* r29) {
 }
 #endif
 
-/* GSmodelPopState | Size: 0x140 */
+/* fn_800E9B2C | Size: 0x140 */
 #if 0
-asm void GSmodelPopState(void) {
-#include "src/game/gs_material_GSmodelPopState.inc"
+asm void fn_800E9B2C(void) {
+#include "src/game/gs_material_fn_800E9B2C.inc"
 }
 #else
-void GSmodelPopState(void* entry, void* param) {
+void fn_800E9B2C(void* entry, void* param) {
     u32 r0 = *(u32*)entry & 0xFFCDD49Du;
     *(u32*)entry = r0;
     *(u32*)entry = *(u32*)entry | *(u32*)param;
@@ -3830,8 +3830,8 @@ void fn_800E9E34(GSmaterialEntry* entry, void* a, void* b, void* c) {
 #endif
 
 /* fn_800E9E90 -- EnvMap pipeline | Size: 0x77C */
-extern void PSMTXInverse(u8* dst, void* src);
-extern void PSMTXConcat(void* a, void* b, void* c);
+extern void fn_800A2EB4(u8* dst, void* src);
+extern void fn_800A2D98(void* a, void* b, void* c);
 extern void fn_800E064C(u8* data);
 extern void fn_80197B6C(void*, void*, void*);
 extern void fn_8019F024();
@@ -3850,13 +3850,13 @@ void fn_800E9E90(void) {
 }
 #endif
 
-/* fn_800EA60C | Size: 0x58 */
+/* HSD_JObjMtxIsDirty | Size: 0x58 */
 #if 0
-asm void fn_800EA60C(void) {
-#include "src/game/gs_material_fn_800EA60C.inc"
+asm void HSD_JObjMtxIsDirty(void) {
+#include "src/game/gs_material_HSD_JObjMtxIsDirty.inc"
 }
 #else
-s32 fn_800EA60C(void* obj) {
+s32 HSD_JObjMtxIsDirty(void* obj) {
     u32 flags;
     if (obj == NULL) {
         fn_80196E10(&lbl_8047CC00, 0x25d, &lbl_8047CC08);
@@ -3923,10 +3923,10 @@ void fn_800EA6D4(void* entry, void* tex, void* r5) {
             }
             if (r3 != 0) fn_8019D9DC(r31);
         }
-        PSMTXInverse((u8*)*(void**)((u8*)r29 + 0x10) + 0x44, r5);
-        PSMTXConcat((u8*)r29 + 0x44, r5, r5);
+        fn_800A2EB4((u8*)*(void**)((u8*)r29 + 0x10) + 0x44, r5);
+        fn_800A2D98((u8*)r29 + 0x44, r5, r5);
         if (entry != NULL) {
-            PSMTXConcat(entry, r5, r5);
+            fn_800A2D98(entry, r5, r5);
         }
     }
 }
@@ -4075,7 +4075,7 @@ void fn_800EA960(void* obj, void* mtx, void* dst, s32 typeFlag, void* doBlend, v
                                             fn_8019D9DC(texObj);
                                         }
                                     }
-                                    PSMTXConcat(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
+                                    fn_800A2D98(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
                                     fn_800E0628(baseOfs, (void*)stk2);
                                 }
                             }
@@ -4185,7 +4185,7 @@ void fn_800EACD0(void* obj, void* mtx, void* dst, u8 doBlend, void* callback, vo
                                     fn_8019D9DC(texObj);
                                 }
                             }
-                            PSMTXConcat(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
+                            fn_800A2D98(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
                             fn_800E0628(baseOfs, (void*)stk2);
                         }
                     }
@@ -4222,7 +4222,7 @@ void fn_800EACD0(void* obj, void* mtx, void* dst, u8 doBlend, void* callback, vo
 
 /* fn_800EAFE4 -- ConfigureZMode | Size: 0x284 */
 extern void* fn_80197A64(void*, void*);
-extern void HSD_MtxScaledAdd(void*, void*, void*, f32);
+extern void fn_801A85F0(void*, void*, void*, f32);
 extern u8 lbl_80270EB8[];
 extern u32 lbl_8047CC18;
 extern u32 lbl_8047CC10;
@@ -4277,7 +4277,7 @@ void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
             }
             if (obj != NULL) {
                 void* tex = *(void**)((u8*)nodeData + 0x4);
-                PSMTXConcat((u8*)tex + 0x44, *(void**)((u8*)tex + 0x78), (void*)mtxBuf);
+                fn_800A2D98((u8*)tex + 0x44, *(void**)((u8*)tex + 0x78), (void*)mtxBuf);
                 texObj = (void*)mtxBuf;
             } else {
                 void* tex = *(void**)((u8*)nodeData + 0x4);
@@ -4324,16 +4324,16 @@ void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
                 if (*(void**)((u8*)texObj + 0x78) == NULL) {
                     fn_80196E10(&lbl_8047CC10, 0x82, assertStr + 0x1c);
                 }
-                PSMTXConcat((u8*)texObj + 0x44, *(void**)((u8*)texObj + 0x78), (void*)mtxTmp);
-                HSD_MtxScaledAdd((void*)mtxTmp, (void*)mtxBuf, (void*)mtxBuf, *(f32*)((u8*)nodeData + 0x8));
+                fn_800A2D98((u8*)texObj + 0x44, *(void**)((u8*)texObj + 0x78), (void*)mtxTmp);
+                fn_801A85F0((void*)mtxTmp, (void*)mtxBuf, (void*)mtxBuf, *(f32*)((u8*)nodeData + 0x8));
                 nodeData = *(void**)nodeData;
             }
             texObj = (void*)mtxBuf;
         }
         if (obj != NULL) {
-            PSMTXConcat(texObj, obj, (void*)mtxBuf);
+            fn_800A2D98(texObj, obj, (void*)mtxBuf);
         }
-        PSMTXConcat(dst, texObj, (void*)mtxTmp);
+        fn_800A2D98(dst, texObj, (void*)mtxTmp);
         fn_800E0628(outPtr, (void*)mtxTmp);
         node = *(void**)node;
         outPtr += 0x30;
@@ -4416,7 +4416,7 @@ void fn_800EB340(void* entry) {
 #endif
 
 /* fn_800EB414 | Size: 0x50 */
-extern void GSgfxParseDisplayList(void);
+extern void fn_800DA578(void);
 extern u8 lbl_80315598[];
 #if 0
 asm void fn_800EB414(void) {
@@ -4428,7 +4428,7 @@ void fn_800EB414(void* p, void* a2, void* a3, void* a4, void* a5, void* a6) {
     args[0] = a6;
     args[1] = a3;
     args[2] = a4;
-    ((void(*)(void*, void*, u32, u8*, void*, void*))GSgfxParseDisplayList)(
+    ((void(*)(void*, void*, u32, u8*, void*, void*))fn_800DA578)(
         *(void**)((u8*)p + 0x8),
         *(void**)((u8*)p + 0x10),
         (u32)(*(u16*)((u8*)p + 0xe)) << 5,
@@ -4501,7 +4501,7 @@ void fn_800EB528(void* entry) {
     *(u32*)((u8*)entry + 0x10) = (u32)((void*(*)(void*))fn_801A0FBC)(src);
     src = *(void**)*(void**)((u8*)entry + 0x4);
     *(u32*)((u8*)entry + 0x14) = (u32)((void*(*)(void*))fn_801A0FBC)(src);
-    ((void(*)(void*))_modelSetRotateEulerToQuatAll__FP9_HSD_JObj)(*(void**)((u8*)entry + 0xc));
+    ((void(*)(void*))fn_800EBEEC)(*(void**)((u8*)entry + 0xc));
 }
 #endif
 
@@ -4658,13 +4658,13 @@ void fn_800EB904(void) {
 }
 #endif
 
-/* _modelSetRotateEulerToQuatAll__FP9_HSD_JObj -- Render config | Size: 0x1FC */
+/* fn_800EBEEC -- Render config | Size: 0x1FC */
 #if 0
-asm void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void) {
-#include "src/game/gs_material__modelSetRotateEulerToQuatAll__FP9_HSD_JObj.inc"
+asm void fn_800EBEEC(void) {
+#include "src/game/gs_material_fn_800EBEEC.inc"
 }
 #else
-void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void* r23) {
+void fn_800EBEEC(void* r23) {
     void* r31;
     void* r30;
     void* r29;
@@ -4710,7 +4710,7 @@ void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void* r23) {
                                                                 if (!(*(u32*)((u8*)r24 + 0x14) & 0x80000)) {
                                                                     r23 = *(void**)((u8*)r24 + 0x10);
                                                                     while (r23 != NULL) {
-                                                                        ((void(*)(void*))_modelSetRotateEulerToQuatAll__FP9_HSD_JObj)(r23);
+                                                                        ((void(*)(void*))fn_800EBEEC)(r23);
                                                                         r23 = *(void**)((u8*)r23 + 0x8);
                                                                     }
                                                                 }

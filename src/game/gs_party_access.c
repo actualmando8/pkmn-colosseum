@@ -36,7 +36,7 @@
  *   fn_8000BA94  GSparty_GetFieldPtr         -- return base pointer to party array
  *   fn_8000BAB8  GSparty_GetSpecies           -- get species ID for slot N
  *   fn_8000BB00  GSparty_GetLevel             -- get level for slot N
- *   dbgMenuHeroPokemonAdd  GSparty_GetMoveCount         -- count non-zero moves for slot N
+ *   fn_8000BB48  GSparty_GetMoveCount         -- count non-zero moves for slot N
  *   fn_8000BBEC  GSparty_GetSlot0_HP          -- direct HP accessor, slot 0
  *   fn_8000BC58  GSparty_GetSlot1_HP          -- direct HP accessor, slot 1
  *   fn_8000BCC4  GSparty_GetSlot2_HP          -- direct HP accessor, slot 2
@@ -60,7 +60,7 @@
  *   fn_8000C328  GSparty_GetFriendship        -- get friendship value
  *   fn_8000C358  GSparty_GetExperience        -- get current EXP
  *   fn_8000C3A4  GSparty_GetExpToNext         -- get EXP to next level
- *   dbgMenuMsgTest  GSparty_GetMoveData          -- 0xCC bytes, get all move data
+ *   fn_8000C3D4  GSparty_GetMoveData          -- 0xCC bytes, get all move data
  *   fn_8000C4A0  GSparty_SetMove              -- set move at index
  *   fn_8000C518  GSparty_GetMovePP            -- get PP for move N
  *   fn_8000C588  GSparty_GetMovePPMax         -- get max PP for move N
@@ -76,7 +76,7 @@
  *   fn_8000CAFC  GSparty_GetBall              -- get Pokeball type
  *   fn_8000CB28  GSparty_GetOTGender          -- get original trainer gender
  *   fn_8000CB54  GSparty_IsShadow             -- check if Shadow Pokemon
- *   dbgMenuMenuTestD2Present  GSparty_GetShadowGauge       -- 0xC8 bytes, get heart gauge value
+ *   fn_8000CB74  GSparty_GetShadowGauge       -- 0xC8 bytes, get heart gauge value
  *   fn_8000CC3C  GSparty_GetOTName            -- get OT name pointer
  *   fn_8000CC60  GSparty_GetNickname          -- get nickname pointer
  *   fn_8000CC84  GSparty_GetOTID              -- get OT trainer ID
@@ -84,13 +84,13 @@
  *   fn_8000CCD0  GSparty_GetPersonality       -- get personality value (PID)
  *   fn_8000CCF8  GSparty_GetEncryptionKey     -- get encryption key
  *   fn_8000CD20  GSparty_GetFormData          -- get form/cosmetic data
- *   testEvolution__Fv  GSparty_GetStatusFull        -- 0xC8 bytes, get full status struct
+ *   fn_8000CD50  GSparty_GetStatusFull        -- 0xC8 bytes, get full status struct
  *   fn_8000CE18  GSparty_CureStatus           -- cure status condition
  *   fn_8000CE5C  GSparty_ApplyDamage          -- apply damage to HP
  *   fn_8000CED0  GSparty_IsAlive              -- check if HP > 0
  *   fn_8000CEF8  GSparty_FullHeal             -- restore HP to max
  *   fn_8000CF68  GSparty_GetBattleStats       -- 0xF4 bytes, get computed battle stats
- *   dbgMenuMenuTestNameEntryMenu  GSparty_CalcStatModifiers    -- 0xC0 bytes, apply stat stage modifiers
+ *   fn_8000D05C  GSparty_CalcStatModifiers    -- 0xC0 bytes, apply stat stage modifiers
  *   fn_8000D11C  GSparty_GetCritRate          -- get critical hit rate
  *   fn_8000D154  GSparty_GetAccuracy          -- get accuracy modifier
  *   fn_8000D1C4  GSparty_GetEvasion           -- get evasion modifier
@@ -182,7 +182,7 @@ u32 fn_8000BB00(void) {
 #pragma peephole on
 #endif
 
-/* dbgMenuHeroPokemonAdd - 0x8000BB48 | size: 0xa4 */
+/* fn_8000BB48 - 0x8000BB48 | size: 0xa4 */
 extern u32 fn_801EF63C(void);
 extern void fn_80124A60(u8* a);
 extern s32 fn_800096B4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f);
@@ -190,11 +190,11 @@ extern void fn_80129F20(u32 a, u8* b, u32 c, u32 d, u32 e);
 extern u8 lbl_80478840;
 extern u8 lbl_803A1A48[];
 #if 0
-asm void dbgMenuHeroPokemonAdd(void) {
-#include "src/game/gs_party_access_dbgMenuHeroPokemonAdd.inc"
+asm void fn_8000BB48(void) {
+#include "src/game/gs_party_access_fn_8000BB48.inc"
 }
 #else
-s32 dbgMenuHeroPokemonAdd(void) {
+s32 fn_8000BB48(void) {
     if ((u8)fn_801EF63C() == 1) { return -1; }
     if (lbl_80478840 != 0) {
         fn_80124A60(lbl_803A1A48);
@@ -639,7 +639,7 @@ u32 fn_8000C3A4(void) {
 #pragma peephole on
 #endif
 
-/* dbgMenuMsgTest - 0x8000C3D4 | size: 0xcc */
+/* fn_8000C3D4 - 0x8000C3D4 | size: 0xcc */
 extern void fn_801C41C8(u32 a, f32 b);
 extern void fn_801C40F0(u32 a);
 extern void fn_80105FF8(u32 a, u32 b, u32 c);
@@ -648,12 +648,12 @@ extern void fn_80105FB0(u32 a);
 extern void fn_80132A38(u32 a, u32 b);
 extern f32 lbl_8047B6E0;
 #if 0
-asm void dbgMenuMsgTest(void) {
-#include "src/game/gs_party_access_dbgMenuMsgTest.inc"
+asm void fn_8000C3D4(void) {
+#include "src/game/gs_party_access_fn_8000C3D4.inc"
 }
 #else
 #pragma peephole off
-s32 dbgMenuMsgTest(u32 arg1, u32 type) {
+s32 fn_8000C3D4(u32 arg1, u32 type) {
     switch (type) {
     case 0:
         fn_801C41C8(3, lbl_8047B6E0);
@@ -1070,14 +1070,14 @@ void fn_8000CB54(void) {
     fn_80266320();
 }
 
-/* dbgMenuMenuTestD2Present - 0x8000CB74 | size: 0xc8 */
+/* fn_8000CB74 - 0x8000CB74 | size: 0xc8 */
 /* GSparty_GetShadowGauge -- load table, search, call fn_800F07A8 + fn_800F0654 */
 #if 0
-asm void dbgMenuMenuTestD2Present(void) {
-#include "src/game/gs_party_access_dbgMenuMenuTestD2Present.inc"
+asm void fn_8000CB74(void) {
+#include "src/game/gs_party_access_fn_8000CB74.inc"
 }
 #else
-u32 dbgMenuMenuTestD2Present(u32 arg) {
+u32 fn_8000CB74(u32 arg) {
     u32 table[6];
     u32 idx = 0;
     u32 val;
@@ -1152,14 +1152,14 @@ s32 fn_8000CD20(void) {
     return 0;
 }
 
-/* testEvolution__Fv - 0x8000CD50 | size: 0xc8 */
+/* fn_8000CD50 - 0x8000CD50 | size: 0xc8 */
 /* GSparty_GetStatusFull -- complex multi-call with float arg */
 #if 0
-asm void testEvolution__Fv(void) {
-#include "src/game/gs_party_access_testEvolution__Fv.inc"
+asm void fn_8000CD50(void) {
+#include "src/game/gs_party_access_fn_8000CD50.inc"
 }
 #else
-void testEvolution__Fv(void) {
+void fn_8000CD50(void) {
     u32 val1, val2;
     struct { u32 buf[5]; u16 a; u16 b; } locals;
 
@@ -1178,11 +1178,11 @@ void testEvolution__Fv(void) {
 #endif
 
 /* fn_8000CE18 - 0x8000CE18 | size: 0x44 */
-/* GSparty_CureStatus -- call fn_800FF560, then fn_800F07A8 with testEvolution__Fv as callback */
+/* GSparty_CureStatus -- call fn_800FF560, then fn_800F07A8 with fn_8000CD50 as callback */
 s32 fn_8000CE18(void) {
     u32 r;
     r = (u32)fn_800FF560();
-    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)testEvolution__Fv);
+    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)fn_8000CD50);
     return 0;
 }
 
@@ -1293,15 +1293,15 @@ u32 fn_8000CF68(u32 arg) {
 #pragma peephole reset
 #endif
 
-/* dbgMenuMenuTestNameEntryMenu - 0x8000D05C | size: 0xc0 */
+/* fn_8000D05C - 0x8000D05C | size: 0xc0 */
 /* GSparty_CalcStatModifiers -- table lookup with struct copy */
 #if 0
-asm void dbgMenuMenuTestNameEntryMenu(void) {
-#include "src/game/gs_party_access_dbgMenuMenuTestNameEntryMenu.inc"
+asm void fn_8000D05C(void) {
+#include "src/game/gs_party_access_fn_8000D05C.inc"
 }
 #else
 #pragma peephole off
-u32 dbgMenuMenuTestNameEntryMenu(u32 arg) {
+u32 fn_8000D05C(u32 arg) {
     u32 table[8];
     u32 idx = 0;
     u32 val;

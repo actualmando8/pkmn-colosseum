@@ -27,7 +27,7 @@
  *   fn_8000682C  GStask_LoadBattleMenu      -- loads archive slot 6, priority 0 (battle)
  *   fn_80006884  GStask_SelectRandomNPC     -- random NPC selection from scene data
  *   fn_80006908  GStask_ProcessSceneEvent   -- 0x6A4 bytes, large scene event dispatcher
- *   dbmMenuFightButtonNormal  GStask_ProcessEventResult  -- handles event return codes
+ *   fn_80006FAC  GStask_ProcessEventResult  -- handles event return codes
  *   fn_80007088  GStask_GetField1           -- struct field accessor (offset 0x00)
  *   fn_800070CC  GStask_GetField2           -- struct field accessor (offset 0x04)
  *   fn_80007110  GStask_GetField3           -- struct field accessor (offset 0x08)
@@ -37,7 +37,7 @@
  *   fn_8000725C  GStask_LoadSlot3           -- archive load helper, slot 3
  *   fn_800072B4  GStask_LoadSlot4           -- archive load helper, slot 4
  *   fn_8000730C  GStask_LoadSlot5           -- archive load helper, slot 5
- *   _dbgMenuFightFightPokemonSelectSub  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
+ *   fn_80007364  GStask_InitSceneResources  -- 0x2F8 bytes, resource init
  *   fn_8000765C  GStask_ShutdownResources   -- resource cleanup
  *   fn_80007708  GStask_UpdateLoadState     -- resource loading state machine
  *   fn_80007778  GStask_GetLoadFlag0        -- small accessor (0x20 bytes)
@@ -68,7 +68,7 @@
  *   fn_80008174  GStask_Accessor6           -- 8-byte accessor
  *   fn_8000817C  GStask_Accessor7           -- 8-byte accessor
  *   fn_80008184  GStask_FinalizeLoad        -- 0xC0 bytes, finalize resource load
- *   _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub  GStask_BuildResourceList   -- 0x14C bytes, compile resource table
+ *   fn_80008244  GStask_BuildResourceList   -- 0x14C bytes, compile resource table
  *
  * Code patterns:
  *   - SDA globals lbl_8047A288 (current scene halfword), lbl_80478F50 (scene table ptr)
@@ -299,14 +299,14 @@ s32 GStask_LoadBattleMenu(void) {
  *     - Commits the selection via fn_8001E200
  *     - Updates the resource table via fn_8020DFB0/fn_8020DFA0/etc.
  *
- * dbmMenuFightButtonNormal - fn_80007110 (accessor cluster):
+ * fn_80006FAC - fn_80007110 (accessor cluster):
  *   Small field accessors for the scene resource structure.
  *
  * fn_80007154 - fn_8000730C (archive load helpers):
  *   Six nearly identical functions that load archives for slots 0-5,
  *   each following the same load/activate/commit pattern.
  *
- * _dbgMenuFightFightPokemonSelectSub (GStask_InitSceneResources):
+ * fn_80007364 (GStask_InitSceneResources):
  *   0x2F8 bytes. Initializes the resource table for a new scene,
  *   setting up all model/texture/script entries.
  *
@@ -314,7 +314,7 @@ s32 GStask_LoadBattleMenu(void) {
  *   0x4AC bytes. The main task update state machine that coordinates
  *   archive loading, scene transitions, and event processing.
  *
- * fn_80008184 - _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub (finalization):
+ * fn_80008184 - fn_80008244 (finalization):
  *   Finalize loaded resources and build the active resource list.
  * ========================================================================= */
 
@@ -1121,16 +1121,16 @@ asm s32 fn_80006908(u16 id) {
 s32 fn_80006908(u16 id) { /* TODO */ return 0; }
 #endif
 
-/* dbmMenuFightButtonNormal - 0x80006FAC | size: 0xdc */
+/* fn_80006FAC - 0x80006FAC | size: 0xdc */
 extern u32 fn_800F7AF0(s32 port);
 extern u32 fn_800F7BC4(s32 port);
 #if 0
-asm void dbmMenuFightButtonNormal(void) {
-#include "src/game/gs_task_dbmMenuFightButtonNormal.inc"
+asm void fn_80006FAC(void) {
+#include "src/game/gs_task_fn_80006FAC.inc"
 }
 #else
 #pragma peephole off
-void dbmMenuFightButtonNormal(u8* ctx) {
+void fn_80006FAC(u8* ctx) {
     u32 buttons;
     u32 held;
 
@@ -1223,7 +1223,7 @@ s32 fn_80007110(void) {
 #endif
 
 /* fn_80007154 - 0x80007154 | size: 0x58 */
-extern s32  _dbgMenuFightFightPokemonSelectSub(void);
+extern s32  fn_80007364(void);
 extern u32  fn_801F986C(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
@@ -1238,7 +1238,7 @@ s32 fn_80007154(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 5);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
@@ -1255,7 +1255,7 @@ s32 fn_800071AC(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 4);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
@@ -1272,7 +1272,7 @@ s32 fn_80007204(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 3);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
@@ -1289,7 +1289,7 @@ s32 fn_8000725C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 2);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
@@ -1306,7 +1306,7 @@ s32 fn_800072B4(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 1);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
@@ -1323,12 +1323,12 @@ s32 fn_8000730C(void) {
     if (fn_801EF63C() == 0) return -1;
     lbl_8047A27C = fn_801F986C(lbl_8047A278, 0);
     if (lbl_8047A27C == 0) return -1;
-    return _dbgMenuFightFightPokemonSelectSub();
+    return fn_80007364();
 }
 #pragma pop
 #endif
 
-/* _dbgMenuFightFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
+/* fn_80007364 - 0x80007364 | size: 0x2f8 */
 extern void* fn_801F54A4(s32 a, u16 b, s32 c, s32 d);
 extern void* fn_80205BE8(u32 ctx);
 extern void* fn_801F4460(s32 a, u32 ctx);
@@ -1358,12 +1358,12 @@ extern void fn_80207BC0(void* ptr, void* a);
 extern void fn_80207B5C(void* ptr, u8 a, u16 b);
 extern void fn_80265754(void* ptr, u16 a);
 #if 1
-asm s32 _dbgMenuFightFightPokemonSelectSub(void) {
-#include "src/game/gs_task__dbgMenuFightFightPokemonSelectSub.inc"
+asm s32 fn_80007364(void) {
+#include "src/game/gs_task_fn_80007364.inc"
 }
 #else
 #pragma peephole off
-s32 _dbgMenuFightFightPokemonSelectSub(u32 ctx) {
+s32 fn_80007364(u32 ctx) {
     u32 savedId;
     u8 prevLevel;
     void* archive;
@@ -1591,10 +1591,10 @@ void fn_80007820(void) {
 #endif
 
 /* fn_80007848 - 0x80007848 | size: 0xa4 */
-extern void dbgMenuFightTrainerDataStatusInputDigit(u16 id, s32 a, s32 b, s32 c, s32 d);
+extern void fn_80053064(u16 id, s32 a, s32 b, s32 c, s32 d);
 extern u16 lbl_8047A28A;
 extern u32 lbl_80478F28;
-extern void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id);
+extern void* fn_80008244(u32 id);
 #if 0
 asm void fn_80007848(void) {
 #include "src/game/gs_task_fn_80007848.inc"
@@ -1606,7 +1606,7 @@ s32 fn_80007848(void) {
     s32 val;
 
     for (;;) {
-        if (fn_8001E304(lbl_8047A28A, &result, _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub) == 0) {
+        if (fn_8001E304(lbl_8047A28A, &result, fn_80008244) == 0) {
             val = -1;
         } else {
             if (result > *(u32*)lbl_80478F28) {
@@ -1619,7 +1619,7 @@ s32 fn_80007848(void) {
             return 1;
         }
         lbl_8047A28A = (u16)val;
-        dbgMenuFightTrainerDataStatusInputDigit((u16)val, 0x3e, 0, 0xc8, -0xc8);
+        fn_80053064((u16)val, 0x3e, 0, 0xc8, -0xc8);
     }
 }
 #pragma peephole on
@@ -1712,7 +1712,7 @@ s32 fn_80007A4C(void) {
 #endif
 
 /* fn_80007A84 - 0x80007A84 | size: 0xac */
-extern void dbgMenuFightWazaEditSub(u16 id);
+extern void fn_80053110(u16 id);
 extern u16 lbl_8047882A;
 extern void* fn_800083FC(u32 id);
 #if 0
@@ -1743,7 +1743,7 @@ s32 fn_80007A84(void) {
             return 1;
         }
         lbl_8047882A = (u16)val;
-        dbgMenuFightWazaEditSub((u16)val);
+        fn_80053110((u16)val);
     }
 }
 #pragma peephole on
@@ -1752,7 +1752,7 @@ s32 fn_80007A84(void) {
 /* fn_80007B30 - 0x80007B30 | size: 0x4ac */
 extern u8 fn_802117FC(void);
 extern void fn_80211810(u8 val);
-extern s8 menuSubOpenYesNo(s32 max, s32 a, s32 b, s32 initial);
+extern s8 fn_8001E074(s32 max, s32 a, s32 b, s32 initial);
 extern u8 fn_8001E224(u8 val, u32* out, s32 a, s32 b, s32 c, s32 d);
 extern u8 fn_80219FE4(u16 id);
 extern u8 lbl_80478828;
@@ -1824,7 +1824,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x57) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A271 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A271 == 0);
             if (r == 0) {
                 lbl_8047A271 = 1;
             } else if (r == 1) {
@@ -1853,7 +1853,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x5b) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A270 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A270 == 0);
             if (r == 0) {
                 lbl_8047A270 = 1;
             } else if (r == 1) {
@@ -1866,7 +1866,7 @@ s32 fn_80007B30(void) {
             u8 curVal;
             s8 r;
             curVal = fn_802117FC();
-            r = menuSubOpenYesNo(0x7f, -1, -1, curVal == 0);
+            r = fn_8001E074(0x7f, -1, -1, curVal == 0);
             if (r == 0) {
                 fn_80211810(1);
             } else if (r == 1) {
@@ -1877,7 +1877,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x5f) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A284 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A284 == 0);
             if (r == 0) {
                 lbl_8047A284 = 1;
             } else if (r == 1) {
@@ -1888,7 +1888,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x6de) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A285 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A285 == 0);
             if (r == 0) {
                 lbl_8047A285 = 1;
             } else if (r == 1) {
@@ -1899,7 +1899,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x6f9) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A286 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A286 == 0);
             if (r == 0) {
                 lbl_8047A286 = 1;
             } else if (r == 1) {
@@ -1910,7 +1910,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x778) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047A280 == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047A280 == 0);
             if (r == 0) {
                 lbl_8047A280 = 1;
             } else if (r == 1) {
@@ -1947,7 +1947,7 @@ s32 fn_80007B30(void) {
 
         if (evt == 0x1198) {
             s8 r;
-            r = menuSubOpenYesNo(0x7f, -1, -1, lbl_8047882E == 0);
+            r = fn_8001E074(0x7f, -1, -1, lbl_8047882E == 0);
             if (r == 0) {
                 lbl_8047882E = 1;
             } else if (r == 1) {
@@ -2089,16 +2089,16 @@ u32 fn_80008184(u32 value) {
 #pragma peephole on
 #endif
 
-/* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub - 0x80008244 | size: 0x14c */
+/* fn_80008244 - 0x80008244 | size: 0x14c */
 extern void fn_80132A38(s32 slot, void* ptr);
 extern u32 lbl_80478F28;
 #if 0
-asm void _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(void) {
-#include "src/game/gs_task__dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub.inc"
+asm void fn_80008244(void) {
+#include "src/game/gs_task_fn_80008244.inc"
 }
 #else
 #pragma peephole off
-void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
+void* fn_80008244(u32 id) {
     void* r31;
     void* r30;
     void* r29;
@@ -2163,7 +2163,7 @@ s32 fn_80008460(s32 id) {
 #endif
 
 /* fn_800084C0 - 0x800084C0 | size: 0x58 */
-extern void* wazaGetWazaTypeIdName(u8 idx);
+extern void* fn_8011BA0C(u8 idx);
 #if 0
 asm void fn_800084C0(void) {
 #include "src/game/gs_task_fn_800084C0.inc"
@@ -2174,7 +2174,7 @@ asm void fn_800084C0(void) {
 void* fn_800084C0(u32 id) {
     if (id == 0) return fn_800FA280(0xEB63);
     if (id > 0xb) return fn_800FA280(0xEB63);
-    return fn_800FA280((u32)wazaGetWazaTypeIdName((u8)id));
+    return fn_800FA280((u32)fn_8011BA0C((u8)id));
 }
 #pragma pop
 #endif

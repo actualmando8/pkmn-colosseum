@@ -18,9 +18,9 @@
  *   fn_80012B94  GSevent_ProcessCommand       -- 0x18C bytes, decode & dispatch command
  *   fn_80012D20  GSevent_EvalCondition        -- 0xF8 bytes, evaluate flag conditions
  *   fn_80012E18  GSevent_SetFlag              -- 0x198 bytes, set game flag from event
- *   menuPanelCursorDecimalInput  GSevent_DisplayText          -- 0x2EC bytes, show event text box
+ *   fn_80012FB0  GSevent_DisplayText          -- 0x2EC bytes, show event text box
  *   fn_8001329C  GSevent_MoveNPC              -- 0x3CC bytes, script NPC movement
- *   menuPanelCtrlLvUp  GSevent_PlayAnimation        -- 0xDC bytes, trigger NPC animation
+ *   fn_80013668  GSevent_PlayAnimation        -- 0xDC bytes, trigger NPC animation
  *   fn_80013744  GSevent_Nop                  -- 8 bytes, no-op command
  *   fn_8001374C  GSevent_WaitFrames           -- 0x168 bytes, wait N frames
  *   fn_800138B4  GSevent_FadeScreen           -- 0x164 bytes, screen fade in/out
@@ -362,14 +362,14 @@ s32 fn_80012E18(u8* ctx) {
 }
 #pragma pop
 
-/* menuPanelCursorDecimalInput - 0x80012FB0 | size: 0x2ec */
+/* fn_80012FB0 - 0x80012FB0 | size: 0x2ec */
 extern void fn_801040B8(void);
 #if 1
-asm void menuPanelCursorDecimalInput(void) {
-#include "src/game/gs_event_exec_menuPanelCursorDecimalInput.inc"
+asm void fn_80012FB0(void) {
+#include "src/game/gs_event_exec_fn_80012FB0.inc"
 }
 #else
-void menuPanelCursorDecimalInput(void) { /* TODO */ }
+void fn_80012FB0(void) { /* TODO */ }
 #endif
 
 /* fn_8001329C - 0x8001329C | size: 0x3cc */
@@ -384,11 +384,11 @@ asm void fn_8001329C(void) {
 void fn_8001329C(void) { /* TODO */ }
 #endif
 
-/* menuPanelCtrlLvUp - 0x80013668 | size: 0xdc */
+/* fn_80013668 - 0x80013668 | size: 0xdc */
 extern u8 fn_80107ED8(s32, s32);
 #pragma push
 #pragma peephole off
-s32 menuPanelCtrlLvUp(u8* ctx) {
+s32 fn_80013668(u8* ctx) {
     s32 flag = 0;
     switch ((s32)(s8)ctx[1]) {
     case 0:

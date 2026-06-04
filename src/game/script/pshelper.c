@@ -20,12 +20,12 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* Math */
 extern f64   fn_800CE2D8(f32 y, f32 x);   /* atan2 */
-extern void  sin(f32 angle);        /* sin */
-extern void  cos(f32 angle);        /* cos */
+extern void  fn_800CE148(f32 angle);        /* sin */
+extern void  fn_800CDBE0(f32 angle);        /* cos */
 
 /* Matrix ops */
 extern void  fn_800A2D38(void* mtxOut);                  /* MTXIdentity */
-extern void  PSMTXConcat(void* out, void* a, void* b);   /* MTXConcat */
+extern void  fn_800A2D98(void* out, void* a, void* b);   /* MTXConcat */
 extern void  fn_800A3074(f32 angle, void* out, u32 axis); /* MTXRotAxis */
 extern void  fn_800A3ADC(void* in, void* out);            /* MTXNormalize */
 extern void  fn_800A3B9C(void* a, void* b, void* out);    /* VECCross */
@@ -84,7 +84,7 @@ PSParticle* psCleanup(PSParticle* pp) {
 }
 
 /* ======================================================================
- * psCopyGeneratorData | psGeneratorInit (declared in script.h)
+ * fn_80172930 | psGeneratorInit (declared in script.h)
  * Size: 0xBC
  *
  * Initialize generator data for a spawned generator particle.
@@ -109,7 +109,7 @@ void psGeneratorInit(PSParticle* gen, void* owner) {
 }
 
 /* ======================================================================
- * psApplyOffsetLocalRotation | psUpdateVelocity (declared in script.h)
+ * fn_801729EC | psUpdateVelocity (declared in script.h)
  * Size: 0xF4
  *
  * Update a particle's velocity based on external force data.
@@ -140,7 +140,7 @@ void psUpdateVelocity(PSParticle* pp, f32* velocityVec) {
 }
 
 /* ======================================================================
- * psApplyVelocityLocalRotation | psInitParticle (declared in script.h)
+ * fn_80172AE0 | psInitParticle (declared in script.h)
  * Size: 0xDC
  *
  * Initialize a particle with default values after allocation.
@@ -252,7 +252,7 @@ void psCameraAttach(PSParticle* pp, void* camData) {
 }
 
 /* ======================================================================
- * modifyDir | psRotationUpdate (declared in script.h)
+ * fn_80172FA8 | psRotationUpdate (declared in script.h)
  * Size: 0x2F8
  *
  * Process rotation update for a particle.
@@ -300,7 +300,7 @@ void psRotationUpdate(PSParticle* pp, f32 param) {
 }
 
 /* ======================================================================
- * modifyDirGenBase | psCameraLookAt (declared in script.h)
+ * fn_801732A0 | psCameraLookAt (declared in script.h)
  * Size: 0x31C
  *
  * Process camera look-at parameters for a particle.

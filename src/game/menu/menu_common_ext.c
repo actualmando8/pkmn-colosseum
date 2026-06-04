@@ -35,7 +35,7 @@ extern void fn_80129280();
 extern void fn_80196E10();
 extern void fn_8025F3F4();
 extern void fn_8025F584();
-extern void GBAWrite();
+extern void fn_8025F648();
 extern void OSCreateAlarm();
 extern void OSDisableInterrupts();
 extern void OSGetTick();
@@ -547,7 +547,7 @@ void fn_80071700(void) {
         *(u32*)(sp + 0xC) = tmp;
         r4 = (u32)sp + 0xc;
         r5 = (u32)sp + 0xa;
-        ((void(*)(void))GBAWrite)();
+        ((void(*)(void))fn_8025F648)();
         if ((s32)r3 != 0) {
             r27 = 0xb;
         } else {
@@ -863,7 +863,7 @@ do {
     *(u32*)(sp + 0x10) = tmp;
     r4 = (u32)sp + 0x10;
     r5 = (u32)sp + 0xa;
-    ((void(*)(void))GBAWrite)();
+    ((void(*)(void))fn_8025F648)();
     if ((s32)r3 != 0) {
         r21 = 0xb;
         goto L_80071CAC;
@@ -950,7 +950,7 @@ do {
         r4 = (u32)sp + 0xc;
         r5 = (u32)sp + 0x9;
         *(u32*)(sp + 0xC) = tmp;
-        ((void(*)(void))GBAWrite)();
+        ((void(*)(void))fn_8025F648)();
         if ((s32)r3 != 0) {
             r21 = 0x10;
             break;
@@ -1085,7 +1085,7 @@ void fn_80071EA4(void) {
     *(u32*)(sp + 0x18) = tmp;
     r4 = (u32)sp + 0x18;
     r5 = (u32)sp + 0xd;
-    ((void(*)(void))GBAWrite)();
+    ((void(*)(void))fn_8025F648)();
     if ((s32)r3 != 0) {
         r3 = 0xb;
         goto L_80071FE8;
@@ -1363,7 +1363,7 @@ void fn_800722A0(void) {
         *(u32*)(sp + 0xC) = tmp;
         r4 = (u32)sp + 0xc;
         r5 = (u32)sp + 0xa;
-        ((void(*)(void))GBAWrite)();
+        ((void(*)(void))fn_8025F648)();
         if ((s32)r3 != 0) {
             r27 = 0xb;
         } else {
@@ -1706,7 +1706,7 @@ L_80072758:
     *(u32*)(sp + 0x10) = tmp;
     r4 = (u32)sp + 0x10;
     r5 = (u32)sp + 0xa;
-    ((void(*)(void))GBAWrite)();
+    ((void(*)(void))fn_8025F648)();
     if ((s32)r3 != 0) {
         r16 = 0xb;
         goto L_800728C8;
@@ -1785,7 +1785,7 @@ L_800728C8:
         r4 = (u32)sp + 0xc;
         r5 = (u32)sp + 0x9;
         *(u32*)(sp + 0xC) = tmp;
-        ((void(*)(void))GBAWrite)();
+        ((void(*)(void))fn_8025F648)();
         if ((s32)r3 != 0) break;
         tmp = *(u32*)((u8*)r20 + 0xF8);
         tmp = (u32)tmp >> 2;

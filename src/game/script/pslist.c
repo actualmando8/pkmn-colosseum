@@ -115,7 +115,7 @@ void pslist_Unlink(PSParticle* pp, PSParticle* parent) {
 }
 
 /* ======================================================================
- * _psListNew | pslist_Alloc
+ * fn_80168DAC | pslist_Alloc
  * Size: 0xDC
  *
  * Allocates a particle from the free list. If the free list is empty,
@@ -171,7 +171,7 @@ PSParticle* pslist_Alloc(PSParticle* insertAfter, u32 linkNo) {
 }
 
 /* ======================================================================
- * _psListClear | pslist_DestroyAll
+ * fn_80168E88 | pslist_DestroyAll
  * Size: 0xA0
  *
  * Frees all particles from all lists (free list + all 16 link lists).
@@ -207,7 +207,7 @@ void pslist_DestroyAll(void) {
 }
 
 /* ======================================================================
- * _psLinkInit | pslist_Init
+ * fn_80168F28 | pslist_Init
  * Size: 0x10C
  *
  * Initializes the particle system pool.
@@ -247,7 +247,7 @@ s32 pslist_Init(s32 count) {
 }
 
 /* ======================================================================
- * psSetParticleVisibility | pslist_UpdateVisibility
+ * fn_80169034 | pslist_UpdateVisibility
  * Size: 0xD0
  *
  * Iterates through all particles in the same link as pp, and all
