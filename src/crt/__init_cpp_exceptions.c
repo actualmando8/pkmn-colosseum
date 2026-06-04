@@ -32,10 +32,12 @@ asm void __init_cpp(void) {
 #else
 void __init_cpp(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void _ExitProcess(void) {
 #include "src/crt/__init_cpp_exceptions__ExitProcess.inc"
 }
 #else
-void _ExitProcess(void) { /* TODO */ }
+void _ExitProcess(void) {
+    PPCHalt();
+}
 #endif
