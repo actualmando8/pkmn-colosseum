@@ -4941,6 +4941,141 @@ static u32 g_rjtVisited[PCPORT_RJT_VISITED_MAX];
 static int g_rjtVisitedCount;
 static int g_rjtDepth;
 
+/* CPU skinned-mesh render for type-2 (envelope) PObjs. The envelope (pobj+0x14)
+ * is a null-terminated array of per-matrix-slot pointers; each slot points to a
+ * {jobj, weight} list. We build a palette of per-slot joint WORLD matrices, then
+ * walk the display list transforming each vertex's position by its PNMTXIDX-slot
+ * matrix and submitting it immediate-mode in MODEL space (the view matrix is
+ * loaded as the GX pos matrix, so GX applies view+projection). Material/texture
+ * pipeline must already be configured by the caller. Returns 1 if it drew.
+ * Gated by PCPORT_SKIN. */
+#define PCPORT_SKIN_MAX_SLOTS 32
+static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
+                             const PCPortTranslatedPObj* tp, u32 rootJoint,
+                             const PCPortTranslatedCamera* cam) {
+    u32 envOff = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x14);
+    f32 palette[PCPORT_SKIN_MAX_SLOTS][3][4];
+    int slot;
+    const HSD_VtxDescList* v;
+    const HSD_VtxDescList* posD = NULL;
+    const HSD_VtxDescList* clrD = NULL;
+    const HSD_VtxDescList* texD = NULL;
+    const u8* dl = tp->displayList;
+    const u8* end;
+
+    if (envOff == 0u || tp->verts == NULL || dl == NULL ||
+        !ArchiveRangeValid(a, envOff, 0x4u)) {
+        return 0;
+    }
+    end = dl + tp->pobj.n_display;
+
+    /* Build the per-slot world-matrix palette (single {jobj,weight=1} per slot
+     * = rigid-per-slot, the common case; weighted blend handled by summing). */
+    for (slot = 0; slot < PCPORT_SKIN_MAX_SLOTS; ++slot) {
+        u32 entry = PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u);
+        f32 (*M)[4] = palette[slot];
+        int r, c, any = 0, k;
+        for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
+        if (!ArchiveRangeValid(a, entry, 0x8u)) {
+            break; /* null terminator -> palette size = slot */
+        }
+        for (k = 0; k < 16; ++k) { /* {jobj,weight} list, jobj==0 ends it */
+            u32 jobj = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 0u);
+            union { u32 u; f32 f; } w;
+            PCPortTranslatedJointTransform jt;
+            if (!ArchiveRangeValid(a, jobj, PCPORT_SERIALIZED_JOINT_SIZE)) {
+                break;
+            }
+            w.u = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 4u);
+            memset(&jt, 0, sizeof(jt));
+            if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint, jobj, &jt)) {
+                f32 wt = (w.f != 0.0f) ? w.f : 1.0f;
+                for (r = 0; r < 3; ++r)
+                    for (c = 0; c < 4; ++c)
+                        M[r][c] += wt * jt.modelMatrix[r][c];
+                any = 1;
+            }
+        }
+        if (!any) { M[0][0] = M[1][1] = M[2][2] = 1.0f; }
+    }
+    if (slot == 0) {
+        return 0;
+    }
+
+    for (v = tp->verts; v->attr != GX_VA_NULL; ++v) {
+        if (v->attr == GX_VA_POS)  posD = v;
+        else if (v->attr == GX_VA_CLR0) clrD = v;
+        else if (v->attr == GX_VA_TEX0) texD = v;
+    }
+    if (posD == NULL) {
+        return 0;
+    }
+
+    /* Load the camera view as the GX position matrix; submit model-space verts. */
+    GXLoadPosMtxImm(cam->viewMatrix, 0);
+
+    while (dl + 3 <= end) {
+        u8 cmd = dl[0];
+        u16 vcount;
+        u32 vi;
+        if ((cmd & 0xF8u) == 0u) {
+            break; /* end / padding */
+        }
+        vcount = (u16)(((u16)dl[1] << 8) | dl[2]);
+        dl += 3;
+        if (vcount == 0u) {
+            break;
+        }
+        GXBegin((GXPrimitive)(cmd & 0xF8u), GX_VTXFMT0, vcount);
+        for (vi = 0; vi < vcount; ++vi) {
+            u32 curSlot = 0u;
+            f32 px = 0.0f, py = 0.0f, pz = 0.0f, u = 0.0f, vv = 0.0f;
+            u8 cr = 255, cg = 255, cb = 255, ca = 255;
+            int haveTex = 0, haveCol = 0;
+            const HSD_VtxDescList* a2;
+            for (a2 = tp->verts; a2->attr != GX_VA_NULL; ++a2) {
+                u32 idx;
+                int isz;
+                if (a2->attr == GX_VA_PNMTXIDX) {
+                    if (dl + 1 > end) { GXEnd(); return 1; }
+                    curSlot = (u32)dl[0] / 3u;
+                    dl += 1;
+                    continue;
+                }
+                isz = (a2->attr_type == GX_INDEX16) ? 2 : 1;
+                if (dl + isz > end) { GXEnd(); return 1; }
+                idx = (isz == 2) ? (u32)(((u16)dl[0] << 8) | dl[1]) : (u32)dl[0];
+                dl += isz;
+                if (a2->attr == GX_VA_POS && tp->positionData != NULL) {
+                    const f32* p = (const f32*)(tp->positionData + (size_t)idx * a2->stride);
+                    px = p[0]; py = p[1];
+                    pz = (a2->comp_cnt == GX_POS_XYZ) ? p[2] : 0.0f;
+                } else if (a2->attr == GX_VA_TEX0 && tp->texcoordData != NULL && texD != NULL) {
+                    const f32* t = (const f32*)(tp->texcoordData + (size_t)idx * a2->stride);
+                    u = t[0]; vv = t[1]; haveTex = 1;
+                } else if (a2->attr == GX_VA_CLR0 && tp->colorData != NULL && clrD != NULL) {
+                    const u8* cptr = tp->colorData + (size_t)idx * a2->stride;
+                    cr = cptr[0]; cg = cptr[1]; cb = cptr[2];
+                    ca = (a2->comp_type == GX_RGBA8) ? cptr[3] : 255;
+                    haveCol = 1;
+                }
+            }
+            if (curSlot >= (u32)slot) curSlot = 0u;
+            {
+                f32 (*M)[4] = palette[curSlot];
+                f32 wx = M[0][0]*px + M[0][1]*py + M[0][2]*pz + M[0][3];
+                f32 wy = M[1][0]*px + M[1][1]*py + M[1][2]*pz + M[1][3];
+                f32 wz = M[2][0]*px + M[2][1]*py + M[2][2]*pz + M[2][3];
+                if (haveCol) GXColor4u8(cr, cg, cb, ca); else GXColor4u8(255,255,255,255);
+                GXPosition3f32(wx, wy, wz);
+                GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
+            }
+        }
+        GXEnd();
+    }
+    return 1;
+}
+
 static void RenderJointTree(const PCPortHSDArchive* a,
                             u32 rootJoint,
                             u32 joint,
@@ -5262,7 +5397,16 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (getenv("PCPORT_NO_ZTEST") != NULL) {
                         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
                     }
-                    fn_800DAD10((void*)&drawObject);
+                    /* Skinned (type-2 envelope) PObjs: CPU-skin + immediate-mode
+                     * submit (PCPORT_SKIN). fn_800DAD10 would draw them rigidly
+                     * (jumbled). Falls back to the rigid draw if skinning bails. */
+                    if (getenv("PCPORT_SKIN") != NULL &&
+                        ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
+                        RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam)) {
+                        /* drawn by the skinned path */
+                    } else {
+                        fn_800DAD10((void*)&drawObject);
+                    }
                     GXHostSetLightingEnabled(GX_FALSE);
                     stats->drawn++;
                 } else {
