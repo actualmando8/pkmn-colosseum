@@ -136,11 +136,28 @@ typedef struct GXTevShaderEntry {
     s32 loc_alphaComp1;
     s32 loc_alphaRef1;
     s32 loc_alphaOp;
+
+    /** Real fog uniforms (no longer repurposed for host-only state). */
     s32 loc_fogEnable;
     s32 loc_fogType;
     s32 loc_fogStart;
     s32 loc_fogEnd;
     s32 loc_fogColor;
+
+    /** Host-only uniforms (dedicated names, no longer piggybacking on fog). */
+    s32 loc_hasTexture;
+    s32 loc_vertexAlphaScale;
+    s32 loc_lightingEnabled;
+
+    /** Per-stage konst color/alpha selectors (GXTevKColorSel/KAlphaSel). */
+    s32 loc_tevKonstColorSel;
+    s32 loc_tevKonstAlphaSel;
+
+    /** GX lighting channel (ambient + material color) uniforms. */
+    s32 loc_chanLightEnabled;
+    s32 loc_chanMatColor;
+    s32 loc_chanAmbColor;
+
     s32 loc_texSwizzle[8];
 
     /** Validity flag */
@@ -235,6 +252,51 @@ void gx_tev_set_alpha_compare(u8 comp0, u8 ref0, u8 op, u8 comp1, u8 ref1);
  * @param scale  [0,1] multiplier applied to vertex color alpha in the shader.
  */
 void gx_tev_set_vertex_alpha_scale(f32 scale);
+
+/**
+ * gx_tev_set_konst_sel -- Record a TEV stage's konst color/alpha selector.
+ * @param stage      TEV stage index (0..GX_TEV_MAX_STAGES-1).
+ * @param colorSel   GXTevKColorSel value (selects K0..K3 whole color,
+ *                   an R/G/B/A channel, or a fixed constant 1/8..8/8).
+ * @param alphaSel   GXTevKAlphaSel value (selects a K register R/G/B/A
+ *                   channel or a fixed constant).
+ *
+ * Selection is applied in the fragment shader via a per-draw uniform array
+ * (no shader recompile / cache-key change), so the shader cache stays keyed
+ * on the combiner structure only.
+ */
+void gx_tev_set_konst_sel(u32 stage, u8 colorSel, u8 alphaSel);
+
+/**
+ * gx_tev_set_fog -- Record the GX fog state (from GXSetFog).
+ * @param type     GXFogType (only GX_FOG_PERSP_LIN is computed; others fall
+ *                 back to no fog).
+ * @param startz   Fog start Z (eye-space distance where fog begins).
+ * @param endz     Fog end Z (eye-space distance where fog is fully applied).
+ * @param r,g,b,a  Fog color, 8-bit channels.
+ */
+void gx_tev_set_fog(u8 type, f32 startz, f32 endz, u8 r, u8 g, u8 b, u8 a);
+
+/**
+ * gx_tev_set_chan_lighting -- Toggle the GX color-channel lighting path.
+ * @param enabled  Non-zero replaces the rasterized vertex color with the
+ *                 GX material color modulated by the ambient color
+ *                 (GXSetChanCtrl with mat_src == GX_SRC_REG). Zero leaves
+ *                 the rasterized vertex color untouched.
+ */
+void gx_tev_set_chan_lighting(int enabled);
+
+/**
+ * gx_tev_set_chan_mat_color -- Set the GX material color (GXSetChanMatColor).
+ * @param r,g,b,a  8-bit channels.
+ */
+void gx_tev_set_chan_mat_color(u8 r, u8 g, u8 b, u8 a);
+
+/**
+ * gx_tev_set_chan_amb_color -- Set the GX ambient color (GXSetChanAmbColor).
+ * @param r,g,b,a  8-bit channels.
+ */
+void gx_tev_set_chan_amb_color(u8 r, u8 g, u8 b, u8 a);
 
 /**
  * gx_tev_submit -- Compile/look up the program for the given TEV state, bind

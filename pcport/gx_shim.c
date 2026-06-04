@@ -123,6 +123,8 @@ static GXCullMode g_cullMode;
 /** Channel state (lighting) */
 static GXColor g_chanAmbColor[2];
 static GXColor g_chanMatColor[2];
+static u8 g_chanCtrlEnable[2];   /* per-channel GXSetChanCtrl enable flag */
+static u8 g_chanMatSrc[2];       /* per-channel material color source (GXColorSrc) */
 
 /** TEV color/konst registers */
 static GXColor g_tevColorRegs[4];
@@ -473,6 +475,8 @@ void GXInit(void* base, u32 size) {
     memset(g_tevKColorSel, 0, sizeof(g_tevKColorSel));
     memset(g_tevKAlphaSel, 0, sizeof(g_tevKAlphaSel));
     memset(g_tevIndirect, 0, sizeof(g_tevIndirect));
+    memset(g_chanCtrlEnable, 0, sizeof(g_chanCtrlEnable));
+    memset(g_chanMatSrc, 0, sizeof(g_chanMatSrc));
     {
         u32 swapTableIndex;
         /* Default identity swap tables: R->R, G->G, B->B, A->A. */
@@ -1092,24 +1096,11 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz,
     g_fogFar = farz;
     g_fogColor = color;
 
-    /* TODO: Phase 3e -- Set fog uniforms in fragment shader
-     *
-     * if (type == GX_FOG_NONE) {
-     *     glUniform1i(u_fogEnable_loc, 0);
-     * } else {
-     *     glUniform1i(u_fogEnable_loc, 1);
-     *     glUniform1i(u_fogType_loc, type);
-     *     glUniform1f(u_fogStart_loc, startz);
-     *     glUniform1f(u_fogEnd_loc, endz);
-     *     glUniform4f(u_fogColor_loc,
-     *                 color.r/255.0f, color.g/255.0f,
-     *                 color.b/255.0f, color.a/255.0f);
-     * }
-     *
-     * Fragment shader fog calculation:
-     *   float fogFactor = clamp((fogEnd - viewZ) / (fogEnd - fogStart), 0, 1);
-     *   fragColor.rgb = mix(fogColor.rgb, fragColor.rgb, fogFactor);
-     */
+    /* Push the fog state into the TEV shader render state. The shader computes
+     * linear fog (GX_FOG_PERSP_LIN) from the eye-space distance; GX_FOG_NONE
+     * disables it. Uploaded per-draw in gx_tev_bind. */
+    gx_tev_set_fog((u8)type, startz, endz,
+                   color.r, color.g, color.b, color.a);
 }
 
 void GXSetCullMode(GXCullMode mode) {
@@ -1131,49 +1122,65 @@ void GXSetCullMode(GXCullMode mode) {
     }
 }
 
+/* Map a GXChannelID to a 0/1 color-channel index, or -1 if not a color
+ * channel this basic path handles. COLOR0/COLOR0A0 -> 0, COLOR1/COLOR1A1 -> 1. */
+static int GXChanColorIndex(GXChannelID chan) {
+    switch (chan) {
+        case GX_COLOR0:
+        case GX_COLOR0A0:
+            return 0;
+        case GX_COLOR1:
+        case GX_COLOR1A1:
+            return 1;
+        default:
+            return -1;
+    }
+}
+
 void GXSetChanCtrl(GXChannelID chan, GXBool enable,
                    GXColorSrc amb_src, GXColorSrc mat_src,
                    u32 light_mask, GXDiffuseFn diff_fn,
                    GXAttnFn attn_fn) {
-    (void)chan; (void)enable; (void)amb_src; (void)mat_src;
-    (void)light_mask; (void)diff_fn; (void)attn_fn;
+    int idx;
+    (void)amb_src; (void)light_mask; (void)diff_fn; (void)attn_fn;
 
-    /* TODO: Phase 3e -- Configure per-channel lighting in shader
-     *
-     * Store the channel control state. This determines whether the
-     * vertex shader computes lighting for COLOR0/COLOR1 or passes
-     * through vertex colors / material colors.
-     *
-     * Uniforms to set:
-     *   u_chanCtrlEnable[chan] = enable
-     *   u_chanAmbSrc[chan] = amb_src  (REG or VTX)
-     *   u_chanMatSrc[chan] = mat_src  (REG or VTX)
-     *   u_chanLightMask[chan] = light_mask
-     *   u_chanDiffFn[chan] = diff_fn
-     *   u_chanAttnFn[chan] = attn_fn
-     */
+    /* Basic GX lighting channel: track per-channel enable + material source.
+     * The host shader path replaces the rasterized color with the register
+     * material color modulated by the register ambient color when the channel
+     * is enabled with mat_src == GX_SRC_REG (the common single-channel case).
+     * Per-light dynamic lighting (light objects, attenuation, diffuse fn) is
+     * not yet implemented -- this covers the ambient+material flat-shaded case. */
+    idx = GXChanColorIndex(chan);
+    if (idx < 0) return;
+
+    g_chanCtrlEnable[idx] = enable ? 1 : 0;
+    g_chanMatSrc[idx] = (u8)mat_src;
+
+    /* Drive the host channel lighting off color channel 0 (the channel the
+     * field/title geometry rasterizes through). Active only when enabled and
+     * the material color comes from the register. */
+    gx_tev_set_chan_lighting(g_chanCtrlEnable[0] &&
+                             g_chanMatSrc[0] == GX_SRC_REG);
 }
 
 void GXSetChanAmbColor(GXChannelID chan, GXColor color) {
-    if (chan < 2) g_chanAmbColor[chan] = color;
+    int idx = GXChanColorIndex(chan);
+    if (idx < 0) return;
 
-    /* TODO: Phase 3e -- Upload ambient color uniform
-     *
-     * glUniform4f(u_ambientColor_loc[chan],
-     *             color.r/255.0f, color.g/255.0f,
-     *             color.b/255.0f, color.a/255.0f);
-     */
+    g_chanAmbColor[idx] = color;
+    if (idx == 0) {
+        gx_tev_set_chan_amb_color(color.r, color.g, color.b, color.a);
+    }
 }
 
 void GXSetChanMatColor(GXChannelID chan, GXColor color) {
-    if (chan < 2) g_chanMatColor[chan] = color;
+    int idx = GXChanColorIndex(chan);
+    if (idx < 0) return;
 
-    /* TODO: Phase 3e -- Upload material color uniform
-     *
-     * glUniform4f(u_matColor_loc[chan],
-     *             color.r/255.0f, color.g/255.0f,
-     *             color.b/255.0f, color.a/255.0f);
-     */
+    g_chanMatColor[idx] = color;
+    if (idx == 0) {
+        gx_tev_set_chan_mat_color(color.r, color.g, color.b, color.a);
+    }
 }
 
 /* =========================================================================
@@ -1610,6 +1617,16 @@ static int GXSubmitViaShader(GLenum glPrim,
                                  g_tevColorRegs[i].b, g_tevColorRegs[i].a);
             gx_tev_set_konst_color(i, g_tevKonstRegs[i].r, g_tevKonstRegs[i].g,
                                    g_tevKonstRegs[i].b, g_tevKonstRegs[i].a);
+        }
+    }
+
+    /* Per-stage konst color/alpha selectors (GXSetTevKColorSel/KAlphaSel).
+     * Passed to the shader as a per-draw uniform array so the shader cache is
+     * keyed only on the combiner structure, not the konst selection. */
+    {
+        u32 i;
+        for (i = 0; i < GX_MAX_TEVSTAGE && i < (u32)GX_TEV_MAX_STAGES; ++i) {
+            gx_tev_set_konst_sel(i, g_tevKColorSel[i], g_tevKAlphaSel[i]);
         }
     }
 

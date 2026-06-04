@@ -75,6 +75,24 @@ typedef struct {
     s32 lightingEnabled;   /* 1 = apply directional lambert; 0 = full bright */
     f32 lightDir[3];       /* view-space sun direction (normalized in shader) */
     f32 lightAmbient;      /* floor brightness for unlit faces [0..1] */
+
+    /* Per-stage konst color/alpha selectors (GXTevKColorSel/KAlphaSel).
+     * Uploaded as int-array uniforms so the shader does selection at draw
+     * time without a recompile. */
+    s32 konstColorSel[GX_TEV_MAX_STAGES];
+    s32 konstAlphaSel[GX_TEV_MAX_STAGES];
+
+    /* Fog state (GXSetFog). */
+    s32 fogEnable;         /* 1 = fog active (GX_FOG_PERSP_LIN) */
+    s32 fogType;           /* GXFogType */
+    f32 fogStart;          /* eye-space near distance */
+    f32 fogEnd;            /* eye-space far distance */
+    f32 fogColor[4];       /* normalized RGBA */
+
+    /* GX lighting channel (GXSetChanCtrl + ambient/material color). */
+    s32 chanLightEnabled;  /* 1 = use mat color * ambient instead of v_color0 */
+    f32 chanMatColor[4];   /* normalized RGBA material color */
+    f32 chanAmbColor[4];   /* normalized RGBA ambient color */
 } GXTevRenderState;
 
 static GXTevRenderState g_rs;
@@ -340,6 +358,19 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "uniform int  u_lightingEnabled;\n"
         "uniform vec3 u_lightDir;\n"
         "uniform float u_lightAmbient;\n"
+        /* Per-stage konst selectors (GXTevKColorSel/KAlphaSel raw values). */
+        "uniform int  u_tevKonstColorSel[16];\n"
+        "uniform int  u_tevKonstAlphaSel[16];\n"
+        /* Fog (GXSetFog). */
+        "uniform int  u_fogEnable;\n"
+        "uniform int  u_fogType;\n"
+        "uniform float u_fogStart;\n"
+        "uniform float u_fogEnd;\n"
+        "uniform vec4 u_fogColor;\n"
+        /* GX lighting channel (ambient + material color). */
+        "uniform int  u_chanLightEnabled;\n"
+        "uniform vec4 u_chanMatColor;\n"
+        "uniform vec4 u_chanAmbColor;\n"
         "\n"
         "in vec4 v_color0;\n"
         "in vec2 v_texcoord0;\n"
@@ -360,8 +391,42 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "    return true;\n"                        /* ALWAYS */
         "}\n"
         "\n"
+        /* GXTevKColorSel -> vec4 konst. Whole-color sels 0x0C..0x0F pick
+         * K0..K3.rgb; channel sels 0x10..0x1F pick a single K register
+         * channel broadcast to rgb; constant sels 0x00..0x07 are 8/8..1/8. */
+        "vec3 tevKonstColor(int sel) {\n"
+        "    if (sel >= 16) {\n"
+        "        int k = (sel - 16) / 4;\n"
+        "        int c = (sel - 16) - k * 4;\n"
+        "        return vec3(u_tevKonst[k][c]);\n"
+        "    }\n"
+        "    if (sel >= 12) return u_tevKonst[sel - 12].rgb;\n"
+        "    if (sel <= 7) return vec3(float(8 - sel) / 8.0);\n"
+        "    return vec3(1.0);\n"
+        "}\n"
+        /* GXTevKAlphaSel -> float konst alpha. Channel sels 0x10..0x1F pick a
+         * single K register channel; constant sels 0x00..0x07 are 8/8..1/8. */
+        "float tevKonstAlpha(int sel) {\n"
+        "    if (sel >= 16) {\n"
+        "        int k = (sel - 16) / 4;\n"
+        "        int c = (sel - 16) - k * 4;\n"
+        "        return u_tevKonst[k][c];\n"
+        "    }\n"
+        "    if (sel <= 7) return float(8 - sel) / 8.0;\n"
+        "    return 1.0;\n"
+        "}\n"
+        "\n"
         "void main() {\n"
-        "    vec4 rasc  = vec4(v_color0.rgb, v_color0.a * u_vertexAlphaScale);\n"
+        /* Rasterized color: when GX channel lighting is enabled with a register
+         * material source, the channel color is matColor * ambColor (the common
+         * single-channel ambient/material case). Otherwise use vertex color. */
+        "    vec3 rasrgb = (u_chanLightEnabled != 0)\n"
+        "        ? (u_chanMatColor.rgb * u_chanAmbColor.rgb)\n"
+        "        : v_color0.rgb;\n"
+        "    float rasa = (u_chanLightEnabled != 0)\n"
+        "        ? (u_chanMatColor.a * u_chanAmbColor.a)\n"
+        "        : v_color0.a;\n"
+        "    vec4 rasc  = vec4(rasrgb, rasa * u_vertexAlphaScale);\n"
         "    vec4 prev  = rasc;\n"
         "    vec4 creg0 = u_tevColor[1];\n"
         "    vec4 creg1 = u_tevColor[2];\n"
@@ -410,8 +475,14 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
             tev_append(outBuf, bufSize, &pos, line);
         }
 
-        /* konst is the konstant color register; default K0 for first pass. */
-        tev_append(outBuf, bufSize, &pos, "    konst = u_tevKonst[0];\n");
+        /* konst: select per-stage from the GXTevKColorSel/KAlphaSel selectors
+         * (uploaded as the u_tevKonst*Sel uniform arrays). The selection runs
+         * at draw time so the shader cache is not keyed on the konst sels. */
+        snprintf(line, sizeof(line),
+            "    konst.rgb = tevKonstColor(u_tevKonstColorSel[%u]);\n"
+            "    konst.a   = tevKonstAlpha(u_tevKonstAlphaSel[%u]);\n",
+            i, i);
+        tev_append(outBuf, bufSize, &pos, line);
 
         outName = tev_out_reg_name(rs.colorOutReg);
 
@@ -515,6 +586,19 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "            fragColor.rgb *= lambert;\n"
         "        }\n"
         "    }\n"
+        /* Linear fog (GX_FOG_PERSP_LIN). The fog factor is 1 at fogStart and 0
+         * at fogEnd; fragColor blends toward the fog color as it drops. Eye-space
+         * distance uses the view-space position magnitude (perspective). Only the
+         * linear type (u_fogType == 2) is computed; other types are treated as no
+         * fog until needed. */
+        "    if (u_fogEnable != 0 && u_fogType == 2) {\n"
+        "        float fogZ = length(v_viewPos);\n"
+        "        float denom = u_fogEnd - u_fogStart;\n"
+        "        float fogFactor = (abs(denom) > 1e-6)\n"
+        "            ? clamp((u_fogEnd - fogZ) / denom, 0.0, 1.0)\n"
+        "            : 1.0;\n"
+        "        fragColor.rgb = mix(u_fogColor.rgb, fragColor.rgb, fogFactor);\n"
+        "    }\n"
         "}\n");
 
     return (s32)pos;
@@ -601,10 +685,27 @@ static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
     entry->loc_alphaRef1  = glGetUniformLocation(p, "u_alphaRef1");
     entry->loc_alphaOp    = glGetUniformLocation(p, "u_alphaOp");
 
-    /* Reuse spare fog slots for host-only uniforms. */
-    entry->loc_fogEnable = glGetUniformLocation(p, "u_hasTexture");
-    entry->loc_fogType   = glGetUniformLocation(p, "u_vertexAlphaScale");
-    entry->loc_fogStart  = glGetUniformLocation(p, "u_lightingEnabled");
+    /* Host-only uniforms now have their own dedicated locations (they no longer
+     * piggyback on the fog uniform slots). */
+    entry->loc_hasTexture       = glGetUniformLocation(p, "u_hasTexture");
+    entry->loc_vertexAlphaScale = glGetUniformLocation(p, "u_vertexAlphaScale");
+    entry->loc_lightingEnabled  = glGetUniformLocation(p, "u_lightingEnabled");
+
+    /* Per-stage konst selectors (uniform arrays). */
+    entry->loc_tevKonstColorSel = glGetUniformLocation(p, "u_tevKonstColorSel");
+    entry->loc_tevKonstAlphaSel = glGetUniformLocation(p, "u_tevKonstAlphaSel");
+
+    /* Real fog uniforms. */
+    entry->loc_fogEnable = glGetUniformLocation(p, "u_fogEnable");
+    entry->loc_fogType   = glGetUniformLocation(p, "u_fogType");
+    entry->loc_fogStart  = glGetUniformLocation(p, "u_fogStart");
+    entry->loc_fogEnd    = glGetUniformLocation(p, "u_fogEnd");
+    entry->loc_fogColor  = glGetUniformLocation(p, "u_fogColor");
+
+    /* GX lighting channel (ambient + material color). */
+    entry->loc_chanLightEnabled = glGetUniformLocation(p, "u_chanLightEnabled");
+    entry->loc_chanMatColor     = glGetUniformLocation(p, "u_chanMatColor");
+    entry->loc_chanAmbColor     = glGetUniformLocation(p, "u_chanAmbColor");
 }
 
 /* =========================================================================
@@ -664,7 +765,29 @@ void gx_tev_init(void) {
             g_rs.konstColor[i][0] = g_rs.konstColor[i][1] =
                 g_rs.konstColor[i][2] = g_rs.konstColor[i][3] = 1.0f;
         }
+        /* Konst selectors default to 0 (constant 8/8 = 1.0), a no-op for the
+         * common case where stages do not read konst. */
+        for (i = 0; i < GX_TEV_MAX_STAGES; ++i) {
+            g_rs.konstColorSel[i] = 0;
+            g_rs.konstAlphaSel[i] = 0;
+        }
     }
+
+    /* Fog: disabled by default; default color black, sane near/far. */
+    g_rs.fogEnable = 0;
+    g_rs.fogType = 0;
+    g_rs.fogStart = 0.0f;
+    g_rs.fogEnd = 1.0f;
+    g_rs.fogColor[0] = g_rs.fogColor[1] = g_rs.fogColor[2] = 0.0f;
+    g_rs.fogColor[3] = 1.0f;
+
+    /* GX lighting channel: disabled by default; white material, white ambient
+     * (so if enabled before a color is set, the channel color is full bright). */
+    g_rs.chanLightEnabled = 0;
+    g_rs.chanMatColor[0] = g_rs.chanMatColor[1] =
+        g_rs.chanMatColor[2] = g_rs.chanMatColor[3] = 1.0f;
+    g_rs.chanAmbColor[0] = g_rs.chanAmbColor[1] =
+        g_rs.chanAmbColor[2] = g_rs.chanAmbColor[3] = 1.0f;
 
     printf("[gx_tev] TEV shader cache initialized (max %d entries)\n",
            TEV_SHADER_CACHE_MAX);
@@ -819,14 +942,42 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
     if (entry->loc_alphaRef1  >= 0) glUniform1f(entry->loc_alphaRef1, g_rs.alphaRef1);
     if (entry->loc_alphaOp    >= 0) glUniform1i(entry->loc_alphaOp, g_rs.alphaOp);
 
-    /* --- Host-only uniforms (vertex alpha scale lives in loc_fogType,
-     *     lighting-enabled flag lives in loc_fogStart) --- */
-    if (entry->loc_fogType >= 0) glUniform1f(entry->loc_fogType, g_rs.vertexAlphaScale);
-    if (entry->loc_fogStart >= 0) glUniform1i(entry->loc_fogStart, g_rs.lightingEnabled);
+    /* --- Host-only uniforms (now with dedicated locations) --- */
+    if (entry->loc_vertexAlphaScale >= 0)
+        glUniform1f(entry->loc_vertexAlphaScale, g_rs.vertexAlphaScale);
+    if (entry->loc_lightingEnabled >= 0)
+        glUniform1i(entry->loc_lightingEnabled, g_rs.lightingEnabled);
     if (entry->loc_lightDir >= 0)
         glUniform3f(entry->loc_lightDir, g_rs.lightDir[0], g_rs.lightDir[1], g_rs.lightDir[2]);
     if (entry->loc_lightAmbient >= 0)
         glUniform1f(entry->loc_lightAmbient, g_rs.lightAmbient);
+
+    /* --- Per-stage konst selectors (int arrays) --- */
+    if (entry->loc_tevKonstColorSel >= 0)
+        glUniform1iv(entry->loc_tevKonstColorSel, GX_TEV_MAX_STAGES,
+                     (const GLint*)g_rs.konstColorSel);
+    if (entry->loc_tevKonstAlphaSel >= 0)
+        glUniform1iv(entry->loc_tevKonstAlphaSel, GX_TEV_MAX_STAGES,
+                     (const GLint*)g_rs.konstAlphaSel);
+
+    /* --- Fog --- */
+    if (entry->loc_fogEnable >= 0) glUniform1i(entry->loc_fogEnable, g_rs.fogEnable);
+    if (entry->loc_fogType   >= 0) glUniform1i(entry->loc_fogType, g_rs.fogType);
+    if (entry->loc_fogStart  >= 0) glUniform1f(entry->loc_fogStart, g_rs.fogStart);
+    if (entry->loc_fogEnd    >= 0) glUniform1f(entry->loc_fogEnd, g_rs.fogEnd);
+    if (entry->loc_fogColor  >= 0)
+        glUniform4f(entry->loc_fogColor, g_rs.fogColor[0], g_rs.fogColor[1],
+                    g_rs.fogColor[2], g_rs.fogColor[3]);
+
+    /* --- GX lighting channel (ambient + material color) --- */
+    if (entry->loc_chanLightEnabled >= 0)
+        glUniform1i(entry->loc_chanLightEnabled, g_rs.chanLightEnabled);
+    if (entry->loc_chanMatColor >= 0)
+        glUniform4f(entry->loc_chanMatColor, g_rs.chanMatColor[0], g_rs.chanMatColor[1],
+                    g_rs.chanMatColor[2], g_rs.chanMatColor[3]);
+    if (entry->loc_chanAmbColor >= 0)
+        glUniform4f(entry->loc_chanAmbColor, g_rs.chanAmbColor[0], g_rs.chanAmbColor[1],
+                    g_rs.chanAmbColor[2], g_rs.chanAmbColor[3]);
 }
 
 /* =========================================================================
@@ -886,6 +1037,43 @@ void gx_tev_set_vertex_alpha_scale(f32 scale) {
     if (scale < 0.0f) scale = 0.0f;
     if (scale > 1.0f) scale = 1.0f;
     g_rs.vertexAlphaScale = scale;
+}
+
+void gx_tev_set_konst_sel(u32 stage, u8 colorSel, u8 alphaSel) {
+    if (stage >= (u32)GX_TEV_MAX_STAGES) return;
+    g_rs.konstColorSel[stage] = (s32)colorSel;
+    g_rs.konstAlphaSel[stage] = (s32)alphaSel;
+}
+
+void gx_tev_set_fog(u8 type, f32 startz, f32 endz, u8 r, u8 g, u8 b, u8 a) {
+    /* GX_FOG_NONE (0) disables fog; any other type stores its value but only
+     * the linear type (2) is computed in the shader. */
+    g_rs.fogType = (s32)type;
+    g_rs.fogEnable = (type != 0) ? 1 : 0;
+    g_rs.fogStart = startz;
+    g_rs.fogEnd = endz;
+    g_rs.fogColor[0] = (f32)r / 255.0f;
+    g_rs.fogColor[1] = (f32)g / 255.0f;
+    g_rs.fogColor[2] = (f32)b / 255.0f;
+    g_rs.fogColor[3] = (f32)a / 255.0f;
+}
+
+void gx_tev_set_chan_lighting(int enabled) {
+    g_rs.chanLightEnabled = enabled ? 1 : 0;
+}
+
+void gx_tev_set_chan_mat_color(u8 r, u8 g, u8 b, u8 a) {
+    g_rs.chanMatColor[0] = (f32)r / 255.0f;
+    g_rs.chanMatColor[1] = (f32)g / 255.0f;
+    g_rs.chanMatColor[2] = (f32)b / 255.0f;
+    g_rs.chanMatColor[3] = (f32)a / 255.0f;
+}
+
+void gx_tev_set_chan_amb_color(u8 r, u8 g, u8 b, u8 a) {
+    g_rs.chanAmbColor[0] = (f32)r / 255.0f;
+    g_rs.chanAmbColor[1] = (f32)g / 255.0f;
+    g_rs.chanAmbColor[2] = (f32)b / 255.0f;
+    g_rs.chanAmbColor[3] = (f32)a / 255.0f;
 }
 
 /* =========================================================================
@@ -949,8 +1137,8 @@ int gx_tev_submit(const GXTevState* state, u32 glPrim,
     /* Bind program + upload uniforms from the current render state. */
     gx_tev_bind(entry);
 
-    /* Per-draw texture availability flag (loc_fogEnable holds u_hasTexture). */
-    hasTexLoc = entry->loc_fogEnable;
+    /* Per-draw texture availability flag (dedicated u_hasTexture uniform). */
+    hasTexLoc = entry->loc_hasTexture;
     if (hasTexLoc >= 0) {
         glUniform1i(hasTexLoc, (hasTexture && glTexId != 0) ? 1 : 0);
     }
