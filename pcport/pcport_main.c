@@ -4954,7 +4954,9 @@ static int g_rjtDepth;
 #define PCPORT_SKIN_MAX_SLOTS 32
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
-                             const PCPortTranslatedCamera* cam) {
+                             const PCPortTranslatedCamera* cam,
+                             int haveTexture, GXTexObj* textureObject,
+                             u8 textureMapId, u8 textureTevMode) {
     u32 envOff = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x14);
     f32 palette[PCPORT_SKIN_MAX_SLOTS][3][4];
     int slot;
@@ -5015,6 +5017,37 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
 
     /* Load the camera view as the GX position matrix; submit model-space verts. */
     GXLoadPosMtxImm(cam->viewMatrix, 0);
+    GXSetCurrentMtx(0);
+
+    /* Texture binding for the IMMEDIATE-mode submit.
+     *
+     * The rigid draw path (fn_800DAD10) binds the node texture by REPLAYING the
+     * GSgfx pipeline state that ConfigureTranslatedTexturedPipeline registered
+     * via GSgfxHostSetPipelineTexture -- but the immediate GXBegin/GXEnd path
+     * below does NOT run that pipeline, so the GX shim's immediate-mode texture
+     * slot (g_boundTextureId / g_numTexGens / stage-0 TEV mode) is whatever the
+     * previous draw left (typically cleared to 0 -> the mesh sampled NO texture
+     * and rendered solid white). Bind the node texture DIRECTLY here so the
+     * immediate submit (GXSubmitVertices -> GXSubmitViaShader) sees a live
+     * texture + a textured TEV mode (it only samples when g_boundTextureId != 0
+     * && g_numTexGens != 0 && tevMode != GX_PASSCLR). When the node has no
+     * texture fall back to vertex-colour-only (PASSCLR). */
+    if (haveTexture && textureObject != NULL) {
+        GXTexMapID mapId = (GXTexMapID)textureMapId;
+        if (mapId == GX_TEXMAP_NULL) mapId = GX_TEXMAP0;
+        GXLoadTexObj(textureObject, mapId);
+        GXSetNumTexGens(1);
+        /* The translated TObj carries the node's TEV mode (MODULATE/REPLACE/...);
+         * if it decoded as PASSCLR (no texture) force MODULATE so the bound
+         * texture is actually sampled and modulated by the vertex colour. */
+        GXSetTevOp(GX_TEVSTAGE0,
+                   (textureTevMode == (u8)GX_PASSCLR)
+                       ? GX_MODULATE
+                       : (GXTevMode)textureTevMode);
+    } else {
+        GXSetNumTexGens(0);
+        GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    }
 
     while (dl + 3 <= end) {
         u8 cmd = dl[0];
@@ -5081,6 +5114,119 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         GXEnd();
     }
     return 1;
+}
+
+/* ---- Model-bounds walker for the model-view auto-camera --------------------
+ *
+ * Walks a joint tree (same shape as RenderJointTree: dobj/pobj chains, sibling
+ * iteration, cycle guard) and accumulates a WORLD-space AABB over every PObj's
+ * geometry. For rigid (type-0/1) PObjs the local min/max corners are transformed
+ * by the joint's world matrix; for envelope (type-2 skinned) PObjs the vertices
+ * are already in model/bind space (RenderSkinnedPObj submits them as-is), so the
+ * local bounds are used directly. The result is the union over all walked nodes.
+ * Used only to frame the camera -- an approximation is fine. */
+static u32 g_aabbVisited[PCPORT_RJT_VISITED_MAX];
+static int g_aabbVisitedCount;
+static int g_aabbDepth;
+
+static void AccumulateModelAABB(const PCPortHSDArchive* a,
+                                u32 rootJoint, u32 joint,
+                                f32 outMin[3], f32 outMax[3], int* any) {
+    u32 dobjOffset;
+    int vi;
+
+    if (g_aabbDepth++ == 0) {
+        g_aabbVisitedCount = 0;
+    }
+    for (;;) {
+        if (!ArchiveRangeValid(a, joint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+            g_aabbDepth--; return;
+        }
+        for (vi = 0; vi < g_aabbVisitedCount; ++vi) {
+            if (g_aabbVisited[vi] == joint) { g_aabbDepth--; return; }
+        }
+        if (g_aabbVisitedCount < PCPORT_RJT_VISITED_MAX) {
+            g_aabbVisited[g_aabbVisitedCount++] = joint;
+        }
+
+        dobjOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x10);
+        while (dobjOffset != 0u &&
+               ArchiveRangeValid(a, dobjOffset, PCPORT_SERIALIZED_DOBJ_SIZE)) {
+            u32 pobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x0C);
+            while (ArchiveRangeValid(a, pobjOffset, PCPORT_SERIALIZED_POBJ_SIZE)) {
+                PCPortTranslatedPObj tp;
+                PCPortTranslatedJointTransform jt;
+                memset(&tp, 0, sizeof(tp));
+                memset(&jt, 0, sizeof(jt));
+                if (PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &tp) &&
+                    tp.totalSubmittedVertices > 0u) {
+                    int isEnvelope = (((tp.pobj.flags >> 12) & 3u) == 2u);
+                    int cx, cy, cz;
+                    if (!isEnvelope &&
+                        !PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint, &jt)) {
+                        /* fall back to identity (local-space bounds) */
+                        memset(&jt, 0, sizeof(jt));
+                        jt.modelMatrix[0][0] = jt.modelMatrix[1][1] =
+                            jt.modelMatrix[2][2] = 1.0f;
+                    } else if (isEnvelope) {
+                        memset(&jt, 0, sizeof(jt));
+                        jt.modelMatrix[0][0] = jt.modelMatrix[1][1] =
+                            jt.modelMatrix[2][2] = 1.0f;
+                    }
+                    /* transform all 8 AABB corners by the joint world matrix */
+                    for (cx = 0; cx < 2; ++cx)
+                    for (cy = 0; cy < 2; ++cy)
+                    for (cz = 0; cz < 2; ++cz) {
+                        f32 lx = cx ? tp.maxPosition[0] : tp.minPosition[0];
+                        f32 ly = cy ? tp.maxPosition[1] : tp.minPosition[1];
+                        f32 lz = cz ? tp.maxPosition[2] : tp.minPosition[2];
+                        f32 (*M)[4] = jt.modelMatrix;
+                        f32 wx = M[0][0]*lx + M[0][1]*ly + M[0][2]*lz + M[0][3];
+                        f32 wy = M[1][0]*lx + M[1][1]*ly + M[1][2]*lz + M[1][3];
+                        f32 wz = M[2][0]*lx + M[2][1]*ly + M[2][2]*lz + M[2][3];
+                        if (!*any) {
+                            outMin[0] = outMax[0] = wx;
+                            outMin[1] = outMax[1] = wy;
+                            outMin[2] = outMax[2] = wz;
+                            *any = 1;
+                        } else {
+                            if (wx < outMin[0]) outMin[0] = wx;
+                            if (wy < outMin[1]) outMin[1] = wy;
+                            if (wz < outMin[2]) outMin[2] = wz;
+                            if (wx > outMax[0]) outMax[0] = wx;
+                            if (wy > outMax[1]) outMax[1] = wy;
+                            if (wz > outMax[2]) outMax[2] = wz;
+                        }
+                    }
+                }
+                /* walk the PObj `next` chain (split skinned meshes); pobj next@+0x04 */
+                {
+                    u32 pn = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x04);
+                    if (pn == pobjOffset) break;
+                    pobjOffset = pn;
+                }
+            }
+            /* dobj `next` @ +0x04 (matches RenderJointTree) */
+            {
+                u32 dn = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x04);
+                if (dn == dobjOffset) break;
+                dobjOffset = dn;
+            }
+        }
+
+        {
+            u32 childOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x08);
+            if (childOffset != 0u && childOffset != joint) {
+                AccumulateModelAABB(a, rootJoint, childOffset, outMin, outMax, any);
+            }
+        }
+        {
+            u32 nextOffset = PCPort_ReadBigEndianU32(a->storage + joint + 0x0C);
+            if (nextOffset == 0u || nextOffset == joint) break;
+            joint = nextOffset;
+        }
+    }
+    g_aabbDepth--;
 }
 
 static void RenderJointTree(const PCPortHSDArchive* a,
@@ -5409,7 +5555,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                      * (jumbled). Falls back to the rigid draw if skinning bails. */
                     if (getenv("PCPORT_SKIN") != NULL &&
                         ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
-                        RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam)) {
+                        RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam,
+                                          haveTexture,
+                                          haveTexture ? &nodeTextureObject : NULL,
+                                          (u8)textureMapId,
+                                          haveTexture
+                                              ? (u8)translatedTextureExp.stages[0].texture.tevMode
+                                              : (u8)GX_PASSCLR)) {
                         /* drawn by the skinned path */
                     } else {
                         fn_800DAD10((void*)&drawObject);
@@ -7490,6 +7642,87 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
             if (g_engExtraRootJointCount < PCPORT_MAX_SCENE_MODELS) {
                 g_engExtraRootJoints[g_engExtraRootJointCount++] = rj;
             }
+        }
+    }
+
+    /* MODEL-VIEW AUTO-CAMERA: when viewing a specific archive member
+     * (PCPORT_FIELD_MEMBER, e.g. a people_archive character) and the user has
+     * NOT supplied a manual camera (PCPORT_CAM_EYE), automatically frame the
+     * camera on the rendered model's center so any character model is centered
+     * regardless of its origin (feet, hips, scale). The embedded field camera is
+     * for full rooms, not single character models, so this overrides it for the
+     * member-view case. Compute the world-space AABB over the primary rootJoint
+     * AND every extra model-set root, then place the eye on +Z (slightly above
+     * center) at a distance that fits the AABB to the vertical FOV. */
+    if (getenv("PCPORT_FIELD_MEMBER") != NULL &&
+        getenv("PCPORT_FIELD_MEMBER")[0] != '\0' &&
+        getenv("PCPORT_CAM_EYE") == NULL) {
+        f32 mn[3] = {0,0,0}, mx[3] = {0,0,0};
+        int any = 0;
+        int i;
+        g_aabbDepth = 0; g_aabbVisitedCount = 0;
+        AccumulateModelAABB(&g_engTitleArchive, g_engTitleRootJoint,
+                            g_engTitleRootJoint, mn, mx, &any);
+        for (i = 0; i < g_engExtraRootJointCount; ++i) {
+            AccumulateModelAABB(&g_engTitleArchive, g_engExtraRootJoints[i],
+                                g_engExtraRootJoints[i], mn, mx, &any);
+        }
+        if (any) {
+            f32 center[3];
+            f32 ext[3];
+            f32 radius;
+            f32 dist;
+            f32 eye[3], up[3] = {0.0f, 1.0f, 0.0f};
+            /* vertical half-FOV of the default 45-deg projection */
+            f32 halfFovY = (f32)(45.0 * 0.5 * 3.14159265358979 / 180.0);
+            f32 tanHalf = (f32)tan((double)halfFovY);
+            center[0] = (mn[0] + mx[0]) * 0.5f;
+            center[1] = (mn[1] + mx[1]) * 0.5f;
+            center[2] = (mn[2] + mx[2]) * 0.5f;
+            ext[0] = (mx[0] - mn[0]) * 0.5f;
+            ext[1] = (mx[1] - mn[1]) * 0.5f;
+            ext[2] = (mx[2] - mn[2]) * 0.5f;
+            radius = ext[0];
+            if (ext[1] > radius) radius = ext[1];
+            if (ext[2] > radius) radius = ext[2];
+            if (radius < 0.001f) radius = 1.0f;
+            /* distance so the bounding sphere fits the vertical FOV, *1.6 margin */
+            dist = (radius / (tanHalf > 0.001f ? tanHalf : 0.5f)) * 1.6f;
+            if (dist < radius * 2.0f) dist = radius * 2.0f;
+            eye[0] = center[0];
+            eye[1] = center[1] + radius * 0.25f; /* slight elevation */
+            eye[2] = center[2] + dist;
+            /* Rebuild a clean default perspective projection (the member's own
+             * embedded camera projection may be tuned for a different scene). */
+            {
+                f32 aspect = (f32)PCPORT_WINDOW_WIDTH / (f32)PCPORT_WINDOW_HEIGHT;
+                f32 nz = (radius * 0.05f < 0.5f) ? 0.5f : radius * 0.05f;
+                f32 fz = dist + radius * 8.0f + 100.0f;
+                f32 cot = 1.0f / tanHalf;
+                f32 (*m)[4] = g_engTitleCamera.projectionMatrix;
+                memset(m, 0, sizeof(g_engTitleCamera.projectionMatrix));
+                m[0][0] = cot / aspect;
+                m[1][1] = cot;
+                m[2][2] = fz / (nz - fz);
+                m[2][3] = (fz * nz) / (nz - fz);
+                m[3][2] = -1.0f;
+                g_engTitleCamera.viewportLeft = 0; g_engTitleCamera.viewportTop = 0;
+                g_engTitleCamera.viewportRight = (u16)PCPORT_WINDOW_WIDTH;
+                g_engTitleCamera.viewportBottom = (u16)PCPORT_WINDOW_HEIGHT;
+                g_engTitleCamera.scissorLeft = 0; g_engTitleCamera.scissorTop = 0;
+                g_engTitleCamera.scissorRight = (u16)PCPORT_WINDOW_WIDTH;
+                g_engTitleCamera.scissorBottom = (u16)PCPORT_WINDOW_HEIGHT;
+            }
+            BuildViewMatrixLookAt(eye, center, up, g_engTitleCamera.viewMatrix);
+            printf("[field] model-view auto-camera: aabb=[%.2f,%.2f,%.2f .. "
+                   "%.2f,%.2f,%.2f] center=(%.2f,%.2f,%.2f) radius=%.2f "
+                   "eye=(%.2f,%.2f,%.2f) dist=%.2f\n",
+                   mn[0], mn[1], mn[2], mx[0], mx[1], mx[2],
+                   center[0], center[1], center[2], radius,
+                   eye[0], eye[1], eye[2], dist);
+        } else {
+            printf("[field] model-view auto-camera: no geometry bounds found, "
+                   "using default/embedded camera\n");
         }
     }
 
