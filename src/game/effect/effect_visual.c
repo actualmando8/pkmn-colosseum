@@ -60,14 +60,14 @@
  *     "seaEffectStart: Could not start sea effect!"
  *     Struct size: 0x2C bytes
  *     Callbacks: start=fn_8013B558, stop=fn_8013B85C,
- *                update=fn_8013B504, render=fn_8013B5E4
+ *                update=fn_8013B504, render=surfEffectStart
  *
  *   envMapEffectInit        (fn_8013C5A0)  -- Environment-mapped reflections
  *     "envMapEffectInit: Could not initialise env map effect!"
  *     "envMapEffectStart: Could not start env map effect!"
  *     Struct size: 0x48 bytes
  *     Callbacks: start=fn_8013C670, stop=fn_8013CBF0,
- *                update=fn_8013C614, render=fn_8013C718
+ *                update=fn_8013C614, render=seaEffectStart
  *     Core logic: fn_8013C074 (0x52C bytes), fn_8013CA48 (0x1A8 bytes),
  *                 fn_8013CE58 (0x250 bytes)
  *
@@ -75,13 +75,13 @@
  *     "blurEffectStart: Could not start blur effect!"
  *     Struct size: 0x24 bytes
  *     Callbacks: start=fn_8013D730, stop=fn_8013D984,
- *                update=fn_8013D7CC, render=fn_8013D804
+ *                update=fn_8013D7CC, render=envMapEffectInit
  *     Core logic: fn_8013D0A8 (0x55C bytes -- large GX pipeline setup)
  *
  *   auraEffectStart         (fn_8013DC18)  -- Aura glow (Shadow Pokemon)
  *     "auraEffectStart: Could not start aura effect!"
  *     Struct size: 0x20 bytes
- *     Callbacks: start=fn_8013DDCC, stop=fn_8013E258,
+ *     Callbacks: start=blurEffectStart, stop=fn_8013E258,
  *                update=fn_8013DC94, render=fn_8013DE6C
  *     Core logic: fn_8013DE6C (0x3EC bytes -- aura rendering)
  *
@@ -91,13 +91,13 @@
  *     Struct size: 0x50 bytes
  *     Uses rodata string "translate" for matrix node lookup
  *     Callbacks: start=fn_8013E5AC, stop=fn_8013E8A4,
- *                update=fn_8013E54C, render=fn_8013E658
+ *                update=fn_8013E54C, render=auraEffectStart
  *     Core logic: fn_8013E6C4 (0x1E0 bytes), fn_8013EA44 (0x5BC bytes)
  *
  *   billboardEffectStart    (fn_8013F000)  -- Billboard sprite particles
  *     "billboardEffectStart: Could not start billboard effect!"
  *     Struct size: 0xB4 bytes
- *     Callbacks: start=fn_8013F114, stop=fn_8013F344,
+ *     Callbacks: start=fn_8013F114, stop=distortionEffectStart,
  *                update=fn_8013F078, render=fn_8013F410
  *     Core logic: fn_8013F80C (0x170 bytes), _distortionEffectUpdateMatrices (0x264 bytes),
  *                 fn_8013FF0C (0x22C bytes -- billboard transform setup)
@@ -106,7 +106,7 @@
  *     "Failed to create Patchiru texture"
  *     Struct size: 0x40 bytes
  *     Uses custom texture generation for the Spinda spot pattern
- *     Callbacks: start=fn_8013FCC4, stop=fn_8013FDD0,
+ *     Callbacks: start=fn_8013FCC4, stop=billboardEffectStart,
  *                update=fn_8013FC58, render=fn_8013FD68
  *
  * External references:
@@ -255,14 +255,14 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* ---- Surf / wave effect ---- */
 /* fn_8013B034: _surfUpdate callback */
 /* fn_8013B0A0: _surfRender callback */
-/* fn_8013B158: _surfCalcWave (0x110 bytes) */
+/* filterStart: _surfCalcWave (0x110 bytes) */
 /* fn_8013B268: _surfRenderWave (0x228 bytes) */
 
 /* ---- Sea effect ---- */
 /* fn_8013B490: seaEffectStart */
 /* fn_8013B504: _seaUpdate callback */
 /* fn_8013B558: _seaStart callback */
-/* fn_8013B5E4: _seaRender callback (0x278 bytes) */
+/* surfEffectStart: _seaRender callback (0x278 bytes) */
 /* fn_8013B85C: _seaStop callback (0x23C bytes) */
 /* fn_8013BA98: _seaCalcSurface (0x178 bytes) */
 /* fn_8013BC10: _seaRenderSurface (0x1F4 bytes) */
@@ -273,7 +273,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013C5A0: envMapEffectInit */
 /* fn_8013C614: _envMapUpdate callback */
 /* fn_8013C670: _envMapStart callback */
-/* fn_8013C718: _envMapRender callback (0x330 bytes) */
+/* seaEffectStart: _envMapRender callback (0x330 bytes) */
 /* fn_8013CA48: _envMapCalcReflection (0x1A8 bytes) */
 /* fn_8013CBF0: _envMapStop callback (0x268 bytes) */
 /* fn_8013CE58: _envMapUpdateTexture (0x250 bytes) */
@@ -284,7 +284,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013D6B8: blurEffectStart */
 /* fn_8013D730: _blurStart callback */
 /* fn_8013D7CC: _blurUpdate callback */
-/* fn_8013D804: _blurRender callback (0x104 bytes) */
+/* envMapEffectInit: _blurRender callback (0x104 bytes) */
 /* envMapEffectStart: _blurCalcMotion */
 /* fn_8013D984: _blurStop callback (0x1E0 bytes) */
 /* fn_8013DB64: _blurCleanup */
@@ -294,7 +294,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013DC94: _auraUpdate callback */
 /* fn_8013DD10: _auraHelper */
 /* fn_8013DD7C: _auraHelper2 */
-/* fn_8013DDCC: _auraStart callback */
+/* blurEffectStart: _auraStart callback */
 /* fn_8013DE6C: _auraRender callback (0x3EC bytes) */
 /* fn_8013E258: _auraStop callback (0x218 bytes) */
 
@@ -303,7 +303,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013E4D4: distortionEffectStart */
 /* fn_8013E54C: _distortionUpdate callback */
 /* fn_8013E5AC: _distortionStart callback */
-/* fn_8013E658: _distortionRender callback */
+/* auraEffectStart: _distortionRender callback */
 /* fn_8013E6C4: _distortionCalcMatrices (0x1E0 bytes) */
 /* fn_8013E8A4: _distortionStop callback (0x1A0 bytes) */
 /* fn_8013EA44: _distortionEffectUpdateMatrices (0x5BC bytes) */
@@ -312,7 +312,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013F000: billboardEffectStart -- allocate 0xB4 bytes */
 /* fn_8013F078: _billboardUpdate callback */
 /* fn_8013F114: _billboardStart callback (0x230 bytes) */
-/* fn_8013F344: _billboardStop callback */
+/* distortionEffectStart: _billboardStop callback */
 /* fn_8013F410: _billboardRender callback (0x3FC bytes) */
 /* fn_8013F80C: _billboardCalcTransform (0x170 bytes) */
 /* _distortionEffectUpdateMatrices: _billboardRenderQuad (0x264 bytes) */
@@ -322,7 +322,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013FC58: _patchiruUpdate callback */
 /* fn_8013FCC4: _patchiruStart callback */
 /* fn_8013FD68: _patchiruRender callback */
-/* fn_8013FDD0: _patchiruStop callback (0x13C bytes) */
+/* billboardEffectStart: _patchiruStop callback (0x13C bytes) */
 
 /* ---- Billboard transform helpers ---- */
 /* fn_8013FF0C: _billboardTransformSetup (0x22C bytes) */
@@ -362,11 +362,11 @@ extern u32 fn_8013AD68(void* ptr);
 extern void fn_8013AD9C(void);
 extern u32 fn_8013B034(void* ptr);
 extern void fn_8013B0A0(void);
-extern void fn_8013B158(void);
+extern u16 filterStart(void);
 extern void fn_8013B268(void);
 extern u32 fn_8013B504(void* ptr);
 extern u32 fn_8013B558(void* ptr);
-extern void fn_8013B5E4(void);
+extern u16 surfEffectStart(void);
 extern void fn_8013B85C(void);
 extern void fn_8013BA98(void);
 extern void fn_8013BC10(void);
@@ -374,39 +374,39 @@ extern void fn_8013BE04(void);
 extern void fn_8013C074(void);
 extern u32 fn_8013C614(void* ptr);
 extern void fn_8013C670(void);
-extern void fn_8013C718(void);
+extern u16 seaEffectStart(void);
 extern void fn_8013CA48(void);
 extern void fn_8013CBF0(void);
 extern void fn_8013CE58(void* inner, void* ptr);
 extern void fn_8013D0A8(void);
 extern u32 fn_8013D730(void* ptr);
 extern u32 fn_8013D7CC(void* ptr);
-extern u32 fn_8013D804(void* ptr);
+extern u32 envMapEffectInit(void* ptr);
 extern u32 envMapEffectStart(void* ptr);
 extern void fn_8013D984(void);
 extern u32 fn_8013DC94(void* ptr);
 extern u32 fn_8013DD10(void* ptr);
 extern u32 fn_8013DD7C(void* ptr);
-extern u32 fn_8013DDCC(void* ptr);
+extern u32 blurEffectStart(void* ptr);
 extern void fn_8013DE6C(void);
 extern void fn_8013E258(void);
 extern u32 fn_8013E470(void* ptr, u32 delta);
 extern void fn_8013E54C(void);
 extern u32  fn_8013E5AC(u8* p);
-extern u32 fn_8013E658(void* ptr);
+extern u32 auraEffectStart(void* ptr);
 extern void fn_8013E6C4(void);
 extern void fn_8013E8A4(void);
 extern void fn_8013EA44(void);
 extern u32 fn_8013F078(void* ptr);
 extern void fn_8013F114(void);
-extern void fn_8013F344(void);
+extern u16 distortionEffectStart(void);
 extern void fn_8013F410(void);
 extern void fn_8013F80C(void);
 extern void _distortionEffectUpdateMatrices(void);
 extern u32 fn_8013FC58(void* ptr);
 extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
-extern void fn_8013FDD0(void);
+extern u16 billboardEffectStart(void);
 extern void fn_8013FF0C(void);
 
 #if 1
@@ -814,7 +814,7 @@ u32 fn_8013AABC(void* callbacks) {
         fn_80131200(effectId,
             0,
             (GSEffectStopFunc)fn_8013B034,
-            (GSEffectStartFunc)fn_8013B158,
+            (GSEffectStartFunc)filterStart,
             (GSEffectStopFunc)fn_8013B0A0,
             (void*)fn_8013AD68,
             (GSEffectUpdateFunc)fn_8013AD9C,
@@ -922,11 +922,11 @@ extern u8 lbl_80363CA8[];
 extern u8 lbl_80272E30[];
 extern u8 lbl_80272E70[];
 #if 1
-asm void fn_8013B158(void) {
-#include "src/game/effect/effect_visual_fn_8013B158.inc"
+asm u16 filterStart(void) {
+#include "src/game/effect/effect_visual_filterStart.inc"
 }
 #else
-void fn_8013B158(void) { /* TODO */ }
+u16 filterStart(void) { /* TODO */ }
 #endif
 extern void fn_800E5B68(void);
 extern u32 lbl_8047D1E8;
@@ -951,7 +951,7 @@ u32 fn_8013B490(void* callbacks) {
         fn_80131200(effectId,
             0,
             (GSEffectStopFunc)fn_8013B504,
-            (GSEffectStartFunc)fn_8013B5E4,
+            (GSEffectStartFunc)surfEffectStart,
             (GSEffectStopFunc)fn_8013B558,
             0,
             (GSEffectUpdateFunc)fn_8013B85C,
@@ -1016,11 +1016,11 @@ extern u32 lbl_8047D200;
 extern u32 lbl_8047D204;
 extern u8 lbl_80272EA0[];
 #if 1
-asm void fn_8013B5E4(void) {
-#include "src/game/effect/effect_visual_fn_8013B5E4.inc"
+asm u16 surfEffectStart(void) {
+#include "src/game/effect/effect_visual_surfEffectStart.inc"
 }
 #else
-void fn_8013B5E4(void) { /* TODO */ }
+u16 surfEffectStart(void) { /* TODO */ }
 #endif
 extern void fn_800E09E8(void);
 extern u32 lbl_8047D208;
@@ -1087,7 +1087,7 @@ u32 fn_8013C5A0(void* callbacks) {
         fn_80131200(effectId,
             0,
             (GSEffectStopFunc)fn_8013C614,
-            (GSEffectStartFunc)fn_8013C718,
+            (GSEffectStartFunc)seaEffectStart,
             (GSEffectStopFunc)fn_8013C670,
             0,
             (GSEffectUpdateFunc)fn_8013CA48,
@@ -1129,11 +1129,11 @@ extern u32 lbl_8047D238;
 extern u32 lbl_8047D23C;
 extern u8 lbl_80272ED0[];
 #if 1
-asm void fn_8013C718(void) {
-#include "src/game/effect/effect_visual_fn_8013C718.inc"
+asm u16 seaEffectStart(void) {
+#include "src/game/effect/effect_visual_seaEffectStart.inc"
 }
 #else
-void fn_8013C718(void) { /* TODO */ }
+u16 seaEffectStart(void) { /* TODO */ }
 #endif
 extern void fn_800E0CA0(void);
 extern u32 lbl_8047D248;
@@ -1214,7 +1214,7 @@ u32 fn_8013D6B8(void* callbacks) {
     u32 effectId = fn_80131428(callbacks, 0x18);
     if (effectId) {
         fn_80131200(effectId,
-            (GSEffectStartFunc)fn_8013D804,
+            (GSEffectStartFunc)envMapEffectInit,
             (GSEffectStopFunc)fn_8013D730,
             (GSEffectStartFunc)envMapEffectStart,
             (GSEffectStopFunc)fn_8013D7CC,
@@ -1283,11 +1283,11 @@ extern u8 lbl_80466BC0[];
 extern u16 lbl_8047AEE4;
 extern u8 lbl_80272F00[];
 #if 0
-asm u32 fn_8013D804(void* ptr) {
-#include "src/game/effect/effect_visual_fn_8013D804.inc"
+asm u32 envMapEffectInit(void* ptr) {
+#include "src/game/effect/effect_visual_envMapEffectInit.inc"
 }
 #else
-u32 fn_8013D804(void* ptr) {
+u32 envMapEffectInit(void* ptr) {
     void* next;
     u32 val;
     if (ptr) {
@@ -1407,7 +1407,7 @@ u32 fn_8013DC18(void* callbacks) {
         fn_80131200(effectId,
             (GSEffectStartFunc)fn_8013DD10,
             (GSEffectStopFunc)fn_8013DC94,
-            (GSEffectStartFunc)fn_8013DDCC,
+            (GSEffectStartFunc)blurEffectStart,
             (GSEffectStopFunc)fn_8013DD7C,
             0,
             (GSEffectUpdateFunc)fn_8013E470,
@@ -1485,11 +1485,11 @@ extern void fn_800DC390(void* handle, void* callback, void* ctx);
 extern void* fn_800E584C(void* a, void* b);
 extern u8 lbl_80272F70[];
 #if 0
-asm void fn_8013DDCC(void) {
-#include "src/game/effect/effect_visual_fn_8013DDCC.inc"
+asm u16 blurEffectStart(void) {
+#include "src/game/effect/effect_visual_blurEffectStart.inc"
 }
 #else
-u32 fn_8013DDCC(void* ptr) {
+u32 blurEffectStart(void* ptr) {
     if (ptr) {
         *(u32*)((u8*)ptr + 0x18) = *(u32*)((u8*)ptr + 0x14);
         *(u32*)((u8*)ptr + 0x1c) = 0;
@@ -1592,7 +1592,7 @@ u32 fn_8013E4D4(void* callbacks) {
         fn_80131200(effectId,
             (GSEffectStartFunc)fn_8013E5AC,
             (GSEffectStopFunc)fn_8013E54C,
-            (GSEffectStartFunc)fn_8013E658,
+            (GSEffectStartFunc)auraEffectStart,
             0,
             0,
             (GSEffectUpdateFunc)fn_8013E8A4,
@@ -1639,11 +1639,11 @@ u32 fn_8013E5AC(u8* p) {
 #endif
 extern u8 lbl_80272FA0[];
 #if 0
-asm u32 fn_8013E658(void* ptr) {
-#include "src/game/effect/effect_visual_fn_8013E658.inc"
+asm u32 auraEffectStart(void* ptr) {
+#include "src/game/effect/effect_visual_auraEffectStart.inc"
 }
 #else
-u32 fn_8013E658(void* ptr) {
+u32 auraEffectStart(void* ptr) {
     if (ptr == NULL) { goto log; }
     *(u16*)((u8*)ptr + 0x30) = 0;
     if (*(void**)ptr == NULL) { goto log; }
@@ -1717,7 +1717,7 @@ u32 fn_8013F000(void* callbacks) {
         fn_80131200(effectId,
             (GSEffectStartFunc)fn_8013F114,
             (GSEffectStopFunc)fn_8013F078,
-            (GSEffectStartFunc)fn_8013F344,
+            (GSEffectStartFunc)distortionEffectStart,
             0,
             0,
             (GSEffectUpdateFunc)fn_8013F80C,
@@ -1774,11 +1774,11 @@ extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D300;
 extern u8 lbl_80272FE0[];
 #if 1
-asm void fn_8013F344(void) {
-#include "src/game/effect/effect_visual_fn_8013F344.inc"
+asm u16 distortionEffectStart(void) {
+#include "src/game/effect/effect_visual_distortionEffectStart.inc"
 }
 #else
-void fn_8013F344(void) { /* TODO */ }
+u16 distortionEffectStart(void) { /* TODO */ }
 #endif
 extern void fn_800E3D08(void);
 extern void fn_80118104(void);
@@ -1856,7 +1856,7 @@ u32 fn_8013FBE0(void* callbacks) {
         fn_80131200(effectId,
             (GSEffectStartFunc)fn_8013FCC4,
             (GSEffectStopFunc)fn_8013FC58,
-            (GSEffectStartFunc)fn_8013FDD0,
+            (GSEffectStartFunc)billboardEffectStart,
             (GSEffectStopFunc)fn_8013FD68,
             0,
             (GSEffectUpdateFunc)fn_8013FF0C,
@@ -1946,11 +1946,11 @@ extern u32 lbl_8047D328;
 extern u32 lbl_8047D32C;
 extern u8 lbl_80273078[];
 #if 1
-asm void fn_8013FDD0(void) {
-#include "src/game/effect/effect_visual_fn_8013FDD0.inc"
+asm u16 billboardEffectStart(void) {
+#include "src/game/effect/effect_visual_billboardEffectStart.inc"
 }
 #else
-void fn_8013FDD0(void) { /* TODO */ }
+u16 billboardEffectStart(void) { /* TODO */ }
 #endif
 extern void fn_800CE220(void);
 extern void fn_80118DA8(void);

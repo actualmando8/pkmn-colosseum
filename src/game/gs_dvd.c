@@ -16,7 +16,7 @@
  *   fn_80167070 (GSDVD_CloseHandle)
  *   fn_80167118 (GSDVD_Open)
  *   fn_80167298 (GSDVD_Read)
- *   fn_80167318 (GSDVD_ReadAsync)
+ *   _sndCheckSndWorkALL (GSDVD_ReadAsync)
  *   fn_8016737C (GSDVD_GetReadStatus)
  *   fn_80167408 (GSDVD_CancelRead)
  *   fn_80167490 (GSDVD_WaitForRead)

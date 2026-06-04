@@ -137,7 +137,7 @@ extern void  fn_80167070(u32 sndId, u32 mode); /* _sndCleanupWork */
 extern void  fn_80167118(u32 sndId, u32 flag, u32 name,
                          u32 r6, u32 r7, u32 r8, u32 r9,
                          u32 r10); /* _sndOpenWaveWorker */
-extern void  fn_80167318(void);     /* _sndFlushAllWork */
+extern void  _sndCheckSndWorkALL(void);     /* _sndFlushAllWork */
 extern s32   fn_80167408(u32 sndId, u32 volume); /* _sndSetVolume */
 extern void  fn_80167490(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeBgmInternal */
 extern void  fn_80167508(u32 sndId, u32 fadeTime, u32 volume); /* _sndFadeSeInternal */

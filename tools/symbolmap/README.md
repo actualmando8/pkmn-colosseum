@@ -93,6 +93,18 @@ build links dtk-extracted asm objects carved from the DOL — the C is not
 compiled into it, and the DOL has no symbol table. Renaming is byte-neutral;
 `build/GC6E01/ok` (SHA-1 gate) still passes.
 
+### Wiring leads (partial)
+
+Some leads are tractable: a function whose only blocker is a return-type
+mismatch (header `u16 NewName(void)` vs wrapper `void NewName(void)`) wires by
+renaming + matching the return type. `wire_leads.py` does the return-type fix
+(byte-neutral — the asm body is verbatim `.inc`); `finalize_leads.py` then moves
+the wired names into `applied_symbols.txt` and refreshes `leads_needs_wiring.md`
++ the `symbols.txt` annotations. 9 of the original 20 leads were wired this way
+(the 8 `effect_visual` `u16` effect functions + `_sndCheckSndWorkALL`), each
+compile-verified with byte-match preserved. The remaining 11 need typed-arg
+signatures + call-site casts / global typing (genuine per-function decomp).
+
 ### Regenerating `.inc` after a rename
 
 The stock `convert_to_asm_wrappers.py` / `regen_incs.py` only recognise `fn_`
