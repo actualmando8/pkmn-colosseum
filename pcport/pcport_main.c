@@ -5237,6 +5237,10 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                     const f32* p = (const f32*)((const u8*)tp->positionData + (size_t)idx * a2->stride);
                     px = p[0]; py = p[1];
                     pz = (a2->comp_cnt == GX_POS_XYZ) ? p[2] : 0.0f;
+                    if (dbgVtxPos && g_skinVtxPosN < 20) {
+                        fprintf(stderr, "[idx] v#%d posIdx=%u local=(%.2f,%.2f,%.2f)\n",
+                                g_skinVtxPosN, idx, px, py, pz);
+                    }
                 } else if (a2->attr == GX_VA_TEX0 && tp->texcoordData != NULL && texD != NULL) {
                     const f32* t = (const f32*)((const u8*)tp->texcoordData + (size_t)idx * a2->stride);
                     u = t[0]; vv = t[1]; haveTex = 1;
