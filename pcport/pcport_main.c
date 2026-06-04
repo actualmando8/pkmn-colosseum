@@ -5838,6 +5838,10 @@ static const PCPortTitleSet kTitleSets[] = {
  * PCPORT_DUMP) keeps the headless screenshot path finite. Reuses the resolve/
  * camera/draw primitives proven by the slice smokes.
  */
+/* Set by the main menu (New Game / Continue) to hand off into the walkable field
+ * after RunMenuScene returns -> boot->title->menu->field is the start-of-game flow. */
+static int g_pcEnterFieldWalk = 0;
+
 static int RunMenuScene(GLFWwindow* window) {
     PCPortHSDArchive archive;
     PCPortTranslatedCamera translatedCamera;
@@ -6337,6 +6341,13 @@ static int RunMenuScene(GLFWwindow* window) {
         ok = 1;
         goto cleanup;
     }
+    /* Headless verify of the New Game -> field hand-off (skips menu navigation). */
+    if (getenv("PCPORT_DEBUG_NEWGAME") != NULL) {
+        printf("[pcport_bootstrap] DEBUG_NEWGAME -> entering field\n");
+        g_pcEnterFieldWalk = 1;
+        ok = 1;
+        goto cleanup;
+    }
 
     /* Build the ASCII font atlas once (GL context ready) for menu/prompt text. */
     EnsureFontAtlas();
@@ -6455,8 +6466,12 @@ static int RunMenuScene(GLFWwindow* window) {
                         dialogYesNo = 1; dialogKind = PCPORT_DLG_NEWGAME;
                         dialogText = "A saved game already exists. Overwrite it and start a new adventure?";
                     } else {
-                        dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
-                        dialogText = "A new adventure begins! (Story Mode is not yet playable in this port.)";
+                        /* No save -> start the new adventure: enter the first field
+                         * (Wes's hideout, D1_garage_1F) via the walkable field path. */
+                        printf("[pcport_bootstrap] New Game -> entering field\n");
+                        g_pcEnterFieldWalk = 1;
+                        ok = 1;
+                        goto cleanup;
                     }
                     break;
                 case 2: /* COLOSSEUM BATTLE */
@@ -6499,8 +6514,16 @@ static int RunMenuScene(GLFWwindow* window) {
                                 glfwSetWindowShouldClose(window, GLFW_TRUE);
                             }
                             printf("[pcport_bootstrap] Quit confirmed -> closing\n");
+                        } else if (dialogKind == PCPORT_DLG_NEWGAME ||
+                                   dialogKind == PCPORT_DLG_CONTINUE) {
+                            /* New Game (overwrite) or Continue -> enter the field. */
+                            printf("[pcport_bootstrap] %s -> entering field\n",
+                                   dialogKind == PCPORT_DLG_NEWGAME ? "New Game" : "Continue");
+                            g_pcEnterFieldWalk = 1;
+                            ok = 1;
+                            goto cleanup;
                         } else {
-                            printf("[pcport_bootstrap] Confirmed (load/new-game not yet implemented)\n");
+                            printf("[pcport_bootstrap] Confirmed (not yet implemented)\n");
                         }
                     }
                     sceneState = PCPORT_SCENE_MAIN_MENU;
@@ -7388,7 +7411,7 @@ static int RunFieldScene(GLFWwindow* window) {
         }
     }
 
-    if (getenv("PCPORT_FIELD_WALK") != NULL) {
+    if (getenv("PCPORT_FIELD_WALK") != NULL || g_pcEnterFieldWalk) {
         /* Third-person walkable mode (placeholder avatar on the WZX floor). */
         return RunFieldWalkLoop(window, dumpPath, frameCap,
                                 getenv("PCPORT_COL_WIRE") != NULL);
@@ -7847,6 +7870,14 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Top-menu scene graph rendered through the existing game-owned draw bridge\n");
+
+        /* Start-of-game flow: the menu's New Game / Continue hands off into the
+         * walkable first field (Wes's hideout). boot->title->menu->field. */
+        if (g_pcEnterFieldWalk && window != NULL &&
+            !glfwWindowShouldClose(window)) {
+            printf("[pcport_bootstrap] Entering Story Mode field (walkable)\n");
+            RunFieldScene(window);
+        }
     } else {
         printf("[pcport_bootstrap] No game code, assets, or render loop started\n");
     }
