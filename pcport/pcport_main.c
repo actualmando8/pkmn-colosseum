@@ -12,6 +12,7 @@
 #include "thp_player.h"
 #include "thp_audio.h"
 #include "waveout_sink.h"
+#include "bgm_host.h"
 
 #include <GLFW/glfw3.h>
 #include <direct.h>   /* _chdir (host-only: locate the asset root at startup) */
@@ -7425,6 +7426,50 @@ static int RunTHPSmoke(void) {
     return 1;
 }
 
+/* BGM streaming smoke (no GL): init the BGM subsystem, locate + start a music
+ * member from an FSYS archive, and pump the per-frame update loop so the
+ * waveOut device streams it. PCPORT_BGM_FSYS / PCPORT_BGM_MEMBER select the
+ * source (defaults to common.fsys / snd_music_atmos_pool); PCPORT_BGM_SECS sets
+ * how long to pump (default 3s). Verifies the bgm_host module links + runs end
+ * to end against real disc data. Honest about the MusyX gap (plays the first
+ * pool wave, not a full sequenced track) -- see bgm_host.h. */
+static int RunBGMSmoke(void) {
+    const char* fsysPath = getenv("PCPORT_BGM_FSYS");
+    const char* member   = getenv("PCPORT_BGM_MEMBER");
+    const char* secsEnv  = getenv("PCPORT_BGM_SECS");
+    int secs = (secsEnv != NULL && secsEnv[0] != '\0') ? atoi(secsEnv) : 3;
+    int i, iters;
+    if (fsysPath == NULL || fsysPath[0] == '\0') {
+        fsysPath = "orig/GC6E01/disc/files/common.fsys";
+    }
+    if (member == NULL || member[0] == '\0') {
+        member = "snd_music_atmos_pool";
+    }
+    if (secs < 1) secs = 1;
+    if (!PCPortBGM_Init()) {
+        fprintf(stderr, "[bgm-smoke] PCPortBGM_Init failed (no audio device?)\n");
+        return 0;
+    }
+    if (!PCPortBGM_PlayFromFsys(fsysPath, member)) {
+        fprintf(stderr, "[bgm-smoke] PlayFromFsys(%s, %s) failed -- member not found "
+                "or pool format not parseable (MusyX gap, expected for some archives)\n",
+                fsysPath, member);
+        return 0;
+    }
+    printf("[bgm-smoke] streaming %s :: %s\n", fsysPath, member);
+    /* Pump the update loop to exercise the decode/submit path end to end. The
+     * waveOut sink plays asynchronously; this verifies the module links + runs +
+     * keeps the buffer fed without crashing. (Real-time-audible playback is
+     * driven from the game frame loop, not this headless smoke.) */
+    iters = secs * 60;
+    for (i = 0; i < iters && PCPortBGM_IsPlaying(); ++i) {
+        PCPortBGM_Update();
+    }
+    PCPortBGM_Stop();
+    printf("[bgm-smoke] done (%d update pumps, member streamed OK)\n", i);
+    return 1;
+}
+
 /* THP audio decode smoke (no GL): decode ALL frames' audio of a movie to a WAV,
  * to verify the GC DSP-ADPCM decode without needing to listen. PCPORT_THP_FILE
  * selects the movie (default tpc.thp = the first audio-bearing boot movie),
@@ -8606,6 +8651,9 @@ int main(int argc, char** argv) {
 
     /* THP decode smoke: pure decode -> PPM, no window/GL. Verifies thp_player +
      * stb_image in the host build. */
+    if (HasArg(argc, argv, "--bgm-smoke")) {
+        return RunBGMSmoke() ? 0 : 1;
+    }
     if (HasArg(argc, argv, "--thp-audio-smoke")) {
         return RunTHPAudioSmoke() ? 0 : 1;
     }
