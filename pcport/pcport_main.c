@@ -4997,6 +4997,7 @@ static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
 static int g_skinVtxPosN;
 static f32 g_skinHybridThresh2 = 49.0f; /* (7.0)^2; model-space-vert cutoff */
+static int g_slotModelSpace[PCPORT_SKIN_MAX_SLOTS]; /* per-slot: 1=model-space */
 static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
@@ -5180,6 +5181,59 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     }
 
+    /* PER-SLOT SPACE CLASSIFICATION pre-pass. These GS character meshes mix two
+     * vertex spaces: most bones hold JOINT-LOCAL verts (small, near the bone ->
+     * apply jointWorld), but some bones (head/hair/arm) hold MODEL-space verts
+     * (large local coords spanning the model -> submit as-is; the bone matrix
+     * would double-translate and fling them). A per-VERTEX magnitude test splits
+     * a single arm across both rules; classify the whole SLOT instead by the max
+     * local magnitude of any vertex using it. PCPORT_SKIN_HYBRID_THRESH (default
+     * 7) is the cutoff; 0 disables (all slots bone-local). */
+    {
+        const u8* sp = tp->displayList;
+        int s2;
+        for (s2 = 0; s2 < PCPORT_SKIN_MAX_SLOTS; ++s2) g_slotModelSpace[s2] = 0;
+        while (sp + 3 <= end) {
+            u8 c = sp[0];
+            u16 vc; u32 vj;
+            if ((c & 0xF8u) == 0u) break;
+            vc = (u16)(((u16)sp[1] << 8) | sp[2]);
+            sp += 3;
+            if (vc == 0u) break;
+            for (vj = 0; vj < vc; ++vj) {
+                u32 cs = 0u; f32 lpx = 0, lpy = 0, lpz = 0; const HSD_VtxDescList* a3;
+                for (a3 = tp->verts; a3->attr != GX_VA_NULL; ++a3) {
+                    u32 ix; int isz3;
+                    if (a3->attr <= GX_VA_TEX7MTXIDX) {
+                        if (sp + 1 > end) { sp = end; break; }
+                        if (a3->attr == GX_VA_PNMTXIDX) cs = (u32)sp[0] / 3u;
+                        sp += 1; continue;
+                    }
+                    isz3 = (a3->attr_type == GX_INDEX16) ? 2 : 1;
+                    if (sp + isz3 > end) { sp = end; break; }
+                    ix = (isz3 == 2) ? (u32)(((u16)sp[0] << 8) | sp[1]) : (u32)sp[0];
+                    sp += isz3;
+                    if (a3->attr == GX_VA_POS && tp->positionData != NULL) {
+                        const f32* pp = (const f32*)((const u8*)tp->positionData + (size_t)ix * a3->stride);
+                        lpx = pp[0]; lpy = pp[1];
+                        lpz = (a3->comp_cnt == GX_POS_XYZ) ? pp[2] : 0.0f;
+                    }
+                }
+                if (cs >= (u32)slot) cs = 0u;
+                if (cs < PCPORT_SKIN_MAX_SLOTS &&
+                    (lpx*lpx + lpy*lpy + lpz*lpz) > g_skinHybridThresh2) {
+                    g_slotModelSpace[cs] = 1;
+                }
+            }
+        }
+        if (getenv("PCPORT_SKIN_PAL") != NULL) {
+            int s3; fprintf(stderr, "[slotcls] model-space slots:");
+            for (s3 = 0; s3 < slot && s3 < PCPORT_SKIN_MAX_SLOTS; ++s3)
+                if (g_slotModelSpace[s3]) fprintf(stderr, " %d", s3);
+            fprintf(stderr, " (of %d)\n", slot);
+        }
+    }
+
     while (dl + 3 <= end) {
         u8 cmd = dl[0];
         u16 vcount;
@@ -5305,17 +5359,13 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * PCPORT_SKIN_NOMTX disables this for A/B comparison. */
                 if (dbgNoMtx) {
                     GXPosition3f32(px, py, pz);
-                } else if (px*px + py*py + pz*pz > g_skinHybridThresh2) {
-                    /* HYBRID: a few verts per mesh carry MODEL-space coordinates
-                     * (large local magnitude == near the model's full extent, e.g.
-                     * Wes's hair tip / outstretched-arm verts at local y~11-14),
-                     * while the bulk are JOINT-LOCAL (small, near their bone).
-                     * Applying the bone's world matrix to a model-space vert
-                     * double-translates it, flinging it far (the spikes / missing
-                     * arm). Submit large-local verts as-is (their model position is
-                     * already correct at the bind pose); bone-local verts below get
-                     * the jointWorld transform. Threshold tunable via
-                     * PCPORT_SKIN_HYBRID_THRESH (0/unset disables the split). */
+                } else if (curSlot < PCPORT_SKIN_MAX_SLOTS && g_slotModelSpace[curSlot]) {
+                    /* This bone slot was classified MODEL-space by the pre-pass
+                     * (its verts span the model, not clustered near the bone), so
+                     * its verts are already in model/bind position -- submit as-is.
+                     * Applying jointWorld would double-translate + fling them (the
+                     * head/hair/arm spikes). Whole-slot classification keeps an arm
+                     * consistent instead of splitting it per-vertex. */
                     GXPosition3f32(px, py, pz);
                 } else {
                     f32 (*Mx)[4] = palette[curSlot];
