@@ -248,6 +248,8 @@ asm void fn_801A6C34(void) {
 #include "src/hsd/hsd_mobj_fn_801A6C34.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 2
 void fn_801A6C34(void* obj) {
     u32 node;
     volatile u32* pp;
@@ -266,12 +268,15 @@ void fn_801A6C34(void* obj) {
         return;
     }
     while (lbl_8047B2DC != 0) {
-        u32 head = *(volatile u32*)&lbl_8047B2DC;
-        *(u32*)((u8*)*(volatile u32*)&lbl_8047B2DC + 8) = 0;
-        head = *(u32*)((u8*)head + 8);
-        lbl_8047B2DC = head;
+        u32 b, a;
+        a = *(volatile u32*)&lbl_8047B2DC;
+        b = *(volatile u32*)&lbl_8047B2DC;
+        a = *(u32*)((u8*)a + 8);
+        *(u32*)((u8*)b + 8) = 0;
+        lbl_8047B2DC = a;
     }
 }
+#pragma pop
 #endif
 
 /* 0x801A6CA4 | 0x64 */
