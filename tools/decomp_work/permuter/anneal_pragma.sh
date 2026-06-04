@@ -20,6 +20,8 @@
 #
 # Emits one of:
 #   WIN <fn> <config>          score-0 exact match; winning C copied to wins/<fn>.c
+#                              and a line `<fn> <src> <config>` appended to
+#                              wins/MANIFEST.txt. STOPS the sweep on first win.
 #   NOWIN <fn> <best> <config> best score reached across all configs, no exact match
 #   FAIL <fn> <reason>         dir build failed, or no config produced a valid object
 #
@@ -108,17 +110,47 @@ for ((i=0; i<NCFG; i++)); do
   fi
   rm -f "$PROBE_O"
 
-  # 2b. run the permuter for this config's slice of the budget.
-  ( cd "$DIR" && timeout "$PER" python3 "$PERM/permuter.py" . -j "$JOBS" \
-      --stop-on-zero --best-only > "$RUNLOG" 2>&1 )
+  # Clear any output-* dirs from a previous config so the post-run harvest only
+  # ever sees THIS config's outputs (the permuter never deletes them itself).
+  rm -rf "$DIR"/output-* 2>/dev/null || true
 
-  # 3. harvest this config. A score-0 match is saved as output-0-*/source.c.
+  # 2b. run the permuter for this config's slice of the budget.
+  #     PROVEN CAPTURE (recover_one.sh): --stop-on-zero WITHOUT --best-only. With
+  #     --best-only the score-0 candidate's output-0-* dir was not retained where
+  #     the harvest could find it (it printed NOWIN ... 0 and LOST the win for
+  #     fn_800084C0). Without --best-only, every improving result — including the
+  #     score-0 — is written to output-<score>-<ctr>/source.c, so we can harvest.
+  ( cd "$DIR" && timeout "$PER" python3 "$PERM/permuter.py" . -j "$JOBS" \
+      --stop-on-zero > "$RUNLOG" 2>&1 )
+
+  # 3. harvest this config. TWO distinct score-0 paths must BOTH be caught:
+  #
+  #   (a) MUTATION win: a permuted candidate reached score 0. post_score() wrote
+  #       it to output-0-<ctr>/source.c. Harvest that file.
+  #
+  #   (b) BASE win: the UNMUTATED base.c already scores 0 under this pragma. The
+  #       permuter prints "base score = 0" then "Found zero score! Exiting" but
+  #       NEVER calls write_candidate for the base, so NO output-0-* dir is ever
+  #       created. This is exactly the bug that lost fn_800084C0 (peephole_off):
+  #       the old harvest only looked for output-0-* and printed NOWIN 0. Here we
+  #       also detect "base score = 0" / "score = 0" in the run log and harvest
+  #       the dir's own base.c — which, under this config's pragma, is the match.
   WINDIR=$(ls -d "$DIR"/output-0-* 2>/dev/null | head -1)
   if [ -n "$WINDIR" ] && [ -f "$WINDIR/source.c" ]; then
     cp "$WINDIR/source.c" "$PDIR/wins/$FN.c"
+    echo "$FN $SRC $NAME" >> "$PDIR/wins/MANIFEST.txt"
     WON="$NAME"
     BEST=0; BEST_CFG="$NAME"
-    echo "  [$NAME] score 0 — WIN"
+    echo "  [$NAME] score 0 — WIN (mutation; wins/$FN.c via $NAME)"
+    break
+  fi
+  # base-already-zero: log shows a zero score but no output dir was produced.
+  if grep -qE '(base score = 0|score = 0\b|Found zero score)' "$RUNLOG" 2>/dev/null; then
+    cp "$DIR/base.c" "$PDIR/wins/$FN.c"
+    echo "$FN $SRC $NAME (base)" >> "$PDIR/wins/MANIFEST.txt"
+    WON="$NAME"
+    BEST=0; BEST_CFG="$NAME"
+    echo "  [$NAME] score 0 — WIN (base already matches; wins/$FN.c via $NAME)"
     break
   fi
 
