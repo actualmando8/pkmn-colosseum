@@ -42,6 +42,7 @@ BOOT = ["pcport/pcport_main.c", "pcport/gs_gfx_host_support.c",
         "pcport/os_thread_host.c", "pcport/engine_host.c",
         "pcport/engine_spike.c", "pcport/gs_sched_host.c",
         "pcport/engine_boot.c", "pcport/field_collision.c",
+        "pcport/hsd_fobj_host.c",
         "src/dolphin/vi/VI.c",
         "src/dolphin/os/OSStateFlags.c", "src/trk/TRKUtil.c",
         "src/hsd/hsd_pobj_disp.c", "src/game/gs_gfx.c", "src/game/gs_render.c"]

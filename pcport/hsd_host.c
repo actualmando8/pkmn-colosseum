@@ -179,20 +179,17 @@ void HSD_JObjDispAll(HSD_JObj* jobj, f32 vmtx[3][4], u32 flags, u32 rendermode)
  *   void HSD_FObjInterpretAnimAll(void* fobj, void* obj,
  *                                 HSD_ObjUpdateFunc obj_update, f32 rate);
  *
- * Walks the FObj list and advances each FObj's animation clock by `rate`.
- * Full keyframe decoding lives in the (asm-only) original; this host impl is
- * crash-safe and keeps the animation time base moving so dependent systems
- * (AObj curr_frame, etc.) stay consistent. */
+ * Faithful host decompilation of fn_80199A88: walk the FObj list and run the
+ * per-FObj keyframe interpreter (HSD_FObjInterpretAnim, fn_80199AF8) on each.
+ * The interpreter + FObjLoadData + cubic-Hermite eval live in hsd_fobj_host.c
+ * (decompiled from the original GC asm; see that file). */
 void HSD_FObjInterpretAnimAll(void* fobj, void* obj,
                               HSD_ObjUpdateFunc obj_update, f32 rate)
 {
     HSD_FObj* f;
 
-    (void) obj;
-    (void) obj_update;
-
     for (f = (HSD_FObj*) fobj; f != NULL; f = f->next) {
-        f->time += rate;
+        HSD_FObjInterpretAnim(f, obj, obj_update, rate);
     }
 }
 

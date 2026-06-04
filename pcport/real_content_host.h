@@ -3,6 +3,12 @@
 
 #include "dolphin/types.h"
 #include "hsd/hsd_pobj.h"
+#include "hsd/hsd_fobj.h"
+
+/* Host kickoff for the FObj keyframe interpreter (hsd_fobj_host.c): put an
+ * FObj list into the "load next packet" start state (flags low-nibble = 2),
+ * since the adapted src/hsd/hsd_fobj.c zeroes flags. */
+void PCPort_FObjStartAnim(HSD_FObj* fobj, f32 startframe);
 
 typedef struct {
     u8* storage;
