@@ -10,7 +10,7 @@
  * link order.
  *
  * Matches: 0x800A8178 - 0x800AA430
- *   fn_800A8178 (0xF8) - DVDConvertPathToEntrynum (part 1)
+ *   DVDCompareDiskID (0xF8) - DVDConvertPathToEntrynum (part 1)
  *   fn_800A8270 (0x8C) - __DVDConvertEntrynumToPath helper
  *   fn_800A82FC (0x70) - DVDGetCurrentDir
  *   fn_800A836C (0x30) - DVDChangeDir
@@ -21,13 +21,13 @@
  *   fn_800A8850 (0x44) - DVDReadPrio helper
  *   fn_800A8894 (0xA0) - DVDReadAsyncPrio
  *   fn_800A8934 (0x200) - DVDRead (synchronous)
- *   fn_800A8B34 (0x4B0) - DVDReadDir / DVDOpenDir
+ *   VIInit (0x4B0) - DVDReadDir / DVDOpenDir
  *   fn_800A8FE4 (0x54) - DVDCloseDir
- *   fn_800A9038 (0x2D4) - DVDGetFSTLocation
- *   fn_800A930C (0x1A0) - Internal FST traversal
+ *   setFbbRegs (0x2D4) - DVDGetFSTLocation
+ *   setVerticalRegs (0x1A0) - Internal FST traversal
  *   fn_800A94AC (0x828) - DVDConvertPathToEntrynum (full)
- *   fn_800A9CD4 (0x394) - Additional path conversion
- *   fn_800AA068 (0x130) - CARD module stub or DVD state helper
+ *   VIConfigurePan (0x394) - Additional path conversion
+ *   VIFlush (0x130) - CARD module stub or DVD state helper
  *   fn_800AA198 (0x6C)  - __DVDCheckDevice
  *   fn_800AA204 (0x7C)  - __DVDCheckDisk
  *   fn_800AA280 (0x08)  - stub
@@ -304,7 +304,7 @@ void __DVDPrepareResetAsync(void (*callback)(void)) {
 extern u32 lbl_8047A838;
 extern u32 bb2_8047A83C;
 extern u32 idTmp_8047A840;
-extern void fn_800A73B4();
+extern void DVDReadAbsAsyncForBS();
 extern void DVDReset();
 extern BOOL DVDReadDiskID();
 /* 0x800A839C | 0xD8 */
@@ -313,14 +313,14 @@ void cb(s32 result, DVDCommandBlock* cmdBlock) {
         switch (lbl_8047A838) {
         case 0:
             lbl_8047A838 = 1;
-            fn_800A73B4(cmdBlock, bb2_8047A83C, 0x20, 0x420, cb);
+            DVDReadAbsAsyncForBS(cmdBlock, bb2_8047A83C, 0x20, 0x420, cb);
             break;
         case 1: {
             u8* bb2 = (u8*)bb2_8047A83C;
             u32 size;
             lbl_8047A838 = 2;
             size = *(u32*)(bb2 + 0x8);
-            fn_800A73B4(cmdBlock, *(u32*)(bb2 + 0x10), (size + 0x1F) & ~0x1F, *(u32*)(bb2 + 0x4), cb);
+            DVDReadAbsAsyncForBS(cmdBlock, *(u32*)(bb2 + 0x10), (size + 0x1F) & ~0x1F, *(u32*)(bb2 + 0x4), cb);
             break;
         }
         }

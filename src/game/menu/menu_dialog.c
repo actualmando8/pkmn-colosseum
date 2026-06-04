@@ -70,7 +70,7 @@ extern void  fn_80054760(void);
 extern void  fn_80055194(void);
 
 /* ===== Sound ===== */
-extern void  fn_800CE148(u32 sndId);       /* Sound play (SDK) */
+extern void  sin(u32 sndId);       /* Sound play (SDK) */
 
 /* ===== BSS data ===== */
 extern u8    lbl_803A9A08[];   /* Dialog window state A */

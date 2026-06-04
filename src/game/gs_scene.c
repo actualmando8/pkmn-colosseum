@@ -9,19 +9,19 @@
  * Decompiled from 78 functions in range 0x8017572C - 0x8017A5FC.
  *
  * Selected functions:
- *   fn_8017572C (GSscene_ProcessFreeList)
- *   fn_801758D8 (GSscene_UpdateActive)
- *   fn_80175A1C (GSscene_SpawnObject)
- *   fn_80175B94 (GSscene_DespawnObject)
+ *   psKillAllGenerator (GSscene_ProcessFreeList)
+ *   psKillGeneratorID (GSscene_UpdateActive)
+ *   psKillGenerator (GSscene_SpawnObject)
+ *   psRemoveGenerator (GSscene_DespawnObject)
  *   fn_80175DF0 (GSscene_FindObject)
- *   fn_80175E88 (GSscene_GetObjectByHandle)
+ *   genPosUpdate (GSscene_GetObjectByHandle)
  *   fn_80175F44 (GSscene_GetObjectCount)
  *   fn_80175F6C (GSscene_SetObjectCallback)
  *   fn_801760C4 (GSscene_AttachToParent)
  *   fn_80176228 (GSscene_DetachFromParent)
  *   fn_801765F4 (GSscene_NopAccessor1)
  *   fn_80176600-80176690 (GSscene_Get/SetField accessors)
- *   fn_801766A8 (GSscene_SetPosition)
+ *   cameraSetFov (GSscene_SetPosition)
  *   fn_80176758 (GSscene_SetRotation)
  *   fn_801767E0 (GSscene_SetScale)
  *   fn_80176868 (GSscene_SetColor)
@@ -30,7 +30,7 @@
  *   fn_801769E4 (GSscene_SetVisible)
  *   fn_80176A44 (GSscene_GetVisible)
  *   fn_80176AE4 (GSscene_ComputeWorldTransform)
- *   fn_80176B48 (GSscene_UpdateTransformHierarchy)
+ *   cameraWaitSyncAnime (GSscene_UpdateTransformHierarchy)
  *   fn_80176C04 (GSscene_GetWorldPosition)
  *   fn_80176C78 (GSscene_Render)
  *   fn_80176E0C (GSscene_RenderChildren)
@@ -47,7 +47,7 @@
  *   fn_80179404 (GSscene_CameraSetTarget)
  *   fn_801794F0 (GSscene_CameraSetPosition)
  *   fn_80179748 (GSscene_EnvironmentUpdate)
- *   fn_80179A18 (GSscene_LightingUpdate)
+ *   cameraSetFloorDefault (GSscene_LightingUpdate)
  *   fn_80179BEC (GSscene_FogUpdate)
  *   fn_80179FA4 (GSscene_Init -- 1624 bytes)
  *
@@ -62,8 +62,8 @@
  *   - Active list at lbl_8047B188 (sda21)
  *   - Object count at lbl_8047B118 (sda21, u16)
  *   - Object entry size 0x50+ bytes (offsets seen up to 0x50)
- *   - fn_80169520 called for status updates
- *   - fn_8016A644 called for resource cleanup
+ *   - psKillGeneratorChild called for status updates
+ *   - psRemoveGeneratorAppSRT called for resource cleanup
  *   - Calls to fn_800E01F4, fn_800E0518, fn_800E019C, fn_800DFF98
  *     (GSgfx vector/matrix operations)
  *   - Camera state at lbl_80478C40 (sda21)
@@ -99,8 +99,8 @@ extern f32   fn_800CE2D8(f32 x, f32 y);                /* atan2 */
 extern void* fn_800FF56C(void);                         /* GSfloor get active */
 
 /* Script/generator */
-extern void  fn_80169520(void* obj);                    /* status flag update */
-extern void  fn_8016A644(void* obj);                    /* resource cleanup */
+extern void  psKillGeneratorChild(void* obj);                    /* status flag update */
+extern void  psRemoveGeneratorAppSRT(void* obj);                    /* resource cleanup */
 extern void  fn_800D305C(s32 param);                     /* gs_render_util: set render mode */
 extern void  fn_800E24B0(u16 handle);                  /* GSmemLock */
 extern void  fn_800E01D0(void* dst, void* src);
@@ -167,7 +167,7 @@ typedef struct GSSceneRenderEntry {
 } GSSceneRenderEntry;
 
 /* ==================================================================
- * fn_8017572C -- GSscene_ProcessFreeList
+ * psKillAllGenerator -- GSscene_ProcessFreeList
  *
  * Process the scene object free list. Iterates through the active
  * list, checks for objects that should be freed, and moves them
@@ -189,7 +189,7 @@ void GSscene_ProcessFreeList(void) {
 #pragma pop
 
 /* ==================================================================
- * fn_80175B94 -- GSscene_SpawnObject
+ * psRemoveGenerator -- GSscene_SpawnObject
  *
  * Spawn a new scene object. Allocates from the free list, initializes
  * fields, and adds to the active list. 604 bytes.

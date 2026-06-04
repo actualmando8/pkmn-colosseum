@@ -67,7 +67,7 @@ extern void* sScriptDataBanks[];  /* lbl_804527C8 */
 extern const char lbl_802737F8[]; /* "psdisp.c" or similar assert string */
 
 /* ======================================================================
- * fn_80169104 | psdisp_ExecAll
+ * psSetGeneratorAngleRadiusScale | psdisp_ExecAll
  * Size: 0x23C
  *
  * Execute all active particles across all 16 link lists for display.
@@ -236,7 +236,7 @@ void psdisp_SetGeneratorHead(void* head) {
 }
 
 /* ======================================================================
- * fn_80169520 | psdisp_StatusUpdate
+ * psKillGeneratorChild | psdisp_StatusUpdate
  * Size: 0xDC -- referenced by gs_scene.c, gs_dvd.c
  *
  * Updates the status flags for an object. Checks various state bits
@@ -244,7 +244,7 @@ void psdisp_SetGeneratorHead(void* head) {
  * ====================================================================== */
 /* This function is already referenced as extern from other files;
  * its body is defined here. */
-void fn_80169520(void* obj) {
+void psKillGeneratorChild(void* obj) {
     u8* p = (u8*)obj;
     u32 flags;
 
@@ -279,7 +279,7 @@ void fn_80169520(void* obj) {
 }
 
 /* ======================================================================
- * fn_801695FC | psdisp_SpawnDisplay
+ * psKillFamily | psdisp_SpawnDisplay
  * Size: 0xD4
  *
  * Spawn a display object for a particle.
@@ -313,7 +313,7 @@ void psdisp_SpawnDisplay(PSParticle* pp, u32 displayType) {
 }
 
 /* ======================================================================
- * fn_8016972C | psdisp_SpawnDisplayEx
+ * psSetPointJObjNodup | psdisp_SpawnDisplayEx
  * Size: 0xD4
  *
  * Extended display spawn with additional parameters.
@@ -345,7 +345,7 @@ void psdisp_SpawnDisplayEx(PSParticle* pp, u32 displayType, u32 param) {
 }
 
 /* ======================================================================
- * fn_801698F8 | psdisp_UpdateDisplay
+ * psKillAllParticle | psdisp_UpdateDisplay
  * Size: 0xEC
  *
  * Update display data for a particle.
@@ -402,7 +402,7 @@ void psdisp_DestroyDisplay(PSParticle* pp) {
 }
 
 /* ======================================================================
- * fn_80169A48 | psSpawnScript (declared in script.h)
+ * psGenerateParticleID0 | psSpawnScript (declared in script.h)
  * Size: 0xF8
  *
  * Spawn a new particle script by ID.
@@ -450,7 +450,7 @@ PSParticle* psSpawnScript(PSParticle* parent, u8 linkNo, u8 bankIdx,
 }
 
 /* ======================================================================
- * fn_80169B40 | psdisp_SpawnScriptEx
+ * psGenerateParticle0 | psdisp_SpawnScriptEx
  * Size: 0x2B8
  *
  * Extended script spawn with inherited position/velocity from parent.
@@ -495,7 +495,7 @@ PSParticle* psdisp_SpawnScriptEx(PSParticle* parent, u8 linkNo,
 }
 
 /* ======================================================================
- * fn_80169DF8 | psdisp_SpawnScriptInherit
+ * psRemoveParticle | psdisp_SpawnScriptInherit
  * Size: 0x224
  *
  * Spawn script inheriting full state from parent.
@@ -577,7 +577,7 @@ PSParticle* psdisp_SpawnFromTable(PSParticle* parent, u8 linkNo,
 }
 
 /* ======================================================================
- * fn_8016A17C | psdisp_SpawnFromTableEx
+ * psInitDataBank | psdisp_SpawnFromTableEx
  * Size: 0x154
  *
  * Extended table spawn with position inheritance.
@@ -607,7 +607,7 @@ PSParticle* psdisp_SpawnFromTableEx(PSParticle* parent, u8 linkNo,
 }
 
 /* ======================================================================
- * fn_8016A2D0 | psdisp_SpawnGenerator
+ * psInitDataBankLocate | psdisp_SpawnGenerator
  * Size: 0x374
  *
  * Spawn a generator that creates NPC/people objects.
@@ -659,12 +659,12 @@ PSParticle* psdisp_SpawnGenerator(PSParticle* parent, u8 linkNo,
 }
 
 /* ======================================================================
- * fn_8016A644 | psdisp_ResourceCleanup
+ * psRemoveGeneratorAppSRT | psdisp_ResourceCleanup
  * Size: referenced by gs_scene.c, gs_dvd.c
  *
  * Cleans up resources associated with a script object.
  * ====================================================================== */
-void fn_8016A644(void* obj) {
+void psRemoveGeneratorAppSRT(void* obj) {
     u8* p = (u8*)obj;
 
     if (p == NULL) {
@@ -680,7 +680,7 @@ void fn_8016A644(void* obj) {
 }
 
 /* ======================================================================
- * fn_8016A6FC | psPeopleLinkUpdate (declared in script.h)
+ * psRemoveParticleAppSRT | psPeopleLinkUpdate (declared in script.h)
  * Size: 0xA0
  *
  * Update the people/NPC attachment link for a particle.
@@ -710,7 +710,7 @@ void psPeopleLinkUpdate(PSParticle* pp) {
 }
 
 /* ======================================================================
- * fn_8016A79C | psPeopleDetach (declared in script.h)
+ * psChangeGeneratorAppSRT | psPeopleDetach (declared in script.h)
  * Size: 0xDC
  *
  * Detach a particle from its people/NPC object.
@@ -746,7 +746,7 @@ void psPeopleDetach(PSParticle* pp) {
 }
 
 /* ======================================================================
- * fn_8016A878 | psPeopleAttach (declared in script.h)
+ * psChangeParticleAppSRT | psPeopleAttach (declared in script.h)
  * Size: 0xC4
  *
  * Attach a particle to a people/NPC object.
@@ -802,7 +802,7 @@ void psPeopleAttachStandalone(PSParticle* pp, void* parent) {
 }
 
 /* ======================================================================
- * fn_8016A9B4 | psdisp_InitDefaultValues
+ * psAddGeneratorAppSRT | psdisp_InitDefaultValues
  * Size: 0xF8
  *
  * Initialize a particle with default display values.
@@ -854,7 +854,7 @@ void psdisp_SetDisplayCallback(u32 index, void* callback) {
 }
 
 /* ======================================================================
- * fn_8016AAF4 | psdisp_GetDisplayCallback
+ * psInitAppSRT | psdisp_GetDisplayCallback
  * Size: 0xA0
  * ====================================================================== */
 void* psdisp_GetDisplayCallback(u32 index) {
@@ -921,7 +921,7 @@ void psdisp_ProcessGenerators(void) {
 }
 
 /* ======================================================================
- * fn_8016BA18 | psdisp_RenderAll
+ * psDispSub | psdisp_RenderAll
  * Size: 0x738
  *
  * Render all active display objects. Walks the active list and
@@ -1044,7 +1044,7 @@ void psdisp_UpdateAll(void) {
 }
 
 /* ======================================================================
- * fn_8016CE2C | psdisp_ProcessCamera
+ * psDispSubAppSRT | psdisp_ProcessCamera
  * Size: 0xA74
  *
  * Camera tracking processing for particles attached to the camera.
@@ -1136,7 +1136,7 @@ void psdisp_ProcessOrbital(void) {
 }
 
 /* ======================================================================
- * fn_8016E3F8 | psdisp_CleanupDead
+ * setupTevReg | psdisp_CleanupDead
  * Size: 0x41C
  *
  * Clean up particles that have been marked for destruction.
@@ -1177,7 +1177,7 @@ void psdisp_CleanupDead(void) {
 }
 
 /* ======================================================================
- * fn_8016E814 | psdisp_CountActive
+ * setupChanReg | psdisp_CountActive
  * Size: 0x274
  *
  * Count active particles across all link lists.
@@ -1245,7 +1245,7 @@ void psdisp_KillByScriptId(u16 scriptId) {
 }
 
 /* ======================================================================
- * fn_8016EC1C | psdisp_MainUpdate
+ * psSetupTev | psdisp_MainUpdate
  * Size: 0x6D8
  *
  * Main per-frame dispatch update. Called from the task system.
@@ -1284,7 +1284,7 @@ void psdisp_Nop(void) {
 }
 
 /* ======================================================================
- * fn_8016F300 | psdisp_Init
+ * psSetupTevCommon | psdisp_Init
  * Size: 0x130
  *
  * Initialize the script dispatch system.

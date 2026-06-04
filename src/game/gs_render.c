@@ -750,8 +750,8 @@ extern void fn_800D7650(u8*);
 extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
 extern void fn_800D7940(void);
 extern void fn_800D7A70(u32);
-extern void fn_800DA6F0(void);
-extern void fn_800DA880(void);
+extern void _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(void);
+extern void _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(void);
 extern void fn_800DB098(void);
 extern void fn_800DB758(u32);
 extern void fn_800DD128(u8*);
@@ -771,7 +771,7 @@ extern void fn_800E064C(void*);
 extern void fn_800E0678(u8*);
 extern void fn_800E0698(void*, f32, f32, f32, f32, f32, f32);
 extern void fn_800E0C78(void);
-extern void fn_800E0D24(void);
+extern void GSmathInitCosTable(void);
 
 #if 0
 asm void fn_800DC874(void) {
@@ -2249,7 +2249,7 @@ void fn_800D83E4(u32 count) {
 }
 #endif
 extern void fn_800B857C(u32, u32, u32, u32, u32, u32, u32);
-extern void fn_800BD58C(void);
+extern void GXLoadTexMtxImm(void);
 extern u8 lbl_80314404[];
 extern u8 lbl_80314454[];
 extern u8 lbl_803144A8[];
@@ -2654,28 +2654,28 @@ void fn_800DA4C4(s32 a, s32 b, s32 c) {
 }
 #endif
 #if 1
-asm void fn_800DA578(void) {
-#include "src/game/gs_render_fn_800DA578.inc"
+asm void GSgfxParseDisplayList(void) {
+#include "src/game/gs_render_GSgfxParseDisplayList.inc"
 }
 #else
-void fn_800DA578(void) { /* TODO */ }
+void GSgfxParseDisplayList(void) { /* TODO */ }
 #endif
 extern void jumptable_803152B8();
 #if 1
-asm void fn_800DA6F0(void) {
-#include "src/game/gs_render_fn_800DA6F0.inc"
+asm void _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(void) {
+#include "src/game/gs_render__dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590.inc"
 }
 #else
-void fn_800DA6F0(void) { /* TODO */ }
+void _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(void) { /* TODO */ }
 #endif
 extern void jumptable_80315340();
 extern void jumptable_80315320();
 #if 1
-asm void fn_800DA880(void) {
-#include "src/game/gs_render_fn_800DA880.inc"
+asm void _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(void) {
+#include "src/game/gs_render__dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720.inc"
 }
 #else
-void fn_800DA880(void) { /* TODO */ }
+void _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(void) { /* TODO */ }
 #endif
 extern void fn_800E24B0(u16);
 extern void fn_800E209C(u16);
@@ -3133,11 +3133,11 @@ extern void fn_800EF504(void);
 extern u8 lbl_80400EE0[];
 extern u8 lbl_8047AAE0;
 #if 1
-asm void fn_800DC298(void) {
-#include "src/game/gs_render_fn_800DC298.inc"
+asm void GSgfxEndBackFBCapture(void) {
+#include "src/game/gs_render_GSgfxEndBackFBCapture.inc"
 }
 #else
-void fn_800DC298(void) { /* TODO */ }
+void GSgfxEndBackFBCapture(void) { /* TODO */ }
 #endif
 extern void fn_800EF4DC(void);
 extern void fn_800EF590(void);
@@ -3145,11 +3145,11 @@ extern void fn_800EF578(void);
 extern void fn_800EF548(void);
 extern u8 lbl_8047AAE0;
 #if 1
-asm void fn_800DC390(void) {
-#include "src/game/gs_render_fn_800DC390.inc"
+asm void GSgfxBeginBackFBCapture(void) {
+#include "src/game/gs_render_GSgfxBeginBackFBCapture.inc"
 }
 #else
-void fn_800DC390(void) { /* TODO */ }
+void GSgfxBeginBackFBCapture(void) { /* TODO */ }
 #endif
 extern u8 lbl_8047AAE0;
 #if 0
@@ -3350,11 +3350,11 @@ void fn_800DCC84(u8* obj, f32* rgb) {
 extern void fn_801A68F8(u32, u32);
 extern void fn_801A6910(u32, u32);
 #if 0
-asm void fn_800DCCF0(void) {
-#include "src/game/gs_render_fn_800DCCF0.inc"
+asm void GSlightSetType(void) {
+#include "src/game/gs_render_GSlightSetType.inc"
 }
 #else
-void fn_800DCCF0(u8* obj, s32 mode) {
+void GSlightSetType(u8* obj, s32 mode) {
     fn_801A68F8(*(u32*)(obj + 0xc), 3);
     switch (mode) {
         case 0:
@@ -3480,14 +3480,14 @@ extern void fn_801A4F54(void);
 extern u32 lbl_8047AAEC;
 extern u32 lbl_8047AAF0;
 #if 0
-asm void fn_800DD174(void) {
-#include "src/game/gs_render_fn_800DD174.inc"
+asm void GSlightSetupLights(void) {
+#include "src/game/gs_render_GSlightSetupLights.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma scheduling on
-void fn_800DD174(void* arg) {
+void GSlightSetupLights(void* arg) {
     extern void fn_801A4B00(s32);
     extern void fn_801A4D20(void*);
     extern void fn_801A4F54(void*);
@@ -3677,7 +3677,7 @@ void fn_800DEFC8(u8* obj) {
     *(u32*)(obj + 0x38) = 0xfefefefe;
 }
 #endif
-extern void fn_801BBD84(void);
+extern void HSD_ImageDescAlloc(void);
 extern void fn_800EF4FC(void);
 extern void fn_800EF4F4(void);
 extern void fn_800EF3E0(void);
@@ -3853,11 +3853,11 @@ void fn_800DF504(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_800DF550(void) {
-#include "src/game/gs_render_fn_800DF550.inc"
+asm void GSmaterialSetFlags(void) {
+#include "src/game/gs_render_GSmaterialSetFlags.inc"
 }
 #else
-void fn_800DF550(u8* obj, u32 flags) {
+void GSmaterialSetFlags(u8* obj, u32 flags) {
     u32 r4;
     *(u32*)(obj + 4) = fn_801A8458(*(void**)(obj + 8));
     fn_801A8428(*(void**)(obj + 8), 0x4000600f);
@@ -3944,11 +3944,11 @@ void fn_800DF854(u32 count) {
 extern void fn_80193B30(void*, void*, void*, void*, u32, u32);
 extern u8 lbl_8036CB30[];
 #if 0
-asm void fn_800DF8CC(void) {
-#include "src/game/gs_render_fn_800DF8CC.inc"
+asm void _GSmaterialObjInit_800EF33C(void) {
+#include "src/game/gs_render__GSmaterialObjInit_800EF33C.inc"
 }
 #else
-void fn_800DF8CC(void) {
+void _GSmaterialObjInit_800EF33C(void) {
     fn_80193B30(lbl_80315490, lbl_8036CB30, (void*)lbl_802705C0, (void*)lbl_802705C0, 0x54, 0x24);
     *(void**)&lbl_80315490[0x40] = (void*)fn_800DFE98;
     *(void**)&lbl_80315490[0x44] = (void*)fn_800DF930;
@@ -4178,13 +4178,13 @@ asm void fn_800E0204(void) {
 #else
 void fn_800E0204(f32* arr) { f32 v = lbl_8047CADC; arr[0] = v; arr[1] = v; arr[2] = v; }
 #endif
-extern void fn_800A3458(void);
+extern void C_MTXLookAt(void);
 #if 0
 asm void fn_800E0218(void) {
 #include "src/game/gs_render_fn_800E0218.inc"
 }
 #else
-void fn_800E0218(void) { fn_800A3458(); }
+void fn_800E0218(void) { C_MTXLookAt(); }
 #endif
 extern void fn_800A2E64(void*, void*);
 #if 0
@@ -4194,21 +4194,21 @@ asm void fn_800E0238(void) {
 #else
 void fn_800E0238(void* a, void* b) { fn_800A2E64(b, a); }
 #endif
-extern void fn_800A2EB4(void*, void*);
+extern void PSMTXInverse(void*, void*);
 #if 0
 asm void fn_800E0264(void) {
 #include "src/game/gs_render_fn_800E0264.inc"
 }
 #else
-void fn_800E0264(void* a, void* b) { fn_800A2EB4(b, a); }
+void fn_800E0264(void* a, void* b) { PSMTXInverse(b, a); }
 #endif
-extern void fn_800A2D98(void*, void*, void*);
+extern void PSMTXConcat(void*, void*, void*);
 #if 0
 asm void fn_800E0290(void* a, void* b, void* c) {
 #include "src/game/gs_render_fn_800E0290.inc"
 }
 #else
-void fn_800E0290(void* a, void* b, void* c) { fn_800A2D98(b, c, a); }
+void fn_800E0290(void* a, void* b, void* c) { PSMTXConcat(b, c, a); }
 #endif
 extern void fn_800A335C(void*, void*);
 #if 0
@@ -4224,21 +4224,21 @@ asm void fn_800E02E8(void* obj) {
 #include "src/game/gs_render_fn_800E02E8.inc"
 }
 #else
-void fn_800E02E8(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x5a); fn_800A2D98(obj, tmp, obj); }
+void fn_800E02E8(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x5a); PSMTXConcat(obj, tmp, obj); }
 #endif
 #if 0
 asm void fn_800E032C(void* obj) {
 #include "src/game/gs_render_fn_800E032C.inc"
 }
 #else
-void fn_800E032C(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x59); fn_800A2D98(obj, tmp, obj); }
+void fn_800E032C(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x59); PSMTXConcat(obj, tmp, obj); }
 #endif
 #if 0
 asm void fn_800E0370(void* obj) {
 #include "src/game/gs_render_fn_800E0370.inc"
 }
 #else
-void fn_800E0370(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x58); fn_800A2D98(obj, tmp, obj); }
+void fn_800E0370(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x58); PSMTXConcat(obj, tmp, obj); }
 #endif
 extern void fn_800A32E8(void*, void*, f32, f32, f32);
 #if 0
@@ -4257,13 +4257,13 @@ asm void fn_800E03E8(void* a, f32 b, f32 c, f32 d) {
 #else
 void fn_800E03E8(void* a, f32 b, f32 c, f32 d) { fn_800A32E8(a, a, b, c, d); }
 #endif
-extern void fn_800A33B4(void);
+extern void PSMTXQuat(void);
 #if 0
 asm void fn_800E040C(void) {
 #include "src/game/gs_render_fn_800E040C.inc"
 }
 #else
-void fn_800E040C(void) { fn_800A33B4(); }
+void fn_800E040C(void) { PSMTXQuat(); }
 #endif
 extern u8 lbl_80315568[];
 #if 0
@@ -4349,13 +4349,13 @@ asm void fn_800E064C(void) {
 #else
 void fn_800E064C(void* dst) { memcpy(dst, lbl_80315568, 0x30); }
 #endif
-extern void fn_800A3910(void);
+extern void C_MTXPerspective(void);
 #if 0
 asm void fn_800E0678(u8* p) {
 #include "src/game/gs_render_fn_800E0678.inc"
 }
 #else
-void fn_800E0678(u8* p) { fn_800A3910(); }
+void fn_800E0678(u8* p) { C_MTXPerspective(); }
 #endif
 extern void fn_800A39E0(void);
 #if 0
@@ -4365,13 +4365,13 @@ asm void fn_800E0698(void) {
 #else
 void fn_800E0698(void* p, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) { fn_800A39E0(); }
 #endif
-extern void fn_800A3D3C(void*, void*, void*);
+extern void C_QUATSlerp(void*, void*, void*);
 #if 0
 asm void fn_800E06B8(void) {
 #include "src/game/gs_render_fn_800E06B8.inc"
 }
 #else
-void fn_800E06B8(void* a, void* b, void* c) { fn_800A3D3C(b, c, a); }
+void fn_800E06B8(void* a, void* b, void* c) { C_QUATSlerp(b, c, a); }
 #endif
 extern void fn_801ADAAC(void*, void*);
 #if 0
@@ -4428,7 +4428,7 @@ void fn_800E0790(void) {
         mtspr GQR5, r3
     }
     fn_800E0C78();
-    fn_800E0D24();
+    GSmathInitCosTable();
 }
 #pragma pop
 #endif
@@ -4436,11 +4436,11 @@ extern u32 lbl_8047CAE4;
 extern u32 lbl_8047CAE0;
 extern u32 lbl_8047CAE8;
 #if 0
-asm void fn_800E07E4(void) {
-#include "src/game/gs_render_fn_800E07E4.inc"
+asm void GSbezierCalculateVector(void) {
+#include "src/game/gs_render_GSbezierCalculateVector.inc"
 }
 #else
-void fn_800E07E4(void* dst, void* pts, f32 t) {
+void GSbezierCalculateVector(void* dst, void* pts, f32 t) {
     f32 t2;
     f32 omt;
     f32 omt2;
@@ -4603,15 +4603,15 @@ f32 fn_800E0CA0(f32 x) {
 }
 #pragma pop
 #endif
-extern void fn_800CDBE0(void);
+extern void cos(void);
 extern f32 lbl_8047CB38;
 extern f64 lbl_8047CB40;
 #if 1
-asm void fn_800E0D24(void) {
-#include "src/game/gs_render_fn_800E0D24.inc"
+asm void GSmathInitCosTable(void) {
+#include "src/game/gs_render_GSmathInitCosTable.inc"
 }
 #else
-void fn_800E0D24(void) { /* TODO */ }
+void GSmathInitCosTable(void) { /* TODO */ }
 #endif
 extern u8 lbl_80270658[];
 extern u32 lbl_8047AB30;

@@ -39,7 +39,7 @@
  *   fn_80167AF0 (GSDVD_FreeHandleResources)
  *   fn_80167B70 (GSDVD_GetHandleInfo)
  *   fn_80167BB0 (GSDVD_SetHandleCallback)
- *   fn_80167BE8 (GSDVD_ProcessQueue)
+ *   _gsdvdErrorTask_801879AC (GSDVD_ProcessQueue)
  *   fn_80167D30 (GSDVD_FlushQueue)
  *   fn_80167D60 (GSDVD_QueueRequest)
  *   fn_80167DC0 (GSDVD_IsQueueEmpty)
@@ -64,9 +64,9 @@
  *   fn_80168284 (_sndCheckSndWorkALL)
  *   fn_80168408 (GSDVD_ValidateAllSndWork)
  *   fn_801684F0 (GSDVD_SndWorkCheck)
- *   fn_80168570 (GSDVD_SndWorkReset)
+ *   GSfilterCreate (GSDVD_SndWorkReset)
  *   fn_80168638 (GSDVD_ErrorCoverOpenMain)
- *   fn_80168934 (GSDVD_Init)
+ *   particleSort (GSDVD_Init)
  *
  * Debug strings:
  *   "_sndCheckSndWorkALL:Start"
@@ -91,8 +91,8 @@
 extern void  fn_800DD970(const char* fmt, ...);         /* OSReport / GSlog */
 extern void  fn_800F9318(void* ptr, u32 param);        /* resource resolution */
 extern void  fn_801669E4(u32 a, u32 b, u32 c);         /* sound subsystem */
-extern void  fn_8016A644(void* ptr);                    /* resource cleanup */
-extern void  fn_80169520(void* ptr);                    /* status flag update */
+extern void  psRemoveGeneratorAppSRT(void* ptr);                    /* resource cleanup */
+extern void  psKillGeneratorChild(void* ptr);                    /* status flag update */
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80273748[]; /* "_sndCheckSndWorkALL:Start" */
@@ -366,7 +366,7 @@ void GSDVD_ErrorStateMachine(void) {
     extern void fn_800FE834();
     extern void fn_8016821C();
     extern void fn_8016824C();
-    extern void fn_80167BE8();
+    extern void _gsdvdErrorTask_801879AC();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -429,9 +429,9 @@ void GSDVD_ErrorStateMachine(void) {
     }
     r3 = 0x1;
     fn_800A82FC();
-    r4 = (u32)fn_80167BE8;
+    r4 = (u32)_gsdvdErrorTask_801879AC;
     r3 = 0x1;
-    r6 = (u32)fn_80167BE8;
+    r6 = (u32)_gsdvdErrorTask_801879AC;
     r5 = 0x0;
     r4 = 0x13;
     fn_800FE834();
@@ -786,7 +786,7 @@ void GSDVD_ErrorCoverOpenMain(void) {
 }
 
 /* ==================================================================
- * fn_80168934 -- GSDVD_Init
+ * particleSort -- GSDVD_Init
  *
  * Initialize the DVD subsystem. Largest function in this module
  * at 816 bytes. Sets up handle table, error callbacks, and

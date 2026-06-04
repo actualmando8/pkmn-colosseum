@@ -15,7 +15,7 @@ extern void OSDumpContext(void* context);
 extern void PPCHalt(void);
 
 /* Forward declarations */
-static void fn_800A2C74(void);
+static void __DBExceptionDestinationAux(void);
 asm void __DBExceptionDestination(void);
 
 /*
@@ -35,10 +35,10 @@ void DBInit(void) {
 }
 
 /*
- * fn_800A2C74 - Internal debug exception handler body.
+ * __DBExceptionDestinationAux - Internal debug exception handler body.
  * Reports the exception and dumps context, then halts.
  */
-static void fn_800A2C74(void) {
+static void __DBExceptionDestinationAux(void) {
     void* context;
 
     /* Read from physical address 0xC0 to get context pointer */
@@ -61,7 +61,7 @@ asm void __DBExceptionDestination(void) {
     mfmsr r3
     ori   r3, r3, 0x30
     mtmsr r3
-    b     fn_800A2C74
+    b     __DBExceptionDestinationAux
 }
 
 /*

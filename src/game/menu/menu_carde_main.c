@@ -17,7 +17,7 @@ extern void fn_800E209C();
 extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
-extern void fn_800F9D24();
+extern void GScharLenCpy();
 extern void fn_800F9E70();
 extern void fn_801046C8();
 extern void fn_80196E10();
@@ -132,7 +132,7 @@ void fn_8007FDBC(void) {
         r3 = r28;
         r4 = r20;
         r5 = 0x50;
-        ((void(*)(void))fn_800F9D24)();
+        ((void(*)(void))GScharLenCpy)();
         tmp = 0x0;
         *(u16*)((u8*)r28 + 0x9E) = tmp;
     } else {

@@ -613,7 +613,7 @@ HSD_TExp* fn_801B3258(u32 op, HSD_TExp* left, HSD_TExp* right) {
  * HSD_TExpMakeUnaryOp - 0x801B3338 | Size: 0xD0
  * Build a unary operation TExp node.
  */
-HSD_TExp* fn_801B3338(u32 op, HSD_TExp* child) {
+HSD_TExp* HSD_Index2TevStage(u32 op, HSD_TExp* child) {
     HSD_TExp* exp;
 
     if (child == NULL) {
@@ -710,7 +710,7 @@ void fn_801B3770(HSD_TExp* exp, u32 idx, HSD_TExp* input) {
  * HSD_TExpTraverse - 0x801B37A0 | Size: 0xDC
  * Walk a TExp tree and call a visitor function for each node.
  */
-void fn_801B37A0(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
+void HSD_StateAssignTev(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
     u32 i;
 
     if (exp == NULL || visitor == NULL) {
@@ -722,13 +722,13 @@ void fn_801B37A0(HSD_TExp* exp, void (*visitor)(HSD_TExp*)) {
     if (exp->type == HSD_TE_ALL) {
         for (i = 0; i < 4; i++) {
             if (exp->arg[i] != NULL) {
-                fn_801B37A0(exp->arg[i], visitor);
+                HSD_StateAssignTev(exp->arg[i], visitor);
             }
         }
     }
 
     if (exp->next != NULL) {
-        fn_801B37A0(exp->next, visitor);
+        HSD_StateAssignTev(exp->next, visitor);
     }
 }
 
@@ -755,7 +755,7 @@ void fn_801B3890(void) {
  * HSD_TExpFreeAll - 0x801B38C0 | Size: 0xD8
  * Free all nodes in a TExp tree recursively.
  */
-void fn_801B38C0(HSD_TExp* exp) {
+void HSD_StateRegisterTexGen(HSD_TExp* exp) {
     u32 i;
 
     if (exp == NULL) {
@@ -766,7 +766,7 @@ void fn_801B38C0(HSD_TExp* exp) {
     if (exp->type == HSD_TE_ALL) {
         for (i = 0; i < 4; i++) {
             if (exp->arg[i] != NULL) {
-                fn_801B38C0(exp->arg[i]);
+                HSD_StateRegisterTexGen(exp->arg[i]);
                 exp->arg[i] = NULL;
             }
         }
@@ -774,7 +774,7 @@ void fn_801B38C0(HSD_TExp* exp) {
 
     /* Free the linked list */
     if (exp->next != NULL) {
-        fn_801B38C0(exp->next);
+        HSD_StateRegisterTexGen(exp->next);
         exp->next = NULL;
     }
 
@@ -941,6 +941,6 @@ void fn_801B3D1C(HSD_TObj* tobj, u32 render_mode) {
     }
 
     /* Free expression trees */
-    fn_801B38C0(color_expr);
-    fn_801B38C0(alpha_expr);
+    HSD_StateRegisterTexGen(color_expr);
+    HSD_StateRegisterTexGen(alpha_expr);
 }

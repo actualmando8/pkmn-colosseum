@@ -192,10 +192,10 @@ void fn_801C6008(u8 transition, void* target, f32 speed, f32 zoom) {
 }
 
 /**
- * fn_801C6274 - Camera view transition interpolation.
+ * _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs - Camera view transition interpolation.
  * Address: 0x801C6274 | Size: 0x144
  */
-void fn_801C6274(f32 t, f32 ease) {
+void _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(f32 t, f32 ease) {
     /* TODO: Camera view transition (0x144 bytes) */
 }
 
@@ -306,26 +306,26 @@ extern void fn_800A3C00();
 extern void fn_800B01AC();
 extern void fn_800B01C4();
 extern void fn_800B0358();
-extern void fn_800B0388();
+extern void CARDFreeBlocks();
 extern void fn_800B2F84();
-extern void fn_800B3078();
-extern void fn_800B373C();
-extern void fn_800B3978();
+extern void CARDProbeEx();
+extern void CARDMountAsync();
+extern void CARDUnmount();
 extern void fn_800B41C0();
 extern void fn_800B4488();
 extern void fn_800B45E8();
-extern void fn_800B4774();
+extern void CARDCreateAsync();
 extern void fn_800B4C7C();
 extern void fn_800B4DC4();
-extern void fn_800B5070();
-extern void fn_800B5228();
+extern void CARDWriteAsync();
+extern void CARDDeleteAsync();
 extern void fn_800B5530();
-extern void fn_800B565C();
-extern void fn_800B5AE0();
+extern void CARDSetStatusAsync();
+extern void CARDGetSerialNo();
 extern void fn_800B5BA4();
 extern void fn_800B5BE4();
 extern void fn_800CA7FC();
-extern void fn_800CA968();
+extern void strcpy();
 extern void fn_800CE2D8();
 extern void fn_800D6A00();
 extern void fn_800D7820();
@@ -507,10 +507,10 @@ void fn_801C6AE8(s32 row, s32 col, u8 type) {
 }
 
 /**
- * fn_801C6D78 - Scene slot transform update.
+ * fadeFluidSetShock - Scene slot transform update.
  * Address: 0x801C6D78 | Size: 0x118
  */
-void fn_801C6D78(s32 slot, f32 x, f32 y, f32 z) {
+void fadeFluidSetShock(s32 slot, f32 x, f32 y, f32 z) {
     /* TODO: Scene slot transform (0x118 bytes) */
 }
 
@@ -523,10 +523,10 @@ void* fn_801C6E90(s32 slot) {
 }
 
 /**
- * fn_801C6EE4 - Scene slot model setup.
+ * fadeFluidEvaluate - Scene slot model setup.
  * Address: 0x801C6EE4 | Size: 0x1AC
  */
-void fn_801C6EE4(s32 slot, void* modelData) {
+void fadeFluidEvaluate(s32 slot, void* modelData) {
     /* TODO: Scene slot model setup (0x1AC bytes) */
 }
 
@@ -539,10 +539,10 @@ s32 fn_801C7090(void) {
 }
 
 /**
- * fn_801C70FC - Scene slot visibility control.
+ * fadeFluidQuit - Scene slot visibility control.
  * Address: 0x801C70FC | Size: 0xB4
  */
-void fn_801C70FC(s32 slot, u8 visible) {
+void fadeFluidQuit(s32 slot, u8 visible) {
     /* TODO: Scene slot visibility (0xB4 bytes) */
 }
 
@@ -1115,10 +1115,10 @@ void fn_801CB1C4(s32 slot, s32 materialIdx, u32 color) {
 }
 
 /**
- * fn_801CB2B8 - Animation model material reset.
+ * scriptIsMoveButtonPush - Animation model material reset.
  * Address: 0x801CB2B8 | Size: 0xDC
  */
-void fn_801CB2B8(s32 slot) {
+void scriptIsMoveButtonPush(s32 slot) {
     /* TODO: Model material reset (0xDC bytes) */
 }
 

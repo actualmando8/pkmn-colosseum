@@ -30,7 +30,7 @@ extern u16  fn_800E2C04(u32 size, u32 alignment);     /* heap alloc */
 extern void* fn_800E27B0(u16 handle);                  /* handle -> ptr */
 
 /* DVD / file operations */
-extern void fn_800CA968(void* dst, const void* src);   /* string copy (path) */
+extern void strcpy(void* dst, const void* src);   /* string copy (path) */
 extern u32  fn_80167F28(const char* path);              /* DVDOpen */
 extern u32  fn_80167E5C(u32 fileInfo);                  /* DVDGetLength */
 extern void fn_80167E64(u32 fileInfo);                  /* DVDClose */
@@ -180,7 +180,7 @@ s32 FSYSInit(u32 numSlots, u32 param2, u32 param3, u32 param4) {
     /* Open and read gsfsys.toc */
     {
         char tocPath[0x80];
-        fn_800CA968(tocPath, "gsfsys.toc");
+        strcpy(tocPath, "gsfsys.toc");
         tocFile = fn_80167F28(tocPath);
         tocSize = fn_80167E5C(tocFile);
 
@@ -748,7 +748,7 @@ u32 fn_8017FA5C(void) {
  * Waits (spin-loop) for completion.
  */
 extern void fn_801808E4(DVDQueueEntry* entry);
-extern void fn_800AE630(void* p1, void* p2, u32 a, u32 b, void* cb, void* arg, void* src, void* dst, u32 size);
+extern void ARQPostRequest(void* p1, void* p2, u32 a, u32 b, void* cb, void* arg, void* src, void* dst, u32 size);
 extern u32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(u32 saved);
 extern u32 lbl_8047B1D4;
@@ -795,7 +795,7 @@ void* fn_80180450(void* src, void* dst, u32 size) {
     entry->dstPtr = dst;
     entry->size = alignedSize;
     DCFlushRange(src, alignedSize);
-    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    ARQPostRequest(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
     OSRestoreInterrupts(savedIntr);
 
     result = entry;
@@ -854,7 +854,7 @@ void* fn_80180584(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
     entry->dstPtr = dst;
     entry->size = alignedSize;
     DCFlushRange(src, alignedSize);
-    fn_800AE630(entry, entry, 1, 0, fn_801808E4, entry, dst, src, alignedSize);
+    ARQPostRequest(entry, entry, 1, 0, fn_801808E4, entry, dst, src, alignedSize);
     OSRestoreInterrupts(savedIntr);
 
     return entry;
@@ -905,7 +905,7 @@ void* fn_80180694(void* src, void* dst, u32 size, u32 cbA, u32 cbB) {
     entry->dstPtr = dst;
     entry->size = alignedSize;
     DCFlushRange(src, alignedSize);
-    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    ARQPostRequest(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
     OSRestoreInterrupts(savedIntr);
 
     return entry;
@@ -956,7 +956,7 @@ void* fn_801807A8(void* src, void* dst, u32 size) {
     entry->dstPtr = dst;
     entry->size = alignedSize;
     DCFlushRange(src, alignedSize);
-    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
+    ARQPostRequest(entry, entry, 0, 0, fn_801808E4, entry, src, dst, alignedSize);
     OSRestoreInterrupts(savedIntr);
 
     return entry;

@@ -201,8 +201,8 @@ void fn_800B75D0(void) {
     /* GX Misc / PE / draw sync (0x3C bytes) */
 }
 
-/* fn_800B760C - 0x800B760C | size: 0x100 -- GX Misc / PE / draw sync */
-void fn_800B760C(void) {
+/* __GXCleanGPFifo - 0x800B760C | size: 0x100 -- GX Misc / PE / draw sync */
+void __GXCleanGPFifo(void) {
     /* GX Misc / PE / draw sync (0x100 bytes) */
 }
 
@@ -233,8 +233,8 @@ void fn_800B7BC4(void) {
     /* GX Misc / PE / draw sync (0x54 bytes) */
 }
 
-/* fn_800B7C18 - 0x800B7C18 | size: 0x124 -- GX Misc / PE / draw sync */
-void fn_800B7C18(void) {
+/* __GXCalculateVLim - 0x800B7C18 | size: 0x124 -- GX Misc / PE / draw sync */
+void __GXCalculateVLim(void) {
     /* GX Misc / PE / draw sync (0x124 bytes) */
 }
 
@@ -283,8 +283,8 @@ void fn_800B8920(void) {
     /* GX Misc / PE / draw sync (0x5C bytes) */
 }
 
-/* fn_800B897C - 0x800B897C | size: 0x16C -- GX Misc / PE / draw sync */
-void fn_800B897C(void) {
+/* __GXAbort - 0x800B897C | size: 0x16C -- GX Misc / PE / draw sync */
+void __GXAbort(void) {
     /* GX Misc / PE / draw sync (0x16C bytes) */
 }
 
@@ -453,8 +453,8 @@ void fn_800B9874(void) {
     /* GX Transform / viewport / projection (0x68 bytes) */
 }
 
-/* fn_800B98DC - 0x800B98DC | size: 0x238 -- GX Transform / viewport / projection */
-void fn_800B98DC(void) {
+/* GXGetYScaleFactor - 0x800B98DC | size: 0x238 -- GX Transform / viewport / projection */
+void GXGetYScaleFactor(void) {
     /* GX Transform / viewport / projection (0x238 bytes) -- large function, requires Ghidra */
 }
 
@@ -503,13 +503,13 @@ void fn_800BA198(u8* r3, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) {
     *(f32*)(r3 + 0x24) = f;
 }
 
-/* fn_800BA1B4 - 0x800BA1B4 | size: 0x190 -- GX Geometry / vertex descriptor */
-void fn_800BA1B4(void) {
+/* GXInitLightSpot - 0x800BA1B4 | size: 0x190 -- GX Geometry / vertex descriptor */
+void GXInitLightSpot(void) {
     /* GX Geometry / vertex descriptor (0x190 bytes) */
 }
 
-/* fn_800BA344 - 0x800BA344 | size: 0xD0 -- GX Geometry / vertex descriptor */
-void fn_800BA344(void) {
+/* GXInitLightDistAttn - 0x800BA344 | size: 0xD0 -- GX Geometry / vertex descriptor */
+void GXInitLightDistAttn(void) {
     /* GX Geometry / vertex descriptor (0xD0 bytes) */
 }
 
@@ -557,13 +557,13 @@ void fn_800BA6F4(void) {
     /* GX Geometry / vertex descriptor (0xCC bytes) */
 }
 
-/* fn_800BA7C0 - 0x800BA7C0 | size: 0x15C -- GX Geometry / vertex descriptor */
-void fn_800BA7C0(void) {
+/* GXGetTexBufferSize - 0x800BA7C0 | size: 0x15C -- GX Geometry / vertex descriptor */
+void GXGetTexBufferSize(void) {
     /* GX Geometry / vertex descriptor (0x15C bytes) */
 }
 
-/* fn_800BA91C - 0x800BA91C | size: 0xC8 -- GX Geometry / vertex descriptor */
-void fn_800BA91C(void) {
+/* __GetImageTileCount - 0x800BA91C | size: 0xC8 -- GX Geometry / vertex descriptor */
+void __GetImageTileCount(void) {
     /* GX Geometry / vertex descriptor (0xC8 bytes) */
 }
 
@@ -632,8 +632,8 @@ void fn_800BB30C(void) {
     /* GX Texture / TMEM (0xB8 bytes) */
 }
 
-/* fn_800BB3C4 - 0x800BB3C4 | size: 0x17C -- GX Texture / TMEM */
-void fn_800BB3C4(void) {
+/* __GXSetSUTexRegs - 0x800BB3C4 | size: 0x17C -- GX Texture / TMEM */
+void __GXSetSUTexRegs(void) {
     /* GX Texture / TMEM (0x17C bytes) */
 }
 
@@ -851,8 +851,8 @@ void fn_800BD0FC(void) {
     /* GX Pixel / blend / alpha / z-mode (0x70 bytes) */
 }
 
-/* fn_800BD16C - 0x800BD16C | size: 0x174 -- GX Pixel / blend / alpha / z-mode */
-void fn_800BD16C(void) {
+/* GXProject - 0x800BD16C | size: 0x174 -- GX Pixel / blend / alpha / z-mode */
+void GXProject(void) {
     /* GX Pixel / blend / alpha / z-mode (0x174 bytes) */
 }
 
@@ -886,8 +886,8 @@ void fn_800BD554(void) {
     /* GX Pixel / blend / alpha / z-mode (0x38 bytes) */
 }
 
-/* fn_800BD58C - 0x800BD58C | size: 0xB4 -- GX Pixel / blend / alpha / z-mode */
-void fn_800BD58C(void) {
+/* GXLoadTexMtxImm - 0x800BD58C | size: 0xB4 -- GX Pixel / blend / alpha / z-mode */
+void GXLoadTexMtxImm(void) {
     /* GX Pixel / blend / alpha / z-mode (0xB4 bytes) */
 }
 

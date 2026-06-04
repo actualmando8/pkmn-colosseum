@@ -44,7 +44,7 @@
  *   fn_8000FF50  GSnpc_NameRater             -- 0x58 bytes, name rater check
  *   fn_8000FFA8  GSnpc_NameRaterRename       -- 0x118 bytes, rename Pokemon
  *   fn_800100C0  GSnpc_DaycareDeposit        -- 0x68 bytes, daycare deposit
- *   fn_80010128  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
+ *   _menuFightIsUse__FP16MENU_WAZA_STATUSUs  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
  *   fn_80010294  GSnpc_PurificationChamber   -- 0x1E8 bytes, purification setup
  *   fn_8001047C  GSnpc_ShadowGaugeCheck      -- 0x10C bytes, check purification ready
  *   fn_80010588  GSnpc_PurifyPokemon         -- 0x11C bytes, purify Shadow Pokemon
@@ -587,13 +587,13 @@ L_80011500:
 
 /* 0x80011700 | 0xBC — clear 4 event flags referenced by input arg */
 #if 0
-asm void fn_80011700(void) {
-#include "src/game/gs_npc_interact_fn_80011700.inc"
+asm void menuFightCloseWaza(void) {
+#include "src/game/gs_npc_interact_menuFightCloseWaza.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80011700(s32 arg) {
+s32 menuFightCloseWaza(s32 arg) {
     if ((u8)fn_80102620(0x4c) != 0) fn_80102568(0x4c, 0, arg);
     if ((u8)fn_80102620(0xf9) != 0) fn_80102568(0xf9, 0, arg);
     if ((u8)fn_80102620(0xfa) != 0) fn_80102568(0xfa, 0, arg);
@@ -604,7 +604,7 @@ s32 fn_80011700(s32 arg) {
 #endif
 
 /* 0x800117BC | 0x1EC */
-extern void fn_80010128();
+extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
 extern void fn_80106394();
 extern void fn_80106080();
 #if 1
@@ -613,7 +613,7 @@ asm void fn_800117BC(void) {
 }
 #else
 void fn_800117BC(void) {
-    extern void fn_80010128();
+    extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
     extern void fn_80102568();
     extern void fn_80102620();
     extern void fn_801026A4();
@@ -664,7 +664,7 @@ L_800117F0:
         if ((s32)r27 < 0) break;
         r3 = r28;
         r4 = r27 & 0xFFFF;
-        fn_80010128();
+        _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
         r26 = r3;
         if (r26 == 0) break;
         r3 = 0x4c;
@@ -911,11 +911,11 @@ u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
 
 /* 0x80011CF0 | 0xAC */
 #if 0
-asm void fn_80011CF0(void) {
-#include "src/game/gs_npc_interact_fn_80011CF0.inc"
+asm void menuFightStatusStartAnimHP(void) {
+#include "src/game/gs_npc_interact_menuFightStatusStartAnimHP.inc"
 }
 #else
-void fn_80011CF0(u32 arg1, s16 target) {
+void menuFightStatusStartAnimHP(u32 arg1, s16 target) {
     u32 ptr;
     u32 state;
     u32 data;
@@ -1627,7 +1627,7 @@ extern void fn_801CBAB8(void);
 extern void fn_80109764(void);
 extern void fn_801660D8(void);
 extern void fn_80102038(void);
-extern void fn_80102428(void);
+extern void menuCloseSync(void);
 extern void fn_8012BBA8(void);
 extern u8 lbl_8047A2A0;
 extern u32 lbl_8047B6F8;
@@ -1665,7 +1665,7 @@ u32 fn_8000DAB0(void) {
 #endif
 
 /* fn_8000DAE8 - 0x8000DAE8 | size: 0x1a0 */
-extern void* fn_8001D834(void*, void*);
+extern void* menuSubCalcColor(void*, void*);
 extern void fn_800FBB34(void);
 extern u8 lbl_802E4B98[];
 extern u8 lbl_803A1B80[];
@@ -2123,15 +2123,15 @@ u32 fn_800100C0(u8* ptr) {
 #pragma peephole on
 #endif
 
-/* fn_80010128 - 0x80010128 | size: 0x16c */
+/* _menuFightIsUse__FP16MENU_WAZA_STATUSUs - 0x80010128 | size: 0x16c */
 extern void fn_801FFEC8(void);
 extern void fn_802040E8(void);
 #if 1
-asm void fn_80010128(void) {
-#include "src/game/gs_npc_interact_fn_80010128.inc"
+asm void _menuFightIsUse__FP16MENU_WAZA_STATUSUs(void) {
+#include "src/game/gs_npc_interact__menuFightIsUse__FP16MENU_WAZA_STATUSUs.inc"
 }
 #else
-void fn_80010128(void) { /* TODO */ }
+void _menuFightIsUse__FP16MENU_WAZA_STATUSUs(void) { /* TODO */ }
 #endif
 
 /* fn_80010294 - 0x80010294 | size: 0x1e8 */
@@ -2227,7 +2227,7 @@ void fn_80010588(u8* arg1, u8* arg2) {
     entry = (u8*)participant + idx * 0xc;
     if (*(u32*)(entry + 4) != 0) {
         fn_80132A38(0x37, *(u32*)(entry + 4));
-        result = (s32)fn_8001D834(arg1, arg2);
+        result = (s32)menuSubCalcColor(arg1, arg2);
         fn_800FB680(0, 0, result, 0xE7, 0);
     }
 }
@@ -2247,7 +2247,7 @@ void fn_800106A4(u8* arg1, u8* arg2) {
     extern u32 fn_801040A0(u8* a);
     extern u32 fn_801040D0(u8* a, s32 b);
     extern void fn_80132A38(s32 p1, s32 val);
-    extern void* fn_8001D834(u8* a, u8* b);
+    extern void* menuSubCalcColor(u8* a, u8* b);
     extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
     extern void* fn_802037DC(void* a);
     void* participant;
@@ -2304,7 +2304,7 @@ void fn_800106A4(u8* arg1, u8* arg2) {
         break;
     }
     if (r30 != 0) {
-        fn_800FB680(0, -2, (s32)fn_8001D834(arg1, arg2), r30);
+        fn_800FB680(0, -2, (s32)menuSubCalcColor(arg1, arg2), r30);
     }
 }
 #pragma pop

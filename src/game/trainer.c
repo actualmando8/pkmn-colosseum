@@ -103,8 +103,8 @@ extern u32 fn_801254B4(void* context, u32 slot, u16 tableId, u32 flags, u32 valu
 /* fn_80125424 - Data table auxiliary writer */
 extern void fn_80125424(void* context, u32 value);
 
-/* fn_80142CF4 - Secondary data accessor (169 calls) */
-extern u32 fn_80142CF4(u32 context, u32 param, u16 field, u32 flags);
+/* itemGetStatus - Secondary data accessor (169 calls) */
+extern u32 itemGetStatus(u32 context, u32 param, u16 field, u32 flags);
 
 /* fn_801F02AC - PokemonSlotLookup (89 calls) */
 extern u32 fn_801F02AC(u32 type, void* ptr, u32 param);
@@ -2753,7 +2753,7 @@ u32 fn_801F9034(void* context) {
 
 /* 0x801F90C4 | size: 0x6C */
 void* fn_801F90C4(void* arg0, void* arg1) {
-    extern void* fn_80129D64(void*, void*);
+    extern void* heroIsMinePokemon(void*, void*);
     extern void* fn_801FB1C0(void*, u32, u32, u32);
     void* pokemon;
     void* trainerData;
@@ -2767,7 +2767,7 @@ void* fn_801F90C4(void* arg0, void* arg1) {
     if (trainerData == NULL) {
         return NULL;
     }
-    return fn_80129D64(trainerData, pokemon);
+    return heroIsMinePokemon(trainerData, pokemon);
 }
 
 /* 0x801F9130 | size: 0x10C */
@@ -2806,7 +2806,7 @@ void fn_801F9130(void* unused, void* trainer, void* pokemon) {
 /* 0x801F923C | size: 0x1BC */
 u32 fn_801F923C(void* context, void* param) {
     extern u16 fn_801EF634(void* ctx);
-    extern void fn_801F1460(void* ptr);
+    extern void fightActionInit(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     extern void fn_80207760(void* ptr);
     extern void fn_802342CC(void* ctx, void* param);
@@ -2820,7 +2820,7 @@ u32 fn_801F923C(void* context, void* param) {
 
     result = fn_801FB1C0(context, 0, 0x4D, 0);
     if (result != NULL) {
-        fn_801F1460(result);
+        fightActionInit(result);
     }
     for (i = 0; i < 2; i++) {
         fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
@@ -3071,7 +3071,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
 
 /* 0x801F9790 | size: 0x8C */
 void fn_801F9790(void* context) {
-    extern void fn_801F1460(void* ptr);
+    extern void fightActionInit(void* ptr);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     extern void fn_80207760(void* ptr);
     void* result;
@@ -3079,7 +3079,7 @@ void fn_801F9790(void* context) {
 
     result = fn_801FB1C0(context, 0, 0x4D, 0);
     if (result != NULL) {
-        fn_801F1460(result);
+        fightActionInit(result);
     }
     for (i = 0; i < 2; i++) {
         fn_80207760(fn_801FB1C0(context, 0, 0x46, i));
@@ -3582,7 +3582,7 @@ void fn_801F9F78(void) {
     extern void fn_80124978();
     extern void fn_80125314();
     extern void fn_8012546C();
-    extern void fn_80135938();
+    extern void gamedataGetStatus();
     extern void fn_801EE750();
     extern void fn_801EE7BC();
     extern void fn_801EE824();
@@ -3740,7 +3740,7 @@ void fn_801F9F78(void) {
     r28 = (s8)r3;
     r3 = 0x0;
     r4 = 0x1;
-    fn_80135938();
+    gamedataGetStatus();
     r6 = r3;
     r3 = r31;
     r4 = r23;
@@ -4030,7 +4030,7 @@ u32 fn_801FA634(void* context) {
 void fn_801FA6D8(void) {
     extern void fn_8012A248();
     extern void fn_8012AC64();
-    extern void fn_801F1460();
+    extern void fightActionInit();
     extern void fn_801F198C();
     extern void fn_801FAA58();
     extern void fn_801FB1C0();
@@ -4127,7 +4127,7 @@ void fn_801FA6D8(void) {
                 r6 = 0x0;
                 fn_801FB1C0();
                 if (r3 != (u32)0x0) {
-                    fn_801F1460();
+                    fightActionInit();
                 }
                 r3 = r27;
                 r4 = 0x0;
@@ -4175,7 +4175,7 @@ void fn_801FA6D8(void) {
 /* 0x801FA8CC | size: 0x18C */
 void fn_801FA8CC(void* base, u16 count) {
     extern void fn_8012A248(void* ptr);
-    extern void fn_801F1460(void* ptr);
+    extern void fightActionInit(void* ptr);
     extern void fn_801FAA58(void* ctx, u32 slot, u32 field, u32 idx, u32 val);
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     extern void fn_80206C3C(void* ptr, u32 count);
@@ -4204,7 +4204,7 @@ void fn_801FA8CC(void* base, u16 count) {
             fn_801FAA58(trainer, 0, 0x4C, 0, 0);
             result = fn_801FB1C0(trainer, 0, 0x4D, 0);
             if (result != NULL) {
-                fn_801F1460(result);
+                fightActionInit(result);
             }
             fn_8020ECE0(fn_801FB1C0(trainer, 0, 0x4E, 0), 0xC);
         }
@@ -5390,7 +5390,7 @@ void fn_801FBAD4(void* context, u32 param, u8 mode) {
     if ((data = fn_801FB1C0(context, 0, 0x4C, 0)) == NULL) {
         return;
     }
-    animId = (u16)fn_80142CF4(0, param, 0x12, 0);
+    animId = (u16)itemGetStatus(0, param, 0x12, 0);
     if (mode == 0) {
         fn_801DDD28(data, animId, 4, 0);
     } else if (mode == 1) {
@@ -5436,7 +5436,7 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
         return;
     }
     typeId = (u8)(u32)fn_8012640C(fn_80205B8C(trainerCtx), 0, 0x73, 0);
-    animId = (u16)fn_80142CF4(0, typeId, 0x11, 0);
+    animId = (u16)itemGetStatus(0, typeId, 0x11, 0);
     if (mode == 0) {
         fn_801DDD28(data, animId, 4, 0);
     } else if (mode == 1) {
@@ -6371,7 +6371,7 @@ void fn_801FDB78(void) {
 
 /* 0x801FE168 | size: 0x290 | large */
 void fn_801FE168(void) {
-    extern void fn_8001D994();
+    extern void menuSubGetPokemonSexForFightDisp();
     extern void fn_80119ED0();
     extern void fn_8011B67C();
     extern void fn_8011F5FC();
@@ -6520,7 +6520,7 @@ void fn_801FE168(void) {
         r4 = r31;
         fn_801202CC();
         r3 = r29;
-        fn_8001D994();
+        menuSubGetPokemonSexForFightDisp();
         *(u8*)((u8*)r31 + 0x28) = r3;
     }
     r0 = 0x1;
@@ -8911,7 +8911,7 @@ void fn_801FFEC8(void) {
 
 /* 0x80200A5C | size: 0xB4 */
 typedef struct { u16 fields[9]; } FieldTable9;
-u32 fn_80200A5C(void* context) {
+u32 fightOutPokemonCheckNoAttackFlag(void* context) {
     extern FieldTable9 lbl_80279CA4;
     FieldTable9 table;
     u8 i;

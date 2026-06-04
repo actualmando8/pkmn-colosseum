@@ -67,7 +67,7 @@ extern void fn_800AC440(void* arAddr);   /* ARInit / ARQInit */
 
 /* --- Graphics init --- */
 extern void fn_800DDF54(u32 xfbSize, u32 numXfbs);   /* GXInit or framebuffer setup */
-extern void fn_800EEDF8(u32 unused);                   /* VI init */
+extern void GSscratchInit(u32 unused);                   /* VI init */
 
 /* --- Game-specific init called from main --- */
 extern void fn_80167FA4(int argc, char** argv, u32 flag); /* GameArgsParse */
@@ -192,16 +192,16 @@ extern void fn_8018E920(u32 a);   /* Pokemon data/model init */
 extern void fn_801ED388(void);    /* GBA link init */
 extern void fn_801D0A30(void);    /* Menu/UI system init */
 extern void fn_801128A0(void);    /* Colosseum mode init */
-extern void* fn_8025DBD4(u32 id);  /* Load relocatable module (REL) by ID */
+extern void* tableResBiosGetResPtr(u32 id);  /* Load relocatable module (REL) by ID */
 
 extern void fn_801664F0(void* color); /* Set clear/background color */
 extern void fn_800F9378(void* work, u32 time, u32 numFrames, u32 arg); /* Thread wait/schedule */
 
-extern u32  fn_800A03B4(void);    /* OSGetResetButtonState */
+extern u32  OSGetResetButtonState(void);    /* OSGetResetButtonState */
 extern void fn_80166E44(void);    /* Screen fade to black */
 extern void fn_800AAE34(u32 mask);/* VISetBlack / video blank */
 extern void fn_800AA204(u32 flag);/* VIFlush */
-extern void fn_800AA068(void);    /* VIWaitForRetrace */
+extern void VIFlush(void);    /* VIWaitForRetrace */
 extern void fn_800A880C(u32 a);   /* AISetDSPSampleRate */
 extern void fn_800A8850(u32 a);   /* AIStopDMA */
 extern void fn_800A263C(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
@@ -392,7 +392,7 @@ int main(int argc, char** argv) {
     fn_800DDF54(0x10000, 1);
 
     /* Initialize video interface */
-    fn_800EEDF8(0);
+    GSscratchInit(0);
 
     /* Parse command-line arguments (from disc header / apploader) */
     fn_80167FA4(argc, argv, 1);
@@ -757,11 +757,11 @@ static void GameMainLoop(void) {
     lbl_80478DC8 = 0;
 
     /* Load REL modules and register their scene/floor data.
-     * fn_8025DBD4 loads a relocatable module by ID and returns a pointer
+     * tableResBiosGetResPtr loads a relocatable module by ID and returns a pointer
      * to its data, which is then registered with the floor system. */
-    fn_800FC39C(fn_8025DBD4(1));  /* REL 1 -> register scene data */
-    fn_800FC244(fn_8025DBD4(4));  /* REL 4 -> register scene data (alt) */
-    fn_800F76E4(fn_8025DBD4(7));  /* REL 7 -> register floor data */
+    fn_800FC39C(tableResBiosGetResPtr(1));  /* REL 1 -> register scene data */
+    fn_800FC244(tableResBiosGetResPtr(4));  /* REL 4 -> register scene data (alt) */
+    fn_800F76E4(tableResBiosGetResPtr(7));  /* REL 7 -> register floor data */
 
     /* Seed the RNG using the low bits of the OS tick counter.
      * OSGetTime returns u64 in r3:r4; we use r4 (low 32 bits).
@@ -844,18 +844,18 @@ static void GameMainLoop(void) {
 static void TaskResetHandler(void) {
     if (lbl_80478DCA == 0) {
         /* Button not yet latched - check if pressed */
-        if (fn_800A03B4() == 1) {
+        if (OSGetResetButtonState() == 1) {
             lbl_80478DCA = 1; /* latch the reset press */
         }
     } else {
         /* Button was latched - wait for release */
-        if (fn_800A03B4() == 0) {
+        if (OSGetResetButtonState() == 0) {
             /* Released. Only reset if init is complete. */
             if (lbl_80478DC9 == 1) {
                 fn_80166E44();           /* Fade screen to black */
                 fn_800AAE34(0xF000);     /* VISetBlack */
                 fn_800AA204(1);          /* VIFlush */
-                fn_800AA068();           /* VIWaitForRetrace */
+                VIFlush();           /* VIWaitForRetrace */
                 fn_800A880C(0);          /* Stop DSP sample rate */
                 fn_800A8850(0);          /* Stop DMA */
                 fn_800A263C(0, 0, 0, 0); /* Clean up threads */

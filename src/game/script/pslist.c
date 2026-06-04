@@ -42,7 +42,7 @@ static PSParticle* sLinkHeads[PS_NUM_LINK];
 static void* sLinkDataBanks[PS_NUM_LINK];
 
 /* ======================================================================
- * fn_80168C64 | pslist_GetHead
+ * _psListGetFirst | pslist_GetHead
  * Size: 0x6C
  *
  * Returns the head particle of the given link list.
@@ -65,7 +65,7 @@ PSParticle* pslist_GetHead(s32 linkNo) {
 }
 
 /* ======================================================================
- * fn_80168CD0 | pslist_Unlink
+ * _psListDelete | pslist_Unlink
  * Size: 0xDC
  *
  * Removes a particle from its link list and places it on the free list.
@@ -115,7 +115,7 @@ void pslist_Unlink(PSParticle* pp, PSParticle* parent) {
 }
 
 /* ======================================================================
- * fn_80168DAC | pslist_Alloc
+ * _psListNew | pslist_Alloc
  * Size: 0xDC
  *
  * Allocates a particle from the free list. If the free list is empty,
@@ -171,7 +171,7 @@ PSParticle* pslist_Alloc(PSParticle* insertAfter, u32 linkNo) {
 }
 
 /* ======================================================================
- * fn_80168E88 | pslist_DestroyAll
+ * _psListClear | pslist_DestroyAll
  * Size: 0xA0
  *
  * Frees all particles from all lists (free list + all 16 link lists).
@@ -207,7 +207,7 @@ void pslist_DestroyAll(void) {
 }
 
 /* ======================================================================
- * fn_80168F28 | pslist_Init
+ * _psLinkInit | pslist_Init
  * Size: 0x10C
  *
  * Initializes the particle system pool.
@@ -247,7 +247,7 @@ s32 pslist_Init(s32 count) {
 }
 
 /* ======================================================================
- * fn_80169034 | pslist_UpdateVisibility
+ * psSetParticleVisibility | pslist_UpdateVisibility
  * Size: 0xD0
  *
  * Iterates through all particles in the same link as pp, and all

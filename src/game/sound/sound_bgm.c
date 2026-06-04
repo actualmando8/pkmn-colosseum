@@ -42,7 +42,7 @@ extern void fn_8014D6D8(u32 channel, u16 value, u32 handle, u32 flags);
 extern s32 fn_8014D880(u32 handle);
 extern void fn_8014D8C8(u8 volume, u16 pan, u8 code);
 extern void fn_8014D928(u8 chorus, u16 reverb, u8 delay, u8 wet);
-extern void fn_8014D9BC(void);
+extern void sndOutputMode(void);
 extern s32  fn_800A0E34(void);
 extern void fn_800A0EB4(u32 enable);
 
@@ -466,7 +466,7 @@ BOOL sndIsAudioAvailable(void) {
  * =========================================================================
  */
 void sndSetSurroundMode(s32 mode) {
-    fn_8014D9BC(); /* reset DSP state */
+    sndOutputMode(); /* reset DSP state */
 
     if (mode == 0) {
         /* Mono: disable surround processing */

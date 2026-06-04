@@ -443,7 +443,7 @@ s32 sndPlaySe3D4Point(u32 sndId, void* pos, void* fwd, void* up,
 }
 
 /* =========================================================================
- * fn_801652DC -- _sndUpdateAllVolumes
+ * ReverbHICallback -- _sndUpdateAllVolumes
  *
  * Per-frame volume update for all active sound channels.
  * Iterates through the three channel types (0=BGM, 1=SE, 2=stream)
@@ -473,14 +473,14 @@ void _sndUpdateAllVolumes(u32 bgmHandle, u32 seHandle, u32 streamHandle,
                     fn_80164C40(bgmHandle, seHandle, scaledVol, invVol);
                 }
 
-                fn_80164DD0(bgmHandle, params, 0);
+                HandleReverb(bgmHandle, params, 0);
                 break;
             }
             case 1:
-                fn_80164DD0(seHandle, params, 1);
+                HandleReverb(seHandle, params, 1);
                 break;
             case 2:
-                fn_80164DD0(streamHandle, params, 2);
+                HandleReverb(streamHandle, params, 2);
                 break;
         }
     }

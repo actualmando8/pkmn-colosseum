@@ -38,7 +38,7 @@ extern void fn_8012F150(s32 slot);               /* Party activate slot */
 extern void fn_80129280(s32 slot, s32 count);    /* Party set active count */
 extern void fn_8012A86C(s32 slot, u16 param);    /* Party event apply */
 extern void fn_800FF56C(s32 floorID);            /* Floor/scene load */
-extern void fn_80113778(s32 slot, f32 x, f32 y, f32 z);  /* Set world position */
+extern void floorChangePos(s32 slot, f32 x, f32 y, f32 z);  /* Set world position */
 
 /* =========================================================================
  * SDA global variables
@@ -460,7 +460,7 @@ void GSflagSet(s32 flagID) {
             posX = *(f32*)(gFlagSceneTbl + sceneIdx + 0x08);
             posY = *(f32*)(gFlagSceneTbl + sceneIdx + 0x0C);
             posZ = *(f32*)(gFlagSceneTbl + sceneIdx + 0x10);
-            fn_80113778(0, posX, posY, posZ);
+            floorChangePos(0, posX, posY, posZ);
         }
     }
 }
@@ -907,7 +907,7 @@ void GSflagInit(u32* savePtr, u32 flagCount, u32 size0,
 }
 
 /* =========================================================================
- * GSflagSetBitValue (fn_80190C90) -- 0x1A4 bytes
+ * GSflagSetBitValue (GSflagInitBitPos) -- 0x1A4 bytes
  * ========================================================================= */
 
 /**

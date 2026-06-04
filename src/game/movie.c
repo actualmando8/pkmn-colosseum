@@ -46,7 +46,7 @@ extern void* fn_80135168(void* ctx, u32 a);            /* effect query */
 extern void fn_8012A450(u32 a, u32 b, u32 c);         /* effect system control */
 extern void* fn_8012A5B0(u32 a, u32 b, u32 c);        /* effect system query */
 extern void fn_80106D3C(u32 a, u32 b, u32 c, u32 d);  /* floor transition trigger */
-extern s8   fn_8001E074(u32 a, u32 b, u32 c, u32 d);  /* input poll / wait */
+extern s8   menuSubOpenYesNo(u32 a, u32 b, u32 c, u32 d);  /* input poll / wait */
 extern void* fn_801D036C(void);                        /* battle state query */
 extern u32  fn_801D0748(u32 a, u32 b, u32 c);         /* battle mode set */
 extern void fn_800FF58C(u32 a);                        /* floor cleanup helper */
@@ -246,7 +246,7 @@ void movieStopAndCleanup(void) {
  *
  *    ; Poll input for skip
  *    li r3, 0; li r4, 0x3C; li r5, 0xAA; li r6, 0
- *    bl fn_8001E074
+ *    bl menuSubOpenYesNo
  *    ; if input detected, check for skip
  *    ...
  *
@@ -319,7 +319,7 @@ void moviePlayStaffRoll(void) {
     fn_80106D3C(2, 0x444C, 1, 0);
 
     /* Poll input: wait for button press or timeout */
-    inputResult = fn_8001E074(0, 0x3C, 0xAA, 0);
+    inputResult = menuSubOpenYesNo(0, 0x3C, 0xAA, 0);
 
     if (inputResult != 0) {
         goto cleanup;
@@ -358,7 +358,7 @@ void moviePlayStaffRoll(void) {
 
             /* Load special credits floor */
             fn_80106D3C(2, 0x3C02, 1, 0);
-            inputResult = fn_8001E074(0, 0x3C, 0xAA, 1);
+            inputResult = menuSubOpenYesNo(0, 0x3C, 0xAA, 1);
         }
     }
 

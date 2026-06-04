@@ -17,7 +17,7 @@
  *   fn_80140588 (peopleFieldOpen)      -- 0x514 bytes
  *     Open/spawn an NPC from field data. Takes a PeopleEntry pointer,
  *     group/index pair, spawn data, and a "force" flag. Calls into
- *     fn_80142CF4 (peopleFieldAlloc) to find or create a slot, loads
+ *     itemGetStatus (peopleFieldAlloc) to find or create a slot, loads
  *     the model, and configures the NPC's initial state.
  *     References: lbl_80478BD8 (gPeopleFieldCount),
  *                 lbl_803681E8 (gPeopleFieldLookup),
@@ -61,15 +61,15 @@
  *     Apply a motion/animation to an NPC. Blends between current and
  *     target animation states.
  *
- *   fn_80142CF4 (peopleFieldAlloc)     -- 0x204 bytes
+ *   itemGetStatus (peopleFieldAlloc)     -- 0x204 bytes
  *     Allocate or find an NPC slot. If a slot with the same group+index
  *     already exists, returns it. Otherwise allocates a new slot from
  *     the free pool. Called by 38 external functions.
  *
- *   fn_80142EF8 (peopleFieldRelease)   -- 0x2B4 bytes
+ *   itemParamConvertOrigFormat (peopleFieldRelease)   -- 0x2B4 bytes
  *     Release an NPC slot back to the free pool.
  *
- *   fn_801431AC (peopleFieldInit)      -- 0x4F0 bytes
+ *   itemParamGetRecoverType (peopleFieldInit)      -- 0x4F0 bytes
  *     Initialize the field people system. Allocates the NPC array,
  *     lookup table, and work buffer. Sets up global state.
  *
@@ -223,9 +223,9 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
 /* fn_801429E8: peopleFieldGetEntry (0xA0 bytes) */
 /* fn_80142A88: peopleFieldSetState (0x9C bytes) */
 /* fn_80142B24: peopleFieldApplyMotion (0x1D0 bytes) */
-/* fn_80142CF4: peopleFieldAlloc (0x204 bytes) */
-/* fn_80142EF8: peopleFieldRelease (0x2B4 bytes) */
-/* fn_801431AC: peopleFieldInit (0x4F0 bytes) */
+/* itemGetStatus: peopleFieldAlloc (0x204 bytes) */
+/* itemParamConvertOrigFormat: peopleFieldRelease (0x2B4 bytes) */
+/* itemParamGetRecoverType: peopleFieldInit (0x4F0 bytes) */
 
 /* --- Getter/Setter cluster (83 functions) --- */
 /* fn_8014369C: getField07 */
@@ -317,11 +317,11 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
 
 /* fn_801440F0: peopleFieldOpenModel (0xB8 bytes) */
 /* fn_801441A8: peopleFieldConfigModel (0x224 bytes) */
-/* fn_801443CC: peopleFieldFinalizeModel (0x1A8 bytes) */
+/* hpRecover__FP20ITEMUSE2POKEMON_LOG1PsP7PokemonUcbUsP12FightPokemon: peopleFieldFinalizeModel (0x1A8 bytes) */
 /* Forward declarations for self-referencing asm blocks */
 extern void fn_801425E8(void);
 extern void fn_80142B24(void*, u32, u16, u32, u32);
-extern s32 fn_80142CF4(u32, u16, u16, u32);
+extern s32 itemGetStatus(u32, u16, u16, u32);
 extern u16  fn_80143B30(u8* p);
 extern u8*  fn_80143B48(u16 idx);
 extern void fn_80143B70(u8* p, u16 val);
@@ -396,7 +396,7 @@ asm void fn_80142984(void) {
 s32 fn_80142984(u16 id) {
     s32 r;
 
-    r = fn_80142CF4(0, id, 1, 0);
+    r = itemGetStatus(0, id, 1, 0);
     if (r == 0) return 0;
     return lbl_80478BD8 > (u16)id;
 }
@@ -414,10 +414,10 @@ s32 fn_801429E8(u32 arg) {
 
     if (arg == 0) return 0;
 
-    r31 = (u16)fn_80142CF4(arg, 0, 0x1b, 0);
+    r31 = (u16)itemGetStatus(arg, 0, 0x1b, 0);
     if (r31 == 0) return 0;
 
-    if (fn_80142CF4(0, r31, 1, 0) == 0) {
+    if (itemGetStatus(0, r31, 1, 0) == 0) {
         valid = 0;
     } else if (r31 >= lbl_80478BD8) {
         valid = 0;
@@ -492,27 +492,27 @@ extern void fn_8020A350(void);
 extern void fn_8020A338(void);
 extern void jumptable_80367DE8();
 #if 1
-asm s32 fn_80142CF4(u32 a, u16 b, u16 c, u32 d) {
-#include "src/game/people/people_data_fn_80142CF4.inc"
+asm s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) {
+#include "src/game/people/people_data_itemGetStatus.inc"
 }
 #else
-s32 fn_80142CF4(u32 a, u16 b, u16 c, u32 d) { /* TODO */ return 0; }
+s32 itemGetStatus(u32 a, u16 b, u16 c, u32 d) { /* TODO */ return 0; }
 #endif
 extern void jumptable_80367E70();
 extern u8 lbl_802730E0[];
 #if 1
-asm void fn_80142EF8(void) {
-#include "src/game/people/people_data_fn_80142EF8.inc"
+asm void itemParamConvertOrigFormat(void) {
+#include "src/game/people/people_data_itemParamConvertOrigFormat.inc"
 }
 #else
-void fn_80142EF8(void) { /* TODO */ }
+void itemParamConvertOrigFormat(void) { /* TODO */ }
 #endif
 #if 1
-asm void fn_801431AC(void) {
-#include "src/game/people/people_data_fn_801431AC.inc"
+asm void itemParamGetRecoverType(void) {
+#include "src/game/people/people_data_itemParamGetRecoverType.inc"
 }
 #else
-void fn_801431AC(void) { /* TODO */ }
+void itemParamGetRecoverType(void) { /* TODO */ }
 #endif
 #if 0
 asm void fn_801436B8(void) {

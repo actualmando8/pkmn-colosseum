@@ -642,12 +642,12 @@ void fn_800EEA6C(void) {
  * if (b & 0x1f) != 0, return 2
  * if (a & 0x1f) != 0, return 2
  * if (c & 0x1f) != 0, return 2
- * fn_8009B55C(a, b, c)
+ * LCStoreData(a, b, c)
  * lbl_8047ABDC += return_val
  * return 0
  * ================================================================== */
 extern u32 fn_8009B608(void);
-extern u32 fn_8009B55C(u32 a, u32 b, u32 c);
+extern u32 LCStoreData(u32 a, u32 b, u32 c);
 extern u32 lbl_8047ABDC;
 #if 0
 asm void fn_800EEA98(void) {
@@ -671,14 +671,14 @@ u32 fn_800EEA98(u32 a, u32 b, u32 c) {
         return 2;
     }
 
-    ret = fn_8009B55C(a, b, c);
+    ret = LCStoreData(a, b, c);
     lbl_8047ABDC = lbl_8047ABDC + ret;
     return 0;
 }
 #endif
 
 /* ==================================================================
- * fn_800EEB34 | Size: 0x104
+ * GSscratchFree | Size: 0x104
  * r3 = data pointer.
  * Computes slot index = extrwi((ptr - lbl_8047ABE0), 8, 15) = (ptr-base)>>9 & 0xff
  * Searches lbl_804018F0 table (32 entries, stride 8) for entry with byte[0] == index.
@@ -690,11 +690,11 @@ u32 fn_800EEA98(u32 a, u32 b, u32 c) {
 extern u32 lbl_8047ABE0;
 extern u32 lbl_8047ABEC;
 #if 0
-asm void fn_800EEB34(void) {
-#include "src/game/gs_particle_fn_800EEB34.inc"
+asm void GSscratchFree(void) {
+#include "src/game/gs_particle_GSscratchFree.inc"
 }
 #else
-void fn_800EEB34(u32 ptr) {
+void GSscratchFree(u32 ptr) {
     u32 base;
     u32 idx;
     u8* table;
@@ -748,7 +748,7 @@ void fn_800EEB34(u32 ptr) {
 #endif
 
 /* ==================================================================
- * fn_800EEC38 -- VI register retrace callback | Size: 0x1C0
+ * GSscratchAlloc -- VI register retrace callback | Size: 0x1C0
  * r3 = count (1-32), r4 = data pointer, r5 = param.
  * If lbl_8047ABE8 == 1, return NULL.
  * If count == 0 or count > 32, return NULL.
@@ -760,11 +760,11 @@ extern u32 lbl_8047ABE8;
 extern u32 lbl_8047ABEC;
 extern u32 lbl_8047ABE0;
 #if 0
-asm void fn_800EEC38(void) {
-#include "src/game/gs_particle_fn_800EEC38.inc"
+asm void GSscratchAlloc(void) {
+#include "src/game/gs_particle_GSscratchAlloc.inc"
 }
 #else
-void* fn_800EEC38(u8 count, u32 dataPtr, u8 param) {
+void* GSscratchAlloc(u8 count, u32 dataPtr, u8 param) {
     u32 bitmap;
     u8 startBit;
     u8 i;
@@ -857,9 +857,9 @@ void* fn_800EEC38(u8 count, u32 dataPtr, u8 param) {
 #endif
 
 /* ==================================================================
- * fn_800EEDF8 -- VI init | Size: 0x150
+ * GSscratchInit -- VI init | Size: 0x150
  * ================================================================== */
-void fn_800EEDF8(void) { /* TODO */ }
+void GSscratchInit(void) { /* TODO */ }
 
 /* ==================================================================
  * fn_800EEF48 | Size: 0x150

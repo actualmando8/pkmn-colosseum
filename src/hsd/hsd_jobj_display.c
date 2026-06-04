@@ -19,8 +19,8 @@ u32 fn_801A1988(void) {
 void fn_801A1A00(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
-    extern void fn_800A2D98();
-    extern void fn_800A2EB4();
+    extern void PSMTXConcat();
+    extern void PSMTXInverse();
     extern void fn_801942B8();
     extern void fn_80196E10();
     extern void fn_8019D9DC();
@@ -85,16 +85,16 @@ void fn_801A1A00(void) {
     r3 = *(u32*)((u8*)r29 + 0x10);
     r4 = r30;
     r3 = r3 + 0x44;
-    fn_800A2EB4();
+    PSMTXInverse();
     r4 = r30;
     r5 = r30;
     r3 = r29 + 0x44;
-    fn_800A2D98();
+    PSMTXConcat();
     if (r28 != 0) {
         r3 = r28;
         r4 = r30;
         r5 = r30;
-        fn_800A2D98();
+        PSMTXConcat();
         return;
     }
     fn_801942B8();
@@ -102,7 +102,7 @@ void fn_801A1A00(void) {
     r3 = r3 + 0x54;
     r4 = r30;
     r5 = r30;
-    fn_800A2D98();
+    PSMTXConcat();
 
     return;
 }
@@ -1982,7 +1982,7 @@ void fn_801A3574(void) {
 void fn_801A3600(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
-    extern void fn_800A2D98();
+    extern void PSMTXConcat();
     extern void fn_800A37CC();
     extern void fn_80196E10();
     extern void fn_8019D9DC();
@@ -2158,7 +2158,7 @@ L_801A3794:
         r4 = r31 + 0x44;
         r5 = r31 + 0x44;
         r3 = r3 + 0x44;
-        fn_800A2D98();
+        PSMTXConcat();
     }
     tmp = *(u32*)((u8*)r31 + 0x7C);
     if (tmp == 0) return;

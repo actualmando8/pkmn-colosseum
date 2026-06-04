@@ -18,7 +18,7 @@
 
 /* Address: 0x801A85F0 | Size: 0xC4 */
 /* HSD matrix utility - possibly MTXInverse or MTXTranspose */
-void fn_801A85F0(void) {
+void HSD_MtxScaledAdd(void) {
 }
 
 /* Address: 0x801A86B4 | Size: 0x1D0 */

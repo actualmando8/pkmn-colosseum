@@ -12,12 +12,12 @@
  * Adapted from doldecomp/melee and zeldaret/tp matching implementations.
  *
  * Matches: 0x8009C860 - 0x8009DF3C
- *   fn_8009C860 (0x3DC) - WriteSram (large EXI transfer)
- *   fn_8009CC3C (0xFC)  - WriteSramCallback
+ *   ScreenReport (0x3DC) - WriteSram (large EXI transfer)
+ *   ConfigureVideo (0xFC)  - WriteSramCallback
  *   fn_8009CD38 (0x154) - ReadSram
  *   fn_8009CE8C (0x684) - __OSInitSram
  *   fn_8009D510 (0x19C) - __OSLockSram
- *   fn_8009D6AC (0x174) - __OSLockSramEx
+ *   Decode (0x174) - __OSLockSramEx
  *   fn_8009D820 (0x58)  - UnlockSram
  *   fn_8009D878 (0x8C)  - __OSUnlockSram
  *   fn_8009D904 (0x334) - __OSUnlockSramEx
@@ -540,7 +540,7 @@ void fn_800A09B0(void) {
     return;
 }
 
-/* fn_800A0D10 - 0x800A0D10 | size: 0x124 */
+/* __OSReadROM - 0x800A0D10 | size: 0x124 */
 /*
  * ReadSramDma - Read SRAM data via EXI DMA transfer.
  *
@@ -550,7 +550,7 @@ void fn_800A09B0(void) {
  *
  * 0x800A0D10 | size: 0x124
  */
-BOOL fn_800A0D10(void* dest, u32 size, u32 offset) {
+BOOL __OSReadROM(void* dest, u32 size, u32 offset) {
     u32 cmd;
     BOOL err = FALSE;
 

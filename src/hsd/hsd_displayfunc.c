@@ -44,8 +44,8 @@
 /* ===== External functions ===== */
 extern void fn_80196E10(const char* file, u32 line, const char* msg); /* HSD_Halt / assert */
 extern void fn_80196D78(const char* file, u32 line, const char* msg); /* HSD_Panic */
-extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
-extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
+extern void PSMTXInverse(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
+extern void PSMTXConcat(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
 extern void fn_801A9DF0(void* a, void* b, void* c);                  /* HSD_MtxInverseConcat */
 
 /* Render pass subroutines - fn_80198038/fn_801985E0/fn_80198B20 defined as asm wrappers below */
@@ -211,7 +211,7 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
         /* Same node: copy world matrix directly */
         u32* foundPtr = (u32*)found;
         void* worldMtx = (void*)foundPtr[30]; /* offset 0x78 */
-        fn_800A2EB4(worldMtx, outputMtx);
+        PSMTXInverse(worldMtx, outputMtx);
     } else {
         u32* foundPtr = (u32*)found;
         u32 foundFlags = foundPtr[5];
@@ -227,7 +227,7 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
             void* foundJointMtx = (void*)((u8*)found + 0x44);
             void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
 
-            fn_800A2D98(foundJointMtx, foundWorldMtx, localMtx);
+            PSMTXConcat(foundJointMtx, foundWorldMtx, localMtx);
             fn_801A9DF0(localMtx, dobjJointMtx, outputMtx);
         }
     }
@@ -271,14 +271,14 @@ void HSD_DObjDisplayFunc2(void* dobj, void* viewMtx, void* renderState) {
     if (passType == 0) {
         /* No render pass flags: simple matrix setup */
         void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-        fn_800A2D98(viewMtx, dobjJointMtx, renderState);
+        PSMTXConcat(viewMtx, dobjJointMtx, renderState);
         return;
     }
 
     /* Concat viewMtx with dobj->jointMtx */
     {
         void* dobjJointMtx = (void*)((u8*)dobj + 0x44);
-        fn_800A2D98(viewMtx, dobjJointMtx, localMtx);
+        PSMTXConcat(viewMtx, dobjJointMtx, localMtx);
     }
 
     switch (passType) {

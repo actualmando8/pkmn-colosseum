@@ -42,7 +42,7 @@ extern void  fn_800DD970(const char* fmt, ...);        /* OSReport */
 extern u16   GSmemAllocRaw(u32 size);                  /* fn_800E3534 */
 extern void* GSmemGetPtr(u16 handle);                  /* fn_800E27B0 */
 extern void  fn_800E0790(void);                        /* GSmem stats/check */
-extern void  fn_800EEC38(u32 slot, void* callback);    /* VI register retrace cb */
+extern void  GSscratchAlloc(u32 slot, void* callback);    /* VI register retrace cb */
 extern void  fn_8019C3C4(u32 a, ...);                  /* VIConfigure wrapper */
 extern void  fn_8019CB70(void);                        /* VIFlush / apply config */
 extern void  fn_800D37D4(u32 mode, u32 tvFmt, u32 a,
@@ -250,7 +250,7 @@ void GSgfxSetVideoMode(u32 mode, u32 tvFormat, u32 field0,
  *  Assembly sequence (heavily abbreviated):
  *
  *  1. fn_800E0790()                    -- GSmem stats snapshot
- *  2. fn_800EEC38(3, fn_800D3E4C)      -- register VBlank retrace cb slot 3
+ *  2. GSscratchAlloc(3, fn_800D3E4C)      -- register VBlank retrace cb slot 3
  *  3. if (state already exists) goto skip_alloc
  *     handle = GSmemAllocRaw(0x5A0)    -- allocate state struct
  *     if (handle == 0):
@@ -320,7 +320,7 @@ void GSgfxInit(u32 memSize, u32 fifoSize, u32 mtxDepth,
     fn_800E0790();
 
     /* Step 2: Register VBlank retrace callback in slot 3 */
-    fn_800EEC38(3, (void*)fn_800D3E4C);
+    GSscratchAlloc(3, (void*)fn_800D3E4C);
 
     /* Step 3: Allocate or reuse the 0x5A0-byte state structure */
     if (gsGfxState == NULL) {

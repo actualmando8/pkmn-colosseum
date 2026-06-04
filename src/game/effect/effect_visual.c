@@ -328,7 +328,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013FF0C: _billboardTransformSetup (0x22C bytes) */
 /* fn_80140138: _billboardTransformHelper */
 /* fn_80140190: _billboardTransformHelper2 (0x11C bytes) */
-/* fn_801402AC: _billboardTransformMain (0x2DC bytes) */
+/* _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl: _billboardTransformMain (0x2DC bytes) */
 extern void fn_800E008C(void);
 extern void fn_800D6728(void);
 extern void fn_800D85D4(void);
@@ -488,8 +488,8 @@ u32 fn_801387C0(void* ptr, u32 delta) {
 }
 #endif
 extern void fn_800E0BE4(void);
-extern void fn_800CDBE0(void);
-extern void fn_800CE148(void);
+extern void cos(void);
+extern void sin(void);
 extern void fn_800E01F4(void);
 extern void fn_800E01D0(void);
 extern void fn_800DFFCC(void);
@@ -570,7 +570,7 @@ asm void fn_80138CCC(void) {
 #else
 void fn_80138CCC(void) { /* TODO */ }
 #endif
-extern void fn_800E07E4(void);
+extern void GSbezierCalculateVector(void);
 extern void fn_800E06B8(void);
 extern void fn_800E040C(void);
 extern void fn_800E02C4(void);
@@ -917,7 +917,7 @@ void fn_8013B0A0(void) { /* TODO */ }
 #endif
 extern void fn_800E6478(void);
 extern void fn_800E5BE0(void);
-extern void fn_80168570(void);
+extern void GSfilterCreate(void);
 extern u8 lbl_80363CA8[];
 extern u8 lbl_80272E30[];
 extern u8 lbl_80272E70[];
@@ -1459,7 +1459,7 @@ u32 fn_8013DD10(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800DC298(void* a);
+extern void GSgfxEndBackFBCapture(void* a);
 extern void fn_800E5790(void* a);
 #if 0
 asm u32 fn_8013DD7C(void* ptr) {
@@ -1470,7 +1470,7 @@ u32 fn_8013DD7C(void* ptr) {
     void* inner;
     if (ptr) {
         if (*(s32*)((u8*)ptr + 0x10) != 0) {
-            fn_800DC298(*(void**)((u8*)ptr + 0xc));
+            GSgfxEndBackFBCapture(*(void**)((u8*)ptr + 0xc));
         } else {
             inner = *(void**)ptr;
             if (inner) {
@@ -1481,7 +1481,7 @@ u32 fn_8013DD7C(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800DC390(void* handle, void* callback, void* ctx);
+extern void GSgfxBeginBackFBCapture(void* handle, void* callback, void* ctx);
 extern void* fn_800E584C(void* a, void* b);
 extern u8 lbl_80272F70[];
 #if 0
@@ -1495,7 +1495,7 @@ u32 blurEffectStart(void* ptr) {
         *(u32*)((u8*)ptr + 0x1c) = 0;
         if (*(s32*)((u8*)ptr + 0x10) != 0) {
             if (*(void**)((u8*)ptr + 0xc) != NULL) {
-                fn_800DC390(*(void**)((u8*)ptr + 0xc), (void*)fn_8013E258, ptr);
+                GSgfxBeginBackFBCapture(*(void**)((u8*)ptr + 0xc), (void*)fn_8013E258, ptr);
                 return 1;
             }
         } else {
@@ -1515,7 +1515,7 @@ extern void fn_800EC53C(void);
 extern void fn_800EC570(void);
 extern void fn_800D45F8(void);
 extern void fn_800DF3F0(void);
-extern void fn_800DF550(void);
+extern void GSmaterialSetFlags(void);
 extern void fn_800DF188(void);
 extern void fn_800EC990(void);
 extern void fn_800ECA78(void);
@@ -1990,7 +1990,7 @@ void fn_80140138(u8* ptr) {
     }
 }
 #endif
-extern void fn_801402AC(void);
+extern void _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(void);
 extern void fn_800DF028(void);
 #if 1
 asm void fn_80140190(void) {

@@ -8,7 +8,7 @@
  * event scripting system with the game's UI subsystems.
  *
  * Key behaviors:
- *   - fn_80053110 (0x33C bytes) is a multi-case handler that reads script
+ *   - dbgMenuFightWazaEditSub (0x33C bytes) is a multi-case handler that reads script
  *     parameters and dispatches to appropriate subsystems
  *   - fn_80053778 references BSS lbl_803A95E8 (0x138 bytes) and
  *     lbl_803A9720 (0x48 bytes), and calls fn_80057270 (text system)
@@ -68,7 +68,7 @@ extern u8    lbl_803A9720[];   /* Script callback state B (0x48 bytes) */
 /*
  * Functions in this translation unit (25 total):
  *
- * fn_80053110  0x33C  Multi-case script handler
+ * dbgMenuFightWazaEditSub  0x33C  Multi-case script handler
  * fn_8005344C  0x0D0  Script callback (calls fn_80057094, fn_80057A08, fn_80058F08)
  * fn_8005351C  0x20C  Script callback (calls fn_80057E40)
  * fn_80053728  0x050  Script callback (calls fn_80057E40)
@@ -97,8 +97,8 @@ extern u8    lbl_803A9720[];   /* Script callback state B (0x48 bytes) */
 
 
 /* 0x80053110 | size: 0x33C */
-asm void fn_80053110(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/script_callback/fn_80053110.s"
+asm void dbgMenuFightWazaEditSub(void) { nofralloc
+    #include "asm/GC6E01/nonmatching/script_callback/dbgMenuFightWazaEditSub.s"
 }
 
 /* 0x80053778 | size: 0x2E8 */

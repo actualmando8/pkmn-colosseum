@@ -9,7 +9,7 @@
 #include "dolphin/types.h"
 
 /* ===== External function declarations ===== */
-extern void fn_8001E074();
+extern void menuSubOpenYesNo();
 extern void fn_8006B420();
 extern void fn_80075B74();
 extern void fn_80075BFC();
@@ -901,7 +901,7 @@ void fn_80078390(void) {
     r4 = -0x1;
     r5 = -0x1;
     r6 = 0x0;
-    ((void(*)(void))fn_8001E074)();
+    ((void(*)(void))menuSubOpenYesNo)();
     r31 = r3;
     r3 = 0x1;
     ((void(*)(void))fn_801069FC)();

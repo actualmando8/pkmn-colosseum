@@ -52,7 +52,7 @@ extern void fn_800E3D98(void*, void*);
 extern void fn_800E4014(void*, u8);
 extern void fn_800E4170(void*);
 extern void fn_800E43A4(void*);
-extern void fn_800E9B2C(void);
+extern void GSmodelPopState(void);
 extern void fn_800E9C6C(void);
 extern void fn_800EC2A4(void);
 extern void fn_800EC308(void);
@@ -664,7 +664,7 @@ extern void fn_80101B90(void);
 extern void fn_8018FB94(void);
 extern void fn_8018F5E4(void);
 extern void fn_8011163C(void);
-extern void fn_8012BAF0(void);
+extern void heroMoveSetEventList(void);
 extern void fn_8010FDF8(void);
 extern void fn_8010F320(void);
 extern void fn_800A3A9C(void);
@@ -890,8 +890,8 @@ void fn_80184A90(void) { /* TODO: match -- 752 bytes at 0x80184A90 */ }
 /* 0x80184D80 | 0x4CC */
 extern void fn_800D37CC(void);
 extern void fn_800E0BE4(void);
-extern void fn_800CE148(void);
-extern void fn_800CDBE0(void);
+extern void sin(void);
+extern void cos(void);
 extern void fn_800E0BA0(void);
 extern u8 lbl_80273FC0[];
 extern u32 lbl_8047D7A0;
@@ -1075,9 +1075,9 @@ void fn_80186B5C(void) { /* TODO: match -- 1420 bytes at 0x80186B5C */ }
 
 /* 0x801870E8 | 0x3D4 */
 extern void fn_8010C77C(void);
-extern void fn_8010FA54(void);
+extern void GScolsy2UtilGetCpPlanePoint(void);
 extern void fn_800A3BD8(void);
-extern void fn_8010F71C(void);
+extern void GScolsy2UtilChkInTri(void);
 extern u32 lbl_8047D844;
 extern u32 lbl_8047D7A0;
 #if 1

@@ -62,7 +62,7 @@ extern u8   fn_80102620(u32 objID);
 extern void fn_80102510(u32 arg1);
 
 /* Forward declarations for converted functions */
-void fn_80131CE8(u32 arg1, u32 arg2);
+void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2);
 void fn_80133E6C(void);
 
 /* 0x58 | fn_8013151C | leaf_multi_output */
@@ -136,7 +136,7 @@ extern u16  lbl_8047AEA0;
 /* Forward declarations for self-referencing asm blocks */
 extern void* fn_80104704(s32 key);
 extern void* fn_80134228(s32 offset);
-/* fn_80131CE8 already declared at top with typed params */
+/* _msgctrlSideName__FP15FightOutPokemonUc already declared at top with typed params */
 extern void fn_80133E6C(void);
 extern s32 fn_80134258(void* obj);
 extern void* fn_80135CD0(void* ptr);
@@ -166,13 +166,13 @@ extern void fn_80133B50(void);
 extern u8 fn_80133BE4(void);
 extern void fn_80133C3C(void);
 extern u32 fn_80133E1C(void);
-extern void fn_80134164(void);
+extern void _dbgMenuGetLink__Fl(void);
 extern u32 fn_80134274(void);
 extern s32 fn_801342B8(void);
 extern u32 fn_80134304(void);
 extern void fn_80135338(void*);
-extern void fn_801353C0(void*, u8, u8, u8, u8);
-extern void fn_80135708(void*);
+extern void gamedataAttestCreate(void*, u8, u8, u8, u8);
+extern void gamedataAttestInit(void*);
 extern void fn_80135A30(void* ptr, u8 val);
 extern void fn_80135A40(void* ptr, u8 val);
 extern void fn_80135A50(void* ptr, u8 val);
@@ -189,7 +189,7 @@ extern void fn_80135BA0(void* ptr, u32 val);
 extern f32 fn_80135C10(void* ptr);
 extern void fn_80135C90(void* dst, void* src);
 extern void fn_80135CE8(void*);
-extern void fn_8013613C(void);
+extern void _koukaOneExec__FUlPvPvPl(void);
 
 #if 0
 asm void fn_801316A8(void) {
@@ -579,7 +579,7 @@ u32 fn_80131BE8(void) { return lbl_8047AE24; }
 /* 0x80131BF0 | 0x8 | sda_getter */
 u32 fn_80131BF0(void) { return lbl_8047AE20; }
 
-/* 0x80131BF8 | 0x28 -- fn_80131CE8(lbl_8047AE4C, 2) */
+/* 0x80131BF8 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2) */
 extern u32 lbl_8047AE4C;
 extern u32 lbl_8047AE4C;
 #if 0
@@ -589,12 +589,12 @@ asm void fn_80131BF8(void) {
 #else
 #pragma peephole off
 void fn_80131BF8(void) {
-    fn_80131CE8(lbl_8047AE4C, 2);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C20 | 0x28 -- fn_80131CE8(lbl_8047AE48, 1) */
+/* 0x80131C20 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE48, 1) */
 extern u32 lbl_8047AE48;
 extern u32 lbl_8047AE48;
 #if 0
@@ -604,12 +604,12 @@ asm void fn_80131C20(void) {
 #else
 #pragma peephole off
 void fn_80131C20(void) {
-    fn_80131CE8(lbl_8047AE48, 1);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE48, 1);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C48 | 0x28 -- fn_80131CE8(lbl_8047AE44, 0) */
+/* 0x80131C48 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE44, 0) */
 extern u32 lbl_8047AE44;
 extern u32 lbl_8047AE44;
 #if 0
@@ -619,12 +619,12 @@ asm void fn_80131C48(void) {
 #else
 #pragma peephole off
 void fn_80131C48(void) {
-    fn_80131CE8(lbl_8047AE44, 0);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE44, 0);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C70 | 0x28 -- fn_80131CE8(lbl_8047AE1C, 2) */
+/* 0x80131C70 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE1C, 2) */
 extern u32 lbl_8047AE1C;
 extern u32 lbl_8047AE1C;
 #if 0
@@ -634,12 +634,12 @@ asm void fn_80131C70(void) {
 #else
 #pragma peephole off
 void fn_80131C70(void) {
-    fn_80131CE8(lbl_8047AE1C, 2);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE1C, 2);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C98 | 0x28 -- fn_80131CE8(lbl_8047AE18, 1) */
+/* 0x80131C98 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE18, 1) */
 extern u32 lbl_8047AE18;
 extern u32 lbl_8047AE18;
 #if 0
@@ -649,12 +649,12 @@ asm void fn_80131C98(void) {
 #else
 #pragma peephole off
 void fn_80131C98(void) {
-    fn_80131CE8(lbl_8047AE18, 1);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE18, 1);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131CC0 | 0x28 -- fn_80131CE8(lbl_8047AE14, 0) */
+/* 0x80131CC0 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE14, 0) */
 extern u32 lbl_8047AE14;
 extern u32 lbl_8047AE14;
 #if 0
@@ -664,7 +664,7 @@ asm void fn_80131CC0(void) {
 #else
 #pragma peephole off
 void fn_80131CC0(void) {
-    fn_80131CE8(lbl_8047AE14, 0);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE14, 0);
 }
 #pragma peephole on
 #endif
@@ -672,7 +672,7 @@ void fn_80131CC0(void) {
 /* 0x80131CE8 | 0x21C */
 #pragma push
 #pragma optimization_level 1
-void fn_80131CE8(u32 arg1, u32 arg2) {
+void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     extern void fn_800FA280();
     extern void fn_80132A38();
     extern void fn_801F0058();
@@ -2618,7 +2618,7 @@ void fn_80133E6C(void) {
     extern u32 lbl_80478F8C;
     extern void fn_800057A8();
     extern void fn_80133E6C();
-    extern void fn_80134164();
+    extern void _dbgMenuGetLink__Fl();
     extern void fn_80134228();
     extern void fn_80134258();
     extern u32 fn_80134274();
@@ -2757,7 +2757,7 @@ void fn_80133E6C(void) {
                                     r4 = r4 + r0;
                                     fn_80133E6C();
                                 }
-                                fn_80134164();
+                                _dbgMenuGetLink__Fl();
                                 r3 = (s16)r3;
                             }
                             r29 = r3 + r29;
@@ -2850,11 +2850,11 @@ void fn_80133E6C(void) {
 extern u32 lbl_80478F88;
 extern u32 lbl_80478F8C;
 #if 1
-asm void fn_80134164(void) {
-#include "src/game/effect/effect_util_fn_80134164.inc"
+asm void _dbgMenuGetLink__Fl(void) {
+#include "src/game/effect/effect_util__dbgMenuGetLink__Fl.inc"
 }
 #else
-s32 fn_80134164(s32 idx) {
+s32 _dbgMenuGetLink__Fl(s32 idx) {
     s32 count;
     u8* result;
 
@@ -2973,7 +2973,7 @@ asm void fn_80134420(void) {
 u16 fn_80134420(void* base, u16 effect_id) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     void* cur;
     void* entry;
     s16 idx;
@@ -2986,7 +2986,7 @@ u16 fn_80134420(void* base, u16 effect_id) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -2995,7 +2995,7 @@ u16 fn_80134420(void* base, u16 effect_id) {
     if (entry == 0) {
         val = 0xFFFF;
     } else if (fn_801429E8(entry)) {
-        val = fn_80142CF4(entry, 0, 0x1c, 0) & 0xFFFF;
+        val = itemGetStatus(entry, 0, 0x1c, 0) & 0xFFFF;
     } else {
         val = 0xFFFF;
     }
@@ -3014,7 +3014,7 @@ asm void fn_80134584(void) {
 u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
@@ -3023,7 +3023,7 @@ u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -3043,7 +3043,7 @@ asm void fn_8013467C(void) {
 u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
@@ -3052,7 +3052,7 @@ u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -3073,12 +3073,12 @@ u32 fn_801347E0(void) { return 3; }
 /* 0x801347E8 | 0x104 */
 extern void fn_80123FBC(void);
 #if 0
-asm void fn_801347E8(void) {
-#include "src/game/effect/effect_util_fn_801347E8.inc"
+asm void pcboxGetPokemonBoxNbEmptySlot(void) {
+#include "src/game/effect/effect_util_pcboxGetPokemonBoxNbEmptySlot.inc"
 }
 #else
 #pragma optimization_level 4
-s8 fn_801347E8(void* base, s8 slot) {
+s8 pcboxGetPokemonBoxNbEmptySlot(void* base, s8 slot) {
     extern u8 fn_80123FBC(void*);
     u8* cur;
     s8 count;
@@ -3149,13 +3149,13 @@ s32 fn_801348EC(void* base, void* src, s8 slot, s8 idx) {
 /* 0x801349DC | 0xBC */
 extern void fn_800F9E70(void);
 #if 0
-asm void fn_801349DC(void) {
-#include "src/game/effect/effect_util_fn_801349DC.inc"
+asm void pcboxSetPokemonBoxName(void) {
+#include "src/game/effect/effect_util_pcboxSetPokemonBoxName.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-s32 fn_801349DC(void* base, s8 slot, u16* name) {
+s32 pcboxSetPokemonBoxName(void* base, s8 slot, u16* name) {
     extern void fn_800F9E70(void*, u16*);
     s32 len;
     u16* p;
@@ -3570,12 +3570,12 @@ u32 fn_80135168(void* ptr, u16 kind) {
 
 /* 0x8013528C | 0xAC */
 #if 0
-asm void fn_8013528C(void) {
-#include "src/game/effect/effect_util_fn_8013528C.inc"
+asm void gamedataCreate(void) {
+#include "src/game/effect/effect_util_gamedataCreate.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+void gamedataCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     void* base;
     if (ptr == 0) return;
     fn_80135338(ptr);
@@ -3589,7 +3589,7 @@ void fn_8013528C(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     }
     base = (void*)fn_80135B0C(base);
     if (base == 0) return;
-    fn_801353C0(base, r4, r5, r6, r7);
+    gamedataAttestCreate(base, r4, r5, r6, r7);
 }
 #endif
 
@@ -3612,26 +3612,26 @@ void fn_80135338(void* ptr) {
     }
     base = (void*)fn_80135B0C(base);
     if (base == 0) return;
-    fn_80135708(base);
+    gamedataAttestInit(base);
     fn_80135CE8(ptr);
 }
 #endif
 
 /* 0x801353C0 | 0x170 */
 #if 0
-asm void fn_801353C0(void) {
-#include "src/game/effect/effect_util_fn_801353C0.inc"
+asm void gamedataAttestCreate(void) {
+#include "src/game/effect/effect_util_gamedataAttestCreate.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+void gamedataAttestCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
     void* base;
     if (ptr == 0) return;
     if ((r4 & 0xFF) == 0) return;
     if ((r5 & 0xFF) == 0) return;
     if ((r6 & 0xFF) == 0) return;
     if ((r7 & 0xFF) == 0) return;
-    fn_80135708(ptr);
+    gamedataAttestInit(ptr);
     /* A60 */
     if (ptr == 0) {
         base = (void*)fn_80129280(0, 0);
@@ -3679,12 +3679,12 @@ void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
 
 /* 0x80135530 | 0x1D8 */
 #if 0
-asm void fn_80135530(void) {
-#include "src/game/effect/effect_util_fn_80135530.inc"
+asm void gamedataAttestCheckValid(void) {
+#include "src/game/effect/effect_util_gamedataAttestCheckValid.inc"
 }
 #else
 #pragma optimization_level 4
-u32 fn_80135530(void* ptr) {
+u32 gamedataAttestCheckValid(void* ptr) {
     void* base; u32 r0; u32 r3;
     if (ptr == 0) return 0;
     /* AB8 */
@@ -3740,13 +3740,13 @@ u32 fn_80135530(void* ptr) {
 
 /* 0x80135708 | 0x134 */
 #if 0
-asm void fn_80135708(void) {
-#include "src/game/effect/effect_util_fn_80135708.inc"
+asm void gamedataAttestInit(void) {
+#include "src/game/effect/effect_util_gamedataAttestInit.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-void fn_80135708(void* ptr) {
+void gamedataAttestInit(void* ptr) {
     void* r31 = ptr;
     void* base;
     if (r31 == 0) goto _end;
@@ -3804,13 +3804,13 @@ _end:;
 
 /* 0x8013583C | 0xFC */
 #if 0
-asm void fn_8013583C(void) {
-#include "src/game/effect/effect_util_fn_8013583C.inc"
+asm void gamedataSetStatus(void) {
+#include "src/game/effect/effect_util_gamedataSetStatus.inc"
 }
 #else
 #pragma push
 #pragma scheduling on
-void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
+void gamedataSetStatus(void* ptr, u16 effect_type, u32 value) {
     void* base; u16 et;
     et = effect_type & 0xFFFF;
     if (et == 0 || et >= 7) return;
@@ -3836,14 +3836,14 @@ void fn_8013583C(void* ptr, u16 effect_type, u32 value) {
 
 /* 0x80135938 | 0xF8 */
 #if 0
-asm void fn_80135938(void) {
-#include "src/game/effect/effect_util_fn_80135938.inc"
+asm void gamedataGetStatus(void) {
+#include "src/game/effect/effect_util_gamedataGetStatus.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma optimization_level 1
-u8 fn_80135938(void* ptr, u16 effect_type) {
+u8 gamedataGetStatus(void* ptr, u16 effect_type) {
     void* base; u16 et;
     et = effect_type & 0xFFFF;
     if (et == 0 || et >= 7) return 0;
@@ -4146,8 +4146,8 @@ extern u32 fn_801F75F8();
 extern u32 fn_801FAA58();
 extern void jumptable_80363AC8();
 #if 0
-asm void fn_80135D10(void) {
-#include "src/game/effect/effect_util_fn_80135D10.inc"
+asm void statusSetStatus(void) {
+#include "src/game/effect/effect_util_statusSetStatus.inc"
 }
 #else
 #pragma scheduling on
@@ -4155,12 +4155,12 @@ asm void fn_80135D10(void) {
 #pragma optimization_level 2
 #pragma peephole off
 #pragma scheduling on
-u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
+u32 statusSetStatus(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     extern u32 fn_8011BBD8();
     extern u32 fn_801254B4();
     extern u32 fn_8012A450();
     extern u32 fn_80135024();
-    extern u32 fn_8013583C();
+    extern u32 gamedataSetStatus();
     extern u32 fn_80142B24();
     extern u32 fn_801F4C14();
     extern u32 fn_801F75F8();
@@ -4171,7 +4171,7 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
     case 0:
         break;
     case 1:
-        fn_8013583C(arg1, arg3, arg5);
+        gamedataSetStatus(arg1, arg3, arg5);
         break;
     case 2:
         fn_80135024(arg1, arg3, arg5);
@@ -4207,31 +4207,31 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 #endif
 
 /* 0x80135E44 | 0x114 */
-extern u32 fn_80142CF4();
+extern u32 itemGetStatus();
 extern u32 fn_8012A5B0();
 extern u32 fn_8012640C();
 extern u32 fn_8011BEB4();
 extern u32 fn_801F54A4();
-extern u32 fn_801F76B8();
+extern u32 fightSideGetStatus();
 extern u32 fn_801FB1C0();
 extern void jumptable_80363AF0();
 #if 0
-asm void fn_80135E44(void) {
-#include "src/game/effect/effect_util_fn_80135E44.inc"
+asm void statusGetStatus(void) {
+#include "src/game/effect/effect_util_statusGetStatus.inc"
 }
 #else
-u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
+u32 statusGetStatus(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     switch ((u8)kind) {
     case 0:
         return 0;
     case 1:
-        return fn_80135938((void*)arg1, (u16)arg3);
+        return gamedataGetStatus((void*)arg1, (u16)arg3);
     case 2:
         return fn_80135028(arg1, arg3, arg4);
     case 3:
         return fn_8012A5B0(arg1, arg3, arg4);
     case 4:
-        return fn_80142CF4(arg1, arg2, arg3, arg4);
+        return itemGetStatus(arg1, arg2, arg3, arg4);
     case 5:
         return fn_8012640C(arg1, arg2, arg3, arg4);
     case 6:
@@ -4239,7 +4239,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 7:
         return fn_801F54A4(arg1, arg2, arg3, arg4);
     case 8:
-        return fn_801F76B8(arg1, arg2, arg3, arg4);
+        return fightSideGetStatus(arg1, arg2, arg3, arg4);
     case 9:
         return fn_801FB1C0(arg1, arg2, arg3, arg4);
     default:
@@ -4339,16 +4339,16 @@ u32 fn_80136050(u32 index) {
 
 /* 0x80136078 | 0xC4 */
 #if 1
-asm void fn_80136078(void) {
-#include "src/game/effect/effect_util_fn_80136078.inc"
+asm void koukaExec(void) {
+#include "src/game/effect/effect_util_koukaExec.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void fn_80136078(void) {
+void koukaExec(void) {
     extern void fn_80135F58(void);
     extern void fn_80135F90(void);
-    extern void fn_8013613C(void);
+    extern void _koukaOneExec__FUlPvPvPl(void);
     u32 r26;
     u32 r27;
     u32 r28;
@@ -4362,9 +4362,9 @@ void fn_80136078(void) {
     r27 = 0;
     r28 = 0;
     if (r29 != 0) {
-        fn_8013613C();
+        _koukaOneExec__FUlPvPvPl();
     } else {
-        fn_8013613C();
+        _koukaOneExec__FUlPvPvPl();
     }
     r31 = fn_80135F90();
     r31 &= 0xFFFF;
@@ -4375,9 +4375,9 @@ void fn_80136078(void) {
         r0 &= 0xFFFF;
         if (r0 != 0) {
             if (r29 != 0) {
-                fn_8013613C(r26, r27, r28, r29 + ((r30 & 0xFFFF) + 1) * 4);
+                _koukaOneExec__FUlPvPvPl(r26, r27, r28, r29 + ((r30 & 0xFFFF) + 1) * 4);
             } else {
-                fn_8013613C(r26, r27, r28, 0);
+                _koukaOneExec__FUlPvPvPl(r26, r27, r28, 0);
             }
         }
         r30++;
@@ -4390,13 +4390,13 @@ end:;
 /* 0x8013613C | 0x22C */
 extern void fn_801F0134(void);
 #if 1
-asm void fn_8013613C(void) {
-#include "src/game/effect/effect_util_fn_8013613C.inc"
+asm void _koukaOneExec__FUlPvPvPl(void) {
+#include "src/game/effect/effect_util__koukaOneExec__FUlPvPvPl.inc"
 }
 #else
-void fn_8013613C(void) {
-    extern void fn_80135D10();
-    extern void fn_80135E44();
+void _koukaOneExec__FUlPvPvPl(void) {
+    extern void statusSetStatus();
+    extern void statusGetStatus();
     extern void fn_80135FBC();
     extern void fn_80135FF8();
     extern void fn_80136024();
@@ -4453,7 +4453,7 @@ void fn_8013613C(void) {
     r6 = r30;
     r7 = r24 & 0xFFFF;
     r5 = 0x0;
-    fn_80135E44();
+    statusGetStatus();
     r31 = r3;
     if (r23 != (u32)0x0 && r23 != (u32)0x2) {
 
@@ -4466,7 +4466,7 @@ void fn_8013613C(void) {
             r6 = r25 & 0xFFFF;
             r5 = 0x0;
             r7 = 0x0;
-            fn_80135E44();
+            statusGetStatus();
             r0 = (u32)r3 >> 31;
             r0 = r0 + r3;
             r0 = (s32)r0 >> 1;
@@ -4478,7 +4478,7 @@ void fn_8013613C(void) {
             r6 = r25 & 0xFFFF;
             r5 = 0x0;
             r7 = 0x0;
-            fn_80135E44();
+            statusGetStatus();
             r24 = (s16)r3;
 
         } else {
@@ -4554,7 +4554,7 @@ do {
     r6 = r30;
     r8 = r23;
     r5 = 0x0;
-    fn_80135D10();
+    statusSetStatus();
     if (r28 == (u32)0x0) return;
     *(u32*)((u8*)r28 + 0x0) = r23;
 
@@ -5420,7 +5420,7 @@ u32 fn_801315EC(void* obj) {
 }
 #pragma peephole on
 #endif
-extern void fn_800FA064(void);
+extern void GSmsgAdjustAlign(void);
 #if 0
 asm void fn_80131714(void) {
 #include "src/game/effect/effect_util_fn_80131714.inc"
@@ -5431,13 +5431,13 @@ asm void fn_80131714(void) {
 #pragma peephole off
 #pragma scheduling on
 s32 fn_80131714(void* obj) {
-    extern void fn_800FA064(void*);
+    extern void GSmsgAdjustAlign(void*);
     u8* p = (u8*)obj;
     u8* stream;
     if (p[0x01] != 0) {
         stream = *(u8**)(p + 0x30);
         p[0x4a] = stream[0];
-        fn_800FA064(obj);
+        GSmsgAdjustAlign(obj);
     }
     stream = *(u8**)(p + 0x30);
     *(u32*)(p + 0x30) = (u32)(stream + 1);

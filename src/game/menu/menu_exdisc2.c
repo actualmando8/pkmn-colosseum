@@ -42,7 +42,7 @@ extern void fn_800A50E4();
 extern void fn_800A541C();
 extern void fn_800A7BCC();
 extern void fn_800C8174();
-extern void fn_800CA968();
+extern void strcpy();
 extern void fn_800D0F44();
 extern void fn_800D3088();
 extern void fn_800D37CC();
@@ -68,7 +68,7 @@ extern void fn_80128DD4();
 extern void fn_80129280();
 extern void fn_8012A5B0();
 extern void fn_8012AC08();
-extern void fn_80130770();
+extern void heroPokemonGetPikachu();
 /* ... and 24 more external functions */
 extern void OSCreateAlarm();
 extern void OSDisableInterrupts();
@@ -799,7 +799,7 @@ L_8007962C:
         ((void(*)(void))fn_801159F0)();
         r4 = r3;
         r3 = (u32)sp + 0xf0;
-        ((void(*)(void))fn_80130770)();
+        ((void(*)(void))heroPokemonGetPikachu)();
         r30 = 0x0;
         while (1) {
             tmp = r30 & 0xFFFF;
@@ -1077,7 +1077,7 @@ void fn_800798E8(void) {
         ((void(*)(void))fn_801159F0)();
         r4 = r3;
         r3 = r29;
-        ((void(*)(void))fn_80130770)();
+        ((void(*)(void))heroPokemonGetPikachu)();
         ((void(*)(void))fn_80075AE4)();
     }
     tmp = *(u8*)&lbl_8047A630;
@@ -2514,7 +2514,7 @@ void fn_8007B114(void) {
     r3 = tmp;
     tmp = r5 << 2;
     r4 = *(u32*)(r4 + tmp);
-    ((void(*)(void))fn_800CA968)();
+    ((void(*)(void))strcpy)();
     r3 = (u32)&lbl_803FADF8;
     r4 = (u32)sp + 0x44;
     r3 = (u32)&lbl_803FADF8;
@@ -2825,7 +2825,7 @@ void fn_8007B6D8(void) {
     extern void fn_8025F3F4();
     extern void fn_8025F484();
     extern void fn_8025F584();
-    extern void fn_8025F648();
+    extern void GBAWrite();
     extern void fn_8007C23C();
     u8 sp[0x40];
     u32 tmp = 0;
@@ -2931,7 +2931,7 @@ void fn_8007B6D8(void) {
             r3 = r30;
             r4 = r31 + 0x350;
             r5 = (u32)sp + 0x9;
-            fn_8025F648();
+            GBAWrite();
             if ((s32)r3 != 0) {
                 r3 = 0x0;
                 return;
@@ -2964,7 +2964,7 @@ void fn_8007B6D8(void) {
             tmp = r7 | tmp;
             tmp = r6 | tmp;
             *(u32*)(sp + 0xC) = tmp;
-            fn_8025F648();
+            GBAWrite();
             if ((s32)r3 != 0) {
                 r3 = 0x0;
                 return;
@@ -3049,7 +3049,7 @@ void fn_8007B6D8(void) {
                 r5 = (u32)sp + 0x9;
                 tmp = *(u32*)(r6 + r26);
                 *(u32*)(sp + 0xC) = tmp;
-                fn_8025F648();
+                GBAWrite();
                 if ((s32)r3 != 0) {
                     tmp = 0x9;
                     r3 = 0x9;
@@ -3171,7 +3171,7 @@ void fn_8007B6D8(void) {
             r3 = r30;
             r4 = r31 + 0x34c;
             r5 = (u32)sp + 0x9;
-            fn_8025F648();
+            GBAWrite();
             if ((s32)r3 != 0) {
                 tmp = 0x9;
                 r3 = 0x9;
@@ -3265,7 +3265,7 @@ void fn_8007B6D8(void) {
     r3 = r30;
     r4 = (u32)sp + 0xc;
     r5 = (u32)sp + 0x9;
-    fn_8025F648();
+    GBAWrite();
     if ((s32)r3 != 0) {
         tmp = 0x9;
         r3 = 0x9;
@@ -3312,7 +3312,7 @@ void fn_8007B6D8(void) {
             r5 = (u32)sp + 0x9;
             tmp = *(u32*)((u8*)r31 + 0x358);
             *(u32*)(sp + 0xC) = tmp;
-            fn_8025F648();
+            GBAWrite();
             if ((s32)r3 == 0) {
                 tmp = *(u8*)(sp + 0x9);
                 tmp = tmp & 0x00000030;

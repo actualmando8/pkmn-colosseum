@@ -1419,7 +1419,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                 void* renderObj = fn_8019F718();
                 if (renderObj != NULL) {
                     /* Set up camera tracking */
-                    psSetCameraTracking(camIdx + 1, renderObj);  /* fn_80169800 */
+                    psSetCameraTracking(camIdx + 1, renderObj);  /* psSetPointJObj */
                     fn_801A05EC(renderObj);
                 }
             }

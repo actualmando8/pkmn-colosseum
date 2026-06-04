@@ -18,9 +18,9 @@
  *   fn_80012B94  GSevent_ProcessCommand       -- 0x18C bytes, decode & dispatch command
  *   fn_80012D20  GSevent_EvalCondition        -- 0xF8 bytes, evaluate flag conditions
  *   fn_80012E18  GSevent_SetFlag              -- 0x198 bytes, set game flag from event
- *   fn_80012FB0  GSevent_DisplayText          -- 0x2EC bytes, show event text box
+ *   menuPanelCursorDecimalInput  GSevent_DisplayText          -- 0x2EC bytes, show event text box
  *   fn_8001329C  GSevent_MoveNPC              -- 0x3CC bytes, script NPC movement
- *   fn_80013668  GSevent_PlayAnimation        -- 0xDC bytes, trigger NPC animation
+ *   menuPanelCtrlLvUp  GSevent_PlayAnimation        -- 0xDC bytes, trigger NPC animation
  *   fn_80013744  GSevent_Nop                  -- 8 bytes, no-op command
  *   fn_8001374C  GSevent_WaitFrames           -- 0x168 bytes, wait N frames
  *   fn_800138B4  GSevent_FadeScreen           -- 0x164 bytes, screen fade in/out
@@ -362,14 +362,14 @@ s32 fn_80012E18(u8* ctx) {
 }
 #pragma pop
 
-/* fn_80012FB0 - 0x80012FB0 | size: 0x2ec */
+/* menuPanelCursorDecimalInput - 0x80012FB0 | size: 0x2ec */
 extern void fn_801040B8(void);
 #if 1
-asm void fn_80012FB0(void) {
-#include "src/game/gs_event_exec_fn_80012FB0.inc"
+asm void menuPanelCursorDecimalInput(void) {
+#include "src/game/gs_event_exec_menuPanelCursorDecimalInput.inc"
 }
 #else
-void fn_80012FB0(void) { /* TODO */ }
+void menuPanelCursorDecimalInput(void) { /* TODO */ }
 #endif
 
 /* fn_8001329C - 0x8001329C | size: 0x3cc */
@@ -384,11 +384,11 @@ asm void fn_8001329C(void) {
 void fn_8001329C(void) { /* TODO */ }
 #endif
 
-/* fn_80013668 - 0x80013668 | size: 0xdc */
+/* menuPanelCtrlLvUp - 0x80013668 | size: 0xdc */
 extern u8 fn_80107ED8(s32, s32);
 #pragma push
 #pragma peephole off
-s32 fn_80013668(u8* ctx) {
+s32 menuPanelCtrlLvUp(u8* ctx) {
     s32 flag = 0;
     switch ((s32)(s8)ctx[1]) {
     case 0:
@@ -525,7 +525,7 @@ extern void fn_80143C50(void);
 extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_80102510(void);
-extern void fn_80102428(void);
+extern void menuCloseSync(void);
 extern u8 lbl_80266BD8[];
 extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2DC;

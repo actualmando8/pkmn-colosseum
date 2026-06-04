@@ -43,7 +43,7 @@ extern void fn_80106698(s32 msgID, s32 arg1, s32 arg2, s32 arg3);
 /* Pokemon data access (People/NPC system) */
 extern s32  fn_80129280(s32 side, s32 slotType);    /* get battle party */
 extern s32  fn_8012AC08(s32 party, u16 slotIdx);    /* get pokemon from party */
-extern s32  fn_80129D64(s32 pokemon, s32 move);      /* check move validity */
+extern s32  heroIsMinePokemon(s32 pokemon, s32 move);      /* check move validity */
 extern s32  fn_8011EE40(s32 pokemon);                /* get pokemon HP */
 extern s32  fn_8011F4F0(s32 pokemon);                /* get pokemon species */
 
@@ -1213,7 +1213,7 @@ u8* fn_801ED2DC(u8* data);
 /* Forward declarations for intra-TU functions */
 void fn_80029760(void);
 void fn_8009B388(void);
-void fn_8009B55C(void);
+void LCStoreData(void);
 void fn_8009B614(void);
 void fn_8009F1D0(void);
 void fn_800A19CC(void);
@@ -1262,7 +1262,7 @@ void fn_800BD4B4(void);
 void fn_800BD554(void);
 void fn_800BD744(void);
 void fn_800BD7A0(void);
-void fn_800C4928(void);
+void __div2i(void);
 void fn_800C4C50(void);
 void fn_800C4C98(void);
 void fn_800CA7FC(void);
@@ -1337,13 +1337,13 @@ void fn_8012361C(void);
 void fn_80123FBC(void);
 void fn_80124A60(void);
 void fn_80125424(void);
-u32 fn_8012BDE0(u32, u32);
+u32 heroMoveAddStepCallback(u32, u32);
 void fn_8014E9B4(void);
 void fn_8014EE40(void);
 void fn_8014F2DC(void);
-void fn_8014F838(void);
-void fn_8014FF0C(void);
-void fn_80150564(void);
+void sndStreamFree(void);
+void sndStreamActivate(void);
+void sndStreamDeactivate(void);
 void fn_80166AB8(void);
 void fn_80183018(void);
 void fn_80183350(void);
@@ -1389,25 +1389,25 @@ void fn_801E4F34(void);
 void fn_801E5400(void);
 void fn_801E543C(void);
 void fn_801E5470(void);
-void fn_801E5548(void);
+void THPVideoDecode(void);
 void fn_801E578C(void);
-void fn_801E57D0(void);
-void fn_801E590C(void);
-void fn_801E5A28(void);
-void fn_801E5DE4(void);
-void fn_801E5FC4(void);
+void __THPReadFrameHeader(void);
+void __THPReadScaneHeader(void);
+void __THPReadQuantizationTable(void);
+void __THPReadHuffmanTableSpecification(void);
+void __THPHuffGenerateSizeTable(void);
 void fn_801E60B4(void);
-void fn_801E611C(void);
+void __THPHuffGenerateDecoderTables(void);
 void fn_801E62D8(void);
-void fn_801E632C(void);
-void fn_801E6578(void);
-void fn_801E6684(void);
-void fn_801E810C(void);
-void fn_801E9B98(void);
-void fn_801EB644(void);
-void fn_801EBCC0(void);
-void fn_801EC368(void);
-void fn_801ECA10(void);
+void __THPPrepBitStream(void);
+void __THPDecompressYUV(void);
+void __THPDecompressiMCURow512x448(void);
+void __THPDecompressiMCURow640x480(void);
+void __THPDecompressiMCURowNxN(void);
+void __THPHuffDecodeDCTCompY(void);
+void __THPHuffDecodeDCTCompU(void);
+void __THPHuffDecodeDCTCompV(void);
+void THPInit(void);
 void fn_801ECAB0(void);
 void fn_801ECF14(void);
 void fn_801ECFA4(void);
@@ -1468,7 +1468,7 @@ void fn_801E03D4(void) {
                 r4 = r30 & 0xFFFF; r29 = r3;
                 ((void(*)(void))fn_8012AC08)();
                 r4 = r3; r3 = r29;
-                ((void(*)(void))fn_80129D64)();
+                ((void(*)(void))heroIsMinePokemon)();
                 tmp = r3 & 0xFF;
                 r29 = (r29 == 0xc) ? 0x5 : 0x4;
                 break;
@@ -4833,7 +4833,7 @@ void fn_801E34F0(void) {
     extern u32 lbl_8047B474;
     extern void fn_8014E9B4();
     extern void fn_8014EE40();
-    extern void fn_8014F838();
+    extern void sndStreamFree();
     extern void fn_801E2B74();
     extern void fn_801E260C();
     u8 sp[0x50];
@@ -4904,7 +4904,7 @@ void fn_801E34F0(void) {
         lbl_80478D04 = r3;
         if (tmp == 0xffff) {
             r3 = lbl_80478D00;
-            fn_8014F838();
+            sndStreamFree();
             r3 = 0x0;
             return;
     }
@@ -5256,9 +5256,9 @@ void fn_801E3A50(void) {
     extern u32 lbl_8047B46C;
     extern f32 lbl_8047E4A8;
     extern void fn_800AA2F0();
-    extern void fn_800C4928();
-    extern void fn_8014FF0C();
-    extern void fn_80150564();
+    extern void __div2i();
+    extern void sndStreamActivate();
+    extern void sndStreamDeactivate();
     extern void fn_801E4EF0();
     u8 sp[0x20];
     u32 tmp = 0;
@@ -5357,20 +5357,20 @@ void fn_801E3A50(void) {
                 tmp = r3 + (0x1 << 16);
                 do {
                     if (tmp == 0xffff) break;
-                    fn_8014FF0C();
+                    sndStreamActivate();
                     tmp = r3 & 0xFF;
                     if (tmp == 0xffff) break;
                     r3 = lbl_80478D04;
                     tmp = r3 + (0x1 << 16);
                     if (tmp != 0xffff) {
-                        fn_8014FF0C();
+                        sndStreamActivate();
                         tmp = r3 & 0xFF;
                         if (tmp != 0xffff) {
                             tmp = 0x1;
                             break;
                         }
                         r3 = lbl_80478D00;
-                        fn_80150564();
+                        sndStreamDeactivate();
                         break;
                     }
                     tmp = 0x1;
@@ -5415,20 +5415,20 @@ void fn_801E3A50(void) {
         tmp = r3 + (0x1 << 16);
         do {
         if (tmp == 0xffff) break;
-            fn_8014FF0C();
+            sndStreamActivate();
             tmp = r3 & 0xFF;
             if (tmp == 0xffff) break;
             r3 = lbl_80478D04;
             tmp = r3 + (0x1 << 16);
             if (tmp != 0xffff) {
-                fn_8014FF0C();
+                sndStreamActivate();
                 tmp = r3 & 0xFF;
                 if (tmp != 0xffff) {
                     tmp = 0x1;
                     break;
                 }
                 r3 = lbl_80478D00;
-                fn_80150564();
+                sndStreamDeactivate();
                 break;
             }
             tmp = 0x1;
@@ -5480,7 +5480,7 @@ void fn_801E3A50(void) {
             r3 = r3 + r7;
             r4 = r8 * r29;
             r3 = r3 + tmp;
-            fn_800C4928();
+            __div2i();
             r3 = (u32)lbl_8046AC60;
             r3 = (u32)lbl_8046AC60;
             *(u32*)((u8*)r3 + 0xD4) = r4;
@@ -5497,7 +5497,7 @@ void fn_801E3A50(void) {
             r3 = r3 + r7;
             r4 = r8 * r29;
             r3 = r3 + tmp;
-            fn_800C4928();
+            __div2i();
             r3 = (u32)lbl_8046AC60;
             r3 = (u32)lbl_8046AC60;
             *(u32*)((u8*)r3 + 0xD4) = r4;
@@ -5610,7 +5610,7 @@ void fn_801E3F54(void) {
     extern u32 lbl_8047B46C;
     extern void fn_800A7AFC(void);
     extern void fn_800A8850(u32);
-    extern void fn_8014F838(u32);
+    extern void sndStreamFree(u32);
     extern void fn_801E1D0C(void);
     extern void fn_801E4DAC(void);
     extern void fn_801E5400(void);
@@ -5630,11 +5630,11 @@ void fn_801E3F54(void) {
     }
     fn_801E5400();
     if (*(u8*)(lbl_8046AC60 + 0xa7) != 0) {
-        fn_8014F838(lbl_80478D00);
+        sndStreamFree(lbl_80478D00);
         r0 = lbl_80478D04;
         lbl_80478D00 = -1;
         if ((r0 + 0x10000) != 0xffff) {
-            fn_8014F838(r0);
+            sndStreamFree(r0);
             lbl_80478D04 = -1;
         }
         fn_801E4DAC();
@@ -6194,7 +6194,7 @@ void fn_801E4778(void) {
     extern void fn_800A50E4();
     extern void fn_800A541C();
     extern void fn_800CA7FC();
-    extern void fn_801ECA10();
+    extern void THPInit();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -6213,7 +6213,7 @@ void fn_801E4778(void) {
 
     r24 = r3;
     r31 = r4;
-    fn_801ECA10();
+    THPInit();
     if ((s32)r3 == 0) {
         r3 = 0x0;
         return;
@@ -6835,7 +6835,7 @@ void fn_801E4F64(void) {
     extern u32 lbl_8047B48C;
     extern void fn_800A221C();
     extern void fn_801E446C();
-    extern void fn_801E5548();
+    extern void THPVideoDecode();
     u8 sp[0x40];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -6917,7 +6917,7 @@ void fn_801E4F64(void) {
                 r5 = *(u32*)((u8*)r23 + 0x4);
                 r6 = *(u32*)((u8*)r23 + 0x8);
                 r7 = *(u32*)((u8*)r31 + 0x9C);
-                fn_801E5548();
+                THPVideoDecode();
                 *(u32*)((u8*)r31 + 0xAC) = r3;
                 if ((s32)r3 != 0) {
                     tmp = lbl_8047B48C;
@@ -6997,7 +6997,7 @@ void fn_801E5154(void) {
     extern void fn_801E1BB8();
     extern void fn_801E1BE8();
     extern void fn_801E446C();
-    extern void fn_801E5548();
+    extern void THPVideoDecode();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -7064,7 +7064,7 @@ void fn_801E5154(void) {
                             r5 = *(u32*)((u8*)r29 + 0x4);
                             r6 = *(u32*)((u8*)r29 + 0x8);
                             r7 = *(u32*)((u8*)r31 + 0x9C);
-                            fn_801E5548();
+                            THPVideoDecode();
                             *(u32*)((u8*)r31 + 0xAC) = r3;
                             if ((s32)r3 != 0) {
                                 tmp = lbl_8047B48C;
@@ -7146,7 +7146,7 @@ void fn_801E5154(void) {
                 r5 = *(u32*)((u8*)r27 + 0x4);
                 r6 = *(u32*)((u8*)r27 + 0x8);
                 r7 = *(u32*)((u8*)r31 + 0x9C);
-                fn_801E5548();
+                THPVideoDecode();
                 *(u32*)((u8*)r31 + 0xAC) = r3;
                 if ((s32)r3 != 0) {
                     tmp = lbl_8047B48C;
@@ -7302,22 +7302,22 @@ void fn_801E5470(void) {
 
 /* 0x801E5548 | size: 0x244 | large */
 #if 0
-asm void fn_801E5548(void) {
-#include "src/game/battle/battle_logic_fn_801E5548.inc"
+asm void THPVideoDecode(void) {
+#include "src/game/battle/battle_logic_THPVideoDecode.inc"
 }
 #else
-void fn_801E5548(void) {
+void THPVideoDecode(void) {
     extern u32 lbl_8047B5AC;
     extern u32 lbl_8047B5B0;
     extern u32 lbl_8047B5B4;
     extern void fn_8009B388();
     extern void fn_801E578C();
-    extern void fn_801E57D0();
-    extern void fn_801E590C();
-    extern void fn_801E5A28();
-    extern void fn_801E5DE4();
+    extern void __THPReadFrameHeader();
+    extern void __THPReadScaneHeader();
+    extern void __THPReadQuantizationTable();
+    extern void __THPReadHuffmanTableSpecification();
     extern void fn_801E62D8();
-    extern void fn_801E6578();
+    extern void __THPDecompressYUV();
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -7389,13 +7389,13 @@ void fn_801E5548(void) {
         tmp = *(u8*)((u8*)r3 + 0x0);
         if (tmp <= 0xd7) {
             if (tmp == 0xc4) {
-                fn_801E5DE4();
+                __THPReadHuffmanTableSpecification();
                 tmp = r3 & 0xFF;
                 if (tmp != 0xc4) { r3 = r3 & 0xFF; return; }
                 break;
             }
             if (tmp != 0xc0) { r3 = 0xb; return; }
-            fn_801E57D0();
+            __THPReadFrameHeader();
             tmp = r3 & 0xFF;
             if (tmp != 0xc0) { r3 = r3 & 0xFF; return; }
             break;
@@ -7406,12 +7406,12 @@ void fn_801E5548(void) {
                 fn_801E62D8();
 
             } else if (tmp == 0xdb) {
-                fn_801E5A28();
+                __THPReadQuantizationTable();
                 tmp = r3 & 0xFF;
                 if (tmp != 0xdb) { r3 = r3 & 0xFF; return; }
 
             } else if (tmp == 0xda) {
-                fn_801E590C();
+                __THPReadScaneHeader();
                 tmp = r3 & 0xFF;
                 if (tmp != 0xda) { r3 = r3 & 0xFF; return; }
                 r31 = 0x1;
@@ -7442,7 +7442,7 @@ void fn_801E5548(void) {
     r3 = r28 + 0x0;
     r4 = r29 + 0x0;
     r5 = r30 + 0x0;
-    fn_801E6578();
+    __THPDecompressYUV();
     r3 = 0x0;
     return;
 
@@ -7487,11 +7487,11 @@ void fn_801E578C(void) {
 
 /* 0x801E57D0 | size: 0x13C | medium */
 #if 0
-asm void fn_801E57D0(void) {
-#include "src/game/battle/battle_logic_fn_801E57D0.inc"
+asm void __THPReadFrameHeader(void) {
+#include "src/game/battle/battle_logic___THPReadFrameHeader.inc"
 }
 #else
-void fn_801E57D0(void) {
+void __THPReadFrameHeader(void) {
     extern u32 lbl_8047B5B0;
     u32 tmp = 0;
     u32 r3 = 0;
@@ -7587,11 +7587,11 @@ void fn_801E57D0(void) {
 
 /* 0x801E590C | size: 0x11C | medium */
 #if 0
-asm void fn_801E590C(void) {
-#include "src/game/battle/battle_logic_fn_801E590C.inc"
+asm void __THPReadScaneHeader(void) {
+#include "src/game/battle/battle_logic___THPReadScaneHeader.inc"
 }
 #else
-void fn_801E590C(void) {
+void __THPReadScaneHeader(void) {
     extern u32 lbl_8047B5B0;
     u32 tmp = 0;
     u32 r3 = 0;
@@ -7681,11 +7681,11 @@ void fn_801E590C(void) {
 
 /* 0x801E5A28 | size: 0x3BC | large */
 #if 0
-asm void fn_801E5A28(void) {
-#include "src/game/battle/battle_logic_fn_801E5A28.inc"
+asm void __THPReadQuantizationTable(void) {
+#include "src/game/battle/battle_logic___THPReadQuantizationTable.inc"
 }
 #else
-void fn_801E5A28(void) {
+void __THPReadQuantizationTable(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B5B0;
     extern f64 lbl_8047E4B0;
@@ -7936,19 +7936,19 @@ void fn_801E5A28(void) {
 
 /* 0x801E5DE4 | size: 0x1E0 | medium */
 #if 0
-asm void fn_801E5DE4(void) {
-#include "src/game/battle/battle_logic_fn_801E5DE4.inc"
+asm void __THPReadHuffmanTableSpecification(void) {
+#include "src/game/battle/battle_logic___THPReadHuffmanTableSpecification.inc"
 }
 #else
-void fn_801E5DE4(void) {
+void __THPReadHuffmanTableSpecification(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B548;
     extern u32 lbl_8047B54C;
     extern u32 lbl_8047B5AC;
     extern u32 lbl_8047B5B0;
-    extern void fn_801E5FC4();
+    extern void __THPHuffGenerateSizeTable();
     extern void fn_801E60B4();
-    extern void fn_801E611C();
+    extern void __THPHuffGenerateDecoderTables();
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -8051,10 +8051,10 @@ void fn_801E5DE4(void) {
         r3 = *(u32*)((u8*)r4 + 0x69C);
         tmp = r3 + tmp;
         *(u32*)((u8*)r4 + 0x69C) = tmp;
-        fn_801E5FC4();
+        __THPHuffGenerateSizeTable();
         fn_801E60B4();
         r3 = r31;
-        fn_801E611C();
+        __THPHuffGenerateDecoderTables();
         r5 = lbl_8047B5B0;
         tmp = r29 + 0x11;
         r30 = r30 - tmp;
@@ -8072,11 +8072,11 @@ void fn_801E5DE4(void) {
 
 /* 0x801E5FC4 | size: 0xF0 | medium */
 #if 0
-asm void fn_801E5FC4(void) {
-#include "src/game/battle/battle_logic_fn_801E5FC4.inc"
+asm void __THPHuffGenerateSizeTable(void) {
+#include "src/game/battle/battle_logic___THPHuffGenerateSizeTable.inc"
 }
 #else
-void fn_801E5FC4(void) {
+void __THPHuffGenerateSizeTable(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B548;
     u32 tmp = 0;
@@ -8207,11 +8207,11 @@ void fn_801E60B4(void) {
 
 /* 0x801E611C | size: 0x1BC | medium */
 #if 0
-asm void fn_801E611C(void) {
-#include "src/game/battle/battle_logic_fn_801E611C.inc"
+asm void __THPHuffGenerateDecoderTables(void) {
+#include "src/game/battle/battle_logic___THPHuffGenerateDecoderTables.inc"
 }
 #else
-void fn_801E611C(void) {
+void __THPHuffGenerateDecoderTables(void) {
     extern u32 lbl_8047B544;
     extern u32 lbl_8047B54C;
     extern u32 lbl_8047B5B0;
@@ -8378,11 +8378,11 @@ void fn_801E62D8(void) {
 
 /* 0x801E632C | size: 0x24C | large */
 #if 0
-asm void fn_801E632C(void) {
-#include "src/game/battle/battle_logic_fn_801E632C.inc"
+asm void __THPPrepBitStream(void) {
+#include "src/game/battle/battle_logic___THPPrepBitStream.inc"
 }
 #else
-void fn_801E632C(void) {
+void __THPPrepBitStream(void) {
     extern u32 lbl_8047B4A0;
     extern u32 lbl_8047B4C0;
     extern u32 lbl_8047B4E0;
@@ -8559,18 +8559,18 @@ void fn_801E632C(void) {
 
 /* 0x801E6578 | size: 0x10C | medium */
 #if 0
-asm void fn_801E6578(void) {
-#include "src/game/battle/battle_logic_fn_801E6578.inc"
+asm void __THPDecompressYUV(void) {
+#include "src/game/battle/battle_logic___THPDecompressYUV.inc"
 }
 #else
-void fn_801E6578(void) {
+void __THPDecompressYUV(void) {
     extern u32 lbl_8047B5A4;
     extern u32 lbl_8047B5A8;
     extern u32 lbl_8047B5B0;
-    extern void fn_801E632C();
-    extern void fn_801E6684();
-    extern void fn_801E810C();
-    extern void fn_801E9B98();
+    extern void __THPPrepBitStream();
+    extern void __THPDecompressiMCURow512x448();
+    extern void __THPDecompressiMCURow640x480();
+    extern void __THPDecompressiMCURowNxN();
     u32 tmp = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -8598,7 +8598,7 @@ void fn_801E6578(void) {
     r3 = 0x3d04;
     r3 = r3 | (0x3d04 << 16);
     /* mtspr GQR6, r3 */;
-    fn_801E632C();
+    __THPPrepBitStream();
     r4 = lbl_8047B5B0;
     tmp = *(u16*)((u8*)r4 + 0x692);
     if (tmp == 0x200 && r30 == 0x1c0) {
@@ -8606,7 +8606,7 @@ void fn_801E6578(void) {
         while (1) {
             tmp = r31 & 0xFFFF;
             if (tmp >= r30) break;
-            fn_801E6684();
+            __THPDecompressiMCURow512x448();
             r31 = r31 + 0x10;
 
         }
@@ -8619,7 +8619,7 @@ void fn_801E6578(void) {
         while (1) {
             tmp = r31 & 0xFFFF;
             if (tmp >= r30) break;
-            fn_801E810C();
+            __THPDecompressiMCURow640x480();
             r31 = r31 + 0x10;
 
         }
@@ -8627,7 +8627,7 @@ void fn_801E6578(void) {
     }
     while (tmp < r30) {
             tmp = r31 & 0xFFFF;
-            fn_801E9B98();
+            __THPDecompressiMCURowNxN();
             r31 = r31 + 0x10;
     }
 L_801E665C:
@@ -8641,11 +8641,11 @@ L_801E665C:
 
 /* 0x801E6684 | size: 0x1A88 | massive */
 #if 0
-asm void fn_801E6684(void) {
-#include "src/game/battle/battle_logic_fn_801E6684.inc"
+asm void __THPDecompressiMCURow512x448(void) {
+#include "src/game/battle/battle_logic___THPDecompressiMCURow512x448.inc"
 }
 #else
-void fn_801E6684(void) {
+void __THPDecompressiMCURow512x448(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
     extern u32 lbl_8047B580;
@@ -8656,11 +8656,11 @@ void fn_801E6684(void) {
     extern f32 lbl_8047E4C0;
     extern f32 lbl_8047E4C4;
     extern f32 lbl_8047E4C8;
-    extern void fn_8009B55C();
+    extern void LCStoreData();
     extern void fn_8009B614();
-    extern void fn_801EB644();
-    extern void fn_801EBCC0();
-    extern void fn_801EC368();
+    extern void __THPHuffDecodeDCTCompY();
+    extern void __THPHuffDecodeDCTCompU();
+    extern void __THPHuffDecodeDCTCompV();
     u8 sp[0x100];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -8712,22 +8712,22 @@ void fn_801E6684(void) {
         if ((s32)r4 >= (s32)tmp) break;
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x118);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x11C);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x120);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x124);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x128);
-        fn_801EBCC0();
+        __THPHuffDecodeDCTCompU();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x12C);
-        fn_801EC368();
+        __THPHuffDecodeDCTCompV();
         r3 = *(u32*)((u8*)r31 + 0x100);
         tmp = 0x200;
         r4 = lbl_8047B5B0;
@@ -10074,17 +10074,17 @@ void fn_801E6684(void) {
     r3 = *(u32*)((u8*)r3 + 0x6B0);
     r5 = 0x2000;
     r4 = *(u32*)((u8*)r31 + 0x100);
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = 0x800;
     r4 = *(u32*)((u8*)r31 + 0x104);
     r3 = *(u32*)((u8*)r3 + 0x6B4);
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = 0x800;
     r4 = *(u32*)((u8*)r31 + 0x108);
     r3 = *(u32*)((u8*)r3 + 0x6B8);
-    fn_8009B55C();
+    LCStoreData();
     r4 = lbl_8047B5B0;
     r3 = *(u32*)((u8*)r4 + 0x6B0);
     tmp = r3 + 0x2000;
@@ -10108,11 +10108,11 @@ void fn_801E6684(void) {
 
 /* 0x801E810C | size: 0x1A8C | massive */
 #if 0
-asm void fn_801E810C(void) {
-#include "src/game/battle/battle_logic_fn_801E810C.inc"
+asm void __THPDecompressiMCURow640x480(void) {
+#include "src/game/battle/battle_logic___THPDecompressiMCURow640x480.inc"
 }
 #else
-void fn_801E810C(void) {
+void __THPDecompressiMCURow640x480(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
     extern u32 lbl_8047B580;
@@ -10123,11 +10123,11 @@ void fn_801E810C(void) {
     extern f32 lbl_8047E4C0;
     extern f32 lbl_8047E4C4;
     extern f32 lbl_8047E4C8;
-    extern void fn_8009B55C();
+    extern void LCStoreData();
     extern void fn_8009B614();
-    extern void fn_801EB644();
-    extern void fn_801EBCC0();
-    extern void fn_801EC368();
+    extern void __THPHuffDecodeDCTCompY();
+    extern void __THPHuffDecodeDCTCompU();
+    extern void __THPHuffDecodeDCTCompV();
     u8 sp[0x100];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -10179,22 +10179,22 @@ void fn_801E810C(void) {
         if ((s32)r4 >= (s32)tmp) break;
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x118);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x11C);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x120);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x124);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x128);
-        fn_801EBCC0();
+        __THPHuffDecodeDCTCompU();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r31 + 0x12C);
-        fn_801EC368();
+        __THPHuffDecodeDCTCompV();
         r3 = *(u32*)((u8*)r31 + 0x10C);
         tmp = 0x280;
         r4 = lbl_8047B5B0;
@@ -11541,17 +11541,17 @@ void fn_801E810C(void) {
     r3 = *(u32*)((u8*)r3 + 0x6B0);
     r5 = 0x2800;
     r4 = *(u32*)((u8*)r31 + 0x10C);
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = 0xa00;
     r4 = *(u32*)((u8*)r31 + 0x110);
     r3 = *(u32*)((u8*)r3 + 0x6B4);
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = 0xa00;
     r4 = *(u32*)((u8*)r31 + 0x114);
     r3 = *(u32*)((u8*)r3 + 0x6B8);
-    fn_8009B55C();
+    LCStoreData();
     r4 = lbl_8047B5B0;
     r3 = *(u32*)((u8*)r4 + 0x6B0);
     tmp = r3 + 0x2800;
@@ -11575,11 +11575,11 @@ void fn_801E810C(void) {
 
 /* 0x801E9B98 | size: 0x1AAC | massive */
 #if 0
-asm void fn_801E9B98(void) {
-#include "src/game/battle/battle_logic_fn_801E9B98.inc"
+asm void __THPDecompressiMCURowNxN(void) {
+#include "src/game/battle/battle_logic___THPDecompressiMCURowNxN.inc"
 }
 #else
-void fn_801E9B98(void) {
+void __THPDecompressiMCURowNxN(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_8047B560;
     extern u32 lbl_8047B580;
@@ -11590,11 +11590,11 @@ void fn_801E9B98(void) {
     extern f32 lbl_8047E4C0;
     extern f32 lbl_8047E4C4;
     extern f32 lbl_8047E4C8;
-    extern void fn_8009B55C();
+    extern void LCStoreData();
     extern void fn_8009B614();
-    extern void fn_801EB644();
-    extern void fn_801EBCC0();
-    extern void fn_801EC368();
+    extern void __THPHuffDecodeDCTCompY();
+    extern void __THPHuffDecodeDCTCompU();
+    extern void __THPHuffDecodeDCTCompV();
     u8 sp[0x100];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -11651,22 +11651,22 @@ void fn_801E9B98(void) {
         if ((s32)r4 >= (s32)tmp) break;
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x118);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x11C);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x120);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x124);
-        fn_801EB644();
+        __THPHuffDecodeDCTCompY();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x128);
-        fn_801EBCC0();
+        __THPHuffDecodeDCTCompU();
         r3 = lbl_8047B5B0;
         r4 = *(u32*)((u8*)r30 + 0x12C);
-        fn_801EC368();
+        __THPHuffDecodeDCTCompV();
         tmp = *(u32*)((u8*)r30 + 0x10C);
         r5 = lbl_8047B5B0;
         lbl_8047B560 = tmp;
@@ -13012,17 +13012,17 @@ void fn_801E9B98(void) {
     r3 = *(u32*)((u8*)r3 + 0x6B0);
     r4 = *(u32*)((u8*)r30 + 0x10C);
     /* extlwi r5, r28, 24, 4 */;
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = r29 << 6;
     r4 = *(u32*)((u8*)r30 + 0x110);
     r3 = *(u32*)((u8*)r3 + 0x6B4);
-    fn_8009B55C();
+    LCStoreData();
     r3 = lbl_8047B5B0;
     r5 = r29 << 6;
     r4 = *(u32*)((u8*)r30 + 0x114);
     r3 = *(u32*)((u8*)r3 + 0x6B8);
-    fn_8009B55C();
+    LCStoreData();
     r5 = lbl_8047B5B0;
     tmp = r29 << 8;
     r4 = r29 << 6;
@@ -13048,11 +13048,11 @@ void fn_801E9B98(void) {
 
 /* 0x801EB644 | size: 0x67C | large */
 #if 0
-asm void fn_801EB644(void) {
-#include "src/game/battle/battle_logic_fn_801EB644.inc"
+asm void __THPHuffDecodeDCTCompY(void) {
+#include "src/game/battle/battle_logic___THPHuffDecodeDCTCompY.inc"
 }
 #else
-void fn_801EB644(void) {
+void __THPHuffDecodeDCTCompY(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4A0;
     extern u32 lbl_8047B500;
@@ -13504,11 +13504,11 @@ L_801EB8DC:
 
 /* 0x801EBCC0 | size: 0x6A8 | large */
 #if 0
-asm void fn_801EBCC0(void) {
-#include "src/game/battle/battle_logic_fn_801EBCC0.inc"
+asm void __THPHuffDecodeDCTCompU(void) {
+#include "src/game/battle/battle_logic___THPHuffDecodeDCTCompU.inc"
 }
 #else
-void fn_801EBCC0(void) {
+void __THPHuffDecodeDCTCompU(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4C0;
     extern u32 lbl_8047B520;
@@ -13970,11 +13970,11 @@ L_801EBF54:
 
 /* 0x801EC368 | size: 0x6A8 | large */
 #if 0
-asm void fn_801EC368(void) {
-#include "src/game/battle/battle_logic_fn_801EC368.inc"
+asm void __THPHuffDecodeDCTCompV(void) {
+#include "src/game/battle/battle_logic___THPHuffDecodeDCTCompV.inc"
 }
 #else
-void fn_801EC368(void) {
+void __THPHuffDecodeDCTCompV(void) {
     extern u8 lbl_80279AE8[];
     extern u32 lbl_8047B4E0;
     extern u32 lbl_8047B540;
@@ -14436,11 +14436,11 @@ L_801EC5FC:
 
 /* 0x801ECA10 | size: 0xA0 | medium */
 #if 0
-asm void fn_801ECA10(void) {
-#include "src/game/battle/battle_logic_fn_801ECA10.inc"
+asm void THPInit(void) {
+#include "src/game/battle/battle_logic_THPInit.inc"
 }
 #else
-void fn_801ECA10(void) {
+void THPInit(void) {
     extern u8 lbl_8046D500[];
     extern u32 lbl_80478D08;
     extern u32 lbl_8047B5B4;
@@ -15184,7 +15184,7 @@ asm void fn_801ED388(void) {
 #else
 void fn_801ED388(void) {
     extern u32 lbl_8047B5B8;
-    extern void fn_8012BDE0();
+    extern void heroMoveAddStepCallback();
     extern void fn_801ED3B8();
     u8 sp[0x10];
     u32 tmp = 0;
@@ -15194,7 +15194,7 @@ void fn_801ED388(void) {
     r3 = (u32)fn_801ED3B8;
     r4 = 0x0;
     r3 = (u32)fn_801ED3B8;
-    fn_8012BDE0();
+    heroMoveAddStepCallback();
     lbl_8047B5B8 = r3;
     return;
 }

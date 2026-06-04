@@ -779,7 +779,7 @@ u32 SIProbe(s32 chan) {
 }
 
 /*
- * fn_800CF764 - 0x800CF764 | size: 0x2FC
+ * CompleteTransfer - 0x800CF764 | size: 0x2FC
  * __SIInterruptHandler variant / PADOriginCallback
  * This is the PAD-layer callback that processes controller
  * origin calibration data after a SIGetType completes.

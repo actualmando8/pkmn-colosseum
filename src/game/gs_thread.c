@@ -84,7 +84,7 @@ extern void fn_800EF504(void* ctx);
 extern void fn_800EF548(void);
 extern void fn_801669BC(u32 type);
 extern void fn_800EF5FC(void);
-extern void fn_800CDBE0(void);
+extern void cos(void);
 extern u32 fn_800D3088(void);
 extern void fn_800DBF78(void);
 extern void fn_800DBFD4(void);
@@ -778,14 +778,14 @@ extern void fn_800FBB34(void);
 extern void fn_800FBF10(void);
 extern void fn_800FBF74(void);
 extern void fn_800FC2A4(void);
-extern u32 fn_800FC2A8(void* ptr);
+extern u32 GSmsgFontClose(void* ptr);
 extern void* fn_800FC39C(void* ptr);
 extern s32 fn_800FC518(u32 val);
 extern void fn_800FC528(void);
 extern s32 fn_800FC7E0(void* entry, u8 type, u32 arg);
 extern void fn_800FD348(void);
 extern void fn_800FD69C(void);
-extern void* fn_800FDF1C(void* obj, u32 key, void** outNode);
+extern void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode);
 extern s32 fn_800FDFE4(const void* str);
 extern s32 fn_800FE010(const void* str);
 extern void fn_800FE35C(void);
@@ -1393,14 +1393,14 @@ void fn_800F9D04(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9D24(void) {
-#include "src/game/gs_thread_fn_800F9D24.inc"
+asm void GScharLenCpy(void) {
+#include "src/game/gs_thread_GScharLenCpy.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 #pragma optimization_level 2
-void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
+void* GScharLenCpy(u16* dst, u16* src, s32 maxlen) {
     s32 r;
     s32 i;
 
@@ -1448,12 +1448,12 @@ u8* fn_800F9E70(u8* dst, u8* src) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800F9EE4(void) {
-#include "src/game/gs_thread_fn_800F9EE4.inc"
+asm void GScharCmp(void) {
+#include "src/game/gs_thread_GScharCmp.inc"
 }
 #else
 #pragma optimization_level 2
-s32 fn_800F9EE4(void* str1, void* str2) {
+s32 GScharCmp(void* str1, void* str2) {
     s32 len1;
     s32 len2;
     u16* p1;
@@ -1536,12 +1536,12 @@ s32 fn_800F9EE4(void* str1, void* str2) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FA064(void) {
-#include "src/game/gs_thread_fn_800FA064.inc"
+asm void GSmsgAdjustAlign(void) {
+#include "src/game/gs_thread_GSmsgAdjustAlign.inc"
 }
 #else
 #pragma optimization_level 2
-void fn_800FA064(void* obj) {
+void GSmsgAdjustAlign(void* obj) {
     u8* o;
     u32 rv;
     s16 r5;
@@ -2094,13 +2094,13 @@ void fn_800FC2A4(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 0
-asm void fn_800FC2A8(void* ptr) {
-#include "src/game/gs_thread_fn_800FC2A8.inc"
+asm void GSmsgFontClose(void* ptr) {
+#include "src/game/gs_thread_GSmsgFontClose.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma scheduling on
-u32 fn_800FC2A8(void* ptr) {
+u32 GSmsgFontClose(void* ptr) {
     u8* p;
     register s32 offset;
     register u8* head;
@@ -2328,12 +2328,12 @@ void fn_800FD69C(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 1
-asm void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
-#include "src/game/gs_thread_fn_800FDF1C.inc"
+asm void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode) {
+#include "src/game/gs_thread__msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
+void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode) {
     u8* head;
     u32 count;
     u32 offset;
@@ -2875,7 +2875,7 @@ static void fn_800FEA74(void) {
 extern void fn_800F02F4(void);
 extern void fn_800F028C(void);
 extern void fn_800EEA50(void);
-extern void fn_800EEB34(void);
+extern void GSscratchFree(void);
 extern void fn_800EEA98(void);
 extern void fn_800EEA6C(void);
 extern void DCFlushRange();

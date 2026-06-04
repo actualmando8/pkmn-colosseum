@@ -9,8 +9,8 @@
 
 extern void MWTRACE(s32 level, const char* fmt, ...);
 extern void fn_800BE464(void* event, s32 type);
-extern s32  fn_800BE47C(void* event);
-extern s32  fn_800BF1FC(void);  /* TRKProcessInput - returns buffer index or -1 */
+extern s32  TRKPostEvent(void* event);
+extern s32  TRKTestForPacket(void);  /* TRKProcessInput - returns buffer index or -1 */
 extern void* TRKGetBuffer(s32 index);
 
 /* Serial handler state at lbl_803FE7B8 */
@@ -57,7 +57,7 @@ s32 TRKInitializeSerialHandler(void) {
 void TRKGetInput(void) {
     s32 bufIdx;
 
-    bufIdx = fn_800BF1FC();
+    bufIdx = TRKTestForPacket();
 
     if (bufIdx != -1) {
         u8 eventBuf[0x10];
@@ -73,7 +73,7 @@ void TRKGetInput(void) {
         /* Reset serial state */
         ((s32*)state)[0] = -1;
 
-        fn_800BE47C((void*)eventBuf); /* post event */
+        TRKPostEvent((void*)eventBuf); /* post event */
     }
 }
 
@@ -94,7 +94,7 @@ void fn_800BF14C(s32 bufIdx) {
 
     fn_800BE464((void*)eventBuf, 2);
     ((s32*)lbl_803FE7B8)[0] = -1;
-    fn_800BE47C((void*)eventBuf);
+    TRKPostEvent((void*)eventBuf);
 }
 
 /*

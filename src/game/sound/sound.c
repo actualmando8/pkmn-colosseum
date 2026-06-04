@@ -67,8 +67,8 @@ extern void fn_8014D880(u32 handle);
 extern void fn_8014D8C0(void* callback);
 extern void fn_8014D8C8(u8 volume, u16 pan, u8 code);
 extern void fn_8014D928(u8 chorus, u16 reverb, u8 delay, u8 wet);
-extern void fn_8014D9BC(void);
-extern void fn_8014DAA8(u32 channel, void* callback, void* userData,
+extern void sndOutputMode(void);
+extern void sndSetAuxProcessingCallbacks(u32 channel, void* callback, void* userData,
                         u32 volume, u32 pan, u32 r8, u32 r9, u32 r10);
 
 /* libc */
@@ -162,7 +162,7 @@ extern void fn_80167040(void); /* _sndUpdateCallback */
 
 /* Volume update function */
 extern void fn_80164C40(u32 handle, u32 seHandle, f32 f1, f32 f2);
-extern void fn_80164DD0(u32 handle, void* params, u32 channel);
+extern void HandleReverb(u32 handle, void* params, u32 channel);
 
 /* =========================================================================
  * Rodata string references (used for error/debug prints)
@@ -1152,7 +1152,7 @@ BOOL sndInit(u32 numBgm, u32 numSe, u32 numBgmRes, u32 numSe3d,
     fn_801644E0((void*)0x80452500); /* set table buffer */
 
     /* Step 7: Register the per-frame update callback */
-    fn_8014DAA8(
+    sndSetAuxProcessingCallbacks(
         0,                  /* channel */
         (void*)fn_80167040, /* callback: _sndUpdateCallback */
         (void*)0x80452500,  /* userData */

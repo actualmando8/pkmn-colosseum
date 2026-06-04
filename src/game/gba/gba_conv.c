@@ -9,7 +9,7 @@
 #include "dolphin/types.h"
 
 /* ===== External function declarations ===== */
-extern void fn_8001E074();
+extern void menuSubOpenYesNo();
 extern void fn_8005CF2C();
 extern void fn_8006A76C();
 extern void fn_8006A79C();
@@ -306,7 +306,7 @@ void fn_80083CFC(void) {
 void fn_80083D30(void) {
     extern void fn_8011F228();
     extern void fn_8012AC08();
-    extern void fn_80135938();
+    extern void gamedataGetStatus();
     u8 sp[0x170];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -368,7 +368,7 @@ void fn_80083D30(void) {
                 r3 = 0x0;
                 *(u16*)(r4 + tmp) = r5;
                 r4 = 0x5;
-                fn_80135938();
+                gamedataGetStatus();
                 r5 = r3;
                 r3 = r28;
                 r4 = (u32)sp + 0xac;
@@ -403,7 +403,7 @@ void fn_80083D30(void) {
                     r3 = 0x0;
                     *(u16*)(r4 + tmp) = r5;
                     r4 = 0x5;
-                    fn_80135938();
+                    gamedataGetStatus();
                     r5 = r3;
                     r3 = r25;
                     r4 = (u32)sp + 0x8;
@@ -424,7 +424,7 @@ void fn_80083D30(void) {
 
 /* 0x80083ECC | size: 0x168 */
 void fn_80083ECC(void) {
-    extern void fn_80135938();
+    extern void gamedataGetStatus();
     u8 sp[0x160];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -471,7 +471,7 @@ void fn_80083ECC(void) {
     r3 = 0x0;
     *(u16*)(r4 + tmp) = r5;
     r4 = 0x5;
-    fn_80135938();
+    gamedataGetStatus();
     r5 = r3;
     r3 = r31;
     r4 = (u32)sp + 0xac;
@@ -506,7 +506,7 @@ void fn_80083ECC(void) {
         r3 = 0x0;
         *(u16*)(r4 + tmp) = r5;
         r4 = 0x5;
-        fn_80135938();
+        gamedataGetStatus();
         r5 = r3;
         r3 = r31;
         r4 = (u32)sp + 0x8;
@@ -4975,7 +4975,7 @@ void fn_80087C64(void) {
 void fn_80088428(void) {
     extern void fn_80087C64();
     extern void fn_80166A28();
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     u8 sp[0x10];
     u32 tmp = 0;
@@ -4994,7 +4994,7 @@ void fn_80088428(void) {
     r6 = 0x0;
     fn_80176E0C();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = (u32)&lbl_803FB2F8;
     r3 = (u32)&lbl_803FB2F8;
     fn_80087C64();
@@ -5008,7 +5008,7 @@ void fn_80088428(void) {
     r6 = 0x0;
     fn_80176E0C();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     ((void(*)(void))fn_800FF660)();
     r3 = (u32)&lbl_803FB2F8;
     r3 = (u32)&lbl_803FB2F8;
@@ -5254,7 +5254,7 @@ L_80088824:
     r4 = -0x1;
     r5 = -0x1;
     r6 = 0x0;
-    ((void(*)(void))fn_8001E074)();
+    ((void(*)(void))menuSubOpenYesNo)();
     tmp = (s8)r3;
     if ((s32)tmp == 0) {
         r30 = 0x0;
@@ -5297,7 +5297,7 @@ L_80088824:
         r4 = -0x1;
         r5 = -0x1;
         r6 = 0x1;
-        ((void(*)(void))fn_8001E074)();
+        ((void(*)(void))menuSubOpenYesNo)();
         tmp = (s8)r3;
         if ((s32)tmp != 0) goto L_80088824;
         fn_80128E24();

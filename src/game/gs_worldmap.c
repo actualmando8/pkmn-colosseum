@@ -52,7 +52,7 @@
  *   fn_80027960  GSmap_StartTravel           -- 0x144 bytes, begin travel sequence
  *   fn_80027AA4  GSmap_TravelAnimation       -- 0x2B4 bytes, flight/drive animation
  *   fn_80027D58  GSmap_ArrivalSequence       -- 0x3A4 bytes, arrive at destination
- *   fn_800280FC  GSmap_UpdateCamera          -- 0xF4 bytes, map camera control
+ *   menuNameEntryCtrl  GSmap_UpdateCamera          -- 0xF4 bytes, map camera control
  *   fn_800281F0  GSmap_Nop                   -- 4 bytes, no-op
  *   fn_800281F4  GSmap_Init                  -- 0x250 bytes, full initialization
  *   fn_80028444  GSmap_DrawCityA             -- 0x50 bytes, specific city renderer
@@ -767,19 +767,19 @@ asm void fn_80027D58(void) {
 void fn_80027D58(void) { /* TODO */ }
 #endif
 
-/* fn_800280FC - 0x800280FC | size: 0xf4 */
+/* menuNameEntryCtrl - 0x800280FC | size: 0xf4 */
 extern void fn_801080CC(void*, s32);
 extern f32 lbl_8047B930;
 extern f32 lbl_8047B950;
 extern f32 lbl_8047B934;
 #if 0
-asm void fn_800280FC(void) {
-#include "src/game/gs_worldmap_fn_800280FC.inc"
+asm void menuNameEntryCtrl(void) {
+#include "src/game/gs_worldmap_menuNameEntryCtrl.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma peephole off
-s32 fn_800280FC(void* r3) {
+s32 menuNameEntryCtrl(void* r3) {
     u8* r30;
     u8* r31;
     f32* fptr;
@@ -843,10 +843,10 @@ extern void fn_801337A8(void);
 extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_80106D3C(void);
-extern void fn_8001E074(void);
+extern void menuSubOpenYesNo(void);
 extern void fn_801069FC(s32);
 extern void fn_80102510(void);
-extern void fn_80102428(void);
+extern void menuCloseSync(void);
 extern f32 lbl_8047B930;
 extern u8 lbl_8047A3D4[];
 extern u8 lbl_8047A3D0[];
@@ -1171,7 +1171,7 @@ extern void fn_8010A5BC(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);
-extern void fn_80109894(void);
+extern void menuModelSetMotion(void);
 extern void fn_80109C88(void);
 extern void fn_80109B90(void);
 extern void fn_801C41C8(void);
@@ -1179,8 +1179,8 @@ extern void fn_801C40F0(void);
 extern void fn_8010A420(void);
 extern void fn_8012A450(void);
 extern void fn_8011DEE4(void);
-extern void fn_801349DC(void);
-extern void fn_800F9EE4(void);
+extern void pcboxSetPokemonBoxName(void);
+extern void GScharCmp(void);
 extern void fn_800FF660(void);
 extern void fn_8011288C(s32, u32);
 extern u32 lbl_804788A0;
@@ -2206,7 +2206,7 @@ s32 fn_8002AE9C(void* r3, u8* r4) {
 extern void fn_801440A0(u32);
 extern u32 fn_80144014(void);
 extern u32 fn_80129BC8(s32, u32, u16*, s32, s32, s32, s32);
-extern u32 fn_80142CF4(u32, s32, s32, s32);
+extern u32 itemGetStatus(u32, s32, s32, s32);
 #if 0
 asm void fn_8002AEF8(void) {
 #include "src/game/gs_worldmap_fn_8002AEF8.inc"
@@ -2238,8 +2238,8 @@ s32 fn_8002AEF8(void* r3, u8* r4) {
         r27 = fn_80129BC8(0, fn_80144014(), &stack, 0, 0, 0, 0);
         r28 = 0;
         while (r28 < (s32)stack) {
-            if ((u16)fn_80142CF4(r27, 0, 0x1b, 0) == (u16)r31) {
-                r29 += (s32)fn_80142CF4(r27, 0, 0x1c, 0);
+            if ((u16)itemGetStatus(r27, 0, 0x1b, 0) == (u16)r31) {
+                r29 += (s32)itemGetStatus(r27, 0, 0x1c, 0);
             }
             r28++;
             r27 += 4;
@@ -2385,8 +2385,8 @@ void fn_8002B40C(void) { /* TODO */ }
 #endif
 
 /* fn_8002B594 - 0x8002B594 | size: 0x2ec */
-extern void fn_800CDBE0(void);
-extern void fn_800CE148(void);
+extern void cos(void);
+extern void sin(void);
 extern f32 lbl_8047B980;
 extern f32 lbl_8047B97C;
 extern f64 lbl_8047B998;
@@ -2781,7 +2781,7 @@ extern void fn_80124A60(void);
 extern void fn_8011F5FC(void);
 extern void fn_801024E8(void);
 extern void fn_801CB834(void);
-extern void fn_80176B48(void);
+extern void cameraWaitSyncAnime(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A420;
 extern u32 lbl_8047A414;

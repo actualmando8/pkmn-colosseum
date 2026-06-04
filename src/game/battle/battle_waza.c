@@ -398,10 +398,10 @@ void fn_801D1D58(s32 seqHandle) {
 }
 
 /**
- * fn_801D1E50 - Waza projectile hit check.
+ * mailGetReceiveNumber - Waza projectile hit check.
  * Address: 0x801D1E50 | Size: 0xBC
  */
-BOOL fn_801D1E50(s32 seqHandle) {
+BOOL mailGetReceiveNumber(s32 seqHandle) {
     /* TODO: Projectile hit check (0xBC bytes) */
     return FALSE;
 }

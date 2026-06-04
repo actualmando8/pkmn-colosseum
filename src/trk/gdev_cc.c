@@ -21,10 +21,10 @@ extern void fn_800CE7D4(void);     /* GDEV_PreContinue */
 extern void fn_800CEBB8(void* callback, void* pendingPtr); /* GDEV_Initialize */
 
 /* Receive FIFO buffer management */
-extern void fn_800C404C(void* fifo, void* data, s32 size); /* FIFO_Push */
+extern void CircleBufferWriteBytes(void* fifo, void* data, s32 size); /* FIFO_Push */
 extern s32  fn_800C41A4(void* fifo);                        /* FIFO_Count */
 extern void fn_800C4154(void* fifo, void* buffer, s32 size); /* FIFO_Init */
-extern s32  fn_800C3F44(void* fifo, void* dst, s32 size);   /* FIFO_Pop */
+extern s32  CircleBufferReadBytes(void* fifo, void* dst, s32 size);   /* FIFO_Pop */
 
 /* SDA-relative flag: nonzero if port is open */
 extern s32 lbl_8047A9E8; /* gdev_cc open flag */
@@ -73,7 +73,7 @@ s32 gdev_cc_peek(void) {
             return -10009; /* 0xD8E7 */
         }
 
-        fn_800C404C(lbl_803FFA98, tmpBuf, avail);
+        CircleBufferWriteBytes(lbl_803FFA98, tmpBuf, avail);
     }
 
     return avail;
@@ -172,12 +172,12 @@ s32 gdev_cc_read(void* data, s32 size) {
                 continue;
             }
 
-            fn_800C404C(fifo, tmpBuf, avail);
+            CircleBufferWriteBytes(fifo, tmpBuf, avail);
         }
 
         /* Extract requested data from FIFO */
         if (err == 0) {
-            fn_800C3F44(fifo, data, requestedSize);
+            CircleBufferReadBytes(fifo, data, requestedSize);
         } else {
             MWTRACE(8, lbl_8026FDFC, err);
         }

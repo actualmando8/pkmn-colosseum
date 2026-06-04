@@ -48,13 +48,13 @@ extern void  fn_801BE490(s32 a, s32 b);
 extern void  fn_800BD554(s32 a);
 extern void  fn_800BD4B4(void* mtx, s32 a);
 extern void  fn_800BD504(void* mtx, s32 a);
-extern void  fn_800BD58C(void* mtx, s32 a, s32 b);
-extern void  fn_800A2FAC(void* pobj, void* mtx);
+extern void  GXLoadTexMtxImm(void* mtx, s32 a, s32 b);
+extern void  PSMTXInvXpose(void* pobj, void* mtx);
 extern void  fn_800A2D64(void* pobj, void* mtx);
-extern void  fn_800A2D98(void* dst, void* src, void* dst2);
-extern void  fn_801A85F0(f32 weight, void* src, void* dst, void* dst2);
-extern void  fn_801BBF28(s32 idx);
-extern void* fn_801BF098(s32 idx);
+extern void  PSMTXConcat(void* dst, void* src, void* dst2);
+extern void  HSD_MtxScaledAdd(f32 weight, void* src, void* dst, void* dst2);
+extern void  HSD_Index2TexMtx(s32 idx);
+extern void* HSD_Index2PosNrmMtx(s32 idx);
 extern void  fn_800B84E0(u32 type, void* data, u32 stride, u8 frac);
 extern void  fn_800B7874(u32 type, u32 comptype);
 extern void  fn_800B7D74(u32 type, u32 comptype, void* data, u32 stride,
@@ -63,8 +63,8 @@ extern void  fn_800BD0FC(void* display, u32 nbytes);
 extern void  fn_801B2878(s32 cullmode);
 extern s32   fn_8019C6EC(s32 val);
 extern f32   fn_800CE298(void);
-extern f32   fn_800CE148(f32 x);
-extern f32   fn_800CDBE0(f32 x);
+extern f32   sin(f32 x);
+extern f32   cos(f32 x);
 extern void* fn_8019F01C(void* obj);
 
 /* =========================================================================
@@ -240,7 +240,7 @@ void fn_801AA538(void* a, void* b)
  * 0x801AA568 | size: 0x44  -- PObj class info init (small)
  * Calls fn_80193B30 to register lbl_8036CC00 class
  * ========================================================================= */
-void fn_801AA568(void)
+void ObjInfoInit_802596A4(void)
 {
     fn_80193B30(lbl_8036CC00, lbl_8036C638, lbl_80274EC8,
                 (void*)&lbl_8047DCA0, 0x3c, 0x8);

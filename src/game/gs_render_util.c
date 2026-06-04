@@ -113,7 +113,7 @@ extern f32 lbl_8047CA0C;   /* SDA2 float constant */
 extern u32 lbl_80270350[4]; /* .rodata array */
 extern void* fn_800D7BF8(u32 idx);
 extern void fn_800DFF98(void* out, void* sphere, void* ray);
-extern void fn_800BD16C(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
+extern void GXProject(void* sphere, void* center, void* radii, f32 x, f32 y, f32 z, void* outA, void* outB, void* outC);
 extern void* fn_8019BB78(void* ctx);
 extern void fn_8019BD18(u32 zero);
 extern void fn_8016EA88(void);
@@ -1168,7 +1168,7 @@ s32 fn_800D2DE8(void* arg1, void* arg2, u32 count) {
                 *(f32*)((u8*)out + 0x4) = val;
                 *(f32*)((u8*)out + 0x0) = val;
             } else {
-                fn_800BD16C(sphere,
+                GXProject(sphere,
                     center,
                     radii,
                     *(f32*)((u8*)rays + 0x0),
@@ -1220,7 +1220,7 @@ s32 fn_800D2F34(void* arg1, void* arg2) {
     radii[3] = lbl_8047CA08;
     radii[4] = lbl_8047CA00;
     radii[5] = lbl_8047CA0C;
-    fn_800BD16C(sphere,
+    GXProject(sphere,
         center,
         radii,
         *(f32*)((u8*)arg1 + 0x0),

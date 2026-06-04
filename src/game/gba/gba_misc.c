@@ -19,7 +19,7 @@ extern void fn_800726A8();
 extern void fn_80072A00();
 extern void fn_80072C74();
 extern void fn_80072D58();
-extern void fn_80073034();
+extern void _AGB_EntryGetStatus__FlPUl();
 extern void fn_800730F8();
 extern void fn_800733D0();
 extern void fn_80073990();
@@ -133,7 +133,7 @@ void fn_8008ABE4(void);
 void fn_8008AC34(void);
 void fn_8008AE18(void);
 void fn_8008BBDC(void);
-void fn_8008C5D4(void);
+void gbaPokemonConditonFromGC(void);
 void fn_8008C6FC(void);
 void fn_8008C700(void);
 s32 fn_8008C78C(void);
@@ -179,7 +179,7 @@ void fn_800895A4(void) {
     extern void fn_8012AA54();
     extern void fn_8012AA64();
     extern void fn_8012AC08();
-    extern void fn_80135938();
+    extern void gamedataGetStatus();
     extern void fn_80265EC4();
     u8 sp[0x30];
     u32 r0 = 0;
@@ -208,7 +208,7 @@ void fn_800895A4(void) {
     fn_8012A774();
     r3 = 0x0;
     r4 = 0x5;
-    fn_80135938();
+    gamedataGetStatus();
     r6 = r3;
     r3 = (u32)sp + 0x8;
     r4 = r31 + 0x4;
@@ -923,7 +923,7 @@ u32 fn_80089F70(u32 v) {
 
 /* 0x80089F78 | size: 0xA24 */
 void fn_80089F78(void) {
-    extern void fn_8008C5D4();
+    extern void gbaPokemonConditonFromGC();
     extern void fn_8011E7C0();
     extern void fn_8011E808();
     extern void fn_8011E8F4();
@@ -1149,7 +1149,7 @@ void fn_80089F78(void) {
         tmp = r4 | tmp;
         tmp = tmp & 0xFFFF;
         *(u16*)((u8*)r27 + 0x24) = tmp;
-        fn_8008C5D4();
+        gbaPokemonConditonFromGC();
         r20 = r3 & 0xFFFF;
         r3 = r29;
         tmp = r20 & 0xFF;
@@ -1667,7 +1667,7 @@ void fn_8008A9E4(void) {
     tmp = 0x2000000;
     *(u32*)((u8*)r30 + 0x0) = tmp;
     r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80073034)();
+    ((void(*)(void))_AGB_EntryGetStatus__FlPUl)();
     if ((s32)r3 < 0) {
         tmp = 0x2000000;
         *(u32*)(sp + 0x8) = tmp;
@@ -2980,7 +2980,7 @@ void fn_8008BBDC(void) {
     extern void fn_8012190C();
     extern void fn_801219F4();
     extern void fn_80124A60();
-    extern void fn_801353C0();
+    extern void gamedataAttestCreate();
     extern u8 jumptable_802EEC10[];
     extern u8 jumptable_802EEC30[];
     u8 sp[0x60];
@@ -3242,7 +3242,7 @@ void fn_8008BBDC(void) {
     r6 = r26;
     r7 = r27;
     r5 = 0x3;
-    fn_801353C0();
+    gamedataAttestCreate();
     r25 = r27 & 0xFF;
     r3 = (u32)sp + 0x20;
     r6 = r25;
@@ -3639,7 +3639,7 @@ void fn_8008BBDC(void) {
 }
 
 /* 0x8008C5D4 | size: 0x128 */
-void fn_8008C5D4(void) {
+void gbaPokemonConditonFromGC(void) {
     extern void fn_8012189C();
     extern void fn_80121984();
     extern void fn_80121ADC();
@@ -3776,7 +3776,7 @@ s32 fn_8008C78C(void) {
 
 /* 0x8008C7B0 | size: 0x31C */
 void fn_8008C7B0(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_80190528();
@@ -3982,7 +3982,7 @@ void fn_8008C7B0(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x8d0;
     fn_80190528();
     r3 = 0x1;
@@ -3995,7 +3995,7 @@ void fn_8008C7B0(void) {
 
 /* 0x8008CACC | size: 0x30C */
 void fn_8008CACC(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -4192,7 +4192,7 @@ void fn_8008CACC(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -4203,7 +4203,7 @@ void fn_8008CACC(void) {
 
 /* 0x8008CDD8 | size: 0x2C8 */
 void fn_8008CDD8(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -4383,7 +4383,7 @@ void fn_8008CDD8(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -4394,7 +4394,7 @@ void fn_8008CDD8(void) {
 
 /* 0x8008D0A0 | size: 0x2A8 */
 void fn_8008D0A0(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -4565,7 +4565,7 @@ void fn_8008D0A0(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -4576,7 +4576,7 @@ void fn_8008D0A0(void) {
 
 /* 0x8008D348 | size: 0x5F0 */
 void fn_8008D348(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -4974,7 +4974,7 @@ void fn_8008D348(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -4985,7 +4985,7 @@ void fn_8008D348(void) {
 
 /* 0x8008D938 | size: 0x9E8 */
 void fn_8008D938(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -5640,7 +5640,7 @@ void fn_8008D938(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -5651,7 +5651,7 @@ void fn_8008D938(void) {
 
 /* 0x8008E320 | size: 0x4B4 */
 void fn_8008E320(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -5965,7 +5965,7 @@ void fn_8008E320(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -5976,7 +5976,7 @@ void fn_8008E320(void) {
 
 /* 0x8008E7D4 | size: 0x454 */
 void fn_8008E7D4(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -6265,7 +6265,7 @@ void fn_8008E7D4(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -6276,7 +6276,7 @@ void fn_8008E7D4(void) {
 
 /* 0x8008EC28 | size: 0x2A8 */
 void fn_8008EC28(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -6447,7 +6447,7 @@ void fn_8008EC28(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -6458,7 +6458,7 @@ void fn_8008EC28(void) {
 
 /* 0x8008EED0 | size: 0x2C0 */
 void fn_8008EED0(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -6636,7 +6636,7 @@ void fn_8008EED0(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -6647,7 +6647,7 @@ void fn_8008EED0(void) {
 
 /* 0x8008F190 | size: 0x394 */
 void fn_8008F190(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -6881,7 +6881,7 @@ void fn_8008F190(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -6892,7 +6892,7 @@ void fn_8008F190(void) {
 
 /* 0x8008F524 | size: 0x3F8 */
 void fn_8008F524(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -7158,7 +7158,7 @@ void fn_8008F524(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -7169,7 +7169,7 @@ void fn_8008F524(void) {
 
 /* 0x8008F91C | size: 0x2D8 */
 void fn_8008F91C(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -7360,7 +7360,7 @@ void fn_8008F91C(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -7371,7 +7371,7 @@ void fn_8008F91C(void) {
 
 /* 0x8008FBF4 | size: 0x2A0 */
 void fn_8008FBF4(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -7541,7 +7541,7 @@ void fn_8008FBF4(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -7552,7 +7552,7 @@ void fn_8008FBF4(void) {
 
 /* 0x8008FE94 | size: 0x26C */
 void fn_8008FE94(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -7709,7 +7709,7 @@ void fn_8008FE94(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -7720,7 +7720,7 @@ void fn_8008FE94(void) {
 
 /* 0x80090100 | size: 0x620 */
 void fn_80090100(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -8134,7 +8134,7 @@ void fn_80090100(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -8145,7 +8145,7 @@ void fn_80090100(void) {
 
 /* 0x80090720 | size: 0x2C4 */
 void fn_80090720(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -8325,7 +8325,7 @@ void fn_80090720(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -8336,7 +8336,7 @@ void fn_80090720(void) {
 
 /* 0x800909E4 | size: 0x350 */
 void fn_800909E4(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -8557,7 +8557,7 @@ void fn_800909E4(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -8568,7 +8568,7 @@ void fn_800909E4(void) {
 
 /* 0x80090D34 | size: 0x2D8 */
 void fn_80090D34(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -8758,7 +8758,7 @@ void fn_80090D34(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -8769,7 +8769,7 @@ void fn_80090D34(void) {
 
 /* 0x8009100C | size: 0x558 */
 void fn_8009100C(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB834();
@@ -9127,7 +9127,7 @@ void fn_8009100C(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9138,7 +9138,7 @@ void fn_8009100C(void) {
 
 /* 0x80091564 | size: 0x210 */
 void fn_80091564(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -9270,7 +9270,7 @@ void fn_80091564(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x81;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9281,7 +9281,7 @@ void fn_80091564(void) {
 
 /* 0x80091774 | size: 0x210 */
 void fn_80091774(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -9413,7 +9413,7 @@ void fn_80091774(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x82;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9424,7 +9424,7 @@ void fn_80091774(void) {
 
 /* 0x80091984 | size: 0x210 */
 void fn_80091984(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -9556,7 +9556,7 @@ void fn_80091984(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x82;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9567,7 +9567,7 @@ void fn_80091984(void) {
 
 /* 0x80091B94 | size: 0x210 */
 void fn_80091B94(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB7C4();
@@ -9699,7 +9699,7 @@ void fn_80091B94(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x82;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9710,7 +9710,7 @@ void fn_80091B94(void) {
 
 /* 0x80091DA4 | size: 0x1A4 */
 void fn_80091DA4(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801CB7C4();
     extern void fn_801CB834();
@@ -9813,7 +9813,7 @@ void fn_80091DA4(void) {
 
     }
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x82;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9824,7 +9824,7 @@ void fn_80091DA4(void) {
 
 /* 0x80091F48 | size: 0x1F8 */
 void fn_80091F48(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB708();
@@ -9956,7 +9956,7 @@ void fn_80091F48(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x89;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -9967,7 +9967,7 @@ void fn_80091F48(void) {
 
 /* 0x80092140 | size: 0x358 */
 void fn_80092140(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB834();
@@ -10192,7 +10192,7 @@ void fn_80092140(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x83;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -10203,7 +10203,7 @@ void fn_80092140(void) {
 
 /* 0x80092498 | size: 0x1CC */
 void fn_80092498(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801CB7C4();
     extern void fn_801CB834();
@@ -10316,7 +10316,7 @@ void fn_80092498(void) {
     r6 = 0x0;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x83;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -10327,7 +10327,7 @@ void fn_80092498(void) {
 
 /* 0x80092664 | size: 0x358 */
 void fn_80092664(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB834();
@@ -10552,7 +10552,7 @@ void fn_80092664(void) {
     r6 = 0x1;
     fn_801CB834();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x87;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -10563,7 +10563,7 @@ void fn_80092664(void) {
 
 /* 0x800929BC | size: 0x170 */
 void fn_800929BC(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801CB7C4();
     extern void fn_801CB834();
@@ -10653,7 +10653,7 @@ void fn_800929BC(void) {
 
     }
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x83;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;
@@ -10664,7 +10664,7 @@ void fn_800929BC(void) {
 
 /* 0x80092B2C | size: 0x164 */
 void fn_80092B2C(void) {
-    extern void fn_80176B48();
+    extern void cameraWaitSyncAnime();
     extern void fn_80176E0C();
     extern void fn_801845E4();
     extern void fn_801CB834();
@@ -10751,7 +10751,7 @@ void fn_80092B2C(void) {
     r7 = 0x0;
     fn_801845E4();
     r3 = 0x1;
-    fn_80176B48();
+    cameraWaitSyncAnime();
     r3 = 0x87;
     ((void(*)(void))fn_800FF58C)();
     r3 = 0x0;

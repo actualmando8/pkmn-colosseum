@@ -3007,7 +3007,7 @@ void GSfield_ObjectBatchUpdate(void) {
     extern void fn_8011D480();
     extern void fn_801254B4();
     extern u32 fn_8012640C();
-    extern void fn_80135708();
+    extern void gamedataAttestInit();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -3075,7 +3075,7 @@ void GSfield_ObjectBatchUpdate(void) {
         r5 = 0x70;
         r6 = 0x0;
         fn_8012640C();
-        fn_80135708();
+        gamedataAttestInit();
         if (r30 != (u32)0x0) {
             r3 = r30;
             r4 = 0x0;
@@ -5599,13 +5599,13 @@ void* fn_80115BD8(void) {
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 #if 0
-asm void fn_80115CB4(void) {
-#include "src/game/gs_field_world_fn_80115CB4.inc"
+asm void floorEventGetTresureList(void) {
+#include "src/game/gs_field_world_floorEventGetTresureList.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void* fn_80115CB4(u32 param) {
+void* floorEventGetTresureList(u32 param) {
     extern u32 lbl_80478EB8;
     extern u32 lbl_80478EBC;
     u32 r4 = param & 0x7FFF0000;
@@ -5641,13 +5641,13 @@ extern void fn_8018C1E8(void);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 #if 0
-asm void fn_80115D64(void) {
-#include "src/game/gs_field_world_fn_80115D64.inc"
+asm void floorEventSetTresureDisp(void) {
+#include "src/game/gs_field_world_floorEventSetTresureDisp.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-void fn_80115D64(u32 r25, u32 r26) {
+void floorEventSetTresureDisp(u32 r25, u32 r26) {
     extern u32 lbl_80478EB8;
     extern u32 lbl_80478EBC;
     extern void* fn_80113F48();
@@ -7893,7 +7893,7 @@ void fn_80118100(void) {
 }
 #endif
 /* 0x80118104 | 0xAC */
-extern void fn_80173624();
+extern void psSetBillboardCamera();
 extern void fn_8016AB94();
 #if 0
 asm void fn_80118104(void) {
@@ -7907,7 +7907,7 @@ void fn_80118104(u32 a, u8 b) {
 
     result = fn_800D2584();
     if (result != NULL) {
-        fn_80173624(*(void**)((u8*)result + 0xC));
+        psSetBillboardCamera(*(void**)((u8*)result + 0xC));
         switch (a) {
         case 0x10:
             val = 0;
@@ -7929,10 +7929,10 @@ void fn_80118104(u32 a, u8 b) {
 #endif
 /* 0x801181B0 | 0x23C */
 extern void fn_801694A8(void* ptr);
-extern void fn_801695FC();
+extern void psKillFamily();
 extern void fn_800EC160();
 extern void fn_80169484();
-extern void fn_80175A1C();
+extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 #if 1
@@ -7947,8 +7947,8 @@ void fn_801181B0(void) {
     extern void fn_800EC160();
     extern void fn_80169484();
     extern void fn_801694A8();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     extern void fn_801694E0();
     u32 r0 = 0;
     u32 r3 = 0;
@@ -7990,7 +7990,7 @@ void fn_801181B0(void) {
                             r4 = *(u32*)((u8*)r27 + 0x10);
                             r3 = *(u16*)((u8*)r4 + 0x18);
                             r4 = *(u8*)((u8*)r4 + 0x15);
-                            fn_801695FC();
+                            psKillFamily();
                             r0 = *(u32*)((u8*)r27 + 0x44);
                             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
                                 r3 = *(u32*)((u8*)r27 + 0x48);
@@ -8063,7 +8063,7 @@ void fn_801181B0(void) {
                             fn_800E01D0();
                 }
                             r3 = *(u32*)((u8*)r27 + 0x10);
-                            fn_80175A1C();
+                            psKillGenerator();
                             r5 = *(u32*)((u8*)r27 + 0xC);
                             r0 = 0x40;
                             r3 = 0x0;
@@ -8104,7 +8104,7 @@ extern void fn_800E06EC(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0108(void);
 extern void psInterpretParticles(void);
-extern void fn_80173F98(void);
+extern void psExecGenerator(void);
 extern void fn_800057A0(void);
 extern void jumptable_8035BB88();
 extern u32 lbl_8047AD9C;
@@ -8129,7 +8129,7 @@ void fn_801183EC(void) {
     extern void fn_800EE3BC();
     extern void fn_800EE828();
     extern void psInterpretParticles();
-    extern void fn_80173F98();
+    extern void psExecGenerator();
     extern u8 jumptable_8035BB88[];
     u8 sp[0x70];
     u32 r0 = 0;
@@ -8409,7 +8409,7 @@ void fn_801183EC(void) {
         r3 = 0x0;
         psInterpretParticles();
         r3 = 0x0;
-        fn_80173F98();
+        psExecGenerator();
         r27 = r27 + 0x1;
     }
     fn_800057A0();
@@ -8422,7 +8422,7 @@ void fn_801183EC(void) {
             r3 = 0x0;
             psInterpretParticles();
             r3 = 0x0;
-            fn_80173F98();
+            psExecGenerator();
             r0 = 0x0;
             lbl_8047ADB0 = r0;
     }
@@ -8440,8 +8440,8 @@ void fn_80118874(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -8464,7 +8464,7 @@ void fn_80118874(void) {
                 r4 = *(u32*)((u8*)r30 + 0x10);
                 r3 = *(u16*)((u8*)r4 + 0x18);
                 r4 = *(u8*)((u8*)r4 + 0x15);
-                fn_801695FC();
+                psKillFamily();
             }
             r0 = *(u32*)((u8*)r30 + 0x44);
             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
@@ -8538,7 +8538,7 @@ void fn_80118874(void) {
             fn_800E01D0();
             }
             r3 = *(u32*)((u8*)r30 + 0x10);
-            fn_80175A1C();
+            psKillGenerator();
             r5 = *(u32*)((u8*)r30 + 0xC);
             r0 = 0x40;
             r3 = 0x0;
@@ -8581,7 +8581,7 @@ void fn_80118A68(u8* obj, u32 notify) {
 
     if ((notify & 0xFF) == 1) {
         model = *(u8**)(obj + 0x10);
-        fn_801695FC(*(u16*)(model + 0x18), model[0x15]);
+        psKillFamily(*(u16*)(model + 0x18), model[0x15]);
     }
 
     active = (s32*)(obj + 0x44);
@@ -8622,7 +8622,7 @@ void fn_80118A68(u8* obj, u32 notify) {
         }
     }
 
-    fn_80175A1C(*(u32*)(obj + 0x10));
+    psKillGenerator(*(u32*)(obj + 0x10));
 
     base = *(u8**)(obj + 0x0C);
     scan = base;
@@ -8638,20 +8638,20 @@ void fn_80118A68(u8* obj, u32 notify) {
 }
 #endif
 /* 0x68 | fn_80118C20 | guarded_call */
-extern void fn_80169034();  /* K&R: called with 0 or 1 args */
+extern void psSetParticleVisibility();  /* K&R: called with 0 or 1 args */
 void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
     u8* scan = arg1;
     u32 i = 0;
     for (i = 0; i < 0x40; i++, scan += 4) {
         void* entry = *(void**)(scan + 8);
         if (entry) {
-            fn_80169034(*(void**)((u8*)entry + 0x10), arg2);
+            psSetParticleVisibility(*(void**)((u8*)entry + 0x10), arg2);
         }
     }
 }
 /* 0x80118C88 | 36 bytes | load_then_call */
 void fn_80118C88(void* obj) {
-    fn_80169034(*(void**)((u8*)obj + 0x10));
+    psSetParticleVisibility(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118CAC | 36 bytes | load_then_call */
 void fn_80118CAC(void* obj) {
@@ -8688,7 +8688,7 @@ s32 fn_80118DA8(u8* ptr) {
     return fn_801694E0(*(u32*)(&ptr[0x10]));
 }
 /* 0x80118DE0 | 0xAC */
-extern void fn_80169104(void);
+extern void psSetGeneratorAngleRadiusScale(void);
 #if 0
 asm void fn_80118DE0(void) {
 #include "src/game/gs_field_world_fn_80118DE0.inc"
@@ -8696,7 +8696,7 @@ asm void fn_80118DE0(void) {
 #else
 void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
     extern void fn_800E01D0();
-    extern void fn_80169104();
+    extern void psSetGeneratorAngleRadiusScale();
     if ((s32)*(u32*)(arg1 + 0x44) == 0) {
         fn_800E01D0(arg1 + 0x2c);
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x98) = arg2[0];
@@ -8706,7 +8706,7 @@ void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
         fn_800E01D0(arg1 + 0x68);
     }
     if ((arg3 & 0xFF) == 1) {
-        fn_80169104(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
+        psSetGeneratorAngleRadiusScale(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
     }
 }
 #endif
@@ -9064,8 +9064,8 @@ void fn_801193BC(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9086,7 +9086,7 @@ void fn_801193BC(void) {
             r4 = *(u32*)((u8*)r29 + 0x10);
             r3 = *(u16*)((u8*)r4 + 0x18);
             r4 = *(u8*)((u8*)r4 + 0x15);
-            fn_801695FC();
+            psKillFamily();
             r0 = *(u32*)((u8*)r29 + 0x44);
             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
                 r3 = *(u32*)((u8*)r29 + 0x48);
@@ -9159,7 +9159,7 @@ void fn_801193BC(void) {
             fn_800E01D0();
             }
             r3 = *(u32*)((u8*)r29 + 0x10);
-            fn_80175A1C();
+            psKillGenerator();
             r5 = *(u32*)((u8*)r29 + 0xC);
             r0 = 0x40;
             r3 = 0x0;
@@ -9190,7 +9190,7 @@ void fn_801193BC(void) {
 }
 #endif
 /* 0x801195AC | 0x278 */
-extern void fn_8016A17C(void);
+extern void psInitDataBank(void);
 extern void DCFlushRange();
 extern u8 lbl_802727D8[];
 extern u32 lbl_8047AD9C;
@@ -9204,7 +9204,7 @@ void fn_801195AC(void) {
     extern u8 lbl_802727D8[];
     extern u32 lbl_8047AD9C;
     extern u32 lbl_8047ADA0;
-    extern void fn_8016A17C();
+    extern void psInitDataBank();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9364,7 +9364,7 @@ L_80119734: ;
     r4 = *(u32*)((u8*)r31 + 0x4);
     r5 = *(u32*)((u8*)r31 + 0x8);
     r6 = *(u32*)((u8*)r31 + 0x10);
-    fn_8016A17C();
+    psInitDataBank();
     r3 = r30;
     return;
 }
@@ -9372,10 +9372,10 @@ L_80119734: ;
 /* 0x80119824 | 0x10C */
 extern void fn_8016A01C(void);
 extern void fn_80175DF0(void);
-extern void fn_8016AAF4(void);
+extern void psInitAppSRT(void);
 extern void fn_8019733C(void);
 extern void fn_8019D618(void);
-extern void fn_8016972C(void);
+extern void psSetPointJObjNodup(void);
 extern void fn_8019D610(void);
 extern u32 lbl_8047ADA0;
 extern u16 lbl_8047AD98;
@@ -9396,13 +9396,13 @@ void fn_80119824(void) {
     extern u32 lbl_8047ADA8;
     extern u32 lbl_8047ADAC;
     extern void fn_8016A01C();
-    extern void fn_8016AAF4();
+    extern void psInitAppSRT();
     extern void fn_80175DF0();
     extern void fn_8019733C();
     extern void fn_8019D610();
     extern void fn_8019D618();
     extern void fn_80119BD0();
-    extern void fn_8016972C();
+    extern void psSetPointJObjNodup();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9457,15 +9457,15 @@ void fn_80119824(void) {
     fn_80175DF0();
     r3 = 0x0;
     r4 = 0x74;
-    fn_8016AAF4();
+    psInitAppSRT();
     r3 = (u32)fn_80119BD0;
     r3 = (u32)fn_80119BD0;
     fn_8019733C();
     r3 = (u32)fn_80119BD0;
     r3 = (u32)fn_80119BD0;
     fn_8019D618();
-    r3 = (u32)fn_8016972C;
-    r3 = (u32)fn_8016972C;
+    r3 = (u32)psSetPointJObjNodup;
+    r3 = (u32)psSetPointJObjNodup;
     fn_8019D610();
     return;
 }
@@ -9480,8 +9480,8 @@ void fn_80119930(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9563,7 +9563,7 @@ void fn_80119930(void) {
     r4 = *(u32*)((u8*)r31 + 0x10);
     r3 = *(u16*)((u8*)r4 + 0x18);
     r4 = *(u8*)((u8*)r4 + 0x15);
-    fn_801695FC();
+    psKillFamily();
     r0 = *(u32*)((u8*)r31 + 0x44);
     if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
         r3 = *(u32*)((u8*)r31 + 0x48);
@@ -9638,7 +9638,7 @@ void fn_80119930(void) {
     fn_800E01D0();
         }
     r3 = *(u32*)((u8*)r31 + 0x10);
-    fn_80175A1C();
+    psKillGenerator();
     r5 = *(u32*)((u8*)r31 + 0xC);
     r0 = 0x40;
     r3 = 0x0;
@@ -9670,7 +9670,7 @@ extern void fn_800EE22C(void);
 extern void fn_800E3CBC(void);
 extern void fn_800E3BF0(void);
 extern void fn_800E3D08(void);
-extern void fn_80169034();
+extern void psSetParticleVisibility();
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 #if 0
@@ -9747,12 +9747,12 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
 
     fn_800EE828(entry);
     if ((fn_800E3D08(resource) & 0xFF) == 0) {
-        fn_80169034(*(void**)(node + 0x10), 0);
+        psSetParticleVisibility(*(void**)(node + 0x10), 0);
     }
 }
 #endif
 /* 0x8011A0A8 | 0x1D8 */
-extern void fn_80135E44(void);
+extern void statusGetStatus(void);
 #if 1
 asm void fn_8011A0A8(void) {
 #include "src/game/gs_field_world_fn_8011A0A8.inc"
@@ -9763,7 +9763,7 @@ void fn_8011A0A8(void) {
     extern void fn_80119ED0();
     extern void fn_80119F10();
     extern void fn_8011A090();
-    extern void fn_80135E44();
+    extern void statusGetStatus();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9793,7 +9793,7 @@ void fn_8011A0A8(void) {
     r4 = r27;
     r5 = 0x0;
     r7 = 0x0;
-    fn_80135E44();
+    statusGetStatus();
     if (r3 == (u32)0x0) {
         r31 = 0x0;
     } else {
@@ -9820,7 +9820,7 @@ void fn_8011A0A8(void) {
         r4 = r29;
         r5 = 0x0;
         r7 = 0x0;
-        fn_80135E44();
+        statusGetStatus();
         if (r3 == (u32)0x0) {
             r27 = 0x0;
         } else {
@@ -9873,7 +9873,7 @@ void fn_8011A0A8(void) {
     r4 = r29;
     r5 = 0x0;
     r7 = 0x0;
-    fn_80135E44();
+    statusGetStatus();
     if (r3 == (u32)0x0) {
         r4 = 0x0;
     } else {
@@ -9902,7 +9902,7 @@ void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FA0(u8* ptr, u32 val);
     u8* base;
@@ -9915,7 +9915,7 @@ void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -9945,7 +9945,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -9965,7 +9965,7 @@ s32 fn_8011A3E4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A018(u8* ptr);
     u8* base;
@@ -9978,7 +9978,7 @@ s32 fn_8011A3E4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10007,7 +10007,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10029,7 +10029,7 @@ void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119F90(u8* ptr, u32 val);
     u8* base;
@@ -10042,7 +10042,7 @@ void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10072,7 +10072,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10092,7 +10092,7 @@ s32 fn_8011A6D4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A000(u8* ptr);
     u8* base;
@@ -10105,7 +10105,7 @@ s32 fn_8011A6D4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10134,7 +10134,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10151,7 +10151,7 @@ s32 fn_8011A860(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A078(u8* ptr);
     u8* base;
@@ -10164,7 +10164,7 @@ s32 fn_8011A860(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10193,7 +10193,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10215,7 +10215,7 @@ void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FD0(u8* ptr, u32 val);
     u8* base;
@@ -10228,7 +10228,7 @@ void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10258,7 +10258,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10283,7 +10283,7 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FC0(u8* ptr, u32 val);
     u8* base;
@@ -10296,7 +10296,7 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10326,7 +10326,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10346,7 +10346,7 @@ s32 fn_8011ACB4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A048(u8* ptr);
     u8* base;
@@ -10359,7 +10359,7 @@ s32 fn_8011ACB4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10388,7 +10388,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10405,7 +10405,7 @@ s32 fn_8011AE40(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A060(u8* ptr);
     u8* base;
@@ -10418,7 +10418,7 @@ s32 fn_8011AE40(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10447,7 +10447,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10469,7 +10469,7 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FB0(u8* ptr, u8 val);
     u8* base;
@@ -10482,7 +10482,7 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10512,7 +10512,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10532,7 +10532,7 @@ s32 fn_8011B130(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern u8 fn_8011A030(u8* ptr);
     u8* base;
@@ -10545,7 +10545,7 @@ s32 fn_8011B130(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10574,7 +10574,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10608,7 +10608,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern void fn_80119FE0(u8* ptr, u16 val);
     extern void fn_80119FF0(u8* ptr, u16 val);
     extern u8 fn_8011A030(u8* ptr);
-    extern u8* fn_80135E44(u32 a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u32 a, void* b, u32 c, u32 d, u32 e);
     u32 idx;
     u8 type;
     u32 old_count;
@@ -10621,7 +10621,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     idx = (u8)fn_80119E90(id);
     selector = fn_80119F10(id);
     span = fn_80119ED0(id);
-    elem = fn_80135E44(selector, obj, 0, span, 0);
+    elem = statusGetStatus(selector, obj, 0, span, 0);
     if (elem != NULL) {
         elem += (u16)idx << 4;
     }
@@ -10660,7 +10660,7 @@ s32 fn_8011B444(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern u8 fn_80119E50(u16 val);
     extern u16 fn_80119E10(u16 val);
@@ -10673,7 +10673,7 @@ s32 fn_8011B444(void* obj, u16 val) {
     if (val == 0) { return 1; }
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10737,7 +10737,7 @@ s32 fn_8011B67C(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     u8* base;
     u16 idx;
@@ -10746,7 +10746,7 @@ s32 fn_8011B67C(void* obj, u16 val) {
     if (val == 0) { return 0; }
     idx = fn_80119E90(val);
     base = (0, fn_80119F10(val));
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10777,7 +10777,7 @@ void fn_8011B788(void* obj, u16 id) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FF0(u8* ptr, u32 val);
     extern void fn_80119FE0(u8* ptr, u32 val);
@@ -10796,7 +10796,7 @@ void fn_8011B788(void* obj, u16 id) {
 body_start:
     idx = fn_80119E90(id);
     base = fn_80119F10(id);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10825,7 +10825,7 @@ flag_check:
 
     idx = fn_80119E90(id);
     base = fn_80119F10(id);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10879,11 +10879,11 @@ void fn_8011B950(u8* base, u16 count) {
 /* 0x8011BA0C | 0xB4 */
 extern void jumptable_8035C260();
 #if 1
-asm void fn_8011BA0C(void) {
-#include "src/game/gs_field_world_fn_8011BA0C.inc"
+asm void wazaGetWazaTypeIdName(void) {
+#include "src/game/gs_field_world_wazaGetWazaTypeIdName.inc"
 }
 #else
-void fn_8011BA0C(void) {
+void wazaGetWazaTypeIdName(void) {
     extern u8 jumptable_8035C260[];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -12458,23 +12458,23 @@ void fn_8011DE68(u8* ptr, u16 val) {
 void fn_8011DEA8(u8* ptr, void* src) {
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x44, src, 0xB);
+    GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x70 | fn_8011DEE4 | dual_memcpy_setter */
 void fn_8011DEE4(u8* ptr, void* src) {
-    extern void fn_800F9D24();
+    extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x2E, src, 0xB);
+    GScharLenCpy(ptr + 0x2E, src, 0xB);
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x44, src, 0xB);
+    GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x8011DF54 | 0x3C */
 void fn_8011DF54(u8* ptr, void* src) {
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x18, src, 0xB);
+    GScharLenCpy(ptr + 0x18, src, 0xB);
 }
 /* 0x8011E048 | 0x30 */
 u8 fn_8011E048(u8* ptr, u16 idx) {
@@ -13843,7 +13843,7 @@ void fn_8011FCA4(void) {
 /* 0x8011FDC8 | 0x504 */
 extern void fn_800F9E70(void);
 extern void fn_8010BBB8(void);
-extern void fn_8001D994(void);
+extern void menuSubGetPokemonSexForFightDisp(void);
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
@@ -13858,7 +13858,7 @@ void fn_8011FDC8(void) {
     extern f32 lbl_8047CFF4;
     extern f64 lbl_8047D008;
     extern f64 lbl_8047D010;
-    extern void fn_8001D994();
+    extern void menuSubGetPokemonSexForFightDisp();
     extern void fn_800F9E70();
     extern void fn_8010BBB8();
     extern void fn_80119ED0();
@@ -14119,7 +14119,7 @@ do {
     fn_8010BBB8();
     *(u16*)((u8*)r30 + 0x26) = r3;
     r3 = r31;
-    fn_8001D994();
+    menuSubGetPokemonSexForFightDisp();
     *(u8*)((u8*)r30 + 0x28) = r3;
     r3 = r31;
     r4 = 0x0;
@@ -15212,7 +15212,7 @@ void fn_80122040(u8* ptr, void* obj) {
 }
 #endif
 /* 0x80122370 | 0x360 */
-extern void fn_80135530(void);
+extern void gamedataAttestCheckValid(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 #if 1
 asm void fn_80122370(void) {
@@ -15226,7 +15226,7 @@ void fn_80122370(void) {
     extern void fn_8011F77C();
     extern void fn_801254B4();
     extern u32 fn_8012640C();
-    extern void fn_80135530();
+    extern void gamedataAttestCheckValid();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -15285,7 +15285,7 @@ L_80122408: ;
     r5 = 0x70;
     r6 = 0x0;
     fn_8012640C();
-    fn_80135530();
+    gamedataAttestCheckValid();
     r0 = r3 & 0xFF;
     if (r28 == (u32)r0) {
         r0 = 0x0;
@@ -15466,7 +15466,7 @@ void fn_801226D0(void) {
     extern u8 lbl_80272948[];
     extern void fn_801254B4();
     extern u32 fn_8012640C();
-    extern void fn_80135530();
+    extern void gamedataAttestCheckValid();
     u8 sp[0x50];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -15547,7 +15547,7 @@ L_801227BC: ;
     r5 = 0x70;
     r6 = 0x0;
     fn_8012640C();
-    fn_80135530();
+    gamedataAttestCheckValid();
     r0 = r3 & 0xFF;
     if (r27 == (u32)r0) {
         r0 = 0x0;
@@ -15775,7 +15775,7 @@ u32 fn_80122DDC(u8* ptr) {
 #endif
 /* 0x80122FF4 | 0x9C */
 extern void fn_80008154(void);
-extern void fn_80142CF4(void);
+extern void itemGetStatus(void);
 #if 0
 asm void fn_80122FF4(void) {
 #include "src/game/gs_field_world_fn_80122FF4.inc"
@@ -15784,18 +15784,18 @@ asm void fn_80122FF4(void) {
 u16 fn_80122FF4(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_80008154(void);
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     u16 val;
     u16 check;
     val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
     if ((u8)fn_80008154() == 1) {
-        check = (u16)fn_80142CF4(0, val, 7, 0);
+        check = (u16)itemGetStatus(0, val, 7, 0);
         if (check == 0x1a || check == 0x1e) {
             return 0x63;
         }
     }
-    return (u16)fn_80142CF4(0, val, 0xa, 0);
+    return (u16)itemGetStatus(0, val, 0xa, 0);
 }
 #endif
 /* 0x801230E0 | 0x30 */
@@ -15893,7 +15893,7 @@ void fn_801232E0(u8* ptr, u8 flag) {
 }
 #endif
 /* 0x80123368 | 0x8C */
-extern void fn_8025FF9C(void);
+extern void memoDataSet(void);
 #if 0
 asm void fn_80123368(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
@@ -15901,11 +15901,11 @@ asm void fn_80123368(void) {
 #else
 void fn_80123368(u8* ptr, u8 flag) {
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     if (ptr == NULL) { return; }
     fn_8012640C(ptr, 0, 0x6e, 0);
-    fn_8025FF9C(0, ptr);
+    memoDataSet(0, ptr);
     fn_801254B4(ptr, 0, 0x62, 0, 1);
     if ((u8)flag == 0) { return; }
     fn_801254B4(ptr, 0, 0x63, 0, 1);
@@ -15920,7 +15920,7 @@ asm void fn_801233F4(void) {
 #else
 void fn_801233F4(void) {
     extern u32 fn_8012640C();
-    extern void fn_80135530();
+    extern void gamedataAttestCheckValid();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -15972,7 +15972,7 @@ void fn_801233F4(void) {
         r5 = 0x70;
         r6 = 0x0;
         fn_8012640C();
-        fn_80135530();
+        gamedataAttestCheckValid();
         r0 = r3 & 0xFF;
         if (r31 == (u32)r0) {
             r0 = 0x0;
@@ -16478,7 +16478,7 @@ asm void fn_80123FBC(void) {
 #else
 u32 fn_80123FBC(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_80135530(u32 val);
+    extern u32 gamedataAttestCheckValid(u32 val);
     u16 val;
     u8 flag;
     if (ptr == NULL) { return 0; }
@@ -16491,7 +16491,7 @@ u32 fn_80123FBC(u8* ptr) {
         else { flag = 1; }
     }
     if ((u8)flag == 0) { return 0; }
-    if ((u8)fn_80135530(fn_8012640C(ptr, 0, 0x70, 0)) == 0) { return 0; }
+    if ((u8)gamedataAttestCheckValid(fn_8012640C(ptr, 0, 0x70, 0)) == 0) { return 0; }
     return (u8)fn_8012640C(ptr, 0, 0xb8, 0) != 1;
 }
 #endif
@@ -17683,7 +17683,7 @@ void fn_8012805C(void) {
     extern void fn_8012A5B0();
     extern void fn_801C40F0();
     extern void fn_801C41C8();
-    extern void fn_8025FF9C();
+    extern void memoDataSet();
     extern void fn_8026132C();
     u8 sp[0x300];
     u32 r0 = 0;
@@ -17816,7 +17816,7 @@ void fn_8012805C(void) {
     if ((s32)r28 != (s32)0x0) {
         r4 = (u32)sp + 0x1a4;
         r3 = 0x0;
-        fn_8025FF9C();
+        memoDataSet();
     }
     r3 = r25;
     r4 = (u32)sp + 0x1a4;
@@ -17866,7 +17866,7 @@ void fn_8012805C(void) {
     if ((s32)r28 == (s32)0x0) { r3 = 0x0; return; }
     r4 = (u32)sp + 0x6c;
     r3 = 0x0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = 0x0;
     return;
 }
@@ -18036,14 +18036,14 @@ void fn_80128300(void) {
 }
 #endif
 /* 0x80128524 | 0x1A4 */
-extern void fn_800F9EE4(void);
+extern void GScharCmp(void);
 #if 1
 asm void fn_80128524(void) {
 #include "src/game/gs_field_world_fn_80128524.inc"
 }
 #else
 void fn_80128524(void) {
-    extern void fn_800F9EE4();
+    extern void GScharCmp();
     extern void fn_800FA280();
     extern void fn_8011DEE4();
     extern void fn_8011DFF0();
@@ -18122,7 +18122,7 @@ void fn_80128524(void) {
     r0 = r3;
     r3 = r25;
     r4 = r0;
-    fn_800F9EE4();
+    GScharCmp();
     if ((s32)r3 == (s32)0x0) {
         r3 = r28;
         fn_8011E778();
@@ -18703,7 +18703,7 @@ void* fn_80128E2C(void) {
     return (void*)lbl_80408400;
 }
 /* 0x80128E38 | 0x25C */
-extern void fn_8013528C(void);
+extern void gamedataCreate(void);
 extern void fn_800F9D04(void);
 extern void fn_80135030(void);
 extern u8 lbl_8047D028[];
@@ -18727,8 +18727,8 @@ void fn_80128E38(void) {
     extern void fn_80130A88();
     extern void fn_80130BB0();
     extern void fn_80135030();
-    extern void fn_8013528C();
-    extern void fn_8025FF9C();
+    extern void gamedataCreate();
+    extern void memoDataSet();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -18768,7 +18768,7 @@ do {
         r5 = 0x3;
         r6 = 0x1;
         r7 = 0x1;
-        fn_8013528C();
+        gamedataCreate();
         break;
     }
     r3 = r31;
@@ -18776,7 +18776,7 @@ do {
     r5 = 0x3;
     r6 = 0x2;
     r7 = 0x2;
-    fn_8013528C();
+    gamedataCreate();
     break;
 L_80128EE4: ;
     r3 = r31;
@@ -18784,7 +18784,7 @@ L_80128EE4: ;
     r5 = 0x3;
     r6 = 0x3;
     r7 = 0x8;
-    fn_8013528C();
+    gamedataCreate();
 } while (0);
     r3 = r30;
     if (r30 == (u32)0x0) {
@@ -18831,13 +18831,13 @@ L_80128F20: ;
     r0 = r3;
     r3 = 0x0;
     r4 = r0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = r30;
     r4 = 0x1;
     fn_8012AC08();
     r4 = r3;
     r3 = 0x0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = r30;
     r4 = 0xc;
     r5 = 0x2710;
@@ -19269,14 +19269,14 @@ asm void fn_801298B8(void) {
 }
 #else
 s32 fn_801298B8(u8* ptr, u32 arg2) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u8* e);
     extern s32 fn_80140588(void* a, u16 b, u32 c, u16 d, u8 e);
     u16 local_c = 0;
     u16 local_a = 0;
     u8 local_8;
     void* result;
-    result = fn_80129BC8(ptr, (u8)fn_80142CF4(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
+    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
     if (result == NULL) { return -1; }
     return fn_80140588(result, local_c, arg2, local_a, local_8);
 }
@@ -19300,7 +19300,7 @@ asm void fn_801299C8(void) {
 }
 #else
 s32 fn_801299C8(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* a, u8 b, u16* c, u16* d, u8* e, u32 f);
     extern s32 fn_80140ACC(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g);
     u16 local_c = 0;
@@ -19308,7 +19308,7 @@ s32 fn_801299C8(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     u8 local_8;
     u8 tmp;
     void* result;
-    tmp = (u8)fn_80142CF4(0, arg2, 2, 0);
+    tmp = (u8)itemGetStatus(0, arg2, 2, 0);
     result = fn_80129BC8(ptr, tmp, &local_c, &local_a, &local_8, 0);
     if (result == NULL) { return -1; }
     return fn_80140ACC(result, local_c, arg2, arg3, arg4, local_a, local_8);
@@ -19321,7 +19321,7 @@ asm void fn_80129A78(void) {
 }
 #else
 s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* a, u8 b, u16* c, u16* d, u8* e, u8* f);
     extern s32 fn_80141308(void* a, u16 b, u32 c, u32 d, u32 e, u16 f, u8 g, u8 h);
     u16 local_c = 0;
@@ -19330,7 +19330,7 @@ s32 fn_80129A78(u8* ptr, u32 arg2, u32 arg3, u32 arg4) {
     u8 local_8;
     u8 tmp;
     void* result;
-    tmp = (u8)fn_80142CF4(0, arg2, 2, 0);
+    tmp = (u8)itemGetStatus(0, arg2, 2, 0);
     result = fn_80129BC8(ptr, tmp, &local_c, &local_a, &local_9, &local_8);
     if (result == NULL) { return -1; }
     return fn_80141308(result, local_c, arg2, arg3, arg4, local_a, local_9, local_8);
@@ -19343,13 +19343,13 @@ asm void fn_80129B2C(void) {
 }
 #else
 u32 fn_80129B2C(u8* ptr, u32 arg2) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u32 e);
     extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
     u16 local_a = 0;
     u16 local_8 = 0;
     void* result;
-    result = fn_80129BC8(ptr, (u8)fn_80142CF4(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
+    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
     if (result == NULL) { return 0; }
     return fn_80142368(result, local_a, arg2, 0, local_8) != 0;
 }
@@ -19464,21 +19464,21 @@ void fn_80129BC8(void) {
 #endif
 /* 0x80129D64 | 0xBC */
 #if 0
-asm void fn_80129D64(void) {
-#include "src/game/gs_field_world_fn_80129D64.inc"
+asm void heroIsMinePokemon(void) {
+#include "src/game/gs_field_world_heroIsMinePokemon.inc"
 }
 #else
-u32 fn_80129D64(u8* ptr, u8* arg2) {
+u32 heroIsMinePokemon(u8* ptr, u8* arg2) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_800F9EE4(u32 a, u32 b);
+    extern u32 GScharCmp(u32 a, u32 b);
     u32 val1, temp, val2, result2;
     val1 = fn_8012A5B0(ptr, 2, 0);
     temp = fn_8012A5B0(ptr, 1, 0);
     val2 = fn_8012640C(arg2, 0, 0x75, 0);
     result2 = fn_8012640C(arg2, 0, 0x76, 0);
     if (val1 != val2) { return 0; }
-    return fn_800F9EE4(temp, result2) == 0;
+    return GScharCmp(temp, result2) == 0;
 }
 #endif
 /* 0x80129E20 | 0x100 */
@@ -19902,7 +19902,7 @@ void fn_8012A86C(u8* ptr, s32 val) {
 void fn_8012A89C(u8* ptr, void* src) {
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0xAC2, src, 0xB);
+    GScharLenCpy(ptr + 0xAC2, src, 0xB);
 }
 /* 0x8012A8D4 | 24 bytes | nc_addi_ptr */
 void* fn_8012A8D4(void* ptr) {
@@ -19913,7 +19913,7 @@ void* fn_8012A8D4(void* ptr) {
 void fn_8012AA64(void* dst, void* src) {
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(dst, src, 0xB);
+    GScharLenCpy(dst, src, 0xB);
 }
 /* 0x8012AA9C | 0x34 */
 void* fn_8012AA9C(u8* ptr, u16 idx) {
@@ -21061,11 +21061,11 @@ void fn_8012BAD0(u32 a, u32 b, u32 c, u32 d, u32 e) {
 }
 /* 0x8012BAF0 | 0xB8 */
 #if 0
-asm void fn_8012BAF0(void) {
-#include "src/game/gs_field_world_fn_8012BAF0.inc"
+asm void heroMoveSetEventList(void) {
+#include "src/game/gs_field_world_heroMoveSetEventList.inc"
 }
 #else
-void fn_8012BAF0(u8 type, void* src, u32 val) {
+void heroMoveSetEventList(u8 type, void* src, u32 val) {
     extern u8 lbl_80426BD0[];
     switch (type) {
         case 1:
@@ -21228,13 +21228,13 @@ void fn_8012BCA4(void) {
 #endif
 /* 0x8012BDE0 | 0xD4 */
 #if 0
-asm void fn_8012BDE0(void) {
-#include "src/game/gs_field_world_fn_8012BDE0.inc"
+asm void heroMoveAddStepCallback(void) {
+#include "src/game/gs_field_world_heroMoveAddStepCallback.inc"
 }
 #else
 #pragma push
 #pragma optimization_level 1
-u32 fn_8012BDE0(u32 r3, u32 r4) {
+u32 heroMoveAddStepCallback(u32 r3, u32 r4) {
     u32 r0 = 0;
     u32 r5 = 0;
     u32 r6 = 0;
@@ -21449,8 +21449,8 @@ void fn_8012BEB4(void) {
 extern void fn_8018CD08(void);
 extern void fn_8018FCBC(void);
 extern void fn_8018FC50(void);
-extern void fn_800CE148(void);
-extern void fn_800CDBE0(void);
+extern void sin(void);
+extern void cos(void);
 extern void fn_80111B9C(void);
 extern void fn_8018790C(void);
 extern void fn_800F7D38(void);
@@ -21486,8 +21486,8 @@ void fn_8012C0B4(void) {
     extern f32 lbl_8047D07C;
     extern f32 lbl_8047D080;
     extern void fn_800A3A78();
-    extern void fn_800CDBE0();
-    extern void fn_800CE148();
+    extern void cos();
+    extern void sin();
     extern void fn_800F7434();
     extern void fn_800F7C8C();
     extern void fn_800F7D38();
@@ -21578,7 +21578,7 @@ void fn_8012C0B4(void) {
             *(u32*)(sp + 0x40) = r0;
             *(f32*)(sp + 0x3C) = f0;
             f1 = *(f32*)((u8*)r3 + 0x4);
-            fn_800CE148();
+            sin();
             f2 = (f32)f1;
             f1 = lbl_8047D07C;
             f0 = lbl_8047D038;
@@ -21586,7 +21586,7 @@ void fn_8012C0B4(void) {
             *(f32*)(sp + 0x48) = f0;
             *(f32*)(sp + 0x44) = f1;
             f1 = *(f32*)((u8*)r24 + 0x4);
-            fn_800CDBE0();
+            cos();
             f1 = (f32)f1;
             f0 = lbl_8047D07C;
             r4 = (u32)sp + 0x44;
@@ -21825,8 +21825,8 @@ void fn_8012C540(void) {
     extern f32 lbl_8047D078;
     extern f32 lbl_8047D07C;
     extern void fn_800A3A78();
-    extern void fn_800CDBE0();
-    extern void fn_800CE148();
+    extern void cos();
+    extern void sin();
     extern void fn_80111B9C();
     extern void fn_8018D928();
     extern void fn_8018D998();
@@ -21875,7 +21875,7 @@ void fn_8012C540(void) {
         *(u32*)(sp + 0x24) = r0;
         *(f32*)(sp + 0x20) = f0;
         f1 = *(f32*)((u8*)r3 + 0x4);
-        fn_800CE148();
+        sin();
         f2 = (f32)f1;
         f1 = lbl_8047D07C;
         f0 = lbl_8047D038;
@@ -21883,7 +21883,7 @@ void fn_8012C540(void) {
         *(f32*)(sp + 0x14) = f0;
         *(f32*)(sp + 0x10) = f1;
         f1 = *(f32*)((u8*)r31 + 0x4);
-        fn_800CDBE0();
+        cos();
         f1 = (f32)f1;
         f0 = lbl_8047D07C;
         r4 = (u32)sp + 0x10;
@@ -23448,7 +23448,7 @@ void fn_8012E388(void) {
     extern f32 lbl_8047D0C0;
     extern f32 lbl_8047D0C4;
     extern f64 lbl_8047D0C8;
-    extern void fn_800CE148();
+    extern void sin();
     extern void fn_800F7A08();
     extern void fn_800F7A7C();
     extern void fn_800F7BC4();
@@ -23699,7 +23699,7 @@ void fn_8012E388(void) {
                 }
                 f0 = lbl_8047D0C0;
                 f1 = f1 / f0;
-                fn_800CE148();
+                sin();
                 f1 = (f32)f1;
                 f0 = lbl_8047D0BC;
                 f2 = f0 * f1;
@@ -24768,8 +24768,8 @@ void fn_8012F610(void) {
     extern f32 lbl_8047D07C;
     extern f32 lbl_8047D0AC;
     extern f32 lbl_8047D0D8;
-    extern void fn_800CDBE0();
-    extern void fn_800CE148();
+    extern void cos();
+    extern void sin();
     extern void fn_800E3D6C();
     extern void fn_800E3D98();
     extern void fn_800E4170();
@@ -24846,10 +24846,10 @@ void fn_8012F610(void) {
         r4 = (u32)sp + 0x50;
         fn_800E3D6C();
         f1 = *(f32*)(sp + 0x54);
-        fn_800CE148();
+        sin();
         f31 = (f32)f1;
         f1 = *(f32*)(sp + 0x54);
-        fn_800CDBE0();
+        cos();
         f1 = (f32)f1;
         f0 = *(f32*)(sp + 0x48);
         r3 = (u32)&lbl_80426BD0;
@@ -25954,58 +25954,58 @@ void fn_8013024C(void) {
 }
 #endif
 /* 0x80130660 | 0x110 */
-extern void fn_80135938(void);
-extern void fn_801353C0(void);
+extern void gamedataGetStatus(void);
+extern void gamedataAttestCreate(void);
 #if 0
 asm void fn_80130660(void) {
 #include "src/game/gs_field_world_fn_80130660.inc"
 }
 #else
 void fn_80130660(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x9, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
     fn_801240C4(buf, 0xfb, 0xa, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0xa, 4, 1, 0x7991, fn_800FA280(0x12af));
     tmp = fn_80124410(buf, -1, -1, 0, 0x7991);
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
 /* 0x80130770 | 0x120 */
 #if 0
-asm void fn_80130770(void) {
-#include "src/game/gs_field_world_fn_80130770.inc"
+asm void heroPokemonGetPikachu(void) {
+#include "src/game/gs_field_world_heroPokemonGetPikachu.inc"
 }
 #else
-void fn_80130770(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+void heroPokemonGetPikachu(u8* arg1) {
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     extern u16 fn_80123110(u8* a, u32 b, u8 c);
     u32 temp;
@@ -26013,9 +26013,9 @@ void fn_80130770(u8* arg1) {
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x9, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
     fn_801240C4(buf, 0x19, 0xa, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0xa, 4, 0, 0x7991, fn_800FA280(0x12ae));
@@ -26023,7 +26023,7 @@ void fn_80130770(u8* arg1) {
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_80123110(buf, 0xca, 1);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
@@ -26034,60 +26034,60 @@ asm void fn_80130890(void) {
 }
 #else
 void fn_80130890(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x8, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x8, 3, r30_u8, r31);
     fn_801240C4(buf, 0xfa, 0x46, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0x46, 4, 0, 0x2740, fn_800FA280(0x12ad));
     tmp = fn_80124410(buf, -1, -1, 0, 0x2740);
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
 /* 0x801309A0 | 0xE8 */
 #if 0
-asm void fn_801309A0(void) {
-#include "src/game/gs_field_world_fn_801309A0.inc"
+asm void heroPokemonGetPrasle(void) {
+#include "src/game/gs_field_world_heroPokemonGetPrasle.inc"
 }
 #else
-void fn_801309A0(u32 arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
+void heroPokemonGetPrasle(u32 arg1) {
+    extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern void fn_80129E20(u32 a, u8* b, u32 c);
     u8 local[0x144];
     u32 tmp;
-    fn_801240C4(local, 0x161, 0xd, fn_80135938(0, 1));
+    fn_801240C4(local, 0x161, 0xd, gamedataGetStatus(0, 1));
     fn_801254B4(local, 0, 0x99, 0, 0x46);
     tmp = fn_800FA280(0x12ac);
     fn_80123EF0(local, 0xfe, 0xd, 4, 0, 0x911D, tmp);
     tmp = fn_80124410(local, -1, -1, 0, 0x911D);
     fn_801254B4(local, 0, 0x6f, 0, tmp);
     fn_8012546C(local);
-    fn_8025FF9C(0, local);
+    memoDataSet(0, local);
     fn_80129E20(arg1, local, 1);
 }
 #endif
@@ -26099,7 +26099,7 @@ asm void fn_80130A88(void) {
 #else
 void fn_80130A88(u32 arg1) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
-    extern u32 fn_80135938(u32 a, u32 b);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_80123D58(u8* a, u32 b, u32 c);
     extern u32 fn_80124410(u8* a, u32 b, s32 c, u32 d, u32 e);
@@ -26109,7 +26109,7 @@ void fn_80130A88(u32 arg1) {
     u8 buf[0x140];
     u32 val, tmp;
     val = fn_8012A5B0((u8*)arg1, 2, 0);
-    fn_801240C4(buf, 0xc4, 0x19, fn_80135938(0, 1));
+    fn_801240C4(buf, 0xc4, 0x19, gamedataGetStatus(0, 1));
     fn_80123D58(buf, 0, 0x5d);
     fn_80123D58(buf, 1, 0xd8);
     fn_80123D58(buf, 2, 0x73);
@@ -26130,7 +26130,7 @@ asm void fn_80130BB0(void) {
 #else
 void fn_80130BB0(u32 arg1) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
-    extern u32 fn_80135938(u32 a, u32 b);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_80123D58(u8* a, u32 b, u32 c);
     extern u32 fn_80124410(u8* a, u32 b, s32 c, u32 d, u32 e);
@@ -26140,7 +26140,7 @@ void fn_80130BB0(u32 arg1) {
     u8 buf[0x140];
     u32 val, tmp;
     val = fn_8012A5B0((u8*)arg1, 2, 0);
-    fn_801240C4(buf, 0xc5, 0x1a, fn_80135938(0, 1));
+    fn_801240C4(buf, 0xc5, 0x1a, gamedataGetStatus(0, 1));
     fn_80123D58(buf, 0, 0x2c);
     fn_80123D58(buf, 1, 0x122);
     fn_80123D58(buf, 2, 0x10d);
@@ -26258,7 +26258,7 @@ u32 fn_80115124(void* ptr) {
 }
 #pragma pop
 #endif
-extern void fn_800FC2A8();
+extern void GSmsgFontClose();
 #if 0
 asm void fn_80115170(void) {
 #include "src/game/gs_field_world_fn_80115170.inc"
@@ -26271,7 +26271,7 @@ u32 fn_80115170(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
-    fn_800FC2A8(ptr);
+    GSmsgFontClose(ptr);
     return 1;
 }
 #pragma pop
@@ -26689,11 +26689,11 @@ extern u32 lbl_80478EB8;
 extern u8 lbl_8035BB70[];
 extern u32 lbl_80478EBC;
 #if 0
-asm void fn_80115E04(void) {
-#include "src/game/gs_field_world_fn_80115E04.inc"
+asm void floorEventChangeTresure(void) {
+#include "src/game/gs_field_world_floorEventChangeTresure.inc"
 }
 #else
-s32 fn_80115E04(u32 index, u16 val, u8 byte) {
+s32 floorEventChangeTresure(u32 index, u16 val, u8 byte) {
     extern u32 lbl_80478EB8;
     extern u32 lbl_80478EBC;
     extern u8 lbl_8035BB70[];
@@ -27576,11 +27576,11 @@ asm void fn_80123090(void) {
 #else
 #pragma optimization_level 4
 u16 fn_80123090(u8* ptr) {
-    extern u32 fn_80142CF4(u32 a, u16 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u16 b, u32 c, u32 d);
     u16 val;
     val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
-    return (u16)fn_80142CF4(0, val, 7, 0);
+    return (u16)itemGetStatus(0, val, 7, 0);
 }
 #endif
 #if 0
@@ -27614,7 +27614,7 @@ void fn_80124978(u8* ptr, u32 arg2) {
     fn_801254B4(ptr, 0, 0xb7, 0, (u8)arg2);
 }
 #endif
-extern void fn_80135708(void);
+extern void gamedataAttestInit(void);
 #if 0
 asm void fn_80124A60(void) {
 #include "src/game/gs_field_world_fn_80124A60.inc"
@@ -27624,7 +27624,7 @@ void fn_80124A60(u8* ptr) {
     extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
     extern void fn_8011B950(u32 base, u16 count);
-    extern void fn_80135708(u32 val);
+    extern void gamedataAttestInit(u32 val);
     extern void fn_8011D480(u8* ptr, u8 val);
     u32 i;
     u16 local;
@@ -27638,7 +27638,7 @@ void fn_80124A60(u8* ptr) {
     fn_8011B950(fn_8012640C(ptr, 0, 0xc8, 0), 1);
     fn_801254B4(ptr, 0, 0x6e, 0, 0);
     fn_801254B4(ptr, 0, 0x6f, 0, 0);
-    fn_80135708(fn_8012640C(ptr, 0, 0x70, 0));
+    gamedataAttestInit(fn_8012640C(ptr, 0, 0x70, 0));
     if (ptr != NULL) {
         fn_801254B4(ptr, 0, 0x71, 0, 0);
         fn_801254B4(ptr, 0, 0x72, 0, 0);
@@ -27894,9 +27894,9 @@ asm void fn_8012A130(void) {
 #else
 u32 fn_8012A130(u8* ptr) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern s32 fn_800F9EE4(u32 val, u16* out);
+    extern s32 GScharCmp(u32 val, u16* out);
     u16 local = 0;
-    if (fn_800F9EE4(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
+    if (GScharCmp(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
     return fn_8012A5B0(ptr, 0xb, 0) != 2;
 }
 #endif

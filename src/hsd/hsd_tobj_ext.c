@@ -137,7 +137,7 @@ void fn_801BBD60(void* obj) {
  * HSD_TObjSetImageDesc - 0x801BBD84 | Size: 0x58
  * Set the image descriptor for a TObj, marking it dirty.
  */
-void fn_801BBD84(HSD_TObj* tobj, HSD_ImageDesc* imagedesc) {
+void HSD_ImageDescAlloc(HSD_TObj* tobj, HSD_ImageDesc* imagedesc) {
     if (tobj == NULL) {
         return;
     }
@@ -198,7 +198,7 @@ u32 fn_801BBED4(HSD_TObj* tobj) {
  * HSD_TObjSetFlags - 0x801BBF28 | Size: 0xBC
  * Set texture flags with validation.
  */
-void fn_801BBF28(HSD_TObj* tobj, u32 flags) {
+void HSD_Index2TexMtx(HSD_TObj* tobj, u32 flags) {
     u32 colormap;
     u32 alphamap;
 
@@ -575,7 +575,7 @@ void fn_801BEEDC(HSD_TObj* tobj, void* texobj) {
  * HSD_RenderPassInit - 0x801BF098 | Size: 0xA0
  * Initialize render pass state.
  */
-void fn_801BF098(void* state, u32 num_passes) {
+void HSD_Index2PosNrmMtx(void* state, u32 num_passes) {
     if (state == NULL) {
         return;
     }

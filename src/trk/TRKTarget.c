@@ -10,12 +10,12 @@
 
 extern void MWTRACE(s32 level, const char* fmt, ...);
 extern void fn_800BE464(void* event, s32 type);
-extern s32  fn_800BE47C(void* event);
+extern s32  TRKPostEvent(void* event);
 extern s32  fn_800C0CD8(s32 event);
-extern s32  fn_800C07A4(u32 addr, u8 type, u32 count, void* result);
-extern s32  fn_800C06BC(u32 addr, void* result);
-extern s32  fn_800C05AC(u32 addr, void* data, u8 type, void* result, void* length);
-extern s32  fn_800C0AA0(u32 addr, u32 count, void* buf, void* result, u32 flags, u32 isD1, u32 step);
+extern s32  HandleOpenFileSupportRequest(u32 addr, u8 type, u32 count, void* result);
+extern s32  HandleCloseFileSupportRequest(u32 addr, void* result);
+extern s32  HandlePositionFileSupportRequest(u32 addr, void* data, u8 type, void* result, void* length);
+extern s32  TRKSuppAccessFile(u32 addr, u32 count, void* buf, void* result, u32 flags, u32 isD1, u32 step);
 extern void fn_800C0D70(u32 addr, u32 size);
 extern s32  fn_800C25B0(u8* buf, u32 pc);
 
@@ -88,7 +88,7 @@ void TRKTargetSupportRequest(void) {
         reason != 0xD3 && reason != 0xD4) {
         u8 eventBuf[0x10];
         fn_800BE464((void*)eventBuf, 4);
-        fn_800BE47C((void*)eventBuf);
+        TRKPostEvent((void*)eventBuf);
         return;
     }
 
@@ -99,7 +99,7 @@ void TRKTargetSupportRequest(void) {
         u32 count = *(u32*)&cpuState[0x18]; /* GPR6 = count */
         u32 resultCode = 0;
 
-        err = fn_800C07A4(addr, type, count, &resultCode);
+        err = HandleOpenFileSupportRequest(addr, type, count, &resultCode);
 
         if (resultCode == 0 && err != 0) {
             resultCode = 1;
@@ -110,7 +110,7 @@ void TRKTargetSupportRequest(void) {
         u32 addr = *(u32*)&cpuState[0x10]; /* GPR4 = filename addr */
         u32 resultCode = 0;
 
-        err = fn_800C06BC(addr, &resultCode);
+        err = HandleCloseFileSupportRequest(addr, &resultCode);
 
         if (resultCode == 0 && err != 0) {
             resultCode = 1;
@@ -125,7 +125,7 @@ void TRKTargetSupportRequest(void) {
         u8  type = (u8)count;
         u32 resultCode = 0;
 
-        err = fn_800C05AC(addr, &data, type, &resultCode, &data);
+        err = HandlePositionFileSupportRequest(addr, &data, type, &resultCode, &data);
 
         if (resultCode == 0 && err != 0) {
             resultCode = 1;
@@ -140,7 +140,7 @@ void TRKTargetSupportRequest(void) {
         u32 isD1 = (reason == 0xD1) ? 1 : 0;
         u32 resultCode = 0;
 
-        err = fn_800C0AA0(addr, count, (void*)buf, &resultCode, (u32)*buf, isD1, 1);
+        err = TRKSuppAccessFile(addr, count, (void*)buf, &resultCode, (u32)*buf, isD1, 1);
 
         if (resultCode == 0 && err != 0) {
             resultCode = 1;
@@ -302,7 +302,7 @@ void TRKPostInterruptEvent(void) {
         }
 
         fn_800BE464((void*)eventBuf, eventType);
-        fn_800BE47C((void*)eventBuf);
+        TRKPostEvent((void*)eventBuf);
     }
 }
 
