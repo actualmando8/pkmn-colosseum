@@ -7062,9 +7062,20 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
     memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
     memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
 
-    if (!PCPort_LoadFsysSceneMember(archivePath, &memberData, &memberSize)) {
-        fprintf(stderr, "[field] no scene_data member in %s\n", archivePath);
-        return 0;
+    /* PCPORT_FIELD_MEMBER loads a specific named member (e.g. a people_archive
+     * character model) instead of the auto-selected largest scene_data member. */
+    {
+        const char* fm = getenv("PCPORT_FIELD_MEMBER");
+        BOOL loaded;
+        if (fm != NULL && fm[0] != '\0') {
+            loaded = PCPort_LoadFsysMember(archivePath, fm, &memberData, &memberSize);
+        } else {
+            loaded = PCPort_LoadFsysSceneMember(archivePath, &memberData, &memberSize);
+        }
+        if (!loaded) {
+            fprintf(stderr, "[field] no scene_data member in %s\n", archivePath);
+            return 0;
+        }
     }
     if (!PCPort_HSDArchiveParseBE(&g_engTitleArchive, memberData, memberSize)) {
         fprintf(stderr, "[field] archive parse failed (%s)\n", archivePath);
