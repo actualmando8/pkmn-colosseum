@@ -954,26 +954,55 @@ found:
 }
 #pragma pop
 #endif
+static inline u8* PADInput_FindPad(s32 padId) {
+    extern u8 lbl_80401C10[];
+    u8* pad = &lbl_80401C10[0];
+    u8* nul = NULL;
+    if (*(s32*)pad == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    if (*(s32*)(pad += 0x6c) == padId) return pad;
+    return nul;
+}
+/* NOTE: asm-active (#if 1). The C below is correct & equivalent but does NOT
+ * byte-match: CW 1.3 folds the not-found sentinel to `li r5,0` at the miss,
+ * while the target keeps it in r6 (`li r6,0` early + `mr r5,r6`). Confirmed
+ * W1 reg-alloc wall — see WALLS.md. lwzu in-place increment and a separate
+ * sentinel register are mutually exclusive in this allocator. */
 #if 1
 asm void fn_800F7DE4(void) {
 #include "src/game/input/input_fn_800F7DE4.inc"
 }
 #else
-void fn_800F7DE4(void) { /* TODO */ }
+void fn_800F7DE4(s32 padId, u32 val) {
+    u8* pad = PADInput_FindPad(padId);
+    if (pad == NULL) return;
+    *(u32*)(pad + 0x14) = val;
+}
 #endif
+/* asm-active W1 wall (same class as fn_800F7DE4); equivalent C staged below. */
 #if 1
 asm void fn_800F7E40(void) {
 #include "src/game/input/input_fn_800F7E40.inc"
 }
 #else
-void fn_800F7E40(void) { /* TODO */ }
+void fn_800F7E40(s32 padId, u8 val) {
+    u8* pad = PADInput_FindPad(padId);
+    if (pad == NULL) return;
+    *(u8*)(pad + 0x10) = val;
+}
 #endif
+/* asm-active W1 wall (same class as fn_800F7DE4); equivalent C staged below. */
 #if 1
 asm void fn_800F7E9C(void) {
 #include "src/game/input/input_fn_800F7E9C.inc"
 }
 #else
-void fn_800F7E9C(void) { /* TODO */ }
+void fn_800F7E9C(s32 padId, u32 val) {
+    u8* pad = PADInput_FindPad(padId);
+    if (pad == NULL) return;
+    *(u32*)(pad + 0x8) = val;
+}
 #endif
 #if 1
 asm void fn_800F7EF8(void) {

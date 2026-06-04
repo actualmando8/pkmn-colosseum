@@ -960,7 +960,22 @@ asm void fn_80161D20(void) {
 #include "src/game/people/people_field_fn_80161D20.inc"
 }
 #else
-void fn_80161D20(void) { /* TODO */ }
+/* W6: 99.64% — only residual is anonymous @174@ha/l vs named jumptable_80369CB0@ha/l (not C-controllable). */
+u32 fn_80161D20(u32 r3) {
+    u32 key = r3 & 0xFF;
+    switch (key) {
+    case 0x80: return 0x80;
+    case 0x81: return 0x82;
+    case 0x82: return 0xa0;
+    case 0x83: return 0xa1;
+    case 0x84: return 0x83;
+    case 0x85: return 0x84;
+    case 0x86: return 0xa2;
+    case 0x87: return 0xa3;
+    case 0x88: return 0xa4;
+    default:   return r3;
+    }
+}
 #endif
 #pragma pop
 extern void fn_80160BDC(void);
