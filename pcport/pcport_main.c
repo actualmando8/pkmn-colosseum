@@ -6609,9 +6609,10 @@ static int RunMenuScene(GLFWwindow* window) {
                     f32 bandH = cloudBandH;
                     f32 feat = 70.0f;            /* long fade into the warm-tan horizon */
                     f32 vMid;
-                    /* Slightly translucent so the 3D sky's blue reads through (softer,
-                     * matches the game's hazier sky than a hard texture replace). */
-                    u8 aMain = 232;
+                    /* Opaque upper band so the translucent 3D haze planes (which
+                     * extend up into the sky region) don't show through as vertical
+                     * seams. The lower feather strip still fades into the desert. */
+                    u8 aMain = 255;
                     if (feat > bandH) { feat = bandH; }
                     vMid = (bandH - feat) / bandH;
                     DrawTexturedScreenRectA(&cloudTex, 0.0f, 0.0f, 640.0f, bandH - feat,
