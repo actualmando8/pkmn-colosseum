@@ -1341,11 +1341,14 @@ void fn_800F0424(GSThread* thr) {
     *(u8*)&lbl_8047AC0C = 1;
 }
 #endif
-void fn_800F0438(void) { /* TODO */ }
+void fn_800F0438(u8* p) {
+    p[0x9] = 1;
+    *(u8*)&lbl_8047AC0C = 1;
+}
 void fn_800F0448(void) { /* TODO */ }
 void fn_800F0470(void) { /* TODO */ }
 void fn_800F0494(void) { /* TODO */ }
-void fn_800F04BC(void) { /* TODO */ }
+u8 fn_800F04BC(u8* p) { return p[0x14]; }
 void fn_800F04C4(void) { /* TODO */ }
 void fn_800F05A0(void) { /* TODO */ }
 void fn_800F0654(void) { /* TODO */ }

@@ -524,6 +524,9 @@ void fn_801C2Be0(void* ctx, s32 arg1) {
  * Address: 0x801C2D54 | Size: 0x8
  * Referenced by battle_main.c as battle grid tick 1.
  */
+extern u8 lbl_8047B398;
+extern u8 lbl_8047B399;
+
 void fn_801C2D54(void) {
     /* No-op tick callback */
 }
@@ -542,7 +545,7 @@ void fn_801C2D5C(void) {
  * Referenced by battle_main.c as battle grid tick 2.
  */
 void fn_801C2D68(void) {
-    /* Tick callback 2 -- calls internal update */
+    lbl_8047B399 = 1;
 }
 
 /**
@@ -550,7 +553,7 @@ void fn_801C2D68(void) {
  * Address: 0x801C2D74 | Size: 0xC
  */
 void fn_801C2D74(void) {
-    /* Tick callback 3 */
+    lbl_8047B398 = 1;
 }
 
 /**
