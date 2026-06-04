@@ -6356,24 +6356,27 @@ static int RunMenuScene(GLFWwindow* window) {
         padPressed = (u16)(padHeld & ~padPrev);
         padPrev = padHeld;
 
-        if (sceneState == PCPORT_SCENE_TITLE) {
-            /* Idle cast cycling: advance to the next set every titleCycleSecs of
-             * no input (like the real attract title). Any input resets the timer;
-             * PCPORT_TITLE_SET pins a set for headless capture. */
+        /* Cast cycling: advance to the next set every titleCycleSecs, CONTINUOUSLY
+         * (like the real attract title) -- NOT gated on idle/input. The previous
+         * "reset on any input" made the cast appear stuck whenever input arrived
+         * each frame, and only the menu round-trip (which froze the timer) ever
+         * advanced it. Runs every frame regardless of scene state; only rendered on
+         * the title. PCPORT_TITLE_SET pins a set for headless capture. */
+        {
             double nowT = glfwGetTime();
             if (titleCycleStart == 0.0) {
                 titleCycleStart = nowT;
             }
-            if (padPressed != 0) {
-                titleCycleStart = nowT;
-            } else if (titleSetForced < 0 &&
-                       (nowT - titleCycleStart) >= titleCycleSecs) {
+            if (titleSetForced < 0 && (nowT - titleCycleStart) >= titleCycleSecs) {
                 titleSetIndex = (titleSetIndex + 1) % PCPORT_TITLE_NUM_SETS;
                 titleCycleStart = nowT;
                 printf("[pcport_bootstrap] title cast -> set %d (%s)\n",
                        titleSetIndex, kTitleSets[titleSetIndex].name);
             }
+        }
 
+        if (sceneState == PCPORT_SCENE_TITLE) {
+            double nowT = glfwGetTime();
             /* Attract loop: after a longer idle (no input) on the title, play the
              * opening-demo movie, then return to the title -- this is where the
              * real game shows the demo (NOT during boot). PCPORT_NO_ATTRACT off,
