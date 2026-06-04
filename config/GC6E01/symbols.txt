@@ -1520,7 +1520,7 @@ __OSInterruptInit = .text:0x8009DFB8; // type:function size:0x74 scope:global
 SetInterruptMask = .text:0x8009E02C; // type:function size:0x2D8  // XD-struct MED n=182
 __OSMaskInterrupts = .text:0x8009E304; // type:function size:0x88 scope:global
 __OSUnmaskInterrupts = .text:0x8009E38C; // type:function size:0x88 scope:global
-__OSDispatchInterrupt = .text:0x8009E414; // type:function size:0x344  // XD-struct MED n=209
+fn_8009E414 = .text:0x8009E414; // type:function size:0x344
 ExternalInterruptHandler = .text:0x8009E758; // type:function size:0x50 scope:local
 fn_8009E7A8 = .text:0x8009E7A8; // type:function size:0x4
 fn_8009E7AC = .text:0x8009E7AC; // type:function size:0x4
@@ -1589,27 +1589,27 @@ OSDisableScheduler = .text:0x800A1404; // type:function size:0x40 scope:global
 OSEnableScheduler = .text:0x800A1444; // type:function size:0x40 scope:global
 fn_800A1484 = .text:0x800A1484; // type:function size:0x68
 fn_800A14EC = .text:0x800A14EC; // type:function size:0x3C
-SetEffectivePriority = .text:0x800A1528; // type:function size:0x1C0  // XD-struct MED n=112
+fn_800A1528 = .text:0x800A1528; // type:function size:0x1C0
 fn_800A16E8 = .text:0x800A16E8; // type:function size:0x50
 SelectThread = .text:0x800A1738; // type:function size:0x228 scope:local
 __OSReschedule = .text:0x800A1960; // type:function size:0x30 scope:global
 fn_800A1990 = .text:0x800A1990; // type:function size:0x3C
-OSCreateThread = .text:0x800A19CC; // type:function size:0x1E8  // XD-struct MED n=122
-OSExitThread = .text:0x800A1BB4; // type:function size:0xE4  // XD-struct MED n=57
+fn_800A19CC = .text:0x800A19CC; // type:function size:0x1E8
+fn_800A1BB4 = .text:0x800A1BB4; // type:function size:0xE4
 OSCancelThread = .text:0x800A1C98; // type:function size:0x1BC scope:global
 fn_800A1E54 = .text:0x800A1E54; // type:function size:0x140
-OSResumeThread = .text:0x800A1F94; // type:function size:0x288  // XD-struct MED n=162
-OSSuspendThread = .text:0x800A221C; // type:function size:0x170  // XD-struct MED n=92
-OSSleepThread = .text:0x800A238C; // type:function size:0xEC  // XD-struct MED n=59
-OSWakeupThread = .text:0x800A2478; // type:function size:0x104  // XD-struct MED n=65
+fn_800A1F94 = .text:0x800A1F94; // type:function size:0x288
+fn_800A221C = .text:0x800A221C; // type:function size:0x170
+fn_800A238C = .text:0x800A238C; // type:function size:0xEC
+fn_800A2478 = .text:0x800A2478; // type:function size:0x104
 fn_800A257C = .text:0x800A257C; // type:function size:0xC0
 fn_800A263C = .text:0x800A263C; // type:function size:0x90
 OSClearStack = .text:0x800A26CC; // type:function size:0xAC scope:global
 OSGetTime = .text:0x800A2778; // type:function size:0x18 scope:global
 OSGetTick = .text:0x800A2790; // type:function size:0x8 scope:global
 __OSGetSystemTime = .text:0x800A2798; // type:function size:0x64 scope:global
-GetDates = .text:0x800A27FC; // type:function size:0x19C  // XD-struct MED n=103
-OSTicksToCalendarTime = .text:0x800A2998; // type:function size:0x204  // XD-struct MED n=129
+fn_800A27FC = .text:0x800A27FC; // type:function size:0x19C
+fn_800A2998 = .text:0x800A2998; // type:function size:0x204
 __init_user = .text:0x800A2B9C; // type:function size:0x20 scope:global
 __init_cpp = .text:0x800A2BBC; // type:function size:0x54 scope:local
 _ExitProcess = .text:0x800A2C10; // type:function size:0x20 scope:global
@@ -1660,12 +1660,12 @@ __DVDInitWA = .text:0x800A3EB0; // type:function size:0x40 scope:weak
 __DVDInterruptHandler = .text:0x800A3EF0; // type:function size:0x2E0 scope:weak
 fn_800A41D0 = .text:0x800A41D0; // type:function size:0x84
 AlarmHandlerForTimeout = .text:0x800A4254; // type:function size:0x70 scope:local
-Read = .text:0x800A42C4; // type:function size:0x110  // XD-struct MED n=68
+fn_800A42C4 = .text:0x800A42C4; // type:function size:0x110
 fn_800A43D4 = .text:0x800A43D4; // type:function size:0x80
-DVDLowRead = .text:0x800A4454; // type:function size:0x298  // XD-struct MED n=166
+fn_800A4454 = .text:0x800A4454; // type:function size:0x298
 fn_800A46EC = .text:0x800A46EC; // type:function size:0x94
 DVDLowWaitCoverClose = .text:0x800A4780; // type:function size:0x2C scope:weak
-DVDLowReadDiskID = .text:0x800A47AC; // type:function size:0xA4  // XD-struct MED n=41
+fn_800A47AC = .text:0x800A47AC; // type:function size:0xA4
 DVDLowStopMotor = .text:0x800A4850; // type:function size:0x8C scope:weak
 fn_800A48DC = .text:0x800A48DC; // type:function size:0x8C
 fn_800A4968 = .text:0x800A4968; // type:function size:0x9C
@@ -1677,11 +1677,11 @@ fn_800A4C80 = .text:0x800A4C80; // type:function size:0x14
 fn_800A4C94 = .text:0x800A4C94; // type:function size:0x18
 __DVDLowSetWAType = .text:0x800A4CAC; // type:function size:0x44 scope:global
 __DVDFSInit = .text:0x800A4CF0; // type:function size:0x38 scope:global
-DVDConvertPathToEntrynum = .text:0x800A4D28; // type:function size:0x2F4  // XD-struct HIGH n=189
-DVDOpen = .text:0x800A501C; // type:function size:0xC8  // XD-struct HIGH n=50
+fn_800A4D28 = .text:0x800A4D28; // type:function size:0x2F4
+fn_800A501C = .text:0x800A501C; // type:function size:0xC8
 fn_800A50E4 = .text:0x800A50E4; // type:function size:0x24
-entryToPath = .text:0x800A5108; // type:function size:0x160  // XD-struct MED n=88
-DVDGetCurrentDir = .text:0x800A5268; // type:function size:0xC4  // XD-struct MED n=49
+fn_800A5108 = .text:0x800A5108; // type:function size:0x160
+fn_800A5268 = .text:0x800A5268; // type:function size:0xC4
 fn_800A532C = .text:0x800A532C; // type:function size:0xC0
 fn_800A53EC = .text:0x800A53EC; // type:function size:0x30
 fn_800A541C = .text:0x800A541C; // type:function size:0x118
@@ -2107,19 +2107,19 @@ TRKNubWelcome = .text:0x800BE668; // type:function size:0x28 scope:global
 TRKTerminateNub = .text:0x800BE690; // type:function size:0x24 scope:global
 TRKInitializeNub = .text:0x800BE6B4; // type:function size:0x14C scope:global
 MessageSend = .text:0x800BE800; // type:function size:0x44
-TRKReadBuffer_ui32 = .text:0x800BE844; // type:function size:0xF0  // XD-struct MED n=60
+fn_800BE844 = .text:0x800BE844; // type:function size:0xF0
 fn_800BE934 = .text:0x800BE934; // type:function size:0x98
-TRKReadBuffer1_ui64 = .text:0x800BE9CC; // type:function size:0xE8  // XD-struct MED n=58
-TRKAppendBuffer_ui32 = .text:0x800BEAB4; // type:function size:0xFC  // XD-struct MED n=63
+fn_800BE9CC = .text:0x800BE9CC; // type:function size:0xE8
+fn_800BEAB4 = .text:0x800BEAB4; // type:function size:0xFC
 fn_800BEBB0 = .text:0x800BEBB0; // type:function size:0x68
-TRKAppendBuffer1_ui64 = .text:0x800BEC18; // type:function size:0xFC  // XD-struct MED n=63
+fn_800BEC18 = .text:0x800BEC18; // type:function size:0xFC
 fn_800BED14 = .text:0x800BED14; // type:function size:0x8C
-TRKAppendBuffer = .text:0x800BEDA0; // type:function size:0xA4  // XD-struct MED n=41
+fn_800BEDA0 = .text:0x800BEDA0; // type:function size:0xA4
 fn_800BEE44 = .text:0x800BEE44; // type:function size:0x30
 fn_800BEE74 = .text:0x800BEE74; // type:function size:0x40
 fn_800BEEB4 = .text:0x800BEEB4; // type:function size:0x64
 TRKGetBuffer = .text:0x800BEF18; // type:function size:0x2C scope:global
-TRKGetFreeBuffer = .text:0x800BEF44; // type:function size:0xC8  // XD-struct HIGH n=50
+fn_800BEF44 = .text:0x800BEF44; // type:function size:0xC8
 TRKInitializeMessageBuffers = .text:0x800BF00C; // type:function size:0x74 scope:global
 fn_800BF080 = .text:0x800BF080; // type:function size:0x8
 TRKInitializeSerialHandler = .text:0x800BF088; // type:function size:0xC4 scope:global
@@ -2146,18 +2146,18 @@ fn_800C040C = .text:0x800C040C; // type:function size:0x78
 fn_800C0484 = .text:0x800C0484; // type:function size:0x64
 fn_800C04E8 = .text:0x800C04E8; // type:function size:0xC
 fn_800C04F4 = .text:0x800C04F4; // type:function size:0x10
-OutputData = .text:0x800C0504; // type:function size:0xA8  // XD-struct HIGH n=42
+fn_800C0504 = .text:0x800C0504; // type:function size:0xA8
 HandlePositionFileSupportRequest = .text:0x800C05AC; // type:function size:0x110  // XD-struct MED n=68
 HandleCloseFileSupportRequest = .text:0x800C06BC; // type:function size:0xE8  // XD-struct MED n=58
 HandleOpenFileSupportRequest = .text:0x800C07A4; // type:function size:0x11C  // XD-struct MED n=71
-TRKRequestSend = .text:0x800C08C0; // type:function size:0x1E0  // XD-struct MED n=120
+fn_800C08C0 = .text:0x800C08C0; // type:function size:0x1E0
 TRKSuppAccessFile = .text:0x800C0AA0; // type:function size:0x220  // XD-struct MED n=136
 fn_800C0CC0 = .text:0x800C0CC0; // type:function size:0x8
 fn_800C0CC8 = .text:0x800C0CC8; // type:function size:0x8
 fn_800C0CD0 = .text:0x800C0CD0; // type:function size:0x8
 fn_800C0CD8 = .text:0x800C0CD8; // type:function size:0x98
 fn_800C0D70 = .text:0x800C0D70; // type:function size:0x38
-TRK_fill_mem_800D6430 = .text:0x800C0DA8; // type:function size:0xB8  // XD-struct MED n=46
+fn_800C0DA8 = .text:0x800C0DA8; // type:function size:0xB8
 fn_800C0E60 = .text:0x800C0E60; // type:function size:0x8
 fn_800C0E68 = .text:0x800C0E68; // type:function size:0x8
 fn_800C0E70 = .text:0x800C0E70; // type:function size:0x3C
@@ -2167,26 +2167,26 @@ TRKSwapAndGo = .text:0x800C10DC; // type:function size:0xC4 scope:global
 TRKInterruptHandlerEnableInterrupts = .text:0x800C11A0; // type:function size:0x54 scope:global
 fn_800C11F4 = .text:0x800C11F4; // type:function size:0x24
 fn_800C1218 = .text:0x800C1218; // type:function size:0x24
-TRKTargetAccessARAM = .text:0x800C123C; // type:function size:0xC4  // XD-struct MED n=49
+fn_800C123C = .text:0x800C123C; // type:function size:0xC4
 TRKTargetSetInputPendingPtr = .text:0x800C1300; // type:function size:0x10 scope:global
 fn_800C1310 = .text:0x800C1310; // type:function size:0x18
 TRKTargetSetStopped = .text:0x800C1328; // type:function size:0x10 scope:global
 TRKTargetStopped = .text:0x800C1338; // type:function size:0x10 scope:global
 TRKTargetSupportRequest = .text:0x800C1348; // type:function size:0x200 scope:global
 fn_800C1548 = .text:0x800C1548; // type:function size:0x10
-TRKTargetStepOutOfRange = .text:0x800C1558; // type:function size:0xB8  // XD-struct HIGH n=46
-TRKTargetSingleStep = .text:0x800C1610; // type:function size:0xAC  // XD-struct HIGH n=43
+fn_800C1558 = .text:0x800C1558; // type:function size:0xB8
+fn_800C1610 = .text:0x800C1610; // type:function size:0xAC
 fn_800C16BC = .text:0x800C16BC; // type:function size:0x84
 fn_800C1740 = .text:0x800C1740; // type:function size:0x8C
 TRKTargetInterrupt = .text:0x800C17CC; // type:function size:0x190 scope:global
 TRKPostInterruptEvent = .text:0x800C195C; // type:function size:0xAC scope:global
-TRKTargetAccessExtended2 = .text:0x800C1A08; // type:function size:0x438  // XD-struct MED n=270
-TRKTargetAccessExtended1 = .text:0x800C1E40; // type:function size:0x170  // XD-struct MED n=92
-TRKTargetAccessFP = .text:0x800C1FB0; // type:function size:0x50C  // XD-struct MED n=323
-TRKTargetAccessDefault = .text:0x800C24BC; // type:function size:0xF4  // XD-struct MED n=61
+fn_800C1A08 = .text:0x800C1A08; // type:function size:0x438
+fn_800C1E40 = .text:0x800C1E40; // type:function size:0x170
+fn_800C1FB0 = .text:0x800C1FB0; // type:function size:0x50C
+fn_800C24BC = .text:0x800C24BC; // type:function size:0xF4
 fn_800C25B0 = .text:0x800C25B0; // type:function size:0x4C
-TRKTargetAccessMemory = .text:0x800C25FC; // type:function size:0x14C  // XD-struct MED n=83
-TRKValidMemory32 = .text:0x800C2748; // type:function size:0x2A4  // XD-struct MED n=169
+fn_800C25FC = .text:0x800C25FC; // type:function size:0x14C
+fn_800C2748 = .text:0x800C2748; // type:function size:0x2A4
 fn_800C29F0 = .text:0x800C29F0; // type:function size:0x8
 fn_800C29F8 = .text:0x800C29F8; // type:function size:0x8
 fn_800C2A00 = .text:0x800C2A00; // type:function size:0x8
@@ -2195,10 +2195,10 @@ TRKSaveExtended1Block = .text:0x800C2A10; // type:function size:0x1B8 scope:glob
 TRKRestoreExtended1Block = .text:0x800C2BC8; // type:function size:0x1B8 scope:global
 InitMetroTRK = .text:0x800C2D80; // type:function size:0x94 scope:global
 InitMetroTRK_BBA = .text:0x800C2E18; // type:function size:0x94 scope:weak
-TRK__write_aram = .text:0x800C2EAC; // type:function size:0x1EC  // XD-struct MED n=123
-TRK__read_aram = .text:0x800C3098; // type:function size:0x134  // XD-struct MED n=77
+fn_800C2EAC = .text:0x800C2EAC; // type:function size:0x1EC
+fn_800C3098 = .text:0x800C3098; // type:function size:0x134
 TRKInitializeTarget = .text:0x800C31CC; // type:function size:0x4C scope:global
-__TRK_copy_vectors = .text:0x800C3218; // type:function size:0x12C  // XD-struct MED n=75
+fn_800C3218 = .text:0x800C3218; // type:function size:0x12C
 fn_800C3344 = .text:0x800C3344; // type:function size:0x58
 EnableMetroTRKInterrupts = .text:0x800C339C; // type:function size:0x20 scope:global
 TRK_main = .text:0x800C33BC; // type:function size:0x58 scope:global
@@ -2349,14 +2349,14 @@ __sys_free = .text:0x800C4D8C; // type:function size:0xB8
 exit = .text:0x800C4E44; // type:function size:0xF0 scope:global
 fn_800C4F34 = .text:0x800C4F34; // type:function size:0x70
 fn_800C4FA4 = .text:0x800C4FA4; // type:function size:0x58
-deallocate_from_fixed_pools = .text:0x800C4FFC; // type:function size:0x158  // XD-struct MED n=86
-deallocate_from_var_pools = .text:0x800C5154; // type:function size:0x294  // XD-struct MED n=165
+fn_800C4FFC = .text:0x800C4FFC; // type:function size:0x158
+fn_800C5154 = .text:0x800C5154; // type:function size:0x294
 fn_800C53E8 = .text:0x800C53E8; // type:function size:0x70
 __close_all = .text:0x800C5458; // type:function size:0xA8 scope:global
-__num2dec = .text:0x800C5500; // type:function size:0x1A4  // XD-struct MED n=105
-__num2dec_internal = .text:0x800C56A4; // type:function size:0x3B4  // XD-struct MED n=237
-__two_exp_800DCCB8 = .text:0x800C5A58; // type:function size:0x1784  // XD-struct MED n=1505
-__timesdec = .text:0x800C71DC; // type:function size:0x278  // XD-struct MED n=158
+fn_800C5500 = .text:0x800C5500; // type:function size:0x1A4
+fn_800C56A4 = .text:0x800C56A4; // type:function size:0x3B4
+fn_800C5A58 = .text:0x800C5A58; // type:function size:0x1784
+fn_800C71DC = .text:0x800C71DC; // type:function size:0x278
 __flush_buffer = .text:0x800C7454; // type:function size:0xC4 scope:global
 __prep_buffer = .text:0x800C7518; // type:function size:0x34 scope:global
 __end_critical_region = .text:0x800C754C; // type:function size:0x4 scope:global
@@ -2374,29 +2374,29 @@ wcstombs = .text:0x800C7FB8; // type:function size:0x118 scope:global
 fn_800C80D0 = .text:0x800C80D0; // type:function size:0x4C
 __memrchr = .text:0x800C811C; // type:function size:0x2C scope:global
 memchr = .text:0x800C8148; // type:function size:0x2C scope:global
-memmove = .text:0x800C8174; // type:function size:0xCC  // XD-struct MED n=51
-__copy_longs_rev_unaligned = .text:0x800C8240; // type:function size:0xAC  // XD-struct MED n=43
-__copy_longs_unaligned = .text:0x800C82EC; // type:function size:0xC0  // XD-struct MED n=48
-__copy_longs_rev_aligned = .text:0x800C83AC; // type:function size:0xA8  // XD-struct MED n=42
-__copy_longs_aligned = .text:0x800C8454; // type:function size:0xBC  // XD-struct MED n=47
+fn_800C8174 = .text:0x800C8174; // type:function size:0xCC
+fn_800C8240 = .text:0x800C8240; // type:function size:0xAC
+fn_800C82EC = .text:0x800C82EC; // type:function size:0xC0
+fn_800C83AC = .text:0x800C83AC; // type:function size:0xA8
+fn_800C8454 = .text:0x800C8454; // type:function size:0xBC
 __stdio_atexit = .text:0x800C8510; // type:function size:0x10 scope:global
-sprintf = .text:0x800C8520; // type:function size:0xE0  // XD-struct MED n=56
+fn_800C8520 = .text:0x800C8520; // type:function size:0xE0
 fn_800C8600 = .text:0x800C8600; // type:function size:0x78
 vprintf = .text:0x800C8678; // type:function size:0x98 scope:global
-printf = .text:0x800C8710; // type:function size:0xE8  // XD-struct MED n=58
+fn_800C8710 = .text:0x800C8710; // type:function size:0xE8
 fn_800C87F8 = .text:0x800C87F8; // type:function size:0x6C
 __FileWrite = .text:0x800C8864; // type:function size:0x58 scope:global
 __pformatter = .text:0x800C88BC; // type:function size:0x774 scope:local
 float2str = .text:0x800C9030; // type:function size:0x71C scope:local
-round_decimal = .text:0x800C974C; // type:function size:0x12C  // XD-struct MED n=75
+fn_800C974C = .text:0x800C974C; // type:function size:0x12C
 double2hex = .text:0x800C9878; // type:function size:0x338 scope:local
 longlong2str = .text:0x800C9BB0; // type:function size:0x314 scope:local
 long2str = .text:0x800C9EC4; // type:function size:0x258 scope:local
 parse_format = .text:0x800CA11C; // type:function size:0x504 scope:local
-qsort = .text:0x800CA620; // type:function size:0x16C  // XD-struct MED n=91
+fn_800CA620 = .text:0x800CA620; // type:function size:0x16C
 strchr = .text:0x800CA78C; // type:function size:0x30 scope:global
 fn_800CA7BC = .text:0x800CA7BC; // type:function size:0x40
-strcmp = .text:0x800CA7FC; // type:function size:0x128  // XD-struct MED n=74
+fn_800CA7FC = .text:0x800CA7FC; // type:function size:0x128
 fn_800CA924 = .text:0x800CA924; // type:function size:0x44
 strcpy = .text:0x800CA968; // type:function size:0xB8  // XD-struct MED n=46
 strlen = .text:0x800CAA20; // type:function size:0x1C scope:global
@@ -2452,7 +2452,7 @@ AMC_IsStub = .text:0x800CE7C4; // type:function size:0x8 scope:global
 Hu_IsStub = .text:0x800CE7CC; // type:function size:0x8 scope:weak
 fn_800CE7D4 = .text:0x800CE7D4; // type:function size:0x4
 fn_800CE7D8 = .text:0x800CE7D8; // type:function size:0x4
-DBWrite = .text:0x800CE7DC; // type:function size:0x260  // XD-struct MED n=152
+fn_800CE7DC = .text:0x800CE7DC; // type:function size:0x260
 fn_800CEA3C = .text:0x800CEA3C; // type:function size:0x8C
 fn_800CEAC8 = .text:0x800CEAC8; // type:function size:0x9C
 fn_800CEB64 = .text:0x800CEB64; // type:function size:0x54
@@ -2463,7 +2463,7 @@ fn_800CECAC = .text:0x800CECAC; // type:function size:0xAC
 DBGWrite = .text:0x800CED58; // type:function size:0xDC  // XD-struct MED n=55
 DBGRead = .text:0x800CEE34; // type:function size:0xDC  // XD-struct MED n=55
 fn_800CEF10 = .text:0x800CEF10; // type:function size:0xAC
-DBGEXIImm = .text:0x800CEFBC; // type:function size:0x298  // XD-struct MED n=166
+fn_800CEFBC = .text:0x800CEFBC; // type:function size:0x298
 __EXIProbe = .text:0x800CF254; // type:function size:0x174  // XD-struct MED n=93
 EXIProbeEx = .text:0x800CF3C8; // type:function size:0xB4  // XD-struct MED n=45
 fn_800CF47C = .text:0x800CF47C; // type:function size:0x70
@@ -2476,21 +2476,21 @@ fn_800CFDA4 = .text:0x800CFDA4; // type:function size:0x98
 SIRegisterPollingHandler = .text:0x800CFE3C; // type:function size:0xCC  // XD-struct MED n=51
 SIUnregisterPollingHandler = .text:0x800CFF08; // type:function size:0xF4  // XD-struct MED n=61
 SIInit = .text:0x800CFFFC; // type:function size:0xB4 scope:global
-__SITransfer = .text:0x800D00B0; // type:function size:0x20C  // XD-struct HIGH n=131
+fn_800D00B0 = .text:0x800D00B0; // type:function size:0x20C
 fn_800D02BC = .text:0x800D02BC; // type:function size:0x7C
 fn_800D0338 = .text:0x800D0338; // type:function size:0x14
 fn_800D034C = .text:0x800D034C; // type:function size:0x10
 SISetXY = .text:0x800D035C; // type:function size:0x6C scope:global
 fn_800D03C8 = .text:0x800D03C8; // type:function size:0x9C
 fn_800D0464 = .text:0x800D0464; // type:function size:0x6C
-SIGetResponseRaw = .text:0x800D04D0; // type:function size:0xD4  // XD-struct MED n=53
-SIGetResponse = .text:0x800D05A4; // type:function size:0xC4  // XD-struct MED n=49
+fn_800D04D0 = .text:0x800D04D0; // type:function size:0xD4
+fn_800D05A4 = .text:0x800D05A4; // type:function size:0xC4
 fn_800D0668 = .text:0x800D0668; // type:function size:0x8C
 SITransfer = .text:0x800D06F4; // type:function size:0x16C scope:global
 GetTypeCallback = .text:0x800D0860; // type:function size:0x298 scope:local
 SIGetType = .text:0x800D0AF8; // type:function size:0x1C4 scope:global
-SIGetTypeAsync = .text:0x800D0CBC; // type:function size:0x13C  // XD-struct MED n=79
-SIDecodeType = .text:0x800D0DF8; // type:function size:0x14C  // XD-struct MED n=83
+fn_800D0CBC = .text:0x800D0CBC; // type:function size:0x13C
+fn_800D0DF8 = .text:0x800D0DF8; // type:function size:0x14C
 fn_800D0F44 = .text:0x800D0F44; // type:function size:0x24
 SISetSamplingRate = .text:0x800D0F68; // type:function size:0xE4 scope:global
 fn_800D104C = .text:0x800D104C; // type:function size:0x24
@@ -5568,7 +5568,7 @@ fn_80194DA4 = .text:0x80194DA4; // type:function size:0x32C
 fn_801950D0 = .text:0x801950D0; // type:function size:0x6C
 fn_8019513C = .text:0x8019513C; // type:function size:0x454
 fn_80195590 = .text:0x80195590; // type:function size:0x204
-HSD_CObjGetEyeDistance = .text:0x80195794; // type:function size:0x104  // lead: HSD_CObjGetEyeDistance (see config/GC6E01/symbolmap/leads_needs_wiring.md)  // XD-struct HIGH n=65
+fn_80195794 = .text:0x80195794; // type:function size:0x104  // lead: HSD_CObjGetEyeDistance (see config/GC6E01/symbolmap/leads_needs_wiring.md)
 fn_80195898 = .text:0x80195898; // type:function size:0x6C
 fn_80195904 = .text:0x80195904; // type:function size:0x6C
 fn_80195970 = .text:0x80195970; // type:function size:0x6C
@@ -5586,8 +5586,8 @@ fn_80196BB8 = .text:0x80196BB8; // type:function size:0x84
 fn_80196C3C = .text:0x80196C3C; // type:function size:0x18
 fn_80196C54 = .text:0x80196C54; // type:function size:0x8C
 fn_80196CE0 = .text:0x80196CE0; // type:function size:0x98
-HSD_Panic = .text:0x80196D78; // type:function size:0x98  // XD-struct HIGH n=38
-__assert = .text:0x80196E10; // type:function size:0xA4  // XD-struct HIGH n=41
+fn_80196D78 = .text:0x80196D78; // type:function size:0x98
+fn_80196E10 = .text:0x80196E10; // type:function size:0xA4
 fn_80196EB4 = .text:0x80196EB4; // type:function size:0x44
 fn_80196EF8 = .text:0x80196EF8; // type:function size:0x424
 fn_8019731C = .text:0x8019731C; // type:function size:0x20
@@ -5617,7 +5617,7 @@ fn_801992D8 = .text:0x801992D8; // type:function size:0xCC
 fn_801993A4 = .text:0x801993A4; // type:function size:0x1C4  // lead: DObjLoad (see config/GC6E01/symbolmap/leads_needs_wiring.md)
 fn_80199568 = .text:0x80199568; // type:function size:0x6C
 fn_801995D4 = .text:0x801995D4; // type:function size:0x80
-HSD_DObjAddAnimAll = .text:0x80199654; // type:function size:0xB0  // XD-struct MED n=44
+fn_80199654 = .text:0x80199654; // type:function size:0xB0
 fn_80199704 = .text:0x80199704; // type:function size:0x8
 fn_8019970C = .text:0x8019970C; // type:function size:0x2C
 fn_80199738 = .text:0x80199738; // type:function size:0x5C
@@ -5654,9 +5654,9 @@ fn_8019C708 = .text:0x8019C708; // type:function size:0xA8
 fn_8019C7B0 = .text:0x8019C7B0; // type:function size:0x8
 fn_8019C7B8 = .text:0x8019C7B8; // type:function size:0x28
 fn_8019C7E0 = .text:0x8019C7E0; // type:function size:0x74
-_HSD_MemGetRemainDefaultCB = .text:0x8019C854; // type:function size:0x48 // Proposed: HSD_InitAssert2  // XD-struct HIGH n=18
-_HSD_MemFreeDefaultCB = .text:0x8019C89C; // type:function size:0x58 // Proposed: HSD_InitAssert3  // XD-struct HIGH n=22
-_HSD_MemAllocDefaultCB = .text:0x8019C8F4; // type:function size:0x84 // Proposed: HSD_InitAssert4  // XD-struct HIGH n=33
+fn_8019C854 = .text:0x8019C854; // type:function size:0x48 // Proposed: HSD_InitAssert2
+fn_8019C89C = .text:0x8019C89C; // type:function size:0x58 // Proposed: HSD_InitAssert3
+fn_8019C8F4 = .text:0x8019C8F4; // type:function size:0x84 // Proposed: HSD_InitAssert4
 fn_8019C978 = .text:0x8019C978; // type:function size:0x1F8
 fn_8019CB70 = .text:0x8019CB70; // type:function size:0x2E0
 fn_8019CE50 = .text:0x8019CE50; // type:function size:0x104 // Proposed: HSD_JObjInit
@@ -5688,7 +5688,7 @@ fn_801A02B0 = .text:0x801A02B0; // type:function size:0x28C
 fn_801A053C = .text:0x801A053C; // type:function size:0xB0
 fn_801A05EC = .text:0x801A05EC; // type:function size:0x158
 fn_801A0744 = .text:0x801A0744; // type:function size:0x458
-HSD_JObjRef = .text:0x801A0B9C; // type:function size:0x54  // XD-struct HIGH n=21
+fn_801A0B9C = .text:0x801A0B9C; // type:function size:0x54
 fn_801A0BF0 = .text:0x801A0BF0; // type:function size:0x2C
 fn_801A0C1C = .text:0x801A0C1C; // type:function size:0x4C
 fn_801A0C68 = .text:0x801A0C68; // type:function size:0x34
@@ -5770,7 +5770,7 @@ fn_801A6DC4 = .text:0x801A6DC4; // type:function size:0x18
 fn_801A6DDC = .text:0x801A6DDC; // type:function size:0x24
 fn_801A6E00 = .text:0x801A6E00; // type:function size:0x24
 fn_801A6E24 = .text:0x801A6E24; // type:function size:0x154
-MObjSetupTev = .text:0x801A6F78; // type:function size:0x78  // XD-struct HIGH n=30
+fn_801A6F78 = .text:0x801A6F78; // type:function size:0x78
 fn_801A6FF0 = .text:0x801A6FF0; // type:function size:0x138
 fn_801A7128 = .text:0x801A7128; // type:function size:0x9FC
 fn_801A7B24 = .text:0x801A7B24; // type:function size:0x1D8
