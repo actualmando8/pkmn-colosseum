@@ -10,6 +10,8 @@
 #include "pcport_window.h"
 #include "real_content_host.h"
 #include "thp_player.h"
+#include "thp_audio.h"
+#include "waveout_sink.h"
 
 #include <GLFW/glfw3.h>
 #include <direct.h>   /* _chdir (host-only: locate the asset root at startup) */
@@ -5047,14 +5049,14 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                 idx = (isz == 2) ? (u32)(((u16)dl[0] << 8) | dl[1]) : (u32)dl[0];
                 dl += isz;
                 if (a2->attr == GX_VA_POS && tp->positionData != NULL) {
-                    const f32* p = (const f32*)(tp->positionData + (size_t)idx * a2->stride);
+                    const f32* p = (const f32*)((const u8*)tp->positionData + (size_t)idx * a2->stride);
                     px = p[0]; py = p[1];
                     pz = (a2->comp_cnt == GX_POS_XYZ) ? p[2] : 0.0f;
                 } else if (a2->attr == GX_VA_TEX0 && tp->texcoordData != NULL && texD != NULL) {
-                    const f32* t = (const f32*)(tp->texcoordData + (size_t)idx * a2->stride);
+                    const f32* t = (const f32*)((const u8*)tp->texcoordData + (size_t)idx * a2->stride);
                     u = t[0]; vv = t[1]; haveTex = 1;
                 } else if (a2->attr == GX_VA_CLR0 && tp->colorData != NULL && clrD != NULL) {
-                    const u8* cptr = tp->colorData + (size_t)idx * a2->stride;
+                    const u8* cptr = (const u8*)tp->colorData + (size_t)idx * a2->stride;
                     cr = cptr[0]; cg = cptr[1]; cb = cptr[2];
                     ca = (a2->comp_type == GX_RGBA8) ? cptr[3] : 255;
                     haveCol = 1;
@@ -5794,6 +5796,7 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
     int decoded = 0;
     float fps;
     double startTime;
+    int audioOn = 0;
 
     if (thp == NULL) {
         fprintf(stderr, "[boot] cannot open %s (skipping)\n", path);
@@ -5809,6 +5812,11 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
         fps = 29.97f;
     }
     printf("[boot] playing %s (%dx%d, %d frames, %.2f fps)\n", path, vw, vh, total, fps);
+
+    if (PCPortTHP_HasAudio(thp)) {
+        audioOn = WaveOutSink_Open(PCPortTHP_AudioSampleRate(thp),
+                                   PCPortTHP_AudioChannels(thp), 16);
+    }
 
     if (dumpFrame >= 0) {
         int f;
@@ -5830,6 +5838,7 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
             }
             GSgfxSwapBuffers(1);
         }
+        if (audioOn) WaveOutSink_Close();
         PCPortTHP_Close(thp);
         return 1;
     }
@@ -5842,6 +5851,7 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
         u16 pressed;
 
         if (window != NULL && glfwWindowShouldClose(window)) {
+            if (audioOn) WaveOutSink_Close();
             PCPortTHP_Close(thp);
             return 0;
         }
@@ -5862,6 +5872,13 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
             }
             GXHostUpdateTexObjRGBA8(&frameTex, rgba, (u16)vw, (u16)vh);
             ++decoded;
+            if (audioOn) {
+                const short* pcm = NULL;
+                unsigned int nfr = 0;
+                if (PCPortTHP_NextFrameAudioPCM(thp, &pcm, &nfr) && pcm && nfr) {
+                    WaveOutSink_Submit(pcm, nfr);
+                }
+            }
         }
         if (rgba == NULL && decoded >= total) {
             break;
@@ -5875,6 +5892,7 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
         }
         GSgfxSwapBuffers(1);
     }
+    if (audioOn) WaveOutSink_Close();
     PCPortTHP_Close(thp);
     return 1;
 }
@@ -7115,6 +7133,69 @@ static int RunTHPSmoke(void) {
     return 1;
 }
 
+/* THP audio decode smoke (no GL): decode ALL frames' audio of a movie to a WAV,
+ * to verify the GC DSP-ADPCM decode without needing to listen. PCPORT_THP_FILE
+ * selects the movie (default tpc.thp = the first audio-bearing boot movie),
+ * PCPORT_THP_OUT the WAV path. Reports duration + RMS + clip% so correctness is
+ * checkable from the numbers. */
+static int RunTHPAudioSmoke(void) {
+    const char* path = getenv("PCPORT_THP_FILE");
+    const char* outPath = getenv("PCPORT_THP_OUT");
+    const unsigned char* rgba = NULL;
+    PCPortTHP* thp;
+    short* acc;
+    unsigned int total, written = 0, ch, sr, i;
+    double sumsq = 0.0;
+    unsigned int clipped = 0, nsamp;
+
+    if (path == NULL || path[0] == '\0') {
+        path = "orig/GC6E01/disc/files/movie/tpc.thp";
+    }
+    if (outPath == NULL || outPath[0] == '\0') {
+        outPath = "build_pc/thp_audio_smoke.wav";
+    }
+    thp = PCPortTHP_Open(path);
+    if (thp == NULL) {
+        fprintf(stderr, "[thp-audio] failed to open %s\n", path);
+        return 0;
+    }
+    if (!PCPortTHP_HasAudio(thp)) {
+        fprintf(stderr, "[thp-audio] %s has no audio component\n", path);
+        PCPortTHP_Close(thp);
+        return 0;
+    }
+    ch = (unsigned int)PCPortTHP_AudioChannels(thp);
+    sr = PCPortTHP_AudioSampleRate(thp);
+    total = PCPortTHP_AudioTotalSamples(thp);
+    printf("[thp-audio] %s: %u ch, %u Hz, %u total samples (%.2fs)\n",
+           path, ch, sr, total, sr ? (double)total / (double)sr : 0.0);
+    acc = (short*)malloc((size_t)(total + 4096u) * ch * sizeof(short));
+    if (acc == NULL) { PCPortTHP_Close(thp); return 0; }
+    while (PCPortTHP_NextFrameRGBA(thp, &rgba)) {  /* must run first per frame */
+        const short* pcm = NULL;
+        unsigned int nfr = 0;
+        if (PCPortTHP_NextFrameAudioPCM(thp, &pcm, &nfr) && pcm && nfr) {
+            if (written + nfr <= total + 4096u) {
+                memcpy(acc + (size_t)written * ch, pcm, (size_t)nfr * ch * sizeof(short));
+                written += nfr;
+            }
+        }
+    }
+    nsamp = written * ch;
+    for (i = 0; i < nsamp; ++i) {
+        sumsq += (double)acc[i] * (double)acc[i];
+        if (acc[i] >= 32767 || acc[i] <= -32767) ++clipped;
+    }
+    thp_audio_write_wav(outPath, acc, written, (int)ch, sr);
+    free(acc);
+    PCPortTHP_Close(thp);
+    printf("[thp-audio] wrote %s: %u frames (%.2fs), RMS=%.0f, clip=%.2f%%\n",
+           outPath, written, sr ? (double)written / (double)sr : 0.0,
+           nsamp ? sqrt(sumsq / (double)nsamp) : 0.0,
+           nsamp ? 100.0 * (double)clipped / (double)nsamp : 0.0);
+    return 1;
+}
+
 /* ===================================================================
  * P-B inc2: real title-scene render driven by the engine scheduler.
  *
@@ -7901,6 +7982,9 @@ int main(int argc, char** argv) {
 
     /* THP decode smoke: pure decode -> PPM, no window/GL. Verifies thp_player +
      * stb_image in the host build. */
+    if (HasArg(argc, argv, "--thp-audio-smoke")) {
+        return RunTHPAudioSmoke() ? 0 : 1;
+    }
     if (HasArg(argc, argv, "--thp-smoke")) {
         return RunTHPSmoke() ? 0 : 1;
     }

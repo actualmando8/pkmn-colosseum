@@ -20,6 +20,7 @@
 #else
 
 #include "thp_player.h"
+#include "thp_audio.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_STDIO
@@ -31,8 +32,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef unsigned char thp_u8;
-typedef unsigned int  thp_u32;
+typedef unsigned char  thp_u8;
+typedef unsigned short thp_u16;
+typedef short          thp_s16;
+typedef unsigned int   thp_u32;
 
 struct PCPortTHP {
     FILE*   fp;
@@ -49,6 +52,26 @@ struct PCPortTHP {
     thp_u8* stuffBuf;      /* scratch for the re-stuffed standard JPEG */
     thp_u32 stuffCap;
     unsigned char* rgba;   /* stb-allocated decoded frame (freed next call/close) */
+
+    /* --- Audio (THP DSP-ADPCM) --- */
+    int     hasAudio;
+    int     audioCompIndex;     /* component index of the audio stream */
+    int     numAudioChannels;
+    thp_u32 audioSampleRate;
+    thp_u32 audioTotalSamples;
+    thp_u32 maxAudioSamples;    /* header @0x0C: max decoded samples per frame */
+    thp_u8* audioBlock;         /* scratch for one frame's raw audio block */
+    thp_u32 audioBlockCap;
+    short*  pcmBuf;             /* interleaved decoded PCM (this frame) */
+    thp_u32 pcmCap;             /* capacity in samples (frames*channels) */
+    thp_s16* monoBuf;           /* per-channel mono decode scratch */
+
+    /* per-frame bookkeeping captured by NextFrameRGBA so the audio call can
+     * locate the audio block within the SAME frame regardless of call order. */
+    thp_u32 frameBaseOffset;    /* file offset of the frame header just read */
+    thp_u32 frameHdrSize;       /* 8 + 4*numComponents */
+    thp_u32 compSize[16];       /* per-component data sizes for the current frame */
+    int     frameValid;         /* 1 once NextFrameRGBA has read a frame header */
 };
 
 static thp_u32 thp_be32(const thp_u8* p) {
@@ -89,6 +112,7 @@ PCPortTHP* PCPortTHP_Open(const char* path) {
     }
     thp->fp = fp;
     thp->maxBufSize = thp_be32(hdr + 0x08);
+    thp->maxAudioSamples = thp_be32(hdr + 0x0C);
     thp->fps        = thp_bef32(hdr + 0x10);
     thp->numFrames  = thp_be32(hdr + 0x14);
     thp->curSize    = thp_be32(hdr + 0x18);  /* firstFrameSize */
@@ -107,6 +131,36 @@ PCPortTHP* PCPortTHP_Open(const char* path) {
     thp->width  = (int)thp_be32(comp + 0x14);
     thp->height = (int)thp_be32(comp + 0x18);
 
+    /* Walk the 16 type bytes (comp+0x04) and the per-component structs that
+     * follow the 16-byte type block (comp+0x14): video=12 bytes, audio=16 bytes.
+     * type 0=video, 1=audio, 0xFF=none. */
+    {
+        thp_u32 structOff = 0x14;  /* start of per-component structs */
+        thp_u32 ci;
+        thp->hasAudio = 0;
+        thp->audioCompIndex = -1;
+        for (ci = 0; ci < thp->numComponents && ci < 16; ++ci) {
+            thp_u8 type = comp[0x04 + ci];
+            if (type == 0) {            /* video: width+height+pad = 12 bytes */
+                structOff += 12u;
+            } else if (type == 1) {     /* audio: nCh+rate+total+unk = 16 bytes */
+                if (structOff + 12u <= sizeof(comp)) {
+                    thp->numAudioChannels  = (int)thp_be32(comp + structOff + 0x00);
+                    thp->audioSampleRate   = thp_be32(comp + structOff + 0x04);
+                    thp->audioTotalSamples = thp_be32(comp + structOff + 0x08);
+                    if (thp->numAudioChannels >= 1 && thp->numAudioChannels <= 2 &&
+                        thp->audioSampleRate > 0 && thp->maxAudioSamples > 0) {
+                        thp->hasAudio = 1;
+                        thp->audioCompIndex = (int)ci;
+                    }
+                }
+                structOff += 16u;
+            } else {
+                break;  /* 0xFF / unknown: no more components */
+            }
+        }
+    }
+
     if (thp->numComponents == 0 || thp->numComponents > 16 ||
         thp->width <= 0 || thp->height <= 0 ||
         thp->maxBufSize == 0 || thp->numFrames == 0) {
@@ -121,6 +175,23 @@ PCPortTHP* PCPortTHP_Open(const char* path) {
     if (thp->jpegBuf == NULL || thp->stuffBuf == NULL) {
         PCPortTHP_Close(thp);
         return NULL;
+    }
+
+    if (thp->hasAudio) {
+        /* Raw audio block per frame: 8 (channelSize+numSamples) + numCh*36
+         * (headers) + numCh*channelSize (data). channelSize bounded by
+         * ceil(maxAudioSamples/14)*8. Generous cap covers worst-case frames. */
+        thp_u32 chSize = ((thp->maxAudioSamples + 13u) / 14u) * 8u;
+        thp->audioBlockCap = 8u + (thp_u32)thp->numAudioChannels * (36u + chSize) + 64u;
+        thp->audioBlock = (thp_u8*)malloc(thp->audioBlockCap);
+        thp->pcmCap = thp->maxAudioSamples * (thp_u32)thp->numAudioChannels;
+        thp->pcmBuf = (short*)malloc(thp->pcmCap * sizeof(short));
+        thp->monoBuf = (thp_s16*)malloc(thp->maxAudioSamples * sizeof(thp_s16));
+        if (thp->audioBlock == NULL || thp->pcmBuf == NULL ||
+            thp->monoBuf == NULL) {
+            /* Audio is optional; degrade to video-only rather than fail. */
+            thp->hasAudio = 0;
+        }
     }
     return thp;
 }
@@ -137,6 +208,15 @@ void PCPortTHP_Close(PCPortTHP* thp) {
     }
     if (thp->stuffBuf != NULL) {
         free(thp->stuffBuf);
+    }
+    if (thp->audioBlock != NULL) {
+        free(thp->audioBlock);
+    }
+    if (thp->pcmBuf != NULL) {
+        free(thp->pcmBuf);
+    }
+    if (thp->monoBuf != NULL) {
+        free(thp->monoBuf);
     }
     if (thp->fp != NULL) {
         fclose(thp->fp);
@@ -239,6 +319,19 @@ int PCPortTHP_NextFrameRGBA(PCPortTHP* thp, const unsigned char** outRGBA) {
     }
     nextSize  = thp_be32(fh + 0x00);
     videoSize = thp_be32(fh + 0x08);  /* first component (video) data size */
+
+    /* Capture per-component sizes + frame base so NextFrameAudioPCM can locate
+     * the audio block in this SAME frame (independent of advance order). */
+    {
+        thp_u32 ci;
+        thp->frameBaseOffset = thp->curOffset;
+        thp->frameHdrSize = hdrSize;
+        for (ci = 0; ci < thp->numComponents && ci < 16; ++ci) {
+            thp->compSize[ci] = thp_be32(fh + 0x08 + ci * 4u);
+        }
+        thp->frameValid = 1;
+    }
+
     if (videoSize == 0 || videoSize > thp->maxBufSize) {
         fprintf(stderr, "[thp] frame %u: bad videoSize %u (max %u)\n",
                 thp->frameIndex, videoSize, thp->maxBufSize);
@@ -283,6 +376,106 @@ int PCPortTHP_NextFrameRGBA(PCPortTHP* thp, const unsigned char** outRGBA) {
 
     if (outRGBA != NULL) {
         *outRGBA = thp->rgba;
+    }
+    return 1;
+}
+
+/* --- Audio --------------------------------------------------------------- */
+
+int      PCPortTHP_HasAudio(const PCPortTHP* thp) {
+    return (thp && thp->hasAudio) ? 1 : 0;
+}
+unsigned PCPortTHP_AudioSampleRate(const PCPortTHP* thp) {
+    return (thp && thp->hasAudio) ? thp->audioSampleRate : 0u;
+}
+int      PCPortTHP_AudioChannels(const PCPortTHP* thp) {
+    return (thp && thp->hasAudio) ? thp->numAudioChannels : 0;
+}
+unsigned PCPortTHP_AudioTotalSamples(const PCPortTHP* thp) {
+    return (thp && thp->hasAudio) ? thp->audioTotalSamples : 0u;
+}
+
+int PCPortTHP_NextFrameAudioPCM(PCPortTHP* thp, const short** outPCM,
+                                unsigned* outNumFrames) {
+    thp_u32 audioOffset;
+    thp_u32 audioSize;
+    thp_u32 channelSize;
+    thp_u32 numSamples;
+    thp_u32 headersBase;
+    thp_u32 dataBase;
+    int ch;
+    int nCh;
+    thp_u32 ci;
+
+    if (outNumFrames != NULL) {
+        *outNumFrames = 0;
+    }
+    if (thp == NULL || !thp->hasAudio || !thp->frameValid ||
+        thp->audioBlock == NULL || thp->pcmBuf == NULL) {
+        return 0;
+    }
+    nCh = thp->numAudioChannels;
+
+    /* The audio block is the audioCompIndex-th component within the frame; its
+     * file offset = frameBase + frameHdr + sum(sizes of earlier components). */
+    audioOffset = thp->frameBaseOffset + thp->frameHdrSize;
+    for (ci = 0; ci < (thp_u32)thp->audioCompIndex && ci < 16; ++ci) {
+        audioOffset += thp->compSize[ci];
+    }
+    audioSize = (thp->audioCompIndex < 16) ?
+                thp->compSize[thp->audioCompIndex] : 0u;
+    if (audioSize < 8u || audioSize > thp->audioBlockCap) {
+        return 0;
+    }
+
+    if (fseek(thp->fp, (long)audioOffset, SEEK_SET) != 0 ||
+        fread(thp->audioBlock, 1, audioSize, thp->fp) != audioSize) {
+        return 0;
+    }
+
+    /* Layout A: [channelSize][numSamples][ch0 hdr 36][ch1 hdr 36][ch0 data][ch1 data] */
+    channelSize = thp_be32(thp->audioBlock + 0x00);
+    numSamples  = thp_be32(thp->audioBlock + 0x04);
+    if (numSamples == 0 || numSamples > thp->maxAudioSamples) {
+        return 0;
+    }
+    headersBase = 8u;
+    dataBase    = 8u + (thp_u32)nCh * 36u;
+    /* Validate the block is large enough for headers + data. */
+    if (dataBase + (thp_u32)nCh * channelSize > audioSize) {
+        return 0;
+    }
+
+    for (ch = 0; ch < nCh; ++ch) {
+        const thp_u8* chHdr  = thp->audioBlock + headersBase + (thp_u32)ch * 36u;
+        const thp_u8* chData = thp->audioBlock + dataBase + (thp_u32)ch * channelSize;
+        thp_s16 coeffs[16];
+        thp_s16 yn1;
+        thp_s16 yn2;
+        thp_u32 s;
+        int i;
+
+        for (i = 0; i < 16; ++i) {
+            coeffs[i] = (thp_s16)(thp_u16)
+                (((thp_u16)chHdr[i * 2] << 8) | (thp_u16)chHdr[i * 2 + 1]);
+        }
+        yn1 = (thp_s16)(thp_u16)(((thp_u16)chHdr[32] << 8) | (thp_u16)chHdr[33]);
+        yn2 = (thp_s16)(thp_u16)(((thp_u16)chHdr[34] << 8) | (thp_u16)chHdr[35]);
+
+        /* Decode this channel to mono, then scatter into the interleaved out.
+         * THP supplies fresh yn1/yn2 per frame, so re-seed each frame (do NOT
+         * carry decoder state across frames). */
+        thp_adpcm_decode(chData, coeffs, &yn1, &yn2, numSamples, thp->monoBuf);
+        for (s = 0; s < numSamples; ++s) {
+            thp->pcmBuf[s * (thp_u32)nCh + (thp_u32)ch] = thp->monoBuf[s];
+        }
+    }
+
+    if (outPCM != NULL) {
+        *outPCM = thp->pcmBuf;
+    }
+    if (outNumFrames != NULL) {
+        *outNumFrames = numSamples;
     }
     return 1;
 }

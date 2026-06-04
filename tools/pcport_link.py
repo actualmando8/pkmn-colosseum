@@ -33,12 +33,14 @@ LIBS = [
     str(ROOT / "build_pc/_deps/glfw-build/src/Debug/glfw3.lib"),
     # system libs via -l (clang/lld-link resolves against the auto-detected SDK paths)
     "-lopengl32", "-luser32", "-lgdi32", "-lshell32", "-lkernel32",
+    "-lwinmm",  # waveOut (THP boot-movie audio sink)
 ]
 
 # bootstrap sources (== CMake add_executable list)
 BOOT = ["pcport/pcport_main.c", "pcport/gs_gfx_host_support.c",
         "pcport/real_content_host.c", "pcport/hsd_host.c",
         "pcport/thp_player.c",
+        "pcport/thp_audio.c", "pcport/waveout_sink.c",
         "pcport/os_thread_host.c", "pcport/engine_host.c",
         "pcport/engine_spike.c", "pcport/gs_sched_host.c",
         "pcport/engine_boot.c", "pcport/field_collision.c",
