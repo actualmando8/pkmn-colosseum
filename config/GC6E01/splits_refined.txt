@@ -105,7 +105,7 @@ KNOWN   0x800A2C30  0x800A2D38  src/dolphin/db/DB.c                       5     
 GAP     0x800A2D38  0x800A3EB0  ??? (DVDCancel.c / DVDRead.c?)            ~25   # DVD read/cancel functions
 KNOWN   0x800A3EB0  0x800A4CF0  src/dolphin/dvd/DVDLow.c                  ~25   # __DVDInterruptHandler, DVDLowReset, DVDLowStopMotor
 KNOWN   0x800A4CF0  0x800A4D28  src/dolphin/dvd/DVDFs.c                   1     # __DVDFSInit
-GAP     0x800A4D28  0x800A5624  ??? (DVDFsInternal.c?)                    ~20   # DVD filesystem internals
+LIKELY  0x800A4D28  0x800A5624  src/dolphin/dvd/DVDFs.c                  ~20   # DVD filesystem internals; dvdfs.c __FILE__ x4
 KNOWN   0x800A5624  0x800A7820  src/dolphin/dvd/DVD.c                     ~30   # DVDInit, stateReady, stateBusy, DVDReadDiskID
 GAP     0x800A7820  0x800A7DE8  ???                                        ~5    # DVD bridge functions
 KNOWN   0x800A7DE8  0x800A7F80  src/dolphin/dvd/DVDQueue.c                4     # __DVDClearWaitingQueue, Push/Pop/Check
@@ -237,21 +237,21 @@ GAP     0x80193748  0x801938FC  ???                                        ~5   
 KNOWN   0x801938FC  0x80193C24  src/hsd/hsd_class.c                       ~10   # OO class system
 KNOWN   0x80193C24  0x80197A64  src/hsd/hsd_cobj.c                        ~60   # Camera Object
 KNOWN   0x80197A64  0x80198F7C  src/hsd/hsd_displayfunc.c                 ~15   # Billboard, render pass dispatch
-KNOWN   0x80198F7C  0x8019B7C0  src/hsd/hsd_dobj.c                        ~30   # Display Object (visible geometry)
-KNOWN   0x8019B7C0  0x8019C690  src/hsd/hsd_fog.c                         ~15   # Fog adjustment
+KNOWN   0x80198F7C  0x8019B7C0  src/hsd/hsd_dobj.c                       ~30   # Display Object (visible geometry); +also fobj.c
+KNOWN   0x8019B7C0  0x8019C690  src/hsd/hsd_fog.c                        ~15   # Fog adjustment; +also hash.c, id.c
 KNOWN   0x8019C690  0x8019CE50  src/hsd/hsd_initialize.c                  ~10   # HSD system initialization
-KNOWN   0x8019CE50  0x801A4000  src/hsd/hsd_jobj.c                        ~80   # Joint Object (skeletal hierarchy)
+KNOWN   0x8019CE50  0x801A4000  src/hsd/hsd_jobj.c                       ~80   # Joint Object (skeletal hierarchy); +also list.c
 KNOWN   0x801A4000  0x801A69C0  src/hsd/hsd_lobj.c                        ~40   # Light Object
-GAP     0x801A69C0  0x801A6A34  ??? (hsd_memory.c)                        1     # HSD_MemoryAssert
-KNOWN   0x801A6A34  0x801AA608  src/hsd/hsd_mobj.c                        ~50   # Material Object
-KNOWN   0x801AA608  0x801B019C  src/hsd/hsd_pobj.c                        ~60   # Primitive Object (mesh data)
+LIKELY  0x801A69C0  0x801A6A34  src/hsd/hsd_memory.c                     1     # HSD_MemoryAssert; memory.c __FILE__
+KNOWN   0x801A6A34  0x801AA608  src/hsd/hsd_mobj.c                       ~50   # Material Object; +also mtx.c, perf.c
+KNOWN   0x801AA608  0x801B019C  src/hsd/hsd_pobj.c                       ~60   # Primitive Object (mesh data); +also robj.c
 LIKELY  0x801B019C  0x801B1730  src/hsd/hsd_shadow.c                      14    # HSD stencil shadow system (NOT game shadow.c)
   # NOTE: "shadow.c" string in rodata refers to this HSD module
-GAP     0x801B1730  0x801BBAC8  ??? (hsd_fobj.c?)                         ~80   # Float Object / keyframe curves
+LIKELY  0x801B1730  0x801BBAC8  src/hsd/hsd_texp.c                       ~80   # Float Object / keyframe curves; texp.c x15 + tev.c x5 (split)
   # Likely hsd_fobj.c based on position between shadow and tobj
-KNOWN   0x801BBAC8  0x801BF138  src/hsd/hsd_tobj.c                        ~40   # Texture Object
-LIKELY  0x801BF138  0x801C0000  src/hsd/hsd_robj.c                        ~20   # Reference Object (constraints)
-GAP     0x801C0000  0x801C3108  ???                                        ~30   # HSD tail / battle transition
+KNOWN   0x801BBAC8  0x801BF138  src/hsd/hsd_tobj.c                       ~40   # Texture Object; +also util.c
+LIKELY  0x801BF138  0x801C0000  src/hsd/hsd_video.c                      ~20   # Reference Object (constraints); RELABEL: video.c x3 (robj.c is in the pobj range)
+LIKELY  0x801C0000  0x801C3108  src/hsd/hsd_aobj.c                       ~30   # HSD tail / battle transition; aobj.c __FILE__ x3
 
 # --- BATTLE SYSTEM ---
 
