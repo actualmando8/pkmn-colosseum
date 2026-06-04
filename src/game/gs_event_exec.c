@@ -363,13 +363,89 @@ s32 fn_80012E18(u8* ctx) {
 #pragma pop
 
 /* fn_80012FB0 - 0x80012FB0 | size: 0x2ec */
-extern void fn_801040B8(void);
-#if 1
+extern void fn_801040B8(void*, s32, s32);
+#if 0
 asm void fn_80012FB0(void) {
 #include "src/game/gs_event_exec_fn_80012FB0.inc"
 }
 #else
-void fn_80012FB0(void) { /* TODO */ }
+s32 fn_80012FB0(u8* ctx) {
+    u8* state;
+    u8* cursor;
+    s32 value;
+    s32 mode;
+    s32 limit;
+    s32 radix;
+    u16 bits;
+    s32 delta;
+    s32 pos;
+    s32 i;
+    s64 signed_sum;
+
+    cursor = fn_801040A0();
+    value = (s32)fn_801040D0(ctx, 0);
+    mode = (s32)fn_801040D0(ctx, 1);
+    if (mode == 2) {
+        limit = 8;
+        radix = 0x10;
+    } else {
+        limit = 0xA;
+        radix = 0xA;
+    }
+
+    state = fn_80105624();
+    bits = *(u16*)(state + 6);
+    if ((bits & 8) != 0) {
+        *(s32*)cursor = *(s32*)cursor - 1;
+    } else if ((bits & 4) != 0) {
+        *(s32*)cursor = *(s32*)cursor + 1;
+    }
+
+    if (*(s32*)cursor < 0) {
+        *(s32*)cursor = 0;
+        value = 0;
+    }
+    if (*(s32*)cursor >= limit) {
+        *(s32*)cursor = limit - 1;
+    }
+
+    delta = 0;
+    if ((bits & 1) != 0) {
+        delta = 1;
+        pos = *(s32*)cursor;
+        for (i = 0; i < pos; i++) {
+            delta *= radix;
+        }
+    } else if ((bits & 2) != 0) {
+        delta = -1;
+        pos = *(s32*)cursor;
+        for (i = 0; i < pos; i++) {
+            delta *= radix;
+        }
+    }
+
+    if (mode == 0) {
+        signed_sum = (s64)value + (s64)delta;
+        if (signed_sum < (s64)-0x80000000) {
+            signed_sum = (s64)-0x80000000;
+        }
+        if (signed_sum > (s64)0x7FFFFFFF) {
+            signed_sum = (s64)0x7FFFFFFF;
+        }
+    } else {
+        signed_sum = (u32)value + (s64)delta;
+        if (signed_sum < 0) {
+            signed_sum = 0;
+        }
+        if (signed_sum > (s64)0xFFFFFFFFU) {
+            signed_sum = (s64)0xFFFFFFFFU;
+        }
+    }
+
+    *(s32*)(ctx + 0x80) = (s32)signed_sum;
+    fn_801040B8(ctx, 0, (s32)signed_sum);
+    return 0;
+}
 #endif
 
 /* fn_8001329C - 0x8001329C | size: 0x3cc */
