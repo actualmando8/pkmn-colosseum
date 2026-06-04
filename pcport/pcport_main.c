@@ -7645,6 +7645,11 @@ static PCPortHSDArchive       g_engTitleArchive;
 static PCPortTranslatedCamera g_engTitleCamera;
 static u32  g_engTitleRootJoint;
 static int  g_engTitleReady;
+/* Field player character (the skinned Wes avatar, ken_b1). Loaded once into its
+ * own archive; rendered each frame at the walk-loop player position. */
+static PCPortHSDArchive       g_engCharArchive;
+static u32  g_engCharRoot;
+static int  g_engCharLoaded;
 /* Field maps pack SEVERAL model sets in the scene branch (e.g. D1_garage_1F:
  * +0 room walls/props, +4 + +8 additional sets incl. the FLOOR). We render the
  * primary (g_engTitleRootJoint) plus every additional model root here. */
@@ -8269,6 +8274,73 @@ static void DrawFieldAvatar(f32 px, f32 py, f32 pz, f32 yaw,
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 }
 
+/* Load the skinned player character (ken_b1 from field_common.fsys by default)
+ * into its own archive once, deriving its root joint the same way as a field
+ * scene member (scene_data -> branch+0 -> jointList -> rootJoint). Returns 1 on
+ * success (and on a no-op repeat call). PCPORT_WES_ARCHIVE / PCPORT_WES_MEMBER
+ * override the source. */
+static int PCPort_LoadFieldCharacter(void) {
+    const char* fsysPath = getenv("PCPORT_WES_ARCHIVE");
+    const char* member   = getenv("PCPORT_WES_MEMBER");
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOff = 0, branchOff, jlOff;
+    if (g_engCharLoaded) return 1;
+    if (fsysPath == NULL || fsysPath[0] == '\0')
+        fsysPath = "orig/GC6E01/disc/files/field_common.fsys";
+    if (member == NULL || member[0] == '\0')
+        member = "ken_b1";
+    if (!PCPort_LoadFsysMember(fsysPath, member, &data, &size) || data == NULL) {
+        fprintf(stderr, "[field/wes] cannot load %s :: %s\n", fsysPath, member);
+        return 0;
+    }
+    memset(&g_engCharArchive, 0, sizeof(g_engCharArchive));
+    if (!PCPort_HSDArchiveParseBE(&g_engCharArchive, data, size)) {
+        fprintf(stderr, "[field/wes] archive parse failed\n");
+        return 0;
+    }
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_engCharArchive,
+                                                             "scene_data", &sceneOff);
+    if (sceneData == NULL) { fprintf(stderr, "[field/wes] scene_data unresolved\n"); return 0; }
+    branchOff = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&g_engCharArchive, branchOff, 0x10u)) return 0;
+    jlOff = PCPort_ReadBigEndianU32(g_engCharArchive.storage + branchOff + 0x00);
+    g_engCharRoot = PCPort_ReadBigEndianU32(g_engCharArchive.storage + jlOff + 0x00);
+    if (!ArchiveRangeValid(&g_engCharArchive, g_engCharRoot, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        fprintf(stderr, "[field/wes] root joint invalid (0x%X)\n", g_engCharRoot);
+        return 0;
+    }
+    g_engCharLoaded = 1;
+    printf("[field/wes] loaded %s :: %s (rootJoint=0x%X)\n", fsysPath, member, g_engCharRoot);
+    return 1;
+}
+
+/* Render the loaded player character at world (px,py,pz) facing yaw, uniformly
+ * scaled. Composes the orbit camera's view with a placement matrix
+ * (translate * rotateY(yaw) * scale) and walks the character's skinned joint
+ * tree. Needs PCPORT_SKIN for the envelope skin path. */
+static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
+    PCPortTranslatedCamera tcam;
+    MenuTreeStats stats;
+    f32 P[3][4];
+    f32 cy = cosf(yaw), sy = sinf(yaw);
+    if (!g_engCharLoaded) return;
+    /* placement = translate(p) * rotateY(yaw) * uniformScale(scale) */
+    P[0][0] =  scale * cy; P[0][1] = 0.0f;  P[0][2] =  scale * sy; P[0][3] = px;
+    P[1][0] =  0.0f;       P[1][1] = scale; P[1][2] =  0.0f;       P[1][3] = py;
+    P[2][0] = -scale * sy; P[2][1] = 0.0f;  P[2][2] =  scale * cy; P[2][3] = pz;
+    memset(&tcam, 0, sizeof(tcam));
+    PCPortMulAffine3x4(g_engTitleCamera.viewMatrix, P, tcam.viewMatrix);
+    memcpy(tcam.projectionMatrix, g_engTitleCamera.projectionMatrix,
+           sizeof(tcam.projectionMatrix));
+    memset(&stats, 0, sizeof(stats));
+    GXSetProjection(g_engTitleCamera.projectionMatrix, GX_PERSPECTIVE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    RenderJointTree(&g_engCharArchive, g_engCharRoot, g_engCharRoot, &tcam,
+                    (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+}
+
 /* Third-person "walk the room" mode for --field (PCPORT_FIELD_WALK). The player
  * is a box avatar that moves on the WZX floor with wall blocking; the camera
  * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
@@ -8297,6 +8369,9 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 spawnY;
 
     memset(pads, 0, sizeof(pads));
+    if (getenv("PCPORT_FIELD_WES") != NULL) {
+        PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
+    }
     if (spawn != NULL) {
         ppos[0] = spawn[0]; ppos[1] = spawn[1]; ppos[2] = spawn[2];
     }
@@ -8386,7 +8461,22 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
 
         PCPort_EngineTitleRenderFrame();
-        DrawFieldAvatar(ppos[0], ppos[1], ppos[2], pyaw, PLAYER_H, PLAYER_R);
+        /* Player avatar: the real skinned Wes model (PCPORT_FIELD_WES, needs
+         * PCPORT_SKIN), else the placeholder box. The model is ~17 units tall in
+         * its own space; PCPORT_WES_SCALE maps it to the room scale (PLAYER_H=30),
+         * PCPORT_WES_YOFF lifts the feet to the floor, PCPORT_WES_YAWOFF aligns
+         * its facing with the move direction. */
+        if (g_engCharLoaded) {
+            const char* sEnv = getenv("PCPORT_WES_SCALE");
+            const char* yEnv = getenv("PCPORT_WES_YOFF");
+            const char* aEnv = getenv("PCPORT_WES_YAWOFF");
+            f32 wScale = (sEnv != NULL && sEnv[0]) ? (f32)atof(sEnv) : 1.8f;
+            f32 wYoff  = (yEnv != NULL && yEnv[0]) ? (f32)atof(yEnv) : 6.0f;
+            f32 wYaw   = (aEnv != NULL && aEnv[0]) ? (f32)atof(aEnv) : 0.0f;
+            RenderFieldCharacter(ppos[0], ppos[1] + wYoff, ppos[2], pyaw + wYaw, wScale);
+        } else {
+            DrawFieldAvatar(ppos[0], ppos[1], ppos[2], pyaw, PLAYER_H, PLAYER_R);
+        }
         if (colWire) {
             DrawFieldCollisionWire();
         }
