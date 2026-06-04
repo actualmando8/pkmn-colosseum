@@ -5373,6 +5373,30 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                                 printf(" skinJoint@0x%X (chain-resolve FAILED)", uField);
                             }
                         }
+                        /* PCPORT_ENV_DUMP: for type-2 (envelope) PObjs, uField is
+                         * the envelope-array pointer (one entry per matrix slot).
+                         * Dump it + the first entries it points to, to decode the
+                         * slot -> {jobj, weight} skinning palette. */
+                        if (getenv("PCPORT_ENV_DUMP") != NULL && ptype == 2u &&
+                            uField != 0u && ArchiveRangeValid(a, uField, 0x20u)) {
+                            u32 ei;
+                            printf("\n[env] pobj#%u envelope@0x%X:", stats->dobjs, uField);
+                            for (ei = 0; ei < 0x20u; ei += 4u) {
+                                u32 v = PCPort_ReadBigEndianU32(a->storage + uField + ei);
+                                int isp = ArchiveRangeValid(a, v, 0x4u);
+                                printf(" +%X=0x%X%s", ei, v, isp ? "*" : "");
+                            }
+                            /* follow slot 0's entry pointer (a {jobj,weight} list) */
+                            {
+                                u32 e0 = PCPort_ReadBigEndianU32(a->storage + uField + 0x0);
+                                if (ArchiveRangeValid(a, e0, 0x10u)) {
+                                    union { u32 u; f32 f; } w;
+                                    u32 jb = PCPort_ReadBigEndianU32(a->storage + e0 + 0x0);
+                                    w.u = PCPort_ReadBigEndianU32(a->storage + e0 + 0x4);
+                                    printf("  slot0@0x%X: jobj=0x%X weight=%.3f", e0, jb, (double)w.f);
+                                }
+                            }
+                        }
                         printf("\n");
                     }
                 }
