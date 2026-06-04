@@ -168,7 +168,7 @@ void fn_8006AFE4(void);
 void fn_8006B09C(void);
 void fn_8006B0F8(void);
 void fn_8006B154(void);
-void fn_8006B1C0(void);
+u32 fn_8006B1C0(s32 i);
 void fn_8006B1D4(void);
 void fn_8006B1F4(void);
 void fn_8006B2A4(void);
@@ -1768,7 +1768,8 @@ void fn_8006B154(void) {
 
 
 /* 0x8006B1C0 | size: 0x14 */
-void fn_8006B1C0(void) {
+u32 fn_8006B1C0(s32 i) {
+    return ((u32*)lbl_80267DD8)[i];
 }
 
 /* 0x8006B1D4 | size: 0x20 */

@@ -2073,6 +2073,7 @@ void fn_8007AAA8(void) {
 
 /* 0x8007AAFC | size: 0x14 */
 void fn_8007AAFC(void) {
+    lbl_803F7A30[0x342] = 1;
 }
 
 /* 0x8007AB10 | size: 0x580 */

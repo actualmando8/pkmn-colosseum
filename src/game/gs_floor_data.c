@@ -574,8 +574,8 @@ void fn_800FF4D4(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FF52C(void) {
-    /* TODO: match -- 20 bytes at 0x800FF52C */
+u32 fn_800FF52C(void) {
+    return lbl_8047ACC4 != 0;
 }
 #pragma pop
 
