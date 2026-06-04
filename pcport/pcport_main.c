@@ -1571,6 +1571,16 @@ static void ConfigureTranslatedMaterialPipeline(unsigned int pipelineId,
                                       GX_BL_SRCALPHA,
                                       GX_BL_INVSRCALPHA,
                                       GX_LO_COPY);
+            /* These XLU planes (distance-haze, full vertex alpha) are faded by
+             * GameCube distance fog in the real game, which the port doesn't
+             * implement -- so at full strength they read as dark occluding bands.
+             * Render them at reduced opacity to approximate the subtle haze.
+             * PCPORT_HAZE_ALPHA tunes it. */
+            {
+                const char* ha = getenv("PCPORT_HAZE_ALPHA");
+                f32 hazeA = (ha != NULL) ? (f32)atof(ha) : 0.40f;
+                GSgfxHostSetPipelineAlphaScale(pipelineId, material->alpha * hazeA);
+            }
         }
     }
 
@@ -6499,6 +6509,19 @@ static int RunMenuScene(GLFWwindow* window) {
             ClearBackbuffer(0.0f, 0.0f, 0.0f);
         }
         GSgfx_BeginFrame();
+
+        /* GSgfx_BeginFrame paints a green EFB clear-quad; the 3D title used to be
+         * fully covered by the (opaque) desert planes so it never showed, but now
+         * those planes are translucent (XLU haze) the green bleeds through. Wipe it
+         * to a pale desert-haze tone so the translucent haze reads as bright desert
+         * (matches the Dolphin look) instead of green. PCPORT_TITLE_BG overrides. */
+        if (render3D && (sceneState == PCPORT_SCENE_TITLE ||
+                         sceneState == PCPORT_SCENE_SAVE_PROMPT)) {
+            const char* tbg = getenv("PCPORT_TITLE_BG");
+            f32 br = 0.80f, bg = 0.76f, bb = 0.68f;
+            if (tbg != NULL) sscanf(tbg, "%f,%f,%f", &br, &bg, &bb);
+            ClearBackbuffer(br, bg, bb);
+        }
 
         if (render3D && (sceneState == PCPORT_SCENE_TITLE ||
                          sceneState == PCPORT_SCENE_SAVE_PROMPT)) {
