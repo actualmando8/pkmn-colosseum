@@ -1643,11 +1643,11 @@ static void SwizMatAnimJoint(PCPortSwizCtx* c, u32 off) {
 }
 
 static void SwizAnimJoint(PCPortSwizCtx* c, u32 off) {
-    u8* p;
     if (SwizMarkVisited(c, off)) return;
-    p = c->base + off;
-    Swap32InPlace(p + 0x10);   /* flags */
-    /* child(0), next(4), aobjdesc(8), robj_anim(C): pointers */
+    /* In Colosseum the scene AnimJoint header is 0x10 bytes and all-pointer:
+     * {child@0, next@4, aobjdesc@8, robj_anim@C} -- NO trailing flags scalar (the
+     * matanimjoint sits at +0x10, so swapping a "flags@0x10" corrupts it). Just
+     * recurse the pointers; ApplyHostRelocations fixes them. */
     SwizAObjDesc(c, SwizChildOff(c, off + 0x8));
     SwizAnimJoint(c, SwizChildOff(c, off + 0x0)); /* child */
     SwizAnimJoint(c, SwizChildOff(c, off + 0x4)); /* next */
@@ -1751,6 +1751,19 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
                        mj, ReadBE32(archive.storage+mj+0), ReadBE32(archive.storage+mj+4),
                        ReadBE32(archive.storage+mj+8));
             }
+            /* Raw aobjdesc (BE, pre-swizzle): animjoint(+8) should be an AObjDesc
+             * {flags@0, end_frame@4 (float), fobjdesc@8, obj_id@C}. */
+            if (aj >= 0x20u && aj < 0x20u + archive.dataSize) {
+                u32 aod = ReadBE32(archive.storage + aj + 0x8);
+                if (aod >= 0x20u && aod < 0x20u + archive.dataSize) {
+                    union { u32 u; f32 f; } ef; ef.u = ReadBE32(archive.storage+aod+4);
+                    printf("[hsd-swiz] aobjdesc@0x%X: flags=0x%X end_frame=%.3f fobjdesc=0x%X obj_id=0x%X\n",
+                           aod, ReadBE32(archive.storage+aod+0), ef.f,
+                           ReadBE32(archive.storage+aod+8), ReadBE32(archive.storage+aod+0xC));
+                } else {
+                    printf("[hsd-swiz] animjoint+8=0x%X NOT a valid data offset -> +8 isn't aobjdesc\n", aod);
+                }
+            }
         }
     }
     printf("[hsd-swiz] scene=0x%X branch=0x%X jointList=0x%X root=0x%X relocs=%u\n",
@@ -1824,8 +1837,15 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
          * so the animjoint location/structure needs more reverse-engineering. Off by
          * default so the verified load path is crash-free. */
         if (getenv("PCPORT_HSD_ANIM") != NULL) {
-            printf("[hsd-swiz] attaching anim (animjoint=%p matanim=%p)...\n",
-                   animjoint, matanimjoint);
+            /* Isolation: load the root animjoint's aobjdesc alone first (tests the
+             * AObjDesc/FObjDesc swizzle + HSD_AObjLoadDesc/FObj load path). */
+            u32 ajAobjDesc = animjoint ? *(u32*)((u8*)animjoint + 0x8) : 0u;
+            printf("[hsd-swiz] anim: animjoint=%p aobjdesc=0x%X\n", animjoint, ajAobjDesc);
+            if (ajAobjDesc != 0u) {
+                void* a = HSD_AObjLoadDesc((HSD_AObjDesc*)(uintptr_t)ajAobjDesc);
+                printf("[hsd-swiz] HSD_AObjLoadDesc(root aobjdesc) -> %p OK\n", a);
+            }
+            printf("[hsd-swiz] calling HSD_JObjAddAnimAll...\n");
             HSD_JObjAddAnimAll(root, (HSD_AnimJoint*)animjoint,
                                (HSD_MatAnimJoint*)matanimjoint, NULL);
             printf("[hsd-swiz] HSD_JObjAddAnimAll done\n");
