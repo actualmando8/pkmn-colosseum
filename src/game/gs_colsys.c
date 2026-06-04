@@ -31,7 +31,7 @@
  *   fn_8010D064 (GScolsys2_Init)
  *   fn_8010D170 (GScolsys2_InitRenderer)
  *   fn_8010D20C (GScolsys2_DrawTriGroup)
- *   fn_8010D3C8 (GScolsys2_Draw)
+ *   GScolsys2Draw (GScolsys2_Draw)
  *   fn_8010D8D4 (GScolsys2_DrawActive)
  *   fn_8010DE00 (GScolsys2_FindNearestGround)
  *   fn_8010DEF0 (GScolsys2_TriangleBoundsCheck)
@@ -1170,7 +1170,7 @@ void GScolsys2_DrawTriGroup(void* meshData, void* mtx)
 }
 
 /* ===================================================================
- * fn_8010D3C8 -- GScolsys2_Draw
+ * GScolsys2Draw -- GScolsys2_Draw
  *
  * Builds a debug display list for all collision meshes.
  *
@@ -1992,7 +1992,7 @@ void fn_8010D20C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010D3C8(void) {
+void GScolsys2Draw(void) {
     /* TODO: match -- 1292 bytes at 0x8010D3C8 */
 }
 #pragma pop

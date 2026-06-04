@@ -252,10 +252,10 @@ skip_bc:
  * else: sub = NULL
  * Walk linked list (field_4 = next) counting r3 from 0.
  * When r3 == r4: result = sub->field_8.
- * If result != NULL: call fn_800DF7A4(), if ret != NULL: ret->field_8 = result.
+ * If result != NULL: call GSmaterialCreate(), if ret != NULL: ret->field_8 = result.
  * Return ret.
  * ================================================================== */
-extern void* fn_800DF7A4(void);
+extern void* GSmaterialCreate(void);
 #if 0
 asm void fn_800EE6B4(void) {
 #include "src/game/gs_particle_fn_800EE6B4.inc"
@@ -297,7 +297,7 @@ void* fn_800EE6B4(void* outerP, u32 idx) {
         return NULL;
     }
 
-    ret = (void**)fn_800DF7A4();
+    ret = (void**)GSmaterialCreate();
     if (ret == NULL) {
         return NULL;
     }

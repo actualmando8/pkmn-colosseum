@@ -77,7 +77,7 @@ extern void fn_80167FA4(int argc, char** argv, u32 flag); /* GameArgsParse */
 static void GameInit(void);
 
 /* --- Subsystem init functions called from GameInit --- */
-extern void fn_800F09D8(u32 numFrames);              /* VIFrameInit or render timing */
+extern void GSthread(u32 numFrames);              /* VIFrameInit or render timing */
 extern void fn_800D39E0(u32 memSize, u32 a, u32 b,   /* GSgfx init */
                          u32 c, u32 d, u32 e);
 extern u32  fn_800A0F58(void);                         /* OSGetResetSwitchState (checks warm boot) */
@@ -537,7 +537,7 @@ static void GameInit(void) {
     u32 isWarmBoot = FALSE;
 
     /* Set render timing to 20Hz (50ms per frame for init) */
-    fn_800F09D8(0x14);
+    GSthread(0x14);
 
     /* Initialize the GSgfx graphics state machine:
      *   memSize = 0x7DDD0 (~512 KB minus overhead)

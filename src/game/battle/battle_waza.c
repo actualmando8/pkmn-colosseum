@@ -20,9 +20,9 @@
  * Key large functions:
  *   fn_801D7464 (0x730): wazaSequenceLoad -- loads a complete waza sequence
  *   fn_801D7B94 (0x2C4): wazaSequenceUpdate -- per-frame update
- *   fn_801D84F4 (0x2BC): wazaSequenceEntryStart -- starts a single entry
+ *   wazaSequenceEntryStart (0x2BC): wazaSequenceEntryStart -- starts a single entry
  *   fn_801D87B0 (0x388): wazaSequenceStartEntry -- initializes entry resources
- *   fn_801D8B38 (0x6B4): _wazaSequenceParticleEntryStart -- particle init
+ *   _wazaSequenceParticleEntryStart (0x6B4): _wazaSequenceParticleEntryStart -- particle init
  *   fn_801D91EC (0x604): _wazaSequenceModelEntryStart -- model init
  *   fn_801D9950 (0x2CC): wazaSequencePokemonMotionStart -- motion driver
  *   fn_801D349C (0xAE0): Move animation state machine A
@@ -66,7 +66,7 @@ extern void  fn_8036A384(void* jobj, f32 x, f32 y, f32 z); /* HSD_JObjSetTransla
 
 /* Sound */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay */
-extern void  fn_801657F8(s32 sndID, s32 volume);              /* sndStop */
+extern void  soundStop(s32 sndID, s32 volume);              /* sndStop */
 
 /* Particle system */
 extern void* fn_800F04C4(void);                            /* stop particle system */
@@ -87,9 +87,9 @@ void fn_801D44C4(void);
 void fn_801D624C(void);
 void fn_801D7464(void);
 void fn_801D7B94(void);
-void fn_801D84F4(void);
+void wazaSequenceEntryStart(void);
 void fn_801D87B0(void* entry, s32 type);
-void fn_801D8B38(void* entry);
+void _wazaSequenceParticleEntryStart(void* entry);
 void fn_801D91EC(void* entry);
 void fn_801D9950(s32 slot, s32 motionType);
 void fn_801DAC90(void);
@@ -806,11 +806,11 @@ void fn_801D7B94(void) {
 }
 
 /**
- * fn_801D7E58 / wazaSequenceEntryStop - Stop a single waza entry.
+ * wazaSequenceEntryStop / wazaSequenceEntryStop - Stop a single waza entry.
  * Address: 0x801D7E58 | Size: 0x374
  * Proposed name from symbols: wazaSequenceEntryStop.
  */
-void fn_801D7E58(void* entry) {
+void wazaSequenceEntryStop(void* entry) {
     /* TODO: Waza entry stop (0x374 bytes)
      * Stops and cleans up a single waza entry:
      * - Particle: destroys particle system
@@ -821,21 +821,21 @@ void fn_801D7E58(void* entry) {
 }
 
 /**
- * fn_801D81CC / wazaSequenceEntryUpdate - Update a single waza entry.
+ * wazaSequenceEntryUpdate / wazaSequenceEntryUpdate - Update a single waza entry.
  * Address: 0x801D81CC | Size: 0x328
  * Proposed name from symbols: wazaSequenceEntryUpdate.
  */
-void fn_801D81CC(void* entry) {
+void wazaSequenceEntryUpdate(void* entry) {
     /* TODO: Waza entry update (0x328 bytes) */
 }
 
 /**
- * fn_801D84F4 / wazaSequenceEntryStart - Start a single waza entry.
+ * wazaSequenceEntryStart / wazaSequenceEntryStart - Start a single waza entry.
  * Address: 0x801D84F4 | Size: 0x2BC
  * Proposed name from symbols: wazaSequenceEntryStart.
  * Referenced by battle_logic.c.
  */
-void fn_801D84F4(void) {
+void wazaSequenceEntryStart(void) {
     /* TODO: Waza entry start (0x2BC bytes)
      * Dispatches to entry-type-specific start functions:
      *   WAZA_ENTRY_PARTICLE -> _wazaSequenceParticleEntryStart
@@ -855,12 +855,12 @@ void fn_801D87B0(void* entry, s32 type) {
 }
 
 /**
- * fn_801D8B38 / _wazaSequenceParticleEntryStart - Particle entry init.
+ * _wazaSequenceParticleEntryStart / _wazaSequenceParticleEntryStart - Particle entry init.
  * Address: 0x801D8B38 | Size: 0x6B4
  * Proposed name from symbols: _wazaSequenceParticleEntryStart.
  * Large function that initializes a particle effect for a move animation.
  */
-void fn_801D8B38(void* entry) {
+void _wazaSequenceParticleEntryStart(void* entry) {
     /* TODO: Particle entry start (0x6B4 bytes)
      * 1. Loads particle effect data from archive
      * 2. Configures emitter parameters (rate, lifetime, color)
@@ -912,10 +912,10 @@ void fn_801D9950(s32 slot, s32 motionType) {
 }
 
 /**
- * fn_801D9C1C - Pokemon motion update.
+ * wazaSequencePokemonMotionStart - Pokemon motion update.
  * Address: 0x801D9C1C | Size: 0x200
  */
-void fn_801D9C1C(s32 slot) {
+void wazaSequencePokemonMotionStart(s32 slot) {
     /* TODO: Pokemon motion update (0x200 bytes) */
 }
 
@@ -1326,10 +1326,10 @@ BOOL fn_801DB8FC(void* entry) {
 }
 
 /**
- * fn_801DB988 - Waza rendering setup.
+ * wazaSequenceUpdate - Waza rendering setup.
  * Address: 0x801DB988 | Size: 0x188
  */
-void fn_801DB988(void) {
+void wazaSequenceUpdate(void) {
     /* TODO: Waza rendering setup (0x188 bytes) */
 }
 
@@ -1544,10 +1544,10 @@ void fn_801DD3E4(void) {
 }
 
 /**
- * fn_801DD45C - Waza scene snapshot.
+ * sequenceLoad - Waza scene snapshot.
  * Address: 0x801DD45C | Size: 0x18C
  */
-void fn_801DD45C(void) {
+void sequenceLoad(void) {
     /* TODO: Scene snapshot for transition effects (0x18C bytes) */
 }
 
@@ -1644,10 +1644,10 @@ void fn_801DE698(s32 slot, s32 statID, s32 direction) {
 }
 
 /**
- * fn_801DEC64 - Waza stat change update.
+ * _eyeTexAnimEnded - Waza stat change update.
  * Address: 0x801DEC64 | Size: 0x1B0
  */
-void fn_801DEC64(void) {
+void _eyeTexAnimEnded(void) {
     /* TODO: Stat change effect update (0x1B0 bytes) */
 }
 

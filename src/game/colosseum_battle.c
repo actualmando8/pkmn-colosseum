@@ -127,7 +127,7 @@ extern u32   fn_801254B4();
 extern void fn_801EF8F4();
 
 /* Sound functions */
-extern void fn_801657F8();     /* Stop sound */
+extern void soundStop();     /* Stop sound */
 extern void fn_80165A20();     /* Fade out music */
 extern void fn_801659FC();     /* Start BGM */
 
@@ -39920,7 +39920,7 @@ LAB_0025db60:
       }
       if (bVar4) {
         fn_801065B8(1);
-        fn_801657F8(0x3d4,0x32);
+        soundStop(0x3d4,0x32);
         iVar6 = 0;
         if ((_DAT_8027a4b0 < uVar12) && (iVar6 = 1, _DAT_8027a4b8 < uVar12)) {
           iVar6 = 2;
@@ -39962,7 +39962,7 @@ LAB_0025db60:
         fn_801DA4E8(r3[1],1);
         fn_802606D8(r3,1,0,8);
         fn_801065B8(1);
-        fn_801657F8(0x3d4,0x32);
+        soundStop(0x3d4,0x32);
         if (r6 == 0) {
           iVar6 = 0;
         }

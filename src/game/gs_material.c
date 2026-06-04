@@ -2604,7 +2604,7 @@ void fn_800E638C(void* obj) {
 #endif
 
 /* fn_800E6478 | Size: 0x154 */
-extern void fn_800DF498(void);
+extern void GSmaterialSetPEdescr(void);
 #if 0
 asm void fn_800E6478(void) {
 #include "src/game/gs_material_fn_800E6478.inc"
@@ -2655,7 +2655,7 @@ void fn_800E6478(void* entry, void* param) {
         while (r23 < r24) {
             void* p = r25[r23];
             if (p != NULL) {
-                ((void(*)(void*, void*))fn_800DF498)(p, param);
+                ((void(*)(void*, void*))GSmaterialSetPEdescr)(p, param);
             }
             r23++;
             r25++;
@@ -4863,7 +4863,7 @@ void fn_800EC1E4(void* p) {
 #endif
 
 /* fn_800EC208 | Size: 0x9C */
-extern void fn_801C028C();
+extern void HSD_ForeachAnim();
 #if 0
 asm void fn_800EC208(void) {
 #include "src/game/gs_material_fn_800EC208.inc"
@@ -4877,9 +4877,9 @@ void fn_800EC208(void* entry, s32 mode) {
     *(s32*)((u8*)entry + 0xa4) = mode;
     mode = *(s32*)((u8*)entry + 0xa4);
     if (mode == 0) {
-        fn_801C028C(mobj, 6, 0x64db, fn_800EE054, 3, 0);
+        HSD_ForeachAnim(mobj, 6, 0x64db, fn_800EE054, 3, 0);
     } else if (mode == 1) {
-        fn_801C028C(mobj, 6, 0x64db, fn_800EE054, 3, 1);
+        HSD_ForeachAnim(mobj, 6, 0x64db, fn_800EE054, 3, 1);
     }
 }
 #endif
@@ -4958,7 +4958,7 @@ void fn_800EC35C(void* entry, u32 idx) {
             fn_801A2B5C(mobj2, 0, pe);
         }
         *(f32*)((u8*)entry + 0xb8) = lbl_8047CC5C;
-        fn_801C028C(mobj2, 6, 0x64db, fn_800EE08C, 2, (u8*)entry + 0xb8);
+        HSD_ForeachAnim(mobj2, 6, 0x64db, fn_800EE08C, 2, (u8*)entry + 0xb8);
     }
     flags = *(u32*)entry;
     mobj2 = *(void**)((u8*)entry + 0x8);
@@ -4979,9 +4979,9 @@ void fn_800EC35C(void* entry, u32 idx) {
     }
     *(s32*)((u8*)entry + 0xa4) = mode;
     if (mode == 0) {
-        fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
+        HSD_ForeachAnim(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
     } else if (mode == 1) {
-        fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
+        HSD_ForeachAnim(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
     }
 }
 #endif
@@ -5164,12 +5164,12 @@ void fn_800EC5FC(void* entry, u32 start, u32 end) {
     /* Setup timer callbacks for entry->0x10 */
     fval = *(f32*)&lbl_8047CC5C;
     *(f32*)((u8*)entry + 0xcc) = fval;
-    fn_801C028C(*(void**)((u8*)entry + 0x10), 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xcc);
+    HSD_ForeachAnim(*(void**)((u8*)entry + 0x10), 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xcc);
 
     /* Setup timer callbacks for entry->0x14 */
     fval = *(f32*)&lbl_8047CC5C;
     *(f32*)((u8*)entry + 0xd0) = fval;
-    fn_801C028C(*(void**)((u8*)entry + 0x14), 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xd0);
+    HSD_ForeachAnim(*(void**)((u8*)entry + 0x14), 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xd0);
 
     /* Compute blend ratio */
     {
@@ -5201,7 +5201,7 @@ void fn_800EC5FC(void* entry, u32 start, u32 end) {
         fn_801A2B5C(dobj, tbl[*(u32*)((u8*)entry + 0xa8)], 0, 0);
         fval = *(f32*)&lbl_8047CC5C;
         *(f32*)((u8*)entry + 0xb8) = fval;
-        fn_801C028C(dobj, 6, 0x64db, (void*)fn_800EE08C, 2, (u8*)entry + 0xb8);
+        HSD_ForeachAnim(dobj, 6, 0x64db, (void*)fn_800EE08C, 2, (u8*)entry + 0xb8);
     }
 
     /* Part 2: handle blend/anim state */
@@ -5231,10 +5231,10 @@ void fn_800EC5FC(void* entry, u32 start, u32 end) {
         *(s32*)((u8*)entry + 0xa4) = mode;
         switch (mode) {
         case 0:
-            fn_801C028C(obj3, 6, 0x64db, (void*)fn_800EE054, 3, 0);
+            HSD_ForeachAnim(obj3, 6, 0x64db, (void*)fn_800EE054, 3, 0);
             break;
         case 1:
-            fn_801C028C(obj3, 6, 0x64db, (void*)fn_800EE054, 3, 1);
+            HSD_ForeachAnim(obj3, 6, 0x64db, (void*)fn_800EE054, 3, 1);
             break;
         }
     }
@@ -5418,9 +5418,9 @@ void fn_800ECB74(void* entry, s32 mode) {
     }
     *(s32*)((u8*)entry + 0x8c) = mode;
     if (mode == 0) {
-        fn_801C028C(mobj, 6, 0x9b2f, fn_800EE054, 3, 0);
+        HSD_ForeachAnim(mobj, 6, 0x9b2f, fn_800EE054, 3, 0);
     } else if (mode == 1) {
-        fn_801C028C(mobj, 6, 0x9b2f, fn_800EE054, 3, 1);
+        HSD_ForeachAnim(mobj, 6, 0x9b2f, fn_800EE054, 3, 1);
     }
     {
         u32 flags = *(u32*)entry;
@@ -5431,9 +5431,9 @@ void fn_800ECB74(void* entry, s32 mode) {
             }
             *(s32*)((u8*)entry + 0xa4) = mode;
             if (mode == 0) {
-                fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
+                HSD_ForeachAnim(mobj2, 6, 0x64db, fn_800EE054, 3, 0);
             } else if (mode == 1) {
-                fn_801C028C(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
+                HSD_ForeachAnim(mobj2, 6, 0x64db, fn_800EE054, 3, 1);
             }
         }
     }
@@ -5491,7 +5491,7 @@ void fn_800ECCA8(void* entry, s32 idx) {
 
     fval = *(f32*)&lbl_8047CC5C;
     *(f32*)((u8*)entry + 0xa0) = fval;
-    fn_801C028C(dobj, 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xa0);
+    HSD_ForeachAnim(dobj, 6, 0x9B2F, (void*)fn_800EE08C, 2, (u8*)entry + 0xa0);
 
 part2:
     flags = *(u32*)entry;
@@ -5547,9 +5547,9 @@ section3:
         }
         *(s32*)((u8*)entry + 0x8c) = mode;
         if (mode == 0) {
-            fn_801C028C(mobj, 6, 0x9B2F, (void*)fn_800EE054, 3, 0);
+            HSD_ForeachAnim(mobj, 6, 0x9B2F, (void*)fn_800EE054, 3, 0);
         } else if (mode == 1) {
-            fn_801C028C(mobj, 6, 0x9B2F, (void*)fn_800EE054, 3, 1);
+            HSD_ForeachAnim(mobj, 6, 0x9B2F, (void*)fn_800EE054, 3, 1);
         }
     }
 
@@ -5574,7 +5574,7 @@ section3:
         fn_801A2B5C(dobj, tbl[*(u32*)((u8*)entry + 0xa8)], 0, 0);
         fval = *(f32*)&lbl_8047CC5C;
         *(f32*)((u8*)entry + 0xb8) = fval;
-        fn_801C028C(dobj, 6, 0x64db, (void*)fn_800EE08C, 2, (u8*)entry + 0xb8);
+        HSD_ForeachAnim(dobj, 6, 0x64db, (void*)fn_800EE08C, 2, (u8*)entry + 0xb8);
     }
 
     {
@@ -5603,9 +5603,9 @@ section3:
         *(s32*)((u8*)entry + 0xa4) = *(s32*)((u8*)entry + 0xa4);
         mode = *(s32*)((u8*)entry + 0xa4);
         if (mode == 0) {
-            fn_801C028C(mobj2, 6, 0x64db, (void*)fn_800EE054, 3, 0);
+            HSD_ForeachAnim(mobj2, 6, 0x64db, (void*)fn_800EE054, 3, 0);
         } else if (mode == 1) {
-            fn_801C028C(mobj2, 6, 0x64db, (void*)fn_800EE054, 3, 1);
+            HSD_ForeachAnim(mobj2, 6, 0x64db, (void*)fn_800EE054, 3, 1);
         }
     }
 
@@ -5666,7 +5666,7 @@ asm void fn_800ED1CC(void) {
 }
 #else
 void fn_800ED1CC(void* entry) {
-    extern void fn_801C028C(void*, int, int, void*, int, ...);
+    extern void HSD_ForeachAnim(void*, int, int, void*, int, ...);
     u32 flags = *(u32*)entry;
     void* r31;
     f32 f31, f30;
@@ -5711,17 +5711,17 @@ void fn_800ED1CC(void* entry) {
                 *(f32*)((u8*)entry + 0xb0), *(f32*)((u8*)entry + 0xb4),
                 *(f32*)((u8*)entry + 0xb8), *(f32*)((u8*)entry + 0xac));
         }
-        fn_801C028C(r31, 6, 0x9b2f, fn_801C027C, 1, f31);
-        fn_801C028C(r31, 6, 0x64db, fn_801C027C, 1, f30);
+        HSD_ForeachAnim(r31, 6, 0x9b2f, fn_801C027C, 1, f31);
+        HSD_ForeachAnim(r31, 6, 0x64db, fn_801C027C, 1, f30);
         fn_801A1B40(r31);
         if (*(u32*)entry & 0x20) {
             void* result = NULL;
-            fn_801C028C(r31, 6, 0x20, fn_800EE044, 2, &result);
+            HSD_ForeachAnim(r31, 6, 0x20, fn_800EE044, 2, &result);
             *(f32*)((u8*)entry + 0x9c) = *(f32*)((u8*)result + 0x4);
         }
         if (*(u32*)entry & 0x40) {
             void* result = NULL;
-            fn_801C028C(r31, 6, 0x480, fn_800EE044, 2, &result);
+            HSD_ForeachAnim(r31, 6, 0x480, fn_800EE044, 2, &result);
             *(f32*)((u8*)entry + 0xb4) = *(f32*)((u8*)result + 0x4);
         }
         if (*(u32*)entry & 0x20) {

@@ -281,8 +281,8 @@ s32 TRKInitializeNub(void) {
 /* Stub functions for coverage - TODO: decompile              */
 /* ========================================================== */
 
-/* fn_800BE800 - 0x800BE800 | size: 0x44 */
-s32 fn_800BE800(u8* p) {
+/* MessageSend - 0x800BE800 | size: 0x44 */
+s32 MessageSend(u8* p) {
     extern char lbl_8026F640[];
     extern s32 fn_800C3588(void* dst, u32 val);
 

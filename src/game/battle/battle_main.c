@@ -41,7 +41,7 @@
  *   4. Restores People system state (fn_80177A44)
  *   5. Cleans up battle grid (fn_801C31EC)
  *   6. Cleans up waza system (fn_801DAC90)
- *   7. Stops any active sound (fn_801657F8)
+ *   7. Stops any active sound (soundStop)
  *   8. Fades out battle music (fn_80165A20)
  *   9. Restores VSync mode (fn_801337A8)
  *   10. Prints "---------- fight end !! ----------" via GSlog
@@ -85,7 +85,7 @@ extern void fn_80103BA8(void* padData, s32 port);          /* read pad input */
 extern void fn_80113FB4(void);                             /* check floor loaded */
 
 /* Sound */
-extern void fn_801657F8(s32 sndID, s32 volume);    /* sndStop */
+extern void soundStop(s32 sndID, s32 volume);    /* sndStop */
 extern void fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay with fade */
 extern void fn_80165A20(s32 mode, s32 sndID, s32 volume);     /* sndFade */
 
@@ -276,7 +276,7 @@ void battle_FightEnd(void) {
     /* Stop any battle sound effects */
     fn_801F54A4(0, 0, 0x12, 0);
     /* result checked but not stored -- original code checks return != NULL
-       and calls fn_801657F8 to stop it */
+       and calls soundStop to stop it */
 
     /* Fade out battle music */
     fn_80165A20(1, 0, 0xFF);
@@ -1173,7 +1173,7 @@ void fn_801EFA08(void) {
     ((void(*)(void))fn_801F54A4)();
     if (r3 != 0) {
         r4 = 0x3e8;
-        ((void(*)(void))fn_801657F8)();
+        ((void(*)(void))soundStop)();
     }
     r3 = 0x0;
     r4 = 0x0;

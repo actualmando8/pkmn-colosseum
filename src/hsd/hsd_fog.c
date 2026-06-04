@@ -259,11 +259,11 @@ void fn_8019BD18(void) {
 extern u8 lbl_80274800[];
 extern u8 lbl_8047DA98[];
 #if 1
-asm void fn_8019BFE8(void) {
-#include "src/hsd/hsd_fog_fn_8019BFE8.inc"
+asm void HSD_HashSearch(void) {
+#include "src/hsd/hsd_fog_HSD_HashSearch.inc"
 }
 #else
-void fn_8019BFE8(void) {
+void HSD_HashSearch(void) {
     /* TODO: match -- 272 bytes at 0x8019BFE8 */
 }
 #endif
@@ -371,12 +371,12 @@ extern void* fn_801AA4CC(void* list);
 extern u8 lbl_8047DAA0[];
 extern u8 lbl_8047DAA8[];
 #if 1
-asm void fn_8019C264(void) {
-#include "src/hsd/hsd_fog_fn_8019C264.inc"
+asm void HSD_IDInsertToTable(void) {
+#include "src/hsd/hsd_fog_HSD_IDInsertToTable.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019C264(u32* table, u32 key, u32 value) {
+void HSD_IDInsertToTable(u32* table, u32 key, u32 value) {
     u32** node;
     u32** newnode;
     u32 hash;

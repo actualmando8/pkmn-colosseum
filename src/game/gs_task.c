@@ -1345,7 +1345,7 @@ extern void fn_800F0308(void);
 extern void fn_8010BBB8(void* ptr);
 extern s8   fn_8010BCE4(void);
 extern void* fn_80121C18(void* ptr);
-extern void fn_801C3D64(void* ptr, void* src);
+extern void battleGridReplacePokemon(void* ptr, void* src);
 extern void fn_801C3430(void);
 extern void fn_801254B4(void* ptr, s32 a, s32 b, s32 c, s32 d);
 extern void fn_801DB100(void* ptr);
@@ -1420,7 +1420,7 @@ s32 fn_80007364(u32 ctx) {
                         fn_8010BBB8(scene);
                     } while (fn_8010BCE4() == 0);
                     animPtr = fn_80121C18(scene);
-                    fn_801C3D64((void*)(u32)subItem, animPtr);
+                    battleGridReplacePokemon((void*)(u32)subItem, animPtr);
                     fn_801C3430();
                     fn_801254B4(encounter, 0, 0xee, 0, (s32)animPtr);
                     fn_801DB100((void*)(u32)subItem);

@@ -8,8 +8,8 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_debug.h"
 
-/* 0x74 | fn_801A69C0 | global_cond_call */
-void fn_801A69C0(void) {
+/* 0x74 | _HSD_MemSetCallbacks | global_cond_call */
+void _HSD_MemSetCallbacks(void) {
     /* uses lbl_80274E10 */
     if (0 /* field check */) { return; }
     fn_80196E10();

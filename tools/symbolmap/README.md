@@ -65,6 +65,45 @@ wrong name cannot forge a match. To adopt:
 - XD-port names (score ≥ 2, unambiguous) are the most trustworthy; string
   self-names can be a shared prefix rather than a unique name (flagged).
 
+## Applying the names
+
+The proposals were applied to the project (this is what's committed alongside
+the tooling):
+
+```sh
+python tools/symbolmap/partition_apply.py     # split proposals -> applied vs leads
+python tools/symbolmap/apply_names.py --map config/GC6E01/symbolmap/applied_symbols.txt --symbols --source
+```
+
+`partition_apply.py` splits the 54 merged proposals into:
+
+- **`applied_symbols.txt` (34)** — renamed in **both** `symbols.{txt,build.txt}`
+  and `src/**/*.{c,h}`. Safe because the name has no pre-existing typed
+  prototype to clash with.
+- **`leads_needs_wiring.md` (20)** — names that ALREADY exist as a typed
+  prototype in the headers (XD *and* the headers agree — doubly confirmed), so
+  the asm-wrapper's `(void)` signature and untyped `lbl_` globals conflict.
+  Left as `fn_` (annotated in `symbols.txt`); each needs per-function typing to
+  wire up. The split is **compile-verified**: `compile_sweep.ps1` confirmed
+  zero rename-induced compile regressions across every touched TU vs. the `fn_`
+  baseline, and `dtk` re-link reproduced `main.dol` byte-identical.
+
+Why this is byte-safe: `config.libs = []` (configure.py), so the byte-match
+build links dtk-extracted asm objects carved from the DOL — the C is not
+compiled into it, and the DOL has no symbol table. Renaming is byte-neutral;
+`build/GC6E01/ok` (SHA-1 gate) still passes.
+
+### Regenerating `.inc` after a rename
+
+The stock `convert_to_asm_wrappers.py` / `regen_incs.py` only recognise `fn_`
+wrappers. For renamed functions use the name-aware regen (so objdiff works
+without committing the gitignored `.inc`):
+
+```sh
+ninja build/GC6E01/ok                                  # produce renamed build/GC6E01/asm
+python tools/symbolmap/regen_named_incs.py --all       # regenerate every .inc by name
+```
+
 ## Regenerating
 
 All `*.json`/`*.md` outputs are deterministic functions of the dtk asm. The

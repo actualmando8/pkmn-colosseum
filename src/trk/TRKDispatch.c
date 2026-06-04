@@ -15,7 +15,7 @@ extern s32 fn_800BF53C(void* buffer);  /* cmd 0x00: Ping */
 extern s32 fn_800BF5E4(void* buffer);  /* cmd 0x01: Connect */
 extern s32 fn_800BF68C(void* buffer);  /* cmd 0x02: Disconnect */
 extern s32 fn_800BF8AC(void* buffer);  /* cmd 0x03: Reset */
-extern s32 fn_800BF95C(void* buffer);  /* cmd 0x04: Versions */
+extern s32 SendACK(void* buffer);  /* cmd 0x04: Versions */
 extern s32 fn_800BFBEC(void* buffer);  /* cmd 0x05: SupportMask */
 extern s32 fn_800BFECC(void* buffer);  /* cmd 0x06: CPUType */
 extern s32 fn_800C0108(void* buffer);  /* cmd 0x07: ReadMemory */
@@ -58,7 +58,7 @@ s32 TRKDispatchMessage(void* buffer) {
             result = fn_800BF8AC(buffer);
             break;
         case 0x04: /* Versions */
-            result = fn_800BF95C(buffer);
+            result = SendACK(buffer);
             break;
         case 0x05: /* SupportMask */
             result = fn_800BFBEC(buffer);
@@ -166,7 +166,7 @@ void fn_800C0504(u8* data, s32 len) {
 /* fn_800C08C0 - 0x800C08C0 | size: 0x1E0 */
 void fn_800C08C0(void) {
     extern u8 lbl_8026FA40[];
-    extern void fn_800BE800();
+    extern void MessageSend();
     extern void fn_800BEEB4();
     extern void fn_800BF14C();
     extern void fn_800BF1FC();
@@ -209,7 +209,7 @@ void fn_800C08C0(void) {
         r3 = 0x1;
         ((void(*)(void))MWTRACE)();
         r3 = r21;
-        fn_800BE800();
+        MessageSend();
         /* mr. r30, r3 */;
         if ((s32)tmp != 0) continue;
         if ((s32)r23 != 0) {

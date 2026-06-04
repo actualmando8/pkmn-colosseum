@@ -362,7 +362,7 @@ void sndStopBgm(u32 sndId) {
 }
 
 /* =========================================================================
- * fn_801657F8 -- sndStop
+ * soundStop -- sndStop
  *
  * Stops a sound by its handle. Handles BGM/SE distinction, cleanup
  * of the global current BGM tracking, and prints warnings when a BGM

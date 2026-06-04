@@ -73,7 +73,7 @@ extern void  fn_8013111C(u32 effectId);                 /* GSeffect_TriggerEffec
 
 /* FSYS */
 extern void* fn_80191ECC(void* name, const char* tocName);
-extern void  fn_80191F64(void* resPtr, u32 fsysHandle, const char* name);
+extern void  HSD_ArchiveParse(void* resPtr, u32 fsysHandle, const char* name);
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_802717F0[];  /* "GSfloorOpen: cannot find floor %d\n" */

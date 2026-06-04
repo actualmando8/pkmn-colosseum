@@ -32,7 +32,7 @@
  *     "_leaffxGenerateLeafData: Could not create leaf clone model."
  *     Struct size: 0x98 bytes
  *     Callbacks: start=fn_80138CCC, stop=fn_80139074,
- *                update=fn_80138BBC, render=fn_80139378
+ *                update=fn_80138BBC, render=_leaffxGenerateLeafData
  *     Core logic: fn_80138DE4 (0x290 bytes), fn_80139074 (0x304 bytes)
  *
  *   electronStartEffect    (fn_80139820)  -- Electrical arc effect
@@ -99,7 +99,7 @@
  *     Struct size: 0xB4 bytes
  *     Callbacks: start=fn_8013F114, stop=fn_8013F344,
  *                update=fn_8013F078, render=fn_8013F410
- *     Core logic: fn_8013F80C (0x170 bytes), fn_8013F97C (0x264 bytes),
+ *     Core logic: fn_8013F80C (0x170 bytes), _distortionEffectUpdateMatrices (0x264 bytes),
  *                 fn_8013FF0C (0x22C bytes -- billboard transform setup)
  *
  *   patchiru texture effect (fn_8013FBE0)  -- Patchiru (Spinda) special effect
@@ -229,7 +229,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_80138CCC: _leaffxStart callback */
 /* fn_80138DE4: _leaffxGenerateLeafData (0x290 bytes) */
 /* fn_80139074: _leaffxStop callback (0x304 bytes) */
-/* fn_80139378: _leaffxRender callback (0x4A8 bytes) */
+/* _leaffxGenerateLeafData: _leaffxRender callback (0x4A8 bytes) */
 
 /* ---- Electron effect ---- */
 /* fn_80139820: electronStartEffect */
@@ -285,7 +285,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013D730: _blurStart callback */
 /* fn_8013D7CC: _blurUpdate callback */
 /* fn_8013D804: _blurRender callback (0x104 bytes) */
-/* fn_8013D908: _blurCalcMotion */
+/* envMapEffectStart: _blurCalcMotion */
 /* fn_8013D984: _blurStop callback (0x1E0 bytes) */
 /* fn_8013DB64: _blurCleanup */
 
@@ -315,7 +315,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_8013F344: _billboardStop callback */
 /* fn_8013F410: _billboardRender callback (0x3FC bytes) */
 /* fn_8013F80C: _billboardCalcTransform (0x170 bytes) */
-/* fn_8013F97C: _billboardRenderQuad (0x264 bytes) */
+/* _distortionEffectUpdateMatrices: _billboardRenderQuad (0x264 bytes) */
 
 /* ---- Patchiru (Spinda) texture effect ---- */
 /* fn_8013FBE0: patchiru texture start -- allocate 0x40 bytes */
@@ -347,7 +347,7 @@ extern void fn_80138BBC(void);
 extern void fn_80138CCC(void);
 extern void fn_80138DE4(void);
 extern void fn_80139074(void);
-extern void fn_80139378(void);
+extern void _leaffxGenerateLeafData(void);
 extern u32 fn_80139898(void* ptr);
 extern u32 fn_801398E0(void* ptr);
 extern void fn_80139934(void);
@@ -382,7 +382,7 @@ extern void fn_8013D0A8(void);
 extern u32 fn_8013D730(void* ptr);
 extern u32 fn_8013D7CC(void* ptr);
 extern u32 fn_8013D804(void* ptr);
-extern u32 fn_8013D908(void* ptr);
+extern u32 envMapEffectStart(void* ptr);
 extern void fn_8013D984(void);
 extern u32 fn_8013DC94(void* ptr);
 extern u32 fn_8013DD10(void* ptr);
@@ -402,7 +402,7 @@ extern void fn_8013F114(void);
 extern void fn_8013F344(void);
 extern void fn_8013F410(void);
 extern void fn_8013F80C(void);
-extern void fn_8013F97C(void);
+extern void _distortionEffectUpdateMatrices(void);
 extern u32 fn_8013FC58(void* ptr);
 extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
@@ -607,11 +607,11 @@ extern u32 lbl_8047D180;
 extern u32 lbl_8047D184;
 extern u32 lbl_8047D188;
 #if 1
-asm void fn_80139378(void) {
-#include "src/game/effect/effect_visual_fn_80139378.inc"
+asm void _leaffxGenerateLeafData(void) {
+#include "src/game/effect/effect_visual__leaffxGenerateLeafData.inc"
 }
 #else
-void fn_80139378(void) { /* TODO */ }
+void _leaffxGenerateLeafData(void) { /* TODO */ }
 #endif
 #if 0
 asm void fn_80139820(void) {
@@ -1216,7 +1216,7 @@ u32 fn_8013D6B8(void* callbacks) {
         fn_80131200(effectId,
             (GSEffectStartFunc)fn_8013D804,
             (GSEffectStopFunc)fn_8013D730,
-            (GSEffectStartFunc)fn_8013D908,
+            (GSEffectStartFunc)envMapEffectStart,
             (GSEffectStopFunc)fn_8013D7CC,
             0,
             (GSEffectUpdateFunc)fn_8013D984,
@@ -1326,11 +1326,11 @@ extern void fn_800E61BC(void* a, void* b, void* c, void* d, f32 e);
 extern u32 lbl_8047AEE0;
 extern u8 lbl_80272F38[];
 #if 0
-asm u32 fn_8013D908(void* ptr) {
-#include "src/game/effect/effect_visual_fn_8013D908.inc"
+asm u32 envMapEffectStart(void* ptr) {
+#include "src/game/effect/effect_visual_envMapEffectStart.inc"
 }
 #else
-u32 fn_8013D908(void* ptr) {
+u32 envMapEffectStart(void* ptr) {
     void* inner;
     if (ptr) {
         *(void**)((u8*)ptr + 0x10) = *(void**)((u8*)ptr + 0xc);
@@ -1839,11 +1839,11 @@ extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D310;
 extern u32 lbl_8047D324;
 #if 1
-asm void fn_8013F97C(void) {
-#include "src/game/effect/effect_visual_fn_8013F97C.inc"
+asm void _distortionEffectUpdateMatrices(void) {
+#include "src/game/effect/effect_visual__distortionEffectUpdateMatrices.inc"
 }
 #else
-void fn_8013F97C(void) { /* TODO */ }
+void _distortionEffectUpdateMatrices(void) { /* TODO */ }
 #endif
 #if 0
 asm void fn_8013FBE0(void) {

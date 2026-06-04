@@ -8103,7 +8103,7 @@ void fn_801181B0(void) {
 extern void fn_800E06EC(void);
 extern void fn_800DFEEC(void);
 extern void fn_800E0108(void);
-extern void fn_8016F430(void);
+extern void psInterpretParticles(void);
 extern void fn_80173F98(void);
 extern void fn_800057A0(void);
 extern void jumptable_8035BB88();
@@ -8128,7 +8128,7 @@ void fn_801183EC(void) {
     extern void fn_800EE150();
     extern void fn_800EE3BC();
     extern void fn_800EE828();
-    extern void fn_8016F430();
+    extern void psInterpretParticles();
     extern void fn_80173F98();
     extern u8 jumptable_8035BB88[];
     u8 sp[0x70];
@@ -8407,7 +8407,7 @@ void fn_801183EC(void) {
     r27 = 0x0;
     while (r27 < r26) {
         r3 = 0x0;
-        fn_8016F430();
+        psInterpretParticles();
         r3 = 0x0;
         fn_80173F98();
         r27 = r27 + 0x1;
@@ -8420,7 +8420,7 @@ void fn_801183EC(void) {
         lbl_8047ADB0 = r3;
         if (r0 >= (u32)0x5) {
             r3 = 0x0;
-            fn_8016F430();
+            psInterpretParticles();
             r3 = 0x0;
             fn_80173F98();
             r0 = 0x0;

@@ -21,7 +21,7 @@ void fn_8019C3C4(void) {
     extern u32 lbl_8047B288;
     extern u32 lbl_8047B28C;
     extern void fn_8009F3D4();
-    extern void fn_801A69C0();
+    extern void _HSD_MemSetCallbacks();
     extern u8 jumptable_8036C8C0[];
     u8 sp[0x90];
     u32 tmp = 0;
@@ -159,7 +159,7 @@ void fn_8019C3C4(void) {
     }
     r3 = (u32)sp + 0x74;
     r4 = 0x14;
-    fn_801A69C0();
+    _HSD_MemSetCallbacks();
     tmp = 0x1;
     r30 = 0x1;
     lbl_8047B288 = tmp;

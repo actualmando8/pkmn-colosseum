@@ -12,11 +12,11 @@
  * Matches: 0x8009E7A4 - 0x8009F1B8
  *   fn_8009E7A8 (0x04) - __OSGetRTC stub / return
  *   fn_8009E7AC (0x04) - (nop)
- *   fn_8009E7B0 (0x2BC) - __OSReadROM (read from IPL font ROM via EXI)
+ *   OSLink (0x2BC) - __OSReadROM (read from IPL font ROM via EXI)
  *   fn_8009EA6C (0x2E0) - __OSGetRTC / __OSSetRTC (RTC access via EXI)
  *   fn_8009ED4C (0x24)  - (helper)
  *   fn_8009ED70 (0x3C)  - (helper)
- *   fn_8009EDAC (0x238) - __OSReadFontROM
+ *   OSUnlink (0x238) - __OSReadFontROM
  *   fn_8009EFE4 (0x1D4) - __OSGetSerialNumber
  */
 
