@@ -1,0 +1,254 @@
+/* Host-side WZX field-collision parser + floor query for the PC port.
+ * See field_collision.h for the on-disc WZX layout. Pure host C (no engine
+ * dependency): the game's own GScolsys2 (src/game/gs_colsys.c) reads the same
+ * data, but for the port's free-fly/walk path a flat triangle list + a vertical
+ * ray query is simpler and avoids dragging in the GSmem allocator + layer BSS. */
+
+#include "field_collision.h"
+#include "real_content_host.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    f32 v[3][3];   /* three triangle vertices */
+    f32 n[3];      /* face normal (from the WZX record) */
+    int cat;       /* PCPortColCategory */
+} ColTri;
+
+static ColTri* s_tris = NULL;
+static int s_triCount = 0;
+static int s_triCap = 0;
+static f32 s_min[3], s_max[3];
+
+static u32 ReadBE32(const u8* p) {
+    return ((u32)p[0] << 24) | ((u32)p[1] << 16) | ((u32)p[2] << 8) | (u32)p[3];
+}
+
+static f32 ReadBEf32(const u8* p) {
+    union { u32 u; f32 f; } v;
+    v.u = ReadBE32(p);
+    return v.f;
+}
+
+static BOOL FiniteBounded(f32 a) {
+    /* a == a rejects NaN; the magnitude clamp rejects inf / garbage. */
+    return (a == a) && a < 1.0e6f && a > -1.0e6f;
+}
+
+static void PushTri(const u8* base, u32 triOff, int cat) {
+    ColTri* t;
+    int i, j;
+    f32 vals[9], nrm[3];
+
+    for (i = 0; i < 9; ++i) {
+        vals[i] = ReadBEf32(base + triOff + (u32)i * 4u);
+        if (!FiniteBounded(vals[i])) {
+            return;
+        }
+    }
+    for (i = 0; i < 3; ++i) {
+        nrm[i] = ReadBEf32(base + triOff + 0x24u + (u32)i * 4u);
+        if (!FiniteBounded(nrm[i])) {
+            nrm[i] = 0.0f;
+        }
+    }
+
+    if (s_triCount == s_triCap) {
+        int newCap = s_triCap ? s_triCap * 2 : 256;
+        ColTri* grown = (ColTri*)realloc(s_tris, (size_t)newCap * sizeof(ColTri));
+        if (grown == NULL) {
+            return;
+        }
+        s_tris = grown;
+        s_triCap = newCap;
+    }
+
+    t = &s_tris[s_triCount++];
+    for (i = 0; i < 3; ++i) {
+        for (j = 0; j < 3; ++j) {
+            t->v[i][j] = vals[i * 3 + j];
+            if (t->v[i][j] < s_min[j]) s_min[j] = t->v[i][j];
+            if (t->v[i][j] > s_max[j]) s_max[j] = t->v[i][j];
+        }
+    }
+    t->n[0] = nrm[0]; t->n[1] = nrm[1]; t->n[2] = nrm[2];
+    t->cat = cat;
+}
+
+void PCPort_FieldColUnload(void) {
+    free(s_tris);
+    s_tris = NULL;
+    s_triCount = 0;
+    s_triCap = 0;
+}
+
+int PCPort_FieldColLoad(const char* fsysPath) {
+    u8* wzx = NULL;
+    u32 wzxSize = 0;
+    u32 vertOff, groupCount, g;
+
+    PCPort_FieldColUnload();
+
+    if (!PCPort_LoadFsysWZXMember(fsysPath, &wzx, &wzxSize) || wzx == NULL) {
+        return 0;
+    }
+    if (wzxSize < 0x48u) {
+        PCPort_FreeBuffer(wzx);
+        return 0;
+    }
+
+    s_min[0] = s_min[1] = s_min[2] = 1.0e30f;
+    s_max[0] = s_max[1] = s_max[2] = -1.0e30f;
+
+    vertOff = ReadBE32(wzx + 0x00);
+    groupCount = ReadBE32(wzx + 0x04);
+    if (vertOff < 8u || vertOff >= wzxSize || groupCount == 0u || groupCount > 256u) {
+        PCPort_FreeBuffer(wzx);
+        return 0;
+    }
+
+    for (g = 0; g < groupCount; ++g) {
+        u32 grpBase = vertOff + g * 0x40u;
+        u32 slot;
+        if (grpBase + 0x40u > wzxSize) {
+            break;
+        }
+        for (slot = 0; slot < 6u; ++slot) {
+            u32 so = ReadBE32(wzx + grpBase + 0x24u + slot * 4u);
+            u32 smVtx, smCnt, t;
+            if (so == 0u || so + 0x10u > wzxSize) {
+                continue;
+            }
+            smVtx = ReadBE32(wzx + so + 0x00u);
+            smCnt = ReadBE32(wzx + so + 0x04u);
+            if (smVtx == 0u || smCnt == 0u || smCnt > 100000u) {
+                continue;
+            }
+            if (smVtx + smCnt * 0x34u > wzxSize) {
+                continue;
+            }
+            for (t = 0; t < smCnt; ++t) {
+                PushTri(wzx, smVtx + t * 0x34u, (int)slot);
+            }
+        }
+    }
+
+    PCPort_FreeBuffer(wzx);
+    return s_triCount;
+}
+
+int PCPort_FieldColTriCount(void) {
+    return s_triCount;
+}
+
+BOOL PCPort_FieldColGetTri(int i, f32 out9[9], int* outCat) {
+    int a, b;
+    if (i < 0 || i >= s_triCount || out9 == NULL) {
+        return FALSE;
+    }
+    for (a = 0; a < 3; ++a) {
+        for (b = 0; b < 3; ++b) {
+            out9[a * 3 + b] = s_tris[i].v[a][b];
+        }
+    }
+    if (outCat != NULL) {
+        *outCat = s_tris[i].cat;
+    }
+    return TRUE;
+}
+
+BOOL PCPort_FieldColBounds(f32 outMin[3], f32 outMax[3]) {
+    int j;
+    if (s_triCount == 0) {
+        return FALSE;
+    }
+    for (j = 0; j < 3; ++j) {
+        if (outMin) outMin[j] = s_min[j];
+        if (outMax) outMax[j] = s_max[j];
+    }
+    return TRUE;
+}
+
+/* True if (px,pz) is inside triangle t's XZ projection. Uses the sign of the
+ * three edge cross-products; accepts either winding (collision tris are not
+ * consistently wound). A small epsilon includes shared edges. */
+static BOOL PointInTriXZ(const ColTri* t, f32 px, f32 pz) {
+    f32 d1, d2, d3;
+    BOOL hasNeg, hasPos;
+    const f32 eps = 1.0e-3f;
+
+    d1 = (px - t->v[1][0]) * (t->v[0][2] - t->v[1][2]) -
+         (t->v[0][0] - t->v[1][0]) * (pz - t->v[1][2]);
+    d2 = (px - t->v[2][0]) * (t->v[1][2] - t->v[2][2]) -
+         (t->v[1][0] - t->v[2][0]) * (pz - t->v[2][2]);
+    d3 = (px - t->v[0][0]) * (t->v[2][2] - t->v[0][2]) -
+         (t->v[2][0] - t->v[0][0]) * (pz - t->v[0][2]);
+
+    hasNeg = (d1 < -eps) || (d2 < -eps) || (d3 < -eps);
+    hasPos = (d1 > eps) || (d2 > eps) || (d3 > eps);
+    return !(hasNeg && hasPos);
+}
+
+/* Solve the triangle's plane for Y at (px,pz). Returns FALSE for near-vertical
+ * surfaces (no well-defined floor height). */
+static BOOL TriPlaneY(const ColTri* t, f32 px, f32 pz, f32* outY) {
+    /* Plane normal via edge cross product (don't trust the stored normal's
+     * sign/scale for this). */
+    f32 e1[3], e2[3], nx, ny, nz;
+    e1[0] = t->v[1][0] - t->v[0][0];
+    e1[1] = t->v[1][1] - t->v[0][1];
+    e1[2] = t->v[1][2] - t->v[0][2];
+    e2[0] = t->v[2][0] - t->v[0][0];
+    e2[1] = t->v[2][1] - t->v[0][1];
+    e2[2] = t->v[2][2] - t->v[0][2];
+    nx = e1[1] * e2[2] - e1[2] * e2[1];
+    ny = e1[2] * e2[0] - e1[0] * e2[2];
+    nz = e1[0] * e2[1] - e1[1] * e2[0];
+
+    if (ny < 1.0e-4f && ny > -1.0e-4f) {
+        return FALSE;
+    }
+    /* n . (P - v0) = 0  ->  Py = v0y - (nx*(Px-v0x) + nz*(Pz-v0z)) / ny */
+    *outY = t->v[0][1] -
+            (nx * (px - t->v[0][0]) + nz * (pz - t->v[0][2])) / ny;
+    return TRUE;
+}
+
+static BOOL Walkable(int cat) {
+    return cat == PCPORT_COLCAT_FLOOR ||
+           cat == PCPORT_COLCAT_SLOPE ||
+           cat == PCPORT_COLCAT_EXTFLOOR;
+}
+
+BOOL PCPort_FieldColFloorAt(f32 x, f32 z, f32 queryY, f32 climb, f32* outY) {
+    int i;
+    BOOL found = FALSE;
+    f32 best = -1.0e30f;
+
+    if (outY == NULL) {
+        return FALSE;
+    }
+    for (i = 0; i < s_triCount; ++i) {
+        const ColTri* t = &s_tris[i];
+        f32 y;
+        if (!Walkable(t->cat)) {
+            continue;
+        }
+        if (!PointInTriXZ(t, x, z)) {
+            continue;
+        }
+        if (!TriPlaneY(t, x, z, &y)) {
+            continue;
+        }
+        /* Floors at or below the query point (allow a small upward step). */
+        if (y <= queryY + climb && y > best) {
+            best = y;
+            found = TRUE;
+        }
+    }
+    if (found) {
+        *outY = best;
+    }
+    return found;
+}

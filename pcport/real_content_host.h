@@ -187,6 +187,9 @@ BOOL PCPort_LoadFsysMember(const char* fsysPath, const char* memberName,
 /* Returns the largest HSD-archive member exposing a "scene_data" public symbol
  * (for field maps whose members share names; the title uses LoadFsysMember). */
 BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize);
+/* Returns the WZX collision-mesh member of a field-map .fsys (matched by
+ * content signature, since it shares the map's member name). See field_collision.c. */
+BOOL PCPort_LoadFsysWZXMember(const char* fsysPath, u8** outData, u32* outSize);
 void PCPort_FreeBuffer(void* buffer);
 
 BOOL PCPort_HSDArchiveParseBE(PCPortHSDArchive* archive,

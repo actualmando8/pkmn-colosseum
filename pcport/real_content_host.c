@@ -1215,6 +1215,128 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
     return TRUE;
 }
 
+/* True if `data` looks like a WZX collision mesh (see include/game/gs_colsys.h
+ * + pcport/field_collision.c). Top-level header is {u32 vertDataOff@0,
+ * u32 groupCount@4}; groupCount group records of 0x40 bytes start at vertDataOff,
+ * each with 6 self-relative submesh slots at +0x24..+0x38. A submesh is
+ * {u32 vtxOff, u32 triCount, ...}; its triangles are 0x34 bytes (3 Vec3f + normal).
+ * We confirm the header shape and that at least one submesh resolves to
+ * room-scale finite vertex coordinates -- enough to disambiguate the WZX from
+ * the other raw members (which all share the map's member name). */
+static BOOL WZXLooksValid(const u8* d, u32 n) {
+    u32 vertOff, groupCount, g, validTris = 0;
+    if (n < 0x48) {
+        return FALSE;
+    }
+    /* Not an HSD archive (those have fileSize word == n). */
+    if (ReadBE32(d) == n) {
+        return FALSE;
+    }
+    vertOff = ReadBE32(d + 0x00);
+    groupCount = ReadBE32(d + 0x04);
+    if (vertOff < 8u || vertOff >= n || groupCount == 0u || groupCount > 256u) {
+        return FALSE;
+    }
+    if (vertOff + groupCount * 0x40u > n) {
+        return FALSE;
+    }
+    for (g = 0; g < groupCount; ++g) {
+        u32 grpBase = vertOff + g * 0x40u;
+        u32 slot;
+        for (slot = 0; slot < 6u; ++slot) {
+            u32 so = ReadBE32(d + grpBase + 0x24u + slot * 4u);
+            u32 vtx, cnt, k;
+            if (so == 0u || so + 0x10u > n) {
+                continue;
+            }
+            vtx = ReadBE32(d + so + 0x00u);
+            cnt = ReadBE32(d + so + 0x04u);
+            if (vtx == 0u || cnt == 0u || cnt > 100000u) {
+                continue;
+            }
+            if (vtx + cnt * 0x34u > n) {
+                continue;
+            }
+            /* Sanity-check the first vertex of the first triangle. */
+            for (k = 0; k < 3u; ++k) {
+                union { u32 u; f32 f; } v;
+                f32 a;
+                v.u = ReadBE32(d + vtx + k * 4u);
+                a = v.f;
+                if (!(a == a) || a > 1.0e5f || a < -1.0e5f) {
+                    goto next_slot;
+                }
+            }
+            validTris += cnt;
+        next_slot:;
+        }
+    }
+    return validTris >= 8u;
+}
+
+/* Field-map .fsys archives bundle the WZX collision mesh as a raw member that
+ * (like the scene) shares the map's member name -- so it can't be fetched by
+ * name. Scan all members and return the one matching the WZX signature.
+ * Caller frees *outData via PCPort_FreeBuffer. */
+BOOL PCPort_LoadFsysWZXMember(const char* fsysPath, u8** outData, u32* outSize) {
+    u8* fsysData;
+    u32 fsysSize = 0;
+    u32 entryCount, stringTableOffset, entryTableOffset, i;
+
+    if (outData == NULL || outSize == NULL) {
+        return FALSE;
+    }
+    *outData = NULL;
+    *outSize = 0;
+
+    fsysData = LoadFileBytes(fsysPath, &fsysSize);
+    if (fsysData == NULL) {
+        return FALSE;
+    }
+    if (fsysSize < 0x20 || ReadBE32(fsysData) != PCPORT_FSYS_MAGIC) {
+        free(fsysData);
+        return FALSE;
+    }
+
+    entryCount = ReadBE32(fsysData + 0x08);
+    stringTableOffset = ReadBE32(fsysData + 0x18);
+    if (stringTableOffset + 4 > fsysSize) {
+        free(fsysData);
+        return FALSE;
+    }
+    entryTableOffset = ReadBE32(fsysData + stringTableOffset);
+    if (entryTableOffset >= fsysSize) {
+        free(fsysData);
+        return FALSE;
+    }
+
+    for (i = 0; i < entryCount; ++i) {
+        u32 entryOffset, memSize = 0;
+        u8* mem;
+        if (entryTableOffset + i * 4 + 4 > fsysSize) {
+            break;
+        }
+        entryOffset = ReadBE32(fsysData + entryTableOffset + (i * 4));
+        if (entryOffset + 0x28 > fsysSize) {
+            continue;
+        }
+        mem = DecompressMemberAt(fsysData, fsysSize, entryOffset, &memSize);
+        if (mem == NULL) {
+            continue;
+        }
+        if (WZXLooksValid(mem, memSize)) {
+            free(fsysData);
+            *outData = mem;
+            *outSize = memSize;
+            return TRUE;
+        }
+        free(mem);
+    }
+
+    free(fsysData);
+    return FALSE;
+}
+
 void PCPort_FreeBuffer(void* buffer) {
     free(buffer);
 }

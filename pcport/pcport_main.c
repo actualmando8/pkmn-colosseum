@@ -1,5 +1,6 @@
 #include "audio_shim.h"
 #include "dvd_shim.h"
+#include "field_collision.h"
 #include "gx_shim.h"
 #include "gx_texture.h"
 #include "hsd/hsd_pobj.h"
@@ -6950,6 +6951,60 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
 
 /* --field: static field-map render loop. PCPORT_FIELD_ARCHIVE picks the map
  * (default D1_garage_1F = Wes's hideout, the game's start). */
+/* Debug overlay: draw the loaded WZX collision mesh as world-space wireframe
+ * lines over the field render, so the parsed triangles can be visually checked
+ * against the rendered room geometry. Walkable surfaces (floor/slope/extfloor)
+ * are green, blocking surfaces (walls/boundary) pink, ceiling grey. Uses the
+ * current camera's view matrix (model = identity); depth-tests against the scene
+ * but does not write depth. Gated by PCPORT_COL_WIRE. */
+static void DrawFieldCollisionWire(void) {
+    int n = PCPort_FieldColTriCount();
+    int i, cat;
+    f32 t9[9];
+
+    if (n <= 0) {
+        return;
+    }
+
+    GXSetProjection(g_engTitleCamera.projectionMatrix, GX_PERSPECTIVE);
+    GXLoadPosMtxImm(g_engTitleCamera.viewMatrix, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_COPY);
+    GXSetNumTexGens(1);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXHostSetLightingEnabled(GX_FALSE);
+    GXHostSetVertexAlphaScale(1.0f);
+
+    GXBegin(GX_LINES, GX_VTXFMT0, (u16)(n * 6));
+    for (i = 0; i < n; ++i) {
+        u8 r, g, b;
+        int e;
+        if (!PCPort_FieldColGetTri(i, t9, &cat)) {
+            continue;
+        }
+        if (cat == PCPORT_COLCAT_WALL || cat == PCPORT_COLCAT_BOUND) {
+            r = 255; g = 60; b = 200;       /* blocking -> pink */
+        } else if (cat == PCPORT_COLCAT_CEIL) {
+            r = 130; g = 130; b = 130;      /* ceiling -> grey */
+        } else {
+            r = 60; g = 255; b = 90;        /* walkable -> green */
+        }
+        for (e = 0; e < 3; ++e) {
+            int a0 = e, a1 = (e + 1) % 3;
+            GXColor4u8(r, g, b, 255);
+            GXPosition3f32(t9[a0 * 3 + 0], t9[a0 * 3 + 1], t9[a0 * 3 + 2]);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXColor4u8(r, g, b, 255);
+            GXPosition3f32(t9[a1 * 3 + 0], t9[a1 * 3 + 1], t9[a1 * 3 + 2]);
+            GXTexCoord2f32(0.0f, 0.0f);
+        }
+    }
+    GXEnd();
+
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+}
+
 static int RunFieldScene(GLFWwindow* window) {
     const char* archive = getenv("PCPORT_FIELD_ARCHIVE");
     const char* capEnv = getenv("PCPORT_MENU_FRAMES");
@@ -6975,6 +7030,19 @@ static int RunFieldScene(GLFWwindow* window) {
 
     if (!PCPort_EngineFieldSetup(archive)) {
         return 0;
+    }
+
+    { /* Load the field WZX collision mesh (floor-clamp + debug wireframe). */
+        int colTris = PCPort_FieldColLoad(archive);
+        if (colTris > 0) {
+            f32 cmin[3], cmax[3];
+            PCPort_FieldColBounds(cmin, cmax);
+            printf("[field] collision: %d triangles  bounds X[%.1f,%.1f] "
+                   "Y[%.1f,%.1f] Z[%.1f,%.1f]\n", colTris,
+                   cmin[0], cmax[0], cmin[1], cmax[1], cmin[2], cmax[2]);
+        } else {
+            printf("[field] collision: no WZX mesh found in %s\n", archive);
+        }
     }
 
     { /* optional initial eye placement */
@@ -7019,12 +7087,28 @@ static int RunFieldScene(GLFWwindow* window) {
         if (btn & GCN_PAD_BUTTON_A) eye[1] += MOVE;
         if (btn & GCN_PAD_BUTTON_B) eye[1] -= MOVE;
 
+        /* Floor-clamp: keep the camera at least eyeHeight above the walkable
+         * surface under it, so you can't sink through the floor. PCPORT_NO_FLOORCLAMP
+         * keeps the old free-fly; PCPORT_EYE_HEIGHT tunes the standing height. */
+        if (getenv("PCPORT_NO_FLOORCLAMP") == NULL) {
+            const char* ehEnv = getenv("PCPORT_EYE_HEIGHT");
+            f32 eyeHeight = (ehEnv != NULL) ? (f32)atof(ehEnv) : 25.0f;
+            f32 floorY;
+            if (PCPort_FieldColFloorAt(eye[0], eye[2], eye[1], 1.0e9f, &floorY) &&
+                eye[1] < floorY + eyeHeight) {
+                eye[1] = floorY + eyeHeight;
+            }
+        }
+
         interest[0] = eye[0] + fwd[0];
         interest[1] = eye[1] + fwd[1];
         interest[2] = eye[2] + fwd[2];
         BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
 
         PCPort_EngineTitleRenderFrame();   /* same scene_data -> RenderJointTree path */
+        if (getenv("PCPORT_COL_WIRE") != NULL) {
+            DrawFieldCollisionWire();      /* debug overlay: collision mesh wireframe */
+        }
         if (dumpPath != NULL && dumpPath[0] != '\0' &&
             (frameCap > 0 ? frame == frameCap - 1 : frame == 2)) {
             DumpBackbufferTo(dumpPath);
