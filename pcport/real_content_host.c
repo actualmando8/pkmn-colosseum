@@ -1727,6 +1727,27 @@ static void PCPortHSDDumpStruct(const PCPortHSDArchive* a, u32 off,
     }
 }
 
+/* Raw byte hexdump at absolute storage offset `off` (for decoding the FObj
+ * keyframe stream `ad` against the known packed format). */
+static void PCPortHSDHexDump(const PCPortHSDArchive* a, u32 off,
+                             u32 nbytes, const char* label) {
+    u32 i;
+    if (off == 0u || off >= a->storageSize) {
+        printf("[hsd-swiz] %s @0x%X: (out of range)\n", label, off);
+        return;
+    }
+    printf("[hsd-swiz] %s @0x%X (%u bytes):\n", label, off, nbytes);
+    for (i = 0; i < nbytes; i += 16u) {
+        u32 j;
+        printf("[hsd-swiz]   +0x%-3X:", i);
+        for (j = 0; j < 16u && (i + j) < nbytes; ++j) {
+            if (off + i + j >= a->storageSize) break;
+            printf(" %02X", a->storage[off + i + j]);
+        }
+        printf("\n");
+    }
+}
+
 /* Public: prepare a parsed archive's scene-data joint graph for the game's HSD
  * pipeline. `rootJointOffset` is the storage offset of the scene root HSD_Joint
  * (scene_data -> branch -> jointList). Returns the root joint as a native ptr. */
@@ -1841,7 +1862,15 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
                 PCPortHSDDumpStruct(&archive, ajAobj, 6, "  animjoint+8->(aobjdesc?)");
                 ajFobj = ReadBE32(archive.storage + ajAobj + 0x8);
                 if (ajFobj >= archive.dataOffset) {
+                    u32 adPtr;
                     PCPortHSDDumpStruct(&archive, ajFobj, 8, "    aobjdesc+8->(fobjdesc?)");
+                    /* the fobjdesc's only [ptr] is the keyframe stream `ad`:
+                     * hexdump it + decode the header byte against the FObj format
+                     * (low nibble = op 1..6, high bits = run-length varint). */
+                    adPtr = ReadBE32(archive.storage + ajFobj + 0x8);
+                    if (adPtr >= archive.dataOffset) {
+                        PCPortHSDHexDump(&archive, adPtr, 48, "      fobjdesc+8->(keyframe ad?)");
+                    }
                 }
             }
         }
