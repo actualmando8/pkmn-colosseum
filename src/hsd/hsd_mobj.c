@@ -243,30 +243,33 @@ void fn_801A6B8C(HSD_MObj* mobj) {
 #endif
 
 /* 0x801A6C34 | 0x70 */
-#if 1
+#if 0
 asm void fn_801A6C34(void) {
 #include "src/hsd/hsd_mobj_fn_801A6C34.inc"
 }
 #else
 void fn_801A6C34(void* obj) {
-    u32* pp;
     u32 node;
+    volatile u32* pp;
 
     if (obj != NULL) {
         pp = &lbl_8047B2DC;
-        while ((node = *pp) != 0) {
-            if ((void*)node == obj) {
+        while (*pp != 0) {
+            if ((void*)*pp == obj) {
                 *pp = *(u32*)((u8*)obj + 8);
                 *(u32*)((u8*)obj + 8) = 0;
                 return;
             }
-            pp = (u32*)((u8*)node + 8);
+            node = *pp;
+            pp = (volatile u32*)((u8*)node + 8);
         }
+        return;
     }
     while (lbl_8047B2DC != 0) {
-        node = lbl_8047B2DC;
-        lbl_8047B2DC = *(u32*)((u8*)node + 8);
-        *(u32*)((u8*)node + 8) = 0;
+        u32 head = *(volatile u32*)&lbl_8047B2DC;
+        *(u32*)((u8*)*(volatile u32*)&lbl_8047B2DC + 8) = 0;
+        head = *(u32*)((u8*)head + 8);
+        lbl_8047B2DC = head;
     }
 }
 #endif
