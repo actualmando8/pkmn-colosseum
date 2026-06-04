@@ -7104,8 +7104,27 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
     /* Camera: try the map's embedded camera (scene branch +0x08, same layout as
      * the title). If it doesn't resolve, synthesize a generous default look-at so
      * something draws; PCPORT_CAM_EYE/INT/UP override either way (for framing). */
-    cameraDescOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x08);
+    /* The scene branch is a NULL-terminated list of model-set jointLists from
+     * +0; the camera desc immediately follows the terminator. D1_garage_1F has
+     * 3 models (+0/+4/+8), null at +0xC, camera at +0x10; the title has 1 model
+     * (+0), null at +4, camera at +8. The old code hardcoded +0x08, which only
+     * framed single-model scenes -- multi-model field maps fell to the default. */
+    {
+        u32 modelSlots = 0u, s;
+        for (s = 0u; s <= 0x20u; s += 0x4u) {
+            u32 jl = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + s);
+            u32 rj;
+            if (!ArchiveRangeValid(&g_engTitleArchive, jl, 0x4u)) break;
+            rj = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + jl + 0x00);
+            if (!ArchiveRangeValid(&g_engTitleArchive, rj, PCPORT_SERIALIZED_JOINT_SIZE)) break;
+            modelSlots++;
+        }
+        cameraDescOffset = PCPort_ReadBigEndianU32(
+            g_engTitleArchive.storage + sceneBranchOffset +
+            (modelSlots > 0u ? (modelSlots + 1u) * 4u : 0x08u));
+    }
     if (cameraDescOffset != 0 &&
+        ArchiveRangeValid(&g_engTitleArchive, cameraDescOffset, 0x4u) &&
         PCPort_TranslatePerspectiveCameraFromArchiveBE(&g_engTitleArchive,
                                                        cameraDescOffset, &g_engTitleCamera)) {
         haveCam = 1;
