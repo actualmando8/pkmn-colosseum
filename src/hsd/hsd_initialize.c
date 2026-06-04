@@ -282,7 +282,7 @@ void* fn_8019C8F4(void* buffer) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_8009F3D4(void);
-extern void fn_801A69C0(void);
+extern void _HSD_MemSetCallbacks(void);
 extern void fn_801AA538(void);
 extern void OSGetArenaLo();
 extern void OSGetArenaHi();

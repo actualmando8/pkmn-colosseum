@@ -179,7 +179,7 @@ void fn_800C4F34(void* handler) {
  * Genuine MetroWerks Standard Library source, wired to Colosseum's
  * own symbol names (fn_800C4FA4 = __pool_free,
  * fn_800C4FFC = deallocate_from_fixed_pools,
- * fn_800C5154 = deallocate_from_var_pools, fn_800C4D8C = __sys_free).
+ * fn_800C5154 = deallocate_from_var_pools, __sys_free = __sys_free).
  * ---------------------------------------------------------------- */
 
 typedef struct Block {
@@ -227,7 +227,7 @@ typedef struct __mem_pool_obj {
 extern const unsigned long lbl_8026FEE8[];
 #define fix_pool_sizes lbl_8026FEE8
 
-extern void fn_800C4D8C(void* bp);    /* __sys_free */
+extern void __sys_free(void* bp);    /* __sys_free */
 
 #define SubBlock_size(ths) ((ths)->size & 0xFFFFFFF8)
 #define SubBlock_block(ths) ((Block*)((unsigned long)((ths)->block) & ~0x1))
@@ -448,7 +448,7 @@ void fn_800C5154(__mem_pool_obj* pool_obj, void* ptr) {
 
     if (Block_empty(bp)) {
         __unlink(pool_obj, bp);
-        fn_800C4D8C(bp);
+        __sys_free(bp);
     }
 }
 

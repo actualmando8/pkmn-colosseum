@@ -59,7 +59,7 @@ extern void  fn_8036A2D8(void* jobj, f32 rx, f32 ry, f32 rz); /* HSD_JObjSetRota
 extern void* fn_80369654(void* jobj, s32 childIdx);         /* HSD_JObjGetChild */
 
 /* Sound */
-extern void  fn_801657F8(s32 sndID, s32 volume);    /* sndStop */
+extern void  soundStop(s32 sndID, s32 volume);    /* sndStop */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay with fade */
 
 /* Battle scene (forward refs to battle_scene.c) */
@@ -128,13 +128,13 @@ void* fn_801C027C(void) {
 }
 
 /**
- * fn_801C028C - Main pre-grid state machine.
+ * HSD_ForeachAnim - Main pre-grid state machine.
  * Address: 0x801C028C | Size: 0xC94
  * This is a massive state machine controlling the pre-battle field setup.
  * It handles camera transitions, model loading, and initial animations
  * before the battle grid is ready.
  */
-void fn_801C028C(void* ctx) {
+void HSD_ForeachAnim(void* ctx) {
     u8* state = (u8*)ctx;
     s32 phase;
 
@@ -778,12 +778,12 @@ void fn_801C3C98(s32 slot) {
 }
 
 /**
- * fn_801C3D64 / battleGridReplacePokemon - Replace Pokemon model in a grid slot.
+ * battleGridReplacePokemon / battleGridReplacePokemon - Replace Pokemon model in a grid slot.
  * Address: 0x801C3D64 | Size: 0xD8
  * Proposed name from symbols: battleGridReplacePokemon.
  * Removes the current Pokemon model from a slot and loads a new one.
  */
-void fn_801C3D64(void* model) {
+void battleGridReplacePokemon(void* model) {
     /* Replace Pokemon model in a grid slot:
      * 1. Find the slot this model belongs to
      * 2. Remove the current Pokemon JObj
@@ -822,13 +822,13 @@ void fn_801C3E3C(s32 slot, s32 animType) {
 }
 
 /**
- * fn_801C3F10 / battleGridReplaceTrainer - Replace trainer model in a grid slot.
+ * battleGridReplaceTrainer / battleGridReplaceTrainer - Replace trainer model in a grid slot.
  * Address: 0x801C3F10 | Size: 0xAC
  * Proposed name from symbols: battleGridReplaceTrainer.
  */
-void fn_801C3F10(void* model) {
+void battleGridReplaceTrainer(void* model) {
     /* Replace trainer model in a grid slot:
-     * Similar to fn_801C3D64 but for trainer models.
+     * Similar to battleGridReplacePokemon but for trainer models.
      */
     if (model == NULL) {
         return;

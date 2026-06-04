@@ -8802,7 +8802,7 @@ void fn_8020EED4(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
 void fn_8020F108(void* battleCtx, void* ctx) {
     extern void fn_8011BEB4();
     extern void fn_801C3430();
-    extern void fn_801C3D64();
+    extern void battleGridReplacePokemon();
     extern void fn_801DB100();
     extern u8 fn_801F453C();
     extern void fn_801FCEC4();
@@ -8823,7 +8823,7 @@ void fn_8020F108(void* battleCtx, void* ctx) {
     fn_80208750(ctx, battleCtx, 1, 0);
     fn_80208750(localBuf, battleCtx, 3, 0);
     fn_802085C4(ctx, battleCtx, 1, 1, 0);
-    fn_801C3D64(eeData, resolved);
+    battleGridReplacePokemon(eeData, resolved);
     fn_801C3430();
     fn_801254B4(ctx, 0, 0xEE, 0, (u32)resolved);
     fn_802085C4(ctx, battleCtx, 3, 0, 0);
@@ -8834,7 +8834,7 @@ void fn_8020F108(void* battleCtx, void* ctx) {
 void fn_8020F238(void* battleCtx, void* ctx) {
     extern void fn_8011BEB4();
     extern void fn_801C3430();
-    extern void fn_801C3D64();
+    extern void battleGridReplacePokemon();
     extern void fn_801DB100();
     extern u8 fn_801F453C();
     extern void fn_801FCEC4();
@@ -8855,7 +8855,7 @@ void fn_8020F238(void* battleCtx, void* ctx) {
     fn_80208750(ctx, battleCtx, 3, 0);
     fn_80208750(localBuf, battleCtx, 3, 1);
     fn_802085C4(ctx, battleCtx, 3, 1, 0);
-    fn_801C3D64(eeData, resolved);
+    battleGridReplacePokemon(eeData, resolved);
     fn_801C3430();
     fn_801254B4(ctx, 0, 0xEE, 0, (u32)resolved);
     fn_802085C4(ctx, battleCtx, 3, 0, 0);

@@ -758,7 +758,7 @@ extern void fn_800DD128(u8*);
 extern void fn_800DE09C(void);
 extern void fn_800DE128(void);
 extern void fn_800DF930(void);
-extern void fn_800DFABC(void);
+extern void _matGSmatEnableEnvMapExt(void);
 extern s32 fn_800DFE98(u8*);
 extern void fn_800E0290(void*, void*, void*);
 extern void fn_800E02C4(void*);
@@ -3193,7 +3193,7 @@ extern void fn_801A49C0(u32);
 extern void fn_801A48F4(u32);
 extern void fn_801A66E0(u32);
 extern void fn_801A426C(u32, u32);
-extern void fn_801C028C(u32, u32, u32, void*, u32, ...);
+extern void HSD_ForeachAnim(u32, u32, u32, void*, u32, ...);
 extern s32 fn_800D37CC(void);
 extern void fn_801C027C(void);
 extern f32 lbl_8047CA78;
@@ -3273,7 +3273,7 @@ void fn_800DCAF0(u8* obj, f32 speed) {
         speed *= lbl_8047CA88;
     }
     *(f32*)(obj + 0x64) = speed;
-    fn_801C028C(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_801C027C, 1, *(f32*)(obj + 0x64));
+    HSD_ForeachAnim(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_801C027C, 1, *(f32*)(obj + 0x64));
 }
 #endif
 extern f32 lbl_8047CA78;
@@ -3296,7 +3296,7 @@ void fn_800DCB78(u8* obj, u32 frame) {
     }
     fn_801A6370(*(u32*)(obj + 0xc), lbl_8047CA78);
     lbl_8047AAF4 = lbl_8047CA78;
-    fn_801C028C(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_800DD128, 0);
+    HSD_ForeachAnim(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_800DD128, 0);
     *(f32*)(obj + 0x6c) = lbl_8047AAF4;
 }
 #endif
@@ -3788,7 +3788,7 @@ void fn_800DF384(u8* obj, u32 flags) {
     new_bits = flags & ~cur;
     if (!new_bits) return;
     *(u8**)(ptr + 0x20) = obj;
-    if (new_bits & (1 << 2)) fn_800DFABC();
+    if (new_bits & (1 << 2)) _matGSmatEnableEnvMapExt();
     *(u16*)(obj + 0x2) = *(u16*)(obj + 0x2) | new_bits;
     fn_801A6FF0(ptr);
 }
@@ -3825,11 +3825,11 @@ void fn_800DF470(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_800DF498(void) {
-#include "src/game/gs_render_fn_800DF498.inc"
+asm void GSmaterialSetPEdescr(void) {
+#include "src/game/gs_render_GSmaterialSetPEdescr.inc"
 }
 #else
-void fn_800DF498(u8* obj, u32 new_val) {
+void GSmaterialSetPEdescr(u8* obj, u32 new_val) {
     u32 sentinel = *(u32*)(obj + 0x3c);
     if ((u32)(sentinel + 0x01020000) == 0xfefe) {
         *(u32*)(obj + 0x3c) = *(u32*)(*(u8**)(obj + 0x8) + 0x10);
@@ -3883,11 +3883,11 @@ void fn_800DF608(void) { /* TODO */ }
 extern u32 lbl_8047AB20;
 extern u32 lbl_8047AB1C;
 #if 0
-asm void fn_800DF7A4(void) {
-#include "src/game/gs_render_fn_800DF7A4.inc"
+asm void GSmaterialCreate(void) {
+#include "src/game/gs_render_GSmaterialCreate.inc"
 }
 #else
-u8* fn_800DF7A4(void) {
+u8* GSmaterialCreate(void) {
     u32 count;
     u8* p;
     count = lbl_8047AB20;
@@ -3977,11 +3977,11 @@ extern void fn_801A6DA0(void);
 extern u8 lbl_803154E4[];
 extern u32 lbl_8047CAC8;
 #if 1
-asm void fn_800DFABC(void) {
-#include "src/game/gs_render_fn_800DFABC.inc"
+asm void _matGSmatEnableEnvMapExt(void) {
+#include "src/game/gs_render__matGSmatEnableEnvMapExt.inc"
 }
 #else
-void fn_800DFABC(void) { /* TODO */ }
+void _matGSmatEnableEnvMapExt(void) { /* TODO */ }
 #endif
 #if 0
 asm s32 fn_800DFE98(u8* obj) {

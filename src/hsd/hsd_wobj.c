@@ -443,11 +443,11 @@ void fn_801919EC(HSD_WObj* wobj) {
 #pragma optimizewithasm off
 extern void fn_801B1890(void);
 #if 1
-asm void fn_80191A34(void) {
-#include "src/hsd/hsd_wobj_fn_80191A34.inc"
+asm void WObjUpdateFunc(void) {
+#include "src/hsd/hsd_wobj_WObjUpdateFunc.inc"
 }
 #else
-void fn_80191A34(void) { /* TODO */ }
+void WObjUpdateFunc(void) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -586,12 +586,12 @@ typedef struct {
 } WObjTableFull;
 extern const char lbl_802744A8[];
 #if 1
-asm void fn_80191F64(void) {
-#include "src/hsd/hsd_wobj_fn_80191F64.inc"
+asm void HSD_ArchiveParse(void) {
+#include "src/hsd/hsd_wobj_HSD_ArchiveParse.inc"
 }
 #else
 #pragma optimization_level 4
-s32 fn_80191F64(WObjTableFull* tbl, u8* data, u32 magic) {
+s32 HSD_ArchiveParse(WObjTableFull* tbl, u8* data, u32 magic) {
     u32 offset;
     u32 i;
     if (tbl == NULL) {

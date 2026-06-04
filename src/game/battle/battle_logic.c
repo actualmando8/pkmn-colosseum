@@ -51,7 +51,7 @@ extern s32  fn_8011F4F0(s32 pokemon);                /* get pokemon species */
 extern void fn_801DAEF8(s32 count);      /* load waza data */
 extern void fn_801D7464(void);           /* wazaSequenceLoad */
 extern void fn_801D7B94(void);           /* wazaSequenceUpdate */
-extern void fn_801D84F4(void);           /* wazaSequenceEntryStart */
+extern void wazaSequenceEntryStart(void);           /* wazaSequenceEntryStart */
 
 /* Battle state checks */
 extern s32  fn_8001E184(void);           /* wait for event completion */
@@ -2438,7 +2438,7 @@ void fn_801E1300(void) {
     extern u8 lbl_80467CF8[];
     extern u8 lbl_8047B43C;
     extern void fn_800FE834(u32, u32, u32, void *);
-    extern void fn_801E1368(void);
+    extern void _vtrTexDispFunc__Fv(void);
     lbl_8047B420 = 0;
     lbl_8047B424 = 0;
     lbl_8047B42C = 0;
@@ -2446,17 +2446,17 @@ void fn_801E1300(void) {
     lbl_8047B434 = 1;
     lbl_8047B43C = 0;
     memset(lbl_80467CF8, 0, 0x10);
-    fn_800FE834(1, 0xfd, 0xa, fn_801E1368);
+    fn_800FE834(1, 0xfd, 0xa, _vtrTexDispFunc__Fv);
 }
 #endif
 
 /* 0x801E1368 | size: 0x368 | large */
 #if 0
-asm void fn_801E1368(void) {
-#include "src/game/battle/battle_logic_fn_801E1368.inc"
+asm void _vtrTexDispFunc__Fv(void) {
+#include "src/game/battle/battle_logic__vtrTexDispFunc__Fv.inc"
 }
 #else
-void fn_801E1368(void) {
+void _vtrTexDispFunc__Fv(void) {
     extern u8 lbl_80314958[];
     extern u8 lbl_80314C78[];
     extern u8 lbl_8047B435;

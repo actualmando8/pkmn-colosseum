@@ -620,7 +620,7 @@ void fn_80221104(u8 r3, u32 r4)
     extern u8 lbl_80378964[];
     extern void fn_800F0308();
     extern void fn_801C3430();
-    extern void fn_801C3D64();
+    extern void battleGridReplacePokemon();
     extern void fn_801DA8C4();
     extern u8 fn_801DA94C();
     extern void fn_801DA9E8();
@@ -996,7 +996,7 @@ LAB_0021ef70:
     }
     fn_801DA8C4(uVar5,0x81,4);
   }
-  fn_801C3D64(uVar3,uVar4);
+  battleGridReplacePokemon(uVar3,uVar4);
   fn_801C3430();
   fn_801254B4(uVar2,0,0xee,0,uVar4);
   fn_801F54A4(0,0,0x14,0);
@@ -7275,7 +7275,7 @@ void fn_8022E6F0(u32 r3, u8 r4)
     extern u8 fn_8011FC74();
     extern int fn_801906A0();
     extern void fn_801C3430();
-    extern void fn_801C3F10();
+    extern void battleGridReplaceTrainer();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
     extern u8 fn_801DA94C();
@@ -7364,7 +7364,7 @@ void fn_8022E6F0(u32 r3, u8 r4)
             uVar5 = fn_801DE418(0x32);
             fn_801DDD28(uVar5,0xa0,4,0);
             fn_80208404(r3,0,uVar10,0);
-            fn_801C3F10(uVar3,uVar5);
+            battleGridReplaceTrainer(uVar3,uVar5);
             fn_801C3430();
             fn_801DA9E8(uVar5,0xa0,4);
             fn_801EF7C4(0);
@@ -7374,7 +7374,7 @@ void fn_8022E6F0(u32 r3, u8 r4)
               if (cVar9 == 0) break;
               fn_800F0308();
             }
-            fn_801C3F10(uVar5,uVar3);
+            battleGridReplaceTrainer(uVar5,uVar3);
             fn_801C3430();
             fn_801EF7C4(1);
             fn_801DA4E8(uVar5,0);

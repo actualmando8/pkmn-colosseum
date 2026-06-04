@@ -57,7 +57,7 @@ extern void  fn_8036A2D8(void* jobj, f32 rx, f32 ry, f32 rz); /* HSD_JObjSetRota
 
 /* Sound */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay with fade */
-extern void  fn_801657F8(s32 sndID, s32 volume);              /* sndStop */
+extern void  soundStop(s32 sndID, s32 volume);              /* sndStop */
 
 /* Pokemon data access */
 extern s32   fn_80129280(s32 side, s32 slotType);     /* get battle party */

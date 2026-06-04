@@ -6,7 +6,7 @@
  *   fn_800FE9B0 (GStaskInit)
  *   fn_800FE834 (GStaskCreate)
  *   fn_800FE7A0 (GStaskRun)
- *   fn_800F09D8 (GSthreadInit)
+ *   GSthread (GSthreadInit)
  *   fn_800F07A8 (GSthreadCreate)
  *   fn_800FEA74 (GStaskSchedulerThread -- internal)
  *   fn_800FEBA0 (GStaskSwapCallback -- internal)
@@ -477,7 +477,7 @@ void GStaskRun(void) {
 }
 
 /* =======================================================================
- *  GSthreadInit / fn_800F09D8
+ *  GSthreadInit / GSthread
  *  Address: 0x800F09D8, Size: 0x9C
  *
  *  Allocates the thread array from GSmem and zeroes all entries.

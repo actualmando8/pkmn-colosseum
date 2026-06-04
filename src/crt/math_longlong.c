@@ -452,8 +452,8 @@ void fn_800C4CC0(void) {
     return;
 }
 
-/* fn_800C4D8C - 0x800C4D8C | size: 0xB8 */
-void fn_800C4D8C(void) {
+/* __sys_free - 0x800C4D8C | size: 0xB8 */
+void __sys_free(void) {
     extern u8 lbl_8026FE70[];
     extern u8 lbl_8026FEA8[];
     extern u32 lbl_80478980;

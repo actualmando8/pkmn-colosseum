@@ -171,7 +171,7 @@
  *     fn_800FA280 / fn_80132A38 -- message/window callbacks
  *     fn_80106D3C / fn_801069FC -- text print + wait
  *     fn_801902E0 -- config flag check (returns u8)
- *     fn_80165A20 / fn_801657F8 -- audio sequence control
+ *     fn_80165A20 / soundStop -- audio sequence control
  *     fn_801C40F0 / fn_801C41C8 -- BGM volume/fade
  *
  * --------------------------------------------------------------------------
@@ -1314,7 +1314,7 @@ LAB_80025564:
  * fn_800255A4 -- title-screen audio/timing update driven by lbl_8047A384.
  *   IF title active (lbl_8047A384 != 0):
  *     fn_801C41C8(lbl_8047B8E4, 3)     -- set BGM volume fade target
- *     fn_801657F8(0x449, 0)            -- play SE cue
+ *     soundStop(0x449, 0)            -- play SE cue
  *     while (accumulator < limit) {    -- time-based integration loop
  *       fn_800F0308();                 -- frame advance
  *       accumulator += (f32)fn_800D3088() / (f32)(s32)fn_800D37CC();
@@ -1336,7 +1336,7 @@ LAB_80025564:
  * fn_801653C4 chains into fn_801656F8 (3 args).
  */
 extern void fn_801C41C8(f32, s32);
-extern void fn_801657F8(void);
+extern void soundStop(void);
 extern void fn_800D37CC(void);
 extern void fn_801653C4(void);
 extern void fn_801656F8(void);
@@ -1374,7 +1374,7 @@ void fn_800255A4(void) {
     extern void fn_80102510(s32);
     extern u32 fn_801653C4(void);
     extern void fn_801656F8(u32, s32, s32);
-    extern void fn_801657F8(s32, s32);
+    extern void soundStop(s32, s32);
     extern void fn_801C40F0(s32);
     extern void fn_801C41C8(f32, s32);
     f32 limit;
@@ -1382,7 +1382,7 @@ void fn_800255A4(void) {
 
     if (lbl_8047A384 != 0) {
         fn_801C41C8(lbl_8047B8E4, 3);
-        fn_801657F8(0x449, 0);
+        soundStop(0x449, 0);
         accum = lbl_8047B8AC;
         limit = lbl_8047B8B0;
         while (accum < limit) {

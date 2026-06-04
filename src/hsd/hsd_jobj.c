@@ -990,7 +990,7 @@ extern void fn_801992D8(void);
 extern void fn_801AE5E8(void);
 extern void fn_800A2D38(void);
 extern void fn_801A8524(void);
-extern void fn_8019C264(void);
+extern void HSD_IDInsertToTable(void);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047B298;
 #if 1

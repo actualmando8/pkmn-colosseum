@@ -10,7 +10,7 @@
  * Rodata label: lbl_80268B38 = "menuPokeCoupon.c" (0x11 bytes)
  *
  * Address range: 0x8007C2C0 - 0x8007C300 (assert function only)
- *   fn_8007C2C0  (0x40) menuPokeCoupon_ValidateRefer
+ *   menuPokeCouponInit  (0x40) menuPokeCoupon_ValidateRefer
  *
  * Surrounding functions that likely belong to this module:
  *   fn_8007B6D8  (0xB64) menuPokeCoupon_Main (very large - shop state machine)
@@ -115,7 +115,7 @@ s32 menuPokeCoupon_GetBalance(void) {
 }
 
 /* =========================================================================
- * fn_8007C2C0 | menuPokeCoupon_ValidateRefer
+ * menuPokeCouponInit | menuPokeCoupon_ValidateRefer
  * Size: 0x40
  *
  * Validates that the shop reference type is set to a valid value.

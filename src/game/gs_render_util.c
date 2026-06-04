@@ -76,7 +76,7 @@ extern void fn_801966FC(void* jobj);
 extern void fn_801C027C(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
 extern f32 lbl_8047C9B0;     /* SDA float: fov scaling constant */
-extern void fn_801C028C(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
+extern void HSD_ForeachAnim(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
 extern void fn_80196E10(const char* file, u32 line, const char* msg);
 extern f32 lbl_8047C990;     /* SDA float: animation step increment */
 extern char lbl_8047C9DC[] __attribute__((section(".sdata2")));  /* SDA2 string: assert filename */
@@ -273,7 +273,7 @@ void fn_800D13C8(void* dst, void* src) {
                     ((void***)((u8*)*(void**)((u8*)dst + 0x8) + 4))[0][*(u32*)((u8*)dst + 0x114)]);
                 fn_80196698(*(void**)((u8*)dst + 0xc), lbl_8047C998);
                 lbl_8047AA78 = lbl_8047C998;
-                fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
                 *(f32*)((u8*)dst + 0x120) = lbl_8047AA78;
             }
         }
@@ -284,14 +284,14 @@ void fn_800D13C8(void* dst, void* src) {
                 fov *= lbl_8047C9B0;
             }
             *(f32*)((u8*)dst + 0x118) = fov;
-            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
         }
         if (*(u8*)((u8*)dst + 0x3) != 0) {
             *(f32*)((u8*)dst + 0x11c) = *(f32*)((u8*)src + 0xac);
-            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
             fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
             fn_801966FC(*(void**)((u8*)dst + 0xc));
-            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
         }
         if (*(u8*)((u8*)dst + 0x3) != 0) {
             *(u8*)((u8*)dst + 0x4) = 1;
@@ -299,10 +299,10 @@ void fn_800D13C8(void* dst, void* src) {
             *(u8*)((u8*)dst + 0x125) = 1;
         }
         if (*(u8*)((u8*)dst + 0x3) != 0) {
-            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
             fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
             fn_801966FC(*(void**)((u8*)dst + 0xc));
-            fn_801C028C(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
         }
     }
 }
@@ -370,10 +370,10 @@ void fn_800D1798(void* obj) {
         speed = *(f32*)((u8*)obj + 0x11c);
         if (*(u8*)((u8*)obj + 0x3) != 0) {
             *(f32*)((u8*)obj + 0x11c) = speed;
-            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
             fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
             fn_801966FC(*(void**)((u8*)obj + 0xc));
-            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
+            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
         }
     }
 }
@@ -394,10 +394,10 @@ void fn_800D1858(void* obj, u32 val) {
 void fn_800D1860(void* obj, f32 speed) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         *(f32*)((u8*)obj + 0x11c) = speed;
-        fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
         fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
         fn_801966FC(*(void**)((u8*)obj + 0xc));
-        fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
+        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
     }
 }
 
@@ -412,7 +412,7 @@ void fn_800D18FC(void* obj, f32 fov) {
             fov *= lbl_8047C9B0;
         }
         *(f32*)((u8*)obj + 0x118) = fov;
-        fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)obj + 0x118), (u32)1);
+        HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)obj + 0x118), (u32)1);
     }
 }
 
@@ -431,7 +431,7 @@ void fn_800D1984(void* obj, u32 frame_idx) {
                 (*(void***)((u8*)*(void**)((u8*)obj + 0x8) + 4))[*(u32*)((u8*)obj + 0x114)]);
             fn_80196698(*(void**)((u8*)obj + 0xc), lbl_8047C998);
             lbl_8047AA78 = lbl_8047C998;
-            fn_801C028C(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+            HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
             *(f32*)((u8*)obj + 0x120) = lbl_8047AA78;
         }
     }
@@ -908,7 +908,7 @@ found:
                 lbl_8047AA78 = lbl_8047C998;
                 {
                     lis_r3_fn_800D2B44:
-                    fn_801C028C(*(void**)((u8*)slot + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
+                    HSD_ForeachAnim(*(void**)((u8*)slot + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
                 }
                 *(f32*)((u8*)slot + 0x120) = lbl_8047AA78;
             }
@@ -1044,7 +1044,7 @@ void fn_800D2AD4(u32 count) {
 /* ==================================================================
  * fn_800D2B44 - GS render: animation step callback
  * Address: 0x800D2B44, Size: 0x4C
- * Called by fn_801C028C as a callback with the JObj*.
+ * Called by HSD_ForeachAnim as a callback with the JObj*.
  * Accumulates animation step into lbl_8047AA78.
  * ================================================================== */
 void fn_800D2B44(void* obj) {

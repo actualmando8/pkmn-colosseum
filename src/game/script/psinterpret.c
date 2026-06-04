@@ -67,7 +67,7 @@ extern f64 sIntToFloatBias;             /* lbl_8047D660: 4503599627370496.0 (0x4
 extern f64 sSignedBias;                 /* lbl_8047D668: signed int conversion bias */
 
 /* ======================================================================
- * fn_8016F430 | psinterpret_RunAll (psinterpret_ObjRefAssert in codebase_map)
+ * psInterpretParticles | psinterpret_RunAll (psinterpret_ObjRefAssert in codebase_map)
  * Size: 0xD0
  *
  * Runs the interpreter for all active particles across all 16 link lists.

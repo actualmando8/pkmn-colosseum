@@ -103,7 +103,7 @@ extern void* fn_800E4D18(u32 handle);
 
 /* FSYS / Archive */
 extern void* fn_80191ECC(void* name, const char* tocName);  /* FSYS lookup by name */
-extern void  fn_80191F64(void* resPtr, u32 fsysHandle, const char* name); /* FSYS bind */
+extern void  HSD_ArchiveParse(void* resPtr, u32 fsysHandle, const char* name); /* FSYS bind */
 extern void* fn_800D27FC(u32 handle);                    /* FSYS get archive ptr */
 
 /* Floor resource loading callbacks */
@@ -1057,7 +1057,7 @@ void GSfloorLoadData(const char* archiveName, u32 subFileIndex,
  *     for an existing entry with matching fsysHandle. If found,
  *     increments its reference count.
  *  2. If not found, allocates a new resource thread (fn_800F9418),
- *     binds it to the FSYS archive (fn_80191F64), finds a free slot
+ *     binds it to the FSYS archive (HSD_ArchiveParse), finds a free slot
  *     in the table, and copies the entry data.
  *  3. Counts the total number of sub-files and FSYS entries, and
  *     logs the result.
@@ -1105,7 +1105,7 @@ void GSfloorLoadMain(u32 fsysHandle, const char* archiveName,
     }
 
     /* Bind to the FSYS archive */
-    fn_80191F64(resThread, fsysHandle, archiveName);
+    HSD_ArchiveParse(resThread, fsysHandle, archiveName);
 
     /* Find a free slot and copy the entry data */
     /* First pass: search in blocks of 4 (unrolled) for matching handles */
