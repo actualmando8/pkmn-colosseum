@@ -7385,6 +7385,12 @@ static int  g_engTitleReady;
 #define PCPORT_MAX_SCENE_MODELS 8
 static u32  g_engExtraRootJoints[PCPORT_MAX_SCENE_MODELS];
 static int  g_engExtraRootJointCount;
+/* Model-view auto-camera (PCPort_EngineFieldSetup computes a framed eye/center
+ * for a loaded character model; RunFieldScene seeds its free-fly camera from
+ * these so the model is centered instead of the free-fly default eye). */
+static int  g_engModelView;
+static f32  g_engModelViewEye[3];
+static f32  g_engModelViewCenter[3];
 /* Field mode: GSgfx_BeginFrame paints a green EFB clear-quad that, on a sparse field
  * map, shows through where geometry doesn't cover (the title covers it with its sky/
  * ground). In field mode we re-clear to a chosen background AFTER GSgfx_BeginFrame. */
@@ -7654,6 +7660,7 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
      * member-view case. Compute the world-space AABB over the primary rootJoint
      * AND every extra model-set root, then place the eye on +Z (slightly above
      * center) at a distance that fits the AABB to the vertical FOV. */
+    g_engModelView = 0;
     if (getenv("PCPORT_FIELD_MEMBER") != NULL &&
         getenv("PCPORT_FIELD_MEMBER")[0] != '\0' &&
         getenv("PCPORT_CAM_EYE") == NULL) {
@@ -7714,6 +7721,11 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
                 g_engTitleCamera.scissorBottom = (u16)PCPORT_WINDOW_HEIGHT;
             }
             BuildViewMatrixLookAt(eye, center, up, g_engTitleCamera.viewMatrix);
+            /* Stash for RunFieldScene's free-fly camera (which otherwise rebuilds
+             * the view from its own default eye each frame and hides the model). */
+            g_engModelView = 1;
+            g_engModelViewEye[0] = eye[0]; g_engModelViewEye[1] = eye[1]; g_engModelViewEye[2] = eye[2];
+            g_engModelViewCenter[0] = center[0]; g_engModelViewCenter[1] = center[1]; g_engModelViewCenter[2] = center[2];
             printf("[field] model-view auto-camera: aabb=[%.2f,%.2f,%.2f .. "
                    "%.2f,%.2f,%.2f] center=(%.2f,%.2f,%.2f) radius=%.2f "
                    "eye=(%.2f,%.2f,%.2f) dist=%.2f\n",
@@ -8250,6 +8262,21 @@ static int RunFieldScene(GLFWwindow* window) {
     { /* optional initial eye placement */
         const char* ce = getenv("PCPORT_CAM_EYE");
         if (ce != NULL) sscanf(ce, "%f,%f,%f", &eye[0], &eye[1], &eye[2]);
+    }
+    /* Model-view: seed the free-fly camera from the auto-camera framing computed
+     * in PCPort_EngineFieldSetup, so the loaded character/model is centered
+     * (the loop rebuilds the view from eye/yaw/pitch each frame, so set those,
+     * not just the one-shot view matrix). */
+    if (g_engModelView) {
+        f32 dx = g_engModelViewCenter[0] - g_engModelViewEye[0];
+        f32 dy = g_engModelViewCenter[1] - g_engModelViewEye[1];
+        f32 dz = g_engModelViewCenter[2] - g_engModelViewEye[2];
+        f32 len = (f32)sqrt((double)(dx*dx + dy*dy + dz*dz));
+        eye[0] = g_engModelViewEye[0];
+        eye[1] = g_engModelViewEye[1];
+        eye[2] = g_engModelViewEye[2];
+        yaw = (f32)atan2((double)dx, (double)(-dz));
+        pitch = (len > 0.001f) ? (f32)asin((double)(dy / len)) : 0.0f;
     }
     memset(pads, 0, sizeof(pads));
     printf("[field] interactive free-fly: W/S forward, A/D strafe (sticks), arrows turn/look, "
