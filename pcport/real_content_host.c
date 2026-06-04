@@ -928,6 +928,48 @@ static BOOL DecompressLZSS(const u8* src, u32 srcSize, u8* dst, u32 dstSize) {
     return dstPos == dstSize;
 }
 
+/* Enumerate every member of an .fsys (name + decompressed size + compression
+ * flag), for investigating which archives hold what (e.g. character models in
+ * people_archive/chara_*). Diagnostic; prints to stdout. */
+void PCPort_FsysListMembers(const char* fsysPath) {
+    u8* fsysData;
+    u32 fsysSize = 0;
+    u32 entryCount, stringTableOffset, entryTableOffset, i;
+
+    fsysData = LoadFileBytes(fsysPath, &fsysSize);
+    if (fsysData == NULL) {
+        printf("[fsys-ls] cannot open %s\n", fsysPath);
+        return;
+    }
+    if (fsysSize < 0x20 || ReadBE32(fsysData) != PCPORT_FSYS_MAGIC) {
+        printf("[fsys-ls] %s is not an FSYS archive\n", fsysPath);
+        free(fsysData);
+        return;
+    }
+    entryCount = ReadBE32(fsysData + 0x08);
+    stringTableOffset = ReadBE32(fsysData + 0x18);
+    if (stringTableOffset + 4u > fsysSize) { free(fsysData); return; }
+    entryTableOffset = ReadBE32(fsysData + stringTableOffset);
+    printf("[fsys-ls] %s: %u members\n", fsysPath, entryCount);
+    for (i = 0; i < entryCount; ++i) {
+        u32 entryOffset = ReadBE32(fsysData + entryTableOffset + (i * 4u));
+        u32 nameOffset, dataOffset, decompSize, isLZSS = 0;
+        if (entryOffset + 0x28u > fsysSize) { continue; }
+        nameOffset = ReadBE32(fsysData + entryOffset + 0x24);
+        dataOffset = ReadBE32(fsysData + entryOffset + 0x04);
+        decompSize = ReadBE32(fsysData + entryOffset + 0x08);
+        if (dataOffset + 4u <= fsysSize) {
+            isLZSS = (ReadBE32(fsysData + dataOffset) == PCPORT_LZSS_MAGIC);
+        }
+        if (nameOffset < fsysSize) {
+            printf("[fsys-ls]   [%3u] %-24s size=0x%-8X %s\n", i,
+                   (const char*)(fsysData + nameOffset), decompSize,
+                   isLZSS ? "(lzss)" : "");
+        }
+    }
+    free(fsysData);
+}
+
 static BOOL FindFsysEntry(const u8* fsysData, u32 fsysSize,
                           const char* memberName, u32* outEntryOffset) {
     u32 entryCount;

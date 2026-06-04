@@ -7700,6 +7700,16 @@ int main(int argc, char** argv) {
      * directory works (assets are loaded via repo-relative paths). */
     PCPort_ChdirToAssetRoot(argc > 0 ? argv[0] : NULL);
 
+    /* FSYS member enumeration (no window/GL): PCPORT_FSYS_LIST=<path> lists the
+     * members of an archive (used to locate character models etc.). */
+    {
+        const char* fl = getenv("PCPORT_FSYS_LIST");
+        if (fl != NULL && fl[0] != '\0') {
+            PCPort_FsysListMembers(fl);
+            return 0;
+        }
+    }
+
     /* THP decode smoke: pure decode -> PPM, no window/GL. Verifies thp_player +
      * stb_image in the host build. */
     if (HasArg(argc, argv, "--thp-smoke")) {

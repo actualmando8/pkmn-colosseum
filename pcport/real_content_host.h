@@ -197,6 +197,8 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
  * content signature, since it shares the map's member name). See field_collision.c. */
 BOOL PCPort_LoadFsysWZXMember(const char* fsysPath, u8** outData, u32* outSize);
 void PCPort_FreeBuffer(void* buffer);
+/* Enumerate .fsys members (name/size/compression) to stdout. Diagnostic. */
+void PCPort_FsysListMembers(const char* fsysPath);
 
 BOOL PCPort_HSDArchiveParseBE(PCPortHSDArchive* archive,
                               const void* data, u32 size);
