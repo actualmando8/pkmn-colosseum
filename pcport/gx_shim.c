@@ -164,6 +164,10 @@ static u8 g_numTexGens = 0;
 /** Set when GLAD loaded and the modern TEV->GLSL draw path is usable. */
 static int g_tevPathReady = 0;
 
+/** Per-slot texture SRT matrices (8 slots, row-major 3x4). Loaded by
+ *  GXHostSetTexMatrix / GXSetTexCoordGen2 and forwarded to gx_tev. */
+static f32 g_texMatrixStore[8][3][4];
+
 typedef struct {
     u32 magic;
     u32 glTexId;
@@ -502,6 +506,17 @@ void GXInit(void* base, u32 size) {
     g_tevState.numTexGens = 0;
     g_tevState.stages[0].tevMode = GX_PASSCLR;
 
+    /* Texture SRT matrix store: default to identity for all 8 slots. */
+    {
+        u32 s;
+        for (s = 0; s < 8; ++s) {
+            memset(g_texMatrixStore[s], 0, sizeof(g_texMatrixStore[s]));
+            g_texMatrixStore[s][0][0] = 1.0f;
+            g_texMatrixStore[s][1][1] = 1.0f;
+            g_texMatrixStore[s][2][2] = 1.0f;
+        }
+    }
+
     /* Default alpha compare to "always pass". GX hardware powers up with the
      * alpha test effectively disabled, and the legacy fixed-function draw did
      * no alpha testing. The modern shader path honors alpha compare, so the
@@ -759,6 +774,56 @@ void GXHostSetLightParams(f32 dx, f32 dy, f32 dz, f32 ambient) {
 
 void GXHostSetExposure(f32 gain) {
     gx_tev_set_exposure(gain);
+}
+
+/* Map a GXTexMtx slot enum to a 0-based slot index (GX_TEXMTX0 = slot 0,
+ * GX_TEXMTX1 = slot 1, ..., GX_IDENTITY = -1 = no matrix). */
+static int GXTexMtxSlot(GXTexMtx mtx) {
+    if (mtx == GX_IDENTITY) return -1;
+    if (mtx < GX_TEXMTX0 || mtx > GX_TEXMTX7) return -1;
+    return (int)((mtx - GX_TEXMTX0) / 3);
+}
+
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func,
+                       GXTexGenSrc src_param, GXTexMtx mtx,
+                       GXBool normalize, u32 pt_mtx) {
+    int mtxSlot;
+    (void)func; (void)src_param; (void)normalize; (void)pt_mtx;
+
+    /* Map the named texture matrix to a 0-based texcoord slot so that the
+     * vertex shader applies the correct SRT to each generated texcoord.
+     * When mtx == GX_IDENTITY, the corresponding slot stays identity. */
+    if ((u32)dst_coord >= 8) return;
+    mtxSlot = GXTexMtxSlot(mtx);
+    if (mtxSlot >= 0) {
+        /* Associate this texcoord slot with the matrix slot index.  If the
+         * slot differs from dst_coord (GCN allows remapping), copy the matrix
+         * from the source slot so the dst_coord slot is always authoritative
+         * in the shader. */
+        if (mtxSlot != (int)(u32)dst_coord) {
+            /* Copy current matrix from mtxSlot to dst_coord. */
+            memcpy(g_texMatrixStore[dst_coord], g_texMatrixStore[mtxSlot],
+                   sizeof(g_texMatrixStore[0]));
+        }
+        gx_tev_set_tex_matrix((u32)dst_coord, g_texMatrixStore[dst_coord]);
+    } else {
+        /* GX_IDENTITY: reset this texcoord slot to identity. */
+        gx_tev_set_tex_matrix((u32)dst_coord, (const f32(*)[4])0);
+    }
+}
+
+void GXHostSetTexMatrix(u32 slot, const f32 m[3][4]) {
+    if (slot >= 8) return;
+    if (m != (const f32(*)[4])0) {
+        memcpy(g_texMatrixStore[slot], m, sizeof(g_texMatrixStore[slot]));
+    } else {
+        /* NULL -> reset to identity. */
+        memset(g_texMatrixStore[slot], 0, sizeof(g_texMatrixStore[slot]));
+        g_texMatrixStore[slot][0][0] = 1.0f;
+        g_texMatrixStore[slot][1][1] = 1.0f;
+        g_texMatrixStore[slot][2][2] = 1.0f;
+    }
+    gx_tev_set_tex_matrix(slot, g_texMatrixStore[slot]);
 }
 
 /* =========================================================================

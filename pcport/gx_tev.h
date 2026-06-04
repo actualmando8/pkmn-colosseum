@@ -161,6 +161,9 @@ typedef struct GXTevShaderEntry {
 
     s32 loc_texSwizzle[8];
 
+    /** Texture SRT matrix array (one mat3 per texcoord gen, 8 max). */
+    s32 loc_texMatrix;
+
     /** Validity flag */
     u8 valid;
 } GXTevShaderEntry;
@@ -306,6 +309,20 @@ void gx_tev_set_chan_mat_color(u8 r, u8 g, u8 b, u8 a);
  * @param r,g,b,a  8-bit channels.
  */
 void gx_tev_set_chan_amb_color(u8 r, u8 g, u8 b, u8 a);
+
+/**
+ * gx_tev_set_tex_matrix -- Set a texture SRT matrix for a texcoord slot.
+ * @param slot   Texcoord slot index (0..7).
+ * @param m      Row-major 3x4 GCN TObj SRT matrix (only the upper-left 2x3
+ *               ST-scale+rotate portion is used; the shader applies it as a
+ *               mat3 to (s, t, 1) so scroll and rotation work correctly).
+ *               Pass NULL to restore the slot to the identity matrix.
+ *
+ * Defaults to identity for every slot, so existing scenes are unaffected.
+ * Call after GXSetTexCoordGen2 (or directly via GXHostSetTexMatrix) to
+ * animate UVs (scrolling clouds, water ripple, projected decals).
+ */
+void gx_tev_set_tex_matrix(u32 slot, const f32 m[3][4]);
 
 /**
  * gx_tev_submit -- Compile/look up the program for the given TEV state, bind

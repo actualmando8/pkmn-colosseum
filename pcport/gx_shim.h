@@ -451,6 +451,52 @@ typedef enum {
     GX_TEXCOORD_NULL = 0xFF
 } GXTexCoordID;
 
+/* GXTexGenType -- source for texcoord generation */
+typedef enum {
+    GX_TG_MTX3x4 = 0,
+    GX_TG_MTX2x4 = 1,
+    GX_TG_BUMP0  = 2,
+    GX_TG_SRTG   = 10
+} GXTexGenType;
+
+/* GXTexGenSrc -- input to texcoord generator */
+typedef enum {
+    GX_TG_POS   = 0,
+    GX_TG_NRM   = 1,
+    GX_TG_BINRM = 2,
+    GX_TG_TANGENT = 3,
+    GX_TG_TEX0  = 4,
+    GX_TG_TEX1  = 5,
+    GX_TG_TEX2  = 6,
+    GX_TG_TEX3  = 7,
+    GX_TG_TEX4  = 8,
+    GX_TG_TEX5  = 9,
+    GX_TG_TEX6  = 10,
+    GX_TG_TEX7  = 11,
+    GX_TG_TEXCOORD0 = 12,
+    GX_TG_TEXCOORD1 = 13,
+    GX_TG_TEXCOORD2 = 14,
+    GX_TG_TEXCOORD3 = 15,
+    GX_TG_TEXCOORD4 = 16,
+    GX_TG_TEXCOORD5 = 17,
+    GX_TG_TEXCOORD6 = 18,
+    GX_TG_COLOR0 = 19,
+    GX_TG_COLOR1 = 20
+} GXTexGenSrc;
+
+/* GXTexMtx -- texture matrix slot */
+typedef enum {
+    GX_TEXMTX0  = 30,
+    GX_TEXMTX1  = 33,
+    GX_TEXMTX2  = 36,
+    GX_TEXMTX3  = 39,
+    GX_TEXMTX4  = 42,
+    GX_TEXMTX5  = 45,
+    GX_TEXMTX6  = 48,
+    GX_TEXMTX7  = 51,
+    GX_IDENTITY = 60
+} GXTexMtx;
+
 /* GXGamma */
 typedef enum {
     GX_GM_1_0 = 0,
@@ -1015,6 +1061,32 @@ void GXHostSetLightParams(f32 dx, f32 dy, f32 dz, f32 ambient);
  * toward the brightness of the lit reference art. Output is clamped to [0,1].
  */
 void GXHostSetExposure(f32 gain);
+
+/**
+ * GXSetTexCoordGen2 -- Configure a texture coordinate generator.
+ * Called from HSD TObj setup (hsd_tobj_ext.c).
+ * PC port: records the texgen configuration and marks the tex matrix slot
+ * as active for the named texcoord so the vertex shader applies the SRT.
+ *
+ * @param dst_coord   Output texcoord ID (GX_TEXCOORD0..7).
+ * @param func        Texcoord generator type (GXTexGenType).
+ * @param src_param   Texcoord generator input (GXTexGenSrc).
+ * @param mtx         Texture matrix slot (GXTexMtx or GX_IDENTITY).
+ * @param normalize   If GX_TRUE, normalize the generated texcoord.
+ * @param pt_mtx      Post-transform matrix slot (pass GX_IDENTITY normally).
+ */
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func,
+                       GXTexGenSrc src_param, GXTexMtx mtx,
+                       GXBool normalize, u32 pt_mtx);
+
+/**
+ * GXHostSetTexMatrix -- Host-only: load a 3x4 SRT texture matrix into a slot.
+ * @param slot  Texcoord slot index (0..7), matching GX_TEXCOORD0..7.
+ * @param m     Row-major 3x4 matrix (GCN Mtx convention). The upper-left 3x3
+ *              is used to transform (s, t, 1) in the vertex shader.
+ *              Pass NULL to restore the identity matrix for that slot.
+ */
+void GXHostSetTexMatrix(u32 slot, const f32 m[3][4]);
 
 #ifdef __cplusplus
 }

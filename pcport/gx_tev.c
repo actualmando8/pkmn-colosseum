@@ -95,6 +95,12 @@ typedef struct {
     s32 chanLightEnabled;  /* 1 = use mat color * ambient instead of v_color0 */
     f32 chanMatColor[4];   /* normalized RGBA material color */
     f32 chanAmbColor[4];   /* normalized RGBA ambient color */
+
+    /* Texture SRT matrices (one mat3 per texcoord slot, 8 slots).
+     * Each matrix is stored as a row-major 3x3 (9 floats) and applied to
+     * (s, t, 1) in the vertex shader to implement scroll/rotate/scale.
+     * Defaults to identity so untouched slots pass UVs unchanged. */
+    f32 texMatrix[8][3][3];
 } GXTevRenderState;
 
 static GXTevRenderState g_rs;
@@ -128,6 +134,10 @@ static const char* VERTEX_SHADER_SOURCE =
     "uniform mat4 u_projMatrix;\n"
     "uniform mat4 u_modelViewMatrix;\n"
     "uniform mat3 u_normalMatrix;\n"
+    /* Texture SRT matrices: one mat3 per texcoord slot (8 slots).
+     * Applied to (s, t, 1) to implement scroll, rotate, scale.
+     * Defaults to identity so untouched slots pass UVs unchanged. */
+    "uniform mat3 u_texMatrix[8];\n"
     "\n"
     "out vec4 v_color0;\n"
     "out vec2 v_texcoord0;\n"
@@ -141,8 +151,11 @@ static const char* VERTEX_SHADER_SOURCE =
     "    v_viewPos = viewPos.xyz;\n"
     "    v_normal = u_normalMatrix * a_normal;\n"
     "    v_color0 = a_color0;\n"
-    "    v_texcoord0 = a_texcoord0;\n"
-    "    v_texcoord1 = a_texcoord0;\n"
+    /* Apply the per-slot SRT matrix: multiply (s,t,1) by the mat3, then
+     * take the first two components as the transformed UV.  When u_texMatrix[n]
+     * is identity (the default) this is a no-op: (s,t,1)*I = (s,t,1). */
+    "    v_texcoord0 = (u_texMatrix[0] * vec3(a_texcoord0, 1.0)).xy;\n"
+    "    v_texcoord1 = (u_texMatrix[1] * vec3(a_texcoord0, 1.0)).xy;\n"
     "}\n";
 
 /* =========================================================================
@@ -716,6 +729,9 @@ static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
     entry->loc_chanLightEnabled = glGetUniformLocation(p, "u_chanLightEnabled");
     entry->loc_chanMatColor     = glGetUniformLocation(p, "u_chanMatColor");
     entry->loc_chanAmbColor     = glGetUniformLocation(p, "u_chanAmbColor");
+
+    /* Texture SRT matrix array (u_texMatrix[0] is the base of the array). */
+    entry->loc_texMatrix = glGetUniformLocation(p, "u_texMatrix");
 }
 
 /* =========================================================================
@@ -781,6 +797,18 @@ void gx_tev_init(void) {
         for (i = 0; i < GX_TEV_MAX_STAGES; ++i) {
             g_rs.konstColorSel[i] = 0;
             g_rs.konstAlphaSel[i] = 0;
+        }
+    }
+
+    /* Texture SRT matrices: default to identity for all 8 slots so UVs pass
+     * through unchanged until a scene explicitly sets a non-identity matrix. */
+    {
+        u32 s;
+        for (s = 0; s < 8; ++s) {
+            memset(g_rs.texMatrix[s], 0, sizeof(g_rs.texMatrix[s]));
+            g_rs.texMatrix[s][0][0] = 1.0f;
+            g_rs.texMatrix[s][1][1] = 1.0f;
+            g_rs.texMatrix[s][2][2] = 1.0f;
         }
     }
 
@@ -991,6 +1019,14 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
     if (entry->loc_chanAmbColor >= 0)
         glUniform4f(entry->loc_chanAmbColor, g_rs.chanAmbColor[0], g_rs.chanAmbColor[1],
                     g_rs.chanAmbColor[2], g_rs.chanAmbColor[3]);
+
+    /* --- Texture SRT matrices (8 mat3 uniforms, row-major) ---
+     * Upload all 8 slots as a single glUniformMatrix3fv array call.
+     * GL_TRUE = transpose so our row-major storage matches GL column-major. */
+    if (entry->loc_texMatrix >= 0) {
+        glUniformMatrix3fv(entry->loc_texMatrix, 8, GL_TRUE,
+                           &g_rs.texMatrix[0][0][0]);
+    }
 }
 
 /* =========================================================================
@@ -1092,6 +1128,28 @@ void gx_tev_set_chan_amb_color(u8 r, u8 g, u8 b, u8 a) {
     g_rs.chanAmbColor[1] = (f32)g / 255.0f;
     g_rs.chanAmbColor[2] = (f32)b / 255.0f;
     g_rs.chanAmbColor[3] = (f32)a / 255.0f;
+}
+
+void gx_tev_set_tex_matrix(u32 slot, const f32 m[3][4]) {
+    u32 r, c;
+    if (slot >= 8) return;
+    if (m == (const f32(*)[4])0) {
+        /* NULL -> restore identity. */
+        memset(g_rs.texMatrix[slot], 0, sizeof(g_rs.texMatrix[slot]));
+        g_rs.texMatrix[slot][0][0] = 1.0f;
+        g_rs.texMatrix[slot][1][1] = 1.0f;
+        g_rs.texMatrix[slot][2][2] = 1.0f;
+        return;
+    }
+    /* Copy the upper-left 3x3 of the 3x4 input matrix.
+     * The GCN TObj SRT matrix is 3x4; column 3 (translation) is irrelevant for
+     * UV scrolling encoded as a 2D affine (s,t,1) multiply -- the translation
+     * is in columns 0-2 row 2, so the 3x3 already captures it correctly. */
+    for (r = 0; r < 3; ++r) {
+        for (c = 0; c < 3; ++c) {
+            g_rs.texMatrix[slot][r][c] = m[r][c];
+        }
+    }
 }
 
 /* =========================================================================
