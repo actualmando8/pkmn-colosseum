@@ -653,6 +653,10 @@ static int BuildSandWindTexture(GXTexObj* tex) {
     u8* px;
     int x;
     int y;
+    const char* wi = getenv("PCPORT_WIND_INTENSITY");
+    /* Peak wisp alpha. 30 was "barely visible"; ~90 reads as drifting blowing
+     * sand over the desert (still translucent, not a sandstorm). */
+    f32 windMax = (wi != NULL) ? (f32)atof(wi) : 90.0f;
 
     px = (u8*)malloc((size_t)WIND_W * WIND_H * 4u);
     if (px == NULL) {
@@ -681,7 +685,7 @@ static int BuildSandWindTexture(GXTexObj* tex) {
             px[o + 0] = 240;                /* warm pale sand */
             px[o + 1] = 228;
             px[o + 2] = 198;
-            px[o + 3] = (u8)(a * 30.0f);    /* max ~30/255 -> very subtle haze */
+            px[o + 3] = (u8)(a * windMax);  /* drifting blowing-sand intensity */
         }
     }
     memset(tex, 0, sizeof(*tex));
@@ -1578,7 +1582,7 @@ static void ConfigureTranslatedMaterialPipeline(unsigned int pipelineId,
              * PCPORT_HAZE_ALPHA tunes it. */
             {
                 const char* ha = getenv("PCPORT_HAZE_ALPHA");
-                f32 hazeA = (ha != NULL) ? (f32)atof(ha) : 0.40f;
+                f32 hazeA = (ha != NULL) ? (f32)atof(ha) : 0.72f;
                 GSgfxHostSetPipelineAlphaScale(pipelineId, material->alpha * hazeA);
             }
         }
