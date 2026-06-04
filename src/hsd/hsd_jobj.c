@@ -718,13 +718,42 @@ void fn_801A02B0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A053C(void) {
 #include "src/hsd/hsd_jobj_fn_801A053C.inc"
 }
 #else
-void fn_801A053C(void) {
-    /* TODO: match -- 176 bytes at 0x801A053C */
+#pragma optimization_level 1
+static inline BOOL iref_DEC_indiv(void* o) {
+    BOOL r;
+    if ((r = (*(volatile u16*)&HSD_OBJ(o)->ref_count_individual == 0))) {
+        return r;
+    }
+    HSD_OBJ(o)->ref_count_individual -= 1;
+    return HSD_OBJ(o)->ref_count_individual == 0;
+}
+static inline s32 ref_CNT_obj(void* o) {
+    if (*(volatile u16*)&HSD_OBJ(o)->ref_count == HSD_OBJ_NOREF) {
+        return -1;
+    }
+    return HSD_OBJ(o)->ref_count;
+}
+void fn_801A053C(void* obj) {
+    HSD_ClassInfo* info;
+
+    if (obj == NULL) {
+        return;
+    }
+    if (iref_DEC_indiv(obj)) {
+        if (ref_CNT_obj(obj) < 0) {
+            if (obj != NULL) {
+                info = HSD_CLASS_METHOD(obj);
+                info->init((HSD_Class*)obj);
+                info = HSD_CLASS_METHOD(obj);
+                info->release((HSD_Class*)obj);
+            }
+        }
+    }
 }
 #endif
 #pragma pop
