@@ -5354,6 +5354,10 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                                translatedPObj.maxPosition[0],
                                translatedPObj.maxPosition[1],
                                translatedPObj.maxPosition[2]);
+                        printf(" mat=%d diff=0x%08X amb=0x%08X alpha=%.2f tex=%d texId=0x%X rmode=0x%X",
+                               haveMaterial, translatedMaterial.diffuse,
+                               translatedMaterial.ambient, translatedMaterial.alpha,
+                               haveTexture, textureMapId, translatedMaterial.rendermode);
                         if (uField != 0u &&
                             ArchiveRangeValid(a, uField, PCPORT_SERIALIZED_JOINT_SIZE)) {
                             PCPortTranslatedJointTransform skinJoint;
@@ -7385,6 +7389,11 @@ static int RunFieldScene(GLFWwindow* window) {
     f32 yaw = 0.0f, pitch = -0.12f;
     const f32 MOVE = 5.0f, TURN = 0.035f, LOOK = 0.045f;
     const f32 up[3] = { 0.0f, 1.0f, 0.0f };
+    { /* PCPORT_CAM_PITCH=<rad> pins the look pitch (e.g. -1.4 = look down at the
+       * floor) for headless geometry inspection. */
+        const char* cp = getenv("PCPORT_CAM_PITCH");
+        if (cp != NULL) pitch = (f32) atof(cp);
+    }
 
     if (archive == NULL || archive[0] == '\0') {
         archive = "orig/GC6E01/disc/files/D1_garage_1F.fsys";
@@ -7529,6 +7538,19 @@ void PCPort_EngineTitleRenderFrame(void) {
 
     RenderJointTree(&g_engTitleArchive, g_engTitleRootJoint, g_engTitleRootJoint,
                     &g_engTitleCamera, (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+
+    /* One-shot coverage report (PCPORT_RENDER_DEBUG) for the field/title scene:
+     * joints/dobjs walked and how many drew vs skipped vs textured. */
+    if (getenv("PCPORT_RENDER_DEBUG") != NULL) {
+        static int reported = 0;
+        if (!reported) {
+            reported = 1;
+            printf("[render] scene walk: joints=%u dobjs=%u drawn=%u skipped=%u "
+                   "textured=%u materialOnly=%u rootJoint=0x%X\n",
+                   stats.joints, stats.dobjs, stats.drawn, stats.skipped,
+                   stats.textured, stats.materialOnly, g_engTitleRootJoint);
+        }
+    }
 }
 
 int main(int argc, char** argv) {
