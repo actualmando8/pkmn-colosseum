@@ -166,8 +166,9 @@ void fn_800B7180(void) {
 }
 
 /* fn_800B71F0 - 0x800B71F0 | size: 0xC -- GX FIFO management */
-void fn_800B71F0(void) {
-    /* Simple accessor (0xC bytes) */
+void fn_800B71F0(u8* r3, u32 r4, u32 r5) {
+    *(u32*)(r3 + 0xC) = r4;
+    *(u32*)(r3 + 0x10) = r5;
 }
 
 /* fn_800B7484 - 0x800B7484 | size: 0x44 -- GX FIFO management */
@@ -508,8 +509,10 @@ void fn_800BA344(void) {
 }
 
 /* fn_800BA414 - 0x800BA414 | size: 0x10 -- GX Geometry / vertex descriptor */
-void fn_800BA414(void) {
-    /* Simple accessor (0x10 bytes) */
+void fn_800BA414(u8* r3, f32 f1, f32 f2, f32 f3) {
+    *(f32*)(r3 + 0x28) = f1;
+    *(f32*)(r3 + 0x2C) = f2;
+    *(f32*)(r3 + 0x30) = f3;
 }
 
 /* fn_800BA424 - 0x800BA424 | size: 0x1C -- GX Geometry / vertex descriptor */
@@ -518,8 +521,8 @@ void fn_800BA424(void) {
 }
 
 /* fn_800BA440 - 0x800BA440 | size: 0xC -- GX Geometry / vertex descriptor */
-void fn_800BA440(void) {
-    /* Simple accessor (0xC bytes) */
+void fn_800BA440(u8* r3, u8* r4) {
+    *(u32*)(r3 + 0xC) = *(u32*)(r4 + 0x0);
 }
 
 /* fn_800BA44C - 0x800BA44C | size: 0x7C -- GX Geometry / vertex descriptor */
