@@ -4983,6 +4983,8 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         if (!ArchiveRangeValid(a, entry, 0x8u)) {
             break; /* null terminator -> palette size = slot */
         }
+        {
+        int influences = 0;
         for (k = 0; k < 16; ++k) { /* {jobj,weight} list, jobj==0 ends it */
             u32 jobj = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 0u);
             union { u32 u; f32 f; } w;
@@ -4990,6 +4992,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             if (!ArchiveRangeValid(a, jobj, PCPORT_SERIALIZED_JOINT_SIZE)) {
                 break;
             }
+            ++influences;
             w.u = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 4u);
             memset(&jt, 0, sizeof(jt));
             if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint, jobj, &jt)) {
@@ -5000,7 +5003,12 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                 any = 1;
             }
         }
-        if (!any) { M[0][0] = M[1][1] = M[2][2] = 1.0f; }
+        (void)influences;
+        if (!any) {
+            for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
+            M[0][0] = M[1][1] = M[2][2] = 1.0f;
+        }
+        }
         if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
             fprintf(stderr,
                 "[skinpal] slot %d entry=0x%X resolved=%d  M row0=(%.2f %.2f %.2f | %.2f)\n",
@@ -5106,9 +5114,12 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             for (a2 = tp->verts; a2->attr != GX_VA_NULL; ++a2) {
                 u32 idx;
                 int isz;
-                if (a2->attr == GX_VA_PNMTXIDX) {
+                if (a2->attr <= GX_VA_TEX7MTXIDX) {
+                    /* 1-byte inline matrix index. PNMTXIDX selects the skinning
+                     * palette slot (byte/3); the TEXnMTXIDX bytes are consumed
+                     * but not yet used for host texgen. */
                     if (dl + 1 > end) { GXEnd(); return 1; }
-                    curSlot = (u32)dl[0] / 3u;
+                    if (a2->attr == GX_VA_PNMTXIDX) curSlot = (u32)dl[0] / 3u;
                     dl += 1;
                     continue;
                 }
@@ -5536,6 +5547,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                  * drawn opaque it would cover the whole title scene. Keying on
                  * alpha (not camera-space position) is camera-independent. */
                 int debugFlatChar = 0;
+                int skinIsolateSkip = 0;
                 {
                     static int isoChars = -1;
                     static int isoLo = 6, isoHi = 9;
@@ -5602,10 +5614,21 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (getenv("PCPORT_NO_ZTEST") != NULL) {
                         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
                     }
+                    /* Per-pobj isolation: PCPORT_SKIN_ONLY=<n> renders only the
+                     * nth pobj (1-based, matches the [rjt] pobj#N labels) so each
+                     * mesh piece can be identified in isolation. Mismatched pobjs
+                     * are skipped (not drawn) but the walk proceeds normally. */
+                    {
+                        const char* so = getenv("PCPORT_SKIN_ONLY");
+                        skinIsolateSkip = (so != NULL && so[0] != '\0' &&
+                                           (u32)atoi(so) != stats->dobjs);
+                    }
                     /* Skinned (type-2 envelope) PObjs: CPU-skin + immediate-mode
                      * submit (PCPORT_SKIN). fn_800DAD10 would draw them rigidly
                      * (jumbled). Falls back to the rigid draw if skinning bails. */
-                    if (getenv("PCPORT_SKIN") != NULL &&
+                    if (skinIsolateSkip) {
+                        /* isolation: suppress this mesh's draw */
+                    } else if (getenv("PCPORT_SKIN") != NULL &&
                         ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
                         RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam,
                                           haveTexture,
@@ -5669,7 +5692,6 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         }
                         (void)posCnt; (void)posType;
                         if (getenv("PCPORT_VTXDESC") != NULL &&
-                            (stats->dobjs == 17u || stats->dobjs == 31u) &&
                             translatedPObj.pobj.verts != NULL) {
                             HSD_VtxDescList* v = translatedPObj.pobj.verts;
                             printf("   [vtxdesc pobj#%u]", stats->dobjs);

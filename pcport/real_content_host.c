@@ -422,14 +422,19 @@ static BOOL ScanDisplayListIndices(const u8* displayList,
                 int indexSize;
                 u32 index;
 
-                /* PNMTXIDX is a 1-byte DIRECT matrix-palette index inline in the
-                 * display list (not an index into a vertex array): consume the
-                 * byte and track its max (palette size) for the skinning pass. */
-                if (v->attr == GX_VA_PNMTXIDX) {
+                /* The matrix-index attributes (GX_VA_PNMTXIDX=0 and the eight
+                 * GX_VA_TEXnMTXIDX=1..8) are 1-byte DIRECT indices inline in the
+                 * display list (not indices into a vertex array): consume the
+                 * byte. For the position-matrix index track its max (palette size)
+                 * for the skinning pass; the texture-matrix indices are consumed
+                 * but not otherwise used yet. A PObj carrying a TEXnMTXIDX (e.g.
+                 * Wes's coat) was previously rejected outright -> the mesh dropped. */
+                if (v->attr <= GX_VA_TEX7MTXIDX) {
                     if ((u32)(end - cursor) < 1u) {
                         return FALSE;
                     }
-                    if ((u32)cursor[0] > stats->maxMatrixIndex) {
+                    if (v->attr == GX_VA_PNMTXIDX &&
+                        (u32)cursor[0] > stats->maxMatrixIndex) {
                         stats->maxMatrixIndex = cursor[0];
                     }
                     cursor += 1;
@@ -2364,7 +2369,7 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
          * per-vertex matrix + envelope-palette transform are applied at render
          * time. Rigid field meshes (type 0) never carry this attribute, so the
          * proven rigid path is unaffected. */
-        if (parsedVerts[entryCount].attr == GX_VA_PNMTXIDX) {
+        if (parsedVerts[entryCount].attr <= GX_VA_TEX7MTXIDX) {
             continue;
         }
 
@@ -2418,9 +2423,9 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
     for (i = 0; i < entryCount; ++i) {
         u32 usedCount;
 
-        /* PNMTXIDX has no source vertex array (inline DIRECT bytes); skip the
-         * array load for it. */
-        if (outPObj->verts[i].attr == GX_VA_PNMTXIDX) {
+        /* The matrix-index attributes (PNMTXIDX + TEXnMTXIDX) have no source
+         * vertex array (inline DIRECT bytes); skip the array load for them. */
+        if (outPObj->verts[i].attr <= GX_VA_TEX7MTXIDX) {
             continue;
         }
 
