@@ -4,11 +4,18 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_pobj.h"
 #include "hsd/hsd_fobj.h"
+#include "hsd/hsd_jobj.h"
 
 /* Host kickoff for the FObj keyframe interpreter (hsd_fobj_host.c): put an
  * FObj list into the "load next packet" start state (flags low-nibble = 2),
  * since the adapted src/hsd/hsd_fobj.c zeroes flags. */
 void PCPort_FObjStartAnim(HSD_FObj* fobj, f32 startframe);
+
+/* Walk a live HSD_JObj tree (after HSD_JObjAddAnimAll) and kick every attached
+ * AObj's FObj chain into the interpreter start state via PCPort_FObjStartAnim.
+ * Covers both joint SRT anim (jobj->aobj) and material/texture anim
+ * (dobj->mobj->{aobj, tobj->aobj}). Defined in hsd_host.c. */
+void PCPort_HSDStartAnimAll(HSD_JObj* root);
 
 typedef struct {
     u8* storage;
@@ -210,6 +217,14 @@ void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 jointListOffset);
 /* Verify the swizzle math: load+resolve+swizzle a scene member, print sane-value
  * report (root joint SRT/flags, first material colors/alpha, first TObj). */
 void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName);
+
+/* Build + arm a live animated HSD_JObj tree from a scene member (swizzle ->
+ * LoadJoint -> AddAnimAll -> ReqAnimAll -> StartAnimAll). Returns 1 on success.
+ * The archive storage is kept alive internally (the live tree points into it). */
+int PCPort_TitleAnimSetup(const char* fsysPath, const char* memberName);
+/* Advance the title HSD animation one frame (HSD_JObjAnimAll over the live tree
+ * built by PCPort_TitleAnimSetup). No-op if setup was not run / failed. */
+void PCPort_TitleAnimTick(void);
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive);
 const void* PCPort_HSDArchiveGetPublicAddress(const PCPortHSDArchive* archive,
                                               const char* name,

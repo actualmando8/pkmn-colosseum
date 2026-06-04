@@ -6323,6 +6323,17 @@ static int RunMenuScene(GLFWwindow* window) {
            frameCap,
            dumpRequested);
 
+    /* Real title HSD animation drive (FObj interpreter): build + arm a live
+     * animated HSD_JObj tree from the title scene so the game's own anim pipeline
+     * (HSD_JObjAnimAll -> HSD_TObjAnim/HSD_JObjAnim host overrides -> FObj interp)
+     * runs each frame and updates the live HSD_TObj/JObj SRT fields. Gated by
+     * PCPORT_TITLE_ANIM (the raw-BE RenderJointTree path does not yet read the
+     * live tree, so this is the verified animation engine drive, not yet visible
+     * -- see PCPort_TitleAnimSetup notes + the lane report). */
+    if (getenv("PCPORT_TITLE_ANIM") != NULL) {
+        PCPort_TitleAnimSetup(sceneArchive, menuMember);
+    }
+
     /* Boot movies play first (skippable via PCPORT_NO_BOOT). */
     if (!RunBootSequence(window)) {
         ok = 1;  /* window closed during the boot sequence -> clean exit */
@@ -6596,6 +6607,13 @@ static int RunMenuScene(GLFWwindow* window) {
                 printf("[pcport_bootstrap] title cast -> set %d (%s)\n",
                        titleSetIndex, kTitleSets[titleSetIndex].name);
             }
+        }
+
+        /* Advance the real title HSD animation (when armed via PCPORT_TITLE_ANIM).
+         * Runs the game's HSD_JObjAnimAll over the live tree -> FObj interpreter
+         * updates the live HSD_TObj/JObj SRT fields. No-op unless set up. */
+        if (sceneState == PCPORT_SCENE_TITLE) {
+            PCPort_TitleAnimTick();
         }
 
         if (sceneState == PCPORT_SCENE_TITLE) {

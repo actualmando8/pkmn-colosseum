@@ -2006,12 +2006,12 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
         void* matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
         HSD_JObj* root = HSD_JObjLoadJoint(rootJoint);
         HSD_JObj* stk[512]; int sp = 0, nj = 0, nd = 0, na = 0, guard = 0;
-        /* EXPERIMENTAL anim attach (gated): jointList+4/+8 as animjoint/matanimjoint
-         * crashes HSD_JObjAddAnimAll -- the GS scene wraps the animation differently
-         * than a plain HSD model-set (the header structs pack 0x10 apart, not 0x14),
-         * so the animjoint location/structure needs more reverse-engineering. Off by
-         * default so the verified load path is crash-free. */
-        if (getenv("PCPORT_HSD_ANIM") != NULL) {
+        /* Anim attach: jointList+4 = root AnimJoint (SRT anim), jointList+8 = root
+         * MatAnimJoint (material/texture UV-scroll). The Colosseum AnimJoint/AObjDesc/
+         * FObjDesc layouts are confirmed and the swizzle (above) now runs
+         * unconditionally, so attach the animation through the game's real
+         * HSD_JObjAddAnimAll (loads AObj/FObj from the descriptors). */
+        {
             /* Isolation: load the root animjoint's aobjdesc alone first (tests the
              * AObjDesc/FObjDesc swizzle + HSD_AObjLoadDesc/FObj load path). */
             u32 ajAobjDesc = animjoint ? *(u32*)((u8*)animjoint + 0x8) : 0u;
@@ -2024,6 +2024,12 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
             HSD_JObjAddAnimAll(root, (HSD_AnimJoint*)animjoint,
                                (HSD_MatAnimJoint*)matanimjoint, NULL);
             printf("[hsd-swiz] HSD_JObjAddAnimAll done\n");
+            /* Kick the FObj state machines so the interpreter actually produces
+             * values (HSD_FObjReqAnimAll alone leaves them idle on the adapted
+             * src path). HSD_JObjReqAnimAll requests playback; then walk the tree
+             * and start each AObj's FObj chain. */
+            HSD_JObjReqAnimAll(root, 0.0f);
+            PCPort_HSDStartAnimAll(root);
         }
         if (root != NULL) {
             stk[sp++] = root;
@@ -2042,6 +2048,123 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
 done:
     PCPort_HSDArchiveDestroy(&archive);
     free(data);
+}
+
+/* ========================================================================= */
+/*  Title HSD animation drive (persistent)                                    */
+/* ========================================================================= */
+
+/*
+ * Build a live, animated HSD_JObj tree from a scene member and arm its animation,
+ * then advance it once per frame. This drives the title material/UV (and SRT)
+ * animation through the game's REAL pipeline:
+ *   swizzle (BE->LE) -> HSD_JObjLoadJoint -> HSD_JObjAddAnimAll
+ *   -> HSD_JObjReqAnimAll + PCPort_HSDStartAnimAll  (arm FObj state machines)
+ *   -> [per frame] HSD_JObjAnimAll  -> HSD_JObjAnim / HSD_TObjAnim (host overrides)
+ *      -> HSD_AObjInterpretAnim -> FObj interpreter (hsd_fobj_host.c)
+ *      -> PCPort_JObjUpdateFunc / PCPort_TObjUpdateFunc -> live HSD_JObj/HSD_TObj
+ *         SRT fields (+ TEX_MTX_DIRTY).
+ *
+ * NOTE (remaining wiring): the title 3D render (pcport_main.c RenderJointTree)
+ * reads RAW big-endian archive bytes, NOT this live HSD tree, so the animated
+ * HSD_TObj/HSD_JObj fields updated here are not yet consumed by the rasteriser.
+ * Making the animation visible requires routing the title render through this
+ * live tree (HSD_JObjDispAll / a tree-driven RenderJointTree) and building the
+ * texture matrix from the live HSD_TObj SRT into the GX texgen path. This module
+ * provides the verified, correct animation engine drive; the render-readback is
+ * the next step. PCPORT_TITLE_ANIM_DEBUG prints the root SRT each tick so the
+ * drive can be verified to actually move values without the render path.
+ */
+
+static PCPortHSDArchive g_titleAnimArchive;
+static HSD_JObj*        g_titleAnimRoot = NULL;
+static int             g_titleAnimReady = 0;
+static u8*             g_titleAnimData = NULL;
+
+int PCPort_TitleAnimSetup(const char* fsysPath, const char* memberName) {
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0, branchOff, jointListOff;
+    void* rootPtr;
+    HSD_Joint* rootJoint;
+    void* animjoint;
+    void* matanimjoint;
+
+    g_titleAnimReady = 0;
+    g_titleAnimRoot = NULL;
+    memset(&g_titleAnimArchive, 0, sizeof(g_titleAnimArchive));
+
+    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
+        printf("[title-anim] load %s:%s FAILED\n", fsysPath, memberName);
+        return 0;
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_titleAnimArchive, data, size)) {
+        printf("[title-anim] parse FAILED\n");
+        free(data);
+        return 0;
+    }
+    g_titleAnimData = data; /* keep alive: the live HSD tree points into storage */
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_titleAnimArchive,
+                                                             "scene_data", &sceneOffset);
+    if (sceneData == NULL) {
+        printf("[title-anim] no scene_data\n");
+        PCPort_HSDArchiveDestroy(&g_titleAnimArchive);
+        free(data); g_titleAnimData = NULL;
+        return 0;
+    }
+    branchOff = ReadBE32(sceneData + 0x00);
+    jointListOff = ReadBE32(g_titleAnimArchive.storage + branchOff + 0x00);
+
+    /* Swizzle BE->LE (joint tree + anim + matanim) and relocate to host ptrs. */
+    rootPtr = PCPort_SwizzleSceneForHSD(&g_titleAnimArchive, jointListOff);
+    if (rootPtr == NULL) {
+        printf("[title-anim] swizzle FAILED\n");
+        PCPort_HSDArchiveDestroy(&g_titleAnimArchive);
+        free(data); g_titleAnimData = NULL;
+        return 0;
+    }
+
+    {
+        u8* jl = (u8*)rootPtr;
+        rootJoint    = (HSD_Joint*)(uintptr_t)(*(u32*)(jl + 0x0));
+        animjoint    = (void*)(uintptr_t)(*(u32*)(jl + 0x4));
+        matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
+    }
+
+    g_titleAnimRoot = HSD_JObjLoadJoint(rootJoint);
+    if (g_titleAnimRoot == NULL) {
+        printf("[title-anim] HSD_JObjLoadJoint FAILED\n");
+        PCPort_HSDArchiveDestroy(&g_titleAnimArchive);
+        free(data); g_titleAnimData = NULL;
+        return 0;
+    }
+
+    /* Attach SRT + material/texture animation, then arm the FObj state machines. */
+    HSD_JObjAddAnimAll(g_titleAnimRoot, (HSD_AnimJoint*)animjoint,
+                       (HSD_MatAnimJoint*)matanimjoint, NULL);
+    HSD_JObjReqAnimAll(g_titleAnimRoot, 0.0f);
+    PCPort_HSDStartAnimAll(g_titleAnimRoot);
+
+    g_titleAnimReady = 1;
+    printf("[title-anim] setup OK (root=%p animjoint=%p matanim=%p)\n",
+           (void*)g_titleAnimRoot, animjoint, matanimjoint);
+    return 1;
+}
+
+void PCPort_TitleAnimTick(void) {
+    if (!g_titleAnimReady || g_titleAnimRoot == NULL) {
+        return;
+    }
+    HSD_JObjAnimAll(g_titleAnimRoot);
+    if (getenv("PCPORT_TITLE_ANIM_DEBUG") != NULL) {
+        HSD_JObj* r = g_titleAnimRoot;
+        printf("[title-anim] tick root SRT t=(%.3f,%.3f,%.3f) r=(%.3f,%.3f,%.3f) s=(%.3f,%.3f,%.3f)\n",
+               r->translate_x, r->translate_y, r->translate_z,
+               r->rotate_x, r->rotate_y, r->rotate_z,
+               r->scale_x, r->scale_y, r->scale_z);
+    }
 }
 
 /* Swizzle a scene model-set entry (jointList) BE->LE for the game's HSD pipeline.
@@ -2066,13 +2189,15 @@ void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 jointListOffset) 
     ctx.size = archive->storageSize;
     ctx.dataOffset = archive->dataOffset;
     SwizJoint(&ctx, rootOff);                    /* (1a) joint tree (verified) */
-    /* Anim-tree swizzle is WIP: the jointList+4/+8 animjoint/matanimjoint
-     * interpretation isn't confirmed (HSD_JObjAddAnimAll crashes), so only walk it
-     * when explicitly experimenting -- the default path stays joint-only + safe. */
-    if (getenv("PCPORT_HSD_ANIM") != NULL) {
-        SwizAnimJoint(&ctx, animOff);            /* (1b) SRT animation */
-        SwizMatAnimJoint(&ctx, matanimOff);      /* (1c) material/texture anim (sand) */
-    }
+    /* Anim-tree swizzle: the Colosseum AnimJoint (0x10B, all-pointer, no flags),
+     * AObjDesc (0x10B {flags,end_frame,fobjdesc,obj_id}) and FObjDesc (0x14B)
+     * layouts are confirmed (see project memory 2026-06-04/05) and SwizAnimJoint /
+     * SwizMatAnimJoint handle them, so the anim tree is swizzled unconditionally.
+     * This lets the host build a live HSD_JObj tree with attached AObj/FObj animation
+     * (HSD_JObjAddAnimAll). (1b) = JObj SRT animation; (1c) = MObj/TObj material +
+     * texture (UV-scroll) animation = the title "sand" drive. */
+    SwizAnimJoint(&ctx, animOff);                /* (1b) SRT animation */
+    SwizMatAnimJoint(&ctx, matanimOff);          /* (1c) material/texture anim (sand) */
     PCPort_HSDApplyHostRelocations(archive);     /* (2) pointers -> host */
     return (void*)(archive->storage + jointListOffset);
 }
