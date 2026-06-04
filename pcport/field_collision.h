@@ -56,4 +56,11 @@ BOOL PCPort_FieldColFloorAt(f32 x, f32 z, f32 queryY, f32 climb, f32* outY);
  * sanity checks). Returns FALSE if no mesh is loaded. */
 BOOL PCPort_FieldColBounds(f32 outMin[3], f32 outMax[3]);
 
+/* Push (*x,*z) out of any blocking (wall/boundary) triangles it is within
+ * `radius` of, considering only walls whose vertical span overlaps [yLo, yHi]
+ * (the player's body height range). Resolves against triangle edges projected
+ * to XZ with a few relaxation passes so corners and multiple walls settle,
+ * giving wall sliding. Returns TRUE if any push was applied. */
+BOOL PCPort_FieldColResolveXZ(f32* x, f32* z, f32 yLo, f32 yHi, f32 radius);
+
 #endif

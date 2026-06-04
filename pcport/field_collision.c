@@ -7,6 +7,7 @@
 #include "field_collision.h"
 #include "real_content_host.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -219,6 +220,80 @@ static BOOL Walkable(int cat) {
     return cat == PCPORT_COLCAT_FLOOR ||
            cat == PCPORT_COLCAT_SLOPE ||
            cat == PCPORT_COLCAT_EXTFLOOR;
+}
+
+static BOOL Blocking(int cat) {
+    return cat == PCPORT_COLCAT_WALL || cat == PCPORT_COLCAT_BOUND;
+}
+
+/* Closest point on segment (ax,az)-(bx,bz) to (px,pz), in XZ. */
+static void ClosestOnSeg(f32 ax, f32 az, f32 bx, f32 bz,
+                         f32 px, f32 pz, f32* cx, f32* cz) {
+    f32 dx = bx - ax, dz = bz - az;
+    f32 len2 = dx * dx + dz * dz;
+    f32 t;
+    if (len2 < 1.0e-8f) {
+        *cx = ax; *cz = az;
+        return;
+    }
+    t = ((px - ax) * dx + (pz - az) * dz) / len2;
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+    *cx = ax + dx * t;
+    *cz = az + dz * t;
+}
+
+BOOL PCPort_FieldColResolveXZ(f32* x, f32* z, f32 yLo, f32 yHi, f32 radius) {
+    int pass, i, e;
+    BOOL pushedAny = FALSE;
+    const f32 r2 = radius * radius;
+
+    if (x == NULL || z == NULL || radius <= 0.0f) {
+        return FALSE;
+    }
+
+    /* A few relaxation passes so a corner (two walls) settles. */
+    for (pass = 0; pass < 4; ++pass) {
+        BOOL pushedThisPass = FALSE;
+        for (i = 0; i < s_triCount; ++i) {
+            const ColTri* t = &s_tris[i];
+            f32 triLo, triHi;
+            int k;
+            if (!Blocking(t->cat)) {
+                continue;
+            }
+            /* Vertical-span overlap test with the player's body. */
+            triLo = triHi = t->v[0][1];
+            for (k = 1; k < 3; ++k) {
+                if (t->v[k][1] < triLo) triLo = t->v[k][1];
+                if (t->v[k][1] > triHi) triHi = t->v[k][1];
+            }
+            if (triHi < yLo || triLo > yHi) {
+                continue;
+            }
+            /* Push out of the nearest of the triangle's 3 XZ edges. */
+            for (e = 0; e < 3; ++e) {
+                int a0 = e, a1 = (e + 1) % 3;
+                f32 cx, cz, dx, dz, d2;
+                ClosestOnSeg(t->v[a0][0], t->v[a0][2],
+                             t->v[a1][0], t->v[a1][2], *x, *z, &cx, &cz);
+                dx = *x - cx; dz = *z - cz;
+                d2 = dx * dx + dz * dz;
+                if (d2 < r2 && d2 > 1.0e-8f) {
+                    f32 d = (f32)sqrt((double)d2);
+                    f32 push = (radius - d) / d;
+                    *x += dx * push;
+                    *z += dz * push;
+                    pushedThisPass = TRUE;
+                    pushedAny = TRUE;
+                }
+            }
+        }
+        if (!pushedThisPass) {
+            break;
+        }
+    }
+    return pushedAny;
 }
 
 BOOL PCPort_FieldColFloorAt(f32 x, f32 z, f32 queryY, f32 climb, f32* outY) {

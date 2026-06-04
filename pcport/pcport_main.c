@@ -7005,6 +7005,186 @@ static void DrawFieldCollisionWire(void) {
     GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 }
 
+/* Placeholder player avatar: an oriented box (a stand-in until the real Wes
+ * overworld model is ported). Drawn in world space via the immediate path; the
+ * front face is brightened so the facing direction reads. yaw=0 faces -Z. */
+static void DrawFieldAvatar(f32 px, f32 py, f32 pz, f32 yaw,
+                            f32 height, f32 radius) {
+    f32 rt[3], fw[3];        /* local right / forward unit vectors (XZ) */
+    f32 c[8][3];             /* 8 box corners: index = uy*4 + fz*2 + rx bits */
+    int rxB, fzB, uyB;
+
+    rt[0] = cosf(yaw);  rt[1] = 0.0f;  rt[2] = sinf(yaw);
+    fw[0] = sinf(yaw);  fw[1] = 0.0f;  fw[2] = -cosf(yaw);
+
+    for (uyB = 0; uyB < 2; ++uyB) {
+        for (fzB = 0; fzB < 2; ++fzB) {
+            for (rxB = 0; rxB < 2; ++rxB) {
+                int idx = uyB * 4 + fzB * 2 + rxB;
+                f32 sr = rxB ? radius : -radius;
+                f32 sf = fzB ? radius : -radius;
+                f32 uy = uyB ? height : 0.0f;
+                c[idx][0] = px + rt[0] * sr + fw[0] * sf;
+                c[idx][1] = py + uy;
+                c[idx][2] = pz + rt[2] * sr + fw[2] * sf;
+            }
+        }
+    }
+
+    GXSetProjection(g_engTitleCamera.projectionMatrix, GX_PERSPECTIVE);
+    GXLoadPosMtxImm(g_engTitleCamera.viewMatrix, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_COPY);
+    GXSetNumTexGens(1);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXHostSetLightingEnabled(GX_FALSE);
+    GXHostSetVertexAlphaScale(1.0f);
+
+    /* 6 quads (faces); winding doesn't matter (cull none). Each face by 4 corner
+     * indices + an RGB tint. Front (fz=1) bright cyan; others steel blue. */
+    {
+        static const int faces[6][4] = {
+            { 2, 3, 7, 6 },   /* front  (fz=1) */
+            { 0, 1, 5, 4 },   /* back   (fz=0) */
+            { 1, 3, 7, 5 },   /* right  (rx=1) */
+            { 0, 2, 6, 4 },   /* left   (rx=0) */
+            { 4, 5, 7, 6 },   /* top    (uy=1) */
+            { 0, 1, 3, 2 }    /* bottom (uy=0) */
+        };
+        int f;
+        GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6 * 6);
+        for (f = 0; f < 6; ++f) {
+            u8 r, g, b;
+            int tri, vi;
+            static const int order[6] = { 0, 1, 2, 0, 2, 3 };
+            if (f == 0)      { r = 90;  g = 230; b = 255; }   /* front */
+            else if (f == 4) { r = 120; g = 170; b = 230; }   /* top   */
+            else             { r = 60;  g = 110; b = 190; }   /* sides */
+            for (tri = 0; tri < 6; ++tri) {
+                vi = faces[f][order[tri]];
+                GXColor4u8(r, g, b, 255);
+                GXPosition3f32(c[vi][0], c[vi][1], c[vi][2]);
+                GXTexCoord2f32(0.0f, 0.0f);
+            }
+        }
+        GXEnd();
+    }
+
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+}
+
+/* Third-person "walk the room" mode for --field (PCPORT_FIELD_WALK). The player
+ * is a box avatar that moves on the WZX floor with wall blocking; the camera
+ * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
+ * avatar snaps to the floor each step and slides along walls. */
+static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
+                            int frameCap, int colWire) {
+    PADStatus pads[4];
+    f32 ppos[3] = { 0.0f, 0.0f, 0.0f };
+    f32 pyaw = 0.0f;
+    f32 camYaw = 0.0f, camPitch = 0.30f;
+    const f32 up[3] = { 0.0f, 1.0f, 0.0f };
+    const f32 SPEED = 4.0f, ORBIT = 0.04f;
+    const f32 PLAYER_H = 30.0f, PLAYER_R = 10.0f;
+    const char* dEnv = getenv("PCPORT_CAM_DIST");
+    const char* hEnv = getenv("PCPORT_CAM_HEIGHT");
+    f32 camDist = (dEnv != NULL) ? (f32)atof(dEnv) : 150.0f;
+    f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 60.0f;
+    int autopan = getenv("PCPORT_FIELD_AUTOPAN") != NULL;
+    int frame = 0;
+    f32 spawnY;
+
+    memset(pads, 0, sizeof(pads));
+    { /* spawn at the start XZ on the floor (PCPORT_CAM_EYE x,_,z seeds XZ) */
+        const char* ce = getenv("PCPORT_CAM_EYE");
+        if (ce != NULL) { f32 yy; sscanf(ce, "%f,%f,%f", &ppos[0], &yy, &ppos[2]); }
+    }
+    if (PCPort_FieldColFloorAt(ppos[0], ppos[2], 1.0e5f, 1.0e9f, &spawnY)) {
+        ppos[1] = spawnY;
+    }
+    printf("[field/walk] spawn=(%.1f,%.1f,%.1f). Left stick walks, arrows/C-stick "
+           "orbit camera.%s\n", ppos[0], ppos[1], ppos[2],
+           autopan ? " [AUTOPAN]" : "");
+
+    while (!glfwWindowShouldClose(window)) {
+        f32 fwdXZ[3], rightXZ[3], mvx, mvz, eye[3], interest[3], floorY;
+        f32 prevx, prevz;
+        u16 btn;
+        f32 sx, sy;
+
+        VIWaitForRetrace_PC();
+        PADRead(pads);
+        btn = pads[0].button;
+        sx = (f32)pads[0].stickX / 112.0f;
+        sy = (f32)pads[0].stickY / 112.0f;
+
+        /* Camera orbit (arrows + C-stick). */
+        if (btn & GCN_PAD_BUTTON_LEFT)  camYaw   -= ORBIT;
+        if (btn & GCN_PAD_BUTTON_RIGHT) camYaw   += ORBIT;
+        if (btn & GCN_PAD_BUTTON_UP)    camPitch += ORBIT;
+        if (btn & GCN_PAD_BUTTON_DOWN)  camPitch -= ORBIT;
+        camYaw   += (f32)pads[0].substickX / 112.0f * ORBIT;
+        camPitch += (f32)pads[0].substickY / 112.0f * ORBIT;
+        if (camPitch >  1.30f) camPitch =  1.30f;
+        if (camPitch < -0.20f) camPitch = -0.20f;
+        if (autopan) { sy = 0.7f; camYaw += 0.01f; }
+
+        /* Camera-relative ground movement. fwdXZ points where the camera looks. */
+        fwdXZ[0] = sinf(camYaw); fwdXZ[1] = 0.0f; fwdXZ[2] = -cosf(camYaw);
+        rightXZ[0] = cosf(camYaw); rightXZ[1] = 0.0f; rightXZ[2] = sinf(camYaw);
+        mvx = fwdXZ[0] * sy + rightXZ[0] * sx;
+        mvz = fwdXZ[2] * sy + rightXZ[2] * sx;
+
+        prevx = ppos[0]; prevz = ppos[2];
+        if (mvx != 0.0f || mvz != 0.0f) {
+            ppos[0] += mvx * SPEED;
+            ppos[2] += mvz * SPEED;
+            pyaw = atan2f(mvx, -mvz);   /* face the move direction */
+        }
+
+        /* Block at walls (slide), then snap to the floor under the new spot. If
+         * there is no floor there (walked off a ledge), revert the step. */
+        PCPort_FieldColResolveXZ(&ppos[0], &ppos[2],
+                                 ppos[1] + 2.0f, ppos[1] + PLAYER_H, PLAYER_R);
+        if (PCPort_FieldColFloorAt(ppos[0], ppos[2], ppos[1] + PLAYER_H,
+                                   PLAYER_H, &floorY)) {
+            ppos[1] = floorY;
+        } else {
+            ppos[0] = prevx; ppos[2] = prevz;
+        }
+
+        /* Orbit camera behind the player. */
+        eye[0] = ppos[0] - sinf(camYaw) * cosf(camPitch) * camDist;
+        eye[2] = ppos[2] + cosf(camYaw) * cosf(camPitch) * camDist;
+        eye[1] = ppos[1] + camHigh + sinf(camPitch) * camDist;
+        interest[0] = ppos[0];
+        interest[1] = ppos[1] + PLAYER_H * 0.6f;
+        interest[2] = ppos[2];
+        BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
+
+        PCPort_EngineTitleRenderFrame();
+        DrawFieldAvatar(ppos[0], ppos[1], ppos[2], pyaw, PLAYER_H, PLAYER_R);
+        if (colWire) {
+            DrawFieldCollisionWire();
+        }
+        if (dumpPath != NULL && dumpPath[0] != '\0' &&
+            (frameCap > 0 ? frame == frameCap - 1 : frame == 2)) {
+            DumpBackbufferTo(dumpPath);
+            printf("[field/walk] dumped frame %d (player=%.1f,%.1f,%.1f) to %s\n",
+                   frame, ppos[0], ppos[1], ppos[2], dumpPath);
+        }
+        GSgfxSwapBuffers(0);
+        frame++;
+        if (frameCap > 0 && frame >= frameCap) {
+            break;
+        }
+    }
+    printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)\n",
+           frame, ppos[0], ppos[1], ppos[2]);
+    return 1;
+}
+
 static int RunFieldScene(GLFWwindow* window) {
     const char* archive = getenv("PCPORT_FIELD_ARCHIVE");
     const char* capEnv = getenv("PCPORT_MENU_FRAMES");
@@ -7043,6 +7223,12 @@ static int RunFieldScene(GLFWwindow* window) {
         } else {
             printf("[field] collision: no WZX mesh found in %s\n", archive);
         }
+    }
+
+    if (getenv("PCPORT_FIELD_WALK") != NULL) {
+        /* Third-person walkable mode (placeholder avatar on the WZX floor). */
+        return RunFieldWalkLoop(window, dumpPath, frameCap,
+                                getenv("PCPORT_COL_WIRE") != NULL);
     }
 
     { /* optional initial eye placement */
