@@ -5181,6 +5181,35 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         if (vcount == 0u) {
             break;
         }
+        {
+            /* PCPORT_SKIN_SKIPCMD=0xNN skips drawing primitives of that GX type
+             * (still consumes their verts) to isolate which primitive produces
+             * the bad geometry. */
+            const char* sc = getenv("PCPORT_SKIN_SKIPCMD");
+            if (sc != NULL && sc[0] != '\0' &&
+                (u32)strtol(sc, NULL, 0) == (u32)(cmd & 0xF8u)) {
+                u32 vskip;
+                for (vskip = 0; vskip < vcount; ++vskip) {
+                    const HSD_VtxDescList* as;
+                    for (as = tp->verts; as->attr != GX_VA_NULL; ++as) {
+                        int sz = (as->attr <= GX_VA_TEX7MTXIDX) ? 1
+                               : ((as->attr_type == GX_INDEX16) ? 2 : 1);
+                        if (dl + sz > end) break;
+                        dl += sz;
+                    }
+                }
+                continue;
+            }
+        }
+        if (dbgVtxPos) {
+            fprintf(stderr, "[dl] prim cmd=0x%02X (%s) vcount=%u\n",
+                    cmd & 0xF8u,
+                    (cmd & 0xF8u) == 0x98u ? "TRISTRIP" :
+                    (cmd & 0xF8u) == 0xA0u ? "TRIFAN" :
+                    (cmd & 0xF8u) == 0x90u ? "TRIANGLES" :
+                    (cmd & 0xF8u) == 0x80u ? "QUADS" : "?",
+                    vcount);
+        }
         GXBegin((GXPrimitive)(cmd & 0xF8u), GX_VTXFMT0, vcount);
         for (vi = 0; vi < vcount; ++vi) {
             u32 curSlot = 0u;
