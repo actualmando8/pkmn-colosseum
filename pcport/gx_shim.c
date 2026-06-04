@@ -757,6 +757,10 @@ void GXHostSetLightParams(f32 dx, f32 dy, f32 dz, f32 ambient) {
     gx_tev_set_light_params(dx, dy, dz, ambient);
 }
 
+void GXHostSetExposure(f32 gain) {
+    gx_tev_set_exposure(gain);
+}
+
 /* =========================================================================
  * 4. TEV / Blend / Alpha / Z / Fog State
  * ========================================================================= */

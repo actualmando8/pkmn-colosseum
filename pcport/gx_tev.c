@@ -75,6 +75,8 @@ typedef struct {
     s32 lightingEnabled;   /* 1 = apply directional lambert; 0 = full bright */
     f32 lightDir[3];       /* view-space sun direction (normalized in shader) */
     f32 lightAmbient;      /* floor brightness for unlit faces [0..1] */
+    f32 exposure;          /* final RGB gain (1.0 = neutral); lifts unlit dark
+                            * albedo to read like the lit reference */
 
     /* Per-stage konst color/alpha selectors (GXTevKColorSel/KAlphaSel).
      * Uploaded as int-array uniforms so the shader does selection at draw
@@ -358,6 +360,7 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "uniform int  u_lightingEnabled;\n"
         "uniform vec3 u_lightDir;\n"
         "uniform float u_lightAmbient;\n"
+        "uniform float u_exposure;\n"
         /* Per-stage konst selectors (GXTevKColorSel/KAlphaSel raw values). */
         "uniform int  u_tevKonstColorSel[16];\n"
         "uniform int  u_tevKonstAlphaSel[16];\n"
@@ -599,6 +602,12 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "            : 1.0;\n"
         "        fragColor.rgb = mix(u_fogColor.rgb, fragColor.rgb, fogFactor);\n"
         "    }\n"
+        /* Final exposure gain. 1.0 = neutral (no effect on existing scenes). A
+         * value >1 lifts an unlit dark-albedo mesh (e.g. the character models,
+         * which the game would otherwise light at runtime) toward the brightness
+         * of the lit reference art. Clamp so colours saturate to white rather
+         * than wrapping. */
+        "    fragColor.rgb = clamp(fragColor.rgb * u_exposure, 0.0, 1.0);\n"
         "}\n");
 
     return (s32)pos;
@@ -672,6 +681,7 @@ static void tev_cache_uniform_locations(GXTevShaderEntry* entry) {
     entry->loc_normalMatrix    = glGetUniformLocation(p, "u_normalMatrix");
     entry->loc_lightDir        = glGetUniformLocation(p, "u_lightDir");
     entry->loc_lightAmbient    = glGetUniformLocation(p, "u_lightAmbient");
+    entry->loc_exposure        = glGetUniformLocation(p, "u_exposure");
 
     entry->loc_tex[0] = glGetUniformLocation(p, "u_tex0");
     entry->loc_tex[1] = glGetUniformLocation(p, "u_tex1");
@@ -754,6 +764,7 @@ void gx_tev_init(void) {
     g_rs.lightDir[1] = 0.50f;
     g_rs.lightDir[2] = 0.55f;
     g_rs.lightAmbient = 0.18f;
+    g_rs.exposure = 1.0f;
     g_rs.alphaComp0 = GX_ALWAYS;
     g_rs.alphaComp1 = GX_ALWAYS;
     g_rs.alphaOp = GX_AOP_AND;
@@ -951,6 +962,8 @@ void gx_tev_bind(const GXTevShaderEntry* entry) {
         glUniform3f(entry->loc_lightDir, g_rs.lightDir[0], g_rs.lightDir[1], g_rs.lightDir[2]);
     if (entry->loc_lightAmbient >= 0)
         glUniform1f(entry->loc_lightAmbient, g_rs.lightAmbient);
+    if (entry->loc_exposure >= 0)
+        glUniform1f(entry->loc_exposure, g_rs.exposure > 0.0f ? g_rs.exposure : 1.0f);
 
     /* --- Per-stage konst selectors (int arrays) --- */
     if (entry->loc_tevKonstColorSel >= 0)
@@ -1007,6 +1020,11 @@ void gx_tev_set_light_params(f32 dx, f32 dy, f32 dz, f32 ambient) {
     if (ambient < 0.0f) ambient = 0.0f;
     if (ambient > 1.0f) ambient = 1.0f;
     g_rs.lightAmbient = ambient;
+}
+
+void gx_tev_set_exposure(f32 gain) {
+    if (gain <= 0.0f) gain = 1.0f;
+    g_rs.exposure = gain;
 }
 
 void gx_tev_set_tev_color(u32 id, u8 r, u8 g, u8 b, u8 a) {

@@ -1009,6 +1009,13 @@ void GXHostSetLightingEnabled(GXBool enabled);
  */
 void GXHostSetLightParams(f32 dx, f32 dy, f32 dz, f32 ambient);
 
+/**
+ * GXHostSetExposure -- Host-only final RGB gain (1.0 = neutral). >1 brightens
+ * the fragment colour, used to lift the unlit dark-albedo character meshes
+ * toward the brightness of the lit reference art. Output is clamped to [0,1].
+ */
+void GXHostSetExposure(f32 gain);
+
 #ifdef __cplusplus
 }
 #endif

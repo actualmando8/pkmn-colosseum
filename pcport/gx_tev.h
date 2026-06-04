@@ -126,6 +126,7 @@ typedef struct GXTevShaderEntry {
     s32 loc_normalMatrix;
     s32 loc_lightDir;       /* u_lightDir: view-space directional sun */
     s32 loc_lightAmbient;   /* u_lightAmbient: floor brightness for unlit faces */
+    s32 loc_exposure;       /* u_exposure: final RGB gain (1.0 = neutral) */
     s32 loc_tex[8];
     s32 loc_tevColor[4];
     s32 loc_tevKonst[4];
@@ -227,6 +228,14 @@ void gx_tev_set_lighting_enabled(int enabled);
  *                  = more contrast. Tunable live via PCPORT_LIGHT_DIR/_AMB.
  */
 void gx_tev_set_light_params(f32 dx, f32 dy, f32 dz, f32 ambient);
+
+/**
+ * gx_tev_set_exposure -- Final RGB gain applied to the fragment colour.
+ * @param gain  1.0 = neutral (no change). >1 brightens; used to lift unlit
+ *              dark-albedo character meshes toward the lit reference. Values
+ *              <=0 are treated as 1.0. Output is clamped to [0,1].
+ */
+void gx_tev_set_exposure(f32 gain);
 
 /**
  * gx_tev_set_tev_color -- Record a TEV color register (GX_TEVREG0..2 / PREV).

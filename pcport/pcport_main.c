@@ -5032,6 +5032,33 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
      * texture + a textured TEV mode (it only samples when g_boundTextureId != 0
      * && g_numTexGens != 0 && tevMode != GX_PASSCLR). When the node has no
      * texture fall back to vertex-colour-only (PASSCLR). */
+    /* Diagnostics for the skinned-mesh fidelity work:
+     *   PCPORT_SKIN_REPLACE  -> force GX_REPLACE (texture only, ignore vtx colour)
+     *   PCPORT_SKIN_WHITE    -> force white vertex colour (isolate texture decode)
+     * Lets us separate "texture decodes dark" from "baked vertex colours are dark
+     * (model expects runtime lighting we don't yet drive)". */
+    int dbgReplace = (getenv("PCPORT_SKIN_REPLACE") != NULL);
+    int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
+
+    /* The character meshes carry a dark albedo (navy coat, black boots) that the
+     * GameCube lit at runtime; we don't yet drive GX dynamic lights for the skin
+     * submit, so an unlit sample reads near-black. Lift it two ways for a
+     * recognizable, lit-looking model:
+     *   - derivative face-normal lambert (u_lightingEnabled) gives 3D form, and
+     *   - an exposure gain (>1) brightens the dark albedo toward the lit art.
+     * Both are tunable live and restored to neutral after the submit so other
+     * draws (title/field/menu) are unaffected. */
+    {
+        const char* expEnv = getenv("PCPORT_EXPOSURE");
+        const char* ambEnv = getenv("PCPORT_SKIN_AMB");
+        f32 exposure = (expEnv != NULL && expEnv[0] != '\0') ? (f32)atof(expEnv) : 2.4f;
+        f32 ambient  = (ambEnv != NULL && ambEnv[0] != '\0') ? (f32)atof(ambEnv) : 0.55f;
+        GXHostSetExposure(exposure);
+        GXHostSetLightingEnabled(GX_TRUE);
+        /* Key light from the upper-front-left in view space (matches the
+         * reference's three-quarter key). */
+        GXHostSetLightParams(-0.4f, 0.7f, 0.6f, ambient);
+    }
     if (haveTexture && textureObject != NULL) {
         GXTexMapID mapId = (GXTexMapID)textureMapId;
         if (mapId == GX_TEXMAP_NULL) mapId = GX_TEXMAP0;
@@ -5041,6 +5068,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
          * if it decoded as PASSCLR (no texture) force MODULATE so the bound
          * texture is actually sampled and modulated by the vertex colour. */
         GXSetTevOp(GX_TEVSTAGE0,
+                   dbgReplace ? GX_REPLACE :
                    (textureTevMode == (u8)GX_PASSCLR)
                        ? GX_MODULATE
                        : (GXTevMode)textureTevMode);
@@ -5106,13 +5134,16 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * wrong -- it double-applied the bind transform and scattered the
                  * mesh. */
                 (void) curSlot;
-                if (haveCol) GXColor4u8(cr, cg, cb, ca); else GXColor4u8(255,255,255,255);
+                if (dbgWhite || !haveCol) GXColor4u8(255,255,255,255); else GXColor4u8(cr, cg, cb, ca);
                 GXPosition3f32(px, py, pz);
                 GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
             }
         }
         GXEnd();
     }
+    /* Restore neutral shading state so subsequent draws are unaffected. */
+    GXHostSetExposure(1.0f);
+    GXHostSetLightingEnabled(GX_FALSE);
     return 1;
 }
 
