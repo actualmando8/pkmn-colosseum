@@ -6950,6 +6950,12 @@ static PCPortHSDArchive       g_engTitleArchive;
 static PCPortTranslatedCamera g_engTitleCamera;
 static u32  g_engTitleRootJoint;
 static int  g_engTitleReady;
+/* Field maps pack SEVERAL model sets in the scene branch (e.g. D1_garage_1F:
+ * +0 room walls/props, +4 + +8 additional sets incl. the FLOOR). We render the
+ * primary (g_engTitleRootJoint) plus every additional model root here. */
+#define PCPORT_MAX_SCENE_MODELS 8
+static u32  g_engExtraRootJoints[PCPORT_MAX_SCENE_MODELS];
+static int  g_engExtraRootJointCount;
 /* Field mode: GSgfx_BeginFrame paints a green EFB clear-quad that, on a sparse field
  * map, shows through where geometry doesn't cover (the title covers it with its sky/
  * ground). In field mode we re-clear to a chosen background AFTER GSgfx_BeginFrame. */
@@ -7004,6 +7010,7 @@ int PCPort_EngineTitleSetup(void) {
 
     sceneJointListOffset = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + 0x00);
     g_engTitleRootJoint  = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneJointListOffset + 0x00);
+    g_engExtraRootJointCount = 0; /* title = single model set */
     if (!ArchiveRangeValid(&g_engTitleArchive, g_engTitleRootJoint, PCPORT_SERIALIZED_JOINT_SIZE)) {
         fprintf(stderr, "[boot] title root joint invalid (0x%X)\n", g_engTitleRootJoint);
         return 0;
@@ -7070,6 +7077,30 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
         return 0;
     }
 
+    /* One-shot scene-branch audit (PCPORT_FIELD_DEBUG): the GS scene branch packs
+     * several slots; we render only slot +0 (jointList->rootJoint). If the floor
+     * is a SEPARATE model set in another slot, it shows up here. For each word
+     * that looks like a data pointer, probe whether it's a jointList (its +0 is a
+     * valid joint = a candidate model set) so additional models can be rendered. */
+    if (getenv("PCPORT_FIELD_DEBUG") != NULL) {
+        u32 w;
+        printf("[field-branch] branch@0x%X:\n", sceneBranchOffset);
+        for (w = 0; w < 0x28u; w += 4u) {
+            u32 v = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + w);
+            int isPtr = ArchiveRangeValid(&g_engTitleArchive, v, 0x4u);
+            printf("[field-branch]   +0x%-2X = 0x%08X%s", w, v, isPtr ? " *" : "");
+            if (isPtr) {
+                /* treat v as a jointList: jointList+0 = rootJoint candidate */
+                u32 rj = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + v + 0x00);
+                if (ArchiveRangeValid(&g_engTitleArchive, rj, PCPORT_SERIALIZED_JOINT_SIZE)) {
+                    u32 rjDobj = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + rj + 0x10);
+                    printf("  -> [jointList? rootJoint=0x%X dobj=0x%X]", rj, rjDobj);
+                }
+            }
+            printf("\n");
+        }
+    }
+
     /* Camera: try the map's embedded camera (scene branch +0x08, same layout as
      * the title). If it doesn't resolve, synthesize a generous default look-at so
      * something draws; PCPORT_CAM_EYE/INT/UP override either way (for framing). */
@@ -7131,10 +7162,36 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
         return 0;
     }
 
+    /* The scene branch holds CONTIGUOUS leading jointList pointers, one per model
+     * set (D1_garage_1F: +0 walls/props, +4 + +8 more sets incl. the floor). The
+     * field originally rendered only slot +0; collect every additional slot whose
+     * target is a valid jointList (its +0 is a valid joint) so the whole room --
+     * floor included -- renders. Stop at the first non-jointList slot. */
+    g_engExtraRootJointCount = 0;
+    {
+        u32 slot;
+        for (slot = 0x4u; slot <= 0x20u; slot += 0x4u) {
+            u32 jl = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + sceneBranchOffset + slot);
+            u32 rj;
+            if (!ArchiveRangeValid(&g_engTitleArchive, jl, 0x4u)) {
+                break; /* contiguous run of model-set pointers ended */
+            }
+            rj = PCPort_ReadBigEndianU32(g_engTitleArchive.storage + jl + 0x00);
+            if (!ArchiveRangeValid(&g_engTitleArchive, rj, PCPORT_SERIALIZED_JOINT_SIZE)) {
+                break; /* not a jointList -> reached camera/light/fog slots */
+            }
+            if (g_engExtraRootJointCount < PCPORT_MAX_SCENE_MODELS) {
+                g_engExtraRootJoints[g_engExtraRootJointCount++] = rj;
+            }
+        }
+    }
+
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
     g_engTitleReady = 1;
-    printf("[field] map loaded for render: %s (scene member 0x%X bytes, rootJoint=0x%X, cam=%s)\n",
-           archivePath, memberSize, g_engTitleRootJoint, haveCam ? "embedded" : "default");
+    printf("[field] map loaded for render: %s (scene member 0x%X bytes, rootJoint=0x%X, "
+           "extraModels=%d, cam=%s)\n",
+           archivePath, memberSize, g_engTitleRootJoint, g_engExtraRootJointCount,
+           haveCam ? "embedded" : "default");
     return 1;
 }
 
@@ -7538,6 +7595,17 @@ void PCPort_EngineTitleRenderFrame(void) {
 
     RenderJointTree(&g_engTitleArchive, g_engTitleRootJoint, g_engTitleRootJoint,
                     &g_engTitleCamera, (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+
+    /* Render every additional scene model set (field maps split the room across
+     * several jointLists -- the floor lives in one of these, not the primary). */
+    {
+        int mi;
+        for (mi = 0; mi < g_engExtraRootJointCount; ++mi) {
+            RenderJointTree(&g_engTitleArchive, g_engExtraRootJoints[mi],
+                            g_engExtraRootJoints[mi], &g_engTitleCamera,
+                            (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+        }
+    }
 
     /* One-shot coverage report (PCPORT_RENDER_DEBUG) for the field/title scene:
      * joints/dobjs walked and how many drew vs skipped vs textured. */
