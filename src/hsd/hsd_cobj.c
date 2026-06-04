@@ -448,13 +448,14 @@ asm void fn_801942C0(void) {
 #include "src/hsd/hsd_cobj_fn_801942C0.inc"
 }
 #else
-void fn_801942C0(u8* ptr, f32* a, f32* b, f32* c, f32* d) {
-    if (ptr == NULL) return;
-    if (ptr[0x50] != 3) return;
-    if (a != NULL) *(f32*)a = *(f32*)(ptr + 0x40);
-    if (b != NULL) *(f32*)b = *(f32*)(ptr + 0x44);
-    if (c != NULL) *(f32*)c = *(f32*)(ptr + 0x48);
-    if (d != NULL) *(f32*)d = *(f32*)(ptr + 0x4C);
+void fn_801942C0(HSD_CObj* cobj, f32* a, f32* b, f32* c, f32* d) {
+    if (cobj == NULL || cobj->projection_type != PROJ_ORTHO) {
+        return;
+    }
+    if (a != NULL) *a = cobj->projection_param.ortho.top;
+    if (b != NULL) *b = cobj->projection_param.ortho.bottom;
+    if (c != NULL) *c = cobj->projection_param.ortho.left;
+    if (d != NULL) *d = cobj->projection_param.ortho.right;
 }
 #endif
 #pragma pop
@@ -468,11 +469,12 @@ asm void fn_8019431C(void) {
 #include "src/hsd/hsd_cobj_fn_8019431C.inc"
 }
 #else
-void fn_8019431C(u8* ptr, f32* a, f32* b) {
-    if (ptr == NULL) return;
-    if (ptr[0x50] != 1) return;
-    if (a != NULL) *(f32*)a = *(f32*)(ptr + 0x40);
-    if (b != NULL) *(f32*)b = *(f32*)(ptr + 0x44);
+void fn_8019431C(HSD_CObj* cobj, f32* a, f32* b) {
+    if (cobj == NULL || cobj->projection_type != PROJ_PERSPECTIVE) {
+        return;
+    }
+    if (a != NULL) *a = cobj->projection_param.perspective.fov;
+    if (b != NULL) *b = cobj->projection_param.perspective.aspect;
 }
 #endif
 #pragma pop
@@ -791,11 +793,12 @@ void fn_80194788(HSD_CObj* cobj, f32 val)
 #endif
 
 /* 0x801947A8 | 0x20 */
-void fn_801947A8(u8* ptr, f32 val) {
-    if (ptr == NULL) return;
-    if (*(u8*)(ptr + 0x50) == 1) {
-        *(f32*)(ptr + 0x40) = val;
+void fn_801947A8(HSD_CObj* cobj, f32 val)
+{
+    if (cobj == NULL || cobj->projection_type != PROJ_PERSPECTIVE) {
+        return;
     }
+    cobj->projection_param.perspective.fov = val;
 }
 
 /* 0x801947C8 | 0x464 */
@@ -1082,6 +1085,7 @@ asm void fn_80195A48(void) {
 #include "src/hsd/hsd_cobj_fn_80195A48.inc"
 }
 #else
+/* WALL: CW 1.2.5n emits a compact 8-byte frame; this C is real-diffs=0 with --cw 1.3. */
 void fn_80195A48(void) { fn_801975FC(); fn_801974A8(); }
 #endif
 #pragma pop
@@ -1448,12 +1452,11 @@ asm void fn_8019731C(void) {
 #else
 void fn_8019731C(u8 a, u8 b, u8 c, u8 d) {
     extern u8 lbl_80478C60;
-    u8* p;
-    lbl_80478C60 = a;
-    p = &lbl_80478C60;
-    p[1] = b;
-    p[2] = c;
-    p[3] = d;
+    /* WALL: CW CSE collapses the repeated SDA base; target keeps r9/r8/r7 bases. */
+    (&lbl_80478C60)[0] = a;
+    (&lbl_80478C60)[1] = b;
+    (&lbl_80478C60)[2] = c;
+    (&lbl_80478C60)[3] = d;
 }
 #endif
 #pragma pop
