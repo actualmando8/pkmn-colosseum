@@ -2,6 +2,8 @@
 #include "gx_shim.h"
 #include "gx_texture.h"
 #include "hsd/hsd_jobj.h"
+#include "hsd/hsd_aobj.h"
+#include "hsd/hsd_mobj.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -1485,6 +1487,10 @@ static void SwizTObjDesc(PCPortSwizCtx* c, u32 off);
 static void SwizPObjDesc(PCPortSwizCtx* c, u32 off);
 static void SwizAObjDesc(PCPortSwizCtx* c, u32 off);
 static void SwizFObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizAnimJoint(PCPortSwizCtx* c, u32 off);
+static void SwizMatAnimJoint(PCPortSwizCtx* c, u32 off);
+static void SwizMatAnim(PCPortSwizCtx* c, u32 off);
+static void SwizTexAnim(PCPortSwizCtx* c, u32 off);
 
 static void SwizImageDesc(PCPortSwizCtx* c, u32 off) {
     u8* p;
@@ -1607,6 +1613,46 @@ static void SwizJoint(PCPortSwizCtx* c, u32 off) {
     /* robjdesc(0x3C): flags swap handled lazily if present (skip union for now) */
 }
 
+/* --- animation descriptor trees (animjoint + matanimjoint) --- */
+static void SwizTexAnim(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x4);    /* id */
+    Swap16InPlace(p + 0x14);   /* n_imagetbl */
+    Swap16InPlace(p + 0x16);   /* n_tluttbl */
+    /* next(0), aobjdesc(8), imagetbl(C), tluttbl(10): pointers */
+    SwizAObjDesc(c, SwizChildOff(c, off + 0x8));
+    SwizTexAnim(c, SwizChildOff(c, off + 0x0));  /* next */
+}
+
+static void SwizMatAnim(PCPortSwizCtx* c, u32 off) {
+    if (SwizMarkVisited(c, off)) return;
+    /* next(0), aobjdesc(4), texanim(8), renderanim(C): pointers */
+    SwizAObjDesc(c, SwizChildOff(c, off + 0x4));
+    SwizTexAnim(c, SwizChildOff(c, off + 0x8));
+    SwizMatAnim(c, SwizChildOff(c, off + 0x0)); /* next */
+}
+
+static void SwizMatAnimJoint(PCPortSwizCtx* c, u32 off) {
+    if (SwizMarkVisited(c, off)) return;
+    /* child(0), next(4), matanim(8): pointers */
+    SwizMatAnim(c, SwizChildOff(c, off + 0x8));
+    SwizMatAnimJoint(c, SwizChildOff(c, off + 0x0)); /* child */
+    SwizMatAnimJoint(c, SwizChildOff(c, off + 0x4)); /* next */
+}
+
+static void SwizAnimJoint(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x10);   /* flags */
+    /* child(0), next(4), aobjdesc(8), robj_anim(C): pointers */
+    SwizAObjDesc(c, SwizChildOff(c, off + 0x8));
+    SwizAnimJoint(c, SwizChildOff(c, off + 0x0)); /* child */
+    SwizAnimJoint(c, SwizChildOff(c, off + 0x4)); /* next */
+}
+
 /* Convert every relocated pointer field (from the reloc table) from its BE
  * storage-relative value to a native host pointer (storage + value). Must run
  * AFTER the scalar walk (which reads pointers as BE offsets to traverse). */
@@ -1640,6 +1686,7 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
     u32 sceneOffset = 0, branchOff, jointListOff, rootOff;
     void* rootPtr;
 
+    setvbuf(stdout, NULL, _IONBF, 0); /* unbuffered so a crash doesn't eat output */
     if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
         printf("[hsd-swiz] load %s:%s FAILED\n", fsysPath, memberName);
         return;
@@ -1649,20 +1696,73 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
         free(data);
         return;
     }
+    /* Enumerate ALL public symbols (find any separate animjoint/matanim_joint). */
+    {
+        u32 k;
+        printf("[hsd-swiz] %u public symbols:\n", archive.publicCount);
+        for (k = 0; k < archive.publicCount; ++k) {
+            u32 entryOff = archive.publicOffset + k * 8u;
+            u32 dataOff, key, nameOff;
+            if (entryOff + 8u > archive.storageSize) break;
+            dataOff = ReadBE32(archive.storage + entryOff + 0);
+            key = ReadBE32(archive.storage + entryOff + 4);
+            nameOff = archive.stringOffset + key;
+            if (nameOff < archive.storageSize) {
+                printf("[hsd-swiz]   pub[%u] '%s' @0x%X\n", k,
+                       (const char*)(archive.storage + nameOff), dataOff);
+            }
+        }
+    }
+
     sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&archive, "scene_data", &sceneOffset);
     if (sceneData == NULL) { printf("[hsd-swiz] no scene_data\n"); goto done; }
     branchOff = ReadBE32(sceneData + 0x00);
     jointListOff = ReadBE32(archive.storage + branchOff + 0x00);
     rootOff = ReadBE32(archive.storage + jointListOff + 0x00);
+    /* Dump the scene branch + jointList structs (find animjoint/matanimjoint:
+     * a field whose value is a valid data-section offset [0x20, dataSize)). */
+    {
+        u32 w;
+        printf("[hsd-swiz] branch@0x%X:", branchOff);
+        for (w = 0; w < 0x20u; w += 4u) {
+            u32 v = ReadBE32(archive.storage + branchOff + w);
+            int isPtr = (v >= 0x20u && v < 0x20u + archive.dataSize);
+            printf(" +%X=0x%X%s", w, v, isPtr ? "*" : "");
+        }
+        printf("\n[hsd-swiz] jointList@0x%X:", jointListOff);
+        for (w = 0; w < 0x18u; w += 4u) {
+            u32 v = ReadBE32(archive.storage + jointListOff + w);
+            int isPtr = (v >= 0x20u && v < 0x20u + archive.dataSize);
+            printf(" +%X=0x%X%s", w, v, isPtr ? "*" : "");
+        }
+        printf("\n");
+        /* Candidate animjoint(+4) + matanimjoint(+8): dump their first words. */
+        {
+            u32 aj = ReadBE32(archive.storage + jointListOff + 0x4);
+            u32 mj = ReadBE32(archive.storage + jointListOff + 0x8);
+            if (aj >= 0x20u && aj < 0x20u + archive.dataSize) {
+                printf("[hsd-swiz] +4@0x%X (animjoint?): child=0x%X next=0x%X aobjdesc=0x%X robjanim=0x%X flags=0x%X\n",
+                       aj, ReadBE32(archive.storage+aj+0), ReadBE32(archive.storage+aj+4),
+                       ReadBE32(archive.storage+aj+8), ReadBE32(archive.storage+aj+0xC),
+                       ReadBE32(archive.storage+aj+0x10));
+            }
+            if (mj >= 0x20u && mj < 0x20u + archive.dataSize) {
+                printf("[hsd-swiz] +8@0x%X (matanimjoint?): child=0x%X next=0x%X matanim=0x%X\n",
+                       mj, ReadBE32(archive.storage+mj+0), ReadBE32(archive.storage+mj+4),
+                       ReadBE32(archive.storage+mj+8));
+            }
+        }
+    }
     printf("[hsd-swiz] scene=0x%X branch=0x%X jointList=0x%X root=0x%X relocs=%u\n",
            sceneOffset, branchOff, jointListOff, rootOff, archive.relocCount);
 
-    rootPtr = PCPort_SwizzleSceneForHSD(&archive, rootOff);
+    rootPtr = PCPort_SwizzleSceneForHSD(&archive, jointListOff);  /* jointList host ptr */
     if (rootPtr == NULL) { printf("[hsd-swiz] swizzle FAILED\n"); goto done; }
 
     {
-        /* Read the swizzled root joint as native LE. */
-        u8* j = (u8*)rootPtr;
+        /* Model entry: +0 rootJoint, +4 animjoint, +8 matanimjoint (host ptrs). */
+        u8* jl = (u8*)rootPtr;
+        u8* j = (u8*)(uintptr_t)(*(u32*)(jl + 0x0));   /* root HSD_Joint */
         u32 flags = *(u32*)(j + 0x4);
         f32 rx = *(f32*)(j + 0x14), ry = *(f32*)(j + 0x18), rz = *(f32*)(j + 0x1C);
         f32 sx = *(f32*)(j + 0x20), sy = *(f32*)(j + 0x24), sz = *(f32*)(j + 0x28);
@@ -1707,42 +1807,79 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
             }
         }
     }
-    /* Build the REAL HSD_JObj tree via the game's HSD_JObjLoadJoint + real
-     * HSD_*LoadDesc leaves, and count it (sanity: ~31 joints / 43 dobjs, no crash). */
+    /* Build the REAL HSD_JObj tree (game's HSD_JObjLoadJoint + HSD_*LoadDesc),
+     * attach the SRT + material/texture animation via the game's real
+     * HSD_JObjAddAnimAll, and count joints/dobjs + attached aobjs (proves the
+     * sand-scroll animation is wired through the game's own code). */
     {
-        HSD_JObj* root = HSD_JObjLoadJoint((HSD_Joint*)rootPtr);
-        HSD_JObj* stk[512]; int sp = 0, nj = 0, nd = 0, guard = 0;
+        u8* jl = (u8*)rootPtr;
+        HSD_Joint* rootJoint = (HSD_Joint*)(uintptr_t)(*(u32*)(jl + 0x0));
+        void* animjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x4));
+        void* matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
+        HSD_JObj* root = HSD_JObjLoadJoint(rootJoint);
+        HSD_JObj* stk[512]; int sp = 0, nj = 0, nd = 0, na = 0, guard = 0;
+        /* EXPERIMENTAL anim attach (gated): jointList+4/+8 as animjoint/matanimjoint
+         * crashes HSD_JObjAddAnimAll -- the GS scene wraps the animation differently
+         * than a plain HSD model-set (the header structs pack 0x10 apart, not 0x14),
+         * so the animjoint location/structure needs more reverse-engineering. Off by
+         * default so the verified load path is crash-free. */
+        if (getenv("PCPORT_HSD_ANIM") != NULL) {
+            printf("[hsd-swiz] attaching anim (animjoint=%p matanim=%p)...\n",
+                   animjoint, matanimjoint);
+            HSD_JObjAddAnimAll(root, (HSD_AnimJoint*)animjoint,
+                               (HSD_MatAnimJoint*)matanimjoint, NULL);
+            printf("[hsd-swiz] HSD_JObjAddAnimAll done\n");
+        }
         if (root != NULL) {
             stk[sp++] = root;
             while (sp > 0 && guard < 100000) {
                 HSD_JObj* cur = stk[--sp];
                 ++guard; ++nj;
                 if (union_type_dobj(cur) && cur->u.dobj != NULL) ++nd;
+                if (cur->aobj != NULL) ++na;
                 if (cur->next != NULL && sp < 512) stk[sp++] = cur->next;
                 if (cur->child != NULL && sp < 512) stk[sp++] = cur->child;
             }
         }
-        printf("[hsd-swiz] HSD_JObjLoadJoint -> root=%p joints=%d dobjs=%d\n",
-               (void*)root, nj, nd);
+        printf("[hsd-swiz] LoadJoint+AddAnimAll -> root=%p joints=%d dobjs=%d jobj-aobjs=%d (animjoint=%p matanim=%p)\n",
+               (void*)root, nj, nd, na, animjoint, matanimjoint);
     }
 done:
     PCPort_HSDArchiveDestroy(&archive);
     free(data);
 }
 
-void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 rootJointOffset) {
+/* Swizzle a scene model-set entry (jointList) BE->LE for the game's HSD pipeline.
+ * The model entry is {rootJoint@0, animjoint@4, matanimjoint@8, ...}. Walks the
+ * joint tree + the animjoint (SRT anim) + the matanimjoint (material/texture anim
+ * = the title sand UV scroll), then relocates ALL pointers to native (once).
+ * Returns the model-entry host pointer (read +0/+4/+8 as native HSD_Joint,
+ * HSD_AnimJoint, HSD_MatAnimJoint pointers). */
+void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 jointListOffset) {
     PCPortSwizCtx ctx;
+    u32 rootOff, animOff, matanimOff;
     if (archive == NULL || archive->storage == NULL ||
-        rootJointOffset == 0u || rootJointOffset >= archive->storageSize) {
+        jointListOffset == 0u || jointListOffset + 0xCu > archive->storageSize) {
         return NULL;
     }
+    rootOff    = ReadBE32(archive->storage + jointListOffset + 0x0);
+    animOff    = ReadBE32(archive->storage + jointListOffset + 0x4);
+    matanimOff = ReadBE32(archive->storage + jointListOffset + 0x8);
+
     memset(&ctx, 0, sizeof(ctx));
     ctx.base = archive->storage;
     ctx.size = archive->storageSize;
     ctx.dataOffset = archive->dataOffset;
-    SwizJoint(&ctx, rootJointOffset);            /* (1) scalar swap */
+    SwizJoint(&ctx, rootOff);                    /* (1a) joint tree (verified) */
+    /* Anim-tree swizzle is WIP: the jointList+4/+8 animjoint/matanimjoint
+     * interpretation isn't confirmed (HSD_JObjAddAnimAll crashes), so only walk it
+     * when explicitly experimenting -- the default path stays joint-only + safe. */
+    if (getenv("PCPORT_HSD_ANIM") != NULL) {
+        SwizAnimJoint(&ctx, animOff);            /* (1b) SRT animation */
+        SwizMatAnimJoint(&ctx, matanimOff);      /* (1c) material/texture anim (sand) */
+    }
     PCPort_HSDApplyHostRelocations(archive);     /* (2) pointers -> host */
-    return (void*)(archive->storage + rootJointOffset);
+    return (void*)(archive->storage + jointListOffset);
 }
 
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive) {
