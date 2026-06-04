@@ -5062,12 +5062,17 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
             if (curSlot >= (u32)slot) curSlot = 0u;
             {
-                f32 (*M)[4] = palette[curSlot];
-                f32 wx = M[0][0]*px + M[0][1]*py + M[0][2]*pz + M[0][3];
-                f32 wy = M[1][0]*px + M[1][1]*py + M[1][2]*pz + M[1][3];
-                f32 wz = M[2][0]*px + M[2][1]*py + M[2][2]*pz + M[2][3];
+                /* Envelope verts are stored in MODEL (bind-pose) space. The true
+                 * skinning matrix is palette[slot] = jointWorld * invBind, which
+                 * is identity at the bind pose -- so with no animation applied the
+                 * correct world position is the vertex as-is. (When joint anim is
+                 * driven, multiply by jointWorld*invBind here; palette[] above is
+                 * built ready for that.) Submitting jointWorld*pos directly was
+                 * wrong -- it double-applied the bind transform and scattered the
+                 * mesh. */
+                (void) curSlot;
                 if (haveCol) GXColor4u8(cr, cg, cb, ca); else GXColor4u8(255,255,255,255);
-                GXPosition3f32(wx, wy, wz);
+                GXPosition3f32(px, py, pz);
                 GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
             }
         }

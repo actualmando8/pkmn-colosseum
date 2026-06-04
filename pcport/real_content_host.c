@@ -2174,7 +2174,12 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
     flags = (u16)(flagsAndDisplayCount >> 16);
     serializedDisplayCount = (u16)(flagsAndDisplayCount & 0xFFFFu);
 
-    if (nextOffset != 0u || serializedDisplayCount == 0u ||
+    /* nextOffset (pobj+0x04) being non-zero just means this PObj is one link of
+     * a chain (e.g. a character DObj's body meshes); each link has its own
+     * complete vtxdesc + display list, so translate it on its own. The caller
+     * (RenderJointTree) walks the chain. (Previously next!=0 was rejected, which
+     * dropped most of a skinned character's meshes.) */
+    if (serializedDisplayCount == 0u ||
         !IsArchiveRangeValid(archive, vertsOffset, PCPORT_SERIALIZED_VTXDESC_SIZE) ||
         displayOffset >= pobjArchiveOffset) {
         if (getenv("PCPORT_SKIN_DEBUG") != NULL) {
