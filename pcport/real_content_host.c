@@ -1672,6 +1672,61 @@ static void PCPort_HSDApplyHostRelocations(PCPortHSDArchive* a) {
     }
 }
 
+/* True iff the data field at absolute storage offset `absOff` is a relocated
+ * pointer (i.e. appears in the HSD archive reloc table). The reloc table stores
+ * DATA-relative offsets (fieldAbs = dataOffset + entry), so we compare against
+ * (absOff - dataOffset). This is the ground truth for struct layout RE: a
+ * reloc'd field IS a pointer; a non-reloc'd field is a scalar (flags/float/int).
+ * Linear scan -- fine for a one-shot probe. */
+static BOOL PCPortHSDIsRelocField(const PCPortHSDArchive* a, u32 absOff) {
+    u32 i, rel;
+    if (absOff < a->dataOffset) {
+        return FALSE;
+    }
+    rel = absOff - a->dataOffset;
+    for (i = 0; i < a->relocCount; ++i) {
+        u32 e = a->relocOffset + (i * 4u);
+        if (e + 4u > a->storageSize) {
+            break;
+        }
+        if (ReadBE32(a->storage + e) == rel) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* Dump `nwords` 32-bit words at absolute storage offset `off`, annotating each
+ * relocated pointer field with [ptr] and showing the int/float reading of every
+ * scalar. Cross-referencing the reloc table reveals the true (Colosseum/XD-
+ * specific) HSD AnimJoint / AObjDesc / FObjDesc layouts, which diverge from the
+ * stock Melee structs (the stock-layout assumption crashes HSD_AObjLoadDesc). */
+static void PCPortHSDDumpStruct(const PCPortHSDArchive* a, u32 off,
+                                u32 nwords, const char* label) {
+    u32 w;
+    if (off == 0u || off >= a->storageSize) {
+        printf("[hsd-swiz] %s @0x%X: (out of range)\n", label, off);
+        return;
+    }
+    printf("[hsd-swiz] %s @0x%X:\n", label, off);
+    for (w = 0; w < nwords; ++w) {
+        u32 foff = off + (w * 4u);
+        u32 v;
+        union { u32 u; f32 f; } cvt;
+        if (foff + 4u > a->storageSize) {
+            break;
+        }
+        v = ReadBE32(a->storage + foff);
+        cvt.u = v;
+        if (PCPortHSDIsRelocField(a, foff)) {
+            printf("[hsd-swiz]   +0x%-2X = 0x%08X  [ptr]\n", w * 4u, v);
+        } else {
+            printf("[hsd-swiz]   +0x%-2X = 0x%08X  (int=%d float=%.5g)\n",
+                   w * 4u, v, (int) v, (double) cvt.f);
+        }
+    }
+}
+
 /* Public: prepare a parsed archive's scene-data joint graph for the game's HSD
  * pipeline. `rootJointOffset` is the storage offset of the scene root HSD_Joint
  * (scene_data -> branch -> jointList). Returns the root joint as a native ptr. */
@@ -1763,6 +1818,39 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
                 } else {
                     printf("[hsd-swiz] animjoint+8=0x%X NOT a valid data offset -> +8 isn't aobjdesc\n", aod);
                 }
+            }
+        }
+    }
+    /* Reloc-aware layout dump: the reloc table marks exactly which fields are
+     * pointers, so these dumps reveal the true Colosseum HSD anim-struct layout
+     * (vs the stock Melee structs that crash HSD_AObjLoadDesc). Each [ptr] line
+     * is a relocated pointer field; scalars show int/float. Walk:
+     *   jointList+4 (animjoint-tree root) -> its aobjdesc -> its fobjdesc
+     *   jointList+8 (matanimjoint-tree root) -> its matanim. */
+    {
+        u32 aj = ReadBE32(archive.storage + jointListOff + 0x4);
+        u32 mj = ReadBE32(archive.storage + jointListOff + 0x8);
+        PCPortHSDDumpStruct(&archive, jointListOff, 8, "jointList");
+        if (aj >= archive.dataOffset) {
+            u32 ajAobj, ajFobj;
+            PCPortHSDDumpStruct(&archive, aj, 8, "animjoint(+4)");
+            /* Try the stock AnimJoint aobjdesc slot (+8) and dump what it points
+             * to + the slot a possible 0x10-byte-AnimJoint variant would use. */
+            ajAobj = ReadBE32(archive.storage + aj + 0x8);
+            if (ajAobj >= archive.dataOffset) {
+                PCPortHSDDumpStruct(&archive, ajAobj, 6, "  animjoint+8->(aobjdesc?)");
+                ajFobj = ReadBE32(archive.storage + ajAobj + 0x8);
+                if (ajFobj >= archive.dataOffset) {
+                    PCPortHSDDumpStruct(&archive, ajFobj, 8, "    aobjdesc+8->(fobjdesc?)");
+                }
+            }
+        }
+        if (mj >= archive.dataOffset) {
+            u32 mjMat;
+            PCPortHSDDumpStruct(&archive, mj, 6, "matanimjoint(+8)");
+            mjMat = ReadBE32(archive.storage + mj + 0x8);
+            if (mjMat >= archive.dataOffset) {
+                PCPortHSDDumpStruct(&archive, mjMat, 8, "  matanimjoint+8->(matanim?)");
             }
         }
     }
