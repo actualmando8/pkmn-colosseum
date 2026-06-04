@@ -13,6 +13,7 @@
 #include "thp_audio.h"
 #include "waveout_sink.h"
 #include "bgm_host.h"
+#include "musyx_wave.h"
 
 #include <GLFW/glfw3.h>
 #include <direct.h>   /* _chdir (host-only: locate the asset root at startup) */
@@ -7569,6 +7570,39 @@ static int RunBGMSmoke(void) {
     return 1;
 }
 
+/* MusyX wave smoke (no GL): decode + play the first wave of a MusyX sdir/samp
+ * group via the standalone musyx_wave module. Defaults to snd_se_motion (the
+ * verified single-entry group); PCPORT_MUSYX_FSYS / _SDIR / _POOL / _SAMP and
+ * PCPORT_MUSYX_SECS override. Verifies the .sdir parse + .samp DSP-ADPCM decode
+ * + WaveOut submit end to end against real disc data. */
+static int RunMusyXSmoke(void) {
+    const char* fsysPath = getenv("PCPORT_MUSYX_FSYS");
+    const char* sdir     = getenv("PCPORT_MUSYX_SDIR");
+    const char* pool     = getenv("PCPORT_MUSYX_POOL");
+    const char* samp     = getenv("PCPORT_MUSYX_SAMP");
+    const char* secsEnv  = getenv("PCPORT_MUSYX_SECS");
+    int secs = (secsEnv != NULL && secsEnv[0]) ? atoi(secsEnv) : 3;
+    volatile double spin; long i;
+    if (fsysPath == NULL || fsysPath[0] == '\0') fsysPath = "orig/GC6E01/disc/files/common.fsys";
+    if (sdir == NULL || sdir[0] == '\0') sdir = "snd_se_motion_sdir";
+    if (pool == NULL || pool[0] == '\0') pool = "snd_se_motion_pool";
+    if (samp == NULL || samp[0] == '\0') samp = "orig/GC6E01/disc/files/sound/snd_se_motion.samp";
+    if (secs < 1) secs = 1;
+    if (!MusyX_PlayWave(fsysPath, sdir, pool, samp)) {
+        fprintf(stderr, "[musyx-smoke] MusyX_PlayWave failed\n");
+        return 0;
+    }
+    printf("[musyx-smoke] streaming %s :: %s + %s (~%ds)\n", fsysPath, sdir, samp, secs);
+    /* Keep the process alive briefly so the async WaveOut buffer plays out (no
+     * portable sleep here; a coarse CPU spin is fine for a one-shot smoke). */
+    spin = 0.0;
+    for (i = 0; i < (long)secs * 40000000L; ++i) { spin += (double)i * 1e-9; }
+    (void)spin;
+    MusyX_StopWave();
+    printf("[musyx-smoke] done\n");
+    return 1;
+}
+
 /* THP audio decode smoke (no GL): decode ALL frames' audio of a movie to a WAV,
  * to verify the GC DSP-ADPCM decode without needing to listen. PCPORT_THP_FILE
  * selects the movie (default tpc.thp = the first audio-bearing boot movie),
@@ -8842,6 +8876,9 @@ int main(int argc, char** argv) {
      * stb_image in the host build. */
     if (HasArg(argc, argv, "--bgm-smoke")) {
         return RunBGMSmoke() ? 0 : 1;
+    }
+    if (HasArg(argc, argv, "--musyx-smoke")) {
+        return RunMusyXSmoke() ? 0 : 1;
     }
     if (HasArg(argc, argv, "--thp-audio-smoke")) {
         return RunTHPAudioSmoke() ? 0 : 1;
