@@ -5010,6 +5010,162 @@ static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
 static int g_skinVtxPosN;
 static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
+
+/* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
+ * the GameCube envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix
+ * slot's envelope is a list of {jobj, weight} influences; the FIRST influence's
+ * weight selects the path (the asm's `fcmpo; cror eq,gt,eq; bne` against ~1.0):
+ *
+ *   weight >= 1.0  -> RIGID single bone. Verts are JOINT-LOCAL; palette is the
+ *       bone's world matrix (jobj->mtx, +0x44) applied directly. Legs/boots.
+ *   weight <  1.0  -> ENVELOPE BLEND. Verts are MODEL (bind-pose) space; palette
+ *       is Sum_i w_i*(jointWorld_i * invBind_i), invBind = inverse(bindWorld).
+ *       Blend weights sum to 1.0, so at the rest pose every term is w_i*I and the
+ *       palette is identity -> the model-space vert passes through. Coat/torso.
+ *
+ * We render the static rest pose, so invBind = inverse(jointWorld_rest) is
+ * derived directly from the joint chain (no FIFO, no per-character bake, scales
+ * to the whole cast). Returns the slot count (palette[0..count) valid). */
+static int BuildSkinPalette(const PCPortHSDArchive* a, u32 envOff, u32 rootJoint,
+                            f32 palette[PCPORT_SKIN_MAX_SLOTS][3][4]) {
+    const char* rwEnv = getenv("PCPORT_SKIN_RIGID_W");
+    f32 rigidW = (rwEnv != NULL && rwEnv[0]) ? (f32)atof(rwEnv) : 1.0f;
+    int slot;
+    for (slot = 0; slot < PCPORT_SKIN_MAX_SLOTS; ++slot) {
+        u32 entry = PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u);
+        f32 (*M)[4] = palette[slot];
+        int r, c, any = 0, k, isEnvelope;
+        union { u32 u; f32 f; } w0;
+        for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
+        if (!ArchiveRangeValid(a, entry, 0x8u)) {
+            break; /* null terminator -> palette size = slot */
+        }
+        w0.u = PCPort_ReadBigEndianU32(a->storage + entry + 4u);
+        isEnvelope = (w0.f < rigidW); /* first-entry weight < ~1.0 -> blend */
+        {
+        int influences = 0;
+        for (k = 0; k < 16; ++k) { /* {jobj,weight} list, jobj==0 ends it */
+            u32 jobj = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 0u);
+            union { u32 u; f32 f; } w;
+            PCPortTranslatedJointTransform jt;
+            if (!ArchiveRangeValid(a, jobj, PCPORT_SERIALIZED_JOINT_SIZE)) {
+                break;
+            }
+            ++influences;
+            w.u = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 4u);
+            memset(&jt, 0, sizeof(jt));
+            if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint, jobj, &jt)) {
+                if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
+                    fprintf(stderr, "  [infl] slot %d jobj=0x%X w=%.3f env=%d\n",
+                            slot, jobj, (double)w.f, isEnvelope);
+                }
+                if (isEnvelope) {
+                    /* term = w * (jointWorld * inverse(bindWorld)); at rest
+                     * inverse(bindWorld) = inverse(jointWorld) -> term = w*I. */
+                    f32 invBind[3][4], skinned[3][4];
+                    if (PCPortInvertAffine3x4(jt.modelMatrix, invBind)) {
+                        PCPortMulAffine3x4(jt.modelMatrix, invBind, skinned);
+                    } else {
+                        for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c)
+                            skinned[r][c] = (r==c)?1.0f:0.0f;
+                    }
+                    for (r = 0; r < 3; ++r)
+                        for (c = 0; c < 4; ++c)
+                            M[r][c] += w.f * skinned[r][c];
+                    any = 1;
+                } else {
+                    /* RIGID single bone: jointWorld applied to joint-local
+                     * verts. Use the first influence only and stop. */
+                    for (r = 0; r < 3; ++r)
+                        for (c = 0; c < 4; ++c)
+                            M[r][c] = jt.modelMatrix[r][c];
+                    any = 1;
+                    break;
+                }
+            }
+        }
+        if (!any) {
+            for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
+            M[0][0] = M[1][1] = M[2][2] = 1.0f;
+        }
+        if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
+            fprintf(stderr,
+                "[skinpal] slot %d entry=0x%X infl=%d env=%d resolved=%d "
+                "translate=(%.2f %.2f %.2f)\n",
+                slot, entry, influences, isEnvelope, any,
+                M[0][3], M[1][3], M[2][3]);
+        }
+        }
+    }
+    return slot;
+}
+
+/* Walk an envelope PObj's display list and accumulate the WORLD-space AABB of
+ * its skinned vertices (palette[slot] * local). This is the true rendered bound,
+ * unlike the PObj's stored model-space min/max (which for verts on rigid slots
+ * is meaningless -- they get re-placed at their bone). Used to frame the
+ * model-view auto-camera correctly for skinned characters. */
+static void AccumulateSkinnedPObjWorldAABB(const PCPortHSDArchive* a, u32 pobjOffset,
+                                           const PCPortTranslatedPObj* tp, u32 rootJoint,
+                                           f32 outMin[3], f32 outMax[3], int* any) {
+    f32 palette[PCPORT_SKIN_MAX_SLOTS][3][4];
+    int slot;
+    const u8* dl = tp->displayList;
+    const u8* end;
+    u32 envOff;
+    if (tp->verts == NULL || dl == NULL) return;
+    envOff = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x14);
+    if (envOff == 0u || !ArchiveRangeValid(a, envOff, 0x4u)) return;
+    end = dl + tp->pobj.n_display;
+    slot = BuildSkinPalette(a, envOff, rootJoint, palette);
+    if (slot == 0) return;
+    while (dl + 3 <= end) {
+        u8 cmd = dl[0];
+        u16 vcount, vi;
+        if ((cmd & 0xF8u) == 0u) break;
+        vcount = (u16)(((u16)dl[1] << 8) | dl[2]);
+        dl += 3;
+        if (vcount == 0u) break;
+        for (vi = 0; vi < vcount; ++vi) {
+            u32 curSlot = 0u;
+            f32 px = 0.0f, py = 0.0f, pz = 0.0f;
+            const HSD_VtxDescList* a2;
+            for (a2 = tp->verts; a2->attr != GX_VA_NULL; ++a2) {
+                u32 idx; int isz;
+                if (a2->attr <= GX_VA_TEX7MTXIDX) {
+                    if (dl + 1 > end) return;
+                    if (a2->attr == GX_VA_PNMTXIDX) curSlot = (u32)dl[0] / 3u;
+                    dl += 1; continue;
+                }
+                isz = (a2->attr_type == GX_INDEX16) ? 2 : 1;
+                if (dl + isz > end) return;
+                idx = (isz == 2) ? (u32)(((u16)dl[0] << 8) | dl[1]) : (u32)dl[0];
+                dl += isz;
+                if (a2->attr == GX_VA_POS && tp->positionData != NULL) {
+                    const f32* p = (const f32*)((const u8*)tp->positionData + (size_t)idx * a2->stride);
+                    px = p[0]; py = p[1];
+                    pz = (a2->comp_cnt == GX_POS_XYZ) ? p[2] : 0.0f;
+                }
+            }
+            if (curSlot >= (u32)slot) curSlot = 0u;
+            {
+                f32 (*M)[4] = palette[curSlot];
+                f32 wx = M[0][0]*px + M[0][1]*py + M[0][2]*pz + M[0][3];
+                f32 wy = M[1][0]*px + M[1][1]*py + M[1][2]*pz + M[1][3];
+                f32 wz = M[2][0]*px + M[2][1]*py + M[2][2]*pz + M[2][3];
+                if (!*any) {
+                    outMin[0]=outMax[0]=wx; outMin[1]=outMax[1]=wy; outMin[2]=outMax[2]=wz;
+                    *any = 1;
+                } else {
+                    if (wx<outMin[0])outMin[0]=wx; if (wx>outMax[0])outMax[0]=wx;
+                    if (wy<outMin[1])outMin[1]=wy; if (wy>outMax[1])outMax[1]=wy;
+                    if (wz<outMin[2])outMin[2]=wz; if (wz>outMax[2])outMax[2]=wz;
+                }
+            }
+        }
+    }
+}
+
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
                              const PCPortTranslatedCamera* cam,
@@ -5034,102 +5190,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     }
     end = dl + tp->pobj.n_display;
 
-    /* Build the per-slot skinning-matrix palette, replicating the GameCube
-     * envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix slot's
-     * envelope is a list of {jobj, weight} influences; the FIRST influence's
-     * weight selects the path (the asm's `fcmpo; cror eq,gt,eq; bne` against a
-     * constant ~1.0):
-     *
-     *   weight >= 1.0  -> RIGID single bone. The vertices are in JOINT-LOCAL
-     *       space; the skin matrix is the bone's world matrix (jobj->mtx, +0x44)
-     *       applied directly (no inverse-bind, for the non-billboard case).
-     *       This is the legs/boots/bands/visor case (each one bone, weight 1.0).
-     *
-     *   weight <  1.0  -> ENVELOPE BLEND. The vertices are in MODEL (bind-pose)
-     *       space; the skin matrix is  Sum_i w_i * (jointWorld_i * invBind_i),
-     *       where invBind_i = inverse(bindWorld_i) (the runtime jobj->envelopemtx
-     *       at +0x78, which the archive does NOT store -- it is computed at
-     *       setup). The data's blend weights sum to 1.0 (e.g. 0.105+0.895), so
-     *       at the bind pose jointWorld_i == bindWorld_i and every term is
-     *       w_i * I -> the palette is the identity and the model-space vertex
-     *       passes through unchanged. This is the coat/torso/arm case.
-     *
-     * Because we render the static rest pose (no joint animation driven yet),
-     * jointWorld == bindWorld, so we derive invBind = inverse(jointWorld_rest)
-     * directly from the joint chain -- no FIFO, no per-character bake, scales to
-     * the whole cast. When animation is later added, invBind must be precomputed
-     * from the BIND pose (cached at load) while jointWorld tracks the animated
-     * pose; only that split changes, the formula stays. */
-    {
-        const char* rwEnv = getenv("PCPORT_SKIN_RIGID_W");
-        f32 rigidW = (rwEnv != NULL && rwEnv[0]) ? (f32)atof(rwEnv) : 1.0f;
-        for (slot = 0; slot < PCPORT_SKIN_MAX_SLOTS; ++slot) {
-            u32 entry = PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u);
-            f32 (*M)[4] = palette[slot];
-            int r, c, any = 0, k, isEnvelope;
-            union { u32 u; f32 f; } w0;
-            for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
-            if (!ArchiveRangeValid(a, entry, 0x8u)) {
-                break; /* null terminator -> palette size = slot */
-            }
-            w0.u = PCPort_ReadBigEndianU32(a->storage + entry + 4u);
-            isEnvelope = (w0.f < rigidW); /* first-entry weight < ~1.0 -> blend */
-            {
-            int influences = 0;
-            for (k = 0; k < 16; ++k) { /* {jobj,weight} list, jobj==0 ends it */
-                u32 jobj = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 0u);
-                union { u32 u; f32 f; } w;
-                PCPortTranslatedJointTransform jt;
-                if (!ArchiveRangeValid(a, jobj, PCPORT_SERIALIZED_JOINT_SIZE)) {
-                    break;
-                }
-                ++influences;
-                w.u = PCPort_ReadBigEndianU32(a->storage + entry + (u32)k * 8u + 4u);
-                memset(&jt, 0, sizeof(jt));
-                if (PCPort_TranslateJointChainToMatrixBE(a, rootJoint, jobj, &jt)) {
-                    if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
-                        fprintf(stderr, "  [infl] slot %d jobj=0x%X w=%.3f env=%d\n",
-                                slot, jobj, (double)w.f, isEnvelope);
-                    }
-                    if (isEnvelope) {
-                        /* term = w * (jointWorld * inverse(bindWorld)); at rest
-                         * inverse(bindWorld) = inverse(jointWorld) -> term = w*I. */
-                        f32 invBind[3][4], skinned[3][4];
-                        if (PCPortInvertAffine3x4(jt.modelMatrix, invBind)) {
-                            PCPortMulAffine3x4(jt.modelMatrix, invBind, skinned);
-                        } else {
-                            for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c)
-                                skinned[r][c] = (r==c)?1.0f:0.0f;
-                        }
-                        for (r = 0; r < 3; ++r)
-                            for (c = 0; c < 4; ++c)
-                                M[r][c] += w.f * skinned[r][c];
-                        any = 1;
-                    } else {
-                        /* RIGID single bone: jointWorld applied to joint-local
-                         * verts. Use the first influence only and stop. */
-                        for (r = 0; r < 3; ++r)
-                            for (c = 0; c < 4; ++c)
-                                M[r][c] = jt.modelMatrix[r][c];
-                        any = 1;
-                        break;
-                    }
-                }
-            }
-            if (!any) {
-                for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
-                M[0][0] = M[1][1] = M[2][2] = 1.0f;
-            }
-            if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
-                fprintf(stderr,
-                    "[skinpal] slot %d entry=0x%X infl=%d env=%d resolved=%d "
-                    "translate=(%.2f %.2f %.2f)\n",
-                    slot, entry, influences, isEnvelope, any,
-                    M[0][3], M[1][3], M[2][3]);
-            }
-            }
-        }
-    }
+    /* Build the per-slot skinning-matrix palette (the exact GameCube envelope-skin
+     * math; see BuildSkinPalette). */
+    slot = BuildSkinPalette(a, envOff, rootJoint, palette);
     if (slot == 0) {
         if (getenv("PCPORT_SKIN_BAIL") != NULL)
             fprintf(stderr, "[skinbail] pobj@0x%X envOff=0x%X -> slot==0 (no valid envelope entry)\n",
@@ -5417,41 +5480,45 @@ static void AccumulateModelAABB(const PCPortHSDArchive* a,
                 if (PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &tp) &&
                     tp.totalSubmittedVertices > 0u) {
                     int isEnvelope = (((tp.pobj.flags >> 12) & 3u) == 2u);
-                    int cx, cy, cz;
-                    if (!isEnvelope &&
-                        !PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint, &jt)) {
-                        /* fall back to identity (local-space bounds) */
-                        memset(&jt, 0, sizeof(jt));
-                        jt.modelMatrix[0][0] = jt.modelMatrix[1][1] =
-                            jt.modelMatrix[2][2] = 1.0f;
-                    } else if (isEnvelope) {
-                        memset(&jt, 0, sizeof(jt));
-                        jt.modelMatrix[0][0] = jt.modelMatrix[1][1] =
-                            jt.modelMatrix[2][2] = 1.0f;
-                    }
-                    /* transform all 8 AABB corners by the joint world matrix */
-                    for (cx = 0; cx < 2; ++cx)
-                    for (cy = 0; cy < 2; ++cy)
-                    for (cz = 0; cz < 2; ++cz) {
-                        f32 lx = cx ? tp.maxPosition[0] : tp.minPosition[0];
-                        f32 ly = cy ? tp.maxPosition[1] : tp.minPosition[1];
-                        f32 lz = cz ? tp.maxPosition[2] : tp.minPosition[2];
-                        f32 (*M)[4] = jt.modelMatrix;
-                        f32 wx = M[0][0]*lx + M[0][1]*ly + M[0][2]*lz + M[0][3];
-                        f32 wy = M[1][0]*lx + M[1][1]*ly + M[1][2]*lz + M[1][3];
-                        f32 wz = M[2][0]*lx + M[2][1]*ly + M[2][2]*lz + M[2][3];
-                        if (!*any) {
-                            outMin[0] = outMax[0] = wx;
-                            outMin[1] = outMax[1] = wy;
-                            outMin[2] = outMax[2] = wz;
-                            *any = 1;
-                        } else {
-                            if (wx < outMin[0]) outMin[0] = wx;
-                            if (wy < outMin[1]) outMin[1] = wy;
-                            if (wz < outMin[2]) outMin[2] = wz;
-                            if (wx > outMax[0]) outMax[0] = wx;
-                            if (wy > outMax[1]) outMax[1] = wy;
-                            if (wz > outMax[2]) outMax[2] = wz;
+                    if (isEnvelope) {
+                        /* Skinned PObj: the stored model-space min/max is wrong for
+                         * the camera (verts on rigid slots get re-placed at their
+                         * bone), so compute the TRUE world bounds by skinning each
+                         * vertex through the same palette the render uses. */
+                        AccumulateSkinnedPObjWorldAABB(a, pobjOffset, &tp, rootJoint,
+                                                       outMin, outMax, any);
+                    } else {
+                        int cx, cy, cz;
+                        if (!PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint, &jt)) {
+                            /* fall back to identity (local-space bounds) */
+                            memset(&jt, 0, sizeof(jt));
+                            jt.modelMatrix[0][0] = jt.modelMatrix[1][1] =
+                                jt.modelMatrix[2][2] = 1.0f;
+                        }
+                        /* transform all 8 AABB corners by the joint world matrix */
+                        for (cx = 0; cx < 2; ++cx)
+                        for (cy = 0; cy < 2; ++cy)
+                        for (cz = 0; cz < 2; ++cz) {
+                            f32 lx = cx ? tp.maxPosition[0] : tp.minPosition[0];
+                            f32 ly = cy ? tp.maxPosition[1] : tp.minPosition[1];
+                            f32 lz = cz ? tp.maxPosition[2] : tp.minPosition[2];
+                            f32 (*M)[4] = jt.modelMatrix;
+                            f32 wx = M[0][0]*lx + M[0][1]*ly + M[0][2]*lz + M[0][3];
+                            f32 wy = M[1][0]*lx + M[1][1]*ly + M[1][2]*lz + M[1][3];
+                            f32 wz = M[2][0]*lx + M[2][1]*ly + M[2][2]*lz + M[2][3];
+                            if (!*any) {
+                                outMin[0] = outMax[0] = wx;
+                                outMin[1] = outMax[1] = wy;
+                                outMin[2] = outMax[2] = wz;
+                                *any = 1;
+                            } else {
+                                if (wx < outMin[0]) outMin[0] = wx;
+                                if (wy < outMin[1]) outMin[1] = wy;
+                                if (wz < outMin[2]) outMin[2] = wz;
+                                if (wx > outMax[0]) outMax[0] = wx;
+                                if (wy > outMax[1]) outMax[1] = wy;
+                                if (wz > outMax[2]) outMax[2] = wz;
+                            }
                         }
                     }
                 }
@@ -5530,7 +5597,12 @@ static void RenderJointTree(const PCPortHSDArchive* a,
 
         stats->dobjs++;
 
-        if (ArchiveRangeValid(a, pobjOffset, PCPORT_SERIALIZED_POBJ_SIZE)) {
+        /* Walk the PObj `next` chain (+0x04), not just the first PObj. A DObj's
+         * skinned body splits its mesh across several PObjs (head / arms / torso);
+         * rendering only the first dropped the arms + torso for high-detail models
+         * like ken_a1 (the battle Wes). The model-bounds walker already does this,
+         * so the auto-camera framed geometry the render never drew. */
+        while (ArchiveRangeValid(a, pobjOffset, PCPORT_SERIALIZED_POBJ_SIZE)) {
             PCPortTranslatedPObj translatedPObj;
             PCPortTranslatedJointTransform translatedJoint;
             PCPortTranslatedMaterial translatedMaterial;
@@ -5976,8 +6048,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
 
             PCPort_FreeBuffer(bakedPixels);
             PCPort_DestroyTranslatedPObj(&translatedPObj);
-        } else {
-            stats->skipped++;
+
+            /* advance to the next PObj in this DObj's chain (+0x04) */
+            {
+                u32 pn = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x04);
+                if (pn == pobjOffset) break;
+                pobjOffset = pn;
+            }
         }
 
         /* Serialized HSD_DObjDesc layout: +0x00 class_name, +0x04 next,
