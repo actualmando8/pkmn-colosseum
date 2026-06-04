@@ -53,6 +53,7 @@
 #include "bgm_host.h"
 #include "thp_audio.h"     /* thp_adpcm_decode() */
 #include "waveout_sink.h"  /* WaveOutSink_* */
+#include "real_content_host.h"  /* PCPort_LoadFsysMember (proven FSYS loader) */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -541,7 +542,6 @@ int PCPortBGM_Init(void) {
 }
 
 int PCPortBGM_PlayFromFsys(const char *fsysPath, const char *member) {
-    FILE    *fp;
     uint8_t *blob;
     uint32_t blobSize;
     BgmWaveInfo wv;
@@ -558,19 +558,21 @@ int PCPortBGM_PlayFromFsys(const char *fsysPath, const char *member) {
     /* Stop any currently playing BGM */
     PCPortBGM_Stop();
 
-    fp = fopen(fsysPath, "rb");
-    if (!fp) {
-        fprintf(stderr, "[bgm] cannot open FSYS: %s\n", fsysPath);
-        return 0;
-    }
-
-    blob = bgm_fsys_extract(fp, member, &blobSize);
-    fclose(fp);
-
-    if (!blob) {
-        fprintf(stderr, "[bgm] member '%s' not found in %s\n",
-                member, fsysPath);
-        return 0;
+    /* Use the proven host FSYS loader (real_content_host) rather than bgm_host's
+     * own header parser, which did not match the archive layout and resolved
+     * none of the real members. PCPort_LoadFsysMember handles the FSYS header,
+     * name table and LZSS decompression and malloc()s the output (free()-able
+     * here and in PCPortBGM_Stop). */
+    {
+        u8 *md = NULL;
+        u32 ms = 0u;
+        if (!PCPort_LoadFsysMember(fsysPath, member, &md, &ms) || md == NULL) {
+            fprintf(stderr, "[bgm] member '%s' not found in %s\n",
+                    member, fsysPath);
+            return 0;
+        }
+        blob = (uint8_t *)md;
+        blobSize = (uint32_t)ms;
     }
 
     /*
