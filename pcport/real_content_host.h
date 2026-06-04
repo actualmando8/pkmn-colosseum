@@ -203,6 +203,17 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
 /* Returns the WZX collision-mesh member of a field-map .fsys (matched by
  * content signature, since it shares the map's member name). See field_collision.c. */
 BOOL PCPort_LoadFsysWZXMember(const char* fsysPath, u8** outData, u32* outSize);
+/* Attempt to locate the per-room exit/door trigger records (RE'd 0x2C-byte
+ * "people"-subsystem exit table) inside a field-map .fsys scene_data. The 0x2C
+ * layout is RE-derived from runtime SDA r13-relative accessor fns and a probe
+ * (tools/pcport_probe/probe_exits.py) did NOT find a coherent static table in
+ * the archive -- the exit array is populated at runtime by the asm people
+ * subsystem during floor load. This function therefore currently always returns
+ * FALSE (exit data not statically locatable); the host warp path falls back to
+ * a hand-specified exit list. Kept as the integration point for the future RE.
+ * On success (when implemented) writes a malloc'd buffer of raw 0x2C records to
+ * *outData with *outCount the number of records; caller frees via PCPort_FreeBuffer. */
+BOOL PCPort_LoadFsysExitData(const char* fsysPath, u8** outData, u32* outCount);
 void PCPort_FreeBuffer(void* buffer);
 /* Enumerate .fsys members (name/size/compression) to stdout. Diagnostic. */
 void PCPort_FsysListMembers(const char* fsysPath);

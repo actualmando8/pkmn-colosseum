@@ -1398,6 +1398,26 @@ BOOL PCPort_LoadFsysWZXMember(const char* fsysPath, u8** outData, u32* outSize) 
     return FALSE;
 }
 
+/* Attempt to locate the per-room exit/door trigger records in a field-map's
+ * scene_data. See the header doc + tools/pcport_probe/probe_exits.py: the RE'd
+ * 0x2C exit record lives in a RUNTIME SDA r13-relative array populated by the
+ * asm "people" subsystem during floor load, NOT a discrete static block; the
+ * probe found no coherent 0x2C-stride table in D1_garage_1F.fsys (only scattered
+ * geometry/material float coincidences). So this is intentionally a stub that
+ * reports "not found" -- the host warp path drives from a hand-specified exit
+ * list instead. Wired now so the future RE (parse the people-subsystem populate
+ * path / the baked DOL floor table) is a drop-in replacement here. */
+BOOL PCPort_LoadFsysExitData(const char* fsysPath, u8** outData, u32* outCount) {
+    (void)fsysPath;
+    if (outData != NULL) {
+        *outData = NULL;
+    }
+    if (outCount != NULL) {
+        *outCount = 0;
+    }
+    return FALSE;
+}
+
 void PCPort_FreeBuffer(void* buffer) {
     free(buffer);
 }

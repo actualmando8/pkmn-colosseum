@@ -63,4 +63,49 @@ BOOL PCPort_FieldColBounds(f32 outMin[3], f32 outMax[3]);
  * giving wall sliding. Returns TRUE if any push was applied. */
 BOOL PCPort_FieldColResolveXZ(f32* x, f32* z, f32 yLo, f32 yHi, f32 radius);
 
+/* ------------------------------------------------------------------------- *
+ *  Field exit / door triggers (map warps)
+ * ------------------------------------------------------------------------- *
+ * A door is a proximity trigger: when the player walks inside the exit's
+ * approach cone (a position, a facing direction, a reach radius, and a
+ * half-angle width) the game warps to the connected map.
+ *
+ * The RE'd on-disc exit record (0x2C bytes) is RE-derived from the asm "people"
+ * subsystem accessor fns, and lives in a *runtime* SDA r13-relative array that
+ * is populated during floor load, NOT as a discrete locatable block in the
+ * static fsys scene_data. A probe of D1_garage_1F.fsys (tools/pcport_probe/
+ * probe_exits.py) did NOT find a coherent 0x2C-stride table -- the float-shape
+ * heuristic only matched scattered geometry/material coefficients. So for the
+ * port MVP we drive warps from a HOST-SPECIFIED exit list (a trigger box at a
+ * known door position per map). The real exit-record parse (RE the people
+ * subsystem populate path / the DOL floor table) is a documented follow-up. */
+
+typedef struct {
+    f32 pos[3];        /* world-space trigger position (the door) */
+    f32 facing;        /* approach yaw (radians); player must move ~toward it */
+    f32 radius;        /* reach distance to fire the trigger */
+    f32 halfAngle;     /* half-width of the approach cone (radians); <=0 = any */
+    int targetFloor;   /* destination floor id (index into the warp table) */
+    f32 spawn[3];      /* where to place the player after the warp (world XZ/Y) */
+} PCPortFieldExit;
+
+/* Replace the loaded exit-trigger list with `n` host-specified exits. Pass
+ * n==0 / exits==NULL to clear. The exits are copied. */
+void PCPort_FieldExitSet(const PCPortFieldExit* exits, int n);
+
+/* Discard the loaded exit-trigger list. */
+void PCPort_FieldExitUnload(void);
+
+/* Number of loaded exit triggers. */
+int PCPort_FieldExitCount(void);
+
+/* Per-frame proximity / approach check. Given the player position (px,py,pz)
+ * and the unit move direction (mvx,mvz) this frame (0,0 if standing still),
+ * return the index of the first exit the player is triggering (inside its
+ * radius AND, if halfAngle>0, moving into the cone), or -1 if none. */
+int PCPort_FieldExitCheck(f32 px, f32 py, f32 pz, f32 mvx, f32 mvz);
+
+/* Fetch exit `i`. Returns FALSE if out of range. */
+BOOL PCPort_FieldExitGet(int i, PCPortFieldExit* out);
+
 #endif

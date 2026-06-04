@@ -7794,6 +7794,137 @@ static void DrawFieldCollisionWire(void) {
 /* Placeholder player avatar: an oriented box (a stand-in until the real Wes
  * overworld model is ported). Drawn in world space via the immediate path; the
  * front face is brightened so the facing direction reads. yaw=0 faces -Z. */
+/* =================================================================== *
+ *  MAP WARPS: floor-id -> fsys-name table + door-trigger reload
+ * =================================================================== *
+ * Walk through a door -> load the connected map. The trigger geometry (door
+ * positions / approach cones) and the floor-id<->map mapping are RE-derived
+ * (see the MAP WARPS scope plan + field_collision.h). The real per-room exit
+ * records are NOT statically locatable in the fsys (probe_exits.py found no
+ * coherent 0x2C-stride table -- they're a runtime SDA r13 array filled by the
+ * asm people subsystem). So the MVP drives warps from a HOST-SPECIFIED exit
+ * list per map (a trigger box at a known door position), proving the warp
+ * mechanism end-to-end; PCPort_LoadFsysExitData stays the integration point
+ * for the future real exit parse. */
+
+typedef struct {
+    int          floorId;     /* host floor id (table index identity) */
+    const char*  fsysName;    /* bare member name -> orig/.../<name>.fsys */
+    /* hand-specified exits for this map (test triggers). */
+    PCPortFieldExit exits[4];
+    int          exitCount;
+    f32          defaultSpawn[3];  /* fallback spawn if an exit gives none */
+} PCPortWarpMapEntry;
+
+/* Floor-id <-> map table. Hand-built for the reachable D1_garage_* cluster
+ * (Wes's hideout, the game start). Door positions use the WZX collision bounds
+ * for each map (D1_garage_1F = X[-106,105] Y[-24,21] Z[-68,78]). Reciprocal
+ * exits let you warp 1F <-> B1 and back. Tunable; the real door data is a
+ * follow-up. PCPORT_WARP_TUNE can override the first exit at runtime. */
+enum { PC_FLOOR_GARAGE_1F = 0, PC_FLOOR_GARAGE_B1 = 1 };
+
+static const PCPortWarpMapEntry g_pcWarpMaps[] = {
+    {
+        PC_FLOOR_GARAGE_1F, "D1_garage_1F",
+        {
+            /* a door at the far (+Z) edge of the room -> down to B1. Spawning
+             * INTO 1F (from B1) lands at Z=-30, well clear of this door's
+             * radius so it doesn't instantly re-trigger. */
+            { { 0.0f, 0.0f, 65.0f }, 0.0f /*any approach dir (MVP)*/,
+              26.0f, 0.0f, PC_FLOOR_GARAGE_B1, { 0.0f, 0.0f, 0.0f } }
+        },
+        1,
+        { 0.0f, 0.0f, -30.0f }   /* spawn point when arriving in 1F */
+    },
+    {
+        PC_FLOOR_GARAGE_B1, "D1_garage_B1",
+        {
+            /* a door back up to 1F near the room's near (-Z) edge. */
+            { { 0.0f, 0.0f, -55.0f }, 0.0f, 26.0f, 0.0f,
+              PC_FLOOR_GARAGE_1F, { 0.0f, 0.0f, 0.0f } }
+        },
+        1,
+        { 0.0f, 0.0f, 0.0f }     /* spawn point when arriving in B1 */
+    }
+};
+static const int g_pcWarpMapCount =
+    (int)(sizeof(g_pcWarpMaps) / sizeof(g_pcWarpMaps[0]));
+
+static const PCPortWarpMapEntry* PCPort_WarpFindFloor(int floorId) {
+    int i;
+    for (i = 0; i < g_pcWarpMapCount; ++i) {
+        if (g_pcWarpMaps[i].floorId == floorId) {
+            return &g_pcWarpMaps[i];
+        }
+    }
+    return NULL;
+}
+
+/* Resolve a bare map name to its disc fsys path. */
+static void PCPort_WarpResolvePath(const char* name, char* out, size_t n) {
+    if (strchr(name, '/') != NULL || strchr(name, '\\') != NULL) {
+        snprintf(out, n, "%s", name);
+    } else {
+        snprintf(out, n, "orig/GC6E01/disc/files/%s.fsys", name);
+    }
+}
+
+/* Tear down the current field map + load the target floor's map: scene
+ * geometry (PCPort_EngineFieldSetup re-inits archive/camera/render state),
+ * WZX collision, and the new map's exit triggers. Returns 1 on success and
+ * writes the player's spawn position to outSpawn[3]; 0 on failure (caller
+ * should keep the old map). */
+static int PCPort_FieldWarpTo(int targetFloor, f32 outSpawn[3]) {
+    const PCPortWarpMapEntry* dst = PCPort_WarpFindFloor(targetFloor);
+    char path[512];
+    int colTris;
+
+    if (dst == NULL) {
+        fprintf(stderr, "[warp] no map for floor id %d (no table entry)\n",
+                targetFloor);
+        return 0;
+    }
+    PCPort_WarpResolvePath(dst->fsysName, path, sizeof(path));
+    printf("[warp] -> floor %d (%s)\n", targetFloor, path);
+
+    /* Tear down the old map's collision + exits, load the new scene. */
+    PCPort_FieldColUnload();
+    PCPort_FieldExitUnload();
+
+    if (!PCPort_EngineFieldSetup(path)) {
+        fprintf(stderr, "[warp] EngineFieldSetup failed for %s\n", path);
+        return 0;
+    }
+    colTris = PCPort_FieldColLoad(path);
+    if (colTris > 0) {
+        f32 cmin[3], cmax[3];
+        PCPort_FieldColBounds(cmin, cmax);
+        printf("[warp] collision: %d tris  X[%.0f,%.0f] Y[%.0f,%.0f] Z[%.0f,%.0f]\n",
+               colTris, cmin[0], cmax[0], cmin[1], cmax[1], cmin[2], cmax[2]);
+    }
+
+    /* Load the new map's exit triggers. Try the (future) real parse first; it
+     * currently always reports "not found", so we fall back to the hand list. */
+    {
+        u8* exitRaw = NULL;
+        u32 exitCount = 0;
+        if (PCPort_LoadFsysExitData(path, &exitRaw, &exitCount) && exitCount > 0) {
+            /* (future) translate the raw 0x2C records into PCPortFieldExit. */
+            PCPort_FreeBuffer(exitRaw);
+        }
+        if (PCPort_FieldExitCount() == 0 && dst->exitCount > 0) {
+            PCPort_FieldExitSet(dst->exits, dst->exitCount);
+        }
+    }
+
+    if (outSpawn != NULL) {
+        outSpawn[0] = dst->defaultSpawn[0];
+        outSpawn[1] = dst->defaultSpawn[1];
+        outSpawn[2] = dst->defaultSpawn[2];
+    }
+    return 1;
+}
+
 static void DrawFieldAvatar(f32 px, f32 py, f32 pz, f32 yaw,
                             f32 height, f32 radius) {
     f32 rt[3], fw[3];        /* local right / forward unit vectors (XZ) */
@@ -7864,8 +7995,12 @@ static void DrawFieldAvatar(f32 px, f32 py, f32 pz, f32 yaw,
  * is a box avatar that moves on the WZX floor with wall blocking; the camera
  * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
  * avatar snaps to the floor each step and slides along walls. */
+/* Returns >=0 = a target floor id to warp to (the loop tripped an exit
+ * trigger), or -1 if the window was closed / frame cap hit without a warp.
+ * `spawn` seeds the player XZ/Y position (snapped to the floor); pass NULL to
+ * use PCPORT_CAM_EYE / origin. */
 static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
-                            int frameCap, int colWire) {
+                            int frameCap, int colWire, const f32 spawn[3]) {
     PADStatus pads[4];
     f32 ppos[3] = { 0.0f, 0.0f, 0.0f };
     f32 pyaw = 0.0f;
@@ -7879,10 +8014,15 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 60.0f;
     int autopan = getenv("PCPORT_FIELD_AUTOPAN") != NULL;
     int frame = 0;
+    int warpTo = -1;
+    int graceFrames = 30;   /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
 
     memset(pads, 0, sizeof(pads));
-    { /* spawn at the start XZ on the floor (PCPORT_CAM_EYE x,_,z seeds XZ) */
+    if (spawn != NULL) {
+        ppos[0] = spawn[0]; ppos[1] = spawn[1]; ppos[2] = spawn[2];
+    }
+    { /* PCPORT_CAM_EYE x,_,z still overrides the spawn XZ (tuning). */
         const char* ce = getenv("PCPORT_CAM_EYE");
         if (ce != NULL) { f32 yy; sscanf(ce, "%f,%f,%f", &ppos[0], &yy, &ppos[2]); }
     }
@@ -7890,8 +8030,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         ppos[1] = spawnY;
     }
     printf("[field/walk] spawn=(%.1f,%.1f,%.1f). Left stick walks, arrows/C-stick "
-           "orbit camera.%s\n", ppos[0], ppos[1], ppos[2],
-           autopan ? " [AUTOPAN]" : "");
+           "orbit camera. (%d exit trigger(s))%s\n", ppos[0], ppos[1], ppos[2],
+           PCPort_FieldExitCount(), autopan ? " [AUTOPAN]" : "");
 
     while (!glfwWindowShouldClose(window)) {
         f32 fwdXZ[3], rightXZ[3], mvx, mvz, eye[3], interest[3], floorY;
@@ -7940,6 +8080,24 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             ppos[0] = prevx; ppos[2] = prevz;
         }
 
+        /* Door / exit trigger: if the player walked into an exit's approach
+         * zone (after a short post-spawn grace), break out and warp. */
+        if (graceFrames > 0) {
+            graceFrames--;
+        } else {
+            int hit = PCPort_FieldExitCheck(ppos[0], ppos[1], ppos[2], mvx, mvz);
+            if (hit >= 0) {
+                PCPortFieldExit ex;
+                if (PCPort_FieldExitGet(hit, &ex)) {
+                    printf("[field/walk] exit %d tripped at (%.1f,%.1f,%.1f) "
+                           "-> floor %d\n", hit, ppos[0], ppos[1], ppos[2],
+                           ex.targetFloor);
+                    warpTo = ex.targetFloor;
+                    break;
+                }
+            }
+        }
+
         /* Orbit camera behind the player. */
         eye[0] = ppos[0] - sinf(camYaw) * cosf(camPitch) * camDist;
         eye[2] = ppos[2] + cosf(camYaw) * cosf(camPitch) * camDist;
@@ -7966,10 +8124,15 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             break;
         }
     }
-    printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)\n",
-           frame, ppos[0], ppos[1], ppos[2]);
-    HoldWindowOpen(window);
-    return 1;
+    printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)%s\n",
+           frame, ppos[0], ppos[1], ppos[2],
+           warpTo >= 0 ? " [WARP]" : "");
+    if (warpTo < 0) {
+        /* Only hold the window when the loop ended (not on a warp; the caller
+         * immediately re-enters with the next map). */
+        HoldWindowOpen(window);
+    }
+    return warpTo;
 }
 
 static int RunFieldScene(GLFWwindow* window) {
@@ -8000,6 +8163,73 @@ static int RunFieldScene(GLFWwindow* window) {
         archive = path;
     }
 
+    if (getenv("PCPORT_FIELD_WALK") != NULL || g_pcEnterFieldWalk) {
+        /* Third-person walkable mode with MAP WARPS: load -> walk -> (door)
+         * warp -> load... until the window closes. The first map is the one
+         * named by PCPORT_FIELD_ARCHIVE (or D1_garage_1F); subsequent maps come
+         * from the exit triggers' target floor ids via the warp table.
+         * (g_pcEnterFieldWalk = New Game menu handoff into the field.) */
+        int colWire = getenv("PCPORT_COL_WIRE") != NULL;
+        const f32* spawn = NULL;        /* first map: PCPORT_CAM_EYE / origin */
+        int floor;
+
+        /* Resolve the starting floor from the archive base name (so its exits
+         * load). Fall back to floor 0 (D1_garage_1F). */
+        floor = PC_FLOOR_GARAGE_1F;
+        {
+            int i;
+            const char* base = archive;
+            const char* s;
+            for (s = archive; *s; ++s) {
+                if (*s == '/' || *s == '\\') base = s + 1;
+            }
+            for (i = 0; i < g_pcWarpMapCount; ++i) {
+                if (strncmp(base, g_pcWarpMaps[i].fsysName,
+                            strlen(g_pcWarpMaps[i].fsysName)) == 0) {
+                    floor = g_pcWarpMaps[i].floorId;
+                    break;
+                }
+            }
+        }
+
+        /* Load the first map (scene + collision + exits) via the warp path so
+         * the load/teardown is uniform. */
+        {
+            f32 firstSpawn[3];
+            if (!PCPort_FieldWarpTo(floor, firstSpawn)) {
+                /* table miss: load whatever archive was named, no exits. */
+                if (!PCPort_EngineFieldSetup(archive)) {
+                    return 0;
+                }
+                PCPort_FieldColLoad(archive);
+            } else {
+                /* keep PCPORT_CAM_EYE override for the first map (spawn=NULL). */
+            }
+        }
+
+        for (;;) {
+            int next = RunFieldWalkLoop(window, dumpPath, frameCap, colWire,
+                                        spawn);
+            if (next < 0) {
+                break;          /* window closed / frame cap, no warp */
+            }
+            {
+                static f32 warpSpawn[3];
+                if (!PCPort_FieldWarpTo(next, warpSpawn)) {
+                    break;      /* unknown floor -> stop */
+                }
+                spawn = warpSpawn;   /* next loop spawns at the warp target */
+            }
+            if (frameCap > 0) {
+                /* In a bounded (headless) run, one warp is enough to prove it. */
+                HoldWindowOpen(window);
+                break;
+            }
+        }
+        return 1;
+    }
+
+    /* Free-fly (non-walk) path: single static map load. */
     if (!PCPort_EngineFieldSetup(archive)) {
         return 0;
     }
@@ -8015,12 +8245,6 @@ static int RunFieldScene(GLFWwindow* window) {
         } else {
             printf("[field] collision: no WZX mesh found in %s\n", archive);
         }
-    }
-
-    if (getenv("PCPORT_FIELD_WALK") != NULL || g_pcEnterFieldWalk) {
-        /* Third-person walkable mode (placeholder avatar on the WZX floor). */
-        return RunFieldWalkLoop(window, dumpPath, frameCap,
-                                getenv("PCPORT_COL_WIRE") != NULL);
     }
 
     { /* optional initial eye placement */

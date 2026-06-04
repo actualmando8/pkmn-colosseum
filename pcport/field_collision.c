@@ -296,6 +296,72 @@ BOOL PCPort_FieldColResolveXZ(f32* x, f32* z, f32 yLo, f32 yHi, f32 radius) {
     return pushedAny;
 }
 
+/* ------------------------------------------------------------------------- *
+ *  Field exit / door triggers (map warps)
+ * ------------------------------------------------------------------------- */
+
+static PCPortFieldExit* s_exits = NULL;
+static int s_exitCount = 0;
+
+void PCPort_FieldExitUnload(void) {
+    free(s_exits);
+    s_exits = NULL;
+    s_exitCount = 0;
+}
+
+void PCPort_FieldExitSet(const PCPortFieldExit* exits, int n) {
+    PCPort_FieldExitUnload();
+    if (exits == NULL || n <= 0) {
+        return;
+    }
+    s_exits = (PCPortFieldExit*)malloc((size_t)n * sizeof(PCPortFieldExit));
+    if (s_exits == NULL) {
+        return;
+    }
+    memcpy(s_exits, exits, (size_t)n * sizeof(PCPortFieldExit));
+    s_exitCount = n;
+}
+
+int PCPort_FieldExitCount(void) {
+    return s_exitCount;
+}
+
+BOOL PCPort_FieldExitGet(int i, PCPortFieldExit* out) {
+    if (i < 0 || i >= s_exitCount || out == NULL) {
+        return FALSE;
+    }
+    *out = s_exits[i];
+    return TRUE;
+}
+
+int PCPort_FieldExitCheck(f32 px, f32 py, f32 pz, f32 mvx, f32 mvz) {
+    int i;
+    f32 mlen2 = mvx * mvx + mvz * mvz;
+    (void)py;
+    for (i = 0; i < s_exitCount; ++i) {
+        const PCPortFieldExit* e = &s_exits[i];
+        f32 dx = e->pos[0] - px;
+        f32 dz = e->pos[2] - pz;
+        f32 d2 = dx * dx + dz * dz;
+        if (e->radius <= 0.0f || d2 > e->radius * e->radius) {
+            continue;
+        }
+        /* Approach-cone gate: only fire if the player is moving roughly toward
+         * the door (within halfAngle of the exit facing). halfAngle<=0 = any. */
+        if (e->halfAngle > 0.0f && mlen2 > 1.0e-6f) {
+            f32 fdx = sinf(e->facing);
+            f32 fdz = -cosf(e->facing);
+            f32 mlen = (f32)sqrt((double)mlen2);
+            f32 dot = (mvx * fdx + mvz * fdz) / mlen;
+            if (dot < cosf(e->halfAngle)) {
+                continue;
+            }
+        }
+        return i;
+    }
+    return -1;
+}
+
 BOOL PCPort_FieldColFloorAt(f32 x, f32 z, f32 queryY, f32 climb, f32* outY) {
     int i;
     BOOL found = FALSE;
