@@ -6330,6 +6330,14 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Title sand-wind layer built (procedural wisps)\n");
     }
 
+    /* HSD-pipeline bring-up: verify the BE->LE scene swizzle produces sane values
+     * (root joint SRT, material colors/alpha, TObj) before wiring the real load. */
+    if (getenv("PCPORT_HSD_SWIZ_TEST") != NULL) {
+        PCPort_HSDSwizzleSmoke(PCPORT_LOGO_ARCHIVE, PCPORT_LOGO_MEMBER);
+        ok = 1;
+        goto cleanup;
+    }
+
     /* Build the ASCII font atlas once (GL context ready) for menu/prompt text. */
     EnsureFontAtlas();
 

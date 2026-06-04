@@ -194,6 +194,14 @@ void PCPort_FreeBuffer(void* buffer);
 
 BOOL PCPort_HSDArchiveParseBE(PCPortHSDArchive* archive,
                               const void* data, u32 size);
+/* Swizzle a parsed scene archive's joint graph BE->LE + relocate pointers to
+ * native, in place, so the GAME'S OWN HSD_*LoadDesc can consume it. Pass the
+ * storage offset of the scene root HSD_Joint; returns it as a native pointer
+ * (cast to HSD_Joint*). Destroys the BE layout -- use only for the HSD pipeline. */
+void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 rootJointOffset);
+/* Verify the swizzle math: load+resolve+swizzle a scene member, print sane-value
+ * report (root joint SRT/flags, first material colors/alpha, first TObj). */
+void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName);
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive);
 const void* PCPort_HSDArchiveGetPublicAddress(const PCPortHSDArchive* archive,
                                               const char* name,

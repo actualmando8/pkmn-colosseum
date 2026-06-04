@@ -1420,6 +1420,312 @@ BOOL PCPort_HSDArchiveParseBE(PCPortHSDArchive* archive,
     return TRUE;
 }
 
+/* =========================================================================
+ * BE->LE swizzle for running the GAME'S OWN HSD pipeline.
+ *
+ * The archive scalars are GameCube big-endian and PCPort_HSDArchiveParseBE
+ * leaves relocated pointer fields as BE (storage-relative+dataOffset). To feed
+ * the data to the game's real HSD_*LoadDesc (which read native LE structs +
+ * native host pointers) we, ONCE, walk the descriptor graph and:
+ *   (1) byte-swap every non-pointer multibyte scalar (u16/u32/f32) in place;
+ *   (2) convert every relocated pointer field to a native host pointer.
+ * Pointer fields are identified structurally (per HSD_*Desc layout); during the
+ * scalar walk they still hold BE offsets, so we follow them by offset. After
+ * the walk, ApplyHostRelocations rewrites ALL relocated fields (from the reloc
+ * table) to native pointers. Visited-set keyed on storage offset handles shared
+ * + cyclic descriptors. NOTE: vertex-array payloads + display lists are handled
+ * separately (the GX shim already reads BE display-list indices; vertex data
+ * swap is a follow-up step). This is the game's data driving the game's code --
+ * no re-created rendering. */
+
+static void Swap16InPlace(u8* p) { u8 t = p[0]; p[0] = p[1]; p[1] = t; }
+static void Swap32InPlace(u8* p) {
+    u8 t; t = p[0]; p[0] = p[3]; p[3] = t; t = p[1]; p[1] = p[2]; p[2] = t;
+}
+
+#define PCPORT_SWIZ_MAX_NODES 16384u
+typedef struct {
+    u8* base;            /* archive->storage */
+    u32 size;
+    u32 dataOffset;
+    u32 visited[PCPORT_SWIZ_MAX_NODES];
+    u32 visitedCount;
+} PCPortSwizCtx;
+
+static BOOL SwizMarkVisited(PCPortSwizCtx* c, u32 off) {
+    u32 i;
+    if (off == 0u || off >= c->size) {
+        return TRUE; /* NULL / OOB -> treat as already-handled (skip) */
+    }
+    for (i = 0; i < c->visitedCount; ++i) {
+        if (c->visited[i] == off) {
+            return TRUE;
+        }
+    }
+    if (c->visitedCount < PCPORT_SWIZ_MAX_NODES) {
+        c->visited[c->visitedCount++] = off;
+    }
+    return FALSE;
+}
+
+/* Read a (still-BE) relocated pointer field as a storage offset (0 == NULL). */
+static u32 SwizChildOff(PCPortSwizCtx* c, u32 fieldAbsOff) {
+    if (fieldAbsOff + 4u > c->size) {
+        return 0u;
+    }
+    return ReadBE32(c->base + fieldAbsOff); /* already dataOffset+offset, abs */
+}
+
+/* Forward decls (mutually recursive graph walk). */
+static void SwizJoint(PCPortSwizCtx* c, u32 off);
+static void SwizDObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizMObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizTObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizPObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizAObjDesc(PCPortSwizCtx* c, u32 off);
+static void SwizFObjDesc(PCPortSwizCtx* c, u32 off);
+
+static void SwizImageDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap16InPlace(p + 0x4);   /* width  */
+    Swap16InPlace(p + 0x6);   /* height */
+    Swap32InPlace(p + 0x8);   /* format */
+    Swap32InPlace(p + 0xC);   /* mipmap */
+    Swap32InPlace(p + 0x10);  /* minLOD */
+    Swap32InPlace(p + 0x14);  /* maxLOD */
+    /* +0x0 image_ptr = pointer (handled by ApplyHostRelocations) */
+}
+
+static void SwizTObjDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    u32 i;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x8);   /* id  */
+    Swap32InPlace(p + 0xC);   /* src */
+    for (i = 0; i < 9u; ++i) Swap32InPlace(p + 0x10 + i * 4u); /* rotate/scale/translate */
+    Swap32InPlace(p + 0x34);  /* wrap_s */
+    Swap32InPlace(p + 0x38);  /* wrap_t */
+    /* +0x3C repeat_s, +0x3D repeat_t : u8, no swap */
+    Swap32InPlace(p + 0x40);  /* blend_flags */
+    Swap32InPlace(p + 0x44);  /* blending */
+    Swap32InPlace(p + 0x48);  /* magFilt */
+    SwizImageDesc(c, SwizChildOff(c, off + 0x4C)); /* imagedesc */
+    /* next(0x4), tlutdesc(0x50), lod(0x54), tev(0x58): pointers */
+    SwizTObjDesc(c, SwizChildOff(c, off + 0x4));    /* next */
+}
+
+static void SwizMObjDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    u32 matOff;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x4);   /* rendermode */
+    SwizTObjDesc(c, SwizChildOff(c, off + 0x8)); /* texdesc */
+    matOff = SwizChildOff(c, off + 0xC);         /* mat (HSD_Material) */
+    if (!SwizMarkVisited(c, matOff)) {
+        u8* m = c->base + matOff;
+        Swap32InPlace(m + 0x0);  /* ambient  */
+        Swap32InPlace(m + 0x4);  /* diffuse  */
+        Swap32InPlace(m + 0x8);  /* specular */
+        Swap32InPlace(m + 0xC);  /* alpha    */
+        Swap32InPlace(m + 0x10); /* shininess */
+    }
+    /* renderdesc(0x10), pedesc(0x14, all u8) : no scalar swap */
+}
+
+static void SwizFObjDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x4);   /* length */
+    Swap32InPlace(p + 0x8);   /* startframe */
+    /* +0xC..0xF: u8 type/frac_value/frac_slope/dummy0 : no swap; +0x10 ad ptr */
+    SwizFObjDesc(c, SwizChildOff(c, off + 0x0)); /* next */
+}
+
+static void SwizAObjDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x0);   /* flags */
+    Swap32InPlace(p + 0x4);   /* end_frame */
+    Swap32InPlace(p + 0xC);   /* obj_id */
+    SwizFObjDesc(c, SwizChildOff(c, off + 0x8)); /* fobjdesc */
+}
+
+static void SwizPObjDesc(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    u32 vlist;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap16InPlace(p + 0xC);   /* flags */
+    Swap16InPlace(p + 0xE);   /* n_display */
+    /* verts(0x8) -> VtxDescList array; display(0x10) bytes (indices read BE by
+     * the shim); u.joint(0x14) pointer. */
+    vlist = SwizChildOff(c, off + 0x8);
+    if (!SwizMarkVisited(c, vlist) && vlist != 0u) {
+        u32 e = vlist;
+        /* iterate entries until attr (BE u32) == GX_VA_NULL (0xFF) */
+        while (e + 0x18u <= c->size) {
+            u32 attr = ReadBE32(c->base + e);
+            if (attr == 0xFFu) { Swap32InPlace(c->base + e); break; }
+            Swap32InPlace(c->base + e + 0x0);  /* attr */
+            Swap32InPlace(c->base + e + 0x4);  /* attr_type */
+            Swap32InPlace(c->base + e + 0x8);  /* comp_cnt */
+            Swap32InPlace(c->base + e + 0xC);  /* comp_type */
+            /* +0x10 frac u8; +0x12 stride u16; +0x14 vertex ptr */
+            Swap16InPlace(c->base + e + 0x12); /* stride */
+            e += 0x18u;
+        }
+    }
+    SwizPObjDesc(c, SwizChildOff(c, off + 0x4)); /* next */
+}
+
+static void SwizDObjDesc(PCPortSwizCtx* c, u32 off) {
+    if (SwizMarkVisited(c, off)) return;
+    /* class_name(0), next(4), mobjdesc(8), pobjdesc(C): all pointers */
+    SwizMObjDesc(c, SwizChildOff(c, off + 0x8));
+    SwizPObjDesc(c, SwizChildOff(c, off + 0xC));
+    SwizDObjDesc(c, SwizChildOff(c, off + 0x4)); /* next */
+}
+
+static void SwizJoint(PCPortSwizCtx* c, u32 off) {
+    u8* p;
+    u32 i;
+    if (SwizMarkVisited(c, off)) return;
+    p = c->base + off;
+    Swap32InPlace(p + 0x4);   /* flags */
+    for (i = 0; i < 9u; ++i) Swap32InPlace(p + 0x14 + i * 4u); /* rotation/scale/position */
+    /* class_name(0), child(8), next(C), u.dobjdesc(10), mtx(38), robjdesc(3C) ptrs */
+    SwizDObjDesc(c, SwizChildOff(c, off + 0x10)); /* u.dobjdesc */
+    SwizJoint(c, SwizChildOff(c, off + 0x8));     /* child */
+    SwizJoint(c, SwizChildOff(c, off + 0xC));     /* next */
+    /* robjdesc(0x3C): flags swap handled lazily if present (skip union for now) */
+}
+
+/* Convert every relocated pointer field (from the reloc table) from its BE
+ * storage-relative value to a native host pointer (storage + value). Must run
+ * AFTER the scalar walk (which reads pointers as BE offsets to traverse). */
+static void PCPort_HSDApplyHostRelocations(PCPortHSDArchive* a) {
+    u32 i;
+    for (i = 0; i < a->relocCount; ++i) {
+        u32 relocEntryOffset = a->relocOffset + (i * 4u);
+        u32 fieldOffset, fieldAbs, value;
+        if (relocEntryOffset + 4u > a->storageSize) break;
+        fieldOffset = ReadBE32(a->storage + relocEntryOffset);
+        fieldAbs = a->dataOffset + fieldOffset;
+        if (fieldAbs + 4u > a->storageSize) continue;
+        value = ReadBE32(a->storage + fieldAbs);     /* dataOffset+offset (abs) */
+        if (value == 0u || value >= a->storageSize) continue;
+        /* native host pointer (32-bit build: pointer fits in u32) */
+        *(u32*)(a->storage + fieldAbs) = (u32)(uintptr_t)(a->storage + value);
+    }
+}
+
+/* Public: prepare a parsed archive's scene-data joint graph for the game's HSD
+ * pipeline. `rootJointOffset` is the storage offset of the scene root HSD_Joint
+ * (scene_data -> branch -> jointList). Returns the root joint as a native ptr. */
+/* Smoke test: load a scene member, resolve the root joint (BE), swizzle, then
+ * read back NATIVE-LE fields to confirm the swap produced sane values. Prints a
+ * report. Verifies the swizzle math independently of the load/render. */
+void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
+    u8* data = NULL;
+    u32 size = 0;
+    PCPortHSDArchive archive;
+    const u8* sceneData;
+    u32 sceneOffset = 0, branchOff, jointListOff, rootOff;
+    void* rootPtr;
+
+    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
+        printf("[hsd-swiz] load %s:%s FAILED\n", fsysPath, memberName);
+        return;
+    }
+    if (!PCPort_HSDArchiveParseBE(&archive, data, size)) {
+        printf("[hsd-swiz] parse FAILED\n");
+        free(data);
+        return;
+    }
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&archive, "scene_data", &sceneOffset);
+    if (sceneData == NULL) { printf("[hsd-swiz] no scene_data\n"); goto done; }
+    branchOff = ReadBE32(sceneData + 0x00);
+    jointListOff = ReadBE32(archive.storage + branchOff + 0x00);
+    rootOff = ReadBE32(archive.storage + jointListOff + 0x00);
+    printf("[hsd-swiz] scene=0x%X branch=0x%X jointList=0x%X root=0x%X relocs=%u\n",
+           sceneOffset, branchOff, jointListOff, rootOff, archive.relocCount);
+
+    rootPtr = PCPort_SwizzleSceneForHSD(&archive, rootOff);
+    if (rootPtr == NULL) { printf("[hsd-swiz] swizzle FAILED\n"); goto done; }
+
+    {
+        /* Read the swizzled root joint as native LE. */
+        u8* j = (u8*)rootPtr;
+        u32 flags = *(u32*)(j + 0x4);
+        f32 rx = *(f32*)(j + 0x14), ry = *(f32*)(j + 0x18), rz = *(f32*)(j + 0x1C);
+        f32 sx = *(f32*)(j + 0x20), sy = *(f32*)(j + 0x24), sz = *(f32*)(j + 0x28);
+        f32 px = *(f32*)(j + 0x2C), py = *(f32*)(j + 0x30), pz = *(f32*)(j + 0x34);
+        u32 dobj = *(u32*)(j + 0x10);   /* now native host pointer */
+        u8* stack[256]; int sp = 0; int scanned = 0;
+        printf("[hsd-swiz] ROOT flags=0x%08X rot=(%.3f,%.3f,%.3f) scale=(%.3f,%.3f,%.3f) pos=(%.1f,%.1f,%.1f) dobj=%p\n",
+               flags, rx, ry, rz, sx, sy, sz, px, py, pz, (void*)(uintptr_t)dobj);
+        /* Walk the joint tree (host pointers now) to the first dobj-bearing joint. */
+        stack[sp++] = j;
+        while (sp > 0 && dobj == 0u && scanned < 4096) {
+            u8* cur = stack[--sp]; u32 ch, nx;
+            ++scanned;
+            dobj = *(u32*)(cur + 0x10);
+            if (dobj != 0u) { j = cur; break; }
+            ch = *(u32*)(cur + 0x8); nx = *(u32*)(cur + 0xC);
+            if (nx != 0u && sp < 256) stack[sp++] = (u8*)(uintptr_t)nx;
+            if (ch != 0u && sp < 256) stack[sp++] = (u8*)(uintptr_t)ch;
+        }
+        printf("[hsd-swiz] first dobj-joint after %d nodes: dobj=%p\n", scanned, (void*)(uintptr_t)dobj);
+        if (dobj != 0u) {
+            u8* d = (u8*)(uintptr_t)dobj;
+            u32 mobj = *(u32*)(d + 0x8);
+            if (mobj != 0u) {
+                u8* m = (u8*)(uintptr_t)mobj;
+                u32 rendermode = *(u32*)(m + 0x4);
+                u32 mat = *(u32*)(m + 0xC);
+                u32 tobj = *(u32*)(m + 0x8);
+                printf("[hsd-swiz] MObj rendermode=0x%X mat=%p tobj=%p\n",
+                       rendermode, (void*)(uintptr_t)mat, (void*)(uintptr_t)tobj);
+                if (mat != 0u) {
+                    u8* mm = (u8*)(uintptr_t)mat;
+                    printf("[hsd-swiz]   Material ambient=0x%08X diffuse=0x%08X alpha=%.3f shininess=%.2f\n",
+                           *(u32*)(mm + 0x0), *(u32*)(mm + 0x4), *(f32*)(mm + 0xC), *(f32*)(mm + 0x10));
+                }
+                if (tobj != 0u) {
+                    u8* tt = (u8*)(uintptr_t)tobj;
+                    printf("[hsd-swiz]   TObj scale=(%.3f,%.3f,%.3f) wrap_s=%u img=%p\n",
+                           *(f32*)(tt + 0x1C), *(f32*)(tt + 0x20), *(f32*)(tt + 0x24),
+                           *(u32*)(tt + 0x34), (void*)(uintptr_t)*(u32*)(tt + 0x4C));
+                }
+            }
+        }
+    }
+done:
+    PCPort_HSDArchiveDestroy(&archive);
+    free(data);
+}
+
+void* PCPort_SwizzleSceneForHSD(PCPortHSDArchive* archive, u32 rootJointOffset) {
+    PCPortSwizCtx ctx;
+    if (archive == NULL || archive->storage == NULL ||
+        rootJointOffset == 0u || rootJointOffset >= archive->storageSize) {
+        return NULL;
+    }
+    memset(&ctx, 0, sizeof(ctx));
+    ctx.base = archive->storage;
+    ctx.size = archive->storageSize;
+    ctx.dataOffset = archive->dataOffset;
+    SwizJoint(&ctx, rootJointOffset);            /* (1) scalar swap */
+    PCPort_HSDApplyHostRelocations(archive);     /* (2) pointers -> host */
+    return (void*)(archive->storage + rootJointOffset);
+}
+
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive) {
     if (archive == NULL) {
         return;
