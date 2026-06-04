@@ -1,0 +1,8134 @@
+[
+ {
+  "fn": "fn_8017424C",
+  "xd_name": "generateParticle_801947D4",
+  "n": 1336,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "generator.c",
+   "psCamera"
+  ]
+ },
+ {
+  "fn": "fn_800AA8D4",
+  "xd_name": "PADTypeAndStatusCallback",
+  "n": 203,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "A",
+   "B"
+  ]
+ },
+ {
+  "fn": "fn_800CF764",
+  "xd_name": "CompleteTransfer",
+  "n": 191,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "<< Dolphin SDK - SI\\trelease build: Sep "
+  ]
+ },
+ {
+  "fn": "fn_800A4D28",
+  "xd_name": "DVDConvertPathToEntrynum",
+  "n": 189,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "DVDConvertEntrynumToPath(possibly DVDOpe",
+   "dvdfs.c"
+  ]
+ },
+ {
+  "fn": "fn_801402AC",
+  "xd_name": "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl",
+  "n": 183,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "Failed to create Patchiru texture\\n"
+  ]
+ },
+ {
+  "fn": "fn_80173F98",
+  "xd_name": "psExecGenerator",
+  "n": 173,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "jobj.h",
+   "jobj"
+  ]
+ },
+ {
+  "fn": "fn_80172D00",
+  "xd_name": "setVelToJObj",
+  "n": 170,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "jobj.h",
+   "jobj"
+  ]
+ },
+ {
+  "fn": "fn_800D00B0",
+  "xd_name": "__SITransfer",
+  "n": 131,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "<< Dolphin SDK - SI\\trelease build: Sep "
+  ]
+ },
+ {
+  "fn": "fn_80190C90",
+  "xd_name": "GSflagInitBitPos",
+  "n": 105,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "ERROR[GSflagSet]:Initialization has not "
+  ]
+ },
+ {
+  "fn": "fn_8016A17C",
+  "xd_name": "psInitDataBank",
+  "n": 85,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "object.h"
+  ]
+ },
+ {
+  "fn": "fn_80167BE8",
+  "xd_name": "_gsdvdErrorTask_801879AC",
+  "n": 82,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "[GSDVD_ERROR_STATE_COVEROPEN_WAIT]  stat"
+  ]
+ },
+ {
+  "fn": "fn_80172BBC",
+  "xd_name": "applyForceJObj",
+  "n": 81,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "jobj.h",
+   "jobj"
+  ]
+ },
+ {
+  "fn": "fn_80195794",
+  "xd_name": "HSD_CObjGetEyeDistance",
+  "n": 65,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "cobj->eyepos",
+   "cobj->interest"
+  ]
+ },
+ {
+  "fn": "fn_80169800",
+  "xd_name": "psSetPointJObj",
+  "n": 62,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "object.h"
+  ]
+ },
+ {
+  "fn": "fn_80173624",
+  "xd_name": "psSetBillboardCamera",
+  "n": 61,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "object.h",
+   "HSD_OBJ(o)->ref_count != HSD_OBJ_NOREF"
+  ]
+ },
+ {
+  "fn": "fn_80168CD0",
+  "xd_name": "_psListDelete",
+  "n": 55,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "pslist.c"
+  ]
+ },
+ {
+  "fn": "fn_801B37A0",
+  "xd_name": "HSD_StateAssignTev",
+  "n": 55,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "tev.c",
+   "0"
+  ]
+ },
+ {
+  "fn": "fn_801B38C0",
+  "xd_name": "HSD_StateRegisterTexGen",
+  "n": 54,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "tev.c",
+   "0"
+  ]
+ },
+ {
+  "fn": "fn_8016972C",
+  "xd_name": "psSetPointJObjNodup",
+  "n": 53,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "object.h"
+  ]
+ },
+ {
+  "fn": "fn_801B3338",
+  "xd_name": "HSD_Index2TevStage",
+  "n": 52,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "tev.c",
+   "0"
+  ]
+ },
+ {
+  "fn": "fn_800A501C",
+  "xd_name": "DVDOpen",
+  "n": 50,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "Warning: DVDOpen(): file '%s' was not fo"
+  ]
+ },
+ {
+  "fn": "fn_800BEF44",
+  "xd_name": "TRKGetFreeBuffer",
+  "n": 50,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "ERROR : No buffer available\\n"
+  ]
+ },
+ {
+  "fn": "fn_80175E88",
+  "xd_name": "genPosUpdate",
+  "n": 47,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "jobj.h",
+   "jobj"
+  ]
+ },
+ {
+  "fn": "fn_801BBF28",
+  "xd_name": "HSD_Index2TexMtx",
+  "n": 47,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "texmtx index exceed hardware limit (%d).",
+   "tobj.c"
+  ]
+ },
+ {
+  "fn": "fn_800C1558",
+  "xd_name": "TRKTargetStepOutOfRange",
+  "n": 46,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "TargetDoStep()\\n"
+  ]
+ },
+ {
+  "fn": "fn_800C1610",
+  "xd_name": "TRKTargetSingleStep",
+  "n": 43,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "TargetDoStep()\\n"
+  ]
+ },
+ {
+  "fn": "fn_800C0504",
+  "xd_name": "OutputData",
+  "n": 42,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "%02x ",
+   "\\n"
+  ]
+ },
+ {
+  "fn": "fn_80196E10",
+  "xd_name": "__assert",
+  "n": 41,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "%s in %s on line %d.\\n",
+   "assertion \\\"%s\\\" failed"
+  ]
+ },
+ {
+  "fn": "fn_801BF098",
+  "xd_name": "HSD_Index2PosNrmMtx",
+  "n": 40,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "util.c",
+   "0"
+  ]
+ },
+ {
+  "fn": "fn_80102428",
+  "xd_name": "menuCloseSync",
+  "n": 38,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "menuCloseSync"
+  ]
+ },
+ {
+  "fn": "fn_80196D78",
+  "xd_name": "HSD_Panic",
+  "n": 38,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "%s in %s on line %d.\\n"
+  ]
+ },
+ {
+  "fn": "fn_800A56F0",
+  "xd_name": "stateReadingFST",
+  "n": 37,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "DVDChangeDisk(): FST in the new disc is ",
+   "dvd.c"
+  ]
+ },
+ {
+  "fn": "fn_8019C8F4",
+  "xd_name": "_HSD_MemAllocDefaultCB",
+  "n": 33,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "initialize.c",
+   "addr"
+  ]
+ },
+ {
+  "fn": "fn_801A6F78",
+  "xd_name": "MObjSetupTev",
+  "n": 30,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "mobj->tevdesc",
+   "mobj.c"
+  ]
+ },
+ {
+  "fn": "fn_80261444",
+  "xd_name": "charNameBiosGetHearFlag",
+  "n": 28,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "charNameBiosGetPtr"
+  ]
+ },
+ {
+  "fn": "fn_80168C64",
+  "xd_name": "_psListGetFirst",
+  "n": 27,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "pslist.c"
+  ]
+ },
+ {
+  "fn": "fn_80115E04",
+  "xd_name": "floorEventChangeTresure",
+  "n": 26,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "floorEventChangeTresure"
+  ]
+ },
+ {
+  "fn": "fn_800DF8CC",
+  "xd_name": "_GSmaterialObjInit_800EF33C",
+  "n": 25,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "GSmaterial MObj"
+  ]
+ },
+ {
+  "fn": "fn_800EE08C",
+  "xd_name": "_modelGetEndFrame",
+  "n": 23,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "aobj.h",
+   "aobj"
+  ]
+ },
+ {
+  "fn": "fn_800EA60C",
+  "xd_name": "HSD_JObjMtxIsDirty",
+  "n": 22,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "jobj.h",
+   "jobj"
+  ]
+ },
+ {
+  "fn": "fn_8019C89C",
+  "xd_name": "_HSD_MemFreeDefaultCB",
+  "n": 22,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "initialize.c"
+  ]
+ },
+ {
+  "fn": "fn_801BBD84",
+  "xd_name": "HSD_ImageDescAlloc",
+  "n": 22,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "tobj.c",
+   "idesc"
+  ]
+ },
+ {
+  "fn": "fn_8025DBD4",
+  "xd_name": "tableResBiosGetResPtr",
+  "n": 22,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "tableResBiosGetResPtr"
+  ]
+ },
+ {
+  "fn": "fn_801A0B9C",
+  "xd_name": "HSD_JObjRef",
+  "n": 21,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "object.h"
+  ]
+ },
+ {
+  "fn": "fn_800A2C74",
+  "xd_name": "__DBExceptionDestinationAux",
+  "n": 18,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "DBExceptionDestination\\n"
+  ]
+ },
+ {
+  "fn": "fn_8019C854",
+  "xd_name": "_HSD_MemGetRemainDefaultCB",
+  "n": 18,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "initialize.c"
+  ]
+ },
+ {
+  "fn": "fn_801AA568",
+  "xd_name": "ObjInfoInit_802596A4",
+  "n": 17,
+  "confidence": "HIGH",
+  "shared_strings": [
+   "sysdolphin_base_library",
+   "hsd_obj"
+  ]
+ },
+ {
+  "fn": "fn_801E9B98",
+  "xd_name": "__THPDecompressiMCURowNxN",
+  "n": 1707,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E810C",
+  "xd_name": "__THPDecompressiMCURow640x480",
+  "n": 1699,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E6684",
+  "xd_name": "__THPDecompressiMCURow512x448",
+  "n": 1698,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ACBFC",
+  "xd_name": "__ARChecksize",
+  "n": 1533,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C5A58",
+  "xd_name": "__two_exp_800DCCB8",
+  "n": 1505,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CC754",
+  "xd_name": "__kernel_rem_pio2",
+  "n": 917,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B089C",
+  "xd_name": "__CARDUnlock",
+  "n": 726,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014788C",
+  "xd_name": "seqCrossFade",
+  "n": 726,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016CE2C",
+  "xd_name": "psDispSubAppSRT",
+  "n": 669,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CBA90",
+  "xd_name": "__ieee754_pow",
+  "n": 524,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014B044",
+  "xd_name": "LowPrecisionHandler",
+  "n": 465,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016BA18",
+  "xd_name": "psDispSub",
+  "n": 462,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80150564",
+  "xd_name": "sndStreamDeactivate",
+  "n": 453,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015D7D0",
+  "xd_name": "salCalcVolume",
+  "n": 444,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016EC1C",
+  "xd_name": "psSetupTev",
+  "n": 438,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014F838",
+  "xd_name": "sndStreamFree",
+  "n": 437,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801EBCC0",
+  "xd_name": "__THPHuffDecodeDCTCompU",
+  "n": 426,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801EC368",
+  "xd_name": "__THPHuffDecodeDCTCompV",
+  "n": 426,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801EB644",
+  "xd_name": "__THPHuffDecodeDCTCompY",
+  "n": 415,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B3B68",
+  "xd_name": "__CARDFormatRegionAsync",
+  "n": 406,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014FF0C",
+  "xd_name": "sndStreamActivate",
+  "n": 406,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B29F4",
+  "xd_name": "CARDCheckExAsync",
+  "n": 356,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D000",
+  "xd_name": "synthInit",
+  "n": 349,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C984",
+  "xd_name": "synthVolume",
+  "n": 332,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C0A4",
+  "xd_name": "synthHandle",
+  "n": 324,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C1FB0",
+  "xd_name": "TRKTargetAccessFP",
+  "n": 323,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164520",
+  "xd_name": "ReverbHICreate",
+  "n": 323,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164DD0",
+  "xd_name": "HandleReverb",
+  "n": 323,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801431AC",
+  "xd_name": "itemParamGetRecoverType",
+  "n": 316,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A8B34",
+  "xd_name": "VIInit",
+  "n": 300,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80161134",
+  "xd_name": "_GetInputValue",
+  "n": 296,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80149204",
+  "xd_name": "HandleTrackEvents",
+  "n": 295,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DA880",
+  "xd_name": "_dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720",
+  "n": 272,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C1A08",
+  "xd_name": "TRKTargetAccessExtended2",
+  "n": 270,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE9FC",
+  "xd_name": "__DSPHandler",
+  "n": 265,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016E3F8",
+  "xd_name": "setupTevReg",
+  "n": 263,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009C860",
+  "xd_name": "ScreenReport",
+  "n": 247,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A5CC",
+  "xd_name": "StartLayer",
+  "n": 240,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E5A28",
+  "xd_name": "__THPReadQuantizationTable",
+  "n": 239,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C56A4",
+  "xd_name": "__num2dec_internal",
+  "n": 237,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015A484",
+  "xd_name": "salInitDspCtrl",
+  "n": 237,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CC2C0",
+  "xd_name": "__ieee754_rem_pio2",
+  "n": 232,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A9CD4",
+  "xd_name": "VIConfigurePan",
+  "n": 229,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A2D0",
+  "xd_name": "psInitDataBankLocate",
+  "n": 221,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009E414",
+  "xd_name": "__OSDispatchInterrupt",
+  "n": 209,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80053110",
+  "xd_name": "dbgMenuFightWazaEditSub",
+  "n": 207,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CB4D8",
+  "xd_name": "__ieee754_fmod",
+  "n": 207,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010F71C",
+  "xd_name": "GScolsy2UtilChkInTri",
+  "n": 206,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168934",
+  "xd_name": "particleSort",
+  "n": 204,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B1464",
+  "xd_name": "DoneCallback",
+  "n": 201,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801732A0",
+  "xd_name": "modifyDirGenBase",
+  "n": 199,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80007364",
+  "xd_name": "_dbgMenuFightFightPokemonSelectSub",
+  "n": 190,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80172FA8",
+  "xd_name": "modifyDir",
+  "n": 190,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801525E4",
+  "xd_name": "mcmdWait",
+  "n": 188,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80012FB0",
+  "xd_name": "menuPanelCursorDecimalInput",
+  "n": 187,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009EA6C",
+  "xd_name": "Link",
+  "n": 184,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BFBEC",
+  "xd_name": "TRKDoReadRegisters",
+  "n": 184,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009E02C",
+  "xd_name": "SetInterruptMask",
+  "n": 182,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A9038",
+  "xd_name": "setFbbRegs",
+  "n": 181,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80160BDC",
+  "xd_name": "inpGetMidiCtrl",
+  "n": 177,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162A58",
+  "xd_name": "hwSetVolume",
+  "n": 176,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169B40",
+  "xd_name": "psGenerateParticle0",
+  "n": 174,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80142EF8",
+  "xd_name": "itemParamConvertOrigFormat",
+  "n": 173,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80147168",
+  "xd_name": "seqStop",
+  "n": 172,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C2748",
+  "xd_name": "TRKValidMemory32",
+  "n": 169,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A32C",
+  "xd_name": "do_voice_portamento",
+  "n": 168,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158088",
+  "xd_name": "synthInitAllocationAids",
+  "n": 168,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A03B4",
+  "xd_name": "OSGetResetButtonState",
+  "n": 166,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A4454",
+  "xd_name": "DVDLowRead",
+  "n": 166,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEFBC",
+  "xd_name": "DBGEXIImm",
+  "n": 166,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C5154",
+  "xd_name": "deallocate_from_var_pools",
+  "n": 165,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CB024",
+  "xd_name": "__ieee754_atan2",
+  "n": 164,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A1F94",
+  "xd_name": "OSResumeThread",
+  "n": 162,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B2220",
+  "xd_name": "VerifyID",
+  "n": 161,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B26E4",
+  "xd_name": "VerifyFAT",
+  "n": 161,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80151E88",
+  "xd_name": "dataRemoveMacro",
+  "n": 161,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7880",
+  "xd_name": "DVDCancelAsync",
+  "n": 159,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CB814",
+  "xd_name": "__ieee754_log",
+  "n": 159,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80146EEC",
+  "xd_name": "seqPause",
+  "n": 159,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801535F8",
+  "xd_name": "mcmdSetPitchADSR",
+  "n": 159,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C71DC",
+  "xd_name": "__timesdec",
+  "n": 158,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016E814",
+  "xd_name": "setupChanReg",
+  "n": 157,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C7C64",
+  "xd_name": "_fseek",
+  "n": 156,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158D2C",
+  "xd_name": "salChangeADSRState",
+  "n": 155,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE7DC",
+  "xd_name": "DBWrite",
+  "n": 152,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A98C",
+  "xd_name": "StartKeymap",
+  "n": 151,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80175B94",
+  "xd_name": "psRemoveGenerator",
+  "n": 151,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80153274",
+  "xd_name": "mcmdSetADSR",
+  "n": 150,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015AFF8",
+  "xd_name": "SortVoices",
+  "n": 150,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80157818",
+  "xd_name": "voiceSetPriority",
+  "n": 147,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E632C",
+  "xd_name": "__THPPrepBitStream",
+  "n": 147,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010DEF0",
+  "xd_name": "getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec",
+  "n": 146,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80150FE4",
+  "xd_name": "dataInsertLayer",
+  "n": 146,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0108",
+  "xd_name": "TRKDoReadMemory",
+  "n": 145,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015544C",
+  "xd_name": "mcmdSendMessage",
+  "n": 145,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E5548",
+  "xd_name": "THPVideoDecode",
+  "n": 145,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B24A4",
+  "xd_name": "VerifyDir",
+  "n": 144,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BFECC",
+  "xd_name": "TRKDoWriteMemory",
+  "n": 143,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CABB0",
+  "xd_name": "__ieee754_acos",
+  "n": 143,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169104",
+  "xd_name": "psSetGeneratorAngleRadiusScale",
+  "n": 143,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B98DC",
+  "xd_name": "GXGetYScaleFactor",
+  "n": 142,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CADEC",
+  "xd_name": "__ieee754_asin",
+  "n": 142,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015863C",
+  "xd_name": "voiceKill",
+  "n": 141,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8013613C",
+  "xd_name": "_koukaOneExec__FUlPvPvPl",
+  "n": 139,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CB2B4",
+  "xd_name": "__ieee754_exp",
+  "n": 137,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE378",
+  "xd_name": "__ieee754_sqrt",
+  "n": 137,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169DF8",
+  "xd_name": "psRemoveParticle",
+  "n": 137,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4774",
+  "xd_name": "CARDCreateAsync",
+  "n": 136,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF68C",
+  "xd_name": "TRKDoStep",
+  "n": 136,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0AA0",
+  "xd_name": "TRKSuppAccessFile",
+  "n": 136,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801550E0",
+  "xd_name": "mcmdVarCalculation",
+  "n": 136,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80131CE8",
+  "xd_name": "_msgctrlSideName__FP15FightOutPokemonUc",
+  "n": 135,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CD85C",
+  "xd_name": "atan",
+  "n": 134,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801483E4",
+  "xd_name": "GenerateNextTrackEvent",
+  "n": 134,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158424",
+  "xd_name": "voiceUnblock",
+  "n": 134,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CD648",
+  "xd_name": "__kernel_tan",
+  "n": 133,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164A2C",
+  "xd_name": "ReverbHIModify",
+  "n": 133,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159A38",
+  "xd_name": "vsSampleUpdates",
+  "n": 132,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2998",
+  "xd_name": "OSTicksToCalendarTime",
+  "n": 129,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80142CF4",
+  "xd_name": "itemGetStatus",
+  "n": 129,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801513F0",
+  "xd_name": "dataInsertCurve",
+  "n": 129,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EBEEC",
+  "xd_name": "_modelSetRotateEulerToQuatAll__FP9_HSD_JObj",
+  "n": 127,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801601A0",
+  "xd_name": "salInvertMatrix",
+  "n": 127,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5338",
+  "xd_name": "UpdateIconOffsets",
+  "n": 126,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80150C78",
+  "xd_name": "dataInsertKeymap",
+  "n": 124,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8024FE80",
+  "xd_name": "fightTrainerAiGetFightPokemonIrekaeDasuTokuseiAddsubDataId",
+  "n": 124,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C2EAC",
+  "xd_name": "TRK__write_aram",
+  "n": 123,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A19CC",
+  "xd_name": "OSCreateThread",
+  "n": 122,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC72C",
+  "xd_name": "__AI_SRC_INIT",
+  "n": 121,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80161E8C",
+  "xd_name": "inpSetExCtrl",
+  "n": 121,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C08C0",
+  "xd_name": "TRKRequestSend",
+  "n": 120,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010CE04",
+  "xd_name": "_offsetCCD__FP12CCD_FILEHEAD",
+  "n": 120,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E5DE4",
+  "xd_name": "__THPReadHuffmanTableSpecification",
+  "n": 120,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801632B4",
+  "xd_name": "aramUploadData",
+  "n": 119,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135530",
+  "xd_name": "gamedataAttestCheckValid",
+  "n": 118,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009EFE4",
+  "xd_name": "OSUnlink",
+  "n": 117,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80179A18",
+  "xd_name": "cameraSetFloorDefault",
+  "n": 117,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801476C0",
+  "xd_name": "seqVolume",
+  "n": 115,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDE88",
+  "xd_name": "ldexp",
+  "n": 113,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015122C",
+  "xd_name": "dataRemoveLayer",
+  "n": 113,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80157EC4",
+  "xd_name": "voiceFree",
+  "n": 113,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A1528",
+  "xd_name": "SetEffectivePriority",
+  "n": 112,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EEC38",
+  "xd_name": "GSscratchAlloc",
+  "n": 112,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C7A3C",
+  "xd_name": "fclose",
+  "n": 111,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E611C",
+  "xd_name": "__THPHuffGenerateDecoderTables",
+  "n": 111,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4994",
+  "xd_name": "__CARDSeek",
+  "n": 110,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801624A8",
+  "xd_name": "hwInitSamplePlayback",
+  "n": 109,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B2070",
+  "xd_name": "__CARDCheckSum",
+  "n": 108,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DC390",
+  "xd_name": "GSgfxBeginBackFBCapture",
+  "n": 108,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801626AC",
+  "xd_name": "hwSetADSR",
+  "n": 107,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8017572C",
+  "xd_name": "psKillAllGenerator",
+  "n": 107,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C6EE4",
+  "xd_name": "fadeFluidEvaluate",
+  "n": 107,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801443CC",
+  "xd_name": "hpRecover__FP20ITEMUSE2POKEMON_LOG1PsP7PokemonUcbUsP12FightPokemon",
+  "n": 106,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A094",
+  "xd_name": "seqInit",
+  "n": 106,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA4D4",
+  "xd_name": "UpdateOrigin",
+  "n": 105,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C5500",
+  "xd_name": "__num2dec",
+  "n": 105,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A930C",
+  "xd_name": "setVerticalRegs",
+  "n": 104,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AEE20",
+  "xd_name": "__DSP_exec_task",
+  "n": 104,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B373C",
+  "xd_name": "CARDMountAsync",
+  "n": 104,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801530D4",
+  "xd_name": "DoSetPitch",
+  "n": 104,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A27FC",
+  "xd_name": "GetDates",
+  "n": 103,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80153D4C",
+  "xd_name": "mcmdRandomKey",
+  "n": 103,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159278",
+  "xd_name": "adsrHandle",
+  "n": 102,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5CFC",
+  "xd_name": "__GXShutdown_800C6260",
+  "n": 100,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA1B4",
+  "xd_name": "GXInitLightSpot",
+  "n": 100,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DA6F0",
+  "xd_name": "_dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590",
+  "n": 100,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3458",
+  "xd_name": "C_MTXLookAt",
+  "n": 99,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AEFC0",
+  "xd_name": "__DSP_boot_task",
+  "n": 99,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802575C8",
+  "xd_name": "fightTrainerAiWazaHit109",
+  "n": 98,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F9EE4",
+  "xd_name": "GScharCmp",
+  "n": 96,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B3078",
+  "xd_name": "CARDProbeEx",
+  "n": 95,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BB3C4",
+  "xd_name": "__GXSetSUTexRegs",
+  "n": 95,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80152F58",
+  "xd_name": "mcmdVibrato",
+  "n": 95,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802126C4",
+  "xd_name": "fightSeqGetItemType",
+  "n": 95,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DA578",
+  "xd_name": "GSgfxParseDisplayList",
+  "n": 94,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80175A1C",
+  "xd_name": "psKillGenerator",
+  "n": 94,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009D6AC",
+  "xd_name": "Decode",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3D3C",
+  "xd_name": "C_QUATSlerp",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AB614",
+  "xd_name": "SPEC0_MakeStatus",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AB788",
+  "xd_name": "SPEC1_MakeStatus",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B565C",
+  "xd_name": "CARDSetStatusAsync",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD16C",
+  "xd_name": "GXProject",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CF254",
+  "xd_name": "__EXIProbe",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80149090",
+  "xd_name": "InitTrackEvents",
+  "n": 93,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A221C",
+  "xd_name": "OSSuspendThread",
+  "n": 92,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4E50",
+  "xd_name": "WriteCallback",
+  "n": 92,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C1E40",
+  "xd_name": "TRKTargetAccessExtended1",
+  "n": 92,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801353C0",
+  "xd_name": "gamedataAttestCreate",
+  "n": 92,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80010128",
+  "xd_name": "_menuFightIsUse__FP16MENU_WAZA_STATUSUs",
+  "n": 91,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC440",
+  "xd_name": "AIInit",
+  "n": 91,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B0528",
+  "xd_name": "bitrev",
+  "n": 91,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B897C",
+  "xd_name": "__GXAbort",
+  "n": 91,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CA620",
+  "xd_name": "qsort",
+  "n": 91,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800626CC",
+  "xd_name": "_menuCBBattleStartDispTrainerTexCallBack__FlPvl",
+  "n": 90,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159110",
+  "xd_name": "adsrRelease",
+  "n": 90,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80154F14",
+  "xd_name": "mcmdPortamento",
+  "n": 89,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A5108",
+  "xd_name": "entryToPath",
+  "n": 88,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014E854",
+  "xd_name": "GetPrivateIndex",
+  "n": 88,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A01C",
+  "xd_name": "psInitParticle",
+  "n": 88,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE630",
+  "xd_name": "ARQPostRequest",
+  "n": 87,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA7C0",
+  "xd_name": "GXGetTexBufferSize",
+  "n": 87,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4FFC",
+  "xd_name": "deallocate_from_fixed_pools",
+  "n": 86,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014DAA8",
+  "xd_name": "sndSetAuxProcessingCallbacks",
+  "n": 86,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015D678",
+  "xd_name": "salHandleAuxProcessing",
+  "n": 86,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801529A4",
+  "xd_name": "mcmdLoop",
+  "n": 85,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016221C",
+  "xd_name": "snd_handle_irq",
+  "n": 85,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B0388",
+  "xd_name": "CARDFreeBlocks",
+  "n": 84,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EEDF8",
+  "xd_name": "GSscratchInit",
+  "n": 84,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014BE84",
+  "xd_name": "synthAddJob",
+  "n": 84,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158FC0",
+  "xd_name": "adsrStartRelease",
+  "n": 84,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015A950",
+  "xd_name": "salActivateStudio",
+  "n": 84,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80008244",
+  "xd_name": "_dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub",
+  "n": 83,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C25FC",
+  "xd_name": "TRKTargetAccessMemory",
+  "n": 83,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D0DF8",
+  "xd_name": "SIDecodeType",
+  "n": 83,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F9D24",
+  "xd_name": "GScharLenCpy",
+  "n": 83,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80155300",
+  "xd_name": "mcmdIfVarCompare",
+  "n": 83,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDCB4",
+  "xd_name": "floor",
+  "n": 82,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B0694",
+  "xd_name": "ReadArrayUnlock",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B3A24",
+  "xd_name": "FormatCallback",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDA74",
+  "xd_name": "ceil",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158A70",
+  "xd_name": "voiceInitLastStarted",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801758D8",
+  "xd_name": "psKillGeneratorID",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C6274",
+  "xd_name": "_fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802587C0",
+  "xd_name": "fightTrainerAiWazaHit082",
+  "n": 81,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E9B2C",
+  "xd_name": "GSmodelPopState",
+  "n": 80,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80258284",
+  "xd_name": "fightTrainerAiWazaHit090",
+  "n": 80,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF1FC",
+  "xd_name": "TRKTestForPacket",
+  "n": 79,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D0CBC",
+  "xd_name": "SIGetTypeAsync",
+  "n": 79,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80153C10",
+  "xd_name": "mcmdFadeIn",
+  "n": 79,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E57D0",
+  "xd_name": "__THPReadFrameHeader",
+  "n": 79,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B3604",
+  "xd_name": "__CARDMountCallback",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4928",
+  "xd_name": "__div2i",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C7904",
+  "xd_name": "fflush",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801034DC",
+  "xd_name": "_menuGetAgbKeyInfo__FlPUs",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F34EC",
+  "xd_name": "_fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirstSub__FPvUsPv",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F3678",
+  "xd_name": "_fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv",
+  "n": 78,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AFD90",
+  "xd_name": "__CARDReadSegment",
+  "n": 77,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C3098",
+  "xd_name": "TRK__read_aram",
+  "n": 77,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135708",
+  "xd_name": "gamedataAttestInit",
+  "n": 77,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135D10",
+  "xd_name": "statusSetStatus",
+  "n": 77,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801539AC",
+  "xd_name": "mcmdScaleVolume",
+  "n": 77,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA068",
+  "xd_name": "VIFlush",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4644",
+  "xd_name": "CreateCallbackFat",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4B4C",
+  "xd_name": "ReadCallback",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014ED10",
+  "xd_name": "streamOutputModeChanged",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80153AE0",
+  "xd_name": "mcmdEnvelope",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016F300",
+  "xd_name": "psSetupTevCommon",
+  "n": 76,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009C1B4",
+  "xd_name": "OSFillFPUContext",
+  "n": 75,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C3218",
+  "xd_name": "__TRK_copy_vectors",
+  "n": 75,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C974C",
+  "xd_name": "round_decimal",
+  "n": 75,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801534CC",
+  "xd_name": "mcmdSetADSRFromCtrl",
+  "n": 75,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802397B8",
+  "xd_name": "fightTrainerAiGetValueAryMaxBanme",
+  "n": 75,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8008C5D4",
+  "xd_name": "gbaPokemonConditonFromGC",
+  "n": 74,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CA7FC",
+  "xd_name": "strcmp",
+  "n": 74,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E07E4",
+  "xd_name": "GSbezierCalculateVector",
+  "n": 74,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A0D10",
+  "xd_name": "__OSReadROM",
+  "n": 73,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B7C18",
+  "xd_name": "__GXCalculateVLim",
+  "n": 73,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801609C8",
+  "xd_name": "inpSetMidiCtrl14",
+  "n": 73,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257CD4",
+  "xd_name": "fightTrainerAiWazaHit100",
+  "n": 73,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F888",
+  "xd_name": "TypeAndStatusCallback",
+  "n": 73,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80130770",
+  "xd_name": "heroPokemonGetPikachu",
+  "n": 72,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802585D4",
+  "xd_name": "fightTrainerAiWazaHit086",
+  "n": 72,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7CCC",
+  "xd_name": "__DVDPrepareResetAsync",
+  "n": 71,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C07A4",
+  "xd_name": "HandleOpenFileSupportRequest",
+  "n": 71,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E590C",
+  "xd_name": "__THPReadScaneHeader",
+  "n": 71,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A06AC",
+  "xd_name": "WriteSram",
+  "n": 70,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF35C",
+  "xd_name": "__CARDExiHandler",
+  "n": 70,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B1BAC",
+  "xd_name": "__CARDAllocBlock",
+  "n": 70,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C6D78",
+  "xd_name": "fadeFluidSetShock",
+  "n": 70,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5070",
+  "xd_name": "CARDWriteAsync",
+  "n": 69,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135E44",
+  "xd_name": "statusGetStatus",
+  "n": 69,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80160FA8",
+  "xd_name": "inpFXCopyCtrl",
+  "n": 69,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001E074",
+  "xd_name": "menuSubOpenYesNo",
+  "n": 68,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A42C4",
+  "xd_name": "Read",
+  "n": 68,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AFACC",
+  "xd_name": "UnlockedCallback",
+  "n": 68,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5228",
+  "xd_name": "CARDDeleteAsync",
+  "n": 68,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C05AC",
+  "xd_name": "HandlePositionFileSupportRequest",
+  "n": 68,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4B44",
+  "xd_name": "__mod2i",
+  "n": 67,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168F28",
+  "xd_name": "_psLinkInit",
+  "n": 67,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E6578",
+  "xd_name": "__THPDecompressYUV",
+  "n": 67,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802554EC",
+  "xd_name": "fightTrainerAiWazaHit168",
+  "n": 67,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C3F44",
+  "xd_name": "CircleBufferReadBytes",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C404C",
+  "xd_name": "CircleBufferWriteBytes",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801474FC",
+  "xd_name": "seqContinue",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156A30",
+  "xd_name": "macSetPedalState",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156BDC",
+  "xd_name": "macMakeActive",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025BB20",
+  "xd_name": "fightTrainerAiWazaHit007",
+  "n": 66,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2478",
+  "xd_name": "OSWakeupThread",
+  "n": 65,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EEB34",
+  "xd_name": "GSscratchFree",
+  "n": 65,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801347E8",
+  "xd_name": "pcboxGetPokemonBoxNbEmptySlot",
+  "n": 65,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F1B14",
+  "xd_name": "_fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv",
+  "n": 65,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE3F0",
+  "xd_name": "__ARQServiceQueueLo",
+  "n": 64,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B760C",
+  "xd_name": "__GXCleanGPFifo",
+  "n": 64,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025A770",
+  "xd_name": "fightTrainerAiWazaHit038",
+  "n": 64,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009CC3C",
+  "xd_name": "ConfigureVideo",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEAB4",
+  "xd_name": "TRKAppendBuffer_ui32",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEC18",
+  "xd_name": "TRKAppendBuffer1_ui64",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE04C",
+  "xd_name": "modf",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DD174",
+  "xd_name": "GSlightSetupLights",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FA064",
+  "xd_name": "GSmsgAdjustAlign",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010F5A4",
+  "xd_name": "GScolsys2UtilGetCpLinePoint",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8013583C",
+  "xd_name": "gamedataSetStatus",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156CE4",
+  "xd_name": "macMakeInactive",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80161D90",
+  "xd_name": "inpGetExCtrl",
+  "n": 63,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2EB4",
+  "xd_name": "PSMTXInverse",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7BD4",
+  "xd_name": "DVDCheckDisk",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A8178",
+  "xd_name": "DVDCompareDiskID",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DC298",
+  "xd_name": "GSgfxEndBackFBCapture",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135938",
+  "xd_name": "gamedataGetStatus",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163DE8",
+  "xd_name": "aramFreeStreamBuffer",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169A48",
+  "xd_name": "psGenerateParticleID0",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A9B4",
+  "xd_name": "psAddGeneratorAppSRT",
+  "n": 62,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800280FC",
+  "xd_name": "menuNameEntryCtrl",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C24BC",
+  "xd_name": "TRKTargetAccessDefault",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CC660",
+  "xd_name": "__kernel_cos",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CFF08",
+  "xd_name": "SIUnregisterPollingHandler",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FC2A8",
+  "xd_name": "GSmsgFontClose",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015AAC0",
+  "xd_name": "salCheckVolErrorAndResetDelta",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801729EC",
+  "xd_name": "psApplyOffsetLocalRotation",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257FC8",
+  "xd_name": "fightTrainerAiWazaHit095",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025BA2C",
+  "xd_name": "fightTrainerAiWazaHit008",
+  "n": 61,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC990",
+  "xd_name": "ARStartDMA",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BE844",
+  "xd_name": "TRKReadBuffer_ui32",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010DE00",
+  "xd_name": "GScolsys2WalkGetLayer",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156940",
+  "xd_name": "macSetExternalKeyoff",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80160AEC",
+  "xd_name": "inpResetMidiCtrl",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E5FC4",
+  "xd_name": "__THPHuffGenerateSizeTable",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80253FDC",
+  "xd_name": "fightTrainerAiWazaHit203",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80255000",
+  "xd_name": "fightTrainerAiWazaHit177",
+  "n": 60,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A238C",
+  "xd_name": "OSSleepThread",
+  "n": 59,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010F4B8",
+  "xd_name": "GScolsys2UtilGetCpPlaneLine",
+  "n": 59,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D9BC",
+  "xd_name": "sndOutputMode",
+  "n": 59,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801698F8",
+  "xd_name": "psKillAllParticle",
+  "n": 59,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BE9CC",
+  "xd_name": "TRKReadBuffer1_ui64",
+  "n": 58,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C06BC",
+  "xd_name": "HandleCloseFileSupportRequest",
+  "n": 58,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8710",
+  "xd_name": "printf",
+  "n": 58,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801309A0",
+  "xd_name": "heroPokemonGetPrasle",
+  "n": 58,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A1BB4",
+  "xd_name": "OSExitThread",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C7ED4",
+  "xd_name": "ftell",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE5A4",
+  "xd_name": "sqrtf",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80147418",
+  "xd_name": "seqSpeed",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801524E0",
+  "xd_name": "dataInit",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158BF0",
+  "xd_name": "sndGetPitch",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025498C",
+  "xd_name": "fightTrainerAiWazaHit189",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257EE4",
+  "xd_name": "fightTrainerAiWazaHit097",
+  "n": 57,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8005DEE8",
+  "xd_name": "menuDbgItemCreate",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A5EE0",
+  "xd_name": "stateCheckID_800B5D94",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC210",
+  "xd_name": "AISetDSPSampleRate",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BE47C",
+  "xd_name": "TRKPostEvent",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8520",
+  "xd_name": "sprintf",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80157280",
+  "xd_name": "vidInit",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015A870",
+  "xd_name": "salExitDspCtrl",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801652DC",
+  "xd_name": "ReverbHICallback",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F76B8",
+  "xd_name": "fightSideGetStatus",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025AED8",
+  "xd_name": "fightTrainerAiWazaHit028",
+  "n": 56,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80006FAC",
+  "xd_name": "dbmMenuFightButtonNormal",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80013668",
+  "xd_name": "menuPanelCtrlLvUp",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A720C",
+  "xd_name": "DVDReadAbsAsyncPrio",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CED58",
+  "xd_name": "DBGWrite",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEE34",
+  "xd_name": "DBGRead",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80155710",
+  "xd_name": "mcmdSetKeyGroup",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168DAC",
+  "xd_name": "_psListNew",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169520",
+  "xd_name": "psKillGeneratorChild",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A79C",
+  "xd_name": "psChangeGeneratorAppSRT",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80172AE0",
+  "xd_name": "psApplyVelocityLocalRotation",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CB2B8",
+  "xd_name": "scriptIsMoveButtonPush",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F70C",
+  "xd_name": "__GBAHandler",
+  "n": 55,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA7FC",
+  "xd_name": "PADProbeCallback",
+  "n": 54,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC128",
+  "xd_name": "AISetStreamPlayState",
+  "n": 54,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF284",
+  "xd_name": "__CARDExtHandler",
+  "n": 54,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE148",
+  "xd_name": "sin",
+  "n": 54,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80152C84",
+  "xd_name": "mcmdAddKey",
+  "n": 54,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC304",
+  "xd_name": "__AI_set_stream_sample_rate",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDBE0",
+  "xd_name": "cos",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D04D0",
+  "xd_name": "SIGetResponseRaw",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012BDE0",
+  "xd_name": "heroMoveAddStepCallback",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801695FC",
+  "xd_name": "psKillFamily",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801908D4",
+  "xd_name": "GSflagClear",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025FF9C",
+  "xd_name": "memoDataSet",
+  "n": 53,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3910",
+  "xd_name": "C_MTXPerspective",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A73B4",
+  "xd_name": "DVDReadAbsAsyncForBS",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA344",
+  "xd_name": "GXInitLightDistAttn",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CAAE0",
+  "xd_name": "__write_console",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801528D4",
+  "xd_name": "mcmdGosub",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169034",
+  "xd_name": "psSetParticleVisibility",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025813C",
+  "xd_name": "fightTrainerAiWazaHit092",
+  "n": 52,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000C3D4",
+  "xd_name": "dbgMenuMsgTest",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001D994",
+  "xd_name": "menuSubGetPokemonSexForFightDisp",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B40C",
+  "xd_name": "__LCEnable",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2D98",
+  "xd_name": "PSMTXConcat",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3678",
+  "xd_name": "C_MTXLightPerspective",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A72E8",
+  "xd_name": "DVDSeekAbsAsyncPrio",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE4F4",
+  "xd_name": "__ARQInterruptServiceRoutine",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B2FAC",
+  "xd_name": "IsCard",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4CC0",
+  "xd_name": "__cvt_dbl_usll",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8174",
+  "xd_name": "memmove",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CFE3C",
+  "xd_name": "SIRegisterPollingHandler",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80255B4C",
+  "xd_name": "fightTrainerAiWazaHit161",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257B54",
+  "xd_name": "fightTrainerAiWazaHit102",
+  "n": 51,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000CB74",
+  "xd_name": "dbgMenuMenuTestD2Present",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000CD50",
+  "xd_name": "testEvolution__Fv",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2FAC",
+  "xd_name": "PSMTXInvXpose",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA91C",
+  "xd_name": "__GetImageTileCount",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FDF1C",
+  "xd_name": "_msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80109290",
+  "xd_name": "winSpriteAdd",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163FFC",
+  "xd_name": "salInitAi",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168570",
+  "xd_name": "GSfilterCreate",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80254810",
+  "xd_name": "fightTrainerAiWazaHit191",
+  "n": 50,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80073034",
+  "xd_name": "_AGB_EntryGetStatus__FlPUl",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A5268",
+  "xd_name": "DVDGetCurrentDir",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA678",
+  "xd_name": "PADOriginCallback",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ACA80",
+  "xd_name": "ARInit",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE7E0",
+  "xd_name": "DSPInit",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B07D8",
+  "xd_name": "DummyLen",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B1FAC",
+  "xd_name": "__CARDUpdateDir",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5AE0",
+  "xd_name": "CARDGetSerialNo",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C123C",
+  "xd_name": "TRKTargetAccessARAM",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D05A4",
+  "xd_name": "SIGetResponse",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80134164",
+  "xd_name": "_dbgMenuGetLink__Fl",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80136078",
+  "xd_name": "koukaExec",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158870",
+  "xd_name": "voiceKillSound",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163BE4",
+  "xd_name": "InitStreamBuffers",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A878",
+  "xd_name": "psChangeParticleAppSRT",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A85F0",
+  "xd_name": "HSD_MtxScaledAdd",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F1C98",
+  "xd_name": "_fightFloorGetFightTrainerFightOutPokemonPtrArySub__FPvUsPv",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F648",
+  "xd_name": "GBAWrite",
+  "n": 49,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000D05C",
+  "xd_name": "dbgMenuMenuTestNameEntryMenu",
+  "n": 48,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF5A0",
+  "xd_name": "__CARDEnableInterrupt",
+  "n": 48,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C82EC",
+  "xd_name": "__copy_longs_unaligned",
+  "n": 48,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80253E68",
+  "xd_name": "fightTrainerAiWazaHit205",
+  "n": 48,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80011700",
+  "xd_name": "menuFightCloseWaza",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7558",
+  "xd_name": "DVDCancelStreamAsync",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8454",
+  "xd_name": "__copy_longs_aligned",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80129D64",
+  "xd_name": "heroIsMinePokemon",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801349DC",
+  "xd_name": "pcboxSetPokemonBoxName",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80147604",
+  "xd_name": "seqMute",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159494",
+  "xd_name": "vsInit",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80172930",
+  "xd_name": "psCopyGeneratorData",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80176B48",
+  "xd_name": "cameraWaitSyncAnime",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801D1E50",
+  "xd_name": "mailGetReceiveNumber",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802586FC",
+  "xd_name": "fightTrainerAiWazaHit084",
+  "n": 47,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B023C",
+  "xd_name": "__CARDGetControlBlock",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0DA8",
+  "xd_name": "TRK_fill_mem_800D6430",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CA968",
+  "xd_name": "strcpy",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DF550",
+  "xd_name": "GSmaterialSetFlags",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E0D24",
+  "xd_name": "GSmathInitCosTable",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012BAF0",
+  "xd_name": "heroMoveSetEventList",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A644",
+  "xd_name": "psRemoveGeneratorAppSRT",
+  "n": 46,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001D834",
+  "xd_name": "menuSubCalcColor",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A5918",
+  "xd_name": "CategorizeError",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD58C",
+  "xd_name": "GXLoadTexMtxImm",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CF3C8",
+  "xd_name": "EXIProbeEx",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011BA0C",
+  "xd_name": "wazaGetWazaTypeIdName",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80160088",
+  "xd_name": "salNormalizeVector",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C70FC",
+  "xd_name": "fadeFluidQuit",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80200A5C",
+  "xd_name": "fightOutPokemonCheckNoAttackFlag",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025253C",
+  "xd_name": "fightTrainerAiWazaDamage104",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025C6BC",
+  "xd_name": "_fightTrainerAiCheckHorobinoutaSub",
+  "n": 45,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A30E4",
+  "xd_name": "PSMTXRotTrig",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3194",
+  "xd_name": "__PSMTXRotAxisRadInternal",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4FC0",
+  "xd_name": "EraseCallback",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF8AC",
+  "xd_name": "TRKDoContinue",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80113778",
+  "xd_name": "floorChangePos",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80115CB4",
+  "xd_name": "floorEventGetTresureList",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801766A8",
+  "xd_name": "cameraSetFov",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80199654",
+  "xd_name": "HSD_DObjAddAnimAll",
+  "n": 44,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80011CF0",
+  "xd_name": "menuFightStatusStartAnimHP",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80053064",
+  "xd_name": "dbgMenuFightTrainerDataStatusInputDigit",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B55C",
+  "xd_name": "LCStoreData",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A115C",
+  "xd_name": "OSSetWirelessID",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7AFC",
+  "xd_name": "DVDCancel",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC628",
+  "xd_name": "__AIDHandler",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF750",
+  "xd_name": "__CARDClearStatus",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B00C0",
+  "xd_name": "CARDInit",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B1D60",
+  "xd_name": "__CARDUpdateFatBlock",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B3978",
+  "xd_name": "CARDUnmount",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8240",
+  "xd_name": "__copy_longs_rev_unaligned",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8013528C",
+  "xd_name": "gamedataCreate",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156894",
+  "xd_name": "macSampleEndNotify",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015AC70",
+  "xd_name": "DoDepopFade",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015FFDC",
+  "xd_name": "salApplyMatrix",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F1460",
+  "xd_name": "fightActionInit",
+  "n": 43,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF474",
+  "xd_name": "__CARDTxHandler",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF53C",
+  "xd_name": "TRKDoSetOption",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF5E4",
+  "xd_name": "TRKDoStop",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C83AC",
+  "xd_name": "__copy_longs_rev_aligned",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DCCF0",
+  "xd_name": "GSlightSetType",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159798",
+  "xd_name": "vsSampleEndNotify",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163EE0",
+  "xd_name": "salCallback",
+  "n": 42,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000BB48",
+  "xd_name": "dbgMenuHeroPokemonAdd",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A33B4",
+  "xd_name": "PSMTXQuat",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A47AC",
+  "xd_name": "DVDLowReadDiskID",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF7FC",
+  "xd_name": "TimeoutHandler",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5184",
+  "xd_name": "DeleteCallback",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEDA0",
+  "xd_name": "TRKAppendBuffer",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80156B38",
+  "xd_name": "TimeQueueAdd",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162118",
+  "xd_name": "sndBSearch",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F1F7C",
+  "xd_name": "_fightFloorCheckHuuinWazaFightOutPokemonSub__FPvUsPv",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802567B8",
+  "xd_name": "fightTrainerAiWazaHit135",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F350",
+  "xd_name": "GBAInit",
+  "n": 41,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8005DC24",
+  "xd_name": "dbgMenuFieldCameraChangeDisp",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF14C",
+  "xd_name": "__DSP_insert_task",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CD5A8",
+  "xd_name": "__kernel_sin",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80109894",
+  "xd_name": "menuModelSetMotion",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010FA54",
+  "xd_name": "GScolsy2UtilGetCpPlanePoint",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80115D64",
+  "xd_name": "floorEventSetTresureDisp",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015D44C",
+  "xd_name": "salActivateVoice",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163214",
+  "xd_name": "aramQueueCallback",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168E88",
+  "xd_name": "_psListClear",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016A6FC",
+  "xd_name": "psRemoveParticleAppSRT",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016AAF4",
+  "xd_name": "psInitAppSRT",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ECA10",
+  "xd_name": "THPInit",
+  "n": 40,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80014A48",
+  "xd_name": "menuPocket2NumCtrl",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3874",
+  "xd_name": "C_MTXFrustum",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A4968",
+  "xd_name": "DVDLowInquiry",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A4B28",
+  "xd_name": "DVDLowAudioBufferConfig",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B1CC4",
+  "xd_name": "__CARDFreeBlock",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B38DC",
+  "xd_name": "DoUnmount",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEAC8",
+  "xd_name": "DBQueryData",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D03C8",
+  "xd_name": "SIEnablePolling",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D1860",
+  "xd_name": "GSlightSetAnimFrame",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EEA98",
+  "xd_name": "GSscratchStore",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F00C0",
+  "xd_name": "threadLoadFPRRegisters",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F01F0",
+  "xd_name": "threadSaveFPRRegisters",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80152444",
+  "xd_name": "dataGetFX",
+  "n": 39,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A39E0",
+  "xd_name": "C_MTXOrtho",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A4A04",
+  "xd_name": "DVDLowAudioStream",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA398",
+  "xd_name": "VIGetCurrentLine",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B8D10",
+  "xd_name": "GXSetDrawDone",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BE934",
+  "xd_name": "TRKReadBuffer_ui8",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0CD8",
+  "xd_name": "TRKDoNotifyStopped",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CFDA4",
+  "xd_name": "SIEnablePollingInterrupt",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80134EF0",
+  "xd_name": "getPokemon__5PCBOXFScSc",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80160F10",
+  "xd_name": "inpAddCtrl",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80175DF0",
+  "xd_name": "psInitGenerator",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80196CE0",
+  "xd_name": "HSD_SaveContext",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8019B490",
+  "xd_name": "HSD_FObjStopAnimAll",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A6370",
+  "xd_name": "HSD_LObjReqAnimAll",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020BBFC",
+  "xd_name": "fightActionFlowAllFightOutPokemonDoFightAction",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802181D8",
+  "xd_name": "_fightSeqWsHorobinoutaSub__FPvUsPv",
+  "n": 38,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A35E4",
+  "xd_name": "C_MTXLightFrustum",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A46EC",
+  "xd_name": "DVDLowSeek",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF1EC",
+  "xd_name": "__DSP_remove_task",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F015C",
+  "xd_name": "threadSaveGPRRegisters",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80133B50",
+  "xd_name": "_dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D928",
+  "xd_name": "sndMasterVolume",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020156C",
+  "xd_name": "fightOutPokemonGetAllAbiCnt",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F584",
+  "xd_name": "GBARead",
+  "n": 37,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A263C",
+  "xd_name": "OSSetIdleFunction",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F0030",
+  "xd_name": "threadLoadGPRRegisters",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162EB8",
+  "xd_name": "hwFlushStream",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B8FB8",
+  "xd_name": "HSD_TExpSimplify",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ECF14",
+  "xd_name": "__THPAudioGetNewSample",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80212840",
+  "xd_name": "fightSeqSpecificationActionCounterInit",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025DC2C",
+  "xd_name": "waitTime__Ff",
+  "n": 36,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3CB0",
+  "xd_name": "C_QUATRotAxisRad",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A4A9C",
+  "xd_name": "DVDLowRequestAudioStatus",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A8270",
+  "xd_name": "ShowMessage",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B2968",
+  "xd_name": "__CARDVerify",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4DC4",
+  "xd_name": "CARDCancel",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BC114",
+  "xd_name": "GXSetTevOp",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BED14",
+  "xd_name": "TRKReadBuffer",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C1740",
+  "xd_name": "TRKTargetAddStopInfo",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDDFC",
+  "xd_name": "frexp",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEA3C",
+  "xd_name": "DBRead",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D0668",
+  "xd_name": "AlarmHandler",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DCA10",
+  "xd_name": "GSlightPushState",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FE714",
+  "xd_name": "GSgappTerminate",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014DE94",
+  "xd_name": "SetHWMix",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015211C",
+  "xd_name": "dataGetMacro",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016208C",
+  "xd_name": "sndSin",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A6408",
+  "xd_name": "HSD_LObjAnimAll",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257838",
+  "xd_name": "fightTrainerAiWazaHit107",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025A870",
+  "xd_name": "fightTrainerAiWazaHit037",
+  "n": 35,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3744",
+  "xd_name": "C_MTXLightOrtho",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC070",
+  "xd_name": "AIInitDMA",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B937C",
+  "xd_name": "__GXSendFlushPrim",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF33C",
+  "xd_name": "usr_puts_serial",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EE758",
+  "xd_name": "GSpartGetMaterialCount",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80111B9C",
+  "xd_name": "GScolsys2CheckGetEventID",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C8FC",
+  "xd_name": "synthSendKeyOff",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167408",
+  "xd_name": "_sndSetVolumeWork",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8019C128",
+  "xd_name": "HSD_IDGetDataFromTable",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802073C0",
+  "xd_name": "fightOutPokemonInitAbiCntAll",
+  "n": 34,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A10D8",
+  "xd_name": "OSGetWirelessID",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AF51C",
+  "xd_name": "__CARDUnlockedHandler",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD898",
+  "xd_name": "__GXSetMatrixIndex",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C16BC",
+  "xd_name": "TRKTargetAddExceptionInfo",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C39BC",
+  "xd_name": "__close_console",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D20CC",
+  "xd_name": "GScameraSetPerspective",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8013275C",
+  "xd_name": "msgctrlKeyEnd",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C878",
+  "xd_name": "synthFXCloneMidiSetup",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80159410",
+  "xd_name": "adsrHandleLowPrecision",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167508",
+  "xd_name": "_sndStopBGM",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80210234",
+  "xd_name": "fightWazaWzxVariationFuncRenzokugiri",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802134D4",
+  "xd_name": "_fightSeqTurnCheckSubFightOutPokemon__FPvUsPv",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025CCE0",
+  "xd_name": "_fightTrainerAiSawaguCheckSub",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025FF18",
+  "xd_name": "memoDataSetMemoFlag",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80261B68",
+  "xd_name": "fightMenuAllFightTrainerCloseStatusMenu",
+  "n": 33,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A0E34",
+  "xd_name": "OSGetSoundMode",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A43D4",
+  "xd_name": "SeekTwiceBeforeRead",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B8DF4",
+  "xd_name": "GXDrawDone",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DF3F0",
+  "xd_name": "GSmaterialGetFlags",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80155690",
+  "xd_name": "mcmdGetVID",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167298",
+  "xd_name": "_sndSetSampleDataUploadCallbackFunction",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167AF0",
+  "xd_name": "_sndInitParms",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80199178",
+  "xd_name": "HSD_DObjCountVertices",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801995D4",
+  "xd_name": "HSD_DObjReqAnimAllByFlags",
+  "n": 32,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80023274",
+  "xd_name": "cbForgetWazaSelect__FP7PokemonUsl",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA204",
+  "xd_name": "VISetBlack",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC5AC",
+  "xd_name": "__AISHandler",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA44C",
+  "xd_name": "GXLoadLightObjImm",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D02BC",
+  "xd_name": "SIGetStatus",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801070F4",
+  "xd_name": "winSeqCheckMove",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801523B8",
+  "xd_name": "dataGetLayer",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257544",
+  "xd_name": "fightTrainerAiWazaHit112",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80261E7C",
+  "xd_name": "fightMenuAllFightOutPokemonCloseStatusMenu",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802621F4",
+  "xd_name": "fightMenuSubMenuLvupStatus",
+  "n": 31,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000C4A0",
+  "xd_name": "dbgMenuMsgCheck",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800370E0",
+  "xd_name": "_menuSoundReadWaveThread__FPv",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ACB54",
+  "xd_name": "__ARHandler",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C040C",
+  "xd_name": "TRKDoDisconnect",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C8600",
+  "xd_name": "vsprintf",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE220",
+  "xd_name": "tan",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEBB8",
+  "xd_name": "DBInitComm",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D3E4C",
+  "xd_name": "_gfxScratchNotify__F15GSscratchNotifyPvUc",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80116F68",
+  "xd_name": "floorCharacterBiosGetRot",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80129384",
+  "xd_name": "heroDecPokecoupon",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801293FC",
+  "xd_name": "heroAddPokecoupon",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80129840",
+  "xd_name": "heroCheckSetMonohiroiAllTemotiPokemon",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80132454",
+  "xd_name": "msgctrlWait",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A2B4",
+  "xd_name": "synthInitPortamento",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016292C",
+  "xd_name": "hwSetPitch",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167490",
+  "xd_name": "_sndStopSE",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ED310",
+  "xd_name": "sodateyaInit",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F0058",
+  "xd_name": "fightTargetIsHostSide",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F8424",
+  "xd_name": "fightTrainerIsAllyFightTargetPtr",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8021A2C0",
+  "xd_name": "fightSeqMonomaneNGCheck",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80250B44",
+  "xd_name": "fightTrainerAiWazaDamage203",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80256A68",
+  "xd_name": "fightTrainerAiWazaHit128",
+  "n": 30,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000CE5C",
+  "xd_name": "dbgMenuMenuTestWazaMenu",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001BD80",
+  "xd_name": "menuPokemonOpenFight",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ABCF4",
+  "xd_name": "PADSetAnalogMode",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F9E70",
+  "xd_name": "GScharCpy",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FA3D0",
+  "xd_name": "GSmsgIsCheck",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FC1D0",
+  "xd_name": "GSmsgClose",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012A130",
+  "xd_name": "heroCheckValid",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158934",
+  "xd_name": "voiceIsLastStarted",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801589FC",
+  "xd_name": "voiceResetLastStarted",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015ABFC",
+  "xd_name": "sal_update_hostplayinfo",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164238",
+  "xd_name": "salCtrlDsp",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C40F0",
+  "xd_name": "fadeCheck",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C41C8",
+  "xd_name": "fadeSet",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80255C18",
+  "xd_name": "fightTrainerAiWazaHit160",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F9AC",
+  "xd_name": "__GBATransfer",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80262270",
+  "xd_name": "fightMenuWazaWasure",
+  "n": 29,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80007708",
+  "xd_name": "dbgMenuFightFightTrainerAiDataEdit",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000CEF8",
+  "xd_name": "dbgMenuMenuTestPokemonMenu",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009F958",
+  "xd_name": "__OSUnlockAllMutex",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A0F58",
+  "xd_name": "OSGetProgressiveMode",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A82FC",
+  "xd_name": "DVDSetAutoFatalMessaging",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE5C0",
+  "xd_name": "ARQInit",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AE93C",
+  "xd_name": "DSPAddTask",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B13F4",
+  "xd_name": "InitCallback",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B7180",
+  "xd_name": "GXInitFifoPtrs",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD0FC",
+  "xd_name": "GXCallDisplayList",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4F34",
+  "xd_name": "free",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C53E8",
+  "xd_name": "__flush_all",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CF47C",
+  "xd_name": "InitializeUART",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80161D20",
+  "xd_name": "inpTranslateExCtrl",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8018D928",
+  "xd_name": "peopleSearchID",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80199A88",
+  "xd_name": "HSD_FObjInterpretAnimAll",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C4904",
+  "xd_name": "fadeEffectHookFunction_yoko_or_tate_or_ball_Init",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801D1F0C",
+  "xd_name": "mailGetMailIDInMailbox",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80219FE4",
+  "xd_name": "fightSeqCheckYubiwohuruWazaDataId",
+  "n": 28,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80008390",
+  "xd_name": "_dbgMenuFightGetFightTrainerPokemonPartDataIdSub",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001DA60",
+  "xd_name": "menuSubGetPokemonSexForDisp",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8006B154",
+  "xd_name": "menuCBBios_ControlerIDtoPortID",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A106C",
+  "xd_name": "OSGetLanguage",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA198",
+  "xd_name": "VISetNextFrameBuffer",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C87F8",
+  "xd_name": "__StringWrite",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D0464",
+  "xd_name": "SIDisablePolling",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DF384",
+  "xd_name": "GSmaterialEnableExtension",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EC4D0",
+  "xd_name": "GSmodelGetFrameCount",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80194CF4",
+  "xd_name": "HSD_CObjGetInvViewingMtxPtrDirect",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801991F8",
+  "xd_name": "HSD_DObjResolveRefsAll",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80199568",
+  "xd_name": "HSD_DObjAnimAll",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C7090",
+  "xd_name": "fadeFluidCalcParms",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CAEA0",
+  "xd_name": "scriptGetPokemonNickName",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F3430",
+  "xd_name": "_fightFloorCheckFightOutPokemonPtrAryJoutaiDataIdSub__FPvUsPv",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020FC04",
+  "xd_name": "fightWazaWzxVariationFuncWeatherHP",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802400D8",
+  "xd_name": "fightTrainerAiWazaValueOomugaesi",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80258A64",
+  "xd_name": "fightTrainerAiWazaHit079",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F81C",
+  "xd_name": "__GBASync",
+  "n": 27,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800100C0",
+  "xd_name": "menuFightCtrlBall",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80075FEC",
+  "xd_name": "menuCBRule_CheckPokemonEventFlag",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A1484",
+  "xd_name": "UnsetRun",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA288",
+  "xd_name": "getCurrentFieldEvenOdd",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B4208",
+  "xd_name": "__CARDCompareFileName",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEBB0",
+  "xd_name": "TRKAppendBuffer_ui8",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E4014",
+  "xd_name": "GSmodelSetVisibility",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F028C",
+  "xd_name": "threadExecute",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80108518",
+  "xd_name": "winSetSequence",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801297D8",
+  "xd_name": "heroHizukiItemGetItemAryPtr",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801325C4",
+  "xd_name": "msgctrlFont",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80143E88",
+  "xd_name": "itemDataBiosGetHidenMachineNo",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014635C",
+  "xd_name": "seqGetPrivateId",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D6D8",
+  "xd_name": "sndSeqVolume",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80155078",
+  "xd_name": "varGet",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80157218",
+  "xd_name": "macInit",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CAA60",
+  "xd_name": "scriptAddItem",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801D04F4",
+  "xd_name": "memcardGetTaskResult",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E60B4",
+  "xd_name": "__THPHuffGenerateCodeTable",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80255AE4",
+  "xd_name": "fightTrainerAiWazaHit162",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80259A84",
+  "xd_name": "fightTrainerAiWazaHit057",
+  "n": 26,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800083FC",
+  "xd_name": "_dbgMenuFightGetWazaDataIdSub",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80076334",
+  "xd_name": "menuCBRule_CheckPokemonErrorAll",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B02F4",
+  "xd_name": "__CARDPutControlBlock",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEEB4",
+  "xd_name": "TRKReleaseBuffer",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0484",
+  "xd_name": "TRKDoConnect",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CE718",
+  "xd_name": "__fpclassifyf",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F0308",
+  "xd_name": "_threadSwitch",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FBF10",
+  "xd_name": "GSmsgDaemon",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80102254",
+  "xd_name": "menuSetDisp",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80102ED4",
+  "xd_name": "menuButtonNormal",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80131588",
+  "xd_name": "msgctrlSndWait",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80146E88",
+  "xd_name": "StartPause",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014BFD4",
+  "xd_name": "synthStartSynthJobHandling",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016013C",
+  "xd_name": "salCrossProduct",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163F98",
+  "xd_name": "dspResumeCallback",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801699E4",
+  "xd_name": "psGenerateParticle",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80176AE4",
+  "xd_name": "cameraStopAnime",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C4164",
+  "xd_name": "fadeSetEX",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F00D0",
+  "xd_name": "fightTargetGetRelativeHostSideFightTargetIdToTragetPtr",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8021C090",
+  "xd_name": "fightSeqCondChgActTypeToPokemonStatusId",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802564C8",
+  "xd_name": "fightTrainerAiWazaHit142",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025D5E0",
+  "xd_name": "toolentryTaisenSetEtnryPokemonOrderGBA",
+  "n": 25,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800066C4",
+  "xd_name": "dbgMenuCameraSetType",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000FDD8",
+  "xd_name": "menuFightCtrlSecretWazaTop",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A064C",
+  "xd_name": "WriteSramCallback",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7F80",
+  "xd_name": "__DVDDequeueWaitingQueue",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AB5B4",
+  "xd_name": "PADSetSpec",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ABEFC",
+  "xd_name": "SamplingHandler",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FC244",
+  "xd_name": "GSmsgOpen",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D75C",
+  "xd_name": "sndFXCtrl",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D8C8",
+  "xd_name": "sndVolume",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015D4EC",
+  "xd_name": "salDeactivateVoice",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167D60",
+  "xd_name": "_errorTask_State_None_80187B24",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801769E4",
+  "xd_name": "cameraSetAnimeRate",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E12A0",
+  "xd_name": "GSvtrRegisterGSgapp",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020BF40",
+  "xd_name": "_fightActionFlowFightTrainerSelectFightAction__FPvUsPv",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020EDBC",
+  "xd_name": "fightTrainerEnemyPokemonInitFightOutStatus",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8022FE20",
+  "xd_name": "fightSeqWazaOutBeforeCheckSub",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025CC30",
+  "xd_name": "_fightTrainerAiSimerikeCheckSub",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F524",
+  "xd_name": "ReadProc",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025FE84",
+  "xd_name": "memoDataGetPokemonID",
+  "n": 24,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000D234",
+  "xd_name": "dbgMenuWazaDebugStart",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3C54",
+  "xd_name": "PSQUATMultiply",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B8920",
+  "xd_name": "GXFlush",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C46B0",
+  "xd_name": "__cvt_fp2unsigned",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800D173C",
+  "xd_name": "GScameraStopAnimation",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E9E34",
+  "xd_name": "GSmodelParse",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EE22C",
+  "xd_name": "GSpartGetJObjIndex",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801141F8",
+  "xd_name": "EvlogSet__FScUl",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801629FC",
+  "xd_name": "hwSetITDMode",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162FB0",
+  "xd_name": "hwFrq2Pitch",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016442C",
+  "xd_name": "sndAuxCallbackReverbHI",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801696D0",
+  "xd_name": "psDeletePntJObjwithParticle",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801942C0",
+  "xd_name": "HSD_CObjGetOrtho",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8019905C",
+  "xd_name": "DObjRelease",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B4264",
+  "xd_name": "HSD_RenderInitAllocData",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C2A04",
+  "xd_name": "HSD_AObjInvokeCallBacks",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8021C034",
+  "xd_name": "fightSeqCondChgActParaIdToValue",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80220778",
+  "xd_name": "_WsWkcActSubJoutaiMigawari__FPvUsPv",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80251070",
+  "xd_name": "fightTrainerAiWazaDamage189",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802574AC",
+  "xd_name": "fightTrainerAiWazaHit114",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025D584",
+  "xd_name": "toolentryTaisenDeleteEtnryPokemonOrder",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802612D0",
+  "xd_name": "evolution",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8026132C",
+  "xd_name": "evolutionOpen",
+  "n": 23,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800084C0",
+  "xd_name": "_dbgMenuFightGetWazaTypeIdSub",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000FF50",
+  "xd_name": "menuFightCtrlSecretMain",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80071644",
+  "xd_name": "menuCB_InitMenu",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A335C",
+  "xd_name": "PSMTXScaleApply",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC6D4",
+  "xd_name": "__AICallbackStackSwitch",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C3344",
+  "xd_name": "TRKTargetTranslate",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4FA4",
+  "xd_name": "__pool_free",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010264C",
+  "xd_name": "menuOpen",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80116FE0",
+  "xd_name": "floorCharacterBiosGetPos",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80140138",
+  "xd_name": "Unload__13ModelSequenceFPUc",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D680",
+  "xd_name": "sndSeqMute",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158CD4",
+  "xd_name": "adsrConvertTimeCents",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015ECA8",
+  "xd_name": "sndAddEmitter",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801637B8",
+  "xd_name": "aramSetUploadCallback",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164488",
+  "xd_name": "sndAuxCallbackUpdateSettingsReverbHI",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169404",
+  "xd_name": "psSetOffsetRotationInLocal",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801728B0",
+  "xd_name": "U8ClampAdd",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C499C",
+  "xd_name": "fadeEffectHookFunction_yoko_or_tate_Init",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020BBA4",
+  "xd_name": "fightActionFlowOneTurnPost",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802152A8",
+  "xd_name": "fightSeqGetKetaguriIryoku",
+  "n": 22,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8007C26C",
+  "xd_name": "menuPokeCouponMain",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80088FA4",
+  "xd_name": "dbgMenuGBAAddCoupon",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A37CC",
+  "xd_name": "PSMTXMultVec",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3820",
+  "xd_name": "PSMTXMultVecSR",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3C00",
+  "xd_name": "PSVECDistance",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A8FE4",
+  "xd_name": "VIWaitForRetrace",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800ABF5C",
+  "xd_name": "PADSetSamplingCallback",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B45E8",
+  "xd_name": "CARDClose",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BAFFC",
+  "xd_name": "GXLoadTexObj",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BCDDC",
+  "xd_name": "GXSetBlendMode",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEB64",
+  "xd_name": "DBInitInterrupts",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DFE98",
+  "xd_name": "_matGSmatObjLoad",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80112380",
+  "xd_name": "floorCheckFightKind",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80131714",
+  "xd_name": "msgctrlAlign",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801327E0",
+  "xd_name": "msgctrlCR",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014CEB4",
+  "xd_name": "synthIsFadeOutActive",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801589A8",
+  "xd_name": "voiceSetLastStarted",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80166BE0",
+  "xd_name": "GSsndOpenWaveDVD",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167A9C",
+  "xd_name": "_sndSetReverbParm",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80168110",
+  "xd_name": "_info2work",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801915D4",
+  "xd_name": "WObjRelease",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C409C",
+  "xd_name": "fadeEffectDokuStart",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C6E90",
+  "xd_name": "_fadeFluidSetShockSub__FUlUlf",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E62D8",
+  "xd_name": "__THPRestartDefinition",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F2654",
+  "xd_name": "fightFloorGetValidFightOutPokemonCount",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F3624",
+  "xd_name": "fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataId",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020C108",
+  "xd_name": "_fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020E758",
+  "xd_name": "fightOutPokemonEnemyInit",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80252918",
+  "xd_name": "fightTrainerAiWazaDamage091",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F2FC",
+  "xd_name": "ShortCommandProc",
+  "n": 21,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001BCEC",
+  "xd_name": "menuPokemonOpenItemGive",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001D7E4",
+  "xd_name": "menuSubKeyWait",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8004BE40",
+  "xd_name": "pdaMailGetMailID",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8008ABE4",
+  "xd_name": "gbaCommandSetKeyState",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2E64",
+  "xd_name": "PSMTXTranspose",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7830",
+  "xd_name": "DVDResume",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B04D8",
+  "xd_name": "OnReset_800C0734",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD4B4",
+  "xd_name": "GXLoadPosMtxImm",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD504",
+  "xd_name": "GXLoadNrmMtxImm",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BF14C",
+  "xd_name": "TRKProcessInput",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4154",
+  "xd_name": "CircleBufferInitialize",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E0C04",
+  "xd_name": "_fadeEffectGetRandom__FUl",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EB414",
+  "xd_name": "_modelBoundPObj__FP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F0384",
+  "xd_name": "GSthreadUnblockGroup",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800F03D4",
+  "xd_name": "GSthreadBlockGroup",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010CC04",
+  "xd_name": "GScolsys2UnloadCCD",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80129474",
+  "xd_name": "heroDecPokedoru",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801294C4",
+  "xd_name": "heroAddPokedoru",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80133E1C",
+  "xd_name": "_dbgMenuGetMsgID__FP14tagWINDOW_WORKl",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801577C8",
+  "xd_name": "vidGetInternalId",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016265C",
+  "xd_name": "hwBreak",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801680C0",
+  "xd_name": "_AsyncCallback",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801966FC",
+  "xd_name": "HSD_CObjAnim",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C9D74",
+  "xd_name": "scriptLightStopMotion",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F349C",
+  "xd_name": "fightFloorGetFightOutPokemonPtrAryPokemonTokuseiDataIdFirst",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025CC90",
+  "xd_name": "fightTrainerAiCheckSawagu",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80265EC4",
+  "xd_name": "exribbonSetNo",
+  "n": 20,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000C358",
+  "xd_name": "dbgMenuMemcardLoad",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000F310",
+  "xd_name": "menuFightCtrlSecretPokemonTop",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80077C1C",
+  "xd_name": "menuCBRule_CheckValidItem",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800979EC",
+  "xd_name": "menuPokemonStatus",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A32E8",
+  "xd_name": "PSMTXTransApply",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A7728",
+  "xd_name": "DVDGetCommandBlockStatus",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C25B0",
+  "xd_name": "TRKTargetReadInstruction",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C80D0",
+  "xd_name": "memcmp",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DF504",
+  "xd_name": "GSmaterialResetFlags",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EE834",
+  "xd_name": "GSpartCreate",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801342B8",
+  "xd_name": "dbgMenuGetLink__Fl",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801642AC",
+  "xd_name": "salGetStartDelay",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80166C74",
+  "xd_name": "GSsndGetOutputMode",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80169390",
+  "xd_name": "psSetTornadoScaling",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801779EC",
+  "xd_name": "cameraGetActive",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801AD678",
+  "xd_name": "PObjUpdateFunc",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80204A10",
+  "xd_name": "fightOutPokemonIsGcHeroFightOutPokemon",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802118FC",
+  "xd_name": "_fightSeqInitSubFightOutPokemon__FPvUsPv",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80261388",
+  "xd_name": "charNameBiosSearchIndex",
+  "n": 19,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009FFC0",
+  "xd_name": "__OSDoHotReset",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B41C0",
+  "xd_name": "CARDFormatAsync",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BAC58",
+  "xd_name": "GXInitTexObjCI",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BB29C",
+  "xd_name": "GXInvalidateTexAll",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C3630",
+  "xd_name": "EnableEXI2Interrupts",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80104704",
+  "xd_name": "windowSearchID",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80113F6C",
+  "xd_name": "floorGetResource",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D600",
+  "xd_name": "sndSeqSpeed",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015ABB4",
+  "xd_name": "sal_setup_dspvol",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801615D4",
+  "xd_name": "inpGetVolume",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801621CC",
+  "xd_name": "sndConvertTicks",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8016AAAC",
+  "xd_name": "psRemoveAppSRT",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80191788",
+  "xd_name": "HSD_WObjSetPosition",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B1890",
+  "xd_name": "splArcLengthPoint",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F150C",
+  "xd_name": "fightFloorSetTuusinErrorFightResult",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F33E8",
+  "xd_name": "fightFloorCheckFightOutPokemonPtrAryJoutaiDataId",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80210610",
+  "xd_name": "fightWazaWzxVariationFuncTikyuunage",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8021B870",
+  "xd_name": "_fightSeqWsKuroikiriSub__FPvUsPv",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025C674",
+  "xd_name": "fightTrainerAiCheckHorobinouta",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025CBE8",
+  "xd_name": "fightTrainerAiCheckSimerike",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80265F4C",
+  "xd_name": "exribbonInit",
+  "n": 18,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000CE18",
+  "xd_name": "dbgMenuMenuTestEvolution",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001BD3C",
+  "xd_name": "menuPokemonOpenItemUse",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8001BDF4",
+  "xd_name": "menuPokemonOpen",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8006AC28",
+  "xd_name": "menuCBBios_InitTrainer",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3ADC",
+  "xd_name": "PSVECNormalize",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3B38",
+  "xd_name": "PSVECMag",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CA924",
+  "xd_name": "strncpy",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EC5B8",
+  "xd_name": "GSmodelSetBlendFactor",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EF504",
+  "xd_name": "GStextureUnlockImage",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801315EC",
+  "xd_name": "msgctrlSndPlay",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8013264C",
+  "xd_name": "msgctrlRubyStart",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A23C",
+  "xd_name": "synthSetBpm",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C038",
+  "xd_name": "synthForceLowPrecisionUpdate",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014F298",
+  "xd_name": "sndStreamAllocLength",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015D408",
+  "xd_name": "salSynthSendMessage",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80191E88",
+  "xd_name": "HSD_WObjRemoveAnim",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A6D5C",
+  "xd_name": "HSD_MObjAddTObjNext",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B009C",
+  "xd_name": "RObjUpdateFunc",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C47D0",
+  "xd_name": "fadeInit",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CA8B0",
+  "xd_name": "scriptAddPremium",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CB180",
+  "xd_name": "scriptIsTrigerPush",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801D23C0",
+  "xd_name": "mailMainReceiveTerminate",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801D2B08",
+  "xd_name": "mailMainInit",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801DE654",
+  "xd_name": "soundSetVolume",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E578C",
+  "xd_name": "__THPSetupBuffers",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802399FC",
+  "xd_name": "fightTrainerAiAddValue",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80255DB4",
+  "xd_name": "fightTrainerAiWazaHit156",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025D744",
+  "xd_name": "toolentryTaisenInitPokemonOrder",
+  "n": 17,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8008AB4C",
+  "xd_name": "gbaCommandSendWazaText",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B5BA4",
+  "xd_name": "CARDGetAttributes",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEE74",
+  "xd_name": "TRKResetBuffer",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CA7BC",
+  "xd_name": "strncmp",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEC30",
+  "xd_name": "DBGHandler",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010C77C",
+  "xd_name": "GScolsy2UtilGetSidePlanePoint",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80136368",
+  "xd_name": "tenkouDataBiosGetFightInitMsgId",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014D7BC",
+  "xd_name": "sndFXKeyOff",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801644E0",
+  "xd_name": "sndAuxCallbackPrepareReverbHI",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801694E0",
+  "xd_name": "psGetGeneratorChildMaxLife",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B3AA8",
+  "xd_name": "HSD_StateSetNumChans",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801B42C0",
+  "xd_name": "HSD_TExpFreeTevDesc",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C29C4",
+  "xd_name": "HSD_AObjReqAnim",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80218FDC",
+  "xd_name": "fightSeqRendouWazaCheck",
+  "n": 16,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000C2A0",
+  "xd_name": "dbgMenuGSvtrChangeDisp",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000C2DC",
+  "xd_name": "dbgMenuGSvtrChangeActive",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80011E68",
+  "xd_name": "menuFightStatusSetHP",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009ED70",
+  "xd_name": "OSLinkFixed",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009F3E0",
+  "xd_name": "OnReset_800AF628",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A14EC",
+  "xd_name": "__OSGetEffectivePriority",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A1990",
+  "xd_name": "OSYieldThread",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3B9C",
+  "xd_name": "PSVECCrossProduct",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AA498",
+  "xd_name": "VIGetDTVStatus",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800AC954",
+  "xd_name": "ARGetDMAStatus",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD008",
+  "xd_name": "GXSetDstAlpha",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0E70",
+  "xd_name": "TRK_ppc_memcpy",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CEC70",
+  "xd_name": "MWCallback",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CF728",
+  "xd_name": "SIIsChanBusy",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EA7E4",
+  "xd_name": "_modelParseJObjDisp__FP9_HSD_JObjP5GSmtx12HSD_TrspMaskbPFP9_HSD_PObjP5GSmtxP5GSmtxP5GSmtxPv_vPv_800FBD9C",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801046C8",
+  "xd_name": "windowSearchItemID",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80109220",
+  "xd_name": "winSpriteSetDisp",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801096AC",
+  "xd_name": "menuOffScreenFadeSet",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CA60",
+  "xd_name": "pokemonNakigoeDataBiosGetDataAddress",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135FBC",
+  "xd_name": "koukaDataBiosGetValue",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158BB4",
+  "xd_name": "sndPitchUpOne",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801610BC",
+  "xd_name": "inpSetMidiLastNote",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801610F8",
+  "xd_name": "inpGetMidiLastNote",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801628C8",
+  "xd_name": "hwStart",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8018F6F4",
+  "xd_name": "peopleInfoBiosGetPtr",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8019431C",
+  "xd_name": "HSD_CObjGetPerspective",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A1B40",
+  "xd_name": "HSD_JObjAnimAll",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801BE490",
+  "xd_name": "_HSD_TObjGetCurrentByType",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E0F78",
+  "xd_name": "etctoolSetPokemonNakigoe",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ECFA4",
+  "xd_name": "__THPAudioInitialize",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F32B0",
+  "xd_name": "fightFloorIsIrekaeFightOutPokemon",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8020ECA4",
+  "xd_name": "fightTrainerEnemyPokemonCheckValid",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80266320",
+  "xd_name": "d2presentOpen",
+  "n": 15,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8000D11C",
+  "xd_name": "dbgMenuWazaDebugStop",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8005D7F8",
+  "xd_name": "menuSeBiosGetPtr",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8008A9AC",
+  "xd_name": "gbaCommandEntryPokemon",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80093F2C",
+  "xd_name": "menuPokemonStatusCtrlRibbon",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B4D8",
+  "xd_name": "LCEnable",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A609C",
+  "xd_name": "stateCheckID2",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B0174",
+  "xd_name": "__CARDSetDiskID",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BA160",
+  "xd_name": "GXClearBoundingBox",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C0D70",
+  "xd_name": "TRK_flush_cache",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EE8F0",
+  "xd_name": "_partFindIndexCB__FP9_HSD_JObjPPvi",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80105C30",
+  "xd_name": "winMsgButton",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012A89C",
+  "xd_name": "heroBiosSetHizukiNamePtr",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012AA64",
+  "xd_name": "heroBiosSetNamePtr",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135F58",
+  "xd_name": "koukaLinkDataBiosGetKouka",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015A838",
+  "xd_name": "salInitHRTFBuffer",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80163DB0",
+  "xd_name": "aramGetStreamBufferAddress",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164328",
+  "xd_name": "hwEnableIrq",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164360",
+  "xd_name": "hwDisableIrq",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801694A8",
+  "xd_name": "psGetParticleChildCount",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801735EC",
+  "xd_name": "getFloat",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F650C",
+  "xd_name": "fightFloorBiosSetFightOutPokemonPtrAryPtr",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F6588",
+  "xd_name": "fightFloorBiosGetFightOutPokemonPtrAry",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80254F1C",
+  "xd_name": "fightTrainerAiWazaHit180",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80256AE0",
+  "xd_name": "fightTrainerAiWazaHit127",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80257EAC",
+  "xd_name": "fightTrainerAiWazaHit098",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80265F14",
+  "xd_name": "exribbonGetNo",
+  "n": 14,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8004BE0C",
+  "xd_name": "menuPdaOpen",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2D64",
+  "xd_name": "PSMTXCopy",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A32B4",
+  "xd_name": "PSMTXTrans",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A58BC",
+  "xd_name": "stateTimeout",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BCE88",
+  "xd_name": "GXSetZMode",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E09B4",
+  "xd_name": "GSlerpGetLinearInterpolationFloat",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80102038",
+  "xd_name": "menuReleaseOffScreen",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010925C",
+  "xd_name": "winSpriteRelease",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010CBD0",
+  "xd_name": "GScolsys2GetCurFloor",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011274C",
+  "xd_name": "floorCheckFade",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80117070",
+  "xd_name": "floorCharacterBiosGetPeopleInfoPtr",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8012F11C",
+  "xd_name": "heroMoveIsMember",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80143EF0",
+  "xd_name": "itemDataBiosGetWazaIDByWazaMachineNo",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014A280",
+  "xd_name": "synthGetTicksPerSecond",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014C5B4",
+  "xd_name": "synthFXGetMaxVoices",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014EC98",
+  "xd_name": "CheckOutputMode",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8015FFA0",
+  "xd_name": "sndQuit",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162428",
+  "xd_name": "hwExit",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801640E4",
+  "xd_name": "salExitAi",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ADC08",
+  "xd_name": "_HSD_RandForgetMemory",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C68D4",
+  "xd_name": "_fadeEffect_AdjustParms__Fv",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801ED2DC",
+  "xd_name": "sodateyaGetPokemonPtr",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80219804",
+  "xd_name": "fightSeqIsEncoreNgWazaDataId",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F7E8",
+  "xd_name": "__GBASyncCallback",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025FEE4",
+  "xd_name": "memoDataGetCount",
+  "n": 13,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8005DA18",
+  "xd_name": "menuDataBiosGetPtr",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80077E50",
+  "xd_name": "menuCBRule_ConstantRule",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80088FF8",
+  "xd_name": "dbgToolBattleDebugSetAGBConnectionMode",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B300",
+  "xd_name": "DCStoreRange",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A64D8",
+  "xd_name": "stateCoverClosed_CMD",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B0358",
+  "xd_name": "CARDGetResultCode",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BEE44",
+  "xd_name": "TRKSetBufferPosition",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E3BC0",
+  "xd_name": "GSmodelDestroyLinkedParticles",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EF548",
+  "xd_name": "GStextureLockImage",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FE35C",
+  "xd_name": "menuSubOpenYesNoField",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8010C74C",
+  "xd_name": "zokuseiGetWazaJoutai",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CAE0",
+  "xd_name": "pokemonFriendFilterDataBiosGetValue",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CE44",
+  "xd_name": "pokemonGrowDataBiosGetExp",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80143F24",
+  "xd_name": "itemDataBiosGetWazaMachineNo",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80164118",
+  "xd_name": "salAiGetDest",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167D30",
+  "xd_name": "_gsdvdError_MsgOpen",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801735BC",
+  "xd_name": "getTime",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80186254",
+  "xd_name": "peopleGazeHeroCheck",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80193A58",
+  "xd_name": "_hsdClassDestroy",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80194CC4",
+  "xd_name": "HSD_CObjGetViewingMtxPtr",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801C84FC",
+  "xd_name": "_fnDistanceSortFunc__FPCvPCv",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F6B18",
+  "xd_name": "fightFloorBiosGetJoutaiPtr",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8025F618",
+  "xd_name": "WriteProc",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802621C4",
+  "xd_name": "fightMenuOpenLevelUpStatusMenu",
+  "n": 12,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009AFD0",
+  "xd_name": "OSAllocFromArenaLo",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B35C",
+  "xd_name": "DCStoreRangeNoSync",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8009B388",
+  "xd_name": "DCZeroRange",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A2D38",
+  "xd_name": "PSMTXIdentity",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E064C",
+  "xd_name": "memcardMemAllocForSavedata",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E3534",
+  "xd_name": "_toolentryAlloc__FUl",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800EC53C",
+  "xd_name": "GSmodelGetAnimFrame",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800FDFE4",
+  "xd_name": "_msgGetLength__FPCUs",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80101A70",
+  "xd_name": "kaisuuBiosGetMax",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801091F4",
+  "xd_name": "winSpriteGetDisp",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80116E84",
+  "xd_name": "floorCharacterBiosSetPos",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CA34",
+  "xd_name": "wazaDataBiosGetPtr",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CBC8",
+  "xd_name": "pokemonSeikakuRateDataBiosGetPtr",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801316E8",
+  "xd_name": "msgctrlTalkSE",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80131768",
+  "xd_name": "msgctrlShadow",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135FF8",
+  "xd_name": "koukaDataBiosGetVar",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801642F8",
+  "xd_name": "hwInitIrq",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8018FD88",
+  "xd_name": "peopleBiosGetWorkPtr",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801A0BF0",
+  "xd_name": "HSD_IDGetData",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CAA34",
+  "xd_name": "scriptHaveItem",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CAAC8",
+  "xd_name": "scriptGetItem",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801E1274",
+  "xd_name": "GSvtrLoadTexture",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_802119D4",
+  "xd_name": "fightSeqPost",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80262308",
+  "xd_name": "fightMenuYesNo",
+  "n": 11,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80077BA8",
+  "xd_name": "menuCBRule_GetBattleTimeLimit",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80097FD0",
+  "xd_name": "menuKeyDiscMain",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800998B8",
+  "xd_name": "OSGetConsoleType",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3334",
+  "xd_name": "PSMTXScale",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800A3BD8",
+  "xd_name": "PSVECSquareDistance",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800B2F84",
+  "xd_name": "CARDCheckAsync",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800BD870",
+  "xd_name": "GXSetClipMode",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800C4C98",
+  "xd_name": "__shr2i",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800CDBB8",
+  "xd_name": "copysign",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800DF470",
+  "xd_name": "GSmaterialResetPEdescr",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_800E3C94",
+  "xd_name": "GSmodelSetBoundCheck",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80101A9C",
+  "xd_name": "kaisuuBiosGetMin",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8011CAB8",
+  "xd_name": "pokemonDpFilterDataBiosGetPtr",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80135CE8",
+  "xd_name": "gamedatasaveInit",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80136050",
+  "xd_name": "koukaDataBiosGetStatusKind",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80143E60",
+  "xd_name": "itemDataBiosGetKinomiNo",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8014CF08",
+  "xd_name": "synthSetMusicVolumeType",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80158F98",
+  "xd_name": "adsrSetup",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162904",
+  "xd_name": "hwKeyOff",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80162D44",
+  "xd_name": "hwSetAUXProcessingCallbacks",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801631CC",
+  "xd_name": "hwGetVirtualSampleID",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80167A44",
+  "xd_name": "_sndInitStack",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_80175F44",
+  "xd_name": "psGetNewIDNum",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8018F6CC",
+  "xd_name": "peopleInfoBiosGetPtrFromIndex",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_8019C7B8",
+  "xd_name": "_HSD_MemCheckOwnDefaultCB",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801CA8F4",
+  "xd_name": "scriptSetPremium",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801DB060",
+  "xd_name": "wazaSequenceSysGetResID",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ },
+ {
+  "fn": "fn_801F6560",
+  "xd_name": "fightFloorBiosSetFightOutPokemonPtrAry",
+  "n": 10,
+  "confidence": "MED",
+  "shared_strings": []
+ }
+]
