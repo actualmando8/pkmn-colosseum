@@ -4954,6 +4954,8 @@ static int g_rjtDepth;
 #define PCPORT_SKIN_MAX_SLOTS 32
 static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
+static int g_skinVtxPosN;
+static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                              const PCPortTranslatedPObj* tp, u32 rootJoint,
                              const PCPortTranslatedCamera* cam,
@@ -5005,17 +5007,19 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                 any = 1;
             }
         }
-        (void)influences;
         if (!any) {
             for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
             M[0][0] = M[1][1] = M[2][2] = 1.0f;
         }
-        }
         if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
+            u32 e = PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u);
+            u32 jb = ArchiveRangeValid(a, e, 0x8u)
+                       ? PCPort_ReadBigEndianU32(a->storage + e + 0u) : 0u;
             fprintf(stderr,
-                "[skinpal] slot %d entry=0x%X resolved=%d  M row0=(%.2f %.2f %.2f | %.2f)\n",
-                slot, (unsigned)PCPort_ReadBigEndianU32(a->storage + envOff + (u32)slot * 4u),
-                any, M[0][0], M[0][1], M[0][2], M[0][3]);
+                "[skinpal] slot %d entry=0x%X jobj=0x%X infl=%d resolved=%d "
+                "translate=(%.2f %.2f %.2f)\n",
+                slot, e, jb, influences, any, M[0][3], M[1][3], M[2][3]);
+        }
         }
     }
     if (slot == 0) {
@@ -5056,8 +5060,10 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     int dbgReplace = (getenv("PCPORT_SKIN_REPLACE") != NULL);
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
     int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
+    int dbgVtxPos  = (getenv("PCPORT_SKIN_VTXPOS") != NULL);
     memset(g_skinHist, 0, sizeof(g_skinHist));
     g_skinHistOob = 0;
+    g_skinVtxPosN = 0;
 
     /* The character meshes carry a dark albedo (navy coat, black boots) that the
      * GameCube lit at runtime; we don't yet drive GX dynamic lights for the skin
@@ -5147,6 +5153,28 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
             if (curSlot >= (u32)slot) { curSlot = 0u; ++g_skinHistOob; }
             if (curSlot < PCPORT_SKIN_MAX_SLOTS) ++g_skinHist[curSlot];
+            if (dbgVtxPos) {
+                f32 (*Mp)[4] = palette[curSlot];
+                f32 wx = Mp[0][0]*px+Mp[0][1]*py+Mp[0][2]*pz+Mp[0][3];
+                f32 wy = Mp[1][0]*px+Mp[1][1]*py+Mp[1][2]*pz+Mp[1][3];
+                f32 wz = Mp[2][0]*px+Mp[2][1]*py+Mp[2][2]*pz+Mp[2][3];
+                if (g_skinVtxPosN == 0) {
+                    g_locMin[0]=g_locMax[0]=px; g_locMin[1]=g_locMax[1]=py; g_locMin[2]=g_locMax[2]=pz;
+                    g_wMin[0]=g_wMax[0]=wx; g_wMin[1]=g_wMax[1]=wy; g_wMin[2]=g_wMax[2]=wz;
+                } else {
+                    if(px<g_locMin[0])g_locMin[0]=px; if(px>g_locMax[0])g_locMax[0]=px;
+                    if(py<g_locMin[1])g_locMin[1]=py; if(py>g_locMax[1])g_locMax[1]=py;
+                    if(pz<g_locMin[2])g_locMin[2]=pz; if(pz>g_locMax[2])g_locMax[2]=pz;
+                    if(wx<g_wMin[0])g_wMin[0]=wx; if(wx>g_wMax[0])g_wMax[0]=wx;
+                    if(wy<g_wMin[1])g_wMin[1]=wy; if(wy>g_wMax[1])g_wMax[1]=wy;
+                    if(wz<g_wMin[2])g_wMin[2]=wz; if(wz>g_wMax[2])g_wMax[2]=wz;
+                }
+                /* flag any vert whose LOCAL coords are large (model-space, not bone-local) */
+                if (px*px+py*py+pz*pz > 25.0f && g_skinVtxPosN < 9999)
+                    fprintf(stderr, "[vtxpos] BIG-LOCAL #%d slot=%u local=(%.1f,%.1f,%.1f) world=(%.1f,%.1f,%.1f)\n",
+                            g_skinVtxPosN, curSlot, px,py,pz, wx,wy,wz);
+                ++g_skinVtxPosN;
+            }
             {
                 /* Envelope verts are stored in MODEL (bind-pose) space. The true
                  * skinning matrix is palette[slot] = jointWorld * invBind, which
@@ -5177,6 +5205,12 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
         }
         GXEnd();
+    }
+    if (getenv("PCPORT_SKIN_VTXPOS") != NULL && g_skinVtxPosN > 0) {
+        fprintf(stderr, "[vtxpos] LOCAL bbox=[%.1f,%.1f,%.1f .. %.1f,%.1f,%.1f] "
+                "WORLD bbox=[%.1f,%.1f,%.1f .. %.1f,%.1f,%.1f] (n=%d)\n",
+                g_locMin[0],g_locMin[1],g_locMin[2], g_locMax[0],g_locMax[1],g_locMax[2],
+                g_wMin[0],g_wMin[1],g_wMin[2], g_wMax[0],g_wMax[1],g_wMax[2], g_skinVtxPosN);
     }
     if (getenv("PCPORT_SKIN_HIST") != NULL) {
         int s; u32 tot = 0;
