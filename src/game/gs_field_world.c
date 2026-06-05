@@ -27857,9 +27857,9 @@ asm void fn_8012A130(void) {
 #else
 u32 fn_8012A130(u8* ptr) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
-    extern s32 fn_800F9EE4(u32 val, u16* out);
+    extern s32 GScharCmp(u32 val, u16* out);
     u16 local = 0;
-    if (fn_800F9EE4(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
+    if (GScharCmp(fn_8012A5B0(ptr, 1, 0), &local) == 0) { return 0; }
     return fn_8012A5B0(ptr, 0xb, 0) != 2;
 }
 #endif
