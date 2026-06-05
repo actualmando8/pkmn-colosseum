@@ -8615,6 +8615,10 @@ typedef struct PCPortFieldMotionMap {
     int run;
 } PCPortFieldMotionMap;
 
+#define PCPORT_WES_IDLE_MOTION 1
+#define PCPORT_WES_WALK_MOTION 5
+#define PCPORT_WES_RUN_MOTION  8
+
 static int PCPort_ParseIntEnv(const char* name, int* outValue) {
     const char* e = getenv(name);
     if (e == NULL || e[0] == '\0' || outValue == NULL) {
@@ -8626,15 +8630,14 @@ static int PCPort_ParseIntEnv(const char* name, int* outValue) {
 
 /* Role-to-motion indirection. This is intentionally data-shaped: the field
  * action-table trace can populate the three roles when its struct offsets land.
- * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win; otherwise the
- * PC port derives a ken_b1 default from the real Resource+0x4 motion bank. */
+ * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win. The default
+ * Wes map below is checksum-confirmed from ken_b1's real cyclic clips. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
-    int explicitMap = 0;
-    map.idle = -1;
-    map.walk = -1;
-    map.run = -1;
+    map.idle = PCPORT_WES_IDLE_MOTION;
+    map.walk = PCPORT_WES_WALK_MOTION;
+    map.run = PCPORT_WES_RUN_MOTION;
 
     packed = getenv("PCPORT_FIELD_MOTION_MAP");
     if (packed != NULL && packed[0] != '\0') {
@@ -8643,25 +8646,14 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
             map.idle = a;
             map.walk = b;
             map.run = c;
-            explicitMap = 1;
         }
     }
-    if (PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle)) explicitMap = 1;
-    if (PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk)) explicitMap = 1;
-    if (PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run)) explicitMap = 1;
-    if (!explicitMap && getenv("PCPORT_FIELD_MOTION_AUTOMAP_DISABLE") == NULL) {
-        int idle = -1, walk = -1, run = -1;
-        if (PCPort_CharAnimSuggestLocomotionMap(
-                "orig/GC6E01/disc/files/field_common.fsys", "ken_b1",
-                &idle, &walk, &run)) {
-            map.idle = idle;
-            map.walk = walk;
-            map.run = run;
-            if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
-                printf("[field/motion] auto map idle=%d walk=%d run=%d\n",
-                       map.idle, map.walk, map.run);
-            }
-        }
+    PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle);
+    PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk);
+    PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
+    if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
+        printf("[field/motion] map idle=%d walk=%d run=%d\n",
+               map.idle, map.walk, map.run);
     }
     return map;
 }
