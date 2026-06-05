@@ -19306,13 +19306,13 @@ asm void fn_80129B2C(void) {
 }
 #else
 u32 fn_80129B2C(u8* ptr, u32 arg2) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u32 e);
     extern s32 fn_80142368(void* a, u16 b, u32 c, u32 d, u16 e);
     u16 local_a = 0;
     u16 local_8 = 0;
     void* result;
-    result = fn_80129BC8(ptr, (u8)fn_80142CF4(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
+    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_a, &local_8, 0, 0);
     if (result == NULL) { return 0; }
     return fn_80142368(result, local_a, arg2, 0, local_8) != 0;
 }
