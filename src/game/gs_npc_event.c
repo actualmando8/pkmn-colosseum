@@ -418,63 +418,9 @@ L_80031778:
         r3 = r31;
         r4 = 0x1;
         fn_80109220();
-        return;
-    }
-    r3 = r30;
-    fn_80123FBC();
-    tmp = r3 & 0xFF;
-    if (tmp != 0) {
-        r3 = r30;
-        fn_80075FEC();
-        tmp = r3 & 0xFF;
-        if (tmp == 1) {
-            r3 = r30;
-            fn_8011E8DC();
-            tmp = r3 & 0xFF;
-            if (tmp != 0) {
-                r3 = 0x56b;
-                fn_800FA280();
-                r4 = r3;
-                r3 = 0x37;
-                ((void(*)(void))fn_80132A38)();
-            } else {
-
-                r3 = r30;
-                fn_8011F4F0();
-                tmp = r3;
-                r3 = 0x37;
-                r4 = tmp;
-                ((void(*)(void))fn_80132A38)();
-            }
-            r3 = 0xe7;
-            fn_800FA444();
-            tmp = (u32)r3 >> 16;
-            r3 = *(s16*)((u8*)r31 + 0x54);
-            r6 = (s16)tmp;
-            r4 = 0x0;
-            r5 = (u32)r6 >> 31;
-            tmp = (u32)r3 >> 31;
-            r6 = r5 + r6;
-            r7 = (s32)r6 >> 1;
-            tmp = tmp + r3;
-            tmp = (s32)tmp >> 1;
-            r5 = -0x1;
-            tmp = tmp - r7;
-            r6 = 0xe7;
-            r3 = (s16)tmp;
-            ((void(*)(void))fn_800FB680)();
-            r3 = r31;
-            r4 = 0x1;
-            fn_80109220();
-            return;
-    }
-    }
-    r3 = r31;
-    r4 = 0x0;
-    fn_80109220();
-
     return;
 }
+#pragma pop
 #endif
 
 /* 0x800318D8 | 0x144 — scan 12-entry table for matching species, dispatch to fn_80109220 */
@@ -1893,7 +1839,7 @@ void fn_80032ED8_legacy_disabled(void) {
 }
 #endif
 
-/* 0x800330B8 | 0x1C0 */
+/* 0x800330B8 | 0x1C0 | WALL 98.2%: loop scheduling - mr r3 placement */
 extern void fn_801FC828(s32, s32);
 extern void fn_801FC7B4(s32, u8);
 extern void fn_801EEE6C(u8, u8);
@@ -1913,9 +1859,12 @@ asm void fn_800330B8(void) {
 #include "src/game/gs_npc_event_fn_800330B8.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 4
+#pragma peephole off
 void fn_800330B8(s32 arg0, u8* arg1) {
-    s32 i;
     u8* walk;
+    s32 i;
 
     fn_801FC794(arg0, *(u16*)(arg1 + 0x0));
     fn_801FC828(arg0, 0);
