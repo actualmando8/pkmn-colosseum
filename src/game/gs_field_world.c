@@ -27539,11 +27539,11 @@ asm void fn_80123090(void) {
 #else
 #pragma optimization_level 4
 u16 fn_80123090(u8* ptr) {
-    extern u32 fn_80142CF4(u32 a, u16 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u16 b, u32 c, u32 d);
     u16 val;
     val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
-    return (u16)fn_80142CF4(0, val, 7, 0);
+    return (u16)itemGetStatus(0, val, 7, 0);
 }
 #endif
 #if 0
