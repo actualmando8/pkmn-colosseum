@@ -10710,7 +10710,7 @@ s32 fn_8011B67C(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     u8* base;
     u16 idx;
@@ -10719,7 +10719,7 @@ s32 fn_8011B67C(void* obj, u16 val) {
     if (val == 0) { return 0; }
     idx = fn_80119E90(val);
     base = (0, fn_80119F10(val));
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
