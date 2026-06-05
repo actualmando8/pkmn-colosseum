@@ -8713,7 +8713,7 @@ s32 fn_80118DA8(u8* ptr) {
     return fn_801694E0(*(u32*)(&ptr[0x10]));
 }
 /* 0x80118DE0 | 0xAC */
-extern void fn_80169104(void);
+extern void psSetGeneratorAngleRadiusScale(void);
 #if 0
 asm void fn_80118DE0(void) {
 #include "src/game/gs_field_world_fn_80118DE0.inc"
@@ -8721,7 +8721,7 @@ asm void fn_80118DE0(void) {
 #else
 void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
     extern void fn_800E01D0();
-    extern void fn_80169104();
+    extern void psSetGeneratorAngleRadiusScale();
     if ((s32)*(u32*)(arg1 + 0x44) == 0) {
         fn_800E01D0(arg1 + 0x2c);
         *(f32*)(*(u8**)(arg1 + 0x10) + 0x98) = arg2[0];
@@ -8731,7 +8731,7 @@ void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
         fn_800E01D0(arg1 + 0x68);
     }
     if ((arg3 & 0xFF) == 1) {
-        fn_80169104(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
+        psSetGeneratorAngleRadiusScale(*(void**)(arg1 + 0x10), arg2, (void*)arg4);
     }
 }
 #endif
