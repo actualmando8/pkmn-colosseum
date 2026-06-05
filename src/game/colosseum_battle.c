@@ -36462,10 +36462,11 @@ void fn_8025DD14(int *r3)
 void fn_8025DDAC(u32 *r3,u32 r4)
 {
     extern u32 fn_800E4170();
-    extern u32 fn_801DAC3C();
+    extern u32 fn_801DAC3C(u32);
   u32 iVar1;
-  if (*r3 == 0) return;
-  iVar1 = fn_801DAC3C();
+  r3 = (u32*)*r3;
+  if (r3 == 0) return;
+  iVar1 = fn_801DAC3C((u32)r3);
   if (iVar1 == 0) return;
   fn_800E4170(iVar1,r4);
 }
@@ -36485,10 +36486,11 @@ void fn_8025DDF4(u32 *r3)
 void fn_8025DE0C(u32 *r3,u32 r4)
 {
     extern u32 fn_800E43A4();
-    extern u32 fn_801DAC3C();
+    extern u32 fn_801DAC3C(u32);
   u32 iVar1;
-  if (*r3 == 0) return;
-  iVar1 = fn_801DAC3C();
+  r3 = (u32*)*r3;
+  if (r3 == 0) return;
+  iVar1 = fn_801DAC3C((u32)r3);
   if (iVar1 == 0) return;
   fn_800E43A4(iVar1,r4);
 }
