@@ -2828,18 +2828,18 @@ static void PCPort_HeadlessMotionBankRelease(PCPortHeadlessMotionBank* bank) {
     memset(bank, 0, sizeof(*bank));
 }
 
+static BOOL PCPort_HeadlessMotionBankLoadData(const char* fsysPath,
+                                              const char* memberName,
+                                              u8* memberData,
+                                              u32 size,
+                                              PCPortHeadlessMotionBank* bank,
+                                              int verbose);
+
 static BOOL PCPort_HeadlessMotionBankLoad(const char* fsysPath,
                                           const char* memberName,
                                           PCPortHeadlessMotionBank* bank,
                                           int verbose) {
-    const u8* sceneData;
     u32 size = 0u;
-    u32 sceneOffset = 0u;
-    u32 resourceOff = 0u;
-    u32 animArrOff;
-    u32 rootOff;
-    u32 k;
-    PCPortSwizCtx ctx;
 
     if (bank == NULL) {
         return FALSE;
@@ -2859,6 +2859,31 @@ static BOOL PCPort_HeadlessMotionBankLoad(const char* fsysPath,
         }
         return FALSE;
     }
+    return PCPort_HeadlessMotionBankLoadData(fsysPath, memberName,
+                                             bank->memberData, size, bank,
+                                             verbose);
+}
+
+static BOOL PCPort_HeadlessMotionBankLoadData(const char* fsysPath,
+                                              const char* memberName,
+                                              u8* memberData,
+                                              u32 size,
+                                              PCPortHeadlessMotionBank* bank,
+                                              int verbose) {
+    const u8* sceneData;
+    u32 sceneOffset = 0u;
+    u32 resourceOff = 0u;
+    u32 animArrOff;
+    u32 rootOff;
+    u32 k;
+    PCPortSwizCtx ctx;
+
+    if (bank == NULL || memberData == NULL) {
+        return FALSE;
+    }
+    memset(bank, 0, sizeof(*bank));
+    bank->memberData = memberData;
+
     if (verbose) {
         printf("[headless-motion] member loaded size=0x%X; parsing HSD\n",
                size);
@@ -3127,6 +3152,41 @@ static BOOL PCPort_HeadlessMotionCollectMemberStats(
     if (frames <= 1) frames = 40;
 
     if (!PCPort_HeadlessMotionBankLoad(fsysPath, memberName, &bank, verbose)) {
+        return FALSE;
+    }
+    *outMotionCount = bank.motionCount;
+    for (motionIdx = 0u; motionIdx < bank.motionCount; ++motionIdx) {
+        PCPort_HeadlessMotionProbeCollectStats(&bank, motionIdx, frames,
+                                               &stats[motionIdx]);
+    }
+    PCPort_HeadlessMotionBankRelease(&bank);
+    return TRUE;
+}
+
+static BOOL PCPort_HeadlessMotionCollectMemberDataStats(
+    const char* fsysPath,
+    const char* memberName,
+    u8* memberData,
+    u32 memberSize,
+    int frames,
+    PCPortMotionProbeStats stats[64],
+    u32* outMotionCount,
+    int verbose) {
+    PCPortHeadlessMotionBank bank;
+    u32 motionIdx;
+
+    if (stats == NULL || outMotionCount == NULL) {
+        if (memberData != NULL) {
+            free(memberData);
+        }
+        return FALSE;
+    }
+    memset(stats, 0, sizeof(PCPortMotionProbeStats) * 64u);
+    *outMotionCount = 0u;
+    if (frames <= 1) frames = 40;
+
+    if (!PCPort_HeadlessMotionBankLoadData(fsysPath, memberName, memberData,
+                                           memberSize, &bank, verbose)) {
         return FALSE;
     }
     *outMotionCount = bank.motionCount;
@@ -3778,6 +3838,8 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         u32 entryOffset;
         u32 nameOffset;
         const char* memberName;
+        u8* memberData;
+        u32 memberSize = 0u;
         PCPortMotionProbeStats stats[64];
         PCPortLocomotionSuggestion s;
         u32 motionCount = 0u;
@@ -3795,9 +3857,15 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         }
         memberName = (const char*)(fsysData + nameOffset);
 
-        if (!PCPort_HeadlessMotionCollectMemberStats(fsysPath, memberName,
-                                                     frames, stats,
-                                                     &motionCount, 0)) {
+        memberData = DecompressMemberAt(fsysData, fsysSize, entryOffset,
+                                        &memberSize);
+        if (memberData == NULL) {
+            continue;
+        }
+
+        if (!PCPort_HeadlessMotionCollectMemberDataStats(
+                fsysPath, memberName, memberData, memberSize, frames, stats,
+                &motionCount, 0)) {
             continue;
         }
 
