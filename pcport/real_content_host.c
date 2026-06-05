@@ -2884,53 +2884,130 @@ static void PCPort_SortMotionCandidates(PCPortMotionCandidate* c, int count) {
     }
 }
 
+static f32 PCPort_MotionProbeEnergy(const PCPortMotionProbeStats* s) {
+    if (s == NULL || !s->valid) {
+        return 0.0f;
+    }
+    return s->frameDeltaSum + s->checksumRange;
+}
+
+static int PCPort_MotionProbeConfirmedCyclic(const PCPortMotionProbeStats* s) {
+    return s != NULL &&
+           s->valid &&
+           strcmp(s->kind, "cyclic") == 0 &&
+           s->varyingFrames > 0;
+}
+
+static const PCPortMotionProbeStats* PCPort_FindMotionProbeStats(
+    const PCPortMotionProbeStats* stats,
+    u32 motionCount,
+    int motionIdx) {
+    u32 i;
+    if (stats == NULL || motionIdx < 0) {
+        return NULL;
+    }
+    for (i = 0u; i < motionCount && i < 64u; ++i) {
+        if (stats[i].valid && (int)stats[i].motionIdx == motionIdx) {
+            return &stats[i];
+        }
+    }
+    return NULL;
+}
+
+static int PCPort_SelectLocomotionSuggestionFromStats(
+    const PCPortMotionProbeStats* stats,
+    u32 motionCount,
+    PCPortLocomotionSuggestion* out) {
+    PCPortMotionCandidate cyclic[64];
+    int count = 0;
+    u32 i;
+
+    if (out == NULL) {
+        return 0;
+    }
+    memset(out, 0, sizeof(*out));
+    out->idle = -1;
+    out->walk = -1;
+    out->run = -1;
+    out->motionCount = motionCount;
+
+    for (i = 0u; i < motionCount && i < 64u; ++i) {
+        if (!stats[i].valid) continue;
+        if (strcmp(stats[i].kind, "cyclic") == 0) {
+            ++out->cyclicCount;
+        }
+        if (!PCPort_MotionProbeConfirmedCyclic(&stats[i])) continue;
+        ++out->varyingCyclicCount;
+        cyclic[count].motionIdx = (int)stats[i].motionIdx;
+        cyclic[count].energy = PCPort_MotionProbeEnergy(&stats[i]);
+        ++count;
+    }
+    if (count < 1) {
+        return 0;
+    }
+
+    PCPort_SortMotionCandidates(cyclic, count);
+    out->idle = cyclic[0].motionIdx;
+    out->run = cyclic[count - 1].motionIdx;
+    out->walk = cyclic[(count > 2) ? 1 : (count - 1)].motionIdx;
+    {
+        const PCPortMotionProbeStats* idle =
+            PCPort_FindMotionProbeStats(stats, motionCount, out->idle);
+        const PCPortMotionProbeStats* walk =
+            PCPort_FindMotionProbeStats(stats, motionCount, out->walk);
+        const PCPortMotionProbeStats* run =
+            PCPort_FindMotionProbeStats(stats, motionCount, out->run);
+        out->idleConfirmed = PCPort_MotionProbeConfirmedCyclic(idle);
+        out->walkConfirmed = PCPort_MotionProbeConfirmedCyclic(walk);
+        out->runConfirmed = PCPort_MotionProbeConfirmedCyclic(run);
+        out->allConfirmed = out->idleConfirmed &&
+                            out->walkConfirmed &&
+                            out->runConfirmed;
+        out->idleEnergy = PCPort_MotionProbeEnergy(idle);
+        out->walkEnergy = PCPort_MotionProbeEnergy(walk);
+        out->runEnergy = PCPort_MotionProbeEnergy(run);
+    }
+    out->valid = 1;
+    return 1;
+}
+
 static int PCPort_SelectLocomotionMapFromStats(
     const PCPortMotionProbeStats* stats,
     u32 motionCount,
     int* outIdle,
     int* outWalk,
     int* outRun) {
-    PCPortMotionCandidate cyclic[64];
-    int count = 0;
-    u32 i;
+    PCPortLocomotionSuggestion s;
 
     if (outIdle == NULL || outWalk == NULL || outRun == NULL) {
         return 0;
     }
-    for (i = 0; i < motionCount && i < 64u; ++i) {
-        if (!stats[i].valid) continue;
-        if (strcmp(stats[i].kind, "cyclic") != 0) continue;
-        if (stats[i].varyingFrames <= 0) continue;
-        cyclic[count].motionIdx = (int)stats[i].motionIdx;
-        cyclic[count].energy = stats[i].frameDeltaSum + stats[i].checksumRange;
-        ++count;
-    }
-    if (count < 1) {
+    if (!PCPort_SelectLocomotionSuggestionFromStats(stats, motionCount, &s)) {
         return 0;
     }
-    PCPort_SortMotionCandidates(cyclic, count);
-    *outIdle = cyclic[0].motionIdx;
-    *outRun = cyclic[count - 1].motionIdx;
-    *outWalk = cyclic[(count > 2) ? 1 : (count - 1)].motionIdx;
+    *outIdle = s.idle;
+    *outWalk = s.walk;
+    *outRun = s.run;
     return 1;
 }
 
-int PCPort_CharAnimSuggestLocomotionMap(const char* fsysPath,
-                                        const char* memberName,
-                                        int* outIdle,
-                                        int* outWalk,
-                                        int* outRun) {
+int PCPort_CharAnimSuggestLocomotionMapEx(const char* fsysPath,
+                                          const char* memberName,
+                                          int frames,
+                                          PCPortLocomotionSuggestion* out) {
     PCPortMotionProbeStats stats[64];
     u32 motionCount, motionIdx;
     int oldQuiet = g_charAnimQuietSetup;
 
-    if (outIdle == NULL || outWalk == NULL || outRun == NULL) {
+    if (out == NULL) {
         return 0;
     }
-    *outIdle = -1;
-    *outWalk = -1;
-    *outRun = -1;
+    memset(out, 0, sizeof(*out));
+    out->idle = -1;
+    out->walk = -1;
+    out->run = -1;
     memset(stats, 0, sizeof(stats));
+    if (frames <= 1) frames = 40;
 
     g_charAnimQuietSetup = 1;
     motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
@@ -2941,14 +3018,35 @@ int PCPort_CharAnimSuggestLocomotionMap(const char* fsysPath,
     }
 
     for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
-        PCPort_MotionProbeCollectStats(fsysPath, memberName, motionIdx, 40,
+        PCPort_MotionProbeCollectStats(fsysPath, memberName, motionIdx, frames,
                                        &stats[motionIdx]);
     }
     g_charAnimQuietSetup = oldQuiet;
     PCPort_CharAnimProbeRelease();
 
-    return PCPort_SelectLocomotionMapFromStats(stats, motionCount,
-                                               outIdle, outWalk, outRun);
+    return PCPort_SelectLocomotionSuggestionFromStats(stats, motionCount, out);
+}
+
+int PCPort_CharAnimSuggestLocomotionMap(const char* fsysPath,
+                                        const char* memberName,
+                                        int* outIdle,
+                                        int* outWalk,
+                                        int* outRun) {
+    PCPortLocomotionSuggestion s;
+
+    if (outIdle == NULL || outWalk == NULL || outRun == NULL) {
+        return 0;
+    }
+    *outIdle = -1;
+    *outWalk = -1;
+    *outRun = -1;
+    if (!PCPort_CharAnimSuggestLocomotionMapEx(fsysPath, memberName, 40, &s)) {
+        return 0;
+    }
+    *outIdle = s.idle;
+    *outWalk = s.walk;
+    *outRun = s.run;
+    return 1;
 }
 
 void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
@@ -3029,6 +3127,129 @@ void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
 void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
                               int frames) {
     PCPort_MotionProbe(fsysPath, memberName, frames);
+}
+
+static const char* PCPort_PathBaseName(const char* path) {
+    const char* slash;
+    const char* backslash;
+    if (path == NULL) {
+        return "";
+    }
+    slash = strrchr(path, '/');
+    backslash = strrchr(path, '\\');
+    if (backslash != NULL && (slash == NULL || backslash > slash)) {
+        slash = backslash;
+    }
+    return slash != NULL ? slash + 1 : path;
+}
+
+static void PCPort_MotionBatchProbeArchive(const char* fsysPath, int frames) {
+    u8* fsysData;
+    u32 fsysSize = 0;
+    u32 entryCount, stringTableOffset, entryTableOffset, i;
+    u32 probed = 0u, confirmed = 0u;
+
+    fsysData = LoadFileBytes(fsysPath, &fsysSize);
+    if (fsysData == NULL) {
+        printf("[motion-batch] cannot open %s\n", fsysPath);
+        fflush(stdout);
+        return;
+    }
+    if (fsysSize < 0x20u || ReadBE32(fsysData) != PCPORT_FSYS_MAGIC) {
+        printf("[motion-batch] %s is not an FSYS archive\n", fsysPath);
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+    entryCount = ReadBE32(fsysData + 0x08);
+    stringTableOffset = ReadBE32(fsysData + 0x18);
+    if (stringTableOffset + 4u > fsysSize) {
+        free(fsysData);
+        return;
+    }
+    entryTableOffset = ReadBE32(fsysData + stringTableOffset);
+    if (entryTableOffset >= fsysSize) {
+        free(fsysData);
+        return;
+    }
+
+    printf("[motion-batch] archive=%s members=%u frames=%d\n",
+           fsysPath, entryCount, frames);
+    fflush(stdout);
+    for (i = 0u; i < entryCount; ++i) {
+        u32 entryOffset = ReadBE32(fsysData + entryTableOffset + i * 4u);
+        u32 nameOffset;
+        u32 motionCount;
+        const char* memberName;
+        PCPortLocomotionSuggestion s;
+
+        if (entryOffset + 0x28u > fsysSize) {
+            continue;
+        }
+        nameOffset = ReadBE32(fsysData + entryOffset + 0x24);
+        if (nameOffset >= fsysSize) {
+            continue;
+        }
+        memberName = (const char*)(fsysData + nameOffset);
+        memset(&s, 0, sizeof(s));
+        {
+            int oldQuiet = g_charAnimQuietSetup;
+            g_charAnimQuietSetup = 1;
+            motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
+            g_charAnimQuietSetup = oldQuiet;
+        }
+        if (motionCount == 0u) {
+            continue;
+        }
+        if (!PCPort_CharAnimSuggestLocomotionMapEx(fsysPath, memberName,
+                                                   frames, &s)) {
+            ++probed;
+            printf("[motion-batch] %-18s %-24s motions=%2u cyclic=%2u "
+                   "varyCyclic=%2u idle=%2d walk=%2d run=%2d confirmed=%s "
+                   "energy=%.4f/%.4f/%.4f\n",
+                   PCPort_PathBaseName(fsysPath), memberName,
+                   motionCount, 0u, 0u, -1, -1, -1, "no",
+                   0.0f, 0.0f, 0.0f);
+            fflush(stdout);
+            continue;
+        }
+
+        ++probed;
+        if (s.allConfirmed) {
+            ++confirmed;
+        }
+        printf("[motion-batch] %-18s %-24s motions=%2u cyclic=%2u "
+               "varyCyclic=%2u idle=%2d walk=%2d run=%2d confirmed=%s "
+               "energy=%.4f/%.4f/%.4f\n",
+               PCPort_PathBaseName(fsysPath), memberName,
+               s.motionCount, s.cyclicCount, s.varyingCyclicCount,
+               s.idle, s.walk, s.run, s.allConfirmed ? "yes" : "no",
+               s.idleEnergy, s.walkEnergy, s.runEnergy);
+        fflush(stdout);
+    }
+    printf("[motion-batch] archive=%s probed=%u confirmed=%u\n",
+           fsysPath, probed, confirmed);
+    fflush(stdout);
+    free(fsysData);
+}
+
+void PCPort_MotionBatchProbe(int frames) {
+    static const char* const archives[] = {
+        "orig/GC6E01/disc/files/chara_big.fsys",
+        "orig/GC6E01/disc/files/chara_small.fsys",
+        "orig/GC6E01/disc/files/field_common.fsys",
+        "orig/GC6E01/disc/files/people_archive.fsys"
+    };
+    int i;
+    if (frames <= 1) {
+        frames = 40;
+    }
+    printf("[motion-batch] archive member motions cyclic varyCyclic "
+           "idle walk run confirmed energy(idle/walk/run)\n");
+    fflush(stdout);
+    for (i = 0; i < (int)(sizeof(archives) / sizeof(archives[0])); ++i) {
+        PCPort_MotionBatchProbeArchive(archives[i], frames);
+    }
 }
 
 void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {

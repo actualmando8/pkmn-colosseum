@@ -7880,6 +7880,8 @@ static int  g_engTitleReady;
 static PCPortHSDArchive       g_engCharArchive;
 static u32  g_engCharRoot;
 static int  g_engCharLoaded;
+static char g_engCharFsysPath[260];
+static char g_engCharMember[64];
 /* Field maps pack SEVERAL model sets in the scene branch (e.g. D1_garage_1F:
  * +0 room walls/props, +4 + +8 additional sets incl. the FLOOR). We render the
  * primary (g_engTitleRootJoint) plus every additional model root here. */
@@ -8560,6 +8562,8 @@ static int PCPort_LoadFieldCharacter(void) {
         fprintf(stderr, "[field/wes] root joint invalid (0x%X)\n", g_engCharRoot);
         return 0;
     }
+    snprintf(g_engCharFsysPath, sizeof(g_engCharFsysPath), "%s", fsysPath);
+    snprintf(g_engCharMember, sizeof(g_engCharMember), "%s", member);
     g_engCharLoaded = 1;
     printf("[field/wes] loaded %s :: %s (rootJoint=0x%X)\n", fsysPath, member, g_engCharRoot);
 
@@ -8618,6 +8622,7 @@ typedef struct PCPortFieldMotionMap {
     int walkLoop;
     int runLoop;
     int fromRecord;
+    int fromHeuristic;
     u32 key;
 } PCPortFieldMotionMap;
 
@@ -8808,10 +8813,10 @@ static void PCPort_FieldMotionRecordProbe(const u8* record, u32 key) {
     fflush(stdout);
 }
 
-/* Role-to-motion indirection. The normal path is the real 0x2C per-character
- * record table resolved by character key, mirrored from fn_8018F4C8 /
- * fn_8018F6F4. Env overrides remain diagnostic only; there is no hardcoded Wes
- * fallback. */
+/* Role-to-motion indirection. If a real 0x2C per-character record table is
+ * installed, use it. Otherwise classify the loaded model's motion bank: lowest,
+ * middle, highest-energy cyclic clips become idle, walk, run. Env overrides
+ * remain diagnostic only; there is no hardcoded Wes fallback. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
@@ -8825,6 +8830,7 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     map.walkLoop = 0;
     map.runLoop = 0;
     map.fromRecord = 0;
+    map.fromHeuristic = 0;
     map.key = 0u;
 
     if (PCPort_ParseFieldMotionRecordEnv(envRecord)) {
@@ -8837,6 +8843,32 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
         PCPort_FieldMotionMapFromRecord(record, &map);
         if (getenv("PCPORT_FIELD_MOTION_RECORD_PROBE") != NULL) {
             PCPort_FieldMotionRecordProbe(record, map.key);
+        }
+    }
+
+    if ((map.idle < 0 || map.walk < 0 || map.run < 0) &&
+        g_engCharLoaded &&
+        g_engCharFsysPath[0] != '\0' &&
+        g_engCharMember[0] != '\0') {
+        PCPortLocomotionSuggestion s;
+        if (PCPort_CharAnimSuggestLocomotionMapEx(g_engCharFsysPath,
+                                                  g_engCharMember,
+                                                  40, &s)) {
+            map.idle = s.idle;
+            map.walk = s.walk;
+            map.run = s.run;
+            map.idleLoop = 1;
+            map.walkLoop = 1;
+            map.runLoop = 1;
+            map.fromHeuristic = 1;
+            if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
+                printf("[field/motion] heuristic %s :: %s idle=%d walk=%d "
+                       "run=%d confirmed=%s cyclic=%u/%u\n",
+                       g_engCharFsysPath, g_engCharMember,
+                       s.idle, s.walk, s.run,
+                       s.allConfirmed ? "yes" : "no",
+                       s.varyingCyclicCount, s.motionCount);
+            }
         }
     }
 
@@ -8854,9 +8886,11 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
     if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
         printf("[field/motion] map idle=%d(loop=%d) walk=%d(loop=%d) "
-               "run=%d(loop=%d)%s key=0x%08X\n",
+               "run=%d(loop=%d)%s%s key=0x%08X\n",
                map.idle, map.idleLoop, map.walk, map.walkLoop,
-               map.run, map.runLoop, map.fromRecord ? " [record]" : "",
+               map.run, map.runLoop,
+               map.fromRecord ? " [record]" : "",
+               map.fromHeuristic ? " [heuristic]" : "",
                map.key);
     }
     return map;
@@ -8909,7 +8943,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
     int motionDebug = getenv("PCPORT_MOTION_DEBUG") != NULL;
     int currentMotion = -999;
-    PCPortFieldMotionMap motionMap = PCPort_LoadFieldMotionMap();
+    PCPortFieldMotionMap motionMap;
     int reportedMissingMotionMap = 0;
     int frame = 0;
     int warpTo = -1;
@@ -8926,6 +8960,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk) {
         PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
     }
+    motionMap = PCPort_LoadFieldMotionMap();
     if (spawn != NULL) {
         ppos[0] = spawn[0]; ppos[1] = spawn[1]; ppos[2] = spawn[2];
     }
@@ -9004,8 +9039,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             if (nextMotion < 0) {
                 if (!reportedMissingMotionMap && motionDebug) {
                     printf("[field/motion] role %d has no mapped motion "
-                           "(install 0x2C record table + PCPORT_FIELD_CHAR_KEY; "
-                           "env motion overrides are diagnostic)\n", (int)role);
+                           "(motion-bank heuristic failed; env motion overrides "
+                           "are diagnostic)\n", (int)role);
                     reportedMissingMotionMap = 1;
                 }
             } else if (nextMotion != currentMotion) {
@@ -9430,8 +9465,15 @@ int main(int argc, char** argv) {
     fflush(stdout);
 
     {
+        const char* batchFrames = getenv("PCPORT_MOTION_BATCH_PROBE");
         const char* motionFrames = getenv("PCPORT_MOTION_PROBE");
         const char* bankFrames = getenv("PCPORT_CHARANIM_BANK_PROBE");
+        if (batchFrames != NULL) {
+            printf("[pcport_bootstrap] MOTION_BATCH_PROBE requested\n");
+            fflush(stdout);
+            PCPort_MotionBatchProbe(atoi(batchFrames));
+            return 0;
+        }
         if (motionFrames != NULL || bankFrames != NULL) {
             const char* sa = getenv("PCPORT_SWIZ_ARCHIVE");
             const char* sm = getenv("PCPORT_SWIZ_MEMBER");
