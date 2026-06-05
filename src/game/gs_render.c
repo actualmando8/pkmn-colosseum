@@ -750,8 +750,6 @@ extern void fn_800D7650(u8*);
 extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
 extern void fn_800D7940(void);
 extern void fn_800D7A70(u32);
-extern void fn_800DA6F0(void);
-extern void fn_800DA880(void);
 extern void fn_800DB098(void);
 extern void fn_800DB758(u32);
 extern void fn_800DD128(u8*);
@@ -2248,18 +2246,33 @@ void fn_800D83E4(u32 count) {
     }
 }
 #endif
-extern void fn_800B857C(u32, u32, u32, u32, u32, u32, u32);
-extern void fn_800BD58C(void);
+extern void fn_800B857C(u32, u32, u32, u32, u32, u32);
+extern void GXLoadTexMtxImm(void*, u32, u32);
 extern u8 lbl_80314404[];
 extern u8 lbl_80314454[];
 extern u8 lbl_803144A8[];
 extern u8 lbl_80314424[];
-#if 1
+#if 0
 asm void fn_800D848C(void) {
 #include "src/game/gs_render_fn_800D848C.inc"
 }
 #else
-void fn_800D848C(void) { /* TODO */ }
+void fn_800D848C(u32 idx, s32 mode, u32 arg, void* mtx) {
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x27, 0x13, idx, mode, arg, mtx);
+    } else {
+        if (mode == 0) {
+            fn_800B857C(((u32*)lbl_80314404)[idx], 1, ((u32*)lbl_80314454)[arg], 0x3c, 0, 0x7d);
+        } else {
+            if (mode == 1) {
+                GXLoadTexMtxImm(mtx, ((u32*)lbl_803144A8)[idx], 0);
+            } else if (mode == 2) {
+                GXLoadTexMtxImm(mtx, ((u32*)lbl_803144A8)[idx], 1);
+            }
+            fn_800B857C(((u32*)lbl_80314404)[idx], ((u32*)lbl_80314424)[mode], ((u32*)lbl_80314454)[arg], ((u32*)lbl_803144A8)[idx], 0, 0x7d);
+        }
+    }
+}
 #endif
 extern void fn_800BAE34(void);
 extern void fn_800BACA0(void);
@@ -2299,7 +2312,7 @@ void fn_800D87AC(u32 mask) {
         r31 = r30;
         do {
             *(u32*)(lbl_8047AA80 + 0x28 + r30) = (u32)r31;
-            fn_800B857C(*(u32*)r29, 1, r28 + 4, 1, 0x3c, 0, 0x7d);
+            ((void (*)(u32, u32, u32, u32, u32, u32, u32))fn_800B857C)(*(u32*)r29, 1, r28 + 4, 1, 0x3c, 0, 0x7d);
             r28++;
             r29 += 4;
             r30 += 4;
@@ -2653,29 +2666,403 @@ void fn_800DA4C4(s32 a, s32 b, s32 c) {
     }
 }
 #endif
-#if 1
+typedef struct GSgfxVtxDescList {
+    u32 attr;
+    u32 attr_type;
+    u32 comp_cnt;
+    u32 comp_type;
+    u8 frac;
+    u16 stride;
+    void* vertex;
+} GSgfxVtxDescList;
+
+typedef struct GSgfxParseCallbackList {
+    void (*begin)(s32 prim, u16 count, u32 attrs, void* user);
+    void (*beginVertex)(void* user);
+    void (*vertexAttr)(u32 attr, void* data, GSgfxVtxDescList* desc, void* user);
+    void (*endVertex)(void* user);
+    void (*end)(void* user);
+} GSgfxParseCallbackList;
+
+u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user);
+u8* fn_800DA880(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user);
+
+#if 0
 asm void fn_800DA578(void) {
 #include "src/game/gs_render_fn_800DA578.inc"
 }
 #else
-void fn_800DA578(void) { /* TODO */ }
+void fn_800DA578(GSgfxVtxDescList* desc, u8* dl, u16 size, GSgfxParseCallbackList* callbacks, void* user) {
+    u8* ptr;
+    u8* end;
+    s32 prim;
+    u16 count;
+    s32 cmd;
+
+    ptr = dl;
+    end = dl + size;
+    while (ptr < end) {
+        cmd = *ptr++ & 0xf8;
+        switch (cmd) {
+        case 0:
+            break;
+        case 0x61:
+            ptr += 4;
+            break;
+        case 0x80:
+        case 0x90:
+        case 0x98:
+        case 0xa0:
+        case 0xa8:
+        case 0xb0:
+        case 0xb8:
+            count = *(u16*)ptr;
+            ptr += 2;
+            switch (cmd) {
+            case 0xb8:
+                prim = 0;
+                break;
+            case 0xa8:
+                prim = 1;
+                break;
+            case 0xb0:
+                prim = 2;
+                break;
+            case 0x90:
+                prim = 3;
+                break;
+            case 0x98:
+                prim = 4;
+                break;
+            case 0xa0:
+                prim = 5;
+                break;
+            case 0x80:
+                prim = 6;
+                break;
+            }
+            ptr = fn_800DA6F0(prim, desc, ptr, count, callbacks, user);
+            break;
+        default:
+            return;
+        }
+    }
+}
 #endif
 extern void jumptable_803152B8();
-#if 1
+#if 0
 asm void fn_800DA6F0(void) {
 #include "src/game/gs_render_fn_800DA6F0.inc"
 }
 #else
-void fn_800DA6F0(void) { /* TODO */ }
+u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user) {
+    GSgfxVtxDescList* it;
+    u32 mask;
+    u16 remaining;
+
+    mask = 0;
+    it = desc;
+    while (it->attr != 0xff) {
+        switch (it->attr) {
+        case 0:
+            mask |= 1;
+            break;
+        case 1:
+            mask |= 0x40;
+            break;
+        case 9:
+            mask |= 2;
+            break;
+        case 10:
+            mask |= 4;
+            break;
+        case 11:
+            mask |= 8;
+            break;
+        case 12:
+            mask |= 0x10;
+            break;
+        case 13:
+            mask |= 0x20;
+            break;
+        case 14:
+            mask |= 0x80;
+            break;
+        case 15:
+            mask |= 0x100;
+            break;
+        case 16:
+            mask |= 0x200;
+            break;
+        case 17:
+            mask |= 0x400;
+            break;
+        case 18:
+            mask |= 0x800;
+            break;
+        case 19:
+            mask |= 0x1000;
+            break;
+        case 20:
+            mask |= 0x2000;
+            break;
+        case 25:
+            mask |= 0x4000;
+            break;
+        }
+        it++;
+    }
+
+    if (callbacks->begin != 0) {
+        callbacks->begin(prim, count, mask, user);
+    }
+
+    remaining = count;
+    while (remaining-- != 0) {
+        if (callbacks->beginVertex != 0) {
+            callbacks->beginVertex(user);
+        }
+        it = desc;
+        while (it->attr != 0xff) {
+            ptr = fn_800DA880(it, ptr, callbacks, user);
+            it++;
+        }
+        if (callbacks->endVertex != 0) {
+            callbacks->endVertex(user);
+        }
+    }
+
+    if (callbacks->end != 0) {
+        callbacks->end(user);
+    }
+    return ptr;
+}
 #endif
 extern void jumptable_80315340();
 extern void jumptable_80315320();
-#if 1
+#if 0
 asm void fn_800DA880(void) {
 #include "src/game/gs_render_fn_800DA880.inc"
 }
 #else
-void fn_800DA880(void) { /* TODO */ }
+u8* fn_800DA880(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user) {
+    u8* data;
+    u32 attr_flag;
+    u32 comp_flag;
+    u32 type_flag;
+    s32 comp_count;
+    u32 index;
+
+    data = ptr;
+    switch (desc->attr) {
+    case 0:
+        attr_flag = 1;
+        comp_flag = 0x10000;
+        type_flag = 0x10000000;
+        ptr += 1;
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        attr_flag = 0x40;
+        comp_flag = 0x10000;
+        type_flag = 0x10000000;
+        ptr += 1;
+        break;
+    case 11:
+    case 12:
+        if (desc->attr == 11) {
+            attr_flag = 0x10;
+        } else {
+            attr_flag = 0x20;
+        }
+        type_flag = 0x10000000;
+        switch (desc->comp_type) {
+        case 0:
+            comp_flag = 0x200000;
+            break;
+        case 1:
+            comp_flag = 0x400000;
+            break;
+        case 2:
+            comp_flag = 0x800000;
+            break;
+        case 3:
+            comp_flag = 0x1000000;
+            break;
+        case 4:
+            comp_flag = 0x2000000;
+            break;
+        case 5:
+            comp_flag = 0x4000000;
+            break;
+        }
+        goto calc_direct_or_indexed;
+    default:
+        switch (desc->comp_type) {
+        case 0:
+            comp_flag = 0x10000;
+            break;
+        case 1:
+            comp_flag = 0x20000;
+            break;
+        case 2:
+            comp_flag = 0x40000;
+            break;
+        case 3:
+            comp_flag = 0x80000;
+            break;
+        case 4:
+            comp_flag = 0x100000;
+            break;
+        }
+        switch (desc->attr) {
+        case 9:
+            attr_flag = 2;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x20000000;
+            } else {
+                type_flag = 0x40000000;
+            }
+            break;
+        case 10:
+            attr_flag = 4;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x40000000;
+            } else {
+                type_flag = 0x10000000;
+            }
+            break;
+        case 25:
+            attr_flag = 8;
+            if (desc->comp_cnt == 1) {
+                type_flag = 0x40000000;
+            } else {
+                type_flag = 0x10000000;
+            }
+            break;
+        case 13:
+            attr_flag = 0x80;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 14:
+            attr_flag = 0x100;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 15:
+            attr_flag = 0x200;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 16:
+            attr_flag = 0x400;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 17:
+            attr_flag = 0x800;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 18:
+            attr_flag = 0x1000;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 19:
+            attr_flag = 0x2000;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        case 20:
+            attr_flag = 0x4000;
+            if (desc->comp_cnt == 0) {
+                type_flag = 0x10000000;
+            } else {
+                type_flag = 0x20000000;
+            }
+            break;
+        }
+calc_direct_or_indexed:
+        if (desc->attr_type == 1) {
+            switch (comp_flag) {
+            case 0x10000:
+            case 0x20000:
+                comp_count = 1;
+                break;
+            case 0x40000:
+            case 0x80000:
+            case 0x200000:
+            case 0x1000000:
+                comp_count = 2;
+                break;
+            case 0x400000:
+            case 0x2000000:
+                comp_count = 3;
+                break;
+            case 0x100000:
+            case 0x800000:
+            case 0x4000000:
+                comp_count = 4;
+                break;
+            }
+            switch (type_flag) {
+            case 0x20000000:
+                comp_count <<= 1;
+                break;
+            case 0x40000000:
+                comp_count *= 3;
+                break;
+            case 0x80000000:
+                comp_count <<= 2;
+                break;
+            }
+            ptr += comp_count;
+        } else {
+            if (desc->attr_type == 2) {
+                index = *ptr++;
+            } else {
+                index = *(u16*)ptr;
+                ptr += 2;
+            }
+            data = (u8*)desc->vertex + ((u16)index * desc->stride);
+        }
+        break;
+    }
+
+    if (callbacks->vertexAttr != 0) {
+        callbacks->vertexAttr(type_flag | attr_flag | comp_flag, data, desc, user);
+    }
+    return ptr;
+}
 #endif
 extern void fn_800E24B0(u16);
 extern void fn_800E209C(u16);
