@@ -14559,16 +14559,16 @@ void fn_80120B00(u8* ptr, u16* out1, u16* out2) {
     u8 lo = (u8)((v93 & 1) | ((v94 & 1) << 1) | ((v95 & 1) << 2) |
                  ((v98 & 1) << 3) | ((v96 & 1) << 4) | ((v97 & 1) << 5));
     u16 val1 = (u16)((s32)(hi * 0x28) / 0x3F + 0x1E);
-    u16 val2 = (u16)((s32)(lo * 0xF) / 0x3F + 1);
+    u32 val2 = (u8)((s32)(lo * 0xF) / 0x3F + 1);
 
     if ((u8)val2 >= 9) {
-        val2 = (u8)val2 + 1;
+        val2 = (u16)((u8)val2 + 1);
     }
     if (out1 != NULL) {
         *out1 = val1;
     }
     if (out2 != NULL) {
-        *out2 = val2;
+        *out2 = (u16)val2;
     }
 }
 #endif
