@@ -4524,6 +4524,15 @@ typedef struct PCPortBattleProbeMoveScript {
     int defaultDamage;
 } PCPortBattleProbeMoveScript;
 
+#define PCPORT_COMMON_REL_POKEMON_STATS_OFFSET   0x12336Cu
+#define PCPORT_COMMON_REL_MOVE_DATA_OFFSET       0x11E048u
+#define PCPORT_COMMON_REL_TRAINER_DATA_OFFSET    0x092ED0u
+#define PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET 0x09FE28u
+#define PCPORT_COMMON_REL_POKEMON_STATS_SIZE     0x11Cu
+#define PCPORT_COMMON_REL_MOVE_DATA_SIZE         0x38u
+#define PCPORT_COMMON_REL_TRAINER_DATA_SIZE      0x34u
+#define PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE   0x50u
+
 static const PCPortBattleProbeActorDefault
     kBattleProbeDefaultActors[4] = {
         { "player-left",  "PCPORT_BATTLE_P0", "eifie",   "Eifie",
@@ -4737,6 +4746,166 @@ static int PCPort_BattleProbeEnvInt(const char* envName, int fallback) {
     return atoi(v);
 }
 
+static int PCPort_BattleProbeRangeValid(u32 base, u32 stride, u32 index,
+                                        u32 need, u32 size) {
+    u32 off;
+    if (stride != 0u && index > (0xFFFFFFFFu - base) / stride) {
+        return 0;
+    }
+    off = base + index * stride;
+    return off <= size && need <= size - off;
+}
+
+static void PCPort_BattleProbePrintCommonRelMove(const u8* commonRel,
+                                                 u32 commonRelSize,
+                                                 u16 moveId,
+                                                 const char* label) {
+    u32 moveIndex = moveId > 0u ? (u32)moveId - 1u : 0u;
+    u32 off;
+
+    if (!PCPort_BattleProbeRangeValid(PCPORT_COMMON_REL_MOVE_DATA_OFFSET,
+                                      PCPORT_COMMON_REL_MOVE_DATA_SIZE,
+                                      moveIndex,
+                                      PCPORT_COMMON_REL_MOVE_DATA_SIZE,
+                                      commonRelSize)) {
+        printf("[battle-probe-table] move label=%s moveId=%u load=oob\n",
+               label, moveId);
+        return;
+    }
+    off = PCPORT_COMMON_REL_MOVE_DATA_OFFSET +
+          moveIndex * PCPORT_COMMON_REL_MOVE_DATA_SIZE;
+    printf("[battle-probe-table] move label=%s moveId=%u tableIndex=%u "
+           "priority=%u pp=%u type=%u accuracy=%u power=%u effect=%u "
+           "nameText=0x%04X descText=0x%04X anim=%u\n",
+           label, moveId, moveIndex,
+           commonRel[off + 0x00], commonRel[off + 0x01],
+           commonRel[off + 0x02], commonRel[off + 0x04],
+           commonRel[off + 0x17], commonRel[off + 0x1B],
+           ReadBE16(commonRel + off + 0x22),
+           ReadBE16(commonRel + off + 0x2E),
+           ReadBE16(commonRel + off + 0x32));
+}
+
+static void PCPort_BattleProbePrintCommonRelPokemon(const u8* commonRel,
+                                                    u32 commonRelSize,
+                                                    const PCPortBattleProbeActor* actor) {
+    u32 speciesIndex;
+    u32 off;
+
+    if (actor == NULL) {
+        return;
+    }
+    speciesIndex = actor->speciesId > 0u ? (u32)actor->speciesId - 1u : 0u;
+    if (!PCPort_BattleProbeRangeValid(PCPORT_COMMON_REL_POKEMON_STATS_OFFSET,
+                                      PCPORT_COMMON_REL_POKEMON_STATS_SIZE,
+                                      speciesIndex,
+                                      PCPORT_COMMON_REL_POKEMON_STATS_SIZE,
+                                      commonRelSize)) {
+        printf("[battle-probe-table] pokemon actor=%s species=%u load=oob\n",
+               actor->label, actor->speciesId);
+        return;
+    }
+    off = PCPORT_COMMON_REL_POKEMON_STATS_OFFSET +
+          speciesIndex * PCPORT_COMMON_REL_POKEMON_STATS_SIZE;
+    printf("[battle-probe-table] pokemon actor=%s species=%u tableIndex=%u "
+           "nameText=0x%04X model=%u type=%u/%u base=%u/%u/%u/%u/%u/%u\n",
+           actor->label, actor->speciesId, speciesIndex,
+           ReadBE16(commonRel + off + 0x1A),
+           ReadBE16(commonRel + off + 0x2E),
+           commonRel[off + 0x30], commonRel[off + 0x31],
+           commonRel[off + 0x85], commonRel[off + 0x87],
+           commonRel[off + 0x89], commonRel[off + 0x8B],
+           commonRel[off + 0x8D], commonRel[off + 0x8F]);
+}
+
+static void PCPort_BattleProbePrintCommonRelTrainer(const u8* commonRel,
+                                                    u32 commonRelSize,
+                                                    const PCPortBattleProbeActor* actor) {
+    u32 off;
+    u16 firstPokemon;
+    u32 pokeOff;
+
+    if (actor == NULL) {
+        return;
+    }
+    if (!PCPort_BattleProbeRangeValid(PCPORT_COMMON_REL_TRAINER_DATA_OFFSET,
+                                      PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                      actor->trainerId,
+                                      PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                      commonRelSize)) {
+        printf("[battle-probe-table] trainer actor=%s trainer=0x%04X load=oob\n",
+               actor->label, actor->trainerId);
+        return;
+    }
+    off = PCPORT_COMMON_REL_TRAINER_DATA_OFFSET +
+          (u32)actor->trainerId * PCPORT_COMMON_REL_TRAINER_DATA_SIZE;
+    firstPokemon = ReadBE16(commonRel + off + 0x04);
+    printf("[battle-probe-table] trainer actor=%s trainer=0x%04X class=%u "
+           "firstPokemon=%u nameText=0x%08X pre=0x%08X win=0x%08X "
+           "lose=0x%08X\n",
+           actor->label, actor->trainerId, commonRel[off + 0x03],
+           firstPokemon, ReadBE32(commonRel + off + 0x08),
+           ReadBE32(commonRel + off + 0x24),
+           ReadBE32(commonRel + off + 0x28),
+           ReadBE32(commonRel + off + 0x2C));
+    if (!PCPort_BattleProbeRangeValid(
+            PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET,
+            PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE,
+            (u32)firstPokemon + (u32)actor->teamSlot,
+            PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE,
+            commonRelSize)) {
+        return;
+    }
+    pokeOff = PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET +
+              ((u32)firstPokemon + (u32)actor->teamSlot) *
+                  PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE;
+    printf("[battle-probe-table] trainer-pokemon actor=%s tableIndex=%u "
+           "species=%u level=%u shadow=%u moves=%u/%u/%u/%u\n",
+           actor->label, (u32)firstPokemon + (u32)actor->teamSlot,
+           ReadBE16(commonRel + pokeOff + 0x0A),
+           commonRel[pokeOff + 0x04], commonRel[pokeOff + 0x03],
+           ReadBE16(commonRel + pokeOff + 0x34),
+           ReadBE16(commonRel + pokeOff + 0x36),
+           ReadBE16(commonRel + pokeOff + 0x38),
+           ReadBE16(commonRel + pokeOff + 0x3A));
+}
+
+static void PCPort_BattleProbePrintCommonRelTables(
+    const PCPortBattleProbeActor actors[4],
+    u16 playerMoveId,
+    u16 enemyMoveId) {
+    u8* commonRel = NULL;
+    u32 commonRelSize = 0u;
+    u32 i;
+
+    if (!PCPort_LoadFsysMember("orig/GC6E01/disc/files/common.fsys",
+                               "pcommon_rel", &commonRel, &commonRelSize)) {
+        if (!PCPort_LoadFsysMember("orig/GC6E01/disc/files/common.fsys",
+                                   "common_rel", &commonRel, &commonRelSize)) {
+            printf("[battle-probe-table] common_rel load=failed\n");
+            fflush(stdout);
+            return;
+        }
+    }
+
+    printf("[battle-probe-table] common_rel load=ok size=0x%X\n",
+           commonRelSize);
+    PCPort_BattleProbePrintCommonRelMove(commonRel, commonRelSize,
+                                         playerMoveId, "player");
+    PCPort_BattleProbePrintCommonRelMove(commonRel, commonRelSize,
+                                         enemyMoveId, "enemy");
+    for (i = 0u; i < 4u; ++i) {
+        PCPort_BattleProbePrintCommonRelPokemon(commonRel, commonRelSize,
+                                                &actors[i]);
+    }
+    PCPort_BattleProbePrintCommonRelTrainer(commonRel, commonRelSize,
+                                            &actors[0]);
+    PCPort_BattleProbePrintCommonRelTrainer(commonRel, commonRelSize,
+                                            &actors[2]);
+    fflush(stdout);
+    PCPort_FreeBuffer(commonRel);
+}
+
 static void PCPort_BattleProbeFormatMoveText(char* out,
                                              u32 outSize,
                                              const PCPortBattleProbeActor* actor,
@@ -4835,6 +5004,7 @@ void PCPort_BattleProbe(int frames) {
            "playerMove=%u enemyMove=%u playerText=0x%04X enemyText=0x%04X\n",
            actors[0].trainerId, actors[2].trainerId,
            playerMoveId, enemyMoveId, playerTextId, enemyTextId);
+    PCPort_BattleProbePrintCommonRelTables(actors, playerMoveId, enemyMoveId);
     printf("[battle-probe-text] \"FIGHT  POKEMON  BAG  RUN\"\n");
     printf("[battle-probe-text] \"%s\"\n", playerMoveText);
     printf("[battle-probe-text] \"%s\"\n", playerDamageText);
