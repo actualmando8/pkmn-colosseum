@@ -4765,10 +4765,13 @@ static const char* PCPort_BattleProbeEnvText(const char* envName,
 
 static int PCPort_BattleProbeEnvInt(const char* envName, int fallback) {
     const char* v = getenv(envName);
+    char* end = NULL;
+    long parsed;
     if (v == NULL || v[0] == '\0') {
         return fallback;
     }
-    return atoi(v);
+    parsed = strtol(v, &end, 0);
+    return (end != v) ? (int)parsed : fallback;
 }
 
 static int PCPort_BattleProbeRangeValid(u32 base, u32 stride, u32 index,
@@ -5291,6 +5294,12 @@ void PCPort_BattleProbe(int frames) {
         PCPort_BattleProbeInitActor(&actors[i],
                                     &kBattleProbeDefaultActors[i]);
     }
+    actors[0].trainerId = actors[1].trainerId =
+        (u16)PCPort_BattleProbeEnvInt("PCPORT_BATTLE_PLAYER_TRAINER",
+                                      actors[0].trainerId);
+    actors[2].trainerId = actors[3].trainerId =
+        (u16)PCPort_BattleProbeEnvInt("PCPORT_BATTLE_ENEMY_TRAINER",
+                                      actors[2].trainerId);
 
     playerMoveName = PCPort_BattleProbeEnvText(
         kBattleProbeDefaultMoves[0].moveEnv,
