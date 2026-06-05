@@ -4479,6 +4479,7 @@ static void PCPort_HeadlessMotionBatchProbePkxArchives(int frames) {
 typedef struct PCPortBattleProbeActor {
     const char* label;
     const char* member;
+    const char* displayName;
     char fsysPath[320];
     f32 x;
     f32 y;
@@ -4491,6 +4492,44 @@ typedef struct PCPortBattleProbeActor {
     int attackMotion;
     int damageMotion;
 } PCPortBattleProbeActor;
+
+typedef struct PCPortBattleProbeActorDefault {
+    const char* label;
+    const char* envName;
+    const char* member;
+    const char* displayName;
+    f32 x;
+    f32 y;
+    f32 z;
+} PCPortBattleProbeActorDefault;
+
+typedef struct PCPortBattleProbeMoveScript {
+    const char* moveEnv;
+    const char* damageEnv;
+    const char* defaultMove;
+    int attacker;
+    int target;
+    int defaultDamage;
+} PCPortBattleProbeMoveScript;
+
+static const PCPortBattleProbeActorDefault
+    kBattleProbeDefaultActors[4] = {
+        { "player-left",  "PCPORT_BATTLE_P0", "eifie",   "Eifie",
+          -1.35f, 0.0f,  1.10f },
+        { "player-right", "PCPORT_BATTLE_P1", "blacky",  "Blacky",
+           1.35f, 0.0f,  1.10f },
+        { "enemy-left",   "PCPORT_BATTLE_E0", "absol",   "Absol",
+          -1.35f, 0.0f, -1.35f },
+        { "enemy-right",  "PCPORT_BATTLE_E1", "pikachu", "Pikachu",
+           1.35f, 0.0f, -1.35f }
+    };
+
+static const PCPortBattleProbeMoveScript kBattleProbeDefaultMoves[2] = {
+    { "PCPORT_BATTLE_PLAYER_MOVE", "PCPORT_BATTLE_PLAYER_DAMAGE",
+      "Test Strike", 0, 2, 32 },
+    { "PCPORT_BATTLE_ENEMY_MOVE", "PCPORT_BATTLE_ENEMY_DAMAGE",
+      "Test Claw", 2, 0, 21 }
+};
 
 static f32 PCPort_BattleProbeMotionScore(const PCPortMotionProbeStats* s) {
     if (s == NULL || !s->valid) {
@@ -4572,21 +4611,23 @@ static void PCPort_BattleProbeDescribeMotion(
 }
 
 static void PCPort_BattleProbeInitActor(PCPortBattleProbeActor* actor,
-                                        const char* label,
-                                        const char* envName,
-                                        const char* defaultMember,
-                                        f32 x,
-                                        f32 y,
-                                        f32 z) {
-    const char* envValue = getenv(envName);
+                                        const PCPortBattleProbeActorDefault* d) {
+    const char* envValue;
+
+    if (actor == NULL || d == NULL) {
+        return;
+    }
+    envValue = getenv(d->envName);
 
     memset(actor, 0, sizeof(*actor));
-    actor->label = label;
+    actor->label = d->label;
     actor->member = (envValue != NULL && envValue[0] != '\0') ?
-                    envValue : defaultMember;
-    actor->x = x;
-    actor->y = y;
-    actor->z = z;
+                    envValue : d->member;
+    actor->displayName = (envValue != NULL && envValue[0] != '\0') ?
+                         envValue : d->displayName;
+    actor->x = d->x;
+    actor->y = d->y;
+    actor->z = d->z;
     actor->stanceMotion = -1;
     actor->attackMotion = -1;
     actor->damageMotion = -1;
@@ -4658,8 +4699,58 @@ static void PCPort_BattleProbePrintAction(const char* state,
     fflush(stdout);
 }
 
+static const char* PCPort_BattleProbeEnvText(const char* envName,
+                                             const char* fallback) {
+    const char* v = getenv(envName);
+    return (v != NULL && v[0] != '\0') ? v : fallback;
+}
+
+static int PCPort_BattleProbeEnvInt(const char* envName, int fallback) {
+    const char* v = getenv(envName);
+    if (v == NULL || v[0] == '\0') {
+        return fallback;
+    }
+    return atoi(v);
+}
+
+static void PCPort_BattleProbeFormatMoveText(char* out,
+                                             u32 outSize,
+                                             const PCPortBattleProbeActor* actor,
+                                             const char* moveName) {
+    if (out == NULL || outSize == 0u) {
+        return;
+    }
+    snprintf(out, outSize, "%s used %s!",
+             actor != NULL ? actor->displayName : "Pokemon",
+             moveName != NULL ? moveName : "Move");
+}
+
+static void PCPort_BattleProbeFormatDamageText(
+    char* out,
+    u32 outSize,
+    const PCPortBattleProbeActor* actor) {
+    if (out == NULL || outSize == 0u) {
+        return;
+    }
+    if (actor != NULL && strncmp(actor->label, "enemy-", 6) == 0) {
+        snprintf(out, outSize, "The opposing %s took damage.",
+                 actor->displayName);
+    } else {
+        snprintf(out, outSize, "%s took damage.",
+                 actor != NULL ? actor->displayName : "Pokemon");
+    }
+}
+
 void PCPort_BattleProbe(int frames) {
     PCPortBattleProbeActor actors[4];
+    const char* playerMoveName;
+    const char* enemyMoveName;
+    int playerDamage;
+    int enemyDamage;
+    char playerMoveText[96];
+    char playerDamageText[96];
+    char enemyMoveText[96];
+    char enemyDamageText[96];
     u32 loadedCount = 0u;
     u32 i;
     int hpEnemyLeft = 100;
@@ -4669,23 +4760,40 @@ void PCPort_BattleProbe(int frames) {
         frames = 24;
     }
 
-    PCPort_BattleProbeInitActor(&actors[0], "player-left",
-                                "PCPORT_BATTLE_P0", "eifie",
-                                -1.35f, 0.0f, 1.10f);
-    PCPort_BattleProbeInitActor(&actors[1], "player-right",
-                                "PCPORT_BATTLE_P1", "blacky",
-                                1.35f, 0.0f, 1.10f);
-    PCPort_BattleProbeInitActor(&actors[2], "enemy-left",
-                                "PCPORT_BATTLE_E0", "absol",
-                                -1.35f, 0.0f, -1.35f);
-    PCPort_BattleProbeInitActor(&actors[3], "enemy-right",
-                                "PCPORT_BATTLE_E1", "pikachu",
-                                1.35f, 0.0f, -1.35f);
+    for (i = 0u; i < 4u; ++i) {
+        PCPort_BattleProbeInitActor(&actors[i],
+                                    &kBattleProbeDefaultActors[i]);
+    }
+
+    playerMoveName = PCPort_BattleProbeEnvText(
+        kBattleProbeDefaultMoves[0].moveEnv,
+        kBattleProbeDefaultMoves[0].defaultMove);
+    enemyMoveName = PCPort_BattleProbeEnvText(
+        kBattleProbeDefaultMoves[1].moveEnv,
+        kBattleProbeDefaultMoves[1].defaultMove);
+    playerDamage = PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[0].damageEnv,
+        kBattleProbeDefaultMoves[0].defaultDamage);
+    enemyDamage = PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[1].damageEnv,
+        kBattleProbeDefaultMoves[1].defaultDamage);
+    PCPort_BattleProbeFormatMoveText(playerMoveText, sizeof(playerMoveText),
+                                     &actors[kBattleProbeDefaultMoves[0].attacker],
+                                     playerMoveName);
+    PCPort_BattleProbeFormatDamageText(
+        playerDamageText, sizeof(playerDamageText),
+        &actors[kBattleProbeDefaultMoves[0].target]);
+    PCPort_BattleProbeFormatMoveText(enemyMoveText, sizeof(enemyMoveText),
+                                     &actors[kBattleProbeDefaultMoves[1].attacker],
+                                     enemyMoveName);
+    PCPort_BattleProbeFormatDamageText(
+        enemyDamageText, sizeof(enemyDamageText),
+        &actors[kBattleProbeDefaultMoves[1].target]);
 
     printf("[battle-probe] mode=headless actors=4 frames=%d\n", frames);
     printf("[battle-probe-text] \"FIGHT  POKEMON  BAG  RUN\"\n");
-    printf("[battle-probe-text] \"Eifie used Test Strike!\"\n");
-    printf("[battle-probe-text] \"The opposing Absol took damage.\"\n");
+    printf("[battle-probe-text] \"%s\"\n", playerMoveText);
+    printf("[battle-probe-text] \"%s\"\n", playerDamageText);
     fflush(stdout);
 
     for (i = 0u; i < 4u; ++i) {
@@ -4702,24 +4810,33 @@ void PCPort_BattleProbe(int frames) {
            hpPlayerLeft, hpEnemyLeft);
     printf("[battle-probe-turn] state=command-menu selected=FIGHT "
            "text=\"FIGHT  POKEMON  BAG  RUN\"\n");
-    printf("[battle-probe-turn] state=move-menu selected=TEST_STRIKE "
-           "target=enemy-left\n");
+    printf("[battle-probe-turn] state=move-menu selected=\"%s\" "
+           "target=%s\n", playerMoveName,
+           actors[kBattleProbeDefaultMoves[0].target].label);
     fflush(stdout);
 
-    PCPort_BattleProbePrintAction("player-attack", &actors[0],
-                                  "Eifie used Test Strike!",
-                                  actors[0].attackMotion);
-    hpEnemyLeft -= 32;
-    PCPort_BattleProbePrintAction("enemy-damage", &actors[2],
-                                  "The opposing Absol took damage.",
-                                  actors[2].damageMotion);
-    PCPort_BattleProbePrintAction("enemy-attack", &actors[2],
-                                  "The opposing Absol used Test Claw!",
-                                  actors[2].attackMotion);
-    hpPlayerLeft -= 21;
-    PCPort_BattleProbePrintAction("player-damage", &actors[0],
-                                  "Eifie took damage.",
-                                  actors[0].damageMotion);
+    PCPort_BattleProbePrintAction(
+        "player-attack",
+        &actors[kBattleProbeDefaultMoves[0].attacker],
+        playerMoveText,
+        actors[kBattleProbeDefaultMoves[0].attacker].attackMotion);
+    hpEnemyLeft -= playerDamage;
+    PCPort_BattleProbePrintAction(
+        "enemy-damage",
+        &actors[kBattleProbeDefaultMoves[0].target],
+        playerDamageText,
+        actors[kBattleProbeDefaultMoves[0].target].damageMotion);
+    PCPort_BattleProbePrintAction(
+        "enemy-attack",
+        &actors[kBattleProbeDefaultMoves[1].attacker],
+        enemyMoveText,
+        actors[kBattleProbeDefaultMoves[1].attacker].attackMotion);
+    hpPlayerLeft -= enemyDamage;
+    PCPort_BattleProbePrintAction(
+        "player-damage",
+        &actors[kBattleProbeDefaultMoves[1].target],
+        enemyDamageText,
+        actors[kBattleProbeDefaultMoves[1].target].damageMotion);
     printf("[battle-probe-turn] state=end-turn playerHP=%d enemyHP=%d "
            "next=command-menu\n", hpPlayerLeft, hpEnemyLeft);
     printf("[battle-probe] summary loaded=%u/4 confirmed=%s\n",

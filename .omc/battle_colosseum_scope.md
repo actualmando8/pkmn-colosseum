@@ -142,6 +142,7 @@ Commit target: minimal headless vertical slice.
 - Native PowerShell `Start-Process` validation completed with `summary loaded=4/4 confirmed=yes`.
 - Default actors: player-left `eifie`, player-right `blacky`, enemy-left `absol`, enemy-right `pikachu`.
 - Probe prints fixed 2v2 placement, menu text (`FIGHT  POKEMON  BAG  RUN`), deterministic selected move/target, player attack, enemy damage, enemy attack, player damage, and end-turn HP state.
+- Follow-up table/env pass added default actor and move-script tables. Actor archive members can be overridden with `PCPORT_BATTLE_P0`, `PCPORT_BATTLE_P1`, `PCPORT_BATTLE_E0`, and `PCPORT_BATTLE_E1`. Move labels/damage can be overridden with `PCPORT_BATTLE_PLAYER_MOVE`, `PCPORT_BATTLE_PLAYER_DAMAGE`, `PCPORT_BATTLE_ENEMY_MOVE`, and `PCPORT_BATTLE_ENEMY_DAMAGE`.
 
 Validated output highlights:
 
