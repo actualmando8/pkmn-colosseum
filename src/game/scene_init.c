@@ -816,7 +816,7 @@ u32 fn_800382E8(u8* p) {
 #pragma pop
 #endif
 
-/* fn_80038380 - 0x80038380 | size: 0xac */
+/* fn_80038380 - 0x80038380 | size: 0xac | WALL 89.88% (W2: instruction scheduling — stb moved earlier, cmpwi moved later) */
 extern s32 fn_801020C0(u32 a);
 #if 0
 asm void fn_80038380(void) {
@@ -1045,7 +1045,7 @@ asm void fn_80038E74(void) {
 void fn_80038E74(void) { /* TODO */ }
 #endif
 
-/* fn_80039004 - 0x80039004 | size: 0x78 */
+/* fn_80039004 - 0x80039004 | size: 0x78 | WALL 89.17% (W2+W1: extsb. vs extsb+cmpwi codegen idiom, lfsx indexed vs lfs offset load, mulli r6 vs r0 regalloc) */
 #if 0
 asm void fn_80039004(void) {
 #include "src/game/scene_init_fn_80039004.inc"
@@ -1065,7 +1065,7 @@ s32 fn_80039004(u8* ctx, u8* p) {
 }
 #endif
 
-/* fn_8003907C - 0x8003907C | size: 0xac */
+/* fn_8003907C - 0x8003907C | size: 0xac | WALL 89.88% (W2: instruction scheduling — same stb/cmpwi reorder as fn_80038380) */
 #if 0
 asm void fn_8003907C(void) {
 #include "src/game/scene_init_fn_8003907C.inc"
@@ -3962,50 +3962,58 @@ asm void fn_8004BFB0(void) {
 #else
 #pragma optimization_level 4
 void fn_8004BFB0(void) {
-    u16* r28;
-    u16* r30;
-    s32 r31;
-    s32 r29;
-    r28 = (u16*)lbl_8047A500;
+    u16* base;
+    s32 count;
+    s32 i;
+    base = (u16*)lbl_8047A500;
     switch (fn_801D1B4C()) {
     case 1:
-        r30 = r28;
-        r31 = 0;
-        while (r31 < fn_801D1F7C()) {
-            *r30 = (u16)fn_801D1F0C(r31);
-            r31++;
-            r30++;
+        i = 0;
+        for (;;) {
+            *base = (u16)fn_801D1F0C(i);
+            i++;
+            base++;
+            if (i >= fn_801D1F7C()) {
+                break;
+            }
         }
         break;
     case 2:
-        r29 = fn_801D1F7C();
-        r30 = r28;
-        r31 = 0;
-        while (r31 < r29) {
-            *r30 = (u16)fn_801D1F0C(r31);
-            r31++;
-            r30++;
+        count = fn_801D1F7C();
+        i = 0;
+        for (;;) {
+            *base = (u16)fn_801D1F0C(i);
+            i++;
+            base++;
+            if (i >= count) {
+                break;
+            }
         }
-        fn_800CA620(r28, r29, 2, (void*)fn_8004BF20);
+        fn_800CA620((u16*)lbl_8047A500, count, 2, (void*)fn_8004BF20);
         break;
     case 3:
-        r31 = fn_801D1F7C();
-        r30 = r28;
-        r29 = 0;
-        while (r29 < r31) {
-            *r30 = (u16)fn_801D1F0C(r29);
-            r29++;
-            r30++;
+        count = fn_801D1F7C();
+        i = 0;
+        for (;;) {
+            *base = (u16)fn_801D1F0C(i);
+            i++;
+            base++;
+            if (i >= count) {
+                break;
+            }
         }
-        fn_800CA620(r28, r31, 2, (void*)fn_8004BE90);
+        fn_800CA620((u16*)lbl_8047A500, count, 2, (void*)fn_8004BE90);
         break;
+    case 0:
     default:
-        r30 = r28;
-        r29 = fn_801D1F7C() - 1;
-        while (r29 >= 0) {
-            *r30 = (u16)fn_801D1F0C(r29);
-            r29--;
-            r30++;
+        count = fn_801D1F7C() - 1;
+        for (;;) {
+            *base = (u16)fn_801D1F0C(count);
+            count--;
+            base++;
+            if (count < 0) {
+                break;
+            }
         }
         break;
     }
