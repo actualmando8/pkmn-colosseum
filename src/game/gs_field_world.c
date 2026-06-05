@@ -19865,7 +19865,7 @@ void fn_8012A86C(u8* ptr, s32 val) {
 void fn_8012A89C(u8* ptr, void* src) {
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0xAC2, src, 0xB);
+    GScharLenCpy(ptr + 0xAC2, src, 0xB);
 }
 /* 0x8012A8D4 | 24 bytes | nc_addi_ptr */
 void* fn_8012A8D4(void* ptr) {
