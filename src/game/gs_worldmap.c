@@ -172,7 +172,7 @@ s32 fn_80026390(void* r3, u8* r4) {
 }
 #endif
 
-/* fn_800263B0 - 0x800263B0 | size: 0x6c */
+/* fn_800263B0 - 0x800263B0 | size: 0x6c | WALL 92.6%: li vs mr pattern */
 extern u8 lbl_80266E18[];
 #if 0
 asm void fn_800263B0(void) {
@@ -429,7 +429,7 @@ L_700_end:
 #pragma pop
 #endif
 
-/* fn_80026740 - 0x80026740 | size: 0x90 */
+/* fn_80026740 - 0x80026740 | size: 0x90 | WALL 50%: regalloc + fnmsubs fusion + clrlwi */
 extern f32 lbl_8047B938;
 extern f32 lbl_8047B934;
 #if 1

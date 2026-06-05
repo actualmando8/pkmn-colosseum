@@ -91,6 +91,8 @@ extern u32   fn_800FA444(s32 resourceId);
 extern void  fn_800FB680(s32 x, s32 y, s32 flags, u32 color);
 
 /* Math/rendering helpers */
+extern f32   sin(f32);
+extern f32   cos(f32);
 extern void  fn_800E0CA0(f32 angle);          /* Set camera rotation */
 extern void  fn_800E090C(void* outVec, void* posA, void* posB); /* Vector subtract */
 extern void  fn_80106ADC(s32 p1, void* data, s32 p3, s32 p4, u8 p5);
@@ -400,7 +402,7 @@ void fn_80017764(void) {
     }
 }
 
-/* fn_80017790 - 0x80017790 | size: 0xd8 */
+/* fn_80017790 - 0x80017790 | size: 0xd8 | WALL 85%: regalloc (ptr-chasing vs indexed) + scheduling */
 #if 1
 asm void fn_80017790(void) {
 #include "src/game/gs_pokemon_summary_fn_80017790.inc"
