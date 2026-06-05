@@ -1,0 +1,42 @@
+#include "real_content_host.h"
+
+#include <stdlib.h>
+
+int main(int argc, char** argv) {
+    const char* batchFrames = getenv("PCPORT_MOTION_BATCH_PROBE");
+    const char* motionFrames = getenv("PCPORT_MOTION_PROBE");
+    const char* bankFrames = getenv("PCPORT_CHARANIM_BANK_PROBE");
+    const char* charFrames = getenv("PCPORT_CHARANIM_PROBE");
+    const char* fsys = getenv("PCPORT_SWIZ_ARCHIVE");
+    const char* member = getenv("PCPORT_SWIZ_MEMBER");
+
+    (void)argc;
+    (void)argv;
+
+    if (fsys == NULL || fsys[0] == '\0') {
+        fsys = "orig/GC6E01/disc/files/field_common.fsys";
+    }
+    if (member == NULL || member[0] == '\0') {
+        member = "ken_b1";
+    }
+
+    if (batchFrames != NULL) {
+        PCPort_MotionBatchProbe(atoi(batchFrames));
+        return 0;
+    }
+    if (motionFrames != NULL) {
+        PCPort_MotionProbe(fsys, member, atoi(motionFrames));
+        return 0;
+    }
+    if (bankFrames != NULL) {
+        PCPort_CharAnimBankProbe(fsys, member, atoi(bankFrames));
+        return 0;
+    }
+    if (charFrames != NULL) {
+        PCPort_CharAnimProbe(fsys, member, atoi(charFrames));
+        return 0;
+    }
+
+    PCPort_MotionProbe(fsys, member, 24);
+    return 0;
+}
