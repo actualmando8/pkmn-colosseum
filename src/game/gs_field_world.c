@@ -27587,7 +27587,7 @@ void fn_80124A60(u8* ptr) {
     extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
     extern void fn_8011B950(u32 base, u16 count);
-    extern void fn_80135708(u32 val);
+    extern void gamedataAttestInit(u32 val);
     extern void fn_8011D480(u8* ptr, u8 val);
     u32 i;
     u16 local;
@@ -27601,7 +27601,7 @@ void fn_80124A60(u8* ptr) {
     fn_8011B950(fn_8012640C(ptr, 0, 0xc8, 0), 1);
     fn_801254B4(ptr, 0, 0x6e, 0, 0);
     fn_801254B4(ptr, 0, 0x6f, 0, 0);
-    fn_80135708(fn_8012640C(ptr, 0, 0x70, 0));
+    gamedataAttestInit(fn_8012640C(ptr, 0, 0x70, 0));
     if (ptr != NULL) {
         fn_801254B4(ptr, 0, 0x71, 0, 0);
         fn_801254B4(ptr, 0, 0x72, 0, 0);
