@@ -8626,10 +8626,12 @@ static int PCPort_ParseIntEnv(const char* name, int* outValue) {
 
 /* Role-to-motion indirection. This is intentionally data-shaped: the field
  * action-table trace can populate the three roles when its struct offsets land.
- * For now, only env or PCPORT_FIELD_MOTION_MAP="idle,walk,run" fills it. */
+ * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win; otherwise the
+ * PC port derives a ken_b1 default from the real Resource+0x4 motion bank. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
+    int explicitMap = 0;
     map.idle = -1;
     map.walk = -1;
     map.run = -1;
@@ -8641,11 +8643,26 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
             map.idle = a;
             map.walk = b;
             map.run = c;
+            explicitMap = 1;
         }
     }
-    PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle);
-    PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk);
-    PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
+    if (PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle)) explicitMap = 1;
+    if (PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk)) explicitMap = 1;
+    if (PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run)) explicitMap = 1;
+    if (!explicitMap && getenv("PCPORT_FIELD_MOTION_AUTOMAP_DISABLE") == NULL) {
+        int idle = -1, walk = -1, run = -1;
+        if (PCPort_CharAnimSuggestLocomotionMap(
+                "orig/GC6E01/disc/files/field_common.fsys", "ken_b1",
+                &idle, &walk, &run)) {
+            map.idle = idle;
+            map.walk = walk;
+            map.run = run;
+            if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
+                printf("[field/motion] auto map idle=%d walk=%d run=%d\n",
+                       map.idle, map.walk, map.run);
+            }
+        }
+    }
     return map;
 }
 
@@ -8781,8 +8798,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         /* Drive the motion bank: idle while standing, walk for partial-stick
          * movement, run/dash for full-stick or held B/R. The
-         * indices are env-tunable (ken_b1: 0=T-pose bind, others=real poses);
-         * SetMotion is a no-op unless the movement state actually changed. */
+         * role map is data-derived from ken_b1's cyclic clips unless env
+         * overrides or the future field action-table path fill it explicitly. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
             PCPortFieldMotionRole role = moving
                 ? (running ? PCPORT_FIELD_MOTION_RUN : PCPORT_FIELD_MOTION_WALK)
@@ -9217,15 +9234,19 @@ int main(int argc, char** argv) {
     fflush(stdout);
 
     {
+        const char* motionFrames = getenv("PCPORT_MOTION_PROBE");
         const char* bankFrames = getenv("PCPORT_CHARANIM_BANK_PROBE");
-        if (bankFrames != NULL) {
+        if (motionFrames != NULL || bankFrames != NULL) {
             const char* sa = getenv("PCPORT_SWIZ_ARCHIVE");
             const char* sm = getenv("PCPORT_SWIZ_MEMBER");
-            printf("[pcport_bootstrap] CHARANIM_BANK_PROBE requested\n");
+            printf("[pcport_bootstrap] %s requested\n",
+                   motionFrames != NULL ? "MOTION_PROBE"
+                                        : "CHARANIM_BANK_PROBE");
             fflush(stdout);
-            PCPort_CharAnimBankProbe(
+            PCPort_MotionProbe(
                 sa != NULL ? sa : "orig/GC6E01/disc/files/field_common.fsys",
-                sm != NULL ? sm : "ken_b1", atoi(bankFrames));
+                sm != NULL ? sm : "ken_b1",
+                atoi(motionFrames != NULL ? motionFrames : bankFrames));
             return 0;
         }
     }

@@ -243,6 +243,17 @@ void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int fram
  * motion over real HSD data, printing moved-joint counts and SRT checksums. */
 void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
                               int frames);
+/* Diagnostic: non-visual motion-bank proof. Steps each AnimJoint/FObj motion and
+ * prints per-motion SRT checksum variation plus loop/cyclic classification. */
+void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
+                        int frames);
+/* Data-derived locomotion map from the character's motion bank. The current
+ * heuristic selects the lowest/middle/highest-energy cyclic motions. */
+int PCPort_CharAnimSuggestLocomotionMap(const char* fsysPath,
+                                        const char* memberName,
+                                        int* outIdle,
+                                        int* outWalk,
+                                        int* outRun);
 
 /* Field-character animation. PCPort_CharAnimSetup builds a live animated HSD
  * tree from a swizzled copy of the character archive (once). Each frame,

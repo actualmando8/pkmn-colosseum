@@ -2408,6 +2408,7 @@ static char             g_charAnimMember[80];
 static int              g_charAnimMotionIdx = -1;  /* -1 = use env/default */
 static f32              g_charAnimTime = 0.0f;
 static f32              g_charAnimLoopLen = -1.0f;
+static int              g_charAnimQuietSetup = 0;
 
 int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     u8* data = NULL;
@@ -2433,11 +2434,13 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
         snprintf(g_charAnimMember, sizeof(g_charAnimMember), "%s", memberName);
 
     if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
-        printf("[char-anim] load %s:%s FAILED\n", fsysPath, memberName);
+        if (!g_charAnimQuietSetup) {
+            printf("[char-anim] load %s:%s FAILED\n", fsysPath, memberName);
+        }
         return 0;
     }
     if (!PCPort_HSDArchiveParseBE(&g_charAnimArchive, data, size)) {
-        printf("[char-anim] parse FAILED\n");
+        if (!g_charAnimQuietSetup) printf("[char-anim] parse FAILED\n");
         free(data);
         return 0;
     }
@@ -2446,7 +2449,7 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_charAnimArchive,
                                                              "scene_data", &sceneOffset);
     if (sceneData == NULL) {
-        printf("[char-anim] no scene_data\n");
+        if (!g_charAnimQuietSetup) printf("[char-anim] no scene_data\n");
         PCPort_HSDArchiveDestroy(&g_charAnimArchive);
         free(data); g_charAnimData = NULL;
         return 0;
@@ -2501,13 +2504,15 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
         animjoint    = (realAnimOff >= dataLo && realAnimOff < dataHi)
                            ? (void*)(g_charAnimArchive.storage + realAnimOff) : NULL;
         matanimjoint = NULL;
-        printf("[char-anim] motion bank: %u motions; using idx %u (animOff=0x%X)\n",
-               motionCount, motionIdx, realAnimOff);
+        if (!g_charAnimQuietSetup) {
+            printf("[char-anim] motion bank: %u motions; using idx %u (animOff=0x%X)\n",
+                   motionCount, motionIdx, realAnimOff);
+        }
     }
 
     g_charAnimRoot = HSD_JObjLoadJoint(rootJoint);
     if (g_charAnimRoot == NULL) {
-        printf("[char-anim] HSD_JObjLoadJoint FAILED\n");
+        if (!g_charAnimQuietSetup) printf("[char-anim] HSD_JObjLoadJoint FAILED\n");
         PCPort_HSDArchiveDestroy(&g_charAnimArchive);
         free(data); g_charAnimData = NULL;
         return 0;
@@ -2521,8 +2526,10 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     g_charAnimTime = 0.0f;
     g_charAnimLoopLen = -1.0f;
     g_charAnimReady = 1;
-    printf("[char-anim] setup OK (%s :: %s, root=%p animjoint=%p)\n",
-           fsysPath, memberName, (void*)g_charAnimRoot, animjoint);
+    if (!g_charAnimQuietSetup) {
+        printf("[char-anim] setup OK (%s :: %s, root=%p animjoint=%p)\n",
+               fsysPath, memberName, (void*)g_charAnimRoot, animjoint);
+    }
     return 1;
 }
 
@@ -2592,18 +2599,26 @@ static u32 PCPort_CharAnimCountMotionBank(const char* fsysPath,
     u32 dataLo, dataHi, count = 0u, k;
 
     memset(&archive, 0, sizeof(archive));
-    printf("[charbank] count: load %s :: %s\n", fsysPath, memberName);
-    fflush(stdout);
-    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
-        printf("[charbank] count: load FAILED\n");
+    if (!g_charAnimQuietSetup) {
+        printf("[charbank] count: load %s :: %s\n", fsysPath, memberName);
         fflush(stdout);
+    }
+    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
+        if (!g_charAnimQuietSetup) {
+            printf("[charbank] count: load FAILED\n");
+            fflush(stdout);
+        }
         return 0u;
     }
-    printf("[charbank] count: loaded %u bytes, parse\n", size);
-    fflush(stdout);
-    if (!PCPort_HSDArchiveParseBE(&archive, data, size)) {
-        printf("[charbank] count: parse FAILED\n");
+    if (!g_charAnimQuietSetup) {
+        printf("[charbank] count: loaded %u bytes, parse\n", size);
         fflush(stdout);
+    }
+    if (!PCPort_HSDArchiveParseBE(&archive, data, size)) {
+        if (!g_charAnimQuietSetup) {
+            printf("[charbank] count: parse FAILED\n");
+            fflush(stdout);
+        }
         if (data != NULL) free(data);
         return 0u;
     }
@@ -2707,110 +2722,313 @@ static f32 PCPort_ProbeSnapshotDelta(const f32 a[PCPORT_PROBE_MAX_JOINTS][9],
     return sum;
 }
 
-void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
-                              int frames) {
-    u32 motionCount, motionIdx;
-    const char* maxEnv = getenv("PCPORT_CHARANIM_BANK_MAX");
-    u32 maxMotions = (maxEnv != NULL && maxEnv[0]) ? (u32)atoi(maxEnv) : 0u;
+typedef struct PCPortMotionProbeStats {
+    u32 motionIdx;
+    int valid;
+    int jointCount;
+    int aobjCount;
+    int probeFrames;
+    int movedFromRest;
+    int varyingFrames;
+    int loopMoved;
+    f32 endFrame;
+    f32 checksumFirst;
+    f32 checksumLast;
+    f32 checksumRange;
+    f32 frameDeltaSum;
+    f32 frameDeltaMax;
+    f32 maxRestRot;
+    f32 maxRestTrans;
+    f32 loopDelta;
+    f32 loopMaxRot;
+    f32 loopMaxTrans;
+    f32 rootLoopTrans;
+    const char* kind;
+} PCPortMotionProbeStats;
 
-    if (frames <= 0) frames = 30;
-    motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
-    if (maxMotions > 0u && motionCount > maxMotions) {
-        motionCount = maxMotions;
-    }
-    printf("[charbank] %s :: %s -> %u motion(s), stepping %d frame(s) each\n",
-           fsysPath, memberName, motionCount, frames);
-    fflush(stdout);
-    if (motionCount == 0u) {
-        printf("[charbank] no Resource+0x4 motion bank found\n");
-        fflush(stdout);
+static void PCPort_MotionProbeCollectStats(const char* fsysPath,
+                                           const char* memberName,
+                                           u32 motionIdx,
+                                           int frames,
+                                           PCPortMotionProbeStats* outStats) {
+    int f, i;
+    f32 prevChecksum, minChecksum, maxChecksum;
+
+    memset(outStats, 0, sizeof(*outStats));
+    outStats->motionIdx = motionIdx;
+    outStats->kind = "setup-failed";
+    if (frames <= 1) frames = 2;
+
+    g_charAnimMotionIdx = (int)motionIdx;
+    if (!PCPort_CharAnimSetup(fsysPath, memberName)) {
         return;
     }
 
-    for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
-        int f, i, moved = 0, loopMoved = 0;
-        f32 checksum0, checksumN, maxRot = 0.0f, maxTrans = 0.0f;
-        f32 endFrame, loopDelta, loopMaxRot, loopMaxTrans, rootLoopTrans;
-        const char* kind;
+    g_probeCount = 0;
+    g_probeAnimCount = 0;
+    PCPort_ProbeCollect(g_charAnimRoot);
+    outStats->valid = 1;
+    outStats->jointCount = g_probeCount;
+    outStats->aobjCount = g_probeAnimCount;
+    outStats->endFrame = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
 
-        g_charAnimMotionIdx = (int)motionIdx;
-        printf("[charbank] motion[%u]: setup...\n", motionIdx);
-        fflush(stdout);
-        if (!PCPort_CharAnimSetup(fsysPath, memberName)) {
-            printf("[charbank] motion[%u] setup FAILED\n", motionIdx);
-            fflush(stdout);
-            continue;
-        }
+    HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
+    PCPort_HSDStartAnimAll(g_charAnimRoot);
+    HSD_JObjAnimAll(g_charAnimRoot);
+    prevChecksum = PCPort_ProbeSRTChecksum();
+    minChecksum = prevChecksum;
+    maxChecksum = prevChecksum;
+    outStats->checksumFirst = prevChecksum;
+    outStats->checksumLast = prevChecksum;
+    outStats->probeFrames = 1;
 
-        g_probeCount = 0;
-        g_probeAnimCount = 0;
-        PCPort_ProbeCollect(g_charAnimRoot);
-        checksum0 = PCPort_ProbeSRTChecksum();
-        endFrame = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
-
-        for (f = 0; f < frames; ++f) {
-            HSD_JObjAnimAll(g_charAnimRoot);
-        }
-        checksumN = PCPort_ProbeSRTChecksum();
-
-        for (i = 0; i < g_probeCount; ++i) {
-            HSD_JObj* j = g_probeJoints[i];
-            f32 dt, dr, ds;
-            if (j == NULL) continue;
-            dt = fabsf(j->translate_x - g_probeRest[i][0]) +
-                 fabsf(j->translate_y - g_probeRest[i][1]) +
-                 fabsf(j->translate_z - g_probeRest[i][2]);
-            dr = fabsf(j->rotate_x - g_probeRest[i][3]) +
-                 fabsf(j->rotate_y - g_probeRest[i][4]) +
-                 fabsf(j->rotate_z - g_probeRest[i][5]);
-            ds = fabsf(j->scale_x - g_probeRest[i][6]) +
-                 fabsf(j->scale_y - g_probeRest[i][7]) +
-                 fabsf(j->scale_z - g_probeRest[i][8]);
-            if (dt > 1.0e-4f || dr > 1.0e-4f || ds > 1.0e-4f) {
-                ++moved;
-                if (dr > maxRot) maxRot = dr;
-                if (dt > maxTrans) maxTrans = dt;
-            }
-        }
-
-        HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
-        PCPort_HSDStartAnimAll(g_charAnimRoot);
+    for (f = 1; f < frames; ++f) {
+        f32 now, delta;
         HSD_JObjAnimAll(g_charAnimRoot);
-        PCPort_ProbeSnapshot(g_probeLoopStart);
-        for (f = 1; f < (int)(endFrame + 0.5f); ++f) {
-            HSD_JObjAnimAll(g_charAnimRoot);
+        now = PCPort_ProbeSRTChecksum();
+        delta = fabsf(now - prevChecksum);
+        if (delta > 1.0e-4f) {
+            ++outStats->varyingFrames;
         }
-        PCPort_ProbeSnapshot(g_probeLoopEnd);
-        loopDelta = PCPort_ProbeSnapshotDelta(g_probeLoopStart, g_probeLoopEnd,
-                                              1, &loopMoved, &loopMaxRot,
-                                              &loopMaxTrans, &rootLoopTrans);
-        if (moved <= 1 && maxRot < 0.01f && maxTrans < 0.01f) {
-            kind = "static/bind";
-        } else if (loopDelta < 0.75f) {
-            kind = "cyclic";
-        } else {
-            kind = "one-shot";
+        outStats->frameDeltaSum += delta;
+        if (delta > outStats->frameDeltaMax) {
+            outStats->frameDeltaMax = delta;
         }
+        if (now < minChecksum) minChecksum = now;
+        if (now > maxChecksum) maxChecksum = now;
+        prevChecksum = now;
+        outStats->checksumLast = now;
+        ++outStats->probeFrames;
+    }
+    outStats->checksumRange = maxChecksum - minChecksum;
 
-        printf("[charbank] motion[%u]: joints=%d aobjs=%d end=%.2f moved=%d "
-               "kind=%s loopDelta=%.4f loopMoved=%d loopMaxRot=%.4f "
-               "loopMaxTrans=%.4f rootLoopTrans=%.4f "
-               "checksum %.4f -> %.4f (delta=%.4f maxDRot=%.4f maxDTrans=%.4f)\n",
-               motionIdx, g_probeCount, g_probeAnimCount,
-               endFrame, moved, kind, loopDelta, loopMoved, loopMaxRot,
-               loopMaxTrans, rootLoopTrans,
-               checksum0, checksumN, fabsf(checksumN - checksum0),
-               maxRot, maxTrans);
-        fflush(stdout);
+    for (i = 0; i < g_probeCount; ++i) {
+        HSD_JObj* j = g_probeJoints[i];
+        f32 dt, dr, ds;
+        if (j == NULL) continue;
+        dt = fabsf(j->translate_x - g_probeRest[i][0]) +
+             fabsf(j->translate_y - g_probeRest[i][1]) +
+             fabsf(j->translate_z - g_probeRest[i][2]);
+        dr = fabsf(j->rotate_x - g_probeRest[i][3]) +
+             fabsf(j->rotate_y - g_probeRest[i][4]) +
+             fabsf(j->rotate_z - g_probeRest[i][5]);
+        ds = fabsf(j->scale_x - g_probeRest[i][6]) +
+             fabsf(j->scale_y - g_probeRest[i][7]) +
+             fabsf(j->scale_z - g_probeRest[i][8]);
+        if (dt > 1.0e-4f || dr > 1.0e-4f || ds > 1.0e-4f) {
+            ++outStats->movedFromRest;
+            if (dr > outStats->maxRestRot) outStats->maxRestRot = dr;
+            if (dt > outStats->maxRestTrans) outStats->maxRestTrans = dt;
+        }
     }
 
-    if (g_charAnimData != NULL) { free(g_charAnimData); g_charAnimData = NULL; }
-    if (g_charAnimArchive.storage != NULL) PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+    HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
+    PCPort_HSDStartAnimAll(g_charAnimRoot);
+    HSD_JObjAnimAll(g_charAnimRoot);
+    PCPort_ProbeSnapshot(g_probeLoopStart);
+    if (outStats->endFrame >= 1.0f) {
+        int loopFrames = (int)(outStats->endFrame + 0.5f);
+        if (loopFrames < 1) loopFrames = 1;
+        for (f = 1; f < loopFrames; ++f) {
+            HSD_JObjAnimAll(g_charAnimRoot);
+        }
+    }
+    PCPort_ProbeSnapshot(g_probeLoopEnd);
+    outStats->loopDelta = PCPort_ProbeSnapshotDelta(
+        g_probeLoopStart, g_probeLoopEnd, 1, &outStats->loopMoved,
+        &outStats->loopMaxRot, &outStats->loopMaxTrans,
+        &outStats->rootLoopTrans);
+
+    if (outStats->varyingFrames == 0 &&
+        outStats->movedFromRest <= 1 &&
+        outStats->maxRestRot < 0.01f &&
+        outStats->maxRestTrans < 0.01f) {
+        outStats->kind = "static/bind";
+    } else if (outStats->loopDelta < 0.75f) {
+        outStats->kind = "cyclic";
+    } else {
+        outStats->kind = "one-shot";
+    }
+}
+
+static void PCPort_CharAnimProbeRelease(void) {
+    if (g_charAnimData != NULL) {
+        free(g_charAnimData);
+        g_charAnimData = NULL;
+    }
+    if (g_charAnimArchive.storage != NULL) {
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+    }
     g_charAnimRoot = NULL;
     g_charAnimReady = 0;
     g_charAnimMotionIdx = -1;
     g_charAnimTime = 0.0f;
     g_charAnimLoopLen = -1.0f;
+}
+
+typedef struct PCPortMotionCandidate {
+    int motionIdx;
+    f32 energy;
+} PCPortMotionCandidate;
+
+static void PCPort_SortMotionCandidates(PCPortMotionCandidate* c, int count) {
+    int i, j;
+    for (i = 1; i < count; ++i) {
+        PCPortMotionCandidate v = c[i];
+        j = i - 1;
+        while (j >= 0 && c[j].energy > v.energy) {
+            c[j + 1] = c[j];
+            --j;
+        }
+        c[j + 1] = v;
+    }
+}
+
+static int PCPort_SelectLocomotionMapFromStats(
+    const PCPortMotionProbeStats* stats,
+    u32 motionCount,
+    int* outIdle,
+    int* outWalk,
+    int* outRun) {
+    PCPortMotionCandidate cyclic[64];
+    int count = 0;
+    u32 i;
+
+    if (outIdle == NULL || outWalk == NULL || outRun == NULL) {
+        return 0;
+    }
+    for (i = 0; i < motionCount && i < 64u; ++i) {
+        if (!stats[i].valid) continue;
+        if (strcmp(stats[i].kind, "cyclic") != 0) continue;
+        if (stats[i].varyingFrames <= 0) continue;
+        cyclic[count].motionIdx = (int)stats[i].motionIdx;
+        cyclic[count].energy = stats[i].frameDeltaSum + stats[i].checksumRange;
+        ++count;
+    }
+    if (count < 1) {
+        return 0;
+    }
+    PCPort_SortMotionCandidates(cyclic, count);
+    *outIdle = cyclic[0].motionIdx;
+    *outRun = cyclic[count - 1].motionIdx;
+    *outWalk = cyclic[(count > 2) ? 1 : (count - 1)].motionIdx;
+    return 1;
+}
+
+int PCPort_CharAnimSuggestLocomotionMap(const char* fsysPath,
+                                        const char* memberName,
+                                        int* outIdle,
+                                        int* outWalk,
+                                        int* outRun) {
+    PCPortMotionProbeStats stats[64];
+    u32 motionCount, motionIdx;
+    int oldQuiet = g_charAnimQuietSetup;
+
+    if (outIdle == NULL || outWalk == NULL || outRun == NULL) {
+        return 0;
+    }
+    *outIdle = -1;
+    *outWalk = -1;
+    *outRun = -1;
+    memset(stats, 0, sizeof(stats));
+
+    g_charAnimQuietSetup = 1;
+    motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
+    if (motionCount > 64u) motionCount = 64u;
+    if (motionCount == 0u) {
+        g_charAnimQuietSetup = oldQuiet;
+        return 0;
+    }
+
+    for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
+        PCPort_MotionProbeCollectStats(fsysPath, memberName, motionIdx, 40,
+                                       &stats[motionIdx]);
+    }
+    g_charAnimQuietSetup = oldQuiet;
+    PCPort_CharAnimProbeRelease();
+
+    return PCPort_SelectLocomotionMapFromStats(stats, motionCount,
+                                               outIdle, outWalk, outRun);
+}
+
+void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
+                        int frames) {
+    u32 motionCount, motionIdx;
+    const char* maxEnv = getenv("PCPORT_CHARANIM_BANK_MAX");
+    const char* verboseEnv = getenv("PCPORT_MOTION_PROBE_VERBOSE");
+    PCPortMotionProbeStats stats[64];
+    u32 maxMotions = (maxEnv != NULL && maxEnv[0]) ? (u32)atoi(maxEnv) : 0u;
+    int verbose = verboseEnv != NULL && verboseEnv[0] != '\0';
+
+    memset(stats, 0, sizeof(stats));
+    if (frames <= 0) frames = 30;
+    motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
+    if (motionCount > 64u) {
+        motionCount = 64u;
+    }
+    if (maxMotions > 0u && motionCount > maxMotions) {
+        motionCount = maxMotions;
+    }
+    printf("[motion-probe] %s :: %s -> %u motion(s), stepping %d frame(s) each\n",
+           fsysPath, memberName, motionCount, frames);
+    fflush(stdout);
+    if (motionCount == 0u) {
+        printf("[motion-probe] no Resource+0x4 motion bank found\n");
+        fflush(stdout);
+        return;
+    }
+
+    printf("[motion-probe] id joints aobjs endFrame frames cyclic kind "
+           "varyFrames frameDeltaSum frameDeltaMax checksumRange "
+           "loopDelta moved maxDRot maxDTrans rootLoopTrans\n");
+    fflush(stdout);
+    for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
+        PCPortMotionProbeStats* s = &stats[motionIdx];
+        PCPort_MotionProbeCollectStats(fsysPath, memberName, motionIdx, frames,
+                                       s);
+        if (!s->valid) {
+            printf("[motion-probe] %2u setup FAILED\n", motionIdx);
+            fflush(stdout);
+            continue;
+        }
+
+        printf("[motion-probe] %2u %6d %5d %8.2f %6d %6s %-11s "
+               "%10d %13.4f %13.4f %13.4f %9.4f %5d %7.4f %9.4f %13.4f\n",
+               motionIdx, s->jointCount, s->aobjCount, s->endFrame,
+               s->probeFrames,
+               strcmp(s->kind, "cyclic") == 0 ? "yes" : "no",
+               s->kind, s->varyingFrames, s->frameDeltaSum,
+               s->frameDeltaMax, s->checksumRange, s->loopDelta,
+               s->movedFromRest, s->maxRestRot, s->maxRestTrans,
+               s->rootLoopTrans);
+        if (verbose) {
+            printf("[motion-probe]    checksum %.4f -> %.4f, loopMoved=%d "
+                   "loopMaxRot=%.4f loopMaxTrans=%.4f\n",
+                   s->checksumFirst, s->checksumLast, s->loopMoved,
+                   s->loopMaxRot, s->loopMaxTrans);
+        }
+        fflush(stdout);
+    }
+    {
+        int idle = -1, walk = -1, run = -1;
+        if (PCPort_SelectLocomotionMapFromStats(stats, motionCount,
+                                               &idle, &walk, &run)) {
+            printf("[motion-probe] data-derived locomotion map: "
+                   "idle=%d walk=%d run=%d "
+                   "(PCPORT_FIELD_MOTION_MAP=%d,%d,%d)\n",
+                   idle, walk, run, idle, walk, run);
+        } else {
+            printf("[motion-probe] data-derived locomotion map: unavailable\n");
+        }
+        fflush(stdout);
+    }
+
+    PCPort_CharAnimProbeRelease();
+}
+
+void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
+                              int frames) {
+    PCPort_MotionProbe(fsysPath, memberName, frames);
 }
 
 void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
