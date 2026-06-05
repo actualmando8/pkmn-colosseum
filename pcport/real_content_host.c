@@ -2401,6 +2401,9 @@ static PCPortHSDArchive g_charAnimArchive;
 static HSD_JObj*        g_charAnimRoot = NULL;
 static int              g_charAnimReady = 0;
 static u8*              g_charAnimData = NULL;
+static char             g_charAnimFsys[300];
+static char             g_charAnimMember[80];
+static int              g_charAnimMotionIdx = -1;  /* -1 = use env/default */
 
 int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     u8* data = NULL;
@@ -2412,9 +2415,18 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     void* animjoint;
     void* matanimjoint;
 
+    /* Free any prior live tree/archive (motion switches re-run this). */
+    if (g_charAnimData != NULL) { free(g_charAnimData); g_charAnimData = NULL; }
+    if (g_charAnimArchive.storage != NULL) PCPort_HSDArchiveDestroy(&g_charAnimArchive);
     g_charAnimReady = 0;
     g_charAnimRoot = NULL;
     memset(&g_charAnimArchive, 0, sizeof(g_charAnimArchive));
+
+    /* Remember source so PCPort_CharAnimSetMotion can rebuild with a new motion. */
+    if (fsysPath != g_charAnimFsys)
+        snprintf(g_charAnimFsys, sizeof(g_charAnimFsys), "%s", fsysPath);
+    if (memberName != g_charAnimMember)
+        snprintf(g_charAnimMember, sizeof(g_charAnimMember), "%s", memberName);
 
     if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
         printf("[char-anim] load %s:%s FAILED\n", fsysPath, memberName);
@@ -2452,8 +2464,11 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
         u32 rootOff    = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x0);
         u32 animArrOff = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x4);
         u32 matanimOff = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x8);
+        /* Motion index: runtime-set (g_charAnimMotionIdx, via SetMotion) wins;
+         * else PCPORT_MOTION_IDX env; else 0. */
         const char* mi = getenv("PCPORT_MOTION_IDX");
-        u32 motionIdx = (mi != NULL) ? (u32)atoi(mi) : 0u;
+        u32 motionIdx = (g_charAnimMotionIdx >= 0) ? (u32)g_charAnimMotionIdx
+                        : ((mi != NULL) ? (u32)atoi(mi) : 0u);
         u32 dataLo = g_charAnimArchive.dataOffset;
         u32 dataHi = g_charAnimArchive.dataOffset + g_charAnimArchive.dataSize;
         u32 realAnimOff = 0u, motionCount = 0u, k;
@@ -2503,6 +2518,17 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     printf("[char-anim] setup OK (%s :: %s, root=%p animjoint=%p)\n",
            fsysPath, memberName, (void*)g_charAnimRoot, animjoint);
     return 1;
+}
+
+/* Switch the playing motion (e.g. idle <-> walk). Rebuilds the live tree with
+ * motion[idx] from the remembered archive. Cheap (re-parses ~100KB ken_b1) and
+ * only called on a movement-state transition, not per frame. No-op if already
+ * on that motion. Returns 1 on success. */
+int PCPort_CharAnimSetMotion(int motionIdx) {
+    if (g_charAnimReady && motionIdx == g_charAnimMotionIdx) return 1;
+    if (g_charAnimFsys[0] == '\0') return 0;   /* never set up */
+    g_charAnimMotionIdx = motionIdx;
+    return PCPort_CharAnimSetup(g_charAnimFsys, g_charAnimMember);
 }
 
 /* Lockstep walk: BE joint chain (offsets: child@+0x08, next@+0x0C) <-> live

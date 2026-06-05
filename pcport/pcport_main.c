@@ -8563,12 +8563,12 @@ static int PCPort_LoadFieldCharacter(void) {
     printf("[field/wes] loaded %s :: %s (rootJoint=0x%X)\n", fsysPath, member, g_engCharRoot);
 
     /* Build the live animated HSD tree (a second, swizzled copy of the same
-     * archive) so the embedded animation can drive the BE skinning each frame.
-     * GATED behind PCPORT_CHAR_ANIM: the embedded animjoint is a constant pose
-     * (no walk motion) and posing currently tears envelope meshes -- see the
-     * note in RenderFieldCharacter. Default render stays clean. */
-    if (getenv("PCPORT_CHAR_ANIM") != NULL && PCPort_CharAnimSetup(fsysPath, member)) {
-        printf("[field/wes] animation armed (PCPORT_CHAR_ANIM)\n");
+     * archive) so the character's real motion bank drives the BE skinning. The
+     * motion data was reverse-engineered (Resource+0x4 = array of HSD_AnimJoint
+     * motions); the walk loop selects idle/walk via PCPort_CharAnimSetMotion.
+     * On by default; PCPORT_NO_CHAR_ANIM disables (falls back to static pose). */
+    if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && PCPort_CharAnimSetup(fsysPath, member)) {
+        printf("[field/wes] motion bank armed\n");
     }
     return 1;
 }
@@ -8583,13 +8583,9 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
     f32 P[3][4];
     f32 cy = cosf(yaw), sy = sinf(yaw);
     if (!g_engCharLoaded) return;
-    /* Advance the embedded animation and write the animated joint SRT into the
-     * BE archive the skinning reads. GATED OFF by default (PCPORT_CHAR_ANIM):
-     * ken_b1's embedded animjoint is a constant POSE, not a walk motion, AND
-     * applying a non-bind pose currently tears the envelope-skinned meshes
-     * (invBind must be snapshotted at the REST pose, not recomputed from the
-     * posed world). Both are open follow-ups; default render stays clean. */
-    if (getenv("PCPORT_CHAR_ANIM") != NULL) {
+    /* Advance the active motion and write the animated joint SRT into the BE
+     * archive the skinning reads (on by default; PCPORT_NO_CHAR_ANIM disables). */
+    if (getenv("PCPORT_NO_CHAR_ANIM") == NULL) {
         PCPort_CharAnimStepAndApply(&g_engCharArchive, g_engCharRoot);
     }
     /* placement = translate(p) * rotateY(yaw) * uniformScale(scale) */
@@ -8686,6 +8682,18 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             ppos[0] += mvx * SPEED;
             ppos[2] += mvz * SPEED;
             pyaw = atan2f(mvx, -mvz);   /* face the move direction */
+        }
+
+        /* Drive the motion bank: walk while moving, idle while standing. The
+         * indices are env-tunable (ken_b1: 0=T-pose bind, others=real poses);
+         * SetMotion is a no-op unless the movement state actually changed. */
+        if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
+            const char* im = getenv("PCPORT_IDLE_MOTION");
+            const char* wm = getenv("PCPORT_WALK_MOTION");
+            int idleMot = (im != NULL && im[0]) ? atoi(im) : 1;
+            int walkMot = (wm != NULL && wm[0]) ? atoi(wm) : 2;
+            int moving = (mvx != 0.0f || mvz != 0.0f);
+            PCPort_CharAnimSetMotion(moving ? walkMot : idleMot);
         }
 
         /* Block at walls (slide), then snap to the floor under the new spot. If

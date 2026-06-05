@@ -248,6 +248,9 @@ void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int fram
 int  PCPort_CharAnimSetup(const char* fsysPath, const char* memberName);
 void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint);
 int  PCPort_CharAnimReady(void);
+/* Switch the active motion (idle/walk/run) by bank index; rebuilds the live
+ * tree from the remembered archive. No-op if already on that motion. */
+int  PCPort_CharAnimSetMotion(int motionIdx);
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive);
 const void* PCPort_HSDArchiveGetPublicAddress(const PCPortHSDArchive* archive,
                                               const char* name,
