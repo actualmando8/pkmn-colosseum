@@ -798,6 +798,10 @@ extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
 extern f32 lbl_8047CA34;
 extern f32 lbl_8047CA38;
+/* WALL(codex): fn_800D55D0/fn_800D5648 are prologue-scheduling limited.
+ * Adding val to fn_800D4F98 fixes crset cr1eq, but both remain 93.5484%
+ * because target schedules lfs lbl_8047CA30 before stw LR; scheduling on
+ * did not move it. Reverted non-matching experiment. */
 #if 0
 asm void fn_800D55D0(void) {
 #include "src/game/gs_render_fn_800D55D0.inc"
