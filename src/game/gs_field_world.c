@@ -16441,20 +16441,22 @@ asm void fn_80123FBC(void) {
 #else
 u32 fn_80123FBC(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
-    extern u32 fn_80135530(u32 val);
+    extern u32 gamedataAttestCheckValid(u32 val);
     u16 val;
     u8 flag;
     if (ptr == NULL) { return 0; }
     val = (u16)fn_8012640C(ptr, 0, 0x6e, 0);
     if (val == 0) { return 0; }
     flag = 0;
-    if (val != 0) {
+    if (val == 0) {
+        flag = 0;
+    } else {
         if ((u32)fn_8012640C(NULL, val, 1, 0) == 0) { flag = 0; }
         else if (val >= *(u32*)(u32)lbl_80478F90) { flag = 0; }
         else { flag = 1; }
     }
     if ((u8)flag == 0) { return 0; }
-    if ((u8)fn_80135530(fn_8012640C(ptr, 0, 0x70, 0)) == 0) { return 0; }
+    if ((u8)gamedataAttestCheckValid(fn_8012640C(ptr, 0, 0x70, 0)) == 0) { return 0; }
     return (u8)fn_8012640C(ptr, 0, 0xb8, 0) != 1;
 }
 #endif
