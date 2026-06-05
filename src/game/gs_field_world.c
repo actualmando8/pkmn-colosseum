@@ -8768,98 +8768,46 @@ void fn_80118F7C(u8* obj, void* arg) {
 extern void fn_80169494(void);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
-#if 1
+#if 0
 asm void fn_80118FB0(void) {
 #include "src/game/gs_field_world_fn_80118FB0.inc"
 }
 #else
-void fn_80118FB0(void) {
-    extern f32 lbl_8047CFE8;
-    extern f32 lbl_8047CFEC;
-    extern void fn_800E01D0();
-    extern void fn_800E01F4();
-    extern void fn_80169494();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    r27 = r3;
-    r28 = r4;
-    r29 = r5;
-    r30 = r6;
-    r31 = r8;
-    r0 = *(u32*)((u8*)r3 + 0x44);
-    if (((s32)r0 == (s32)0x0) && ((s32)r29 != (s32)0x0)) {
-        r3 = *(u32*)((u8*)r28 + 0x4);
-        r0 = r7 & 0xFF;
-        *(u32*)((u8*)r27 + 0x48) = r3;
-        r0 = *(u16*)((u8*)r28 + 0x2);
-        *(u32*)((u8*)r27 + 0x4C) = r0;
-        if (r0 == (u32)0x1) {
-            f1 = lbl_8047CFE8;
-            r3 = r27 + 0x50;
-            f2 = f1;
-            f3 = f1;
-            fn_800E01F4();
-            f1 = lbl_8047CFE8;
-            r3 = r27 + 0x5c;
-            f2 = f1;
-            f3 = f1;
-            fn_800E01F4();
-            f1 = lbl_8047CFEC;
-            r3 = r27 + 0x68;
-            f2 = f1;
-            f3 = f1;
-            fn_800E01F4();
+void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model) {
+    extern void fn_800E01D0(void* dst, void* src);
+    extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
+    extern void fn_80169494(u32 model, u32 value);
+    f32 zero;
+    f32 one;
+
+    if (*(s32*)(obj + 0x44) == 0 && (s32)state != 0) {
+        *(u32*)(obj + 0x48) = *(u32*)(desc + 0x4);
+        *(u32*)(obj + 0x4C) = *(u16*)(desc + 0x2);
+        if ((u8)init_from_zero == 1) {
+            zero = lbl_8047CFE8;
+            fn_800E01F4(obj + 0x50, zero, zero, zero);
+            zero = lbl_8047CFE8;
+            fn_800E01F4(obj + 0x5C, zero, zero, zero);
+            one = lbl_8047CFEC;
+            fn_800E01F4(obj + 0x68, one, one, one);
         } else {
-            r3 = r27 + 0x50;
-            r4 = r27 + 0x14;
-            fn_800E01D0();
-            r3 = r27 + 0x5c;
-            r4 = r27 + 0x20;
-            fn_800E01D0();
-            r3 = r27 + 0x68;
-            r4 = r27 + 0x2c;
-            fn_800E01D0();
+            fn_800E01D0(obj + 0x50, obj + 0x14);
+            fn_800E01D0(obj + 0x5C, obj + 0x20);
+            fn_800E01D0(obj + 0x68, obj + 0x2C);
         }
-        f1 = lbl_8047CFE8;
-        r3 = r27 + 0x14;
-        f2 = f1;
-        f3 = f1;
-        fn_800E01F4();
-        f1 = lbl_8047CFE8;
-        r3 = r27 + 0x20;
-        f2 = f1;
-        f3 = f1;
-        fn_800E01F4();
-        f1 = lbl_8047CFEC;
-        r3 = r27 + 0x2c;
-        f2 = f1;
-        f3 = f1;
-        fn_800E01F4();
-        r0 = r31 & 0xFF;
-        if (r0 != (u32)0x1) {
-            r3 = *(u32*)((u8*)r27 + 0x10);
-            r4 = *(u32*)((u8*)r28 + 0x8);
-            fn_80169494();
+        zero = lbl_8047CFE8;
+        fn_800E01F4(obj + 0x14, zero, zero, zero);
+        zero = lbl_8047CFE8;
+        fn_800E01F4(obj + 0x20, zero, zero, zero);
+        one = lbl_8047CFEC;
+        fn_800E01F4(obj + 0x2C, one, one, one);
+        if ((u8)attach_model != 0) {
+            fn_80169494(*(u32*)(obj + 0x10), *(u32*)(desc + 0x8));
         }
-        *(u32*)((u8*)r27 + 0x44) = r29;
-        r0 = 0x1;
-        *(u8*)((u8*)r27 + 0x5) = r30;
-        *(u8*)((u8*)r27 + 0x6) = r0;
+        *(u32*)(obj + 0x44) = state;
+        obj[5] = (u8)byte5;
+        obj[6] = 1;
     }
-    return;
 }
 #endif
 /* 0x801190DC | 0x2E0 */
