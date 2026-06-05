@@ -19232,14 +19232,14 @@ asm void fn_801298B8(void) {
 }
 #else
 s32 fn_801298B8(u8* ptr, u32 arg2) {
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     extern void* fn_80129BC8(u8* ptr, u8 a, u16* b, u16* c, u32 d, u8* e);
     extern s32 fn_80140588(void* a, u16 b, u32 c, u16 d, u8 e);
     u16 local_c = 0;
     u16 local_a = 0;
     u8 local_8;
     void* result;
-    result = fn_80129BC8(ptr, (u8)fn_80142CF4(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
+    result = fn_80129BC8(ptr, (u8)itemGetStatus(0, arg2, 2, 0), &local_c, &local_a, 0, &local_8);
     if (result == NULL) { return -1; }
     return fn_80140588(result, local_c, arg2, local_a, local_8);
 }
