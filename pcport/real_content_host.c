@@ -4486,6 +4486,7 @@ typedef struct PCPortBattleProbeActor {
     u8 level;
     u16 tableMoves[4];
     int tableTeamResolved;
+    int allowTableActorDerive;
     char fsysPath[320];
     f32 x;
     f32 y;
@@ -4526,6 +4527,12 @@ typedef struct PCPortBattleProbeMoveScript {
     int defaultDamage;
 } PCPortBattleProbeMoveScript;
 
+typedef struct PCPortBattleProbeSpeciesMember {
+    u16 speciesId;
+    const char* member;
+    const char* displayName;
+} PCPortBattleProbeSpeciesMember;
+
 #define PCPORT_COMMON_REL_POKEMON_STATS_OFFSET   0x12336Cu
 #define PCPORT_COMMON_REL_MOVE_DATA_OFFSET       0x11E048u
 #define PCPORT_COMMON_REL_TRAINER_DATA_OFFSET    0x092ED0u
@@ -4561,6 +4568,19 @@ static const PCPortBattleProbeMoveScript kBattleProbeDefaultMoves[2] = {
       "PCPORT_BATTLE_ENEMY_TEXT_ID", "PCPORT_BATTLE_ENEMY_DAMAGE",
       "Bite", 44u, 0x8002u, 2, 0, 21 }
 };
+
+static const PCPortBattleProbeSpeciesMember
+    kBattleProbeSpeciesMembers[] = {
+        { 25u,  "pikachu",   "Pikachu" },
+        { 196u, "eifie",     "Eifie" },
+        { 197u, "blacky",    "Blacky" },
+        { 292u, "nukenin",   "Nukenin" },
+        { 316u, "gokulin",   "Gokulin" },
+        { 317u, "marunoom",  "Marunoom" },
+        { 335u, "zangoose",  "Zangoose" },
+        { 336u, "habunake",  "Habunake" },
+        { 359u, "absol",     "Absol" }
+    };
 
 static f32 PCPort_BattleProbeMotionScore(const PCPortMotionProbeStats* s) {
     if (s == NULL || !s->valid) {
@@ -4660,6 +4680,7 @@ static void PCPort_BattleProbeInitActor(PCPortBattleProbeActor* actor,
     actor->teamSlot = d->teamSlot;
     actor->speciesId = d->speciesId;
     actor->level = d->level;
+    actor->allowTableActorDerive = (envValue == NULL || envValue[0] == '\0');
     actor->x = d->x;
     actor->y = d->y;
     actor->z = d->z;
@@ -4926,6 +4947,40 @@ static u16 PCPort_BattleProbeFirstUsableTableMove(
     return 0u;
 }
 
+static const PCPortBattleProbeSpeciesMember*
+PCPort_BattleProbeFindSpeciesMember(u16 speciesId) {
+    u32 i;
+    for (i = 0u; i < sizeof(kBattleProbeSpeciesMembers) /
+                    sizeof(kBattleProbeSpeciesMembers[0]); ++i) {
+        if (kBattleProbeSpeciesMembers[i].speciesId == speciesId) {
+            return &kBattleProbeSpeciesMembers[i];
+        }
+    }
+    return NULL;
+}
+
+static int PCPort_BattleProbeTrainerFirstPokemon(
+    const u8* commonRel,
+    u32 commonRelSize,
+    u16 trainerId,
+    u16* outFirstPokemon) {
+    u32 off;
+    if (outFirstPokemon == NULL) {
+        return 0;
+    }
+    if (!PCPort_BattleProbeRangeValid(PCPORT_COMMON_REL_TRAINER_DATA_OFFSET,
+                                      PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                      trainerId,
+                                      PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                      commonRelSize)) {
+        return 0;
+    }
+    off = PCPORT_COMMON_REL_TRAINER_DATA_OFFSET +
+          (u32)trainerId * PCPORT_COMMON_REL_TRAINER_DATA_SIZE;
+    *outFirstPokemon = ReadBE16(commonRel + off + 0x04);
+    return 1;
+}
+
 static int PCPort_BattleProbeFindTrainerForFirstPokemon(
     const u8* commonRel,
     u32 commonRelSize,
@@ -4984,6 +5039,94 @@ static int PCPort_BattleProbeFindTeamPair(
     return 0;
 }
 
+static int PCPort_BattleProbeApplyTrainerIdTeam(
+    const u8* commonRel,
+    u32 commonRelSize,
+    PCPortBattleProbeActor* actors,
+    u32 actorBase,
+    const char* sideLabel,
+    u16* outMoveId,
+    int allowMoveDerive) {
+    u16 trainerId;
+    u16 firstPokemon;
+    u32 slot;
+    const PCPortBattleProbeSpeciesMember* members[2];
+    u16 species[2];
+
+    if (actors == NULL || actorBase + 1u >= 4u) {
+        return 0;
+    }
+    trainerId = actors[actorBase].trainerId;
+    if (!actors[actorBase].allowTableActorDerive ||
+        !actors[actorBase + 1u].allowTableActorDerive) {
+        printf("[battle-probe-table-derive] side=%s status=actor-env-override "
+               "trainer=0x%04X\n", sideLabel, trainerId);
+        return 0;
+    }
+    if (!PCPort_BattleProbeTrainerFirstPokemon(commonRel, commonRelSize,
+                                               trainerId, &firstPokemon)) {
+        printf("[battle-probe-table-derive] side=%s status=trainer-oob "
+               "trainer=0x%04X\n", sideLabel, trainerId);
+        return 0;
+    }
+    for (slot = 0u; slot < 2u; ++slot) {
+        u32 tableIndex = (u32)firstPokemon + slot;
+        if (!PCPort_BattleProbeTrainerPokemonValid(commonRel, commonRelSize,
+                                                   tableIndex)) {
+            printf("[battle-probe-table-derive] side=%s status=team-oob "
+                   "trainer=0x%04X firstPokemon=%u slot=%u\n",
+                   sideLabel, trainerId, firstPokemon, slot);
+            return 0;
+        }
+        species[slot] =
+            PCPort_BattleProbeTrainerPokemonSpecies(commonRel, tableIndex);
+        members[slot] = PCPort_BattleProbeFindSpeciesMember(species[slot]);
+        if (members[slot] == NULL) {
+            printf("[battle-probe-table-derive] side=%s status=unmapped-species "
+                   "trainer=0x%04X firstPokemon=%u slot=%u species=%u\n",
+                   sideLabel, trainerId, firstPokemon, slot, species[slot]);
+            return 0;
+        }
+    }
+
+    for (slot = 0u; slot < 2u; ++slot) {
+        PCPortBattleProbeActor* actor = &actors[actorBase + slot];
+        u32 tableIndex = (u32)firstPokemon + slot;
+        u32 moveSlot;
+        actor->trainerId = trainerId;
+        actor->teamSlot = (u8)slot;
+        actor->speciesId = species[slot];
+        actor->member = members[slot]->member;
+        actor->displayName = members[slot]->displayName;
+        actor->level = PCPort_BattleProbeTrainerPokemonLevel(commonRel,
+                                                             tableIndex);
+        actor->tableTeamResolved = 1;
+        snprintf(actor->fsysPath, sizeof(actor->fsysPath),
+                 "orig/GC6E01/disc/files/pkx_%s.fsys", actor->member);
+        for (moveSlot = 0u; moveSlot < 4u; ++moveSlot) {
+            actor->tableMoves[moveSlot] =
+                PCPort_BattleProbeTrainerPokemonMove(commonRel, tableIndex,
+                                                     moveSlot);
+        }
+    }
+    if (allowMoveDerive && outMoveId != NULL) {
+        u16 derivedMove =
+            PCPort_BattleProbeFirstUsableTableMove(&actors[actorBase]);
+        if (derivedMove != 0u) {
+            *outMoveId = derivedMove;
+        }
+    }
+    printf("[battle-probe-table-derive] side=%s status=trainer-applied "
+           "trainer=0x%04X firstPokemon=%u species=%u/%u levels=%u/%u "
+           "members=%s/%s moves0=%u/%u/%u/%u\n",
+           sideLabel, trainerId, firstPokemon, species[0], species[1],
+           actors[actorBase].level, actors[actorBase + 1u].level,
+           actors[actorBase].member, actors[actorBase + 1u].member,
+           actors[actorBase].tableMoves[0], actors[actorBase].tableMoves[1],
+           actors[actorBase].tableMoves[2], actors[actorBase].tableMoves[3]);
+    return 1;
+}
+
 static void PCPort_BattleProbeApplyDerivedTeam(
     const u8* commonRel,
     u32 commonRelSize,
@@ -4997,6 +5140,11 @@ static void PCPort_BattleProbeApplyDerivedTeam(
     u32 slot;
 
     if (actors == NULL || actorBase + 1u >= 4u) {
+        return;
+    }
+    if (PCPort_BattleProbeApplyTrainerIdTeam(commonRel, commonRelSize,
+                                             actors, actorBase, sideLabel,
+                                             outMoveId, allowMoveDerive)) {
         return;
     }
     if (!PCPort_BattleProbeFindTeamPair(commonRel, commonRelSize,
@@ -5124,6 +5272,8 @@ void PCPort_BattleProbe(int frames) {
     u16 enemyTextId;
     int playerDamage;
     int enemyDamage;
+    char playerMoveNameAuto[32];
+    char enemyMoveNameAuto[32];
     char playerMoveText[96];
     char playerDamageText[96];
     char enemyMoveText[96];
@@ -5166,6 +5316,24 @@ void PCPort_BattleProbe(int frames) {
     enemyDamage = PCPort_BattleProbeEnvInt(
         kBattleProbeDefaultMoves[1].damageEnv,
         kBattleProbeDefaultMoves[1].defaultDamage);
+
+    printf("[battle-probe] mode=headless actors=4 frames=%d\n", frames);
+    PCPort_BattleProbePrintCommonRelTables(
+        actors, &playerMoveId, &enemyMoveId,
+        getenv(kBattleProbeDefaultMoves[0].moveIdEnv) == NULL,
+        getenv(kBattleProbeDefaultMoves[1].moveIdEnv) == NULL);
+    if (getenv(kBattleProbeDefaultMoves[0].moveEnv) == NULL &&
+        playerMoveId != kBattleProbeDefaultMoves[0].moveId) {
+        snprintf(playerMoveNameAuto, sizeof(playerMoveNameAuto),
+                 "Move %u", playerMoveId);
+        playerMoveName = playerMoveNameAuto;
+    }
+    if (getenv(kBattleProbeDefaultMoves[1].moveEnv) == NULL &&
+        enemyMoveId != kBattleProbeDefaultMoves[1].moveId) {
+        snprintf(enemyMoveNameAuto, sizeof(enemyMoveNameAuto),
+                 "Move %u", enemyMoveId);
+        enemyMoveName = enemyMoveNameAuto;
+    }
     PCPort_BattleProbeFormatMoveText(playerMoveText, sizeof(playerMoveText),
                                      &actors[kBattleProbeDefaultMoves[0].attacker],
                                      playerMoveName);
@@ -5178,12 +5346,6 @@ void PCPort_BattleProbe(int frames) {
     PCPort_BattleProbeFormatDamageText(
         enemyDamageText, sizeof(enemyDamageText),
         &actors[kBattleProbeDefaultMoves[1].target]);
-
-    printf("[battle-probe] mode=headless actors=4 frames=%d\n", frames);
-    PCPort_BattleProbePrintCommonRelTables(
-        actors, &playerMoveId, &enemyMoveId,
-        getenv(kBattleProbeDefaultMoves[0].moveIdEnv) == NULL,
-        getenv(kBattleProbeDefaultMoves[1].moveIdEnv) == NULL);
     printf("[battle-probe-data] playerTrainer=0x%04X enemyTrainer=0x%04X "
            "playerMove=%u enemyMove=%u playerText=0x%04X enemyText=0x%04X\n",
            actors[0].trainerId, actors[2].trainerId,

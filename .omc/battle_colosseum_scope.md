@@ -145,12 +145,12 @@ Commit target: minimal headless vertical slice.
 - Follow-up table/env pass added default actor and move-script tables. Actor archive members can be overridden with `PCPORT_BATTLE_P0`, `PCPORT_BATTLE_P1`, `PCPORT_BATTLE_E0`, and `PCPORT_BATTLE_E1`. Move labels/damage can be overridden with `PCPORT_BATTLE_PLAYER_MOVE`, `PCPORT_BATTLE_PLAYER_DAMAGE`, `PCPORT_BATTLE_ENEMY_MOVE`, and `PCPORT_BATTLE_ENEMY_DAMAGE`.
 - Real-ID table pass added trainer IDs, team slots, species IDs, move IDs, and text IDs to the headless probe records. Defaults are Espeon/Eifie species 196 level 25, Umbreon/Blacky species 197 level 26, Absol species 359 level 50, Pikachu species 25 level 50; player move defaults to Swift ID 129, enemy move defaults to Bite ID 44. Move/text IDs can be overridden with `PCPORT_BATTLE_PLAYER_MOVE_ID`, `PCPORT_BATTLE_ENEMY_MOVE_ID`, `PCPORT_BATTLE_PLAYER_TEXT_ID`, and `PCPORT_BATTLE_ENEMY_TEXT_ID`.
 - common_rel table pass loads `common.fsys :: pcommon_rel` and prints bounded rows from the actual move, Pokemon stats, trainer, and trainer-Pokemon tables. Validated `common_rel` size is `0x14E5B0`; Swift ID 129 reads table index 128 with power 60, and Bite ID 44 reads table index 43 with power 60. The native PowerShell gate still ends with `summary loaded=4/4 confirmed=yes`.
-- Trainer/team derivation pass now scans common_rel trainer-Pokemon pairs before loading actors. If the selected species pair is not present as a trainer-owned adjacent pair, the probe emits an explicit fallback line and keeps the safe host-contained defaults; this is currently the case for Eifie/Blacky and Absol/Pikachu.
+- Trainer/team derivation now reads the selected common_rel trainer rows before loading actors. Default trainer `0x0001` resolves to trainer-Pokemon rows `8/9` as Zangoose/Zangoose at level 100, and trainer `0x0200` resolves to rows `630/631` as Gokulin/Nukenin at level 50; the enemy move derives from the table as move ID `213`. The probe keeps explicit fallback handling for unmapped species or actor env overrides.
 
 Validated output highlights:
 
-- `player-left eifie`: 7 motions, 4 varying.
-- `player-right blacky`: 9 motions, 6 varying.
-- `enemy-left absol`: 8 motions, 5 varying.
-- `enemy-right pikachu`: 15 motions, 12 varying.
+- Table-derived `player-left zangoose`: 8 motions, 5 varying.
+- Table-derived `player-right zangoose`: 8 motions, 5 varying.
+- Table-derived `enemy-left gokulin`: 6 motions, 6 varying.
+- Table-derived `enemy-right nukenin`: 4 motions, 4 varying.
 - Turn stub ends at `playerHP=79 enemyHP=68 next=command-menu`.
