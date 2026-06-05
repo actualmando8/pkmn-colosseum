@@ -130,3 +130,23 @@ Validation gates:
 - Waza tracer: use `waza_viewer` and `battle_waza.c` to map move sequence file formats and Pokemon motion IDs.
 - Host implementer: add `pcport/battle_host.c` with fixed 2v2 placement, animation stepping, text overlay, and deterministic turn state.
 - Decomp integrator: isolate dependency-light functions in `battle_logic.c` that can be linked into the PC port before scheduler integration.
+
+## Phase 0 Implementation Checkpoint
+
+Commit target: minimal headless vertical slice.
+
+- Added `PCPort_BattleProbe(frames)` in `pcport/real_content_host.c`.
+- Added standalone `pcport/battle_probe_main.c`.
+- Added dedicated `pcport/battle_probe_stubs.c` for unused render-side HSD DObj/object-link references in the headless probe.
+- Built fresh exe: `build_pc/pcport_battle_probe_headless_1780675322.exe`.
+- Native PowerShell `Start-Process` validation completed with `summary loaded=4/4 confirmed=yes`.
+- Default actors: player-left `eifie`, player-right `blacky`, enemy-left `absol`, enemy-right `pikachu`.
+- Probe prints fixed 2v2 placement, menu text (`FIGHT  POKEMON  BAG  RUN`), deterministic selected move/target, player attack, enemy damage, enemy attack, player damage, and end-turn HP state.
+
+Validated output highlights:
+
+- `player-left eifie`: 7 motions, 4 varying.
+- `player-right blacky`: 9 motions, 6 varying.
+- `enemy-left absol`: 8 motions, 5 varying.
+- `enemy-right pikachu`: 15 motions, 12 varying.
+- Turn stub ends at `playerHP=79 enemyHP=68 next=command-menu`.

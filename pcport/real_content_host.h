@@ -280,6 +280,10 @@ int PCPort_CharAnimSuggestLocomotionMapEx(const char* fsysPath,
  * row for each member with a Resource+0x4 motion bank. */
 void PCPort_MotionBatchProbe(int frames);
 void PCPort_HeadlessMotionBatchProbe(int frames);
+/* Headless Battle Colosseum vertical-slice probe. Loads four pkx Pokemon models,
+ * chooses deterministic stance/attack/damage motions from their real motion
+ * banks, prints fixed 2v2 placement, menu text, and a scripted one-turn flow. */
+void PCPort_BattleProbe(int frames);
 
 /* Field-character animation. PCPort_CharAnimSetup builds a live animated HSD
  * tree from a swizzled copy of the character archive (once). Each frame,

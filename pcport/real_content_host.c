@@ -4476,6 +4476,257 @@ static void PCPort_HeadlessMotionBatchProbePkxArchives(int frames) {
 #endif
 }
 
+typedef struct PCPortBattleProbeActor {
+    const char* label;
+    const char* member;
+    char fsysPath[320];
+    f32 x;
+    f32 y;
+    f32 z;
+    PCPortMotionProbeStats stats[64];
+    u32 motionCount;
+    u32 varyingCount;
+    int loaded;
+    int stanceMotion;
+    int attackMotion;
+    int damageMotion;
+} PCPortBattleProbeActor;
+
+static f32 PCPort_BattleProbeMotionScore(const PCPortMotionProbeStats* s) {
+    if (s == NULL || !s->valid) {
+        return -1.0f;
+    }
+    return PCPort_MotionProbeEnergy(s);
+}
+
+static int PCPort_BattleProbeFirstValidMotion(
+    const PCPortMotionProbeStats* stats,
+    u32 motionCount) {
+    u32 i;
+    if (stats == NULL) {
+        return -1;
+    }
+    for (i = 0u; i < motionCount && i < 64u; ++i) {
+        if (stats[i].valid) {
+            return (int)i;
+        }
+    }
+    return -1;
+}
+
+static int PCPort_BattleProbeBestVaryingMotion(
+    const PCPortMotionProbeStats* stats,
+    u32 motionCount,
+    int excludeMotion,
+    int highEnergy) {
+    u32 i;
+    int best = -1;
+    f32 bestScore = highEnergy ? -1.0f : 1.0e30f;
+
+    if (stats == NULL) {
+        return -1;
+    }
+    for (i = 0u; i < motionCount && i < 64u; ++i) {
+        f32 score;
+        if (!stats[i].valid || stats[i].varyingFrames <= 0 ||
+            (int)i == excludeMotion) {
+            continue;
+        }
+        score = PCPort_BattleProbeMotionScore(&stats[i]);
+        if ((highEnergy && score > bestScore) ||
+            (!highEnergy && score < bestScore)) {
+            best = (int)i;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
+static const PCPortMotionProbeStats* PCPort_BattleProbeStatsForMotion(
+    const PCPortBattleProbeActor* actor,
+    int motion) {
+    if (actor == NULL || motion < 0 || motion >= (int)actor->motionCount ||
+        motion >= 64) {
+        return NULL;
+    }
+    if (!actor->stats[motion].valid) {
+        return NULL;
+    }
+    return &actor->stats[motion];
+}
+
+static void PCPort_BattleProbeDescribeMotion(
+    const PCPortBattleProbeActor* actor,
+    const char* role,
+    int motion) {
+    const PCPortMotionProbeStats* s =
+        PCPort_BattleProbeStatsForMotion(actor, motion);
+    if (s == NULL) {
+        printf("%s=-1", role);
+        return;
+    }
+    printf("%s=%d(kind=%s,end=%.1f,energy=%.4f,delta=%.4f)",
+           role, motion, s->kind != NULL ? s->kind : "?",
+           s->endFrame, PCPort_MotionProbeEnergy(s),
+           s->frameDeltaSum);
+}
+
+static void PCPort_BattleProbeInitActor(PCPortBattleProbeActor* actor,
+                                        const char* label,
+                                        const char* envName,
+                                        const char* defaultMember,
+                                        f32 x,
+                                        f32 y,
+                                        f32 z) {
+    const char* envValue = getenv(envName);
+
+    memset(actor, 0, sizeof(*actor));
+    actor->label = label;
+    actor->member = (envValue != NULL && envValue[0] != '\0') ?
+                    envValue : defaultMember;
+    actor->x = x;
+    actor->y = y;
+    actor->z = z;
+    actor->stanceMotion = -1;
+    actor->attackMotion = -1;
+    actor->damageMotion = -1;
+    snprintf(actor->fsysPath, sizeof(actor->fsysPath),
+             "orig/GC6E01/disc/files/pkx_%s.fsys", actor->member);
+}
+
+static void PCPort_BattleProbeLoadActor(PCPortBattleProbeActor* actor,
+                                        int frames) {
+    int fallback;
+
+    if (actor == NULL) {
+        return;
+    }
+    actor->loaded = PCPort_HeadlessMotionCollectMemberStats(
+        actor->fsysPath, actor->member, frames, actor->stats,
+        &actor->motionCount, 0);
+    actor->varyingCount =
+        PCPort_MotionProbeVaryingMotionCount(actor->stats, actor->motionCount);
+
+    if (!actor->loaded) {
+        printf("[battle-probe] actor=%s member=%s load=failed path=%s\n",
+               actor->label, actor->member, actor->fsysPath);
+        fflush(stdout);
+        return;
+    }
+
+    actor->stanceMotion =
+        PCPort_BattleProbeFirstValidMotion(actor->stats, actor->motionCount);
+    actor->attackMotion =
+        PCPort_BattleProbeBestVaryingMotion(actor->stats, actor->motionCount,
+                                            -1, 1);
+    actor->damageMotion =
+        PCPort_BattleProbeBestVaryingMotion(actor->stats, actor->motionCount,
+                                            actor->attackMotion, 0);
+    fallback = actor->stanceMotion;
+    if (actor->attackMotion < 0) actor->attackMotion = fallback;
+    if (actor->damageMotion < 0) actor->damageMotion = fallback;
+
+    printf("[battle-probe] actor=%s member=%-8s motions=%2u varying=%2u "
+           "pos=(%.2f,%.2f,%.2f) ",
+           actor->label, actor->member, actor->motionCount,
+           actor->varyingCount, actor->x, actor->y, actor->z);
+    PCPort_BattleProbeDescribeMotion(actor, "stance", actor->stanceMotion);
+    printf(" ");
+    PCPort_BattleProbeDescribeMotion(actor, "attack", actor->attackMotion);
+    printf(" ");
+    PCPort_BattleProbeDescribeMotion(actor, "damage", actor->damageMotion);
+    printf("\n");
+    fflush(stdout);
+}
+
+static void PCPort_BattleProbePrintAction(const char* state,
+                                          const PCPortBattleProbeActor* actor,
+                                          const char* text,
+                                          int motion) {
+    const PCPortMotionProbeStats* s =
+        PCPort_BattleProbeStatsForMotion(actor, motion);
+    printf("[battle-probe-turn] state=%s actor=%s motion=%d text=\"%s\"",
+           state, actor != NULL ? actor->label : "-", motion,
+           text != NULL ? text : "");
+    if (s != NULL) {
+        printf(" kind=%s first=%.4f last=%.4f range=%.4f energy=%.4f",
+               s->kind != NULL ? s->kind : "?",
+               s->checksumFirst, s->checksumLast, s->checksumRange,
+               PCPort_MotionProbeEnergy(s));
+    }
+    printf("\n");
+    fflush(stdout);
+}
+
+void PCPort_BattleProbe(int frames) {
+    PCPortBattleProbeActor actors[4];
+    u32 loadedCount = 0u;
+    u32 i;
+    int hpEnemyLeft = 100;
+    int hpPlayerLeft = 100;
+
+    if (frames <= 1) {
+        frames = 24;
+    }
+
+    PCPort_BattleProbeInitActor(&actors[0], "player-left",
+                                "PCPORT_BATTLE_P0", "eifie",
+                                -1.35f, 0.0f, 1.10f);
+    PCPort_BattleProbeInitActor(&actors[1], "player-right",
+                                "PCPORT_BATTLE_P1", "blacky",
+                                1.35f, 0.0f, 1.10f);
+    PCPort_BattleProbeInitActor(&actors[2], "enemy-left",
+                                "PCPORT_BATTLE_E0", "absol",
+                                -1.35f, 0.0f, -1.35f);
+    PCPort_BattleProbeInitActor(&actors[3], "enemy-right",
+                                "PCPORT_BATTLE_E1", "pikachu",
+                                1.35f, 0.0f, -1.35f);
+
+    printf("[battle-probe] mode=headless actors=4 frames=%d\n", frames);
+    printf("[battle-probe-text] \"FIGHT  POKEMON  BAG  RUN\"\n");
+    printf("[battle-probe-text] \"Eifie used Test Strike!\"\n");
+    printf("[battle-probe-text] \"The opposing Absol took damage.\"\n");
+    fflush(stdout);
+
+    for (i = 0u; i < 4u; ++i) {
+        PCPort_BattleProbeLoadActor(&actors[i], frames);
+        if (actors[i].loaded) {
+            ++loadedCount;
+        }
+    }
+
+    printf("[battle-probe] placement player-left=(-1.35,0.00,1.10) "
+           "player-right=(1.35,0.00,1.10) enemy-left=(-1.35,0.00,-1.35) "
+           "enemy-right=(1.35,0.00,-1.35)\n");
+    printf("[battle-probe-turn] state=opening playerHP=%d enemyHP=%d\n",
+           hpPlayerLeft, hpEnemyLeft);
+    printf("[battle-probe-turn] state=command-menu selected=FIGHT "
+           "text=\"FIGHT  POKEMON  BAG  RUN\"\n");
+    printf("[battle-probe-turn] state=move-menu selected=TEST_STRIKE "
+           "target=enemy-left\n");
+    fflush(stdout);
+
+    PCPort_BattleProbePrintAction("player-attack", &actors[0],
+                                  "Eifie used Test Strike!",
+                                  actors[0].attackMotion);
+    hpEnemyLeft -= 32;
+    PCPort_BattleProbePrintAction("enemy-damage", &actors[2],
+                                  "The opposing Absol took damage.",
+                                  actors[2].damageMotion);
+    PCPort_BattleProbePrintAction("enemy-attack", &actors[2],
+                                  "The opposing Absol used Test Claw!",
+                                  actors[2].attackMotion);
+    hpPlayerLeft -= 21;
+    PCPort_BattleProbePrintAction("player-damage", &actors[0],
+                                  "Eifie took damage.",
+                                  actors[0].damageMotion);
+    printf("[battle-probe-turn] state=end-turn playerHP=%d enemyHP=%d "
+           "next=command-menu\n", hpPlayerLeft, hpEnemyLeft);
+    printf("[battle-probe] summary loaded=%u/4 confirmed=%s\n",
+           loadedCount, loadedCount == 4u ? "yes" : "no");
+    fflush(stdout);
+}
+
 void PCPort_HeadlessMotionBatchProbe(int frames) {
     static const char* const archives[] = {
         "orig/GC6E01/disc/files/chara_big.fsys",
