@@ -1,0 +1,58 @@
+
+### How successful GC/Wii matching-decomp projects handle their hardest reg-alloc/scheduling functions, 
+MISSING: An "Equivalent" function tier in our build/config (the Pikmin2/TWW model): a third class between byte-exact-Matching and asm-wrapper that lets a hard reg-alloc/scheduling function ship as clean, readable, logically-correct C that does NOT byte-match, still counts toward completion, and is excluded only from the byte-verify gate. Concretely we appear to be missing: (a) a two-axis progress metric that separates "decompiled/converted to C" from "byte-exact-linked", so our headline number isn't artificially depressed by the wall functions; (b) the INLINE_ASM/`-DSKIP_ASM=1` dual-build + objdiff `.N
+DO: 1) STOP measuring success as "byte-exact-or-nothing." Adopt the universal two-axis metric: track "C-converted %" (asm removed, logically correct C, may be Equivalent) separately from "byte-exact %". Our 55.5% is the strict axis; report a converted-axis number alongside it — that is the headline number peers use. 2) Add an EQUIVALENT tier to our config (copy Pikmin2/TWW): functions blocked only by data-flow-locked reg-alloc or opposite-direction scheduling get marked Equivalent — shipped as c
+
+### Per-TU CodeWarrior version + flag discrimination is the #1 thing GC/Wii decomps get right and rookie
+MISSING: A per-TU compiler-version-AND-flags discrimination pass driven by code ORIGIN, implemented in the build/configure script (not config.yml). Concretely we lack: (1) a configure.py-style mapping that assigns each library group its own mw_version + cflag set the way tww does (Dolphin SDK→1.2.5n, MSL/Runtime→1.3, game→1.3.2, middleware→its own); (2) use of the three ground-truth version oracles — link-date-nearest mwcceppc build, SDK init compiler-build strings, and per-TU trial on already-100% functions; (3) a systematic per-library flag sweep of the codegen-shaping flags (-inline auto/n
+DO: 1) Re-frame mw_comment_version: it's a LINKER fingerprint (08=1.0+,0A=1.3.2+,0B/0C=2.7+,0E/0F=3.0a3+) — keep it for link correctness but STOP treating it as the per-TU compiler selector. The compiler+flags belong in the build script per library group.
+2) Restructure the build like tww/pikmin2 configure.py: define library groups (DolphinSDK, MSL/Runtime, game, any middleware) each with its OWN mw_version AND cflag set; expose per-object extra_cflags. Stop running near-uniform GC/1.3.
+3) Assign 
+
+### PPC/CodeWarrior matching-decomp tooling beyond dtk/objdiff/decomp-permuter, and how top GC/Wii proje
+MISSING: Three concrete things, in priority order: (1) objdiff per-unit SYMBOL_MAPPINGS in objdiff.json to resolve your jumptable/relocation-NAME mismatches (content matches, name differs) — this is a config feature you almost certainly aren't using. (2) An LLM-in-the-loop matching harness (Mizuchi-style: objdiff diff report + compiler errors fed back as structured prompt context, m2c seed, permuter in background) wired to your mwcc/dtk/objdiff-cli — you have all the parts (Claude agents, objdiff, dtk) but not the closed feedback loop. (3) A systematic PER-FILE compiler-version + inline-mode sweep 
+DO: 1. Add per-unit "symbol_mappings" to objdiff.json for functions that diff only on jumptable/reloc symbol NAMES — verify against config.schema.json in encounter/objdiff; this likely recovers "matches" you're currently scoring as mismatches. 2. Stand up objdiff-cli 'report' (JSON oneshot) as the scoring backend for an automated loop instead of parsing objdiff UI. 3. Clone github.com/macabeus/mizuchi (MIT) and study its plugin pipeline (m2c->permuter->Claude->compiler->objdiff->retry, mizuchi.yam
+
+### How successful GC/Wii decomp projects crack (or accept) complex CW register-allocation + instruction
+MISSING: A per-TU-granularity build escape hatch (file-splitting to give scheduling-/peephole-blocked functions their own compiler-flag/version context) plus the inline-control levers (`-inline deferred`, `#pragma inline_max_size`/`auto_inline`/`dont_inline`) that change the live-range graph upstream of the allocator. Also missing: an explicit "mark Equivalent and move on" policy for confirmed Layer-2 scheduling walls so you stop grinding functions the whole field accepts as non-matching.
+DO: 1) Build per-TU split tooling so a single blocked function (or small cluster) can be compiled in its own .c with its own flags (peephole on/off, scheduling on/off, CW version, opt level). Your gs_title peephole-bne-b and instr-scheduling-order clusters are the test cases that have been sitting marked "split untested." 2) Add `-inline deferred` to your version/flag sweep matrix — it's a documented PrimeDecomp lever you've never tried and it reorders TU codegen context. 3) Add `#pragma inline_ma
+
+
+===== PLAN =====
+ Direct answers below.
+
+## (1) Do they CRACK the hard reg-alloc/scheduling functions, or wrap them as asm?
+
+**They wrap them. They do not crack them.** This is the honest, unanimous verdict across all four probes and it matches your own conclusion.
+
+No mature GC/Wii project (TWW, Prime, Pikmin2, SMG/Petari) defeats genuine data-flow-locked register allocation or opposite-direction instruction scheduling by being cleverer with C. The one project that built a tool *stronger* than decomp-permuter (Sims2's asm_processor: cross-function instruction injection, forced reg assignment, scheduling mutators) explicitly **rejects its own output as not a legitimate match** and logs those functions in a `walls.md` backlog. Melee, the one strict byte-exact-only project, has sat at ~69% for years precisely because it refuses the escape valve. Everyone else retires the wall functions one of two ways:
+
+- **"Equivalent" tier** — ship clean, logically-correct C that does *not* byte-match, still counts toward completion, excluded only from the byte-verify gate (Pikmin2/TWW `configure.py`).
+- **asm-wrapper** — `INLINE_ASM`/`NON_MATCHING` ifdef keeps the ROM byte-identical; objdiff v3's `.NON_MATCHING`-label auto-strip keeps it out of the progress %.
+
+So: **the real gap is NOT a missing cracking technique. There is no tool or method that genuinely source-cracks these.** The gap is (a) exact per-TU toolchain, and (b) a completeness model that lets you stop grinding them.
+
+## (2) Top 3 things we are likely MISSING (ranked by impact)
+
+**#1 — Exact per-TU compiler version + codegen-flag discrimination, driven by code ORIGIN, not a uniform GC/1.3 default.** This is the highest-impact gap and the one most likely to be manufacturing *fake* walls. The structural facts:
+- `mw_comment_version: 8` in our config.yml is a **linker fingerprint**, not a compiler selector — one linker covers many mwcceppc builds. Reading it as "the compiler" is a category error.
+- Mature projects pin compiler+flags **per library group** in the build script (TWW ships three simultaneously: GC/1.2.5n for Dolphin SDK, GC/1.3 for MSL/Runtime, GC/1.3.2 for game code). We run near-uniform 1.3 with a handful of overrides — we have *not finished* per-TU version assignment.
+- The wrong version OR a wrong codegen-shaping flag produces *exactly* the symptom we call a wall: persistent reg-assignment + scheduling drift that permuter can't anneal (because permuter reshuffles C; it cannot change the allocator a different mwcc build/flag would use).
+- **`-use_lmw_stmw on/off` IS the stmw threshold** — our documented "stmw wall" is very plausibly this flag, not an unbreakable idiom. Likewise untested: `-inline {auto,noauto,deferred,off}`, `-O4,p` vs `-O3,s`, `-schedule on/off`, `-fp_contract`, `-ipa file/program`.
+- Our own `compiler_comparison_results.json` already shows files recommending 1.3 vs 1.2.5n inconsistently — direct local evidence some "walls" sit in mis-versioned TUs.
+
+**#2 — Per-TU split + inline-control levers (the upstream-of-allocator knobs we've never tried).** TU boundaries change MWCC's whole-CU scheduling/regalloc context; our gs_title notes literally mark "split the file" as *untested*. Plus the inline levers that reshape the live-range graph feeding the allocator — `-inline deferred` (reverses TU function order; never tried), `#pragma inline_max_size(N)` / `inline_max_auto_size` / `auto_inline off` / `dont_inline`. Inlining decisions are the usual *upstream* cause of a "reg-alloc permutation" that has no in-function fix. These are documented, project-proven (Prime/TWW), and absent from our pragma catalog.
+
+**#3 — A two-axis completeness model + Equivalent tier + walls.md ledger.** We are measuring success as byte-exact-or-nothing, which (a) artificially depresses our headline number vs peers who report "decompiled %" separately from "linked %", and (b) keeps us re-spending agent budget on functions the entire field accepts as unmatchable. We're missing: the Equivalent tier in config, the `-DSKIP_ASM=1` dual-build + `.NON_MATCHING` auto-strip plumbing, and a `walls.md` that logs each confirmed wall ONCE (with class: stmw-threshold, carry-vs-sign bool, commutative-fresh-reg add, opposite scheduling) and HARD-SKIPS it.
+
+*(Lower-priority, real but secondary: objdiff per-unit `symbol_mappings` to recover phantom jumptable/reloc-NAME mismatches; a Mizuchi-style closed LLM loop feeding objdiff diff + mwcc stderr back into the prompt. Worth doing, but they don't crack walls either — they recover mis-scored near-matches and tighten iteration.)*
+
+## (3) Single highest-value action
+
+**Build and run a per-TU compiler-version × codegen-flag sweep harness, scored by objdiff-cli, BEFORE classifying any residual as a reg-alloc/scheduling wall — and validate cheaply at the asm level first with the existing `tools/decomp_work/ra/` mwcc -S harness.**
+
+Concretely: for each stuck TU, cross `mwcc {1.2.5n, 1.3.2, 2.0, 3.0a5}` × `{-inline auto/noauto/deferred/off}` × `{-use_lmw_stmw on/off, -O4,p vs -O3,s, -schedule on/off, -fp_contract on/off}` × your existing pragma matrix. Use the three ground-truth version oracles to seed it (link-date-nearest mwcceppc build; SDK init compiler-build strings printed in the .dol; trial-fit on functions already at 100% in that file). Target `-use_lmw_stmw off` at the "stmw wall" specifically — that single flag may dissolve a whole documented wall class.
+
+This is the highest-value action because it directly attacks the #1 gap, it is the lever mature projects actually use against these walls (not permuter), and it is cheap to falsify per-function via the local `mwcc -S` harness before any C rewrite. Permuter stays the *last* step — regalloc-only polish — never the tool to overcome a wrong toolchain.
+
+**Bottom line:** They wrap them as asm/Equivalent too. There is no secret cracker. Our real, addressable gap is exact per-TU toolchain (version + the handful of codegen-shaping flags, especially `-use_lmw_stmw` for the stmw wall) plus a completeness model that lets us stop grinding the genuine walls — in that order.

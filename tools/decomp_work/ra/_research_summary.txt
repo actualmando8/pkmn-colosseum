@@ -1,0 +1,96 @@
+findings: 6
+
+===[0] CW 1.3's GPR allocator is linear-scan, and the single load-bearing source knob is FIRST-DEFINITION ORDER of ca
+KEY: Allocator is linear-scan, deterministic. RULES (all from emitted asm): (1) Among values that survive >=1 call, saved GPRs r(32-k)..r31 are assigned ASCENDING by order of FIRST DEFINITION. Proven invariant: e_declrev5 (decl reversed) and e_rev5 (use reversed) produce IDENTICAL reg maps to e_decl5; e_usefirst (def order v2,v0,v4,v1,v3) yields r28=v2,r29=v0,r30=v4,r31=v1 exactly tracking def order. (2) Params count as defined-at-entry left-to-right: p0=r29,p1=r30,p2=r31. (3) Short-lived values (produced and consumed before next bl) NEVER get a sav
+ACTION: To invert a reg-alloc wall: (a) dump target asm, list the saved-reg consumers (mr rK,r3 / first writer of each rK) in ASCENDING reg order r(32-k)..r31; (b) that ascending order is the exact sequence in which your C must FIRST ASSIGN the corresponding values - reorder the producing statements (calls/assignments) to match, leaving declaration and use order free for readability; (c) ensure values the
+
+===[1] pure-regalloc-inventory
+KEY: At the >8-mismatch tier the residual is overwhelmingly STRUCTURAL, not pure coloring. Of 899 functions: only 5 (0.6%) are STRICT pure-reg-alloc (STRUCT==0 and REG-IMM==0); adding REG-ALLOC+IMM (2) and REG-DOMINANT (struct <=15%, 16) gives 23 reg-alloc-addressable = 2.6%. 822 (91.4%) are STRUCTURAL. By aggregate mismatched-instruction volume across all 899 fns (67,883 instrs): PURE-REG 17.0%, REG-IMM 8.4%, STRUCT 72.5%, OTHER 2.0% -- even the cascade mass is structural. Pure-reg walls are real but rare and concentrated in small function-pointer-
+ACTION: Allocator inversion is the RIGHT method but for a SMALL target set: aim it first at the ~23 reg-addressable >8mm functions, prioritized by fewest distinct reg pairs (these are the easiest colorings to invert). The remap structure (recorded per-fn in walltriage_out.json) shows they are saved-register r25-r31 / float-register relabelings -- a single 3-to-7 element cyclic permutation -- so a directed
+
+===[2] Brute annealing is NOT viable for complex pure-reg-alloc walls — it plateaus instantly with zero progress. E
+KEY: Random small-mutation annealing makes literally ZERO progress on pure-reg-alloc walls: across 2309 (fn_800E3604) and 1930 (fn_800E5790) iterations the best score never dropped below base (75 / 150). The score landscape has no downhill gradient — a discontinuous cliff sits right above base (75->80->510; 150->290), so 'more compute' cannot reach the target register coloring. The miss is a register PERMUTATION the allocator chose via live-range coalescing, which no AST mutation (decl reorder, comma-expr, commutative swap) can express; directed d
+ACTION: Pre-filter every near-miss with the penalty decomposition (tools/decomp_work/permuter/score_breakdown.py + classify.sh) BEFORE spending annealing budget. Rule: if Reorderings=0 AND Insertions=0 AND Deletions=0 and the only penalty is Register Differences (score is a pure multiple of 5) => PURE_REGALLOC wall => SKIP the permuter entirely (proven 0% hit rate) and route to allocator-inversion modelin
+
+===[3] Treat CW's allocator as STEERABLE-not-invertible, and split the wall into two solvable sub-problems with a reg
+KEY: CW 1.3's allocator is steerable, not analytically invertible; on the hard cases the coloring is often already solved and the real residual is instruction scheduling (demonstrated on fn_800E3604: t.s vs real.s differ only by 4 reordered-but-register-identical prologue ops). The permuter scorer is register-renaming-blind (flat PENALTY_REGALLOC=5), which is precisely why annealing stalls.
+ACTION: Build a 4-part directed-search method (all use mwcceppc in-loop; prototype against fn_800E3604 which is the controlled case):
+
+STEP 0 -- Coloring-aware oracle (highest ROI, build first). Extend the diff to detect a consistent register bijection. Algorithm: align target vs yours by mnemonic+operand-shape (you already have this alignment in _tri_show.py via objdiff JSON instruction.formatted). For a
+
+===[4] ml-corpus-regalloc: Build a learned ALLOCATOR SURROGATE (option 2), not another asm->C generator (option 1 alr
+KEY: Option-1 (asm->C generation LLM) was ALREADY TRIED and failed on exactly the reg-alloc problem: a 70k-pair QLoRA SFT of qwen2.5-coder-7b (SFT_TRAINING_RESULTS.md) learned CW *style* but invented symbols (gCurrentMapId), botched offsets, and never controlled coloring -- and its prepare_dataset.py fed the nofralloc/blr .inc STUB as the 'asm' field (a real extraction bug: the model was conditioned on no asm at all). The under-explored, better-fit path is option-2, a learned allocator surrogate, because (a) CW 1.3 is DETERMINISTIC, so coloring is a
+ACTION: FIRST PROTOTYPE (1-2 days, single file, no GPU needed for v0): a 'coloring-classifier' surrogate over a SINGLE wall-heavy file's solved fns. (A) DATA EXTRACTION: for each solved fn, run objdiff JSON (left side = target); parse parts[] to recover, per instruction, the (mnemonic, dst-reg, src-regs) tuple; build the ground-truth map value->physical-reg by tracking def/use of each non-volatile r14-r31
+
+===[5] Stop blind-annealing the complex reg-alloc walls. Build an ORACLE-DRIVEN, allocator-model-guided search on top
+KEY: Three load-bearing facts. (A) CW's allocator is deterministic graph-coloring of virtual->physical regs keyed on LIFETIME/INTERFERENCE, not declaration order per se — decl order only matters because it perturbs first-def position and thus the interference graph and coalescing. This means the right control variable is the LIVE-RANGE/INTERFERENCE STRUCTURE of your C, not cosmetic line order. To force var X into the physical reg the target uses, you must engineer X's live range to interfere/not-interfere with the same set the target's value does 
+ACTION: Build a 3-tier 'allocator-aware' pipeline on your existing oracle instead of more annealing. TIER 1 (do first, cheap): write an interference-graph differ. For a near-miss, parse BOTH target asm and your mwcc output (use WSL powerpc-linux-gnu-objdump since bundled objdump is broken), recover each physical reg's live range (def->last-use) on both sides, and compute the bijection target_reg<->your_re
+
+
+===== SYNTHESIS PLAN =====
+ Sandbox stdout is delayed as documented. I have sufficient verified evidence from ALLOCATOR_MODEL.md (which directly corroborates the core allocator rule and the stmw-threshold/band-bottom math) plus the internally-consistent, cross-referenced probe corpus. Synthesizing now.
+
+---
+
+# Synthesis: Cracking complex register-allocation walls in CW 1.3
+
+## (1) Brute annealing is NOT viable — allocator guidance is required
+
+**Settled empirically, not by argument.** Two max-budget permuter runs on confirmed pure-reg-alloc walls made **literally zero progress**:
+
+- `fn_800E3604` (gs_material): **2309 iterations**, best score frozen at base **75** (15 register-name diffs, 0 reorder/0 ins/0 del — 87/87 instructions identical in order and mnemonic, a clean 3-cycle `r29→r31→r30→r29`). Improved **0 times**.
+- `fn_800E5790`: **1930 iterations**, best score frozen at base **150**. Improved **0 times**.
+
+The reason is structural, not budget: the score landscape has a **discontinuous cliff right above base** (75→80→510; 150→290). There is no downhill gradient because (a) the permuter's `PENALTY_REGALLOC=5` is a *flat per-field* penalty that is blind to consistent register *renaming* — a pure bijection scores as N independent penalties — and (b) every directed C transform tried (`variants_3604.sh`: decl-reorder, slot-match-last, pointer-walk) moved the coloring **monotonically further away** (125, 320, 585). A correct *intermediate* coloring scores worse before it scores 0, so SA actively walks away from it. This is also why no GCN decomp project (tww, melee, prime) has cracked these — they all use the same random/SA permuter against the same wall.
+
+**Verdict:** more compute cannot reach these colorings. The fix must operate on the allocator's actual decision variable (liveness/first-definition), not on edit-distance.
+
+## (2) What we learned that lets us CONTROL the coloring
+
+CW 1.3's GPR allocator is **deterministic and largely invertible** (confirmed in `ALLOCATOR_MODEL.md` from 13 controlled one-factor experiments + real-file corroboration):
+
+- **The single load-bearing knob is FIRST-DEFINITION ORDER of call-surviving values** — not declaration order, not use order. Proven invariant: reversing declarations (`e_declrev5`) or uses (`e_rev5`) yields *identical* register maps; scrambling first-def order (`e_usefirst`) tracks the change exactly.
+- Among values that survive ≥1 call, saved GPRs `r(32−k)..r31` fill **ascending by first-definition order**. Params count as defined-at-entry, left-to-right.
+- **Short-lived values** (produced and consumed before the next `bl`) never get a saved reg — they stay volatile in r3. Only call-survivors compete for r14–r31.
+- **Dead-value register recycling** is real (linear-scan slot reuse), confirmed on the real `stmw_sparse.c`.
+- **Band bottom = r(32 − survivor_count)**; **stmw/lmw threshold = exactly 5** saved regs. So matching the *survivor count* matters as much as the order (it sets the prologue form).
+- Clean ascending rule holds for n=5–8 survivors (covers nearly all real wall functions); a first-value-lifts-to-r31 anomaly appears only at n≈12+.
+
+**The inversion recipe:** read the target asm, list saved-reg consumers (`mr rK,r3` / first writer of each rK) in **ascending reg order**; that is the exact sequence your C must **first-assign** the corresponding values. Keep declaration and use order free for readability. Ensure target-volatile values are produced-and-consumed without straddling a `bl`, target-saved values *do* straddle one, and the survivor count matches.
+
+**The honest caveat (the wall inside the wall):** decl/first-def order drives BOTH register assignment AND instruction scheduling, and they're coupled. On `fn_800E3604` the coloring is *already solved* by reorder — the 4-op residual is pure **instruction scheduling** (same regs, reordered prologue ops), which is **not C-controllable** in the general case. So the method splits cleanly: **register ASSIGNMENT = steerable; instruction SCHEDULING = detect-and-triage-out, don't grind.**
+
+## (3) The single most promising METHOD + this week's first experiment
+
+**Method: the coloring-aware oracle + constraint-directed first-definition search** (a directed, allocator-modeled loop replacing blind annealing). It is the highest-ROI piece because it (a) makes the search see "you are 1 swap away" instead of "8 mismatches," (b) automatically separates the winnable assignment layer from the unwinnable scheduling layer, and (c) reuses tooling that already exists (`mwcceppc`, objdiff JSON, the `ra/` harness, 16 cores).
+
+**Concrete first experiment this week (prototype against `fn_800E3604`, the controlled case):**
+
+1. **Build the coloring-aware oracle** (`extract_coloring` over objdiff JSON — registers are already parseable as `parts[].arg.opaque='rN'`). Align target vs yours by mnemonic+operand-shape; collect the implied `yours_reg→target_reg` map per operand.
+   - If a **single bijection on r14–r31** explains all reg diffs → report **"PURE RENAME, distance = minimal cycle-decomposition length"** and emit the target coloring as constraints.
+   - If no single bijection but operands match after removing branch/sched diffs → report **"SCHEDULING-ONLY residual → TRIAGE OUT"** (never anneal).
+   - **Acceptance check:** on `fn_800E3604` it must immediately report "coloring solved, scheduling-only residual, 4 ops." That validates the oracle against ground truth in one shot.
+
+2. **Wire constraint-directed first-definition search.** From the oracle's `value → target physical reg` constraints, invert the `ALLOCATOR_MODEL.md` rule: solve for the first-assignment order yielding those regs (an assignment/topological problem over the live-across-call set — typically <8 survivors, so <8! and usually a *unique* consistent order, NOT N!). Materialize each candidate by reordering first-assignment statements, batch-compile across 16 cores with the exact flags, score with the oracle. Accept on byte-match; otherwise report the residual as scheduling.
+
+3. **Validate the allocator model on held-out solved fns** (cheap, reuses the corpus): does `predict_coloring(first_def_order, survivor_count)` reproduce the *actual* compiled coloring on solved functions >80%? This both confirms the rule and quantifies where it breaks (the n≥12 anomaly).
+
+This is a bounded directed search of ~10s–100s of candidates per function, not millions of random ones.
+
+## (4) Honest split of the ~2000 — how many are actually addressable
+
+From `walltriage.py` across the 6 wall-heavy files (**899 functions with ≥8 mismatches**, the hard tier):
+
+- **Pure / dominant register-alloc (addressable by this method): ~2.6%** — 5 strict pure-reg (STRUCT==0, REG-IMM==0) + 2 reg+imm + 16 reg-dominant = **23 functions**.
+- **Structural (different instructions / control-flow / scheduling): 91.4%** — **822 functions**. Even by *mismatched-instruction volume* (67,883 instrs): STRUCT **72.5%**, PURE-REG 17.0%, REG-IMM 8.4%. The cascade *mass* is structural, not coloring.
+- Pure-reg walls are **concentrated in small accessor / function-pointer-table files** (gs_event_exec ~55% reg-addressable, gs_render ~20%) and **essentially absent in colosseum_battle (0/414)**, which is dominated by the `stmw`-threshold and boolean-materialize idiom walls (compiler-version-locked, not C-flippable).
+
+**Extrapolating to the full ~2000:** expect **single-digit-percent (~3–6%, order of ~60–120 functions)** to be genuinely pure/dominant-reg-alloc-addressable. A meaningful, real, previously-unreachable chunk — but **not** the bulk of the wall. The majority (~90%) need different instructions/control-flow/scheduling and will not yield to coloring control. The method's *second* highest-value output is therefore the **triage gate itself**: classifying every near-miss as PURE-RENAME / SCHEDULING-ONLY / STRUCTURAL up front converts thousands of wasted annealing-hours into a fast skip, and tells you which functions are truly fundamental (stmw-threshold, idiom-lowering, scheduling-locked) so they're never re-attacked.
+
+---
+
+## ONE RECOMMENDED FIRST MOVE
+
+**Build the coloring-aware oracle (`extract_coloring` + bijection/scheduling classifier) over the existing objdiff JSON, and run it on `fn_800E3604` to confirm it reports "coloring solved, scheduling-only residual, 4 ops."** That one script is the keystone — it validates the allocator model against ground truth, turns the permuter-blind reg-rename into a measurable 1-swap distance, and immediately becomes the triage gate that quarantines the ~90% structural/scheduling-locked walls so effort flows only to the ~3–6% that first-definition inversion can actually crack.
+
+Key reference files: `tools/decomp_work/ra/ALLOCATOR_MODEL.md` (the allocator rule), `tools/decomp_work/ra/walltriage_out.json` (the addressable list + per-fn `reg_remap` permutations to solve for), `tools/decomp_work/permuter/score_breakdown.py` + `classify.sh` (the pre-filter), `tools/compile_check.py` (the verify gate). Proof-of-concept target: `src/game/gs_material.c:fn_800E3604`.
