@@ -118,14 +118,18 @@ saved var is consumed (dead after), no spelling reproduces the reuse.
   with W5. See `feedback_crset_dropped_float_vararg`.
 - *Triage:* residual is which register holds a commutative add operand, saved var dead.
 
-### W6 — relocation / jumptable NAME mismatch
-Instructions are **byte-identical**; the only diff is a jumptable or relocation
-**symbol name** (e.g. `jumptable_803634A8` vs CW's anonymous label). Not reachable
-from C — the fix is objdiff per-unit `symbol_mappings` (a config feature) or
-symbols/splits edits, which are **forbidden-edit** truth files here.
+### W6 — relocation / jumptable / call-target NAME mismatch
+Instructions are **byte-identical**; the only diff is a jumptable, relocation, or
+**`bl` call-target** **symbol name** (e.g. `jumptable_803634A8` vs CW's anonymous label,
+or `bl fn_80053110` vs `bl dbgMenuFightWazaEditSub` — same address, different name).
+Not reachable from C — the fix is objdiff per-unit `symbol_mappings` (a config feature)
+or symbols/splits edits, which are **forbidden-edit** truth files here.
 - *Failed levers:* none from C; this is a scoring artifact, not a codegen miss.
-- *Triage:* objdiff shows 100%-identical opcodes, mismatch flagged only on a reloc
-  target name. Candidate for the `symbol_mappings` recovery pass (lower-priority).
+- *Triage:* objdiff shows 100%-identical opcodes (or same-address call targets),
+  mismatch flagged only on a reloc/call target name. Candidate for the `symbol_mappings`
+  recovery pass. Note: `progress.py` / `measure_cache` invoke `objdiff-cli diff` without
+  the `-p` project flag, so `symbol_mappings` only affect per-unit diffs in `objdiff.json`
+  and the decomp.dev interactive GUI, not per-function `compile_check.py` diffs.
 
 ---
 
@@ -137,6 +141,10 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 
 | Function | File | Class | match% | Equivalent? | Evidence |
 |---|---|---|---|---|---|
+| `fn_80038380` | scene_init.c | W2 instruction scheduling (stb/cmpwi reorder) | 89.88% | no (C active) | 4 real mismatches: instruction scheduling moves `stb` earlier and `cmpwi` later; 8 name-only symbol diffs. Sibling of fn_8003907C (identical pattern). |
+| `fn_8003907C` | scene_init.c | W2 instruction scheduling (stb/cmpwi reorder) | 89.88% | no (C active) | Same W2 pattern as fn_80038380. |
+| `fn_80039004` | scene_init.c | W2 `extsb.` vs `extsb`+`cmpwi` codegen idiom + W1 regalloc (`lfsx` indexed vs `lfs` offset, `mulli r6` vs `mulli r0`) | 89.17% | no (C active) | `extsb.` combines sign-extend+condition test — CW emits separate `extsb`+`cmpwi`. `lfsx f0,r5,r0` vs `lfs f0,0(r5)` is regalloc-driven addressing mode. |
+| `fn_801A4A54` | hsd_lobj.c | W2 branch inversion (`ble` vs `bgt`) + early-return emission (`li r3,0; blr` vs fall-through) | 88.21% | no (C active) | Target inverts branch condition and emits early-return block; CW uses opposite branch direction. |
 | `fn_800E3604` | gs_material.c | W1 data-flow-locked reg-alloc (live-range coalescing) | 99.37% | yes | inversion-tested 7 experiments, reg assignment invariant to source order (slotMatch is param-derived + loop-carried → lifted to r31 by data-flow). `feedback_objdiff_orientation_and_mwcc_harness` |
 | `fn_80216650` | colosseum_script.c | W1 data-flow-locked reg-alloc | 99.14% | yes | inversion-tested, locked (`wf_invert`) |
 | `fn_8022E6F0` | colosseum_script.c | W1 data-flow-locked reg-alloc | 99.50% | yes | inversion-tested, locked (`wf_invert`) |
