@@ -38,6 +38,18 @@ The first milestone is not "link the full battle engine." The first milestone is
 - Waza/battle archives: `wzx_battle_name_*.fsys`, `wzx_battle_name_final.fsys`, `wzx_dark_pokemon_battle*.fsys`, and related `wzx_*` files.
 - Candidate debug/test lead: `waza_viewer` is documented in the local reference as a move-viewer room and should be traced as a safe move-animation harness.
 
+First inventory checkpoint:
+
+- `pkx_*.fsys`: 527 archives.
+- `wzx*.fsys`: 1108 archives.
+- `wzx_*_attack.fsys`: 306 archives.
+- `wzx_*_damage.fsys`: 280 archives.
+- `wzx_*_special.fsys`: 79 archives.
+- `wzx_*status*.fsys`: 23 archives.
+- `wzx_*ball*.fsys`: 81 archives.
+- `wzx_snatch*.fsys`: 54 archives.
+- Colosseum/battle-name/intro families (`wzx_colo_*`, `wzx_battle_name*`, `wzx_intro*`): 34 archives.
+
 ## Implementation Plan
 
 ### Phase 0: Inventory And Probes
