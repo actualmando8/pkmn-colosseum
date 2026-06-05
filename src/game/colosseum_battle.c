@@ -34871,11 +34871,11 @@ void fn_8025C5A4(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x8025C674 | Size: 0x48 | Pattern: field_accessor */
 u32 fn_8025C674(void* ctx, u32 slot, u32 param) {
     extern u32 fn_801F37B0();
-    extern void fn_8025C6BC();
+    extern void _fightTrainerAiCheckHorobinoutaSub();
     u32 result[2];
     result[0] = (u32)ctx;
     result[1] = 0;
-    fn_801F37B0(0, (u32)fn_8025C6BC, (u32)result, 0);
+    fn_801F37B0(0, (u32)_fightTrainerAiCheckHorobinoutaSub, (u32)result, 0);
     return result[1] & 0xFFFF;
 }
 
