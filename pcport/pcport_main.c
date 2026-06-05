@@ -1,5 +1,6 @@
 #include "audio_shim.h"
 #include "dvd_shim.h"
+#include "field_motion_host.h"
 #include "field_collision.h"
 #include "gx_shim.h"
 #include "gx_texture.h"
@@ -8626,6 +8627,16 @@ typedef struct PCPortFieldMotionMap {
 static const u8* g_pcFieldMotionRecordTable;
 static u32       g_pcFieldMotionRecordCount;
 
+void PCPort_FieldMotionInstallRecordTable(const void* table, u32 count) {
+    g_pcFieldMotionRecordTable = (const u8*)table;
+    g_pcFieldMotionRecordCount = count;
+}
+
+void PCPort_FieldMotionClearRecordTable(void) {
+    g_pcFieldMotionRecordTable = NULL;
+    g_pcFieldMotionRecordCount = 0;
+}
+
 static int PCPort_ParseIntEnv(const char* name, int* outValue) {
     const char* e = getenv(name);
     if (e == NULL || e[0] == '\0' || outValue == NULL) {
@@ -8797,11 +8808,10 @@ static void PCPort_FieldMotionRecordProbe(const u8* record, u32 key) {
     fflush(stdout);
 }
 
-/* Role-to-motion indirection. This is intentionally data-shaped: the field
- * action-table trace can populate the three roles when its struct offsets land.
- * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win, but there is no
- * hardcoded Wes fallback: the normal path is the real 0x2C per-character record
- * mirrored from fn_8018F4C8 / fn_8018F6F4. */
+/* Role-to-motion indirection. The normal path is the real 0x2C per-character
+ * record table resolved by character key, mirrored from fn_8018F4C8 /
+ * fn_8018F6F4. Env overrides remain diagnostic only; there is no hardcoded Wes
+ * fallback. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
@@ -8983,9 +8993,9 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         }
 
         /* Drive the motion bank: idle while standing, walk for partial-stick
-         * movement, run/dash for full-stick or held B/R. The
-         * role map is data-derived from ken_b1's cyclic clips unless env
-         * overrides or the future field action-table path fill it explicitly. */
+         * movement, run/dash for full-stick or held B/R. Motion ids come from
+         * the real per-character action record when its table and key are
+         * available. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
             PCPortFieldMotionRole role = moving
                 ? (running ? PCPORT_FIELD_MOTION_RUN : PCPORT_FIELD_MOTION_WALK)
@@ -8994,8 +9004,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             if (nextMotion < 0) {
                 if (!reportedMissingMotionMap && motionDebug) {
                     printf("[field/motion] role %d has no mapped motion "
-                           "(set PCPORT_FIELD_MOTION_MAP=idle,walk,run or "
-                           "PCPORT_*_MOTION)\n", (int)role);
+                           "(install 0x2C record table + PCPORT_FIELD_CHAR_KEY; "
+                           "env motion overrides are diagnostic)\n", (int)role);
                     reportedMissingMotionMap = 1;
                 }
             } else if (nextMotion != currentMotion) {
