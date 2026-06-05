@@ -36731,16 +36731,19 @@ void fn_8025E534(void)
     extern f32 lbl_8047E684;
     float fVar1;
     u32 uVar2;
+    u32 state;
     u32 local_buf[3];
 
     local_buf[0] = lbl_8027A478[0];
     local_buf[1] = lbl_8027A478[1];
     local_buf[2] = lbl_8027A478[2];
-    if ((s32)lbl_8047B664 == 1) {
-        fn_80118A68(lbl_8047B660, 1);
-        lbl_8047B660 = 0;
-        lbl_8047B664 = 0;
-    }
+    state = lbl_8047B664;
+    if ((s32)state != 1) goto skip_cleanup;
+    if ((s32)state != 1) goto skip_cleanup;
+    fn_80118A68(lbl_8047B660, 1);
+    lbl_8047B660 = 0;
+    lbl_8047B664 = 0;
+skip_cleanup:
     uVar2 = fn_80113F48();
     uVar2 = fn_800F9318(uVar2, 0x108a1400);
     uVar2 = fn_801190DC(uVar2, 0, 0);
