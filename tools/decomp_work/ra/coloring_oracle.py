@@ -89,6 +89,12 @@ def classify(entry):
     saved_only = all((a in SAVED or a in FLOAT_SAVED) and (b in SAVED or b in FLOAT_SAVED)
                      for a, b in mapping.items() if a != b)
     dist, ncyc = _cycle_distance(mapping)
+    moved = sum(1 for a, b in mapping.items() if a != b)
+    # a TRUE permutation has exactly one distinct pair per moved reg; more distinct
+    # pairs than moved regs => a src maps to >1 target (many-to-many ambiguity) =>
+    # the first-def order for that reg is undetermined, so it is NOT invertible.
+    dpairs = entry.get("distinct_reg_pairs", moved)
+    ambiguous = dpairs > moved
 
     verdict = "STRUCTURAL"
     reason = ""
@@ -98,6 +104,14 @@ def classify(entry):
         reason = (f"clean bijection ({clean:.0%} of diff mass), "
                   f"{'saved-reg only' if saved_only else 'incl. volatile regs'}, "
                   f"swap-distance {dist} ({ncyc} cycle(s))")
+    elif (clean >= 0.95 and saved_only and purereg >= 8 * (struct + regimm)
+          and struct <= 2 and dist > 0 and not ambiguous):
+        # a clean saved-reg bijection DOMINATES, with only minor non-reg residual
+        # (1-2 struct/imm instrs, often alignment noise). Inversion is still the
+        # right lever; it just won't reach 0 without also clearing the residual.
+        verdict = "REG_DOMINANT_RENAME"
+        reason = (f"clean saved-reg bijection (swap-distance {dist}, {ncyc} cycle(s)) "
+                  f"dominates; {struct} struct + {regimm} imm residual remains after inversion")
     elif struct == 0 and purereg > 0 and clean >= 0.6:
         verdict = "SCHEDULING"     # regs mostly align but reorder/imm noise remains
         reason = f"reg bijection {clean:.0%} clean but residual reorder/imm; triage out"
@@ -136,25 +150,30 @@ def main():
     for v in verdicts:
         by.setdefault(v["verdict"], []).append(v)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    # both PURE_RENAME and REG_DOMINANT_RENAME are allocator-inversion candidates
+    invertible = [x for x in verdicts if x["verdict"] in ("PURE_RENAME", "REG_DOMINANT_RENAME")]
     payload = {"total": len(verdicts),
                "counts": {k: len(v) for k, v in by.items()},
-               "pure_rename": sorted(
-                   [{"fn": x["fn"], "file": x["file"], "swap_distance": x["swap_distance"],
+               "invertible": sorted(
+                   [{"fn": x["fn"], "file": x["file"], "verdict": x["verdict"],
+                     "swap_distance": x["swap_distance"],
                      "target_coloring": x["target_coloring"], "reason": x["reason"]}
-                    for x in by.get("PURE_RENAME", [])],
-                   key=lambda x: x["swap_distance"]),
+                    for x in invertible],
+                   key=lambda x: (x["swap_distance"], x["verdict"] != "PURE_RENAME")),
                "verdicts": verdicts}
+    payload["pure_rename"] = [x for x in payload["invertible"] if x["verdict"] == "PURE_RENAME"]
     json.dump(payload, open(OUT, "w"), indent=1)
 
     if as_json:
         print(json.dumps(payload["counts"], indent=1))
         return
     print(f"coloring oracle over {len(verdicts)} wall functions ->")
-    for k in ("PURE_RENAME", "SCHEDULING", "STRUCTURAL"):
-        print(f"  {k:<12} {len(by.get(k, []))}")
-    print("\nPURE_RENAME targets (allocator-inversion candidates, easiest first):")
-    for x in payload["pure_rename"]:
-        print(f"  {x['fn']:<14} dist={x['swap_distance']}  {x['file']}")
+    for k in ("PURE_RENAME", "REG_DOMINANT_RENAME", "SCHEDULING", "STRUCTURAL"):
+        print(f"  {k:<20} {len(by.get(k, []))}")
+    print("\nallocator-inversion candidates (easiest first):")
+    for x in payload["invertible"]:
+        tag = "" if x["verdict"] == "PURE_RENAME" else "  (+residual)"
+        print(f"  {x['fn']:<14} dist={x['swap_distance']}  {x['file']}{tag}")
     print(f"\nwrote {OUT}")
 
 

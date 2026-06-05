@@ -68,6 +68,7 @@ def recipe_for(entry):
                      f"(target wants it in {v['must_become']})")
     return {
         "fn": entry["fn"], "file": entry.get("file"),
+        "verdict": entry.get("verdict"),
         "swap_distance": entry.get("swap_distance"),
         "first_definition_order": [v["value_now_in"] for v in order],
         "target_regs_ascending": [v["must_become"] for v in order],
@@ -89,7 +90,8 @@ def main():
         print(f"missing {ORACLE} — run coloring_oracle.py first")
         sys.exit(1)
     oracle = json.load(open(ORACLE))
-    pure = {v["fn"]: v for v in oracle["verdicts"] if v["verdict"] == "PURE_RENAME"}
+    pure = {v["fn"]: v for v in oracle["verdicts"]
+            if v["verdict"] in ("PURE_RENAME", "REG_DOMINANT_RENAME")}
 
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     do_all = "--all" in sys.argv or not args

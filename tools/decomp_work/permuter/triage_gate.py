@@ -48,18 +48,22 @@ def ensure_oracle():
 
 
 def route(entry, oracle_by_fn):
+    # ALLOC_INVERT is driven ONLY by the coloring oracle's verdict — a consistent
+    # saved-reg bijection — NOT the looser walltriage class. (The class-based
+    # heuristic over-counted: REG-DOMINANT entries with volatile-reg / IMM /
+    # many-to-many noise are NOT pure inversions. Confirmed by teammate analysis.)
     fn = entry["fn"]
     ov = oracle_by_fn.get(fn, {})
     verdict = ov.get("verdict")
     if verdict == "PURE_RENAME":
         return "ALLOC_INVERT", (f"pure saved-reg bijection, swap-distance "
                                 f"{ov.get('swap_distance')} -> 1 directed candidate")
+    if verdict == "REG_DOMINANT_RENAME":
+        return "ALLOC_INVERT", (f"clean saved-reg bijection dominates (swap-distance "
+                                f"{ov.get('swap_distance')}); minor non-reg residual after inversion")
     if verdict == "SCHEDULING":
         return "PARK_SCHEDULING", "regs align, residual is instruction scheduling (not C-controllable)"
     mm = entry.get("mismatches", 999)
-    cls = entry.get("class", "")
-    if cls in ("REG-DOMINANT", "REG-ALLOC+IMM") and entry.get("distinct_reg_pairs", 99) <= 8:
-        return "ALLOC_INVERT", f"reg-dominant ({cls}), {entry.get('distinct_reg_pairs')} reg pairs — inversion candidate"
     if mm <= ANNEAL_MAX_MISMATCH:
         return "ANNEAL", f"small residual ({mm} mismatches), not pure-reg — SA has gradient"
     return "PARK_STRUCTURAL", f"structural mass ({entry.get('buckets',{}).get('STRUCT',0)} instr) — needs reshape"
