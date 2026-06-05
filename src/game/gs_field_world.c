@@ -15856,7 +15856,7 @@ void fn_801232E0(u8* ptr, u8 flag) {
 }
 #endif
 /* 0x80123368 | 0x8C */
-extern void fn_8025FF9C(void);
+extern void memoDataSet(void);
 #if 0
 asm void fn_80123368(void) {
 #include "src/game/gs_field_world_fn_80123368.inc"
@@ -15864,11 +15864,11 @@ asm void fn_80123368(void) {
 #else
 void fn_80123368(u8* ptr, u8 flag) {
     extern u32 fn_8012640C(u8* ptr, u32 a, u32 b, u32 c);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern void fn_801254B4(u8* ptr, u32 a, u32 b, u32 c, u32 d);
     if (ptr == NULL) { return; }
     fn_8012640C(ptr, 0, 0x6e, 0);
-    fn_8025FF9C(0, ptr);
+    memoDataSet(0, ptr);
     fn_801254B4(ptr, 0, 0x62, 0, 1);
     if ((u8)flag == 0) { return; }
     fn_801254B4(ptr, 0, 0x63, 0, 1);
