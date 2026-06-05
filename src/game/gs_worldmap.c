@@ -2714,7 +2714,7 @@ asm void fn_8002D91C(void) {
 void fn_8002D91C(void) { /* TODO */ }
 #endif
 
-/* fn_8002DC6C - 0x8002DC6C | size: 0xb8 */
+/* fn_8002DC6C - 0x8002DC6C | size: 0xb8 | WALL 71%: fsub/fdiv double vs fsubs/fdivs single + sda21 store */
 extern void fn_801D23C0(void);
 extern u32 fn_800D37CC(void);
 extern void fn_8010206C(f32);
