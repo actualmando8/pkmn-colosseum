@@ -1623,7 +1623,7 @@ void fn_80029EF4(void* r3, s32 r4, s32 r5, u8 r6, void* r7) {
 }
 #endif
 
-/* fn_80029FAC - 0x80029FAC | size: 0x10c */
+/* fn_80029FAC - 0x80029FAC | size: 0x10c | WALL 97%: slwi scheduling */
 extern void* __va_arg(void*, s32);
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E4C;
@@ -1679,7 +1679,7 @@ u32 fn_80029FAC(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
 }
 #endif
 
-/* fn_8002A0B8 - 0x8002A0B8 | size: 0x10c */
+/* fn_8002A0B8 - 0x8002A0B8 | size: 0x10c | WALL 97%: slwi scheduling */
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E3C;
 #if 0
@@ -1726,7 +1726,7 @@ u32 fn_8002A0B8(u8* r3, s32 r4, s32 r5, s32 r6, ...) {
 }
 #endif
 
-/* fn_8002A1C4 - 0x8002A1C4 | size: 0x108 */
+/* fn_8002A1C4 - 0x8002A1C4 | size: 0x108 | WALL 97%: slwi scheduling */
 extern void fn_80106ADC(s32, u32, s32, s32, u8);
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E4C;
@@ -1773,7 +1773,7 @@ void fn_8002A1C4(u8* r3, s32 r4, s32 r5, ...) {
 }
 #endif
 
-/* fn_8002A2CC - 0x8002A2CC | size: 0x108 */
+/* fn_8002A2CC - 0x8002A2CC | size: 0x108 | WALL 97%: slwi scheduling */
 extern u32 lbl_80478E54;
 extern u32 lbl_80478E3C;
 #if 0
