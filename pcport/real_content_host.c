@@ -5334,13 +5334,13 @@ void PCPort_BattleProbe(int frames) {
     if (getenv(kBattleProbeDefaultMoves[0].moveEnv) == NULL &&
         playerMoveId != kBattleProbeDefaultMoves[0].moveId) {
         snprintf(playerMoveNameAuto, sizeof(playerMoveNameAuto),
-                 "Move %u", playerMoveId);
+                 "Table Move %u", playerMoveId);
         playerMoveName = playerMoveNameAuto;
     }
     if (getenv(kBattleProbeDefaultMoves[1].moveEnv) == NULL &&
         enemyMoveId != kBattleProbeDefaultMoves[1].moveId) {
         snprintf(enemyMoveNameAuto, sizeof(enemyMoveNameAuto),
-                 "Move %u", enemyMoveId);
+                 "Table Move %u", enemyMoveId);
         enemyMoveName = enemyMoveNameAuto;
     }
     PCPort_BattleProbeFormatMoveText(playerMoveText, sizeof(playerMoveText),
