@@ -5011,6 +5011,8 @@ static u32 g_skinHistOob;
 static int g_skinVtxPosN;
 static int g_skinPobjSeq; /* per-frame skinned-PObj counter for PCPORT_SKIN_POBJ */
 static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
+static int g_slotEnv[PCPORT_SKIN_MAX_SLOTS]; /* 1 = slot is envelope/blend, 0 = rigid */
+static int g_slotInfl[PCPORT_SKIN_MAX_SLOTS]; /* influence count per slot */
 
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
  * the GameCube envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix
@@ -5088,6 +5090,10 @@ static int BuildSkinPalette(const PCPortHSDArchive* a, u32 envOff, u32 rootJoint
         if (!any) {
             for (r = 0; r < 3; ++r) for (c = 0; c < 4; ++c) M[r][c] = 0.0f;
             M[0][0] = M[1][1] = M[2][2] = 1.0f;
+        }
+        if (slot < PCPORT_SKIN_MAX_SLOTS) {
+            g_slotEnv[slot] = isEnvelope ? 1 : 0;
+            g_slotInfl[slot] = influences;
         }
         if (getenv("PCPORT_SKIN_PAL") != NULL && slot < 8) {
             fprintf(stderr,
@@ -5384,8 +5390,10 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                     px = p[0]; py = p[1];
                     pz = (a2->comp_cnt == GX_POS_XYZ) ? p[2] : 0.0f;
                     if (dbgVtxPos && g_skinVtxPosN < 9999) {
-                        fprintf(stderr, "[idx] v#%d slot=%u posIdx=%u local=(%.3f,%.3f,%.3f)\n",
-                                g_skinVtxPosN, curSlot, idx, px, py, pz);
+                        u32 cs = (curSlot < PCPORT_SKIN_MAX_SLOTS) ? curSlot : 0u;
+                        fprintf(stderr, "[idx] v#%d slot=%u posIdx=%u env=%d infl=%d local=(%.3f,%.3f,%.3f)\n",
+                                g_skinVtxPosN, curSlot, idx,
+                                g_slotEnv[cs], g_slotInfl[cs], px, py, pz);
                     }
                 } else if (a2->attr == GX_VA_TEX0 && tp->texcoordData != NULL && texD != NULL) {
                     const f32* t = (const f32*)((const u8*)tp->texcoordData + (size_t)idx * a2->stride);
@@ -6082,6 +6090,18 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     }
                 }
             } else {
+                if (getenv("PCPORT_SKIP_DBG") != NULL) {
+                    u32 uF = PCPort_ReadBigEndianU32(a->storage + pobjOffset + 0x14);
+                    PCPortTranslatedPObj tpp; PCPortTranslatedJointTransform jtp;
+                    int pOk, jOk;
+                    memset(&tpp, 0, sizeof(tpp)); memset(&jtp, 0, sizeof(jtp));
+                    pOk = PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &tpp);
+                    jOk = PCPort_TranslateJointChainToMatrixBE(a, rootJoint, joint, &jtp);
+                    fprintf(stderr, "[skip] pobj@0x%X SKIPPED joint@0x%X uField=0x%X "
+                            "translatePObj=%d jointChain=%d verts=%u\n",
+                            pobjOffset, joint, uF, pOk, jOk, tpp.totalSubmittedVertices);
+                    PCPort_DestroyTranslatedPObj(&tpp);
+                }
                 stats->skipped++;
             }
 

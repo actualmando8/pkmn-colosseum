@@ -399,12 +399,25 @@ static BOOL ScanDisplayListIndices(const u8* displayList,
         u32 i;
 
         if ((u32)(end - cursor) < 3u) {
-            return FALSE;
+            break; /* not enough room for cmd + 2-byte count -> trailing pad, done */
         }
 
+        /* End-of-list: a NOP opcode (0x00) with a zero count is the terminator/
+         * trailing padding. */
         if (cursor[0] == 0u && cursor[1] == 0u && cursor[2] == 0u &&
             stats->totalPrimitiveCommands != 0u) {
             break;
+        }
+
+        /* Mid-list GX NOP: a single 0x00 padding byte BETWEEN primitives (for
+         * 32-byte alignment), distinguished from the 3-zero terminator above by
+         * a non-zero following byte. The old code mis-parsed it as a primitive
+         * with a garbage vertex count, failed the scan, and the WHOLE PObj was
+         * rejected and skipped -- silently dropping an entire body mesh
+         * (mania/warugaki's coat/torso link). Skip the pad byte and continue. */
+        if (cursor[0] == 0u) {
+            cursor += 1;
+            continue;
         }
 
         ++cursor; /* command byte: primitive + vtxfmt */
@@ -2372,7 +2385,21 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
         return FALSE;
     }
 
-    displayCapacity = pobjArchiveOffset - displayOffset;
+    /* The display-list length is the PObj's n_display (serializedDisplayCount) in
+     * 32-byte GX-FIFO chunks -- the authoritative size. The old heuristic used the
+     * gap to the next struct (pobjArchiveOffset - displayOffset), which for some
+     * meshes is LARGER than the real list (e.g. mania pobj@0x5E6C: gap=1804 but
+     * real len=55*32=1760). The scan then over-ran 44 bytes into the following
+     * data, desynced, failed, and the WHOLE mesh was skipped -- the missing
+     * coat/torso. Use n_display*32, capped at the gap so it never overlaps the
+     * PObj struct. */
+    displayCapacity = (u32)serializedDisplayCount * 32u;
+    {
+        u32 gapToStruct = pobjArchiveOffset - displayOffset;
+        if (displayCapacity == 0u || displayCapacity > gapToStruct) {
+            displayCapacity = gapToStruct;
+        }
+    }
     if (!IsArchiveRangeValid(archive, displayOffset, displayCapacity)) {
         return FALSE;
     }
@@ -2425,6 +2452,9 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
     }
 
     if (entryCount == 0u || parsedVerts[entryCount].attr != GX_VA_NULL) {
+        if (getenv("PCPORT_SKIN_DEBUG") != NULL)
+            fprintf(stderr, "[skin] pobj@0x%X FAIL: vtxdesc not terminated (entryCount=%u)\n",
+                    pobjArchiveOffset, entryCount);
         PCPort_DestroyTranslatedPObj(outPObj);
         return FALSE;
     }
@@ -2442,11 +2472,16 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
                                 outPObj->verts,
                                 &stats,
                                 &translatedDisplaySize)) {
+        if (getenv("PCPORT_SKIN_DEBUG") != NULL)
+            fprintf(stderr, "[skin] pobj@0x%X FAIL: ScanDisplayListIndices (dispOff=0x%X cap=%u dispCount=%u)\n",
+                    pobjArchiveOffset, displayOffset, displayCapacity, serializedDisplayCount);
         PCPort_DestroyTranslatedPObj(outPObj);
         return FALSE;
     }
 
     if (translatedDisplaySize == 0u) {
+        if (getenv("PCPORT_SKIN_DEBUG") != NULL)
+            fprintf(stderr, "[skin] pobj@0x%X FAIL: translatedDisplaySize=0\n", pobjArchiveOffset);
         PCPort_DestroyTranslatedPObj(outPObj);
         return FALSE;
     }
@@ -2486,6 +2521,10 @@ BOOL PCPort_TranslatePObjFromArchiveBE(const PCPortHSDArchive* archive,
                                   sourceVertexOffsets[i],
                                   usedCount,
                                   outPObj)) {
+            if (getenv("PCPORT_SKIN_DEBUG") != NULL)
+                fprintf(stderr, "[skin] pobj@0x%X FAIL: TranslateVertexArray attr=%u srcOff=0x%X usedCount=%u stride=%u\n",
+                        pobjArchiveOffset, outPObj->verts[i].attr, sourceVertexOffsets[i],
+                        usedCount, outPObj->verts[i].stride);
             PCPort_DestroyTranslatedPObj(outPObj);
             return FALSE;
         }
