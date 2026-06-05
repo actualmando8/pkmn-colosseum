@@ -3363,12 +3363,31 @@ void fn_800DBB84(u32 idx, u32 a, u32 b) {
     }
 }
 #endif
-#if 1
+#if 0
 asm void fn_800DBBFC(void) {
 #include "src/game/gs_render_fn_800DBBFC.inc"
 }
 #else
-void fn_800DBBFC(void) { /* TODO */ }
+void fn_800DBBFC(u32 idx, u32 a, u16 b, u16 c, u16 d, u16 e, u32 f, u32 g, u32 h, u32 j) {
+    u8* p;
+
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x54, 10, idx, a, b, c, d, e, f, g, h, j);
+    } else {
+        lbl_80400B28[idx + 0x1fc] = 1;
+        p = lbl_80400B28 + idx * 0x14 + 0x20c;
+        *p = 2;
+        p[1] = a;
+        *(u16*)(p + 0xc) = b;
+        *(u16*)(p + 0xe) = c;
+        *(u16*)(p + 0x10) = d;
+        *(u16*)(p + 0x12) = e;
+        p[3] = f;
+        p[2] = g;
+        p[4] = h;
+        p[5] = j;
+    }
+}
 #endif
 #if 0
 asm void fn_800DBCE4(void) {
