@@ -5614,9 +5614,9 @@ s32 fn_8001AF44(s32 ctx) {
     extern u8 lbl_802E4E58[];
     extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
     u32 result;
-    s32 i;
-    u8* iter;
     s32 byte_off;
+    u8* iter;
+    s32 i;
 
     result = fn_801040D0(ctx, 0);
     if (result == 0) return 0;
@@ -5624,9 +5624,10 @@ s32 fn_8001AF44(s32 ctx) {
     if ((s8)*((u8*)ctx + 1) == 0) {
         *((s8*)ctx + 0x97) = -1;
         if ((s8)*((u8*)ctx + 2) == 0) {
+            i = 0;
             byte_off = 0;
             iter = (u8*)result;
-            for (i = 0; i < 6; i++) {
+            for (; i < 6; i++) {
                 s16 sy, sx;
                 s16 npcId;
                 u8* slot;
@@ -5656,20 +5657,20 @@ s32 fn_8001AF44(s32 ctx) {
     } else if ((s8)*((u8*)ctx + 1) == 3) {
         if ((s8)*((u8*)ctx + 2) == 0) {
             byte_off = 0;
-            for (i = 0; i < 6; i++) {
+            for (i = byte_off; byte_off < 6; byte_off++) {
                 s16 sy, sx;
                 s16 npcId;
                 u8* slot;
                 s32 state;
 
                 slot = lbl_802E4E58 + (s32)(s8)lbl_803A1D40[4] * 0x30;
-                npcId = *(s16*)(slot + byte_off);
+                npcId = *(s16*)(slot + i);
                 fn_8005D95C(npcId, (u16*)&sx, (u16*)&sy);
                 if (sx > 0xfa) state = 0x11a;
                 else state = 0x122;
                 fn_801080CC((void*)(s32)npcId, state);
 
-                byte_off += 8;
+                i += 8;
             }
             fn_801080CC(*(void**)((u8*)ctx + 4), 7);
             *((s8*)ctx + 2) = 1;
