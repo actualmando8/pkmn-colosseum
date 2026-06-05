@@ -3812,6 +3812,7 @@ void fn_800DCCF0(u8* obj, s32 mode) {
     *(s32*)(obj + 4) = mode;
 }
 #endif
+/* WALL 95.6%: bne vs beq+b branch inversion at cmpw */
 #if 0
 asm void fn_800DCD98(void) {
 #include "src/game/gs_render_fn_800DCD98.inc"
