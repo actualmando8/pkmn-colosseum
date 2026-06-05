@@ -8603,6 +8603,65 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
                     (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
 }
 
+typedef enum PCPortFieldMotionRole {
+    PCPORT_FIELD_MOTION_IDLE = 0,
+    PCPORT_FIELD_MOTION_WALK = 1,
+    PCPORT_FIELD_MOTION_RUN  = 2
+} PCPortFieldMotionRole;
+
+typedef struct PCPortFieldMotionMap {
+    int idle;
+    int walk;
+    int run;
+} PCPortFieldMotionMap;
+
+static int PCPort_ParseIntEnv(const char* name, int* outValue) {
+    const char* e = getenv(name);
+    if (e == NULL || e[0] == '\0' || outValue == NULL) {
+        return 0;
+    }
+    *outValue = atoi(e);
+    return 1;
+}
+
+/* Role-to-motion indirection. This is intentionally data-shaped: the field
+ * action-table trace can populate the three roles when its struct offsets land.
+ * For now, only env or PCPORT_FIELD_MOTION_MAP="idle,walk,run" fills it. */
+static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
+    PCPortFieldMotionMap map;
+    const char* packed;
+    map.idle = -1;
+    map.walk = -1;
+    map.run = -1;
+
+    packed = getenv("PCPORT_FIELD_MOTION_MAP");
+    if (packed != NULL && packed[0] != '\0') {
+        int a, b, c;
+        if (sscanf(packed, "%d,%d,%d", &a, &b, &c) == 3) {
+            map.idle = a;
+            map.walk = b;
+            map.run = c;
+        }
+    }
+    PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle);
+    PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk);
+    PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
+    return map;
+}
+
+static int PCPort_FieldMotionForRole(const PCPortFieldMotionMap* map,
+                                     PCPortFieldMotionRole role) {
+    if (map == NULL) {
+        return -1;
+    }
+    switch (role) {
+    case PCPORT_FIELD_MOTION_IDLE: return map->idle;
+    case PCPORT_FIELD_MOTION_WALK: return map->walk;
+    case PCPORT_FIELD_MOTION_RUN:  return map->run;
+    default:                       return -1;
+    }
+}
+
 /* Third-person "walk the room" mode for --field (PCPORT_FIELD_WALK). The player
  * is a box avatar that moves on the WZX floor with wall blocking; the camera
  * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
@@ -8637,6 +8696,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
     int motionDebug = getenv("PCPORT_MOTION_DEBUG") != NULL;
     int currentMotion = -999;
+    PCPortFieldMotionMap motionMap = PCPort_LoadFieldMotionMap();
+    int reportedMissingMotionMap = 0;
     int frame = 0;
     int warpTo = -1;
     int graceFrames = 30;   /* ignore exit triggers right after a (re)spawn */
@@ -8723,14 +8784,18 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
          * indices are env-tunable (ken_b1: 0=T-pose bind, others=real poses);
          * SetMotion is a no-op unless the movement state actually changed. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
-            const char* im = getenv("PCPORT_IDLE_MOTION");
-            const char* wm = getenv("PCPORT_WALK_MOTION");
-            const char* rm = getenv("PCPORT_RUN_MOTION");
-            int idleMot = (im != NULL && im[0]) ? atoi(im) : 1;
-            int walkMot = (wm != NULL && wm[0]) ? atoi(wm) : 2;
-            int runMot  = (rm != NULL && rm[0]) ? atoi(rm) : 3;
-            int nextMotion = moving ? (running ? runMot : walkMot) : idleMot;
-            if (nextMotion != currentMotion) {
+            PCPortFieldMotionRole role = moving
+                ? (running ? PCPORT_FIELD_MOTION_RUN : PCPORT_FIELD_MOTION_WALK)
+                : PCPORT_FIELD_MOTION_IDLE;
+            int nextMotion = PCPort_FieldMotionForRole(&motionMap, role);
+            if (nextMotion < 0) {
+                if (!reportedMissingMotionMap && motionDebug) {
+                    printf("[field/motion] role %d has no mapped motion "
+                           "(set PCPORT_FIELD_MOTION_MAP=idle,walk,run or "
+                           "PCPORT_*_MOTION)\n", (int)role);
+                    reportedMissingMotionMap = 1;
+                }
+            } else if (nextMotion != currentMotion) {
                 if (motionDebug) {
                     printf("[field/motion] %s -> motion %d (mag=%.2f speed=%.2f)\n",
                            moving ? (running ? "run" : "walk") : "idle",

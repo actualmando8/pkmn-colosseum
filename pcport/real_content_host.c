@@ -2287,6 +2287,8 @@ void PCPort_TitleAnimTick(void) {
 #define PCPORT_PROBE_MAX_JOINTS 512
 static HSD_JObj* g_probeJoints[PCPORT_PROBE_MAX_JOINTS];
 static f32       g_probeRest[PCPORT_PROBE_MAX_JOINTS][9];
+static f32       g_probeLoopStart[PCPORT_PROBE_MAX_JOINTS][9];
+static f32       g_probeLoopEnd[PCPORT_PROBE_MAX_JOINTS][9];
 static int       g_probeCount;
 static int       g_probeAnimCount; /* joints with an attached aobj */
 
@@ -2646,6 +2648,65 @@ static f32 PCPort_ProbeSRTChecksum(void) {
     return sum;
 }
 
+static void PCPort_ProbeSnapshot(f32 outSrt[PCPORT_PROBE_MAX_JOINTS][9]) {
+    int i;
+    for (i = 0; i < g_probeCount; ++i) {
+        HSD_JObj* j = g_probeJoints[i];
+        if (j == NULL) {
+            memset(outSrt[i], 0, sizeof(outSrt[i]));
+            continue;
+        }
+        outSrt[i][0] = j->translate_x; outSrt[i][1] = j->translate_y; outSrt[i][2] = j->translate_z;
+        outSrt[i][3] = j->rotate_x;    outSrt[i][4] = j->rotate_y;    outSrt[i][5] = j->rotate_z;
+        outSrt[i][6] = j->scale_x;     outSrt[i][7] = j->scale_y;     outSrt[i][8] = j->scale_z;
+    }
+}
+
+static f32 PCPort_ProbeSnapshotDelta(const f32 a[PCPORT_PROBE_MAX_JOINTS][9],
+                                     const f32 b[PCPORT_PROBE_MAX_JOINTS][9],
+                                     int ignoreRootTranslate,
+                                     int* outMoved,
+                                     f32* outMaxRot,
+                                     f32* outMaxTrans,
+                                     f32* outRootTrans) {
+    int i;
+    f32 sum = 0.0f;
+    int moved = 0;
+    f32 maxRot = 0.0f;
+    f32 maxTrans = 0.0f;
+    f32 rootTrans = 0.0f;
+
+    for (i = 0; i < g_probeCount; ++i) {
+        f32 dt = fabsf(b[i][0] - a[i][0]) +
+                 fabsf(b[i][1] - a[i][1]) +
+                 fabsf(b[i][2] - a[i][2]);
+        f32 dr = fabsf(b[i][3] - a[i][3]) +
+                 fabsf(b[i][4] - a[i][4]) +
+                 fabsf(b[i][5] - a[i][5]);
+        f32 ds = fabsf(b[i][6] - a[i][6]) +
+                 fabsf(b[i][7] - a[i][7]) +
+                 fabsf(b[i][8] - a[i][8]);
+        if (i == 0) {
+            rootTrans = dt;
+            if (ignoreRootTranslate) {
+                dt = 0.0f;
+            }
+        }
+        if (dt > 1.0e-4f || dr > 1.0e-4f || ds > 1.0e-4f) {
+            ++moved;
+        }
+        if (dt > maxTrans) maxTrans = dt;
+        if (dr > maxRot) maxRot = dr;
+        sum += dt + dr + ds;
+    }
+
+    if (outMoved != NULL) *outMoved = moved;
+    if (outMaxRot != NULL) *outMaxRot = maxRot;
+    if (outMaxTrans != NULL) *outMaxTrans = maxTrans;
+    if (outRootTrans != NULL) *outRootTrans = rootTrans;
+    return sum;
+}
+
 void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
                               int frames) {
     u32 motionCount, motionIdx;
@@ -2667,8 +2728,10 @@ void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
     }
 
     for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
-        int f, i, moved = 0;
+        int f, i, moved = 0, loopMoved = 0;
         f32 checksum0, checksumN, maxRot = 0.0f, maxTrans = 0.0f;
+        f32 endFrame, loopDelta, loopMaxRot, loopMaxTrans, rootLoopTrans;
+        const char* kind;
 
         g_charAnimMotionIdx = (int)motionIdx;
         printf("[charbank] motion[%u]: setup...\n", motionIdx);
@@ -2683,6 +2746,7 @@ void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
         g_probeAnimCount = 0;
         PCPort_ProbeCollect(g_charAnimRoot);
         checksum0 = PCPort_ProbeSRTChecksum();
+        endFrame = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
 
         for (f = 0; f < frames; ++f) {
             HSD_JObjAnimAll(g_charAnimRoot);
@@ -2709,10 +2773,32 @@ void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
             }
         }
 
+        HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
+        PCPort_HSDStartAnimAll(g_charAnimRoot);
+        HSD_JObjAnimAll(g_charAnimRoot);
+        PCPort_ProbeSnapshot(g_probeLoopStart);
+        for (f = 1; f < (int)(endFrame + 0.5f); ++f) {
+            HSD_JObjAnimAll(g_charAnimRoot);
+        }
+        PCPort_ProbeSnapshot(g_probeLoopEnd);
+        loopDelta = PCPort_ProbeSnapshotDelta(g_probeLoopStart, g_probeLoopEnd,
+                                              1, &loopMoved, &loopMaxRot,
+                                              &loopMaxTrans, &rootLoopTrans);
+        if (moved <= 1 && maxRot < 0.01f && maxTrans < 0.01f) {
+            kind = "static/bind";
+        } else if (loopDelta < 0.75f) {
+            kind = "cyclic";
+        } else {
+            kind = "one-shot";
+        }
+
         printf("[charbank] motion[%u]: joints=%d aobjs=%d end=%.2f moved=%d "
+               "kind=%s loopDelta=%.4f loopMoved=%d loopMaxRot=%.4f "
+               "loopMaxTrans=%.4f rootLoopTrans=%.4f "
                "checksum %.4f -> %.4f (delta=%.4f maxDRot=%.4f maxDTrans=%.4f)\n",
                motionIdx, g_probeCount, g_probeAnimCount,
-               PCPort_CharAnimMaxEndFrame(g_charAnimRoot), moved,
+               endFrame, moved, kind, loopDelta, loopMoved, loopMaxRot,
+               loopMaxTrans, rootLoopTrans,
                checksum0, checksumN, fabsf(checksumN - checksum0),
                maxRot, maxTrans);
         fflush(stdout);
