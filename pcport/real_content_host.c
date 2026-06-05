@@ -808,6 +808,16 @@ static BOOL BuildCameraProjectionMatrix(f32 fovDegrees,
     return TRUE;
 }
 
+/* Cycle guard for FindJointPath. The sibling (next) recursion does NOT increment
+ * depth, so a sibling cycle (A.next->B, B.next->A) recurses forever -- the depth
+ * cap can't stop it. Some character rigs (e.g. casey, reached via the field-walk
+ * avatar path) have such cycles and HUNG the render. Track every joint visited in
+ * the current search and never revisit one. Reset on the top-level (depth 0) call.
+ * Joint graphs here are proper trees, so this never blocks a real path. */
+#define PCPORT_MAX_JOINT_VISIT 8192u
+static u32 g_jointPathVisited[PCPORT_MAX_JOINT_VISIT];
+static u32 g_jointPathVisitedCount;
+
 static BOOL FindJointPath(const PCPortHSDArchive* archive,
                           u32 currentJointOffset,
                           u32 targetJointOffset,
@@ -816,11 +826,26 @@ static BOOL FindJointPath(const PCPortHSDArchive* archive,
                           u32* outPathLength) {
     u32 childOffset;
     u32 nextOffset;
+    u32 vi;
+
+    if (depth == 0u) {
+        g_jointPathVisitedCount = 0u;
+    }
 
     if (pathOffsets == NULL || outPathLength == NULL ||
         depth >= PCPORT_MAX_JOINT_PATH ||
         !IsArchiveRangeValid(archive, currentJointOffset, PCPORT_SERIALIZED_JOINT_SIZE)) {
         return FALSE;
+    }
+
+    /* already visited this joint in the current search -> cycle, bail */
+    for (vi = 0; vi < g_jointPathVisitedCount; ++vi) {
+        if (g_jointPathVisited[vi] == currentJointOffset) {
+            return FALSE;
+        }
+    }
+    if (g_jointPathVisitedCount < PCPORT_MAX_JOINT_VISIT) {
+        g_jointPathVisited[g_jointPathVisitedCount++] = currentJointOffset;
     }
 
     pathOffsets[depth] = currentJointOffset;

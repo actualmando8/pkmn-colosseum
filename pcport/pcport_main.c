@@ -5472,9 +5472,11 @@ static void AccumulateModelAABB(const PCPortHSDArchive* a,
         while (dobjOffset != 0u &&
                ArchiveRangeValid(a, dobjOffset, PCPORT_SERIALIZED_DOBJ_SIZE)) {
             u32 pobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x0C);
+            int pobjGuard = 0;
             while (ArchiveRangeValid(a, pobjOffset, PCPORT_SERIALIZED_POBJ_SIZE)) {
                 PCPortTranslatedPObj tp;
                 PCPortTranslatedJointTransform jt;
+                if (++pobjGuard > 4096) break; /* cyclic PObj chain guard */
                 memset(&tp, 0, sizeof(tp));
                 memset(&jt, 0, sizeof(jt));
                 if (PCPort_TranslatePObjFromArchiveBE(a, pobjOffset, &tp) &&
@@ -5594,6 +5596,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
            ArchiveRangeValid(a, dobjOffset, PCPORT_SERIALIZED_DOBJ_SIZE)) {
         u32 pobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x0C);
         u32 mobjOffset = PCPort_ReadBigEndianU32(a->storage + dobjOffset + 0x08);
+        int pobjChainGuard = 0;
 
         stats->dobjs++;
 
@@ -5611,6 +5614,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
             GXTexObj nodeTextureObject;
             f32 modelViewMatrix[3][4];
             u8* bakedPixels = NULL;
+            if (++pobjChainGuard > 4096) break; /* cyclic PObj chain guard */
             u32 bakedSize = 0u;
             u32 tobjOffset = 0u;
             u32 textureMapId = 0u;
