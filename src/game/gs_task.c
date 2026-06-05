@@ -1222,7 +1222,7 @@ s32 fn_80007110(void) {
 #pragma pop
 #endif
 
-/* fn_80007154 - 0x80007154 | size: 0x58 */
+/* fn_80007154 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 extern s32  fn_80007364(void);
 extern u32  fn_801F986C(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
@@ -1243,7 +1243,7 @@ s32 fn_80007154(void) {
 #pragma pop
 #endif
 
-/* fn_800071AC - 0x800071AC | size: 0x58 */
+/* fn_800071AC - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_800071AC(void) {
 #include "src/game/gs_task_fn_800071AC.inc"
@@ -1260,7 +1260,7 @@ s32 fn_800071AC(void) {
 #pragma pop
 #endif
 
-/* fn_80007204 - 0x80007204 | size: 0x58 */
+/* fn_80007204 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_80007204(void) {
 #include "src/game/gs_task_fn_80007204.inc"
@@ -1277,7 +1277,7 @@ s32 fn_80007204(void) {
 #pragma pop
 #endif
 
-/* fn_8000725C - 0x8000725C | size: 0x58 */
+/* fn_8000725C - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_8000725C(void) {
 #include "src/game/gs_task_fn_8000725C.inc"
@@ -1294,7 +1294,7 @@ s32 fn_8000725C(void) {
 #pragma pop
 #endif
 
-/* fn_800072B4 - 0x800072B4 | size: 0x58 */
+/* fn_800072B4 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_800072B4(void) {
 #include "src/game/gs_task_fn_800072B4.inc"
@@ -1311,7 +1311,7 @@ s32 fn_800072B4(void) {
 #pragma pop
 #endif
 
-/* fn_8000730C - 0x8000730C | size: 0x58 */
+/* fn_8000730C - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_80007364 vs bl _dbgMenuFightFightPokemonSelectSub (same addr) */
 #if 0
 asm void fn_8000730C(void) {
 #include "src/game/gs_task_fn_8000730C.inc"
@@ -1711,7 +1711,7 @@ s32 fn_80007A4C(void) {
 #pragma pop
 #endif
 
-/* fn_80007A84 - 0x80007A84 | size: 0xac */
+/* fn_80007A84 - 0x80007A84 | size: 0xac | SYMBOL-NAME WALL 97.67%: bl fn_80053110 vs bl dbgMenuFightWazaEditSub (same addr) */
 extern void fn_80053110(u16 id);
 extern u16 lbl_8047882A;
 extern void* fn_800083FC(u32 id);
@@ -2162,7 +2162,7 @@ s32 fn_80008460(s32 id) {
 #pragma pop
 #endif
 
-/* fn_800084C0 - 0x800084C0 | size: 0x58 */
+/* fn_800084C0 - 0x800084C0 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl fn_8011BA0C vs bl wazaGetWazaTypeIdName (same addr) */
 extern void* fn_8011BA0C(u8 idx);
 #if 0
 asm void fn_800084C0(void) {
