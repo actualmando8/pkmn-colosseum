@@ -2404,6 +2404,8 @@ static u8*              g_charAnimData = NULL;
 static char             g_charAnimFsys[300];
 static char             g_charAnimMember[80];
 static int              g_charAnimMotionIdx = -1;  /* -1 = use env/default */
+static f32              g_charAnimTime = 0.0f;
+static f32              g_charAnimLoopLen = -1.0f;
 
 int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     u8* data = NULL;
@@ -2514,6 +2516,8 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
     PCPort_HSDStartAnimAll(g_charAnimRoot);
 
+    g_charAnimTime = 0.0f;
+    g_charAnimLoopLen = -1.0f;
     g_charAnimReady = 1;
     printf("[char-anim] setup OK (%s :: %s, root=%p animjoint=%p)\n",
            fsysPath, memberName, (void*)g_charAnimRoot, animjoint);
@@ -2567,23 +2571,168 @@ static f32 PCPort_CharAnimMaxEndFrame(HSD_JObj* root) {
     return maxEnd;
 }
 
+static u32 PCPort_CharAnimCountMotionBank(const char* fsysPath,
+                                          const char* memberName) {
+    PCPortHSDArchive archive;
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0, branchOff, jointListOff, animArrOff;
+    u32 dataLo, dataHi, count = 0u, k;
+
+    memset(&archive, 0, sizeof(archive));
+    printf("[charbank] count: load %s :: %s\n", fsysPath, memberName);
+    fflush(stdout);
+    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
+        printf("[charbank] count: load FAILED\n");
+        fflush(stdout);
+        return 0u;
+    }
+    printf("[charbank] count: loaded %u bytes, parse\n", size);
+    fflush(stdout);
+    if (!PCPort_HSDArchiveParseBE(&archive, data, size)) {
+        printf("[charbank] count: parse FAILED\n");
+        fflush(stdout);
+        if (data != NULL) free(data);
+        return 0u;
+    }
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&archive,
+                                                             "scene_data",
+                                                             &sceneOffset);
+    if (sceneData == NULL) {
+        PCPort_HSDArchiveDestroy(&archive);
+        free(data);
+        return 0u;
+    }
+
+    branchOff = ReadBE32(sceneData + 0x00);
+    jointListOff = ReadBE32(archive.storage + branchOff + 0x00);
+    animArrOff = ReadBE32(archive.storage + jointListOff + 0x4);
+    dataLo = archive.dataOffset;
+    dataHi = archive.dataOffset + archive.dataSize;
+
+    if (animArrOff >= dataLo && animArrOff < dataHi) {
+        for (k = 0; k < 64u; ++k) {
+            u32 e = ReadBE32(archive.storage + animArrOff + k * 4u);
+            if (e < dataLo || e >= dataHi) break;
+            ++count;
+        }
+    }
+
+    PCPort_HSDArchiveDestroy(&archive);
+    free(data);
+    return count;
+}
+
+static f32 PCPort_ProbeSRTChecksum(void) {
+    f32 sum = 0.0f;
+    int i;
+    for (i = 0; i < g_probeCount; ++i) {
+        HSD_JObj* j = g_probeJoints[i];
+        if (j == NULL) continue;
+        sum += fabsf(j->translate_x) + fabsf(j->translate_y) + fabsf(j->translate_z);
+        sum += fabsf(j->rotate_x) + fabsf(j->rotate_y) + fabsf(j->rotate_z);
+        sum += fabsf(j->scale_x) + fabsf(j->scale_y) + fabsf(j->scale_z);
+    }
+    return sum;
+}
+
+void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
+                              int frames) {
+    u32 motionCount, motionIdx;
+    const char* maxEnv = getenv("PCPORT_CHARANIM_BANK_MAX");
+    u32 maxMotions = (maxEnv != NULL && maxEnv[0]) ? (u32)atoi(maxEnv) : 0u;
+
+    if (frames <= 0) frames = 30;
+    motionCount = PCPort_CharAnimCountMotionBank(fsysPath, memberName);
+    if (maxMotions > 0u && motionCount > maxMotions) {
+        motionCount = maxMotions;
+    }
+    printf("[charbank] %s :: %s -> %u motion(s), stepping %d frame(s) each\n",
+           fsysPath, memberName, motionCount, frames);
+    fflush(stdout);
+    if (motionCount == 0u) {
+        printf("[charbank] no Resource+0x4 motion bank found\n");
+        fflush(stdout);
+        return;
+    }
+
+    for (motionIdx = 0u; motionIdx < motionCount; ++motionIdx) {
+        int f, i, moved = 0;
+        f32 checksum0, checksumN, maxRot = 0.0f, maxTrans = 0.0f;
+
+        g_charAnimMotionIdx = (int)motionIdx;
+        printf("[charbank] motion[%u]: setup...\n", motionIdx);
+        fflush(stdout);
+        if (!PCPort_CharAnimSetup(fsysPath, memberName)) {
+            printf("[charbank] motion[%u] setup FAILED\n", motionIdx);
+            fflush(stdout);
+            continue;
+        }
+
+        g_probeCount = 0;
+        g_probeAnimCount = 0;
+        PCPort_ProbeCollect(g_charAnimRoot);
+        checksum0 = PCPort_ProbeSRTChecksum();
+
+        for (f = 0; f < frames; ++f) {
+            HSD_JObjAnimAll(g_charAnimRoot);
+        }
+        checksumN = PCPort_ProbeSRTChecksum();
+
+        for (i = 0; i < g_probeCount; ++i) {
+            HSD_JObj* j = g_probeJoints[i];
+            f32 dt, dr, ds;
+            if (j == NULL) continue;
+            dt = fabsf(j->translate_x - g_probeRest[i][0]) +
+                 fabsf(j->translate_y - g_probeRest[i][1]) +
+                 fabsf(j->translate_z - g_probeRest[i][2]);
+            dr = fabsf(j->rotate_x - g_probeRest[i][3]) +
+                 fabsf(j->rotate_y - g_probeRest[i][4]) +
+                 fabsf(j->rotate_z - g_probeRest[i][5]);
+            ds = fabsf(j->scale_x - g_probeRest[i][6]) +
+                 fabsf(j->scale_y - g_probeRest[i][7]) +
+                 fabsf(j->scale_z - g_probeRest[i][8]);
+            if (dt > 1.0e-4f || dr > 1.0e-4f || ds > 1.0e-4f) {
+                ++moved;
+                if (dr > maxRot) maxRot = dr;
+                if (dt > maxTrans) maxTrans = dt;
+            }
+        }
+
+        printf("[charbank] motion[%u]: joints=%d aobjs=%d end=%.2f moved=%d "
+               "checksum %.4f -> %.4f (delta=%.4f maxDRot=%.4f maxDTrans=%.4f)\n",
+               motionIdx, g_probeCount, g_probeAnimCount,
+               PCPort_CharAnimMaxEndFrame(g_charAnimRoot), moved,
+               checksum0, checksumN, fabsf(checksumN - checksum0),
+               maxRot, maxTrans);
+        fflush(stdout);
+    }
+
+    if (g_charAnimData != NULL) { free(g_charAnimData); g_charAnimData = NULL; }
+    if (g_charAnimArchive.storage != NULL) PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+    g_charAnimRoot = NULL;
+    g_charAnimReady = 0;
+    g_charAnimMotionIdx = -1;
+    g_charAnimTime = 0.0f;
+    g_charAnimLoopLen = -1.0f;
+}
+
 void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
-    static f32 s_animTime = 0.0f;
-    static f32 s_loopLen = -1.0f;
     if (!g_charAnimReady || g_charAnimRoot == NULL || beArchive == NULL) {
         return;
     }
-    if (s_loopLen < 0.0f) {
-        s_loopLen = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
-        if (s_loopLen < 1.0f) s_loopLen = 0.0f; /* no real loop */
+    if (g_charAnimLoopLen < 0.0f) {
+        g_charAnimLoopLen = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
+        if (g_charAnimLoopLen < 1.0f) g_charAnimLoopLen = 0.0f; /* no real loop */
     }
     /* Loop: the host HSD_AObjInterpretAnim never rewinds, so once curr_frame
      * passes end_frame the FObj settles to a constant (frozen) pose. Re-arm the
      * whole tree at frame 0 each cycle to make the idle/walk loop. */
-    if (s_loopLen > 0.0f) {
-        s_animTime += 1.0f;
-        if (s_animTime >= s_loopLen) {
-            s_animTime = 0.0f;
+    if (g_charAnimLoopLen > 0.0f) {
+        g_charAnimTime += 1.0f;
+        if (g_charAnimTime >= g_charAnimLoopLen) {
+            g_charAnimTime = 0.0f;
             HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
             PCPort_HSDStartAnimAll(g_charAnimRoot);
         }

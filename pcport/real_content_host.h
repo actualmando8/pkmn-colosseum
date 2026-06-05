@@ -239,6 +239,10 @@ void PCPort_TitleAnimTick(void);
 /* Diagnostic: build a character's live animated tree and report how many joints
  * actually move over <frames> (proves whether the archive carries real motion). */
 void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames);
+/* Diagnostic: enumerate a character's Resource+0x4 motion bank and step every
+ * motion over real HSD data, printing moved-joint counts and SRT checksums. */
+void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
+                              int frames);
 
 /* Field-character animation. PCPort_CharAnimSetup builds a live animated HSD
  * tree from a swizzled copy of the character archive (once). Each frame,

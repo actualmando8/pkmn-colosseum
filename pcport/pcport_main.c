@@ -8618,17 +8618,35 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 pyaw = 0.0f;
     f32 camYaw = 0.0f, camPitch = 0.30f;
     const f32 up[3] = { 0.0f, 1.0f, 0.0f };
-    const f32 SPEED = 4.0f, ORBIT = 0.04f;
+    const f32 ORBIT = 0.04f;
     const f32 PLAYER_H = 30.0f, PLAYER_R = 10.0f;
     const char* dEnv = getenv("PCPORT_CAM_DIST");
     const char* hEnv = getenv("PCPORT_CAM_HEIGHT");
+    const char* walkSpeedEnv = getenv("PCPORT_WALK_SPEED");
+    const char* runSpeedEnv = getenv("PCPORT_RUN_SPEED");
+    const char* runThreshEnv = getenv("PCPORT_RUN_THRESHOLD");
+    const char* deadzoneEnv = getenv("PCPORT_WALK_DEADZONE");
     f32 camDist = (dEnv != NULL) ? (f32)atof(dEnv) : 150.0f;
     f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 60.0f;
+    f32 walkSpeed = (walkSpeedEnv != NULL && walkSpeedEnv[0]) ? (f32)atof(walkSpeedEnv) : 4.0f;
+    f32 runSpeed = (runSpeedEnv != NULL && runSpeedEnv[0]) ? (f32)atof(runSpeedEnv) : 7.0f;
+    f32 runThreshold = (runThreshEnv != NULL && runThreshEnv[0]) ? (f32)atof(runThreshEnv) : 0.85f;
+    f32 walkDeadzone = (deadzoneEnv != NULL && deadzoneEnv[0]) ? (f32)atof(deadzoneEnv) : 0.05f;
     int autopan = getenv("PCPORT_FIELD_AUTOPAN") != NULL;
+    int forceRun = getenv("PCPORT_FORCE_RUN") != NULL || getenv("PCPORT_FIELD_AUTORUN") != NULL;
+    int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
+    int motionDebug = getenv("PCPORT_MOTION_DEBUG") != NULL;
+    int currentMotion = -999;
     int frame = 0;
     int warpTo = -1;
     int graceFrames = 30;   /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
+
+    if (walkSpeed < 0.0f) walkSpeed = 0.0f;
+    if (runSpeed < walkSpeed) runSpeed = walkSpeed;
+    if (runThreshold < 0.0f) runThreshold = 0.0f;
+    if (runThreshold > 1.0f) runThreshold = 1.0f;
+    if (walkDeadzone < 0.0f) walkDeadzone = 0.0f;
 
     memset(pads, 0, sizeof(pads));
     if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk) {
@@ -8650,9 +8668,11 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
     while (!glfwWindowShouldClose(window)) {
         f32 fwdXZ[3], rightXZ[3], mvx, mvz, eye[3], interest[3], floorY;
+        f32 moveMag, moveSpeed;
         f32 prevx, prevz;
         u16 btn;
         f32 sx, sy;
+        int moving, running;
 
         VIWaitForRetrace_PC();
         PADRead(pads);
@@ -8676,24 +8696,49 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         rightXZ[0] = cosf(camYaw); rightXZ[1] = 0.0f; rightXZ[2] = sinf(camYaw);
         mvx = fwdXZ[0] * sy + rightXZ[0] * sx;
         mvz = fwdXZ[2] * sy + rightXZ[2] * sx;
+        moveMag = sqrtf(mvx * mvx + mvz * mvz);
+        if (moveMag > 1.0f) {
+            mvx /= moveMag;
+            mvz /= moveMag;
+            moveMag = 1.0f;
+        }
+        moving = moveMag > walkDeadzone;
+        running = moving &&
+                  (((moveMag >= runThreshold) ||
+                    (btn & (GCN_PAD_BUTTON_B | GCN_PAD_TRIGGER_R)) ||
+                    pads[0].triggerRight >= 200u ||
+                    forceRun) &&
+                   !forceWalk);
+        moveSpeed = running ? runSpeed : walkSpeed;
 
         prevx = ppos[0]; prevz = ppos[2];
-        if (mvx != 0.0f || mvz != 0.0f) {
-            ppos[0] += mvx * SPEED;
-            ppos[2] += mvz * SPEED;
+        if (moving) {
+            ppos[0] += mvx * moveSpeed;
+            ppos[2] += mvz * moveSpeed;
             pyaw = atan2f(mvx, -mvz);   /* face the move direction */
         }
 
-        /* Drive the motion bank: walk while moving, idle while standing. The
+        /* Drive the motion bank: idle while standing, walk for partial-stick
+         * movement, run/dash for full-stick or held B/R. The
          * indices are env-tunable (ken_b1: 0=T-pose bind, others=real poses);
          * SetMotion is a no-op unless the movement state actually changed. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
             const char* im = getenv("PCPORT_IDLE_MOTION");
             const char* wm = getenv("PCPORT_WALK_MOTION");
+            const char* rm = getenv("PCPORT_RUN_MOTION");
             int idleMot = (im != NULL && im[0]) ? atoi(im) : 1;
             int walkMot = (wm != NULL && wm[0]) ? atoi(wm) : 2;
-            int moving = (mvx != 0.0f || mvz != 0.0f);
-            PCPort_CharAnimSetMotion(moving ? walkMot : idleMot);
+            int runMot  = (rm != NULL && rm[0]) ? atoi(rm) : 3;
+            int nextMotion = moving ? (running ? runMot : walkMot) : idleMot;
+            if (nextMotion != currentMotion) {
+                if (motionDebug) {
+                    printf("[field/motion] %s -> motion %d (mag=%.2f speed=%.2f)\n",
+                           moving ? (running ? "run" : "walk") : "idle",
+                           nextMotion, moveMag, moveSpeed);
+                }
+                PCPort_CharAnimSetMotion(nextMotion);
+                currentMotion = nextMotion;
+            }
         }
 
         /* Block at walls (slide), then snap to the floor under the new spot. If
@@ -9104,6 +9149,21 @@ int main(int argc, char** argv) {
     runField = HasArg(argc, argv, "--field");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
+    fflush(stdout);
+
+    {
+        const char* bankFrames = getenv("PCPORT_CHARANIM_BANK_PROBE");
+        if (bankFrames != NULL) {
+            const char* sa = getenv("PCPORT_SWIZ_ARCHIVE");
+            const char* sm = getenv("PCPORT_SWIZ_MEMBER");
+            printf("[pcport_bootstrap] CHARANIM_BANK_PROBE requested\n");
+            fflush(stdout);
+            PCPort_CharAnimBankProbe(
+                sa != NULL ? sa : "orig/GC6E01/disc/files/field_common.fsys",
+                sm != NULL ? sm : "ken_b1", atoi(bankFrames));
+            return 0;
+        }
+    }
 
     /* Resolve assets relative to the exe, so launching by double-click / from any
      * directory works (assets are loaded via repo-relative paths). */
