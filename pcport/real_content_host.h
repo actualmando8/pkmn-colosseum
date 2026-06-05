@@ -239,6 +239,15 @@ void PCPort_TitleAnimTick(void);
 /* Diagnostic: build a character's live animated tree and report how many joints
  * actually move over <frames> (proves whether the archive carries real motion). */
 void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames);
+
+/* Field-character animation. PCPort_CharAnimSetup builds a live animated HSD
+ * tree from a swizzled copy of the character archive (once). Each frame,
+ * PCPort_CharAnimStepAndApply advances it and writes the animated per-joint SRT
+ * back into the renderer's BE archive (beArchive/beRootJoint) so the existing
+ * skinning animates. PCPort_CharAnimReady reports whether setup succeeded. */
+int  PCPort_CharAnimSetup(const char* fsysPath, const char* memberName);
+void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint);
+int  PCPort_CharAnimReady(void);
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive);
 const void* PCPort_HSDArchiveGetPublicAddress(const PCPortHSDArchive* archive,
                                               const char* name,

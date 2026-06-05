@@ -8561,6 +8561,15 @@ static int PCPort_LoadFieldCharacter(void) {
     }
     g_engCharLoaded = 1;
     printf("[field/wes] loaded %s :: %s (rootJoint=0x%X)\n", fsysPath, member, g_engCharRoot);
+
+    /* Build the live animated HSD tree (a second, swizzled copy of the same
+     * archive) so the embedded animation can drive the BE skinning each frame.
+     * GATED behind PCPORT_CHAR_ANIM: the embedded animjoint is a constant pose
+     * (no walk motion) and posing currently tears envelope meshes -- see the
+     * note in RenderFieldCharacter. Default render stays clean. */
+    if (getenv("PCPORT_CHAR_ANIM") != NULL && PCPort_CharAnimSetup(fsysPath, member)) {
+        printf("[field/wes] animation armed (PCPORT_CHAR_ANIM)\n");
+    }
     return 1;
 }
 
@@ -8574,6 +8583,15 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
     f32 P[3][4];
     f32 cy = cosf(yaw), sy = sinf(yaw);
     if (!g_engCharLoaded) return;
+    /* Advance the embedded animation and write the animated joint SRT into the
+     * BE archive the skinning reads. GATED OFF by default (PCPORT_CHAR_ANIM):
+     * ken_b1's embedded animjoint is a constant POSE, not a walk motion, AND
+     * applying a non-bind pose currently tears the envelope-skinned meshes
+     * (invBind must be snapshotted at the REST pose, not recomputed from the
+     * posed world). Both are open follow-ups; default render stays clean. */
+    if (getenv("PCPORT_CHAR_ANIM") != NULL) {
+        PCPort_CharAnimStepAndApply(&g_engCharArchive, g_engCharRoot);
+    }
     /* placement = translate(p) * rotateY(yaw) * uniformScale(scale) */
     P[0][0] =  scale * cy; P[0][1] = 0.0f;  P[0][2] =  scale * sy; P[0][3] = px;
     P[1][0] =  0.0f;       P[1][1] = scale; P[1][2] =  0.0f;       P[1][3] = py;

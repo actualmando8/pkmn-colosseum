@@ -97,6 +97,12 @@ static void WriteBE32(u8* data, u32 value) {
     data[3] = (u8)(value & 0xFF);
 }
 
+static void WriteBEFloat(u8* data, f32 value) {
+    union { f32 f; u32 u; } v;
+    v.f = value;
+    WriteBE32(data, v.u);
+}
+
 static BOOL IsArchiveRangeValid(const PCPortHSDArchive* archive,
                                 u32 offset, u32 size) {
     if (archive == NULL || archive->storage == NULL ||
@@ -2342,6 +2348,195 @@ void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int fram
         printf("[charanim] => REAL embedded animation. The live tree can drive field skinning.\n");
     }
 }
+
+/* ========================================================================= */
+/*  Field-character animation: drive the BE skinning from a live HSD tree.    */
+/*                                                                           */
+/*  The field character (Wes/ken_b1) renders through the proven BIG-ENDIAN    */
+/*  archive skinning path (pcport_main.c BuildSkinPalette reads joint SRT     */
+/*  straight from the archive bytes). To animate it WITHOUT touching that     */
+/*  hot path, we keep a SECOND, swizzled copy of the same archive, build the  */
+/*  game's real live HSD_JObj tree from it (HSD_JObjLoadJoint + AddAnimAll),  */
+/*  advance the animation each frame (HSD_JObjAnimAll -> FObj interpreter),    */
+/*  then WRITE the animated per-joint SRT back into the renderer's BE archive  */
+/*  storage by walking both trees in lockstep (identical ken_b1 topology).    */
+/*  The existing skinning then computes animated world matrices for free.     */
+/*                                                                           */
+/*  Rigid bones (the bulk of ken_b1: limbs/boots, single-influence weight 1)  */
+/*  animate correctly (palette = animated jointWorld). Envelope/blend bones   */
+/*  recompute invBind from the now-animated world so they hold the rest pose  */
+/*  (no distortion); exact envelope animation = a later refinement.           */
+/* ========================================================================= */
+static PCPortHSDArchive g_charAnimArchive;
+static HSD_JObj*        g_charAnimRoot = NULL;
+static int              g_charAnimReady = 0;
+static u8*              g_charAnimData = NULL;
+
+int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0, branchOff, jointListOff;
+    void* rootPtr;
+    HSD_Joint* rootJoint;
+    void* animjoint;
+    void* matanimjoint;
+
+    g_charAnimReady = 0;
+    g_charAnimRoot = NULL;
+    memset(&g_charAnimArchive, 0, sizeof(g_charAnimArchive));
+
+    if (!PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)) {
+        printf("[char-anim] load %s:%s FAILED\n", fsysPath, memberName);
+        return 0;
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_charAnimArchive, data, size)) {
+        printf("[char-anim] parse FAILED\n");
+        free(data);
+        return 0;
+    }
+    g_charAnimData = data; /* keep alive: the live tree points into storage */
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_charAnimArchive,
+                                                             "scene_data", &sceneOffset);
+    if (sceneData == NULL) {
+        printf("[char-anim] no scene_data\n");
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+        free(data); g_charAnimData = NULL;
+        return 0;
+    }
+    branchOff = ReadBE32(sceneData + 0x00);
+    jointListOff = ReadBE32(g_charAnimArchive.storage + branchOff + 0x00);
+
+    rootPtr = PCPort_SwizzleSceneForHSD(&g_charAnimArchive, jointListOff);
+    if (rootPtr == NULL) {
+        printf("[char-anim] swizzle FAILED\n");
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+        free(data); g_charAnimData = NULL;
+        return 0;
+    }
+    {
+        u8* jl = (u8*)rootPtr;
+        rootJoint    = (HSD_Joint*)(uintptr_t)(*(u32*)(jl + 0x0));
+        animjoint    = (void*)(uintptr_t)(*(u32*)(jl + 0x4));
+        matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
+    }
+
+    g_charAnimRoot = HSD_JObjLoadJoint(rootJoint);
+    if (g_charAnimRoot == NULL) {
+        printf("[char-anim] HSD_JObjLoadJoint FAILED\n");
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+        free(data); g_charAnimData = NULL;
+        return 0;
+    }
+
+    HSD_JObjAddAnimAll(g_charAnimRoot, (HSD_AnimJoint*)animjoint,
+                       (HSD_MatAnimJoint*)matanimjoint, NULL);
+    HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
+    PCPort_HSDStartAnimAll(g_charAnimRoot);
+
+    g_charAnimReady = 1;
+    printf("[char-anim] setup OK (%s :: %s, root=%p animjoint=%p)\n",
+           fsysPath, memberName, (void*)g_charAnimRoot, animjoint);
+    return 1;
+}
+
+/* Lockstep walk: BE joint chain (offsets: child@+0x08, next@+0x0C) <-> live
+ * JObj chain (child/next ptrs). Write each live joint's animated SRT into the
+ * BE archive bytes (rot@+0x14, scale@+0x20, translate@+0x2C as BE floats). */
+static void PCPort_CharAnimLockstepWrite(PCPortHSDArchive* be, u32 beJointOff,
+                                         HSD_JObj* live) {
+    u32 childOff, nextOff;
+    if (live == NULL || beJointOff == 0u ||
+        !IsArchiveRangeValid(be, beJointOff, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        return;
+    }
+    WriteBEFloat(be->storage + beJointOff + 0x14, live->rotate_x);
+    WriteBEFloat(be->storage + beJointOff + 0x18, live->rotate_y);
+    WriteBEFloat(be->storage + beJointOff + 0x1C, live->rotate_z);
+    WriteBEFloat(be->storage + beJointOff + 0x20, live->scale_x);
+    WriteBEFloat(be->storage + beJointOff + 0x24, live->scale_y);
+    WriteBEFloat(be->storage + beJointOff + 0x28, live->scale_z);
+    WriteBEFloat(be->storage + beJointOff + 0x2C, live->translate_x);
+    WriteBEFloat(be->storage + beJointOff + 0x30, live->translate_y);
+    WriteBEFloat(be->storage + beJointOff + 0x34, live->translate_z);
+
+    childOff = ReadBE32(be->storage + beJointOff + 0x08);
+    nextOff  = ReadBE32(be->storage + beJointOff + 0x0C);
+    PCPort_CharAnimLockstepWrite(be, childOff, live->child);
+    PCPort_CharAnimLockstepWrite(be, nextOff, live->next);
+}
+
+/* Find the largest end_frame across the live tree's aobjs (the loop length). */
+static f32 PCPort_CharAnimMaxEndFrame(HSD_JObj* root) {
+    f32 maxEnd = 0.0f;
+    HSD_JObj* st[512]; int sp = 0; st[sp++] = root;
+    while (sp > 0) { HSD_JObj* lv = st[--sp]; if (!lv) continue;
+        if (lv->aobj != NULL && lv->aobj->end_frame > maxEnd) maxEnd = lv->aobj->end_frame;
+        if (sp < 510) { if (lv->child) st[sp++] = lv->child; if (lv->next) st[sp++] = lv->next; } }
+    return maxEnd;
+}
+
+void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
+    static f32 s_animTime = 0.0f;
+    static f32 s_loopLen = -1.0f;
+    if (!g_charAnimReady || g_charAnimRoot == NULL || beArchive == NULL) {
+        return;
+    }
+    if (s_loopLen < 0.0f) {
+        s_loopLen = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
+        if (s_loopLen < 1.0f) s_loopLen = 0.0f; /* no real loop */
+    }
+    /* Loop: the host HSD_AObjInterpretAnim never rewinds, so once curr_frame
+     * passes end_frame the FObj settles to a constant (frozen) pose. Re-arm the
+     * whole tree at frame 0 each cycle to make the idle/walk loop. */
+    if (s_loopLen > 0.0f) {
+        s_animTime += 1.0f;
+        if (s_animTime >= s_loopLen) {
+            s_animTime = 0.0f;
+            HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
+            PCPort_HSDStartAnimAll(g_charAnimRoot);
+        }
+    }
+    HSD_JObjAnimAll(g_charAnimRoot);
+    PCPort_CharAnimLockstepWrite(beArchive, beRootJoint, g_charAnimRoot);
+    if (getenv("PCPORT_ANIM_DEBUG") != NULL) {
+        /* Find the most-rotated live joint, and read back the BE value the
+         * renderer will use for the SAME joint offset (lockstep position). */
+        HSD_JObj* stack[512]; u32 boff[512]; int sp = 0;
+        f32 bestRot = -1.0f; HSD_JObj* bestLive = NULL; u32 bestBE = 0;
+        stack[sp] = g_charAnimRoot; boff[sp] = beRootJoint; sp++;
+        while (sp > 0) {
+            HSD_JObj* lv; u32 bo; f32 ar;
+            --sp; lv = stack[sp]; bo = boff[sp];
+            if (lv == NULL) continue;
+            ar = fabsf(lv->rotate_x) + fabsf(lv->rotate_y) + fabsf(lv->rotate_z);
+            if (ar > bestRot) { bestRot = ar; bestLive = lv; bestBE = bo; }
+            if (sp < 510) {
+                if (lv->child) { stack[sp] = lv->child; boff[sp] = ReadBE32(beArchive->storage + bo + 0x08); sp++; }
+                if (lv->next)  { stack[sp] = lv->next;  boff[sp] = ReadBE32(beArchive->storage + bo + 0x0C); sp++; }
+            }
+        }
+        if (bestLive != NULL) {
+            f32 beRz = ReadBEFloat(beArchive->storage + bestBE + 0x1C);
+            f32 cf = (bestLive->aobj != NULL) ? bestLive->aobj->curr_frame : -999.0f;
+            /* also scan the whole tree for the max curr_frame (is anything ticking?) */
+            f32 maxCf = -1.0f; int aobjs = 0, withFobj = 0; f32 sumAnim = 0.0f;
+            HSD_JObj* st2[512]; int s2 = 0; st2[s2++] = g_charAnimRoot;
+            while (s2 > 0) { HSD_JObj* lv = st2[--s2]; if (!lv) continue;
+                if (lv->aobj) { aobjs++; if (lv->aobj->fobj) withFobj++;
+                    if (lv->aobj->curr_frame > maxCf) maxCf = lv->aobj->curr_frame;
+                    sumAnim += fabsf(lv->rotate_x)+fabsf(lv->rotate_y)+fabsf(lv->rotate_z)
+                             + fabsf(lv->translate_x)+fabsf(lv->translate_y)+fabsf(lv->translate_z); }
+                if (s2 < 510) { if (lv->child) st2[s2++] = lv->child; if (lv->next) st2[s2++] = lv->next; } }
+            (void)beRz;
+            printf("[anim-dbg] maxCurrFrame=%.2f aobjs=%d withFobj=%d animSRTchecksum=%.4f\n",
+                   maxCf, aobjs, withFobj, sumAnim);
+        }
+    }
+}
+
+int PCPort_CharAnimReady(void) { return g_charAnimReady; }
 
 /* Swizzle a scene model-set entry (jointList) BE->LE for the game's HSD pipeline.
  * The model entry is {rootJoint@0, animjoint@4, matanimjoint@8, ...}. Walks the
