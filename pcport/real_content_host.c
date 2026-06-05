@@ -683,6 +683,12 @@ static void BuildJointLocalMtx(const PCPortHSDArchive* archive,
     out[2][1] = (cy * sxRot) * sy;
     out[2][2] = (cy * cx) * sz;
     out[2][3] = tz;
+
+    if (getenv("PCPORT_MIRROR_DBG") != NULL && (sx < 0.0f || sy < 0.0f || sz < 0.0f)) {
+        u32 flags = ReadBE32(archive->storage + jointOffset + 0x04);
+        fprintf(stderr, "[mirror] joint@0x%X NEGATIVE-SCALE=(%.2f,%.2f,%.2f) flags=0x%X trans=(%.2f,%.2f,%.2f)\n",
+                jointOffset, sx, sy, sz, flags, tx, ty, tz);
+    }
 }
 
 static f32 Vec3Dot(const f32 a[3], const f32 b[3]) {

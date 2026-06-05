@@ -5123,6 +5123,7 @@ static void AccumulateSkinnedPObjWorldAABB(const PCPortHSDArchive* a, u32 pobjOf
     while (dl + 3 <= end) {
         u8 cmd = dl[0];
         u16 vcount, vi;
+        if (cmd == 0u) { dl += 1; continue; } /* skip GX NOP pad (see submit loop) */
         if ((cmd & 0xF8u) == 0u) break;
         vcount = (u16)(((u16)dl[1] << 8) | dl[2]);
         dl += 3;
@@ -5216,6 +5217,15 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         else if (v->attr == GX_VA_CLR0) clrD = v;
         else if (v->attr == GX_VA_TEX0) texD = v;
     }
+    if (getenv("PCPORT_MIRROR_DBG") != NULL) {
+        /* position-array offset within the archive: two PObjs sharing the SAME
+         * offset reuse the SAME vertex data (a mirror/instanced mesh). */
+        long posOff = (posD != NULL && tp->positionData != NULL)
+                        ? (long)((const u8*)tp->positionData - a->storage) : -1;
+        fprintf(stderr, "[share] pobj@0x%X posArray=0x%lX stride=%u verts=%u dl=%u\n",
+                pobjOffset, posOff, posD ? posD->stride : 0,
+                tp->pobj.n_display, tp->pobj.n_display);
+    }
     if (posD == NULL) {
         if (getenv("PCPORT_SKIN_BAIL") != NULL)
             fprintf(stderr, "[skinbail] pobj@0x%X -> no POS vtx descriptor\n", pobjOffset);
@@ -5300,8 +5310,17 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         u8 cmd = dl[0];
         u16 vcount;
         u32 vi;
+        if (cmd == 0u) {
+            /* GX NOP byte (0x00): display lists are padded with NOPs for 32-byte
+             * alignment, and one can appear BETWEEN primitives. Skip it -- do NOT
+             * treat it as end-of-list, or every primitive after the pad is dropped
+             * (this was silently losing the mirrored half of shared-vertex meshes,
+             * e.g. mania's left chest/coat). */
+            dl += 1;
+            continue;
+        }
         if ((cmd & 0xF8u) == 0u) {
-            break; /* end / padding */
+            break; /* genuinely malformed opcode (0x01-0x07) -> stop */
         }
         vcount = (u16)(((u16)dl[1] << 8) | dl[2]);
         dl += 3;
@@ -5424,6 +5443,11 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
             }
         }
         GXEnd();
+    }
+    if (getenv("PCPORT_DL_DBG") != NULL) {
+        fprintf(stderr, "[dl] pobj@0x%X consumed %ld of %u bytes (stopped at cmd=0x%02X)\n",
+                pobjOffset, (long)(dl - tp->displayList), (unsigned)tp->pobj.n_display,
+                (dl + 3 <= end) ? dl[0] : 0xFF);
     }
     if (getenv("PCPORT_SKIN_VTXPOS") != NULL && g_skinVtxPosN > 0) {
         fprintf(stderr, "[vtxpos] LOCAL bbox=[%.1f,%.1f,%.1f .. %.1f,%.1f,%.1f] "
