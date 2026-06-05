@@ -8613,11 +8613,18 @@ typedef struct PCPortFieldMotionMap {
     int idle;
     int walk;
     int run;
+    int idleLoop;
+    int walkLoop;
+    int runLoop;
+    int fromRecord;
+    u32 key;
 } PCPortFieldMotionMap;
 
-#define PCPORT_WES_IDLE_MOTION 1
-#define PCPORT_WES_WALK_MOTION 5
-#define PCPORT_WES_RUN_MOTION  8
+#define PCPORT_FIELD_MOTION_RECORD_STRIDE 0x2Cu
+#define PCPORT_FIELD_MOTION_RECORD_KEY_OFF 0x0Cu
+
+static const u8* g_pcFieldMotionRecordTable;
+static u32       g_pcFieldMotionRecordCount;
 
 static int PCPort_ParseIntEnv(const char* name, int* outValue) {
     const char* e = getenv(name);
@@ -8628,16 +8635,200 @@ static int PCPort_ParseIntEnv(const char* name, int* outValue) {
     return 1;
 }
 
+static int PCPort_ParseU32Env(const char* name, u32* outValue) {
+    const char* e = getenv(name);
+    char* endp;
+    unsigned long v;
+    if (e == NULL || e[0] == '\0' || outValue == NULL) {
+        return 0;
+    }
+    v = strtoul(e, &endp, 0);
+    if (endp == e) {
+        return 0;
+    }
+    *outValue = (u32)v;
+    return 1;
+}
+
+static int PCPort_FieldMotionActionSlot(int actionStateIndex,
+                                        int* outOffset,
+                                        int* outLoopFlag) {
+    int offset = -1;
+    int loop = 0;
+    switch (actionStateIndex) {
+    case 1: offset = 0x1; loop = 1; break;
+    case 2: offset = 0x2; loop = 1; break;
+    case 3: offset = 0x3; loop = 1; break;
+    case 4: offset = 0x4; loop = 0; break;
+    case 5: offset = 0x1; loop = 1; break;
+    case 6: offset = 0x6; loop = 0; break;
+    case 7: offset = 0x7; loop = 1; break;
+    case 8: offset = 0x8; loop = 0; break;
+    default: return 0;
+    }
+    if (outOffset != NULL) *outOffset = offset;
+    if (outLoopFlag != NULL) *outLoopFlag = loop;
+    return 1;
+}
+
+/* Host mirror of fn_8018F4C8: record bytes are signed motion ids, and -1 means
+ * "no motion". Loop flag is owned by the action slot, not the byte value. */
+static int PCPort_FieldMotionRecordReadAction(const u8* record,
+                                              int actionStateIndex,
+                                              int* outMotion,
+                                              int* outLoopFlag) {
+    int offset, loop;
+    int motion;
+    if (record == NULL || !PCPort_FieldMotionActionSlot(actionStateIndex,
+                                                       &offset, &loop)) {
+        if (outMotion != NULL) *outMotion = -1;
+        if (outLoopFlag != NULL) *outLoopFlag = 0;
+        return 0;
+    }
+    motion = (int)(signed char)record[offset];
+    if (outMotion != NULL) *outMotion = motion;
+    if (outLoopFlag != NULL) *outLoopFlag = loop;
+    return motion >= 0;
+}
+
+static const u8* PCPort_FieldMotionFindRecordByKey(u32 key) {
+    u32 i;
+    const u8* p = g_pcFieldMotionRecordTable;
+    if (p == NULL || g_pcFieldMotionRecordCount == 0u) {
+        return NULL;
+    }
+    for (i = 0u; i < g_pcFieldMotionRecordCount; ++i) {
+        if (PCPort_ReadBigEndianU32(p + PCPORT_FIELD_MOTION_RECORD_KEY_OFF) == key) {
+            return p;
+        }
+        p += PCPORT_FIELD_MOTION_RECORD_STRIDE;
+    }
+    return NULL;
+}
+
+static int PCPort_ParseFieldMotionRecordEnv(u8 outRecord[PCPORT_FIELD_MOTION_RECORD_STRIDE]) {
+    const char* e = getenv("PCPORT_FIELD_MOTION_RECORD_BYTES");
+    int values[9];
+    int n = 0;
+    const char* p;
+    if (e == NULL || e[0] == '\0' || outRecord == NULL) {
+        return 0;
+    }
+    memset(outRecord, 0, PCPORT_FIELD_MOTION_RECORD_STRIDE);
+    p = e;
+    while (*p != '\0' && n < 9) {
+        char* endp;
+        long v = strtol(p, &endp, 0);
+        if (endp == p) {
+            break;
+        }
+        values[n++] = (int)v;
+        p = endp;
+        while (*p == ',' || *p == ' ' || *p == '\t') {
+            ++p;
+        }
+    }
+    if (n != 8 && n != 9) {
+        return 0;
+    }
+    if (n == 8) {
+        int i;
+        for (i = 0; i < 8; ++i) {
+            outRecord[i + 1] = (u8)(signed char)values[i];
+        }
+    } else {
+        int i;
+        for (i = 0; i < 9; ++i) {
+            outRecord[i] = (u8)(signed char)values[i];
+        }
+    }
+    return 1;
+}
+
+static int PCPort_FieldMotionMapFromRecord(const u8* record,
+                                           PCPortFieldMotionMap* map) {
+    int idle = -1, walk = -1, run = -1;
+    int idleLoop = 0, walkLoop = 0, runLoop = 0;
+    if (map == NULL || record == NULL) {
+        return 0;
+    }
+    PCPort_FieldMotionRecordReadAction(record, 1, &idle, &idleLoop);
+    PCPort_FieldMotionRecordReadAction(record, 2, &walk, &walkLoop);
+    PCPort_FieldMotionRecordReadAction(record, 3, &run, &runLoop);
+    if (idle < 0 && walk < 0 && run < 0) {
+        return 0;
+    }
+    map->idle = idle;
+    map->walk = walk;
+    map->run = run;
+    map->idleLoop = idleLoop;
+    map->walkLoop = walkLoop;
+    map->runLoop = runLoop;
+    map->fromRecord = 1;
+    return 1;
+}
+
+static void PCPort_FieldMotionRecordProbe(const u8* record, u32 key) {
+    int i;
+    int idle = -1, walk = -1, run = -1;
+    int loop = 0;
+    if (record == NULL) {
+        return;
+    }
+    printf("[field/motion-record] key=0x%08X bytes:", key);
+    for (i = 0; i <= 8; ++i) {
+        printf(" %d", (int)(signed char)record[i]);
+    }
+    printf("\n");
+    for (i = 1; i <= 8; ++i) {
+        int motion = -1, loop = 0;
+        int valid = PCPort_FieldMotionRecordReadAction(record, i, &motion, &loop);
+        printf("[field/motion-record] action[%d] motion=%d loop=%d%s\n",
+               i, motion, loop, valid ? "" : " skip");
+    }
+    PCPort_FieldMotionRecordReadAction(record, 1, &idle, &loop);
+    PCPort_FieldMotionRecordReadAction(record, 2, &walk, &loop);
+    PCPort_FieldMotionRecordReadAction(record, 3, &run, &loop);
+    printf("[field/motion-record] role map idle=%d walk=%d run=%d%s\n",
+           idle, walk, run,
+           (idle == 1 && walk == 5 && run == 8)
+               ? " [Wes checksum-confirmed]"
+               : "");
+    fflush(stdout);
+}
+
 /* Role-to-motion indirection. This is intentionally data-shaped: the field
  * action-table trace can populate the three roles when its struct offsets land.
- * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win. The default
- * Wes map below is checksum-confirmed from ken_b1's real cyclic clips. */
+ * Env / PCPORT_FIELD_MOTION_MAP="idle,walk,run" overrides win, but there is no
+ * hardcoded Wes fallback: the normal path is the real 0x2C per-character record
+ * mirrored from fn_8018F4C8 / fn_8018F6F4. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
-    map.idle = PCPORT_WES_IDLE_MOTION;
-    map.walk = PCPORT_WES_WALK_MOTION;
-    map.run = PCPORT_WES_RUN_MOTION;
+    u8 envRecord[PCPORT_FIELD_MOTION_RECORD_STRIDE];
+    u32 key = 0u;
+    const u8* record = NULL;
+    map.idle = -1;
+    map.walk = -1;
+    map.run = -1;
+    map.idleLoop = 0;
+    map.walkLoop = 0;
+    map.runLoop = 0;
+    map.fromRecord = 0;
+    map.key = 0u;
+
+    if (PCPort_ParseFieldMotionRecordEnv(envRecord)) {
+        record = envRecord;
+    } else if (PCPort_ParseU32Env("PCPORT_FIELD_CHAR_KEY", &key)) {
+        record = PCPort_FieldMotionFindRecordByKey(key);
+        map.key = key;
+    }
+    if (record != NULL) {
+        PCPort_FieldMotionMapFromRecord(record, &map);
+        if (getenv("PCPORT_FIELD_MOTION_RECORD_PROBE") != NULL) {
+            PCPort_FieldMotionRecordProbe(record, map.key);
+        }
+    }
 
     packed = getenv("PCPORT_FIELD_MOTION_MAP");
     if (packed != NULL && packed[0] != '\0') {
@@ -8652,8 +8843,11 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk);
     PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
     if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
-        printf("[field/motion] map idle=%d walk=%d run=%d\n",
-               map.idle, map.walk, map.run);
+        printf("[field/motion] map idle=%d(loop=%d) walk=%d(loop=%d) "
+               "run=%d(loop=%d)%s key=0x%08X\n",
+               map.idle, map.idleLoop, map.walk, map.walkLoop,
+               map.run, map.runLoop, map.fromRecord ? " [record]" : "",
+               map.key);
     }
     return map;
 }
