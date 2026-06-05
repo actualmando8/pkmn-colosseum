@@ -2322,7 +2322,7 @@ void fn_8003480C(void) {
 #pragma pop
 #endif
 
-/* fn_80034DC0 - 0x80034DC0 | size: 0x78 */
+/* fn_80034DC0 - 0x80034DC0 | size: 0x78 | WALL 80%: oris+ori constant build pattern */
 extern u32 lbl_8047A44C;
 #if 0
 asm void fn_80034DC0(void) {

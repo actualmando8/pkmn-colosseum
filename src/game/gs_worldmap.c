@@ -201,7 +201,7 @@ s32 fn_800263B0(void* r3, u8* r4) {
 }
 #endif
 
-/* fn_8002641C - 0x8002641C | size: 0x5c */
+/* fn_8002641C - 0x8002641C | size: 0x5c | WALL 91.3%: li vs mr pattern */
 #if 0
 asm void fn_8002641C(void) {
 #include "src/game/gs_worldmap_fn_8002641C.inc"
@@ -2210,7 +2210,7 @@ s32 fn_8002AE9C(void* r3, u8* r4) {
 }
 #endif
 
-/* fn_8002AEF8 - 0x8002AEF8 | size: 0x144 */
+/* fn_8002AEF8 - 0x8002AEF8 | size: 0x144 | WALL 83.7%: regalloc + scheduling */
 extern void fn_801440A0(u32);
 extern u32 fn_80144014(void);
 extern u32 fn_80129BC8(s32, u32, u16*, s32, s32, s32, s32);
@@ -2475,7 +2475,7 @@ s32 fn_8002BCE8(void* r3, u8* r4) {
 }
 #endif
 
-/* fn_8002BE08 - 0x8002BE08 | size: 0x20c */
+/* fn_8002BE08 - 0x8002BE08 | size: 0x20c | WALL 86.5%: regalloc + scheduling */
 extern void fn_80143F84(void);
 extern f32 lbl_8047B9B8;
 extern f32 lbl_8047B9BC;
