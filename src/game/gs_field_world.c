@@ -8670,7 +8670,7 @@ void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
     for (i = 0; i < 0x40; i++, scan += 4) {
         void* entry = *(void**)(scan + 8);
         if (entry) {
-            fn_80169034(*(void**)((u8*)entry + 0x10), arg2);
+            psSetParticleVisibility(*(void**)((u8*)entry + 0x10), arg2);
         }
     }
 }
