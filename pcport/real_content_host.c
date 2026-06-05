@@ -4057,7 +4057,8 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         return;
     }
 
-    entryCount = ReadBE32(fsysData + 0x08);
+    isPkx = PCPort_IsPkxArchivePath(fsysPath);
+    entryCount = ReadBE32(fsysData + (isPkx ? 0x0Cu : 0x08u));
     stringTableOffset = ReadBE32(fsysData + 0x18);
     if (stringTableOffset + 4u > fsysSize) {
         free(fsysData);
@@ -4068,8 +4069,6 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         free(fsysData);
         return;
     }
-    isPkx = PCPort_IsPkxArchivePath(fsysPath);
-
     for (i = 0u; i < entryCount; ++i) {
         u32 entryOffset;
         u32 nameOffset;
@@ -4228,7 +4227,7 @@ void PCPort_HeadlessMotionBatchProbe(int frames) {
         "orig/GC6E01/disc/files/people_archive.fsys"
     };
     int i;
-    const char* includePkx = getenv("PCPORT_MOTION_BATCH_INCLUDE_PKX");
+    const char* skipPkx = getenv("PCPORT_MOTION_BATCH_SKIP_PKX");
     if (frames <= 1) {
         frames = 40;
     }
@@ -4238,8 +4237,7 @@ void PCPort_HeadlessMotionBatchProbe(int frames) {
     for (i = 0; i < (int)(sizeof(archives) / sizeof(archives[0])); ++i) {
         PCPort_HeadlessMotionBatchProbeArchive(archives[i], frames);
     }
-    if (includePkx != NULL && includePkx[0] != '\0' &&
-        strcmp(includePkx, "0") != 0) {
+    if (skipPkx == NULL || skipPkx[0] == '\0' || strcmp(skipPkx, "0") == 0) {
         PCPort_HeadlessMotionBatchProbePkxArchives(frames);
     }
 }
