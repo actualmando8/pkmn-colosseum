@@ -26234,7 +26234,7 @@ u32 fn_80115170(void* ptr) {
     if (fn_800FF554() != 0) {
         return 0;
     }
-    fn_800FC2A8(ptr);
+    GSmsgFontClose(ptr);
     return 1;
 }
 #pragma pop
