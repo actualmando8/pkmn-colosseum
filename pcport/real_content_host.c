@@ -2934,6 +2934,12 @@ static BOOL PCPort_IsPkxArchivePath(const char* fsysPath) {
     return strncmp(PCPort_PathBaseName(fsysPath), "pkx_", 4) == 0;
 }
 
+static BOOL PCPort_IsKnownNonAnimatedCharacterArchive(const char* fsysPath) {
+    const char* base = PCPort_PathBaseName(fsysPath);
+    return strcmp(base, "chara_big.fsys") == 0 ||
+           strcmp(base, "chara_small.fsys") == 0;
+}
+
 static BOOL PCPort_IsPlausibleFsysEntry(const u8* fsysData, u32 fsysSize,
                                         u32 entryOffset) {
     u32 dataOffset;
@@ -4040,8 +4046,6 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
     u32 i;
     u32 probed = 0u;
     u32 confirmed = 0u;
-    BOOL isPkx;
-    BOOL pkxTried = FALSE;
 
     fsysData = LoadFileBytes(fsysPath, &fsysSize);
     if (fsysData == NULL) {
@@ -4056,9 +4060,17 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         free(fsysData);
         return;
     }
+    printf("[headless-motion-batch] begin archive=%s\n", fsysPath);
+    fflush(stdout);
+    if (PCPort_IsKnownNonAnimatedCharacterArchive(fsysPath)) {
+        printf("[headless-motion-batch] archive=%s probed=0 confirmed=0 "
+               "note=non-animated-assets\n", fsysPath);
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
 
-    isPkx = PCPort_IsPkxArchivePath(fsysPath);
-    entryCount = ReadBE32(fsysData + (isPkx ? 0x0Cu : 0x08u));
+    entryCount = ReadBE32(fsysData + 0x08);
     stringTableOffset = ReadBE32(fsysData + 0x18);
     if (stringTableOffset + 4u > fsysSize) {
         free(fsysData);
@@ -4083,17 +4095,11 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
             break;
         }
         entryOffset = ReadBE32(fsysData + entryTableOffset + i * 4u);
-        if (!PCPort_IsPlausibleFsysEntry(fsysData, fsysSize, entryOffset)) {
-            if (isPkx && pkxTried) {
-                break;
-            }
-            continue;
-        }
-        if (isPkx && pkxTried) {
+        if (entryOffset == 0u) {
             break;
         }
-        if (isPkx) {
-            pkxTried = TRUE;
+        if (!PCPort_IsPlausibleFsysEntry(fsysData, fsysSize, entryOffset)) {
+            continue;
         }
         nameOffset = ReadBE32(fsysData + entryOffset + 0x24);
         if (nameOffset >= fsysSize) {
@@ -4104,51 +4110,12 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         memberData = DecompressMemberAt(fsysData, fsysSize, entryOffset,
                                         &memberSize);
         if (memberData == NULL) {
-            if (isPkx) {
-                printf("[headless-motion-pkx] %-18s %-24s load=decompress-failed\n",
-                       PCPort_PathBaseName(fsysPath), memberName);
-                fflush(stdout);
-            }
             continue;
         }
 
         if (!PCPort_HeadlessMotionCollectMemberDataStats(
                 fsysPath, memberName, memberData, memberSize, frames, stats,
                 &motionCount, 0)) {
-            if (isPkx) {
-                printf("[headless-motion-pkx] %-18s %-24s load=motion-bank-failed "
-                       "memberSize=0x%X\n",
-                       PCPort_PathBaseName(fsysPath), memberName, memberSize);
-                fflush(stdout);
-            }
-            continue;
-        }
-
-        if (isPkx) {
-            u32 j;
-            u32 cyclicCount = 0u;
-            u32 varyingCyclicCount = 0u;
-            for (j = 0u; j < motionCount && j < 64u; ++j) {
-                if (!stats[j].valid) {
-                    continue;
-                }
-                if (strcmp(stats[j].kind, "cyclic") == 0) {
-                    ++cyclicCount;
-                    if (stats[j].varyingFrames > 0) {
-                        ++varyingCyclicCount;
-                    }
-                }
-            }
-            ++probed;
-            if (varyingCyclicCount > 0u) {
-                ++confirmed;
-            }
-            printf("[headless-motion-pkx] %-18s %-24s motions=%2u "
-                   "cyclic=%2u varyCyclic=%2u animates=%s\n",
-                   PCPort_PathBaseName(fsysPath), memberName, motionCount,
-                   cyclicCount, varyingCyclicCount,
-                   varyingCyclicCount > 0u ? "yes" : "no");
-            fflush(stdout);
             continue;
         }
 
@@ -4188,6 +4155,118 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
     free(fsysData);
 }
 
+static void PCPort_HeadlessMotionBatchProbePkxArchive(const char* fsysPath,
+                                                      int frames) {
+    u8* fsysData;
+    u32 fsysSize = 0u;
+    u32 entryCount;
+    u32 stringTableOffset;
+    u32 entryTableOffset;
+    u32 i;
+    u32 bestEntryOffset = 0u;
+    u32 bestSize = 0u;
+    const char* memberName;
+    u8* memberData;
+    u32 memberSize = 0u;
+    PCPortMotionProbeStats stats[64];
+    u32 motionCount = 0u;
+    u32 varyingCount;
+    u32 cyclicCount;
+    u32 varyingCyclicCount;
+
+    fsysData = LoadFileBytes(fsysPath, &fsysSize);
+    if (fsysData == NULL) {
+        printf("[headless-motion-pkx] %-18s %-24s load=open-failed\n",
+               PCPort_PathBaseName(fsysPath), "");
+        fflush(stdout);
+        return;
+    }
+    if (fsysSize < 0x20u || ReadBE32(fsysData) != PCPORT_FSYS_MAGIC) {
+        printf("[headless-motion-pkx] %-18s %-24s load=not-fsys\n",
+               PCPort_PathBaseName(fsysPath), "");
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+
+    entryCount = ReadBE32(fsysData + 0x0C);
+    stringTableOffset = ReadBE32(fsysData + 0x18);
+    if (entryCount == 0u || stringTableOffset + 4u > fsysSize) {
+        printf("[headless-motion-pkx] %-18s %-24s load=no-entry-table\n",
+               PCPort_PathBaseName(fsysPath), "");
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+    entryTableOffset = ReadBE32(fsysData + stringTableOffset);
+    if (entryTableOffset >= fsysSize) {
+        printf("[headless-motion-pkx] %-18s %-24s load=no-entry-table\n",
+               PCPort_PathBaseName(fsysPath), "");
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+
+    for (i = 0u; i < entryCount; ++i) {
+        u32 entryOffset;
+        u32 size;
+        if (entryTableOffset + i * 4u + 4u > fsysSize) {
+            break;
+        }
+        entryOffset = ReadBE32(fsysData + entryTableOffset + i * 4u);
+        if (!PCPort_IsPlausibleFsysEntry(fsysData, fsysSize, entryOffset)) {
+            continue;
+        }
+        size = ReadBE32(fsysData + entryOffset + 0x08);
+        if (bestEntryOffset == 0u || size > bestSize) {
+            bestEntryOffset = entryOffset;
+            bestSize = size;
+        }
+    }
+    if (bestEntryOffset == 0u) {
+        printf("[headless-motion-pkx] %-18s %-24s load=no-model-entry\n",
+               PCPort_PathBaseName(fsysPath), "");
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+
+    memberName = (const char*)(fsysData + ReadBE32(fsysData + bestEntryOffset + 0x24));
+    memberData = DecompressMemberAt(fsysData, fsysSize, bestEntryOffset,
+                                    &memberSize);
+    if (memberData == NULL) {
+        printf("[headless-motion-pkx] %-18s %-24s load=decompress-failed\n",
+               PCPort_PathBaseName(fsysPath), memberName);
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+
+    if (!PCPort_HeadlessMotionCollectMemberDataStats(
+            fsysPath, memberName, memberData, memberSize, frames, stats,
+            &motionCount, 0)) {
+        printf("[headless-motion-pkx] %-18s %-24s load=motion-bank-failed "
+               "memberSize=0x%X\n",
+               PCPort_PathBaseName(fsysPath), memberName, memberSize);
+        fflush(stdout);
+        free(fsysData);
+        return;
+    }
+
+    varyingCount = PCPort_MotionProbeVaryingMotionCount(stats, motionCount);
+    cyclicCount = PCPort_MotionProbeCyclicCount(stats, motionCount);
+    varyingCyclicCount =
+        PCPort_MotionProbeConfirmedCyclicCount(stats, motionCount);
+    printf("[headless-motion-pkx] %-18s %-24s motions=%2u varying=%2u "
+           "cyclic=%2u varyCyclic=%2u animates=%s confirmed=%s\n",
+           PCPort_PathBaseName(fsysPath), memberName, motionCount,
+           varyingCount, cyclicCount, varyingCyclicCount,
+           varyingCount > 0u ? "yes" : "no",
+           varyingCount > 0u ? "yes" : "no");
+    fflush(stdout);
+    free(fsysData);
+}
+
 static void PCPort_HeadlessMotionBatchProbePkxArchives(int frames) {
 #ifdef _WIN32
     WIN32_FIND_DATAA fd;
@@ -4208,7 +4287,7 @@ static void PCPort_HeadlessMotionBatchProbePkxArchives(int frames) {
             continue;
         }
         snprintf(path, sizeof(path), "%s/%s", dir, fd.cFileName);
-        PCPort_HeadlessMotionBatchProbeArchive(path, frames);
+        PCPort_HeadlessMotionBatchProbePkxArchive(path, frames);
     } while (FindNextFileA(find, &fd));
     FindClose(find);
 #else
