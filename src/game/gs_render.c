@@ -3156,6 +3156,10 @@ u32 fn_800DADB4(void) {
 extern u16 fn_800E2C04(u32, u32);
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
+/* WALL(codex): fn_800DAF60 free-slot scan is branch-shape limited.
+ * for/goto form makes CW use mtctr/bdnz and improves to 96.1538%, but
+ * remaining loop branches are target ble/bne/explicit b versus decomp beq/beq.
+ * Reverted non-100 loop experiment. */
 #if 0
 asm void fn_800DAF60(void) {
 #include "src/game/gs_render_fn_800DAF60.inc"
