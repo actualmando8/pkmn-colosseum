@@ -4619,21 +4619,27 @@ asm void fn_800E0238(void) {
 #else
 void fn_800E0238(void* a, void* b) { fn_800A2E64(b, a); }
 #endif
-extern void fn_800A2EB4(void*, void*);
+extern void PSMTXInverse(void*, void*);
 #if 0
 asm void fn_800E0264(void) {
 #include "src/game/gs_render_fn_800E0264.inc"
 }
 #else
-void fn_800E0264(void* a, void* b) { fn_800A2EB4(b, a); }
+void fn_800E0264(void* a, void* b)
+{
+    PSMTXInverse(b, a);
+}
 #endif
-extern void fn_800A2D98(void*, void*, void*);
+extern void PSMTXConcat(void*, void*, void*);
 #if 0
 asm void fn_800E0290(void* a, void* b, void* c) {
 #include "src/game/gs_render_fn_800E0290.inc"
 }
 #else
-void fn_800E0290(void* a, void* b, void* c) { fn_800A2D98(b, c, a); }
+void fn_800E0290(void* a, void* b, void* c)
+{
+    PSMTXConcat(b, c, a);
+}
 #endif
 extern void fn_800A335C(void*, void*);
 #if 0
@@ -4649,21 +4655,36 @@ asm void fn_800E02E8(void* obj) {
 #include "src/game/gs_render_fn_800E02E8.inc"
 }
 #else
-void fn_800E02E8(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x5a); fn_800A2D98(obj, tmp, obj); }
+void fn_800E02E8(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    fn_800A3074(tmp, 0x5a);
+    PSMTXConcat(obj, tmp, obj);
+}
 #endif
 #if 0
 asm void fn_800E032C(void* obj) {
 #include "src/game/gs_render_fn_800E032C.inc"
 }
 #else
-void fn_800E032C(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x59); fn_800A2D98(obj, tmp, obj); }
+void fn_800E032C(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    fn_800A3074(tmp, 0x59);
+    PSMTXConcat(obj, tmp, obj);
+}
 #endif
 #if 0
 asm void fn_800E0370(void* obj) {
 #include "src/game/gs_render_fn_800E0370.inc"
 }
 #else
-void fn_800E0370(void* obj, f32 angle) { u8 tmp[0x30]; fn_800A3074(tmp, 0x58); fn_800A2D98(obj, tmp, obj); }
+void fn_800E0370(void* obj, f32 angle)
+{
+    u8 tmp[0x30];
+    fn_800A3074(tmp, 0x58);
+    PSMTXConcat(obj, tmp, obj);
+}
 #endif
 extern void fn_800A32E8(void*, void*, f32, f32, f32);
 #if 0
@@ -4790,13 +4811,16 @@ asm void fn_800E0698(void) {
 #else
 void fn_800E0698(void* p, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f) { fn_800A39E0(); }
 #endif
-extern void fn_800A3D3C(void*, void*, void*);
+extern void C_QUATSlerp(void*, void*, void*);
 #if 0
 asm void fn_800E06B8(void) {
 #include "src/game/gs_render_fn_800E06B8.inc"
 }
 #else
-void fn_800E06B8(void* a, void* b, void* c) { fn_800A3D3C(b, c, a); }
+void fn_800E06B8(void* a, void* b, void* c)
+{
+    C_QUATSlerp(b, c, a);
+}
 #endif
 extern void fn_801ADAAC(void*, void*);
 #if 0
