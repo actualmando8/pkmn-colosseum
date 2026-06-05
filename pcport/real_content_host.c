@@ -1945,6 +1945,29 @@ void PCPort_HSDSwizzleSmoke(const char* fsysPath, const char* memberName) {
             printf(" +%X=0x%X%s", w, v, isPtr ? "*" : "");
         }
         printf("\n");
+        /* Dump each branch model-set slot (stride 8) as a jointList {root,anim,
+         * matanim}: for a character the extra slots are candidate motions. */
+        {
+            u32 si;
+            for (si = 0; si < 6u; ++si) {
+                u32 slotOff = ReadBE32(archive.storage + branchOff + si * 8u);
+                u32 r, aj2, mj2;
+                if (slotOff < 0x20u || slotOff >= 0x20u + archive.dataSize) break;
+                r   = ReadBE32(archive.storage + slotOff + 0x0);
+                aj2 = ReadBE32(archive.storage + slotOff + 0x4);
+                mj2 = ReadBE32(archive.storage + slotOff + 0x8);
+                printf("[hsd-swiz] branchSlot[%u]@0x%X: root=0x%X anim=0x%X matanim=0x%X", si, slotOff, r, aj2, mj2);
+                /* If anim looks like an animjoint, peek its aobjdesc end_frame. */
+                if (aj2 >= 0x20u && aj2 < 0x20u + archive.dataSize) {
+                    u32 aod = ReadBE32(archive.storage + aj2 + 0x8);
+                    if (aod >= 0x20u && aod < 0x20u + archive.dataSize) {
+                        union { u32 u; f32 f; } ef; ef.u = ReadBE32(archive.storage + aod + 4);
+                        printf("  [anim aobjdesc end_frame=%.2f fobjdesc=0x%X]", ef.f, ReadBE32(archive.storage+aod+8));
+                    }
+                }
+                printf("\n");
+            }
+        }
         /* Candidate animjoint(+4) + matanimjoint(+8): dump their first words. */
         {
             u32 aj = ReadBE32(archive.storage + jointListOff + 0x4);
@@ -2190,7 +2213,14 @@ int PCPort_TitleAnimSetup(const char* fsysPath, const char* memberName) {
         return 0;
     }
     branchOff = ReadBE32(sceneData + 0x00);
-    jointListOff = ReadBE32(g_titleAnimArchive.storage + branchOff + 0x00);
+    /* PCPORT_ANIM_SLOT picks which branch model-set slot to load (stride 8:
+     * slot0=+0, slot1=+8, ...). For characters the extra slots are candidate
+     * alternate motions (idle/walk/run); default 0 keeps existing behavior. */
+    {
+        const char* sl = getenv("PCPORT_ANIM_SLOT");
+        u32 slot = (sl != NULL) ? (u32)atoi(sl) : 0u;
+        jointListOff = ReadBE32(g_titleAnimArchive.storage + branchOff + slot * 8u);
+    }
 
     /* Swizzle BE->LE (joint tree + anim + matanim) and relocate to host ptrs. */
     rootPtr = PCPort_SwizzleSceneForHSD(&g_titleAnimArchive, jointListOff);
@@ -2407,19 +2437,53 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     }
     branchOff = ReadBE32(sceneData + 0x00);
     jointListOff = ReadBE32(g_charAnimArchive.storage + branchOff + 0x00);
+    (void)rootPtr;
 
-    rootPtr = PCPort_SwizzleSceneForHSD(&g_charAnimArchive, jointListOff);
-    if (rootPtr == NULL) {
-        printf("[char-anim] swizzle FAILED\n");
-        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
-        free(data); g_charAnimData = NULL;
-        return 0;
-    }
+    /* Resource layout (reverse-engineered from the model loader fn_800E51A4 /
+     * attach fn_800ECCA8): Resource = jointList here:
+     *   +0x0 = JObjDesc* (the skeleton root)
+     *   +0x4 = pointer to a NULL-terminated ARRAY of HSD_AnimJoint* -- the MOTION
+     *          BANK, indexed by motion id (idle/walk/run/...). model+0x84 = count.
+     *   +0x8 = second anim array (secondary motions), +0xC = material-anim array.
+     * The earlier code wrongly treated +0x4 as a single AnimJoint (it's the array
+     * pointer) -> attached garbage = a frozen pose. Select motion[PCPORT_MOTION_IDX]. */
     {
-        u8* jl = (u8*)rootPtr;
-        rootJoint    = (HSD_Joint*)(uintptr_t)(*(u32*)(jl + 0x0));
-        animjoint    = (void*)(uintptr_t)(*(u32*)(jl + 0x4));
-        matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
+        PCPortSwizCtx ctx;
+        u32 rootOff    = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x0);
+        u32 animArrOff = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x4);
+        u32 matanimOff = ReadBE32(g_charAnimArchive.storage + jointListOff + 0x8);
+        const char* mi = getenv("PCPORT_MOTION_IDX");
+        u32 motionIdx = (mi != NULL) ? (u32)atoi(mi) : 0u;
+        u32 dataLo = g_charAnimArchive.dataOffset;
+        u32 dataHi = g_charAnimArchive.dataOffset + g_charAnimArchive.dataSize;
+        u32 realAnimOff = 0u, motionCount = 0u, k;
+
+        /* Count motions (array entries that are valid data pointers). */
+        if (animArrOff >= dataLo && animArrOff < dataHi) {
+            for (k = 0; k < 64u; ++k) {
+                u32 e = ReadBE32(g_charAnimArchive.storage + animArrOff + k * 4u);
+                if (e < dataLo || e >= dataHi) break;
+                ++motionCount;
+            }
+            if (motionIdx >= motionCount && motionCount > 0u) motionIdx = motionCount - 1u;
+            realAnimOff = ReadBE32(g_charAnimArchive.storage + animArrOff + motionIdx * 4u);
+        }
+
+        memset(&ctx, 0, sizeof(ctx));
+        ctx.base = g_charAnimArchive.storage;
+        ctx.size = g_charAnimArchive.storageSize;
+        ctx.dataOffset = g_charAnimArchive.dataOffset;
+        SwizJoint(&ctx, rootOff);
+        if (realAnimOff >= dataLo && realAnimOff < dataHi) SwizAnimJoint(&ctx, realAnimOff);
+        if (matanimOff >= dataLo && matanimOff < dataHi) SwizMatAnimJoint(&ctx, matanimOff);
+        PCPort_HSDApplyHostRelocations(&g_charAnimArchive);
+
+        rootJoint    = (HSD_Joint*)(g_charAnimArchive.storage + rootOff);
+        animjoint    = (realAnimOff >= dataLo && realAnimOff < dataHi)
+                           ? (void*)(g_charAnimArchive.storage + realAnimOff) : NULL;
+        matanimjoint = NULL;
+        printf("[char-anim] motion bank: %u motions; using idx %u (animOff=0x%X)\n",
+               motionCount, motionIdx, realAnimOff);
     }
 
     g_charAnimRoot = HSD_JObjLoadJoint(rootJoint);
