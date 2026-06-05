@@ -58,6 +58,29 @@ extern void  fn_800A3A9C(void* out, void* in, f32 s);     /* VEC normalize */
 extern void  fn_800D7868(void* handle, u32 a, u32 b, u32 c,
                           u32 d, u32 e, u32 f, u32 g);     /* GSgfx draw setup */
 extern void* fn_800D7894(void);                             /* GSgfx create render obj */
+/* Real named labels referenced by remaining inline-asm wrappers in this TU. */
+extern void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj();
+extern void cos();
+extern void gamedataAttestCheckValid();
+extern void gamedataAttestCreate();
+extern void gamedataAttestInit();
+extern void gamedataCreate();
+extern void gamedataGetStatus();
+extern void GScharCmp();
+extern void GScharLenCpy();
+extern void GSflagClear();
+extern void GSmsgFontClose();
+extern void itemGetStatus();
+extern void LCStoreData();
+extern void memoDataSet();
+extern void menuSubGetPokemonSexForFightDisp();
+extern void OSGetTick();
+extern void psInitAppSRT();
+extern void psInitParticle();
+extern void psSetGeneratorAngleRadiusScale();
+extern void psSetParticleVisibility();
+extern void sin();
+extern void statusGetStatus();
 /* GSfloor / GScolsys */
 extern void* fn_800FF56C(void);                             /* GSfloor get active */
 extern void  fn_8010C7BC(u32 triIdx, void* outFlag);        /* GScolsys query */
@@ -7930,9 +7953,11 @@ void fn_80118104(u32 a, u8 b) {
 /* 0x801181B0 | 0x23C */
 extern void fn_801694A8(void* ptr);
 extern void fn_801695FC();
+extern void psKillFamily();
 extern void fn_800EC160();
 extern void fn_80169484();
 extern void fn_80175A1C();
+extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 #if 1
@@ -10878,50 +10903,40 @@ void fn_8011B950(u8* base, u16 count) {
 #endif
 /* 0x8011BA0C | 0xB4 */
 extern void jumptable_8035C260();
-#if 1
+#if 0
 asm void fn_8011BA0C(void) {
 #include "src/game/gs_field_world_fn_8011BA0C.inc"
 }
 #else
-void fn_8011BA0C(void) {
-    extern u8 jumptable_8035C260[];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    void (*ctr_fn)(void) = 0;
-    r0 = r3 & 0xFF;
-    r3 = 0x0;
-    if (r0 > (u32)0xb) return;
-    r4 = (u32)jumptable_8035C260;
-    r0 = r0 << 2;
-    r4 = (u32)jumptable_8035C260;
-    r0 = *(u32*)(r4 + r0);
-    ctr_fn = (void(*)(void))r0;
-    /* indirect jump via ctr */;
-    r3 = 0x0;
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
-    r3 = (0x1 << 16);
-    return;
+u32 fn_8011BA0C(u8 type) {
+    switch (type) {
+    case 0:
+        return 0;
+    case 1:
+        return 0xEC50;
+    case 2:
+        return 0xEC51;
+    case 3:
+        return 0xEC52;
+    case 4:
+        return 0xED09;
+    case 5:
+        return 0xEC53;
+    case 6:
+        return 0xEC54;
+    case 7:
+        return 0xEC55;
+    case 8:
+        return 0xEC56;
+    case 9:
+        return 0xEC57;
+    case 10:
+        return 0xEC58;
+    case 11:
+        return 0xEC59;
+    default:
+        return 0;
+    }
 }
 #endif
 /* 0x8011BAC0 | 0xAC */
