@@ -5009,6 +5009,7 @@ static int PCPortInvertAffine3x4(const f32 M[3][4], f32 out[3][4]) {
 static u32 g_skinHist[PCPORT_SKIN_MAX_SLOTS];
 static u32 g_skinHistOob;
 static int g_skinVtxPosN;
+static int g_skinPobjSeq; /* per-frame skinned-PObj counter for PCPORT_SKIN_POBJ */
 static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
@@ -5180,6 +5181,16 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     const HSD_VtxDescList* texD = NULL;
     const u8* dl = tp->displayList;
     const u8* end;
+    /* PCPORT_SKIN_POBJ=N renders only the Nth skinned PObj this frame (others are
+     * skipped) to isolate a single mesh; PCPORT_SKIN_POBJTINT colours each PObj
+     * distinctly. Diagnostic for the per-pobj torso/limb placement. */
+    {
+        const char* only = getenv("PCPORT_SKIN_POBJ");
+        int idx = g_skinPobjSeq++;
+        if (only != NULL && only[0] != '\0' && atoi(only) != idx) {
+            return 1; /* skip drawing this pobj, but count it as handled */
+        }
+    }
 
     if (envOff == 0u || tp->verts == NULL || dl == NULL ||
         !ArchiveRangeValid(a, envOff, 0x4u)) {
