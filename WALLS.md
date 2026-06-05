@@ -157,6 +157,34 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 | `fn_801327E0` | effect_util.c | float-conversion-in-TU (CW's auto `(f32)(s32)` int→float emits a per-TU **anonymous** 2^52 magic-double pool constant; target references the shared **named** `lbl_8047D0E0(r2)` sdata2 global) | 57% (GC/1.3, exact size 84) | no (asm-wrapper; C correct) | `*(f32*)(p+0xC)=*(f32*)(p+4)` + `field10 += field64*(f32)((u8)p[0x23]+(s8)p[0x42])` is logically byte-correct; auto-conversion's magic-build matches but its constant is anonymous (objdiff name-mismatch under `calculatePoolRelocations=false`) + scheduling of the magic-build differs. Manual union conversion via `lbl_8047D0E0` made it WORSE (50%, size 88). The brief's flagged "float-conversion fails in-TU" class, confirmed. |
 | `fn_801CA728` | battle_scene.c | float-conversion-in-TU — SAME class as `fn_801327E0` (anonymous 2^52 magic-double pool constant vs target's shared named `(r2)` sdata2 global) | 93.79% (GC/1.3, exact size 132) | no (asm-wrapper; C correct) | `base + (s32)((f32)param * fn_8025D0A8())` with the int→float + `fctiwz` is byte-identical EXCEPT the single `lfd f2` magic-constant reloc (mine anonymous `@263`, target named `-21888(r2)`); diff persists even with `calculatePoolRelocations=true` (genuine, not a pool-scoring artifact). Manual union conversion via `lbl_8047D0E0` made it WORSE (88%, size 136). Block-scope shadow decls (`s32 fn_8006ADEC()`, `f32 fn_8025D0A8()`) resolve the void-return caller-decl conflicts cleanly. |
 | `fn_800F7DE4` / `fn_800F7E40` / `fn_800F7E9C` (family) | input.c | W1 reg-alloc: **`lwzu`-in-place-increment vs separate-sentinel-register are mutually exclusive in CW 1.3.** The 4-way pad-by-id lookup (`lbl_80401C10`, stride 0x6c) needs the early-return-of-pointer form to emit the target's `lwzu r0,0x6c(r5)` in-place walk + un-merged `bne next; b end` (achieved via a `static inline` helper that returns `pad` directly). But that form makes CW fold the not-found sentinel to `li r5,0` at the miss, where the **target keeps `li r6,0` hoisted early + `mr r5,r6`**. Any form that keeps the sentinel in a separate live register (result-var, comma-`else if`) instead emits absolute-offset `lwz`+`addi` (loses `lwzu`). | ~92% (objdiff reports **0.0%** — alignment artifact: the single early `li r6,0` displaces the LCS) | no (asm-active; correct C staged + shared `PADInput_FindPad` helper) | swept ≥10 source forms: early-return / goto-hit / result-var+goto / nul-as-param-with-second-use / `static const` sentinel / named local / peephole off (breaks `lwzu`) / opt-level 0–4. `lwzu`+folded-`li r5,0` is locked; separate-`r6` only with absolute loads. Sentinel hoist-vs-fold is internal to the allocator. The float-storing cousins `fn_800F7C8C`/`fn_800F7D38` add the `fn_801327E0` float-conversion wall on top. |
+| `fn_800EC4D0` | gs_material.c | W2 branch-reorder + REG-IMM offset swap (then/else block order in `if (flag) {out0=a0; out1=a0+cc} else {out0=a0+a0; out1=a0_const}`) | 84.19% (objdiff 68.97%) | no (C active) | Target emits then-block first (`lfs f0, 0xa0(r3)`), CW emits else-block first (`lfs f0, 0xcc(r3)`). The offset swap (`0xa0↔0xcc`) is a W2 structural reorder. Also has `clrlwi.` vs `clrlwi` idiom (dot-record in target, separate test in base). |
+| `fn_800EC208` | gs_material.c | W2 branch inversion (`cmpwi r0, 0x1` first vs `cmpwi r0, 0x0` first in if/else chain) | 79.21% (objdiff 75.61%) | no (C active) | Target tests `mode==1` first with compound branch (`beq .L1; bge .Lelse; cmpwi 0x0`), CW tests `mode==0` first (`cmpwi 0x0; bne .Lcheck1; ...`). Not C-controllable: compiler chooses branch order. |
+| `fn_800E59C8` | gs_material.c | W2 store scheduling (`stb r3, 0x2→0x1→0x0` vs `0x0→0x1→0x2`) + `clrlwi.` vs `clrlwi` idiom | 80.88% (objdiff 76.09%) | no (C active) | Store order of `color[2]→[1]→[0]` vs `color[0]→[1]→[2]` is a compiler scheduling decision. The `clrlwi.` combining test+branch is a W2/W4 idiom. |
+| `fn_800E4598` | gs_material.c | W1+W2 (PURE-REG r4⇔r3 swap + STRUCT 8 scheduling diffs) | 83.98% (objdiff 73.47%) | no (C active) | `rlwinm. r0, r4, 0, 8, 8` vs `rlwinm. r0, r3, 0, 8, 8` — register swap is data-flow-locked (W1), structural diffs are scheduling (W2). |
+| `fn_800E5B68` | gs_material.c | W1+W2 (register rotation r30↔r31, r29↔r30, r31↔r29 + STRUCT 5) | 83.67% (objdiff 68.75%) | no (C active) | 3-way register rotation in callee-save band is data-flow-locked. |
+| `fn_800E60F0` | gs_material.c | W1+W2+REG-IMM (r29⇔r31 swap + STRUCT scheduling + `li r31→li r29` immediate reorder) | 83.49% (objdiff 72.22%) | no (C active) | Data-flow-locked regalloc + instruction scheduling. |
+| `fn_800DF854` | gs_render.c | W1+W2 (7-pair reg remap + STRUCT) | 81.67% (objdiff 65.63%) | no (C active) | Heavy register permutation across loop-carried values — W1-locked. |
+| `fn_800DD0B8` | gs_render.c | W1+W2 (6-pair reg remap + STRUCT) | 77.14% (objdiff 63.33%) | no (C active) | Similar to fn_800DF854 — regalloc permutation across loop. |
+| `fn_800FC244` | gs_thread.c | W2+type mismatch (void vs s32 return — target uses `beqlr` to return pointer when found, CW generates `bne+li r3,0+blr` for void) | 81.67% | no (C active, TODO annotated) | Target returns `(s32)p` on found-path via `beqlr`; current C declares `void` so CW returns early without value. Changing return type to `s32` may improve match but cannot verify due to compile_check.py failure on ASM-heavy files. **Potential fix: change `void fn_800FC244(u32*)` → `s32 fn_800FC244(u32*)` with `return (s32)p` on found and `return 0` on append.** |
+
+---
+
+## 75–85% range scan summary (2026-06-05)
+
+All 122 functions in the 75–85% objdiff range (from `walltriage_out.json`) were classified:
+
+| Category | Count | Wall class |
+|---|---|---|
+| C-ACTIVE (`#if 0` asm / `#else` active C) | 19 | W1/W2 (regalloc + structural scheduling) |
+| PLAIN-C (Ghidra-import C stubs, no asm wrapper) | 102 | W1/W2 (colosseum_script.c bulk) |
+| NOT_FOUND | 1 | — |
+
+**Key finding:** Every single 75–85% C-ACTIVE target is blocked by W1 (data-flow-locked register allocation) and/or W2 (instruction scheduling). No new fixable patterns were found beyond those already logged.
+
+**Exceptions worth noting:**
+- `fn_800FC244` (81.67%) has a **type mismatch** (void vs s32) that is potentially fixable — the target uses `beqlr` to return the found-pointer, but the C declaration is `void`. Fixing the return type could improve match.
+- `fn_800EBEEC` (80.46%, 80 mismatches) is the largest C-ACTIVE function with a `stmw r23→r22` register-band shift — pure W1.
+- All colosseum_script.c functions (92 in this range) are PLAIN-C with heavy W1/W2 — no `#if 0` wrappers to toggle.
 
 ---
 
