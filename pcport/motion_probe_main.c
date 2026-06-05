@@ -1,5 +1,6 @@
 #include "real_content_host.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char** argv) {
@@ -20,23 +21,26 @@ int main(int argc, char** argv) {
         member = "ken_b1";
     }
 
+    printf("[headless-motion-main] start fsys=%s member=%s\n", fsys, member);
+    fflush(stdout);
+
     if (batchFrames != NULL) {
-        PCPort_MotionBatchProbe(atoi(batchFrames));
+        PCPort_HeadlessMotionBatchProbe(atoi(batchFrames));
         return 0;
     }
     if (motionFrames != NULL) {
-        PCPort_MotionProbe(fsys, member, atoi(motionFrames));
+        PCPort_HeadlessMotionProbe(fsys, member, atoi(motionFrames));
         return 0;
     }
     if (bankFrames != NULL) {
-        PCPort_CharAnimBankProbe(fsys, member, atoi(bankFrames));
+        PCPort_HeadlessMotionProbe(fsys, member, atoi(bankFrames));
         return 0;
     }
     if (charFrames != NULL) {
-        PCPort_CharAnimProbe(fsys, member, atoi(charFrames));
+        PCPort_HeadlessMotionProbe(fsys, member, atoi(charFrames));
         return 0;
     }
 
-    PCPort_MotionProbe(fsys, member, 24);
+    PCPort_HeadlessMotionProbe(fsys, member, 24);
     return 0;
 }

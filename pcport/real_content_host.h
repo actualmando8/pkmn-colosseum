@@ -247,6 +247,8 @@ void PCPort_CharAnimBankProbe(const char* fsysPath, const char* memberName,
  * prints per-motion SRT checksum variation plus loop/cyclic classification. */
 void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
                         int frames);
+void PCPort_HeadlessMotionProbe(const char* fsysPath, const char* memberName,
+                                int frames);
 typedef struct PCPortLocomotionSuggestion {
     int valid;
     int idle;
@@ -277,6 +279,7 @@ int PCPort_CharAnimSuggestLocomotionMapEx(const char* fsysPath,
 /* Batch non-visual classifier over the field/character archives. It prints one
  * row for each member with a Resource+0x4 motion bank. */
 void PCPort_MotionBatchProbe(int frames);
+void PCPort_HeadlessMotionBatchProbe(int frames);
 
 /* Field-character animation. PCPort_CharAnimSetup builds a live animated HSD
  * tree from a swizzled copy of the character archive (once). Each frame,
