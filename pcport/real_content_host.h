@@ -236,6 +236,9 @@ int PCPort_TitleAnimSetup(const char* fsysPath, const char* memberName);
 /* Advance the title HSD animation one frame (HSD_JObjAnimAll over the live tree
  * built by PCPort_TitleAnimSetup). No-op if setup was not run / failed. */
 void PCPort_TitleAnimTick(void);
+/* Diagnostic: build a character's live animated tree and report how many joints
+ * actually move over <frames> (proves whether the archive carries real motion). */
+void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames);
 void PCPort_HSDArchiveDestroy(PCPortHSDArchive* archive);
 const void* PCPort_HSDArchiveGetPublicAddress(const PCPortHSDArchive* archive,
                                               const char* name,

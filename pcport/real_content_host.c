@@ -2236,6 +2236,113 @@ void PCPort_TitleAnimTick(void) {
     }
 }
 
+/* ------------------------------------------------------------------------- */
+/*  PCPort_CharAnimProbe — does a character archive carry REAL joint motion?  */
+/*                                                                           */
+/*  Decisive diagnostic for wiring overworld animation: builds the live      */
+/*  animated tree for <member> (e.g. field_common.fsys :: ken_b1), snapshots */
+/*  every joint's SRT, steps the FObj-driven HSD_JObjAnimAll <frames> times,  */
+/*  then reports how many joints moved + the largest deltas. A non-zero       */
+/*  "moved" count proves the embedded animation is real motion (idle/walk),   */
+/*  so the live tree can drive the field skinning. Zero moved => motion lives */
+/*  in a separate motion archive and must be located.                         */
+/*  Run: PCPORT_CHARANIM_PROBE=<frames> PCPORT_SWIZ_ARCHIVE=.. PCPORT_SWIZ_MEMBER=.. */
+/* ------------------------------------------------------------------------- */
+#define PCPORT_PROBE_MAX_JOINTS 512
+static HSD_JObj* g_probeJoints[PCPORT_PROBE_MAX_JOINTS];
+static f32       g_probeRest[PCPORT_PROBE_MAX_JOINTS][9];
+static int       g_probeCount;
+static int       g_probeAnimCount; /* joints with an attached aobj */
+
+static void PCPort_ProbeCollect(HSD_JObj* j) {
+    for (; j != NULL; j = j->next) {
+        if (g_probeCount < PCPORT_PROBE_MAX_JOINTS) {
+            int i = g_probeCount++;
+            g_probeJoints[i] = j;
+            g_probeRest[i][0] = j->translate_x; g_probeRest[i][1] = j->translate_y; g_probeRest[i][2] = j->translate_z;
+            g_probeRest[i][3] = j->rotate_x;    g_probeRest[i][4] = j->rotate_y;    g_probeRest[i][5] = j->rotate_z;
+            g_probeRest[i][6] = j->scale_x;     g_probeRest[i][7] = j->scale_y;     g_probeRest[i][8] = j->scale_z;
+            if (j->aobj != NULL) g_probeAnimCount++;
+        }
+        if (j->child != NULL) PCPort_ProbeCollect(j->child);
+    }
+}
+
+void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames) {
+    int f, i, moved = 0;
+    f32 maxRot = 0.0f, maxTrans = 0.0f, maxScale = 0.0f;
+
+    if (frames <= 0) frames = 30;
+    if (!PCPort_TitleAnimSetup(fsysPath, memberName)) {
+        printf("[charanim] setup FAILED for %s :: %s\n", fsysPath, memberName);
+        return;
+    }
+    g_probeCount = 0; g_probeAnimCount = 0;
+    PCPort_ProbeCollect(g_titleAnimRoot);
+    printf("[charanim] %s :: %s -> %d joints, %d with aobj. Stepping %d frames...\n",
+           fsysPath, memberName, g_probeCount, g_probeAnimCount, frames);
+
+    /* Inspect the attached aobjs BEFORE stepping: real curves vs empty/static. */
+    {
+        int shown = 0;
+        for (i = 0; i < g_probeCount && shown < 12; ++i) {
+            HSD_AObj* a = g_probeJoints[i]->aobj;
+            if (a == NULL) continue;
+            ++shown;
+            printf("[charanim]   aobj joint[%d]: end_frame=%.2f framerate=%.3f curr_frame=%.2f fobj=%p",
+                   i, a->end_frame, a->framerate, a->curr_frame, (void*)a->fobj);
+            if (a->fobj != NULL) {
+                HSD_FObj* fo = a->fobj;
+                printf("  fobj{op=%u obj_type=%u length=%u ad=%p flags=0x%02X}",
+                       fo->op, fo->obj_type, fo->length, (void*)fo->ad_head, fo->flags);
+            }
+            printf("\n");
+        }
+    }
+
+    for (f = 0; f < frames; ++f) {
+        HSD_JObjAnimAll(g_titleAnimRoot);
+    }
+
+    /* Inspect aobjs AFTER stepping: did curr_frame advance? */
+    {
+        int shown = 0;
+        for (i = 0; i < g_probeCount && shown < 4; ++i) {
+            HSD_AObj* a = g_probeJoints[i]->aobj;
+            if (a == NULL) continue;
+            ++shown;
+            printf("[charanim]   (after %d steps) aobj joint[%d]: curr_frame=%.2f\n",
+                   frames, i, a->curr_frame);
+        }
+    }
+
+    for (i = 0; i < g_probeCount; ++i) {
+        HSD_JObj* j = g_probeJoints[i];
+        f32 dt = fabsf(j->translate_x - g_probeRest[i][0]) + fabsf(j->translate_y - g_probeRest[i][1]) + fabsf(j->translate_z - g_probeRest[i][2]);
+        f32 dr = fabsf(j->rotate_x - g_probeRest[i][3]) + fabsf(j->rotate_y - g_probeRest[i][4]) + fabsf(j->rotate_z - g_probeRest[i][5]);
+        f32 ds = fabsf(j->scale_x - g_probeRest[i][6]) + fabsf(j->scale_y - g_probeRest[i][7]) + fabsf(j->scale_z - g_probeRest[i][8]);
+        if (dt > 1.0e-4f || dr > 1.0e-4f || ds > 1.0e-4f) {
+            ++moved;
+            if (dr > maxRot)   maxRot = dr;
+            if (dt > maxTrans) maxTrans = dt;
+            if (ds > maxScale) maxScale = ds;
+            if (moved <= 8) {
+                printf("[charanim]   joint[%d] moved: dTrans=%.4f dRot=%.4f dScale=%.4f  (rest r=%.3f,%.3f,%.3f -> now %.3f,%.3f,%.3f)\n",
+                       i, dt, dr, ds,
+                       g_probeRest[i][3], g_probeRest[i][4], g_probeRest[i][5],
+                       j->rotate_x, j->rotate_y, j->rotate_z);
+            }
+        }
+    }
+    printf("[charanim] RESULT: %d / %d joints MOVED over %d frames (maxDRot=%.4f maxDTrans=%.4f maxDScale=%.4f)\n",
+           moved, g_probeCount, frames, maxRot, maxTrans, maxScale);
+    if (moved == 0) {
+        printf("[charanim] => NO embedded motion (static pose). Walk/idle motion is in a separate archive.\n");
+    } else {
+        printf("[charanim] => REAL embedded animation. The live tree can drive field skinning.\n");
+    }
+}
+
 /* Swizzle a scene model-set entry (jointList) BE->LE for the game's HSD pipeline.
  * The model entry is {rootJoint@0, animjoint@4, matanimjoint@8, ...}. Walks the
  * joint tree + the animjoint (SRT anim) + the matanimjoint (material/texture anim

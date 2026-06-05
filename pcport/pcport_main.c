@@ -5014,6 +5014,14 @@ static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 static int g_slotEnv[PCPORT_SKIN_MAX_SLOTS]; /* 1 = slot is envelope/blend, 0 = rigid */
 static int g_slotInfl[PCPORT_SKIN_MAX_SLOTS]; /* influence count per slot */
 
+/* Set by the main menu (New Game / Continue) to hand off into the walkable field
+ * after RunMenuScene returns -> boot->title->menu->field is the start-of-game flow.
+ * Also acts as the "real game session" flag: when set, the field walk auto-loads
+ * the real skinned player (Wes/ken_b1) and enables the envelope-skin path WITHOUT
+ * the PCPORT_FIELD_WES / PCPORT_SKIN dev env flags. Declared here (ahead of
+ * RenderJointTree) so the skin gate can read it. */
+static int g_pcEnterFieldWalk = 0;
+
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
  * the GameCube envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix
  * slot's envelope is a list of {jobj, weight} influences; the FIRST influence's
@@ -5940,7 +5948,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                      * (jumbled). Falls back to the rigid draw if skinning bails. */
                     if (skinIsolateSkip) {
                         /* isolation: suppress this mesh's draw */
-                    } else if (getenv("PCPORT_SKIN") != NULL &&
+                    } else if ((getenv("PCPORT_SKIN") != NULL || g_pcEnterFieldWalk) &&
                         ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
                         RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam,
                                           haveTexture,
@@ -6588,10 +6596,6 @@ static const PCPortTitleSet kTitleSets[] = {
  * PCPORT_DUMP) keeps the headless screenshot path finite. Reuses the resolve/
  * camera/draw primitives proven by the slice smokes.
  */
-/* Set by the main menu (New Game / Continue) to hand off into the walkable field
- * after RunMenuScene returns -> boot->title->menu->field is the start-of-game flow. */
-static int g_pcEnterFieldWalk = 0;
-
 static int RunMenuScene(GLFWwindow* window) {
     PCPortHSDArchive archive;
     PCPortTranslatedCamera translatedCamera;
@@ -7104,6 +7108,17 @@ static int RunMenuScene(GLFWwindow* window) {
         const char* sm = getenv("PCPORT_SWIZ_MEMBER");
         PCPort_HSDSwizzleSmoke(sa != NULL ? sa : PCPORT_LOGO_ARCHIVE,
                                sm != NULL ? sm : PCPORT_LOGO_MEMBER);
+        ok = 1;
+        goto cleanup;
+    }
+    /* Decisive probe: does a character archive carry real joint motion? */
+    if (getenv("PCPORT_CHARANIM_PROBE") != NULL) {
+        const char* sa = getenv("PCPORT_SWIZ_ARCHIVE");
+        const char* sm = getenv("PCPORT_SWIZ_MEMBER");
+        int frames = atoi(getenv("PCPORT_CHARANIM_PROBE"));
+        PCPort_CharAnimProbe(
+            sa != NULL ? sa : "orig/GC6E01/disc/files/field_common.fsys",
+            sm != NULL ? sm : "ken_b1", frames);
         ok = 1;
         goto cleanup;
     }
@@ -8326,9 +8341,20 @@ typedef struct {
  * for each map (D1_garage_1F = X[-106,105] Y[-24,21] Z[-68,78]). Reciprocal
  * exits let you warp 1F <-> B1 and back. Tunable; the real door data is a
  * follow-up. PCPORT_WARP_TUNE can override the first exit at runtime. */
-enum { PC_FLOOR_GARAGE_1F = 0, PC_FLOOR_GARAGE_B1 = 1 };
+enum { PC_FLOOR_GARAGE_1F = 0, PC_FLOOR_GARAGE_B1 = 1, PC_FLOOR_OUTSKIRT = 2 };
 
 static const PCPortWarpMapEntry g_pcWarpMaps[] = {
+    {
+        /* The Outskirt Stand exterior — the game's first walkable scene and the
+         * New Game spawn map. The train-car diner sits to one side; Wes spawns in
+         * the open desert plaza in front of it. No exits wired yet (the shop-door
+         * warp into S1_shop_1F is a follow-up); spawn clear of map edges.
+         * Collision bounds X[-146,231] Y[-10,64] Z[-127,127]. */
+        PC_FLOOR_OUTSKIRT, "S1_out",
+        { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, 0, { 0.0f, 0.0f, 0.0f } } },
+        0,
+        { 40.0f, 0.0f, 40.0f }   /* spawn point: open plaza in front of the diner */
+    },
     {
         PC_FLOOR_GARAGE_1F, "D1_garage_1F",
         {
@@ -8591,7 +8617,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 spawnY;
 
     memset(pads, 0, sizeof(pads));
-    if (getenv("PCPORT_FIELD_WES") != NULL) {
+    if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk) {
         PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
     }
     if (spawn != NULL) {
@@ -8746,7 +8772,12 @@ static int RunFieldScene(GLFWwindow* window) {
     }
 
     if (archive == NULL || archive[0] == '\0') {
-        archive = "orig/GC6E01/disc/files/D1_garage_1F.fsys";
+        /* New Game / Continue starts at The Outskirt Stand exterior (S1_out) —
+         * the game's first walkable overworld scene. The dev --field path (no
+         * menu handoff) still defaults to Wes's hideout interior. */
+        archive = g_pcEnterFieldWalk
+                      ? "orig/GC6E01/disc/files/S1_out.fsys"
+                      : "orig/GC6E01/disc/files/D1_garage_1F.fsys";
     } else if (strchr(archive, '/') == NULL && strchr(archive, '\\') == NULL) {
         /* bare name -> resolve under the disc files dir */
         snprintf(path, sizeof(path), "orig/GC6E01/disc/files/%s.fsys", archive);
@@ -8760,7 +8791,8 @@ static int RunFieldScene(GLFWwindow* window) {
          * from the exit triggers' target floor ids via the warp table.
          * (g_pcEnterFieldWalk = New Game menu handoff into the field.) */
         int colWire = getenv("PCPORT_COL_WIRE") != NULL;
-        const f32* spawn = NULL;        /* first map: PCPORT_CAM_EYE / origin */
+        static f32 firstSpawn[3];       /* first map's table spawn (warp default) */
+        const f32* spawn = NULL;        /* first map: table spawn / PCPORT_CAM_EYE */
         int floor;
 
         /* Resolve the starting floor from the archive base name (so its exits
@@ -8785,7 +8817,6 @@ static int RunFieldScene(GLFWwindow* window) {
         /* Load the first map (scene + collision + exits) via the warp path so
          * the load/teardown is uniform. */
         {
-            f32 firstSpawn[3];
             if (!PCPort_FieldWarpTo(floor, firstSpawn)) {
                 /* table miss: load whatever archive was named, no exits. */
                 if (!PCPort_EngineFieldSetup(archive)) {
@@ -8793,7 +8824,9 @@ static int RunFieldScene(GLFWwindow* window) {
                 }
                 PCPort_FieldColLoad(archive);
             } else {
-                /* keep PCPORT_CAM_EYE override for the first map (spawn=NULL). */
+                /* spawn at the map's table position (PCPORT_CAM_EYE still
+                 * overrides the XZ inside RunFieldWalkLoop for tuning). */
+                spawn = firstSpawn;
             }
         }
 

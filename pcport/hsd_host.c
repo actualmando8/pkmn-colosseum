@@ -321,6 +321,29 @@ void HSD_JObjAnim(HSD_JObj* jobj)
 }
 
 /* ------------------------------------------------------------------------- */
+/*  HSD_JObjAnimAll (host override)                                           */
+/*                                                                           */
+/*  CRITICAL FIX: src/hsd/hsd_jobj.c ALSO defines HSD_JObjAnimAll, and its    */
+/*  recursion `HSD_JObjAnimAll -> HSD_JObjAnim` binds INTRA-TU at compile     */
+/*  time to that file's OWN (inert) HSD_JObjAnim -- which never interprets    */
+/*  the joint's aobj. So overriding HSD_JObjAnim alone (above) is bypassed    */
+/*  for the whole-tree walk: the override only intercepts CROSS-TU callers.   */
+/*  This host HSD_JObjAnimAll (BOOT-linked first, so /FORCE:MULTIPLE selects  */
+/*  it for cross-TU callers) recurses calling the SAME-TU host HSD_JObjAnim   */
+/*  above, so the per-joint aobj IS interpreted and curr_frame advances.      */
+/*  Without this the joint SRT animation never plays (curr_frame stuck at 0). */
+/* ------------------------------------------------------------------------- */
+void HSD_JObjAnimAll(HSD_JObj* jobj)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    HSD_JObjAnim(jobj);
+    HSD_JObjAnimAll(jobj->child);
+    HSD_JObjAnimAll(jobj->next);
+}
+
+/* ------------------------------------------------------------------------- */
 /*  HSD_FObjReqAnimAll (host override)                                        */
 /*                                                                           */
 /*  The adapted src/hsd/hsd_fobj.c HSD_FObjReqAnimAll sets f->flags = 0,      */
