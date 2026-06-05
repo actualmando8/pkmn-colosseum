@@ -15747,18 +15747,18 @@ asm void fn_80122FF4(void) {
 u16 fn_80122FF4(u8* ptr) {
     extern u32 fn_8012640C(u8* a, u32 b, u32 c, u32 d);
     extern u32 fn_80008154(void);
-    extern u32 fn_80142CF4(u32 a, u32 b, u32 c, u32 d);
+    extern u32 itemGetStatus(u32 a, u32 b, u32 c, u32 d);
     u16 val;
     u16 check;
     val = (u16)fn_8012640C(ptr, 0, 0x82, 0);
     if (val == 0) { return 0; }
     if ((u8)fn_80008154() == 1) {
-        check = (u16)fn_80142CF4(0, val, 7, 0);
+        check = (u16)itemGetStatus(0, val, 7, 0);
         if (check == 0x1a || check == 0x1e) {
             return 0x63;
         }
     }
-    return (u16)fn_80142CF4(0, val, 0xa, 0);
+    return (u16)itemGetStatus(0, val, 0xa, 0);
 }
 #endif
 /* 0x801230E0 | 0x30 */
