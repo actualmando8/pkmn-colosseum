@@ -2537,9 +2537,14 @@ int PCPort_CharAnimSetMotion(int motionIdx) {
 
 /* Lockstep walk: BE joint chain (offsets: child@+0x08, next@+0x0C) <-> live
  * JObj chain (child/next ptrs). Write each live joint's animated SRT into the
- * BE archive bytes (rot@+0x14, scale@+0x20, translate@+0x2C as BE floats). */
+ * BE archive bytes (rot@+0x14, scale@+0x20, translate@+0x2C as BE floats).
+ *
+ * Field locomotion already moves the avatar's world transform. Do not also copy
+ * root-motion translate from the clip by default, or walk/run clips double-apply
+ * locomotion and look like sliding/body offsets instead of in-place stride. */
 static void PCPort_CharAnimLockstepWrite(PCPortHSDArchive* be, u32 beJointOff,
-                                         HSD_JObj* live) {
+                                         HSD_JObj* live, int isRoot,
+                                         int applyRootTranslate) {
     u32 childOff, nextOff;
     if (live == NULL || beJointOff == 0u ||
         !IsArchiveRangeValid(be, beJointOff, PCPORT_SERIALIZED_JOINT_SIZE)) {
@@ -2551,14 +2556,18 @@ static void PCPort_CharAnimLockstepWrite(PCPortHSDArchive* be, u32 beJointOff,
     WriteBEFloat(be->storage + beJointOff + 0x20, live->scale_x);
     WriteBEFloat(be->storage + beJointOff + 0x24, live->scale_y);
     WriteBEFloat(be->storage + beJointOff + 0x28, live->scale_z);
-    WriteBEFloat(be->storage + beJointOff + 0x2C, live->translate_x);
-    WriteBEFloat(be->storage + beJointOff + 0x30, live->translate_y);
-    WriteBEFloat(be->storage + beJointOff + 0x34, live->translate_z);
+    if (!isRoot || applyRootTranslate) {
+        WriteBEFloat(be->storage + beJointOff + 0x2C, live->translate_x);
+        WriteBEFloat(be->storage + beJointOff + 0x30, live->translate_y);
+        WriteBEFloat(be->storage + beJointOff + 0x34, live->translate_z);
+    }
 
     childOff = ReadBE32(be->storage + beJointOff + 0x08);
     nextOff  = ReadBE32(be->storage + beJointOff + 0x0C);
-    PCPort_CharAnimLockstepWrite(be, childOff, live->child);
-    PCPort_CharAnimLockstepWrite(be, nextOff, live->next);
+    PCPort_CharAnimLockstepWrite(be, childOff, live->child, 0,
+                                 applyRootTranslate);
+    PCPort_CharAnimLockstepWrite(be, nextOff, live->next, 0,
+                                 applyRootTranslate);
 }
 
 /* Find the largest end_frame across the live tree's aobjs (the loop length). */
@@ -2738,7 +2747,8 @@ void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
         }
     }
     HSD_JObjAnimAll(g_charAnimRoot);
-    PCPort_CharAnimLockstepWrite(beArchive, beRootJoint, g_charAnimRoot);
+    PCPort_CharAnimLockstepWrite(beArchive, beRootJoint, g_charAnimRoot, 1,
+                                 getenv("PCPORT_CHAR_ROOT_TRANSLATE") != NULL);
     if (getenv("PCPORT_ANIM_DEBUG") != NULL) {
         /* Find the most-rotated live joint, and read back the BE value the
          * renderer will use for the SAME joint offset (lockstep position). */
