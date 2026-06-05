@@ -29,34 +29,53 @@ def opt(flag, default, cast=float):
 
 
 def classify_sources():
-    """fn -> source path, restricted to functions whose ACTIVE (#if-live) branch
-    is a real C definition (not an `asm` wrapper)."""
-    real, asmw, fnfile = set(), set(), {}
+    """fn -> source path, restricted to functions that are a REAL-C near-miss:
+    the decomp pattern wraps each function as
+
+        #if 1            #if 0
+        asm ... fn(){    asm ... fn(){          <- asm wrapper
+        #include .inc    #include .inc
+        }                }
+        #else            #else
+        void fn(){TODO}  void fn(){ ...real C }  <- C body
+        #endif           #endif
+
+    The reliable signal is the `#if` guarding the `asm` wrapper:
+      #if 1 -> asm ACTIVE -> it's a wrapper (no real C); SKIP.
+      #if 0 -> C (#else) ACTIVE -> a real near-miss; INCLUDE — unless the C body
+               is a `{ /* TODO */ }` / empty stub.
+    (The previous stack+loose-regex approach matched forward declarations in
+     other files and ignored stub bodies, letting asm/stub fns through —
+     caught on fn_800D848C.)"""
+    real, fnfile = set(), {}
+    asm_re = re.compile(r"^\s*asm\s+\w[\w \*]*\s+(fn_[0-9A-Fa-f]{8})\s*\(")
+    stub_re = re.compile(r"\{\s*(/\*\s*TODO.*?\*/\s*)?\}\s*$", re.I)
     for c in SRC.rglob("*.c"):
         try:
             lines = c.read_text(errors="replace").splitlines()
         except OSError:
             continue
-        stack = [True]
-        for l in lines:
+        last_if = None   # numeric literal of the most recent #if, else None
+        for i, l in enumerate(lines):
             s = l.strip()
+            m = re.match(r"#if\s+(\d+)\s*$", s)
+            if m:
+                last_if = int(m.group(1)); continue
             if s.startswith("#if"):
-                stack.append(stack[-1] and s[3:].strip() != "0")
-            elif s.startswith("#else"):
-                if len(stack) > 1:
-                    stack[-1] = (not stack[-1]) and stack[-2]
-            elif s.startswith("#endif"):
-                if len(stack) > 1:
-                    stack.pop()
-            elif stack[-1]:
-                m = re.match(r"^\s*asm\s+\w+\s+(fn_[0-9A-Fa-f]+)\s*\(", l)
-                if m:
-                    asmw.add(m.group(1))
-                m2 = re.match(r"^\s*(?:static\s+)?[A-Za-z_][\w \*]*\b(fn_[0-9A-Fa-f]{8})\s*\(", l)
-                if m2:
-                    real.add(m2.group(1))
-                    fnfile.setdefault(m2.group(1), str(c.relative_to(REPO)).replace("\\", "/"))
-    return real, asmw, fnfile
+                last_if = None; continue       # complex condition -> unknown
+            am = asm_re.match(l)
+            if am and last_if == 0:
+                fn = am.group(1)
+                # the C body lives after the matching #else; find it and reject stubs
+                body = ""
+                for j in range(i, min(i + 40, len(lines))):
+                    if lines[j].strip().startswith("#else"):
+                        body = "\n".join(lines[j + 1:j + 4]); break
+                if stub_re.search(body) or "/* TODO" in body or "/*stub" in body.lower():
+                    continue
+                real.add(fn)
+                fnfile.setdefault(fn, str(c.relative_to(REPO)).replace("\\", "/"))
+    return real, set(), fnfile
 
 
 def main():
