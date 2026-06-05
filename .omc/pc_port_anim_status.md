@@ -133,3 +133,18 @@ confirmed, then fix batch enumeration (was probed=0) for the all-archive sweep.
   parse at 0, on fail retry at 0x40 with HSD-internal fileSize=BE32(member+0x40). Then same
   scene_data→branch→Resource→+0x4 motion-bank walk. absol→8 motions. Single-member except
   pkx_patcheel (3 members). Codex implementing → sweep all 527.
+
+## 2026-06-05 ~05:55 — PKX SWEEP COMPLETE
+- Pokémon pkx batch now reaches the full archive set: **527/527 pkx rows emitted**.
+- Result: **526/527 animate=yes confirmed=yes**. The only non-animating row is
+  `pkx_egg.fsys :: egg`, which preflights to a single non-varying motion and is classified
+  as `note=low-motion-placeholder` rather than a battle-animation miss.
+- No pkx load failures remain (`load=motion-bank-failed=0`). The old failure class was a
+  bogus plausible header at member offset 0; the loader now prefers HSD payload candidates
+  exposing public `scene_data`, which selects the real wrapped HSD archive at `+0x40`.
+- Character side in the final full sweep: field_common probes the locomotion-bearing members
+  (`ken_b1`, `hizuki_b1`) and skips non-locomotion props safely; people_archive skips the
+  low-count bike special entries safely. Character motion verification remains complete from
+  the relax-fix pass.
+- Final animation verification status: **field/player/NPC movement animation done; Pokémon
+  battle model animation coverage done (526 real animated pkx + egg placeholder).**
