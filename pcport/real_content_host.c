@@ -4480,6 +4480,10 @@ typedef struct PCPortBattleProbeActor {
     const char* label;
     const char* member;
     const char* displayName;
+    u16 trainerId;
+    u8 teamSlot;
+    u16 speciesId;
+    u8 level;
     char fsysPath[320];
     f32 x;
     f32 y;
@@ -4498,6 +4502,10 @@ typedef struct PCPortBattleProbeActorDefault {
     const char* envName;
     const char* member;
     const char* displayName;
+    u16 trainerId;
+    u8 teamSlot;
+    u16 speciesId;
+    u8 level;
     f32 x;
     f32 y;
     f32 z;
@@ -4505,8 +4513,12 @@ typedef struct PCPortBattleProbeActorDefault {
 
 typedef struct PCPortBattleProbeMoveScript {
     const char* moveEnv;
+    const char* moveIdEnv;
+    const char* textIdEnv;
     const char* damageEnv;
     const char* defaultMove;
+    u16 moveId;
+    u16 textId;
     int attacker;
     int target;
     int defaultDamage;
@@ -4515,20 +4527,26 @@ typedef struct PCPortBattleProbeMoveScript {
 static const PCPortBattleProbeActorDefault
     kBattleProbeDefaultActors[4] = {
         { "player-left",  "PCPORT_BATTLE_P0", "eifie",   "Eifie",
+          0x0001u, 0u, 196u, 25u,
           -1.35f, 0.0f,  1.10f },
         { "player-right", "PCPORT_BATTLE_P1", "blacky",  "Blacky",
+          0x0001u, 1u, 197u, 26u,
            1.35f, 0.0f,  1.10f },
         { "enemy-left",   "PCPORT_BATTLE_E0", "absol",   "Absol",
+          0x0200u, 0u, 359u, 50u,
           -1.35f, 0.0f, -1.35f },
         { "enemy-right",  "PCPORT_BATTLE_E1", "pikachu", "Pikachu",
+          0x0200u, 1u, 25u, 50u,
            1.35f, 0.0f, -1.35f }
     };
 
 static const PCPortBattleProbeMoveScript kBattleProbeDefaultMoves[2] = {
-    { "PCPORT_BATTLE_PLAYER_MOVE", "PCPORT_BATTLE_PLAYER_DAMAGE",
-      "Test Strike", 0, 2, 32 },
-    { "PCPORT_BATTLE_ENEMY_MOVE", "PCPORT_BATTLE_ENEMY_DAMAGE",
-      "Test Claw", 2, 0, 21 }
+    { "PCPORT_BATTLE_PLAYER_MOVE", "PCPORT_BATTLE_PLAYER_MOVE_ID",
+      "PCPORT_BATTLE_PLAYER_TEXT_ID", "PCPORT_BATTLE_PLAYER_DAMAGE",
+      "Swift", 129u, 0x8001u, 0, 2, 32 },
+    { "PCPORT_BATTLE_ENEMY_MOVE", "PCPORT_BATTLE_ENEMY_MOVE_ID",
+      "PCPORT_BATTLE_ENEMY_TEXT_ID", "PCPORT_BATTLE_ENEMY_DAMAGE",
+      "Bite", 44u, 0x8002u, 2, 0, 21 }
 };
 
 static f32 PCPort_BattleProbeMotionScore(const PCPortMotionProbeStats* s) {
@@ -4625,6 +4643,10 @@ static void PCPort_BattleProbeInitActor(PCPortBattleProbeActor* actor,
                     envValue : d->member;
     actor->displayName = (envValue != NULL && envValue[0] != '\0') ?
                          envValue : d->displayName;
+    actor->trainerId = d->trainerId;
+    actor->teamSlot = d->teamSlot;
+    actor->speciesId = d->speciesId;
+    actor->level = d->level;
     actor->x = d->x;
     actor->y = d->y;
     actor->z = d->z;
@@ -4667,9 +4689,11 @@ static void PCPort_BattleProbeLoadActor(PCPortBattleProbeActor* actor,
     if (actor->attackMotion < 0) actor->attackMotion = fallback;
     if (actor->damageMotion < 0) actor->damageMotion = fallback;
 
-    printf("[battle-probe] actor=%s member=%-8s motions=%2u varying=%2u "
+    printf("[battle-probe] actor=%s member=%-8s trainer=0x%04X team=%u "
+           "species=%u level=%u motions=%2u varying=%2u "
            "pos=(%.2f,%.2f,%.2f) ",
-           actor->label, actor->member, actor->motionCount,
+           actor->label, actor->member, actor->trainerId, actor->teamSlot,
+           actor->speciesId, actor->level, actor->motionCount,
            actor->varyingCount, actor->x, actor->y, actor->z);
     PCPort_BattleProbeDescribeMotion(actor, "stance", actor->stanceMotion);
     printf(" ");
@@ -4745,6 +4769,10 @@ void PCPort_BattleProbe(int frames) {
     PCPortBattleProbeActor actors[4];
     const char* playerMoveName;
     const char* enemyMoveName;
+    u16 playerMoveId;
+    u16 enemyMoveId;
+    u16 playerTextId;
+    u16 enemyTextId;
     int playerDamage;
     int enemyDamage;
     char playerMoveText[96];
@@ -4771,6 +4799,18 @@ void PCPort_BattleProbe(int frames) {
     enemyMoveName = PCPort_BattleProbeEnvText(
         kBattleProbeDefaultMoves[1].moveEnv,
         kBattleProbeDefaultMoves[1].defaultMove);
+    playerMoveId = (u16)PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[0].moveIdEnv,
+        kBattleProbeDefaultMoves[0].moveId);
+    enemyMoveId = (u16)PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[1].moveIdEnv,
+        kBattleProbeDefaultMoves[1].moveId);
+    playerTextId = (u16)PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[0].textIdEnv,
+        kBattleProbeDefaultMoves[0].textId);
+    enemyTextId = (u16)PCPort_BattleProbeEnvInt(
+        kBattleProbeDefaultMoves[1].textIdEnv,
+        kBattleProbeDefaultMoves[1].textId);
     playerDamage = PCPort_BattleProbeEnvInt(
         kBattleProbeDefaultMoves[0].damageEnv,
         kBattleProbeDefaultMoves[0].defaultDamage);
@@ -4791,6 +4831,10 @@ void PCPort_BattleProbe(int frames) {
         &actors[kBattleProbeDefaultMoves[1].target]);
 
     printf("[battle-probe] mode=headless actors=4 frames=%d\n", frames);
+    printf("[battle-probe-data] playerTrainer=0x%04X enemyTrainer=0x%04X "
+           "playerMove=%u enemyMove=%u playerText=0x%04X enemyText=0x%04X\n",
+           actors[0].trainerId, actors[2].trainerId,
+           playerMoveId, enemyMoveId, playerTextId, enemyTextId);
     printf("[battle-probe-text] \"FIGHT  POKEMON  BAG  RUN\"\n");
     printf("[battle-probe-text] \"%s\"\n", playerMoveText);
     printf("[battle-probe-text] \"%s\"\n", playerDamageText);
@@ -4810,9 +4854,9 @@ void PCPort_BattleProbe(int frames) {
            hpPlayerLeft, hpEnemyLeft);
     printf("[battle-probe-turn] state=command-menu selected=FIGHT "
            "text=\"FIGHT  POKEMON  BAG  RUN\"\n");
-    printf("[battle-probe-turn] state=move-menu selected=\"%s\" "
-           "target=%s\n", playerMoveName,
-           actors[kBattleProbeDefaultMoves[0].target].label);
+    printf("[battle-probe-turn] state=move-menu selected=\"%s\" moveId=%u "
+           "textId=0x%04X target=%s\n", playerMoveName, playerMoveId,
+           playerTextId, actors[kBattleProbeDefaultMoves[0].target].label);
     fflush(stdout);
 
     PCPort_BattleProbePrintAction(
@@ -4820,6 +4864,11 @@ void PCPort_BattleProbe(int frames) {
         &actors[kBattleProbeDefaultMoves[0].attacker],
         playerMoveText,
         actors[kBattleProbeDefaultMoves[0].attacker].attackMotion);
+    printf("[battle-probe-turn-data] state=player-attack trainer=0x%04X "
+           "species=%u moveId=%u textId=0x%04X damage=%d\n",
+           actors[kBattleProbeDefaultMoves[0].attacker].trainerId,
+           actors[kBattleProbeDefaultMoves[0].attacker].speciesId,
+           playerMoveId, playerTextId, playerDamage);
     hpEnemyLeft -= playerDamage;
     PCPort_BattleProbePrintAction(
         "enemy-damage",
@@ -4831,6 +4880,11 @@ void PCPort_BattleProbe(int frames) {
         &actors[kBattleProbeDefaultMoves[1].attacker],
         enemyMoveText,
         actors[kBattleProbeDefaultMoves[1].attacker].attackMotion);
+    printf("[battle-probe-turn-data] state=enemy-attack trainer=0x%04X "
+           "species=%u moveId=%u textId=0x%04X damage=%d\n",
+           actors[kBattleProbeDefaultMoves[1].attacker].trainerId,
+           actors[kBattleProbeDefaultMoves[1].attacker].speciesId,
+           enemyMoveId, enemyTextId, enemyDamage);
     hpPlayerLeft -= enemyDamage;
     PCPort_BattleProbePrintAction(
         "player-damage",

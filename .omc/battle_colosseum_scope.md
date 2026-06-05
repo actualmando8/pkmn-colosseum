@@ -143,6 +143,7 @@ Commit target: minimal headless vertical slice.
 - Default actors: player-left `eifie`, player-right `blacky`, enemy-left `absol`, enemy-right `pikachu`.
 - Probe prints fixed 2v2 placement, menu text (`FIGHT  POKEMON  BAG  RUN`), deterministic selected move/target, player attack, enemy damage, enemy attack, player damage, and end-turn HP state.
 - Follow-up table/env pass added default actor and move-script tables. Actor archive members can be overridden with `PCPORT_BATTLE_P0`, `PCPORT_BATTLE_P1`, `PCPORT_BATTLE_E0`, and `PCPORT_BATTLE_E1`. Move labels/damage can be overridden with `PCPORT_BATTLE_PLAYER_MOVE`, `PCPORT_BATTLE_PLAYER_DAMAGE`, `PCPORT_BATTLE_ENEMY_MOVE`, and `PCPORT_BATTLE_ENEMY_DAMAGE`.
+- Real-ID table pass added trainer IDs, team slots, species IDs, move IDs, and text IDs to the headless probe records. Defaults are Espeon/Eifie species 196 level 25, Umbreon/Blacky species 197 level 26, Absol species 359 level 50, Pikachu species 25 level 50; player move defaults to Swift ID 129, enemy move defaults to Bite ID 44. Move/text IDs can be overridden with `PCPORT_BATTLE_PLAYER_MOVE_ID`, `PCPORT_BATTLE_ENEMY_MOVE_ID`, `PCPORT_BATTLE_PLAYER_TEXT_ID`, and `PCPORT_BATTLE_ENEMY_TEXT_ID`.
 
 Validated output highlights:
 
