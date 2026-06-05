@@ -249,6 +249,8 @@ void PCPort_MotionProbe(const char* fsysPath, const char* memberName,
                         int frames);
 void PCPort_HeadlessMotionProbe(const char* fsysPath, const char* memberName,
                                 int frames);
+void PCPort_AnimDump(const char* fsysPath, const char* memberName,
+                     int motionIdx, int frames);
 typedef struct PCPortLocomotionSuggestion {
     int valid;
     int idle;

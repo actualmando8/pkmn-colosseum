@@ -3968,6 +3968,353 @@ void PCPort_HeadlessMotionProbe(const char* fsysPath, const char* memberName,
     }
 }
 
+typedef struct PCPortAnimDumpJointRef {
+    HSD_JObj* joint;
+    int parent;
+} PCPortAnimDumpJointRef;
+
+typedef struct PCPortAnimDumpTransform {
+    f32 basis[3][3];
+    f32 pos[3];
+} PCPortAnimDumpTransform;
+
+static void PCPort_AnimDumpCollectJoints(HSD_JObj* joint,
+                                         int parentIndex,
+                                         PCPortAnimDumpJointRef* refs,
+                                         int* count,
+                                         int maxRefs) {
+    for (; joint != NULL; joint = joint->next) {
+        int currentIndex = -1;
+        if (*count < maxRefs) {
+            currentIndex = *count;
+            refs[currentIndex].joint = joint;
+            refs[currentIndex].parent = parentIndex;
+            ++(*count);
+        }
+        if (joint->child != NULL && currentIndex >= 0) {
+            PCPort_AnimDumpCollectJoints(joint->child, currentIndex,
+                                         refs, count, maxRefs);
+        }
+    }
+}
+
+static void PCPort_AnimDumpMat3Identity(f32 m[3][3]) {
+    memset(m, 0, sizeof(f32) * 9u);
+    m[0][0] = 1.0f;
+    m[1][1] = 1.0f;
+    m[2][2] = 1.0f;
+}
+
+static void PCPort_AnimDumpMat3Mul(const f32 a[3][3], const f32 b[3][3],
+                                   f32 out[3][3]) {
+    int r, c, k;
+    for (r = 0; r < 3; ++r) {
+        for (c = 0; c < 3; ++c) {
+            f32 sum = 0.0f;
+            for (k = 0; k < 3; ++k) {
+                sum += a[r][k] * b[k][c];
+            }
+            out[r][c] = sum;
+        }
+    }
+}
+
+static void PCPort_AnimDumpMat3VecMul(const f32 m[3][3], const f32 v[3],
+                                      f32 out[3]) {
+    out[0] = m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2];
+    out[1] = m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2];
+    out[2] = m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2];
+}
+
+static void PCPort_AnimDumpBuildLocalTransform(const HSD_JObj* joint,
+                                               PCPortAnimDumpTransform* out) {
+    f32 rx[3][3];
+    f32 ry[3][3];
+    f32 rz[3][3];
+    f32 tmp[3][3];
+    f32 rot[3][3];
+    f32 scale[3][3];
+    f32 scaled[3][3];
+    f32 qx, qy, qz, qw;
+
+    if (out == NULL) {
+        return;
+    }
+    PCPort_AnimDumpMat3Identity(rx);
+    PCPort_AnimDumpMat3Identity(ry);
+    PCPort_AnimDumpMat3Identity(rz);
+    PCPort_AnimDumpMat3Identity(scale);
+    scale[0][0] = joint != NULL ? joint->scale_x : 1.0f;
+    scale[1][1] = joint != NULL ? joint->scale_y : 1.0f;
+    scale[2][2] = joint != NULL ? joint->scale_z : 1.0f;
+
+    if (joint != NULL && (joint->flags & JOBJ_USE_QUATERNION) != 0u) {
+        qx = joint->rotate_x;
+        qy = joint->rotate_y;
+        qz = joint->rotate_z;
+        qw = joint->rotate_w;
+        rot[0][0] = 1.0f - 2.0f * (qy * qy + qz * qz);
+        rot[0][1] = 2.0f * (qx * qy - qz * qw);
+        rot[0][2] = 2.0f * (qx * qz + qy * qw);
+        rot[1][0] = 2.0f * (qx * qy + qz * qw);
+        rot[1][1] = 1.0f - 2.0f * (qx * qx + qz * qz);
+        rot[1][2] = 2.0f * (qy * qz - qx * qw);
+        rot[2][0] = 2.0f * (qx * qz - qy * qw);
+        rot[2][1] = 2.0f * (qy * qz + qx * qw);
+        rot[2][2] = 1.0f - 2.0f * (qx * qx + qy * qy);
+    } else {
+        f32 cx = cosf(joint != NULL ? joint->rotate_x : 0.0f);
+        f32 sx = sinf(joint != NULL ? joint->rotate_x : 0.0f);
+        f32 cy = cosf(joint != NULL ? joint->rotate_y : 0.0f);
+        f32 sy = sinf(joint != NULL ? joint->rotate_y : 0.0f);
+        f32 cz = cosf(joint != NULL ? joint->rotate_z : 0.0f);
+        f32 sz = sinf(joint != NULL ? joint->rotate_z : 0.0f);
+
+        rx[0][0] = 1.0f; rx[0][1] = 0.0f; rx[0][2] = 0.0f;
+        rx[1][0] = 0.0f; rx[1][1] = cx;   rx[1][2] = -sx;
+        rx[2][0] = 0.0f; rx[2][1] = sx;   rx[2][2] = cx;
+
+        ry[0][0] = cy;   ry[0][1] = 0.0f; ry[0][2] = sy;
+        ry[1][0] = 0.0f; ry[1][1] = 1.0f; ry[1][2] = 0.0f;
+        ry[2][0] = -sy;  ry[2][1] = 0.0f; ry[2][2] = cy;
+
+        rz[0][0] = cz;   rz[0][1] = -sz;  rz[0][2] = 0.0f;
+        rz[1][0] = sz;   rz[1][1] = cz;   rz[1][2] = 0.0f;
+        rz[2][0] = 0.0f; rz[2][1] = 0.0f;  rz[2][2] = 1.0f;
+
+        PCPort_AnimDumpMat3Mul(rz, ry, tmp);
+        PCPort_AnimDumpMat3Mul(tmp, rx, rot);
+    }
+
+    PCPort_AnimDumpMat3Mul(rot, scale, scaled);
+    memcpy(out->basis, scaled, sizeof(out->basis));
+    out->pos[0] = joint != NULL ? joint->translate_x : 0.0f;
+    out->pos[1] = joint != NULL ? joint->translate_y : 0.0f;
+    out->pos[2] = joint != NULL ? joint->translate_z : 0.0f;
+}
+
+static void PCPort_AnimDumpCombineTransform(const PCPortAnimDumpTransform* parent,
+                                            const PCPortAnimDumpTransform* local,
+                                            PCPortAnimDumpTransform* out) {
+    f32 rotated[3];
+
+    if (out == NULL || local == NULL) {
+        return;
+    }
+    if (parent == NULL) {
+        memcpy(out->basis, local->basis, sizeof(out->basis));
+        memcpy(out->pos, local->pos, sizeof(out->pos));
+        return;
+    }
+    PCPort_AnimDumpMat3Mul(parent->basis, local->basis, out->basis);
+    PCPort_AnimDumpMat3VecMul(parent->basis, local->pos, rotated);
+    out->pos[0] = parent->pos[0] + rotated[0];
+    out->pos[1] = parent->pos[1] + rotated[1];
+    out->pos[2] = parent->pos[2] + rotated[2];
+}
+
+static void PCPort_AnimDumpFillFramePositions(
+    HSD_JObj* joint,
+    const PCPortAnimDumpTransform* parent,
+    f32 positions[PCPORT_PROBE_MAX_JOINTS][3],
+    int* cursor,
+    int maxRefs) {
+    PCPortAnimDumpTransform local;
+    PCPortAnimDumpTransform world;
+
+    for (; joint != NULL; joint = joint->next) {
+        PCPort_AnimDumpBuildLocalTransform(joint, &local);
+        PCPort_AnimDumpCombineTransform(parent, &local, &world);
+        if (*cursor < maxRefs) {
+            positions[*cursor][0] = world.pos[0];
+            positions[*cursor][1] = world.pos[1];
+            positions[*cursor][2] = world.pos[2];
+            ++(*cursor);
+        }
+        if (joint->child != NULL) {
+            PCPort_AnimDumpFillFramePositions(joint->child, &world,
+                                              positions, cursor, maxRefs);
+        }
+    }
+}
+
+static const char* PCPort_AnimDumpModelAlias(const char* memberName) {
+    if (memberName == NULL) {
+        return "model";
+    }
+    if (strcmp(memberName, "ken_b1") == 0) {
+        return "wes";
+    }
+    return memberName;
+}
+
+static const char* PCPort_AnimDumpMotionLabel(u32 motionIdx) {
+    switch (motionIdx) {
+    case 1u:
+        return "idle";
+    case 5u:
+        return "walk";
+    case 8u:
+        return "run";
+    default:
+        break;
+    }
+    return NULL;
+}
+
+static void PCPort_AnimDumpWriteFrameJson(FILE* out,
+                                          int frameIdx,
+                                          const PCPortAnimDumpJointRef* refs,
+                                          const f32 positions[PCPORT_PROBE_MAX_JOINTS][3],
+                                          int jointCount) {
+    int i;
+    fprintf(out, "    {\"frame\":%d,\"joints\":[", frameIdx);
+    for (i = 0; i < jointCount; ++i) {
+        if (i > 0) {
+            fputs(",", out);
+        }
+        if (refs[i].joint == NULL) {
+            fprintf(out, "{\"x\":0.0,\"y\":0.0,\"z\":0.0,\"parent\":%d}",
+                    refs[i].parent);
+            continue;
+        }
+        fprintf(out, "{\"x\":%.6f,\"y\":%.6f,\"z\":%.6f,\"parent\":%d}",
+                positions[i][0], positions[i][1], positions[i][2],
+                refs[i].parent);
+    }
+    fputs("]}", out);
+}
+
+void PCPort_AnimDump(const char* fsysPath, const char* memberName,
+                     int motionIdx, int frames) {
+    PCPortHeadlessMotionBank bank;
+    HSD_JObj* root = NULL;
+    HSD_AnimJoint* animjoint;
+    PCPortAnimDumpJointRef refs[PCPORT_PROBE_MAX_JOINTS];
+    f32 positions[PCPORT_PROBE_MAX_JOINTS][3];
+    int jointCount = 0;
+    int frameIdx;
+    FILE* jsonOut = NULL;
+    char jsonPath[384];
+    const char* alias;
+    const char* motionLabel;
+    char motionLabelAuto[32];
+
+    if (frames <= 0) {
+        frames = 24;
+    }
+    if (!PCPort_HeadlessMotionBankLoad(fsysPath, memberName, &bank, 1)) {
+        printf("[anim-dump] load failed %s :: %s\n", fsysPath, memberName);
+        fflush(stdout);
+        return;
+    }
+    if (bank.motionCount == 0u) {
+        printf("[anim-dump] no motions %s :: %s\n", fsysPath, memberName);
+        fflush(stdout);
+        PCPort_HeadlessMotionBankRelease(&bank);
+        return;
+    }
+    if (motionIdx < 0) {
+        motionIdx = 0;
+    }
+    if ((u32)motionIdx >= bank.motionCount) {
+        motionIdx = (int)bank.motionCount - 1;
+    }
+
+    root = HSD_JObjLoadJoint((HSD_Joint*)(bank.archive.storage + bank.rootOff));
+    if (root == NULL) {
+        printf("[anim-dump] HSD_JObjLoadJoint failed %s :: %s\n",
+               fsysPath, memberName);
+        fflush(stdout);
+        PCPort_HeadlessMotionBankRelease(&bank);
+        return;
+    }
+    animjoint = (HSD_AnimJoint*)(bank.archive.storage +
+                                 bank.motionOffs[(u32)motionIdx]);
+    HSD_JObjAddAnimAll(root, animjoint, NULL, NULL);
+    HSD_JObjReqAnimAll(root, 0.0f);
+    PCPort_HSDStartAnimAll(root);
+
+    memset(refs, 0, sizeof(refs));
+    memset(positions, 0, sizeof(positions));
+    PCPort_AnimDumpCollectJoints(root, -1, refs, &jointCount,
+                                 PCPORT_PROBE_MAX_JOINTS);
+    if (jointCount <= 0) {
+        printf("[anim-dump] no joints %s :: %s\n", fsysPath, memberName);
+        fflush(stdout);
+        HSD_JObjRemoveAll(root);
+        PCPort_HeadlessMotionBankRelease(&bank);
+        return;
+    }
+
+    alias = PCPort_AnimDumpModelAlias(memberName);
+    motionLabel = PCPort_AnimDumpMotionLabel((u32)motionIdx);
+    if (motionLabel == NULL) {
+        snprintf(motionLabelAuto, sizeof(motionLabelAuto), "motion%d",
+                 motionIdx);
+        motionLabel = motionLabelAuto;
+    }
+    snprintf(jsonPath, sizeof(jsonPath), "build_pc/anim_%s_%s.json",
+             alias, motionLabel);
+    jsonOut = fopen(jsonPath, "wb");
+    if (jsonOut == NULL) {
+        printf("[anim-dump] open failed %s\n", jsonPath);
+        fflush(stdout);
+        HSD_JObjRemoveAll(root);
+        PCPort_HeadlessMotionBankRelease(&bank);
+        return;
+    }
+
+    fprintf(jsonOut,
+            "{\n"
+            "  \"model\":\"%s\",\n"
+            "  \"member\":\"%s\",\n"
+            "  \"motionId\":%d,\n"
+            "  \"motionLabel\":\"%s\",\n"
+            "  \"jointCount\":%d,\n"
+            "  \"frames\":[\n",
+            alias, memberName, motionIdx, motionLabel, jointCount);
+    {
+        int loopFrames = (int)(PCPort_CharAnimMaxEndFrame(root) + 0.5f);
+        if (loopFrames < 1) {
+            loopFrames = 0;
+        }
+        for (frameIdx = 0; frameIdx < frames; ++frameIdx) {
+            int frameJointCount = 0;
+            PCPortAnimDumpTransform identity;
+
+            if (frameIdx > 0) {
+                fputs(",\n", jsonOut);
+            }
+            HSD_JObjAnimAll(root);
+            memset(positions, 0, sizeof(positions));
+            PCPort_AnimDumpMat3Identity(identity.basis);
+            identity.pos[0] = 0.0f;
+            identity.pos[1] = 0.0f;
+            identity.pos[2] = 0.0f;
+            PCPort_AnimDumpFillFramePositions(root, &identity, positions,
+                                              &frameJointCount,
+                                              PCPORT_PROBE_MAX_JOINTS);
+            PCPort_AnimDumpWriteFrameJson(jsonOut, frameIdx, refs, positions,
+                                          jointCount);
+            if (loopFrames > 0 && frameIdx + 1 < frames &&
+                ((frameIdx + 1) % loopFrames) == 0) {
+                HSD_JObjReqAnimAll(root, 0.0f);
+                PCPort_HSDStartAnimAll(root);
+            }
+        }
+    }
+    fputs("\n  ]\n}\n", jsonOut);
+    fclose(jsonOut);
+
+    printf("[anim-dump] wrote %s frames=%d joints=%d\n",
+           jsonPath, frames, jointCount);
+    fflush(stdout);
+
+    HSD_JObjRemoveAll(root);
+    PCPort_HeadlessMotionBankRelease(&bank);
+}
+
 static const char* PCPort_PathBaseName(const char* path) {
     const char* slash;
     const char* backslash;

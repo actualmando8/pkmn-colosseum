@@ -8,8 +8,12 @@ int main(int argc, char** argv) {
     const char* motionFrames = getenv("PCPORT_MOTION_PROBE");
     const char* bankFrames = getenv("PCPORT_CHARANIM_BANK_PROBE");
     const char* charFrames = getenv("PCPORT_CHARANIM_PROBE");
+    const char* animDump = getenv("PCPORT_ANIM_DUMP");
+    const char* animDumpFrames = getenv("PCPORT_ANIM_DUMP_FRAMES");
     const char* fsys = getenv("PCPORT_SWIZ_ARCHIVE");
     const char* member = getenv("PCPORT_SWIZ_MEMBER");
+    int dumpMotionIdx;
+    int dumpFrames;
 
     (void)argc;
     (void)argv;
@@ -26,6 +30,13 @@ int main(int argc, char** argv) {
 
     if (batchFrames != NULL) {
         PCPort_HeadlessMotionBatchProbe(atoi(batchFrames));
+        return 0;
+    }
+    if (animDump != NULL && animDump[0] != '\0') {
+        dumpMotionIdx = atoi(animDump);
+        dumpFrames = (animDumpFrames != NULL && animDumpFrames[0] != '\0') ?
+                     atoi(animDumpFrames) : 24;
+        PCPort_AnimDump(fsys, member, dumpMotionIdx, dumpFrames);
         return 0;
     }
     if (motionFrames != NULL) {
