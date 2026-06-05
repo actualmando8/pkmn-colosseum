@@ -26062,7 +26062,7 @@ asm void fn_80130A88(void) {
 #else
 void fn_80130A88(u32 arg1) {
     extern u32 fn_8012A5B0(u8* a, u32 b, u32 c);
-    extern u32 fn_80135938(u32 a, u32 b);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_80123D58(u8* a, u32 b, u32 c);
     extern u32 fn_80124410(u8* a, u32 b, s32 c, u32 d, u32 e);
@@ -26072,7 +26072,7 @@ void fn_80130A88(u32 arg1) {
     u8 buf[0x140];
     u32 val, tmp;
     val = fn_8012A5B0((u8*)arg1, 2, 0);
-    fn_801240C4(buf, 0xc4, 0x19, fn_80135938(0, 1));
+    fn_801240C4(buf, 0xc4, 0x19, gamedataGetStatus(0, 1));
     fn_80123D58(buf, 0, 0x5d);
     fn_80123D58(buf, 1, 0xd8);
     fn_80123D58(buf, 2, 0x73);
