@@ -4617,13 +4617,16 @@ asm void fn_800E0204(void) {
 #else
 void fn_800E0204(f32* arr) { f32 v = lbl_8047CADC; arr[0] = v; arr[1] = v; arr[2] = v; }
 #endif
-extern void fn_800A3458(void);
+extern void C_MTXLookAt(void);
 #if 0
 asm void fn_800E0218(void) {
 #include "src/game/gs_render_fn_800E0218.inc"
 }
 #else
-void fn_800E0218(void) { fn_800A3458(); }
+void fn_800E0218(void)
+{
+    C_MTXLookAt();
+}
 #endif
 extern void fn_800A2E64(void*, void*);
 #if 0
@@ -4717,13 +4720,16 @@ asm void fn_800E03E8(void* a, f32 b, f32 c, f32 d) {
 #else
 void fn_800E03E8(void* a, f32 b, f32 c, f32 d) { fn_800A32E8(a, a, b, c, d); }
 #endif
-extern void fn_800A33B4(void);
+extern void PSMTXQuat(void);
 #if 0
 asm void fn_800E040C(void) {
 #include "src/game/gs_render_fn_800E040C.inc"
 }
 #else
-void fn_800E040C(void) { fn_800A33B4(); }
+void fn_800E040C(void)
+{
+    PSMTXQuat();
+}
 #endif
 extern u8 lbl_80315568[];
 #if 0
@@ -4809,13 +4815,16 @@ asm void fn_800E064C(void) {
 #else
 void fn_800E064C(void* dst) { memcpy(dst, lbl_80315568, 0x30); }
 #endif
-extern void fn_800A3910(void);
+extern void C_MTXPerspective(void);
 #if 0
 asm void fn_800E0678(u8* p) {
 #include "src/game/gs_render_fn_800E0678.inc"
 }
 #else
-void fn_800E0678(u8* p) { fn_800A3910(); }
+void fn_800E0678(u8* p)
+{
+    C_MTXPerspective();
+}
 #endif
 extern void fn_800A39E0(void);
 #if 0
