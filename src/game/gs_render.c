@@ -3465,7 +3465,10 @@ asm void fn_800DBF1C(void) {
 #else
 void fn_800DBF1C(u32 idx, u32 val) {
     if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x4f, 2, idx, val); }
-    else { *(s32*)&lbl_80400B28[idx * 4 + 0x1ac] = val; }
+    else {
+        u32* base = (u32*)(lbl_80400B28 + 0x1ac);
+        base[idx] = val;
+    }
 }
 #endif
 #if 0
@@ -3475,7 +3478,10 @@ asm void fn_800DBF78(void) {
 #else
 void fn_800DBF78(u32 idx, u32 val) {
     if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x4e, 2, idx, val); }
-    else { *(s32*)&lbl_80400B28[idx * 4 + 0x16c] = val; }
+    else {
+        u32* base = (u32*)(lbl_80400B28 + 0x16c);
+        base[idx] = val;
+    }
 }
 #endif
 #if 0
