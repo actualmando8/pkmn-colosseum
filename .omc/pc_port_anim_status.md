@@ -148,3 +148,14 @@ confirmed, then fix batch enumeration (was probed=0) for the all-archive sweep.
   the relax-fix pass.
 - Final animation verification status: **field/player/NPC movement animation done; Pokémon
   battle model animation coverage done (526 real animated pkx + egg placeholder).**
+
+## 2026-06-05 23:10 HST — ORCHESTRATOR RERUN
+- Re-ran `build_pc/_runbatch.ps1` through native PowerShell `Start-Process` against
+  `pcport_motion_probe_headless_meshdump_1780726420.exe`.
+- Batch output: **527/527 pkx rows emitted**, **526/527 animates=yes confirmed=yes**;
+  the only `confirmed=no` pkx remains `pkx_egg.fsys :: egg` with
+  `note=low-motion-placeholder`.
+- Character batch emitted **149 rows** in the same run: **125 confirmed=yes** and
+  **24 confirmed=no note=animates-no-locomotion**. This does not overturn the prior
+  relax-fix character verification; %8 was fed the counts and asked to resolve or
+  explicitly classify these rows without regressing pkx coverage.
