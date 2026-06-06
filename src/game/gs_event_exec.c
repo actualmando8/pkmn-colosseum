@@ -452,6 +452,7 @@ s32 fn_80012FB0(u8* ctx) {
 extern void fn_8001EC08(void);
 extern void fn_80132A38(s32, s32);
 extern void jumptable_802E4D90();
+/* Keep this on the asm wrapper until the active-C rewrite compiles cleanly. */
 #if 1
 asm void fn_8001329C(void) {
 #include "src/game/gs_event_exec_fn_8001329C.inc"
