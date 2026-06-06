@@ -24,10 +24,15 @@ fi
 ( cd "$DIR" && timeout "$BUDGET" python3 "$PERM/permuter.py" . -j "$JOBS" \
     --stop-on-zero --best-only > "$PDIR/logs/run_$FN.log" 2>&1 )
 
-# 3. harvest: a score-0 match is saved by the permuter as output-0-*/source.c
+# 3. harvest: a score-0 match is normally saved by the permuter as
+# output-0-*/source.c. If the original base already scores 0, permuter exits
+# before writing an output dir; in that case base.c is the exact match.
 WIN=$(ls -d "$DIR"/output-0-* 2>/dev/null | head -1)
 if [ -n "$WIN" ] && [ -f "$WIN/source.c" ]; then
   cp "$WIN/source.c" "$PDIR/wins/$FN.c"
+  echo "WIN $FN"
+elif grep -qE '(^|[^0-9-])(base score = 0|score = 0)([^0-9]|$)' "$PDIR/logs/run_$FN.log" 2>/dev/null; then
+  cp "$DIR/base.c" "$PDIR/wins/$FN.c"
   echo "WIN $FN"
 else
   BEST=$(grep -oE 'score = [0-9-]+' "$PDIR/logs/run_$FN.log" 2>/dev/null | grep -oE '[0-9-]+$' | sort -n | head -1)
