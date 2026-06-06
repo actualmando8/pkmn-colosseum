@@ -108,6 +108,7 @@ s32 ddh_cc_write(void* data, s32 size) {
     char* strings = lbl_8026FC98;
     u8* ptr = (u8*)data;
     s32 remaining = size;
+    s32 written;
 
     /* Check if port is open */
     if (lbl_8047A9E0 == 0) {
@@ -118,8 +119,6 @@ s32 ddh_cc_write(void* data, s32 size) {
     MWTRACE(8, strings + 0x14, data, size);
 
     while (remaining > 0) {
-        s32 written;
-
         MWTRACE(1, strings + 0x40, remaining);
 
         written = fn_800CE7B4(ptr, remaining);

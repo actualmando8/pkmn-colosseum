@@ -107,6 +107,7 @@ s32 gdev_cc_write(void* data, s32 size) {
     char* strings = lbl_8026FD78;
     u8* ptr = (u8*)data;
     s32 remaining = size;
+    s32 written;
 
     /* Check if port is open */
     if (lbl_8047A9E8 == 0) {
@@ -117,8 +118,6 @@ s32 gdev_cc_write(void* data, s32 size) {
     MWTRACE(8, strings + 0x14, data, size);
 
     while (remaining > 0) {
-        s32 written;
-
         MWTRACE(1, strings + 0x40, remaining);
 
         written = fn_800CE7DC(ptr, remaining);
