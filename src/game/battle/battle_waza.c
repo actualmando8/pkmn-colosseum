@@ -75,6 +75,7 @@ extern void  fn_80121F3C(void* particle);                  /* destroy particle *
 extern void  fn_80122048(void* particle, f32 x, f32 y, f32 z); /* set particle pos */
 
 /* Battle grid/scene */
+extern void* fn_80129280(s32 side, s32 slotType);
 extern void* fn_801C4078(s32 slot);                        /* get grid slot model */
 extern f32   fn_801C4814(s32 slot);                        /* get slot X */
 extern f32   fn_801C483C(s32 slot);                        /* get slot Y */
@@ -152,8 +153,10 @@ f32 fn_801D142C(void* entry) {
  * fn_801D1470 - Waza get entry flags.
  * Address: 0x801D1470 | Size: 0xC
  */
+extern u32* lbl_80478E98; /* waza context pointer */
+extern u32 lbl_80478E9C; /* waza entry array pointer */
 u32 fn_801D1470(void* entry) {
-    return 0;
+    return *lbl_80478E98;
 }
 
 /**
@@ -214,7 +217,7 @@ f32 fn_801D15D0(void* entry) {
  * fn_801D1618 - Waza get entry active flag.
  * Address: 0x801D1618 | Size: 0x8
  */
-extern u32 lbl_80478CB8;
+extern s32 lbl_80478CB8;
 u32 fn_801D1618(void) {
     return lbl_80478CB8;
 }
@@ -229,39 +232,54 @@ void fn_801D1620(void* entry, u8 active) {
 }
 
 /**
- * fn_801D1650 - Waza set entry position.
+ * fn_801D1650 - Waza handle table lookup.
  * Address: 0x801D1650 | Size: 0x2C
  */
-void fn_801D1650(void* entry, f32 x, f32 y, f32 z) {
-    /* Set entry XYZ position */
+extern u32 lbl_8036E0E0[];
+u32 fn_801D1650(u32 idx) {
+    s32 slot = idx & 0xFF;
+    if (slot >= lbl_80478CB8) {
+        return 0;
+    }
+    return lbl_8036E0E0[slot * 2];
 }
 
 /**
- * fn_801D167C - Waza set entry scale and rotation.
+ * fn_801D167C - Waza set current handle.
  * Address: 0x801D167C | Size: 0x48
  */
-void fn_801D167C(void* entry, f32 scale, f32 rotation) {
-    if (entry == NULL) return;
-    *(f32*)((u8*)entry + 0x1C) = scale;
-    *(f32*)((u8*)entry + 0x20) = rotation;
+void fn_801D167C(u32 handle) {
+    s32 slot = handle & 0xFF;
+    void* party = fn_80129280(0, 0x0A);
+    if (slot < lbl_80478CB8) {
+        *(u8*)((u8*)party + 0x443) = (u8)handle;
+    }
 }
 
 /**
- * fn_801D16C4 - Waza entry get target slot.
+ * fn_801D16C4 - Waza get current handle.
  * Address: 0x801D16C4 | Size: 0x2C
  */
-s32 fn_801D16C4(void* entry) {
-    if (entry == NULL) return -1;
-    return *(s32*)((u8*)entry + 0x28);
+#pragma scheduling off
+u8 fn_801D16C4(void) {
+    void* party = fn_80129280(0, 0x0A);
+    return *(u8*)((u8*)party + 0x443);
 }
+#pragma scheduling on
 
 /**
- * fn_801D16F0 - Waza entry set target slot.
+ * fn_801D16F0 - Waza entry get field 0x18 by index.
  * Address: 0x801D16F0 | Size: 0x44
  */
-void fn_801D16F0(void* entry, s32 targetSlot) {
-    if (entry == NULL) return;
-    *(s32*)((u8*)entry + 0x28) = targetSlot;
+u32 fn_801D16F0(s32 idx) {
+    void* entry;
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = (void*)(lbl_80478E9C + (u32)idx * 0x2C);
+    }
+    if (entry == NULL) return 0;
+    return *(u32*)((u8*)entry + 0x18);
 }
 
 /* =========================================================================
@@ -300,8 +318,6 @@ void fn_801D19A4(s32 seqHandle, f32 speed) {
  * Bounds-checks idx against lbl_80478E98->count, then
  * returns entry[idx*0x2C + 0x14] from lbl_80478E9C.
  */
-extern u32* lbl_80478E98; /* waza context pointer */
-extern u32 lbl_80478E9C; /* waza entry array pointer */
 u32 fn_801D1A44(s32 idx) {
     void* entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
@@ -360,10 +376,12 @@ void fn_801D1B10(s32 handle) {
  * fn_801D1B4C - Waza get byte from battle party at offset 0x442.
  * Address: 0x801D1B4C | Size: 0x2C
  */
+#pragma scheduling off
 u8 fn_801D1B4C(void) {
     void* party = (void*)fn_80129280(0, 0x0A);
     return *(u8*)((u8*)party + 0x442);
 }
+#pragma scheduling on
 
 /**
  * fn_801D1B78 - Waza effect position update (attacker-relative).

@@ -35,6 +35,16 @@ Most remaining unmatched fns. Use `python tools/objdiff-cli.exe diff -1 <target>
 
 ## Session log
 
+- **2026-06-06 (Codex battle-flow grind)** — `fn_8025F2FC` converted from
+  83.3333% to **100.0000%** active C by expressing the original shared
+  completion branch for request slots where `entry[5] != 0 || entry[6] != 4`.
+  Verified with `python tools/compile_check.py src/game/colosseum_battle.c --diff --symbols fn_8025F2FC fn_8025F514 --timeout 180`:
+  `fn_8025F2FC 21/21 instructions, 0 mismatches, no active asm wrapper`.
+- **2026-06-06 (Codex battle-flow grind)** — `fn_8025F514` converted from
+  60.0000% to **100.0000%** active C by adding a local `#pragma scheduling off`
+  around the battle request-stop flag setter. Verified with
+  `python tools/compile_check.py src/game/colosseum_battle.c --diff --symbols fn_8025F514 fn_8025F584 fn_8025F648 --timeout 180`:
+  `fn_8025F514 4/4 instructions, 0 mismatches, no active asm wrapper`.
 - **2026-05-13 (w5)** — stalled, no salvageable commits. Identified the
   "no actual near-misses" problem above. Recommend full-decomp wave on the
   35-60% cluster, not easy-win sweeps.

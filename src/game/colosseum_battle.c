@@ -37080,15 +37080,13 @@ asm void fn_8025F2FC(void) {
 #pragma pop
 void fn_8025F2FC(int r3) {
   u8 *entry;
-  u8 b5;
-  u8 b6;
   u8 b7;
   entry = lbl_804783E0 + (r3 * 0x100);
   if (*(s32 *)(entry + 0x20) != 0) return;
-  b5 = *(u8 *)(entry + 0x5);
-  if (b5 != 0) { *(s32 *)(entry + 0x20) = 1; return; }
-  b6 = *(u8 *)(entry + 0x6);
-  if (b6 != 4) { *(s32 *)(entry + 0x20) = 1; return; }
+  if ((*(u8 *)(entry + 0x5) != 0) || (*(u8 *)(entry + 0x6) != 4)) {
+    *(s32 *)(entry + 0x20) = 1;
+    return;
+  }
   b7 = *(u8 *)(entry + 0x7);
   *(u8 *)(*(u32 *)(entry + 0x14)) = b7 & 0x3a;
 }
@@ -37197,10 +37195,12 @@ asm void fn_8025F514(void) {
 }
 #endif
 #pragma pop
+#pragma scheduling off
 u32 fn_8025F514(void) {
   lbl_8047B670 = 1;
   return 1;
 }
+#pragma scheduling on
 
 /* Address: 0x8025F524 | Size: 0x60 | Ghidra import */
 void fn_8025F524(int r3)
