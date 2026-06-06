@@ -9434,6 +9434,298 @@ void PCPort_EngineTitleRenderFrame(void) {
     }
 }
 
+typedef struct PCPortBattleRenderActor {
+    const char* label;
+    const char* member;
+    const char* displayName;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 yaw;
+    f32 scale;
+    PCPortHSDArchive archive;
+    u32 rootJoint;
+    int loaded;
+} PCPortBattleRenderActor;
+
+static int PCPort_LoadPkxRenderActor(PCPortBattleRenderActor* actor) {
+    char fsysPath[320];
+    u8* memberData = NULL;
+    u32 memberSize = 0u;
+    u32 off;
+
+    if (actor == NULL || actor->member == NULL) {
+        return 0;
+    }
+    snprintf(fsysPath, sizeof(fsysPath),
+             "orig/GC6E01/disc/files/pkx_%s.fsys", actor->member);
+    if (!PCPort_LoadFsysMember(fsysPath, actor->member, &memberData,
+                               &memberSize)) {
+        fprintf(stderr, "[battle-scene] load failed %s :: %s\n",
+                fsysPath, actor->member);
+        return 0;
+    }
+
+    for (off = 0u; off + 0x20u <= memberSize && off <= 0x400u; off += 4u) {
+        u32 fileSize = PCPort_ReadBigEndianU32(memberData + off + 0x00);
+        PCPortHSDArchive candidate;
+        const u8* sceneData;
+        u32 sceneOffset = 0u;
+        u32 branchOff;
+        u32 jointListOff;
+        u32 rootJoint;
+
+        if (fileSize < 0x20u || fileSize > memberSize - off) {
+            continue;
+        }
+        memset(&candidate, 0, sizeof(candidate));
+        if (!PCPort_HSDArchiveParseBE(&candidate, memberData + off, fileSize)) {
+            continue;
+        }
+        sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(
+            &candidate, "scene_data", &sceneOffset);
+        if (sceneData == NULL) {
+            PCPort_HSDArchiveDestroy(&candidate);
+            continue;
+        }
+        branchOff = PCPort_ReadBigEndianU32(sceneData + 0x00);
+        if (!ArchiveRangeValid(&candidate, branchOff, 0x04u)) {
+            PCPort_HSDArchiveDestroy(&candidate);
+            continue;
+        }
+        jointListOff = PCPort_ReadBigEndianU32(candidate.storage + branchOff);
+        if (!ArchiveRangeValid(&candidate, jointListOff, 0x04u)) {
+            PCPort_HSDArchiveDestroy(&candidate);
+            continue;
+        }
+        rootJoint = PCPort_ReadBigEndianU32(candidate.storage + jointListOff);
+        if (!ArchiveRangeValid(&candidate, rootJoint,
+                               PCPORT_SERIALIZED_JOINT_SIZE)) {
+            PCPort_HSDArchiveDestroy(&candidate);
+            continue;
+        }
+
+        actor->archive = candidate;
+        actor->rootJoint = rootJoint;
+        actor->loaded = 1;
+        PCPort_FreeBuffer(memberData);
+        printf("[battle-scene] actor=%s member=%s root=0x%X wrapper=0x%X\n",
+               actor->label, actor->member, actor->rootJoint, off);
+        return 1;
+    }
+
+    PCPort_FreeBuffer(memberData);
+    fprintf(stderr, "[battle-scene] no scene_data HSD payload for %s\n",
+            actor->member);
+    return 0;
+}
+
+static void PCPort_FreeBattleRenderActors(PCPortBattleRenderActor* actors,
+                                          int count) {
+    int i;
+    if (actors == NULL) {
+        return;
+    }
+    for (i = 0; i < count; ++i) {
+        if (actors[i].loaded) {
+            PCPort_HSDArchiveDestroy(&actors[i].archive);
+            actors[i].loaded = 0;
+        }
+    }
+}
+
+static void PCPort_BuildActorModelMatrix(const PCPortBattleRenderActor* actor,
+                                         f32 out[3][4]) {
+    f32 c = cosf(actor != NULL ? actor->yaw : 0.0f);
+    f32 s = sinf(actor != NULL ? actor->yaw : 0.0f);
+    f32 scale = (actor != NULL && actor->scale > 0.0f) ? actor->scale : 1.0f;
+    memset(out, 0, sizeof(f32) * 12u);
+    out[0][0] = c * scale;
+    out[0][2] = s * scale;
+    out[1][1] = scale;
+    out[2][0] = -s * scale;
+    out[2][2] = c * scale;
+    if (actor != NULL) {
+        out[0][3] = actor->x;
+        out[1][3] = actor->y;
+        out[2][3] = actor->z;
+    }
+}
+
+static void DrawBattleArenaFloor(void) {
+    int i;
+    GXHostSetLightingEnabled(GX_FALSE);
+    GXSetNumTexGens(0);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_COPY);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXColor4u8(78, 86, 92, 255);
+    GXPosition3f32(-170.0f, -2.0f, -105.0f);
+    GXColor4u8(78, 86, 92, 255);
+    GXPosition3f32(170.0f, -2.0f, -105.0f);
+    GXColor4u8(58, 66, 72, 255);
+    GXPosition3f32(170.0f, -2.0f, 105.0f);
+    GXColor4u8(58, 66, 72, 255);
+    GXPosition3f32(-170.0f, -2.0f, 105.0f);
+    GXEnd();
+
+    for (i = -3; i <= 3; ++i) {
+        f32 x = (f32)i * 42.0f;
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXColor4u8(106, 116, 122, 255);
+        GXPosition3f32(x - 0.65f, -1.8f, -105.0f);
+        GXColor4u8(106, 116, 122, 255);
+        GXPosition3f32(x + 0.65f, -1.8f, -105.0f);
+        GXColor4u8(88, 98, 104, 255);
+        GXPosition3f32(x + 0.65f, -1.8f, 105.0f);
+        GXColor4u8(88, 98, 104, 255);
+        GXPosition3f32(x - 0.65f, -1.8f, 105.0f);
+        GXEnd();
+    }
+    for (i = -2; i <= 2; ++i) {
+        f32 z = (f32)i * 42.0f;
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXColor4u8(96, 106, 112, 255);
+        GXPosition3f32(-170.0f, -1.7f, z - 0.65f);
+        GXColor4u8(96, 106, 112, 255);
+        GXPosition3f32(170.0f, -1.7f, z - 0.65f);
+        GXColor4u8(96, 106, 112, 255);
+        GXPosition3f32(170.0f, -1.7f, z + 0.65f);
+        GXColor4u8(96, 106, 112, 255);
+        GXPosition3f32(-170.0f, -1.7f, z + 0.65f);
+        GXEnd();
+    }
+}
+
+static int RunBattleScene(GLFWwindow* window) {
+    PCPortBattleRenderActor actors[4] = {
+        { "player-left",  "eifie",   "Eifie",   -42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
+        { "player-right", "blacky",  "Blacky",   42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
+        { "enemy-left",   "absol",   "Absol",   -42.0f, 0.0f, -30.0f,  0.0f,    6.0f },
+        { "enemy-right",  "pikachu", "Pikachu",  42.0f, 0.0f, -30.0f,  0.0f,    6.0f }
+    };
+    PCPortTranslatedCamera camera;
+    f32 eye[3] = { 0.0f, 68.0f, 135.0f };
+    f32 interest[3] = { 0.0f, 28.0f, -2.0f };
+    f32 up[3] = { 0.0f, 1.0f, 0.0f };
+    const char* scaleEnv = getenv("PCPORT_BATTLE_SCALE");
+    int frameCap = 0;
+    int frame;
+    int i;
+
+    (void)window;
+    if (getenv("PCPORT_BATTLE_P0") != NULL) actors[0].member = getenv("PCPORT_BATTLE_P0");
+    if (getenv("PCPORT_BATTLE_P1") != NULL) actors[1].member = getenv("PCPORT_BATTLE_P1");
+    if (getenv("PCPORT_BATTLE_E0") != NULL) actors[2].member = getenv("PCPORT_BATTLE_E0");
+    if (getenv("PCPORT_BATTLE_E1") != NULL) actors[3].member = getenv("PCPORT_BATTLE_E1");
+    if (scaleEnv != NULL && scaleEnv[0] != '\0') {
+        f32 scale = (f32)atof(scaleEnv);
+        if (scale > 0.0f) {
+            for (i = 0; i < 4; ++i) {
+                actors[i].scale = scale;
+            }
+        }
+    }
+    if (getenv("PCPORT_BATTLE_FRAMES") != NULL) {
+        frameCap = atoi(getenv("PCPORT_BATTLE_FRAMES"));
+    }
+    if (frameCap <= 0) {
+        frameCap = 0;
+    }
+
+    memset(&camera, 0, sizeof(camera));
+    camera.viewportLeft = 0;
+    camera.viewportTop = 0;
+    camera.viewportRight = (u16)PCPORT_WINDOW_WIDTH;
+    camera.viewportBottom = (u16)PCPORT_WINDOW_HEIGHT;
+    camera.scissorLeft = 0;
+    camera.scissorTop = 0;
+    camera.scissorRight = (u16)PCPORT_WINDOW_WIDTH;
+    camera.scissorBottom = (u16)PCPORT_WINDOW_HEIGHT;
+    {
+        f32 fov = 45.0f * 3.14159265f / 180.0f;
+        f32 aspect = (f32)PCPORT_WINDOW_WIDTH / (f32)PCPORT_WINDOW_HEIGHT;
+        f32 nearZ = 1.0f;
+        f32 farZ = 2000.0f;
+        f32 f = 1.0f / tanf(fov * 0.5f);
+        memset(camera.projectionMatrix, 0, sizeof(camera.projectionMatrix));
+        camera.projectionMatrix[0][0] = f / aspect;
+        camera.projectionMatrix[1][1] = f;
+        camera.projectionMatrix[2][2] = -(farZ + nearZ) / (farZ - nearZ);
+        camera.projectionMatrix[2][3] = -(2.0f * farZ * nearZ) / (farZ - nearZ);
+        camera.projectionMatrix[3][2] = -1.0f;
+    }
+    BuildViewMatrixLookAt(eye, interest, up, camera.viewMatrix);
+
+    for (i = 0; i < 4; ++i) {
+        if (!PCPort_LoadPkxRenderActor(&actors[i])) {
+            PCPort_FreeBattleRenderActors(actors, 4);
+            return 0;
+        }
+    }
+
+    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    EnsureFontAtlas();
+    printf("[battle-scene] loaded actors=4 frameCap=%d\n", frameCap);
+
+    for (frame = 0; ; ++frame) {
+        MenuTreeStats stats;
+        if (window != NULL && glfwWindowShouldClose(window)) {
+            break;
+        }
+        if (frameCap > 0 && frame >= frameCap) {
+            break;
+        }
+        memset(&stats, 0, sizeof(stats));
+        VIWaitForRetrace_PC();
+        ClearBackbuffer(0.03f, 0.04f, 0.06f);
+        GSgfx_BeginFrame();
+        ClearBackbuffer(0.08f, 0.10f, 0.13f);
+        GXSetViewport(0.0f, 0.0f, (f32)PCPORT_WINDOW_WIDTH,
+                      (f32)PCPORT_WINDOW_HEIGHT, 0.0f, 1.0f);
+        GXSetScissor(0u, 0u, PCPORT_WINDOW_WIDTH, PCPORT_WINDOW_HEIGHT);
+        GXSetProjection(camera.projectionMatrix, GX_PERSPECTIVE);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+        GXLoadPosMtxImm(camera.viewMatrix, 0);
+        DrawBattleArenaFloor();
+
+        for (i = 0; i < 4; ++i) {
+            PCPortTranslatedCamera actorCam = camera;
+            f32 actorMtx[3][4];
+            PCPort_BuildActorModelMatrix(&actors[i], actorMtx);
+            PCPortMulAffine3x4(camera.viewMatrix, actorMtx,
+                               actorCam.viewMatrix);
+            RenderJointTree(&actors[i].archive, actors[i].rootJoint,
+                            actors[i].rootJoint, &actorCam,
+                            (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+        }
+
+        BeginMenuOverlay();
+        DrawTextScreen(42.0f, 334.0f, 13.0f, 19.0f, 238, 242, 248, 255,
+                       "FIGHT     POKEMON     BAG     RUN");
+        DrawTextScreen(42.0f, 384.0f, 11.0f, 17.0f, 220, 230, 244, 255,
+                       "Eifie used Swift!  The opposing Absol took damage.");
+
+        if (getenv("PCPORT_RENDER_DEBUG") != NULL && frame == 0) {
+            printf("[battle-scene] render stats joints=%u dobjs=%u drawn=%u "
+                   "skipped=%u textured=%u materialOnly=%u\n",
+                   stats.joints, stats.dobjs, stats.drawn, stats.skipped,
+                   stats.textured, stats.materialOnly);
+        }
+        GSgfxSwapBuffers(1);
+        if (frameCap == 0) {
+            continue;
+        }
+    }
+    printf("[battle-scene] frames=%d\n", frame);
+    HoldWindowOpen(window);
+    PCPort_FreeBattleRenderActors(actors, 4);
+    return 1;
+}
+
 int main(int argc, char** argv) {
     int audioInitialized = 0;
     int runRealContentParserSmoke;
@@ -9458,6 +9750,7 @@ int main(int argc, char** argv) {
     int runEngine;
     int runEngineBoot;
     int runField;
+    int runBattle;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -9487,6 +9780,7 @@ int main(int argc, char** argv) {
     runEngine = HasArg(argc, argv, "--engine");
     runEngineBoot = HasArg(argc, argv, "--engine-boot");
     runField = HasArg(argc, argv, "--field");
+    runBattle = HasArg(argc, argv, "--battle");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
     fflush(stdout);
@@ -9569,7 +9863,8 @@ int main(int argc, char** argv) {
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
-        runMenu || runEngine || runEngineBoot || runField || argc <= 1) {
+        runMenu || runEngine || runEngineBoot || runField || runBattle ||
+        argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
             return 1;
@@ -9764,6 +10059,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
+    } else if (runBattle) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --battle requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunBattleScene(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Battle Colosseum host scene rendered through the existing draw bridge\n");
     } else if (runField) {
         if (window == NULL) {
             fprintf(stderr,

@@ -352,6 +352,7 @@ void HSD_JObjAnimAll(HSD_JObj* jobj)
 /*  override does the correct thing so HSD_JObjReqAnimAll alone is enough to  */
 /*  arm playback (it routes through HSD_AObjReqAnim -> HSD_FObjReqAnimAll).    */
 /* ------------------------------------------------------------------------- */
+#ifndef PCPORT_USE_SRC_FOBJ_REQ_ANIM_ALL
 void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
 {
     HSD_FObj* f;
@@ -362,6 +363,7 @@ void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
         f->nb_pack = 0;
     }
 }
+#endif
 
 /* ------------------------------------------------------------------------- */
 /*  PCPort_HSDStartAnimAll — belt-and-suspenders FObj kickoff                 */
