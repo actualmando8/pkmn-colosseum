@@ -246,29 +246,10 @@ static const s32 sStatStageDenominator[13] = {
 };
 
 /**
- * Physical/special split by type (Gen III rules).
- * TRUE = physical, FALSE = special.
+ * Physical/special split by move category (Gen IV+ move-based rules).
+ * Each move has a category field (MOVE_CAT_PHYSICAL/SPECIAL/STATUS).
+ * The old type-based split table was removed in favor of per-move data.
  */
-static const u8 sTypeIsPhysical[TYPE_COUNT] = {
-    /* Normal   */ 1,
-    /* Fighting */ 1,
-    /* Flying   */ 1,
-    /* Poison   */ 1,
-    /* Ground   */ 1,
-    /* Rock     */ 1,
-    /* Bug      */ 1,
-    /* Ghost    */ 1,
-    /* Steel    */ 1,
-    /* Fire     */ 0,
-    /* Water    */ 0,
-    /* Grass    */ 0,
-    /* Electric */ 0,
-    /* Psychic  */ 0,
-    /* Ice      */ 0,
-    /* Dragon   */ 0,
-    /* Dark     */ 0,
-    /* Shadow   */ 1,  /* Shadow Rush is treated as physical */
-};
 
 /* =========================================================================
  * AI Constants (from battle_ai.c)
@@ -782,7 +763,7 @@ s32 battle_GetRandomDamageFactor(void) {
 }
 
 /**
- * Calculate damage using the Gen III formula.
+ * Calculate damage using the Gen IV+ formula (move-based physical/special split).
  */
 s32 battle_CalcDamage(BattlePokemon* attacker, BattlePokemon* defender,
                       const MoveData* move, u8 isCritical) {
@@ -804,8 +785,8 @@ s32 battle_CalcDamage(BattlePokemon* attacker, BattlePokemon* defender,
         return 0;
     }
 
-    /* Determine physical or special based on move type (Gen III type-based split) */
-    if (sTypeIsPhysical[moveType]) {
+    /* Determine physical or special based on move category (Gen IV+ move-based split) */
+    if (move->category == MOVE_CAT_PHYSICAL) {
         attack = attacker->attack;
         defense = defender->defense;
 
