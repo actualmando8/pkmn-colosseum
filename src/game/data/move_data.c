@@ -318,11 +318,125 @@ u16 MoveData_GetAnimationID(u16 moveID) {
 }
 
 /**
- * Determine the move category (physical/special/status) based on type.
- * In Gen III, the physical/special split is determined by type:
- *   Physical: Normal, Fighting, Flying, Poison, Ground, Rock, Bug, Ghost, Steel
- *   Special:  Fire, Water, Grass, Electric, Psychic, Ice, Dragon, Dark
- * Status moves have basePower == 0.
+ * Gen IV+ move-based physical/special split override table.
+ *
+ * In Gen III, category was determined by type. In Gen IV+, each move
+ * has its own category. This table lists moves that CHANGED category
+ * from Gen III to Gen IV. Moves NOT in this table keep their Gen III
+ * (type-based) category.
+ *
+ * Move IDs use standard Pokemon numbering (1-based).
+ *
+ * Format: { moveID, category }
+ *   0 = physical, 1 = special
+ *
+ * Sorted by moveID.
+ * Terminated with moveID == 0.
+ */
+typedef struct {
+    u16 moveID;
+    u8  category;
+} MoveCategoryOverride;
+
+/*
+ * Only moves that CHANGED category from Gen III to Gen IV are listed.
+ * Based on the user's moveset list provided.
+ */
+static const MoveCategoryOverride sMoveCategoryOverrides[] = {
+    /* Became Physical in Gen IV (were Special by type in Gen III) */
+    { 8,   0 },   /* Fire Punch - Fire type, now Physical */
+    { 86,  0 },   /* Thunderpunch - Electric type, now Physical */
+    { 127, 0 },   /* Waterfall - Water type, now Physical */
+    { 200, 0 },   /* Outrage - Dragon type, now Physical */
+    { 209, 0 },   /* Spark - Electric type, now Physical */
+    { 242, 0 },   /* Crunch - Dark type, now Physical */
+    { 303, 0 },   /* Leaf Blade - Grass type, now Physical */
+    { 337, 0 },   /* Dragon Claw - Dragon type, now Physical */
+    { 338, 0 },   /* Ice Punch - Ice type, now Physical */
+
+    /* Became Special in Gen IV (were Physical by type in Gen III) */
+    { 2,   1 },   /* Acid - Poison type, now Special */
+    { 5,   1 },   /* Petal Dance - Grass type, now Special */
+    { 13,  1 },   /* Razor Wind - Normal type, now Special */
+    { 16,  1 },   /* Gust - Flying type, now Special */
+    { 46,  1 },   /* Sonicboom - Normal type, now Special */
+    { 55,  1 },   /* Water Gun - Water type, now Special */
+    { 56,  1 },   /* Hydro Pump - Water type, now Special */
+    { 57,  1 },   /* Surf - Water type, now Special */
+    { 60,  1 },   /* Psybeam - Psychic type, now Special */
+    { 61,  1 },   /* Bubble Beam - Water type, now Special */
+    { 82,  1 },   /* Dragon Rage - Dragon type, now Special */
+    { 83,  1 },   /* Fire Spin - Fire type, now Special */
+    { 84,  1 },   /* Thundershock - Electric type, now Special */
+    { 85,  1 },   /* Thunderbolt - Electric type, now Special */
+    { 87,  1 },   /* Thunder - Electric type, now Special */
+    { 93,  1 },   /* Confusion - Psychic type, now Special */
+    { 94,  1 },   /* Psychic - Psychic type, now Special */
+    { 101, 1 },   /* Night Shade - Ghost type, now Special */
+    { 120, 1 },   /* Smog - Poison type, now Special */
+    { 124, 1 },   /* Sludge - Poison type, now Special */
+    { 126, 1 },   /* Fire Blast - Fire type, now Special */
+    { 129, 1 },   /* Swift - Normal type, now Special */
+    { 130, 1 },   /* Bubble - Water type, now Special */
+    { 134, 1 },   /* Aurora Beam - Ice type, now Special */
+    { 138, 1 },   /* Dream Eater - Psychic type, now Special */
+    { 149, 1 },   /* Psywave - Psychic type, now Special */
+    { 161, 1 },   /* Tri Attack - Normal type, now Special */
+    { 173, 1 },   /* Snore - Normal type, now Special */
+    { 177, 1 },   /* Aeroblast - Flying type, now Special */
+    { 189, 1 },   /* Mud-Slap - Ground type, now Special */
+    { 196, 1 },   /* Icy Wind - Ice type, now Special */
+    { 218, 1 },   /* Sludge Bomb - Poison type, now Special */
+    { 239, 1 },   /* Twister - Dragon type, now Special */
+    { 246, 1 },   /* Ancient Power - Rock type, now Special */
+    { 247, 1 },   /* Shadow Ball - Ghost type, now Special */
+    { 248, 1 },   /* Future Sight - Psychic type, now Special */
+    { 250, 1 },   /* Whirlpool - Water type, now Special */
+    { 257, 1 },   /* Heat Wave - Fire type, now Special */
+    { 268, 1 },   /* Zap Cannon - Electric type, now Special */
+    { 297, 1 },   /* Mist Ball - Psychic type, now Special */
+    { 304, 1 },   /* Hyper Voice - Normal type, now Special */
+    { 311, 1 },   /* Weather Ball - Normal type, now Special */
+    { 314, 1 },   /* Air Cutter - Flying type, now Special */
+    { 318, 1 },   /* Silver Wind - Bug type, now Special */
+    { 323, 1 },   /* Water Spout - Water type, now Special */
+    { 326, 1 },   /* Extrasensory - Psychic type, now Special */
+    { 329, 1 },   /* Sheer Cold - Ice type, now Special */
+    { 330, 1 },   /* Muddy Water - Water type, now Special */
+    { 341, 1 },   /* Mud Shot - Ground type, now Special */
+    { 345, 1 },   /* Magical Leaf - Grass type, now Special */
+    { 348, 1 },   /* Luster Purge - Psychic type, now Special */
+    { 351, 1 },   /* Shock Wave - Electric type, now Special */
+    { 352, 1 },   /* Water Pulse - Water type, now Special */
+    { 356, 1 },   /* Doom Desire - Steel type, now Special */
+    { 406, 1 },   /* Dragon Pulse - Dragon type, now Special */
+    { 435, 1 },   /* Dragonbreath - Dragon type, now Special */
+    { 444, 1 },   /* Signal Beam - Bug type, now Special */
+
+    /* Terminate */
+    { 0, 0 },
+};
+
+/**
+ * Look up a move in the category override table using linear search.
+ * Returns the override category if found, or 0xFF if not found.
+ */
+static u8 MoveData_GetCategoryOverride(u16 moveID) {
+    u32 i;
+    for (i = 0; sMoveCategoryOverrides[i].moveID != 0; i++) {
+        if (sMoveCategoryOverrides[i].moveID == moveID) {
+            return sMoveCategoryOverrides[i].category;
+        }
+    }
+    return 0xFF;
+}
+
+/**
+ * Determine the move category (physical/special/status).
+ *
+ * Uses Gen IV+ move-based split where each move has its own category.
+ * Moves in the override table use their explicit category.
+ * Moves not in the table fall back to the Gen III type-based split.
  *
  * @param moveID  Move index
  * @return        0 = physical, 1 = special, 2 = status
@@ -330,6 +444,7 @@ u16 MoveData_GetAnimationID(u16 moveID) {
 u8 MoveData_GetCategory(u16 moveID) {
     CommonMoveData* move;
     u8 type;
+    u8 override;
 
     move = CommonRel_GetMoveData(moveID);
     if (move == NULL) {
@@ -341,7 +456,13 @@ u8 MoveData_GetCategory(u16 moveID) {
         return 2;
     }
 
-    /* Gen III physical/special split by type */
+    /* Check Gen IV+ override table first */
+    override = MoveData_GetCategoryOverride(moveID);
+    if (override != 0xFF) {
+        return override;
+    }
+
+    /* Fall back to Gen III type-based split for moves not in override table */
     type = move->type;
     switch (type) {
         case  0: /* Normal   */
