@@ -9444,8 +9444,19 @@ typedef struct PCPortBattleRenderActor {
     f32 yaw;
     f32 scale;
     PCPortHSDArchive archive;
+    PCPortHostMotionBank motionBank;
+    HSD_JObj* liveRoot;
     u32 rootJoint;
+    u32 stanceMotion;
+    u32 attackMotion;
+    u32 damageMotion;
+    u32 activeMotion;
+    f32 motionTime;
+    f32 motionEndFrame;
+    f32 prevChecksum;
+    f32 lastChecksum;
     int loaded;
+    int motionLoaded;
 } PCPortBattleRenderActor;
 
 static int PCPort_LoadPkxRenderActor(PCPortBattleRenderActor* actor) {
@@ -9508,9 +9519,19 @@ static int PCPort_LoadPkxRenderActor(PCPortBattleRenderActor* actor) {
         actor->archive = candidate;
         actor->rootJoint = rootJoint;
         actor->loaded = 1;
+        if (PCPort_HostMotionBankLoad(fsysPath, actor->member,
+                                      &actor->motionBank, 0)) {
+            actor->motionLoaded = 1;
+        } else {
+            fprintf(stderr,
+                    "[battle-scene] motion bank unavailable %s :: %s\n",
+                    fsysPath, actor->member);
+        }
         PCPort_FreeBuffer(memberData);
-        printf("[battle-scene] actor=%s member=%s root=0x%X wrapper=0x%X\n",
-               actor->label, actor->member, actor->rootJoint, off);
+        printf("[battle-scene] actor=%s member=%s root=0x%X wrapper=0x%X "
+               "motions=%u\n",
+               actor->label, actor->member, actor->rootJoint, off,
+               actor->motionLoaded ? actor->motionBank.motionCount : 0u);
         return 1;
     }
 
@@ -9527,11 +9548,86 @@ static void PCPort_FreeBattleRenderActors(PCPortBattleRenderActor* actors,
         return;
     }
     for (i = 0; i < count; ++i) {
+        if (actors[i].liveRoot != NULL) {
+            HSD_JObjRemoveAll(actors[i].liveRoot);
+            actors[i].liveRoot = NULL;
+        }
+        if (actors[i].motionLoaded) {
+            PCPort_HostMotionBankRelease(&actors[i].motionBank);
+            actors[i].motionLoaded = 0;
+        }
         if (actors[i].loaded) {
             PCPort_HSDArchiveDestroy(&actors[i].archive);
             actors[i].loaded = 0;
         }
     }
+}
+
+static int PCPort_BattleActorSetMotion(PCPortBattleRenderActor* actor,
+                                       u32 motionIdx,
+                                       int frame,
+                                       const char* reason) {
+    if (actor == NULL || !actor->motionLoaded ||
+        motionIdx >= actor->motionBank.motionCount) {
+        return 0;
+    }
+    if (actor->liveRoot != NULL && actor->activeMotion == motionIdx) {
+        return 1;
+    }
+    if (actor->liveRoot != NULL) {
+        HSD_JObjRemoveAll(actor->liveRoot);
+        actor->liveRoot = NULL;
+    }
+    actor->motionTime = 0.0f;
+    actor->motionEndFrame = 0.0f;
+    actor->activeMotion = motionIdx;
+    actor->liveRoot = PCPort_HostMotionCreateRoot(&actor->motionBank,
+                                                  motionIdx,
+                                                  &actor->motionEndFrame);
+    if (actor->liveRoot == NULL) {
+        fprintf(stderr,
+                "[battle-anim] frame=%d actor=%s motion=%u setup=failed\n",
+                frame, actor->label, motionIdx);
+        return 0;
+    }
+    actor->prevChecksum = PCPort_HostMotionSRTChecksum(actor->liveRoot);
+    actor->lastChecksum = actor->prevChecksum;
+    printf("[battle-anim] frame=%d actor=%s member=%s motion=%u reason=%s "
+           "end=%.1f checksum=%.4f\n",
+           frame, actor->label, actor->member, motionIdx,
+           reason != NULL ? reason : "state", actor->motionEndFrame,
+           actor->lastChecksum);
+    fflush(stdout);
+    return 1;
+}
+
+static void PCPort_BattleActorStep(PCPortBattleRenderActor* actor) {
+    if (actor == NULL || actor->liveRoot == NULL || !actor->loaded) {
+        return;
+    }
+    actor->prevChecksum = actor->lastChecksum;
+    PCPort_HostMotionStepAndApply(actor->liveRoot, &actor->archive,
+                                  actor->rootJoint, &actor->motionTime,
+                                  actor->motionEndFrame,
+                                  getenv("PCPORT_BATTLE_ROOT_TRANSLATE") != NULL);
+    actor->lastChecksum = PCPort_HostMotionSRTChecksum(actor->liveRoot);
+}
+
+static void PCPort_BattleLogMotionSample(PCPortBattleRenderActor* actors,
+                                         int actorCount,
+                                         int frame,
+                                         const char* stateText) {
+    int i;
+    printf("[battle-anim-sample] frame=%d state=\"%s\"",
+           frame, stateText != NULL ? stateText : "");
+    for (i = 0; i < actorCount; ++i) {
+        f32 delta = fabsf(actors[i].lastChecksum - actors[i].prevChecksum);
+        printf(" %s{motion=%u checksum=%.4f delta=%.5f}",
+               actors[i].label, actors[i].activeMotion,
+               actors[i].lastChecksum, delta);
+    }
+    printf("\n");
+    fflush(stdout);
 }
 
 static void PCPort_BuildActorModelMatrix(const PCPortBattleRenderActor* actor,
@@ -9600,12 +9696,49 @@ static void DrawBattleArenaFloor(void) {
     }
 }
 
+static const char* PCPort_BattleStateText(int frame,
+                                          const char** outCommand,
+                                          const char** outStatus) {
+    const char* command = "FIGHT  POKEMON  BAG  RUN";
+    const char* status = "Player HP 100   Enemy HP 100";
+    const char* message;
+
+    if (frame < 90) {
+        message = "Choose a command.";
+    } else if (frame < 140) {
+        command = "SWIFT";
+        message = "Move selected: Swift -> enemy-left";
+    } else if (frame < 240) {
+        message = "Zangoose used Swift!";
+    } else if (frame < 300) {
+        status = "Player HP 100   Enemy HP 68";
+        message = "The opposing Gokulin took damage.";
+    } else if (frame < 420) {
+        status = "Player HP 100   Enemy HP 68";
+        message = "Gokulin used Table Move 213!";
+    } else if (frame < 520) {
+        status = "Player HP 79    Enemy HP 68";
+        message = "Zangoose took damage.";
+    } else {
+        status = "Player HP 79    Enemy HP 68";
+        message = "Next: command menu.";
+    }
+
+    if (outCommand != NULL) {
+        *outCommand = command;
+    }
+    if (outStatus != NULL) {
+        *outStatus = status;
+    }
+    return message;
+}
+
 static int RunBattleScene(GLFWwindow* window) {
     PCPortBattleRenderActor actors[4] = {
-        { "player-left",  "eifie",   "Eifie",   -42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
-        { "player-right", "blacky",  "Blacky",   42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
-        { "enemy-left",   "absol",   "Absol",   -42.0f, 0.0f, -30.0f,  0.0f,    6.0f },
-        { "enemy-right",  "pikachu", "Pikachu",  42.0f, 0.0f, -30.0f,  0.0f,    6.0f }
+        { "player-left",  "zangoose", "Zangoose", -42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
+        { "player-right", "zangoose", "Zangoose",  42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
+        { "enemy-left",   "gokulin",  "Gokulin",  -42.0f, 0.0f, -30.0f,  0.0f,    6.0f },
+        { "enemy-right",  "nukenin",  "Nukenin",   42.0f, 0.0f, -30.0f,  0.0f,    6.0f }
     };
     PCPortTranslatedCamera camera;
     f32 eye[3] = { 0.0f, 68.0f, 135.0f };
@@ -9621,6 +9754,10 @@ static int RunBattleScene(GLFWwindow* window) {
     if (getenv("PCPORT_BATTLE_P1") != NULL) actors[1].member = getenv("PCPORT_BATTLE_P1");
     if (getenv("PCPORT_BATTLE_E0") != NULL) actors[2].member = getenv("PCPORT_BATTLE_E0");
     if (getenv("PCPORT_BATTLE_E1") != NULL) actors[3].member = getenv("PCPORT_BATTLE_E1");
+    actors[0].stanceMotion = 0u; actors[0].attackMotion = 3u; actors[0].damageMotion = 0u;
+    actors[1].stanceMotion = 0u; actors[1].attackMotion = 3u; actors[1].damageMotion = 0u;
+    actors[2].stanceMotion = 0u; actors[2].attackMotion = 3u; actors[2].damageMotion = 0u;
+    actors[3].stanceMotion = 0u; actors[3].attackMotion = 2u; actors[3].damageMotion = 0u;
     if (scaleEnv != NULL && scaleEnv[0] != '\0') {
         f32 scale = (f32)atof(scaleEnv);
         if (scale > 0.0f) {
@@ -9666,13 +9803,25 @@ static int RunBattleScene(GLFWwindow* window) {
             return 0;
         }
     }
+    for (i = 0; i < 4; ++i) {
+        PCPort_BattleActorSetMotion(&actors[i], actors[i].stanceMotion, 0,
+                                    "stance");
+    }
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
     EnsureFontAtlas();
     printf("[battle-scene] loaded actors=4 frameCap=%d\n", frameCap);
+    printf("[battle-state] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
+           "playerMove=129 enemyMove=213 actors=zangoose,zangoose,gokulin,nukenin\n");
+    printf("[battle-state] text command=\"FIGHT  POKEMON  BAG  RUN\" "
+           "player=\"Zangoose used Swift!\" enemy=\"Gokulin used Table Move 213!\"\n");
+    fflush(stdout);
 
     for (frame = 0; ; ++frame) {
         MenuTreeStats stats;
+        const char* commandText;
+        const char* statusText;
+        const char* messageText;
         if (window != NULL && glfwWindowShouldClose(window)) {
             break;
         }
@@ -9680,6 +9829,33 @@ static int RunBattleScene(GLFWwindow* window) {
             break;
         }
         memset(&stats, 0, sizeof(stats));
+        messageText = PCPort_BattleStateText(frame, &commandText, &statusText);
+        if (frame == 140) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].attackMotion,
+                                        frame, "player-attack");
+        } else if (frame == 240) {
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].damageMotion,
+                                        frame, "enemy-damage");
+        } else if (frame == 300) {
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].attackMotion,
+                                        frame, "enemy-attack");
+        } else if (frame == 420) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].damageMotion,
+                                        frame, "player-damage");
+        } else if (frame == 520) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].stanceMotion,
+                                        frame, "command-menu");
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].stanceMotion,
+                                        frame, "command-menu");
+        }
+        for (i = 0; i < 4; ++i) {
+            PCPort_BattleActorStep(&actors[i]);
+        }
+        if (frame == 0 || frame == 1 || frame == 30 || frame == 90 ||
+            frame == 141 || frame == 180 || frame == 241 || frame == 301 ||
+            frame == 360 || frame == 421 || frame == 500) {
+            PCPort_BattleLogMotionSample(actors, 4, frame, messageText);
+        }
         VIWaitForRetrace_PC();
         ClearBackbuffer(0.03f, 0.04f, 0.06f);
         GSgfx_BeginFrame();
@@ -9704,12 +9880,16 @@ static int RunBattleScene(GLFWwindow* window) {
         }
 
         BeginMenuOverlay();
-        DrawTextScreen(42.0f, 334.0f, 13.0f, 19.0f, 238, 242, 248, 255,
-                       "FIGHT     POKEMON     BAG     RUN");
-        DrawTextScreen(42.0f, 384.0f, 11.0f, 17.0f, 220, 230, 244, 255,
-                       "Eifie used Swift!  The opposing Absol took damage.");
+        DrawSolidScreenRect(28.0f, 314.0f, 584.0f, 92.0f, 8, 14, 22, 220);
+        DrawTextScreen(42.0f, 330.0f, 12.0f, 18.0f, 238, 242, 248, 255,
+                       commandText);
+        DrawTextScreen(42.0f, 362.0f, 10.0f, 16.0f, 220, 230, 244, 255,
+                       messageText);
+        DrawTextScreen(42.0f, 386.0f, 9.0f, 14.0f, 178, 202, 225, 255,
+                       statusText);
 
-        if (getenv("PCPORT_RENDER_DEBUG") != NULL && frame == 0) {
+        if ((getenv("PCPORT_RENDER_DEBUG") != NULL ||
+             getenv("PCPORT_BATTLE_LOG_MOTION") != NULL) && frame == 0) {
             printf("[battle-scene] render stats joints=%u dobjs=%u drawn=%u "
                    "skipped=%u textured=%u materialOnly=%u\n",
                    stats.joints, stats.dobjs, stats.drawn, stats.skipped,

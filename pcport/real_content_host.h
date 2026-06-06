@@ -32,6 +32,32 @@ typedef struct {
 } PCPortHSDArchive;
 
 typedef struct {
+    PCPortHSDArchive archive;
+    u8* memberData;
+    u32 rootOff;
+    u32 animArrOff;
+    u32 motionOffs[64];
+    u32 motionCount;
+} PCPortHostMotionBank;
+
+BOOL PCPort_HostMotionBankLoad(const char* fsysPath,
+                               const char* memberName,
+                               PCPortHostMotionBank* bank,
+                               int verbose);
+void PCPort_HostMotionBankRelease(PCPortHostMotionBank* bank);
+HSD_JObj* PCPort_HostMotionCreateRoot(PCPortHostMotionBank* bank,
+                                      u32 motionIdx,
+                                      f32* outEndFrame);
+void PCPort_HostMotionRestart(HSD_JObj* root);
+void PCPort_HostMotionStepAndApply(HSD_JObj* root,
+                                   PCPortHSDArchive* beArchive,
+                                   u32 beRootJoint,
+                                   f32* timeInOut,
+                                   f32 loopLen,
+                                   BOOL applyRootTranslate);
+f32 PCPort_HostMotionSRTChecksum(HSD_JObj* root);
+
+typedef struct {
     HSD_PObj pobj;
     HSD_VtxDescList* verts;
     u8* displayList;

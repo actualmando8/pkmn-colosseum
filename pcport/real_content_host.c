@@ -2755,14 +2755,7 @@ typedef struct PCPortMotionProbeStats {
     const char* kind;
 } PCPortMotionProbeStats;
 
-typedef struct PCPortHeadlessMotionBank {
-    PCPortHSDArchive archive;
-    u8* memberData;
-    u32 rootOff;
-    u32 animArrOff;
-    u32 motionOffs[64];
-    u32 motionCount;
-} PCPortHeadlessMotionBank;
+typedef PCPortHostMotionBank PCPortHeadlessMotionBank;
 
 static BOOL PCPort_IsDataOffset(const PCPortHSDArchive* archive, u32 off,
                                 u32 size) {
@@ -3220,6 +3213,101 @@ static HSD_JObj* PCPort_HeadlessLoadJointSkeleton(HSD_Joint* joint) {
     jobj->next = PCPort_HeadlessLoadJointSkeleton(joint->next);
 
     return jobj;
+}
+
+BOOL PCPort_HostMotionBankLoad(const char* fsysPath,
+                               const char* memberName,
+                               PCPortHostMotionBank* bank,
+                               int verbose) {
+    return PCPort_HeadlessMotionBankLoad(fsysPath, memberName, bank, verbose);
+}
+
+void PCPort_HostMotionBankRelease(PCPortHostMotionBank* bank) {
+    PCPort_HeadlessMotionBankRelease(bank);
+}
+
+HSD_JObj* PCPort_HostMotionCreateRoot(PCPortHostMotionBank* bank,
+                                      u32 motionIdx,
+                                      f32* outEndFrame) {
+    HSD_Joint* rootJoint;
+    HSD_AnimJoint* animjoint;
+    HSD_JObj* root;
+
+    if (outEndFrame != NULL) {
+        *outEndFrame = 0.0f;
+    }
+    if (bank == NULL || bank->archive.storage == NULL ||
+        motionIdx >= bank->motionCount ||
+        !PCPort_IsDataOffset(&bank->archive, bank->rootOff, 4u) ||
+        !PCPort_IsDataOffset(&bank->archive, bank->motionOffs[motionIdx], 4u)) {
+        return NULL;
+    }
+
+    rootJoint = (HSD_Joint*)(bank->archive.storage + bank->rootOff);
+    animjoint = (HSD_AnimJoint*)(bank->archive.storage +
+                                 bank->motionOffs[motionIdx]);
+    root = PCPort_HeadlessLoadJointSkeleton(rootJoint);
+    if (root == NULL) {
+        return NULL;
+    }
+
+    HSD_JObjAddAnimAll(root, animjoint, NULL, NULL);
+    HSD_JObjReqAnimAll(root, 0.0f);
+    PCPort_HSDStartAnimAll(root);
+    if (outEndFrame != NULL) {
+        *outEndFrame = PCPort_CharAnimMaxEndFrame(root);
+    }
+    return root;
+}
+
+void PCPort_HostMotionRestart(HSD_JObj* root) {
+    if (root == NULL) {
+        return;
+    }
+    HSD_JObjReqAnimAll(root, 0.0f);
+    PCPort_HSDStartAnimAll(root);
+}
+
+static f32 PCPort_HostMotionSRTChecksumRec(HSD_JObj* root) {
+    f32 sum = 0.0f;
+    HSD_JObj* j;
+    for (j = root; j != NULL; j = j->next) {
+        sum += fabsf(j->translate_x) + fabsf(j->translate_y) +
+               fabsf(j->translate_z);
+        sum += fabsf(j->rotate_x) + fabsf(j->rotate_y) +
+               fabsf(j->rotate_z);
+        sum += fabsf(j->scale_x) + fabsf(j->scale_y) +
+               fabsf(j->scale_z);
+        if (j->child != NULL) {
+            sum += PCPort_HostMotionSRTChecksumRec(j->child);
+        }
+    }
+    return sum;
+}
+
+f32 PCPort_HostMotionSRTChecksum(HSD_JObj* root) {
+    return PCPort_HostMotionSRTChecksumRec(root);
+}
+
+void PCPort_HostMotionStepAndApply(HSD_JObj* root,
+                                   PCPortHSDArchive* beArchive,
+                                   u32 beRootJoint,
+                                   f32* timeInOut,
+                                   f32 loopLen,
+                                   BOOL applyRootTranslate) {
+    if (root == NULL || beArchive == NULL) {
+        return;
+    }
+    if (loopLen > 0.0f && timeInOut != NULL) {
+        *timeInOut += 1.0f;
+        if (*timeInOut >= loopLen) {
+            *timeInOut = 0.0f;
+            PCPort_HostMotionRestart(root);
+        }
+    }
+    HSD_JObjAnimAll(root);
+    PCPort_CharAnimLockstepWrite(beArchive, beRootJoint, root, 1,
+                                 applyRootTranslate);
 }
 
 static void PCPort_HeadlessMotionProbeCollectStats(
