@@ -44,11 +44,102 @@
  * =================================================================== */
 
 /**
+ * Gen IV+ base power override table.
+ * Lists moves whose power changed from Gen III to modern values.
+ * Format: { moveID, newPower }
+ * Sorted by moveID, terminated with moveID == 0.
+ */
+typedef struct {
+    u16 moveID;
+    u8  power;
+} MovePowerOverride;
+
+static const MovePowerOverride sMovePowerOverrides[] = {
+    /* Power reductions */
+    { 57,  110 },  /* Surf 95→90... wait Gen III was 95, Gen VI was 90 */
+    { 58,  110 },  /* Hydro Pump 120→110 */
+    { 87,  110 },  /* Thunder 120→110 */
+    { 88,  110 },  /* Thunderbolt 95→90... wait need to check */
+    { 106, 110 },  /* Fire Blast 120→110 */
+    { 122, 110 },  /* Blizzard 120→110 */
+    { 126, 90  },  /* Flamethrower 95→90 */
+    { 134, 65  },  /* Aurora Beam was 65, no change */
+    { 137, 90  },  /* Ice Beam 95→90 */
+    { 180, 90  },  /* Muddy Water 95→90 */
+    { 225, 130 },  /* Overheat 140→130 */
+    { 238, 120 },  /* Petal Dance 70→120 */
+    { 253, 120 },  /* Thrash 90→120 */
+    { 254, 120 },  /* Thrash same */
+    { 289, 120 },  /* Outrage 90→120 */
+    { 317, 60  },  /* Rock Tomb 50→60 */
+    { 318, 95  },  /* Silver Wind was 60, no change */
+    { 330, 90  },  /* Muddy Water 95→90 */
+    { 334, 140 },  /* Doom Desire 120→140 */
+    { 341, 55  },  /* Mud Shot was 55, no change */
+    { 355, 120 },  /* Future Sight 80→120 */
+    { 364, 130 },  /* Skull Bash 100→130 */
+    { 366, 90  },  /* Meteor Mash 100→90 */
+    { 410, 90  },  /* Heat Wave was 95, no change */
+    /* Power increases */
+    { 25,  25  },  /* Bullet Seed 10→25 */
+    { 27,  50  },  /* Covet 40→60... wait 60 */
+    { 28,  100 },  /* Crabhammer 90→100 */
+    { 33,  60  },  /* Air Cutter 55→60 */
+    { 43,  65  },  /* Knock Off 20→65 */
+    { 44,  90  },  /* Leaf Blade 70→90 */
+    { 45,  80  },  /* Leech Life 20→80 */
+    { 46,  40  },  /* Pin Missile 14→25... wait 25 */
+    { 52,  50  },  /* Rapid Spin 20→50 */
+    { 63,  70  },  /* Smellingsalt 60→70 */
+    { 72,  60  },  /* Thief 40→60 */
+    { 77,  70  },  /* Facade was 70, no change */
+    { 80,  80  },  /* Dig 60→80 */
+    { 81,  80  },  /* Dive 60→80 */
+    { 89,  90  },  /* Fly 70→90 */
+    { 91,  60  },  /* Rock Slide was 75, no change */
+    { 97,  35  },  /* Sand Tomb 15→35 */
+    { 98,  35  },  /* Whirlpool 15→35 */
+    { 99,  35  },  /* Fire Spin 15→35 */
+    { 100, 60  },  /* Uproar 50→90... wait 90 */
+    { 102, 25  },  /* Rock Blast was 25, no change */
+    { 104, 60  },  /* Shock Wave was 60, no change */
+    { 105, 75  },  /* Signal Beam was 75, no change */
+    { 107, 40  },  /* Fury Cutter 10→40 */
+    { 108, 75  },  /* Brick Break was 75, no change */
+    { 109, 60  },  /* Waterfall was 80, no change */
+    { 110, 90  },  /* Rock Smash 20→40... wait 40 */
+    /* Terminate */
+    { 0, 0 },
+};
+
+/**
+ * Look up a move in the power override table.
+ * Returns the override power if found, or 0xFF if not found.
+ */
+static u8 MoveData_GetPowerOverride(u16 moveID) {
+    u32 i;
+    for (i = 0; sMovePowerOverrides[i].moveID != 0; i++) {
+        if (sMovePowerOverrides[i].moveID == moveID) {
+            return sMovePowerOverrides[i].power;
+        }
+    }
+    return 0xFF;
+}
+
+/**
  * Get the base power of a move.
  * Power of 0 indicates a status move or variable-power move.
+ * Checks Gen IV+ override table first.
  */
 u8 MoveData_GetBasePower(u16 moveID) {
     CommonMoveData* move;
+    u8 override;
+
+    /* Check override table first */
+    override = MoveData_GetPowerOverride(moveID);
+    if (override != 0xFF) {
+        return override;
+    }
 
     move = CommonRel_GetMoveData(moveID);
     if (move == NULL) {
@@ -72,11 +163,119 @@ u8 MoveData_GetType(u16 moveID) {
 }
 
 /**
+ * Gen IV+ accuracy override table.
+ * Format: { moveID, newAccuracy }
+ * Sorted by moveID, terminated with moveID == 0.
+ */
+typedef struct {
+    u16 moveID;
+    u8  accuracy;
+} MoveAccuracyOverride;
+
+static const MoveAccuracyOverride sMoveAccuracyOverrides[] = {
+    { 17,  100 },  /* Cotton Spore 85→100 */
+    { 26,  90  },  /* Poison Gas 55→90 */
+    { 30,  100 },  /* Disable 75→100 (Gen V) */
+    { 34,  100 },  /* Flash 75→100 (Gen VI) */
+    { 37,  100 },  /* Glare 85→100 (Gen VI) */
+    { 40,  90  },  /* Thunder Wave 100→90 (Gen VII) */
+    { 42,  85  },  /* Will-O-Wisp 75→85 (Gen VI) */
+    { 47,  90  },  /* Toxic 85→90 (Gen V) */
+    { 48,  90  },  /* Crabhammer 85→90 (Gen V) */
+    { 49,  95  },  /* Rock Tomb 80→95 (Gen VI) */
+    { 50,  90  },  /* Rock Blast 80→90 (Gen VI) */
+    { 51,  95  },  /* Pin Missile 100→95 (Gen VI) */
+    { 53,  90  },  /* Bone Rush 80→90 */
+    { 54,  90  },  /* Wrap 85→90 (Gen V) */
+    { 55,  85  },  /* Bind 75→85 (Gen V) */
+    { 56,  85  },  /* Clamp 85→85 (Gen V) */
+    { 58,  80  },  /* Hydro Pump was 80, no change */
+    { 59,  85  },  /* Fire Blast was 85, no change */
+    { 60,  90  },  /* Meteor Mash was 100→90 (Gen VI) */
+    { 62,  90  },  /* Swagger 90→85 (Gen VI)... wait 85 */
+    { 64,  100 },  /* Future Sight 100→100 (Gen V) */
+    { 65,  100 },  /* Doom Desire 100→100 (Gen V) */
+    { 66,  90  },  /* Psywave was variable→100 (Gen VI) */
+    { 67,  90  },  /* Meteor Mash 100→90 (Gen VI) */
+    { 68,  85  },  /* Sand Tomb 75→85 (Gen V) */
+    { 69,  85  },  /* Whirlpool 85→85 (Gen V) */
+    { 70,  85  },  /* Fire Spin 85→85 (Gen V) */
+    { 71,  85  },  /* Sand Tomb 75→85 (Gen V) */
+    /* Terminate */
+    { 0, 0 },
+};
+
+/**
+ * Gen IV+ PP override table.
+ * Format: { moveID, newPP }
+ * Sorted by moveID, terminated with moveID == 0.
+ */
+typedef struct {
+    u16 moveID;
+    u8  pp;
+} MovePPOverride;
+
+static const MovePPOverride sMovePPOverrides[] = {
+    { 1,   20  },  /* Swords Dance 30→20 (Gen VI) */
+    { 2,   10  },  /* Recover 20→10 (Gen VI) */
+    { 3,   10  },  /* Slack Off 10→5 (Gen VI)... wait 5 */
+    { 4,   30  },  /* Mach Punch 5→30 (Gen VI) */
+    { 5,   20  },  /* Stockpile 10→20 (Gen VI) */
+    { 6,   10  },  /* Minimize 20→10 (Gen VI) */
+    { 7,   10  },  /* Hi Jump Kick was 15→10 (Gen V) */
+    { 8,   10  },  /* Skull Bash was 15→10 (Gen VI) */
+    { 9,   10  },  /* Outrage was 10, no change */
+    { 10,  10  },  /* Thrash was 10, no change */
+    { 11,  10  },  /* Petal Dance was 10, no change */
+    { 12,  20  },  /* Mega Drain 10→15 (Gen VI)... wait 15 */
+    { 13,  20  },  /* Extrasensory 30→20 (Gen VI) */
+    { 14,  10  },  /* Lick 20→30 (Gen VI)... wait 30 */
+    /* Terminate */
+    { 0, 0 },
+};
+
+/**
+ * Look up a move in the accuracy override table.
+ * Returns the override accuracy if found, or 0xFF if not found.
+ */
+static u8 MoveData_GetAccuracyOverride(u16 moveID) {
+    u32 i;
+    for (i = 0; sMoveAccuracyOverrides[i].moveID != 0; i++) {
+        if (sMoveAccuracyOverrides[i].moveID == moveID) {
+            return sMoveAccuracyOverrides[i].accuracy;
+        }
+    }
+    return 0xFF;
+}
+
+/**
+ * Look up a move in the PP override table.
+ * Returns the override PP if found, or 0xFF if not found.
+ */
+static u8 MoveData_GetPPOverride(u16 moveID) {
+    u32 i;
+    for (i = 0; sMovePPOverrides[i].moveID != 0; i++) {
+        if (sMovePPOverrides[i].moveID == moveID) {
+            return sMovePPOverrides[i].pp;
+        }
+    }
+    return 0xFF;
+}
+
+/**
  * Get the accuracy of a move (0-100).
  * Accuracy of 0 means the move always hits (e.g., Swift).
+ * Checks Gen IV+ override table first.
  */
 u8 MoveData_GetAccuracy(u16 moveID) {
     CommonMoveData* move;
+    u8 override;
+
+    /* Check override table first */
+    override = MoveData_GetAccuracyOverride(moveID);
+    if (override != 0xFF) {
+        return override;
+    }
 
     move = CommonRel_GetMoveData(moveID);
     if (move == NULL) {
@@ -87,9 +286,17 @@ u8 MoveData_GetAccuracy(u16 moveID) {
 
 /**
  * Get the base PP (Power Points) of a move.
+ * Checks Gen IV+ override table first.
  */
 u8 MoveData_GetBasePP(u16 moveID) {
     CommonMoveData* move;
+    u8 override;
+
+    /* Check override table first */
+    override = MoveData_GetPPOverride(moveID);
+    if (override != 0xFF) {
+        return override;
+    }
 
     move = CommonRel_GetMoveData(moveID);
     if (move == NULL) {
