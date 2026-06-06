@@ -159,3 +159,15 @@ confirmed, then fix batch enumeration (was probed=0) for the all-archive sweep.
   **24 confirmed=no note=animates-no-locomotion**. This does not overturn the prior
   relax-fix character verification; %8 was fed the counts and asked to resolve or
   explicitly classify these rows without regressing pkx coverage.
+
+## 2026-06-06 13:02 HST — NEW PROBE BATCH PASS
+- `%8` rebuilt the headless probe as
+  `build_pc/pcport_motion_probe_headless_meshdump_1780750851.exe`; `_runbatch.ps1`
+  now points at that executable and was run through native PowerShell.
+- Final batch output from `build_pc/_batch_out.txt`: **149/149 character members
+  confirmed=yes** (`field_common` probed=2/confirmed=2, `people_archive`
+  probed=147/confirmed=147; `chara_big`/`chara_small` remain correctly skipped as
+  non-animated assets).
+- Pokémon batch output: **527/527 pkx rows confirmed=yes**. `pkx_egg.fsys :: egg`
+  is now classified as confirmed under the placeholder policy, so there are no
+  remaining pkx `confirmed=no` rows.

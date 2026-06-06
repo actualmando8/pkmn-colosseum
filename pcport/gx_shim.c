@@ -25,6 +25,7 @@
 
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifndef GL_CLAMP_TO_EDGE
@@ -33,6 +34,25 @@
 
 #ifndef GL_MIRRORED_REPEAT
 #define GL_MIRRORED_REPEAT 0x8370
+#endif
+
+#ifndef GL_FRAMEBUFFER
+#define GL_FRAMEBUFFER 0x8D40
+#endif
+#ifndef GL_RENDERBUFFER
+#define GL_RENDERBUFFER 0x8D41
+#endif
+#ifndef GL_COLOR_ATTACHMENT0
+#define GL_COLOR_ATTACHMENT0 0x8CE0
+#endif
+#ifndef GL_DEPTH_STENCIL_ATTACHMENT
+#define GL_DEPTH_STENCIL_ATTACHMENT 0x821A
+#endif
+#ifndef GL_DEPTH24_STENCIL8
+#define GL_DEPTH24_STENCIL8 0x88F0
+#endif
+#ifndef GL_FRAMEBUFFER_COMPLETE
+#define GL_FRAMEBUFFER_COMPLETE 0x8CD5
 #endif
 
 /* =========================================================================
@@ -94,6 +114,35 @@ static f32 g_nrmMtx[10][3][4];
 /** Current viewport parameters */
 static f32 g_viewportX, g_viewportY, g_viewportW, g_viewportH;
 static f32 g_viewportNear, g_viewportFar;
+
+static GLuint g_offscreenFbo = 0;
+static GLuint g_offscreenColorTex = 0;
+static GLuint g_offscreenDepthRbo = 0;
+static u32 g_offscreenWidth = 0;
+static u32 g_offscreenHeight = 0;
+static int g_offscreenEnabled = 0;
+
+typedef void   (APIENTRY *PFNGLGENFRAMEBUFFERSPROC)(GLsizei, GLuint*);
+typedef void   (APIENTRY *PFNGLBINDFRAMEBUFFERPROC)(GLenum, GLuint);
+typedef void   (APIENTRY *PFNGLDELETEFRAMEBUFFERSPROC)(GLsizei, const GLuint*);
+typedef void   (APIENTRY *PFNGLFRAMEBUFFERTEXTURE2DPROC)(GLenum, GLenum, GLenum, GLuint, GLint);
+typedef void   (APIENTRY *PFNGLGENRENDERBUFFERSPROC)(GLsizei, GLuint*);
+typedef void   (APIENTRY *PFNGLBINDRENDERBUFFERPROC)(GLenum, GLuint);
+typedef void   (APIENTRY *PFNGLDELETERENDERBUFFERSPROC)(GLsizei, const GLuint*);
+typedef void   (APIENTRY *PFNGLRENDERBUFFERSTORAGEPROC)(GLenum, GLenum, GLsizei, GLsizei);
+typedef void   (APIENTRY *PFNGLFRAMEBUFFERRENDERBUFFERPROC)(GLenum, GLenum, GLenum, GLuint);
+typedef GLenum (APIENTRY *PFNGLCHECKFRAMEBUFFERSTATUSPROC)(GLenum);
+
+static PFNGLGENFRAMEBUFFERSPROC g_glGenFramebuffers = NULL;
+static PFNGLBINDFRAMEBUFFERPROC g_glBindFramebuffer = NULL;
+static PFNGLDELETEFRAMEBUFFERSPROC g_glDeleteFramebuffers = NULL;
+static PFNGLFRAMEBUFFERTEXTURE2DPROC g_glFramebufferTexture2D = NULL;
+static PFNGLGENRENDERBUFFERSPROC g_glGenRenderbuffers = NULL;
+static PFNGLBINDRENDERBUFFERPROC g_glBindRenderbuffer = NULL;
+static PFNGLDELETERENDERBUFFERSPROC g_glDeleteRenderbuffers = NULL;
+static PFNGLRENDERBUFFERSTORAGEPROC g_glRenderbufferStorage = NULL;
+static PFNGLFRAMEBUFFERRENDERBUFFERPROC g_glFramebufferRenderbuffer = NULL;
+static PFNGLCHECKFRAMEBUFFERSTATUSPROC g_glCheckFramebufferStatus = NULL;
 
 /** Scissor state */
 static u32 g_scissorX, g_scissorY, g_scissorW, g_scissorH;
@@ -408,6 +457,76 @@ static void GXApplyModelViewMatrix(const Mtx mtx) {
     GXLoadMatrixMode(GL_MODELVIEW, expanded);
 }
 
+static void GXDestroyOffscreenRenderTarget(void) {
+    if (g_glDeleteRenderbuffers == NULL ||
+        g_glDeleteFramebuffers == NULL) {
+        g_offscreenEnabled = 0;
+        g_offscreenWidth = 0u;
+        g_offscreenHeight = 0u;
+        return;
+    }
+
+    if (g_offscreenDepthRbo != 0u) {
+        g_glDeleteRenderbuffers(1, &g_offscreenDepthRbo);
+        g_offscreenDepthRbo = 0u;
+    }
+    if (g_offscreenColorTex != 0u) {
+        glDeleteTextures(1, &g_offscreenColorTex);
+        g_offscreenColorTex = 0u;
+    }
+    if (g_offscreenFbo != 0u) {
+        g_glDeleteFramebuffers(1, &g_offscreenFbo);
+        g_offscreenFbo = 0u;
+    }
+    g_offscreenEnabled = 0;
+    g_offscreenWidth = 0u;
+    g_offscreenHeight = 0u;
+}
+
+static void GXBindOffscreenRenderTarget(void) {
+    if (!g_offscreenEnabled || g_offscreenFbo == 0u) {
+        return;
+    }
+
+    if (g_glBindFramebuffer == NULL) {
+        return;
+    }
+
+    g_glBindFramebuffer(GL_FRAMEBUFFER, g_offscreenFbo);
+    glViewport(0, 0, (GLsizei)g_offscreenWidth, (GLsizei)g_offscreenHeight);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+}
+
+static int GXLoadOffscreenGLFunctions(void) {
+    if (g_glGenFramebuffers != NULL) {
+        return 1;
+    }
+
+#define GX_LOAD_GL_PROC(name) \
+    do { \
+        g_##name = (void*)glfwGetProcAddress(#name); \
+        if (g_##name == NULL) { \
+            fprintf(stderr, "[gx_shim] missing GL proc %s\n", #name); \
+            return 0; \
+        } \
+    } while (0)
+
+    GX_LOAD_GL_PROC(glGenFramebuffers);
+    GX_LOAD_GL_PROC(glBindFramebuffer);
+    GX_LOAD_GL_PROC(glDeleteFramebuffers);
+    GX_LOAD_GL_PROC(glFramebufferTexture2D);
+    GX_LOAD_GL_PROC(glGenRenderbuffers);
+    GX_LOAD_GL_PROC(glBindRenderbuffer);
+    GX_LOAD_GL_PROC(glDeleteRenderbuffers);
+    GX_LOAD_GL_PROC(glRenderbufferStorage);
+    GX_LOAD_GL_PROC(glFramebufferRenderbuffer);
+    GX_LOAD_GL_PROC(glCheckFramebufferStatus);
+
+#undef GX_LOAD_GL_PROC
+    return 1;
+}
+
 static GXHostTexObj* GXGetHostTexObj(GXTexObj* obj) {
     return (GXHostTexObj*)(void*)obj;
 }
@@ -470,8 +589,14 @@ static GLenum GXTranslateTevModeToEnvMode(GXTevMode mode) {
 
 void GXInit(void* base, u32 size) {
     GLFWwindow* window;
+    const char* headlessEnv;
+    int glTrace;
 
     (void)base; (void)size;
+    glTrace = (getenv("PCPORT_GL_TRACE") != NULL);
+    if (glTrace) {
+        fprintf(stderr, "[gx_shim] GXInit:start\n");
+    }
 
     memset(&g_tevState, 0, sizeof(g_tevState));
     memset(g_vtxDescState, 0, sizeof(g_vtxDescState));
@@ -505,6 +630,13 @@ void GXInit(void* base, u32 size) {
     g_numTexGens = 0;
     g_tevState.numTexGens = 0;
     g_tevState.stages[0].tevMode = GX_PASSCLR;
+    headlessEnv = getenv("PCPORT_OFFSCREEN");
+    if (headlessEnv == NULL || headlessEnv[0] == '\0' || headlessEnv[0] == '0') {
+        headlessEnv = getenv("PCPORT_HEADLESS_GL");
+    }
+    if (headlessEnv == NULL || headlessEnv[0] == '\0' || headlessEnv[0] == '0') {
+        headlessEnv = getenv("PCPORT_DUMP");
+    }
 
     /* Texture SRT matrix store: default to identity for all 8 slots. */
     {
@@ -556,10 +688,17 @@ void GXInit(void* base, u32 size) {
         glfwMakeContextCurrent(window);
     }
 
-    /* Load GLAD + initialize the TEV->GLSL shader path now that the GL context
-     * is current. All modern-GL usage stays inside gx_tev.c; this is a no-op on
-     * subsequent GXInit calls. If it fails, GXSubmitVertices falls back to the
-     * legacy fixed-function draw below. */
+    /* Load the offscreen framebuffer entry points if the headless path is
+     * active. The legacy fixed-function path remains available for the default
+     * windowed case. */
+    if (headlessEnv != NULL && headlessEnv[0] != '\0' && headlessEnv[0] != '0') {
+        GXLoadOffscreenGLFunctions();
+    }
+
+    /* Initialize the TEV->GLSL shader path now that the GL context is current.
+     * All modern-GL usage stays inside gx_tev.c; this is a no-op on subsequent
+     * GXInit calls. If it fails, GXSubmitVertices falls back to the legacy
+     * fixed-function draw below. */
     g_tevPathReady = gx_tev_ensure_loaded();
 
     glEnable(GL_DEPTH_TEST);
@@ -579,7 +718,18 @@ void GXInit(void* base, u32 size) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    if (headlessEnv != NULL && headlessEnv[0] != '\0' && headlessEnv[0] != '0') {
+        if (glTrace) {
+            fprintf(stderr, "[gx_shim] GXInit:enable-offscreen\n");
+        }
+        GXHostEnableOffscreenRender((u32)PCPort_GetVideoWidth(),
+                                    (u32)PCPort_GetVideoHeight());
+    }
+
     printf("[gx_shim] GXInit configured host GL defaults\n");
+    if (glTrace) {
+        fprintf(stderr, "[gx_shim] GXInit:done\n");
+    }
 }
 
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
@@ -824,6 +974,81 @@ void GXHostSetTexMatrix(u32 slot, const f32 m[3][4]) {
         g_texMatrixStore[slot][2][2] = 1.0f;
     }
     gx_tev_set_tex_matrix(slot, g_texMatrixStore[slot]);
+}
+
+void GXHostEnableOffscreenRender(u32 width, u32 height) {
+    GLuint colorTex;
+    GLuint depthRbo;
+    GLuint fbo;
+    GLenum status;
+
+    if (width == 0u || height == 0u) {
+        return;
+    }
+
+    GXEnsureCurrentContext();
+
+    if (g_offscreenEnabled &&
+        g_offscreenWidth == width &&
+        g_offscreenHeight == height) {
+        GXBindOffscreenRenderTarget();
+        return;
+    }
+
+    GXDestroyOffscreenRenderTarget();
+
+    if (g_glGenFramebuffers == NULL || g_glBindFramebuffer == NULL ||
+        g_glDeleteFramebuffers == NULL || g_glFramebufferTexture2D == NULL ||
+        g_glGenRenderbuffers == NULL || g_glBindRenderbuffer == NULL ||
+        g_glDeleteRenderbuffers == NULL || g_glRenderbufferStorage == NULL ||
+        g_glFramebufferRenderbuffer == NULL || g_glCheckFramebufferStatus == NULL) {
+        fprintf(stderr, "[gx_shim] offscreen GL functions unavailable\n");
+        return;
+    }
+
+    g_glGenFramebuffers(1, &fbo);
+    g_glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    glGenTextures(1, &colorTex);
+    glBindTexture(GL_TEXTURE_2D, colorTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, (GLsizei)width, (GLsizei)height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    g_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             GL_TEXTURE_2D, colorTex, 0);
+
+    g_glGenRenderbuffers(1, &depthRbo);
+    g_glBindRenderbuffer(GL_RENDERBUFFER, depthRbo);
+    g_glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+                            (GLsizei)width, (GLsizei)height);
+    g_glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                                GL_RENDERBUFFER, depthRbo);
+
+    status = g_glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        fprintf(stderr, "[gx_shim] offscreen framebuffer incomplete: 0x%X\n",
+                (unsigned)status);
+        g_glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        g_glDeleteRenderbuffers(1, &depthRbo);
+        glDeleteTextures(1, &colorTex);
+        return;
+    }
+
+    g_offscreenFbo = fbo;
+    g_offscreenColorTex = colorTex;
+    g_offscreenDepthRbo = depthRbo;
+    g_offscreenWidth = width;
+    g_offscreenHeight = height;
+    g_offscreenEnabled = 1;
+
+    GXBindOffscreenRenderTarget();
+    if (getenv("PCPORT_GL_TRACE") != NULL) {
+        fprintf(stderr, "[gx_shim] offscreen render target enabled %ux%u\n",
+                (unsigned)width, (unsigned)height);
+    }
 }
 
 /* =========================================================================
@@ -1285,7 +1510,7 @@ static int GXUploadHostTexture(GXTexObj* obj,
     GXEnsureCurrentContext();
     hostObj = GXGetHostTexObj(obj);
 
-    glGenTextures(1, &hostObj->glTexId);
+    glGenTextures(1, (GLuint*)&hostObj->glTexId);
     if (hostObj->glTexId == 0) {
         memset(obj, 0, sizeof(*obj));
         return 0;
@@ -2162,7 +2387,9 @@ void GXCopyDisp(void* dest, GXBool clear) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    glfwSwapBuffers(window);
+    if (!g_offscreenEnabled) {
+        glfwSwapBuffers(window);
+    }
 
     if (g_drawDoneCallback != (GXDrawDoneCallback)0) {
         g_drawDoneCallback();
@@ -2172,7 +2399,9 @@ void GXCopyDisp(void* dest, GXBool clear) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    glfwPollEvents();
+    if (!g_offscreenEnabled) {
+        glfwPollEvents();
+    }
 }
 
 void GXSetCopyFilter(GXBool aa, u8 sample_pattern[12][2],

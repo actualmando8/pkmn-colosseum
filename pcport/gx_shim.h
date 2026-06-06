@@ -1088,6 +1088,13 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func,
  */
 void GXHostSetTexMatrix(u32 slot, const f32 m[3][4]);
 
+/**
+ * GXHostEnableOffscreenRender -- Host-only offscreen framebuffer path.
+ * When enabled, GX draws into a texture-backed FBO instead of the default
+ * window framebuffer. This is used for headless / PCPORT_DUMP capture.
+ */
+void GXHostEnableOffscreenRender(u32 width, u32 height);
+
 #ifdef __cplusplus
 }
 #endif

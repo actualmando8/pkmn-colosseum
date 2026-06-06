@@ -4776,15 +4776,36 @@ static int HasArg(int argc, char** argv, const char* arg) {
     return 0;
 }
 
+static int IsEnvEnabled(const char* name) {
+    const char* value = getenv(name);
+
+    return value != NULL && value[0] != '\0' && value[0] != '0';
+}
+
+static void TraceGLStage(const char* stage) {
+    if (IsEnvEnabled("PCPORT_GL_TRACE")) {
+        fprintf(stderr, "[pcport_gl] %s\n", stage);
+    }
+}
+
 static GLFWwindow* CreateSmokeWindow(void) {
     GLFWwindow* window;
+    int offscreen = IsEnvEnabled("PCPORT_OFFSCREEN") ||
+                    IsEnvEnabled("PCPORT_HEADLESS_GL") ||
+                    getenv("PCPORT_DUMP") != NULL;
 
+    TraceGLStage("glfwInit:start");
     if (!glfwInit()) {
         fprintf(stderr, "[pcport_bootstrap] glfwInit failed\n");
         return NULL;
     }
+    TraceGLStage("glfwInit:done");
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    if (offscreen) {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    }
+    TraceGLStage("glfwCreateWindow:start");
 
     window = glfwCreateWindow(PCPORT_WINDOW_WIDTH,
                               PCPORT_WINDOW_HEIGHT,
@@ -4796,9 +4817,15 @@ static GLFWwindow* CreateSmokeWindow(void) {
         glfwTerminate();
         return NULL;
     }
+    TraceGLStage("glfwCreateWindow:done");
 
+    TraceGLStage("glfwMakeContextCurrent:start");
     glfwMakeContextCurrent(window);
+    TraceGLStage("glfwMakeContextCurrent:done");
     glfwSwapInterval(1);
+    if (offscreen) {
+        printf("[pcport_bootstrap] headless GL window created (hidden)\n");
+    }
     return window;
 }
 
@@ -9471,7 +9498,7 @@ int main(int argc, char** argv) {
         if (batchFrames != NULL) {
             printf("[pcport_bootstrap] MOTION_BATCH_PROBE requested\n");
             fflush(stdout);
-            PCPort_MotionBatchProbe(atoi(batchFrames));
+            PCPort_HeadlessMotionBatchProbe(atoi(batchFrames));
             return 0;
         }
         if (motionFrames != NULL || bankFrames != NULL) {
@@ -9569,7 +9596,9 @@ int main(int argc, char** argv) {
         goto cleanup;
     }
 
+    TraceGLStage("GXInit:main-call:start");
     GXInit(NULL, 0);
+    TraceGLStage("GXInit:main-call:done");
 
     CurrTvMode = 2;
     tvFormat = VIGetTvFormat();

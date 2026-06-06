@@ -125,7 +125,13 @@ void fn_8019C690(u32 black, u32 unused) {
 }
 
 void fn_801C021C(void) {
+    if (getenv("PCPORT_GL_TRACE") != NULL) {
+        fprintf(stderr, "[gs_gfx_host_support] GXInit:start\n");
+    }
     GXInit(NULL, 0);
+    if (getenv("PCPORT_GL_TRACE") != NULL) {
+        fprintf(stderr, "[gs_gfx_host_support] GXInit:done\n");
+    }
 }
 
 void fn_801C01C8(void* callback) {

@@ -10,6 +10,8 @@ int main(int argc, char** argv) {
     const char* charFrames = getenv("PCPORT_CHARANIM_PROBE");
     const char* animDump = getenv("PCPORT_ANIM_DUMP");
     const char* animDumpFrames = getenv("PCPORT_ANIM_DUMP_FRAMES");
+    const char* meshDump = getenv("PCPORT_MESH_DUMP");
+    const char* meshDumpFrames = getenv("PCPORT_MESH_DUMP_FRAMES");
     const char* fsys = getenv("PCPORT_SWIZ_ARCHIVE");
     const char* member = getenv("PCPORT_SWIZ_MEMBER");
     int dumpMotionIdx;
@@ -37,6 +39,13 @@ int main(int argc, char** argv) {
         dumpFrames = (animDumpFrames != NULL && animDumpFrames[0] != '\0') ?
                      atoi(animDumpFrames) : 24;
         PCPort_AnimDump(fsys, member, dumpMotionIdx, dumpFrames);
+        return 0;
+    }
+    if (meshDump != NULL && meshDump[0] != '\0') {
+        dumpMotionIdx = atoi(meshDump);
+        dumpFrames = (meshDumpFrames != NULL && meshDumpFrames[0] != '\0') ?
+                     atoi(meshDumpFrames) : 24;
+        PCPort_MeshDump(fsys, member, dumpMotionIdx, dumpFrames);
         return 0;
     }
     if (motionFrames != NULL) {

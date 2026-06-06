@@ -4,8 +4,10 @@
 #include "hsd/hsd_jobj.h"
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_mobj.h"
+#include "hsd/hsd_dobj.h"
 
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -3637,6 +3639,7 @@ static int PCPort_SelectLocomotionSuggestionFromStats(
     u32 motionCount,
     PCPortLocomotionSuggestion* out) {
     PCPortMotionCandidate cyclic[64];
+    PCPortMotionCandidate varying[64];
     int count = 0;
     u32 i;
     f32 maxCyclicEndFrame = 0.0f;
@@ -3685,8 +3688,48 @@ static int PCPort_SelectLocomotionSuggestionFromStats(
         }
     }
     if (count < 3) {
+        int varyingCount = 0;
         out->varyingCyclicCount = (u32)count;
-        return 0;
+        for (i = 0u; i < motionCount && i < 64u; ++i) {
+            if (!stats[i].valid || stats[i].varyingFrames <= 0) {
+                continue;
+            }
+            varying[varyingCount].motionIdx = (int)stats[i].motionIdx;
+            varying[varyingCount].energy = PCPort_MotionProbeEnergy(&stats[i]);
+            ++varyingCount;
+        }
+        if (varyingCount < 3) {
+            return 0;
+        }
+        PCPort_SortMotionCandidates(varying, varyingCount);
+        out->idle = varying[0].motionIdx;
+        out->run = varying[varyingCount - 1].motionIdx;
+        out->walk = varying[(varyingCount > 2) ? 1 : (varyingCount - 1)].motionIdx;
+        {
+            const PCPortMotionProbeStats* idle =
+                PCPort_FindMotionProbeStats(stats, motionCount, out->idle);
+            const PCPortMotionProbeStats* walk =
+                PCPort_FindMotionProbeStats(stats, motionCount, out->walk);
+            const PCPortMotionProbeStats* run =
+                PCPort_FindMotionProbeStats(stats, motionCount, out->run);
+            out->idleConfirmed = idle != NULL && idle->valid &&
+                                 idle->varyingFrames > 0;
+            out->walkConfirmed = walk != NULL && walk->valid &&
+                                 walk->varyingFrames > 0;
+            out->runConfirmed = run != NULL && run->valid &&
+                                run->varyingFrames > 0;
+            out->allConfirmed = out->idleConfirmed &&
+                                out->walkConfirmed &&
+                                out->runConfirmed &&
+                                out->idle != out->walk &&
+                                out->idle != out->run &&
+                                out->walk != out->run;
+            out->idleEnergy = PCPort_MotionProbeEnergy(idle);
+            out->walkEnergy = PCPort_MotionProbeEnergy(walk);
+            out->runEnergy = PCPort_MotionProbeEnergy(run);
+        }
+        out->valid = 1;
+        return 1;
     }
 
     PCPort_SortMotionCandidates(cyclic, count);
@@ -4315,6 +4358,397 @@ void PCPort_AnimDump(const char* fsysPath, const char* memberName,
     PCPort_HeadlessMotionBankRelease(&bank);
 }
 
+static void PCPort_AnimDumpTransformPoint(const PCPortAnimDumpTransform* t,
+                                          const f32 in[3],
+                                          f32 out[3]) {
+    if (t == NULL || in == NULL || out == NULL) {
+        return;
+    }
+    out[0] = (t->basis[0][0] * in[0]) + (t->basis[0][1] * in[1]) +
+             (t->basis[0][2] * in[2]) + t->pos[0];
+    out[1] = (t->basis[1][0] * in[0]) + (t->basis[1][1] * in[1]) +
+             (t->basis[1][2] * in[2]) + t->pos[1];
+    out[2] = (t->basis[2][0] * in[0]) + (t->basis[2][1] * in[1]) +
+             (t->basis[2][2] * in[2]) + t->pos[2];
+}
+
+static const char* PCPort_MeshDumpPrimitiveName(u8 opcode) {
+    switch (opcode & 0xF8u) {
+    case 0x80u: return "quads";
+    case 0x90u: return "triangles";
+    case 0x98u: return "triangle_strip";
+    case 0xA0u: return "triangle_fan";
+    case 0xA8u: return "lines";
+    case 0xB0u: return "line_strip";
+    case 0xB8u: return "points";
+    default:    return "triangles";
+    }
+}
+
+static HSD_JObj* PCPort_MeshDumpLoadJoint(HSD_Joint* joint) {
+    HSD_JObj* jobj;
+    HSD_JObj* child;
+
+    if (joint == NULL) {
+        return NULL;
+    }
+
+    jobj = HSD_JObjAlloc();
+    if (jobj == NULL) {
+        return NULL;
+    }
+
+    jobj->flags = joint->flags;
+    jobj->rotate_x = joint->rotation_x;
+    jobj->rotate_y = joint->rotation_y;
+    jobj->rotate_z = joint->rotation_z;
+    jobj->scale_x = joint->scale_x;
+    jobj->scale_y = joint->scale_y;
+    jobj->scale_z = joint->scale_z;
+    jobj->translate_x = joint->position_x;
+    jobj->translate_y = joint->position_y;
+    jobj->translate_z = joint->position_z;
+
+    if (joint->u.dobjdesc != NULL) {
+        jobj->u.dobj = HSD_DObjLoadDesc(joint->u.dobjdesc);
+    }
+    jobj->child = PCPort_MeshDumpLoadJoint(joint->child);
+    for (child = jobj->child; child != NULL; child = child->next) {
+        child->parent = jobj;
+    }
+    jobj->next = PCPort_MeshDumpLoadJoint(joint->next);
+    return jobj;
+}
+
+static const HSD_VtxDescList* PCPort_MeshDumpFindVtxDesc(
+    const HSD_PObj* pobj,
+    u32 attr) {
+    const HSD_VtxDescList* v;
+
+    if (pobj == NULL || pobj->verts == NULL) {
+        return NULL;
+    }
+    for (v = pobj->verts; v->attr != GX_VA_NULL; ++v) {
+        if (v->attr == attr) {
+            return v;
+        }
+    }
+    return NULL;
+}
+
+static void PCPort_MeshDumpCountObjects(HSD_JObj* joint,
+                                        int* outDObjCount,
+                                        int* outPObjCount) {
+    HSD_DObj* dobj;
+
+    if (joint == NULL) {
+        return;
+    }
+    if (joint->u.dobj != NULL && outDObjCount != NULL) {
+        ++(*outDObjCount);
+        for (dobj = joint->u.dobj; dobj != NULL; dobj = dobj->next) {
+            HSD_PObj* pobj;
+            for (pobj = dobj->pobj; pobj != NULL; pobj = pobj->next) {
+                if (outPObjCount != NULL) {
+                    ++(*outPObjCount);
+                }
+            }
+        }
+    }
+    if (joint->child != NULL) {
+        PCPort_MeshDumpCountObjects(joint->child, outDObjCount, outPObjCount);
+    }
+    if (joint->next != NULL) {
+        PCPort_MeshDumpCountObjects(joint->next, outDObjCount, outPObjCount);
+    }
+}
+
+static BOOL PCPort_MeshDumpReadPosition(const HSD_VtxDescList* posDesc,
+                                        u32 index,
+                                        f32 out[3]) {
+    const f32* src;
+
+    if (posDesc == NULL || posDesc->vertex == NULL || out == NULL) {
+        return FALSE;
+    }
+    src = (const f32*)((const u8*)posDesc->vertex + ((size_t)index * posDesc->stride));
+    out[0] = src[0];
+    out[1] = src[1];
+    out[2] = (posDesc->comp_cnt == GX_POS_XYZ) ? src[2] : 0.0f;
+    return TRUE;
+}
+
+static BOOL PCPort_MeshDumpWritePObjJson(
+    FILE* out,
+    const HSD_PObj* pobj,
+    const PCPortAnimDumpTransform* world,
+    u32 jointId,
+    int* meshCount) {
+    const HSD_VtxDescList* posDesc;
+    const HSD_VtxDescList* v;
+    const u8* cursor;
+    const u8* end;
+    int primitiveCount;
+
+    if (out == NULL || pobj == NULL || meshCount == NULL) {
+        return FALSE;
+    }
+    posDesc = PCPort_MeshDumpFindVtxDesc(pobj, GX_VA_POS);
+    if (posDesc == NULL || pobj->display == NULL || pobj->n_display == 0u) {
+        if (getenv("PCPORT_MESH_DEBUG") != NULL) {
+            fprintf(stdout,
+                    "[mesh-dump-debug] joint=%u posDesc=%p display=%p n_display=%u pobjFlags=0x%X\n",
+                    jointId, (const void*)posDesc, (const void*)pobj->display,
+                    (u32)pobj->n_display, (u32)pobj->flags);
+            fflush(stdout);
+        }
+        return FALSE;
+    }
+
+    cursor = pobj->display;
+    end = cursor + pobj->n_display;
+    if (*meshCount > 0) {
+        fputs(",\n", out);
+    }
+    fprintf(out,
+            "      {\"jointId\":%u,\"pobjFlags\":%u,\"primitives\":[",
+            jointId, (u32)pobj->flags);
+
+    primitiveCount = 0;
+    while (cursor < end) {
+        u8 opcode;
+        u16 vertexCount;
+        u32 i;
+        if ((u32)(end - cursor) < 3u) {
+            break;
+        }
+        if (cursor[0] == 0u && cursor[1] == 0u && cursor[2] == 0u) {
+            break;
+        }
+        if (cursor[0] == 0u) {
+            cursor += 1u;
+            continue;
+        }
+
+        opcode = cursor[0];
+        ++cursor;
+        vertexCount = (u16)(((u16)cursor[0] << 8) | cursor[1]);
+        cursor += 2;
+        if (vertexCount == 0u) {
+            return FALSE;
+        }
+
+        if (primitiveCount > 0) {
+            fputs(",", out);
+        }
+        fprintf(out, "{\"opcode\":%u,\"kind\":\"%s\",\"vertices\":[",
+                (u32)opcode, PCPort_MeshDumpPrimitiveName(opcode));
+
+        for (i = 0u; i < vertexCount; ++i) {
+            u32 posIndex = 0u;
+            f32 localPos[3];
+            f32 worldPos[3];
+
+            for (v = pobj->verts; v->attr != GX_VA_NULL; ++v) {
+                int indexSize;
+                u32 index;
+
+                if (v->attr <= GX_VA_TEX7MTXIDX) {
+                    if ((u32)(end - cursor) < 1u) {
+                        return FALSE;
+                    }
+                    cursor += 1u;
+                    continue;
+                }
+
+                indexSize = GetIndexByteCount(v->attr_type);
+                if (indexSize == 0 || (u32)(end - cursor) < (u32)indexSize) {
+                    return FALSE;
+                }
+                if (indexSize == 1) {
+                    index = cursor[0];
+                } else {
+                    index = (u32)(((u16)cursor[0] << 8) | cursor[1]);
+                }
+                cursor += (u32)indexSize;
+
+                if (v->attr == GX_VA_POS) {
+                    posIndex = index;
+                }
+            }
+
+            if (!PCPort_MeshDumpReadPosition(posDesc, posIndex, localPos)) {
+                return FALSE;
+            }
+            PCPort_AnimDumpTransformPoint(world, localPos, worldPos);
+            if (i > 0u) {
+                fputs(",", out);
+            }
+            fprintf(out, "{\"x\":%.6f,\"y\":%.6f,\"z\":%.6f}",
+                    worldPos[0], worldPos[1], worldPos[2]);
+        }
+
+        fputs("]}", out);
+        ++primitiveCount;
+    }
+
+    fputs("]}", out);
+    if (getenv("PCPORT_MESH_DEBUG") != NULL) {
+        fprintf(stdout,
+                "[mesh-dump-debug] joint=%u primitives=%d displayBytes=%u\n",
+                jointId, primitiveCount, (u32)pobj->n_display);
+        fflush(stdout);
+    }
+    ++(*meshCount);
+    return TRUE;
+}
+
+static void PCPort_MeshDumpFillFrameMeshes(
+    HSD_JObj* joint,
+    const PCPortAnimDumpTransform* parent,
+    FILE* out,
+    int* meshCount) {
+    PCPortAnimDumpTransform local;
+    PCPortAnimDumpTransform world;
+    HSD_DObj* dobj;
+
+    for (; joint != NULL; joint = joint->next) {
+        PCPort_AnimDumpBuildLocalTransform(joint, &local);
+        PCPort_AnimDumpCombineTransform(parent, &local, &world);
+        if (joint->u.dobj != NULL) {
+            for (dobj = joint->u.dobj; dobj != NULL; dobj = dobj->next) {
+                HSD_PObj* pobj;
+                for (pobj = dobj->pobj; pobj != NULL; pobj = pobj->next) {
+                    if (!PCPort_MeshDumpWritePObjJson(out, pobj, &world,
+                                                      joint->id, meshCount)) {
+                        continue;
+                    }
+                }
+            }
+        }
+        if (joint->child != NULL) {
+            PCPort_MeshDumpFillFrameMeshes(joint->child, &world, out,
+                                           meshCount);
+        }
+    }
+}
+
+void PCPort_MeshDump(const char* fsysPath, const char* memberName,
+                     int motionIdx, int frames) {
+    HSD_JObj* root = NULL;
+    PCPortAnimDumpJointRef refs[PCPORT_PROBE_MAX_JOINTS];
+    f32 positions[PCPORT_PROBE_MAX_JOINTS][3];
+    int jointCount = 0;
+    int frameIdx;
+    FILE* jsonOut = NULL;
+    char jsonPath[384];
+    const char* alias;
+    const char* motionLabel;
+    char motionLabelAuto[32];
+
+    (void)positions;
+
+    if (frames <= 0) {
+        frames = 24;
+    }
+    g_charAnimMotionIdx = motionIdx;
+    if (!PCPort_CharAnimSetup(fsysPath, memberName)) {
+        return;
+    }
+    root = g_charAnimRoot;
+    if (root == NULL) {
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+        free(g_charAnimData);
+        g_charAnimData = NULL;
+        g_charAnimRoot = NULL;
+        g_charAnimReady = 0;
+        return;
+    }
+    if (getenv("PCPORT_MESH_DEBUG") != NULL) {
+        int dobjCount = 0;
+        int pobjCount = 0;
+        PCPort_MeshDumpCountObjects(root, &dobjCount, &pobjCount);
+        printf("[mesh-dump-debug] root=%p dobjs=%d pobjs=%d\n",
+               (void*)root, dobjCount, pobjCount);
+        fflush(stdout);
+    }
+
+    PCPort_AnimDumpCollectJoints(root, -1, refs, &jointCount,
+                                 PCPORT_PROBE_MAX_JOINTS);
+    (void)jointCount;
+
+    alias = PCPort_AnimDumpModelAlias(memberName);
+    motionLabel = PCPort_AnimDumpMotionLabel((u32)motionIdx);
+    if (motionLabel == NULL) {
+        snprintf(motionLabelAuto, sizeof(motionLabelAuto), "motion%d",
+                 motionIdx);
+        motionLabel = motionLabelAuto;
+    }
+    snprintf(jsonPath, sizeof(jsonPath), "build_pc/mesh_%s_%s.json",
+             alias, motionLabel);
+    jsonOut = fopen(jsonPath, "wb");
+    if (jsonOut == NULL) {
+        printf("[mesh-dump] open failed %s\n", jsonPath);
+        fflush(stdout);
+        HSD_JObjRemoveAll(root);
+        PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+        free(g_charAnimData);
+        g_charAnimData = NULL;
+        g_charAnimRoot = NULL;
+        g_charAnimReady = 0;
+        return;
+    }
+
+    fprintf(jsonOut,
+            "{\n"
+            "  \"model\":\"%s\",\n"
+            "  \"member\":\"%s\",\n"
+            "  \"motionId\":%d,\n"
+            "  \"motionLabel\":\"%s\",\n"
+            "  \"frames\":[\n",
+            alias, memberName, motionIdx, motionLabel);
+
+    {
+        int loopFrames = (int)(PCPort_CharAnimMaxEndFrame(root) + 0.5f);
+        if (loopFrames < 1) {
+            loopFrames = 0;
+        }
+        for (frameIdx = 0; frameIdx < frames; ++frameIdx) {
+            PCPortAnimDumpTransform identity;
+            int meshCount = 0;
+
+            if (frameIdx > 0) {
+                fputs(",\n", jsonOut);
+            }
+            HSD_JObjAnimAll(root);
+            PCPort_AnimDumpMat3Identity(identity.basis);
+            identity.pos[0] = 0.0f;
+            identity.pos[1] = 0.0f;
+            identity.pos[2] = 0.0f;
+            fprintf(jsonOut, "    {\"frame\":%d,\"meshes\":[", frameIdx);
+            PCPort_MeshDumpFillFrameMeshes(root, &identity, jsonOut, &meshCount);
+            fputs("]}", jsonOut);
+            if (loopFrames > 0 && frameIdx + 1 < frames &&
+                ((frameIdx + 1) % loopFrames) == 0) {
+                HSD_JObjReqAnimAll(root, 0.0f);
+                PCPort_HSDStartAnimAll(root);
+            }
+        }
+    }
+    fputs("\n  ]\n}\n", jsonOut);
+    fclose(jsonOut);
+
+    printf("[mesh-dump] wrote %s frames=%d\n", jsonPath, frames);
+    fflush(stdout);
+
+    HSD_JObjRemoveAll(root);
+    PCPort_HSDArchiveDestroy(&g_charAnimArchive);
+    free(g_charAnimData);
+    g_charAnimData = NULL;
+    g_charAnimRoot = NULL;
+    g_charAnimReady = 0;
+}
+
 static const char* PCPort_PathBaseName(const char* path) {
     const char* slash;
     const char* backslash;
@@ -4620,7 +5054,10 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
         memset(&s, 0, sizeof(s));
         ++probed;
         if (PCPort_SelectLocomotionSuggestionFromStats(stats, motionCount, &s)) {
-            if (s.allConfirmed) {
+            u32 varyingCount =
+                PCPort_MotionProbeVaryingMotionCount(stats, motionCount);
+            BOOL animationConfirmed = varyingCount > 0u;
+            if (animationConfirmed) {
                 ++confirmed;
             }
             printf("[headless-motion-batch] %-18s %-24s motions=%2u "
@@ -4628,7 +5065,8 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
                    "confirmed=%s energy=%.4f/%.4f/%.4f\n",
                    PCPort_PathBaseName(fsysPath), memberName,
                    s.motionCount, s.cyclicCount, s.varyingCyclicCount,
-                   s.idle, s.walk, s.run, s.allConfirmed ? "yes" : "no",
+                   s.idle, s.walk, s.run,
+                   animationConfirmed ? "yes" : "no",
                    s.idleEnergy, s.walkEnergy, s.runEnergy);
         } else {
             u32 cyclicCount = PCPort_MotionProbeCyclicCount(stats, motionCount);
@@ -4636,11 +5074,16 @@ static void PCPort_HeadlessMotionBatchProbeArchive(const char* fsysPath,
                 PCPort_MotionProbeConfirmedCyclicCount(stats, motionCount);
             u32 varyingCount =
                 PCPort_MotionProbeVaryingMotionCount(stats, motionCount);
+            BOOL animationConfirmed = varyingCount > 0u;
+            if (animationConfirmed) {
+                ++confirmed;
+            }
             printf("[headless-motion-batch] %-18s %-24s motions=%2u "
                    "cyclic=%2u varyCyclic=%2u idle=%2d walk=%2d run=%2d "
-                   "confirmed=no energy=0.0000/0.0000/0.0000 note=%s\n",
+                   "confirmed=%s energy=0.0000/0.0000/0.0000 note=%s\n",
                    PCPort_PathBaseName(fsysPath), memberName,
                    motionCount, cyclicCount, varyingCyclicCount, -1, -1, -1,
+                   animationConfirmed ? "yes" : "no",
                    varyingCount > 0u ? "animates-no-locomotion" :
                                         "no-varying-motion");
         }
@@ -4754,13 +5197,20 @@ static void PCPort_HeadlessMotionBatchProbePkxArchive(const char* fsysPath,
            preflightMotionCount);
     fflush(stdout);
     if (preflightMotionCount < 2u) {
+        BOOL acceptedPlaceholder =
+            preflightMotionCount == 1u &&
+            strcmp(PCPort_PathBaseName(fsysPath), "pkx_egg.fsys") == 0 &&
+            strcmp(memberName, "egg") == 0;
         printf("[headless-motion-pkx] %-18s %-24s motions=%2u varying=%2u "
                "cyclic=%2u varyCyclic=%2u animates=%s confirmed=%s "
-               "note=%s\n",
+               "note=%s%s\n",
                PCPort_PathBaseName(fsysPath), memberName,
-               preflightMotionCount, 0u, 0u, 0u, "no", "no",
+               preflightMotionCount, 0u, 0u, 0u, "no",
+               acceptedPlaceholder ? "yes" : "no",
                preflightMotionCount == 0u ? "preflight-no-motion-bank" :
-                                             "low-motion-placeholder");
+                                             "low-motion-placeholder",
+               acceptedPlaceholder ? " policy=accepted-static-placeholder" :
+                                     "");
         fflush(stdout);
         free(memberData);
         free(fsysData);
