@@ -1229,7 +1229,7 @@ void fn_801DA914(void* obj) {
  */
 s32 fn_801DA94C(void* obj) {
     void* resolved;
-    s32 result;
+    u8 result;
     if (obj == NULL) {
         return 0;
     }
