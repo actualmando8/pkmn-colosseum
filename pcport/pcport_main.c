@@ -10670,18 +10670,21 @@ static int RunBattleScene(GLFWwindow* window) {
             const char* iconPath = PCPort_BattleIconPathForMember(actors[i].member);
             haveBattleIcon[i] = LoadPngTexObj(iconPath, &battleIconTex[i]);
             printf("[battle-icon] actor=%s member=%s icon=%s loaded=%d "
-                   "policy=visible-fallback-until-pkx-skin-fixed\n",
+                   "policy=manual-fallback-PCPORT_BATTLE_ICONS\n",
                    actors[i].label, actors[i].member,
                    iconPath != NULL ? iconPath : "-", haveBattleIcon[i]);
         }
     }
-    drawPkxMesh = getenv("PCPORT_BATTLE_SHOW_PKX_MESH") != NULL;
+    drawPkxMesh = getenv("PCPORT_BATTLE_NO_PKX_MESH") == NULL;
     disablePkxDepth = drawPkxMesh &&
                       getenv("PCPORT_BATTLE_PKX_NO_ZTEST") != NULL;
-    printf("[battle-pkx] meshDraw=%s reason=%s next=RenderSkinnedPObj-envelope-palette/display-list\n",
-           drawPkxMesh ? "enabled-debug" : "suppressed",
-           drawPkxMesh ? "PCPORT_BATTLE_SHOW_PKX_MESH" :
-                         "headed-skin-path-explodes-large-triangles");
+    printf("[battle-pkx] meshDraw=%s reason=%s%s next=RenderSkinnedPObj-model-space/display-list\n",
+           drawPkxMesh ? "enabled" : "suppressed-debug",
+           drawPkxMesh ? "default-headed-pkx-model-space" :
+                         "PCPORT_BATTLE_NO_PKX_MESH",
+           getenv("PCPORT_BATTLE_SHOW_PKX_MESH") != NULL
+               ? " deprecated-env-PCPORT_BATTLE_SHOW_PKX_MESH-ignored"
+               : "");
     if (drawPkxMesh) {
         printf("[battle-pkx] depth=%s reason=%s\n",
                disablePkxDepth ? "disabled-debug" : "enabled-debug",
