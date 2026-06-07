@@ -75,7 +75,7 @@ def energy_graph(anns, tw, frame):
     """A multi-row time-series graph of objdiff score per chain (colored), that
     grows as each annealer accumulates history. Newest sample on the right."""
     H = 9
-    W = clamp(tw - 6, 30, 120)
+    W = clamp(tw - 10, 20, 120)   # leave 8 cols for the Y-axis tick labels + margin
     cell = [[None] * W for _ in range(H)]   # stores annealer idx per plotted cell
     series = [(a["idx"], _ehist.get(a["fn"], [])) for a in anns]
     allv = [v for _, h in series for v in h]
@@ -101,7 +101,15 @@ def energy_graph(anns, tw, frame):
                             cell[yy][x - 1] = idx
                 py = y
     out = []
+    out.append("  " + DM + "E = objdiff cost  [instruction-diff units]   (0 = byte-exact match)" + R)
     for r in range(H):
+        # Y-axis tick labels carry the unit (objdiff cost) on the top/bottom rows
+        if r == 0:
+            axis = YL + f"{hi:>6} " + DM + "┤" + R
+        elif r == H - 1:
+            axis = YL + f"{lo:>6} " + DM + "┤" + R
+        else:
+            axis = "       " + DM + "│" + R
         s = ""
         for c in range(W):
             ci = cell[r][c]
@@ -109,8 +117,9 @@ def energy_graph(anns, tw, frame):
                 s += DM + ("." if (c % 12 == 0) else " ") + R   # faint gridline
             else:
                 s += ACOLORS[ci % len(ACOLORS)] + "•" + R
-        out.append("  " + s)
-    out.append("  " + DM + f"E hi {hi}  ->  lo {lo}   (0 = byte-exact match)" + R)
+        out.append(axis + s)
+    out.append("       " + DM + "└" + "─" * min(W, 56) + "→ iterations (anneal time)" + R)
+    out.append("  " + DM + f"E: hi {hi}  →  lo {lo}  objdiff cost units   (0 = byte-exact match)" + R)
     return out
 
 
@@ -391,12 +400,12 @@ def main():
             except OSError:
                 tw, th = 100, 44
             lines = render(load(), frame, tw, th)
-            sys.stdout.write("\x1b[H\x1b[2J" + "\n".join(lines[:th]) + R + "\x1b[J")
+            sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in lines[:th]) + "\x1b[J\x1b[?2026l")
             sys.stdout.flush()
             if once:
                 break
             frame += 1
-            time.sleep(0.1)
+            time.sleep(0.22)
     except KeyboardInterrupt:
         pass
     finally:

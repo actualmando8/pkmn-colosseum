@@ -33,8 +33,8 @@ try:
     NCORE = os.cpu_count() or 8
 except Exception:
     NCORE = 8
-JOBS = 3                              # permuter -j per function (lower so 5 fns fit the mwcc-interop budget)
-WORKERS = 5                           # concurrent functions (staggered starts keep build_dir from colliding)
+JOBS = int(os.environ.get("GRIND_JOBS","1"))
+WORKERS = int(os.environ.get("GRIND_WORKERS","2"))
 STAGGER = 6                           # seconds between worker starts (avoid simultaneous build_dir mwcc bursts)
 REPLICAS = 1                         # one annealer per function (distinct fns run concurrently)
 BUDGET = 600

@@ -229,7 +229,7 @@ def main():
                 tw, th = os.get_terminal_size()
             except OSError:
                 tw, th = 120, 30
-            sys.stdout.write("\x1b[H\x1b[2J" + "\n".join(render(frame, tw, th)[:th]) + R + "\x1b[J")
+            sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in render(frame, tw, th)[:th]) + "\x1b[J\x1b[?2026l")
             sys.stdout.flush()
             if once:
                 break

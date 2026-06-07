@@ -85,7 +85,7 @@ def main():
                 tw, th = 110, 40
             evs = load_events()
             lines = render(evs, tw, th)
-            sys.stdout.write("\x1b[H\x1b[2J" + "\n".join(lines[:th]) + R + "\x1b[J")
+            sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in lines[:th]) + "\x1b[J\x1b[?2026l")
             sys.stdout.flush()
             if once:
                 break
