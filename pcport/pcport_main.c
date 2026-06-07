@@ -9957,37 +9957,54 @@ typedef struct PCPortBattleFlow {
     PCPortBattleInputState prevInput;
 } PCPortBattleFlow;
 
+static const char* kPcportBattleCommandNames[4] = {
+    "FIGHT", "POKEMON", "BAG", "RUN"
+};
+
 static void DrawBattleUI(GXTexObj* messageTex,
                          int haveMessageTex,
                          GXTexObj* commandTex,
                          int haveCommandTex,
                          const PCPortBattleFlow* battleFlow) {
+    /* Clean game-style battle HUD (640x480 ortho):
+     *   - left:  message box (battle text) + HP line
+     *   - right: 2x2 command grid FIGHT / POKeMON / BAG / RUN, selection lit
+     * Replaces the old crammed layout where message/command/status text overlapped.
+     * (void)commandTex/messageTex: we draw the chrome procedurally so the text aligns
+     * to the boxes exactly regardless of the loaded art. */
+    const f32 BOXY = 388.0f, BOXH = 84.0f;
+    int i;
+    (void)messageTex; (void)haveMessageTex; (void)commandTex; (void)haveCommandTex;
     BeginMenuOverlay();
 
-    if (haveMessageTex) {
-        DrawTexturedScreenRect(messageTex, 0.0f, 300.0f, 640.0f, 180.0f,
-                               0.0f, 0.0f, 1.0f, 1.0f);
-    } else {
-        DrawSolidScreenRect(0.0f, 300.0f, 640.0f, 180.0f,
-                            46, 72, 92, 245);
-    }
-
-    if (haveCommandTex) {
-        DrawTexturedScreenRect(commandTex, 350.0f, 314.0f, 248.0f, 116.0f,
-                               0.0f, 0.0f, 1.0f, 1.0f);
-    } else {
-        DrawSolidScreenRect(350.0f, 314.0f, 248.0f, 116.0f,
-                            230, 236, 238, 210);
-    }
-
-    /* Text is still the host bitmap font; the surrounding command/message chrome
-     * is the loaded battle UI art. */
-    DrawTextScreen(44.0f, 328.0f, 11.0f, 17.0f, 245, 248, 252, 255,
+    /* --- message box (bottom-left) --- */
+    DrawSolidScreenRect(10.0f, BOXY, 388.0f, BOXH, 16, 32, 64, 240);
+    DrawSolidScreenRect(10.0f, BOXY, 388.0f, 3.0f, 96, 160, 232, 255);     /* top accent */
+    DrawSolidScreenRect(10.0f, BOXY + BOXH - 3.0f, 388.0f, 3.0f, 40, 80, 140, 255);
+    DrawTextScreen(26.0f, BOXY + 16.0f, 10.0f, 16.0f, 248, 250, 252, 255,
                    battleFlow->messageText);
-    DrawTextScreen(370.0f, 336.0f, 10.0f, 16.0f, 30, 45, 60, 255,
-                   battleFlow->commandText);
-    DrawTextScreen(44.0f, 386.0f, 9.0f, 14.0f, 220, 232, 242, 255,
+    DrawTextScreen(26.0f, BOXY + 52.0f, 8.0f, 13.0f, 170, 224, 180, 255,
                    battleFlow->statusText);
+
+    /* --- command grid (bottom-right): FIGHT / POKeMON / BAG / RUN --- */
+    DrawSolidScreenRect(406.0f, BOXY, 224.0f, BOXH, 232, 238, 244, 240);
+    DrawSolidScreenRect(406.0f, BOXY, 224.0f, 3.0f, 200, 210, 220, 255);
+    {
+        const f32 cellX[4] = { 414.0f, 522.0f, 414.0f, 522.0f };
+        const f32 cellY[4] = { BOXY + 8.0f,  BOXY + 8.0f,
+                               BOXY + 44.0f, BOXY + 44.0f };
+        for (i = 0; i < 4; ++i) {
+            int sel = (battleFlow->commandIndex == i);
+            f32 cx = cellX[i], cy = cellY[i];
+            if (sel) {
+                DrawSolidScreenRect(cx - 6.0f, cy - 4.0f, 104.0f, 28.0f,
+                                    64, 132, 214, 255);     /* selection highlight */
+            }
+            DrawTextScreen(cx, cy, 9.0f, 16.0f,
+                           sel ? 255 : 36, sel ? 255 : 48, sel ? 255 : 66, 255,
+                           kPcportBattleCommandNames[i]);
+        }
+    }
 }
 
 static const char* PCPort_BattleIconPathForMember(const char* member) {
@@ -10031,10 +10048,6 @@ static void DrawBattleActorIconFallback(PCPortBattleRenderActor actors[4],
                        236, 242, 248, 230, actors[i].displayName);
     }
 }
-
-static const char* kPcportBattleCommandNames[4] = {
-    "FIGHT", "POKEMON", "BAG", "RUN"
-};
 
 static const char* kPcportBattleMoveNames[2] = {
     "SWIFT", "TABLE MOVE 129"
@@ -10587,7 +10600,12 @@ static int RunBattleScene(GLFWwindow* window) {
             }
         }
 
-        DrawBattleActorIconFallback(actors, battleIconTex, haveBattleIcon, frame);
+        /* 2D Pokemon icons were a fallback for when the 3D pkx meshes didn't
+         * render; the skinned pkx now render, so icons are OFF by default.
+         * Set PCPORT_BATTLE_ICONS=1 to bring them back. */
+        if (getenv("PCPORT_BATTLE_ICONS") != NULL) {
+            DrawBattleActorIconFallback(actors, battleIconTex, haveBattleIcon, frame);
+        }
         DrawBattleUI(&battleMessageTex, haveBattleMessageTex,
                      &battleCommandTex, haveBattleCommandTex, &battleFlow);
 
