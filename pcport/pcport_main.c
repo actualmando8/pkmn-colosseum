@@ -181,6 +181,9 @@ static int g_pcBattleRenderSkin = 0;
  * model-space (the per-actor model matrix already places them in the scene). Scoped
  * to the pkx render loop so the (joint-local) field character path is unaffected. */
 static int g_pcBattleModelSpaceVerts = 0;
+/* When 1, disable the per-vertex "joint-local rigid piece -> place by bone matrix"
+ * correction (e.g. Shedinja's halo). Set from PCPORT_BATTLE_NO_RIGID_PLACE. */
+static int g_battleNoRigidPlace = 0;
 #define PCPORT_SIBLING_MOBJ_OFFSET   0x39CCu
 #define PCPORT_SIBLING_POBJ_OFFSET   0x6F80u
 #define PCPORT_PDA2_BG_OBJECT0_JOINT_OFFSET 0x22E8u
@@ -5538,7 +5541,30 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * PCPORT_SKIN_NOMTX submits raw local coords for A/B comparison. */
                 if (dbgWhite || !haveCol) GXColor4u8(255,255,255,255); else GXColor4u8(cr, cg, cb, ca);
                 if (dbgNoMtx) {
-                    GXPosition3f32(px, py, pz);
+                    /* Model-space pass-through for the bulk of the mesh, EXCEPT
+                     * rigid accessory pieces whose verts are JOINT-LOCAL (clustered
+                     * near the origin) and need their bone's world transform to land
+                     * in place -- e.g. Shedinja's halo, authored at the origin and
+                     * lifted above the head by its bone. Per-vertex test: if the raw
+                     * vert is closer to the origin than to its rigid bone's world
+                     * translate (and that bone is meaningfully offset), it's
+                     * joint-local -> place it by the bone matrix; otherwise the vert
+                     * is already model-space -> pass through. (Disable via
+                     * PCPORT_BATTLE_NO_RIGID_PLACE for A/B.) */
+                    f32 (*Mp)[4] = palette[curSlot];
+                    f32 tx = Mp[0][3], ty = Mp[1][3], tz = Mp[2][3];
+                    f32 tmag = tx*tx + ty*ty + tz*tz;
+                    f32 d0   = px*px + py*py + pz*pz;
+                    f32 dt   = (px-tx)*(px-tx) + (py-ty)*(py-ty) + (pz-tz)*(pz-tz);
+                    if (curSlot < (u32)slot && g_slotEnv[curSlot] == 0 &&
+                        tmag > 4.0f && d0 < dt && !g_battleNoRigidPlace) {
+                        f32 wx = Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + tx;
+                        f32 wy = Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + ty;
+                        f32 wz = Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + tz;
+                        GXPosition3f32(wx, wy, wz);
+                    } else {
+                        GXPosition3f32(px, py, pz);
+                    }
                 } else {
                     f32 (*Mx)[4] = palette[curSlot];
                     f32 wx = Mx[0][0]*px + Mx[0][1]*py + Mx[0][2]*pz + Mx[0][3];
@@ -9805,8 +9831,8 @@ static void PCPort_SetBattleCameraView(PCPortTranslatedCamera* camera, int frame
      *   PCPORT_BATTLE_CAM = "eyeX,eyeY,eyeZ,atX,atY,atZ" overrides everything. */
     f32 orbit = sinf((f32)frame * 0.010f) * 4.0f;
     f32 lift = cosf((f32)frame * 0.007f) * 1.5f;
-    f32 eye[3] = { orbit, 34.0f + lift, 108.0f };
-    f32 interest[3] = { 0.0f, 8.0f, 0.0f };
+    f32 eye[3] = { orbit, 40.0f + lift, 138.0f };
+    f32 interest[3] = { 0.0f, 15.0f, 0.0f };
     f32 up[3] = { 0.0f, 1.0f, 0.0f };
     const char* cam = getenv("PCPORT_BATTLE_CAM");
     if (cam != NULL && cam[0] != '\0') {
@@ -9826,7 +9852,11 @@ static void DrawBattleBackdrop2D(GXTexObj* battleBackdropTex,
     DrawSolidScreenRect(0.0f, 148.0f, 640.0f, 78.0f, 42, 50, 56, 255);
     DrawSolidScreenRect(0.0f, 226.0f, 640.0f, 82.0f, 72, 76, 70, 255);
     DrawSolidScreenRect(0.0f, 252.0f, 640.0f, 34.0f, 100, 104, 92, 210);
-    if (haveBattleBackdrop) {
+    /* The loaded fight_common backdrop is the wrong art (a GameCube controller
+     * button-reference image: R/L/X/Y/C/B/START/1P glyphs) and just clutters the
+     * field. Keep the clean gradient bands above; only draw the texture if asked
+     * via PCPORT_BATTLE_BACKDROP=1 (for when the correct arena art is wired). */
+    if (haveBattleBackdrop && getenv("PCPORT_BATTLE_BACKDROP") != NULL) {
         DrawTexturedScreenRectA(battleBackdropTex, 0.0f, 230.0f,
                                 640.0f, 108.0f, 0.0f, 0.0f,
                                 1.0f, 1.0f, 48, 132);
@@ -10584,6 +10614,7 @@ static int RunBattleScene(GLFWwindow* window) {
              * the actor model matrix (folded into actorCam) places them correctly,
              * instead of the rigid/envelope palette which scatters them. */
             g_pcBattleModelSpaceVerts = (getenv("PCPORT_BATTLE_SKINPAL") == NULL);
+            g_battleNoRigidPlace = (getenv("PCPORT_BATTLE_NO_RIGID_PLACE") != NULL);
             for (i = 0; i < 4; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
