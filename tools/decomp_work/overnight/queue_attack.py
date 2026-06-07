@@ -53,6 +53,7 @@ REPAIR_ROUNDS = int(os.environ.get("REPAIR_ROUNDS", "5"))
 PLATEAU_BREAK_AFTER = int(os.environ.get("PLATEAU_BREAK_AFTER", "3"))
 MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "4096"))
 MAX_FN_ASM_LINES = int(os.environ.get("MAX_FN_ASM_LINES", "80"))
+MIN_PRIOR_PCT = float(os.environ.get("MIN_PRIOR_PCT", "0"))
 MIN_PCT_KEEP = 90.0
 AGENT_NAME = os.environ.get("AGENT_NAME", "deepseek-v4-flash" if MODELS == ["deepseek/deepseek-v4-flash"] else MODELS[0].replace("/", "-"))
 
@@ -109,15 +110,6 @@ def claim_next_task() -> dict | None:
     except Exception as e:
         _log(f"queue read error: {e}")
         return None
-    candidates = [
-        t for t in tasks
-        if t.get("status") == "queued"
-        and t.get("meta", {}).get("model_tier") in TIER_FILTER
-        and t.get("meta", {}).get("asm_lines", 999) <= MAX_FN_ASM_LINES
-        and (not FILE_FILTER or t.get("meta", {}).get("stem") in FILE_FILTER)
-    ]
-    if not candidates:
-        return None
     def _prior_score(t: dict) -> float:
         result = t.get("result") or {}
         try:
@@ -125,10 +117,21 @@ def claim_next_task() -> dict | None:
         except Exception:
             return 0.0
 
+    candidates = [
+        t for t in tasks
+        if t.get("status") == "queued"
+        and t.get("meta", {}).get("model_tier") in TIER_FILTER
+        and t.get("meta", {}).get("asm_lines", 999) <= MAX_FN_ASM_LINES
+        and _prior_score(t) >= MIN_PRIOR_PCT
+        and (not FILE_FILTER or t.get("meta", {}).get("stem") in FILE_FILTER)
+    ]
+    if not candidates:
+        return None
+
     prio_order = {"high": 0, "normal": 1, "low": 2}
     candidates.sort(key=lambda t: (
-        prio_order.get(t.get("priority", "normal"), 1),
         -_prior_score(t),
+        prio_order.get(t.get("priority", "normal"), 1),
         t.get("meta", {}).get("asm_lines", 999),
         t["created"],
     ))
@@ -354,6 +357,15 @@ def local_attack(test: dict, src: Path, stem: str, fn: str, backup: bytes,
     best_pct = best["match_pct"]
     best_code = best["code"]
     best_model = best["model"]
+
+    if best_pct <= 0.0 and not best.get("compile_ok"):
+        print("  initial candidate did not compile/score; skipping repairs from 0.0%")
+        return {
+            "best_pct": best_pct,
+            "best_code": best_code,
+            "best_model": best_model,
+            "history": history,
+        }
 
     def _save_partial() -> None:
         if best_pct <= 0.0 or not best_code:
@@ -593,7 +605,7 @@ def process_one(task: dict) -> None:
 
 
 def main():
-    _log(f"queue_attack started; models={MODELS}; repair_rounds={REPAIR_ROUNDS}; cap={MAX_FN_ASM_LINES}")
+    _log(f"queue_attack started; models={MODELS}; repair_rounds={REPAIR_ROUNDS}; cap={MAX_FN_ASM_LINES}; min_prior={MIN_PRIOR_PCT}")
     _dashboard("INFO", f"queue_attack online (models={','.join(MODELS)}, repairs={REPAIR_ROUNDS})")
 
     n_done = 0
