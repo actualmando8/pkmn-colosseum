@@ -54,6 +54,7 @@ PLATEAU_BREAK_AFTER = int(os.environ.get("PLATEAU_BREAK_AFTER", "3"))
 MAX_TOKENS = int(os.environ.get("MAX_TOKENS", "4096"))
 MAX_FN_ASM_LINES = int(os.environ.get("MAX_FN_ASM_LINES", "80"))
 MIN_PRIOR_PCT = float(os.environ.get("MIN_PRIOR_PCT", "0"))
+REQUIRE_SEED = os.environ.get("REQUIRE_SEED", "0") not in ("", "0", "false", "False")
 MIN_PCT_KEEP = 90.0
 AGENT_NAME = os.environ.get("AGENT_NAME", "deepseek-v4-flash" if MODELS == ["deepseek/deepseek-v4-flash"] else MODELS[0].replace("/", "-"))
 
@@ -66,6 +67,35 @@ FILE_FILTER = set(filter(None, (
 TIER_FILTER = set(filter(None, (
     s.strip() for s in os.environ.get("TIER_FILTER", "deepseek,kimi").split(",")
 )))
+
+
+def extract_current_candidate(src: Path, fn: str) -> str:
+    try:
+        text = src.read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    pat = re.compile(
+        rf'#if\s+[01]\s*\n\s*asm\s+\w+\s+{re.escape(fn)}\s*\([^)]*\)\s*\{{\s*\n'
+        rf'\s*#include\s+"[^"]+"\s*\n\s*\}}\s*\n'
+        rf'#else\s*\n(.*?)#endif',
+        re.DOTALL,
+    )
+    m = pat.search(text)
+    if not m:
+        return ""
+    code = m.group(1).strip()
+    if fn not in code or "TODO" in code or re.search(rf'{re.escape(fn)}\s*\([^)]*\)\s*\{{\s*\}}', code):
+        return ""
+    return code
+
+
+def task_has_seed(task: dict) -> bool:
+    fn = task.get("function", "")
+    meta = task.get("meta", {})
+    if (PARTIAL_POOL / f"{fn}.c").exists():
+        return True
+    file_path = meta.get("file")
+    return bool(file_path and extract_current_candidate(REPO / file_path, fn))
 
 
 def _log(msg: str) -> None:
@@ -123,6 +153,7 @@ def claim_next_task() -> dict | None:
         and t.get("meta", {}).get("model_tier") in TIER_FILTER
         and t.get("meta", {}).get("asm_lines", 999) <= MAX_FN_ASM_LINES
         and _prior_score(t) >= MIN_PRIOR_PCT
+        and (not REQUIRE_SEED or task_has_seed(t))
         and (not FILE_FILTER or t.get("meta", {}).get("stem") in FILE_FILTER)
     ]
     if not candidates:
@@ -334,6 +365,22 @@ def local_attack(test: dict, src: Path, stem: str, fn: str, backup: bytes,
             print(f"    seeded from {pool_path.relative_to(REPO)}")
         except OSError:
             pass
+    current_code = extract_current_candidate(src, fn)
+    if current_code:
+        candidates.append({
+            "model": "current-source",
+            "code": current_code,
+            "elapsed": 0,
+        })
+        print("    seeded from current source")
+    if REQUIRE_SEED and not candidates:
+        print("  no saved/current seed candidate; skipping token spend")
+        return {
+            "best_pct": 0.0,
+            "best_code": "",
+            "best_model": "no-seed",
+            "history": history,
+        }
     if len(MODELS) > 1:
         with ThreadPoolExecutor(max_workers=len(MODELS)) as ex:
             futs = [ex.submit(af.gen_cloud, m, test["prompt"], max_tokens) for m in MODELS]
