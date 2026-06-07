@@ -67,6 +67,8 @@ extern void  fn_8036A384(void* jobj, f32 x, f32 y, f32 z); /* HSD_JObjSetTransla
 /* Sound */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay */
 extern void  soundStop(s32 sndID, s32 volume);              /* sndStop */
+extern void  fn_801669E4(s32 handle, s32 fadeTime, s32 volume);
+extern void  heroMoveAddStepCallback(void* callback, s32 arg);
 
 /* Particle system */
 extern void* fn_800F04C4(void);                            /* stop particle system */
@@ -403,9 +405,32 @@ void fn_801D1C20(s32 seqHandle) {
  * fn_801D1CC4 - Waza effect trajectory calculation.
  * Address: 0x801D1CC4 | Size: 0x94
  */
-void fn_801D1CC4(s32 seqHandle, f32 t) {
-    /* TODO: Effect trajectory calculation (0x94 bytes) */
+#pragma scheduling off
+BOOL fn_801D1CC4(s32 idx) {
+    void* party = fn_80129280(0, 0x0A);
+    u16 count;
+    s32 i;
+    u16* entry;
+
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        return FALSE;
+    }
+
+    count = *(u16*)((u8*)party + 0x400);
+    entry = (u16*)party;
+    for (i = 0; i < count; i++) {
+        if (idx == *entry) {
+            break;
+        }
+        entry++;
+    }
+
+    if (i >= count) {
+        return FALSE;
+    }
+    return TRUE;
 }
+#pragma scheduling on
 
 /**
  * fn_801D1D58 - Waza projectile update.
@@ -450,10 +475,12 @@ load:
  * fn_801D1F7C - Waza get active effect count from party+0x400.
  * Address: 0x801D1F7C | Size: 0x2C
  */
+#pragma scheduling off
 u16 fn_801D1F7C(void) {
     void* party = (void*)fn_80129280(0, 0x0A);
     return *(u16*)((u8*)party + 0x400);
 }
+#pragma scheduling on
 
 /**
  * fn_801D1FA8 - Waza effect color modulation.
@@ -488,11 +515,17 @@ void fn_801D228C(s32 seqHandle, f32 targetRot, f32 speed) {
 }
 
 /**
- * fn_801D23C0 - Waza effect get handle.
+ * fn_801D23C0 - Waza reset callback timer and stop active handle.
  * Address: 0x801D23C0 | Size: 0x44
  */
-s32 fn_801D23C0(s32 seqIdx) {
-    return -1;
+extern s32 lbl_80467390[];
+void fn_801D23C0(void) {
+    s32 handle;
+    lbl_80467390[1] = 0x258;
+    handle = lbl_80467390[2];
+    if (handle != 0) {
+        fn_801669E4(handle, 0, 0);
+    }
 }
 
 /**
@@ -528,11 +561,14 @@ void fn_801D29D8(s32 moveID, s32 hitCount) {
 }
 
 /**
- * fn_801D2B08 - Waza multi-hit get current hit.
+ * fn_801D2B08 - Waza register multi-hit callback and clear state.
  * Address: 0x801D2B08 | Size: 0x44
  */
-s32 fn_801D2B08(void) {
-    return 0;
+void fn_801D2B08(void) {
+    heroMoveAddStepCallback(fn_801D29D8, 0);
+    lbl_80467390[0] = 0;
+    lbl_80467390[2] = 0;
+    lbl_80467390[3] = 0;
 }
 
 /**
@@ -548,6 +584,18 @@ void fn_801D2B4C(void) {
  * Address: 0x801D2C6C | Size: 0x8
  */
 extern u32 lbl_8047B3EC;
+extern u32 lbl_8047B3F0;
+extern s32 lbl_8047B410;
+
+extern u8 lbl_80467CC0[];
+extern void fn_801DD158(void* obj);
+extern void fn_801DF1D0(void* obj);
+extern void fn_801DD3E4(void* obj);
+extern void fn_801DD23C(void* obj);
+extern void fn_800F0308(void);
+extern s32 fn_8017B2CC(s32 id);
+extern void fn_800F915C(s32 id);
+extern void fn_8017B1CC(s32 id);
 u32 fn_801D2C6C(void) {
     return lbl_8047B3EC;
 }
@@ -579,8 +627,28 @@ void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot) {
  * fn_801D2F94 - Waza animation teardown.
  * Address: 0x801D2F94 | Size: 0x88
  */
+extern void fn_80177A44(s32 arg);
+extern void fn_80176AE4(void* arg);
+extern void fn_801765F4(s32 arg);
+extern s32  fn_800057A8(void);
 void fn_801D2F94(void) {
-    /* TODO: Waza animation teardown (0x88 bytes) */
+    void* obj;
+    if (lbl_8047B3EC != 0) {
+        obj = (void*)lbl_8047B3F0;
+        if (obj == NULL) {
+            fn_80177A44(8);
+        } else {
+            if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
+                fn_80176AE4(obj);
+            }
+            lbl_8047B3F0 = 0;
+        }
+        fn_801765F4(0);
+        lbl_8047B3EC = 0;
+        if (fn_800057A8() == 2) {
+            fn_80177A44(2);
+        }
+    }
 }
 
 /**
@@ -588,7 +656,6 @@ void fn_801D2F94(void) {
  * Address: 0x801D301C | Size: 0x18
  */
 extern u8  lbl_8047B3F4;
-extern u32 lbl_8047B3F0;
 void fn_801D301C(void) {
     lbl_8047B3F4 = 1;
     lbl_8047B3EC = 0;
@@ -599,8 +666,24 @@ void fn_801D301C(void) {
  * fn_801D3034 - Waza animation frame step.
  * Address: 0x801D3034 | Size: 0x88
  */
-void fn_801D3034(void) {
-    /* TODO: Waza animation frame step (0x88 bytes) */
+void fn_801D3034(u32 state) {
+    void* obj;
+    if (state == lbl_8047B3EC) {
+        obj = (void*)lbl_8047B3F0;
+        if (obj == NULL) {
+            fn_80177A44(8);
+        } else {
+            if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
+                fn_80176AE4(obj);
+            }
+            lbl_8047B3F0 = 0;
+        }
+        fn_801765F4(0);
+        lbl_8047B3EC = 0;
+        if (fn_800057A8() == 2) {
+            fn_80177A44(2);
+        }
+    }
 }
 
 /**
@@ -942,15 +1025,17 @@ void wazaSequencePokemonMotionStart(s32 slot) {
  * Address: 0x801D9E1C | Size: 0x18
  */
 u8 fn_801D9E1C(void* obj) {
-    if (obj == NULL) return 0;
-    return *(u8*)((u8*)obj + 0x77);
+    if (obj != NULL) {
+        return *(u8*)((u8*)obj + 0x77);
+    }
+    return 0;
 }
 
 /**
  * fn_801D9E34 - Pokemon motion cancel.
  * Address: 0x801D9E34 | Size: 0x58
  */
-void fn_801D9E34(s32 slot) {
+void fn_801D9E34(void* obj) {
     /* Cancel current Pokemon motion */
 }
 
@@ -962,7 +1047,7 @@ void fn_801D9E34(s32 slot) {
  * fn_801D9E8C - Waza effect interpolation (position lerp).
  * Address: 0x801D9E8C | Size: 0x188
  */
-void fn_801D9E8C(void* effect, f32 t) {
+void fn_801D9E8C(void* effect) {
     /* TODO: Effect position lerp (0x188 bytes) */
 }
 
@@ -978,7 +1063,7 @@ f32 fn_801DA014(void* effect) {
  * fn_801DA070 - Waza effect bezier curve eval.
  * Address: 0x801DA070 | Size: 0x1B4
  */
-void fn_801DA070(void* effect, f32 t) {
+void fn_801DA070(void* effect) {
     /* TODO: Bezier curve evaluation (0x1B4 bytes) */
 }
 
@@ -1003,8 +1088,10 @@ void fn_801DA2C4(void* effect, f32 radius, f32 t) {
  * Address: 0x801DA354 | Size: 0x18
  */
 u8 fn_801DA354(void* effect) {
-    if (effect == NULL) return 0;
-    return *(u8*)((u8*)effect + 0x18);
+    if (effect != NULL) {
+        return *(u8*)((u8*)effect + 0x18);
+    }
+    return 0;
 }
 
 /**
@@ -1028,8 +1115,10 @@ void fn_801DA3CC(void* effect, f32 vx, f32 vy, f32 vz) {
  * Address: 0x801DA42C | Size: 0x1C
  */
 u32 fn_801DA42C(void* effect) {
-    if (effect == NULL) return 0;
-    return *(u8*)((u8*)effect + 0x18) & 1;
+    if (effect != NULL) {
+        return *(u8*)((u8*)effect + 0x18) & 1;
+    }
+    return 0;
 }
 
 /**
@@ -1101,35 +1190,74 @@ void fn_801DA83C(void* effect) {
 }
 
 /**
- * fn_801DA8C4 - Waza effect pool get free count.
+ * fn_801DA8C4 - Waza resolve/update helper.
  * Address: 0x801DA8C4 | Size: 0x50
  */
-s32 fn_801DA8C4(void) {
-    return 0;
+extern void* fn_801DD0C8();
+extern void fn_801DBB10(void* obj);
+extern void fn_801DBDDC(void* obj);
+void fn_801DA8C4(void* obj) {
+    void* resolved;
+    if (obj != NULL) {
+        resolved = fn_801DD0C8(obj);
+        if (resolved != NULL) {
+            if (*(u8*)((u8*)resolved + 0x14) != 0) {
+                fn_801DBB10(resolved);
+            }
+            fn_801DBDDC(resolved);
+        }
+    }
 }
 
 /**
  * fn_801DA914 - Waza effect pool get used count.
  * Address: 0x801DA914 | Size: 0x38
  */
-s32 fn_801DA914(void) {
-    return 0;
+void fn_801DA914(void* obj) {
+    void* resolved;
+    if (obj != NULL) {
+        resolved = fn_801DD0C8(obj);
+        if (resolved != NULL) {
+            *(u8*)((u8*)resolved + 0x16) = 0;
+        }
+    }
 }
 
 /**
- * fn_801DA94C - Waza effect pool iterate.
+ * fn_801DA94C - Waza resolved effect has active non-minus-one byte.
  * Address: 0x801DA94C | Size: 0x68
  */
-void fn_801DA94C(void* callback, void* userData) {
-    /* Iterate over active effects in pool */
+s32 fn_801DA94C(void* obj) {
+    void* resolved;
+    s32 result;
+    if (obj == NULL) {
+        return 0;
+    }
+    resolved = fn_801DD0C8(obj);
+    if (resolved != NULL) {
+        result = 0;
+        if (*(u8*)((u8*)resolved + 0x14) != 0) {
+            if (*(s8*)((u8*)resolved + 0x15) != -1) {
+                result = 1;
+            }
+        }
+        return result;
+    }
+    return 0;
 }
 
 /**
  * fn_801DA9B4 - Waza effect pool clear all.
  * Address: 0x801DA9B4 | Size: 0x34
  */
-void fn_801DA9B4(void) {
-    /* Clear all effects in pool */
+void fn_801DA9B4(void* obj) {
+    void* resolved;
+    if (obj != NULL) {
+        resolved = fn_801DD0C8(obj);
+        if (resolved != NULL) {
+            fn_801DBB10(resolved);
+        }
+    }
 }
 
 /**
@@ -1157,35 +1285,47 @@ void fn_801DABAC(s32 sndHandle) {
 }
 
 /**
- * fn_801DAC24 - Waza sound get active count.
+ * fn_801DAC24 - Waza get field 0x10.
  * Address: 0x801DAC24 | Size: 0x18
  */
-s32 fn_801DAC24(void) {
+u32 fn_801DAC24(void* obj) {
+    if (obj != NULL) {
+        return *(u32*)((u8*)obj + 0x10);
+    }
     return 0;
 }
 
 /**
- * fn_801DAC3C - Waza sound stop all.
+ * fn_801DAC3C - Waza get field 0x24.
  * Address: 0x801DAC3C | Size: 0x18
  */
-void fn_801DAC3C(void) {
-    /* Stop all waza sounds */
+u32 fn_801DAC3C(void* obj) {
+    if (obj != NULL) {
+        return *(u32*)((u8*)obj + 0x24);
+    }
+    return 0;
 }
 
 /**
- * fn_801DAC54 - Waza sound set volume.
+ * fn_801DAC54 - Waza check field 0x6C nonzero.
  * Address: 0x801DAC54 | Size: 0x24
  */
-void fn_801DAC54(s32 sndHandle, s32 volume) {
-    /* Set waza sound volume */
+u32 fn_801DAC54(void* obj) {
+    if (obj == NULL) {
+        return 0;
+    }
+    return *(u32*)((u8*)obj + 0x6C) != 0;
 }
 
 /**
- * fn_801DAC78 - Waza sound set pan.
+ * fn_801DAC78 - Waza get field 0x70.
  * Address: 0x801DAC78 | Size: 0x18
  */
-void fn_801DAC78(s32 sndHandle, f32 pan) {
-    /* Set waza sound pan position */
+u16 fn_801DAC78(void* obj) {
+    if (obj != NULL) {
+        return *(u16*)((u8*)obj + 0x70);
+    }
+    return 0;
 }
 
 /* =========================================================================
@@ -1239,7 +1379,12 @@ void fn_801DAEF8(s32 count) {
  * Address: 0x801DB060 | Size: 0x28
  */
 BOOL fn_801DB060(void) {
-    return FALSE;
+    if ((u32)(lbl_8047B410 + 0x10000) == 0xFFFF) {
+        lbl_8047B410 = 0;
+    }
+
+    lbl_8047B410++;
+    return lbl_8047B410;
 }
 
 /**
@@ -1248,15 +1393,34 @@ BOOL fn_801DB060(void) {
  * Referenced by battle_main.c (battle_FightCleanup).
  */
 void fn_801DB088(void) {
-    /* Reset waza system state without freeing memory */
+    u8* pool = lbl_80467CC0;
+    u8* entry = *(u8**)pool;
+    u16 count = *(u16*)(pool + 4);
+    s32 i;
+
+    for (i = 0; i < count; i++, entry += 0x8C) {
+        if (*(u8*)(entry + 0x74) != 0) {
+            fn_801DD158(entry);
+            fn_801DF1D0(entry);
+        }
+    }
+
+    ((void (*)())fn_801D2D28)();
 }
 
 /**
  * fn_801DB100 - Waza system get context.
  * Address: 0x801DB100 | Size: 0x54
  */
-void* fn_801DB100(void) {
-    return NULL;
+void fn_801DB100(void* obj) {
+    if (obj != NULL) {
+        if (*(u8*)((u8*)obj + 0x74) != 0) {
+            fn_801DD3E4(obj);
+            fn_801DD23C(obj);
+        }
+
+        memset(obj, 0, 0x8C);
+    }
 }
 
 /* =========================================================================
@@ -1270,7 +1434,20 @@ void* fn_801DB100(void) {
  * fn_801DB154 - Waza sequence data lookup.
  * Address: 0x801DB154 | Size: 0x78
  */
-void* fn_801DB154(s32 moveID) {
+void* fn_801DB154(void) {
+    u8* pool = lbl_80467CC0;
+    u8* entry = *(u8**)pool;
+    u16 count = *(u16*)(pool + 4);
+    s32 i;
+
+    for (i = 0; i < count; i++, entry += 0x8C) {
+        if (*(u8*)(entry + 0x74) == 0) {
+            memset(entry, 0, 0x8C);
+            *(u8*)(entry + 0x74) = 1;
+            return entry;
+        }
+    }
+
     return NULL;
 }
 
@@ -1278,9 +1455,36 @@ void* fn_801DB154(s32 moveID) {
  * fn_801DB1CC - Waza sequence data validate.
  * Address: 0x801DB1CC | Size: 0xBC
  */
-BOOL fn_801DB1CC(void* seqData) {
-    /* TODO: Validate sequence data (0xBC bytes) */
-    return TRUE;
+void fn_801DB1CC(void* obj) {
+    u16 id = *(u16*)((u8*)obj + 0x72);
+
+    if (id != 0) {
+        u8* pool = lbl_80467CC0;
+        u8* entry = *(u8**)pool;
+        u16 count = *(u16*)(pool + 4);
+        s32 matches = 0;
+        s32 i;
+
+        for (i = 0; i < count; i++, entry += 0x8C) {
+            if (*(u16*)(entry + 0x72) == id) {
+                matches++;
+            }
+        }
+
+        if (matches == 1) {
+            s32 waitId = id;
+            s32 releaseId = id;
+
+            while (fn_8017B2CC(waitId) == 1) {
+                fn_800F0308();
+            }
+
+            fn_800F915C(releaseId);
+            fn_8017B1CC(releaseId);
+        }
+
+        *(u16*)((u8*)obj + 0x72) = 0;
+    }
 }
 
 /**
@@ -1321,8 +1525,9 @@ s32 fn_801DB850(s32 moveID) {
  * fn_801DB858 - Waza data get move flags.
  * Address: 0x801DB858 | Size: 0xC
  */
-u32 fn_801DB858(s32 moveID) {
-    return 0;
+extern u8 lbl_80467C80[];
+void* fn_801DB858(s32 moveID) {
+    return lbl_80467C80;
 }
 
 /**
@@ -1355,7 +1560,7 @@ void wazaSequenceUpdate(void) {
  * fn_801DBB10 - Waza rendering update.
  * Address: 0x801DBB10 | Size: 0x120
  */
-void fn_801DBB10(void) {
+void fn_801DBB10(void* obj) {
     /* TODO: Waza rendering update (0x120 bytes) */
 }
 
@@ -1379,7 +1584,7 @@ void fn_801DBCCC(s32 blendType) {
  * fn_801DBDDC - Waza blend effect update.
  * Address: 0x801DBDDC | Size: 0x1D4
  */
-void fn_801DBDDC(void) {
+void fn_801DBDDC(void* obj) {
     /* TODO: Blend effect update (0x1D4 bytes) */
 }
 
@@ -1453,16 +1658,37 @@ void fn_801DCBC8(s32 fieldEffect) {
  * fn_801DCDA8 - Waza field effect get type.
  * Address: 0x801DCDA8 | Size: 0x24
  */
-s32 fn_801DCDA8(void) {
-    return 0;
+void* fn_801DCDA8(void* obj, s32 fieldEffect) {
+    void* cur = *(void**)((u8*)obj + 0x24);
+
+    while (cur != NULL) {
+        if (*(s32*)cur == fieldEffect) {
+            return cur;
+        }
+        cur = *(void**)((u8*)cur + 0xA8);
+    }
+
+    return cur;
 }
 
 /**
  * fn_801DCDCC - Waza field effect set type.
  * Address: 0x801DCDCC | Size: 0x40
  */
-void fn_801DCDCC(s32 fieldEffect) {
-    /* Set active field effect type */
+s32 fn_801DCDCC(void* obj) {
+    if (obj == NULL) {
+        return 0;
+    }
+
+    if (*(u8*)((u8*)obj + 0x77) == 0) {
+        return 0;
+    }
+
+    if (*(u8*)((u8*)obj + 0x4E) != 0) {
+        return *(u8*)((u8*)obj + 0x4F);
+    }
+
+    return 0;
 }
 
 /**
@@ -1477,8 +1703,16 @@ void fn_801DCE0C(void) {
  * fn_801DCEA8 - Waza field effect clear.
  * Address: 0x801DCEA8 | Size: 0x58
  */
-void fn_801DCEA8(void) {
-    /* Clear active field effect */
+extern void fn_800E6DCC(void* obj);
+extern void fn_801DEF0C(void* obj, s32 arg1, s32 arg2);
+void fn_801DCEA8(void* obj) {
+    u8 flags = *(u8*)((u8*)obj + 0x18);
+
+    if ((flags & 2) == 2) {
+        *(u8*)((u8*)obj + 0x18) = flags ^ 2;
+        fn_800E6DCC(*(void**)((u8*)obj + 0x24));
+        fn_801DEF0C(obj, 1, 0);
+    }
 }
 
 /**
@@ -1493,40 +1727,82 @@ void fn_801DCF00(u32 color, f32 intensity) {
  * fn_801DCF84 - Waza lighting override clear.
  * Address: 0x801DCF84 | Size: 0x54
  */
-void fn_801DCF84(void) {
-    /* Clear lighting override */
+void fn_801DCF84(void* obj) {
+    u8 flags = *(u8*)((u8*)obj + 0x18);
+
+    if ((flags & 8) == 8) {
+        *(u8*)((u8*)obj + 0x18) = flags ^ 8;
+        fn_801DEF0C(obj, 1, 1);
+        fn_801DA014(obj);
+    }
 }
 
 /**
  * fn_801DCFD8 - Waza lighting override get active.
  * Address: 0x801DCFD8 | Size: 0x50
  */
-BOOL fn_801DCFD8(void) {
-    return FALSE;
+extern void fn_800EC96C(void* obj);
+void fn_801DCFD8(void* obj) {
+    u8 flags = *(u8*)((u8*)obj + 0x18);
+
+    if ((flags & 8) != 8) {
+        *(u8*)((u8*)obj + 0x18) = flags | 8;
+        fn_800EC96C(*(void**)((u8*)obj + 0x24));
+        fn_801DA070(obj);
+    }
 }
 
 /**
  * fn_801DD028 - Waza lighting ambient set.
  * Address: 0x801DD028 | Size: 0x50
  */
-void fn_801DD028(u32 color) {
-    /* Set ambient lighting for waza */
+extern void fn_801DF33C(void* obj);
+void fn_801DD028(void* obj) {
+    u8 flags = *(u8*)((u8*)obj + 0x18);
+
+    if ((flags & 4) == 4) {
+        fn_801DF33C(obj);
+        *(u8*)((u8*)obj + 0x18) = *(u8*)((u8*)obj + 0x18) ^ 4;
+        fn_801D9E34(obj);
+    }
 }
 
 /**
  * fn_801DD078 - Waza lighting ambient get.
  * Address: 0x801DD078 | Size: 0x50
  */
-u32 fn_801DD078(void) {
-    return 0xFFFFFFFF;
+extern void fn_801DF3D4(void* obj);
+void fn_801DD078(void* obj) {
+    u8 flags = *(u8*)((u8*)obj + 0x18);
+
+    if ((flags & 4) != 4) {
+        fn_801DF3D4(obj);
+        *(u8*)((u8*)obj + 0x18) = *(u8*)((u8*)obj + 0x18) | 4;
+        fn_801D9E8C(obj);
+    }
 }
 
 /**
  * fn_801DD0C8 - Waza lighting reset.
  * Address: 0x801DD0C8 | Size: 0x38
  */
-void fn_801DD0C8(void) {
-    /* Reset lighting to defaults */
+void* fn_801DD0C8(obj, arg1, arg2)
+void* obj;
+s32 arg1;
+s32 arg2;
+{
+    void* cur = *(void**)((u8*)obj + 0x68);
+    u32 b = (u16)arg2;
+    u32 a = (u16)arg1;
+
+    while (cur != NULL) {
+        if (*(u16*)((u8*)cur + 0x2C) == a && *(u16*)((u8*)cur + 0x2E) == b) {
+            return cur;
+        }
+        cur = *(void**)((u8*)cur + 0x34);
+    }
+
+    return cur;
 }
 
 /**
@@ -1541,7 +1817,7 @@ void fn_801DD100(u32 filterColor) {
  * fn_801DD158 - Waza color filter update.
  * Address: 0x801DD158 | Size: 0xE4
  */
-void fn_801DD158(void) {
+void fn_801DD158(void* obj) {
     /* TODO: Color filter update (0xE4 bytes) */
 }
 
@@ -1549,7 +1825,7 @@ void fn_801DD158(void) {
  * fn_801DD23C - Waza color filter transition.
  * Address: 0x801DD23C | Size: 0x1A8
  */
-void fn_801DD23C(u32 targetColor, f32 speed) {
+void fn_801DD23C(void* obj) {
     /* TODO: Color filter transition (0x1A8 bytes) */
 }
 
@@ -1557,7 +1833,7 @@ void fn_801DD23C(u32 targetColor, f32 speed) {
  * fn_801DD3E4 - Waza color filter clear.
  * Address: 0x801DD3E4 | Size: 0x78
  */
-void fn_801DD3E4(void) {
+void fn_801DD3E4(void* obj) {
     /* Clear color filter */
 }
 
@@ -1681,7 +1957,7 @@ void fn_801DEE14(s32 slot, u32 status) {
  * fn_801DEF0C - Waza status effect update.
  * Address: 0x801DEF0C | Size: 0x164
  */
-void fn_801DEF0C(void) {
+void fn_801DEF0C(void* obj, s32 arg1, s32 arg2) {
     /* TODO: Status effect visual update (0x164 bytes) */
 }
 
@@ -1705,7 +1981,7 @@ void fn_801DF160(void) {
  * fn_801DF1D0 - Waza weather effect render.
  * Address: 0x801DF1D0 | Size: 0x16C
  */
-void fn_801DF1D0(void) {
+void fn_801DF1D0(void* obj) {
     /* TODO: Weather effect render (0x16C bytes) */
 }
 
@@ -1713,7 +1989,7 @@ void fn_801DF1D0(void) {
  * fn_801DF33C - Waza weather effect clear.
  * Address: 0x801DF33C | Size: 0x98
  */
-void fn_801DF33C(void) {
+void fn_801DF33C(void* obj) {
     /* TODO: Weather effect clear (0x98 bytes) */
 }
 
@@ -1721,9 +1997,8 @@ void fn_801DF33C(void) {
  * fn_801DF3D4 - Waza weather get type.
  * Address: 0x801DF3D4 | Size: 0xA0
  */
-s32 fn_801DF3D4(void) {
+void fn_801DF3D4(void* obj) {
     /* TODO: Get current weather type (0xA0 bytes) */
-    return 0;
 }
 
 /**
