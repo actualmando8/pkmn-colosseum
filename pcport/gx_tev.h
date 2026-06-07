@@ -190,6 +190,7 @@ typedef struct GXTevVertex {
     f32 pos[3];
     u8  color[4];
     f32 texcoord[2];
+    f32 normal[3];
 } GXTevVertex;
 
 /**

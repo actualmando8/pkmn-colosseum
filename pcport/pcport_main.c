@@ -5293,6 +5293,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     int slot;
     const HSD_VtxDescList* v;
     const HSD_VtxDescList* posD = NULL;
+    const HSD_VtxDescList* nrmD = NULL;
     const HSD_VtxDescList* clrD = NULL;
     const HSD_VtxDescList* texD = NULL;
     const u8* dl = tp->displayList;
@@ -5329,6 +5330,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
 
     for (v = tp->verts; v->attr != GX_VA_NULL; ++v) {
         if (v->attr == GX_VA_POS)  posD = v;
+        else if (v->attr == GX_VA_NRM) nrmD = v;
         else if (v->attr == GX_VA_CLR0) clrD = v;
         else if (v->attr == GX_VA_TEX0) texD = v;
     }
@@ -5586,8 +5588,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         for (vi = 0; vi < vcount; ++vi) {
             u32 curSlot = 0u;
             f32 px = 0.0f, py = 0.0f, pz = 0.0f, u = 0.0f, vv = 0.0f;
+            f32 nx = 0.0f, ny = 0.0f, nz = 0.0f;
             u8 cr = 255, cg = 255, cb = 255, ca = 255;
-            int haveTex = 0, haveCol = 0;
+            int haveTex = 0, haveCol = 0, haveNrm = 0;
             const HSD_VtxDescList* a2;
             for (a2 = tp->verts; a2->attr != GX_VA_NULL; ++a2) {
                 u32 idx;
@@ -5615,6 +5618,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                                 g_skinVtxPosN, curSlot, idx,
                                 g_slotEnv[cs], g_slotInfl[cs], px, py, pz);
                     }
+                } else if (a2->attr == GX_VA_NRM && tp->normalData != NULL && nrmD != NULL) {
+                    const f32* n = (const f32*)((const u8*)tp->normalData + (size_t)idx * a2->stride);
+                    nx = n[0]; ny = n[1]; nz = n[2]; haveNrm = 1;
                 } else if (a2->attr == GX_VA_TEX0 && tp->texcoordData != NULL && texD != NULL) {
                     const f32* t = (const f32*)((const u8*)tp->texcoordData + (size_t)idx * a2->stride);
                     u = t[0]; vv = t[1]; haveTex = 1;
@@ -5675,6 +5681,13 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                         f32 wx = (Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + Mp[0][3]) * inv;
                         f32 wy = (Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + Mp[1][3]) * inv;
                         f32 wz = (Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + Mp[2][3]) * inv;
+                        if (haveNrm) {
+                            f32 tx = Mp[0][0]*nx + Mp[0][1]*ny + Mp[0][2]*nz;
+                            f32 ty = Mp[1][0]*nx + Mp[1][1]*ny + Mp[1][2]*nz;
+                            f32 tz = Mp[2][0]*nx + Mp[2][1]*ny + Mp[2][2]*nz;
+                            f32 tl = sqrtf(tx*tx + ty*ty + tz*tz);
+                            if (tl > 1e-6f) { nx = tx / tl; ny = ty / tl; nz = tz / tl; }
+                        }
                         GXPosition3f32(wx, wy, wz);
                     } else {
                         GXPosition3f32(px, py, pz);
@@ -5684,6 +5697,13 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                     f32 wx = Mx[0][0]*px + Mx[0][1]*py + Mx[0][2]*pz + Mx[0][3];
                     f32 wy = Mx[1][0]*px + Mx[1][1]*py + Mx[1][2]*pz + Mx[1][3];
                     f32 wz = Mx[2][0]*px + Mx[2][1]*py + Mx[2][2]*pz + Mx[2][3];
+                    if (haveNrm) {
+                        f32 tx = Mx[0][0]*nx + Mx[0][1]*ny + Mx[0][2]*nz;
+                        f32 ty = Mx[1][0]*nx + Mx[1][1]*ny + Mx[1][2]*nz;
+                        f32 tz = Mx[2][0]*nx + Mx[2][1]*ny + Mx[2][2]*nz;
+                        f32 tl = sqrtf(tx*tx + ty*ty + tz*tz);
+                        if (tl > 1e-6f) { nx = tx / tl; ny = ty / tl; nz = tz / tl; }
+                    }
                     if (dbgVtxPos) {
                         f32 vx = cam->viewMatrix[0][0]*wx + cam->viewMatrix[0][1]*wy +
                                  cam->viewMatrix[0][2]*wz + cam->viewMatrix[0][3];
@@ -5733,6 +5753,9 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                         }
                     }
                     GXPosition3f32(wx, wy, wz);
+                }
+                if (haveNrm) {
+                    GXNormal3f32(nx, ny, nz);
                 }
                 GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
             }

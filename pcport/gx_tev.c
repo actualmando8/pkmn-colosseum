@@ -124,11 +124,8 @@ static const char* VERTEX_SHADER_SOURCE =
     "layout(location = 0) in vec3 a_position;\n"
     "layout(location = 1) in vec4 a_color0;\n"
     "layout(location = 2) in vec2 a_texcoord0;\n"
-    /* a_normal (location 3) is optional: the host vertex layout (GXTevVertex)
-     * does not carry a normal, so this attribute is disabled and reads its
-     * generic default. The default is set to (0,0,1) by the submit path so the
-     * v_normal varying is well-defined; per-fragment face normals are derived
-     * from v_viewPos in the fragment shader. */
+    /* a_normal (location 3) is optional per draw. Vertices without normals leave
+     * it zero, and the fragment shader falls back to derivative face normals. */
     "layout(location = 3) in vec3 a_normal;\n"
     "\n"
     "uniform mat4 u_projMatrix;\n"
@@ -580,22 +577,21 @@ s32 gx_tev_generate_fragment_shader(const GXTevState* state,
         "\n"
         "    fragColor = prev;\n"
         "\n"
-        /* Directional vertex lighting. The host geometry path does not carry a
-         * usable per-vertex normal (the scene PObjs submit POS+CLR+TEX only), so
-         * reconstruct a flat per-face normal from the screen-space derivatives of
-         * the view-space position. Cross(dFdx, dFdy) is the face normal in view
-         * space; orient it toward the camera (+Z) so front faces are lit. The
-         * lambert term shades each pillar face by its angle to the light, giving
-         * the otherwise flat-tan geometry visible 3D form. 2D overlays leave
-         * u_lightingEnabled == 0, so they stay full-bright. */
+        /* Directional lighting. Prefer real per-vertex normals when the draw
+         * supplies them; fall back to derivative face normals for older host
+         * paths that still submit only POS+CLR+TEX. */
         "    if (u_lightingEnabled != 0) {\n"
-        "        vec3 dpdx = dFdx(v_viewPos);\n"
-        "        vec3 dpdy = dFdy(v_viewPos);\n"
-        "        vec3 faceN = cross(dpdx, dpdy);\n"
+        "        vec3 faceN = v_normal;\n"
         "        float fl = length(faceN);\n"
+        "        if (fl <= 1e-6) {\n"
+        "            vec3 dpdx = dFdx(v_viewPos);\n"
+        "            vec3 dpdy = dFdy(v_viewPos);\n"
+        "            faceN = cross(dpdx, dpdy);\n"
+        "            fl = length(faceN);\n"
+        "        }\n"
         "        if (fl > 1e-6) {\n"
         "            faceN /= fl;\n"
-        "            if (faceN.z < 0.0) faceN = -faceN;\n"  /* face the camera */
+        "            if (faceN.z < 0.0) faceN = -faceN;\n"
         "            vec3 L = normalize(u_lightDir);\n"
         "            float ndl = max(0.0, dot(faceN, L));\n"
         "            float lambert = u_lightAmbient + (1.0 - u_lightAmbient) * ndl;\n"
@@ -1169,6 +1165,7 @@ static void tev_ensure_gl_objects(void) {
      *   loc 0: position  (3 x f32)  offset 0
      *   loc 1: color0    (4 x u8 normalized) offset 12
      *   loc 2: texcoord0 (2 x f32)  offset 16
+     *   loc 3: normal    (3 x f32)  offset 24
      */
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
@@ -1185,12 +1182,11 @@ static void tev_ensure_gl_objects(void) {
                           (GLsizei)sizeof(GXTevVertex),
                           (const void*)(3 * sizeof(f32) + 4 * sizeof(u8)));
 
-    /* loc 3: a_normal -- the host vertex layout carries no normal, so this
-     * attribute stays disabled and supplies a constant default of (0,0,1).
-     * Per-face lighting is reconstructed from view-space derivatives in the
-     * fragment shader; this default just keeps v_normal well-defined. */
-    glDisableVertexAttribArray(3);
-    glVertexAttrib3f(3, 0.0f, 0.0f, 1.0f);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE,
+                          (GLsizei)sizeof(GXTevVertex),
+                          (const void*)(3 * sizeof(f32) + 4 * sizeof(u8) +
+                                        2 * sizeof(f32)));
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

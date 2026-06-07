@@ -591,10 +591,23 @@ static BOOL TranslateVertexArray(const PCPortHSDArchive* archive,
         return TRUE;
 
     case GX_VA_NRM:
-        /* Normal (raw bytes already copied above). The host lights via face
-         * normals, so the per-vertex normal is not consumed at draw time -- the
-         * array only needs to exist (correctly sized) so the indexed display-list
-         * decode advances past the normal index and stays aligned. */
+        if (desc->comp_type != GX_F32 || desc->comp_cnt != GX_NRM_XYZ) {
+            free(data);
+            return FALSE;
+        }
+
+        for (i = 0; i < elementCount; ++i) {
+            u8* dst = data + ((size_t)i * desc->stride);
+            const u8* src = archive->storage + sourceOffset + ((size_t)i * desc->stride);
+            f32 x = ReadBEFloat(src + 0);
+            f32 y = ReadBEFloat(src + 4);
+            f32 z = ReadBEFloat(src + 8);
+
+            memcpy(dst + 0, &x, sizeof(x));
+            memcpy(dst + 4, &y, sizeof(y));
+            memcpy(dst + 8, &z, sizeof(z));
+        }
+
         outPObj->normalData = data;
         desc->vertex = data;
         return TRUE;

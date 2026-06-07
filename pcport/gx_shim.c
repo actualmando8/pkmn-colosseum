@@ -189,6 +189,7 @@ typedef struct {
     f32 pos[3];
     u8  color[4];
     f32 texcoord[2];
+    f32 normal[3];   /* per-vertex normal for smooth (Gouraud) shading; (0,0,0) = unset */
 } GXImmVertex;
 
 static GXImmVertex g_immVertices[GX_IMM_VTX_MAX];
@@ -402,9 +403,9 @@ static int GXDecodeIndexedAttr(const u8** cursor, const u8* end,
             }
             break;
         case GX_VA_NRM:
-            /* The index is already consumed above; the host lights via face
-             * normals (screen-space derivatives), so the per-vertex normal is
-             * not used -- just keep the vertex stream aligned for skinned meshes. */
+            out->normal[0] = GXReadNumericComponent(base + 0, fmt->compType, fmt->frac);
+            out->normal[1] = GXReadNumericComponent(base + GXGetCompTypeSize(fmt->compType), fmt->compType, fmt->frac);
+            out->normal[2] = GXReadNumericComponent(base + (GXGetCompTypeSize(fmt->compType) * 2), fmt->compType, fmt->frac);
             break;
         default:
             return 0;
@@ -2178,6 +2179,9 @@ void GXPosition3f32(f32 x, f32 y, f32 z) {
     g_immVertices[g_immVertexCount].pos[0] = x;
     g_immVertices[g_immVertexCount].pos[1] = y;
     g_immVertices[g_immVertexCount].pos[2] = z;
+    g_immVertices[g_immVertexCount].normal[0] = 0.0f;
+    g_immVertices[g_immVertexCount].normal[1] = 0.0f;
+    g_immVertices[g_immVertexCount].normal[2] = 0.0f;
 }
 
 void GXColor4u8(u8 r, u8 g, u8 b, u8 a) {
@@ -2200,6 +2204,14 @@ void GXTexCoord2f32(f32 s, f32 t) {
     g_immVertices[g_immVertexCount].texcoord[0] = s;
     g_immVertices[g_immVertexCount].texcoord[1] = t;
     g_immVertexCount++;
+}
+
+void GXNormal3f32(f32 x, f32 y, f32 z) {
+    if (g_immVertexCount >= GX_IMM_VTX_MAX) return;
+
+    g_immVertices[g_immVertexCount].normal[0] = x;
+    g_immVertices[g_immVertexCount].normal[1] = y;
+    g_immVertices[g_immVertexCount].normal[2] = z;
 }
 
 void GXCallDisplayList(void* list, u32 nbytes) {

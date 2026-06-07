@@ -967,6 +967,14 @@ void GXColor4u8(u8 r, u8 g, u8 b, u8 a);
 void GXTexCoord2f32(f32 s, f32 t);
 
 /**
+ * GXNormal3f32 -- Submit a normal (immediate mode).
+ * PC port: stores the normal on the current immediate vertex for smooth
+ * shader lighting. Vertices without normals leave this at zero and use the
+ * shader's derivative fallback.
+ */
+void GXNormal3f32(f32 x, f32 y, f32 z);
+
+/**
  * GXCallDisplayList -- Execute a pre-compiled display list.
  * Called from GSgfx_DrawDispatch (fn_800E1544).
  * PC port: glDrawArrays from pre-built static VBO.
