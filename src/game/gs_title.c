@@ -206,6 +206,15 @@ extern void  fn_801EF644(s32 result);
 
 /* Math */
 extern f32   fn_800EC53C(void);               /* Get distance */
+extern double sin(double);
+
+/* Named asm symbols (used in inline asm .inc files) */
+extern void menuModelSetMotion(void);
+extern void menuSubOpenYesNo(void);
+extern void itemParamConvertOrigFormat(void);
+extern void itemParamGetRecoverType(void);
+extern void pcboxGetPokemonBoxNbEmptySlot(void);
+extern void GSgfxBeginBackFBCapture(void);
 
 /* =========================================================================
  * SDA globals
@@ -1421,7 +1430,7 @@ extern u32 lbl_80478DD8;
 extern u8 lbl_8047A3A8;
 extern u32 lbl_8047A388;
 extern void fn_80025F84(void);
-#if 1
+#if 0
 asm void fn_80025730(void) {
 #include "src/game/gs_title_fn_80025730.inc"
 }
@@ -2314,7 +2323,7 @@ extern void fn_80105624(void);
 extern s32 fn_80135168(s32, s32);
 extern f64 fn_800CE148(f32);
 extern void fn_80166CC0(void);
-extern void fn_800F78A4(void);
+extern void fn_800F78A4(s32, s32, s32, s32, s32);
 extern void fn_80135030(void);
 extern u32 lbl_8047B878;
 extern u8 lbl_803A1FC8[];
@@ -2323,7 +2332,7 @@ extern u32 lbl_8047B868;
 extern u32 lbl_8047B86C;
 extern u32 lbl_8047B870;
 extern f32 lbl_8047B874;
-#if 1
+#if 0
 asm void fn_80020618(void) {
 #include "src/game/gs_title_fn_80020618.inc"
 }
@@ -2727,7 +2736,9 @@ extern void fn_80113FE8(void);
 extern u32 lbl_8047A35C;
 extern u32 lbl_8047B898;
 extern u32 lbl_8047A358;
-#if 1
+extern void menuModelSetMotion(void);
+extern void menuSubOpenYesNo(void);
+#if 0
 asm void fn_800210F0(void) {
 #include "src/game/gs_title_fn_800210F0.inc"
 }
@@ -2801,10 +2812,10 @@ void fn_80021644(void) {
 #endif
 
 /* fn_800216E8 - 0x800216E8 | size: 0x1d4 */
-extern void fn_800F96E4(void);
+extern void fn_800F96E4(void*, s32, void*);
 extern void* fn_8011F4F0(s32);
 extern u8 lbl_80266C7C[];
-#if 1
+#if 0
 asm void fn_800216E8(void) {
 #include "src/game/gs_title_fn_800216E8.inc"
 }
@@ -2880,7 +2891,7 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
 extern void fn_80014118(s32, void*, void*);
 extern s32 fn_80123FBC(s32);
 extern u8 fn_8011FC74(s32);
-extern void fn_8011FC14(void);
+extern f32 fn_8011FC14(void*);
 extern s32 fn_800141BC(void*, s32);
 extern void fn_80014198(s32);
 extern u8 lbl_803A1B90[];
@@ -2994,7 +3005,7 @@ extern u8 lbl_80478890[];
 extern u8 lbl_80266DB0[];
 extern u8 lbl_80266D78[];
 extern void fn_80023968(void);
-#if 1
+#if 0
 asm void fn_80021B14(void) {
 #include "src/game/gs_title_fn_80021B14.inc"
 }
@@ -3062,7 +3073,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
 #endif
 
 /* fn_8002217C - 0x8002217C | size: 0x2fc */
-#if 1
+#if 0
 asm void fn_8002217C(void) {
 #include "src/game/gs_title_fn_8002217C.inc"
 }
@@ -3073,10 +3084,10 @@ void fn_8002217C(void) { /* TODO */ }
 /* fn_80022478 - 0x80022478 | size: 0x2a8 */
 extern void jumptable_802E4F00();
 extern u8 lbl_80478888[];
-extern void fn_80023068(void);
+extern s32 fn_80023068(u32, u32*);
 extern void fn_800232F0(void);
-extern void fn_80023760(void);
-#if 1
+extern s32 fn_80023760(u32, u32*);
+#if 0
 asm void fn_80022478(void) {
 #include "src/game/gs_title_fn_80022478.inc"
 }
@@ -3195,7 +3206,7 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
  * syntax, scheduling pragmas).
  */
 extern u8 lbl_80266C54[];
-extern void fn_80023068(void);
+extern s32 fn_80023068(u32, u32*);
 extern void fn_800232F0(void);
 #if 0
 asm void fn_80022720(void) {
@@ -3236,14 +3247,14 @@ extern void fn_80143F24(void);
 extern void fn_80143EF0(void);
 extern void fn_80143E88(void);
 extern void fn_8011F228(void);
-extern void fn_8011F5C8(void);
+extern void fn_8011F5C8(s32);
 extern void fn_8011E778(void);
 extern void fn_8011E2AC(void);
 extern void fn_802600E4(void);
 extern void fn_80123D58(void);
 extern void fn_80123090(void);
 extern void fn_80122370(void);
-#if 1
+#if 0
 asm void fn_80022834(void) {
 #include "src/game/gs_title_fn_80022834.inc"
 }
@@ -3264,6 +3275,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern void fn_80123D58(s32, u32, u32);
     extern u32 fn_80123090(s32);
     extern void fn_80122370(s32, u32, s32);
+    extern void fn_80023274(void);
 
     void* handle;
     u8 status;
@@ -3359,14 +3371,14 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
 #endif
 
 /* fn_80022B3C - 0x80022B3C | size: 0x318 */
-extern void fn_8011E15C(void);
-extern void fn_80166A28(void);
-extern void fn_801666BC(void);
-extern void fn_80121B4C(void);
-extern void fn_8011F910(void);
+extern s32 fn_8011E15C(void);
+extern void fn_80166A28(s32);
+extern s32 fn_801666BC(s32);
+extern void fn_80121B4C(s32, s32);
+extern void fn_8011F910(s32, s32, s32);
 extern u8 lbl_80266C30[];
 extern u32 lbl_8047B8A0;
-#if 1
+#if 0
 asm void fn_80022B3C(void) {
 #include "src/game/gs_title_fn_80022B3C.inc"
 }
@@ -3393,6 +3405,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     s32 count;
     f32 f0;
     void* data_ptr;
+    f32 f1;
 
     data_ptr = &lbl_80266C30;
     temp_r30 = arg0;
@@ -3407,7 +3420,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     sp28 = *(s32*)((u8*)data_ptr + 0x18);
     sp2C = *(s32*)((u8*)data_ptr + 0x1C);
     
-    fn_80014118(&spC, &sp8);
+    fn_80014118(temp_r30, &spC, &sp8);
     result = fn_80123FBC(spC);
     
     if ((result & 0xFF000000) == 0) {
@@ -3434,8 +3447,8 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     
     /* Play particle sound effects */
     fn_8011F4F0(spC);
-    fn_80132A38(0x32, result);
-    fn_80132A38(0x2D, temp_r30);
+    fn_80132A38(0x32, (void*)result);
+    fn_80132A38(0x2D, (void*)temp_r30);
     
     result = *(s32*)((u8*)(&sp10) + temp_r29 * 0xC);
     fn_80106D3C(2, result, 1, 0);
@@ -3502,7 +3515,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     }
     
     /* Final particle processing */
-    fn_8011FC14(spC);
+    f1 = fn_8011FC14((void*)spC);
     f0 = lbl_8047B8A0;
     
     if (f1 > f0) {
@@ -3612,7 +3625,7 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
 /* fn_80023068 - 0x80023068 | size: 0x20c */
 extern s32 fn_80019B48(s32);
 extern void fn_80019B1C(void);
-#if 1
+#if 0
 asm void fn_80023068(void) {
 #include "src/game/gs_title_fn_80023068.inc"
 }
@@ -3726,7 +3739,7 @@ s32 fn_80023274(s32 r3, s32 r4) {
 #endif
 
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
-extern void fn_8012640C(void);
+extern s32 fn_8012640C(u32, s32, s32, s32);
 extern void fn_80165668(void);
 extern void fn_8011F4A8(void);
 extern void fn_80105D48(void);
@@ -3734,7 +3747,7 @@ extern void fn_80105C68(void);
 extern void fn_80123B5C(void);
 extern void fn_801236F8(void);
 extern f32 lbl_8047B8A4;
-#if 1
+#if 0
 asm void fn_800232F0(void) {
 #include "src/game/gs_title_fn_800232F0.inc"
 }
@@ -3743,7 +3756,7 @@ void fn_800232F0(void) { /* TODO */ }
 #endif
 
 /* fn_80023760 - 0x80023760 | size: 0x208 */
-#if 1
+#if 0
 asm void fn_80023760(void) {
 #include "src/game/gs_title_fn_80023760.inc"
 }
@@ -3822,7 +3835,7 @@ s32 fn_80023760(u32 arg0, u32* arg1) {
 extern void fn_80143DFC(void);
 extern void fn_80143A94(void);
 extern void fn_801437B8(void);
-#if 1
+#if 0
 asm void fn_80023968(void) {
 #include "src/game/gs_title_fn_80023968.inc"
 }
@@ -4114,7 +4127,7 @@ MATCH2:
 extern u32 lbl_8047A368;
 extern u32 lbl_80478DF4;
 extern u32 lbl_80478DF0;
-#if 1
+#if 0
 asm void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 #include "src/game/gs_title_fn_80024160.inc"
 }
