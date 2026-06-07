@@ -186,6 +186,17 @@ static int g_pcBattleModelSpaceVerts = 0;
  * 0 = model-space pass-through. Decided once per pobj so a triangle's corners are
  * never split across two transforms (which scattered the wings/Gulpin). */
 static int g_skinPobjPlaceByBone = 0;
+/* Cap (model units) for the halo-lift Y. The joint translations live in a larger
+ * scale than the model-space body verts (body tops out ~y=5 but the halo bone is
+ * y~15), so lifting to the raw bone Y floats the halo far above the head. Clamp it
+ * to sit just above the body. Tunable live via PCPORT_HALO_MAXY. */
+static f32 g_haloLiftMaxY = 7.0f;
+/* The model's root-joint scale (read from game data). A joint-local lifted piece's
+ * world position is divided by this to land in the body's (model-space) frame. */
+static f32 g_haloRootScale = 1.0f;
+/* Data-derived skeleton<->model scale (boneY/vertY of the body pieces), used to map
+ * a lifted joint-local piece (halo) back into the body's frame. ~2.0 for Shedinja. */
+static f32 g_haloModelRatio = 2.0f;
 #define PCPORT_SIBLING_MOBJ_OFFSET   0x39CCu
 #define PCPORT_SIBLING_POBJ_OFFSET   0x6F80u
 #define PCPORT_PDA2_BG_OBJECT0_JOINT_OFFSET 0x22E8u
@@ -5409,12 +5420,117 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
         GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     }
 
-    /* No vertex-space pre-pass needed: palette[slot] already encodes the correct
-     * transform per slot -- the bone's world matrix for RIGID (joint-local) slots,
-     * and (at the rest pose) the identity for ENVELOPE (model-space) slots. The
-     * submit loop applies palette[curSlot] uniformly to every vertex. (The old
-     * magnitude heuristic that guessed model-space slots is gone; the weight-based
-     * rigid/envelope discriminator in the palette build is exact.) */
+    /* Per-pobj joint-local detection (e.g. Shedinja's halo): a halo is authored at
+     * the model origin and lifted above the head by ONE bone. Pre-walk this pobj's
+     * verts for their centroid + dominant matrix slot; if the centroid sits near the
+     * origin but its rigid bone is far away, place the WHOLE pobj by that bone
+     * matrix. Decided once per pobj so a triangle is NEVER split across two
+     * transforms (the per-vertex version scattered the wings/Gulpin). Model-space
+     * body/wing pobjs sit AT their bone -> fail the test -> pass through unchanged.
+     * Disable with PCPORT_BATTLE_NO_HALO_LIFT. */
+    g_skinPobjPlaceByBone = 0;
+    /* Root scale: joint world matrices are in the skeleton frame, which for these
+     * models is a larger scale than the model-space body verts (joints reach y~15
+     * but the body tops out ~y=5). The model's ROOT joint carries that scale, so a
+     * lifted (joint-local) piece must be divided by it to land in the body's frame.
+     * Read it from the game data (root joint SRT: scale @ +0x20, BE float). */
+    {
+        union { u32 u; f32 f; } rs;
+        const char* hs;
+        f32 ds;
+        rs.u = PCPort_ReadBigEndianU32(a->storage + rootJoint + 0x20u);
+        ds = (rs.f > 0.05f && rs.f < 100.0f) ? rs.f : 1.0f;
+        /* The root joint scale is ~1 for these models, yet the skeleton joints are
+         * authored ~2x the model-space verts (body tops ~y=5, head joint ~y=10).
+         * Use the data root scale when it is meaningful (>1.2); otherwise fall back
+         * to the body<->skeleton frame ratio, tunable via PCPORT_HALO_SCALE. */
+        hs = getenv("PCPORT_HALO_SCALE");
+        if (hs != NULL && hs[0]) g_haloRootScale = (f32)atof(hs);   /* manual override */
+        else if (ds > 1.2f) g_haloRootScale = ds;                   /* real root scale */
+        else g_haloRootScale = g_haloModelRatio;                    /* data-derived ratio */
+    }
+    if (dbgNoMtx && posD != NULL && tp->positionData != NULL &&
+        getenv("PCPORT_BATTLE_NO_HALO_LIFT") == NULL) {
+        const u8* pdl = dl;
+        f32 cx = 0.0f, cy = 0.0f, cz = 0.0f, maxMag2 = 0.0f;
+        int cn = 0, domN = 0;
+        u32 cur = 0u, domSlot = 0u;
+        u32 scount[PCPORT_SKIN_MAX_SLOTS];
+        memset(scount, 0, sizeof(scount));
+        while (pdl + 3 <= end) {
+            u8 c = pdl[0];
+            u16 vc; u32 k;
+            if (c == 0u) { pdl += 1; continue; }
+            if ((c & 0xF8u) == 0u) break;
+            vc = (u16)(((u16)pdl[1] << 8) | pdl[2]);
+            pdl += 3;
+            if (vc == 0u) break;
+            for (k = 0; k < vc; ++k) {
+                const HSD_VtxDescList* ad;
+                for (ad = tp->verts; ad->attr != GX_VA_NULL; ++ad) {
+                    u32 ix; int isz;
+                    if (ad->attr <= GX_VA_TEX7MTXIDX) {
+                        if (pdl + 1 > end) { pdl = end; break; }
+                        if (ad->attr == GX_VA_PNMTXIDX) cur = (u32)pdl[0] / 3u;
+                        pdl += 1; continue;
+                    }
+                    isz = (ad->attr_type == GX_INDEX16) ? 2 : 1;
+                    if (pdl + isz > end) { pdl = end; break; }
+                    ix = (isz == 2) ? (u32)(((u16)pdl[0] << 8) | pdl[1]) : (u32)pdl[0];
+                    pdl += isz;
+                    if (ad->attr == GX_VA_POS) {
+                        const f32* pp = (const f32*)((const u8*)tp->positionData +
+                                                     (size_t)ix * ad->stride);
+                        f32 vz2 = (ad->comp_cnt == GX_POS_XYZ) ? pp[2] : 0.0f;
+                        f32 m2 = pp[0]*pp[0] + pp[1]*pp[1] + vz2*vz2;
+                        if (m2 > maxMag2) maxMag2 = m2;
+                        cx += pp[0]; cy += pp[1]; cz += vz2;
+                        ++cn;
+                    }
+                }
+                if (cur < PCPORT_SKIN_MAX_SLOTS &&
+                    (int)(++scount[cur]) > domN) { domN = (int)scount[cur]; domSlot = cur; }
+            }
+        }
+        if (cn > 0 && domSlot < (u32)slot && g_slotEnv[domSlot] == 0) {
+            f32 (*Mp)[4] = palette[domSlot];
+            f32 tx = Mp[0][3], ty = Mp[1][3], tz = Mp[2][3];
+            f32 tmag = tx*tx + ty*ty + tz*tz;
+            f32 ccx = cx / (f32)cn, ccy = cy / (f32)cn, ccz = cz / (f32)cn;
+            f32 cmag2 = ccx*ccx + ccy*ccy + ccz*ccz;
+            f32 domFrac = (f32)domN / (f32)cn;
+            /* Halo signature: a SMALL, SINGLE-bone piece whose verts all sit near the
+             * model origin (maxMag2/cmag2 small) while its bone is lifted high (tmag).
+             * Spread model-space body/wing pieces have large maxMag2 -> excluded, so
+             * the wings/Gulpin stay model-space (clean) and only the halo lifts. */
+            if (getenv("PCPORT_HALO_DBG") != NULL) {
+                fprintf(stderr, "[halo] v=%d centroid=(%.1f,%.1f,%.1f) cR=%.1f maxR=%.1f "
+                        "domSlot=%u domFrac=%.2f boneY=%.1f tmag=%.0f rootScale=%.2f "
+                        "-> liftY=%.1f\n",
+                        cn, ccx, ccy, ccz, sqrtf(cmag2), sqrtf(maxMag2),
+                        domSlot, domFrac, ty, tmag, g_haloRootScale,
+                        ty / (g_haloRootScale > 0.05f ? g_haloRootScale : 1.0f));
+            }
+            /* Data-derived skeleton<->model scale: a MODEL-SPACE body piece sits with
+             * its verts at model scale but its bone at skeleton scale, so boneY/vertY
+             * is exactly the model's skeleton/model ratio (Shedinja: head joint ~10 /
+             * head vert ~5 = 2.0). Average it over the body pieces; the lifted halo is
+             * then divided by THIS data ratio (no guessed constant). Only single-bone
+             * pieces clear of the origin contribute (clean joint<->vert correspondence). */
+            if (cmag2 >= 1.0f && ccy > 1.5f && ty > 1.5f && domFrac > 0.6f) {
+                f32 r = ty / ccy;
+                if (r > 1.1f && r < 6.0f)
+                    g_haloModelRatio = (g_haloModelRatio <= 0.0f)
+                                           ? r : (g_haloModelRatio * 0.85f + r * 0.15f);
+            }
+            /* Measured (Shedinja): halo pieces have centroid AT the origin (cR~0.2,
+             * cmag2~0.04) and are compact (maxR<2.5); every body/wing piece has
+             * cR>=1.0 (cmag2>=1.0). So cmag2<0.5 is a clean separator -- lift only
+             * the origin-centred, single-bone, high-bone (lifted) pieces. */
+            if (cmag2 < 0.5f && maxMag2 < 9.0f && domFrac > 0.85f && tmag > 16.0f)
+                g_skinPobjPlaceByBone = 1;
+        }
+    }
 
     while (dl + 3 <= end) {
         u8 cmd = dl[0];
@@ -5550,10 +5666,15 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                      * wings. So here it is a clean pass-through or a uniform bone
                      * placement decided once for the whole pobj. */
                     if (g_skinPobjPlaceByBone) {
+                        /* Place the joint-local piece by its bone, then divide by the
+                         * model root scale so it lands in the body's frame (the joint
+                         * frame is root-scaled larger than the model verts). This is
+                         * the game-data position, no guessed cap. */
                         f32 (*Mp)[4] = palette[curSlot];
-                        f32 wx = Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + Mp[0][3];
-                        f32 wy = Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + Mp[1][3];
-                        f32 wz = Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + Mp[2][3];
+                        f32 inv = (g_haloRootScale > 0.05f) ? (1.0f / g_haloRootScale) : 1.0f;
+                        f32 wx = (Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + Mp[0][3]) * inv;
+                        f32 wy = (Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + Mp[1][3]) * inv;
+                        f32 wz = (Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + Mp[2][3]) * inv;
                         GXPosition3f32(wx, wy, wz);
                     } else {
                         GXPosition3f32(px, py, pz);
@@ -10607,6 +10728,8 @@ static int RunBattleScene(GLFWwindow* window) {
              * the actor model matrix (folded into actorCam) places them correctly,
              * instead of the rigid/envelope palette which scatters them. */
             g_pcBattleModelSpaceVerts = (getenv("PCPORT_BATTLE_SKINPAL") == NULL);
+            { const char* hy = getenv("PCPORT_HALO_MAXY");
+              if (hy != NULL && hy[0]) g_haloLiftMaxY = (f32)atof(hy); }
             for (i = 0; i < 4; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
