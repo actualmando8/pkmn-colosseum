@@ -10299,6 +10299,7 @@ typedef struct PCPortBattleFlow {
     int playerHP;
     int enemyHP;
     int autoplay;
+    int requestPokemonSetup;
     char commandText[96];
     char messageText[128];
     char statusText[96];
@@ -10307,6 +10308,10 @@ typedef struct PCPortBattleFlow {
 
 static const char* kPcportBattleCommandNames[4] = {
     "FIGHT", "POKEMON", "BAG", "RUN"
+};
+
+static const char* kPcportBattleMoveNames[2] = {
+    "SWIFT", "TABLE MOVE 129"
 };
 
 static void DrawBattleUI(GXTexObj* messageTex,
@@ -10334,23 +10339,43 @@ static void DrawBattleUI(GXTexObj* messageTex,
     DrawTextScreen(26.0f, BOXY + 52.0f, 8.0f, 13.0f, 170, 224, 180, 255,
                    battleFlow->statusText);
 
-    /* --- command grid (bottom-right): FIGHT / POKeMON / BAG / RUN --- */
+    /* --- command / move grid (bottom-right) --- */
     DrawSolidScreenRect(406.0f, BOXY, 224.0f, BOXH, 232, 238, 244, 240);
     DrawSolidScreenRect(406.0f, BOXY, 224.0f, 3.0f, 200, 210, 220, 255);
     {
         const f32 cellX[4] = { 414.0f, 522.0f, 414.0f, 522.0f };
         const f32 cellY[4] = { BOXY + 8.0f,  BOXY + 8.0f,
                                BOXY + 44.0f, BOXY + 44.0f };
+        const char* names[4];
+        int itemCount = 4;
+        int selected = battleFlow->commandIndex;
+        if (battleFlow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
+            names[0] = kPcportBattleMoveNames[0];
+            names[1] = kPcportBattleMoveNames[1];
+            names[2] = "-";
+            names[3] = "-";
+            itemCount = 2;
+            selected = battleFlow->moveIndex;
+        } else {
+            names[0] = kPcportBattleCommandNames[0];
+            names[1] = kPcportBattleCommandNames[1];
+            names[2] = kPcportBattleCommandNames[2];
+            names[3] = kPcportBattleCommandNames[3];
+        }
         for (i = 0; i < 4; ++i) {
-            int sel = (battleFlow->commandIndex == i);
+            int active = i < itemCount;
+            int sel = active && (selected == i);
             f32 cx = cellX[i], cy = cellY[i];
             if (sel) {
                 DrawSolidScreenRect(cx - 6.0f, cy - 4.0f, 104.0f, 28.0f,
                                     64, 132, 214, 255);     /* selection highlight */
             }
             DrawTextScreen(cx, cy, 9.0f, 16.0f,
-                           sel ? 255 : 36, sel ? 255 : 48, sel ? 255 : 66, 255,
-                           kPcportBattleCommandNames[i]);
+                           sel ? 255 : (active ? 36 : 150),
+                           sel ? 255 : (active ? 48 : 158),
+                           sel ? 255 : (active ? 66 : 166),
+                           active ? 255 : 140,
+                           names[i]);
         }
     }
 }
@@ -10396,10 +10421,6 @@ static void DrawBattleActorIconFallback(PCPortBattleRenderActor actors[4],
                        236, 242, 248, 230, actors[i].displayName);
     }
 }
-
-static const char* kPcportBattleMoveNames[2] = {
-    "SWIFT", "TABLE MOVE 129"
-};
 
 static const char* PCPort_BattleFlowStateName(PCPortBattleFlowState state) {
     switch (state) {
@@ -10640,10 +10661,11 @@ static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
                                      ? actors[0].member : "Pokemon";
                 const char* p1 = (actors != NULL && actors[1].member != NULL)
                                      ? actors[1].member : "Pokemon";
+                flow->requestPokemonSetup = 1;
                 snprintf(flow->messageText, sizeof(flow->messageText),
-                         "Pokemon: %s / %s are ready.", p0, p1);
+                         "Choose Pokemon.");
                 printf("[battle-input] frame=%d source=%s action=A state=command-menu "
-                       "selected=POKEMON party=%s,%s policy=selected-team-visible\n",
+                       "selected=POKEMON party=%s,%s next=colosseum-setup\n",
                        frame, source, p0, p1);
             } else if (flow->commandIndex == 2) {
                 snprintf(flow->messageText, sizeof(flow->messageText),
@@ -11218,6 +11240,36 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
             }
         } else {
             PCPort_BattleFlowUpdate(&battleFlow, window, frame, actors);
+            {
+                const char* dbgPokemonFrame = getenv("PCPORT_BATTLE_DEBUG_POKEMON_FRAME");
+                if (dbgPokemonFrame != NULL && atoi(dbgPokemonFrame) == frame) {
+                    battleFlow.requestPokemonSetup = 1;
+                    printf("[battle-debug] frame=%d request=POKEMON setup\n", frame);
+                }
+            }
+            if (battleFlow.requestPokemonSetup) {
+                viewerMode = 1;
+                PCPort_PkxViewerInit(&pkxViewer, actors);
+                pkxViewer.prevZ = PCPort_BattleKeyDown(window, GLFW_KEY_Z);
+                pkxViewer.prevEnter = PCPort_BattleKeyDown(window, GLFW_KEY_ENTER);
+                if (getenv("PCPORT_BATTLE_UNIT") == NULL) {
+                    static const f32 kViewerX[4] = { -54.0f, -18.0f, 18.0f, 54.0f };
+                    static const f32 kViewerZ[4] = { 18.0f, 18.0f, 18.0f, 18.0f };
+                    for (i = 0; i < 4; ++i) {
+                        actors[i].x = kViewerX[i];
+                        actors[i].z = kViewerZ[i];
+                        actors[i].yaw = 0.0f;
+                    }
+                }
+                battleFlow.requestPokemonSetup = 0;
+                printf("[battle-scene] pokemon-command-opened-setup frame=%d actors=%s,%s,%s,%s\n",
+                       frame,
+                       actors[0].member != NULL ? actors[0].member : "-",
+                       actors[1].member != NULL ? actors[1].member : "-",
+                       actors[2].member != NULL ? actors[2].member : "-",
+                       actors[3].member != NULL ? actors[3].member : "-");
+                fflush(stdout);
+            }
         }
         for (i = 0; i < 4; ++i) {
             PCPort_BattleActorStep(&actors[i]);
