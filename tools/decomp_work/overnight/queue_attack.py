@@ -568,7 +568,7 @@ def process_one(task: dict) -> None:
     if best_pct < MIN_PCT_KEEP or not best_code:
         _log(f"REJECT {fn}: best={best_pct:.1f}% via {best_model} (<{MIN_PCT_KEEP}%)")
         mark_task(task["id"], "failed", {
-            "best_pct": best_pct, "best_model": best_model,
+            "attempt_pct": best_pct, "attempt_model": best_model,
             "reason": "below-threshold",
         })
         update_tokens(0, fn, "idle")
