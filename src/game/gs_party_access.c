@@ -310,14 +310,13 @@ asm void fn_8000BE74(void) {
 #pragma peephole off
 s32 fn_8000BE74(s32 arg) {
     u32 local;
-    u32 *p;
     s32 idx;
     local = 0;
     if ((fn_800F7BC4(1) & 0x20) != 0) {
         if ((u8)fn_8001E3E0(0, &local) == 0) { return -1; }
     }
-    for (p = lbl_802E28F0, idx = 0; idx < 0x99; p += 2, idx++) {
-        if (arg == (s32)p[0]) {
+    for (idx = 0; idx < 0x99; idx++) {
+        if (arg == (s32)lbl_802E28F0[idx * 2]) {
             switch (arg) {
                 case 0x63: local = 0xb; break;
                 case 0x64: local = 0xa; break;

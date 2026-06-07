@@ -138,9 +138,10 @@ asm void fn_80015050(void) {
 #pragma peephole off
 typedef s32 (*DrawHandlerFn)(u8*, u8*, s16*);
 s32 fn_80015050(u8* src, u8* param) {
-    u8* entry = &lbl_80266918[(s32)(s8)src[0x95] * 0x4C];
-    DrawHandlerFn fp = *(DrawHandlerFn*)(entry + 0x18);
+    DrawHandlerFn fp;
     u16 tmp;
+    u8* entry = (u8*)lbl_80266918 + (s32)(s8)src[0x95] * 0x4C;
+    fp = *(DrawHandlerFn*)(entry + 0x18);
     if (fp != NULL) {
         tmp = fn_80103E68((u16)*(u32*)(entry + 0x1C)) >> 16;
         return fp(src, param, (s16*)&tmp);
@@ -280,7 +281,7 @@ s32 fn_80016618(u8* src, u8* dst) {
     u16 tmp;
     tmp = (u16)(fn_80103E68((u16)*(u32*)(&lbl_80266918[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
     if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
-        dst[0x67] = (u8)(s32)(*(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4));
+        dst[0x67] = *(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4);
     } else {
         dst[0x67] = 0;
     }
