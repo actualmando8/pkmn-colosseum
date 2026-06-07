@@ -7,8 +7,10 @@ export MODELS='deepseek/deepseek-v4-flash'
 export AGENT_NAME='deepseek-v4-flash'
 export TIER_FILTER='codex,deepseek,kimi'
 export MAX_FN_ASM_LINES='240'
-export MIN_PRIOR_PCT='60'
-export REQUIRE_SEED='1'
+# Broad-drain mode: attack any eligible queued fn (not just >=60% near-misses with
+# a seed). Set MIN_PRIOR_PCT=60 / REQUIRE_SEED=1 to return to marginal-gains cracker mode.
+export MIN_PRIOR_PCT='0'
+export REQUIRE_SEED='0'
 export REPAIR_ROUNDS='8'
 export PLATEAU_BREAK_AFTER='3'
 # FILE_FILTER: queue_attack.py defaults to a narrow hsd/gs whitelist with no queued
