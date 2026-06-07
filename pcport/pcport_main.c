@@ -10768,10 +10768,23 @@ static int RunBattleScene(GLFWwindow* window) {
             if (disablePkxDepth) {
                 GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
             }
-            /* pkx verts are model-space; submit them through the identity path so
-             * the actor model matrix (folded into actorCam) places them correctly,
-             * instead of the rigid/envelope palette which scatters them. */
-            g_pcBattleModelSpaceVerts = (getenv("PCPORT_BATTLE_SKINPAL") == NULL);
+            /* PKX verts are model-space; submit them through the identity path so
+             * the actor model matrix (folded into actorCam) places them correctly.
+             * The rigid/envelope palette is still available only as an explicit
+             * failure-repro knob because it double-transforms model-space PKX verts. */
+            g_pcBattleModelSpaceVerts =
+                (getenv("PCPORT_BATTLE_FORCE_SKINPAL") == NULL);
+            if (frame == 0) {
+                printf("[battle-pkx] vertexSpace=%s palette=%s reason=%s%s\n",
+                       g_pcBattleModelSpaceVerts ? "model-space" : "skin-palette",
+                       g_pcBattleModelSpaceVerts ? "bypassed" : "forced-debug",
+                       g_pcBattleModelSpaceVerts
+                           ? "pkx-verts-match-meshdump-model-space"
+                           : "PCPORT_BATTLE_FORCE_SKINPAL",
+                       getenv("PCPORT_BATTLE_SKINPAL") != NULL
+                           ? " deprecated-env-PCPORT_BATTLE_SKINPAL-ignored"
+                           : "");
+            }
             { const char* hy = getenv("PCPORT_HALO_MAXY");
               if (hy != NULL && hy[0]) g_haloLiftMaxY = (f32)atof(hy); }
             for (i = 0; i < 4; ++i) {
