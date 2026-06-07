@@ -6036,9 +6036,18 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                 }
                 GXHostSetVertexAlphaScale(1.0f);
 
-                ConcatAffineMtx(cam->viewMatrix,
-                                translatedJoint.modelMatrix,
-                                modelViewMatrix);
+                if (g_pcBattleModelSpaceVerts) {
+                    /* Battle pkx verts are MODEL-space. The rigid (non-type-2) draw
+                     * path below (fn_800DAD10) would otherwise concat the joint
+                     * matrix and scatter them into stray "wing" triangles (e.g.
+                     * Shedinja's back). Place by the camera only, matching the
+                     * skinned path, so these pieces stay in the body. */
+                    memcpy(modelViewMatrix, cam->viewMatrix, sizeof(modelViewMatrix));
+                } else {
+                    ConcatAffineMtx(cam->viewMatrix,
+                                    translatedJoint.modelMatrix,
+                                    modelViewMatrix);
+                }
                 GXLoadPosMtxImm(modelViewMatrix, 0);
                 GXSetCurrentMtx(0);
                 /* Apply this PObj's vertex descriptor + arrays to the GX shim so
