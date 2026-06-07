@@ -173,6 +173,14 @@ unsigned long CurrTvMode = 0;
 static int g_pcBattleSuppressControlPObjs = 0;
 static unsigned int g_pcBattleMaterialLogBudget = 0;
 static int g_pcBattleRenderSkin = 0;
+/* Battle pkx (Pokemon) meshes store their vertices in MODEL space (bind pose),
+ * NOT joint-local like the field character (ken_b1). Proven empirically: rendering
+ * them with NO skin matrix (raw verts placed by the actor model matrix) yields a
+ * clean, correct model, while the rigid/envelope palette scatters them. Until the
+ * envelope-skin palette is fixed to resolve to identity-at-rest, submit pkx verts
+ * model-space (the per-actor model matrix already places them in the scene). Scoped
+ * to the pkx render loop so the (joint-local) field character path is unaffected. */
+static int g_pcBattleModelSpaceVerts = 0;
 #define PCPORT_SIBLING_MOBJ_OFFSET   0x39CCu
 #define PCPORT_SIBLING_POBJ_OFFSET   0x6F80u
 #define PCPORT_PDA2_BG_OBJECT0_JOINT_OFFSET 0x22E8u
@@ -5347,7 +5355,7 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
      * (model expects runtime lighting we don't yet drive)". */
     int dbgReplace = (getenv("PCPORT_SKIN_REPLACE") != NULL);
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
-    int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
+    int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL) || g_pcBattleModelSpaceVerts;
     int dbgVtxPos  = (getenv("PCPORT_SKIN_VTXPOS") != NULL);
     f32 dbgViewMin[3] = {0.0f, 0.0f, 0.0f};
     f32 dbgViewMax[3] = {0.0f, 0.0f, 0.0f};
@@ -10551,6 +10559,10 @@ static int RunBattleScene(GLFWwindow* window) {
             if (disablePkxDepth) {
                 GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
             }
+            /* pkx verts are model-space; submit them through the identity path so
+             * the actor model matrix (folded into actorCam) places them correctly,
+             * instead of the rigid/envelope palette which scatters them. */
+            g_pcBattleModelSpaceVerts = (getenv("PCPORT_BATTLE_SKINPAL") == NULL);
             for (i = 0; i < 4; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
@@ -10561,6 +10573,7 @@ static int RunBattleScene(GLFWwindow* window) {
                                 actors[i].rootJoint, &actorCam,
                                 (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
             }
+            g_pcBattleModelSpaceVerts = 0;
             if (disablePkxDepth) {
                 GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             }
