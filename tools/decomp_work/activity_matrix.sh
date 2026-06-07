@@ -5,6 +5,8 @@ REPO=/mnt/c/Users/douglaswhittingham/pkmn-colosseum
 cd "$REPO" 2>/dev/null || exit 1
 G=$'\e[38;5;46m'; C=$'\e[38;5;51m'; Y=$'\e[38;5;226m'; M=$'\e[38;5;201m'; D=$'\e[38;5;240m'; R=$'\e[0m'
 last_commit=""
+last_deepseek=""
+last_research=""
 echo "${G}=== RE-AGENT ACTIVITY MATRIX ===${R}"
 while true; do
   ts=$(date +%H:%M:%S)
@@ -16,12 +18,19 @@ while true; do
   fi
   # latest worker activity (deepseek + qwen logs + permuter swarm + research log)
   ds=$(tail -1 tools/decomp_work/overnight/logs/deepseek_v4_live.log 2>/dev/null | grep -oE "START fn_[0-9A-F]+|REJECT fn_[0-9A-F]+.*|[0-9.]+% via" | head -1)
-  [ -n "$ds" ] && echo "${C}${ts} DEEPSEEK ${R}$ds"
-  rl=$(tail -1 .omc/research_log.jsonl 2>/dev/null | python3 -c "import sys,json
+  if [ -n "$ds" ] && [ "$ds" != "$last_deepseek" ]; then
+    echo "${C}${ts} DEEPSEEK ${R}$ds"
+    last_deepseek="$ds"
+  fi
+  raw_rl=$(tail -1 .omc/research_log.jsonl 2>/dev/null)
+  rl=$(printf '%s' "$raw_rl" | python3 -c "import sys,json
 try:
  d=json.loads(sys.stdin.read()); print(d.get('stage','?'),d.get('fn',''),d.get('msg','')[:50])
 except: pass" 2>/dev/null)
-  [ -n "$rl" ] && echo "${Y}${ts} SWARM    ${R}$rl"
+  if [ -n "$rl" ] && [ "$raw_rl" != "$last_research" ]; then
+    echo "${Y}${ts} SWARM    ${R}$rl"
+    last_research="$raw_rl"
+  fi
   # active annealer chains
   ann=$(python3 -c "import json
 try:
