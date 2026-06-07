@@ -17,3 +17,11 @@
   `fn_801E1D7C 8/42 19.0476%` in committed source; a typed semantic rewrite was
   tested locally and reached `32/42 76.1905%`, but was not committed because this
   pass is scoped to clean exact wins.
+- **2026-06-06 (Codex Battle Colosseum PC-port support, queue setter)** —
+  continued in the battle queue/state helper cluster. Corrected `fn_801E4B08`
+  to forward its input value pointer into `fn_8009F230` and declared
+  `lbl_8046AE58` as an array/data label so MWCC emits the target absolute
+  address setup instead of SDA scalar addressing. Verified with
+  `python tools/compile_check.py src/game/battle/battle_logic.c --diff --symbols fn_801E4B08 fn_801E17A8 --timeout 180`:
+  `fn_801E4B08 12/12 100.0000%`,
+  `fn_801E17A8 26/26 100.0000%`.

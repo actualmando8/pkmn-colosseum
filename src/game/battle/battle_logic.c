@@ -1380,7 +1380,7 @@ int fn_801E4724(void);
 void fn_801E4778(void);
 void fn_801E4A6C(void);
 u32 fn_801E4AC4(u32 arg);
-void fn_801E4B08(void);
+void fn_801E4B08();
 void fn_801E4DAC(void);
 void fn_801E4DE8(void);
 void fn_801E4E1C(void);
@@ -6452,9 +6452,9 @@ asm void fn_801E4B08(void) {
 #include "src/game/battle/battle_logic_fn_801E4B08.inc"
 }
 #else
-void fn_801E4B08(void) {
-    extern u8 lbl_8046AE58;
-    fn_8009F230(&lbl_8046AE58, (void *)0, 0);
+void fn_801E4B08(void* val) {
+    extern u8 lbl_8046AE58[];
+    fn_8009F230(lbl_8046AE58, val, 0);
 }
 #endif
 
@@ -17184,4 +17184,3 @@ void fn_801EEFF4(void) {
     return;
 }
 #endif
-
