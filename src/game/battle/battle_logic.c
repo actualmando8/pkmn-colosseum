@@ -2780,9 +2780,21 @@ void fn_801E17A8(void) {
     extern u32 lbl_8047B458;
     extern u32 lbl_8047B45C;
     extern void fn_801E3978(u32, u32, u32, u32, u32);
-    u8 tmp;
-    tmp = lbl_8047B440 != 0 && lbl_8047B441 != 0;
-    if (tmp != 0) {
+    u32 tmp;
+
+    if (lbl_8047B440 == 0) {
+        goto false_case;
+    }
+    if (lbl_8047B441 != 0) {
+        goto true_case;
+    }
+false_case:
+    tmp = 0;
+    goto test_case;
+true_case:
+    tmp = 1;
+test_case:
+    if ((u8)tmp != 0) {
         fn_801E3978(lbl_8047B45C, lbl_8047B458, lbl_8047B454, lbl_80469030[0], lbl_80469030[1]);
     }
 }
