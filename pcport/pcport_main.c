@@ -181,9 +181,11 @@ static int g_pcBattleRenderSkin = 0;
  * model-space (the per-actor model matrix already places them in the scene). Scoped
  * to the pkx render loop so the (joint-local) field character path is unaffected. */
 static int g_pcBattleModelSpaceVerts = 0;
-/* When 1, disable the per-vertex "joint-local rigid piece -> place by bone matrix"
- * correction (e.g. Shedinja's halo). Set from PCPORT_BATTLE_NO_RIGID_PLACE. */
-static int g_battleNoRigidPlace = 0;
+/* Set per-pobj (whole mesh piece) inside RenderSkinnedPObj: 1 = this pobj's verts
+ * are joint-local and must be placed by its bone matrix (e.g. Shedinja's halo);
+ * 0 = model-space pass-through. Decided once per pobj so a triangle's corners are
+ * never split across two transforms (which scattered the wings/Gulpin). */
+static int g_skinPobjPlaceByBone = 0;
 #define PCPORT_SIBLING_MOBJ_OFFSET   0x39CCu
 #define PCPORT_SIBLING_POBJ_OFFSET   0x6F80u
 #define PCPORT_PDA2_BG_OBJECT0_JOINT_OFFSET 0x22E8u
@@ -5541,26 +5543,17 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                  * PCPORT_SKIN_NOMTX submits raw local coords for A/B comparison. */
                 if (dbgWhite || !haveCol) GXColor4u8(255,255,255,255); else GXColor4u8(cr, cg, cb, ca);
                 if (dbgNoMtx) {
-                    /* Model-space pass-through for the bulk of the mesh, EXCEPT
-                     * rigid accessory pieces whose verts are JOINT-LOCAL (clustered
-                     * near the origin) and need their bone's world transform to land
-                     * in place -- e.g. Shedinja's halo, authored at the origin and
-                     * lifted above the head by its bone. Per-vertex test: if the raw
-                     * vert is closer to the origin than to its rigid bone's world
-                     * translate (and that bone is meaningfully offset), it's
-                     * joint-local -> place it by the bone matrix; otherwise the vert
-                     * is already model-space -> pass through. (Disable via
-                     * PCPORT_BATTLE_NO_RIGID_PLACE for A/B.) */
-                    f32 (*Mp)[4] = palette[curSlot];
-                    f32 tx = Mp[0][3], ty = Mp[1][3], tz = Mp[2][3];
-                    f32 tmag = tx*tx + ty*ty + tz*tz;
-                    f32 d0   = px*px + py*py + pz*pz;
-                    f32 dt   = (px-tx)*(px-tx) + (py-ty)*(py-ty) + (pz-tz)*(pz-tz);
-                    if (curSlot < (u32)slot && g_slotEnv[curSlot] == 0 &&
-                        tmag > 4.0f && d0 < dt && !g_battleNoRigidPlace) {
-                        f32 wx = Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + tx;
-                        f32 wy = Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + ty;
-                        f32 wz = Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + tz;
+                    /* Model-space pass-through for the whole mesh. Joint-local
+                     * accessory pieces (e.g. Shedinja's halo) are lifted PER-POBJ
+                     * before this loop (g_skinPobjPlaceByBone) -- never per-vertex,
+                     * which would split a triangle's corners apart and scatter the
+                     * wings. So here it is a clean pass-through or a uniform bone
+                     * placement decided once for the whole pobj. */
+                    if (g_skinPobjPlaceByBone) {
+                        f32 (*Mp)[4] = palette[curSlot];
+                        f32 wx = Mp[0][0]*px + Mp[0][1]*py + Mp[0][2]*pz + Mp[0][3];
+                        f32 wy = Mp[1][0]*px + Mp[1][1]*py + Mp[1][2]*pz + Mp[1][3];
+                        f32 wz = Mp[2][0]*px + Mp[2][1]*py + Mp[2][2]*pz + Mp[2][3];
                         GXPosition3f32(wx, wy, wz);
                     } else {
                         GXPosition3f32(px, py, pz);
@@ -6036,18 +6029,9 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                 }
                 GXHostSetVertexAlphaScale(1.0f);
 
-                if (g_pcBattleModelSpaceVerts) {
-                    /* Battle pkx verts are MODEL-space. The rigid (non-type-2) draw
-                     * path below (fn_800DAD10) would otherwise concat the joint
-                     * matrix and scatter them into stray "wing" triangles (e.g.
-                     * Shedinja's back). Place by the camera only, matching the
-                     * skinned path, so these pieces stay in the body. */
-                    memcpy(modelViewMatrix, cam->viewMatrix, sizeof(modelViewMatrix));
-                } else {
-                    ConcatAffineMtx(cam->viewMatrix,
-                                    translatedJoint.modelMatrix,
-                                    modelViewMatrix);
-                }
+                ConcatAffineMtx(cam->viewMatrix,
+                                translatedJoint.modelMatrix,
+                                modelViewMatrix);
                 GXLoadPosMtxImm(modelViewMatrix, 0);
                 GXSetCurrentMtx(0);
                 /* Apply this PObj's vertex descriptor + arrays to the GX shim so
@@ -10623,7 +10607,6 @@ static int RunBattleScene(GLFWwindow* window) {
              * the actor model matrix (folded into actorCam) places them correctly,
              * instead of the rigid/envelope palette which scatters them. */
             g_pcBattleModelSpaceVerts = (getenv("PCPORT_BATTLE_SKINPAL") == NULL);
-            g_battleNoRigidPlace = (getenv("PCPORT_BATTLE_NO_RIGID_PLACE") != NULL);
             for (i = 0; i < 4; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
