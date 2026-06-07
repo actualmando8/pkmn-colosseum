@@ -9898,14 +9898,22 @@ static void PCPort_BattleApplyGridPlacement(PCPortBattleRenderActor actors[4]) {
      * current PKX render units until the real battleGrid state is wired through. */
     static const f32 kGridX[4] = { -3.0f, 3.0f, -3.0f, 3.0f };
     static const f32 kGridZ[4] = { -5.0f, -5.0f, 5.0f, 5.0f };
-    const f32 unit = 10.0f;
+    f32 unit = 10.0f;
+    f32 yawP = 3.14159f, yawE = 0.0f;
     int i;
+    /* Live tuning while we dial in battle placement:
+     *   PCPORT_BATTLE_UNIT=<f>   grid spacing multiplier (default 10)
+     *   PCPORT_BATTLE_YAW=<p,e>  player/enemy facing radians (default pi,0) */
+    { const char* u = getenv("PCPORT_BATTLE_UNIT");
+      if (u != NULL && u[0]) { f32 v = (f32)atof(u); if (v > 0.0f) unit = v; } }
+    { const char* y = getenv("PCPORT_BATTLE_YAW");
+      if (y != NULL && y[0]) { float p, e; if (sscanf(y, "%f,%f", &p, &e) == 2) { yawP = p; yawE = e; } } }
 
     for (i = 0; i < 4; ++i) {
         actors[i].x = kGridX[i] * unit;
         actors[i].y = 0.0f;
         actors[i].z = kGridZ[i] * unit;
-        actors[i].yaw = (i < 2) ? 3.14159f : 0.0f;
+        actors[i].yaw = (i < 2) ? yawP : yawE;
     }
     printf("[battle-grid] source=src/game/battle/battle_grid.c:fn_801C27F4 "
            "center=(0,0) unit=%.1f slots={P0(%.1f,%.1f),P1(%.1f,%.1f),"
