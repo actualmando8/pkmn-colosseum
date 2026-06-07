@@ -381,6 +381,28 @@ def local_attack(test: dict, src: Path, stem: str, fn: str, backup: bytes,
             "best_model": "no-seed",
             "history": history,
         }
+    if REQUIRE_SEED:
+        print("  Phase 1.5: seed precheck")
+        seed_scored = []
+        for c in candidates:
+            pct, ok, reason = score_local(c.get("code", ""), src, stem, fn, backup)
+            seed_scored.append({**c, "match_pct": pct, "compile_ok": ok, "reason": reason})
+            print(f"    {c['model']:36}  {pct:5.1f}%  compile={ok}  reason={reason}  seed")
+        history.append({"phase": "seed_precheck", "candidates": [
+            {k: v for k, v in s.items() if k != "raw"} for s in seed_scored
+        ]})
+        best_seed = max(seed_scored, key=lambda x: (x["match_pct"], x["compile_ok"]))
+        if best_seed["match_pct"] < MIN_PRIOR_PCT or not best_seed.get("compile_ok"):
+            print(
+                f"  seed best {best_seed['match_pct']:.1f}% below min_prior "
+                f"{MIN_PRIOR_PCT:.1f}%; skipping token spend"
+            )
+            return {
+                "best_pct": best_seed["match_pct"],
+                "best_code": best_seed.get("code", ""),
+                "best_model": best_seed.get("model", "seed-precheck"),
+                "history": history,
+            }
     if len(MODELS) > 1:
         with ThreadPoolExecutor(max_workers=len(MODELS)) as ex:
             futs = [ex.submit(af.gen_cloud, m, test["prompt"], max_tokens) for m in MODELS]
