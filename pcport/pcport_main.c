@@ -5123,13 +5123,13 @@ static f32 g_locMin[3], g_locMax[3], g_wMin[3], g_wMax[3];
 static int g_slotEnv[PCPORT_SKIN_MAX_SLOTS]; /* 1 = slot is envelope/blend, 0 = rigid */
 static int g_slotInfl[PCPORT_SKIN_MAX_SLOTS]; /* influence count per slot */
 
-/* Set by the main menu (New Game / Continue) to hand off into the walkable field
- * after RunMenuScene returns -> boot->title->menu->field is the start-of-game flow.
- * Also acts as the "real game session" flag: when set, the field walk auto-loads
- * the real skinned player (Wes/ken_b1) and enables the envelope-skin path WITHOUT
- * the PCPORT_FIELD_WES / PCPORT_SKIN dev env flags. Declared here (ahead of
- * RenderJointTree) so the skin gate can read it. */
+/* Set by the main menu to hand off after RunMenuScene returns.
+ * g_pcEnterFieldWalk also acts as the "real game session" flag: when set, the
+ * field walk auto-loads the real skinned player (Wes/ken_b1) and enables the
+ * envelope-skin path WITHOUT the PCPORT_FIELD_WES / PCPORT_SKIN dev env flags.
+ * Declared here (ahead of RenderJointTree) so the skin gate can read it. */
 static int g_pcEnterFieldWalk = 0;
+static int g_pcEnterBattleColosseum = 0;
 
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
  * the GameCube envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix
@@ -7488,6 +7488,13 @@ static int RunMenuScene(GLFWwindow* window) {
         ok = 1;
         goto cleanup;
     }
+    /* Headless verify of the Colosseum Battle menu hand-off. */
+    if (getenv("PCPORT_DEBUG_COLOSSEUM_BATTLE") != NULL) {
+        printf("[pcport_bootstrap] DEBUG_COLOSSEUM_BATTLE -> entering Battle Colosseum\n");
+        g_pcEnterBattleColosseum = 1;
+        ok = 1;
+        goto cleanup;
+    }
 
     /* Build the ASCII font atlas once (GL context ready) for menu/prompt text. */
     EnsureFontAtlas();
@@ -7622,9 +7629,10 @@ static int RunMenuScene(GLFWwindow* window) {
                     }
                     break;
                 case 2: /* COLOSSEUM BATTLE */
-                    dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
-                    dialogText = "Colosseum Battle is not yet available in this port.";
-                    break;
+                    printf("[pcport_bootstrap] Colosseum Battle -> entering battle scene\n");
+                    g_pcEnterBattleColosseum = 1;
+                    ok = 1;
+                    goto cleanup;
                 case 3: /* BATTLE NOW */
                     dialogYesNo = 0; dialogKind = PCPORT_DLG_INFO;
                     dialogText = "Battle Now is not yet available in this port.";
@@ -9790,6 +9798,113 @@ typedef struct PCPortBattleRenderActor {
     int motionLoaded;
 } PCPortBattleRenderActor;
 
+#define PCPORT_PKX_VIEWER_MAX_MODELS 640
+#define PCPORT_PKX_VIEWER_NAME_MAX 64
+
+typedef struct PCPortPkxViewerState {
+    int enabled;
+    int selectedSlot;
+    int selectedModel[4];
+    int selectedMotion[4];
+    f32 inspectYaw[4];
+    f32 baseScale;
+    int autoSpin;
+    int startBattle;
+    int modelCount;
+    char modelNames[PCPORT_PKX_VIEWER_MAX_MODELS][PCPORT_PKX_VIEWER_NAME_MAX];
+    int prevTab, prevLeft, prevRight, prevUp, prevDown;
+    int prevOne, prevTwo, prevThree, prevFour;
+    int prevQ, prevE, prevR, prevEnter, prevZ;
+} PCPortPkxViewerState;
+
+static const char* kPcportPkxViewerFallbackModels[] = {
+    "zangoose", "gokulin", "nukenin", "boober", "bangiras",
+    "absol", "raichu", "arbok", "mew", "nendoll", "sakurabyss"
+};
+
+static int PCPort_PkxViewerAddModel(PCPortPkxViewerState* viewer,
+                                    const char* name) {
+    int i;
+    if (viewer == NULL || name == NULL || name[0] == '\0' ||
+        viewer->modelCount >= PCPORT_PKX_VIEWER_MAX_MODELS) {
+        return 0;
+    }
+    for (i = 0; i < viewer->modelCount; ++i) {
+        if (strcmp(viewer->modelNames[i], name) == 0) {
+            return 0;
+        }
+    }
+    snprintf(viewer->modelNames[viewer->modelCount],
+             sizeof(viewer->modelNames[viewer->modelCount]), "%s", name);
+    viewer->modelCount++;
+    return 1;
+}
+
+static void PCPort_PkxViewerLoadModelList(PCPortPkxViewerState* viewer) {
+    FILE* f;
+    char line[512];
+    int i;
+    if (viewer == NULL) {
+        return;
+    }
+    f = fopen("build_pc/pkx_model_audit.csv", "rb");
+    if (f != NULL) {
+        while (fgets(line, sizeof(line), f) != NULL) {
+            char* archive;
+            char* member;
+            char* status;
+            char* comma0;
+            char* comma1;
+            char* comma2;
+            if (strncmp(line, "archive,", 8) == 0) {
+                continue;
+            }
+            archive = line;
+            comma0 = strchr(archive, ',');
+            if (comma0 == NULL) {
+                continue;
+            }
+            *comma0 = '\0';
+            member = comma0 + 1;
+            comma1 = strchr(member, ',');
+            if (comma1 == NULL) {
+                continue;
+            }
+            *comma1 = '\0';
+            status = comma1 + 1;
+            comma2 = strchr(status, ',');
+            if (comma2 != NULL) {
+                *comma2 = '\0';
+            }
+            if (strncmp(archive, "pkx_", 4) == 0 &&
+                strcmp(status, "fail") != 0) {
+                PCPort_PkxViewerAddModel(viewer, member);
+            }
+        }
+        fclose(f);
+    }
+    if (viewer->modelCount == 0) {
+        for (i = 0; i < (int)(sizeof(kPcportPkxViewerFallbackModels) /
+                              sizeof(kPcportPkxViewerFallbackModels[0])); ++i) {
+            PCPort_PkxViewerAddModel(viewer, kPcportPkxViewerFallbackModels[i]);
+        }
+    }
+}
+
+static int PCPort_PkxViewerFindModel(const PCPortPkxViewerState* viewer,
+                                     const char* name) {
+    int i;
+    if (viewer == NULL || name == NULL) {
+        return 0;
+    }
+    for (i = 0; i < viewer->modelCount; ++i) {
+        if (strcmp(viewer->modelNames[i], name) == 0) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 static int PCPort_LoadPkxRenderActor(PCPortBattleRenderActor* actor) {
     char fsysPath[320];
     u8* memberData = NULL;
@@ -9872,6 +9987,11 @@ static int PCPort_LoadPkxRenderActor(PCPortBattleRenderActor* actor) {
     return 0;
 }
 
+static int PCPort_BattleActorSetMotion(PCPortBattleRenderActor* actor,
+                                       u32 motionIdx,
+                                       int frame,
+                                       const char* reason);
+
 static void PCPort_FreeBattleRenderActors(PCPortBattleRenderActor* actors,
                                           int count) {
     int i;
@@ -9892,6 +10012,49 @@ static void PCPort_FreeBattleRenderActors(PCPortBattleRenderActor* actors,
             actors[i].loaded = 0;
         }
     }
+}
+
+static int PCPort_ReloadBattleRenderActor(PCPortBattleRenderActor* actor,
+                                          const char* member,
+                                          u32 motionIdx,
+                                          int frame,
+                                          const char* reason) {
+    const char* label;
+    f32 x, y, z, yaw, scale;
+    if (actor == NULL || member == NULL || member[0] == '\0') {
+        return 0;
+    }
+    label = actor->label;
+    x = actor->x;
+    y = actor->y;
+    z = actor->z;
+    yaw = actor->yaw;
+    scale = actor->scale;
+    PCPort_FreeBattleRenderActors(actor, 1);
+    memset(actor, 0, sizeof(*actor));
+    actor->label = label;
+    actor->member = member;
+    actor->displayName = member;
+    actor->x = x;
+    actor->y = y;
+    actor->z = z;
+    actor->yaw = yaw;
+    actor->scale = scale;
+    actor->stanceMotion = 0u;
+    actor->attackMotion = 3u;
+    actor->damageMotion = 0u;
+    if (!PCPort_LoadPkxRenderActor(actor)) {
+        fprintf(stderr, "[pkx-viewer] reload failed slot=%s member=%s\n",
+                label != NULL ? label : "-", member);
+        return 0;
+    }
+    if (actor->motionLoaded && actor->motionBank.motionCount > 0u) {
+        if (motionIdx >= actor->motionBank.motionCount) {
+            motionIdx = 0u;
+        }
+        PCPort_BattleActorSetMotion(actor, motionIdx, frame, reason);
+    }
+    return 1;
 }
 
 static int PCPort_BattleActorSetMotion(PCPortBattleRenderActor* actor,
@@ -10312,6 +10475,10 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
                                    int frame,
                                    PCPortBattleRenderActor actors[4],
                                    const char* reason) {
+    const char* playerName = (actors != NULL && actors[0].member != NULL)
+                                 ? actors[0].member : "Pokemon";
+    const char* enemyName = (actors != NULL && actors[2].member != NULL)
+                               ? actors[2].member : "opponent";
     flow->state = state;
     flow->stateFrame = 0;
 
@@ -10340,7 +10507,7 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         break;
     case PCPORT_BATTLE_FLOW_PLAYER_ATTACK:
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "Zangoose used Swift!");
+                 "%s used Swift!", playerName);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[0], actors[0].attackMotion,
                                         frame, "player-attack");
@@ -10353,7 +10520,7 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         flow->enemyHP -= 32;
         if (flow->enemyHP < 0) flow->enemyHP = 0;
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "The opposing Gokulin took damage.");
+                 "The opposing %s took damage.", enemyName);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[2], actors[2].damageMotion,
                                         frame, "enemy-damage");
@@ -10364,7 +10531,7 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         break;
     case PCPORT_BATTLE_FLOW_ENEMY_ATTACK:
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "Gokulin used Table Move 213!");
+                 "%s used Table Move 213!", enemyName);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[2], actors[2].attackMotion,
                                         frame, "enemy-attack");
@@ -10377,7 +10544,7 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         flow->playerHP -= 21;
         if (flow->playerHP < 0) flow->playerHP = 0;
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "Zangoose took damage.");
+                 "%s took damage.", playerName);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[0], actors[0].damageMotion,
                                         frame, "player-damage");
@@ -10468,6 +10635,28 @@ static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
             if (flow->commandIndex == 0) {
                 PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_MOVE_MENU,
                                        frame, actors, "input-fight");
+            } else if (flow->commandIndex == 1) {
+                const char* p0 = (actors != NULL && actors[0].member != NULL)
+                                     ? actors[0].member : "Pokemon";
+                const char* p1 = (actors != NULL && actors[1].member != NULL)
+                                     ? actors[1].member : "Pokemon";
+                snprintf(flow->messageText, sizeof(flow->messageText),
+                         "Pokemon: %s / %s are ready.", p0, p1);
+                printf("[battle-input] frame=%d source=%s action=A state=command-menu "
+                       "selected=POKEMON party=%s,%s policy=selected-team-visible\n",
+                       frame, source, p0, p1);
+            } else if (flow->commandIndex == 2) {
+                snprintf(flow->messageText, sizeof(flow->messageText),
+                         "Items cannot be used in this Colosseum battle.");
+                printf("[battle-input] frame=%d source=%s action=A state=command-menu "
+                       "selected=BAG policy=colosseum-no-items\n",
+                       frame, source);
+            } else if (flow->commandIndex == 3) {
+                snprintf(flow->messageText, sizeof(flow->messageText),
+                         "No running from a Colosseum battle.");
+                printf("[battle-input] frame=%d source=%s action=A state=command-menu "
+                       "selected=RUN policy=colosseum-no-run\n",
+                       frame, source);
             } else {
                 snprintf(flow->messageText, sizeof(flow->messageText),
                          "%s is not wired in this host slice.",
@@ -10538,7 +10727,233 @@ static void PCPort_BattleFlowUpdate(PCPortBattleFlow* flow,
     PCPort_BattleFlowRefreshText(flow);
 }
 
-static int RunBattleScene(GLFWwindow* window) {
+static int PCPort_PkxViewerPressed(GLFWwindow* window,
+                                   int key,
+                                   int* prev) {
+    int now;
+    if (window == NULL || prev == NULL) {
+        return 0;
+    }
+    now = glfwGetKey(window, key) == GLFW_PRESS;
+    if (now && !*prev) {
+        *prev = now;
+        return 1;
+    }
+    *prev = now;
+    return 0;
+}
+
+static void PCPort_PkxViewerReloadSelected(PCPortPkxViewerState* viewer,
+                                           PCPortBattleRenderActor actors[4],
+                                           int slot,
+                                           int frame,
+                                           const char* reason) {
+    const char* member;
+    u32 motionIdx;
+    if (viewer == NULL || actors == NULL || slot < 0 || slot >= 4 ||
+        viewer->modelCount <= 0) {
+        return;
+    }
+    if (viewer->selectedModel[slot] < 0 ||
+        viewer->selectedModel[slot] >= viewer->modelCount) {
+        viewer->selectedModel[slot] = 0;
+    }
+    member = viewer->modelNames[viewer->selectedModel[slot]];
+    motionIdx = (u32)((viewer->selectedMotion[slot] < 0) ? 0 :
+                      viewer->selectedMotion[slot]);
+    if (!PCPort_ReloadBattleRenderActor(&actors[slot], member, motionIdx,
+                                        frame, reason)) {
+        return;
+    }
+    if (!actors[slot].motionLoaded || actors[slot].motionBank.motionCount == 0u) {
+        viewer->selectedMotion[slot] = 0;
+    } else if ((u32)viewer->selectedMotion[slot] >=
+               actors[slot].motionBank.motionCount) {
+        viewer->selectedMotion[slot] = 0;
+        PCPort_BattleActorSetMotion(&actors[slot], 0u, frame, "viewer-clamp");
+    }
+    printf("[pkx-viewer] frame=%d slot=%d member=%s motion=%d/%u reason=%s\n",
+           frame, slot, actors[slot].member, viewer->selectedMotion[slot],
+           actors[slot].motionLoaded ? actors[slot].motionBank.motionCount : 0u,
+           reason != NULL ? reason : "-");
+    fflush(stdout);
+}
+
+static void PCPort_PkxViewerInit(PCPortPkxViewerState* viewer,
+                                 PCPortBattleRenderActor actors[4]) {
+    int i;
+    const char* scaleEnv;
+    if (viewer == NULL || actors == NULL) {
+        return;
+    }
+    memset(viewer, 0, sizeof(*viewer));
+    viewer->enabled = 1;
+    viewer->baseScale = 1.35f;
+    scaleEnv = getenv("PCPORT_PKX_VIEWER_SCALE");
+    if (scaleEnv != NULL && scaleEnv[0] != '\0') {
+        f32 v = (f32)atof(scaleEnv);
+        if (v > 0.0f) {
+            viewer->baseScale = v;
+        }
+    }
+    PCPort_PkxViewerLoadModelList(viewer);
+    for (i = 0; i < 4; ++i) {
+        char scaleSlotEnvName[32];
+        char motionSlotEnvName[32];
+        const char* scaleSlotEnv;
+        const char* motionSlotEnv;
+        viewer->selectedModel[i] =
+            PCPort_PkxViewerFindModel(viewer, actors[i].member);
+        viewer->selectedMotion[i] = 0;
+        viewer->inspectYaw[i] = 0.0f;
+        actors[i].scale = viewer->baseScale;
+        snprintf(scaleSlotEnvName, sizeof(scaleSlotEnvName),
+                 "PCPORT_PKX_VIEWER_SCALE%d", i);
+        scaleSlotEnv = getenv(scaleSlotEnvName);
+        if (scaleSlotEnv != NULL && scaleSlotEnv[0] != '\0') {
+            f32 v = (f32)atof(scaleSlotEnv);
+            if (v > 0.0f) {
+                actors[i].scale = v;
+            }
+        }
+        snprintf(motionSlotEnvName, sizeof(motionSlotEnvName),
+                 "PCPORT_PKX_VIEWER_MOTION%d", i);
+        motionSlotEnv = getenv(motionSlotEnvName);
+        if (motionSlotEnv != NULL && motionSlotEnv[0] != '\0') {
+            int v = atoi(motionSlotEnv);
+            if (v >= 0) {
+                viewer->selectedMotion[i] = v;
+            }
+        }
+        if (viewer->modelCount > 0) {
+            actors[i].member = viewer->modelNames[viewer->selectedModel[i]];
+            actors[i].displayName = actors[i].member;
+        }
+    }
+    printf("[pkx-viewer] models=%d source=build_pc/pkx_model_audit.csv "
+           "keys=1-4/TAB slot LEFT-RIGHT Pokemon UP-DOWN motion A-D rotate "
+           "Q-E scale R autospin ENTER/Z start-battle\n", viewer->modelCount);
+    fflush(stdout);
+}
+
+static void PCPort_PkxViewerUpdate(PCPortPkxViewerState* viewer,
+                                   GLFWwindow* window,
+                                   PCPortBattleRenderActor actors[4],
+                                   int frame) {
+    int slot;
+    if (viewer == NULL || !viewer->enabled || actors == NULL) {
+        return;
+    }
+    slot = viewer->selectedSlot;
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_TAB, &viewer->prevTab)) {
+        viewer->selectedSlot = (viewer->selectedSlot + 1) & 3;
+    }
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_1, &viewer->prevOne)) viewer->selectedSlot = 0;
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_2, &viewer->prevTwo)) viewer->selectedSlot = 1;
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_3, &viewer->prevThree)) viewer->selectedSlot = 2;
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_4, &viewer->prevFour)) viewer->selectedSlot = 3;
+    slot = viewer->selectedSlot;
+
+    if (viewer->modelCount > 0 &&
+        (PCPort_PkxViewerPressed(window, GLFW_KEY_LEFT, &viewer->prevLeft) ||
+         PCPort_PkxViewerPressed(window, GLFW_KEY_RIGHT, &viewer->prevRight))) {
+        int right = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS;
+        int delta = right ? 1 : -1;
+        viewer->selectedModel[slot] =
+            (viewer->selectedModel[slot] + delta + viewer->modelCount) %
+            viewer->modelCount;
+        viewer->selectedMotion[slot] = 0;
+        PCPort_PkxViewerReloadSelected(viewer, actors, slot, frame,
+                                       "viewer-model-select");
+    }
+    if (actors[slot].motionLoaded && actors[slot].motionBank.motionCount > 0u &&
+        (PCPort_PkxViewerPressed(window, GLFW_KEY_UP, &viewer->prevUp) ||
+         PCPort_PkxViewerPressed(window, GLFW_KEY_DOWN, &viewer->prevDown))) {
+        int up = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS;
+        int count = (int)actors[slot].motionBank.motionCount;
+        int delta = up ? 1 : -1;
+        viewer->selectedMotion[slot] =
+            (viewer->selectedMotion[slot] + delta + count) % count;
+        PCPort_BattleActorSetMotion(&actors[slot],
+                                    (u32)viewer->selectedMotion[slot],
+                                    frame, "viewer-motion-select");
+        printf("[pkx-viewer] frame=%d slot=%d member=%s motion=%d/%d\n",
+               frame, slot, actors[slot].member,
+               viewer->selectedMotion[slot], count);
+        fflush(stdout);
+    }
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_R, &viewer->prevR)) {
+        viewer->autoSpin = !viewer->autoSpin;
+        printf("[pkx-viewer] frame=%d autospin=%d\n", frame, viewer->autoSpin);
+        fflush(stdout);
+    }
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_ENTER, &viewer->prevEnter) ||
+        PCPort_PkxViewerPressed(window, GLFW_KEY_Z, &viewer->prevZ)) {
+        viewer->startBattle = 1;
+        printf("[pkx-viewer] frame=%d start-battle slots=%s,%s,%s,%s\n",
+               frame,
+               actors[0].member != NULL ? actors[0].member : "-",
+               actors[1].member != NULL ? actors[1].member : "-",
+               actors[2].member != NULL ? actors[2].member : "-",
+               actors[3].member != NULL ? actors[3].member : "-");
+        fflush(stdout);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        actors[slot].yaw -= 0.035f;
+        viewer->inspectYaw[slot] -= 0.035f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        actors[slot].yaw += 0.035f;
+        viewer->inspectYaw[slot] += 0.035f;
+    }
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_Q, &viewer->prevQ)) {
+        actors[slot].scale *= 0.90f;
+        if (actors[slot].scale < 0.2f) actors[slot].scale = 0.2f;
+    }
+    if (PCPort_PkxViewerPressed(window, GLFW_KEY_E, &viewer->prevE)) {
+        actors[slot].scale *= 1.10f;
+        if (actors[slot].scale > 12.0f) actors[slot].scale = 12.0f;
+    }
+    if (viewer->autoSpin) {
+        actors[slot].yaw += 0.020f;
+        viewer->inspectYaw[slot] += 0.020f;
+    }
+}
+
+static void DrawPkxViewerUI(const PCPortPkxViewerState* viewer,
+                            const PCPortBattleRenderActor actors[4]) {
+    int i;
+    if (viewer == NULL || !viewer->enabled || actors == NULL) {
+        return;
+    }
+    BeginMenuOverlay();
+    DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 76.0f, 12, 20, 32, 225);
+    DrawSolidScreenRect(0.0f, 384.0f, 640.0f, 96.0f, 10, 18, 30, 235);
+    DrawTextScreen(14.0f, 10.0f, 7.0f, 12.0f, 230, 238, 246, 255,
+                   "BATTLE COLOSSEUM SETUP   1-4/TAB slot   LEFT/RIGHT Pokemon   UP/DOWN motion   A/D rotate   Q/E scale   ENTER start");
+    for (i = 0; i < 4; ++i) {
+        char line[192];
+        int selected = (i == viewer->selectedSlot);
+        u32 motionCount = actors[i].motionLoaded ? actors[i].motionBank.motionCount : 0u;
+        snprintf(line, sizeof(line),
+                 "%s%d %s  model %d/%d %s  motion %d/%u  yaw %.2f scale %.2f%s",
+                 selected ? ">" : " ", i + 1,
+                 actors[i].label != NULL ? actors[i].label : "-",
+                 viewer->selectedModel[i] + 1, viewer->modelCount,
+                 actors[i].member != NULL ? actors[i].member : "-",
+                 viewer->selectedMotion[i], motionCount,
+                 actors[i].yaw, actors[i].scale,
+                 selected ? "  SELECTED" : "");
+        DrawTextScreen(14.0f, 396.0f + (f32)i * 18.0f,
+                       7.0f, 12.0f,
+                       selected ? 255 : 190, selected ? 244 : 206,
+                       selected ? 120 : 218, 255, line);
+    }
+    DrawTextScreen(14.0f, 468.0f, 6.0f, 10.0f, 160, 188, 210, 255,
+                   "Selections carry into the battle scene; commands there use FIGHT / POKEMON / BAG / RUN.");
+}
+
+static int RunBattleScene(GLFWwindow* window, int viewerMode) {
     PCPortBattleRenderActor actors[4] = {
         { "player-left",  "zangoose", "Zangoose", -48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
         { "player-right", "zangoose", "Zangoose",  48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
@@ -10553,6 +10968,7 @@ static int RunBattleScene(GLFWwindow* window) {
     GXTexObj battleIconTex[4];
     int haveBattleIcon[4] = { 0, 0, 0, 0 };
     PCPortBattleFlow battleFlow;
+    PCPortPkxViewerState pkxViewer;
     int haveBattleBackdrop = 0;
     int haveBattleMessageTex = 0;
     int haveBattleCommandTex = 0;
@@ -10563,7 +10979,11 @@ static int RunBattleScene(GLFWwindow* window) {
     int frameCap = 0;
     int frame;
     int i;
+    int setupDisablesAutoplay;
 
+    memset(&pkxViewer, 0, sizeof(pkxViewer));
+    setupDisablesAutoplay =
+        viewerMode && getenv("PCPORT_BATTLE_AUTOPLAY") == NULL;
     if (getenv("PCPORT_BATTLE_P0") != NULL) actors[0].member = getenv("PCPORT_BATTLE_P0");
     if (getenv("PCPORT_BATTLE_P1") != NULL) actors[1].member = getenv("PCPORT_BATTLE_P1");
     if (getenv("PCPORT_BATTLE_E0") != NULL) actors[2].member = getenv("PCPORT_BATTLE_E0");
@@ -10580,7 +11000,22 @@ static int RunBattleScene(GLFWwindow* window) {
             }
         }
     }
+    if (viewerMode) {
+        PCPort_PkxViewerInit(&pkxViewer, actors);
+    }
     PCPort_BattleApplyGridPlacement(actors);
+    if (viewerMode && getenv("PCPORT_BATTLE_UNIT") == NULL) {
+        static const f32 kViewerX[4] = { -54.0f, -18.0f, 18.0f, 54.0f };
+        static const f32 kViewerZ[4] = { 18.0f, 18.0f, 18.0f, 18.0f };
+        for (i = 0; i < 4; ++i) {
+            actors[i].x = kViewerX[i];
+            actors[i].z = kViewerZ[i];
+            actors[i].yaw = 0.0f;
+        }
+        printf("[pkx-viewer] placement=compact-inspection slots={P0(%.1f,%.1f),P1(%.1f,%.1f),E0(%.1f,%.1f),E1(%.1f,%.1f)}\n",
+               actors[0].x, actors[0].z, actors[1].x, actors[1].z,
+               actors[2].x, actors[2].z, actors[3].x, actors[3].z);
+    }
     if (getenv("PCPORT_BATTLE_FRAMES") != NULL) {
         frameCap = atoi(getenv("PCPORT_BATTLE_FRAMES"));
     }
@@ -10619,10 +11054,23 @@ static int RunBattleScene(GLFWwindow* window) {
         }
     }
     for (i = 0; i < 4; ++i) {
-        PCPort_BattleActorSetMotion(&actors[i], actors[i].stanceMotion, 0,
-                                    "stance");
+        u32 motionIdx = viewerMode ? (u32)pkxViewer.selectedMotion[i] :
+                                     actors[i].stanceMotion;
+        if (actors[i].motionLoaded &&
+            motionIdx >= actors[i].motionBank.motionCount) {
+            motionIdx = 0u;
+            if (viewerMode) {
+                pkxViewer.selectedMotion[i] = 0;
+            }
+        }
+        PCPort_BattleActorSetMotion(&actors[i], motionIdx, 0,
+                                    viewerMode ? "viewer-start" : "stance");
     }
     PCPort_BattleFlowInit(&battleFlow, actors);
+    if (setupDisablesAutoplay) {
+        battleFlow.autoplay = 0;
+        printf("[battle-flow] autoplay=0 reason=interactive-colosseum-setup\n");
+    }
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
     EnsureFontAtlas();
@@ -10713,7 +11161,8 @@ static int RunBattleScene(GLFWwindow* window) {
         (getenv("PCPORT_BATTLE_SHOW_CONTROL_POBJS") == NULL) ? 1 : 0;
     g_pcBattleMaterialLogBudget = g_pcBattleSuppressControlPObjs ? 12u : 0u;
     g_pcBattleRenderSkin = drawPkxMesh;
-    printf("[battle-scene] loaded actors=4 frameCap=%d\n", frameCap);
+    printf("[battle-scene] loaded actors=4 frameCap=%d mode=%s\n",
+           frameCap, viewerMode ? "pkx-viewer" : "battle");
     printf("[battle-state] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
            "playerMove=129 enemyMove=213 actors=zangoose,zangoose,gokulin,nukenin\n");
     printf("[battle-state] text command=\"FIGHT  POKEMON  BAG  RUN\" "
@@ -10729,7 +11178,47 @@ static int RunBattleScene(GLFWwindow* window) {
             break;
         }
         memset(&stats, 0, sizeof(stats));
-        PCPort_BattleFlowUpdate(&battleFlow, window, frame, actors);
+        if (viewerMode) {
+            PCPort_PkxViewerUpdate(&pkxViewer, window, actors, frame);
+            if (getenv("PCPORT_PKX_VIEWER_AUTOSTART") != NULL && frame >= 2) {
+                pkxViewer.startBattle = 1;
+            }
+            if (pkxViewer.startBattle) {
+                f32 battleScale = 1.8f;
+                if (scaleEnv != NULL && scaleEnv[0] != '\0') {
+                    f32 v = (f32)atof(scaleEnv);
+                    if (v > 0.0f) {
+                        battleScale = v;
+                    }
+                }
+                viewerMode = 0;
+                pkxViewer.enabled = 0;
+                for (i = 0; i < 4; ++i) {
+                    actors[i].scale = battleScale;
+                }
+                PCPort_BattleApplyGridPlacement(actors);
+                for (i = 0; i < 4; ++i) {
+                    PCPort_BattleActorSetMotion(&actors[i],
+                                                actors[i].stanceMotion,
+                                                frame,
+                                                "viewer-start-battle");
+                }
+                PCPort_BattleFlowInit(&battleFlow, actors);
+                if (setupDisablesAutoplay) {
+                    battleFlow.autoplay = 0;
+                    printf("[battle-flow] autoplay=0 reason=interactive-colosseum-battle\n");
+                }
+                printf("[battle-scene] setup-started-battle frame=%d actors=%s,%s,%s,%s\n",
+                       frame,
+                       actors[0].member != NULL ? actors[0].member : "-",
+                       actors[1].member != NULL ? actors[1].member : "-",
+                       actors[2].member != NULL ? actors[2].member : "-",
+                       actors[3].member != NULL ? actors[3].member : "-");
+                fflush(stdout);
+            }
+        } else {
+            PCPort_BattleFlowUpdate(&battleFlow, window, frame, actors);
+        }
         for (i = 0; i < 4; ++i) {
             PCPort_BattleActorStep(&actors[i]);
         }
@@ -10812,8 +11301,12 @@ static int RunBattleScene(GLFWwindow* window) {
         if (getenv("PCPORT_BATTLE_ICONS") != NULL) {
             DrawBattleActorIconFallback(actors, battleIconTex, haveBattleIcon, frame);
         }
-        DrawBattleUI(&battleMessageTex, haveBattleMessageTex,
-                     &battleCommandTex, haveBattleCommandTex, &battleFlow);
+        if (viewerMode) {
+            DrawPkxViewerUI(&pkxViewer, actors);
+        } else {
+            DrawBattleUI(&battleMessageTex, haveBattleMessageTex,
+                         &battleCommandTex, haveBattleCommandTex, &battleFlow);
+        }
 
         if ((getenv("PCPORT_RENDER_DEBUG") != NULL ||
              getenv("PCPORT_BATTLE_LOG_MOTION") != NULL) && frame == 0) {
@@ -10862,6 +11355,7 @@ int main(int argc, char** argv) {
     int runEngineBoot;
     int runField;
     int runBattle;
+    int runPkxViewer;
     int exitCode = 0;
     char trkBuffer[32];
     char trkSuffix[8];
@@ -10892,6 +11386,7 @@ int main(int argc, char** argv) {
     runEngineBoot = HasArg(argc, argv, "--engine-boot");
     runField = HasArg(argc, argv, "--field");
     runBattle = HasArg(argc, argv, "--battle");
+    runPkxViewer = HasArg(argc, argv, "--pkx-viewer");
 
     printf("[pcport_bootstrap] Starting stub native bootstrap\n");
     fflush(stdout);
@@ -10975,6 +11470,7 @@ int main(int argc, char** argv) {
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
+        runPkxViewer ||
         argc <= 1) {
         window = CreateSmokeWindow();
         if (window == NULL) {
@@ -11170,20 +11666,22 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] No game code, assets, or decompiled frame path started\n");
-    } else if (runBattle) {
+    } else if (runBattle || runPkxViewer) {
         if (window == NULL) {
             fprintf(stderr,
-                    "[pcport_bootstrap] --battle requested but no window/GL context available\n");
+                    "[pcport_bootstrap] --battle/--pkx-viewer requested but no window/GL context available\n");
             exitCode = 1;
             goto cleanup;
         }
 
-        if (!RunBattleScene(window)) {
+        if (!RunBattleScene(window, runPkxViewer)) {
             exitCode = 1;
             goto cleanup;
         }
 
-        printf("[pcport_bootstrap] Battle Colosseum host scene rendered through the existing draw bridge\n");
+        printf("[pcport_bootstrap] %s rendered through the existing draw bridge\n",
+               runPkxViewer ? "PKX model verifier" :
+                              "Battle Colosseum host scene");
     } else if (runField) {
         if (window == NULL) {
             fprintf(stderr,
@@ -11241,12 +11739,22 @@ int main(int argc, char** argv) {
 
         printf("[pcport_bootstrap] Top-menu scene graph rendered through the existing game-owned draw bridge\n");
 
-        /* Start-of-game flow: the menu's New Game / Continue hands off into the
-         * walkable first field (Wes's hideout). boot->title->menu->field. */
-        if (g_pcEnterFieldWalk && window != NULL &&
+        /* Main-menu handoffs keep one native window alive while switching from
+         * title/menu into the selected game mode. */
+        if (g_pcEnterBattleColosseum && window != NULL &&
+            !glfwWindowShouldClose(window)) {
+            printf("[pcport_bootstrap] Entering Battle Colosseum setup\n");
+            if (!RunBattleScene(window, 1)) {
+                exitCode = 1;
+                goto cleanup;
+            }
+        } else if (g_pcEnterFieldWalk && window != NULL &&
             !glfwWindowShouldClose(window)) {
             printf("[pcport_bootstrap] Entering Story Mode field (walkable)\n");
-            RunFieldScene(window);
+            if (!RunFieldScene(window)) {
+                exitCode = 1;
+                goto cleanup;
+            }
         }
     } else {
         printf("[pcport_bootstrap] No game code, assets, or render loop started\n");
