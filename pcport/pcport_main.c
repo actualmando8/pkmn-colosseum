@@ -9840,9 +9840,26 @@ static int PCPort_PkxViewerAddModel(PCPortPkxViewerState* viewer,
     return 1;
 }
 
+static int PCPort_PkxAuditRowLooksPokemon(const char* member,
+                                          const char* materialOnly) {
+    if (member == NULL || materialOnly == NULL) {
+        return 0;
+    }
+    if (strcmp(member, "egg") == 0 || strcmp(member, "pkx_egg") == 0) {
+        return 1;
+    }
+    if (strcmp(member, "yukiwarashi") == 0) {
+        return 1;
+    }
+    return atoi(materialOnly) > 0;
+}
+
 static void PCPort_PkxViewerLoadModelList(PCPortPkxViewerState* viewer) {
     FILE* f;
     char line[512];
+    int auditRows = 0;
+    int auditKept = 0;
+    int auditSkipped = 0;
     int i;
     if (viewer == NULL) {
         return;
@@ -9853,12 +9870,16 @@ static void PCPort_PkxViewerLoadModelList(PCPortPkxViewerState* viewer) {
             char* archive;
             char* member;
             char* status;
+            char* materialOnly;
             char* comma0;
             char* comma1;
             char* comma2;
+            char* field;
+            int col;
             if (strncmp(line, "archive,", 8) == 0) {
                 continue;
             }
+            auditRows++;
             archive = line;
             comma0 = strchr(archive, ',');
             if (comma0 == NULL) {
@@ -9876,9 +9897,27 @@ static void PCPort_PkxViewerLoadModelList(PCPortPkxViewerState* viewer) {
             if (comma2 != NULL) {
                 *comma2 = '\0';
             }
+            materialOnly = NULL;
+            field = comma2 != NULL ? comma2 + 1 : NULL;
+            for (col = 4; field != NULL && col <= 13; ++col) {
+                char* next = strchr(field, ',');
+                if (next != NULL) {
+                    *next = '\0';
+                }
+                if (col == 13) {
+                    materialOnly = field;
+                    break;
+                }
+                field = next != NULL ? next + 1 : NULL;
+            }
             if (strncmp(archive, "pkx_", 4) == 0 &&
-                strcmp(status, "fail") != 0) {
-                PCPort_PkxViewerAddModel(viewer, member);
+                strcmp(status, "fail") != 0 &&
+                PCPort_PkxAuditRowLooksPokemon(member, materialOnly)) {
+                if (PCPort_PkxViewerAddModel(viewer, member)) {
+                    auditKept++;
+                }
+            } else if (strncmp(archive, "pkx_", 4) == 0) {
+                auditSkipped++;
             }
         }
         fclose(f);
@@ -9889,6 +9928,12 @@ static void PCPort_PkxViewerLoadModelList(PCPortPkxViewerState* viewer) {
             PCPort_PkxViewerAddModel(viewer, kPcportPkxViewerFallbackModels[i]);
         }
     }
+    printf("[pkx-viewer] audit rows=%d keptPokemon=%d skippedNonPokemon=%d "
+           "first=%s last=%s\n",
+           auditRows, auditKept, auditSkipped,
+           viewer->modelCount > 0 ? viewer->modelNames[0] : "-",
+           viewer->modelCount > 0 ?
+               viewer->modelNames[viewer->modelCount - 1] : "-");
 }
 
 static int PCPort_PkxViewerFindModel(const PCPortPkxViewerState* viewer,
@@ -10019,41 +10064,43 @@ static int PCPort_ReloadBattleRenderActor(PCPortBattleRenderActor* actor,
                                           u32 motionIdx,
                                           int frame,
                                           const char* reason) {
-    const char* label;
-    f32 x, y, z, yaw, scale;
+    PCPortBattleRenderActor temp;
     if (actor == NULL || member == NULL || member[0] == '\0') {
         return 0;
     }
-    label = actor->label;
-    x = actor->x;
-    y = actor->y;
-    z = actor->z;
-    yaw = actor->yaw;
-    scale = actor->scale;
-    PCPort_FreeBattleRenderActors(actor, 1);
-    memset(actor, 0, sizeof(*actor));
-    actor->label = label;
-    actor->member = member;
-    actor->displayName = member;
-    actor->x = x;
-    actor->y = y;
-    actor->z = z;
-    actor->yaw = yaw;
-    actor->scale = scale;
-    actor->stanceMotion = 0u;
-    actor->attackMotion = 3u;
-    actor->damageMotion = 0u;
-    if (!PCPort_LoadPkxRenderActor(actor)) {
+
+    memset(&temp, 0, sizeof(temp));
+    temp.label = actor->label;
+    temp.member = member;
+    temp.displayName = member;
+    temp.x = actor->x;
+    temp.y = actor->y;
+    temp.z = actor->z;
+    temp.yaw = actor->yaw;
+    temp.scale = actor->scale;
+    temp.stanceMotion = actor->stanceMotion;
+    temp.attackMotion = actor->attackMotion;
+    temp.damageMotion = actor->damageMotion;
+    if (!PCPort_LoadPkxRenderActor(&temp)) {
         fprintf(stderr, "[pkx-viewer] reload failed slot=%s member=%s\n",
-                label != NULL ? label : "-", member);
+                actor->label != NULL ? actor->label : "-", member);
         return 0;
     }
-    if (actor->motionLoaded && actor->motionBank.motionCount > 0u) {
-        if (motionIdx >= actor->motionBank.motionCount) {
+    if (temp.motionLoaded && temp.motionBank.motionCount > 0u) {
+        if (motionIdx >= temp.motionBank.motionCount) {
             motionIdx = 0u;
         }
-        PCPort_BattleActorSetMotion(actor, motionIdx, frame, reason);
+        if (!PCPort_BattleActorSetMotion(&temp, motionIdx, frame, reason)) {
+            PCPort_FreeBattleRenderActors(&temp, 1);
+            fprintf(stderr, "[pkx-viewer] reload motion failed slot=%s member=%s "
+                    "motion=%u\n",
+                    actor->label != NULL ? actor->label : "-", member,
+                    motionIdx);
+            return 0;
+        }
     }
+    PCPort_FreeBattleRenderActors(actor, 1);
+    *actor = temp;
     return 1;
 }
 
@@ -10765,16 +10812,16 @@ static int PCPort_PkxViewerPressed(GLFWwindow* window,
     return 0;
 }
 
-static void PCPort_PkxViewerReloadSelected(PCPortPkxViewerState* viewer,
-                                           PCPortBattleRenderActor actors[4],
-                                           int slot,
-                                           int frame,
-                                           const char* reason) {
+static int PCPort_PkxViewerReloadSelected(PCPortPkxViewerState* viewer,
+                                          PCPortBattleRenderActor actors[4],
+                                          int slot,
+                                          int frame,
+                                          const char* reason) {
     const char* member;
     u32 motionIdx;
     if (viewer == NULL || actors == NULL || slot < 0 || slot >= 4 ||
         viewer->modelCount <= 0) {
-        return;
+        return 0;
     }
     if (viewer->selectedModel[slot] < 0 ||
         viewer->selectedModel[slot] >= viewer->modelCount) {
@@ -10785,7 +10832,7 @@ static void PCPort_PkxViewerReloadSelected(PCPortPkxViewerState* viewer,
                       viewer->selectedMotion[slot]);
     if (!PCPort_ReloadBattleRenderActor(&actors[slot], member, motionIdx,
                                         frame, reason)) {
-        return;
+        return 0;
     }
     if (!actors[slot].motionLoaded || actors[slot].motionBank.motionCount == 0u) {
         viewer->selectedMotion[slot] = 0;
@@ -10799,6 +10846,7 @@ static void PCPort_PkxViewerReloadSelected(PCPortPkxViewerState* viewer,
            actors[slot].motionLoaded ? actors[slot].motionBank.motionCount : 0u,
            reason != NULL ? reason : "-");
     fflush(stdout);
+    return 1;
 }
 
 static void PCPort_PkxViewerInit(PCPortPkxViewerState* viewer,
@@ -10810,7 +10858,7 @@ static void PCPort_PkxViewerInit(PCPortPkxViewerState* viewer,
     }
     memset(viewer, 0, sizeof(*viewer));
     viewer->enabled = 1;
-    viewer->baseScale = 1.35f;
+    viewer->baseScale = actors[0].scale > 0.0f ? actors[0].scale : 1.8f;
     scaleEnv = getenv("PCPORT_PKX_VIEWER_SCALE");
     if (scaleEnv != NULL && scaleEnv[0] != '\0') {
         f32 v = (f32)atof(scaleEnv);
@@ -10879,14 +10927,18 @@ static void PCPort_PkxViewerUpdate(PCPortPkxViewerState* viewer,
     if (viewer->modelCount > 0 &&
         (PCPort_PkxViewerPressed(window, GLFW_KEY_LEFT, &viewer->prevLeft) ||
          PCPort_PkxViewerPressed(window, GLFW_KEY_RIGHT, &viewer->prevRight))) {
+        int oldModel = viewer->selectedModel[slot];
         int right = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS;
         int delta = right ? 1 : -1;
         viewer->selectedModel[slot] =
             (viewer->selectedModel[slot] + delta + viewer->modelCount) %
             viewer->modelCount;
         viewer->selectedMotion[slot] = 0;
-        PCPort_PkxViewerReloadSelected(viewer, actors, slot, frame,
-                                       "viewer-model-select");
+        if (!PCPort_PkxViewerReloadSelected(viewer, actors, slot, frame,
+                                            "viewer-model-select")) {
+            viewer->selectedModel[slot] = oldModel;
+            viewer->selectedMotion[slot] = 0;
+        }
     }
     if (actors[slot].motionLoaded && actors[slot].motionBank.motionCount > 0u &&
         (PCPort_PkxViewerPressed(window, GLFW_KEY_UP, &viewer->prevUp) ||
