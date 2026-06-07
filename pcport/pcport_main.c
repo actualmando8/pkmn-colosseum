@@ -9791,12 +9791,23 @@ static void PCPort_BuildActorModelMatrix(const PCPortBattleRenderActor* actor,
 }
 
 static void PCPort_SetBattleCameraView(PCPortTranslatedCamera* camera, int frame) {
+    /* Env-tunable while we dial in battle framing (the diamond is x=+/-30, z=+/-50;
+     * enemies at z=+50 project low and were hiding under the 2D UI panels). Defaults
+     * pulled back + up so all 4 actors frame above the command UI.
+     *   PCPORT_BATTLE_CAM = "eyeX,eyeY,eyeZ,atX,atY,atZ" overrides everything. */
     f32 orbit = sinf((f32)frame * 0.010f) * 4.0f;
     f32 lift = cosf((f32)frame * 0.007f) * 1.5f;
-    f32 eye[3] = { orbit, 54.0f + lift, 132.0f };
-    f32 interest[3] = { 0.0f, 10.0f, -6.0f };
+    f32 eye[3] = { orbit, 70.0f + lift, 175.0f };
+    f32 interest[3] = { 0.0f, 24.0f, 0.0f };
     f32 up[3] = { 0.0f, 1.0f, 0.0f };
-
+    const char* cam = getenv("PCPORT_BATTLE_CAM");
+    if (cam != NULL && cam[0] != '\0') {
+        float e0,e1,e2,a0,a1,a2;
+        if (sscanf(cam, "%f,%f,%f,%f,%f,%f", &e0,&e1,&e2,&a0,&a1,&a2) == 6) {
+            eye[0]=e0+orbit; eye[1]=e1+lift; eye[2]=e2;
+            interest[0]=a0; interest[1]=a1; interest[2]=a2;
+        }
+    }
     BuildViewMatrixLookAt(eye, interest, up, camera->viewMatrix);
 }
 
