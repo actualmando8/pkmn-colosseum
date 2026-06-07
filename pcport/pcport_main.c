@@ -503,6 +503,14 @@ static void ClearBackbuffer(float r, float g, float b) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+static void ClearDepthBuffer(void) {
+    glDrawBuffer(GL_BACK);
+    glReadBuffer(GL_BACK);
+    glDisable(GL_SCISSOR_TEST);
+    glDepthMask(GL_TRUE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
 /* For watching headless/capped visual tests: if PCPORT_HOLD_SECS is set, keep
  * the window up (last rendered frame stays on the front buffer) for that many
  * wall-clock seconds before the scene returns, so a human can see the result.
@@ -10659,7 +10667,7 @@ static int RunBattleScene(GLFWwindow* window) {
     }
     drawPkxMesh = getenv("PCPORT_BATTLE_SHOW_PKX_MESH") != NULL;
     disablePkxDepth = drawPkxMesh &&
-                      getenv("PCPORT_BATTLE_PKX_ZTEST") == NULL;
+                      getenv("PCPORT_BATTLE_PKX_NO_ZTEST") != NULL;
     printf("[battle-pkx] meshDraw=%s reason=%s next=RenderSkinnedPObj-envelope-palette/display-list\n",
            drawPkxMesh ? "enabled-debug" : "suppressed",
            drawPkxMesh ? "PCPORT_BATTLE_SHOW_PKX_MESH" :
@@ -10668,8 +10676,8 @@ static int RunBattleScene(GLFWwindow* window) {
         printf("[battle-pkx] depth=%s reason=%s\n",
                disablePkxDepth ? "disabled-debug" : "enabled-debug",
                disablePkxDepth
-                   ? "host-depth-precision-shreds-skinned-pkx-surfaces"
-                   : "PCPORT_BATTLE_PKX_ZTEST");
+                   ? "PCPORT_BATTLE_PKX_NO_ZTEST"
+                   : "arena-depth-cleared-before-pkx");
     }
     printf("[battle-arena] backdrop=%s source=%s controlPObjPolicy=%s "
            "skin=%s\n",
@@ -10744,6 +10752,9 @@ static int RunBattleScene(GLFWwindow* window) {
         }
 
         if (drawPkxMesh) {
+            /* The host arena/backdrop pass is a temporary placement aid; keep its
+             * depth writes from clipping the PKX actor self-depth pass. */
+            ClearDepthBuffer();
             if (disablePkxDepth) {
                 GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
             }
