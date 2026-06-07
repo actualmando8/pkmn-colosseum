@@ -16,6 +16,11 @@
 #include "bgm_host.h"
 #include "musyx_wave.h"
 
+#define STB_IMAGE_STATIC
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include "../third_party/stb_image.h"
+
 #include <GLFW/glfw3.h>
 #include <direct.h>   /* _chdir (host-only: locate the asset root at startup) */
 #include <stdio.h>
@@ -164,6 +169,10 @@ unsigned long CurrTvMode = 0;
 #define PCPORT_TEXTURED_POBJ_OFFSET  0x3B80u
 #define PCPORT_SIBLING_JOINT_OFFSET  0x70E8u
 #define PCPORT_SIBLING_DOBJ_OFFSET   0x6F98u
+
+static int g_pcBattleSuppressControlPObjs = 0;
+static unsigned int g_pcBattleMaterialLogBudget = 0;
+static int g_pcBattleRenderSkin = 0;
 #define PCPORT_SIBLING_MOBJ_OFFSET   0x39CCu
 #define PCPORT_SIBLING_POBJ_OFFSET   0x6F80u
 #define PCPORT_PDA2_BG_OBJECT0_JOINT_OFFSET 0x22E8u
@@ -1045,6 +1054,28 @@ static int LoadFsysSpriteTexObj(const char* archive, const char* member,
     return 1;
 }
 
+static int LoadPngTexObj(const char* path, GXTexObj* outTex) {
+    int w = 0;
+    int h = 0;
+    int n = 0;
+    unsigned char* pixels;
+
+    if (path == NULL || outTex == NULL) {
+        return 0;
+    }
+    pixels = stbi_load(path, &w, &h, &n, 4);
+    if (pixels == NULL || w <= 0 || h <= 0 || w > 4096 || h > 4096) {
+        if (pixels != NULL) {
+            stbi_image_free(pixels);
+        }
+        return 0;
+    }
+    memset(outTex, 0, sizeof(*outTex));
+    GXHostInitTexObjRGBA8(outTex, pixels, (u16)w, (u16)h, GX_CLAMP, GX_CLAMP);
+    stbi_image_free(pixels);
+    return 1;
+}
+
 static int RunRawPrimitiveControl(void) {
     unsigned char pixel[4];
 
@@ -1622,6 +1653,22 @@ static void ConfigureTranslatedTexturedPipeline(unsigned int pipelineId,
                                     texture->hasCoordId ? texture->coordId : 0u,
                                     textureMapId);
     }
+}
+
+static int PCPort_IsBattleControlPObj(const PCPortTranslatedPObj* pobj,
+                                      const PCPortTranslatedMaterial* material,
+                                      int haveMaterial,
+                                      int haveTexture) {
+    if (!g_pcBattleSuppressControlPObjs || haveTexture || !haveMaterial ||
+        pobj == NULL || material == NULL) {
+        return 0;
+    }
+
+    return pobj->pobj.flags == 0x8000u &&
+           pobj->totalSubmittedVertices == 24u &&
+           material->diffuse == 0xB3B3B3FFu &&
+           material->alpha > 0.99f &&
+           material->alpha < 1.01f;
 }
 
 static int RunRealContentTranslationSmoke(void) {
@@ -4920,6 +4967,8 @@ typedef struct {
     unsigned int skipped;
     unsigned int textured;
     unsigned int materialOnly;
+    unsigned int battleControlPObjSuppressed;
+    unsigned int battleMaterialLogged;
 } MenuTreeStats;
 
 /*
@@ -5699,6 +5748,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
             u32 textureMapId = 0u;
             int haveMaterial = 0;
             int haveTexture = 0;
+            int battleControlPObj = 0;
             int isLogoTex = 0;
 
             memset(&translatedPObj, 0, sizeof(translatedPObj));
@@ -5845,6 +5895,9 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                                 : (unsigned int)pipelineId;
                 drawObject.totalVerts = translatedPObj.totalSubmittedVertices;
                 drawObject.totalPrims = translatedPObj.totalPrimitiveCommands;
+                battleControlPObj = PCPort_IsBattleControlPObj(
+                    &translatedPObj, &translatedMaterial, haveMaterial,
+                    haveTexture);
 
                 if (haveTexture) {
                     ConfigureTranslatedTexturedPipeline(
@@ -5855,10 +5908,34 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                         (unsigned char)textureMapId);
                     stats->textured++;
                 } else {
-                    ConfigureTranslatedMaterialPipeline(
-                        (unsigned int)pipelineId,
-                        haveMaterial ? &translatedMaterial : NULL);
+                    if (battleControlPObj) {
+                        u32 tobjDebug = 0u;
+                        if (ArchiveRangeValid(a, mobjOffset, 0x0Cu)) {
+                            tobjDebug = PCPort_ReadBigEndianU32(
+                                a->storage + mobjOffset + 0x08);
+                        }
+                        if (g_pcBattleMaterialLogBudget > 0u) {
+                            printf("[battle-material] suppress-control pobj=%u joint=0x%X "
+                                   "dobj=0x%X mobj=0x%X pobj=0x%X flags=0x%X "
+                                   "verts=%u mat=%d tobj=0x%X alpha=%.2f "
+                                   "diffuse=0x%08X reason=no-tobj-gray-24v\n",
+                                   stats->dobjs, joint, dobjOffset, mobjOffset,
+                                   pobjOffset, translatedPObj.pobj.flags,
+                                   translatedPObj.totalSubmittedVertices,
+                                   haveMaterial, tobjDebug,
+                                   translatedMaterial.alpha,
+                                   translatedMaterial.diffuse);
+                            fflush(stdout);
+                            g_pcBattleMaterialLogBudget--;
+                        }
+                        stats->battleControlPObjSuppressed++;
+                    }
                     stats->materialOnly++;
+                    if (!battleControlPObj) {
+                        ConfigureTranslatedMaterialPipeline(
+                            (unsigned int)pipelineId,
+                            haveMaterial ? &translatedMaterial : NULL);
+                    }
                 }
                 GXHostSetVertexAlphaScale(1.0f);
 
@@ -5943,7 +6020,8 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     stats->drawn++;
                 } else if (!((haveTexture == 0 && haveMaterial &&
                        translatedMaterial.alpha < 0.01f) ||
-                      isLogoTex)) {
+                      isLogoTex ||
+                      battleControlPObj)) {
                     /* Enable directional lighting for the 3D scene geometry so
                      * each pillar face is shaded by its angle to the light and
                      * the otherwise flat-tan ruins gain visible 3D form. The 2D
@@ -5976,7 +6054,8 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                      * (jumbled). Falls back to the rigid draw if skinning bails. */
                     if (skinIsolateSkip) {
                         /* isolation: suppress this mesh's draw */
-                    } else if ((getenv("PCPORT_SKIN") != NULL || g_pcEnterFieldWalk) &&
+                    } else if ((getenv("PCPORT_SKIN") != NULL || g_pcEnterFieldWalk ||
+                        g_pcBattleRenderSkin) &&
                         ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
                         RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam,
                                           haveTexture,
@@ -9648,6 +9727,30 @@ static void PCPort_BuildActorModelMatrix(const PCPortBattleRenderActor* actor,
     }
 }
 
+static void PCPort_SetBattleCameraView(PCPortTranslatedCamera* camera, int frame) {
+    f32 orbit = sinf((f32)frame * 0.010f) * 4.0f;
+    f32 lift = cosf((f32)frame * 0.007f) * 1.5f;
+    f32 eye[3] = { orbit, 54.0f + lift, 132.0f };
+    f32 interest[3] = { 0.0f, 10.0f, -6.0f };
+    f32 up[3] = { 0.0f, 1.0f, 0.0f };
+
+    BuildViewMatrixLookAt(eye, interest, up, camera->viewMatrix);
+}
+
+static void DrawBattleBackdrop2D(GXTexObj* battleBackdropTex,
+                                 int haveBattleBackdrop) {
+    BeginMenuOverlay();
+    DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 148.0f, 20, 28, 40, 255);
+    DrawSolidScreenRect(0.0f, 148.0f, 640.0f, 78.0f, 42, 50, 56, 255);
+    DrawSolidScreenRect(0.0f, 226.0f, 640.0f, 82.0f, 72, 76, 70, 255);
+    DrawSolidScreenRect(0.0f, 252.0f, 640.0f, 34.0f, 100, 104, 92, 210);
+    if (haveBattleBackdrop) {
+        DrawTexturedScreenRectA(battleBackdropTex, 0.0f, 230.0f,
+                                640.0f, 108.0f, 0.0f, 0.0f,
+                                1.0f, 1.0f, 48, 132);
+    }
+}
+
 static void DrawBattleArenaFloor(void) {
     int i;
     GXHostSetLightingEnabled(GX_FALSE);
@@ -9658,98 +9761,520 @@ static void DrawBattleArenaFloor(void) {
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXColor4u8(78, 86, 92, 255);
+    GXColor4u8(88, 92, 96, 255);
+    GXPosition3f32(-190.0f, -2.0f, -118.0f);
+    GXColor4u8(88, 92, 96, 255);
+    GXPosition3f32(190.0f, -2.0f, -118.0f);
+    GXColor4u8(46, 54, 66, 255);
+    GXPosition3f32(190.0f, 78.0f, -126.0f);
+    GXColor4u8(46, 54, 66, 255);
+    GXPosition3f32(-190.0f, 78.0f, -126.0f);
+    GXEnd();
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXColor4u8(118, 122, 112, 255);
     GXPosition3f32(-170.0f, -2.0f, -105.0f);
-    GXColor4u8(78, 86, 92, 255);
+    GXColor4u8(118, 122, 112, 255);
     GXPosition3f32(170.0f, -2.0f, -105.0f);
-    GXColor4u8(58, 66, 72, 255);
+    GXColor4u8(80, 86, 82, 255);
     GXPosition3f32(170.0f, -2.0f, 105.0f);
-    GXColor4u8(58, 66, 72, 255);
+    GXColor4u8(80, 86, 82, 255);
     GXPosition3f32(-170.0f, -2.0f, 105.0f);
     GXEnd();
 
     for (i = -3; i <= 3; ++i) {
         f32 x = (f32)i * 42.0f;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXColor4u8(106, 116, 122, 255);
+        GXColor4u8(148, 154, 140, 255);
         GXPosition3f32(x - 0.65f, -1.8f, -105.0f);
-        GXColor4u8(106, 116, 122, 255);
+        GXColor4u8(148, 154, 140, 255);
         GXPosition3f32(x + 0.65f, -1.8f, -105.0f);
-        GXColor4u8(88, 98, 104, 255);
+        GXColor4u8(118, 126, 118, 255);
         GXPosition3f32(x + 0.65f, -1.8f, 105.0f);
-        GXColor4u8(88, 98, 104, 255);
+        GXColor4u8(118, 126, 118, 255);
         GXPosition3f32(x - 0.65f, -1.8f, 105.0f);
         GXEnd();
     }
     for (i = -2; i <= 2; ++i) {
         f32 z = (f32)i * 42.0f;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXColor4u8(96, 106, 112, 255);
+        GXColor4u8(136, 144, 132, 255);
         GXPosition3f32(-170.0f, -1.7f, z - 0.65f);
-        GXColor4u8(96, 106, 112, 255);
+        GXColor4u8(136, 144, 132, 255);
         GXPosition3f32(170.0f, -1.7f, z - 0.65f);
-        GXColor4u8(96, 106, 112, 255);
+        GXColor4u8(136, 144, 132, 255);
         GXPosition3f32(170.0f, -1.7f, z + 0.65f);
-        GXColor4u8(96, 106, 112, 255);
+        GXColor4u8(136, 144, 132, 255);
         GXPosition3f32(-170.0f, -1.7f, z + 0.65f);
         GXEnd();
     }
 }
 
-static const char* PCPort_BattleStateText(int frame,
-                                          const char** outCommand,
-                                          const char** outStatus) {
-    const char* command = "FIGHT  POKEMON  BAG  RUN";
-    const char* status = "Player HP 100   Enemy HP 100";
-    const char* message;
+static void PCPort_BattleApplyGridPlacement(PCPortBattleRenderActor actors[4]) {
+    /* Mirrors src/game/battle/battle_grid.c:fn_801C27F4's double-battle
+     * diamond: slot X = +/-3, slot Z = +/-5. Host scale expands that grid to the
+     * current PKX render units until the real battleGrid state is wired through. */
+    static const f32 kGridX[4] = { -3.0f, 3.0f, -3.0f, 3.0f };
+    static const f32 kGridZ[4] = { -5.0f, -5.0f, 5.0f, 5.0f };
+    const f32 unit = 13.0f;
+    int i;
 
-    if (frame < 90) {
-        message = "Choose a command.";
-    } else if (frame < 140) {
-        command = "SWIFT";
-        message = "Move selected: Swift -> enemy-left";
-    } else if (frame < 240) {
-        message = "Zangoose used Swift!";
-    } else if (frame < 300) {
-        status = "Player HP 100   Enemy HP 68";
-        message = "The opposing Gokulin took damage.";
-    } else if (frame < 420) {
-        status = "Player HP 100   Enemy HP 68";
-        message = "Gokulin used Table Move 213!";
-    } else if (frame < 520) {
-        status = "Player HP 79    Enemy HP 68";
-        message = "Zangoose took damage.";
+    for (i = 0; i < 4; ++i) {
+        actors[i].x = kGridX[i] * unit;
+        actors[i].y = 0.0f;
+        actors[i].z = kGridZ[i] * unit;
+        actors[i].yaw = (i < 2) ? 3.14159f : 0.0f;
+    }
+    printf("[battle-grid] source=src/game/battle/battle_grid.c:fn_801C27F4 "
+           "center=(0,0) unit=%.1f slots={P0(%.1f,%.1f),P1(%.1f,%.1f),"
+           "E0(%.1f,%.1f),E1(%.1f,%.1f)}\n",
+           unit,
+           actors[0].x, actors[0].z, actors[1].x, actors[1].z,
+           actors[2].x, actors[2].z, actors[3].x, actors[3].z);
+}
+
+typedef enum PCPortBattleFlowState {
+    PCPORT_BATTLE_FLOW_COMMAND_MENU = 0,
+    PCPORT_BATTLE_FLOW_MOVE_MENU,
+    PCPORT_BATTLE_FLOW_PLAYER_ATTACK,
+    PCPORT_BATTLE_FLOW_ENEMY_DAMAGE,
+    PCPORT_BATTLE_FLOW_ENEMY_ATTACK,
+    PCPORT_BATTLE_FLOW_PLAYER_DAMAGE,
+    PCPORT_BATTLE_FLOW_END_TURN
+} PCPortBattleFlowState;
+
+typedef struct PCPortBattleInputState {
+    int left;
+    int right;
+    int up;
+    int down;
+    int a;
+    int b;
+} PCPortBattleInputState;
+
+typedef struct PCPortBattleFlow {
+    PCPortBattleFlowState state;
+    int stateFrame;
+    int turn;
+    int commandIndex;
+    int moveIndex;
+    int playerHP;
+    int enemyHP;
+    int autoplay;
+    char commandText[96];
+    char messageText[128];
+    char statusText[96];
+    PCPortBattleInputState prevInput;
+} PCPortBattleFlow;
+
+static void DrawBattleUI(GXTexObj* messageTex,
+                         int haveMessageTex,
+                         GXTexObj* commandTex,
+                         int haveCommandTex,
+                         const PCPortBattleFlow* battleFlow) {
+    BeginMenuOverlay();
+
+    if (haveMessageTex) {
+        DrawTexturedScreenRect(messageTex, 0.0f, 300.0f, 640.0f, 180.0f,
+                               0.0f, 0.0f, 1.0f, 1.0f);
     } else {
-        status = "Player HP 79    Enemy HP 68";
-        message = "Next: command menu.";
+        DrawSolidScreenRect(0.0f, 300.0f, 640.0f, 180.0f,
+                            46, 72, 92, 245);
     }
 
-    if (outCommand != NULL) {
-        *outCommand = command;
+    if (haveCommandTex) {
+        DrawTexturedScreenRect(commandTex, 350.0f, 314.0f, 248.0f, 116.0f,
+                               0.0f, 0.0f, 1.0f, 1.0f);
+    } else {
+        DrawSolidScreenRect(350.0f, 314.0f, 248.0f, 116.0f,
+                            230, 236, 238, 210);
     }
-    if (outStatus != NULL) {
-        *outStatus = status;
+
+    /* Text is still the host bitmap font; the surrounding command/message chrome
+     * is the loaded battle UI art. */
+    DrawTextScreen(44.0f, 328.0f, 11.0f, 17.0f, 245, 248, 252, 255,
+                   battleFlow->messageText);
+    DrawTextScreen(370.0f, 336.0f, 10.0f, 16.0f, 30, 45, 60, 255,
+                   battleFlow->commandText);
+    DrawTextScreen(44.0f, 386.0f, 9.0f, 14.0f, 220, 232, 242, 255,
+                   battleFlow->statusText);
+}
+
+static const char* PCPort_BattleIconPathForMember(const char* member) {
+    if (member == NULL) {
+        return NULL;
     }
-    return message;
+    if (strcmp(member, "zangoose") == 0) {
+        return "sprites/pokemon_icons/sprite_0335.png";
+    }
+    if (strcmp(member, "gokulin") == 0) {
+        return "sprites/pokemon_icons/sprite_0316.png";
+    }
+    if (strcmp(member, "nukenin") == 0) {
+        return "sprites/pokemon_icons/sprite_0292.png";
+    }
+    return NULL;
+}
+
+static void DrawBattleActorIconFallback(PCPortBattleRenderActor actors[4],
+                                        GXTexObj iconTex[4],
+                                        int haveIcon[4],
+                                        int frame) {
+    static const f32 kIconX[4] = { 132.0f, 238.0f, 390.0f, 496.0f };
+    static const f32 kIconY[4] = { 230.0f, 246.0f, 150.0f, 134.0f };
+    int i;
+
+    BeginMenuOverlay();
+    for (i = 0; i < 4; ++i) {
+        f32 bob;
+        f32 x;
+        f32 y;
+        if (!haveIcon[i]) {
+            continue;
+        }
+        bob = sinf(((f32)frame * 0.08f) + (f32)i) * 3.0f;
+        x = kIconX[i];
+        y = kIconY[i] + bob;
+        DrawTexturedScreenRect(&iconTex[i], x, y, 72.0f, 72.0f,
+                               0.0f, 0.0f, 1.0f, 1.0f);
+        DrawTextScreen(x - 4.0f, y + 72.0f, 7.0f, 11.0f,
+                       236, 242, 248, 230, actors[i].displayName);
+    }
+}
+
+static const char* kPcportBattleCommandNames[4] = {
+    "FIGHT", "POKEMON", "BAG", "RUN"
+};
+
+static const char* kPcportBattleMoveNames[2] = {
+    "SWIFT", "TABLE MOVE 129"
+};
+
+static const char* PCPort_BattleFlowStateName(PCPortBattleFlowState state) {
+    switch (state) {
+    case PCPORT_BATTLE_FLOW_COMMAND_MENU: return "command-menu";
+    case PCPORT_BATTLE_FLOW_MOVE_MENU: return "move-menu";
+    case PCPORT_BATTLE_FLOW_PLAYER_ATTACK: return "player-attack";
+    case PCPORT_BATTLE_FLOW_ENEMY_DAMAGE: return "enemy-damage";
+    case PCPORT_BATTLE_FLOW_ENEMY_ATTACK: return "enemy-attack";
+    case PCPORT_BATTLE_FLOW_PLAYER_DAMAGE: return "player-damage";
+    case PCPORT_BATTLE_FLOW_END_TURN: return "end-turn";
+    default: return "unknown";
+    }
+}
+
+static int PCPort_BattleKeyDown(GLFWwindow* window, int key) {
+    return window != NULL && glfwGetKey(window, key) == GLFW_PRESS;
+}
+
+static void PCPort_BattlePollInput(GLFWwindow* window,
+                                   PCPortBattleFlow* flow,
+                                   PCPortBattleInputState* pressed) {
+    PCPortBattleInputState now;
+
+    memset(&now, 0, sizeof(now));
+    memset(pressed, 0, sizeof(*pressed));
+    now.left = PCPort_BattleKeyDown(window, GLFW_KEY_LEFT);
+    now.right = PCPort_BattleKeyDown(window, GLFW_KEY_RIGHT);
+    now.up = PCPort_BattleKeyDown(window, GLFW_KEY_UP);
+    now.down = PCPort_BattleKeyDown(window, GLFW_KEY_DOWN);
+    now.a = PCPort_BattleKeyDown(window, GLFW_KEY_Z) ||
+            PCPort_BattleKeyDown(window, GLFW_KEY_ENTER);
+    now.b = PCPort_BattleKeyDown(window, GLFW_KEY_X) ||
+            PCPort_BattleKeyDown(window, GLFW_KEY_BACKSPACE);
+
+    pressed->left = now.left && !flow->prevInput.left;
+    pressed->right = now.right && !flow->prevInput.right;
+    pressed->up = now.up && !flow->prevInput.up;
+    pressed->down = now.down && !flow->prevInput.down;
+    pressed->a = now.a && !flow->prevInput.a;
+    pressed->b = now.b && !flow->prevInput.b;
+    flow->prevInput = now;
+}
+
+static void PCPort_BattleFlowRefreshText(PCPortBattleFlow* flow) {
+    if (flow->state == PCPORT_BATTLE_FLOW_COMMAND_MENU) {
+        snprintf(flow->commandText, sizeof(flow->commandText),
+                 "%s%s%s  %s%s%s  %s%s%s  %s%s%s",
+                 flow->commandIndex == 0 ? "[" : "", kPcportBattleCommandNames[0],
+                 flow->commandIndex == 0 ? "]" : "",
+                 flow->commandIndex == 1 ? "[" : "", kPcportBattleCommandNames[1],
+                 flow->commandIndex == 1 ? "]" : "",
+                 flow->commandIndex == 2 ? "[" : "", kPcportBattleCommandNames[2],
+                 flow->commandIndex == 2 ? "]" : "",
+                 flow->commandIndex == 3 ? "[" : "", kPcportBattleCommandNames[3],
+                 flow->commandIndex == 3 ? "]" : "");
+    } else if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
+        snprintf(flow->commandText, sizeof(flow->commandText),
+                 "%s%s%s  %s%s%s",
+                 flow->moveIndex == 0 ? "[" : "", kPcportBattleMoveNames[0],
+                 flow->moveIndex == 0 ? "]" : "",
+                 flow->moveIndex == 1 ? "[" : "", kPcportBattleMoveNames[1],
+                 flow->moveIndex == 1 ? "]" : "");
+    } else {
+        snprintf(flow->commandText, sizeof(flow->commandText),
+                 "TURN %d  PLAYER MOVE 129  ENEMY MOVE 213", flow->turn);
+    }
+    snprintf(flow->statusText, sizeof(flow->statusText),
+             "Player HP %-3d   Enemy HP %-3d", flow->playerHP, flow->enemyHP);
+}
+
+static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
+                                   PCPortBattleFlowState state,
+                                   int frame,
+                                   PCPortBattleRenderActor actors[4],
+                                   const char* reason) {
+    flow->state = state;
+    flow->stateFrame = 0;
+
+    switch (state) {
+    case PCPORT_BATTLE_FLOW_COMMAND_MENU:
+        flow->commandIndex = 0;
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Choose a command.");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].stanceMotion,
+                                        frame, "command-menu");
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].stanceMotion,
+                                        frame, "command-menu");
+        }
+        printf("[battle-flow] frame=%d state=command-menu selected=FIGHT "
+               "text=\"FIGHT  POKEMON  BAG  RUN\" reason=%s\n",
+               frame, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_MOVE_MENU:
+        flow->moveIndex = 0;
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Select a move.");
+        printf("[battle-flow] frame=%d state=move-menu selected=\"Swift\" "
+               "moveId=129 textId=0x8001 target=enemy-left reason=%s\n",
+               frame, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_PLAYER_ATTACK:
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Zangoose used Swift!");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].attackMotion,
+                                        frame, "player-attack");
+        }
+        printf("[battle-flow] frame=%d state=player-attack actor=player-left "
+               "moveId=129 textId=0x8001 damage=32 reason=%s\n",
+               frame, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_ENEMY_DAMAGE:
+        flow->enemyHP -= 32;
+        if (flow->enemyHP < 0) flow->enemyHP = 0;
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "The opposing Gokulin took damage.");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].damageMotion,
+                                        frame, "enemy-damage");
+        }
+        printf("[battle-flow] frame=%d state=enemy-damage target=enemy-left "
+               "enemyHP=%d reason=%s\n",
+               frame, flow->enemyHP, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_ENEMY_ATTACK:
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Gokulin used Table Move 213!");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].attackMotion,
+                                        frame, "enemy-attack");
+        }
+        printf("[battle-flow] frame=%d state=enemy-attack actor=enemy-left "
+               "moveId=213 textId=0x8002 damage=21 reason=%s\n",
+               frame, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_PLAYER_DAMAGE:
+        flow->playerHP -= 21;
+        if (flow->playerHP < 0) flow->playerHP = 0;
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Zangoose took damage.");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].damageMotion,
+                                        frame, "player-damage");
+        }
+        printf("[battle-flow] frame=%d state=player-damage target=player-left "
+               "playerHP=%d reason=%s\n",
+               frame, flow->playerHP, reason != NULL ? reason : "-");
+        break;
+    case PCPORT_BATTLE_FLOW_END_TURN:
+        snprintf(flow->messageText, sizeof(flow->messageText),
+                 "Next: command menu.");
+        if (actors != NULL) {
+            PCPort_BattleActorSetMotion(&actors[0], actors[0].stanceMotion,
+                                        frame, "end-turn");
+            PCPort_BattleActorSetMotion(&actors[2], actors[2].stanceMotion,
+                                        frame, "end-turn");
+        }
+        printf("[battle-flow] frame=%d state=end-turn playerHP=%d enemyHP=%d "
+               "next=command-menu reason=%s\n",
+               frame, flow->playerHP, flow->enemyHP,
+               reason != NULL ? reason : "-");
+        flow->turn++;
+        break;
+    }
+    PCPort_BattleFlowRefreshText(flow);
+    fflush(stdout);
+}
+
+static void PCPort_BattleFlowInit(PCPortBattleFlow* flow,
+                                  PCPortBattleRenderActor actors[4]) {
+    memset(flow, 0, sizeof(*flow));
+    flow->playerHP = 100;
+    flow->enemyHP = 100;
+    flow->turn = 1;
+    flow->autoplay = getenv("PCPORT_BATTLE_AUTOPLAY") == NULL ||
+                     strcmp(getenv("PCPORT_BATTLE_AUTOPLAY"), "0") != 0;
+    printf("[battle-flow] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
+           "playerMove=129 enemyMove=213 playerDamage=32 enemyDamage=21 "
+           "autoplay=%d\n", flow->autoplay);
+    printf("[battle-flow] input keyboard=arrows+Z/Enter+B/X "
+           "states=command-menu,move-menu,attack,damage,end-turn\n");
+    PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_COMMAND_MENU, 0,
+                           actors, "opening");
+}
+
+static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
+                                         PCPortBattleInputState* pressed,
+                                         int frame,
+                                         PCPortBattleRenderActor actors[4],
+                                         const char* source) {
+    if (pressed->left || pressed->right) {
+        if (flow->state == PCPORT_BATTLE_FLOW_COMMAND_MENU) {
+            int delta = pressed->left ? -1 : 1;
+            flow->commandIndex = (flow->commandIndex + delta + 4) % 4;
+            snprintf(flow->messageText, sizeof(flow->messageText),
+                     "Choose a command.");
+            printf("[battle-input] frame=%d source=%s action=%s state=%s "
+                   "selected=%s\n", frame, source,
+                   pressed->left ? "LEFT" : "RIGHT",
+                   PCPort_BattleFlowStateName(flow->state),
+                   kPcportBattleCommandNames[flow->commandIndex]);
+        }
+    }
+    if (pressed->up || pressed->down) {
+        if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
+            flow->moveIndex = (flow->moveIndex + 1) % 2;
+            snprintf(flow->messageText, sizeof(flow->messageText),
+                     "Select a move.");
+            printf("[battle-input] frame=%d source=%s action=%s state=%s "
+                   "selected=\"%s\"\n", frame, source,
+                   pressed->up ? "UP" : "DOWN",
+                   PCPort_BattleFlowStateName(flow->state),
+                   kPcportBattleMoveNames[flow->moveIndex]);
+        }
+    }
+    if (pressed->b && flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
+        printf("[battle-input] frame=%d source=%s action=B state=move-menu "
+               "next=command-menu\n", frame, source);
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_COMMAND_MENU, frame,
+                               actors, "input-back");
+        return;
+    }
+    if (pressed->a) {
+        if (flow->state == PCPORT_BATTLE_FLOW_COMMAND_MENU) {
+            printf("[battle-input] frame=%d source=%s action=A state=command-menu "
+                   "selected=%s\n", frame, source,
+                   kPcportBattleCommandNames[flow->commandIndex]);
+            if (flow->commandIndex == 0) {
+                PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_MOVE_MENU,
+                                       frame, actors, "input-fight");
+            } else {
+                snprintf(flow->messageText, sizeof(flow->messageText),
+                         "%s is not wired in this host slice.",
+                         kPcportBattleCommandNames[flow->commandIndex]);
+            }
+            return;
+        }
+        if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
+            printf("[battle-input] frame=%d source=%s action=A state=move-menu "
+                   "selected=\"%s\" moveId=129\n", frame, source,
+                   kPcportBattleMoveNames[flow->moveIndex]);
+            PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_PLAYER_ATTACK,
+                                   frame, actors, "input-move");
+            return;
+        }
+    }
+    PCPort_BattleFlowRefreshText(flow);
+}
+
+static void PCPort_BattleFlowUpdate(PCPortBattleFlow* flow,
+                                    GLFWwindow* window,
+                                    int frame,
+                                    PCPortBattleRenderActor actors[4]) {
+    PCPortBattleInputState pressed;
+
+    PCPort_BattlePollInput(window, flow, &pressed);
+    if (flow->autoplay && flow->turn == 1) {
+        if (flow->state == PCPORT_BATTLE_FLOW_COMMAND_MENU &&
+            flow->stateFrame == 40) {
+            pressed.a = 1;
+            PCPort_BattleFlowHandleInput(flow, &pressed, frame, actors, "auto");
+        } else if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU &&
+                   flow->stateFrame == 35) {
+            pressed.a = 1;
+            PCPort_BattleFlowHandleInput(flow, &pressed, frame, actors, "auto");
+        } else {
+            PCPort_BattleFlowHandleInput(flow, &pressed, frame, actors,
+                                         "keyboard");
+        }
+    } else {
+        PCPort_BattleFlowHandleInput(flow, &pressed, frame, actors,
+                                     "keyboard");
+    }
+
+    if (flow->state == PCPORT_BATTLE_FLOW_PLAYER_ATTACK &&
+        flow->stateFrame >= 100) {
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_ENEMY_DAMAGE,
+                               frame, actors, "turn-timer");
+    } else if (flow->state == PCPORT_BATTLE_FLOW_ENEMY_DAMAGE &&
+               flow->stateFrame >= 60) {
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_ENEMY_ATTACK,
+                               frame, actors, "turn-timer");
+    } else if (flow->state == PCPORT_BATTLE_FLOW_ENEMY_ATTACK &&
+               flow->stateFrame >= 120) {
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_PLAYER_DAMAGE,
+                               frame, actors, "turn-timer");
+    } else if (flow->state == PCPORT_BATTLE_FLOW_PLAYER_DAMAGE &&
+               flow->stateFrame >= 80) {
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_END_TURN,
+                               frame, actors, "turn-timer");
+    } else if (flow->state == PCPORT_BATTLE_FLOW_END_TURN &&
+               flow->stateFrame >= 80) {
+        PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_COMMAND_MENU,
+                               frame, actors, "next-turn");
+    }
+
+    flow->stateFrame++;
+    PCPort_BattleFlowRefreshText(flow);
 }
 
 static int RunBattleScene(GLFWwindow* window) {
     PCPortBattleRenderActor actors[4] = {
-        { "player-left",  "zangoose", "Zangoose", -42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
-        { "player-right", "zangoose", "Zangoose",  42.0f, 0.0f,  34.0f,  3.14159f, 6.0f },
-        { "enemy-left",   "gokulin",  "Gokulin",  -42.0f, 0.0f, -30.0f,  0.0f,    6.0f },
-        { "enemy-right",  "nukenin",  "Nukenin",   42.0f, 0.0f, -30.0f,  0.0f,    6.0f }
+        { "player-left",  "zangoose", "Zangoose", -48.0f, 16.0f,  30.0f,  3.14159f, 11.5f },
+        { "player-right", "zangoose", "Zangoose",  48.0f, 16.0f,  30.0f,  3.14159f, 11.5f },
+        { "enemy-left",   "gokulin",  "Gokulin",  -48.0f, 16.0f, -36.0f,  0.0f,    11.5f },
+        { "enemy-right",  "nukenin",  "Nukenin",   48.0f, 16.0f, -36.0f,  0.0f,    11.5f }
     };
     PCPortTranslatedCamera camera;
-    f32 eye[3] = { 0.0f, 68.0f, 135.0f };
-    f32 interest[3] = { 0.0f, 28.0f, -2.0f };
-    f32 up[3] = { 0.0f, 1.0f, 0.0f };
     const char* scaleEnv = getenv("PCPORT_BATTLE_SCALE");
+    GXTexObj battleBackdropTex;
+    GXTexObj battleMessageTex;
+    GXTexObj battleCommandTex;
+    GXTexObj battleIconTex[4];
+    int haveBattleIcon[4] = { 0, 0, 0, 0 };
+    PCPortBattleFlow battleFlow;
+    int haveBattleBackdrop = 0;
+    int haveBattleMessageTex = 0;
+    int haveBattleCommandTex = 0;
+    int haveBattleStage = 0;
+    int drawBattleStage = 0;
+    int drawPkxMesh = 0;
     int frameCap = 0;
     int frame;
     int i;
 
-    (void)window;
     if (getenv("PCPORT_BATTLE_P0") != NULL) actors[0].member = getenv("PCPORT_BATTLE_P0");
     if (getenv("PCPORT_BATTLE_P1") != NULL) actors[1].member = getenv("PCPORT_BATTLE_P1");
     if (getenv("PCPORT_BATTLE_E0") != NULL) actors[2].member = getenv("PCPORT_BATTLE_E0");
@@ -9766,6 +10291,7 @@ static int RunBattleScene(GLFWwindow* window) {
             }
         }
     }
+    PCPort_BattleApplyGridPlacement(actors);
     if (getenv("PCPORT_BATTLE_FRAMES") != NULL) {
         frameCap = atoi(getenv("PCPORT_BATTLE_FRAMES"));
     }
@@ -9795,7 +10321,7 @@ static int RunBattleScene(GLFWwindow* window) {
         camera.projectionMatrix[2][3] = -(2.0f * farZ * nearZ) / (farZ - nearZ);
         camera.projectionMatrix[3][2] = -1.0f;
     }
-    BuildViewMatrixLookAt(eye, interest, up, camera.viewMatrix);
+    PCPort_SetBattleCameraView(&camera, 0);
 
     for (i = 0; i < 4; ++i) {
         if (!PCPort_LoadPkxRenderActor(&actors[i])) {
@@ -9807,9 +10333,85 @@ static int RunBattleScene(GLFWwindow* window) {
         PCPort_BattleActorSetMotion(&actors[i], actors[i].stanceMotion, 0,
                                     "stance");
     }
+    PCPort_BattleFlowInit(&battleFlow, actors);
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
     EnsureFontAtlas();
+    memset(&battleBackdropTex, 0, sizeof(battleBackdropTex));
+    memset(&battleMessageTex, 0, sizeof(battleMessageTex));
+    memset(&battleCommandTex, 0, sizeof(battleCommandTex));
+    memset(battleIconTex, 0, sizeof(battleIconTex));
+    haveBattleBackdrop = LoadFsysSpriteTexObj(
+        "orig/GC6E01/disc/files/fight_common.fsys", "menu_048",
+        &battleBackdropTex);
+    if (!haveBattleBackdrop) {
+        haveBattleBackdrop = LoadFsysSpriteTexObj(
+            "orig/GC6E01/disc/files/fight_common.fsys", "menu001",
+            &battleBackdropTex);
+    }
+    haveBattleMessageTex = LoadFsysSpriteTexObj(
+        "orig/GC6E01/disc/files/fight_common.fsys", "menu001",
+        &battleMessageTex);
+    haveBattleCommandTex = LoadFsysSpriteTexObj(
+        "orig/GC6E01/disc/files/colosseumbattle_menu.fsys", "menu_076",
+        &battleCommandTex);
+    if (!haveBattleCommandTex) {
+        haveBattleCommandTex = LoadFsysSpriteTexObj(
+            "orig/GC6E01/disc/files/toolbattle_menu.fsys", "menu001",
+            &battleCommandTex);
+    }
+    if (getenv("PCPORT_BATTLE_NO_STAGE") == NULL) {
+        const char* stageArchive = getenv("PCPORT_BATTLE_STAGE_ARCHIVE");
+        if (stageArchive == NULL || stageArchive[0] == '\0') {
+            stageArchive = "orig/GC6E01/disc/files/M1_stadium_1F.fsys";
+        }
+        haveBattleStage = PCPort_EngineFieldSetup(stageArchive);
+        drawBattleStage = getenv("PCPORT_BATTLE_DRAW_STAGE") != NULL;
+        printf("[battle-arena] stage=%s draw=%s source=%s models=%d "
+               "placement=grid-derived reason=%s\n",
+               haveBattleStage ? "loaded" : "fallback-floor",
+               (haveBattleStage && drawBattleStage) ? "enabled-debug" : "suppressed",
+               stageArchive, haveBattleStage ? (g_engExtraRootJointCount + 1) : 0,
+               (haveBattleStage && !drawBattleStage)
+                   ? "field-map-camera-scale-not-battle-framed"
+                   : "-");
+    }
+    if (getenv("PCPORT_BATTLE_NO_ICON_FALLBACK") == NULL) {
+        for (i = 0; i < 4; ++i) {
+            const char* iconPath = PCPort_BattleIconPathForMember(actors[i].member);
+            haveBattleIcon[i] = LoadPngTexObj(iconPath, &battleIconTex[i]);
+            printf("[battle-icon] actor=%s member=%s icon=%s loaded=%d "
+                   "policy=visible-fallback-until-pkx-skin-fixed\n",
+                   actors[i].label, actors[i].member,
+                   iconPath != NULL ? iconPath : "-", haveBattleIcon[i]);
+        }
+    }
+    drawPkxMesh = getenv("PCPORT_BATTLE_SHOW_PKX_MESH") != NULL;
+    printf("[battle-pkx] meshDraw=%s reason=%s next=RenderSkinnedPObj-envelope-palette/display-list\n",
+           drawPkxMesh ? "enabled-debug" : "suppressed",
+           drawPkxMesh ? "PCPORT_BATTLE_SHOW_PKX_MESH" :
+                         "headed-skin-path-explodes-large-triangles");
+    printf("[battle-arena] backdrop=%s source=%s controlPObjPolicy=%s "
+           "skin=%s\n",
+           haveBattleBackdrop ? "loaded" : "fallback",
+           haveBattleBackdrop ? "fight_common.fsys" : "procedural",
+           getenv("PCPORT_BATTLE_SHOW_CONTROL_POBJS") == NULL
+               ? "suppress"
+               : "show-debug",
+           drawPkxMesh ? "enabled" : "suppressed-with-mesh");
+    printf("[battle-ui] message=%s(fight_common.fsys:menu001) "
+           "command=%s(colosseumbattle_menu.fsys:menu_076/toolbattle_menu.fsys:menu001) "
+           "glyphs=host-bitmap-pending-game-font\n",
+           haveBattleMessageTex ? "loaded" : "fallback",
+           haveBattleCommandTex ? "loaded" : "fallback");
+    printf("[battle-camera] mode=host-colosseum-angled fov=45 "
+           "eye0=(0.0,55.5,132.0) interest=(0.0,10.0,-6.0) "
+           "orbit=deterministic arenaCandidate=M1_stadium_1F.fsys\n");
+    fflush(stdout);
+    g_pcBattleSuppressControlPObjs =
+        (getenv("PCPORT_BATTLE_SHOW_CONTROL_POBJS") == NULL) ? 1 : 0;
+    g_pcBattleMaterialLogBudget = g_pcBattleSuppressControlPObjs ? 12u : 0u;
+    g_pcBattleRenderSkin = drawPkxMesh;
     printf("[battle-scene] loaded actors=4 frameCap=%d\n", frameCap);
     printf("[battle-state] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
            "playerMove=129 enemyMove=213 actors=zangoose,zangoose,gokulin,nukenin\n");
@@ -9819,9 +10421,6 @@ static int RunBattleScene(GLFWwindow* window) {
 
     for (frame = 0; ; ++frame) {
         MenuTreeStats stats;
-        const char* commandText;
-        const char* statusText;
-        const char* messageText;
         if (window != NULL && glfwWindowShouldClose(window)) {
             break;
         }
@@ -9829,71 +10428,65 @@ static int RunBattleScene(GLFWwindow* window) {
             break;
         }
         memset(&stats, 0, sizeof(stats));
-        messageText = PCPort_BattleStateText(frame, &commandText, &statusText);
-        if (frame == 140) {
-            PCPort_BattleActorSetMotion(&actors[0], actors[0].attackMotion,
-                                        frame, "player-attack");
-        } else if (frame == 240) {
-            PCPort_BattleActorSetMotion(&actors[2], actors[2].damageMotion,
-                                        frame, "enemy-damage");
-        } else if (frame == 300) {
-            PCPort_BattleActorSetMotion(&actors[2], actors[2].attackMotion,
-                                        frame, "enemy-attack");
-        } else if (frame == 420) {
-            PCPort_BattleActorSetMotion(&actors[0], actors[0].damageMotion,
-                                        frame, "player-damage");
-        } else if (frame == 520) {
-            PCPort_BattleActorSetMotion(&actors[0], actors[0].stanceMotion,
-                                        frame, "command-menu");
-            PCPort_BattleActorSetMotion(&actors[2], actors[2].stanceMotion,
-                                        frame, "command-menu");
-        }
+        PCPort_BattleFlowUpdate(&battleFlow, window, frame, actors);
         for (i = 0; i < 4; ++i) {
             PCPort_BattleActorStep(&actors[i]);
         }
         if (frame == 0 || frame == 1 || frame == 30 || frame == 90 ||
             frame == 141 || frame == 180 || frame == 241 || frame == 301 ||
             frame == 360 || frame == 421 || frame == 500) {
-            PCPort_BattleLogMotionSample(actors, 4, frame, messageText);
+            PCPort_BattleLogMotionSample(actors, 4, frame,
+                                         battleFlow.messageText);
         }
         VIWaitForRetrace_PC();
         ClearBackbuffer(0.03f, 0.04f, 0.06f);
         GSgfx_BeginFrame();
         ClearBackbuffer(0.08f, 0.10f, 0.13f);
+        DrawBattleBackdrop2D(&battleBackdropTex, haveBattleBackdrop);
+        PCPort_SetBattleCameraView(&camera, frame);
         GXSetViewport(0.0f, 0.0f, (f32)PCPORT_WINDOW_WIDTH,
                       (f32)PCPORT_WINDOW_HEIGHT, 0.0f, 1.0f);
         GXSetScissor(0u, 0u, PCPORT_WINDOW_WIDTH, PCPORT_WINDOW_HEIGHT);
         GXSetProjection(camera.projectionMatrix, GX_PERSPECTIVE);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXLoadPosMtxImm(camera.viewMatrix, 0);
-        DrawBattleArenaFloor();
-
-        for (i = 0; i < 4; ++i) {
-            PCPortTranslatedCamera actorCam = camera;
-            f32 actorMtx[3][4];
-            PCPort_BuildActorModelMatrix(&actors[i], actorMtx);
-            PCPortMulAffine3x4(camera.viewMatrix, actorMtx,
-                               actorCam.viewMatrix);
-            RenderJointTree(&actors[i].archive, actors[i].rootJoint,
-                            actors[i].rootJoint, &actorCam,
+        if (haveBattleStage && drawBattleStage) {
+            RenderJointTree(&g_engTitleArchive, g_engTitleRootJoint,
+                            g_engTitleRootJoint, &camera,
                             (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+            for (i = 0; i < g_engExtraRootJointCount; ++i) {
+                RenderJointTree(&g_engTitleArchive, g_engExtraRootJoints[i],
+                                g_engExtraRootJoints[i], &camera,
+                                (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+            }
+        } else {
+            DrawBattleArenaFloor();
         }
 
-        BeginMenuOverlay();
-        DrawSolidScreenRect(28.0f, 314.0f, 584.0f, 92.0f, 8, 14, 22, 220);
-        DrawTextScreen(42.0f, 330.0f, 12.0f, 18.0f, 238, 242, 248, 255,
-                       commandText);
-        DrawTextScreen(42.0f, 362.0f, 10.0f, 16.0f, 220, 230, 244, 255,
-                       messageText);
-        DrawTextScreen(42.0f, 386.0f, 9.0f, 14.0f, 178, 202, 225, 255,
-                       statusText);
+        if (drawPkxMesh) {
+            for (i = 0; i < 4; ++i) {
+                PCPortTranslatedCamera actorCam = camera;
+                f32 actorMtx[3][4];
+                PCPort_BuildActorModelMatrix(&actors[i], actorMtx);
+                PCPortMulAffine3x4(camera.viewMatrix, actorMtx,
+                                   actorCam.viewMatrix);
+                RenderJointTree(&actors[i].archive, actors[i].rootJoint,
+                                actors[i].rootJoint, &actorCam,
+                                (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+            }
+        }
+
+        DrawBattleActorIconFallback(actors, battleIconTex, haveBattleIcon, frame);
+        DrawBattleUI(&battleMessageTex, haveBattleMessageTex,
+                     &battleCommandTex, haveBattleCommandTex, &battleFlow);
 
         if ((getenv("PCPORT_RENDER_DEBUG") != NULL ||
              getenv("PCPORT_BATTLE_LOG_MOTION") != NULL) && frame == 0) {
             printf("[battle-scene] render stats joints=%u dobjs=%u drawn=%u "
-                   "skipped=%u textured=%u materialOnly=%u\n",
+                   "skipped=%u textured=%u materialOnly=%u suppressedControlPObj=%u\n",
                    stats.joints, stats.dobjs, stats.drawn, stats.skipped,
-                   stats.textured, stats.materialOnly);
+                   stats.textured, stats.materialOnly,
+                   stats.battleControlPObjSuppressed);
         }
         GSgfxSwapBuffers(1);
         if (frameCap == 0) {
@@ -9902,6 +10495,9 @@ static int RunBattleScene(GLFWwindow* window) {
     }
     printf("[battle-scene] frames=%d\n", frame);
     HoldWindowOpen(window);
+    g_pcBattleSuppressControlPObjs = 0;
+    g_pcBattleMaterialLogBudget = 0;
+    g_pcBattleRenderSkin = 0;
     PCPort_FreeBattleRenderActors(actors, 4);
     return 1;
 }
