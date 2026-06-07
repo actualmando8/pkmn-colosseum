@@ -5395,16 +5395,26 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
 
     /* The character meshes carry a dark albedo (navy coat, black boots) that the
      * GameCube lit at runtime; we don't yet drive GX dynamic lights for the skin
-     * submit, so an unlit sample reads near-black. Lift it two ways for a
-     * recognizable, lit-looking model:
+     * submit, so an unlit sample reads near-black. Lift non-battle character
+     * skins two ways for a recognizable, lit-looking model:
      *   - derivative face-normal lambert (u_lightingEnabled) gives 3D form, and
      *   - an exposure gain (>1) brightens the dark albedo toward the lit art.
+     * Battle PKX textures are already bright; the same gain clips Zangoose into
+     * a pink/white blob, so keep battle skin exposure neutral unless overridden.
      * Both are tunable live and restored to neutral after the submit so other
      * draws (title/field/menu) are unaffected. */
     {
         const char* expEnv = getenv("PCPORT_EXPOSURE");
+        const char* battleExpEnv = getenv("PCPORT_BATTLE_SKIN_EXPOSURE");
         const char* ambEnv = getenv("PCPORT_SKIN_AMB");
-        f32 exposure = (expEnv != NULL && expEnv[0] != '\0') ? (f32)atof(expEnv) : 2.4f;
+        f32 defaultExposure = g_pcBattleRenderSkin ? 1.0f : 2.4f;
+        f32 exposure = (expEnv != NULL && expEnv[0] != '\0')
+            ? (f32)atof(expEnv)
+            : defaultExposure;
+        if (g_pcBattleRenderSkin &&
+            battleExpEnv != NULL && battleExpEnv[0] != '\0') {
+            exposure = (f32)atof(battleExpEnv);
+        }
         f32 ambient  = (ambEnv != NULL && ambEnv[0] != '\0') ? (f32)atof(ambEnv) : 0.55f;
         GXHostSetExposure(exposure);
         GXHostSetLightingEnabled(GX_TRUE);
