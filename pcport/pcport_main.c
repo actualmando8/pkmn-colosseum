@@ -5349,6 +5349,12 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
     int dbgWhite   = (getenv("PCPORT_SKIN_WHITE") != NULL);
     int dbgNoMtx   = (getenv("PCPORT_SKIN_NOMTX") != NULL);
     int dbgVtxPos  = (getenv("PCPORT_SKIN_VTXPOS") != NULL);
+    f32 dbgViewMin[3] = {0.0f, 0.0f, 0.0f};
+    f32 dbgViewMax[3] = {0.0f, 0.0f, 0.0f};
+    f32 dbgNdcMin[3] = {0.0f, 0.0f, 0.0f};
+    f32 dbgNdcMax[3] = {0.0f, 0.0f, 0.0f};
+    int dbgViewAny = 0;
+    int dbgNearFail = 0;
     memset(g_skinHist, 0, sizeof(g_skinHist));
     g_skinHistOob = 0;
     g_skinVtxPosN = 0;
@@ -5530,6 +5536,54 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                     f32 wx = Mx[0][0]*px + Mx[0][1]*py + Mx[0][2]*pz + Mx[0][3];
                     f32 wy = Mx[1][0]*px + Mx[1][1]*py + Mx[1][2]*pz + Mx[1][3];
                     f32 wz = Mx[2][0]*px + Mx[2][1]*py + Mx[2][2]*pz + Mx[2][3];
+                    if (dbgVtxPos) {
+                        f32 vx = cam->viewMatrix[0][0]*wx + cam->viewMatrix[0][1]*wy +
+                                 cam->viewMatrix[0][2]*wz + cam->viewMatrix[0][3];
+                        f32 vy = cam->viewMatrix[1][0]*wx + cam->viewMatrix[1][1]*wy +
+                                 cam->viewMatrix[1][2]*wz + cam->viewMatrix[1][3];
+                        f32 vz = cam->viewMatrix[2][0]*wx + cam->viewMatrix[2][1]*wy +
+                                 cam->viewMatrix[2][2]*wz + cam->viewMatrix[2][3];
+                        f32 cx = cam->projectionMatrix[0][0]*vx +
+                                 cam->projectionMatrix[0][1]*vy +
+                                 cam->projectionMatrix[0][2]*vz +
+                                 cam->projectionMatrix[0][3];
+                        f32 cy = cam->projectionMatrix[1][0]*vx +
+                                 cam->projectionMatrix[1][1]*vy +
+                                 cam->projectionMatrix[1][2]*vz +
+                                 cam->projectionMatrix[1][3];
+                        f32 cz = cam->projectionMatrix[2][0]*vx +
+                                 cam->projectionMatrix[2][1]*vy +
+                                 cam->projectionMatrix[2][2]*vz +
+                                 cam->projectionMatrix[2][3];
+                        f32 cw = cam->projectionMatrix[3][0]*vx +
+                                 cam->projectionMatrix[3][1]*vy +
+                                 cam->projectionMatrix[3][2]*vz +
+                                 cam->projectionMatrix[3][3];
+                        if (vz > -1.0f) {
+                            ++dbgNearFail;
+                        }
+                        if (cw != 0.0f) {
+                            cx /= cw;
+                            cy /= cw;
+                            cz /= cw;
+                        }
+                        if (!dbgViewAny) {
+                            dbgViewMin[0]=dbgViewMax[0]=vx;
+                            dbgViewMin[1]=dbgViewMax[1]=vy;
+                            dbgViewMin[2]=dbgViewMax[2]=vz;
+                            dbgNdcMin[0]=dbgNdcMax[0]=cx;
+                            dbgNdcMin[1]=dbgNdcMax[1]=cy;
+                            dbgNdcMin[2]=dbgNdcMax[2]=cz;
+                            dbgViewAny = 1;
+                        } else {
+                            if (vx<dbgViewMin[0]) dbgViewMin[0]=vx; if (vx>dbgViewMax[0]) dbgViewMax[0]=vx;
+                            if (vy<dbgViewMin[1]) dbgViewMin[1]=vy; if (vy>dbgViewMax[1]) dbgViewMax[1]=vy;
+                            if (vz<dbgViewMin[2]) dbgViewMin[2]=vz; if (vz>dbgViewMax[2]) dbgViewMax[2]=vz;
+                            if (cx<dbgNdcMin[0]) dbgNdcMin[0]=cx; if (cx>dbgNdcMax[0]) dbgNdcMax[0]=cx;
+                            if (cy<dbgNdcMin[1]) dbgNdcMin[1]=cy; if (cy>dbgNdcMax[1]) dbgNdcMax[1]=cy;
+                            if (cz<dbgNdcMin[2]) dbgNdcMin[2]=cz; if (cz>dbgNdcMax[2]) dbgNdcMax[2]=cz;
+                        }
+                    }
                     GXPosition3f32(wx, wy, wz);
                 }
                 GXTexCoord2f32(haveTex ? u : 0.0f, haveTex ? vv : 0.0f);
@@ -5547,6 +5601,15 @@ static int RenderSkinnedPObj(const PCPortHSDArchive* a, u32 pobjOffset,
                 "WORLD bbox=[%.1f,%.1f,%.1f .. %.1f,%.1f,%.1f] (n=%d)\n",
                 g_locMin[0],g_locMin[1],g_locMin[2], g_locMax[0],g_locMax[1],g_locMax[2],
                 g_wMin[0],g_wMin[1],g_wMin[2], g_wMax[0],g_wMax[1],g_wMax[2], g_skinVtxPosN);
+        if (dbgViewAny) {
+            fprintf(stderr, "[vtxclip] VIEW bbox=[%.1f,%.1f,%.1f .. %.1f,%.1f,%.1f] "
+                    "NDC bbox=[%.2f,%.2f,%.2f .. %.2f,%.2f,%.2f] nearFail=%d/%d\n",
+                    dbgViewMin[0],dbgViewMin[1],dbgViewMin[2],
+                    dbgViewMax[0],dbgViewMax[1],dbgViewMax[2],
+                    dbgNdcMin[0],dbgNdcMin[1],dbgNdcMin[2],
+                    dbgNdcMax[0],dbgNdcMax[1],dbgNdcMax[2],
+                    dbgNearFail, g_skinVtxPosN);
+        }
     }
     if (getenv("PCPORT_SKIN_HIST") != NULL) {
         int s; u32 tot = 0;
@@ -9816,7 +9879,7 @@ static void PCPort_BattleApplyGridPlacement(PCPortBattleRenderActor actors[4]) {
      * current PKX render units until the real battleGrid state is wired through. */
     static const f32 kGridX[4] = { -3.0f, 3.0f, -3.0f, 3.0f };
     static const f32 kGridZ[4] = { -5.0f, -5.0f, 5.0f, 5.0f };
-    const f32 unit = 13.0f;
+    const f32 unit = 10.0f;
     int i;
 
     for (i = 0; i < 4; ++i) {
@@ -10252,10 +10315,10 @@ static void PCPort_BattleFlowUpdate(PCPortBattleFlow* flow,
 
 static int RunBattleScene(GLFWwindow* window) {
     PCPortBattleRenderActor actors[4] = {
-        { "player-left",  "zangoose", "Zangoose", -48.0f, 16.0f,  30.0f,  3.14159f, 11.5f },
-        { "player-right", "zangoose", "Zangoose",  48.0f, 16.0f,  30.0f,  3.14159f, 11.5f },
-        { "enemy-left",   "gokulin",  "Gokulin",  -48.0f, 16.0f, -36.0f,  0.0f,    11.5f },
-        { "enemy-right",  "nukenin",  "Nukenin",   48.0f, 16.0f, -36.0f,  0.0f,    11.5f }
+        { "player-left",  "zangoose", "Zangoose", -48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
+        { "player-right", "zangoose", "Zangoose",  48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
+        { "enemy-left",   "gokulin",  "Gokulin",  -48.0f, 16.0f, -36.0f,  0.0f,    1.8f },
+        { "enemy-right",  "nukenin",  "Nukenin",   48.0f, 16.0f, -36.0f,  0.0f,    1.8f }
     };
     PCPortTranslatedCamera camera;
     const char* scaleEnv = getenv("PCPORT_BATTLE_SCALE");
@@ -10271,6 +10334,7 @@ static int RunBattleScene(GLFWwindow* window) {
     int haveBattleStage = 0;
     int drawBattleStage = 0;
     int drawPkxMesh = 0;
+    int disablePkxDepth = 0;
     int frameCap = 0;
     int frame;
     int i;
@@ -10311,8 +10375,8 @@ static int RunBattleScene(GLFWwindow* window) {
     {
         f32 fov = 45.0f * 3.14159265f / 180.0f;
         f32 aspect = (f32)PCPORT_WINDOW_WIDTH / (f32)PCPORT_WINDOW_HEIGHT;
-        f32 nearZ = 1.0f;
-        f32 farZ = 2000.0f;
+        f32 nearZ = 20.0f;
+        f32 farZ = 500.0f;
         f32 f = 1.0f / tanf(fov * 0.5f);
         memset(camera.projectionMatrix, 0, sizeof(camera.projectionMatrix));
         camera.projectionMatrix[0][0] = f / aspect;
@@ -10387,10 +10451,19 @@ static int RunBattleScene(GLFWwindow* window) {
         }
     }
     drawPkxMesh = getenv("PCPORT_BATTLE_SHOW_PKX_MESH") != NULL;
+    disablePkxDepth = drawPkxMesh &&
+                      getenv("PCPORT_BATTLE_PKX_ZTEST") == NULL;
     printf("[battle-pkx] meshDraw=%s reason=%s next=RenderSkinnedPObj-envelope-palette/display-list\n",
            drawPkxMesh ? "enabled-debug" : "suppressed",
            drawPkxMesh ? "PCPORT_BATTLE_SHOW_PKX_MESH" :
                          "headed-skin-path-explodes-large-triangles");
+    if (drawPkxMesh) {
+        printf("[battle-pkx] depth=%s reason=%s\n",
+               disablePkxDepth ? "disabled-debug" : "enabled-debug",
+               disablePkxDepth
+                   ? "host-depth-precision-shreds-skinned-pkx-surfaces"
+                   : "PCPORT_BATTLE_PKX_ZTEST");
+    }
     printf("[battle-arena] backdrop=%s source=%s controlPObjPolicy=%s "
            "skin=%s\n",
            haveBattleBackdrop ? "loaded" : "fallback",
@@ -10404,7 +10477,7 @@ static int RunBattleScene(GLFWwindow* window) {
            "glyphs=host-bitmap-pending-game-font\n",
            haveBattleMessageTex ? "loaded" : "fallback",
            haveBattleCommandTex ? "loaded" : "fallback");
-    printf("[battle-camera] mode=host-colosseum-angled fov=45 "
+    printf("[battle-camera] mode=host-colosseum-angled fov=45 near=20 far=500 "
            "eye0=(0.0,55.5,132.0) interest=(0.0,10.0,-6.0) "
            "orbit=deterministic arenaCandidate=M1_stadium_1F.fsys\n");
     fflush(stdout);
@@ -10464,6 +10537,9 @@ static int RunBattleScene(GLFWwindow* window) {
         }
 
         if (drawPkxMesh) {
+            if (disablePkxDepth) {
+                GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+            }
             for (i = 0; i < 4; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
@@ -10473,6 +10549,9 @@ static int RunBattleScene(GLFWwindow* window) {
                 RenderJointTree(&actors[i].archive, actors[i].rootJoint,
                                 actors[i].rootJoint, &actorCam,
                                 (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+            }
+            if (disablePkxDepth) {
+                GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             }
         }
 
