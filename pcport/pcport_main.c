@@ -9810,6 +9810,7 @@ typedef struct PCPortPkxViewerState {
     f32 baseScale;
     int autoSpin;
     int startBattle;
+    int singleDebug;
     int sweepEnabled;
     int sweepSlot;
     int sweepNextModel;
@@ -10715,12 +10716,17 @@ static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
                                      ? actors[0].member : "Pokemon";
                 const char* p1 = (actors != NULL && actors[1].member != NULL)
                                      ? actors[1].member : "Pokemon";
+                const char* p2 = (actors != NULL && actors[2].member != NULL)
+                                     ? actors[2].member : "Pokemon";
+                const char* p3 = (actors != NULL && actors[3].member != NULL)
+                                     ? actors[3].member : "Pokemon";
                 flow->requestPokemonSetup = 1;
                 snprintf(flow->messageText, sizeof(flow->messageText),
-                         "Choose Pokemon.");
+                         "Choose Pokemon from your party.");
                 printf("[battle-input] frame=%d source=%s action=A state=command-menu "
-                       "selected=POKEMON party=%s,%s next=colosseum-setup\n",
-                       frame, source, p0, p1);
+                       "selected=POKEMON partySlots=6 activeSlots=2 "
+                       "party=%s,%s,%s,%s,slot5,slot6 next=colosseum-setup\n",
+                       frame, source, p0, p1, p2, p3);
             } else if (flow->commandIndex == 2) {
                 snprintf(flow->messageText, sizeof(flow->messageText),
                          "Items cannot be used in this Colosseum battle.");
@@ -10940,13 +10946,16 @@ static void PCPort_PkxViewerUpdate(PCPortPkxViewerState* viewer,
         return;
     }
     slot = viewer->selectedSlot;
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_TAB, &viewer->prevTab)) {
+    if (!viewer->singleDebug &&
+        PCPort_PkxViewerPressed(window, GLFW_KEY_TAB, &viewer->prevTab)) {
         viewer->selectedSlot = (viewer->selectedSlot + 1) & 3;
     }
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_1, &viewer->prevOne)) viewer->selectedSlot = 0;
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_2, &viewer->prevTwo)) viewer->selectedSlot = 1;
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_3, &viewer->prevThree)) viewer->selectedSlot = 2;
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_4, &viewer->prevFour)) viewer->selectedSlot = 3;
+    if (!viewer->singleDebug) {
+        if (PCPort_PkxViewerPressed(window, GLFW_KEY_1, &viewer->prevOne)) viewer->selectedSlot = 0;
+        if (PCPort_PkxViewerPressed(window, GLFW_KEY_2, &viewer->prevTwo)) viewer->selectedSlot = 1;
+        if (PCPort_PkxViewerPressed(window, GLFW_KEY_3, &viewer->prevThree)) viewer->selectedSlot = 2;
+        if (PCPort_PkxViewerPressed(window, GLFW_KEY_4, &viewer->prevFour)) viewer->selectedSlot = 3;
+    }
     slot = viewer->selectedSlot;
 
     if (viewer->modelCount > 0 &&
@@ -10986,8 +10995,9 @@ static void PCPort_PkxViewerUpdate(PCPortPkxViewerState* viewer,
         printf("[pkx-viewer] frame=%d autospin=%d\n", frame, viewer->autoSpin);
         fflush(stdout);
     }
-    if (PCPort_PkxViewerPressed(window, GLFW_KEY_ENTER, &viewer->prevEnter) ||
-        PCPort_PkxViewerPressed(window, GLFW_KEY_Z, &viewer->prevZ)) {
+    if (!viewer->singleDebug &&
+        (PCPort_PkxViewerPressed(window, GLFW_KEY_ENTER, &viewer->prevEnter) ||
+         PCPort_PkxViewerPressed(window, GLFW_KEY_Z, &viewer->prevZ))) {
         viewer->startBattle = 1;
         printf("[pkx-viewer] frame=%d start-battle slots=%s,%s,%s,%s\n",
                frame,
@@ -11093,6 +11103,24 @@ static void DrawPkxViewerUI(const PCPortPkxViewerState* viewer,
     BeginMenuOverlay();
     DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 76.0f, 12, 20, 32, 225);
     DrawSolidScreenRect(0.0f, 384.0f, 640.0f, 96.0f, 10, 18, 30, 235);
+    if (viewer->singleDebug) {
+        char line[192];
+        u32 motionCount = actors[0].motionLoaded ?
+            actors[0].motionBank.motionCount : 0u;
+        DrawTextScreen(14.0f, 10.0f, 7.0f, 12.0f, 230, 238, 246, 255,
+                       "DEBUG MENU   Pokemon Models");
+        snprintf(line, sizeof(line),
+                 "Pokemon Models  model %d/%d %s  motion %d/%u  yaw %.2f scale %.2f  all-PObj visible",
+                 viewer->selectedModel[0] + 1, viewer->modelCount,
+                 actors[0].member != NULL ? actors[0].member : "-",
+                 viewer->selectedMotion[0], motionCount,
+                 actors[0].yaw, actors[0].scale);
+        DrawTextScreen(14.0f, 396.0f, 7.0f, 12.0f,
+                       255, 244, 120, 255, line);
+        DrawTextScreen(14.0f, 468.0f, 6.0f, 10.0f, 160, 188, 210, 255,
+                       "Single-model inspector; battle parties remain six Pokemon with two active in Double Battle.");
+        return;
+    }
     DrawTextScreen(14.0f, 10.0f, 7.0f, 12.0f, 230, 238, 246, 255,
                    "BATTLE COLOSSEUM SETUP   1-4/TAB slot   LEFT/RIGHT Pokemon   UP/DOWN motion   A/D rotate   Q/E scale   ENTER start");
     for (i = 0; i < 4; ++i) {
@@ -11144,6 +11172,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
     int frame;
     int i;
     int setupDisablesAutoplay;
+    int prevDebugMenuKey = 0;
 
     memset(&pkxViewer, 0, sizeof(pkxViewer));
     setupDisablesAutoplay =
@@ -11164,8 +11193,18 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
             }
         }
     }
+    if (getenv("PCPORT_DEBUG_POKEMON_MODE") != NULL) {
+        viewerMode = 1;
+    }
     if (viewerMode) {
         PCPort_PkxViewerInit(&pkxViewer, actors);
+        if (getenv("PCPORT_DEBUG_POKEMON_MODE") != NULL) {
+            pkxViewer.singleDebug = 1;
+            pkxViewer.selectedSlot = 0;
+            printf("[debug-ui] opened tab=pokemon-models frame=0 "
+                   "partySlots=6 activeSlots=2 model=%s reason=env\n",
+                   actors[0].member != NULL ? actors[0].member : "-");
+        }
     }
     PCPort_BattleApplyGridPlacement(actors);
     if (viewerMode && getenv("PCPORT_BATTLE_UNIT") == NULL) {
@@ -11175,6 +11214,10 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
             actors[i].x = kViewerX[i];
             actors[i].z = kViewerZ[i];
             actors[i].yaw = 0.0f;
+        }
+        if (pkxViewer.singleDebug) {
+            actors[0].x = 0.0f;
+            actors[0].z = 18.0f;
         }
         printf("[pkx-viewer] placement=compact-inspection slots={P0(%.1f,%.1f),P1(%.1f,%.1f),E0(%.1f,%.1f),E1(%.1f,%.1f)}\n",
                actors[0].x, actors[0].z, actors[1].x, actors[1].z,
@@ -11335,12 +11378,37 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
 
     for (frame = 0; ; ++frame) {
         MenuTreeStats stats;
+        int debugMenuKey;
         if (window != NULL && glfwWindowShouldClose(window)) {
             break;
         }
         if (frameCap > 0 && frame >= frameCap) {
             break;
         }
+        debugMenuKey = PCPort_BattleKeyDown(window, GLFW_KEY_GRAVE_ACCENT);
+        if (debugMenuKey && !prevDebugMenuKey) {
+            if (!viewerMode || !pkxViewer.singleDebug) {
+                viewerMode = 1;
+                PCPort_PkxViewerInit(&pkxViewer, actors);
+                pkxViewer.singleDebug = 1;
+                pkxViewer.selectedSlot = 0;
+                actors[0].x = 0.0f;
+                actors[0].z = 18.0f;
+                actors[0].yaw = 0.0f;
+                printf("[debug-ui] opened tab=pokemon-models frame=%d "
+                       "partySlots=6 activeSlots=2 model=%s\n",
+                       frame, actors[0].member != NULL ? actors[0].member : "-");
+            } else {
+                pkxViewer.enabled = 0;
+                pkxViewer.singleDebug = 0;
+                viewerMode = 0;
+                PCPort_BattleApplyGridPlacement(actors);
+                PCPort_BattleFlowInit(&battleFlow, actors);
+                printf("[debug-ui] closed frame=%d\n", frame);
+            }
+            fflush(stdout);
+        }
+        prevDebugMenuKey = debugMenuKey;
         memset(&stats, 0, sizeof(stats));
         if (viewerMode) {
             PCPort_PkxViewerUpdate(&pkxViewer, window, actors, frame);
@@ -11474,7 +11542,13 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
             }
             { const char* hy = getenv("PCPORT_HALO_MAXY");
               if (hy != NULL && hy[0]) g_haloLiftMaxY = (f32)atof(hy); }
-            for (i = 0; i < 4; ++i) {
+            {
+                int savedSuppress = g_pcBattleSuppressControlPObjs;
+                int renderActors = (viewerMode && pkxViewer.singleDebug) ? 1 : 4;
+                if (viewerMode && pkxViewer.singleDebug) {
+                    g_pcBattleSuppressControlPObjs = 0;
+                }
+                for (i = 0; i < renderActors; ++i) {
                 PCPortTranslatedCamera actorCam = camera;
                 f32 actorMtx[3][4];
                 PCPort_BuildActorModelMatrix(&actors[i], actorMtx);
@@ -11483,6 +11557,8 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
                 RenderJointTree(&actors[i].archive, actors[i].rootJoint,
                                 actors[i].rootJoint, &actorCam,
                                 (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+                }
+                g_pcBattleSuppressControlPObjs = savedSuppress;
             }
             g_pcBattleModelSpaceVerts = 0;
             if (disablePkxDepth) {
