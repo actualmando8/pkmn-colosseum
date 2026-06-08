@@ -9810,6 +9810,13 @@ typedef struct PCPortPkxViewerState {
     f32 baseScale;
     int autoSpin;
     int startBattle;
+    int sweepEnabled;
+    int sweepSlot;
+    int sweepNextModel;
+    int sweepFrameStep;
+    int sweepSuccesses;
+    int sweepFailures;
+    int sweepDone;
     int modelCount;
     char modelNames[PCPORT_PKX_VIEWER_MAX_MODELS][PCPORT_PKX_VIEWER_NAME_MAX];
     int prevTab, prevLeft, prevRight, prevUp, prevDown;
@@ -9846,7 +9853,7 @@ static int PCPort_PkxAuditRowLooksPokemon(const char* member,
         return 0;
     }
     if (strcmp(member, "egg") == 0 || strcmp(member, "pkx_egg") == 0) {
-        return 1;
+        return 0;
     }
     if (strcmp(member, "yukiwarashi") == 0) {
         return 1;
@@ -10867,6 +10874,24 @@ static void PCPort_PkxViewerInit(PCPortPkxViewerState* viewer,
         }
     }
     PCPort_PkxViewerLoadModelList(viewer);
+    if (getenv("PCPORT_PKX_VIEWER_SWEEP") != NULL) {
+        const char* stepEnv = getenv("PCPORT_PKX_VIEWER_SWEEP_STEP");
+        const char* slotEnv = getenv("PCPORT_PKX_VIEWER_SWEEP_SLOT");
+        viewer->sweepEnabled = 1;
+        viewer->sweepSlot = slotEnv != NULL ? atoi(slotEnv) : 0;
+        if (viewer->sweepSlot < 0 || viewer->sweepSlot >= 4) {
+            viewer->sweepSlot = 0;
+        }
+        viewer->sweepFrameStep = stepEnv != NULL ? atoi(stepEnv) : 2;
+        if (viewer->sweepFrameStep <= 0) {
+            viewer->sweepFrameStep = 1;
+        }
+        viewer->selectedSlot = viewer->sweepSlot;
+        printf("[pkx-sweep] enabled slot=%d step=%d models=%d\n",
+               viewer->sweepSlot, viewer->sweepFrameStep,
+               viewer->modelCount);
+        fflush(stdout);
+    }
     for (i = 0; i < 4; ++i) {
         char scaleSlotEnvName[32];
         char motionSlotEnvName[32];
@@ -10992,6 +11017,71 @@ static void PCPort_PkxViewerUpdate(PCPortPkxViewerState* viewer,
         actors[slot].yaw += 0.020f;
         viewer->inspectYaw[slot] += 0.020f;
     }
+}
+
+static void PCPort_PkxViewerSweepUpdate(PCPortPkxViewerState* viewer,
+                                        PCPortBattleRenderActor actors[4],
+                                        int frame) {
+    int slot;
+    int oldModel;
+    const char* member;
+    int ok;
+    if (viewer == NULL || actors == NULL || !viewer->enabled ||
+        !viewer->sweepEnabled || viewer->sweepDone) {
+        return;
+    }
+    if (viewer->modelCount <= 0) {
+        viewer->sweepDone = 1;
+        return;
+    }
+    if (viewer->sweepFrameStep <= 0) {
+        viewer->sweepFrameStep = 1;
+    }
+    if (frame % viewer->sweepFrameStep != 0) {
+        return;
+    }
+    if (viewer->sweepNextModel >= viewer->modelCount) {
+        viewer->sweepDone = 1;
+        printf("[pkx-sweep] done frame=%d slot=%d ok=%d fail=%d total=%d\n",
+               frame, viewer->sweepSlot, viewer->sweepSuccesses,
+               viewer->sweepFailures, viewer->modelCount);
+        fflush(stdout);
+        return;
+    }
+    slot = viewer->sweepSlot;
+    if (slot < 0 || slot >= 4) {
+        slot = 0;
+    }
+    oldModel = viewer->selectedModel[slot];
+    viewer->selectedSlot = slot;
+    viewer->selectedModel[slot] = viewer->sweepNextModel;
+    viewer->selectedMotion[slot] = 0;
+    member = viewer->modelNames[viewer->sweepNextModel];
+    printf("[pkx-sweep] begin frame=%d slot=%d model=%d/%d member=%s\n",
+           frame, slot, viewer->sweepNextModel + 1, viewer->modelCount,
+           member != NULL ? member : "-");
+    fflush(stdout);
+    ok = PCPort_PkxViewerReloadSelected(viewer, actors, slot, frame,
+                                        "viewer-sweep");
+    if (ok) {
+        viewer->sweepSuccesses++;
+        printf("[pkx-sweep] ok frame=%d slot=%d model=%d/%d member=%s "
+               "motions=%u\n",
+               frame, slot, viewer->sweepNextModel + 1, viewer->modelCount,
+               actors[slot].member != NULL ? actors[slot].member : "-",
+               actors[slot].motionLoaded ?
+                   actors[slot].motionBank.motionCount : 0u);
+    } else {
+        viewer->sweepFailures++;
+        viewer->selectedModel[slot] = oldModel;
+        printf("[pkx-sweep] fail frame=%d slot=%d model=%d/%d member=%s "
+               "kept=%s\n",
+               frame, slot, viewer->sweepNextModel + 1, viewer->modelCount,
+               member != NULL ? member : "-",
+               actors[slot].member != NULL ? actors[slot].member : "-");
+    }
+    fflush(stdout);
+    viewer->sweepNextModel++;
 }
 
 static void DrawPkxViewerUI(const PCPortPkxViewerState* viewer,
@@ -11254,6 +11344,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
         memset(&stats, 0, sizeof(stats));
         if (viewerMode) {
             PCPort_PkxViewerUpdate(&pkxViewer, window, actors, frame);
+            PCPort_PkxViewerSweepUpdate(&pkxViewer, actors, frame);
             if (getenv("PCPORT_PKX_VIEWER_AUTOSTART") != NULL && frame >= 2) {
                 pkxViewer.startBattle = 1;
             }
@@ -11421,6 +11512,9 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
                    stats.battleControlPObjSuppressed);
         }
         GSgfxSwapBuffers(1);
+        if (viewerMode && pkxViewer.sweepDone) {
+            break;
+        }
         if (frameCap == 0) {
             continue;
         }
