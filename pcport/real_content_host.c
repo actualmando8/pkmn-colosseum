@@ -241,6 +241,12 @@ static BOOL HasZeroColorRamp(const PCPortTranslatedTexture* texture) {
 
 static BOOL IsNoTevDirectSampleFormat(u32 textureFormat) {
     switch (textureFormat) {
+    case GX_TF_I4:
+    case GX_TF_I8:
+    case GX_TF_IA4:
+    case GX_TF_IA8:
+    case GX_TF_RGB565:
+    case GX_TF_RGB5A3:
     case GX_TF_CMPR:
     case GX_TF_RGBA8:
     case GX_TF_C4:  /* CI4 (palettized) */
@@ -257,7 +263,7 @@ static u8 ClassifyTextureExpStageKind(const PCPortTranslatedTexture* texture,
         return PCPORT_TEXP_STAGE_NONE;
     }
 
-    /* A directly-sampleable format (CMPR/RGBA8/CI4/CI8) is a plain texture
+    /* A directly-sampleable format (I/IA/RGB/CI/CMPR) is a plain texture
      * stage. A non-NULL TEV is fine as long as it is NOT the special I8
      * colour-ramp kind: the generic TEV just selects a blend mode, which the
      * pipeline already applies via tevMode. Requiring tevArchiveOffset==0 here
