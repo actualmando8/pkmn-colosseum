@@ -7319,8 +7319,8 @@ BOOL PCPort_BakeTextureExpRGBAFromArchiveBE(const PCPortHSDArchive* archive,
                                      &modulatePixels,
                                      &modulateSize)) {
             PCPort_FreeBuffer(modulatePixels);
-            PCPort_FreeBuffer(basePixels);
-            return FALSE;
+            modulatePixels = NULL;
+            break;
         }
 
         for (y = 0; y < (u32)exp->stages[0].texture.height; ++y) {

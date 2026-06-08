@@ -213,37 +213,64 @@ u32 gx_texture_compute_size(u16 width, u16 height, GXTexFmt format) {
 
 s32 gx_texture_decode_I4(const void* src, u16 w, u16 h,
                          GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode I4 (4-bit intensity)
-     *
-     * Tile layout: 8x8 texels per tile, 4 bits per texel
-     * Each tile is 32 bytes (8*8/2 = 32)
-     *
-     * Algorithm:
-     * for each tile (x, y):
-     *   for each row r in [0,7]:
-     *     for each column c in [0,7] step 2:
-     *       byte = src[tileOffset + r*4 + c/2]
-     *       pixel0 = (byte >> 4) & 0xF    // high nibble
-     *       pixel1 = byte & 0xF           // low nibble
-     *       out[(tileY*8+r)*w + (tileX*8+c)]   = pixel0 * 17  // scale 0-15 to 0-255
-     *       out[(tileY*8+r)*w + (tileX*8+c+1)] = pixel1 * 17
-     *
-     * Output: GL_R8 format, swizzle mode RRRR
-     */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 7u) / 8u;
+    u32 tilesY = ((u32)h + 7u) / 8u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
     memset(out->data, 0, out->dataSize);
-    out->glInternalFormat = GL_R8;
-    out->glFormat = GL_RED;
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 8u; ++row) {
+                u32 dstY = (tileY * 8u) + row;
+                u32 colPair;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (colPair = 0; colPair < 4u; ++colPair) {
+                    u8 packed = tileSrc[(row * 4u) + colPair];
+                    u32 n;
+
+                    for (n = 0u; n < 2u; ++n) {
+                        u32 dstX = (tileX * 8u) + (colPair * 2u) + n;
+                        u8 intensity;
+                        u8* dstPixel;
+
+                        if (dstX >= w) {
+                            continue;
+                        }
+                        intensity = (u8)(((n == 0u) ? (packed >> 4) :
+                                          (packed & 0x0Fu)) * 0x11u);
+                        dstPixel =
+                            out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                        dstPixel[0] = intensity;
+                        dstPixel[1] = intensity;
+                        dstPixel[2] = intensity;
+                        dstPixel[3] = 0xFFu;
+                    }
+                }
+            }
+        }
+    }
+
+    out->glInternalFormat = GL_RGBA8;
+    out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;
     out->isCompressed = 0;
-    out->swizzleMode = GX_TEX_SWIZZLE_RRRR;
+    out->swizzleMode = GX_TEX_SWIZZLE_RGBA;
     return 0;
 }
 
@@ -306,65 +333,123 @@ s32 gx_texture_decode_I8(const void* src, u16 w, u16 h,
 
 s32 gx_texture_decode_IA4(const void* src, u16 w, u16 h,
                           GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode IA4 (4-bit intensity + 4-bit alpha)
-     *
-     * Tile layout: 8x4 texels per tile, 8 bits per texel (4I + 4A)
-     * Each tile is 32 bytes
-     *
-     * For each texel:
-     *   intensity = (byte >> 4) & 0xF -> scale to [0,255]
-     *   alpha = byte & 0xF -> scale to [0,255]
-     *   out[pixel*2+0] = intensity * 17
-     *   out[pixel*2+1] = alpha * 17
-     *
-     * Output: GL_RG8 format (R=intensity, G=alpha), swizzle RRRA
-     */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 7u) / 8u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 2;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
     memset(out->data, 0, out->dataSize);
-    out->glInternalFormat = GL_RG8;
-    out->glFormat = GL_RG;
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 8u; ++col) {
+                    u32 dstX = (tileX * 8u) + col;
+                    u8 packed;
+                    u8 intensity;
+                    u8 alpha;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+                    packed = tileSrc[(row * 8u) + col];
+                    intensity = (u8)((packed >> 4) * 0x11u);
+                    alpha = (u8)((packed & 0x0Fu) * 0x11u);
+                    dstPixel =
+                        out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    dstPixel[0] = intensity;
+                    dstPixel[1] = intensity;
+                    dstPixel[2] = intensity;
+                    dstPixel[3] = alpha;
+                }
+            }
+        }
+    }
+
+    out->glInternalFormat = GL_RGBA8;
+    out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;
     out->isCompressed = 0;
-    out->swizzleMode = GX_TEX_SWIZZLE_RRRA;
+    out->swizzleMode = GX_TEX_SWIZZLE_RGBA;
     return 0;
 }
 
 s32 gx_texture_decode_IA8(const void* src, u16 w, u16 h,
                           GXDecodedTexture* out) {
-    (void)src;
-
-    /* TODO: Phase 3d -- Decode IA8 (8-bit intensity + 8-bit alpha)
-     *
-     * Tile layout: 4x4 texels per tile, 16 bits per texel
-     * Each tile is 32 bytes
-     *
-     * For each texel (big-endian):
-     *   alpha = byte0
-     *   intensity = byte1
-     *   out[pixel*2+0] = intensity
-     *   out[pixel*2+1] = alpha
-     *
-     * Output: GL_RG8, swizzle RRRA
-     */
+    const u8* srcBytes = (const u8*)src;
+    u32 tilesX = ((u32)w + 3u) / 4u;
+    u32 tilesY = ((u32)h + 3u) / 4u;
+    u32 tileY;
+    u32 tileX;
 
     out->width = w;
     out->height = h;
-    out->dataSize = (u32)w * h * 2;
+    out->dataSize = (u32)w * (u32)h * 4u;
     out->data = (u8*)malloc(out->dataSize);
     if (!out->data) return -1;
     memset(out->data, 0, out->dataSize);
-    out->glInternalFormat = GL_RG8;
-    out->glFormat = GL_RG;
+
+    for (tileY = 0; tileY < tilesY; ++tileY) {
+        for (tileX = 0; tileX < tilesX; ++tileX) {
+            const u8* tileSrc =
+                srcBytes + (((tileY * tilesX) + tileX) * 32u);
+            u32 row;
+
+            for (row = 0; row < 4u; ++row) {
+                u32 dstY = (tileY * 4u) + row;
+                u32 col;
+
+                if (dstY >= h) {
+                    continue;
+                }
+
+                for (col = 0; col < 4u; ++col) {
+                    u32 dstX = (tileX * 4u) + col;
+                    const u8* srcPixel;
+                    u8 alpha;
+                    u8 intensity;
+                    u8* dstPixel;
+
+                    if (dstX >= w) {
+                        continue;
+                    }
+                    srcPixel = tileSrc + (((row * 4u) + col) * 2u);
+                    alpha = srcPixel[0];
+                    intensity = srcPixel[1];
+                    dstPixel =
+                        out->data + ((((u32)dstY * (u32)w) + dstX) * 4u);
+                    dstPixel[0] = intensity;
+                    dstPixel[1] = intensity;
+                    dstPixel[2] = intensity;
+                    dstPixel[3] = alpha;
+                }
+            }
+        }
+    }
+
+    out->glInternalFormat = GL_RGBA8;
+    out->glFormat = GL_RGBA;
     out->glType = GL_UNSIGNED_BYTE;
     out->isCompressed = 0;
-    out->swizzleMode = GX_TEX_SWIZZLE_RRRA;
+    out->swizzleMode = GX_TEX_SWIZZLE_RGBA;
     return 0;
 }
 

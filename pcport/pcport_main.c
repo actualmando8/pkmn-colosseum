@@ -6034,17 +6034,23 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                  * material-only pipeline so flat-shaded geometry still renders.
                  * Never aborts. */
                 if (haveMaterial && ArchiveRangeValid(a, mobjOffset, 0x0Cu)) {
+                    int texRangeOk;
+                    int texExpOk = 0;
+                    int texBakeOk = 0;
                     tobjOffset =
                         PCPort_ReadBigEndianU32(a->storage + mobjOffset + 0x08);
-                    if (ArchiveRangeValid(a, tobjOffset, 0x0Cu) &&
-                        PCPort_TranslateTextureExpFromArchiveBE(
-                            a, tobjOffset, &translatedTextureExp) &&
-                        translatedTextureExp.stageCount != 0u &&
+                    texRangeOk = ArchiveRangeValid(a, tobjOffset, 0x0Cu);
+                    if (texRangeOk) {
+                        texExpOk = PCPort_TranslateTextureExpFromArchiveBE(
+                            a, tobjOffset, &translatedTextureExp);
+                    }
+                    if (texExpOk && translatedTextureExp.stageCount != 0u &&
                         translatedTextureExp.stages[0].texture.width != 0u &&
-                        translatedTextureExp.stages[0].texture.height != 0u &&
-                        PCPort_BakeTextureExpRGBAFromArchiveBE(
-                            a, &translatedTextureExp, &bakedPixels, &bakedSize) &&
-                        bakedPixels != NULL) {
+                        translatedTextureExp.stages[0].texture.height != 0u) {
+                        texBakeOk = PCPort_BakeTextureExpRGBAFromArchiveBE(
+                            a, &translatedTextureExp, &bakedPixels, &bakedSize);
+                    }
+                    if (texBakeOk && bakedPixels != NULL) {
                         const PCPortTranslatedTexture* baseTexture =
                             &translatedTextureExp.stages[0].texture;
 
@@ -6137,6 +6143,36 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                             (GXTexWrapMode)baseTexture->wrapS,
                             (GXTexWrapMode)baseTexture->wrapT);
                         haveTexture = 1;
+                    } else if (getenv("PCPORT_TEX_DEBUG") != NULL &&
+                               tobjOffset != 0u) {
+                        u32 imageDebug = 0u;
+                        u32 formatDebug = 0xFFFFFFFFu;
+                        u16 widthDebug = 0u;
+                        u16 heightDebug = 0u;
+                        if (ArchiveRangeValid(a, tobjOffset, 0x50u)) {
+                            imageDebug = PCPort_ReadBigEndianU32(
+                                a->storage + tobjOffset + 0x4C);
+                            if (ArchiveRangeValid(a, imageDebug, 0x0Cu)) {
+                                widthDebug = (u16)(
+                                    ((u16)a->storage[imageDebug + 0x04] << 8) |
+                                    (u16)a->storage[imageDebug + 0x05]);
+                                heightDebug = (u16)(
+                                    ((u16)a->storage[imageDebug + 0x06] << 8) |
+                                    (u16)a->storage[imageDebug + 0x07]);
+                                formatDebug = PCPort_ReadBigEndianU32(
+                                    a->storage + imageDebug + 0x08);
+                            }
+                        }
+                        printf("[tex-debug] fail joint=0x%X dobj=0x%X "
+                               "mobj=0x%X pobj=0x%X tobj=0x%X img=0x%X "
+                               "fmt=0x%X size=%ux%u range=%d exp=%d "
+                               "stages=%u bake=%d pixels=%d\n",
+                               joint, dobjOffset, mobjOffset, pobjOffset,
+                               tobjOffset, imageDebug, formatDebug,
+                               widthDebug, heightDebug, texRangeOk, texExpOk,
+                               translatedTextureExp.stageCount, texBakeOk,
+                               bakedPixels != NULL ? 1 : 0);
+                        fflush(stdout);
                     }
                 }
 
