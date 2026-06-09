@@ -36,7 +36,7 @@ via native PowerShell/Windows Python (WSL interop hangs launching exes).
 | launch | `ctl.py launch [--load-state NAME] [--iso PATH]` | isolated profile seeded from `profile_template/`; polls until server is live |
 | kill / status | `ctl.py status` | status detects dead-pid and dead-socket separately |
 | press | `ctl.py press A --frames 4` | buttons: A B X Y Z L R Start Up Down Left Right |
-| stick | `ctl.py stick 1.0 0.0 --frames 30` | -1..1 floats (or raw 0-255); `--c` for C-stick |
+| stick | `ctl.py stick 0 -1 --frames 6` | -1..1 floats: `+x`=right, `-x`=left, `+y`=UP, `-y`=DOWN (raw 0-255 if magnitude>1); `--c` for C-stick. Menus use the stick, NOT the D-pad — see PLAYBOOK.md |
 | hold / release | `ctl.py hold R` | persists across commands, reapplied every frame |
 | wait | `ctl.py wait 600` | frames (60/s) |
 | screenshot | `ctl.py screenshot out.png` | default `--method window` (crash-free). `--method framedrawn` = exact emulated pixels, but can crash Dolphin during scene transitions — stable scenes only |

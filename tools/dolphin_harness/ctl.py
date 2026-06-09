@@ -60,11 +60,22 @@ def norm_buttons(items):
     return out
 
 
-def stick_byte(v):
-    """Map -1.0..1.0 (or 0..255 int) to pad byte."""
+def stick_byte(v, axis="x"):
+    """Map a CLI stick value to a GC pad byte (0-255, 128 = neutral).
+
+    Convention (natural / joystick): floats in [-1.0, 1.0] where
+      +x = right, -x = left, +y = UP, -y = DOWN.
+    Values written with magnitude > 1 (e.g. "200") are taken as raw bytes.
+
+    The Y axis is inverted relative to the raw pad byte: this game's pad
+    reports StickY byte 255 when pushed DOWN and 1 when pushed UP, so +y
+    (up) maps to a low byte. Verified against the New Game YES/NO prompt.
+    """
     f = float(v)
     if -1.0 <= f <= 1.0 and ("." in str(v) or abs(f) <= 1):
-        return int(round(128 + f * 127))
+        if axis == "y":
+            return int(round(128 - f * 127))  # +1.0 (up) -> 1, -1.0 (down) -> 255
+        return int(round(128 + f * 127))      # +1.0 (right) -> 255
     return max(0, min(255, int(f)))
 
 
@@ -213,7 +224,7 @@ def cmd_press(args):
 
 def cmd_stick(args):
     frames = args.frames
-    msg = {"cmd": "stick", "x": stick_byte(args.x), "y": stick_byte(args.y),
+    msg = {"cmd": "stick", "x": stick_byte(args.x, "x"), "y": stick_byte(args.y, "y"),
            "frames": frames, "which": "c" if args.c else "main"}
     if args.buttons:
         msg["buttons"] = norm_buttons(args.buttons)

@@ -1,0 +1,23 @@
+{
+  "_comment": "Milestone savestates for the play harness. .sav files are gitignored (binary, machine-specific); this manifest is committed so the set is documented and reproducible. Load with: python ctl.py launch --load-state <name>  (or load-state <name> on a running session).",
+  "states": [
+    {
+      "name": "main_menu_fresh",
+      "desc": "Title -> Start -> created a fresh save -> main menu (Story/Battle Mode). Cursor on CONTINUE.",
+      "floor_id": "0x03A1",
+      "reached_from": "boot"
+    },
+    {
+      "name": "name_entry",
+      "desc": "New Game confirmed -> 'Your name?' screen with Wes model and NEW NAME/WES/SETH/THOMAS list.",
+      "floor_id": "0x0390",
+      "reached_from": "main_menu_fresh"
+    },
+    {
+      "name": "intro_start",
+      "desc": "Name confirmed (WES) -> opening desert/Snagem-hideout cutscene begins.",
+      "floor_id": "0x03A0",
+      "reached_from": "name_entry"
+    }
+  ]
+}
