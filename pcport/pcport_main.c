@@ -9813,6 +9813,11 @@ typedef struct PCPortBattleRenderActor {
     const char* label;
     const char* member;
     const char* displayName;
+    u16 trainerId;
+    u8 teamSlot;
+    u16 speciesId;
+    u8 level;
+    u16 tableMoves[4];
     f32 x;
     f32 y;
     f32 z;
@@ -9833,6 +9838,372 @@ typedef struct PCPortBattleRenderActor {
     int loaded;
     int motionLoaded;
 } PCPortBattleRenderActor;
+
+typedef struct PCPortBattleSpeciesMember {
+    u16 speciesId;
+    const char* member;
+    const char* displayName;
+} PCPortBattleSpeciesMember;
+
+typedef struct PCPortBattleTableSetup {
+    u16 playerTrainerId;
+    u16 enemyTrainerId;
+    u16 playerMoveId;
+    u16 enemyMoveId;
+    u16 playerTextId;
+    u16 enemyTextId;
+    int playerDamage;
+    int enemyDamage;
+    char playerMoveName[32];
+    char enemyMoveName[32];
+    int commonRelLoaded;
+} PCPortBattleTableSetup;
+
+#define PCPORT_COMMON_REL_MOVE_DATA_OFFSET       0x11E048u
+#define PCPORT_COMMON_REL_TRAINER_DATA_OFFSET    0x092ED0u
+#define PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET 0x09FE28u
+#define PCPORT_COMMON_REL_MOVE_DATA_SIZE         0x38u
+#define PCPORT_COMMON_REL_TRAINER_DATA_SIZE      0x34u
+#define PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE   0x50u
+#define PCPORT_COMMON_REL_MAX_TRAINER_POKEMON    5510u
+
+static const PCPortBattleSpeciesMember kPcportBattleSpeciesMembers[] = {
+    { 25u,  "pikachu",   "Pikachu" },
+    { 196u, "eifie",     "Eifie" },
+    { 197u, "blacky",    "Blacky" },
+    { 292u, "nukenin",   "Nukenin" },
+    { 316u, "gokulin",   "Gokulin" },
+    { 317u, "marunoom",  "Marunoom" },
+    { 335u, "zangoose",  "Zangoose" },
+    { 336u, "habunake",  "Habunake" },
+    { 359u, "absol",     "Absol" }
+};
+
+static u16 PCPort_ReadBigEndianU16Local(const u8* data) {
+    return (u16)(((u16)data[0] << 8) | (u16)data[1]);
+}
+
+static int PCPort_BattleRangeValid(u32 base, u32 stride, u32 index,
+                                   u32 need, u32 size) {
+    u32 off;
+    if (stride != 0u && index > (0xFFFFFFFFu - base) / stride) {
+        return 0;
+    }
+    off = base + index * stride;
+    return off <= size && need <= size - off;
+}
+
+static int PCPort_BattleParseU16Env(const char* name, u16* outValue) {
+    u32 value;
+    if (outValue == NULL || !PCPort_ParseU32Env(name, &value)) {
+        return 0;
+    }
+    *outValue = (u16)value;
+    return 1;
+}
+
+static int PCPort_BattleParseIntEnvWithDefault(const char* name, int fallback) {
+    int value;
+    return PCPort_ParseIntEnv(name, &value) ? value : fallback;
+}
+
+static const PCPortBattleSpeciesMember*
+PCPort_BattleFindSpeciesMember(u16 speciesId) {
+    u32 i;
+    for (i = 0u; i < sizeof(kPcportBattleSpeciesMembers) /
+                    sizeof(kPcportBattleSpeciesMembers[0]); ++i) {
+        if (kPcportBattleSpeciesMembers[i].speciesId == speciesId) {
+            return &kPcportBattleSpeciesMembers[i];
+        }
+    }
+    return NULL;
+}
+
+static int PCPort_BattleTrainerPokemonValid(const u8* commonRel,
+                                            u32 commonRelSize,
+                                            u32 index) {
+    (void)commonRel;
+    return index < PCPORT_COMMON_REL_MAX_TRAINER_POKEMON &&
+           PCPort_BattleRangeValid(PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET,
+                                   PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE,
+                                   index,
+                                   PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE,
+                                   commonRelSize);
+}
+
+static u16 PCPort_BattleTrainerFirstPokemon(const u8* commonRel,
+                                            u32 commonRelSize,
+                                            u16 trainerId,
+                                            int* outValid) {
+    u32 off;
+    if (!PCPort_BattleRangeValid(PCPORT_COMMON_REL_TRAINER_DATA_OFFSET,
+                                 PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                 trainerId,
+                                 PCPORT_COMMON_REL_TRAINER_DATA_SIZE,
+                                 commonRelSize)) {
+        if (outValid != NULL) {
+            *outValid = 0;
+        }
+        return 0u;
+    }
+    off = PCPORT_COMMON_REL_TRAINER_DATA_OFFSET +
+          (u32)trainerId * PCPORT_COMMON_REL_TRAINER_DATA_SIZE;
+    if (outValid != NULL) {
+        *outValid = 1;
+    }
+    return PCPort_ReadBigEndianU16Local(commonRel + off + 0x04);
+}
+
+static u16 PCPort_BattleTrainerPokemonSpecies(const u8* commonRel,
+                                              u32 index) {
+    u32 off = PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET +
+              index * PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE;
+    return PCPort_ReadBigEndianU16Local(commonRel + off + 0x0A);
+}
+
+static u8 PCPort_BattleTrainerPokemonLevel(const u8* commonRel, u32 index) {
+    u32 off = PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET +
+              index * PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE;
+    return commonRel[off + 0x04];
+}
+
+static u16 PCPort_BattleTrainerPokemonMove(const u8* commonRel,
+                                           u32 index,
+                                           u32 moveSlot) {
+    u32 off = PCPORT_COMMON_REL_TRAINER_POKEMON_OFFSET +
+              index * PCPORT_COMMON_REL_TRAINER_POKEMON_SIZE;
+    if (moveSlot >= 4u) {
+        return 0u;
+    }
+    return PCPort_ReadBigEndianU16Local(commonRel + off + 0x34 + moveSlot * 2u);
+}
+
+static u16 PCPort_BattleFirstUsableMove(const PCPortBattleRenderActor* actor) {
+    u32 i;
+    if (actor == NULL) {
+        return 0u;
+    }
+    for (i = 0u; i < 4u; ++i) {
+        u16 move = actor->tableMoves[i];
+        if (move != 0u && move != 0xFFFFu && move < 512u) {
+            return move;
+        }
+    }
+    return 0u;
+}
+
+static int PCPort_BattleMovePower(const u8* commonRel,
+                                  u32 commonRelSize,
+                                  u16 moveId,
+                                  u16* outNameText,
+                                  u16* outAnim) {
+    u32 moveIndex;
+    u32 off;
+    if (moveId == 0u) {
+        return -1;
+    }
+    moveIndex = (u32)moveId - 1u;
+    if (!PCPort_BattleRangeValid(PCPORT_COMMON_REL_MOVE_DATA_OFFSET,
+                                 PCPORT_COMMON_REL_MOVE_DATA_SIZE,
+                                 moveIndex,
+                                 PCPORT_COMMON_REL_MOVE_DATA_SIZE,
+                                 commonRelSize)) {
+        return -1;
+    }
+    off = PCPORT_COMMON_REL_MOVE_DATA_OFFSET +
+          moveIndex * PCPORT_COMMON_REL_MOVE_DATA_SIZE;
+    if (outNameText != NULL) {
+        *outNameText = PCPort_ReadBigEndianU16Local(commonRel + off + 0x22);
+    }
+    if (outAnim != NULL) {
+        *outAnim = PCPort_ReadBigEndianU16Local(commonRel + off + 0x32);
+    }
+    return commonRel[off + 0x17];
+}
+
+static int PCPort_BattleApplyTrainerTeam(const u8* commonRel,
+                                         u32 commonRelSize,
+                                         PCPortBattleRenderActor actors[4],
+                                         u32 actorBase,
+                                         u16 trainerId,
+                                         const char* sideLabel,
+                                         const char* env0,
+                                         const char* env1,
+                                         u16* outMoveId,
+                                         int allowMoveDerive) {
+    int trainerValid = 0;
+    u16 firstPokemon;
+    u32 slot;
+    if (actors == NULL || actorBase + 1u >= 4u) {
+        return 0;
+    }
+    if ((getenv(env0) != NULL && getenv(env0)[0] != '\0') ||
+        (getenv(env1) != NULL && getenv(env1)[0] != '\0')) {
+        printf("[battle-table] side=%s status=actor-env-override trainer=0x%04X\n",
+               sideLabel, trainerId);
+        return 0;
+    }
+    firstPokemon = PCPort_BattleTrainerFirstPokemon(commonRel, commonRelSize,
+                                                    trainerId, &trainerValid);
+    if (!trainerValid) {
+        printf("[battle-table] side=%s status=trainer-oob trainer=0x%04X\n",
+               sideLabel, trainerId);
+        return 0;
+    }
+    for (slot = 0u; slot < 2u; ++slot) {
+        u32 tableIndex = (u32)firstPokemon + slot;
+        u16 species;
+        const PCPortBattleSpeciesMember* member;
+        u32 moveSlot;
+        PCPortBattleRenderActor* actor;
+        if (!PCPort_BattleTrainerPokemonValid(commonRel, commonRelSize,
+                                              tableIndex)) {
+            printf("[battle-table] side=%s status=team-oob trainer=0x%04X "
+                   "firstPokemon=%u slot=%u\n",
+                   sideLabel, trainerId, firstPokemon, slot);
+            return 0;
+        }
+        species = PCPort_BattleTrainerPokemonSpecies(commonRel, tableIndex);
+        member = PCPort_BattleFindSpeciesMember(species);
+        if (member == NULL) {
+            printf("[battle-table] side=%s status=unmapped-species "
+                   "trainer=0x%04X firstPokemon=%u slot=%u species=%u\n",
+                   sideLabel, trainerId, firstPokemon, slot, species);
+            return 0;
+        }
+        actor = &actors[actorBase + slot];
+        actor->trainerId = trainerId;
+        actor->teamSlot = (u8)slot;
+        actor->speciesId = species;
+        actor->member = member->member;
+        actor->displayName = member->displayName;
+        actor->level = PCPort_BattleTrainerPokemonLevel(commonRel, tableIndex);
+        for (moveSlot = 0u; moveSlot < 4u; ++moveSlot) {
+            actor->tableMoves[moveSlot] =
+                PCPort_BattleTrainerPokemonMove(commonRel, tableIndex,
+                                                moveSlot);
+        }
+    }
+    if (allowMoveDerive && outMoveId != NULL) {
+        u16 derivedMove = PCPort_BattleFirstUsableMove(&actors[actorBase]);
+        if (derivedMove != 0u) {
+            *outMoveId = derivedMove;
+        }
+    }
+    printf("[battle-table] side=%s status=trainer-applied trainer=0x%04X "
+           "firstPokemon=%u members=%s/%s species=%u/%u levels=%u/%u "
+           "moves0=%u/%u/%u/%u\n",
+           sideLabel, trainerId, firstPokemon,
+           actors[actorBase].member, actors[actorBase + 1u].member,
+           actors[actorBase].speciesId, actors[actorBase + 1u].speciesId,
+           actors[actorBase].level, actors[actorBase + 1u].level,
+           actors[actorBase].tableMoves[0], actors[actorBase].tableMoves[1],
+           actors[actorBase].tableMoves[2], actors[actorBase].tableMoves[3]);
+    return 1;
+}
+
+static void PCPort_BattleInitSetup(PCPortBattleTableSetup* setup) {
+    if (setup == NULL) {
+        return;
+    }
+    memset(setup, 0, sizeof(*setup));
+    setup->playerTrainerId = 0x0001u;
+    setup->enemyTrainerId = 0x0200u;
+    setup->playerMoveId = 129u;
+    setup->enemyMoveId = 44u;
+    setup->playerTextId = 0x8001u;
+    setup->enemyTextId = 0x8002u;
+    setup->playerDamage = 32;
+    setup->enemyDamage = 21;
+    snprintf(setup->playerMoveName, sizeof(setup->playerMoveName), "Swift");
+    snprintf(setup->enemyMoveName, sizeof(setup->enemyMoveName), "Bite");
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_PLAYER_TRAINER",
+                             &setup->playerTrainerId);
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_ENEMY_TRAINER",
+                             &setup->enemyTrainerId);
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_PLAYER_MOVE_ID",
+                             &setup->playerMoveId);
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_ENEMY_MOVE_ID",
+                             &setup->enemyMoveId);
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_PLAYER_TEXT_ID",
+                             &setup->playerTextId);
+    PCPort_BattleParseU16Env("PCPORT_BATTLE_ENEMY_TEXT_ID",
+                             &setup->enemyTextId);
+    setup->playerDamage = PCPort_BattleParseIntEnvWithDefault(
+        "PCPORT_BATTLE_PLAYER_DAMAGE", setup->playerDamage);
+    setup->enemyDamage = PCPort_BattleParseIntEnvWithDefault(
+        "PCPORT_BATTLE_ENEMY_DAMAGE", setup->enemyDamage);
+    if (getenv("PCPORT_BATTLE_PLAYER_MOVE") != NULL &&
+        getenv("PCPORT_BATTLE_PLAYER_MOVE")[0] != '\0') {
+        snprintf(setup->playerMoveName, sizeof(setup->playerMoveName), "%s",
+                 getenv("PCPORT_BATTLE_PLAYER_MOVE"));
+    }
+    if (getenv("PCPORT_BATTLE_ENEMY_MOVE") != NULL &&
+        getenv("PCPORT_BATTLE_ENEMY_MOVE")[0] != '\0') {
+        snprintf(setup->enemyMoveName, sizeof(setup->enemyMoveName), "%s",
+                 getenv("PCPORT_BATTLE_ENEMY_MOVE"));
+    }
+}
+
+static void PCPort_BattleApplyCommonRelSetup(PCPortBattleTableSetup* setup,
+                                             PCPortBattleRenderActor actors[4]) {
+    u8* commonRel = NULL;
+    u32 commonRelSize = 0u;
+    u16 playerNameText = 0u, enemyNameText = 0u;
+    u16 playerAnim = 0u, enemyAnim = 0u;
+    int playerPower, enemyPower;
+
+    if (setup == NULL || actors == NULL) {
+        return;
+    }
+    if (!PCPort_LoadFsysMember("orig/GC6E01/disc/files/common.fsys",
+                               "pcommon_rel", &commonRel, &commonRelSize) &&
+        !PCPort_LoadFsysMember("orig/GC6E01/disc/files/common.fsys",
+                               "common_rel", &commonRel, &commonRelSize)) {
+        printf("[battle-table] common_rel load=failed source=common.fsys\n");
+        return;
+    }
+    setup->commonRelLoaded = 1;
+    PCPort_BattleApplyTrainerTeam(
+        commonRel, commonRelSize, actors, 0u, setup->playerTrainerId,
+        "player", "PCPORT_BATTLE_P0", "PCPORT_BATTLE_P1",
+        &setup->playerMoveId, getenv("PCPORT_BATTLE_PLAYER_MOVE_ID") == NULL);
+    PCPort_BattleApplyTrainerTeam(
+        commonRel, commonRelSize, actors, 2u, setup->enemyTrainerId,
+        "enemy", "PCPORT_BATTLE_E0", "PCPORT_BATTLE_E1",
+        &setup->enemyMoveId, getenv("PCPORT_BATTLE_ENEMY_MOVE_ID") == NULL);
+
+    if (getenv("PCPORT_BATTLE_PLAYER_MOVE") == NULL &&
+        setup->playerMoveId != 129u) {
+        snprintf(setup->playerMoveName, sizeof(setup->playerMoveName),
+                 "Table Move %u", setup->playerMoveId);
+    }
+    if (getenv("PCPORT_BATTLE_ENEMY_MOVE") == NULL &&
+        setup->enemyMoveId != 44u) {
+        snprintf(setup->enemyMoveName, sizeof(setup->enemyMoveName),
+                 "Table Move %u", setup->enemyMoveId);
+    }
+
+    playerPower = PCPort_BattleMovePower(commonRel, commonRelSize,
+                                         setup->playerMoveId,
+                                         &playerNameText, &playerAnim);
+    enemyPower = PCPort_BattleMovePower(commonRel, commonRelSize,
+                                       setup->enemyMoveId,
+                                       &enemyNameText, &enemyAnim);
+    if (getenv("PCPORT_BATTLE_PLAYER_DAMAGE") == NULL && playerPower > 0) {
+        setup->playerDamage = playerPower / 2 + 2;
+    }
+    if (getenv("PCPORT_BATTLE_ENEMY_DAMAGE") == NULL && enemyPower > 0) {
+        setup->enemyDamage = enemyPower / 2 + 2;
+    }
+    printf("[battle-table] common_rel load=ok size=0x%X playerMove=%u "
+           "enemyMove=%u playerPower=%d enemyPower=%d playerNameText=0x%04X "
+           "enemyNameText=0x%04X playerAnim=%u enemyAnim=%u\n",
+           commonRelSize, setup->playerMoveId, setup->enemyMoveId,
+           playerPower, enemyPower, playerNameText, enemyNameText,
+           playerAnim, enemyAnim);
+    PCPort_FreeBuffer(commonRel);
+}
 
 #define PCPORT_PKX_VIEWER_MAX_MODELS 640
 #define PCPORT_PKX_VIEWER_NAME_MAX 64
@@ -10391,6 +10762,13 @@ typedef struct PCPortBattleFlow {
     int enemyHP;
     int autoplay;
     int requestPokemonSetup;
+    u16 playerMoveId;
+    u16 enemyMoveId;
+    u16 playerTextId;
+    u16 enemyTextId;
+    int playerDamage;
+    int enemyDamage;
+    char moveNames[2][32];
     char commandText[96];
     char messageText[128];
     char statusText[96];
@@ -10399,10 +10777,6 @@ typedef struct PCPortBattleFlow {
 
 static const char* kPcportBattleCommandNames[4] = {
     "FIGHT", "POKEMON", "BAG", "RUN"
-};
-
-static const char* kPcportBattleMoveNames[2] = {
-    "SWIFT", "TABLE MOVE 129"
 };
 
 static void DrawBattleUI(GXTexObj* messageTex,
@@ -10441,8 +10815,8 @@ static void DrawBattleUI(GXTexObj* messageTex,
         int itemCount = 4;
         int selected = battleFlow->commandIndex;
         if (battleFlow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
-            names[0] = kPcportBattleMoveNames[0];
-            names[1] = kPcportBattleMoveNames[1];
+            names[0] = battleFlow->moveNames[0];
+            names[1] = battleFlow->moveNames[1];
             names[2] = "-";
             names[3] = "-";
             itemCount = 2;
@@ -10570,13 +10944,14 @@ static void PCPort_BattleFlowRefreshText(PCPortBattleFlow* flow) {
     } else if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
         snprintf(flow->commandText, sizeof(flow->commandText),
                  "%s%s%s  %s%s%s",
-                 flow->moveIndex == 0 ? "[" : "", kPcportBattleMoveNames[0],
+                 flow->moveIndex == 0 ? "[" : "", flow->moveNames[0],
                  flow->moveIndex == 0 ? "]" : "",
-                 flow->moveIndex == 1 ? "[" : "", kPcportBattleMoveNames[1],
+                 flow->moveIndex == 1 ? "[" : "", flow->moveNames[1],
                  flow->moveIndex == 1 ? "]" : "");
     } else {
         snprintf(flow->commandText, sizeof(flow->commandText),
-                 "TURN %d  PLAYER MOVE 129  ENEMY MOVE 213", flow->turn);
+                 "TURN %d  PLAYER MOVE %u  ENEMY MOVE %u", flow->turn,
+                 flow->playerMoveId, flow->enemyMoveId);
     }
     snprintf(flow->statusText, sizeof(flow->statusText),
              "Player HP %-3d   Enemy HP %-3d", flow->playerHP, flow->enemyHP);
@@ -10588,9 +10963,9 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
                                    PCPortBattleRenderActor actors[4],
                                    const char* reason) {
     const char* playerName = (actors != NULL && actors[0].member != NULL)
-                                 ? actors[0].member : "Pokemon";
+                                 ? actors[0].displayName : "Pokemon";
     const char* enemyName = (actors != NULL && actors[2].member != NULL)
-                               ? actors[2].member : "opponent";
+                               ? actors[2].displayName : "opponent";
     flow->state = state;
     flow->stateFrame = 0;
 
@@ -10613,23 +10988,25 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         flow->moveIndex = 0;
         snprintf(flow->messageText, sizeof(flow->messageText),
                  "Select a move.");
-        printf("[battle-flow] frame=%d state=move-menu selected=\"Swift\" "
-               "moveId=129 textId=0x8001 target=enemy-left reason=%s\n",
-               frame, reason != NULL ? reason : "-");
+        printf("[battle-flow] frame=%d state=move-menu selected=\"%s\" "
+               "moveId=%u textId=0x%04X target=enemy-left reason=%s\n",
+               frame, flow->moveNames[0], flow->playerMoveId,
+               flow->playerTextId, reason != NULL ? reason : "-");
         break;
     case PCPORT_BATTLE_FLOW_PLAYER_ATTACK:
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "%s used Swift!", playerName);
+                 "%s used %s!", playerName, flow->moveNames[0]);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[0], actors[0].attackMotion,
                                         frame, "player-attack");
         }
         printf("[battle-flow] frame=%d state=player-attack actor=player-left "
-               "moveId=129 textId=0x8001 damage=32 reason=%s\n",
-               frame, reason != NULL ? reason : "-");
+               "moveId=%u textId=0x%04X damage=%d reason=%s\n",
+               frame, flow->playerMoveId, flow->playerTextId,
+               flow->playerDamage, reason != NULL ? reason : "-");
         break;
     case PCPORT_BATTLE_FLOW_ENEMY_DAMAGE:
-        flow->enemyHP -= 32;
+        flow->enemyHP -= flow->playerDamage;
         if (flow->enemyHP < 0) flow->enemyHP = 0;
         snprintf(flow->messageText, sizeof(flow->messageText),
                  "The opposing %s took damage.", enemyName);
@@ -10643,17 +11020,18 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
         break;
     case PCPORT_BATTLE_FLOW_ENEMY_ATTACK:
         snprintf(flow->messageText, sizeof(flow->messageText),
-                 "%s used Table Move 213!", enemyName);
+                 "%s used %s!", enemyName, flow->moveNames[1]);
         if (actors != NULL) {
             PCPort_BattleActorSetMotion(&actors[2], actors[2].attackMotion,
                                         frame, "enemy-attack");
         }
         printf("[battle-flow] frame=%d state=enemy-attack actor=enemy-left "
-               "moveId=213 textId=0x8002 damage=21 reason=%s\n",
-               frame, reason != NULL ? reason : "-");
+               "moveId=%u textId=0x%04X damage=%d reason=%s\n",
+               frame, flow->enemyMoveId, flow->enemyTextId,
+               flow->enemyDamage, reason != NULL ? reason : "-");
         break;
     case PCPORT_BATTLE_FLOW_PLAYER_DAMAGE:
-        flow->playerHP -= 21;
+        flow->playerHP -= flow->enemyDamage;
         if (flow->playerHP < 0) flow->playerHP = 0;
         snprintf(flow->messageText, sizeof(flow->messageText),
                  "%s took damage.", playerName);
@@ -10686,16 +11064,31 @@ static void PCPort_BattleFlowEnter(PCPortBattleFlow* flow,
 }
 
 static void PCPort_BattleFlowInit(PCPortBattleFlow* flow,
-                                  PCPortBattleRenderActor actors[4]) {
+                                  PCPortBattleRenderActor actors[4],
+                                  const PCPortBattleTableSetup* setup) {
     memset(flow, 0, sizeof(*flow));
     flow->playerHP = 100;
     flow->enemyHP = 100;
     flow->turn = 1;
+    flow->playerMoveId = setup != NULL ? setup->playerMoveId : 129u;
+    flow->enemyMoveId = setup != NULL ? setup->enemyMoveId : 44u;
+    flow->playerTextId = setup != NULL ? setup->playerTextId : 0x8001u;
+    flow->enemyTextId = setup != NULL ? setup->enemyTextId : 0x8002u;
+    flow->playerDamage = setup != NULL ? setup->playerDamage : 32;
+    flow->enemyDamage = setup != NULL ? setup->enemyDamage : 21;
+    snprintf(flow->moveNames[0], sizeof(flow->moveNames[0]), "%s",
+             setup != NULL ? setup->playerMoveName : "Swift");
+    snprintf(flow->moveNames[1], sizeof(flow->moveNames[1]), "%s",
+             setup != NULL ? setup->enemyMoveName : "Bite");
     flow->autoplay = getenv("PCPORT_BATTLE_AUTOPLAY") == NULL ||
                      strcmp(getenv("PCPORT_BATTLE_AUTOPLAY"), "0") != 0;
-    printf("[battle-flow] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
-           "playerMove=129 enemyMove=213 playerDamage=32 enemyDamage=21 "
-           "autoplay=%d\n", flow->autoplay);
+    printf("[battle-flow] source=common_rel playerTrainer=0x%04X "
+           "enemyTrainer=0x%04X playerMove=%u enemyMove=%u "
+           "playerDamage=%d enemyDamage=%d autoplay=%d\n",
+           setup != NULL ? setup->playerTrainerId : 0x0001u,
+           setup != NULL ? setup->enemyTrainerId : 0x0200u,
+           flow->playerMoveId, flow->enemyMoveId,
+           flow->playerDamage, flow->enemyDamage, flow->autoplay);
     printf("[battle-flow] input keyboard=arrows+Z/Enter+B/X "
            "states=command-menu,move-menu,attack,damage,end-turn\n");
     PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_COMMAND_MENU, 0,
@@ -10729,7 +11122,7 @@ static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
                    "selected=\"%s\"\n", frame, source,
                    pressed->up ? "UP" : "DOWN",
                    PCPort_BattleFlowStateName(flow->state),
-                   kPcportBattleMoveNames[flow->moveIndex]);
+                   flow->moveNames[flow->moveIndex]);
         }
     }
     if (pressed->b && flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
@@ -10784,8 +11177,10 @@ static void PCPort_BattleFlowHandleInput(PCPortBattleFlow* flow,
         }
         if (flow->state == PCPORT_BATTLE_FLOW_MOVE_MENU) {
             printf("[battle-input] frame=%d source=%s action=A state=move-menu "
-                   "selected=\"%s\" moveId=129\n", frame, source,
-                   kPcportBattleMoveNames[flow->moveIndex]);
+                   "selected=\"%s\" moveId=%u\n", frame, source,
+                   flow->moveNames[flow->moveIndex],
+                   flow->moveIndex == 0 ? flow->playerMoveId :
+                                          flow->enemyMoveId);
             PCPort_BattleFlowEnter(flow, PCPORT_BATTLE_FLOW_PLAYER_ATTACK,
                                    frame, actors, "input-move");
             return;
@@ -11183,10 +11578,14 @@ static void DrawPkxViewerUI(const PCPortPkxViewerState* viewer,
 
 static int RunBattleScene(GLFWwindow* window, int viewerMode) {
     PCPortBattleRenderActor actors[4] = {
-        { "player-left",  "zangoose", "Zangoose", -48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
-        { "player-right", "zangoose", "Zangoose",  48.0f, 16.0f,  30.0f,  3.14159f, 1.8f },
-        { "enemy-left",   "gokulin",  "Gokulin",  -48.0f, 16.0f, -36.0f,  0.0f,    1.8f },
-        { "enemy-right",  "nukenin",  "Nukenin",   48.0f, 16.0f, -36.0f,  0.0f,    1.8f }
+        { "player-left",  "zangoose", "Zangoose", 0x0001u, 0u, 335u, 100u,
+          { 0u, 0u, 0u, 0u }, -48.0f, 16.0f,  30.0f, 3.14159f, 1.8f },
+        { "player-right", "zangoose", "Zangoose", 0x0001u, 1u, 335u, 100u,
+          { 0u, 0u, 0u, 0u },  48.0f, 16.0f,  30.0f, 3.14159f, 1.8f },
+        { "enemy-left",   "gokulin",  "Gokulin",  0x0200u, 0u, 316u, 50u,
+          { 0u, 0u, 0u, 0u }, -48.0f, 16.0f, -36.0f, 0.0f,    1.8f },
+        { "enemy-right",  "nukenin",  "Nukenin",  0x0200u, 1u, 292u, 50u,
+          { 0u, 0u, 0u, 0u },  48.0f, 16.0f, -36.0f, 0.0f,    1.8f }
     };
     PCPortTranslatedCamera camera;
     const char* scaleEnv = getenv("PCPORT_BATTLE_SCALE");
@@ -11209,18 +11608,33 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
     int i;
     int setupDisablesAutoplay;
     int prevDebugMenuKey = 0;
+    PCPortBattleTableSetup battleSetup;
 
     memset(&pkxViewer, 0, sizeof(pkxViewer));
+    PCPort_BattleInitSetup(&battleSetup);
     setupDisablesAutoplay =
         viewerMode && getenv("PCPORT_BATTLE_AUTOPLAY") == NULL;
-    if (getenv("PCPORT_BATTLE_P0") != NULL) actors[0].member = getenv("PCPORT_BATTLE_P0");
-    if (getenv("PCPORT_BATTLE_P1") != NULL) actors[1].member = getenv("PCPORT_BATTLE_P1");
-    if (getenv("PCPORT_BATTLE_E0") != NULL) actors[2].member = getenv("PCPORT_BATTLE_E0");
-    if (getenv("PCPORT_BATTLE_E1") != NULL) actors[3].member = getenv("PCPORT_BATTLE_E1");
+    if (getenv("PCPORT_BATTLE_P0") != NULL) {
+        actors[0].member = getenv("PCPORT_BATTLE_P0");
+        actors[0].displayName = actors[0].member;
+    }
+    if (getenv("PCPORT_BATTLE_P1") != NULL) {
+        actors[1].member = getenv("PCPORT_BATTLE_P1");
+        actors[1].displayName = actors[1].member;
+    }
+    if (getenv("PCPORT_BATTLE_E0") != NULL) {
+        actors[2].member = getenv("PCPORT_BATTLE_E0");
+        actors[2].displayName = actors[2].member;
+    }
+    if (getenv("PCPORT_BATTLE_E1") != NULL) {
+        actors[3].member = getenv("PCPORT_BATTLE_E1");
+        actors[3].displayName = actors[3].member;
+    }
     actors[0].stanceMotion = 0u; actors[0].attackMotion = 3u; actors[0].damageMotion = 0u;
     actors[1].stanceMotion = 0u; actors[1].attackMotion = 3u; actors[1].damageMotion = 0u;
     actors[2].stanceMotion = 0u; actors[2].attackMotion = 3u; actors[2].damageMotion = 0u;
     actors[3].stanceMotion = 0u; actors[3].attackMotion = 2u; actors[3].damageMotion = 0u;
+    PCPort_BattleApplyCommonRelSetup(&battleSetup, actors);
     if (scaleEnv != NULL && scaleEnv[0] != '\0') {
         f32 scale = (f32)atof(scaleEnv);
         if (scale > 0.0f) {
@@ -11309,7 +11723,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
         PCPort_BattleActorSetMotion(&actors[i], motionIdx, 0,
                                     viewerMode ? "viewer-start" : "stance");
     }
-    PCPort_BattleFlowInit(&battleFlow, actors);
+    PCPort_BattleFlowInit(&battleFlow, actors, &battleSetup);
     if (setupDisablesAutoplay) {
         battleFlow.autoplay = 0;
         printf("[battle-flow] autoplay=0 reason=interactive-colosseum-setup\n");
@@ -11406,10 +11820,17 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
     g_pcBattleRenderSkin = drawPkxMesh;
     printf("[battle-scene] loaded actors=4 frameCap=%d mode=%s\n",
            frameCap, viewerMode ? "pkx-viewer" : "battle");
-    printf("[battle-state] source=probe playerTrainer=0x0001 enemyTrainer=0x0200 "
-           "playerMove=129 enemyMove=213 actors=zangoose,zangoose,gokulin,nukenin\n");
+    printf("[battle-state] source=common_rel playerTrainer=0x%04X "
+           "enemyTrainer=0x%04X playerMove=%u enemyMove=%u "
+           "actors=%s,%s,%s,%s\n",
+           battleSetup.playerTrainerId, battleSetup.enemyTrainerId,
+           battleSetup.playerMoveId, battleSetup.enemyMoveId,
+           actors[0].member, actors[1].member, actors[2].member,
+           actors[3].member);
     printf("[battle-state] text command=\"FIGHT  POKEMON  BAG  RUN\" "
-           "player=\"Zangoose used Swift!\" enemy=\"Gokulin used Table Move 213!\"\n");
+           "player=\"%s used %s!\" enemy=\"%s used %s!\"\n",
+           actors[0].displayName, battleSetup.playerMoveName,
+           actors[2].displayName, battleSetup.enemyMoveName);
     fflush(stdout);
 
     for (frame = 0; ; ++frame) {
@@ -11439,7 +11860,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
                 pkxViewer.singleDebug = 0;
                 viewerMode = 0;
                 PCPort_BattleApplyGridPlacement(actors);
-                PCPort_BattleFlowInit(&battleFlow, actors);
+                PCPort_BattleFlowInit(&battleFlow, actors, &battleSetup);
                 printf("[debug-ui] closed frame=%d\n", frame);
             }
             fflush(stdout);
@@ -11472,7 +11893,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
                                                 frame,
                                                 "viewer-start-battle");
                 }
-                PCPort_BattleFlowInit(&battleFlow, actors);
+                PCPort_BattleFlowInit(&battleFlow, actors, &battleSetup);
                 if (setupDisablesAutoplay) {
                     battleFlow.autoplay = 0;
                     printf("[battle-flow] autoplay=0 reason=interactive-colosseum-battle\n");

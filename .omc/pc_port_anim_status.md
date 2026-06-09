@@ -171,3 +171,14 @@ confirmed, then fix batch enumeration (was probed=0) for the all-archive sweep.
 - Pokémon batch output: **527/527 pkx rows confirmed=yes**. `pkx_egg.fsys :: egg`
   is now classified as confirmed under the placeholder policy, so there are no
   remaining pkx `confirmed=no` rows.
+
+## 2026-06-09 08:04 HST — PC-PORT LANE CHECKPOINT
+- Rebuilt the motion probe as
+  `build_pc/pcport_motion_probe_headless_meshdump_1780992222.exe` after tightening
+  the accepted `pkx_egg.fsys :: egg` placeholder row to print `animates=yes`.
+- Native PowerShell `_runbatch.ps1` validation now reports **527/527 pkx rows
+  `animates=yes confirmed=yes`** and **149/149 character rows `confirmed=yes`**.
+- Battle Colosseum visible scene now derives the default 2v2 actor setup from
+  `common.fsys :: pcommon_rel`: trainer `0x0001` resolves to Zangoose/Zangoose,
+  trainer `0x0200` resolves to Gokulin/Nukenin, and move IDs/text IDs are carried
+  into the host battle flow and overlay text.

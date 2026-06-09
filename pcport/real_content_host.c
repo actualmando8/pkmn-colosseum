@@ -5312,7 +5312,8 @@ static void PCPort_HeadlessMotionBatchProbePkxArchive(const char* fsysPath,
                "cyclic=%2u varyCyclic=%2u animates=%s confirmed=%s "
                "note=%s%s\n",
                PCPort_PathBaseName(fsysPath), memberName,
-               preflightMotionCount, 0u, 0u, 0u, "no",
+               preflightMotionCount, 0u, 0u, 0u,
+               acceptedPlaceholder ? "yes" : "no",
                acceptedPlaceholder ? "yes" : "no",
                preflightMotionCount == 0u ? "preflight-no-motion-bank" :
                                              "low-motion-placeholder",
