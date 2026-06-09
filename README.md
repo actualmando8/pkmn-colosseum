@@ -11,10 +11,15 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~46.5% (3733 / 8029 functions) |
-| Byte match | ~44.0% (664 KB / 1.5 MB) |
+| Function match | ~52.7% (4796 / 9100 functions) |
+| Byte match | ~39.9% (643,624 / 1,615,116 bytes) |
 
-The latest figure is regenerated on every push — see `.github/workflows/progress.yml`.
+Last measured 2026-06-09 with `objdiff-cli report generate` against a verified
+byte-identical `main.dol` build. The numbers are regenerated locally — public CI
+cannot hold the ROM-derived target objects, so `.github/workflows/progress.yml`
+only gates compilation until the private build container is published. (Note:
+the denominators grew over time as more translation units were unblocked, so
+percentages are not comparable to figures from before 2026-06-04.)
 
 ## You will need
 
