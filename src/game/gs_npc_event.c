@@ -1229,7 +1229,7 @@ void fn_8003258C(void) {
 /* 0x800327FC | 0x6DC */
 extern void fn_800E0C04(void);
 extern void fn_800F9E70(void);
-extern void fn_8012640C(void);
+extern u16 fn_8012640C(void*, s32, s32, s32);
 extern void fn_80082EA4(void);
 extern void fn_80102620(void);
 extern void fn_800D37CC(void);
