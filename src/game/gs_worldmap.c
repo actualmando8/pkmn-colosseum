@@ -1379,13 +1379,15 @@ asm void fn_80029850(void) {
 }
 #else
 #pragma optimization_level 4
-u16 fn_80029850(void** r3, u16 r4, u16 r5, u16 r6) {
-    void** r26;
+u32 fn_80029850(u8* r3, u16 r4, u16 r5, u16 r6) {
+    register u32 r28;
+    register s32 r27;
+    register u8* r26;
     u16 r30;
     u16 r29;
-    u32 r28;
-    s32 r27;
     u16 r31;
+    u16 val;
+    u16 cur;
     r26 = r3;
     r30 = r6;
     r29 = r4;
@@ -1393,17 +1395,17 @@ u16 fn_80029850(void** r3, u16 r4, u16 r5, u16 r6) {
     r27 = 0;
     r31 = r5;
     while (r27 < r29) {
-        u16 val = fn_80143C68(r26);
+        val = fn_80143C68(r26);
         if (val == r31) {
-            u16 cur = fn_80143C50(r26);
+            cur = fn_80143C50(r26);
             r28 += (u16)(r30 - cur);
         } else if (val == 0) {
             r28 += r30;
         }
         r27++;
-        r26++;
+        r26 += 4;
     }
-    return (u16)r28;
+    return r28;
 }
 #endif
 
