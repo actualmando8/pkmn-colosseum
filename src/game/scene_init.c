@@ -66,7 +66,8 @@ extern u32   fn_801022B8(u32 a);         /* scene message get */
 extern void  fn_800F7F64(u32 pad);       /* input init */
 extern u32   fn_800F7BC4(u32 pad);       /* input poll */
 extern u32   fn_800AA498(void);          /* VIGetTvFormat / card detect */
-extern void  fn_800A0F58(void);          /* card status */
+extern u32   fn_800A0F58(void);          /* card status */
+extern f32   lbl_8047BA34;     /* timing threshold (< 1.0f) */
 extern void  fn_800A0FC8(u32 a);         /* card close */
 extern s32   fn_800D37CC(void);          /* GSmem tick */
 extern u32   fn_800D3088(void);          /* GSmem query */
@@ -164,20 +165,435 @@ typedef struct { u32 data[78]; } Tbl78;
  * =================================================================== */
 
 
+/* forward declarations needed for fn_8003686C */
+extern void fn_801069FC();
+extern s32  fn_8017B2CC(u32 a);
+extern s32 fn_800370E0(u32* arg);
+
 /* 0x8003686C | size: 0x820 */
 /* Scene main init - OSGetResetCode handling, thread creation, card detection */
-asm void fn_8003686C(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/scene_init/fn_8003686C.s"
+#pragma peephole off
+void fn_8003686C(void) {
+    u8* ctx;        /* → r31 */
+    s8 anim_result; /* → r30 */
+    u32 bias_hi;    /* → r29 */
+    s8 anim_track;  /* → r28 */
+    f64 f27;        /* float accumulator */
+    f64 f28;        /* float threshold or bias_s (warm boot) — f64, lfd no frsp in warm boot */
+    f64 f29;        /* float bias_u or tick_f (warm boot) — f64, lfd no frsp */
+    f64 f30;        /* float tick_f */
+    f64 f31;        /* float bias_s (named lfd, no frsp) */
+    u32 tick_u;     /* scratch unsigned tick */
+    u32 tmp;        /* scratch u32 for fn_801026A4 call — at 0xc */
+    u32 tmp2;       /* scratch u32 for path B fn_801026A4 call — at 0x8 */
+    u32 spill_s[2]; /* [0]=bias_hi_hi, [1]=signed_lo */
+    u32 spill_u[2]; /* [0]=bias_hi_hi, [1]=unsigned_lo */
+    u8* obj;        /* scratch object pointer */
+    ctx = lbl_803A3E58;
+    lbl_804788B8 = (u32)-1;
+
+    /* Warm boot check */
+    {
+        s32 is_warm;
+        if ((OSGetResetCode() + 0x80000000u) == 0u)
+            is_warm = 1;
+        else
+            is_warm = 0;
+        if (is_warm) goto warm_boot;
+    }
+
+    /* Cold boot: card / TV detect */
+    if (fn_800AA498() != 1) goto card_fail;
+
+    fn_800F7F64(1);
+    if (!(fn_800F7BC4(1) & 0x200u)) goto no_input;
+
+    /* === Path A: cold boot, bit9 set === */
+    fn_80106D3C(1, 0x3b50, 1, 1);
+    tmp = 0;
+    fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp, 0, 0, 0);
+    fn_80102868(0x11, 0x2d, 0xbe);
+
+    /* loop_a: accumulate time until animation done or threshold */
+    f27 = lbl_8047BA30;
+    anim_track = -1;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA48;
+    goto loop_a_cmp;
+loop_a_body:
+    if (fn_801045A8(0x11, 0) == 0) {
+        anim_result = fn_801043A4(0x11);
+        goto loop_a_exit;
+    }
+    obj = (u8*)fn_80104704(0x11);
+    if ((s8)anim_track != (s8)obj[0x95]) {
+        f27 = lbl_8047BA30;
+        anim_track = obj[0x95];
+    }
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_u[0] = bias_hi;
+        spill_u[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_u - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_s[1] = tick_u;
+    spill_s[0] = bias_hi;
+    f27 += (*(f64*)spill_s - f29) / f30;
+loop_a_cmp:
+    if (f27 < f28) goto loop_a_body;
+    if (!(f27 >= lbl_8047BA48)) goto loop_a_body;
+    obj = (u8*)fn_80104704(0x11);
+    anim_result = obj[0x95];
+loop_a_exit:
+    fn_80102568(0x11, 0, 1);
+
+    if ((s8)anim_result != 0) goto path_a_phase2;
+
+    /* anim_result==0: load 0x3b51 */
+    {
+        s32 is_w;
+        if ((OSGetResetCode() + 0x80000000u) == 0u)
+            is_w = 1;
+        else
+            is_w = 0;
+        if (is_w == 1) {
+            if (fn_800A0F58() == 0) {
+                lbl_804788B8 = 1;
+            }
+        } else {
+            lbl_804788B8 = 1;
+        }
+    }
+    fn_80106D3C(1, 0x3b51, 1, 1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_a1_cmp;
+simple_loop_a1_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_a1_cmp:
+    if (f27 < f28) goto simple_loop_a1_body;
+    goto epilogue;
+
+path_a_phase2:
+    /* anim_result!=0: load 0x3b52 */
+    {
+        s32 is_w;
+        if ((OSGetResetCode() + 0x80000000u) == 0u)
+            is_w = 1;
+        else
+            is_w = 0;
+        if (is_w == 1) {
+            if (fn_800A0F58() == 1) {
+                lbl_804788B8 = 0;
+            }
+        } else {
+            lbl_804788B8 = 0;
+        }
+    }
+    fn_80106D3C(1, 0x3b52, 1, 1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_a2_cmp;
+simple_loop_a2_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_a2_cmp:
+    if (f27 < f28) goto simple_loop_a2_body;
+    fn_801069FC(1);
+    goto epilogue;
+
+    /* === Path B: cold boot, bit9 NOT set === */
+no_input:
+    if (fn_800A0F58() != 1) goto card_fail2;
+    fn_80106D3C(1, 0x3b50, 1, 1);
+    tmp2 = 0;
+    fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp2, 0, 0, 0);
+    fn_80102868(0x11, 0x2d, 0xbe);
+
+    /* loop_a2: path B animation accumulator */
+    f27 = lbl_8047BA30;
+    anim_track = -1;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA48;
+    goto loop_a2_cmp;
+loop_a2_body:
+    if (fn_801045A8(0x11, 0) == 0) {
+        anim_result = fn_801043A4(0x11);
+        goto loop_a2_exit;
+    }
+    obj = (u8*)fn_80104704(0x11);
+    if ((s8)anim_track != (s8)obj[0x95]) {
+        f27 = lbl_8047BA30;
+        anim_track = obj[0x95];
+    }
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+loop_a2_cmp:
+    if (f27 < f28) goto loop_a2_body;
+    if (!(f27 >= lbl_8047BA48)) goto loop_a2_body;
+    obj = (u8*)fn_80104704(0x11);
+    anim_result = obj[0x95];
+loop_a2_exit:
+    fn_80102568(0x11, 0, 1);
+
+    if ((s8)anim_result != 0) goto path_b_phase2;
+
+    {
+        s32 is_w;
+        if ((OSGetResetCode() + 0x80000000u) == 0u)
+            is_w = 1;
+        else
+            is_w = 0;
+        if (is_w == 1) {
+            if (fn_800A0F58() == 0) {
+                lbl_804788B8 = 1;
+            }
+        } else {
+            lbl_804788B8 = 1;
+        }
+    }
+    fn_80106D3C(1, 0x3b51, 1, 1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_b1_cmp;
+simple_loop_b1_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_b1_cmp:
+    if (f27 < f28) goto simple_loop_b1_body;
+    goto epilogue;
+
+path_b_phase2:
+    {
+        s32 is_w;
+        if ((OSGetResetCode() + 0x80000000u) == 0u)
+            is_w = 1;
+        else
+            is_w = 0;
+        if (is_w == 1) {
+            if (fn_800A0F58() == 1) {
+                lbl_804788B8 = 0;
+            }
+        } else {
+            lbl_804788B8 = 0;
+        }
+    }
+    fn_80106D3C(1, 0x3b52, 1, 1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_b2_cmp;
+simple_loop_b2_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_b2_cmp:
+    if (f27 < f28) goto simple_loop_b2_body;
+    fn_801069FC(1);
+    goto epilogue;
+
+    /* === Path C: no_input, card fail === */
+card_fail2:
+    fn_801C40F0(1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_c_cmp;
+simple_loop_c_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_c_cmp:
+    if (f27 < f28) goto simple_loop_c_body;
+    goto epilogue;
+
+    /* === Path D: cold boot, fn_800AA498 != 1 === */
+card_fail:
+    fn_801C40F0(1);
+    f27 = lbl_8047BA30;
+    f31 = lbl_8047BA38;
+    bias_hi = 0x43300000u;
+    f29 = lbl_8047BA40;
+    f28 = lbl_8047BA34;
+    goto simple_loop_d_cmp;
+simple_loop_d_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f30 = *(f64*)spill_s - f31;
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f29) / f30;
+simple_loop_d_cmp:
+    if (f27 < f28) goto simple_loop_d_body;
+    fn_800A0FC8(0);
+    goto epilogue;
+
+    /* === Path E: warm boot === */
+warm_boot:
+    fn_801C40F0(1);
+    /* warm boot timing loop - different FPR assignments */
+    f27 = lbl_8047BA30;
+    f28 = lbl_8047BA38;   /* bias_s → f28 (lfd, named) */
+    bias_hi = 0x43300000u;
+    f30 = lbl_8047BA40;   /* bias_u → f30 (lfd, named) */
+    f31 = lbl_8047BA34;   /* threshold → f31 (lfs, named) */
+    goto warm_loop_cmp;
+warm_loop_body:
+    fn_800F0308();
+    {
+        s32 ts = fn_800D37CC();
+        spill_s[0] = bias_hi;
+        spill_s[1] = (u32)ts ^ 0x80000000u;
+        f29 = *(f64*)spill_s - f28;   /* tick_f → f29 */
+    }
+    tick_u = fn_800D3088();
+    spill_u[1] = tick_u;
+    spill_u[0] = bias_hi;
+    f27 += (*(f64*)spill_u - f30) / f29;
+warm_loop_cmp:
+    if (f27 < f31) goto warm_loop_body;
+
+    /* wait for fn_8017B2CC(0xa) >= 0 */
+    {
+        s32 res;
+        const u8* str = lbl_80267050;
+        for (;;) {
+            res = fn_8017B2CC(0xa);
+            if (res >= 0) break;
+            fn_800DD970((const char*)str);
+            if (res != 0) fn_800F0308();
+        }
+    }
+
+    fn_80166E88(2, 1, 0x20, 1, 0x10);
+    fn_80165F84();
+
+    /* Create GS thread */
+    {
+        u8* stack;
+        u32* arg;
+        u32 ctr_new;
+        u32 ctr_old = lbl_8047A460;
+        stack = ctx + 0x1640;
+        *(u32*)(ctx + 0x1318) = 1;
+        ctr_new = ctr_old + 1;
+        arg = (u32*)(ctx + 0x1318);
+        lbl_8047A460 = ctr_new;
+        stack = (u8*)((u32)stack + 0xffc);
+        arg[1] = 0;
+        arg[2] = 0;
+        arg[3] = 0;
+        fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, arg, stack, 0x1000, 0x10, 1);
+        fn_800A1F94(ctx + 0x1328);
+    }
+
+    /* Wait for thread completion */
+    goto lbl_8047A460_check;
+lbl_8047A460_wait:
+    fn_800F0308();
+lbl_8047A460_check:
+    if ((s32)lbl_8047A460 != 0) goto lbl_8047A460_wait;
+
+epilogue:
+    return;
 }
 
 /* 0x8003708C | size: 0x54 */
-asm void fn_8003708C(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/scene_init/fn_8003708C.s"
+extern void fn_8017AC40(u32 a, u32 b, u32 c, u32 d);
+extern void fn_800FE834(u32 a, u32 b, u32 c, void* fn);
+extern void fn_8017AAA4(void);
+s32 fn_8003708C(void) {
+    fn_8017AC40(0x40, 0, 0, 0);
+    fn_800FE834(1, 0x14, 0, fn_8017AAA4);
+    lbl_8047A464 = 1;
+    return 0;
 }
 
 /* 0x800370E0 | size: 0x78 */
-asm void fn_800370E0(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/scene_init/fn_800370E0.s"
+s32 fn_800370E0(u32* arg) {
+    if (arg[0]) fn_801655D4(arg[0]);
+    if (arg[1]) fn_801655D4(arg[1]);
+    if (arg[2]) fn_801655D4(arg[2]);
+    if (arg[3]) fn_801655D4(arg[3]);
+    lbl_8047A460--;
+    return 0;
 }
 
 
@@ -498,6 +914,7 @@ asm void fn_800376F8(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma fp_contract on
 void fn_800376F8(u32 unused, u8* p) {
     f32 f1, f3, f4;
     s32 v;
@@ -512,11 +929,12 @@ void fn_800376F8(u32 unused, u8* p) {
         *(f32*)(lbl_803A654C + 0x50) = lbl_8047A494 * *(f32*)(lbl_803A654C + 0x4c) + f4;
         if (f3 > lbl_8047BA58) {
             *(f32*)(lbl_803A654C + 0x58) = lbl_8047BA58;
-            *(s16*)(p + 0x50) = (s16)(s32)*(f32*)(lbl_803A654C + 0x54);
+            *(s16*)(p + 0x50) = (s16)*(f32*)(lbl_803A654C + 0x54);
         }
-        *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A654C + 0x54) + *(f32*)(lbl_803A654C + 0x58));
+        *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A654C + 0x54) + *(f32*)(lbl_803A654C + 0x58));
     }
 }
+#pragma fp_contract off
 #endif
 
 /* fn_800377B4 - 0x800377B4 | size: 0xbc */
@@ -528,6 +946,7 @@ asm void fn_800377B4(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma fp_contract on
 void fn_800377B4(u32 unused, u8* p) {
     f32 f1, f3, f4;
     s32 v;
@@ -542,11 +961,12 @@ void fn_800377B4(u32 unused, u8* p) {
         *(f32*)(lbl_803A654C + 0x38) = lbl_8047A494 * *(f32*)(lbl_803A654C + 0x34) + f4;
         if (f3 > lbl_8047BA58) {
             *(f32*)(lbl_803A654C + 0x40) = lbl_8047BA58;
-            *(s16*)(p + 0x50) = (s16)(s32)*(f32*)(lbl_803A654C + 0x3c);
+            *(s16*)(p + 0x50) = (s16)*(f32*)(lbl_803A654C + 0x3c);
         }
-        *(s16*)(p + 0x50) = (s16)(s32)(*(f32*)(lbl_803A654C + 0x3c) + *(f32*)(lbl_803A654C + 0x40));
+        *(s16*)(p + 0x50) = (s16)(*(f32*)(lbl_803A654C + 0x3c) + *(f32*)(lbl_803A654C + 0x40));
     }
 }
+#pragma fp_contract off
 #endif
 
 /* fn_80037870 - 0x80037870 | size: 0xbc */
