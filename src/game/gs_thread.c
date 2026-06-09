@@ -49,6 +49,10 @@ extern void  OSRestoreInterrupts(void);
 extern void  fn_800D30A0(void* callback);                 /* GSgfx register swap callback */
 extern void  fn_800F015C(void);                           /* GSthread context init */
 extern void  fn_800F01F0(void);                           /* GSthread FPU context init */
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void GSscratchFree();
+extern void _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO();
+extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
 
 /* ===== String constants (rodata references) ===== */
 extern const char lbl_80271008[]; /* "GSthreadCreate. Warning: 'usesFPU==FALE' OK?\n" */
