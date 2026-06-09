@@ -500,6 +500,45 @@ extern void  DCFlushRange(void* ptr, u32 size);
 extern u32   OSDisableInterrupts(void);
 extern void  OSRestoreInterrupts(u32 level);
 
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void ARQPostRequest();
+extern void InitStreamBuffers();
+extern void ReverbHICreate();
+extern void aramQueueCallback();
+extern void aramUploadData();
+extern void inpGetMidiCtrl();
+extern void salCalcVolume();
+extern void salCallback();
+extern void sndBSearch();
+extern u8 jumptable_80369CB0[];
+extern u8 jumptable_80369CD4[];
+extern u8 jumptable_80369CF8[];
+extern u8 lbl_80273448[];
+extern u8 lbl_8036944C[];
+extern u8 lbl_8036BF00[];
+extern u8 lbl_80434C50[];
+extern f32 lbl_8047D4D8;
+extern f32 lbl_8047D4DC;
+extern f32 lbl_8047D4E0;
+extern f64 lbl_8047D4E8;
+extern f32 lbl_8047D4F0;
+extern f32 lbl_8047D4F4;
+extern f32 lbl_8047D4F8;
+extern f32 lbl_8047D4FC;
+extern f32 lbl_8047D500;
+extern f32 lbl_8047D504;
+extern f64 lbl_8047D508;
+extern f32 lbl_8047D510;
+extern f32 lbl_8047D514;
+extern f64 lbl_8047D518;
+extern f32 lbl_8047D520;
+extern f64 lbl_8047D528;
+extern f32 lbl_8047D530;
+extern f32 lbl_8047D534;
+extern u32 lbl_8047B070;
+extern u32 lbl_8047B078;
+extern u32 lbl_8047B07C;
+
 /* GSmem allocator */
 extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
