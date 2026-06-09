@@ -4,3 +4,4 @@ backup/
 states/*.sav
 states/*.png
 shots/
+scenarios/out/
