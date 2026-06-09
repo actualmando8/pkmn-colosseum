@@ -34,6 +34,15 @@ extern u32  OSGetResetCode(void);
 
 /* ===== CRT / libc ===== */
 extern void* memset(void* dst, int val, u32 size);
+extern void sin();   /* MSL trig (renamed fn_800CE148) — referenced by asm incs */
+extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
+extern void atan();
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void GSlightSetType();
+extern void cameraWaitSyncAnime();
+extern void gamedataGetStatus();
+extern void menuModelSetMotion();
+extern void menuSubOpenYesNo();
 
 /* ===== GS Engine ===== */
 extern void  fn_800A19CC(void* ctx, void* callback, void* arg,
