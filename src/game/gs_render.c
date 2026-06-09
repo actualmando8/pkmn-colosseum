@@ -3568,7 +3568,7 @@ void fn_800DC1D4(u8 val) {
     else { lbl_80400B28[0x1a] = val; }
 }
 #endif
-extern void fn_800EF504(void);
+extern u32 fn_800EF504(void*);
 extern u8 lbl_80400EE0[];
 extern u8 lbl_8047AAE0;
 #if 1
@@ -3581,7 +3581,7 @@ void fn_800DC298(void) { /* TODO */ }
 extern void fn_800EF4DC(void);
 extern void fn_800EF590(void);
 extern void fn_800EF578(void);
-extern void fn_800EF548(void);
+extern void* fn_800EF548(void*, u32);
 extern u8 lbl_8047AAE0;
 #if 1
 asm void fn_800DC390(void) {
@@ -4170,18 +4170,43 @@ void fn_800DEFC8(u8* obj) {
     *(u32*)(obj + 0x38) = 0xfefefefe;
 }
 #endif
-extern void HSD_ImageDescAlloc(void);
-extern void fn_800EF4FC(void);
-extern void fn_800EF4F4(void);
-extern void fn_800EF3E0(void);
-extern void fn_800EF4E4(void);
-extern u32 lbl_8047CAC8;
-#if 1
+extern void* HSD_ImageDescAlloc(void);
+extern u16 fn_800EF4FC(void*);
+extern u16 fn_800EF4F4(void*);
+extern void* fn_800EF3E0(void*, u32);
+extern u8 fn_800EF4E4(void*);
+extern f32 lbl_8047CAC8;
+#if 0
 asm void fn_800DF028(void) {
 #include "src/game/gs_render_fn_800DF028.inc"
 }
 #else
-void fn_800DF028(void) { /* TODO */ }
+void fn_800DF028(u8* obj, void* image) {
+    void* desc;
+    u32 transparent;
+    f32 scale;
+
+    if ((*(u32*)(obj + 0x38) + 0x01020000) == 0xfefe) {
+        *(u32*)(obj + 0x38) = *(u32*)(*(u8**)(*(u8**)(obj + 0x8) + 0x8) + 0x58);
+        desc = HSD_ImageDescAlloc();
+    } else {
+        desc = *(void**)(*(u8**)(*(u8**)(obj + 0x8) + 0x8) + 0x58);
+    }
+
+    if (desc != 0) {
+        *(void**)desc = fn_800EF548(image, 0);
+        *(u16*)((u8*)desc + 0x4) = fn_800EF4FC(image);
+        *(u16*)((u8*)desc + 0x6) = fn_800EF4F4(image);
+        *(void**)((u8*)desc + 0x8) = fn_800EF3E0(image, 1);
+        transparent = fn_800EF4E4(image);
+        scale = lbl_8047CAC8;
+        *(u32*)((u8*)desc + 0xc) = ((0 - transparent) | transparent) >> 31;
+        *(f32*)((u8*)desc + 0x10) = scale;
+        *(f32*)((u8*)desc + 0x14) = scale;
+        fn_800B8DF4(fn_800EF504(image));
+        *(void**)(*(u8**)(*(u8**)(obj + 0x8) + 0x8) + 0x58) = desc;
+    }
+}
 #endif
 #if 0
 asm void fn_800DF11C(void) {
@@ -4468,7 +4493,7 @@ extern void fn_801A6DC4(void);
 extern void fn_801A6D5C(void);
 extern void fn_801A6DA0(void);
 extern u8 lbl_803154E4[];
-extern u32 lbl_8047CAC8;
+extern f32 lbl_8047CAC8;
 #if 1
 asm void _matGSmatEnableEnvMapExt(void) {
 #include "src/game/gs_render__matGSmatEnableEnvMapExt.inc"
