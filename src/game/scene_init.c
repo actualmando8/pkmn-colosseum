@@ -3971,58 +3971,50 @@ asm void fn_8004BFB0(void) {
 #else
 #pragma optimization_level 4
 void fn_8004BFB0(void) {
-    u16* base;
-    s32 count;
-    s32 i;
-    base = (u16*)lbl_8047A500;
+    u16* r28;
+    u16* r30;
+    s32 r31;
+    s32 r29;
+    r28 = (u16*)lbl_8047A500;
     switch (fn_801D1B4C()) {
     case 1:
-        i = 0;
-        for (;;) {
-            *base = (u16)fn_801D1F0C(i);
-            i++;
-            base++;
-            if (i >= fn_801D1F7C()) {
-                break;
-            }
+        r30 = r28;
+        r31 = 0;
+        while (r31 < fn_801D1F7C()) {
+            *r30 = (u16)fn_801D1F0C(r31);
+            r31++;
+            r30++;
         }
         break;
     case 2:
-        count = fn_801D1F7C();
-        i = 0;
-        for (;;) {
-            *base = (u16)fn_801D1F0C(i);
-            i++;
-            base++;
-            if (i >= count) {
-                break;
-            }
+        r29 = fn_801D1F7C();
+        r30 = r28;
+        r31 = 0;
+        while (r31 < r29) {
+            *r30 = (u16)fn_801D1F0C(r31);
+            r31++;
+            r30++;
         }
-        fn_800CA620((u16*)lbl_8047A500, count, 2, (void*)fn_8004BF20);
+        fn_800CA620(r28, r29, 2, (void*)fn_8004BF20);
         break;
     case 3:
-        count = fn_801D1F7C();
-        i = 0;
-        for (;;) {
-            *base = (u16)fn_801D1F0C(i);
-            i++;
-            base++;
-            if (i >= count) {
-                break;
-            }
+        r31 = fn_801D1F7C();
+        r30 = r28;
+        r29 = 0;
+        while (r29 < r31) {
+            *r30 = (u16)fn_801D1F0C(r29);
+            r29++;
+            r30++;
         }
-        fn_800CA620((u16*)lbl_8047A500, count, 2, (void*)fn_8004BE90);
+        fn_800CA620(r28, r31, 2, (void*)fn_8004BE90);
         break;
-    case 0:
     default:
-        count = fn_801D1F7C() - 1;
-        for (;;) {
-            *base = (u16)fn_801D1F0C(count);
-            count--;
-            base++;
-            if (count < 0) {
-                break;
-            }
+        r30 = r28;
+        r29 = fn_801D1F7C() - 1;
+        while (r29 >= 0) {
+            *r30 = (u16)fn_801D1F0C(r29);
+            r29--;
+            r30++;
         }
         break;
     }
