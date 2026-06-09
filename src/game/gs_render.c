@@ -4011,12 +4011,33 @@ extern u32 lbl_8047AAF8;
 extern u32 lbl_8047AB08;
 extern u32 lbl_8047AAFA;
 extern u32 lbl_8047AAFC;
-#if 1
+#if 0
 asm void fn_800DD270(void) {
 #include "src/game/gs_render_fn_800DD270.inc"
 }
 #else
-void fn_800DD270(void) { /* TODO */ }
+u32 fn_800DD270(u32 count) {
+    u16* entries;
+    u32 sum;
+    u32 i;
+    u32 ret;
+
+    if (*(u16*)&lbl_8047AAF8 == 0) {
+        return 0;
+    }
+    if (count > lbl_8047AB08) {
+        return 0;
+    }
+
+    entries = fn_800E27B0(*(u16*)&lbl_8047AAFA);
+    sum = 0;
+    for (i = 0; i < count; i++) {
+        sum += entries[i];
+    }
+    ret = lbl_8047AAFC + sum;
+    fn_800E24B0(*(u16*)&lbl_8047AAFA);
+    return ret;
+}
 #endif
 extern u32 lbl_8047AB08;
 #if 0
