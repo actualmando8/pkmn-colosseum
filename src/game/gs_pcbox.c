@@ -5160,12 +5160,69 @@ s32 fn_80019680(u8* arg) {
 extern u32 fn_80129B2C();
 extern u32 lbl_80478868;
 extern u32 lbl_80478BD8;
-#if 1
+extern u8  lbl_802E4E10[];
+extern u8  lbl_802EF0A8[];
+#if 0
 asm void fn_80019754(void) {
 #include "src/game/gs_pcbox_fn_80019754.inc"
 }
 #else
-void fn_80019754(void) { /* TODO */ }
+s32 fn_80019754(void* arg) {
+    extern s32 fn_801046B8(void);
+    extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
+    extern void fn_80102510(s32);
+    extern void fn_80102428(s32, s32);
+    u8* e;
+    s16* p4;
+    s16* p8;
+    u16 ids[3];
+    s32 count_plus_one;
+    s32 count;
+    s32 i;
+    s32 sel;
+    s32 r4;
+
+    if (lbl_80478868 != 0) {
+        e = lbl_802E4E10;
+        p4 = (s16*)(lbl_802EF0A8 + 0x4);
+        p8 = (s16*)(lbl_802EF0A8 + 0x8);
+        *(s16*)(e + 0x4)  = p4[*(u32*)(e + 0x0)  * 0xe];
+        *(s16*)(e + 0x6)  = p8[*(u32*)(e + 0x0)  * 0xe];
+        *(s16*)(e + 0x10) = p4[*(u32*)(e + 0xc)  * 0xe];
+        *(s16*)(e + 0x12) = p8[*(u32*)(e + 0xc)  * 0xe];
+        *(s16*)(e + 0x1c) = p4[*(u32*)(e + 0x18) * 0xe];
+        *(s16*)(e + 0x1e) = p8[*(u32*)(e + 0x18) * 0xe];
+        *(s16*)(e + 0x28) = p4[*(u32*)(e + 0x24) * 0xe];
+        *(s16*)(e + 0x2a) = p8[*(u32*)(e + 0x24) * 0xe];
+        *(s16*)(e + 0x34) = p4[*(u32*)(e + 0x30) * 0xe];
+        *(s16*)(e + 0x36) = p8[*(u32*)(e + 0x30) * 0xe];
+        *(s16*)(e + 0x40) = p4[*(u32*)(e + 0x3c) * 0xe];
+        *(s16*)(e + 0x42) = p8[*(u32*)(e + 0x3c) * 0xe];
+        lbl_80478868 = 0;
+    }
+
+    count = 0;
+    for (i = 0; (u32)(u16)i < lbl_80478BD8 && count < 3; i++) {
+        fn_801440A0(i);
+        if ((u8)fn_80144014(0) == 6) {
+            if ((u8)fn_80129B2C(0, i)) {
+                ids[count] = (u16)i;
+                count++;
+            }
+        }
+    }
+    ids[count] = 0;
+    count_plus_one = count + 1;
+
+    r4 = fn_801046B8();
+    sel = fn_801026A4(0x5f, r4, 0, 0, 1, 1, &arg);
+    fn_80102510(0x5f);
+    fn_80102428(0x5f, 1);
+    if (sel >= 0 && sel < count_plus_one) {
+        return ids[sel];
+    }
+    return 0;
+}
 #endif
 
 /* fn_80019938 - 0x80019938 | size: 0xbc */
