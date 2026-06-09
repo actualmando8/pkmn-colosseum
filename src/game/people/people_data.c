@@ -318,6 +318,8 @@ PeopleFieldEntry* peopleFieldGetByIndex(u16 index) {
 /* fn_801440F0: peopleFieldOpenModel (0xB8 bytes) */
 /* fn_801441A8: peopleFieldConfigModel (0x224 bytes) */
 /* fn_801443CC: peopleFieldFinalizeModel (0x1A8 bytes) */
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void itemGetStatus();
 /* Forward declarations for self-referencing asm blocks */
 extern void fn_801425E8(void);
 extern void fn_80142B24(void*, u32, u16, u32, u32);
