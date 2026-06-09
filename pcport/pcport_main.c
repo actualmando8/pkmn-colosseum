@@ -5054,6 +5054,23 @@ static u32 g_rjtVisited[PCPORT_RJT_VISITED_MAX];
 static int g_rjtVisitedCount;
 static int g_rjtDepth;
 
+/* Per-archive texture cache for RenderJointTree: avoids decoding + re-uploading
+ * the same GX texture (same archive image offset + same diffuse modulation) on
+ * every frame.  The cache is persistent across frames as long as the archive
+ * storage pointer stays the same; it is cleared whenever a new map is loaded
+ * (PCPort_EngineFieldSetup changes a->storage).  This makes exterior scenes
+ * like S1_out (which re-render many large shared textures per frame) finish
+ * within the same ~2s/120-frame budget as smaller interior maps. */
+#define PCPORT_RJT_TEX_CACHE_MAX 256
+typedef struct {
+    u32      archiveOffset; /* baseTexture->imageDataArchiveOffset */
+    u32      diffuse;       /* translatedMaterial.diffuse baked into pixels */
+    GXTexObj texObj;        /* uploaded GL texture (glTexId valid) */
+} PCPortRJTTexCacheEntry;
+static PCPortRJTTexCacheEntry g_rjtTexCache[PCPORT_RJT_TEX_CACHE_MAX];
+static int                   g_rjtTexCacheCount  = 0;
+static const u8*             g_rjtTexCacheArchive = NULL; /* a->storage sentinel */
+
 /* CPU skinned-mesh render for type-2 (envelope) PObjs. The envelope (pobj+0x14)
  * is a null-terminated array of per-matrix-slot pointers; each slot points to a
  * {jobj, weight} list. We build a palette of per-slot joint WORLD matrices, then
@@ -5953,6 +5970,11 @@ static void RenderJointTree(const PCPortHSDArchive* a,
     if (g_rjtDepth++ == 0) {
         g_rjtVisitedCount = 0;
         PCPortApplyLightEnv();
+        /* Invalidate the texture cache when the archive changes (new map loaded). */
+        if (a->storage != g_rjtTexCacheArchive) {
+            g_rjtTexCacheCount  = 0;
+            g_rjtTexCacheArchive = a->storage;
+        }
     }
     for (;;) {
 
@@ -6047,8 +6069,29 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (texExpOk && translatedTextureExp.stageCount != 0u &&
                         translatedTextureExp.stages[0].texture.width != 0u &&
                         translatedTextureExp.stages[0].texture.height != 0u) {
-                        texBakeOk = PCPort_BakeTextureExpRGBAFromArchiveBE(
-                            a, &translatedTextureExp, &bakedPixels, &bakedSize);
+                        /* Texture cache lookup: skip decode + GPU upload when the
+                         * same (archiveOffset, diffuse) was already uploaded this
+                         * map session.  Cuts per-frame cost for large exterior maps
+                         * (S1_out) from ~0.9 s/frame down to ~D1_garage_1F levels. */
+                        u32 cacheOff  = translatedTextureExp.stages[0].texture.imageDataArchiveOffset;
+                        u32 cacheDiff = haveMaterial ? translatedMaterial.diffuse : 0xFFFFFFFFu;
+                        int ci, cacheHit = 0;
+                        for (ci = 0; ci < g_rjtTexCacheCount; ++ci) {
+                            if (g_rjtTexCache[ci].archiveOffset == cacheOff &&
+                                g_rjtTexCache[ci].diffuse      == cacheDiff) {
+                                memcpy(&nodeTextureObject, &g_rjtTexCache[ci].texObj,
+                                       sizeof(GXTexObj));
+                                textureMapId = PCPort_ReadBigEndianU32(
+                                    a->storage + tobjOffset + 0x08);
+                                haveTexture = 1;
+                                cacheHit = 1;
+                                break;
+                            }
+                        }
+                        if (!cacheHit) {
+                            texBakeOk = PCPort_BakeTextureExpRGBAFromArchiveBE(
+                                a, &translatedTextureExp, &bakedPixels, &bakedSize);
+                        }
                     }
                     if (texBakeOk && bakedPixels != NULL) {
                         const PCPortTranslatedTexture* baseTexture =
@@ -6143,6 +6186,16 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                             (GXTexWrapMode)baseTexture->wrapS,
                             (GXTexWrapMode)baseTexture->wrapT);
                         haveTexture = 1;
+                        /* Cache the uploaded GL texture for reuse across frames. */
+                        if (g_rjtTexCacheCount < PCPORT_RJT_TEX_CACHE_MAX) {
+                            g_rjtTexCache[g_rjtTexCacheCount].archiveOffset =
+                                baseTexture->imageDataArchiveOffset;
+                            g_rjtTexCache[g_rjtTexCacheCount].diffuse =
+                                haveMaterial ? translatedMaterial.diffuse : 0xFFFFFFFFu;
+                            memcpy(&g_rjtTexCache[g_rjtTexCacheCount].texObj,
+                                   &nodeTextureObject, sizeof(GXTexObj));
+                            g_rjtTexCacheCount++;
+                        }
                     } else if (getenv("PCPORT_TEX_DEBUG") != NULL &&
                                tobjOffset != 0u) {
                         u32 imageDebug = 0u;
