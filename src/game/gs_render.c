@@ -5076,15 +5076,25 @@ f32 fn_800E0CA0(f32 x) {
 }
 #pragma pop
 #endif
-extern void fn_800CDBE0(void);
+extern f64 fn_800CDBE0(f32);
 extern f32 lbl_8047CB38;
 extern f64 lbl_8047CB40;
-#if 1
+#if 0
 asm void fn_800E0D24(void) {
 #include "src/game/gs_render_fn_800E0D24.inc"
 }
 #else
-void fn_800E0D24(void) { /* TODO */ }
+void fn_800E0D24(void) {
+    register s32 i;
+    f32 step;
+    f32 scale;
+
+    scale = lbl_8047CB38;
+    step = lbl_8047CB30;
+    for (i = 0; i < 181; i++) {
+        lbl_804011B8[i] = (f32)fn_800CDBE0(scale * (step * (f32)i));
+    }
+}
 #endif
 extern u8 lbl_80270658[];
 extern u32 lbl_8047AB30;
