@@ -676,6 +676,13 @@ extern u32 lbl_8047D7EC;
 extern u32 lbl_8047D894;
 extern u32 lbl_8047D800;
 extern u32 lbl_8047D7A0;
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void heroMoveSetEventList();
+extern void sin();   /* MSL trig (renamed) — referenced by asm incs */
+extern void cos();   /* MSL trig (renamed) — referenced by asm incs */
+extern void GScolsy2UtilGetCpPlanePoint();
+extern void GScolsy2UtilChkInTri();
+extern void GSmodelPopState();
 #if 1
 asm void fn_8018E9B4(void) {
 #include "src/game/people/people_fn_8018E9B4.inc"
@@ -1117,6 +1124,11 @@ asm void fn_80188984(void) {
 #else
 void fn_80188984(void) { /* TODO: match -- 368 bytes at 0x80188984 */ }
 #endif
+
+/* SDA data labels referenced by asm incs (symbolmap port), typed by load width */
+extern f32 lbl_8047D8A0;
+extern u8  lbl_8047B1F0[];
+extern f32 lbl_8047D8B0;
 
 #pragma push
 #pragma optimization_level 0
