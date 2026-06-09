@@ -18,6 +18,12 @@
       "desc": "Name confirmed (WES) -> opening desert/Snagem-hideout cutscene begins.",
       "floor_id": "0x03A0",
       "reached_from": "name_entry"
+    },
+    {
+      "name": "outskirt_stand",
+      "desc": "First playable overworld scene: The Outskirt Stand (copper train-car diner), Wes controllable. This is the scene the PC port renders as its New Game start (S1_out) -> prime Phase 4 parity target.",
+      "floor_id": "0x0001",
+      "reached_from": "intro_start"
     }
   ]
 }
