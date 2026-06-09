@@ -144,6 +144,13 @@
 extern void  fn_800DD970(const char* fmt, ...);     /* OSReport */
 extern void* memset(void* dst, int val, u32 size);
 
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void GSbezierCalculateVector();
+extern void GSfilterCreate();
+extern void GSmaterialSetFlags();
+extern void sin();   /* MSL trig (renamed) — referenced by asm incs */
+extern void cos();   /* MSL trig (renamed) — referenced by asm incs */
+
 /* GSmem allocator */
 extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
