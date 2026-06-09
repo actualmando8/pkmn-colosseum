@@ -133,6 +133,19 @@ extern u16  lbl_8047AEA0;
 extern void fn_801FBD58(u16 handle);
 extern void fn_801FBD28(void);
 extern u16  lbl_8047AEA0;
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void GSmsgAdjustAlign();
+extern void _dbgMenuGetLink__Fl();
+extern void _koukaOneExec__FUlPvPvPl();
+extern void _msgctrlSideName__FP15FightOutPokemonUc();
+extern void fightSideGetStatus();
+extern void gamedataAttestCreate();
+extern void gamedataAttestInit();
+extern void gamedataGetStatus();
+extern void gamedataSetStatus();
+extern void itemGetStatus();
+extern void statusGetStatus();
+extern void statusSetStatus();
 /* Forward declarations for self-referencing asm blocks */
 extern void* fn_80104704(s32 key);
 extern void* fn_80134228(s32 offset);
