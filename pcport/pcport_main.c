@@ -6396,6 +6396,7 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     if (skinIsolateSkip) {
                         /* isolation: suppress this mesh's draw */
                     } else if ((getenv("PCPORT_SKIN") != NULL || g_pcEnterFieldWalk ||
+                        getenv("PCPORT_FIELD_WALK") != NULL ||
                         g_pcBattleRenderSkin) &&
                         ((translatedPObj.pobj.flags >> 12) & 3u) == 2u &&
                         RenderSkinnedPObj(a, pobjOffset, &translatedPObj, rootJoint, cam,
@@ -9376,8 +9377,11 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
                             int frameCap, int colWire, const f32 spawn[3]) {
     PADStatus pads[4];
     f32 ppos[3] = { 0.0f, 0.0f, 0.0f };
-    f32 pyaw = 0.0f;
-    f32 camYaw = 0.0f, camPitch = 0.30f;
+    /* pyaw=PI rotates the ken_b1 model 180 degrees (model faces -Z at yaw=PI).
+     * camYaw=0 puts the camera at +Z behind him, looking toward -Z (toward the
+     * Outskirt Stand diner), matching the real game's S1_out entry framing. */
+    f32 pyaw = 3.14159265f;
+    f32 camYaw = 0.0f, camPitch = 0.20f;
     const f32 up[3] = { 0.0f, 1.0f, 0.0f };
     const f32 ORBIT = 0.04f;
     const f32 PLAYER_H = 30.0f, PLAYER_R = 10.0f;
@@ -9387,8 +9391,12 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     const char* runSpeedEnv = getenv("PCPORT_RUN_SPEED");
     const char* runThreshEnv = getenv("PCPORT_RUN_THRESHOLD");
     const char* deadzoneEnv = getenv("PCPORT_WALK_DEADZONE");
-    f32 camDist = (dEnv != NULL) ? (f32)atof(dEnv) : 150.0f;
-    f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 60.0f;
+    /* Camera defaults tuned to match the real game's Outskirt Stand entry framing:
+     * Wes seen from behind at roughly head height, moderate distance.
+     * camDist=75, camHigh=25, camPitch=0.20 rad: eye ~38 units above floor (just
+     * above Wes's head PLAYER_H=30, scale 1.8), 73 units behind at pitch=0.20. */
+    f32 camDist = (dEnv != NULL) ? (f32)atof(dEnv) : 75.0f;
+    f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 25.0f;
     f32 walkSpeed = (walkSpeedEnv != NULL && walkSpeedEnv[0]) ? (f32)atof(walkSpeedEnv) : 4.0f;
     f32 runSpeed = (runSpeedEnv != NULL && runSpeedEnv[0]) ? (f32)atof(runSpeedEnv) : 7.0f;
     f32 runThreshold = (runThreshEnv != NULL && runThreshEnv[0]) ? (f32)atof(runThreshEnv) : 0.85f;
@@ -9412,7 +9420,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     if (walkDeadzone < 0.0f) walkDeadzone = 0.0f;
 
     memset(pads, 0, sizeof(pads));
-    if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk) {
+    if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk ||
+        getenv("PCPORT_FIELD_WALK") != NULL) {
         PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
     }
     motionMap = PCPort_LoadFieldMotionMap();
@@ -9548,11 +9557,11 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         BuildViewMatrixLookAt(eye, interest, up, g_engTitleCamera.viewMatrix);
 
         PCPort_EngineTitleRenderFrame();
-        /* Player avatar: the real skinned Wes model (PCPORT_FIELD_WES, needs
-         * PCPORT_SKIN), else the placeholder box. The model is ~17 units tall in
-         * its own space; PCPORT_WES_SCALE maps it to the room scale (PLAYER_H=30),
-         * PCPORT_WES_YOFF lifts the feet to the floor, PCPORT_WES_YAWOFF aligns
-         * its facing with the move direction. */
+        /* Player avatar: the real skinned Wes model (ken_b1), loaded whenever
+         * PCPORT_FIELD_WALK or PCPORT_FIELD_WES is set (or g_pcEnterFieldWalk).
+         * The model is ~17 units tall in its own space; PCPORT_WES_SCALE maps it
+         * to the room scale (PLAYER_H=30), PCPORT_WES_YOFF lifts the feet to the
+         * floor, PCPORT_WES_YAWOFF aligns its facing with the move direction. */
         if (g_engCharLoaded) {
             const char* sEnv = getenv("PCPORT_WES_SCALE");
             const char* yEnv = getenv("PCPORT_WES_YOFF");
