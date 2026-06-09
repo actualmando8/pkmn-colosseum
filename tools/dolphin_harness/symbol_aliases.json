@@ -1,0 +1,7 @@
+{
+  "gsFloorCurrentId": {"addr": "0x80478B18", "size": 4},
+  "gsFloorState": {"addr": "0x8047ACD8", "size": 4},
+  "gsFloorNextState": {"addr": "0x8047ACDC", "size": 4},
+  "gsDebugInstrBar": {"addr": "0x8047B420", "size": 1},
+  "gsDebugProcessBar": {"addr": "0x8047ACF0", "size": 4}
+}
