@@ -97,6 +97,10 @@
  * External declarations
  * ========================================================================= */
 
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
+extern void menuSubCalcColor();
+
 /* NPC/People system */
 extern void  fn_80109220(void* npc, s32 direction);  /* Set NPC facing */
 extern void* fn_8005D934(s16 npcId);                  /* Lookup NPC data by ID */
@@ -1636,6 +1640,7 @@ extern u32 lbl_8047A2A4;
 extern u32 lbl_8047A2A8;
 extern u32 lbl_8047A2AC;
 extern u32 lbl_8047A2B0;
+u32 fn_8000DAB0(void); /* forward decl: referenced by fn_8000D710 asm inc */
 #if 1
 asm void fn_8000D710(void) {
 #include "src/game/gs_npc_interact_fn_8000D710.inc"
