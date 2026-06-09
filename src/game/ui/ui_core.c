@@ -129,6 +129,11 @@ extern void fn_800FF56C();
 extern void fn_800FF58C();
 extern void fn_801022B8();
 extern void menuCloseSync();
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void floorChangePos();
+extern void GScharCmp();
+extern void menuSubOpenYesNo();
+extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(); /* renamed fn_800626CC */
 extern void fn_80102510();
 extern void fn_80102568();
 extern void fn_80102620();
