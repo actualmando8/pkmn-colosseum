@@ -7307,15 +7307,9 @@ void fn_8022E6F0(u32 r3, u8 r4)
     extern void fn_802653FC();
   u8 cVar8;
   u32 uVar1;
-  u32 uVar2;
   u16 uVar6;
-  u32 uVar3;
   u8 cVar9;
-  u16 sVar7;
-  u32 uVar4;
-  u32 uVar5;
-  u32 uVar10;
-  
+
   fn_801F54A4(0,0,0x14,0);
   if (r3 != 0) {
     cVar8 = fn_802062FC(r3);
@@ -7323,11 +7317,14 @@ void fn_8022E6F0(u32 r3, u8 r4)
       fn_80205B8C(r3);
       cVar8 = fn_8011FC74();
       if (cVar8 != 0) {
+        u32 uVar4;
+        u32 uVar5;
         uVar1 = (int)fn_8012640C(r3,0,0xd6,0);
         cVar8 = fn_80204A10(r3);
         if (cVar8 == 1) {
           cVar8 = (int)fn_8012640C(uVar1,0,0xd1,0);
           if (cVar8 == 0) {
+            u32 uVar2;
             uVar2 = fn_80205B8C(r3);
             fn_8011F910(uVar2,0,0);
             cVar8 = fn_801FECD4(r3);
@@ -7344,12 +7341,16 @@ void fn_8022E6F0(u32 r3, u8 r4)
           }
         }
         else if (r4 == 0) {
+          u32 uVar3;
+          u32 uVar2;
           uVar2 = fn_801F2A7C(0);
           uVar3 = fn_801FB1C0(uVar2,0,0x4c,0);
           cVar8 = fn_801F7B70(uVar2);
           cVar9 = (int)fn_8012640C(uVar1,0,0xd1,0);
           if (((cVar9 == 0) && (cVar9 = fn_801F54A4(0,0,0x2b,0), cVar9 == 1)) &&
              (uVar3 != 0)) {
+            u16 sVar7;
+            u32 uVar10;
             sVar7 = fn_801F54A4(0,0,0xd,0);
             if (sVar7 != 0x11) {
               uVar10 = 0;
