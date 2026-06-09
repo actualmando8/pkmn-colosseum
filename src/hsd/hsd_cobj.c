@@ -13,6 +13,12 @@
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_wobj.h"
 
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void C_MTXLookAt();
+extern void C_MTXPerspective();
+extern void OSFillFPUContext();
+extern void PSMTXInverse();
+
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
 
