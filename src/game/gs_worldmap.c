@@ -850,7 +850,6 @@ extern void menuCloseSync(void);
 extern void menuSubOpenYesNo(void);
 extern void pcboxSetPokemonBoxName(void);
 extern void GScharCmp(void);
-extern void itemGetStatus(void);
 extern void menuModelSetMotion(void);
 extern void cameraWaitSyncAnime(void);
 extern f32 sin(f32);
@@ -2216,7 +2215,7 @@ s32 fn_8002AE9C(void* r3, u8* r4) {
 extern void fn_801440A0(u32);
 extern u32 fn_80144014(void);
 extern u32 fn_80129BC8(s32, u32, u16*, s32, s32, s32, s32);
-extern u32 fn_80142CF4(u32, s32, s32, s32);
+extern u32 itemGetStatus(u32, s32, s32, s32);
 #if 0
 asm void fn_8002AEF8(void) {
 #include "src/game/gs_worldmap_fn_8002AEF8.inc"
@@ -2248,8 +2247,8 @@ s32 fn_8002AEF8(void* r3, u8* r4) {
         r27 = fn_80129BC8(0, fn_80144014(), &stack, 0, 0, 0, 0);
         r28 = 0;
         while (r28 < (s32)stack) {
-            if ((u16)fn_80142CF4(r27, 0, 0x1b, 0) == (u16)r31) {
-                r29 += (s32)fn_80142CF4(r27, 0, 0x1c, 0);
+            if ((u16)itemGetStatus(r27, 0, 0x1b, 0) == (u16)r31) {
+                r29 += (s32)itemGetStatus(r27, 0, 0x1c, 0);
             }
             r28++;
             r27 += 4;

@@ -206,7 +206,7 @@ extern void  fn_801EF644(s32 result);
 
 /* Math */
 extern f32   fn_800EC53C(void);               /* Get distance */
-extern double sin(double);
+extern f64 sin(f32);
 
 /* Named asm symbols (used in inline asm .inc files) */
 extern void menuModelSetMotion(void);
@@ -1420,7 +1420,6 @@ extern void fn_801026A4(void);
 extern void fn_8011394C(void);
 extern void fn_800D3074(void);
 extern void fn_800EF5FC(void);
-extern void fn_800DC390(void);
 extern void fn_8010264C(void);
 extern u32 lbl_80478DDC;
 extern u32 lbl_8047A368;
@@ -1446,7 +1445,7 @@ void fn_80025730(void) {
     extern void fn_8005D8F8();
     extern void fn_8005D934();
     extern void fn_800D3074();
-    extern void fn_800DC390();
+    extern void GSgfxBeginBackFBCapture();
     extern void fn_800EF5FC();
     extern void fn_80102510();
     extern void fn_8010264C();
@@ -1603,7 +1602,7 @@ L_80025910:
         lbl_8047A388 = r3;
         r4 = (u32)fn_80025F74;
         r5 = 0x0;
-        fn_800DC390();
+        GSgfxBeginBackFBCapture();
         while (1) {
             tmp = lbl_8047A3A8;
             if (tmp != 0) break;
@@ -1791,7 +1790,7 @@ void fn_80025A7C(void) { }
  *        lbl_8047A3A4 -= lbl_8047B8C8; clamp >= 0
  *   4. Return 1 if either scale is still > 0 (quad still visible), else 0.
  *
- * Used by fn_800DC390 as a particle callback; re-registered until it
+ * Used by GSgfxBeginBackFBCapture as a particle callback; re-registered until it
  * returns 0 (fully faded).
  *
  * Status: 90.6% matched. Remaining diffs: FP register swaps in the
@@ -2065,7 +2064,7 @@ s32 fn_80025F74(void) {
  *   4. Per lbl_8047A380 (debug flag?), pick one of two frame-sequence tables
  *      (lbl_80478DEC + idx*0x10), read 2 u32s, advance index (wrap > 9).
  *   5. Reset cursor scales: lbl_8047A3A4 = lbl_8047A3A0 = lbl_8047B8A8 (0).
- *   6. Register fn_80025A80 as a particle callback (fn_800DC390).
+ *   6. Register fn_80025A80 as a particle callback (GSgfxBeginBackFBCapture).
  *   7. Start BGM via fn_80176E0C, then run two timing delay loops
  *      (fn_800F0308 + fn_800D3088 accumulator vs 1 or 0xAE target).
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
@@ -2137,7 +2136,7 @@ void fn_80025F84(void) {
     extern u32 fn_800C46B0(f64);
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
-    extern void fn_800DC390(u32, void*, s32);
+    extern void GSgfxBeginBackFBCapture(u32, void*, s32);
     extern void fn_800E3C00(u32, s32);
     extern void fn_800E3C08(u32, u32);
     extern void fn_800E3C94(u32, s32);
@@ -2218,7 +2217,7 @@ void fn_80025F84(void) {
         lbl_8047A3A4 = lbl_8047B8A8;
         lbl_8047A3A0 = lbl_8047B8A8;
         lbl_8047A38C = fn_800EF5FC(0, 0, 0x44, 0, 0);
-        fn_800DC390(lbl_8047A38C, (void*)fn_80025A80, 0);
+        GSgfxBeginBackFBCapture(lbl_8047A38C, (void*)fn_80025A80, 0);
         fn_80176E0C(fn_80113F48(), frame_b, 0, 0);
 
         delay = 1;
@@ -2321,7 +2320,6 @@ void fn_8002060C(void) {
 /* fn_80020618 - 0x80020618 | size: 0x304 */
 extern void fn_80105624(void);
 extern s32 fn_80135168(s32, s32);
-extern f64 fn_800CE148(f32);
 extern void fn_80166CC0(void);
 extern void fn_800F78A4(s32, s32, s32, s32, s32);
 extern void fn_80135030(void);
@@ -2366,7 +2364,7 @@ asm void fn_8002092C(void) {
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
@@ -2391,7 +2389,7 @@ asm void fn_800209BC(void) {
 void fn_800209BC(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
@@ -2416,7 +2414,7 @@ asm void fn_80020A4C(void) {
 void fn_80020A4C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
-    f2 = (f32)fn_800CE148(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
+    f2 = (f32)sin(lbl_8047B874 * *(f32*)(lbl_803A1FC8 + 0x24));
     f0 = lbl_8047B88C * f2 + lbl_8047B888;
     *(f32*)(r4 + 0x6c) = f0;
     *(f32*)(r4 + 0x68) = f0;
