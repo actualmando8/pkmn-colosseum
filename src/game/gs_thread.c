@@ -2031,14 +2031,14 @@ s32 fn_800FC1D0(u32* item) {
     u32* p;
 
     head = (u32*)lbl_80478B08;
+    if ((u32*)head[2] == NULL) return -1;
     p = (u32*)head[2];
-    if (p == NULL) return -1;
     while (p != NULL) {
         if (p == item) {
             if (p[3] != 0) ((u32*)p[3])[2] = p[2];
             else head[2] = p[2];
             if (p[2] != 0) ((u32*)p[2])[3] = p[3];
-            return 0;
+            break;
         }
         p = (u32*)p[2];
     }
