@@ -98,7 +98,16 @@ diverges. Band size = number of values live across a call, only weakly C-steerab
   the **wrong direction** — the target was built with a compiler whose stmw threshold is
   ~2-3 saved regs, so it wants *more* stmw than CW 1.3 emits (≥5), and `off` removes stmw
   entirely. No CW flag *lowers* the threshold. `-inline {off,noauto,deferred,auto}` and
-  `-O3,p/-O4,s` were inert. **W3 is a genuine wall, not a flag artifact.** Do not re-test.
+  `-O3,p/-O4,s` were inert. ~~**W3 is a genuine wall, not a flag artifact.** Do not re-test.~~
+- **W3 DISSOLVED 2026-06-10 (pokemon.c campaign).** The 2026-05-31 sweep result was wrong:
+  **`-O4,s` (optimize-for-size) emits `stmw` at 2-3 saved regs**, exactly the target idiom.
+  Verified on a minimal repro (same fn: `,p` → `stw/stw`, `,s`/plain `-O4` → `stmw r30`,
+  identical objects for `-O4` and `-O4,s`) AND TU-wide: switching `src/game/pokemon.c` to
+  `-O4,s` in `config/GC6E01/compile_config.json` took 84→86 byte-exact, **22 improved,
+  0 regressed**. Per-function form: `#pragma push` / `#pragma optimize_for_size on` /
+  `#pragma pop` flips it under a `,p` TU. Compiler version is NOT the axis (1.1→2.7
+  identical at `,p`). → Re-test colosseum_script/battle/event with a per-TU `-O4,s`
+  sweep gated on 0 regressions.
 - *Triage:* residual concentrated in `stmw/lmw` vs `stw…/lwz…` in prologue/epilogue.
 
 ### W4 — carry-vs-sign boolean materialize
@@ -236,6 +245,24 @@ All 122 functions in the 75–85% objdiff range (from `walltriage_out.json`) wer
 - All colosseum_script.c functions (92 in this range) are PLAIN-C with heavy W1/W2 — no `#if 0` wrappers to toggle.
 
 ---
+
+## 2026-06-10 — pokemon.c campaign walls (84→136+/185 byte-exact)
+
+W3 DISSOLVED for this TU (see W3 section: `-O4,s`). Walls logged from the campaign:
+
+| function | best% | class | residual |
+|---|---|---|---|
+| fightSideGetStatus | 99.82 | W6 | anonymous vs `jumptable_8037564C` (instructions byte-exact; in equivalent.txt) |
+| fn_801F54A4 (PokemonGet) | 98.8 | W1+W6 | pkm/a16 r30↔r31 coloring pair (8+ shape variants swept) + jumptable name; real C in #else branch, wrapper stays |
+| fn_801F2F3C / 3178 / 3074 / 32EC / 3430 | 97–99 | W1 | param-vs-loop-counter pair swaps (param gets high reg in ours, low in target) |
+| fn_801F2020 / 221C / 2434 / 2350 / 1C18 / 1DBC | 86–99.7 | W1 | r29/r30/r31 pair/cycle swaps |
+| fn_801F4220 / 4354 / 47B4 / 75F8 | 84–98.6 | new: **unfolded-branch** | target keeps `bne+b` / `blt+b` two-branch where CW folds to single inverted branch; goto/else-empty/one-case-switch/pragma all folded back |
+| fn_801F7090 / 7174 / 6B54 / 6F38 / 6FD4 / 61EC | 90–98.9 | W1 | loop-var band shifts; 61EC: 15-reg fn puts params at TOP regs |
+| fn_801F4718 / 4860 | 98.5 | new: **zero-init li-vs-mr** | target `li rA,0; mr rB,rA` (copy of zero) vs CW two `li`; `i = n` source form did not reproduce |
+
+The W1 entries are candidates if a per-TU allocator lever ever lands; the
+unfolded-branch and li-vs-mr classes look like a *different original compiler
+build/patch-level* fingerprint — flag/version sweeps were inert.
 
 ## How to use this ledger
 - **Before** attacking a near-miss: check it isn't already logged here. If it is, skip.
