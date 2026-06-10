@@ -2970,17 +2970,21 @@ int fn_8020505C(void)
   return iVar1;
 }
 #pragma push
-#pragma optimization_level 4
-#pragma optimizewithasm off
+#pragma peephole on
 #if 0
 asm void fn_802050F4(void) {
 #include "src/game/colosseum_event_fn_802050F4.inc"
 }
 #else
 void* fn_802050F4(void* ctx) {
-    void* p = fn_8012640C(ctx, 0, 0xFE, 0);
-    if (p == 0) return (void*)-0x80;
-    return fn_801F0928(p);
+    void* p;
+    p = fn_8012640C(ctx, 0, 0xFE, 0);
+    if (p == NULL) {
+        p = (void*)-0x80;
+    } else {
+        p = fn_801F0928(p);
+    }
+    return p;
 }
 #endif
 #pragma pop
