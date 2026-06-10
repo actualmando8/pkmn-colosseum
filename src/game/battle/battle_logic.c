@@ -2366,13 +2366,15 @@ void fn_801E11F0(void) {
     extern void fn_800FE6DC(u32);
     u32 *ptr;
     u32 i;
+    u32 entry;
     ptr = lbl_80467CF8;
     i = 0;
     lbl_8047B424 = i;
     lbl_8047B420 = (u8)i;
     while (i < lbl_8047B42C) {
-        if (*ptr != 0) {
-            fn_800FE6DC(*ptr);
+        entry = *ptr;
+        if (entry != 0) {
+            fn_800FE6DC(entry);
         }
         i++;
         ptr++;
@@ -2745,8 +2747,21 @@ void fn_801E16F0(void) {
     extern int fn_801E4724(void);
     s32 r3b;
     u32 r3;
+    u32 tmp;
 
-    if (!(lbl_8047B440 != 0 && lbl_8047B441 != 0)) return;
+    if (lbl_8047B440 == 0) {
+        goto false_case;
+    }
+    if (lbl_8047B441 != 0) {
+        goto true_case;
+    }
+false_case:
+    tmp = 0;
+    goto test_case;
+true_case:
+    tmp = 1;
+test_case:
+    if ((u8)tmp == 0) return;
     fn_801E386C();
     r3b = fn_801E38D8();
     if (r3b == 4) return;
