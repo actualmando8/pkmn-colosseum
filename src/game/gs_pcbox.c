@@ -4592,7 +4592,7 @@ extern u8 lbl_80266918[];
 extern u32 lbl_8047A2DC;
 extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2B8;
-extern void fn_80019754(void);
+extern s32 fn_80019754(void* arg);
 #if 1
 asm s32 fn_80018594() {
 #include "src/game/gs_pcbox_fn_80018594.inc"

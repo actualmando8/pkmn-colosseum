@@ -13,6 +13,7 @@
  * serial communication for the TRK debugger.
  */
 
+extern void DBGWrite(); /* renamed symbol referenced by asm incs */
 extern s32 OSDisableInterrupts(void);
 extern void OSRestoreInterrupts(s32 enabled);
 extern void __OSMaskInterrupts(u32 mask);

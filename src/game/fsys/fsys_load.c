@@ -21,6 +21,7 @@
  * External SDK / engine functions
  * =================================================================== */
 
+extern void ARQPostRequest(); /* renamed symbol referenced by asm incs */
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 

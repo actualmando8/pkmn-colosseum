@@ -3,6 +3,13 @@
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSTime.h"
 #include "dolphin/os/OSContext.h"
+extern void fn_800AA8D4(); /* referenced by asm incs */
+extern void OSSetWirelessID(); /* renamed symbol referenced by asm incs */
+extern void PADOriginCallback();
+extern void PADProbeCallback();
+extern void SPEC0_MakeStatus();
+extern void SPEC1_MakeStatus();
+extern void UpdateOrigin();
 #include "dolphin/gx/GX.h"
 
 /*
