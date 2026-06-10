@@ -2013,15 +2013,17 @@ void fn_800E5790(void* obj) {
     *(u16*)((u8*)obj + 0x152) = (u16)(count2 - 1);
     if (*(u16*)((u8*)obj + 0x152) != 0) return;
     {
+        void** r31;
         s32 r30 = *(u16*)((u8*)obj + 0x150);
         s32 r29 = 0;
-        void** r31 = *(void***)((u8*)obj + 0x14c);
+        r31 = *(void***)((u8*)obj + 0x14c);
         while (r29 < r30) {
-            void* p = r31[r29];
+            void* p = *r31;
             if (p != NULL) {
                 fn_800DF608(p);
             }
             r29++;
+            r31++;
         }
         {
             u16 r29_h = *(u16*)((u8*)obj + 0x154);
