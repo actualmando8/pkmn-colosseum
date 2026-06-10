@@ -23,7 +23,7 @@ extern void OSReport(const char* fmt, ...);
 
 /* Forward declarations for EXI2 internal functions */
 extern void fn_800CED58(u32 type, void* buf, u32 len);  /* SIEnablePolling - in SI.c */
-extern void fn_800CEE34(u32 type, void* buf, u32 len);  /* SIDisablePolling - in SI.c */
+extern void DBGRead(u32 type, void* buf, u32 len);  /* SIDisablePolling - in SI.c */
 extern void fn_800CEF10(void* resp);  /* SIGetResponse - in SI.c */
 extern void fn_800CEC30(void);  /* SISetCommand - in SI.c */
 extern void fn_800CEC70(void);  /* SIGetCommand - in SI.c */
@@ -159,7 +159,7 @@ asm void fn_800CEA3C(void) {
 s32 fn_800CEA3C(void* buf, s32 len) {
     s32 enabled;
     enabled = OSDisableInterrupts();
-    fn_800CEE34(((lbl_8047AA30 & 0x10000) ? 0x1000 : 0) + 0x1E000, buf,
+    DBGRead(((lbl_8047AA30 & 0x10000) ? 0x1000 : 0) + 0x1E000, buf,
                 (len + 3) & ~3);
     lbl_8047AA34 = 0;
     lbl_8047AA3C = 0;

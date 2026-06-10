@@ -4584,8 +4584,8 @@ void fn_8001FD48(void) {
 extern void fn_80143DE4(void);
 extern void fn_80143DCC(void);
 extern void fn_80017CB8(void);
-extern void menuCloseSync();
 extern void fn_8012959C(void);
+extern void menuCloseSync(); /* referenced by asm incs */
 extern u32 lbl_8047A2E0;
 extern u32 lbl_8047A2D8;
 extern u8 lbl_80266918[];
@@ -5171,7 +5171,7 @@ s32 fn_80019754(void* arg) {
     extern s32 fn_801046B8(void);
     extern s32 fn_801026A4(s32, s32, s32, s32, s32, s32, void*, ...);
     extern void fn_80102510(s32);
-    extern void fn_80102428(s32, s32);
+    extern void menuCloseSync(s32, s32);
     u8* e;
     s16* p4;
     s16* p8;
@@ -5217,7 +5217,7 @@ s32 fn_80019754(void* arg) {
     r4 = fn_801046B8();
     sel = fn_801026A4(0x5f, r4, 0, 0, 1, 1, &arg);
     fn_80102510(0x5f);
-    fn_80102428(0x5f, 1);
+    menuCloseSync(0x5f, 1);
     if (sel >= 0 && sel < count_plus_one) {
         return ids[sel];
     }
