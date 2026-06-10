@@ -751,7 +751,7 @@ extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
 extern void fn_800D7940(void);
 extern void fn_800D7A70(u32);
 extern void fn_800DB098(void);
-extern void fn_800DB758(u32);
+extern void fn_800DB758(u16);
 extern void fn_800DD128(u8*);
 extern void fn_800DE09C(void);
 extern void fn_800DE128(void);
@@ -3218,7 +3218,7 @@ asm void fn_800DB758(void) {
 #include "src/game/gs_render_fn_800DB758.inc"
 }
 #else
-void fn_800DB758(u32 vertCount)
+void fn_800DB758(u16 vertCount)
 {
     u32 state;
     u32 obj;
@@ -3254,6 +3254,8 @@ void fn_800DB758(u32 vertCount)
             *(u8*)*(u32*)(state + 0x484) = 0xA0;
             break;
         case 6:
+            *(u8*)*(u32*)(state + 0x484) = 0x80;
+            break;
         case 7:
             *(u8*)*(u32*)(state + 0x484) = 0x80;
             break;
@@ -3263,11 +3265,11 @@ void fn_800DB758(u32 vertCount)
     p = *(u8**)(state + 0x484);
     *(u32*)(state + 0x484) = (u32)(p + 1);
     obj = *(u32*)(state + 0x480);
-    *p |= *(u8*)(*(u32*)(obj + 0xC) + 7);
+    *p = (u8)(*p | *(u32*)(*(u32*)(obj + 0xC) + 4));
 
     state = lbl_8047AA80;
     p = *(u8**)(state + 0x484);
-    *(u16*)p = (u16)vertCount;
+    *(u16*)p = vertCount;
     p += 2;
     state = lbl_8047AA80;
     *(u32*)(state + 0x484) = (u32)p;
