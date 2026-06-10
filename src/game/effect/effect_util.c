@@ -62,7 +62,7 @@ extern u8   fn_80102620(u32 objID);
 extern void fn_80102510(u32 arg1);
 
 /* Forward declarations for converted functions */
-void fn_80131CE8(u32 arg1, u32 arg2);
+void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2);
 void fn_80133E6C(void);
 
 /* 0x58 | fn_8013151C | leaf_multi_output */
@@ -134,22 +134,19 @@ extern void fn_801FBD58(u16 handle);
 extern void fn_801FBD28(void);
 extern u16  lbl_8047AEA0;
 /* renamed symbols referenced by asm incs (symbolmap port) */
-extern void GSmsgAdjustAlign();
 extern void _dbgMenuGetLink__Fl();
 extern void _koukaOneExec__FUlPvPvPl();
-extern void _msgctrlSideName__FP15FightOutPokemonUc();
 extern void fightSideGetStatus();
 extern void gamedataAttestCreate();
 extern void gamedataAttestInit();
 extern void gamedataGetStatus();
 extern void gamedataSetStatus();
-extern void itemGetStatus();
 extern void statusGetStatus();
 extern void statusSetStatus();
 /* Forward declarations for self-referencing asm blocks */
 extern void* fn_80104704(s32 key);
 extern void* fn_80134228(s32 offset);
-/* fn_80131CE8 already declared at top with typed params */
+/* _msgctrlSideName__FP15FightOutPokemonUc already declared at top with typed params */
 extern void fn_80133E6C(void);
 extern s32 fn_80134258(void* obj);
 extern void* fn_80135CD0(void* ptr);
@@ -592,7 +589,7 @@ u32 fn_80131BE8(void) { return lbl_8047AE24; }
 /* 0x80131BF0 | 0x8 | sda_getter */
 u32 fn_80131BF0(void) { return lbl_8047AE20; }
 
-/* 0x80131BF8 | 0x28 -- fn_80131CE8(lbl_8047AE4C, 2) */
+/* 0x80131BF8 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2) */
 extern u32 lbl_8047AE4C;
 extern u32 lbl_8047AE4C;
 #if 0
@@ -602,12 +599,12 @@ asm void fn_80131BF8(void) {
 #else
 #pragma peephole off
 void fn_80131BF8(void) {
-    fn_80131CE8(lbl_8047AE4C, 2);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE4C, 2);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C20 | 0x28 -- fn_80131CE8(lbl_8047AE48, 1) */
+/* 0x80131C20 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE48, 1) */
 extern u32 lbl_8047AE48;
 extern u32 lbl_8047AE48;
 #if 0
@@ -617,12 +614,12 @@ asm void fn_80131C20(void) {
 #else
 #pragma peephole off
 void fn_80131C20(void) {
-    fn_80131CE8(lbl_8047AE48, 1);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE48, 1);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C48 | 0x28 -- fn_80131CE8(lbl_8047AE44, 0) */
+/* 0x80131C48 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE44, 0) */
 extern u32 lbl_8047AE44;
 extern u32 lbl_8047AE44;
 #if 0
@@ -632,12 +629,12 @@ asm void fn_80131C48(void) {
 #else
 #pragma peephole off
 void fn_80131C48(void) {
-    fn_80131CE8(lbl_8047AE44, 0);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE44, 0);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C70 | 0x28 -- fn_80131CE8(lbl_8047AE1C, 2) */
+/* 0x80131C70 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE1C, 2) */
 extern u32 lbl_8047AE1C;
 extern u32 lbl_8047AE1C;
 #if 0
@@ -647,12 +644,12 @@ asm void fn_80131C70(void) {
 #else
 #pragma peephole off
 void fn_80131C70(void) {
-    fn_80131CE8(lbl_8047AE1C, 2);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE1C, 2);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131C98 | 0x28 -- fn_80131CE8(lbl_8047AE18, 1) */
+/* 0x80131C98 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE18, 1) */
 extern u32 lbl_8047AE18;
 extern u32 lbl_8047AE18;
 #if 0
@@ -662,12 +659,12 @@ asm void fn_80131C98(void) {
 #else
 #pragma peephole off
 void fn_80131C98(void) {
-    fn_80131CE8(lbl_8047AE18, 1);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE18, 1);
 }
 #pragma peephole on
 #endif
 
-/* 0x80131CC0 | 0x28 -- fn_80131CE8(lbl_8047AE14, 0) */
+/* 0x80131CC0 | 0x28 -- _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE14, 0) */
 extern u32 lbl_8047AE14;
 extern u32 lbl_8047AE14;
 #if 0
@@ -677,7 +674,7 @@ asm void fn_80131CC0(void) {
 #else
 #pragma peephole off
 void fn_80131CC0(void) {
-    fn_80131CE8(lbl_8047AE14, 0);
+    _msgctrlSideName__FP15FightOutPokemonUc(lbl_8047AE14, 0);
 }
 #pragma peephole on
 #endif
@@ -685,7 +682,7 @@ void fn_80131CC0(void) {
 /* 0x80131CE8 | 0x21C */
 #pragma push
 #pragma optimization_level 1
-void fn_80131CE8(u32 arg1, u32 arg2) {
+void _msgctrlSideName__FP15FightOutPokemonUc(u32 arg1, u32 arg2) {
     extern void fn_800FA280();
     extern void fn_80132A38();
     extern void fn_801F0058();
@@ -2966,7 +2963,7 @@ asm void fn_80134420(void) {
 u16 fn_80134420(void* base, u16 effect_id) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     void* cur;
     void* entry;
     s16 idx;
@@ -2979,7 +2976,7 @@ u16 fn_80134420(void* base, u16 effect_id) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -2988,7 +2985,7 @@ u16 fn_80134420(void* base, u16 effect_id) {
     if (entry == 0) {
         val = 0xFFFF;
     } else if (fn_801429E8(entry)) {
-        val = fn_80142CF4(entry, 0, 0x1c, 0) & 0xFFFF;
+        val = itemGetStatus(entry, 0, 0x1c, 0) & 0xFFFF;
     } else {
         val = 0xFFFF;
     }
@@ -3007,7 +3004,7 @@ asm void fn_80134584(void) {
 u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
@@ -3016,7 +3013,7 @@ u16 fn_80134584(void* base, u16 effect_id, u16 r5) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -3036,7 +3033,7 @@ asm void fn_8013467C(void) {
 u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801440A0(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 fn_80142CF4(void*, u32, u32, u32);
+    extern u16 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)fn_80129280(0, 3); }
@@ -3045,7 +3042,7 @@ u16 fn_8013467C(void* base, u16 effect_id, u16 r5) {
     cur = (u8*)base;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
-            if (fn_80142CF4((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
+            if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
@@ -4200,7 +4197,7 @@ u32 fn_80135D10(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5) {
 #endif
 
 /* 0x80135E44 | 0x114 */
-extern u32 fn_80142CF4();
+extern u32 itemGetStatus();
 extern u32 fn_8012A5B0();
 extern u32 fn_8012640C();
 extern u32 fn_8011BEB4();
@@ -4224,7 +4221,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 3:
         return fn_8012A5B0(arg1, arg3, arg4);
     case 4:
-        return fn_80142CF4(arg1, arg2, arg3, arg4);
+        return itemGetStatus(arg1, arg2, arg3, arg4);
     case 5:
         return fn_8012640C(arg1, arg2, arg3, arg4);
     case 6:
@@ -5413,7 +5410,7 @@ u32 fn_801315EC(void* obj) {
 }
 #pragma peephole on
 #endif
-extern void fn_800FA064(void);
+extern void GSmsgAdjustAlign(void);
 #if 0
 asm void fn_80131714(void) {
 #include "src/game/effect/effect_util_fn_80131714.inc"
@@ -5424,13 +5421,13 @@ asm void fn_80131714(void) {
 #pragma peephole off
 #pragma scheduling on
 s32 fn_80131714(void* obj) {
-    extern void fn_800FA064(void*);
+    extern void GSmsgAdjustAlign(void*);
     u8* p = (u8*)obj;
     u8* stream;
     if (p[0x01] != 0) {
         stream = *(u8**)(p + 0x30);
         p[0x4a] = stream[0];
-        fn_800FA064(obj);
+        GSmsgAdjustAlign(obj);
     }
     stream = *(u8**)(p + 0x30);
     *(u32*)(p + 0x30) = (u32)(stream + 1);
