@@ -5000,7 +5000,400 @@ asm void fn_801F54A4(void) {
 #include "src/game/pokemon_fn_801F54A4.inc"
 }
 #else
-void fn_801F54A4(void) { /* TODO */ }
+/* Real C at 98.8% (instruction-equivalent): residuals are a pkm/a16
+ * r30/r31 coloring swap, the case-0xA/0xB in-place arg mask shape, and
+ * the dtk-named jumptable symbol. See tools/decomp_work/scratch/pokemon_boss.c
+ * history; flip #if only at verified 100%. */
+/* 0x801F54A4 | size: 0xD18 | PokemonGet: field dispatcher */
+s32 fn_801F54A4(u8* pkm, u32 slot, u32 field, u32 arg) {
+    extern struct Pokemon* fn_801F6738(u32);
+    extern struct Pokemon* fn_801F6B48(void);
+    extern u32 fn_80119ED0(u32);
+    extern u32 fn_8011B67C(u8*, u32);
+    extern u32 fn_8011B444(u8*, u32);
+    extern void fn_801F37B0(u8*, u32 (*)(u8*, u32*), u32*, u32);
+    extern u32 _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(u8*, u32*);
+    extern u32 fn_8012640C(u32, u32, u32, u32);
+    extern u32 fn_801EF634(void);
+    extern u8 fn_801F66D4(u8*);
+    extern u32 fn_801F66BC(u8*);
+    extern u32 fn_801F66A4(u8*);
+    extern u32 fn_801F668C(u8*);
+    extern u16 fn_801F6B00(u8*);
+    extern u16 fn_801F6AE8(u8*);
+    extern u32 fn_801F6A98(u8*);
+    extern u32 fn_801F6A7C(u8*);
+    extern u32 fn_801F6A60(u8*);
+    extern u32 fn_801F6A44(u8*);
+    extern u32 fn_801F6A28(u8*);
+    extern u32 fn_801F6A0C(u8*);
+    extern u32 fn_801F69F0(u8*);
+    extern u32 fn_801F69D4(u8*);
+    extern u32 fn_801F69B8(u8*);
+    extern u32 fn_801F699C(u8*);
+    extern u32 fn_801F6980(u8*);
+    extern u32 fn_801F6964(u8*);
+    extern u32 fn_801F6948(u8*);
+    extern u32 fn_801F692C(u8*);
+    extern u32 fn_801F6910(u8*);
+    extern u32 fn_801F68F4(u8*);
+    extern u32 fn_801F68D8(u8*);
+    extern u32 fn_801F65D4(u8*);
+    extern u32 fn_801F64F0(u8*);
+    extern u32 fn_801F64C0(u8*);
+    extern u32 fn_801F6490(u8*);
+    extern u32 fn_801F6460(u8*);
+    extern u32 fn_801F6430(u8*);
+    extern u32 fn_801F6414(void);
+    extern u32 fn_801F7404(u32);
+    extern u32 fn_801F7258(u32, u32);
+    extern u32 fn_801F981C(u32, u32);
+    extern u32 fn_8020E0F8(u32);
+    extern u32 fn_8020E0B0(u32);
+    extern u32 fn_8020E0C8(u32);
+    extern u32 fn_8020E0E0(u32);
+    extern u32 fn_8020DD80(u32);
+    extern u32 fn_8020DD44(u32);
+    extern u32 fn_8020E204(u32);
+    extern u32 fn_8020E1EC(u32);
+    extern u32 fn_8020E1D4(u32);
+    extern u32 fn_8020E1BC(u32);
+    extern u32 fn_8020E1A4(u32);
+    extern u32 fn_8020E124(u32);
+    extern u32 fn_8020E488(u32);
+    extern u32 fn_8020E248(u32);
+    extern u32 fn_8020E4B4(u32);
+    extern u32 fn_8020E470(u32);
+    extern u32 fn_8020E458(u32);
+    extern u32 fn_8020E440(u32);
+    extern u32 fn_8020E428(u32);
+    extern u32 fn_8020E410(u32);
+    extern u32 fn_8020E3F8(u32);
+    extern u32 fn_8020E3E0(u32);
+    extern u32 fn_8020E3C8(u32);
+    extern u32 fn_8020E3B0(u32);
+    extern u32 fn_8020E398(u32);
+    extern u32 fn_8020E380(u32);
+    extern u32 fn_8020E368(u32);
+    extern u32 fn_8020E350(u32);
+    extern u32 fn_8020E338(u32);
+    extern u32 fn_8020E320(u32);
+    extern u32 fn_8020E308(u32);
+    extern u32 fn_8020E2F0(u32);
+    extern u32 fn_8020E2D8(u32);
+    extern u32 fn_8020E2C0(u32);
+    extern u32 fn_8020E2A8(u32);
+    extern u32 fn_8020E290(u32);
+    extern u32 fn_8020E278(u32);
+    extern u32 fn_8020E260(u32);
+    extern u32 fn_8020E230(u32);
+    u16 f;
+
+    f = (u16)field;
+    if (f >= 0x60) {
+        return 0;
+    }
+    if (f == 0) {
+        return (s32)fn_801F6B48();
+    }
+    if (f < 8) {
+        if ((pkm = (u8*)fn_801F6738(slot)) == NULL) {
+            return 0;
+        }
+    } else if (f < 0x5F) {
+        if (pkm == NULL) {
+            if ((pkm = (u8*)fn_801F6B48()) == NULL) {
+                return 0;
+            }
+        }
+    }
+
+    switch ((u16)field) {
+    case 0x1:
+        return fn_801F6600(pkm);
+    case 0x2:
+        return fn_801F6720(pkm);
+    case 0x3:
+        return (u16)fn_801F66EC(pkm, (u8)arg);
+    case 0x4:
+        return fn_801F66D4(pkm);
+    case 0x5:
+        return fn_801F66BC(pkm);
+    case 0x6:
+        return fn_801F66A4(pkm);
+    case 0x7:
+        return fn_801F668C(pkm);
+    case 0x9: {
+        extern u8* fn_801F6B18();
+        return (s32)fn_801F6B18(pkm, arg);
+    }
+    case 0xA: {
+        u32 v;
+        arg &= 0xFFFF;
+        if ((u16)fn_80119ED0(arg) != 9) {
+            v = 0;
+        } else {
+            v = fn_8011B67C(pkm, arg);
+        }
+        return (u8)v;
+    }
+    case 0xB: {
+        u32 v;
+        arg &= 0xFFFF;
+        if ((u16)fn_80119ED0(arg) != 9) {
+            v = 0;
+        } else {
+            v = fn_8011B444(pkm, arg);
+        }
+        return (u8)v;
+    }
+    case 0xC:
+        return fn_801F6B00(pkm);
+    case 0xD:
+        return fn_801F6AE8(pkm);
+    case 0xE:
+        return (u16)fn_8020E0B0(fn_8020E0F8((u16)fn_801F54A4(pkm, 0, 0xD, 0)));
+    case 0xF:
+        return fn_801F54A4(NULL, (u16)fn_801F54A4(pkm, 0, 0xE, 0), 4, 0);
+    case 0x10:
+        return fn_801F54A4(NULL, (u16)fn_801F54A4(pkm, 0, 0xE, 0), 5, 0);
+    case 0x11:
+        return fn_8020DD80((u16)fn_801F54A4(pkm, 0, 0xD, 0));
+    case 0x12:
+        return fn_8020DD44((u16)fn_801F54A4(pkm, 0, 0xD, 0));
+    case 0x13: {
+        u32 v;
+        if ((u8)arg == 1) {
+            u32 a[4];
+            u32 b[4];
+            a[0] = 0xD;
+            a[1] = 0;
+            a[2] = 0;
+            a[3] = 0;
+            fn_801F37B0(pkm, _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, a, 0);
+            if ((u16)a[1] != 0) {
+                v = 0;
+                goto done13;
+            }
+            b[0] = 0x4D;
+            b[1] = 0;
+            b[2] = 0;
+            b[3] = 0;
+            fn_801F37B0(pkm, _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv, b, 0);
+            if ((u16)b[1] != 0) {
+                v = 0;
+                goto done13;
+            }
+        }
+        if (fn_801F54A4(pkm, 0, 0xA, 0x4E) == 1) {
+            v = 0;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x4F) == 1) {
+            v = 1;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x50) == 1) {
+            v = 2;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x51) == 1) {
+            v = 3;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x52) == 1) {
+            v = 4;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x53) == 1) {
+            v = 1;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x54) == 1) {
+            v = 2;
+        } else if (fn_801F54A4(pkm, 0, 0xA, 0x55) == 1) {
+            v = 3;
+        } else {
+            v = 0;
+        }
+    done13:
+        return (u8)v;
+    }
+    case 0x14:
+        return (u8)fn_8020E0C8(fn_8020E0F8((u16)fn_801F54A4(pkm, 0, 0xD, 0)));
+    case 0x15:
+        return fn_8020E1EC(fn_8020E204((u16)fn_801F54A4(pkm, 0, 0x14, 0)));
+    case 0x16:
+        return (u8)fn_8020E1D4(fn_8020E204((u16)fn_801F54A4(pkm, 0, 0x14, 0)));
+    case 0x17:
+        return (u8)fn_8020E1BC(fn_8020E204((u16)fn_801F54A4(pkm, 0, 0x14, 0)));
+    case 0x18:
+        return (u8)fn_8020E1A4(fn_8020E204((u16)fn_801F54A4(pkm, 0, 0x14, 0)));
+    case 0x19:
+        return (u16)fn_8020E124((u16)fn_801F54A4(pkm, 0, 0x14, 0));
+    case 0x1A:
+        return (u8)fn_8020E0E0(fn_8020E0F8((u16)fn_801F54A4(pkm, 0, 0xD, 0)));
+    case 0x1B:
+        return fn_8020E248(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x1C:
+        return (u8)fn_8020E4B4(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x1D:
+        return (u8)fn_8020E470(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x1E:
+        return (u8)fn_8020E458(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x1F:
+        return (u8)fn_8020E440(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x20:
+        return (u8)fn_8020E428(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x21:
+        return (u8)fn_8020E410(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x22:
+        return (u8)fn_8020E3F8(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x23:
+        return (u8)fn_8020E3E0(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x24:
+        return (u8)fn_8020E3C8(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x26:
+        return (u8)fn_8020E3B0(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x25:
+        return (u8)fn_8020E398(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x27:
+        return (u8)fn_8020E380(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x28:
+        return (u8)fn_8020E368(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x29:
+        return (u8)fn_8020E350(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2A:
+        return (u8)fn_8020E338(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2B:
+        return (u8)fn_8020E320(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2C:
+        return (u8)fn_8020E308(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2D:
+        return (u8)fn_8020E2F0(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2E:
+        return (u8)fn_8020E2D8(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x2F:
+        return (u8)fn_8020E2C0(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x30:
+        return (u8)fn_8020E2A8(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x31:
+        return (u8)fn_8020E290(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x32:
+        return (u8)fn_8020E278(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x33:
+        return (u8)fn_8020E260(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x34:
+        return (u8)fn_8020E230(fn_8020E488((u16)fn_801F54A4(pkm, 0, 0x1A, 0)));
+    case 0x35: {
+        extern u8* fn_801F6AB4();
+        return (s32)fn_801F6AB4(pkm, arg);
+    }
+    case 0x36:
+        return fn_801F6A98(pkm);
+    case 0x37:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDA, 0);
+    case 0x38:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDB, 0);
+    case 0x39:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDC, 0);
+    case 0x3A:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDD, 0);
+    case 0x3B:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDE, arg);
+    case 0x3C:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xDF, arg);
+    case 0x3D:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xE0, arg);
+    case 0x3E:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xE1, 0);
+    case 0x3F:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xE2, 0);
+    case 0x40:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xE3, 0);
+    case 0x41:
+        return fn_8012640C(fn_801F6A98(pkm), 0, 0xE4, 0);
+    case 0x42:
+        return fn_801F6A7C(pkm);
+    case 0x44:
+        return fn_801F6A60(pkm);
+    case 0x45:
+        return fn_801F6A44(pkm);
+    case 0x46:
+        return fn_801F64C0(pkm);
+    case 0x47:
+        return fn_801F6490(pkm);
+    case 0x48:
+        return fn_801F6460(pkm);
+    case 0x49:
+        return fn_801F6430(pkm);
+    case 0x4A:
+        return fn_801F6414();
+    case 0x4B:
+        return fn_801F6A28(pkm);
+    case 0x4C:
+        return fn_801F6A0C(pkm);
+    case 0x4D:
+        return fn_801F69F0(pkm);
+    case 0x4E:
+        return fn_801F69D4(pkm);
+    case 0x4F:
+        return fn_801F69B8(pkm);
+    case 0x50:
+        return fn_801F699C(pkm);
+    case 0x51:
+        return fn_801F6980(pkm);
+    case 0x52:
+        return fn_801F6964(pkm);
+    case 0x53:
+        return fn_801F6948(pkm);
+    case 0x54:
+        return (u16)fn_801F692C(pkm);
+    case 0x55:
+        return (u16)fn_801F6910(pkm);
+    case 0x56:
+        return (u16)fn_801F68F4(pkm);
+    case 0x57:
+        return (u16)fn_801F68D8(pkm);
+    case 0x58:
+        return (s16)fn_801F65D4(pkm);
+    case 0x59:
+        return fn_801F6588(pkm, (u16)arg);
+    case 0x5A:
+        return (s32)fn_801F6544(pkm);
+    case 0x5B:
+        return (u16)fn_801F64F0(pkm);
+    case 0x5C:
+        return (u16)fn_801EF634();
+    case 0x5D: {
+        u32 a16, n, c18, c16, k, i, j, m;
+        fn_801F54A4(pkm, 0, 0x14, 0);
+        c16 = (u16)fn_801F54A4(pkm, 0, 0x16, 0);
+        c18 = (u16)fn_801F54A4(pkm, 0, 0x18, 0);
+        n = 0;
+        a16 = (u16)arg;
+        for (i = 0; (u16)i < c18; i++) {
+            for (j = 0; (u16)j < c16; j++) {
+                for (k = 0; (u16)k < 2; k++) {
+                    u32 v;
+                    m = fn_801F54A4(pkm, 0, 0x35, k);
+                    if ((u8)fn_801F7404(m) == 0) {
+                        m = 0;
+                    }
+                    if (m == 0) {
+                        v = 0;
+                    } else {
+                        v = fn_801F7258(m, j);
+                        if (v == 0) {
+                            v = 0;
+                        } else {
+                            v = fn_801F981C(v, i);
+                            if (v == 0) {
+                                v = 0;
+                            }
+                        }
+                    }
+                    if (v != 0 && (u16)n == a16) {
+                        return v;
+                    }
+                    n++;
+                }
+            }
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
+}
 #endif
 #pragma pop
 
