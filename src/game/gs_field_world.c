@@ -9939,7 +9939,7 @@ s32 fn_8011A3E4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A018(u8* ptr);
     u8* base;
@@ -9952,7 +9952,7 @@ s32 fn_8011A3E4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -9981,7 +9981,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10066,7 +10066,7 @@ s32 fn_8011A6D4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A000(u8* ptr);
     u8* base;
@@ -10079,7 +10079,7 @@ s32 fn_8011A6D4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10108,7 +10108,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10125,7 +10125,7 @@ s32 fn_8011A860(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A078(u8* ptr);
     u8* base;
@@ -10138,7 +10138,7 @@ s32 fn_8011A860(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10167,7 +10167,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10320,7 +10320,7 @@ s32 fn_8011ACB4(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A048(u8* ptr);
     u8* base;
@@ -10333,7 +10333,7 @@ s32 fn_8011ACB4(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10362,7 +10362,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10379,7 +10379,7 @@ s32 fn_8011AE40(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_8011A060(u8* ptr);
     u8* base;
@@ -10392,7 +10392,7 @@ s32 fn_8011AE40(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10421,7 +10421,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10506,7 +10506,7 @@ s32 fn_8011B130(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern u8 fn_8011A030(u8* ptr);
     u8* base;
@@ -10519,7 +10519,7 @@ s32 fn_8011B130(void* obj, u16 val) {
 body_start:
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10548,7 +10548,7 @@ flag_check:
 
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10582,7 +10582,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern void fn_80119FE0(u8* ptr, u16 val);
     extern void fn_80119FF0(u8* ptr, u16 val);
     extern u8 fn_8011A030(u8* ptr);
-    extern u8* fn_80135E44(u32 a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u32 a, void* b, u32 c, u32 d, u32 e);
     u32 idx;
     u8 type;
     u32 old_count;
@@ -10595,7 +10595,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     idx = (u8)fn_80119E90(id);
     selector = fn_80119F10(id);
     span = fn_80119ED0(id);
-    elem = fn_80135E44(selector, obj, 0, span, 0);
+    elem = statusGetStatus(selector, obj, 0, span, 0);
     if (elem != NULL) {
         elem += (u16)idx << 4;
     }
@@ -10634,7 +10634,7 @@ s32 fn_8011B444(void* obj, u16 val) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern u8 fn_80119E50(u16 val);
     extern u16 fn_80119E10(u16 val);
@@ -10647,7 +10647,7 @@ s32 fn_8011B444(void* obj, u16 val) {
     if (val == 0) { return 1; }
     idx = fn_80119E90(val);
     base = fn_80119F10(val);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(val), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10751,7 +10751,7 @@ void fn_8011B788(void* obj, u16 id) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FF0(u8* ptr, u32 val);
     extern void fn_80119FE0(u8* ptr, u32 val);
@@ -10770,7 +10770,7 @@ void fn_8011B788(void* obj, u16 id) {
 body_start:
     idx = fn_80119E90(id);
     base = fn_80119F10(id);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10799,7 +10799,7 @@ flag_check:
 
     idx = fn_80119E90(id);
     base = fn_80119F10(id);
-    base = fn_80135E44(base, obj, 0, fn_80119ED0(id), 0);
+    base = statusGetStatus(base, obj, 0, fn_80119ED0(id), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
