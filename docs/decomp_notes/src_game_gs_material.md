@@ -91,3 +91,32 @@ Partial register allocation improvement:
 - `git diff --name-only`: only `src/game/gs_material.c` and `docs/decomp_notes/src_game_gs_material.md`
 - No `*_fn_*.inc` files modified
 - No `#if 0` → `#if 1` flips
+
+## Session: Jun 10 2026 (Fable)
+
+### fn_800EB268 -- ConfigureAlpha (85.4% -> 100%)
+Four structure-first fixes (commit 9dc9f513):
+1. **Direct call** `fn_800ECA78(entry, lbl_8047CC28)` instead of the
+   `((void(*)(void*,f32))fn_800ECA78)(...)` fnptr cast. The cast produced the
+   indirect `lis/addi r12/mtctr/bctrl`; target wants a direct `bl`. (Sibling
+   fn_800EB340 already called it directly — copy that.)
+2. **Decl order**: declared the 0x144 saved value (r31) BEFORE the 0x8 obj ptr
+   (r30) so value->r31, ptr->r30.
+3. **Nested-assert idiom**: moved the 0x25d HSD-assert INSIDE the
+   `if (r30 != NULL)` block as a redundant `if (r30 == NULL) assert();` (mirrors
+   the fn_800E4598 crack 16ef3799). This produces target's shared beq/bne null
+   test instead of a re-loaded `cmplwi; beq`.
+4. **active-first**: declared `s32 active;` before re-reading `flags` in an inner
+   block, flipping the r3<->r4 coloring (flags->r4, active->r3).
+
+### Lever confirmed
+- The "inlined fn_8019D620/fn_8019D9DC precondition idiom" (redundant nested
+  null-assert inside the not-null guard) is a repeatable W1-wall cracker for the
+  ConfigureAlpha/blend family. Same shape as fn_800E4598.
+
+### Quadruplet still walled
+- fn_800E5550/638C/65CC/68D8 (98.92%): re-confirmed W1 reg-alloc permutation —
+  the FIRST loop swaps count(r30)/counter(r29) vs target (counter->r29,
+  count->r30). Data-flow-locked: pointer-walk, decl reorder, dec-var split, and
+  count-first all kept 98.92% or worsened (95.5-95.6%). The SECOND loop already
+  matches with identical C. Skip.

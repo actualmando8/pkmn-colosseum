@@ -19,7 +19,7 @@
 ## Near-misses still open (re-measured 2026-06-10)
 | Function | % | class |
 |---|---|---|
-| fn_800D27FC | 95.67 | TBD |
+| fn_800D27FC | 95.67 | multi-diff: control-flow inversion (bne/b vs beq), a `cmplwi r0,0;blt` vs `cmpwi` quirk on the slot+0x110 `>=0` check (s32 cast swap didn't move it), and an else-block store-materialization (target `li r3,1;li r0,0` vs our `stb r5/r4` reuse). Several independent issues — not a single-lever win. |
 | fn_800D2AD4 | 94.11 | TBD |
 | fn_800D13C8 | 92.57 | TBD |
 | fn_800D2150 | 89.33 | TBD |
