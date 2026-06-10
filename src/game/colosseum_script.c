@@ -19231,7 +19231,7 @@ void fn_80214864(void)
 {
     extern void fn_8011BBD8();
     extern u32 fn_801F025C();
-  s8 cVar2;
+  u8 cVar2;
   u32 uVar1;
 
   cVar2 = (int)fn_801F453C(0,1);
@@ -19256,7 +19256,7 @@ void fn_80214864(void)
   else {
     fn_8011BBD8(uVar1,0,0x30,0,0);
   }
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 1;
+  lbl_8047B610 = lbl_8047B610 + 1;
   return;
 }
 /* Address: 0x802149B8 | Size: 0xfc | Ghidra import */
