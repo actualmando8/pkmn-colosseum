@@ -2461,7 +2461,7 @@ asm void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
 void fn_800FE38C(s32 x1, s32 y1, s32 x2, s32 y2) {
     s32 ax, ay, bx, by;
     f32 scale_x, scale_y;
-    s32 cx1, cy1, cx2, cy2;
+    s32 cy2, cx2, cy1, cx1;
 
     ax = (s32)(*(s16*)&lbl_8047AC70) + x1;
     ay = (s32)(*(s16*)&lbl_8047AC72) + y1;
