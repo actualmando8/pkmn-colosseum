@@ -49,6 +49,7 @@ extern void  fn_800A19CC(void* ctx, void* callback, void* arg,
                          void* stack, u32 stackSize, u32 priority, u32 flag);
 extern void  fn_800A1F94(void* ctx);    /* GS thread start */
 extern void  fn_800F0308(void);          /* GSthread yield / step */
+extern void  fn_800DD970(const char* fmt, ...);  /* OSReport / GSlog */
 extern void  fn_801C41C8(f32 speed, u32 mode);  /* fade set */
 extern void  fn_801C40F0(u32 enable);            /* fade enable */
 extern u32   fn_80102568(u32 sceneId, u32 a, u32 b);  /* scene/model load */
@@ -59,7 +60,7 @@ extern s32   fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c,
 extern void  fn_80102868(u32 a, u32 b, u32 c);        /* scene positioning */
 extern void* fn_80104704(u32 a);         /* scene object query */
 extern u8    fn_801045A8(u32 a, u32 b);  /* scene anim check */
-extern s8    fn_801043A4(u32 a);         /* scene anim result */
+extern s32   fn_801043A4(u32 a);         /* scene anim result */
 extern void  fn_80106D3C(u32 slot, u32 floorId, u32 a, u32 b);  /* floor load */
 extern void* fn_801046B8(void);          /* scene context get */
 extern u32   fn_801022B8(u32 a);         /* scene message get */
@@ -67,7 +68,7 @@ extern void  fn_800F7F64(u32 pad);       /* input init */
 extern u32   fn_800F7BC4(u32 pad);       /* input poll */
 extern u32   fn_800AA498(void);          /* VIGetTvFormat / card detect */
 extern u32   fn_800A0F58(void);          /* card status */
-extern f32   lbl_8047BA34;     /* timing threshold (< 1.0f) */
+extern const f32 lbl_8047BA34;     /* timing threshold 2.0f */
 extern void  fn_800A0FC8(u32 a);         /* card close */
 extern s32   fn_800D37CC(void);          /* GSmem tick */
 extern u32   fn_800D3088(void);          /* GSmem query */
@@ -89,10 +90,10 @@ extern u32   lbl_8047A460;     /* Thread completion flag */
 extern u32   lbl_8047A464;     /* Thread active flag */
 
 /* ===== SDATA2 (float constants) ===== */
-extern f32   lbl_8047BA30;     /* 0.0f */
-extern f64   lbl_8047BA38;     /* 4503599627370496.0 (int-to-float bias) */
-extern f64   lbl_8047BA40;     /* int-to-float bias B */
-extern f32   lbl_8047BA48;     /* 1.0f */
+extern const f32 lbl_8047BA30;     /* 0.0f */
+extern const f64 lbl_8047BA38;     /* s32->f32 bias */
+extern const f64 lbl_8047BA40;     /* u32->f32 bias */
+extern const f32 lbl_8047BA48;     /* 10.0f */
 extern f32   lbl_8047BA4C;     /* fade speed */
 extern f32   lbl_8047BA50;     /* scale factor */
 
@@ -174,366 +175,236 @@ extern s32 fn_800370E0(u32* arg);
 /* Scene main init - OSGetResetCode handling, thread creation, card detection */
 #pragma peephole off
 void fn_8003686C(void) {
-    u8* ctx;        /* → r31 */
-    s8 anim_result; /* → r30 */
-    u32 bias_hi;    /* → r29 */
-    s8 anim_track;  /* → r28 */
-    f64 f27;        /* float accumulator */
-    f64 f28;        /* float threshold or bias_s (warm boot) — f64, lfd no frsp in warm boot */
-    f64 f29;        /* float bias_u or tick_f (warm boot) — f64, lfd no frsp */
-    f64 f30;        /* float tick_f */
-    f64 f31;        /* float bias_s (named lfd, no frsp) */
-    u32 tick_u;     /* scratch unsigned tick */
-    u32 tmp;        /* scratch u32 for fn_801026A4 call — at 0xc */
-    u32 tmp2;       /* scratch u32 for path B fn_801026A4 call — at 0x8 */
-    u32 spill_s[2]; /* [0]=bias_hi_hi, [1]=signed_lo */
-    u32 spill_u[2]; /* [0]=bias_hi_hi, [1]=unsigned_lo */
-    u8* obj;        /* scratch object pointer */
+    u8* ctx;        /* -> r31 */
+    s8 anim_result;
+    u32 tmp;        /* scratch u32 for fn_801026A4 call */
+    u32 tmp2;       /* scratch u32 for path B fn_801026A4 call */
+    s8* obj;        /* scratch object pointer */
+    s32 is_warm;
     ctx = lbl_803A3E58;
     lbl_804788B8 = (u32)-1;
 
     /* Warm boot check */
-    {
-        s32 is_warm;
-        if ((OSGetResetCode() + 0x80000000u) == 0u)
-            is_warm = 1;
-        else
-            is_warm = 0;
-        if (is_warm) goto warm_boot;
-    }
+    if ((OSGetResetCode() + 0x80000000u) == 0u)
+        is_warm = 1;
+    else
+        is_warm = 0;
 
-    /* Cold boot: card / TV detect */
-    if (fn_800AA498() != 1) goto card_fail;
+    if (is_warm == 0) {
+        /* Cold boot: card / TV detect */
+        if (fn_800AA498() == 1) {
+            fn_800F7F64(1);
+            if (fn_800F7BC4(1) & 0x200u) {
+                /* === Path A: cold boot, bit9 set === */
+                s8 anim_track;  /* block-local: demotes below the 0x4330 temps -> r28 */
+                fn_80106D3C(1, 0x3b50, 1, 1);
+                tmp = 0;
+                fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp, 0, 0, 0);
+                fn_80102868(0x11, 0x2d, 0xbe);
 
-    fn_800F7F64(1);
-    if (!(fn_800F7BC4(1) & 0x200u)) goto no_input;
+                {
+                    f32 acc;
+                    acc = lbl_8047BA30;
+                    anim_track = -1;
+                    while (acc < lbl_8047BA48) {
+                        if (fn_801045A8(0x11, 0) == 0) {
+                            anim_result = fn_801043A4(0x11);
+                            break;
+                        }
+                        obj = (s8*)fn_80104704(0x11);
+                        if (anim_track != obj[0x95]) {
+                            acc = lbl_8047BA30;
+                            anim_track = obj[0x95];
+                        }
+                        fn_800F0308();
+                        acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                    }
+                    if (acc >= lbl_8047BA48) {
+                        obj = (s8*)fn_80104704(0x11);
+                        anim_result = obj[0x95];
+                    }
+                }
+                fn_80102568(0x11, 0, 1);
 
-    /* === Path A: cold boot, bit9 set === */
-    fn_80106D3C(1, 0x3b50, 1, 1);
-    tmp = 0;
-    fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp, 0, 0, 0);
-    fn_80102868(0x11, 0x2d, 0xbe);
+                if (anim_result == 0) {
+                    {
+                        s32 is_w;
+                        if ((OSGetResetCode() + 0x80000000u) == 0u)
+                            is_w = 1;
+                        else
+                            is_w = 0;
+                        if (is_w == 1) {
+                            if (fn_800A0F58() == 0) {
+                                lbl_804788B8 = 1;
+                            }
+                        } else {
+                            lbl_804788B8 = 1;
+                        }
+                    }
+                    fn_80106D3C(1, 0x3b51, 1, 1);
+                    {
+                        f32 acc;
+                        acc = lbl_8047BA30;
+                        while (acc < lbl_8047BA34) {
+                            fn_800F0308();
+                            acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                        }
+                    }
+                } else {
+                    {
+                        s32 is_w;
+                        if ((OSGetResetCode() + 0x80000000u) == 0u)
+                            is_w = 1;
+                        else
+                            is_w = 0;
+                        if (is_w == 1) {
+                            if (fn_800A0F58() == 1) {
+                                lbl_804788B8 = 0;
+                            }
+                        } else {
+                            lbl_804788B8 = 0;
+                        }
+                    }
+                    fn_80106D3C(1, 0x3b52, 1, 1);
+                    {
+                        f32 acc;
+                        acc = lbl_8047BA30;
+                        while (acc < lbl_8047BA34) {
+                            fn_800F0308();
+                            acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                        }
+                    }
+                }
+                fn_801069FC(1);
+            } else {
+                /* === Path B: cold boot, bit9 NOT set === */
+                if (fn_800A0F58() == 1) {
+                    s8 anim_result_b;  /* block-local: shares the demoted r28 color */
+                    fn_80106D3C(1, 0x3b50, 1, 1);
+                    tmp2 = 0;
+                    fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp2, 0, 0, 0);
+                    fn_80102868(0x11, 0x2d, 0xbe);
 
-    /* loop_a: accumulate time until animation done or threshold */
-    f27 = lbl_8047BA30;
-    anim_track = -1;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA48;
-    goto loop_a_cmp;
-loop_a_body:
-    if (fn_801045A8(0x11, 0) == 0) {
-        anim_result = fn_801043A4(0x11);
-        goto loop_a_exit;
-    }
-    obj = (u8*)fn_80104704(0x11);
-    if ((s8)anim_track != (s8)obj[0x95]) {
-        f27 = lbl_8047BA30;
-        anim_track = obj[0x95];
-    }
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_u[0] = bias_hi;
-        spill_u[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_u - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_s[1] = tick_u;
-    spill_s[0] = bias_hi;
-    f27 += (*(f64*)spill_s - f29) / f30;
-loop_a_cmp:
-    if (f27 < f28) goto loop_a_body;
-    if (!(f27 >= lbl_8047BA48)) goto loop_a_body;
-    obj = (u8*)fn_80104704(0x11);
-    anim_result = obj[0x95];
-loop_a_exit:
-    fn_80102568(0x11, 0, 1);
+                    /* NOTE: path B reuses the two anim vars with swapped
+                     * roles vs path A (anim_result = track, anim_result_b =
+                     * result) — required for the target r30/r28 mapping. */
+                    {
+                        f32 acc;
+                        acc = lbl_8047BA30;
+                        anim_result = -1;
+                        while (acc < lbl_8047BA48) {
+                            if (fn_801045A8(0x11, 0) == 0) {
+                                anim_result_b = fn_801043A4(0x11);
+                                break;
+                            }
+                            obj = (s8*)fn_80104704(0x11);
+                            if (anim_result != obj[0x95]) {
+                                acc = lbl_8047BA30;
+                                anim_result = obj[0x95];
+                            }
+                            fn_800F0308();
+                            acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                        }
+                        if (acc >= lbl_8047BA48) {
+                            obj = (s8*)fn_80104704(0x11);
+                            anim_result_b = obj[0x95];
+                        }
+                    }
+                    fn_80102568(0x11, 0, 1);
 
-    if ((s8)anim_result != 0) goto path_a_phase2;
-
-    /* anim_result==0: load 0x3b51 */
-    {
-        s32 is_w;
-        if ((OSGetResetCode() + 0x80000000u) == 0u)
-            is_w = 1;
-        else
-            is_w = 0;
-        if (is_w == 1) {
-            if (fn_800A0F58() == 0) {
-                lbl_804788B8 = 1;
+                    if (anim_result_b == 0) {
+                        {
+                            s32 is_w;
+                            if ((OSGetResetCode() + 0x80000000u) == 0u)
+                                is_w = 1;
+                            else
+                                is_w = 0;
+                            if (is_w == 1) {
+                                if (fn_800A0F58() == 0) {
+                                    lbl_804788B8 = 1;
+                                }
+                            } else {
+                                lbl_804788B8 = 1;
+                            }
+                        }
+                        fn_80106D3C(1, 0x3b51, 1, 1);
+                        {
+                            f32 acc;
+                            acc = lbl_8047BA30;
+                            while (acc < lbl_8047BA34) {
+                                fn_800F0308();
+                                acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                            }
+                        }
+                    } else {
+                        {
+                            s32 is_w;
+                            if ((OSGetResetCode() + 0x80000000u) == 0u)
+                                is_w = 1;
+                            else
+                                is_w = 0;
+                            if (is_w == 1) {
+                                if (fn_800A0F58() == 1) {
+                                    lbl_804788B8 = 0;
+                                }
+                            } else {
+                                lbl_804788B8 = 0;
+                            }
+                        }
+                        fn_80106D3C(1, 0x3b52, 1, 1);
+                        {
+                            f32 acc;
+                            acc = lbl_8047BA30;
+                            while (acc < lbl_8047BA34) {
+                                fn_800F0308();
+                                acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                            }
+                        }
+                    }
+                    fn_801069FC(1);
+                } else {
+                    /* === Path C: no_input, card fail === */
+                    fn_801C40F0(1);
+                    {
+                        f32 acc;
+                        acc = lbl_8047BA30;
+                        while (acc < lbl_8047BA34) {
+                            fn_800F0308();
+                            acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                        }
+                    }
+                }
             }
         } else {
-            lbl_804788B8 = 1;
-        }
-    }
-    fn_80106D3C(1, 0x3b51, 1, 1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_a1_cmp;
-simple_loop_a1_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_a1_cmp:
-    if (f27 < f28) goto simple_loop_a1_body;
-    goto epilogue;
-
-path_a_phase2:
-    /* anim_result!=0: load 0x3b52 */
-    {
-        s32 is_w;
-        if ((OSGetResetCode() + 0x80000000u) == 0u)
-            is_w = 1;
-        else
-            is_w = 0;
-        if (is_w == 1) {
-            if (fn_800A0F58() == 1) {
-                lbl_804788B8 = 0;
+            /* === Path D: cold boot, fn_800AA498 != 1 === */
+            fn_801C40F0(1);
+            {
+                f32 acc;
+                acc = lbl_8047BA30;
+                while (acc < lbl_8047BA34) {
+                    fn_800F0308();
+                    acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                }
             }
-        } else {
-            lbl_804788B8 = 0;
+            fn_800A0FC8(0);
         }
-    }
-    fn_80106D3C(1, 0x3b52, 1, 1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_a2_cmp;
-simple_loop_a2_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_a2_cmp:
-    if (f27 < f28) goto simple_loop_a2_body;
-    fn_801069FC(1);
-    goto epilogue;
-
-    /* === Path B: cold boot, bit9 NOT set === */
-no_input:
-    if (fn_800A0F58() != 1) goto card_fail2;
-    fn_80106D3C(1, 0x3b50, 1, 1);
-    tmp2 = 0;
-    fn_801026A4(0x11, (u32)fn_801046B8(), (u32)&tmp2, 0, 0, 0);
-    fn_80102868(0x11, 0x2d, 0xbe);
-
-    /* loop_a2: path B animation accumulator */
-    f27 = lbl_8047BA30;
-    anim_track = -1;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA48;
-    goto loop_a2_cmp;
-loop_a2_body:
-    if (fn_801045A8(0x11, 0) == 0) {
-        anim_result = fn_801043A4(0x11);
-        goto loop_a2_exit;
-    }
-    obj = (u8*)fn_80104704(0x11);
-    if ((s8)anim_track != (s8)obj[0x95]) {
-        f27 = lbl_8047BA30;
-        anim_track = obj[0x95];
-    }
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-loop_a2_cmp:
-    if (f27 < f28) goto loop_a2_body;
-    if (!(f27 >= lbl_8047BA48)) goto loop_a2_body;
-    obj = (u8*)fn_80104704(0x11);
-    anim_result = obj[0x95];
-loop_a2_exit:
-    fn_80102568(0x11, 0, 1);
-
-    if ((s8)anim_result != 0) goto path_b_phase2;
-
-    {
-        s32 is_w;
-        if ((OSGetResetCode() + 0x80000000u) == 0u)
-            is_w = 1;
-        else
-            is_w = 0;
-        if (is_w == 1) {
-            if (fn_800A0F58() == 0) {
-                lbl_804788B8 = 1;
+    } else {
+        /* === Path E: warm boot === */
+        fn_801C40F0(1);
+        {
+            f32 acc;
+            acc = lbl_8047BA30;
+            while (acc < lbl_8047BA34) {
+                fn_800F0308();
+                acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
             }
-        } else {
-            lbl_804788B8 = 1;
         }
     }
-    fn_80106D3C(1, 0x3b51, 1, 1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_b1_cmp;
-simple_loop_b1_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_b1_cmp:
-    if (f27 < f28) goto simple_loop_b1_body;
-    goto epilogue;
 
-path_b_phase2:
+    /* === Shared tail: wait for fn_8017B2CC(0xa) >= 0 === */
     {
-        s32 is_w;
-        if ((OSGetResetCode() + 0x80000000u) == 0u)
-            is_w = 1;
-        else
-            is_w = 0;
-        if (is_w == 1) {
-            if (fn_800A0F58() == 1) {
-                lbl_804788B8 = 0;
-            }
-        } else {
-            lbl_804788B8 = 0;
-        }
-    }
-    fn_80106D3C(1, 0x3b52, 1, 1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_b2_cmp;
-simple_loop_b2_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_b2_cmp:
-    if (f27 < f28) goto simple_loop_b2_body;
-    fn_801069FC(1);
-    goto epilogue;
-
-    /* === Path C: no_input, card fail === */
-card_fail2:
-    fn_801C40F0(1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_c_cmp;
-simple_loop_c_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_c_cmp:
-    if (f27 < f28) goto simple_loop_c_body;
-    goto epilogue;
-
-    /* === Path D: cold boot, fn_800AA498 != 1 === */
-card_fail:
-    fn_801C40F0(1);
-    f27 = lbl_8047BA30;
-    f31 = lbl_8047BA38;
-    bias_hi = 0x43300000u;
-    f29 = lbl_8047BA40;
-    f28 = lbl_8047BA34;
-    goto simple_loop_d_cmp;
-simple_loop_d_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f30 = *(f64*)spill_s - f31;
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f29) / f30;
-simple_loop_d_cmp:
-    if (f27 < f28) goto simple_loop_d_body;
-    fn_800A0FC8(0);
-    goto epilogue;
-
-    /* === Path E: warm boot === */
-warm_boot:
-    fn_801C40F0(1);
-    /* warm boot timing loop - different FPR assignments */
-    f27 = lbl_8047BA30;
-    f28 = lbl_8047BA38;   /* bias_s → f28 (lfd, named) */
-    bias_hi = 0x43300000u;
-    f30 = lbl_8047BA40;   /* bias_u → f30 (lfd, named) */
-    f31 = lbl_8047BA34;   /* threshold → f31 (lfs, named) */
-    goto warm_loop_cmp;
-warm_loop_body:
-    fn_800F0308();
-    {
-        s32 ts = fn_800D37CC();
-        spill_s[0] = bias_hi;
-        spill_s[1] = (u32)ts ^ 0x80000000u;
-        f29 = *(f64*)spill_s - f28;   /* tick_f → f29 */
-    }
-    tick_u = fn_800D3088();
-    spill_u[1] = tick_u;
-    spill_u[0] = bias_hi;
-    f27 += (*(f64*)spill_u - f30) / f29;
-warm_loop_cmp:
-    if (f27 < f31) goto warm_loop_body;
-
-    /* wait for fn_8017B2CC(0xa) >= 0 */
-    {
-        s32 res;
         const u8* str = lbl_80267050;
+        s32 res;
         for (;;) {
             res = fn_8017B2CC(0xa);
             if (res >= 0) break;
@@ -556,23 +427,17 @@ warm_loop_cmp:
         ctr_new = ctr_old + 1;
         arg = (u32*)(ctx + 0x1318);
         lbl_8047A460 = ctr_new;
-        stack = (u8*)((u32)stack + 0xffc);
         arg[1] = 0;
         arg[2] = 0;
         arg[3] = 0;
-        fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, arg, stack, 0x1000, 0x10, 1);
+        fn_800A19CC(ctx + 0x1328, (void*)fn_800370E0, arg, stack + 0xffc, 0x1000, 0x10, 1);
         fn_800A1F94(ctx + 0x1328);
     }
 
     /* Wait for thread completion */
-    goto lbl_8047A460_check;
-lbl_8047A460_wait:
-    fn_800F0308();
-lbl_8047A460_check:
-    if ((s32)lbl_8047A460 != 0) goto lbl_8047A460_wait;
-
-epilogue:
-    return;
+    while ((s32)lbl_8047A460 != 0) {
+        fn_800F0308();
+    }
 }
 
 /* 0x8003708C | size: 0x54 */
