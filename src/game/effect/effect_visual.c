@@ -368,7 +368,7 @@ extern u32 fn_8013AA8C(void* ptr, u16 delta);
 extern u32 fn_8013AD68(void* ptr);
 extern void fn_8013AD9C(void);
 extern u32 fn_8013B034(void* ptr);
-extern void fn_8013B0A0(void);
+extern u32 fn_8013B0A0(void* ptr);
 extern u16 filterStart(void);
 extern void fn_8013B268(void);
 extern u32 fn_8013B504(void* ptr);
@@ -916,15 +916,53 @@ u32 fn_8013B034(void* ptr) {
     return ret;
 }
 #endif
-extern void fn_800E5A74(void);
-extern void fn_800E638C(void);
-extern void fn_801684F0(void);
-#if 1
+extern void fn_800E5A74(void* texture);
+extern void fn_800E638C(void* texture);
+extern void fn_801684F0(void* texture);
+#if 0
 asm void fn_8013B0A0(void) {
 #include "src/game/effect/effect_visual_fn_8013B0A0.inc"
 }
 #else
-void fn_8013B0A0(void) { /* TODO */ }
+u32 fn_8013B0A0(void* ptr) {
+    u8 flag2;
+    u8 flag1;
+    u16 i;
+    u32 count;
+    u8* p;
+
+    if (ptr == NULL) {
+        goto fail;
+    }
+
+    if (*(u8*)((u8*)ptr + 0x4c) != 0) {
+        p = (u8*)ptr + 4;
+        count = *(u32*)((u8*)ptr + 0x48) & 0xffff;
+        flag1 = *(u8*)((u8*)ptr + 0x4e);
+        flag2 = *(u8*)((u8*)ptr + 0x4f);
+        fn_800B8DF4();
+        fn_800B856C();
+        for (i = 0; i < count; i++, p += 4) {
+            if (*(void**)p != NULL) {
+                if (flag2 == 0) {
+                    fn_800E5A74(*(void**)p);
+                }
+                if (flag1 != 0) {
+                    fn_800E638C(*(void**)p);
+                }
+            }
+        }
+    } else {
+        void* tex = *(void**)ptr;
+        if (tex != NULL) {
+            fn_801684F0(tex);
+        }
+    }
+    return 1;
+
+fail:
+    return 0;
+}
 #endif
 extern void fn_800E6478(void);
 extern void fn_800E5BE0(void);
