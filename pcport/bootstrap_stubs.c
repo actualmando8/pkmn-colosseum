@@ -309,8 +309,9 @@ int PCPort_CharAnimSetup(const char* fsysPath, const char* memberName) {
     (void)fsysPath; (void)memberName; return 0;
 }
 
-void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
-    (void)beArchive; (void)beRootJoint;
+void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint,
+                                 f32 frameStep) {
+    (void)beArchive; (void)beRootJoint; (void)frameStep;
 }
 
 int PCPort_CharAnimReady(void) {

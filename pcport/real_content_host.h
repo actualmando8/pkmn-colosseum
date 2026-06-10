@@ -321,7 +321,10 @@ void PCPort_BattleProbe(int frames);
  * back into the renderer's BE archive (beArchive/beRootJoint) so the existing
  * skinning animates. PCPort_CharAnimReady reports whether setup succeeded. */
 int  PCPort_CharAnimSetup(const char* fsysPath, const char* memberName);
-void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint);
+/* frameStep: game-frame units to advance this call (1.0 = one 60 Hz tick).
+ * Pass elapsed_seconds * 60.0f for real-time-locked animation. */
+void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint,
+                                 f32 frameStep);
 int  PCPort_CharAnimReady(void);
 /* Switch the active motion (idle/walk/run) by bank index; rebuilds the live
  * tree from the remembered archive. No-op if already on that motion. */

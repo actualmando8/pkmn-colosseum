@@ -8812,7 +8812,11 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         PC_FLOOR_OUTSKIRT, "S1_out",
         { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, 0, { 0.0f, 0.0f, 0.0f } } },
         0,
-        { 40.0f, 0.0f, 40.0f }   /* spawn point: open plaza in front of the diner */
+        { 60.0f, 0.0f, 20.0f }   /* spawn point: just behind the gas-pump foundation
+                                   * (concrete pad under the green pump, right side
+                                   * of view), matching the real game's S1_out entry.
+                                   * Pump is at ~X=80, Z~-5; Wes at X=60, Z=20 stands
+                                   * just to its left/in-front with plaza open ahead. */
     },
     {
         PC_FLOOR_GARAGE_1F, "D1_garage_1F",
@@ -9037,8 +9041,10 @@ static int PCPort_LoadFieldCharacter(void) {
 /* Render the loaded player character at world (px,py,pz) facing yaw, uniformly
  * scaled. Composes the orbit camera's view with a placement matrix
  * (translate * rotateY(yaw) * scale) and walks the character's skinned joint
- * tree. Needs PCPORT_SKIN for the envelope skin path. */
-static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
+ * tree. Needs PCPORT_SKIN for the envelope skin path.
+ * frameStep: real-time elapsed seconds * 60.0f (pass 1.0f if not available). */
+static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale,
+                                 f32 frameStep) {
     PCPortTranslatedCamera tcam;
     MenuTreeStats stats;
     f32 P[3][4];
@@ -9047,7 +9053,7 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale) {
     /* Advance the active motion and write the animated joint SRT into the BE
      * archive the skinning reads (on by default; PCPORT_NO_CHAR_ANIM disables). */
     if (getenv("PCPORT_NO_CHAR_ANIM") == NULL) {
-        PCPort_CharAnimStepAndApply(&g_engCharArchive, g_engCharRoot);
+        PCPort_CharAnimStepAndApply(&g_engCharArchive, g_engCharRoot, frameStep);
     }
     /* placement = translate(p) * rotateY(yaw) * uniformScale(scale) */
     P[0][0] =  scale * cy; P[0][1] = 0.0f;  P[0][2] =  scale * sy; P[0][3] = px;
@@ -9394,7 +9400,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     /* Camera defaults tuned to match the real game's Outskirt Stand entry framing:
      * Wes seen from behind at roughly head height, moderate distance.
      * camDist=75, camHigh=25, camPitch=0.20 rad: eye ~38 units above floor (just
-     * above Wes's head PLAYER_H=30, scale 1.8), 73 units behind at pitch=0.20. */
+     * above Wes's head at ~22 units, scale 1.3), 73 units behind at pitch=0.20. */
     f32 camDist = (dEnv != NULL) ? (f32)atof(dEnv) : 75.0f;
     f32 camHigh = (hEnv != NULL) ? (f32)atof(hEnv) : 25.0f;
     f32 walkSpeed = (walkSpeedEnv != NULL && walkSpeedEnv[0]) ? (f32)atof(walkSpeedEnv) : 4.0f;
@@ -9412,6 +9418,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int warpTo = -1;
     int graceFrames = 30;   /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
+    double g_walkPrevTime = 0.0; /* real-time clock for animation frame-step */
 
     if (walkSpeed < 0.0f) walkSpeed = 0.0f;
     if (runSpeed < walkSpeed) runSpeed = walkSpeed;
@@ -9439,15 +9446,24 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
            "orbit camera. (%d exit trigger(s))%s\n", ppos[0], ppos[1], ppos[2],
            PCPort_FieldExitCount(), autopan ? " [AUTOPAN]" : "");
 
+    g_walkPrevTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
         f32 fwdXZ[3], rightXZ[3], mvx, mvz, eye[3], interest[3], floorY;
         f32 moveMag, moveSpeed;
         f32 prevx, prevz;
+        f32 frameStep;
+        double nowTime;
         u16 btn;
         f32 sx, sy;
         int moving, running;
 
         VIWaitForRetrace_PC();
+        /* Real-time frame step: elapsed seconds * 60 = game frames elapsed.
+         * This keeps animation at GC speed (1 frame/tick) even if rendering
+         * takes longer than 1/60 s (e.g. large exterior scenes). */
+        nowTime = glfwGetTime();
+        frameStep = (f32)((nowTime - g_walkPrevTime) * 60.0);
+        g_walkPrevTime = nowTime;
         PADRead(pads);
         btn = pads[0].button;
         sx = (f32)pads[0].stickX / 112.0f;
@@ -9488,7 +9504,12 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         if (moving) {
             ppos[0] += mvx * moveSpeed;
             ppos[2] += mvz * moveSpeed;
-            pyaw = atan2f(mvx, -mvz);   /* face the move direction */
+            /* face the move direction: model +Z is its visual "back" at pyaw=PI,
+             * so we rotate by atan2(-mvx, mvz) to keep W=facing-away,
+             * S=facing-camera, matching the real game's overworld convention.
+             * The sign inversion fixes the previous 180-degree facing error
+             * (W showed front, S showed back — opposite of correct). */
+            pyaw = atan2f(-mvx, mvz);
         }
 
         /* Drive the motion bank: idle while standing, walk for partial-stick
@@ -9566,10 +9587,16 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             const char* sEnv = getenv("PCPORT_WES_SCALE");
             const char* yEnv = getenv("PCPORT_WES_YOFF");
             const char* aEnv = getenv("PCPORT_WES_YAWOFF");
-            f32 wScale = (sEnv != NULL && sEnv[0]) ? (f32)atof(sEnv) : 1.8f;
-            f32 wYoff  = (yEnv != NULL && yEnv[0]) ? (f32)atof(yEnv) : 6.0f;
+            /* Scale 1.3: the ken_b1 model is ~17 units tall; at 1.3 it stands ~22
+             * units, matching the real game's overworld character proportions (the
+             * real root-joint scale observed by comparing Wes's height relative to
+             * the Outskirt Stand diner and gas pump in the sxs_dolphin reference).
+             * wYoff scaled proportionally from the old 1.8/6.0 pairing: 6*(1.3/1.8)≈4.3 */
+            f32 wScale = (sEnv != NULL && sEnv[0]) ? (f32)atof(sEnv) : 1.3f;
+            f32 wYoff  = (yEnv != NULL && yEnv[0]) ? (f32)atof(yEnv) : 4.3f;
             f32 wYaw   = (aEnv != NULL && aEnv[0]) ? (f32)atof(aEnv) : 0.0f;
-            RenderFieldCharacter(ppos[0], ppos[1] + wYoff, ppos[2], pyaw + wYaw, wScale);
+            RenderFieldCharacter(ppos[0], ppos[1] + wYoff, ppos[2], pyaw + wYaw, wScale,
+                                 frameStep);
         } else {
             DrawFieldAvatar(ppos[0], ppos[1], ppos[2], pyaw, PLAYER_H, PLAYER_R);
         }

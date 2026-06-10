@@ -6350,19 +6350,26 @@ void PCPort_HeadlessMotionBatchProbe(int frames) {
     }
 }
 
-void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint) {
+void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint,
+                                 f32 frameStep) {
     if (!g_charAnimReady || g_charAnimRoot == NULL || beArchive == NULL) {
         return;
     }
+    /* Clamp frameStep: never negative, cap at 4 frames to survive a hitch
+     * without a large jump (matches the real game's behaviour on slow frames). */
+    if (frameStep < 0.0f) frameStep = 0.0f;
+    if (frameStep > 4.0f) frameStep = 4.0f;
     if (g_charAnimLoopLen < 0.0f) {
         g_charAnimLoopLen = PCPort_CharAnimMaxEndFrame(g_charAnimRoot);
         if (g_charAnimLoopLen < 1.0f) g_charAnimLoopLen = 0.0f; /* no real loop */
     }
     /* Loop: the host HSD_AObjInterpretAnim never rewinds, so once curr_frame
      * passes end_frame the FObj settles to a constant (frozen) pose. Re-arm the
-     * whole tree at frame 0 each cycle to make the idle/walk loop. */
+     * whole tree at frame 0 each cycle to make the idle/walk loop.
+     * frameStep (real elapsed seconds * 60) keeps the animation locked to
+     * game-speed (1 GC frame = 1/60 s) regardless of render frame rate. */
     if (g_charAnimLoopLen > 0.0f) {
-        g_charAnimTime += 1.0f;
+        g_charAnimTime += frameStep;
         if (g_charAnimTime >= g_charAnimLoopLen) {
             g_charAnimTime = 0.0f;
             HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
