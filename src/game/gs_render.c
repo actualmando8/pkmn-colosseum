@@ -798,10 +798,12 @@ extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
 extern f32 lbl_8047CA34;
 extern f32 lbl_8047CA38;
-/* WALL(codex): fn_800D55D0/fn_800D5648 are prologue-scheduling limited.
- * Adding val to fn_800D4F98 fixes crset cr1eq, but both remain 93.5484%
- * because target schedules lfs lbl_8047CA30 before stw LR; scheduling on
- * did not move it. Reverted non-matching experiment. */
+/* fn_800D55D0/fn_800D5648 @ 93.33: the dropped-float vararg restored
+ * (fn_800D4F98(.., val) -> crset cr1eq). Residual is a single prologue
+ * scheduling diff: target issues `lfs f0, lbl_8047CA30@sda21` BEFORE the
+ * `stw r0, 0x14(r1)` LR-save; CW always emits the LR store first.
+ * scheduling 604 reschedules the whole fn (regress 80); not per-spot
+ * controllable. Prologue-scheduler wall. */
 #if 0
 asm void fn_800D55D0(void) {
 #include "src/game/gs_render_fn_800D55D0.inc"
@@ -809,7 +811,7 @@ asm void fn_800D55D0(void) {
 #else
 void fn_800D55D0(f32 val) {
     if (val < lbl_8047CA30 || val > lbl_8047CA34) return;
-    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x25, 0xb); }
+    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x25, 0xb, val); }
     else {
         u32 tmp;
         tmp = (u32)(s32)(lbl_8047CA38 * val);
@@ -828,7 +830,7 @@ asm void fn_800D5648(void) {
 #else
 void fn_800D5648(f32 val) {
     if (val < lbl_8047CA30 || val > lbl_8047CA34) return;
-    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x24, 0xb); }
+    if (*(s32*)lbl_8047AA80 == 1) { fn_800D4F98(0x24, 0xb, val); }
     else {
         u32 tmp;
         tmp = (u32)(s32)(lbl_8047CA38 * val);
