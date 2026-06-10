@@ -839,6 +839,238 @@ def fmt_tokens(n):
     if n >= 1_000: return f"{n/1_000:.1f}K"
     return str(n)
 
+
+# ─── CODEX + CLAUDE daily token usage (lazy/async, never blocks render) ──────
+#
+# CODEX: codex CLI rollout session files (~/.codex/sessions/YYYY/MM/DD/
+# rollout-*.jsonl) carry "token_count" events with cumulative per-session
+# total_token_usage AND rate-limit snapshots (primary=5h window,
+# secondary=weekly). We tail-read the last such event per today's session.
+#
+# CLAUDE: Claude Code writes transcripts as JSONL under
+# <home>/.claude/projects/<munged-repo-path>/; each assistant message has a
+# usage object. We sum files whose mtime is today, deduping by message id.
+#
+# Both readers run in a background thread (or inline for --once) and the
+# result is cached in-process + on disk (reports/) with a 60s TTL.
+
+USAGE_TTL = 60.0
+# Per-platform cache file: WSL and Windows see different sources (~/.codex
+# only exists inside WSL), so they must not share a snapshot.
+USAGE_CACHE_FILE = os.path.join(
+    REPORTS_DIR, f"agent_usage_cache.{sys.platform}.json")
+_usage_cache = {"ts": 0.0, "data": None, "thread": None}
+
+
+def _last_json_line_with(path, needle, tail_bytes=262144):
+    """Last JSON line in `path` containing `needle` (tail-read only)."""
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - tail_bytes))
+            data = f.read().decode("utf-8", "replace")
+    except OSError:
+        return None
+    for line in reversed(data.splitlines()):
+        if needle in line:
+            try:
+                return json.loads(line)
+            except ValueError:
+                continue
+    return None
+
+
+def _codex_sessions_dirs():
+    cands = [os.path.expanduser("~/.codex/sessions")]
+    if sys.platform == "win32":
+        import glob as _glob
+        try:
+            cands += _glob.glob(r"\\wsl.localhost\*\home\*\.codex\sessions")
+            cands += _glob.glob(r"\\wsl$\*\home\*\.codex\sessions")
+        except Exception:
+            pass
+    return [c for c in cands if os.path.isdir(c)]
+
+
+def _read_codex_usage():
+    """Today's codex usage + latest weekly/5h rate-limit snapshot, or None."""
+    from datetime import date
+    today = date.today()
+    out = {"in": 0, "out": 0, "sessions": 0,
+           "weekly_pct": None, "p5h_pct": None}
+    found = False
+    for root in _codex_sessions_dirs():
+        day_dir = os.path.join(
+            root, f"{today.year:04d}", f"{today.month:02d}", f"{today.day:02d}")
+        try:
+            names = sorted(os.listdir(day_dir))
+        except OSError:
+            continue
+        newest_mtime = -1.0
+        for n in names:
+            if not (n.startswith("rollout-") and n.endswith(".jsonl")):
+                continue
+            p = os.path.join(day_dir, n)
+            last = _last_json_line_with(p, '"token_count"')
+            if not last:
+                continue
+            payload = last.get("payload") or {}
+            info = payload.get("info") or {}
+            tot = info.get("total_token_usage") or {}
+            out["in"] += int(tot.get("input_tokens", 0) or 0)
+            out["out"] += int(tot.get("output_tokens", 0) or 0)
+            out["sessions"] += 1
+            found = True
+            rl = payload.get("rate_limits") or {}
+            try:
+                mt = os.path.getmtime(p)
+            except OSError:
+                mt = 0.0
+            if rl and mt >= newest_mtime:
+                newest_mtime = mt
+                pri = rl.get("primary") or {}
+                sec = rl.get("secondary") or {}
+                out["p5h_pct"] = pri.get("used_percent")
+                out["weekly_pct"] = sec.get("used_percent")
+        if found:
+            return out
+    return None
+
+
+def _claude_project_dirs():
+    """Claude Code transcript dirs for THIS repo. The JSONL lives on the
+    Windows side; under WSL the repo path is already /mnt/c/... so deriving
+    the home dir from REPO's parent works in both environments."""
+    dirs = []
+    repo_name = os.path.basename(REPO)
+    bases = [
+        os.path.join(os.path.dirname(REPO), ".claude", "projects"),
+        os.path.expanduser("~/.claude/projects"),
+    ]
+    seen = set()
+    for base in bases:
+        try:
+            entries = os.listdir(base)
+        except OSError:
+            continue
+        for e in entries:
+            if e.endswith("-" + repo_name):
+                p = os.path.join(base, e)
+                key = os.path.normcase(os.path.normpath(p))
+                if key not in seen and os.path.isdir(p):
+                    seen.add(key)
+                    dirs.append(p)
+    return dirs
+
+
+def _read_claude_usage():
+    """Sum usage objects from today's (mtime) transcript JSONLs, or None."""
+    from datetime import date, datetime
+    today = date.today()
+    out = {"in": 0, "out": 0, "files": 0}
+    found = False
+    for d in _claude_project_dirs():
+        try:
+            names = os.listdir(d)
+        except OSError:
+            continue
+        for n in names:
+            if not n.endswith(".jsonl"):
+                continue
+            p = os.path.join(d, n)
+            try:
+                if datetime.fromtimestamp(os.path.getmtime(p)).date() != today:
+                    continue
+            except OSError:
+                continue
+            seen_ids = set()
+            try:
+                with open(p, encoding="utf-8", errors="replace") as f:
+                    for line in f:
+                        if '"usage"' not in line:
+                            continue
+                        try:
+                            rec = json.loads(line)
+                        except ValueError:
+                            continue
+                        msg = rec.get("message") or {}
+                        usage = msg.get("usage")
+                        if not isinstance(usage, dict):
+                            continue
+                        mid = msg.get("id") or rec.get("requestId") or rec.get("uuid")
+                        if mid is not None:
+                            if mid in seen_ids:
+                                continue
+                            seen_ids.add(mid)
+                        out["in"] += int(usage.get("input_tokens", 0) or 0)
+                        out["in"] += int(usage.get("cache_creation_input_tokens", 0) or 0)
+                        out["in"] += int(usage.get("cache_read_input_tokens", 0) or 0)
+                        out["out"] += int(usage.get("output_tokens", 0) or 0)
+                        found = True
+            except OSError:
+                continue
+            out["files"] += 1
+    return out if found else None
+
+
+def _collect_agent_usage():
+    data = {
+        "codex": _read_codex_usage(),
+        "claude": _read_claude_usage(),
+        "at": time.time(),
+    }
+    try:
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+        with open(USAGE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+    except OSError:
+        pass
+    return data
+
+
+def get_agent_usage(block=False):
+    """Cached codex+claude usage snapshot. Never blocks the render loop:
+    stale/missing data kicks a background refresh and returns the last
+    snapshot (or None for the 'measuring' placeholder). --once renders
+    block inline so a single frame still has real data."""
+    now = time.time()
+    if _usage_cache["data"] is not None and now - _usage_cache["ts"] < USAGE_TTL:
+        return _usage_cache["data"]
+    if _usage_cache["data"] is None:
+        # Cross-run disk cache (same TTL) so cold starts paint instantly.
+        try:
+            mt = os.path.getmtime(USAGE_CACHE_FILE)
+            if now - mt < USAGE_TTL:
+                d = _load_json(USAGE_CACHE_FILE, None)
+                if isinstance(d, dict):
+                    _usage_cache["data"] = d
+                    _usage_cache["ts"] = mt
+                    return d
+        except OSError:
+            pass
+    if block:
+        try:
+            data = _collect_agent_usage()
+        except Exception:
+            data = {"codex": None, "claude": None}
+        _usage_cache["data"] = data
+        _usage_cache["ts"] = time.time()
+        return data
+    th = _usage_cache.get("thread")
+    if th is None or not th.is_alive():
+        def _bg():
+            try:
+                data = _collect_agent_usage()
+            except Exception:
+                data = {"codex": None, "claude": None}
+            _usage_cache["data"] = data
+            _usage_cache["ts"] = time.time()
+        th = threading.Thread(target=_bg, daemon=True)
+        _usage_cache["thread"] = th
+        th.start()
+    return _usage_cache["data"]  # possibly stale or None — never blocks
+
 MILESTONES = {60:"BADGE 6",70:"BADGE 7",80:"BADGE 8",90:"CHAMPION"}
 def load_ms():
     try:
@@ -1660,15 +1892,60 @@ def render_frame(stats, frame, tw, th):
     if stale_n or missing_n:
         out.append(_c(f"  !! STALE BUILDS: {stale_n} stale .o, {missing_n} missing .o — run `python rebuild_stale.py` to recompile and refresh dex count", Y93, BLD))
 
-    # Agent token usage section
+    # Agent token usage section — CODEX + CLAUDE daily usage, then any
+    # active .omc/agent_tokens.json lanes.
+    out.append(_c("--- AGENT TOKENS " + "-"*max(1, tw-19), C96))
+    bar_w = max(12, min(28, tw - 60))
+    usage = get_agent_usage(block=("--once" in sys.argv))
+
+    def _limit_bar(pct):
+        """Clamped fill bar in the section's green/yellow/red scheme."""
+        color = G92 if pct < 60 else (Y93 if pct < 85 else R91)
+        filled = min(bar_w, int((pct / 100) * bar_w))  # clamp at 100%
+        return (_c("█" * filled, color, BLD) + _c("░" * (bar_w - filled), DM),
+                color)
+
+    if usage is None:
+        out.append("  " + _c("measuring agent usage...", DM))
+    else:
+        cx = usage.get("codex")
+        if cx:
+            wk = cx.get("weekly_pct")
+            if wk is not None:
+                b, wc = _limit_bar(float(wk))
+                p5 = cx.get("p5h_pct")
+                p5_str = _c(f"  5h {p5:.0f}%", DM) if p5 is not None else ""
+                out.append(f"  {_c('▶', G92, BLD)} {'codex gpt-5.5':<16s} "
+                           f"{b} {_c(f'{float(wk):3.0f}%', wc, BLD)} "
+                           f"{_c('weekly limit used', DM)}{p5_str}")
+            else:
+                out.append(f"  {_c('▶', G92, BLD)} {'codex gpt-5.5':<16s} "
+                           + _c("no rate-limit snapshot", DM))
+            out.append("    " + _c(
+                f"today {fmt_tokens(cx['in'] + cx['out'])} tok "
+                f"({fmt_tokens(cx['out'])} out, {cx['sessions']} sessions)", DM))
+        else:
+            out.append(f"  {_c('·', GR37)} {'codex gpt-5.5':<16s} "
+                       + _c("n/a (source not found)", DM))
+        cl = usage.get("claude")
+        if cl:
+            out.append(f"  {_c('▶', G92, BLD)} {'claude fable':<16s} "
+                       + _c("today ", DM)
+                       + _c(fmt_tokens(cl['in'] + cl['out']), W97, BLD)
+                       + _c(" tok / ", DM)
+                       + _c(fmt_tokens(cl['out']), C96, BLD)
+                       + _c(f" out ({cl['files']} sessions)", DM))
+        else:
+            out.append(f"  {_c('·', GR37)} {'claude fable':<16s} "
+                       + _c("n/a (source not found)", DM))
+
     tokens_data = stats.get("tokens", {})
     agents = tokens_data.get("agents", {}) if isinstance(tokens_data, dict) else {}
-    if agents:
-        out.append(_c("--- AGENT TOKENS " + "-"*max(1, tw-19), C96))
-        # Animated fill bars: busy agents get a sliding "shimmer" pulse,
-        # idle agents are static. Bar width scales with terminal width.
-        bar_w = max(12, min(28, tw - 60))
-        for name in sorted(agents.keys()):
+    active_lanes = [n for n in sorted(agents.keys())
+                    if (agents[n].get("status", "") or "").lower().startswith("busy")]
+    if active_lanes:
+        # Animated fill bars: busy agents get a sliding "shimmer" pulse.
+        for name in active_lanes:
             a = agents[name]
             used = int(a.get("tokens_used", 0))
             limit = int(a.get("limit", 0))
