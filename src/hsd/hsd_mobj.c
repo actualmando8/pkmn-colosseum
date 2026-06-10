@@ -197,18 +197,23 @@ extern u32 lbl_8047B2D0;
 extern u8 lbl_8036CB30[];
 extern u32 lbl_8047B2D8;
 extern u32 lbl_8047B2DC;
-#if 1
+#if 0
 asm void fn_801A6B24(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B24.inc"
 }
 #else
 void fn_801A6B24(void* info) {
+    u32 zero1;
+    u32 zero2;
+
     if (info == (void*)lbl_8047B2D0) {
         lbl_8047B2D0 = 0;
     }
     if (info == (void*)lbl_8036CB30) {
-        lbl_8047B2D8 = 0;
-        lbl_8047B2DC = 0;
+        zero1 = 0;
+        zero2 = 0;
+        lbl_8047B2D8 = zero1;
+        lbl_8047B2DC = zero2;
     }
     ((HSD_ClassInfo*)lbl_8036CB30)->head.parent->destroy((HSD_Class*)info);
 }
