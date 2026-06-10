@@ -8812,11 +8812,11 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         PC_FLOOR_OUTSKIRT, "S1_out",
         { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, 0, { 0.0f, 0.0f, 0.0f } } },
         0,
-        { 60.0f, 0.0f, 20.0f }   /* spawn point: just behind the gas-pump foundation
-                                   * (concrete pad under the green pump, right side
-                                   * of view), matching the real game's S1_out entry.
-                                   * Pump is at ~X=80, Z~-5; Wes at X=60, Z=20 stands
-                                   * just to its left/in-front with plaza open ahead. */
+        { 47.7f, 0.0f, 79.9f }   /* spawn point: just behind the gas-pump foundation
+                                   * (concrete pad under the green pump, right side of
+                                   * view).  Dialled in by the user walking Wes to the
+                                   * spot in the live port; final coords from the
+                                   * [field/walk] exit log were (47.7, 0.0, 79.9). */
     },
     {
         PC_FLOOR_GARAGE_1F, "D1_garage_1F",
@@ -9459,10 +9459,13 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         VIWaitForRetrace_PC();
         /* Real-time frame step: elapsed seconds * 60 = game frames elapsed.
-         * This keeps animation at GC speed (1 frame/tick) even if rendering
-         * takes longer than 1/60 s (e.g. large exterior scenes). */
+         * This keeps animation at GC speed (1 frame/tick) even when rendering
+         * takes longer than 1/60 s (e.g. large exterior scenes like S1_out).
+         * Fall back to 1.0 (one GC tick) when glfwGetTime is frozen/unavailable
+         * (headless mode, first frame, or very fast loops where delta rounds to 0). */
         nowTime = glfwGetTime();
         frameStep = (f32)((nowTime - g_walkPrevTime) * 60.0);
+        if (frameStep < 0.001f) frameStep = 1.0f;   /* frozen clock fallback */
         g_walkPrevTime = nowTime;
         PADRead(pads);
         btn = pads[0].button;
