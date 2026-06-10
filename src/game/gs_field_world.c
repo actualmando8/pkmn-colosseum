@@ -17097,49 +17097,41 @@ void fn_80125314(u8* ptr, u32 arg2) {
     fn_801254B4(ptr, 0, 0x81, arg2, 0);
 }
 /* 0x80125390 | 0x94 */
+#pragma push
+#pragma opt_propagation off
 #if 1
 asm void fn_80125390(void) {
 #include "src/game/gs_field_world_fn_80125390.inc"
 }
 #else
-void fn_80125390(void) {
-    extern u32 fn_8012640C();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    if ((s32)r0 == (s32)0) {
-        r3 = 0x0;
-    } else {
-        r4 = 0x0;
-        r5 = 0x75;
-        r6 = 0x0;
-        fn_8012640C();
-        r31 = r3;
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0x6f;
-        r6 = 0x0;
-        fn_8012640C();
-        r4 = (u32)r31 >> 16;
-        r0 = r31 & 0xFFFF;
-        r5 = (u32)r3 >> 16;
-        r6 = r3 & 0xFFFF;
-        r0 = r4 ^ r0;
-        r3 = 0x8;
-        r0 = r5 ^ r0;
-        r0 = r6 ^ r0;
-        r0 = r3 ^ r0;
-        r0 = __cntlzw(r0);
-        r0 = r3 << r0;
-        r3 = (u32)r0 >> 31;
+u32 fn_80125390(void* ctx) {
+    extern u32 fn_8012640C(void* a, u32 b, u32 c, u32 d);
+    u32 a;      /* r31 */
+    u32 b;
+    u32 s;
+    u32 lo_a;
+    u32 hi_a;
+    u32 hi_b;
+    u32 lo_b;
+    u32 eight;  /* materialized once: xor operand AND slw operand */
+    if (ctx == NULL) {
+        return 0;
     }
-    return;
+    a = fn_8012640C(ctx, 0, 0x75, 0);
+    b = fn_8012640C(ctx, 0, 0x6F, 0);
+    lo_a = a & 0xFFFF;
+    hi_a = a >> 16;
+    hi_b = b >> 16;
+    lo_b = b & 0xFFFF;
+    s = hi_a ^ lo_a;
+    eight = 8;
+    s = hi_b ^ s;
+    s = lo_b ^ s;
+    s = eight ^ s;
+    return (u32)(eight << __cntlzw(s)) >> 31;
 }
 #endif
+#pragma pop
 /* 0x48 | fn_80125424 | null_guard_chain */
 void fn_80125424(void* ptr, u32 arg2) {
     extern void fn_801254B4();

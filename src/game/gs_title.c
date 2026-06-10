@@ -3266,7 +3266,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern u32 fn_80143F24(void*);
     extern u32 fn_80143EF0(u32);
     extern u32 fn_80143E88(void*);
-    extern s32 fn_8001E074(s32, s32, s32, s32);
+    extern s32 menuSubOpenYesNo(s32, s32, s32, s32);
     extern u32 fn_8011F228(s32, u32);
     extern void fn_8011F5C8(s32);
     extern s32 fn_8011E778(void);
@@ -3277,23 +3277,26 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     extern void fn_80122370(s32, u32, s32);
     extern void fn_80023274(void);
 
-    void* handle;
-    u8 status;
-    u32 value16;
     s32 type_byte;
-    s32 msg;
-    s32 state;
-    s32 action;
     s32 slot;
+    s32 state;
+    s32 effect;
+    s32 msg;
+    void* handle;
+    u16 value16;
+    u8 status;
+    s32 c;
+    s32 tmp;
+    u32 v2;
+    s32 i;
+    s32 action;
     s32 sc;
     s32 sd;
-    s32 effect;
-    s32 i;
     u8 buf;
 
     handle = fn_801440A0((u16)arg0);
     status = (u8)fn_80143F24(handle);
-    value16 = (u16)fn_80143EF0(status);
+    value16 = fn_80143EF0(status);
     fn_80166A50(0x4CB, 0, 0xFF, 0);
     type_byte = fn_80143E88(handle);
     if ((u8)type_byte != 0xFF) {
@@ -3305,7 +3308,7 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     fn_80106D3C(2, msg, 1, 0);
     fn_801069FC(1);
     fn_80106D3C(2, 0x426B, 1, 0);
-    state = (s8)fn_8001E074(0, -1, -1, 0);
+    state = (s8)menuSubOpenYesNo(0, -1, -1, 0);
     fn_801069FC(1);
     switch (state) {
     case 0:  action = 0; break;
@@ -3319,50 +3322,50 @@ s32 fn_80022834(u32 arg0, u32* arg1) {
     slot = fn_800141BC((void*)arg0, 1);
     if (slot >= 0) {
         fn_80014118(slot, &sc, &sd);
-        if (fn_8011FC74(sc) != 0) {
+        c = sc;
+        if (fn_8011FC74(c) != 0) {
             fn_80106D3C(2, 0x424C, 1, 0);
             fn_801069FC(1);
-            effect = 0;
+            tmp = 0;
         } else {
-            value16 = fn_80143EF0(status);
+            v2 = fn_80143EF0(status);
             for (i = 0; i < 4; i++) {
-                if ((u16)value16 == (u16)fn_8011F228(sc, (u16)i)) {
+                if ((u16)v2 == (u16)fn_8011F228(c, (u16)i)) {
                     break;
                 }
             }
             if (i < 4) {
-                fn_80132A38(0x32, fn_8011F4F0(sc));
-                fn_80132A38(0x39, (void*)(u16)value16);
+                fn_80132A38(0x32, fn_8011F4F0(c));
+                fn_80132A38(0x39, (void*)(u16)v2);
                 fn_80106D3C(2, 0x4244, 1, 0);
                 fn_801069FC(1);
-                effect = 0;
+                tmp = 0;
             } else {
-                fn_8011F5C8(sc);
+                fn_8011F5C8(c);
                 if (fn_8011E2AC(fn_8011E778(), status) == 0) {
-                    fn_80132A38(0x32, fn_8011F4F0(sc));
-                    fn_80132A38(0x39, (void*)(u16)value16);
+                    fn_80132A38(0x32, fn_8011F4F0(c));
+                    fn_80132A38(0x39, (void*)(u16)v2);
                     fn_80106D3C(2, 0x423F, 1, 0);
                     fn_801069FC(1);
-                    effect = 0;
+                    tmp = 0;
                 } else {
-                    effect = fn_802600E4(sc, value16, &buf, 1, fn_80023274, 0);
-                    if (effect != 0) {
-                        fn_80123D58(sc, buf, (u16)value16);
-                        fn_80122370(sc, fn_80123090(sc), 4);
+                    tmp = fn_802600E4(c, v2, &buf, 1, fn_80023274, 0);
+                    if (tmp != 0) {
+                        fn_80123D58(c, buf, (u16)v2);
+                        fn_80122370(c, fn_80123090(c), 4);
                     }
                 }
             }
         }
-    } else {
-        effect = 0;
+        effect = tmp;
     }
 
     fn_80014198(slot);
     if (slot >= 0 && effect != 0) {
-        if ((u8)type_byte == 0xFF) {
-            *arg1 = 1;
-        } else {
+        if ((u8)type_byte != 0xFF) {
             *arg1 = 0;
+        } else {
+            *arg1 = 1;
         }
         return 0;
     }
