@@ -17640,7 +17640,7 @@ void fn_8012805C(void) {
     extern void fn_8012A5B0();
     extern void fn_801C40F0();
     extern void fn_801C41C8();
-    extern void fn_8025FF9C();
+    extern void memoDataSet();
     extern void fn_8026132C();
     u8 sp[0x300];
     u32 r0 = 0;
@@ -17773,7 +17773,7 @@ void fn_8012805C(void) {
     if ((s32)r28 != (s32)0x0) {
         r4 = (u32)sp + 0x1a4;
         r3 = 0x0;
-        fn_8025FF9C();
+        memoDataSet();
     }
     r3 = r25;
     r4 = (u32)sp + 0x1a4;
@@ -17823,7 +17823,7 @@ void fn_8012805C(void) {
     if ((s32)r28 == (s32)0x0) { r3 = 0x0; return; }
     r4 = (u32)sp + 0x6c;
     r3 = 0x0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = 0x0;
     return;
 }
@@ -18685,7 +18685,7 @@ void fn_80128E38(void) {
     extern void fn_80130BB0();
     extern void fn_80135030();
     extern void fn_8013528C();
-    extern void fn_8025FF9C();
+    extern void memoDataSet();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -18788,13 +18788,13 @@ L_80128F20: ;
     r0 = r3;
     r3 = 0x0;
     r4 = r0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = r30;
     r4 = 0x1;
     fn_8012AC08();
     r4 = r3;
     r3 = 0x0;
-    fn_8025FF9C();
+    memoDataSet();
     r3 = r30;
     r4 = 0xc;
     r5 = 0x2710;
@@ -25911,39 +25911,39 @@ void fn_8013024C(void) {
 }
 #endif
 /* 0x80130660 | 0x110 */
-extern void fn_80135938(void);
-extern void fn_801353C0(void);
+extern void gamedataGetStatus(void);
+extern void gamedataAttestCreate(void);
 #if 0
 asm void fn_80130660(void) {
 #include "src/game/gs_field_world_fn_80130660.inc"
 }
 #else
 void fn_80130660(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x9, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
     fn_801240C4(buf, 0xfb, 0xa, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0xa, 4, 1, 0x7991, fn_800FA280(0x12af));
     tmp = fn_80124410(buf, -1, -1, 0, 0x7991);
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
@@ -25954,15 +25954,15 @@ asm void fn_80130770(void) {
 }
 #else
 void fn_80130770(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     extern u16 fn_80123110(u8* a, u32 b, u8 c);
     u32 temp;
@@ -25970,9 +25970,9 @@ void fn_80130770(u8* arg1) {
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x9, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x9, 3, r30_u8, r31);
     fn_801240C4(buf, 0x19, 0xa, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0xa, 4, 0, 0x7991, fn_800FA280(0x12ae));
@@ -25980,7 +25980,7 @@ void fn_80130770(u8* arg1) {
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_80123110(buf, 0xca, 1);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
@@ -25991,31 +25991,31 @@ asm void fn_80130890(void) {
 }
 #else
 void fn_80130890(u8* arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
-    extern void fn_801353C0(u32* a, u32 b, u32 c, u8 d, u8 e);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
+    extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32* d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern s32 fn_80129E20(u8* a, u8* b, u32 c);
     u32 temp;
     u8 buf[0x13c];
     u8 r31, r30_u8;
     u32 tmp;
 
-    r31 = (u8)fn_80135938(0, 5);
-    r30_u8 = (u8)fn_80135938(0, 4);
-    fn_801353C0(&temp, 0x8, 3, r30_u8, r31);
+    r31 = (u8)gamedataGetStatus(0, 5);
+    r30_u8 = (u8)gamedataGetStatus(0, 4);
+    gamedataAttestCreate(&temp, 0x8, 3, r30_u8, r31);
     fn_801240C4(buf, 0xfa, 0x46, &temp);
     fn_801254B4(buf, 0, 0x99, 0, 0x46);
     fn_80123EF0(buf, 0xff, 0x46, 4, 0, 0x2740, fn_800FA280(0x12ad));
     tmp = fn_80124410(buf, -1, -1, 0, 0x2740);
     fn_801254B4(buf, 0, 0x6f, 0, tmp);
     fn_8012546C(buf);
-    fn_8025FF9C(0, buf);
+    memoDataSet(0, buf);
     fn_80129E20(arg1, buf, 1);
 }
 #endif
@@ -26026,25 +26026,25 @@ asm void fn_801309A0(void) {
 }
 #else
 void fn_801309A0(u32 arg1) {
-    extern u32 fn_80135938(u32 a, u32 b);
+    extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void fn_801240C4(u8* a, u32 b, u32 c, u32 d);
     extern void fn_801254B4(u8* a, u32 b, u32 c, u32 d, u32 e);
     extern u32 fn_800FA280(u32 val);
     extern void fn_80123EF0(u8* a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g);
     extern u32 fn_80124410(u8* a, s32 b, s32 c, u32 d, u32 e);
     extern void fn_8012546C(u8* a);
-    extern void fn_8025FF9C(u32 a, u8* b);
+    extern void memoDataSet(u32 a, u8* b);
     extern void fn_80129E20(u32 a, u8* b, u32 c);
     u8 local[0x144];
     u32 tmp;
-    fn_801240C4(local, 0x161, 0xd, fn_80135938(0, 1));
+    fn_801240C4(local, 0x161, 0xd, gamedataGetStatus(0, 1));
     fn_801254B4(local, 0, 0x99, 0, 0x46);
     tmp = fn_800FA280(0x12ac);
     fn_80123EF0(local, 0xfe, 0xd, 4, 0, 0x911D, tmp);
     tmp = fn_80124410(local, -1, -1, 0, 0x911D);
     fn_801254B4(local, 0, 0x6f, 0, tmp);
     fn_8012546C(local);
-    fn_8025FF9C(0, local);
+    memoDataSet(0, local);
     fn_80129E20(arg1, local, 1);
 }
 #endif
