@@ -175,10 +175,10 @@ extern void fn_801026A4(u32, ...);
 extern void fn_80132834(void* table, u32 stride, u32 count, u32 type);
 extern void fn_80132A38(u32 id, u32 value);
 extern void fn_801338A4(void);
-extern void fn_80133B50(void);
-extern u8 fn_80133BE4(void);
+extern u32 fn_80133B50(u32 arg0, u32* outMax);
+extern u32 fn_80133BE4();
 extern void fn_80133C3C(void);
-extern u32 fn_80133E1C(void);
+extern u32 fn_80133E1C();
 extern void fn_80134164(void);
 extern u32 fn_80134274(void);
 extern s32 fn_801342B8(void);
@@ -2412,54 +2412,34 @@ L_801338C8: ;
 #endif
 
 /* 0x80133B50 | 0x94 */
-extern void fn_800FA444(void);
-#if 1
+extern u32 fn_800FA444(u32 val);
+#if 0
 asm void fn_80133B50(void) {
 #include "src/game/effect/effect_util_fn_80133B50.inc"
 }
 #else
-void fn_80133B50(void) {
-    extern void fn_800FA444();
-    extern void fn_80133BE4();
-    extern void fn_80133E1C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+u32 fn_80133B50(u32 arg0, u32* outMax) {
+    u32 index;
+    u32 value;
+    u32 max;
+    s32 done;
 
-    /* mr. r30, r4 */;
-    r29 = r3;
-    if ((s32)r0 != (s32)0) {
-        r0 = 0x0;
-        *(u32*)((u8*)r30 + 0x0) = r0;
+    if (outMax != NULL) {
+        *outMax = 0;
     }
-    r31 = 0x0;
+    index = 0;
     do {
-        r3 = r29;
-        r4 = r31;
-        fn_80133E1C();
-        if (r30 != (u32)0x0) {
-            fn_800FA444();
-            r0 = *(u32*)((u8*)r30 + 0x0);
-            r3 = (u32)r3 >> 16;
-            if ((s32)r0 < (s32)r3) {
-                *(u32*)((u8*)r30 + 0x0) = r3;
+        value = fn_80133E1C(arg0, index);
+        if (outMax != NULL) {
+            value = fn_800FA444(value) >> 16;
+            max = *outMax;
+            if ((s32)max < (s32)value) {
+                *outMax = value;
+            }
         }
-        }
-        r4 = r31;
-        r3 = r29;
-        r31 = r31 + 0x1;
-        fn_80133BE4();
-    } while ((s32)r3 == (s32)0x0);
-    r3 = r31;
-    r31 = *(u32*)(sp + 0x1C);
-    r30 = *(u32*)(sp + 0x18);
-    r29 = *(u32*)(sp + 0x14);
-    return;
+        done = fn_80133BE4(arg0, index++);
+    } while (done == 0);
+    return index;
 }
 #endif
 
@@ -5709,7 +5689,7 @@ asm u8 fn_80133BE4(void) {
 #include "src/game/effect/effect_util_fn_80133BE4.inc"
 }
 #else
-u8 fn_80133BE4(void) {
+u32 fn_80133BE4(void) {
     u8* result;
     u32 ret;
     fn_80133E6C();
