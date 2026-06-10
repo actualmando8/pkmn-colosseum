@@ -6241,6 +6241,30 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                     haveTexture);
 
                 if (haveTexture) {
+                    /* Cloud / scene UV-scroll: if the field-anim TexAnim drove
+                     * a UV translation for this TObj, apply it as a texture
+                     * matrix so the GLSL shader shifts the UV coordinates.
+                     * coordId 0 = GX_TEXCOORD0 (v_texcoord0 in the shader). */
+                    {
+                        f32 animU = 0.0f, animV = 0.0f;
+                        if (PCPort_FieldAnimGetTexUV(tobjOffset, &animU, &animV)) {
+                            /* 3x4 row-major UV translation matrix.
+                             * gx_tev_set_tex_matrix uses only the upper 3x3:
+                             *   [1  0  animU]       (u,v,1) · this = (u+animU, v+animV)
+                             *   [0  1  animV]
+                             *   [0  0  1    ] */
+                            f32 uvMtx[3][4] = {
+                                { 1.0f, 0.0f, animU, 0.0f },
+                                { 0.0f, 1.0f, animV, 0.0f },
+                                { 0.0f, 0.0f, 1.0f, 0.0f }
+                            };
+                            u32 coordSlot = haveTexture
+                                ? (u32)translatedTextureExp.stages[0].texture.coordId
+                                : 0u;
+                            if (coordSlot >= 8u) coordSlot = 0u;
+                            GXHostSetTexMatrix(coordSlot, (const f32(*)[4])uvMtx);
+                        }
+                    }
                     ConfigureTranslatedTexturedPipeline(
                         PCPORT_REAL_TEXTURED_PIPELINE,
                         &translatedMaterial,
@@ -6424,6 +6448,13 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                 }
 
                 if (haveTexture) {
+                    /* Reset the texture matrix to identity so any UV-scroll
+                     * applied for this TObj does not bleed into the next draw. */
+                    {
+                        u32 coordSlot = (u32)translatedTextureExp.stages[0].texture.coordId;
+                        if (coordSlot >= 8u) coordSlot = 0u;
+                        GXHostSetTexMatrix(coordSlot, NULL);
+                    }
                     GXHostClearTextureBinding();
                     GSgfxHostClearPipelineState(PCPORT_REAL_TEXTURED_PIPELINE);
                 }
@@ -9493,9 +9524,12 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         if (frameStep < 0.001f) frameStep = 1.0f;   /* frozen clock fallback */
         g_walkPrevTime = nowTime;
 
-        /* Advance scene-ambient animation (signpost swing etc.) each frame at
-         * real-time speed.  No-op if the map has no animjoint (static maps). */
+        /* Advance scene-ambient animation (signpost swing, cloud UV scroll) each
+         * frame at real-time speed.  No-op if the map has no animjoint (static
+         * maps).  Harvest follows immediately so the UV table is current before
+         * the next RenderJointTree call. */
         PCPort_FieldAnimTick(frameStep);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
 
         PADRead(pads);
         btn = pads[0].button;
@@ -9815,7 +9849,8 @@ static int RunFieldScene(GLFWwindow* window) {
         frameStep = (f32)((nowTime - freeFlyPrevTime) * 60.0);
         if (frameStep < 0.001f) frameStep = 1.0f;
         freeFlyPrevTime = nowTime;
-        PCPort_FieldAnimTick(frameStep);  /* advance scene-ambient anim (signpost etc.) */
+        PCPort_FieldAnimTick(frameStep);  /* advance scene-ambient anim (signpost, cloud UV) */
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
 
         PADRead(pads);
         btn = pads[0].button;

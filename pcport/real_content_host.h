@@ -281,6 +281,15 @@ void PCPort_FieldAnimRelease(void);
  * SRT into the storage that RenderJointTree reads.  Call after EngineFieldSetup. */
 void PCPort_FieldAnimSetRenderTarget(PCPortHSDArchive* renderArchive,
                                      u32 renderAnimRootOff);
+/* Walk the live field-anim JObj tree + BE archive simultaneously and populate
+ * the module-scope UV-offset table from every TObj whose TexAnim drove a
+ * non-zero translate_x/translate_y this tick.  renderArchive is &g_engTitleArchive
+ * and beRootJointOff is g_engTitleRootJoint (same args as SetRenderTarget). */
+void PCPort_FieldAnimHarvestTexUV(PCPortHSDArchive* renderArchive,
+                                   u32 beRootJointOff);
+/* Lookup the UV offset for a given TObj archive offset.  Returns 1 and fills
+ * *outU / *outV if a TexAnim entry was found; returns 0 for identity UV. */
+int PCPort_FieldAnimGetTexUV(u32 tobjArchiveOffset, f32* outU, f32* outV);
 /* Diagnostic: build a character's live animated tree and report how many joints
  * actually move over <frames> (proves whether the archive carries real motion). */
 void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames);

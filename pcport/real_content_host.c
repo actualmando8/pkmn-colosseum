@@ -2510,6 +2510,100 @@ void PCPort_FieldAnimTick(f32 frameStep) {
     }
 }
 
+/* -------------------------------------------------------------------------
+ *  PCPort_FieldAnimHarvestTexUV
+ *
+ *  After each PCPort_FieldAnimTick, walk the live g_fieldAnimRoot tree and
+ *  the render-side BE archive simultaneously (lockstep).  For every TObj
+ *  whose TexAnim drove a non-zero UV translation, store
+ *  (beTObjOffset, translate_x, translate_y) in g_texUVTable.
+ *
+ *  RenderJointTree looks up the TObj archive offset it finds in the BE
+ *  archive against this table.  On a hit it builds a 3x3 UV-translation
+ *  matrix and calls GXHostSetTexMatrix(coordSlot, m) before drawing so
+ *  the GLSL shader offsets the UV coordinates, producing the cloud drift.
+ *
+ *  The render-side BE TObj archive offset is the same across all frames
+ *  (the archive bytes don't move) so the key is stable.  The table is
+ *  rebuilt every tick so stale values age out automatically.
+ * ----------------------------------------------------------------------- */
+
+#define PCPORT_TEX_UV_TABLE_MAX 64
+typedef struct {
+    u32 tobjOff;     /* render-side BE archive offset of this TObj */
+    f32 translateU;  /* HSD_TObj::translate_x after animation tick  */
+    f32 translateV;  /* HSD_TObj::translate_y after animation tick  */
+} PCPortTexUVEntry;
+
+static PCPortTexUVEntry g_texUVTable[PCPORT_TEX_UV_TABLE_MAX];
+static int              g_texUVCount = 0;
+
+/* Recursive lockstep walk: compare live HSD_JObj tree with BE archive
+ * joint-by-joint, harvest TObj UV offsets into g_texUVTable. */
+static void FieldAnimHarvestJoint(PCPortHSDArchive* be, u32 beJointOff,
+                                  HSD_JObj* live) {
+    u32 beDobjOff, beMobjOff, beTobjOff, beChildOff, beNextOff;
+    HSD_DObj* liveDobj;
+    HSD_MObj* liveMobj;
+    HSD_TObj* liveTobj;
+
+    if (live == NULL || beJointOff == 0u ||
+        !IsArchiveRangeValid(be, beJointOff, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        return;
+    }
+
+    /* Walk this joint's DObj chain in lockstep. */
+    beDobjOff = ReadBE32(be->storage + beJointOff + 0x10);
+    liveDobj  = union_type_dobj(live) ? live->u.dobj : NULL;
+    while (liveDobj != NULL && beDobjOff != 0u &&
+           IsArchiveRangeValid(be, beDobjOff, 0x10u)) {
+        /* MObj: BE dobj+0x08, live dobj->mobj. */
+        beMobjOff = ReadBE32(be->storage + beDobjOff + 0x08);
+        liveMobj  = liveDobj->mobj;
+        if (liveMobj != NULL && beMobjOff != 0u &&
+            IsArchiveRangeValid(be, beMobjOff, 0x0Cu)) {
+            /* TObj chain: BE mobj+0x08, live mobj->tobj. */
+            beTobjOff = ReadBE32(be->storage + beMobjOff + 0x08);
+            liveTobj  = liveMobj->tobj;
+            while (liveTobj != NULL && beTobjOff != 0u &&
+                   IsArchiveRangeValid(be, beTobjOff, 0x10u) &&
+                   g_texUVCount < PCPORT_TEX_UV_TABLE_MAX) {
+                /* Only record entries where the animation drove a non-zero
+                 * UV offset so the lookup hot-path stays tight. */
+                if (liveTobj->translate_x != 0.0f ||
+                    liveTobj->translate_y != 0.0f) {
+                    g_texUVTable[g_texUVCount].tobjOff    = beTobjOff;
+                    g_texUVTable[g_texUVCount].translateU = liveTobj->translate_x;
+                    g_texUVTable[g_texUVCount].translateV = liveTobj->translate_y;
+                    g_texUVCount++;
+                }
+                /* Advance TObj chain: BE tobj+0x04 (next ptr), live tobj->next. */
+                beTobjOff = ReadBE32(be->storage + beTobjOff + 0x04);
+                liveTobj  = liveTobj->next;
+            }
+        }
+        /* Advance DObj chain: BE dobj+0x04 (next ptr), live dobj->next. */
+        beDobjOff = ReadBE32(be->storage + beDobjOff + 0x04);
+        liveDobj  = liveDobj->next;
+    }
+
+    /* Recurse into child/next in lockstep. */
+    beChildOff = ReadBE32(be->storage + beJointOff + 0x08);
+    beNextOff  = ReadBE32(be->storage + beJointOff + 0x0C);
+    FieldAnimHarvestJoint(be, beChildOff, live->child);
+    FieldAnimHarvestJoint(be, beNextOff,  live->next);
+}
+
+void PCPort_FieldAnimHarvestTexUV(PCPortHSDArchive* renderArchive,
+                                   u32 beRootJointOff) {
+    g_texUVCount = 0;
+    if (!g_fieldAnimReady || g_fieldAnimRoot == NULL ||
+        renderArchive == NULL || beRootJointOff == 0u) {
+        return;
+    }
+    FieldAnimHarvestJoint(renderArchive, beRootJointOff, g_fieldAnimRoot);
+}
+
 /* Tear down the field scene anim (call before loading a new map). */
 void PCPort_FieldAnimRelease(void) {
     g_fieldAnimReady          = 0;
@@ -2534,6 +2628,21 @@ void PCPort_FieldAnimSetRenderTarget(PCPortHSDArchive* renderArchive,
                                      u32 renderAnimRootOff) {
     g_fieldAnimRenderArchive = renderArchive;
     g_fieldAnimRenderRootOff = renderAnimRootOff;
+}
+
+/* Look up a TObj archive offset in the UV harvest table built by the most
+ * recent PCPort_FieldAnimHarvestTexUV call.  Returns 1 and fills *outU / *outV
+ * if found; returns 0 if no entry exists for that TObj (identity UV). */
+int PCPort_FieldAnimGetTexUV(u32 tobjArchiveOffset, f32* outU, f32* outV) {
+    int i;
+    for (i = 0; i < g_texUVCount; ++i) {
+        if (g_texUVTable[i].tobjOff == tobjArchiveOffset) {
+            *outU = g_texUVTable[i].translateU;
+            *outV = g_texUVTable[i].translateV;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /* ------------------------------------------------------------------------- */
