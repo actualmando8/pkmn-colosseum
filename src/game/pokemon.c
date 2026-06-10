@@ -2276,7 +2276,7 @@ void fn_801F1918(void) {
 }
 
 /* 0x801F198C | size: 0x4 | trivial */
-s32 fn_801F198C(void) { return 0; }
+void fn_801F198C(void) {}
 
 /* 0x801F1990 | size: 0xDC | medium */
 void fn_801F1990(void) {
