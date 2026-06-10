@@ -3471,24 +3471,25 @@ void fn_80223F1C(void)
     extern void fn_801F4354();
     extern u32 fn_801F54A4();
     extern void fn_801FE7EC();
-    extern s8 fn_801FECD4();
-    extern s8 fn_802026E4();
+    extern u8 fn_801FECD4();
+    extern u8 fn_802026E4();
     extern void fn_80202810();
     extern void fn_80202998();
     extern void fn_80205B8C();
     extern void fn_8020912C();
     extern void fn_8026532C();
+    extern void fn_80232FE4();
   u16 uVar2;
   u32 uVar1;
-  s8 cVar3;
+  u8 cVar3;
 
   uVar2 = fn_801F54A4(0,0,0x14,0);
-  uVar1 = fn_801F025C(*(u8 *)(*(int *)(lbl_8047B610) + 1),0);
+  uVar1 = fn_801F025C(*(u8 *)(lbl_8047B610 + 1),0);
   fn_801F4354(0,uVar1);
   fn_8020912C(uVar1,2);
   fn_8026532C(uVar1,uVar2,0);
   fn_8020912C(uVar1,3);
-  fn_801F37B0(0,0x80232fe4,uVar1,0);
+  fn_801F37B0(0,(u32)fn_80232FE4,uVar1,0);
   fn_80205B8C(uVar1);
   fn_801252E0();
   fn_80202998(uVar1,0);
@@ -3505,7 +3506,7 @@ void fn_80223F1C(void)
       fn_801FE7EC(uVar1,200,0,0);
     }
   }
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 2;
+  lbl_8047B610 = lbl_8047B610 + 2;
   return;
 }
 /* Address: 0x80224060 | Size: 0xf8 | Ghidra import */
