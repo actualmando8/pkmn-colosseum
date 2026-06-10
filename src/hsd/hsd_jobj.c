@@ -463,7 +463,7 @@ extern void fn_80199264(void);
 extern void fn_801AE50C(void);
 extern void fn_801C25E4(void);
 extern u8 lbl_80274AA0[];
-extern u8 lbl_8047DB20[];
+extern char lbl_8047DB20;
 extern u8 lbl_8047DB28[];
 #if 1
 asm void fn_8019D05C(void) {
@@ -478,16 +478,23 @@ void fn_8019D05C(void) {
 
 /* 0x8019D5A0 | 0x70 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 extern u32 lbl_8047DB30;
 #if 1
 asm void fn_8019D5A0(void) {
 #include "src/hsd/hsd_jobj_fn_8019D5A0.inc"
 }
 #else
-void fn_8019D5A0(void) {
-    /* TODO: match -- 112 bytes at 0x8019D5A0 */
+s32 fn_8019D5A0(HSD_JObj* jobj)
+{
+    if ((s32) ((HSD_ClassInfo*) lbl_8036C8E0)->head.parent->alloc((HSD_ClassInfo*) jobj) >= 0) {
+        f32 a = *(f32*) &lbl_8047DB30;
+        f32 b = *(f32*) &lbl_8047DB30;
+        jobj->flags = JOBJ_MTX_DIRTY;
+        jobj->scale_x = a;
+        jobj->scale_y = b;
+        jobj->scale_z = *(f32*) &lbl_8047DB30;
+        return 0;
+    }
 }
 #endif
 #pragma pop
@@ -777,7 +784,7 @@ extern BOOL fn_801A0D48(void*);
 extern void fn_801A0D94(void);
 extern void fn_801AEBE4(void);
 #if 1
-asm void fn_801A0744(void) {
+asm void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint) {
 #include "src/hsd/hsd_jobj_fn_801A0744.inc"
 }
 #else
@@ -968,16 +975,58 @@ void fn_801A0D94(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80193748(void);
-extern void fn_80193828(void);
+extern HSD_ClassInfo* fn_80193748(const char*);
+extern HSD_JObj* fn_80193828(HSD_ClassInfo*);
 extern u32 lbl_8047B298;
 #if 1
 asm void fn_801A0FBC(void) {
 #include "src/hsd/hsd_jobj_fn_801A0FBC.inc"
 }
 #else
-void fn_801A0FBC(void) {
-    /* TODO: match -- 220 bytes at 0x801A0FBC */
+#pragma optimization_level 1
+HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+{
+    HSD_JObj* jobj;
+    HSD_ClassInfo* info;
+
+    if (joint == NULL) {
+        jobj = NULL;
+        goto done;
+    }
+
+    if (joint->class_name != NULL) {
+        info = fn_80193748(joint->class_name);
+        if (info != NULL) {
+            goto found;
+        }
+    }
+
+    if (lbl_8047B298 != 0) {
+        info = (HSD_ClassInfo*) lbl_8047B298;
+    } else {
+        info = (HSD_ClassInfo*) lbl_8036C8E0;
+    }
+    jobj = fn_80193828(info);
+    if (jobj == NULL) {
+        fn_80196E10(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
+    }
+    goto setup;
+
+found:
+    jobj = fn_80193828(info);
+    if (jobj == NULL) {
+        fn_80196E10(&lbl_8047DB20, 0x3D5, &lbl_8047DB3C);
+    }
+
+setup:
+    {
+        void** vtable = *(void***) jobj;
+        ((void (*)(HSD_JObj*, HSD_Joint*, HSD_JObj*)) vtable[0x3C / 4])(jobj, joint, NULL);
+    }
+
+done:
+    fn_801A0744(jobj, joint);
+    return jobj;
 }
 #endif
 #pragma pop
