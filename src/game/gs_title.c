@@ -210,7 +210,7 @@ extern double sin(double);
 
 /* Named asm symbols (used in inline asm .inc files) */
 extern void menuModelSetMotion(void);
-extern void menuSubOpenYesNo(void);
+extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
 extern void itemParamConvertOrigFormat(void);
 extern void itemParamGetRecoverType(void);
 extern void pcboxGetPokemonBoxNbEmptySlot(void);
@@ -2588,7 +2588,7 @@ void fn_80020C9C(void) {
             if (fn_80135168(0, 9) != fmt) {
                 if (fn_801D04E8() != 0) {
                     fn_80106D3C(1, 0x3D82, 1, 0);
-                    if ((s8)fn_8001E074(0, 0x3C, 0xAA, 1) == 0) {
+                    if ((s8)menuSubOpenYesNo(0, 0x3C, 0xAA, 1) == 0) {
                         fn_801D0748(7, 2, 0);
                     }
                     fn_801069FC(1);
@@ -2737,7 +2737,7 @@ extern u32 lbl_8047A35C;
 extern u32 lbl_8047B898;
 extern u32 lbl_8047A358;
 extern void menuModelSetMotion(void);
-extern void menuSubOpenYesNo(void);
+extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
 #if 0
 asm void fn_800210F0(void) {
 #include "src/game/gs_title_fn_800210F0.inc"
