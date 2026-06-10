@@ -4202,7 +4202,7 @@ extern u32 fn_8012A5B0();
 extern u32 fn_8012640C();
 extern u32 fn_8011BEB4();
 extern u32 fn_801F54A4();
-extern u32 fn_801F76B8();
+extern u32 fightSideGetStatus();
 extern u32 fn_801FB1C0();
 extern void jumptable_80363AF0();
 #if 0
@@ -4229,7 +4229,7 @@ u32 fn_80135E44(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 7:
         return fn_801F54A4(arg1, arg2, arg3, arg4);
     case 8:
-        return fn_801F76B8(arg1, arg2, arg3, arg4);
+        return fightSideGetStatus(arg1, arg2, arg3, arg4);
     case 9:
         return fn_801FB1C0(arg1, arg2, arg3, arg4);
     default:

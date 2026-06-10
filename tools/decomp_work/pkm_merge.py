@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 CANON = ROOT / "src" / "game" / "pokemon.c"
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
 
-FUNC_DEF = re.compile(r'^(?:static\s+|asm\s+)*(?:[A-Za-z_]\w*[\s*]+)+(fn_[0-9A-Fa-f]{8})\s*\([^;]*\)\s*(?:\{.*)?$')
+FUNC_DEF = re.compile(r'^(?:static\s+|asm\s+)*(?:[A-Za-z_]\w*[\s*]+)+((?:fn_[0-9A-Fa-f]{8}|_?[A-Za-z]\w*__F\w*|fight\w+))\s*\([^;]*\)\s*(?:\{.*)?$')
 
 
 def spans(text):
