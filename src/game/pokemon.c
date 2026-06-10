@@ -6042,47 +6042,44 @@ void fn_801F7530(u32 param_1, u16 param_2) {
     }
 }
 
-/* 0x801F75F8 | size: 0xC0 | medium */
-void fn_801F75F8(u8* ptr1, u16 param2, u16 slotType, u8 param4, u16 param5) {
-    extern u8* fn_801F7870(u16);
-    extern void fn_801F77E0(u8*, u16);
-    extern void fn_801F77BC(u8*, u8, u32);
-    extern void fn_801F7798(u8*, u8, u32);
-    extern void fn_801F78AC(u8*, u16);
-    extern void fn_801F789C(u8*, u8);
-    u16 st;
-    u8* r3;
+/* 0x801F75F8 | size: 0xC4 | medium */
+void fn_801F75F8(u8* ptr1, u32 param2, u32 slotType, u32 param4, u32 param5) {
+    extern u8* fn_801F7870(u32);
+    extern void fn_801F77E0(u8*, u32);
+    extern void fn_801F77BC(u8*, u32, u32);
+    extern void fn_801F7798(u8*, u32, u32);
+    extern void fn_801F78AC(u8*, u32);
+    extern void fn_801F789C(u8*, u32);
 
-    st = slotType;
-    if (st == 0) return;
-    if (st >= 0xa) return;
-    if (st < 4)
-        r3 = fn_801F7870(param2);
-    else
-        r3 = ptr1;
-    if (r3 == NULL) return;
-    if ((u16)st > 8) return;
-
-    switch ((u32)(u16)st) {
-    case 0:
-        fn_801F77E0(r3, (u16)param5);
-        break;
+    if ((u16)slotType == 0) {
+        return;
+    }
+    if ((u16)slotType < 0xA) {
+        ;
+    } else {
+        return;
+    }
+    if ((u16)slotType < 4) {
+        ptr1 = fn_801F7870(param2);
+    }
+    if (ptr1 == NULL) {
+        return;
+    }
+    switch ((u16)slotType) {
     case 1:
-        fn_801F77BC(r3, param4, param5);
+        fn_801F77E0(ptr1, (u16)param5);
         break;
     case 2:
-        fn_801F7798(r3, param4, param5);
+        fn_801F77BC(ptr1, (0, (u8)param4), param5);
         break;
     case 3:
-        fn_801F78AC(r3, (u16)param5);
-        break;
-    case 4:
-        fn_801F789C(r3, (u8)param5);
+        fn_801F7798(ptr1, (0, (u8)param4), param5);
         break;
     case 5:
-    case 6:
-    case 7:
+        fn_801F78AC(ptr1, (u16)param5);
+        break;
     case 8:
+        fn_801F789C(ptr1, (u8)param5);
         break;
     }
 }
