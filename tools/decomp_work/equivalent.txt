@@ -20,3 +20,4 @@ fn_80065A48   # ui_core          � W6 jumptable NAME only (@2187 vs jumptable_
 fn_800E4170   # gs_material      — W1 register-recycling (linear-scan slot reuse in section 3); 94.3%, C is correct
 fn_800E8EFC   # gs_material      — W2 prologue scheduling (addi via r0 vs direct addi r30); 92.9%, C is correct
 fn_800E8FA0   # gs_material      — W-peephole bgtlr-fusion (ble @L; blr not reproducible); 88.9%, C is correct
+fightSideGetStatus	# pokemon.c 99.82%: instructions byte-exact; sole diff = CW anonymous local jumptable symbol vs target's named jumptable_8037564C (dtk-named). Unreachable from C.

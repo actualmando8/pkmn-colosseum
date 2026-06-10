@@ -6288,79 +6288,44 @@ void fn_801F75F8(u8* ptr1, u32 param2, u32 slotType, u32 param4, u32 param5) {
     }
 }
 
-/* 0x801F76B8 | size: 0xE0 | medium */
-void fightSideGetStatus(void) {
-    extern void fn_801F77F0();
-    extern void fn_801F7824();
-    extern void fn_801F7858();
-    extern void fn_801F7870();
-    extern void fn_801F78BC();
-    extern void fn_801F78D4();
-    extern void fn_801F7908();
-    extern void fn_801F793C();
-    extern u8 jumptable_8037564C[];
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+/* 0x801F76B8 | size: 0xE0 | fightSideGetStatus: per-side status dispatcher */
+u32 fightSideGetStatus(u8* ptr1, u32 param2, u32 slotType, u32 param5) {
+    extern u32 fn_801F77F0(u8*, u32);
+    extern u32 fn_801F7824(u8*, u32);
+    extern u32 fn_801F7858(u8*);
+    extern u8* fn_801F7870(u32);
+    extern u32 fn_801F78BC(u8*);
+    extern u32 fn_801F78D4(u8*, u32);
+    extern u32 fn_801F7908(u8*, u32);
+    extern u32 fn_801F793C(u8*);
 
-    r0 = r5 & 0xFFFF;
-    r30 = r5;
-    r31 = r6;
-    if ((s32)r0 == (s32)0) { r3 = 0x0; return; }
-    if (r0 >= (u32)0xa) {
-
-        r3 = 0x0;
-        return;
+    if ((u16)slotType == 0 || (u16)slotType >= 0xA) {
+        return 0;
     }
-    if (r0 < (u32)0x4) {
-        r3 = r4;
-        fn_801F7870();
+    if ((u16)slotType < 4) {
+        ptr1 = fn_801F7870(param2);
     }
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    if (ptr1 == NULL) {
+        return 0;
     }
-    r0 = r30 & 0xFFFF;
-    if (r0 <= (u32)0x8) {
-        r4 = (u32)jumptable_8037564C;
-        r0 = r0 << 2;
-        r4 = (u32)jumptable_8037564C;
-        r0 = *(u32*)(r4 + r0);
-        ctr_fn = (void(*)(void))r0;
-        /* indirect jump via ctr */;
-        fn_801F7858();
-        r3 = r3 & 0xFFFF;
-        return;
-        r4 = r31 & 0xFF;
-        fn_801F7824();
-        return;
-        r4 = r31 & 0xFF;
-        fn_801F77F0();
-        return;
-        fn_801F793C();
-        r3 = r3 & 0xFFFF;
-        return;
-        r4 = r31;
-        fn_801F7908();
-        return;
-        r4 = r31;
-        fn_801F78D4();
-        return;
-        fn_801F78BC();
-        r3 = r3 & 0xFF;
-        return;
+    switch ((u16)slotType) {
+    case 1:
+        return (u16)fn_801F7858(ptr1);
+    case 2:
+        return fn_801F7824(ptr1, (u8)param5);
+    case 3:
+        return fn_801F77F0(ptr1, (u8)param5);
+    case 5:
+        return (u16)fn_801F793C(ptr1);
+    case 6:
+        return fn_801F7908(ptr1, param5);
+    case 7:
+        return fn_801F78D4(ptr1, param5);
+    case 8:
+        return (u8)fn_801F78BC(ptr1);
+    default:
+        return 0;
     }
-    r3 = 0x0;
-
-    return;
 }
 
 /* 0x801F7798 | size: 0x24 | small */

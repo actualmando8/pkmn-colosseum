@@ -136,7 +136,6 @@ extern u16  lbl_8047AEA0;
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void _dbgMenuGetLink__Fl();
 extern void _koukaOneExec__FUlPvPvPl();
-extern void fightSideGetStatus();
 extern void gamedataAttestCreate();
 extern void gamedataAttestInit();
 extern void gamedataGetStatus();
