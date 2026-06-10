@@ -3886,16 +3886,12 @@ void fn_800DD0B8(u32 count) {
     handle = fn_800E3534(count * 0x74);
     lbl_8047AAE8 = handle;
     if (handle) {
-        u32 i;
         u32 off;
-        lbl_8047AAEC = (u32)fn_800E27B0(handle);
-        i = 0;
-        off = 0;
-        do {
-            ((u8*)lbl_8047AAEC)[off] = 0;
-            off += 0x74;
-            i++;
-        } while (i < lbl_8047AAF0);
+        u32 i;
+        lbl_8047AAEC = (u32)fn_800E27B0((u16)handle);
+        for (off = 0, i = 0; i < lbl_8047AAF0; i++, off += 0x74) {
+            *(u8*)(lbl_8047AAEC + off) = 0;
+        }
     }
 }
 #endif
