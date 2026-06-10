@@ -141,6 +141,7 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 
 | Function | File | Class | match% | Equivalent? | Evidence |
 |---|---|---|---|---|---|
+| `fn_80029FAC` | gs_worldmap.c | W2 instruction scheduling (slwi vs early sda21 lwz issue order) | 97.01% | no (C active) | Gekko list-scheduler always issues the ready SDA load before the ready shift — exhaustively swept 2026-06-10 (volatile cast, subscript inversion, statement reorders, scheduling 601/603/604/750/off, peephole on) all inert or worse. Sibling `fn_8002A0B8` same wall. → equivalent.txt |
 | `fn_80038380` | scene_init.c | W2 instruction scheduling (stb/cmpwi reorder) | 89.88% | no (C active) | 4 real mismatches: instruction scheduling moves `stb` earlier and `cmpwi` later; 8 name-only symbol diffs. Sibling of fn_8003907C (identical pattern). |
 | `fn_8003907C` | scene_init.c | W2 instruction scheduling (stb/cmpwi reorder) | 89.88% | no (C active) | Same W2 pattern as fn_80038380. |
 | `fn_80039004` | scene_init.c | W2 `extsb.` vs `extsb`+`cmpwi` codegen idiom + W1 regalloc (`lfsx` indexed vs `lfs` offset, `mulli r6` vs `mulli r0`) | 89.17% | no (C active) | `extsb.` combines sign-extend+condition test — CW emits separate `extsb`+`cmpwi`. `lfsx f0,r5,r0` vs `lfs f0,0(r5)` is regalloc-driven addressing mode. |
