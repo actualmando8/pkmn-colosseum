@@ -25761,11 +25761,12 @@ void fn_8021F1CC(void)
   u32 uVar2;
 
   uVar1 = fn_801F025C(*(u8 *)(lbl_8047B610 + 1),0);
-  if (*(s8 *)(lbl_8047B610 + 2) == 2) {
-    uVar2 = fn_802037DC();
-    fn_80132A38(0xd,uVar2);
+  switch (*(s8 *)(lbl_8047B610 + 2)) {
+  case 2:
+    fn_80132A38(0xd,fn_802037DC());
     uVar1 = fn_80203758(uVar1);
     fn_80132A38(0xe,uVar1);
+    break;
   }
   lbl_8047B610 = lbl_8047B610 + 3;
   return;
