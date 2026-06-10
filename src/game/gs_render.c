@@ -3158,10 +3158,12 @@ u32 fn_800DADB4(void) {
 extern u16 fn_800E2C04(u32, u32);
 extern u32 lbl_8047AAD8;
 extern u32 lbl_8047AAD4;
-/* WALL(codex): fn_800DAF60 free-slot scan is branch-shape limited.
- * for/goto form makes CW use mtctr/bdnz and improves to 96.1538%, but
- * remaining loop branches are target ble/bne/explicit b versus decomp beq/beq.
- * Reverted non-100 loop experiment. */
+/* fn_800DAF60 @ 98.53: for(count=lbl;count!=0;count--)+goto gives the
+ * target's mtctr/bdnz free-slot scan. Residual = entry `ble` vs `beq`
+ * (target's signed `> 0` guard conflicts with the unsigned bdnz the same
+ * counter needs — (s32)count>0 regresses) + the loop-body branch fusion
+ * (target `bne tail; b found` vs CW's fused `beq found`). Both
+ * compiler-internal; not jointly C-controllable. */
 #if 0
 asm void fn_800DAF60(void) {
 #include "src/game/gs_render_fn_800DAF60.inc"
@@ -3176,15 +3178,13 @@ u32 fn_800DAF60(u32 a, u32 b) {
         if (*(u8*)(s + 0x47e) == 1) { return 0; }
         if (*(u8*)(s + 0x49f) == 1) { return 0; }
     }
-    count = lbl_8047AAD8;
     r31 = lbl_8047AAD4;
-    if (count > 0) {
-        do {
-            if (*(u8*)r31 == 0) { break; }
-            r31 += 0x18;
-        } while (--count);
+    for (count = lbl_8047AAD8; count != 0; count--) {
+        if (*(u8*)r31 == 0) { goto _found; }
+        r31 += 0x18;
     }
-    if (count == 0) { r31 = 0; }
+    r31 = 0;
+_found:
     if (r31 == 0) { return 0; }
     *(u8*)(r31 + 0x0) = 1;
     *(u8*)(r31 + 0x1) = 0;
