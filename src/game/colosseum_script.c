@@ -22102,14 +22102,14 @@ void fn_8021908C(void)
   return;
 }
 /* Address: 0x80219270 | Size: 0x44 | Ghidra import */
-u32 fn_80219270(u16 r3)
+u32 fn_80219270(u32 r3)
 
 {
-  if ((((r3 != 0x164) && (1 < (u16)(r3 - 0xa5U))) && (r3 != 0xffff)) &&
-     ((r3 != 0 && (r3 != 0x165)))) {
-    return 0;
+  if ((((u16)r3 == 0x164) || (1 >= (u16)(r3 - 0xa5U))) || ((u16)r3 == 0xffff) ||
+     (((u16)r3 == 0 || ((u16)r3 == 0x165)))) {
+    return 1;
   }
-  return 1;
+  return 0;
 }
 /* Address: 0x802192B4 | Size: 0xa0 | Ghidra import */
 void fn_802192B4(void)
