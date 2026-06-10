@@ -16,3 +16,4 @@ fn_80129280   # gs_field_world   — W6 jumptable NAME only (@6029 vs jumptable_
 fn_80132A38   # effect_util      — W6 jumptable NAME only (@559 vs jumptable_80363630); 99.92%, bytes link identical
 fn_80029FAC   # gs_worldmap       — W2 scheduling (SDA-load-first issue order); 97.01%, exhaustively swept 2026-06-10
 fn_8002A0B8   # gs_worldmap       — W2 scheduling, sibling of fn_80029FAC (same wall)
+fn_80065A48   # ui_core          � W6 jumptable NAME only (@2187 vs jumptable_802EDB7C); 99.99%, bytes link identical
