@@ -307,6 +307,9 @@ void fn_801A4344(void) {}
 extern void fn_801917D0(void);
 extern void fn_80196D78(void);
 extern void OSReport();
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void GXInitLightSpot();
+extern void GXInitLightDistAttn();
 extern u8 lbl_80274D94[];
 extern u8 lbl_8047DBC8[];
 #if 1
