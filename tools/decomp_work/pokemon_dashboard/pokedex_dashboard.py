@@ -1676,7 +1676,7 @@ def render_frame(stats, frame, tw, th):
             status = (a.get("status", "") or "").lower()
             pct = (used / limit * 100) if limit > 0 else 0
             color = G92 if pct < 60 else (Y93 if pct < 85 else R91)
-            filled = int((pct / 100) * bar_w)
+            filled = min(bar_w, int((pct / 100) * bar_w))   # clamp: used can exceed limit
             empty = bar_w - filled
             # Animation: when busy, slide a brighter glyph through the empty
             # portion (1 cell per frame) to signal "actively iterating".
@@ -1726,18 +1726,18 @@ def render_frame(stats, frame, tw, th):
     # Split: in-progress (has asm remaining) vs complete (0 asm remaining)
     in_progress = [(f, d) for f, d in fs.items() if d["asm"] > 0]
     complete    = [(f, d) for f, d in fs.items() if d["asm"] == 0 and d["matched"] > 0]
-    # Order in-progress files by MOST MATCHED first (match ratio descending),
-    # so the fullest progress bars are at the top.
-    in_progress.sort(key=lambda x: x[1]["matched"] / max(1, x[1]["matched"] + x[1]["asm"]), reverse=True)
+    # Order in-progress files WORST-FIRST (lowest match ratio at the top) so
+    # the files needing the most work lead the list.
+    in_progress.sort(key=lambda x: x[1]["matched"] / max(1, x[1]["matched"] + x[1]["asm"]))
     complete.sort(key=lambda x: x[0])
 
     out.append(_c("--- POKEDEX BY ROUTE " + "-"*max(1, tw-22), M95) +
-               _c(" (in-progress files)", DM))
+               _c(" (in-progress files, worst-first)", DM))
 
     # Reserve rows for complete-files line + legend + activity
     activity_rows = max(6, th - len(out) - len(in_progress) - 6)
     max_files = max(6, th - len(out) - activity_rows - 6)
-    name_w = min(28, tw - 32)
+    name_w = max(8, min(28, tw - 32))
     bar_w_file = max(8, tw - name_w - 22)
 
     out.append("  " + _c(f"{'File':<{name_w}s} {'match progress':<{bar_w_file}s} {'%':>6s} {'fns':>7s}", C96, BLD))
@@ -1865,9 +1865,31 @@ def _load_report_measures():
     return None
 
 
+def _print_loading_frame():
+    """Immediate first paint — the full source scan (objdiff per fn) can take
+    a long time on a cold cache; show SOMETHING the instant the pane opens."""
+    term = shutil.get_terminal_size((120, 40))
+    tw = term.columns
+    lines = [
+        "",
+        "  " + _c("POKEDEX DECOMP DASHBOARD", C96, BLD),
+        "  " + _c("measuring sources + build artifacts...", DM),
+        "  " + _c("first full frame lands when the scan finishes", DM),
+        "",
+        "  " + _c("(cached snapshots render instantly on later launches)", DM),
+    ]
+    out = "\033[H\033[J" + "\n".join(
+        _truncate_visible(l, tw - 1) if _visible_len(l) > tw - 1 else l
+        for l in lines)
+    sys.stdout.write(out + "\n")
+    sys.stdout.flush()
+
+
 def main():
     once = "--once" in sys.argv
     stats = load_dashboard_state_for_render()
+    if stats is None:
+        _print_loading_frame()   # cold start: paint immediately, then measure
     frame = 1 if stats is not None else 0
     ms = load_ms()
     history = load_match_history()

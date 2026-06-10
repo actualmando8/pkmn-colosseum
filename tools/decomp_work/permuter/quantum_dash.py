@@ -4,7 +4,7 @@ simulated-annealing search. Reads .omc/permuter_state.json (grind2.py swarm).
 ASCII-art equation (renders everywhere), a rotating 3D |psi|^2 probability cloud,
 energy-descent, temperature, queue, and a MATCH-FOUND celebration animation.
 Run with WSL python3. Ctrl-C to exit."""
-import json, os, sys, time, math, random
+import json, os, sys, time, math, random, shutil
 
 REPO = "/mnt/c/Users/douglaswhittingham/pkmn-colosseum"
 STATE = os.path.join(REPO, ".omc", "permuter_state.json")
@@ -75,7 +75,7 @@ def energy_graph(anns, tw, frame):
     """A multi-row time-series graph of objdiff score per chain (colored), that
     grows as each annealer accumulates history. Newest sample on the right."""
     H = 9
-    W = clamp(tw - 10, 20, 120)   # leave 8 cols for the Y-axis tick labels + margin
+    W = clamp(tw - 10, 16, 120)   # leave 8 cols for the Y-axis tick labels + margin
     cell = [[None] * W for _ in range(H)]   # stores annealer idx per plotted cell
     series = [(a["idx"], _ehist.get(a["fn"], [])) for a in anns]
     allv = [v for _, h in series for v in h]
@@ -162,6 +162,34 @@ def read_annealers():
 def clamp(v, a, b): return max(a, min(b, v))
 
 
+_ANSI_RE = _re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+
+
+def vlen(s):
+    """Visible length of a string (ANSI escapes stripped)."""
+    return len(_ANSI_RE.sub("", s))
+
+
+def vtrunc(s, n):
+    """Hard-truncate to n visible columns, keeping ANSI sequences intact.
+    Appends a dim ellipsis when something was cut."""
+    if n <= 0:
+        return ""
+    if vlen(s) <= n:
+        return s
+    out, vis, i, budget = [], 0, 0, max(0, n - 1)
+    while i < len(s) and vis < budget:
+        m = _ANSI_RE.match(s, i)
+        if m:
+            out.append(m.group())
+            i = m.end()
+            continue
+        out.append(s[i])
+        vis += 1
+        i += 1
+    return "".join(out) + R + DM + "…" + R
+
+
 def eq_block(frame):
     glow = QGRAD[(frame // 2) % len(QGRAD)]
     g = lambda s: glow + BD + s + R
@@ -174,7 +202,7 @@ def eq_block(frame):
 
 
 def cloud_block(frame, tw, busy, nann=1):
-    h, w = 14, clamp(tw - 4, 34, 96)
+    h, w = 14, clamp(tw - 6, 20, 96)
     grid = [[" "] * w for _ in range(h)]
     zbuf = [[-9.0] * w for _ in range(h)]
     cbuf = [[0] * w for _ in range(h)]   # which annealer "owns" each cell (for multi-color)
@@ -218,7 +246,7 @@ def multi_cloud(frame, tw, anns):
     """Superimpose one rotating |psi|^2 cloud per annealer in the same 3D space,
     z-buffer composited, each its own color. Each cloud rotates at its own rate
     and VIBRATES (breath freq/amplitude) driven by its annealer's energy. 2x tall."""
-    h, w = 26, clamp(tw - 4, 34, 100)
+    h, w = 26, clamp(tw - 6, 20, 100)
     grid = [[" "] * w for _ in range(h)]
     zbuf = [[-9.0] * w for _ in range(h)]
     cbuf = [[0] * w for _ in range(h)]
@@ -303,11 +331,12 @@ _seen_wins = set()
 def render(st, frame, tw, th):
     global _seen_wins
     out = []
-    title = "  Q U A N T U M   A N N E A L E R  "
+    # width-adaptive title: spaced letters when roomy, compact when narrow
+    title = " Q U A N T U M   A N N E A L E R " if tw >= 64 else " QUANTUM ANNEALER "
     sh = "".join(QGRAD[(i + frame) % len(QGRAD)] + c for i, c in enumerate(title))
     out.append("")
-    out.append("  " + sh + R)
-    out.append("  " + DM + "decomp-permuter * simulated annealing over CodeWarrior codegen" + R)
+    out.append("  " + CY + BD + sh + R)
+    out.append("  " + DM + "decomp-permuter * simulated annealing over CW codegen" + R)
 
     wins = st.get("wins") or []
     new = [w for w in wins if w not in _seen_wins]
@@ -337,8 +366,9 @@ def render(st, frame, tw, th):
             spk = ""
             if hist:
                 lo, hi = min(hist), max(hist); rng = max(1, hi - lo)
+                spk_w = clamp(tw - 48, 4, 16)   # sparkline shrinks with the pane
                 spk = "".join(SPARK[clamp(int((v - lo) / rng * (len(SPARK) - 1)), 0, len(SPARK) - 1)]
-                              for v in hist[-16:])
+                              for v in hist[-spk_w:])
             out.append("    " + col + BD + spin + " " + f"{a['fn']:<13}" + R
                        + DM + " it " + R + col + f"{a['iter']:>5,}" + R
                        + DM + " E=" + R + col + f"{str(e):<5}" + R
@@ -377,15 +407,21 @@ def render(st, frame, tw, th):
     out.append("")
 
     q = st.get("queue") or []
-    out.append("  " + MG + BD + "QUEUE " + R + DM + f"({len(q)}) " + R
-               + "  ".join(WH + fn + R for fn in q[:8]))
+    nq = max(1, (tw - 16) // 14)               # how many fn names fit on one line
+    qs = "  ".join(WH + fn + R for fn in q[:nq])
+    if len(q) > nq:
+        qs += DM + f"  +{len(q) - nq} more" + R
+    out.append("  " + MG + BD + "QUEUE " + R + DM + f"({len(q)}) " + R + qs)
     done = st.get("done") or []
     if done:
+        nd = max(1, (tw - 12) // 19)
         ds = "   ".join((GR + "[WIN] " + d["fn"] + R) if d.get("result") == "WIN"
-                        else (DM + d["fn"] + f" E={d.get('score')}" + R) for d in done[-7:])
+                        else (DM + d["fn"] + f" E={d.get('score')}" + R) for d in done[-nd:])
         out.append("  " + GR + BD + "RESULTS " + R + ds)
     if wins:
-        out.append("  " + GR + BD + "MATCHES: " + R + GR + ", ".join(wins) + R)
+        nw = max(1, (tw - 14) // 15)
+        ws = ", ".join(wins[-nw:]) + (DM + f" +{len(wins) - nw} more" + R if len(wins) > nw else "")
+        out.append("  " + GR + BD + "MATCHES: " + R + GR + ws + R)
     return out
 
 
@@ -395,11 +431,12 @@ def main():
     frame = 0
     try:
         while True:
-            try:
-                tw, th = os.get_terminal_size()
-            except OSError:
-                tw, th = 100, 44
+            # re-read size every frame; honors COLUMNS/LINES env for testing
+            tw, th = shutil.get_terminal_size((100, 44))
             lines = render(load(), frame, tw, th)
+            # never emit a line wider than the pane: hard ANSI-aware truncation
+            safe_w = max(20, tw - 1)
+            lines = [vtrunc(ln, safe_w) for ln in lines]
             sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in lines[:th]) + "\x1b[J\x1b[?2026l")
             sys.stdout.flush()
             if once:

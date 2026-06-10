@@ -8,9 +8,10 @@ whole research stack together as one flow:
 
 Reads .omc/permuter_state.json (grind2 swarm), .omc/agent_tokens.json (LLM agents),
 report.json (decomp.dev metrics), and git (merged matches). Run with WSL python3."""
-import json, os, sys, time, subprocess
+import json, os, re, sys, time, shutil, subprocess
 
 REPO = "/mnt/c/Users/douglaswhittingham/pkmn-colosseum"
+WALLS = os.path.join(REPO, ".omc", "codex_walls.md")
 STATE = os.path.join(REPO, ".omc", "permuter_state.json")
 TOKENS = os.path.join(REPO, ".omc", "agent_tokens.json")
 POOL = os.path.join(REPO, ".omc", "permuter_pool")
@@ -26,6 +27,33 @@ DM = fg(240); WH = fg(255); MG = fg(201); BL = fg(39); TEAL = fg(45); VI = fg(13
 GRAD = [fg(39), fg(45), fg(51), fg(87), fg(123)]
 
 
+_ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+
+
+def vlen(s):
+    """Visible length (ANSI escapes stripped)."""
+    return len(_ANSI_RE.sub("", s))
+
+
+def vtrunc(s, n):
+    """Hard-truncate to n visible columns, ANSI-safe, with dim ellipsis."""
+    if n <= 0:
+        return ""
+    if vlen(s) <= n:
+        return s
+    out, vis, i, budget = [], 0, 0, max(0, n - 1)
+    while i < len(s) and vis < budget:
+        m = _ANSI_RE.match(s, i)
+        if m:
+            out.append(m.group())
+            i = m.end()
+            continue
+        out.append(s[i])
+        vis += 1
+        i += 1
+    return "".join(out) + R + DM + "…" + R
+
+
 def jload(p, d):
     try:
         return json.load(open(p))
@@ -33,13 +61,43 @@ def jload(p, d):
         return d
 
 
-def merged_matches():
+def _git(args, timeout=6):
     try:
-        out = subprocess.run(["git", "-C", REPO, "log", "--oneline", "-40"],
-                             capture_output=True, text=True, timeout=6).stdout
-        return sum(1 for l in out.splitlines() if "via " in l and "100%" in l)
+        return subprocess.run(["git", "-C", REPO] + args,
+                              capture_output=True, text=True, timeout=timeout).stdout
     except Exception:
+        return ""
+
+
+_MATCH_RE = re.compile(r"^[0-9a-f]{7,12}\s+match fn_[0-9A-Fa-f]{8}", re.I)
+_git_cache = {"ts": 0.0, "merged": 0, "today": 0, "recent": []}
+
+
+def git_info(ttl=15):
+    """Cached git-derived stats: merged matches (last 40), matches landed
+    today, and the last 5 'Match fn_' commit one-liners."""
+    now = time.time()
+    if now - _git_cache["ts"] < ttl:
+        return _git_cache
+    out40 = _git(["log", "--oneline", "-40"])
+    _git_cache["merged"] = sum(1 for l in out40.splitlines() if "via " in l and "100%" in l)
+    today = _git(["log", "--since=midnight", "--oneline"])
+    _git_cache["today"] = sum(1 for l in today.splitlines() if _MATCH_RE.match(l))
+    out20 = _git(["log", "--oneline", "-20"])
+    _git_cache["recent"] = [l for l in out20.splitlines() if _MATCH_RE.match(l)][:5]
+    _git_cache["ts"] = now
+    return _git_cache
+
+
+def walls_depth():
+    """Open entries in the codex->fable wall handoff ledger."""
+    try:
+        txt = open(WALLS, errors="replace").read()
+    except OSError:
         return 0
+    n = len(re.findall(r"^## fn_", txt, re.M))
+    closed = len(re.findall(r"fable:.*CLOSED", txt))
+    return max(0, n - closed)
 
 
 def box(label, lines, color, w=22):
@@ -70,10 +128,20 @@ def render(frame, tw, th):
             best_e = b
 
     out = []
-    title = "  I N T E G R A T E D   D E C O M P   P I P E L I N E  "
+    gi = git_info()
+    title = (" I N T E G R A T E D   D E C O M P   P I P E L I N E "
+             if tw >= 64 else " DECOMP PIPELINE ")
     out.append("")
-    out.append("  " + "".join(GRAD[(i + frame) % len(GRAD)] + c for i, c in enumerate(title)) + R)
-    out.append("  " + DM + "every wall function flows through all tiers; matches land on decomp.dev" + R)
+    out.append("  " + CY + BD + title + R)
+    out.append("  " + DM + "every wall fn flows through all tiers; matches land on decomp.dev" + R)
+    # FLEET status strip: matches landed today | walls queue depth | headline
+    dec = 2 if tw >= 84 else 1   # 1-decimal headline below 84 cols
+    out.append("  " + WH + BD + " FLEET " + R
+               + GR + BD + f" {gi['today']} matched today" + R + DM + " | " + R
+               + OR + f"walls {walls_depth()}" + R + DM + " | " + R
+               + GR + f"Code {rep.get('matched_code_percent', 0):.{dec}f}%" + R + " "
+               + YL + f"Fz {rep.get('fuzzy_match_percent', 0):.{dec}f}%" + R + " "
+               + CY + f"Fn {rep.get('matched_functions_percent', 0):.{dec}f}%" + R)
     out.append("")
 
     # --- map each tracked function to its current pipeline stage + a stable number
@@ -99,8 +167,9 @@ def render(frame, tw, th):
         if not items:
             return DM + "  -" + R
         pcol, pball = POKE.get(key, (color, "o"))
+        nshow = 1 if tw < 70 else (2 if tw < 100 else 4)   # width-adaptive
         s = ""
-        for f in items[:5]:
+        for f in items[:nshow]:
             ball = pball
             if key == "ANNEAL":
                 ball = SPIN[(frame + num[f]) % 4]; pcol = RD
@@ -112,6 +181,8 @@ def render(frame, tw, th):
                 ball = SPIN[(frame // 2 + num[f]) % 4]  # gentle wobble
             glow = (GRAD[(num[f] + frame) % len(GRAD)] + BD) if key == "ANNEAL" else color
             s += " " + pcol + BD + ball + R + glow + f"#{num[f]}" + R + DM + ":" + R + WH + f.replace("fn_", "") + R
+        if len(items) > nshow:
+            s += DM + f" +{len(items) - nshow} more" + R
         return s
 
     # research-derived routing counts (triage gate over the wall inventory)
@@ -133,16 +204,26 @@ def render(frame, tw, th):
         (fg(214),"RA2","INVERT", f"{n_plans} directed candidates (1 each, not N!)", DM + "  first-def order solve" + R),
         (YL,   "T3", "PREDICT",  "allocator surrogate (model)", DM + "  ALLOCATOR_MODEL.md" + R),
         (GR,   "  ", "VERIFY",   "compile_check==100%", DM + "  -" + R),
-        (GR,   "  ", "COMMIT",   f"{merged_matches()} merged", toks("COMMIT", GR)),
+        (GR,   "  ", "COMMIT",   f"{gi['merged']} merged", toks("COMMIT", GR)),
     ]
     travel = frame % len(stages)  # a marker that descends through the stages
     for i, (col, tier, name, detail, tokens) in enumerate(stages):
-        head = (">>" if i == travel else "  ")
-        out.append("  " + (GRAD[frame % len(GRAD)] + BD + head + R) + col + BD + f"{tier} " + R
+        head = (">> " if i == travel else "   ")
+        out.append("  " + (GRAD[frame % len(GRAD)] + BD + head + R) + col + BD + f"{tier:<3} " + R
                    + col + f"{name:<9}" + R + DM + f" {detail}" + R + tokens)
         if i < len(stages) - 1:
-            arr = (GRAD[(frame) % len(GRAD)] + BD + "  V" + R) if i == travel else (DM + "  v" + R)
-            out.append("  " + arr)
+            arr = (GRAD[(frame) % len(GRAD)] + BD + "V" + R) if i == travel else (DM + "v" + R)
+            out.append("      " + arr)   # fixed gutter under the tier column
+    out.append("")
+
+    # RECENT MATCHES ticker — last 5 'Match fn_' commits from git log
+    out.append("  " + GR + BD + "RECENT MATCHES" + R + DM + "  (newest first, git log)" + R)
+    if gi["recent"]:
+        for l in gi["recent"]:
+            sha, _, subj = l.partition(" ")
+            out.append("    " + DM + sha[:8] + R + " " + WH + subj + R)
+    else:
+        out.append("    " + DM + "no Match commits in the last 20" + R)
     out.append("")
 
     # NEW WINNABLE TRACK: allocator-inversion (what cracks the pure-reg walls the
@@ -225,11 +306,11 @@ def main():
     frame = 0
     try:
         while True:
-            try:
-                tw, th = os.get_terminal_size()
-            except OSError:
-                tw, th = 120, 30
-            sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in render(frame, tw, th)[:th]) + "\x1b[J\x1b[?2026l")
+            # re-read size every frame; honors COLUMNS/LINES env for testing
+            tw, th = shutil.get_terminal_size((120, 30))
+            safe_w = max(20, tw - 1)
+            lines = [vtrunc(ln, safe_w) for ln in render(frame, tw, th)]
+            sys.stdout.write("\x1b[?2026h\x1b[H" + "".join(ln + R + "\x1b[K\n" for ln in lines[:th]) + "\x1b[J\x1b[?2026l")
             sys.stdout.flush()
             if once:
                 break
