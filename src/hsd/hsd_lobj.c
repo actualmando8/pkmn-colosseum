@@ -325,7 +325,7 @@ extern void fn_80191688();
 /* HSD_LObjGetInterestPosition */
 s32 fn_801A48B0(HSD_LObj* lobj) {
     if (lobj != NULL) {
-        if (*(u32*)((u8*)lobj + 0x1C) != 0) {
+        if (*(volatile u32*)((u8*)lobj + 0x1C) != 0) {
             fn_80191688(*(void**)((u8*)lobj + 0x1C));
             return 1;
         }
@@ -368,18 +368,15 @@ asm void fn_801A497C(void) {
 #include "src/hsd/hsd_lobj_fn_801A497C.inc"
 }
 #else
-#pragma push
-#pragma peephole off
 s32 fn_801A497C(HSD_LObj* lobj) {
     if (lobj != NULL) {
-        if (*(u32*)((u8*)lobj + 0x18) != 0) {
+        if (*(volatile u32*)((u8*)lobj + 0x18) != 0) {
             fn_80191688(*(void**)((u8*)lobj + 0x18));
             return 1;
         }
     }
     return 0;
 }
-#pragma pop
 #endif
 
 /* 0x801A49C0 | 0x88 */
