@@ -8676,7 +8676,8 @@ void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
 }
 /* 0x80118C88 | 36 bytes | load_then_call */
 void fn_80118C88(void* obj) {
-    fn_80169034(*(void**)((u8*)obj + 0x10));
+    extern void psSetParticleVisibility();
+    psSetParticleVisibility(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118CAC | 36 bytes | load_then_call */
 void fn_80118CAC(void* obj) {
@@ -9875,7 +9876,7 @@ void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FA0(u8* ptr, u32 val);
     u8* base;
@@ -9888,7 +9889,7 @@ void fn_8011A280(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -9918,7 +9919,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10002,7 +10003,7 @@ void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119F90(u8* ptr, u32 val);
     u8* base;
@@ -10015,7 +10016,7 @@ void fn_8011A570(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10045,7 +10046,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10188,7 +10189,7 @@ void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FD0(u8* ptr, u32 val);
     u8* base;
@@ -10201,7 +10202,7 @@ void fn_8011A9EC(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10231,7 +10232,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10256,7 +10257,7 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FC0(u8* ptr, u32 val);
     u8* base;
@@ -10269,7 +10270,7 @@ void fn_8011AB50(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10299,7 +10300,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -10442,7 +10443,7 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
     extern u8 fn_80119E90(u16 val);
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
-    extern u8* fn_80135E44(u8* a, u8* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, u8* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
     extern void fn_80119FB0(u8* ptr, u8 val);
     u8* base;
@@ -10455,7 +10456,7 @@ void fn_8011AFCC(u8* arg1, u16 arg2, u32 arg3) {
 body_start:
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
     goto check_base;
@@ -10485,7 +10486,7 @@ flag_check:
     /* Phase 2 */
     idx = fn_80119E90(arg2);
     base = fn_80119F10(arg2);
-    base = fn_80135E44(base, arg1, 0, fn_80119ED0(arg2), 0);
+    base = statusGetStatus(base, arg1, 0, fn_80119ED0(arg2), 0);
     if (base != NULL) { goto p2_offset; }
     base = NULL;
     goto p2_check;
@@ -19070,10 +19071,12 @@ void fn_801293FC(u8* ptr, s32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
     u32 val;
-    val = fn_8012A5B0(ptr, 0xd, 0) + offset;
+    val = fn_8012A5B0(ptr, 0xd, 0);
+    val += offset;
     fn_8012A450(ptr, 0xd, val);
     if (offset >= 0) {
-        val = fn_8012A5B0(ptr, 0xe, 0) + offset;
+        val = fn_8012A5B0(ptr, 0xe, 0);
+        val += offset;
         fn_8012A450(ptr, 0xe, val);
     }
 }
@@ -19098,7 +19101,8 @@ asm void fn_801294C4(void) {
 void fn_801294C4(u8* ptr, u32 offset) {
     extern u32 fn_8012A5B0(u8* ptr, u32 a, u32 b);
     extern void fn_8012A450(u8* ptr, u32 a, u32 b);
-    u32 val = fn_8012A5B0(ptr, 0xc, 0) + offset;
+    u32 val = fn_8012A5B0(ptr, 0xc, 0);
+    val += offset;
     fn_8012A450(ptr, 0xc, val);
 }
 #endif
