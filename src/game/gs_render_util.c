@@ -247,6 +247,8 @@ void fn_800D13C4(void) {
  * Address: 0x800D13C8, Size: 0x2AC
  * Copies state from src (saved snapshot) into dst (render object).
  * ================================================================== */
+#pragma push
+#pragma scheduling on
 void fn_800D13C8(void* dst, void* src) {
     f32 fov;
     fn_800E01D0((u8*)dst + 0x70, (u8*)src + 0x4);
@@ -286,26 +288,34 @@ void fn_800D13C8(void* dst, void* src) {
             *(f32*)((u8*)dst + 0x118) = fov;
             HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
         }
-        if (*(u8*)((u8*)dst + 0x3) != 0) {
-            *(f32*)((u8*)dst + 0x11c) = *(f32*)((u8*)src + 0xac);
-            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-            fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
-            fn_801966FC(*(void**)((u8*)dst + 0xc));
-            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+        {
+            f32 src_ac = *(f32*)((u8*)src + 0xac);
+            if (*(u8*)((u8*)dst + 0x3) != 0) {
+                *(f32*)((u8*)dst + 0x11c) = src_ac;
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+                fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+                fn_801966FC(*(void**)((u8*)dst + 0xc));
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            }
         }
         if (*(u8*)((u8*)dst + 0x3) != 0) {
             *(u8*)((u8*)dst + 0x4) = 1;
             *(u8*)((u8*)dst + 0x124) = 0;
             *(u8*)((u8*)dst + 0x125) = 1;
         }
-        if (*(u8*)((u8*)dst + 0x3) != 0) {
-            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-            fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
-            fn_801966FC(*(void**)((u8*)dst + 0xc));
-            HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+        {
+            f32 dst_11c = *(f32*)((u8*)dst + 0x11c);
+            if (*(u8*)((u8*)dst + 0x3) != 0) {
+                *(f32*)((u8*)dst + 0x11c) = dst_11c;
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
+                fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+                fn_801966FC(*(void**)((u8*)dst + 0xc));
+                HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
+            }
         }
     }
 }
+#pragma pop
 
 /* ==================================================================
  * fn_800D1674 - GS render: copy object data to dest struct
