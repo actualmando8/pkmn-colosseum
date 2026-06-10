@@ -2301,6 +2301,242 @@ void PCPort_TitleAnimTick(void) {
 }
 
 /* ------------------------------------------------------------------------- */
+/*  PCPort_FieldAnimSetup / PCPort_FieldAnimTick                             */
+/*                                                                           */
+/*  Scene-ambient animation for field maps (e.g. signpost swing in S1_out).  */
+/*  Works exactly like PCPort_TitleAnimSetup but uses separate globals so    */
+/*  the title and field paths are independent.  A fresh copy of the archive  */
+/*  member is loaded and swizzled (BE->LE) without touching the render-side  */
+/*  g_engTitleArchive which RenderJointTree reads as raw-BE.  The live       */
+/*  HSD_JObj tree is stepped each frame via PCPort_FieldAnimTick.            */
+/*                                                                           */
+/*  The live JObj SRT updates land in the HSD runtime structs; after each    */
+/*  tick they are pushed back into the render-side raw-BE archive storage    */
+/*  via PCPort_CharAnimLockstepWrite (see PCPort_FieldAnimSetRenderTarget),  */
+/*  so RenderJointTree sees the animation.                                   */
+/* ------------------------------------------------------------------------- */
+
+static PCPortHSDArchive g_fieldAnimArchive;
+static HSD_JObj*        g_fieldAnimRoot      = NULL;
+static int              g_fieldAnimReady     = 0;
+static u8*              g_fieldAnimData      = NULL;
+/* Looping: track accumulated frame time and loop length so FObj frames
+ * wrap around instead of freezing at end_frame. */
+static f32              g_fieldAnimTime      = 0.0f;
+static f32              g_fieldAnimLoopLen   = -1.0f;
+/* Render-side write-back target: the BE archive + root joint offset that
+ * RenderJointTree reads from.  Set by PCPort_FieldAnimSetRenderTarget after
+ * PCPort_EngineFieldSetup completes so Tick can push updated SRT into the
+ * render storage each frame. */
+static PCPortHSDArchive* g_fieldAnimRenderArchive = NULL;
+static u32               g_fieldAnimRenderRootOff = 0u;
+
+/* Find the largest end_frame in an HSD_JObj tree (loop length). */
+static f32 PCPort_FieldAnimMaxEndFrame(HSD_JObj* root) {
+    f32 maxEnd = 0.0f;
+    HSD_JObj* st[512]; int sp = 0;
+    st[sp++] = root;
+    while (sp > 0) {
+        HSD_JObj* lv = st[--sp];
+        if (!lv) continue;
+        if (lv->aobj != NULL) {
+            HSD_AObj* ao = lv->aobj;
+            if (ao->end_frame > maxEnd) maxEnd = ao->end_frame;
+        }
+        if (lv->child != NULL && sp < 512) st[sp++] = lv->child;
+        if (lv->next  != NULL && sp < 512) st[sp++] = lv->next;
+    }
+    return maxEnd;
+}
+
+/* Setup: load a fresh copy of the field map's scene member, swizzle it, and
+ * arm the animjoint tree.  fsysPath is the .fsys file; memberName may be NULL
+ * (uses the largest scene_data member, same as PCPort_EngineFieldSetup).
+ * Returns 1 on success, 0 if no animjoint data present (static map). */
+int PCPort_FieldAnimSetup(const char* fsysPath, const char* memberName,
+                          u32* outAnimRootOff) {
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOffset = 0;
+    u32 branchOff, jointListOff;
+    u32 animRootOff = 0u;
+    void* rawPtr;
+    HSD_Joint* rootJoint;
+    void* animjoint;
+    void* matanimjoint;
+    u8* jl;
+
+    g_fieldAnimReady = 0;
+    g_fieldAnimRoot  = NULL;
+    g_fieldAnimTime  = 0.0f;
+    g_fieldAnimLoopLen = -1.0f;
+    memset(&g_fieldAnimArchive, 0, sizeof(g_fieldAnimArchive));
+
+    /* Load a fresh copy (separate from the render-side archive). */
+    {
+        BOOL loaded = (memberName != NULL && memberName[0] != '\0')
+            ? PCPort_LoadFsysMember(fsysPath, memberName, &data, &size)
+            : PCPort_LoadFsysSceneMember(fsysPath, &data, &size);
+        if (!loaded) {
+            printf("[field-anim] load %s failed\n", fsysPath);
+            return 0;
+        }
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_fieldAnimArchive, data, size)) {
+        printf("[field-anim] archive parse failed\n");
+        free(data);
+        return 0;
+    }
+    g_fieldAnimData = data; /* keep alive: live HSD tree points into storage */
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&g_fieldAnimArchive,
+                                                             "scene_data", &sceneOffset);
+    if (sceneData == NULL) {
+        printf("[field-anim] no scene_data\n");
+        PCPort_HSDArchiveDestroy(&g_fieldAnimArchive);
+        free(data); g_fieldAnimData = NULL;
+        return 0;
+    }
+    branchOff = ReadBE32(sceneData + 0x00);
+
+    /* Find the first jointList slot in the scene branch that has a non-null
+     * animjoint.  Field-map scene branches use stride-4 slots; each slot
+     * pointer refers to a {rootJoint, animjoint, matanimjoint} triple. */
+    {
+        u32 slot;
+        jointListOff = 0u;
+        for (slot = 0x0u; slot <= 0x20u; slot += 0x4u) {
+            u32 jl = ReadBE32(g_fieldAnimArchive.storage + branchOff + slot);
+            u32 rj, aj;
+            if (!IsArchiveRangeValid(&g_fieldAnimArchive, jl, 0x0Cu)) break;
+            rj = ReadBE32(g_fieldAnimArchive.storage + jl + 0x0);
+            if (!IsArchiveRangeValid(&g_fieldAnimArchive, rj, 4u)) break;
+            aj = ReadBE32(g_fieldAnimArchive.storage + jl + 0x4);
+            if (IsArchiveRangeValid(&g_fieldAnimArchive, aj, 0x10u)) {
+                jointListOff  = jl;
+                animRootOff   = rj; /* archive offset of this slot's rootJoint */
+                break;
+            }
+        }
+        if (jointListOff == 0u) {
+            PCPort_HSDArchiveDestroy(&g_fieldAnimArchive);
+            free(data); g_fieldAnimData = NULL;
+            return 0; /* static map: no animjoint in any slot */
+        }
+    }
+    if (outAnimRootOff != NULL) *outAnimRootOff = animRootOff;
+
+    /* Swizzle this SEPARATE copy BE->LE + relocate pointers. */
+    rawPtr = PCPort_SwizzleSceneForHSD(&g_fieldAnimArchive, jointListOff);
+    if (rawPtr == NULL) {
+        printf("[field-anim] swizzle failed\n");
+        PCPort_HSDArchiveDestroy(&g_fieldAnimArchive);
+        free(data); g_fieldAnimData = NULL;
+        return 0;
+    }
+
+    jl = (u8*)rawPtr;
+    rootJoint    = (HSD_Joint*)(uintptr_t)(*(u32*)(jl + 0x0));
+    animjoint    = (void*)(uintptr_t)(*(u32*)(jl + 0x4));
+    matanimjoint = (void*)(uintptr_t)(*(u32*)(jl + 0x8));
+
+    g_fieldAnimRoot = HSD_JObjLoadJoint(rootJoint);
+    if (g_fieldAnimRoot == NULL) {
+        printf("[field-anim] HSD_JObjLoadJoint failed\n");
+        PCPort_HSDArchiveDestroy(&g_fieldAnimArchive);
+        free(data); g_fieldAnimData = NULL;
+        return 0;
+    }
+
+    /* The scene animjoint tree's root node is a virtual container that has no
+     * corresponding JObj.  Its child subtree maps 1:1 to the rootJoint's JObj
+     * tree and carries the actual SRT keyframes.  Skip the root so
+     * HSD_JObjAddAnimAll pairs at the correct depth and reaches the keyed nodes
+     * (S1_out: 4 animated joints at tree indices 31, 32, 83, 85; end_frame=179). */
+    {
+        HSD_AnimJoint* aj = (HSD_AnimJoint*)animjoint;
+        if (aj != NULL && aj->child != NULL)
+            animjoint = aj->child;
+    }
+
+    HSD_JObjAddAnimAll(g_fieldAnimRoot,
+                       (HSD_AnimJoint*)animjoint,
+                       (HSD_MatAnimJoint*)matanimjoint,
+                       NULL);
+    HSD_JObjReqAnimAll(g_fieldAnimRoot, 0.0f);
+    PCPort_HSDStartAnimAll(g_fieldAnimRoot);
+
+    g_fieldAnimReady = 1;
+    return 1;
+}
+
+/* Forward declaration: defined later in this file (char-anim section). */
+static void PCPort_CharAnimLockstepWrite(PCPortHSDArchive* be, u32 beJointOff,
+                                         HSD_JObj* live, int isRoot,
+                                         int applyRootTranslate);
+
+/* Advance the field scene animation by frameStep game frames (1.0 = one
+ * 60 Hz tick).  Loops the animation by re-arming the FObj state machines
+ * when the accumulated time exceeds the loop length. */
+void PCPort_FieldAnimTick(f32 frameStep) {
+    if (!g_fieldAnimReady || g_fieldAnimRoot == NULL) {
+        return;
+    }
+    if (g_fieldAnimLoopLen < 0.0f) {
+        g_fieldAnimLoopLen = PCPort_FieldAnimMaxEndFrame(g_fieldAnimRoot);
+        if (g_fieldAnimLoopLen < 1.0f) g_fieldAnimLoopLen = 0.0f;
+    }
+    if (g_fieldAnimLoopLen > 0.0f) {
+        g_fieldAnimTime += frameStep;
+        if (g_fieldAnimTime >= g_fieldAnimLoopLen) {
+            g_fieldAnimTime = 0.0f;
+            HSD_JObjReqAnimAll(g_fieldAnimRoot, 0.0f);
+            PCPort_HSDStartAnimAll(g_fieldAnimRoot);
+        }
+    }
+    HSD_JObjAnimAll(g_fieldAnimRoot);
+
+    /* Push updated SRT into the render-side BE archive so RenderJointTree
+     * sees the animation.  Uses the same lockstep-write pattern as
+     * PCPort_CharAnimLockstepWrite (applyRootTranslate=1: write all fields
+     * including root translation so the signpost pivot moves correctly). */
+    if (g_fieldAnimRenderArchive != NULL && g_fieldAnimRenderRootOff != 0u) {
+        PCPort_CharAnimLockstepWrite(g_fieldAnimRenderArchive,
+                                     g_fieldAnimRenderRootOff,
+                                     g_fieldAnimRoot,
+                                     1, /* isRoot */
+                                     1  /* applyRootTranslate */);
+    }
+}
+
+/* Tear down the field scene anim (call before loading a new map). */
+void PCPort_FieldAnimRelease(void) {
+    g_fieldAnimReady          = 0;
+    g_fieldAnimRoot           = NULL;
+    g_fieldAnimTime           = 0.0f;
+    g_fieldAnimLoopLen        = -1.0f;
+    g_fieldAnimRenderArchive  = NULL;
+    g_fieldAnimRenderRootOff  = 0u;
+    PCPort_HSDArchiveDestroy(&g_fieldAnimArchive);
+    if (g_fieldAnimData != NULL) {
+        free(g_fieldAnimData);
+        g_fieldAnimData = NULL;
+    }
+}
+
+/* Register the render-side BE archive + root joint offset so PCPort_FieldAnimTick
+ * can write updated SRT back into the storage that RenderJointTree reads.
+ * Call this from PCPort_EngineFieldSetup after g_engTitleArchive / g_engTitleRootJoint
+ * are populated, passing the matching slot's rootJoint offset (the 148-joint model
+ * set in S1_out, not the 3-joint outer container). */
+void PCPort_FieldAnimSetRenderTarget(PCPortHSDArchive* renderArchive,
+                                     u32 renderAnimRootOff) {
+    g_fieldAnimRenderArchive = renderArchive;
+    g_fieldAnimRenderRootOff = renderAnimRootOff;
+}
+
+/* ------------------------------------------------------------------------- */
 /*  PCPort_CharAnimProbe — does a character archive carry REAL joint motion?  */
 /*                                                                           */
 /*  Decisive diagnostic for wiring overworld animation: builds the live      */

@@ -6363,15 +6363,22 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                        translatedMaterial.alpha < 0.01f) ||
                       isLogoTex ||
                       battleControlPObj)) {
-                    /* Enable directional lighting for the 3D scene geometry so
-                     * each pillar face is shaded by its angle to the light and
-                     * the otherwise flat-tan ruins gain visible 3D form. The 2D
-                     * overlays (BeginMenuOverlay) leave lighting disabled, so
-                     * they stay full-bright. Disabled again right after the draw
-                     * to keep the gate tightly scoped to scene geometry. */
+                    /* Enable directional lighting only when the material's
+                     * rendermode has RENDER_DIFFUSE (bit 2 = 0x4) set, matching
+                     * the GCN HSD material channel control.  Unlit surfaces
+                     * (sky, clouds, prelit props) clear this bit and must render
+                     * full-bright; applying lambert to them was the root cause of
+                     * the dim/grey S1_out sky (Defect A). */
+#define PCPORT_RENDER_DIFFUSE 0x04u /* hsd_mobj.h RENDER_DIFFUSE = 1<<2 */
                     fn_801AA568(&translatedPObj.pobj);
-                    GXHostSetLightingEnabled(getenv("PCPORT_SCENE_NOLIGHT") != NULL
-                                                 ? GX_FALSE : GX_TRUE);
+                    {
+                        int wantLight = haveMaterial
+                            ? ((translatedMaterial.rendermode & PCPORT_RENDER_DIFFUSE) != 0u)
+                            : 0;
+                        GXHostSetLightingEnabled(
+                            (getenv("PCPORT_SCENE_NOLIGHT") != NULL || !wantLight)
+                                ? GX_FALSE : GX_TRUE);
+                    }
                     /* Debug: override the jobj-derived cull so backface-culled
                      * (wrong-winding) geometry can be ruled in/out. fn_801AA568
                      * sets cull from the jobj flags, so override AFTER it. */
@@ -8705,6 +8712,24 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
         }
     }
 
+    /* Scene-ambient animation (signpost swing, cloud UV scroll, etc.):
+     * load a SEPARATE copy of the same scene archive and arm the animjoint
+     * tree so the live HSD_JObj tick does not corrupt the raw-BE storage that
+     * RenderJointTree reads.  No-op (returns 0) for static maps.
+     * After setup, register the render-side archive so PCPort_FieldAnimTick
+     * can write updated SRT back into the storage RenderJointTree reads. */
+    PCPort_FieldAnimRelease();
+    {
+        u32 animRootOff = 0u;
+        const char* fm = getenv("PCPORT_FIELD_MEMBER");
+        /* Use the same member selection logic as the render-side load above. */
+        if (PCPort_FieldAnimSetup(archivePath,
+                                  (fm != NULL && fm[0] != '\0') ? fm : NULL,
+                                  &animRootOff) && animRootOff != 0u) {
+            PCPort_FieldAnimSetRenderTarget(&g_engTitleArchive, animRootOff);
+        }
+    }
+
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
     g_engTitleReady = 1;
     printf("[field] map loaded for render: %s (scene member 0x%X bytes, rootJoint=0x%X, "
@@ -9467,6 +9492,11 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         frameStep = (f32)((nowTime - g_walkPrevTime) * 60.0);
         if (frameStep < 0.001f) frameStep = 1.0f;   /* frozen clock fallback */
         g_walkPrevTime = nowTime;
+
+        /* Advance scene-ambient animation (signpost swing etc.) each frame at
+         * real-time speed.  No-op if the map has no animjoint (static maps). */
+        PCPort_FieldAnimTick(frameStep);
+
         PADRead(pads);
         btn = pads[0].button;
         sx = (f32)pads[0].stickX / 112.0f;
@@ -9772,11 +9802,21 @@ static int RunFieldScene(GLFWwindow* window) {
            "Z=A rise / X=B sink. Close window to quit.%s\n",
            autopan ? " [AUTOPAN]" : "");
 
+    {
+    double freeFlyPrevTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
         f32 fwd[3], right[3], interest[3], mv, st, sx, sy;
+        f32 frameStep;
+        double nowTime;
         u16 btn;
 
         VIWaitForRetrace_PC();          /* pumps glfwPollEvents -> fresh key state */
+        nowTime = glfwGetTime();
+        frameStep = (f32)((nowTime - freeFlyPrevTime) * 60.0);
+        if (frameStep < 0.001f) frameStep = 1.0f;
+        freeFlyPrevTime = nowTime;
+        PCPort_FieldAnimTick(frameStep);  /* advance scene-ambient anim (signpost etc.) */
+
         PADRead(pads);
         btn = pads[0].button;
         sx = (f32)pads[0].stickX / 112.0f;   /* A/D */
@@ -9842,6 +9882,7 @@ static int RunFieldScene(GLFWwindow* window) {
     printf("[field] explored %d frames (final eye=%.0f,%.0f,%.0f yaw=%.2f)\n",
            frame, eye[0], eye[1], eye[2], yaw);
     HoldWindowOpen(window);
+    } /* end freeFlyPrevTime scope */
     return 1;
 }
 

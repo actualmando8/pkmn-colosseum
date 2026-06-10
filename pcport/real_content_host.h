@@ -262,6 +262,25 @@ int PCPort_TitleAnimSetup(const char* fsysPath, const char* memberName);
 /* Advance the title HSD animation one frame (HSD_JObjAnimAll over the live tree
  * built by PCPort_TitleAnimSetup). No-op if setup was not run / failed. */
 void PCPort_TitleAnimTick(void);
+
+/* Field scene-ambient animation (signpost swing, etc.).
+ * PCPort_FieldAnimSetup: load a fresh copy of the field map's scene archive
+ *   and arm the animjoint tree.  Pass the .fsys path; memberName may be NULL
+ *   to auto-select the largest scene_data member (same as PCPort_EngineFieldSetup).
+ *   Returns 1 on success, 0 if no animjoint is present (static map).
+ * PCPort_FieldAnimTick: advance the scene anim by frameStep game frames each
+ *   frame (1.0 = one 60 Hz tick); loops via re-arm when end_frame is reached.
+ * PCPort_FieldAnimRelease: reset state before loading a new map. */
+/* outAnimRootOff (may be NULL): receives the archive offset of the animated
+ * slot's rootJoint so the caller can pass it to PCPort_FieldAnimSetRenderTarget. */
+int  PCPort_FieldAnimSetup(const char* fsysPath, const char* memberName,
+                           u32* outAnimRootOff);
+void PCPort_FieldAnimTick(f32 frameStep);
+void PCPort_FieldAnimRelease(void);
+/* Register the render-side BE archive so PCPort_FieldAnimTick can write updated
+ * SRT into the storage that RenderJointTree reads.  Call after EngineFieldSetup. */
+void PCPort_FieldAnimSetRenderTarget(PCPortHSDArchive* renderArchive,
+                                     u32 renderAnimRootOff);
 /* Diagnostic: build a character's live animated tree and report how many joints
  * actually move over <frames> (proves whether the archive carries real motion). */
 void PCPort_CharAnimProbe(const char* fsysPath, const char* memberName, int frames);
