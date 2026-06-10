@@ -4937,7 +4937,7 @@ s32 fn_800F670C(u8* ptr) {
     } else {
         count--;
         *(s32*)(ptr + 0x28) = count;
-        val = *(u32*)(ptr + count * 4 + 0x6c);
+        val = ((u32*)(ptr + 0x6c))[count];
     }
     if ((s32)val != 0) {
         *(u32*)(ptr + 0x14) = *(u32*)(ptr + 0x14) + 4;
