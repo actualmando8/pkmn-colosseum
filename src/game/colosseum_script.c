@@ -18528,12 +18528,13 @@ u32 fn_802134D4(u32 r3)
   u8 cVar1;
   
   cVar1 = fn_802062FC();
-  if (cVar1 != 0) {
-    fn_80202810(r3,0x11);
-    cVar1 = fn_802026E4(r3,8);
-    if ((cVar1 == 1) && (cVar1 = fn_802026E4(r3,0x22), cVar1 == 1)) {
-      fn_80200B10(r3);
-    }
+  if (cVar1 == 0) {
+    return 1;
+  }
+  fn_80202810(r3,0x11);
+  cVar1 = fn_802026E4(r3,8);
+  if ((cVar1 == 1) && (cVar1 = fn_802026E4(r3,0x22), cVar1 == 1)) {
+    fn_80200B10(r3);
   }
   return 1;
 }
