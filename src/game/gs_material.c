@@ -2200,15 +2200,16 @@ asm void fn_800E5B68(void) {
 }
 #else
 void fn_800E5B68(void* obj, void* param) {
+    u16 i = 0;
     u16 count = *(u16*)((u8*)obj + 0x150);
     void** arr = *(void***)((u8*)obj + 0x14c);
-    u16 i = 0;
     while (i < count) {
-        void* p = arr[i];
+        void* p = *arr;
         if (p != NULL) {
             fn_800DF1E4(p, param);
         }
         i++;
+        arr++;
     }
 }
 #endif
