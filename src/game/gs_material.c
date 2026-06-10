@@ -4369,23 +4369,30 @@ asm void fn_800EB268(void) {
 }
 #else
 void fn_800EB268(void* entry, s32 r4) {
-    void* r30;
     u32 r31;
+    void* r30;
     fn_800ECCA8(entry, r4);
     fn_80191460((u8*)entry + 0x4c);
     r31 = *(u32*)((u8*)entry + 0x144);
     *(u32*)((u8*)entry + 0x144) = 0;
     if (*(u32*)entry & 0x4) {
-        ((void(*)(void*, f32))fn_800ECA78)(entry, lbl_8047CC28);
+        fn_800ECA78(entry, lbl_8047CC28);
         fn_800EC134(entry);
         r30 = *(void**)((u8*)entry + 0x8);
-        if (r30 == NULL) {
-            fn_80196E10(lbl_8047CC2C, 0x25d, lbl_8047CC34);
-        }
         if (r30 != NULL) {
-            u32 flags = *(u32*)((u8*)r30 + 0x14);
-            s32 active = 0;
-            if (!(flags & 0x800000) && (flags & 0x40)) active = 1;
+            s32 active;
+            if (r30 == NULL) {
+                fn_80196E10(lbl_8047CC2C, 0x25d, lbl_8047CC34);
+            }
+            active = 0;
+            {
+                u32 flags = *(u32*)((u8*)r30 + 0x14);
+                if (!(flags & 0x800000)) {
+                    if (flags & 0x40) {
+                        active = 1;
+                    }
+                }
+            }
             if (active) fn_8019D9DC(r30);
         }
     }
