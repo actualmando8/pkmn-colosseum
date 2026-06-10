@@ -12420,25 +12420,27 @@ void fn_8011DE68(u8* ptr, u16 val) {
 }
 /* 0x8011DEA8 | 0x3C */
 void fn_8011DEA8(u8* ptr, void* src) {
+    extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x44, src, 0xB);
+    GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x70 | fn_8011DEE4 | dual_memcpy_setter */
 void fn_8011DEE4(u8* ptr, void* src) {
-    extern void fn_800F9D24();
+    extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x2E, src, 0xB);
+    GScharLenCpy(ptr + 0x2E, src, 0xB);
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x44, src, 0xB);
+    GScharLenCpy(ptr + 0x44, src, 0xB);
 }
 /* 0x8011DF54 | 0x3C */
 void fn_8011DF54(u8* ptr, void* src) {
+    extern void GScharLenCpy();
     if (ptr == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(ptr + 0x18, src, 0xB);
+    GScharLenCpy(ptr + 0x18, src, 0xB);
 }
 /* 0x8011E048 | 0x30 */
 u8 fn_8011E048(u8* ptr, u16 idx) {
@@ -19872,9 +19874,10 @@ void* fn_8012A8D4(void* ptr) {
 }
 /* 0x8012AA64 | 0x38 */
 void fn_8012AA64(void* dst, void* src) {
+    extern void GScharLenCpy();
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
-    fn_800F9D24(dst, src, 0xB);
+    GScharLenCpy(dst, src, 0xB);
 }
 /* 0x8012AA9C | 0x34 */
 void* fn_8012AA9C(u8* ptr, u16 idx) {
