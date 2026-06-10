@@ -1134,7 +1134,7 @@ extern void fn_800AC0F8(void);
 extern void fn_800AC110(void);
 extern u32  fn_800AE794(void);
 extern void fn_800AE7CC(u32 a);
-extern void fn_800AE7E0(void);
+extern void DSPInit(void);
 extern void fn_800AE8A4(void);
 extern void fn_800AE8EC(void);
 extern u32  fn_800AE92C(void);
@@ -2305,7 +2305,7 @@ u32 fn_80164148(u32 d) {
     *(u32*)(s + 0x30) = 0;
     *(u32*)(s + 0x34) = 0;
     *(u32*)(s + 0x04) = 0;
-    fn_800AE7E0();
+    DSPInit();
     fn_800AE93C(lbl_804504A0);
     lbl_8047B088 = 0;
     fn_80164328();
