@@ -156,7 +156,7 @@
 
 extern void* fn_8012640C();
 extern u32   fn_801254B4();
-extern u32   fn_80142CF4();
+extern u32   itemGetStatus();
 
 /* fn_801F453C: Get player party reference */
 extern void* fn_801F453C();
@@ -1123,7 +1123,7 @@ u32 fn_80230568(u32 r3,u32 r4)
     extern int fn_801F986C();
     extern void fn_801FE7EC();
     extern s8 fn_801FECD4();
-    extern s8 fn_80200A5C();
+    extern s8 fightOutPokemonCheckNoAttackFlag();
     extern void fn_80200B10();
     extern s8 fn_80201704();
     extern u32 fn_80201890();
@@ -1360,7 +1360,7 @@ u32 fn_80230568(u32 r3,u32 r4)
     else {
       fn_80202810(r3,0xb);
     }
-    cVar14 = fn_80200A5C(r3);
+    cVar14 = fightOutPokemonCheckNoAttackFlag(r3);
     if ((cVar14 == 1) || (cVar14 = fn_802026E4(r3,0xb), cVar14 != 1)) {
       fn_80200B10(r3);
       lbl_80478D7D = 1;
@@ -1388,7 +1388,7 @@ u32 fn_80230568(u32 r3,u32 r4)
     else {
       fn_80202810(r3,0xd);
     }
-    cVar14 = fn_80200A5C(r3);
+    cVar14 = fightOutPokemonCheckNoAttackFlag(r3);
     if (cVar14 == 1) {
       fn_80200B10(r3);
     }
@@ -1705,7 +1705,7 @@ fn_80239EE8(void)
     fn_80132A38(0x28,uVar4);
   }
   if ((r9 & 0xffff) != 0) {
-    fn_80142CF4(0,r9,1,0);
+    itemGetStatus(0,r9,1,0);
     uVar4 = fn_800FA280();
     fn_80132A38(0x29,uVar4);
   }
@@ -2947,7 +2947,7 @@ void fn_802232F4(void)
     extern u32 fn_801F54A4();
     extern int fn_801F7258();
     extern s8 fn_801F7404();
-    extern u32 fn_801F76B8();
+    extern u32 fightSideGetStatus();
     extern int fn_801F8E34();
     extern s8 fn_801F9034();
     extern s8 fn_801F90C4();
@@ -3073,7 +3073,7 @@ void fn_802232F4(void)
             }
           }
           for (uVar24 = 0; (int)uVar24 < (int)(uVar7 & 0xffff); uVar24 = uVar24 + 1) {
-            uVar9 = fn_801F76B8(uVar6,0,7,uVar24 & 0xffff);
+            uVar9 = fightSideGetStatus(uVar6,0,7,uVar24 & 0xffff);
             cVar17 = fn_801F9034();
             if (cVar17 != 0) {
               uVar10 = fn_801FB1C0(uVar9,0,0x44,0);
@@ -5620,7 +5620,7 @@ u32 fn_80229704(u32 r3, u32 r4)
         uVar1 = fn_801F025C(2,r4);
         uVar4 = fn_801F54A4(0,0,0x16,0);
         fn_801F54A4(0,0,0x17,0);
-        for (uVar9 = 0; uVar9 < uVar4; uVar9 = uVar9 + 1) {
+        for (uVar9 = 0; uVar9 < (uVar4 & 0xffff); uVar9 = uVar9 + 1) {
           iVar2 = fn_801F7258(uVar1,uVar9);
           if (iVar2 != 0) {
             for (uVar10 = 0; (uVar10 & 0xffff) < 6; uVar10 = uVar10 + 1) {
@@ -5642,7 +5642,7 @@ u32 fn_80229704(u32 r3, u32 r4)
       uVar1 = fn_801F025C(2,r4);
       uVar4 = fn_801F54A4(0,0,0x16,0);
       fn_801F54A4(0,0,0x17,0);
-      for (uVar9 = 0; uVar9 < uVar4; uVar9 = uVar9 + 1) {
+      for (uVar9 = 0; uVar9 < (uVar4 & 0xffff); uVar9 = uVar9 + 1) {
         iVar2 = fn_801F7258(uVar1,uVar9);
         if (iVar2 != 0) {
           for (uVar10 = 0; (uVar10 & 0xffff) < 6; uVar10 = uVar10 + 1) {
@@ -13151,7 +13151,7 @@ fn_80239A40(void)
     fn_80132A38(0x28,uVar4);
   }
   if ((r9 & 0xffff) != 0) {
-    fn_80142CF4(0,r9,1,0);
+    itemGetStatus(0,r9,1,0);
     uVar4 = fn_800FA280();
     fn_80132A38(0x29,uVar4);
   }
@@ -13230,7 +13230,7 @@ fn_80239CCC(void)
     fn_80132A38(0x28,uVar3);
   }
   if ((r9 & 0xffff) != 0) {
-    fn_80142CF4(0,r9,1,0);
+    itemGetStatus(0,r9,1,0);
     uVar3 = fn_800FA280();
     fn_80132A38(0x29,uVar3);
   }
@@ -13312,7 +13312,7 @@ fn_8023A118(void)
     fn_80132A38(0x28,uVar1);
   }
   if (param_9 != 0) {
-    fn_80142CF4(0,param_9,1,0);
+    itemGetStatus(0,param_9,1,0);
     uVar1 = fn_800FA280();
     fn_80132A38(0x29,uVar1);
   }
@@ -18879,8 +18879,8 @@ void fn_80213A78(void)
 
   uVar1 = fn_801F025C(0x11,0);
   uVar2 = (int)fn_8012640C(uVar1,0,0xe5,0);
-  uVar9 = fn_80142CF4(uVar2,0,0x1e,0);
-  uVar9 = fn_80142CF4(0,uVar9,10,0);
+  uVar9 = itemGetStatus(uVar2,0,0x1e,0);
+  uVar9 = itemGetStatus(0,uVar9,10,0);
   uVar2 = fn_801F4354(0,uVar1);
   uVar1 = fn_801F4220(0,uVar1);
   uVar3 = fn_801F025C(0x12,0);
@@ -18996,8 +18996,8 @@ void fn_80213E94(void)
   fn_801F54A4(0,0,0xf,0);
   uVar1 = fn_801F025C(0x11,0);
   uVar2 = (int)fn_8012640C(uVar1,0,0xe5,0);
-  fn_80142CF4(uVar2,0,0x20,0);
-  uVar3 = fn_80142CF4(uVar2,0,0x1e,0);
+  itemGetStatus(uVar2,0,0x20,0);
+  uVar3 = itemGetStatus(uVar2,0,0x1e,0);
   uVar3 = uVar3 & 0xffff;
   uVar2 = fn_801F025C(0x12,0);
   uVar4 = fn_80205B8C();
@@ -20133,10 +20133,10 @@ void fn_80215CF0(void)
       }
       fn_80202810(uVar2,0x36);
       fn_80202810(uVar4,0x36);
-      fn_80142CF4(0,uVar5,1,0);
+      itemGetStatus(0,uVar5,1,0);
       uVar2 = fn_800FA280();
       fn_80132A38(0xd,uVar2);
-      fn_80142CF4(0,uVar3,1,0);
+      itemGetStatus(0,uVar3,1,0);
       uVar2 = fn_800FA280();
       fn_80132A38(0xe,uVar2);
       if (((uVar3 & 0xffff) == 0) || ((uVar5 & 0xffff) == 0)) {
@@ -20859,9 +20859,9 @@ void fn_80217220(void)
   u32 uVar1;
   u32 uVar2;
   u32 uVar3;
-  s8 cVar8;
+  u8 cVar8;
   u32 uVar4;
-  int iVar5;
+  u32 iVar5;
   u32 uVar6;
 
   uVar7 = fn_801F54A4(0,0,0x14,0);
@@ -20890,7 +20890,7 @@ void fn_80217220(void)
     fn_801F6EEC(uVar2,0x4a);
     fn_80211B94(lbl_8047B62C,0x80378f25,0);
   }
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 1;
+  lbl_8047B610 = lbl_8047B610 + 1;
   return;
 }
 /* Address: 0x802173D4 | Size: 0x60 | Ghidra import */
@@ -21551,7 +21551,7 @@ void fn_8021847C(void)
   u32 sVar7;
   u32 iVar2;
   u32 uVar3;
-  u32 uVar4;
+  u16 uVar4;
   u8 cVar8;
   u32 uVar5;
   int iVar6;
@@ -21597,7 +21597,7 @@ void fn_8021847C(void)
         *((&lbl_80478D78)+5) = *((&lbl_80478D78)+5) | 2;
       }
     }
-    for (uVar9 = 0; uVar9 < (uVar4 & 0xffff); uVar9 = uVar9 + 1) {
+    for (uVar9 = 0; uVar9 < uVar4; uVar9 = uVar9 + 1) {
       iVar2 = fn_801F7258(uVar3,uVar9 & 0xffff);
       if (iVar2 != 0) {
         uVar1 = fn_801FB1C0(iVar2,0,0x44,0);
@@ -21637,7 +21637,7 @@ void fn_8021847C(void)
         fn_801FE7EC(iVar2,0x7c,0,0);
       }
     }
-    for (uVar9 = 0; uVar9 < (uVar4 & 0xffff); uVar9 = uVar9 + 1) {
+    for (uVar9 = 0; uVar9 < uVar4; uVar9 = uVar9 + 1) {
       iVar2 = fn_801F7258(uVar3,uVar9 & 0xffff);
       if (iVar2 != 0) {
         uVar1 = fn_801FB1C0(iVar2,0,0x44,0);
@@ -24774,7 +24774,7 @@ void fn_8021D688(void)
   uVar3 = fn_80205BE8(uVar3);
   uVar7 = (int)fn_8012640C(uVar3,0,0x83,0);
   uVar5 = (int)fn_8012640C(uVar1,0,0xe5,0);
-  sVar8 = fn_80142CF4(uVar5,0,0x1e,0);
+  sVar8 = itemGetStatus(uVar5,0,0x1e,0);
   fn_801440A0(sVar8);
   fn_80143DFC();
   iVar6 = fn_80143A94();
@@ -25679,7 +25679,7 @@ void fn_8021EF24(void)
     extern short fn_801F6D9C();
     extern s8 fn_801F6E98();
     extern void fn_801F75F8();
-    extern int fn_801F76B8();
+    extern int fightSideGetStatus();
     extern u32 fn_80203B5C();
     extern s8 fn_80207AE0();
     extern void fn_80209FAC();
@@ -25707,7 +25707,7 @@ void fn_8021EF24(void)
   fn_801F3074(0);
   fn_801254B4(uVar2,0,0x119,0,0);
   fn_801254B4(uVar2,0,0x121,0, (void*)0xffffffff);
-  iVar4 = fn_801F76B8(uVar3,0,8,0);
+  iVar4 = fightSideGetStatus(uVar3,0,8,0);
   if ((((iVar4 == 0) && (cVar8 = fn_801F6E98(uVar3,0x4a), cVar8 == 1)) &&
       (cVar8 = fn_80207AE0(uVar2,2), cVar8 == 0)) && (sVar6 != 0x1a)) {
     fn_801F75F8(uVar3,0,8,0,1);
@@ -25731,7 +25731,7 @@ void fn_8021EF24(void)
     }
     fn_80211B94(lbl_8047B62C,uVar1,0);
     fn_8020A2B8(uVar5,auStack_c8);
-    iVar4 = fn_801F76B8(uVar3,0,8,0);
+    iVar4 = fightSideGetStatus(uVar3,0,8,0);
     if (iVar4 == 0) {
       *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 2;
       return;
