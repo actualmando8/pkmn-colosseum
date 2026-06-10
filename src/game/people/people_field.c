@@ -258,10 +258,10 @@
  *   fn_80159EF0 (0x32C bytes)  -- peopleFieldScriptSetVar
  *   fn_8015A21C (0x14C bytes)  -- peopleFieldScriptCommand2
  *   fn_8015A368 (0x11C bytes)  -- peopleFieldScriptTrigger
- *   fn_8015A484 (0x3B4 bytes)  -- peopleFieldScriptProcess
+ *   salInitDspCtrl (0x3B4 bytes)  -- peopleFieldScriptProcess
  *   fn_8015A838 (0x38 bytes)   -- peopleFieldScriptHelper1
- *   fn_8015A870 (0xE0 bytes)   -- peopleFieldScriptHelper2
- *   fn_8015A950 (0x150 bytes)  -- peopleFieldScriptHelper3
+ *   salExitDspCtrl (0xE0 bytes)   -- peopleFieldScriptHelper2
+ *   salActivateStudio (0x150 bytes)  -- peopleFieldScriptHelper3
  *   fn_8015AAA0 (0x20 bytes)   -- peopleFieldScriptHelper4
  *   fn_8015AAC0 (0xF4 bytes)   -- peopleFieldScriptHelper5
  *   fn_8015ABB4 (0x48 bytes)   -- peopleFieldScriptHelper6
@@ -276,7 +276,7 @@
  *
  * 0x8015D408 - 0x8015FFA0: People rendering pipeline (0x2B98 bytes)
  *   fn_8015D408 (0x44 bytes)   -- peopleFieldRenderPipeInit
- *   fn_8015D44C (0xA0 bytes)   -- peopleFieldRenderPipeSetup
+ *   salActivateVoice (0xA0 bytes)   -- peopleFieldRenderPipeSetup
  *   fn_8015D4EC (0x60 bytes)   -- peopleFieldRenderPipeHelper
  *   fn_8015D54C (0xA8 bytes)   -- peopleFieldRenderPipeConfig
  *   fn_8015D5F4 (0x84 bytes)   -- peopleFieldRenderPipeGetState
@@ -335,14 +335,14 @@
  *   fn_80161E8C (0x1E4 bytes)  -- peopleFieldUtilProcess
  *   fn_80162070 (0x1C bytes)   -- peopleFieldUtilGetPtr
  *   fn_8016208C (0x8C bytes)   -- peopleFieldUtilSetup
- *   fn_80162118 (0xA4 bytes)   -- peopleFieldUtilConfig
+ *   sndBSearch (0xA4 bytes)   -- peopleFieldUtilConfig
  *   fn_801621BC (0x10 bytes)   -- peopleFieldUtilDispatch
  *     Script dispatch entry point. Called from fn_8014C984.
  *   fn_801621CC (0x48 bytes)   -- peopleFieldUtilHelper3
  *   fn_80162214 (0x8 bytes)    -- peopleFieldUtilNop
  *
  * 0x8016221C - 0x801652DC: People state & memory management (0x30C0 bytes)
- *   fn_8016221C (0x154 bytes)  -- peopleFieldStateInit
+ *   snd_handle_irq (0x154 bytes)  -- peopleFieldStateInit
  *   fn_80162370 (0xB8 bytes)   -- peopleFieldStateSetup
  *   fn_80162428 (0x34 bytes)   -- peopleFieldStateGet
  *   fn_8016245C (0x8 bytes)    -- peopleFieldStateNop1
@@ -404,11 +404,11 @@
  *   fn_80163BE4 (0xC4 bytes)   -- peopleFieldMoveSetState
  *   fn_80163CA8 (0x108 bytes)  -- peopleFieldMoveApplyForce
  *   fn_80163DB0 (0x38 bytes)   -- peopleFieldMoveGetForce
- *   fn_80163DE8 (0xF8 bytes)   -- peopleFieldMoveCalcForce
+ *   aramFreeStreamBuffer (0xF8 bytes)   -- peopleFieldMoveCalcForce
  *   fn_80163EE0 (0xA8 bytes)   -- peopleFieldMoveCalcFriction
  *   fn_80163F88 (0x10 bytes)   -- peopleFieldMoveGetFriction
  *   fn_80163F98 (0x64 bytes)   -- peopleFieldMoveSetFriction
- *   fn_80163FFC (0xC8 bytes)   -- peopleFieldMoveApplyGravity
+ *   salInitAi (0xC8 bytes)   -- peopleFieldMoveApplyGravity
  *   fn_801640C4 (0x20 bytes)   -- peopleFieldMoveGetGravity
  *   fn_801640E4 (0x34 bytes)   -- peopleFieldMoveSetGravity
  *   fn_80164118 (0x30 bytes)   -- peopleFieldMoveGetVelocity
@@ -428,9 +428,9 @@
  *   fn_8016442C (0x5C bytes)   -- peopleFieldMemResize
  *   fn_80164488 (0x58 bytes)   -- peopleFieldMemQuery
  *   fn_801644E0 (0x40 bytes)   -- peopleFieldMemValidate
- *   fn_80164520 (0x50C bytes)  -- peopleFieldAnimMain
+ *   ReverbHICreate (0x50C bytes)  -- peopleFieldAnimMain
  *     NPC animation main processing for field rendering.
- *   fn_80164A2C (0x214 bytes)  -- peopleFieldAnimProcess
+ *   ReverbHIModify (0x214 bytes)  -- peopleFieldAnimProcess
  *   fn_80164C40 (0x190 bytes)  -- peopleFieldAnimBlendFinal
  *   fn_80164DD0 (0x50C bytes)  -- peopleFieldAnimInterp
  *     Animation interpolation for smooth NPC movement. Accesses struct
@@ -503,13 +503,11 @@ extern void  OSRestoreInterrupts(u32 level);
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void ARQPostRequest();
 extern void InitStreamBuffers();
-extern void ReverbHICreate();
 extern void aramQueueCallback();
 extern void aramUploadData();
 extern void inpGetMidiCtrl();
 extern void salCalcVolume();
 extern void salCallback();
-extern void sndBSearch();
 extern u8 jumptable_80369CB0[];
 extern u8 jumptable_80369CD4[];
 extern u8 jumptable_80369CF8[];
@@ -582,7 +580,7 @@ extern void fn_801621BC(u32* ptr);  /* peopleFieldUtilDispatch - same-TU asm wra
 
 extern void fn_8015210C(void);
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
-extern void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
+extern void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
 extern u32 lbl_8047AF98;
 extern u8 lbl_8047AF90[];
@@ -646,10 +644,10 @@ asm void fn_801522F0(void) {
 }
 #else
 u32 fn_801522F0(u16 arg) {
-    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF7C + 4) = arg;
-    result = fn_80162118(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
+    result = sndBSearch(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
     lbl_8047AF78 = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -665,10 +663,10 @@ asm void fn_8015234C(void) {
 }
 #else
 u32 fn_8015234C(u16 arg) {
-    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF70 + 4) = arg;
-    result = fn_80162118(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
+    result = sndBSearch(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
     lbl_8047AF6C = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -693,10 +691,10 @@ asm void fn_801523B8(void) {
 }
 #else
 u32 fn_801523B8(u16 arg, u16* out) {
-    extern void* fn_80162118(u8* a, u8* b, u16 c, u32 d, void* e);
+    extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_80445F18 + 4) = arg;
-    result = fn_80162118(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
+    result = sndBSearch(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
     lbl_8047AF68 = (u32)result;
     if (result != NULL) {
         *out = *(u16*)((u8*)result + 6);
@@ -1019,8 +1017,8 @@ u32 fn_80161D20(u32 r3) {
 #pragma pop
 extern void fn_80160BDC(void);
 extern void fn_801603C0(void);
-extern u32  fn_8015A484(u32 a, u32 b, u32 c);
-extern void fn_8015A870(void);
+extern u32  salInitDspCtrl(u32 a, u32 b, u32 c);
+extern void salExitDspCtrl(void);
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -1096,11 +1094,11 @@ s32 fn_8016208C(u32 angle) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80162118(void) {
+asm void sndBSearch(void) {
 #include "src/game/people/people_field_fn_80162118.inc"
 }
 #else
-void* fn_80162118(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
+void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp) {
     s32 lo, hi, mid;
     s32 r;
     u8* elem;
@@ -1141,9 +1139,9 @@ extern u32  fn_800AE92C(void);
 extern void fn_800AE93C(u8* ptr);
 extern void fn_800CE358(void);
 extern void fn_8015B250(u32, u32);
-extern void fn_80164520(void);
-extern void fn_80164A2C(void);
-extern void fn_801652DC(u32 a, u32 b, u32 c, u8* d);
+extern void ReverbHICreate(void);
+extern void ReverbHIModify(void);
+extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
 extern void fn_8009B300(void);
 extern void fn_800AC02C(u32 a);
 extern void fn_800AC070(u8* ptr, u32 size);
@@ -1153,9 +1151,9 @@ extern void fn_800AE630(void);
 extern u32  fn_800AE78C(void);
 extern void fn_8014A280(void);
 extern void fn_80158CD4(void);
-extern void fn_8015A950(void);
+extern void salActivateStudio(void);
 extern void fn_8015AAA0(void);
-extern void fn_8015D44C(u8* ptr);
+extern void salActivateVoice(u8* ptr);
 extern void fn_8015D4EC(void);
 extern void fn_8015D54C(u8* ptr);
 extern void fn_8015D5F4(u8* ptr);
@@ -1174,8 +1172,8 @@ extern void fn_80163BCC(u8* a, u32 b);
 extern void fn_80163BE4(void);
 extern u8   fn_80163CA8();
 extern u32  fn_80163DB0(u32 idx, u32 *out);
-extern void fn_80163DE8();
-extern u32  fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a);
+extern void aramFreeStreamBuffer();
+extern u32  salInitAi(u32(*fnptr)(void), u32 d, u32 a);
 extern void fn_801640C4(void);
 extern u32  fn_801640E4(void);
 extern u32  fn_80164148(u32 d);
@@ -1223,15 +1221,15 @@ asm void fn_80162370(void) {
 #else
 extern u8  lbl_8047B05E;
 extern u8  lbl_8047B05F;
-extern u32 fn_8016221C(void);
+extern u32 snd_handle_irq(void);
 u32 fn_80162370(u32 a, u8 b, u8 c, u32 d) {
     extern u32 lbl_8047B028;
     fn_801642F8();
     lbl_8047B05F = 0;
     lbl_8047B05E = 0;
     lbl_8047B028 = 0;
-    if (fn_80163FFC(fn_8016221C, d, a) != 0
-     && fn_8015A484(b, c, (u32)(d & 1)) != 0
+    if (salInitAi(snd_handle_irq, d, a) != 0
+     && salInitDspCtrl(b, c, (u32)(d & 1)) != 0
      && fn_80164148(d) != 0) {
         fn_80164328();
         fn_801640C4();
@@ -1252,7 +1250,7 @@ asm void fn_80162428(void) {
 void fn_80162428(void) {
     fn_80164360();
     fn_80164204();
-    fn_8015A870();
+    salExitDspCtrl();
     fn_801640E4();
     fn_80164328();
     fn_80164324();
@@ -1446,7 +1444,7 @@ asm void fn_801628C8(void) {
 void fn_801628C8(u32 index) {
     u32 offset = index * 0xF4;
     ((u8*)lbl_8047B024 + offset)[0xD4] = lbl_8047B050;
-    fn_8015D44C((u8*)lbl_8047B024 + offset);
+    salActivateVoice((u8*)lbl_8047B024 + offset);
 }
 #endif
 #pragma pop
@@ -1581,7 +1579,7 @@ asm void fn_80162D6C(void) {
 #include "src/game/people/people_field_fn_80162D6C.inc"
 }
 #else
-void fn_80162D6C(void) { fn_8015A950(); }
+void fn_80162D6C(void) { salActivateStudio(); }
 #endif
 #pragma pop
 #pragma push
@@ -1664,7 +1662,7 @@ asm void fn_80162F68(void) {
 #include "src/game/people/people_field_fn_80162F68.inc"
 }
 #else
-void fn_80162F68(void) { fn_80163DE8(); }
+void fn_80162F68(void) { aramFreeStreamBuffer(); }
 #endif
 #pragma pop
 #pragma push
@@ -2106,13 +2104,13 @@ u32 fn_80163DB0(u32 idx, u32 *out) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80163DE8(void) {
+asm void aramFreeStreamBuffer(void) {
 #include "src/game/people/people_field_fn_80163DE8.inc"
 }
 #else
 /* peopleFieldMoveCalcForce: unlink a block, and if it was the active one, recompute the
  * min and recoalesce; else push to the other free list. byte-match verified via objdiff. */
-void fn_80163DE8(u32 idx) {
+void aramFreeStreamBuffer(u32 idx) {
     PFNode* blk;
     PFNode* cur;
     PFNode* prev;
@@ -2239,11 +2237,11 @@ void fn_80163F98(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm u32 fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a) {
+asm u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
 #include "src/game/people/people_field_fn_80163FFC.inc"
 }
 #else
-u32 fn_80163FFC(u32(*fnptr)(void), u32 d, u32 a) { return 0; }
+u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) { return 0; }
 #endif
 #pragma pop
 #pragma push
@@ -2482,7 +2480,7 @@ void fn_8016442C(u8 type, u32* data, u8* obj) {
     switch (type) {
         case 0:
             if (obj[0x1C4] != 0) { break; }
-            fn_801652DC(data[0], data[1], data[2], obj);
+            ReverbHICallback(data[0], data[1], data[2], obj);
             break;
         case 1:
             break;
@@ -2491,9 +2489,9 @@ void fn_8016442C(u8 type, u32* data, u8* obj) {
 #endif
 #pragma pop
 u32 fn_80164488(u8* ptr) {
-    extern void fn_80164A2C(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    extern void ReverbHIModify(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 1;
-    fn_80164A2C(
+    ReverbHIModify(
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -2513,9 +2511,9 @@ asm void fn_801644E0(void) {
 }
 #else
 void fn_801644E0(u8* ptr) {
-    extern void fn_80164520(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+    extern void ReverbHICreate(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 0;
-    fn_80164520(
+    ReverbHICreate(
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -2530,22 +2528,22 @@ void fn_801644E0(u8* ptr) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_80164520(void) {
+asm void ReverbHICreate(void) {
 #include "src/game/people/people_field_fn_80164520.inc"
 }
 #else
-void fn_80164520(void) { /* TODO */ }
+void ReverbHICreate(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_80164A2C(void) {
+asm void ReverbHIModify(void) {
 #include "src/game/people/people_field_fn_80164A2C.inc"
 }
 #else
-void fn_80164A2C(void) { /* TODO */ }
+void ReverbHIModify(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
