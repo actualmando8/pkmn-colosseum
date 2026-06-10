@@ -398,7 +398,7 @@ extern u32 blurEffectStart(void* ptr);
 extern void fn_8013DE6C(void);
 extern void fn_8013E258(void);
 extern u32 fn_8013E470(void* ptr, u32 delta);
-extern void fn_8013E54C(void);
+extern u32 fn_8013E54C(void* ptr);
 extern u32  fn_8013E5AC(u8* p);
 extern u32 auraEffectStart(void* ptr);
 extern void fn_8013E6C4(void);
@@ -1651,12 +1651,22 @@ u32 fn_8013E4D4(void* callbacks) {
     return effectId;
 }
 #endif
-#if 1
+#if 0
 asm void fn_8013E54C(void) {
 #include "src/game/effect/effect_visual_fn_8013E54C.inc"
 }
 #else
-void fn_8013E54C(void) { /* TODO */ }
+u32 fn_8013E54C(void* ptr) {
+    if (ptr != NULL) {
+        if (*(void**)((u8*)ptr + 4) != NULL) {
+            fn_800B8DF4();
+            fn_800B856C();
+            fn_800EF5A4(*(void**)((u8*)ptr + 4));
+        }
+        memset(ptr, 0, 0x34);
+    }
+    return 1;
+}
 #endif
 #if 0
 asm void fn_8013E5AC(void) {
