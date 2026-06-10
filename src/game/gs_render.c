@@ -3776,12 +3776,9 @@ asm void fn_800DCC84(void) {
 void fn_800DCC84(u8* obj, f32* rgb) {
     u8 t[4];
     u8 tmp[4];
-    f32 r = rgb[0];
-    f32 g = rgb[1];
-    f32 b = rgb[2];
-    t[0] = (u8)(s32)r;
-    t[1] = (u8)(s32)g;
-    t[2] = (u8)(s32)b;
+    t[0] = (u8)(s32)rgb[0];
+    t[1] = (u8)(s32)rgb[1];
+    t[2] = (u8)(s32)rgb[2];
     *(u32*)tmp = *(u32*)t;
     fn_801A4A48(*(u32*)(obj + 0xc), tmp);
 }
