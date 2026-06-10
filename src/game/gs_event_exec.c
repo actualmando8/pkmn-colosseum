@@ -271,14 +271,15 @@ extern void fn_801080CC(s32, s32);
 #pragma peephole off
 #pragma push
 #pragma optimization_level 1
-s32 fn_80012D20(u8* ctx) {
-    void* src;
+s32 fn_80012D20(u8* arg) {
     s32   size;
+    void* src;
+    u8*   ctx = arg;
     void* buf;
     switch ((s32)(s8)ctx[1]) {
     case 0:
         if ((s32)(s8)ctx[2] == 0) {
-            src  = fn_801040D0(ctx, 1);
+            src  = fn_801040D0(arg, 1);
             size = (s32)fn_801040D0(ctx, 2) << 2;
             buf  = fn_80103FFC(ctx, size);
             if (buf != 0) {
