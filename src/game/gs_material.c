@@ -1916,28 +1916,30 @@ void fn_800E5550(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** r31 = *(void***)((u8*)obj + 0x14c);
-        s32 r30 = *(u16*)((u8*)obj + 0x150);
-        s32 r29 = 0;
+        void** ptr = *(void***)((u8*)obj + 0x14c);
+        s32 cnt = *(u16*)((u8*)obj + 0x150);
+        s32 idx = 0;
         count2--;
         *(u16*)((u8*)obj + 0x152) = count2;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) {
                 fn_800DEFC8(p);
             }
-            r29++;
+            idx++;
+            ptr++;
         }
         if (*(u16*)((u8*)obj + 0x152) != 0) return;
-        r30 = *(u16*)((u8*)obj + 0x150);
-        r31 = *(void***)((u8*)obj + 0x14c);
-        r29 = 0;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
+        ptr = *(void***)((u8*)obj + 0x14c);
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) {
                 fn_800DF608(p);
             }
-            r29++;
+            idx++;
+            ptr++;
         }
         {
             u16 handle = *(u16*)((u8*)obj + 0x154);
@@ -2604,28 +2606,30 @@ void fn_800E638C(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** r31 = *(void***)((u8*)obj + 0x14c);
-        s32 r30 = *(u16*)((u8*)obj + 0x150);
-        s32 r29 = 0;
+        void** ptr = *(void***)((u8*)obj + 0x14c);
+        s32 cnt = *(u16*)((u8*)obj + 0x150);
+        s32 idx = 0;
         count2--;
         *(u16*)((u8*)obj + 0x152) = count2;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) {
                 fn_800DF470(p);
             }
-            r29++;
+            idx++;
+            ptr++;
         }
         if (*(u16*)((u8*)obj + 0x152) != 0) return;
-        r30 = *(u16*)((u8*)obj + 0x150);
-        r31 = *(void***)((u8*)obj + 0x14c);
-        r29 = 0;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
+        ptr = *(void***)((u8*)obj + 0x14c);
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) {
                 fn_800DF608(p);
             }
-            r29++;
+            idx++;
+            ptr++;
         }
         {
             u16 handle = *(u16*)((u8*)obj + 0x154);
@@ -2713,24 +2717,26 @@ void fn_800E65CC(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** r31 = *(void***)((u8*)obj + 0x14c);
-        s32 r30 = *(u16*)((u8*)obj + 0x150);
-        s32 r29 = 0;
+        void** ptr = *(void***)((u8*)obj + 0x14c);
+        s32 cnt = *(u16*)((u8*)obj + 0x150);
+        s32 idx = 0;
         count2--;
         *(u16*)((u8*)obj + 0x152) = count2;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) { fn_800DF140(p); }
-            r29++;
+            idx++;
+            ptr++;
         }
         if (*(u16*)((u8*)obj + 0x152) != 0) return;
-        r30 = *(u16*)((u8*)obj + 0x150);
-        r31 = *(void***)((u8*)obj + 0x14c);
-        r29 = 0;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
+        ptr = *(void***)((u8*)obj + 0x14c);
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) { fn_800DF608(p); }
-            r29++;
+            idx++;
+            ptr++;
         }
         {
             u16 handle = *(u16*)((u8*)obj + 0x154);
@@ -2840,24 +2846,26 @@ void fn_800E68D8(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** r31 = *(void***)((u8*)obj + 0x14c);
-        s32 r30 = *(u16*)((u8*)obj + 0x150);
-        s32 r29 = 0;
+        void** ptr = *(void***)((u8*)obj + 0x14c);
+        s32 cnt = *(u16*)((u8*)obj + 0x150);
+        s32 idx = 0;
         count2--;
         *(u16*)((u8*)obj + 0x152) = count2;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) { fn_800DF504(p); }
-            r29++;
+            idx++;
+            ptr++;
         }
         if (*(u16*)((u8*)obj + 0x152) != 0) return;
-        r30 = *(u16*)((u8*)obj + 0x150);
-        r31 = *(void***)((u8*)obj + 0x14c);
-        r29 = 0;
-        while (r29 < r30) {
-            void* p = r31[r29];
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
+        ptr = *(void***)((u8*)obj + 0x14c);
+        while (idx < cnt) {
+            void* p = *ptr;
             if (p != NULL) { fn_800DF608(p); }
-            r29++;
+            idx++;
+            ptr++;
         }
         {
             u16 handle = *(u16*)((u8*)obj + 0x154);
