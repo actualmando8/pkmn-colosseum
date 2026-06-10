@@ -317,7 +317,7 @@
  *   fn_80160FA8 (0x114 bytes)  -- peopleFieldMotionHelper4
  *   fn_801610BC (0x3C bytes)   -- peopleFieldMotionLookup
  *   fn_801610F8 (0x3C bytes)   -- peopleFieldMotionLookup2
- *   fn_80161134 (0x4A0 bytes)  -- peopleFieldMotionMain
+ *   _GetInputValue (0x4A0 bytes)  -- peopleFieldMotionMain
  *     Large motion processing function.
  *
  *   fn_801615D4 - fn_801618EC  -- Motion type handlers (12 functions)
@@ -785,14 +785,14 @@ asm void fn_80154A14(void) {
 void fn_80154A14(void) {}
 #endif
 
-extern u32 fn_80161134(u8* obj, u8* motionBase, u32 p1, u32 p2);
+extern u32 _GetInputValue(u8* obj, u8* motionBase, u32 p1, u32 p2);
 #if 0
 asm void fn_8016161C(void) {
 #include "src/game/people/people_field_fn_8016161C.inc"
 }
 #else
 /* If flags bit 30 (0x2) is CLEAR: return halfword at 0x25c.
- * If SET: clear bit 30, call fn_80161134 with motion data, return its result. */
+ * If SET: clear bit 30, call _GetInputValue with motion data, return its result. */
 u32 fn_8016161C(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
@@ -800,7 +800,7 @@ u32 fn_8016161C(u8* obj) {
         return *(u16*)(obj + 0x25c);
     }
     *(u32*)(obj + 0x214) = flags & ~0x2u;
-    return fn_80161134(obj, obj + 0x23c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x23c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -816,7 +816,7 @@ u32 fn_80161664(u8* obj) {
         return *(u16*)(obj + 0x280);
     }
     *(u32*)(obj + 0x214) = flags & ~0x4u;
-    return fn_80161134(obj, obj + 0x260, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x260, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -832,7 +832,7 @@ u32 fn_801616AC(u8* obj) {
         return *(u16*)(obj + 0x2a4);
     }
     *(u32*)(obj + 0x214) = flags & ~0x8u;
-    return fn_80161134(obj, obj + 0x284, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x284, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -848,7 +848,7 @@ u32 fn_801616F4(u8* obj) {
         return *(u16*)(obj + 0x2c8);
     }
     *(u32*)(obj + 0x214) = flags & ~0x10u;
-    return fn_80161134(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x2a8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -864,7 +864,7 @@ u32 fn_8016173C(u8* obj) {
         return *(u16*)(obj + 0x2ec);
     }
     *(u32*)(obj + 0x214) = flags & ~0x20u;
-    return fn_80161134(obj, obj + 0x2cc, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x2cc, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -880,7 +880,7 @@ u32 fn_80161784(u8* obj) {
         return *(u16*)(obj + 0x310);
     }
     *(u32*)(obj + 0x214) = flags & ~0x40u;
-    return fn_80161134(obj, obj + 0x2f0, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x2f0, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -896,7 +896,7 @@ u32 fn_801617CC(u8* obj) {
         return *(u16*)(obj + 0x358);
     }
     *(u32*)(obj + 0x214) = flags & ~0x100u;
-    return fn_80161134(obj, obj + 0x338, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x338, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -912,7 +912,7 @@ u32 fn_80161814(u8* obj) {
         return *(u16*)(obj + 0x37c);
     }
     *(u32*)(obj + 0x214) = flags & ~0x200u;
-    return fn_80161134(obj, obj + 0x35c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x35c, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -928,7 +928,7 @@ u32 fn_8016185C(u8* obj) {
         return *(u16*)(obj + 0x3a0);
     }
     *(u32*)(obj + 0x214) = flags & ~0x400u;
-    return fn_80161134(obj, obj + 0x380, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x380, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -944,7 +944,7 @@ u32 fn_801618A4(u8* obj) {
         return *(u16*)(obj + 0x3c4);
     }
     *(u32*)(obj + 0x214) = flags & ~0x800u;
-    return fn_80161134(obj, obj + 0x3a4, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x3a4, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #if 0
@@ -960,7 +960,7 @@ u32 fn_801618EC(u8* obj) {
         return *(u16*)(obj + 0x3e8);
     }
     *(u32*)(obj + 0x214) = flags & ~0x1000u;
-    return fn_80161134(obj, obj + 0x3c8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
+    return _GetInputValue(obj, obj + 0x3c8, *(u8*)(obj + 0x121), *(u8*)(obj + 0x122));
 }
 #endif
 #pragma push
@@ -984,7 +984,7 @@ u32 fn_801619E8(u8 idx, u8 r4, u32 r5, u32 r6) {
         row[(u8)r5] = t1 & ~t2;
     }
     if (nonzero) {
-        return fn_80161134(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24, r5, r6);
+        return _GetInputValue(NULL, lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24, r5, r6);
     } else {
         return *(u16*)(lbl_804356F4 + (u32)idx * 0x90 + (u32)r4 * 0x24 + 0x20);
     }
