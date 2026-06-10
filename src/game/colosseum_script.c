@@ -7905,21 +7905,20 @@ u32 fn_80230088(void)
   return 1;
 }
 /* Address: 0x8023011C | Size: 0x8c | Ghidra import */
-u32 fn_8023011C(void)
+u32 fn_8023011C(void* r3)
 
 {
-    u32 r3;
-
     extern void fn_801F4C14();
     extern void fn_80211B94();
     extern u32 lbl_8047B62C;
-  s8 cVar1;
+    extern u8 lbl_80378721[];
+  u8 cVar1;
 
   cVar1 = (int)fn_8012640C(r3,0,0x120,0);
   if (cVar1 == 1) {
     fn_801F4C14(0,0,0x46,0,r3);
     fn_801F4C14(0,0,0x42,0,r3);
-    fn_80211B94(lbl_8047B62C,0x80378721,0);
+    fn_80211B94(lbl_8047B62C,lbl_80378721,0);
   }
   return 1;
 }
