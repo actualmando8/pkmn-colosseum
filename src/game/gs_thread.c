@@ -4914,7 +4914,7 @@ s32 fn_800F668C(void* obj) {
         fn_800DD38C((const char*)lbl_80271068);
     } else {
         *(s32*)(p + 0x28) = count + 1;
-        *(u32*)((u8*)p + count * 4 + 0x6C) = val;
+        ((u32*)(p + 0x6C))[count] = val;
     }
     *(u32*)(p + 0x14) = *(u32*)(p + 0x14) + 4;
     return 1;
