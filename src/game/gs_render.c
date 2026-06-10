@@ -4473,9 +4473,10 @@ void fn_800DF854(u32 count) {
     if (handle) {
         u32 off;
         u32 i;
-        lbl_8047AB1C = (u32)fn_800E27B0(handle);
-        off = 0; i = 0;
-        while (i < lbl_8047AB20) { i++; ((u8*)lbl_8047AB1C)[off] = 0; off += 0x40; }
+        lbl_8047AB1C = (u32)fn_800E27B0((u16)handle);
+        for (off = 0, i = 0; i < lbl_8047AB20; i++, off += 0x40) {
+            *(u8*)(lbl_8047AB1C + off) = 0;
+        }
         fn_801A7CFC(lbl_80315490);
     }
 }
