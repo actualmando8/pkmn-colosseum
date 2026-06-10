@@ -146,7 +146,7 @@ extern void* memset(void* dst, int val, u32 size);
 
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSbezierCalculateVector();
-extern void GSfilterCreate();
+extern void* GSfilterCreate(void);
 extern void GSmaterialSetFlags();
 extern void sin();   /* MSL trig (renamed) — referenced by asm incs */
 extern void cos();   /* MSL trig (renamed) — referenced by asm incs */
@@ -369,7 +369,7 @@ extern u32 fn_8013AD68(void* ptr);
 extern void fn_8013AD9C(void);
 extern u32 fn_8013B034(void* ptr);
 extern u32 fn_8013B0A0(void* ptr);
-extern u16 filterStart(void);
+extern u16 filterStart(void* ptr);
 extern void fn_8013B268(void);
 extern u32 fn_8013B504(void* ptr);
 extern u32 fn_8013B558(void* ptr);
@@ -964,18 +964,65 @@ fail:
     return 0;
 }
 #endif
-extern void fn_800E6478(void);
-extern void fn_800E5BE0(void);
+extern void fn_800E6478(void* texture, void* name);
+extern void fn_800E5BE0(void* texture, void* filter);
 extern void fn_80168570(void);
 extern u8 lbl_80363CA8[];
 extern u8 lbl_80272E30[];
 extern u8 lbl_80272E70[];
-#if 1
+#if 0
 asm u16 filterStart(void) {
 #include "src/game/effect/effect_visual_filterStart.inc"
 }
 #else
-u16 filterStart(void) { /* TODO */ }
+u16 filterStart(void* ptr) {
+    u8* p;
+    u16 i;
+    u32 count;
+    u8 flag1;
+    u8 flag2;
+    void* filter;
+
+    if (ptr == NULL) {
+        goto report_null;
+    }
+
+    filter = *(void**)((u8*)ptr + 0x50);
+    if (filter == NULL) {
+        return 0;
+    }
+
+    if (*(u8*)((u8*)ptr + 0x4c) != 0) {
+        p = (u8*)ptr + 4;
+        count = *(u32*)((u8*)ptr + 0x48) & 0xffff;
+        flag1 = *(u8*)((u8*)ptr + 0x4e);
+        flag2 = *(u8*)((u8*)ptr + 0x4f);
+        for (i = 0; i < count; i++, p += 4) {
+            if (*(void**)p != NULL) {
+                if (flag1 != 0) {
+                    fn_800E6478(*(void**)p, lbl_80363CA8);
+                }
+                if (flag2 == 0) {
+                    fn_800E5BE0(*(void**)p, filter);
+                }
+            }
+        }
+    } else {
+        *(void**)ptr = GSfilterCreate();
+        if (*(void**)ptr == NULL) {
+            fn_800DD970((const char*)lbl_80272E30);
+            return 0;
+        }
+    }
+
+    *(void**)((u8*)ptr + 0x54) = filter;
+    *(u32*)((u8*)ptr + 0x58) = 0;
+    return 1;
+
+report_null:
+    fn_800DD970((const char*)lbl_80272E70);
+    return 0;
+}
 #endif
 extern void fn_800E5B68(void);
 extern u32 lbl_8047D1E8;
