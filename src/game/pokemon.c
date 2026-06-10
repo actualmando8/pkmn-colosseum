@@ -1560,62 +1560,30 @@ end:
     return 1;
 }
 
-/* 0x801F1460 | size: 0xAC | medium */
-void fightActionInit(void) {
-    extern void fn_8020D78C();
-    extern void fn_8020D844();
-    extern void fn_8020D868();
-    extern void fn_8020D878();
-    extern void fn_8020D888();
-    extern void fn_8020D898();
-    extern void fn_8020D8A8();
-    extern void fn_8020D8B8();
-    extern void fn_8020D8C8();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+/* 0x801F1460 | size: 0xB4 | fightActionInit */
+void fightActionInit(u8* ptr) {
+    extern void fn_8020D8C8(u8*, u32);
+    extern void fn_8020D8B8(u8*, u32);
+    extern void fn_8020D8A8(u8*, u32);
+    extern void fn_8020D844(u8*, u32, u32);
+    extern void fn_8020D888(u8*, u32);
+    extern void fn_8020D878(u8*, u32);
+    extern void fn_8020D898(u8*, u32);
+    extern void fn_8020D868(u8*, u32);
+    extern void fn_8020D78C(u8*, s32);
+    u32 i;
 
-    r4 = 0x0;
-    r30 = r3;
-    fn_8020D8C8();
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D8B8();
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D8A8();
-    r31 = 0x0;
-
-    while (r0 < (u32)0x4) {
-        r3 = r30;
-        r4 = r31;
-        r5 = 0x0;
-        fn_8020D844();
-        r31 = r31 + 0x1;
-
-    r0 = r31 & 0xFFFF;
+    fn_8020D8C8(ptr, 0);
+    fn_8020D8B8(ptr, 0);
+    fn_8020D8A8(ptr, 0);
+    for (i = 0; (u16)i < 4; i++) {
+        fn_8020D844(ptr, i, 0);
     }
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D888();
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D878();
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D898();
-    r3 = r30;
-    r4 = 0x0;
-    fn_8020D868();
-    r3 = r30;
-    r4 = -0x1;
-    fn_8020D78C();
-    return;
+    fn_8020D888(ptr, 0);
+    fn_8020D878(ptr, 0);
+    fn_8020D898(ptr, 0);
+    fn_8020D868(ptr, 0);
+    fn_8020D78C(ptr, -1);
 }
 
 /* 0x801F150C | size: 0x48 | small */
