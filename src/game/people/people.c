@@ -672,7 +672,7 @@ extern void fn_800A3A78(void);
 extern void fn_801101B4(void);
 extern void fn_8010E138(void);
 extern u32 lbl_8047D890;
-extern u32 lbl_8047D7EC;
+extern const f32 lbl_8047D7EC;
 extern u32 lbl_8047D894;
 extern u32 lbl_8047D800;
 extern u32 lbl_8047D7A0;
@@ -803,7 +803,7 @@ void fn_801839A0(void) { /* TODO: match -- 420 bytes at 0x801839A0 */ }
 /* 0x80183B44 | 0x19C */
 extern u32 lbl_8047D7A0;
 extern u32 lbl_8047D7E8;
-extern u32 lbl_8047D7EC;
+extern const f32 lbl_8047D7EC;
 extern u32 lbl_8047D79C;
 #if 1
 asm void fn_80183B44(void) {
@@ -985,15 +985,20 @@ void fn_80185F44(void) { /* TODO: match -- 436 bytes at 0x80185F44 */ }
 #endif
 
 /* 0x80186254 | 0x30 */
-extern u32 lbl_8047D7EC;
-extern u32 lbl_8047D838;
-extern void fn_80186284(void);
-#if 1
+extern const f32 lbl_8047D7EC;
+extern const f32 lbl_8047D838;
+extern void fn_80186284(u32 a, u32 b, f32 x, s32 c, s32 d, f32 y);
+#if 0
 asm void fn_80186254(void) {
 #include "src/game/people/people_fn_80186254.inc"
 }
 #else
-void fn_80186254(void) { /* TODO: match -- 48 bytes at 0x80186254 */ }
+#pragma push
+#pragma scheduling on
+void fn_80186254(u32 a, u32 b) {
+    fn_80186284(a, b, lbl_8047D7EC, 0, 100, lbl_8047D838);
+}
+#pragma pop
 #endif
 
 /* 0x80186284 | 0x39C */
@@ -1006,7 +1011,7 @@ extern u32 lbl_8047D820;
 extern u32 lbl_8047D814;
 extern u32 lbl_8047D7A4;
 #if 1
-asm void fn_80186284(void) {
+asm void fn_80186284(u32 a, u32 b, f32 x, s32 c, s32 d, f32 y) {
 #include "src/game/people/people_fn_80186284.inc"
 }
 #else
