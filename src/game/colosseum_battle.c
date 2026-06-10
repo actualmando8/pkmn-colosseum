@@ -36332,18 +36332,22 @@ u32 fn_8025DA18(void* ctx) { if (ctx == NULL) return 0; return 0; /* stub */ }
 
 /* fn_8025DA3C | Size: 0x4C | Get battle party size based on mode */
 u32 fn_8025DA3C(void) {
+    s32 mode;
+    u32 res;
     extern void* fn_8006B5A8(void);
     void* result = fn_8006B5A8();
-    s32 mode = *(s32*)((u8*)result + 0x4);
+    res = 2;
+    mode = *(s32*)((u8*)result + 0x4);
     switch (mode) {
         case 0:
         case 1:
-            return 2;
+            res = 2;
+            break;
         case 2:
-            return 4;
-        default:
-            return 2;
+            res = 4;
+            break;
     }
+    return res;
 }
 
 /* Address: 0x8025DA88 | Size: 0x24 | Pattern: null_check_getter */
