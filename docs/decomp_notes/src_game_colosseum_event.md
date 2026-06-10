@@ -51,6 +51,18 @@
 
 ## Recently landed
 
+- **fn_80202C1C** — 85.9 -> **89.1%** (2026-06-10, commit 1e5f5eae). (1) `fn_801EF634`
+  + result `sVar8` retyped short -> u16 (extsh/cmpwi -> clrlwi/cmplwi on `==1`);
+  (2) outer `do { if (bound<=i) return; ... i++; } while(1)` -> `for(i=0;
+  (i&0xffff)<(uVar2&0xffff);i++)` for the entry-`b`-to-bottom-condition shape.
+  Residual: W1 r21-r31 rename + W4 null-check booleanize in the deep nest.
+- **fn_80204854** — 90.1 -> **91.3%** (2026-06-10, commit a2750603). BODY BYTE-EXACT.
+  (1) De-Morgan-inverted the `||`-chain-to-uVar1=0 precondition so uVar1=1 (return 1)
+  lays out first (fixes swapped li r3,0x1/li r3,0x0 epilogue); (2) moved `iVar2` decl
+  ahead of `sVar3` to flip the r30<->r31 saved-band home. Sole residual = W3 stmw
+  threshold (2 saved regs). **LESSON: the De Morgan return-order inversion + a single
+  decl reorder can take a fn to body-byte-exact, leaving only a pure W3 prologue.**
+
 - **fn_802078F0** — `#pragma peephole on` + `if ((ctx = r3) != NULL)` → `mr. r31, r3` (2026-05-17)
 - **fn_80209D90** — `#pragma peephole on` + `if ((ctx = r3) == NULL)` → `mr. r31, r3` (2026-05-17)
 - **fn_8020A478** — `#pragma peephole on` + `if ((ctx = r3) != NULL)` → `mr. r31, r3` (2026-05-17)
@@ -86,3 +98,25 @@ fn_802078F0, fn_80209D90, fn_8020A478, fn_8020FC70, fn_80211040
 ## Untouched near-misses
 (Pull from `python tools/near_miss_report.py` for full list)
 fn_80210998 (96.44%), fn_803103E8 (95.70%), fn_80211810 (95.00%), fn_80210D04 (93.96%), fn_8020ECE0 (91.36%), fn_8020B330 (89.68%)
+
+## Blocked near-misses (2026-06-10 session, Opus)
+
+- **fn_80208028** @ 99.84% — W6 call-target NAME (`bl itemGetStatus` vs `bl fn_80142CF4`,
+  same address). Byte-identical; symbol_mappings artifact. Hard skip.
+- **fn_80211A78** @ 98.45% — first `if(result==1)` emits `beq body; b skip` in target
+  but `bne skip` from CW; merging the two ifs (89%) and peephole off (92.5%) both
+  regressed. Branch-shape residual, 1-2 instrs. Skip.
+- **fn_8020E7AC** @ 96.44% / **fn_8020E95C** @ 89.6% — W1 saved-band rename (r26-r31).
+  `u8 bVar1` fixes the `clrlwi.` combine but shifts the whole band -> net worse
+  (E7AC 95.97). `matchVal==sVar3` operand-order flip inert (CW canonicalizes). Skip.
+- **fn_8020DAD0** @ 95.0% — manual round-toward-zero `((s32)x>>1)+((s32)x<0 & x&1)`
+  IS `(s32)x/2`; replacing -> +0.45 (3-instr srwi/add/srawi, still not target's
+  2-instr srawi/addze DIV-IDIOM wall) + W1 r27-r31 rename. Reverted (sub-bar). Skip.
+- **fn_8020BFA0** @ 95.15% — W2 scheduler call-arg slot interleave (target hoists
+  `li r4/r5/r6` constant args into the lbl-address-load gap; CW groups them at the
+  call) + `mr r0,r3; li r3,0` hop on a u16-return arg. Not per-spot controllable.
+- **fn_802077D4** @ 87.9% — pure W3 stmw threshold (body matches). Skip.
+
+NOTE: this TU's Ghidra imports share colosseum_script's bug classes — s8/short
+mis-types on `==N` compares, and entry-`b` loop shapes written as `do{...}while(1)`
+with a top-tested return. Both are pure correctness fixes; sweep them first.
