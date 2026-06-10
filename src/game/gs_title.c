@@ -213,7 +213,7 @@ extern void menuModelSetMotion(void);
 extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
 extern void itemParamConvertOrigFormat(void);
 extern void itemParamGetRecoverType(void);
-extern void pcboxGetPokemonBoxNbEmptySlot(void);
+extern s32 pcboxGetPokemonBoxNbEmptySlot(s32, s8);
 extern void GSgfxBeginBackFBCapture(void);
 
 /* =========================================================================
@@ -3049,7 +3049,7 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
         cVar1 = fn_801347E0();
         iVar3 = 0;
         while (iVar3 < cVar1) {
-            cVar2 = fn_801347E8(0, (s8)iVar3);
+            cVar2 = pcboxGetPokemonBoxNbEmptySlot(0, (s8)iVar3);
             if (cVar2 > 0) {
                 break;
             }
