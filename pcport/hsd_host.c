@@ -361,6 +361,18 @@ void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
         f->time = startframe;
         f->flags = (u8) ((f->flags & 0xF0) | 2); /* load-next-packet start state */
         f->nb_pack = 0;
+        /* Reset segment state so the interpreter re-reads fterm from the stream
+         * on the next call.  Without this, re-arm after loop-rewind leaves fterm
+         * at the last-cycle value, causing state-4 to sample the terminal segment
+         * control points for the entire next cycle instead of starting from
+         * segment 0.  The initial load has fterm=0 (from HSD_FObjAlloc memset),
+         * which produces the correct "fall through to state-3 immediately" path;
+         * re-arm must replicate that condition. */
+        f->fterm = 0;
+        f->p0    = 0.0f;
+        f->p1    = 0.0f;
+        f->d0    = 0.0f;
+        f->d1    = 0.0f;
     }
 }
 #endif

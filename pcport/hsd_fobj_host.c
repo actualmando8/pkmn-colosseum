@@ -389,6 +389,17 @@ void PCPort_FObjStartAnim(HSD_FObj* fobj, f32 startframe)
         f->time = startframe;
         f->flags = (u8) ((f->flags & 0xF0) | 2);
         f->nb_pack = 0;
+        /* Reset segment control state to match the initial-load condition
+         * (HSD_FObjAlloc memsetz fterm/p0/p1/d0/d1 to 0).  Re-arming
+         * without this leaves stale fterm from the previous cycle, causing
+         * the state-4 "fterm_f > time" guard to skip over the stream-decode
+         * in state-3 and sample the wrong (terminal) segment's control points
+         * for the whole next cycle. */
+        f->fterm = 0;
+        f->p0    = 0.0f;
+        f->p1    = 0.0f;
+        f->d0    = 0.0f;
+        f->d1    = 0.0f;
     }
 }
 
