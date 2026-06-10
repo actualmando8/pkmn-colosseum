@@ -1215,24 +1215,30 @@ void fn_800E43A4(void* entry, void* param) {
         if (param == NULL) {
             fn_80196E10(lbl_8047CB60, 0x3aa, lbl_80270E50);
         }
-        *(s32*)((u8*)r30 + 0x38) = *(s32*)((u8*)param + 0x0);
-        *(s32*)((u8*)r30 + 0x3c) = *(s32*)((u8*)param + 0x4);
+        {
+            struct ZModeAB { s32 a; s32 b; };
+            *(struct ZModeAB*)((u8*)r30 + 0x38) = *(struct ZModeAB*)((u8*)param + 0x0);
+        }
         *(s32*)((u8*)r30 + 0x40) = *(s32*)((u8*)param + 0x8);
         {
             u32 flags = *(s32*)((u8*)r30 + 0x14);
-            if ((flags & 0x2000000) && r30 != NULL) {
-                s32 active;
-                if (r30 == NULL) {
-                    fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
-                }
-                flags = *(s32*)((u8*)r30 + 0x14);
-                if ((flags & 0x800000) || !(flags & 0x40)) {
+            if (!(flags & 0x2000000)) {
+                if (r30 != NULL) {
+                    s32 active;
+                    u32 f2;
+                    if (r30 == NULL) {
+                        fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
+                    }
+                    f2 = *(u32*)((u8*)r30 + 0x14);
                     active = 0;
-                } else {
-                    active = 1;
-                }
-                if (!active) {
-                    fn_8019D620(r30);
+                    if (!(f2 & 0x800000)) {
+                        if (f2 & 0x40) {
+                            active = 1;
+                        }
+                    }
+                    if (!active) {
+                        fn_8019D620(r30);
+                    }
                 }
             }
         }
