@@ -380,7 +380,7 @@ extern void fn_8013BC10(void);
 extern void fn_8013BE04(void);
 extern void fn_8013C074(void);
 extern u32 fn_8013C614(void* ptr);
-extern void fn_8013C670(void);
+extern u32 fn_8013C670(void* ptr);
 extern u16 seaEffectStart(void);
 extern void fn_8013CA48(void);
 extern void fn_8013CBF0(void);
@@ -1164,12 +1164,39 @@ u32 fn_8013C614(void* ptr) {
 }
 #endif
 extern void fn_800EC1D4(void* a);
-#if 1
+#if 0
 asm void fn_8013C670(void) {
 #include "src/game/effect/effect_visual_fn_8013C670.inc"
 }
 #else
-void fn_8013C670(void) { /* TODO */ }
+u32 fn_8013C670(void* ptr) {
+    void* inner;
+    u16 val;
+
+    if (ptr != NULL) {
+        inner = *(void**)ptr;
+        fn_800EC1D4(inner);
+        if (inner != NULL) {
+            fn_800E4014(inner, 0);
+        }
+        fn_800B8DF4();
+        fn_800B856C();
+        fn_8013CE58(inner, ptr);
+
+        val = *(u16*)((u8*)ptr + 0x1c);
+        if (val != 0) {
+            fn_800E24B0(val);
+            fn_800E209C(val);
+        }
+
+        val = *(u16*)((u8*)ptr + 0x8c);
+        if (val != 0) {
+            fn_800E24B0(val);
+            fn_800E209C(val);
+        }
+    }
+    return 1;
+}
 #endif
 extern void fn_800EC188(void);
 extern u32 lbl_8047D230;
