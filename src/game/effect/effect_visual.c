@@ -975,20 +975,19 @@ asm u16 filterStart(void) {
 #include "src/game/effect/effect_visual_filterStart.inc"
 }
 #else
-u16 filterStart(void* ptr) {
-    u8* p;
+u16 filterStart(void* arg) {
+    u8 flag2;
+    u8 flag1;
     u16 i;
     u32 count;
-    u8 flag1;
-    u8 flag2;
-    void* filter;
+    u8* p;
+    void* ptr = arg;
 
     if (ptr == NULL) {
         goto report_null;
     }
 
-    filter = *(void**)((u8*)ptr + 0x50);
-    if (filter == NULL) {
+    if (*(void**)((u8*)arg + 0x50) == NULL) {
         return 0;
     }
 
@@ -1003,7 +1002,7 @@ u16 filterStart(void* ptr) {
                     fn_800E6478(*(void**)p, lbl_80363CA8);
                 }
                 if (flag2 == 0) {
-                    fn_800E5BE0(*(void**)p, filter);
+                    fn_800E5BE0(*(void**)p, *(void**)((u8*)ptr + 0x50));
                 }
             }
         }
@@ -1015,7 +1014,7 @@ u16 filterStart(void* ptr) {
         }
     }
 
-    *(void**)((u8*)ptr + 0x54) = filter;
+    *(void**)((u8*)ptr + 0x54) = *(void**)((u8*)ptr + 0x50);
     *(u32*)((u8*)ptr + 0x58) = 0;
     return 1;
 
@@ -1216,14 +1215,18 @@ asm void fn_8013C670(void) {
 #include "src/game/effect/effect_visual_fn_8013C670.inc"
 }
 #else
-u32 fn_8013C670(void* ptr) {
+#pragma push
+#pragma global_optimizer off
+u32 fn_8013C670(void* arg) {
+    void* ptr;
     void* inner;
     u16 val;
 
-    if (ptr != NULL) {
-        inner = *(void**)ptr;
+    if (arg != 0) {
+        inner = *(void**)arg;
+        ptr = arg;
         fn_800EC1D4(inner);
-        if (inner != NULL) {
+        if (inner != 0) {
             fn_800E4014(inner, 0);
         }
         fn_800B8DF4();
@@ -1244,6 +1247,7 @@ u32 fn_8013C670(void* ptr) {
     }
     return 1;
 }
+#pragma pop
 #endif
 extern void fn_800EC188(void);
 extern u32 lbl_8047D230;
@@ -1730,9 +1734,13 @@ asm void fn_8013E54C(void) {
 #include "src/game/effect/effect_visual_fn_8013E54C.inc"
 }
 #else
-u32 fn_8013E54C(void* ptr) {
-    if (ptr != NULL) {
-        if (*(void**)((u8*)ptr + 4) != NULL) {
+#pragma push
+#pragma global_optimizer off
+u32 fn_8013E54C(void* arg) {
+    void* ptr;
+    if (arg != 0) {
+        ptr = arg;
+        if (*(void**)((u8*)arg + 4) != 0) {
             fn_800B8DF4();
             fn_800B856C();
             fn_800EF5A4(*(void**)((u8*)ptr + 4));
@@ -1741,6 +1749,7 @@ u32 fn_8013E54C(void* ptr) {
     }
     return 1;
 }
+#pragma pop
 #endif
 #if 0
 asm void fn_8013E5AC(void) {
