@@ -37646,14 +37646,18 @@ u32 fn_8025FDDC(u16 *r3, u16 r4) {
 /* Address: 0x8025FE84 | Size: 0x60 | Ghidra import */
 u16 fn_8025FE84(u16 *r3, u32 r4)
 {
+    u16 res;
     extern void *fn_80129280();
     if (r3 == (u16 *)0) {
         r3 = (u16 *)fn_80129280(0, 0xc);
     }
     if (*r3 != 0) {
         r3 = (u16 *)((u8 *)r3 + (r4 & 0xFFFF) * 12);
+        res = *(u16 *)((u8 *)r3 + 4);
+    } else {
+        res = 0;
     }
-    return *(u16 *)((u8 *)r3 + 4);
+    return res;
 }
 
 /* Address: 0x8025FEE4 | Size: 0x34 | Ghidra import */
