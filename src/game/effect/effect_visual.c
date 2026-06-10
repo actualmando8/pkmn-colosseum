@@ -413,7 +413,7 @@ extern void _distortionEffectUpdateMatrices(void);
 extern u32 fn_8013FC58(void* ptr);
 extern u32 fn_8013FCC4(void* ptr);
 extern u32 fn_8013FD68(void* ptr);
-extern u16 billboardEffectStart(void);
+extern u16 billboardEffectStart(void* ptr);
 extern void fn_8013FF0C(void);
 
 #if 1
@@ -1102,12 +1102,12 @@ u32 fn_8013B558(void* ptr) {
 extern void fn_800E2C04(void);
 extern void fn_800E0E14(void);
 extern void fn_800E4170(void);
-extern void fn_800EC1B0(void);
-extern void fn_800EC35C(void);
-extern void fn_800EC308(void);
-extern void fn_800EC2A4(void);
-extern void fn_800EC208(void);
-extern void fn_800EC1E4(void);
+extern u8 fn_800EC1B0(void* model);
+extern void fn_800EC35C(void* model, u16 value);
+extern void fn_800EC308(void* model, f32 value);
+extern void fn_800EC2A4(void* model, f32 value);
+extern void fn_800EC208(void* model, u32 value);
+extern void fn_800EC1E4(void* model);
 extern u32 lbl_8047D200;
 extern u32 lbl_8047D204;
 extern u8 lbl_80272EA0[];
@@ -1640,8 +1640,8 @@ extern void fn_800D45F8(void);
 extern void fn_800DF3F0(void);
 extern void fn_800DF550(void);
 extern void fn_800DF188(void);
-extern void fn_800EC990(void);
-extern void fn_800ECA78(void);
+extern void fn_800EC990(void* model);
+extern void fn_800ECA78(void* model, f32 value);
 extern void fn_800EC134(void);
 extern void fn_800DF140(void);
 extern void fn_800DF504(void);
@@ -2069,21 +2069,60 @@ u32 fn_8013FD68(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_801190DC(void);
-extern void fn_800E3CC8(void);
-extern void fn_800EC1BC(void);
-extern void fn_800ECCA8(void);
-extern void fn_800ECB74(void);
-extern void fn_800EC9DC(void);
+extern void* fn_801190DC(void* ptr, u16 arg, u32 flag);
+extern void fn_800E3CC8(void* model, u32 flag);
+extern u8 fn_800EC1BC(void* model);
+extern void fn_800ECCA8(void* model, u16 value);
+extern void fn_800ECB74(void* model, u32 value);
+extern void fn_800EC9DC(void* model, f32 value);
 extern u32 lbl_8047D328;
 extern u32 lbl_8047D32C;
 extern u8 lbl_80273078[];
-#if 1
+#if 0
 asm u16 billboardEffectStart(void) {
 #include "src/game/effect/effect_visual_billboardEffectStart.inc"
 }
 #else
-u16 billboardEffectStart(void) { /* TODO */ }
+u16 billboardEffectStart(void* ptr) {
+    void* model;
+
+    if (ptr == NULL) {
+        goto report_null;
+    }
+
+    model = *(void**)((u8*)ptr + 0x10);
+    if (model == NULL && *(void**)((u8*)ptr + 0x14) == NULL) {
+        return 0;
+    }
+
+    if (*(void**)((u8*)ptr + 0x14) != NULL) {
+        *(void**)((u8*)ptr + 0x20) = fn_801190DC(*(void**)((u8*)ptr + 0x14), *(u16*)((u8*)ptr + 0x1e), 1);
+    }
+
+    if (model != NULL) {
+        fn_800E4014(model, 1);
+        fn_800E3CC8(model, 1);
+        if (fn_800EC1BC(model)) {
+            fn_800ECCA8(model, *(u16*)((u8*)ptr + 0x1c));
+            fn_800ECB74(model, *(u32*)((u8*)ptr + 0x18));
+            fn_800EC9DC(model, *(f32*)&lbl_8047D328);
+            fn_800ECA78(model, *(f32*)&lbl_8047D32C);
+            fn_800EC990(model);
+        }
+        if (fn_800EC1B0(model)) {
+            fn_800EC35C(model, *(u16*)((u8*)ptr + 0x1c));
+            fn_800EC208(model, *(u32*)((u8*)ptr + 0x18));
+            fn_800EC308(model, *(f32*)&lbl_8047D328);
+            fn_800EC2A4(model, *(f32*)&lbl_8047D32C);
+            fn_800EC1E4(model);
+        }
+    }
+    return 1;
+
+report_null:
+    fn_800DD970((const char*)lbl_80273078);
+    return 0;
+}
 #endif
 extern void fn_800CE220(void);
 extern void fn_80118DA8(void);
