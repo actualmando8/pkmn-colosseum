@@ -1474,7 +1474,7 @@ void fn_80202C1C(int r3,u32 r4)
     extern s8 fn_80123FBC();
     extern u16 fn_801EF634();
     extern u32 fn_801F54A4();
-    extern u32 fn_801F76B8();
+    extern u32 fightSideGetStatus();
     extern s8 fn_801FA634();
     extern int fn_801FB1C0();
     extern int fn_8020E57C();
@@ -1497,7 +1497,7 @@ void fn_80202C1C(int r3,u32 r4)
   uVar2 = fn_801F54A4(0,0,0x16,0);
   uVar3 = fn_801F54A4(0,0,0x18,0);
   for (uVar12 = 0; (uVar12 & 0xffff) < (uVar2 & 0xffff); uVar12 = uVar12 + 1) {
-    uVar4 = fn_801F76B8(r4,0,7,uVar12);
+    uVar4 = fightSideGetStatus(r4,0,7,uVar12);
     cVar9 = fn_801FA634();
     if (cVar9 != 0) {
       for (uVar11 = 0; (uVar11 & 0xffff) < (uVar3 & 0xffff); uVar11 = uVar11 + 1) {
@@ -3038,7 +3038,7 @@ void fn_80205274(int r3,u32 r4)
     extern s8 fn_80123FBC();
     extern short fn_801EF634();
     extern u32 fn_801F54A4();
-    extern u32 fn_801F76B8();
+    extern u32 fightSideGetStatus();
     extern s8 fn_801FA634();
     extern int fn_801FB1C0();
   u32 bVar1;
@@ -3063,7 +3063,7 @@ void fn_80205274(int r3,u32 r4)
     if ((uVar2 & 0xffff) <= (uVar12 & 0xffff)) {
       return;
     }
-    uVar4 = fn_801F76B8(r4,0,7,uVar12);
+    uVar4 = fightSideGetStatus(r4,0,7,uVar12);
     cVar10 = fn_801FA634();
     if (cVar10 != 0) {
       for (uVar13 = 0; (uVar13 & 0xffff) < (uVar3 & 0xffff); uVar13 = uVar13 + 1) {
@@ -4223,7 +4223,7 @@ void fn_80206C94(int r3)
     extern u32 _DAT_80279c6c;
     extern void fn_8011B950();
     extern void fn_80124A60();
-    extern void fn_801F1460();
+    extern void fightActionInit();
     extern void fn_801FD830();
     extern void fn_80209D90();
     extern void fn_8020A478();
@@ -4270,7 +4270,7 @@ void fn_80206C94(int r3)
     }
     iVar1 = (int)fn_8012640C(r3,0,0xfe,0);
     if (iVar1 != 0) {
-      fn_801F1460();
+      fightActionInit();
       fn_8012640C(r3,0,0xd9,0);
       fn_80209D90();
       fn_8012640C(r3,0,0xe5,0);
@@ -4406,14 +4406,14 @@ void fn_802075A4(void* param_1) {
 
 /* 0x80207760 | size: 0x74 | small */
 void fn_80207760(void* param_1) {
-    extern void fn_801F1460(void*);
+    extern void fightActionInit(void*);
     extern void fn_80209D90(void*);
     extern void fn_8020A478(void*);
     void* iVar1;
 
     iVar1 = fn_8012640C(param_1, 0, 0xFE, 0);
     if (iVar1 != NULL) {
-        fn_801F1460(iVar1);
+        fightActionInit(iVar1);
         fn_8012640C(param_1, 0, 0xD9, 0);
         fn_80209D90(iVar1);
         fn_8012640C(param_1, 0, 0xE5, 0);
@@ -7622,7 +7622,7 @@ u32 fn_8020D1FC(void)
     extern void fn_801F72B0();
     extern u32 fn_801F7388();
     extern s8 fn_801F7404();
-    extern u32 fn_801F76B8();
+    extern u32 fightSideGetStatus();
     extern u32 fn_801F8FD8();
     extern int fn_801F9930();
     extern void fn_801F99C8();
@@ -7680,11 +7680,11 @@ u32 fn_8020D1FC(void)
   else {
     iVar13 = -(uVar1 & 0xffff);
     iVar18 = iVar13 + 4;
-    uVar14 = fn_801F76B8(uVar6,0,5,0);
+    uVar14 = fightSideGetStatus(uVar6,0,5,0);
     uVar1 = 0;
     while (1) {
       if (uVar3 <= (uVar1 & 0xffff)) break;
-      uVar7 = fn_801F76B8(uVar6,0,7,uVar1);
+      uVar7 = fightSideGetStatus(uVar6,0,7,uVar1);
       uVar19 = uVar1 + (iVar18 - ((u32)(iVar18 == 0) + iVar13 + 3) & 0xffff) * uVar3 & 0xff;
       uVar8 = fn_8020E068(uVar2,uVar19);
       uVar9 = fn_8020E020(uVar2,uVar19);
