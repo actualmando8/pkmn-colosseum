@@ -99,7 +99,7 @@
 
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
-extern void menuSubCalcColor();
+extern void* menuSubCalcColor(void*, void*);
 
 /* NPC/People system */
 extern void  fn_80109220(void* npc, s32 direction);  /* Set NPC facing */
@@ -2309,7 +2309,7 @@ void fn_800106A4(u8* arg1, u8* arg2) {
         break;
     }
     if (r30 != 0) {
-        fn_800FB680(0, -2, (s32)fn_8001D834(arg1, arg2), r30);
+        fn_800FB680(0, -2, (s32)menuSubCalcColor(arg1, arg2), r30);
     }
 }
 #pragma pop
@@ -2413,4 +2413,3 @@ void fn_80010C98(void) { /* TODO */ }
 /* fn_800119A8 - 0x800119A8 | size: 0x74 -- already decompiled above */
 /* fn_80011B4C - 0x80011B4C | size: 0x78 -- already decompiled above */
 /* fn_80011C78 - 0x80011C78 | size: 0x78 -- already decompiled above */
-
