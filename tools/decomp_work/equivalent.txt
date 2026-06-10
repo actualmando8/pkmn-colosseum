@@ -16,5 +16,7 @@ fn_80129280   # gs_field_world   — W6 jumptable NAME only (@6029 vs jumptable_
 fn_80132A38   # effect_util      — W6 jumptable NAME only (@559 vs jumptable_80363630); 99.92%, bytes link identical
 fn_80029FAC   # gs_worldmap       — W2 scheduling (SDA-load-first issue order); 97.01%, exhaustively swept 2026-06-10
 fn_8002A0B8   # gs_worldmap       — W2 scheduling, sibling of fn_80029FAC (same wall)
-fn_80065A48   # ui_core          � W6 jumptable NAME only (@2187 vs jumptable_802EDB7C); 99.99%, bytes link identical
+fn_80065A48   # ui_core          � W6 jumptable NAME only (@2187 vs jumptable_802EDB7C); 99.99%, bytes link identical
 fn_800E4170   # gs_material      — W1 register-recycling (linear-scan slot reuse in section 3); 94.3%, C is correct
+fn_800E8EFC   # gs_material      — W2 prologue scheduling (addi via r0 vs direct addi r30); 92.9%, C is correct
+fn_800E8FA0   # gs_material      — W-peephole bgtlr-fusion (ble @L; blr not reproducible); 88.9%, C is correct
