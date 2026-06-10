@@ -2584,10 +2584,10 @@ u32 fn_80204854(void* param_1, void* param_2) {
     extern u8 fn_801F1170(void*);
     extern s16 fn_8020D8D8(void*);
     extern u16 fn_8020D950(void*);
+    void* iVar2;
     s16 sVar3;
     u32 uVar1;
     s16 sVar4;
-    void* iVar2;
     u8 cVar5;
 
     sVar3 = (s16)(u32)fn_8012640C(param_2, 0, 0xCE, 0);
@@ -2599,12 +2599,12 @@ u32 fn_80204854(void* param_1, void* param_2) {
             uVar1 = 1;
         } else {
             iVar2 = fn_8012640C(param_1, 0, 0xFE, 0);
-            if ((((iVar2 == NULL) || (cVar5 = fn_801F1170(iVar2), cVar5 != 1)) ||
-                ((u16)fn_8020D950(iVar2) != 9)) ||
-               (sVar4 = fn_8020D8D8(iVar2), sVar3 != sVar4)) {
-                uVar1 = 0;
-            } else {
+            if ((((iVar2 != NULL) && (cVar5 = fn_801F1170(iVar2), cVar5 == 1)) &&
+                ((u16)fn_8020D950(iVar2) == 9)) &&
+               (sVar4 = fn_8020D8D8(iVar2), sVar3 == sVar4)) {
                 uVar1 = 1;
+            } else {
+                uVar1 = 0;
             }
         }
     }
