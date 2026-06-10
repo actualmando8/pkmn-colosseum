@@ -473,25 +473,29 @@ asm void fn_801386DC(void) {
 #else
 void fn_801386DC(void) { /* TODO */ }
 #endif
-#if 1
+#if 0
 asm void fn_801387C0(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_801387C0.inc"
 }
 #else
 u32 fn_801387C0(void* ptr, u32 delta) {
+    u8* p;
+    u32 d;
     u16 limit;
+    d = delta;
     if (ptr == NULL) {
-        return 0;
+        goto fail;
     }
-    limit = *(u16*)((u8*)ptr + 0x12);
-    if (limit != 0) {
-        if (*(u16*)((u8*)ptr + 0x10) >= limit) {
-            return 0;
-        }
+    p = ptr;
+    limit = *(u16*)(p + 0x12);
+    if (limit != 0 && *(u16*)(p + 0x10) >= limit) {
+        goto fail;
     }
-    fn_80138838(ptr, 0);
-    *(u16*)((u8*)ptr + 0x10) = *(u16*)((u8*)ptr + 0x10) + delta;
+    fn_80138838(p, 0);
+    *(u16*)(p + 0x10) = *(u16*)(p + 0x10) + d;
     return 1;
+fail:
+    return 0;
 }
 #endif
 extern void fn_800E0BE4(void);
