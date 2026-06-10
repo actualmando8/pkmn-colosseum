@@ -375,7 +375,7 @@ extern void fn_801069FC();
 extern void fn_80113D58();
 extern void fn_80113F48();
 extern void fn_80117AE4();
-extern void fn_80123FBC();
+extern u8 fn_80123FBC();
 extern void fn_80128E38();
 extern void fn_8012A450();
 extern void fn_8012A5B0();
@@ -408,6 +408,17 @@ extern void fn_801C40F0();
 extern void fn_801EEAD0();
 extern void fn_8025D0A8();
 extern void fn_8025D164();
+/* renamed symbols referenced by asm incs (symbolmap port) */
+extern void CARDUnmount();
+extern void CARDCreateAsync();
+extern void CARDDeleteAsync();
+extern void CARDFreeBlocks();
+extern void CARDGetSerialNo();
+extern void CARDMountAsync();
+extern void CARDProbeEx();
+extern void CARDSetStatusAsync();
+extern void CARDWriteAsync();
+extern void strcpy();
 s32 fn_801C7090(void);
 f32 fn_801C7630(s32 slot);
 void fn_801CA358(s32 effectType, s32 slot);
@@ -1072,15 +1083,28 @@ void fn_801CAFD4(s32 slot, s32 particleID) {
  * fn_801CB078 - Animation particle update.
  * Address: 0x801CB078 | Size: 0x8C
  */
-#if 1
+#pragma push
+#pragma peephole off
+#if 0
 asm void fn_801CB078(void) {
 #include "src/game/battle/battle_scene_fn_801CB078.inc"
 }
 #else
-void fn_801CB078(void) {
-    /* TODO: Particle update (0x8C bytes) */
+u16 fn_801CB078(void) {
+    s32 party;   /* r31 */
+    u16 i;       /* r30 */
+    u16 count;   /* r29 */
+    count = 0;
+    party = fn_80129280(0, 2);
+    for (i = 0; i < 6; i++) {
+        if (fn_80123FBC(fn_8012AC08(party, i)) != 0) {
+            count++;
+        }
+    }
+    return (u16)(u32)count;
 }
 #endif
+#pragma pop
 
 /**
  * fn_801CB104 - Animation particle check active.
