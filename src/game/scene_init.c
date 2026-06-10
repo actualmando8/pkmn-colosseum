@@ -2738,7 +2738,7 @@ void fn_8003E394(void) { /* TODO */ }
 #endif
 
 /* fn_8003F040 - 0x8003F040 | size: 0x29c */
-extern s32 fn_800F9EE4(u32 a, u32 b);
+extern s32 GScharCmp(u32 a, u32 b);
 extern void fn_800F96E4(u8* dst, u32 len, u8* src);
 extern u32 fn_800E2C04(u32 a, u32 b);
 extern u32 fn_800E27B0(void);
@@ -2841,7 +2841,7 @@ void fn_8003F040(void) {
             test_lbl:
                 if (k < 0) { break; }
                 q = base + (k + gap) * 0x1a;
-            } while (fn_800F9EE4((u32)(p + 2), (u32)(q + 2)) >= 0);
+            } while (GScharCmp((u32)(p + 2), (u32)(q + 2)) >= 0);
         }
     }
 
@@ -4189,7 +4189,7 @@ s32 fn_8004BE40(s32 a) {
 
 /* fn_8004BE90 - 0x8004BE90 | size: 0x90 */
 extern u32 fn_801D1ACC(u32 a);
-extern u32 fn_801D1E50(u32 a);
+extern u32 mailGetReceiveNumber(u32 a);
 #if 0
 asm void fn_8004BE90(void) {
 #include "src/game/scene_init_fn_8004BE90.inc"
@@ -4207,12 +4207,12 @@ s32 fn_8004BE90(u16* a, u16* b) {
     r30 = (u32)*b;
     r29 = fn_800FA280(fn_801D1ACC(r31));
     fa = fn_800FA280(fn_801D1ACC(r30));
-    result = fn_800F9EE4(r29, fa);
+    result = GScharCmp(r29, fa);
     if (result != 0) {
         return result;
     }
-    ea = fn_801D1E50(r31);
-    return (s32)(fn_801D1E50(r30) - ea);
+    ea = mailGetReceiveNumber(r31);
+    return (s32)(mailGetReceiveNumber(r30) - ea);
 }
 #endif
 
@@ -4235,12 +4235,12 @@ s32 fn_8004BF20(u16* a, u16* b) {
     r30 = (u32)*b;
     r29 = fn_800FA280(fn_801D1A88(r31));
     fa = fn_800FA280(fn_801D1A88(r30));
-    result = fn_800F9EE4(r29, fa);
+    result = GScharCmp(r29, fa);
     if (result != 0) {
         return result;
     }
-    ea = fn_801D1E50(r31);
-    return (s32)(fn_801D1E50(r30) - ea);
+    ea = mailGetReceiveNumber(r31);
+    return (s32)(mailGetReceiveNumber(r30) - ea);
 }
 #endif
 
