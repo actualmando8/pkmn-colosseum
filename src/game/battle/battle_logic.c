@@ -1224,7 +1224,7 @@ void fn_800A39E0(void);
 void fn_800A501C(void);
 void fn_800A50E4(void);
 void fn_800A541C(void);
-void fn_800A7AFC(void);
+void DVDCancel(void);
 void fn_800A8850(void);
 void fn_800AA2F0(void);
 void fn_800B7874(void);
@@ -1341,7 +1341,7 @@ u32 fn_8012BDE0(u32, u32);
 void fn_8014E9B4(void);
 void fn_8014EE40(void);
 void fn_8014F2DC(void);
-void fn_8014F838(void);
+void sndStreamFree(void);
 void fn_8014FF0C(void);
 void fn_80150564(void);
 void fn_80166AB8(void);
@@ -4845,7 +4845,7 @@ void fn_801E34F0(void) {
     extern u32 lbl_8047B474;
     extern void fn_8014E9B4();
     extern void fn_8014EE40();
-    extern void fn_8014F838();
+    extern void sndStreamFree();
     extern void fn_801E2B74();
     extern void fn_801E260C();
     u8 sp[0x50];
@@ -4916,7 +4916,7 @@ void fn_801E34F0(void) {
         lbl_80478D04 = r3;
         if (tmp == 0xffff) {
             r3 = lbl_80478D00;
-            fn_8014F838();
+            sndStreamFree();
             r3 = 0x0;
             return;
     }
@@ -5620,9 +5620,9 @@ void fn_801E3F54(void) {
     extern u32 lbl_80478D00;
     extern u32 lbl_80478D04;
     extern u32 lbl_8047B46C;
-    extern void fn_800A7AFC(void);
+    extern void DVDCancel(void);
     extern void fn_800A8850(u32);
-    extern void fn_8014F838(u32);
+    extern void sndStreamFree(u32);
     extern void fn_801E1D0C(void);
     extern void fn_801E4DAC(void);
     extern void fn_801E5400(void);
@@ -5637,16 +5637,16 @@ void fn_801E3F54(void) {
     *(u8*)(lbl_8046AC60 + 0xa4) = 0;
     fn_800A8850(lbl_8047B46C);
     if ((s32)*(u32*)(lbl_8046AC60 + 0xb0) == 0) {
-        fn_800A7AFC();
+        DVDCancel();
         fn_801E1D0C();
     }
     fn_801E5400();
     if (*(u8*)(lbl_8046AC60 + 0xa7) != 0) {
-        fn_8014F838(lbl_80478D00);
+        sndStreamFree(lbl_80478D00);
         r0 = lbl_80478D04;
         lbl_80478D00 = -1;
         if ((r0 + 0x10000) != 0xffff) {
-            fn_8014F838(r0);
+            sndStreamFree(r0);
             lbl_80478D04 = -1;
         }
         fn_801E4DAC();
