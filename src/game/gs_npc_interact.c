@@ -2150,24 +2150,32 @@ asm void fn_80010588(void) {
 #pragma push
 #pragma peephole off
 void fn_80010588(u8* arg1, u8* arg2) {
+    extern void* fn_80103FE4(u8* a);
+    extern void* fn_801040A0(u8* a);
+    extern void fn_800FB680(s32 a, s32 b, s32 c, u32 d);
     void* participant;
     void* npc_data;
     s32 idx;
     s16 npc_id;
     u8* entry;
     s32 result;
-    participant = (void*)fn_80103FE4((u32)arg1);
-    npc_data = (void*)fn_801040A0((u32)arg1);
+    participant = fn_80103FE4(arg1);
+    npc_data = fn_801040A0(arg1);
     npc_id = *(s16*)(arg2 + 6);
     idx = 0;
-    if (npc_id == 0xC4) {
+    switch (npc_id) {
+    case 0xC4:
         idx = 0;
-    } else if (npc_id == 0xC5) {
+        break;
+    case 0xC5:
         idx = 1;
-    } else if (npc_id == 0xC6) {
+        break;
+    case 0xC6:
         idx = 2;
-    } else if (npc_id == 0xC7) {
+        break;
+    case 0xC7:
         idx = 3;
+        break;
     }
     if ((s8)*((u8*)npc_data + 2) == idx) {
         fn_801040F0(0, 0, arg1, 0x49, 0);
@@ -2176,8 +2184,8 @@ void fn_80010588(u8* arg1, u8* arg2) {
     entry = (u8*)participant + idx * 0xc;
     if (*(u32*)(entry + 4) != 0) {
         fn_80132A38(0x37, *(u32*)(entry + 4));
-        result = (s32)fn_8001D834(arg1, arg2);
-        fn_800FB680(0, 0, result, 0xE7, 0);
+        result = (s32)menuSubCalcColor(arg1, arg2);
+        fn_800FB680(0, 0, result, 0xE7);
     }
 }
 #pragma pop
