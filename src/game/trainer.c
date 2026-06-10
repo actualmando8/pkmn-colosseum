@@ -2206,12 +2206,12 @@ void fn_801F86C0(void* context, u8 flag) {
     extern u8 fn_80121ADC(void* ptr, u32 field);
     extern u16 fn_801230E0(void* pokemon);
     extern u8 fn_80206A04(void* ptr);
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     void* slot;
+    u16 i;
     void* pokemon;
     void* moveData;
     u16 speciesId;
-    u16 i;
 
     if (context == NULL) {
         return;
