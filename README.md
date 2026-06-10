@@ -11,8 +11,8 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~55.0% (5006 / 9100 functions) |
-| Code match | ~48.4% (matched code bytes) |
+| Function match | ~55.4% (5038 / 9100 functions) |
+| Code match | ~48.6% (matched code bytes) |
 
 Last measured 2026-06-09 with `objdiff-cli report generate` against a verified
 byte-identical `main.dol` build. The numbers are regenerated locally — public CI
