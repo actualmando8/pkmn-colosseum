@@ -416,7 +416,6 @@ void fn_801A4A48(HSD_LObj* lobj, u32* color) {
 extern void jumptable_8036CA64();
 /* GXLightIndex to GXLightID bitmask */
 u32 fn_801A4A54(u32 idx) {
-    if (idx > 8) return 0;
     switch (idx) {
     case 0: return 0x1;
     case 1: return 0x2;
