@@ -17,7 +17,6 @@
 extern void C_MTXLookAt();
 extern void C_MTXPerspective();
 extern void OSFillFPUContext();
-extern void PSMTXInverse();
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
@@ -879,7 +878,7 @@ u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 extern f32* fn_801A8524(void);
-extern void fn_800A2EB4(f32*, f32*);
+extern void PSMTXInverse(f32*, f32*);
 #if 0
 asm void fn_80194CF4(void) {
 #include "src/hsd/hsd_cobj_fn_80194CF4.inc"
@@ -890,7 +889,7 @@ f32* fn_80194CF4(HSD_CObj* cobj) {
         if (cobj->proj_mtx == NULL) {
             cobj->proj_mtx = fn_801A8524();
         }
-        fn_800A2EB4(cobj->view_mtx[0], cobj->proj_mtx);
+        PSMTXInverse(cobj->view_mtx[0], cobj->proj_mtx);
         if (cobj != NULL) {
             cobj->flags &= ~0x80000000;
         }

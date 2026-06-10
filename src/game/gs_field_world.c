@@ -7952,11 +7952,9 @@ void fn_80118104(u32 a, u8 b) {
 #endif
 /* 0x801181B0 | 0x23C */
 extern void fn_801694A8(void* ptr);
-extern void fn_801695FC();
 extern void psKillFamily();
 extern void fn_800EC160();
 extern void fn_80169484();
-extern void fn_80175A1C();
 extern void psKillGenerator();
 extern u32 lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
@@ -7972,8 +7970,8 @@ void fn_801181B0(void) {
     extern void fn_800EC160();
     extern void fn_80169484();
     extern void fn_801694A8();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     extern void fn_801694E0();
     u32 r0 = 0;
     u32 r3 = 0;
@@ -8015,7 +8013,7 @@ void fn_801181B0(void) {
                             r4 = *(u32*)((u8*)r27 + 0x10);
                             r3 = *(u16*)((u8*)r4 + 0x18);
                             r4 = *(u8*)((u8*)r4 + 0x15);
-                            fn_801695FC();
+                            psKillFamily();
                             r0 = *(u32*)((u8*)r27 + 0x44);
                             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
                                 r3 = *(u32*)((u8*)r27 + 0x48);
@@ -8088,7 +8086,7 @@ void fn_801181B0(void) {
                             fn_800E01D0();
                 }
                             r3 = *(u32*)((u8*)r27 + 0x10);
-                            fn_80175A1C();
+                            psKillGenerator();
                             r5 = *(u32*)((u8*)r27 + 0xC);
                             r0 = 0x40;
                             r3 = 0x0;
@@ -8465,8 +8463,8 @@ void fn_80118874(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -8489,7 +8487,7 @@ void fn_80118874(void) {
                 r4 = *(u32*)((u8*)r30 + 0x10);
                 r3 = *(u16*)((u8*)r4 + 0x18);
                 r4 = *(u8*)((u8*)r4 + 0x15);
-                fn_801695FC();
+                psKillFamily();
             }
             r0 = *(u32*)((u8*)r30 + 0x44);
             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
@@ -8563,7 +8561,7 @@ void fn_80118874(void) {
             fn_800E01D0();
             }
             r3 = *(u32*)((u8*)r30 + 0x10);
-            fn_80175A1C();
+            psKillGenerator();
             r5 = *(u32*)((u8*)r30 + 0xC);
             r0 = 0x40;
             r3 = 0x0;
@@ -8606,7 +8604,7 @@ void fn_80118A68(u8* obj, u32 notify) {
 
     if ((notify & 0xFF) == 1) {
         model = *(u8**)(obj + 0x10);
-        fn_801695FC(*(u16*)(model + 0x18), model[0x15]);
+        psKillFamily(*(u16*)(model + 0x18), model[0x15]);
     }
 
     active = (s32*)(obj + 0x44);
@@ -8647,7 +8645,7 @@ void fn_80118A68(u8* obj, u32 notify) {
         }
     }
 
-    fn_80175A1C(*(u32*)(obj + 0x10));
+    psKillGenerator(*(u32*)(obj + 0x10));
 
     base = *(u8**)(obj + 0x0C);
     scan = base;
@@ -8663,7 +8661,7 @@ void fn_80118A68(u8* obj, u32 notify) {
 }
 #endif
 /* 0x68 | fn_80118C20 | guarded_call */
-extern void fn_80169034();  /* K&R: called with 0 or 1 args */
+extern void psSetParticleVisibility();  /* K&R: called with 0 or 1 args */
 void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
     u8* scan = arg1;
     u32 i = 0;
@@ -9038,8 +9036,8 @@ void fn_801193BC(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9060,7 +9058,7 @@ void fn_801193BC(void) {
             r4 = *(u32*)((u8*)r29 + 0x10);
             r3 = *(u16*)((u8*)r4 + 0x18);
             r4 = *(u8*)((u8*)r4 + 0x15);
-            fn_801695FC();
+            psKillFamily();
             r0 = *(u32*)((u8*)r29 + 0x44);
             if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
                 r3 = *(u32*)((u8*)r29 + 0x48);
@@ -9133,7 +9131,7 @@ void fn_801193BC(void) {
             fn_800E01D0();
             }
             r3 = *(u32*)((u8*)r29 + 0x10);
-            fn_80175A1C();
+            psKillGenerator();
             r5 = *(u32*)((u8*)r29 + 0xC);
             r0 = 0x40;
             r3 = 0x0;
@@ -9454,8 +9452,8 @@ void fn_80119930(void) {
     extern void fn_800E01D0();
     extern void fn_800EC160();
     extern void fn_80169484();
-    extern void fn_801695FC();
-    extern void fn_80175A1C();
+    extern void psKillFamily();
+    extern void psKillGenerator();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -9537,7 +9535,7 @@ void fn_80119930(void) {
     r4 = *(u32*)((u8*)r31 + 0x10);
     r3 = *(u16*)((u8*)r4 + 0x18);
     r4 = *(u8*)((u8*)r4 + 0x15);
-    fn_801695FC();
+    psKillFamily();
     r0 = *(u32*)((u8*)r31 + 0x44);
     if ((s32)r0 != (s32)0x0 && (s32)r0 != (s32)0x0) {
         r3 = *(u32*)((u8*)r31 + 0x48);
@@ -9612,7 +9610,7 @@ void fn_80119930(void) {
     fn_800E01D0();
         }
     r3 = *(u32*)((u8*)r31 + 0x10);
-    fn_80175A1C();
+    psKillGenerator();
     r5 = *(u32*)((u8*)r31 + 0xC);
     r0 = 0x40;
     r3 = 0x0;
@@ -9644,7 +9642,7 @@ extern void fn_800EE22C(void);
 extern void fn_800E3CBC(void);
 extern void fn_800E3BF0(void);
 extern void fn_800E3D08(void);
-extern void fn_80169034();
+extern void psSetParticleVisibility();
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 #if 0
@@ -9721,7 +9719,7 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
 
     fn_800EE828(entry);
     if ((fn_800E3D08(resource) & 0xFF) == 0) {
-        fn_80169034(*(void**)(node + 0x10), 0);
+        psSetParticleVisibility(*(void**)(node + 0x10), 0);
     }
 }
 #endif

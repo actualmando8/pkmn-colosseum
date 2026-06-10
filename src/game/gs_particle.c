@@ -642,12 +642,12 @@ void fn_800EEA6C(void) {
  * if (b & 0x1f) != 0, return 2
  * if (a & 0x1f) != 0, return 2
  * if (c & 0x1f) != 0, return 2
- * fn_8009B55C(a, b, c)
+ * LCStoreData(a, b, c)
  * lbl_8047ABDC += return_val
  * return 0
  * ================================================================== */
 extern u32 fn_8009B608(void);
-extern u32 fn_8009B55C(u32 a, u32 b, u32 c);
+extern u32 LCStoreData(u32 a, u32 b, u32 c);
 extern u32 lbl_8047ABDC;
 #if 0
 asm void fn_800EEA98(void) {
@@ -671,7 +671,7 @@ u32 fn_800EEA98(u32 a, u32 b, u32 c) {
         return 2;
     }
 
-    ret = fn_8009B55C(a, b, c);
+    ret = LCStoreData(a, b, c);
     lbl_8047ABDC = lbl_8047ABDC + ret;
     return 0;
 }

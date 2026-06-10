@@ -233,7 +233,7 @@
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* fn_800D2584(void);                        /* HSD_StartRender (acquire context) */
 extern void  fn_800D87AC(s32 mode);                    /* GSgfx_SetInternalMode */
-extern void  fn_800DD174(void* renderObj);              /* HSD render dispatch */
+extern void  GSlightSetupLights(void* renderObj);              /* HSD render dispatch */
 extern void  GSlightSetupLights(void* renderObj);
 extern void  fn_800D6A5C(void* callbackA, void* callbackB); /* callback dispatch */
 
@@ -776,7 +776,7 @@ void fn_800E3604(u32 flags, u8 slot) {
     fn_801B25C4(0x7f);
     if ((mobj = fn_800D2584()) != NULL) {
         if (fn_80195A6C(*(void**)((u8*)mobj + 0xc)) != 0) {
-            fn_800DD174(*(void**)((u8*)mobj + 0xc));
+            GSlightSetupLights(*(void**)((u8*)mobj + 0xc));
             slotMatch = (u8)slot;
             animFlag = flags & 0x10;
             envFlag = flags & 0x1000;
@@ -3847,7 +3847,7 @@ void fn_800E9E34(GSmaterialEntry* entry, void* a, void* b, void* c) {
 
 /* fn_800E9E90 -- EnvMap pipeline | Size: 0x77C */
 extern void fn_800A2EB4(u8* dst, void* src);
-extern void fn_800A2D98(void* a, void* b, void* c);
+extern void PSMTXConcat(void* a, void* b, void* c);
 extern void fn_800E064C(u8* data);
 extern void fn_80197B6C(void*, void*, void*);
 extern void fn_8019F024();
@@ -3940,9 +3940,9 @@ void fn_800EA6D4(void* entry, void* tex, void* r5) {
             if (r3 != 0) fn_8019D9DC(r31);
         }
         fn_800A2EB4((u8*)*(void**)((u8*)r29 + 0x10) + 0x44, r5);
-        fn_800A2D98((u8*)r29 + 0x44, r5, r5);
+        PSMTXConcat((u8*)r29 + 0x44, r5, r5);
         if (entry != NULL) {
-            fn_800A2D98(entry, r5, r5);
+            PSMTXConcat(entry, r5, r5);
         }
     }
 }
@@ -4091,7 +4091,7 @@ void fn_800EA960(void* obj, void* mtx, void* dst, s32 typeFlag, void* doBlend, v
                                             fn_8019D9DC(texObj);
                                         }
                                     }
-                                    fn_800A2D98(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
+                                    PSMTXConcat(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
                                     fn_800E0628(baseOfs, (void*)stk2);
                                 }
                             }
@@ -4201,7 +4201,7 @@ void fn_800EACD0(void* obj, void* mtx, void* dst, u8 doBlend, void* callback, vo
                                     fn_8019D9DC(texObj);
                                 }
                             }
-                            fn_800A2D98(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
+                            PSMTXConcat(mtx, (u8*)*(void**)((u8*)node + 0x14) + 0x44, (void*)stk2);
                             fn_800E0628(baseOfs, (void*)stk2);
                         }
                     }
@@ -4238,7 +4238,7 @@ void fn_800EACD0(void* obj, void* mtx, void* dst, u8 doBlend, void* callback, vo
 
 /* fn_800EAFE4 -- ConfigureZMode | Size: 0x284 */
 extern void* fn_80197A64(void*, void*);
-extern void fn_801A85F0(void*, void*, void*, f32);
+extern void HSD_MtxScaledAdd(void*, void*, void*, f32);
 extern u8 lbl_80270EB8[];
 extern u32 lbl_8047CC18;
 extern u32 lbl_8047CC10;
@@ -4293,7 +4293,7 @@ void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
             }
             if (obj != NULL) {
                 void* tex = *(void**)((u8*)nodeData + 0x4);
-                fn_800A2D98((u8*)tex + 0x44, *(void**)((u8*)tex + 0x78), (void*)mtxBuf);
+                PSMTXConcat((u8*)tex + 0x44, *(void**)((u8*)tex + 0x78), (void*)mtxBuf);
                 texObj = (void*)mtxBuf;
             } else {
                 void* tex = *(void**)((u8*)nodeData + 0x4);
@@ -4340,16 +4340,16 @@ void fn_800EAFE4(void* obj, void* dst, void* unused, void* output) {
                 if (*(void**)((u8*)texObj + 0x78) == NULL) {
                     fn_80196E10(&lbl_8047CC10, 0x82, assertStr + 0x1c);
                 }
-                fn_800A2D98((u8*)texObj + 0x44, *(void**)((u8*)texObj + 0x78), (void*)mtxTmp);
-                fn_801A85F0((void*)mtxTmp, (void*)mtxBuf, (void*)mtxBuf, *(f32*)((u8*)nodeData + 0x8));
+                PSMTXConcat((u8*)texObj + 0x44, *(void**)((u8*)texObj + 0x78), (void*)mtxTmp);
+                HSD_MtxScaledAdd((void*)mtxTmp, (void*)mtxBuf, (void*)mtxBuf, *(f32*)((u8*)nodeData + 0x8));
                 nodeData = *(void**)nodeData;
             }
             texObj = (void*)mtxBuf;
         }
         if (obj != NULL) {
-            fn_800A2D98(texObj, obj, (void*)mtxBuf);
+            PSMTXConcat(texObj, obj, (void*)mtxBuf);
         }
-        fn_800A2D98(dst, texObj, (void*)mtxTmp);
+        PSMTXConcat(dst, texObj, (void*)mtxTmp);
         fn_800E0628(outPtr, (void*)mtxTmp);
         node = *(void**)node;
         outPtr += 0x30;

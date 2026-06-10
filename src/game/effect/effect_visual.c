@@ -1586,7 +1586,7 @@ u32 fn_8013DD10(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800DC298(void* a);
+extern void GSgfxEndBackFBCapture(void* a);
 extern void fn_800E5790(void* a);
 #if 0
 asm u32 fn_8013DD7C(void* ptr) {
@@ -1597,7 +1597,7 @@ u32 fn_8013DD7C(void* ptr) {
     void* inner;
     if (ptr) {
         if (*(s32*)((u8*)ptr + 0x10) != 0) {
-            fn_800DC298(*(void**)((u8*)ptr + 0xc));
+            GSgfxEndBackFBCapture(*(void**)((u8*)ptr + 0xc));
         } else {
             inner = *(void**)ptr;
             if (inner) {

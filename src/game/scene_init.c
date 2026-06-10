@@ -40,7 +40,6 @@ extern void atan();
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSlightSetType();
 extern void cameraWaitSyncAnime();
-extern void gamedataGetStatus();
 extern void menuModelSetMotion();
 extern void menuSubOpenYesNo();
 
@@ -2089,7 +2088,7 @@ void fn_8003B2D8(u8* ctx) {
 #endif
 
 /* fn_8003B478 - 0x8003B478 | size: 0x258 */
-extern u32 fn_80135938(u32 a, u32 b);
+extern u32 gamedataGetStatus(u32 a, u32 b);
 extern void fn_801240C4(u32 a, u32 b, u32 c, u32 d);
 extern u32 fn_801EE750(u32 a);
 extern void fn_8011DFE0(u32 a, u32 b);
@@ -2135,7 +2134,7 @@ void fn_8003B478(u8* ctx) {
     } else {
         r27 = 2;
     }
-    r6 = fn_80135938(0, 1);
+    r6 = gamedataGetStatus(0, 1);
     fn_801240C4(r28, r29_u16, 0xa, r6);
     r29_u32 = *(u32*)(base + 0x98);
     fn_801EE750(r26);
@@ -2745,7 +2744,7 @@ extern u32 fn_800E27B0(void);
 extern u32 fn_800E202C(u32 a);
 extern void fn_800E24B0(u32 a);
 extern void fn_800E209C(u32 a);
-extern u32 fn_80135938(u32 a, u32 b);
+extern u32 gamedataGetStatus(u32 a, u32 b);
 extern void fn_801240C4(u32 a, u32 b, u32 c, u32 d);
 extern u32 fn_8025FDDC(u32 a, u32 b);
 extern u32 fn_8025FD34(u32 a, u32 b);
@@ -2804,7 +2803,7 @@ void fn_8003F040(void) {
             if (src_id >= 0x8000) {
                 lookup = src_id & 0x3FFF;
             }
-            r3 = fn_80135938(0, 1);
+            r3 = gamedataGetStatus(0, 1);
             fn_801240C4(ctx, lookup & 0xFFFF, 0xa, r3);
             a = fn_8025FDDC(0, lookup);
             lookup = fn_8025FD34(0, lookup);
@@ -3607,7 +3606,7 @@ void fn_80044378(u8* ctx, u8* p) {
                 if (r27 >= 0x8000) {
                     r27 = r27 & 0x3fff;
                 }
-                fn_801240C4(r25, r27 & 0xFFFF, 0xa, fn_80135938(0, 1));
+                fn_801240C4(r25, r27 & 0xFFFF, 0xa, gamedataGetStatus(0, 1));
                 r26 = fn_8025FDDC(0, r27);
                 r27 = fn_8025FD34(0, r27);
                 fn_8011DFE0(r25, r26);
