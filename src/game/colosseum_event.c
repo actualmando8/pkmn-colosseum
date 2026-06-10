@@ -1472,7 +1472,7 @@ void fn_80202C1C(int r3,u32 r4)
 {
     extern s8 fn_801233F4();
     extern s8 fn_80123FBC();
-    extern short fn_801EF634();
+    extern u16 fn_801EF634();
     extern u32 fn_801F54A4();
     extern u32 fn_801F76B8();
     extern s8 fn_801FA634();
@@ -1486,7 +1486,7 @@ void fn_80202C1C(int r3,u32 r4)
   u32 uVar4;
   u8 cVar9;
   int iVar5;
-  short sVar8;
+  u16 sVar8;
   int iVar6;
   int iVar7;
   u16 uVar10;
@@ -1496,11 +1496,7 @@ void fn_80202C1C(int r3,u32 r4)
   fn_801F54A4(0,0,0x14,0);
   uVar2 = fn_801F54A4(0,0,0x16,0);
   uVar3 = fn_801F54A4(0,0,0x18,0);
-  uVar12 = 0;
-  do {
-    if ((uVar2 & 0xffff) <= (uVar12 & 0xffff)) {
-      return;
-    }
+  for (uVar12 = 0; (uVar12 & 0xffff) < (uVar2 & 0xffff); uVar12 = uVar12 + 1) {
     uVar4 = fn_801F76B8(r4,0,7,uVar12);
     cVar9 = fn_801FA634();
     if (cVar9 != 0) {
@@ -1748,8 +1744,7 @@ void fn_80202C1C(int r3,u32 r4)
         }
       }
     }
-    uVar12 = uVar12 + 1;
-  } while (1);
+  }
 }
 /* 0x80203198 | size: 0x14C | medium */
 /* 0x80203198 | size: 0x14C */
