@@ -2465,23 +2465,29 @@ void fn_800E60F0(void* obj, f32 val) {
         if (p == NULL) {
             r0 = 0;
         } else {
-            r0 = (((u32(*)(void*))fn_800DF240)(p) & 4) ? 1 : 0;
+            extern u32 fn_800DF240(void*);
+            if (fn_800DF240(p) & 4) {
+                r0 = 1;
+            } else {
+                r0 = 0;
+            }
         }
     }
     if (!(r0 & 0xff)) return;
     {
+        s32 r31;
         s32 r30 = *(u16*)((u8*)obj + 0x150);
+        void** r29;
         if (r30 == 0) return;
-        {
-            void** r29 = *(void***)((u8*)obj + 0x14c);
-            s32 r31 = 0;
-            while (r31 < r30) {
-                void* p = r29[r31];
-                if (p != NULL) {
-                    fn_800DF1B8(p, val);
-                }
-                r31++;
+        r29 = *(void***)((u8*)obj + 0x14c);
+        r31 = 0;
+        while (r31 < r30) {
+            void* p = *r29;
+            if (p != NULL) {
+                fn_800DF1B8(p, val);
             }
+            r31++;
+            r29++;
         }
     }
 }
