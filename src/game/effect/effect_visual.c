@@ -558,12 +558,12 @@ u32 fn_80138B74(void* ptr) {
 extern void fn_800E4014(void* a, u32 b);
 extern void fn_800E4BF4(void);
 extern void fn_800EE0E8(void);
-extern void fn_800EE150(void);
+extern void* fn_800EE150(void* model, u32 mode);
 extern void fn_800EE758(void);
-extern void fn_800EE6B4(void);
+extern void* fn_800EE6B4(void* handle, u32 idx);
 extern void fn_800DF21C(void);
-extern void fn_800DF608(void);
-extern void fn_800EE828(void);
+extern void fn_800DF608(void* handle);
+extern void fn_800EE828(void* handle);
 extern u32 lbl_8047D160;
 #if 1
 asm void fn_80138BBC(void) {
@@ -2123,14 +2123,60 @@ void fn_80140138(u8* ptr) {
     }
 }
 #endif
-extern void _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(void);
-extern void fn_800DF028(void);
-#if 1
+extern void* _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(void* tex1, void* tex2, u32 arg);
+extern void fn_800DF028(void* material, void* texture);
+#if 0
 asm void fn_80140190(void) {
 #include "src/game/effect/effect_visual_fn_80140190.inc"
 }
 #else
-void fn_80140190(void) { /* TODO */ }
+u32 fn_80140190(void** out, void* model, u32 arg) {
+    u32 ret;
+    void* handle;
+    void* tex1;
+    void* tex2;
+
+    ret = 0;
+    if (model == NULL) {
+        return 0;
+    }
+
+    handle = fn_800EE150(model, 2);
+    if (handle == NULL) {
+        return 0;
+    }
+
+    out[0] = NULL;
+    out[1] = NULL;
+    out[0] = fn_800EE6B4(handle, 0);
+    if (out[0] != NULL) {
+        tex1 = fn_800F9318(0x387, 0x10561200);
+        if (tex1 != NULL) {
+            tex2 = fn_800F9318(0x387, 0x10571200);
+            if (tex2 != NULL) {
+                out[1] = _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(tex1, tex2, arg);
+                if (out[1] != NULL) {
+                    fn_800DF028(out[0], out[1]);
+                    ret = 1;
+                }
+            }
+        }
+    }
+
+    if ((u8)ret == 0) {
+        if (out[1] != NULL) {
+            fn_800EF5A4(out[1]);
+            out[1] = NULL;
+        }
+        if (out[0] != NULL) {
+            fn_800DF608(out[0]);
+            out[0] = NULL;
+        }
+    }
+
+    fn_800EE828(handle);
+    return ret;
+}
 #endif
 
 #if 0
