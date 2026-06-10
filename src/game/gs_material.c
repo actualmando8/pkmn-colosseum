@@ -1303,17 +1303,22 @@ void fn_800E4598(void* entry, void* r4) {
         u32 flags = *(u32*)((u8*)r31 + 0x14);
         flags |= 0x3800000;
         *(u32*)((u8*)r31 + 0x14) = flags;
-    }
-    {
-        u32 flags = *(u32*)((u8*)r31 + 0x14);
-        s32 r3 = 0;
-        if (!(flags & 0x800000)) {
-            if (flags & 0x40) {
-                r3 = 1;
+        if (r31 != NULL) {
+            s32 active;
+            u32 f2;
+            if (r31 == NULL) {
+                fn_80196E10(lbl_8047CB60, 0x25d, lbl_8047CB68);
             }
-        }
-        if (r3 == 0) {
-            fn_8019D620(r31);
+            f2 = *(u32*)((u8*)r31 + 0x14);
+            active = 0;
+            if (!(f2 & 0x800000)) {
+                if (f2 & 0x40) {
+                    active = 1;
+                }
+            }
+            if (!active) {
+                fn_8019D620(r31);
+            }
         }
     }
 }
