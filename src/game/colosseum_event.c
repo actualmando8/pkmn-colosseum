@@ -2990,6 +2990,8 @@ void* fn_802050F4(void* ctx) {
 #pragma pop
 
 /* fn_80205134 | Size: 0x50 | Get field 0x30 from resolved 0xD9, default 9 */
+#pragma push
+#pragma peephole on
 u16 fn_80205134(void* ctx) {
     extern u32 fn_8011BEB4();
     void* resolved = fn_8012640C(ctx, 0, 0xD9, 0);
@@ -3029,6 +3031,7 @@ u16 fn_80205224(void* ctx) {
     }
     return (u16)fn_8011BEB4(resolved, 0, 0x27, 0);
 }
+#pragma pop
 
 /* Address: 0x80205274 | Size: 0x690 | Ghidra import */
 
