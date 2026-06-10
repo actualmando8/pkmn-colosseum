@@ -769,7 +769,7 @@ extern void fn_800E064C(void*);
 extern void fn_800E0678(u8*);
 extern void fn_800E0698(void*, f32, f32, f32, f32, f32, f32);
 extern void fn_800E0C78(void);
-extern void fn_800E0D24(void);
+extern void GSmathInitCosTable(void);
 
 #if 0
 asm void fn_800DC874(void) {
@@ -4997,7 +4997,7 @@ void fn_800E0790(void) {
         mtspr GQR5, r3
     }
     fn_800E0C78();
-    fn_800E0D24();
+    GSmathInitCosTable();
 }
 #pragma pop
 #endif
@@ -5172,7 +5172,7 @@ f32 fn_800E0CA0(f32 x) {
 }
 #pragma pop
 #endif
-extern f64 fn_800CDBE0(f32);
+extern f64 cos(f32);
 extern f32 lbl_8047CB38;
 extern f64 lbl_8047CB40;
 #if 0
@@ -5180,7 +5180,7 @@ asm void fn_800E0D24(void) {
 #include "src/game/gs_render_fn_800E0D24.inc"
 }
 #else
-void fn_800E0D24(void) {
+void GSmathInitCosTable(void) {
     register s32 i;
     f32 step;
     f32 scale;
@@ -5188,7 +5188,7 @@ void fn_800E0D24(void) {
     scale = lbl_8047CB38;
     step = lbl_8047CB30;
     for (i = 0; i < 181; i++) {
-        lbl_804011B8[i] = (f32)fn_800CDBE0(scale * (step * (f32)i));
+        lbl_804011B8[i] = (f32)cos(scale * (step * (f32)i));
     }
 }
 #endif
