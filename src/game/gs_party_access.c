@@ -1158,7 +1158,7 @@ asm void fn_8000CD50(void) {
 #include "src/game/gs_party_access_fn_8000CD50.inc"
 }
 #else
-void fn_8000CD50(void) {
+void testEvolution__Fv(void) {
     u32 val1, val2;
     struct { u32 buf[5]; u16 a; u16 b; } locals;
 
@@ -1181,7 +1181,7 @@ void fn_8000CD50(void) {
 s32 fn_8000CE18(void) {
     u32 r;
     r = (u32)fn_800FF560();
-    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)fn_8000CD50);
+    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)testEvolution__Fv);
     return 0;
 }
 
