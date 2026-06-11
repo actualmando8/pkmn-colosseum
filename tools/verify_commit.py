@@ -93,23 +93,52 @@ def check_truth_files(rng):
     return bad
 
 
-def check_asm_wrapper_flip(diff):
+def _active_wrapper_re(fn):
+    return re.compile(
+        r"#if\s+1\s*(?://[^\n]*)?\n\s*(?:#[^\n]*\n\s*)*"
+        r"asm\s+void\s+" + re.escape(fn) + r"\b",
+        re.MULTILINE,
+    )
+
+
+def _parent_had_active_wrapper(parent, path, fn):
+    if parent is None or path is None or fn is None:
+        return False
+    content = _file_at(parent, path)
+    return bool(content and _active_wrapper_re(fn).search(content))
+
+
+def check_asm_wrapper_flip(diff, parent=None):
     """Detect `#if 0` -> `#if 1` re-activation of an asm wrapper.
 
     Fraud signature: an added `#if 1` (or `#if 0` removed and `#if 1`
     added) within a few lines of an `asm ` wrapper or a `_fn_*.inc`
-    include.
+    include. If the parent already had the same active wrapper for the
+    same function, do not flag it: large #else-body rewrites can make
+    unchanged context lines appear as additions in Git's chosen hunk split.
     """
     lines = diff.splitlines()
     violations = []
     window = []
+    path = None
     for i, ln in enumerate(lines):
+        if ln.startswith("+++ b/"):
+            path = ln[6:]
+            continue
+        if ln.startswith("+++ /dev/null"):
+            path = None
+            continue
         window = lines[max(0, i - 4):i + 5]
         if re.match(r"^\+\s*#if\s+1\b", ln):
             ctx = "\n".join(window)
             if ("asm " in ctx or re.search(r"_fn_[0-9A-Fa-f]+\.inc", ctx)
                     or re.search(r"^\+.*asm\s+\w+\s+fn_", ctx, re.M)):
-                violations.append(ln.strip())
+                m = re.search(r"^[ +]\s*asm\s+void\s+(\w+)\b", ctx, re.M)
+                fn = m.group(1) if m else None
+                if _parent_had_active_wrapper(parent, path, fn):
+                    continue
+                where = f"{path}:{fn}: " if path and fn else ""
+                violations.append(where + ln.strip())
         # also: removed `#if 0` paired with added `#if 1`
         if re.match(r"^-\s*#if\s+0\b", ln):
             nxt = "\n".join(lines[i:i + 6])
@@ -235,7 +264,7 @@ def main():
         violations.append("TRUTH-FILE EDIT (forbidden): "
                           + ", ".join(bad_truth))
 
-    flips = check_asm_wrapper_flip(diff)
+    flips = check_asm_wrapper_flip(diff, parent)
     if flips:
         violations.append("ASM-WRAPPER #if 0->#if 1 FLIP: "
                           + " | ".join(flips[:5]))
