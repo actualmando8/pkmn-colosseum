@@ -133,7 +133,6 @@ extern void menuCloseSync();
 extern void floorChangePos();
 extern void GScharCmp();
 extern void menuSubOpenYesNo();
-extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(); /* renamed fn_800626CC */
 extern void fn_80102510();
 extern void fn_80102568();
 extern void fn_80102620();
@@ -441,7 +440,7 @@ void fn_80061D34(void);
 void fn_80061F6C(void);
 void fn_80062284(void);
 void fn_80062334(void);
-void fn_800626CC(void);
+void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void);
 void fn_80062834(void);
 void fn_80062948(void);
 void fn_80062AB4(void);
@@ -3465,7 +3464,7 @@ void fn_8005DFC8(void) {
     extern void fn_801666BC();
     extern void fn_8017B000();
     extern s32 fn_8025DA88();
-    extern void fn_800626CC();
+    extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -3554,9 +3553,9 @@ void fn_8005DFC8(void) {
 
                 r3 = 0x5c3;
             }
-            r5 = (u32)fn_800626CC;
+            r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
             r4 = 0x0;
-            r5 = (u32)fn_800626CC;
+            r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
             r6 = 0x0;
             r7 = 0x0;
             fn_8017B000();
@@ -7622,17 +7621,17 @@ void fn_80062334(void) {
 
 /* 0x800626CC | size: 0x168 */
 #if 1
-asm void fn_800626CC(void) {
+asm void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void) {
 #include "src/game/ui/ui_core_fn_800626CC.inc"
 }
 #else
-void fn_800626CC(void) {
+void _menuCBBattleStartDispTrainerTexCallBack__FlPvl(void) {
     extern void fn_800F92D4();
     extern void fn_8017B000();
     extern void fn_8025D2D4();
     extern void fn_8025D364();
     extern s32 fn_8025DA88();
-    extern void fn_800626CC();
+    extern void _menuCBBattleStartDispTrainerTexCallBack__FlPvl();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -7710,9 +7709,9 @@ void fn_800626CC(void) {
         *(u32*)((u8*)r29 + 0x0) = r3;
         r0 = *(u32*)((u8*)r29 + 0x0);
         if (r0 == (u32)0x0) {
-        r4 = (u32)fn_800626CC;
+        r4 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
         r3 = r27;
-        r5 = (u32)fn_800626CC;
+        r5 = (u32)_menuCBBattleStartDispTrainerTexCallBack__FlPvl;
         r6 = r29;
         r4 = r28;
         r7 = r28;
