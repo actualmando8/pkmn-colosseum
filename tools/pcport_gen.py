@@ -69,6 +69,10 @@ PREAMBLE = {
 # silenced by the build's -w. Applied only to the generated copy; originals stay pristine.
 # Map: rel-path -> { label_name: canonical_extern_decl_without_trailing_semicolon }
 EXTERN_UNIFY = {
+    "game/gs_field_world.c": {
+        # u8-scalar vs u8[] decls; all uses are `&lbl` — array form keeps both legal.
+        "lbl_80426BD0": "extern u8 lbl_80426BD0[]",
+    },
     "hsd/hsd_cobj.c": {
         # Array form: bare-decay usages (arith/compare/cast) dominate; the lone
         # `&lbl_8036C678` (HSD_CLASS_INFO cast) accepts an array address fine.
@@ -276,6 +280,71 @@ TEXT_FIXUPS = {
     ],
 }
 
+# Files that get the generic conflicting-prototype auto-unifier (see auto_unify()).
+# Step-0 flip-harvest TUs (2026-06-10): each has 100s of block-scope extern decls that
+# disagree across declaring functions — the class that got campaign TUs deferred.
+AUTO_UNIFY_FILES = {
+    "game/gs_field_world.c",
+    "game/gs_worldmap.c",
+    "game/effect/effect_util.c",
+    "game/battle/battle_scene.c",
+    "game/menu/menu_middle.c",   # pre-existing fn_8006B1C0 u32(s32)-vs-void() conflict
+}
+
+# Per-file: flipped #else bodies that are pseudo-register-broken (their CALL SITES omit
+# arguments the callee's real prototype requires — on PPC the values were live in
+# r3/r4, on x86 they'd be stack garbage). Emit a neutral stub instead of the broken C;
+# identical semantics to the auto-stub link baseline. Populated iteratively from
+# `too few arguments` compile errors. Map: rel-path -> set of fn names.
+FLIP_AS_STUB = {
+    # gs_field_world TODO-stub #else bodies: `(void)`-signature one-liners whose real
+    # callers pass args (pseudo-register dispatchers). K&R-parens stubs accept every
+    # call shape. These four are the TU's real decomp backlog (incl. the floor-
+    # transition boss fn_8012640C and the object-update dispatcher fn_801254B4).
+    "game/gs_field_world.c": {
+        "fn_8012640C", "fn_801254B4", "fn_8012CA84", "fn_80117514",
+        # arity-erroring flipped bodies (0-arg pseudo-register call sites):
+        "fn_801183EC", "fn_8011A0A8", "fn_8011BBD8", "fn_8011BEB4", "fn_8011F910",
+        "fn_8011FCA4", "fn_8011FDC8", "fn_8012086C", "fn_80122370", "fn_801237B8",
+        "fn_801240C4", "fn_8012795C", "fn_8012805C", "fn_80128300", "fn_80128524",
+        "fn_801286C8", "fn_80128A64", "fn_80128E38", "fn_80129094", "fn_8012A5B0",
+        "fn_8012AD50", "fn_8012EBD4",
+    },
+    "game/effect/effect_util.c": {
+        "fn_801338A4", "fn_80135030", "fn_80136078",
+    },
+    # TODO-stub #else with (void) sig but real (jobj, joint) callers — K&R stub.
+    "hsd/hsd_jobj.c": {
+        "fn_801A0744",
+    },
+}
+
+# Per-file: ACTIVE (non-wrapper) definitions whose bodies are pseudo-register
+# transcriptions — byte-matched on PPC (implicit r3/r4 dataflow) but functionally
+# broken on x86 (0-arg calls / lvalue casts / computed-goto jumptables). Their gen-copy
+# bodies are replaced with a neutral K&R stub; identical to the auto-stub baseline.
+# Populated from arity-class compile errors (tools/pcport_map_errors.py).
+# Map: rel-path -> set of function names.
+STUB_BODY = {
+    # arity-class errors (0-arg pseudo-register calls / computed-goto jumptables) in
+    # ACTIVE byte-matched bodies, + one CW lvalue-cast (fn_8011538C).
+    "game/gs_field_world.c": {
+        "GSfield_ObjectBatchUpdate", "GSfield_RenderPass",
+        "GSfield_TransitionStateMachine",
+        "fn_80119BD0", "fn_80123C54", "fn_80129280", "fn_80129840",
+        "fn_80130660", "fn_80130770", "fn_80130890", "fn_801309A0",
+        "fn_80130A88", "fn_80130BB0", "fn_8011538C",
+    },
+    "game/effect/effect_util.c": {
+        "fn_80135D10", "_koukaOneExec__FUlPvPvPl",
+    },
+    # pseudo-register-param callees (u32 r3) only ever called 0-arg; K&R stub accepts
+    # the residue-calls and drops the residue-dependent behavior (== PPC accident).
+    "game/menu/menu_middle.c": {
+        "fn_8006A7E8", "fn_8006A814",
+    },
+}
+
 # A standalone function PROTOTYPE line (declaration, not definition): begins with
 # `extern`, names fn_X, has a parameter list, and ends with `;` (no body brace).
 _FUNC_PROTO_RE = re.compile(
@@ -352,6 +421,43 @@ def retype_func_protos(lines, mapping):
     return out, rewrites
 
 
+def stub_bodies(lines, names):
+    """Replace the DEFINITION body of each named function with a neutral K&R stub
+    (`<ret> name() { [return 0;] }`). The definition is matched at file scope; its
+    brace-balanced body is dropped. Returns (lines, stubbed_count)."""
+    out, i, n, stubbed = [], 0, len(lines), 0
+    while i < n:
+        ln = lines[i]
+        m = None
+        if ln and not ln[0].isspace() and not ln.rstrip().endswith(';'):
+            m = _DEF_SIG_RE.match(ln)
+        if m and m.group('fn') in names and m.group('fn') not in _C_KEYWORDS and \
+           (ln.rstrip().endswith('{') or (i + 1 < n and lines[i + 1].lstrip().startswith('{'))):
+            ret = ' '.join(m.group('ret').replace('static', '').split())
+            name = m.group('fn')
+            # advance to the opening brace, then to its balanced close
+            j, depth, opened = i, 0, False
+            while j < n:
+                for ch in lines[j]:
+                    if ch == '{':
+                        depth += 1; opened = True
+                    elif ch == '}':
+                        depth -= 1
+                if opened and depth == 0:
+                    break
+                j += 1
+            out.append(f"{ret} {name}() {{")
+            out.append("    /* pcport_gen STUB_BODY: pseudo-register transcription "
+                       "body (x86-broken); neutral stub == auto-stub baseline */")
+            out.append("}" if ret == "void" else "    return 0; }")
+            stubbed += 1
+            i = j + 1
+            continue
+        out.append(ln)
+        i += 1
+    return out, stubbed
+
+
 def drop_func_stubs(lines, names):
     """Drop every standalone arg-less STUB prototype (`extern <ret> fn_X(void);` or
     `... fn_X();`) whose name is in `names`, replacing it with an explanatory comment so
@@ -371,29 +477,74 @@ def drop_func_stubs(lines, names):
 
 
 ASM_RE   = re.compile(r'^\s*asm\s')
+ASM_FN_RE = re.compile(r'^\s*asm\s+[\w\s\*]*?\b(fn_[0-9A-Fa-f]+)\s*\(')
 INC_RE   = re.compile(r'#\s*include\s+"[^"]*\.inc"')
 IF1_RE   = re.compile(r'^\s*#\s*if\s+1\b')
 ELSE_RE  = re.compile(r'^\s*#\s*else\b')
 ENDIF_RE = re.compile(r'^\s*#\s*endif\b')
 IF_RE    = re.compile(r'^\s*#\s*if')          # #if / #ifdef / #ifndef
 
+# A C function-definition signature line: `<ret-tokens> name(args) {` (brace on this
+# or the next line, never a trailing `;`). Used by FLIP_AS_STUB and auto-unify.
+_DEF_SIG_RE = re.compile(
+    r'^(?P<ret>(?:static\s+)?(?:const\s+)?[A-Za-z_][\w\s]*?[\s\*]+\**)'
+    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>[^;{}()]*)\)\s*\{?\s*$')
 
-def transform(lines):
-    out, i, n, flipped = [], 0, len(lines), 0
+_C_KEYWORDS = {"return", "if", "while", "for", "switch", "goto", "else", "do",
+               "case", "sizeof", "typedef", "break", "continue"}
+
+
+def transform(lines, stub_fns=None):
+    """Flip `#if 1 asm {...} #else <C> #endif` wrappers to their #else C. Wrappers whose
+    fn name is in `stub_fns` (pseudo-register-broken #else bodies: call sites missing
+    args) are emitted as a neutral stub built from the #else C signature instead —
+    functionally identical to the auto-stub link baseline, never worse."""
+    stub_fns = stub_fns or set()
+    out, i, n, flipped, stubbed = [], 0, len(lines), 0, 0
     while i < n:
         if IF1_RE.match(lines[i]):
             # scan the #if-1 branch (to its #else at depth 1); is it an asm wrapper?
             k, d, else_idx, has_asm, has_inc = i + 1, 1, None, False, False
+            asm_fn = None
             while k < n and d >= 1:
                 if ELSE_RE.match(lines[k]) and d == 1:
                     else_idx = k; break
                 if IF_RE.match(lines[k]): d += 1
                 elif ENDIF_RE.match(lines[k]): d -= 1
                 if d == 1:
+                    am = ASM_FN_RE.match(lines[k])
+                    if am:
+                        asm_fn = am.group(1)
                     if ASM_RE.match(lines[k]): has_asm = True
                     if INC_RE.search(lines[k]): has_inc = True
                 k += 1
             if else_idx is not None and has_asm and has_inc:
+                if asm_fn in stub_fns:
+                    # find the #else C signature, emit a stub, skip to the #endif
+                    k, d, sig = else_idx + 1, 1, None
+                    while k < n and d >= 1:
+                        if IF_RE.match(lines[k]): d += 1
+                        elif ENDIF_RE.match(lines[k]):
+                            d -= 1
+                            if d == 0:
+                                break
+                        elif sig is None:
+                            m = _DEF_SIG_RE.match(lines[k])
+                            if m and m.group('fn') not in _C_KEYWORDS:
+                                sig = m
+                        k += 1
+                    ret = ' '.join(sig.group('ret').split()) if sig else 'void'
+                    name = sig.group('fn') if sig else asm_fn
+                    # K&R empty parens: unspecified params, accepts every call shape
+                    # (pseudo-register callers pass varying arg counts). Signature on
+                    # its own brace-terminated line so auto_unify's defs-pass sees it.
+                    out.append(f"{ret} {name}() {{")
+                    out.append(f"    /* pcport_gen FLIP_AS_STUB: #else body pseudo-"
+                               f"register-broken; neutral stub == auto-stub baseline */")
+                    out.append("}" if ret == "void" else "    return 0; }")
+                    i = k + 1
+                    stubbed += 1
+                    continue
                 # emit only the #else branch (drop #if1/asm and the matching #endif)
                 k, d = else_idx + 1, 1
                 while k < n and d >= 1:
@@ -411,7 +562,140 @@ def transform(lines):
                 flipped += 1
                 continue
         out.append(lines[i]); i += 1
-    return out, flipped
+    return out, flipped, stubbed
+
+
+# CRT-provided functions: the decomp redeclares these with GC signatures (`extern f32
+# sin(f32);`, K&R `extern void cos();`) that clash with the host CRT prototypes already
+# in scope via pcport_compat.h's includes. Drop the decomp decls; the CRT wins (f32
+# arguments promote to double fine).
+_CRT_FNS = {"sin", "cos", "tan", "sqrt", "atan", "atan2", "fabs", "floor", "ceil",
+            "pow", "fmod", "exp", "log", "abs", "memset", "memcpy", "memmove",
+            "strlen", "strcpy", "strncpy", "strcmp", "strncmp", "sprintf", "printf"}
+
+# A standalone single-function declaration line, any symbol name (not just fn_*):
+# optional `extern`, return tokens, name, parameter list, trailing `;`.
+_ANY_DECL_RE = re.compile(
+    r'^(?P<indent>\s*)(?P<ext>extern\s+)?'
+    r'(?P<ret>(?:const\s+|unsigned\s+|signed\s+|struct\s+\w+\s+)?[A-Za-z_]\w*(?:\s+\w+)*[\s\*]+\**)'
+    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>[^;{}()]*)\)\s*;\s*(?:/\*.*\*/\s*|//.*)?$')
+
+
+def _strip_comments(text):
+    """Remove /*...*/ and //... comments and string literals so structural scans
+    (value-use detection) never match prose or quoted text."""
+    text = re.sub(r'/\*.*?\*/', ' ', text, flags=re.S)
+    text = re.sub(r'//[^\n]*', ' ', text)
+    text = re.sub(r'"(?:[^"\\\n]|\\.)*"', '""', text)
+    return text
+
+
+def _value_used(text, name):
+    """True if a call to `name` appears in a value context anywhere in the TU text
+    (assignment/initializer RHS, condition, argument, cast operand, return expr).
+    `text` must be comment-stripped (_strip_comments)."""
+    return re.search(
+        r'(?:[=!<>+\-*/%&|^,?:(\[]|\breturn)\s*(?:\([\w\s\*]+\)\s*)*'
+        + re.escape(name) + r'\s*\(', text) is not None
+
+
+def auto_unify(lines):
+    """Generic conflicting-prototype unifier for campaign-tail TUs (hundreds of
+    block-scope extern decls that disagree per declaring function; hand-tables don't
+    scale). Policy: CRT names -> decl dropped; `jumptable_*` function decls -> dropped
+    (they're data objects; computed-goto transcriptions referencing them get stubbed);
+    symbol DEFINED in this TU -> decls unified to K&R with the definition's return
+    (exact prototype when params are promotion-unsafe); undefined symbol -> K&R with
+    majority non-void return; all-void undefined symbol whose call RESULT is used
+    anywhere in the TU (CW tolerated value-use of void calls) -> retyped to u32.
+    Returns (lines, rewritten_count)."""
+    text = _strip_comments("\n".join(lines))
+    # pass 1: in-TU definitions (file scope: no leading whitespace, brace-started body)
+    defs = {}
+    for idx, ln in enumerate(lines):
+        if not ln or ln[0].isspace() or ln.rstrip().endswith(';'):
+            continue
+        m = _DEF_SIG_RE.match(ln)
+        if not m or m.group('fn') in _C_KEYWORDS:
+            continue
+        if ln.rstrip().endswith('{') or \
+           (idx + 1 < len(lines) and lines[idx + 1].lstrip().startswith('{')):
+            ret = ' '.join(m.group('ret').replace('static', '').split())
+            defs[m.group('fn')] = (ret, m.group('args').strip(), idx)
+    # pass 2: declarations per symbol
+    decls = {}
+    for idx, ln in enumerate(lines):
+        m = _ANY_DECL_RE.match(ln)
+        if not m or m.group('fn') in _C_KEYWORDS:
+            continue
+        if not m.group('ext') and m.group('indent'):
+            continue  # indented non-extern: not a decl this pass should touch
+        ret = ' '.join(m.group('ret').split())
+        decls.setdefault(m.group('fn'), []).append(
+            (idx, m.group('indent'), ret, m.group('args').strip()))
+    changed = 0
+    for name, ds in decls.items():
+        if name in _CRT_FNS or name.startswith("jumptable_"):
+            why = "CRT" if name in _CRT_FNS else "data-object jumptable"
+            for idx, indent, _, _ in ds:
+                lines[idx] = (f"{indent}/* pcport_gen auto-unify: {why} {name} "
+                              f"fn-redeclaration dropped */")
+                changed += 1
+            continue
+        sigs = {(r, a) for _, _, r, a in ds}
+        if name in defs:
+            dret, dargs, didx = defs[name]
+            if dret == 'void' and _value_used(text, name):
+                # CW dropped-return artifact: the matched definition is typed void but
+                # callers read the call result (r3 residue on PPC). Retype the gen-copy
+                # definition to u32 so value-use sites compile; missing return paths
+                # leave garbage EAX — the same accident the PPC binary exhibits.
+                dret = 'u32'
+                lines[didx] = re.sub(r'^(static\s+)?void\b', r'\1u32', lines[didx], count=1)
+                changed += 1
+            # Promotion-unsafe params (float/char/short) make a K&R `()` decl
+            # incompatible with the prototyped definition — must match it exactly.
+            # Otherwise prefer K&R: the matched decomp deliberately leaves 0-arg
+            # pseudo-register call sites (CW-legal through `()` decls); an exact
+            # prototype would turn every one into an arity error.
+            unsafe = re.search(r'\b(f32|f64|float|double|u8|s8|u16|s16|char|short)\b'
+                               r'(?!\s*\*)', dargs) is not None
+            canon = (f"extern {dret} {name}({dargs});" if unsafe
+                     else f"extern {dret} {name}();")
+            for idx, indent, _, _ in ds:
+                new = f"{indent}{canon}"
+                if lines[idx] != new:
+                    lines[idx] = new
+                    changed += 1
+        else:
+            rets = [r for _, _, r, _ in ds]
+            nonvoid = [r for r in rets if r != 'void']
+            if not nonvoid:
+                # all decls say void: retype to u32 if the call RESULT is used
+                # anywhere (CW tolerated value-use of void calls; clang errors).
+                # A u32 return on a genuinely-void fn is harmless on x86 cdecl.
+                if not _value_used(text, name):
+                    if len(sigs) <= 1:
+                        continue
+                    ret = 'void'
+                else:
+                    ret = 'u32'
+            else:
+                if len(sigs) <= 1:
+                    continue
+                ret = max(set(nonvoid), key=nonvoid.count)
+            for idx, indent, _, _ in ds:
+                new = f"{indent}extern {ret} {name}();"
+                if lines[idx] != new:
+                    lines[idx] = new
+                    changed += 1
+    # defined void fns that are value-used but have no separate decls in the TU
+    for name, (dret, dargs, didx) in defs.items():
+        if dret == 'void' and name not in decls and _value_used(text, name) \
+           and re.match(r'^(static\s+)?void\b', lines[didx]):
+            lines[didx] = re.sub(r'^(static\s+)?void\b', r'\1u32', lines[didx], count=1)
+            changed += 1
+    return lines, changed
 
 
 def main():
@@ -424,7 +708,14 @@ def main():
         src = (ROOT / f) if not Path(f).is_absolute() else Path(f)
         rel = src.resolve().relative_to(ROOT / "src")
         lines = src.read_text(errors="replace").splitlines()
-        gen, flipped = transform(lines)
+        gen, flipped, stubbed = transform(lines, FLIP_AS_STUB.get(rel.as_posix()))
+        body_names = STUB_BODY.get(rel.as_posix())
+        if body_names:
+            gen, body_stubbed = stub_bodies(gen, body_names)
+            stubbed += body_stubbed
+        auto_uni = 0
+        if rel.as_posix() in AUTO_UNIFY_FILES:
+            gen, auto_uni = auto_unify(gen)
         unify_map = EXTERN_UNIFY.get(rel.as_posix())
         rewrites = 0
         if unify_map:
@@ -445,6 +736,7 @@ def main():
         dst.parent.mkdir(parents=True, exist_ok=True)
         header = (f"/* GENERATED by tools/pcport_gen.py from src/{rel.as_posix()} — "
                   f"{flipped} asm wrapper(s) replaced with their #else C; "
+                  f"{stubbed} broken body(ies) stubbed; {auto_uni} decl(s) auto-unified; "
                   f"{rewrites} conflicting data extern(s) unified; "
                   f"{kr} func proto(s) neutralized; {retyped} retyped; "
                   f"{dropped} stub proto(s) dropped. DO NOT EDIT. */\n")
@@ -456,7 +748,8 @@ def main():
                 text = text.replace(old, new)
                 fixes += 1
         dst.write_text(text)
-        print(f"  {rel.as_posix():<28} flipped {flipped}, "
+        print(f"  {rel.as_posix():<28} flipped {flipped}, stubbed {stubbed}, "
+              f"auto-unified {auto_uni}, "
               f"unified {rewrites} data extern(s), {kr} kr-proto(s), "
               f"{retyped} retype(s), {dropped} stub-drop(s), {fixes} text fixup(s) -> "
               f"{dst.relative_to(ROOT).as_posix()}")

@@ -25,7 +25,12 @@ COMPAT = ["-include", "pcport/pcport_compat.h"]
 # typedef redefinitions the decomp+SDK headers disagree on) so the same TUs that
 # the CMake/MSVC build compiles also compile here.
 CFLAGS = ["-m32", "-c", "-DPCPORT=1", "-w", "-O1",
-          "-fms-compatibility", "-fms-extensions"] + COMPAT + INC
+          "-fms-compatibility", "-fms-extensions",
+          # default-error diagnostics the 32-bit decomp violates by design
+          # (u32<->pointer interchange, CW value-use-of-void artifacts):
+          "-Wno-error=int-conversion", "-Wno-error=incompatible-pointer-types",
+          "-Wno-error=implicit-function-declaration",
+          "-Wno-error=return-mismatch"] + COMPAT + INC
 LIBS = [
     # project libs by full path (not in standard search dirs)
     str(ROOT / "build_pc/Debug/pcport_shim.lib"),
@@ -100,6 +105,12 @@ GAME_GEN = ["game/battle/battle_main",
             "game/gs_particle", "game/movie", "game/pokemon/poke_detail",
             "game/menu/menu_dialog", "game/gs_event_exec", "game/fsys/fsys_load",
             "game/input/input",
+            # Step-0 flip-harvest (2026-06-10): pcport_gen auto-unify + FLIP_AS_STUB/
+            # STUB_BODY made these asm-bearing TUs compile; broken pseudo-register
+            # bodies are stubbed (= auto-stub baseline), real #else C + already-active
+            # C goes live (~300 real fns incl. 40 newly-flipped field_world bodies).
+            "game/gs_field_world", "game/gs_worldmap",
+            "game/effect/effect_util", "game/battle/battle_scene",
             ]
 
 
