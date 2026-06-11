@@ -362,6 +362,16 @@ STUB_BODY = {
     },
 }
 
+# Per-file: swap a definition's whole body in the GENERATED copy with a replacement
+# file containing a complete new definition (real typed signature included). This is
+# how functional decompilations of ACTIVE byte-matched transcription bodies land in
+# the PC build without ever editing the byte-match source (mirrors STUB_BODY
+# consumption). Names listed here are automatically EXCLUDED from STUB_BODY/KR_DEF at
+# gen time, so stale stub-table entries cannot re-stub a function that has a real
+# body. `asm` sibling definitions (the #if0-dead branch of a wrapper) are skipped.
+# Map: rel-path -> { fn_name: replacement-body file path relative to repo ROOT }.
+REPLACE_BODY = {}
+
 # Per-file: definitions to convert to K&R parameter style — `ret f(u32 a, u8* b) {`
 # becomes `ret f(a, b) u32 a; u8* b; {`. Keeps the REAL body (often a functional
 # Ghidra import) while making the function accept any call arity (residue callers
@@ -382,12 +392,19 @@ if _TBL.exists():
     import json as _json
     _ext = _json.loads(_TBL.read_text())
     AUTO_UNIFY_FILES.update(_ext.get("auto_unify", []))
-    for _k, _v in _ext.get("flip_as_stub", {}).items():
-        FLIP_AS_STUB.setdefault(_k, set()).update(_v)
-    for _k, _v in _ext.get("stub_body", {}).items():
-        STUB_BODY.setdefault(_k, set()).update(_v)
-    for _k, _v in _ext.get("kr_def", {}).items():
-        KR_DEF.setdefault(_k, set()).update(_v)
+    def _merge(table, key):
+        # An in-file entry emptied to comment-only braces parses as an empty DICT,
+        # which .update(list) rejects — coerce every entry to a set before merging.
+        for _k, _v in _ext.get(key, {}).items():
+            cur = table.get(_k)
+            if not isinstance(cur, set):
+                table[_k] = cur = set(cur or ())
+            cur.update(_v)
+    _merge(FLIP_AS_STUB, "flip_as_stub")
+    _merge(STUB_BODY, "stub_body")
+    _merge(KR_DEF, "kr_def")
+    for _k, _v in _ext.get("replace_body", {}).items():
+        REPLACE_BODY.setdefault(_k, {}).update(_v)
 
 # A standalone function PROTOTYPE line (declaration, not definition): begins with
 # `extern`, names fn_X, has a parameter list, and ends with `;` (no body brace).
@@ -568,6 +585,51 @@ def stub_bodies(lines, names):
         out.append(ln)
         i += 1
     return out, stubbed
+
+
+def replace_bodies(lines, mapping):
+    """Replace each named function's whole DEFINITION (signature line through the
+    balanced closing brace) with the content of its replacement-body file, which
+    carries its own — possibly different — signature. Skips `asm` definitions (the
+    #if0-dead asm sibling of a wrapper) so the function is emitted exactly once.
+    Returns (lines, replaced_count)."""
+    out, i, n, replaced = [], 0, len(lines), 0
+    done = set()
+    while i < n:
+        ln = lines[i]
+        m = None
+        if ln and not ln[0].isspace() and not ln.rstrip().endswith(';') \
+           and not re.match(r'\s*asm\b', ln):
+            m = _DEF_SIG_RE.match(ln)
+        if m and m.group('fn') in mapping and m.group('fn') not in done and \
+           m.group('fn') not in _C_KEYWORDS and \
+           (m.group('trail') is not None or _brace_follows(lines, i)):
+            name = m.group('fn')
+            j, depth, opened = i, 0, False
+            while j < n:
+                for ch in lines[j]:
+                    if ch == '{':
+                        depth += 1; opened = True
+                    elif ch == '}':
+                        depth -= 1
+                if opened and depth == 0:
+                    break
+                j += 1
+            body_path = ROOT / mapping[name]
+            out.append(f"/* pcport_gen REPLACE_BODY: functional decomp from "
+                       f"{mapping[name]} replaces the pseudo-register transcription "
+                       f"(generated copy only) */")
+            out.extend(body_path.read_text(errors="replace").rstrip("\n").splitlines())
+            done.add(name)
+            replaced += 1
+            i = j + 1
+            continue
+        out.append(ln)
+        i += 1
+    missing = set(mapping) - done
+    if missing:
+        print(f"  WARNING: REPLACE_BODY found no definition for: {sorted(missing)}")
+    return out, replaced
 
 
 def drop_func_stubs(lines, names):
@@ -816,8 +878,11 @@ def auto_unify(lines):
             # Otherwise prefer K&R: the matched decomp deliberately leaves 0-arg
             # pseudo-register call sites (CW-legal through `()` decls); an exact
             # prototype would turn every one into an arity error.
-            unsafe = re.search(r'\b(f32|f64|float|double|u8|s8|u16|s16|char|short)\b'
-                               r'(?!\s*\*)', dargs) is not None
+            # Variadic definitions also require an exact prototype: a K&R `()`
+            # declaration is incompatible with a `...` definition in C.
+            unsafe = (re.search(r'\b(f32|f64|float|double|u8|s8|u16|s16|char|short)\b'
+                                r'(?!\s*\*)', dargs) is not None
+                      or '...' in dargs)
             canon = (f"extern {dret} {name}({dargs});" if unsafe
                      else f"extern {dret} {name}();")
             for idx, indent, _, _ in ds:
@@ -869,8 +934,15 @@ def main():
         gen, flipped, stubbed = transform(lines, FLIP_AS_STUB.get(rel.as_posix()))
         if rel.as_posix() in AUTO_UNIFY_FILES:
             gen, _j = join_split_sigs(gen)
+        replace_map = REPLACE_BODY.get(rel.as_posix()) or {}
+        replaced_bodies = 0
+        if replace_map:
+            gen, replaced_bodies = replace_bodies(gen, replace_map)
         body_names = STUB_BODY.get(rel.as_posix())
         if body_names:
+            # functions with a real replacement body must never be re-stubbed by
+            # stale stub-table entries
+            body_names = set(body_names) - set(replace_map)
             gen, body_stubbed = stub_bodies(gen, body_names)
             stubbed += body_stubbed
         auto_uni = 0
@@ -880,6 +952,7 @@ def main():
         # decl unification must see the original prototyped definitions first.
         kr_names_def = KR_DEF.get(rel.as_posix())
         if kr_names_def:
+            kr_names_def = set(kr_names_def) - set(replace_map)
             gen, _krd = kr_definitions(gen, kr_names_def)
         unify_map = EXTERN_UNIFY.get(rel.as_posix())
         rewrites = 0
@@ -901,6 +974,7 @@ def main():
         dst.parent.mkdir(parents=True, exist_ok=True)
         header = (f"/* GENERATED by tools/pcport_gen.py from src/{rel.as_posix()} — "
                   f"{flipped} asm wrapper(s) replaced with their #else C; "
+                  f"{replaced_bodies} body(ies) replaced with functional decomps; "
                   f"{stubbed} broken body(ies) stubbed; {auto_uni} decl(s) auto-unified; "
                   f"{rewrites} conflicting data extern(s) unified; "
                   f"{kr} func proto(s) neutralized; {retyped} retyped; "

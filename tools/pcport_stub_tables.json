@@ -19,13 +19,7 @@
   "game/trainer.c": [],
   "game/colosseum_event.c": [],
   "game/colosseum_battle.c": [],
-  "game/colosseum_script.c": [],
-  "game/gs_field_world.c": [
-   "fn_8012BCA4",
-   "fn_8012C0B4",
-   "fn_8012FCD4",
-   "fn_8012E7B8"
-  ]
+  "game/colosseum_script.c": []
  },
  "stub_body": {
   "game/pokemon.c": [
@@ -142,7 +136,11 @@
    "fn_8023FDDC"
   ],
   "game/gs_field_world.c": [
-   "GSfield_ProcessTriggers"
+   "GSfield_ProcessTriggers",
+   "fn_8012BCA4",
+   "fn_8012C0B4",
+   "fn_8012E7B8",
+   "fn_8012FCD4"
   ]
  },
  "kr_def": {
