@@ -99,21 +99,31 @@ void HSD_Free(void* ptr)
  * the recursive glue the asm function would otherwise perform. Building the real
  * HSD_JObj tree is the prerequisite for running the game's HSD_JObjAnimAll
  * (texture-matrix UV scroll = the title "sand") + its real render. */
-HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
+/* PC host detail: the helpers below load all JObjs first, then resolve
+ * post-load refs. Instance children stay as private tree copies until the host
+ * JObj walkers are graph-aware; exact shared-child pointers can cycle through
+ * child/next walks. */
+
+typedef struct PCPort_JObjLoadContext {
+    BOOL failed;
+} PCPort_JObjLoadContext;
+
+static HSD_JObj* PCPort_JObjAllocForJoint(HSD_Joint* joint)
 {
-    HSD_JObj* jobj;
-    HSD_JObj* c;
+    HSD_ClassInfo* info;
 
-    if (joint == NULL) {
-        return NULL;
+    if (joint != NULL && joint->class_name != NULL) {
+        info = hsdSearchClassInfo(joint->class_name);
+        if (info != NULL) {
+            return (HSD_JObj*) hsdNew(info);
+        }
     }
+    return HSD_JObjAlloc();
+}
 
-    jobj = HSD_JObjAlloc();
-    if (jobj == NULL) {
-        return NULL;
-    }
-
-    jobj->flags = joint->flags;
+static void PCPort_JObjLoadPayload(HSD_JObj* jobj, HSD_Joint* joint)
+{
+    jobj->flags |= joint->flags;
     jobj->rotate_x = joint->rotation_x;
     jobj->rotate_y = joint->rotation_y;
     jobj->rotate_z = joint->rotation_z;
@@ -123,24 +133,93 @@ HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
     jobj->translate_x = joint->position_x;
     jobj->translate_y = joint->position_y;
     jobj->translate_z = joint->position_z;
+    jobj->scl = NULL;
+    jobj->envelopemtx = joint->mtx;
 
-    if (union_type_dobj(joint) && joint->u.dobjdesc != NULL) {
+    if (jobj->flags & JOBJ_SPLINE) {
+        jobj->u.spline = joint->u.spline;
+    } else if (jobj->flags & JOBJ_PTCL) {
+        jobj->u.ptcl = joint->u.ptcl;
+    } else if (joint->u.dobjdesc != NULL) {
         jobj->u.dobj = HSD_DObjLoadDesc(joint->u.dobjdesc);
     }
     if (joint->robjdesc != NULL) {
         jobj->robj = HSD_RObjLoadDesc(joint->robjdesc);
     }
+}
 
-    /* Children (with their full sibling chain), then set their parent. */
-    jobj->child = HSD_JObjLoadJoint(joint->child);
-    for (c = jobj->child; c != NULL; c = c->next) {
-        c->parent = jobj;
+static HSD_JObj* PCPort_JObjLoadTree(HSD_Joint* joint,
+                                     HSD_JObj* parent,
+                                     PCPort_JObjLoadContext* ctx)
+{
+    HSD_JObj* first;
+    HSD_JObj* prev;
+    HSD_JObj* jobj;
+
+    first = NULL;
+    prev = NULL;
+    while (joint != NULL && !ctx->failed) {
+        jobj = PCPort_JObjAllocForJoint(joint);
+        if (jobj == NULL) {
+            ctx->failed = TRUE;
+            break;
+        }
+
+        jobj->next = NULL;
+        jobj->parent = parent;
+        jobj->child = NULL;
+        PCPort_JObjLoadPayload(jobj, joint);
+
+        if (prev != NULL) {
+            prev->next = jobj;
+        } else {
+            first = jobj;
+        }
+        prev = jobj;
+
+        jobj->child = PCPort_JObjLoadTree(joint->child, jobj, ctx);
+        HSD_JObjSetMtxDirty(jobj);
+        joint = joint->next;
     }
-    /* Siblings of this joint (parent set by the caller's child loop). */
-    jobj->next = HSD_JObjLoadJoint(joint->next);
+    return first;
+}
 
-    HSD_JObjSetMtxDirty(jobj);
-    return jobj;
+static void PCPort_JObjResolveTree(HSD_JObj* jobj,
+                                   HSD_Joint* joint)
+{
+    while (jobj != NULL && joint != NULL) {
+        if (jobj->robj != NULL && joint->robjdesc != NULL) {
+            HSD_RObjResolveRefsAll(jobj->robj, joint->robjdesc);
+        }
+        if (union_type_dobj(jobj) && jobj->u.dobj != NULL) {
+            HSD_DObjResolveRefsAll(jobj->u.dobj, joint->u.dobjdesc);
+        }
+
+        PCPort_JObjResolveTree(jobj->child, joint->child);
+
+        jobj = jobj->next;
+        joint = joint->next;
+    }
+}
+
+HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
+{
+    PCPort_JObjLoadContext ctx;
+    HSD_JObj* root;
+
+    if (joint == NULL) {
+        return NULL;
+    }
+
+    memset(&ctx, 0, sizeof(ctx));
+    root = PCPort_JObjLoadTree(joint, NULL, &ctx);
+    if (!ctx.failed) {
+        PCPort_JObjResolveTree(root, joint);
+    } else if (root != NULL) {
+        HSD_JObjRemoveAll(root);
+        root = NULL;
+    }
+    return root;
 }
 
 /* ========================================================================= */
