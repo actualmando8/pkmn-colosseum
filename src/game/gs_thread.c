@@ -51,7 +51,6 @@ extern void  fn_800F015C(void);                           /* GSthread context in
 extern void  fn_800F01F0(void);                           /* GSthread FPU context init */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSscratchFree();
-extern void _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO();
 extern void cos();   /* MSL trig (renamed fn_800CDBE0) — referenced by asm incs */
 
 /* ===== String constants (rodata references) ===== */
@@ -789,7 +788,7 @@ extern void fn_800FC528(void);
 extern s32 fn_800FC7E0(void* entry, u8 type, u32 arg);
 extern void fn_800FD348(void);
 extern void fn_800FD69C(void);
-extern void* fn_800FDF1C(void* obj, u32 key, void** outNode);
+extern void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode);
 extern s32 fn_800FDFE4(const void* str);
 extern s32 fn_800FE010(const void* str);
 extern void fn_800FE35C(void);
@@ -2332,12 +2331,12 @@ void fn_800FD69C(void) {
 #pragma optimization_level 2
 #pragma optimizewithasm off
 #if 1
-asm void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
+asm void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode) {
 #include "src/game/gs_thread_fn_800FDF1C.inc"
 }
 #else
 #pragma optimization_level 2
-void* fn_800FDF1C(void* obj, u32 key, void** outNode) {
+void* _msgGetCodeInfo__FP13MSG_TASK_WORKUsPP12tagFONT_INFO(void* obj, u32 key, void** outNode) {
     u8* head;
     u32 count;
     u32 offset;
