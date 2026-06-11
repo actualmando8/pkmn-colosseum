@@ -85,7 +85,18 @@ spot. Not C-controllable.
 - *Triage:* residual instructions are a *permutation of identical opcodes/operands*
   (no register or immediate differs). → log W2.
 
-### W3 — stmw / lmw threshold mismatch  *(flag lever TESTED — does NOT dissolve it)*
+### W3 — stmw / lmw threshold mismatch  *(**PARTIALLY DISSOLVED 2026-06-10: per-TU `-O4,s`**)*
+> **UPDATE 2026-06-10:** the pokemon.c campaign discovered the target's stmw-at-2-3-regs idiom
+> comes from `-O4,s` (size), not our default `-O4,p`. The fix is a PER-TU override in
+> compile_config.json, NOT the file-global -use_lmw_stmw flag tested below. Swept across 10
+> W3-heavy TUs: **KEPT on trainer.c (+8 byte-exact), colosseum_event.c (+9), battle_main.c (+6),
+> colosseum_script.c (+1) — +24 fns, 0 lost-100s** (commits bb015a65 369089e0 e70d8996 4d496c44).
+> REJECTED on colosseum_battle/battle_waza/gs_title/gs_event_exec/menu_middle/battle_logic
+> (lost-100s or no byte-exact gain — those TUs genuinely are `-O4,p`). W3 rows for the cracked
+> fns (fn_801FE468, fn_801FA8CC, fn_80209380, fn_80202998, fn_802077D4, fn_80204854, fn_80214864
+> tail, fn_801FA634, battle_main quintuplet+1) are SUPERSEDED — now 100%, parent-verified.
+> Before filing any new W3: test the TU's flag first.
+
 With `-use_lmw_stmw on` (our current flag) CW emits `stmw/lmw` only when the saved
 band is **≥ 5** registers; for ≤ 4 it emits individual `stw/lwz`. When the target
 saved 2–4 regs but our C forces a ≥5 band (or vice-versa) the whole prologue/epilogue
