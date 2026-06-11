@@ -86,7 +86,7 @@ extern u8 lbl_803D6E40[];
 void fn_80072A00(void);
 void fn_80072C74(void);
 void fn_80072D58(void);
-void fn_80073034(void);
+void _AGB_EntryGetStatus__FlPUl(void);
 void fn_800730F8(void);
 void fn_800733D0(void);
 void fn_80073690(void);
@@ -566,7 +566,7 @@ void fn_80072D58(void) {
 }
 
 /* 0x80073034 | size: 0xC4 */
-void fn_80073034(void) {
+void _AGB_EntryGetStatus__FlPUl(void) {
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;

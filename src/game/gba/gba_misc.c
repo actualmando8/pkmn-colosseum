@@ -19,7 +19,7 @@ extern void fn_800726A8();
 extern void fn_80072A00();
 extern void fn_80072C74();
 extern void fn_80072D58();
-extern void fn_80073034();
+extern void _AGB_EntryGetStatus__FlPUl();
 extern void fn_800730F8();
 extern void fn_800733D0();
 extern void fn_80073990();
@@ -1667,7 +1667,7 @@ void fn_8008A9E4(void) {
     tmp = 0x2000000;
     *(u32*)((u8*)r30 + 0x0) = tmp;
     r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80073034)();
+    ((void(*)(void))_AGB_EntryGetStatus__FlPUl)();
     if ((s32)r3 < 0) {
         tmp = 0x2000000;
         *(u32*)(sp + 0x8) = tmp;
