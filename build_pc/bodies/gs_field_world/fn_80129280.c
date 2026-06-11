@@ -3,7 +3,7 @@
    Selector >= 0x11 returns 0 unconditionally. */
 u32 fn_80129280(u8* arg1, u16 arg2)
 {
-    extern u8* fn_80128E24(u8* ptr);
+    extern u8* fn_80128E24(void);
     extern u32 fn_80128E04(u8* ptr);
     extern u32 fn_80128DEC(u8* ptr);
     extern u32 fn_80128DD4(u8* ptr);
@@ -22,7 +22,7 @@ u32 fn_80129280(u8* arg1, u16 arg2)
         return 0;
     }
     if (arg1 == NULL) {
-        arg1 = fn_80128E24(arg1);
+        arg1 = fn_80128E24();
         if (arg1 == NULL) {
             return 0;
         }

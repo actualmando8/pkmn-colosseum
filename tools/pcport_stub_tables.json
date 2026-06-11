@@ -174,12 +174,7 @@
    "fn_8011F77C",
    "fn_8011F260",
    "fn_8012DE94",
-   "fn_8012BEB4",
-   "fn_801190DC",
-   "fn_80128E24",
-   "fn_80116164",
-   "fn_8012E388",
-   "fn_80124410"
+   "fn_8012BEB4"
   ]
  },
  "replace_body": {
@@ -193,6 +188,9 @@
    "fn_8012FCD4": "build_pc/bodies/gs_field_world/fn_8012FCD4.c",
    "fn_8012BCA4": "build_pc/bodies/gs_field_world/fn_8012BCA4.c",
    "fn_80119BD0": "build_pc/bodies/gs_field_world/fn_80119BD0.c",
+   "fn_801190DC": "build_pc/bodies/gs_field_world/fn_801190DC.c",
+   "fn_80116164": "build_pc/bodies/gs_field_world/fn_80116164.c",
+   "fn_8012E388": "build_pc/bodies/gs_field_world/fn_8012E388.c",
    "fn_80129280": "build_pc/bodies/gs_field_world/fn_80129280.c",
    "fn_80130770": "build_pc/bodies/gs_field_world/fn_80130770.c",
    "fn_80130660": "build_pc/bodies/gs_field_world/fn_80130660.c",
@@ -201,6 +199,7 @@
    "fn_80130BB0": "build_pc/bodies/gs_field_world/fn_80130BB0.c",
    "fn_801309A0": "build_pc/bodies/gs_field_world/fn_801309A0.c",
    "fn_8011538C": "build_pc/bodies/gs_field_world/fn_8011538C.c",
+   "fn_80124410": "build_pc/bodies/gs_field_world/fn_80124410.c",
    "fn_80123C54": "build_pc/bodies/gs_field_world/fn_80123C54.c",
    "fn_80129840": "build_pc/bodies/gs_field_world/fn_80129840.c"
   }
