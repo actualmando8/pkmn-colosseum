@@ -22,18 +22,83 @@ Verification:
 ## Batch 5B - hsd_jobj Functional Holes
 
 - [ ] Decompile or host-bridge the live-impact instance/reference helpers `fn_801A0744` and `fn_801A0D94`.
+- [x] Triage `fn_801A0744` and `fn_801A0D94` with DeepSeek V4 Flash.
 - [ ] Triage remaining `hsd_jobj` TODO wrappers from `tools/decomp_work/_interesting_reordered.json`.
 - [ ] Verify that new JObj work changes linked PC-port runtime behavior.
+
+Active lane:
+
+- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum-wt-jobj`
+- Branch: `pcport-5b-jobj`
+- Worker focus: `src\hsd\hsd_jobj.c`, PC-port `REPLACE_BODY` overlays for `fn_801A0744` and `fn_801A0D94`.
+
+Lane result:
+
+- No overlay landed; the first `fn_801A0744` / `fn_801A0D94` candidate was rejected as unsafe and reverted in the worktree.
+- Blocker: the real Colosseum `.inc` path includes ref-count transitions through `fn_801A0D48`, `fn_801A0D3C`, `fn_801A0CE8`, `fn_801A0C9C`, `fn_801A0C68`, and ID lookup through `fn_8019C128`; the candidate leaned too much on upstream Melee semantics.
+- Next JObj action: reconstruct from `src\hsd\hsd_jobj_fn_801A0744.inc` and `src\hsd\hsd_jobj_fn_801A0D94.inc` line-by-line before attempting another overlay.
 
 ## Batch 5C - hsd_mobj Material Runtime Holes
 
 - [ ] Attack `fn_801A7128` and nearby alpha/material setter holes.
+- [x] Triage `fn_801A7128` with DeepSeek V4 Flash.
 - [ ] Verify material state changes on real PC-port scene content.
+
+Active lane:
+
+- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum-wt-mobj`
+- Branch: `pcport-5c-mobj`
+- Worker focus: `src\hsd\hsd_mobj.c`, PC-port `REPLACE_BODY` overlay for `fn_801A7128`.
+
+Lane result:
+
+- No overlay landed; the generated `fn_801A7128` candidate was compile-plausible but rejected for runtime safety.
+- Blocker: `fn_801A7128` expects TEV/TExp helper semantics for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, and `fn_801B7C60`, but the current PC-linked `src\hsd\hsd_texp.c` definitions at those labels are placeholder texture/GObj routines with incompatible signatures.
+- Next MObj action: recover or host-bridge the TExp helper layer first, then retry `fn_801A7128`.
 
 ## Batch 5D - hsd_cobj Camera Runtime Holes
 
-- [ ] Triage remaining CObj runtime gaps after JObj and MObj stabilize.
+- [x] Triage remaining CObj runtime gaps after JObj and MObj stabilize.
+- [x] Land safe PC-port overlay for viewport rect unpacker `fn_80194400`.
 - [ ] Verify camera behavior against headed field captures.
+
+Active lane:
+
+- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum-wt-cobj`
+- Branch: `pcport-5d-cobj`
+- Worker focus: `src\hsd\hsd_cobj.c`, small camera/runtime TODO wrappers with visible field impact.
+
+Lane result:
+
+- Integrated `build_pc\bodies\hsd_cobj\fn_80194400.c` via `tools\pcport_stub_tables.json` `replace_body`.
+- `fn_801950D0` was triaged but not landed because its common path still depends on unresolved `fn_8019513C`.
+- Verification: `python tools\pcport_gen.py --out-dir build_pc\gen src\hsd\hsd_cobj.c`, `python tools\pcport_link.py`, and headed `build_pc\pcport_bootstrap.exe --field` smoke passed.
+
+## Batch 5E - Display/Render Pass Holes
+
+- [x] Triage display pass wrappers in `src\hsd\hsd_displayfunc.c`.
+- [ ] Attempt PC-port overlays for `fn_80198038`, `fn_801985E0`, or `fn_80198B20` only if the result is safe enough to compile and review.
+- [ ] Re-run headed field capture after any display overlay lands.
+
+Active lane:
+
+- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum-wt-display`
+- Branch: `pcport-5e-display`
+- Worker focus: `src\hsd\hsd_displayfunc.c` first; `src\hsd\hsd_pobj_disp.c` only if a smaller safe target is obvious.
+
+Lane result:
+
+- `fn_80198038`, `fn_801985E0`, and `fn_80198B20` were triaged with DeepSeek V4 Flash.
+- No overlay landed; all three responses ended `SAFE_OVERLAY: no`.
+- Blocker: displayfunc wrappers need recovered constant/flag contracts before a safe PC-port replacement.
+- Next display action: retry only `fn_80198B20` after naming `lbl_80478AC0`, `lbl_80478ACC`, `lbl_802746D0`, and the flag-controlled path, or pivot to a smaller `hsd_pobj_disp.c` helper.
+
+Integration rules:
+
+- Do not edit `*_fn_*.inc` truth files.
+- Do not flip asm wrapper `#if` switches for PC-port-only progress.
+- Prefer `build_pc\bodies\<tu>\<fn>.c` plus `tools\pcport_stub_tables.json` `replace_body` entries.
+- Main checkout owns final integration, `python tools\pcport_link.py`, headed smoke, and commit/push.
 
 ## Later Critical Path
 
