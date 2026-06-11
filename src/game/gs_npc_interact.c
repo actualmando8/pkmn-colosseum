@@ -44,7 +44,7 @@
  *   fn_8000FF50  GSnpc_NameRater             -- 0x58 bytes, name rater check
  *   fn_8000FFA8  GSnpc_NameRaterRename       -- 0x118 bytes, rename Pokemon
  *   fn_800100C0  GSnpc_DaycareDeposit        -- 0x68 bytes, daycare deposit
- *   fn_80010128  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
+ *   _menuFightIsUse__FP16MENU_WAZA_STATUSUs  GSnpc_DaycareWithdraw       -- 0x16C bytes, daycare withdraw
  *   fn_80010294  GSnpc_PurificationChamber   -- 0x1E8 bytes, purification setup
  *   fn_8001047C  GSnpc_ShadowGaugeCheck      -- 0x10C bytes, check purification ready
  *   fn_80010588  GSnpc_PurifyPokemon         -- 0x11C bytes, purify Shadow Pokemon
@@ -608,7 +608,7 @@ s32 fn_80011700(s32 arg) {
 #endif
 
 /* 0x800117BC | 0x1EC */
-extern void fn_80010128();
+extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
 extern void fn_80106394();
 extern void fn_80106080();
 #if 1
@@ -617,7 +617,7 @@ asm void fn_800117BC(void) {
 }
 #else
 void fn_800117BC(void) {
-    extern void fn_80010128();
+    extern void _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
     extern void fn_80102568();
     extern void fn_80102620();
     extern void fn_801026A4();
@@ -668,7 +668,7 @@ L_800117F0:
         if ((s32)r27 < 0) break;
         r3 = r28;
         r4 = r27 & 0xFFFF;
-        fn_80010128();
+        _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
         r26 = r3;
         if (r26 == 0) break;
         r3 = 0x4c;
@@ -2072,15 +2072,15 @@ u32 fn_800100C0(u8* ptr) {
 #pragma peephole on
 #endif
 
-/* fn_80010128 - 0x80010128 | size: 0x16c */
+/* _menuFightIsUse__FP16MENU_WAZA_STATUSUs - 0x80010128 | size: 0x16c */
 extern void fn_801FFEC8(void);
 extern void fn_802040E8(void);
 #if 1
-asm void fn_80010128(void) {
+asm void _menuFightIsUse__FP16MENU_WAZA_STATUSUs(void) {
 #include "src/game/gs_npc_interact_fn_80010128.inc"
 }
 #else
-void fn_80010128(void) { /* TODO */ }
+void _menuFightIsUse__FP16MENU_WAZA_STATUSUs(void) { /* TODO */ }
 #endif
 
 /* fn_80010294 - 0x80010294 | size: 0x1e8 */
