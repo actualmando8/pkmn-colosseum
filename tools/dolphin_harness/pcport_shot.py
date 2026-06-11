@@ -2,7 +2,7 @@
 """Launch the PC port HEADED (visible window) and screenshot its window.
 
 Host-side only (no pcport/ changes). Runs from a stable COPY of the exe so it
-never collides with an in-flight rebuild/link of build_pc\\Debug\\pcport_bootstrap.exe.
+never collides with an in-flight rebuild/link of build_pc\\pcport_bootstrap.exe.
 
 Usage:
   python pcport_shot.py --map S1_out --out shots/pcport_s1out_headed.png
@@ -32,7 +32,7 @@ except OSError:
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
-SRC_EXE = os.path.join(REPO, "build_pc", "Debug", "pcport_bootstrap.exe")
+SRC_EXE = os.path.join(REPO, "build_pc", "pcport_bootstrap.exe")
 COPY_EXE = os.path.join(REPO, "build_pc", "_headed_pcport.exe")
 
 
@@ -40,7 +40,9 @@ def stable_copy():
     """Copy the live exe to a stable path so a concurrent relink can't lock or
     corrupt the file we launch. Verifies it's a non-trivial PE first."""
     if not os.path.exists(SRC_EXE):
-        raise SystemExit(f"missing {SRC_EXE} - build the PC port first")
+        raise SystemExit(
+            f"missing {SRC_EXE} - run `python tools\\pcport_link.py` first"
+        )
     sz = os.path.getsize(SRC_EXE)
     if sz < 100_000:
         raise SystemExit(f"{SRC_EXE} looks truncated ({sz} bytes) - a build may be in progress; retry")
