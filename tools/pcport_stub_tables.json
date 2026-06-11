@@ -19,7 +19,10 @@
   "game/trainer.c": [],
   "game/colosseum_event.c": [],
   "game/colosseum_battle.c": [],
-  "game/colosseum_script.c": []
+  "game/colosseum_script.c": [],
+  "game/gs_field_world.c": [
+   "fn_8012C660"
+  ]
  },
  "stub_body": {
   "game/pokemon.c": [

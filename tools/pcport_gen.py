@@ -321,18 +321,15 @@ FLIP_AS_STUB = {
     # transition boss fn_8012640C and the object-update dispatcher fn_801254B4).
     "game/gs_field_world.c": {
         # (fn_8012640C, fn_801254B4 removed 2026-06-10 — functional #else decomps)
-        "fn_8012CA84", "fn_80117514",
+        # 10 batch-2 fns -> functional #else decomps 2026-06-10 (incl. fn_8012CA84)
         # arity-erroring flipped bodies (0-arg pseudo-register call sites):
         # (fn_8011BEB4, fn_8012A5B0 removed 2026-06-10 — functional #else decomps)
-        "fn_801183EC", "fn_8011A0A8", "fn_8011BBD8", "fn_8011F910",
+        "fn_801183EC", "fn_8011F910",
         "fn_8011FCA4", "fn_8011FDC8", "fn_8012086C", "fn_80122370", "fn_801237B8",
-        "fn_801240C4", "fn_8012795C", "fn_8012805C", "fn_80128300", "fn_80128524",
-        "fn_801286C8", "fn_80128A64", "fn_80128E38", "fn_80129094",
-        "fn_8012AD50", "fn_8012EBD4",
+        "fn_801240C4", "fn_8012795C", "fn_8012805C", "fn_801286C8", "fn_80128A64", "fn_8012AD50", "fn_8012EBD4",
         # 0-arg residue call to the now-prototyped fn_8012A5B0:
-        "fn_80130054",
         # 0-arg residue calls to the now-prototyped fn_801254B4:
-        "fn_80120674", "fn_801226D0",
+        "fn_801226D0",
     },
     "game/effect/effect_util.c": {
         "fn_801338A4", "fn_80135030", "fn_80136078",
