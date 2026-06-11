@@ -400,26 +400,346 @@ void HSD_JObjAnim(HSD_JObj* jobj)
 }
 
 /* ------------------------------------------------------------------------- */
-/*  HSD_JObjAnimAll (host override)                                           */
+/*  Graph-safe JObj walkers (host overrides)                                  */
 /*                                                                           */
-/*  CRITICAL FIX: src/hsd/hsd_jobj.c ALSO defines HSD_JObjAnimAll, and its    */
-/*  recursion `HSD_JObjAnimAll -> HSD_JObjAnim` binds INTRA-TU at compile     */
-/*  time to that file's OWN (inert) HSD_JObjAnim -- which never interprets    */
-/*  the joint's aobj. So overriding HSD_JObjAnim alone (above) is bypassed    */
-/*  for the whole-tree walk: the override only intercepts CROSS-TU callers.   */
-/*  This host HSD_JObjAnimAll (BOOT-linked first, so /FORCE:MULTIPLE selects  */
-/*  it for cross-TU callers) recurses calling the SAME-TU host HSD_JObjAnim   */
-/*  above, so the per-joint aobj IS interpreted and curr_frame advances.      */
-/*  Without this the joint SRT animation never plays (curr_frame stuck at 0). */
+/*  Batch 5A guardrail: Colosseum's JOBJ_INSTANCE/reference path can make the  */
+/*  JObj relation graph share child chains instead of being a strict tree.     */
+/*  The adapted src walkers recurse through child+next with no visited guard,  */
+/*  which is unsafe once the loader starts preserving shared instance edges.   */
+/*  These BOOT-set overrides keep the original per-node work but make every    */
+/*  public all-walker process each JObj pointer at most once per call.         */
 /* ------------------------------------------------------------------------- */
-void HSD_JObjAnimAll(HSD_JObj* jobj)
+
+#define PCPORT_JOBJ_VISIT_INLINE_CAPACITY 1024u
+
+typedef struct PCPort_JObjVisit {
+    HSD_JObj** items;
+    size_t count;
+    size_t capacity;
+    BOOL overflowed;
+    HSD_JObj* inline_items[PCPORT_JOBJ_VISIT_INLINE_CAPACITY];
+} PCPort_JObjVisit;
+
+static void PCPort_JObjVisitInit(PCPort_JObjVisit* visit)
 {
+    visit->items = visit->inline_items;
+    visit->count = 0;
+    visit->capacity = PCPORT_JOBJ_VISIT_INLINE_CAPACITY;
+    visit->overflowed = FALSE;
+}
+
+static void PCPort_JObjVisitDestroy(PCPort_JObjVisit* visit)
+{
+    if (visit->items != visit->inline_items) {
+        free(visit->items);
+    }
+    visit->items = NULL;
+    visit->count = 0;
+    visit->capacity = 0;
+}
+
+static BOOL PCPort_JObjVisitGrow(PCPort_JObjVisit* visit)
+{
+    size_t new_capacity;
+    HSD_JObj** new_items;
+
+    new_capacity = visit->capacity * 2u;
+    if (visit->items == visit->inline_items) {
+        new_items = (HSD_JObj**) malloc(new_capacity * sizeof(*new_items));
+        if (new_items != NULL) {
+            memcpy(new_items, visit->inline_items,
+                   visit->count * sizeof(*new_items));
+        }
+    } else {
+        new_items = (HSD_JObj**) realloc(visit->items,
+                                         new_capacity * sizeof(*new_items));
+    }
+    if (new_items == NULL) {
+        visit->overflowed = TRUE;
+        return FALSE;
+    }
+    visit->items = new_items;
+    visit->capacity = new_capacity;
+    return TRUE;
+}
+
+static BOOL PCPort_JObjVisitMark(PCPort_JObjVisit* visit, HSD_JObj* jobj)
+{
+    size_t i;
+
+    if (jobj == NULL) {
+        return FALSE;
+    }
+    for (i = 0; i < visit->count; i++) {
+        if (visit->items[i] == jobj) {
+            return FALSE;
+        }
+    }
+    if (visit->count >= visit->capacity && !PCPort_JObjVisitGrow(visit)) {
+        return FALSE;
+    }
+    visit->items[visit->count++] = jobj;
+    return TRUE;
+}
+
+static void PCPort_JObjSetFlagsAllRec(HSD_JObj* jobj, u32 flags,
+                                      PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        HSD_JObjSetFlags(jobj, flags);
+        PCPort_JObjSetFlagsAllRec(jobj->child, flags, visit);
+        jobj = next;
+    }
+}
+
+void HSD_JObjSetFlagsAll(HSD_JObj* jobj, u32 flags)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjSetFlagsAllRec(jobj, flags, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjClearFlagsAllRec(HSD_JObj* jobj, u32 flags,
+                                        PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        HSD_JObjClearFlags(jobj, flags);
+        PCPort_JObjClearFlagsAllRec(jobj->child, flags, visit);
+        jobj = next;
+    }
+}
+
+void HSD_JObjClearFlagsAll(HSD_JObj* jobj, u32 flags)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjClearFlagsAllRec(jobj, flags, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static BOOL PCPort_JObjSetMtxDirtySubRec(HSD_JObj* jobj,
+                                         PCPort_JObjVisit* visit)
+{
+    HSD_JObj* child;
+
+    if (!PCPort_JObjVisitMark(visit, jobj)) {
+        return FALSE;
+    }
+
+    jobj->flags |= JOBJ_MTX_DIRTY;
+    child = jobj->child;
+    while (child != NULL) {
+        HSD_JObj* next;
+
+        next = child->next;
+        if (!(child->flags & JOBJ_MTX_INDEP_PARENT) &&
+            !PCPort_JObjSetMtxDirtySubRec(child, visit))
+        {
+            break;
+        }
+        if (next == child) {
+            break;
+        }
+        child = next;
+    }
+    return TRUE;
+}
+
+void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj)
+{
+    PCPort_JObjVisit visit;
+
     if (jobj == NULL) {
         return;
     }
-    HSD_JObjAnim(jobj);
-    HSD_JObjAnimAll(jobj->child);
-    HSD_JObjAnimAll(jobj->next);
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjSetMtxDirtySubRec(jobj, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjRemoveAllRec(HSD_JObj* jobj,
+                                    PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+        HSD_JObj* child;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        child = jobj->child;
+        PCPort_JObjRemoveAllRec(child, visit);
+        jobj->child = NULL;
+        jobj->next = NULL;
+        jobj->parent = NULL;
+        HSD_JObjUnref(jobj);
+        jobj = next;
+    }
+}
+
+void HSD_JObjRemoveAll(HSD_JObj* jobj)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjRemoveAllRec(jobj, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjRemoveAnimAllRec(HSD_JObj* jobj,
+                                        PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        HSD_JObjRemoveAnim(jobj);
+        PCPort_JObjRemoveAnimAllRec(jobj->child, visit);
+        jobj = next;
+    }
+}
+
+void HSD_JObjRemoveAnimAll(HSD_JObj* jobj)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjRemoveAnimAllRec(jobj, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjReqAnimAllRec(HSD_JObj* jobj, f32 frame,
+                                     PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        HSD_AObjReqAnim(jobj->aobj, frame);
+        HSD_RObjReqAnimAll(jobj->robj, frame);
+        if (union_type_dobj(jobj)) {
+            HSD_DObjReqAnimAll(jobj->u.dobj, frame);
+        }
+        PCPort_JObjReqAnimAllRec(jobj->child, frame, visit);
+        jobj = next;
+    }
+}
+
+void HSD_JObjReqAnimAll(HSD_JObj* jobj, f32 frame)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjReqAnimAllRec(jobj, frame, &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjAddAnimAllRec(HSD_JObj* jobj,
+                                     HSD_AnimJoint* animjoint,
+                                     HSD_MatAnimJoint* matanimjoint,
+                                     HSD_ShapeAnimJoint* shapeanimjoint,
+                                     PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+        HSD_AnimJoint* next_animjoint;
+        HSD_MatAnimJoint* next_matanimjoint;
+        HSD_ShapeAnimJoint* next_shapeanimjoint;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+
+        next = jobj->next;
+        next_animjoint = animjoint != NULL ? animjoint->next : NULL;
+        next_matanimjoint = matanimjoint != NULL ? matanimjoint->next : NULL;
+        next_shapeanimjoint = shapeanimjoint != NULL ? shapeanimjoint->next : NULL;
+
+        if (animjoint != NULL) {
+            if (jobj->aobj != NULL) {
+                HSD_AObjRemove(jobj->aobj);
+            }
+            jobj->aobj = HSD_AObjLoadDesc(animjoint->aobjdesc);
+            HSD_RObjAddAnimAll(jobj->robj, animjoint->robj_anim);
+        }
+
+        if (union_type_dobj(jobj)) {
+            HSD_DObjAddAnimAll(
+                jobj->u.dobj,
+                matanimjoint != NULL ? matanimjoint->matanim : NULL,
+                shapeanimjoint != NULL ? shapeanimjoint->shapeanimdobj : NULL);
+        }
+
+        PCPort_JObjAddAnimAllRec(
+            jobj->child,
+            animjoint != NULL ? animjoint->child : NULL,
+            matanimjoint != NULL ? matanimjoint->child : NULL,
+            shapeanimjoint != NULL ? shapeanimjoint->child : NULL,
+            visit);
+
+        jobj = next;
+        animjoint = next_animjoint;
+        matanimjoint = next_matanimjoint;
+        shapeanimjoint = next_shapeanimjoint;
+    }
+}
+
+void HSD_JObjAddAnimAll(HSD_JObj* jobj, HSD_AnimJoint* animjoint,
+                        HSD_MatAnimJoint* matanimjoint,
+                        HSD_ShapeAnimJoint* shapeanimjoint)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjAddAnimAllRec(jobj, animjoint, matanimjoint, shapeanimjoint,
+                             &visit);
+    PCPort_JObjVisitDestroy(&visit);
+}
+
+static void PCPort_JObjAnimAllRec(HSD_JObj* jobj, PCPort_JObjVisit* visit)
+{
+    while (jobj != NULL) {
+        HSD_JObj* next;
+
+        if (!PCPort_JObjVisitMark(visit, jobj)) {
+            break;
+        }
+        next = jobj->next;
+        HSD_JObjAnim(jobj);
+        PCPort_JObjAnimAllRec(jobj->child, visit);
+        jobj = next;
+    }
+}
+
+void HSD_JObjAnimAll(HSD_JObj* jobj)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_JObjAnimAllRec(jobj, &visit);
+    PCPort_JObjVisitDestroy(&visit);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -472,10 +792,13 @@ static void PCPort_StartAObj(HSD_AObj* aobj)
     }
 }
 
-void PCPort_HSDStartAnimAll(HSD_JObj* root)
+static void PCPort_HSDStartAnimAllRec(HSD_JObj* root, PCPort_JObjVisit* visit)
 {
     HSD_JObj* j;
     for (j = root; j != NULL; j = j->next) {
+        if (!PCPort_JObjVisitMark(visit, j)) {
+            break;
+        }
         PCPort_StartAObj(j->aobj);
         if (union_type_dobj(j)) {
             HSD_DObj* d;
@@ -491,9 +814,18 @@ void PCPort_HSDStartAnimAll(HSD_JObj* root)
             }
         }
         if (j->child != NULL) {
-            PCPort_HSDStartAnimAll(j->child);
+            PCPort_HSDStartAnimAllRec(j->child, visit);
         }
     }
+}
+
+void PCPort_HSDStartAnimAll(HSD_JObj* root)
+{
+    PCPort_JObjVisit visit;
+
+    PCPort_JObjVisitInit(&visit);
+    PCPort_HSDStartAnimAllRec(root, &visit);
+    PCPort_JObjVisitDestroy(&visit);
 }
 
 #endif /* PCPORT */
