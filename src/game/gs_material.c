@@ -153,7 +153,7 @@
  *    - fn_800EB5A0: GX command batch (0x140 bytes)
  *    - fn_800EB6E0: Texture setup (0x224 bytes)
  *    - fn_800EB904: Large render setup (0x5E8 bytes)
- *    - fn_800EBEEC: Render config (0x1FC bytes)
+ *    - _modelSetRotateEulerToQuatAll__FP9_HSD_JObj: Render config (0x1FC bytes)
  *    - fn_800EC0E8: SetAlpha (0x4C bytes)
  *    - fn_800EC134: UpdateMObjColor (0x20 bytes)
  *    - fn_800EC154: GetMObjPtr (0xC bytes)
@@ -735,7 +735,7 @@ extern void fn_800EB340(void* entry);
 extern void fn_800EB414();
 extern void fn_800EB6E0(void*, void*, void*, void*, f64);
 extern void fn_800EB904(void);
-extern void fn_800EBEEC(void*);
+extern void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void*);
 extern void fn_800EC1E4();
 extern void fn_800EC208();
 extern void fn_800EC2A4(void*, f32);
@@ -4555,7 +4555,7 @@ void fn_800EB528(void* entry) {
     *(u32*)((u8*)entry + 0x10) = (u32)((void*(*)(void*))fn_801A0FBC)(src);
     src = *(void**)*(void**)((u8*)entry + 0x4);
     *(u32*)((u8*)entry + 0x14) = (u32)((void*(*)(void*))fn_801A0FBC)(src);
-    ((void(*)(void*))fn_800EBEEC)(*(void**)((u8*)entry + 0xc));
+    ((void(*)(void*))_modelSetRotateEulerToQuatAll__FP9_HSD_JObj)(*(void**)((u8*)entry + 0xc));
 }
 #endif
 
@@ -4712,13 +4712,13 @@ void fn_800EB904(void) {
 }
 #endif
 
-/* fn_800EBEEC -- Render config | Size: 0x1FC */
+/* _modelSetRotateEulerToQuatAll__FP9_HSD_JObj -- Render config | Size: 0x1FC */
 #if 0
-asm void fn_800EBEEC(void) {
+asm void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void) {
 #include "src/game/gs_material_fn_800EBEEC.inc"
 }
 #else
-void fn_800EBEEC(void* r23) {
+void _modelSetRotateEulerToQuatAll__FP9_HSD_JObj(void* r23) {
     void* r31;
     void* r30;
     void* r29;
@@ -4764,7 +4764,7 @@ void fn_800EBEEC(void* r23) {
                                                                 if (!(*(u32*)((u8*)r24 + 0x14) & 0x80000)) {
                                                                     r23 = *(void**)((u8*)r24 + 0x10);
                                                                     while (r23 != NULL) {
-                                                                        ((void(*)(void*))fn_800EBEEC)(r23);
+                                                                        ((void(*)(void*))_modelSetRotateEulerToQuatAll__FP9_HSD_JObj)(r23);
                                                                         r23 = *(void**)((u8*)r23 + 0x8);
                                                                     }
                                                                 }
