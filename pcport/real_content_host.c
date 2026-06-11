@@ -263,17 +263,6 @@ static u8 ClassifyTextureExpStageKind(const PCPortTranslatedTexture* texture,
         return PCPORT_TEXP_STAGE_NONE;
     }
 
-    /* A directly-sampleable format (I/IA/RGB/CI/CMPR) is a plain texture
-     * stage. A non-NULL TEV is fine as long as it is NOT the special I8
-     * colour-ramp kind: the generic TEV just selects a blend mode, which the
-     * pipeline already applies via tevMode. Requiring tevArchiveOffset==0 here
-     * is what rejected the RGBA8/palettized ground/ruins nodes (they carry a
-     * plain modulate TEV) and left them rendering as a flat material colour. */
-    if (IsNoTevDirectSampleFormat(texture->format) &&
-        texture->tev.kind == PCPORT_TRANSLATED_TEV_NONE) {
-        return PCPORT_TEXP_STAGE_DIRECT_SAMPLE;
-    }
-
     if (texture->format == GX_TF_I8 &&
         texture->tev.kind == PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP) {
         return PCPORT_TEXP_STAGE_I8_RAMP_SAMPLE;
@@ -286,6 +275,15 @@ static u8 ClassifyTextureExpStageKind(const PCPortTranslatedTexture* texture,
         (texture->flags & 0x00F00000u) == 0x00300000u &&
         HasZeroColorRamp(texture)) {
         return PCPORT_TEXP_STAGE_I8_MASK_MODULATE;
+    }
+
+    /* A directly-sampleable format (I/IA/RGB/CI/CMPR) is a plain texture
+     * stage unless one of the narrower I8 expression cases above claimed it.
+     * A generic TEV only selects a blend mode, which the pipeline applies via
+     * tevMode. */
+    if (IsNoTevDirectSampleFormat(texture->format) &&
+        texture->tev.kind != PCPORT_TRANSLATED_TEV_I8_COLOR_RAMP) {
+        return PCPORT_TEXP_STAGE_DIRECT_SAMPLE;
     }
 
     return PCPORT_TEXP_STAGE_NONE;

@@ -52,6 +52,7 @@
 #include "real_content_host.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 /* ========================================================================= */
@@ -83,6 +84,272 @@ void HSD_Free(void* ptr)
     if (ptr != NULL) {
         free(ptr);
     }
+}
+
+/* ========================================================================= */
+/*  TExp construction bridge (host override for placeholder labels)           */
+/* ========================================================================= */
+
+#define PCPORT_HSD_TE_ZERO 0U
+#define PCPORT_HSD_TE_TEV  1U
+#define PCPORT_HSD_TE_TEX  2U
+#define PCPORT_HSD_TE_RAS  3U
+#define PCPORT_HSD_TE_CNST 4U
+
+#define PCPORT_HSD_TE_0 7U
+
+typedef struct PCPort_TEArg {
+    u8 type;
+    u8 sel;
+    u8 arg;
+    u8 pad;
+    HSD_TExp* exp;
+} PCPort_TEArg;
+
+typedef struct PCPort_TETev {
+    u32 type;
+    HSD_TExp* next;
+    s32 c_ref;
+    u8 c_dst;
+    u8 c_op;
+    u8 c_bias;
+    u8 c_scale;
+    u8 c_clamp;
+    u8 c_pad[3];
+    s32 a_ref;
+    u8 a_dst;
+    u8 a_op;
+    u8 a_bias;
+    u8 a_scale;
+    u8 a_clamp;
+    u8 a_pad[3];
+    PCPort_TEArg c_in[4];
+    PCPort_TEArg a_in[4];
+    HSD_TObj* tex;
+    u8 chan;
+    u8 pad[3];
+} PCPort_TETev;
+
+typedef struct PCPort_TECnst {
+    u32 type;
+    HSD_TExp* next;
+    void* val;
+    u32 comp;
+    u32 ctype;
+    u8 reg;
+    u8 idx;
+    u8 ref;
+    u8 pad;
+} PCPort_TECnst;
+
+union HSD_TExp {
+    u32 type;
+    struct {
+        u32 type;
+        HSD_TExp* next;
+    } comm;
+    PCPort_TETev tev;
+    PCPort_TECnst cnst;
+};
+
+static u32 PCPort_TExpGetType(HSD_TExp* texp)
+{
+    uintptr_t raw = (uintptr_t) texp;
+
+    if (raw == 0U) {
+        return PCPORT_HSD_TE_ZERO;
+    }
+    if (raw == (uintptr_t) -1) {
+        return PCPORT_HSD_TE_TEX;
+    }
+    if (raw == (uintptr_t) -2) {
+        return PCPORT_HSD_TE_RAS;
+    }
+    return texp->type;
+}
+
+static HSD_TExp* PCPort_TExpAlloc(u32 type)
+{
+    HSD_TExp* texp = (HSD_TExp*) HSD_MemAlloc((s32) sizeof(HSD_TExp));
+
+    if (texp == NULL) {
+        return NULL;
+    }
+    memset(texp, 0, sizeof(HSD_TExp));
+    texp->type = type;
+    return texp;
+}
+
+static void PCPort_TExpLink(HSD_TExp** list, HSD_TExp* texp)
+{
+    if (list == NULL || texp == NULL) {
+        return;
+    }
+    texp->comm.next = *list;
+    *list = texp;
+}
+
+static void PCPort_TExpInitArg(PCPort_TEArg* arg)
+{
+    arg->type = (u8) PCPORT_HSD_TE_ZERO;
+    arg->sel = (u8) PCPORT_HSD_TE_0;
+    arg->arg = 0xFF;
+    arg->pad = 0;
+    arg->exp = NULL;
+}
+
+static void PCPort_TExpSetArg(PCPort_TEArg* arg, u32 sel, HSD_TExp* exp)
+{
+    arg->type = (u8) PCPort_TExpGetType(exp);
+    arg->sel = (u8) sel;
+    arg->arg = 0xFF;
+    arg->pad = 0;
+    arg->exp = exp;
+}
+
+static BOOL PCPort_TExpIsTev(HSD_TExp* texp)
+{
+    return PCPort_TExpGetType(texp) == PCPORT_HSD_TE_TEV;
+}
+
+static HSD_TExp* PCPort_TExpFindCnst(HSD_TExp** list, void* val, u32 comp,
+                                     u32 ctype)
+{
+    HSD_TExp* texp;
+
+    if (list == NULL) {
+        return NULL;
+    }
+    for (texp = *list; texp != NULL; texp = texp->comm.next) {
+        if (PCPort_TExpGetType(texp) == PCPORT_HSD_TE_CNST &&
+            texp->cnst.val == val && texp->cnst.comp == comp &&
+            texp->cnst.ctype == ctype) {
+            return texp;
+        }
+    }
+    return NULL;
+}
+
+HSD_TExp* fn_801B707C(HSD_TExp** list)
+{
+    HSD_TExp* texp = PCPort_TExpAlloc(PCPORT_HSD_TE_TEV);
+    s32 i;
+
+    if (texp == NULL) {
+        return NULL;
+    }
+    texp->tev.c_ref = 0;
+    texp->tev.c_dst = 0;
+    texp->tev.c_op = 0;
+    texp->tev.c_bias = 0;
+    texp->tev.c_scale = 0;
+    texp->tev.c_clamp = 1;
+    texp->tev.a_ref = 0;
+    texp->tev.a_dst = 0;
+    texp->tev.a_op = 0;
+    texp->tev.a_bias = 0;
+    texp->tev.a_scale = 0;
+    texp->tev.a_clamp = 1;
+    texp->tev.tex = NULL;
+    texp->tev.chan = 0xFF;
+    for (i = 0; i < 4; i++) {
+        PCPort_TExpInitArg(&texp->tev.c_in[i]);
+        PCPort_TExpInitArg(&texp->tev.a_in[i]);
+    }
+    PCPort_TExpLink(list, texp);
+    return texp;
+}
+
+HSD_TExp* fn_801B6F5C(void* val, u32 comp, u32 ctype, HSD_TExp** list)
+{
+    HSD_TExp* texp = PCPort_TExpFindCnst(list, val, comp, ctype);
+
+    if (texp != NULL) {
+        return texp;
+    }
+    texp = PCPort_TExpAlloc(PCPORT_HSD_TE_CNST);
+    if (texp == NULL) {
+        return NULL;
+    }
+    texp->cnst.val = val;
+    texp->cnst.comp = comp;
+    texp->cnst.ctype = ctype;
+    texp->cnst.reg = 0xFF;
+    texp->cnst.idx = 0xFF;
+    texp->cnst.ref = 0;
+    PCPort_TExpLink(list, texp);
+    return texp;
+}
+
+void fn_801B5E40(HSD_TExp* texp, HSD_TObj* tobj, u32 chan)
+{
+    if (!PCPort_TExpIsTev(texp)) {
+        return;
+    }
+    texp->tev.tex = tobj;
+    texp->tev.chan = (u8) chan;
+}
+
+void fn_801B6E74(HSD_TExp* texp, u32 op, u32 bias, u32 scale, u32 clamp)
+{
+    if (!PCPort_TExpIsTev(texp)) {
+        return;
+    }
+    texp->tev.c_op = (u8) op;
+    texp->tev.c_bias = (u8) bias;
+    texp->tev.c_scale = (u8) scale;
+    texp->tev.c_clamp = (u8) clamp;
+}
+
+void fn_801B6CD8(HSD_TExp* texp, u32 op, u32 bias, u32 scale, u32 clamp)
+{
+    if (!PCPort_TExpIsTev(texp)) {
+        return;
+    }
+    texp->tev.a_op = (u8) op;
+    texp->tev.a_bias = (u8) bias;
+    texp->tev.a_scale = (u8) scale;
+    texp->tev.a_clamp = (u8) clamp;
+}
+
+void fn_801B64EC(HSD_TExp* texp, u32 sel0, HSD_TExp* exp0, u32 sel1,
+                 HSD_TExp* exp1, u32 sel2, HSD_TExp* exp2, u32 sel3,
+                 HSD_TExp* exp3)
+{
+    if (!PCPort_TExpIsTev(texp)) {
+        return;
+    }
+    PCPort_TExpSetArg(&texp->tev.c_in[0], sel0, exp0);
+    PCPort_TExpSetArg(&texp->tev.c_in[1], sel1, exp1);
+    PCPort_TExpSetArg(&texp->tev.c_in[2], sel2, exp2);
+    PCPort_TExpSetArg(&texp->tev.c_in[3], sel3, exp3);
+}
+
+void fn_801B5F08(HSD_TExp* texp, u32 sel0, HSD_TExp* exp0, u32 sel1,
+                 HSD_TExp* exp1, u32 sel2, HSD_TExp* exp2, u32 sel3,
+                 HSD_TExp* exp3)
+{
+    if (!PCPort_TExpIsTev(texp)) {
+        return;
+    }
+    PCPort_TExpSetArg(&texp->tev.a_in[0], sel0, exp0);
+    PCPort_TExpSetArg(&texp->tev.a_in[1], sel1, exp1);
+    PCPort_TExpSetArg(&texp->tev.a_in[2], sel2, exp2);
+    PCPort_TExpSetArg(&texp->tev.a_in[3], sel3, exp3);
+}
+
+s32 fn_801B7C60(HSD_TExp* texp)
+{
+    return PCPort_TExpIsTev(texp) ? 1 : 0;
+}
+
+s32 fn_801B4300(void* tevdesc_out, HSD_TExp** texp_list)
+{
+    (void) texp_list;
+    if (tevdesc_out != NULL) {
+        *(void**) tevdesc_out = NULL;
+    }
+    return 0;
 }
 
 /* ========================================================================= */

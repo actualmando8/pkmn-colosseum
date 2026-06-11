@@ -42,6 +42,8 @@ Lane result:
 
 - [ ] Attack `fn_801A7128` and nearby alpha/material setter holes.
 - [x] Triage `fn_801A7128` with DeepSeek V4 Flash.
+- [x] Host-bridge the TExp helper labels that blocked safe MObj work.
+- [x] Restore the six-smoke real TObj/TExp parser verification gate.
 - [ ] Verify material state changes on real PC-port scene content.
 
 Active lane:
@@ -53,8 +55,20 @@ Active lane:
 Lane result:
 
 - No overlay landed; the generated `fn_801A7128` candidate was compile-plausible but rejected for runtime safety.
-- Blocker: `fn_801A7128` expects TEV/TExp helper semantics for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, and `fn_801B7C60`, but the current PC-linked `src\hsd\hsd_texp.c` definitions at those labels are placeholder texture/GObj routines with incompatible signatures.
-- Next MObj action: recover or host-bridge the TExp helper layer first, then retry `fn_801A7128`.
+- Main checkout added BOOT-order host overrides in `pcport\hsd_host.c` for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B6CD8`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, `fn_801B7C60`, and `fn_801B4300`.
+- Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
+- Remaining blocker: `fn_801A7128` still cannot safely land until MObj/TObj method wiring is repaired. `hsdMObj.make_texp` and `hsdTObj.make_texp` remain unset in the current source init path, and `src\hsd\hsd_tobj_ext.c` `fn_801BC8BC` / `fn_801BCF30` are still placeholders.
+- Next MObj action: implement a minimal safe TObj `make_texp` bridge and PC-port method init wiring, then retry the `fn_801A7128` overlay.
+
+Verification:
+
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1708 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --real-textured-scene-slice-smoke`
+- `build_pc\pcport_bootstrap.exe --real-scene-slice-3-smoke`
+- `build_pc\pcport_bootstrap.exe --real-scene-slice-4-smoke` -> passed with `kind0=2 stage00=1 stage01=2 stages0=2 kind1=1 stage10=1 stages1=1`.
+- `build_pc\pcport_bootstrap.exe --real-tev-scene-slice-3-smoke`
+- `build_pc\pcport_bootstrap.exe --real-tev-scene-slice-2-smoke`
+- `build_pc\pcport_bootstrap.exe --gsgfx-visible-smoke`
 
 ## Batch 5D - hsd_cobj Camera Runtime Holes
 
