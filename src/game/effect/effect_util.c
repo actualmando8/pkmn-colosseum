@@ -134,8 +134,6 @@ extern void fn_801FBD58(u16 handle);
 extern void fn_801FBD28(void);
 extern u16  lbl_8047AEA0;
 /* renamed symbols referenced by asm incs (symbolmap port) */
-extern void _dbgMenuGetLink__Fl();
-extern void _koukaOneExec__FUlPvPvPl();
 extern void gamedataAttestCreate();
 extern void gamedataAttestInit();
 extern void gamedataGetStatus();
@@ -175,7 +173,7 @@ extern u32 fn_80133B50(u32 arg0, u32* outMax);
 extern u32 fn_80133BE4();
 extern void fn_80133C3C(void);
 extern u32 fn_80133E1C();
-extern void fn_80134164(void);
+extern void _dbgMenuGetLink__Fl(void);
 extern u32 fn_80134274(void);
 extern s32 fn_801342B8(void);
 extern u32 fn_80134304(void);
@@ -198,7 +196,7 @@ extern void fn_80135BA0(void* ptr, u32 val);
 extern f32 fn_80135C10(void* ptr);
 extern void fn_80135C90(void* dst, void* src);
 extern void fn_80135CE8(void*);
-extern void fn_8013613C(void);
+extern void _koukaOneExec__FUlPvPvPl(void);
 
 #if 0
 asm void fn_801316A8(void) {
@@ -2607,7 +2605,7 @@ void fn_80133E6C(void) {
     extern u32 lbl_80478F8C;
     extern void fn_800057A8();
     extern void fn_80133E6C();
-    extern void fn_80134164();
+    extern void _dbgMenuGetLink__Fl();
     extern void fn_80134228();
     extern void fn_80134258();
     extern u32 fn_80134274();
@@ -2746,7 +2744,7 @@ void fn_80133E6C(void) {
                                     r4 = r4 + r0;
                                     fn_80133E6C();
                                 }
-                                fn_80134164();
+                                _dbgMenuGetLink__Fl();
                                 r3 = (s16)r3;
                             }
                             r29 = r3 + r29;
@@ -2839,11 +2837,11 @@ void fn_80133E6C(void) {
 extern u32 lbl_80478F88;
 extern u32 lbl_80478F8C;
 #if 1
-asm void fn_80134164(void) {
+asm void _dbgMenuGetLink__Fl(void) {
 #include "src/game/effect/effect_util_fn_80134164.inc"
 }
 #else
-s32 fn_80134164(s32 idx) {
+s32 _dbgMenuGetLink__Fl(s32 idx) {
     s32 count;
     u8* result;
 
@@ -4337,7 +4335,7 @@ asm void fn_80136078(void) {
 void fn_80136078(void) {
     extern void fn_80135F58(void);
     extern void fn_80135F90(void);
-    extern void fn_8013613C(void);
+    extern void _koukaOneExec__FUlPvPvPl(void);
     u32 r26;
     u32 r27;
     u32 r28;
@@ -4351,9 +4349,9 @@ void fn_80136078(void) {
     r27 = 0;
     r28 = 0;
     if (r29 != 0) {
-        fn_8013613C();
+        _koukaOneExec__FUlPvPvPl();
     } else {
-        fn_8013613C();
+        _koukaOneExec__FUlPvPvPl();
     }
     r31 = fn_80135F90();
     r31 &= 0xFFFF;
@@ -4364,9 +4362,9 @@ void fn_80136078(void) {
         r0 &= 0xFFFF;
         if (r0 != 0) {
             if (r29 != 0) {
-                fn_8013613C(r26, r27, r28, r29 + ((r30 & 0xFFFF) + 1) * 4);
+                _koukaOneExec__FUlPvPvPl(r26, r27, r28, r29 + ((r30 & 0xFFFF) + 1) * 4);
             } else {
-                fn_8013613C(r26, r27, r28, 0);
+                _koukaOneExec__FUlPvPvPl(r26, r27, r28, 0);
             }
         }
         r30++;
@@ -4379,11 +4377,11 @@ end:;
 /* 0x8013613C | 0x22C */
 extern void fn_801F0134(void);
 #if 1
-asm void fn_8013613C(void) {
+asm void _koukaOneExec__FUlPvPvPl(void) {
 #include "src/game/effect/effect_util_fn_8013613C.inc"
 }
 #else
-void fn_8013613C(void) {
+void _koukaOneExec__FUlPvPvPl(void) {
     extern void fn_80135D10();
     extern void fn_80135E44();
     extern void fn_80135FBC();
