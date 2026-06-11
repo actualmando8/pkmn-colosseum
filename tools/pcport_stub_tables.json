@@ -174,7 +174,35 @@
    "fn_8011F77C",
    "fn_8011F260",
    "fn_8012DE94",
-   "fn_8012BEB4"
+   "fn_8012BEB4",
+   "fn_801190DC",
+   "fn_80128E24",
+   "fn_80116164",
+   "fn_8012E388",
+   "fn_80124410"
   ]
+ },
+ "replace_body": {
+  "game/gs_field_world.c": {
+   "GSfield_TransitionStateMachine": "build_pc/bodies/gs_field_world/GSfield_TransitionStateMachine.c",
+   "GSfield_RenderPass": "build_pc/bodies/gs_field_world/GSfield_RenderPass.c",
+   "GSfield_ObjectBatchUpdate": "build_pc/bodies/gs_field_world/GSfield_ObjectBatchUpdate.c",
+   "GSfield_ProcessTriggers": "build_pc/bodies/gs_field_world/GSfield_ProcessTriggers.c",
+   "fn_8012C0B4": "build_pc/bodies/gs_field_world/fn_8012C0B4.c",
+   "fn_8012E7B8": "build_pc/bodies/gs_field_world/fn_8012E7B8.c",
+   "fn_8012FCD4": "build_pc/bodies/gs_field_world/fn_8012FCD4.c",
+   "fn_8012BCA4": "build_pc/bodies/gs_field_world/fn_8012BCA4.c",
+   "fn_80119BD0": "build_pc/bodies/gs_field_world/fn_80119BD0.c",
+   "fn_80129280": "build_pc/bodies/gs_field_world/fn_80129280.c",
+   "fn_80130770": "build_pc/bodies/gs_field_world/fn_80130770.c",
+   "fn_80130660": "build_pc/bodies/gs_field_world/fn_80130660.c",
+   "fn_80130890": "build_pc/bodies/gs_field_world/fn_80130890.c",
+   "fn_80130A88": "build_pc/bodies/gs_field_world/fn_80130A88.c",
+   "fn_80130BB0": "build_pc/bodies/gs_field_world/fn_80130BB0.c",
+   "fn_801309A0": "build_pc/bodies/gs_field_world/fn_801309A0.c",
+   "fn_8011538C": "build_pc/bodies/gs_field_world/fn_8011538C.c",
+   "fn_80123C54": "build_pc/bodies/gs_field_world/fn_80123C54.c",
+   "fn_80129840": "build_pc/bodies/gs_field_world/fn_80129840.c"
+  }
  }
 }

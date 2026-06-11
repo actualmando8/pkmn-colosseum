@@ -47,6 +47,11 @@ build.ninja
 # PC port host build (CMake out-of-source dir + GLFW FetchContent clone) and the
 # generated GLAD loader — all regenerable via tools/pcport_build.ps1.
 build_pc/
+# functional-decomp replacement bodies (inputs to pcport_gen REPLACE_BODY) stay tracked
+!build_pc/
+build_pc/*
+!build_pc/bodies/
+!build_pc/render_anim.py
 third_party/
 
 # decompctx output
