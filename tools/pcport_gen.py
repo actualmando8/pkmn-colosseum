@@ -324,13 +324,9 @@ FLIP_AS_STUB = {
         # 10 batch-2 fns -> functional #else decomps 2026-06-10 (incl. fn_8012CA84)
         # arity-erroring flipped bodies (0-arg pseudo-register call sites):
         # (fn_8011BEB4, fn_8012A5B0 removed 2026-06-10 — functional #else decomps)
-        "fn_801183EC", "fn_8011F910",
-        "fn_8011FCA4", "fn_8011FDC8", "fn_8012086C", "fn_80122370", "fn_801237B8",
-        "fn_801240C4", "fn_8012795C", "fn_8012805C", "fn_801286C8", "fn_80128A64", "fn_8012AD50", "fn_8012EBD4",
         # 0-arg residue call to the now-prototyped fn_8012A5B0:
         # 0-arg residue calls to the now-prototyped fn_801254B4:
-        "fn_801226D0",
-    },
+        },
     "game/effect/effect_util.c": {
         "fn_801338A4", "fn_80135030", "fn_80136078",
     },

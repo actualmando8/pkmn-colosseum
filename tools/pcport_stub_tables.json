@@ -21,7 +21,10 @@
   "game/colosseum_battle.c": [],
   "game/colosseum_script.c": [],
   "game/gs_field_world.c": [
-   "fn_8012C660"
+   "fn_8012BCA4",
+   "fn_8012C0B4",
+   "fn_8012FCD4",
+   "fn_8012E7B8"
   ]
  },
  "stub_body": {
@@ -137,6 +140,9 @@
    "fn_8023FB5C",
    "fn_8023FD44",
    "fn_8023FDDC"
+  ],
+  "game/gs_field_world.c": [
+   "GSfield_ProcessTriggers"
   ]
  },
  "kr_def": {
@@ -165,6 +171,12 @@
    "fn_80239984",
    "fn_802399FC",
    "fn_8023C370"
+  ],
+  "game/gs_field_world.c": [
+   "fn_8011F77C",
+   "fn_8011F260",
+   "fn_8012DE94",
+   "fn_8012BEB4"
   ]
  }
 }
