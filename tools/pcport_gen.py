@@ -69,6 +69,16 @@ PREAMBLE = {
 # silenced by the build's -w. Applied only to the generated copy; originals stay pristine.
 # Map: rel-path -> { label_name: canonical_extern_decl_without_trailing_semicolon }
 EXTERN_UNIFY = {
+    "game/colosseum_battle.c": {
+        # f32 decls 2:1 over u32; the lone u32 read converts (flagged for runtime QA).
+        "lbl_8047E6D8": "extern f32 lbl_8047E6D8",
+    },
+    "game/colosseum_script.c": {
+        # u8-scalar decls dominate 20:1; the lone array-decl site decays fine via &.
+        "lbl_80478D78": "extern u8 lbl_80478D78",
+        # u8-scalar decls dominate; the lone u32 read converts (flagged for runtime QA).
+        "lbl_80478D7D": "extern u8 lbl_80478D7D",
+    },
     "game/gs_field_world.c": {
         # u8-scalar vs u8[] decls; all uses are `&lbl` — array form keeps both legal.
         "lbl_80426BD0": "extern u8 lbl_80426BD0[]",
@@ -151,6 +161,14 @@ FUNC_STUB_DROP = {
 # match the real definition's signature so the forward decl and definition agree.
 # Map: rel-path -> { fn_name: canonical_prototype_without_trailing_semicolon }.
 FUNC_PROTO_RETYPE = {
+    # Step-0 harvest: fn_8012640C result is masked (`& 0xFF`) here; the TU's void*
+    # majority decl breaks the arithmetic. Real return is u32 (see gs_field_world def).
+    "game/colosseum_event.c": {
+        "fn_8012640C": "u32 fn_8012640C()",
+    },
+    "game/colosseum_battle.c": {
+        "fn_8012640C": "u32 fn_8012640C()",
+    },
     # Campaign Phase 2 chunk 2a (workflow wf_ad563b5e):
     "game/fsys/fsys_load.c": {
         "fn_8017F6B4": "void* fn_8017F6B4()",
@@ -302,13 +320,19 @@ FLIP_AS_STUB = {
     # call shape. These four are the TU's real decomp backlog (incl. the floor-
     # transition boss fn_8012640C and the object-update dispatcher fn_801254B4).
     "game/gs_field_world.c": {
-        "fn_8012640C", "fn_801254B4", "fn_8012CA84", "fn_80117514",
+        # (fn_8012640C, fn_801254B4 removed 2026-06-10 — functional #else decomps)
+        "fn_8012CA84", "fn_80117514",
         # arity-erroring flipped bodies (0-arg pseudo-register call sites):
-        "fn_801183EC", "fn_8011A0A8", "fn_8011BBD8", "fn_8011BEB4", "fn_8011F910",
+        # (fn_8011BEB4, fn_8012A5B0 removed 2026-06-10 — functional #else decomps)
+        "fn_801183EC", "fn_8011A0A8", "fn_8011BBD8", "fn_8011F910",
         "fn_8011FCA4", "fn_8011FDC8", "fn_8012086C", "fn_80122370", "fn_801237B8",
         "fn_801240C4", "fn_8012795C", "fn_8012805C", "fn_80128300", "fn_80128524",
-        "fn_801286C8", "fn_80128A64", "fn_80128E38", "fn_80129094", "fn_8012A5B0",
+        "fn_801286C8", "fn_80128A64", "fn_80128E38", "fn_80129094",
         "fn_8012AD50", "fn_8012EBD4",
+        # 0-arg residue call to the now-prototyped fn_8012A5B0:
+        "fn_80130054",
+        # 0-arg residue calls to the now-prototyped fn_801254B4:
+        "fn_80120674", "fn_801226D0",
     },
     "game/effect/effect_util.c": {
         "fn_801338A4", "fn_80135030", "fn_80136078",
@@ -344,6 +368,33 @@ STUB_BODY = {
         "fn_8006A7E8", "fn_8006A814",
     },
 }
+
+# Per-file: definitions to convert to K&R parameter style — `ret f(u32 a, u8* b) {`
+# becomes `ret f(a, b) u32 a; u8* b; {`. Keeps the REAL body (often a functional
+# Ghidra import) while making the function accept any call arity (residue callers
+# pass extra args; cdecl caller-pops makes that harmless on x86).
+KR_DEF = {
+    # active 1-param defs the (asm-faithful) fn_801254B4 dispatcher calls with 2 args;
+    # K&R def accepts the extra arg (ignored — same as the PPC register behavior).
+    "game/gs_field_world.c": {"fn_8011CF44", "fn_8011CF70"},
+}
+
+# External table overlay: tools/pcport_stub_tables.json (written by the harvest driver
+# tools/pcport_harvest.py) merges INTO the in-file tables above. Format:
+#   { "auto_unify": ["rel.c", ...],
+#     "flip_as_stub": {"rel.c": ["fn", ...]},
+#     "stub_body":    {"rel.c": ["fn", ...]} }
+_TBL = ROOT / "tools" / "pcport_stub_tables.json"
+if _TBL.exists():
+    import json as _json
+    _ext = _json.loads(_TBL.read_text())
+    AUTO_UNIFY_FILES.update(_ext.get("auto_unify", []))
+    for _k, _v in _ext.get("flip_as_stub", {}).items():
+        FLIP_AS_STUB.setdefault(_k, set()).update(_v)
+    for _k, _v in _ext.get("stub_body", {}).items():
+        STUB_BODY.setdefault(_k, set()).update(_v)
+    for _k, _v in _ext.get("kr_def", {}).items():
+        KR_DEF.setdefault(_k, set()).update(_v)
 
 # A standalone function PROTOTYPE line (declaration, not definition): begins with
 # `extern`, names fn_X, has a parameter list, and ends with `;` (no body brace).
@@ -421,6 +472,74 @@ def retype_func_protos(lines, mapping):
     return out, rewrites
 
 
+def kr_definitions(lines, names):
+    """Convert the named functions' definitions to K&R parameter style."""
+    changed = 0
+    for idx, ln in enumerate(lines):
+        if not ln or ln[0].isspace() or ln.rstrip().endswith(';'):
+            continue
+        m = _DEF_SIG_RE.match(ln)
+        if not m or m.group('fn') not in names:
+            continue
+        if m.group('trail') is None and not _brace_follows(lines, idx):
+            continue
+        args = m.group('args').strip()
+        if args in ('', 'void'):
+            # no params: plain K&R parens
+            lines[idx] = re.sub(r'\((?:\s*void\s*)?\)', '()', ln, count=1)
+            changed += 1
+            continue
+        # split top-level commas, take the last identifier of each param as its name
+        parts, depth, cur = [], 0, ''
+        for ch in args:
+            if ch == ',' and depth == 0:
+                parts.append(cur); cur = ''
+            else:
+                if ch == '(':
+                    depth += 1
+                elif ch == ')':
+                    depth -= 1
+                cur += ch
+        parts.append(cur)
+        names_only, decls = [], []
+        ok = True
+        for p in parts:
+            pm = re.search(r'([A-Za-z_]\w*)\s*(?:\[\s*\d*\s*\])?\s*$', p)
+            if not pm:
+                ok = False
+                break
+            names_only.append(pm.group(1))
+            decls.append(p.strip() + ';')
+        if not ok:
+            continue
+        trailer = ln[m.end('args'):].lstrip()  # ')' onward — preserve trailing '{'
+        brace = ' {' if trailer.rstrip().endswith('{') else ''
+        lines[idx] = (f"{m.group('ret')}{m.group('fn')}({', '.join(names_only)}) "
+                      f"{' '.join(decls)}{brace}")
+        changed += 1
+    return lines, changed
+
+
+_TYPE_ONLY_RE = re.compile(r'^(?:static\s+)?(?:const\s+)?[A-Za-z_][\w]*(?:\s*\*+)?\s*$')
+_SIG_START_RE = re.compile(r'^[A-Za-z_]\w*\s*\(')
+
+
+def join_split_sigs(lines):
+    """Ghidra imports sometimes split a definition signature across two lines
+    (`u32` newline `fn_X(void)`). Join them so the line-based passes see them."""
+    out, i, joined = [], 0, 0
+    while i < len(lines):
+        if (lines[i] and not lines[i][0].isspace() and _TYPE_ONLY_RE.match(lines[i])
+                and i + 1 < len(lines) and _SIG_START_RE.match(lines[i + 1])):
+            out.append(lines[i].rstrip() + ' ' + lines[i + 1])
+            joined += 1
+            i += 2
+            continue
+        out.append(lines[i])
+        i += 1
+    return out, joined
+
+
 def stub_bodies(lines, names):
     """Replace the DEFINITION body of each named function with a neutral K&R stub
     (`<ret> name() { [return 0;] }`). The definition is matched at file scope; its
@@ -432,7 +551,7 @@ def stub_bodies(lines, names):
         if ln and not ln[0].isspace() and not ln.rstrip().endswith(';'):
             m = _DEF_SIG_RE.match(ln)
         if m and m.group('fn') in names and m.group('fn') not in _C_KEYWORDS and \
-           (ln.rstrip().endswith('{') or (i + 1 < n and lines[i + 1].lstrip().startswith('{'))):
+           (m.group('trail') is not None or _brace_follows(lines, i)):
             ret = ' '.join(m.group('ret').replace('static', '').split())
             name = m.group('fn')
             # advance to the opening brace, then to its balanced close
@@ -488,20 +607,56 @@ IF_RE    = re.compile(r'^\s*#\s*if')          # #if / #ifdef / #ifndef
 # or the next line, never a trailing `;`). Used by FLIP_AS_STUB and auto-unify.
 _DEF_SIG_RE = re.compile(
     r'^(?P<ret>(?:static\s+)?(?:const\s+)?[A-Za-z_][\w\s]*?[\s\*]+\**)'
-    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>[^;{}()]*)\)\s*\{?\s*$')
+    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>(?:[^;{}()]|\([^;{}()]*\))*)\)\s*(?P<trail>\{.*)?$')
 
 _C_KEYWORDS = {"return", "if", "while", "for", "switch", "goto", "else", "do",
                "case", "sizeof", "typedef", "break", "continue"}
+
+
+_RAW_ASM_RE = re.compile(r'^\s*asm\s+(?P<ret>[\w\s\*]+?)\s*\b(?P<fn>[A-Za-z_]\w*)\s*\([^)]*\)\s*\{')
 
 
 def transform(lines, stub_fns=None):
     """Flip `#if 1 asm {...} #else <C> #endif` wrappers to their #else C. Wrappers whose
     fn name is in `stub_fns` (pseudo-register-broken #else bodies: call sites missing
     args) are emitted as a neutral stub built from the #else C signature instead —
-    functionally identical to the auto-stub link baseline, never worse."""
+    functionally identical to the auto-stub link baseline, never worse.
+    RAW asm blocks (no #if guard, preprocessor-live) are emitted as neutral K&R stubs —
+    clang can't assemble PPC; the stub equals the auto-stub link baseline."""
     stub_fns = stub_fns or set()
     out, i, n, flipped, stubbed = [], 0, len(lines), 0, 0
+    pp = [True]  # preprocessor active-state stack for raw (non-wrapper) lines
     while i < n:
+        s = lines[i].lstrip()
+        if s.startswith('#if'):
+            cond_active = not re.match(r'^#\s*if\s+0\b', s)
+            pp.append(pp[-1] and cond_active)
+        elif s.startswith('#else') and len(pp) > 1:
+            pp[-1] = pp[-2] and not pp[-1]
+        elif s.startswith('#endif') and len(pp) > 1:
+            pp.pop()
+        if pp[-1] and not IF1_RE.match(lines[i]):
+            rm = _RAW_ASM_RE.match(lines[i])
+            if rm:
+                # consume the brace-balanced asm block, emit a neutral K&R stub
+                j, depth, opened = i, 0, False
+                while j < n:
+                    for ch in lines[j]:
+                        if ch == '{':
+                            depth += 1; opened = True
+                        elif ch == '}':
+                            depth -= 1
+                    if opened and depth == 0:
+                        break
+                    j += 1
+                ret = ' '.join(rm.group('ret').split())
+                out.append(f"{ret} {rm.group('fn')}() {{")
+                out.append("    /* pcport_gen: raw asm block (preprocessor-live, no "
+                           "#else C) -> neutral stub == auto-stub baseline */")
+                out.append("}" if ret == "void" else "    return 0; }")
+                stubbed += 1
+                i = j + 1
+                continue
         if IF1_RE.match(lines[i]):
             # scan the #if-1 branch (to its #else at depth 1); is it an asm wrapper?
             k, d, else_idx, has_asm, has_inc = i + 1, 1, None, False, False
@@ -578,7 +733,18 @@ _CRT_FNS = {"sin", "cos", "tan", "sqrt", "atan", "atan2", "fabs", "floor", "ceil
 _ANY_DECL_RE = re.compile(
     r'^(?P<indent>\s*)(?P<ext>extern\s+)?'
     r'(?P<ret>(?:const\s+|unsigned\s+|signed\s+|struct\s+\w+\s+)?[A-Za-z_]\w*(?:\s+\w+)*[\s\*]+\**)'
-    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>[^;{}()]*)\)\s*;\s*(?:/\*.*\*/\s*|//.*)?$')
+    r'(?P<fn>[A-Za-z_]\w*)\s*\((?P<args>(?:[^;{}()]|\([^;{}()]*\))*)\)\s*;\s*(?:/\*.*\*/\s*|//.*)?$')
+
+
+def _brace_follows(lines, idx):
+    """True if the next non-blank line after `idx` starts with '{' (or line idx itself
+    ends with '{'). Ghidra-import bodies put a blank line between signature and brace."""
+    if lines[idx].rstrip().endswith('{'):
+        return True
+    j = idx + 1
+    while j < len(lines) and not lines[j].strip():
+        j += 1
+    return j < len(lines) and lines[j].lstrip().startswith('{')
 
 
 def _strip_comments(text):
@@ -618,8 +784,7 @@ def auto_unify(lines):
         m = _DEF_SIG_RE.match(ln)
         if not m or m.group('fn') in _C_KEYWORDS:
             continue
-        if ln.rstrip().endswith('{') or \
-           (idx + 1 < len(lines) and lines[idx + 1].lstrip().startswith('{')):
+        if m.group('trail') is not None or _brace_follows(lines, idx):
             ret = ' '.join(m.group('ret').replace('static', '').split())
             defs[m.group('fn')] = (ret, m.group('args').strip(), idx)
     # pass 2: declarations per symbol
@@ -709,6 +874,8 @@ def main():
         rel = src.resolve().relative_to(ROOT / "src")
         lines = src.read_text(errors="replace").splitlines()
         gen, flipped, stubbed = transform(lines, FLIP_AS_STUB.get(rel.as_posix()))
+        if rel.as_posix() in AUTO_UNIFY_FILES:
+            gen, _j = join_split_sigs(gen)
         body_names = STUB_BODY.get(rel.as_posix())
         if body_names:
             gen, body_stubbed = stub_bodies(gen, body_names)
@@ -716,6 +883,11 @@ def main():
         auto_uni = 0
         if rel.as_posix() in AUTO_UNIFY_FILES:
             gen, auto_uni = auto_unify(gen)
+        # AFTER auto_unify: K&R-converted defs are invisible to its defs-pass, so the
+        # decl unification must see the original prototyped definitions first.
+        kr_names_def = KR_DEF.get(rel.as_posix())
+        if kr_names_def:
+            gen, _krd = kr_definitions(gen, kr_names_def)
         unify_map = EXTERN_UNIFY.get(rel.as_posix())
         rewrites = 0
         if unify_map:

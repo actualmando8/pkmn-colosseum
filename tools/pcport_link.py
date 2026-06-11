@@ -111,6 +111,15 @@ GAME_GEN = ["game/battle/battle_main",
             # C goes live (~300 real fns incl. 40 newly-flipped field_world bodies).
             "game/gs_field_world", "game/gs_worldmap",
             "game/effect/effect_util", "game/battle/battle_scene",
+            # Step-0 wave 2 (2026-06-10): harvest driver (pcport_harvest.py +
+            # pcport_stub_tables.json) + kr_def/join-split-sigs passes cracked the
+            # campaign's deferred TUs, incl. the three "pathological" pseudo-register
+            # walls (their Ghidra-import bodies are functional C).
+            "game/colosseum_event", "game/colosseum_battle", "game/colosseum_script",
+            "game/colosseum_ui", "game/pokemon", "game/trainer",
+            "game/menu/menu_bag", "game/menu/menu_msgbox", "game/menu/menu_pokemon",
+            "game/menu/menu_shop", "game/menu/menu_status",
+            "game/pokemon/evolution", "game/script/script_callback",
             ]
 
 
