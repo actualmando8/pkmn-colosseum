@@ -2690,8 +2690,8 @@ typedef struct GSgfxParseCallbackList {
     void (*end)(void* user);
 } GSgfxParseCallbackList;
 
-u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user);
-u8* fn_800DA880(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user);
+u8* _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user);
+u8* _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user);
 
 #if 0
 asm void fn_800DA578(void) {
@@ -2747,7 +2747,7 @@ void fn_800DA578(GSgfxVtxDescList* desc, u8* dl, u16 size, GSgfxParseCallbackLis
                 prim = 6;
                 break;
             }
-            ptr = fn_800DA6F0(prim, desc, ptr, count, callbacks, user);
+            ptr = _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(prim, desc, ptr, count, callbacks, user);
             break;
         default:
             return;
@@ -2757,11 +2757,11 @@ void fn_800DA578(GSgfxVtxDescList* desc, u8* dl, u16 size, GSgfxParseCallbackLis
 #endif
 extern void jumptable_803152B8();
 #if 0
-asm void fn_800DA6F0(void) {
+asm void _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(void) {
 #include "src/game/gs_render_fn_800DA6F0.inc"
 }
 #else
-u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user) {
+u8* _dlParseSurface__F13GSgfxPrimTypeP16_HSD_VtxDescListPUcUsP22GSgfxParseCallbackListPv_802B1590(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParseCallbackList* callbacks, void* user) {
     GSgfxVtxDescList* it;
     u32 mask;
     u16 remaining;
@@ -2830,7 +2830,7 @@ u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParse
         }
         it = desc;
         while (it->attr != 0xff) {
-            ptr = fn_800DA880(it, ptr, callbacks, user);
+            ptr = _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(it, ptr, callbacks, user);
             it++;
         }
         if (callbacks->endVertex != 0) {
@@ -2847,11 +2847,11 @@ u8* fn_800DA6F0(s32 prim, GSgfxVtxDescList* desc, u8* ptr, u16 count, GSgfxParse
 extern void jumptable_80315340();
 extern void jumptable_80315320();
 #if 0
-asm void fn_800DA880(void) {
+asm void _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(void) {
 #include "src/game/gs_render_fn_800DA880.inc"
 }
 #else
-u8* fn_800DA880(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user) {
+u8* _dlParseVertex__FP16_HSD_VtxDescListPUcP22GSgfxParseCallbackListPv_802B1720(GSgfxVtxDescList* desc, u8* ptr, GSgfxParseCallbackList* callbacks, void* user) {
     u8* data;
     u32 attr_flag;
     u32 comp_flag;
