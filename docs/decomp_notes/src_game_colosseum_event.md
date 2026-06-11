@@ -75,6 +75,19 @@ fn_802078F0, fn_80209D90, fn_8020A478, fn_8020FC70, fn_80211040
 
 ## Session log
 
+### 2026-06-10 (session 2) — executor (Sonnet 4.6)
+
+**fn_80211A78** at 99.15% (already committed with peephole on). Attempted:
+- `switch ((u8)result) { case 1: }` shape (same 99.15%)
+- `#pragma peephole off/on` around switch (same 99.15% — `cmpwi` is the switch codegen itself)
+- `switch ((u32)(u8)result)` (same 99.15%)
+- Both `peephole on` and `peephole off` produce `cmpwi r0, 0x1` for switch case compares
+- Wall: CW 1.3 switch codegen always emits `cmpwi` for small constants; target uses `cmplwi`.
+  Not a peephole issue. Hard skip.
+
+Completed full 80-100% band scan (39 functions). All remaining near-misses blocked by W1/W3/W4/W2.
+See "Full 80-100% band scan" section above. Session complete for this TU.
+
 ### 2026-05-17 — executor (Sonnet 4.6)
 
 **Goal:** push HINT near-misses in 88-99% band to 100%.
@@ -97,15 +110,52 @@ fn_802078F0, fn_80209D90, fn_8020A478, fn_8020FC70, fn_80211040
 
 ## Untouched near-misses
 (Pull from `python tools/near_miss_report.py` for full list)
-fn_80210998 (96.44%), fn_803103E8 (95.70%), fn_80211810 (95.00%), fn_80210D04 (93.96%), fn_8020ECE0 (91.36%), fn_8020B330 (89.68%)
+fn_80210998 (now 100%), fn_80211810 (now 100%), fn_80210D04 (now 100%), fn_8020ECE0 (now 100%),
+fn_803103E8 (NA in this TU), fn_8020B330 (99.70% — W1 r23↔r26 rename, hard skip)
+
+## Full 80-100% band scan (2026-06-10 session 2)
+
+All 39 functions in 80-100% band scanned. Classification:
+- **fn_8020341C** 99.62% — W2 scheduler: target saves fn_8012640C result to r29/r28 on
+  null path (`li r29, 0x0; b; cmplwi r29, 0x0`); CW uses r3 directly. Not C-controllable.
+- **fn_8020EED4** 99.53% — W1 r28↔r29 + r30↔r5 rename throughout. Hard skip.
+- **fn_80211A78** 99.15% — W2 switch cmpwi vs cmplwi (see above). Hard skip.
+- **fn_8020E7AC** 96.44% — W1 r26-r31 band rotation. Hard skip (noted previously).
+- **fn_80209CB4** 96.00% — W2 mr./cmpwi + W4 booleanize. Hard skip (noted previously).
+- **fn_8020BFA0** 95.15% — W2 scheduler. Hard skip (noted previously).
+- **fn_8020DAD0** 95.03% — W1 + DIV-IDIOM wall (srawi/addze). Hard skip (noted previously).
+- **fn_8020B72C** 94.71% — W1 r25-r30 full band rotation. Hard skip.
+- **fn_8020B910** 94.69% — W1 r29↔r31/r30 rotation. Hard skip.
+- **fn_80206C94** 94.66% — W3 stmw (3 saved) + W1 r29↔r30. Hard skip.
+- **fn_8020E204/fn_8020E488** 93.64% — clrlslwi-cse (noted previously). Hard skip.
+- **fn_80206780** 92.26% — W4 booleanize + branch-shape diffs. Hard skip.
+- **fn_80206AEC** 91.79% — W3 stmw (noted previously, was 89.42% now 91.79%). Hard skip.
+- **fn_80204854** 91.32% — W3 stmw body-exact (noted previously). Hard skip.
+- **fn_80206608** 91.06% — W4 booleanize + inverted condition. Hard skip.
+- **fn_80209380** 89.85% — W3 stmw for 3 saved regs, body byte-exact. Hard skip.
+- **fn_8020E95C** 89.63% — W1 r26-r31. Hard skip (noted previously).
+- **fn_80202C1C** 89.09% — W1 r21-r31 + W4. Hard skip (noted previously).
+- **fn_8020E614** 88.64% — W4 booleanize. Hard skip (noted previously).
+- **fn_802032E4** 88.13% — W3 stmw (4 saved) + W1 r29-r31 rotation. Hard skip.
+- **fn_802077D4** 87.89% — W3 stmw (noted previously). Hard skip.
+- **fn_80202998** 87.57% — W3 stmw (2 saved regs, r30/r31). Hard skip.
+- **fn_80210BF8** 86.15% — W3 stmw (4 saved) + W1 param home order. Hard skip.
+- **fn_80210888** 85.61% — W3 stmw (4 saved) + W1 param home order. Hard skip.
+- **fn_8020BA80** 85.17% (and 10+ others 80-85%) — W1+W3 combinations. Hard skip.
+- All remaining 80-85% functions: W1 and/or W3 combinations. No improvable functions found.
+
+**CONCLUSION**: colosseum_event.c 80-100% band is fully exhausted. All remaining near-misses
+are blocked by W1 (register allocation), W3 (stmw threshold), W4 (booleanize idiom), or
+W2 (scheduler) walls.
 
 ## Blocked near-misses (2026-06-10 session, Opus)
 
 - **fn_80208028** @ 99.84% — W6 call-target NAME (`bl itemGetStatus` vs `bl fn_80142CF4`,
   same address). Byte-identical; symbol_mappings artifact. Hard skip.
-- **fn_80211A78** @ 98.45% — first `if(result==1)` emits `beq body; b skip` in target
-  but `bne skip` from CW; merging the two ifs (89%) and peephole off (92.5%) both
-  regressed. Branch-shape residual, 1-2 instrs. Skip.
+- **fn_80211A78** @ 99.15% — single diff: `cmplwi r0, 0x1` (T) vs `cmpwi r0, 0x1` (M)
+  at the switch case-1 compare. `#pragma peephole on/off` both emit `cmpwi` for small
+  constants (this is a CW switch codegen wall, not peephole). `switch((u8)result){case 1:}`
+  shape is correct; the compare instruction type is compiler-version-locked. Hard skip.
 - **fn_8020E7AC** @ 96.44% / **fn_8020E95C** @ 89.6% — W1 saved-band rename (r26-r31).
   `u8 bVar1` fixes the `clrlwi.` combine but shifts the whole band -> net worse
   (E7AC 95.97). `matchVal==sVar3` operand-order flip inert (CW canonicalizes). Skip.

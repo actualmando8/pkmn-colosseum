@@ -781,7 +781,9 @@ def transform(lines, stub_fns=None):
 # arguments promote to double fine).
 _CRT_FNS = {"sin", "cos", "tan", "sqrt", "atan", "atan2", "fabs", "floor", "ceil",
             "pow", "fmod", "exp", "log", "abs", "memset", "memcpy", "memmove",
-            "strlen", "strcpy", "strncpy", "strcmp", "strncmp", "sprintf", "printf"}
+            "strlen", "strcpy", "strncpy", "strcmp", "strncmp", "sprintf", "printf",
+            "sinf", "cosf", "tanf", "sqrtf", "atanf", "atan2f", "fabsf", "floorf",
+            "ceilf", "powf", "fmodf", "expf", "logf"}
 
 # A standalone single-function declaration line, any symbol name (not just fn_*):
 # optional `extern`, return tokens, name, parameter list, trailing `;`.
