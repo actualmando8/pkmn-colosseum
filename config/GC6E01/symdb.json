@@ -34073,7 +34073,7 @@
       "section": ".text",
       "size": "0x20"
     },
-    "fn_80193B30": {
+    "hsdInitClassInfo": {
       "addr": "0x80193B30",
       "kind": "function",
       "section": ".text",

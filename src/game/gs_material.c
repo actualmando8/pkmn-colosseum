@@ -244,8 +244,8 @@ extern void* fn_800E24B0(u16 handle);                  /* GSmemLock */
 extern void  fn_800E209C(u16 handle);                  /* GSmemFree */
 
 /* HSD object system */
-extern void  fn_80193B30(void* classDesc, void* parent, void* name,
-                          u32 entrySize, u32 alignment, void* nameDup); /* HSD_ClassInit */
+extern void  hsdInitClassInfo(void* classDesc, void* parent, void* name,
+                              u32 entrySize, u32 alignment, void* nameDup);
 extern void  fn_801A13CC(void* obj, u32 a, u32 b, u32 c); /* HSD_MObjAnim */
 extern s32   fn_80195A6C(void* renderCtx);             /* HSD render context check */
 extern void  fn_80195A48(void);                        /* HSD render end */

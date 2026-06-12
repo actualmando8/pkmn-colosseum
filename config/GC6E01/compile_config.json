@@ -67,8 +67,8 @@
       "comment": "Dolphin SDK compiled with CW GC/1.2.5n"
     },
     "src/hsd/hsd_class.c": {
-      "compiler": "GC/1.2.5n",
-      "comment": "HSD library compiled with CW GC/1.2.5n"
+      "compiler": "GC/1.3",
+      "comment": "HSD class TU matches hsdInitClassInfo with CW GC/1.3; GC/1.2.5n emits a larger caller frame"
     },
     "src/crt/exit.c": {
       "compiler": "GC/1.3.2",

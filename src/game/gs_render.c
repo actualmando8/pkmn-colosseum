@@ -4478,7 +4478,7 @@ void fn_800DF854(u32 count) {
     }
 }
 #endif
-extern void fn_80193B30(void*, void*, void*, void*, u32, u32);
+extern void hsdInitClassInfo(void*, void*, void*, void*, u32, u32);
 extern u8 lbl_8036CB30[];
 #if 0
 asm void _GSmaterialObjInit_800EF33C(void) {
@@ -4486,7 +4486,8 @@ asm void _GSmaterialObjInit_800EF33C(void) {
 }
 #else
 void _GSmaterialObjInit_800EF33C(void) {
-    fn_80193B30(lbl_80315490, lbl_8036CB30, (void*)lbl_802705C0, (void*)lbl_802705C0, 0x54, 0x24);
+    hsdInitClassInfo(lbl_80315490, lbl_8036CB30, (void*)lbl_802705C0,
+                     (void*)lbl_802705C0, 0x54, 0x24);
     *(void**)&lbl_80315490[0x40] = (void*)fn_800DFE98;
     *(void**)&lbl_80315490[0x44] = (void*)fn_800DF930;
 }

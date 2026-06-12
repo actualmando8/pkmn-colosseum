@@ -1,6 +1,6 @@
 # Confirmed-name leads needing signature/typing work
 
-10 remaining (of the original proposals). These names are confirmed but the asm-wrapper `(void)` signature / untyped `lbl_` globals / a name collision block a clean bulk rename — each needs per-function decomp work (match the real prototype, type its globals). Wired leads have been moved to applied_symbols.txt.
+9 remaining (of the original proposals). These names are confirmed but the asm-wrapper `(void)` signature / untyped `lbl_` globals / a name collision block a clean bulk rename — each needs per-function decomp work (match the real prototype, type its globals). Wired leads have been moved to applied_symbols.txt.
 
 | addr (fn_) | confirmed name | provenance | header proto in |
 |---|---|---|---|
@@ -12,5 +12,4 @@
 | `fn_80114948` | floorReadCameraPreFunc | string self-name (leading) | ? |
 | `fn_80114CA8` | floorReadMapPreFunc | string self-name (leading) | ? |
 | `fn_80117514` | floorUpdateFieldCamera | string self-name (leading) | G:/decomp-worktrees/symbolmap/include/game/world/gs_field.h |
-| `fn_80193B30` | hsdInitClassInfo | XD port (score 3.0) | G:/decomp-worktrees/symbolmap/include/hsd/hsd_class.h |
 | `fn_80137AA4` | tracefxStartEffect | string self-name (leading) | G:/decomp-worktrees/symbolmap/include/game/effect/gs_effect.h |

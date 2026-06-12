@@ -42,38 +42,6 @@ void ClassInfoInit(HSD_ClassInfo* info)
 }
 
 /* ========================================================================= */
-/*  hsdInitClassInfo                                                         */
-/* ========================================================================= */
-
-void hsdInitClassInfo(HSD_ClassInfo* class_info, HSD_ClassInfo* parent_info,
-                      char* base_class_library, char* type, s32 info_size,
-                      s32 class_size)
-{
-    class_info->head.flags = 1;
-    class_info->head.library_name = base_class_library;
-    class_info->head.class_name = type;
-    class_info->head.obj_size = (s16) class_size;
-    class_info->head.info_size = (s16) info_size;
-    class_info->head.parent = parent_info;
-    class_info->head.child = NULL;
-    class_info->head.next = NULL;
-    class_info->head.nb_exist = 0;
-    class_info->head.nb_peak = 0;
-
-    if (parent_info != NULL) {
-        if ((parent_info->head.flags & 1) == 0) {
-            (*parent_info->head.info_init)();
-        }
-        HSD_ASSERT(94, class_info->head.obj_size >= parent_info->head.obj_size);
-        HSD_ASSERT(95, class_info->head.info_size >= parent_info->head.info_size);
-        memcpy(&class_info->alloc, &parent_info->alloc,
-               parent_info->head.info_size - 0x28);
-        class_info->head.next = parent_info->head.child;
-        parent_info->head.child = class_info;
-    }
-}
-
-/* ========================================================================= */
 /*  Memory management                                                        */
 /* ========================================================================= */
 
@@ -605,14 +573,46 @@ void fn_80193B10(HSD_ClassInfo* info) {
 
 /* 0x80193B30 | 0xF4 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-extern void __assert(void);
-#if 1
-asm void fn_80193B30(void) {
+extern char lbl_8047D950;
+extern char lbl_802745B4[];
+extern char lbl_802745EC[];
+#if 0
+asm void hsdInitClassInfo(void) {
 #include "src/hsd/hsd_class_fn_80193B30.inc"
 }
 #else
-void fn_80193B30(void) { /* TODO */ }
+void hsdInitClassInfo(HSD_ClassInfo* class_info, HSD_ClassInfo* parent_info,
+                      char* base_class_library, char* type, s32 info_size,
+                      s32 class_size)
+{
+    class_info->head.flags = 1;
+    class_info->head.library_name = base_class_library;
+    class_info->head.class_name = type;
+    class_info->head.obj_size = (s16) class_size;
+    class_info->head.info_size = (s16) info_size;
+    class_info->head.parent = parent_info;
+    class_info->head.child = NULL;
+    class_info->head.next = NULL;
+    class_info->head.nb_exist = 0;
+    class_info->head.nb_peak = 0;
+
+    if (parent_info != NULL) {
+        if ((parent_info->head.flags & 1) == 0) {
+            (*parent_info->head.info_init)();
+        }
+        if (class_info->head.obj_size < parent_info->head.obj_size) {
+            __assert(&lbl_8047D950, 0x67, lbl_802745B4);
+        }
+        if (class_info->head.info_size < parent_info->head.info_size) {
+            __assert(&lbl_8047D950, 0x68, lbl_802745EC);
+        }
+        memcpy(&class_info->alloc, &parent_info->alloc,
+               parent_info->head.info_size - 0x28);
+        class_info->head.next = parent_info->head.child;
+        parent_info->head.child = class_info;
+    }
+}
 #endif
 #pragma pop

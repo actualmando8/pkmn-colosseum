@@ -150,7 +150,6 @@ static void FogAdjInfoInit(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80193B30(void* classDesc, void* parent, void* name, void* label, u16 infoSize, u16 objSize);
 extern void fn_8019B874(void);
 extern void fn_8019B948(void);
 extern u8 lbl_8036C7E8[];
@@ -158,7 +157,9 @@ extern u8 lbl_8036CC00[];
 extern u8 lbl_802747B8[];
 extern u8 lbl_8047DA60;
 void fn_8019B808(void) {
-    fn_80193B30(lbl_8036C7E8, lbl_8036CC00, lbl_802747B8, &lbl_8047DA60, 0x40, 0x20);
+    hsdInitClassInfo((HSD_ClassInfo*) lbl_8036C7E8,
+                     (HSD_ClassInfo*) lbl_8036CC00, (char*) lbl_802747B8,
+                     (char*) &lbl_8047DA60, 0x40, 0x20);
     ((void**)lbl_8036C7E8)[0x30/4] = (void*)fn_8019B874;
     ((void**)lbl_8036C7E8)[0x3c/4] = (void*)fn_8019B948;
 }
@@ -203,7 +204,6 @@ void fn_8019B948(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_80193828(void);
-extern void __assert(const char* file, s32 line, const char* msg);
 extern void fn_800BD768(void);
 extern void* memset(void* dst, int val, u32 n);
 extern u8 lbl_8047DA74[];

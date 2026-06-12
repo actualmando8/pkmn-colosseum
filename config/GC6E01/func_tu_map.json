@@ -37855,7 +37855,7 @@
   "src": "src/hsd/hsd_class.c",
   "status": "KNOWN"
  },
- "fn_80193B30": {
+ "hsdInitClassInfo": {
   "addr": "0x80193B30",
   "section": ".text",
   "size": "0xF4",

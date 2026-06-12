@@ -28,8 +28,6 @@ extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void  fn_800B7D3C(void);
 extern s32   fn_801BF138(u32 val);
-extern void  fn_80193B30(void* classDesc, void* parentClass, void* name,
-                          void* sdata2name, u32 classInfoSize, u32 classSize);
 extern void* fn_80193748(const char* name);
 extern void* fn_80193828(void* classInfo);
 extern void* fn_80193B10(s32 size);
@@ -238,12 +236,13 @@ void fn_801AA538(void* a, void* b)
 
 /* =========================================================================
  * 0x801AA568 | size: 0x44  -- PObj class info init (small)
- * Calls fn_80193B30 to register lbl_8036CC00 class
+ * Calls hsdInitClassInfo to register lbl_8036CC00 class
  * ========================================================================= */
 void ObjInfoInit_802596A4(void)
 {
-    fn_80193B30(lbl_8036CC00, lbl_8036C638, lbl_80274EC8,
-                (void*)&lbl_8047DCA0, 0x3c, 0x8);
+    hsdInitClassInfo((HSD_ClassInfo*) lbl_8036CC00,
+                     (HSD_ClassInfo*) lbl_8036C638, (char*) lbl_80274EC8,
+                     (char*) &lbl_8047DCA0, 0x3c, 0x8);
 }
 
 /* =========================================================================
@@ -264,12 +263,13 @@ void fn_801AA5AC(s32 idx)
 
 /* =========================================================================
  * 0x801AA608 | size: 0xC8  -- PObj class info init (main)
- * Calls fn_80193B30 to register lbl_8036CCD0 and installs vtable
+ * Calls hsdInitClassInfo to register lbl_8036CCD0 and installs vtable
  * ========================================================================= */
 void fn_801AA608(void)
 {
-    fn_80193B30(lbl_8036CCD0, lbl_8036C638, lbl_80274EE0,
-                lbl_80274EF8, 0x4c, 0x1c);
+    hsdInitClassInfo((HSD_ClassInfo*) lbl_8036CCD0,
+                     (HSD_ClassInfo*) lbl_8036C638, (char*) lbl_80274EE0,
+                     (char*) lbl_80274EF8, 0x4c, 0x1c);
 
     *(void**)((u8*)lbl_8036CCD0 + 0x30) = (void*)fn_801AA788;
     *(void**)((u8*)lbl_8036CCD0 + 0x38) = (void*)fn_801AA6D0;
