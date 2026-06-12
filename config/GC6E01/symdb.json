@@ -34308,7 +34308,7 @@
       "section": ".text",
       "size": "0x204"
     },
-    "fn_80195794": {
+    "HSD_CObjGetEyeDistance": {
       "addr": "0x80195794",
       "kind": "function",
       "section": ".text",

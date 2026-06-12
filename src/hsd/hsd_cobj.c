@@ -813,7 +813,7 @@ void fn_801947A8(HSD_CObj* cobj, f32 val)
 extern void OSReport(const char* fmt, ...);
 extern void fn_800A3244(void);
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void);
+extern void fn_800A3A9C(void*, void*, void*);
 extern void fn_800A3ADC(void);
 extern void fn_800CE59C(void);
 extern void fn_800CE718(void);
@@ -936,7 +936,7 @@ extern void OSReport(const char* fmt, ...);
 extern void fn_800A3244(void);
 extern void fn_800A3458(void);
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void);
+extern void fn_800A3A9C(void*, void*, void*);
 extern void fn_800A3ADC(void);
 extern void fn_800A3B7C(void);
 extern void fn_800CE2D8(void);
@@ -970,7 +970,7 @@ void fn_801950D0(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_800A3820(void);
-extern void fn_800A3A9C(void);
+extern void fn_800A3A9C(void*, void*, void*);
 extern void fn_800A3ADC(void);
 #if 1
 asm void fn_8019513C(void) {
@@ -985,7 +985,7 @@ void fn_8019513C(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_800A3B38(void);
+extern f32 fn_800A3B38(void*);
 #if 1
 asm void fn_80195590(void) {
 #include "src/hsd/hsd_cobj_fn_80195590.inc"
@@ -997,14 +997,48 @@ void fn_80195590(void) { /* TODO */ }
 
 /* 0x80195794 | 0x104 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
-asm void fn_80195794(void) {
-#include "src/hsd/hsd_cobj_fn_80195794.inc"
+extern char lbl_8047D958;
+extern char lbl_8047D960;
+extern char lbl_80274660[];
+extern char lbl_80274670[];
+#if 0
+asm void HSD_CObjGetEyeDistance(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetEyeDistance.inc"
 }
 #else
-void fn_80195794(void) { /* TODO */ }
+f32 HSD_CObjGetEyeDistance(HSD_CObj* cobj) {
+    f32 eye[3];
+    f32 interest[3];
+    f32 diff[3];
+
+    if (cobj == NULL) {
+        return lbl_8047D978;
+    }
+    if (cobj->eyepos == NULL) {
+        __assert(&lbl_8047D958, 0x353, lbl_80274660);
+    }
+    if (cobj->interest == NULL) {
+        __assert(&lbl_8047D958, 0x354, lbl_80274670);
+    }
+    if (cobj == NULL) {
+        __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+    }
+    if (cobj == NULL) {
+        __assert(&lbl_8047D958, 0x2E8, &lbl_8047D960);
+    }
+    fn_80191688(cobj->eyepos, eye);
+    if (cobj == NULL) {
+        __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+    }
+    if (cobj == NULL) {
+        __assert(&lbl_8047D958, 0x2D0, &lbl_8047D960);
+    }
+    fn_80191688(cobj->interest, interest);
+    fn_800A3A9C(interest, eye, diff);
+    return fn_800A3B38(diff);
+}
 #endif
 #pragma pop
 

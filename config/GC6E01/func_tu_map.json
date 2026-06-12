@@ -38128,7 +38128,7 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80195794": {
+ "HSD_CObjGetEyeDistance": {
   "addr": "0x80195794",
   "section": ".text",
   "size": "0x104",

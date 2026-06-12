@@ -3356,7 +3356,7 @@ extern void fn_80195970(void);
 extern void fn_801B0A98(void);
 extern void fn_801944E8(void);
 extern void fn_801944C0(void);
-extern void fn_80195794(void);
+extern void HSD_CObjGetEyeDistance(void);
 extern void fn_801B073C(void);
 extern void fn_80195904(void);
 extern void fn_801950D0(void);
