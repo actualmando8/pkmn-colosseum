@@ -1297,12 +1297,16 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
     u32 entryCount, stringTableOffset, entryTableOffset, i;
     u8* best = NULL;
     u32 bestSize = 0;
+    u32 bestIndex = 0;
+    char bestName[96];
+    int debug = getenv("PCPORT_FIELD_DEBUG") != NULL;
 
     if (outData == NULL || outSize == NULL) {
         return FALSE;
     }
     *outData = NULL;
     *outSize = 0;
+    bestName[0] = '\0';
 
     fsysData = LoadFileBytes(fsysPath, &fsysSize);
     if (fsysData == NULL) {
@@ -1327,6 +1331,8 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
 
     for (i = 0; i < entryCount; ++i) {
         u32 entryOffset, memSize = 0;
+        u32 nameOffset;
+        const char* name = "<bad-name>";
         u8* mem;
         if (entryTableOffset + i * 4 + 4 > fsysSize) {
             break;
@@ -1335,14 +1341,24 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
         if (entryOffset + 0x28 > fsysSize) {
             continue;
         }
+        nameOffset = ReadBE32(fsysData + entryOffset + 0x24);
+        if (nameOffset < fsysSize) {
+            name = (const char*)(fsysData + nameOffset);
+        }
         mem = DecompressMemberAt(fsysData, fsysSize, entryOffset, &memSize);
         if (mem == NULL) {
             continue;
         }
         if (memSize > bestSize && HSDArchiveHasPublic(mem, memSize, "scene_data")) {
+            if (debug) {
+                printf("[fsys-scene] candidate %s[%u] size=0x%X\n",
+                       name, i, memSize);
+            }
             free(best);
             best = mem;
             bestSize = memSize;
+            bestIndex = i;
+            snprintf(bestName, sizeof(bestName), "%s", name);
         } else {
             free(mem);
         }
@@ -1351,6 +1367,12 @@ BOOL PCPort_LoadFsysSceneMember(const char* fsysPath, u8** outData, u32* outSize
     free(fsysData);
     if (best == NULL) {
         return FALSE;
+    }
+    if (debug) {
+        printf("[fsys-scene] selected %s[%u] size=0x%X from %s\n",
+               bestName[0] ? bestName : "<unknown>", bestIndex, bestSize,
+               fsysPath);
+        fflush(stdout);
     }
     *outData = best;
     *outSize = bestSize;

@@ -5815,7 +5815,8 @@ typedef struct PCPortStoryFieldSmokeState {
 } PCPortStoryFieldSmokeState;
 
 static PCPortStoryFieldSmokeState g_pcStoryFieldSmoke;
-static int g_pcFieldRoomReloadSmokeActive;
+static int g_pcFieldWarpSmokeActive;
+static f32 g_pcFieldWarpSmokeStickY;
 
 static void PCPort_StoryFieldSmokeBegin(void) {
     memset(&g_pcStoryFieldSmoke, 0, sizeof(g_pcStoryFieldSmoke));
@@ -9075,6 +9076,20 @@ static int  g_engFieldGfxInitialized;
 static int  g_engFieldMode;
 static f32  g_engFieldBg[3] = { 0.04f, 0.05f, 0.08f }; /* near-black; PCPORT_FIELD_BG overrides */
 
+static int PCPort_FieldAnimAllowedForArchive(const char* archivePath) {
+    if (getenv("PCPORT_NO_FIELD_ANIM") != NULL) {
+        return 0;
+    }
+    /* S1_shop_1F's scene renders statically, but its ambient animjoint path
+     * currently trips the host swizzle/JObj animation setup. Keep the playtest
+     * warp gate moving and revisit this when field-anim coverage broadens past
+     * the verified S1_out sign/cloud path. */
+    if (archivePath != NULL && strstr(archivePath, "S1_shop_1F") != NULL) {
+        return 0;
+    }
+    return 1;
+}
+
 static void PCPort_EngineSceneRelease(void) {
     PCPort_FieldAnimRelease();
     if (g_engTitleArchive.storage != NULL) {
@@ -9441,7 +9456,7 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
      * After setup, register the render-side archive so PCPort_FieldAnimTick
      * can write updated SRT back into the storage RenderJointTree reads. */
     PCPort_FieldAnimRelease();
-    {
+    if (PCPort_FieldAnimAllowedForArchive(archivePath)) {
         u32 animRootOff = 0u;
         const char* fm = getenv("PCPORT_FIELD_MEMBER");
         /* Use the same member selection logic as the render-side load above. */
@@ -9450,6 +9465,8 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
                                   &animRootOff) && animRootOff != 0u) {
             PCPort_FieldAnimSetRenderTarget(&g_engTitleArchive, animRootOff);
         }
+    } else if (getenv("PCPORT_FIELD_DEBUG") != NULL) {
+        printf("[field-anim] skipped for %s\n", archivePath);
     }
 
     if (!g_engFieldGfxInitialized) {
@@ -9550,18 +9567,27 @@ typedef struct {
  * for each map (D1_garage_1F = X[-106,105] Y[-24,21] Z[-68,78]). Reciprocal
  * exits let you warp 1F <-> B1 and back. Tunable; the real door data is a
  * follow-up. PCPORT_WARP_TUNE can override the first exit at runtime. */
-enum { PC_FLOOR_GARAGE_1F = 0, PC_FLOOR_GARAGE_B1 = 1, PC_FLOOR_OUTSKIRT = 2 };
+enum {
+    PC_FLOOR_GARAGE_1F = 0,
+    PC_FLOOR_GARAGE_B1 = 1,
+    PC_FLOOR_OUTSKIRT = 2,
+    PC_FLOOR_OUTSKIRT_SHOP = 3
+};
 
 static const PCPortWarpMapEntry g_pcWarpMaps[] = {
     {
         /* The Outskirt Stand exterior — the game's first walkable scene and the
          * New Game spawn map. The train-car diner sits to one side; Wes spawns in
-         * the open desert plaza in front of it. No exits wired yet (the shop-door
-         * warp into S1_shop_1F is a follow-up); spawn clear of map edges.
+         * the open desert plaza in front of it. The host shop-door trigger is
+         * near the current smoke autorun path into the train-car diner; the real
+         * exit table remains a follow-up.
          * Collision bounds X[-146,231] Y[-10,64] Z[-127,127]. */
         PC_FLOOR_OUTSKIRT, "S1_out",
-        { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, 0, { 0.0f, 0.0f, 0.0f } } },
-        0,
+        {
+            { { 69.0f, 0.0f, -30.0f }, 0.0f,
+              18.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } }
+        },
+        1,
         { 47.7f, 0.0f, 79.9f }   /* spawn point: just behind the gas-pump foundation
                                    * (concrete pad under the green pump, right side of
                                    * view).  Dialled in by the user walking Wes to the
@@ -9589,6 +9615,18 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         },
         1,
         { 0.0f, 0.0f, 0.0f }     /* spawn point when arriving in B1 */
+    },
+    {
+        PC_FLOOR_OUTSKIRT_SHOP, "S1_shop_1F",
+        {
+            /* Interior doorway back to the Outskirt exterior. Static render +
+             * WZX collision are verified; ambient field animation is skipped for
+             * this map until its animjoint setup is recovered. */
+            { { 0.0f, 0.0f, -30.0f }, 0.0f, 18.0f, 0.0f,
+              PC_FLOOR_OUTSKIRT, { 69.0f, 0.0f, -48.0f } }
+        },
+        1,
+        { 0.0f, 0.0f, 35.0f }    /* spawn point when arriving in the shop */
     }
 };
 static const int g_pcWarpMapCount =
@@ -10167,10 +10205,10 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 runThreshold = (runThreshEnv != NULL && runThreshEnv[0]) ? (f32)atof(runThreshEnv) : 0.85f;
     f32 walkDeadzone = (deadzoneEnv != NULL && deadzoneEnv[0]) ? (f32)atof(deadzoneEnv) : 0.05f;
     int autopan = g_pcStoryFieldSmoke.active ||
-                  g_pcFieldRoomReloadSmokeActive ||
+                  g_pcFieldWarpSmokeActive ||
                   getenv("PCPORT_FIELD_AUTOPAN") != NULL;
     int forceRun = g_pcStoryFieldSmoke.active ||
-                   g_pcFieldRoomReloadSmokeActive ||
+                   g_pcFieldWarpSmokeActive ||
                    getenv("PCPORT_FORCE_RUN") != NULL ||
                    getenv("PCPORT_FIELD_AUTORUN") != NULL;
     int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
@@ -10180,7 +10218,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int reportedMissingMotionMap = 0;
     int frame = 0;
     int warpTo = -1;
-    int graceFrames = g_pcFieldRoomReloadSmokeActive ? 0 : 30;
+    int graceFrames = g_pcFieldWarpSmokeActive ? 0 : 30;
                             /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
     double g_walkPrevTime = 0.0; /* real-time clock for animation frame-step */
@@ -10261,7 +10299,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         if (camPitch >  1.30f) camPitch =  1.30f;
         if (camPitch < -0.20f) camPitch = -0.20f;
         if (autopan) {
-            sy = g_pcFieldRoomReloadSmokeActive ? -0.7f : 0.7f;
+            sy = g_pcFieldWarpSmokeActive ? g_pcFieldWarpSmokeStickY : 0.7f;
             camYaw += 0.01f;
         }
 
@@ -10864,9 +10902,10 @@ static int RunFieldRoomReloadSmoke(GLFWwindow* window) {
 
     prevEnterFieldWalk = g_pcEnterFieldWalk;
     g_pcEnterFieldWalk = 1;
-    g_pcFieldRoomReloadSmokeActive = 1;
+    g_pcFieldWarpSmokeStickY = -0.7f;
+    g_pcFieldWarpSmokeActive = 1;
     next = RunFieldWalkLoop(window, NULL, 8, 0, start);
-    g_pcFieldRoomReloadSmokeActive = 0;
+    g_pcFieldWarpSmokeActive = 0;
     g_pcEnterFieldWalk = prevEnterFieldWalk;
 
     if (next != PC_FLOOR_GARAGE_B1) {
@@ -10904,6 +10943,87 @@ static int RunFieldRoomReloadSmoke(GLFWwindow* window) {
            PCPort_FieldColTriCount(),
            exB1.targetFloor,
            spawnB1[0], spawnB1[1], spawnB1[2]);
+    return 1;
+}
+
+static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
+    PCPortFieldExit exOut;
+    PCPortFieldExit exShop;
+    f32 start[3];
+    f32 spawnShop[3];
+    int prevEnterFieldWalk;
+    int next;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, NULL)) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (PCPort_FieldColTriCount() <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &exOut) ||
+        exOut.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: S1_out was not shop-warp-ready (tris=%d exits=%d target=%d)\n",
+                PCPort_FieldColTriCount(),
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &exOut) ? exOut.targetFloor : -1);
+        return 0;
+    }
+
+    start[0] = exOut.pos[0];
+    start[1] = exOut.pos[1];
+    start[2] = exOut.pos[2];
+    PCPort_FieldColFloorAt(start[0], start[2], 1.0e5f, 1.0e9f, &start[1]);
+
+    prevEnterFieldWalk = g_pcEnterFieldWalk;
+    g_pcEnterFieldWalk = 1;
+    g_pcFieldWarpSmokeStickY = 0.0f;
+    g_pcFieldWarpSmokeActive = 1;
+    next = RunFieldWalkLoop(window, NULL, 2, 0, start);
+    g_pcFieldWarpSmokeActive = 0;
+    g_pcEnterFieldWalk = prevEnterFieldWalk;
+
+    if (next != PC_FLOOR_OUTSKIRT_SHOP) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: walk loop returned floor %d, expected %d\n",
+                next, PC_FLOOR_OUTSKIRT_SHOP);
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(next, spawnShop)) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: could not reload target floor %d\n",
+                next);
+        return 0;
+    }
+    if (PCPort_FieldColTriCount() <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &exShop) ||
+        exShop.targetFloor != PC_FLOOR_OUTSKIRT) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: S1_shop_1F was not ready after reload (tris=%d exits=%d target=%d)\n",
+                PCPort_FieldColTriCount(),
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &exShop) ? exShop.targetFloor : -1);
+        return 0;
+    }
+
+    PCPort_EngineTitleRenderFrame();
+    GSgfxSwapBuffers(0);
+
+    printf("[field-world-warp-smoke] passed: player triggered %d->%d at "
+           "start=(%.1f,%.1f,%.1f); reloaded S1_shop_1F tris=%d exit->%d "
+           "spawn=(%.1f,%.1f,%.1f)\n",
+           PC_FLOOR_OUTSKIRT,
+           next,
+           start[0], start[1], start[2],
+           PCPort_FieldColTriCount(),
+           exShop.targetFloor,
+           spawnShop[0], spawnShop[1], spawnShop[2]);
     return 1;
 }
 
@@ -13242,6 +13362,7 @@ int main(int argc, char** argv) {
     int runStoryFieldSmoke;
     int runFieldRoomWarpSmoke;
     int runFieldRoomReloadSmoke;
+    int runFieldWorldWarpSmoke;
     int runMenu;
     int runEngine;
     int runEngineBoot;
@@ -13260,6 +13381,7 @@ int main(int argc, char** argv) {
     runStoryFieldSmoke = HasArg(argc, argv, "--story-field-smoke");
     runFieldRoomWarpSmoke = HasArg(argc, argv, "--field-room-warp-smoke");
     runFieldRoomReloadSmoke = HasArg(argc, argv, "--field-room-reload-smoke");
+    runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
@@ -13372,6 +13494,7 @@ int main(int argc, char** argv) {
         runStoryFieldSmoke ||
         runFieldRoomWarpSmoke ||
         runFieldRoomReloadSmoke ||
+        runFieldWorldWarpSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
         runPkxViewer ||
         argc <= 1) {
@@ -13655,6 +13778,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
+    } else if (runFieldWorldWarpSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-world-warp-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldWorldWarpSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field world-warp smoke exercised S1_out trigger crossing and shop reload\n");
     } else if (runFieldRoomReloadSmoke) {
         if (window == NULL) {
             fprintf(stderr,
