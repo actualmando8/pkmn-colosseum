@@ -193,7 +193,8 @@ Verification:
 - [x] Replace the host idle/walk/run role projection with the retail action-state caller from `fn_8012CA84` / `fn_8012C660`.
 - [x] Gate host-side START-in-field menu open/close behavior.
 - [ ] Link START-in-field to the real menu/title/message subsystems instead of the host overlay.
-- [ ] Add NPC spawn/talk coverage.
+- [x] Add first NPC talk-state coverage through the real `fn_801812E8` people interaction entry.
+- [ ] Recover real floor NPC spawn records and visible retail NPC model instancing.
 - [x] Add host-side message box/text progression coverage.
 - [ ] Link field messages to the real `menu_msgbox` / script-callback state machine.
 - [ ] Add field trigger/event dispatch coverage.
@@ -203,7 +204,7 @@ Verification:
 
 Lane result:
 
-- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, `--field-locomotion-smoke`, `--field-message-smoke`, `--field-start-menu-smoke`, `--worldmap-handoff-smoke`, `--worldmap-menu`, and `--worldmap-menu-smoke`.
+- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, `--field-locomotion-smoke`, `--field-message-smoke`, `--field-npc-talk-smoke`, `--field-start-menu-smoke`, `--worldmap-handoff-smoke`, `--worldmap-menu`, and `--worldmap-menu-smoke`.
 - The smoke validates the host warp table and trigger lookup for `D1_garage_1F` -> `D1_garage_B1` and `D1_garage_B1` -> `D1_garage_1F`.
 - It also loads both rooms' WZX collision meshes directly, proving the target archives and collision data are reachable before we wire live in-process reload into the gameplay loop.
 - The live reload smoke now drives the normal walk loop from just inside garage 1F, lets the player enter the 1F door trigger, returns target floor `1`, reloads `D1_garage_B1` in-process, and renders a post-reload frame.
@@ -213,6 +214,7 @@ Lane result:
 - Accepted worldmap travel now resolves through the host floor table and renders the selected field target after confirmation. `PYRITE TOWN` maps to `M2_out` and is smoke-gated with WZX collision; `AGATE VILLAGE` maps to `M3_out` and is verified as a render/collision target. `PHENAC CITY` remains route-locked because `M1_out` renders but currently has no discovered WZX mesh.
 - The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the playable walk loop's movement/yaw helpers, and now drives animation choice from the recovered retail people action record `0x00F30400` through the `fn_8012C660` turn-zone selector over `fn_8018F4C8` action slots 1-4. The host still selects the dominant endpoint when retail would blend two slots through `fn_800EC5FC` / `fn_800EC5B8`, so exact blend transitions remain open even though the idle/right/left/hard-right action-slot choices are now smoke-gated.
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
+- `fn_801812E8` is now a PC-port C mirror of the 0x190-byte retail people interaction state entry instead of an auto-generated link stub. The first NPC talk smoke host-seeds two `PeopleEntry` records, drives the recovered talk-start and restore branches, renders the field/message path over `S1_out`, and asserts missing-NPC lookup returns 0. Real floor-spawn NPC records, visible NPC models, and script-owned talk callbacks remain pending.
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
 - The title default now keeps the legacy host title logo/prompt disabled while loading the retail `title.fsys` `t_vs_*` cast cutouts, the title sky/cloud band, and the sand-wind overlay by default. The incomplete archive Pokemon-logo billboard DObj is suppressed until the full retail logo composition is fixed; `PCPORT_TITLE_HOST_UI=1` remains the opt-in diagnostic path for the old host overlay.
 - The boot sequence now supports `PCPORT_BOOT_DUMP_ITEM` alongside `PCPORT_BOOT_DUMP_FRAME`, so Nintendo, The Pokemon Company, and Genius Sonority can be dumped through the actual GL boot presentation path instead of only dumping the first boot item or relying on standalone THP decode.
@@ -242,6 +244,9 @@ Audit verification (2026-06-12 update):
 - `PCPORT_BOOT_DUMP_ITEM=2 PCPORT_BOOT_DUMP_FRAME=48 PCPORT_DUMP=build_pc\boot_item2_gs_f48.bmp build_pc\pcport_bootstrap.exe` -> dumped Genius Sonority THP through the GL boot path; visual inspection verified upright text.
 - `PCPORT_THP_FILE=orig/GC6E01/disc/files/movie/tpc.thp PCPORT_THP_OUT=build_pc\thp_tpc_audio.wav build_pc\pcport_bootstrap.exe --thp-audio-smoke` -> passed with `2 ch`, `32000 Hz`, `80152` total samples, `RMS=4948`, and `clip=1.13%`.
 - `PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> completed normal boot playback for Nintendo logo, TPC THP with audio, GS THP, and the first title frame.
+- `build_pc\pcport_bootstrap.exe --field-npc-talk-smoke` -> passed with `fn_801812E8 talk=1 idle=1 restore=1 missing=0`, talk-state `4 -> 0`, restore-state `1/prev=5 -> 5`, `frames=4`, `idleMotion=1`, and live `S1_out` field/message render.
+- `rg -n "fn_801812E8" build_pc\gen\pcport_stubs.c` -> no matches after relink; the generated `gs_field_world` calls now resolve to the PC C body.
+- Adjacent `--field-message-smoke`, `--field-start-menu-smoke`, `--field-locomotion-smoke`, and `--story-field-smoke` -> passed after the NPC talk-state change.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 - `git diff --check` -> no whitespace errors in the edited repo files.
 

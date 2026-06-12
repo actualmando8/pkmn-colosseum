@@ -9,6 +9,7 @@
 #include "hsd/hsd_memory.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
+#include "game/people/people.h"
 #include "os_shim.h"
 #include "pad_shim.h"
 #include "pcport_font.h"
@@ -10166,6 +10167,122 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale,
                     (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
 }
 
+#define PCPORT_HOST_PEOPLE_MAX 8
+
+static PeopleEntry g_pcHostPeople[PCPORT_HOST_PEOPLE_MAX];
+static s32 g_pcHostPeopleCount;
+
+static void PCPort_PeopleHostClear(void) {
+    memset(g_pcHostPeople, 0, sizeof(g_pcHostPeople));
+    g_pcHostPeopleCount = 0;
+}
+
+static PeopleEntry* PCPort_PeopleHostAdd(u32 groupId, u32 index, u8 state) {
+    PeopleEntry* entry;
+    if (g_pcHostPeopleCount >= PCPORT_HOST_PEOPLE_MAX) {
+        return NULL;
+    }
+    entry = &g_pcHostPeople[g_pcHostPeopleCount++];
+    memset(entry, 0, sizeof(*entry));
+    entry->active = 1;
+    entry->selfPtr = entry;
+    entry->visible = 1;
+    entry->flags = PEOPLE_FLAG_ACTIVE | PEOPLE_FLAG_TALKABLE;
+    entry->groupId = groupId;
+    entry->index = index;
+    entry->state = state;
+    entry->prevState = state;
+    entry->subState = 0;
+    entry->animBlendFactor = 0.0f;
+    return entry;
+}
+
+static PeopleEntry* PCPort_PeopleHostEntryAt(s32 slot) {
+    if (slot < 0 || slot >= g_pcHostPeopleCount) {
+        return NULL;
+    }
+    return &g_pcHostPeople[slot];
+}
+
+static PeopleEntry* PCPort_PeopleHostResolveSelf(void* selfPtr) {
+    s32 i;
+    if (selfPtr == NULL) {
+        return NULL;
+    }
+    for (i = 0; i < g_pcHostPeopleCount; ++i) {
+        PeopleEntry* entry = PCPort_PeopleHostEntryAt(i);
+        if (entry != NULL && entry->active != 0 && entry->selfPtr == selfPtr) {
+            return entry;
+        }
+    }
+    return NULL;
+}
+
+static PeopleEntry* PCPort_PeopleHostFindByGroupIndex(u32 groupId, u32 index) {
+    s32 i;
+    void* selfPtr = NULL;
+
+    for (i = 0; i < g_pcHostPeopleCount; ++i) {
+        PeopleEntry* entry = PCPort_PeopleHostEntryAt(i);
+        if (entry != NULL && entry->active != 0 &&
+            entry->groupId == groupId && entry->index == index) {
+            selfPtr = entry->selfPtr;
+            break;
+        }
+    }
+
+    if (selfPtr == NULL) {
+        for (i = 0; i < g_pcHostPeopleCount; ++i) {
+            PeopleEntry* entry = PCPort_PeopleHostEntryAt(i);
+            if (entry != NULL && entry->active != 0 && entry->index == index) {
+                printf("[people] Warining: people[%u,%u] group is different!!\n",
+                       groupId, index);
+                selfPtr = entry->selfPtr;
+                break;
+            }
+        }
+    }
+
+    return PCPort_PeopleHostResolveSelf(selfPtr);
+}
+
+/* PC-port mirror of retail fn_801812E8 (0x190 bytes). The full people.c TU is
+ * not host-linkable yet, but gs_field_world already calls this symbol from the
+ * recovered field interaction path. Keep this body faithful to the retail state
+ * transitions so the link no longer satisfies the call with an auto-stub. */
+u32 fn_801812E8(u32 groupId, u32 index, u32 doInteract) {
+    PeopleEntry* entry = PCPort_PeopleHostFindByGroupIndex(groupId, index);
+    u8 state;
+    u8 prev;
+
+    if (entry == NULL) {
+        return 0u;
+    }
+
+    state = entry->state;
+    if (state == PEOPLE_STATE_IDLE) {
+        return 1u;
+    }
+
+    if ((doInteract & 0xFFu) != 0u) {
+        entry->prevState = state;
+        if (state >= PEOPLE_STATE_INTERACTING &&
+            state < PEOPLE_STATE_INACTIVE) {
+            entry->state = PEOPLE_STATE_IDLE;
+        }
+    } else {
+        prev = entry->prevState;
+        if (prev >= PEOPLE_STATE_INTERACTING &&
+            prev < PEOPLE_STATE_INACTIVE) {
+            entry->state = prev;
+        }
+    }
+
+    entry->subState = 0;
+    entry->animBlendFactor = 0.0f;
+    return 1u;
+}
+
 typedef enum PCPortFieldMotionRole {
     PCPORT_FIELD_MOTION_IDLE = 0,
     PCPORT_FIELD_MOTION_WALK = 1,
@@ -11898,6 +12015,171 @@ static int RunFieldMessageSmoke(GLFWwindow* window) {
            closeFrame,
            idleMotion,
            spawn[0], spawn[1], spawn[2]);
+    return 1;
+}
+
+static int RunFieldNpcTalkSmoke(GLFWwindow* window) {
+    const char* pages[] = {
+        "This host-seeded NPC uses the recovered people talk-state entry before the field message opens."
+    };
+    PCPortMessageBoxState msg;
+    PCPortFieldMotionMap motionMap;
+    PeopleEntry* talkNpc;
+    PeopleEntry* restoreNpc;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    int idleMotion;
+    int frame;
+    int renderedFrames = 0;
+    int sawPartial = 0;
+    int sawFastForward = 0;
+    int sawClose = 0;
+    u32 talkResult;
+    u32 idleResult;
+    u32 restoreResult;
+    u32 missingResult;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter() || !PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: could not load animated field character\n");
+        return 0;
+    }
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    if (idleMotion < 0 || !PCPort_CharAnimSetMotion(idleMotion)) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: idle motion %d could not be set\n",
+                idleMotion);
+        return 0;
+    }
+
+    PCPort_PeopleHostClear();
+    talkNpc = PCPort_PeopleHostAdd(PC_FLOOR_OUTSKIRT, 7u,
+                                   PEOPLE_STATE_INTERACTING);
+    restoreNpc = PCPort_PeopleHostAdd(PC_FLOOR_OUTSKIRT, 8u,
+                                      PEOPLE_STATE_RESERVED1);
+    if (talkNpc == NULL || restoreNpc == NULL) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: could not seed host people entries\n");
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    talkNpc->subState = 3;
+    talkNpc->animBlendFactor = 0.75f;
+    restoreNpc->prevState = PEOPLE_STATE_CUTSCENE;
+    restoreNpc->subState = 4;
+    restoreNpc->animBlendFactor = 0.5f;
+
+    talkResult = fn_801812E8(PC_FLOOR_OUTSKIRT, 7u, 1u);
+    idleResult = fn_801812E8(PC_FLOOR_OUTSKIRT, 7u, 0u);
+    restoreResult = fn_801812E8(PC_FLOOR_OUTSKIRT, 8u, 0u);
+    missingResult = fn_801812E8(PC_FLOOR_OUTSKIRT, 99u, 1u);
+
+    if (talkResult != 1u || idleResult != 1u || restoreResult != 1u ||
+        missingResult != 0u ||
+        talkNpc->state != PEOPLE_STATE_IDLE ||
+        talkNpc->prevState != PEOPLE_STATE_INTERACTING ||
+        talkNpc->subState != 0 ||
+        talkNpc->animBlendFactor != 0.0f ||
+        restoreNpc->state != PEOPLE_STATE_CUTSCENE ||
+        restoreNpc->subState != 0 ||
+        restoreNpc->animBlendFactor != 0.0f) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: talk=%u idle=%u restore=%u missing=%u talkState=%u prev=%u sub=%u blend=%.2f restoreState=%u restoreSub=%u restoreBlend=%.2f\n",
+                talkResult,
+                idleResult,
+                restoreResult,
+                missingResult,
+                talkNpc->state,
+                talkNpc->prevState,
+                talkNpc->subState,
+                talkNpc->animBlendFactor,
+                restoreNpc->state,
+                restoreNpc->subState,
+                restoreNpc->animBlendFactor);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    PCPort_MessageBoxInit(&msg, pages,
+                          (int)(sizeof(pages) / sizeof(pages[0])), 5);
+    for (frame = 0; frame < 40; ++frame) {
+        u16 pressed = 0u;
+        int beforeFastForward = msg.fastForwardCount;
+        int beforeClose = msg.closeCount;
+        int pageLen = PCPort_MessageBoxPageLen(&msg);
+
+        if (msg.active && msg.visibleChars > 0 && msg.visibleChars < pageLen) {
+            sawPartial = 1;
+        }
+        if (msg.active && frame == 2) {
+            pressed = GCN_PAD_BUTTON_A;
+        } else if (msg.active && msg.visibleChars >= pageLen && frame > 2) {
+            pressed = GCN_PAD_BUTTON_A;
+        }
+
+        VIWaitForRetrace_PC();
+        PCPort_MessageBoxTick(&msg, pressed);
+        if (msg.fastForwardCount > beforeFastForward) {
+            sawFastForward = 1;
+        }
+        if (msg.closeCount > beforeClose) {
+            sawClose = 1;
+        }
+
+        PCPort_FieldAnimTick(1.0f);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             3.14159265f, 1.3f, 1.0f);
+        RenderFieldCharacter(spawn[0] + 4.0f, spawn[1], spawn[2] - 3.0f,
+                             0.0f, 1.15f, 1.0f);
+        DrawFieldMessageBox(&msg, "NPC");
+        GSgfxSwapBuffers(0);
+        renderedFrames++;
+
+        if (!msg.active && sawClose) {
+            break;
+        }
+    }
+
+    if (msg.active || !sawPartial || !sawFastForward || !sawClose ||
+        msg.fastForwardCount != 1 || msg.closeCount != 1) {
+        fprintf(stderr,
+                "[field-npc-talk-smoke] failed: active=%d partial=%d fast=%d close=%d counts=%d/%d frame=%d\n",
+                msg.active,
+                sawPartial,
+                sawFastForward,
+                sawClose,
+                msg.fastForwardCount,
+                msg.closeCount,
+                frame);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    printf("[field-npc-talk-smoke] passed: fn_801812E8 talk=%u idle=%u restore=%u missing=%u talkState=%u prev=%u restoreState=%u frames=%d idleMotion=%d spawn=(%.1f,%.1f,%.1f)\n",
+           talkResult,
+           idleResult,
+           restoreResult,
+           missingResult,
+           talkNpc->state,
+           talkNpc->prevState,
+           restoreNpc->state,
+           renderedFrames,
+           idleMotion,
+           spawn[0], spawn[1], spawn[2]);
+    PCPort_PeopleHostClear();
     return 1;
 }
 
@@ -14710,6 +14992,7 @@ int main(int argc, char** argv) {
     int runFieldWorldWarpSmoke;
     int runFieldLocomotionSmoke;
     int runFieldMessageSmoke;
+    int runFieldNpcTalkSmoke;
     int runFieldStartMenuSmoke;
     int runWorldMapHandoffSmoke;
     int runWorldMapMenuSmoke;
@@ -14735,6 +15018,7 @@ int main(int argc, char** argv) {
     runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
     runFieldLocomotionSmoke = HasArg(argc, argv, "--field-locomotion-smoke");
     runFieldMessageSmoke = HasArg(argc, argv, "--field-message-smoke");
+    runFieldNpcTalkSmoke = HasArg(argc, argv, "--field-npc-talk-smoke");
     runFieldStartMenuSmoke = HasArg(argc, argv, "--field-start-menu-smoke");
     runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runWorldMapMenuSmoke = HasArg(argc, argv, "--worldmap-menu-smoke");
@@ -14854,6 +15138,7 @@ int main(int argc, char** argv) {
         runFieldWorldWarpSmoke ||
         runFieldLocomotionSmoke ||
         runFieldMessageSmoke ||
+        runFieldNpcTalkSmoke ||
         runFieldStartMenuSmoke ||
         runWorldMapHandoffSmoke ||
         runWorldMapMenuSmoke ||
@@ -15169,6 +15454,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Worldmap handoff smoke rendered world_map.fsys through the field scene bridge\n");
+    } else if (runFieldNpcTalkSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-npc-talk-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldNpcTalkSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field NPC talk smoke exercised fn_801812E8 and message close\n");
     } else if (runFieldStartMenuSmoke) {
         if (window == NULL) {
             fprintf(stderr,
