@@ -14,6 +14,11 @@
 
 static void TObjInfoInit(void);
 
+#ifdef PCPORT
+void PCPort_TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
+                         HSD_TExp** c, HSD_TExp** a, HSD_TExp** list);
+#endif
+
 HSD_TObjInfo hsdTObj = { TObjInfoInit };
 
 static HSD_TObjInfo* default_class = NULL;
@@ -205,4 +210,7 @@ static void TObjInfoInit(void)
     HSD_CLASS_INFO(&hsdTObj)->release = TObjRelease;
     HSD_CLASS_INFO(&hsdTObj)->amnesia = TObjAmnesia;
     HSD_TOBJ_INFO(&hsdTObj)->load = TObjLoad;
+#ifdef PCPORT
+    HSD_TOBJ_INFO(&hsdTObj)->make_texp = PCPort_TObjMakeTExp;
+#endif
 }

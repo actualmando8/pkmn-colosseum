@@ -96,7 +96,11 @@ void HSD_Free(void* ptr)
 #define PCPORT_HSD_TE_RAS  3U
 #define PCPORT_HSD_TE_CNST 4U
 
-#define PCPORT_HSD_TE_0 7U
+#define PCPORT_HSD_TE_RGB 1U
+#define PCPORT_HSD_TE_A   5U
+#define PCPORT_HSD_TE_X   6U
+#define PCPORT_HSD_TE_0   7U
+#define PCPORT_HSD_TE_1   8U
 
 typedef struct PCPort_TEArg {
     u8 type;
@@ -350,6 +354,203 @@ s32 fn_801B4300(void* tevdesc_out, HSD_TExp** texp_list)
         *(void**) tevdesc_out = NULL;
     }
     return 0;
+}
+
+static HSD_TExp* PCPort_TExpTexSource(void)
+{
+    return (HSD_TExp*) (uintptr_t) -1;
+}
+
+static HSD_TExp* PCPort_TExpPrevOrTex(HSD_TExp* previous)
+{
+    return previous != NULL ? previous : PCPort_TExpTexSource();
+}
+
+void PCPort_TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
+                         HSD_TExp** c, HSD_TExp** a, HSD_TExp** list)
+{
+    HSD_TExp* texp;
+    HSD_TExp* prev_c;
+    HSD_TExp* prev_a;
+
+    (void) lightmap;
+    (void) lightmap_done;
+    if (tobj == NULL || c == NULL || a == NULL || list == NULL) {
+        return;
+    }
+
+    prev_c = *c;
+    prev_a = *a;
+    texp = fn_801B707C(list);
+    if (texp == NULL) {
+        return;
+    }
+    fn_801B5E40(texp, tobj, 0xFF);
+
+    fn_801B6E74(texp, 0, 0, 0, 1);
+    switch (tobj_colormap(tobj)) {
+    case TEX_COLORMAP_REPLACE:
+        fn_801B64EC(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_RGB, PCPort_TExpTexSource());
+        *c = texp;
+        break;
+    case TEX_COLORMAP_NONE:
+    case TEX_COLORMAP_PASS:
+        fn_801B64EC(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_RGB, PCPort_TExpPrevOrTex(prev_c));
+        *c = texp;
+        break;
+    case TEX_COLORMAP_ADD:
+    case TEX_COLORMAP_SUB:
+    case TEX_COLORMAP_BLEND:
+    case TEX_COLORMAP_ALPHA_MASK:
+    case TEX_COLORMAP_RGB_MASK:
+    case TEX_COLORMAP_MODULATE:
+    default:
+        fn_801B64EC(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_RGB, PCPort_TExpTexSource(),
+                    PCPORT_HSD_TE_RGB, prev_c,
+                    PCPORT_HSD_TE_0, NULL);
+        *c = texp;
+        break;
+    }
+
+    fn_801B6CD8(texp, 0, 0, 0, 1);
+    switch (tobj_alphamap(tobj)) {
+    case TEX_ALPHAMAP_REPLACE:
+        fn_801B5F08(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_A, PCPort_TExpTexSource());
+        *a = texp;
+        break;
+    case TEX_ALPHAMAP_NONE:
+    case TEX_ALPHAMAP_PASS:
+        fn_801B5F08(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_A, PCPort_TExpPrevOrTex(prev_a));
+        *a = texp;
+        break;
+    case TEX_ALPHAMAP_ADD:
+    case TEX_ALPHAMAP_SUB:
+    case TEX_ALPHAMAP_BLEND:
+    case TEX_ALPHAMAP_ALPHA_MASK:
+    case TEX_ALPHAMAP_MODULATE:
+    default:
+        fn_801B5F08(texp, PCPORT_HSD_TE_0, NULL,
+                    PCPORT_HSD_TE_A, PCPort_TExpTexSource(),
+                    PCPORT_HSD_TE_A, prev_a,
+                    PCPORT_HSD_TE_0, NULL);
+        *a = texp;
+        break;
+    }
+}
+
+static void PCPort_MObjSeedMaterial(HSD_MObj* mobj, HSD_TExp** c,
+                                    HSD_TExp** a, HSD_TExp** list)
+{
+    HSD_TExp* texp;
+    HSD_TExp* diffuse;
+    HSD_TExp* alpha;
+
+    if (c == NULL || a == NULL || list == NULL) {
+        return;
+    }
+    if (mobj == NULL || mobj->mat == NULL) {
+        *c = NULL;
+        *a = NULL;
+        return;
+    }
+
+    texp = fn_801B707C(list);
+    if (texp == NULL) {
+        return;
+    }
+    diffuse = fn_801B6F5C(&mobj->mat->diffuse, PCPORT_HSD_TE_RGB, 0, list);
+    alpha = fn_801B6F5C(&mobj->mat->alpha, PCPORT_HSD_TE_X, 3, list);
+
+    fn_801B6E74(texp, 0, 0, 0, 1);
+    fn_801B64EC(texp, PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                diffuse != NULL ? PCPORT_HSD_TE_RGB : PCPORT_HSD_TE_1,
+                diffuse);
+    fn_801B6CD8(texp, 0, 0, 0, 1);
+    fn_801B5F08(texp, PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                alpha != NULL ? PCPORT_HSD_TE_X : PCPORT_HSD_TE_1,
+                alpha);
+    *c = texp;
+    *a = texp;
+}
+
+HSD_TExp* PCPort_MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top,
+                              HSD_TExp** list)
+{
+    HSD_TExp* color;
+    HSD_TExp* alpha;
+    HSD_TExp* root;
+    HSD_TObj* tobj;
+    u32 lightmap_done;
+
+    if (list == NULL) {
+        return NULL;
+    }
+    *list = NULL;
+    color = NULL;
+    alpha = NULL;
+    lightmap_done = 0;
+
+    PCPort_MObjSeedMaterial(mobj, &color, &alpha, list);
+    for (tobj = tobj_top; tobj != NULL; tobj = tobj->next) {
+        HSD_ClassInfo* info;
+        HSD_TObjInfo* method;
+        u32 lightmap;
+
+        if ((tobj->id & 0xFF) == 0xFF) {
+            continue;
+        }
+        info = tobj->parent.parent.class_info;
+        method = info != NULL ? HSD_TOBJ_INFO(info) : NULL;
+        lightmap = tobj_lightmap(tobj);
+        if (method != NULL && method->make_texp != NULL) {
+            method->make_texp(tobj, lightmap, lightmap_done, &color, &alpha,
+                              list);
+        } else {
+            PCPort_TObjMakeTExp(tobj, lightmap, lightmap_done, &color, &alpha,
+                                list);
+        }
+        lightmap_done |= lightmap;
+    }
+
+    if (color == NULL && alpha == NULL) {
+        return *list;
+    }
+    if (color == alpha && fn_801B7C60(color)) {
+        return color;
+    }
+
+    root = fn_801B707C(list);
+    if (root == NULL) {
+        return color != NULL ? color : alpha;
+    }
+    fn_801B6E74(root, 0, 0, 0, 1);
+    fn_801B64EC(root, PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_RGB, color);
+    fn_801B6CD8(root, 0, 0, 0, 1);
+    fn_801B5F08(root, PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_0, NULL,
+                PCPORT_HSD_TE_A, alpha != NULL ? alpha : color);
+    return root;
 }
 
 /* ========================================================================= */

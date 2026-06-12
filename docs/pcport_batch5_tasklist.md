@@ -44,6 +44,9 @@ Lane result:
 - [x] Triage `fn_801A7128` with DeepSeek V4 Flash.
 - [x] Host-bridge the TExp helper labels that blocked safe MObj work.
 - [x] Restore the six-smoke real TObj/TExp parser verification gate.
+- [x] Wire PC-port `hsdMObj.make_texp` and `hsdTObj.make_texp` to conservative host TExp builders.
+- [x] Replace the generated PC body for `fn_801A7B24` so it calls the local `load` and `make_texp` method slots correctly.
+- [x] Verify the live HSD character tree load path through `HSD_JObjLoadJoint -> HSD_DObjLoadDesc -> fn_801A7B24`.
 - [ ] Verify material state changes on real PC-port scene content.
 
 Active lane:
@@ -57,8 +60,9 @@ Lane result:
 - No overlay landed; the generated `fn_801A7128` candidate was compile-plausible but rejected for runtime safety.
 - Main checkout added BOOT-order host overrides in `pcport\hsd_host.c` for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B6CD8`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, `fn_801B7C60`, and `fn_801B4300`.
 - Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
-- Remaining blocker: `fn_801A7128` still cannot safely land until MObj/TObj method wiring is repaired. `hsdMObj.make_texp` and `hsdTObj.make_texp` remain unset in the current source init path, and `src\hsd\hsd_tobj_ext.c` `fn_801BC8BC` / `fn_801BCF30` are still placeholders.
-- Next MObj action: implement a minimal safe TObj `make_texp` bridge and PC-port method init wiring, then retry the `fn_801A7128` overlay.
+- Follow-up integrated in main: `pcport\hsd_host.c` now provides conservative `PCPort_MObjMakeTExp` / `PCPort_TObjMakeTExp` builders, `src\hsd\hsd_mobj.c` and `src\hsd\hsd_tobj.c` wire those into the PC-only class init path, and `build_pc\bodies\hsd_mobj\fn_801A7B24.c` corrects the generated MObj loader's local method-slot mapping.
+- Remaining blocker: the full `fn_801A7128` overlay is still deferred until its material/lightmap branches are reconstructed from the Colosseum `.inc` path. The method-contract prerequisite is now cleared, but visible material-state changes still need a render-side consumer beyond the conservative host bridge.
+- Next MObj action: reconstruct `fn_801A7128` branch-by-branch against `src\hsd\hsd_mobj_fn_801A7128.inc`, using the new host bridge as a runtime safety net rather than a byte-match substitute.
 
 Verification:
 
@@ -69,6 +73,9 @@ Verification:
 - `build_pc\pcport_bootstrap.exe --real-tev-scene-slice-3-smoke`
 - `build_pc\pcport_bootstrap.exe --real-tev-scene-slice-2-smoke`
 - `build_pc\pcport_bootstrap.exe --gsgfx-visible-smoke`
+- `PCPORT_MENU_FRAMES=45 build_pc\pcport_bootstrap.exe --field` -> loaded `D1_garage_1F`, 324 collision triangles, rendered 45 frames, exited cleanly.
+- `PCPORT_CHARANIM_BANK_PROBE=12 build_pc\pcport_bootstrap.exe` -> loaded `field_common.fsys :: ken_b1`, set up 11 motions, and stepped live HSD animation trees successfully.
+- `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 
 ## Batch 5D - hsd_cobj Camera Runtime Holes
 

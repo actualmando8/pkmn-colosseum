@@ -17,6 +17,11 @@ extern void* memset(void* dst, int val, u32 size);
 
 static void MObjInfoInit(void);
 
+#ifdef PCPORT
+HSD_TExp* PCPort_MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top,
+                              HSD_TExp** list);
+#endif
+
 HSD_MObjInfo hsdMObj = { MObjInfoInit };
 
 static HSD_ClassInfo* default_class = NULL;
@@ -190,6 +195,9 @@ static void MObjInfoInit(void)
     ((HSD_ClassInfo*) &hsdMObj)->release = MObjRelease;
     ((HSD_ClassInfo*) &hsdMObj)->amnesia = MObjAmnesia;
     hsdMObj.load = MObjLoad;
+#ifdef PCPORT
+    hsdMObj.make_texp = PCPort_MObjMakeTExp;
+#endif
 }
 
 /* 0x801A6B24 | 0x68 */
