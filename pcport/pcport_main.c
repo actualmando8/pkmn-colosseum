@@ -154,6 +154,8 @@ unsigned long CurrTvMode = 0;
  * renders it with just this archive/member swap. */
 #define PCPORT_TITLE_SCENE_ARCHIVE "orig/GC6E01/disc/files/title.fsys"
 #define PCPORT_TITLE_SCENE_MEMBER  "logo_demo"
+#define PCPORT_TITLE_SCENE_ROOT_JOINT 0x26108u
+#define PCPORT_TITLE_SCENE_LOGO_DOBJ 40u
 #define PCPORT_WORLDMAP_ARCHIVE    "orig/GC6E01/disc/files/world_map.fsys"
 
 /* Sky/sand horizon backdrop texture inside title.fsys:logo_demo (CMPR 512x256
@@ -750,13 +752,9 @@ static int BuildSandWindTexture(GXTexObj* tex) {
     return 1;
 }
 
-/* Make an RGBA image tile seamlessly left-to-right so it can be GX_REPEAT
- * scrolled without a wrap seam. The title sky texture wraps a sky cylinder in
- * the real game and is only ~seamless (its cloud edges don't quite line up), so
- * a naive horizontal scroll shows a moving vertical seam. Fix: roll the columns
- * by W/2 (the original left|right seam moves to the centre and the new outer
- * edges, being interior-adjacent columns, join seamlessly), then linearly heal
- * the now-central seam over a narrow band. Edits pixels in place. */
+/* Optional cloud diagnostic: roll an RGBA image left-to-right and heal the
+ * center seam before GX_REPEAT scrolling. This is not the default title path;
+ * the retail sky texture reads cleaner without the synthesized center band. */
 static void MakeSeamlessHoriz(u8* px, int w, int h) {
     int half = w / 2;
     int band = 28;            /* heal half-width (px) around the central seam */
@@ -7015,6 +7013,15 @@ static void RenderJointTree(const PCPortHSDArchive* a,
                  * alpha (not camera-space position) is camera-independent. */
                 int debugFlatChar = 0;
                 int skinIsolateSkip = 0;
+                if (rootJoint == PCPORT_TITLE_SCENE_ROOT_JOINT &&
+                    stats->dobjs == PCPORT_TITLE_SCENE_LOGO_DOBJ &&
+                    getenv("PCPORT_TITLE_SHOW_ARCHIVE_LOGO") == NULL) {
+                    /* Current host rendering only shows the archive Pokemon-logo
+                     * billboard without the full Colosseum composition. Keep it
+                     * suppressed by default; the old host 2D logo remains opt-in
+                     * for diagnostics. */
+                    isLogoTex = 1;
+                }
                 {
                     static int isoChars = -1;
                     static int isoLo = 6, isoHi = 9;
@@ -8032,7 +8039,7 @@ static int RunMenuScene(GLFWwindow* window) {
     GXTexObj windTex;              /* procedural sand-wind wisps, GX_REPEAT */
     int haveWind = 0;
     f32 cloudSpeed = 0.010f;       /* texture-units/sec the clouds drift left */
-    f32 cloudSpanX = 1.6f;         /* texture widths across the screen (>1 = smaller clouds) */
+    f32 cloudSpanX = 1.0f;         /* texture widths across the screen */
     f32 windSpeed = 0.060f;        /* texture-units/sec the sand-wind blows left */
     f32 cloudBandH = 190.0f;       /* sky-band height in px (clouds fade out below) */
     int cloudsEnabled = 0;
@@ -8070,6 +8077,9 @@ static int RunMenuScene(GLFWwindow* window) {
     int capExplicit;
     int titleHostUi = 0;
     int titleHostCam = 0;
+    int titleSceneOverlays = 0;
+    int titleCastEnabled = 0;
+    int haveTitleCast = 0;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
@@ -8101,8 +8111,13 @@ static int RunMenuScene(GLFWwindow* window) {
     }
     titleHostUi = getenv("PCPORT_TITLE_HOST_UI") != NULL;
     titleHostCam = getenv("PCPORT_TITLE_HOST_CAM") != NULL;
-    cloudsEnabled = titleHostUi;
-    windEnabled = titleHostUi;
+    titleSceneOverlays =
+        strcmp(sceneArchive, PCPORT_TITLE_SCENE_ARCHIVE) == 0 &&
+        strcmp(menuMember, PCPORT_TITLE_SCENE_MEMBER) == 0;
+    titleCastEnabled = titleSceneOverlays &&
+        getenv("PCPORT_NO_TITLE_CAST") == NULL;
+    cloudsEnabled = titleSceneOverlays;
+    windEnabled = titleSceneOverlays;
 
     if (!PCPort_LoadFsysMember(sceneArchive, menuMember,
                                &memberData, &memberSize)) {
@@ -8252,7 +8267,7 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
     /* Default to rendering the real 3D title scene from title.fsys:logo_demo.
-     * The legacy host foreground composite is opt-in via PCPORT_TITLE_HOST_UI;
+     * The legacy host logo/prompt composite is opt-in via PCPORT_TITLE_HOST_UI;
      * set PCPORT_NO_RENDER_3D=1 to fall back to the flat 2D sky backdrop. */
     render3D = getenv("PCPORT_NO_RENDER_3D") == NULL;
 
@@ -8265,7 +8280,7 @@ static int RunMenuScene(GLFWwindow* window) {
            frameCap,
            dumpRequested);
     if (!titleHostUi) {
-        printf("[pcport_bootstrap] Title host UI disabled; using archive scene foreground only (set PCPORT_TITLE_HOST_UI=1 for legacy composite)\n");
+        printf("[pcport_bootstrap] Legacy title logo/prompt disabled; title cast/cloud/sand overlays remain retail-backed (set PCPORT_TITLE_HOST_UI=1 for old composite)\n");
     }
     if (!titleHostCam) {
         printf("[pcport_bootstrap] Title host camera disabled; using archive camera (set PCPORT_TITLE_HOST_CAM=1 for legacy camera/pan)\n");
@@ -8345,7 +8360,7 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Main-menu chrome (menu_032: hand cursor + Quit) loaded\n");
     }
 
-    if (titleHostUi) {
+    if (titleCastEnabled) {
         /* Title posed cast: load EVERY set's cutouts once (RGBA8/RGB5A3, alpha).
          * The title cycles through kTitleSets[] while idle. */
         for (titleSetI = 0; titleSetI < PCPORT_TITLE_NUM_SETS; ++titleSetI) {
@@ -8368,6 +8383,9 @@ static int RunMenuScene(GLFWwindow* window) {
                 printf("[pcport_bootstrap] Title cast[%s] %s: %s\n",
                        set->name, cm->member,
                        titleCastOk[titleSetI][titleCastIdx] ? "loaded" : "FAILED");
+                if (titleCastOk[titleSetI][titleCastIdx]) {
+                    haveTitleCast = 1;
+                }
             }
         }
     }
@@ -8457,11 +8475,11 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
 
-    /* Legacy host drifting-cloud layer: the same sky texture (blue + clouds fading to tan),
+    /* Retail-backed drifting-cloud layer: the same sky texture (blue + clouds fading to tan),
      * but uploaded GX_REPEAT on S so the title can scroll its U over time and the
      * clouds wrap seamlessly. Drawn as a 2D band over the top sky region in the
      * 3D title path (where the scene's own sky reads as flat blue), so the clouds
-     * are actually visible and animate. Opt-in with PCPORT_TITLE_HOST_UI. */
+     * are actually visible and animate without reviving the old host logo. */
     if (cloudsEnabled) {
         PCPortTranslatedTexture cloudDesc;
         u8* cloudPixels = NULL;
@@ -8474,8 +8492,10 @@ static int RunMenuScene(GLFWwindow* window) {
         cloudDesc.height = PCPORT_TITLE_SKY_HEIGHT;
         if (PCPort_BakeTextureRGBAFromArchiveBE(&archive, &cloudDesc,
                                                 &cloudPixels, &cloudPxSize)) {
-            MakeSeamlessHoriz(cloudPixels, PCPORT_TITLE_SKY_WIDTH,
-                              PCPORT_TITLE_SKY_HEIGHT);
+            if (getenv("PCPORT_CLOUD_SEAM_HEAL") != NULL) {
+                MakeSeamlessHoriz(cloudPixels, PCPORT_TITLE_SKY_WIDTH,
+                                  PCPORT_TITLE_SKY_HEIGHT);
+            }
             GXHostInitTexObjRGBA8(&cloudTex, cloudPixels,
                                   PCPORT_TITLE_SKY_WIDTH, PCPORT_TITLE_SKY_HEIGHT,
                                   GX_REPEAT, GX_CLAMP);
@@ -8486,7 +8506,7 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
 
-    /* Legacy host sand-wind layer: procedural tileable wisps, scrolled across the desert. */
+    /* Retail-backed sand-wind layer: procedural tileable wisps, scrolled across the desert. */
     if (windEnabled && BuildSandWindTexture(&windTex)) {
         haveWind = 1;
         printf("[pcport_bootstrap] Title sand-wind layer built (procedural wisps)\n");
@@ -8818,10 +8838,10 @@ static int RunMenuScene(GLFWwindow* window) {
 
         /* 2D overlay, selected by the current front-end state. The sky/sand
          * backdrop (when 3D is off) is shared by both states; the title draws
-         * legacy host foreground only when PCPORT_TITLE_HOST_UI is set, while
-         * the main menu draws the menu_033 panel. */
+         * retail-backed cast/cloud/sand overlays by default, and the old host
+         * logo/prompt only when PCPORT_TITLE_HOST_UI is set. */
         if (haveSky || haveCloud || haveWind || haveLogo ||
-            haveMenu018 || haveMenu033 || haveMenu032) {
+            haveTitleCast || haveMenu018 || haveMenu033 || haveMenu032) {
             BeginMenuOverlay();
             if (sceneState == PCPORT_SCENE_TITLE ||
                 sceneState == PCPORT_SCENE_SAVE_PROMPT) {
@@ -8885,7 +8905,7 @@ static int RunMenuScene(GLFWwindow* window) {
                     uiAfter = (!titlePanOn) || (aT >= panSecs + 0.45);
 
                     /* cast cutouts (under the logo) -- appear once the logo lands */
-                    if (titleHostUi && uiAfter && !sceneOnly) {
+                    if (titleCastEnabled && haveTitleCast && uiAfter && !sceneOnly) {
                         const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
                         int acnt = aset->count;
                         if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }

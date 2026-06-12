@@ -198,7 +198,7 @@ Verification:
 - [ ] Link field messages to the real `menu_msgbox` / script-callback state machine.
 - [ ] Add field trigger/event dispatch coverage.
 - [ ] Add story progression state mutation/restore coverage.
-- [ ] Restore retail-backed title cast, sand animation, and crossing clouds without the removed host-mismatched logo assumptions.
+- [x] Restore retail-backed title cast, sand animation, and crossing clouds without the removed host-mismatched logo assumptions.
 - [ ] Fix boot video/audio playback and the Nintendo logo orientation after the title path is audited.
 
 Lane result:
@@ -214,6 +214,7 @@ Lane result:
 - The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the playable walk loop's movement/yaw helpers, and now drives animation choice from the recovered retail people action record `0x00F30400` through the `fn_8012C660` turn-zone selector over `fn_8018F4C8` action slots 1-4. The host still selects the dominant endpoint when retail would blend two slots through `fn_800EC5FC` / `fn_800EC5B8`, so exact blend transitions remain open even though the idle/right/left/hard-right action-slot choices are now smoke-gated.
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
+- The title default now keeps the legacy host title logo/prompt disabled while loading the retail `title.fsys` `t_vs_*` cast cutouts, the title sky/cloud band, and the sand-wind overlay by default. The incomplete archive Pokemon-logo billboard DObj is suppressed until the full retail logo composition is fixed; `PCPORT_TITLE_HOST_UI=1` remains the opt-in diagnostic path for the old host overlay.
 - The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
 - `S1_shop_1F` currently renders as a static field target; its ambient field animation setup is skipped until that map's animjoint path is recovered.
 - `include\hsd\hsd_debug.h` now uses a `PCPORT`-only unprototyped `__assert()` declaration so generated/decompiled HSD TUs with mixed assert call shapes compile in the host harness without changing the matching build declaration.
@@ -224,7 +225,7 @@ Audit correction (2026-06-11):
 - Asset/render/collision backed but still host-orchestrated: field scene load, WZX collision load, field character load, room/world reload mechanics, and worldmap render handoff.
 - Host scaffolds, not game-code correctness: hand-written field warp exits/spawns, host worldmap menu/destination table, host START field menu overlay, host message box pages, and menu New Game smoke skip/autorun.
 - Incorrectly overstated before this audit: `--field-locomotion-smoke` did not prove true directional animation correctness while it was backed by the motion-bank heuristic (`idle=1`, `walk=5`, `run=8` for `ken_b1`) or the later host idle/walk/run projection. Follow-up now links the recovered people action-record rows from retail common_rel and drives the live walk loop through the `fn_8012C660` turn-zone selector (`key=0x00F30400`, action slots `1/2/3/4 -> motions 1/2/3/4`). The remaining animation gap is exact HSD blend transition behavior, not the action-slot source.
-- Incorrectly overstated before this audit: title foreground/camera composition included host-made logo/cast/cloud/pan assumptions. The PC front-end should default to the real `title.fsys:logo_demo` archive scene; legacy host title UI/camera diagnostics are opt-in.
+- Incorrectly overstated before this audit: title foreground/camera composition included host-made logo/cast/cloud/pan assumptions. The PC front-end now defaults to the real `title.fsys:logo_demo` archive scene plus the retail-backed 2D cast/cloud/sand overlays that were already recovered; legacy host title logo/prompt/camera diagnostics are opt-in. The partial archive Pokemon-logo billboard is suppressed by default until the full retail logo composition is recovered.
 
 Audit verification (2026-06-12 update):
 
@@ -232,7 +233,8 @@ Audit verification (2026-06-12 update):
 - `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> now passes with `source=game-record`, `key=0x00F30400`, action slots `1:1 2:2 3:3 4:4`, and `turnCases=6`.
 - `PCPORT_FIELD_REQUIRE_GAME_MOTION=1 PCPORT_FIELD_MOTION_RECORD_PROBE=1 build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passes, prints the recovered retail slots, and validates straight/right/left/hard-right `fn_8012C660` turn-zone cases.
 - `build_pc\pcport_bootstrap.exe --field-message-smoke`, `--field-start-menu-smoke`, `--worldmap-menu-smoke`, `--story-field-smoke`, `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, and `--worldmap-handoff-smoke` -> passed after the audit wording/code changes.
-- `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=2 build_pc\pcport_bootstrap.exe` -> passed and rendered two title/menu frames without loading the legacy host title logo, PRESS START sheet, cast cutouts, clouds, wind, or host camera.
+- `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> passed and loaded title cast cutouts, drifting-cloud layer, and sand-wind layer while keeping the legacy host title logo/prompt disabled.
+- `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 PCPORT_ANIM_TIME=0/5 PCPORT_DUMP=... build_pc\pcport_bootstrap.exe` -> title captures verified no mismatched logo, visible cast/cloud/sand, and animation deltas of `sky_0_190=96985`, `sand_196_432=103654`, `fullDiffPixels=200639`.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 - `git diff --check` -> no whitespace errors in the edited repo files.
 
@@ -242,6 +244,8 @@ Verification:
 - `build_pc\pcport_bootstrap.exe --field-start-menu-smoke` -> passed with `S1_out`, `ken_b1`, START open, two cursor moves, START close, `frames=6`, `idleMotion=1`.
 - `build_pc\pcport_bootstrap.exe --field-message-smoke` -> passed with `S1_out`, `ken_b1`, two message pages, one fast-forward, one page advance, one close, `frames=24`, `idleMotion=1`.
 - `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passed with `S1_out`, `ken_b1`, `source=game-record`, `key=0x00F30400`, action slots `1:1 2:2 3:3 4:4`, and 6 `fn_8012C660` turn-zone cases.
+- `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> passed with default title cast/cloud/sand overlays active and no legacy host logo/prompt.
+- `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 PCPORT_ANIM_TIME=0/5 PCPORT_DUMP=... build_pc\pcport_bootstrap.exe` -> title visual captures passed with no mismatched logo and cloud/sand drift pixel delta (`sky=96985`, `sand=103654`, `full=200639`).
 - `build_pc\pcport_bootstrap.exe --worldmap-menu-smoke` -> passed with cursor `OUTSKIRT STAND -> PHENAC CITY -> PYRITE TOWN`, travel confirm opened, `YES` accepted, then loaded `M2_out` with `floor=4`, `tris=2125`, `frames=9`.
 - `build_pc\pcport_bootstrap.exe --worldmap-handoff-smoke` -> passed with `world_map.fsys`, selected/rendered `move_demo`, `rootJoint=0x20`, `extraModels=2`, `collisionTris=0`.
 - `build_pc\pcport_bootstrap.exe --field-world-warp-smoke` -> passed with player trigger `2->3`, start `(69.0,0.0,-30.0)`, target `S1_shop_1F`, shop `tris=196`, `exit->2`, spawn `(0.0,0.0,35.0)`.
