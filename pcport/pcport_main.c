@@ -8035,8 +8035,8 @@ static int RunMenuScene(GLFWwindow* window) {
     f32 cloudSpanX = 1.6f;         /* texture widths across the screen (>1 = smaller clouds) */
     f32 windSpeed = 0.060f;        /* texture-units/sec the sand-wind blows left */
     f32 cloudBandH = 190.0f;       /* sky-band height in px (clouds fade out below) */
-    int cloudsEnabled = 1;
-    int windEnabled = 1;
+    int cloudsEnabled = 0;
+    int windEnabled = 0;
     double animTimeForced = -1.0;  /* PCPORT_ANIM_TIME pins the anim clock (headless) */
     GXTexObj titleCastTex[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
     int titleCastOk[PCPORT_TITLE_MAX_SETS][PCPORT_TITLE_CAST_MAX];
@@ -8068,6 +8068,8 @@ static int RunMenuScene(GLFWwindow* window) {
     const char* seqBase = NULL;    /* PCPORT_DUMP_SEQ: within-run sequence capture */
     int seqEvery = 10;
     int capExplicit;
+    int titleHostUi = 0;
+    int titleHostCam = 0;
 
     memset(&archive, 0, sizeof(archive));
     memset(&translatedCamera, 0, sizeof(translatedCamera));
@@ -8081,6 +8083,8 @@ static int RunMenuScene(GLFWwindow* window) {
     memset(&skyTex, 0, sizeof(skyTex));
     memset(&cloudTex, 0, sizeof(cloudTex));
     memset(&windTex, 0, sizeof(windTex));
+    memset(titleCastTex, 0, sizeof(titleCastTex));
+    memset(titleCastOk, 0, sizeof(titleCastOk));
     memset(pads, 0, sizeof(pads));
 
     /* Default to the title scene (desert/ruins environment + logo) in
@@ -8095,6 +8099,10 @@ static int RunMenuScene(GLFWwindow* window) {
     if (menuMember == NULL || menuMember[0] == '\0') {
         menuMember = PCPORT_TITLE_SCENE_MEMBER;
     }
+    titleHostUi = getenv("PCPORT_TITLE_HOST_UI") != NULL;
+    titleHostCam = getenv("PCPORT_TITLE_HOST_CAM") != NULL;
+    cloudsEnabled = titleHostUi;
+    windEnabled = titleHostUi;
 
     if (!PCPort_LoadFsysMember(sceneArchive, menuMember,
                                &memberData, &memberSize)) {
@@ -8139,20 +8147,17 @@ static int RunMenuScene(GLFWwindow* window) {
         goto cleanup;
     }
 
-    /* Replace logo_demo's embedded flythrough-START camera (interest looks down
-     * and close, which frames the scene zoomed-in) with the title END pose held
-     * by cam_logo_demo_stop: same eye, but the interest looks ACROSS the desert
-     * at eye level. These are the end-frame values of cam_logo_demo_stop's
-     * (all-constant) camera animation. The archive's projection (fov 45, near/
-     * far) is kept. PCPORT_NO_TITLE_CAM disables it (use the raw scene camera). */
-    if (getenv("PCPORT_NO_TITLE_CAM") == NULL) {
+    /* The real archive camera is the default. The old host-composited title
+     * camera/pan is kept only as an opt-in diagnostic because it is not proven
+     * against the game's title code path. */
+    if (titleHostCam) {
         static const f32 titleEye[3] = { 0.0f, 38.905f, 409.812f };
         static const f32 titleInt[3] = { 0.0f, 39.6514f, 1.5625f };
         static const f32 titleUp[3]  = { 0.0f, 1.0f, 0.0f };
 
         BuildViewMatrixLookAt(titleEye, titleInt, titleUp,
                               translatedCamera.viewMatrix);
-        /* enable the intro pan-out (held at this end pose once it completes) */
+        /* enable the diagnostic intro pan-out (held at this end pose once it completes) */
         if (getenv("PCPORT_NO_PAN") == NULL) {
             const char* ps = getenv("PCPORT_PAN_SECS");
             if (ps != NULL && atof(ps) > 0.0) panSecs = atof(ps);
@@ -8246,10 +8251,9 @@ static int RunMenuScene(GLFWwindow* window) {
             frameCap = debugStartFrame + 2;
         }
     }
-    /* Default to rendering the real 3D title scene (desert/ruins + the textured
-     * geometry, texture x diffuse modulated, demo fade + logo billboards
-     * skipped). Set PCPORT_NO_RENDER_3D=1 to fall back to the flat 2D sky
-     * backdrop instead. */
+    /* Default to rendering the real 3D title scene from title.fsys:logo_demo.
+     * The legacy host foreground composite is opt-in via PCPORT_TITLE_HOST_UI;
+     * set PCPORT_NO_RENDER_3D=1 to fall back to the flat 2D sky backdrop. */
     render3D = getenv("PCPORT_NO_RENDER_3D") == NULL;
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
@@ -8260,6 +8264,12 @@ static int RunMenuScene(GLFWwindow* window) {
            rootJointOffset,
            frameCap,
            dumpRequested);
+    if (!titleHostUi) {
+        printf("[pcport_bootstrap] Title host UI disabled; using archive scene foreground only (set PCPORT_TITLE_HOST_UI=1 for legacy composite)\n");
+    }
+    if (!titleHostCam) {
+        printf("[pcport_bootstrap] Title host camera disabled; using archive camera (set PCPORT_TITLE_HOST_CAM=1 for legacy camera/pan)\n");
+    }
 
     /* Real title HSD animation drive (FObj interpreter): build + arm a live
      * animated HSD_JObj tree from the title scene so the game's own anim pipeline
@@ -8282,10 +8292,10 @@ static int RunMenuScene(GLFWwindow* window) {
         goto cleanup;
     }
 
-    /* Load + bake + upload the static title logo once (GL context + GSgfxInit
-     * are ready here). The decompressor fix in real_content_host.c is required
-     * for logo_demo (a strongly-compressed v0102 member) to load at all. */
-    if (PCPort_LoadFsysMember(PCPORT_LOGO_ARCHIVE, PCPORT_LOGO_MEMBER,
+    /* Legacy host-composited title foreground. Disabled by default because the
+     * real title code owns this composition; keep it only for comparison work. */
+    if (titleHostUi &&
+        PCPort_LoadFsysMember(PCPORT_LOGO_ARCHIVE, PCPORT_LOGO_MEMBER,
                               &logoData, &logoSize) &&
         PCPort_HSDArchiveParseBE(&logoArchive, logoData, logoSize)) {
         PCPortTranslatedTexture logoDesc;
@@ -8306,15 +8316,17 @@ static int RunMenuScene(GLFWwindow* window) {
                    PCPORT_LOGO_WIDTH, PCPORT_LOGO_HEIGHT, logoPxSize);
         }
     }
-    if (!haveLogo) {
+    if (titleHostUi && !haveLogo) {
         fprintf(stderr,
                 "[pcport_bootstrap] Title logo unavailable (continuing without it)\n");
     }
 
     /* Title-screen 2D overlay: copyright lines + PRESS START (raw RGB5A3 sprite). */
-    haveMenu018 = LoadRawMenuTexObj(PCPORT_TITLE_PRESS_MEMBER, &menu018Tex);
-    if (haveMenu018) {
-        printf("[pcport_bootstrap] Title overlay (PRESS START + copyright) loaded\n");
+    if (titleHostUi) {
+        haveMenu018 = LoadRawMenuTexObj(PCPORT_TITLE_PRESS_MEMBER, &menu018Tex);
+        if (haveMenu018) {
+            printf("[pcport_bootstrap] Title overlay (PRESS START + copyright) loaded\n");
+        }
     }
 
     /* Main-menu panel (shown after START). Loaded up front so the title->menu
@@ -8333,28 +8345,30 @@ static int RunMenuScene(GLFWwindow* window) {
         printf("[pcport_bootstrap] Main-menu chrome (menu_032: hand cursor + Quit) loaded\n");
     }
 
-    /* Title posed cast: load EVERY set's cutouts once (RGBA8/RGB5A3, alpha).
-     * The title cycles through kTitleSets[] while idle. */
-    for (titleSetI = 0; titleSetI < PCPORT_TITLE_NUM_SETS; ++titleSetI) {
-        const PCPortTitleSet* set = &kTitleSets[titleSetI];
-        int cnt = set->count;
-        if (cnt > PCPORT_TITLE_CAST_MAX) {
-            cnt = PCPORT_TITLE_CAST_MAX;
-        }
-        for (titleCastIdx = 0; titleCastIdx < cnt; ++titleCastIdx) {
-            const PCPortTitleCastMember* cm = &set->members[titleCastIdx];
-            memset(&titleCastTex[titleSetI][titleCastIdx], 0,
-                   sizeof(titleCastTex[titleSetI][titleCastIdx]));
-            titleCastOk[titleSetI][titleCastIdx] = LoadFsysSpriteTexObj(
-                PCPORT_TITLE_CAST_ARCHIVE, cm->member,
-                &titleCastTex[titleSetI][titleCastIdx]);
-            if (!titleCastOk[titleSetI][titleCastIdx] && cm->blob != NULL) {
-                titleCastOk[titleSetI][titleCastIdx] = LoadRawRGBABlobTexObj(
-                    cm->blob, &titleCastTex[titleSetI][titleCastIdx]);
+    if (titleHostUi) {
+        /* Title posed cast: load EVERY set's cutouts once (RGBA8/RGB5A3, alpha).
+         * The title cycles through kTitleSets[] while idle. */
+        for (titleSetI = 0; titleSetI < PCPORT_TITLE_NUM_SETS; ++titleSetI) {
+            const PCPortTitleSet* set = &kTitleSets[titleSetI];
+            int cnt = set->count;
+            if (cnt > PCPORT_TITLE_CAST_MAX) {
+                cnt = PCPORT_TITLE_CAST_MAX;
             }
-            printf("[pcport_bootstrap] Title cast[%s] %s: %s\n",
-                   set->name, cm->member,
-                   titleCastOk[titleSetI][titleCastIdx] ? "loaded" : "FAILED");
+            for (titleCastIdx = 0; titleCastIdx < cnt; ++titleCastIdx) {
+                const PCPortTitleCastMember* cm = &set->members[titleCastIdx];
+                memset(&titleCastTex[titleSetI][titleCastIdx], 0,
+                       sizeof(titleCastTex[titleSetI][titleCastIdx]));
+                titleCastOk[titleSetI][titleCastIdx] = LoadFsysSpriteTexObj(
+                    PCPORT_TITLE_CAST_ARCHIVE, cm->member,
+                    &titleCastTex[titleSetI][titleCastIdx]);
+                if (!titleCastOk[titleSetI][titleCastIdx] && cm->blob != NULL) {
+                    titleCastOk[titleSetI][titleCastIdx] = LoadRawRGBABlobTexObj(
+                        cm->blob, &titleCastTex[titleSetI][titleCastIdx]);
+                }
+                printf("[pcport_bootstrap] Title cast[%s] %s: %s\n",
+                       set->name, cm->member,
+                       titleCastOk[titleSetI][titleCastIdx] ? "loaded" : "FAILED");
+            }
         }
     }
     {
@@ -8443,11 +8457,11 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
 
-    /* Drifting-cloud layer: the same sky texture (blue + clouds fading to tan),
+    /* Legacy host drifting-cloud layer: the same sky texture (blue + clouds fading to tan),
      * but uploaded GX_REPEAT on S so the title can scroll its U over time and the
      * clouds wrap seamlessly. Drawn as a 2D band over the top sky region in the
      * 3D title path (where the scene's own sky reads as flat blue), so the clouds
-     * are actually visible and animate. Baked regardless of render3D. */
+     * are actually visible and animate. Opt-in with PCPORT_TITLE_HOST_UI. */
     if (cloudsEnabled) {
         PCPortTranslatedTexture cloudDesc;
         u8* cloudPixels = NULL;
@@ -8472,7 +8486,7 @@ static int RunMenuScene(GLFWwindow* window) {
         }
     }
 
-    /* Sand-wind layer: procedural tileable wisps, scrolled across the desert. */
+    /* Legacy host sand-wind layer: procedural tileable wisps, scrolled across the desert. */
     if (windEnabled && BuildSandWindTexture(&windTex)) {
         haveWind = 1;
         printf("[pcport_bootstrap] Title sand-wind layer built (procedural wisps)\n");
@@ -8804,8 +8818,8 @@ static int RunMenuScene(GLFWwindow* window) {
 
         /* 2D overlay, selected by the current front-end state. The sky/sand
          * backdrop (when 3D is off) is shared by both states; the title draws
-         * logo + PRESS START + copyright, the main menu draws the menu_033
-         * panel. The 3D scene is gated behind PCPORT_RENDER_3D. */
+         * legacy host foreground only when PCPORT_TITLE_HOST_UI is set, while
+         * the main menu draws the menu_033 panel. */
         if (haveSky || haveCloud || haveWind || haveLogo ||
             haveMenu018 || haveMenu033 || haveMenu032) {
             BeginMenuOverlay();
@@ -8871,7 +8885,7 @@ static int RunMenuScene(GLFWwindow* window) {
                     uiAfter = (!titlePanOn) || (aT >= panSecs + 0.45);
 
                     /* cast cutouts (under the logo) -- appear once the logo lands */
-                    if (uiAfter && !sceneOnly) {
+                    if (titleHostUi && uiAfter && !sceneOnly) {
                         const PCPortTitleSet* aset = &kTitleSets[titleSetIndex];
                         int acnt = aset->count;
                         if (acnt > PCPORT_TITLE_CAST_MAX) { acnt = PCPORT_TITLE_CAST_MAX; }
@@ -10120,6 +10134,7 @@ typedef struct PCPortFieldMotionMap {
     int runLoop;
     int fromRecord;
     int fromHeuristic;
+    int fromEnv;
     u32 key;
 } PCPortFieldMotionMap;
 
@@ -10310,10 +10325,10 @@ static void PCPort_FieldMotionRecordProbe(const u8* record, u32 key) {
     fflush(stdout);
 }
 
-/* Role-to-motion indirection. If a real 0x2C per-character record table is
- * installed, use it. Otherwise classify the loaded model's motion bank: lowest,
- * middle, highest-energy cyclic clips become idle, walk, run. Env overrides
- * remain diagnostic only; there is no hardcoded Wes fallback. */
+/* Role-to-motion indirection. If a real 0x2C per-character action record is
+ * installed, use it. Otherwise classify the loaded model's motion bank as a
+ * visual fallback only; that fallback is not proof of the game's directional
+ * animation/action selection. Env overrides remain diagnostic. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
@@ -10328,6 +10343,7 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     map.runLoop = 0;
     map.fromRecord = 0;
     map.fromHeuristic = 0;
+    map.fromEnv = 0;
     map.key = 0u;
 
     if (PCPort_ParseFieldMotionRecordEnv(envRecord)) {
@@ -10376,21 +10392,52 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
             map.idle = a;
             map.walk = b;
             map.run = c;
+            map.fromEnv = 1;
         }
     }
-    PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle);
-    PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk);
-    PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run);
+    if (PCPort_ParseIntEnv("PCPORT_IDLE_MOTION", &map.idle)) {
+        map.fromEnv = 1;
+    }
+    if (PCPort_ParseIntEnv("PCPORT_WALK_MOTION", &map.walk)) {
+        map.fromEnv = 1;
+    }
+    if (PCPort_ParseIntEnv("PCPORT_RUN_MOTION", &map.run)) {
+        map.fromEnv = 1;
+    }
     if (getenv("PCPORT_MOTION_DEBUG") != NULL) {
         printf("[field/motion] map idle=%d(loop=%d) walk=%d(loop=%d) "
-               "run=%d(loop=%d)%s%s key=0x%08X\n",
+               "run=%d(loop=%d)%s%s%s key=0x%08X\n",
                map.idle, map.idleLoop, map.walk, map.walkLoop,
                map.run, map.runLoop,
                map.fromRecord ? " [record]" : "",
                map.fromHeuristic ? " [heuristic]" : "",
+               map.fromEnv ? " [env]" : "",
                map.key);
     }
     return map;
+}
+
+static const char* PCPort_FieldMotionMapSourceName(const PCPortFieldMotionMap* map) {
+    if (map == NULL) {
+        return "missing";
+    }
+    if (map->fromEnv) {
+        return "env-override";
+    }
+    if (map->fromRecord && map->fromHeuristic) {
+        return "record+heuristic-fill";
+    }
+    if (map->fromRecord) {
+        return "game-record";
+    }
+    if (map->fromHeuristic) {
+        return "motion-bank-heuristic";
+    }
+    return "missing";
+}
+
+static int PCPort_FieldMotionMapIsGameBacked(const PCPortFieldMotionMap* map) {
+    return map != NULL && map->fromRecord && !map->fromHeuristic && !map->fromEnv;
 }
 
 static int PCPort_FieldMotionForRole(const PCPortFieldMotionMap* map,
@@ -10539,6 +10586,10 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
     }
     motionMap = PCPort_LoadFieldMotionMap();
+    if (g_engCharLoaded && !PCPort_FieldMotionMapIsGameBacked(&motionMap)) {
+        printf("[field/motion] source=%s; real field action-record selection is not linked yet\n",
+               PCPort_FieldMotionMapSourceName(&motionMap));
+    }
     if (spawn != NULL) {
         ppos[0] = spawn[0]; ppos[1] = spawn[1]; ppos[2] = spawn[2];
     }
@@ -10641,8 +10692,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         /* Drive the motion bank: idle while standing, walk for partial-stick
          * movement, run/dash for full-stick or held B/R. Motion ids come from
-         * the real per-character action record when its table and key are
-         * available. */
+         * the real per-character action record when its table/key are available;
+         * otherwise the motion-bank classifier is only a visual fallback. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
             int nextMotion = PCPort_FieldMotionForRole(&motionMap, role);
             if (nextMotion < 0) {
@@ -11392,6 +11443,17 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
                 idleMotion, walkMotion, runMotion);
         return 0;
     }
+    if (getenv("PCPORT_FIELD_REQUIRE_GAME_MOTION") != NULL &&
+        !PCPort_FieldMotionMapIsGameBacked(&motionMap)) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: source=%s is not game action-record backed\n",
+                PCPort_FieldMotionMapSourceName(&motionMap));
+        return 0;
+    }
+    if (!PCPort_FieldMotionMapIsGameBacked(&motionMap)) {
+        printf("[field-locomotion-smoke] source=%s; verifying motion plumbing/facing only, not canonical game directional animation\n",
+               PCPort_FieldMotionMapSourceName(&motionMap));
+    }
 
     for (i = 0; i < (int)(sizeof(cases) / sizeof(cases[0])); ++i) {
         const PCPortFieldLocomotionSmokeCase* c = &cases[i];
@@ -11444,7 +11506,8 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
                moveMag);
     }
 
-    printf("[field-locomotion-smoke] passed: S1_out player locomotion idle=%d walk=%d run=%d directions=%d spawn=(%.1f,%.1f,%.1f)\n",
+    printf("[field-locomotion-smoke] passed: S1_out player motion plumbing source=%s idle=%d walk=%d run=%d facingCases=%d spawn=(%.1f,%.1f,%.1f)\n",
+           PCPort_FieldMotionMapSourceName(&motionMap),
            idleMotion,
            walkMotion,
            runMotion,
@@ -14891,7 +14954,7 @@ int main(int argc, char** argv) {
             goto cleanup;
         }
 
-        printf("[pcport_bootstrap] Field locomotion smoke exercised idle/walk/run directional animation gating\n");
+        printf("[pcport_bootstrap] Field locomotion smoke exercised idle/walk/run motion plumbing and facing cases\n");
     } else if (runFieldWorldWarpSmoke) {
         if (window == NULL) {
             fprintf(stderr,
