@@ -190,7 +190,7 @@ def main():
     print(f"compiled {len(objs)} objects; {len(failed)} failed to compile: "
           f"{[f[0] if isinstance(f, tuple) else f for f in failed]}")
 
-    exe = ROOT / "build_pc/pcport_bootstrap.exe"
+    exe = ROOT / os.environ.get("PCPORT_LINK_EXE", "build_pc/pcport_bootstrap.exe")
     all_undef, so = set(), None
     for rnd in range(1, 9):
         if exe.exists():

@@ -64,9 +64,8 @@ extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
 extern void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint);
 extern HSD_JObj* fn_801A0FBC(HSD_Joint* joint);
-extern void fn_801A6E24(HSD_MObj* mobj);
 extern s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src);
-extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
+extern void MObjUpdateFunc(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
 extern void GSgfxHostClearPipelineState(unsigned int pipelineId);
 extern void GSgfxHostSetPipelineBlend(unsigned int pipelineId,
                                       unsigned int type,
@@ -2687,10 +2686,10 @@ static int RunRealMaterialDeltaSmoke(void) {
     materialAnimOriginalDiffuse = liveMObj->mat->diffuse;
     materialAnimOriginalAlpha = liveMObj->mat->alpha;
     materialAnimValue.fv = 0.125f;
-    fn_801A7E84(liveMObj, 4u, &materialAnimValue);
+    MObjUpdateFunc(liveMObj, 4u, &materialAnimValue);
     materialAnimDiffuseR = (liveMObj->mat->diffuse >> 24) & 0xFFu;
     materialAnimValue.fv = 0.75f;
-    fn_801A7E84(liveMObj, 7u, &materialAnimValue);
+    MObjUpdateFunc(liveMObj, 7u, &materialAnimValue);
     materialAnimAlpha = liveMObj->mat->alpha;
     if (materialAnimDiffuseR != 31u ||
         !(materialAnimAlpha > 0.249f && materialAnimAlpha < 0.251f)) {
@@ -2723,7 +2722,7 @@ static int RunRealMaterialDeltaSmoke(void) {
     }
 
     liveMObj->texp = NULL;
-    fn_801A6E24(liveMObj);
+    HSD_MObjSetup(liveMObj, liveMObj->rendermode);
     setupTExpList = liveMObj->texp;
     if (setupTExpList == NULL) {
         fprintf(stderr,
@@ -5801,6 +5800,9 @@ typedef struct PCPortStoryFieldSmokeState {
     int active;
     int sawMenuHandoff;
     int targetFloor;
+    int currentFloor;
+    int sawOutskirtLoad;
+    int sawShopLoad;
     int mapLoaded;
     int colTris;
     int exitCount;
@@ -5809,6 +5811,15 @@ typedef struct PCPortStoryFieldSmokeState {
     int charLoaded;
     int charAnimReady;
     int moved;
+    int doorStoryReady;
+    int doorStoryOpened;
+    int doorStoryAdvanced;
+    int doorStoryClosed;
+    int doorStoryWarpFloor;
+    int doorStoryNpcDrawn;
+    u32 doorStoryNpcIndex;
+    u32 storyStep;
+    u32 cutsceneState;
     f32 spawn[3];
     f32 finalPos[3];
     char mapPath[128];
@@ -5822,6 +5833,8 @@ static void PCPort_StoryFieldSmokeBegin(void) {
     memset(&g_pcStoryFieldSmoke, 0, sizeof(g_pcStoryFieldSmoke));
     g_pcStoryFieldSmoke.active = 1;
     g_pcStoryFieldSmoke.targetFloor = -1;
+    g_pcStoryFieldSmoke.currentFloor = -1;
+    g_pcStoryFieldSmoke.doorStoryWarpFloor = -1;
 }
 
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
@@ -10007,6 +10020,7 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
 };
 static const int g_pcWarpMapCount =
     (int)(sizeof(g_pcWarpMaps) / sizeof(g_pcWarpMaps[0]));
+static int g_pcCurrentFieldFloor = -1;
 
 static const PCPortWarpMapEntry* PCPort_WarpFindFloor(int floorId) {
     int i;
@@ -10076,13 +10090,20 @@ static int PCPort_FieldWarpTo(int targetFloor, f32 outSpawn[3]) {
     }
 
     if (g_pcStoryFieldSmoke.active) {
-        g_pcStoryFieldSmoke.targetFloor = targetFloor;
-        g_pcStoryFieldSmoke.mapLoaded = 1;
-        g_pcStoryFieldSmoke.colTris = colTris;
+        g_pcStoryFieldSmoke.currentFloor = targetFloor;
+        if (targetFloor == PC_FLOOR_OUTSKIRT) {
+            g_pcStoryFieldSmoke.sawOutskirtLoad = 1;
+            g_pcStoryFieldSmoke.targetFloor = targetFloor;
+            g_pcStoryFieldSmoke.mapLoaded = 1;
+            g_pcStoryFieldSmoke.colTris = colTris;
+            snprintf(g_pcStoryFieldSmoke.mapPath,
+                     sizeof(g_pcStoryFieldSmoke.mapPath), "%s", path);
+        } else if (targetFloor == PC_FLOOR_OUTSKIRT_SHOP) {
+            g_pcStoryFieldSmoke.sawShopLoad = 1;
+        }
         g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
-        snprintf(g_pcStoryFieldSmoke.mapPath,
-                 sizeof(g_pcStoryFieldSmoke.mapPath), "%s", path);
     }
+    g_pcCurrentFieldFloor = targetFloor;
 
     if (outSpawn != NULL) {
         outSpawn[0] = dst->defaultSpawn[0];
@@ -11287,8 +11308,7 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
         }
     }
 
-    if ((map.idle < 0 || map.walk < 0 || map.run < 0) &&
-        g_engCharLoaded &&
+    if (g_engCharLoaded &&
         g_engCharFsysPath[0] != '\0' &&
         g_engCharMember[0] != '\0') {
         PCPortLocomotionSuggestion s;
@@ -11365,7 +11385,7 @@ static const char* PCPort_FieldMotionMapSourceName(const PCPortFieldMotionMap* m
 }
 
 static int PCPort_FieldMotionMapIsGameBacked(const PCPortFieldMotionMap* map) {
-    return map != NULL && map->fromRecord && !map->fromHeuristic && !map->fromEnv;
+    return map != NULL && map->fromRecord && !map->fromEnv;
 }
 
 static int PCPort_FieldMotionMapHasActionSlots(const PCPortFieldMotionMap* map) {
@@ -11524,6 +11544,321 @@ static int PCPort_FieldMotionChoiceDominantSlot(const PCPortFieldMotionChoice* c
     return c->blend >= 0.5f ? c->toSlot : c->fromSlot;
 }
 
+static int PCPort_FieldMotionSelectLive(const PCPortFieldMotionMap* map,
+                                        PCPortFieldMotionRole role,
+                                        f32 turnAmount,
+                                        PCPortFieldMotionChoice* outChoice,
+                                        int* outActionSlot) {
+    PCPortFieldMotionChoice choice;
+    int actionSlot = -1;
+    int motion = -1;
+
+    memset(&choice, 0, sizeof(choice));
+    choice.fromSlot = -1;
+    choice.toSlot = -1;
+    choice.zoneName = "role";
+
+    if (role != PCPORT_FIELD_MOTION_IDLE &&
+        PCPort_FieldMotionMapHasActionSlots(map) &&
+        fabsf(turnAmount) > 0.10f) {
+        PCPort_FieldMotionChoiceForTurnAmount(turnAmount, &choice);
+        actionSlot = PCPort_FieldMotionChoiceDominantSlot(&choice);
+        if (actionSlot != 1) {
+            motion = PCPort_FieldMotionForActionSlot(map, actionSlot);
+        }
+    }
+    if (motion < 0) {
+        actionSlot = -1;
+        motion = PCPort_FieldMotionForRole(map, role);
+    }
+    if (outChoice != NULL) {
+        *outChoice = choice;
+    }
+    if (outActionSlot != NULL) {
+        *outActionSlot = actionSlot;
+    }
+    return motion;
+}
+
+typedef struct PCPortFieldDoorStoryState {
+    int enabled;
+    int ready;
+    int active;
+    int done;
+    int pendingWarpFloor;
+    int sawOpen;
+    int sawAdvance;
+    int sawClose;
+    int msgCtxLinked;
+    int scriptCbLinked;
+    u32 npcIndex;
+    u32 storyStep;
+    u32 cutsceneState;
+    u32 talkResult;
+    u32 npcDrawn;
+    f32 npcPos[3];
+    PCPortFieldNpcScriptPlacement npcPlacement;
+    PCPortMessageBoxState msg;
+    PCPortScriptMsgContext* msgCtx;
+} PCPortFieldDoorStoryState;
+
+static const char* kPCPortOutskirtDoorStoryPages[] = {
+    "Welcome to Outskirt Stand. The opening story event is now linked to this door.",
+    "The NPC interaction closes by recording the next story and cutscene markers."
+};
+
+static int PCPort_FieldDoorStoryEnabledForCurrentMap(void) {
+    if (g_pcCurrentFieldFloor != PC_FLOOR_OUTSKIRT) {
+        return 0;
+    }
+    return g_pcStoryFieldSmoke.active ||
+           (g_pcEnterFieldWalk && !g_pcFieldWarpSmokeActive) ||
+           getenv("PCPORT_FIELD_STORY_EVENTS") != NULL;
+}
+
+static void PCPort_FieldDoorStoryShutdown(PCPortFieldDoorStoryState* story) {
+    if (story == NULL || !story->enabled) {
+        return;
+    }
+    PCPort_FieldNpcModelRelease();
+    PCPort_PeopleHostClear();
+    memset(story, 0, sizeof(*story));
+    story->pendingWarpFloor = -1;
+}
+
+static int PCPort_FieldDoorStoryPrepare(PCPortFieldDoorStoryState* story) {
+    static const char* kArchive = "orig/GC6E01/disc/files/S1_out.fsys";
+    PCPortFieldNpcScriptPlacement npcPlacement;
+    PeopleEntry* npc;
+    char deps[8][64];
+    char depSummary[256];
+    char* npcMember = NULL;
+    u32 npcIndex;
+    int rawDepCount = 0;
+    int resolvedDepCount;
+    int storedDepCount;
+    int i;
+
+    if (story == NULL) {
+        return 0;
+    }
+    memset(story, 0, sizeof(*story));
+    story->pendingWarpFloor = -1;
+    if (!PCPort_FieldDoorStoryEnabledForCurrentMap()) {
+        return 0;
+    }
+    story->enabled = 1;
+
+    memset(deps, 0, sizeof(deps));
+    depSummary[0] = '\0';
+    resolvedDepCount = PCPort_FieldNpcReadDependencyList(
+        kArchive, deps, (int)(sizeof(deps) / sizeof(deps[0])),
+        &rawDepCount, depSummary, sizeof(depSummary));
+    storedDepCount = resolvedDepCount;
+    if (storedDepCount > (int)(sizeof(deps) / sizeof(deps[0]))) {
+        storedDepCount = (int)(sizeof(deps) / sizeof(deps[0]));
+    }
+    if (rawDepCount < 3 || resolvedDepCount < 3) {
+        printf("[field/story] S1_out dependency list unavailable raw=%d resolved=%d summary=%s\n",
+               rawDepCount, resolvedDepCount, depSummary);
+        return 0;
+    }
+
+    for (i = 0; i < storedDepCount; ++i) {
+        if (strstr(deps[i], "truck") == NULL &&
+            strstr(deps[i], "bike") == NULL) {
+            npcMember = deps[i];
+            break;
+        }
+    }
+    if (npcMember == NULL && storedDepCount > 0) {
+        npcMember = deps[0];
+    }
+    if (npcMember == NULL || npcMember[0] == '\0') {
+        printf("[field/story] no renderable S1_out NPC dependency from %s\n",
+               depSummary);
+        return 0;
+    }
+
+    if (!PCPort_FieldNpcReadScriptPlacement(kArchive, &npcPlacement)) {
+        printf("[field/story] no S1_out NPC placement marker 0x%08X\n",
+               PCPORT_S1_OUT_NPC_ACTOR_TOKEN);
+        return 0;
+    }
+    npcIndex = (npcPlacement.actorToken >> 16) & 0xFFFFu;
+    if (npcIndex == 0u) {
+        npcIndex = 1u;
+    }
+
+    PCPort_PeopleHostClear();
+    PCPort_PeopleOpenSetPlacement(PC_FLOOR_OUTSKIRT, npcIndex, &npcPlacement);
+    fn_8018E050(PC_FLOOR_OUTSKIRT, npcIndex, npcPlacement.actionWord);
+    PCPort_PeopleOpenClearPlacement();
+
+    npc = PCPort_PeopleHostFindExact(PC_FLOOR_OUTSKIRT, npcIndex);
+    if (npc == NULL ||
+        npc->field_34 != npcPlacement.actorToken ||
+        npc->field_38 != npcPlacement.actionWord ||
+        npc->scriptRef != (void*)(unsigned long)npcPlacement.tokenOffset ||
+        npc->state != PEOPLE_STATE_INTERACTING) {
+        printf("[field/story] NPC open/setup failed index=%u setupCount=%u\n",
+               npcIndex, g_pcPeopleOpenSetupCount);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    PCPort_PeopleHostGetPosition(npc, story->npcPos);
+    if (!PCPort_Vec3Near(story->npcPos, npcPlacement.pos)) {
+        printf("[field/story] NPC placement mismatch at (%.1f,%.1f,%.1f)\n",
+               story->npcPos[0], story->npcPos[1], story->npcPos[2]);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    if (!PCPort_LoadFieldNpcModel(kArchive, npcMember)) {
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    story->npcPlacement = npcPlacement;
+    story->npcIndex = npcIndex;
+    story->ready = 1;
+    if (g_pcStoryFieldSmoke.active) {
+        g_pcStoryFieldSmoke.doorStoryReady = 1;
+        g_pcStoryFieldSmoke.doorStoryNpcIndex = npcIndex;
+    }
+    printf("[field/story] S1_out door story ready: npc=%s index=%u marker=0x%08X pos=(%.1f,%.1f,%.1f)\n",
+           npcMember,
+           npcIndex,
+           npcPlacement.actorToken,
+           story->npcPos[0],
+           story->npcPos[1],
+           story->npcPos[2]);
+    return 1;
+}
+
+static int PCPort_FieldDoorStoryBegin(PCPortFieldDoorStoryState* story,
+                                      int pendingWarpFloor) {
+    PeopleEntry* npc;
+    if (story == NULL || !story->ready || story->active || story->done) {
+        return 0;
+    }
+    npc = PCPort_PeopleHostFindExact(PC_FLOOR_OUTSKIRT, story->npcIndex);
+    if (npc == NULL) {
+        return 0;
+    }
+    story->talkResult = fn_801812E8(PC_FLOOR_OUTSKIRT, story->npcIndex, 1u);
+    if (story->talkResult != 1u) {
+        printf("[field/story] talk start failed for npc index=%u result=%u\n",
+               story->npcIndex, story->talkResult);
+        return 0;
+    }
+
+    PCPort_MessageBoxInit(
+        &story->msg,
+        kPCPortOutskirtDoorStoryPages,
+        (int)(sizeof(kPCPortOutskirtDoorStoryPages) /
+              sizeof(kPCPortOutskirtDoorStoryPages[0])),
+        5);
+    PCPort_MessageBoxSeedScriptContext(
+        &story->msg,
+        story->npcIndex,
+        kPCPortOutskirtDoorStoryPages[0]);
+    story->msgCtx = PCPort_MessageBoxScriptContext();
+    story->msgCtxLinked =
+        story->msgCtx != NULL &&
+        story->msgCtx == (PCPortScriptMsgContext*)(lbl_803A9768 +
+                                                   PCPORT_MSGBOX_SLOT_BASE) &&
+        story->msgCtx->magic == PCPORT_MSGBOX_CONTEXT_MAGIC &&
+        story->msgCtx->speakerId == story->npcIndex &&
+        story->msgCtx->pageCount == (u32)story->msg.pageCount &&
+        story->msgCtx->active == 1u;
+    memset(lbl_803A95E8, 0, 0x138u);
+    memset(lbl_803A9720, 0, 0x48u);
+    fn_80053778();
+    story->scriptCbLinked =
+        *(void**)lbl_803A95E8 == (void*)story->msgCtx &&
+        *(void**)lbl_803A9720 == (void*)story->msgCtx &&
+        *(u32*)(lbl_803A95E8 + 8) == 1u &&
+        *(u32*)(lbl_803A9720 + 8) == 1u;
+    if (!story->msgCtxLinked || !story->scriptCbLinked) {
+        printf("[field/story] message/script context not linked msg=%d cb=%d\n",
+               story->msgCtxLinked, story->scriptCbLinked);
+        return 0;
+    }
+
+    story->pendingWarpFloor = pendingWarpFloor;
+    story->active = 1;
+    story->sawOpen = 1;
+    if (g_pcStoryFieldSmoke.active) {
+        g_pcStoryFieldSmoke.doorStoryOpened = 1;
+    }
+    printf("[field/story] train door opened NPC dialogue; pending floor %d\n",
+           pendingWarpFloor);
+    return 1;
+}
+
+static void PCPort_FieldDoorStoryTick(PCPortFieldDoorStoryState* story,
+                                      u16 pressed,
+                                      int autoAdvance) {
+    int beforeAdvance;
+    int beforeClose;
+    int pageLen;
+
+    if (story == NULL || !story->active) {
+        return;
+    }
+    beforeAdvance = story->msg.advanceCount;
+    beforeClose = story->msg.closeCount;
+    pageLen = PCPort_MessageBoxPageLen(&story->msg);
+
+    if (autoAdvance) {
+        if (story->msg.visibleChars >= pageLen) {
+            pressed |= GCN_PAD_BUTTON_A;
+        }
+    }
+
+    PCPort_MessageBoxTick(&story->msg, pressed);
+    if (story->msg.advanceCount > beforeAdvance) {
+        story->sawAdvance = 1;
+        if (g_pcStoryFieldSmoke.active) {
+            g_pcStoryFieldSmoke.doorStoryAdvanced = 1;
+        }
+    }
+    if (story->msg.closeCount > beforeClose) {
+        story->sawClose = 1;
+        story->done = 1;
+        story->active = 0;
+        story->storyStep = 1u;
+        story->cutsceneState = 2u;
+        if (g_pcStoryFieldSmoke.active) {
+            g_pcStoryFieldSmoke.doorStoryClosed = 1;
+            g_pcStoryFieldSmoke.storyStep = story->storyStep;
+            g_pcStoryFieldSmoke.cutsceneState = story->cutsceneState;
+            g_pcStoryFieldSmoke.doorStoryWarpFloor = story->pendingWarpFloor;
+        }
+    }
+    PCPort_MessageBoxSyncScriptContext(
+        &story->msg,
+        story->storyStep,
+        story->cutsceneState);
+}
+
+static void PCPort_FieldDoorStoryDraw(PCPortFieldDoorStoryState* story) {
+    if (story == NULL || !story->ready) {
+        return;
+    }
+    story->npcDrawn += RenderFieldStaticArchive(&g_engNpcArchive,
+                                                g_engNpcRoot,
+                                                story->npcPos[0],
+                                                story->npcPos[1],
+                                                story->npcPos[2],
+                                                story->npcPlacement.yaw,
+                                                1.15f);
+    if (g_pcStoryFieldSmoke.active) {
+        g_pcStoryFieldSmoke.doorStoryNpcDrawn = (int)story->npcDrawn;
+    }
+    DrawFieldMessageBox(&story->msg, story->active ? "NPC" : NULL);
+}
+
 /* Third-person "walk the room" mode for --field (PCPORT_FIELD_WALK). The player
  * is a box avatar that moves on the WZX floor with wall blocking; the camera
  * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
@@ -11574,12 +11909,14 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int reportedMissingMotionMap = 0;
     int frame = 0;
     int warpTo = -1;
-    int graceFrames = g_pcFieldWarpSmokeActive ? 0 : 30;
+    int graceFrames = (g_pcFieldWarpSmokeActive ||
+                       g_pcStoryFieldSmoke.active) ? 0 : 30;
                             /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
     double g_walkPrevTime = 0.0; /* real-time clock for animation frame-step */
     u16 padPrev = 0u;
     PCPortFieldStartMenuState startMenu;
+    PCPortFieldDoorStoryState doorStory;
 
     if (walkSpeed < 0.0f) walkSpeed = 0.0f;
     if (runSpeed < walkSpeed) runSpeed = walkSpeed;
@@ -11588,6 +11925,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     if (walkDeadzone < 0.0f) walkDeadzone = 0.0f;
 
     memset(pads, 0, sizeof(pads));
+    memset(&doorStory, 0, sizeof(doorStory));
+    doorStory.pendingWarpFloor = -1;
     PCPort_FieldStartMenuInit(&startMenu);
     if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk ||
         getenv("PCPORT_FIELD_WALK") != NULL) {
@@ -11617,6 +11956,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     printf("[field/walk] spawn=(%.1f,%.1f,%.1f). Left stick walks, arrows/C-stick "
            "orbit camera. (%d exit trigger(s))%s\n", ppos[0], ppos[1], ppos[2],
            PCPort_FieldExitCount(), autopan ? " [AUTOPAN]" : "");
+    PCPort_FieldDoorStoryPrepare(&doorStory);
 
     g_walkPrevTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
@@ -11632,6 +11972,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         f32 sx, sy;
         int moving, running;
         PCPortFieldMotionRole role;
+        int storyWasActive;
 
         VIWaitForRetrace_PC();
         /* Real-time frame step: elapsed seconds * 60 = game frames elapsed.
@@ -11655,11 +11996,19 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         btn = pads[0].button;
         padPressed = (u16)(btn & ~padPrev);
         padPrev = btn;
-        PCPort_FieldStartMenuTick(&startMenu, padPressed);
+        storyWasActive = doorStory.active;
+        if (doorStory.active) {
+            PCPort_FieldDoorStoryTick(&doorStory,
+                                      padPressed,
+                                      g_pcStoryFieldSmoke.active ||
+                                      getenv("PCPORT_FIELD_STORY_AUTO") != NULL);
+        } else {
+            PCPort_FieldStartMenuTick(&startMenu, padPressed);
+        }
         sx = (f32)pads[0].stickX / 112.0f;
         sy = (f32)pads[0].stickY / 112.0f;
 
-        if (startMenu.active) {
+        if (storyWasActive || doorStory.active || startMenu.active) {
             sx = 0.0f;
             sy = 0.0f;
             btn = 0u;
@@ -11703,21 +12052,15 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             pyaw = desiredYaw;
         }
 
-        /* Drive the motion bank from the retail fn_8012C660 turn zones when
-         * action slots are present. HSD blend transitions are still TODO, so
-         * the host chooses the dominant endpoint of the retail slot pair. */
+        /* Drive idle/walk/run from the live motion bank, with retail
+         * fn_8012C660 action slots used only for visible turn cases. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
             PCPortFieldMotionChoice choice;
             int actionSlot = -1;
-            int nextMotion = -1;
-            if (PCPort_FieldMotionMapHasActionSlots(&motionMap)) {
-                PCPort_FieldMotionChoiceForTurnAmount(turnAmount, &choice);
-                actionSlot = PCPort_FieldMotionChoiceDominantSlot(&choice);
-                nextMotion = PCPort_FieldMotionForActionSlot(&motionMap,
-                                                             actionSlot);
-            } else {
-                nextMotion = PCPort_FieldMotionForRole(&motionMap, role);
-            }
+            int nextMotion = PCPort_FieldMotionSelectLive(&motionMap, role,
+                                                          turnAmount,
+                                                          &choice,
+                                                          &actionSlot);
             if (nextMotion < 0) {
                 if (!reportedMissingMotionMap && motionDebug) {
                     printf("[field/motion] role %d actionSlot=%d has no mapped motion "
@@ -11727,7 +12070,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
                 }
             } else if (nextMotion != currentMotion) {
                 if (motionDebug) {
-                    if (PCPort_FieldMotionMapHasActionSlots(&motionMap)) {
+                    if (actionSlot >= 0) {
                         printf("[field/motion] turn=%.2f zone=%s slots=%d->%d blend=%.2f dominant=%d motion=%d (mag=%.2f speed=%.2f)\n",
                                turnAmount, choice.zoneName, choice.fromSlot,
                                choice.toSlot, choice.blend, actionSlot,
@@ -11756,7 +12099,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         /* Door / exit trigger: if the player walked into an exit's approach
          * zone (after a short post-spawn grace), break out and warp. */
-        if (startMenu.active) {
+        if (startMenu.active || doorStory.active) {
             /* Menus pause field trigger crossing until control returns. */
         } else if (graceFrames > 0) {
             graceFrames--;
@@ -11768,10 +12111,22 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
                     printf("[field/walk] exit %d tripped at (%.1f,%.1f,%.1f) "
                            "-> floor %d\n", hit, ppos[0], ppos[1], ppos[2],
                            ex.targetFloor);
-                    warpTo = ex.targetFloor;
-                    break;
+                    if (doorStory.ready && !doorStory.done &&
+                        ex.targetFloor == PC_FLOOR_OUTSKIRT_SHOP &&
+                        PCPort_FieldDoorStoryBegin(&doorStory,
+                                                   ex.targetFloor)) {
+                        /* Story dialogue owns the transition; the warp happens
+                         * after the message closes. */
+                    } else {
+                        warpTo = ex.targetFloor;
+                        break;
+                    }
                 }
             }
+        }
+        if (doorStory.done && doorStory.pendingWarpFloor >= 0) {
+            warpTo = doorStory.pendingWarpFloor;
+            break;
         }
 
         /* Orbit camera behind the player. */
@@ -11806,6 +12161,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         } else {
             DrawFieldAvatar(ppos[0], ppos[1], ppos[2], pyaw, PLAYER_H, PLAYER_R);
         }
+        PCPort_FieldDoorStoryDraw(&doorStory);
         if (colWire) {
             DrawFieldCollisionWire();
         }
@@ -11834,6 +12190,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         g_pcStoryFieldSmoke.moved = (dx * dx + dz * dz) > 16.0f;
         g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
     }
+    PCPort_FieldDoorStoryShutdown(&doorStory);
     printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)%s\n",
            frame, ppos[0], ppos[1], ppos[2],
            warpTo >= 0 ? " [WARP]" : "");
@@ -11864,8 +12221,8 @@ static int RunFieldScene(GLFWwindow* window) {
         const char* cp = getenv("PCPORT_CAM_PITCH");
         if (cp != NULL) pitch = (f32) atof(cp);
     }
-    if (g_pcStoryFieldSmoke.active && frameCap < 30) {
-        frameCap = 30;
+    if (g_pcStoryFieldSmoke.active && frameCap < 120) {
+        frameCap = 120;
     }
 
     if (archive == NULL || archive[0] == '\0') {
@@ -12102,12 +12459,14 @@ static int RunStoryFieldSmoke(GLFWwindow* window) {
     }
 
     if (!g_pcStoryFieldSmoke.mapLoaded ||
+        !g_pcStoryFieldSmoke.sawOutskirtLoad ||
         g_pcStoryFieldSmoke.targetFloor != PC_FLOOR_OUTSKIRT) {
         fprintf(stderr,
-                "[story-field-smoke] failed: expected S1_out floor %d, got floor %d mapLoaded=%d path=%s\n",
+                "[story-field-smoke] failed: expected S1_out floor %d, got floor %d mapLoaded=%d sawOutskirt=%d path=%s\n",
                 PC_FLOOR_OUTSKIRT,
                 g_pcStoryFieldSmoke.targetFloor,
                 g_pcStoryFieldSmoke.mapLoaded,
+                g_pcStoryFieldSmoke.sawOutskirtLoad,
                 g_pcStoryFieldSmoke.mapPath);
         return 0;
     }
@@ -12143,10 +12502,38 @@ static int RunStoryFieldSmoke(GLFWwindow* window) {
                 g_pcStoryFieldSmoke.finalPos[2]);
         return 0;
     }
+    if (!g_pcStoryFieldSmoke.doorStoryReady ||
+        !g_pcStoryFieldSmoke.doorStoryOpened ||
+        !g_pcStoryFieldSmoke.doorStoryAdvanced ||
+        !g_pcStoryFieldSmoke.doorStoryClosed ||
+        g_pcStoryFieldSmoke.storyStep != 1u ||
+        g_pcStoryFieldSmoke.cutsceneState != 2u ||
+        g_pcStoryFieldSmoke.doorStoryNpcDrawn <= 0) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: door story ready=%d open=%d advance=%d close=%d story=%u cutscene=%u npcDrawn=%d\n",
+                g_pcStoryFieldSmoke.doorStoryReady,
+                g_pcStoryFieldSmoke.doorStoryOpened,
+                g_pcStoryFieldSmoke.doorStoryAdvanced,
+                g_pcStoryFieldSmoke.doorStoryClosed,
+                g_pcStoryFieldSmoke.storyStep,
+                g_pcStoryFieldSmoke.cutsceneState,
+                g_pcStoryFieldSmoke.doorStoryNpcDrawn);
+        return 0;
+    }
+    if (!g_pcStoryFieldSmoke.sawShopLoad ||
+        g_pcStoryFieldSmoke.doorStoryWarpFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: door warp missed shop sawShop=%d warpFloor=%d expected=%d current=%d\n",
+                g_pcStoryFieldSmoke.sawShopLoad,
+                g_pcStoryFieldSmoke.doorStoryWarpFloor,
+                PC_FLOOR_OUTSKIRT_SHOP,
+                g_pcStoryFieldSmoke.currentFloor);
+        return 0;
+    }
 
     printf("[story-field-smoke] passed: menu->New Game->%s floor=%d colTris=%d "
            "spawn=(%.1f,%.1f,%.1f) final=(%.1f,%.1f,%.1f) frames=%d "
-           "wes=%d anim=%d exits=%d\n",
+           "wes=%d anim=%d exits=%d doorNpc=%u story=%u cutscene=%u warp=%d\n",
            g_pcStoryFieldSmoke.mapPath,
            g_pcStoryFieldSmoke.targetFloor,
            g_pcStoryFieldSmoke.colTris,
@@ -12159,7 +12546,11 @@ static int RunStoryFieldSmoke(GLFWwindow* window) {
            g_pcStoryFieldSmoke.frames,
            g_pcStoryFieldSmoke.charLoaded,
            g_pcStoryFieldSmoke.charAnimReady,
-           g_pcStoryFieldSmoke.exitCount);
+           g_pcStoryFieldSmoke.exitCount,
+           g_pcStoryFieldSmoke.doorStoryNpcIndex,
+           g_pcStoryFieldSmoke.storyStep,
+           g_pcStoryFieldSmoke.cutsceneState,
+           g_pcStoryFieldSmoke.doorStoryWarpFloor);
     return 1;
 }
 
@@ -12424,12 +12815,12 @@ typedef struct PCPortFieldLocomotionSmokeCase {
 
 static int RunFieldLocomotionSmoke(GLFWwindow* window) {
     static const PCPortFieldLocomotionSmokeCase cases[] = {
-        { "idle-straight",      3.14159265f,  0.0f,  0.0f, PCPORT_FIELD_MOTION_IDLE, 1, 3.14159265f, 0 },
-        { "walk-straight",      3.14159265f,  0.0f,  0.5f, PCPORT_FIELD_MOTION_WALK, 1, 3.14159265f, 1 },
+        { "idle-straight",      3.14159265f,  0.0f,  0.0f, PCPORT_FIELD_MOTION_IDLE, -1, 3.14159265f, 0 },
+        { "walk-straight",      3.14159265f,  0.0f,  0.5f, PCPORT_FIELD_MOTION_WALK, -1, 3.14159265f, 1 },
         { "turn-right",         3.14159265f,  0.5f,  0.0f, PCPORT_FIELD_MOTION_WALK, 3, -1.57079633f, 1 },
         { "turn-left",          3.14159265f, -0.5f,  0.0f, PCPORT_FIELD_MOTION_WALK, 4, 1.57079633f, 1 },
         { "hard-right-cross",  -1.57079633f, -0.5f,  0.0f, PCPORT_FIELD_MOTION_WALK, 2, 1.57079633f, 1 },
-        { "run-straight",       3.14159265f,  0.0f,  1.0f, PCPORT_FIELD_MOTION_RUN, 1, 3.14159265f, 1 }
+        { "run-straight",       3.14159265f,  0.0f,  1.0f, PCPORT_FIELD_MOTION_RUN, -1, 3.14159265f, 1 }
     };
     PCPortFieldMotionMap motionMap;
     f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
@@ -12524,8 +12915,9 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
                 return 0;
             }
         }
-        PCPort_FieldMotionChoiceForTurnAmount(turnAmount, &choice);
-        actionSlot = PCPort_FieldMotionChoiceDominantSlot(&choice);
+        motion = PCPort_FieldMotionSelectLive(&motionMap, gotRole,
+                                              turnAmount, &choice,
+                                              &actionSlot);
         if (actionSlot != c->wantSlot) {
             fprintf(stderr,
                     "[field-locomotion-smoke] failed: %s actionSlot=%d expected=%d turn=%.2f zone=%s\n",
@@ -12533,7 +12925,15 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
                     choice.zoneName);
             return 0;
         }
-        motion = PCPort_FieldMotionForActionSlot(&motionMap, actionSlot);
+        if (actionSlot < 0) {
+            int roleMotion = PCPort_FieldMotionForRole(&motionMap, gotRole);
+            if (motion != roleMotion) {
+                fprintf(stderr,
+                        "[field-locomotion-smoke] failed: %s role motion=%d expected=%d\n",
+                        c->name, motion, roleMotion);
+                return 0;
+            }
+        }
         if (motion < 0 || !PCPort_CharAnimSetMotion(motion)) {
             fprintf(stderr,
                     "[field-locomotion-smoke] failed: %s actionSlot=%d motion %d could not be set\n",

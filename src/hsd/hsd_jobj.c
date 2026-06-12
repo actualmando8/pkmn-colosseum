@@ -441,7 +441,7 @@ void fn_8019CF54(void* info) {
 extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
 extern void fn_8019C1B0(void);
 extern void HSD_VecFree(void);
-extern void fn_801A84F0(void);
+extern void HSD_MtxFree(void);
 #if 1
 asm void fn_8019CFBC(void) {
 #include "src/hsd/hsd_jobj_fn_8019CFBC.inc"
@@ -773,7 +773,7 @@ extern void __assert();
 extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
 extern void fn_801A05EC(void);
-extern void fn_801A0B9C();
+extern void HSD_JObjRef(HSD_JObj* jobj);
 extern void* HSD_IDGetData(u32 key, u32* found);
 extern void fn_801A0C1C();
 extern BOOL fn_801A0C68(HSD_Obj*);
@@ -784,11 +784,13 @@ extern BOOL fn_801A0D48(void*);
 extern void fn_801A0D94(void);
 extern void fn_801AEBE4(void);
 #if 1
-asm void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint) {
+asm void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
 #include "src/hsd/hsd_jobj_fn_801A0744.inc"
 }
 #else
-void fn_801A0744(void) {
+void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
+    (void)jobj;
+    (void)joint;
     /* TODO: match -- 1112 bytes at 0x801A0744 */
 }
 #endif
@@ -800,18 +802,16 @@ void fn_801A0744(void) {
 #pragma optimizewithasm off
 extern u8 lbl_80274AF4[];
 extern u8 lbl_80274B64[];
-/* Proposed: HSD_JObjRef. Not applied because include/hsd/hsd_jobj.h already
- * defines that name as a static inline helper in this translation unit. */
 #if 0
-asm void fn_801A0B9C(void) {
+asm void HSD_JObjRef(void) {
 #include "src/hsd/hsd_jobj_fn_801A0B9C.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A0B9C(HSD_Obj* obj) {
-    if (obj != NULL) {
-        obj->ref_count++;
-        if (!(obj->ref_count != HSD_OBJ_NOREF)) {
+void HSD_JObjRef(HSD_JObj* jobj) {
+    if (jobj != NULL) {
+        jobj->object.ref_count++;
+        if (!(jobj->object.ref_count != HSD_OBJ_NOREF)) {
             __assert(lbl_80274AF4, 0x5d, lbl_80274B64);
         }
     }
@@ -1027,7 +1027,7 @@ setup:
     }
 
 done:
-    fn_801A0744(jobj, joint);
+    HSD_JObjResolveRefsAll(jobj, joint);
     return jobj;
 }
 #endif
@@ -1040,7 +1040,7 @@ done:
 extern void fn_801992D8(void);
 extern void fn_801AE5E8(void);
 extern void fn_800A2D38(void);
-extern void fn_801A8524(void);
+extern void HSD_MtxAlloc(void);
 extern void HSD_IDInsertToTable(void);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047B298;
