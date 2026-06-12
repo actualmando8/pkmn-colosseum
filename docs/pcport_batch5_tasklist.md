@@ -182,7 +182,7 @@ Verification:
 ## Batch 5G - Expanded Playtest Gates
 
 - [x] Add a room-warp trigger/collision smoke for the existing D1 garage 1F/B1 cluster.
-- [ ] Exercise live in-process room reload from player crossing a door trigger.
+- [x] Exercise live in-process room reload from player crossing a door trigger.
 - [ ] Add worldmap menu/handoff coverage.
 - [ ] Gate directional locomotion animations for idle/walk/run while moving north/south/east/west.
 - [ ] Gate START-in-field menu open/close behavior.
@@ -193,16 +193,20 @@ Verification:
 
 Lane result:
 
-- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`.
+- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke` and `--field-room-reload-smoke`.
 - The smoke validates the host warp table and trigger lookup for `D1_garage_1F` -> `D1_garage_B1` and `D1_garage_B1` -> `D1_garage_1F`.
 - It also loads both rooms' WZX collision meshes directly, proving the target archives and collision data are reachable before we wire live in-process reload into the gameplay loop.
-- A first attempt at a full in-process render reload smoke hung, so live door-crossing reload remains an explicit open gate.
+- The live reload smoke now drives the normal walk loop from just inside garage 1F, lets the player enter the 1F door trigger, returns target floor `1`, reloads `D1_garage_B1` in-process, and renders a post-reload frame.
+- The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
+- `include\hsd\hsd_debug.h` now uses a `PCPORT`-only unprototyped `__assert()` declaration so generated/decompiled HSD TUs with mixed assert call shapes compile in the host harness without changing the matching build declaration.
 
 Verification:
 
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1711 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --field-room-reload-smoke` -> passed with player trigger `0->1`, start `(0.0,0.0,35.0)`, trigger hit at `(-0.0,0.0,39.9)`, B1 `tris=222`, `exit->0`, spawn `(0.0,0.0,0.0)`.
 - `build_pc\pcport_bootstrap.exe --field-room-warp-smoke` -> passed with `D1_garage_1F` `tris=324` `exit->1`, `D1_garage_B1` `tris=222` `exit->0`.
-- `build_pc\pcport_bootstrap.exe --story-field-smoke` -> passed after the room-warp smoke change.
+- `build_pc\pcport_bootstrap.exe --story-field-smoke` -> passed after the room-reload smoke change.
+- `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 
 Integration rules:
 

@@ -5815,6 +5815,7 @@ typedef struct PCPortStoryFieldSmokeState {
 } PCPortStoryFieldSmokeState;
 
 static PCPortStoryFieldSmokeState g_pcStoryFieldSmoke;
+static int g_pcFieldRoomReloadSmokeActive;
 
 static void PCPort_StoryFieldSmokeBegin(void) {
     memset(&g_pcStoryFieldSmoke, 0, sizeof(g_pcStoryFieldSmoke));
@@ -9067,11 +9068,24 @@ static int  g_engExtraRootJointCount;
 static int  g_engModelView;
 static f32  g_engModelViewEye[3];
 static f32  g_engModelViewCenter[3];
+static int  g_engFieldGfxInitialized;
 /* Field mode: GSgfx_BeginFrame paints a green EFB clear-quad that, on a sparse field
  * map, shows through where geometry doesn't cover (the title covers it with its sky/
  * ground). In field mode we re-clear to a chosen background AFTER GSgfx_BeginFrame. */
 static int  g_engFieldMode;
 static f32  g_engFieldBg[3] = { 0.04f, 0.05f, 0.08f }; /* near-black; PCPORT_FIELD_BG overrides */
+
+static void PCPort_EngineSceneRelease(void) {
+    PCPort_FieldAnimRelease();
+    if (g_engTitleArchive.storage != NULL) {
+        PCPort_HSDArchiveDestroy(&g_engTitleArchive);
+    }
+    memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
+    g_engTitleRootJoint = 0;
+    g_engExtraRootJointCount = 0;
+    g_engModelView = 0;
+    g_engTitleReady = 0;
+}
 
 int PCPort_EngineTitleSetup(void) {
     u8* memberData = NULL;
@@ -9084,12 +9098,11 @@ int PCPort_EngineTitleSetup(void) {
     static const f32 titleInt[3] = { 0.0f, 39.6514f, 1.5625f };
     static const f32 titleUp[3]  = { 0.0f, 1.0f, 0.0f };
 
-    if (g_engTitleReady) {
+    if (g_engTitleReady && !g_engFieldMode) {
         return 1;
     }
+    PCPort_EngineSceneRelease();
     g_engFieldMode = 0;   /* title covers the screen; keep the engine's own clear */
-    memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
-    memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
 
     if (!PCPort_LoadFsysMember(PCPORT_TITLE_SCENE_ARCHIVE, PCPORT_TITLE_SCENE_MEMBER,
                                &memberData, &memberSize)) {
@@ -9128,6 +9141,7 @@ int PCPort_EngineTitleSetup(void) {
     }
 
     GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    g_engFieldGfxInitialized = 0;
     g_engTitleReady = 1;
     printf("[boot] title scene loaded for engine render (rootJoint=0x%X)\n", g_engTitleRootJoint);
     return 1;
@@ -9157,7 +9171,7 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
     u32 sceneBranchOffset, cameraDescOffset, sceneJointListOffset;
     int haveCam = 0;
 
-    g_engTitleReady = 0;
+    PCPort_EngineSceneRelease();
     g_engFieldMode = 1;   /* re-clear GSgfx_BeginFrame's green EFB quad to the bg */
     {
         const char* bg = getenv("PCPORT_FIELD_BG");
@@ -9165,8 +9179,6 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
             sscanf(bg, "%f,%f,%f", &g_engFieldBg[0], &g_engFieldBg[1], &g_engFieldBg[2]);
         }
     }
-    memset(&g_engTitleArchive, 0, sizeof(g_engTitleArchive));
-    memset(&g_engTitleCamera, 0, sizeof(g_engTitleCamera));
 
     /* PCPORT_FIELD_MEMBER loads a specific named member (e.g. a people_archive
      * character model) instead of the auto-selected largest scene_data member. */
@@ -9440,7 +9452,10 @@ int PCPort_EngineFieldSetup(const char* archivePath) {
         }
     }
 
-    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    if (!g_engFieldGfxInitialized) {
+        GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+        g_engFieldGfxInitialized = 1;
+    }
     g_engTitleReady = 1;
     printf("[field] map loaded for render: %s (scene member 0x%X bytes, rootJoint=0x%X, "
            "extraModels=%d, cam=%s)\n",
@@ -10152,8 +10167,10 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 runThreshold = (runThreshEnv != NULL && runThreshEnv[0]) ? (f32)atof(runThreshEnv) : 0.85f;
     f32 walkDeadzone = (deadzoneEnv != NULL && deadzoneEnv[0]) ? (f32)atof(deadzoneEnv) : 0.05f;
     int autopan = g_pcStoryFieldSmoke.active ||
+                  g_pcFieldRoomReloadSmokeActive ||
                   getenv("PCPORT_FIELD_AUTOPAN") != NULL;
     int forceRun = g_pcStoryFieldSmoke.active ||
+                   g_pcFieldRoomReloadSmokeActive ||
                    getenv("PCPORT_FORCE_RUN") != NULL ||
                    getenv("PCPORT_FIELD_AUTORUN") != NULL;
     int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
@@ -10163,7 +10180,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     int reportedMissingMotionMap = 0;
     int frame = 0;
     int warpTo = -1;
-    int graceFrames = 30;   /* ignore exit triggers right after a (re)spawn */
+    int graceFrames = g_pcFieldRoomReloadSmokeActive ? 0 : 30;
+                            /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
     double g_walkPrevTime = 0.0; /* real-time clock for animation frame-step */
 
@@ -10242,7 +10260,10 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         camPitch += (f32)pads[0].substickY / 112.0f * ORBIT;
         if (camPitch >  1.30f) camPitch =  1.30f;
         if (camPitch < -0.20f) camPitch = -0.20f;
-        if (autopan) { sy = 0.7f; camYaw += 0.01f; }
+        if (autopan) {
+            sy = g_pcFieldRoomReloadSmokeActive ? -0.7f : 0.7f;
+            camYaw += 0.01f;
+        }
 
         /* Camera-relative ground movement. fwdXZ points where the camera looks. */
         fwdXZ[0] = sinf(camYaw); fwdXZ[1] = 0.0f; fwdXZ[2] = -cosf(camYaw);
@@ -10803,6 +10824,86 @@ static int RunFieldRoomWarpSmoke(GLFWwindow* window) {
            pathB1,
            trisB1,
            exB1.targetFloor);
+    return 1;
+}
+
+static int RunFieldRoomReloadSmoke(GLFWwindow* window) {
+    PCPortFieldExit ex1f;
+    PCPortFieldExit exB1;
+    f32 start[3];
+    f32 spawnB1[3];
+    int prevEnterFieldWalk;
+    int next;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    if (!PCPort_FieldWarpTo(PC_FLOOR_GARAGE_1F, NULL)) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: could not load garage 1F\n");
+        return 0;
+    }
+    if (PCPort_FieldColTriCount() <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &ex1f) ||
+        ex1f.targetFloor != PC_FLOOR_GARAGE_B1) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: garage 1F was not warp-ready (tris=%d exits=%d target=%d)\n",
+                PCPort_FieldColTriCount(),
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &ex1f) ? ex1f.targetFloor : -1);
+        return 0;
+    }
+
+    start[0] = ex1f.pos[0];
+    start[1] = ex1f.pos[1];
+    start[2] = ex1f.pos[2] - ex1f.radius - 4.0f;
+    PCPort_FieldColFloorAt(start[0], start[2], 1.0e5f, 1.0e9f, &start[1]);
+
+    prevEnterFieldWalk = g_pcEnterFieldWalk;
+    g_pcEnterFieldWalk = 1;
+    g_pcFieldRoomReloadSmokeActive = 1;
+    next = RunFieldWalkLoop(window, NULL, 8, 0, start);
+    g_pcFieldRoomReloadSmokeActive = 0;
+    g_pcEnterFieldWalk = prevEnterFieldWalk;
+
+    if (next != PC_FLOOR_GARAGE_B1) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: walk loop returned floor %d, expected %d\n",
+                next, PC_FLOOR_GARAGE_B1);
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(next, spawnB1)) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: could not reload target floor %d\n",
+                next);
+        return 0;
+    }
+    if (PCPort_FieldColTriCount() <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &exB1) ||
+        exB1.targetFloor != PC_FLOOR_GARAGE_1F) {
+        fprintf(stderr,
+                "[field-room-reload-smoke] failed: garage B1 was not ready after reload (tris=%d exits=%d target=%d)\n",
+                PCPort_FieldColTriCount(),
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &exB1) ? exB1.targetFloor : -1);
+        return 0;
+    }
+
+    PCPort_EngineTitleRenderFrame();
+    GSgfxSwapBuffers(0);
+
+    printf("[field-room-reload-smoke] passed: player triggered %d->%d at "
+           "start=(%.1f,%.1f,%.1f); reloaded B1 tris=%d exit->%d "
+           "spawn=(%.1f,%.1f,%.1f)\n",
+           PC_FLOOR_GARAGE_1F,
+           next,
+           start[0], start[1], start[2],
+           PCPort_FieldColTriCount(),
+           exB1.targetFloor,
+           spawnB1[0], spawnB1[1], spawnB1[2]);
     return 1;
 }
 
@@ -13140,6 +13241,7 @@ int main(int argc, char** argv) {
     int runWindowSmoke;
     int runStoryFieldSmoke;
     int runFieldRoomWarpSmoke;
+    int runFieldRoomReloadSmoke;
     int runMenu;
     int runEngine;
     int runEngineBoot;
@@ -13157,6 +13259,7 @@ int main(int argc, char** argv) {
     runWindowSmoke = HasArg(argc, argv, "--window-smoke");
     runStoryFieldSmoke = HasArg(argc, argv, "--story-field-smoke");
     runFieldRoomWarpSmoke = HasArg(argc, argv, "--field-room-warp-smoke");
+    runFieldRoomReloadSmoke = HasArg(argc, argv, "--field-room-reload-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
@@ -13268,6 +13371,7 @@ int main(int argc, char** argv) {
         runGXPrimitiveSmoke || runGXScissorSmoke ||
         runStoryFieldSmoke ||
         runFieldRoomWarpSmoke ||
+        runFieldRoomReloadSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
         runPkxViewer ||
         argc <= 1) {
@@ -13551,6 +13655,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
+    } else if (runFieldRoomReloadSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-room-reload-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldRoomReloadSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field room-reload smoke exercised live trigger crossing and map reload\n");
     } else if (runFieldRoomWarpSmoke) {
         if (window == NULL) {
             fprintf(stderr,
