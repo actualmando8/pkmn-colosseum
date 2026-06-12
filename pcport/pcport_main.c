@@ -10513,9 +10513,25 @@ static int PCPort_FieldNpcReadScriptPlacement(
 static PeopleEntry g_pcHostPeople[PCPORT_HOST_PEOPLE_MAX];
 static s32 g_pcHostPeopleCount;
 
+typedef struct PCPortPeopleOpenPlacement {
+    int valid;
+    u32 groupId;
+    u32 index;
+    u32 actionWord;
+    u32 actorToken;
+    u32 tokenOffset;
+    f32 pos[3];
+    f32 yaw;
+} PCPortPeopleOpenPlacement;
+
+static PCPortPeopleOpenPlacement g_pcPeopleOpenPlacement;
+static u32 g_pcPeopleOpenSetupCount;
+
 static void PCPort_PeopleHostClear(void) {
     memset(g_pcHostPeople, 0, sizeof(g_pcHostPeople));
     g_pcHostPeopleCount = 0;
+    memset(&g_pcPeopleOpenPlacement, 0, sizeof(g_pcPeopleOpenPlacement));
+    g_pcPeopleOpenSetupCount = 0u;
 }
 
 static void PCPort_WriteHostU32(u8* data, u32 value) {
@@ -10659,6 +10675,101 @@ static PeopleEntry* PCPort_PeopleHostFindByGroupIndex(u32 groupId, u32 index) {
     }
 
     return PCPort_PeopleHostResolveSelf(selfPtr);
+}
+
+static PeopleEntry* PCPort_PeopleHostFindExact(u32 groupId, u32 index) {
+    s32 i;
+    for (i = 0; i < g_pcHostPeopleCount; ++i) {
+        PeopleEntry* entry = PCPort_PeopleHostEntryAt(i);
+        if (entry != NULL && entry->active != 0 &&
+            entry->groupId == groupId && entry->index == index) {
+            return entry;
+        }
+    }
+    return NULL;
+}
+
+static void PCPort_PeopleOpenClearPlacement(void) {
+    memset(&g_pcPeopleOpenPlacement, 0, sizeof(g_pcPeopleOpenPlacement));
+}
+
+static void PCPort_PeopleOpenSetPlacement(
+    u32 groupId,
+    u32 index,
+    const PCPortFieldNpcScriptPlacement* placement) {
+    PCPort_PeopleOpenClearPlacement();
+    if (placement == NULL) {
+        return;
+    }
+    g_pcPeopleOpenPlacement.valid = 1;
+    g_pcPeopleOpenPlacement.groupId = groupId;
+    g_pcPeopleOpenPlacement.index = index;
+    g_pcPeopleOpenPlacement.actionWord = placement->actionWord;
+    g_pcPeopleOpenPlacement.actorToken = placement->actorToken;
+    g_pcPeopleOpenPlacement.tokenOffset = placement->tokenOffset;
+    g_pcPeopleOpenPlacement.pos[0] = placement->pos[0];
+    g_pcPeopleOpenPlacement.pos[1] = placement->pos[1];
+    g_pcPeopleOpenPlacement.pos[2] = placement->pos[2];
+    g_pcPeopleOpenPlacement.yaw = placement->yaw;
+}
+
+void fn_8018E1C4(PeopleEntry* entry, u32 groupId, u32 index, u32 actionWord) {
+    f32 zero[3] = { 0.0f, 0.0f, 0.0f };
+
+    if (entry == NULL) {
+        return;
+    }
+
+    entry->active = 1;
+    entry->selfPtr = entry;
+    entry->visible = 1;
+    entry->animId = 1;
+    entry->shadowAnimId = 0;
+    entry->flags = PEOPLE_FLAG_ACTIVE | PEOPLE_FLAG_TALKABLE;
+    entry->groupId = groupId;
+    entry->index = index;
+    entry->scriptRef = (void*)(unsigned long)actionWord;
+    entry->field_34 = 0u;
+    entry->field_38 = actionWord;
+    entry->talkRange = 5.0f;
+    entry->walkTargetNode = -1;
+    entry->shadowId = -1;
+    entry->state = PEOPLE_STATE_IDLE;
+    entry->prevState = PEOPLE_STATE_IDLE;
+    entry->subState = 0;
+    entry->talkLock = 0;
+    entry->moveSpeed = 1.0f;
+    entry->animBlendFactor = 0.0f;
+    entry->motionIndex = actionWord;
+    entry->isTalkable = 1;
+    entry->moveType = PEOPLE_MOVE_NONE;
+    entry->targetX = 0.0f;
+    entry->targetY = 0.0f;
+    entry->targetZ = 0.0f;
+    PCPort_PeopleHostSetPosition(entry, zero);
+
+    if (g_pcPeopleOpenPlacement.valid &&
+        g_pcPeopleOpenPlacement.groupId == groupId &&
+        g_pcPeopleOpenPlacement.index == index &&
+        g_pcPeopleOpenPlacement.actionWord == actionWord) {
+        entry->field_34 = g_pcPeopleOpenPlacement.actorToken;
+        entry->scriptRef =
+            (void*)(unsigned long)g_pcPeopleOpenPlacement.tokenOffset;
+        entry->state = PEOPLE_STATE_INTERACTING;
+        entry->prevState = PEOPLE_STATE_INTERACTING;
+        entry->flags |= PEOPLE_FLAG_HAS_MODEL;
+        PCPort_PeopleHostSetPosition(entry, g_pcPeopleOpenPlacement.pos);
+    }
+
+    ++g_pcPeopleOpenSetupCount;
+}
+
+void fn_8018E050(u32 groupId, u32 index, u32 actionWord) {
+    PeopleEntry* entry = PCPort_PeopleHostFindExact(groupId, index);
+    if (entry == NULL) {
+        entry = PCPort_PeopleHostAllocRaw();
+    }
+    fn_8018E1C4(entry, groupId, index, actionWord);
 }
 
 u32 fn_8018F730(void) {
@@ -13077,6 +13188,252 @@ static int RunFieldPeopleSnapshotSmoke(GLFWwindow* window) {
            importedPos[1],
            importedPos[2],
            talkResult,
+           npcDrawn,
+           renderedFrames);
+
+    PCPort_FieldNpcModelRelease();
+    PCPort_PeopleHostClear();
+    return 1;
+}
+
+static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
+    static const char* kArchive = "orig/GC6E01/disc/files/S1_out.fsys";
+    const char* pages[] = {
+        "Welcome to Outskirt Stand. The story path can now open an NPC dialogue.",
+        "The interaction closes with a progression marker for the next script gate."
+    };
+    PCPortFieldMotionMap motionMap;
+    PCPortFieldNpcScriptPlacement npcPlacement;
+    PCPortMessageBoxState msg;
+    PeopleEntry* npc;
+    char deps[8][64];
+    char depSummary[256];
+    char* npcMember = NULL;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    f32 npcPos[3];
+    u32 npcIndex;
+    u32 talkResult;
+    u32 storyStep = 0u;
+    u32 cutsceneState = 0u;
+    int rawDepCount = 0;
+    int resolvedDepCount;
+    int storedDepCount;
+    int idleMotion;
+    int frame;
+    int renderedFrames = 0;
+    int sawOpen = 0;
+    int sawAdvance = 0;
+    int sawClose = 0;
+    unsigned int npcDrawn = 0;
+    int i;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    memset(deps, 0, sizeof(deps));
+    depSummary[0] = '\0';
+    resolvedDepCount = PCPort_FieldNpcReadDependencyList(
+        kArchive, deps, (int)(sizeof(deps) / sizeof(deps[0])),
+        &rawDepCount, depSummary, sizeof(depSummary));
+    storedDepCount = resolvedDepCount;
+    if (storedDepCount > (int)(sizeof(deps) / sizeof(deps[0]))) {
+        storedDepCount = (int)(sizeof(deps) / sizeof(deps[0]));
+    }
+    if (rawDepCount < 3 || resolvedDepCount < 3) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: dependency list raw=%d resolved=%d summary=%s\n",
+                rawDepCount,
+                resolvedDepCount,
+                depSummary);
+        return 0;
+    }
+
+    for (i = 0; i < storedDepCount; ++i) {
+        if (strstr(deps[i], "truck") == NULL &&
+            strstr(deps[i], "bike") == NULL) {
+            npcMember = deps[i];
+            break;
+        }
+    }
+    if (npcMember == NULL && storedDepCount > 0) {
+        npcMember = deps[0];
+    }
+    if (npcMember == NULL || npcMember[0] == '\0') {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: no renderable dependency member from %s\n",
+                depSummary);
+        return 0;
+    }
+
+    if (!PCPort_FieldNpcReadScriptPlacement(kArchive, &npcPlacement)) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: no real S1_out NPC placement marker 0x%08X\n",
+                PCPORT_S1_OUT_NPC_ACTOR_TOKEN);
+        return 0;
+    }
+
+    npcIndex = (npcPlacement.actorToken >> 16) & 0xFFFFu;
+    if (npcIndex == 0u) {
+        npcIndex = 1u;
+    }
+
+    PCPort_PeopleHostClear();
+    PCPort_PeopleOpenSetPlacement(PC_FLOOR_OUTSKIRT, npcIndex, &npcPlacement);
+    fn_8018E050(PC_FLOOR_OUTSKIRT, npcIndex, npcPlacement.actionWord);
+    PCPort_PeopleOpenClearPlacement();
+
+    npc = PCPort_PeopleHostFindExact(PC_FLOOR_OUTSKIRT, npcIndex);
+    if (npc == NULL || g_pcPeopleOpenSetupCount != 1u) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: fn_8018E050 did not create NPC index=%u setupCount=%u\n",
+                npcIndex,
+                g_pcPeopleOpenSetupCount);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    PCPort_PeopleHostGetPosition(npc, npcPos);
+    if (npc->field_34 != npcPlacement.actorToken ||
+        npc->field_38 != npcPlacement.actionWord ||
+        npc->scriptRef != (void*)(unsigned long)npcPlacement.tokenOffset ||
+        npc->state != PEOPLE_STATE_INTERACTING ||
+        !PCPort_Vec3Near(npcPos, npcPlacement.pos)) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: marker=0x%08X action=0x%08X script=%p state=%u pos=(%.1f,%.1f,%.1f)\n",
+                npc->field_34,
+                npc->field_38,
+                npc->scriptRef,
+                npc->state,
+                npcPos[0],
+                npcPos[1],
+                npcPos[2]);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    talkResult = fn_801812E8(PC_FLOOR_OUTSKIRT, npcIndex, 1u);
+    if (talkResult != 1u ||
+        npc->state != PEOPLE_STATE_IDLE ||
+        npc->prevState != PEOPLE_STATE_INTERACTING) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: talk=%u state=%u prev=%u\n",
+                talkResult,
+                npc->state,
+                npc->prevState);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: could not load S1_out\n");
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter() || !PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: could not load animated field character\n");
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    if (idleMotion < 0 || !PCPort_CharAnimSetMotion(idleMotion)) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: idle motion %d could not be set\n",
+                idleMotion);
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+    if (!PCPort_LoadFieldNpcModel(kArchive, npcMember)) {
+        PCPort_FieldNpcModelRelease();
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    PCPort_MessageBoxInit(&msg, pages,
+                          (int)(sizeof(pages) / sizeof(pages[0])), 5);
+    for (frame = 0; frame < 48; ++frame) {
+        u16 pressed = 0u;
+        int beforeAdvance = msg.advanceCount;
+        int beforeClose = msg.closeCount;
+        int pageLen = PCPort_MessageBoxPageLen(&msg);
+
+        if (msg.active) {
+            sawOpen = 1;
+        }
+        if (msg.active && frame == 2) {
+            pressed = GCN_PAD_BUTTON_A;
+        } else if (msg.active && msg.visibleChars >= pageLen && frame > 2) {
+            pressed = GCN_PAD_BUTTON_A;
+        }
+
+        VIWaitForRetrace_PC();
+        PCPort_MessageBoxTick(&msg, pressed);
+        if (msg.advanceCount > beforeAdvance) {
+            sawAdvance = 1;
+        }
+        if (msg.closeCount > beforeClose) {
+            sawClose = 1;
+            storyStep = 1u;
+            cutsceneState = 2u;
+        }
+
+        PCPort_FieldAnimTick(1.0f);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             3.14159265f, 1.3f, 1.0f);
+        npcDrawn += RenderFieldStaticArchive(&g_engNpcArchive, g_engNpcRoot,
+                                             npcPos[0],
+                                             npcPos[1],
+                                             npcPos[2],
+                                             npcPlacement.yaw, 1.15f);
+        DrawFieldMessageBox(&msg, "NPC");
+        GSgfxSwapBuffers(0);
+        ++renderedFrames;
+
+        if (!msg.active && sawClose) {
+            break;
+        }
+    }
+
+    if (msg.active || !sawOpen || !sawAdvance || !sawClose ||
+        storyStep != 1u || cutsceneState != 2u ||
+        npcDrawn == 0u || renderedFrames == 0) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: active=%d open=%d advance=%d close=%d story=%u cutscene=%u npcDrawn=%u frames=%d\n",
+                msg.active,
+                sawOpen,
+                sawAdvance,
+                sawClose,
+                storyStep,
+                cutsceneState,
+                npcDrawn,
+                renderedFrames);
+        PCPort_FieldNpcModelRelease();
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
+    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
+           g_pcPeopleOpenSetupCount,
+           (u32)PC_FLOOR_OUTSKIRT,
+           npcIndex,
+           npcPlacement.actorToken,
+           npcPlacement.tokenOffset,
+           npcPlacement.actionWord,
+           npcPos[0],
+           npcPos[1],
+           npcPos[2],
+           talkResult,
+           sawOpen,
+           sawAdvance,
+           sawClose,
+           storyStep,
+           cutsceneState,
            npcDrawn,
            renderedFrames);
 
@@ -15896,6 +16253,7 @@ int main(int argc, char** argv) {
     int runFieldMessageSmoke;
     int runFieldNpcTalkSmoke;
     int runFieldNpcModelSmoke;
+    int runFieldNpcOpenSmoke;
     int runFieldPeopleSnapshotSmoke;
     int runFieldStartMenuSmoke;
     int runWorldMapHandoffSmoke;
@@ -15924,6 +16282,7 @@ int main(int argc, char** argv) {
     runFieldMessageSmoke = HasArg(argc, argv, "--field-message-smoke");
     runFieldNpcTalkSmoke = HasArg(argc, argv, "--field-npc-talk-smoke");
     runFieldNpcModelSmoke = HasArg(argc, argv, "--field-npc-model-smoke");
+    runFieldNpcOpenSmoke = HasArg(argc, argv, "--field-npc-open-smoke");
     runFieldPeopleSnapshotSmoke =
         HasArg(argc, argv, "--field-people-snapshot-smoke");
     runFieldStartMenuSmoke = HasArg(argc, argv, "--field-start-menu-smoke");
@@ -16047,6 +16406,7 @@ int main(int argc, char** argv) {
         runFieldMessageSmoke ||
         runFieldNpcTalkSmoke ||
         runFieldNpcModelSmoke ||
+        runFieldNpcOpenSmoke ||
         runFieldPeopleSnapshotSmoke ||
         runFieldStartMenuSmoke ||
         runWorldMapHandoffSmoke ||
@@ -16391,6 +16751,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Field NPC model smoke rendered a real S1_out dependency member\n");
+    } else if (runFieldNpcOpenSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-npc-open-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldNpcOpenSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field NPC open smoke exercised NPC setup, dialogue, and story marker\n");
     } else if (runFieldPeopleSnapshotSmoke) {
         if (window == NULL) {
             fprintf(stderr,
