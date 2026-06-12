@@ -9572,7 +9572,9 @@ enum {
     PC_FLOOR_GARAGE_1F = 0,
     PC_FLOOR_GARAGE_B1 = 1,
     PC_FLOOR_OUTSKIRT = 2,
-    PC_FLOOR_OUTSKIRT_SHOP = 3
+    PC_FLOOR_OUTSKIRT_SHOP = 3,
+    PC_FLOOR_PYRITE = 4,
+    PC_FLOOR_AGATE = 5
 };
 
 static const PCPortWarpMapEntry g_pcWarpMaps[] = {
@@ -9628,6 +9630,26 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         },
         1,
         { 0.0f, 0.0f, 35.0f }    /* spawn point when arriving in the shop */
+    },
+    {
+        /* Pyrite Town exterior. Verified render/collision target for the
+         * worldmap travel smoke: M2_out has 2125 WZX triangles. Real exits are
+         * still future floor-event data, so this entry intentionally has no
+         * host exit triggers yet. */
+        PC_FLOOR_PYRITE, "M2_out",
+        { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, -1,
+              { 0.0f, 0.0f, 0.0f } } },
+        0,
+        { 0.0f, 0.0f, 0.0f }
+    },
+    {
+        /* Agate/The Under map-group exterior. M3_out renders and has WZX
+         * collision; real story availability and exit records remain follow-up. */
+        PC_FLOOR_AGATE, "M3_out",
+        { { { 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f, 0.0f, -1,
+              { 0.0f, 0.0f, 0.0f } } },
+        0,
+        { 0.0f, 0.0f, 0.0f }
     }
 };
 static const int g_pcWarpMapCount =
@@ -11073,7 +11095,8 @@ static int RunWorldMapHandoffSmoke(GLFWwindow* window) {
 typedef enum PCPortWorldMapMenuState {
     PCPORT_WORLDMAP_SELECT = 0,
     PCPORT_WORLDMAP_CONFIRM = 1,
-    PCPORT_WORLDMAP_ACCEPTED = 2
+    PCPORT_WORLDMAP_ACCEPTED = 2,
+    PCPORT_WORLDMAP_UNAVAILABLE = 3
 } PCPortWorldMapMenuState;
 
 typedef struct PCPortWorldMapLocation {
@@ -11093,21 +11116,21 @@ static const PCPortWorldMapLocation kWorldMapLocations[] = {
     },
     {
         "PHENAC CITY",
-        "City destination placeholder; travel target wiring follows the field table.",
+        "Route pending: M1_out renders, but no WZX collision mesh is linked yet.",
         405.0f, 186.0f,
         -1
     },
     {
         "PYRITE TOWN",
-        "Town destination placeholder for the worldmap cursor and confirm flow.",
+        "Travel to Pyrite Town exterior through the verified M2_out field target.",
         338.0f, 270.0f,
-        -1
+        PC_FLOOR_PYRITE
     },
     {
         "AGATE VILLAGE",
-        "Village destination placeholder for later story-state availability.",
+        "Travel to the verified M3_out exterior target; story gating follows.",
         184.0f, 142.0f,
-        -1
+        PC_FLOOR_AGATE
     }
 };
 #define PCPORT_WORLDMAP_LOCATION_COUNT \
@@ -11134,9 +11157,9 @@ static void DrawWorldMapMenuOverlay(int cursor,
     for (i = 0; i < PCPORT_WORLDMAP_LOCATION_COUNT; ++i) {
         const PCPortWorldMapLocation* m = &kWorldMapLocations[i];
         int selected = (i == cursor);
-        u8 r = selected ? 248 : 92;
-        u8 g = selected ? 214 : 198;
-        u8 b = selected ? 92 : 220;
+        u8 r = selected ? 248 : (m->floorId >= 0 ? 92 : 124);
+        u8 g = selected ? 214 : (m->floorId >= 0 ? 198 : 132);
+        u8 b = selected ? 92 : (m->floorId >= 0 ? 220 : 140);
         DrawSolidScreenRect(m->x - 8.0f, m->y - 8.0f, 16.0f, 16.0f,
                             r, g, b, 245);
         DrawSolidScreenRect(m->x - 4.0f, m->y - 4.0f, 8.0f, 8.0f,
@@ -11168,7 +11191,31 @@ static void DrawWorldMapMenuOverlay(int cursor,
         char prompt[160];
         snprintf(prompt, sizeof(prompt), "Travel confirmed for %s.", loc->name);
         DrawDialogBox(prompt, 0, 0);
+    } else if (state == PCPORT_WORLDMAP_UNAVAILABLE) {
+        char prompt[160];
+        snprintf(prompt, sizeof(prompt), "%s is not travel-ready yet.", loc->name);
+        DrawDialogBox(prompt, 0, 0);
     }
+}
+
+static void DrawWorldMapTravelResultOverlay(const PCPortWorldMapLocation* loc,
+                                            int floorId,
+                                            int colTris) {
+    char title[128];
+    char detail[160];
+
+    BeginMenuOverlay();
+    EnsureFontAtlas();
+
+    DrawSolidScreenRect(44.0f, 350.0f, 552.0f, 96.0f, 96, 124, 142, 230);
+    DrawSolidScreenRect(50.0f, 356.0f, 540.0f, 84.0f, 20, 39, 54, 244);
+    snprintf(title, sizeof(title), "ARRIVED: %s", loc->name);
+    snprintf(detail, sizeof(detail),
+             "Worldmap accepted travel and loaded floor %d with %d collision triangles.",
+             floorId, colTris);
+    DrawTextScreen(70.0f, 370.0f, 9.0f, 14.0f, 248, 246, 224, 255, title);
+    DrawTextWrapped(70.0f, 400.0f, 7.0f, 11.0f, 62, 2,
+                    206, 222, 232, 255, detail);
 }
 
 static int RunWorldMapMenuScene(GLFWwindow* window, int smokeMode) {
@@ -11181,6 +11228,10 @@ static int RunWorldMapMenuScene(GLFWwindow* window, int smokeMode) {
     int openedConfirm = 0;
     int accepted = 0;
     int acceptedFrame = -1;
+    int acceptedFloor = -1;
+    int targetLoaded = 0;
+    int targetTris = 0;
+    f32 targetSpawn[3] = { 0.0f, 0.0f, 0.0f };
     int confirmCursor = 0;
     u16 padHeld = 0;
     u16 padPrev = 0;
@@ -11262,11 +11313,17 @@ static int RunWorldMapMenuScene(GLFWwindow* window, int smokeMode) {
                        cursor, kWorldMapLocations[cursor].name);
             }
             if (padPressed & GCN_PAD_BUTTON_A) {
-                state = PCPORT_WORLDMAP_CONFIRM;
-                confirmCursor = 0;
-                openedConfirm = 1;
-                printf("[worldmap-menu] select %s -> travel confirm\n",
-                       kWorldMapLocations[cursor].name);
+                if (kWorldMapLocations[cursor].floorId < 0) {
+                    state = PCPORT_WORLDMAP_UNAVAILABLE;
+                    printf("[worldmap-menu] select %s -> route unavailable\n",
+                           kWorldMapLocations[cursor].name);
+                } else {
+                    state = PCPORT_WORLDMAP_CONFIRM;
+                    confirmCursor = 0;
+                    openedConfirm = 1;
+                    printf("[worldmap-menu] select %s -> travel confirm\n",
+                           kWorldMapLocations[cursor].name);
+                }
             }
             if (!smokeMode && (padPressed & (GCN_PAD_BUTTON_B |
                                              GCN_PAD_BUTTON_START))) {
@@ -11285,12 +11342,26 @@ static int RunWorldMapMenuScene(GLFWwindow* window, int smokeMode) {
             }
             if (padPressed & GCN_PAD_BUTTON_A) {
                 if (confirmCursor == 0) {
+                    acceptedFloor = kWorldMapLocations[cursor].floorId;
+                    if (!PCPort_FieldWarpTo(acceptedFloor, targetSpawn)) {
+                        fprintf(stderr,
+                                "[worldmap-menu-smoke] failed: could not load accepted floor %d (%s)\n",
+                                acceptedFloor,
+                                kWorldMapLocations[cursor].name);
+                        return 0;
+                    }
+                    targetLoaded = 1;
+                    targetTris = PCPort_FieldColTriCount();
                     accepted = 1;
                     acceptedFrame = frame;
                     state = PCPORT_WORLDMAP_ACCEPTED;
-                    printf("[worldmap-menu] travel accepted: %s floor=%d\n",
+                    printf("[worldmap-menu] travel accepted: %s floor=%d tris=%d spawn=(%.1f,%.1f,%.1f)\n",
                            kWorldMapLocations[cursor].name,
-                           kWorldMapLocations[cursor].floorId);
+                           acceptedFloor,
+                           targetTris,
+                           targetSpawn[0],
+                           targetSpawn[1],
+                           targetSpawn[2]);
                 } else {
                     state = PCPORT_WORLDMAP_SELECT;
                     printf("[worldmap-menu] travel declined\n");
@@ -11305,23 +11376,42 @@ static int RunWorldMapMenuScene(GLFWwindow* window, int smokeMode) {
             if (smokeMode && acceptedFrame >= 0 && frame > acceptedFrame + 1) {
                 break;
             }
+        } else if (state == PCPORT_WORLDMAP_UNAVAILABLE) {
+            if (padPressed & (GCN_PAD_BUTTON_A | GCN_PAD_BUTTON_B |
+                              GCN_PAD_BUTTON_START)) {
+                state = PCPORT_WORLDMAP_SELECT;
+            }
         }
 
         PCPort_EngineTitleRenderFrame();
-        DrawWorldMapMenuOverlay(cursor, state, confirmCursor);
+        if (targetLoaded) {
+            DrawWorldMapTravelResultOverlay(&kWorldMapLocations[cursor],
+                                            acceptedFloor, targetTris);
+        } else {
+            DrawWorldMapMenuOverlay(cursor, state, confirmCursor);
+        }
         GSgfxSwapBuffers(0);
     }
 
     if (smokeMode) {
-        if (!moved || !openedConfirm || !accepted || cursor != 2) {
+        if (!moved || !openedConfirm || !accepted || cursor != 2 ||
+            acceptedFloor != PC_FLOOR_PYRITE || !targetLoaded ||
+            targetTris <= 0) {
             fprintf(stderr,
-                    "[worldmap-menu-smoke] failed: moved=%d confirm=%d accepted=%d cursor=%d\n",
-                    moved, openedConfirm, accepted, cursor);
+                    "[worldmap-menu-smoke] failed: moved=%d confirm=%d accepted=%d cursor=%d floor=%d loaded=%d tris=%d\n",
+                    moved,
+                    openedConfirm,
+                    accepted,
+                    cursor,
+                    acceptedFloor,
+                    targetLoaded,
+                    targetTris);
             return 0;
         }
-        printf("[worldmap-menu-smoke] passed: cursor->%s confirm=yes floor=%d frames=%d\n",
+        printf("[worldmap-menu-smoke] passed: cursor->%s confirm=yes floor=%d tris=%d frames=%d\n",
                kWorldMapLocations[cursor].name,
-               kWorldMapLocations[cursor].floorId,
+               acceptedFloor,
+               targetTris,
                frame);
     }
     return 1;
