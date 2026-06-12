@@ -62,7 +62,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
                         unsigned int x2, unsigned int y2);
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
-extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
+extern void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint);
 extern HSD_JObj* fn_801A0FBC(HSD_Joint* joint);
 extern void fn_801A6E24(HSD_MObj* mobj);
 extern s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src);
@@ -1369,7 +1369,7 @@ static int RunJObjResolveSmoke(void)
     instance->flags = JOBJ_INSTANCE;
     instance->child = NULL;
 
-    fn_801A0744(root, &rootJoint);
+    HSD_JObjResolveRefsAll(root, &rootJoint);
 
     instanceChild = instance->child;
     ok = instanceChild == target && target->parent == root;
@@ -1387,7 +1387,7 @@ static int RunJObjResolveSmoke(void)
         return 0;
     }
 
-    printf("[pcport_bootstrap] JObj fn_801A0744 resolve smoke passed (shared child=%p)\n",
+    printf("[pcport_bootstrap] JObj HSD_JObjResolveRefsAll resolve smoke passed (shared child=%p)\n",
            (void*)target);
     return 1;
 }
@@ -7427,6 +7427,9 @@ typedef struct PCPortScriptMsgContext {
 extern u8 lbl_803A9768[];
 extern void fn_80056C54(u8* out, u8* src, u32 slot);
 extern void* fn_80057270(void);
+extern u8 lbl_803A95E8[];
+extern u8 lbl_803A9720[];
+extern void fn_80053778(void);
 
 static int PCPort_TextLen(const char* text) {
     return text != NULL ? (int)strlen(text) : 0;
@@ -13291,6 +13294,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
     int sawAdvance = 0;
     int sawClose = 0;
     int msgCtxLinked = 0;
+    int scriptCbLinked = 0;
     unsigned int npcDrawn = 0;
     int i;
 
@@ -13443,6 +13447,26 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
         PCPort_PeopleHostClear();
         return 0;
     }
+    memset(lbl_803A95E8, 0, 0x138u);
+    memset(lbl_803A9720, 0, 0x48u);
+    fn_80053778();
+    scriptCbLinked =
+        *(void**)lbl_803A95E8 == (void*)msgCtx &&
+        *(void**)lbl_803A9720 == (void*)msgCtx &&
+        *(u32*)(lbl_803A95E8 + 8) == 1u &&
+        *(u32*)(lbl_803A9720 + 8) == 1u;
+    if (!scriptCbLinked) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: fn_80053778 script callback did not resolve msg context cbA=%p cbB=%p countA=%u countB=%u msg=%p\n",
+                *(void**)lbl_803A95E8,
+                *(void**)lbl_803A9720,
+                *(u32*)(lbl_803A95E8 + 8),
+                *(u32*)(lbl_803A9720 + 8),
+                (void*)msgCtx);
+        PCPort_FieldNpcModelRelease();
+        PCPort_PeopleHostClear();
+        return 0;
+    }
 
     for (frame = 0; frame < 48; ++frame) {
         u16 pressed = 0u;
@@ -13491,19 +13515,20 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
     }
 
     if (msg.active || !sawOpen || !sawAdvance || !sawClose ||
-        !msgCtxLinked || msgCtx == NULL ||
+        !msgCtxLinked || !scriptCbLinked || msgCtx == NULL ||
         msgCtx->active != 0u ||
         msgCtx->storyStep != 1u || msgCtx->cutsceneState != 2u ||
         msgCtx->pageIndex != 1u ||
         storyStep != 1u || cutsceneState != 2u ||
         npcDrawn == 0u || renderedFrames == 0) {
         fprintf(stderr,
-                "[field-npc-open-smoke] failed: active=%d open=%d advance=%d close=%d msgCtx=%d ctxActive=%u ctxStory=%u ctxCutscene=%u ctxPage=%u story=%u cutscene=%u npcDrawn=%u frames=%d\n",
+                "[field-npc-open-smoke] failed: active=%d open=%d advance=%d close=%d msgCtx=%d scriptCb=%d ctxActive=%u ctxStory=%u ctxCutscene=%u ctxPage=%u story=%u cutscene=%u npcDrawn=%u frames=%d\n",
                 msg.active,
                 sawOpen,
                 sawAdvance,
                 sawClose,
                 msgCtxLinked,
+                scriptCbLinked,
                 msgCtx != NULL ? msgCtx->active : 0u,
                 msgCtx != NULL ? msgCtx->storyStep : 0u,
                 msgCtx != NULL ? msgCtx->cutsceneState : 0u,
@@ -13517,7 +13542,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
         return 0;
     }
 
-    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u fn_80056C54=1 fn_80057270=1 group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
+    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u fn_80056C54=1 fn_80057270=1 fn_80053778=1 group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
            g_pcPeopleOpenSetupCount,
            (u32)PC_FLOOR_OUTSKIRT,
            npcIndex,
@@ -16596,7 +16621,7 @@ int main(int argc, char** argv) {
             goto cleanup;
         }
 
-        printf("[pcport_bootstrap] JObj fn_801A0744 direct resolver exercised\n");
+        printf("[pcport_bootstrap] JObj HSD_JObjResolveRefsAll direct resolver exercised\n");
     } else if (runJObjInstanceSmoke) {
         if (!RunJObjInstanceSmoke()) {
             exitCode = 1;
