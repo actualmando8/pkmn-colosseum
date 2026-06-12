@@ -10407,6 +10407,87 @@ static int PCPort_FieldNpcReadDependencyList(const char* fsysPath,
     return resolvedCount;
 }
 
+typedef struct PCPortFieldNpcScriptPlacement {
+    u32 tokenOffset;
+    u32 actorToken;
+    u32 actionWord;
+    f32 pos[3];
+    f32 yaw;
+} PCPortFieldNpcScriptPlacement;
+
+#define PCPORT_S1_OUT_NPC_ACTOR_TOKEN 0x025D0000u
+
+static f32 PCPort_ReadBigEndianF32Local(const u8* data) {
+    union {
+        u32 u;
+        f32 f;
+    } v;
+    v.u = PCPort_ReadBigEndianU32(data);
+    return v.f;
+}
+
+static int PCPort_FieldNpcPlacementPlausible(const f32 pos[3]) {
+    if (pos == NULL) {
+        return 0;
+    }
+    if (!isfinite(pos[0]) || !isfinite(pos[1]) || !isfinite(pos[2])) {
+        return 0;
+    }
+    if (pos[0] == 0.0f && pos[1] == 0.0f && pos[2] == 0.0f) {
+        return 0;
+    }
+    return pos[0] >= -200.0f && pos[0] <= 300.0f &&
+           pos[1] >= -20.0f && pos[1] <= 80.0f &&
+           pos[2] >= -160.0f && pos[2] <= 160.0f;
+}
+
+static int PCPort_FieldNpcReadScriptPlacement(
+    const char* fsysPath,
+    PCPortFieldNpcScriptPlacement* outPlacement) {
+    u8* data = NULL;
+    u32 size = 0;
+    u32 off;
+
+    if (outPlacement != NULL) {
+        memset(outPlacement, 0, sizeof(*outPlacement));
+    }
+    if (!PCPort_LoadFsysMember(fsysPath, "S1_out", &data, &size) ||
+        data == NULL || size < 0x20u) {
+        return 0;
+    }
+
+    for (off = 0; off + 0x1Cu <= size; off += 4u) {
+        f32 pos[3];
+        u32 token = PCPort_ReadBigEndianU32(data + off);
+        if (token != PCPORT_S1_OUT_NPC_ACTOR_TOKEN) {
+            continue;
+        }
+
+        pos[0] = PCPort_ReadBigEndianF32Local(data + off + 0x10u);
+        pos[1] = PCPort_ReadBigEndianF32Local(data + off + 0x14u);
+        pos[2] = PCPort_ReadBigEndianF32Local(data + off + 0x18u);
+        if (!PCPort_FieldNpcPlacementPlausible(pos)) {
+            continue;
+        }
+
+        if (outPlacement != NULL) {
+            outPlacement->tokenOffset = off;
+            outPlacement->actorToken = token;
+            outPlacement->actionWord =
+                PCPort_ReadBigEndianU32(data + off + 0x0Cu);
+            outPlacement->pos[0] = pos[0];
+            outPlacement->pos[1] = pos[1];
+            outPlacement->pos[2] = pos[2];
+            outPlacement->yaw = 0.0f;
+        }
+        PCPort_FreeBuffer(data);
+        return 1;
+    }
+
+    PCPort_FreeBuffer(data);
+    return 0;
+}
+
 #define PCPORT_HOST_PEOPLE_MAX 8
 
 static PeopleEntry g_pcHostPeople[PCPORT_HOST_PEOPLE_MAX];
@@ -12429,6 +12510,7 @@ static int RunFieldNpcModelSmoke(GLFWwindow* window) {
     char deps[8][64];
     char depSummary[256];
     char* npcMember = NULL;
+    PCPortFieldNpcScriptPlacement npcPlacement;
     f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
     int rawDepCount = 0;
     int resolvedDepCount;
@@ -12480,6 +12562,13 @@ static int RunFieldNpcModelSmoke(GLFWwindow* window) {
         return 0;
     }
 
+    if (!PCPort_FieldNpcReadScriptPlacement(kArchive, &npcPlacement)) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: no real S1_out NPC placement marker 0x%08X\n",
+                PCPORT_S1_OUT_NPC_ACTOR_TOKEN);
+        return 0;
+    }
+
     if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
         fprintf(stderr,
                 "[field-npc-model-smoke] failed: could not load S1_out\n");
@@ -12512,10 +12601,10 @@ static int RunFieldNpcModelSmoke(GLFWwindow* window) {
         RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
                              3.14159265f, 1.3f, 1.0f);
         npcDrawn += RenderFieldStaticArchive(&g_engNpcArchive, g_engNpcRoot,
-                                             spawn[0] + 4.5f,
-                                             spawn[1],
-                                             spawn[2] - 4.0f,
-                                             0.0f, 1.15f);
+                                             npcPlacement.pos[0],
+                                             npcPlacement.pos[1],
+                                             npcPlacement.pos[2],
+                                             npcPlacement.yaw, 1.15f);
         GSgfxSwapBuffers(0);
         ++renderedFrames;
     }
@@ -12532,7 +12621,7 @@ static int RunFieldNpcModelSmoke(GLFWwindow* window) {
         return 0;
     }
 
-    printf("[field-npc-model-smoke] passed: deps raw=%d resolved=%d [%s], rendered %s rootJoint=0x%X npcDrawn=%u frames=%d spawn=(%.1f,%.1f,%.1f)\n",
+    printf("[field-npc-model-smoke] passed: deps raw=%d resolved=%d [%s], rendered %s rootJoint=0x%X npcDrawn=%u frames=%d spawn=(%.1f,%.1f,%.1f) npcMarker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f)\n",
            rawDepCount,
            resolvedDepCount,
            depSummary,
@@ -12540,7 +12629,13 @@ static int RunFieldNpcModelSmoke(GLFWwindow* window) {
            g_engNpcRoot,
            npcDrawn,
            renderedFrames,
-           spawn[0], spawn[1], spawn[2]);
+           spawn[0], spawn[1], spawn[2],
+           npcPlacement.actorToken,
+           npcPlacement.tokenOffset,
+           npcPlacement.actionWord,
+           npcPlacement.pos[0],
+           npcPlacement.pos[1],
+           npcPlacement.pos[2]);
     PCPort_FieldNpcModelRelease();
     return 1;
 }
