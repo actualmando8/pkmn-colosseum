@@ -4,6 +4,7 @@
 #include "field_collision.h"
 #include "gx_shim.h"
 #include "gx_texture.h"
+#include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
 #include "os_shim.h"
 #include "pad_shim.h"
@@ -1687,6 +1688,98 @@ static void ConfigureTranslatedTexturedPipeline(unsigned int pipelineId,
     }
 }
 
+static void TranslateLiveMObjMaterial(const HSD_MObj* mobj,
+                                      PCPortTranslatedMaterial* outMaterial) {
+    if (outMaterial == NULL) {
+        return;
+    }
+
+    memset(outMaterial, 0, sizeof(*outMaterial));
+    outMaterial->alpha = 1.0f;
+    if (mobj == NULL) {
+        return;
+    }
+
+    outMaterial->rendermode = mobj->rendermode;
+    if (mobj->mat != NULL) {
+        outMaterial->ambient = mobj->mat->ambient;
+        outMaterial->diffuse = mobj->mat->diffuse;
+        outMaterial->specular = mobj->mat->specular;
+        outMaterial->alpha = mobj->mat->alpha;
+        outMaterial->shininess = mobj->mat->shininess;
+    }
+    if (mobj->pe != NULL) {
+        outMaterial->hasPEDesc = TRUE;
+        outMaterial->peFlags = mobj->pe->flags;
+        outMaterial->peRef0 = mobj->pe->ref0;
+        outMaterial->peRef1 = mobj->pe->ref1;
+        outMaterial->peDstAlpha = mobj->pe->dst_alpha;
+        outMaterial->peType = mobj->pe->type;
+        outMaterial->peSrcFactor = mobj->pe->src_factor;
+        outMaterial->peDstFactor = mobj->pe->dst_factor;
+        outMaterial->peLogicOp = mobj->pe->logic_op;
+        outMaterial->peZComp = mobj->pe->z_comp;
+        outMaterial->peAlphaComp0 = mobj->pe->alpha_comp0;
+        outMaterial->peAlphaOp = mobj->pe->alpha_op;
+        outMaterial->peAlphaComp1 = mobj->pe->alpha_comp1;
+    }
+}
+
+static void ForceMaterialDeltaBlend(PCPortTranslatedMaterial* material) {
+    if (material == NULL) {
+        return;
+    }
+
+    material->rendermode |= PCPORT_RENDER_XLU | PCPORT_RENDER_NO_ZUPDATE;
+    material->hasPEDesc = FALSE;
+}
+
+static unsigned char* CaptureMaterialDeltaFrame(
+    const PCPortTranslatedCamera* camera,
+    const PCPortTranslatedPObj* pobj,
+    const PCPortTranslatedMaterial* material,
+    const f32 modelViewMatrix[3][4],
+    const PCPortGSDrawObject* drawObject,
+    unsigned char sample[4])
+{
+    if (camera == NULL || pobj == NULL || material == NULL ||
+        modelViewMatrix == NULL || drawObject == NULL) {
+        return NULL;
+    }
+
+    ConfigureTranslatedMaterialPipeline(PCPORT_REAL_MATERIAL_PIPELINE,
+                                        material);
+    GXHostSetVertexAlphaScale(1.0f);
+    VIWaitForRetrace_PC();
+    ClearBackbuffer(0.0f, 0.0f, 0.0f);
+    GSgfx_BeginFrame();
+
+    GXSetViewport((f32)camera->viewportLeft,
+                  (f32)camera->viewportTop,
+                  (f32)(camera->viewportRight - camera->viewportLeft),
+                  (f32)(camera->viewportBottom - camera->viewportTop),
+                  0.0f,
+                  1.0f);
+    GXSetScissor((u32)camera->scissorLeft,
+                 (u32)camera->scissorTop,
+                 (u32)(camera->scissorRight - camera->scissorLeft),
+                 (u32)(camera->scissorBottom - camera->scissorTop));
+    GXSetProjection(camera->projectionMatrix, GX_PERSPECTIVE);
+    GXLoadPosMtxImm((f32 (*)[4])modelViewMatrix, 0);
+    GXSetCurrentMtx(0);
+
+    fn_801AA568((HSD_PObj*)&pobj->pobj);
+    fn_800DAD10((void*)drawObject);
+    glFlush();
+
+    if (sample != NULL) {
+        ReadBackbufferPixelAt(PCPORT_GX_SMOKE_SAMPLE_X,
+                              PCPORT_GX_SMOKE_SAMPLE_Y,
+                              sample);
+    }
+    return ReadBackbufferImage();
+}
+
 static int PCPort_IsBattleControlPObj(const PCPortTranslatedPObj* pobj,
                                       const PCPortTranslatedMaterial* material,
                                       int haveMaterial,
@@ -2227,6 +2320,306 @@ cleanup:
     GXHostSetVertexAlphaScale(1.0f);
     free(materialPixels);
     free(opaquePixels);
+    PCPort_DestroyTranslatedPObj(&translatedPObj);
+    PCPort_HSDArchiveDestroy(&archive);
+    PCPort_FreeBuffer(memberData);
+    return ok;
+}
+
+static int RunRealMaterialDeltaSmoke(void) {
+    PCPortHSDArchive archive;
+    PCPortTranslatedCamera translatedCamera;
+    PCPortTranslatedPObj translatedPObj;
+    PCPortTranslatedJointTransform translatedJoint;
+    PCPortTranslatedMaterial fullMaterial;
+    PCPortTranslatedMaterial fadedMaterial;
+    PCPortGSDrawObject drawObject;
+    HSD_MObj* liveMObj = NULL;
+    HSD_TExp* loadTExpList = NULL;
+    HSD_TExp* loadTExpRoot = NULL;
+    HSD_TExp* fullTExpList = NULL;
+    HSD_TExp* fadedTExpList = NULL;
+    HSD_TExp* fullTExpRoot = NULL;
+    HSD_TExp* fadedTExpRoot = NULL;
+    u8* memberData = NULL;
+    u32 memberSize = 0;
+    const u8* sceneData;
+    unsigned char* fullPixels = NULL;
+    unsigned char* fadedPixels = NULL;
+    unsigned char fullSample[4] = { 0 };
+    unsigned char fadedSample[4] = { 0 };
+    u32 sceneOffset = 0;
+    u32 sceneBranchOffset;
+    u32 cameraDescOffset;
+    u32 sceneJointListOffset;
+    u32 rootJointOffset;
+    u32 jointOffset = 0;
+    u32 dobjOffset = 0;
+    u32 pobjOffset = 0;
+    u32 mobjOffset = 0;
+    unsigned int diffPixels = 0;
+    f32 modelViewMatrix[3][4];
+    int ok = 0;
+
+    memset(&archive, 0, sizeof(archive));
+    memset(&translatedCamera, 0, sizeof(translatedCamera));
+    memset(&translatedPObj, 0, sizeof(translatedPObj));
+    memset(&translatedJoint, 0, sizeof(translatedJoint));
+    memset(&fullMaterial, 0, sizeof(fullMaterial));
+    memset(&fadedMaterial, 0, sizeof(fadedMaterial));
+    memset(&drawObject, 0, sizeof(drawObject));
+
+    if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE,
+                               PCPORT_REAL_CONTENT_MEMBER,
+                               &memberData,
+                               &memberSize)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta load failed (%s:%s)\n",
+                PCPORT_REAL_CONTENT_ARCHIVE,
+                PCPORT_REAL_CONTENT_MEMBER);
+        goto cleanup;
+    }
+
+    if (!PCPort_HSDArchiveParseBE(&archive, memberData, memberSize)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta archive parse failed (%s:%s)\n",
+                PCPORT_REAL_CONTENT_ARCHIVE,
+                PCPORT_REAL_CONTENT_MEMBER);
+        goto cleanup;
+    }
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(&archive,
+                                                             "scene_data",
+                                                             &sceneOffset);
+    if (sceneData == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to resolve scene_data\n");
+        goto cleanup;
+    }
+
+    sceneBranchOffset = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&archive, sceneBranchOffset, 0x10u)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta branch offset was invalid (0x%X)\n",
+                sceneBranchOffset);
+        goto cleanup;
+    }
+
+    cameraDescOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x08);
+    if (!PCPort_TranslatePerspectiveCameraFromArchiveBE(&archive,
+                                                        cameraDescOffset,
+                                                        &translatedCamera)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to translate camera (scene=0x%X camera=0x%X)\n",
+                sceneOffset,
+                cameraDescOffset);
+        goto cleanup;
+    }
+
+    sceneJointListOffset = PCPort_ReadBigEndianU32(archive.storage + sceneBranchOffset + 0x00);
+    rootJointOffset = PCPort_ReadBigEndianU32(archive.storage + sceneJointListOffset + 0x00);
+    if (!ResolveFirstRenderablePObjDescFromJoint(&archive,
+                                                 rootJointOffset,
+                                                 &jointOffset,
+                                                 &dobjOffset,
+                                                 &pobjOffset)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta found no renderable PObjDesc (rootJoint=0x%X)\n",
+                rootJointOffset);
+        goto cleanup;
+    }
+
+    if (!PCPort_TranslatePObjFromArchiveBE(&archive,
+                                           pobjOffset,
+                                           &translatedPObj)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to translate PObjDesc (joint=0x%X dobj=0x%X pobj=0x%X)\n",
+                jointOffset,
+                dobjOffset,
+                pobjOffset);
+        goto cleanup;
+    }
+
+    if (!PCPort_TranslateJointChainToMatrixBE(&archive,
+                                              rootJointOffset,
+                                              jointOffset,
+                                              &translatedJoint)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to translate joint chain (root=0x%X target=0x%X)\n",
+                rootJointOffset,
+                jointOffset);
+        goto cleanup;
+    }
+
+    mobjOffset = PCPort_ReadBigEndianU32(archive.storage + dobjOffset + 0x08);
+    if (!ArchiveRangeValid(&archive, mobjOffset, 0x18u)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta MObj offset was invalid (dobj=0x%X mobj=0x%X)\n",
+                dobjOffset,
+                mobjOffset);
+        goto cleanup;
+    }
+
+    if (PCPort_SwizzleSceneForHSD(&archive, sceneJointListOffset) == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to swizzle scene for live HSD load (jointList=0x%X)\n",
+                sceneJointListOffset);
+        goto cleanup;
+    }
+
+    liveMObj = HSD_MObjLoadDesc((HSD_MObjDesc*)(archive.storage + mobjOffset));
+    if (liveMObj == NULL || liveMObj->mat == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta live MObj load failed (mobj=0x%X live=%p mat=%p)\n",
+                mobjOffset,
+                (void*)liveMObj,
+                liveMObj != NULL ? (void*)liveMObj->mat : NULL);
+        goto cleanup;
+    }
+
+    liveMObj->rendermode |= PCPORT_RENDER_XLU | PCPORT_RENDER_NO_ZUPDATE;
+    if (HSD_MOBJ_METHOD(liveMObj)->make_texp == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta live MObj has no make_texp method\n");
+        goto cleanup;
+    }
+    loadTExpRoot = HSD_MOBJ_METHOD(liveMObj)->make_texp(liveMObj,
+                                                        liveMObj->tobj,
+                                                        &loadTExpList);
+    liveMObj->texp = loadTExpList;
+    if (loadTExpRoot == NULL || liveMObj->texp == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta live MObj produced no TExp list (root=%p list=%p mobj=0x%X)\n",
+                (void*)loadTExpRoot,
+                (void*)liveMObj->texp,
+                mobjOffset);
+        goto cleanup;
+    }
+
+    HSD_MObjSetAlpha(liveMObj, 1.0f);
+    fullTExpRoot = HSD_MOBJ_METHOD(liveMObj)->make_texp(liveMObj,
+                                                        liveMObj->tobj,
+                                                        &fullTExpList);
+    if (fullTExpRoot == NULL || fullTExpList == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta full-alpha TExp rebuild failed (root=%p list=%p)\n",
+                (void*)fullTExpRoot,
+                (void*)fullTExpList);
+        goto cleanup;
+    }
+    TranslateLiveMObjMaterial(liveMObj, &fullMaterial);
+    fullMaterial.mobjArchiveOffset = mobjOffset;
+    ForceMaterialDeltaBlend(&fullMaterial);
+
+    drawObject.displayList = translatedPObj.pobj.display;
+    drawObject.displayListSize = translatedPObj.pobj.n_display;
+    drawObject.pipelineId = PCPORT_REAL_MATERIAL_PIPELINE;
+    drawObject.totalVerts = translatedPObj.totalSubmittedVertices;
+    drawObject.totalPrims = translatedPObj.totalPrimitiveCommands;
+
+    GSgfxInit(0x7DDD0, 0x10, 0x8, 0x20, 1, 0x1E0);
+    ConcatAffineMtx(translatedCamera.viewMatrix,
+                    translatedJoint.modelMatrix,
+                    modelViewMatrix);
+
+    fullPixels = CaptureMaterialDeltaFrame(&translatedCamera,
+                                           &translatedPObj,
+                                           &fullMaterial,
+                                           modelViewMatrix,
+                                           &drawObject,
+                                           fullSample);
+    if (fullPixels == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to capture full-alpha framebuffer\n");
+        goto cleanup;
+    }
+
+    HSD_MObjSetAlpha(liveMObj, 0.25f);
+    fadedTExpRoot = HSD_MOBJ_METHOD(liveMObj)->make_texp(liveMObj,
+                                                         liveMObj->tobj,
+                                                         &fadedTExpList);
+    if (fadedTExpRoot == NULL || fadedTExpList == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta faded-alpha TExp rebuild failed (root=%p list=%p)\n",
+                (void*)fadedTExpRoot,
+                (void*)fadedTExpList);
+        goto cleanup;
+    }
+    TranslateLiveMObjMaterial(liveMObj, &fadedMaterial);
+    fadedMaterial.mobjArchiveOffset = mobjOffset;
+    ForceMaterialDeltaBlend(&fadedMaterial);
+
+    if (!(fullMaterial.alpha > 0.99f && fadedMaterial.alpha < 0.26f)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta alpha setter did not update live material (full=%.3f faded=%.3f)\n",
+                fullMaterial.alpha,
+                fadedMaterial.alpha);
+        goto cleanup;
+    }
+
+    fadedPixels = CaptureMaterialDeltaFrame(&translatedCamera,
+                                            &translatedPObj,
+                                            &fadedMaterial,
+                                            modelViewMatrix,
+                                            &drawObject,
+                                            fadedSample);
+    if (fadedPixels == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta failed to capture faded-alpha framebuffer\n");
+        goto cleanup;
+    }
+
+    diffPixels = CountFramebufferDiffPixels(fullPixels, fadedPixels);
+    if (diffPixels == 0u) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta produced no framebuffer delta (scene=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X full=%u,%u,%u,%u faded=%u,%u,%u,%u)\n",
+                sceneOffset,
+                jointOffset,
+                dobjOffset,
+                mobjOffset,
+                pobjOffset,
+                fullSample[0],
+                fullSample[1],
+                fullSample[2],
+                fullSample[3],
+                fadedSample[0],
+                fadedSample[1],
+                fadedSample[2],
+                fadedSample[3]);
+        goto cleanup;
+    }
+
+    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
+           sceneOffset,
+           translatedCamera.cameraArchiveOffset,
+           jointOffset,
+           dobjOffset,
+           mobjOffset,
+           pobjOffset,
+           diffPixels,
+           fullSample[0],
+           fullSample[1],
+           fullSample[2],
+           fullSample[3],
+           fadedSample[0],
+           fadedSample[1],
+           fadedSample[2],
+           fadedSample[3],
+           fullMaterial.alpha,
+           fadedMaterial.alpha,
+           (void*)loadTExpRoot,
+           (void*)fullTExpRoot,
+           (void*)fadedTExpRoot,
+           GXHostGetLastSubmittedVertexCount(),
+           GXHostGetLastExpandedVertexCount(),
+           GXHostGetLastSubmittedPrimitive());
+    ok = 1;
+
+cleanup:
+    GSgfxHostClearPipelineState(PCPORT_REAL_MATERIAL_PIPELINE);
+    GXHostSetVertexAlphaScale(1.0f);
+    free(fadedPixels);
+    free(fullPixels);
     PCPort_DestroyTranslatedPObj(&translatedPObj);
     PCPort_HSDArchiveDestroy(&archive);
     PCPort_FreeBuffer(memberData);
@@ -12238,6 +12631,7 @@ int main(int argc, char** argv) {
     int runRealTevSceneSliceSmoke;
     int runRealSceneSlice3Smoke;
     int runRealSceneSlice2Smoke;
+    int runRealMaterialDeltaSmoke;
     int runRealTexturedSceneSliceSmoke;
     int runRealContentTranslationSmoke;
     int runGSgfxPObjSmoke;
@@ -12272,6 +12666,7 @@ int main(int argc, char** argv) {
     runRealTevSceneSliceSmoke = HasArg(argc, argv, "--real-tev-scene-slice-smoke");
     runRealSceneSlice3Smoke = HasArg(argc, argv, "--real-scene-slice-3-smoke");
     runRealSceneSlice2Smoke = HasArg(argc, argv, "--real-scene-slice-2-smoke");
+    runRealMaterialDeltaSmoke = HasArg(argc, argv, "--real-material-delta-smoke");
     runRealTexturedSceneSliceSmoke = HasArg(argc, argv, "--real-textured-scene-slice-smoke");
     runRealContentTranslationSmoke = HasArg(argc, argv, "--real-content-translation-smoke");
     runGSgfxPObjSmoke = HasArg(argc, argv, "--gsgfx-pobj-smoke");
@@ -12362,6 +12757,7 @@ int main(int argc, char** argv) {
         runRealTevSceneSliceSmoke ||
         runRealSceneSlice3Smoke ||
         runRealSceneSlice2Smoke ||
+        runRealMaterialDeltaSmoke ||
         runRealTexturedSceneSliceSmoke ||
         runRealContentTranslationSmoke ||
         runGSgfxPObjSmoke ||
@@ -12496,6 +12892,13 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Real scene slice 2 exercised through the existing game-owned draw bridge\n");
+    } else if (runRealMaterialDeltaSmoke) {
+        if (!RunRealMaterialDeltaSmoke()) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Real material alpha delta exercised through live HSD MObj load and game-owned draw bridge\n");
     } else if (runRealContentTranslationSmoke) {
         if (!RunRealContentTranslationSmoke()) {
             exitCode = 1;

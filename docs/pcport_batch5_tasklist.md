@@ -47,8 +47,9 @@ Lane result:
 - [x] Wire PC-port `hsdMObj.make_texp` and `hsdTObj.make_texp` to conservative host TExp builders.
 - [x] Replace the generated PC body for `fn_801A7B24` so it calls the local `load` and `make_texp` method slots correctly.
 - [x] Verify the live HSD character tree load path through `HSD_JObjLoadJoint -> HSD_DObjLoadDesc -> fn_801A7B24`.
-- [ ] Continue nearby alpha/material setter holes after a material-state delta probe exists.
-- [ ] Verify material state changes on real PC-port scene content.
+- [x] Add a targeted real-content material-state delta probe.
+- [x] Verify material state changes on real PC-port scene content.
+- [ ] Continue nearby alpha/material setter holes now that the delta gate exists.
 
 Active lane:
 
@@ -61,16 +62,19 @@ Lane result:
 - `build_pc\bodies\hsd_mobj\fn_801A7128.c` now lands as a generated-copy-only `REPLACE_BODY` overlay.
 - `src\hsd\hsd_mobj.c` now wires the PC-only `hsdMObj.make_texp` slot to `fn_801A7128`; generated `build_pc\gen\hsd\hsd_mobj.c` contains the replacement body and compiled `build_pc\obj\hsd_mobj.o` contains `_fn_801A7128`.
 - The overlay follows the Colosseum `.inc` material/lightmap branch shape, uses the host TExp helper bridge for the known label calls, and routes TObj expression building through the local class method when available with a `PCPort_TObjMakeTExp` fallback.
+- `pcport\pcport_main.c` now exposes `--real-material-delta-smoke`, which loads a real swizzled MObj descriptor through `HSD_MObjLoadDesc`, rebuilds TExp through the PC `make_texp` slot, calls `HSD_MObjSetAlpha(1.0f)` and `HSD_MObjSetAlpha(0.25f)`, and requires a framebuffer delta on real `menu_bg00` geometry through `fn_800DAD10`.
 - Main checkout added BOOT-order host overrides in `pcport\hsd_host.c` for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B6CD8`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, `fn_801B7C60`, and `fn_801B4300`.
 - Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
 - Follow-up integrated in main: `pcport\hsd_host.c` now provides conservative `PCPort_MObjMakeTExp` / `PCPort_TObjMakeTExp` builders, `src\hsd\hsd_mobj.c` and `src\hsd\hsd_tobj.c` wire those into the PC-only class init path, and `build_pc\bodies\hsd_mobj\fn_801A7B24.c` corrects the generated MObj loader's local method-slot mapping.
-- Remaining blocker: visible material-state changes still need a targeted render-side delta probe; the current smoke set proves inclusion, buildability, and runtime stability, not a user-visible material difference.
-- Next MObj action: add or find a real-content material-state delta probe, then continue nearby alpha/material setter holes.
+- Remaining blocker: the alpha/material setter backlog still needs function-by-function reconstruction; the probe now exists to catch regressions and prove visible impact.
+- Next MObj action: continue nearby alpha/material setter holes with `--real-material-delta-smoke` in the standard verification set.
 
 Verification:
 
 - `python tools\pcport_gen.py --out-dir build_pc\gen src\hsd\hsd_mobj.c` -> generated `hsd_mobj.c` with 7 flipped wrappers and the `fn_801A7128` replacement body.
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1709 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --real-material-delta-smoke` -> live `HSD_MObjLoadDesc` + PC `make_texp` rebuilds produced TExp roots and `HSD_MObjSetAlpha(1.0 -> 0.25)` produced `diffPixels=307200` on real `menu_bg00` geometry.
+- `build_pc\pcport_bootstrap.exe --real-scene-slice-2-smoke`
 - `build_pc\pcport_bootstrap.exe --real-textured-scene-slice-smoke`
 - `build_pc\pcport_bootstrap.exe --real-scene-slice-3-smoke`
 - `build_pc\pcport_bootstrap.exe --real-scene-slice-4-smoke` -> passed with `kind0=2 stage00=1 stage01=2 stages0=2 kind1=1 stage10=1 stages1=1`.
