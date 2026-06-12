@@ -7512,6 +7512,93 @@ static void DrawFieldMessageBox(const PCPortMessageBoxState* msg,
     }
 }
 
+typedef struct PCPortFieldStartMenuState {
+    int active;
+    int cursor;
+    int openCount;
+    int closeCount;
+    int moveCount;
+    int selectCount;
+} PCPortFieldStartMenuState;
+
+static const char* kFieldStartMenuItems[] = {
+    "POKEMON",
+    "ITEMS",
+    "PDA",
+    "SAVE",
+    "OPTIONS"
+};
+#define PCPORT_FIELD_START_MENU_COUNT \
+    ((int)(sizeof(kFieldStartMenuItems) / sizeof(kFieldStartMenuItems[0])))
+
+static void PCPort_FieldStartMenuInit(PCPortFieldStartMenuState* menu) {
+    if (menu != NULL) {
+        memset(menu, 0, sizeof(*menu));
+    }
+}
+
+static void PCPort_FieldStartMenuTick(PCPortFieldStartMenuState* menu,
+                                      u16 pressed) {
+    if (menu == NULL) {
+        return;
+    }
+    if (!menu->active) {
+        if (pressed & GCN_PAD_BUTTON_START) {
+            menu->active = 1;
+            menu->cursor = 0;
+            menu->openCount++;
+        }
+        return;
+    }
+
+    if (pressed & GCN_PAD_BUTTON_DOWN) {
+        menu->cursor = (menu->cursor + 1) % PCPORT_FIELD_START_MENU_COUNT;
+        menu->moveCount++;
+    }
+    if (pressed & GCN_PAD_BUTTON_UP) {
+        menu->cursor = (menu->cursor + PCPORT_FIELD_START_MENU_COUNT - 1) %
+                       PCPORT_FIELD_START_MENU_COUNT;
+        menu->moveCount++;
+    }
+    if (pressed & GCN_PAD_BUTTON_A) {
+        menu->selectCount++;
+    }
+    if (pressed & (GCN_PAD_BUTTON_START | GCN_PAD_BUTTON_B)) {
+        menu->active = 0;
+        menu->closeCount++;
+    }
+}
+
+static void DrawFieldStartMenuOverlay(const PCPortFieldStartMenuState* menu) {
+    int i;
+    if (menu == NULL || !menu->active) {
+        return;
+    }
+
+    BeginMenuOverlay();
+    EnsureFontAtlas();
+    DrawSolidScreenRect(0.0f, 0.0f, 640.0f, 480.0f, 0, 0, 0, 72);
+    DrawSolidScreenRect(404.0f, 56.0f, 190.0f, 286.0f, 96, 124, 142, 246);
+    DrawSolidScreenRect(412.0f, 64.0f, 174.0f, 270.0f, 22, 40, 56, 252);
+    DrawTextScreen(438.0f, 84.0f, 11.0f, 17.0f,
+                   238, 242, 246, 255, "FIELD MENU");
+
+    for (i = 0; i < PCPORT_FIELD_START_MENU_COUNT; ++i) {
+        f32 y = 126.0f + (f32)i * 34.0f;
+        if (i == menu->cursor) {
+            DrawSolidScreenRect(428.0f, y - 5.0f, 138.0f, 26.0f,
+                                244, 208, 92, 255);
+            DrawTextScreen(444.0f, y, 9.0f, 15.0f,
+                           28, 38, 52, 255, kFieldStartMenuItems[i]);
+        } else {
+            DrawTextScreen(444.0f, y, 9.0f, 15.0f,
+                           206, 220, 232, 255, kFieldStartMenuItems[i]);
+        }
+    }
+    DrawTextScreen(424.0f, 308.0f, 7.0f, 11.0f,
+                   162, 184, 204, 255, "START/B CLOSE");
+}
+
 /* What a dialog's confirm ("Yes" / A on an info box) does. */
 #define PCPORT_DLG_INFO      0   /* info only: A or B dismisses back to the menu */
 #define PCPORT_DLG_QUIT      1   /* Yes -> close the window */
@@ -10436,6 +10523,8 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
                             /* ignore exit triggers right after a (re)spawn */
     f32 spawnY;
     double g_walkPrevTime = 0.0; /* real-time clock for animation frame-step */
+    u16 padPrev = 0u;
+    PCPortFieldStartMenuState startMenu;
 
     if (walkSpeed < 0.0f) walkSpeed = 0.0f;
     if (runSpeed < walkSpeed) runSpeed = walkSpeed;
@@ -10444,6 +10533,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     if (walkDeadzone < 0.0f) walkDeadzone = 0.0f;
 
     memset(pads, 0, sizeof(pads));
+    PCPort_FieldStartMenuInit(&startMenu);
     if (getenv("PCPORT_FIELD_WES") != NULL || g_pcEnterFieldWalk ||
         getenv("PCPORT_FIELD_WALK") != NULL) {
         PCPort_LoadFieldCharacter();   /* loads ken_b1 once; no-op on later maps */
@@ -10477,6 +10567,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         f32 frameStep;
         double nowTime;
         u16 btn;
+        u16 padPressed;
         f32 sx, sy;
         int moving, running;
         PCPortFieldMotionRole role;
@@ -10501,21 +10592,30 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         PADRead(pads);
         btn = pads[0].button;
+        padPressed = (u16)(btn & ~padPrev);
+        padPrev = btn;
+        PCPort_FieldStartMenuTick(&startMenu, padPressed);
         sx = (f32)pads[0].stickX / 112.0f;
         sy = (f32)pads[0].stickY / 112.0f;
 
-        /* Camera orbit (arrows + C-stick). */
-        if (btn & GCN_PAD_BUTTON_LEFT)  camYaw   -= ORBIT;
-        if (btn & GCN_PAD_BUTTON_RIGHT) camYaw   += ORBIT;
-        if (btn & GCN_PAD_BUTTON_UP)    camPitch += ORBIT;
-        if (btn & GCN_PAD_BUTTON_DOWN)  camPitch -= ORBIT;
-        camYaw   += (f32)pads[0].substickX / 112.0f * ORBIT;
-        camPitch += (f32)pads[0].substickY / 112.0f * ORBIT;
-        if (camPitch >  1.30f) camPitch =  1.30f;
-        if (camPitch < -0.20f) camPitch = -0.20f;
-        if (autopan) {
-            sy = g_pcFieldWarpSmokeActive ? g_pcFieldWarpSmokeStickY : 0.7f;
-            camYaw += 0.01f;
+        if (startMenu.active) {
+            sx = 0.0f;
+            sy = 0.0f;
+            btn = 0u;
+        } else {
+            /* Camera orbit (arrows + C-stick). */
+            if (btn & GCN_PAD_BUTTON_LEFT)  camYaw   -= ORBIT;
+            if (btn & GCN_PAD_BUTTON_RIGHT) camYaw   += ORBIT;
+            if (btn & GCN_PAD_BUTTON_UP)    camPitch += ORBIT;
+            if (btn & GCN_PAD_BUTTON_DOWN)  camPitch -= ORBIT;
+            camYaw   += (f32)pads[0].substickX / 112.0f * ORBIT;
+            camPitch += (f32)pads[0].substickY / 112.0f * ORBIT;
+            if (camPitch >  1.30f) camPitch =  1.30f;
+            if (camPitch < -0.20f) camPitch = -0.20f;
+            if (autopan) {
+                sy = g_pcFieldWarpSmokeActive ? g_pcFieldWarpSmokeStickY : 0.7f;
+                camYaw += 0.01f;
+            }
         }
 
         PCPort_FieldComputeMoveVector(camYaw, sx, sy, &mvx, &mvz, &moveMag);
@@ -10576,7 +10676,9 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
         /* Door / exit trigger: if the player walked into an exit's approach
          * zone (after a short post-spawn grace), break out and warp. */
-        if (graceFrames > 0) {
+        if (startMenu.active) {
+            /* Menus pause field trigger crossing until control returns. */
+        } else if (graceFrames > 0) {
             graceFrames--;
         } else {
             int hit = PCPort_FieldExitCheck(ppos[0], ppos[1], ppos[2], mvx, mvz);
@@ -10627,6 +10729,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         if (colWire) {
             DrawFieldCollisionWire();
         }
+        DrawFieldStartMenuOverlay(&startMenu);
         if (dumpPath != NULL && dumpPath[0] != '\0' &&
             (frameCap > 0 ? frame == frameCap - 1 : frame == 2)) {
             DumpBackbufferTo(dumpPath);
@@ -11474,6 +11577,110 @@ static int RunFieldMessageSmoke(GLFWwindow* window) {
            msg.closeCount,
            renderedFrames,
            closeFrame,
+           idleMotion,
+           spawn[0], spawn[1], spawn[2]);
+    return 1;
+}
+
+static int RunFieldStartMenuSmoke(GLFWwindow* window) {
+    PCPortFieldStartMenuState menu;
+    PCPortFieldMotionMap motionMap;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    int idleMotion;
+    int frame;
+    int renderedFrames = 0;
+    int sawOpen = 0;
+    int sawCursorTwo = 0;
+    int sawClose = 0;
+    int closedCursor = -1;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-start-menu-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-start-menu-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter() || !PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-start-menu-smoke] failed: could not load animated field character\n");
+        return 0;
+    }
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    if (idleMotion < 0 || !PCPort_CharAnimSetMotion(idleMotion)) {
+        fprintf(stderr,
+                "[field-start-menu-smoke] failed: idle motion %d could not be set\n",
+                idleMotion);
+        return 0;
+    }
+
+    PCPort_FieldStartMenuInit(&menu);
+    for (frame = 0; frame < 12; ++frame) {
+        u16 pressed = 0u;
+        int wasActive = menu.active;
+
+        if (frame == 0) {
+            pressed = GCN_PAD_BUTTON_START;
+        } else if (frame == 1 || frame == 2) {
+            pressed = GCN_PAD_BUTTON_DOWN;
+        } else if (frame == 5) {
+            pressed = GCN_PAD_BUTTON_START;
+        }
+
+        VIWaitForRetrace_PC();
+        PCPort_FieldStartMenuTick(&menu, pressed);
+        if (!wasActive && menu.active) {
+            sawOpen = 1;
+        }
+        if (menu.active && menu.cursor == 2) {
+            sawCursorTwo = 1;
+        }
+        if (wasActive && !menu.active) {
+            sawClose = 1;
+            closedCursor = menu.cursor;
+        }
+
+        PCPort_FieldAnimTick(1.0f);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             3.14159265f, 1.3f, 1.0f);
+        DrawFieldStartMenuOverlay(&menu);
+        GSgfxSwapBuffers(0);
+        renderedFrames++;
+
+        if (sawClose) {
+            break;
+        }
+    }
+
+    if (menu.active || !sawOpen || !sawCursorTwo || !sawClose ||
+        menu.openCount != 1 || menu.moveCount != 2 ||
+        menu.closeCount != 1 || closedCursor != 2) {
+        fprintf(stderr,
+                "[field-start-menu-smoke] failed: active=%d open=%d cursor2=%d close=%d counts=%d/%d/%d closedCursor=%d frame=%d\n",
+                menu.active,
+                sawOpen,
+                sawCursorTwo,
+                sawClose,
+                menu.openCount,
+                menu.moveCount,
+                menu.closeCount,
+                closedCursor,
+                frame);
+        return 0;
+    }
+
+    printf("[field-start-menu-smoke] passed: open=%d move=%d close=%d closedCursor=%d frames=%d idleMotion=%d spawn=(%.1f,%.1f,%.1f)\n",
+           menu.openCount,
+           menu.moveCount,
+           menu.closeCount,
+           closedCursor,
+           renderedFrames,
            idleMotion,
            spawn[0], spawn[1], spawn[2]);
     return 1;
@@ -14184,6 +14391,7 @@ int main(int argc, char** argv) {
     int runFieldWorldWarpSmoke;
     int runFieldLocomotionSmoke;
     int runFieldMessageSmoke;
+    int runFieldStartMenuSmoke;
     int runWorldMapHandoffSmoke;
     int runWorldMapMenuSmoke;
     int runWorldMapMenu;
@@ -14208,6 +14416,7 @@ int main(int argc, char** argv) {
     runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
     runFieldLocomotionSmoke = HasArg(argc, argv, "--field-locomotion-smoke");
     runFieldMessageSmoke = HasArg(argc, argv, "--field-message-smoke");
+    runFieldStartMenuSmoke = HasArg(argc, argv, "--field-start-menu-smoke");
     runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runWorldMapMenuSmoke = HasArg(argc, argv, "--worldmap-menu-smoke");
     runWorldMapMenu = HasArg(argc, argv, "--worldmap-menu");
@@ -14326,6 +14535,7 @@ int main(int argc, char** argv) {
         runFieldWorldWarpSmoke ||
         runFieldLocomotionSmoke ||
         runFieldMessageSmoke ||
+        runFieldStartMenuSmoke ||
         runWorldMapHandoffSmoke ||
         runWorldMapMenuSmoke ||
         runWorldMapMenu ||
@@ -14640,6 +14850,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Worldmap handoff smoke rendered world_map.fsys through the field scene bridge\n");
+    } else if (runFieldStartMenuSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-start-menu-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldStartMenuSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field START-menu smoke exercised open, navigation, and close\n");
     } else if (runFieldMessageSmoke) {
         if (window == NULL) {
             fprintf(stderr,
