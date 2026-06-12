@@ -822,6 +822,26 @@ static void PCPort_TObjUpdateFunc(void* obj, u32 type, HSD_ObjData* val)
     tobj->flags |= TEX_MTX_DIRTY;
 }
 
+extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* val);
+
+/* ------------------------------------------------------------------------- */
+/*  HSD_MObjAnim (host override)                                              */
+/*                                                                           */
+/*  The adapted src body only advances TObj animation, so material AObj keys  */
+/*  never reach the MObj updater. Route MObj keys through the Colosseum        */
+/*  material dispatcher, then preserve the existing TObj animation chain.      */
+/* ------------------------------------------------------------------------- */
+void HSD_MObjAnim(HSD_MObj* mobj)
+{
+    if (mobj == NULL) {
+        return;
+    }
+    if (mobj->aobj != NULL) {
+        HSD_AObjInterpretAnim(mobj->aobj, mobj, fn_801A7E84);
+    }
+    HSD_TObjAnimAll(mobj->tobj);
+}
+
 /* ------------------------------------------------------------------------- */
 /*  HSD_TObjAnim (host override)                                              */
 /*                                                                           */

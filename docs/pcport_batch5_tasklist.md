@@ -50,13 +50,14 @@ Lane result:
 - [x] Add a targeted real-content material-state delta probe.
 - [x] Verify material state changes on real PC-port scene content.
 - [x] Replace the generated PC body for `fn_801A6E24` so material setup calls the PC `make_texp` slot with the correct signature.
+- [x] Replace the generated PC body for `fn_801A7E84` and route `HSD_MObjAnim` through it so material AObj keys update live MObj state.
 - [ ] Continue remaining nearby alpha/material setter holes now that the delta gate covers setup as well.
 
 Active lane:
 
 - Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum`
 - Branch: `master`
-- Worker focus: `src\hsd\hsd_mobj.c`, PC-port `REPLACE_BODY` overlays for `fn_801A7128`, `fn_801A7B24`, and `fn_801A6E24`.
+- Worker focus: `src\hsd\hsd_mobj.c`, PC-port `REPLACE_BODY` overlays for `fn_801A7128`, `fn_801A7B24`, `fn_801A6E24`, and `fn_801A7E84`.
 
 Lane result:
 
@@ -66,17 +67,20 @@ Lane result:
 - `pcport\pcport_main.c` now exposes `--real-material-delta-smoke`, which loads a real swizzled MObj descriptor through `HSD_MObjLoadDesc`, rebuilds TExp through the PC `make_texp` slot, calls `HSD_MObjSetAlpha(1.0f)` and `HSD_MObjSetAlpha(0.25f)`, and requires a framebuffer delta on real `menu_bg00` geometry through `fn_800DAD10`.
 - `build_pc\bodies\hsd_mobj\fn_801A6E24.c` now replaces the generated material setup path so it builds the temporary TObj chain and calls `make_texp(mobj, tobj_top, &mobj->texp)` instead of casting the method slot to the old `(mobj, tobj, rendermode)` shape.
 - `--real-material-delta-smoke` now directly calls `fn_801A6E24(liveMObj)` after live HSD loading and requires a non-null setup-built `mobj->texp`, so the setup overlay is included in the visible-impact gate.
+- `build_pc\bodies\hsd_mobj\fn_801A7E84.c` now replaces the empty generated material-animation dispatcher. It follows the Colosseum `.inc` order: ambient RGB, diffuse RGB, inverted alpha, specular RGB, then PE ref0/ref1/dst alpha.
+- `pcport\hsd_host.c` now provides a BOOT-order `HSD_MObjAnim` override so MObj AObj keys reach `fn_801A7E84` before the existing TObj animation walk.
+- `--real-material-delta-smoke` now verifies the dispatcher on live real content by requiring type 4 to set diffuse red to 31 and type 7 to set alpha to 0.250 before restoring the material for the framebuffer delta check.
 - Main checkout added BOOT-order host overrides in `pcport\hsd_host.c` for `fn_801B707C`, `fn_801B6F5C`, `fn_801B6E74`, `fn_801B6CD8`, `fn_801B64EC`, `fn_801B5F08`, `fn_801B5E40`, `fn_801B7C60`, and `fn_801B4300`.
 - Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
 - Follow-up integrated in main: `pcport\hsd_host.c` now provides conservative `PCPort_MObjMakeTExp` / `PCPort_TObjMakeTExp` builders, `src\hsd\hsd_mobj.c` and `src\hsd\hsd_tobj.c` wire those into the PC-only class init path, and `build_pc\bodies\hsd_mobj\fn_801A7B24.c` corrects the generated MObj loader's local method-slot mapping.
-- Remaining blocker: the alpha/material setter backlog still needs function-by-function reconstruction; the probe now catches both direct `make_texp` rebuilds and setup-path regressions.
-- Next MObj action: continue the remaining nearby alpha/material setter holes with `--real-material-delta-smoke` in the standard verification set.
+- Remaining blocker: the alpha/material setter backlog still needs function-by-function reconstruction; the probe now catches direct `make_texp` rebuilds, setup-path regressions, and material animation dispatch regressions.
+- Next MObj action: inspect the remaining active-asm MObj helpers (`fn_801A6B8C`, `fn_801A6D08`, `fn_801A7D58`) and only overlay the ones that affect live PC-port runtime.
 
 Verification:
 
 - `python tools\pcport_gen.py --out-dir build_pc\gen src\hsd\hsd_mobj.c` -> generated `hsd_mobj.c` with 7 flipped wrappers and the `fn_801A7128` replacement body.
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1709 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
-- `build_pc\pcport_bootstrap.exe --real-material-delta-smoke` -> live `HSD_MObjLoadDesc`, `fn_801A6E24` setup, and PC `make_texp` rebuilds produced TExp roots; `HSD_MObjSetAlpha(1.0 -> 0.25)` produced `diffPixels=307200` on real `menu_bg00` geometry.
+- `build_pc\pcport_bootstrap.exe --real-material-delta-smoke` -> live `HSD_MObjLoadDesc`, `fn_801A7E84` material animation dispatch (`animDiffuseR=31`, `animAlpha=0.250`), `fn_801A6E24` setup, and PC `make_texp` rebuilds produced TExp roots; `HSD_MObjSetAlpha(1.0 -> 0.25)` produced `diffPixels=307200` on real `menu_bg00` geometry.
 - `build_pc\pcport_bootstrap.exe --real-scene-slice-2-smoke`
 - `build_pc\pcport_bootstrap.exe --real-textured-scene-slice-smoke`
 - `build_pc\pcport_bootstrap.exe --real-scene-slice-3-smoke`

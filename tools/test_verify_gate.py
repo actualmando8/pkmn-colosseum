@@ -105,6 +105,7 @@ def _diff_aware_test():
         _run(["git", "init", "-q"], repo)
         _run(["git", "config", "user.email", "t@t"], repo)
         _run(["git", "config", "user.name", "t"], repo)
+        _run(["git", "config", "commit.gpgsign", "false"], repo)
         target = repo / "src" / "mod.c"
         target.parent.mkdir(parents=True, exist_ok=True)
         # Commit a file that already has a pending #if 1 wrapper + a real C fn.
@@ -139,7 +140,12 @@ def _git_available() -> bool:
 
 
 def _run(args, cwd):
-    subprocess.run(args, cwd=str(cwd), capture_output=True, text=True)
+    p = subprocess.run(args, cwd=str(cwd), capture_output=True, text=True)
+    if p.returncode != 0:
+        raise RuntimeError(
+            f"{' '.join(args)} failed with {p.returncode}: {p.stderr or p.stdout}"
+        )
+    return p
 
 
 def _git_in(repo, args):

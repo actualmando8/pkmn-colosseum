@@ -4,6 +4,7 @@
 #include "field_collision.h"
 #include "gx_shim.h"
 #include "gx_texture.h"
+#include "hsd/hsd_fobj.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
 #include "os_shim.h"
@@ -59,6 +60,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
 extern void fn_801A6E24(HSD_MObj* mobj);
+extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
 extern void GSgfxHostClearPipelineState(unsigned int pipelineId);
 extern void GSgfxHostSetPipelineBlend(unsigned int pipelineId,
                                       unsigned int type,
@@ -2343,6 +2345,7 @@ static int RunRealMaterialDeltaSmoke(void) {
     HSD_TExp* fadedTExpList = NULL;
     HSD_TExp* fullTExpRoot = NULL;
     HSD_TExp* fadedTExpRoot = NULL;
+    HSD_ObjData materialAnimValue;
     u8* memberData = NULL;
     u32 memberSize = 0;
     const u8* sceneData;
@@ -2359,6 +2362,10 @@ static int RunRealMaterialDeltaSmoke(void) {
     u32 dobjOffset = 0;
     u32 pobjOffset = 0;
     u32 mobjOffset = 0;
+    u32 materialAnimOriginalDiffuse = 0;
+    f32 materialAnimOriginalAlpha = 0.0f;
+    unsigned int materialAnimDiffuseR = 0;
+    f32 materialAnimAlpha = 0.0f;
     unsigned int diffPixels = 0;
     f32 modelViewMatrix[3][4];
     int ok = 0;
@@ -2485,6 +2492,26 @@ static int RunRealMaterialDeltaSmoke(void) {
                 "[pcport_bootstrap] Real material delta live MObj has no make_texp method\n");
         goto cleanup;
     }
+    materialAnimOriginalDiffuse = liveMObj->mat->diffuse;
+    materialAnimOriginalAlpha = liveMObj->mat->alpha;
+    materialAnimValue.fv = 0.125f;
+    fn_801A7E84(liveMObj, 4u, &materialAnimValue);
+    materialAnimDiffuseR = (liveMObj->mat->diffuse >> 24) & 0xFFu;
+    materialAnimValue.fv = 0.75f;
+    fn_801A7E84(liveMObj, 7u, &materialAnimValue);
+    materialAnimAlpha = liveMObj->mat->alpha;
+    if (materialAnimDiffuseR != 31u ||
+        !(materialAnimAlpha > 0.249f && materialAnimAlpha < 0.251f)) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta MObj anim dispatcher failed (mobj=0x%X diffuseR=%u alpha=%.3f)\n",
+                mobjOffset,
+                materialAnimDiffuseR,
+                materialAnimAlpha);
+        goto cleanup;
+    }
+    liveMObj->mat->diffuse = materialAnimOriginalDiffuse;
+    liveMObj->mat->alpha = materialAnimOriginalAlpha;
+
     liveMObj->texp = NULL;
     fn_801A6E24(liveMObj);
     setupTExpList = liveMObj->texp;
@@ -2600,7 +2627,7 @@ static int RunRealMaterialDeltaSmoke(void) {
         goto cleanup;
     }
 
-    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f setupTExp=%p loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
+    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f animDiffuseR=%u animAlpha=%.3f setupTExp=%p loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
            sceneOffset,
            translatedCamera.cameraArchiveOffset,
            jointOffset,
@@ -2618,6 +2645,8 @@ static int RunRealMaterialDeltaSmoke(void) {
            fadedSample[3],
            fullMaterial.alpha,
            fadedMaterial.alpha,
+           materialAnimDiffuseR,
+           materialAnimAlpha,
            (void*)setupTExpList,
            (void*)loadTExpRoot,
            (void*)fullTExpRoot,
