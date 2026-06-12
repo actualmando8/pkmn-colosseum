@@ -9335,6 +9335,14 @@ static u32  g_engCharRoot;
 static int  g_engCharLoaded;
 static char g_engCharFsysPath[260];
 static char g_engCharMember[64];
+/* First real field NPC model loaded from a floor archive dependency list. Kept
+ * separate from Wes because the current character animation host owns one
+ * global motion-bank state. */
+static PCPortHSDArchive       g_engNpcArchive;
+static u32  g_engNpcRoot;
+static int  g_engNpcLoaded;
+static char g_engNpcFsysPath[260];
+static char g_engNpcMember[64];
 /* Field maps pack SEVERAL model sets in the scene branch (e.g. D1_garage_1F:
  * +0 room walls/props, +4 + +8 additional sets incl. the FLOOR). We render the
  * primary (g_engTitleRootJoint) plus every additional model root here. */
@@ -10165,6 +10173,238 @@ static void RenderFieldCharacter(f32 px, f32 py, f32 pz, f32 yaw, f32 scale,
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     RenderJointTree(&g_engCharArchive, g_engCharRoot, g_engCharRoot, &tcam,
                     (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+}
+
+static void PCPort_FieldNpcModelRelease(void) {
+    if (g_engNpcArchive.storage != NULL) {
+        PCPort_HSDArchiveDestroy(&g_engNpcArchive);
+    }
+    memset(&g_engNpcArchive, 0, sizeof(g_engNpcArchive));
+    g_engNpcRoot = 0;
+    g_engNpcLoaded = 0;
+    g_engNpcFsysPath[0] = '\0';
+    g_engNpcMember[0] = '\0';
+}
+
+static int PCPort_LoadFieldNpcModel(const char* fsysPath,
+                                    const char* member) {
+    u8* data = NULL;
+    u32 size = 0;
+    const u8* sceneData;
+    u32 sceneOff = 0;
+    u32 branchOff;
+    u32 jointListOff;
+
+    if (fsysPath == NULL || member == NULL ||
+        fsysPath[0] == '\0' || member[0] == '\0') {
+        return 0;
+    }
+
+    PCPort_FieldNpcModelRelease();
+    if (!PCPort_LoadFsysMember(fsysPath, member, &data, &size) ||
+        data == NULL) {
+        fprintf(stderr, "[field/npc-model] cannot load %s :: %s\n",
+                fsysPath, member);
+        return 0;
+    }
+    if (!PCPort_HSDArchiveParseBE(&g_engNpcArchive, data, size)) {
+        fprintf(stderr, "[field/npc-model] archive parse failed for %s\n",
+                member);
+        PCPort_FreeBuffer(data);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+    PCPort_FreeBuffer(data);
+
+    sceneData = (const u8*)PCPort_HSDArchiveGetPublicAddress(
+        &g_engNpcArchive, "scene_data", &sceneOff);
+    if (sceneData == NULL) {
+        fprintf(stderr, "[field/npc-model] scene_data unresolved for %s\n",
+                member);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+    branchOff = PCPort_ReadBigEndianU32(sceneData + 0x00);
+    if (!ArchiveRangeValid(&g_engNpcArchive, branchOff, 0x10u)) {
+        fprintf(stderr, "[field/npc-model] scene branch invalid for %s (0x%X)\n",
+                member, branchOff);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+    jointListOff = PCPort_ReadBigEndianU32(g_engNpcArchive.storage + branchOff);
+    if (!ArchiveRangeValid(&g_engNpcArchive, jointListOff, 0x4u)) {
+        fprintf(stderr, "[field/npc-model] joint list invalid for %s (0x%X)\n",
+                member, jointListOff);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+    g_engNpcRoot = PCPort_ReadBigEndianU32(g_engNpcArchive.storage + jointListOff);
+    if (!ArchiveRangeValid(&g_engNpcArchive, g_engNpcRoot,
+                           PCPORT_SERIALIZED_JOINT_SIZE)) {
+        fprintf(stderr, "[field/npc-model] root joint invalid for %s (0x%X)\n",
+                member, g_engNpcRoot);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+
+    snprintf(g_engNpcFsysPath, sizeof(g_engNpcFsysPath), "%s", fsysPath);
+    snprintf(g_engNpcMember, sizeof(g_engNpcMember), "%s", member);
+    g_engNpcLoaded = 1;
+    printf("[field/npc-model] loaded %s :: %s (rootJoint=0x%X)\n",
+           fsysPath, member, g_engNpcRoot);
+    return 1;
+}
+
+static unsigned int RenderFieldStaticArchive(const PCPortHSDArchive* archive,
+                                             u32 rootJoint,
+                                             f32 px, f32 py, f32 pz,
+                                             f32 yaw, f32 scale) {
+    PCPortTranslatedCamera tcam;
+    MenuTreeStats stats;
+    f32 P[3][4];
+    f32 cy = cosf(yaw);
+    f32 sy = sinf(yaw);
+
+    if (archive == NULL || archive->storage == NULL ||
+        rootJoint == 0u ||
+        !ArchiveRangeValid(archive, rootJoint, PCPORT_SERIALIZED_JOINT_SIZE)) {
+        return 0;
+    }
+
+    P[0][0] =  scale * cy; P[0][1] = 0.0f;  P[0][2] =  scale * sy; P[0][3] = px;
+    P[1][0] =  0.0f;       P[1][1] = scale; P[1][2] =  0.0f;       P[1][3] = py;
+    P[2][0] = -scale * sy; P[2][1] = 0.0f;  P[2][2] =  scale * cy; P[2][3] = pz;
+    memset(&tcam, 0, sizeof(tcam));
+    PCPortMulAffine3x4(g_engTitleCamera.viewMatrix, P, tcam.viewMatrix);
+    memcpy(tcam.projectionMatrix, g_engTitleCamera.projectionMatrix,
+           sizeof(tcam.projectionMatrix));
+    memset(&stats, 0, sizeof(stats));
+    GXSetProjection(g_engTitleCamera.projectionMatrix, GX_PERSPECTIVE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    RenderJointTree(archive, rootJoint, rootJoint, &tcam,
+                    (int)PCPORT_REAL_MATERIAL_PIPELINE, &stats);
+    return stats.drawn;
+}
+
+static int PCPort_StringEndsWith(const char* text, const char* suffix) {
+    size_t textLen;
+    size_t suffixLen;
+    if (text == NULL || suffix == NULL) {
+        return 0;
+    }
+    textLen = strlen(text);
+    suffixLen = strlen(suffix);
+    if (suffixLen > textLen) {
+        return 0;
+    }
+    return strcmp(text + textLen - suffixLen, suffix) == 0;
+}
+
+static int PCPort_FieldNpcResolveDependencyName(const char* token,
+                                                char* outName,
+                                                size_t outNameSize) {
+    static const char* kS1OutMembers[] = {
+        "niku_m_b3",
+        "hunter_m_b2",
+        "hunter_m_b3",
+        "caster_a_b1",
+        "agent_m_b1",
+        "truck_b1",
+        "bike_pokemon",
+        "rider_m_b1"
+    };
+    int i;
+
+    if (token == NULL || outName == NULL || outNameSize == 0u) {
+        return 0;
+    }
+
+    for (i = 0; i < (int)(sizeof(kS1OutMembers) / sizeof(kS1OutMembers[0])); ++i) {
+        if (strcmp(kS1OutMembers[i], token) == 0) {
+            snprintf(outName, outNameSize, "%s", kS1OutMembers[i]);
+            return 1;
+        }
+    }
+    for (i = 0; i < (int)(sizeof(kS1OutMembers) / sizeof(kS1OutMembers[0])); ++i) {
+        if (PCPort_StringEndsWith(kS1OutMembers[i], token)) {
+            snprintf(outName, outNameSize, "%s", kS1OutMembers[i]);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int PCPort_FieldNpcReadDependencyList(const char* fsysPath,
+                                             char resolved[][64],
+                                             int maxResolved,
+                                             int* outRawCount,
+                                             char* outSummary,
+                                             size_t summarySize) {
+    u8* data = NULL;
+    u32 size = 0;
+    u32 pos = 0;
+    int rawCount = 0;
+    int resolvedCount = 0;
+
+    if (outRawCount != NULL) {
+        *outRawCount = 0;
+    }
+    if (outSummary != NULL && summarySize > 0u) {
+        outSummary[0] = '\0';
+    }
+    if (!PCPort_LoadFsysMember(fsysPath, "FSYS", &data, &size) ||
+        data == NULL || size == 0u) {
+        return 0;
+    }
+
+    while (pos < size) {
+        char token[64];
+        char member[64];
+        u32 len = 0;
+        while (pos + len < size && data[pos + len] != '\0') {
+            ++len;
+        }
+        if (len > 0u) {
+            size_t copyLen = (len < sizeof(token) - 1u)
+                ? (size_t)len
+                : sizeof(token) - 1u;
+            memcpy(token, data + pos, copyLen);
+            token[copyLen] = '\0';
+            ++rawCount;
+            if (PCPort_FieldNpcResolveDependencyName(token, member,
+                                                     sizeof(member))) {
+                if (resolvedCount < maxResolved) {
+                    snprintf(resolved[resolvedCount],
+                             sizeof(resolved[resolvedCount]), "%s", member);
+                }
+                ++resolvedCount;
+                if (outSummary != NULL && summarySize > 0u) {
+                    size_t used = strlen(outSummary);
+                    if (used < summarySize - 1u) {
+                        snprintf(outSummary + used, summarySize - used,
+                                 "%s%s->%s",
+                                 used != 0u ? "," : "",
+                                 token, member);
+                    }
+                }
+            } else if (outSummary != NULL && summarySize > 0u) {
+                size_t used = strlen(outSummary);
+                if (used < summarySize - 1u) {
+                    snprintf(outSummary + used, summarySize - used,
+                             "%s%s->?",
+                             used != 0u ? "," : "",
+                             token);
+                }
+            }
+        }
+        pos += len + 1u;
+    }
+
+    PCPort_FreeBuffer(data);
+    if (outRawCount != NULL) {
+        *outRawCount = rawCount;
+    }
+    return resolvedCount;
 }
 
 #define PCPORT_HOST_PEOPLE_MAX 8
@@ -12180,6 +12420,128 @@ static int RunFieldNpcTalkSmoke(GLFWwindow* window) {
            idleMotion,
            spawn[0], spawn[1], spawn[2]);
     PCPort_PeopleHostClear();
+    return 1;
+}
+
+static int RunFieldNpcModelSmoke(GLFWwindow* window) {
+    static const char* kArchive = "orig/GC6E01/disc/files/S1_out.fsys";
+    PCPortFieldMotionMap motionMap;
+    char deps[8][64];
+    char depSummary[256];
+    char* npcMember = NULL;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    int rawDepCount = 0;
+    int resolvedDepCount;
+    int storedDepCount;
+    int idleMotion;
+    int frame;
+    int renderedFrames = 0;
+    unsigned int npcDrawn = 0;
+    int i;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    memset(deps, 0, sizeof(deps));
+    depSummary[0] = '\0';
+    resolvedDepCount = PCPort_FieldNpcReadDependencyList(
+        kArchive, deps, (int)(sizeof(deps) / sizeof(deps[0])),
+        &rawDepCount, depSummary, sizeof(depSummary));
+    storedDepCount = resolvedDepCount;
+    if (storedDepCount > (int)(sizeof(deps) / sizeof(deps[0]))) {
+        storedDepCount = (int)(sizeof(deps) / sizeof(deps[0]));
+    }
+    if (rawDepCount < 3 || resolvedDepCount < 3) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: dependency list raw=%d resolved=%d summary=%s\n",
+                rawDepCount,
+                resolvedDepCount,
+                depSummary);
+        return 0;
+    }
+
+    for (i = 0; i < storedDepCount; ++i) {
+        if (strstr(deps[i], "truck") == NULL &&
+            strstr(deps[i], "bike") == NULL) {
+            npcMember = deps[i];
+            break;
+        }
+    }
+    if (npcMember == NULL && storedDepCount > 0) {
+        npcMember = deps[0];
+    }
+    if (npcMember == NULL || npcMember[0] == '\0') {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: no renderable dependency member from %s\n",
+                depSummary);
+        return 0;
+    }
+
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter() || !PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: could not load animated field character\n");
+        return 0;
+    }
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    if (idleMotion < 0 || !PCPort_CharAnimSetMotion(idleMotion)) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: idle motion %d could not be set\n",
+                idleMotion);
+        return 0;
+    }
+
+    if (!PCPort_LoadFieldNpcModel(kArchive, npcMember)) {
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+
+    for (frame = 0; frame < 6; ++frame) {
+        VIWaitForRetrace_PC();
+        PCPort_FieldAnimTick(1.0f);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             3.14159265f, 1.3f, 1.0f);
+        npcDrawn += RenderFieldStaticArchive(&g_engNpcArchive, g_engNpcRoot,
+                                             spawn[0] + 4.5f,
+                                             spawn[1],
+                                             spawn[2] - 4.0f,
+                                             0.0f, 1.15f);
+        GSgfxSwapBuffers(0);
+        ++renderedFrames;
+    }
+
+    if (!g_engNpcLoaded || g_engNpcRoot == 0u ||
+        npcDrawn == 0u || renderedFrames != 6) {
+        fprintf(stderr,
+                "[field-npc-model-smoke] failed: loaded=%d root=0x%X npcDrawn=%u frames=%d\n",
+                g_engNpcLoaded,
+                g_engNpcRoot,
+                npcDrawn,
+                renderedFrames);
+        PCPort_FieldNpcModelRelease();
+        return 0;
+    }
+
+    printf("[field-npc-model-smoke] passed: deps raw=%d resolved=%d [%s], rendered %s rootJoint=0x%X npcDrawn=%u frames=%d spawn=(%.1f,%.1f,%.1f)\n",
+           rawDepCount,
+           resolvedDepCount,
+           depSummary,
+           g_engNpcMember,
+           g_engNpcRoot,
+           npcDrawn,
+           renderedFrames,
+           spawn[0], spawn[1], spawn[2]);
+    PCPort_FieldNpcModelRelease();
     return 1;
 }
 
@@ -14993,6 +15355,7 @@ int main(int argc, char** argv) {
     int runFieldLocomotionSmoke;
     int runFieldMessageSmoke;
     int runFieldNpcTalkSmoke;
+    int runFieldNpcModelSmoke;
     int runFieldStartMenuSmoke;
     int runWorldMapHandoffSmoke;
     int runWorldMapMenuSmoke;
@@ -15019,6 +15382,7 @@ int main(int argc, char** argv) {
     runFieldLocomotionSmoke = HasArg(argc, argv, "--field-locomotion-smoke");
     runFieldMessageSmoke = HasArg(argc, argv, "--field-message-smoke");
     runFieldNpcTalkSmoke = HasArg(argc, argv, "--field-npc-talk-smoke");
+    runFieldNpcModelSmoke = HasArg(argc, argv, "--field-npc-model-smoke");
     runFieldStartMenuSmoke = HasArg(argc, argv, "--field-start-menu-smoke");
     runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runWorldMapMenuSmoke = HasArg(argc, argv, "--worldmap-menu-smoke");
@@ -15139,6 +15503,7 @@ int main(int argc, char** argv) {
         runFieldLocomotionSmoke ||
         runFieldMessageSmoke ||
         runFieldNpcTalkSmoke ||
+        runFieldNpcModelSmoke ||
         runFieldStartMenuSmoke ||
         runWorldMapHandoffSmoke ||
         runWorldMapMenuSmoke ||
@@ -15468,6 +15833,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Field NPC talk smoke exercised fn_801812E8 and message close\n");
+    } else if (runFieldNpcModelSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-npc-model-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldNpcModelSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field NPC model smoke rendered a real S1_out dependency member\n");
     } else if (runFieldStartMenuSmoke) {
         if (window == NULL) {
             fprintf(stderr,
