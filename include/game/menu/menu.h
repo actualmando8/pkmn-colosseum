@@ -97,6 +97,8 @@ struct MenuCommonWork;
 struct MenuBattleWork;
 struct MenuPokeCouponWork;
 struct MenuCardEWork;
+struct MenuCardEEntry;
+struct MenuCardEMatrixContext;
 struct MenuCardEMatrixWork;
 
 /* =========================================================================
@@ -218,10 +220,45 @@ typedef struct MenuCardEWork {
 } MenuCardEWork;
 
 /* =========================================================================
+ * Card-E matrix raw matching overlays
+ *
+ * These partial layouts are anchored by fn_8007C300, fn_8007C450,
+ * fn_8007C7EC, fn_8007D978, menuCardE_CompareEntryPtrs, and fn_8007FDBC.
+ * They intentionally stop at supported offsets and leave weak fields as
+ * unk_XX. The older
+ * MenuCardEMatrixWork below remains a high-level sketch used by exploratory
+ * code; use MenuCardEMatrixContext when working from raw matching offsets.
+ * ========================================================================= */
+
+typedef struct MenuCardEEntry {
+    /* 0x00 */ u8  unk_00[0x1A];
+    /* 0x1A */ u8  cardId;                 /* Compared after sortGroup by menuCardE_CompareEntryPtrs */
+    /* 0x1B */ u8  unk_1B;
+    /* 0x1C */ s8  sortGroup;              /* Primary signed sort key in menuCardE_CompareEntryPtrs */
+    /* 0x1D */ u8  unk_1D;                 /* Used as sub-entry count in matrix loops */
+} MenuCardEEntry;
+
+typedef struct MenuCardEMatrixContext {
+    /* 0x000 */ u8                unk_000[0xA0];
+    /* 0x0A0 */ s32               prevEntryIndex;
+    /* 0x0A4 */ s32               currentEntryIndex;
+    /* 0x0A8 */ u8                unk_A8[0x04]; /* includes 0xAA lookup key */
+    /* 0x0AC */ s32               entryCount;
+    /* 0x0B0 */ MenuCardEEntry**  entries;
+    /* 0x0B4 */ u8                prevSubIndex;
+    /* 0x0B5 */ u8                currentSubIndex;
+    /* 0x0B6 */ u8                transitionActive;
+    /* 0x0B7 */ u8                unk_B7;
+    /* 0x0B8 */ s32               transitionFrame;
+    /* 0x0BC */ s32               unk_BC;  /* Switch selector for jumptable_802EE868 */
+} MenuCardEMatrixContext;
+
+/* =========================================================================
  * menuCardE_Matrix work area (cem)
  *
  * From asserts: "i < cem->m_seriesN", "!cem->m_isAnimating", "s[ANIM_cur]"
- * The variable name "cem" and member names are from the asserts.
+ * The variable name "cem" and member names are from the asserts. This is a
+ * high-level sketch; see MenuCardEMatrixContext for raw offset evidence.
  * ========================================================================= */
 
 /** Animation indices for the card matrix display */
@@ -471,25 +508,27 @@ s32 menuCardE_Main(void);
 
 /* =========================================================================
  * menuCardE_Matrix API (0x8007C300 - 0x8007FD64)
+ *
+ * The prototype names in this legacy exploratory section predate the raw
+ * offset overlay above. Prefer MenuCardEMatrixContext and symbols.txt
+ * Proposed names when working directly on the matching decomp files.
  * ========================================================================= */
 
 /**
- * fn_8007C300: Initialize the card e matrix display.
+ * fn_8007C300: Sets the current/previous Card-E matrix selection by card id.
  * File: "menuCardE_Matrix.c"
  * Size: 0x114
  */
 void menuCardE_Matrix_Init(MenuCardEMatrixWork* cem);
 
 /**
- * fn_8007C450: Card e matrix assertion 1.
- * Assert: "i < cem->m_seriesN"
+ * fn_8007C450: Sets a target selection and starts transition state if needed.
  * Size: 0x1E4
  */
 void menuCardE_Matrix_ValidateSeries(MenuCardEMatrixWork* cem, s32 i);
 
 /**
- * fn_8007C7EC: Card e matrix assertion 2.
- * Assert: "!cem->m_isAnimating", "s[ANIM_cur]"
+ * fn_8007C7EC: Reloads and sorts the Card-E entry pointer array.
  * Size: 0x2C4
  */
 void menuCardE_Matrix_ValidateAnim(MenuCardEMatrixWork* cem);

@@ -209,12 +209,12 @@ extern u8 lbl_802749E4[];
 extern u8 lbl_80274A28[];
 extern u32 lbl_80478C70;
 #if 0
-asm void fn_8019C854(void) {
-#include "src/hsd/hsd_initialize_fn_8019C854.inc"
+asm void _HSD_MemGetRemainDefaultCB(void) {
+#include "src/hsd/hsd_initialize__HSD_MemGetRemainDefaultCB.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019C854(void) {
+void _HSD_MemGetRemainDefaultCB(void) {
     if (lbl_8047B288 != 0) {
         fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
     }

@@ -10268,19 +10268,19 @@
   "src": "src/game/menu/menu_carde_matrix.c",
   "status": "LIKELY"
  },
- "fn_8007FD64": {
+ "menuCardE_CompareEntryPtrs": {
   "addr": "0x8007FD64",
   "section": ".text",
   "size": "0x58",
-  "src": null,
-  "status": "GAP"
+  "src": "src/game/menu/menu_carde_main.c",
+  "status": "LIKELY"
  },
  "fn_8007FDBC": {
   "addr": "0x8007FDBC",
   "section": ".text",
   "size": "0x554",
-  "src": null,
-  "status": "GAP"
+  "src": "src/game/menu/menu_carde_main.c",
+  "status": "LIKELY"
  },
  "fn_80080310": {
   "addr": "0x80080310",
@@ -15511,14 +15511,14 @@
   "src": "src/trk/TRKTarget.c",
   "status": "KNOWN"
  },
- "fn_800C1558": {
+ "TRKTargetStepOutOfRange": {
   "addr": "0x800C1558",
   "section": ".text",
   "size": "0xB8",
   "src": "src/trk/TRKTarget.c",
   "status": "KNOWN"
  },
- "fn_800C1610": {
+ "TRKTargetSingleStep": {
   "addr": "0x800C1610",
   "section": ".text",
   "size": "0xAC",
@@ -38254,7 +38254,7 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80196D78": {
+ "HSD_Panic": {
   "addr": "0x80196D78",
   "section": ".text",
   "size": "0x98",
@@ -38730,7 +38730,7 @@
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
- "fn_8019C854": {
+ "_HSD_MemGetRemainDefaultCB": {
   "addr": "0x8019C854",
   "section": ".text",
   "size": "0x48",

@@ -43,7 +43,7 @@
 
 /* ===== External functions ===== */
 extern void fn_80196E10(const char* file, u32 line, const char* msg); /* HSD_Halt / assert */
-extern void fn_80196D78(const char* file, u32 line, const char* msg); /* HSD_Panic */
+extern void HSD_Panic(const char* file, u32 line, const char* msg);
 extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
 extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
 extern void fn_801A9DF0(void* a, void* b, void* c);                  /* HSD_MtxInverseConcat */
@@ -295,7 +295,7 @@ void HSD_DObjDisplayFunc2(void* dobj, void* viewMtx, void* renderState) {
             fn_80197C70(dobj, localMtx, renderState);
             break;
         default:
-            fn_80196D78(lbl_802746DC, 0x170, lbl_80274680);
+            HSD_Panic(lbl_802746DC, 0x170, lbl_80274680);
             break;
     }
 }

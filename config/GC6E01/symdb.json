@@ -10279,7 +10279,7 @@
       "section": ".text",
       "size": "0x23EC"
     },
-    "fn_8007FD64": {
+    "menuCardE_CompareEntryPtrs": {
       "addr": "0x8007FD64",
       "kind": "function",
       "section": ".text",
@@ -14792,13 +14792,13 @@
       "section": ".text",
       "size": "0x10"
     },
-    "fn_800C1558": {
+    "TRKTargetStepOutOfRange": {
       "addr": "0x800C1558",
       "kind": "function",
       "section": ".text",
       "size": "0xB8"
     },
-    "fn_800C1610": {
+    "TRKTargetSingleStep": {
       "addr": "0x800C1610",
       "kind": "function",
       "section": ".text",
@@ -34416,7 +34416,7 @@
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80196D78": {
+    "HSD_Panic": {
       "addr": "0x80196D78",
       "kind": "function",
       "section": ".text",
@@ -34829,7 +34829,7 @@
       "section": ".text",
       "size": "0x74"
     },
-    "fn_8019C854": {
+    "_HSD_MemGetRemainDefaultCB": {
       "addr": "0x8019C854",
       "kind": "function",
       "proposed": "HSD_InitAssert2",

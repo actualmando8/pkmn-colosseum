@@ -470,7 +470,7 @@ HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
 extern void OSReport(const char* fmt, ...);
 extern HSD_MObj* fn_801A7B24(void* mobjdesc);
 extern HSD_PObj* fn_801AD288(void* pobjdesc);
-extern void fn_80196D78(const char* file, s32 line, const char* msg);
+extern void HSD_Panic(const char* file, s32 line, const char* msg);
 extern char lbl_8047DA28;
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
@@ -539,7 +539,7 @@ static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
         default:
             OSReport(*(char**)((u8*)0x80274758),
                      *(u32*)((u8*)dobj->mobj + 4));
-            fn_80196D78(&lbl_8047DA18, 0x13F, &lbl_8047DA28);
+            HSD_Panic(&lbl_8047DA18, 0x13F, &lbl_8047DA28);
             break;
         }
     }

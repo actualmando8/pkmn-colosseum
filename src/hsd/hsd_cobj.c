@@ -1107,7 +1107,7 @@ extern void fn_800BD7A0(void);
 extern void fn_800C46B0(void);
 extern void fn_801960C4(void);
 extern void fn_801963E0(void);
-extern void fn_80196D78(const char*, u32, const char*);
+extern void HSD_Panic(const char*, u32, const char*);
 extern void fn_80197400(void);
 extern void fn_8019C7B0(void);
 #if 1
@@ -1337,11 +1337,11 @@ extern void OSReport(const char* fmt, ...);
 extern char lbl_802746A0[];
 extern char lbl_80465080[];
 #if 0
-asm void fn_80196D78(void) {
-#include "src/hsd/hsd_cobj_fn_80196D78.inc"
+asm void HSD_Panic(void) {
+#include "src/hsd/hsd_cobj_HSD_Panic.inc"
 }
 #else
-void fn_80196D78(const char* file, u32 line, const char* expr) {
+void HSD_Panic(const char* file, u32 line, const char* expr) {
     extern u32 lbl_8047B238;
     if (lbl_8047B238 != 0) {
         fn_80196CE0();

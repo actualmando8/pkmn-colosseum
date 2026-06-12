@@ -305,7 +305,7 @@ void fn_801A4344(void) {}
 
 /* 0x801A4440 | 0x470 */
 extern void fn_801917D0(void);
-extern void fn_80196D78(void);
+extern void HSD_Panic(void);
 extern void OSReport();
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GXInitLightSpot();

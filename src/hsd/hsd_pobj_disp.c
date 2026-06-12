@@ -23,7 +23,7 @@ extern void  fn_801A6960(void* ptr);          /* HSD_MemFree  */
 /* fn_801A6990: virtual dispatch, returns s32 result via r3 */
 extern s32   fn_801A6990(void* obj);
 extern void  fn_80196E10(const char* file, u32 line, const char* msg);
-extern void  fn_80196D78(const char* file, u32 line, const char* msg);
+extern void  HSD_Panic(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void  fn_800B7D3C(void);

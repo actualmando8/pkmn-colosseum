@@ -458,7 +458,7 @@ void fn_8019CFBC(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_80196E10();
-extern void fn_80196D78(void);
+extern void HSD_Panic(void);
 extern void fn_80199264(void);
 extern void fn_801AE50C(void);
 extern void fn_801C25E4(void);
@@ -800,6 +800,8 @@ void fn_801A0744(void) {
 #pragma optimizewithasm off
 extern u8 lbl_80274AF4[];
 extern u8 lbl_80274B64[];
+/* Proposed: HSD_JObjRef. Not applied because include/hsd/hsd_jobj.h already
+ * defines that name as a static inline helper in this translation unit. */
 #if 0
 asm void fn_801A0B9C(void) {
 #include "src/hsd/hsd_jobj_fn_801A0B9C.inc"

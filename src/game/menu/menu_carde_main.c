@@ -39,7 +39,7 @@ extern u8 lbl_80269B68[];
 extern u8 lbl_8026C7F8[];
 
 /* ===== Forward declarations ===== */
-void fn_8007FD64(void);
+s32 menuCardE_CompareEntryPtrs(u32 lhsPtr, u32 rhsPtr);
 void fn_8007FDBC(void);
 void fn_80080310(void);
 void fn_80080ED8(void);
@@ -47,12 +47,16 @@ void fn_8008102C(void);
 
 /* ===== Function implementations ===== */
 
-/* 0x8007FD64 | size: 0x58 */
-void fn_8007FD64(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+/*
+ * 0x8007FD64 | size: 0x58
+ * menuCardE_CompareEntryPtrs: qsort-style comparator for MenuCardEEntry*
+ * elements.
+ * Primary key is signed entry+0x1C descending; secondary key is entry+0x1A
+ * ascending. Passed to fn_800CA620 with element size 4.
+ */
+s32 menuCardE_CompareEntryPtrs(u32 r3, u32 r4) {
+    u32 r0;
+    u32 r5;
 
     r5 = *(u32*)((u8*)r3 + 0x0);
     r4 = *(u32*)((u8*)r4 + 0x0);
@@ -61,27 +65,29 @@ void fn_8007FD64(void) {
     r3 = (s8)r3;
     r0 = (s8)r0;
     if ((s32)r3 < (s32)r0) {
-        r3 = 0x1;
-        return;
+        return 0x1;
     }
     if ((s32)r3 > (s32)r0) {
-        r3 = -0x1;
-        return;
+        return -0x1;
     }
     r3 = *(u8*)((u8*)r5 + 0x1A);
     r0 = *(u8*)((u8*)r4 + 0x1A);
     if (r3 < r0) {
-        r3 = -0x1;
-        return;
+        return -0x1;
     }
     r0 = r0 - r3;
     r3 = (u32)r0 >> 31;
-    return;
+    return r3;
 }
 
-/* 0x8007FDBC | size: 0x554 */
+/*
+ * 0x8007FDBC | size: 0x554
+ * Proposed role: menuCardE_Matrix_CreateContext. Allocates and initializes
+ * the Card-E matrix context, including
+ * context+0xAC entryCount and context+0xB0 sorted entry pointer array.
+ */
 void fn_8007FDBC(void) {
-    extern void fn_8007FD64();
+    extern s32 menuCardE_CompareEntryPtrs(u32, u32);
     u8 sp[0x40];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -196,9 +202,9 @@ void fn_8007FDBC(void) {
             r26 = r26 + 0x4;
 
         }
-        r4 = (u32)fn_8007FD64;
+        r4 = (u32)menuCardE_CompareEntryPtrs;
         r3 = *(u32*)((u8*)r30 + 0xB0);
-        r6 = (u32)fn_8007FD64;
+        r6 = (u32)menuCardE_CompareEntryPtrs;
         r5 = 0x4;
         r4 = r22;
         ((void(*)(void))fn_800CA620)();

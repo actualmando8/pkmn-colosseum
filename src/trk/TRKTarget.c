@@ -336,8 +336,8 @@ s32 fn_800C1548(void) {
     return *(s32*)&gTRKCPUState[0x80];
 }
 
-/* fn_800C1558 - 0x800C1558 | size: 0xB8 */
-s32 fn_800C1558(u32 rangeStart, u32 rangeEnd, s32 c) {
+/* TRKTargetStepOutOfRange - 0x800C1558 | size: 0xB8 */
+s32 TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, s32 c) {
     extern u8 lbl_8026FB70[];
     u8* bpInfo;
     u8* cpuState;
@@ -368,8 +368,8 @@ s32 fn_800C1558(u32 rangeStart, u32 rangeEnd, s32 c) {
     return 0;
 }
 
-/* fn_800C1610 - 0x800C1610 | size: 0xAC */
-s32 fn_800C1610(u32 count, s32 c) {
+/* TRKTargetSingleStep - 0x800C1610 | size: 0xAC */
+s32 TRKTargetSingleStep(u32 count, s32 c) {
     extern u8 lbl_8026FB70[];
     u8* bpInfo;
     u8* cpuState;
@@ -1245,4 +1245,3 @@ void fn_800C2A00(void) {
 /* Empty function (blr) - TRK no-op placeholder */
 void fn_800C2A08(void) {
 }
-

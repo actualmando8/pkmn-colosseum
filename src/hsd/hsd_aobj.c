@@ -157,7 +157,7 @@ extern f64 fn_800CE2F8(f64);      /* exp */
 extern f64 fn_800CE318(f64, f64); /* fmod */
 extern f64 fn_800CE338(f64);      /* log */
 extern f64 fn_800CE358(f64, f64); /* pow */
-extern void fn_80196D78(const char* file, s32 line, const char* msg);
+extern void HSD_Panic(const char* file, s32 line, const char* msg);
 extern void fn_80196E10(const char* file, s32 line, const char* expr);
 extern s32 fn_801ADC3C(s32 range);
 extern f32 fn_801ADC7C(void);
@@ -259,7 +259,7 @@ f32 fn_801920E4(u8* p, u32* args, u32 nb_args)
                     }
                     if (node == NULL) {
                         OSReport(BC_FMT_NOSTACK, operand);
-                        fn_80196D78(BC_FILE, 0x12b, BC_EMPTY);
+                        HSD_Panic(BC_FILE, 0x12b, BC_EMPTY);
                     } else {
                         stack = fn_801A3EB4(stack, node->value);
                     }
@@ -279,9 +279,9 @@ f32 fn_801920E4(u8* p, u32* args, u32 nb_args)
                     stack = fn_801A3EB4(stack, operand);
                     break;
                 case 0xFF:
-                    fn_80196D78(BC_FILE, 0x143, BC_MSG_NOTIMPL);
+                    HSD_Panic(BC_FILE, 0x143, BC_MSG_NOTIMPL);
                 default:
-                    fn_80196D78(BC_FILE, 0x146, BC_MSG_UNEXBC);
+                    HSD_Panic(BC_FILE, 0x146, BC_MSG_UNEXBC);
                     break;
                 }
             }
@@ -694,7 +694,7 @@ f32 fn_801920E4(u8* p, u32* args, u32 nb_args)
                 break;
             default:
                 OSReport(BC_FMT_UNEXOP, opcode & 0xff);
-                fn_80196D78(BC_FILE, 0x2b5, BC_EMPTY);
+                HSD_Panic(BC_FILE, 0x2b5, BC_EMPTY);
                 break;
             }
         }

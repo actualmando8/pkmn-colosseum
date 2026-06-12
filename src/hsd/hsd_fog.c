@@ -227,7 +227,7 @@ void fn_8019BB78(void) {
 #pragma optimizewithasm off
 extern void fn_800BC8F8(void);
 extern void fn_801942B8(void);
-extern void fn_80196D78(void);
+extern void HSD_Panic(void);
 extern void fn_801944D0(void);
 extern void fn_801944F8(void);
 extern void fn_800BD454(void);
