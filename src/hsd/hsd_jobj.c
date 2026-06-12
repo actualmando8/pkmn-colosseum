@@ -438,9 +438,9 @@ void fn_8019CF54(void* info) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019C128();
+extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
 extern void fn_8019C1B0(void);
-extern void fn_801A8570(void);
+extern void HSD_VecFree(void);
 extern void fn_801A84F0(void);
 #if 1
 asm void fn_8019CFBC(void) {
@@ -541,7 +541,7 @@ void fn_8019DD00(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_801AED88(void);
-extern void fn_801A9570(void);
+extern void HSD_MtxGetTranslate(void);
 extern void fn_801AFCAC(void);
 extern u32 lbl_8047DB48;
 extern char lbl_8047DB34;
@@ -585,7 +585,7 @@ u32 fn_8019F01C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80199178(void);
+extern void HSD_DObjCountVertices(HSD_DObj* dobj, s32* total_a, s32* total_b);
 #if 1
 asm void fn_8019F1C4(void) {
 #include "src/hsd/hsd_jobj_fn_8019F1C4.inc"
@@ -770,11 +770,11 @@ void fn_801A053C(void* obj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void __assert();
-extern void fn_801991F8(void);
-extern void fn_8019C128();
+extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
+extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
 extern void fn_801A05EC(void);
 extern void fn_801A0B9C();
-extern void fn_801A0BF0();
+extern void* HSD_IDGetData(u32 key, u32* found);
 extern void fn_801A0C1C();
 extern BOOL fn_801A0C68(HSD_Obj*);
 extern void fn_801A0C9C();
@@ -824,13 +824,13 @@ void fn_801A0B9C(HSD_Obj* obj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801A0BF0(void) {
-#include "src/hsd/hsd_jobj_fn_801A0BF0.inc"
+asm void HSD_IDGetData(void) {
+#include "src/hsd/hsd_jobj_HSD_IDGetData.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801A0BF0(HSD_JObj* jobj, u32 flags) {
-    fn_8019C128(NULL, jobj, flags);
+void* HSD_IDGetData(u32 key, u32* found) {
+    return HSD_IDGetDataFromTable(NULL, key, found);
 }
 #endif
 #pragma pop

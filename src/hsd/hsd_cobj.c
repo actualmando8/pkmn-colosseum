@@ -17,6 +17,8 @@
 extern void C_MTXLookAt();
 extern void C_MTXPerspective();
 extern void OSFillFPUContext();
+extern void fn_801963E0();
+extern void fn_8019674C();
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
@@ -29,7 +31,7 @@ HSD_CObjInfo hsdCObj = { CObjInfoInit };
 /*  Accessors                                                                */
 /* ========================================================================= */
 
-HSD_CObj* HSD_CObjGetCurrent(void)
+HSD_CObj* HSD_CObjGetCurrent_Early(void)
 {
     return current;
 }
@@ -52,13 +54,13 @@ void HSD_CObjClearFlags(HSD_CObj* cobj, u32 flags)
     cobj->flags &= ~flags;
 }
 
-int HSD_CObjGetProjectionType(HSD_CObj* cobj)
+int HSD_CObjGetProjectionType_Early(HSD_CObj* cobj)
 {
     HSD_ASSERT(0, cobj);
     return cobj->projection_type;
 }
 
-void HSD_CObjSetProjectionType(HSD_CObj* cobj, u32 type)
+void HSD_CObjSetProjectionType_Early(HSD_CObj* cobj, u32 type)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_type = (u8) type;
@@ -70,7 +72,7 @@ f32 HSD_CObjGetFov(HSD_CObj* cobj)
     return cobj->projection_param.perspective.fov;
 }
 
-void HSD_CObjSetFov(HSD_CObj* cobj, f32 fov)
+void HSD_CObjSetFov_Early(HSD_CObj* cobj, f32 fov)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_param.perspective.fov = fov;
@@ -82,31 +84,31 @@ f32 HSD_CObjGetAspect(HSD_CObj* cobj)
     return cobj->projection_param.perspective.aspect;
 }
 
-void HSD_CObjSetAspect(HSD_CObj* cobj, f32 aspect)
+void HSD_CObjSetAspect_Early(HSD_CObj* cobj, f32 aspect)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_param.perspective.aspect = aspect;
 }
 
-f32 HSD_CObjGetNear(HSD_CObj* cobj)
+f32 HSD_CObjGetNear_Early(HSD_CObj* cobj)
 {
     HSD_ASSERT(0, cobj);
     return cobj->near;
 }
 
-void HSD_CObjSetNear(HSD_CObj* cobj, f32 near)
+void HSD_CObjSetNear_Early(HSD_CObj* cobj, f32 near)
 {
     HSD_ASSERT(0, cobj);
     cobj->near = near;
 }
 
-f32 HSD_CObjGetFar(HSD_CObj* cobj)
+f32 HSD_CObjGetFar_Early(HSD_CObj* cobj)
 {
     HSD_ASSERT(0, cobj);
     return cobj->far;
 }
 
-void HSD_CObjSetFar(HSD_CObj* cobj, f32 far)
+void HSD_CObjSetFar_Early(HSD_CObj* cobj, f32 far)
 {
     HSD_ASSERT(0, cobj);
     cobj->far = far;
@@ -154,7 +156,7 @@ void HSD_CObjSetInterestWObj(HSD_CObj* cobj, HSD_WObj* interest)
 /*  Perspective / frustum / ortho setup                                      */
 /* ========================================================================= */
 
-void HSD_CObjSetPerspective(HSD_CObj* cobj, f32 fov, f32 aspect)
+void HSD_CObjSetPerspective_Early(HSD_CObj* cobj, f32 fov, f32 aspect)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_type = PROJ_PERSPECTIVE;
@@ -162,8 +164,8 @@ void HSD_CObjSetPerspective(HSD_CObj* cobj, f32 fov, f32 aspect)
     cobj->projection_param.perspective.aspect = aspect;
 }
 
-void HSD_CObjSetFrustum(HSD_CObj* cobj, f32 top, f32 bottom,
-                        f32 left, f32 right)
+void HSD_CObjSetFrustum_Early(HSD_CObj* cobj, f32 top, f32 bottom,
+                              f32 left, f32 right)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_type = PROJ_FRUSTUM;
@@ -173,8 +175,8 @@ void HSD_CObjSetFrustum(HSD_CObj* cobj, f32 top, f32 bottom,
     cobj->projection_param.frustum.right = right;
 }
 
-void HSD_CObjSetOrtho(HSD_CObj* cobj, f32 top, f32 bottom,
-                      f32 left, f32 right)
+void HSD_CObjSetOrtho_Early(HSD_CObj* cobj, f32 top, f32 bottom,
+                            f32 left, f32 right)
 {
     HSD_ASSERT(0, cobj);
     cobj->projection_type = PROJ_ORTHO;
@@ -188,7 +190,7 @@ void HSD_CObjSetOrtho(HSD_CObj* cobj, f32 top, f32 bottom,
 /*  Animation                                                                */
 /* ========================================================================= */
 
-void HSD_CObjRemoveAnim(HSD_CObj* cobj)
+void HSD_CObjRemoveAnim_Early(HSD_CObj* cobj)
 {
     if (cobj != NULL) {
         HSD_AObjRemove(cobj->aobj);
@@ -198,7 +200,7 @@ void HSD_CObjRemoveAnim(HSD_CObj* cobj)
     }
 }
 
-void HSD_CObjAddAnim(HSD_CObj* cobj, HSD_CameraAnim* canim)
+void HSD_CObjAddAnim_Early(HSD_CObj* cobj, HSD_CameraAnim* canim)
 {
     if (cobj == NULL || canim == NULL) {
         return;
@@ -211,7 +213,7 @@ void HSD_CObjAddAnim(HSD_CObj* cobj, HSD_CameraAnim* canim)
     HSD_WObjAddAnim(cobj->interest, canim->interest_anim);
 }
 
-void HSD_CObjReqAnim(HSD_CObj* cobj, f32 startframe)
+void HSD_CObjReqAnim_Early(HSD_CObj* cobj, f32 startframe)
 {
     if (cobj != NULL) {
         HSD_AObjReqAnim(cobj->aobj, startframe);
@@ -220,7 +222,7 @@ void HSD_CObjReqAnim(HSD_CObj* cobj, f32 startframe)
     }
 }
 
-void HSD_CObjAnim(HSD_CObj* cobj)
+void HSD_CObjAnim_Early(HSD_CObj* cobj)
 {
     if (cobj != NULL) {
         HSD_WObjInterpretAnim(cobj->eyepos);
@@ -278,6 +280,10 @@ static void CObjInfoInit(void)
                      sizeof(HSD_CObjInfo), sizeof(HSD_CObj));
     HSD_CLASS_INFO(&hsdCObj)->release = CObjRelease;
     HSD_CLASS_INFO(&hsdCObj)->amnesia = CObjAmnesia;
+    HSD_COBJ_INFO(&hsdCObj)->load =
+        (int (*)(HSD_CObj*, HSD_CObjDesc*)) fn_801963E0;
+    HSD_COBJ_INFO(&hsdCObj)->update =
+        (void (*)(HSD_CObj*, u32, void*)) fn_8019674C;
 }
 
 /* 0x80193CD0 | 0x60 */
@@ -322,7 +328,6 @@ void fn_80193D30(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern void* fn_80191628(void);
 #if 0
 asm void fn_80193EC8(void) {
 #include "src/hsd/hsd_cobj_fn_80193EC8.inc"
@@ -336,8 +341,8 @@ int fn_80193EC8(HSD_CObj* cobj) {
     if (cobj != NULL) {
         cobj->flags |= 0xC0000000;
     }
-    cobj->eyepos = fn_80191628();
-    cobj->interest = fn_80191628();
+        cobj->eyepos = HSD_WObjAlloc();
+        cobj->interest = HSD_WObjAlloc();
     return 0;
 }
 #endif
@@ -396,7 +401,7 @@ setup:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019189C(void);
+extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
 extern void fn_801947C8(void);
 extern void fn_80194DA4(void);
 #if 1
@@ -436,11 +441,11 @@ void* fn_80194258(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801942B8(void) {
-#include "src/hsd/hsd_cobj_fn_801942B8.inc"
+asm void HSD_CObjGetCurrent(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetCurrent.inc"
 }
 #else
-u32 fn_801942B8(void) { extern u32 lbl_8047B234; return lbl_8047B234; }
+HSD_CObj* HSD_CObjGetCurrent(void) { extern u32 lbl_8047B234; return (HSD_CObj*)lbl_8047B234; }
 #endif
 #pragma pop
 
@@ -449,11 +454,11 @@ u32 fn_801942B8(void) { extern u32 lbl_8047B234; return lbl_8047B234; }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801942C0(void) {
-#include "src/hsd/hsd_cobj_fn_801942C0.inc"
+asm void HSD_CObjGetOrtho(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetOrtho.inc"
 }
 #else
-void fn_801942C0(HSD_CObj* cobj, f32* a, f32* b, f32* c, f32* d) {
+void HSD_CObjGetOrtho(HSD_CObj* cobj, f32* a, f32* b, f32* c, f32* d) {
     if (cobj == NULL || cobj->projection_type != PROJ_ORTHO) {
         return;
     }
@@ -470,11 +475,11 @@ void fn_801942C0(HSD_CObj* cobj, f32* a, f32* b, f32* c, f32* d) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019431C(void) {
-#include "src/hsd/hsd_cobj_fn_8019431C.inc"
+asm void HSD_CObjGetPerspective(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetPerspective.inc"
 }
 #else
-void fn_8019431C(HSD_CObj* cobj, f32* a, f32* b) {
+void HSD_CObjGetPerspective(HSD_CObj* cobj, f32* a, f32* b) {
     if (cobj == NULL || cobj->projection_type != PROJ_PERSPECTIVE) {
         return;
     }
@@ -489,11 +494,12 @@ void fn_8019431C(HSD_CObj* cobj, f32* a, f32* b) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80194358(void) {
-#include "src/hsd/hsd_cobj_fn_80194358.inc"
+asm void HSD_CObjSetOrtho(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetOrtho.inc"
 }
 #else
-void fn_80194358(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+void HSD_CObjSetOrtho(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return;
     ptr[0x50] = 3;
     *(f32*)(ptr + 0x40) = f1;
@@ -509,11 +515,12 @@ void fn_80194358(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019437C(void) {
-#include "src/hsd/hsd_cobj_fn_8019437C.inc"
+asm void HSD_CObjSetFrustum(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetFrustum.inc"
 }
 #else
-void fn_8019437C(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+void HSD_CObjSetFrustum(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return;
     ptr[0x50] = 2;
     *(f32*)(ptr + 0x40) = f1;
@@ -529,11 +536,12 @@ void fn_8019437C(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801943A0(void) {
-#include "src/hsd/hsd_cobj_fn_801943A0.inc"
+asm void HSD_CObjSetPerspective(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetPerspective.inc"
 }
 #else
-void fn_801943A0(u8* ptr, f32 f1, f32 f2) {
+void HSD_CObjSetPerspective(HSD_CObj* cobj, f32 f1, f32 f2) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return;
     ptr[0x50] = 1;
     *(f32*)(ptr + 0x40) = f1;
@@ -547,11 +555,11 @@ void fn_801943A0(u8* ptr, f32 f1, f32 f2) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801943BC(void) {
-#include "src/hsd/hsd_cobj_fn_801943BC.inc"
+asm void HSD_CObjSetProjectionType(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetProjectionType.inc"
 }
 #else
-void fn_801943BC(u8* ptr, u8 val) { if (ptr == NULL) return; ptr[0x50] = val; }
+void HSD_CObjSetProjectionType(HSD_CObj* cobj, u32 val) { u8* ptr = (u8*) cobj; if (ptr == NULL) return; ptr[0x50] = val; }
 #endif
 #pragma pop
 
@@ -560,11 +568,12 @@ void fn_801943BC(u8* ptr, u8 val) { if (ptr == NULL) return; ptr[0x50] = val; }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801943CC(void) {
-#include "src/hsd/hsd_cobj_fn_801943CC.inc"
+asm void HSD_CObjGetProjectionType(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetProjectionType.inc"
 }
 #else
-u8 fn_801943CC(u8* ptr) {
+int HSD_CObjGetProjectionType(HSD_CObj* cobj) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return 1;
     return ptr[0x50];
 }
@@ -576,11 +585,12 @@ u8 fn_801943CC(u8* ptr) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801943E4(void) {
-#include "src/hsd/hsd_cobj_fn_801943E4.inc"
+asm void HSD_CObjSetViewportfx4(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetViewportfx4.inc"
 }
 #else
-void fn_801943E4(u8* ptr, f32 f1, f32 f2, f32 f3, f32 f4) {
+void HSD_CObjSetViewportfx4(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return;
     *(f32*)(ptr + 0x0C) = f1;
     *(f32*)(ptr + 0x10) = f2;
@@ -608,11 +618,12 @@ void fn_80194400(void) { /* TODO */ }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801944A4(void) {
-#include "src/hsd/hsd_cobj_fn_801944A4.inc"
+asm void HSD_CObjSetScissorx4(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetScissorx4.inc"
 }
 #else
-void fn_801944A4(u8* ptr, u16 a, u16 b, u16 c, u16 d) {
+void HSD_CObjSetScissorx4(HSD_CObj* cobj, u16 a, u16 b, u16 c, u16 d) {
+    u8* ptr = (u8*) cobj;
     if (ptr == NULL) return;
     *(u16*)(ptr + 0x1C) = a;
     *(u16*)(ptr + 0x1E) = b;
@@ -627,11 +638,11 @@ void fn_801944A4(u8* ptr, u16 a, u16 b, u16 c, u16 d) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801944C0(void) {
-#include "src/hsd/hsd_cobj_fn_801944C0.inc"
+asm void HSD_CObjSetFar(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetFar.inc"
 }
 #else
-void fn_801944C0(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x3C) = val; }
+void HSD_CObjSetFar(HSD_CObj* cobj, f32 val) { u8* ptr = (u8*) cobj; if (ptr == NULL) return; *(f32*)(ptr + 0x3C) = val; }
 #endif
 #pragma pop
 
@@ -640,11 +651,12 @@ void fn_801944C0(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x3C
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801944D0(void) {
-#include "src/hsd/hsd_cobj_fn_801944D0.inc"
+asm void HSD_CObjGetFar(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetFar.inc"
 }
 #else
-f32 fn_801944D0(u8* ptr) {
+f32 HSD_CObjGetFar(HSD_CObj* cobj) {
+    u8* ptr = (u8*) cobj;
     extern f32 lbl_8047D978;
     if (ptr == NULL) return lbl_8047D978;
     return *(f32*)(ptr + 0x3C);
@@ -657,11 +669,11 @@ f32 fn_801944D0(u8* ptr) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801944E8(void) {
-#include "src/hsd/hsd_cobj_fn_801944E8.inc"
+asm void HSD_CObjSetNear(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetNear.inc"
 }
 #else
-void fn_801944E8(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x38) = val; }
+void HSD_CObjSetNear(HSD_CObj* cobj, f32 val) { u8* ptr = (u8*) cobj; if (ptr == NULL) return; *(f32*)(ptr + 0x38) = val; }
 #endif
 #pragma pop
 
@@ -670,11 +682,12 @@ void fn_801944E8(u8* ptr, f32 val) { if (ptr == NULL) return; *(f32*)(ptr + 0x38
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801944F8(void) {
-#include "src/hsd/hsd_cobj_fn_801944F8.inc"
+asm void HSD_CObjGetNear(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetNear.inc"
 }
 #else
-f32 fn_801944F8(u8* ptr) {
+f32 HSD_CObjGetNear(HSD_CObj* cobj) {
+    u8* ptr = (u8*) cobj;
     extern f32 lbl_8047D978;
     if (ptr == NULL) return lbl_8047D978;
     return *(f32*)(ptr + 0x38);
@@ -784,11 +797,11 @@ void fn_801946F0(void) { /* TODO */ }
 
 /* 0x80194788 | 0x20 */
 #if 0
-asm void fn_80194788(void) {
-#include "src/hsd/hsd_cobj_fn_80194788.inc"
+asm void HSD_CObjSetAspect(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetAspect.inc"
 }
 #else
-void fn_80194788(HSD_CObj* cobj, f32 val)
+void HSD_CObjSetAspect(HSD_CObj* cobj, f32 val)
 {
     if (cobj == NULL || cobj->projection_type != 1) {
         return;
@@ -798,7 +811,7 @@ void fn_80194788(HSD_CObj* cobj, f32 val)
 #endif
 
 /* 0x801947A8 | 0x20 */
-void fn_801947A8(HSD_CObj* cobj, f32 val)
+void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
 {
     if (cobj == NULL || cobj->projection_type != PROJ_PERSPECTIVE) {
         return;
@@ -818,11 +831,11 @@ extern void fn_800A3ADC(void);
 extern void fn_800CE59C(void);
 extern void fn_800CE718(void);
 extern void fn_80194C2C(void);
-extern void fn_80194D94(u8*);
+extern void HSD_CObjSetMtxDirty(HSD_CObj*);
 extern void fn_8019513C(void);
 extern void fn_80195590(void);
-extern void fn_80195904(HSD_CObj*, void*);
-extern void fn_801959DC(HSD_CObj*, void*);
+extern void HSD_CObjGetEyePosition(HSD_CObj*, void*);
+extern void HSD_CObjGetInterest(HSD_CObj*, void*);
 #if 1
 asm void fn_801947C8(void) {
 #include "src/hsd/hsd_cobj_fn_801947C8.inc"
@@ -847,11 +860,7 @@ void fn_80194C2C(void) { /* TODO */ }
 
 /* WP-0061 external references */
 extern void fn_80191688(HSD_WObj*, void*);
-extern void fn_80191788(HSD_WObj*, void*);
-extern void fn_80191DCC(void);
-extern void fn_80191E38(HSD_WObj*, f32);
-extern void fn_80191E88(void);
-extern void fn_801919EC(HSD_WObj*);
+extern void HSD_WObjSetPosition(HSD_WObj*, void*);
 extern void fn_801C25E4(void);
 extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
@@ -865,11 +874,15 @@ extern void __assert(const char*, u32, const char*);
 #pragma optimizewithasm off
 extern void fn_80195F0C(u8*);
 #if 0
-asm void fn_80194CC4(void) {
-#include "src/hsd/hsd_cobj_fn_80194CC4.inc"
+asm void HSD_CObjGetViewingMtxPtr(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtxPtr.inc"
 }
 #else
-u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
+f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj)
+{
+    fn_80195F0C((u8*) cobj);
+    return cobj->view_mtx[0];
+}
 #endif
 #pragma pop
 
@@ -880,11 +893,11 @@ u8* fn_80194CC4(u8* ptr) { fn_80195F0C(ptr); return ptr + 0x54; }
 extern f32* fn_801A8524(void);
 extern void PSMTXInverse(f32*, f32*);
 #if 0
-asm void fn_80194CF4(void) {
-#include "src/hsd/hsd_cobj_fn_80194CF4.inc"
+asm void HSD_CObjGetInvViewingMtxPtrDirect(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetInvViewingMtxPtrDirect.inc"
 }
 #else
-f32* fn_80194CF4(HSD_CObj* cobj) {
+f32* HSD_CObjGetInvViewingMtxPtrDirect(HSD_CObj* cobj) {
     if (cobj->flags & 0x80000000) {
         if (cobj->proj_mtx == NULL) {
             cobj->proj_mtx = fn_801A8524();
@@ -905,12 +918,12 @@ f32* fn_80194CF4(HSD_CObj* cobj) {
 #pragma optimizewithasm off
 extern void fn_800A2D64(void*, void*);
 #if 0
-asm void fn_80194D60(void) {
-#include "src/hsd/hsd_cobj_fn_80194D60.inc"
+asm void HSD_CObjGetViewingMtx(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtx.inc"
 }
 #else
-void fn_80194D60(u8* ptr, void* arg2) {
-    fn_800A2D64(fn_80194CC4(ptr), arg2);
+void HSD_CObjGetViewingMtx(HSD_CObj* ptr, f32 arg2[3][4]) {
+    fn_800A2D64(HSD_CObjGetViewingMtxPtr((HSD_CObj*) ptr), arg2);
 }
 #endif
 #pragma pop
@@ -920,11 +933,11 @@ void fn_80194D60(u8* ptr, void* arg2) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80194D94(void) {
-#include "src/hsd/hsd_cobj_fn_80194D94.inc"
+asm void HSD_CObjSetMtxDirty(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetMtxDirty.inc"
 }
 #else
-void fn_80194D94(u8* ptr) { *(u32*)(ptr + 0x8) |= 0xC0000000; }
+void HSD_CObjSetMtxDirty(HSD_CObj* ptr) { *(u32*)((u8*) ptr + 0x8) |= 0xC0000000; }
 #endif
 #pragma pop
 
@@ -957,11 +970,11 @@ void fn_80194DA4(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_8019513C(void);
 #if 1
-asm void fn_801950D0(void) {
-#include "src/hsd/hsd_cobj_fn_801950D0.inc"
+asm void HSD_CObjGetUpVector(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetUpVector.inc"
 }
 #else
-void fn_801950D0(void) { /* TODO */ }
+void HSD_CObjGetUpVector(void) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -1050,14 +1063,14 @@ extern char lbl_8047D960;
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80195898(void) {
-#include "src/hsd/hsd_cobj_fn_80195898.inc"
+asm void HSD_CObjSetEyePosition(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetEyePosition.inc"
 }
 #else
-void fn_80195898(HSD_CObj* cobj, void* arg) {
+void HSD_CObjSetEyePosition(HSD_CObj* cobj, void* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    fn_80191788(cobj->eyepos, arg);
+    HSD_WObjSetPosition(cobj->eyepos, arg);
 }
 #endif
 #pragma pop
@@ -1067,11 +1080,11 @@ void fn_80195898(HSD_CObj* cobj, void* arg) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80195904(void) {
-#include "src/hsd/hsd_cobj_fn_80195904.inc"
+asm void HSD_CObjGetEyePosition(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetEyePosition.inc"
 }
 #else
-void fn_80195904(HSD_CObj* cobj, void* arg) {
+void HSD_CObjGetEyePosition(HSD_CObj* cobj, void* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191688(cobj->eyepos, arg);
@@ -1084,14 +1097,14 @@ void fn_80195904(HSD_CObj* cobj, void* arg) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80195970(void) {
-#include "src/hsd/hsd_cobj_fn_80195970.inc"
+asm void HSD_CObjSetInterest(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjSetInterest.inc"
 }
 #else
-void fn_80195970(HSD_CObj* cobj, void* arg) {
+void HSD_CObjSetInterest(HSD_CObj* cobj, void* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    fn_80191788(cobj->interest, arg);
+    HSD_WObjSetPosition(cobj->interest, arg);
 }
 #endif
 #pragma pop
@@ -1101,11 +1114,11 @@ void fn_80195970(HSD_CObj* cobj, void* arg) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801959DC(void) {
-#include "src/hsd/hsd_cobj_fn_801959DC.inc"
+asm void HSD_CObjGetInterest(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjGetInterest.inc"
 }
 #else
-void fn_801959DC(HSD_CObj* cobj, void* arg) {
+void HSD_CObjGetInterest(HSD_CObj* cobj, void* arg) {
     if (!cobj) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
     if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     fn_80191688(cobj->interest, arg);
@@ -1157,7 +1170,7 @@ void fn_80195A6C(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801950D0(void);
+extern void HSD_CObjGetUpVector(void);
 #if 1
 asm void fn_80195F0C(u8* ptr) {
 #include "src/hsd/hsd_cobj_fn_80195F0C.inc"
@@ -1199,16 +1212,16 @@ void fn_801963E0(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_801C29C4(void*, f32);
 #if 1
-void fn_80196698(HSD_CObj* cobj, f32 frame)
+void HSD_CObjReqAnim(HSD_CObj* cobj, f32 frame)
 {
     if ((cobj = cobj) && cobj) {
         fn_801C29C4(cobj->aobj, frame);
-        fn_80191E38(cobj->eyepos, frame);
-        fn_80191E38(cobj->interest, frame);
+        HSD_WObjReqAnim(cobj->eyepos, frame);
+        HSD_WObjReqAnim(cobj->interest, frame);
     }
 }
 #else
-void fn_80196698(void) { /* TODO */ }
+void HSD_CObjReqAnim(void) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -1217,15 +1230,15 @@ void fn_80196698(void) { /* TODO */ }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801966FC(void) {
-#include "src/hsd/hsd_cobj_fn_801966FC.inc"
+asm void HSD_CObjAnim(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjAnim.inc"
 }
 #else
-void fn_801966FC(HSD_CObj* cobj) {
+void HSD_CObjAnim(HSD_CObj* cobj) {
     if (!cobj) return;
-    fn_801C27F4(cobj->aobj, cobj, ((HSD_CObjInfo*)cobj->parent.parent.class_info)->load);
-    fn_801919EC(cobj->eyepos);
-    fn_801919EC(cobj->interest);
+    fn_801C27F4(cobj->aobj, cobj, HSD_COBJ_METHOD(cobj)->update);
+    HSD_WObjInterpretAnim(cobj->eyepos);
+    HSD_WObjInterpretAnim(cobj->interest);
 }
 #endif
 #pragma pop
@@ -1249,17 +1262,18 @@ void fn_8019674C(void) { /* TODO */ }
 #pragma optimizewithasm off
 extern void fn_801C2670(void);
 #if 0
-asm void fn_80196B10(void) {
-#include "src/hsd/hsd_cobj_fn_80196B10.inc"
+asm void HSD_CObjAddAnim(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjAddAnim.inc"
 }
 #else
-void fn_80196B10(u8* cobj, u8* aobj_info) {
+void HSD_CObjAddAnim(HSD_CObj* cobj_arg, HSD_CameraAnim* aobj_info_arg) {
     extern void fn_801C25E4(u32);
     extern u32 fn_801C2670(u32);
-    extern void fn_80191DCC(u32, u32);
     extern void __assert(const char*, u32, const char*);
     extern char lbl_8047D958;
     extern char lbl_8047D960;
+    u8* cobj = (u8*)cobj_arg;
+    u8* aobj_info = (u8*)aobj_info_arg;
     if (cobj == NULL) return;
     if (aobj_info == NULL) return;
     if (*(volatile u32*)(cobj + 0x84) != 0) {
@@ -1267,9 +1281,11 @@ void fn_80196B10(u8* cobj, u8* aobj_info) {
     }
     *(u32*)(cobj + 0x84) = fn_801C2670(*(u32*)aobj_info);
     if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
-    fn_80191DCC(*(u32*)(cobj + 0x24), *(u32*)(aobj_info + 0x4));
+    HSD_WObjAddAnim((HSD_WObj*)*(u32*)(cobj + 0x24),
+                    (HSD_WObjAnim*)*(u32*)(aobj_info + 0x4));
     if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
-    fn_80191DCC(*(u32*)(cobj + 0x28), *(u32*)(aobj_info + 0x8));
+    HSD_WObjAddAnim((HSD_WObj*)*(u32*)(cobj + 0x28),
+                    (HSD_WObjAnim*)*(u32*)(aobj_info + 0x8));
 }
 #endif
 #pragma pop
@@ -1279,24 +1295,24 @@ void fn_80196B10(u8* cobj, u8* aobj_info) {
 #pragma optimization_level 1
 #pragma optimizewithasm off
 #if 0
-asm void fn_80196BB8(void) {
-#include "src/hsd/hsd_cobj_fn_80196BB8.inc"
+asm void HSD_CObjRemoveAnim(void) {
+#include "src/hsd/hsd_cobj_HSD_CObjRemoveAnim.inc"
 }
 #else
-void fn_80196BB8(u8* ptr) {
+void HSD_CObjRemoveAnim(HSD_CObj* cobj) {
     extern void fn_801C25E4(u32);
-    extern void fn_80191E88(u32);
     extern void __assert(const char*, u32, const char*);
     extern char lbl_8047D958;
     extern char lbl_8047D960;
+    u8* ptr = (u8*)cobj;
     if (!ptr) { return; }
     if (!ptr) { return; }
     fn_801C25E4(*(u32*)(ptr + 0x84));
     *(u32*)(ptr + 0x84) = 0;
     if (!ptr) { __assert(&lbl_8047D958, 0x2E8, &lbl_8047D960); }
-    fn_80191E88(*(u32*)(ptr + 0x24));
+    HSD_WObjRemoveAnim((HSD_WObj*)*(u32*)(ptr + 0x24));
     if (!ptr) { __assert(&lbl_8047D958, 0x2D0, &lbl_8047D960); }
-    fn_80191E88(*(u32*)(ptr + 0x28));
+    HSD_WObjRemoveAnim((HSD_WObj*)*(u32*)(ptr + 0x28));
 }
 #endif
 #pragma pop

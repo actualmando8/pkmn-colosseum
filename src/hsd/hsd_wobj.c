@@ -18,6 +18,11 @@
 #include "hsd/hsd_robj.h"
 
 static void WObjInfoInit(void);
+static int WObjLoad_Early(HSD_WObj* wobj, HSD_WObjDesc* desc);
+int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc);
+void WObjAmnesia(HSD_ClassInfo* info);
+void WObjRelease(HSD_WObj* wobj);
+void WObjUpdateFunc();
 
 HSD_WObjInfo hsdWObj = { WObjInfoInit };
 
@@ -27,7 +32,7 @@ static HSD_ClassInfo* lbl_8047B218 = NULL;
 /*  Animation                                                                */
 /* ========================================================================= */
 
-void HSD_WObjRemoveAnim(HSD_WObj* wobj)
+void HSD_WObjRemoveAnim_Early(HSD_WObj* wobj)
 {
     if (wobj != NULL) {
         HSD_AObjRemove(wobj->aobj);
@@ -36,7 +41,7 @@ void HSD_WObjRemoveAnim(HSD_WObj* wobj)
     }
 }
 
-void HSD_WObjReqAnim(HSD_WObj* wobj, f32 frame)
+void HSD_WObjReqAnim_Early(HSD_WObj* wobj, f32 frame)
 {
     if (wobj != NULL) {
         HSD_AObjReqAnim(wobj->aobj, frame);
@@ -44,7 +49,7 @@ void HSD_WObjReqAnim(HSD_WObj* wobj, f32 frame)
     }
 }
 
-void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* anim)
+void HSD_WObjAddAnim_Early(HSD_WObj* wobj, HSD_WObjAnim* anim)
 {
     if (wobj != NULL && anim != NULL) {
         if (wobj->aobj != NULL) {
@@ -55,7 +60,7 @@ void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* anim)
     }
 }
 
-void HSD_WObjInterpretAnim(HSD_WObj* wobj)
+void HSD_WObjInterpretAnim_Early(HSD_WObj* wobj)
 {
     if (wobj != NULL) {
         /* WObjUpdateFunc callback handles position animation */
@@ -67,9 +72,9 @@ void HSD_WObjInterpretAnim(HSD_WObj* wobj)
 /*  Load / Init                                                              */
 /* ========================================================================= */
 
-static int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc)
+static int WObjLoad_Early(HSD_WObj* wobj, HSD_WObjDesc* desc)
 {
-    HSD_WObjSetPosition(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
+    HSD_WObjSetPosition_Early(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
     if (wobj->robj != NULL) {
         HSD_RObjRemoveAll(wobj->robj);
     }
@@ -78,13 +83,13 @@ static int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc)
     return 0;
 }
 
-void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc)
+void HSD_WObjInit_Early(HSD_WObj* wobj, HSD_WObjDesc* desc)
 {
     if (wobj == NULL || desc == NULL) {
         return;
     }
 
-    HSD_WObjSetPosition(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
+    HSD_WObjSetPosition_Early(wobj, desc->pos_x, desc->pos_y, desc->pos_z);
     if (wobj->robj != NULL) {
         HSD_RObjRemoveAll(wobj->robj);
     }
@@ -108,7 +113,7 @@ void HSD_WObjSetDefaultClass(HSD_ClassInfo* info)
 /*  Load from descriptor                                                     */
 /* ========================================================================= */
 
-HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc)
+HSD_WObj* HSD_WObjLoadDesc_Early(HSD_WObjDesc* desc)
 {
     if (desc != NULL) {
         HSD_WObj* wobj;
@@ -131,7 +136,7 @@ HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc)
 /*  Position accessors                                                       */
 /* ========================================================================= */
 
-void HSD_WObjSetPosition(HSD_WObj* wobj, f32 x, f32 y, f32 z)
+void HSD_WObjSetPosition_Early(HSD_WObj* wobj, f32 x, f32 y, f32 z)
 {
     if (wobj == NULL) {
         return;
@@ -190,7 +195,7 @@ void HSD_WObjGetPosition(HSD_WObj* wobj, f32* x, f32* y, f32* z)
 /*  Alloc                                                                    */
 /* ========================================================================= */
 
-HSD_WObj* HSD_WObjAlloc(void)
+HSD_WObj* HSD_WObjAlloc_Early(void)
 {
     HSD_WObj* wobj = (HSD_WObj*) hsdNew(
         lbl_8047B218 ? lbl_8047B218 : &hsdWObj.parent.parent);
@@ -202,7 +207,7 @@ HSD_WObj* HSD_WObjAlloc(void)
 /*  Class lifecycle                                                          */
 /* ========================================================================= */
 
-static void WObjRelease(HSD_Class* o)
+static void WObjRelease_Early(HSD_Class* o)
 {
     HSD_WObj* wobj = (HSD_WObj*) o;
     HSD_RObjRemoveAll(wobj->robj);
@@ -210,7 +215,7 @@ static void WObjRelease(HSD_Class* o)
     HSD_OBJECT_PARENT_INFO(&hsdWObj)->release(o);
 }
 
-static void WObjAmnesia(HSD_ClassInfo* info)
+static void WObjAmnesia_Early(HSD_ClassInfo* info)
 {
     if (info == HSD_CLASS_INFO(lbl_8047B218)) {
         lbl_8047B218 = NULL;
@@ -223,9 +228,10 @@ static void WObjInfoInit(void)
     hsdInitClassInfo(HSD_CLASS_INFO(&hsdWObj), HSD_CLASS_INFO(&hsdObj),
                      "sysdolphin_base_library", "had_wobj",
                      sizeof(HSD_WObjInfo), sizeof(HSD_WObj));
-    HSD_CLASS_INFO(&hsdWObj)->release = WObjRelease;
+    HSD_CLASS_INFO(&hsdWObj)->release = (void (*)(HSD_Class*)) WObjRelease;
     HSD_CLASS_INFO(&hsdWObj)->amnesia = WObjAmnesia;
     HSD_WOBJ_INFO(&hsdWObj)->load = WObjLoad;
+    HSD_WOBJ_INFO(&hsdWObj)->update = WObjUpdateFunc;
 }
 
 /* 0x8019158C | 0x48 */
@@ -234,17 +240,17 @@ static void WObjInfoInit(void)
 #pragma optimizewithasm off
 #if 1
 #pragma optimization_level 4
-void fn_8019158C(HSD_Class* o)
+void WObjAmnesia(HSD_ClassInfo* info)
 {
     extern u8 lbl_8036C5F0[];
 
-    if (o == (HSD_Class*) lbl_8047B218) {
+    if (info == lbl_8047B218) {
         lbl_8047B218 = NULL;
     }
-    ((HSD_ClassInfo*) *(u32*) (lbl_8036C5F0 + 0x14))->destroy(o);
+    ((HSD_ClassInfo*) *(u32*) (lbl_8036C5F0 + 0x14))->amnesia(info);
 }
 #else
-void fn_8019158C(void) { /* TODO */ }
+void WObjAmnesia(void) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -255,13 +261,13 @@ void fn_8019158C(void) { /* TODO */ }
 extern void fn_801AE50C(void* aobj);
 extern void fn_801C25E4(void* aobj);
 #if 0
-asm void fn_801915D4(void) {
-#include "src/hsd/hsd_wobj_fn_801915D4.inc"
+asm void WObjRelease(void) {
+#include "src/hsd/hsd_wobj_WObjRelease.inc"
 }
 #else
 #pragma optimization_level 1
 extern u8 lbl_8036C5F0[];
-void fn_801915D4(HSD_WObj* wobj) {
+void WObjRelease(HSD_WObj* wobj) {
     fn_801AE50C(wobj->robj);
     fn_801C25E4(wobj->aobj);
     {
@@ -281,12 +287,12 @@ extern void __assert(const char*, u32, const char*);
 extern const char lbl_8047D8C8[7];
 extern const char lbl_8047D8D0[5];
 #if 0
-asm void fn_80191628(void) {
-#include "src/hsd/hsd_wobj_fn_80191628.inc"
+asm void HSD_WObjAlloc(void) {
+#include "src/hsd/hsd_wobj_HSD_WObjAlloc.inc"
 }
 #else
 #pragma optimization_level 1
-HSD_WObj* fn_80191628(void)
+HSD_WObj* HSD_WObjAlloc(void)
 {
     extern u8 lbl_8036C5F0[];
     HSD_WObj* wobj;
@@ -333,12 +339,13 @@ void fn_80191688(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_80191788(void) {
-#include "src/hsd/hsd_wobj_fn_80191788.inc"
+asm void HSD_WObjSetPosition(HSD_WObj* wobj, void* position) {
+#include "src/hsd/hsd_wobj_HSD_WObjSetPosition.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80191788(HSD_WObj* wobj, u32* src) {
+void HSD_WObjSetPosition(HSD_WObj* wobj, void* position) {
+    u32* src = (u32*)position;
     u32* dst;
     if (wobj == NULL) {
         return;
@@ -362,11 +369,11 @@ void fn_80191788(HSD_WObj* wobj, u32* src) {
 #pragma optimizewithasm off
 extern void fn_80193748(void);
 #if 1
-asm void fn_801917D0(void) {
-#include "src/hsd/hsd_wobj_fn_801917D0.inc"
+asm HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc) {
+#include "src/hsd/hsd_wobj_HSD_WObjLoadDesc.inc"
 }
 #else
-void fn_801917D0(void) { /* TODO */ }
+HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -377,19 +384,12 @@ void fn_801917D0(void) { /* TODO */ }
 extern void* fn_801AE5E8(void* desc);
 extern void fn_801AEBE4(void* robj, void* desc);
 #if 1
-asm void fn_8019189C(void) {
-#include "src/hsd/hsd_wobj_fn_8019189C.inc"
+asm void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
+#include "src/hsd/hsd_wobj_HSD_WObjInit.inc"
 }
 #else
 #pragma optimization_level 4
-typedef struct {
-    u32 pad0;
-    f32 x;
-    f32 y;
-    f32 z;
-    void* robj_desc;
-} WObjDesc189C;
-void fn_8019189C(HSD_WObj* wobj, WObjDesc189C* desc) {
+void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc) {
     if (wobj == NULL) {
         return;
     }
@@ -397,17 +397,17 @@ void fn_8019189C(HSD_WObj* wobj, WObjDesc189C* desc) {
         return;
     }
     if ((u32)desc + 4 != 0) {
-        wobj->pos_x = desc->x;
-        wobj->pos_y = desc->y;
-        wobj->pos_z = desc->z;
+        wobj->pos_x = desc->pos_x;
+        wobj->pos_y = desc->pos_y;
+        wobj->pos_z = desc->pos_z;
         wobj->flags |= 0x2;
         wobj->flags &= ~0x1;
     }
     if (wobj->robj != NULL) {
         fn_801AE50C(wobj->robj);
     }
-    wobj->robj = (HSD_RObj*) fn_801AE5E8(desc->robj_desc);
-    fn_801AEBE4(wobj->robj, desc->robj_desc);
+    wobj->robj = (HSD_RObj*) fn_801AE5E8(desc->robjdesc);
+    fn_801AEBE4(wobj->robj, desc->robjdesc);
 }
 #endif
 #pragma pop
@@ -417,12 +417,12 @@ void fn_8019189C(HSD_WObj* wobj, WObjDesc189C* desc) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_8019194C(void) {
-#include "src/hsd/hsd_wobj_fn_8019194C.inc"
+asm int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc) {
+#include "src/hsd/hsd_wobj_WObjLoad.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019194C(void) { /* TODO */ }
+int WObjLoad(HSD_WObj* wobj, HSD_WObjDesc* desc) { /* TODO */ }
 #endif
 #pragma pop
 
@@ -433,14 +433,14 @@ void fn_8019194C(void) { /* TODO */ }
 extern void fn_801B0040(void* robj);
 extern void fn_801C27F4(void* aobj, void* wobj, void* method);
 #if 0
-asm void fn_801919EC(void) {
-#include "src/hsd/hsd_wobj_fn_801919EC.inc"
+asm void HSD_WObjInterpretAnim(void) {
+#include "src/hsd/hsd_wobj_HSD_WObjInterpretAnim.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801919EC(HSD_WObj* wobj) {
+void HSD_WObjInterpretAnim(HSD_WObj* wobj) {
     if (wobj != NULL) {
-        fn_801C27F4(wobj->aobj, wobj, HSD_WOBJ_METHOD(wobj)->load);
+        fn_801C27F4(wobj->aobj, wobj, HSD_WOBJ_METHOD(wobj)->update);
         fn_801B0040(wobj->robj);
     }
 }
@@ -469,12 +469,12 @@ extern void fn_801AFE68(void* robj, void* robj_desc);
 extern void* fn_801C2670(void* aobj_desc);
 typedef struct { void* aobj_desc; void* robj_desc; } WObjADesc;
 #if 0
-asm void fn_80191DCC(void) {
-#include "src/hsd/hsd_wobj_fn_80191DCC.inc"
+asm void HSD_WObjAddAnim(void) {
+#include "src/hsd/hsd_wobj_HSD_WObjAddAnim.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
+void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* desc) {
     if (wobj == NULL) {
         return;
     }
@@ -484,8 +484,8 @@ void fn_80191DCC(HSD_WObj* wobj, WObjADesc* desc) {
     if (*(volatile u32*) ((u8*) wobj + 0x18) != 0) {
         fn_801C25E4(wobj->aobj);
     }
-    wobj->aobj = (HSD_AObj*) fn_801C2670(desc->aobj_desc);
-    fn_801AFE68(wobj->robj, desc->robj_desc);
+    wobj->aobj = (HSD_AObj*) fn_801C2670(desc->aobjdesc);
+    fn_801AFE68(wobj->robj, desc->robjanim);
 }
 #endif
 #pragma pop
@@ -496,7 +496,7 @@ extern void fn_801AFEFC(void* robj, f32 frame);
 extern void fn_801C29C4(void* aobj, f32 frame);
 #pragma push
 #pragma optimization_level 1
-void fn_80191E38(HSD_WObj* wobj, f32 frame) {
+void HSD_WObjReqAnim(HSD_WObj* wobj, f32 frame) {
     if (wobj != NULL) {
         fn_801C29C4(wobj->aobj, frame);
         fn_801AFEFC(wobj->robj, frame);
@@ -510,12 +510,12 @@ void fn_80191E38(HSD_WObj* wobj, f32 frame) {
 #pragma optimizewithasm off
 extern void fn_801AFFE0(void* robj);
 #if 0
-asm void fn_80191E88(void) {
-#include "src/hsd/hsd_wobj_fn_80191E88.inc"
+asm void HSD_WObjRemoveAnim(void) {
+#include "src/hsd/hsd_wobj_HSD_WObjRemoveAnim.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80191E88(HSD_WObj* wobj) {
+void HSD_WObjRemoveAnim(HSD_WObj* wobj) {
     if (wobj != NULL) {
         fn_801C25E4(wobj->aobj);
         wobj->aobj = NULL;

@@ -14,6 +14,8 @@
 #include "hsd/hsd_wobj.h"
 
 static void LObjInfoInit(void);
+extern void fn_801A4440();
+extern void LObjUpdateFunc();
 
 HSD_LObjInfo hsdLObj = { LObjInfoInit };
 
@@ -30,13 +32,13 @@ u32 HSD_LObjGetFlags(HSD_LObj* lobj)
     return lobj->flags;
 }
 
-void HSD_LObjSetFlags(HSD_LObj* lobj, u32 flags)
+void HSD_LObjSetFlags_Early(HSD_LObj* lobj, u32 flags)
 {
     HSD_ASSERT(0, lobj);
     lobj->flags |= (u16) flags;
 }
 
-void HSD_LObjClearFlags(HSD_LObj* lobj, u32 flags)
+void HSD_LObjClearFlags_Early(HSD_LObj* lobj, u32 flags)
 {
     HSD_ASSERT(0, lobj);
     lobj->flags &= (u16) ~flags;
@@ -53,7 +55,7 @@ void HSD_LObjSetActive(HSD_LObj* lobj)
     }
 }
 
-s32 HSD_LObjGetNbActive(void)
+s32 HSD_LObjGetNbActive_Early(void)
 {
     return nb_active;
 }
@@ -80,7 +82,7 @@ void HSD_LObjAddAnim(HSD_LObj* lobj, HSD_LightAnim* lanim)
     HSD_WObjAddAnim(lobj->interest, lanim->interest_anim);
 }
 
-void HSD_LObjAddAnimAll(HSD_LObj* lobj, HSD_LightAnim* lanim)
+void HSD_LObjAddAnimAll_Early(HSD_LObj* lobj, HSD_LightAnim* lanim)
 {
     HSD_LObj* l;
     HSD_LightAnim* a;
@@ -102,7 +104,7 @@ void HSD_LObjAnim(HSD_LObj* lobj)
     }
 }
 
-void HSD_LObjAnimAll(HSD_LObj* lobj)
+void HSD_LObjAnimAll_Early(HSD_LObj* lobj)
 {
     HSD_LObj* l;
     for (l = lobj; l != NULL; l = l->next) {
@@ -119,7 +121,7 @@ void HSD_LObjReqAnim(HSD_LObj* lobj, f32 startframe)
     }
 }
 
-void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe)
+void HSD_LObjReqAnimAll_Early(HSD_LObj* lobj, f32 startframe)
 {
     HSD_LObj* l;
     for (l = lobj; l != NULL; l = l->next) {
@@ -131,22 +133,22 @@ void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe)
 /*  Color / position                                                         */
 /* ========================================================================= */
 
-void HSD_LObjSetColor(HSD_LObj* lobj, u32 color)
+void HSD_LObjSetColor_Early(HSD_LObj* lobj, u32 color)
 {
     HSD_ASSERT(0, lobj);
     lobj->color = color;
 }
 
-void HSD_LObjSetPosition(HSD_LObj* lobj, f32 x, f32 y, f32 z)
+void HSD_LObjSetPosition_Early(HSD_LObj* lobj, f32 x, f32 y, f32 z)
 {
     HSD_ASSERT(0, lobj);
-    HSD_WObjSetPosition(lobj->position, x, y, z);
+    HSD_WObjSetPosition_Early(lobj->position, x, y, z);
 }
 
-void HSD_LObjSetInterest(HSD_LObj* lobj, f32 x, f32 y, f32 z)
+void HSD_LObjSetInterest_Early(HSD_LObj* lobj, f32 x, f32 y, f32 z)
 {
     HSD_ASSERT(0, lobj);
-    HSD_WObjSetPosition(lobj->interest, x, y, z);
+    HSD_WObjSetPosition_Early(lobj->interest, x, y, z);
 }
 
 /* ========================================================================= */
@@ -203,6 +205,10 @@ static void LObjInfoInit(void)
                      sizeof(HSD_LObjInfo), sizeof(HSD_LObj));
     HSD_CLASS_INFO(&hsdLObj)->release = LObjRelease;
     HSD_CLASS_INFO(&hsdLObj)->amnesia = LObjAmnesia;
+    HSD_LOBJ_INFO(&hsdLObj)->load =
+        (int (*)(HSD_LObj*, HSD_LightDesc*)) fn_801A4440;
+    HSD_LOBJ_INFO(&hsdLObj)->update =
+        (void (*)(HSD_LObj*, u32, void*)) LObjUpdateFunc;
 }
 
 /* 0x801A4098 | 0x60 */
@@ -254,13 +260,12 @@ void fn_801A40F8(HSD_LObj* lobj)
 
 /* 0x801A426C | 0xD8 */
 extern HSD_AObj* fn_801C2670(HSD_AObjDesc*);
-extern void fn_80191DCC(HSD_WObj*, HSD_WObjAnim*);
 #if 0
-asm void fn_801A426C(void) {
-#include "src/hsd/hsd_lobj_fn_801A426C.inc"
+asm void HSD_LObjAddAnimAll(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjAddAnimAll.inc"
 }
 #else
-void fn_801A426C(HSD_LObj* lobj, HSD_LightAnim* lanim)
+void HSD_LObjAddAnimAll(HSD_LObj* lobj, HSD_LightAnim* lanim)
 {
     HSD_LObj* l;
     HSD_LightAnim* a;
@@ -276,10 +281,10 @@ void fn_801A426C(HSD_LObj* lobj, HSD_LightAnim* lanim)
                 fn_801C25E4(l->aobj);
             }
             l->aobj = fn_801C2670(a->aobjdesc);
-            fn_80191DCC(l != NULL ? l->position : NULL,
-                        a->position_anim);
-            fn_80191DCC(l != NULL ? l->interest : NULL,
-                        a->interest_anim);
+            HSD_WObjAddAnim(l != NULL ? l->position : NULL,
+                            a->position_anim);
+            HSD_WObjAddAnim(l != NULL ? l->interest : NULL,
+                            a->interest_anim);
         }
         l = l != NULL ? l->next : NULL;
         a = a != NULL ? a->next : NULL;
@@ -304,7 +309,7 @@ void fn_801A4344(void) {}
 #endif
 
 /* 0x801A4440 | 0x470 */
-extern void fn_801917D0(void);
+extern HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc);
 extern void HSD_Panic(void);
 extern void OSReport();
 /* renamed symbols referenced by asm incs (symbolmap port) */
@@ -322,11 +327,11 @@ void fn_801A4440(void) {}
 
 /* 0x801A48B0 | 0x44 */
 extern void fn_80191688();
-/* HSD_LObjGetInterestPosition */
-s32 fn_801A48B0(HSD_LObj* lobj) {
+/* HSD_LObjGetInterest */
+s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
         if (*(volatile u32*)((u8*)lobj + 0x1C) != 0) {
-            fn_80191688(*(void**)((u8*)lobj + 0x1C));
+            fn_80191688(*(void**)((u8*)lobj + 0x1C), out);
             return 1;
         }
     }
@@ -334,44 +339,42 @@ s32 fn_801A48B0(HSD_LObj* lobj) {
 }
 
 /* 0x801A48F4 | 0x88 */
-extern void* fn_80191628();
-extern void fn_80191788();
+extern void HSD_WObjSetPosition(HSD_WObj* wobj, void* position);
 extern char lbl_8047DBCC;
 extern u8 lbl_80274DB8[];
 extern char lbl_8047DBB8;
 #if 0
-asm void fn_801A48F4(void) {
-#include "src/hsd/hsd_lobj_fn_801A48F4.inc"
+asm void HSD_LObjSetInterest(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjSetInterest.inc"
 }
 #else
 #pragma push
 #pragma scheduling on
-/* HSD_LObjSetInterestWObjDesc */
-void fn_801A48F4(HSD_LObj* lobj, void* desc) {
+void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
         __assert(&lbl_8047DBB8, 0x58c, &lbl_8047DBCC);
     }
     if (lobj->interest == NULL) {
-        lobj->interest = fn_80191628();
+        lobj->interest = HSD_WObjAlloc();
         if (lobj->interest == NULL) {
             __assert(&lbl_8047DBB8, 0x58f, lbl_80274DB8);
         }
     }
-    fn_80191788(lobj->interest, desc);
+    HSD_WObjSetPosition(lobj->interest, desc);
 }
 #pragma pop
 #endif
 
 /* 0x801A497C | 0x44 */
 #if 0
-asm void fn_801A497C(void) {
-#include "src/hsd/hsd_lobj_fn_801A497C.inc"
+asm void HSD_LObjGetPosition(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetPosition.inc"
 }
 #else
-s32 fn_801A497C(HSD_LObj* lobj) {
+s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out) {
     if (lobj != NULL) {
         if (*(volatile u32*)((u8*)lobj + 0x18) != 0) {
-            fn_80191688(*(void**)((u8*)lobj + 0x18));
+            fn_80191688(*(void**)((u8*)lobj + 0x18), out);
             return 1;
         }
     }
@@ -382,32 +385,31 @@ s32 fn_801A497C(HSD_LObj* lobj) {
 /* 0x801A49C0 | 0x88 */
 extern u8 lbl_80274DC8[];
 #if 0
-asm void fn_801A49C0(void) {
-#include "src/hsd/hsd_lobj_fn_801A49C0.inc"
+asm void HSD_LObjSetPosition(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjSetPosition.inc"
 }
 #else
-/* HSD_LObjSetPositionWObjDesc */
-void fn_801A49C0(HSD_LObj* lobj, void* desc) {
+void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
         __assert(&lbl_8047DBB8, 0x568, &lbl_8047DBCC);
     }
     if (lobj->position == NULL) {
-        lobj->position = fn_80191628();
+        lobj->position = HSD_WObjAlloc();
         if (lobj->position == NULL) {
             __assert(&lbl_8047DBB8, 0x56b, lbl_80274DC8);
         }
     }
-    fn_80191788(lobj->position, desc);
+    HSD_WObjSetPosition(lobj->position, desc);
 }
 #endif
 
 /* 0x801A4A48 | 0xC */
 #if 0
-asm void fn_801A4A48(void) {
-#include "src/hsd/hsd_lobj_fn_801A4A48.inc"
+asm void HSD_LObjSetColor(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjSetColor.inc"
 }
 #else
-void fn_801A4A48(HSD_LObj* lobj, u32* color) {
+void HSD_LObjSetColor(HSD_LObj* lobj, u32* color) {
     lobj->color = *color;
 }
 #endif
@@ -433,14 +435,14 @@ u32 fn_801A4A54(u32 idx) {
 /* 0x801A4AC4 | 0x3C */
 extern u32 lbl_8047B2B4;
 #if 0
-asm void fn_801A4AC4(void) {
-#include "src/hsd/hsd_lobj_fn_801A4AC4.inc"
+asm void HSD_LObjGetCurrentByType(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetCurrentByType.inc"
 }
 #else
 #pragma push
 #pragma peephole off
 /* Find active light by type */
-HSD_LObj* fn_801A4AC4(u32 type) {
+HSD_LObj* HSD_LObjGetCurrentByType(u32 type) {
     void* data;
     HSD_SList* p;
     type &= 3;
@@ -596,42 +598,40 @@ void fn_801A620C(HSD_LObj* lobj, f32* out)
 
 /* 0x801A6370 | 0x98 */
 extern void fn_801C29C4();
-extern void fn_80191E38();
 #if 0
-asm void fn_801A6370(void) {
-#include "src/hsd/hsd_lobj_fn_801A6370.inc"
+asm void HSD_LObjReqAnimAll(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjReqAnimAll.inc"
 }
 #else
 /* HSD_LObjReqAnimAll - request animation start for all lobjs in list */
-void fn_801A6370(HSD_LObj* lobj, f32 startframe) {
+void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe) {
     HSD_LObj* l;
     if (lobj == NULL) return;
     for (l = lobj; l != NULL; l = l->next) {
         if (l == NULL) continue;
         fn_801C29C4(l->aobj, startframe);
-        fn_80191E38(l != NULL ? l->position : NULL, startframe);
-        fn_80191E38(l != NULL ? l->interest : NULL, startframe);
+        HSD_WObjReqAnim(l != NULL ? l->position : NULL, startframe);
+        HSD_WObjReqAnim(l != NULL ? l->interest : NULL, startframe);
     }
 }
 #endif
 
 /* 0x801A6408 | 0x8C */
 extern void fn_801C27F4();
-extern void fn_801919EC();
 #if 0
-asm void fn_801A6408(void) {
-#include "src/hsd/hsd_lobj_fn_801A6408.inc"
+asm void HSD_LObjAnimAll(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjAnimAll.inc"
 }
 #else
 /* HSD_LObjAnimAll - animate all lobjs in list */
-void fn_801A6408(HSD_LObj* lobj) {
+void HSD_LObjAnimAll(HSD_LObj* lobj) {
     HSD_LObj* l;
     if (lobj == NULL) return;
     for (l = lobj; l != NULL; l = l->next) {
         if (l == NULL) continue;
-        fn_801C27F4(l->aobj, l, HSD_LOBJ_METHOD(l)->load);
-        fn_801919EC(l != NULL ? l->position : NULL);
-        fn_801919EC(l != NULL ? l->interest : NULL);
+        fn_801C27F4(l->aobj, l, HSD_LOBJ_METHOD(l)->update);
+        HSD_WObjInterpretAnim(l != NULL ? l->position : NULL);
+        HSD_WObjInterpretAnim(l != NULL ? l->interest : NULL);
     }
 }
 #endif
@@ -643,15 +643,15 @@ extern u32 lbl_8047DBE8;
 extern u32 lbl_8047DBE4;
 extern u32 lbl_8047DC10;
 #if 1
-asm void fn_801A6494(void) {
-#include "src/hsd/hsd_lobj_fn_801A6494.inc"
+asm void LObjUpdateFunc(void) {
+#include "src/hsd/hsd_lobj_LObjUpdateFunc.inc"
 }
 #else
-void fn_801A6494(void) {}
+void LObjUpdateFunc(void) {}
 #endif
 
 /* 0x801A66E0 | 0xAC */
-extern void fn_80191E88(void);
+extern void HSD_WObjRemoveAnim(HSD_WObj* wobj);
 #if 1
 asm void fn_801A66E0(void) {
 #include "src/hsd/hsd_lobj_fn_801A66E0.inc"
@@ -662,14 +662,14 @@ void fn_801A66E0(void) {}
 
 /* 0x801A678C | 0x30 */
 #if 0
-asm void fn_801A678C(void) {
-#include "src/hsd/hsd_lobj_fn_801A678C.inc"
+asm void HSD_LObjGetActiveByIndex(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetActiveByIndex.inc"
 }
 #else
 /* Get active light by index from lbl_804655E0 table */
 extern u8 lbl_804655E0[];
 #pragma optimization_level 1
-HSD_LObj* fn_801A678C(s32 idx) {
+HSD_LObj* HSD_LObjGetActiveByIndex(s32 idx) {
     if (idx >= 0) {
         if (idx < 8) {
             return *(HSD_LObj**)(lbl_804655E0 + idx * 4);
@@ -681,11 +681,11 @@ HSD_LObj* fn_801A678C(s32 idx) {
 
 /* 0x801A67BC | 0x114 */
 #if 0
-asm void fn_801A67BC(void) {
-#include "src/hsd/hsd_lobj_fn_801A67BC.inc"
+asm void HSD_LObjGetActiveByID(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetActiveByID.inc"
 }
 #else
-HSD_LObj* fn_801A67BC(s32 light_id)
+HSD_LObj* HSD_LObjGetActiveByID(s32 light_id)
 {
     s32 index;
 
@@ -737,11 +737,11 @@ HSD_LObj* fn_801A67BC(s32 light_id)
 /* 0x801A68D0 | 0x8 */
 extern u32 lbl_8047B2B8;
 #if 0
-asm void fn_801A68D0(void) {
-#include "src/hsd/hsd_lobj_fn_801A68D0.inc"
+asm void HSD_LObjGetNbActive(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetNbActive.inc"
 }
 #else
-u32 fn_801A68D0(void) {
+s32 HSD_LObjGetNbActive(void) {
     return lbl_8047B2B8;
 }
 #endif
@@ -749,11 +749,11 @@ u32 fn_801A68D0(void) {
 /* 0x801A68D8 | 0x8 */
 extern u32 lbl_8047B2C0;
 #if 0
-asm void fn_801A68D8(void) {
-#include "src/hsd/hsd_lobj_fn_801A68D8.inc"
+asm void HSD_LObjGetLightMaskSpecular(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetLightMaskSpecular.inc"
 }
 #else
-u32 fn_801A68D8(void) {
+u32 HSD_LObjGetLightMaskSpecular(void) {
     return lbl_8047B2C0;
 }
 #endif
@@ -761,11 +761,11 @@ u32 fn_801A68D8(void) {
 /* 0x801A68E0 | 0x8 */
 extern u32 lbl_8047B2C8;
 #if 0
-asm void fn_801A68E0(void) {
-#include "src/hsd/hsd_lobj_fn_801A68E0.inc"
+asm void HSD_LObjGetLightMaskAlpha(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetLightMaskAlpha.inc"
 }
 #else
-u32 fn_801A68E0(void) {
+u32 HSD_LObjGetLightMaskAlpha(void) {
     return lbl_8047B2C8;
 }
 #endif
@@ -773,11 +773,11 @@ u32 fn_801A68E0(void) {
 /* 0x801A68E8 | 0x8 */
 extern u32 lbl_8047B2C4;
 #if 0
-asm void fn_801A68E8(void) {
-#include "src/hsd/hsd_lobj_fn_801A68E8.inc"
+asm void HSD_LObjGetLightMaskAttnFunc(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetLightMaskAttnFunc.inc"
 }
 #else
-u32 fn_801A68E8(void) {
+u32 HSD_LObjGetLightMaskAttnFunc(void) {
     return lbl_8047B2C4;
 }
 #endif
@@ -785,22 +785,22 @@ u32 fn_801A68E8(void) {
 /* 0x801A68F0 | 0x8 */
 extern u32 lbl_8047B2BC;
 #if 0
-asm void fn_801A68F0(void) {
-#include "src/hsd/hsd_lobj_fn_801A68F0.inc"
+asm void HSD_LObjGetLightMaskDiffuse(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjGetLightMaskDiffuse.inc"
 }
 #else
-u32 fn_801A68F0(void) {
+u32 HSD_LObjGetLightMaskDiffuse(void) {
     return lbl_8047B2BC;
 }
 #endif
 
 /* 0x801A68F8 | 0x18 */
 #if 0
-asm void fn_801A68F8(void) {
-#include "src/hsd/hsd_lobj_fn_801A68F8.inc"
+asm void HSD_LObjClearFlags(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjClearFlags.inc"
 }
 #else
-void fn_801A68F8(HSD_LObj* lobj, u32 flags) {
+void HSD_LObjClearFlags(HSD_LObj* lobj, u32 flags) {
     if (lobj == NULL) return;
     lobj->flags &= ~flags;
 }
@@ -808,11 +808,11 @@ void fn_801A68F8(HSD_LObj* lobj, u32 flags) {
 
 /* 0x801A6910 | 0x18 */
 #if 0
-asm void fn_801A6910(void) {
-#include "src/hsd/hsd_lobj_fn_801A6910.inc"
+asm void HSD_LObjSetFlags(void) {
+#include "src/hsd/hsd_lobj_HSD_LObjSetFlags.inc"
 }
 #else
-void fn_801A6910(HSD_LObj* lobj, u32 flags) {
+void HSD_LObjSetFlags(HSD_LObj* lobj, u32 flags) {
     if (lobj == NULL) return;
     lobj->flags |= flags;
 }
