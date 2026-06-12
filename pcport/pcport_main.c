@@ -7404,6 +7404,29 @@ typedef struct PCPortMessageBoxState {
     int closeCount;
 } PCPortMessageBoxState;
 
+#define PCPORT_MSGBOX_CONTEXT_MAGIC 0x4D534358u /* "MSCX" */
+#define PCPORT_MSGBOX_STATE_SIZE 0x2A0u
+#define PCPORT_MSGBOX_SLOT_SIZE 0x138u
+#define PCPORT_MSGBOX_SLOT_BASE 0x08u
+#define PCPORT_MSGBOX_ACTIVE_SLOT_OFF 0x278u
+#define PCPORT_MSGBOX_X_OFF 0x27Cu
+#define PCPORT_MSGBOX_Y_OFF 0x280u
+
+typedef struct PCPortScriptMsgContext {
+    u32 magic;
+    u32 speakerId;
+    u32 pageCount;
+    u32 pageIndex;
+    u32 visibleChars;
+    u32 active;
+    u32 storyStep;
+    u32 cutsceneState;
+    char preview[96];
+} PCPortScriptMsgContext;
+
+extern u8 lbl_803A9768[];
+extern void* fn_80057270(void);
+
 static int PCPort_TextLen(const char* text) {
     return text != NULL ? (int)strlen(text) : 0;
 }
@@ -7436,6 +7459,50 @@ static void PCPort_MessageBoxInit(PCPortMessageBoxState* msg,
     msg->pageCount = pageCount;
     msg->charsPerFrame = charsPerFrame > 0 ? charsPerFrame : 4;
     msg->active = (pages != NULL && pageCount > 0);
+}
+
+static PCPortScriptMsgContext* PCPort_MessageBoxScriptContext(void) {
+    return (PCPortScriptMsgContext*)fn_80057270();
+}
+
+static void PCPort_MessageBoxSeedScriptContext(
+    const PCPortMessageBoxState* msg,
+    u32 speakerId,
+    const char* preview) {
+    PCPortScriptMsgContext* ctx;
+
+    memset(lbl_803A9768, 0, PCPORT_MSGBOX_STATE_SIZE);
+    *(u32*)(lbl_803A9768 + PCPORT_MSGBOX_ACTIVE_SLOT_OFF) = 0u;
+    *(f32*)(lbl_803A9768 + PCPORT_MSGBOX_X_OFF) = 58.0f;
+    *(f32*)(lbl_803A9768 + PCPORT_MSGBOX_Y_OFF) = 276.0f;
+
+    ctx = PCPort_MessageBoxScriptContext();
+    if (ctx == NULL) {
+        return;
+    }
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->magic = PCPORT_MSGBOX_CONTEXT_MAGIC;
+    ctx->speakerId = speakerId;
+    ctx->pageCount = msg != NULL ? (u32)msg->pageCount : 0u;
+    ctx->active = (msg != NULL && msg->active) ? 1u : 0u;
+    if (preview != NULL) {
+        snprintf(ctx->preview, sizeof(ctx->preview), "%s", preview);
+    }
+}
+
+static void PCPort_MessageBoxSyncScriptContext(
+    const PCPortMessageBoxState* msg,
+    u32 storyStep,
+    u32 cutsceneState) {
+    PCPortScriptMsgContext* ctx = PCPort_MessageBoxScriptContext();
+    if (ctx == NULL || ctx->magic != PCPORT_MSGBOX_CONTEXT_MAGIC) {
+        return;
+    }
+    ctx->pageIndex = msg != NULL ? (u32)msg->pageIndex : 0u;
+    ctx->visibleChars = msg != NULL ? (u32)msg->visibleChars : 0u;
+    ctx->active = (msg != NULL && msg->active) ? 1u : 0u;
+    ctx->storyStep = storyStep;
+    ctx->cutsceneState = cutsceneState;
 }
 
 static int PCPort_MessageBoxPageLen(const PCPortMessageBoxState* msg) {
@@ -13205,6 +13272,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
     PCPortFieldMotionMap motionMap;
     PCPortFieldNpcScriptPlacement npcPlacement;
     PCPortMessageBoxState msg;
+    PCPortScriptMsgContext* msgCtx = NULL;
     PeopleEntry* npc;
     char deps[8][64];
     char depSummary[256];
@@ -13224,6 +13292,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
     int sawOpen = 0;
     int sawAdvance = 0;
     int sawClose = 0;
+    int msgCtxLinked = 0;
     unsigned int npcDrawn = 0;
     int i;
 
@@ -13355,6 +13424,28 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
 
     PCPort_MessageBoxInit(&msg, pages,
                           (int)(sizeof(pages) / sizeof(pages[0])), 5);
+    PCPort_MessageBoxSeedScriptContext(&msg, npcIndex, pages[0]);
+    msgCtx = PCPort_MessageBoxScriptContext();
+    msgCtxLinked =
+        msgCtx == (PCPortScriptMsgContext*)(lbl_803A9768 +
+                                            PCPORT_MSGBOX_SLOT_BASE) &&
+        msgCtx->magic == PCPORT_MSGBOX_CONTEXT_MAGIC &&
+        msgCtx->speakerId == npcIndex &&
+        msgCtx->pageCount == (u32)msg.pageCount &&
+        msgCtx->active == 1u;
+    if (!msgCtxLinked) {
+        fprintf(stderr,
+                "[field-npc-open-smoke] failed: fn_80057270 msg context not linked ctx=%p magic=0x%08X speaker=%u pages=%u active=%u\n",
+                (void*)msgCtx,
+                msgCtx != NULL ? msgCtx->magic : 0u,
+                msgCtx != NULL ? msgCtx->speakerId : 0u,
+                msgCtx != NULL ? msgCtx->pageCount : 0u,
+                msgCtx != NULL ? msgCtx->active : 0u);
+        PCPort_FieldNpcModelRelease();
+        PCPort_PeopleHostClear();
+        return 0;
+    }
+
     for (frame = 0; frame < 48; ++frame) {
         u16 pressed = 0u;
         int beforeAdvance = msg.advanceCount;
@@ -13380,6 +13471,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
             storyStep = 1u;
             cutsceneState = 2u;
         }
+        PCPort_MessageBoxSyncScriptContext(&msg, storyStep, cutsceneState);
 
         PCPort_FieldAnimTick(1.0f);
         PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
@@ -13401,14 +13493,23 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
     }
 
     if (msg.active || !sawOpen || !sawAdvance || !sawClose ||
+        !msgCtxLinked || msgCtx == NULL ||
+        msgCtx->active != 0u ||
+        msgCtx->storyStep != 1u || msgCtx->cutsceneState != 2u ||
+        msgCtx->pageIndex != 1u ||
         storyStep != 1u || cutsceneState != 2u ||
         npcDrawn == 0u || renderedFrames == 0) {
         fprintf(stderr,
-                "[field-npc-open-smoke] failed: active=%d open=%d advance=%d close=%d story=%u cutscene=%u npcDrawn=%u frames=%d\n",
+                "[field-npc-open-smoke] failed: active=%d open=%d advance=%d close=%d msgCtx=%d ctxActive=%u ctxStory=%u ctxCutscene=%u ctxPage=%u story=%u cutscene=%u npcDrawn=%u frames=%d\n",
                 msg.active,
                 sawOpen,
                 sawAdvance,
                 sawClose,
+                msgCtxLinked,
+                msgCtx != NULL ? msgCtx->active : 0u,
+                msgCtx != NULL ? msgCtx->storyStep : 0u,
+                msgCtx != NULL ? msgCtx->cutsceneState : 0u,
+                msgCtx != NULL ? msgCtx->pageIndex : 0u,
                 storyStep,
                 cutsceneState,
                 npcDrawn,
@@ -13418,7 +13519,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
         return 0;
     }
 
-    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
+    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u fn_80057270=1 group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
            g_pcPeopleOpenSetupCount,
            (u32)PC_FLOOR_OUTSKIRT,
            npcIndex,
