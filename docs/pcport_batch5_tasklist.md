@@ -25,6 +25,7 @@ Verification:
 - [x] Triage `fn_801A0744` and `fn_801A0D94` with DeepSeek V4 Flash.
 - [ ] Triage remaining `hsd_jobj` TODO wrappers from `tools/decomp_work/_interesting_reordered.json`.
 - [x] Verify that new JObj work changes linked PC-port runtime behavior.
+- [x] Route direct `fn_801A0FBC` loader calls through the active PC host loader.
 
 Active lane:
 
@@ -41,11 +42,14 @@ Lane result:
 - `pcport\pcport_main.c` now exposes `--jobj-instance-smoke`, a headless smoke that constructs a root/canonical-child/instance-sibling descriptor graph, loads it through public `HSD_JObjLoadJoint`, requires `instance->child == root->child`, then runs graph-safe flag, animation, and removal walkers.
 - Follow-up: `build_pc\bodies\hsd_jobj\fn_801A0744.c` now replaces the generated neutral `FLIP_AS_STUB` body for direct PC-port calls. It builds a descriptor-to-live lookup by walking paired JObj/Joint trees, resolves RObj/DObj refs, and wires `JOBJ_INSTANCE` children to the canonical live JObj. This makes generated `build_pc\gen\hsd\hsd_jobj.c` contain a real typed `void fn_801A0744(HSD_JObj*, HSD_Joint*)` body.
 - `pcport\pcport_main.c` now exposes `--jobj-resolve-smoke`, a direct smoke that allocates a live root/canonical-child/instance-sibling JObj graph, calls `fn_801A0744(root, joint)` directly, and requires the instance child to resolve to the canonical live child before running graph-safe walkers.
-- Remaining direct-loader caveat: `fn_801A0FBC` still depends on the generated `fn_801A1098` load method path, whose generated body is still TODO. Direct `gs_material.c` callers of `fn_801A0FBC` should be routed to the active host `HSD_JObjLoadJoint` or given a safe loader overlay next.
+- Follow-up: `build_pc\bodies\hsd_jobj\fn_801A0FBC.c` now replaces the generated direct-loader wrapper with a small PC overlay that calls the active host `HSD_JObjLoadJoint`. This bypasses the generated `fn_801A1098` method path for direct `gs_material.c` callers while preserving the already-verified host ownership and shared-instance behavior.
+- `pcport\pcport_main.c` now exposes `--jobj-load-wrapper-smoke`, which loads a descriptor graph through `fn_801A0FBC` directly, requires instance-child resolution to the canonical live child, and then runs graph-safe flag, animation, and removal walkers.
+- Next gameplay-readiness action: move past HSD loader plumbing into a bounded new-game/field progression smoke that exercises player spawn, collision/update, script/event dispatch, and NPC interaction triggers.
 
 Verification:
 
-- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1713 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1711 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --jobj-load-wrapper-smoke` -> passed with `JObj fn_801A0FBC direct loader wrapper exercised`.
 - `build_pc\pcport_bootstrap.exe --jobj-instance-smoke` -> passed with `JObj instance child resolved to canonical live child`.
 - `build_pc\pcport_bootstrap.exe --jobj-resolve-smoke` -> passed with `JObj fn_801A0744 direct resolver exercised`.
 - `build_pc\pcport_bootstrap.exe --real-material-delta-smoke`
@@ -96,7 +100,7 @@ Lane result:
 - Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
 - Follow-up integrated in main: `pcport\hsd_host.c` now provides conservative `PCPort_MObjMakeTExp` / `PCPort_TObjMakeTExp` builders, `src\hsd\hsd_mobj.c` and `src\hsd\hsd_tobj.c` wire those into the PC-only class init path, and `build_pc\bodies\hsd_mobj\fn_801A7B24.c` corrects the generated MObj loader's local method-slot mapping.
 - Remaining MObj blocker: `fn_801A6B8C`'s full release path cannot be safely overlaid until archive-owned versus heap-owned MObj resource ownership is recovered; current live loads borrow material data from swizzled archive storage. `fn_801A6D08` already matches the class release/destroy dispatch shape.
-- Next JObj action: route or overlay direct `fn_801A0FBC` loading so `gs_material.c` callers use the active host loader instead of the still-TODO `fn_801A1098` method path.
+- Next JObj action complete: direct `fn_801A0FBC` loading now routes to the active host loader in the PC generated copy, so `gs_material.c` callers no longer depend on the still-TODO `fn_801A1098` method path.
 
 Verification:
 

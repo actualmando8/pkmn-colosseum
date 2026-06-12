@@ -62,6 +62,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
 extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
+extern HSD_JObj* fn_801A0FBC(HSD_Joint* joint);
 extern void fn_801A6E24(HSD_MObj* mobj);
 extern s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src);
 extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
@@ -1387,6 +1388,60 @@ static int RunJObjResolveSmoke(void)
     }
 
     printf("[pcport_bootstrap] JObj fn_801A0744 resolve smoke passed (shared child=%p)\n",
+           (void*)target);
+    return 1;
+}
+
+static int RunJObjLoadWrapperSmoke(void)
+{
+    HSD_Joint rootJoint;
+    HSD_Joint targetJoint;
+    HSD_Joint instanceJoint;
+    HSD_JObj* root;
+    HSD_JObj* target;
+    HSD_JObj* instance;
+    HSD_JObj* instanceChild;
+    int ok;
+
+    InitSmokeJoint(&rootJoint);
+    InitSmokeJoint(&targetJoint);
+    InitSmokeJoint(&instanceJoint);
+
+    rootJoint.child = &targetJoint;
+    rootJoint.next = &instanceJoint;
+    instanceJoint.flags = JOBJ_INSTANCE;
+    instanceJoint.child = &targetJoint;
+
+    root = fn_801A0FBC(&rootJoint);
+    if (root == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj load-wrapper smoke failed: load returned NULL\n");
+        return 0;
+    }
+
+    target = root->child;
+    instance = root->next;
+    instanceChild = instance != NULL ? instance->child : NULL;
+    ok = target != NULL &&
+         instance != NULL &&
+         instanceChild == target &&
+         target->parent == root;
+
+    HSD_JObjSetFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjClearFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjAnimAll(root);
+    HSD_JObjRemoveAll(root);
+
+    if (!ok) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj load-wrapper smoke failed: target=%p instance=%p instanceChild=%p\n",
+                (void*)target,
+                (void*)instance,
+                (void*)instanceChild);
+        return 0;
+    }
+
+    printf("[pcport_bootstrap] JObj fn_801A0FBC load-wrapper smoke passed (shared child=%p)\n",
            (void*)target);
     return 1;
 }
@@ -12828,6 +12883,7 @@ int main(int argc, char** argv) {
     int runRealContentParserSmoke;
     int runJObjInstanceSmoke;
     int runJObjResolveSmoke;
+    int runJObjLoadWrapperSmoke;
     int runRealSceneSlice4Smoke;
     int runRealTevSceneSlice3Smoke;
     int runRealTevSceneSlice2Smoke;
@@ -12864,6 +12920,7 @@ int main(int argc, char** argv) {
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
+    runJObjLoadWrapperSmoke = HasArg(argc, argv, "--jobj-load-wrapper-smoke");
     runRealContentParserSmoke = HasArg(argc, argv, "--real-content-parser-smoke");
     runRealSceneSlice4Smoke = HasArg(argc, argv, "--real-scene-slice-4-smoke");
     runRealTevSceneSlice3Smoke = HasArg(argc, argv, "--real-tev-scene-slice-3-smoke");
@@ -13041,7 +13098,14 @@ int main(int argc, char** argv) {
            trkBuffer, trkLen);
     printf("[pcport_bootstrap] Linked decomp TU OSStateFlags verified (appType=0x%08lX)\n",
            appType);
-    if (runJObjResolveSmoke) {
+    if (runJObjLoadWrapperSmoke) {
+        if (!RunJObjLoadWrapperSmoke()) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] JObj fn_801A0FBC direct loader wrapper exercised\n");
+    } else if (runJObjResolveSmoke) {
         if (!RunJObjResolveSmoke()) {
             exitCode = 1;
             goto cleanup;
