@@ -43,7 +43,7 @@ extern void* fn_800FE834(u32 type, u32 priority, void* param, void* func);
 extern void  fn_800E4014(void* model, u32 flag);
 
 /* Assert */
-extern void  fn_80196E10(const char* file, u32 line, const char* expr);
+extern void  __assert(const char* file, u32 line, const char* expr);
 
 /* Floor/resource */
 extern void* fn_800F9318(u32 group, u32 model);

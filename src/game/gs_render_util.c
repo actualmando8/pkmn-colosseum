@@ -77,7 +77,7 @@ extern void fn_801C027C(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
 extern f32 lbl_8047C9B0;     /* SDA float: fov scaling constant */
 extern void HSD_ForeachAnim(void* jobj, u32 a, u32 b, void (*cb)(void*), ...);
-extern void fn_80196E10(const char* file, u32 line, const char* msg);
+extern void __assert(const char* file, u32 line, const char* msg);
 extern f32 lbl_8047C990;     /* SDA float: animation step increment */
 extern char lbl_8047C9DC[] __attribute__((section(".sdata2")));  /* SDA2 string: assert filename */
 extern char lbl_8047C9E4[] __attribute__((section(".sdata2")));  /* SDA2 string: assert condition */
@@ -713,7 +713,7 @@ void fn_800D2248(void) {
         f32 x, z, w, h;
         jobj = *(void**)((u8*)obj + 0xc);
         if (jobj == 0) {
-            fn_80196E10(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
+            __assert(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
         }
         *(u32*)((u8*)jobj + 0x8) &= ~0x2u;
         fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
@@ -780,7 +780,7 @@ void fn_800D2248(void) {
         f32 x, z, w, h;
         jobj = *(void**)((u8*)obj + 0xc);
         if (jobj == 0) {
-            fn_80196E10(lbl_8047C9C4, 0x1a2, lbl_8047C9CC);
+            __assert(lbl_8047C9C4, 0x1a2, lbl_8047C9CC);
         }
         *(u32*)((u8*)jobj + 0x8) |= 0x80000002u;
         fn_800A2D64((u8*)obj + 0x94, (u8*)jobj + 0x54);
@@ -1059,7 +1059,7 @@ void fn_800D2AD4(u32 count) {
  * ================================================================== */
 void fn_800D2B44(void* obj) {
     if (!obj) {
-        fn_80196E10(lbl_8047C9DC, 0xab, lbl_8047C9E4);
+        __assert(lbl_8047C9DC, 0xab, lbl_8047C9E4);
     }
     lbl_8047AA78 = lbl_8047C990 + *(f32*)((u8*)obj + 0xc);
 }

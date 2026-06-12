@@ -202,7 +202,7 @@ extern void fn_8017B000();
 extern void fn_8017B1CC();
 extern void fn_801906A0();
 extern void fn_8019075C();
-extern void fn_80196E10();
+extern void __assert();
 extern void fn_801C40F0();
 extern void fn_801CB9D8();
 extern void fn_801CBA0C();
@@ -554,10 +554,10 @@ void fn_80059BDC(void) {
     prevCmd = fn_8007162C();
     floorId = 0;
     if (fn_800FF540() != 0) {
-        fn_80196E10((char*)(dat + 0x98), 0x267, (char*)(dat + 0xB0));
+        __assert((char*)(dat + 0x98), 0x267, (char*)(dat + 0xB0));
     }
     if (fn_801906A0(0x8AE) != 0) {
-        fn_80196E10((char*)(dat + 0x98), 0x268, (char*)(dat + 0xD0));
+        __assert((char*)(dat + 0x98), 0x268, (char*)(dat + 0xD0));
     }
     while (fn_8007162C() > 0) {
         s32 mode;
@@ -665,7 +665,7 @@ void fn_80059BDC(void) {
                 }
             }
             if (ok == 0) {
-                fn_80196E10((char*)(dat + 0x98), 0x30F, (char*)(dat + 0x10C));
+                __assert((char*)(dat + 0x98), 0x30F, (char*)(dat + 0x10C));
             }
             cmd = (s32)(WORKP + 0xC98C);
             st = fn_8006AFC4(WORKP);
@@ -733,7 +733,7 @@ void fn_80059BDC(void) {
                     fn_8006ADB4(0);
                 }
                 if (*(s32*)(WORKP + 0) != 0) {
-                    fn_80196E10((char*)(dat + 0x98), 0xAB, (char*)(dat + 0x158));
+                    __assert((char*)(dat + 0x98), 0xAB, (char*)(dat + 0x158));
                 }
                 fn_8019075C(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
                 fn_80069C0C(WORKP);
@@ -759,10 +759,10 @@ void fn_80059BDC(void) {
                     fn_8006ADB4(0);
                 }
                 if (*(s32*)(WORKP + 0xC) != 6) {
-                    fn_80196E10((char*)(dat + 0x98), 0x81, (char*)(dat + 0x184));
+                    __assert((char*)(dat + 0x98), 0x81, (char*)(dat + 0x184));
                 }
                 if (*(s32*)(WORKP + 0) != 1) {
-                    fn_80196E10((char*)(dat + 0x98), 0x82, (char*)(dat + 0x1B0));
+                    __assert((char*)(dat + 0x98), 0x82, (char*)(dat + 0x1B0));
                 }
                 fn_8019075C(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
                 fn_8019075C(0xB59, *(s32*)(WORKP + 0x14));
@@ -867,7 +867,7 @@ void fn_80059BDC(void) {
             break;
         }
         case 0xEB:
-            fn_80196E10((char*)(dat + 0x98), 0x3C4, (char*)&lbl_8047BF1C);
+            __assert((char*)(dat + 0x98), 0x3C4, (char*)&lbl_8047BF1C);
             break;
         case 0xB0:
             switch (fn_80071344()) {
@@ -903,7 +903,7 @@ void fn_80059BDC(void) {
                 fn_80102868(0xDA, 0, -0x28);
                 m = fn_80076054((u8*)prevCmd, fn_8006B420());
                 if ((u16)m == 0) {
-                    fn_80196E10((char*)(dat + 0x98), 0x1BB, (char*)(dat + 0x1E0));
+                    __assert((char*)(dat + 0x98), 0x1BB, (char*)(dat + 0x1E0));
                 }
                 fn_80166A28(0x26);
                 fn_80106D3C(7, (u16)m, 1, 0);
@@ -1104,10 +1104,10 @@ void fn_80059BDC(void) {
             u8* wm;
             cmd = (s32)fn_8006AFC4(WORKP);
             if (*(s32*)(WORKP + 4) == 2) {
-                fn_80196E10((char*)(dat + 0x98), 0x4B9, (char*)(dat + 0x1F4));
+                __assert((char*)(dat + 0x98), 0x4B9, (char*)(dat + 0x1F4));
             }
             if ((u32)cmd == 0) {
-                fn_80196E10((char*)(dat + 0x98), 0x4BA, (char*)&lbl_8047BF20);
+                __assert((char*)(dat + 0x98), 0x4BA, (char*)&lbl_8047BF20);
             }
             wm = fn_8006B420();
             if ((u8)fn_80102620(0xDA)) {
@@ -1249,10 +1249,10 @@ void fn_80059BDC(void) {
                         fn_8006ADB4(0);
                     }
                     if (*(s32*)(WORKP + 0xC) != 6) {
-                        fn_80196E10((char*)(dat + 0x98), 0x81, (char*)(dat + 0x184));
+                        __assert((char*)(dat + 0x98), 0x81, (char*)(dat + 0x184));
                     }
                     if (*(s32*)(WORKP + 0) != 1) {
-                        fn_80196E10((char*)(dat + 0x98), 0x82, (char*)(dat + 0x1B0));
+                        __assert((char*)(dat + 0x98), 0x82, (char*)(dat + 0x1B0));
                     }
                     fn_8019075C(0x8AE, (buf[1] == 0) ? 1 : 2);
                     fn_8019075C(0xB59, *(s32*)(WORKP + 0x14));
@@ -1281,7 +1281,7 @@ void fn_80059BDC(void) {
                         fn_8006ADB4(0);
                     }
                     if (*(s32*)(WORKP + 0) != 0) {
-                        fn_80196E10((char*)(dat + 0x98), 0xAB, (char*)(dat + 0x158));
+                        __assert((char*)(dat + 0x98), 0xAB, (char*)(dat + 0x158));
                     }
                     fn_8019075C(0x8AE, (buf[1] == 0) ? 1 : 2);
                     fn_80069C0C(WORKP);
@@ -1428,7 +1428,7 @@ void fn_80059BDC(void) {
             break;
         }
         case 0xB4:
-            fn_80196E10((char*)(dat + 0x98), 0x5F5, (char*)&lbl_8047BF1C);
+            __assert((char*)(dat + 0x98), 0x5F5, (char*)&lbl_8047BF1C);
             break;
         case 0xBF: {
             s32 v = fn_80071344();
@@ -1763,7 +1763,7 @@ void fn_80059BDC(void) {
                 coins = fn_8006ADEC();
                 cmd = (s32)fn_8006AFC4(WORKP);
                 if ((u32)cmd == 0) {
-                    fn_80196E10((char*)(dat + 0x98), 0x72C, (char*)&lbl_8047BF24);
+                    __assert((char*)(dat + 0x98), 0x72C, (char*)&lbl_8047BF24);
                 }
                 if (coins == 0) {
                     goto quit105;
@@ -1945,7 +1945,7 @@ void fn_8005CCD0(void) {
     extern void fn_80102510();
     extern void fn_80129280();
     extern void fn_8019075C();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801C40F0();
     extern void fn_801CB9D8();
     extern void fn_8025CD64();
@@ -1986,7 +1986,7 @@ void fn_8005CCD0(void) {
         r4 = 0x252;
         r3 = (u32)&lbl_802678D8;
         r5 = (u32)&lbl_8047BF28;
-        fn_80196E10();
+        __assert();
     }
     r3 = r31;
     fn_800E24B0();
@@ -2017,7 +2017,7 @@ void fn_8005CD88(void) {
     extern void fn_80176E0C();
     extern void fn_80177A44();
     extern void fn_8019075C();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801CBA0C();
     extern void fn_8025CDB8();
     u8 sp[0x10];
@@ -2044,7 +2044,7 @@ void fn_8005CD88(void) {
         r3 = r31 + 0x98;
         r5 = r31 + 0x21c;
         r4 = 0x20f;
-        fn_80196E10();
+        __assert();
     }
     r3 = (0x1 << 16);
     r4 = 0x20;
@@ -2056,7 +2056,7 @@ void fn_8005CD88(void) {
         r3 = r31 + 0x98;
         r4 = 0x212;
         r5 = (u32)&lbl_8047BF28;
-        fn_80196E10();
+        __assert();
     }
     r3 = r30;
     fn_800E27B0();
@@ -2065,7 +2065,7 @@ void fn_8005CD88(void) {
         r3 = r31 + 0x98;
         r5 = r31 + 0x22c;
         r4 = 0x213;
-        fn_80196E10();
+        __assert();
     }
     fn_80113F48();
     r4 = (0xffe << 16);
@@ -2141,7 +2141,7 @@ void fn_8005CF2C(void) {
     extern void fn_80102868();
     extern void fn_80106D3C();
     extern void fn_80166A28();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -2196,7 +2196,7 @@ void fn_8005CF2C(void) {
         r3 = (u32)&lbl_802678D8;
         r4 = 0x1bb;
         r5 = (u32)&lbl_80267A20;
-        fn_80196E10();
+        __assert();
     }
     r3 = 0x26;
     fn_80166A28();

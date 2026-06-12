@@ -527,7 +527,7 @@ void fn_800792D8(void) {
     extern void fn_80079EF4();
     extern void fn_80176E0C();
     extern void fn_80177A44();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801C40F0();
     extern void fn_801C41C8();
     extern void fn_801CB9D8();
@@ -825,7 +825,7 @@ L_8007962C:
             r4 = 0x460;
             r3 = (u32)&lbl_80268AE0;
             r5 = (u32)&lbl_8047C10C;
-            fn_80196E10();
+            __assert();
         }
         tmp = tmp | 0x2;
         *(u32*)(sp + 0x20) = tmp;

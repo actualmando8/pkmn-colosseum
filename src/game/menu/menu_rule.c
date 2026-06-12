@@ -19,7 +19,7 @@ extern void fn_80123FBC();
 extern void fn_8012640C();
 extern void fn_8012AC08();
 extern void fn_80142984();
-extern void fn_80196E10();
+extern void __assert();
 
 /* ===== SDA globals ===== */
 extern u8 lbl_80478928;
@@ -120,7 +120,7 @@ void fn_800767B8(void) {
                             r3 = (u32)&lbl_80268A48;
                             r4 = 0xfb;
                             r5 = (u32)&lbl_80268A58;
-                            ((void(*)(void))fn_80196E10)();
+                            ((void(*)(void))__assert)();
                             r0 = 0x0;
                             break;
                         }
@@ -847,7 +847,7 @@ void fn_800772AC(void) {
                 r3 = (u32)&lbl_80268A48;
                 r4 = 0xfb;
                 r5 = (u32)&lbl_80268A58;
-                ((void(*)(void))fn_80196E10)();
+                ((void(*)(void))__assert)();
                 tmp = 0x0;
                 break;
             }
@@ -991,7 +991,7 @@ void fn_800774D4(void) {
         r3 = (u32)&lbl_80268A48;
         r4 = 0xfb;
         r5 = (u32)&lbl_80268A58;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
         r3 = 0x0;
         return;
     }
@@ -1091,7 +1091,7 @@ void fn_800774D4(void) {
     r3 = (u32)&lbl_80268A48;
     r4 = 0xfb;
     r5 = (u32)&lbl_80268A58;
-    ((void(*)(void))fn_80196E10)();
+    ((void(*)(void))__assert)();
     r3 = 0x0;
 
     return;
@@ -1215,7 +1215,7 @@ void fn_800776E4(void) {
                                 r3 = (u32)&lbl_80268A48;
                                 r4 = 0xfb;
                                 r5 = (u32)&lbl_80268A58;
-                                ((void(*)(void))fn_80196E10)();
+                                ((void(*)(void))__assert)();
                                 tmp = 0x0;
                                 break;
                             }

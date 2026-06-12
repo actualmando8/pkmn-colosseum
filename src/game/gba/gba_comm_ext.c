@@ -28,7 +28,7 @@ extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
 extern void fn_800F0308();
-extern void fn_80196E10();
+extern void __assert();
 extern u32 strlen();
 extern void* memset(void* dst, int val, u32 size);
 
@@ -99,7 +99,7 @@ void fn_80092C90(void) {
         r4 = 0x1dd;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r28;
     ((void(*)(void))fn_800E27B0)();
@@ -217,7 +217,7 @@ void fn_80092E38(void) {
         r4 = 0x1dd;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r29;
     ((void(*)(void))fn_800E27B0)();
@@ -332,7 +332,7 @@ void fn_80092FC8(void) {
         r4 = 0x1dd;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r28;
     ((void(*)(void))fn_800E27B0)();
@@ -446,7 +446,7 @@ void fn_80093160(void) {
         r4 = 0x1dd;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r29;
     ((void(*)(void))fn_800E27B0)();
@@ -561,7 +561,7 @@ void fn_800932F0(void) {
         r4 = 0x1dd;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r28;
     ((void(*)(void))fn_800E27B0)();
@@ -856,7 +856,7 @@ void fn_80093698(void) {
         r4 = 0x1e6;
         r3 = (u32)&lbl_8026F5A8;
         r5 = (u32)&lbl_8047C1E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r29;
     ((void(*)(void))fn_800E24B0)();

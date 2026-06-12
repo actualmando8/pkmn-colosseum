@@ -12,6 +12,6 @@
 void _HSD_MemSetCallbacks(void) {
     /* uses lbl_80274E10 */
     if (0 /* field check */) { return; }
-    fn_80196E10();
+    __assert();
 }
 

@@ -109,7 +109,7 @@ void menuCB_Common_ValidateStackNotEmpty(void) {
     if (valid == 0) {
         /* Assert: "0 < _CBC.m_nMenuStackDepth" */
         /* File: "menuCB_Common.c" */
-        fn_80196E10("menuCB_Common.c", 0x3C,
+        __assert("menuCB_Common.c", 0x3C,
                      "0 < _CBC.m_nMenuStackDepth");
     }
 }
@@ -129,7 +129,7 @@ void menuCB_Common_ValidateMenuID(void) {
     }
 
     if (valid == 0) {
-        fn_80196E10("menuCB_Common.c", 0x48,
+        __assert("menuCB_Common.c", 0x48,
                      "0 <= _CBC.m_eCurrentMenuID && _CBC.m_eCurrentMenuID < sMenuCallbackCount");
     }
 }
@@ -255,7 +255,7 @@ void _menuPush(s32 eMenuID) {
     /* Validate stack has room */
     if (_CBC.m_nMenuStackDepth >= MENU_STACK_MAX) {
         /* Assert: "_menuPush(int eMenuID):stack over." */
-        fn_80196E10("menuCB_Common.c", 0x6E,
+        __assert("menuCB_Common.c", 0x6E,
                      "_menuPush(int eMenuID):stack over.");
     }
 
@@ -315,7 +315,7 @@ void _menuPop(void) {
     /* Validate stack is not empty */
     if (_CBC.m_nMenuStackDepth <= 0) {
         /* Assert: "_menuPop():stack under." */
-        fn_80196E10("menuCB_Common.c", 0x85,
+        __assert("menuCB_Common.c", 0x85,
                      "_menuPop():stack under.");
     }
 
@@ -368,14 +368,14 @@ void menuCB_Common_ValidateTransition(void) {
     }
 
     if (valid == 0) {
-        fn_80196E10("menuCB_Common.c", 0x9A,
+        __assert("menuCB_Common.c", 0x9A,
                      "_CBC.m_nTransitionState == 0");
     }
 
     /* Additional validation: current menu should match top of stack */
     if (_CBC.m_nMenuStackDepth > 0) {
         if (_CBC.m_eCurrentMenuID != _CBC.m_aMenuStack[_CBC.m_nMenuStackDepth - 1].eMenuID) {
-            fn_80196E10("menuCB_Common.c", 0x9F,
+            __assert("menuCB_Common.c", 0x9F,
                          "_CBC.m_eCurrentMenuID == _CBC.m_aMenuStack[_CBC.m_nMenuStackDepth-1].eMenuID");
         }
     }

@@ -296,7 +296,7 @@ void fn_801A6C34(void* obj) {
 #endif
 
 /* 0x801A6CA4 | 0x64 */
-extern void fn_80196E10(void* file, s32 line, void* msg);
+extern void __assert(void* file, s32 line, void* msg);
 extern u32 lbl_8047DC18;
 extern u32 lbl_8047DC20;
 #if 0
@@ -308,7 +308,7 @@ void fn_801A6CA4(void* obj) {
     void* node;
 
     if (obj == NULL) {
-        fn_80196E10(&lbl_8047DC18, 0x495, &lbl_8047DC20);
+        __assert(&lbl_8047DC18, 0x495, &lbl_8047DC20);
     }
     node = (void*)lbl_8047B2DC;
     while (node != NULL) {
@@ -474,7 +474,7 @@ asm void fn_801A6F78(void) {
 #else
 void fn_801A6F78(void* obj, void* a, void* b) {
     if (*(u32*)((u8*)obj + 0x18) == 0) {
-        fn_80196E10(&lbl_8047DC18, 0x31e, lbl_80274E5C);
+        __assert(&lbl_8047DC18, 0x31e, lbl_80274E5C);
     }
     fn_801B45A4(*(void**)((u8*)obj + 0x18), *(void**)((u8*)obj + 0x1c));
     fn_801BD8D0(a, b);
@@ -531,13 +531,13 @@ HSD_MObj* fn_801A7B24(void* desc) {
         mobj = fn_80193828((HSD_ClassInfo*)lbl_8036CB30);
     }
     if (mobj == NULL) {
-        fn_80196E10(&lbl_8047DC18, 0x44a, &lbl_8047DC30);
+        __assert(&lbl_8047DC18, 0x44a, &lbl_8047DC30);
     }
     goto call_setup;
 found:
     mobj = fn_80193828((HSD_ClassInfo*)mobj);
     if (mobj == NULL) {
-        fn_80196E10(&lbl_8047DC18, 0x175, &lbl_8047DC30);
+        __assert(&lbl_8047DC18, 0x175, &lbl_8047DC30);
     }
 call_setup:
     HSD_MOBJ_METHOD(mobj)->setup(mobj, (u32)desc);
@@ -596,7 +596,7 @@ s32 fn_801A7D58(void* arg0, void* arg1) {
     *(u32*)((u8*)arg0 + 8) = fn_801BE4CC(*(u32*)((u8*)arg1 + 8));
     mat = (HSD_Material*)fn_80193B10(0x14);
     if (mat == NULL) {
-        fn_80196E10(&lbl_8047DC18, 0x466, &lbl_8047DC28);
+        __assert(&lbl_8047DC18, 0x466, &lbl_8047DC28);
     }
     memset(mat, 0, 0x14);
     mat->alpha = lbl_8047DC2C;

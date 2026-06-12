@@ -12,7 +12,7 @@
 extern void fn_8008AE18();
 extern void fn_8011F5C8();
 extern void fn_80123FBC();
-extern void fn_80196E10();
+extern void __assert();
 extern void fn_80265F14();
 extern void* memset(void* dst, int val, u32 size);
 
@@ -127,7 +127,7 @@ void fn_80089048(void) {
         r3 = (u32)&lbl_8026F568;
         r4 = 0xb7;
         r5 = (u32)&lbl_8026F574;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r10 = r29;
     r3 = *(u16*)((u8*)r29 + 0xE);
@@ -328,7 +328,7 @@ void fn_80089380(void) {
         r3 = (u32)&lbl_8026F568;
         r4 = 0x6f;
         r5 = (u32)&lbl_8026F574;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r6 = r30;
     r7 = 0x0;

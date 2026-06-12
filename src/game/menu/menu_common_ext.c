@@ -32,7 +32,7 @@ extern void fn_801046B8();
 extern void fn_80104704();
 extern void fn_80113828();
 extern void fn_80129280();
-extern void fn_80196E10();
+extern void __assert();
 extern void fn_8025F3F4();
 extern void fn_8025F584();
 extern void fn_8025F648();
@@ -101,7 +101,7 @@ void fn_8007109C(void) {
         r4 = 0xde;
         r3 = (u32)&lbl_80268708;
         r5 = (u32)&lbl_8047C090;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r0 = r31 & 0xFFFF;
     if (r0 != 0x0) {
@@ -135,7 +135,7 @@ void fn_80071104(void) {
             r4 = 0xd5;
             r3 = (u32)&lbl_80268708;
             r5 = (u32)&lbl_8047C090;
-            ((void(*)(void))fn_80196E10)();
+            ((void(*)(void))__assert)();
         }
         r3 = 0x0;
     }
@@ -337,7 +337,7 @@ void fn_80071398(void) {
             r3 = (u32)&lbl_80268708;
             r4 = 0x5c;
             r5 = (u32)&lbl_80268718;
-            ((void(*)(void))fn_80196E10)();
+            ((void(*)(void))__assert)();
         }
         r3 = *(u32*)((u8*)r31 + 0x40);
         *(u32*)((u8*)r31 + 0x40) = tmp;
@@ -413,7 +413,7 @@ void fn_800714C8(void) {
             r3 = (u32)&lbl_80268708;
             r4 = 0x5c;
             r5 = (u32)&lbl_80268718;
-            ((void(*)(void))fn_80196E10)();
+            ((void(*)(void))__assert)();
         }
         r4 = *(u32*)((u8*)r31 + 0x40);
         r3 = (u32)&lbl_803B6D88;
@@ -442,7 +442,7 @@ void fn_800715BC(void) {
         r3 = (u32)&lbl_80268708;
         r4 = 0x41;
         r5 = (u32)&lbl_80268750;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     } else {
 
         tmp = r4 + 0x1;

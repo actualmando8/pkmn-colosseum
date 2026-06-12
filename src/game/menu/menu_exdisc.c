@@ -40,7 +40,7 @@ extern void fn_80132A38();
 extern void fn_80142984();
 extern void fn_80165668();
 extern void fn_80166A28();
-extern void fn_80196E10();
+extern void __assert();
 extern void fn_801C40F0();
 extern void fn_801C41C8();
 extern void fn_801CB708();
@@ -521,7 +521,7 @@ void fn_80077ED4(void) {
         r4 = 0x42e;
         r3 = (u32)&lbl_80268AB8;
         r5 = (u32)&lbl_8047C0E8;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r4 = (u32)&lbl_803F6E40;
     r3 = 0x1;

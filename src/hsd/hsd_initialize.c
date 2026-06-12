@@ -202,7 +202,7 @@ void fn_8019C7E0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void* file, s32 line, void* msg);
+extern void __assert(void* file, s32 line, void* msg);
 extern void fn_8009AC50(void* xfb);
 extern s32 lbl_8047B288;
 extern u8 lbl_802749E4[];
@@ -216,7 +216,7 @@ asm void _HSD_MemGetRemainDefaultCB(void) {
 #pragma optimization_level 4
 void _HSD_MemGetRemainDefaultCB(void) {
     if (lbl_8047B288 != 0) {
-        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+        __assert(lbl_802749E4, 0x1b6, lbl_80274A28);
     }
     fn_8009AC50((void*)lbl_80478C70);
 }
@@ -238,7 +238,7 @@ asm void _HSD_MemFreeDefaultCB(void) {
 #pragma optimization_level 4
 void _HSD_MemFreeDefaultCB(void* param) {
     if (lbl_8047B288 != 0) {
-        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+        __assert(lbl_802749E4, 0x1b6, lbl_80274A28);
     }
     fn_8009AAD4((void*)lbl_80478C70, param);
 }
@@ -266,11 +266,11 @@ void* _HSD_MemAllocDefaultCB(void* buffer) {
         return NULL;
     }
     if (lbl_8047B288 != 0) {
-        fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
+        __assert(lbl_802749E4, 0x1b6, lbl_80274A28);
     }
     result = fn_8009A9D8((void*)lbl_80478C70, buffer);
     if (result == NULL) {
-        fn_80196E10(lbl_802749E4, 0x17a, &lbl_8047DB0C);
+        __assert(lbl_802749E4, 0x17a, &lbl_8047DB0C);
     }
     return result;
 }

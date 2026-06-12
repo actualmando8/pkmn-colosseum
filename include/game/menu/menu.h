@@ -544,10 +544,10 @@ s32 menuCardE_Matrix_Main(MenuCardEMatrixWork* cem);
  * ========================================================================= */
 
 /**
- * fn_80196E10: HSD assertion failure handler.
+ * __assert: HSD assertion failure handler.
  * Prints file, line, and condition string then halts/crashes.
  * This is the "assertion \"%s\" failed" handler from HSD.
  */
-extern void fn_80196E10(const char* file, s32 line, const char* expr);
+extern void __assert(const char* file, s32 line, const char* expr);
 
 #endif /* GAME_MENU_H */

@@ -125,7 +125,7 @@ void psinterpret_RunAll(u32 linkMask) {
                 while (search != NULL && search->next != next) {
                     if (prevCtx == NULL) {
                         /* Assert failure */
-                        fn_80196E10("psinterpret.c", 0x810, NULL);
+                        __assert("psinterpret.c", 0x810, NULL);
                     }
                     search = search->next;
                 }

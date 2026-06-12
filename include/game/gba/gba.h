@@ -313,7 +313,7 @@ void gba_LinkInit(void);
 /* fn_8009FABC */ extern void  SI_TriggerCallback(void* callbackData);
 
 /* Assert function */
-/* fn_80196E10 */ extern void  GS_Assert(const char* file, u32 line, const char* msg);
+/* __assert */ extern void  GS_Assert(const char* file, u32 line, const char* msg);
 
 /* Pokemon validation */
 /* fn_80123FBC */ extern u8    pokemon_IsValid(void* pSaveCtx);

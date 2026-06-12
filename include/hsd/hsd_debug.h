@@ -10,7 +10,7 @@
 #include "dolphin/types.h"
 
 /* Assertion function - prints file/line/expression and halts */
-void __assert(char* file, u32 line, char* expr);
+void __assert(const char* file, u32 line, const char* expr);
 
 /**
  * HSD_ASSERT - runtime assertion macro.

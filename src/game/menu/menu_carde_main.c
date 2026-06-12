@@ -20,7 +20,7 @@ extern void fn_800E2C04();
 extern void fn_800F9D24();
 extern void fn_800F9E70();
 extern void fn_801046C8();
-extern void fn_80196E10();
+extern void __assert();
 extern void* memset(void* dst, int val, u32 size);
 
 /* ===== SDA globals ===== */
@@ -125,7 +125,7 @@ void fn_8007FDBC(void) {
         r3 = r31 + 0x1f0;
         r4 = 0x1a2;
         r5 = (u32)&lbl_8047C140;
-        ((void(*)(void))fn_80196E10)();
+        ((void(*)(void))__assert)();
     }
     r3 = r28;
     ((void(*)(void))fn_800E27B0)();
@@ -155,7 +155,7 @@ void fn_8007FDBC(void) {
             r3 = r31 + 0x1f0;
             r4 = 0x1ab;
             r5 = (u32)&lbl_8047C140;
-            ((void(*)(void))fn_80196E10)();
+            ((void(*)(void))__assert)();
         }
         r3 = r26;
         ((void(*)(void))fn_800E24B0)();
@@ -180,7 +180,7 @@ void fn_8007FDBC(void) {
             r3 = r31 + 0x1f0;
             r4 = 0x1a2;
             r5 = (u32)&lbl_8047C140;
-            ((void(*)(void))fn_80196E10)();
+            ((void(*)(void))__assert)();
         }
         r3 = r27;
         ((void(*)(void))fn_800E27B0)();
@@ -2756,7 +2756,7 @@ void fn_8008102C(void) {
     r3 = r4 + 0x63e8;
     r4 = 0x8c5;
     r5 = (u32)&lbl_8047C178;
-    ((void(*)(void))fn_80196E10)();
+    ((void(*)(void))__assert)();
     r3 = 0x0;
     return;
 

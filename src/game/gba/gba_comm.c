@@ -82,8 +82,8 @@ extern void fn_8009F890(void* ctx);       /* SI_EndTransfer */
 extern void fn_800A257C(void* thread, u32 prio); /* SI_SetPriority */
 extern void fn_8009FABC(void* cbData);    /* SI_TriggerCallback */
 
-/* Assert function (fn_80196E10) */
-extern void fn_80196E10(const char* file, u32 line, const char* msg);
+/* Assert function (__assert) */
+extern void __assert(const char* file, u32 line, const char* msg);
 
 /* Pokemon conversion (pokeconv.c) */
 extern s32 fn_80089048(void* pDst, void* pSrc, void* pSaveCtx);
@@ -148,7 +148,7 @@ s32 gbaCommunication_Transfer1(s32 channel, void* pSrc, void* pSaveCtx) {
 
     /* Assert: allocation succeeded (line 0x1DD) */
     if (((u32)workHandle & 0xFFFF) == 0) {
-        fn_80196E10(sFile, 0x1DD, lbl_8047C1E8);
+        __assert(sFile, 0x1DD, lbl_8047C1E8);
     }
 
     /* Get usable pointer from handle */
@@ -269,7 +269,7 @@ s32 gbaCommunication_Transfer2(s32 channel, void* pDst) {
         workHandle = fn_800E2C04(GBA_WORK_SIZE, 0x20);
 
         if (((u32)workHandle & 0xFFFF) == 0) {
-            fn_80196E10(sFile, 0x1DD, lbl_8047C1E8);
+            __assert(sFile, 0x1DD, lbl_8047C1E8);
         }
 
         work = (u8*)fn_800E27B0(workHandle);

@@ -607,7 +607,7 @@ void fn_80193B10(HSD_ClassInfo* info) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(void);
+extern void __assert(void);
 #if 1
 asm void fn_80193B30(void) {
 #include "src/hsd/hsd_class_fn_80193B30.inc"

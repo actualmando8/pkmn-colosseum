@@ -203,7 +203,7 @@ void fn_8019B948(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_80193828(void);
-extern void fn_80196E10(const char* file, s32 line, const char* msg);
+extern void __assert(const char* file, s32 line, const char* msg);
 extern void fn_800BD768(void);
 extern void* memset(void* dst, int val, u32 n);
 extern u8 lbl_8047DA74[];
@@ -398,7 +398,7 @@ void HSD_IDInsertToTable(u32* table, u32 key, u32 value) {
     } else {
         newnode = (u32**)fn_801AA4CC(lbl_8046553C);
         if (newnode == NULL) {
-            fn_80196E10((char*)lbl_8047DAA0, 0x43, (char*)lbl_8047DAA8);
+            __assert((char*)lbl_8047DAA0, 0x43, (char*)lbl_8047DAA8);
         }
         memset(newnode, 0, 0xc);
         newnode[1] = (u32*)key;

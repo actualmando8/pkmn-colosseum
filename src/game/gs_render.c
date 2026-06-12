@@ -3161,7 +3161,7 @@ extern u32 lbl_8047AAD4;
 /* fn_800DAF60 @ 98.53: for(count=lbl;count!=0;count--)+goto gives the
  * target's mtctr/bdnz free-slot scan. Residual = entry `ble` vs `beq`
  * (target's signed `> 0` guard conflicts with the unsigned bdnz the same
- * counter needs — (s32)count>0 regresses) + the loop-body branch fusion
+ * counter needs ? (s32)count>0 regresses) + the loop-body branch fusion
  * (target `bne tail; b found` vs CW's fused `beq found`). Both
  * compiler-internal; not jointly C-controllable. */
 #if 0
@@ -3896,7 +3896,7 @@ void fn_800DD0B8(u32 count) {
     }
 }
 #endif
-extern void fn_80196E10(u8*, u32, u8*);
+extern void __assert(u8*, u32, u8*);
 extern u8 lbl_8047CA90;
 extern u8 lbl_8047CA98;
 extern f32 lbl_8047CA70;
@@ -3907,7 +3907,7 @@ asm void fn_800DD128(u8* obj) {
 }
 #else
 void fn_800DD128(u8* obj) {
-    if (!obj) fn_80196E10(&lbl_8047CA90, 0xab, &lbl_8047CA98);
+    if (!obj) __assert(&lbl_8047CA90, 0xab, &lbl_8047CA98);
     lbl_8047AAF4 = lbl_8047CA70 + *(f32*)(obj + 0xc);
 }
 #endif

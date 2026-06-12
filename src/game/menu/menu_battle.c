@@ -158,7 +158,7 @@ void menuCB_Battle_ValidateEncounter(void) {
 
     if (valid == 0) {
         /* Assert: "FIGHT_ENCOUNTER_DATA_null != null" */
-        fn_80196E10("menuCB_Battle.c", 0xD4,
+        __assert("menuCB_Battle.c", 0xD4,
                      "FIGHT_ENCOUNTER_DATA_null != null");
     }
 
@@ -171,7 +171,7 @@ void menuCB_Battle_ValidateEncounter(void) {
 
         if (valid == 0) {
             /* Assert: "0 <= eRuleType && _LENGTH(_CB.m_aRule) > eRuleType" */
-            fn_80196E10("menuCB_Battle.c", 0xE0,
+            __assert("menuCB_Battle.c", 0xE0,
                          "0 <= eRuleType && _LENGTH(_CB.m_aRule) > eRuleType");
         }
     }

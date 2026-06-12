@@ -22,7 +22,7 @@ extern void* fn_801A6928(s32 size);          /* HSD_MemAlloc */
 extern void  fn_801A6960(void* ptr);          /* HSD_MemFree  */
 /* fn_801A6990: virtual dispatch, returns s32 result via r3 */
 extern s32   fn_801A6990(void* obj);
-extern void  fn_80196E10(const char* file, u32 line, const char* msg);
+extern void  __assert(const char* file, u32 line, const char* msg);
 extern void  HSD_Panic(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
@@ -153,7 +153,7 @@ void fn_801AA35C(void* list, u32 size, u32 alignment)
     void* p = list;
 
     if (p == NULL) {
-        fn_80196E10((const char*)lbl_80274E90, 0x1ae, lbl_8047DC98);
+        __assert((const char*)lbl_80274E90, 0x1ae, lbl_8047DC98);
     }
 
     if (lbl_8047B2E0 != NULL) {
@@ -175,12 +175,12 @@ void fn_801AA35C(void* list, u32 size, u32 alignment)
     *(s32*)((u8*)p + 0x1c) = -1;
 
     if (size > 0x20) {
-        fn_80196E10((const char*)lbl_80274E90, 0x1b9,
+        __assert((const char*)lbl_80274E90, 0x1b9,
                     (const char*)lbl_80274E90 + 0xc);
     }
     fn_801BF138(size);
     if (fn_801BF138(size) != 1) {
-        fn_80196E10((const char*)lbl_80274E90, 0x1ba,
+        __assert((const char*)lbl_80274E90, 0x1ba,
                     (const char*)lbl_80274E90 + 0x18);
     }
 
@@ -254,7 +254,7 @@ void fn_801AA5AC(s32 idx)
 {
     s32 i = idx;
     if (i >= 0x20) {
-        fn_80196E10(lbl_8047DCA8, 0xa4, lbl_8047DCB0);
+        __assert(lbl_8047DCA8, 0xa4, lbl_8047DCB0);
     }
     {
         u32* entry = (u32*)((u8*)lbl_8036CC40 + (u32)i * 4);
@@ -590,7 +590,7 @@ void* fn_801AD288(void* desc)
         if (info != NULL) {
             p = fn_80193828(info);
             if (p == NULL) {
-                fn_80196E10(lbl_8047DCB8, 0x2a9, lbl_8047DD10);
+                __assert(lbl_8047DCB8, 0x2a9, lbl_8047DD10);
             }
             goto load;
         }
@@ -601,7 +601,7 @@ void* fn_801AD288(void* desc)
     } else {
         p = fn_80193828(lbl_8036CCD0);
         if (p == NULL) {
-            fn_80196E10(lbl_8047DCB8, 0x247, lbl_8047DD10);
+            __assert(lbl_8047DCB8, 0x247, lbl_8047DD10);
         }
     }
 

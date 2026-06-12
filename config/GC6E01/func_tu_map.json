@@ -38261,7 +38261,7 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80196E10": {
+ "__assert": {
   "addr": "0x80196E10",
   "section": ".text",
   "size": "0xA4",

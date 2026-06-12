@@ -14,7 +14,7 @@
 
 /* ===== External functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);
-extern void  fn_80196E10(const char* file, u32 line, const char* expr);
+extern void  __assert(const char* file, u32 line, const char* expr);
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 size);
 

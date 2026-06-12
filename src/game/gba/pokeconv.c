@@ -46,8 +46,8 @@
 
 extern void* memset(void* dst, int val, u32 size);
 
-/* Assert function (fn_80196E10) */
-extern void fn_80196E10(const char* file, u32 line, const char* msg);
+/* Assert function (__assert) */
+extern void __assert(const char* file, u32 line, const char* msg);
 
 /* Pokemon validation (fn_80123FBC) */
 extern u8  fn_80123FBC(void* pSaveCtx);
@@ -177,7 +177,7 @@ s32 pokeconv_ConvertPokemon(void* pDst, void* pSrc, void* pSaveCtx) {
         }
         if (valid == 0) {
             /* Assert at line 0xB7 in pokeconv.c */
-            fn_80196E10(sFile, 0xB7, sAssertItemCount);
+            __assert(sFile, 0xB7, sAssertItemCount);
         }
     }
 
@@ -321,7 +321,7 @@ void pokeconv_ValidateItems(void* pDst, void* pSrc) {
     }
     if (validCount == 0) {
         /* Assert at line 0x6F in pokeconv.c */
-        fn_80196E10(sFile, 0x6F, sAssertItemCount);
+        __assert(sFile, 0x6F, sAssertItemCount);
     }
 
     /* Convert remaining data items */

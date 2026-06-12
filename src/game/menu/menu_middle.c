@@ -263,7 +263,7 @@ void fn_80069C0C(void) {
     extern void fn_8012AA64();
     extern void fn_8012AC08();
     extern void fn_8012AC64();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801F9CBC();
     extern void fn_8020DEF0();
     extern void fn_8020DF00();
@@ -315,7 +315,7 @@ void fn_80069C0C(void) {
         r3 = r29 + 0x7c;
         r5 = r29 + 0x8c;
         r4 = 0xf8;
-        fn_80196E10();
+        __assert();
     }
     r3 = r25;
     fn_8020E0F8();
@@ -407,7 +407,7 @@ void fn_80069C0C(void) {
         r3 = r29 + 0x7c;
         r5 = r29 + 0xb8;
         r4 = 0x166;
-        fn_80196E10();
+        __assert();
     }
     r0 = *(u32*)((u8*)r31 + 0xC);
     r3 = r29 + 0xc;
@@ -431,7 +431,7 @@ void fn_80069C0C(void) {
                 r3 = r29 + 0x7c;
                 r5 = r29 + 0xe0;
                 r4 = 0x17f;
-                fn_80196E10();
+                __assert();
             }
             r0 = *(u32*)((u8*)r31 + 0x14);
             if (r0 < (u32)0x7) {
@@ -520,7 +520,7 @@ void fn_80069C0C(void) {
         r3 = r29 + 0x7c;
         r5 = r29 + 0x108;
         r4 = 0x1c0;
-        fn_80196E10();
+        __assert();
     }
     r3 = r30;
     r4 = 0x5;
@@ -531,7 +531,7 @@ void fn_80069C0C(void) {
         r3 = r29 + 0x7c;
         r5 = r29 + 0x114;
         r4 = 0x1c5;
-        fn_80196E10();
+        __assert();
     }
     r3 = r30;
     r4 = 0x6;
@@ -542,7 +542,7 @@ void fn_80069C0C(void) {
         r3 = r29 + 0x7c;
         r5 = r29 + 0x120;
         r4 = 0x1cb;
-        fn_80196E10();
+        __assert();
     }
     r3 = r30;
     r4 = 0x4;
@@ -560,14 +560,14 @@ void fn_80069C0C(void) {
                     r3 = r29 + 0x7c;
                     r5 = r29 + 0x12c;
                     r4 = 0x221;
-                    fn_80196E10();
+                    __assert();
                 }
                 r0 = *(u32*)((u8*)r31 + 0x0);
                 if (r0 >= (u32)0x4) {
                     r3 = r29 + 0x7c;
                     r5 = r29 + 0x150;
                     r4 = 0x222;
-                    fn_80196E10();
+                    __assert();
                 }
                 r4 = *(u32*)((u8*)r31 + 0x4);
                 r3 = r29 + 0x3c;
@@ -596,7 +596,7 @@ void fn_80069C0C(void) {
                     r3 = r29 + 0x7c;
                     r5 = r29 + 0x174;
                     r4 = 0xca;
-                    fn_80196E10();
+                    __assert();
                     }
                     r3 = (u32)&lbl_802EE618;
                     r0 = r25 << 1;
@@ -626,7 +626,7 @@ void fn_80069C0C(void) {
                         r3 = r29 + 0x7c;
                         r5 = r29 + 0x174;
                         r4 = 0xca;
-                        fn_80196E10();
+                        __assert();
                         }
                         r3 = (u32)&lbl_802EE618;
                         r0 = r28 << 1;
@@ -761,7 +761,7 @@ void fn_80069C0C(void) {
                 r3 = r29 + 0x7c;
                 r5 = r29 + 0x174;
                 r4 = 0xca;
-                fn_80196E10();
+                __assert();
                 }
                 r3 = (u32)&lbl_802EE618;
                 r0 = r28 << 1;
@@ -913,7 +913,7 @@ void fn_80069C0C(void) {
     r3 = r29 + 0x7c;
     r4 = 0x291;
     r5 = (u32)&lbl_8047C030;
-    fn_80196E10();
+    __assert();
     L_8006A5A0: ;
     r0 = *(u32*)((u8*)r31 + 0x4);
     if ((s32)r0 != (s32)0x2) {
@@ -1113,7 +1113,7 @@ void fn_8006A824(void) {
     extern void fn_8006A990();
     extern void fn_8012A784();
     extern void fn_8012AA2C();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x20];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -1143,7 +1143,7 @@ void fn_8006A824(void) {
                 r3 = r31 + 0x10;
                 r5 = r31 + 0x20;
                 r4 = 0x281;
-                fn_80196E10();
+                __assert();
             }
             break;
         case 1:
@@ -1157,7 +1157,7 @@ void fn_8006A824(void) {
                     r3 = r31 + 0x10;
                     r5 = r31 + 0x4c;
                     r4 = 0x28a;
-                    fn_80196E10();
+                    __assert();
                     break;
             }
             break;
@@ -1172,7 +1172,7 @@ void fn_8006A824(void) {
                     r3 = r31 + 0x10;
                     r5 = r31 + 0x4c;
                     r4 = 0x294;
-                    fn_80196E10();
+                    __assert();
                     break;
             }
             break;
@@ -1180,7 +1180,7 @@ void fn_8006A824(void) {
             r3 = r31 + 0x10;
             r5 = r31 + 0x60;
             r4 = 0x299;
-            fn_80196E10();
+            __assert();
             break;
     }
     r3 = r28;
@@ -1271,7 +1271,7 @@ void fn_8006AABC(void) {
     extern void fn_8012A7B4();
     extern void fn_8012AC08();
     extern void fn_8012AC64();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801F9CBC();
     u8 sp[0xB30];
     u32 r0 = 0;
@@ -1303,7 +1303,7 @@ void fn_8006AABC(void) {
         r3 = r31 + 0x10;
         r5 = r31 + 0x7c;
         r4 = 0x258;
-        fn_80196E10();
+        __assert();
     }
     r3 = (u32)sp + 0x8;
     r4 = 0x0;
@@ -1498,7 +1498,7 @@ s32 fn_8006ADEC(void) {
 void fn_8006AE18(void) {
     extern void fn_80129280();
     extern void fn_801906A0();
-    extern void fn_80196E10();
+    extern void __assert();
     u32 r0 = 0;
     u32 r3 = 0;
     u32 r4 = 0;
@@ -1538,7 +1538,7 @@ void fn_8006AE18(void) {
     r4 = 0x1c2;
     r3 = (u32)&lbl_80267DE8;
     r5 = (u32)&lbl_8047C040;
-    fn_80196E10();
+    __assert();
 
     r3 = 0x0;
 
@@ -1877,7 +1877,7 @@ void fn_8006B2A4(void) {
 /* 0x8006B354 | size: 0x74 */
 void fn_8006B354(void) {
     extern void fn_80129280();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -1895,7 +1895,7 @@ void fn_8006B354(void) {
         r4 = 0xe4;
         r3 = (u32)&lbl_80267DE8;
         r5 = (u32)&lbl_8047C040;
-        fn_80196E10();
+        __assert();
         return;
         }
     r31 = 0x1;
@@ -1983,7 +1983,7 @@ void fn_8006B420(void) {
 /* 0x8006B4AC | size: 0x70 */
 void fn_8006B4AC(void) {
     extern void fn_80129280();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x10];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -2004,7 +2004,7 @@ void fn_8006B4AC(void) {
         r3 = (u32)&lbl_80267DE8;
         r4 = 0xb9;
         r5 = (u32)&lbl_80267E70;
-        fn_80196E10();
+        __assert();
     }
     r3 = 0x0;
     r4 = 0xe;
@@ -2461,7 +2461,7 @@ void fn_8006B9B8(void) {
 /* 0x8006BB34 | size: 0x4E4 */
 void fn_8006BB34(void) {
     extern void fn_80166A28();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x40];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -2736,7 +2736,7 @@ void fn_8006BB34(void) {
             r3 = r25 + 0x7d8;
             r5 = r25 + 0x7e8;
             r4 = 0xe73;
-            fn_80196E10();
+            __assert();
         }
         r0 = *(u16*)((u8*)r26 + 0x4);
         r0 = r0 & 0x00000030;
@@ -2757,7 +2757,7 @@ void fn_8006BB34(void) {
             r3 = r25 + 0x7d8;
             r5 = r25 + 0x808;
             r4 = 0xe7f;
-            fn_80196E10();
+            __assert();
         }
         r0 = *(u16*)((u8*)r26 + 0x4);
         r0 = r0 & 0x00000030;
@@ -3659,7 +3659,7 @@ void fn_8006CCC0(void) {
     extern void fn_8012AC08();
     extern void fn_8012AC54();
     extern void fn_80132A38();
-    extern void fn_80196E10();
+    extern void __assert();
     extern u8 jumptable_802EDFB0[];
     u8 sp[0x40];
     u32 r0 = 0;
@@ -3875,7 +3875,7 @@ void fn_8006CCC0(void) {
                                     r4 = 0xb47;
                                     r3 = (u32)&lbl_80268680;
                                     r5 = (u32)&lbl_8047C064;
-                                    fn_80196E10();
+                                    __assert();
                                     L_8006CFF4: ;
                                     r3 = r23;
                                     r4 = 0xe80;
@@ -4277,7 +4277,7 @@ void fn_8006D550(void) {
     extern void fn_8012AC3C();
     extern void fn_8012AC54();
     extern void fn_80132A38();
-    extern void fn_80196E10();
+    extern void __assert();
     extern u8 jumptable_802EDFCC[];
     u8 sp[0x1B0];
     u32 r0 = 0;
@@ -4553,7 +4553,7 @@ void fn_8006D550(void) {
     r4 = 0xae6;
     r3 = (u32)&lbl_80268680;
     r5 = (u32)&lbl_8047C064;
-    fn_80196E10();
+    __assert();
 
     return;
 }
@@ -5314,7 +5314,7 @@ void fn_8006E338(void) {
     extern void fn_80070D84();
     extern void fn_80109220();
     extern void fn_80129280();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0xB0];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5517,7 +5517,7 @@ void fn_8006E338(void) {
                 r3 = r28 + 0x7d8;
                 r5 = r28 + 0x83c;
                 r4 = 0x8a1;
-                fn_80196E10();
+                __assert();
             }
             r3 = 0x0;
             r4 = 0xe;

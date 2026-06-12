@@ -119,7 +119,7 @@ void fn_80076398(void);
 /* 0x8007581C | size: 0x218 */
 void fn_8007581C(void) {
     extern void fn_8019075C();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801C40F0();
     u8 sp[0x10];
     u32 r0 = 0;
@@ -225,7 +225,7 @@ void fn_8007581C(void) {
             r3 = (u32)&lbl_802688F8;
             r4 = 0xa7;
             r5 = (u32)&lbl_8026890C;
-            fn_80196E10();
+            __assert();
         }
         ((void(*)(void))fn_800FF660)();
         r3 = 0x0;
@@ -682,7 +682,7 @@ void fn_80075FEC(void) {
 /* 0x80076054 | size: 0x2E0 */
 void fn_80076054(void) {
     extern void fn_80076398();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -754,7 +754,7 @@ void fn_80076054(void) {
                     r3 = r31 + 0x108;
                     r5 = r31 + 0x118;
                     r4 = 0xfb;
-                    fn_80196E10();
+                    __assert();
                     tmp = 0x0;
                     break;
                 }
@@ -910,7 +910,7 @@ void fn_80076334(void) {
 /* 0x80076398 | size: 0x420 */
 void fn_80076398(void) {
     extern void fn_80076398();
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x150];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -945,10 +945,10 @@ void fn_80076398(void) {
             if ((s32)r28 != 1) {
                 if ((s32)r28 < 1) {
                     if ((s32)r28 < 0) {
-                        { r3 = r29 + 0x108; r5 = r29 + 0x118; r4 = 0x274; fn_80196E10(); r3 = 0x0; return; }
+                        { r3 = r29 + 0x108; r5 = r29 + 0x118; r4 = 0x274; __assert(); r3 = 0x0; return; }
                     }
                     if ((s32)r28 != 5) {
-                        if ((s32)r28 >= 5) { r3 = r29 + 0x108; r5 = r29 + 0x118; r4 = 0x274; fn_80196E10(); r3 = 0x0; return; }
+                        if ((s32)r28 >= 5) { r3 = r29 + 0x108; r5 = r29 + 0x118; r4 = 0x274; __assert(); r3 = 0x0; return; }
                         /* r28 == 0 case */
                         r29 = 0x0;
                         do {
@@ -1158,7 +1158,7 @@ void fn_80076398(void) {
         r3 = r29 + 0x108;
         r5 = r29 + 0x14c;
         r4 = 0x25e;
-        fn_80196E10();
+        __assert();
     }
     r3 = r31;
     ((void(*)(void))fn_80123FBC)();
@@ -1166,7 +1166,7 @@ void fn_80076398(void) {
     r3 = r29 + 0x108;
     r5 = r29 + 0x118;
     r4 = 0x274;
-    fn_80196E10();
+    __assert();
     r3 = 0x0;
 
     return;

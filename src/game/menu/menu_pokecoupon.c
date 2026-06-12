@@ -128,7 +128,7 @@ s32 menuPokeCoupon_GetBalance(void) {
  * This is a small validation function (0x40 = 64 bytes), consisting of:
  *   1. Load _menuPokeCouponWork.m_eRefer
  *   2. Compare against POKECOUPONREFER_INVALID (-1)
- *   3. If equal, call fn_80196E10 with the assert message
+ *   3. If equal, call __assert with the assert message
  * ========================================================================= */
 void menuPokeCoupon_ValidateRefer(void) {
     s32 valid = 0;
@@ -139,7 +139,7 @@ void menuPokeCoupon_ValidateRefer(void) {
 
     if (valid == 0) {
         /* Assert: "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer" */
-        fn_80196E10("menuPokeCoupon.c", 0x1A,
+        __assert("menuPokeCoupon.c", 0x1A,
                      "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer");
     }
 }

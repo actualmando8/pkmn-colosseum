@@ -418,7 +418,7 @@ void fn_80199264(HSD_DObj* dobj) {
 #pragma optimizewithasm off
 extern HSD_ClassInfo* fn_80193748(const char* class_name);
 extern void* fn_80193828(HSD_ClassInfo* info);
-extern void fn_80196E10(const char* file, s32 line, const char* msg);
+extern void __assert(const char* file, s32 line, const char* msg);
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
 #if 0
@@ -444,12 +444,12 @@ HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
         info = default_class ? default_class : (HSD_ClassInfo*) &hsdDObj;
         dobj = (HSD_DObj*) fn_80193828(info);
         if (dobj == NULL) {
-            fn_80196E10(&lbl_8047DA18, 0x214, &lbl_8047DA20);
+            __assert(&lbl_8047DA18, 0x214, &lbl_8047DA20);
         }
     } else {
         dobj = (HSD_DObj*) fn_80193828(info);
         if (dobj == NULL) {
-            fn_80196E10(&lbl_8047DA18, 0x181, &lbl_8047DA20);
+            __assert(&lbl_8047DA18, 0x181, &lbl_8047DA20);
         }
     }
 
@@ -500,12 +500,12 @@ static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
             info = default_class ? default_class : (HSD_ClassInfo*) &hsdDObj;
             sub = (HSD_DObj*) fn_80193828(info);
             if (sub == NULL) {
-                fn_80196E10(&lbl_8047DA18, 0x214, &lbl_8047DA20);
+                __assert(&lbl_8047DA18, 0x214, &lbl_8047DA20);
             }
         } else {
             sub = (HSD_DObj*) fn_80193828(info);
             if (sub == NULL) {
-                fn_80196E10(&lbl_8047DA18, 0x181, &lbl_8047DA20);
+                __assert(&lbl_8047DA18, 0x181, &lbl_8047DA20);
             }
         }
         {
@@ -696,7 +696,7 @@ void fn_8019970C(void* data) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* fn_801AA4CC(void* list);
-extern void fn_80196E10(const char* file, s32 line, const char* msg);
+extern void __assert(const char* file, s32 line, const char* msg);
 extern void* memset(void* dst, int val, u32 size);
 extern char lbl_8047DA30;
 extern char lbl_8047DA38;
@@ -710,7 +710,7 @@ void* fn_80199738(void) {
     void* p;
     p = fn_801AA4CC(lbl_80465378);
     if (p == NULL) {
-        fn_80196E10(&lbl_8047DA30, 755, &lbl_8047DA38);
+        __assert(&lbl_8047DA30, 755, &lbl_8047DA38);
     }
     memset(p, 0, 0x30);
     return p;

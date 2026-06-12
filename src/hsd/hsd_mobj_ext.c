@@ -22,7 +22,7 @@ extern void fn_801BEEDC(HSD_TObj* tobj, void* texanim); /* HSD_TObjAddAnimAll */
 extern void fn_801AA35C(void* list, u32 size, u32 alignment);
 extern void fn_801AA498(void* list, void* data);
 extern void* fn_801AA4CC(void* list);
-extern void fn_80196E10(const char* file, s32 line, const char* msg);
+extern void __assert(const char* file, s32 line, const char* msg);
 
 /* BSS vtx desc globals */
 extern u8 lbl_80465620[];
@@ -150,7 +150,7 @@ void* fn_801A8524(void) {
     void* result;
     result = fn_801AA4CC(lbl_80465620);
     if (result == NULL) {
-        fn_80196E10(lbl_8047DC48, 0x396, lbl_8047DC50);
+        __assert(lbl_8047DC48, 0x396, lbl_8047DC50);
     }
     return result;
 }
@@ -169,7 +169,7 @@ void* fn_801A85A4(void) {
     void* result;
     result = fn_801AA4CC(lbl_8046564C);
     if (result == NULL) {
-        fn_80196E10(lbl_8047DC48, 0x377, lbl_8047DC54);
+        __assert(lbl_8047DC48, 0x377, lbl_8047DC54);
     }
     return result;
 }

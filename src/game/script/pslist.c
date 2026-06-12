@@ -58,7 +58,7 @@ PSParticle* pslist_GetHead(s32 linkNo) {
     if (valid == 0) {
         /* Assert: "linkNo >= 0 && linkNo < PS_NUM_LINK" */
         /* File: "pslist.c", Line: 0x98 (152) */
-        fn_80196E10("pslist.c", 0x98, "linkNo >= 0 && linkNo < PS_NUM_LINK");
+        __assert("pslist.c", 0x98, "linkNo >= 0 && linkNo < PS_NUM_LINK");
     }
 
     return sLinkHeads[linkNo];
@@ -92,7 +92,7 @@ void pslist_Unlink(PSParticle* pp, PSParticle* parent) {
         /* Removing from head of list */
         if (sLinkHeads[pp->linkNo] != pp) {
             /* Assert: "activeParticle[pp->linkNo] == pp" */
-            fn_80196E10("pslist.c", 0x88,
+            __assert("pslist.c", 0x88,
                          "activeParticle[pp->linkNo] == pp");
         }
         sLinkHeads[pp->linkNo] = pp->next;
@@ -100,7 +100,7 @@ void pslist_Unlink(PSParticle* pp, PSParticle* parent) {
         /* Removing from middle/end of list */
         if (parent->next != pp) {
             /* Assert: "parent->next == pp" */
-            fn_80196E10("pslist.c", 0x8B,
+            __assert("pslist.c", 0x8B,
                          "parent->next == pp");
         }
         parent->next = pp->next;

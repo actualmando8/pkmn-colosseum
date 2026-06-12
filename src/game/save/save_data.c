@@ -34,7 +34,7 @@
  * ========================================================================= */
 
 /* Assert function used throughout cardesavedata.c */
-/* fn_80196E10 */ extern void GS_Assert(const char* file, u32 line, const char* msg);
+/* __assert */ extern void GS_Assert(const char* file, u32 line, const char* msg);
 
 /* =========================================================================
  * Rodata string references

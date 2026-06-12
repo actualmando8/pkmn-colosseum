@@ -170,7 +170,7 @@ s32 menuCardE_Main(void) {
 
         if (valid == 0) {
             /* Assert: "_CARDE.card_type == CARDE_CARDTYPE_TRAINER" */
-            fn_80196E10("menuCardE.c", 0x1B8,
+            __assert("menuCardE.c", 0x1B8,
                          "_CARDE.card_type == CARDE_CARDTYPE_TRAINER");
         }
 
@@ -270,7 +270,7 @@ void menuCardE_Matrix_ValidateSeries(MenuCardEMatrixWork* cem, s32 i) {
 
     if (valid == 0) {
         /* Assert: "i < cem->m_seriesN" */
-        fn_80196E10("menuCardE_Matrix.c", 0x5E,
+        __assert("menuCardE_Matrix.c", 0x5E,
                      "i < cem->m_seriesN");
     }
 
@@ -317,7 +317,7 @@ void menuCardE_Matrix_ValidateAnim(MenuCardEMatrixWork* cem) {
 
     if (valid == 0) {
         /* Assert: "!cem->m_isAnimating" */
-        fn_80196E10("menuCardE_Matrix.c", 0x8C,
+        __assert("menuCardE_Matrix.c", 0x8C,
                      "!cem->m_isAnimating");
     }
 
@@ -327,7 +327,7 @@ void menuCardE_Matrix_ValidateAnim(MenuCardEMatrixWork* cem) {
 
     if (s[ANIM_cur] == NULL) {
         /* Assert: "s[ANIM_cur]" */
-        fn_80196E10("menuCardE_Matrix.c", 0x92,
+        __assert("menuCardE_Matrix.c", 0x92,
                      "s[ANIM_cur]");
     }
 

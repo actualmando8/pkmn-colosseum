@@ -42,7 +42,7 @@
 #include "hsd/hsd_jobj.h"
 
 /* ===== External functions ===== */
-extern void fn_80196E10(const char* file, u32 line, const char* msg); /* HSD_Halt / assert */
+extern void __assert(const char* file, u32 line, const char* msg); /* HSD_Halt / assert */
 extern void HSD_Panic(const char* file, u32 line, const char* msg);
 extern void fn_800A2EB4(void* worldMtx, void* dstMtx);               /* MTXCopy (3x4 matrix) */
 extern void fn_800A2D98(void* srcMtx, void* jointMtx, void* dstMtx); /* MTXConcat */
@@ -182,7 +182,7 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
     /* Step 2: NULL check with assert */
     found = dobj;
     if (found == NULL) {
-        fn_80196E10(lbl_802746DC, 0x184, lbl_8047D9E8);
+        __assert(lbl_802746DC, 0x184, lbl_8047D9E8);
     }
 
     /* Step 3: Walk chain to find first node without bit 0 of flags set */
@@ -203,7 +203,7 @@ void* HSD_DObjDisplayFunc1(void* dobj, void* outputMtx) {
 
     /* Step 4: Assert if not found */
     if (found == NULL) {
-        fn_80196E10(lbl_802746DC, 0x1D4, lbl_8047D9F0);
+        __assert(lbl_802746DC, 0x1D4, lbl_8047D9F0);
     }
 
     /* Step 5-7: Set up model-view matrix */

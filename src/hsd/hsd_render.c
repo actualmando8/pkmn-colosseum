@@ -331,7 +331,7 @@ void fn_80197784(void) {
     extern u8 lbl_8047D9E8[];
     extern void fn_800A2D64();
     extern void fn_801942B8();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_8019D9DC();
     extern void fn_801A8524();
     extern void fn_801AA4CC();
@@ -365,7 +365,7 @@ void fn_80197784(void) {
             r3 = (u32)lbl_8047D9E0;
             r4 = 0x25d;
             r5 = (u32)lbl_8047D9E8;
-            fn_80196E10();
+            __assert();
         }
         tmp = *(u32*)((u8*)r28 + 0x14);
         r3 = 0x0;

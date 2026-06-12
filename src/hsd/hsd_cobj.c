@@ -306,7 +306,7 @@ void fn_80193CD0(u8* ptr) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10(const char*, u32, const char*);
+extern void __assert(const char*, u32, const char*);
 extern void fn_801A84F0(void);
 extern void fn_801C25E4(void);
 #if 1
@@ -374,13 +374,13 @@ default_alloc:
         cobj_result = fn_80193828((void*)lbl_8036C678);
     }
     if (cobj_result == NULL) {
-        fn_80196E10(&lbl_8047D958, 0x7a4, &lbl_8047D960);
+        __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
     }
     goto setup;
 do_alloc_from_info:
     cobj_result = fn_80193828(info);
     if (cobj_result == NULL) {
-        fn_80196E10(&lbl_8047D958, 0x7f9, &lbl_8047D960);
+        __assert(&lbl_8047D958, 0x7f9, &lbl_8047D960);
     }
 setup:
     {
@@ -422,10 +422,10 @@ void* fn_80194258(void) {
     extern const char lbl_8047D958[];
     extern const char lbl_8047D960[];
     typedef void* (*fn_80193828_t)(void*);
-    typedef void (*fn_80196E10_t)(const char*, int, const char*);
+    typedef void (*__assert_t)(const char*, int, const char*);
     void* arg = lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)0x8037C678;
     void* result = ((fn_80193828_t)fn_80193828)(arg);
-    if (result == NULL) ((fn_80196E10_t)fn_80196E10)(lbl_8047D958, 0x7A4, lbl_8047D960);
+    if (result == NULL) ((__assert_t)__assert)(lbl_8047D958, 0x7A4, lbl_8047D960);
     return result;
 }
 #endif
@@ -857,7 +857,7 @@ extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
 extern void fn_801C29C4(void*, f32);
 /* WP-0061 forward declarations (defined later in same TU) */
-extern void fn_80196E10(const char*, u32, const char*);
+extern void __assert(const char*, u32, const char*);
 
 /* 0x80194CC4 | 0x30 */
 #pragma push
@@ -941,7 +941,7 @@ extern void fn_800A3ADC(void);
 extern void fn_800A3B7C(void);
 extern void fn_800CE2D8(void);
 extern void fn_80191688(HSD_WObj*, void*);
-extern void fn_80196E10(const char*, u32, const char*);
+extern void __assert(const char*, u32, const char*);
 #if 1
 asm void fn_80194DA4(void) {
 #include "src/hsd/hsd_cobj_fn_80194DA4.inc"
@@ -1021,8 +1021,8 @@ asm void fn_80195898(void) {
 }
 #else
 void fn_80195898(HSD_CObj* cobj, void* arg) {
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x324, &lbl_8047D960);
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191788(cobj->eyepos, arg);
 }
 #endif
@@ -1038,8 +1038,8 @@ asm void fn_80195904(void) {
 }
 #else
 void fn_80195904(HSD_CObj* cobj, void* arg) {
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x318, &lbl_8047D960);
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191688(cobj->eyepos, arg);
 }
 #endif
@@ -1055,8 +1055,8 @@ asm void fn_80195970(void) {
 }
 #else
 void fn_80195970(HSD_CObj* cobj, void* arg) {
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x30c, &lbl_8047D960);
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     fn_80191788(cobj->interest, arg);
 }
 #endif
@@ -1072,8 +1072,8 @@ asm void fn_801959DC(void) {
 }
 #else
 void fn_801959DC(HSD_CObj* cobj, void* arg) {
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x300, &lbl_8047D960);
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     fn_80191688(cobj->interest, arg);
 }
 #endif
@@ -1223,7 +1223,7 @@ void fn_80196B10(u8* cobj, u8* aobj_info) {
     extern void fn_801C25E4(u32);
     extern u32 fn_801C2670(u32);
     extern void fn_80191DCC(u32, u32);
-    extern void fn_80196E10(const char*, u32, const char*);
+    extern void __assert(const char*, u32, const char*);
     extern char lbl_8047D958;
     extern char lbl_8047D960;
     if (cobj == NULL) return;
@@ -1232,9 +1232,9 @@ void fn_80196B10(u8* cobj, u8* aobj_info) {
         fn_801C25E4(*(u32*)(cobj + 0x84));
     }
     *(u32*)(cobj + 0x84) = fn_801C2670(*(u32*)aobj_info);
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
     fn_80191DCC(*(u32*)(cobj + 0x24), *(u32*)(aobj_info + 0x4));
-    if (!cobj) fn_80196E10(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    if (!cobj) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
     fn_80191DCC(*(u32*)(cobj + 0x28), *(u32*)(aobj_info + 0x8));
 }
 #endif
@@ -1252,16 +1252,16 @@ asm void fn_80196BB8(void) {
 void fn_80196BB8(u8* ptr) {
     extern void fn_801C25E4(u32);
     extern void fn_80191E88(u32);
-    extern void fn_80196E10(const char*, u32, const char*);
+    extern void __assert(const char*, u32, const char*);
     extern char lbl_8047D958;
     extern char lbl_8047D960;
     if (!ptr) { return; }
     if (!ptr) { return; }
     fn_801C25E4(*(u32*)(ptr + 0x84));
     *(u32*)(ptr + 0x84) = 0;
-    if (!ptr) { fn_80196E10(&lbl_8047D958, 0x2E8, &lbl_8047D960); }
+    if (!ptr) { __assert(&lbl_8047D958, 0x2E8, &lbl_8047D960); }
     fn_80191E88(*(u32*)(ptr + 0x24));
-    if (!ptr) { fn_80196E10(&lbl_8047D958, 0x2D0, &lbl_8047D960); }
+    if (!ptr) { __assert(&lbl_8047D958, 0x2D0, &lbl_8047D960); }
     fn_80191E88(*(u32*)(ptr + 0x28));
 }
 #endif
@@ -1360,11 +1360,11 @@ void HSD_Panic(const char* file, u32 line, const char* expr) {
 extern char lbl_802746B8[];
 extern char lbl_8047D9D8;
 #if 0
-asm void fn_80196E10(const char*, u32, const char*) {
-#include "src/hsd/hsd_cobj_fn_80196E10.inc"
+asm void __assert(const char*, u32, const char*) {
+#include "src/hsd/hsd_cobj___assert.inc"
 }
 #else
-void fn_80196E10(const char* file, u32 line, const char* expr) {
+void __assert(const char* file, u32 line, const char* expr) {
     extern u32 lbl_8047B238;
     OSReport(lbl_802746B8, expr);
     if (lbl_8047B238 != 0) {

@@ -104,7 +104,7 @@ void* fn_800EE2C8(void* p, void* userdata, void* callback) {
  * ================================================================== */
 extern void fn_800EC0E8(u32 a);
 extern u8 fn_800EC5AC(u32 a);
-extern void fn_80196E10(u8* file, u32 line, u8* func);
+extern void __assert(u8* file, u32 line, u8* func);
 extern void fn_8019D9DC(void* p);
 extern void fn_800E01F4(void* dst, f32 x, f32 y, f32 z);
 extern void fn_800E01D0(void* dst, void* src);
@@ -187,16 +187,16 @@ void fn_800EE3BC(void* p, void* a, void* b, void* c) {
         for (i = count; i > 0; i--) {
             slot = list[i - 1];
             if (slot == NULL) {
-                fn_80196E10(lbl_8047CCA0, 0x2ec, lbl_8047CCA8);
+                __assert(lbl_8047CCA0, 0x2ec, lbl_8047CCA8);
             }
             {
                 f32 sv[3];
                 if (slot == NULL) {
-                    fn_80196E10(lbl_8047CCA0, 0x2fa, lbl_8047CCA8);
+                    __assert(lbl_8047CCA0, 0x2fa, lbl_8047CCA8);
                 }
                 sv[0] = *(f32*)((u8*)slot + 0x1c);
                 if (slot == NULL) {
-                    fn_80196E10(lbl_8047CCA0, 0x308, lbl_8047CCA8);
+                    __assert(lbl_8047CCA0, 0x308, lbl_8047CCA8);
                 }
                 sv[1] = *(f32*)((u8*)slot + 0x20);
                 sv[2] = *(f32*)((u8*)slot + 0x24);
@@ -212,16 +212,16 @@ void fn_800EE3BC(void* p, void* a, void* b, void* c) {
         for (i = count; i > 0; i--) {
             slot = list[i - 1];
             if (slot == NULL) {
-                fn_80196E10(lbl_8047CCA0, 0x383, lbl_8047CCA8);
+                __assert(lbl_8047CCA0, 0x383, lbl_8047CCA8);
             }
             {
                 f32 sv[3];
                 if (slot == NULL) {
-                    fn_80196E10(lbl_8047CCA0, 0x38f, lbl_8047CCA8);
+                    __assert(lbl_8047CCA0, 0x38f, lbl_8047CCA8);
                 }
                 sv[0] = *(f32*)((u8*)slot + 0x2c);
                 if (slot == NULL) {
-                    fn_80196E10(lbl_8047CCA0, 0x39b, lbl_8047CCA8);
+                    __assert(lbl_8047CCA0, 0x39b, lbl_8047CCA8);
                 }
                 sv[1] = *(f32*)((u8*)slot + 0x30);
                 sv[2] = *(f32*)((u8*)slot + 0x34);

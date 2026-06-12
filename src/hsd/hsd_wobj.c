@@ -277,7 +277,7 @@ void fn_801915D4(HSD_WObj* wobj) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* fn_80193828(void*);
-extern void fn_80196E10(const char*, u32, const char*);
+extern void __assert(const char*, u32, const char*);
 extern const char lbl_8047D8C8[7];
 extern const char lbl_8047D8D0[5];
 #if 0
@@ -296,7 +296,7 @@ HSD_WObj* fn_80191628(void)
             ? lbl_8047B218
             : (HSD_ClassInfo*) lbl_8036C5F0)) == NULL)
     {
-        fn_80196E10(lbl_8047D8C8, 0x257, lbl_8047D8D0);
+        __assert(lbl_8047D8C8, 0x257, lbl_8047D8D0);
     }
     return wobj;
 }

@@ -29,7 +29,7 @@ void fn_80199AF8(void) {
     extern f64 lbl_8047DA40;
     extern f64 lbl_8047DA48;
     extern f64 lbl_8047DA50;
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_8019A24C();
     extern void fn_801B2560();
     u8 sp[0x60];
@@ -321,7 +321,7 @@ while (1) {
                 r3 = (u32)lbl_8047DA30;
                 r5 = (u32)lbl_80274764;
                 r4 = 0x16c;
-                fn_80196E10();
+                __assert();
             }
             r4 = *(u32*)((u8*)r29 + 0x8);
             r3 = *(u32*)((u8*)r29 + 0x4);
@@ -513,7 +513,7 @@ void fn_8019A24C(void) {
     extern f32 lbl_8047DA3C;
     extern f64 lbl_8047DA50;
     extern f64 lbl_8047DA58;
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x40];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -605,7 +605,7 @@ void fn_8019A24C(void) {
                         r3 = (u32)lbl_8047DA30;
                         r5 = (u32)lbl_8027477C;
                         r4 = 0x17f;
-                        fn_80196E10();
+                        __assert();
                     }
                     f0 = *(f32*)((u8*)r31 + 0x24);
                     *(f32*)((u8*)r31 + 0x20) = f0;
@@ -744,7 +744,7 @@ void fn_8019A24C(void) {
                     r3 = (u32)lbl_8047DA30;
                     r5 = (u32)lbl_8027477C;
                     r4 = 0x193;
-                    fn_80196E10();
+                    __assert();
                 }
                 f0 = *(f32*)((u8*)r31 + 0x24);
                 *(f32*)((u8*)r31 + 0x20) = f0;
@@ -894,7 +894,7 @@ void fn_8019A24C(void) {
                 r3 = (u32)lbl_8047DA30;
                 r5 = (u32)lbl_8027477C;
                 r4 = 0x1a7;
-                fn_80196E10();
+                __assert();
             }
             f0 = *(f32*)((u8*)r31 + 0x24);
             *(f32*)((u8*)r31 + 0x20) = f0;
@@ -1041,7 +1041,7 @@ void fn_8019A24C(void) {
             r3 = (u32)lbl_8047DA30;
             r5 = (u32)lbl_8027477C;
             r4 = 0x1b9;
-            fn_80196E10();
+            __assert();
         }
         f0 = *(f32*)((u8*)r31 + 0x24);
         *(f32*)((u8*)r31 + 0x20) = f0;
@@ -1289,7 +1289,7 @@ void fn_8019A24C(void) {
             r3 = (u32)lbl_8047DA30;
             r5 = (u32)lbl_8027477C;
             r4 = 0x1cc;
-            fn_80196E10();
+            __assert();
         }
         f0 = *(f32*)((u8*)r31 + 0x2C);
         *(f32*)((u8*)r31 + 0x28) = f0;
@@ -1426,7 +1426,7 @@ void fn_8019A24C(void) {
         r3 = (u32)lbl_8047DA30;
         r5 = (u32)lbl_8027477C;
         r4 = 0x1e9;
-        fn_80196E10();
+        __assert();
     }
     tmp = *(u8*)((u8*)r31 + 0x10);
     tmp = tmp & 0x00000040;

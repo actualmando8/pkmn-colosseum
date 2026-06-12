@@ -148,8 +148,8 @@ extern void* memset(void* dst, int val, u32 size);
 extern void GSbezierCalculateVector();
 extern void* GSfilterCreate(void);
 extern void GSmaterialSetFlags();
-extern void sin();   /* MSL trig (renamed) — referenced by asm incs */
-extern void cos();   /* MSL trig (renamed) — referenced by asm incs */
+extern void sin();   /* MSL trig (renamed) ? referenced by asm incs */
+extern void cos();   /* MSL trig (renamed) ? referenced by asm incs */
 
 /* GSmem allocator */
 extern u16   fn_800E3534(u32 size);
@@ -1824,7 +1824,7 @@ asm void fn_8013E8A4(void) {
 #else
 void fn_8013E8A4(void) { /* TODO */ }
 #endif
-extern void fn_80196E10(void);
+extern void __assert(void);
 extern void fn_800E3C5C(void);
 extern void fn_800E4514(void);
 extern void fn_800E69C4(void);

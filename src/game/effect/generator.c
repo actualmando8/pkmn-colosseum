@@ -82,7 +82,7 @@ extern void  fn_800CDBE0(f32 angle);                     /* cosf -> f1 */
 extern f64   fn_800CE2D8(f32 y, f32 x);                 /* atan2f */
 extern void  fn_801950D0(void* cameraObj,
                           void* outMtx);                 /* camera get matrix */
-extern void  fn_80196E10(const char* file, u32 line,
+extern void  __assert(const char* file, u32 line,
                           const char* expr);             /* assert */
 
 /* ===== Rodata string constants ===== */
@@ -323,7 +323,7 @@ void generatorMain(void* gen) {
 
         /* Assert the camera object exists */
         if (cameraObj == NULL) {
-            fn_80196E10(lbl_802739E4, 0x272, lbl_802739F0);
+            __assert(lbl_802739E4, 0x272, lbl_802739F0);
         }
 
         cameraObj = lbl_8047B190;

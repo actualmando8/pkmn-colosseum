@@ -34422,7 +34422,7 @@
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80196E10": {
+    "__assert": {
       "addr": "0x80196E10",
       "kind": "function",
       "section": ".text",

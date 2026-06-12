@@ -158,7 +158,7 @@ extern f64 fn_800CE318(f64, f64); /* fmod */
 extern f64 fn_800CE338(f64);      /* log */
 extern f64 fn_800CE358(f64, f64); /* pow */
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
-extern void fn_80196E10(const char* file, s32 line, const char* expr);
+extern void __assert(const char* file, s32 line, const char* expr);
 extern s32 fn_801ADC3C(s32 range);
 extern f32 fn_801ADC7C(void);
 extern f64 __frsqrte(f64);
@@ -189,12 +189,12 @@ extern const f32 lbl_80478AC0[]; /* NaN */
 #define BC_EMPTY ""
 
 #define BC_CHK(line) \
-    if (stack == NULL) fn_80196E10(BC_FILE, line, BC_EXPR_STACK)
+    if (stack == NULL) __assert(BC_FILE, line, BC_EXPR_STACK)
 #define BC_CHK2(line)                                          \
     if (stack == NULL)                                         \
-        fn_80196E10(BC_FILE, line, BC_EXPR_STACK);             \
+        __assert(BC_FILE, line, BC_EXPR_STACK);             \
     if (stack->next == NULL)                                   \
-        fn_80196E10(BC_FILE, line, BC_EXPR_NEXT)
+        __assert(BC_FILE, line, BC_EXPR_NEXT)
 
 static inline s32 bc_fpclassify(f32 x)
 {
@@ -244,7 +244,7 @@ f32 fn_801920E4(u8* p, u32* args, u32 nb_args)
                 switch (opcode & 0xff) {
                 case 0x02:
                     if (!(operand < nb_args))
-                        fn_80196E10(BC_FILE, 0x119, BC_EXPR_OPERAND);
+                        __assert(BC_FILE, 0x119, BC_EXPR_OPERAND);
                     stack = fn_801A3EB4(stack, args[operand]);
                     break;
                 case 0x05:

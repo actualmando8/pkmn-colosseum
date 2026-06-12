@@ -457,7 +457,7 @@ void fn_8019CFBC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10();
+extern void __assert();
 extern void HSD_Panic(void);
 extern void fn_80199264(void);
 extern void fn_801AE50C(void);
@@ -609,12 +609,12 @@ asm void fn_8019F778(void) {
 #else
 #pragma optimization_level 1
 void fn_8019F778(HSD_JObj* jobj) {
-    extern void fn_80196E10();
+    extern void __assert();
     extern char lbl_8047DB34;
     extern char lbl_8047DB3C;
     s32 result;
     if (!jobj) return;
-    if (!jobj) fn_80196E10(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+    if (!jobj) __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
     result = 0;
     if (!(jobj->flags & 0x00800000)) {
         if (jobj->flags & 0x00000040) {
@@ -769,7 +769,7 @@ void fn_801A053C(void* obj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_80196E10();
+extern void __assert();
 extern void fn_801991F8(void);
 extern void fn_8019C128();
 extern void fn_801A05EC(void);
@@ -812,7 +812,7 @@ void fn_801A0B9C(HSD_Obj* obj) {
     if (obj != NULL) {
         obj->ref_count++;
         if (!(obj->ref_count != HSD_OBJ_NOREF)) {
-            fn_80196E10(lbl_80274AF4, 0x5d, lbl_80274B64);
+            __assert(lbl_80274AF4, 0x5d, lbl_80274B64);
         }
     }
 }
@@ -848,7 +848,7 @@ asm void fn_801A0C1C(void) {
 void fn_801A0C1C(HSD_Obj* obj) {
     obj->ref_count++;
     if (!(obj->ref_count != HSD_OBJ_NOREF)) {
-        fn_80196E10(lbl_80274AF4, 0x5d, lbl_80274B64);
+        __assert(lbl_80274AF4, 0x5d, lbl_80274B64);
     }
 }
 #endif
@@ -890,7 +890,7 @@ asm void fn_801A0C9C(void) {
 void fn_801A0C9C(HSD_Obj* obj) {
     obj->ref_count_individual++;
     if (!(obj->ref_count_individual != 0)) {
-        fn_80196E10(lbl_80274AF4, 0x9e, lbl_80274B00);
+        __assert(lbl_80274AF4, 0x9e, lbl_80274B00);
     }
 }
 #endif
@@ -1010,14 +1010,14 @@ HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
     }
     jobj = fn_80193828(info);
     if (jobj == NULL) {
-        fn_80196E10(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
+        __assert(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
     }
     goto setup;
 
 found:
     jobj = fn_80193828(info);
     if (jobj == NULL) {
-        fn_80196E10(&lbl_8047DB20, 0x3D5, &lbl_8047DB3C);
+        __assert(&lbl_8047DB20, 0x3D5, &lbl_8047DB3C);
     }
 
 setup:

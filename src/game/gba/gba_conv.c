@@ -526,7 +526,7 @@ void fn_80084034(void) {
 
 /* 0x80084038 | size: 0x97C */
 void fn_80084038(void) {
-    extern void fn_80196E10();
+    extern void __assert();
     u8 sp[0x30];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -582,7 +582,7 @@ void fn_80084038(void) {
                     r3 = r25 + 0x184;
                     r4 = 0xea;
                     r5 = (u32)&lbl_8047C198;
-                    fn_80196E10();
+                    __assert();
                 }
                 r3 = r26;
                 ((void(*)(void))fn_800E27B0)();
@@ -804,7 +804,7 @@ void fn_80084038(void) {
         r3 = r25 + 0x184;
         r4 = 0xf3;
         r5 = (u32)&lbl_8047C198;
-        fn_80196E10();
+        __assert();
     }
     r3 = r26;
     ((void(*)(void))fn_800E24B0)();
@@ -1227,7 +1227,7 @@ void fn_80084A8C(void) {
     extern void fn_80135A70();
     extern void fn_80135B0C();
     extern void fn_80166A28();
-    extern void fn_80196E10();
+    extern void __assert();
     extern u8 jumptable_802EEB78[];
     u8 sp[0xCD0];
     u32 tmp = 0;
@@ -1287,7 +1287,7 @@ void fn_80084A8C(void) {
         r4 = 0x1f4;
         r5 = (u32)&lbl_8047C1A0;
         r3 = r3 + 0x184;
-        fn_80196E10();
+        __assert();
     }
     if (r16 == 0) {
         r3 = 0xa6;
@@ -3121,7 +3121,7 @@ void fn_80084A8C(void) {
                 r4 = 0x1f4;
                 r5 = (u32)&lbl_8047C1A0;
                 r3 = r3 + 0x184;
-                fn_80196E10();
+                __assert();
             }
             if (r16 == 0) {
                 r3 = 0xa6;
@@ -5370,7 +5370,7 @@ void fn_800889E4(void) {
     extern void fn_8012D32C();
     extern void fn_801906A0();
     extern void fn_8019075C();
-    extern void fn_80196E10();
+    extern void __assert();
     extern void fn_801D0748();
     u8 sp[0x40];
     u32 tmp = 0;
@@ -5398,7 +5398,7 @@ void fn_800889E4(void) {
         r3 = r30 + 0x0;
         r5 = r30 + 0x14;
         r4 = 0x7b;
-        fn_80196E10();
+        __assert();
     }
     tmp = *(u32*)((u8*)r31 + 0x0);
     *(u32*)((u8*)r27 + (-13940)) = tmp;
@@ -5420,7 +5420,7 @@ void fn_800889E4(void) {
             r3 = r30 + 0x0;
             r5 = r30 + 0x38;
             r4 = 0x89;
-            fn_80196E10();
+            __assert();
         }
         r3 = (u32)sp + 0x8;
         fn_8012D32C();

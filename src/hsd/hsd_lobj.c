@@ -290,7 +290,7 @@ void fn_801A426C(HSD_LObj* lobj, HSD_LightAnim* lanim)
 /* 0x801A4344 | 0xFC */
 extern void fn_80193748(void);
 extern void fn_80193828(void);
-extern void fn_80196E10();
+extern void __assert();
 extern u32 lbl_8047B2B0;
 extern char lbl_8047DBB8;
 extern u8 lbl_8047DBC0[];
@@ -349,12 +349,12 @@ asm void fn_801A48F4(void) {
 /* HSD_LObjSetInterestWObjDesc */
 void fn_801A48F4(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
-        fn_80196E10(&lbl_8047DBB8, 0x58c, &lbl_8047DBCC);
+        __assert(&lbl_8047DBB8, 0x58c, &lbl_8047DBCC);
     }
     if (lobj->interest == NULL) {
         lobj->interest = fn_80191628();
         if (lobj->interest == NULL) {
-            fn_80196E10(&lbl_8047DBB8, 0x58f, lbl_80274DB8);
+            __assert(&lbl_8047DBB8, 0x58f, lbl_80274DB8);
         }
     }
     fn_80191788(lobj->interest, desc);
@@ -389,12 +389,12 @@ asm void fn_801A49C0(void) {
 /* HSD_LObjSetPositionWObjDesc */
 void fn_801A49C0(HSD_LObj* lobj, void* desc) {
     if (lobj == NULL) {
-        fn_80196E10(&lbl_8047DBB8, 0x568, &lbl_8047DBCC);
+        __assert(&lbl_8047DBB8, 0x568, &lbl_8047DBCC);
     }
     if (lobj->position == NULL) {
         lobj->position = fn_80191628();
         if (lobj->position == NULL) {
-            fn_80196E10(&lbl_8047DBB8, 0x56b, lbl_80274DC8);
+            __assert(&lbl_8047DBB8, 0x56b, lbl_80274DC8);
         }
     }
     fn_80191788(lobj->position, desc);
@@ -718,7 +718,7 @@ HSD_LObj* fn_801A67BC(s32 light_id)
             index = 8;
             break;
         default:
-            fn_80196E10(&lbl_8047DBB8, 0x4A1, &lbl_8047DBD4);
+            __assert(&lbl_8047DBB8, 0x4A1, &lbl_8047DBD4);
             break;
     }
 
