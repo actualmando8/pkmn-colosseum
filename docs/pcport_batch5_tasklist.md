@@ -185,7 +185,8 @@ Verification:
 - [x] Exercise live in-process room reload from player crossing a door trigger.
 - [x] Exercise live outdoor field warp from Outskirt Stand into the shop interior.
 - [x] Add first worldmap asset/handoff smoke coverage.
-- [ ] Gate full worldmap cursor/select/travel-confirm behavior.
+- [x] Gate host-side worldmap cursor/select/travel-confirm behavior.
+- [ ] Wire accepted worldmap destinations to real story/floor availability data.
 - [ ] Gate directional locomotion animations for idle/walk/run while moving north/south/east/west.
 - [ ] Gate START-in-field menu open/close behavior.
 - [ ] Add NPC spawn/talk coverage.
@@ -195,12 +196,13 @@ Verification:
 
 Lane result:
 
-- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, and `--worldmap-handoff-smoke`.
+- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, `--worldmap-handoff-smoke`, `--worldmap-menu`, and `--worldmap-menu-smoke`.
 - The smoke validates the host warp table and trigger lookup for `D1_garage_1F` -> `D1_garage_B1` and `D1_garage_B1` -> `D1_garage_1F`.
 - It also loads both rooms' WZX collision meshes directly, proving the target archives and collision data are reachable before we wire live in-process reload into the gameplay loop.
 - The live reload smoke now drives the normal walk loop from just inside garage 1F, lets the player enter the 1F door trigger, returns target floor `1`, reloads `D1_garage_B1` in-process, and renders a post-reload frame.
 - The world-warp smoke wires the current Story Mode start map (`S1_out`) to `S1_shop_1F`, trips the Outskirt shop trigger through the normal walk loop, reloads the shop scene/collision in-process, and renders a post-reload frame.
 - The worldmap handoff smoke simulates the field-to-worldmap transition target, loads `world_map.fsys`, selects `move_demo`, and renders the scene through the same field scene bridge. This proves the target asset/render path, not the full `gs_worldmap` cursor/select/travel-confirm state machine yet.
+- The worldmap menu smoke drives the host-side worldmap state path over the real `world_map.fsys` render: cursor movement, destination selection, travel confirmation dialog, and accepted travel result. Destination availability and real floor/story mapping beyond the current host table remain separate follow-up work.
 - The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
 - `S1_shop_1F` currently renders as a static field target; its ambient field animation setup is skipped until that map's animjoint path is recovered.
 - `include\hsd\hsd_debug.h` now uses a `PCPORT`-only unprototyped `__assert()` declaration so generated/decompiled HSD TUs with mixed assert call shapes compile in the host harness without changing the matching build declaration.
@@ -208,6 +210,7 @@ Lane result:
 Verification:
 
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1717 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --worldmap-menu-smoke` -> passed with cursor `OUTSKIRT STAND -> PHENAC CITY -> PYRITE TOWN`, travel confirm opened, `YES` accepted, `frames=9`.
 - `build_pc\pcport_bootstrap.exe --worldmap-handoff-smoke` -> passed with `world_map.fsys`, selected/rendered `move_demo`, `rootJoint=0x20`, `extraModels=2`, `collisionTris=0`.
 - `build_pc\pcport_bootstrap.exe --field-world-warp-smoke` -> passed with player trigger `2->3`, start `(69.0,0.0,-30.0)`, target `S1_shop_1F`, shop `tris=196`, `exit->2`, spawn `(0.0,0.0,35.0)`.
 - `build_pc\pcport_bootstrap.exe --field-room-reload-smoke` -> passed with player trigger `0->1`, start `(0.0,0.0,35.0)`, trigger hit at `(-0.0,0.0,39.9)`, B1 `tris=222`, `exit->0`, spawn `(0.0,0.0,0.0)`.
