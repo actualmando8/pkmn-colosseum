@@ -5,6 +5,7 @@
 #include "gx_shim.h"
 #include "gx_texture.h"
 #include "hsd/hsd_fobj.h"
+#include "hsd/hsd_memory.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
 #include "os_shim.h"
@@ -60,6 +61,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
 extern void fn_801A6E24(HSD_MObj* mobj);
+extern s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src);
 extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
 extern void GSgfxHostClearPipelineState(unsigned int pipelineId);
 extern void GSgfxHostSetPipelineBlend(unsigned int pipelineId,
@@ -2346,6 +2348,7 @@ static int RunRealMaterialDeltaSmoke(void) {
     HSD_TExp* fullTExpRoot = NULL;
     HSD_TExp* fadedTExpRoot = NULL;
     HSD_ObjData materialAnimValue;
+    HSD_MObj copiedMObj;
     u8* memberData = NULL;
     u32 memberSize = 0;
     const u8* sceneData;
@@ -2377,6 +2380,7 @@ static int RunRealMaterialDeltaSmoke(void) {
     memset(&fullMaterial, 0, sizeof(fullMaterial));
     memset(&fadedMaterial, 0, sizeof(fadedMaterial));
     memset(&drawObject, 0, sizeof(drawObject));
+    memset(&copiedMObj, 0, sizeof(copiedMObj));
 
     if (!PCPort_LoadFsysMember(PCPORT_REAL_CONTENT_ARCHIVE,
                                PCPORT_REAL_CONTENT_MEMBER,
@@ -2512,6 +2516,24 @@ static int RunRealMaterialDeltaSmoke(void) {
     liveMObj->mat->diffuse = materialAnimOriginalDiffuse;
     liveMObj->mat->alpha = materialAnimOriginalAlpha;
 
+    if (fn_801A7D58(&copiedMObj, liveMObj) != 0 ||
+        copiedMObj.mat == NULL ||
+        copiedMObj.mat == liveMObj->mat ||
+        copiedMObj.mat->diffuse != liveMObj->mat->diffuse ||
+        copiedMObj.tobj == liveMObj->tobj ||
+        (liveMObj->tobj != NULL && copiedMObj.tobj == NULL) ||
+        (copiedMObj.rendermode & RENDER_TOON) == 0u) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta MObj copy helper failed (mobj=0x%X srcMat=%p dstMat=%p srcTObj=%p dstTObj=%p dstMode=0x%X)\n",
+                mobjOffset,
+                (void*)liveMObj->mat,
+                (void*)copiedMObj.mat,
+                (void*)liveMObj->tobj,
+                (void*)copiedMObj.tobj,
+                copiedMObj.rendermode);
+        goto cleanup;
+    }
+
     liveMObj->texp = NULL;
     fn_801A6E24(liveMObj);
     setupTExpList = liveMObj->texp;
@@ -2627,7 +2649,7 @@ static int RunRealMaterialDeltaSmoke(void) {
         goto cleanup;
     }
 
-    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f animDiffuseR=%u animAlpha=%.3f setupTExp=%p loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
+    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f animDiffuseR=%u animAlpha=%.3f setupTExp=%p loadTExp=%p fullTExp=%p fadedTExp=%p copyMat=%p copyTObj=%p submitted=%u expanded=%u prim=0x%X)\n",
            sceneOffset,
            translatedCamera.cameraArchiveOffset,
            jointOffset,
@@ -2651,6 +2673,8 @@ static int RunRealMaterialDeltaSmoke(void) {
            (void*)loadTExpRoot,
            (void*)fullTExpRoot,
            (void*)fadedTExpRoot,
+           (void*)copiedMObj.mat,
+           (void*)copiedMObj.tobj,
            GXHostGetLastSubmittedVertexCount(),
            GXHostGetLastExpandedVertexCount(),
            GXHostGetLastSubmittedPrimitive());
@@ -2659,6 +2683,9 @@ static int RunRealMaterialDeltaSmoke(void) {
 cleanup:
     GSgfxHostClearPipelineState(PCPORT_REAL_MATERIAL_PIPELINE);
     GXHostSetVertexAlphaScale(1.0f);
+    HSD_TObjRemoveAll(copiedMObj.tobj);
+    HSD_Free(copiedMObj.mat);
+    HSD_Free(copiedMObj.pe);
     free(fadedPixels);
     free(fullPixels);
     PCPort_DestroyTranslatedPObj(&translatedPObj);
