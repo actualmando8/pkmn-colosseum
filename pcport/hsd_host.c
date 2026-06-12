@@ -86,6 +86,49 @@ void HSD_Free(void* ptr)
     }
 }
 
+/* Host-only class fallback. The bootstrap link intentionally avoids the full
+ * asm-heavy HSD class TU, but several host HSD loaders only need basic
+ * zeroed allocation and "unknown class" lookup behavior. */
+void* hsdNew(HSD_ClassInfo* info)
+{
+    HSD_Class* object;
+    s32 size;
+
+    size = info != NULL && info->head.obj_size > 0 ?
+        info->head.obj_size : (s32) sizeof(HSD_Class);
+    object = (HSD_Class*) HSD_MemAlloc(size);
+    if (object != NULL) {
+        object->class_info = info;
+        if (info != NULL && info->init != NULL) {
+            info->init(object);
+        }
+    }
+    return object;
+}
+
+HSD_ClassInfo* hsdSearchClassInfo(const char* class_name)
+{
+    (void) class_name;
+    return NULL;
+}
+
+HSD_JObj* HSD_JObjAlloc(void)
+{
+    HSD_JObj* jobj = (HSD_JObj*) HSD_MemAlloc((s32) sizeof(HSD_JObj));
+
+    if (jobj != NULL) {
+        memset(jobj, 0, sizeof(HSD_JObj));
+    }
+    return jobj;
+}
+
+void HSD_JObjUnref(HSD_JObj* jobj)
+{
+    if (jobj != NULL) {
+        HSD_Free(jobj);
+    }
+}
+
 /* ========================================================================= */
 /*  TExp construction bridge (host override for placeholder labels)           */
 /* ========================================================================= */
@@ -796,6 +839,38 @@ HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
     return root;
 }
 
+HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+{
+    return HSD_JObjLoadJoint(joint);
+}
+
+static void PCPort_JObjRegisterTree(HSD_JObj* jobj,
+                                    HSD_Joint* joint,
+                                    PCPort_JObjLoadContext* ctx)
+{
+    while (jobj != NULL && joint != NULL && !ctx->failed) {
+        PCPort_JObjLoadContextRegister(ctx, joint, jobj);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            PCPort_JObjRegisterTree(jobj->child, joint->child, ctx);
+        }
+        jobj = jobj->next;
+        joint = joint->next;
+    }
+}
+
+void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint)
+{
+    PCPort_JObjLoadContext ctx;
+
+    if (jobj == NULL || joint == NULL) {
+        return;
+    }
+    memset(&ctx, 0, sizeof(ctx));
+    PCPort_JObjRegisterTree(jobj, joint, &ctx);
+    PCPort_JObjResolveTree(jobj, joint, &ctx);
+    PCPort_JObjLoadContextDestroy(&ctx);
+}
+
 /* ========================================================================= */
 /*  HSD_JObjDispAll — scene-graph display entry (host)                       */
 /* ========================================================================= */
@@ -967,6 +1042,179 @@ void HSD_TObjAnim(HSD_TObj* tobj)
     HSD_AObjInterpretAnim(tobj->aobj, tobj, PCPort_TObjUpdateFunc);
 }
 
+void HSD_TObjAnimAll(HSD_TObj* tobj)
+{
+    while (tobj != NULL) {
+        HSD_TObjAnim(tobj);
+        tobj = tobj->next;
+    }
+}
+
+static HSD_TObj* PCPort_TObjAlloc(void)
+{
+    HSD_TObj* tobj = (HSD_TObj*) HSD_MemAlloc((s32) sizeof(HSD_TObj));
+
+    if (tobj != NULL) {
+        memset(tobj, 0, sizeof(HSD_TObj));
+    }
+    return tobj;
+}
+
+static void PCPort_TObjLoad(HSD_TObj* tobj, HSD_TObjDesc* desc)
+{
+    if (tobj == NULL || desc == NULL) {
+        return;
+    }
+    tobj->id = desc->id;
+    tobj->src = desc->src;
+    tobj->rotate_x = desc->rotate_x;
+    tobj->rotate_y = desc->rotate_y;
+    tobj->rotate_z = desc->rotate_z;
+    tobj->scale_x = desc->scale_x;
+    tobj->scale_y = desc->scale_y;
+    tobj->scale_z = desc->scale_z;
+    tobj->translate_x = desc->translate_x;
+    tobj->translate_y = desc->translate_y;
+    tobj->translate_z = desc->translate_z;
+    tobj->wrap_s = desc->wrap_s;
+    tobj->wrap_t = desc->wrap_t;
+    tobj->repeat_s = desc->repeat_s;
+    tobj->repeat_t = desc->repeat_t;
+    tobj->flags = desc->blend_flags;
+    tobj->blending = desc->blending;
+    tobj->magFilt = desc->magFilt;
+    tobj->imagedesc = desc->imagedesc;
+    tobj->tlut = desc->tlutdesc;
+    tobj->lod = desc->lod;
+    tobj->tev = desc->tev;
+}
+
+HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* desc)
+{
+    HSD_TObj* first = NULL;
+    HSD_TObj* prev = NULL;
+
+    while (desc != NULL) {
+        HSD_TObj* tobj = PCPort_TObjAlloc();
+        if (tobj == NULL) {
+            HSD_TObjRemoveAll(first);
+            return NULL;
+        }
+        PCPort_TObjLoad(tobj, desc);
+        if (prev != NULL) {
+            prev->next = tobj;
+        } else {
+            first = tobj;
+        }
+        prev = tobj;
+        desc = desc->next;
+    }
+    return first;
+}
+
+void HSD_TObjRemoveAll(HSD_TObj* tobj)
+{
+    while (tobj != NULL) {
+        HSD_TObj* next = tobj->next;
+        HSD_AObjRemove(tobj->aobj);
+        HSD_Free(tobj);
+        tobj = next;
+    }
+}
+
+void HSD_FObjRemoveAll(HSD_FObj* fobj)
+{
+    while (fobj != NULL) {
+        HSD_FObj* next = fobj->next;
+        HSD_Free(fobj);
+        fobj = next;
+    }
+}
+
+HSD_MObj* HSD_MObjLoadDesc(HSD_MObjDesc* desc)
+{
+    HSD_MObj* mobj;
+
+    if (desc == NULL) {
+        return NULL;
+    }
+    mobj = (HSD_MObj*) HSD_MemAlloc((s32) sizeof(HSD_MObj));
+    if (mobj == NULL) {
+        return NULL;
+    }
+    memset(mobj, 0, sizeof(HSD_MObj));
+    mobj->rendermode = desc->rendermode;
+    mobj->tobj = HSD_TObjLoadDesc(desc->texdesc);
+    mobj->mat = desc->mat;
+    mobj->pe = desc->pedesc;
+    return mobj;
+}
+
+void HSD_MObjSetAlpha(HSD_MObj* mobj, f32 alpha)
+{
+    if (mobj != NULL && mobj->mat != NULL) {
+        mobj->mat->alpha = alpha;
+    }
+}
+
+void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode)
+{
+    (void) rendermode;
+    if (mobj != NULL) {
+        PCPort_MObjMakeTExp(mobj, mobj->tobj, &mobj->texp);
+    }
+}
+
+s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src)
+{
+    if (dst == NULL || src == NULL) {
+        return -1;
+    }
+    *dst = *src;
+    dst->tobj = NULL;
+    dst->aobj = NULL;
+    dst->texp = NULL;
+    return 0;
+}
+
+void MObjUpdateFunc(HSD_MObj* mobj, u32 type, HSD_ObjData* val)
+{
+    if (mobj == NULL || mobj->mat == NULL || val == NULL) {
+        return;
+    }
+    switch (type) {
+    case HSD_A_M_AMBIENT_R:
+        mobj->mat->ambient = (mobj->mat->ambient & 0x00FFFFFFu) |
+            (((u32) val->fv & 0xFFu) << 24);
+        break;
+    case HSD_A_M_AMBIENT_G:
+        mobj->mat->ambient = (mobj->mat->ambient & 0xFF00FFFFu) |
+            (((u32) val->fv & 0xFFu) << 16);
+        break;
+    case HSD_A_M_AMBIENT_B:
+        mobj->mat->ambient = (mobj->mat->ambient & 0xFFFF00FFu) |
+            (((u32) val->fv & 0xFFu) << 8);
+        break;
+    case HSD_A_M_DIFFUSE_R:
+        mobj->mat->diffuse = (mobj->mat->diffuse & 0x00FFFFFFu) |
+            (((u32) val->fv & 0xFFu) << 24);
+        break;
+    case HSD_A_M_DIFFUSE_G:
+        mobj->mat->diffuse = (mobj->mat->diffuse & 0xFF00FFFFu) |
+            (((u32) val->fv & 0xFFu) << 16);
+        break;
+    case HSD_A_M_DIFFUSE_B:
+        mobj->mat->diffuse = (mobj->mat->diffuse & 0xFFFF00FFu) |
+            (((u32) val->fv & 0xFFu) << 8);
+        break;
+    case HSD_A_M_ALPHA:
+        mobj->mat->alpha = val->fv;
+        break;
+    default:
+        break;
+    }
+}
+
 /* ------------------------------------------------------------------------- */
 /*  HSD_JObjAnim (host override)                                              */
 /*                                                                           */
@@ -990,6 +1238,34 @@ void HSD_JObjAnim(HSD_JObj* jobj)
         /* DObjAnimAll walks the whole DObj chain (the src HSD_JObjAnim used the
          * single-DObj HSD_DObjAnim, which would skip chained material sets). */
         HSD_DObjAnimAll(jobj->u.dobj);
+    }
+}
+
+void HSD_JObjSetFlags(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj != NULL) {
+        jobj->flags |= flags;
+    }
+}
+
+void HSD_JObjClearFlags(HSD_JObj* jobj, u32 flags)
+{
+    if (jobj != NULL) {
+        jobj->flags &= ~flags;
+    }
+}
+
+void HSD_JObjRemoveAnim(HSD_JObj* jobj)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    HSD_AObjRemove(jobj->aobj);
+    jobj->aobj = NULL;
+    HSD_RObjRemoveAnimAll(jobj->robj);
+    if (union_type_dobj(jobj)) {
+        HSD_DObjRemoveAll(jobj->u.dobj);
+        jobj->u.dobj = NULL;
     }
 }
 

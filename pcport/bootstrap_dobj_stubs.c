@@ -33,3 +33,9 @@ void HSD_DObjRemoveAll(void* dobj)
 {
     (void)dobj;
 }
+
+void HSD_DObjResolveRefsAll(void* dobj, void* desc)
+{
+    (void)dobj;
+    (void)desc;
+}

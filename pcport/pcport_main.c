@@ -7444,6 +7444,39 @@ extern u8 lbl_803A95E8[];
 extern u8 lbl_803A9720[];
 extern void fn_80053778(void);
 
+u8 lbl_803A9768[PCPORT_MSGBOX_STATE_SIZE];
+u8 lbl_803A95E8[0x138];
+u8 lbl_803A9720[0x48];
+
+void fn_80056C54(u8* out, u8* src, u32 slot) {
+    u32 activeSlot = slot % 2u;
+    u8* dst = lbl_803A9768 + PCPORT_MSGBOX_SLOT_BASE +
+        activeSlot * PCPORT_MSGBOX_SLOT_SIZE;
+
+    if (src != NULL) {
+        memcpy(dst, src, sizeof(PCPortScriptMsgContext));
+    }
+    if (out != NULL) {
+        memcpy(out, dst, sizeof(PCPortScriptMsgContext));
+    }
+    *(u32*)(lbl_803A9768 + PCPORT_MSGBOX_ACTIVE_SLOT_OFF) = activeSlot;
+}
+
+void* fn_80057270(void) {
+    u32 activeSlot = *(u32*)(lbl_803A9768 + PCPORT_MSGBOX_ACTIVE_SLOT_OFF) % 2u;
+    return lbl_803A9768 + PCPORT_MSGBOX_SLOT_BASE +
+        activeSlot * PCPORT_MSGBOX_SLOT_SIZE;
+}
+
+void fn_80053778(void) {
+    void* msgCtx = fn_80057270();
+
+    *(void**)lbl_803A95E8 = msgCtx;
+    *(u32*)(lbl_803A95E8 + 8) = 1u;
+    *(void**)lbl_803A9720 = msgCtx;
+    *(u32*)(lbl_803A9720 + 8) = 1u;
+}
+
 static int PCPort_TextLen(const char* text) {
     return text != NULL ? (int)strlen(text) : 0;
 }
