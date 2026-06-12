@@ -7425,6 +7425,7 @@ typedef struct PCPortScriptMsgContext {
 } PCPortScriptMsgContext;
 
 extern u8 lbl_803A9768[];
+extern void fn_80056C54(u8* out, u8* src, u32 slot);
 extern void* fn_80057270(void);
 
 static int PCPort_TextLen(const char* text) {
@@ -7469,25 +7470,22 @@ static void PCPort_MessageBoxSeedScriptContext(
     const PCPortMessageBoxState* msg,
     u32 speakerId,
     const char* preview) {
-    PCPortScriptMsgContext* ctx;
+    PCPortScriptMsgContext seed;
 
     memset(lbl_803A9768, 0, PCPORT_MSGBOX_STATE_SIZE);
     *(u32*)(lbl_803A9768 + PCPORT_MSGBOX_ACTIVE_SLOT_OFF) = 0u;
     *(f32*)(lbl_803A9768 + PCPORT_MSGBOX_X_OFF) = 58.0f;
     *(f32*)(lbl_803A9768 + PCPORT_MSGBOX_Y_OFF) = 276.0f;
 
-    ctx = PCPort_MessageBoxScriptContext();
-    if (ctx == NULL) {
-        return;
-    }
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->magic = PCPORT_MSGBOX_CONTEXT_MAGIC;
-    ctx->speakerId = speakerId;
-    ctx->pageCount = msg != NULL ? (u32)msg->pageCount : 0u;
-    ctx->active = (msg != NULL && msg->active) ? 1u : 0u;
+    memset(&seed, 0, sizeof(seed));
+    seed.magic = PCPORT_MSGBOX_CONTEXT_MAGIC;
+    seed.speakerId = speakerId;
+    seed.pageCount = msg != NULL ? (u32)msg->pageCount : 0u;
+    seed.active = (msg != NULL && msg->active) ? 1u : 0u;
     if (preview != NULL) {
-        snprintf(ctx->preview, sizeof(ctx->preview), "%s", preview);
+        snprintf(seed.preview, sizeof(seed.preview), "%s", preview);
     }
+    fn_80056C54(NULL, (u8*)&seed, 0u);
 }
 
 static void PCPort_MessageBoxSyncScriptContext(
@@ -13435,7 +13433,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
         msgCtx->active == 1u;
     if (!msgCtxLinked) {
         fprintf(stderr,
-                "[field-npc-open-smoke] failed: fn_80057270 msg context not linked ctx=%p magic=0x%08X speaker=%u pages=%u active=%u\n",
+                "[field-npc-open-smoke] failed: fn_80056C54/fn_80057270 msg context not linked ctx=%p magic=0x%08X speaker=%u pages=%u active=%u\n",
                 (void*)msgCtx,
                 msgCtx != NULL ? msgCtx->magic : 0u,
                 msgCtx != NULL ? msgCtx->speakerId : 0u,
@@ -13519,7 +13517,7 @@ static int RunFieldNpcOpenSmoke(GLFWwindow* window) {
         return 0;
     }
 
-    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u fn_80057270=1 group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
+    printf("[field-npc-open-smoke] passed: fn_8018E050/E1C4 setup=%u fn_80056C54=1 fn_80057270=1 group=%u index=%u marker=0x%08X@0x%X action=0x%08X npc=(%.1f,%.1f,%.1f) talk=%u dialogueOpen=%d advance=%d close=%d storyStep=%u cutscene=%u npcDrawn=%u frames=%d\n",
            g_pcPeopleOpenSetupCount,
            (u32)PC_FLOOR_OUTSKIRT,
            npcIndex,
