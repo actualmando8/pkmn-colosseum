@@ -10191,6 +10191,69 @@ static int PCPort_FieldMotionForRole(const PCPortFieldMotionMap* map,
     }
 }
 
+static const char* PCPort_FieldMotionRoleName(PCPortFieldMotionRole role) {
+    switch (role) {
+    case PCPORT_FIELD_MOTION_IDLE: return "idle";
+    case PCPORT_FIELD_MOTION_WALK: return "walk";
+    case PCPORT_FIELD_MOTION_RUN:  return "run";
+    default:                       return "unknown";
+    }
+}
+
+static void PCPort_FieldComputeMoveVector(f32 camYaw, f32 sx, f32 sy,
+                                          f32* outMvx, f32* outMvz,
+                                          f32* outMag) {
+    f32 fwdX = sinf(camYaw);
+    f32 fwdZ = -cosf(camYaw);
+    f32 rightX = cosf(camYaw);
+    f32 rightZ = sinf(camYaw);
+    f32 mvx = fwdX * sy + rightX * sx;
+    f32 mvz = fwdZ * sy + rightZ * sx;
+    f32 moveMag = sqrtf(mvx * mvx + mvz * mvz);
+
+    if (moveMag > 1.0f) {
+        mvx /= moveMag;
+        mvz /= moveMag;
+        moveMag = 1.0f;
+    }
+    if (outMvx != NULL) *outMvx = mvx;
+    if (outMvz != NULL) *outMvz = mvz;
+    if (outMag != NULL) *outMag = moveMag;
+}
+
+static PCPortFieldMotionRole PCPort_FieldMotionRoleForInput(f32 moveMag,
+                                                            u16 btn,
+                                                            u8 triggerRight,
+                                                            int forceRun,
+                                                            int forceWalk,
+                                                            f32 runThreshold,
+                                                            f32 walkDeadzone) {
+    if (moveMag <= walkDeadzone) {
+        return PCPORT_FIELD_MOTION_IDLE;
+    }
+    if ((((moveMag >= runThreshold) ||
+          (btn & (GCN_PAD_BUTTON_B | GCN_PAD_TRIGGER_R)) ||
+          triggerRight >= 200u ||
+          forceRun) &&
+         !forceWalk)) {
+        return PCPORT_FIELD_MOTION_RUN;
+    }
+    return PCPORT_FIELD_MOTION_WALK;
+}
+
+static f32 PCPort_FieldYawForMove(f32 mvx, f32 mvz) {
+    /* Model facing matches the live walk-loop convention: forward/north
+     * movement uses yaw PI, backward/south uses yaw 0. */
+    return atan2f(-mvx, mvz);
+}
+
+static f32 PCPort_FieldAngleAbsDelta(f32 a, f32 b) {
+    f32 d = a - b;
+    while (d > 3.14159265f) d -= 6.28318530f;
+    while (d < -3.14159265f) d += 6.28318530f;
+    return d < 0.0f ? -d : d;
+}
+
 /* Third-person "walk the room" mode for --field (PCPORT_FIELD_WALK). The player
  * is a box avatar that moves on the WZX floor with wall blocking; the camera
  * orbits behind. Left stick walks (camera-relative), arrows/C-stick orbit, the
@@ -10280,7 +10343,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
 
     g_walkPrevTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
-        f32 fwdXZ[3], rightXZ[3], mvx, mvz, eye[3], interest[3], floorY;
+        f32 mvx, mvz, eye[3], interest[3], floorY;
         f32 moveMag, moveSpeed;
         f32 prevx, prevz;
         f32 frameStep;
@@ -10288,6 +10351,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
         u16 btn;
         f32 sx, sy;
         int moving, running;
+        PCPortFieldMotionRole role;
 
         VIWaitForRetrace_PC();
         /* Real-time frame step: elapsed seconds * 60 = game frames elapsed.
@@ -10326,24 +10390,13 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             camYaw += 0.01f;
         }
 
-        /* Camera-relative ground movement. fwdXZ points where the camera looks. */
-        fwdXZ[0] = sinf(camYaw); fwdXZ[1] = 0.0f; fwdXZ[2] = -cosf(camYaw);
-        rightXZ[0] = cosf(camYaw); rightXZ[1] = 0.0f; rightXZ[2] = sinf(camYaw);
-        mvx = fwdXZ[0] * sy + rightXZ[0] * sx;
-        mvz = fwdXZ[2] * sy + rightXZ[2] * sx;
-        moveMag = sqrtf(mvx * mvx + mvz * mvz);
-        if (moveMag > 1.0f) {
-            mvx /= moveMag;
-            mvz /= moveMag;
-            moveMag = 1.0f;
-        }
-        moving = moveMag > walkDeadzone;
-        running = moving &&
-                  (((moveMag >= runThreshold) ||
-                    (btn & (GCN_PAD_BUTTON_B | GCN_PAD_TRIGGER_R)) ||
-                    pads[0].triggerRight >= 200u ||
-                    forceRun) &&
-                   !forceWalk);
+        PCPort_FieldComputeMoveVector(camYaw, sx, sy, &mvx, &mvz, &moveMag);
+        role = PCPort_FieldMotionRoleForInput(moveMag, btn,
+                                              pads[0].triggerRight,
+                                              forceRun, forceWalk,
+                                              runThreshold, walkDeadzone);
+        moving = role != PCPORT_FIELD_MOTION_IDLE;
+        running = role == PCPORT_FIELD_MOTION_RUN;
         moveSpeed = running ? runSpeed : walkSpeed;
 
         prevx = ppos[0]; prevz = ppos[2];
@@ -10355,7 +10408,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
              * S=facing-camera, matching the real game's overworld convention.
              * The sign inversion fixes the previous 180-degree facing error
              * (W showed front, S showed back — opposite of correct). */
-            pyaw = atan2f(-mvx, mvz);
+            pyaw = PCPort_FieldYawForMove(mvx, mvz);
         }
 
         /* Drive the motion bank: idle while standing, walk for partial-stick
@@ -10363,9 +10416,6 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
          * the real per-character action record when its table and key are
          * available. */
         if (getenv("PCPORT_NO_CHAR_ANIM") == NULL && g_engCharLoaded) {
-            PCPortFieldMotionRole role = moving
-                ? (running ? PCPORT_FIELD_MOTION_RUN : PCPORT_FIELD_MOTION_WALK)
-                : PCPORT_FIELD_MOTION_IDLE;
             int nextMotion = PCPort_FieldMotionForRole(&motionMap, role);
             if (nextMotion < 0) {
                 if (!reportedMissingMotionMap && motionDebug) {
@@ -10377,7 +10427,7 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             } else if (nextMotion != currentMotion) {
                 if (motionDebug) {
                     printf("[field/motion] %s -> motion %d (mag=%.2f speed=%.2f)\n",
-                           moving ? (running ? "run" : "walk") : "idle",
+                           PCPort_FieldMotionRoleName(role),
                            nextMotion, moveMag, moveSpeed);
                 }
                 PCPort_CharAnimSetMotion(nextMotion);
@@ -11047,6 +11097,128 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
            PCPort_FieldColTriCount(),
            exShop.targetFloor,
            spawnShop[0], spawnShop[1], spawnShop[2]);
+    return 1;
+}
+
+typedef struct PCPortFieldLocomotionSmokeCase {
+    const char* name;
+    f32 sx;
+    f32 sy;
+    PCPortFieldMotionRole wantRole;
+    f32 wantYaw;
+    int checkYaw;
+} PCPortFieldLocomotionSmokeCase;
+
+static int RunFieldLocomotionSmoke(GLFWwindow* window) {
+    static const PCPortFieldLocomotionSmokeCase cases[] = {
+        { "idle",      0.0f,  0.0f, PCPORT_FIELD_MOTION_IDLE, 0.0f, 0 },
+        { "walk-north", 0.0f,  0.5f, PCPORT_FIELD_MOTION_WALK, 3.14159265f, 1 },
+        { "walk-south", 0.0f, -0.5f, PCPORT_FIELD_MOTION_WALK, 0.0f, 1 },
+        { "walk-east",  0.5f,  0.0f, PCPORT_FIELD_MOTION_WALK, -1.57079633f, 1 },
+        { "walk-west", -0.5f,  0.0f, PCPORT_FIELD_MOTION_WALK, 1.57079633f, 1 },
+        { "run-north",  0.0f,  1.0f, PCPORT_FIELD_MOTION_RUN, 3.14159265f, 1 },
+        { "run-south",  0.0f, -1.0f, PCPORT_FIELD_MOTION_RUN, 0.0f, 1 },
+        { "run-east",   1.0f,  0.0f, PCPORT_FIELD_MOTION_RUN, -1.57079633f, 1 },
+        { "run-west",  -1.0f,  0.0f, PCPORT_FIELD_MOTION_RUN, 1.57079633f, 1 }
+    };
+    PCPortFieldMotionMap motionMap;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    int i;
+    int idleMotion;
+    int walkMotion;
+    int runMotion;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter()) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: could not load field character\n");
+        return 0;
+    }
+    if (!PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: field character animation bank is not ready\n");
+        return 0;
+    }
+
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    walkMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_WALK);
+    runMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_RUN);
+    if (idleMotion < 0 || walkMotion < 0 || runMotion < 0 ||
+        idleMotion == walkMotion || idleMotion == runMotion ||
+        walkMotion == runMotion) {
+        fprintf(stderr,
+                "[field-locomotion-smoke] failed: invalid motion map idle=%d walk=%d run=%d\n",
+                idleMotion, walkMotion, runMotion);
+        return 0;
+    }
+
+    for (i = 0; i < (int)(sizeof(cases) / sizeof(cases[0])); ++i) {
+        const PCPortFieldLocomotionSmokeCase* c = &cases[i];
+        f32 mvx;
+        f32 mvz;
+        f32 moveMag;
+        f32 yaw = 3.14159265f;
+        PCPortFieldMotionRole gotRole;
+        int motion;
+
+        PCPort_FieldComputeMoveVector(0.0f, c->sx, c->sy,
+                                      &mvx, &mvz, &moveMag);
+        gotRole = PCPort_FieldMotionRoleForInput(moveMag, 0u, 0u,
+                                                 0, 0, 0.85f, 0.05f);
+        if (gotRole != c->wantRole) {
+            fprintf(stderr,
+                    "[field-locomotion-smoke] failed: %s role=%s expected=%s mag=%.2f\n",
+                    c->name,
+                    PCPort_FieldMotionRoleName(gotRole),
+                    PCPort_FieldMotionRoleName(c->wantRole),
+                    moveMag);
+            return 0;
+        }
+        if (c->checkYaw) {
+            yaw = PCPort_FieldYawForMove(mvx, mvz);
+            if (PCPort_FieldAngleAbsDelta(yaw, c->wantYaw) > 0.03f) {
+                fprintf(stderr,
+                        "[field-locomotion-smoke] failed: %s yaw=%.3f expected=%.3f\n",
+                        c->name, yaw, c->wantYaw);
+                return 0;
+            }
+        }
+        motion = PCPort_FieldMotionForRole(&motionMap, gotRole);
+        if (motion < 0 || !PCPort_CharAnimSetMotion(motion)) {
+            fprintf(stderr,
+                    "[field-locomotion-smoke] failed: %s motion %d could not be set\n",
+                    c->name, motion);
+            return 0;
+        }
+
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             yaw, 1.3f, 1.0f);
+        GSgfxSwapBuffers(0);
+        printf("[field-locomotion-smoke] %s role=%s motion=%d yaw=%.3f mag=%.2f\n",
+               c->name,
+               PCPort_FieldMotionRoleName(gotRole),
+               motion,
+               yaw,
+               moveMag);
+    }
+
+    printf("[field-locomotion-smoke] passed: S1_out player locomotion idle=%d walk=%d run=%d directions=%d spawn=(%.1f,%.1f,%.1f)\n",
+           idleMotion,
+           walkMotion,
+           runMotion,
+           (int)(sizeof(cases) / sizeof(cases[0])),
+           spawn[0], spawn[1], spawn[2]);
     return 1;
 }
 
@@ -13753,6 +13925,7 @@ int main(int argc, char** argv) {
     int runFieldRoomWarpSmoke;
     int runFieldRoomReloadSmoke;
     int runFieldWorldWarpSmoke;
+    int runFieldLocomotionSmoke;
     int runWorldMapHandoffSmoke;
     int runWorldMapMenuSmoke;
     int runWorldMapMenu;
@@ -13775,6 +13948,7 @@ int main(int argc, char** argv) {
     runFieldRoomWarpSmoke = HasArg(argc, argv, "--field-room-warp-smoke");
     runFieldRoomReloadSmoke = HasArg(argc, argv, "--field-room-reload-smoke");
     runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
+    runFieldLocomotionSmoke = HasArg(argc, argv, "--field-locomotion-smoke");
     runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runWorldMapMenuSmoke = HasArg(argc, argv, "--worldmap-menu-smoke");
     runWorldMapMenu = HasArg(argc, argv, "--worldmap-menu");
@@ -13891,6 +14065,7 @@ int main(int argc, char** argv) {
         runFieldRoomWarpSmoke ||
         runFieldRoomReloadSmoke ||
         runFieldWorldWarpSmoke ||
+        runFieldLocomotionSmoke ||
         runWorldMapHandoffSmoke ||
         runWorldMapMenuSmoke ||
         runWorldMapMenu ||
@@ -14205,6 +14380,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Worldmap handoff smoke rendered world_map.fsys through the field scene bridge\n");
+    } else if (runFieldLocomotionSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-locomotion-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldLocomotionSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field locomotion smoke exercised idle/walk/run directional animation gating\n");
     } else if (runFieldWorldWarpSmoke) {
         if (window == NULL) {
             fprintf(stderr,
