@@ -5,6 +5,7 @@
 #include "gx_shim.h"
 #include "gx_texture.h"
 #include "hsd/hsd_fobj.h"
+#include "hsd/hsd_jobj.h"
 #include "hsd/hsd_memory.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_pobj.h"
@@ -1255,6 +1256,70 @@ static int RunGXScissorSmoke(void) {
            (unsigned int)outside[1],
            (unsigned int)outside[2],
            (unsigned int)outside[3]);
+    return 1;
+}
+
+static void InitSmokeJoint(HSD_Joint* joint)
+{
+    memset(joint, 0, sizeof(*joint));
+    joint->scale_x = 1.0f;
+    joint->scale_y = 1.0f;
+    joint->scale_z = 1.0f;
+}
+
+static int RunJObjInstanceSmoke(void)
+{
+    HSD_Joint rootJoint;
+    HSD_Joint targetJoint;
+    HSD_Joint instanceJoint;
+    HSD_JObj* root;
+    HSD_JObj* target;
+    HSD_JObj* instance;
+    HSD_JObj* instanceChild;
+    int ok;
+
+    InitSmokeJoint(&rootJoint);
+    InitSmokeJoint(&targetJoint);
+    InitSmokeJoint(&instanceJoint);
+
+    rootJoint.child = &targetJoint;
+    rootJoint.next = &instanceJoint;
+    targetJoint.position_x = 10.0f;
+    instanceJoint.flags = JOBJ_INSTANCE;
+    instanceJoint.child = &targetJoint;
+    instanceJoint.position_y = 5.0f;
+
+    root = HSD_JObjLoadJoint(&rootJoint);
+    if (root == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj instance smoke failed: load returned NULL\n");
+        return 0;
+    }
+
+    target = root->child;
+    instance = root->next;
+    instanceChild = instance != NULL ? instance->child : NULL;
+    ok = target != NULL &&
+         instance != NULL &&
+         instanceChild == target &&
+         target->parent == root;
+
+    HSD_JObjSetFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjClearFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjAnimAll(root);
+    HSD_JObjRemoveAll(root);
+
+    if (!ok) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj instance smoke failed: target=%p instance=%p instanceChild=%p\n",
+                (void*)target,
+                (void*)instance,
+                (void*)instanceChild);
+        return 0;
+    }
+
+    printf("[pcport_bootstrap] JObj instance smoke passed (shared child=%p)\n",
+           (void*)target);
     return 1;
 }
 
@@ -12693,6 +12758,7 @@ static int RunBattleScene(GLFWwindow* window, int viewerMode) {
 int main(int argc, char** argv) {
     int audioInitialized = 0;
     int runRealContentParserSmoke;
+    int runJObjInstanceSmoke;
     int runRealSceneSlice4Smoke;
     int runRealTevSceneSlice3Smoke;
     int runRealTevSceneSlice2Smoke;
@@ -12727,6 +12793,7 @@ int main(int argc, char** argv) {
 
     runWindowSmoke = HasArg(argc, argv, "--window-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
+    runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runRealContentParserSmoke = HasArg(argc, argv, "--real-content-parser-smoke");
     runRealSceneSlice4Smoke = HasArg(argc, argv, "--real-scene-slice-4-smoke");
     runRealTevSceneSlice3Smoke = HasArg(argc, argv, "--real-tev-scene-slice-3-smoke");
@@ -12904,7 +12971,14 @@ int main(int argc, char** argv) {
            trkBuffer, trkLen);
     printf("[pcport_bootstrap] Linked decomp TU OSStateFlags verified (appType=0x%08lX)\n",
            appType);
-    if (runRealContentParserSmoke) {
+    if (runJObjInstanceSmoke) {
+        if (!RunJObjInstanceSmoke()) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] JObj instance child resolved to canonical live child\n");
+    } else if (runRealContentParserSmoke) {
         if (!RunRealContentParserSmoke()) {
             exitCode = 1;
             goto cleanup;

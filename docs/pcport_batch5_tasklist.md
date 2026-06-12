@@ -21,22 +21,37 @@ Verification:
 
 ## Batch 5B - hsd_jobj Functional Holes
 
-- [ ] Decompile or host-bridge the live-impact instance/reference helpers `fn_801A0744` and `fn_801A0D94`.
+- [x] Decompile or host-bridge the live-impact instance/reference helpers `fn_801A0744` and `fn_801A0D94`.
 - [x] Triage `fn_801A0744` and `fn_801A0D94` with DeepSeek V4 Flash.
 - [ ] Triage remaining `hsd_jobj` TODO wrappers from `tools/decomp_work/_interesting_reordered.json`.
-- [ ] Verify that new JObj work changes linked PC-port runtime behavior.
+- [x] Verify that new JObj work changes linked PC-port runtime behavior.
 
 Active lane:
 
-- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum-wt-jobj`
-- Branch: `pcport-5b-jobj`
-- Worker focus: `src\hsd\hsd_jobj.c`, PC-port `REPLACE_BODY` overlays for `fn_801A0744` and `fn_801A0D94`.
+- Worktree: `C:\Users\douglaswhittingham\pkmn-colosseum`
+- Branch: `master`
+- Worker focus: active host equivalent of `fn_801A0744` / `fn_801A0D94` in `pcport\hsd_host.c`, because the linked PC-port `HSD_JObjLoadJoint` is the BOOT-order host loader.
 
 Lane result:
 
 - No overlay landed; the first `fn_801A0744` / `fn_801A0D94` candidate was rejected as unsafe and reverted in the worktree.
 - Blocker: the real Colosseum `.inc` path includes ref-count transitions through `fn_801A0D48`, `fn_801A0D3C`, `fn_801A0CE8`, `fn_801A0C9C`, `fn_801A0C68`, and ID lookup through `fn_8019C128`; the candidate leaned too much on upstream Melee semantics.
-- Next JObj action: reconstruct from `src\hsd\hsd_jobj_fn_801A0744.inc` and `src\hsd\hsd_jobj_fn_801A0D94.inc` line-by-line before attempting another overlay.
+- Main-checkout follow-up landed the live-impact host behavior instead of a generated-copy overlay: `pcport\hsd_host.c` now records a descriptor-to-live-JObj map during `HSD_JObjLoadJoint`, skips private child recursion for `JOBJ_INSTANCE` descriptors, and resolves each instance child to the canonical live JObj after all canonical nodes are loaded. This mirrors the practical `fn_801A0744` / `fn_801A0D94` ID-table lookup semantics in the active PC-port path.
+- Host ref-count note: the PC loader intentionally does not increment the shared child ref count when wiring an instance child. The graph-safe `HSD_JObjRemoveAll` ownership path visits and destroys each live JObj pointer once; adding the original assembly ref bump here would leave shared children alive after host graph removal.
+- `pcport\pcport_main.c` now exposes `--jobj-instance-smoke`, a headless smoke that constructs a root/canonical-child/instance-sibling descriptor graph, loads it through public `HSD_JObjLoadJoint`, requires `instance->child == root->child`, then runs graph-safe flag, animation, and removal walkers.
+
+Verification:
+
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1713 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --jobj-instance-smoke` -> passed with `JObj instance child resolved to canonical live child`.
+- `build_pc\pcport_bootstrap.exe --real-material-delta-smoke`
+- `build_pc\pcport_bootstrap.exe --real-scene-slice-2-smoke`
+- `build_pc\pcport_bootstrap.exe --real-textured-scene-slice-smoke`
+- `build_pc\pcport_bootstrap.exe --real-scene-slice-4-smoke`
+- `build_pc\pcport_bootstrap.exe --real-tev-scene-slice-3-smoke`
+- `PCPORT_CHARANIM_BANK_PROBE=12 build_pc\pcport_bootstrap.exe`
+- `PCPORT_MENU_FRAMES=45 build_pc\pcport_bootstrap.exe --field`
+- `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 
 ## Batch 5C - hsd_mobj Material Runtime Holes
 
@@ -52,7 +67,7 @@ Lane result:
 - [x] Replace the generated PC body for `fn_801A6E24` so material setup calls the PC `make_texp` slot with the correct signature.
 - [x] Replace the generated PC body for `fn_801A7E84` and route `HSD_MObjAnim` through it so material AObj keys update live MObj state.
 - [x] Replace the generated PC body for `fn_801A7D58` so MObj copies allocate independent PC-side material, PE, and TObj-chain storage.
-- [ ] Retry hsd_jobj `fn_801A0744` / `fn_801A0D94` from the real Colosseum `.inc` sequence.
+- [x] Retry hsd_jobj `fn_801A0744` / `fn_801A0D94` from the real Colosseum `.inc` sequence.
 
 Active lane:
 

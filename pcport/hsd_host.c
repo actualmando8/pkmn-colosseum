@@ -567,14 +567,99 @@ HSD_TExp* PCPort_MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top,
  * the recursive glue the asm function would otherwise perform. Building the real
  * HSD_JObj tree is the prerequisite for running the game's HSD_JObjAnimAll
  * (texture-matrix UV scroll = the title "sand") + its real render. */
-/* PC host detail: the helpers below load all JObjs first, then resolve
- * post-load refs. Instance children stay as private tree copies until the host
- * JObj walkers are graph-aware; exact shared-child pointers can cycle through
- * child/next walks. */
+/* PC host detail: the helpers below load all canonical JObjs first, then
+ * resolve post-load refs. Batch 5A made the host JObj walkers graph-aware, so
+ * JOBJ_INSTANCE children can now be wired to the canonical live child instead
+ * of being loaded as private duplicate subtrees. */
+
+typedef struct PCPort_JObjLoadEntry {
+    HSD_Joint* joint;
+    HSD_JObj* jobj;
+} PCPort_JObjLoadEntry;
 
 typedef struct PCPort_JObjLoadContext {
     BOOL failed;
+    PCPort_JObjLoadEntry* entries;
+    size_t entryCount;
+    size_t entryCapacity;
 } PCPort_JObjLoadContext;
+
+static void PCPort_JObjLoadContextDestroy(PCPort_JObjLoadContext* ctx)
+{
+    free(ctx->entries);
+    ctx->entries = NULL;
+    ctx->entryCount = 0;
+    ctx->entryCapacity = 0;
+}
+
+static BOOL PCPort_JObjLoadContextGrow(PCPort_JObjLoadContext* ctx)
+{
+    PCPort_JObjLoadEntry* entries;
+    size_t newCapacity;
+
+    newCapacity = ctx->entryCapacity == 0 ? 32 : ctx->entryCapacity * 2;
+    if (newCapacity <= ctx->entryCapacity) {
+        ctx->failed = TRUE;
+        return FALSE;
+    }
+
+    entries = (PCPort_JObjLoadEntry*) realloc(
+        ctx->entries, newCapacity * sizeof(ctx->entries[0]));
+    if (entries == NULL) {
+        ctx->failed = TRUE;
+        return FALSE;
+    }
+
+    ctx->entries = entries;
+    ctx->entryCapacity = newCapacity;
+    return TRUE;
+}
+
+static BOOL PCPort_JObjLoadContextRegister(PCPort_JObjLoadContext* ctx,
+                                           HSD_Joint* joint,
+                                           HSD_JObj* jobj)
+{
+    size_t i;
+
+    if (joint == NULL || jobj == NULL) {
+        return TRUE;
+    }
+
+    for (i = 0; i < ctx->entryCount; i++) {
+        if (ctx->entries[i].joint == joint) {
+            ctx->entries[i].jobj = jobj;
+            return TRUE;
+        }
+    }
+
+    if (ctx->entryCount >= ctx->entryCapacity &&
+        !PCPort_JObjLoadContextGrow(ctx))
+    {
+        return FALSE;
+    }
+
+    ctx->entries[ctx->entryCount].joint = joint;
+    ctx->entries[ctx->entryCount].jobj = jobj;
+    ctx->entryCount++;
+    return TRUE;
+}
+
+static HSD_JObj* PCPort_JObjLoadContextFind(PCPort_JObjLoadContext* ctx,
+                                            HSD_Joint* joint)
+{
+    size_t i;
+
+    if (joint == NULL) {
+        return NULL;
+    }
+
+    for (i = 0; i < ctx->entryCount; i++) {
+        if (ctx->entries[i].joint == joint) {
+            return ctx->entries[i].jobj;
+        }
+    }
+    return NULL;
+}
 
 static HSD_JObj* PCPort_JObjAllocForJoint(HSD_Joint* joint)
 {
@@ -644,8 +729,13 @@ static HSD_JObj* PCPort_JObjLoadTree(HSD_Joint* joint,
             first = jobj;
         }
         prev = jobj;
+        if (!PCPort_JObjLoadContextRegister(ctx, joint, jobj)) {
+            break;
+        }
 
-        jobj->child = PCPort_JObjLoadTree(joint->child, jobj, ctx);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            jobj->child = PCPort_JObjLoadTree(joint->child, jobj, ctx);
+        }
         HSD_JObjSetMtxDirty(jobj);
         joint = joint->next;
     }
@@ -653,7 +743,8 @@ static HSD_JObj* PCPort_JObjLoadTree(HSD_Joint* joint,
 }
 
 static void PCPort_JObjResolveTree(HSD_JObj* jobj,
-                                   HSD_Joint* joint)
+                                   HSD_Joint* joint,
+                                   PCPort_JObjLoadContext* ctx)
 {
     while (jobj != NULL && joint != NULL) {
         if (jobj->robj != NULL && joint->robjdesc != NULL) {
@@ -663,7 +754,20 @@ static void PCPort_JObjResolveTree(HSD_JObj* jobj,
             HSD_DObjResolveRefsAll(jobj->u.dobj, joint->u.dobjdesc);
         }
 
-        PCPort_JObjResolveTree(jobj->child, joint->child);
+        if (jobj->flags & JOBJ_INSTANCE) {
+            if (joint->child != NULL) {
+                jobj->child = PCPort_JObjLoadContextFind(ctx, joint->child);
+                if (jobj->child == NULL) {
+                    ctx->failed = TRUE;
+                    return;
+                }
+            }
+        } else {
+            PCPort_JObjResolveTree(jobj->child, joint->child, ctx);
+            if (ctx->failed) {
+                return;
+            }
+        }
 
         jobj = jobj->next;
         joint = joint->next;
@@ -682,11 +786,13 @@ HSD_JObj* HSD_JObjLoadJoint(HSD_Joint* joint)
     memset(&ctx, 0, sizeof(ctx));
     root = PCPort_JObjLoadTree(joint, NULL, &ctx);
     if (!ctx.failed) {
-        PCPort_JObjResolveTree(root, joint);
-    } else if (root != NULL) {
+        PCPort_JObjResolveTree(root, joint, &ctx);
+    }
+    if (ctx.failed && root != NULL) {
         HSD_JObjRemoveAll(root);
         root = NULL;
     }
+    PCPort_JObjLoadContextDestroy(&ctx);
     return root;
 }
 
