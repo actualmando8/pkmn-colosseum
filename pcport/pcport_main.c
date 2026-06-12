@@ -9948,15 +9948,18 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         /* The Outskirt Stand exterior — the game's first walkable scene and the
          * New Game spawn map. The train-car diner sits to one side; Wes spawns in
          * the open desert plaza in front of it. The host shop-door trigger is
-         * near the current smoke autorun path into the train-car diner; the real
-         * exit table remains a follow-up.
+         * represented by two overlapping samples: the original smoke autorun
+         * path and the visible train-car doorway threshold. The real exit table
+         * remains a follow-up.
          * Collision bounds X[-146,231] Y[-10,64] Z[-127,127]. */
         PC_FLOOR_OUTSKIRT, "S1_out",
         {
             { { 69.0f, 0.0f, -30.0f }, 0.0f,
-              18.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } }
+              18.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } },
+            { { 96.0f, 0.0f, -4.0f }, 0.0f,
+              30.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } }
         },
-        1,
+        2,
         { 47.7f, 0.0f, 79.9f }   /* spawn point: just behind the gas-pump foundation
                                    * (concrete pad under the green pump, right side of
                                    * view).  Dialled in by the user walking Wes to the
@@ -10096,12 +10099,12 @@ static int PCPort_FieldWarpTo(int targetFloor, f32 outSpawn[3]) {
             g_pcStoryFieldSmoke.targetFloor = targetFloor;
             g_pcStoryFieldSmoke.mapLoaded = 1;
             g_pcStoryFieldSmoke.colTris = colTris;
+            g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
             snprintf(g_pcStoryFieldSmoke.mapPath,
                      sizeof(g_pcStoryFieldSmoke.mapPath), "%s", path);
         } else if (targetFloor == PC_FLOOR_OUTSKIRT_SHOP) {
             g_pcStoryFieldSmoke.sawShopLoad = 1;
         }
-        g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
     }
     g_pcCurrentFieldFloor = targetFloor;
 
@@ -12723,10 +12726,12 @@ static int RunFieldRoomReloadSmoke(GLFWwindow* window) {
 
 static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
     PCPortFieldExit exOut;
+    PCPortFieldExit exOutDoor;
     PCPortFieldExit exShop;
     f32 start[3];
     f32 spawnShop[3];
     int prevEnterFieldWalk;
+    int hit;
     int next;
 
     if (window == NULL) {
@@ -12748,6 +12753,31 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
                 PCPort_FieldColTriCount(),
                 PCPort_FieldExitCount(),
                 PCPort_FieldExitGet(0, &exOut) ? exOut.targetFloor : -1);
+        return 0;
+    }
+    if (PCPort_FieldExitCount() < 2 ||
+        !PCPort_FieldExitGet(1, &exOutDoor) ||
+        exOutDoor.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: S1_out visible doorway trigger was not registered (exits=%d target=%d)\n",
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(1, &exOutDoor) ? exOutDoor.targetFloor : -1);
+        return 0;
+    }
+    hit = PCPort_FieldExitCheck(exOut.pos[0], exOut.pos[1], exOut.pos[2],
+                                0.0f, 0.0f);
+    if (hit != 0) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: original S1_out trigger sample hit %d, expected 0\n",
+                hit);
+        return 0;
+    }
+    hit = PCPort_FieldExitCheck(exOutDoor.pos[0], exOutDoor.pos[1],
+                                exOutDoor.pos[2], 0.0f, 0.0f);
+    if (hit != 1) {
+        fprintf(stderr,
+                "[field-world-warp-smoke] failed: visible S1_out doorway sample hit %d, expected 1\n",
+                hit);
         return 0;
     }
 
@@ -12791,11 +12821,14 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
     GSgfxSwapBuffers(0);
 
     printf("[field-world-warp-smoke] passed: player triggered %d->%d at "
-           "start=(%.1f,%.1f,%.1f); reloaded S1_shop_1F tris=%d exit->%d "
+           "start=(%.1f,%.1f,%.1f); doorway=(%.1f,%.1f,%.1f) "
+           "r=%.1f; reloaded S1_shop_1F tris=%d exit->%d "
            "spawn=(%.1f,%.1f,%.1f)\n",
            PC_FLOOR_OUTSKIRT,
            next,
            start[0], start[1], start[2],
+           exOutDoor.pos[0], exOutDoor.pos[1], exOutDoor.pos[2],
+           exOutDoor.radius,
            PCPort_FieldColTriCount(),
            exShop.targetFloor,
            spawnShop[0], spawnShop[1], spawnShop[2]);
