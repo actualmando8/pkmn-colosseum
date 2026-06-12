@@ -154,6 +154,7 @@ unsigned long CurrTvMode = 0;
  * renders it with just this archive/member swap. */
 #define PCPORT_TITLE_SCENE_ARCHIVE "orig/GC6E01/disc/files/title.fsys"
 #define PCPORT_TITLE_SCENE_MEMBER  "logo_demo"
+#define PCPORT_WORLDMAP_ARCHIVE    "orig/GC6E01/disc/files/world_map.fsys"
 
 /* Sky/sand horizon backdrop texture inside title.fsys:logo_demo (CMPR 512x256
  * at archive offset 0x14A8E0): blue sky + clouds fading to tan sand. Drawn as a
@@ -11027,6 +11028,48 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
     return 1;
 }
 
+static int RunWorldMapHandoffSmoke(GLFWwindow* window) {
+    const char* archive = getenv("PCPORT_WORLDMAP_ARCHIVE");
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[worldmap-handoff-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+    if (archive == NULL || archive[0] == '\0') {
+        archive = PCPORT_WORLDMAP_ARCHIVE;
+    }
+
+    printf("[worldmap-handoff-smoke] field START/worldmap handoff -> %s\n",
+           archive);
+
+    PCPort_FieldColUnload();
+    PCPort_FieldExitUnload();
+
+    if (!PCPort_EngineFieldSetup(archive)) {
+        fprintf(stderr,
+                "[worldmap-handoff-smoke] failed: could not load %s\n",
+                archive);
+        return 0;
+    }
+    if (!PCPort_EngineTitleReady()) {
+        fprintf(stderr,
+                "[worldmap-handoff-smoke] failed: worldmap render scene not ready\n");
+        return 0;
+    }
+
+    PCPort_EngineTitleRenderFrame();
+    GSgfxSwapBuffers(0);
+
+    printf("[worldmap-handoff-smoke] passed: loaded/rendered %s "
+           "rootJoint=0x%X extraModels=%d collisionTris=%d\n",
+           archive,
+           g_engTitleRootJoint,
+           g_engExtraRootJointCount,
+           PCPort_FieldColTriCount());
+    return 1;
+}
+
 void PCPort_EngineTitleRenderFrame(void) {
     MenuTreeStats stats;
     if (!g_engTitleReady) {
@@ -13363,6 +13406,7 @@ int main(int argc, char** argv) {
     int runFieldRoomWarpSmoke;
     int runFieldRoomReloadSmoke;
     int runFieldWorldWarpSmoke;
+    int runWorldMapHandoffSmoke;
     int runMenu;
     int runEngine;
     int runEngineBoot;
@@ -13382,6 +13426,7 @@ int main(int argc, char** argv) {
     runFieldRoomWarpSmoke = HasArg(argc, argv, "--field-room-warp-smoke");
     runFieldRoomReloadSmoke = HasArg(argc, argv, "--field-room-reload-smoke");
     runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
+    runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
@@ -13495,6 +13540,7 @@ int main(int argc, char** argv) {
         runFieldRoomWarpSmoke ||
         runFieldRoomReloadSmoke ||
         runFieldWorldWarpSmoke ||
+        runWorldMapHandoffSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
         runPkxViewer ||
         argc <= 1) {
@@ -13778,6 +13824,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
+    } else if (runWorldMapHandoffSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --worldmap-handoff-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunWorldMapHandoffSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Worldmap handoff smoke rendered world_map.fsys through the field scene bridge\n");
     } else if (runFieldWorldWarpSmoke) {
         if (window == NULL) {
             fprintf(stderr,
