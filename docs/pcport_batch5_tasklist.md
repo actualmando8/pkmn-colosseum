@@ -179,6 +179,31 @@ Verification:
 - `build_pc\pcport_bootstrap.exe --jobj-load-wrapper-smoke` -> passed.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 
+## Batch 5G - Expanded Playtest Gates
+
+- [x] Add a room-warp trigger/collision smoke for the existing D1 garage 1F/B1 cluster.
+- [ ] Exercise live in-process room reload from player crossing a door trigger.
+- [ ] Add worldmap menu/handoff coverage.
+- [ ] Gate directional locomotion animations for idle/walk/run while moving north/south/east/west.
+- [ ] Gate START-in-field menu open/close behavior.
+- [ ] Add NPC spawn/talk coverage.
+- [ ] Add message box/text progression coverage.
+- [ ] Add field trigger/event dispatch coverage.
+- [ ] Add story progression state mutation/restore coverage.
+
+Lane result:
+
+- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`.
+- The smoke validates the host warp table and trigger lookup for `D1_garage_1F` -> `D1_garage_B1` and `D1_garage_B1` -> `D1_garage_1F`.
+- It also loads both rooms' WZX collision meshes directly, proving the target archives and collision data are reachable before we wire live in-process reload into the gameplay loop.
+- A first attempt at a full in-process render reload smoke hung, so live door-crossing reload remains an explicit open gate.
+
+Verification:
+
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1711 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --field-room-warp-smoke` -> passed with `D1_garage_1F` `tris=324` `exit->1`, `D1_garage_B1` `tris=222` `exit->0`.
+- `build_pc\pcport_bootstrap.exe --story-field-smoke` -> passed after the room-warp smoke change.
+
 Integration rules:
 
 - Do not edit `*_fn_*.inc` truth files.

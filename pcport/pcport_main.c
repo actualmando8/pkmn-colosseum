@@ -10720,6 +10720,92 @@ static int RunStoryFieldSmoke(GLFWwindow* window) {
     return 1;
 }
 
+static int RunFieldRoomWarpSmoke(GLFWwindow* window) {
+    const PCPortWarpMapEntry* map1f;
+    const PCPortWarpMapEntry* mapB1;
+    PCPortFieldExit ex1f;
+    PCPortFieldExit exB1;
+    char path1f[512];
+    char pathB1[512];
+    int tris1f;
+    int trisB1;
+    int hit;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    map1f = PCPort_WarpFindFloor(PC_FLOOR_GARAGE_1F);
+    mapB1 = PCPort_WarpFindFloor(PC_FLOOR_GARAGE_B1);
+    if (map1f == NULL || mapB1 == NULL) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: garage warp table entries missing\n");
+        return 0;
+    }
+    PCPort_WarpResolvePath(map1f->fsysName, path1f, sizeof(path1f));
+    PCPort_WarpResolvePath(mapB1->fsysName, pathB1, sizeof(pathB1));
+
+    tris1f = PCPort_FieldColLoad(path1f);
+    PCPort_FieldExitSet(map1f->exits, map1f->exitCount);
+    if (tris1f <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &ex1f) ||
+        ex1f.targetFloor != PC_FLOOR_GARAGE_B1) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: garage 1F exit invalid (tris=%d exits=%d target=%d)\n",
+                tris1f,
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &ex1f) ? ex1f.targetFloor : -1);
+        return 0;
+    }
+    hit = PCPort_FieldExitCheck(ex1f.pos[0], ex1f.pos[1], ex1f.pos[2],
+                                0.0f, -1.0f);
+    if (hit != 0) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: garage 1F trigger check returned %d\n",
+                hit);
+        return 0;
+    }
+
+    PCPort_FieldColUnload();
+    PCPort_FieldExitUnload();
+
+    trisB1 = PCPort_FieldColLoad(pathB1);
+    PCPort_FieldExitSet(mapB1->exits, mapB1->exitCount);
+    if (trisB1 <= 0 || PCPort_FieldExitCount() <= 0 ||
+        !PCPort_FieldExitGet(0, &exB1) ||
+        exB1.targetFloor != PC_FLOOR_GARAGE_1F) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: garage B1 exit invalid (tris=%d exits=%d target=%d)\n",
+                trisB1,
+                PCPort_FieldExitCount(),
+                PCPort_FieldExitGet(0, &exB1) ? exB1.targetFloor : -1);
+        return 0;
+    }
+    hit = PCPort_FieldExitCheck(exB1.pos[0], exB1.pos[1], exB1.pos[2],
+                                0.0f, 1.0f);
+    if (hit != 0) {
+        fprintf(stderr,
+                "[field-room-warp-smoke] failed: garage B1 trigger check returned %d\n",
+                hit);
+        return 0;
+    }
+
+    PCPort_FieldColUnload();
+    PCPort_FieldExitUnload();
+
+    printf("[field-room-warp-smoke] passed: %s tris=%d exit->%d, "
+           "%s tris=%d exit->%d\n",
+           path1f,
+           tris1f,
+           ex1f.targetFloor,
+           pathB1,
+           trisB1,
+           exB1.targetFloor);
+    return 1;
+}
+
 void PCPort_EngineTitleRenderFrame(void) {
     MenuTreeStats stats;
     if (!g_engTitleReady) {
@@ -13053,6 +13139,7 @@ int main(int argc, char** argv) {
     int runGsGfxSmoke;
     int runWindowSmoke;
     int runStoryFieldSmoke;
+    int runFieldRoomWarpSmoke;
     int runMenu;
     int runEngine;
     int runEngineBoot;
@@ -13069,6 +13156,7 @@ int main(int argc, char** argv) {
 
     runWindowSmoke = HasArg(argc, argv, "--window-smoke");
     runStoryFieldSmoke = HasArg(argc, argv, "--story-field-smoke");
+    runFieldRoomWarpSmoke = HasArg(argc, argv, "--field-room-warp-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
@@ -13179,6 +13267,7 @@ int main(int argc, char** argv) {
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
         runStoryFieldSmoke ||
+        runFieldRoomWarpSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
         runPkxViewer ||
         argc <= 1) {
@@ -13462,6 +13551,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
+    } else if (runFieldRoomWarpSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-room-warp-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldRoomWarpSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field room-warp smoke exercised trigger lookup and map reloads\n");
     } else if (runStoryFieldSmoke) {
         if (window == NULL) {
             fprintf(stderr,
