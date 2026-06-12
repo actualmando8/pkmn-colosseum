@@ -9948,18 +9948,22 @@ static const PCPortWarpMapEntry g_pcWarpMaps[] = {
         /* The Outskirt Stand exterior — the game's first walkable scene and the
          * New Game spawn map. The train-car diner sits to one side; Wes spawns in
          * the open desert plaza in front of it. The host shop-door trigger is
-         * represented by two overlapping samples: the original smoke autorun
-         * path and the visible train-car doorway threshold. The real exit table
-         * remains a follow-up.
+         * represented by overlapping samples: the original smoke autorun path,
+         * the decoded door/NPC marker lane, and the visible train-car doorway
+         * threshold. The real exit table remains a follow-up.
          * Collision bounds X[-146,231] Y[-10,64] Z[-127,127]. */
         PC_FLOOR_OUTSKIRT, "S1_out",
         {
             { { 69.0f, 0.0f, -30.0f }, 0.0f,
               18.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } },
-            { { 96.0f, 0.0f, -4.0f }, 0.0f,
-              30.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } }
+            { { 56.5f, 0.0f, 10.6f }, 0.0f,
+              16.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } },
+            { { 82.0f, 0.0f, 8.0f }, 0.0f,
+              24.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } },
+            { { 106.0f, 0.0f, -4.0f }, 0.0f,
+              28.0f, 0.0f, PC_FLOOR_OUTSKIRT_SHOP, { 0.0f, 0.0f, 35.0f } }
         },
-        2,
+        4,
         { 47.7f, 0.0f, 79.9f }   /* spawn point: just behind the gas-pump foundation
                                    * (concrete pad under the green pump, right side of
                                    * view).  Dialled in by the user walking Wes to the
@@ -12731,7 +12735,9 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
     f32 start[3];
     f32 spawnShop[3];
     int prevEnterFieldWalk;
+    int outExitCount;
     int hit;
+    int i;
     int next;
 
     if (window == NULL) {
@@ -12745,40 +12751,44 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
                 "[field-world-warp-smoke] failed: could not load S1_out\n");
         return 0;
     }
-    if (PCPort_FieldColTriCount() <= 0 || PCPort_FieldExitCount() <= 0 ||
+    outExitCount = PCPort_FieldExitCount();
+    if (PCPort_FieldColTriCount() <= 0 || outExitCount <= 0 ||
         !PCPort_FieldExitGet(0, &exOut) ||
         exOut.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
         fprintf(stderr,
                 "[field-world-warp-smoke] failed: S1_out was not shop-warp-ready (tris=%d exits=%d target=%d)\n",
                 PCPort_FieldColTriCount(),
-                PCPort_FieldExitCount(),
+                outExitCount,
                 PCPort_FieldExitGet(0, &exOut) ? exOut.targetFloor : -1);
         return 0;
     }
-    if (PCPort_FieldExitCount() < 2 ||
-        !PCPort_FieldExitGet(1, &exOutDoor) ||
-        exOutDoor.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+    if (outExitCount < 4 ||
+        !PCPort_FieldExitGet(outExitCount - 1, &exOutDoor)) {
         fprintf(stderr,
-                "[field-world-warp-smoke] failed: S1_out visible doorway trigger was not registered (exits=%d target=%d)\n",
-                PCPort_FieldExitCount(),
-                PCPort_FieldExitGet(1, &exOutDoor) ? exOutDoor.targetFloor : -1);
+                "[field-world-warp-smoke] failed: S1_out doorway trigger set was incomplete (exits=%d)\n",
+                outExitCount);
         return 0;
     }
-    hit = PCPort_FieldExitCheck(exOut.pos[0], exOut.pos[1], exOut.pos[2],
-                                0.0f, 0.0f);
-    if (hit != 0) {
-        fprintf(stderr,
-                "[field-world-warp-smoke] failed: original S1_out trigger sample hit %d, expected 0\n",
-                hit);
-        return 0;
-    }
-    hit = PCPort_FieldExitCheck(exOutDoor.pos[0], exOutDoor.pos[1],
-                                exOutDoor.pos[2], 0.0f, 0.0f);
-    if (hit != 1) {
-        fprintf(stderr,
-                "[field-world-warp-smoke] failed: visible S1_out doorway sample hit %d, expected 1\n",
-                hit);
-        return 0;
+    for (i = 0; i < outExitCount; ++i) {
+        PCPortFieldExit sample;
+        PCPortFieldExit hitEx;
+        if (!PCPort_FieldExitGet(i, &sample) ||
+            sample.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+            fprintf(stderr,
+                    "[field-world-warp-smoke] failed: S1_out sample %d was not a shop trigger (target=%d)\n",
+                    i, PCPort_FieldExitGet(i, &sample) ? sample.targetFloor : -1);
+            return 0;
+        }
+        hit = PCPort_FieldExitCheck(sample.pos[0], sample.pos[1],
+                                    sample.pos[2], 0.0f, 0.0f);
+        if (hit < 0 ||
+            !PCPort_FieldExitGet(hit, &hitEx) ||
+            hitEx.targetFloor != PC_FLOOR_OUTSKIRT_SHOP) {
+            fprintf(stderr,
+                    "[field-world-warp-smoke] failed: S1_out sample %d at (%.1f,%.1f,%.1f) hit %d instead of a shop trigger\n",
+                    i, sample.pos[0], sample.pos[1], sample.pos[2], hit);
+            return 0;
+        }
     }
 
     start[0] = exOut.pos[0];
@@ -12821,12 +12831,13 @@ static int RunFieldWorldWarpSmoke(GLFWwindow* window) {
     GSgfxSwapBuffers(0);
 
     printf("[field-world-warp-smoke] passed: player triggered %d->%d at "
-           "start=(%.1f,%.1f,%.1f); doorway=(%.1f,%.1f,%.1f) "
+           "start=(%.1f,%.1f,%.1f); doorwaySamples=%d far=(%.1f,%.1f,%.1f) "
            "r=%.1f; reloaded S1_shop_1F tris=%d exit->%d "
            "spawn=(%.1f,%.1f,%.1f)\n",
            PC_FLOOR_OUTSKIRT,
            next,
            start[0], start[1], start[2],
+           outExitCount,
            exOutDoor.pos[0], exOutDoor.pos[1], exOutDoor.pos[2],
            exOutDoor.radius,
            PCPort_FieldColTriCount(),
