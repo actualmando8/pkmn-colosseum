@@ -38737,14 +38737,14 @@
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
- "fn_8019C89C": {
+ "_HSD_MemFreeDefaultCB": {
   "addr": "0x8019C89C",
   "section": ".text",
   "size": "0x58",
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
- "fn_8019C8F4": {
+ "_HSD_MemAllocDefaultCB": {
   "addr": "0x8019C8F4",
   "section": ".text",
   "size": "0x84",

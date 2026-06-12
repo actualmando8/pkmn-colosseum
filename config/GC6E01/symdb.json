@@ -34836,14 +34836,14 @@
       "section": ".text",
       "size": "0x48"
     },
-    "fn_8019C89C": {
+    "_HSD_MemFreeDefaultCB": {
       "addr": "0x8019C89C",
       "kind": "function",
       "proposed": "HSD_InitAssert3",
       "section": ".text",
       "size": "0x58"
     },
-    "fn_8019C8F4": {
+    "_HSD_MemAllocDefaultCB": {
       "addr": "0x8019C8F4",
       "kind": "function",
       "proposed": "HSD_InitAssert4",

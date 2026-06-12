@@ -231,12 +231,12 @@ extern void fn_8009AAD4(void* xfb, void* param);
 extern s32 lbl_8047B288;
 extern u32 lbl_80478C70;
 #if 0
-asm void fn_8019C89C(void) {
-#include "src/hsd/hsd_initialize_fn_8019C89C.inc"
+asm void _HSD_MemFreeDefaultCB(void) {
+#include "src/hsd/hsd_initialize__HSD_MemFreeDefaultCB.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019C89C(void* param) {
+void _HSD_MemFreeDefaultCB(void* param) {
     if (lbl_8047B288 != 0) {
         fn_80196E10(lbl_802749E4, 0x1b6, lbl_80274A28);
     }
@@ -254,12 +254,12 @@ extern s32 lbl_8047B288;
 extern u32 lbl_80478C70;
 extern u32 lbl_8047DB0C;
 #if 0
-asm void fn_8019C8F4(void) {
-#include "src/hsd/hsd_initialize_fn_8019C8F4.inc"
+asm void _HSD_MemAllocDefaultCB(void) {
+#include "src/hsd/hsd_initialize__HSD_MemAllocDefaultCB.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_8019C8F4(void* buffer) {
+void* _HSD_MemAllocDefaultCB(void* buffer) {
     void* result;
 
     if (buffer == NULL) {
