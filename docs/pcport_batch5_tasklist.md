@@ -156,6 +156,29 @@ Lane result:
 - Blocker: displayfunc wrappers need recovered constant/flag contracts before a safe PC-port replacement.
 - Next display action: retry only `fn_80198B20` after naming `lbl_80478AC0`, `lbl_80478ACC`, `lbl_802746D0`, and the flag-controlled path, or pivot to a smaller `hsd_pobj_disp.c` helper.
 
+## Batch 5F - Story Field Smoke Gate
+
+- [x] Add a bounded smoke for the current New Game -> field path.
+- [x] Require menu handoff into Story Mode field walk.
+- [x] Require the Outskirt Stand map (`S1_out`) to load with WZX collision.
+- [x] Require Wes (`field_common.fsys :: ken_b1`) to load with character animation ready.
+- [x] Require player update/movement over a finite frame run.
+- [ ] Add script/event/NPC interaction coverage after those systems are linked far enough to run.
+
+Lane result:
+
+- `pcport\pcport_main.c` now exposes `--story-field-smoke`.
+- The smoke reuses the real menu New Game handoff path, skips boot movies only for the smoke, enters the walkable Story Mode field, forces a bounded 30-frame autorun/autopan, and asserts map load, collision, spawn, Wes load, character animation readiness, and nonzero movement.
+- The first field target is the current New Game spawn map: `orig/GC6E01/disc/files/S1_out.fsys`.
+- This is still not a full playtest gate: script/event dispatch, NPC spawn/talk, message boxes, and story progression remain uncovered.
+
+Verification:
+
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1711 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `build_pc\pcport_bootstrap.exe --story-field-smoke` -> passed with `floor=2`, `colTris=648`, spawn `(47.7,0.0,79.9)`, final `(69.0,0.0,-28.5)`, `frames=30`, `wes=1`, `anim=1`.
+- `build_pc\pcport_bootstrap.exe --jobj-load-wrapper-smoke` -> passed.
+- `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
+
 Integration rules:
 
 - Do not edit `*_fn_*.inc` truth files.

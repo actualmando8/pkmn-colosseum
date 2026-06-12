@@ -5797,6 +5797,31 @@ static int g_slotInfl[PCPORT_SKIN_MAX_SLOTS]; /* influence count per slot */
 static int g_pcEnterFieldWalk = 0;
 static int g_pcEnterBattleColosseum = 0;
 
+typedef struct PCPortStoryFieldSmokeState {
+    int active;
+    int sawMenuHandoff;
+    int targetFloor;
+    int mapLoaded;
+    int colTris;
+    int exitCount;
+    int spawnSet;
+    int frames;
+    int charLoaded;
+    int charAnimReady;
+    int moved;
+    f32 spawn[3];
+    f32 finalPos[3];
+    char mapPath[128];
+} PCPortStoryFieldSmokeState;
+
+static PCPortStoryFieldSmokeState g_pcStoryFieldSmoke;
+
+static void PCPort_StoryFieldSmokeBegin(void) {
+    memset(&g_pcStoryFieldSmoke, 0, sizeof(g_pcStoryFieldSmoke));
+    g_pcStoryFieldSmoke.active = 1;
+    g_pcStoryFieldSmoke.targetFloor = -1;
+}
+
 /* Build the per-slot skinning-matrix palette for an envelope PObj, replicating
  * the GameCube envelope-skin display (hsd_pobj_disp fn_801AAEA8). Each matrix
  * slot's envelope is a list of {jobj, weight} influences; the FIRST influence's
@@ -7623,7 +7648,7 @@ static int RunBootSequence(GLFWwindow* window) {
     int dumpFrame = -1;
     const char* e;
 
-    if (getenv("PCPORT_NO_BOOT") != NULL) {
+    if (g_pcStoryFieldSmoke.active || getenv("PCPORT_NO_BOOT") != NULL) {
         return 1;
     }
     e = getenv("PCPORT_BOOT_DUMP_FRAME");
@@ -8259,8 +8284,13 @@ static int RunMenuScene(GLFWwindow* window) {
         goto cleanup;
     }
     /* Headless verify of the New Game -> field hand-off (skips menu navigation). */
-    if (getenv("PCPORT_DEBUG_NEWGAME") != NULL) {
-        printf("[pcport_bootstrap] DEBUG_NEWGAME -> entering field\n");
+    if (g_pcStoryFieldSmoke.active || getenv("PCPORT_DEBUG_NEWGAME") != NULL) {
+        printf("[pcport_bootstrap] %s -> entering field\n",
+               g_pcStoryFieldSmoke.active ? "STORY_FIELD_SMOKE"
+                                          : "DEBUG_NEWGAME");
+        if (g_pcStoryFieldSmoke.active) {
+            g_pcStoryFieldSmoke.sawMenuHandoff = 1;
+        }
         g_pcEnterFieldWalk = 1;
         ok = 1;
         goto cleanup;
@@ -9616,6 +9646,15 @@ static int PCPort_FieldWarpTo(int targetFloor, f32 outSpawn[3]) {
         }
     }
 
+    if (g_pcStoryFieldSmoke.active) {
+        g_pcStoryFieldSmoke.targetFloor = targetFloor;
+        g_pcStoryFieldSmoke.mapLoaded = 1;
+        g_pcStoryFieldSmoke.colTris = colTris;
+        g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
+        snprintf(g_pcStoryFieldSmoke.mapPath,
+                 sizeof(g_pcStoryFieldSmoke.mapPath), "%s", path);
+    }
+
     if (outSpawn != NULL) {
         outSpawn[0] = dst->defaultSpawn[0];
         outSpawn[1] = dst->defaultSpawn[1];
@@ -10112,8 +10151,11 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     f32 runSpeed = (runSpeedEnv != NULL && runSpeedEnv[0]) ? (f32)atof(runSpeedEnv) : 7.0f;
     f32 runThreshold = (runThreshEnv != NULL && runThreshEnv[0]) ? (f32)atof(runThreshEnv) : 0.85f;
     f32 walkDeadzone = (deadzoneEnv != NULL && deadzoneEnv[0]) ? (f32)atof(deadzoneEnv) : 0.05f;
-    int autopan = getenv("PCPORT_FIELD_AUTOPAN") != NULL;
-    int forceRun = getenv("PCPORT_FORCE_RUN") != NULL || getenv("PCPORT_FIELD_AUTORUN") != NULL;
+    int autopan = g_pcStoryFieldSmoke.active ||
+                  getenv("PCPORT_FIELD_AUTOPAN") != NULL;
+    int forceRun = g_pcStoryFieldSmoke.active ||
+                   getenv("PCPORT_FORCE_RUN") != NULL ||
+                   getenv("PCPORT_FIELD_AUTORUN") != NULL;
     int forceWalk = getenv("PCPORT_FORCE_WALK") != NULL;
     int motionDebug = getenv("PCPORT_MOTION_DEBUG") != NULL;
     int currentMotion = -999;
@@ -10146,6 +10188,12 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
     }
     if (PCPort_FieldColFloorAt(ppos[0], ppos[2], 1.0e5f, 1.0e9f, &spawnY)) {
         ppos[1] = spawnY;
+    }
+    if (g_pcStoryFieldSmoke.active) {
+        g_pcStoryFieldSmoke.spawnSet = 1;
+        g_pcStoryFieldSmoke.spawn[0] = ppos[0];
+        g_pcStoryFieldSmoke.spawn[1] = ppos[1];
+        g_pcStoryFieldSmoke.spawn[2] = ppos[2];
     }
     printf("[field/walk] spawn=(%.1f,%.1f,%.1f). Left stick walks, arrows/C-stick "
            "orbit camera. (%d exit trigger(s))%s\n", ppos[0], ppos[1], ppos[2],
@@ -10331,6 +10379,18 @@ static int RunFieldWalkLoop(GLFWwindow* window, const char* dumpPath,
             break;
         }
     }
+    if (g_pcStoryFieldSmoke.active) {
+        f32 dx = ppos[0] - g_pcStoryFieldSmoke.spawn[0];
+        f32 dz = ppos[2] - g_pcStoryFieldSmoke.spawn[2];
+        g_pcStoryFieldSmoke.frames = frame;
+        g_pcStoryFieldSmoke.finalPos[0] = ppos[0];
+        g_pcStoryFieldSmoke.finalPos[1] = ppos[1];
+        g_pcStoryFieldSmoke.finalPos[2] = ppos[2];
+        g_pcStoryFieldSmoke.charLoaded = g_engCharLoaded;
+        g_pcStoryFieldSmoke.charAnimReady = PCPort_CharAnimReady();
+        g_pcStoryFieldSmoke.moved = (dx * dx + dz * dz) > 16.0f;
+        g_pcStoryFieldSmoke.exitCount = PCPort_FieldExitCount();
+    }
     printf("[field/walk] %d frames (final player=%.1f,%.1f,%.1f)%s\n",
            frame, ppos[0], ppos[1], ppos[2],
            warpTo >= 0 ? " [WARP]" : "");
@@ -10360,6 +10420,9 @@ static int RunFieldScene(GLFWwindow* window) {
        * floor) for headless geometry inspection. */
         const char* cp = getenv("PCPORT_CAM_PITCH");
         if (cp != NULL) pitch = (f32) atof(cp);
+    }
+    if (g_pcStoryFieldSmoke.active && frameCap < 30) {
+        frameCap = 30;
     }
 
     if (archive == NULL || archive[0] == '\0') {
@@ -10567,6 +10630,93 @@ static int RunFieldScene(GLFWwindow* window) {
            frame, eye[0], eye[1], eye[2], yaw);
     HoldWindowOpen(window);
     } /* end freeFlyPrevTime scope */
+    return 1;
+}
+
+static int RunStoryFieldSmoke(GLFWwindow* window) {
+    if (window == NULL) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+
+    PCPort_StoryFieldSmokeBegin();
+    g_pcEnterFieldWalk = 0;
+    g_pcEnterBattleColosseum = 0;
+
+    if (!RunMenuScene(window)) {
+        fprintf(stderr, "[story-field-smoke] failed: menu handoff path failed\n");
+        return 0;
+    }
+    if (!g_pcStoryFieldSmoke.sawMenuHandoff || !g_pcEnterFieldWalk) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: New Game menu handoff was not observed\n");
+        return 0;
+    }
+    if (!RunFieldScene(window)) {
+        fprintf(stderr, "[story-field-smoke] failed: field scene did not run\n");
+        return 0;
+    }
+
+    if (!g_pcStoryFieldSmoke.mapLoaded ||
+        g_pcStoryFieldSmoke.targetFloor != PC_FLOOR_OUTSKIRT) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: expected S1_out floor %d, got floor %d mapLoaded=%d path=%s\n",
+                PC_FLOOR_OUTSKIRT,
+                g_pcStoryFieldSmoke.targetFloor,
+                g_pcStoryFieldSmoke.mapLoaded,
+                g_pcStoryFieldSmoke.mapPath);
+        return 0;
+    }
+    if (g_pcStoryFieldSmoke.colTris <= 0) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: no field collision loaded for %s\n",
+                g_pcStoryFieldSmoke.mapPath);
+        return 0;
+    }
+    if (!g_pcStoryFieldSmoke.spawnSet || g_pcStoryFieldSmoke.frames < 30) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: spawn/frame gate missed (spawn=%d frames=%d)\n",
+                g_pcStoryFieldSmoke.spawnSet,
+                g_pcStoryFieldSmoke.frames);
+        return 0;
+    }
+    if (!g_pcStoryFieldSmoke.charLoaded ||
+        !g_pcStoryFieldSmoke.charAnimReady) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: Wes character/animation not ready (loaded=%d anim=%d)\n",
+                g_pcStoryFieldSmoke.charLoaded,
+                g_pcStoryFieldSmoke.charAnimReady);
+        return 0;
+    }
+    if (!g_pcStoryFieldSmoke.moved) {
+        fprintf(stderr,
+                "[story-field-smoke] failed: player did not move from spawn %.1f,%.1f,%.1f to %.1f,%.1f,%.1f\n",
+                g_pcStoryFieldSmoke.spawn[0],
+                g_pcStoryFieldSmoke.spawn[1],
+                g_pcStoryFieldSmoke.spawn[2],
+                g_pcStoryFieldSmoke.finalPos[0],
+                g_pcStoryFieldSmoke.finalPos[1],
+                g_pcStoryFieldSmoke.finalPos[2]);
+        return 0;
+    }
+
+    printf("[story-field-smoke] passed: menu->New Game->%s floor=%d colTris=%d "
+           "spawn=(%.1f,%.1f,%.1f) final=(%.1f,%.1f,%.1f) frames=%d "
+           "wes=%d anim=%d exits=%d\n",
+           g_pcStoryFieldSmoke.mapPath,
+           g_pcStoryFieldSmoke.targetFloor,
+           g_pcStoryFieldSmoke.colTris,
+           g_pcStoryFieldSmoke.spawn[0],
+           g_pcStoryFieldSmoke.spawn[1],
+           g_pcStoryFieldSmoke.spawn[2],
+           g_pcStoryFieldSmoke.finalPos[0],
+           g_pcStoryFieldSmoke.finalPos[1],
+           g_pcStoryFieldSmoke.finalPos[2],
+           g_pcStoryFieldSmoke.frames,
+           g_pcStoryFieldSmoke.charLoaded,
+           g_pcStoryFieldSmoke.charAnimReady,
+           g_pcStoryFieldSmoke.exitCount);
     return 1;
 }
 
@@ -12902,6 +13052,7 @@ int main(int argc, char** argv) {
     int osInitialized = 0;
     int runGsGfxSmoke;
     int runWindowSmoke;
+    int runStoryFieldSmoke;
     int runMenu;
     int runEngine;
     int runEngineBoot;
@@ -12917,6 +13068,7 @@ int main(int argc, char** argv) {
     GLFWwindow* window = NULL;
 
     runWindowSmoke = HasArg(argc, argv, "--window-smoke");
+    runStoryFieldSmoke = HasArg(argc, argv, "--story-field-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
     runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
@@ -13026,6 +13178,7 @@ int main(int argc, char** argv) {
         runGSgfxScissorRetry || runGSgfxSceneLikeSmoke ||
         runGSgfxVisibleSmoke ||
         runGXPrimitiveSmoke || runGXScissorSmoke ||
+        runStoryFieldSmoke ||
         runMenu || runEngine || runEngineBoot || runField || runBattle ||
         runPkxViewer ||
         argc <= 1) {
@@ -13309,6 +13462,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Engine-fibre spike: host<->engine cooperative round-trip ticked frames\n");
+    } else if (runStoryFieldSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --story-field-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunStoryFieldSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Story Mode field smoke exercised New Game handoff, spawn, collision, animation, and movement\n");
     } else if (runMenu || window != NULL) {
         if (window == NULL) {
             fprintf(stderr,
