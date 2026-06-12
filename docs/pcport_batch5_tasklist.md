@@ -196,7 +196,8 @@ Verification:
 - [x] Add first NPC talk-state coverage through the real `fn_801812E8` people interaction entry.
 - [x] Gate visible retail NPC model instancing from real `S1_out` dependency members.
 - [x] Gate first compact `S1_out` people/actor placement marker into NPC model placement.
-- [ ] Recover full real `0x158` people snapshot records/importer and script-owned NPC placement lifecycle.
+- [x] Gate `fn_8018F730` / `fn_8018F788` / `fn_8018F87C` `0x158` people snapshot size/export/import round-trip from real `S1_out` placement data.
+- [ ] Recover the real `fn_8018E050` / `fn_8018E1C4` script-owned NPC placement lifecycle.
 - [x] Add host-side message box/text progression coverage.
 - [ ] Link field messages to the real `menu_msgbox` / script-callback state machine.
 - [ ] Add field trigger/event dispatch coverage.
@@ -206,7 +207,7 @@ Verification:
 
 Lane result:
 
-- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, `--field-locomotion-smoke`, `--field-message-smoke`, `--field-npc-talk-smoke`, `--field-npc-model-smoke`, `--field-start-menu-smoke`, `--worldmap-handoff-smoke`, `--worldmap-menu`, and `--worldmap-menu-smoke`.
+- `pcport\pcport_main.c` now exposes `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, `--field-locomotion-smoke`, `--field-message-smoke`, `--field-npc-talk-smoke`, `--field-npc-model-smoke`, `--field-people-snapshot-smoke`, `--field-start-menu-smoke`, `--worldmap-handoff-smoke`, `--worldmap-menu`, and `--worldmap-menu-smoke`.
 - The smoke validates the host warp table and trigger lookup for `D1_garage_1F` -> `D1_garage_B1` and `D1_garage_B1` -> `D1_garage_1F`.
 - It also loads both rooms' WZX collision meshes directly, proving the target archives and collision data are reachable before we wire live in-process reload into the gameplay loop.
 - The live reload smoke now drives the normal walk loop from just inside garage 1F, lets the player enter the 1F door trigger, returns target floor `1`, reloads `D1_garage_B1` in-process, and renders a post-reload frame.
@@ -217,7 +218,8 @@ Lane result:
 - The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the playable walk loop's movement/yaw helpers, and now drives animation choice from the recovered retail people action record `0x00F30400` through the `fn_8012C660` turn-zone selector over `fn_8018F4C8` action slots 1-4. The host still selects the dominant endpoint when retail would blend two slots through `fn_800EC5FC` / `fn_800EC5B8`, so exact blend transitions remain open even though the idle/right/left/hard-right action-slot choices are now smoke-gated.
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
 - `fn_801812E8` is now a PC-port C mirror of the 0x190-byte retail people interaction state entry instead of an auto-generated link stub. The first NPC talk smoke host-seeds two `PeopleEntry` records, drives the recovered talk-start and restore branches, renders the field/message path over `S1_out`, and asserts missing-NPC lookup returns 0. Real floor-spawn NPC records and script-owned talk callbacks remain pending.
-- The NPC model smoke reads the real `S1_out.fsys :: FSYS` dependency member list, suffix-resolves the truncated `nt_m_b1` token to `agent_m_b1`, loads that retail actor archive from `S1_out.fsys`, and now requires compact actor marker `0x025D0000` at offset `0x2EC`, action `0x01000011`, position `(56.5,0.0,10.6)` before rendering it over live Outskirt collision/scene state. This gates visible retail model instancing plus the first compact script/actor placement marker, but not the full `0x158` people snapshot/importer or script-owned NPC lifecycle yet.
+- The NPC model smoke reads the real `S1_out.fsys :: FSYS` dependency member list, suffix-resolves the truncated `nt_m_b1` token to `agent_m_b1`, loads that retail actor archive from `S1_out.fsys`, and now requires compact actor marker `0x025D0000` at offset `0x2EC`, action `0x01000011`, position `(56.5,0.0,10.6)` before rendering it over live Outskirt collision/scene state. This gates visible retail model instancing plus the first compact script/actor placement marker, but not the live script-owned NPC lifecycle yet.
+- The people snapshot smoke mirrors retail `fn_8018F730` / `fn_8018F788` / `fn_8018F87C` enough for the PC host people registry: active people count to `N * 0x158`, export `entry+0x20` plus model-state vectors, clear/import the full record, and verify the imported NPC still resolves through `fn_801812E8` and renders at the decoded S1_out position. This gates the `0x158` snapshot format, but not the live `fn_8018E050` / `fn_8018E1C4` script-owned spawn/open lifecycle yet.
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
 - The title default now keeps the legacy host title logo/prompt disabled while loading the retail `title.fsys` `t_vs_*` cast cutouts, the title sky/cloud band, and the sand-wind overlay by default. The incomplete archive Pokemon-logo billboard DObj is suppressed until the full retail logo composition is fixed; `PCPORT_TITLE_HOST_UI=1` remains the opt-in diagnostic path for the old host overlay.
 - The boot sequence now supports `PCPORT_BOOT_DUMP_ITEM` alongside `PCPORT_BOOT_DUMP_FRAME`, so Nintendo, The Pokemon Company, and Genius Sonority can be dumped through the actual GL boot presentation path instead of only dumping the first boot item or relying on standalone THP decode.
@@ -249,6 +251,7 @@ Audit verification (2026-06-12 update):
 - `PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> completed normal boot playback for Nintendo logo, TPC THP with audio, GS THP, and the first title frame.
 - `build_pc\pcport_bootstrap.exe --field-npc-talk-smoke` -> passed with `fn_801812E8 talk=1 idle=1 restore=1 missing=0`, talk-state `4 -> 0`, restore-state `1/prev=5 -> 5`, `frames=4`, `idleMotion=1`, and live `S1_out` field/message render.
 - `build_pc\pcport_bootstrap.exe --field-npc-model-smoke` -> passed with dependency list `nt_m_b1->agent_m_b1,truck_b1->truck_b1,bike_pokemon->bike_pokemon`, rendered `agent_m_b1` from `S1_out.fsys`, `rootJoint=0x50F0`, `npcDrawn=36`, `frames=6`, and decoded compact marker `0x025D0000@0x2EC`, action `0x01000011`, NPC position `(56.5,0.0,10.6)`.
+- `build_pc\pcport_bootstrap.exe --field-people-snapshot-smoke` -> passed with `fn_8018F730=344`, `fn_8018F788` / `fn_8018F87C` round-trip, group `2`, index `605`, marker `0x025D0000@0x2EC`, action `0x01000011`, NPC position `(56.5,0.0,10.6)`, `talk=1`, `npcDrawn=24`, and `frames=4`.
 - `rg -n "fn_801812E8" build_pc\gen\pcport_stubs.c` -> no matches after relink; the generated `gs_field_world` calls now resolve to the PC C body.
 - Adjacent `--field-message-smoke`, `--field-start-menu-smoke`, `--field-locomotion-smoke`, and `--story-field-smoke` -> passed after the NPC talk-state change.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
@@ -258,6 +261,7 @@ Verification:
 
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1730 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
 - Current NPC-model relink: `python tools\pcport_link.py` -> `compiled 128 objects; 1 failed to compile: ['hsd_mobj_ext']`, round 2 linked OK with 1728 stubs. The compile failure is from pre-existing dirty-tree `src\hsd\hsd_mobj_ext.c` / `include\hsd\hsd_mobj.h` edits outside this scoped NPC-model gate.
+- `build_pc\pcport_bootstrap.exe --field-people-snapshot-smoke` -> passed with `fn_8018F730=344`, `fn_8018F788` / `fn_8018F87C` round-trip, imported S1_out-derived NPC group `2`, index `605`, marker `0x025D0000@0x2EC`, action `0x01000011`, position `(56.5,0.0,10.6)`, `talk=1`, `npcDrawn=24`, and `frames=4`.
 - `build_pc\pcport_bootstrap.exe --field-start-menu-smoke` -> passed with `S1_out`, `ken_b1`, START open, two cursor moves, START close, `frames=6`, `idleMotion=1`.
 - `build_pc\pcport_bootstrap.exe --field-message-smoke` -> passed with `S1_out`, `ken_b1`, two message pages, one fast-forward, one page advance, one close, `frames=24`, `idleMotion=1`.
 - `build_pc\pcport_bootstrap.exe --field-npc-model-smoke` -> passed with dependency-list-backed `agent_m_b1` model load/render over `S1_out`, compact marker `0x025D0000@0x2EC`, action `0x01000011`, NPC position `(56.5,0.0,10.6)`, `npcDrawn=36`, and `frames=6`.
