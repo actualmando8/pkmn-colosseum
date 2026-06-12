@@ -61,6 +61,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
                         unsigned int x2, unsigned int y2);
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
+extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801A6E24(HSD_MObj* mobj);
 extern s32 fn_801A7D58(HSD_MObj* dst, HSD_MObj* src);
 extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* value);
@@ -1319,6 +1320,73 @@ static int RunJObjInstanceSmoke(void)
     }
 
     printf("[pcport_bootstrap] JObj instance smoke passed (shared child=%p)\n",
+           (void*)target);
+    return 1;
+}
+
+static int RunJObjResolveSmoke(void)
+{
+    HSD_Joint rootJoint;
+    HSD_Joint targetJoint;
+    HSD_Joint instanceJoint;
+    HSD_JObj* root;
+    HSD_JObj* target;
+    HSD_JObj* instance;
+    HSD_JObj* instanceChild;
+    int ok;
+
+    InitSmokeJoint(&rootJoint);
+    InitSmokeJoint(&targetJoint);
+    InitSmokeJoint(&instanceJoint);
+
+    rootJoint.child = &targetJoint;
+    rootJoint.next = &instanceJoint;
+    instanceJoint.flags = JOBJ_INSTANCE;
+    instanceJoint.child = &targetJoint;
+
+    root = HSD_JObjAlloc();
+    target = HSD_JObjAlloc();
+    instance = HSD_JObjAlloc();
+    if (root == NULL || target == NULL || instance == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj resolve smoke failed: allocation failed\n");
+        if (root != NULL) {
+            HSD_JObjUnref(root);
+        }
+        if (target != NULL) {
+            HSD_JObjUnref(target);
+        }
+        if (instance != NULL) {
+            HSD_JObjUnref(instance);
+        }
+        return 0;
+    }
+
+    root->child = target;
+    root->next = instance;
+    target->parent = root;
+    instance->flags = JOBJ_INSTANCE;
+    instance->child = NULL;
+
+    fn_801A0744(root, &rootJoint);
+
+    instanceChild = instance->child;
+    ok = instanceChild == target && target->parent == root;
+
+    HSD_JObjSetFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjClearFlagsAll(root, JOBJ_HIDDEN);
+    HSD_JObjAnimAll(root);
+    HSD_JObjRemoveAll(root);
+
+    if (!ok) {
+        fprintf(stderr,
+                "[pcport_bootstrap] JObj resolve smoke failed: target=%p instanceChild=%p\n",
+                (void*)target,
+                (void*)instanceChild);
+        return 0;
+    }
+
+    printf("[pcport_bootstrap] JObj fn_801A0744 resolve smoke passed (shared child=%p)\n",
            (void*)target);
     return 1;
 }
@@ -12759,6 +12827,7 @@ int main(int argc, char** argv) {
     int audioInitialized = 0;
     int runRealContentParserSmoke;
     int runJObjInstanceSmoke;
+    int runJObjResolveSmoke;
     int runRealSceneSlice4Smoke;
     int runRealTevSceneSlice3Smoke;
     int runRealTevSceneSlice2Smoke;
@@ -12794,6 +12863,7 @@ int main(int argc, char** argv) {
     runWindowSmoke = HasArg(argc, argv, "--window-smoke");
     runGsGfxSmoke = HasArg(argc, argv, "--gsgfx-smoke");
     runJObjInstanceSmoke = HasArg(argc, argv, "--jobj-instance-smoke");
+    runJObjResolveSmoke = HasArg(argc, argv, "--jobj-resolve-smoke");
     runRealContentParserSmoke = HasArg(argc, argv, "--real-content-parser-smoke");
     runRealSceneSlice4Smoke = HasArg(argc, argv, "--real-scene-slice-4-smoke");
     runRealTevSceneSlice3Smoke = HasArg(argc, argv, "--real-tev-scene-slice-3-smoke");
@@ -12971,7 +13041,14 @@ int main(int argc, char** argv) {
            trkBuffer, trkLen);
     printf("[pcport_bootstrap] Linked decomp TU OSStateFlags verified (appType=0x%08lX)\n",
            appType);
-    if (runJObjInstanceSmoke) {
+    if (runJObjResolveSmoke) {
+        if (!RunJObjResolveSmoke()) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] JObj fn_801A0744 direct resolver exercised\n");
+    } else if (runJObjInstanceSmoke) {
         if (!RunJObjInstanceSmoke()) {
             exitCode = 1;
             goto cleanup;

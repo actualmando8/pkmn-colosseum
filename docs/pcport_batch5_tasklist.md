@@ -39,11 +39,15 @@ Lane result:
 - Main-checkout follow-up landed the live-impact host behavior instead of a generated-copy overlay: `pcport\hsd_host.c` now records a descriptor-to-live-JObj map during `HSD_JObjLoadJoint`, skips private child recursion for `JOBJ_INSTANCE` descriptors, and resolves each instance child to the canonical live JObj after all canonical nodes are loaded. This mirrors the practical `fn_801A0744` / `fn_801A0D94` ID-table lookup semantics in the active PC-port path.
 - Host ref-count note: the PC loader intentionally does not increment the shared child ref count when wiring an instance child. The graph-safe `HSD_JObjRemoveAll` ownership path visits and destroys each live JObj pointer once; adding the original assembly ref bump here would leave shared children alive after host graph removal.
 - `pcport\pcport_main.c` now exposes `--jobj-instance-smoke`, a headless smoke that constructs a root/canonical-child/instance-sibling descriptor graph, loads it through public `HSD_JObjLoadJoint`, requires `instance->child == root->child`, then runs graph-safe flag, animation, and removal walkers.
+- Follow-up: `build_pc\bodies\hsd_jobj\fn_801A0744.c` now replaces the generated neutral `FLIP_AS_STUB` body for direct PC-port calls. It builds a descriptor-to-live lookup by walking paired JObj/Joint trees, resolves RObj/DObj refs, and wires `JOBJ_INSTANCE` children to the canonical live JObj. This makes generated `build_pc\gen\hsd\hsd_jobj.c` contain a real typed `void fn_801A0744(HSD_JObj*, HSD_Joint*)` body.
+- `pcport\pcport_main.c` now exposes `--jobj-resolve-smoke`, a direct smoke that allocates a live root/canonical-child/instance-sibling JObj graph, calls `fn_801A0744(root, joint)` directly, and requires the instance child to resolve to the canonical live child before running graph-safe walkers.
+- Remaining direct-loader caveat: `fn_801A0FBC` still depends on the generated `fn_801A1098` load method path, whose generated body is still TODO. Direct `gs_material.c` callers of `fn_801A0FBC` should be routed to the active host `HSD_JObjLoadJoint` or given a safe loader overlay next.
 
 Verification:
 
 - `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1713 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
 - `build_pc\pcport_bootstrap.exe --jobj-instance-smoke` -> passed with `JObj instance child resolved to canonical live child`.
+- `build_pc\pcport_bootstrap.exe --jobj-resolve-smoke` -> passed with `JObj fn_801A0744 direct resolver exercised`.
 - `build_pc\pcport_bootstrap.exe --real-material-delta-smoke`
 - `build_pc\pcport_bootstrap.exe --real-scene-slice-2-smoke`
 - `build_pc\pcport_bootstrap.exe --real-textured-scene-slice-smoke`
@@ -92,7 +96,7 @@ Lane result:
 - Main checkout fixed the existing parser gate failure by classifying narrow I8 ramp/mask stages before the generic direct-sample fallback in `pcport\real_content_host.c`.
 - Follow-up integrated in main: `pcport\hsd_host.c` now provides conservative `PCPort_MObjMakeTExp` / `PCPort_TObjMakeTExp` builders, `src\hsd\hsd_mobj.c` and `src\hsd\hsd_tobj.c` wire those into the PC-only class init path, and `build_pc\bodies\hsd_mobj\fn_801A7B24.c` corrects the generated MObj loader's local method-slot mapping.
 - Remaining MObj blocker: `fn_801A6B8C`'s full release path cannot be safely overlaid until archive-owned versus heap-owned MObj resource ownership is recovered; current live loads borrow material data from swizzled archive storage. `fn_801A6D08` already matches the class release/destroy dispatch shape.
-- Next action: return to hsd_jobj `fn_801A0744` / `fn_801A0D94` and reconstruct from the real Colosseum `.inc` call sequence, not upstream Melee proxy semantics.
+- Next JObj action: route or overlay direct `fn_801A0FBC` loading so `gs_material.c` callers use the active host loader instead of the still-TODO `fn_801A1098` method path.
 
 Verification:
 
