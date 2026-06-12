@@ -199,7 +199,7 @@ Verification:
 - [ ] Add field trigger/event dispatch coverage.
 - [ ] Add story progression state mutation/restore coverage.
 - [x] Restore retail-backed title cast, sand animation, and crossing clouds without the removed host-mismatched logo assumptions.
-- [ ] Fix boot video/audio playback and the Nintendo logo orientation after the title path is audited.
+- [x] Fix boot video/audio playback and the Nintendo logo orientation after the title path is audited.
 
 Lane result:
 
@@ -215,6 +215,8 @@ Lane result:
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
 - The title default now keeps the legacy host title logo/prompt disabled while loading the retail `title.fsys` `t_vs_*` cast cutouts, the title sky/cloud band, and the sand-wind overlay by default. The incomplete archive Pokemon-logo billboard DObj is suppressed until the full retail logo composition is fixed; `PCPORT_TITLE_HOST_UI=1` remains the opt-in diagnostic path for the old host overlay.
+- The boot sequence now supports `PCPORT_BOOT_DUMP_ITEM` alongside `PCPORT_BOOT_DUMP_FRAME`, so Nintendo, The Pokemon Company, and Genius Sonority can be dumped through the actual GL boot presentation path instead of only dumping the first boot item or relying on standalone THP decode.
+- Boot THP playback now logs audio availability and drains queued waveOut audio for up to one second at natural movie end before closing, avoiding tail truncation without changing skip/window-close teardown.
 - The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
 - `S1_shop_1F` currently renders as a static field target; its ambient field animation setup is skipped until that map's animjoint path is recovered.
 - `include\hsd\hsd_debug.h` now uses a `PCPORT`-only unprototyped `__assert()` declaration so generated/decompiled HSD TUs with mixed assert call shapes compile in the host harness without changing the matching build declaration.
@@ -235,6 +237,11 @@ Audit verification (2026-06-12 update):
 - `build_pc\pcport_bootstrap.exe --field-message-smoke`, `--field-start-menu-smoke`, `--worldmap-menu-smoke`, `--story-field-smoke`, `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, and `--worldmap-handoff-smoke` -> passed after the audit wording/code changes.
 - `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> passed and loaded title cast cutouts, drifting-cloud layer, and sand-wind layer while keeping the legacy host title logo/prompt disabled.
 - `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 PCPORT_ANIM_TIME=0/5 PCPORT_DUMP=... build_pc\pcport_bootstrap.exe` -> title captures verified no mismatched logo, visible cast/cloud/sand, and animation deltas of `sky_0_190=96985`, `sand_196_432=103654`, `fullDiffPixels=200639`.
+- `PCPORT_BOOT_DUMP_ITEM=0 PCPORT_BOOT_DUMP_FRAME=0 PCPORT_DUMP=build_pc\boot_item0_nintendo.bmp build_pc\pcport_bootstrap.exe` -> dumped the Nintendo boot item through the GL boot path; visual inspection verified the logo is upright and centered.
+- `PCPORT_BOOT_DUMP_ITEM=1 PCPORT_BOOT_DUMP_FRAME=30 PCPORT_DUMP=build_pc\boot_item1_tpc_f30.bmp build_pc\pcport_bootstrap.exe` -> dumped The Pokemon Company THP through the GL boot path; visual inspection verified upright text and the boot path reported `audio enabled (32000 Hz, 2 ch)`.
+- `PCPORT_BOOT_DUMP_ITEM=2 PCPORT_BOOT_DUMP_FRAME=48 PCPORT_DUMP=build_pc\boot_item2_gs_f48.bmp build_pc\pcport_bootstrap.exe` -> dumped Genius Sonority THP through the GL boot path; visual inspection verified upright text.
+- `PCPORT_THP_FILE=orig/GC6E01/disc/files/movie/tpc.thp PCPORT_THP_OUT=build_pc\thp_tpc_audio.wav build_pc\pcport_bootstrap.exe --thp-audio-smoke` -> passed with `2 ch`, `32000 Hz`, `80152` total samples, `RMS=4948`, and `clip=1.13%`.
+- `PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> completed normal boot playback for Nintendo logo, TPC THP with audio, GS THP, and the first title frame.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 - `git diff --check` -> no whitespace errors in the edited repo files.
 

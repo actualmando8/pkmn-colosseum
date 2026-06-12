@@ -7730,6 +7730,13 @@ static int BootShowLogo(GLFWwindow* window, const char* archive, const char* mem
     return 1;
 }
 
+static void BootDrainAudio(void) {
+    double start = glfwGetTime();
+    while (WaveOutSink_IsPlaying() && (glfwGetTime() - start) < 1.0) {
+        VIWaitForRetrace_PC();
+    }
+}
+
 /* Play one THP movie full-screen, decoded by thp_player and presented via the 2D
  * quad path. Paced to the movie's fps via glfwGetTime (frames held between vsyncs);
  * START/A skips, window close returns 0. dumpFrame>=0 decodes to that frame, dumps,
@@ -7765,6 +7772,10 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
     if (PCPortTHP_HasAudio(thp)) {
         audioOn = WaveOutSink_Open(PCPortTHP_AudioSampleRate(thp),
                                    PCPortTHP_AudioChannels(thp), 16);
+        printf("[boot] audio %s (%u Hz, %d ch)\n",
+               audioOn ? "enabled" : "unavailable",
+               PCPortTHP_AudioSampleRate(thp),
+               PCPortTHP_AudioChannels(thp));
     }
 
     if (dumpFrame >= 0) {
@@ -7841,7 +7852,10 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
         }
         GSgfxSwapBuffers(1);
     }
-    if (audioOn) WaveOutSink_Close();
+    if (audioOn) {
+        BootDrainAudio();
+        WaveOutSink_Close();
+    }
     PCPortTHP_Close(thp);
     return 1;
 }
@@ -7851,8 +7865,9 @@ static int BootPlayTHP(GLFWwindow* window, const char* path, int dumpFrame, u16*
  * (tpc.thp) -> Genius Sonority (gs_logo.thp) -> opening demo (openingdemo.thp).
  * Static logos come from the *_logo.fsys CMPR sprites; the rest are THP movies.
  * START/A skips the current item; window close aborts. PCPORT_NO_BOOT=1 skips the
- * whole sequence; PCPORT_BOOT_DUMP_FRAME=N dumps the first item (GL path) for
- * headless verification. Must run after GSgfxInit.
+ * whole sequence; PCPORT_BOOT_DUMP_FRAME=N dumps one item (GL path) for
+ * headless verification, with PCPORT_BOOT_DUMP_ITEM selecting the boot item
+ * index (0=Nintendo, 1=TPC, 2=Genius Sonority). Must run after GSgfxInit.
  */
 static int RunBootSequence(GLFWwindow* window) {
     static const struct {
@@ -7871,6 +7886,7 @@ static int RunBootSequence(GLFWwindow* window) {
     int i;
     u16 prev = 0;
     int dumpFrame = -1;
+    int dumpItem = 0;
     const char* e;
 
     if (g_pcStoryFieldSmoke.active || getenv("PCPORT_NO_BOOT") != NULL) {
@@ -7880,14 +7896,25 @@ static int RunBootSequence(GLFWwindow* window) {
     if (e != NULL && e[0] != '\0') {
         dumpFrame = atoi(e);
     }
+    e = getenv("PCPORT_BOOT_DUMP_ITEM");
+    if (e != NULL && e[0] != '\0') {
+        dumpItem = atoi(e);
+        if (dumpItem < 0 || dumpItem >= n) {
+            dumpItem = 0;
+        }
+    }
 
     for (i = 0; i < n; ++i) {
         int rc;
+        int itemDumpFrame = (dumpFrame >= 0 && i == dumpItem) ? dumpFrame : -1;
+        if (dumpFrame >= 0 && i != dumpItem) {
+            continue;
+        }
         if (kBoot[i].isThp) {
-            rc = BootPlayTHP(window, kBoot[i].archive, dumpFrame, &prev);
+            rc = BootPlayTHP(window, kBoot[i].archive, itemDumpFrame, &prev);
         } else {
             rc = BootShowLogo(window, kBoot[i].archive, kBoot[i].member,
-                              2.6, dumpFrame, &prev);
+                              2.6, itemDumpFrame, &prev);
         }
         if (rc == 0) {
             GXHostClearTextureBinding();
