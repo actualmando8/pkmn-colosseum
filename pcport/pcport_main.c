@@ -7384,6 +7384,134 @@ static void DrawDialogBox(const char* text, int yesNo, int cursor) {
     }
 }
 
+typedef struct PCPortMessageBoxState {
+    const char** pages;
+    int pageCount;
+    int pageIndex;
+    int visibleChars;
+    int charsPerFrame;
+    int active;
+    int fastForwardCount;
+    int advanceCount;
+    int closeCount;
+} PCPortMessageBoxState;
+
+static int PCPort_TextLen(const char* text) {
+    return text != NULL ? (int)strlen(text) : 0;
+}
+
+static void PCPort_CopyTextPrefix(char* dst, size_t dstCap,
+                                  const char* text, int visibleChars) {
+    int i;
+    if (dst == NULL || dstCap == 0u) {
+        return;
+    }
+    dst[0] = '\0';
+    if (text == NULL || visibleChars <= 0) {
+        return;
+    }
+    for (i = 0; text[i] != '\0' && i < visibleChars &&
+                (size_t)i + 1u < dstCap; ++i) {
+        dst[i] = text[i];
+    }
+    dst[i] = '\0';
+}
+
+static void PCPort_MessageBoxInit(PCPortMessageBoxState* msg,
+                                  const char** pages, int pageCount,
+                                  int charsPerFrame) {
+    if (msg == NULL) {
+        return;
+    }
+    memset(msg, 0, sizeof(*msg));
+    msg->pages = pages;
+    msg->pageCount = pageCount;
+    msg->charsPerFrame = charsPerFrame > 0 ? charsPerFrame : 4;
+    msg->active = (pages != NULL && pageCount > 0);
+}
+
+static int PCPort_MessageBoxPageLen(const PCPortMessageBoxState* msg) {
+    if (msg == NULL || !msg->active || msg->pages == NULL ||
+        msg->pageIndex < 0 || msg->pageIndex >= msg->pageCount) {
+        return 0;
+    }
+    return PCPort_TextLen(msg->pages[msg->pageIndex]);
+}
+
+static void PCPort_MessageBoxTick(PCPortMessageBoxState* msg, u16 pressed) {
+    int pageLen;
+    if (msg == NULL || !msg->active) {
+        return;
+    }
+    pageLen = PCPort_MessageBoxPageLen(msg);
+    if (pressed & (GCN_PAD_BUTTON_A | GCN_PAD_BUTTON_START)) {
+        if (msg->visibleChars < pageLen) {
+            msg->visibleChars = pageLen;
+            msg->fastForwardCount++;
+            return;
+        }
+        if (msg->pageIndex + 1 < msg->pageCount) {
+            msg->pageIndex++;
+            msg->visibleChars = 0;
+            msg->advanceCount++;
+            return;
+        }
+        msg->active = 0;
+        msg->closeCount++;
+        return;
+    }
+    if (pressed & GCN_PAD_BUTTON_B) {
+        msg->active = 0;
+        msg->closeCount++;
+        return;
+    }
+    if (msg->visibleChars < pageLen) {
+        msg->visibleChars += msg->charsPerFrame;
+        if (msg->visibleChars > pageLen) {
+            msg->visibleChars = pageLen;
+        }
+    }
+}
+
+static void DrawFieldMessageBox(const PCPortMessageBoxState* msg,
+                                const char* speaker) {
+    char visible[256];
+    char hint[64];
+    int pageLen;
+
+    if (msg == NULL || !msg->active) {
+        return;
+    }
+    pageLen = PCPort_MessageBoxPageLen(msg);
+    PCPort_CopyTextPrefix(visible, sizeof(visible),
+                          msg->pages[msg->pageIndex],
+                          msg->visibleChars);
+
+    BeginMenuOverlay();
+    EnsureFontAtlas();
+    DrawSolidScreenRect(34.0f, 292.0f, 572.0f, 156.0f, 94, 122, 142, 245);
+    DrawSolidScreenRect(42.0f, 300.0f, 556.0f, 140.0f, 20, 38, 54, 252);
+    if (speaker != NULL && speaker[0] != '\0') {
+        DrawSolidScreenRect(58.0f, 276.0f, 118.0f, 28.0f, 230, 210, 124, 250);
+        DrawTextScreen(70.0f, 281.0f, 9.0f, 15.0f,
+                       24, 36, 48, 255, speaker);
+    }
+    DrawTextWrapped(66.0f, 320.0f, 10.0f, 16.0f, 48, 4,
+                    232, 240, 248, 255, visible);
+
+    if (msg->visibleChars >= pageLen) {
+        snprintf(hint, sizeof(hint), "[A] %s %d/%d",
+                 (msg->pageIndex + 1 < msg->pageCount) ? "NEXT" : "OK",
+                 msg->pageIndex + 1,
+                 msg->pageCount);
+        DrawTextScreen(448.0f, 414.0f, 8.0f, 13.0f,
+                       174, 194, 214, 255, hint);
+    } else {
+        DrawTextScreen(548.0f, 414.0f, 8.0f, 13.0f,
+                       174, 194, 214, 255, "...");
+    }
+}
+
 /* What a dialog's confirm ("Yes" / A on an info box) does. */
 #define PCPORT_DLG_INFO      0   /* info only: A or B dismisses back to the menu */
 #define PCPORT_DLG_QUIT      1   /* Yes -> close the window */
@@ -11222,6 +11350,135 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
     return 1;
 }
 
+static int RunFieldMessageSmoke(GLFWwindow* window) {
+    const char* pages[] = {
+        "Welcome to Outskirt Stand. This field message opens over the live world scene and reveals text over time.",
+        "Pressing A finishes the current page, pressing A again advances, and the final A closes the message box."
+    };
+    PCPortMessageBoxState msg;
+    PCPortFieldMotionMap motionMap;
+    f32 spawn[3] = { 0.0f, 0.0f, 0.0f };
+    int idleMotion;
+    int frame;
+    int renderedFrames = 0;
+    int sawPage0Partial = 0;
+    int sawPage1Partial = 0;
+    int sawFastForward = 0;
+    int sawAdvance = 0;
+    int sawClose = 0;
+    int closeFrame = -1;
+
+    if (window == NULL) {
+        fprintf(stderr,
+                "[field-message-smoke] failed: no native window/GL context\n");
+        return 0;
+    }
+    if (!PCPort_FieldWarpTo(PC_FLOOR_OUTSKIRT, spawn)) {
+        fprintf(stderr,
+                "[field-message-smoke] failed: could not load S1_out\n");
+        return 0;
+    }
+    if (!PCPort_LoadFieldCharacter() || !PCPort_CharAnimReady()) {
+        fprintf(stderr,
+                "[field-message-smoke] failed: could not load animated field character\n");
+        return 0;
+    }
+    motionMap = PCPort_LoadFieldMotionMap();
+    idleMotion = PCPort_FieldMotionForRole(&motionMap, PCPORT_FIELD_MOTION_IDLE);
+    if (idleMotion < 0 || !PCPort_CharAnimSetMotion(idleMotion)) {
+        fprintf(stderr,
+                "[field-message-smoke] failed: idle motion %d could not be set\n",
+                idleMotion);
+        return 0;
+    }
+
+    PCPort_MessageBoxInit(&msg, pages,
+                          (int)(sizeof(pages) / sizeof(pages[0])), 6);
+
+    for (frame = 0; frame < 80; ++frame) {
+        u16 pressed = 0u;
+        int beforeFastForward = msg.fastForwardCount;
+        int beforeAdvance = msg.advanceCount;
+        int beforeClose = msg.closeCount;
+        int pageLen = PCPort_MessageBoxPageLen(&msg);
+
+        if (msg.active && msg.pageIndex == 0 &&
+            msg.visibleChars > 0 && msg.visibleChars < pageLen) {
+            sawPage0Partial = 1;
+        }
+        if (msg.active && msg.pageIndex == 1 &&
+            msg.visibleChars > 0 && msg.visibleChars < pageLen) {
+            sawPage1Partial = 1;
+        }
+
+        if (msg.active && msg.pageIndex == 0 && frame == 3) {
+            pressed = GCN_PAD_BUTTON_A;     /* partial page -> full page */
+        } else if (msg.active && msg.pageIndex == 0 &&
+                   msg.visibleChars >= pageLen) {
+            pressed = GCN_PAD_BUTTON_A;     /* full page -> next page */
+        } else if (msg.active && msg.pageIndex == 1 &&
+                   msg.visibleChars >= pageLen && frame > 5) {
+            pressed = GCN_PAD_BUTTON_A;     /* final page -> close */
+        }
+
+        VIWaitForRetrace_PC();
+        PCPort_MessageBoxTick(&msg, pressed);
+        if (msg.fastForwardCount > beforeFastForward) {
+            sawFastForward = 1;
+        }
+        if (msg.advanceCount > beforeAdvance) {
+            sawAdvance = 1;
+        }
+        if (msg.closeCount > beforeClose) {
+            sawClose = 1;
+            closeFrame = frame;
+        }
+
+        PCPort_FieldAnimTick(1.0f);
+        PCPort_FieldAnimHarvestTexUV(&g_engTitleArchive, g_engTitleRootJoint);
+        PCPort_EngineTitleRenderFrame();
+        RenderFieldCharacter(spawn[0], spawn[1], spawn[2],
+                             3.14159265f, 1.3f, 1.0f);
+        DrawFieldMessageBox(&msg, "WES");
+        GSgfxSwapBuffers(0);
+        renderedFrames++;
+
+        if (!msg.active && sawClose) {
+            break;
+        }
+    }
+
+    if (msg.active || !sawPage0Partial || !sawPage1Partial ||
+        !sawFastForward || !sawAdvance || !sawClose ||
+        msg.fastForwardCount != 1 || msg.advanceCount != 1 ||
+        msg.closeCount != 1) {
+        fprintf(stderr,
+                "[field-message-smoke] failed: active=%d p0partial=%d p1partial=%d fast=%d advance=%d close=%d counts=%d/%d/%d frame=%d\n",
+                msg.active,
+                sawPage0Partial,
+                sawPage1Partial,
+                sawFastForward,
+                sawAdvance,
+                sawClose,
+                msg.fastForwardCount,
+                msg.advanceCount,
+                msg.closeCount,
+                frame);
+        return 0;
+    }
+
+    printf("[field-message-smoke] passed: pages=%d fastForward=%d advance=%d close=%d frames=%d closeFrame=%d idleMotion=%d spawn=(%.1f,%.1f,%.1f)\n",
+           msg.pageCount,
+           msg.fastForwardCount,
+           msg.advanceCount,
+           msg.closeCount,
+           renderedFrames,
+           closeFrame,
+           idleMotion,
+           spawn[0], spawn[1], spawn[2]);
+    return 1;
+}
+
 static int RunWorldMapHandoffSmoke(GLFWwindow* window) {
     const char* archive = getenv("PCPORT_WORLDMAP_ARCHIVE");
 
@@ -13926,6 +14183,7 @@ int main(int argc, char** argv) {
     int runFieldRoomReloadSmoke;
     int runFieldWorldWarpSmoke;
     int runFieldLocomotionSmoke;
+    int runFieldMessageSmoke;
     int runWorldMapHandoffSmoke;
     int runWorldMapMenuSmoke;
     int runWorldMapMenu;
@@ -13949,6 +14207,7 @@ int main(int argc, char** argv) {
     runFieldRoomReloadSmoke = HasArg(argc, argv, "--field-room-reload-smoke");
     runFieldWorldWarpSmoke = HasArg(argc, argv, "--field-world-warp-smoke");
     runFieldLocomotionSmoke = HasArg(argc, argv, "--field-locomotion-smoke");
+    runFieldMessageSmoke = HasArg(argc, argv, "--field-message-smoke");
     runWorldMapHandoffSmoke = HasArg(argc, argv, "--worldmap-handoff-smoke");
     runWorldMapMenuSmoke = HasArg(argc, argv, "--worldmap-menu-smoke");
     runWorldMapMenu = HasArg(argc, argv, "--worldmap-menu");
@@ -14066,6 +14325,7 @@ int main(int argc, char** argv) {
         runFieldRoomReloadSmoke ||
         runFieldWorldWarpSmoke ||
         runFieldLocomotionSmoke ||
+        runFieldMessageSmoke ||
         runWorldMapHandoffSmoke ||
         runWorldMapMenuSmoke ||
         runWorldMapMenu ||
@@ -14380,6 +14640,20 @@ int main(int argc, char** argv) {
         }
 
         printf("[pcport_bootstrap] Worldmap handoff smoke rendered world_map.fsys through the field scene bridge\n");
+    } else if (runFieldMessageSmoke) {
+        if (window == NULL) {
+            fprintf(stderr,
+                    "[pcport_bootstrap] --field-message-smoke requested but no window/GL context available\n");
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        if (!RunFieldMessageSmoke(window)) {
+            exitCode = 1;
+            goto cleanup;
+        }
+
+        printf("[pcport_bootstrap] Field message smoke exercised text reveal, page advance, and close\n");
     } else if (runFieldLocomotionSmoke) {
         if (window == NULL) {
             fprintf(stderr,
