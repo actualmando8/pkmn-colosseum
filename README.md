@@ -11,11 +11,11 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~56.4% (5246 / 9295 functions) |
-| Code match | ~48.7% (matched code bytes) |
+| Function match | ~54.3% (4921 / 9066 functions) |
+| Code match | ~42.9% (707,176 / 1,650,288 matched code bytes) |
 
-Last measured 2026-06-10 with `objdiff-cli report generate` against a verified
-byte-identical `main.dol` build. The numbers are regenerated locally — public CI
+Last measured 2026-06-12 with `python tools/gen_decomp_report.py -o report.json`
+against the local ROM-extracted target/base objects. The numbers are regenerated locally — public CI
 cannot hold the ROM-derived target objects, so `.github/workflows/progress.yml`
 only gates compilation until the private build container is published. (Note:
 the denominators grew over time as more translation units were unblocked, so

@@ -155,8 +155,8 @@ def build_report():
     g_fuzzy_weighted = 0.0  # sum(match% * size)
     complete_units = 0
 
-    for o in sorted(BASE_DIR.rglob("*.o")):
-        rel = o.relative_to(BASE_DIR).as_posix()
+    base_objects = list(progress.iter_base_objects())
+    for idx, (rel, o) in enumerate(base_objects, 1):
         funcs = measure_cache.diff_funcs(TARGET_O, o)
         if not funcs:  # no fn_ symbols measurable here -> not a report unit
             continue
@@ -217,6 +217,15 @@ def build_report():
         g_total_code += u_total_code
         g_matched_code += u_matched_code
         g_fuzzy_weighted += u_fuzzy_weighted
+
+        if idx % 10 == 0:
+            try:
+                measure_cache.flush()
+            except Exception:  # noqa: BLE001
+                pass
+        if idx % 25 == 0:
+            print("measured %d/%d base objects (%d report units)" %
+                  (idx, len(base_objects), len(units)), flush=True)
 
     total_units = len(units)
     g_fuzzy = (g_fuzzy_weighted / g_total_code) if g_total_code else 0.0

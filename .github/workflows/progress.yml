@@ -63,13 +63,14 @@ jobs:
         run: |
           python3 tools/compile_check.py --all || echo "compile_check.py --all not implemented; skipping"
 
-      # decomp.dev ingests the objdiff report format. objdiff-cli reads the
-      # tracked objdiff.json plus the built target/base objects and emits it.
+      # decomp.dev ingests the objdiff report format. Use the project generator:
+      # native objdiff-cli report generation only sees the curated objdiff.json
+      # units and miscounts this repository's unified-target/per-file-base layout.
       - name: Generate progress report (objdiff format)
         if: ${{ hashFiles('build/GC6E01/obj/auto_01_800055E0_text.o') != '' }}
         run: |
           mkdir -p build/GC6E01
-          ./tools/objdiff-cli.exe report generate -o build/GC6E01/report.json
+          python3 tools/gen_decomp_report.py -o build/GC6E01/report.json
           echo "::group::Summary"
           python3 tools/progress.py --no-files || true
           echo "::endgroup::"

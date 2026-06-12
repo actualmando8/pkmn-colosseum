@@ -29,6 +29,16 @@ ROOT = Path(__file__).resolve().parent.parent
 TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE_DIR = ROOT / "build" / "GC6E01" / "base"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+SKIP_BASE_PREFIXES = ("pcport/",)
+SKIP_BASE_NAMES = {"test_va2.o", "test_va3.o"}
+
+
+def iter_base_objects():
+    for o in sorted(BASE_DIR.rglob("*.o")):
+        rel = o.relative_to(BASE_DIR).as_posix()
+        if rel.startswith(SKIP_BASE_PREFIXES) or rel in SKIP_BASE_NAMES:
+            continue
+        yield rel, o
 
 
 def diff_one(base_o: Path) -> dict:
@@ -44,8 +54,7 @@ def diff_one(base_o: Path) -> dict:
 
 def collect() -> dict:
     files = {}
-    for o in sorted(BASE_DIR.rglob("*.o")):
-        rel = o.relative_to(BASE_DIR).as_posix()
+    for rel, o in iter_base_objects():
         d = diff_one(o)
         funcs = d.get("functions", [])
         if not funcs:
