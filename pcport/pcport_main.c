@@ -10140,9 +10140,31 @@ typedef struct PCPortFieldMotionMap {
 
 #define PCPORT_FIELD_MOTION_RECORD_STRIDE 0x2Cu
 #define PCPORT_FIELD_MOTION_RECORD_KEY_OFF 0x0Cu
+#define PCPORT_FIELD_MOTION_DEFAULT_KEY 0x00F30400u
+#define PCPORT_FIELD_MOTION_PARTNER_KEY 0x00F70400u
 
 static const u8* g_pcFieldMotionRecordTable;
 static u32       g_pcFieldMotionRecordCount;
+
+/* Retail common_rel rows recovered from build_pc/logo_probe/common/common_rel.bin.
+ * They are the raw lbl_80478E7C-style 0x2c action records used by
+ * fn_8018F6F4(key) + fn_8018F4C8(record, slot, outMotion, outLoop).
+ * Offsets in that dumped common_rel: 0x13FCE4 for 0x00F30400, 0x13FCB8
+ * for 0x00F70400. Installed tables from a live loader still take priority. */
+static const u8 kPCPortFieldMotionRetailRecords[][PCPORT_FIELD_MOTION_RECORD_STRIDE] = {
+    {
+        0x54, 0x01, 0x02, 0x03, 0x04, 0xFF, 0xFF, 0xFF, 0xFF, 0x06, 0x00,
+        0x00, 0x00, 0xF3, 0x04, 0x00, 0x41, 0x10, 0x00, 0x00, 0x41, 0x50,
+        0x00, 0x00, 0x40, 0x80, 0x00, 0x00, 0xC2, 0x96, 0x00, 0x00, 0x42,
+        0x96, 0x00, 0x00, 0xC1, 0xF0, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00
+    },
+    {
+        0x34, 0x01, 0x02, 0x03, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x12, 0x00,
+        0x00, 0x00, 0xF7, 0x04, 0x00, 0x41, 0x10, 0x00, 0x00, 0x41, 0x50,
+        0x00, 0x00, 0x40, 0x80, 0x00, 0x00, 0xC2, 0x96, 0x00, 0x00, 0x42,
+        0x96, 0x00, 0x00, 0xC1, 0xF0, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00
+    }
+};
 
 void PCPort_FieldMotionInstallRecordTable(const void* table, u32 count) {
     g_pcFieldMotionRecordTable = (const u8*)table;
@@ -10219,19 +10241,39 @@ static int PCPort_FieldMotionRecordReadAction(const u8* record,
     return motion >= 0;
 }
 
-static const u8* PCPort_FieldMotionFindRecordByKey(u32 key) {
+static const u8* PCPort_FieldMotionFindRecordInTable(const u8* p,
+                                                     u32 count,
+                                                     u32 key) {
     u32 i;
-    const u8* p = g_pcFieldMotionRecordTable;
-    if (p == NULL || g_pcFieldMotionRecordCount == 0u) {
+    if (p == NULL || count == 0u) {
         return NULL;
     }
-    for (i = 0u; i < g_pcFieldMotionRecordCount; ++i) {
+    for (i = 0u; i < count; ++i) {
         if (PCPort_ReadBigEndianU32(p + PCPORT_FIELD_MOTION_RECORD_KEY_OFF) == key) {
             return p;
         }
         p += PCPORT_FIELD_MOTION_RECORD_STRIDE;
     }
     return NULL;
+}
+
+static const u8* PCPort_FieldMotionFindRecordByKey(u32 key) {
+    const u8* record;
+    record = PCPort_FieldMotionFindRecordInTable(g_pcFieldMotionRecordTable,
+                                                 g_pcFieldMotionRecordCount,
+                                                 key);
+    if (record != NULL) {
+        return record;
+    }
+    return PCPort_FieldMotionFindRecordInTable(
+        &kPCPortFieldMotionRetailRecords[0][0],
+        (u32)(sizeof(kPCPortFieldMotionRetailRecords) /
+              sizeof(kPCPortFieldMotionRetailRecords[0])),
+        key);
+}
+
+static u32 PCPort_FieldMotionDefaultKey(void) {
+    return PCPORT_FIELD_MOTION_DEFAULT_KEY;
 }
 
 static int PCPort_ParseFieldMotionRecordEnv(u8 outRecord[PCPORT_FIELD_MOTION_RECORD_STRIDE]) {
@@ -10317,23 +10359,23 @@ static void PCPort_FieldMotionRecordProbe(const u8* record, u32 key) {
     PCPort_FieldMotionRecordReadAction(record, 1, &idle, &loop);
     PCPort_FieldMotionRecordReadAction(record, 2, &walk, &loop);
     PCPort_FieldMotionRecordReadAction(record, 3, &run, &loop);
-    printf("[field/motion-record] role map idle=%d walk=%d run=%d%s\n",
-           idle, walk, run,
-           (idle == 1 && walk == 5 && run == 8)
-               ? " [Wes checksum-confirmed]"
-               : "");
+    printf("[field/motion-record] host role projection action1/2/3 -> idle=%d walk=%d run=%d\n",
+           idle, walk, run);
     fflush(stdout);
 }
 
 /* Role-to-motion indirection. If a real 0x2C per-character action record is
- * installed, use it. Otherwise classify the loaded model's motion bank as a
- * visual fallback only; that fallback is not proof of the game's directional
- * animation/action selection. Env overrides remain diagnostic. */
+ * installed or recovered from retail common_rel, use it. The current host walk
+ * loop projects action slots 1/2/3 into its idle/walk/run roles; the deeper
+ * game-code path still needs the retail action-state caller. If no record is
+ * available, classify the loaded model's motion bank as a visual fallback only.
+ * Env overrides remain diagnostic. */
 static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     PCPortFieldMotionMap map;
     const char* packed;
     u8 envRecord[PCPORT_FIELD_MOTION_RECORD_STRIDE];
     u32 key = 0u;
+    int haveKey = 0;
     const u8* record = NULL;
     map.idle = -1;
     map.walk = -1;
@@ -10346,11 +10388,25 @@ static PCPortFieldMotionMap PCPort_LoadFieldMotionMap(void) {
     map.fromEnv = 0;
     map.key = 0u;
 
+    if (PCPort_ParseU32Env("PCPORT_FIELD_MOTION_KEY", &key) ||
+        PCPort_ParseU32Env("PCPORT_FIELD_CHAR_KEY", &key)) {
+        haveKey = 1;
+    }
+
     if (PCPort_ParseFieldMotionRecordEnv(envRecord)) {
         record = envRecord;
-    } else if (PCPort_ParseU32Env("PCPORT_FIELD_CHAR_KEY", &key)) {
+        if (haveKey) {
+            map.key = key;
+        }
+    } else {
+        if (!haveKey) {
+            key = PCPort_FieldMotionDefaultKey();
+            haveKey = 1;
+        }
         record = PCPort_FieldMotionFindRecordByKey(key);
-        map.key = key;
+        if (record != NULL) {
+            map.key = key;
+        }
     }
     if (record != NULL) {
         PCPort_FieldMotionMapFromRecord(record, &map);
@@ -11506,8 +11562,9 @@ static int RunFieldLocomotionSmoke(GLFWwindow* window) {
                moveMag);
     }
 
-    printf("[field-locomotion-smoke] passed: S1_out player motion plumbing source=%s idle=%d walk=%d run=%d facingCases=%d spawn=(%.1f,%.1f,%.1f)\n",
+    printf("[field-locomotion-smoke] passed: S1_out player motion plumbing source=%s key=0x%08X actionProjection idle=%d walk=%d run=%d facingCases=%d spawn=(%.1f,%.1f,%.1f)\n",
            PCPort_FieldMotionMapSourceName(&motionMap),
+           motionMap.key,
            idleMotion,
            walkMotion,
            runMotion,

@@ -189,7 +189,8 @@ Verification:
 - [x] Wire accepted worldmap destinations to verified host floor targets.
 - [ ] Recover real story unlock/floor availability data and a collision-backed Phenac target.
 - [x] Gate field motion plumbing/facing cases for idle/walk/run while moving north/south/east/west.
-- [ ] Recover true game-code player action/motion selection from the people field-motion records and `fn_8012C660` / `fn_8018F4C8` path.
+- [x] Link real people field-motion action records into the player motion source (`fn_8018F6F4` key lookup plus `fn_8018F4C8` slot mirror).
+- [ ] Replace the host idle/walk/run role projection with the retail action-state caller from `fn_8012CA84` / `fn_8012C660`.
 - [x] Gate host-side START-in-field menu open/close behavior.
 - [ ] Link START-in-field to the real menu/title/message subsystems instead of the host overlay.
 - [ ] Add NPC spawn/talk coverage.
@@ -197,6 +198,8 @@ Verification:
 - [ ] Link field messages to the real `menu_msgbox` / script-callback state machine.
 - [ ] Add field trigger/event dispatch coverage.
 - [ ] Add story progression state mutation/restore coverage.
+- [ ] Restore retail-backed title cast, sand animation, and crossing clouds without the removed host-mismatched logo assumptions.
+- [ ] Fix boot video/audio playback and the Nintendo logo orientation after the title path is audited.
 
 Lane result:
 
@@ -208,7 +211,7 @@ Lane result:
 - The worldmap handoff smoke simulates the field-to-worldmap transition target, loads `world_map.fsys`, selects `move_demo`, and renders the scene through the same field scene bridge. This proves the target asset/render path, not the full `gs_worldmap` cursor/select/travel-confirm state machine yet.
 - The worldmap menu smoke drives a host-side worldmap state path over the real `world_map.fsys` render: cursor movement, destination selection, travel confirmation dialog, and accepted travel result. It does not yet run the real `gs_worldmap` state machine, destination availability, or story-gated floor mapping beyond the current host table.
 - Accepted worldmap travel now resolves through the host floor table and renders the selected field target after confirmation. `PYRITE TOWN` maps to `M2_out` and is smoke-gated with WZX collision; `AGATE VILLAGE` maps to `M3_out` and is verified as a render/collision target. `PHENAC CITY` remains route-locked because `M1_out` renders but currently has no discovered WZX mesh.
-- The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the same movement role/yaw helpers as the playable walk loop, asserts a distinct idle/walk/run motion map, then renders idle plus north/south/east/west walk and run cases. Audit correction: when the source is `motion-bank-heuristic`, this verifies plumbing/facing only; it is not proof of the game's canonical directional/action animation selection.
+- The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the same movement role/yaw helpers as the playable walk loop, asserts a distinct idle/walk/run motion map, then renders idle plus north/south/east/west walk and run cases. It now defaults to the recovered retail people action record `0x00F30400` and mirrors `fn_8018F4C8` slots 1/2/3 into the host role projection (`idle=1`, `walk=2`, `run=3`). This removes the prior motion-bank heuristic source, but full retail directional/action correctness still needs the game action-state caller rather than the host projection.
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
 - The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
@@ -220,14 +223,14 @@ Audit correction (2026-06-11):
 - Game-code backed enough to keep as completed: HSD JObj/MObj/CObj overlays and visible material deltas, because the PC build calls the recovered symbols or BOOT-order host overrides over real HSD descriptors/assets and gates visible framebuffer or graph behavior.
 - Asset/render/collision backed but still host-orchestrated: field scene load, WZX collision load, field character load, room/world reload mechanics, and worldmap render handoff.
 - Host scaffolds, not game-code correctness: hand-written field warp exits/spawns, host worldmap menu/destination table, host START field menu overlay, host message box pages, and menu New Game smoke skip/autorun.
-- Incorrectly overstated before this audit: `--field-locomotion-smoke` does not prove true directional animation correctness unless it is backed by the real people field-motion action records. Current default source is the motion-bank heuristic (`idle=1`, `walk=5`, `run=8` for `ken_b1`), so the next critical path item is linking the `fn_8012CA84` -> `fn_8012C660` -> `fn_8018F4C8` action-record path.
+- Incorrectly overstated before this audit: `--field-locomotion-smoke` did not prove true directional animation correctness while it was backed by the motion-bank heuristic (`idle=1`, `walk=5`, `run=8` for `ken_b1`). Follow-up now links the recovered people action-record rows from retail common_rel, so the default source is `game-record` (`key=0x00F30400`, projected slots `1/2/3 -> idle/walk/run`). The remaining critical path is replacing that host projection with the retail action-state caller from `fn_8012CA84` / `fn_8012C660`.
 - Incorrectly overstated before this audit: title foreground/camera composition included host-made logo/cast/cloud/pan assumptions. The PC front-end should default to the real `title.fsys:logo_demo` archive scene; legacy host title UI/camera diagnostics are opt-in.
 
 Audit verification (2026-06-11):
 
-- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1718 stubs.
-- `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passed as motion plumbing with `source=motion-bank-heuristic`, `idle=1`, `walk=5`, `run=8`, `facingCases=9`.
-- `PCPORT_FIELD_REQUIRE_GAME_MOTION=1 build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> expected failure with `source=motion-bank-heuristic is not game action-record backed`.
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1731 stubs.
+- `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> now passes with `source=game-record`, `key=0x00F30400`, projected `idle=1`, `walk=2`, `run=3`, `facingCases=9`.
+- `PCPORT_FIELD_REQUIRE_GAME_MOTION=1 PCPORT_FIELD_MOTION_RECORD_PROBE=1 build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passes and prints the recovered retail slots: action 1/2/3/4 map to motions `1/2/3/4`, action 5 reuses motion `1`, and actions 6/7/8 are `-1`.
 - `build_pc\pcport_bootstrap.exe --field-message-smoke`, `--field-start-menu-smoke`, `--worldmap-menu-smoke`, `--story-field-smoke`, `--field-room-warp-smoke`, `--field-room-reload-smoke`, `--field-world-warp-smoke`, and `--worldmap-handoff-smoke` -> passed after the audit wording/code changes.
 - `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=2 build_pc\pcport_bootstrap.exe` -> passed and rendered two title/menu frames without loading the legacy host title logo, PRESS START sheet, cast cutouts, clouds, wind, or host camera.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
@@ -235,10 +238,10 @@ Audit verification (2026-06-11):
 
 Verification:
 
-- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1718 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
+- `python tools\pcport_link.py` -> `compiled 129 objects; 0 failed to compile`, round 2 linked OK with 1731 stubs, rebuilt `build_pc\pcport_bootstrap.exe`.
 - `build_pc\pcport_bootstrap.exe --field-start-menu-smoke` -> passed with `S1_out`, `ken_b1`, START open, two cursor moves, START close, `frames=6`, `idleMotion=1`.
 - `build_pc\pcport_bootstrap.exe --field-message-smoke` -> passed with `S1_out`, `ken_b1`, two message pages, one fast-forward, one page advance, one close, `frames=24`, `idleMotion=1`.
-- `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passed with `S1_out`, `ken_b1`, distinct motion map `idle=1`, `walk=5`, `run=8`, and 9 rendered plumbing/facing cases. Audit correction: this is not a true-game directional-animation gate until the source is `game-record`.
+- `build_pc\pcport_bootstrap.exe --field-locomotion-smoke` -> passed with `S1_out`, `ken_b1`, `source=game-record`, `key=0x00F30400`, distinct projected map `idle=1`, `walk=2`, `run=3`, and 9 rendered plumbing/facing cases.
 - `build_pc\pcport_bootstrap.exe --worldmap-menu-smoke` -> passed with cursor `OUTSKIRT STAND -> PHENAC CITY -> PYRITE TOWN`, travel confirm opened, `YES` accepted, then loaded `M2_out` with `floor=4`, `tris=2125`, `frames=9`.
 - `build_pc\pcport_bootstrap.exe --worldmap-handoff-smoke` -> passed with `world_map.fsys`, selected/rendered `move_demo`, `rootJoint=0x20`, `extraModels=2`, `collisionTris=0`.
 - `build_pc\pcport_bootstrap.exe --field-world-warp-smoke` -> passed with player trigger `2->3`, start `(69.0,0.0,-30.0)`, target `S1_shop_1F`, shop `tris=196`, `exit->2`, spawn `(0.0,0.0,35.0)`.
