@@ -340,7 +340,7 @@ done:
 extern u8 fn_800FF52C(void);
 extern void fn_80166A28(u32 a);
 extern void fn_800FAEF8(u32 a, u32 b, s32 c, ...);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern u32 lbl_802666B0[];
 #if 0
 asm void fn_8000BFA0(void) {
@@ -360,7 +360,7 @@ s32 fn_8000BFA0(void) {
         rodata = lbl_802666B0;
         do {
             fn_800FAEF8(0xc8, 0xf0, -1, rodata);
-            fn_800F0308();
+            _threadSwitch();
             i++;
         } while (i < 0xf);
         return 0;
@@ -667,12 +667,12 @@ s32 fn_8000C3D4(u32 arg1, u32 type) {
         fn_80105FB0(1);
         break;
     case 2:
-        fn_800F0308();
-        fn_800F0308();
-        fn_800F0308();
+        _threadSwitch();
+        _threadSwitch();
+        _threadSwitch();
         fn_80106080(0);
-        fn_800F0308();
-        fn_800F0308();
+        _threadSwitch();
+        _threadSwitch();
         break;
     case 3:
         fn_80132A38(0x31, 0x7da);
@@ -858,7 +858,7 @@ extern void fn_80190528(u32);
 extern void fn_800884BC(u32, u32, u32);
 extern void fn_800FF660(void);
 extern u32 fn_800FF560(void);
-extern u32 fn_800F07A8(s32, u32, s32, s32, s32, u32);
+extern u32 GSthreadCreate(s32, u32, s32, s32, s32, u32);
 extern u32 fn_80129280(s32, s32);
 extern u32 fn_8012AC08(u32, s32);
 extern u32 fn_80123FBC(u32);
@@ -1070,7 +1070,7 @@ void fn_8000CB54(void) {
 }
 
 /* fn_8000CB74 - 0x8000CB74 | size: 0xc8 */
-/* GSparty_GetShadowGauge -- load table, search, call fn_800F07A8 + fn_800F0654 */
+/* GSparty_GetShadowGauge -- load table, search, call GSthreadCreate + fn_800F0654 */
 #if 0
 asm void fn_8000CB74(void) {
 #include "src/game/gs_party_access_fn_8000CB74.inc"
@@ -1096,7 +1096,7 @@ u32 fn_8000CB74(u32 arg) {
     idx = 3;
 idx_done:
     val = table[idx * 2 + 1];
-    r = fn_800F07A8(1, fn_800FF560(), 0x4000, 1, 1, (u32)(void(*)(void))fn_8000CB54);
+    r = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, (u32)(void(*)(void))fn_8000CB54);
     fn_800F0654(r, 1, val);
     return 0;
 }
@@ -1177,11 +1177,11 @@ void testEvolution__Fv(void) {
 #endif
 
 /* fn_8000CE18 - 0x8000CE18 | size: 0x44 */
-/* GSparty_CureStatus -- call fn_800FF560, then fn_800F07A8 with fn_8000CD50 as callback */
+/* GSparty_CureStatus -- call fn_800FF560, then GSthreadCreate with fn_8000CD50 as callback */
 s32 fn_8000CE18(void) {
     u32 r;
     r = (u32)fn_800FF560();
-    fn_800F07A8(1, r, 0x4000, 1, 1, (u32)testEvolution__Fv);
+    GSthreadCreate(1, r, 0x4000, 1, 1, (u32)testEvolution__Fv);
     return 0;
 }
 
@@ -1380,7 +1380,7 @@ s32 fn_8000D234(void) {
     }
     if (*(s32*)(lbl_804673F8 + 0x874) == 0) {
         fn_800FF730(0x3E7);
-        fn_800F0308();
+        _threadSwitch();
     }
     return 0;
 }

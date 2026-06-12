@@ -38,7 +38,7 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 /* Engine / GS core */
 extern void  fn_800DD970(const char* fmt, ...);      /* GSlog_Print */
 extern void  fn_800D3088(void);                       /* GSgfx tick */
-extern void* fn_800F07A8(s32 priority, void* parent, s32 stackSize,
+extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
                           u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */
 extern void  fn_800F04C4(void);                       /* stop particle system */
 
@@ -59,7 +59,7 @@ extern void  fn_8036A2D8(void* jobj, f32 rx, f32 ry, f32 rz); /* HSD_JObjSetRota
 extern void* fn_80369654(void* jobj, s32 childIdx);         /* HSD_JObjGetChild */
 
 /* Sound */
-extern void  soundStop(s32 sndID, s32 volume);    /* sndStop */
+extern void  soundStop(s32 sndID, s32 volume);    /* soundStop */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay with fade */
 
 /* Battle scene (forward refs to battle_scene.c) */

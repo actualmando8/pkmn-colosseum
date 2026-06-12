@@ -101,7 +101,7 @@ extern void fn_800E209C();
 extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800F7A08();
 extern void fn_800F7A7C();
 extern void fn_800F7AF0();
@@ -197,7 +197,7 @@ extern void fn_80166A28();
 extern void fn_80166A50();
 extern void fn_80166AB8();
 extern void fn_80176E0C();
-extern void fn_80177A44();
+extern void GSscene_SetMode();
 extern void fn_8017B000();
 extern void fn_8017B1CC();
 extern void fn_801906A0();
@@ -672,7 +672,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xC8)) {
                 fn_80102510(0xC8);
                 while ((u8)fn_80102620(0xC8)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             r = fn_8006A7E8(st);
@@ -680,7 +680,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xD6)) {
                 fn_80102510(0xD6);
                 while ((u8)fn_80102620(0xD6)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             {
@@ -960,7 +960,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xDA)) {
                 fn_80102510(0xDA);
                 while ((u8)fn_80102620(0xDA)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             r = fn_8006A7E8(sv);
@@ -968,7 +968,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xD6)) {
                 fn_80102510(0xD6);
                 while ((u8)fn_80102620(0xD6)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             {
@@ -987,7 +987,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_80102620(0xDA)) {
                         fn_80102510(0xDA);
                         while ((u8)fn_80102620(0xDA)) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     }
                     r = fn_8006A7E8(p);
@@ -995,7 +995,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_80102620(0xD6)) {
                         fn_80102510(0xD6);
                         while ((u8)fn_80102620(0xD6)) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     }
                     {
@@ -1023,7 +1023,7 @@ void fn_80059BDC(void) {
                         if ((u8)fn_80102620(0xDA)) {
                             fn_80102510(0xDA);
                             while ((u8)fn_80102620(0xDA)) {
-                                fn_800F0308();
+                                _threadSwitch();
                             }
                         }
                         r = fn_8006A7E8(sv2);
@@ -1073,7 +1073,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xDA)) {
                 fn_80102510(0xDA);
                 while ((u8)fn_80102620(0xDA)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             r = fn_8006A7E8(p);
@@ -1081,7 +1081,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xD6)) {
                 fn_80102510(0xD6);
                 while ((u8)fn_80102620(0xD6)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             {
@@ -1113,7 +1113,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xDA)) {
                 fn_80102510(0xDA);
                 while ((u8)fn_80102620(0xDA)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             r = fn_8006A7E8((void*)cmd);
@@ -1131,7 +1131,7 @@ void fn_80059BDC(void) {
             if ((u8)fn_80102620(0xD6)) {
                 fn_80102510(0xD6);
                 while ((u8)fn_80102620(0xD6)) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
             }
             {
@@ -1157,7 +1157,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_80102620(0xC8)) {
                         fn_80102510(0xC8);
                         while ((u8)fn_80102620(0xC8)) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     }
                     r = fn_8006A7E8((void*)prevCmd);
@@ -1165,7 +1165,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_80102620(0xD6)) {
                         fn_80102510(0xD6);
                         while ((u8)fn_80102620(0xD6)) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     }
                     {
@@ -1187,7 +1187,7 @@ void fn_80059BDC(void) {
                         if ((u8)fn_80102620(0xDA)) {
                             fn_80102510(0xDA);
                             while ((u8)fn_80102620(0xDA)) {
-                                fn_800F0308();
+                                _threadSwitch();
                             }
                         }
                         r = fn_8006A7E8((void*)cmd);
@@ -1577,7 +1577,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_8008ABA0(1) != 0) {
                         fn_80106D3C(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     } else {
                         fn_80106D3C(2, 0x3D55, 1, 0);
@@ -1586,7 +1586,7 @@ void fn_80059BDC(void) {
                 case 1:
                     fn_80106D3C(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     break;
                 default:
@@ -1598,7 +1598,7 @@ void fn_80059BDC(void) {
                 if ((u8)fn_800F7EF8(1) == 0) {
                     fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     fn_801069FC(1);
                 }
@@ -1614,7 +1614,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_8008ABA0(1) != 0) {
                         fn_80106D3C(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     } else {
                         fn_80106D3C(2, 0x3D55, 1, 0);
@@ -1623,7 +1623,7 @@ void fn_80059BDC(void) {
                 case 1:
                     fn_80106D3C(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     break;
                 default:
@@ -1635,7 +1635,7 @@ void fn_80059BDC(void) {
                 if ((u8)fn_800F7EF8(1) == 0) {
                     fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     fn_801069FC(1);
                 }
@@ -1680,7 +1680,7 @@ void fn_80059BDC(void) {
                     if ((u8)fn_8008ABA0(1) != 0) {
                         fn_80106D3C(2, 0x4445, 1, 0);
                         while ((u8)fn_800F7EF8(1) == 0) {
-                            fn_800F0308();
+                            _threadSwitch();
                         }
                     } else {
                         fn_80106D3C(2, 0x3D55, 1, 0);
@@ -1689,7 +1689,7 @@ void fn_80059BDC(void) {
                 case 1:
                     fn_80106D3C(2, 0x44C0, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     break;
                 default:
@@ -1701,7 +1701,7 @@ void fn_80059BDC(void) {
                 if ((u8)fn_800F7EF8(1) == 0) {
                     fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     fn_801069FC(1);
                 }
@@ -1743,7 +1743,7 @@ void fn_80059BDC(void) {
                 if ((u8)fn_8008ABA0(1) != 0) {
                     fn_80106D3C(2, 0x4445, 1, 0);
                     while ((u8)fn_800F7EF8(1) == 0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                     fn_801069FC(1);
                 }
@@ -1875,7 +1875,7 @@ void fn_80059BDC(void) {
         if ((u8)fn_800F7EF8(1) == 0 && (u8)fn_8008ABA0(1) == 0) {
             fn_80106D3C(2, 0x3C4F, 1, 0);
             while ((u8)fn_800F7EF8(1) == 0) {
-                fn_800F0308();
+                _threadSwitch();
             }
             fn_801069FC(1);
         }
@@ -1917,7 +1917,7 @@ done:
             if ((u8)fn_800F7EF8(1) == 0) {
                 fn_80106D3C(2, (u8)fn_8008ABA0(1) ? 0x4445 : 0x3C4F, 1, 0);
                 while ((u8)fn_800F7EF8(1) == 0) {
-                    fn_800F0308();
+                    _threadSwitch();
                 }
                 fn_801069FC(1);
             }
@@ -2015,7 +2015,7 @@ void fn_8005CD88(void) {
     extern void fn_80129280();
     extern void fn_80165A20();
     extern void fn_80176E0C();
-    extern void fn_80177A44();
+    extern void GSscene_SetMode();
     extern void fn_8019075C();
     extern void __assert();
     extern void fn_801CBA0C();
@@ -2085,7 +2085,7 @@ void fn_8005CD88(void) {
     r6 = 0x1;
     fn_80176E0C();
     r3 = 0x4;
-    fn_80177A44();
+    GSscene_SetMode();
     fn_800FF548();
     r0 = r3 & 0xFF;
     if (r0 == (u32)0x0) {
@@ -7832,7 +7832,7 @@ void fn_80062948(void) {
     extern void fn_80062AB4();
     extern void fn_80063060();
     extern void fn_80069944();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80102568();
     extern void fn_8010264C();
     extern void fn_801070F4();
@@ -7905,13 +7905,13 @@ void fn_80062948(void) {
             r3 = 0xdf;
             fn_801070F4();
             r0 = r3 & 0xFF;
-            fn_800F0308();
+            _threadSwitch();
     }
     while (r0 != (u32)0x0) {
             r3 = 0xba;
             fn_801070F4();
             r0 = r3 & 0xFF;
-            fn_800F0308();
+            _threadSwitch();
     }
     fn_80069944();
     fn_80062834();
@@ -7935,7 +7935,7 @@ asm void fn_80062AB4(void) {
 #else
 void fn_80062AB4(void) {
     extern void fn_8008ABA0();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800F7C28();
     extern void fn_800F7EF8();
     extern void fn_80102568();
@@ -8102,7 +8102,7 @@ void fn_80062AB4(void) {
             r27 = 0x0;
         } else {
 
-            fn_800F0308();
+            _threadSwitch();
         }
     } while ((s32)r27 != (s32)0x0);
     r3 = 0x1;
@@ -8233,7 +8233,7 @@ void fn_80062AB4(void) {
                         r25 = 0x0;
                     }
                     if ((s32)r25 != (s32)0x0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                 } while ((s32)r25 != (s32)0x0);
                 r3 = 0x1;
@@ -8281,7 +8281,7 @@ void fn_80062AB4(void) {
                         r25 = 0x0;
                     }
                     if ((s32)r25 != (s32)0x0) {
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                 } while ((s32)r25 != (s32)0x0);
                 r3 = 0x1;
@@ -8321,7 +8321,7 @@ void fn_80062AB4(void) {
                         r26 = 0x0;
                     } else {
 
-                        fn_800F0308();
+                        _threadSwitch();
                     }
                 } while ((s32)r26 != (s32)0x0);
                 r3 = 0x1;
@@ -8358,7 +8358,7 @@ void fn_80063060(void) {
     extern void fn_800637B0();
     extern void fn_80069944();
     extern void fn_80088D84();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80102568();
     extern void fn_8010264C();
     extern void fn_801026A4();
@@ -8820,7 +8820,7 @@ void fn_80063060(void) {
                 fn_801080CC();
                 while (1) {
 
-                    fn_800F0308();
+                    _threadSwitch();
 
                     r3 = 0xdf;
                     fn_801070F4();
@@ -8829,7 +8829,7 @@ void fn_80063060(void) {
             }
                 while (1) {
 
-                    fn_800F0308();
+                    _threadSwitch();
 
                     r3 = 0xba;
                     fn_801070F4();
@@ -9243,7 +9243,7 @@ void fn_80063D14(void) {
     extern void fn_80062834();
     extern void fn_8008AB20();
     extern void fn_8008AB4C();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800F7C28();
     extern void fn_800F7EF8();
     extern void fn_80102568();
@@ -9559,7 +9559,7 @@ void fn_80063D14(void) {
                 r24 = 0x0;
             } else {
 
-                fn_800F0308();
+                _threadSwitch();
             }
         } while ((s32)r24 != (s32)0x0);
         r3 = 0x1;

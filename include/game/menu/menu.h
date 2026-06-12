@@ -487,7 +487,7 @@ void menuExDiscCoupon_Main(void);
  * ========================================================================= */
 
 /**
- * fn_8007C2C0: Poke Coupon shop validation.
+ * menuPokeCouponInit: Poke Coupon shop validation.
  * Assert: "POKECOUPONREFER_INVALID != _menuPokeCouponWork.m_eRefer"
  * File: "menuPokeCoupon.c"
  * Size: 0x40

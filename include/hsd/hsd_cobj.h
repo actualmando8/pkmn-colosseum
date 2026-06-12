@@ -157,6 +157,7 @@ union HSD_CObjDesc {
 struct HSD_CObjInfo {
     HSD_ObjInfo parent;
     int (*load)(HSD_CObj* cobj, HSD_CObjDesc* desc);
+    void (*update)(HSD_CObj* cobj, u32 type, void* value);
 };
 
 /* ========================================================================= */
@@ -190,7 +191,10 @@ HSD_WObj* HSD_CObjGetEyePositionWObj(HSD_CObj* cobj);
 void HSD_CObjSetEyePositionWObj(HSD_CObj* cobj, HSD_WObj* eyepos);
 BOOL HSD_CObjSetCurrent(HSD_CObj* cobj);
 void HSD_CObjEndCurrent(void);
-void HSD_CObjGetEyePosition(HSD_CObj* cobj, f32* x, f32* y, f32* z);
+void HSD_CObjSetEyePosition(HSD_CObj* cobj, void* position);
+void HSD_CObjGetEyePosition(HSD_CObj* cobj, void* position);
+void HSD_CObjSetInterest(HSD_CObj* cobj, void* position);
+void HSD_CObjGetInterest(HSD_CObj* cobj, void* position);
 HSD_CObj* HSD_CObjAlloc(void);
 void HSD_CObjAddAnim(HSD_CObj* cobj, HSD_CameraAnim* canim);
 void HSD_CObjAnim(HSD_CObj* cobj);
@@ -208,10 +212,17 @@ void HSD_CObjSetFar(HSD_CObj* cobj, f32 far);
 int HSD_CObjGetProjectionType(HSD_CObj* cobj);
 void HSD_CObjSetProjectionType(HSD_CObj* cobj, u32 type);
 void HSD_CObjSetPerspective(HSD_CObj* cobj, f32 fov, f32 aspect);
+void HSD_CObjGetPerspective(HSD_CObj* cobj, f32* fov, f32* aspect);
 void HSD_CObjSetFrustum(HSD_CObj* cobj, f32 top, f32 bottom, f32 left,
                         f32 right);
 void HSD_CObjSetOrtho(HSD_CObj* cobj, f32 top, f32 bottom, f32 left,
                       f32 right);
+void HSD_CObjSetViewportfx4(HSD_CObj* cobj, f32 xmin, f32 xmax, f32 ymin,
+                            f32 ymax);
+void HSD_CObjSetScissorx4(HSD_CObj* cobj, u16 left, u16 right, u16 top,
+                          u16 bottom);
+void HSD_CObjGetOrtho(HSD_CObj* cobj, f32* top, f32* bottom, f32* left,
+                      f32* right);
 u32 HSD_CObjGetFlags(HSD_CObj* cobj);
 void HSD_CObjSetFlags(HSD_CObj* cobj, u32 flags);
 void HSD_CObjClearFlags(HSD_CObj* cobj, u32 flags);
@@ -219,6 +230,10 @@ HSD_CObj* HSD_CObjGetCurrent(void);
 void HSD_CObjInit(HSD_CObj* cobj, HSD_CObjDesc* desc);
 HSD_CObj* HSD_CObjLoadDesc(HSD_CObjDesc* desc);
 void HSD_CObjSetDefaultClass(HSD_ClassInfo* info);
+void HSD_CObjGetViewingMtx(HSD_CObj* cobj, f32 mtx[3][4]);
+f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj);
+void HSD_CObjSetMtxDirty(HSD_CObj* cobj);
+f32* HSD_CObjGetInvViewingMtxPtrDirect(HSD_CObj* cobj);
 
 static inline f32* HSD_CObjGetViewingMtxPtrDirect(HSD_CObj* cobj)
 {

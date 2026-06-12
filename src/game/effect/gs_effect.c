@@ -8,7 +8,7 @@
  *   fn_80130F68 (effectRenderTask)    -- Per-frame render callback
  *   fn_80131010 (GSEffectStop)        -- Stop an active effect
  *   fn_801310A8 (GSEffectIsActive)    -- Query effect active state
- *   fn_8013111C (GSEffectTrigger)     -- Trigger an effect by ID
+ *   GSeffect (GSEffectTrigger)     -- Trigger an effect by ID
  *   fn_80131200 (GSEffectRegister)    -- Register callbacks for an effect
  *   fn_80131268 (GSEffectFree)        -- Destroy and free an effect slot
  *   fn_8013139C (GSEffectResetState)  -- Re-trigger an existing effect
@@ -65,7 +65,7 @@ void fn_80130F04(void);
 void fn_80130F68(void);
 void fn_80131010(u32 effectId);
 BOOL fn_801310A8(u32 effectId);
-BOOL fn_8013111C(u32 effectId);
+BOOL GSeffect(u32 effectId);
 void fn_80131200(u32 effectId, GSEffectStartFunc startFunc,
                  GSEffectStopFunc destroyFunc,
                  GSEffectStartFunc triggerFunc,
@@ -294,7 +294,7 @@ void GSEffectInit(u16 maxEffects) {
 }
 
 /* =======================================================================
- *  GSEffectTrigger / fn_8013111C
+ *  GSEffectTrigger / GSeffect
  *  Address: 0x8013111C, Size: 0xE4
  *
  *  Triggers an effect by its 1-based ID.  The function:
@@ -918,10 +918,10 @@ _ret0:
 }
 
 /* =======================================================================
- * fn_8013111C / GSEffectTrigger
+ * GSeffect / GSEffectTrigger
  * Address: 0x8013111C, Size: 0xE4
  * ======================================================================= */
-BOOL fn_8013111C(u32 effectId) {
+BOOL GSeffect(u32 effectId) {
     GSEffectInstance* inst;
     GSEffectGlobals* g;
     GSEffectStartFunc trigFn;

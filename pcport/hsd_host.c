@@ -928,7 +928,7 @@ static void PCPort_TObjUpdateFunc(void* obj, u32 type, HSD_ObjData* val)
     tobj->flags |= TEX_MTX_DIRTY;
 }
 
-extern void fn_801A7E84(HSD_MObj* mobj, u32 type, HSD_ObjData* val);
+extern void MObjUpdateFunc(HSD_MObj* mobj, u32 type, HSD_ObjData* val);
 
 /* ------------------------------------------------------------------------- */
 /*  HSD_MObjAnim (host override)                                              */
@@ -943,7 +943,7 @@ void HSD_MObjAnim(HSD_MObj* mobj)
         return;
     }
     if (mobj->aobj != NULL) {
-        HSD_AObjInterpretAnim(mobj->aobj, mobj, fn_801A7E84);
+        HSD_AObjInterpretAnim(mobj->aobj, mobj, MObjUpdateFunc);
     }
     HSD_TObjAnimAll(mobj->tobj);
 }

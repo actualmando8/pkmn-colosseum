@@ -51,7 +51,7 @@ extern void  memcpy(void* dst, const void* src, u32 n);
 /* GSthread */
 extern void* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
                              u32 usesFPU, u32 autoStart, void* entryFunc);
-extern void  fn_800F0308(void);                         /* GSthread yield */
+extern void  _threadSwitch(void);                         /* GSthread yield */
 extern void  fn_800F0438(void* modelHandle);            /* GSthread resume model */
 extern void  fn_800F0424(void* modelHandle);            /* GSthread pause model */
 extern void  fn_800F04C4(u32 floorId);                  /* GSthread flush floor */
@@ -102,7 +102,7 @@ extern void  fn_80101A4C(void);                          /* GSfloorLoadDataCallb
 extern void* fn_800E4D18(u32 handle);
 
 /* FSYS / Archive */
-extern void* fn_80191ECC(void* name, const char* tocName);  /* FSYS lookup by name */
+extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* symbol);
 extern void  HSD_ArchiveParse(void* resPtr, u32 fsysHandle, const char* name); /* FSYS bind */
 extern void* fn_800D27FC(u32 handle);                    /* FSYS get archive ptr */
 
@@ -371,7 +371,7 @@ static void markResourcePending(GSFloorResource* pool, u32 count,
  *
  *  Main thread entry for the floor state machine. This is a cooperative
  *  thread that never returns -- it loops through states and yields
- *  between frames via fn_800F0308.
+ *  between frames via _threadSwitch.
  *
  *  State machine:
  *    0 (IDLE):          Yield. No floor active.
@@ -402,7 +402,7 @@ void GSfloorThreadMain(void)
 
         case GSFLOOR_STATE_IDLE:
             /* No floor active -- yield and poll again */
-            fn_800F0308();
+            _threadSwitch();
             break;
 
         case GSFLOOR_STATE_LOADING: {
@@ -448,7 +448,7 @@ void GSfloorThreadMain(void)
                 if (loadResult == 0) {
                     break;
                 }
-                fn_800F0308(); /* yield */
+                _threadSwitch(); /* yield */
             }
 
             /* Deactivate floor resource */
@@ -460,8 +460,8 @@ void GSfloorThreadMain(void)
             }
 
             /* Yield twice (frame sync) */
-            fn_800F0308();
-            fn_800F0308();
+            _threadSwitch();
+            _threadSwitch();
 
             /* Transition to RUNNING state */
             gsFloorState = GSFLOOR_STATE_RUNNING;
@@ -475,7 +475,7 @@ void GSfloorThreadMain(void)
             GSFloorContext* ctx = gsFloorCurrent;
             u8 result = GSfloorUpdate(ctx);
             if (result == 1) {
-                fn_800F0308(); /* yield, still loading */
+                _threadSwitch(); /* yield, still loading */
                 break;
             }
             /* Update complete -- read next state from pending */
@@ -972,8 +972,8 @@ void GSfloorFindAndOpen(const char* archiveName, u32 floorId, u32 loadParam)
     }
 
     /* Look up archive in FSYS TOC */
-    tocEntry = fn_80191ECC((void*)archiveName,
-                            lbl_802717F0 + 0x2C8);  /* TOC search key */
+    tocEntry = HSD_ArchiveGetPublicAddress((void*)archiveName,
+                                           lbl_802717F0 + 0x2C8);  /* TOC search key */
     if (tocEntry == NULL) {
         fn_800DD970(lbl_802717F0 + 0x328);  /* error: not found in TOC */
         return;
@@ -1014,8 +1014,8 @@ void GSfloorLoadData(const char* archiveName, u32 subFileIndex,
     }
 
     /* Look up archive in FSYS TOC */
-    tocEntry = fn_80191ECC((void*)archiveName,
-                            lbl_802717F0 + 0x2C8);
+    tocEntry = HSD_ArchiveGetPublicAddress((void*)archiveName,
+                                           lbl_802717F0 + 0x2C8);
     if (tocEntry == NULL) {
         fn_800DD970(lbl_802717F0 + 0x418);  /* error: not found */
         return;
@@ -1132,8 +1132,8 @@ void GSfloorLoadMain(u32 fsysHandle, const char* archiveName,
 
 postRegister:
     /* Look up TOC for statistics logging */
-    tocEntry = fn_80191ECC(found ? found : &table[0],
-                            lbl_802717F0 + 0x2C8);
+    tocEntry = HSD_ArchiveGetPublicAddress(found ? found : &table[0],
+                                           lbl_802717F0 + 0x2C8);
 
     /* Count sub-files */
     numSubFiles = 0;

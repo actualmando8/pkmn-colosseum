@@ -485,7 +485,7 @@ void fn_8018A700(void) {
 #endif
 
 /* 0x8018AEC0 | 0x1BC */
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern u32 lbl_8047D79C;
 extern u8 lbl_80274008[];
 extern u8 lbl_8036C510[];
@@ -859,7 +859,7 @@ asm void fn_80184450(void) {
 #else
 #pragma optimization_level 4
 void fn_80184450(void) {
-    fn_800F0308();
+    _threadSwitch();
 }
 #endif
 

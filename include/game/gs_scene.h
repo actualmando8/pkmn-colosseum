@@ -62,6 +62,16 @@ typedef struct GSSceneRenderEntry {
 /** fn_80177A64 */ void   GSscene_XFBCapture(u32 captureIndex);
 /** fn_80178AA8 */ void   GSscene_CameraUpdate(u32 sceneObj);
 /** fn_80179020 */ void   GSscene_CameraInterpolate(u32 camera);
+/** 0x801778B4 */ void   GSscene_GetCameraDirectionVector(void* dst);
+/** 0x801778DC */ void   GSscene_SetCameraDirectionVector(void* src);
+/** 0x80177830 */ void   GSscene_GetCameraRotationVector(void* dst);
+/** 0x80177858 */ void   GSscene_SetCameraRotationVector(void* src);
+/** 0x80177908 */ void   GSscene_GetCameraPositionVector(void* dst);
+/** 0x80177930 */ void   GSscene_SetCameraPositionVector(void* src);
+/** 0x8017795C */ void   GSscene_GetCameraViewVector(void* dst);
+/** 0x80177984 */ void   GSscene_SetCameraViewVector(void* src);
+/** 0x80177A38 */ u32    GSscene_GetMode(void);
+/** 0x80177A44 */ u32    GSscene_SetMode(u32 mode);
 /** fn_80179FA4 */ void   GSscene_Init(void);
 /** fn_80176948 */ f32    GSscene_GetPositionX(u32 obj);
 /** fn_8017697C */ f32    GSscene_GetPositionY(void* obj);

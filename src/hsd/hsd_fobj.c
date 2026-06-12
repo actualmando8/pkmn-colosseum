@@ -15,23 +15,25 @@
 
 extern void* memset(void* dst, int val, u32 size);
 
+HSD_FObj* HSD_FObjAlloc_Early(void);
+
 /* ========================================================================= */
 /*  Remove                                                                   */
 /* ========================================================================= */
 
-void HSD_FObjRemove(HSD_FObj* fobj)
+void HSD_FObjRemove_Early(HSD_FObj* fobj)
 {
     if (fobj != NULL) {
         HSD_Free(fobj);
     }
 }
 
-void HSD_FObjRemoveAll(HSD_FObj* fobj)
+void HSD_FObjRemoveAll_Early(HSD_FObj* fobj)
 {
     HSD_FObj* next;
     while (fobj != NULL) {
         next = fobj->next;
-        HSD_FObjRemove(fobj);
+        HSD_FObjRemove_Early(fobj);
         fobj = next;
     }
 }
@@ -40,7 +42,7 @@ void HSD_FObjRemoveAll(HSD_FObj* fobj)
 /*  Request animation                                                        */
 /* ========================================================================= */
 
-void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
+void HSD_FObjReqAnimAll_Early(HSD_FObj* fobj, f32 startframe)
 {
     HSD_FObj* f;
     for (f = fobj; f != NULL; f = f->next) {
@@ -61,7 +63,7 @@ HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc)
     HSD_FObjDesc* d;
 
     for (d = desc; d != NULL; d = d->next) {
-        HSD_FObj* fobj = HSD_FObjAlloc();
+        HSD_FObj* fobj = HSD_FObjAlloc_Early();
         fobj->ad = d->ad;
         fobj->ad_head = d->ad;
         fobj->length = d->length;
@@ -86,7 +88,7 @@ HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc)
 /*  Alloc / Free                                                             */
 /* ========================================================================= */
 
-HSD_FObj* HSD_FObjAlloc(void)
+HSD_FObj* HSD_FObjAlloc_Early(void)
 {
     HSD_FObj* fobj = (HSD_FObj*) HSD_MemAlloc(sizeof(HSD_FObj));
     if (fobj != NULL) {
@@ -95,7 +97,7 @@ HSD_FObj* HSD_FObjAlloc(void)
     return fobj;
 }
 
-void HSD_FObjFree(HSD_FObj* fobj)
+void HSD_FObjFree_Early(HSD_FObj* fobj)
 {
     if (fobj != NULL) {
         HSD_Free(fobj);

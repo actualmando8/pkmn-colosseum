@@ -90,13 +90,13 @@ extern u32   fn_8005D798(void*, s32);
 extern void* fn_8005D858(s32);
 extern void  fn_80166A28(void);
 extern s32   fn_800F037C(void);    /* poll/yield -- 0 if pending */
-extern void  fn_800F0308(void);    /* yield */
+extern void  _threadSwitch(void);    /* yield */
 extern u32   fn_800BE31C(void);    /* rand or tick */
 extern u32   fn_800B8FD8(void*);   /* register fn, returns handle */
 extern void  fn_800BD91C(s32, s32);
 extern void  fn_800B8C58(s32);
 extern void  GSgfxBeginBackFBCapture(u32, void*, void*);
-extern u32   fn_800EF5FC(s32, s32, s32, s32, s32);
+extern u32   GStextureCreate(s32, s32, s32, s32, s32);
 extern u32   fn_800EC1BC(u32);
 extern void  fn_800ECCA8(u32, u32);
 extern void  fn_800EC9DC(u32, f32);
@@ -660,7 +660,7 @@ s32 menuCloseSync(void* p, u8 flag) {
             fn_800DD970((const char*)lbl_80271E10, (const char*)lbl_8035B060, r31);
             goto ret0;
         do_yield:
-            fn_800F0308();
+            _threadSwitch();
             goto loop;
         }
     } else {
@@ -721,7 +721,7 @@ s32 fn_80102568(void* p, u32 mode, u8 wait) {
             r3 = fn_80104704((s32)r29);
             if (r3 == (void*)0) { return 0; }
             if (fn_800F037C() != 0) {
-                fn_800F0308();
+                _threadSwitch();
                 continue;
             }
             fn_800DD970((const char*)lbl_80271E10, (const char*)lbl_8035B060, r29);
@@ -1772,7 +1772,7 @@ u8 fn_80109664(u8 param) {
     goto check;
 loop:
     if (lbl_8047AD24 == 0) { goto done; }
-    fn_800F0308();
+    _threadSwitch();
 check:
     if (r31 != 0) { goto loop; }
 done:
@@ -1823,7 +1823,7 @@ u8 fn_80109718(u8 param) {
     goto check;
 loop:
     if (lbl_8047AD20 != 0) { goto done; }
-    fn_800F0308();
+    _threadSwitch();
 check:
     if (r31 != 0) { goto loop; }
 done:
@@ -1859,7 +1859,7 @@ u8 fn_8010977C(u32 param) {
     goto check;
 loop:
     if (lbl_8047AD20 != 0) { goto done; }
-    fn_800F0308();
+    _threadSwitch();
 check:
     if (r31 != 0) { goto loop; }
 done:
@@ -1870,7 +1870,7 @@ done:
 /* 0x80109810 | 0x74 */
 void fn_80109810(void) {
     if (lbl_8047AD28 == 0) {
-        lbl_8047AD28 = fn_800EF5FC(0, 0, 0x44, 0, 0);
+        lbl_8047AD28 = GStextureCreate(0, 0, 0x44, 0, 0);
     }
     lbl_8047AD21 = 0;
     lbl_8047AD20 = 0;
@@ -1893,7 +1893,7 @@ s32 fn_80109884(void) {
 /* 0x80109894 | 0xA0 */
 #pragma push
 #pragma peephole off
-s32 fn_80109894(void* p, u32 val) {
+s32 menuModelSetMotion(void* p, u32 val) {
     void* r31 = p;
     if (r31 == (void*)0) { return 0; }
     if (*(u8*)((u8*)r31 + 0x1) != 0) {
@@ -1938,7 +1938,7 @@ s32 fn_80109B90(void* obj, u8 wait) {
     check:
         if (*(u8*)r30 != 1) { return 0; }
         if (r31 == 0) { goto done; }
-        fn_800F0308();
+        _threadSwitch();
         goto check;
     done:
         return 1;

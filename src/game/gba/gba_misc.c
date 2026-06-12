@@ -44,7 +44,7 @@ extern void fn_800EC990();
 extern void fn_800ECA78();
 extern void fn_800ECB74();
 extern void fn_800ECCA8();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800F9318();
 extern void fn_800F9AEC();
 extern void fn_800F9C04();
@@ -1611,7 +1611,7 @@ void fn_80089F78(void) {
             r3 = r5 | tmp;
             return;
         }
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
     } while (1);
 
     return;
@@ -3830,7 +3830,7 @@ void fn_8008C7B0(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -3945,7 +3945,7 @@ void fn_8008C7B0(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -4047,7 +4047,7 @@ void fn_8008CACC(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -4129,7 +4129,7 @@ void fn_8008CACC(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -4171,7 +4171,7 @@ void fn_8008CACC(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -4256,7 +4256,7 @@ void fn_8008CDD8(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -4354,7 +4354,7 @@ void fn_8008CDD8(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -4446,7 +4446,7 @@ void fn_8008D0A0(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -4544,7 +4544,7 @@ void fn_8008D0A0(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -4639,7 +4639,7 @@ void fn_8008D348(void) {
     r21 = 0x0;
     while (r21 < r22) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r21 = r21 + r3;
 
@@ -4856,7 +4856,7 @@ void fn_8008D348(void) {
     r21 = 0x0;
     while (r21 < r22) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r21 = r21 + r3;
 
@@ -5052,7 +5052,7 @@ void fn_8008D938(void) {
     r14 = 0x0;
     while (r14 < r16) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r14 = r14 + r3;
 
@@ -5134,7 +5134,7 @@ void fn_8008D938(void) {
     r14 = 0x0;
     while (r14 < r16) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r14 = r14 + r3;
 
@@ -5329,7 +5329,7 @@ void fn_8008D938(void) {
     r14 = 0x0;
     while (r14 < r16) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r14 = r14 + r3;
 
@@ -5708,7 +5708,7 @@ void fn_8008E320(void) {
     r26 = 0x0;
     while (r26 < r27) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r26 = r26 + r3;
 
@@ -5790,7 +5790,7 @@ void fn_8008E320(void) {
     r26 = 0x0;
     while (r26 < r27) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r26 = r26 + r3;
 
@@ -5898,7 +5898,7 @@ void fn_8008E320(void) {
     r26 = 0x0;
     while (r26 < r25) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r26 = r26 + r3;
 
@@ -6032,7 +6032,7 @@ void fn_8008E7D4(void) {
     r27 = 0x0;
     while (r27 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r27 = r27 + r3;
 
@@ -6114,7 +6114,7 @@ void fn_8008E7D4(void) {
     r27 = 0x0;
     while (r27 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r27 = r27 + r3;
 
@@ -6205,7 +6205,7 @@ void fn_8008E7D4(void) {
     r27 = 0x0;
     while (r27 < r26) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r27 = r27 + r3;
 
@@ -6328,7 +6328,7 @@ void fn_8008EC28(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -6426,7 +6426,7 @@ void fn_8008EC28(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -6511,7 +6511,7 @@ void fn_8008EED0(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -6612,7 +6612,7 @@ void fn_8008EED0(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -6702,7 +6702,7 @@ void fn_8008F190(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -6784,7 +6784,7 @@ void fn_8008F190(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -6844,7 +6844,7 @@ void fn_8008F190(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -6948,7 +6948,7 @@ void fn_8008F524(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -7030,7 +7030,7 @@ void fn_8008F524(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -7106,7 +7106,7 @@ void fn_8008F524(void) {
     r27 = 0x0;
     while (r27 < r26) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r27 = r27 + r3;
 
@@ -7223,7 +7223,7 @@ void fn_8008F91C(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -7323,7 +7323,7 @@ void fn_8008F91C(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -7424,7 +7424,7 @@ void fn_8008FBF4(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -7525,7 +7525,7 @@ void fn_8008FBF4(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -7605,7 +7605,7 @@ void fn_8008FE94(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -7688,7 +7688,7 @@ void fn_8008FE94(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -7786,7 +7786,7 @@ void fn_80090100(void) {
     r17 = 0x0;
     while (r17 < r18) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r17 = r17 + r3;
 
@@ -7807,7 +7807,7 @@ void fn_80090100(void) {
     r17 = 0x0;
     while (r17 < r18) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r17 = r17 + r3;
 
@@ -8011,7 +8011,7 @@ void fn_80090100(void) {
     r17 = 0x0;
     while (r17 < r18) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r17 = r17 + r3;
 
@@ -8227,7 +8227,7 @@ void fn_80090720(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -8282,7 +8282,7 @@ void fn_80090720(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -8417,7 +8417,7 @@ void fn_800909E4(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -8461,7 +8461,7 @@ void fn_800909E4(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -8520,7 +8520,7 @@ void fn_800909E4(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -8649,7 +8649,7 @@ void fn_80090D34(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -8721,7 +8721,7 @@ void fn_80090D34(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -8987,7 +8987,7 @@ void fn_8009100C(void) {
     r14 = 0x0;
     while (r14 < r25) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r14 = r14 + r3;
 
@@ -9209,7 +9209,7 @@ void fn_80091564(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -9254,7 +9254,7 @@ void fn_80091564(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -9352,7 +9352,7 @@ void fn_80091774(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -9397,7 +9397,7 @@ void fn_80091774(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -9495,7 +9495,7 @@ void fn_80091984(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -9540,7 +9540,7 @@ void fn_80091984(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -9638,7 +9638,7 @@ void fn_80091B94(void) {
     r30 = 0x0;
     while (r30 < r29) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -9683,7 +9683,7 @@ void fn_80091B94(void) {
     r29 = 0x0;
     while (r29 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -9783,7 +9783,7 @@ void fn_80091DA4(void) {
     r31 = 0x0;
     while (r31 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r31 = r31 + r3;
 
@@ -9807,7 +9807,7 @@ void fn_80091DA4(void) {
     r30 = 0x0;
     while (r30 < r31) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -9911,7 +9911,7 @@ void fn_80091F48(void) {
     r29 = 0x0;
     while (r29 < r28) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r29 = r29 + r3;
 
@@ -10110,7 +10110,7 @@ void fn_80092140(void) {
     r25 = 0x0;
     while (r25 < r24) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r25 = r25 + r3;
 
@@ -10250,7 +10250,7 @@ void fn_80092498(void) {
     r31 = 0x0;
     while (r31 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r31 = r31 + r3;
 
@@ -10304,7 +10304,7 @@ void fn_80092498(void) {
     r30 = 0x0;
     while (r30 < r31) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -10470,7 +10470,7 @@ void fn_80092664(void) {
     r25 = 0x0;
     while (r25 < r24) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r25 = r25 + r3;
 
@@ -10610,7 +10610,7 @@ void fn_800929BC(void) {
     r31 = 0x0;
     while (r31 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r31 = r31 + r3;
 
@@ -10647,7 +10647,7 @@ void fn_800929BC(void) {
     r30 = 0x0;
     while (r30 < r31) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r30 = r30 + r3;
 
@@ -10735,7 +10735,7 @@ void fn_80092B2C(void) {
     r31 = 0x0;
     while (r31 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r31 = r31 + r3;
 

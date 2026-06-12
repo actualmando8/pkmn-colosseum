@@ -7,7 +7,7 @@
  *   fn_800FE834 (GStaskCreate)
  *   fn_800FE7A0 (GStaskRun)
  *   GSthread (GSthreadInit)
- *   fn_800F07A8 (GSthreadCreate)
+ *   GSthreadCreate (GSthreadCreate)
  *   fn_800FEA74 (GStaskSchedulerThread -- internal)
  *   fn_800FEBA0 (GStaskSwapCallback -- internal)
  *
@@ -47,7 +47,7 @@ extern void  fn_800A263C(void* func, void* arg,
 extern void  OSDisableInterrupts(void);
 extern void  OSRestoreInterrupts(void);
 extern void  fn_800D30A0(void* callback);                 /* GSgfx register swap callback */
-extern void  fn_800F015C(void);                           /* GSthread context init */
+extern void  threadSaveGPRRegisters(void);                /* GSthread context init */
 extern void  fn_800F01F0(void);                           /* GSthread FPU context init */
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void GSscratchFree();
@@ -86,7 +86,7 @@ extern void fn_800DE680(void);
 extern void fn_800EF504(void* ctx);
 extern void fn_800EF548(void);
 extern void fn_801669BC(u32 type);
-extern void fn_800EF5FC(void);
+extern void GStextureCreate(void);
 extern void fn_800CDBE0(void);
 extern u32 fn_800D3088(void);
 extern void fn_800DBF78(void);
@@ -534,7 +534,7 @@ void GSthreadInit(u32 maxThreads) {
 }
 
 /* =======================================================================
- *  GSthreadCreate / fn_800F07A8
+ *  GSthreadCreate / GSthreadCreate
  *  Address: 0x800F07A8, Size: 0x228
  *
  *  Creates a cooperative thread with its own GSmem-allocated stack.
@@ -570,7 +570,7 @@ void GSthreadInit(u32 maxThreads) {
  *    stack = GSmemGetPtr(stackHandle)
  *    gsThreadCurrentCtx = ctx
  *    // Init context
- *    fn_800F015C()
+ *    threadSaveGPRRegisters()
  *    if (usesFPU) fn_800F01F0()
  *    // Set up stack frame
  *    ctx->stackPtr = stackSize - 8
@@ -651,7 +651,7 @@ found:
     gsThreadCurrentCtx = ctx;
 
     /* Initialise the thread's execution context */
-    fn_800F015C();
+    threadSaveGPRRegisters();
     if (usesFPU != 0) {
         fn_800F01F0(); /* set up FPU save area */
     }
@@ -2876,10 +2876,10 @@ static void fn_800FEA74(void) {
 
 /* 0x800F0A74 | 0x4D8 */
 extern void fn_800F02F4(void);
-extern void fn_800F028C(void);
+extern void threadExecute(void);
 extern void fn_800EEA50(void);
 extern void fn_800EEB34(void);
-extern void fn_800EEA98(void);
+extern void GSscratchStore(void);
 extern void fn_800EEA6C(void);
 extern void DCFlushRange();
 extern u32 lbl_8047AC08;
@@ -3048,7 +3048,7 @@ skip_call:
 #endif
 
 /* 0x800F13D0 | 0x2F0 */
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 #if 0
 asm void fn_800F13D0(void) {
 #include "src/game/gs_thread_fn_800F13D0.inc"
@@ -3125,7 +3125,7 @@ s32 fn_800F13D0(void* obj) {
             }
             return 0;
         }
-        fn_800F0308();
+        _threadSwitch();
         r30 += fn_800D3088();
     }
 
@@ -5308,7 +5308,7 @@ s32 fn_800F7068(u16 key, u8 flag) {
     found:
         if (entry == NULL) return 0;
         if (f != 0) {
-            fn_800F0308();
+            _threadSwitch();
         } else {
             return 1;
         }
@@ -5353,7 +5353,7 @@ void fn_800F0F4C(u32 arg) {
         if (lbl_8047AC08 == (u32)obj) lbl_8047AC08 = *(u32*)(obj+0x4);
         *(u8*)&lbl_8047AC0C = 1;
     }
-    fn_800F0308();
+    _threadSwitch();
 }
 #endif
 extern u32 lbl_80478B00;
@@ -5485,7 +5485,7 @@ u32 fn_800F7274(u16 key) {
 }
 #endif
 extern u32 fn_800FF560(void);
-extern void* fn_800F07A8(u32, u32, u32, u32, u32, void*);
+extern GSThread* GSthreadCreate(u32, u32, u32, u32, u32, void*);
 extern void fn_800F0654(void*, s32, ...);
 extern u8 lbl_80271294[];
 extern u8 lbl_80315668[];
@@ -5522,7 +5522,7 @@ u32 fn_800F7318(u32 r27, void* callback, u32 r28, u32 r29, u32 r30, u32 r8, ...)
     if (entry == NULL) {
         return 0;
     }
-    thread = fn_800F07A8(r27, current, r28, 1, r29, fn_800F6BC4);
+    thread = GSthreadCreate(r27, current, r28, 1, r29, fn_800F6BC4);
     if (thread != NULL) {
         *(void**)(entry + 0xC) = thread;
         *(u32*)(entry + 0x10) = r30;

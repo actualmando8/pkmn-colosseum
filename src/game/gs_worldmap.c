@@ -3308,7 +3308,7 @@ extern void fn_8010A5BC(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);
-extern void fn_80109894(void);
+extern void menuModelSetMotion(void);
 extern void fn_80109C88(void);
 extern void fn_80109B90(void);
 extern void fn_801C41C8(void);
@@ -3698,7 +3698,7 @@ void fn_80029638(void* r3) {
 
 /* fn_80029660 - 0x80029660 | size: 0x100 */
 extern void fn_800FF730(s32);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern void fn_8011288C(s32, u32);
 #if 0
 asm void fn_80029660(void) {
@@ -3745,7 +3745,7 @@ s32 fn_80029660(s32 r3, s32 r4) {
     *(s32*)(ctx + 0x28) = 1;
     fn_800FF730(0x390);
     fn_8011288C(0, 0x05960008);
-    fn_800F0308();
+    _threadSwitch();
     return *(s32*)(ctx + 0x20);
 }
 #endif
@@ -3795,7 +3795,7 @@ s32 fn_80029760(s32 r3, s32 r4) {
     *(s32*)(ctx + 0x24) = 1;
     *(s32*)(ctx + 0x28) = 1;
     fn_800FF730(0x390);
-    fn_800F0308();
+    _threadSwitch();
     return *(s32*)(ctx + 0x20);
 }
 #endif
@@ -6401,7 +6401,7 @@ asm void fn_8002CE6C(void) {
 void fn_8002CE6C(u8* obj, u8 slot) {
     extern u32  fn_80102568(u32 a, u32 b, u32 c);    /* display engine open/close */
     extern void fn_8002A2CC(u8* obj, s32 msgId, s32 arg2, ...); /* post format message */
-    extern void fn_800F0308(void);                     /* GSthread yield */
+    extern void _threadSwitch(void);                     /* GSthread yield */
     extern void fn_800D3088(void);                     /* GSgfx tick / frame advance */
     extern u32  fn_8012A5B0(u8* ptr, u32 sel, u32 idx); /* interaction getter */
     extern u32  fn_801046B8(void);                    /* get display context handle */
@@ -6472,7 +6472,7 @@ _loop_top:
     /* 2. Spin-yield for 30 frames */
     frames = 0;
     while (frames < 0x1e) {
-        fn_800F0308();
+        _threadSwitch();
         fn_800D3088();
         frames += 1; /* fn_800D3088 returns frame delta in r3 per usage elsewhere;
                       * here the asm does: bl fn_800D3088; add r28,r28,r3 →
@@ -7375,7 +7375,7 @@ void fn_8002DC6C(u32 flag)
     extern void fn_8019075C(s32, s32);
     extern void fn_800FF730(s32);
     extern void fn_8011288C(s32, u32);
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern void fn_80102038(f32);
 
     /* lbl_8047A3FC: two consecutive u32 words in SDA (flag word, active word) */
@@ -7403,7 +7403,7 @@ void fn_8002DC6C(u32 flag)
     fn_8019075C(1, 2);
     fn_800FF730(0x38f);
     fn_8011288C(0, 0);
-    fn_800F0308();   /* GSthreadYield / vsync yield */
+    _threadSwitch();   /* GSthreadYield / vsync yield */
 
     /* post-yield timer sample -> fade-out parameter */
     t = (f32)(s32)fn_800D37CC();
@@ -7477,7 +7477,7 @@ void fn_8002DD24(void *arg)
     extern void fn_801D039C(void);                  /* pool step update */
 
     /* Threading / render helpers */
-    extern void fn_800F0308(void);   /* GSthread yield (one frame) */
+    extern void _threadSwitch(void);   /* GSthread yield (one frame) */
     extern void fn_8008ABE4(s32 mode, s32 flag); /* abort / cancel scene */
 
     /* Save-data helpers */
@@ -7542,7 +7542,7 @@ L_loop:
     }
 
     /* Yield one frame, then poll the scene for an event result */
-    fn_800F0308();
+    _threadSwitch();
     event_result = ((s32(*)(void))fn_801D04F4)();
     if (event_result == 0) {
         goto L_loop;
@@ -7599,7 +7599,7 @@ L_delay:
         /* Play a ~60-frame delay sequence then signal a different outcome */
         timer = fn_800E0C04(0x3c);
         while (timer != 0) {
-            fn_800F0308();
+            _threadSwitch();
             timer--;
         }
         fn_80106D3C(2, 0x44d5, 1, 0);
@@ -7619,7 +7619,7 @@ extern void fn_80176E0C(void);
 extern void fn_80113F48(void);
 extern void fn_801CBA0C(void);
 extern void fn_800F9318(void);
-extern void fn_80177A44(void);
+extern void GSscene_SetMode(void);
 extern void fn_800E4014(void);
 extern u32 lbl_8047A424;
 extern u32 lbl_8047A40C;
@@ -7645,11 +7645,11 @@ asm void fn_8002DF10(void) {
  *   1. Fade/audio transition (fn_801C41C8/fn_801C40F0)
  *   2. Hide marker objects (fn_8010A420)
  *   3. Wait for trainer anim (fn_801CB9D8)
- *   4. Yield one frame (fn_800F0308)
+ *   4. Yield one frame (_threadSwitch)
  *   5. Spawn/configure encounter objects (fn_8012805C)
  *   6. Re-anchor NPC handles (fn_80109C88, fn_8010A5BC)
  *   7. Scene-load BGM/scene (fn_80176E0C, fn_801CBA0C, fn_800F9318)
- *   8. Restore people state (fn_80177A44)
+ *   8. Restore people state (GSscene_SetMode)
  *   9. Mark availability flag and advance state (lbl_8047A42C = 0x12)
  */
 void fn_8002DF10(void)
@@ -7685,8 +7685,8 @@ void fn_8002DF10(void)
     extern void fn_801CB9D8(u32 handle);
     /* fn_80112260 - field collision query reset  (s32 flag) */
     extern void fn_80112260(s32 flag);
-    /* fn_800F0308 - GS vsync yield */
-    extern void fn_800F0308(void);
+    /* _threadSwitch - GS vsync yield */
+    extern void _threadSwitch(void);
     /* fn_8012805C - encounter trigger dispatcher */
     extern s32 fn_8012805C(u8 *world, u32 npc, u16 key, u8 *type_out, u8 *team, s32 memo, s32 arg6, s32 audio);
     /* fn_8010A5BC - model set bounds (u8* obj, s32 w, s32 h) */
@@ -7701,8 +7701,8 @@ void fn_8002DF10(void)
     extern u32  fn_801CBA0C(u32 color_key);
     /* fn_800F9318 - resolve resource pointer from handle (u32 handle) -> void* */
     extern void* fn_800F9318(u32 handle);
-    /* fn_80177A44 - restore people state (s32 mode) */
-    extern void fn_80177A44(s32 mode);
+    /* GSscene_SetMode - restore people state (s32 mode) */
+    extern void GSscene_SetMode(s32 mode);
     /* fn_800E4014 - enable/disable field object (void* obj, s32 flag) */
     extern void fn_800E4014(void *obj, s32 flag);
     /* fn_8010264C - menu close sync (s32 id, s32 flag) -> s32 */
@@ -7770,7 +7770,7 @@ void fn_8002DF10(void)
     fn_801CB9D8(lbl_8047A418);
 
     fn_80112260(0);
-    fn_800F0308();
+    _threadSwitch();
 
     fn_801C41C8(lbl_8047B9D4, 2);
     fn_801C40F0(1);
@@ -7827,7 +7827,7 @@ void fn_8002DF10(void)
 
     fn_80176E0C(0x37c, 0x0fff1800, 0, 1);
 
-    fn_80177A44(4);
+    GSscene_SetMode(4);
 
     fn_800E4014((void*)lbl_8047A414, 1);
 
@@ -7896,7 +7896,7 @@ void fn_8002E26C(void)
     extern void fn_801024E8(s32 arg);
     extern u32  fn_80113F48(void);
     extern void fn_80176E0C(s32 handle, u32 flags, s32 a3, s32 a4);
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern void fn_80166AB8(s32 a1, s32 a2, s32 a3);
     extern void fn_80112260(s32 flag);
     extern void fn_801CB834(u32 a1, s32 a2, s32 a3, s32 a4);
@@ -7939,7 +7939,7 @@ void fn_8002E26C(void)
     handle = fn_80113F48();
     fn_80176E0C((s32)handle, 0x10b71800, 0, 0);
 
-    fn_800F0308();   /* vsync yield */
+    _threadSwitch();   /* vsync yield */
 
     fn_80166AB8(0x4c8, 0, 0);
 
@@ -8043,7 +8043,7 @@ void fn_8002E460(void* mapCtx)
     extern u32  fn_8017B1AC(void);                              /* input-mode status query */
     extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);       /* play SE */
     extern void fn_80106D3C(s32 a, s32 b, s32 c, s32 d);        /* dialog/sound event */
-    extern void fn_800F0308(void);                             /* vsync / scheduler yield */
+    extern void _threadSwitch(void);                             /* vsync / scheduler yield */
     extern void* fn_80129280(s32 a, s32 sel);                  /* staged-record getter */
 
     u8* state = lbl_803A2518;
@@ -8156,7 +8156,7 @@ void fn_8002E460(void* mapCtx)
         }
 
         /* ---- L_8002E764: vsync then refresh menu fields with live flags ---- */
-        fn_800F0308();
+        _threadSwitch();
         {
             u8* mo; u8* fh;
             s32 notA = ((doneA & 0xFF) == 0) ? 1 : 0;
@@ -8293,7 +8293,7 @@ void fn_8002EA5C(void)
     extern u8*  fn_801046C8(u8* head, s32 key);                /* find child element   */
     extern void fn_80109220(u8* elem, u32 flag);              /* set element flag      */
     extern void fn_80166AB8(s32 soundId, s32 p2, s32 p3);     /* play SE              */
-    extern void fn_800F0308(void);                             /* vsync yield          */
+    extern void _threadSwitch(void);                             /* vsync yield          */
     extern u32  fn_800D3088(void);                             /* elapsed frame ticks  */
     extern s32  fn_800D37CC(void);                             /* ticks per unit       */
     extern u8*  fn_8012AC08(u8* base, u32 idx);                /* party slot getter    */
@@ -8343,7 +8343,7 @@ void fn_8002EA5C(void)
 
         accum = lbl_8047B9D4;
         while (accum < lbl_8047B9DC) {
-            fn_800F0308();
+            _threadSwitch();
             den = (f32)(s32)fn_800D37CC();
             num = (f32)(u32)fn_800D3088();
             accum = accum + num / den;
@@ -8404,7 +8404,7 @@ void fn_8002EA5C(void)
 
         accum = lbl_8047B9D4;
         while (accum < lbl_8047B9DC) {
-            fn_800F0308();
+            _threadSwitch();
             den = (f32)(s32)fn_800D37CC();
             num = (f32)(u32)fn_800D3088();
             accum = accum + num / den;
@@ -8427,7 +8427,7 @@ void fn_8002EA5C(void)
 
     accum = lbl_8047B9D4;
     while (accum < lbl_8047B9D0) {
-        fn_800F0308();
+        _threadSwitch();
         den = (f32)(s32)fn_800D37CC();
         num = (f32)(u32)fn_800D3088();
         accum = accum + num / den;
@@ -8487,7 +8487,7 @@ void fn_8002EE74(void)
     extern void* fn_801046C8(void* head, s32 subkey);           /* child node by sub-key */
     extern void  fn_80109220(void* node, u32 enable);           /* enable/disable a node */
     extern void  fn_80166AB8(s32 soundId, s32 p2, s32 p3);      /* play SE */
-    extern void  fn_800F0308(void);                             /* host vsync yield (GSthreadYield) */
+    extern void  _threadSwitch(void);                             /* host vsync yield (GSthreadYield) */
     extern s32   fn_800D37CC(void);                             /* timer read A */
     extern u32   fn_800D3088(void);                             /* timer read B (tick) */
     extern void  fn_80103CC0(s32 mode);
@@ -8532,7 +8532,7 @@ void fn_8002EE74(void)
         acc = lbl_8047B9D4;
         while (acc < lbl_8047B9DC) {
             f64 dtA, dtB;
-            fn_800F0308();
+            _threadSwitch();
             dtA = (f64)(s32)fn_800D37CC() - lbl_8047B9E0;   /* ENDIAN-QA */
             dtB = (f64)(s32)fn_800D3088() - lbl_8047B9E8;   /* ENDIAN-QA */
             acc = acc + (f32)(dtB / dtA);
@@ -8561,7 +8561,7 @@ void fn_8002EE74(void)
         acc = lbl_8047B9D4;
         while (acc < lbl_8047B9DC) {
             f64 dtA, dtB;
-            fn_800F0308();
+            _threadSwitch();
             dtA = (f64)(s32)fn_800D37CC() - lbl_8047B9E0;   /* ENDIAN-QA */
             dtB = (f64)(s32)fn_800D3088() - lbl_8047B9E8;   /* ENDIAN-QA */
             acc = acc + (f32)(dtB / dtA);
@@ -8933,7 +8933,7 @@ void fn_8002F79C(void) {
     extern u8   fn_80075FEC(u8* mon);                     /* usable-state query */
     extern u8   fn_8011E8DC(u8* mon);                     /* flag query */
     extern u32  fn_8012640C(u8* obj, u32 id, u32 selector, u32 d); /* mon prop getter */
-    extern void fn_800F0308(void);                        /* vsync / scheduler yield */
+    extern void _threadSwitch(void);                        /* vsync / scheduler yield */
     extern u32  fn_800D37CC(void);                        /* GSrandom_Get */
     extern s32  fn_800D3088(void);                        /* GSgfx tick */
 
@@ -8986,7 +8986,7 @@ void fn_8002F79C(void) {
         acc = lbl_8047B9D4;
         while (acc < lbl_8047B9DC) {
             f64 r;
-            fn_800F0308();
+            _threadSwitch();
             r = (f64)(u32)fn_800D37CC();          /* ENDIAN-QA: unsigned int->double */
             acc += (f32)((f64)(s32)fn_800D3088() / r); /* ENDIAN-QA: signed int->double */
         }
@@ -9022,7 +9022,7 @@ void fn_8002F79C(void) {
         acc = lbl_8047B9D4;
         while (acc < lbl_8047B9DC) {
             f64 r;
-            fn_800F0308();
+            _threadSwitch();
             r = (f64)(u32)fn_800D37CC();
             acc += (f32)((f64)(s32)fn_800D3088() / r);
         }
@@ -9084,7 +9084,7 @@ void fn_8002F79C(void) {
         acc = lbl_8047B9D4;
         while (acc < lbl_8047B9DC) {
             f64 r;
-            fn_800F0308();
+            _threadSwitch();
             r = (f64)(u32)fn_800D37CC();
             acc += (f32)((f64)(s32)fn_800D3088() / r);
         }

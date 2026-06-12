@@ -27,7 +27,7 @@ void fn_80034280(void) {
     extern void fn_80080310();
     extern void fn_800D3088();
     extern void fn_800D37CC();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801046B8();
     extern void fn_80105624();
     extern void fn_801069FC();
@@ -94,7 +94,7 @@ while (1) {
         r4 = (u32)sp + 0x8;
         fn_8007AB10();
         r30 = r3;
-        fn_800F0308();
+        _threadSwitch();
         tmp = r29 & 0xFF;
         if (tmp != 0) {
             if ((s32)r30 == 0) continue;
@@ -121,7 +121,7 @@ while (1) {
         f28 = lbl_8047BA28;
         while (f27 < f28) {
 
-            fn_800F0308();
+            _threadSwitch();
             fn_800D37CC();
             *(u32*)(sp + 0x14) = tmp;
             f30 = f0 - f31;
@@ -155,7 +155,7 @@ while (1) {
         f31 = lbl_8047BA28;
         while (f27 < f31) {
 
-            fn_800F0308();
+            _threadSwitch();
             fn_800D37CC();
             *(u32*)(sp + 0x1C) = tmp;
             f29 = f0 - f28;
@@ -918,7 +918,7 @@ void fn_80034FB4(void) {
     extern void fn_800836AC();
     extern void fn_800D3088();
     extern void fn_800D37CC();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800F9E70();
     extern void fn_800FA280();
     extern void fn_800FF52C();
@@ -1211,7 +1211,7 @@ void fn_80034FB4(void) {
                 f28 = lbl_8047B9FC;
                 while (f27 < f28) {
 
-                    fn_800F0308();
+                    _threadSwitch();
                     fn_800D37CC();
                     *(u32*)(sp + 0x14) = tmp;
                     f30 = f0 - f31;
@@ -1450,7 +1450,7 @@ void fn_80034FB4(void) {
                 f28 = lbl_8047B9FC;
                 while (f27 < f28) {
 
-                    fn_800F0308();
+                    _threadSwitch();
                     fn_800D37CC();
                     *(u32*)(sp + 0x1C) = tmp;
                     f30 = f0 - f31;
@@ -1676,7 +1676,7 @@ void fn_80034FB4(void) {
             f31 = lbl_8047B9FC;
             while (f27 < f31) {
 
-                fn_800F0308();
+                _threadSwitch();
                 fn_800D37CC();
                 *(u32*)(sp + 0x1C) = tmp;
                 f29 = f0 - f28;
@@ -1858,14 +1858,14 @@ void fn_80035C48(void) {
 #pragma peephole off
 void fn_80035D70(void) {
     extern u8 lbl_8047A439;
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800FF730(s32 r3);
     u32 tmp = 0;
 
     tmp = 0x1;
     lbl_8047A439 = tmp;
     fn_800FF730(0x393);
-    fn_800F0308();
+    _threadSwitch();
     return;
 }
 #pragma pop
@@ -1875,14 +1875,14 @@ void fn_80035D70(void) {
 #pragma peephole off
 void fn_80035DA0(void) {
     extern u8 lbl_8047A439;
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80113828(s32 r3, s32 r4);
     u32 tmp = 0;
 
     tmp = 0x0;
     lbl_8047A439 = tmp;
     fn_80113828(0x393, 0x0);
-    fn_800F0308();
+    _threadSwitch();
     return;
 }
 #pragma pop

@@ -45,6 +45,47 @@ extern void GXInvalidateTexAll(void);
 /* hsdAllocMemPiece/hsdFreeMemPiece declared in hsd_class.h with s32 */
 extern void HSD_AObjInterpretAnim(HSD_AObj* aobj, void* obj, void* update_func);
 
+typedef struct HSD_TlutWork {
+    void* lut;
+    u32 fmt;
+    u32 tlut_name;
+    u16 n_entries;
+} HSD_TlutWork;
+
+typedef struct HSD_TexLODWork {
+    u32 minFilt;
+    f32 LODBias;
+    u8 bias_clamp;
+    u8 edgeLODEnable;
+    u8 pad[2];
+    u32 max_anisotropy;
+} HSD_TexLODWork;
+
+extern HSD_TObj* lbl_8047B37C;
+extern HSD_TexLODWork lbl_8036D594;
+extern char lbl_8047DEB0;
+extern char lbl_8047DEB8;
+extern char lbl_8047DEC4;
+extern char lbl_8047DED0;
+extern char lbl_80275688[];
+extern char lbl_80275694[];
+extern s32 fn_801BC33C(HSD_TObj* tobj);
+extern void fn_801BDD74(HSD_TObj* tobj);
+extern void HSD_StateRegisterTexGen(u32 coord);
+extern void fn_800BB050(void* tlutobj, void* lut, u32 fmt, u16 n_entries);
+extern void fn_800BB098(void* tlutobj, u32 tlut_name);
+extern void fn_800BAC58(void* texobj, void* image, u16 width, u16 height,
+                         u32 format, u32 wrap_s, u32 wrap_t, u32 mipmap,
+                         u32 tlut_name);
+extern void fn_800BA9E4(void* texobj, void* image, u16 width, u16 height,
+                         u32 format, u32 wrap_s, u32 wrap_t, u32 mipmap);
+extern void fn_800BACA0(void* texobj, u32 min_filt, u32 mag_filt,
+                         f32 min_lod, f32 max_lod, f32 lod_bias,
+                         u32 bias_clamp, u32 do_edge_lod, u32 max_aniso);
+extern void fn_800BAFFC(void* texobj, u32 map_id);
+extern void* fn_80193B10(s32 size);
+extern void* memset(void* dest, int value, u32 size);
+
 /* ========================================================================= */
 /*  TObj class initialization                                                */
 /* ========================================================================= */
@@ -121,28 +162,26 @@ void fn_801BBCE0(HSD_TObj* tobj, u32 wrap_s, u32 wrap_t) {
 /* ========================================================================= */
 
 /* Address: 0x801BBD3C | Size: 0x24 */
-/* Free a 0x18-byte memory piece */
+/* Free an image descriptor memory piece. */
 extern void fn_80193AF0(void* obj, s32 size);
-void fn_801BBD3C(void* obj) {
+void HSD_ImageDescFree(void* obj) {
     fn_80193AF0(obj, 0x18);
 }
 
 /* Address: 0x801BBD60 | Size: 0x24 */
-/* Free a 0x18-byte memory piece (duplicate) */
-void fn_801BBD60(void* obj) {
+/* Remove an image descriptor memory piece. */
+void HSD_ImageDescRemove(void* obj) {
     fn_80193AF0(obj, 0x18);
 }
 
-/*
- * HSD_TObjSetImageDesc - 0x801BBD84 | Size: 0x58
- * Set the image descriptor for a TObj, marking it dirty.
- */
-void HSD_ImageDescAlloc(HSD_TObj* tobj, HSD_ImageDesc* imagedesc) {
-    if (tobj == NULL) {
-        return;
+/* Address: 0x801BBD84 | Size: 0x58 */
+HSD_ImageDesc* HSD_ImageDescAlloc(void) {
+    HSD_ImageDesc* idesc = fn_80193B10(0x18);
+    if (idesc == NULL) {
+        __assert(&lbl_8047DEB0, 0x8F7, &lbl_8047DEB8);
     }
-    tobj->imagedesc = imagedesc;
-    tobj->flags |= TEX_MTX_DIRTY;
+    memset(idesc, 0, 0x18);
+    return idesc;
 }
 
 /*
@@ -224,70 +263,187 @@ void HSD_Index2TexMtx(HSD_TObj* tobj, u32 flags) {
 /*  TObj animation update and texture swap                                   */
 /* ========================================================================= */
 
-/*
- * HSD_TObjAnimUpdate - 0x801BBFE4 | Size: 0x358
- * Interpret AObj keys and update texture transform/image swap.
- */
+#pragma push
+#pragma scheduling on
 void fn_801BBFE4(HSD_TObj* tobj) {
+    u8 tlutobj[0x0C];
+    u8 texobj[0x20];
+    HSD_TlutWork* volatile tluts[8];
+    s32 num;
+    s32 nb_tluts;
+    u32 tlut_name;
+    u32 big_tlut_name;
+    s32 i;
+    u32 coord;
+    s32 id;
+    HSD_ImageDesc* imagedesc;
+    HSD_TexLODWork* lod;
+    s32 min_filter;
+    HSD_TlutWork* tlut;
+    u32 mipmap;
+    s32 different;
+
+    nb_tluts = 0;
+    tlut_name = 0;
+    big_tlut_name = 0x10;
+    lbl_8047B37C = tobj;
     if (tobj == NULL) {
         return;
     }
 
-    if (tobj->aobj == NULL) {
-        return;
+    num = fn_801BC33C(tobj);
+    if (num > 0) {
+        switch (num - 1) {
+        case 0:
+            coord = 0;
+            break;
+        case 1:
+            coord = 1;
+            break;
+        case 2:
+            coord = 2;
+            break;
+        case 3:
+            coord = 3;
+            break;
+        case 4:
+            coord = 4;
+            break;
+        case 5:
+            coord = 5;
+            break;
+        case 6:
+            coord = 6;
+            break;
+        case 7:
+            coord = 7;
+            break;
+        default:
+            __assert(&lbl_8047DEB0, 0x794, &lbl_8047DED0);
+            coord = 0;
+            break;
+        }
+        HSD_StateRegisterTexGen(coord);
     }
 
-    /* Interpret animation keys:
-     * HSD_A_T_TRAU -> translate_x
-     * HSD_A_T_TRAV -> translate_y
-     * HSD_A_T_SCAU -> scale_x
-     * HSD_A_T_SCAV -> scale_y
-     * HSD_A_T_ROTX -> rotate_x
-     * HSD_A_T_ROTY -> rotate_y
-     * HSD_A_T_ROTZ -> rotate_z
-     * HSD_A_T_BLEND -> blending
-     * HSD_A_T_TIMG -> texture image swap
-     * HSD_A_T_TCLT -> TLUT swap
-     * HSD_A_T_LOD_BIAS -> LOD bias
-     */
-    HSD_AObjInterpretAnim(tobj->aobj, tobj, NULL);
-    tobj->flags |= TEX_MTX_DIRTY;
+    while (tobj != NULL) {
+        id = tobj->id;
+        imagedesc = tobj->imagedesc;
+        if (id != 0xFF) {
+            fn_801BDD74(tobj);
+            if (imagedesc == NULL) {
+                __assert(&lbl_8047DEB0, 0x6B6, lbl_80275688);
+            }
+            if (imagedesc->image_ptr == NULL) {
+                __assert(&lbl_8047DEB0, 0x6B7, lbl_80275694);
+            }
+
+            if (tobj->lod != NULL) {
+                lod = (HSD_TexLODWork*) tobj->lod;
+            } else {
+                lod = &lbl_8036D594;
+            }
+            min_filter = lod->minFilt;
+
+            switch (imagedesc->format) {
+            case 8:
+            case 9:
+            case 10:
+                if (tobj->tlut_no != 0xFF) {
+                    tlut = (HSD_TlutWork*) tobj->tluttbl[tobj->tlut_no];
+                } else {
+                    tlut = (HSD_TlutWork*) tobj->tlut;
+                }
+                if (tlut == NULL) {
+                    __assert(&lbl_8047DEB0, 0x6C7, &lbl_8047DEC4);
+                }
+
+                i = 0;
+                goto check_tlut;
+            scan_tlut:
+                different = 1;
+                if (tluts[i]->n_entries == tlut->n_entries) {
+                    different = 0;
+                }
+                if (different == 0) {
+                    goto found_tlut;
+                }
+                i++;
+            check_tlut:
+                if (i < nb_tluts) {
+                    goto scan_tlut;
+                }
+            found_tlut:
+
+                if (i < nb_tluts) {
+                    tlut->tlut_name = tluts[i]->tlut_name;
+                } else if (nb_tluts < 8) {
+                    if (tlut->n_entries > 0x100) {
+                        tlut->tlut_name = big_tlut_name++;
+                    } else {
+                        tlut->tlut_name = tlut_name++;
+                    }
+                    fn_800BB050(tlutobj, tlut->lut, tlut->fmt,
+                                tlut->n_entries);
+                    fn_800BB098(tlutobj, tlut->tlut_name);
+                    tluts[nb_tluts] = tlut;
+                    nb_tluts++;
+                } else {
+                    tlut->tlut_name = 0;
+                }
+
+                mipmap = imagedesc->mipmap ? 1 : 0;
+                fn_800BAC58(texobj, imagedesc->image_ptr, imagedesc->width,
+                            imagedesc->height, imagedesc->format,
+                            tobj->wrap_s, tobj->wrap_t, mipmap,
+                            tlut->tlut_name);
+                if (min_filter == 5) {
+                    min_filter = 3;
+                }
+                break;
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 14:
+                mipmap = imagedesc->mipmap ? 1 : 0;
+                fn_800BA9E4(texobj, imagedesc->image_ptr, imagedesc->width,
+                            imagedesc->height, imagedesc->format,
+                            tobj->wrap_s, tobj->wrap_t, mipmap);
+                break;
+            default:
+                __assert(&lbl_8047DEB0, 0x703, &lbl_8047DED0);
+                break;
+            }
+
+            if (imagedesc->mipmap == 0) {
+                min_filter &= 1;
+            }
+            fn_800BACA0(texobj, min_filter, tobj->magFilt,
+                        imagedesc->minLOD, imagedesc->maxLOD, lod->LODBias,
+                        lod->bias_clamp, lod->edgeLODEnable,
+                        lod->max_anisotropy);
+            fn_800BAFFC(texobj, tobj->id);
+        }
+        tobj = tobj->next;
+    }
 }
+#pragma pop
 
 /*
- * HSD_TObjFullAnimDispatch - 0x801BC33C | Size: 0x580
- * Full animation dispatch handling TIMG/TCLT/transform keys.
- * This function is large because it handles all animation types
- * including texture image swapping from the imagetbl/tluttbl arrays.
+ * HSD_TObjAssignResources - 0x801BC33C | Size: 0x580
+ * Assign texture maps and texture coordinates for a TObj chain.
  */
-void fn_801BC33C(HSD_TObj* tobj) {
+s32 fn_801BC33C(HSD_TObj* tobj) {
     if (tobj == NULL) {
-        return;
+        return 0;
     }
 
-    /* Process all animation types:
-     * 1. Transform animation (translate/rotate/scale)
-     * 2. Texture image animation (swap from imagetbl)
-     * 3. TLUT animation (swap from tluttbl)
-     * 4. Blending factor animation
-     * 5. LOD bias animation
-     */
-
-    if (tobj->aobj != NULL) {
-        fn_801BBFE4(tobj);
-    }
-
-    /* Handle TIMG animation */
-    if (tobj->imagetbl != NULL) {
-        /* Look up the current frame's image descriptor index
-         * and swap the active image pointer */
-    }
-
-    /* Handle TCLT animation */
-    if (tobj->tluttbl != NULL) {
-        /* Look up the current frame's TLUT descriptor index
-         * and swap the active TLUT pointer */
-    }
+    /* TODO: decompile the resource assignment pass. */
+    return 0;
 }
 
 /* ========================================================================= */

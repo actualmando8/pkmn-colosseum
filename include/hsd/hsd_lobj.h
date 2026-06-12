@@ -134,6 +134,7 @@ struct HSD_LightAnim {
 struct HSD_LObjInfo {
     HSD_ObjInfo parent;
     int (*load)(HSD_LObj* lobj, HSD_LightDesc* ldesc);
+    void (*update)(HSD_LObj* lobj, u32 type, void* value);
 };
 
 /* ========================================================================= */
@@ -154,18 +155,29 @@ u32 HSD_LObjGetFlags(HSD_LObj* lobj);
 void HSD_LObjSetFlags(HSD_LObj* lobj, u32 flags);
 void HSD_LObjClearFlags(HSD_LObj* lobj, u32 flags);
 void HSD_LObjSetActive(HSD_LObj* lobj);
+HSD_LObj* HSD_LObjGetActiveByIndex(s32 idx);
+HSD_LObj* HSD_LObjGetActiveByID(s32 light_id);
 s32 HSD_LObjGetNbActive(void);
 void HSD_LObjClearActive(void);
+u32 HSD_LObjGetLightMaskSpecular(void);
+u32 HSD_LObjGetLightMaskAlpha(void);
+u32 HSD_LObjGetLightMaskAttnFunc(void);
+u32 HSD_LObjGetLightMaskDiffuse(void);
 void HSD_LObjAddAnim(HSD_LObj* lobj, HSD_LightAnim* lanim);
 void HSD_LObjAddAnimAll(HSD_LObj* lobj, HSD_LightAnim* lanim);
+void HSD_LObjRemoveAnimAll(HSD_LObj* lobj);
 void HSD_LObjAnim(HSD_LObj* lobj);
 void HSD_LObjAnimAll(HSD_LObj* lobj);
 void HSD_LObjReqAnim(HSD_LObj* lobj, f32 startframe);
 void HSD_LObjReqAnimAll(HSD_LObj* lobj, f32 startframe);
-void HSD_LObjSetup(HSD_LObj* lobj, u32 color, f32 shininess);
-void HSD_LObjSetColor(HSD_LObj* lobj, u32 color);
-void HSD_LObjSetPosition(HSD_LObj* lobj, f32 x, f32 y, f32 z);
-void HSD_LObjSetInterest(HSD_LObj* lobj, f32 x, f32 y, f32 z);
+void HSD_LObjSetup(void* setup);
+void HSD_LObjSetColor(HSD_LObj* lobj, u32* color);
+HSD_LObj* HSD_LObjGetCurrentByType(u32 type);
+void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj);
+s32 HSD_LObjGetPosition(HSD_LObj* lobj, void* out);
+s32 HSD_LObjGetInterest(HSD_LObj* lobj, void* out);
+void HSD_LObjSetPosition(HSD_LObj* lobj, void* desc);
+void HSD_LObjSetInterest(HSD_LObj* lobj, void* desc);
 void HSD_LObjRemoveAll(HSD_LObj* lobj);
 HSD_LObj* HSD_LObjAlloc(void);
 HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc);

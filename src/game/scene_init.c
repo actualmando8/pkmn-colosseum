@@ -47,7 +47,7 @@ extern void menuSubOpenYesNo();
 extern void  fn_800A19CC(void* ctx, void* callback, void* arg,
                          void* stack, u32 stackSize, u32 priority, u32 flag);
 extern void  fn_800A1F94(void* ctx);    /* GS thread start */
-extern void  fn_800F0308(void);          /* GSthread yield / step */
+extern void  _threadSwitch(void);          /* GSthread yield / step */
 extern void  fn_800DD970(const char* fmt, ...);  /* OSReport / GSlog */
 extern void  fn_801C41C8(f32 speed, u32 mode);  /* fade set */
 extern void  fn_801C40F0(u32 enable);            /* fade enable */
@@ -215,7 +215,7 @@ void fn_8003686C(void) {
                             acc = lbl_8047BA30;
                             anim_track = obj[0x95];
                         }
-                        fn_800F0308();
+                        _threadSwitch();
                         acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                     }
                     if (acc >= lbl_8047BA48) {
@@ -245,7 +245,7 @@ void fn_8003686C(void) {
                         f32 acc;
                         acc = lbl_8047BA30;
                         while (acc < lbl_8047BA34) {
-                            fn_800F0308();
+                            _threadSwitch();
                             acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                         }
                     }
@@ -269,7 +269,7 @@ void fn_8003686C(void) {
                         f32 acc;
                         acc = lbl_8047BA30;
                         while (acc < lbl_8047BA34) {
-                            fn_800F0308();
+                            _threadSwitch();
                             acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                         }
                     }
@@ -301,7 +301,7 @@ void fn_8003686C(void) {
                                 acc = lbl_8047BA30;
                                 anim_result = obj[0x95];
                             }
-                            fn_800F0308();
+                            _threadSwitch();
                             acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                         }
                         if (acc >= lbl_8047BA48) {
@@ -331,7 +331,7 @@ void fn_8003686C(void) {
                             f32 acc;
                             acc = lbl_8047BA30;
                             while (acc < lbl_8047BA34) {
-                                fn_800F0308();
+                                _threadSwitch();
                                 acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                             }
                         }
@@ -355,7 +355,7 @@ void fn_8003686C(void) {
                             f32 acc;
                             acc = lbl_8047BA30;
                             while (acc < lbl_8047BA34) {
-                                fn_800F0308();
+                                _threadSwitch();
                                 acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                             }
                         }
@@ -368,7 +368,7 @@ void fn_8003686C(void) {
                         f32 acc;
                         acc = lbl_8047BA30;
                         while (acc < lbl_8047BA34) {
-                            fn_800F0308();
+                            _threadSwitch();
                             acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                         }
                     }
@@ -381,7 +381,7 @@ void fn_8003686C(void) {
                 f32 acc;
                 acc = lbl_8047BA30;
                 while (acc < lbl_8047BA34) {
-                    fn_800F0308();
+                    _threadSwitch();
                     acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
                 }
             }
@@ -394,7 +394,7 @@ void fn_8003686C(void) {
             f32 acc;
             acc = lbl_8047BA30;
             while (acc < lbl_8047BA34) {
-                fn_800F0308();
+                _threadSwitch();
                 acc += (f32)fn_800D3088() / (f32)fn_800D37CC();
             }
         }
@@ -408,7 +408,7 @@ void fn_8003686C(void) {
             res = fn_8017B2CC(0xa);
             if (res >= 0) break;
             fn_800DD970((const char*)str);
-            if (res != 0) fn_800F0308();
+            if (res != 0) _threadSwitch();
         }
     }
 
@@ -435,7 +435,7 @@ void fn_8003686C(void) {
 
     /* Wait for thread completion */
     while ((s32)lbl_8047A460 != 0) {
-        fn_800F0308();
+        _threadSwitch();
     }
 }
 
@@ -1209,7 +1209,7 @@ extern u32 fn_8003CE1C(u32 a);
 extern s32 fn_8003ACE8(u32 a, u32 b, u32 c);
 extern u32 fn_8003AE84(void);
 extern void fn_8018F4C8(void);
-extern void fn_80109894(void);
+extern void menuModelSetMotion(void);
 extern void fn_8010A420(u8* a);
 extern void fn_801660D8(void);
 extern void fn_800FF660(void);
@@ -1271,7 +1271,7 @@ void fn_80038990(void) {
     for (;;) {
         tick_f = (f32)(s32)fn_800D37CC();
         lbl_8047A494 = (f32)(u32)fn_800D3088() / tick_f;
-        fn_800F0308();
+        _threadSwitch();
     }
 }
 #endif
@@ -1757,7 +1757,7 @@ void fn_8003A520(void) {
             menuCloseSync(0x1a, 1);
             menuCloseSync(0x1b, 1);
             fn_8017B3E4(0x66f);
-            while (fn_8017B2CC(0x66f) == 1) { fn_800F0308(); }
+            while (fn_8017B2CC(0x66f) == 1) { _threadSwitch(); }
             fn_80018F54(4, 0, 0);
             fn_8017B1CC(0x66f);
             fn_800F915C(0x66f);
@@ -3097,18 +3097,18 @@ extern void fn_8010A210(void);
 extern void fn_80109BFC(void);
 extern void fn_800E3C5C(void);
 extern void fn_80190E34(void);
-extern void fn_80177A44(u32 a);
-extern void fn_800D1FDC(void);
+extern void GSscene_SetMode(u32 a);
+extern void GScameraGetPerspective(void);
 extern void fn_800E01F4(void);
-extern void fn_800D207C(void);
-extern void fn_800D20CC(void);
-extern void fn_800D1F04(void);
-extern void fn_800DCCF0(void);
+extern void GScameraSetPosition(void);
+extern void GScameraSetPerspective(void);
+extern void GScameraLookAt(void);
+extern void GSlightSetType(void);
 extern void fn_800DCC84(void);
 extern void fn_800DCC60(void);
 extern void fn_800DCC3C(void);
 extern void fn_800DCC34(void);
-extern void fn_800D203C(void);
+extern void GScameraSetRotation(void);
 extern void fn_80103484(void);
 extern f32 lbl_8047BCB8;
 extern f32 lbl_8047BCBC;
@@ -3145,7 +3145,7 @@ asm void fn_80041114(void) {
 #else
 #pragma optimization_level 4
 void fn_80041114(u32 a) {
-    fn_80177A44(4);
+    GSscene_SetMode(4);
     fn_800439BC(lbl_803A67FC);
     fn_80041E48(a, 0);
 }
@@ -3159,7 +3159,7 @@ asm void fn_8004115C(void) {
 #else
 #pragma optimization_level 4
 void fn_8004115C(u32 a) {
-    fn_80177A44(4);
+    GSscene_SetMode(4);
     fn_800439BC(lbl_803A67FC);
     fn_80042658(a, 1);
 }
@@ -3173,7 +3173,7 @@ asm void fn_800411A4(void) {
 #else
 #pragma optimization_level 4
 void fn_800411A4(u32 a) {
-    fn_80177A44(4);
+    GSscene_SetMode(4);
     fn_800439BC(lbl_803A67FC);
     fn_80042658(a, 0);
 }
@@ -3831,8 +3831,8 @@ extern void fn_800E4014(void);
 extern void fn_801CB9D8(void);
 extern void fn_801CBA0C(void);
 extern void fn_800EC9DC(void);
-extern void fn_800D1F84(void);
-extern void fn_800D1F58(void);
+extern void GScameraGetPosition(void);
+extern void GScameraGetRotation(void);
 extern void fn_80176E0C(void);
 extern u8 lbl_80267150[];
 extern f32 lbl_8047BC94;
@@ -5903,7 +5903,7 @@ void fn_8004E9C0(s32 a) {
         buf[4] = lbl_8047A530;
         fn_801026A4(0x77, (u32)fn_801046B8(), 0, 0, 1, 1, (u32)buf);
         while (fn_8017B2CC(snd) == 1) {
-            fn_800F0308();
+            _threadSwitch();
         }
         fn_80102510(0x77);
         menuCloseSync(0x77, 1);
@@ -7093,7 +7093,7 @@ void fn_80055B98(s32 idx) {
     fn_801026A4(0x10e, 0x1f, 0, 0, 0, 0);
     fn_80056B74(idx, 1);
     while ((s32)fn_80055E38(idx) == 0) {
-        fn_800F0308();
+        _threadSwitch();
     }
     fn_80054760(0, 1);
     fn_80057A64(0, 0);
@@ -8166,7 +8166,7 @@ void fn_80057C9C(u32 a, u32 b, u32 c) {
                 status = 2;
             }
             if (status == 1) { break; }
-            fn_800F0308();
+            _threadSwitch();
         } while (1);
     }
     fn_8017B1CC(0x70b);
@@ -8174,7 +8174,7 @@ void fn_80057C9C(u32 a, u32 b, u32 c) {
     fn_8017B3E4(0x66f);
     do {
         if (fn_8017B2CC(0x66f) != 1) { break; }
-        fn_800F0308();
+        _threadSwitch();
     } while (1);
     fn_80097D94(a, b, c);
     fn_8017B1CC(0x66f);
@@ -8182,7 +8182,7 @@ void fn_80057C9C(u32 a, u32 b, u32 c) {
     fn_8017B3E4(0x70b);
     do {
         if (fn_8017B2CC(0x70b) != 1) { break; }
-        fn_800F0308();
+        _threadSwitch();
     } while (1);
     if ((u8)waited != 0) {
         *(u32*)(lbl_803A9A08 + 8) = 0;
@@ -8254,11 +8254,11 @@ void fn_80057E70(void) {
         }
         firstIter = 0;
         while (fn_8017B2CC(0x48a) == 1) {
-            fn_800F0308();
+            _threadSwitch();
         }
         do {
             *(u32*)(base + 4) = 1;
-            fn_800F0308();
+            _threadSwitch();
         } while (*(u32*)(base + 8) != 0);
         *(u32*)(base + 4) = 0;
     next:
@@ -8328,7 +8328,7 @@ check:
 extern void fn_801CAC6C(void);
 extern void fn_800E3534(void);
 extern void fn_800FF560(void);
-extern void fn_800F07A8(void);
+extern void GSthreadCreate(void);
 extern void fn_801CAAF4(void);
 extern void fn_80190528(void);
 extern u32 lbl_8047A590;

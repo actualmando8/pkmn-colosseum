@@ -115,7 +115,7 @@ void GStaskRun(void);
  * @param maxThreads  Maximum number of threads.
  *
  * Allocates the thread array and zeroes all entries.
- * Corresponds to fn_800F09D8.
+ * Corresponds to GSthread.
  */
 void GSthreadInit(u32 maxThreads);
 
@@ -130,7 +130,7 @@ void GSthreadInit(u32 maxThreads);
  * @param entryFunc  Thread entry point.
  * @return           Pointer to the GSThread, or NULL on failure.
  *
- * Corresponds to fn_800F07A8.
+ * Corresponds to GSthreadCreate.
  */
 GSThread* GSthreadCreate(u32 affinity, u32 priority, u32 stackSize,
                          u32 usesFPU, u32 autoStart, void* entryFunc);

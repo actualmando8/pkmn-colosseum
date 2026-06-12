@@ -66,7 +66,7 @@ extern void  fn_8036A384(void* jobj, f32 x, f32 y, f32 z); /* HSD_JObjSetTransla
 
 /* Sound */
 extern void  fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay */
-extern void  soundStop(s32 sndID, s32 volume);              /* sndStop */
+extern void  soundStop(s32 sndID, s32 volume);              /* soundStop */
 extern void  fn_801669E4(s32 handle, s32 fadeTime, s32 volume);
 extern void  heroMoveAddStepCallback(void* callback, s32 arg);
 
@@ -592,7 +592,7 @@ extern void fn_801DD158(void* obj);
 extern void fn_801DF1D0(void* obj);
 extern void fn_801DD3E4(void* obj);
 extern void fn_801DD23C(void* obj);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern s32 fn_8017B2CC(s32 id);
 extern void fn_800F915C(s32 id);
 extern void fn_8017B1CC(s32 id);
@@ -627,7 +627,7 @@ void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot) {
  * fn_801D2F94 - Waza animation teardown.
  * Address: 0x801D2F94 | Size: 0x88
  */
-extern void fn_80177A44(s32 arg);
+extern void GSscene_SetMode(s32 arg);
 extern void fn_80176AE4(void* arg);
 extern void fn_801765F4(s32 arg);
 extern s32  fn_800057A8(void);
@@ -636,7 +636,7 @@ void fn_801D2F94(void) {
     if (lbl_8047B3EC != 0) {
         obj = (void*)lbl_8047B3F0;
         if (obj == NULL) {
-            fn_80177A44(8);
+            GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
                 fn_80176AE4(obj);
@@ -646,7 +646,7 @@ void fn_801D2F94(void) {
         fn_801765F4(0);
         lbl_8047B3EC = 0;
         if (fn_800057A8() == 2) {
-            fn_80177A44(2);
+            GSscene_SetMode(2);
         }
     }
 }
@@ -671,7 +671,7 @@ void fn_801D3034(u32 state) {
     if (state == lbl_8047B3EC) {
         obj = (void*)lbl_8047B3F0;
         if (obj == NULL) {
-            fn_80177A44(8);
+            GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
                 fn_80176AE4(obj);
@@ -681,7 +681,7 @@ void fn_801D3034(u32 state) {
         fn_801765F4(0);
         lbl_8047B3EC = 0;
         if (fn_800057A8() == 2) {
-            fn_80177A44(2);
+            GSscene_SetMode(2);
         }
     }
 }
@@ -1476,7 +1476,7 @@ void fn_801DB1CC(void* obj) {
             s32 releaseId = id;
 
             while (fn_8017B2CC(waitId) == 1) {
-                fn_800F0308();
+                _threadSwitch();
             }
 
             fn_800F915C(releaseId);

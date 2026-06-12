@@ -34,7 +34,7 @@
 #include "dolphin/types.h"
 
 /* ===== GS Engine ===== */
-extern void  fn_800F0308(void);           /* GSthread yield */
+extern void  _threadSwitch(void);           /* GSthread yield */
 extern void  fn_801096F8(u32 modelSlot);  /* Model show/hide */
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d); /* Sound trigger */
 extern void  fn_80132A38(u32 effectId, u32 param);

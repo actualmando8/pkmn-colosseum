@@ -39,12 +39,12 @@
 #include "dolphin/types.h"
 
 /* ===== GS Engine ===== */
-extern void  fn_800F0308(void);           /* GSthread yield */
+extern void  _threadSwitch(void);           /* GSthread yield */
 extern void  fn_800E01D0(void* dst, void* src);
 extern void  fn_80109220(u32 obj, u8 visible);
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d);
 extern void  fn_800D61E4(void* obj);
-extern void  fn_800D20CC(void* obj);
+extern void  GScameraSetPerspective(void* obj);
 extern void  fn_80166AB8(u32 seId);        /* Sound SE play */
 
 /* ===== Text / Messages ===== */

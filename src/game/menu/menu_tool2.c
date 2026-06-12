@@ -20,8 +20,8 @@ extern void fn_80076F2C();
 extern void fn_800C46B0();
 extern void fn_800D3088();
 extern void fn_800D37CC();
-extern void fn_800F0308();
-extern void fn_800F07A8();
+extern void _threadSwitch();
+extern void GSthreadCreate();
 extern void fn_800F9318();
 extern void fn_800FA280();
 extern void fn_800FF52C();
@@ -65,7 +65,7 @@ extern void fn_80135168();
 extern void fn_80142984();
 extern void fn_80165A20();
 extern void fn_80176E0C();
-extern void fn_80177A44();
+extern void GSscene_SetMode();
 extern void fn_801902E0();
 extern void fn_80190528();
 extern void fn_801906A0();
@@ -280,7 +280,7 @@ void fn_80075A34(void) {
     r6 = 0x1;
     ((void(*)(void))fn_80176E0C)();
     r3 = 0x4;
-    ((void(*)(void))fn_80177A44)();
+    ((void(*)(void))GSscene_SetMode)();
     return;
 }
 
@@ -532,7 +532,7 @@ void fn_80075DC8(void) {
     r31 = 0x0;
     while (r31 < r30) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D3088)();
         r31 = r31 + r3;
 
@@ -594,7 +594,7 @@ void fn_80075EE0(void) {
         r5 = 0x4000;
         r6 = 0x1;
         r7 = 0x1;
-        ((void(*)(void))fn_800F07A8)();
+        ((void(*)(void))GSthreadCreate)();
     } else {
 
         r3 = 0x46a;

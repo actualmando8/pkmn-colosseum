@@ -319,7 +319,7 @@ u32 sndPlayStreamWithCrossfade(u32 sndId, u32 crossfade, u32 fadeTime, u32 volum
  * @param sndId   Sound ID for the warning message.
  * @return Nonzero on success, zero on failure.
  *
- * Address: 0x801657F8 (fn_801657F8), size 0x104
+ * Address: 0x801657F8 (soundStop), size 0x104
  */
 u32 sndStop(u32 handle, u32 sndId);
 

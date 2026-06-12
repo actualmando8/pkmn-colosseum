@@ -15,7 +15,7 @@
  *    - fn_800E3604: GSmaterialApplyAll (0x15C bytes)
  *      Iterates the material pool at stride 0x170, checking flags for
  *      active+valid+texture-stage match. For each matching entry:
- *        - Acquires HSD render context (fn_800D2584)
+ *        - Acquires HSD render context (GScameraGetActiveCamera)
  *        - Calls fn_800E9148 (render slot check)
  *        - Selects MObj pointer from +0x08 or +0x0C based on render type
  *        - Applies animation (fn_801A13CC with params 0,1,0)
@@ -40,30 +40,30 @@
  *
  * 3. Accessor functions (0x800E3B3C - 0x800E3D08)
  *    Small getters/setters (mostly 0x08-0x54 bytes each):
- *    - fn_800E3B3C: GetPoolCount       -- lwz lbl_8047AB78
- *    - fn_800E3B44: SetShadowFlag      -- bit 10 (0x400) set/clear
- *    - fn_800E3B6C: FindByMObj         -- pool search, stride 0x170
- *    - fn_800E3BC0: GetGXTexGenSrc     -- loads +0x144, calls fn_80118874
- *    - fn_800E3BF0: GetUserData        -- lwz +0x148
- *    - fn_800E3BF8: GetTexture         -- lwz +0x144
- *    - fn_800E3C00: SetUserData        -- stw +0x148
- *    - fn_800E3C08: SetTexture         -- stw +0x144, env-map update
- *    - fn_800E3C5C: GetTransformPtr    -- addi +0x4C
- *    - fn_800E3C64: HasTransform       -- MTXIsIdentity on +0x4C
- *    - fn_800E3C94: SetCustomPEFlag    -- bit 20 set/clear (oris 0x10)
- *    - fn_800E3CBC: GetTexStage        -- extrwi bit 22
- *    - fn_800E3CC8: SetEnvMapFlag      -- bit 9 (0x200) set/clear
- *    - fn_800E3CF0: GetSpecularPtr     -- addi +0x30
- *    - fn_800E3CF8: GetAmbientPtr      -- addi +0x24
- *    - fn_800E3D00: GetDiffusePtr      -- addi +0x18
- *    - fn_800E3D08: IsActive           -- extrwi bit 0
+ *    - GSmaterialGetPoolCount: GetPoolCount       -- lwz lbl_8047AB78
+ *    - GSmaterialSetShadowFlag: SetShadowFlag      -- bit 10 (0x400) set/clear
+ *    - GSmaterialFindByMObj: FindByMObj         -- pool search, stride 0x170
+ *    - fn_800E3BC0: GetGXTexGenSrc
+ *    - GSmaterialGetUserData: GetUserData        -- lwz +0x148
+ *    - GSmaterialGetTexture: GetTexture         -- lwz +0x144
+ *    - GSmaterialSetUserData: SetUserData        -- stw +0x148
+ *    - GSmaterialSetTexture: SetTexture         -- stw +0x144, env-map update
+ *    - GSmaterialGetTransformPtr: GetTransformPtr    -- addi +0x4C
+ *    - GSmaterialHasTransform: HasTransform       -- MTXIsIdentity on +0x4C
+ *    - GSmaterialSetCustomPEFlag: SetCustomPEFlag    -- bit 20 set/clear (oris 0x10)
+ *    - GSmaterialGetTexStage: GetTexStage        -- extrwi bit 22
+ *    - GSmaterialSetEnvMapFlag: SetEnvMapFlag      -- bit 9 (0x200) set/clear
+ *    - GSmaterialGetSpecularPtr: GetSpecularPtr     -- addi +0x30
+ *    - GSmaterialGetAmbientPtr: GetAmbientPtr      -- addi +0x24
+ *    - GSmaterialGetDiffusePtr: GetDiffusePtr      -- addi +0x18
+ *    - GSmaterialIsActive: IsActive           -- extrwi bit 0
  *
  * 4. Color lerp helpers (0x800E3D14 - 0x800E3D98)
  *    Four functions that pass sub-structure offsets to fn_800E01D0:
- *    - fn_800E3D14: LerpPEColor    -- offset +0x3C
- *    - fn_800E3D40: LerpSpecular   -- offset +0x30
- *    - fn_800E3D6C: LerpAmbient    -- offset +0x24
- *    - fn_800E3D98: LerpDiffuse    -- offset +0x18
+ *    - GSmaterialLerpPEColor: LerpPEColor    -- offset +0x3C
+ *    - GSmaterialLerpSpecular: LerpSpecular   -- offset +0x30
+ *    - GSmaterialLerpAmbient: LerpAmbient    -- offset +0x24
+ *    - GSmaterialLerpDiffuse: LerpDiffuse    -- offset +0x18
  *
  * 5. Alpha/color update pipeline (0x800E3DC4 - 0x800E4598)
  *    - fn_800E3DC4: UpdateAlpha (0x250 bytes)
@@ -109,8 +109,8 @@
  *      Cleanup after material rendering.
  *
  * 7. Callback / distance / render-slot system (0x800E8F68 - 0x800E9358)
- *    - fn_800E8F68: SetCallback (0xC bytes) -- stores lbl_8047AB84/80
- *    - fn_800E8F74: SetDistanceThreshold (0xC bytes) -- fmuls f1,f1
+ *    - GSmaterialSetCallback: SetCallback (0xC bytes) -- stores lbl_8047AB84/80
+ *    - GSmaterialSetDistanceThreshold: stores squared distance threshold
  *    - fn_800E8F80: Helper (0x20 bytes)
  *    - fn_800E8FA0: Helper (0x48 bytes)
  *    - fn_800E8FE8: Helper (0x24 bytes)
@@ -169,7 +169,7 @@
  *    - fn_800EC308: Helper (0x54 bytes)
  *    - fn_800EC35C: PE descriptor setup (0x174 bytes)
  *    - fn_800EC4D0: PE helper (0x6C bytes)
- *    - fn_800EC53C: PE helper (0x2C bytes)
+ *    - GSmodelGetAnimFrame: PE helper (0x2C bytes)
  *    - fn_800EC568: Simple getter (0x8 bytes)
  *    - fn_800EC570: Simple getter (0x8 bytes)
  *    - fn_800EC578: PE config (0x34 bytes)
@@ -231,10 +231,10 @@
 
 /* ===== External SDK / engine functions ===== */
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
-extern void* fn_800D2584(void);                        /* HSD_StartRender (acquire context) */
+extern void* GScameraGetActiveCamera(void);                        /* HSD_StartRender (acquire context) */
 extern void  fn_800D87AC(s32 mode);                    /* GSgfx_SetInternalMode */
-extern void  GSlightSetupLights(void* renderObj);              /* HSD render dispatch */
-extern void  GSlightSetupLights(void* renderObj);
+extern void  fn_800DD174(void* renderObj);              /* HSD render dispatch */
+extern void  fn_800DD174(void* renderObj);
 extern void  fn_800D6A5C(void* callbackA, void* callbackB); /* callback dispatch */
 
 /* GSmem */
@@ -256,7 +256,7 @@ extern void  __assert(void* a, u32 line, void* b);  /* HSD assert */
 extern void  fn_8019D620(void* mobj);                  /* HSD MObj color update */
 extern void  fn_801A6FF0(void* obj);                   /* HSD object update */
 extern void  fn_801A7CFC(void* classDesc);             /* HSD class register */
-extern void  fn_801A8458(void* mobj);                  /* HSD MObj flag query */
+extern u32   HSD_MObjGetFlags(void* mobj);             /* HSD MObj flag query */
 extern void  fn_801B25C4(u32 priority);                /* HSD render priority */
 extern void  fn_801B6DC0(void* obj, u32 a, u32 b, u32 c, u32 d); /* HSD TEV config */
 extern u32   fn_801B6F5C(void* desc, u32 a, u32 b, u32 c); /* HSD TEV stage */
@@ -327,7 +327,7 @@ void fn_800E9148(void*, u8);
 
 
 /* =======================================================================
- *  GSmaterialGetPoolCount / fn_800E3B3C
+ *  GSmaterialGetPoolCount / GSmaterialGetPoolCount
  *  Address: 0x800E3B3C, Size: 0x8
  *
  *  Assembly:
@@ -339,7 +339,7 @@ u32 GSmaterialGetPoolCount(void) {
 }
 
 /* =======================================================================
- *  GSmaterialSetShadowFlag / fn_800E3B44
+ *  GSmaterialSetShadowFlag / GSmaterialSetShadowFlag
  *  Address: 0x800E3B44, Size: 0x28
  *
  *  Assembly:
@@ -364,7 +364,7 @@ void GSmaterialSetShadowFlag(GSmaterialEntry* entry, u8 enable) {
 }
 
 /* =======================================================================
- *  GSmaterialFindByMObj / fn_800E3B6C
+ *  GSmaterialFindByMObj / GSmaterialFindByMObj
  *  Address: 0x800E3B6C, Size: 0x54
  *
  *  Assembly:
@@ -424,7 +424,7 @@ GSmaterialEntry* GSmaterialFindByMObj(void* mobj) {
 }
 
 /* =======================================================================
- *  GSmaterialGetUserData / fn_800E3BF0
+ *  GSmaterialGetUserData / GSmaterialGetUserData
  *  Address: 0x800E3BF0, Size: 0x8
  *
  *  Assembly:
@@ -436,7 +436,7 @@ void* GSmaterialGetUserData(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialGetTexture / fn_800E3BF8
+ *  GSmaterialGetTexture / GSmaterialGetTexture
  *  Address: 0x800E3BF8, Size: 0x8
  *
  *  Assembly:
@@ -448,7 +448,7 @@ void* GSmaterialGetTexture(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialSetUserData / fn_800E3C00
+ *  GSmaterialSetUserData / GSmaterialSetUserData
  *  Address: 0x800E3C00, Size: 0x8
  *
  *  Assembly:
@@ -460,7 +460,7 @@ void GSmaterialSetUserData(GSmaterialEntry* entry, void* data) {
 }
 
 /* =======================================================================
- *  GSmaterialSetTexture / fn_800E3C08
+ *  GSmaterialSetTexture / GSmaterialSetTexture
  *  Address: 0x800E3C08, Size: 0x54
  *
  *  Assembly:
@@ -491,7 +491,7 @@ void GSmaterialSetTexture(GSmaterialEntry* entry, void* tex) {
 }
 
 /* =======================================================================
- *  GSmaterialGetTransformPtr / fn_800E3C5C
+ *  GSmaterialGetTransformPtr / GSmaterialGetTransformPtr
  *  Address: 0x800E3C5C, Size: 0x8
  *
  *  Assembly:
@@ -503,7 +503,7 @@ f32* GSmaterialGetTransformPtr(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialHasTransform / fn_800E3C64
+ *  GSmaterialHasTransform / GSmaterialHasTransform
  *  Address: 0x800E3C64, Size: 0x30
  *
  *  Assembly:
@@ -521,7 +521,7 @@ u32 GSmaterialHasTransform(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialSetCustomPEFlag / fn_800E3C94
+ *  GSmaterialSetCustomPEFlag / GSmaterialSetCustomPEFlag
  *  Address: 0x800E3C94, Size: 0x28
  *
  *  Assembly:
@@ -546,7 +546,7 @@ void GSmaterialSetCustomPEFlag(GSmaterialEntry* entry, u8 enable) {
 }
 
 /* =======================================================================
- *  GSmaterialGetTexStage / fn_800E3CBC
+ *  GSmaterialGetTexStage / GSmaterialGetTexStage
  *  Address: 0x800E3CBC, Size: 0xC
  *
  *  Assembly:
@@ -559,7 +559,7 @@ u32 GSmaterialGetTexStage(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialSetEnvMapFlag / fn_800E3CC8
+ *  GSmaterialSetEnvMapFlag / GSmaterialSetEnvMapFlag
  *  Address: 0x800E3CC8, Size: 0x28
  *
  *  Assembly:
@@ -584,7 +584,7 @@ void GSmaterialSetEnvMapFlag(GSmaterialEntry* entry, u8 enable) {
 }
 
 /* =======================================================================
- *  GSmaterialGetSpecularPtr / fn_800E3CF0
+ *  GSmaterialGetSpecularPtr / GSmaterialGetSpecularPtr
  *  Address: 0x800E3CF0, Size: 0x8
  *
  *  Assembly:
@@ -596,7 +596,7 @@ void* GSmaterialGetSpecularPtr(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialGetAmbientPtr / fn_800E3CF8
+ *  GSmaterialGetAmbientPtr / GSmaterialGetAmbientPtr
  *  Address: 0x800E3CF8, Size: 0x8
  *
  *  Assembly:
@@ -608,7 +608,7 @@ void* GSmaterialGetAmbientPtr(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialGetDiffusePtr / fn_800E3D00
+ *  GSmaterialGetDiffusePtr / GSmaterialGetDiffusePtr
  *  Address: 0x800E3D00, Size: 0x8
  *
  *  Assembly:
@@ -620,7 +620,7 @@ void* GSmaterialGetDiffusePtr(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialIsActive / fn_800E3D08
+ *  GSmaterialIsActive / GSmaterialIsActive
  *  Address: 0x800E3D08, Size: 0xC
  *
  *  Assembly:
@@ -633,7 +633,7 @@ u32 GSmaterialIsActive(GSmaterialEntry* entry) {
 }
 
 /* =======================================================================
- *  GSmaterialLerpPEColor / fn_800E3D14
+ *  GSmaterialLerpPEColor / GSmaterialLerpPEColor
  *  Address: 0x800E3D14, Size: 0x2C
  *
  *  Assembly:
@@ -647,7 +647,7 @@ void GSmaterialLerpPEColor(GSmaterialEntry* entry, void* param) {
 }
 
 /* =======================================================================
- *  GSmaterialLerpSpecular / fn_800E3D40
+ *  GSmaterialLerpSpecular / GSmaterialLerpSpecular
  *  Address: 0x800E3D40, Size: 0x2C
  *
  *  Assembly:
@@ -661,7 +661,7 @@ void GSmaterialLerpSpecular(GSmaterialEntry* entry, void* param) {
 }
 
 /* =======================================================================
- *  GSmaterialLerpAmbient / fn_800E3D6C
+ *  GSmaterialLerpAmbient / GSmaterialLerpAmbient
  *  Address: 0x800E3D6C, Size: 0x2C
  *
  *  Assembly:
@@ -675,7 +675,7 @@ void GSmaterialLerpAmbient(GSmaterialEntry* entry, void* param) {
 }
 
 /* =======================================================================
- *  GSmaterialLerpDiffuse / fn_800E3D98
+ *  GSmaterialLerpDiffuse / GSmaterialLerpDiffuse
  *  Address: 0x800E3D98, Size: 0x2C
  *
  *  Assembly:
@@ -689,7 +689,7 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param) {
 }
 
 /* =======================================================================
- *  GSmaterialSetCallback / fn_800E8F68
+ *  GSmaterialSetCallback / GSmaterialSetCallback
  *  Address: 0x800E8F68, Size: 0xC
  *
  *  Assembly:
@@ -774,9 +774,9 @@ void fn_800E3604(u32 flags, u8 slot) {
     u32 i;
 
     fn_801B25C4(0x7f);
-    if ((mobj = fn_800D2584()) != NULL) {
+    if ((mobj = GScameraGetActiveCamera()) != NULL) {
         if (fn_80195A6C(*(void**)((u8*)mobj + 0xc)) != 0) {
-            GSlightSetupLights(*(void**)((u8*)mobj + 0xc));
+            fn_800DD174(*(void**)((u8*)mobj + 0xc));
             slotMatch = (u8)slot;
             animFlag = flags & 0x10;
             envFlag = flags & 0x1000;
@@ -829,10 +829,10 @@ void fn_800E3760(void* entry, u32 r4) {
     if (!(*(u32*)entry & 1)) return;
     fn_801B25C4(0x7f);
     {
-        void* r31 = fn_800D2584();
+        void* r31 = GScameraGetActiveCamera();
         if (r31 != NULL) {
             if (fn_80195A6C(*(void**)((u8*)r31 + 0xc)) != 0) {
-                GSlightSetupLights(*(void**)((u8*)r31 + 0xc));
+                fn_800DD174(*(void**)((u8*)r31 + 0xc));
                 fn_800E9148(entry, 1);
                 {
                     void* mobj;
@@ -1002,7 +1002,7 @@ GSmaterialEntry* fn_800E3B08(u32 index) {
 }
 #endif
 
-/* fn_800E3BC0 -- GetGXTexGenSrc | Size: 0x30 */
+/* fn_800E3BC0 -- GSmaterialGetGXTexGenSrc | Size: 0x30 */
 #if 0
 asm void fn_800E3BC0(void) {
 #include "src/game/gs_material_fn_800E3BC0.inc"
@@ -2880,7 +2880,7 @@ void fn_800E68D8(void* obj) {
 
 /* fn_800E69C4 | Size: 0x15C */
 extern void fn_800DF3F0(void);
-extern void fn_800DF550(void);
+extern void GSmaterialSetFlags(void);
 #if 0
 asm void fn_800E69C4(void) {
 #include "src/game/gs_material_fn_800E69C4.inc"
@@ -2932,7 +2932,7 @@ void fn_800E69C4(void* entry, s32 param) {
             void* p = r25[r23];
             if (p != NULL) {
                 s32 r3 = ((s32(*)(void*))fn_800DF3F0)(p);
-                ((void(*)(void*, s32))fn_800DF550)(p, param | r3);
+                ((void(*)(void*, s32))GSmaterialSetFlags)(p, param | r3);
             }
             r23++;
             r25++;
@@ -3350,16 +3350,16 @@ extern void fn_800C46B0(void);
 extern void fn_801B06DC(u32 val);
 extern void fn_801B07D4(void);
 extern void fn_800E3D14(void* entry, f32* out);
-extern void fn_801943BC(void);
+extern void HSD_CObjSetProjectionType(void);
 extern void fn_800E00AC(void);
-extern void fn_80195970(void);
+extern void HSD_CObjSetInterest(void);
 extern void fn_801B0A98(void);
-extern void fn_801944E8(void);
-extern void fn_801944C0(void);
+extern void HSD_CObjSetNear(void);
+extern void HSD_CObjSetFar(void);
 extern void HSD_CObjGetEyeDistance(void);
 extern void fn_801B073C(void);
-extern void fn_80195904(void);
-extern void fn_801950D0(void);
+extern void HSD_CObjGetEyePosition(void);
+extern void HSD_CObjGetUpVector(void);
 extern void fn_801B0408(void);
 extern void fn_800E3B6C(void);
 extern void fn_801B019C(void);
@@ -3418,14 +3418,14 @@ void fn_800E8EFC(void) {
 }
 #endif
 
-/* fn_800E8F74 -- SetDistanceThreshold | Size: 0xC */
+/* GSmaterialSetDistanceThreshold (0x800E8F74) | Size: 0xC */
 extern f32 lbl_8047AB88;
 #if 0
-asm void fn_800E8F74(void) {
-#include "src/game/gs_material_fn_800E8F74.inc"
+asm void GSmaterialSetDistanceThreshold(void) {
+#include "src/game/gs_material_GSmaterialSetDistanceThreshold.inc"
 }
 #else
-void fn_800E8F74(f32 dist) {
+void GSmaterialSetDistanceThreshold(f32 dist) {
     lbl_8047AB88 = dist * dist;
 }
 #endif
@@ -3883,7 +3883,7 @@ extern void fn_800E064C(u8* data);
 extern void fn_80197B6C(void*, void*, void*);
 extern void fn_8019F024();
 extern void fn_801AB63C(s32, s32);
-extern void fn_80199704();
+extern void HSD_DObjSetCurrent();
 extern u32 lbl_8047CC00;
 extern u32 lbl_8047CC08;
 extern u8 lbl_804016A0[];
@@ -4071,7 +4071,7 @@ void fn_800EA960(void* obj, void* mtx, void* dst, s32 typeFlag, void* doBlend, v
     while (outerNode != NULL) {
         u32 outerFlags = *(u32*)((u8*)outerNode + 0x14);
         if (!(outerFlags & 1) && (outerFlags & typeMask)) {
-            fn_80199704(outerNode);
+            HSD_DObjSetCurrent(outerNode);
             node = *(void**)((u8*)outerNode + 0xc);
 
             while (node != NULL) {
@@ -4157,7 +4157,7 @@ void fn_800EA960(void* obj, void* mtx, void* dst, s32 typeFlag, void* doBlend, v
         }
         outerNode = *(void**)((u8*)outerNode + 0x4);
     }
-    fn_80199704(0);
+    HSD_DObjSetCurrent(0);
     fn_8019F024(0);
 }
 #endif
@@ -5065,14 +5065,14 @@ void fn_800EC4D0(void* entry, f32* out0, f32* out1) {
 }
 #endif
 
-/* fn_800EC53C | Size: 0x2C */
+/* GSmodelGetAnimFrame | Size: 0x2C */
 extern f32 lbl_8047CC5C;
 #if 0
-asm void fn_800EC53C(void) {
-#include "src/game/gs_material_fn_800EC53C.inc"
+asm void GSmodelGetAnimFrame(void) {
+#include "src/game/gs_material_GSmodelGetAnimFrame.inc"
 }
 #else
-f32 fn_800EC53C(void* p) {
+f32 GSmodelGetAnimFrame(void* p) {
     u32 flags = *(u32*)p;
     if (!(flags & 0x4)) {
         return *(f32*)&lbl_8047CC5C;

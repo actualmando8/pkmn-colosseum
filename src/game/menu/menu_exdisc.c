@@ -20,7 +20,7 @@ extern void fn_80093698();
 extern void fn_800C80D0();
 extern void fn_800D3088();
 extern void fn_800D37CC();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_80103CC0();
 extern void fn_801067E8();
 extern void fn_801069FC();
@@ -436,7 +436,7 @@ void fn_80077ED4(void) {
     f28 = *(f32*)&lbl_8047C0E4;
     while (f27 < f28) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D37CC)();
         *(u32*)(sp + 0xC) = tmp;
         f30 = f0 - f31;
@@ -473,7 +473,7 @@ void fn_80077ED4(void) {
     r5 = 0x0;
     r6 = 0x1;
     ((void(*)(void))fn_80106D3C)();
-    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))_threadSwitch)();
     r27 = 0x0;
     r3 = (u32)&lbl_803F6F18;
     r28 = (u32)&lbl_803F6F18;
@@ -587,7 +587,7 @@ void fn_80077ED4(void) {
     f31 = *(f32*)&lbl_8047C0E4;
     while (f27 < f31) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D37CC)();
         *(u32*)(sp + 0x14) = tmp;
         f29 = f0 - f28;
@@ -824,7 +824,7 @@ void fn_80078390(void) {
         f28 = *(f32*)&lbl_8047C0E4;
         while (f27 < f28) {
 
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             ((void(*)(void))fn_800D37CC)();
             *(u32*)(sp + 0xC) = tmp;
             f30 = f0 - f31;
@@ -875,7 +875,7 @@ void fn_80078390(void) {
     f28 = *(f32*)&lbl_8047C0E4;
     while (f27 < f28) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D37CC)();
         *(u32*)(sp + 0x14) = tmp;
         f30 = f0 - f31;
@@ -927,7 +927,7 @@ void fn_80078390(void) {
     f31 = *(f32*)&lbl_8047C0E4;
     while (f27 < f31) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D37CC)();
         *(u32*)(sp + 0x14) = tmp;
         f29 = f0 - f28;
@@ -1086,7 +1086,7 @@ void fn_800788BC(void) {
         f28 = *(f32*)&lbl_8047C0E4;
         while (f27 < f28) {
 
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             ((void(*)(void))fn_800D37CC)();
             *(u32*)(sp + 0xC) = tmp;
             f30 = f0 - f31;
@@ -1125,7 +1125,7 @@ void fn_800788BC(void) {
     f28 = *(f32*)&lbl_8047C0E4;
     while (f27 < f28) {
 
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         ((void(*)(void))fn_800D37CC)();
         *(u32*)(sp + 0x14) = tmp;
         f30 = f0 - f31;
@@ -1177,7 +1177,7 @@ void fn_800788BC(void) {
         f31 = *(f32*)&lbl_8047C0E4;
         while (f27 < f31) {
 
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             ((void(*)(void))fn_800D37CC)();
             *(u32*)(sp + 0x14) = tmp;
             f29 = f0 - f28;

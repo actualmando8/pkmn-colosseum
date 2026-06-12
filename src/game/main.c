@@ -126,7 +126,7 @@ extern void fn_800D3074(u32 flag);                       /* GSgfx enable renderi
 extern void fn_800FE834(u32 active, u32 taskId, u32 param, /* GSthread create task */
                          void* func);
 extern void fn_800FE7A0(void);                           /* GSthread yield / run scheduler */
-extern void fn_800F07A8(u32 affinity, u32 priority,      /* GSthread create main thread */
+extern void GSthreadCreate(u32 affinity, u32 priority,      /* GSthread create main thread */
                          u32 stackSize, u32 usesFPU,
                          u32 autoStart, void* entry);
 
@@ -719,7 +719,7 @@ void fn_800057B0(void) {
     /* Create and start the main game loop thread:
      *   affinity=0, priority=1000, stackSize=0x4000,
      *   usesFPU=1, autoStart=1, entry=fn_80005AAC */
-    fn_800F07A8(0, 0x3E8, 0x4000, 1, 1, (void*)fn_80005AAC);
+    GSthreadCreate(0, 0x3E8, 0x4000, 1, 1, (void*)fn_80005AAC);
 
     /* Infinite yield loop - scheduler takes over from here */
     for (;;) {

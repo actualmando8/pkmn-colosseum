@@ -635,7 +635,7 @@ void fn_800EEA6C(void) {
 #endif
 
 /* ==================================================================
- * fn_800EEA98 | Size: 0x9C
+ * GSscratchStore | Size: 0x9C
  * r3=a, r4=b, r5=c.
  * bl fn_8009B608 -- returns some count in r3
  * if count >= 15, return 1
@@ -650,11 +650,11 @@ extern u32 fn_8009B608(void);
 extern u32 LCStoreData(u32 a, u32 b, u32 c);
 extern u32 lbl_8047ABDC;
 #if 0
-asm void fn_800EEA98(void) {
+asm void GSscratchStore(void) {
 #include "src/game/gs_particle_fn_800EEA98.inc"
 }
 #else
-u32 fn_800EEA98(u32 a, u32 b, u32 c) {
+u32 GSscratchStore(u32 a, u32 b, u32 c) {
     u32 count;
     u32 ret;
 

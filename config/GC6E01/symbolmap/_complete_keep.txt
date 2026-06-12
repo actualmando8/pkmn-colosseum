@@ -1,0 +1,13 @@
+fn_800A720C -> DVDReadAbsAsyncPrio
+fn_800A7AFC -> DVDCancel
+fn_800AC210 -> AISetDSPSampleRate
+fn_800AC440 -> AIInit
+fn_800AC990 -> ARStartDMA
+fn_800ACA80 -> ARInit
+fn_800CDCB4 -> floor
+fn_800CFE3C -> SIRegisterPollingHandler
+fn_800CFF08 -> SIUnregisterPollingHandler
+fn_800D06F4 -> SITransfer
+fn_800EA60C -> HSD_JObjMtxIsDirty
+fn_8016A01C -> psInitParticle
+fn_801908D4 -> GSflagClear

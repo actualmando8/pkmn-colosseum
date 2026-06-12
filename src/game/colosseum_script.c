@@ -618,7 +618,7 @@ void fn_80221104(u8 r3, u32 r4)
 {
     extern u8 lbl_80379F58[];
     extern u8 lbl_80378964[];
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801C3430();
     extern void battleGridReplacePokemon();
     extern void fn_801DA8C4();
@@ -992,7 +992,7 @@ LAB_0021ef70:
   if ((uVar5 != 0) && (cVar9 = fn_801DDD28(uVar5,0x81,4,0), cVar9 != 0)) {
     fn_801DA9E8(uVar5,0x81,4);
     while (cVar9 = fn_801DA94C(uVar5,0x81,4), cVar9 != 0) {
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_801DA8C4(uVar5,0x81,4);
   }
@@ -2036,7 +2036,7 @@ void fn_802221EC(void)
     char r5;
     char r6;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
     extern void fn_801DA9E8();
@@ -2059,7 +2059,7 @@ void fn_802221EC(void)
       while (1) {
         cVar3 = fn_801DA94C(iVar1,r3 & 0xffff,4);
         if (cVar3 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_801DA8C4(iVar1,r3 & 0xffff,4);
       if (r6 == 1) {
@@ -3513,7 +3513,7 @@ void fn_80223F1C(void)
 void fn_80224060(void)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern s8 fn_801DA5C4();
     extern u32 fn_801F025C();
     extern u32 fn_801F54A4();
@@ -3537,7 +3537,7 @@ void fn_80224060(void)
     fn_802086B0(uVar1);
     fn_8020F108(0xa4,uVar1,uVar1,0,0);
     while (cVar4 = fn_801DA5C4(6), cVar4 != 1) {
-      fn_800F0308();
+      _threadSwitch();
     }
   }
   fn_802086B0(uVar1);
@@ -4110,7 +4110,7 @@ void fn_802267E8(void)
 
 {
     extern void fn_80011C78();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern s8 fn_80102620();
     extern s8 fn_801DA5C4();
     extern u32 fn_801F025C();
@@ -4145,7 +4145,7 @@ void fn_802267E8(void)
   cVar5 = fn_802026E4(uVar1,0x14);
   if ((cVar5 == 1) && (iVar3 = fn_801FEF74(uVar1), iVar3 < 1)) {
     while (cVar5 = fn_801DA5C4(6), cVar5 != 1) {
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_80202810(uVar1,0x14);
     fn_80211B94(lbl_8047B62C,0x80379a22,0);
@@ -4331,7 +4331,7 @@ void fn_80226914(void)
 #pragma optimization_level 0
 void fn_80226F0C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 lbl_8047B618;
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801DA5C4();
     extern void fn_801F025C();
     extern void fn_80261E7C();
@@ -4368,7 +4368,7 @@ void fn_80226F0C(void* ctx, u32 param1, u32 param2, u32 param3) {
             fn_801DA5C4();
             tmp = _ctx & 0xFF;
             if (tmp == 1) break;
-            fn_800F0308();
+            _threadSwitch();
         } while (1);
             }
     tmp = var_r29 & 0xFF;
@@ -5014,7 +5014,7 @@ LAB_002252ac:
 void fn_802282D8(void)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
     extern void fn_801DA9E8();
@@ -5065,7 +5065,7 @@ void fn_802282D8(void)
       while (1) {
         cVar9 = fn_801DA94C(iVar4,0x9e,4);
         if (cVar9 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_801DA8C4(iVar4,0x9e,4);
     }
@@ -7271,7 +7271,7 @@ void fn_8022E410(void)
 void fn_8022E6F0(u32 r3, u8 r4)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_8011F910();
     extern u8 fn_8011FC74();
     extern int fn_801906A0();
@@ -7374,7 +7374,7 @@ void fn_8022E6F0(u32 r3, u8 r4)
             while (1) {
               cVar9 = fn_801DA94C(uVar5,0xa0,4);
               if (cVar9 == 0) break;
-              fn_800F0308();
+              _threadSwitch();
             }
             battleGridReplaceTrainer(uVar5,uVar3);
             fn_801C3430();
@@ -25864,7 +25864,7 @@ void fn_8021F39C(void)
 void fn_8021F458(void)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern u8 fn_801DA5C4();
     extern u32 fn_801F025C();
     extern u32 fn_801F4354();
@@ -25923,7 +25923,7 @@ void fn_8021F458(void)
     fn_8026246C();
     fn_8020F108(0xa4,uVar1,uVar1,0,0);
     while (cVar7 = fn_801DA5C4(6), cVar7 != 1) {
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_802086B0(uVar1);
   }
@@ -26080,7 +26080,7 @@ void fn_8021F92C(void)
 void fn_8021F998(void)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern s8 fn_801DA5C4();
     extern u32 fn_801F025C();
     extern u32 fn_801F54A4();
@@ -26108,7 +26108,7 @@ void fn_8021F998(void)
       fn_802086B0(uVar1);
       fn_8020F108(0xa4,uVar1,uVar1,0,0);
       while (cVar4 = fn_801DA5C4(6), cVar4 != 1) {
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     fn_802086B0(uVar1);

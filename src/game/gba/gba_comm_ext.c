@@ -27,7 +27,7 @@ extern void fn_800E209C();
 extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void __assert();
 extern u32 strlen();
 extern void* memset(void* dst, int val, u32 size);
@@ -735,7 +735,7 @@ void fn_80093574(void) {
         ((void(*)(void))fn_800A257C)();
         tmp = (u32)r31 >> 16;
         if ((s32)tmp != 3) { r3 = r31; return; }
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
     }
 
     r3 = r31;
@@ -820,7 +820,7 @@ void fn_80093698(void) {
         ((void(*)(void))fn_800A257C)();
         tmp = (u32)r29 >> 16;
         if ((s32)tmp != 3) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
     }
     /* L_8009372C */
     r3 = r28;

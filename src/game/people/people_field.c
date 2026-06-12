@@ -320,7 +320,7 @@
  *   _GetInputValue (0x4A0 bytes)  -- peopleFieldMotionMain
  *     Large motion processing function.
  *
- *   fn_801615D4 - fn_801618EC  -- Motion type handlers (12 functions)
+ *   fn_801615D4 - peopleFieldMotionResolveInput3C8  -- Motion type handlers (12 functions)
  *     12 functions of identical size 0x48 each. These are motion type
  *     dispatch handlers -- one per motion type (walk, run, idle, etc.).
  *
@@ -334,17 +334,17 @@
  *   fn_80161D90 (0xFC bytes)   -- peopleFieldUtilHelper2
  *   fn_80161E8C (0x1E4 bytes)  -- peopleFieldUtilProcess
  *   fn_80162070 (0x1C bytes)   -- peopleFieldUtilGetPtr
- *   fn_8016208C (0x8C bytes)   -- peopleFieldUtilSetup
+ *   sndSin (0x8C bytes)   -- fixed-point sine lookup
  *   sndBSearch (0xA4 bytes)   -- peopleFieldUtilConfig
  *   fn_801621BC (0x10 bytes)   -- peopleFieldUtilDispatch
  *     Script dispatch entry point. Called from fn_8014C984.
- *   fn_801621CC (0x48 bytes)   -- peopleFieldUtilHelper3
+ *   sndConvertTicks (0x48 bytes)
  *   fn_80162214 (0x8 bytes)    -- peopleFieldUtilNop
  *
  * 0x8016221C - 0x801652DC: People state & memory management (0x30C0 bytes)
  *   snd_handle_irq (0x154 bytes)  -- peopleFieldStateInit
  *   fn_80162370 (0xB8 bytes)   -- peopleFieldStateSetup
- *   fn_80162428 (0x34 bytes)   -- peopleFieldStateGet
+ *   hwExit (0x34 bytes)
  *   fn_8016245C (0x8 bytes)    -- peopleFieldStateNop1
  *   fn_80162464 (0x8 bytes)    -- peopleFieldStateNop2
  *   fn_8016246C (0x20 bytes)   -- peopleFieldStateHelper1
@@ -359,7 +359,7 @@
  *   fn_801628A0 (0x14 bytes)   -- peopleFieldMemGetEnd
  *   fn_801628B4 (0x14 bytes)   -- peopleFieldMemGetFree
  *   fn_801628C8 (0x3C bytes)   -- peopleFieldMemAlloc
- *   fn_80162904 (0x28 bytes)   -- peopleFieldMemFree
+ *   hwKeyOff (0x28 bytes)
  *   fn_8016292C (0x78 bytes)   -- peopleFieldMemInit
  *   fn_801629A4 (0x2C bytes)   -- peopleFieldMemHelper1
  *   fn_801629D0 (0x2C bytes)   -- peopleFieldMemHelper2
@@ -415,19 +415,19 @@
  *   fn_80164148 (0xBC bytes)   -- peopleFieldMoveSetVelocity
  *   fn_80164204 (0x34 bytes)   -- peopleFieldMoveGetAccel
  *   fn_80164238 (0x74 bytes)   -- peopleFieldMoveSetAccel
- *   fn_801642AC (0x4C bytes)   -- peopleFieldMoveHelper7
- *   fn_801642F8 (0x2C bytes)   -- peopleFieldMoveHelper8
+ *   salGetStartDelay (0x4C bytes)  -- peopleFieldMoveHelper7
+ *   hwInitIrq (0x2C bytes)   -- peopleFieldMoveHelper8
  *   fn_80164324 (0x4 bytes)    -- nop
- *   fn_80164328 (0x38 bytes)   -- peopleFieldMoveHelper9
- *   fn_80164360 (0x38 bytes)   -- peopleFieldMoveHelper10
+ *   hwEnableIrq (0x38 bytes)  -- peopleFieldMoveHelper9
+ *   hwDisableIrq (0x38 bytes)  -- peopleFieldMoveHelper10
  *   fn_80164398 (0x20 bytes)   -- peopleFieldMoveHelper11
  *   fn_801643B8 (0x20 bytes)   -- peopleFieldMoveHelper12
  *   fn_801643D8 (0x28 bytes)   -- peopleFieldMemAllocBuf
  *     Allocates the NPC state buffer. Called from fn_8014D000.
  *   fn_80164400 (0x2C bytes)   -- peopleFieldMemFreeBuf
- *   fn_8016442C (0x5C bytes)   -- peopleFieldMemResize
- *   fn_80164488 (0x58 bytes)   -- peopleFieldMemQuery
- *   fn_801644E0 (0x40 bytes)   -- peopleFieldMemValidate
+ *   sndAuxCallbackReverbHI (0x5C bytes)  -- peopleFieldMemResize
+ *   sndAuxCallbackUpdateSettingsReverbHI (0x58 bytes)  -- peopleFieldMemQuery
+ *   sndAuxCallbackPrepareReverbHI (0x40 bytes)  -- peopleFieldMemValidate
  *   ReverbHICreate (0x50C bytes)  -- peopleFieldAnimMain
  *     NPC animation main processing for field rendering.
  *   ReverbHIModify (0x214 bytes)  -- peopleFieldAnimProcess
@@ -542,7 +542,7 @@ extern u16   fn_800E3534(u32 size);
 extern void* fn_800E27B0(u16 handle);
 
 /* External functions referenced from asm wrappers */
-extern u32 fn_80164488(u8* ptr);
+extern u32 sndAuxCallbackUpdateSettingsReverbHI(u8* ptr);
 
 /* Model system */
 extern void  fn_800EE150(void* model, u32 param);
@@ -626,11 +626,11 @@ asm void fn_801521B8(void) {
 void fn_801521B8(void) {}
 #endif
 #if 0
-asm void fn_801522E0(void) {
-#include "src/game/people/people_field_fn_801522E0.inc"
+asm void peopleFieldCompare8ByteTableKey(void) {
+#include "src/game/people/people_field_peopleFieldCompare8ByteTableKey.inc"
 }
 #else
-s32 fn_801522E0(u16* a, u16* b) {
+s32 peopleFieldCompare8ByteTableKey(u16* a, u16* b) {
     return (s32)(a[2]) - (s32)(b[2]);
 }
 #endif
@@ -647,7 +647,7 @@ u32 fn_801522F0(u16 arg) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF7C + 4) = arg;
-    result = sndBSearch(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, fn_801522E0);
+    result = sndBSearch(lbl_8047AF7C, lbl_80438CF8, lbl_8047AFA8, 8, peopleFieldCompare8ByteTableKey);
     lbl_8047AF78 = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
@@ -666,18 +666,18 @@ u32 fn_8015234C(u16 arg) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_8047AF70 + 4) = arg;
-    result = sndBSearch(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, fn_801522E0);
+    result = sndBSearch(lbl_8047AF70, lbl_804378F8, lbl_8047AFA6, 8, peopleFieldCompare8ByteTableKey);
     lbl_8047AF6C = (u32)result;
     if (result != NULL) { return *(u32*)result; }
     return 0;
 }
 #endif
 #if 0
-asm void fn_801523A8(void) {
-#include "src/game/people/people_field_fn_801523A8.inc"
+asm void peopleFieldCompare12ByteTableKey(void) {
+#include "src/game/people/people_field_peopleFieldCompare12ByteTableKey.inc"
 }
 #else
-s32 fn_801523A8(u16* a, u16* b) {
+s32 peopleFieldCompare12ByteTableKey(u16* a, u16* b) {
     return (s32)(a[2]) - (s32)(b[2]);
 }
 #endif
@@ -694,7 +694,7 @@ u32 fn_801523B8(u16 arg, u16* out) {
     extern void* sndBSearch(u8* a, u8* b, u16 c, u32 d, void* e);
     void* result;
     *(u16*)(lbl_80445F18 + 4) = arg;
-    result = sndBSearch(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, fn_801523A8);
+    result = sndBSearch(lbl_80445F18, lbl_804380F8, lbl_8047AFA4, 0xc, peopleFieldCompare12ByteTableKey);
     lbl_8047AF68 = (u32)result;
     if (result != NULL) {
         *out = *(u16*)((u8*)result + 6);
@@ -785,13 +785,13 @@ void fn_80154A14(void) {}
 
 extern u32 _GetInputValue(u8* obj, u8* motionBase, u32 p1, u32 p2);
 #if 0
-asm void fn_8016161C(void) {
-#include "src/game/people/people_field_fn_8016161C.inc"
+asm void peopleFieldMotionResolveInput23C(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput23C.inc"
 }
 #else
 /* If flags bit 30 (0x2) is CLEAR: return halfword at 0x25c.
  * If SET: clear bit 30, call _GetInputValue with motion data, return its result. */
-u32 fn_8016161C(u8* obj) {
+u32 peopleFieldMotionResolveInput23C(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x2)) {
@@ -802,12 +802,12 @@ u32 fn_8016161C(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_80161664(void) {
-#include "src/game/people/people_field_fn_80161664.inc"
+asm void peopleFieldMotionResolveInput260(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput260.inc"
 }
 #else
 /* bit 29 (0x4), offset 0x280, motion at 0x260 */
-u32 fn_80161664(u8* obj) {
+u32 peopleFieldMotionResolveInput260(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x4)) {
@@ -818,12 +818,12 @@ u32 fn_80161664(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_801616AC(void) {
-#include "src/game/people/people_field_fn_801616AC.inc"
+asm void peopleFieldMotionResolveInput284(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput284.inc"
 }
 #else
 /* bit 28 (0x8), offset 0x2a4, motion at 0x284 */
-u32 fn_801616AC(u8* obj) {
+u32 peopleFieldMotionResolveInput284(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x8)) {
@@ -834,12 +834,12 @@ u32 fn_801616AC(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_801616F4(void) {
-#include "src/game/people/people_field_fn_801616F4.inc"
+asm void peopleFieldMotionResolveInput2A8(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput2A8.inc"
 }
 #else
 /* bit 27 (0x10), offset 0x2c8, motion at 0x2a8 */
-u32 fn_801616F4(u8* obj) {
+u32 peopleFieldMotionResolveInput2A8(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x10)) {
@@ -850,12 +850,12 @@ u32 fn_801616F4(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_8016173C(void) {
-#include "src/game/people/people_field_fn_8016173C.inc"
+asm void peopleFieldMotionResolveInput2CC(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput2CC.inc"
 }
 #else
 /* bit 26 (0x20), offset 0x2ec, motion at 0x2cc */
-u32 fn_8016173C(u8* obj) {
+u32 peopleFieldMotionResolveInput2CC(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x20)) {
@@ -866,12 +866,12 @@ u32 fn_8016173C(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_80161784(void) {
-#include "src/game/people/people_field_fn_80161784.inc"
+asm void peopleFieldMotionResolveInput2F0(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput2F0.inc"
 }
 #else
 /* bit 25 (0x40), offset 0x310, motion at 0x2f0 */
-u32 fn_80161784(u8* obj) {
+u32 peopleFieldMotionResolveInput2F0(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x40)) {
@@ -882,12 +882,12 @@ u32 fn_80161784(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_801617CC(void) {
-#include "src/game/people/people_field_fn_801617CC.inc"
+asm void peopleFieldMotionResolveInput338(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput338.inc"
 }
 #else
 /* bit 23 (0x100), offset 0x358, motion at 0x338 */
-u32 fn_801617CC(u8* obj) {
+u32 peopleFieldMotionResolveInput338(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x100)) {
@@ -898,12 +898,12 @@ u32 fn_801617CC(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_80161814(void) {
-#include "src/game/people/people_field_fn_80161814.inc"
+asm void peopleFieldMotionResolveInput35C(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput35C.inc"
 }
 #else
 /* bit 22 (0x200), offset 0x37c, motion at 0x35c */
-u32 fn_80161814(u8* obj) {
+u32 peopleFieldMotionResolveInput35C(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x200)) {
@@ -914,12 +914,12 @@ u32 fn_80161814(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_8016185C(void) {
-#include "src/game/people/people_field_fn_8016185C.inc"
+asm void peopleFieldMotionResolveInput380(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput380.inc"
 }
 #else
 /* bit 21 (0x400), offset 0x3a0, motion at 0x380 */
-u32 fn_8016185C(u8* obj) {
+u32 peopleFieldMotionResolveInput380(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x400)) {
@@ -930,12 +930,12 @@ u32 fn_8016185C(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_801618A4(void) {
-#include "src/game/people/people_field_fn_801618A4.inc"
+asm void peopleFieldMotionResolveInput3A4(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput3A4.inc"
 }
 #else
 /* bit 20 (0x800), offset 0x3c4, motion at 0x3a4 */
-u32 fn_801618A4(u8* obj) {
+u32 peopleFieldMotionResolveInput3A4(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x800)) {
@@ -946,12 +946,12 @@ u32 fn_801618A4(u8* obj) {
 }
 #endif
 #if 0
-asm void fn_801618EC(void) {
-#include "src/game/people/people_field_fn_801618EC.inc"
+asm void peopleFieldMotionResolveInput3C8(void) {
+#include "src/game/people/people_field_peopleFieldMotionResolveInput3C8.inc"
 }
 #else
 /* bit 19 (0x1000), offset 0x3e8, motion at 0x3c8 */
-u32 fn_801618EC(u8* obj) {
+u32 peopleFieldMotionResolveInput3C8(u8* obj) {
     u32 flags;
     flags = *(u32*)(obj + 0x214);
     if (!(flags & 0x1000)) {
@@ -1063,12 +1063,12 @@ u32 fn_80162070(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_8016208C(void) {
-#include "src/game/people/people_field_fn_8016208C.inc"
+asm void sndSin(void) {
+#include "src/game/people/people_field_sndSin.inc"
 }
 #else
 extern s16 lbl_80369D20[];
-s32 fn_8016208C(u32 angle) {
+s32 sndSin(u32 angle) {
     u32 a = angle & 0xFFF;
     if (a < 0x400) {
         return lbl_80369D20[(a & 0xFFFF) * 2 / 2];
@@ -1179,10 +1179,10 @@ extern u32  fn_801640E4(void);
 extern u32  fn_80164148(u32 d);
 extern u32  fn_80164204(void);
 extern void fn_80164324(void);
-extern void fn_80164328(void);
-extern void fn_80164360(void);
-extern void fn_801642F8(void);
-extern u32 fn_801642AC(void);
+extern void hwEnableIrq(void);
+extern void hwDisableIrq(void);
+extern void hwInitIrq(void);
+extern u32 salGetStartDelay(void);
 extern void fn_801643D8(void);
 extern void fn_80164400(u32 a);
 #pragma push
@@ -1200,11 +1200,11 @@ void fn_801621BC(u32* ptr) { *ptr <<= 8; }
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801621CC(void) {
-#include "src/game/people/people_field_fn_801621CC.inc"
+asm void sndConvertTicks(void) {
+#include "src/game/people/people_field_sndConvertTicks.inc"
 }
 #else
-void fn_801621CC(u32* ptr, u32 divisor) {
+void sndConvertTicks(u32* ptr, u32 divisor) {
     extern u32 fn_8014A280(u32 a);
     u32 result = fn_8014A280(divisor);
     *ptr = ((*ptr << 16) / result * 0x3E8) >> 5;
@@ -1224,14 +1224,14 @@ extern u8  lbl_8047B05F;
 extern u32 snd_handle_irq(void);
 u32 fn_80162370(u32 a, u8 b, u8 c, u32 d) {
     extern u32 lbl_8047B028;
-    fn_801642F8();
+    hwInitIrq();
     lbl_8047B05F = 0;
     lbl_8047B05E = 0;
     lbl_8047B028 = 0;
     if (salInitAi(snd_handle_irq, d, a) != 0
      && salInitDspCtrl(b, c, (u32)(d & 1)) != 0
      && fn_80164148(d) != 0) {
-        fn_80164328();
+        hwEnableIrq();
         fn_801640C4();
         return 0;
     }
@@ -1243,16 +1243,16 @@ u32 fn_80162370(u32 a, u8 b, u8 c, u32 d) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80162428(void) {
-#include "src/game/people/people_field_fn_80162428.inc"
+asm void hwExit(void) {
+#include "src/game/people/people_field_hwExit.inc"
 }
 #else
-void fn_80162428(void) {
-    fn_80164360();
+void hwExit(void) {
+    hwDisableIrq();
     fn_80164204();
     salExitDspCtrl();
     fn_801640E4();
-    fn_80164328();
+    hwEnableIrq();
     fn_80164324();
 }
 #endif
@@ -1450,7 +1450,7 @@ void fn_801628C8(u32 index) {
 #pragma pop
 extern u32 lbl_8047B024;
 extern u8 lbl_8047B050;
-void fn_80162904(u32 index) {
+void hwKeyOff(u32 index) {
     u32* p;
     u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
     elem += (u32)lbl_8047B050 << 2;
@@ -2306,10 +2306,10 @@ u32 fn_80164148(u32 d) {
     DSPInit();
     fn_800AE93C(lbl_804504A0);
     lbl_8047B088 = 0;
-    fn_80164328();
+    hwEnableIrq();
     while (*(volatile u32*)&lbl_8047B088 == 0) {
     }
-    fn_80164360();
+    hwDisableIrq();
     return 1;
 }
 #endif
@@ -2332,8 +2332,8 @@ extern u32 lbl_8047B010;
 extern u16 lbl_8047B00C;
 void fn_80164238(u32 arg) {
     extern u32 lbl_8047B098;
-    extern u32 fn_801642AC(void);
-    fn_8015B250(arg, fn_801642AC());
+    extern u32 salGetStartDelay(void);
+    fn_8015B250(arg, salGetStartDelay());
     arg = lbl_8047B010;
     lbl_8047B098 = 0;
     fn_80098034();
@@ -2348,11 +2348,11 @@ void fn_80164238(u32 arg) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801642AC(void) {
-#include "src/game/people/people_field_fn_801642AC.inc"
+asm void salGetStartDelay(void) {
+#include "src/game/people/people_field_salGetStartDelay.inc"
 }
 #else
-u32 fn_801642AC(void) {
+u32 salGetStartDelay(void) {
     extern u32 OSGetTick(void);
     extern u32 lbl_8047B08C;
     u32 tick;
@@ -2372,11 +2372,11 @@ u32 fn_801642AC(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801642F8(void) {
-#include "src/game/people/people_field_fn_801642F8.inc"
+asm void hwInitIrq(void) {
+#include "src/game/people/people_field_hwInitIrq.inc"
 }
 #else
-void fn_801642F8(void) {
+void hwInitIrq(void) {
     extern u32 OSDisableInterrupts(void);
     extern u32 lbl_8047B080;
     extern u16 lbl_8047B084;
@@ -2396,7 +2396,7 @@ asm void fn_80164324(void) {
 void fn_80164324(void) {}
 #endif
 #pragma pop
-void fn_80164328(void) {
+void hwEnableIrq(void) {
     extern u16 lbl_8047B084;
     extern u32 lbl_8047B080;
     lbl_8047B084 = lbl_8047B084 - 1;
@@ -2407,7 +2407,7 @@ void fn_80164328(void) {
 #pragma push
 #pragma optimization_level 2
 #pragma optimizewithasm off
-void fn_80164360(void) {
+void hwDisableIrq(void) {
     extern u16 lbl_8047B084;
     extern u32 lbl_8047B080;
     u16 v = lbl_8047B084++;
@@ -2472,11 +2472,11 @@ void fn_80164400(u32 a) {
 #pragma optimizewithasm off
 #pragma scheduling on
 #if 0
-asm void fn_8016442C(void) {
-#include "src/game/people/people_field_fn_8016442C.inc"
+asm void sndAuxCallbackReverbHI(void) {
+#include "src/game/people/people_field_sndAuxCallbackReverbHI.inc"
 }
 #else
-void fn_8016442C(u8 type, u32* data, u8* obj) {
+void sndAuxCallbackReverbHI(u8 type, u32* data, u8* obj) {
     switch (type) {
         case 0:
             if (obj[0x1C4] != 0) { break; }
@@ -2488,7 +2488,7 @@ void fn_8016442C(u8 type, u32* data, u8* obj) {
 }
 #endif
 #pragma pop
-u32 fn_80164488(u8* ptr) {
+u32 sndAuxCallbackUpdateSettingsReverbHI(u8* ptr) {
     extern void ReverbHIModify(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 1;
     ReverbHIModify(
@@ -2506,11 +2506,11 @@ u32 fn_80164488(u8* ptr) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_801644E0(void) {
-#include "src/game/people/people_field_fn_801644E0.inc"
+asm void sndAuxCallbackPrepareReverbHI(void) {
+#include "src/game/people/people_field_sndAuxCallbackPrepareReverbHI.inc"
 }
 #else
-void fn_801644E0(u8* ptr) {
+void sndAuxCallbackPrepareReverbHI(u8* ptr) {
     extern void ReverbHICreate(f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 0;
     ReverbHICreate(

@@ -17,9 +17,23 @@
 /* ========================================================================= */
 
 /* Address: 0x801A85F0 | Size: 0xC4 */
-/* HSD matrix utility - possibly MTXInverse or MTXTranspose */
-void fn_801A85F0(void) {
+#pragma push
+#pragma fp_contract on
+void HSD_MtxScaledAdd(f32* src, f32 scale, f32* add, f32* dst) {
+    dst[0] = scale * src[0] + add[0];
+    dst[1] = scale * src[1] + add[1];
+    dst[2] = scale * src[2] + add[2];
+    dst[3] = scale * src[3] + add[3];
+    dst[4] = scale * src[4] + add[4];
+    dst[5] = scale * src[5] + add[5];
+    dst[6] = scale * src[6] + add[6];
+    dst[7] = scale * src[7] + add[7];
+    dst[8] = scale * src[8] + add[8];
+    dst[9] = scale * src[9] + add[9];
+    dst[10] = scale * src[10] + add[10];
+    dst[11] = scale * src[11] + add[11];
 }
+#pragma pop
 
 /* Address: 0x801A86B4 | Size: 0x1D0 */
 /* Matrix concatenation with scaling */
@@ -43,7 +57,7 @@ void fn_801A8D1C(void) {
 
 /* Address: 0x801A9570 | Size: 0x1C */
 /* Extract translation vector from 3x4 matrix (last column) */
-void fn_801A9570(f32 mtx[3][4], f32* vec) {
+void HSD_MtxGetTranslate(f32 mtx[3][4], f32* vec) {
     vec[0] = mtx[0][3];
     vec[1] = mtx[1][3];
     vec[2] = mtx[2][3];

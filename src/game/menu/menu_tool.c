@@ -35,7 +35,7 @@ extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
 extern void fn_800E3DC4();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800FF56C();
 extern void fn_80102568();
 extern void fn_80102620();
@@ -278,7 +278,7 @@ void fn_80072A00(void) {
                         }
                     }
                 }
-                ((void(*)(void))fn_800F0308)();
+                ((void(*)(void))_threadSwitch)();
                 if ((s32)r18 == 0x0) {
                     r28 = 0x0;
                     break;
@@ -541,7 +541,7 @@ void fn_80072D58(void) {
                         /* rotlwi tmp, tmp, 6 */;
                         tmp = tmp + r3;
                         if ((s32)tmp == 0) {
-                            ((void(*)(void))fn_800F0308)();
+                            ((void(*)(void))_threadSwitch)();
                         }
                         r17 = r17 + 0x4;
                         r15 = r15 + 0x4;
@@ -1002,7 +1002,7 @@ void fn_800733D0(void) {
                     /* rotlwi tmp, tmp, 6 */;
                     tmp = tmp + r3;
                     if ((s32)tmp == 0) {
-                        ((void(*)(void))fn_800F0308)();
+                        ((void(*)(void))_threadSwitch)();
                     }
                     r28 = r28 + 0x4;
                     r29 = r29 + 0x4;

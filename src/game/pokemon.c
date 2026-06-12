@@ -101,8 +101,8 @@
 /* fn_80008184: GSthread_GetCurrentContext or similar - called from fn_801F000C */
 extern u32 fn_80008184(void);
 
-/* fn_800F0308: VSync/frame wait - called in frame loop */
-extern void fn_800F0308(void);
+/* _threadSwitch: VSync/frame wait - called in frame loop */
+extern void _threadSwitch(void);
 
 /* fn_800D3088: Returns frame delta or similar timing value */
 extern u32 fn_800D3088(void);
@@ -180,7 +180,7 @@ void FrameWaitForDuration(u32 duration) {
     if (target != 0) {
         u32 elapsed = 0;
         while (elapsed < target) {
-            fn_800F0308();
+            _threadSwitch();
             elapsed += fn_800D3088();
         }
     }
@@ -833,7 +833,7 @@ void fn_801F000C(void) {
     if (total != 0) {
         elapsed = 0;
         while (elapsed < total) {
-            fn_800F0308();
+            _threadSwitch();
             elapsed += fn_800D3088();
         }
     }
@@ -2233,11 +2233,11 @@ u32 fn_801F2A7C(u32 ctx) {
 
 /* 0x801F2B5C | size: 0x3E0 | large -- variant 3 */
 void fn_801F2B5C(u32 param_1, void (*param_2)(u32, u32, u32), u32 param_3, u8 param_4) {
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern u32 fn_800F04BC(u32 task);
     extern void fn_800F0494(u32 task);
     extern u32 fn_800FF560(void);
-    extern u32 fn_800F07A8(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3, u32 mon_out);
+    extern u32 GSthreadCreate(u32 type, u32 data, u32 flags, u32 unk1, u32 unk2, u32 unk3, u32 mon_out);
     extern void fn_800F0654(u32 task, u32 b, u32 mon, u32 count, u32 ctx);
     extern u32 fn_801F54A4(u32 poke, u32 b, u32 field, u32 d);
     extern u32 fn_801FB1C0(u32 mon, u32 b, u32 field, u32 d);
@@ -2278,7 +2278,7 @@ void fn_801F2B5C(u32 param_1, void (*param_2)(u32, u32, u32), u32 param_3, u8 pa
                         fn_801FB1C0(r21, 0, 0x4b, 0);
                         if (r20 == 0) {
                             if ((u16)r22 < 4) {
-                                { u32 task = fn_800FF560(); arr[r22] = fn_800F07A8(0x12, task, 0x2000, 1, 0, (u32)param_2, r21); }
+                                { u32 task = fn_800FF560(); arr[r22] = GSthreadCreate(0x12, task, 0x2000, 1, 0, (u32)param_2, r21); }
                                 if (arr[r22] != 0) {
                                     fn_800F0654(arr[r22], 3, r21, r25, r29);
                                     r22++;
@@ -2292,7 +2292,7 @@ void fn_801F2B5C(u32 param_1, void (*param_2)(u32, u32, u32), u32 param_3, u8 pa
             r24++;
         }
         do {
-            fn_800F0308();
+            _threadSwitch();
             r22 = 0;
             while ((u16)r22 < 4) {
                 if (arr[r22] != 0) {

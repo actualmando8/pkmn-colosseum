@@ -525,7 +525,7 @@ void HSD_WObjRemoveAnim(HSD_WObj* wobj) {
 #endif
 #pragma pop
 
-/* 0x80191ECC | 0x98 */
+/* HSD_ArchiveGetPublicAddress (0x80191ECC) | 0x98 */
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -549,12 +549,12 @@ typedef struct {
     u32 key_offset;     /* 0x04 */
 } WObjTablePair;
 #if 1
-asm void fn_80191ECC(void) {
-#include "src/hsd/hsd_wobj_fn_80191ECC.inc"
+asm void HSD_ArchiveGetPublicAddress(void) {
+#include "src/hsd/hsd_wobj_HSD_ArchiveGetPublicAddress.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_80191ECC(WObjTable* table, void* key) {
+void* HSD_ArchiveGetPublicAddress(WObjTable* table, void* key) {
     u32 i;
     WObjTablePair* pairs = (WObjTablePair*) table->pairs;
     for (i = 0; i < table->count; i++) {

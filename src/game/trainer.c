@@ -5320,7 +5320,7 @@ u8 fn_801FB8F8(void* arg0) {
 
 /* 0x801FB974 | size: 0xB0 */
 void fn_801FB974(void* context, u8 mode) {
-    extern void fn_800F0308(void* ptr);
+    extern void _threadSwitch(void* ptr);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5340,7 +5340,7 @@ void fn_801FB974(void* context, u8 mode) {
             if ((u8)fn_801DA94C(data, 0x57, 4) == 0) {
                 return;
             }
-            fn_800F0308(data);
+            _threadSwitch(data);
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, 0x57, 4);
@@ -5349,7 +5349,7 @@ void fn_801FB974(void* context, u8 mode) {
 
 /* 0x801FBA24 | size: 0xB0 */
 void fn_801FBA24(void* context, u8 mode) {
-    extern void fn_800F0308(void* ptr);
+    extern void _threadSwitch(void* ptr);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5369,7 +5369,7 @@ void fn_801FBA24(void* context, u8 mode) {
             if ((u8)fn_801DA94C(data, 0x74, 4) == 0) {
                 return;
             }
-            fn_800F0308(data);
+            _threadSwitch(data);
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, 0x74, 4);
@@ -5378,7 +5378,7 @@ void fn_801FBA24(void* context, u8 mode) {
 
 /* 0x801FBAD4 | size: 0x14C */
 void fn_801FBAD4(void* context, u32 param, u8 mode) {
-    extern void fn_800F0308(void* ptr);
+    extern void _threadSwitch(void* ptr);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5399,7 +5399,7 @@ void fn_801FBAD4(void* context, u32 param, u8 mode) {
             if ((u8)fn_801DA94C(data, animId, 4) == 0) {
                 return;
             }
-            fn_800F0308(data);
+            _threadSwitch(data);
         } while (1);
     } else if (mode == 2) {
         fn_801DA8C4(data, animId, 4);
@@ -5412,7 +5412,7 @@ void fn_801FBAD4(void* context, u32 param, u8 mode) {
             if ((u8)fn_801DA94C(data, 0x57, 4) == 0) {
                 return;
             }
-            fn_800F0308(data);
+            _threadSwitch(data);
         } while (1);
     } else if (mode == 6) {
         fn_801DA8C4(data, 0x57, 4);
@@ -5421,7 +5421,7 @@ void fn_801FBAD4(void* context, u32 param, u8 mode) {
 
 /* 0x801FBC20 | size: 0xF0 */
 void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
-    extern void fn_800F0308(void* ptr);
+    extern void _threadSwitch(void* ptr);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5446,7 +5446,7 @@ void fn_801FBC20(void* context, void* trainerCtx, u8 mode) {
             if ((u8)fn_801DA94C(data, animId, 4) == 0) {
                 return;
             }
-            fn_800F0308(data);
+            _threadSwitch(data);
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, animId, 4);

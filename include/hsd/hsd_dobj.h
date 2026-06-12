@@ -56,6 +56,7 @@ struct HSD_DObjInfo {
     void (*disp)(HSD_DObj* dobj, f32 vmtx[3][4], f32 pmtx[3][4],
                  u32 rendermode);
     int (*load)(HSD_DObj* dobj, HSD_DObjDesc* desc);
+    void (*update)(HSD_DObj* dobj, u32 type, void* value);
 };
 
 /* ========================================================================= */
@@ -83,10 +84,12 @@ void HSD_DObjSetCurrent(HSD_DObj* dobj);
 u32 HSD_DObjGetFlags(HSD_DObj* dobj);
 void HSD_DObjSetFlags(HSD_DObj* dobj, u32 flags);
 void HSD_DObjClearFlags(HSD_DObj* dobj, u32 flags);
+void HSD_DObjCountVertices(HSD_DObj* dobj, s32* total_a, s32* total_b);
 void HSD_DObjAddAnim(HSD_DObj* dobj, HSD_MatAnim* mat_anim,
                      HSD_ShapeAnimDObj* sh_anim);
-void HSD_DObjAddAnimAll(HSD_DObj* dobj, HSD_MatAnim* matanim,
-                        HSD_ShapeAnimDObj* shapeanimdobj);
+void HSD_DObjAddAnimAll(HSD_DObj* dobj, void* matanim,
+                        void* shapeanimdobj);
+void HSD_DObjReqAnimAllByFlags(HSD_DObj* dobj, f32 startframe, void* flags);
 void HSD_DObjReqAnimAll(HSD_DObj* dobj, f32 startframe);
 void HSD_DObjAnim(HSD_DObj* dobj);
 void HSD_DObjAnimAll(HSD_DObj* dobj);

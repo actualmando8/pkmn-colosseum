@@ -97,6 +97,8 @@ void HSD_FObjInterpretAnim(HSD_FObj* fobj, void* obj,
                            HSD_ObjUpdateFunc obj_update, f32 rate);
 void HSD_FObjInterpretAnimAll(void* fobj, void* obj,
                               HSD_ObjUpdateFunc obj_update, f32 rate);
+void HSD_FObjStopAnimAll(HSD_FObj* fobj, void* obj,
+                         HSD_ObjUpdateFunc obj_update, f32 rate);
 HSD_FObj* HSD_FObjLoadDesc(HSD_FObjDesc* desc);
 HSD_FObj* HSD_FObjAlloc(void);
 void HSD_FObjFree(HSD_FObj* fobj);

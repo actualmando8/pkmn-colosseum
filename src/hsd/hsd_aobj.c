@@ -158,7 +158,7 @@ extern f64 fn_800CE318(f64, f64); /* fmod */
 extern f64 fn_800CE338(f64);      /* log */
 extern f64 fn_800CE358(f64, f64); /* pow */
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
-extern void __assert(const char* file, s32 line, const char* expr);
+extern void __assert(const char* file, u32 line, const char* expr);
 extern s32 fn_801ADC3C(s32 range);
 extern f32 fn_801ADC7C(void);
 extern f64 __frsqrte(f64);

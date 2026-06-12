@@ -152,18 +152,20 @@ s32 GSfield_LinePlaneTest(void* segStart, void* segEnd,
 /** fn_801144D0 */ void* floorReadSoundPreFunc(u32 resId, u32 loadMode, u32 dataSize);
 /** fn_80114760 */ void* floorReadParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize);
 /** fn_80114AE0 */ void* floorReadWZXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
-/** fn_80114CA8 */ void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
+/** fn_80114878 */ void* floorReadPKXPreFunc(u32 resId, u32 loadMode, u32 dataSize);
+void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size);
+void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size);
 
 /* ===================================================================
  * Public API -- Field Camera (gs_field_world.c)
  * =================================================================== */
 
 /**
- * fn_80117514 -- Update the field camera each frame.
+ * floorUpdateFieldCamera -- Update the field camera each frame.
  *
  * Interpolates between current and destination camera parameters.
  * Includes a divide-by-zero safety check (see debug string).
  */
-void floorUpdateFieldCamera(void);
+u8 floorUpdateFieldCamera();
 
 #endif /* GS_FIELD_H */

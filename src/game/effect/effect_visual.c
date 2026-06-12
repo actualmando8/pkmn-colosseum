@@ -20,12 +20,12 @@
  *     Struct size: 0x70 bytes (passed to GSEffectAllocSlot)
  *     Callbacks: start=fn_80138630, stop=fn_801386DC,
  *                update=fn_80138680, render=fn_801387C0
- *     Core logic: fn_8013814C (0x4E4 bytes -- main render with
+ *     Core logic: _lightningRenderMain (0x4E4 bytes -- main render with
  *       GX pipeline setup: fog, lighting, material color,
  *       position/rotation matrix, GX draw calls)
  *     Helper: fn_80138838 (0x2C8 bytes -- model transform)
  *
- *   leaffxStartEffect      (fn_80138B00)  -- Leaf particle effect
+ *   leaffxStartEffect      (0x80138B00)  -- Leaf particle effect
  *     "leaffxStartEffect: Could not start leaf effect -
  *      invalid leaf model: groupRes %d, modelRes %d!"
  *     "leaffxStartEffect: Could not start leaf effect!"
@@ -35,7 +35,7 @@
  *                update=fn_80138BBC, render=_leaffxGenerateLeafData
  *     Core logic: fn_80138DE4 (0x290 bytes), fn_80139074 (0x304 bytes)
  *
- *   electronStartEffect    (fn_80139820)  -- Electrical arc effect
+ *   electronStartEffect    (0x80139820)  -- Electrical arc effect
  *     "electronStartEffect: Could not start electron effect -
  *      invalid model: groupRes %d, modelRes %d!"
  *     "leaffxStartEffect: Could not start electron effect!"
@@ -102,7 +102,7 @@
  *     Core logic: fn_8013F80C (0x170 bytes), _distortionEffectUpdateMatrices (0x264 bytes),
  *                 fn_8013FF0C (0x22C bytes -- billboard transform setup)
  *
- *   patchiru texture effect (fn_8013FBE0)  -- Patchiru (Spinda) special effect
+ *   patchiruTextureStart   (0x8013FBE0)  -- Patchiru (Spinda) texture effect
  *     "Failed to create Patchiru texture"
  *     Struct size: 0x40 bytes
  *     Uses custom texture generation for the Spinda spot pattern
@@ -115,7 +115,7 @@
  *   fn_8013139C (GSEffectResetState) -- re-trigger effect
  *   fn_800F9318 (floor resource lookup)
  *   fn_800E3D98 (GSmem / resource helper)
- *   fn_800D2248, fn_800D2584, fn_800D1F84, fn_800D1FDC -- matrix/vector ops
+ *   fn_800D2248, GScameraGetActiveCamera, GScameraGetPosition, GScameraGetPerspective -- matrix/vector ops
  *   fn_800DA4C4, fn_800DA2BC, fn_800DA1E8, fn_800DA028 -- GX TEV/material setup
  *   fn_800D88DC, fn_800D888C -- GX blend/alpha mode
  *   fn_800D7820 -- GX draw begin
@@ -173,9 +173,9 @@ extern void* fn_800F9318(u32 group, u32 model);
 /* Matrix / vector operations */
 extern void  fn_800E3D98(void* dst, void* src);
 extern void  fn_800D2248(void);
-extern void  fn_800D2584(void);
-extern void  fn_800D1F84(void* mtx, void* vec);
-extern void  fn_800D1FDC(void* mtx, void* rx, void* ry, void* rz, void* scale);
+extern void  GScameraGetActiveCamera(void);
+extern void  GScameraGetPosition(void* mtx, void* vec);
+extern void  GScameraGetPerspective(void* mtx, void* rx, void* ry, void* rz, void* scale);
 extern void  fn_800E0040(void* vecA, void* vecB);
 extern void  fn_800E0168(void* dst, void* srcA, void* srcB);
 extern void  fn_800E0060(void* dst, void* src);
@@ -222,7 +222,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 
 /* ---- Lightning effect ---- */
 /* fn_801380D4: lightningStartEffect -- allocate slot, register, reset */
-/* fn_8013814C: _lightningRenderMain (0x4E4 bytes) -- GX pipeline + draw */
+/* _lightningRenderMain (0x8013814C, 0x4E4 bytes) -- GX pipeline + draw */
 /* fn_80138630: _lightningStart callback */
 /* fn_80138680: _lightningUpdate callback */
 /* fn_801386DC: _lightningStop callback */
@@ -230,7 +230,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* fn_80138838: _lightningTransformModel (0x2C8 bytes) */
 
 /* ---- Leaf effect ---- */
-/* fn_80138B00: leaffxStartEffect */
+/* leaffxStartEffect (0x80138B00) */
 /* fn_80138B74: _leaffxHelper */
 /* fn_80138BBC: _leaffxUpdate callback */
 /* fn_80138CCC: _leaffxStart callback */
@@ -239,7 +239,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* _leaffxGenerateLeafData: _leaffxRender callback (0x4A8 bytes) */
 
 /* ---- Electron effect ---- */
-/* fn_80139820: electronStartEffect */
+/* electronStartEffect (0x80139820) */
 /* fn_80139898: _electronHelper */
 /* fn_801398E0: _electronStart callback */
 /* fn_80139934: _electronUpdate callback (0x190 bytes) */
@@ -325,7 +325,7 @@ extern void  DCFlushRange(void* ptr, u32 size);
 /* _distortionEffectUpdateMatrices: _billboardRenderQuad (0x264 bytes) */
 
 /* ---- Patchiru (Spinda) texture effect ---- */
-/* fn_8013FBE0: patchiru texture start -- allocate 0x40 bytes */
+/* patchiruTextureStart (0x8013FBE0) -- allocate 0x40 bytes */
 /* fn_8013FC58: _patchiruUpdate callback */
 /* fn_8013FCC4: _patchiruStart callback */
 /* fn_8013FD68: _patchiruRender callback */
@@ -417,11 +417,11 @@ extern u16 billboardEffectStart(void* ptr);
 extern void fn_8013FF0C(void);
 
 #if 1
-asm void fn_8013814C(void) {
-#include "src/game/effect/effect_visual_fn_8013814C.inc"
+asm void _lightningRenderMain(void) {
+#include "src/game/effect/effect_visual__lightningRenderMain.inc"
 }
 #else
-void fn_8013814C(void) { /* TODO */ }
+void _lightningRenderMain(void) { /* TODO */ }
 #endif
 #if 0
 asm void fn_80138630(void* ptr) {
@@ -521,11 +521,11 @@ asm void fn_80138838(void* ptr, u32 b) {
 void fn_80138838(void* ptr, u32 b) { /* TODO */ }
 #endif
 #if 0
-asm void fn_80138B00(void) {
-#include "src/game/effect/effect_visual_fn_80138B00.inc"
+asm void leaffxStartEffect(void) {
+#include "src/game/effect/effect_visual_leaffxStartEffect.inc"
 }
 #else
-u32 fn_80138B00(void* callbacks) {
+u32 leaffxStartEffect(void* callbacks) {
     u32 effectId = fn_80131428(callbacks, 0x4c);
     if (effectId) {
         fn_80131200(effectId,
@@ -581,7 +581,7 @@ asm void fn_80138CCC(void) {
 #else
 void fn_80138CCC(void) { /* TODO */ }
 #endif
-extern void fn_800E07E4(void);
+extern void GSbezierCalculateVector(void);
 extern void fn_800E06B8(void);
 extern void fn_800E040C(void);
 extern void fn_800E02C4(void);
@@ -625,11 +625,11 @@ asm void _leaffxGenerateLeafData(void) {
 void _leaffxGenerateLeafData(void) { /* TODO */ }
 #endif
 #if 0
-asm void fn_80139820(void) {
-#include "src/game/effect/effect_visual_fn_80139820.inc"
+asm void electronStartEffect(void) {
+#include "src/game/effect/effect_visual_electronStartEffect.inc"
 }
 #else
-u32 fn_80139820(void* callbacks) {
+u32 electronStartEffect(void* callbacks) {
     u32 effectId = fn_80131428(callbacks, 0x60);
     if (effectId) {
         fn_80131200(effectId,
@@ -1162,7 +1162,7 @@ asm void fn_8013BE04(void) {
 void fn_8013BE04(void) { /* TODO */ }
 #endif
 extern void fn_8019FF48(void);
-extern void fn_801A8440(void);
+extern void HSD_MObjSetFlags(void);
 extern void fn_801A6FF0(void);
 #if 1
 asm void fn_8013C074(void) {
@@ -1404,7 +1404,8 @@ u32 fn_8013D7CC(void* ptr) {
     return 1;
 }
 #endif
-extern void* fn_800EF5FC(u32 a, u32 b, u32 size, u32 d, u32 e);
+extern void* GStextureCreate(u32 a, u32 b, u32 size, u32 d, u32 e);
+extern void* fn_800EF5FC(u32 a, u32 b, u32 size, u32 d, u32 e); /* GStextureCreate */
 extern u32 lbl_8047AEE0;
 extern u8 lbl_80466BC0[];
 extern u16 lbl_8047AEE4;
@@ -1577,7 +1578,7 @@ asm u32 fn_8013DD10(void* ptr) {
 u32 fn_8013DD10(void* ptr) {
     if (ptr) {
         if (*(s32*)((u8*)ptr + 0x10) != 0) {
-            *(void**)((u8*)ptr + 0xc) = fn_800EF5FC(0, 0, 0x44, 0, 0);
+            *(void**)((u8*)ptr + 0xc) = GStextureCreate(0, 0, 0x44, 0, 0);
             if (*(void**)((u8*)ptr + 0xc) == NULL) {
                 return 0;
             }
@@ -1608,7 +1609,7 @@ u32 fn_8013DD7C(void* ptr) {
     return 1;
 }
 #endif
-extern void fn_800DC390(void* handle, void* callback, void* ctx);
+extern void GSgfxBeginBackFBCapture(void* handle, void* callback, void* ctx);
 extern void* fn_800E584C(void* a, void* b);
 extern u8 lbl_80272F70[];
 #if 0
@@ -1622,7 +1623,7 @@ u32 blurEffectStart(void* ptr) {
         *(u32*)((u8*)ptr + 0x1c) = 0;
         if (*(s32*)((u8*)ptr + 0x10) != 0) {
             if (*(void**)((u8*)ptr + 0xc) != NULL) {
-                fn_800DC390(*(void**)((u8*)ptr + 0xc), (void*)fn_8013E258, ptr);
+                GSgfxBeginBackFBCapture(*(void**)((u8*)ptr + 0xc), (void*)fn_8013E258, ptr);
                 return 1;
             }
         } else {
@@ -1638,11 +1639,11 @@ u32 blurEffectStart(void* ptr) {
 #endif
 extern void fn_800EC960(void);
 extern void fn_800D3068(void);
-extern void fn_800EC53C(void);
+extern void GSmodelGetAnimFrame(void);
 extern void fn_800EC570(void);
 extern void fn_800D45F8(void);
 extern void fn_800DF3F0(void);
-extern void fn_800DF550(void);
+extern void GSmaterialSetFlags(void);
 extern void fn_800DF188(void);
 extern void fn_800EC990(void* model);
 extern void fn_800ECA78(void* model, f32 value);
@@ -1758,7 +1759,7 @@ asm void fn_8013E5AC(void) {
 #else
 u32 fn_8013E5AC(u8* p) {
     extern u8 lbl_80466BC0[];
-    extern void* fn_800EF5FC(u32 a, u32 b, u32 size, u32 d, u32 e);
+    extern void* GStextureCreate(u32 a, u32 b, u32 size, u32 d, u32 e);
     extern void* fn_800EF548(void* buf, u32 b);
     extern void fn_800EF504(void* buf);
     u8* tbl;
@@ -1768,7 +1769,7 @@ u32 fn_8013E5AC(u8* p) {
         if (p[0x18] > 0x1e) {
             p[0x18] = 0x1e;
         }
-        buf = fn_800EF5FC(*(u16*)(tbl + 4), *(u16*)(tbl + 6), 0xa0, 0, 0);
+        buf = GStextureCreate(*(u16*)(tbl + 4), *(u16*)(tbl + 6), 0xa0, 0, 0);
         if (buf != 0) {
             *(void**)(p + 4) = buf;
             memset(fn_800EF548(buf, 0), 0, *(u16*)(tbl + 4) * *(u16*)(tbl + 6));
@@ -1963,7 +1964,7 @@ asm void fn_8013F80C(void) {
 void fn_8013F80C(void) { /* TODO */ }
 #endif
 extern void fn_800D7BF8(void);
-extern void fn_800D1EB8(void);
+extern void GScameraGetLookAt(void);
 extern void fn_800E0628(void);
 extern void fn_800E0238(void);
 extern void fn_800D2DE8(void);
@@ -1988,11 +1989,11 @@ asm void _distortionEffectUpdateMatrices(void) {
 void _distortionEffectUpdateMatrices(void) { /* TODO */ }
 #endif
 #if 0
-asm void fn_8013FBE0(void) {
-#include "src/game/effect/effect_visual_fn_8013FBE0.inc"
+asm void patchiruTextureStart(void) {
+#include "src/game/effect/effect_visual_patchiruTextureStart.inc"
 }
 #else
-u32 fn_8013FBE0(void* callbacks) {
+u32 patchiruTextureStart(void* callbacks) {
     u32 effectId = fn_80131428(callbacks, 0x24);
     if (effectId) {
         fn_80131200(effectId,

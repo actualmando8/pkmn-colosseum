@@ -105,7 +105,7 @@ extern void fn_8011288C(u32, u32);
 void fn_8004BE0C(void) {
     fn_800FF730(0x392);
     fn_8011288C(0, 0);
-    fn_800F0308();
+    _threadSwitch();
 }
 #pragma pop
 

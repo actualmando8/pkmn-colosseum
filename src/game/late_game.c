@@ -44,7 +44,7 @@ extern void fn_800D7820();
 extern void fn_800D85D4();
 extern void fn_800D888C();
 extern void fn_800D88DC();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800F9318();
 extern void fn_800F9EE4();
 extern void fn_800FA280();
@@ -4632,7 +4632,7 @@ void fn_8009769C(void) {
     r3 = (u32)&lbl_803FB338;
     r3 = (u32)&lbl_803FB338;
     fn_8010A420();
-    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))_threadSwitch)();
     r3 = *(u32*)((u8*)r31 + 0x4);
     return;
 }
@@ -4683,7 +4683,7 @@ void fn_80097A38(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;
@@ -4714,7 +4714,7 @@ void fn_80097A38(void) {
         r4 = 0x0;
         fn_8011288C();
     }
-    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))_threadSwitch)();
     r3 = *(u32*)((u8*)r31 + 0x4);
     return;
 }
@@ -4742,7 +4742,7 @@ void fn_80097B04(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;
@@ -4813,7 +4813,7 @@ void fn_80097BBC(void) {
     while (tmp != 0) {
             fn_8010B560();
             tmp = r3 & 0xFF;
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
     }
     r3 = (u32)&lbl_803FB380;
     r4 = 0x0;
@@ -4843,7 +4843,7 @@ void fn_80097BBC(void) {
         r4 = 0x0;
         fn_8011288C();
     }
-    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))_threadSwitch)();
     r3 = *(u32*)((u8*)r31 + 0x4);
 
     return;
@@ -4874,7 +4874,7 @@ void fn_80097CD0(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;
@@ -4930,7 +4930,7 @@ void fn_80097D94(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;
@@ -4988,7 +4988,7 @@ void fn_80097E58(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;
@@ -5044,7 +5044,7 @@ void fn_80097F08(void) {
         fn_8010B560();
         tmp = r3 & 0xFF;
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
 
     }
     r3 = (u32)&lbl_803FB380;

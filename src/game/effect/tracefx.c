@@ -48,6 +48,10 @@ extern void  fn_800E01D0(void* dst, void* src);         /* Vec3 copy */
 extern void  fn_800E090C(void* dst, void* srcA,
                           void* srcB, f32 t);            /* Vec3 lerp */
 extern void  fn_800E4014(void* model, u32 flag);        /* GSpart set visibility */
+extern u16   fn_800E3534(u32 size);                     /* GSmemAllocRaw */
+extern void* fn_800E27B0(u16 handle);                   /* GSmemGetPtr */
+extern void  fn_800E24B0(u16 handle);                   /* GSmemLock/free step */
+extern void  fn_800E209C(u16 handle);                   /* GSmemFree */
 extern u32   fn_801DB060(void);                          /* Random seed generator */
 extern void  fn_8010147C(u32 memOffset, u32 resId,
                           u32 size, u32 handle);         /* GSfloor load resource */
@@ -648,10 +652,112 @@ void fn_80137A2C(void) {
 
 /* 0x80137AA4 | 0x270 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80137AA4(void) {
-    /* TODO: match -- 624 bytes at 0x80137AA4 */
+#pragma optimization_level 4
+BOOL fn_80137AA4(u8* w) {
+    void* model;
+    u16 max_count;
+    u8* nodes;
+    void* part;
+    u8* weights;
+    u32 i;
+    u16 handle;
+    u32 last_index;
+    u32 count32;
+    f32 step;
+    u32 node_bytes;
+    u16 count;
+
+    if (w == (void*)0) {
+        goto fail;
+    }
+
+    max_count = *(u16*)(w + 0x20);
+    count = *(u16*)(w + 0x22);
+    model = fn_800F9318(*(u16*)(w + 0x24), *(u16*)(w + 0x26));
+
+    if (*(void**)(w + 0x14) == (void*)0) {
+        return FALSE;
+    }
+    if (count == 0 || max_count == 0) {
+        return FALSE;
+    }
+    if (model == (void*)0) {
+        return FALSE;
+    }
+
+    part = fn_800EE150(model, *(u16*)(w + 0x28));
+    if (part == (void*)0) {
+        return FALSE;
+    }
+    fn_800EE828(part);
+
+    part = fn_800EE150(model, *(u16*)(w + 0x2A));
+    if (part == (void*)0) {
+        return FALSE;
+    }
+    fn_800EE828(part);
+
+    if (count > (max_count >> 1)) {
+        count = max_count >> 1;
+        *(u16*)(w + 0x22) = count;
+    }
+
+    node_bytes = (u16)count << 5;
+    count32 = (u16)count;
+    handle = fn_800E3534(node_bytes);
+    if (handle == 0) {
+        return FALSE;
+    }
+
+    *(u16*)(w + 0x0C) = handle;
+    nodes = (u8*)fn_800E27B0(handle);
+    *(u8**)(w + 0x04) = nodes;
+    *(u8**)(w + 0x00) = nodes;
+    memset(nodes, 0, node_bytes);
+
+    last_index = count32 - 1;
+    for (i = 0; (u16)i < count32; i++) {
+        if ((u16)i == 0) {
+            *(u8**)(nodes + (((u16)i << 5) + 0x1C)) = nodes + (last_index << 5);
+        } else {
+            *(u8**)(nodes + (((u16)i << 5) + 0x1C)) = nodes + (((u16)i - 1) << 5);
+        }
+        if ((u16)i == last_index) {
+            *(u8**)(nodes + (((u16)i << 5) + 0x18)) = nodes;
+        } else {
+            *(u8**)(nodes + (((u16)i << 5) + 0x18)) = nodes + (((u16)i + 1) << 5);
+        }
+    }
+
+    handle = fn_800E3534(count32 << 4);
+    if (handle == 0) {
+        fn_800E24B0(*(u16*)(w + 0x0C));
+        fn_800E209C(*(u16*)(w + 0x0C));
+        return FALSE;
+    }
+
+    *(u16*)(w + 0x0E) = handle;
+    weights = (u8*)fn_800E27B0(handle);
+    *(u8**)(w + 0x08) = weights;
+    *(u16*)(w + 0x1C) = 0;
+    *(u16*)(w + 0x1E) = 0;
+
+    count32 = *(u16*)(w + 0x22);
+    step = 1.0f / (f32)(s32)(count32 - 1);
+    for (i = 0; (u16)i < count32; i++) {
+        f32 t = (f32)(u32)(u16)i * step;
+        *(f32*)(weights + 0x00) = t;
+        *(f32*)(weights + 0x04) = 0.0f;
+        *(f32*)(weights + 0x08) = t;
+        *(f32*)(weights + 0x0C) = 1.0f;
+        weights += 0x10;
+    }
+
+    return TRUE;
+
+fail:
+    fn_800DD970(lbl_80272B08);
+    return FALSE;
 }
 #pragma pop
 

@@ -4206,7 +4206,7 @@
       "section": ".text",
       "size": "0x25C"
     },
-    "fn_80011700": {
+    "menuFightCloseWaza": {
       "addr": "0x80011700",
       "kind": "function",
       "section": ".text",
@@ -10178,10 +10178,9 @@
       "section": ".text",
       "size": "0x54"
     },
-    "fn_8007C2C0": {
+    "menuPokeCouponInit": {
       "addr": "0x8007C2C0",
       "kind": "function",
-      "proposed": "menuPokeCoupon_Assert",
       "section": ".text",
       "size": "0x40"
     },
@@ -11498,7 +11497,7 @@
       "section": ".text",
       "size": "0x4"
     },
-    "fn_8009E7B0": {
+    "OSLink": {
       "addr": "0x8009E7B0",
       "kind": "function",
       "section": ".text",
@@ -11522,7 +11521,7 @@
       "section": ".text",
       "size": "0x3C"
     },
-    "fn_8009EDAC": {
+    "OSUnlink": {
       "addr": "0x8009EDAC",
       "kind": "function",
       "section": ".text",
@@ -12206,7 +12205,7 @@
       "section": ".text",
       "size": "0x4"
     },
-    "fn_800A56F0": {
+    "stateReadingFST": {
       "addr": "0x800A56F0",
       "kind": "function",
       "section": ".text",
@@ -14474,7 +14473,7 @@
       "section": ".text",
       "size": "0xE0"
     },
-    "fn_800BE800": {
+    "MessageSend": {
       "addr": "0x800BE800",
       "kind": "function",
       "section": ".text",
@@ -14600,7 +14599,7 @@
       "section": ".text",
       "size": "0xB0"
     },
-    "fn_800BF95C": {
+    "SendACK": {
       "addr": "0x800BF95C",
       "kind": "function",
       "section": ".text",
@@ -15044,7 +15043,7 @@
       "section": ".text",
       "size": "0xCC"
     },
-    "fn_800C4D8C": {
+    "__sys_free": {
       "addr": "0x800C4D8C",
       "kind": "function",
       "section": ".text",
@@ -15758,25 +15757,25 @@
       "section": ".text",
       "size": "0xB8"
     },
-    "fn_800D172C": {
+    "GScameraGetAnimFrame": {
       "addr": "0x800D172C",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800D1734": {
+    "GScameraHasAnimationEnded": {
       "addr": "0x800D1734",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800D173C": {
+    "GScameraStopAnimation": {
       "addr": "0x800D173C",
       "kind": "function",
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_800D1798": {
+    "GScameraStartAnimation": {
       "addr": "0x800D1798",
       "kind": "function",
       "section": ".text",
@@ -15788,37 +15787,37 @@
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800D1860": {
+    "GScameraSetAnimFrame": {
       "addr": "0x800D1860",
       "kind": "function",
       "section": ".text",
       "size": "0x9C"
     },
-    "fn_800D18FC": {
+    "GScameraSetAnimRate": {
       "addr": "0x800D18FC",
       "kind": "function",
       "section": ".text",
       "size": "0x88"
     },
-    "fn_800D1984": {
+    "GScameraSetAnimIndex": {
       "addr": "0x800D1984",
       "kind": "function",
       "section": ".text",
       "size": "0xB4"
     },
-    "fn_800D1A38": {
+    "GScameraIsAnimating": {
       "addr": "0x800D1A38",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800D1A40": {
+    "GScameraGetDistanceVector": {
       "addr": "0x800D1A40",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_800D1A70": {
+    "GScameraGetProjMatrixPtr": {
       "addr": "0x800D1A70",
       "kind": "function",
       "section": ".text",
@@ -15836,49 +15835,49 @@
       "section": ".text",
       "size": "0x1B8"
     },
-    "fn_800D1EB8": {
+    "GScameraGetLookAt": {
       "addr": "0x800D1EB8",
       "kind": "function",
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_800D1F04": {
+    "GScameraLookAt": {
       "addr": "0x800D1F04",
       "kind": "function",
       "section": ".text",
       "size": "0x54"
     },
-    "fn_800D1F58": {
+    "GScameraGetRotation": {
       "addr": "0x800D1F58",
       "kind": "function",
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_800D1F84": {
+    "GScameraGetPosition": {
       "addr": "0x800D1F84",
       "kind": "function",
       "section": ".text",
       "size": "0x58"
     },
-    "fn_800D1FDC": {
+    "GScameraGetPerspective": {
       "addr": "0x800D1FDC",
       "kind": "function",
       "section": ".text",
       "size": "0x60"
     },
-    "fn_800D203C": {
+    "GScameraSetRotation": {
       "addr": "0x800D203C",
       "kind": "function",
       "section": ".text",
       "size": "0x40"
     },
-    "fn_800D207C": {
+    "GScameraSetPosition": {
       "addr": "0x800D207C",
       "kind": "function",
       "section": ".text",
       "size": "0x50"
     },
-    "fn_800D20CC": {
+    "GScameraSetPerspective": {
       "addr": "0x800D20CC",
       "kind": "function",
       "section": ".text",
@@ -15890,7 +15889,7 @@
       "section": ".text",
       "size": "0x78"
     },
-    "fn_800D21C8": {
+    "GScameraSetViewport": {
       "addr": "0x800D21C8",
       "kind": "function",
       "section": ".text",
@@ -15902,7 +15901,7 @@
       "section": ".text",
       "size": "0x33C"
     },
-    "fn_800D2584": {
+    "GScameraGetActiveCamera": {
       "addr": "0x800D2584",
       "kind": "function",
       "section": ".text",
@@ -17007,13 +17006,13 @@
       "section": ".text",
       "size": "0x74"
     },
-    "fn_800DC298": {
+    "GSgfxEndBackFBCapture": {
       "addr": "0x800DC298",
       "kind": "function",
       "section": ".text",
       "size": "0xF8"
     },
-    "fn_800DC390": {
+    "GSgfxBeginBackFBCapture": {
       "addr": "0x800DC390",
       "kind": "function",
       "section": ".text",
@@ -17127,7 +17126,7 @@
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_800DCCF0": {
+    "GSlightSetType": {
       "addr": "0x800DCCF0",
       "kind": "function",
       "section": ".text",
@@ -17307,7 +17306,7 @@
       "section": ".text",
       "size": "0x28"
     },
-    "fn_800DF498": {
+    "GSmaterialSetPEdescr": {
       "addr": "0x800DF498",
       "kind": "function",
       "section": ".text",
@@ -17319,7 +17318,7 @@
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_800DF550": {
+    "GSmaterialSetFlags": {
       "addr": "0x800DF550",
       "kind": "function",
       "section": ".text",
@@ -17343,7 +17342,7 @@
       "section": ".text",
       "size": "0x78"
     },
-    "fn_800DF8CC": {
+    "_GSmaterialObjInit_800EF33C": {
       "addr": "0x800DF8CC",
       "kind": "function",
       "section": ".text",
@@ -17355,7 +17354,7 @@
       "section": ".text",
       "size": "0x18C"
     },
-    "fn_800DFABC": {
+    "_matGSmatEnableEnvMapExt": {
       "addr": "0x800DFABC",
       "kind": "function",
       "section": ".text",
@@ -17637,7 +17636,7 @@
       "section": ".text",
       "size": "0x54"
     },
-    "fn_800E07E4": {
+    "GSbezierCalculateVector": {
       "addr": "0x800E07E4",
       "kind": "function",
       "section": ".text",
@@ -17823,24 +17822,24 @@
       "section": ".text",
       "size": "0x34"
     },
-    "fn_800E3B3C": {
+    "GSmaterialGetPoolCount": {
       "addr": "0x800E3B3C",
       "kind": "function",
-      "proposed": "GSmaterialGetPoolCount",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3B44": {
+    "GSmaterialSetShadowFlag": {
       "addr": "0x800E3B44",
       "kind": "function",
-      "proposed": "GSmaterialSetShadowFlag",
+
       "section": ".text",
       "size": "0x28"
     },
-    "fn_800E3B6C": {
+    "GSmaterialFindByMObj": {
       "addr": "0x800E3B6C",
       "kind": "function",
-      "proposed": "GSmaterialFindByMObj",
+
       "section": ".text",
       "size": "0x54"
     },
@@ -17851,122 +17850,122 @@
       "section": ".text",
       "size": "0x30"
     },
-    "fn_800E3BF0": {
+    "GSmaterialGetUserData": {
       "addr": "0x800E3BF0",
       "kind": "function",
-      "proposed": "GSmaterialGetUserData",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3BF8": {
+    "GSmaterialGetTexture": {
       "addr": "0x800E3BF8",
       "kind": "function",
-      "proposed": "GSmaterialGetTexture",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3C00": {
+    "GSmaterialSetUserData": {
       "addr": "0x800E3C00",
       "kind": "function",
-      "proposed": "GSmaterialSetUserData",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3C08": {
+    "GSmaterialSetTexture": {
       "addr": "0x800E3C08",
       "kind": "function",
-      "proposed": "GSmaterialSetTexture",
+
       "section": ".text",
       "size": "0x54"
     },
-    "fn_800E3C5C": {
+    "GSmaterialGetTransformPtr": {
       "addr": "0x800E3C5C",
       "kind": "function",
-      "proposed": "GSmaterialGetTransformPtr",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3C64": {
+    "GSmaterialHasTransform": {
       "addr": "0x800E3C64",
       "kind": "function",
-      "proposed": "GSmaterialHasTransform",
+
       "section": ".text",
       "size": "0x30"
     },
-    "fn_800E3C94": {
+    "GSmaterialSetCustomPEFlag": {
       "addr": "0x800E3C94",
       "kind": "function",
-      "proposed": "GSmaterialSetCustomPEFlag",
+
       "section": ".text",
       "size": "0x28"
     },
-    "fn_800E3CBC": {
+    "GSmaterialGetTexStage": {
       "addr": "0x800E3CBC",
       "kind": "function",
-      "proposed": "GSmaterialGetTexStage",
+
       "section": ".text",
       "size": "0xC"
     },
-    "fn_800E3CC8": {
+    "GSmaterialSetEnvMapFlag": {
       "addr": "0x800E3CC8",
       "kind": "function",
-      "proposed": "GSmaterialSetEnvMapFlag",
+
       "section": ".text",
       "size": "0x28"
     },
-    "fn_800E3CF0": {
+    "GSmaterialGetSpecularPtr": {
       "addr": "0x800E3CF0",
       "kind": "function",
-      "proposed": "GSmaterialGetSpecularPtr",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3CF8": {
+    "GSmaterialGetAmbientPtr": {
       "addr": "0x800E3CF8",
       "kind": "function",
-      "proposed": "GSmaterialGetAmbientPtr",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3D00": {
+    "GSmaterialGetDiffusePtr": {
       "addr": "0x800E3D00",
       "kind": "function",
-      "proposed": "GSmaterialGetDiffusePtr",
+
       "section": ".text",
       "size": "0x8"
     },
-    "fn_800E3D08": {
+    "GSmaterialIsActive": {
       "addr": "0x800E3D08",
       "kind": "function",
-      "proposed": "GSmaterialIsActive",
+
       "section": ".text",
       "size": "0xC"
     },
-    "fn_800E3D14": {
+    "GSmaterialLerpPEColor": {
       "addr": "0x800E3D14",
       "kind": "function",
-      "proposed": "GSmaterialLerpPEColor",
+
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_800E3D40": {
+    "GSmaterialLerpSpecular": {
       "addr": "0x800E3D40",
       "kind": "function",
-      "proposed": "GSmaterialLerpSpecular",
+
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_800E3D6C": {
+    "GSmaterialLerpAmbient": {
       "addr": "0x800E3D6C",
       "kind": "function",
-      "proposed": "GSmaterialLerpAmbient",
+
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_800E3D98": {
+    "GSmaterialLerpDiffuse": {
       "addr": "0x800E3D98",
       "kind": "function",
-      "proposed": "GSmaterialLerpDiffuse",
+
       "section": ".text",
       "size": "0x2C"
     },
@@ -18268,14 +18267,14 @@
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_800E8F68": {
+    "GSmaterialSetCallback": {
       "addr": "0x800E8F68",
       "kind": "function",
-      "proposed": "GSmaterialSetCallback",
+
       "section": ".text",
       "size": "0xC"
     },
-    "fn_800E8F74": {
+    "GSmaterialSetDistanceThreshold": {
       "addr": "0x800E8F74",
       "kind": "function",
       "proposed": "GSmaterialSetDistanceThreshold",
@@ -18594,7 +18593,7 @@
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_800EC53C": {
+    "GSmodelGetAnimFrame": {
       "addr": "0x800EC53C",
       "kind": "function",
       "section": ".text",
@@ -18768,7 +18767,7 @@
       "section": ".text",
       "size": "0x38"
     },
-    "fn_800EE08C": {
+    "_modelGetEndFrame": {
       "addr": "0x800EE08C",
       "kind": "function",
       "proposed": "GSmaterialConfigureFog",
@@ -18889,7 +18888,7 @@
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_800EEA98": {
+    "GSscratchStore": {
       "addr": "0x800EEA98",
       "kind": "function",
       "section": ".text",
@@ -19022,19 +19021,19 @@
       "section": ".text",
       "size": "0x70"
     },
-    "fn_800F0030": {
+    "threadLoadGPRRegisters": {
       "addr": "0x800F0030",
       "kind": "function",
       "section": ".text",
       "size": "0x90"
     },
-    "fn_800F00C0": {
+    "threadLoadFPRRegisters": {
       "addr": "0x800F00C0",
       "kind": "function",
       "section": ".text",
       "size": "0x9C"
     },
-    "fn_800F015C": {
+    "threadSaveGPRRegisters": {
       "addr": "0x800F015C",
       "kind": "function",
       "section": ".text",
@@ -19046,7 +19045,7 @@
       "section": ".text",
       "size": "0x9C"
     },
-    "fn_800F028C": {
+    "threadExecute": {
       "addr": "0x800F028C",
       "kind": "function",
       "section": ".text",
@@ -19058,7 +19057,7 @@
       "section": ".text",
       "size": "0x14"
     },
-    "fn_800F0308": {
+    "_threadSwitch": {
       "addr": "0x800F0308",
       "kind": "function",
       "section": ".text",
@@ -19148,14 +19147,13 @@
       "section": ".text",
       "size": "0x154"
     },
-    "fn_800F07A8": {
+    "GSthreadCreate": {
       "addr": "0x800F07A8",
       "kind": "function",
-      "proposed": "GSthread_Init",
       "section": ".text",
       "size": "0x230"
     },
-    "fn_800F09D8": {
+    "GSthread": {
       "addr": "0x800F09D8",
       "kind": "function",
       "section": ".text",
@@ -20264,7 +20262,7 @@
       "section": ".text",
       "size": "0x44"
     },
-    "fn_80102428": {
+    "menuCloseSync": {
       "addr": "0x80102428",
       "kind": "function",
       "section": ".text",
@@ -20858,7 +20856,7 @@
       "section": ".text",
       "size": "0x10"
     },
-    "fn_80109894": {
+    "menuModelSetMotion": {
       "addr": "0x80109894",
       "kind": "function",
       "section": ".text",
@@ -21677,7 +21675,7 @@
       "section": ".text",
       "size": "0xCC"
     },
-    "fn_80114948": {
+    "floorReadCameraPreFunc": {
       "addr": "0x80114948",
       "kind": "function",
       "section": ".text",
@@ -21702,7 +21700,7 @@
       "section": ".text",
       "size": "0x1C8"
     },
-    "fn_80114CA8": {
+    "floorReadMapPreFunc": {
       "addr": "0x80114CA8",
       "kind": "function",
       "section": ".text",
@@ -22002,7 +22000,7 @@
       "section": ".text",
       "size": "0xA0"
     },
-    "fn_80115E04": {
+    "floorEventChangeTresure": {
       "addr": "0x80115E04",
       "kind": "function",
       "section": ".text",
@@ -22182,10 +22180,9 @@
       "section": ".text",
       "size": "0x14"
     },
-    "fn_80117514": {
+    "floorUpdateFieldCamera": {
       "addr": "0x80117514",
       "kind": "function",
-      "proposed": "floorUpdateFieldCamera",
       "section": ".text",
       "size": "0x1B4"
     },
@@ -26149,7 +26146,7 @@
       "section": ".text",
       "size": "0x74"
     },
-    "fn_8013111C": {
+    "GSeffect": {
       "addr": "0x8013111C",
       "kind": "function",
       "proposed": "GSeffect_TriggerEffect",
@@ -27489,7 +27486,7 @@
       "section": ".text",
       "size": "0x78"
     },
-    "fn_8013814C": {
+    "_lightningRenderMain": {
       "addr": "0x8013814C",
       "kind": "function",
       "proposed": "_lightningRenderMain",
@@ -27526,7 +27523,7 @@
       "section": ".text",
       "size": "0x2C8"
     },
-    "fn_80138B00": {
+    "leaffxStartEffect": {
       "addr": "0x80138B00",
       "kind": "function",
       "proposed": "leaffxStartEffect",
@@ -27563,13 +27560,13 @@
       "section": ".text",
       "size": "0x304"
     },
-    "fn_80139378": {
+    "_leaffxGenerateLeafData": {
       "addr": "0x80139378",
       "kind": "function",
       "section": ".text",
       "size": "0x4A8"
     },
-    "fn_80139820": {
+    "electronStartEffect": {
       "addr": "0x80139820",
       "kind": "function",
       "proposed": "electronStartEffect",
@@ -27717,7 +27714,7 @@
       "section": ".text",
       "size": "0x8C"
     },
-    "fn_8013B5E4": {
+    "surfEffectStart": {
       "addr": "0x8013B5E4",
       "kind": "function",
       "section": ".text",
@@ -27772,7 +27769,7 @@
       "section": ".text",
       "size": "0xA8"
     },
-    "fn_8013C718": {
+    "seaEffectStart": {
       "addr": "0x8013C718",
       "kind": "function",
       "section": ".text",
@@ -27827,13 +27824,13 @@
       "section": ".text",
       "size": "0x38"
     },
-    "fn_8013D804": {
+    "envMapEffectInit": {
       "addr": "0x8013D804",
       "kind": "function",
       "section": ".text",
       "size": "0x104"
     },
-    "fn_8013D908": {
+    "envMapEffectStart": {
       "addr": "0x8013D908",
       "kind": "function",
       "section": ".text",
@@ -27876,7 +27873,7 @@
       "section": ".text",
       "size": "0x50"
     },
-    "fn_8013DDCC": {
+    "blurEffectStart": {
       "addr": "0x8013DDCC",
       "kind": "function",
       "section": ".text",
@@ -27919,7 +27916,7 @@
       "section": ".text",
       "size": "0xAC"
     },
-    "fn_8013E658": {
+    "auraEffectStart": {
       "addr": "0x8013E658",
       "kind": "function",
       "section": ".text",
@@ -27962,7 +27959,7 @@
       "section": ".text",
       "size": "0x230"
     },
-    "fn_8013F344": {
+    "distortionEffectStart": {
       "addr": "0x8013F344",
       "kind": "function",
       "section": ".text",
@@ -27980,13 +27977,13 @@
       "section": ".text",
       "size": "0x170"
     },
-    "fn_8013F97C": {
+    "_distortionEffectUpdateMatrices": {
       "addr": "0x8013F97C",
       "kind": "function",
       "section": ".text",
       "size": "0x264"
     },
-    "fn_8013FBE0": {
+    "patchiruTextureStart": {
       "addr": "0x8013FBE0",
       "kind": "function",
       "proposed": "patchiruTextureStart",
@@ -28011,7 +28008,7 @@
       "section": ".text",
       "size": "0x68"
     },
-    "fn_8013FDD0": {
+    "billboardEffectStart": {
       "addr": "0x8013FDD0",
       "kind": "function",
       "section": ".text",
@@ -28035,7 +28032,7 @@
       "section": ".text",
       "size": "0x11C"
     },
-    "fn_801402AC": {
+    "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl": {
       "addr": "0x801402AC",
       "kind": "function",
       "section": ".text",
@@ -29241,7 +29238,7 @@
       "section": ".text",
       "size": "0x128"
     },
-    "fn_801522E0": {
+    "peopleFieldCompare8ByteTableKey": {
       "addr": "0x801522E0",
       "kind": "function",
       "section": ".text",
@@ -29259,7 +29256,7 @@
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801523A8": {
+    "peopleFieldCompare12ByteTableKey": {
       "addr": "0x801523A8",
       "kind": "function",
       "section": ".text",
@@ -30121,67 +30118,67 @@
       "section": ".text",
       "size": "0x48"
     },
-    "fn_8016161C": {
+    "peopleFieldMotionResolveInput23C": {
       "addr": "0x8016161C",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_80161664": {
+    "peopleFieldMotionResolveInput260": {
       "addr": "0x80161664",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801616AC": {
+    "peopleFieldMotionResolveInput284": {
       "addr": "0x801616AC",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801616F4": {
+    "peopleFieldMotionResolveInput2A8": {
       "addr": "0x801616F4",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_8016173C": {
+    "peopleFieldMotionResolveInput2CC": {
       "addr": "0x8016173C",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_80161784": {
+    "peopleFieldMotionResolveInput2F0": {
       "addr": "0x80161784",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801617CC": {
+    "peopleFieldMotionResolveInput338": {
       "addr": "0x801617CC",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_80161814": {
+    "peopleFieldMotionResolveInput35C": {
       "addr": "0x80161814",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_8016185C": {
+    "peopleFieldMotionResolveInput380": {
       "addr": "0x8016185C",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801618A4": {
+    "peopleFieldMotionResolveInput3A4": {
       "addr": "0x801618A4",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801618EC": {
+    "peopleFieldMotionResolveInput3C8": {
       "addr": "0x801618EC",
       "kind": "function",
       "section": ".text",
@@ -30230,7 +30227,7 @@
       "section": ".text",
       "size": "0x1C"
     },
-    "fn_8016208C": {
+    "sndSin": {
       "addr": "0x8016208C",
       "kind": "function",
       "section": ".text",
@@ -30248,7 +30245,7 @@
       "section": ".text",
       "size": "0x10"
     },
-    "fn_801621CC": {
+    "sndConvertTicks": {
       "addr": "0x801621CC",
       "kind": "function",
       "section": ".text",
@@ -30272,7 +30269,7 @@
       "section": ".text",
       "size": "0xB8"
     },
-    "fn_80162428": {
+    "hwExit": {
       "addr": "0x80162428",
       "kind": "function",
       "section": ".text",
@@ -30362,7 +30359,7 @@
       "section": ".text",
       "size": "0x3C"
     },
-    "fn_80162904": {
+    "hwKeyOff": {
       "addr": "0x80162904",
       "kind": "function",
       "section": ".text",
@@ -30681,13 +30678,13 @@
       "section": ".text",
       "size": "0x74"
     },
-    "fn_801642AC": {
+    "salGetStartDelay": {
       "addr": "0x801642AC",
       "kind": "function",
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_801642F8": {
+    "hwInitIrq": {
       "addr": "0x801642F8",
       "kind": "function",
       "section": ".text",
@@ -30699,13 +30696,13 @@
       "section": ".text",
       "size": "0x4"
     },
-    "fn_80164328": {
+    "hwEnableIrq": {
       "addr": "0x80164328",
       "kind": "function",
       "section": ".text",
       "size": "0x38"
     },
-    "fn_80164360": {
+    "hwDisableIrq": {
       "addr": "0x80164360",
       "kind": "function",
       "section": ".text",
@@ -30735,19 +30732,19 @@
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_8016442C": {
+    "sndAuxCallbackReverbHI": {
       "addr": "0x8016442C",
       "kind": "function",
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_80164488": {
+    "sndAuxCallbackUpdateSettingsReverbHI": {
       "addr": "0x80164488",
       "kind": "function",
       "section": ".text",
       "size": "0x58"
     },
-    "fn_801644E0": {
+    "sndAuxCallbackPrepareReverbHI": {
       "addr": "0x801644E0",
       "kind": "function",
       "section": ".text",
@@ -30869,10 +30866,9 @@
       "section": ".text",
       "size": "0x28"
     },
-    "fn_801657F8": {
+    "soundStop": {
       "addr": "0x801657F8",
       "kind": "function",
-      "proposed": "sndStop",
       "section": ".text",
       "size": "0x104"
     },
@@ -31304,7 +31300,7 @@
       "section": ".text",
       "size": "0x38"
     },
-    "fn_80167BE8": {
+    "_gsdvdErrorTask_801879AC": {
       "addr": "0x80167BE8",
       "kind": "function",
       "section": ".text",
@@ -31472,14 +31468,14 @@
       "section": ".text",
       "size": "0x330"
     },
-    "fn_80168C64": {
+    "_psListGetFirst": {
       "addr": "0x80168C64",
       "kind": "function",
       "proposed": "pslist_LinkAssert",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_80168CD0": {
+    "_psListDelete": {
       "addr": "0x80168CD0",
       "kind": "function",
       "proposed": "pslist_UnlinkAssert",
@@ -31594,13 +31590,13 @@
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_8016972C": {
+    "psSetPointJObjNodup": {
       "addr": "0x8016972C",
       "kind": "function",
       "section": ".text",
       "size": "0xD4"
     },
-    "fn_80169800": {
+    "psSetPointJObj": {
       "addr": "0x80169800",
       "kind": "function",
       "section": ".text",
@@ -31642,7 +31638,7 @@
       "section": ".text",
       "size": "0x160"
     },
-    "fn_8016A17C": {
+    "psInitDataBank": {
       "addr": "0x8016A17C",
       "kind": "function",
       "section": ".text",
@@ -31786,7 +31782,7 @@
       "section": ".text",
       "size": "0x130"
     },
-    "fn_8016F430": {
+    "psInterpretParticles": {
       "addr": "0x8016F430",
       "kind": "function",
       "proposed": "psinterpret_ObjRefAssert",
@@ -31860,13 +31856,13 @@
       "section": ".text",
       "size": "0xDC"
     },
-    "fn_80172BBC": {
+    "applyForceJObj": {
       "addr": "0x80172BBC",
       "kind": "function",
       "section": ".text",
       "size": "0x144"
     },
-    "fn_80172D00": {
+    "setVelToJObj": {
       "addr": "0x80172D00",
       "kind": "function",
       "section": ".text",
@@ -31896,7 +31892,7 @@
       "section": ".text",
       "size": "0x38"
     },
-    "fn_80173624": {
+    "psSetBillboardCamera": {
       "addr": "0x80173624",
       "kind": "function",
       "section": ".text",
@@ -31908,13 +31904,13 @@
       "section": ".text",
       "size": "0x880"
     },
-    "fn_80173F98": {
+    "psExecGenerator": {
       "addr": "0x80173F98",
       "kind": "function",
       "section": ".text",
       "size": "0x2B4"
     },
-    "fn_8017424C": {
+    "generateParticle_801947D4": {
       "addr": "0x8017424C",
       "kind": "function",
       "proposed": "generator_Main",
@@ -31951,7 +31947,7 @@
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80175E88": {
+    "genPosUpdate": {
       "addr": "0x80175E88",
       "kind": "function",
       "section": ".text",
@@ -32215,49 +32211,49 @@
       "section": ".text",
       "size": "0xD0"
     },
-    "fn_80177830": {
+    "GSscene_GetCameraRotationVector": {
       "addr": "0x80177830",
       "kind": "function",
       "section": ".text",
       "size": "0x28"
     },
-    "fn_80177858": {
+    "GSscene_SetCameraRotationVector": {
       "addr": "0x80177858",
       "kind": "function",
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801778B4": {
+    "GSscene_GetCameraDirectionVector": {
       "addr": "0x801778B4",
       "kind": "function",
       "section": ".text",
       "size": "0x28"
     },
-    "fn_801778DC": {
+    "GSscene_SetCameraDirectionVector": {
       "addr": "0x801778DC",
       "kind": "function",
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_80177908": {
+    "GSscene_GetCameraPositionVector": {
       "addr": "0x80177908",
       "kind": "function",
       "section": ".text",
       "size": "0x28"
     },
-    "fn_80177930": {
+    "GSscene_SetCameraPositionVector": {
       "addr": "0x80177930",
       "kind": "function",
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_8017795C": {
+    "GSscene_GetCameraViewVector": {
       "addr": "0x8017795C",
       "kind": "function",
       "section": ".text",
       "size": "0x28"
     },
-    "fn_80177984": {
+    "GSscene_SetCameraViewVector": {
       "addr": "0x80177984",
       "kind": "function",
       "section": ".text",
@@ -32281,13 +32277,13 @@
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_80177A38": {
+    "GSscene_GetMode": {
       "addr": "0x80177A38",
       "kind": "function",
       "section": ".text",
       "size": "0xC"
     },
-    "fn_80177A44": {
+    "GSscene_SetMode": {
       "addr": "0x80177A44",
       "kind": "function",
       "section": ".text",
@@ -33842,10 +33838,9 @@
       "section": ".text",
       "size": "0x2E8"
     },
-    "fn_80190C90": {
+    "GSflagInitBitPos": {
       "addr": "0x80190C90",
       "kind": "function",
-      "proposed": "GSflagSetBitValue",
       "section": ".text",
       "size": "0x1A4"
     },
@@ -33906,23 +33901,23 @@
     "fn_801914F4": {
       "addr": "0x801914F4",
       "kind": "function",
-      "proposed": "HSD_WObjInit",
+
       "section": ".text",
       "size": "0x98"
     },
-    "fn_8019158C": {
+    "WObjAmnesia": {
       "addr": "0x8019158C",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801915D4": {
+    "WObjRelease": {
       "addr": "0x801915D4",
       "kind": "function",
       "section": ".text",
       "size": "0x54"
     },
-    "fn_80191628": {
+    "HSD_WObjAlloc": {
       "addr": "0x80191628",
       "kind": "function",
       "section": ".text",
@@ -33934,31 +33929,31 @@
       "section": ".text",
       "size": "0x100"
     },
-    "fn_80191788": {
+    "HSD_WObjSetPosition": {
       "addr": "0x80191788",
       "kind": "function",
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801917D0": {
+    "HSD_WObjLoadDesc": {
       "addr": "0x801917D0",
       "kind": "function",
       "section": ".text",
       "size": "0xCC"
     },
-    "fn_8019189C": {
+    "HSD_WObjInit": {
       "addr": "0x8019189C",
       "kind": "function",
       "section": ".text",
       "size": "0xB0"
     },
-    "fn_8019194C": {
+    "WObjLoad": {
       "addr": "0x8019194C",
       "kind": "function",
       "section": ".text",
       "size": "0xA0"
     },
-    "fn_801919EC": {
+    "HSD_WObjInterpretAnim": {
       "addr": "0x801919EC",
       "kind": "function",
       "section": ".text",
@@ -33970,31 +33965,31 @@
       "section": ".text",
       "size": "0x398"
     },
-    "fn_80191DCC": {
+    "HSD_WObjAddAnim": {
       "addr": "0x80191DCC",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_80191E38": {
+    "HSD_WObjReqAnim": {
       "addr": "0x80191E38",
       "kind": "function",
       "section": ".text",
       "size": "0x50"
     },
-    "fn_80191E88": {
+    "HSD_WObjRemoveAnim": {
       "addr": "0x80191E88",
       "kind": "function",
       "section": ".text",
       "size": "0x44"
     },
-    "fn_80191ECC": {
+    "HSD_ArchiveGetPublicAddress": {
       "addr": "0x80191ECC",
       "kind": "function",
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80191F64": {
+    "HSD_ArchiveParse": {
       "addr": "0x80191F64",
       "kind": "function",
       "section": ".text",
@@ -34122,55 +34117,55 @@
       "section": ".text",
       "size": "0x60"
     },
-    "fn_801942B8": {
+    "HSD_CObjGetCurrent": {
       "addr": "0x801942B8",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801942C0": {
+    "HSD_CObjGetOrtho": {
       "addr": "0x801942C0",
       "kind": "function",
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_8019431C": {
+    "HSD_CObjGetPerspective": {
       "addr": "0x8019431C",
       "kind": "function",
       "section": ".text",
       "size": "0x3C"
     },
-    "fn_80194358": {
+    "HSD_CObjSetOrtho": {
       "addr": "0x80194358",
       "kind": "function",
       "section": ".text",
       "size": "0x24"
     },
-    "fn_8019437C": {
+    "HSD_CObjSetFrustum": {
       "addr": "0x8019437C",
       "kind": "function",
       "section": ".text",
       "size": "0x24"
     },
-    "fn_801943A0": {
+    "HSD_CObjSetPerspective": {
       "addr": "0x801943A0",
       "kind": "function",
       "section": ".text",
       "size": "0x1C"
     },
-    "fn_801943BC": {
+    "HSD_CObjSetProjectionType": {
       "addr": "0x801943BC",
       "kind": "function",
       "section": ".text",
       "size": "0x10"
     },
-    "fn_801943CC": {
+    "HSD_CObjGetProjectionType": {
       "addr": "0x801943CC",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801943E4": {
+    "HSD_CObjSetViewportfx4": {
       "addr": "0x801943E4",
       "kind": "function",
       "section": ".text",
@@ -34182,31 +34177,31 @@
       "section": ".text",
       "size": "0xA4"
     },
-    "fn_801944A4": {
+    "HSD_CObjSetScissorx4": {
       "addr": "0x801944A4",
       "kind": "function",
       "section": ".text",
       "size": "0x1C"
     },
-    "fn_801944C0": {
+    "HSD_CObjSetFar": {
       "addr": "0x801944C0",
       "kind": "function",
       "section": ".text",
       "size": "0x10"
     },
-    "fn_801944D0": {
+    "HSD_CObjGetFar": {
       "addr": "0x801944D0",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801944E8": {
+    "HSD_CObjSetNear": {
       "addr": "0x801944E8",
       "kind": "function",
       "section": ".text",
       "size": "0x10"
     },
-    "fn_801944F8": {
+    "HSD_CObjGetNear": {
       "addr": "0x801944F8",
       "kind": "function",
       "section": ".text",
@@ -34236,13 +34231,13 @@
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80194788": {
+    "HSD_CObjSetAspect": {
       "addr": "0x80194788",
       "kind": "function",
       "section": ".text",
       "size": "0x20"
     },
-    "fn_801947A8": {
+    "HSD_CObjSetFov": {
       "addr": "0x801947A8",
       "kind": "function",
       "section": ".text",
@@ -34260,25 +34255,25 @@
       "section": ".text",
       "size": "0x98"
     },
-    "fn_80194CC4": {
+    "HSD_CObjGetViewingMtxPtr": {
       "addr": "0x80194CC4",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_80194CF4": {
+    "HSD_CObjGetInvViewingMtxPtrDirect": {
       "addr": "0x80194CF4",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_80194D60": {
+    "HSD_CObjGetViewingMtx": {
       "addr": "0x80194D60",
       "kind": "function",
       "section": ".text",
       "size": "0x34"
     },
-    "fn_80194D94": {
+    "HSD_CObjSetMtxDirty": {
       "addr": "0x80194D94",
       "kind": "function",
       "section": ".text",
@@ -34290,7 +34285,7 @@
       "section": ".text",
       "size": "0x32C"
     },
-    "fn_801950D0": {
+    "HSD_CObjGetUpVector": {
       "addr": "0x801950D0",
       "kind": "function",
       "section": ".text",
@@ -34314,25 +34309,25 @@
       "section": ".text",
       "size": "0x104"
     },
-    "fn_80195898": {
+    "HSD_CObjSetEyePosition": {
       "addr": "0x80195898",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_80195904": {
+    "HSD_CObjGetEyePosition": {
       "addr": "0x80195904",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_80195970": {
+    "HSD_CObjSetInterest": {
       "addr": "0x80195970",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_801959DC": {
+    "HSD_CObjGetInterest": {
       "addr": "0x801959DC",
       "kind": "function",
       "section": ".text",
@@ -34368,13 +34363,13 @@
       "section": ".text",
       "size": "0x2B8"
     },
-    "fn_80196698": {
+    "HSD_CObjReqAnim": {
       "addr": "0x80196698",
       "kind": "function",
       "section": ".text",
       "size": "0x64"
     },
-    "fn_801966FC": {
+    "HSD_CObjAnim": {
       "addr": "0x801966FC",
       "kind": "function",
       "section": ".text",
@@ -34386,13 +34381,13 @@
       "section": ".text",
       "size": "0x3C4"
     },
-    "fn_80196B10": {
+    "HSD_CObjAddAnim": {
       "addr": "0x80196B10",
       "kind": "function",
       "section": ".text",
       "size": "0xA8"
     },
-    "fn_80196BB8": {
+    "HSD_CObjRemoveAnim": {
       "addr": "0x80196BB8",
       "kind": "function",
       "section": ".text",
@@ -34541,7 +34536,7 @@
     "fn_80198F7C": {
       "addr": "0x80198F7C",
       "kind": "function",
-      "proposed": "HSD_DObjInit",
+      "proposed": "fn_80198F7C",
       "section": ".text",
       "size": "0x98"
     },
@@ -34563,13 +34558,13 @@
       "section": ".text",
       "size": "0xC0"
     },
-    "fn_80199178": {
+    "HSD_DObjCountVertices": {
       "addr": "0x80199178",
       "kind": "function",
       "section": ".text",
       "size": "0x80"
     },
-    "fn_801991F8": {
+    "HSD_DObjResolveRefsAll": {
       "addr": "0x801991F8",
       "kind": "function",
       "section": ".text",
@@ -34593,37 +34588,37 @@
       "section": ".text",
       "size": "0x1C4"
     },
-    "fn_80199568": {
+    "HSD_DObjAnimAll": {
       "addr": "0x80199568",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_801995D4": {
+    "HSD_DObjReqAnimAllByFlags": {
       "addr": "0x801995D4",
       "kind": "function",
       "section": ".text",
       "size": "0x80"
     },
-    "fn_80199654": {
+    "HSD_DObjAddAnimAll": {
       "addr": "0x80199654",
       "kind": "function",
       "section": ".text",
       "size": "0xB0"
     },
-    "fn_80199704": {
+    "HSD_DObjSetCurrent": {
       "addr": "0x80199704",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_8019970C": {
+    "HSD_FObjFree": {
       "addr": "0x8019970C",
       "kind": "function",
       "section": ".text",
       "size": "0x2C"
     },
-    "fn_80199738": {
+    "HSD_FObjAlloc": {
       "addr": "0x80199738",
       "kind": "function",
       "section": ".text",
@@ -34659,46 +34654,46 @@
       "section": ".text",
       "size": "0x1244"
     },
-    "fn_8019B490": {
+    "HSD_FObjStopAnimAll": {
       "addr": "0x8019B490",
       "kind": "function",
       "section": ".text",
       "size": "0x98"
     },
-    "fn_8019B528": {
+    "HSD_FObjReqAnimAll": {
       "addr": "0x8019B528",
       "kind": "function",
       "section": ".text",
       "size": "0xC0"
     },
-    "fn_8019B5E8": {
+    "HSD_FObjRemoveAll": {
       "addr": "0x8019B5E8",
       "kind": "function",
       "section": ".text",
       "size": "0x168"
     },
-    "fn_8019B750": {
+    "HSD_FObjRemove": {
       "addr": "0x8019B750",
       "kind": "function",
       "section": ".text",
       "size": "0x34"
     },
-    "fn_8019B784": {
+    "HSD_FObjInitAllocData": {
       "addr": "0x8019B784",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_8019B7B4": {
+    "HSD_FObjGetAllocData": {
       "addr": "0x8019B7B4",
       "kind": "function",
       "section": ".text",
       "size": "0xC"
     },
-    "fn_8019B7C0": {
+    "HSD_FogAdjInit": {
       "addr": "0x8019B7C0",
       "kind": "function",
-      "proposed": "HSD_FogAdjInit",
+
       "section": ".text",
       "size": "0x48"
     },
@@ -34738,13 +34733,13 @@
       "section": ".text",
       "size": "0x110"
     },
-    "fn_8019C0F8": {
+    "_HSD_IDForgetMemory": {
       "addr": "0x8019C0F8",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_8019C128": {
+    "HSD_IDGetDataFromTable": {
       "addr": "0x8019C128",
       "kind": "function",
       "section": ".text",
@@ -34762,19 +34757,19 @@
       "section": ".text",
       "size": "0xF4"
     },
-    "fn_8019C358": {
+    "HSD_IDSetup": {
       "addr": "0x8019C358",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_8019C388": {
+    "HSD_IDInitAllocData": {
       "addr": "0x8019C388",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_8019C3B8": {
+    "HSD_IDGetAllocData": {
       "addr": "0x8019C3B8",
       "kind": "function",
       "section": ".text",
@@ -34817,7 +34812,7 @@
       "section": ".text",
       "size": "0x8"
     },
-    "fn_8019C7B8": {
+    "_HSD_MemCheckOwnDefaultCB": {
       "addr": "0x8019C7B8",
       "kind": "function",
       "section": ".text",
@@ -35031,19 +35026,19 @@
       "section": ".text",
       "size": "0x158"
     },
-    "fn_801A0744": {
+    "HSD_JObjResolveRefsAll": {
       "addr": "0x801A0744",
       "kind": "function",
       "section": ".text",
       "size": "0x458"
     },
-    "fn_801A0B9C": {
+    "HSD_JObjRef": {
       "addr": "0x801A0B9C",
       "kind": "function",
       "section": ".text",
       "size": "0x54"
     },
-    "fn_801A0BF0": {
+    "HSD_IDGetData": {
       "addr": "0x801A0BF0",
       "kind": "function",
       "section": ".text",
@@ -35260,7 +35255,7 @@
       "section": ".text",
       "size": "0x174"
     },
-    "fn_801A426C": {
+    "HSD_LObjAddAnimAll": {
       "addr": "0x801A426C",
       "kind": "function",
       "section": ".text",
@@ -35278,31 +35273,31 @@
       "section": ".text",
       "size": "0x470"
     },
-    "fn_801A48B0": {
+    "HSD_LObjGetInterest": {
       "addr": "0x801A48B0",
       "kind": "function",
       "section": ".text",
       "size": "0x44"
     },
-    "fn_801A48F4": {
+    "HSD_LObjSetInterest": {
       "addr": "0x801A48F4",
       "kind": "function",
       "section": ".text",
       "size": "0x88"
     },
-    "fn_801A497C": {
+    "HSD_LObjGetPosition": {
       "addr": "0x801A497C",
       "kind": "function",
       "section": ".text",
       "size": "0x44"
     },
-    "fn_801A49C0": {
+    "HSD_LObjSetPosition": {
       "addr": "0x801A49C0",
       "kind": "function",
       "section": ".text",
       "size": "0x88"
     },
-    "fn_801A4A48": {
+    "HSD_LObjSetColor": {
       "addr": "0x801A4A48",
       "kind": "function",
       "section": ".text",
@@ -35314,13 +35309,13 @@
       "section": ".text",
       "size": "0x70"
     },
-    "fn_801A4AC4": {
+    "HSD_LObjGetCurrentByType": {
       "addr": "0x801A4AC4",
       "kind": "function",
       "section": ".text",
       "size": "0x3C"
     },
-    "fn_801A4B00": {
+    "HSD_LObjDeleteCurrentAll": {
       "addr": "0x801A4B00",
       "kind": "function",
       "section": ".text",
@@ -35332,7 +35327,7 @@
       "section": ".text",
       "size": "0x234"
     },
-    "fn_801A4F54": {
+    "HSD_LObjSetup": {
       "addr": "0x801A4F54",
       "kind": "function",
       "section": ".text",
@@ -35356,79 +35351,79 @@
       "section": ".text",
       "size": "0x164"
     },
-    "fn_801A6370": {
+    "HSD_LObjReqAnimAll": {
       "addr": "0x801A6370",
       "kind": "function",
       "section": ".text",
       "size": "0x98"
     },
-    "fn_801A6408": {
+    "HSD_LObjAnimAll": {
       "addr": "0x801A6408",
       "kind": "function",
       "section": ".text",
       "size": "0x8C"
     },
-    "fn_801A6494": {
+    "LObjUpdateFunc": {
       "addr": "0x801A6494",
       "kind": "function",
       "section": ".text",
       "size": "0x24C"
     },
-    "fn_801A66E0": {
+    "HSD_LObjRemoveAnimAll": {
       "addr": "0x801A66E0",
       "kind": "function",
       "section": ".text",
       "size": "0xAC"
     },
-    "fn_801A678C": {
+    "HSD_LObjGetActiveByIndex": {
       "addr": "0x801A678C",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_801A67BC": {
+    "HSD_LObjGetActiveByID": {
       "addr": "0x801A67BC",
       "kind": "function",
       "section": ".text",
       "size": "0x114"
     },
-    "fn_801A68D0": {
+    "HSD_LObjGetNbActive": {
       "addr": "0x801A68D0",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A68D8": {
+    "HSD_LObjGetLightMaskSpecular": {
       "addr": "0x801A68D8",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A68E0": {
+    "HSD_LObjGetLightMaskAlpha": {
       "addr": "0x801A68E0",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A68E8": {
+    "HSD_LObjGetLightMaskAttnFunc": {
       "addr": "0x801A68E8",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A68F0": {
+    "HSD_LObjGetLightMaskDiffuse": {
       "addr": "0x801A68F0",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A68F8": {
+    "HSD_LObjClearFlags": {
       "addr": "0x801A68F8",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801A6910": {
+    "HSD_LObjSetFlags": {
       "addr": "0x801A6910",
       "kind": "function",
       "section": ".text",
@@ -35496,7 +35491,7 @@
       "section": ".text",
       "size": "0x54"
     },
-    "fn_801A6D5C": {
+    "HSD_MObjAddTObjNext": {
       "addr": "0x801A6D5C",
       "kind": "function",
       "section": ".text",
@@ -35526,13 +35521,13 @@
       "section": ".text",
       "size": "0x24"
     },
-    "fn_801A6E24": {
+    "HSD_MObjSetup": {
       "addr": "0x801A6E24",
       "kind": "function",
       "section": ".text",
       "size": "0x154"
     },
-    "fn_801A6F78": {
+    "MObjSetupTev": {
       "addr": "0x801A6F78",
       "kind": "function",
       "section": ".text",
@@ -35574,13 +35569,13 @@
       "section": ".text",
       "size": "0x48"
     },
-    "fn_801A7E84": {
+    "MObjUpdateFunc": {
       "addr": "0x801A7E84",
       "kind": "function",
       "section": ".text",
       "size": "0x4D0"
     },
-    "fn_801A8354": {
+    "HSD_MObjReqAnimByFlags": {
       "addr": "0x801A8354",
       "kind": "function",
       "section": ".text",
@@ -35592,79 +35587,79 @@
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_801A8428": {
+    "HSD_MObjClearFlags": {
       "addr": "0x801A8428",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801A8440": {
+    "HSD_MObjSetFlags": {
       "addr": "0x801A8440",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801A8458": {
+    "HSD_MObjGetFlags": {
       "addr": "0x801A8458",
       "kind": "function",
       "section": ".text",
       "size": "0x18"
     },
-    "fn_801A8470": {
+    "HSD_MObjSetCurrent": {
       "addr": "0x801A8470",
       "kind": "function",
       "section": ".text",
       "size": "0x8"
     },
-    "fn_801A8478": {
+    "HSD_MtxInitAllocData": {
       "addr": "0x801A8478",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_801A84A8": {
+    "HSD_MtxGetAllocData": {
       "addr": "0x801A84A8",
       "kind": "function",
       "section": ".text",
       "size": "0xC"
     },
-    "fn_801A84B4": {
+    "HSD_VecInitAllocData": {
       "addr": "0x801A84B4",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_801A84E4": {
+    "HSD_VecGetAllocData": {
       "addr": "0x801A84E4",
       "kind": "function",
       "section": ".text",
       "size": "0xC"
     },
-    "fn_801A84F0": {
+    "HSD_MtxFree": {
       "addr": "0x801A84F0",
       "kind": "function",
       "section": ".text",
       "size": "0x34"
     },
-    "fn_801A8524": {
+    "HSD_MtxAlloc": {
       "addr": "0x801A8524",
       "kind": "function",
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_801A8570": {
+    "HSD_VecFree": {
       "addr": "0x801A8570",
       "kind": "function",
       "section": ".text",
       "size": "0x34"
     },
-    "fn_801A85A4": {
+    "HSD_VecAlloc": {
       "addr": "0x801A85A4",
       "kind": "function",
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_801A85F0": {
+    "HSD_MtxScaledAdd": {
       "addr": "0x801A85F0",
       "kind": "function",
       "section": ".text",
@@ -35694,7 +35689,7 @@
       "section": ".text",
       "size": "0x854"
     },
-    "fn_801A9570": {
+    "HSD_MtxGetTranslate": {
       "addr": "0x801A9570",
       "kind": "function",
       "section": ".text",
@@ -35730,25 +35725,25 @@
       "section": ".text",
       "size": "0x13C"
     },
-    "fn_801AA498": {
+    "HSD_ObjFree": {
       "addr": "0x801AA498",
       "kind": "function",
       "section": ".text",
       "size": "0x34"
     },
-    "fn_801AA4CC": {
+    "HSD_ObjAlloc": {
       "addr": "0x801AA4CC",
       "kind": "function",
       "section": ".text",
       "size": "0x6C"
     },
-    "fn_801AA538": {
+    "HSD_ObjSetHeap": {
       "addr": "0x801AA538",
       "kind": "function",
       "section": ".text",
       "size": "0x30"
     },
-    "fn_801AA568": {
+    "ObjInfoInit_802596A4": {
       "addr": "0x801AA568",
       "kind": "function",
       "section": ".text",
@@ -35760,7 +35755,7 @@
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801AA608": {
+    "HSD_PObjInit": {
       "addr": "0x801AA608",
       "kind": "function",
       "proposed": "HSD_PObjInit",
@@ -35869,7 +35864,7 @@
       "section": ".text",
       "size": "0x1D0"
     },
-    "fn_801AD214": {
+    "HSD_PObjRemoveAll": {
       "addr": "0x801AD214",
       "kind": "function",
       "section": ".text",
@@ -35887,19 +35882,19 @@
       "section": ".text",
       "size": "0x2C8"
     },
-    "fn_801AD61C": {
+    "HSD_PObjAnimAll": {
       "addr": "0x801AD61C",
       "kind": "function",
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801AD678": {
+    "PObjUpdateFunc": {
       "addr": "0x801AD678",
       "kind": "function",
       "section": ".text",
       "size": "0x4C"
     },
-    "fn_801AD6C4": {
+    "HSD_PObjReqAnimAllByFlags": {
       "addr": "0x801AD6C4",
       "kind": "function",
       "section": ".text",
@@ -35923,7 +35918,7 @@
       "section": ".text",
       "size": "0x15C"
     },
-    "fn_801ADC08": {
+    "_HSD_RandForgetMemory": {
       "addr": "0x801ADC08",
       "kind": "function",
       "section": ".text",
@@ -36073,7 +36068,7 @@
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801B009C": {
+    "RObjUpdateFunc": {
       "addr": "0x801B009C",
       "kind": "function",
       "section": ".text",
@@ -36684,19 +36679,19 @@
       "section": ".text",
       "size": "0x5C"
     },
-    "fn_801BBD3C": {
+    "HSD_ImageDescFree": {
       "addr": "0x801BBD3C",
       "kind": "function",
       "section": ".text",
       "size": "0x24"
     },
-    "fn_801BBD60": {
+    "HSD_ImageDescRemove": {
       "addr": "0x801BBD60",
       "kind": "function",
       "section": ".text",
       "size": "0x24"
     },
-    "fn_801BBD84": {
+    "HSD_ImageDescAlloc": {
       "addr": "0x801BBD84",
       "kind": "function",
       "section": ".text",
@@ -52385,7 +52380,7 @@
       "section": ".text",
       "size": "0x24"
     },
-    "fn_8025DBD4": {
+    "tableResBiosGetResPtr": {
       "addr": "0x8025DBD4",
       "kind": "function",
       "section": ".text",
@@ -52697,7 +52692,7 @@
       "section": ".text",
       "size": "0x70"
     },
-    "fn_80261444": {
+    "charNameBiosGetHearFlag": {
       "addr": "0x80261444",
       "kind": "function",
       "section": ".text",

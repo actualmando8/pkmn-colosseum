@@ -49,7 +49,7 @@
  *
  * HSD integration (lbl_80315490):
  *   The GSmaterial class descriptor is registered with HSD's object system
- *   at lbl_80315490.  fn_800DF8CC installs the class info, render callback
+ *   at lbl_80315490.  _GSmaterialObjInit_800EF33C installs the class info, render callback
  *   (fn_800DFE98), and setup callback (fn_800DF930) into this descriptor.
  */
 #ifndef GS_MATERIAL_H
@@ -122,24 +122,24 @@
  * Pool stored at lbl_8047AB74, count at lbl_8047AB78.
  *
  * Field offsets recovered from the accessor functions in the range:
- *   fn_800E3B44  -- set/clear GSMAT_FLAG_SHADOW (bit 10) at +0x00
- *   fn_800E3B6C  -- search pool by MObj pointer, stride 0x170
- *   fn_800E3BF0  -- return +0x148 (userdata)
- *   fn_800E3BF8  -- return +0x144 (texture)
- *   fn_800E3C00  -- store r4 into +0x148
- *   fn_800E3C08  -- set +0x144 (texture) and call env-map update
- *   fn_800E3C5C  -- return +0x4C (transform matrix)
- *   fn_800E3C94  -- set/clear bit 20 (oris 0x10) at +0x00
- *   fn_800E3CBC  -- extract bit 22 from +0x00
- *   fn_800E3CC8  -- set/clear GSMAT_FLAG_ENVMAP (bit 9) at +0x00
- *   fn_800E3CF0  -- return +0x30 (specular color)
- *   fn_800E3CF8  -- return +0x24 (ambient color)
- *   fn_800E3D00  -- return +0x18 (diffuse color)
- *   fn_800E3D08  -- extract bit 0 (active) from +0x00
- *   fn_800E3D14  -- pass +0x3C to color-lerp fn (PE descriptor ptr)
- *   fn_800E3D40  -- pass +0x30 to color-lerp fn (specular)
- *   fn_800E3D6C  -- pass +0x24 to color-lerp fn (ambient)
- *   fn_800E3D98  -- pass +0x18 to color-lerp fn (diffuse)
+ *   GSmaterialSetShadowFlag  -- set/clear GSMAT_FLAG_SHADOW (bit 10) at +0x00
+ *   GSmaterialFindByMObj  -- search pool by MObj pointer, stride 0x170
+ *   GSmaterialGetUserData  -- return +0x148 (userdata)
+ *   GSmaterialGetTexture  -- return +0x144 (texture)
+ *   GSmaterialSetUserData  -- store r4 into +0x148
+ *   GSmaterialSetTexture  -- set +0x144 (texture) and call env-map update
+ *   GSmaterialGetTransformPtr  -- return +0x4C (transform matrix)
+ *   GSmaterialSetCustomPEFlag  -- set/clear bit 20 (oris 0x10) at +0x00
+ *   GSmaterialGetTexStage  -- extract bit 22 from +0x00
+ *   GSmaterialSetEnvMapFlag  -- set/clear GSMAT_FLAG_ENVMAP (bit 9) at +0x00
+ *   GSmaterialGetSpecularPtr  -- return +0x30 (specular color)
+ *   GSmaterialGetAmbientPtr  -- return +0x24 (ambient color)
+ *   GSmaterialGetDiffusePtr  -- return +0x18 (diffuse color)
+ *   GSmaterialIsActive  -- extract bit 0 (active) from +0x00
+ *   GSmaterialLerpPEColor  -- pass +0x3C to color-lerp fn (PE descriptor ptr)
+ *   GSmaterialLerpSpecular  -- pass +0x30 to color-lerp fn (specular)
+ *   GSmaterialLerpAmbient  -- pass +0x24 to color-lerp fn (ambient)
+ *   GSmaterialLerpDiffuse  -- pass +0x18 to color-lerp fn (diffuse)
  *   fn_800E3DC4  -- large function accessing +0x08, +0x24, +0x114, +0x98
  * =================================================================== */
 typedef struct GSmaterialEntry {
@@ -221,7 +221,7 @@ typedef struct GSmaterialEntry {
  *   - Render callback fn_800DFE98
  *   - Setup callback fn_800DF930
  *
- * Corresponds to fn_800DF8CC.
+ * Corresponds to _GSmaterialObjInit_800EF33C.
  */
 
 /**
@@ -300,7 +300,7 @@ typedef struct GSmaterialEntry {
  *
  * @return  Value of lbl_8047AB78 (max materials).
  *
- * Corresponds to fn_800E3B3C. Size: 0x8.
+ * Corresponds to GSmaterialGetPoolCount. Size: 0x8.
  */
 u32 GSmaterialGetPoolCount(void);
 
@@ -312,7 +312,7 @@ u32 GSmaterialGetPoolCount(void);
  *
  * Manipulates bit 10 (0x400) of entry->flags.
  *
- * Corresponds to fn_800E3B44. Size: 0x28.
+ * Corresponds to GSmaterialSetShadowFlag. Size: 0x28.
  */
 void GSmaterialSetShadowFlag(GSmaterialEntry* entry, u8 enable);
 
@@ -325,7 +325,7 @@ void GSmaterialSetShadowFlag(GSmaterialEntry* entry, u8 enable);
  * Iterates the pool at stride 0x170, checking either +0x08 or +0x0C
  * depending on the GSMAT_FLAG_RENDERTYPE bit.
  *
- * Corresponds to fn_800E3B6C. Size: 0x54.
+ * Corresponds to GSmaterialFindByMObj. Size: 0x54.
  */
 GSmaterialEntry* GSmaterialFindByMObj(void* mobj);
 
@@ -347,7 +347,7 @@ void GSmaterialGetGXTexGenSrc(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        entry->userData at offset 0x148.
  *
- * Corresponds to fn_800E3BF0. Size: 0x8.
+ * Corresponds to GSmaterialGetUserData. Size: 0x8.
  */
 void* GSmaterialGetUserData(GSmaterialEntry* entry);
 
@@ -357,7 +357,7 @@ void* GSmaterialGetUserData(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        entry->texture at offset 0x144.
  *
- * Corresponds to fn_800E3BF8. Size: 0x8.
+ * Corresponds to GSmaterialGetTexture. Size: 0x8.
  */
 void* GSmaterialGetTexture(GSmaterialEntry* entry);
 
@@ -367,7 +367,7 @@ void* GSmaterialGetTexture(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param data    Arbitrary pointer to store.
  *
- * Corresponds to fn_800E3C00. Size: 0x8.
+ * Corresponds to GSmaterialSetUserData. Size: 0x8.
  */
 void GSmaterialSetUserData(GSmaterialEntry* entry, void* data);
 
@@ -381,7 +381,7 @@ void GSmaterialSetUserData(GSmaterialEntry* entry, void* data);
  * update function (fn_800ECA78) with the material's alpha value,
  * and calls fn_800EC134 to refresh the GX state.
  *
- * Corresponds to fn_800E3C08. Size: 0x54.
+ * Corresponds to GSmaterialSetTexture. Size: 0x54.
  */
 void GSmaterialSetTexture(GSmaterialEntry* entry, void* tex);
 
@@ -392,7 +392,7 @@ void GSmaterialSetTexture(GSmaterialEntry* entry, void* tex);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        Pointer to the 3x4 matrix (12 floats).
  *
- * Corresponds to fn_800E3C5C. Size: 0x8.
+ * Corresponds to GSmaterialGetTransformPtr. Size: 0x8.
  */
 f32* GSmaterialGetTransformPtr(GSmaterialEntry* entry);
 
@@ -405,7 +405,7 @@ f32* GSmaterialGetTransformPtr(GSmaterialEntry* entry);
  *
  * Calls fn_80191118 (MTXIsIdentity) on the matrix at +0x4C.
  *
- * Corresponds to fn_800E3C64. Size: 0x30.
+ * Corresponds to GSmaterialHasTransform. Size: 0x30.
  */
 u32 GSmaterialHasTransform(GSmaterialEntry* entry);
 
@@ -415,7 +415,7 @@ u32 GSmaterialHasTransform(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param enable  Non-zero to set (oris 0x10 = bit 20), zero to clear.
  *
- * Corresponds to fn_800E3C94. Size: 0x28.
+ * Corresponds to GSmaterialSetCustomPEFlag. Size: 0x28.
  */
 void GSmaterialSetCustomPEFlag(GSmaterialEntry* entry, u8 enable);
 
@@ -425,7 +425,7 @@ void GSmaterialSetCustomPEFlag(GSmaterialEntry* entry, u8 enable);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        Extracted single bit from position 22 of flags.
  *
- * Corresponds to fn_800E3CBC. Size: 0xC.
+ * Corresponds to GSmaterialGetTexStage. Size: 0xC.
  */
 u32 GSmaterialGetTexStage(GSmaterialEntry* entry);
 
@@ -435,7 +435,7 @@ u32 GSmaterialGetTexStage(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @param enable  Non-zero to set GSMAT_FLAG_ENVMAP (0x200), zero to clear.
  *
- * Corresponds to fn_800E3CC8. Size: 0x28.
+ * Corresponds to GSmaterialSetEnvMapFlag. Size: 0x28.
  */
 void GSmaterialSetEnvMapFlag(GSmaterialEntry* entry, u8 enable);
 
@@ -445,7 +445,7 @@ void GSmaterialSetEnvMapFlag(GSmaterialEntry* entry, u8 enable);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        Pointer to the 12-byte specular color block at +0x30.
  *
- * Corresponds to fn_800E3CF0. Size: 0x8.
+ * Corresponds to GSmaterialGetSpecularPtr. Size: 0x8.
  */
 void* GSmaterialGetSpecularPtr(GSmaterialEntry* entry);
 
@@ -455,7 +455,7 @@ void* GSmaterialGetSpecularPtr(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        Pointer to the 12-byte ambient color block at +0x24.
  *
- * Corresponds to fn_800E3CF8. Size: 0x8.
+ * Corresponds to GSmaterialGetAmbientPtr. Size: 0x8.
  */
 void* GSmaterialGetAmbientPtr(GSmaterialEntry* entry);
 
@@ -465,7 +465,7 @@ void* GSmaterialGetAmbientPtr(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        Pointer to the 12-byte diffuse color block at +0x18.
  *
- * Corresponds to fn_800E3D00. Size: 0x8.
+ * Corresponds to GSmaterialGetDiffusePtr. Size: 0x8.
  */
 void* GSmaterialGetDiffusePtr(GSmaterialEntry* entry);
 
@@ -475,27 +475,27 @@ void* GSmaterialGetDiffusePtr(GSmaterialEntry* entry);
  * @param entry   Pointer to a GSmaterialEntry.
  * @return        1 if bit 0 (GSMAT_FLAG_ACTIVE) is set, 0 otherwise.
  *
- * Corresponds to fn_800E3D08. Size: 0xC.
+ * Corresponds to GSmaterialIsActive. Size: 0xC.
  */
 u32 GSmaterialIsActive(GSmaterialEntry* entry);
 
 /* ===================================================================
- * Public API -- Color Interpolation (fn_800E3D14 - fn_800E3D98)
+ * Public API -- Color Interpolation (GSmaterialLerpPEColor - GSmaterialLerpDiffuse)
  *
  * These four functions pass material sub-structures and an interpolation
  * parameter to fn_800E01D0 (a GXColor lerp utility).
  * =================================================================== */
 
-/** Lerp custom PE descriptor color. Corresponds to fn_800E3D14. */
+/** Lerp custom PE descriptor color. Corresponds to GSmaterialLerpPEColor. */
 void GSmaterialLerpPEColor(GSmaterialEntry* entry, void* param);
 
-/** Lerp specular color. Corresponds to fn_800E3D40. */
+/** Lerp specular color. Corresponds to GSmaterialLerpSpecular. */
 void GSmaterialLerpSpecular(GSmaterialEntry* entry, void* param);
 
-/** Lerp ambient color. Corresponds to fn_800E3D6C. */
+/** Lerp ambient color. Corresponds to GSmaterialLerpAmbient. */
 void GSmaterialLerpAmbient(GSmaterialEntry* entry, void* param);
 
-/** Lerp diffuse color. Corresponds to fn_800E3D98. */
+/** Lerp diffuse color. Corresponds to GSmaterialLerpDiffuse. */
 void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
 
 /* ===================================================================
@@ -571,7 +571,7 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
  *
  * Stores into lbl_8047AB84 and lbl_8047AB80 respectively.
  *
- * Corresponds to fn_800E8F68. Size: 0xC.
+ * Corresponds to GSmaterialSetCallback. Size: 0xC.
  */
 void GSmaterialSetCallback(void* callback, void* state);
 
@@ -582,8 +582,9 @@ void GSmaterialSetCallback(void* callback, void* state);
  *
  * Stored at lbl_8047AB88 for LOD / distance-based material switching.
  *
- * Corresponds to fn_800E8F74. Size: 0xC.
+ * Corresponds to 0x800E8F74. Size: 0xC.
  */
+void GSmaterialSetDistanceThreshold(f32 dist);
 
 /**
  * GSmaterialCheckRenderSlot -- Check if a material entry is bound in
@@ -822,7 +823,7 @@ void GSmaterialSetCallback(void* callback, void* state);
 /**
  * GSmaterialConfigureFog -- Set up fog parameters for a material.
  *
- * Corresponds to fn_800EE08C. Size: 0x5C.
+ * Corresponds to _modelGetEndFrame. Size: 0x5C.
  */
 
 /**

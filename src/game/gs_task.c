@@ -20,7 +20,7 @@
  * Key functions:
  *   fn_80006630  GStask_InitCamera         -- calls GSscene_CameraSetPosition
  *   fn_80006654  GStask_LoadTopMenu         -- loads archive slot 6 (topmenu)
- *   fn_800066C4  GStask_SetSceneType        -- dispatches to fn_80177A44 based on mode
+ *   fn_800066C4  GStask_SetSceneType        -- dispatches to GSscene_SetMode based on mode
  *   fn_80006724  GStask_LoadPDAMenu         -- loads archive slot 6, priority 3 (pda_menu)
  *   fn_8000677C  GStask_LoadPocketMenu      -- loads archive slot 6, priority 2 (pocket_menu)
  *   fn_800067D4  GStask_LoadPCBoxMenu       -- loads archive slot 6, priority 1 (pcbox_menu)
@@ -86,7 +86,7 @@
 
 /* Scene system */
 extern void  fn_801794F0(void);                   /* GSscene_CameraSetPosition */
-extern void  fn_80177A44(s32 mode);               /* GSscene_SetMode */
+extern void  GSscene_SetMode(s32 mode);               /* GSscene_SetMode */
 
 /* FSYS archive loading */
 extern void* fn_801FB1C0(s32 slot, u16 sceneId, s32 priority, s32 group);
@@ -192,11 +192,11 @@ s32 GStask_LoadTopMenu(void) {
  * ========================================================================= */
 s32 GStask_SetSceneType(void* unused, s32 mode) {
     if (mode == 1) {
-        fn_80177A44(5);
+        GSscene_SetMode(5);
     } else if (mode == 2) {
-        fn_80177A44(6);
+        GSscene_SetMode(6);
     } else {
-        fn_80177A44(0);
+        GSscene_SetMode(0);
     }
     return 0;
 }
@@ -1341,7 +1341,7 @@ extern void fn_80207B8C(void* ptr, s32 a);
 extern s32  fn_800096B4(void* ptr, s32 a, u8* b, u8* c, u8* d, u8* e);
 extern u16  fn_8012640C(s32 a, u16 b, s32 c, s32 d);
 extern void fn_8010B01C(void* ptr, s32 a, s32 b);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern void fn_8010BBB8(void* ptr);
 extern s8   fn_8010BCE4(void);
 extern void* fn_80121C18(void* ptr);
@@ -1996,7 +1996,7 @@ s32 fn_80008014(void) {
 /* fn_8000804C - 0x8000804C | size: 0xf8 */
 extern void* fn_800FF560(void);
 extern void fn_8020DAD0(void);
-extern void* fn_800F07A8(s32 a, void* b, s32 c, s32 d, s32 e, void* f);
+extern void* GSthreadCreate(s32 a, void* b, s32 c, s32 d, s32 e, void* f);
 extern void fn_800F0654(void* task, s32 a, ...);
 extern u16 lbl_8047882C;
 extern u32 lbl_80478F50;
@@ -2037,7 +2037,7 @@ s32 fn_8000804C(void) {
             u16 saved;
             void* taskPtr;
             saved = lbl_8047882C;
-            taskPtr = fn_800F07A8(1, fn_800FF560(), 0x4000, 1, 1, (void*)fn_8020DAD0);
+            taskPtr = GSthreadCreate(1, fn_800FF560(), 0x4000, 1, 1, (void*)fn_8020DAD0);
             if (taskPtr != 0) {
                 fn_800F0654(taskPtr, 1, saved);
             }
@@ -2079,7 +2079,7 @@ u32 fn_80008184(u32 value) {
                 if ((held & buttons) & 0x100) {
                     break;
                 }
-                fn_800F0308();
+                _threadSwitch();
             }
         }
     }

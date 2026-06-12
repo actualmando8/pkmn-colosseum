@@ -22,7 +22,7 @@ extern void fn_800E209C();
 extern void fn_800E24B0();
 extern void fn_800E27B0();
 extern void fn_800E2C04();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800F9D24();
 extern void fn_801040A0();
 extern void fn_801040D0();
@@ -126,7 +126,7 @@ void fn_8007C300(void) {
         *(u8*)((u8*)r31 + 0xC8) = r0;
         r0 = *(u8*)((u8*)r31 + 0xB6);
         while (r0 != 0x0) {
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))fn_80104704)();
             ((void(*)(void))fn_801040A0)();
@@ -227,7 +227,7 @@ void fn_8007C450(void) {
         *(u8*)((u8*)r31 + 0xC8) = tmp;
         tmp = *(u8*)((u8*)r31 + 0xB6);
         while (tmp != 0) {
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))fn_80104704)();
             ((void(*)(void))fn_801040A0)();
@@ -316,7 +316,7 @@ void fn_8007C450(void) {
     while (1) {
         tmp = *(u8*)((u8*)r3 + 0xB6);
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))fn_80104704)();
         ((void(*)(void))fn_801040A0)();
@@ -344,7 +344,7 @@ void fn_8007C634(void) {
         *(u8*)((u8*)r4 + 0xC8) = tmp;
         tmp = *(u8*)((u8*)r4 + 0xB6);
         while (tmp != 0) {
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             r3 = 0xa6;
             ((void(*)(void))fn_80104704)();
             ((void(*)(void))fn_801040A0)();
@@ -394,7 +394,7 @@ void fn_8007C634(void) {
     while (1) {
         tmp = *(u8*)((u8*)r3 + 0xB6);
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))fn_80104704)();
         ((void(*)(void))fn_801040A0)();
@@ -613,7 +613,7 @@ void fn_8007C7EC(void) {
     while (1) {
         tmp = *(u8*)((u8*)r3 + 0xB6);
         if (tmp == 0) break;
-        ((void(*)(void))fn_800F0308)();
+        ((void(*)(void))_threadSwitch)();
         r3 = 0xa6;
         ((void(*)(void))fn_80104704)();
         ((void(*)(void))fn_801040A0)();

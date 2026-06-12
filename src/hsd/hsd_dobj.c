@@ -56,7 +56,7 @@ void HSD_DObjAddAnim(HSD_DObj* dobj, HSD_MatAnim* mat_anim,
     }
 }
 
-void HSD_DObjAddAnimAll(HSD_DObj* dobj, HSD_MatAnim* matanim,
+void HSD_DObjAddAnimAll_Early(HSD_DObj* dobj, HSD_MatAnim* matanim,
                         HSD_ShapeAnimDObj* shapeanimdobj)
 {
     HSD_DObj* d;
@@ -92,7 +92,7 @@ void HSD_DObjAnim(HSD_DObj* dobj)
     }
 }
 
-void HSD_DObjAnimAll(HSD_DObj* dobj)
+void HSD_DObjAnimAll_Early(HSD_DObj* dobj)
 {
     HSD_DObj* d;
     for (d = dobj; d != NULL; d = d->next) {
@@ -156,7 +156,7 @@ void HSD_DObjResolveRefs(HSD_DObj* dobj, HSD_DObjDesc* desc)
     }
 }
 
-void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc)
+void HSD_DObjResolveRefsAll_Early(HSD_DObj* dobj, HSD_DObjDesc* desc)
 {
     HSD_DObj* d;
     HSD_DObjDesc* dd;
@@ -258,7 +258,7 @@ asm void fn_80199014(void) {
 #include "src/hsd/hsd_dobj_fn_80199014.inc"
 }
 #else
-#pragma optimization_level 4
+#pragma optimization_level 1
 static void DObjDestroy(HSD_Class* o)
 {
     if (o == (HSD_Class*) default_class) {
@@ -274,7 +274,7 @@ static void DObjDestroy(HSD_Class* o)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_801A6D08(HSD_MObj* mobj);
-extern void fn_801AD214(HSD_PObj* pobj);
+extern void HSD_PObjRemoveAll(HSD_PObj* pobj);
 extern void fn_801C25E4(HSD_AObj* aobj);
 #if 0
 asm void fn_8019905C(void) {
@@ -286,7 +286,7 @@ static void fn_8019905C(HSD_Class* o)
 {
     HSD_DObj* dobj = HSD_DOBJ(o);
     fn_801A6D08(dobj->mobj);
-    fn_801AD214(dobj->pobj);
+    HSD_PObjRemoveAll(dobj->pobj);
     fn_801C25E4(dobj->aobj);
     HSD_PARENT_INFO(&hsdDObj)->init(o);
 }
@@ -297,7 +297,7 @@ static void fn_8019905C(HSD_Class* o)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801A8470(HSD_MObj* mobj);
+extern void HSD_MObjSetCurrent(HSD_MObj* mobj);
 #if 0
 asm void fn_801990B8(void) {
 #include "src/hsd/hsd_dobj_fn_801990B8.inc"
@@ -307,7 +307,7 @@ asm void fn_801990B8(void) {
 static void DObjDisp(HSD_DObj* dobj, void* vmtx, void* pmtx, u32 rendermode)
 {
     HSD_PObj* pobj;
-    fn_801A8470(dobj->mobj);
+    HSD_MObjSetCurrent(dobj->mobj);
     if (!(rendermode & 0x04000000)) {
         void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(dobj->mobj);
         ((void (*)(HSD_MObj*, u32)) vtbl[0x3C / 4])(dobj->mobj, rendermode);
@@ -320,7 +320,7 @@ static void DObjDisp(HSD_DObj* dobj, void* vmtx, void* pmtx, u32 rendermode)
         void (**vtbl)(void) = (void (**)(void)) HSD_CLASS_METHOD(dobj->mobj);
         ((void (*)(HSD_MObj*, u32)) vtbl[0x50 / 4])(dobj->mobj, rendermode);
     }
-    fn_801A8470(NULL);
+    HSD_MObjSetCurrent(NULL);
 }
 #endif
 #pragma pop
@@ -331,12 +331,12 @@ static void DObjDisp(HSD_DObj* dobj, void* vmtx, void* pmtx, u32 rendermode)
 #pragma optimizewithasm off
 extern void fn_801ACDAC(HSD_PObj* pobj, s32* out1, s32* out2);
 #if 0
-asm void fn_80199178(void) {
-#include "src/hsd/hsd_dobj_fn_80199178.inc"
+asm void HSD_DObjCountVertices(void) {
+#include "src/hsd/hsd_dobj_HSD_DObjCountVertices.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80199178(HSD_DObj* dobj, s32* total_a, s32* total_b) {
+void HSD_DObjCountVertices(HSD_DObj* dobj, s32* total_a, s32* total_b) {
     s32 sum_a;
     s32 sum_b;
     s32 a;
@@ -363,21 +363,21 @@ void fn_80199178(HSD_DObj* dobj, s32* total_a, s32* total_b) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AD044(HSD_PObj* pobj, HSD_PObj* pobj2);
+extern void fn_801AD044(HSD_PObj* pobj, HSD_PObjDesc* desc);
 #if 0
-asm void fn_801991F8(void) {
-#include "src/hsd/hsd_dobj_fn_801991F8.inc"
+asm void HSD_DObjResolveRefsAll(void) {
+#include "src/hsd/hsd_dobj_HSD_DObjResolveRefsAll.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801991F8(HSD_DObj* dobj, HSD_DObj* desc) {
-    HSD_DObj* dd;
+void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc) {
+    HSD_DObjDesc* dd;
     HSD_DObj* d;
     dd = desc;
     d = dobj;
     while (d != NULL && dd != NULL) {
         if (d != NULL && dd != NULL) {
-            fn_801AD044(d->pobj, dd->pobj);
+            fn_801AD044(d->pobj, dd->pobjdesc);
         }
         d = d->next;
         dd = dd->next;
@@ -418,7 +418,6 @@ void fn_80199264(HSD_DObj* dobj) {
 #pragma optimizewithasm off
 extern HSD_ClassInfo* fn_80193748(const char* class_name);
 extern void* fn_80193828(HSD_ClassInfo* info);
-extern void __assert(const char* file, s32 line, const char* msg);
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
 #if 0
@@ -428,7 +427,7 @@ asm void fn_801992D8(void) {
 #else
 #pragma optimization_level 4
 #pragma push
-#pragma optimization_level 1
+#pragma optimization_level 4
 HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
 {
     HSD_DObj* dobj;
@@ -471,6 +470,9 @@ extern void OSReport(const char* fmt, ...);
 extern HSD_MObj* fn_801A7B24(void* mobjdesc);
 extern HSD_PObj* fn_801AD288(void* pobjdesc);
 extern void HSD_Panic(const char* file, s32 line, const char* msg);
+extern HSD_ClassInfo* lbl_8047B260;
+extern HSD_DObjInfo lbl_8036C7A0;
+extern char lbl_8027472C[];
 extern char lbl_8047DA28;
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
@@ -482,22 +484,23 @@ asm void fn_801993A4(void) {
 #pragma optimization_level 4
 #pragma push
 #pragma optimization_level 1
-static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
+static int fn_801993A4(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
 {
-    void* desc;
+    HSD_DObjDesc* desc;
+    HSD_DObj* dobj;
     HSD_DObjDesc* subdesc;
     HSD_DObj* sub;
     HSD_ClassInfo* info;
 
-    desc = desc_raw;
-    subdesc = (HSD_DObjDesc*) *(u32*)((u8*)desc + 4);
+    desc = desc_arg;
+    subdesc = desc->next;
     if (subdesc == NULL) {
         sub = NULL;
     } else {
         if (subdesc->class_name == NULL
             || (info = fn_80193748(subdesc->class_name)) == NULL)
         {
-            info = default_class ? default_class : (HSD_ClassInfo*) &hsdDObj;
+            info = lbl_8047B260 ? lbl_8047B260 : (HSD_ClassInfo*) &lbl_8036C7A0;
             sub = (HSD_DObj*) fn_80193828(info);
             if (sub == NULL) {
                 __assert(&lbl_8047DA18, 0x214, &lbl_8047DA20);
@@ -513,32 +516,32 @@ static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
             ((int (*)(HSD_DObj*, HSD_DObjDesc*)) vtbl[0x40 / 4])(sub, subdesc);
         }
     }
+    dobj = dobj_arg;
     dobj->next = sub;
-    dobj->mobj = fn_801A7B24(*(void**)((u8*)desc + 8));
-    dobj->pobj = fn_801AD288(*(void**)((u8*)desc + 0xC));
+    dobj->mobj = fn_801A7B24(desc->mobjdesc);
+    dobj->pobj = fn_801AD288(desc->pobjdesc);
 
     if (dobj->mobj != NULL) {
-        u32 type = *(u32*)((u8*)dobj->mobj + 4);
+        u32 type = dobj->mobj->rendermode;
         type = type & 0x60000000;
         switch (type) {
         case 0x00000000:
             if (dobj != NULL) {
-                dobj->flags = (dobj->flags & ~0x0F) | 0x02;
+                dobj->flags = (dobj->flags & ~0x0E) | 0x02;
             }
             break;
         case 0x40000000:
             if (dobj != NULL) {
-                dobj->flags = (dobj->flags & ~0x0F) | 0x08;
+                dobj->flags = (dobj->flags & ~0x0E) | 0x08;
             }
             break;
         case 0x60000000:
             if (dobj != NULL) {
-                dobj->flags = (dobj->flags & ~0x0F) | 0x04;
+                dobj->flags = (dobj->flags & ~0x0E) | 0x04;
             }
             break;
         default:
-            OSReport(*(char**)((u8*)0x80274758),
-                     *(u32*)((u8*)dobj->mobj + 4));
+            OSReport(lbl_8027472C, dobj->mobj->rendermode);
             HSD_Panic(&lbl_8047DA18, 0x13F, &lbl_8047DA28);
             break;
         }
@@ -554,15 +557,15 @@ static int fn_801993A4(HSD_DObj* dobj, void* desc_raw)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_801A7E3C(HSD_MObj* mobj);
-extern void fn_801AD61C(HSD_PObj* pobj);
+extern void HSD_PObjAnimAll(HSD_PObj* pobj);
 extern void fn_801C27F4(HSD_AObj* aobj, HSD_DObj* dobj, void* method);
 #if 0
-asm void fn_80199568(void) {
-#include "src/hsd/hsd_dobj_fn_80199568.inc"
+asm void HSD_DObjAnimAll(void) {
+#include "src/hsd/hsd_dobj_HSD_DObjAnimAll.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80199568(HSD_DObj* dobj) {
+void HSD_DObjAnimAll(HSD_DObj* dobj) {
     HSD_DObj* d;
     if (dobj == NULL) {
         return;
@@ -570,8 +573,8 @@ void fn_80199568(HSD_DObj* dobj) {
     for (d = dobj; d != NULL; d = d->next) {
         if (d != NULL) {
             fn_801C27F4(d->aobj, d,
-                        (void*) HSD_DOBJ_METHOD(d)->load);
-            fn_801AD61C(d->pobj);
+                        (void*) HSD_DOBJ_METHOD(d)->update);
+            HSD_PObjAnimAll(d->pobj);
             fn_801A7E3C(d->mobj);
         }
     }
@@ -583,23 +586,23 @@ void fn_80199568(HSD_DObj* dobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801A8354(f32 val, HSD_MObj* mobj, void* arg);
-extern void fn_801AD6C4(f32 val, HSD_PObj* pobj, void* arg);
+extern void HSD_MObjReqAnimByFlags(f32 val, HSD_MObj* mobj, void* arg);
+extern void HSD_PObjReqAnimAllByFlags(f32 val, HSD_PObj* pobj, void* arg);
 #if 0
-asm void fn_801995D4(void) {
-#include "src/hsd/hsd_dobj_fn_801995D4.inc"
+asm void HSD_DObjReqAnimAllByFlags(void) {
+#include "src/hsd/hsd_dobj_HSD_DObjReqAnimAllByFlags.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_801995D4(HSD_DObj* dobj, f32 val, void* arg) {
+void HSD_DObjReqAnimAllByFlags(HSD_DObj* dobj, f32 val, void* arg) {
     HSD_DObj* d;
     if (dobj == NULL) {
         return;
     }
     for (d = dobj; d != NULL; d = d->next) {
         if (d != NULL) {
-            fn_801AD6C4(val, d->pobj, arg);
-            fn_801A8354(val, d->mobj, arg);
+            HSD_PObjReqAnimAllByFlags(val, d->pobj, arg);
+            HSD_MObjReqAnimByFlags(val, d->mobj, arg);
         }
     }
 }
@@ -613,12 +616,12 @@ void fn_801995D4(HSD_DObj* dobj, f32 val, void* arg) {
 extern void fn_801A83BC(HSD_MObj* mobj, void* arg);
 extern void fn_801AD738(HSD_PObj* pobj, void* arg);
 #if 0
-asm void fn_80199654(void) {
-#include "src/hsd/hsd_dobj_fn_80199654.inc"
+asm void HSD_DObjAddAnimAll(void) {
+#include "src/hsd/hsd_dobj_HSD_DObjAddAnimAll.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_80199654(HSD_DObj* dobj, void* matanim, void* shapeanim) {
+void HSD_DObjAddAnimAll(HSD_DObj* dobj, void* matanim, void* shapeanim) {
     HSD_DObj* d;
     void* ma;
     void* sa;
@@ -663,12 +666,12 @@ void fn_80199654(HSD_DObj* dobj, void* matanim, void* shapeanim) {
 #pragma optimizewithasm off
 extern u32 lbl_8047B264;
 #if 0
-asm void fn_80199704(void) {
-#include "src/hsd/hsd_dobj_fn_80199704.inc"
+asm void HSD_DObjSetCurrent(HSD_DObj* dobj) {
+#include "src/hsd/hsd_dobj_HSD_DObjSetCurrent.inc"
 }
 #else
-void fn_80199704(u32 val) {
-    lbl_8047B264 = val;
+void HSD_DObjSetCurrent(HSD_DObj* dobj) {
+    lbl_8047B264 = (u32)dobj;
 }
 #endif
 #pragma pop
@@ -677,16 +680,16 @@ void fn_80199704(u32 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA498(void* list, void* data);
+extern void HSD_ObjFree(void* list, void* data);
 extern u8 lbl_80465378[];
 #if 0
-asm void fn_8019970C(void) {
-#include "src/hsd/hsd_dobj_fn_8019970C.inc"
+asm void HSD_FObjFree(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjFree.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019970C(void* data) {
-    fn_801AA498(lbl_80465378, data);
+void HSD_FObjFree(HSD_FObj* data) {
+    HSD_ObjFree(lbl_80465378, data);
 }
 #endif
 #pragma pop
@@ -695,20 +698,19 @@ void fn_8019970C(void* data) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* fn_801AA4CC(void* list);
-extern void __assert(const char* file, s32 line, const char* msg);
+extern void* HSD_ObjAlloc(void* list);
 extern void* memset(void* dst, int val, u32 size);
 extern char lbl_8047DA30;
 extern char lbl_8047DA38;
 #if 0
-asm void fn_80199738(void) {
-#include "src/hsd/hsd_dobj_fn_80199738.inc"
+asm void HSD_FObjAlloc(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjAlloc.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_80199738(void) {
-    void* p;
-    p = fn_801AA4CC(lbl_80465378);
+HSD_FObj* HSD_FObjAlloc(void) {
+    HSD_FObj* p;
+    p = HSD_ObjAlloc(lbl_80465378);
     if (p == NULL) {
         __assert(&lbl_8047DA30, 755, &lbl_8047DA38);
     }
@@ -744,11 +746,11 @@ void fn_80199794(void) { /* TODO */ }
 extern u32 lbl_8047DA58;
 extern u32 lbl_8047DA3C;
 #if 1
-asm void fn_8019B528(void) {
-#include "src/hsd/hsd_dobj_fn_8019B528.inc"
+asm void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe) {
+#include "src/hsd/hsd_dobj_HSD_FObjReqAnimAll.inc"
 }
 #else
-void fn_8019B528(void) {
+void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe) {
     /* TODO: match -- 192 bytes at 0x8019B528 */
 }
 #endif
@@ -758,19 +760,19 @@ void fn_8019B528(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019970C(void* data);
-extern void fn_801AA498(void* list, void* data);
+extern void HSD_FObjFree(HSD_FObj* data);
+extern void HSD_ObjFree(void* list, void* data);
 extern void fn_80199A84(void* list, void* data);
-extern void fn_8019B750(void* data);
+extern void HSD_FObjRemove(HSD_FObj* data);
 extern u8 lbl_80465378[];
 extern u8 lbl_802747AC[];
 #if 0
-asm void fn_8019B5E8(void) {
-#include "src/hsd/hsd_dobj_fn_8019B5E8.inc"
+asm void HSD_FObjRemoveAll(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjRemoveAll.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019B5E8(void* data) {
+void HSD_FObjRemoveAll(HSD_FObj* data) {
     void* r31;
     void* r30;
     void* r29;
@@ -816,40 +818,40 @@ void fn_8019B5E8(void* data) {
     if (r23 == NULL) {
         goto free_r24;
     }
-    fn_8019B5E8(*(void**)r23);
-    fn_8019B750(r23);
+    HSD_FObjRemoveAll(*(void**)r23);
+    HSD_FObjRemove(r23);
 free_r24:
     if (r24 != NULL) {
-        fn_8019970C(r24);
+        HSD_FObjFree(r24);
     }
 free_r25:
     if (r25 != NULL) {
-        fn_801AA498(lbl_80465378, r25);
+        HSD_ObjFree(lbl_80465378, r25);
         fn_80199A84(lbl_80465378, lbl_802747AC);
     }
 free_r26:
     if (r26 != NULL) {
-        fn_801AA498(lbl_80465378, r26);
+        HSD_ObjFree(lbl_80465378, r26);
     }
 free_r27:
     if (r27 != NULL) {
-        fn_801AA498(lbl_80465378, r27);
+        HSD_ObjFree(lbl_80465378, r27);
     }
 free_r28:
     if (r28 != NULL) {
-        fn_801AA498(lbl_80465378, r28);
+        HSD_ObjFree(lbl_80465378, r28);
     }
 free_r29:
     if (r29 != NULL) {
-        fn_801AA498(lbl_80465378, r29);
+        HSD_ObjFree(lbl_80465378, r29);
     }
 free_r30:
     if (r30 != NULL) {
-        fn_801AA498(lbl_80465378, r30);
+        HSD_ObjFree(lbl_80465378, r30);
     }
 free_r31:
     if (r31 != NULL) {
-        fn_801AA498(lbl_80465378, r31);
+        HSD_ObjFree(lbl_80465378, r31);
     }
 end:
     ;
@@ -862,14 +864,14 @@ end:
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019B750(void) {
-#include "src/hsd/hsd_dobj_fn_8019B750.inc"
+asm void HSD_FObjRemove(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjRemove.inc"
 }
 #else
 #pragma optimization_level 4
-void fn_8019B750(void* data) {
+void HSD_FObjRemove(HSD_FObj* data) {
     if (data != NULL) {
-        fn_801AA498(lbl_80465378, data);
+        HSD_ObjFree(lbl_80465378, data);
     }
 }
 #endif
@@ -881,11 +883,11 @@ void fn_8019B750(void* data) {
 #pragma optimizewithasm off
 extern void fn_801AA35C(void* list, u32 size, u32 alignment);
 #if 0
-asm void fn_8019B784(void) {
-#include "src/hsd/hsd_dobj_fn_8019B784.inc"
+asm void HSD_FObjInitAllocData(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjInitAllocData.inc"
 }
 #else
-void fn_8019B784(void) {
+void HSD_FObjInitAllocData(void) {
     fn_801AA35C(lbl_80465378, 0x30, 4);
 }
 #endif
@@ -896,11 +898,11 @@ void fn_8019B784(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019B7B4(void) {
-#include "src/hsd/hsd_dobj_fn_8019B7B4.inc"
+asm void HSD_FObjGetAllocData(void) {
+#include "src/hsd/hsd_dobj_HSD_FObjGetAllocData.inc"
 }
 #else
-void* fn_8019B7B4(void) {
+void* HSD_FObjGetAllocData(void) {
     return lbl_80465378;
 }
 #endif

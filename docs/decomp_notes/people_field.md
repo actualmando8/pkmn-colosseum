@@ -4,7 +4,8 @@
 
 ### 2026-06-10: `_GetInputValue` symbol-name lever — 11-function family to 100%
 
-The `fn_8016161C`..`fn_801618EC` family (11 siblings, stride 0x48) was stuck at
+The `peopleFieldMotionResolveInput23C`..`peopleFieldMotionResolveInput3C8`
+family (11 siblings, stride 0x48) was stuck at
 **99.72%**. The C bodies were already byte-identical to the target — the ONLY
 diff was the relocation symbol name on the tail call:
 
@@ -22,17 +23,17 @@ Result: all 11 family members -> **100.0%** with no code change.
 
 | fn | before | after |
 |----|--------|-------|
-| fn_8016161C | 99.72 | 100.0 |
-| fn_80161664 | 99.72 | 100.0 |
-| fn_801616AC | 99.72 | 100.0 |
-| fn_801616F4 | 99.72 | 100.0 |
-| fn_8016173C | 99.72 | 100.0 |
-| fn_80161784 | 99.72 | 100.0 |
-| fn_801617CC | 99.72 | 100.0 |
-| fn_80161814 | 99.72 | 100.0 |
-| fn_8016185C | 99.72 | 100.0 |
-| fn_801618A4 | 99.72 | 100.0 |
-| fn_801618EC | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput23C | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput260 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput284 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput2A8 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput2CC | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput2F0 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput338 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput35C | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput380 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput3A4 | 99.72 | 100.0 |
+| peopleFieldMotionResolveInput3C8 | 99.72 | 100.0 |
 
 LESSON: a 99.x C-active near-miss whose only objdiff DIFF is a `bl <name>`
 reloc is a symbol-naming artifact, not reg-alloc. Check the target's reloc name
@@ -42,11 +43,11 @@ reloc is a symbol-naming artifact, not reg-alloc. Check the target's reloc name
 
 Same lever applied to the audio/reverb cluster. Each name verified at its exact
 address in `symbols.build.txt`:
-- fn_80164520 -> ReverbHICreate   (fn_801644E0 caller -> 100.0)
-- fn_801652DC -> ReverbHICallback (fn_8016442C caller -> 100.0)
-- fn_80164A2C -> ReverbHIModify   (fn_80164488 caller -> 100.0)
+- fn_80164520 -> ReverbHICreate   (sndAuxCallbackPrepareReverbHI caller -> 100.0)
+- fn_801652DC -> ReverbHICallback (sndAuxCallbackReverbHI caller -> 100.0)
+- fn_80164A2C -> ReverbHIModify   (sndAuxCallbackUpdateSettingsReverbHI caller -> 100.0)
 - fn_80162118 -> sndBSearch       (fn_801523B8 caller -> 100.0)
-- fn_8015A870 -> salExitDspCtrl   (fn_80162428 -> 100.0)
+- fn_8015A870 -> salExitDspCtrl   (hwExit -> 100.0)
 - fn_80163DE8 -> aramFreeStreamBuffer (fn_80162F68 -> 100.0)
 - fn_8015A950 -> salActivateStudio    (fn_80162D6C -> 100.0)
 - fn_8016221C/fn_80163FFC/fn_8015A484 (fn_80162370 partial), fn_8015D44C

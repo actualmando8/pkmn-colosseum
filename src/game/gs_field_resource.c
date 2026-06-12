@@ -18,8 +18,8 @@
  *   fn_80114820 (floorReadPKXPreFunc)
  *   fn_80114878 (floorReadPKXPreFunc_AllocBuffer)
  *   fn_801148CC (floorReadTexPreFunc)
- *   fn_80114AE0 (floorReadCameraPreFunc)
- *   fn_80114CA8 (floorReadMapPreFunc)
+ *   floorReadCameraPreFunc
+ *   floorReadMapPreFunc (floorReadMapPreFunc)
  *
  * Each floor archive (FSYS) contains multiple resource types that need
  * to be loaded into memory before the floor becomes active. The pre-func
@@ -233,7 +233,7 @@ void* floorReadTexPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma pop
 
 /* ==================================================================
- * fn_80114AE0 -- floorReadCameraPreFunc
+ * floorReadCameraPreFunc pseudocode note
  *
  * Allocate memory for pre-set camera data.
  * References lbl_80272428 for error logging.
@@ -241,7 +241,7 @@ void* floorReadTexPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void* floorReadCameraPreFunc(u32 resId, u32 loadMode, u32 dataSize) {
+void* floorReadCameraPreFunc_Pseudocode(u32 resId, u32 loadMode, u32 dataSize) {
     /* TODO: match */
 }
 #pragma pop
@@ -346,10 +346,16 @@ void fn_8011487C(void) {
 
 /* 0x80114948 | 0x74 */
 #pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80114948(void) {
-    /* TODO: match -- 116 bytes at 0x80114948 */
+/* Matches the map pre-load wrapper, but forces the camera load flag. */
+#pragma peephole off
+void* floorReadCameraPreFunc(void* owner, u32 param, u32 alloc_size) {
+    u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
+    void* mem = fn_800F9418(total, 0x20, (u32)owner, (param & 0x7FFF0000) | 0x400, (void*)0);
+    if (mem == (void*)0) {
+        fn_800DD970(lbl_80272428, total);
+        return (void*)0;
+    }
+    return (u8*)mem + 0x60;
 }
 #pragma pop
 

@@ -19,7 +19,7 @@
  *   fn_8011432C             (floorReadGFLPreFunc)
  *   fn_8011487C             (floorReadSoundPreFunc)
  *   fn_80114AE0             (floorReadParticlePreFunc)
- *   fn_801143A0 - fn_80114CA8 (additional floorRead*PreFunc variants)
+ *   fn_801143A0 - floorReadMapPreFunc (additional floorRead*PreFunc variants)
  *
  * Debug strings:
  *   "floorReadGFLPreFunc(): can't alloc %d bytes of memory"
@@ -58,7 +58,7 @@ extern void  memset(void* dst, int val, u32 n);
 extern u32 lbl_8047ACC8;
 
 /* GSthread */
-extern void  fn_800F0308(void);                         /* GSthread yield */
+extern void  _threadSwitch(void);                         /* GSthread yield */
 extern void* fn_800F9418(u32 size, u32 alignment, u32 loadParam,
                           u32 loadParam2, void* callback);
 extern void  fn_800F9378(void* resPtr, u32 floorId, u32 loadParam,
@@ -69,10 +69,10 @@ extern void  fn_80165A44(u32 sndId, u32 bufSize);      /* sndCheckFileInfo */
 extern void  fn_801655D4(u32 sndId);                    /* sndWaveOpen */
 
 /* Particle system */
-extern void  fn_8013111C(u32 effectId);                 /* GSeffect_TriggerEffect */
+extern void  GSeffect(u32 effectId);                 /* GSeffect_TriggerEffect */
 
 /* FSYS */
-extern void* fn_80191ECC(void* name, const char* tocName);
+extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* symbol);
 extern void  HSD_ArchiveParse(void* resPtr, u32 fsysHandle, const char* name);
 
 /* ===== String constants (rodata references) ===== */
@@ -391,9 +391,9 @@ void floorReadTexPreFunc(void)
     /* Reads texture data and registers with GStexture system. */
 }
 
-/** fn_801144D0 -- floorReadCameraPreFunc (camera setup)
+/** fn_801144D0 -- floorReadCameraPreFunc_Pseudocode (camera setup)
  *  Debug string: "floorReadCameraPreFunc" */
-void floorReadCameraPreFunc(void)
+void floorReadCameraPreFunc_Pseudocode(void)
 {
     /* Reads camera parameters (position, target, FOV, etc.) and
      * configures the field camera for this floor. */

@@ -36504,7 +36504,7 @@ void fn_8025DE54(u32 *r3,u16 *r4,int r5,int r6,int r7,
                  int r8)
 
 {
-    extern int fn_800F0308();
+    extern int _threadSwitch();
     extern int fn_801C41C8();
     extern int fn_801DA4E8();
     extern int fn_801DA8C4();
@@ -36530,7 +36530,7 @@ void fn_8025DE54(u32 *r3,u16 *r4,int r5,int r6,int r7,
       cVar1 = fn_801DA94C(*r3,*r4,r4[1]);
       if (cVar1 == '\0') break;
       fn_801DB088();
-      fn_800F0308();
+      _threadSwitch();
     }
     if (r8 == 1) {
       fn_801DA4E8(*r3,0);
@@ -36768,7 +36768,7 @@ skip_cleanup:
 /* Address: 0x8025E5F4 | Size: 0x4C | Ghidra import */
 void fn_8025E5F4(void)
 {
-    extern int fn_800F07A8();
+    extern int GSthreadCreate();
     extern u32 fn_800FF560();
     extern void fn_8025E534();
     extern u32 fn_801CAF0C();
@@ -36778,7 +36778,7 @@ void fn_8025E5F4(void)
   uVar1 = fn_801CAF0C();
   if ((uVar1 & 0xFFFF) != 0) {
     uVar2 = fn_800FF560();
-    fn_800F07A8(1, uVar2, 0x4000, 1, 1, (u32)fn_8025E534);
+    GSthreadCreate(1, uVar2, 0x4000, 1, 1, (u32)fn_8025E534);
   }
 }
 
@@ -36997,7 +36997,7 @@ void fn_8025EF58(void)
       fn_801C40F0(1);
       fn_800FF730(0x385);
       fn_8011288C(0,0);
-      fn_800F0308();
+      _threadSwitch();
       fn_801C41C8((double)lbl_8047E68C,2);
       fn_801C40F0(1);
       fn_8025DCBC((int*)auStack_28);
@@ -37027,7 +37027,7 @@ void fn_8025EF58(void)
           fn_8025DD14((int*)auStack_28);
           fn_800FF730(0x385);
           fn_8011288C(0,0);
-          fn_800F0308();
+          _threadSwitch();
           fn_801C41C8((double)lbl_8047E68C,2);
           fn_801C40F0(1);
           fn_8025DCBC((int*)auStack_28);
@@ -37780,19 +37780,19 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
 {
     extern u32 DAT_8027a488;
     extern int fn_80097A38();
-    extern int fn_800D1FDC();
-    extern u32 fn_800D2584();
+    extern int GScameraGetPerspective();
+    extern u32 GScameraGetActiveCamera();
     extern int fn_800ECB74();
     extern int fn_801766A8();
-    extern int fn_80177830();
-    extern int fn_80177858();
-    extern int fn_801778B4();
-    extern int fn_801778DC();
-    extern int fn_80177908();
-    extern int fn_80177930();
-    extern int fn_8017795C();
-    extern int fn_80177984();
-    extern int fn_80177A44();
+    extern int GSscene_GetCameraRotationVector();
+    extern int GSscene_SetCameraRotationVector();
+    extern int GSscene_GetCameraDirectionVector();
+    extern int GSscene_SetCameraDirectionVector();
+    extern int GSscene_GetCameraPositionVector();
+    extern int GSscene_SetCameraPositionVector();
+    extern int GSscene_GetCameraViewVector();
+    extern int GSscene_SetCameraViewVector();
+    extern int GSscene_SetMode();
     extern int fn_801DAC90();
     extern int fn_801DADC0();
     extern f32 lbl_8047E6C0;
@@ -37837,12 +37837,12 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   
   fn_801C41C8((double)lbl_8047E6C0,3);
   fn_801C40F0(1);
-  fn_801778B4(&local_88);
-  fn_80177830(&local_7c);
-  fn_80177908(&local_70);
-  fn_8017795C(&local_64);
-  uVar1 = fn_800D2584();
-  fn_800D1FDC(uVar1,&local_98,auStack_94,auStack_90,auStack_8c);
+  GSscene_GetCameraDirectionVector(&local_88);
+  GSscene_GetCameraRotationVector(&local_7c);
+  GSscene_GetCameraPositionVector(&local_70);
+  GSscene_GetCameraViewVector(&local_64);
+  uVar1 = GScameraGetActiveCamera();
+  GScameraGetPerspective(uVar1,&local_98,auStack_94,auStack_90,auStack_8c);
   local_58 = local_88;
   local_54 = local_84;
   local_50 = local_80;
@@ -37902,11 +37902,11 @@ int fn_8026045C(u32 r3,u32 r4,int r5)
   uVar1 = fn_801DAC3C(*(u32 *)(r5 + 4));
   fn_800ECB74(uVar1,1);
   fn_801DA4E8(*(u32 *)(r5 + 4),1);
-  fn_80177A44(2);
-  fn_801778DC(&local_58);
-  fn_80177858(&local_4c);
-  fn_80177930(&local_40);
-  fn_80177984(&local_34);
+  GSscene_SetMode(2);
+  GSscene_SetCameraDirectionVector(&local_58);
+  GSscene_SetCameraRotationVector(&local_4c);
+  GSscene_SetCameraPositionVector(&local_40);
+  GSscene_SetCameraViewVector(&local_34);
   fn_801766A8((double)local_28);
   fn_801C41C8((double)lbl_8047E6C0,2);
   fn_801C40F0(1);
@@ -37989,13 +37989,13 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
       }
       cVar7 = fn_801DA94C(uVar9,uVar1,4);
       if (cVar7 == '\0') break;
-      fn_800F0308();
-      fn_801778B4(&local_98);
-      fn_80177830(&local_8c);
-      fn_80177908(&local_80);
-      fn_8017795C(&local_74);
-      uVar6 = fn_800D2584();
-      fn_800D1FDC(uVar6,&local_a8,auStack_a4,auStack_a0,auStack_9c);
+      _threadSwitch();
+      GSscene_GetCameraDirectionVector(&local_98);
+      GSscene_GetCameraRotationVector(&local_8c);
+      GSscene_GetCameraPositionVector(&local_80);
+      GSscene_GetCameraViewVector(&local_74);
+      uVar6 = GScameraGetActiveCamera();
+      GScameraGetPerspective(uVar6,&local_a8,auStack_a4,auStack_a0,auStack_9c);
       local_68 = local_98;
       local_64 = local_94;
       local_60 = local_90;
@@ -38019,11 +38019,11 @@ int fn_802606D8(u32 *r3,int r4,int r5,u32 r6)
         }
       }
     }
-    fn_80177A44(2);
-    fn_801778DC(&local_68);
-    fn_80177858(&local_5c);
-    fn_80177930(&local_50);
-    fn_80177984(&local_44);
+    GSscene_SetMode(2);
+    GSscene_SetCameraDirectionVector(&local_68);
+    GSscene_SetCameraRotationVector(&local_5c);
+    GSscene_SetCameraPositionVector(&local_50);
+    GSscene_SetCameraViewVector(&local_44);
     fn_801766A8((double)local_38);
     if ((r6 & 0x14) != 0) {
       uVar6 = 5;
@@ -39163,7 +39163,7 @@ void fn_80265F94(int r3)
     if (cVar9 == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
-    fn_800F0308();
+    _threadSwitch();
   }
   iVar4 = fn_8011E778(0xfa);
   if (iVar4 == 0) {
@@ -39179,7 +39179,7 @@ void fn_80265F94(int r3)
     if (cVar9 == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
-    fn_800F0308();
+    _threadSwitch();
   }
   fn_801067E8(0x44ba,0,0);
   while (1) {
@@ -39191,7 +39191,7 @@ void fn_80265F94(int r3)
     if (cVar9 == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
-    fn_800F0308();
+    _threadSwitch();
   }
   fn_801065B8(1);
   if (r3 == 1) {
@@ -39215,7 +39215,7 @@ void fn_80265F94(int r3)
     if (cVar9 == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
-    fn_800F0308();
+    _threadSwitch();
   }
   fn_801065B8(1);
   fn_801C41C8((double)lbl_8047E6FC,3);
@@ -39225,7 +39225,7 @@ void fn_80265F94(int r3)
     if (cVar9 == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
-    fn_800F0308();
+    _threadSwitch();
   }
   return;
 }
@@ -39322,12 +39322,12 @@ int fn_8025E3B0(u32 r3,u32 r4)
   
   fn_801C41C8((double)lbl_8047E680,3);
   fn_801C40F0(1);
-  fn_801778B4(&local_44);
-  fn_80177830(&local_38);
-  fn_80177908(&local_2c);
-  fn_8017795C(&local_20);
-  uVar1 = fn_800D2584();
-  fn_800D1FDC(uVar1,&local_54,auStack_50,auStack_4c,auStack_48);
+  GSscene_GetCameraDirectionVector(&local_44);
+  GSscene_GetCameraRotationVector(&local_38);
+  GSscene_GetCameraPositionVector(&local_2c);
+  GSscene_GetCameraViewVector(&local_20);
+  uVar1 = GScameraGetActiveCamera();
+  GScameraGetPerspective(uVar1,&local_54,auStack_50,auStack_4c,auStack_48);
   _DAT_80478288 = local_44;
   _DAT_8047828c = local_40;
   _DAT_80478290 = local_3c;
@@ -39553,7 +39553,7 @@ void fn_8025ED4C(void)
     _DAT_804782c4 = 0;
     fn_800FF660();
     fn_8011288C(0,0);
-    fn_800F0308();
+    _threadSwitch();
   }
   return;
 }
@@ -39816,7 +39816,7 @@ void fn_8025DC2C(double r3)
   dVar5 = lbl_8047E668;
   fVar1 = lbl_8047E660;
   while (dVar3 = (double)fVar1, dVar3 < dVar4) {
-    fn_800F0308();
+    _threadSwitch();
     uVar2 = fn_800D3088();
     fVar1 = (float)(dVar3 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar2)) - dVar5));
   }
@@ -39917,7 +39917,7 @@ LAB_0025db60:
         uVar9 = *(u16 *)(&DAT_8027a488 + r3[2] * 8);
         fn_801DB088();
         fn_801DA94C(uVar5,uVar9,4);
-        fn_800F0308();
+        _threadSwitch();
       }
       if (*(int *)(&DAT_8027a48c + r3[2] * 8) == 0) {
         uVar5 = *r3;
@@ -39930,7 +39930,7 @@ LAB_0025db60:
       dVar14 = (double)lbl_8047E6B4;
       fVar1 = lbl_8047E6B0;
       while (dVar13 = (double)fVar1, dVar13 < dVar14) {
-        fn_800F0308();
+        _threadSwitch();
         uVar5 = fn_800D3088();
         fVar1 = (float)(dVar13 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar5)) - dVar15));
       }
@@ -39963,7 +39963,7 @@ LAB_0025db60:
           fn_80166A28(uVar9);
         }
         while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
-          fn_800F0308();
+          _threadSwitch();
         }
         uVar5 = fn_8011F4F0(r5);
         fn_80132A38(0x32,uVar5);
@@ -40000,7 +40000,7 @@ LAB_0025db60:
           fn_80166A28(uVar9);
         }
         while (iVar6 = fn_801666BC(uVar9), iVar6 == 2) {
-          fn_800F0308();
+          _threadSwitch();
         }
         uVar5 = fn_8011F4F0(r5);
         fn_80132A38(0x32,uVar5);
@@ -40013,7 +40013,7 @@ LAB_0025db60:
         dVar15 = (double)lbl_8047E6C4;
         fVar1 = lbl_8047E6B0;
         while (dVar13 = (double)fVar1, dVar13 < dVar15) {
-          fn_800F0308();
+          _threadSwitch();
           uVar5 = fn_800D3088();
           fVar1 = (float)(dVar13 + (double)(float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar5)) - dVar14));
         }
@@ -40060,7 +40060,7 @@ LAB_0025db60:
       fn_801C41C8((double)lbl_8047E6C0,2);
       bVar3 = 0;
     }
-    fn_800F0308();
+    _threadSwitch();
     iVar6 = fn_800D3088();
     uVar12 = uVar12 + iVar6;
   } while (1);
@@ -40163,22 +40163,22 @@ LAB_0026160c:
       local_7f[0] = '\x01';
       fn_801F2B5C(0,0x80261bec,local_7f,0);
       if (local_7f[0] == '\x01') break;
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_801F37B0(0,0x80261fb4,0,0);
     while (cVar6 = fn_801F37B0(0,0x80261ef8,0,0), cVar6 != '\x01') {
-      fn_800F0308();
+      _threadSwitch();
     }
     cVar6 = fn_801F1700(0);
     if (cVar6 == '\x01') {
       while (cVar6 = fn_8000DD98(), cVar6 != '\0') {
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     cVar6 = fn_801F1758(0);
     if (cVar6 == '\x01') {
       while (cVar6 = fn_8000DD0C(), cVar6 != '\0') {
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     uStack_64 = fn_800D37CC();
@@ -40303,13 +40303,13 @@ void fn_80265DB0(u8 *r3)
   *(u32 *)(r3 + 4) = lbl_8047E6D8;
   dVar3 = (double)lbl_8047E6DC;
   while (*(float *)(r3 + 4) < (float)(dVar3 * (double)*(float *)(r3 + 8))) {
-    fn_800F0308();
+    _threadSwitch();
     uVar1 = fn_800D3088();
     *(float *)(r3 + 4) =
          *(float *)(r3 + 4) + (float)((double)(((u64)(0x43300000) << 32) | (u32)(uVar1)) - dVar2);
   }
   *r3 = 1;
   do {
-    fn_800F0308();
+    _threadSwitch();
   } while (1);
 }

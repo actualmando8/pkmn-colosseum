@@ -180,6 +180,7 @@ extern HSD_MObjInfo hsdMObj;
 /* ========================================================================= */
 
 void HSD_MObjSetCurrent(HSD_MObj* mobj);
+u32 HSD_MObjGetFlags(HSD_MObj* mobj);
 void HSD_MObjSetFlags(HSD_MObj* mobj, u32 flags);
 void HSD_MObjClearFlags(HSD_MObj* mobj, u32 flags);
 void HSD_MObjRemoveAnimByFlags(HSD_MObj* mobj, u32 flags);

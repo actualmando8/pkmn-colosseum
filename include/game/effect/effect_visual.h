@@ -27,7 +27,7 @@
 u16 lightningStartEffect(u16 group, u16 modelA, u16 modelB);
 
 /* -----------------------------------------------------------------------
- * Leaf particle effect (fn_80138B00)
+ * Leaf particle effect (0x80138B00)
  *
  * Spawns leaf particles that drift and rotate. Used for Razor Leaf,
  * Leaf Blade, and similar grass-type moves. Also handles lightning
@@ -36,7 +36,7 @@ u16 lightningStartEffect(u16 group, u16 modelA, u16 modelB);
 u16 leaffxStartEffect(u16 group, u16 model, u16 param);
 
 /* -----------------------------------------------------------------------
- * Electron arc effect (fn_80139820)
+ * Electron arc effect (0x80139820)
  *
  * Creates arcing electrical discharges. Used for Thunderbolt, Spark,
  * and similar electric-type moves. Allocates 0x78-byte work struct.
@@ -114,7 +114,7 @@ u16 distortionEffectStart(void);
 u16 billboardEffectStart(void);
 
 /* -----------------------------------------------------------------------
- * Patchiru (Spinda) texture effect (fn_8013FBE0)
+ * Patchiru (Spinda) texture effect (0x8013FBE0)
  *
  * Generates the unique spot pattern texture for Spinda (Patchiru in
  * Japanese). Each Spinda has a unique spot pattern based on its

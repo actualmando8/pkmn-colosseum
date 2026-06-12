@@ -35,7 +35,7 @@
 #include "dolphin/types.h"
 
 /* ===== GS Engine ===== */
-extern void  fn_800F0308(void);           /* GSthread yield */
+extern void  _threadSwitch(void);           /* GSthread yield */
 extern u32   fn_80102568(u32 a, u32 b, u32 c); /* scene load */
 extern u32   fn_8010264C(u32 a, u32 b);        /* scene query */
 extern void  fn_801026A4(u32 sceneId, u32 a, u32 b, u32 c,

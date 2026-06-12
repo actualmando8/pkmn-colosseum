@@ -31,7 +31,7 @@ extern u8   fn_801E1874(void);                        /* THPPlayerGetState */
 extern void fn_801E189C(const char* path, u32 loop);  /* THPPlayerOpen */
 
 /* ===== GS Engine external functions ===== */
-extern void fn_800F0308(void);                        /* GSthread yield / step */
+extern void _threadSwitch(void);                        /* GSthread yield / step */
 extern void fn_80165A20(u32 sndId, u32 fade, u32 vol); /* sndPlay (BGM start) */
 extern void fn_801C41C8(u32 mode, f32 speed);         /* fade set mode+speed */
 extern void fn_801C40F0(u32 enable);                   /* fade enable */
@@ -65,14 +65,14 @@ extern f32 lbl_8047BA30; /* 1.0f -- fade speed */
  *  movieWaitForFinish (internal helper)
  *
  *  Polls THPPlayerGetState in a loop. While state == THP_STATE_PLAYING,
- *  yields the current thread via fn_800F0308.
+ *  yields the current thread via _threadSwitch.
  *
  *  This pattern is used before starting a new movie or after requesting
  *  a stop -- ensures the THP player is idle before proceeding.
  *
  *  Assembly pattern (appears at multiple sites):
  *    .loop:
- *      bl fn_800F0308           ; yield
+ *      bl _threadSwitch           ; yield
  *    .check:
  *      bl fn_801E1874           ; THPPlayerGetState
  *      clrlwi r0, r3, 24       ; mask to byte
@@ -83,7 +83,7 @@ void movieWaitForFinish(void) {
     u8 state;
 
     do {
-        fn_800F0308();  /* yield thread */
+        _threadSwitch();  /* yield thread */
         state = fn_801E1874();
     } while ((state & 0xFF) == THP_STATE_PLAYING);
 }
@@ -151,7 +151,7 @@ void moviePlayAutoDemo(void) {
  *  Assembly (simplified):
  *    ; Wait loop for THP player
  *    .wait:
- *      bl fn_800F0308            ; yield
+ *      bl _threadSwitch            ; yield
  *      bl fn_801E1874            ; THPPlayerGetState
  *      clrlwi r0, r3, 24
  *      cmplwi r0, 1
@@ -215,7 +215,7 @@ void movieStopAndCleanup(void) {
  *  Assembly (heavily abbreviated -- this is a 0x25C-byte function):
  *    ; Wait for THP player
  *    .waitLoop:
- *      bl fn_800F0308
+ *      bl _threadSwitch
  *    .checkState:
  *      bl fn_801E1874
  *      cmplwi r0, 1
@@ -538,7 +538,7 @@ void fn_80036240(void) {
     loop_body:
     r3 = fn_8017B1AC();
     if (r3 == 0xb || r3 == 0x5) {
-        fn_800F0308();
+        _threadSwitch();
         goto loop_check;
     }
     r31 = fn_800F7AF0(1);
@@ -567,7 +567,7 @@ void fn_80036240(void) {
         }
     }
     r30 = r31;
-    fn_800F0308();
+    _threadSwitch();
 
     loop_check:
     r3 = fn_801E1874();
@@ -624,7 +624,7 @@ asm void fn_80036468(void) {
 void fn_80036468(void) {
     if (lbl_8047A468 != 1) {
         while ((u8)fn_801E1874() == 1) {
-            fn_800F0308();
+            _threadSwitch();
         }
     }
     fn_800FF58C(0x384);
@@ -672,7 +672,7 @@ void fn_800365E0(void) {
     if (lbl_8047A468 != 1) {
         fn_80165F40();
         while ((u8)fn_801E1874() == 1) {
-            fn_800F0308();
+            _threadSwitch();
         }
     }
     fn_800FF58C(0x39A);

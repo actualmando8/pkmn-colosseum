@@ -87,12 +87,12 @@
  *               gCamPhase++;
  *           }
  *       }
- *       fn_800F0308();  // Frame advance
+ *       _threadSwitch();  // Frame advance
  *   }
  *
  * fn_8002049C (GStitle_Init):
  *   - Clears stale state flags
- *   - Creates the title thread via fn_800F07A8 (priority 0x14, stack 0x2000)
+ *   - Creates the title thread via GSthreadCreate (priority 0x14, stack 0x2000)
  *   - Initializes camera position from lbl_803A1F88 float constants
  *   - Checks save file existence via fn_800FF548
  *   - Calls fn_8002060C if no save found
@@ -184,9 +184,9 @@
  * ========================================================================= */
 
 /* Thread management */
-extern void  fn_800F07A8(s32 priority, void* stack, s32 stackSize,
+extern void  GSthreadCreate(s32 priority, void* stack, s32 stackSize,
                           s32 flags, s32 p5, void* entry);
-extern void  fn_800F0308(void);
+extern void  _threadSwitch(void);
 extern void  fn_800F05A0(void* threadCtx);
 
 /* Scene/camera */
@@ -205,7 +205,7 @@ extern void  fn_8011288C(s32 p1, s32 p2);
 extern void  fn_801EF644(s32 result);
 
 /* Math */
-extern f32   fn_800EC53C(void);               /* Get distance */
+extern f32   GSmodelGetAnimFrame(void);               /* Get distance */
 extern f64 sin(f32);
 
 /* Named asm symbols (used in inline asm .inc files) */
@@ -1325,7 +1325,7 @@ LAB_80025564:
  *     fn_801C41C8(lbl_8047B8E4, 3)     -- set BGM volume fade target
  *     soundStop(0x449, 0)            -- play SE cue
  *     while (accumulator < limit) {    -- time-based integration loop
- *       fn_800F0308();                 -- frame advance
+ *       _threadSwitch();                 -- frame advance
  *       accumulator += (f32)fn_800D3088() / (f32)(s32)fn_800D37CC();
  *     }
  *     fn_801653C4(); fn_801656F8(0x7d0, 0)
@@ -1378,7 +1378,7 @@ void fn_800255A4(void) {
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
     extern void fn_800EF5A4(u32);
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern u8 fn_80102620(s32);
     extern void fn_80102510(s32);
     extern u32 fn_801653C4(void);
@@ -1395,7 +1395,7 @@ void fn_800255A4(void) {
         accum = lbl_8047B8AC;
         limit = lbl_8047B8B0;
         while (accum < limit) {
-            fn_800F0308();
+            _threadSwitch();
             accum = accum + (f32)fn_800D3088() / (f32)fn_800D37CC();
         }
         fn_801656F8(fn_801653C4(), 0x7d0, 0);
@@ -1419,7 +1419,7 @@ extern void fn_801046B8(void);
 extern void fn_801026A4(void);
 extern void fn_8011394C(void);
 extern void fn_800D3074(void);
-extern void fn_800EF5FC(void);
+extern void GStextureCreate(void);
 extern void fn_8010264C(void);
 extern u32 lbl_80478DDC;
 extern u32 lbl_8047A368;
@@ -1446,7 +1446,7 @@ void fn_80025730(void) {
     extern void fn_8005D934();
     extern void fn_800D3074();
     extern void GSgfxBeginBackFBCapture();
-    extern void fn_800EF5FC();
+    extern void GStextureCreate();
     extern void fn_80102510();
     extern void fn_8010264C();
     extern void fn_801026A4();
@@ -1597,7 +1597,7 @@ L_80025910:
         r5 = 0x44;
         r6 = 0x0;
         r7 = 0x0;
-        fn_800EF5FC();
+        GStextureCreate();
         r4 = (u32)fn_80025F74;
         lbl_8047A388 = r3;
         r4 = (u32)fn_80025F74;
@@ -1606,7 +1606,7 @@ L_80025910:
         while (1) {
             tmp = lbl_8047A3A8;
             if (tmp != 0) break;
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
 
         }
         r3 = 0xc3;
@@ -2066,7 +2066,7 @@ s32 fn_80025F74(void) {
  *   5. Reset cursor scales: lbl_8047A3A4 = lbl_8047A3A0 = lbl_8047B8A8 (0).
  *   6. Register fn_80025A80 as a particle callback (GSgfxBeginBackFBCapture).
  *   7. Start BGM via fn_80176E0C, then run two timing delay loops
- *      (fn_800F0308 + fn_800D3088 accumulator vs 1 or 0xAE target).
+ *      (_threadSwitch + fn_800D3088 accumulator vs 1 or 0xAE target).
  *   8. Store title origin coords to lbl_803A2040[0..2] and start the final
  *      fade-in loop using fn_800C46B0 for FP-to-int conversion.
  *
@@ -2144,8 +2144,8 @@ void fn_80025F84(void) {
     extern void fn_800E8FE8(u32, u32);
     extern void fn_800E900C(u32, s32, void*);
     extern void fn_800E9108(u32, s32);
-    extern u32 fn_800EF5FC(s32, s32, s32, s32, s32);
-    extern void fn_800F0308(void);
+    extern u32 GStextureCreate(s32, s32, s32, s32, s32);
+    extern void _threadSwitch(void);
     extern u32 fn_800F9318(u32, u32);
     extern u32 fn_80113F48(void);
     extern void fn_80165A20(s32, s32, s32);
@@ -2216,7 +2216,7 @@ void fn_80025F84(void) {
         }
         lbl_8047A3A4 = lbl_8047B8A8;
         lbl_8047A3A0 = lbl_8047B8A8;
-        lbl_8047A38C = fn_800EF5FC(0, 0, 0x44, 0, 0);
+        lbl_8047A38C = GStextureCreate(0, 0, 0x44, 0, 0);
         GSgfxBeginBackFBCapture(lbl_8047A38C, (void*)fn_80025A80, 0);
         fn_80176E0C(fn_80113F48(), frame_b, 0, 0);
 
@@ -2227,7 +2227,7 @@ void fn_80025F84(void) {
             if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
-            fn_800F0308();
+            _threadSwitch();
             tick = fn_800D3088();
         }
         fn_801CB834(0xC6A1000, frame_a, 0, 0);
@@ -2238,7 +2238,7 @@ void fn_80025F84(void) {
             if (delay < 1) delay = 1;
         }
         for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
-            fn_800F0308();
+            _threadSwitch();
             tick = fn_800D3088();
         }
     }
@@ -2258,7 +2258,7 @@ void fn_80025F84(void) {
         }
     }
     for (elapsed = 0; elapsed < delay; elapsed = elapsed + tick) {
-        fn_800F0308();
+        _threadSwitch();
         tick = fn_800D3088();
     }
 }
@@ -2280,7 +2280,7 @@ void fn_8002058C(void) {
     fn_801EF644(-1);
     lbl_8047A32C = 1;
     for (;;) {
-        fn_800F0308();
+        _threadSwitch();
     }
 }
 #endif
@@ -2523,7 +2523,7 @@ asm void fn_80020C9C(void) {
 #pragma peephole off
 #pragma optimization_level 4
 void fn_80020C9C(void) {
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern u8 fn_801070F4(s32);
     extern void fn_800205C0(s32);
     extern u32 fn_80166C74(void);
@@ -2547,7 +2547,7 @@ void fn_80020C9C(void) {
     state = 0;
     active = 1;
     while (fn_801070F4(0xAA) != 0) {
-        fn_800F0308();
+        _threadSwitch();
     }
     fn_800205C0(0);
 
@@ -2727,7 +2727,7 @@ extern void fn_8010A5BC(void);
 extern void fn_8010A010(void);
 extern void fn_8018F6F4(void);
 extern void fn_8018F4C8(void);
-extern void fn_80109894(void);
+extern void menuModelSetMotion(void);
 extern void fn_80005748(void);
 extern void fn_801EF274(void);
 extern void fn_80113FE8(void);
@@ -2776,7 +2776,7 @@ void fn_80021624(void) {
 #endif
 
 /* fn_80021644 - 0x80021644 | size: 0x9c */
-extern void fn_80177A44(void);
+extern void GSscene_SetMode(void);
 extern u32 lbl_8047A35C;
 extern u32 lbl_8047A358;
 #if 0
@@ -2792,7 +2792,7 @@ void fn_80021644(void) {
     extern u32 fn_801CBA0C(s32);
     extern void fn_800F9318(void*, u32);
     extern void fn_80176E0C(s32, s32, s32, s32);
-    extern void fn_80177A44(s32);
+    extern void GSscene_SetMode(s32);
     void* handle;
 
     if (fn_800FF548() == 0) {
@@ -2801,7 +2801,7 @@ void fn_80021644(void) {
         lbl_8047A35C = fn_801CBA0C(0x0FFE1000);
         fn_800F9318(handle, lbl_8047A35C);
         fn_80176E0C(0x632, 0x0FFF1800, 0, 1);
-        fn_80177A44(4);
+        GSscene_SetMode(4);
         lbl_8047A360 = lbl_8047A358;
         (&lbl_8047A360)[1] = 0;
     }
@@ -3463,7 +3463,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
             count = 0;
             
             while (count < 0x3C) {
-                fn_800F0308();
+                _threadSwitch();
                 count += fn_800D3088();
             }
         }
@@ -3473,7 +3473,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
         count = 0;
         
         while (count < 0x60) {
-            fn_800F0308();
+            _threadSwitch();
             count += fn_800D3088();
         }
     }
@@ -3502,7 +3502,7 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     
     /* Wait for particle completion */
     while (fn_801666BC(temp_r29) == 2) {
-        fn_800F0308();
+        _threadSwitch();
     }
     
     /* Update particle state */

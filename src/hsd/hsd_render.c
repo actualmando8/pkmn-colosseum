@@ -80,8 +80,8 @@ void fn_80197400(void) {
     extern u32 lbl_8047B254;
     extern u8 lbl_8047B258[];
     extern u32 lbl_8047B25C;
-    extern void fn_801A84F0();
-    extern void fn_801AA498();
+    extern void HSD_MtxFree();
+    extern void HSD_ObjFree();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -101,12 +101,12 @@ void fn_80197400(void) {
         r30 = *(u32*)((u8*)r31 + 0x44);
         if (tmp != 0) {
             r3 = *(u32*)((u8*)r31 + 0x30);
-            fn_801A84F0();
+            HSD_MtxFree();
         }
         r3 = (u32)lbl_80465348;
         r4 = r31;
         r3 = (u32)lbl_80465348;
-        fn_801AA498();
+        HSD_ObjFree();
         r31 = r30;
 
     }
@@ -140,9 +140,9 @@ void fn_801974A8(void) {
     extern u32 lbl_8047B254;
     extern u8 lbl_8047B258[];
     extern u32 lbl_8047B25C;
-    extern void fn_801942B8();
-    extern void fn_801A84F0();
-    extern void fn_801AA498();
+    extern void HSD_CObjGetCurrent();
+    extern void HSD_MtxFree();
+    extern void HSD_ObjFree();
     u8 sp[0x10];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -157,7 +157,7 @@ void fn_801974A8(void) {
     u32 r31 = 0;
     void (*ctr_fn)(void) = 0;
 
-    fn_801942B8();
+    HSD_CObjGetCurrent();
     tmp = r3 + 0x54;
     r30 = *(u32*)lbl_8047B250;
     r31 = tmp;
@@ -211,12 +211,12 @@ void fn_801974A8(void) {
         r31 = *(u32*)((u8*)r30 + 0x44);
         if (tmp != 0) {
             r3 = *(u32*)((u8*)r30 + 0x30);
-            fn_801A84F0();
+            HSD_MtxFree();
         }
         r3 = (u32)lbl_80465348;
         r4 = r30;
         r3 = (u32)lbl_80465348;
-        fn_801AA498();
+        HSD_ObjFree();
         r30 = r31;
 
     }
@@ -330,11 +330,11 @@ void fn_80197784(void) {
     extern u8 lbl_8047D9E0[];
     extern u8 lbl_8047D9E8[];
     extern void fn_800A2D64();
-    extern void fn_801942B8();
+    extern void HSD_CObjGetCurrent();
     extern void __assert();
     extern void fn_8019D9DC();
-    extern void fn_801A8524();
-    extern void fn_801AA4CC();
+    extern void HSD_MtxAlloc();
+    extern void HSD_ObjAlloc();
     u8 sp[0x50];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -383,7 +383,7 @@ void fn_80197784(void) {
     }
     }
     if (r29 == 0) {
-        fn_801942B8();
+        HSD_CObjGetCurrent();
         tmp = r3 + 0x54;
         r29 = tmp;
     }
@@ -437,7 +437,7 @@ void fn_80197784(void) {
     if ((s32)tmp == 0) return;
     r3 = (u32)lbl_80465348;
     r3 = (u32)lbl_80465348;
-    fn_801AA4CC();
+    HSD_ObjAlloc();
     r27 = r3;
     r4 = 0x0;
     r5 = 0x18;
@@ -447,7 +447,7 @@ void fn_80197784(void) {
     r4 = r27;
     fn_800A2D64();
     if (r29 != 0) {
-        fn_801A8524();
+        HSD_MtxAlloc();
         tmp = r3;
         r3 = r29;
         *(u32*)((u8*)r27 + 0x30) = tmp;
@@ -485,7 +485,7 @@ void fn_80197784(void) {
 
 /* 0x80197998 | 0xCC */
 void fn_80197998(void) {
-    extern void fn_80199704();
+    extern void HSD_DObjSetCurrent();
     extern void fn_8019F024();
     extern void fn_801A5DCC();
     extern void fn_801AB63C();
@@ -533,7 +533,7 @@ void fn_80197998(void) {
             /* and. tmp, tmp, r30 */;
             if ((s32)tmp != 0) {
                 r3 = r31;
-                fn_80199704();
+                HSD_DObjSetCurrent();
                 r6 = *(u32*)((u8*)r31 + 0x0);
                 r3 = r31;
                 r4 = r27;
@@ -548,9 +548,8 @@ void fn_80197998(void) {
 
     }
     r3 = 0x0;
-    fn_80199704();
+    HSD_DObjSetCurrent();
     r3 = 0x0;
     fn_8019F024();
     return;
 }
-

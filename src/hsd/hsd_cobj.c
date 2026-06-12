@@ -313,7 +313,7 @@ void fn_80193CD0(u8* ptr) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void __assert(const char*, u32, const char*);
-extern void fn_801A84F0(void);
+extern void HSD_MtxFree(void);
 extern void fn_801C25E4(void);
 #if 1
 asm void fn_80193D30(void) {
@@ -890,7 +890,7 @@ f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj)
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern f32* fn_801A8524(void);
+extern f32* HSD_MtxAlloc(void);
 extern void PSMTXInverse(f32*, f32*);
 #if 0
 asm void HSD_CObjGetInvViewingMtxPtrDirect(void) {
@@ -900,7 +900,7 @@ asm void HSD_CObjGetInvViewingMtxPtrDirect(void) {
 f32* HSD_CObjGetInvViewingMtxPtrDirect(HSD_CObj* cobj) {
     if (cobj->flags & 0x80000000) {
         if (cobj->proj_mtx == NULL) {
-            cobj->proj_mtx = fn_801A8524();
+            cobj->proj_mtx = HSD_MtxAlloc();
         }
         PSMTXInverse(cobj->view_mtx[0], cobj->proj_mtx);
         if (cobj != NULL) {

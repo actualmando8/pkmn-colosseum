@@ -70,7 +70,7 @@
  * Pool count stored at lbl_8047ABF8.
  * Pool GSmem handle stored at lbl_8047ABF0.
  *
- * Fields recovered from fn_800EF5FC (GStexture_Create):
+ * Fields recovered from GStextureCreate (GStexture_Create):
  * =================================================================== */
 typedef struct GStextureHandle {
     /* 0x00 */ u16    width;          /* texture width in texels */
@@ -133,7 +133,7 @@ void GStextureInit(u32 maxTextures);
  * Prints "GStexture: warning -- texture size adjusted ..." if the
  * dimensions are rounded to the next power of two.
  *
- * Corresponds to fn_800EF5FC.
+ * Corresponds to GStextureCreate.
  */
 GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
                                   u32 tlutFormat, u8 mipLevels);

@@ -539,7 +539,7 @@ void fn_80031AC0(void* r3, void* r4) {
 #endif
 
 /* 0x80031B10 | 0x3C */
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern u32 fn_8010B560(void);
 extern void fn_801CB9D8(u32);
 extern u32 lbl_8047A418;
@@ -551,7 +551,7 @@ asm void fn_80031B10(void) {
 #pragma peephole off
 void fn_80031B10(void) {
     while ((u8)fn_8010B560() != 0) {
-        fn_800F0308();
+        _threadSwitch();
     }
     fn_801CB9D8(lbl_8047A418);
 }
@@ -1038,7 +1038,7 @@ extern u32  fn_80113F48(void);
 extern u32  fn_801CBA0C(u32);
 extern u32  fn_800F9318(u32);
 extern void fn_80176E0C(s32, u32, s32, s32);
-extern void fn_80177A44(s32);
+extern void GSscene_SetMode(s32);
 extern void fn_801CB7C4(u32);
 extern u8 lbl_8047A408;
 extern u32 lbl_8047A42C;
@@ -1085,7 +1085,7 @@ void fn_800324A0(void) {
         lbl_8047A418 = value;
         lbl_8047A414 = fn_800F9318(handle);
         fn_80176E0C(0x37C, 0x0FFF1800, 0, 1);
-        fn_80177A44(4);
+        GSscene_SetMode(4);
         fn_801CB7C4(0x10B11000);
     }
 }
@@ -1102,7 +1102,7 @@ asm void fn_80032564(void) {
 #pragma peephole off
 void fn_80032564(void) {
     fn_800FF730(0x394);
-    fn_800F0308();
+    _threadSwitch();
 }
 #pragma peephole on
 #endif
@@ -1273,7 +1273,7 @@ void fn_800327FC(void) {
     extern void fn_800D3088();
     extern void fn_800D37CC();
     extern void fn_800E0C04();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800F9E70();
     extern void fn_80102510();
     extern void fn_80102620();
@@ -1576,7 +1576,7 @@ void fn_800327FC(void) {
     f31 = lbl_8047BA18;
     while (f27 < f31) {
 
-        fn_800F0308();
+        _threadSwitch();
         fn_800D37CC();
         *(u32*)(sp + 0x1B4) = tmp;
         f29 = f0 - f28;

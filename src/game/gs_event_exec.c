@@ -95,9 +95,9 @@ extern u8   fn_800FF548(void);                     /* Scene transition check */
 extern void fn_800FF56C(s32 floorId);              /* Floor load */
 
 /* Frame control */
-extern void fn_800F0308(void);                     /* Frame advance */
+extern void _threadSwitch(void);                     /* Frame advance */
 extern void fn_800F05A0(void* threadCtx);          /* Resume thread */
-extern void fn_800F07A8(s32 priority, void* stack, s32 stackSize,
+extern void GSthreadCreate(s32 priority, void* stack, s32 stackSize,
                          s32 flags, s32 p5, void* entry);
 
 /* =========================================================================

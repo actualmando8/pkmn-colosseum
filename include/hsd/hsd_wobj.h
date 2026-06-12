@@ -50,6 +50,7 @@ struct HSD_WObjDesc {
 struct HSD_WObjInfo {
     HSD_ObjInfo parent;
     int (*load)(HSD_WObj* wobj, HSD_WObjDesc* desc);
+    void (*update)(HSD_WObj* wobj, u32 type, void* value);
 };
 
 /* ========================================================================= */
@@ -102,7 +103,8 @@ void HSD_WObjAddAnim(HSD_WObj* wobj, HSD_WObjAnim* anim);
 void HSD_WObjInterpretAnim(HSD_WObj* wobj);
 void HSD_WObjInit(HSD_WObj* wobj, HSD_WObjDesc* desc);
 HSD_WObj* HSD_WObjLoadDesc(HSD_WObjDesc* desc);
-void HSD_WObjSetPosition(HSD_WObj* wobj, f32 x, f32 y, f32 z);
+void HSD_WObjSetPosition(HSD_WObj* wobj, void* position);
+void HSD_WObjSetPosition_Early(HSD_WObj* wobj, f32 x, f32 y, f32 z);
 void HSD_WObjSetPositionX(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionY(HSD_WObj* wobj, f32 val);
 void HSD_WObjSetPositionZ(HSD_WObj* wobj, f32 val);

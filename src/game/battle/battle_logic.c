@@ -1266,8 +1266,8 @@ void fn_800C4928(void);
 void fn_800C4C50(void);
 void fn_800C4C98(void);
 void fn_800CA7FC(void);
-void fn_800D1F84(void);
-void fn_800D2584(void);
+void GScameraGetPosition(void);
+void GScameraGetActiveCamera(void);
 void fn_800D2F34(void);
 void fn_800D3088(void);
 void fn_800D3190(void);
@@ -1310,7 +1310,7 @@ void fn_800EE9BC(void);
 void fn_800EF4F4(void);
 void fn_800EF4FC(void);
 void fn_800EFD3C(void);
-void fn_800F0308(void);
+void _threadSwitch(void);
 void fn_800F0470(void);
 void fn_800F9E70(void);
 void fn_800FAEF8(void);
@@ -1611,7 +1611,7 @@ void fn_801E075C(void) {
     extern void fn_800E407C();
     extern void fn_800E43A4();
     extern void fn_800E4BF4();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80113D58();
     extern void fn_8011E15C();
     extern void fn_8011E778();
@@ -1742,7 +1742,7 @@ void fn_801E075C(void) {
                 f0 = f0 - f30;
                 f0 = f0 / f29;
                 f27 = f27 + f0;
-                fn_800F0308();
+                _threadSwitch();
 
             }
             r26 = 0x64;
@@ -1789,7 +1789,7 @@ void fn_801E09E0(void) {
     extern void fn_800EE150();
     extern void fn_800EE3BC();
     extern void fn_800EE828();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_800FF56C();
     extern void fn_80113D58();
     extern void fn_80116958();
@@ -1918,7 +1918,7 @@ void fn_801E09E0(void) {
                     f0 = f0 - f29;
                     f0 = f0 / f30;
                     f27 = f27 + f0;
-                    fn_800F0308();
+                    _threadSwitch();
 
                 }
                 r25 = 0x1;
@@ -1956,7 +1956,7 @@ void fn_801E09E0(void) {
                 f0 = f0 - f29;
                 f0 = f0 / f30;
                 f27 = f27 + f0;
-                fn_800F0308();
+                _threadSwitch();
 
             }
             f2 = lbl_8047E410;
@@ -2008,7 +2008,7 @@ void fn_801E09E0(void) {
                 f0 = f0 - f29;
                 f0 = f0 / f30;
                 f27 = f27 + f0;
-                fn_800F0308();
+                _threadSwitch();
 
             }
             f1 = *(f32*)(sp + 0x20);
@@ -2042,7 +2042,7 @@ void fn_801E09E0(void) {
                 f0 = f0 - f29;
                 f0 = f0 / f30;
                 f27 = f27 + f0;
-                fn_800F0308();
+                _threadSwitch();
 
             }
             break;
@@ -2107,7 +2107,7 @@ void fn_801E09E0(void) {
             f0 = f0 - f30;
             f0 = f0 / f29;
             f27 = f27 + f0;
-            fn_800F0308();
+            _threadSwitch();
 
         }
         r25 = 0x64;
@@ -2867,7 +2867,7 @@ void fn_801E189C(void) {
     extern u8 lbl_8047B448[];
     extern void fn_800A19CC();
     extern void fn_800A1F94();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801E1924();
     u8 sp[0x10];
     u32 tmp = 0;
@@ -2904,7 +2904,7 @@ void fn_801E189C(void) {
     while (1) {
         tmp = lbl_8047B444;
         if ((s32)tmp != 0) break;
-        fn_800F0308();
+        _threadSwitch();
 
 
     }
@@ -15550,8 +15550,8 @@ void fn_801ED780(void) {
     extern f32 lbl_8047E4F0;
     extern f64 lbl_8047E4F8;
     extern f64 lbl_8047E500;
-    extern void fn_800D1F84();
-    extern void fn_800D2584();
+    extern void GScameraGetPosition();
+    extern void GScameraGetActiveCamera();
     extern void fn_800D2F34();
     extern void fn_800D59B8();
     extern void fn_800D5C18();
@@ -15604,10 +15604,10 @@ void fn_801ED780(void) {
     if (tmp == 0) {
         return;
     }
-    fn_800D2584();
+    GScameraGetActiveCamera();
     if (r3 == 0) return;
     r4 = (u32)sp + 0x8;
-    fn_800D1F84();
+    GScameraGetPosition();
     r3 = (u32)lbl_80375230;
     r4 = (u32)sp + 0x8;
     r3 = (u32)lbl_80375230;

@@ -33,7 +33,7 @@
 extern void fn_800DD970(const char* fmt, ...);
 
 /* GS engine timing: wait one frame */
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 
 /* GS engine tick timers (for fade timing) */
 extern s32 fn_800D37CC(void);
@@ -129,8 +129,8 @@ extern void  fn_80167A6C(void);      /* _sndInitBgmPool */
 extern void  fn_80167A44(void);      /* _sndInitSePool */
 extern void  fn_80167A14(void);      /* _sndInitListenerPool */
 extern void  fn_80167A9C(u32 groupId); /* _sndLoadGroup */
-extern void  fn_801644E0(void* buffer); /* _sndSetTableBuffer */
-extern void  fn_80164488(void* buffer); /* _sndLoadTableFromBuffer */
+extern void  sndAuxCallbackPrepareReverbHI(void* buffer);
+extern void  sndAuxCallbackUpdateSettingsReverbHI(void* buffer);
 
 /* Sound internal: group/work management */
 extern void  fn_80167070(u32 sndId, u32 mode); /* _sndCleanupWork */
@@ -680,7 +680,7 @@ void _sndFadeBgm(u32 fadeTimeMs) {
     elapsed = 0.0f;
 
     while (elapsed < target) {
-        fn_800F0308();          /* wait one frame */
+        _threadSwitch();          /* wait one frame */
         startTick = fn_800D37CC(); /* get start tick (fn_800D37CC) */
         endTick = fn_800D3088();   /* get end tick */
         deltaTime = (f32)(endTick - startTick);
@@ -822,7 +822,7 @@ void _sndWaitGroupLoad(u32 groupId) {
             fn_800DD970("ERROR: Can't Read Group(%d)\n\n", groupId);
         }
         if (status != 0) {
-            fn_800F0308(); /* wait one frame */
+            _threadSwitch(); /* wait one frame */
         }
     } while (status != 0);
 }
@@ -989,7 +989,7 @@ BOOL _sndPrepareStream(u32 sndId, u32 fadeTime, u32 volume) {
 
     /* Poll until playback status is ready */
     while (GSsndGetStatus(sndId) == 2) {
-        fn_800F0308(); /* wait one frame */
+        _threadSwitch(); /* wait one frame */
     }
 
     /* Release the work entry */
@@ -1149,7 +1149,7 @@ BOOL sndInit(u32 numBgm, u32 numSe, u32 numBgmRes, u32 numSe3d,
 
     /* Step 6: Load sound bank table from lbl_80452500 */
     fn_80167A9C(0); /* load group 0 */
-    fn_801644E0((void*)0x80452500); /* set table buffer */
+    sndAuxCallbackPrepareReverbHI((void*)0x80452500);
 
     /* Step 7: Register the per-frame update callback */
     fn_8014DAA8(

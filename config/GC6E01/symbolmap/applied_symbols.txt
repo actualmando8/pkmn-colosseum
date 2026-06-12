@@ -1,19 +1,24 @@
 fn_8007C2C0 -> menuPokeCouponInit  // XD port (score 2.0)
 fn_8009E7B0 -> OSLink  // string self-name (leading)
 fn_8009EDAC -> OSUnlink  // string self-name (leading)
+fn_800A56F0 -> stateReadingFST  // XD-struct HIGH n=37; verified 100%
 fn_800BE800 -> MessageSend  // string self-name (leading)
 fn_800BF95C -> SendACK  // string self-name (leading)
 fn_800C4D8C -> __sys_free  // XD port (score 2.0)
+fn_800DC390 -> GSgfxBeginBackFBCapture  // existing build/source name; verified 100%
 fn_800DF498 -> GSmaterialSetPEdescr  // string self-name (leading)
 fn_800DF7A4 -> GSmaterialCreate  // string self-name (leading)
 fn_800DFABC -> _matGSmatEnableEnvMapExt  // XD port (score 2.0)
 fn_800F09D8 -> GSthread  // string self-name (leading)
+fn_80102428 -> menuCloseSync  // XD-struct HIGH n=38; verified 100%
 fn_8010D3C8 -> GScolsys2Draw  // string self-name (leading)
 fn_80139378 -> _leaffxGenerateLeafData  // string self-name (leading)
 fn_8013D908 -> envMapEffectStart  // string self-name (leading)
 fn_8013F97C -> _distortionEffectUpdateMatrices  // string self-name (leading)
 fn_801657F8 -> soundStop  // string self-name (leading)
+fn_80167BE8 -> _gsdvdErrorTask_801879AC  // XD-struct HIGH n=82; verified 100%
 fn_8016F430 -> psInterpretParticles  // XD port (score 2.0)
+fn_80190C90 -> GSflagInitBitPos  // XD-struct HIGH n=105; verified 100%
 fn_80191A34 -> WObjUpdateFunc  // XD port (score 2.83)
 fn_80191F64 -> HSD_ArchiveParse  // string self-name (leading)
 fn_8019BFE8 -> HSD_HashSearch  // XD port (score 2.0)
@@ -41,3 +46,201 @@ fn_8013E658 -> auraEffectStart  // wired-lead (header proto, u16)
 fn_8013F344 -> distortionEffectStart  // wired-lead (header proto, u16)
 fn_8013FDD0 -> billboardEffectStart  // wired-lead (header proto, u16)
 fn_80167318 -> _sndCheckSndWorkALL  // wired-lead (header proto, void)
+fn_8013111C -> GSeffect  // string self-name (leading)
+fn_800F07A8 -> GSthreadCreate  // string self-name (leading)
+fn_80114CA8 -> floorReadMapPreFunc  // string self-name (leading)
+fn_80115E04 -> floorEventChangeTresure  // XD-struct HIGH n=26; verified 100%
+fn_80117514 -> floorUpdateFieldCamera  // string self-name (leading)
+fn_80195794 -> HSD_CObjGetEyeDistance  // XD port (score 2.0)
+fn_80193B30 -> hsdInitClassInfo  // XD port (score 3.0)
+fn_80114948 -> floorReadCameraPreFunc  // string self-name (leading)
+fn_801A6494 -> LObjUpdateFunc  // LObjInfo update callback slot 0x40; fn_801A6408 passes it to HSD_ForeachAnim interpreter; verified 100%
+fn_801A68D0 -> HSD_LObjGetNbActive  // XD LObj order; source C label verified 100%
+fn_801A68D8 -> HSD_LObjGetLightMaskSpecular  // XD LObj order; source C label verified 100%
+fn_801A68E0 -> HSD_LObjGetLightMaskAlpha  // XD LObj order; source C label verified 100%
+fn_801A68E8 -> HSD_LObjGetLightMaskAttnFunc  // XD LObj order; source C label verified 100%
+fn_801A68F0 -> HSD_LObjGetLightMaskDiffuse  // XD LObj order; source C label verified 100%
+fn_801A68F8 -> HSD_LObjClearFlags  // XD LObj order; source C label verified 100%
+fn_801A6910 -> HSD_LObjSetFlags  // XD LObj order; source C label verified 100%
+fn_801942C0 -> HSD_CObjGetOrtho  // CObj projection_type PROJ_ORTHO accessor; structural XD name; verified 100%
+fn_8019431C -> HSD_CObjGetPerspective  // CObj projection_type PROJ_PERSPECTIVE accessor; structural XD name; verified 100%
+fn_80194CC4 -> HSD_CObjGetViewingMtxPtr  // updates viewing matrix then returns view_mtx at offset 0x54; structural XD name; verified 100%
+fn_80194CF4 -> HSD_CObjGetInvViewingMtxPtrDirect  // lazily inverts view_mtx into cached pointer; structural XD name; verified 100%
+fn_801AD678 -> PObjUpdateFunc  // PObj class update slot 0x48 sets shape blend weight; structural XD name; verified 100%
+fn_801B009C -> RObjUpdateFunc  // RObj animation update callback toggles high-bit flag from animated value; structural XD name; verified 100%
+fn_8019C128 -> HSD_IDGetDataFromTable  // ID table hash lookup helper; structural XD name; verified 100%
+fn_801A0BF0 -> HSD_IDGetData  // default-table wrapper around HSD_IDGetDataFromTable; structural XD name; verified 100%
+fn_8025DBD4 -> tableResBiosGetResPtr  // XD-struct HIGH n=22; verified 100%
+fn_80261444 -> charNameBiosGetHearFlag  // XD-struct HIGH n=28; verified 100%
+fn_80109894 -> menuModelSetMotion  // structural build name; verified 100%
+fn_80011700 -> menuFightCloseWaza  // structural build name; verified 100%
+fn_800DC298 -> GSgfxEndBackFBCapture  // structural build name; verified 100%
+fn_800DCCF0 -> GSlightSetType  // structural build name; verified 100%
+fn_800DF550 -> GSmaterialSetFlags  // structural build name; verified 100%
+fn_800E07E4 -> GSbezierCalculateVector  // structural build name; verified 100%
+fn_8019158C -> WObjAmnesia  // XD WObj order; source C label verified 100%
+fn_801915D4 -> WObjRelease  // XD WObj order; source C label verified 100%
+fn_80191628 -> HSD_WObjAlloc  // XD WObj order; source C label verified 100%
+fn_801919EC -> HSD_WObjInterpretAnim  // XD WObj order; source C label verified 100%
+fn_80191DCC -> HSD_WObjAddAnim  // XD WObj order; source C label verified 100%
+fn_80191E38 -> HSD_WObjReqAnim  // XD WObj order; source C label verified 100%
+fn_80191E88 -> HSD_WObjRemoveAnim  // XD WObj order; source C label verified 100%
+fn_801A678C -> HSD_LObjGetActiveByIndex  // XD LObj order; source C label verified 100%
+fn_801A67BC -> HSD_LObjGetActiveByID  // XD LObj order; source C label verified 100%
+fn_801A6370 -> HSD_LObjReqAnimAll  // XD LObj animation order; source C label verified 100%
+fn_801A6408 -> HSD_LObjAnimAll  // XD LObj animation order; source C label verified 100%
+fn_801A48B0 -> HSD_LObjGetInterest  // XD LObj accessor order; source C label verified 100%
+fn_801A497C -> HSD_LObjGetPosition  // XD LObj accessor order; source C label verified 100%
+fn_801A4A48 -> HSD_LObjSetColor  // XD LObj accessor order; source C label verified 100%
+fn_801A4AC4 -> HSD_LObjGetCurrentByType  // XD LObj accessor order; source C label verified 100%
+fn_801A426C -> HSD_LObjAddAnimAll  // XD LObj animation order; source C label verified 100%
+fn_801A48F4 -> HSD_LObjSetInterest  // XD LObj accessor order; source C label verified 100%
+fn_801A49C0 -> HSD_LObjSetPosition  // XD LObj accessor order; source C label verified 100%
+fn_80199568 -> HSD_DObjAnimAll  // XD DObj animation order; source C label verified 100%
+fn_801995D4 -> HSD_DObjReqAnimAllByFlags  // XD DObj animation order; source C label verified 100%
+fn_80199654 -> HSD_DObjAddAnimAll  // XD DObj animation order; source C label verified 100%
+fn_8019B7C0 -> HSD_FogAdjInit  // source/header proposed name; compile_check --diff --symbol verified 100%
+fn_800E3B3C -> GSmaterialGetPoolCount  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3B44 -> GSmaterialSetShadowFlag  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3B6C -> GSmaterialFindByMObj  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3BF0 -> GSmaterialGetUserData  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3BF8 -> GSmaterialGetTexture  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3C00 -> GSmaterialSetUserData  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3C08 -> GSmaterialSetTexture  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3C5C -> GSmaterialGetTransformPtr  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3C64 -> GSmaterialHasTransform  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3C94 -> GSmaterialSetCustomPEFlag  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3CBC -> GSmaterialGetTexStage  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3CC8 -> GSmaterialSetEnvMapFlag  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3CF0 -> GSmaterialGetSpecularPtr  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3CF8 -> GSmaterialGetAmbientPtr  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D00 -> GSmaterialGetDiffusePtr  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D08 -> GSmaterialIsActive  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D14 -> GSmaterialLerpPEColor  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D40 -> GSmaterialLerpSpecular  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D6C -> GSmaterialLerpAmbient  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E3D98 -> GSmaterialLerpDiffuse  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_800E8F68 -> GSmaterialSetCallback  // source-defined material accessor; compile_check --diff --symbol verified 100%
+fn_80199178 -> HSD_DObjCountVertices  // XD structural port; source C label verified 100%
+fn_801991F8 -> HSD_DObjResolveRefsAll  // XD structural port; source C label verified 100%
+fn_801A8428 -> HSD_MObjClearFlags  // XD vocabulary/header-backed flag helper; source C label verified 100%
+fn_801A8440 -> HSD_MObjSetFlags  // XD vocabulary/header-backed flag helper; source C label verified 100%
+fn_801A8458 -> HSD_MObjGetFlags  // XD vocabulary-backed rendermode getter; source C label verified 100%
+fn_801A8470 -> HSD_MObjSetCurrent  // XD vocabulary/header-backed current-MObj setter; source C label verified 100%
+fn_801AD61C -> HSD_PObjAnimAll  // XD vocabulary-backed PObj animation list helper; source C label verified 100%
+fn_80196698 -> HSD_CObjReqAnim  // CObj camera animation helper; source C label verified 100%
+fn_801966FC -> HSD_CObjAnim  // CObj camera animation helper; source C label verified 100%
+fn_80196B10 -> HSD_CObjAddAnim  // CObj camera animation helper; source C label verified 100%
+fn_80196BB8 -> HSD_CObjRemoveAnim  // CObj camera animation helper; source C label verified 100%
+fn_8019B490 -> HSD_FObjStopAnimAll  // XD FObj stop-animation list helper; retained-asm final symbol verified 100%
+fn_8019B5E8 -> HSD_FObjRemoveAll  // XD FObj recursive removal helper; final symbol verified 100%
+fn_801A85A4 -> HSD_VecAlloc  // XD vec allocator helper; final symbol verified 100%
+fn_80191788 -> HSD_WObjSetPosition  // XD WObj vec-position setter; final symbol verified 100%
+fn_8019189C -> HSD_WObjInit  // WObj descriptor initializer; final symbol verified 100%
+fn_8019194C -> WObjLoad  // WObj vtable load method; final symbol verified 100%
+fn_801917D0 -> HSD_WObjLoadDesc  // WObj descriptor allocator/loader; final symbol verified 100%
+fn_801AA608 -> HSD_PObjInit  // PObj class-info initializer; final symbol verified 100%
+fn_801AD214 -> HSD_PObjRemoveAll  // PObj list release/destroy helper; final symbol verified 100%
+fn_8019B528 -> HSD_FObjReqAnimAll  // FObj list request-animation reset helper; retained-asm final symbol verified 100%
+fn_8019970C -> HSD_FObjFree  // XD FObj allocation vocabulary; active C verified 100% before wiring
+fn_80199738 -> HSD_FObjAlloc  // XD FObj allocation vocabulary; active C verified 100% before wiring
+fn_8019B750 -> HSD_FObjRemove  // XD FObj removal wrapper; active C verified 100% before wiring
+fn_8019B784 -> HSD_FObjInitAllocData  // XD FObj allocation vocabulary; active C verified 100% before wiring
+fn_8019B7B4 -> HSD_FObjGetAllocData  // XD FObj allocation vocabulary; active C verified 100% before wiring
+fn_801A84A8 -> HSD_ChanGetAllocData  // XD allocation vocabulary; active C verified 100% before wiring
+fn_801A84B4 -> HSD_VecInitAllocData  // XD Vec allocation vocabulary; active C verified 100% before wiring
+fn_801A84E4 -> HSD_VecGetAllocData  // XD Vec allocation vocabulary; active C verified 100% before wiring
+fn_801A8570 -> HSD_VecFree  // XD Vec allocation vocabulary; active C verified 100% before wiring
+
+fn_801A85F0 -> HSD_MtxScaledAdd  // structural XD, verified 100% C decomp (matrix scaled add)
+fn_801A9570 -> HSD_MtxGetTranslate  // XD vocabulary + behavior copies Mtx translation column, verified 100%
+fn_801AA4CC -> HSD_ObjAlloc  // XD generic object allocation vocabulary; active C verified 100% before wiring
+fn_8019C388 -> HSD_IDInitAllocData  // XD ID allocation vocabulary; active C verified 100% before wiring
+fn_8019C3B8 -> HSD_IDGetAllocData  // XD ID allocation vocabulary; active C verified 100% before wiring
+fn_8019C0F8 -> _HSD_IDForgetMemory  // XD ID table order/size; active C verified 100% before wiring
+fn_8019C358 -> HSD_IDSetup  // XD ID table order/size; active C verified 100% before wiringfn_80194358 -> HSD_CObjSetOrtho  // CObj projection setter; header/XD vocabulary; active C verified 100% before wiring
+fn_8019437C -> HSD_CObjSetFrustum  // CObj projection setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801943A0 -> HSD_CObjSetPerspective  // CObj projection setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801943BC -> HSD_CObjSetProjectionType  // CObj projection_type setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801943CC -> HSD_CObjGetProjectionType  // CObj projection_type getter; header/XD vocabulary; active C verified 100% before wiring
+fn_801943E4 -> HSD_CObjSetViewportfx4  // CObj viewport float setter; XD vocabulary; active C verified 100% before wiring
+fn_801944A4 -> HSD_CObjSetScissorx4  // CObj scissor u16 setter; XD vocabulary; active C verified 100% before wiring
+fn_801944C0 -> HSD_CObjSetFar  // CObj far-plane setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801944D0 -> HSD_CObjGetFar  // CObj far-plane getter; header/XD vocabulary; active C verified 100% before wiring
+fn_801944E8 -> HSD_CObjSetNear  // CObj near-plane setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801944F8 -> HSD_CObjGetNear  // CObj near-plane getter; header/XD vocabulary; active C verified 100% before wiring
+fn_80194788 -> HSD_CObjSetAspect  // CObj perspective aspect setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801947A8 -> HSD_CObjSetFov  // CObj perspective fov setter; header/XD vocabulary; active C verified 100% before wiring
+fn_801942B8 -> HSD_CObjGetCurrent  // CObj current-camera getter; header/XD vocabulary; active C verified 100% before wiring
+fn_80194D60 -> HSD_CObjGetViewingMtx  // CObj view-matrix copy helper; XD vocabulary; active C verified 100% before wiring
+fn_80194D94 -> HSD_CObjSetMtxDirty  // CObj matrix dirty flag helper; XD vocabulary; active C verified 100% before wiring
+fn_80195898 -> HSD_CObjSetEyePosition  // XD vocabulary + body sets eyepos WObj position; match 100%
+fn_80195904 -> HSD_CObjGetEyePosition  // XD vocabulary + body reads eyepos WObj position; match 100%
+fn_80195970 -> HSD_CObjSetInterest  // XD vocabulary + body sets interest WObj position; match 100%
+fn_801959DC -> HSD_CObjGetInterest  // XD vocabulary + body reads interest WObj position; match 100%
+fn_801950D0 -> HSD_CObjGetUpVector  // XD vocabulary + body returns/copies camera up vector; match 100%
+fn_800D173C -> GScameraStopAnimation  // structural/XD vocabulary + body stops/reseeds CObj animation state; match 100%
+fn_800D1860 -> GScameraSetAnimFrame  // XD vocabulary + body requests/animates CObj at frame; match 100%
+fn_800EC53C -> GSmodelGetAnimFrame  // structural/XD vocabulary + body returns model animation frame field; match 100%
+fn_800D20CC -> GScameraSetPerspective  // structural/XD vocabulary + body sets CObj projection/fov/near/far; match 100%
+fn_800D172C -> GScameraGetAnimFrame  // XD vocabulary + body returns camera anim frame field 0x11c; match 100%
+fn_800D1734 -> GScameraHasAnimationEnded  // XD vocabulary + body returns ended flag field 0x124; match 100%
+fn_800D1798 -> GScameraStartAnimation  // XD vocabulary + body sets animating flags and applies CObj frame/rate; match 100%
+fn_800D18FC -> GScameraSetAnimRate  // XD vocabulary + body updates anim rate field 0x118 and HSD_ForeachAnim; match 100%
+fn_800D1984 -> GScameraSetAnimIndex  // XD vocabulary + body swaps camera anim by index; match 100%
+fn_800D1A38 -> GScameraIsAnimating  // XD vocabulary + body returns animating flag field 0x4; match 100%
+fn_800D1F84 -> GScameraGetPosition  // XD vocabulary + body refreshes/copies camera eye position; match 100%
+fn_800D1FDC -> GScameraGetPerspective  // XD vocabulary + body returns fov/aspect/near/far; match 100%
+fn_800D203C -> GScameraSetRotation  // XD vocabulary + body copies rotation and marks dirty; match 100%
+fn_800D207C -> GScameraSetPosition  // XD vocabulary + body copies position and marks dirty; match 100%
+fn_800D21C8 -> GScameraSetViewport  // XD vocabulary + body clamps viewport and applies CObj viewport data; match 100%
+fn_800D1F58 -> GScameraGetRotation  // XD vocabulary + body copies camera rotation vector out; match 100%
+fn_800D1A40 -> GScameraGetDistanceVector  // XD vocabulary + body computes/copies camera distance vector; match 100%
+fn_800D1A70 -> GScameraGetProjMatrixPtr  // XD vocabulary + body builds projection matrix and returns buffer; match 100%
+fn_800D2584 -> GScameraGetActiveCamera  // XD vocabulary + body returns active camera pointer/global; match 100%
+fn_800D1EB8 -> GScameraGetLookAt  // XD vocabulary + body copies up/interest look-at vectors; match 100%
+fn_800D1F04 -> GScameraLookAt  // XD vocabulary + body stores up/interest look-at vectors and marks dirty; match 100%
+fn_801A4F54 -> HSD_LObjSetup  // header/XD vocabulary + body rebuilds active GX light setup state; retained asm verified 100%
+fn_801A4B00 -> HSD_LObjDeleteCurrentAll  // XD vocabulary + body clears/removes active-current light list entries; retained asm verified 100%
+fn_801A66E0 -> HSD_LObjRemoveAnimAll  // XD vocabulary + body removes LObj AObj and WObj animation links; retained asm verified 100%
+fn_80199704 -> HSD_DObjSetCurrent  // header/XD vocabulary + body stores current DObj global; match 100%
+fn_801A8354 -> HSD_MObjReqAnimByFlags  // XD vocabulary + material AObj/TObj animation-by-flags body; match 100%
+fn_801A8478 -> HSD_MtxInitAllocData  // XD contiguous HSD mtx alloc helper sequence; match 100%
+HSD_ChanGetAllocData -> HSD_MtxGetAllocData  // Corrected XD contiguous HSD mtx alloc helper sequence; match 100%
+fn_801A84F0 -> HSD_MtxFree  // XD contiguous HSD mtx alloc helper sequence; match 100%
+fn_801A8524 -> HSD_MtxAlloc  // XD contiguous HSD mtx alloc helper sequence; match 100%
+fn_80138B00 -> leaffxStartEffect  // debug-string/header proposal + allocation wrapper body; source C label verified 100% before wiring
+fn_80139820 -> electronStartEffect  // debug-string/header proposal + allocation wrapper body; source C label verified 100% before wiring
+fn_8013FBE0 -> patchiruTextureStart  // header proposal + Patchiru texture debug string + allocation wrapper body; source C label verified 100% before wiring
+fn_80191ECC -> HSD_ArchiveGetPublicAddress  // HSD vocabulary + table public-address lookup body + FSYS/TOC lookup callsites; source C label verified 100% before wiring
+fn_800E3BC0 -> GSmaterialGetGXTexGenSrc  // gs_material header correspondence + texture helper body; source C label verified 100% before wiring
+fn_801AA498 -> HSD_ObjFree  // XD object allocation vocabulary + exact pool-decrement/free body; source C verified 100% after pragma frame fix
+fn_801AA538 -> HSD_ObjSetHeap  // XD object allocation vocabulary + heap state setter body; source C verified 100% after store-order/pragma fix
+fn_801AD6C4 -> HSD_PObjReqAnimAllByFlags  // XD PObj animation vocabulary + list walk requesting AObj animation for flag bit 0x8; source C verified 100%
+fn_801BBD3C -> HSD_ImageDescFree  // XD ImageDesc vocabulary/order before HSD_ImageDescAlloc + 0x18-byte free wrapper; source C verified 100%
+fn_801BBD60 -> HSD_ImageDescRemove  // XD ImageDesc vocabulary/order before HSD_ImageDescAlloc + duplicate 0x18-byte remove wrapper; source C verified 100%
+fn_801ADC08 -> _HSD_RandForgetMemory  // structural XD port + RNG current-state reset body; source C verified 100%
+fn_801A0B9C -> HSD_JObjRef  // XD vocabulary + object ref-count body, header inline converted to exported declaration; source C verified 100%
+fn_801A6D5C -> HSD_MObjAddTObjNext  // XD vocabulary + texture-object list insertion callsite in gs_render env-map setup; source C verified 100%
+fn_801A6F78 -> MObjSetupTev  // XD structural port + TEV setup body using mobj->tevdesc/texp; source C verified 100%
+fn_8019C7B8 -> _HSD_MemCheckOwnDefaultCB  // HSD memory-callback vocabulary + default arena ownership range check; source C verified 100%
+fn_800EEA98 -> GSscratchStore  // XD vocabulary + LCStoreData scratch-cache store body/callsite; source C verified 100%
+fn_800F0030 -> threadLoadGPRRegisters  // XD thread helper vocabulary + context-block GPR restore body; source/asm label verified 100%
+fn_800F00C0 -> threadLoadFPRRegisters  // XD thread helper vocabulary + context-block FPR restore body; source/asm label verified 100%
+fn_800F015C -> threadSaveGPRRegisters  // XD thread helper vocabulary + context-block GPR save body; source/asm label verified 100%
+fn_800F028C -> threadExecute  // XD thread helper vocabulary + cooperative execute/yield body; source/asm label verified 100%
+fn_800F0308 -> _threadSwitch  // XD thread helper vocabulary + cooperative context-switch body used by frame-wait callsites; source/asm label verified 100%
+fn_801A0744 -> HSD_JObjResolveRefsAll  // HSD JObj API vocabulary + resolver body/calls used by PC-port JObj smoke path; source/asm label verified 100%
+fn_801A6E24 -> HSD_MObjSetup  // HSD MObj API vocabulary + material/texture/TEV/PE setup body used by PC-port material smoke path; source/asm label verified 100%
+fn_801A7E84 -> MObjUpdateFunc  // HSD MObj animation callback vocabulary + material field update dispatcher used by HSD_AObjInterpretAnim; source/asm label verified 100%
+fn_801BBD84 -> HSD_ImageDescAlloc  // XD ImageDesc vocabulary + 0x18-byte allocator/zero-init body; source C verified 100%
+fn_80177908 -> GSscene_GetCameraPositionVector  // GSscene camera-state vector getter at lbl_80478C40+0x1C; field camera callsite names the destination pos; source C verified 100%
+fn_80177930 -> GSscene_SetCameraPositionVector  // GSscene camera-state vector setter at lbl_80478C40+0x1C; battle save/restore callsite pairs with position getter; source C verified 100%
+fn_8017795C -> GSscene_GetCameraViewVector  // GSscene camera-state vector getter at lbl_80478C40+0x28; field camera callsite names the destination view; source C verified 100%
+fn_80177984 -> GSscene_SetCameraViewVector  // GSscene camera-state vector setter at lbl_80478C40+0x28; battle save/restore callsite pairs with view getter; source C verified 100%
+fn_80177A38 -> GSscene_GetMode  // GSscene camera-state mode byte getter at lbl_80478C40+0x0; source C verified 100%
+fn_80177A44 -> GSscene_SetMode  // GSscene camera-state mode byte setter returning previous mode; source C recovered from 37.5% to 100%
+fn_80177830 -> GSscene_GetCameraRotationVector  // GSscene camera-state vector getter at lbl_80478C40+0x10; setter pair updates GScamera rotation; source C verified 100%
+fn_80177858 -> GSscene_SetCameraRotationVector  // GSscene camera-state vector setter at lbl_80478C40+0x10 plus GScameraSetRotation callsite; source C verified 100%
+fn_801778B4 -> GSscene_GetCameraDirectionVector  // GSscene camera-state vector getter at lbl_80478C40+0x04; local camera-state note identifies 0x04-0x10 as direction vector; source C verified 100%
+fn_801778DC -> GSscene_SetCameraDirectionVector  // GSscene camera-state vector setter at lbl_80478C40+0x04; battle save/restore callsites pair with direction getter; source C verified 100%

@@ -198,6 +198,7 @@ void HSD_JObjClearFlagsAll(HSD_JObj* jobj, u32 flags);
 void HSD_JObjReqAnimAll(HSD_JObj* jobj, f32 frame);
 void HSD_JObjSetupMatrixSub(HSD_JObj* jobj);
 void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj);
+void HSD_JObjRef(HSD_JObj* jobj);
 void HSD_JObjUnref(HSD_JObj* jobj);
 HSD_JObj* HSD_JObjRemove(HSD_JObj* jobj);
 void HSD_JObjRemoveAll(HSD_JObj* jobj);
@@ -281,11 +282,6 @@ static inline f32* HSD_JObjGetMtxPtr(HSD_JObj* jobj)
     HSD_ASSERT(1144, jobj);
     HSD_JObjSetupMatrix(jobj);
     return (f32*)jobj->mtx;
-}
-
-static inline void HSD_JObjRef(HSD_JObj* jobj)
-{
-    ref_INC(jobj);
 }
 
 #endif /* HSD_JOBJ_H */

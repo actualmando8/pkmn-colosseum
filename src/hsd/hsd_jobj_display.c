@@ -21,7 +21,7 @@ void fn_801A1A00(void) {
     extern u8 lbl_8047DB3C[];
     extern void fn_800A2D98();
     extern void fn_800A2EB4();
-    extern void fn_801942B8();
+    extern void HSD_CObjGetCurrent();
     extern void __assert();
     extern void fn_8019D9DC();
     u8 sp[0x20];
@@ -97,7 +97,7 @@ void fn_801A1A00(void) {
         fn_800A2D98();
         return;
     }
-    fn_801942B8();
+    HSD_CObjGetCurrent();
     if (r3 == 0) return;
     r3 = r3 + 0x54;
     r4 = r30;
@@ -132,7 +132,7 @@ void fn_801A1B7C(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
     extern void __assert();
-    extern void fn_80199568();
+    extern void HSD_DObjAnimAll();
     extern void fn_8019D980();
     extern void fn_801A1B7C();
     extern void fn_801A1F2C();
@@ -250,7 +250,7 @@ L_801A1CD8:
     if (tmp == 0) break;
 
     r3 = *(u32*)((u8*)r31 + 0x18);
-    fn_80199568();
+    HSD_DObjAnimAll();
     } while (0);
 
     tmp = *(u32*)((u8*)r31 + 0x14);
@@ -332,7 +332,7 @@ L_801A1CD8:
         if (tmp == 0) break;
 
         r3 = *(u32*)((u8*)r31 + 0x18);
-        fn_80199568();
+        HSD_DObjAnimAll();
         } while (0);
 
         tmp = *(u32*)((u8*)r31 + 0x14);
@@ -359,7 +359,7 @@ L_801A1CD8:
                     /* srwi. tmp, tmp, 5 */;
                     if (r30 != 0) {
                         r3 = *(u32*)((u8*)r30 + 0x18);
-                        fn_80199568();
+                        HSD_DObjAnimAll();
                 }
                 }
                 tmp = *(u32*)((u8*)r30 + 0x14);
@@ -406,7 +406,7 @@ void fn_801A1F2C(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
     extern void __assert();
-    extern void fn_80199568();
+    extern void HSD_DObjAnimAll();
     extern void fn_801B0040();
     extern void fn_801C27F4();
     u8 sp[0x10];
@@ -514,7 +514,7 @@ L_801A2078:
     /* srwi. tmp, tmp, 5 */;
     if (tmp == 0) return;
     r3 = *(u32*)((u8*)r31 + 0x18);
-    fn_80199568();
+    HSD_DObjAnimAll();
 
     return;
 }
@@ -542,7 +542,7 @@ void fn_801A20C8(void) {
     extern void fn_8019F7F0();
     extern void fn_8019FB90();
     extern void fn_801A8D1C();
-    extern void fn_801A9570();
+    extern void HSD_MtxGetTranslate();
     extern void fn_801A98CC();
     extern void fn_801A9DF0();
     extern void fn_801B00E0();
@@ -1223,7 +1223,7 @@ void fn_801A20C8(void) {
 
         r3 = (u32)sp + 0x14;
         r4 = r30 + 0x38;
-        fn_801A9570();
+        HSD_MtxGetTranslate();
     }
 
     if (r27 == 0x36 && r27 != 0x37) {
@@ -1247,7 +1247,7 @@ void fn_801A2B5C(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
     extern void __assert();
-    extern void fn_80199654();
+    extern void HSD_DObjAddAnimAll();
     extern void fn_8019D620();
     extern void fn_8019FAEC();
     extern void fn_8019FE8C();
@@ -1414,7 +1414,7 @@ L_801A2D14:
 
         r4 = 0x0;
     }
-    fn_80199654();
+    HSD_DObjAddAnimAll();
     } while (0);
 
     tmp = *(u32*)((u8*)r31 + 0x14);
@@ -1492,7 +1492,7 @@ while (1) {
 
             r4 = 0x0;
         }
-        fn_80199654();
+        HSD_DObjAddAnimAll();
         } while (0);
 
         tmp = *(u32*)((u8*)r31 + 0x14);
@@ -1551,7 +1551,7 @@ void fn_801A301C(void) {
     extern u8 lbl_8047DB34[];
     extern u8 lbl_8047DB3C[];
     extern void __assert();
-    extern void fn_80199654();
+    extern void HSD_DObjAddAnimAll();
     extern void fn_8019D620();
     extern void fn_801AFE68();
     extern void fn_801C25E4();
@@ -1701,7 +1701,7 @@ L_801A31D8:
 
         r4 = 0x0;
     }
-    fn_80199654();
+    HSD_DObjAddAnimAll();
 
     return;
 }
@@ -1713,7 +1713,7 @@ void fn_801A323C(u32 arg1) {
 
 /* 0x801A32A0 | 0x2D4 */
 void fn_801A32A0(void) {
-    extern void fn_801995D4();
+    extern void HSD_DObjReqAnimAllByFlags();
     extern void fn_801A32A0();
     extern void fn_801A3574();
     extern void fn_801AFF64();
@@ -1751,7 +1751,7 @@ void fn_801A32A0(void) {
             f1 = f31;
             r3 = *(u32*)((u8*)r25 + 0x18);
             r4 = r28;
-            fn_801995D4();
+            HSD_DObjReqAnimAllByFlags();
         }
         f1 = f31;
         r3 = *(u32*)((u8*)r25 + 0x80);
@@ -1782,7 +1782,7 @@ void fn_801A32A0(void) {
                 f1 = f31;
                 r3 = *(u32*)((u8*)r29 + 0x18);
                 r4 = r28;
-                fn_801995D4();
+                HSD_DObjReqAnimAllByFlags();
             }
             f1 = f31;
             r3 = *(u32*)((u8*)r29 + 0x80);
@@ -1814,7 +1814,7 @@ void fn_801A32A0(void) {
                     f1 = f31;
                     r3 = *(u32*)((u8*)r31 + 0x18);
                     r4 = r28;
-                    fn_801995D4();
+                    HSD_DObjReqAnimAllByFlags();
                 }
                 f1 = f31;
                 r3 = *(u32*)((u8*)r31 + 0x80);
@@ -1846,7 +1846,7 @@ void fn_801A32A0(void) {
                         f1 = f31;
                         r3 = *(u32*)((u8*)r30 + 0x18);
                         r4 = r28;
-                        fn_801995D4();
+                        HSD_DObjReqAnimAllByFlags();
                     }
                     f1 = f31;
                     r3 = *(u32*)((u8*)r30 + 0x80);
@@ -1876,7 +1876,7 @@ void fn_801A32A0(void) {
                                 f1 = f31;
                                 r3 = *(u32*)((u8*)r27 + 0x18);
                                 r4 = r28;
-                                fn_801995D4();
+                                HSD_DObjReqAnimAllByFlags();
                             }
                             f1 = f31;
                             r3 = *(u32*)((u8*)r27 + 0x80);
@@ -1938,7 +1938,7 @@ void fn_801A32A0(void) {
 
 /* 0x801A3574 | 0x8C */
 void fn_801A3574(void) {
-    extern void fn_801995D4();
+    extern void HSD_DObjReqAnimAllByFlags();
     extern void fn_801AFF64();
     extern void fn_801C29C4();
     u8 sp[0x20];
@@ -1968,7 +1968,7 @@ void fn_801A3574(void) {
             f1 = f31;
             r3 = *(u32*)((u8*)r30 + 0x18);
             r4 = r31;
-            fn_801995D4();
+            HSD_DObjReqAnimAllByFlags();
         }
         f1 = f31;
         r3 = *(u32*)((u8*)r30 + 0x80);
@@ -1986,8 +1986,8 @@ void fn_801A3600(void) {
     extern void fn_800A37CC();
     extern void __assert();
     extern void fn_8019D9DC();
-    extern void fn_801A8570();
-    extern void fn_801A85A4();
+    extern void HSD_VecFree();
+    extern void HSD_VecAlloc();
     extern void fn_801A86B4();
     extern void fn_801A8884();
     u8 sp[0x20];
@@ -2037,7 +2037,7 @@ void fn_801A3600(void) {
             if (tmp != 0) {
                 tmp = *(u32*)((u8*)r31 + 0x74);
                 if (tmp == 0) {
-                    fn_801A85A4();
+                    HSD_VecAlloc();
                     *(u32*)((u8*)r31 + 0x74) = r3;
                 }
                 r3 = *(u32*)((u8*)r31 + 0xC);
@@ -2055,7 +2055,7 @@ void fn_801A3600(void) {
         tmp = *(u32*)((u8*)r31 + 0x74);
         if (tmp != 0) {
             r3 = *(u32*)((u8*)r31 + 0x74);
-            fn_801A8570();
+            HSD_VecFree();
             tmp = 0x0;
             *(u32*)((u8*)r31 + 0x74) = tmp;
         }
@@ -2063,7 +2063,7 @@ void fn_801A3600(void) {
     } else {
         tmp = *(u32*)((u8*)r31 + 0x74);
         if (tmp == 0) {
-            fn_801A85A4();
+            HSD_VecAlloc();
             *(u32*)((u8*)r31 + 0x74) = r3;
         }
         tmp = *(u32*)((u8*)r31 + 0xC);
@@ -2599,7 +2599,7 @@ void fn_801A3D04(void) {
 u32 fn_801A3E64(void) {
     /* uses lbl_804655B4 */
     if (0 /* field check */) { return 0; }
-    fn_801AA498();
+    HSD_ObjFree();
     return 0;
 }
 
@@ -2610,7 +2610,7 @@ void fn_801A3EB4(void) {
     extern u8 lbl_8047DBA8[];
     extern u8 lbl_8047DBB0[];
     extern void __assert();
-    extern void fn_801AA4CC();
+    extern void HSD_ObjAlloc();
     u8 sp[0x20];
     u32 tmp = 0;
     u32 r3 = 0;
@@ -2624,7 +2624,7 @@ void fn_801A3EB4(void) {
     r30 = r4;
     r29 = r3;
     r3 = (u32)lbl_804655B4;
-    fn_801AA4CC();
+    HSD_ObjAlloc();
     /* mr. r31, r3 */;
     if ((s32)tmp == 0) {
         r3 = (u32)lbl_8047DBA0;
@@ -2650,7 +2650,7 @@ void fn_801A3EB4(void) {
 
 /* 0x5C | fn_801A3F48 | multi_call_guarded */
 void fn_801A3F48(void) {
-    { fn_801AA4CC(); return; }
+    { HSD_ObjAlloc(); return; }
     __assert();
     memset();
 }

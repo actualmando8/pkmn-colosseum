@@ -226,10 +226,10 @@ void fn_8019BB78(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_800BC8F8(void);
-extern void fn_801942B8(void);
+extern void HSD_CObjGetCurrent(void);
 extern void HSD_Panic(void);
-extern void fn_801944D0(void);
-extern void fn_801944F8(void);
+extern void HSD_CObjGetFar(void);
+extern void HSD_CObjGetNear(void);
 extern void fn_800BD454(void);
 extern void fn_800BCB14(void);
 extern void fn_800BCCDC(void);
@@ -275,11 +275,11 @@ void HSD_HashSearch(void) {
 #pragma optimizewithasm off
 extern u8 lbl_804653A8[];
 #if 0
-asm void fn_8019C0F8(void) {
-#include "src/hsd/hsd_fog_fn_8019C0F8.inc"
+asm void _HSD_IDForgetMemory(void) {
+#include "src/hsd/hsd_fog__HSD_IDForgetMemory.inc"
 }
 #else
-void fn_8019C0F8(void) {
+void _HSD_IDForgetMemory(void) {
     memset(lbl_804653A8, 0, 0x194);
 }
 #endif
@@ -290,12 +290,12 @@ void fn_8019C0F8(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 1
-asm void fn_8019C128(void) {
-#include "src/hsd/hsd_fog_fn_8019C128.inc"
+asm void HSD_IDGetDataFromTable(void) {
+#include "src/hsd/hsd_fog_HSD_IDGetDataFromTable.inc"
 }
 #else
 #pragma optimization_level 4
-void* fn_8019C128(u32* table, u32 key, u32* found) {
+void* HSD_IDGetDataFromTable(u32* table, u32 key, u32* found) {
     u32** bucket;
     u32** node;
 
@@ -325,7 +325,7 @@ void* fn_8019C128(u32* table, u32 key, u32* found) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AA498(void* list, void* data);
+extern void HSD_ObjFree(void* list, void* data);
 extern u8 lbl_8046553C[];
 #if 1
 asm void fn_8019C1B0(void) {
@@ -353,7 +353,7 @@ void fn_8019C1B0(u32* table, u32 key) {
             } else {
                 *bucket = (u32*)node[0];
             }
-            fn_801AA498(lbl_8046553C, node);
+            HSD_ObjFree(lbl_8046553C, node);
             return;
         }
         prev = node;
@@ -367,7 +367,7 @@ void fn_8019C1B0(u32* table, u32 key) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* fn_801AA4CC(void* list);
+extern void* HSD_ObjAlloc(void* list);
 extern u8 lbl_8047DAA0[];
 extern u8 lbl_8047DAA8[];
 #if 1
@@ -396,7 +396,7 @@ void HSD_IDInsertToTable(u32* table, u32 key, u32 value) {
         node[1] = (u32*)key;
         node[2] = (u32*)value;
     } else {
-        newnode = (u32**)fn_801AA4CC(lbl_8046553C);
+        newnode = (u32**)HSD_ObjAlloc(lbl_8046553C);
         if (newnode == NULL) {
             __assert((char*)lbl_8047DAA0, 0x43, (char*)lbl_8047DAA8);
         }
@@ -415,11 +415,11 @@ void HSD_IDInsertToTable(u32* table, u32 key, u32 value) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019C358(void) {
-#include "src/hsd/hsd_fog_fn_8019C358.inc"
+asm void HSD_IDSetup(void) {
+#include "src/hsd/hsd_fog_HSD_IDSetup.inc"
 }
 #else
-void fn_8019C358(void) {
+void HSD_IDSetup(void) {
     memset(lbl_804653A8, 0, 0x194);
 }
 #endif
@@ -431,11 +431,11 @@ void fn_8019C358(void) {
 #pragma optimizewithasm off
 extern void fn_801AA35C(void* list, u32 size, u32 alignment);
 #if 0
-asm void fn_8019C388(void) {
-#include "src/hsd/hsd_fog_fn_8019C388.inc"
+asm void HSD_IDInitAllocData(void) {
+#include "src/hsd/hsd_fog_HSD_IDInitAllocData.inc"
 }
 #else
-void fn_8019C388(void) {
+void HSD_IDInitAllocData(void) {
     fn_801AA35C(lbl_8046553C, 0xC, 4);
 }
 #endif
@@ -446,11 +446,11 @@ void fn_8019C388(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8019C3B8(void) {
-#include "src/hsd/hsd_fog_fn_8019C3B8.inc"
+asm void HSD_IDGetAllocData(void) {
+#include "src/hsd/hsd_fog_HSD_IDGetAllocData.inc"
 }
 #else
-void* fn_8019C3B8(void) {
+void* HSD_IDGetAllocData(void) {
     return lbl_8046553C;
 }
 #endif

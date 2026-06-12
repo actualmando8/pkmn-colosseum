@@ -260,12 +260,12 @@ typedef struct PSParticle {
 
 /** Get head of active particle list for a given link number.
  *  Asserts that linkNo is in range [0, PS_NUM_LINK). */
-PSParticle* pslist_GetHead(s32 linkNo);           /* fn_80168C64 */
+PSParticle* pslist_GetHead(s32 linkNo);           /* _psListGetFirst */
 
 /** Unlink a particle from its active list and move to free list.
  *  If parent is NULL, removes from head of the link's list.
  *  If parent is non-NULL, removes from after parent in the list. */
-void pslist_Unlink(PSParticle* pp, PSParticle* parent);  /* fn_80168CD0 */
+void pslist_Unlink(PSParticle* pp, PSParticle* parent);  /* _psListDelete */
 
 /** Allocate a new particle from the free list and insert into a link list.
  *  If insertAfter is NULL, inserts at the head.
@@ -290,7 +290,7 @@ void pslist_UpdateVisibility(PSParticle* pp, u8 visible);  /* fn_80169034 */
 /** Run the script interpreter for all active particles.
  *  Iterates through all 16 link lists, calling psinterpret_Main on each.
  *  Parameter is a bitmask of which links to process (bit 0 = link 15). */
-void psinterpret_RunAll(u32 linkMask);            /* fn_8016F430 */
+void psinterpret_RunAll(u32 linkMask);            /* psInterpretParticles */
 
 /** Execute one frame of a particle script.
  *  This is the main bytecode interpreter - processes opcodes until
@@ -326,10 +326,10 @@ PSParticle* psCleanup(PSParticle* pp);            /* fn_80172928 */
 void psUpdateVelocity(PSParticle* pp, f32* velocityVec);  /* fn_801729EC */
 
 /** Perform camera collision/bounds check. */
-s32 psCameraCollisionCheck(PSParticle* pp, void* camData, f32 paramA, f32 paramB);  /* fn_80172BBC */
+s32 psCameraCollisionCheck(PSParticle* pp, void* camData, f32 paramA, f32 paramB);  /* applyForceJObj */
 
 /** Attach particle to camera tracking system. */
-void psCameraAttach(PSParticle* pp, void* camData);  /* fn_80172D00 */
+void psCameraAttach(PSParticle* pp, void* camData);  /* setVelToJObj */
 
 /** Process rotation update for orbital motion. */
 void psRotationUpdate(PSParticle* pp, f32 param);    /* fn_80172FA8 */
@@ -362,7 +362,7 @@ f32 psRandom(void);                              /* fn_801ADC7C */
 u8 psClampColorByte(u8 current);                  /* fn_801728B0 */
 
 /** Update matrices for a people/NPC object. */
-void psPeopleUpdateMatrices(void* people);        /* fn_80175E88 */
+void psPeopleUpdateMatrices(void* people);        /* genPosUpdate */
 
 /** Initialize people/NPC attachment data. */
 void psSetupMotion(PSParticle* pp, void* owner, void* posData, void* rotData, void* scaleData, void* reserved);  /* fn_80172908 */

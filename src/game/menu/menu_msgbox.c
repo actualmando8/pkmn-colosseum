@@ -40,7 +40,7 @@
 /* ===== GS Engine ===== */
 extern void  fn_800E01D0(void* dst, void* src);
 extern void  fn_800D61E4(void* obj);
-extern void  fn_800D20CC(void* obj);
+extern void  GScameraSetPerspective(void* obj);
 extern void  fn_80109220(u32 obj, u8 visible);
 
 /* ===== Text / Messages ===== */

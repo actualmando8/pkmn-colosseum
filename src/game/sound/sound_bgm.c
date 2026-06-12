@@ -32,7 +32,7 @@
 extern void fn_800DD970(const char* fmt, ...);
 
 /* GS engine frame wait */
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 
 /* JAudio: get handle status */
 extern s32 fn_8014D598(u32 handle);
@@ -57,7 +57,7 @@ extern void fn_8016761C(void* entry, u32 fadeTime, u32 volume);
 extern void fn_80166C34(u32 groupId);
 extern void fn_80166AB8(u32 sndId, u32 fadeTime, u32 volume);
 extern void fn_801669E4(u32 sndId, u32 fadeTime, u32 volume);
-extern void fn_80164488(void* buffer);
+extern void sndAuxCallbackUpdateSettingsReverbHI(void* buffer);
 extern void fn_80167A9C(u32 groupId);
 extern u32  fn_80167768(u32 channel, u32 category);
 extern BOOL fn_8015FFD4(void);
@@ -428,7 +428,7 @@ u32 _sndFindCurrentHandle(u32 channel, u32 category) {
 void _sndChangeGroup(u32 groupId) {
     if (groupId != 0 && g_sndCurrentGroup != groupId) {
         fn_80167A9C(groupId);
-        fn_80164488((void*)0x80452500); /* reload table from buffer */
+        sndAuxCallbackUpdateSettingsReverbHI((void*)0x80452500);
     }
 }
 

@@ -74,7 +74,7 @@ typedef void (*GSEffectRenderFunc)(void* userData);
  * GSEffectInstance -- 0x34 bytes per effect slot.
  *
  * Deduced from fn_80131200 (GSEffectRegister) which writes fields at
- * offsets 0x08..0x20, and fn_8013111C (GSEffectTrigger) which reads
+ * offsets 0x08..0x20, and GSeffect (GSEffectTrigger) which reads
  * the state at 0x04 and calls through 0x10 / 0x14.
  *
  * The linked list uses 0x2C (next) and 0x30 (prev).
@@ -165,7 +165,7 @@ typedef struct TraceFXWork {
 void GSEffectInit(u16 maxEffects);
 
 /**
- * GSEffectTrigger -- Trigger an effect by its 1-based ID.
+ * GSeffect -- Trigger an effect by its 1-based ID.
  *
  * Looks up the effect in the instance table, calls the triggerFunc
  * callback, and transitions the effect to ACTIVE state.  If the trigger
@@ -174,9 +174,8 @@ void GSEffectInit(u16 maxEffects);
  * @param effectId  1-based effect ID.
  * @return          1 on success, 0 on failure.
  *
- * Corresponds to fn_8013111C.
  */
-BOOL GSEffectTrigger(u32 effectId);
+BOOL GSeffect(u32 effectId);
 
 /**
  * GSEffectRegister -- Register callbacks for an effect slot.
@@ -343,7 +342,7 @@ void tracefxUpdate(void* work);
  *
  * @param gen  Pointer to the generator work structure.
  *
- * Corresponds to fn_8017424C (5,344 bytes -- one of the largest functions).
+ * Corresponds to generateParticle_801947D4 (5,344 bytes -- one of the largest functions).
  * Source file confirmed by rodata string: "generator.c"
  */
 void generatorMain(void* gen);

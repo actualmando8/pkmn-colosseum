@@ -463,11 +463,11 @@ extern void fn_801A3E64(void);
 extern u8 lbl_804655E0[];
 extern u32 lbl_8047B2B8;
 #if 1
-asm void fn_801A4B00(void) {
-#include "src/hsd/hsd_lobj_fn_801A4B00.inc"
+asm void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj) {
+#include "src/hsd/hsd_lobj_HSD_LObjDeleteCurrentAll.inc"
 }
 #else
-void fn_801A4B00(void) {}
+void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj) {}
 #endif
 
 /* 0x801A4D20 | 0x234 */
@@ -515,11 +515,11 @@ extern char lbl_8047DBD4;
 extern u32 lbl_8047DBF8;
 extern u32 lbl_8047DBFC;
 #if 1
-asm void fn_801A4F54(void) {
-#include "src/hsd/hsd_lobj_fn_801A4F54.inc"
+asm void HSD_LObjSetup(void* setup) {
+#include "src/hsd/hsd_lobj_HSD_LObjSetup.inc"
 }
 #else
-void fn_801A4F54(void) {}
+void HSD_LObjSetup(void* setup) {}
 #endif
 
 /* 0x801A6098 | 0x174 */
@@ -653,11 +653,11 @@ void LObjUpdateFunc(void) {}
 /* 0x801A66E0 | 0xAC */
 extern void HSD_WObjRemoveAnim(HSD_WObj* wobj);
 #if 1
-asm void fn_801A66E0(void) {
-#include "src/hsd/hsd_lobj_fn_801A66E0.inc"
+asm void HSD_LObjRemoveAnimAll(HSD_LObj* lobj) {
+#include "src/hsd/hsd_lobj_HSD_LObjRemoveAnimAll.inc"
 }
 #else
-void fn_801A66E0(void) {}
+void HSD_LObjRemoveAnimAll(HSD_LObj* lobj) {}
 #endif
 
 /* 0x801A678C | 0x30 */

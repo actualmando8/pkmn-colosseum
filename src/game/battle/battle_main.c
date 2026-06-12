@@ -15,9 +15,9 @@
  *   4. Saves current scene state (lbl_8047B5D4, lbl_8047B5D5)
  *   5. Initializes the battle scene (fn_801F108C)
  *   6. Loads waza (move animation) data (fn_801DAEF8)
- *   7. Saves People system state (fn_80177A38)
+ *   7. Saves People system state (GSscene_GetMode)
  *   8. Configures the battle grid camera objects via fn_801F0B00
- *   9. Spawns battle_MainLoop as a thread via GSthread (fn_800F07A8)
+ *   9. Spawns battle_MainLoop as a thread via GSthread (GSthreadCreate)
  *      with priority 0x14, stack size 0x4000
  *
  * battle_MainLoop runs on its own thread and:
@@ -38,7 +38,7 @@
  *   2. Stops particle effects (fn_800F04C4)
  *   3. Iterates through 21 scene objects (from lbl_80279B84 rodata table)
  *      and releases each one via fn_80102568
- *   4. Restores People system state (fn_80177A44)
+ *   4. Restores People system state (GSscene_SetMode)
  *   5. Cleans up battle grid (fn_801C31EC)
  *   6. Cleans up waza system (fn_801DAC90)
  *   7. Stops any active sound (soundStop)
@@ -72,8 +72,8 @@ extern u8   fn_800FF548(void);                      /* check if floor is loaded 
 extern void* fn_800FF560(void);                     /* get parent thread */
 extern void fn_800FF56C(void);                      /* tick floor */
 extern void fn_800F04C4(void);                      /* stop particle system */
-extern void fn_800F0308(void);                      /* tick render */
-extern void* fn_800F07A8(s32 priority, void* parent, s32 stackSize,
+extern void _threadSwitch(void);                      /* tick render */
+extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
                           u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */
 extern void fn_800D3088(void);                      /* GSgfx tick */
 extern void fn_800DD970(const char* fmt, ...);      /* GSlog_Print */
@@ -85,13 +85,13 @@ extern void fn_80103BA8(void* padData, s32 port);          /* read pad input */
 extern void fn_80113FB4(void);                             /* check floor loaded */
 
 /* Sound */
-extern void soundStop(s32 sndID, s32 volume);    /* sndStop */
+extern void soundStop(s32 sndID, s32 volume);    /* soundStop */
 extern void fn_801659FC(s32 sndID, s32 fadeTime, s32 volume); /* sndPlay with fade */
 extern void fn_80165A20(s32 mode, s32 sndID, s32 volume);     /* sndFade */
 
 /* People / NPC system */
-extern u8   fn_80177A38(void);                      /* save people state */
-extern void fn_80177A44(u8 savedState);             /* restore people state */
+extern u8   GSscene_GetMode(void);                      /* save people state */
+extern void GSscene_SetMode(u8 savedState);             /* restore people state */
 extern void fn_80177A64(void);                      /* clear people state */
 
 /* VSync management */
@@ -265,7 +265,7 @@ void battle_FightEnd(void) {
     }
 
     /* Restore NPC/People system state */
-    fn_80177A44(lbl_8047B5D4);
+    GSscene_SetMode(lbl_8047B5D4);
 
     /* Clean up battle grid */
     fn_801C31EC();
@@ -351,7 +351,7 @@ void battle_FightStart(void) {
     fn_801DAEF8(10);
 
     /* Save People/NPC system state */
-    lbl_8047B5D4 = fn_80177A38();
+    lbl_8047B5D4 = GSscene_GetMode();
 
     /* Configure scene rendering passes (3 passes for battle) */
     fn_801F0B00(&lbl_8046D730, 0, 0, 1, 0, &lbl_80375CC8);
@@ -363,7 +363,7 @@ void battle_FightStart(void) {
     parent = (void*)fn_800FF560();
 
     /* Spawn battle_MainLoop as a new thread */
-    lbl_8047B5D0 = (u32)fn_800F07A8(0x14, parent, 0x4000, 1,
+    lbl_8047B5D0 = (u32)GSthreadCreate(0x14, parent, 0x4000, 1,
                                       (void*)battle_MainLoop, 0);
 }
 
@@ -679,7 +679,7 @@ void fn_801EF644(void) {
                 r3 = r28;
                 fn_8017B2CC();
                 if ((s32)r3 == 0 || (s32)r3 < 0) break;
-                ((void(*)(void))fn_800F0308)();
+                ((void(*)(void))_threadSwitch)();
             }
         }
 
@@ -796,7 +796,7 @@ void fn_801EF95C(void) {
             tmp = *(u16*)(sp + 0x8);
             tmp = tmp & 0x00000800;
             if (tmp != 1) break;
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             ((void(*)(void))fn_800D3088)();
             tmp = r31 + r3;
             r31 = tmp & 0xFF;
@@ -905,7 +905,7 @@ void fn_801EFA08(void) {
             tmp = *(u16*)(sp + 0x24);
             tmp = tmp & 0x00000800;
             if (tmp != 1) break;
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
             ((void(*)(void))fn_800D3088)();
             tmp = r29 + r3;
             r29 = tmp & 0xFF;
@@ -1014,7 +1014,7 @@ void fn_801EFA08(void) {
                     tmp = *(u16*)(sp + 0x8);
                     tmp = tmp & 0x00000800;
                     if (tmp != 1) break;
-                    ((void(*)(void))fn_800F0308)();
+                    ((void(*)(void))_threadSwitch)();
                     ((void(*)(void))fn_800D3088)();
                     tmp = r26 + r3;
                     r26 = tmp & 0xFF;
@@ -1056,7 +1056,7 @@ void fn_801EFA08(void) {
                     if (r3 != 0) {
                         r26 = 0x0;
                         while (r26 < r28) {
-                            ((void(*)(void))fn_800F0308)();
+                            ((void(*)(void))_threadSwitch)();
                             ((void(*)(void))fn_800D3088)();
                             r26 = r26 + r3;
                         }
@@ -1224,10 +1224,9 @@ void fn_801EFFC4(u32 count) {
     if (count != 0) {
         i = 0;
         while (i < count) {
-            fn_800F0308();
+            _threadSwitch();
             i += fn_800D3088();
         }
     }
 }
-
 

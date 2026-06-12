@@ -5546,7 +5546,7 @@ u32 fn_80132F7C(void) {
 #pragma scheduling off
 #endif
 extern void fn_801E1810(void);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern u8 fn_801E1874(void);
 extern s32 fn_8010264C(u32, u32);
 extern void fn_800C8520(u8*, u8*, ...);
@@ -5564,7 +5564,7 @@ u32 fn_80132FD8(void) {
     s32 id;
     while ((u32)(fn_801E1874() & 0xFF) == 1) {
         fn_801E1810();
-        fn_800F0308();
+        _threadSwitch();
     }
     id = fn_8010264C(2, 1);
     if (id != -1) {

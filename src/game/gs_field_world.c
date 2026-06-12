@@ -6,12 +6,12 @@
  * system, world object management, and per-frame field update logic.
  *
  * Decompiled from (selected major functions):
- *   fn_80114CA8 - fn_80117514: Floor data parsing, scene setup
- *   fn_80117514 (floorUpdateFieldCamera)
- *   fn_80117514 - fn_80130CE0: World update, object management,
+ *   floorReadMapPreFunc - floorUpdateFieldCamera: Floor data parsing, scene setup
+ *   floorUpdateFieldCamera (floorUpdateFieldCamera)
+ *   floorUpdateFieldCamera - fn_80130CE0: World update, object management,
  *                               field rendering, transition logic
  *
- * The field camera (fn_80117514) is the most identifiable function via
+ * The field camera (floorUpdateFieldCamera) is the most identifiable function via
  * its debug string: "floorUpdateFieldCamera: error updating field camera
  * - divide by zero!"
  *
@@ -104,7 +104,7 @@ extern const char lbl_8027255C[]; /* "floorReadFontPreFunc(): can't alloc..." */
 extern const char lbl_80272594[]; /* "floorReadMsgPreFunc(): can't alloc..." */
 extern const char lbl_802725CC[]; /* "floorReadNormalPreFunc(): can't alloc..." */
 /* ==================================================================
- * fn_80117514 -- floorUpdateFieldCamera
+ * floorUpdateFieldCamera_Pseudocode -- floorUpdateFieldCamera notes
  *
  * Update the field camera each frame. Interpolates position, target,
  * and FOV toward their destination values. Includes safety check for
@@ -120,7 +120,7 @@ extern const char lbl_802725CC[]; /* "floorReadNormalPreFunc(): can't alloc..." 
  *   - If distance is near-zero, snaps to destination (avoids /0)
  *   - On divide-by-zero path: logs lbl_80272770
  * ================================================================== */
-void floorUpdateFieldCamera(void) {
+void floorUpdateFieldCamera_Pseudocode(void) {
     extern f32 lbl_8047CFD0;
     extern f32 lbl_8047CFDC;
     extern f32 lbl_8047CFE0;
@@ -5251,11 +5251,11 @@ void fn_8012795C(void);
 void fn_80129BC8(void);
 void fn_8012A450();
 void fn_8012A5B0(void);
-/* 0x70 | fn_80114CA8 | alloc_wrapper */
+/* 0x70 | floorReadMapPreFunc | alloc_wrapper */
 extern void* fn_800F9418();  /* K&R: called with 5 args, returns void* */
 #pragma push
 #pragma peephole off
-void* fn_80114CA8(void* owner, u32 param, u32 alloc_size) {
+void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
     u32 total = ((alloc_size + 0x1F) & ~0x1F) + 0x60;
     void* mem = (void*)fn_800F9418(total, 0x20, (u32)owner, (u32)param, 0);
     if (mem == NULL) {
@@ -5579,7 +5579,7 @@ extern u16 fn_8011E3B4(u8* ptr, u16 idx);
 extern u8 fn_8011E3FC(u8* ptr, u16 idx);
 extern void fn_8011F260(void);
 extern void fn_80129BC8(void);
-extern u8 fn_80117514();
+extern u8 floorUpdateFieldCamera();
 extern void fn_8012A450();
 extern void fn_8012A5B0(void);
 extern void fn_8012C660(void);
@@ -6161,7 +6161,7 @@ extern void fn_800ECA78(void);
 extern void fn_800EC9DC(void);
 extern void fn_800ECB74(void);
 extern void fn_800EC990(void);
-extern void fn_800F0308(void);
+extern void _threadSwitch(void);
 extern void fn_800EC960(void);
 extern void fn_800EE150(void);
 extern void fn_800EE3BC(void);
@@ -6213,7 +6213,7 @@ void fn_80116470(void) {
     extern void fn_800EE150();
     extern void fn_800EE3BC();
     extern void fn_800EE828();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80113F6C();
     extern void fn_80115A80();
     extern void fn_80115C48();
@@ -6324,7 +6324,7 @@ L_80116540: ;
     } else {
     while (r3 = r29, fn_800EC960(), r0 = r3 & 0xFF, r0 != (u32)0x0) {
 
-    fn_800F0308();
+    _threadSwitch();
     }
 
     }
@@ -6419,7 +6419,7 @@ L_80116540: ;
     }
     while (r3 = r29, fn_800EC960(), r0 = r3 & 0xFF, r0 != (u32)0x0) {
 
-    fn_800F0308();
+    _threadSwitch();
     }
 
     goto L_801168E8;
@@ -6429,7 +6429,7 @@ L_80116750: ;
     } else {
     while (r3 = r29, fn_800EC960(), r0 = r3 & 0xFF, r0 != (u32)0x0) {
 
-    fn_800F0308();
+    _threadSwitch();
     }
 
     }
@@ -6583,7 +6583,7 @@ void fn_80116958(void) {
     extern void fn_800ECA78();
     extern void fn_800ECB74();
     extern void fn_800ECCA8();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80113F6C();
     extern void fn_8012BBA8();
     extern void fn_8012BCA4();
@@ -6835,7 +6835,7 @@ L_80116BF8: ;
     } else {
     while (r3 = r28, fn_800EC960(), r0 = r3 & 0xFF, r0 != (u32)0x0) {
 
-    fn_800F0308();
+    _threadSwitch();
     }
 
     }
@@ -7058,11 +7058,11 @@ void fn_80117164(void) {
 }
 #endif
 /* 0x801171C8 | 0x168 */
-extern u8 fn_80177A38(void);
+extern u8 GSscene_GetMode(void);
 extern void fn_80176868(f32);
 extern void fn_801767E0(f32);
 extern void fn_80176758(f32);
-extern void fn_80177908(void*);
+extern void GSscene_GetCameraPositionVector(void*);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
@@ -7087,7 +7087,7 @@ void fn_801171C8(void) {
     f32 z;
 
     if (lbl_8047AD71 == 0) { return; }
-    if (fn_80177A38() != 0) { return; }
+    if (GSscene_GetMode() != 0) { return; }
     if (lbl_8047AD68 == 0) { return; }
 
     if (lbl_8047AD68 == 1) {
@@ -7102,11 +7102,11 @@ void fn_801171C8(void) {
         return;
     }
 
-    fn_80177908(pos);
+    GSscene_GetCameraPositionVector(pos);
     x = lbl_8047AD74;
     y = lbl_8047AD78;
     z = lbl_8047AD7C;
-    if (fn_80117514(pos, &x, &y, &z) == 0) { return; }
+    if (floorUpdateFieldCamera(pos, &x, &y, &z) == 0) { return; }
 
     if (lbl_8047AD70 != 0) {
         f32 f3 = lbl_8047CFD8;
@@ -7148,7 +7148,7 @@ void fn_801171C8(void) {
 /* 0x80117330 | 0x194 */
 extern void* fn_800F9318();
 extern void fn_800E3D98(void*, void*);
-extern void fn_8017795C(void*);
+extern void GSscene_GetCameraViewVector(void*);
 extern f32 fn_8017669C(void);
 extern f32 fn_80176690(void);
 extern f32 fn_80176684(void);
@@ -7172,8 +7172,8 @@ asm void fn_80117330(void) {
 #pragma push
 #pragma peephole off
 void fn_80117330(f32 arg) {
-    extern u8 fn_80177A38(void);
-    extern void fn_80177908(void*);
+    extern u8 GSscene_GetMode(void);
+    extern void GSscene_GetCameraPositionVector(void*);
     u8 tmp[0x30];
     u8 pos[0xC];
     u8 view[0xC];
@@ -7185,16 +7185,16 @@ void fn_80117330(f32 arg) {
     void* obj;
 
     if (lbl_8047AD71 == 0) { return; }
-    if (fn_80177A38() != 0) { return; }
+    if (GSscene_GetMode() != 0) { return; }
     if (lbl_8047AD68 == 0) { return; }
 
     obj = fn_800F9318(0, 0x64);
     if (obj != NULL) {
         fn_800E3D98(obj, pos);
     } else {
-        fn_80177908(pos);
+        GSscene_GetCameraPositionVector(pos);
     }
-    fn_8017795C(view);
+    GSscene_GetCameraViewVector(view);
 
     if (lbl_8047AD68 == 1) {
         f32* ptr = (f32*)lbl_8047AD6C;
@@ -7205,7 +7205,7 @@ void fn_80117330(f32 arg) {
         x = fn_8017669C();
         y = fn_80176690();
         z = fn_80176684();
-        if (fn_80117514(pos, &x, &y, &z) == 0) { return; }
+        if (floorUpdateFieldCamera(pos, &x, &y, &z) == 0) { return; }
     }
 
     fn_800E01F4(mat, lbl_8047CFD0, x, y);
@@ -7427,7 +7427,7 @@ void fn_801176C8(void) {
 }
 #endif
 /* 0x8011791C | 0x1B8 */
-extern void* fn_800D2584();
+extern void* GScameraGetActiveCamera();
 extern void fn_800E01D0();
 extern u32 lbl_804083D0;
 extern u8 lbl_802727B8[];
@@ -7438,7 +7438,7 @@ asm void fn_8011791C(void) {
 #else
 void fn_8011791C(void) {
     extern u8 lbl_802727B8[];
-    extern void fn_800D2584();
+    extern void GScameraGetActiveCamera();
     extern void fn_800E01D0();
     extern void fn_800FE714();
     extern void fn_80115C48();
@@ -7446,7 +7446,7 @@ void fn_8011791C(void) {
     extern void fn_80176684();
     extern void fn_80176690();
     extern void fn_8017669C();
-    extern void fn_80177A38();
+    extern void GSscene_GetMode();
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r3 = 0;
@@ -7478,10 +7478,10 @@ void fn_8011791C(void) {
         r3 = *(u32*)((u8*)r5 + 0x4);
         r0 = *(u32*)((u8*)r5 + 0x8);
         *(u32*)(sp + 0x10) = r0;
-        fn_80177A38();
+        GSscene_GetMode();
         r0 = r3 & 0xFF;
         if (r0 == (u32)0x5) {
-            fn_800D2584();
+            GScameraGetActiveCamera();
             r4 = r3;
             if (r4 != (u32)0x0) {
                 r3 = (u32)sp + 0x8;
@@ -7562,7 +7562,7 @@ u32 fn_80117AD4(void) {
 extern void fn_800E5550(void);
 extern void fn_800EF5A4(void);
 extern void fn_800E4BF4(void);
-extern void fn_800EF5FC(void);
+extern void GStextureCreate(void);
 extern void fn_80113D34(void);
 extern void fn_800E4014(void);
 extern void fn_800EC188(void);
@@ -7587,7 +7587,7 @@ u8 fn_80117AE4(u32 arg1) {
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
-    extern void* fn_800EF5FC(u16 a, u16 b, u32 c, u32 d, u32 e);
+    extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
     extern void fn_800E4014(void* a, u32 b);
     extern void fn_800EC188(void* a, u32 b);
@@ -7630,7 +7630,7 @@ u8 fn_80117AE4(u32 arg1) {
         return 0;
     }
 
-    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
+    lbl_8047AD8C = (u32)GStextureCreate(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
     if (lbl_8047AD8C == 0) {
         lbl_8047AD88 = 0;
         return 0;
@@ -7727,7 +7727,7 @@ void fn_80117D14(void)
     if (lbl_8047AD88 != 0) {
         if (lbl_8047AD90 != 0) {
             fn_800EC134(lbl_8047AD90);
-            saved = (u32)fn_800D2584();
+            saved = (u32)GScameraGetActiveCamera();
             fn_800D4604(2);
             fn_800D377C(1);
             fn_800D3410(lbl_8047AD8C, 0);
@@ -7778,7 +7778,7 @@ void fn_80117E58(void* arg) {
     extern void fn_800E5550(void* a);
     extern void fn_800EF5A4(void* a);
     extern void fn_800E4BF4(void* a);
-    extern void* fn_800EF5FC(u16 a, u16 b, u32 c, u32 d, u32 e);
+    extern void* GStextureCreate(u16 a, u16 b, u32 c, u32 d, u32 e);
     extern void* fn_80113D34(u32 a, u32 b);
     extern void fn_800E4014(void* a, u32 b);
     extern void fn_800EC188(void* a, u32 b);
@@ -7830,7 +7830,7 @@ void fn_80117E58(void* arg) {
         return;
     }
 
-    lbl_8047AD8C = (u32)fn_800EF5FC(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
+    lbl_8047AD8C = (u32)GStextureCreate(*(u16*)((u8*)lbl_8047AD88 + 0), *(u16*)((u8*)lbl_8047AD88 + 2), 0x44, 0, 0);
     if (lbl_8047AD8C == 0) {
         lbl_8047AD88 = 0;
         return;
@@ -7928,7 +7928,7 @@ void fn_80118104(u32 a, u8 b) {
     void* result;
     u32 val;
 
-    result = fn_800D2584();
+    result = GScameraGetActiveCamera();
     if (result != NULL) {
         psSetBillboardCamera(*(void**)((u8*)result + 0xC));
         switch (a) {
@@ -19327,7 +19327,7 @@ void fn_8012C540(void) {
 /* 0x8012C660 | 0x424 */
 extern void fn_8018F4C8(void);
 extern void fn_800EC578(void);
-extern void fn_800EC53C(void);
+extern void GSmodelGetAnimFrame(void);
 extern void fn_800EC5FC(void);
 extern void fn_800EC5B8(void);
 extern f32 lbl_8047D030;
@@ -19355,7 +19355,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
     extern f32   lbl_8047D08C;
     extern f32   lbl_8047D090;
     extern void  fn_800EC4D0(void *a, f32 *outTotal, f32 *outCurrent);
-    extern f32   fn_800EC53C(void *a);
+    extern f32   GSmodelGetAnimFrame(void *a);
     extern void  fn_800EC578(void *a, u32 *outFromNode, u32 *outNextNode);
     extern void  fn_800EC5B8(void *a, f32 blend);
     extern void  fn_800EC5FC(void *a, u32 nodeA, u32 nodeB);
@@ -19415,7 +19415,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
             speed = lbl_8047D038;
             if (nextNode != (u32)-1) {
                 fn_800EC4D0(obj, &arcTotal, &arcCurrent);
-                speed = fn_800EC53C(obj);
+                speed = GSmodelGetAnimFrame(obj);
                 speed = (arcTotal / arcCurrent) * speed;
             }
             fn_800ECCA8(obj, node4);
@@ -19428,7 +19428,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
         if (!(fromNode == node4 && nextNode == node1)) {
             speed = lbl_8047D038;
             if (nextNode == (u32)-1) {
-                speed = fn_800EC53C(obj);
+                speed = GSmodelGetAnimFrame(obj);
             }
             fn_800EC5FC(obj, node4, node1);
             fn_800EC4D0(obj, &arcTotal, &arcCurrent);
@@ -19442,7 +19442,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
         if (!(fromNode == node3 && nextNode == node1)) {
             speed = lbl_8047D038;
             if (nextNode == (u32)-1) {
-                speed = fn_800EC53C(obj);
+                speed = GSmodelGetAnimFrame(obj);
             }
             fn_800EC5FC(obj, node3, node1);
             fn_800EC4D0(obj, &arcTotal, &arcCurrent);
@@ -19457,7 +19457,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
             speed = lbl_8047D038;
             if (nextNode != (u32)-1) {
                 fn_800EC4D0(obj, &arcTotal, &arcCurrent);
-                speed = fn_800EC53C(obj);
+                speed = GSmodelGetAnimFrame(obj);
                 speed = (arcTotal / arcCurrent) * speed;
             }
             fn_800ECCA8(obj, node3);
@@ -19470,7 +19470,7 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
         if (!(fromNode == node3 && nextNode == node2)) {
             speed = lbl_8047D038;
             if (nextNode == (u32)-1) {
-                speed = fn_800EC53C(obj);
+                speed = GSmodelGetAnimFrame(obj);
             }
             fn_800EC5FC(obj, node3, node2);
             fn_800EC4D0(obj, &arcTotal, &arcCurrent);
@@ -20713,7 +20713,7 @@ void fn_8012E388(void) {
     extern void* fn_800F9318();
     extern void fn_80166458();
     extern void fn_80176684();
-    extern void fn_80177A38();
+    extern void GSscene_GetMode();
     extern void fn_8018790C();
     extern void fn_8018805C();
     extern void fn_80188214();
@@ -20815,7 +20815,7 @@ void fn_8012E388(void) {
             if ((s32)r29 == (s32)0x2) {
                 r0 = (s8)r30;
                 if ((s32)r29 == (s32)0x2) {
-                    fn_80177A38();
+                    GSscene_GetMode();
     }
     }
     }
@@ -21348,7 +21348,7 @@ void fn_8012EBD4(void) {
     extern u8   lbl_80272A38[];
     extern u32  fn_801337B0(void);
     extern u8   fn_80102620(u32 id);
-    extern u8   fn_80177A38(void);
+    extern u8   GSscene_GetMode(void);
     extern u8   fn_8018C424(u32 a, u32 b, u32 c);
     extern u32  fn_800F7AF0(s32 port);
     extern u32  fn_800F7BC4(s32 port);
@@ -21393,7 +21393,7 @@ void fn_8012EBD4(void) {
     if ((fn_80102620(0xca) & 0xFF) != 0)
         return;
 
-    if ((fn_80177A38() & 0xFF) == 0x6)
+    if ((GSscene_GetMode() & 0xFF) == 0x6)
         return;
 
     base    = lbl_80426BD0;
@@ -23880,11 +23880,11 @@ extern f32 lbl_8047CFD0;
 extern f32 lbl_8047CFDC;
 extern f32 lbl_8047CFE0;
 #if 1
-asm u8 fn_80117514(void) {
-#include "src/game/gs_field_world_fn_80117514.inc"
+asm u8 floorUpdateFieldCamera(void) {
+#include "src/game/gs_field_world_floorUpdateFieldCamera.inc"
 }
 #else
-u8 fn_80117514(u8 *pos, f32 *out_x, f32 *out_y, f32 *out_z) {
+u8 floorUpdateFieldCamera(u8 *pos, f32 *out_x, f32 *out_y, f32 *out_z) {
     extern u32 lbl_8047AD68;
     extern u32 lbl_8047AD6C;
     extern f32 lbl_8047CFD0;

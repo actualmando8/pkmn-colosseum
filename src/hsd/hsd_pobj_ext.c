@@ -112,7 +112,7 @@ void fn_801B0040(void) {
 
 /* Address: 0x801B009C | Size: 0x44 */
 /* Shape blend opacity flag setter - if val >= threshold, set high bit */
-void fn_801B009C(u32* obj, s32 mode, f32* val_ptr) {
+void RObjUpdateFunc(u32* obj, s32 mode, f32* val_ptr) {
     if (obj == NULL) {
         return;
     }

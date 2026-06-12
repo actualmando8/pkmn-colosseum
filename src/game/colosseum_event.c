@@ -4732,7 +4732,7 @@ void fn_802080A8(void)
     u32 r6;
     char r7;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80166A50();
     extern void fn_801DA8C4();
     extern s8 fn_801DA94C();
@@ -4791,7 +4791,7 @@ void fn_802080A8(void)
           while (1) {
             cVar6 = fn_801DA94C(iVar1,0xa3,4);
             if (cVar6 == 0) break;
-            fn_800F0308();
+            _threadSwitch();
           }
         }
         fn_801DA9E8(iVar1,0x9f,4);
@@ -4833,7 +4833,7 @@ void fn_802080A8(void)
       while (1) {
         cVar6 = fn_801DA94C(iVar1,saved_r25,4);
         if (cVar6 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     else if (r7 == 3) {
@@ -4855,7 +4855,7 @@ void fn_802080A8(void)
 #pragma peephole on
 void fn_80208404(void* ctx, u8 p4, u8 p5, u8 p6)
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801DA8C4();
     extern u8 fn_801DA94C();
     extern void fn_801DA9B4();
@@ -4891,7 +4891,7 @@ void fn_80208404(void* ctx, u8 p4, u8 p5, u8 p6)
             while (1) {
                 cVar3 = fn_801DA94C(iVar1, uVar4, 4);
                 if (cVar3 == 0) break;
-                fn_800F0308();
+                _threadSwitch();
             }
         } else if (p6 == 3) {
             fn_801DA8C4(iVar1, uVar4, 4);
@@ -4910,7 +4910,7 @@ void fn_80208554(void)
     u32 r5;
     u32 r6;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern s8 fn_801DA698();
   int iVar1;
   s8 cVar2;
@@ -4918,7 +4918,7 @@ void fn_80208554(void)
   iVar1 = (int)fn_8012640C(r3,0,0xee,0);
   if (iVar1 != 0) {
     while (cVar2 = fn_801DA698(iVar1,r4,r5,r6), cVar2 != 1) {
-      fn_800F0308();
+      _threadSwitch();
     }
   }
   return;
@@ -5011,7 +5011,7 @@ void fn_802087C0(void)
     char r6;
     u8 *r7;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801C3C98();
     extern void fn_801DA224();
     extern void fn_801DA2C4();
@@ -5064,13 +5064,13 @@ void fn_802087C0(void)
       while (1) {
         cVar10 = fn_801DA94C(iVar1,uVar4,4);
         if (cVar10 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_801DA9E8(iVar1,uVar5,4);
       while (1) {
         cVar10 = fn_801DA94C(iVar1,uVar5,4);
         if (cVar10 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       bVar11 = 0;
       do {
@@ -5078,7 +5078,7 @@ void fn_802087C0(void)
         while (1) {
           cVar10 = fn_801DA94C(iVar1,uVar6,4);
           if (cVar10 == 0) break;
-          fn_800F0308();
+          _threadSwitch();
         }
         bVar11 = bVar11 + 1;
       } while ((bVar11 < 3) && (bVar11 < r4));
@@ -5087,7 +5087,7 @@ void fn_802087C0(void)
         while (1) {
           cVar10 = fn_801DA94C(iVar1,uVar7,4);
           if (cVar10 == 0) break;
-          fn_800F0308();
+          _threadSwitch();
         }
       }
     }
@@ -5104,7 +5104,7 @@ void fn_802087C0(void)
         while (1) {
           cVar10 = fn_801DA94C(iVar1,uVar8,4);
           if (cVar10 == 0) break;
-          fn_800F0308();
+          _threadSwitch();
         }
       }
     }
@@ -5164,7 +5164,7 @@ void fn_80208C18(void)
     int r3;
     char r4;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern s8 fn_80125390();
     extern void fn_80166A50();
     extern s8 fn_801DA5C4();
@@ -5208,7 +5208,7 @@ void fn_80208C18(void)
     }
     else if (r4 == 2) {
       while (cVar7 = fn_801DA94C(iVar1,uVar4,4), cVar7 != 0) {
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     else if (r4 == 3) {
@@ -5216,7 +5216,7 @@ void fn_80208C18(void)
     }
     else if (r4 == 4) {
       while (cVar7 = fn_801DA5C4(0), cVar7 != 1) {
-        fn_800F0308();
+        _threadSwitch();
       }
       if (r3 == 0) {
         uVar2 = 0;
@@ -5234,13 +5234,13 @@ void fn_80208C18(void)
       uVar4 = (int)fn_8012640C(0,uVar4,0x61,0);
       fn_80166A50(uVar4,0,0xff,0);
       while (cVar7 = fn_801DA94C(iVar1,uVar5,4), cVar7 != 0) {
-        fn_800F0308();
+        _threadSwitch();
       }
       cVar7 = fn_80125390(uVar8);
       if (cVar7 == 1) {
         fn_801DA9E8(iVar1,0x67,4);
         while (cVar7 = fn_801DA94C(iVar1,0x67,4), cVar7 != 0) {
-          fn_800F0308();
+          _threadSwitch();
         }
       }
     }
@@ -5259,7 +5259,7 @@ void fn_80208ED0(void)
     int r3;
     char r4;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801C3C98();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
@@ -5306,7 +5306,7 @@ void fn_80208ED0(void)
       while (1) {
         cVar6 = fn_801DA94C(iVar1,uVar4,4);
         if (cVar6 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
     }
     else if (r4 == 3) {
@@ -5356,7 +5356,7 @@ void fn_8020912C(void)
     int r3;
     char r4;
 
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_801C3C98();
     extern void fn_801DA4E8();
     extern void fn_801DA8C4();
@@ -5403,7 +5403,7 @@ void fn_8020912C(void)
       while (1) {
         cVar6 = fn_801DA94C(iVar1,uVar4,4);
         if (cVar6 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_801DA8C4(iVar1,uVar4,4);
       uVar4 = fn_801F54A4(0,0,0x14,0);
@@ -5492,7 +5492,7 @@ void fn_80209484(void* ctx, u32 param) {
 
 /* 0x802094CC | size: 0x90 | medium */
 void fn_802094CC(u32 param_1, u32 param_2, u32 param_3, s8 param_4) {
-    extern void fn_800F0308(void);
+    extern void _threadSwitch(void);
     extern u16 fn_8011BEB4(void*, u32, u16, u32);
     extern void fn_801DA8C4(u32, u16, u32);
     extern s8 fn_801DA94C(u32, u16, u32);
@@ -5506,7 +5506,7 @@ void fn_802094CC(u32 param_1, u32 param_2, u32 param_3, s8 param_4) {
         while (1) {
             cVar2 = fn_801DA94C(param_1, uVar1, param_3);
             if (cVar2 == 0) break;
-            fn_800F0308();
+            _threadSwitch();
         }
         fn_801DA8C4(param_1, uVar1, param_3);
     }
@@ -6508,7 +6508,7 @@ u32 fn_8020B330(void* ctx)
 {
     extern u32 fn_800896B8();
     extern u32 fn_800896C0();
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80132A38();
     extern void fn_80165668();
     extern u32 fn_801C2D54();
@@ -6590,7 +6590,7 @@ u32 fn_8020B330(void* ctx)
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x5a, 4);
                     if (cVar10 == 0) break;
-                    fn_800F0308();
+                    _threadSwitch();
                 }
                 fn_801EF8F4(saved_r27);
                 fn_8026246C();
@@ -6609,7 +6609,7 @@ u32 fn_8020B330(void* ctx)
                 while (1) {
                     cVar10 = fn_801DA94C(uVar4, 0x59, 4);
                     if (cVar10 == 0) break;
-                    fn_800F0308();
+                    _threadSwitch();
                 }
                 fn_801EF8F4(saved_r27);
                 fn_8026246C();
@@ -7067,7 +7067,7 @@ s32 fn_8020C108(void* ctx, u32 unused, u8* data) {
 u32 fn_8020C15C(void)
 
 {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern void fn_80103BA8();
     extern void fn_80132A38();
     extern void fn_80165A20();
@@ -7150,7 +7150,7 @@ u32 fn_8020C15C(void)
         if (bVar1) goto LAB_00209430;
         cVar14 = fn_801DA94C(uVar5,uVar6 & 0xffff,4);
         if (cVar14 == 0) break;
-        fn_800F0308();
+        _threadSwitch();
       }
       cVar14 = fn_801F54A4(0,0,0x33,0);
       if (cVar14 == 1) {
@@ -7171,7 +7171,7 @@ u32 fn_8020C15C(void)
           if (bVar1) goto LAB_00209430;
           cVar14 = fn_801DA94C(uVar5,lbl_8047B5F8,4);
           if (cVar14 == 0) break;
-          fn_800F0308();
+          _threadSwitch();
         }
       }
       if (uVar7 != 0) {
@@ -7189,7 +7189,7 @@ u32 fn_8020C15C(void)
             }
           }
           if ((bVar1) || (cVar14 = fn_801DA94C(uVar5,uVar7 & 0xffff,4), cVar14 == 0)) break;
-          fn_800F0308();
+          _threadSwitch();
         }
       }
     }
@@ -7214,7 +7214,7 @@ LAB_00209430:
       }
       fn_80262490(iVar9);
       while (cVar14 = fn_801DA94C(uVar5,0x5f,4), cVar14 != 0) {
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_8026246C();
     }
@@ -7235,7 +7235,7 @@ LAB_00209430:
       }
       fn_80262490(0x766d);
       while (cVar14 = fn_801DA94C(uVar5,uVar8 & 0xffff,4), cVar14 != 0) {
-        fn_800F0308();
+        _threadSwitch();
       }
       fn_8026246C();
     }
@@ -7265,7 +7265,7 @@ LAB_00209430:
     fn_801DA4E8(uVar4,1);
     fn_801DA9E8(uVar4,0x54,4);
     while (cVar14 = fn_801DA94C(uVar4,0x54,4), cVar14 != 0) {
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_801EF7C4(0);
     fn_801DA4E8(uVar5,1);
@@ -7279,7 +7279,7 @@ LAB_00209430:
       fn_80262490(0x766d);
     }
     while (cVar14 = fn_801DA94C(uVar5,0x55,4), cVar14 != 0) {
-      fn_800F0308();
+      _threadSwitch();
     }
     cVar14 = fn_801F54A4(0,0,0x33,0);
     if (cVar14 == 1) {
@@ -7288,7 +7288,7 @@ LAB_00209430:
     fn_801EF7C4(1);
     fn_801DA9E8(uVar4,0x56,4);
     while (cVar14 = fn_801DA94C(uVar4,0x56,4), cVar14 != 0) {
-      fn_800F0308();
+      _threadSwitch();
     }
     fn_801DA8C4(uVar4,0x54,4);
     fn_801DA8C4(uVar5,0x55,4);
@@ -7885,7 +7885,7 @@ u32 fn_8020DA14(void)
 #pragma push
 #pragma peephole on
 u32 fn_8020DAD0(u32 p1) {
-    extern void fn_800F0308();
+    extern void _threadSwitch();
     extern u32 fn_800FF56C();
     extern void fn_800FF730();
     extern void fn_80112700();
@@ -7986,7 +7986,7 @@ u32 fn_8020DAD0(u32 p1) {
         fn_801EF7B4();
         fn_800FF730(uVar7);
         fn_8011288C(0, 0);
-        fn_800F0308();
+        _threadSwitch();
         fn_8011395C(uVar7);
         cVar10 = fn_8020DFD8(uVar1);
         if (cVar10 != 0) {
@@ -8001,7 +8001,7 @@ u32 fn_8020DAD0(u32 p1) {
                 fn_8018DA88();
                 fn_80113FE8();
                 fn_8011288C(0, 0x5960008);
-                fn_800F0308();
+                _threadSwitch();
                 uVar1 = fn_801EF634();
                 return uVar1;
             }

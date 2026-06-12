@@ -33,14 +33,14 @@ static HSD_ClassInfo* default_class = NULL;
 /*  Flag accessors                                                           */
 /* ========================================================================= */
 
-void HSD_MObjSetFlags(HSD_MObj* mobj, u32 flags)
+void HSD_MObjSetFlags_Early(HSD_MObj* mobj, u32 flags)
 {
     if (mobj != NULL) {
         mobj->rendermode |= flags;
     }
 }
 
-void HSD_MObjClearFlags(HSD_MObj* mobj, u32 flags)
+void HSD_MObjClearFlags_Early(HSD_MObj* mobj, u32 flags)
 {
     if (mobj != NULL) {
         mobj->rendermode &= ~flags;
@@ -296,7 +296,7 @@ void fn_801A6C34(void* obj) {
 #endif
 
 /* 0x801A6CA4 | 0x64 */
-extern void __assert(void* file, s32 line, void* msg);
+extern void __assert();
 extern u32 lbl_8047DC18;
 extern u32 lbl_8047DC20;
 #if 0
@@ -339,11 +339,11 @@ void fn_801A6D08(HSD_MObj* mobj) {
 /* 0x801A6D5C | 0x44 */
 extern void fn_801BBE3C(void* a, void* b);
 #if 0
-asm void fn_801A6D5C(void) {
+asm void HSD_MObjAddTObjNext(void) {
 #include "src/hsd/hsd_mobj_fn_801A6D5C.inc"
 }
 #else
-void fn_801A6D5C(void* a, void* b, void* c) {
+void HSD_MObjAddTObjNext(void* a, void* b, void* c) {
     if (a == NULL || b == NULL || c == NULL) {
         return;
     }
@@ -418,11 +418,11 @@ extern void fn_801B294C(u32 flags, HSD_PEDesc* pe);
 extern void fn_801B3884(void);
 extern void fn_801BDA58(void* tobj);
 #if 1
-asm void fn_801A6E24(void) {
+asm void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode) {
 #include "src/hsd/hsd_mobj_fn_801A6E24.inc"
 }
 #else
-void fn_801A6E24(HSD_MObj* mobj) {
+void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode_arg) {
     u32 rendermode;
     u32* pp;
     u32 tobj_slot;
@@ -468,11 +468,11 @@ extern void fn_801B45A4(void* a, void* b);
 extern void fn_801BD8D0(void* a, void* b);
 extern u8 lbl_80274E5C[];
 #if 0
-asm void fn_801A6F78(void) {
+asm void MObjSetupTev(void) {
 #include "src/hsd/hsd_mobj_fn_801A6F78.inc"
 }
 #else
-void fn_801A6F78(void* obj, void* a, void* b) {
+void MObjSetupTev(void* obj, void* a, void* b) {
     if (*(u32*)((u8*)obj + 0x18) == 0) {
         __assert(&lbl_8047DC18, 0x31e, lbl_80274E5C);
     }
@@ -637,9 +637,9 @@ extern void jumptable_8036CB84();
 extern u32 lbl_8047DC40;
 extern u32 lbl_8047DC44;
 #if 1
-asm void fn_801A7E84(void) {
+asm void MObjUpdateFunc(void) {
 #include "src/hsd/hsd_mobj_fn_801A7E84.inc"
 }
 #else
-void fn_801A7E84(void) {}
+void MObjUpdateFunc(void) {}
 #endif

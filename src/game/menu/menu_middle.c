@@ -45,7 +45,7 @@ extern void fn_800D7820();
 extern void fn_800D888C();
 extern void fn_800D88DC();
 extern void fn_800E0C54();
-extern void fn_800F0308();
+extern void _threadSwitch();
 extern void fn_800F9D04();
 extern void fn_800FA280();
 extern void fn_800FA444();
@@ -1007,7 +1007,7 @@ void fn_8006A65C(void) {
     fn_80069C0C();
     r3 = 0x397;
     ((void(*)(void))fn_800FF730)();
-    ((void(*)(void))fn_800F0308)();
+    ((void(*)(void))_threadSwitch)();
     r3 = 0x0;
     r4 = 0xe;
     fn_80129280();
@@ -5127,7 +5127,7 @@ void fn_8006E0CC(void) {
         fn_8010BCE4();
         r0 = (s8)r3;
         if ((s32)r0 == (s32)0x0) {
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
 
         } else {
         r31 = r31 + 0x4;

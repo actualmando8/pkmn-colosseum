@@ -1501,7 +1501,7 @@
   "addr": "0x800C483C",
   "section": ".text",
   "size": "0xEC",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "__end_critical_region": {
@@ -1606,7 +1606,7 @@
   "addr": "0x800C4A60",
   "section": ".text",
   "size": "0xE4",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "__pformatter": {
@@ -3205,7 +3205,7 @@
   "src": "src/game/gs_npc_interact.c",
   "status": "LIKELY"
  },
- "fn_80011700": {
+ "menuFightCloseWaza": {
   "addr": "0x80011700",
   "section": ".text",
   "size": "0xBC",
@@ -10156,7 +10156,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8007C2C0": {
+ "menuPokeCouponInit": {
   "addr": "0x8007C2C0",
   "section": ".text",
   "size": "0x40",
@@ -11668,7 +11668,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8009E7B0": {
+ "OSLink": {
   "addr": "0x8009E7B0",
   "section": ".text",
   "size": "0x2BC",
@@ -11696,7 +11696,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8009EDAC": {
+ "OSUnlink": {
   "addr": "0x8009EDAC",
   "section": ".text",
   "size": "0x238",
@@ -12494,7 +12494,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800A56F0": {
+ "stateReadingFST": {
   "addr": "0x800A56F0",
   "section": ".text",
   "size": "0x94",
@@ -15140,7 +15140,7 @@
   "src": "src/trk/TRKNub.c",
   "status": "KNOWN"
  },
- "fn_800BE800": {
+ "MessageSend": {
   "addr": "0x800BE800",
   "section": ".text",
   "size": "0x44",
@@ -15287,7 +15287,7 @@
   "src": "src/trk/TRKDispatch.c",
   "status": "KNOWN"
  },
- "fn_800BF95C": {
+ "SendACK": {
   "addr": "0x800BF95C",
   "section": ".text",
   "size": "0x290",
@@ -15767,49 +15767,49 @@
   "addr": "0x800C4928",
   "section": ".text",
   "size": "0x138",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4B44": {
   "addr": "0x800C4B44",
   "section": ".text",
   "size": "0x10C",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C50": {
   "addr": "0x800C4C50",
   "section": ".text",
   "size": "0x24",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C74": {
   "addr": "0x800C4C74",
   "section": ".text",
   "size": "0x24",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C98": {
   "addr": "0x800C4C98",
   "section": ".text",
   "size": "0x28",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4CC0": {
   "addr": "0x800C4CC0",
   "section": ".text",
   "size": "0xCC",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
- "fn_800C4D8C": {
+ "__sys_free": {
   "addr": "0x800C4D8C",
   "section": ".text",
   "size": "0xB8",
-  "src": "src/crt/longlong.c",
+  "src": "src/crt/math_longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4F34": {
@@ -16638,28 +16638,28 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800D172C": {
+ "GScameraGetAnimFrame": {
   "addr": "0x800D172C",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1734": {
+ "GScameraHasAnimationEnded": {
   "addr": "0x800D1734",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800D173C": {
+ "GScameraStopAnimation": {
   "addr": "0x800D173C",
   "section": ".text",
   "size": "0x5C",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1798": {
+ "GScameraStartAnimation": {
   "addr": "0x800D1798",
   "section": ".text",
   "size": "0xC0",
@@ -16673,42 +16673,42 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800D1860": {
+ "GScameraSetAnimFrame": {
   "addr": "0x800D1860",
   "section": ".text",
   "size": "0x9C",
   "src": null,
   "status": "GAP"
  },
- "fn_800D18FC": {
+ "GScameraSetAnimRate": {
   "addr": "0x800D18FC",
   "section": ".text",
   "size": "0x88",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1984": {
+ "GScameraSetAnimIndex": {
   "addr": "0x800D1984",
   "section": ".text",
   "size": "0xB4",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1A38": {
+ "GScameraIsAnimating": {
   "addr": "0x800D1A38",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1A40": {
+ "GScameraGetDistanceVector": {
   "addr": "0x800D1A40",
   "section": ".text",
   "size": "0x30",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1A70": {
+ "GScameraGetProjMatrixPtr": {
   "addr": "0x800D1A70",
   "section": ".text",
   "size": "0xCC",
@@ -16729,56 +16729,56 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800D1EB8": {
+ "GScameraGetLookAt": {
   "addr": "0x800D1EB8",
   "section": ".text",
   "size": "0x4C",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1F04": {
+ "GScameraLookAt": {
   "addr": "0x800D1F04",
   "section": ".text",
   "size": "0x54",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1F58": {
+ "GScameraGetRotation": {
   "addr": "0x800D1F58",
   "section": ".text",
   "size": "0x2C",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1F84": {
+ "GScameraGetPosition": {
   "addr": "0x800D1F84",
   "section": ".text",
   "size": "0x58",
   "src": null,
   "status": "GAP"
  },
- "fn_800D1FDC": {
+ "GScameraGetPerspective": {
   "addr": "0x800D1FDC",
   "section": ".text",
   "size": "0x60",
   "src": null,
   "status": "GAP"
  },
- "fn_800D203C": {
+ "GScameraSetRotation": {
   "addr": "0x800D203C",
   "section": ".text",
   "size": "0x40",
   "src": null,
   "status": "GAP"
  },
- "fn_800D207C": {
+ "GScameraSetPosition": {
   "addr": "0x800D207C",
   "section": ".text",
   "size": "0x50",
   "src": null,
   "status": "GAP"
  },
- "fn_800D20CC": {
+ "GScameraSetPerspective": {
   "addr": "0x800D20CC",
   "section": ".text",
   "size": "0x84",
@@ -16792,7 +16792,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800D21C8": {
+ "GScameraSetViewport": {
   "addr": "0x800D21C8",
   "section": ".text",
   "size": "0x80",
@@ -16806,7 +16806,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800D2584": {
+ "GScameraGetActiveCamera": {
   "addr": "0x800D2584",
   "section": ".text",
   "size": "0x8",
@@ -18094,14 +18094,14 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DC298": {
+ "GSgfxEndBackFBCapture": {
   "addr": "0x800DC298",
   "section": ".text",
   "size": "0xF8",
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DC390": {
+ "GSgfxBeginBackFBCapture": {
   "addr": "0x800DC390",
   "section": ".text",
   "size": "0x1B0",
@@ -18234,7 +18234,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DCCF0": {
+ "GSlightSetType": {
   "addr": "0x800DCCF0",
   "section": ".text",
   "size": "0xA8",
@@ -18444,7 +18444,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DF498": {
+ "GSmaterialSetPEdescr": {
   "addr": "0x800DF498",
   "section": ".text",
   "size": "0x6C",
@@ -18458,7 +18458,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DF550": {
+ "GSmaterialSetFlags": {
   "addr": "0x800DF550",
   "section": ".text",
   "size": "0xB8",
@@ -18486,7 +18486,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DF8CC": {
+ "_GSmaterialObjInit_800EF33C": {
   "addr": "0x800DF8CC",
   "section": ".text",
   "size": "0x64",
@@ -18500,7 +18500,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DFABC": {
+ "_matGSmatEnableEnvMapExt": {
   "addr": "0x800DFABC",
   "section": ".text",
   "size": "0x3DC",
@@ -18829,7 +18829,7 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800E07E4": {
+ "GSbezierCalculateVector": {
   "addr": "0x800E07E4",
   "section": ".text",
   "size": "0x128",
@@ -19039,21 +19039,21 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800E3B3C": {
+ "GSmaterialGetPoolCount": {
   "addr": "0x800E3B3C",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3B44": {
+ "GSmaterialSetShadowFlag": {
   "addr": "0x800E3B44",
   "section": ".text",
   "size": "0x28",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3B6C": {
+ "GSmaterialFindByMObj": {
   "addr": "0x800E3B6C",
   "section": ".text",
   "size": "0x54",
@@ -19067,119 +19067,119 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800E3BF0": {
+ "GSmaterialGetUserData": {
   "addr": "0x800E3BF0",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3BF8": {
+ "GSmaterialGetTexture": {
   "addr": "0x800E3BF8",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3C00": {
+ "GSmaterialSetUserData": {
   "addr": "0x800E3C00",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3C08": {
+ "GSmaterialSetTexture": {
   "addr": "0x800E3C08",
   "section": ".text",
   "size": "0x54",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3C5C": {
+ "GSmaterialGetTransformPtr": {
   "addr": "0x800E3C5C",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3C64": {
+ "GSmaterialHasTransform": {
   "addr": "0x800E3C64",
   "section": ".text",
   "size": "0x30",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3C94": {
+ "GSmaterialSetCustomPEFlag": {
   "addr": "0x800E3C94",
   "section": ".text",
   "size": "0x28",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3CBC": {
+ "GSmaterialGetTexStage": {
   "addr": "0x800E3CBC",
   "section": ".text",
   "size": "0xC",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3CC8": {
+ "GSmaterialSetEnvMapFlag": {
   "addr": "0x800E3CC8",
   "section": ".text",
   "size": "0x28",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3CF0": {
+ "GSmaterialGetSpecularPtr": {
   "addr": "0x800E3CF0",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3CF8": {
+ "GSmaterialGetAmbientPtr": {
   "addr": "0x800E3CF8",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D00": {
+ "GSmaterialGetDiffusePtr": {
   "addr": "0x800E3D00",
   "section": ".text",
   "size": "0x8",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D08": {
+ "GSmaterialIsActive": {
   "addr": "0x800E3D08",
   "section": ".text",
   "size": "0xC",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D14": {
+ "GSmaterialLerpPEColor": {
   "addr": "0x800E3D14",
   "section": ".text",
   "size": "0x2C",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D40": {
+ "GSmaterialLerpSpecular": {
   "addr": "0x800E3D40",
   "section": ".text",
   "size": "0x2C",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D6C": {
+ "GSmaterialLerpAmbient": {
   "addr": "0x800E3D6C",
   "section": ".text",
   "size": "0x2C",
   "src": null,
   "status": "GAP"
  },
- "fn_800E3D98": {
+ "GSmaterialLerpDiffuse": {
   "addr": "0x800E3D98",
   "section": ".text",
   "size": "0x2C",
@@ -19529,14 +19529,14 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800E8F68": {
+ "GSmaterialSetCallback": {
   "addr": "0x800E8F68",
   "section": ".text",
   "size": "0xC",
   "src": null,
   "status": "GAP"
  },
- "fn_800E8F74": {
+ "GSmaterialSetDistanceThreshold": {
   "addr": "0x800E8F74",
   "section": ".text",
   "size": "0xC",
@@ -19886,7 +19886,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800EC53C": {
+ "GSmodelGetAnimFrame": {
   "addr": "0x800EC53C",
   "section": ".text",
   "size": "0x2C",
@@ -20082,7 +20082,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800EE08C": {
+ "_modelGetEndFrame": {
   "addr": "0x800EE08C",
   "section": ".text",
   "size": "0x5C",
@@ -20215,7 +20215,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_800EEA98": {
+ "GSscratchStore": {
   "addr": "0x800EEA98",
   "section": ".text",
   "size": "0x9C",
@@ -20369,21 +20369,21 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F0030": {
+ "threadLoadGPRRegisters": {
   "addr": "0x800F0030",
   "section": ".text",
   "size": "0x90",
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F00C0": {
+ "threadLoadFPRRegisters": {
   "addr": "0x800F00C0",
   "section": ".text",
   "size": "0x9C",
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F015C": {
+ "threadSaveGPRRegisters": {
   "addr": "0x800F015C",
   "section": ".text",
   "size": "0x94",
@@ -20397,7 +20397,7 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F028C": {
+ "threadExecute": {
   "addr": "0x800F028C",
   "section": ".text",
   "size": "0x68",
@@ -20411,7 +20411,7 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F0308": {
+ "_threadSwitch": {
   "addr": "0x800F0308",
   "section": ".text",
   "size": "0x64",
@@ -20516,14 +20516,7 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "fn_800F07A8": {
-  "addr": "0x800F07A8",
-  "section": ".text",
-  "size": "0x230",
-  "src": "src/game/gs_thread.c",
-  "status": "KNOWN"
- },
- "fn_800F09D8": {
+ "GSthread": {
   "addr": "0x800F09D8",
   "section": ".text",
   "size": "0x9C",
@@ -21811,7 +21804,7 @@
   "src": "src/game/gs_model.c",
   "status": "KNOWN"
  },
- "fn_80102428": {
+ "menuCloseSync": {
   "addr": "0x80102428",
   "section": ".text",
   "size": "0x98",
@@ -22504,7 +22497,7 @@
   "src": "src/game/gs_model.c",
   "status": "KNOWN"
  },
- "fn_80109894": {
+ "menuModelSetMotion": {
   "addr": "0x80109894",
   "section": ".text",
   "size": "0xA0",
@@ -23456,13 +23449,6 @@
   "src": "src/game/gs_field_resource.c",
   "status": "KNOWN"
  },
- "fn_80114948": {
-  "addr": "0x80114948",
-  "section": ".text",
-  "size": "0x74",
-  "src": "src/game/gs_field_resource.c",
-  "status": "KNOWN"
- },
  "fn_801149BC": {
   "addr": "0x801149BC",
   "section": ".text",
@@ -23482,13 +23468,6 @@
   "section": ".text",
   "size": "0x1C8",
   "src": "src/game/gs_field_resource.c",
-  "status": "KNOWN"
- },
- "fn_80114CA8": {
-  "addr": "0x80114CA8",
-  "section": ".text",
-  "size": "0x70",
-  "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  },
  "fn_80114D18": {
@@ -23834,7 +23813,7 @@
   "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  },
- "fn_80115E04": {
+ "floorEventChangeTresure": {
   "addr": "0x80115E04",
   "section": ".text",
   "size": "0x68",
@@ -24041,13 +24020,6 @@
   "addr": "0x80117500",
   "section": ".text",
   "size": "0x14",
-  "src": "src/game/gs_field_world.c",
-  "status": "KNOWN"
- },
- "fn_80117514": {
-  "addr": "0x80117514",
-  "section": ".text",
-  "size": "0x1B4",
   "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  },
@@ -28671,13 +28643,6 @@
   "src": "src/game/effect/gs_effect.c",
   "status": "KNOWN"
  },
- "fn_8013111C": {
-  "addr": "0x8013111C",
-  "section": ".text",
-  "size": "0xE4",
-  "src": "src/game/effect/gs_effect.c",
-  "status": "KNOWN"
- },
  "fn_80131200": {
   "addr": "0x80131200",
   "section": ".text",
@@ -30232,7 +30197,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013814C": {
+ "_lightningRenderMain": {
   "addr": "0x8013814C",
   "section": ".text",
   "size": "0x4E4",
@@ -30274,7 +30239,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_80138B00": {
+ "leaffxStartEffect": {
   "addr": "0x80138B00",
   "section": ".text",
   "size": "0x74",
@@ -30316,14 +30281,14 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_80139378": {
+ "_leaffxGenerateLeafData": {
   "addr": "0x80139378",
   "section": ".text",
   "size": "0x4A8",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_80139820": {
+ "electronStartEffect": {
   "addr": "0x80139820",
   "section": ".text",
   "size": "0x78",
@@ -30491,7 +30456,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013B5E4": {
+ "surfEffectStart": {
   "addr": "0x8013B5E4",
   "section": ".text",
   "size": "0x278",
@@ -30554,7 +30519,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013C718": {
+ "seaEffectStart": {
   "addr": "0x8013C718",
   "section": ".text",
   "size": "0x330",
@@ -30617,14 +30582,14 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013D804": {
+ "envMapEffectInit": {
   "addr": "0x8013D804",
   "section": ".text",
   "size": "0x104",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013D908": {
+ "envMapEffectStart": {
   "addr": "0x8013D908",
   "section": ".text",
   "size": "0x7C",
@@ -30673,7 +30638,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013DDCC": {
+ "blurEffectStart": {
   "addr": "0x8013DDCC",
   "section": ".text",
   "size": "0xA0",
@@ -30722,7 +30687,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013E658": {
+ "auraEffectStart": {
   "addr": "0x8013E658",
   "section": ".text",
   "size": "0x6C",
@@ -30771,7 +30736,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013F344": {
+ "distortionEffectStart": {
   "addr": "0x8013F344",
   "section": ".text",
   "size": "0xCC",
@@ -30792,14 +30757,14 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013F97C": {
+ "_distortionEffectUpdateMatrices": {
   "addr": "0x8013F97C",
   "section": ".text",
   "size": "0x264",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013FBE0": {
+ "patchiruTextureStart": {
   "addr": "0x8013FBE0",
   "section": ".text",
   "size": "0x78",
@@ -30827,7 +30792,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013FDD0": {
+ "billboardEffectStart": {
   "addr": "0x8013FDD0",
   "section": ".text",
   "size": "0x13C",
@@ -30855,7 +30820,7 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_801402AC": {
+ "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl": {
   "addr": "0x801402AC",
   "section": ".text",
   "size": "0x2DC",
@@ -32248,7 +32213,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801522E0": {
+ "peopleFieldCompare8ByteTableKey": {
   "addr": "0x801522E0",
   "section": ".text",
   "size": "0x10",
@@ -32269,7 +32234,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801523A8": {
+ "peopleFieldCompare12ByteTableKey": {
   "addr": "0x801523A8",
   "section": ".text",
   "size": "0x10",
@@ -33270,77 +33235,77 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_8016161C": {
+ "peopleFieldMotionResolveInput23C": {
   "addr": "0x8016161C",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80161664": {
+ "peopleFieldMotionResolveInput260": {
   "addr": "0x80161664",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801616AC": {
+ "peopleFieldMotionResolveInput284": {
   "addr": "0x801616AC",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801616F4": {
+ "peopleFieldMotionResolveInput2A8": {
   "addr": "0x801616F4",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_8016173C": {
+ "peopleFieldMotionResolveInput2CC": {
   "addr": "0x8016173C",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80161784": {
+ "peopleFieldMotionResolveInput2F0": {
   "addr": "0x80161784",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801617CC": {
+ "peopleFieldMotionResolveInput338": {
   "addr": "0x801617CC",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80161814": {
+ "peopleFieldMotionResolveInput35C": {
   "addr": "0x80161814",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_8016185C": {
+ "peopleFieldMotionResolveInput380": {
   "addr": "0x8016185C",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801618A4": {
+ "peopleFieldMotionResolveInput3A4": {
   "addr": "0x801618A4",
   "section": ".text",
   "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801618EC": {
+ "peopleFieldMotionResolveInput3C8": {
   "addr": "0x801618EC",
   "section": ".text",
   "size": "0x48",
@@ -33396,7 +33361,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_8016208C": {
+ "sndSin": {
   "addr": "0x8016208C",
   "section": ".text",
   "size": "0x8C",
@@ -33417,7 +33382,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801621CC": {
+ "sndConvertTicks": {
   "addr": "0x801621CC",
   "section": ".text",
   "size": "0x48",
@@ -33445,7 +33410,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80162428": {
+ "hwExit": {
   "addr": "0x80162428",
   "section": ".text",
   "size": "0x34",
@@ -33550,7 +33515,7 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80162904": {
+ "hwKeyOff": {
   "addr": "0x80162904",
   "section": ".text",
   "size": "0x28",
@@ -33921,14 +33886,14 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801642AC": {
+ "salGetStartDelay": {
   "addr": "0x801642AC",
   "section": ".text",
   "size": "0x4C",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801642F8": {
+ "hwInitIrq": {
   "addr": "0x801642F8",
   "section": ".text",
   "size": "0x2C",
@@ -33942,14 +33907,14 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80164328": {
+ "hwEnableIrq": {
   "addr": "0x80164328",
   "section": ".text",
   "size": "0x38",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80164360": {
+ "hwDisableIrq": {
   "addr": "0x80164360",
   "section": ".text",
   "size": "0x38",
@@ -33984,21 +33949,21 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_8016442C": {
+ "sndAuxCallbackReverbHI": {
   "addr": "0x8016442C",
   "section": ".text",
   "size": "0x5C",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_80164488": {
+ "sndAuxCallbackUpdateSettingsReverbHI": {
   "addr": "0x80164488",
   "section": ".text",
   "size": "0x58",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "fn_801644E0": {
+ "sndAuxCallbackPrepareReverbHI": {
   "addr": "0x801644E0",
   "section": ".text",
   "size": "0x40",
@@ -34138,7 +34103,7 @@
   "src": "src/game/sound/sound.c",
   "status": "KNOWN"
  },
- "fn_801657F8": {
+ "soundStop": {
   "addr": "0x801657F8",
   "section": ".text",
   "size": "0x104",
@@ -34642,7 +34607,7 @@
   "src": "src/game/gs_dvd.c",
   "status": "KNOWN"
  },
- "fn_80167BE8": {
+ "_gsdvdErrorTask_801879AC": {
   "addr": "0x80167BE8",
   "section": ".text",
   "size": "0x148",
@@ -34838,14 +34803,14 @@
   "src": "src/game/gs_dvd.c",
   "status": "KNOWN"
  },
- "fn_80168C64": {
+ "_psListGetFirst": {
   "addr": "0x80168C64",
   "section": ".text",
   "size": "0x6C",
   "src": "src/game/script/pslist.c",
   "status": "KNOWN"
  },
- "fn_80168CD0": {
+ "_psListDelete": {
   "addr": "0x80168CD0",
   "section": ".text",
   "size": "0xDC",
@@ -34978,14 +34943,14 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8016972C": {
+ "psSetPointJObjNodup": {
   "addr": "0x8016972C",
   "section": ".text",
   "size": "0xD4",
   "src": null,
   "status": "GAP"
  },
- "fn_80169800": {
+ "psSetPointJObj": {
   "addr": "0x80169800",
   "section": ".text",
   "size": "0xF8",
@@ -35034,7 +34999,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8016A17C": {
+ "psInitDataBank": {
   "addr": "0x8016A17C",
   "section": ".text",
   "size": "0x154",
@@ -35202,7 +35167,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_8016F430": {
+ "psInterpretParticles": {
   "addr": "0x8016F430",
   "section": ".text",
   "size": "0xD0",
@@ -35286,14 +35251,14 @@
   "src": null,
   "status": "GAP"
  },
- "fn_80172BBC": {
+ "applyForceJObj": {
   "addr": "0x80172BBC",
   "section": ".text",
   "size": "0x144",
   "src": null,
   "status": "GAP"
  },
- "fn_80172D00": {
+ "setVelToJObj": {
   "addr": "0x80172D00",
   "section": ".text",
   "size": "0x2A8",
@@ -35328,7 +35293,7 @@
   "src": null,
   "status": "GAP"
  },
- "fn_80173624": {
+ "psSetBillboardCamera": {
   "addr": "0x80173624",
   "section": ".text",
   "size": "0xF4",
@@ -35342,14 +35307,14 @@
   "src": null,
   "status": "GAP"
  },
- "fn_80173F98": {
+ "psExecGenerator": {
   "addr": "0x80173F98",
   "section": ".text",
   "size": "0x2B4",
   "src": null,
   "status": "GAP"
  },
- "fn_8017424C": {
+ "generateParticle_801947D4": {
   "addr": "0x8017424C",
   "section": ".text",
   "size": "0x14E0",
@@ -35391,7 +35356,7 @@
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80175E88": {
+ "genPosUpdate": {
   "addr": "0x80175E88",
   "section": ".text",
   "size": "0xBC",
@@ -35699,56 +35664,56 @@
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177830": {
+ "GSscene_GetCameraRotationVector": {
   "addr": "0x80177830",
   "section": ".text",
   "size": "0x28",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177858": {
+ "GSscene_SetCameraRotationVector": {
   "addr": "0x80177858",
   "section": ".text",
   "size": "0x5C",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_801778B4": {
+ "GSscene_GetCameraDirectionVector": {
   "addr": "0x801778B4",
   "section": ".text",
   "size": "0x28",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_801778DC": {
+ "GSscene_SetCameraDirectionVector": {
   "addr": "0x801778DC",
   "section": ".text",
   "size": "0x2C",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177908": {
+ "GSscene_GetCameraPositionVector": {
   "addr": "0x80177908",
   "section": ".text",
   "size": "0x28",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177930": {
+ "GSscene_SetCameraPositionVector": {
   "addr": "0x80177930",
   "section": ".text",
   "size": "0x2C",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_8017795C": {
+ "GSscene_GetCameraViewVector": {
   "addr": "0x8017795C",
   "section": ".text",
   "size": "0x28",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177984": {
+ "GSscene_SetCameraViewVector": {
   "addr": "0x80177984",
   "section": ".text",
   "size": "0x2C",
@@ -35776,14 +35741,14 @@
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177A38": {
+ "GSscene_GetMode": {
   "addr": "0x80177A38",
   "section": ".text",
   "size": "0xC",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "fn_80177A44": {
+ "GSscene_SetMode": {
   "addr": "0x80177A44",
   "section": ".text",
   "size": "0x20",
@@ -37589,7 +37554,7 @@
   "src": "src/game/gs_flag.c",
   "status": "KNOWN"
  },
- "fn_80190C90": {
+ "GSflagInitBitPos": {
   "addr": "0x80190C90",
   "section": ".text",
   "size": "0x1A4",
@@ -37666,21 +37631,21 @@
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_8019158C": {
+ "WObjAmnesia": {
   "addr": "0x8019158C",
   "section": ".text",
   "size": "0x48",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_801915D4": {
+ "WObjRelease": {
   "addr": "0x801915D4",
   "section": ".text",
   "size": "0x54",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191628": {
+ "HSD_WObjAlloc": {
   "addr": "0x80191628",
   "section": ".text",
   "size": "0x60",
@@ -37694,35 +37659,35 @@
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191788": {
+ "HSD_WObjSetPosition": {
   "addr": "0x80191788",
   "section": ".text",
   "size": "0x48",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_801917D0": {
+ "HSD_WObjLoadDesc": {
   "addr": "0x801917D0",
   "section": ".text",
   "size": "0xCC",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_8019189C": {
+ "HSD_WObjInit": {
   "addr": "0x8019189C",
   "section": ".text",
   "size": "0xB0",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_8019194C": {
+ "WObjLoad": {
   "addr": "0x8019194C",
   "section": ".text",
   "size": "0xA0",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_801919EC": {
+ "HSD_WObjInterpretAnim": {
   "addr": "0x801919EC",
   "section": ".text",
   "size": "0x48",
@@ -37736,35 +37701,35 @@
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191DCC": {
+ "HSD_WObjAddAnim": {
   "addr": "0x80191DCC",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191E38": {
+ "HSD_WObjReqAnim": {
   "addr": "0x80191E38",
   "section": ".text",
   "size": "0x50",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191E88": {
+ "HSD_WObjRemoveAnim": {
   "addr": "0x80191E88",
   "section": ".text",
   "size": "0x44",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191ECC": {
+ "HSD_ArchiveGetPublicAddress": {
   "addr": "0x80191ECC",
   "section": ".text",
   "size": "0x98",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "fn_80191F64": {
+ "HSD_ArchiveParse": {
   "addr": "0x80191F64",
   "section": ".text",
   "size": "0x180",
@@ -37911,63 +37876,63 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801942B8": {
+ "HSD_CObjGetCurrent": {
   "addr": "0x801942B8",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801942C0": {
+ "HSD_CObjGetOrtho": {
   "addr": "0x801942C0",
   "section": ".text",
   "size": "0x5C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_8019431C": {
+ "HSD_CObjGetPerspective": {
   "addr": "0x8019431C",
   "section": ".text",
   "size": "0x3C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194358": {
+ "HSD_CObjSetOrtho": {
   "addr": "0x80194358",
   "section": ".text",
   "size": "0x24",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_8019437C": {
+ "HSD_CObjSetFrustum": {
   "addr": "0x8019437C",
   "section": ".text",
   "size": "0x24",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801943A0": {
+ "HSD_CObjSetPerspective": {
   "addr": "0x801943A0",
   "section": ".text",
   "size": "0x1C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801943BC": {
+ "HSD_CObjSetProjectionType": {
   "addr": "0x801943BC",
   "section": ".text",
   "size": "0x10",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801943CC": {
+ "HSD_CObjGetProjectionType": {
   "addr": "0x801943CC",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801943E4": {
+ "HSD_CObjSetViewportfx4": {
   "addr": "0x801943E4",
   "section": ".text",
   "size": "0x1C",
@@ -37981,35 +37946,35 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801944A4": {
+ "HSD_CObjSetScissorx4": {
   "addr": "0x801944A4",
   "section": ".text",
   "size": "0x1C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801944C0": {
+ "HSD_CObjSetFar": {
   "addr": "0x801944C0",
   "section": ".text",
   "size": "0x10",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801944D0": {
+ "HSD_CObjGetFar": {
   "addr": "0x801944D0",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801944E8": {
+ "HSD_CObjSetNear": {
   "addr": "0x801944E8",
   "section": ".text",
   "size": "0x10",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801944F8": {
+ "HSD_CObjGetNear": {
   "addr": "0x801944F8",
   "section": ".text",
   "size": "0x18",
@@ -38044,14 +38009,14 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194788": {
+ "HSD_CObjSetAspect": {
   "addr": "0x80194788",
   "section": ".text",
   "size": "0x20",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801947A8": {
+ "HSD_CObjSetFov": {
   "addr": "0x801947A8",
   "section": ".text",
   "size": "0x20",
@@ -38072,28 +38037,28 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194CC4": {
+ "HSD_CObjGetViewingMtxPtr": {
   "addr": "0x80194CC4",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194CF4": {
+ "HSD_CObjGetInvViewingMtxPtrDirect": {
   "addr": "0x80194CF4",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194D60": {
+ "HSD_CObjGetViewingMtx": {
   "addr": "0x80194D60",
   "section": ".text",
   "size": "0x34",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80194D94": {
+ "HSD_CObjSetMtxDirty": {
   "addr": "0x80194D94",
   "section": ".text",
   "size": "0x10",
@@ -38107,7 +38072,7 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801950D0": {
+ "HSD_CObjGetUpVector": {
   "addr": "0x801950D0",
   "section": ".text",
   "size": "0x6C",
@@ -38135,28 +38100,28 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80195898": {
+ "HSD_CObjSetEyePosition": {
   "addr": "0x80195898",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80195904": {
+ "HSD_CObjGetEyePosition": {
   "addr": "0x80195904",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80195970": {
+ "HSD_CObjSetInterest": {
   "addr": "0x80195970",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801959DC": {
+ "HSD_CObjGetInterest": {
   "addr": "0x801959DC",
   "section": ".text",
   "size": "0x6C",
@@ -38198,14 +38163,14 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80196698": {
+ "HSD_CObjReqAnim": {
   "addr": "0x80196698",
   "section": ".text",
   "size": "0x64",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_801966FC": {
+ "HSD_CObjAnim": {
   "addr": "0x801966FC",
   "section": ".text",
   "size": "0x50",
@@ -38219,14 +38184,14 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80196B10": {
+ "HSD_CObjAddAnim": {
   "addr": "0x80196B10",
   "section": ".text",
   "size": "0xA8",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "fn_80196BB8": {
+ "HSD_CObjRemoveAnim": {
   "addr": "0x80196BB8",
   "section": ".text",
   "size": "0x84",
@@ -38422,14 +38387,14 @@
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_80199178": {
+ "HSD_DObjCountVertices": {
   "addr": "0x80199178",
   "section": ".text",
   "size": "0x80",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_801991F8": {
+ "HSD_DObjResolveRefsAll": {
   "addr": "0x801991F8",
   "section": ".text",
   "size": "0x6C",
@@ -38457,42 +38422,42 @@
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_80199568": {
+ "HSD_DObjAnimAll": {
   "addr": "0x80199568",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_801995D4": {
+ "HSD_DObjReqAnimAllByFlags": {
   "addr": "0x801995D4",
   "section": ".text",
   "size": "0x80",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_80199654": {
+ "HSD_DObjAddAnimAll": {
   "addr": "0x80199654",
   "section": ".text",
   "size": "0xB0",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_80199704": {
+ "HSD_DObjSetCurrent": {
   "addr": "0x80199704",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019970C": {
+ "HSD_FObjFree": {
   "addr": "0x8019970C",
   "section": ".text",
   "size": "0x2C",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_80199738": {
+ "HSD_FObjAlloc": {
   "addr": "0x80199738",
   "section": ".text",
   "size": "0x5C",
@@ -38534,49 +38499,49 @@
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B490": {
+ "HSD_FObjStopAnimAll": {
   "addr": "0x8019B490",
   "section": ".text",
   "size": "0x98",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B528": {
+ "HSD_FObjReqAnimAll": {
   "addr": "0x8019B528",
   "section": ".text",
   "size": "0xC0",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B5E8": {
+ "HSD_FObjRemoveAll": {
   "addr": "0x8019B5E8",
   "section": ".text",
   "size": "0x168",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B750": {
+ "HSD_FObjRemove": {
   "addr": "0x8019B750",
   "section": ".text",
   "size": "0x34",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B784": {
+ "HSD_FObjInitAllocData": {
   "addr": "0x8019B784",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B7B4": {
+ "HSD_FObjGetAllocData": {
   "addr": "0x8019B7B4",
   "section": ".text",
   "size": "0xC",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "fn_8019B7C0": {
+ "HSD_FogAdjInit": {
   "addr": "0x8019B7C0",
   "section": ".text",
   "size": "0x48",
@@ -38625,14 +38590,14 @@
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019C0F8": {
+ "_HSD_IDForgetMemory": {
   "addr": "0x8019C0F8",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019C128": {
+ "HSD_IDGetDataFromTable": {
   "addr": "0x8019C128",
   "section": ".text",
   "size": "0x88",
@@ -38653,21 +38618,21 @@
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019C358": {
+ "HSD_IDSetup": {
   "addr": "0x8019C358",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019C388": {
+ "HSD_IDInitAllocData": {
   "addr": "0x8019C388",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019C3B8": {
+ "HSD_IDGetAllocData": {
   "addr": "0x8019C3B8",
   "section": ".text",
   "size": "0xC",
@@ -38716,7 +38681,7 @@
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
- "fn_8019C7B8": {
+ "_HSD_MemCheckOwnDefaultCB": {
   "addr": "0x8019C7B8",
   "section": ".text",
   "size": "0x28",
@@ -38961,21 +38926,21 @@
   "src": "src/hsd/hsd_jobj.c",
   "status": "KNOWN"
  },
- "fn_801A0744": {
+ "HSD_JObjResolveRefsAll": {
   "addr": "0x801A0744",
   "section": ".text",
   "size": "0x458",
   "src": "src/hsd/hsd_jobj.c",
   "status": "KNOWN"
  },
- "fn_801A0B9C": {
+ "HSD_JObjRef": {
   "addr": "0x801A0B9C",
   "section": ".text",
   "size": "0x54",
   "src": "src/hsd/hsd_jobj.c",
   "status": "KNOWN"
  },
- "fn_801A0BF0": {
+ "HSD_IDGetData": {
   "addr": "0x801A0BF0",
   "section": ".text",
   "size": "0x2C",
@@ -39227,7 +39192,7 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A426C": {
+ "HSD_LObjAddAnimAll": {
   "addr": "0x801A426C",
   "section": ".text",
   "size": "0xD8",
@@ -39248,35 +39213,35 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A48B0": {
+ "HSD_LObjGetInterest": {
   "addr": "0x801A48B0",
   "section": ".text",
   "size": "0x44",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A48F4": {
+ "HSD_LObjSetInterest": {
   "addr": "0x801A48F4",
   "section": ".text",
   "size": "0x88",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A497C": {
+ "HSD_LObjGetPosition": {
   "addr": "0x801A497C",
   "section": ".text",
   "size": "0x44",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A49C0": {
+ "HSD_LObjSetPosition": {
   "addr": "0x801A49C0",
   "section": ".text",
   "size": "0x88",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A4A48": {
+ "HSD_LObjSetColor": {
   "addr": "0x801A4A48",
   "section": ".text",
   "size": "0xC",
@@ -39290,14 +39255,14 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A4AC4": {
+ "HSD_LObjGetCurrentByType": {
   "addr": "0x801A4AC4",
   "section": ".text",
   "size": "0x3C",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A4B00": {
+ "HSD_LObjDeleteCurrentAll": {
   "addr": "0x801A4B00",
   "section": ".text",
   "size": "0x220",
@@ -39311,7 +39276,7 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A4F54": {
+ "HSD_LObjSetup": {
   "addr": "0x801A4F54",
   "section": ".text",
   "size": "0xE78",
@@ -39339,91 +39304,91 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A6370": {
+ "HSD_LObjReqAnimAll": {
   "addr": "0x801A6370",
   "section": ".text",
   "size": "0x98",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A6408": {
+ "HSD_LObjAnimAll": {
   "addr": "0x801A6408",
   "section": ".text",
   "size": "0x8C",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A6494": {
+ "LObjUpdateFunc": {
   "addr": "0x801A6494",
   "section": ".text",
   "size": "0x24C",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A66E0": {
+ "HSD_LObjRemoveAnimAll": {
   "addr": "0x801A66E0",
   "section": ".text",
   "size": "0xAC",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A678C": {
+ "HSD_LObjGetActiveByIndex": {
   "addr": "0x801A678C",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A67BC": {
+ "HSD_LObjGetActiveByID": {
   "addr": "0x801A67BC",
   "section": ".text",
   "size": "0x114",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68D0": {
+ "HSD_LObjGetNbActive": {
   "addr": "0x801A68D0",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68D8": {
+ "HSD_LObjGetLightMaskSpecular": {
   "addr": "0x801A68D8",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68E0": {
+ "HSD_LObjGetLightMaskAlpha": {
   "addr": "0x801A68E0",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68E8": {
+ "HSD_LObjGetLightMaskAttnFunc": {
   "addr": "0x801A68E8",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68F0": {
+ "HSD_LObjGetLightMaskDiffuse": {
   "addr": "0x801A68F0",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A68F8": {
+ "HSD_LObjClearFlags": {
   "addr": "0x801A68F8",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "fn_801A6910": {
+ "HSD_LObjSetFlags": {
   "addr": "0x801A6910",
   "section": ".text",
   "size": "0x18",
@@ -39500,7 +39465,7 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A6D5C": {
+ "HSD_MObjAddTObjNext": {
   "addr": "0x801A6D5C",
   "section": ".text",
   "size": "0x44",
@@ -39535,14 +39500,14 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A6E24": {
+ "HSD_MObjSetup": {
   "addr": "0x801A6E24",
   "section": ".text",
   "size": "0x154",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A6F78": {
+ "MObjSetupTev": {
   "addr": "0x801A6F78",
   "section": ".text",
   "size": "0x78",
@@ -39591,18 +39556,18 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A7E84": {
+ "MObjUpdateFunc": {
   "addr": "0x801A7E84",
   "section": ".text",
   "size": "0x4D0",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8354": {
+ "HSD_MObjReqAnimByFlags": {
   "addr": "0x801A8354",
   "section": ".text",
   "size": "0x68",
-  "src": "src/hsd/hsd_mobj.c",
+  "src": "src/hsd/hsd_mobj_ext.c",
   "status": "KNOWN"
  },
  "fn_801A83BC": {
@@ -39612,91 +39577,91 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8428": {
+ "HSD_MObjClearFlags": {
   "addr": "0x801A8428",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8440": {
+ "HSD_MObjSetFlags": {
   "addr": "0x801A8440",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8458": {
+ "HSD_MObjGetFlags": {
   "addr": "0x801A8458",
   "section": ".text",
   "size": "0x18",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8470": {
+ "HSD_MObjSetCurrent": {
   "addr": "0x801A8470",
   "section": ".text",
   "size": "0x8",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8478": {
+ "HSD_MtxInitAllocData": {
   "addr": "0x801A8478",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A84A8": {
+ "HSD_MtxGetAllocData": {
   "addr": "0x801A84A8",
   "section": ".text",
   "size": "0xC",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A84B4": {
+ "HSD_VecInitAllocData": {
   "addr": "0x801A84B4",
   "section": ".text",
   "size": "0x30",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A84E4": {
+ "HSD_VecGetAllocData": {
   "addr": "0x801A84E4",
   "section": ".text",
   "size": "0xC",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A84F0": {
+ "HSD_MtxFree": {
   "addr": "0x801A84F0",
   "section": ".text",
   "size": "0x34",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8524": {
+ "HSD_MtxAlloc": {
   "addr": "0x801A8524",
   "section": ".text",
   "size": "0x4C",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A8570": {
+ "HSD_VecFree": {
   "addr": "0x801A8570",
   "section": ".text",
   "size": "0x34",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A85A4": {
+ "HSD_VecAlloc": {
   "addr": "0x801A85A4",
   "section": ".text",
   "size": "0x4C",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A85F0": {
+ "HSD_MtxScaledAdd": {
   "addr": "0x801A85F0",
   "section": ".text",
   "size": "0xC4",
@@ -39731,7 +39696,7 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801A9570": {
+ "HSD_MtxGetTranslate": {
   "addr": "0x801A9570",
   "section": ".text",
   "size": "0x1C",
@@ -39773,32 +39738,32 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801AA498": {
-  "addr": "0x801AA498",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "fn_801AA4CC": {
+ "HSD_ObjFree": {
+ "addr": "0x801AA498",
+ "section": ".text",
+ "size": "0x34",
+  "src": "src/hsd/hsd_pobj_disp.c",
+ "status": "KNOWN"
+},
+ "HSD_ObjAlloc": {
   "addr": "0x801AA4CC",
   "section": ".text",
   "size": "0x6C",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801AA538": {
-  "addr": "0x801AA538",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "fn_801AA568": {
+ "HSD_ObjSetHeap": {
+ "addr": "0x801AA538",
+ "section": ".text",
+ "size": "0x30",
+  "src": "src/hsd/hsd_pobj_disp.c",
+ "status": "KNOWN"
+},
+ "ObjInfoInit_802596A4": {
   "addr": "0x801AA568",
   "section": ".text",
   "size": "0x44",
-  "src": "src/hsd/hsd_mobj.c",
+  "src": "src/hsd/hsd_pobj_disp.c",
   "status": "KNOWN"
  },
  "fn_801AA5AC": {
@@ -39808,7 +39773,7 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "fn_801AA608": {
+ "HSD_PObjInit": {
   "addr": "0x801AA608",
   "section": ".text",
   "size": "0xC8",
@@ -39934,7 +39899,7 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801AD214": {
+ "HSD_PObjRemoveAll": {
   "addr": "0x801AD214",
   "section": ".text",
   "size": "0x74",
@@ -39955,27 +39920,27 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801AD61C": {
+ "HSD_PObjAnimAll": {
   "addr": "0x801AD61C",
   "section": ".text",
   "size": "0x5C",
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801AD678": {
+ "PObjUpdateFunc": {
   "addr": "0x801AD678",
   "section": ".text",
   "size": "0x4C",
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801AD6C4": {
-  "addr": "0x801AD6C4",
-  "section": ".text",
-  "size": "0x74",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
+ "HSD_PObjReqAnimAllByFlags": {
+ "addr": "0x801AD6C4",
+ "section": ".text",
+ "size": "0x74",
+  "src": "src/hsd/hsd_pobj_disp.c",
+ "status": "KNOWN"
+},
  "fn_801AD738": {
   "addr": "0x801AD738",
   "section": ".text",
@@ -39997,13 +39962,13 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801ADC08": {
-  "addr": "0x801ADC08",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
+ "_HSD_RandForgetMemory": {
+ "addr": "0x801ADC08",
+ "section": ".text",
+ "size": "0x34",
+  "src": "src/hsd/hsd_pobj_disp.c",
+ "status": "KNOWN"
+},
  "fn_801ADC3C": {
   "addr": "0x801ADC3C",
   "section": ".text",
@@ -40172,7 +40137,7 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801B009C": {
+ "RObjUpdateFunc": {
   "addr": "0x801B009C",
   "section": ".text",
   "size": "0x44",
@@ -40872,25 +40837,25 @@
   "src": "src/hsd/hsd_tobj.c",
   "status": "KNOWN"
  },
- "fn_801BBD3C": {
-  "addr": "0x801BBD3C",
-  "section": ".text",
-  "size": "0x24",
-  "src": "src/hsd/hsd_tobj.c",
-  "status": "KNOWN"
- },
- "fn_801BBD60": {
-  "addr": "0x801BBD60",
-  "section": ".text",
-  "size": "0x24",
-  "src": "src/hsd/hsd_tobj.c",
-  "status": "KNOWN"
- },
- "fn_801BBD84": {
+ "HSD_ImageDescFree": {
+ "addr": "0x801BBD3C",
+ "section": ".text",
+ "size": "0x24",
+  "src": "src/hsd/hsd_tobj_ext.c",
+ "status": "KNOWN"
+},
+"HSD_ImageDescRemove": {
+ "addr": "0x801BBD60",
+ "section": ".text",
+ "size": "0x24",
+  "src": "src/hsd/hsd_tobj_ext.c",
+ "status": "KNOWN"
+},
+ "HSD_ImageDescAlloc": {
   "addr": "0x801BBD84",
   "section": ".text",
   "size": "0x58",
-  "src": "src/hsd/hsd_tobj.c",
+  "src": "src/hsd/hsd_tobj_ext.c",
   "status": "KNOWN"
  },
  "fn_801BBDDC": {
@@ -59170,7 +59135,7 @@
   "src": "src/game/colosseum_battle.c",
   "status": "KNOWN"
  },
- "fn_8025DBD4": {
+ "tableResBiosGetResPtr": {
   "addr": "0x8025DBD4",
   "section": ".text",
   "size": "0x58",
@@ -59534,7 +59499,7 @@
   "src": "src/game/colosseum_battle.c",
   "status": "KNOWN"
  },
- "fn_80261444": {
+ "charNameBiosGetHearFlag": {
   "addr": "0x80261444",
   "section": ".text",
   "size": "0x70",
@@ -60218,6 +60183,48 @@
   "section": ".text",
   "size": "0x118",
   "src": "src/crt/wchar.c",
+  "status": "KNOWN"
+ },
+ "GSeffect": {
+  "addr": "0x8013111C",
+  "section": ".text",
+  "size": "0xE4",
+  "src": "src/game/effect/gs_effect.c",
+  "status": "KNOWN"
+ },
+ "GStextureCreate": {
+  "addr": "0x800EF5FC",
+  "section": ".text",
+  "size": "0x718",
+  "src": "src/game/gs_texture.c",
+  "status": "KNOWN"
+ },
+ "GSthreadCreate": {
+  "addr": "0x800F07A8",
+  "section": ".text",
+  "size": "0x230",
+  "src": "src/game/gs_thread.c",
+  "status": "KNOWN"
+ },
+ "floorReadMapPreFunc": {
+  "addr": "0x80114CA8",
+  "section": ".text",
+  "size": "0x70",
+  "src": "src/game/gs_field_world.c",
+  "status": "KNOWN"
+ },
+ "floorReadCameraPreFunc": {
+  "addr": "0x80114948",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/game/gs_field_resource.c",
+  "status": "KNOWN"
+ },
+ "floorUpdateFieldCamera": {
+  "addr": "0x80117514",
+  "section": ".text",
+  "size": "0x1B4",
+  "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  }
 }

@@ -54,25 +54,25 @@ extern void fn_800E0290(void* a, void* b, void* c);
 extern void* fn_800E0264(void* dst, void* src);
 extern void fn_800E0678(void* a, f32 b, f32 c, f32 d, f32 e);
 extern void fn_800E0698(void* a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
-extern void fn_80195904(void* jobj, void* data);
-extern void fn_801950D0(void* jobj, void* data);
-extern void fn_801959DC(void* jobj, void* data);
-extern void fn_80195898(void* jobj);
-extern void fn_801943BC(void* jobj, u32 flag, f32 a, f32 b, f32 c, f32 d);
-extern void fn_801943A0(void* jobj, f32 x, f32 y);
-extern void fn_801944E8(void* jobj, f32 z);
-extern void fn_801944C0(void* jobj, f32 w);
-extern void fn_801944A4(void* jobj, u32 x0, u32 x1, u32 y0, u32 y1);
+extern void HSD_CObjGetEyePosition(void* jobj, void* data);
+extern void HSD_CObjGetUpVector(void* jobj, void* data);
+extern void HSD_CObjGetInterest(void* jobj, void* data);
+extern void HSD_CObjSetEyePosition(void* jobj);
+extern void HSD_CObjSetProjectionType(void* jobj, u32 flag, f32 a, f32 b, f32 c, f32 d);
+extern void HSD_CObjSetPerspective(void* jobj, f32 x, f32 y);
+extern void HSD_CObjSetNear(void* jobj, f32 z);
+extern void HSD_CObjSetFar(void* jobj, f32 w);
+extern void HSD_CObjSetScissorx4(void* jobj, u32 x0, u32 x1, u32 y0, u32 y1);
 extern void fn_80194400(void* jobj, void* rect);
-extern void fn_8019431C(void* jobj, void* outA, void* outB);
-extern f32  fn_801944F8(void* jobj);
-extern f32  fn_801944D0(void* jobj);
-extern void fn_801942C0(void* jobj, void* outA, void* outB, void* outC, void* outD);
-extern void* fn_80194CC4(void* jobj);
-extern void fn_80196BB8(void* jobj);
-extern void fn_80196B10(void* jobj, void* ptr);
-extern void fn_80196698(void* jobj, f32 val);
-extern void fn_801966FC(void* jobj);
+extern void HSD_CObjGetPerspective(void* jobj, void* outA, void* outB);
+extern f32  HSD_CObjGetNear(void* jobj);
+extern f32  HSD_CObjGetFar(void* jobj);
+extern void HSD_CObjGetOrtho(void* jobj, void* outA, void* outB, void* outC, void* outD);
+extern void* HSD_CObjGetViewingMtxPtr(void* jobj);
+extern void HSD_CObjRemoveAnim(void* jobj);
+extern void HSD_CObjAddAnim(void* jobj, void* ptr);
+extern void HSD_CObjReqAnim(void* jobj, f32 val);
+extern void HSD_CObjAnim(void* jobj);
 extern void fn_801C027C(void* jobj);
 extern double lbl_8047C9B8;  /* SDA double constant for animation step */
 extern f32 lbl_8047C9B0;     /* SDA float: fov scaling constant */
@@ -151,11 +151,11 @@ void fn_800D1070(u32 dtUnk) {
                 f32 fov;
                 s32 mode;
                 fn_800E01D0((u8*)obj + 0x7c, (u8*)obj + 0x70);
-                fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
-                fn_801966FC(*(void**)((u8*)obj + 0xc));
-                fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-                fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-                fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+                HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
+                HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
+                HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+                HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+                HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
                 animDir = *(s8*)((u8*)obj + 0x125);
                 fov = *(f32*)((u8*)obj + 0x118);
                 lastFrame = *(f32*)((u8*)obj + 0x120);
@@ -191,10 +191,10 @@ void fn_800D1070(u32 dtUnk) {
             }
             /* transform update */
             if (*(u8*)((u8*)obj + 0x4) != 0) {
-                fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
-                fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-                fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-                fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+                fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
+                HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+                HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+                HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
             } else if (*(u8*)((u8*)obj + 0x1) == 1) {
                 f32 tmp[3];
                 fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
@@ -268,12 +268,12 @@ void fn_800D13C8(void* dst, void* src) {
     {
         u32 frameIdx = *(u32*)((u8*)src + 0xa4);
         if (*(u8*)((u8*)dst + 0x3) != 0) {
-            fn_80196BB8(*(void**)((u8*)dst + 0xc));
+            HSD_CObjRemoveAnim(*(void**)((u8*)dst + 0xc));
             if (frameIdx <= *(u32*)((u8*)dst + 0x110)) {
                 *(u32*)((u8*)dst + 0x114) = frameIdx;
-                fn_80196B10(*(void**)((u8*)dst + 0xc),
+                HSD_CObjAddAnim(*(void**)((u8*)dst + 0xc),
                     ((void***)((u8*)*(void**)((u8*)dst + 0x8) + 4))[0][*(u32*)((u8*)dst + 0x114)]);
-                fn_80196698(*(void**)((u8*)dst + 0xc), lbl_8047C998);
+                HSD_CObjReqAnim(*(void**)((u8*)dst + 0xc), lbl_8047C998);
                 lbl_8047AA78 = lbl_8047C998;
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
                 *(f32*)((u8*)dst + 0x120) = lbl_8047AA78;
@@ -293,8 +293,8 @@ void fn_800D13C8(void* dst, void* src) {
             if (*(u8*)((u8*)dst + 0x3) != 0) {
                 *(f32*)((u8*)dst + 0x11c) = src_ac;
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-                fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
-                fn_801966FC(*(void**)((u8*)dst + 0xc));
+                HSD_CObjReqAnim(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+                HSD_CObjAnim(*(void**)((u8*)dst + 0xc));
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
@@ -308,8 +308,8 @@ void fn_800D13C8(void* dst, void* src) {
             if (*(u8*)((u8*)dst + 0x3) != 0) {
                 *(f32*)((u8*)dst + 0x11c) = dst_11c;
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-                fn_80196698(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
-                fn_801966FC(*(void**)((u8*)dst + 0xc));
+                HSD_CObjReqAnim(*(void**)((u8*)dst + 0xc), *(f32*)((u8*)dst + 0x11c));
+                HSD_CObjAnim(*(void**)((u8*)dst + 0xc));
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
@@ -338,40 +338,40 @@ void fn_800D1674(void* src, void* dst) {
 }
 
 /* ==================================================================
- * fn_800D172C - GS render: get object speed float (field_0x11c)
+ * GScameraGetAnimFrame - GS render: get object speed float (field_0x11c)
  * Address: 0x800D172C, Size: 0x8
  * ================================================================== */
-f32 fn_800D172C(void* obj) {
+f32 GScameraGetAnimFrame(void* obj) {
     return *(f32*)((u8*)obj + 0x11c);
 }
 
 /* ==================================================================
- * fn_800D1734 - GS render: get object signed field_0x124
+ * GScameraHasAnimationEnded - GS render: get object signed field_0x124
  * Address: 0x800D1734, Size: 0xC
  * ================================================================== */
-s8 fn_800D1734(void* obj) {
+s8 GScameraHasAnimationEnded(void* obj) {
     return *(s8*)((u8*)obj + 0x124);
 }
 
 /* ==================================================================
- * fn_800D173C - GS render: init object animation state
+ * GScameraStopAnimation - GS render: init object animation state
  * Address: 0x800D173C, Size: 0x5C
  * ================================================================== */
-void fn_800D173C(void* obj) {
+void GScameraStopAnimation(void* obj) {
     *(u8*)((u8*)obj + 0x4) = 0;
     *(u8*)((u8*)obj + 0x1) = 1;
-    fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-    fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-    fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+    HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+    HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+    HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
 }
 
 /* ==================================================================
- * fn_800D1798 - GS render: advance object animation by speed
+ * GScameraStartAnimation - GS render: advance object animation by speed
  * Address: 0x800D1798, Size: 0xC0
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void fn_800D1798(void* obj) {
+void GScameraStartAnimation(void* obj) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         f32 speed;
         *(u8*)((u8*)obj + 0x4) = 1;
@@ -381,8 +381,8 @@ void fn_800D1798(void* obj) {
         if (*(u8*)((u8*)obj + 0x3) != 0) {
             *(f32*)((u8*)obj + 0x11c) = speed;
             HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-            fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
-            fn_801966FC(*(void**)((u8*)obj + 0xc));
+            HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
+            HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
             HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
         }
     }
@@ -398,24 +398,24 @@ void fn_800D1858(void* obj, u32 val) {
 }
 
 /* ==================================================================
- * fn_800D1860 - GS render: set object anim speed (field 0x11c) and advance
+ * GScameraSetAnimFrame - GS render: set object anim speed (field 0x11c) and advance
  * Address: 0x800D1860, Size: 0x9C
  * ================================================================== */
-void fn_800D1860(void* obj, f32 speed) {
+void GScameraSetAnimFrame(void* obj, f32 speed) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         *(f32*)((u8*)obj + 0x11c) = speed;
         HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, lbl_8047C9B8, (u32)1);
-        fn_80196698(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
-        fn_801966FC(*(void**)((u8*)obj + 0xc));
+        HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), *(f32*)((u8*)obj + 0x11c));
+        HSD_CObjAnim(*(void**)((u8*)obj + 0xc));
         HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_801C027C, (double)(*(f32*)((u8*)obj + 0x118)), (u32)1);
     }
 }
 
 /* ==================================================================
- * fn_800D18FC - GS render: set object fov angle (field 0x118)
+ * GScameraSetAnimRate - GS render: set object fov angle (field 0x118)
  * Address: 0x800D18FC, Size: 0x88
  * ================================================================== */
-void fn_800D18FC(void* obj, f32 fov) {
+void GScameraSetAnimRate(void* obj, f32 fov) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
         s32 mode = fn_800D37CC();
         if (mode == 0x32) {
@@ -427,19 +427,19 @@ void fn_800D18FC(void* obj, f32 fov) {
 }
 
 /* ==================================================================
- * fn_800D1984 - GS render: set object animation frame index
+ * GScameraSetAnimIndex - GS render: set object animation frame index
  * Address: 0x800D1984, Size: 0xB4
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void fn_800D1984(void* obj, u32 frame_idx) {
+void GScameraSetAnimIndex(void* obj, u32 frame_idx) {
     if (*(u8*)((u8*)obj + 0x3) != 0) {
-        fn_80196BB8(*(void**)((u8*)obj + 0xc));
+        HSD_CObjRemoveAnim(*(void**)((u8*)obj + 0xc));
         if (frame_idx <= *(u32*)((u8*)obj + 0x110)) {
             *(u32*)((u8*)obj + 0x114) = frame_idx;
-            fn_80196B10(*(void**)((u8*)obj + 0xc),
+            HSD_CObjAddAnim(*(void**)((u8*)obj + 0xc),
                 (*(void***)((u8*)*(void**)((u8*)obj + 0x8) + 4))[*(u32*)((u8*)obj + 0x114)]);
-            fn_80196698(*(void**)((u8*)obj + 0xc), lbl_8047C998);
+            HSD_CObjReqAnim(*(void**)((u8*)obj + 0xc), lbl_8047C998);
             lbl_8047AA78 = lbl_8047C998;
             HSD_ForeachAnim(*(void**)((u8*)obj + 0xc), (u32)2, (u32)0xffff, fn_800D2B44, (u32)0);
             *(f32*)((u8*)obj + 0x120) = lbl_8047AA78;
@@ -449,41 +449,41 @@ void fn_800D1984(void* obj, u32 frame_idx) {
 #pragma pop
 
 /* ==================================================================
- * fn_800D1A38 - GS render: get object active flag (field_0x4)
+ * GScameraIsAnimating - GS render: get object active flag (field_0x4)
  * Address: 0x800D1A38, Size: 0x8
  * ================================================================== */
-u8 fn_800D1A38(void* obj) {
+u8 GScameraIsAnimating(void* obj) {
     return *(u8*)((u8*)obj + 0x4);
 }
 
 /* ==================================================================
- * fn_800D1A40 - GS render: get object angles (field_0x70, 0x100)
+ * GScameraGetDistanceVector - GS render: get object angles (field_0x70, 0x100)
  * Address: 0x800D1A40, Size: 0x30
  * ================================================================== */
-void fn_800D1A40(void* obj, void* dest) {
+void GScameraGetDistanceVector(void* obj, void* dest) {
     fn_800E0168(dest, (u8*)obj + 0x70, (u8*)obj + 0x100);
 }
 
 /* ==================================================================
- * fn_800D1A70 - GS render: setup viewport/projection from JObj
+ * GScameraGetProjMatrixPtr - GS render: setup viewport/projection from JObj
  * Address: 0x800D1A70, Size: 0xCC
  * Sets up light/camera data from a JObj, writes to lbl_804001B0.
  * Returns pointer to lbl_804001B0.
  * ================================================================== */
 #pragma push
 #pragma scheduling on
-void* fn_800D1A70(void* lightSet) {
+void* GScameraGetProjMatrixPtr(void* lightSet) {
     f32 x, z;
     f32 out3, out2, out1, out0;
     void* jobj = *(void**)((u8*)lightSet + 0xc);
     if (*(u8*)((u8*)jobj + 0x50) == 1) {
         f32 w, h;
-        fn_8019431C(jobj, &x, &z);
-        w = fn_801944F8(*(void**)((u8*)lightSet + 0xc));
-        h = fn_801944D0(*(void**)((u8*)lightSet + 0xc));
+        HSD_CObjGetPerspective(jobj, &x, &z);
+        w = HSD_CObjGetNear(*(void**)((u8*)lightSet + 0xc));
+        h = HSD_CObjGetFar(*(void**)((u8*)lightSet + 0xc));
         fn_800E0678(lbl_804001B0, x, z, w, h);
     } else {
-        fn_801942C0(jobj, &out2, &out0, &out3, &out1);
+        HSD_CObjGetOrtho(jobj, &out2, &out0, &out3, &out1);
         fn_800E0698(lbl_804001B0, out2, out0, out3, out1, lbl_8047C994, lbl_8047C9C0);
     }
     return lbl_804001B0;
@@ -499,10 +499,10 @@ void* fn_800D1A70(void* lightSet) {
 void* fn_800D1B3C(void* obj) {
     if (*(u8*)((u8*)obj + 0x2) != 0) {
         if (*(u8*)((u8*)obj + 0x4) != 0) {
-            fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
-            fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-            fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-            fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+            fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
+            HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+            HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+            HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
         } else if (*(u8*)((u8*)obj + 0x1) == 1) {
             f32 tmp[3];
             fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
@@ -550,10 +550,10 @@ void fn_800D1D00(void* obj) {
         return;
     }
     if (*(u8*)((u8*)obj + 0x4) != 0) {
-        fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
-        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-        fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-        fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
+        HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+        HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
     } else if (*(u8*)((u8*)obj + 0x1) == 1) {
         f32 tmp[3];
         fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
@@ -590,19 +590,19 @@ void fn_800D1D00(void* obj) {
 }
 
 /* ==================================================================
- * fn_800D1EB8 - GS render: get translation and scale data
+ * GScameraGetLookAt - GS render: get translation and scale data
  * Address: 0x800D1EB8, Size: 0x4C
  * ================================================================== */
-void fn_800D1EB8(void* obj, void* dest1, void* dest2) {
+void GScameraGetLookAt(void* obj, void* dest1, void* dest2) {
     fn_800E01D0(dest1, (u8*)obj + 0xf4);
     fn_800E01D0(dest2, (u8*)obj + 0x100);
 }
 
 /* ==================================================================
- * fn_800D1F04 - GS render: set translation and scale data
+ * GScameraLookAt - GS render: set translation and scale data
  * Address: 0x800D1F04, Size: 0x54
  * ================================================================== */
-void fn_800D1F04(void* obj, void* src1, void* src2) {
+void GScameraLookAt(void* obj, void* src1, void* src2) {
     fn_800E01D0((u8*)obj + 0xf4, src1);
     fn_800E01D0((u8*)obj + 0x100, src2);
     *(u8*)((u8*)obj + 0x2) = 1;
@@ -610,63 +610,63 @@ void fn_800D1F04(void* obj, void* src1, void* src2) {
 }
 
 /* ==================================================================
- * fn_800D1F58 - GS render: set object rotation data (field_0x88)
+ * GScameraGetRotation - GS render: set object rotation data (field_0x88)
  * Address: 0x800D1F58, Size: 0x2C
  * ================================================================== */
-void fn_800D1F58(void* obj, void* anim) {
+void GScameraGetRotation(void* obj, void* anim) {
     fn_800E01D0(anim, (u8*)obj + 0x88);
 }
 
 /* ==================================================================
- * fn_800D1F84 - GS render: get position data, optionally update JObj
+ * GScameraGetPosition - GS render: get position data, optionally update JObj
  * Address: 0x800D1F84, Size: 0x58
  * ================================================================== */
-void fn_800D1F84(void* obj, void* dest) {
+void GScameraGetPosition(void* obj, void* dest) {
     if (*(u8*)((u8*)obj + 0x4) != 0) {
-        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
     }
     fn_800E01D0(dest, (u8*)obj + 0x70);
 }
 
 /* ==================================================================
- * fn_800D1FDC - GS render: get object scissor rect extents
+ * GScameraGetPerspective - GS render: get object scissor rect extents
  * Address: 0x800D1FDC, Size: 0x60
  * ================================================================== */
-void fn_800D1FDC(void* obj, void* a, void* b, f32* outA, f32* outB) {
-    fn_8019431C(*(void**)((u8*)obj + 0xc), a, b);
-    *outA = fn_801944F8(*(void**)((u8*)obj + 0xc));
-    *outB = fn_801944D0(*(void**)((u8*)obj + 0xc));
+void GScameraGetPerspective(void* obj, void* a, void* b, f32* outA, f32* outB) {
+    HSD_CObjGetPerspective(*(void**)((u8*)obj + 0xc), a, b);
+    *outA = HSD_CObjGetNear(*(void**)((u8*)obj + 0xc));
+    *outB = HSD_CObjGetFar(*(void**)((u8*)obj + 0xc));
 }
 
 /* ==================================================================
- * fn_800D203C - GS render: set rotation data, mark dirty
+ * GScameraSetRotation - GS render: set rotation data, mark dirty
  * Address: 0x800D203C, Size: 0x40
  * ================================================================== */
-void fn_800D203C(void* obj, void* src) {
+void GScameraSetRotation(void* obj, void* src) {
     fn_800E01D0((u8*)obj + 0x88, src);
     *(u8*)((u8*)obj + 0x2) = 1;
     *(u8*)((u8*)obj + 0x1) = 0;
 }
 
 /* ==================================================================
- * fn_800D207C - GS render: set position data, mark dirty
+ * GScameraSetPosition - GS render: set position data, mark dirty
  * Address: 0x800D207C, Size: 0x50
  * ================================================================== */
-void fn_800D207C(void* obj, void* src) {
-    fn_80195898(*(void**)((u8*)obj + 0xc));
+void GScameraSetPosition(void* obj, void* src) {
+    HSD_CObjSetEyePosition(*(void**)((u8*)obj + 0xc));
     fn_800E01D0((u8*)obj + 0x70, src);
     *(u8*)((u8*)obj + 0x2) = 1;
 }
 
 /* ==================================================================
- * fn_800D20CC - GS render: set object transform params
+ * GScameraSetPerspective - GS render: set object transform params
  * Address: 0x800D20CC, Size: 0x84
  * ================================================================== */
-void fn_800D20CC(void* obj, f32 x, f32 y, f32 z, f32 w) {
-    fn_801943BC(*(void**)((u8*)obj + 0xc), 1, x, y, z, w);
-    fn_801943A0(*(void**)((u8*)obj + 0xc), x, y);
-    fn_801944E8(*(void**)((u8*)obj + 0xc), z);
-    fn_801944C0(*(void**)((u8*)obj + 0xc), w);
+void GScameraSetPerspective(void* obj, f32 x, f32 y, f32 z, f32 w) {
+    HSD_CObjSetProjectionType(*(void**)((u8*)obj + 0xc), 1, x, y, z, w);
+    HSD_CObjSetPerspective(*(void**)((u8*)obj + 0xc), x, y);
+    HSD_CObjSetNear(*(void**)((u8*)obj + 0xc), z);
+    HSD_CObjSetFar(*(void**)((u8*)obj + 0xc), w);
     *(u8*)((u8*)obj + 0x2) = 1;
 }
 
@@ -679,14 +679,14 @@ void fn_800D2150(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
     if ((u16)y0 > 0x1de) y0 = 0x1de;
     if ((u16)x1 > 0x27f) x1 = 0x27f;
     if ((u16)y1 > 0x1df) y1 = 0x1df;
-    fn_801944A4(*(void**)((u8*)obj + 0xc), x0, (u16)(x1 + 1), y0, (u16)(y1 + 1));
+    HSD_CObjSetScissorx4(*(void**)((u8*)obj + 0xc), x0, (u16)(x1 + 1), y0, (u16)(y1 + 1));
 }
 
 /* ==================================================================
- * fn_800D21C8 - GS render: set viewport rect (clamped, packed)
+ * GScameraSetViewport - GS render: set viewport rect (clamped, packed)
  * Address: 0x800D21C8, Size: 0x80
  * ================================================================== */
-void fn_800D21C8(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
+void GScameraSetViewport(void* obj, u32 x0, u32 y0, u32 x1, u32 y1) {
     u16 rect[4];
     if ((u16)x0 > 0x27e) x0 = 0x27e;
     if ((u16)y0 > 0x1de) y0 = 0x1de;
@@ -716,32 +716,32 @@ void fn_800D2248(void) {
             __assert(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
         }
         *(u32*)((u8*)jobj + 0x8) &= ~0x2u;
-        fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
-        w = fn_801944F8(*(void**)((u8*)obj + 0xc));
-        h = fn_801944D0(*(void**)((u8*)obj + 0xc));
+        HSD_CObjGetPerspective(*(void**)((u8*)obj + 0xc), &x, &z);
+        w = HSD_CObjGetNear(*(void**)((u8*)obj + 0xc));
+        h = HSD_CObjGetFar(*(void**)((u8*)obj + 0xc));
         fn_800D9BD0(x, z, w, h);
-        fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
+        fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
         fn_800D834C();
         fn_800D7FE4((u8*)obj + 0x94);
-        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-        fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-        fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+        HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
         return;
     }
     jobj = *(void**)((u8*)obj + 0xc);
     if (*(u8*)((u8*)jobj + 0x50) != 1) {
         f32 a, b, c, d;
-        fn_801942C0(jobj, &b, &d, &a, &c);
+        HSD_CObjGetOrtho(jobj, &b, &d, &a, &c);
         fn_800D9B58(b, d, a, c);
         fn_800D834C();
         return;
     }
     if (*(u8*)((u8*)obj + 0x2) != 0) {
         if (*(u8*)((u8*)obj + 0x4) != 0) {
-            fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
-            fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-            fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-            fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+            fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
+            HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+            HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+            HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
         } else if (*(u8*)((u8*)obj + 0x1) == 1) {
             f32 tmp[3];
             fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
@@ -784,9 +784,9 @@ void fn_800D2248(void) {
         }
         *(u32*)((u8*)jobj + 0x8) |= 0x80000002u;
         fn_800A2D64((u8*)obj + 0x94, (u8*)jobj + 0x54);
-        fn_8019431C(*(void**)((u8*)obj + 0xc), &x, &z);
-        w = fn_801944F8(*(void**)((u8*)obj + 0xc));
-        h = fn_801944D0(*(void**)((u8*)obj + 0xc));
+        HSD_CObjGetPerspective(*(void**)((u8*)obj + 0xc), &x, &z);
+        w = HSD_CObjGetNear(*(void**)((u8*)obj + 0xc));
+        h = HSD_CObjGetFar(*(void**)((u8*)obj + 0xc));
         fn_800D9BD0(x, z, w, h);
         fn_800D834C();
         fn_800D7FE4((u8*)obj + 0x94);
@@ -794,10 +794,10 @@ void fn_800D2248(void) {
 }
 
 /* ==================================================================
- * fn_800D2584 - GS render: get batch count
+ * GScameraGetActiveCamera - GS render: get batch count
  * Address: 0x800D2584, Size: 0x8
  * ================================================================== */
-u32 fn_800D2584(void) {
+u32 GScameraGetActiveCamera(void) {
     return lbl_8047AA74;
 }
 
@@ -809,10 +809,10 @@ u32 fn_800D2584(void) {
 void fn_800D258C(void* obj) {
     lbl_8047AA74 = (u32)obj;
     if (*(u8*)((u8*)obj + 0x4) != 0) {
-        fn_800E0628((u8*)obj + 0x94, fn_80194CC4(*(void**)((u8*)obj + 0xc)));
-        fn_80195904(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
-        fn_801950D0(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
-        fn_801959DC(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
+        fn_800E0628((u8*)obj + 0x94, HSD_CObjGetViewingMtxPtr(*(void**)((u8*)obj + 0xc)));
+        HSD_CObjGetEyePosition(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x70);
+        HSD_CObjGetUpVector(*(void**)((u8*)obj + 0xc), (u8*)obj + 0xf4);
+        HSD_CObjGetInterest(*(void**)((u8*)obj + 0xc), (u8*)obj + 0x100);
     } else if (*(u8*)((u8*)obj + 0x1) == 1) {
         f32 tmp[3];
         fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
@@ -909,12 +909,12 @@ found:
             *(u32*)((u8*)slot + 0x110) = *(u32*)((u8*)slot + 0x110) + 1;
         }
         if (*(u8*)((u8*)slot + 0x3) != 0) {
-            fn_80196BB8(*(void**)((u8*)slot + 0xc));
+            HSD_CObjRemoveAnim(*(void**)((u8*)slot + 0xc));
             if ((s32)*(u32*)((u8*)slot + 0x110) >= 0) {
                 *(u32*)((u8*)slot + 0x114) = 0;
-                fn_80196B10(*(void**)((u8*)slot + 0xc),
+                HSD_CObjAddAnim(*(void**)((u8*)slot + 0xc),
                     ((void***)((u8*)*(void**)((u8*)slot + 0x8) + 4))[0][*(u32*)((u8*)slot + 0x114)]);
-                fn_80196698(*(void**)((u8*)slot + 0xc), lbl_8047C998);
+                HSD_CObjReqAnim(*(void**)((u8*)slot + 0xc), lbl_8047C998);
                 lbl_8047AA78 = lbl_8047C998;
                 {
                     lis_r3_fn_800D2B44:

@@ -80,7 +80,7 @@ extern void  fn_800A3B9C(void* vecA, void* vecB,
 extern void  fn_800CE148(f32 angle);                     /* sinf -> f1 */
 extern void  fn_800CDBE0(f32 angle);                     /* cosf -> f1 */
 extern f64   fn_800CE2D8(f32 y, f32 x);                 /* atan2f */
-extern void  fn_801950D0(void* cameraObj,
+extern void  HSD_CObjGetUpVector(void* cameraObj,
                           void* outMtx);                 /* camera get matrix */
 extern void  __assert(const char* file, u32 line,
                           const char* expr);             /* assert */
@@ -341,7 +341,7 @@ void generatorMain(void* gen) {
         fn_800A3ADC(camDir, camDir);
 
         /* Get camera orientation matrix */
-        fn_801950D0(lbl_8047B190, rightVec);
+        HSD_CObjGetUpVector(lbl_8047B190, rightVec);
 
         /* Normalise the right vector */
         fn_800A3ADC(rightVec, rightVec);

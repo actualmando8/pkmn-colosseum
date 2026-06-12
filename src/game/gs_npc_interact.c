@@ -125,7 +125,7 @@ extern u8    fn_801F18DC(s32 controller);             /* Check input ready */
 extern u8    fn_801F1700(s32 controller);             /* Check button pressed */
 extern u8    fn_80265924(void);                       /* Check A button */
 extern u16   fn_801EF634(void);                       /* Get input state */
-extern void  fn_800F0308(void);                       /* Frame advance */
+extern void  _threadSwitch(void);                       /* Frame advance */
 extern u32   fn_800F7AF0(s32 slot);                   /* Get render flags */
 extern u32   fn_800F7BC4(s32 slot);                   /* Get VSync flags */
 
@@ -591,13 +591,13 @@ L_80011500:
 
 /* 0x80011700 | 0xBC — clear 4 event flags referenced by input arg */
 #if 0
-asm void fn_80011700(void) {
-#include "src/game/gs_npc_interact_fn_80011700.inc"
+asm void menuFightCloseWaza(void) {
+#include "src/game/gs_npc_interact_menuFightCloseWaza.inc"
 }
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80011700(s32 arg) {
+s32 menuFightCloseWaza(s32 arg) {
     if ((u8)fn_80102620(0x4c) != 0) fn_80102568(0x4c, 0, arg);
     if ((u8)fn_80102620(0xf9) != 0) fn_80102568(0xf9, 0, arg);
     if ((u8)fn_80102620(0xfa) != 0) fn_80102568(0xfa, 0, arg);
@@ -748,7 +748,7 @@ L_800117F0:
 
             tmp = tmp & 0xFF;
             if (tmp != 0) break;
-            ((void(*)(void))fn_800F0308)();
+            ((void(*)(void))_threadSwitch)();
 
         }
 
@@ -817,7 +817,7 @@ extern u32 fn_801040A0(u32 a);
 u32 fn_80011B4C(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     fn_80104704(arg1);
     fn_801040A0(arg1);
-    fn_800F0308();
+    _threadSwitch();
     return 1;
 }
 
@@ -853,7 +853,7 @@ void fn_80011BC4(u32 arg1, u32 target) {
 u32 fn_80011C78(u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     fn_80104704(arg1);
     fn_801040A0(arg1);
-    fn_800F0308();
+    _threadSwitch();
     return 1;
 }
 
@@ -1562,7 +1562,7 @@ extern void fn_800FF560(void);
 extern void fn_80130CD8(void);
 extern void fn_800FE6F8(void);
 extern void fn_800F03D4(void);
-extern void fn_800F07A8(void);
+extern void GSthreadCreate(void);
 extern void fn_800FE6DC(void);
 extern void fn_80102510(void);
 extern void fn_800EC8DC(void);

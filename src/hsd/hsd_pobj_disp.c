@@ -38,7 +38,7 @@ extern void  fn_801C29C4(f32 val, void* aobj);
 extern void  fn_801A053C(void* ptr);
 extern void* fn_801A3E64(void* ptr);
 extern void* fn_801A3F48(void);
-extern void* fn_8019C128(void* desc, s32 a, s32 b);
+extern void* HSD_IDGetDataFromTable(void* desc, s32 a, s32 b);
 extern void* fn_8019F01C(void* obj);
 extern void  fn_8019D9DC(void* jobj);
 extern void  fn_80193AF0(void* cls, s32 size);
@@ -50,7 +50,7 @@ extern void  fn_800BD58C(void* mtx, s32 a, s32 b);
 extern void  fn_800A2FAC(void* pobj, void* mtx);
 extern void  fn_800A2D64(void* pobj, void* mtx);
 extern void  fn_800A2D98(void* dst, void* src, void* dst2);
-extern void  fn_801A85F0(f32 weight, void* src, void* dst, void* dst2);
+extern void  HSD_MtxScaledAdd(void* src, f32 weight, void* add, void* dst);
 extern void  HSD_Index2TexMtx(s32 idx);
 extern void* HSD_Index2PosNrmMtx(s32 idx);
 extern void  fn_800B84E0(u32 type, void* data, u32 stride, u8 frac);
@@ -140,7 +140,7 @@ void fn_801AA6D0(void* pobj);
 void fn_801AA8BC(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
 void fn_801AABB4(void* pobj, void* vmtx, void* pmtx, u32 rendermode);
 void fn_801AD354(void* pobj_ptr, void* desc);
-void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr);
+void PObjUpdateFunc(void* pobj, s32 idx, f32* weight_ptr);
 void fn_801AB67C(void* pobj);
 
 /* =========================================================================
@@ -189,21 +189,24 @@ void fn_801AA35C(void* list, u32 size, u32 alignment)
 }
 
 /* =========================================================================
- * 0x801AA498 | size: 0x34  -- Return item to pool / decrement count
+ * 0x801AA498 | size: 0x34  -- HSD_ObjFree
  * ========================================================================= */
-void fn_801AA498(void* list, void* data)
+#pragma push
+#pragma optimization_level 1
+void HSD_ObjFree(void* list, void* data)
 {
     void* l = list;
     *(u32*)((u8*)l + 0x8) = *(u32*)((u8*)l + 0x8) - 1;
     fn_801A6960(data);
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AA4CC | size: 0x6C  -- Allocate from pool
  * ========================================================================= */
 #pragma push
 #pragma optimization_level 1
-void* fn_801AA4CC(void* list)
+void* HSD_ObjAlloc(void* list)
 {
     void* l = list;
 
@@ -223,16 +226,18 @@ void* fn_801AA4CC(void* list)
 #pragma pop
 
 /* =========================================================================
- * 0x801AA538 | size: 0x30
- * Store r4 at [0] and [4], r3 at [8] and [0xC] of lbl_8036CBF0
+ * 0x801AA538 | size: 0x30 -- HSD_ObjSetHeap
  * ========================================================================= */
-void fn_801AA538(void* a, void* b)
+#pragma push
+#pragma optimization_level 0
+void HSD_ObjSetHeap(void* a, void* b)
 {
-    *(void**)((u8*)lbl_8036CBF0 + 0x0) = b;
-    *(void**)((u8*)lbl_8036CBF0 + 0x4) = b;
-    *(void**)((u8*)lbl_8036CBF0 + 0x8) = a;
-    *(void**)((u8*)lbl_8036CBF0 + 0xc) = a;
+    *(volatile void**)((u8*)lbl_8036CBF0 + 0x4) = b;
+    *(volatile void**)((u8*)lbl_8036CBF0 + 0x0) = b;
+    *(volatile void**)((u8*)lbl_8036CBF0 + 0xc) = a;
+    *(volatile void**)((u8*)lbl_8036CBF0 + 0x8) = a;
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AA568 | size: 0x44  -- PObj class info init (small)
@@ -265,7 +270,7 @@ void fn_801AA5AC(s32 idx)
  * 0x801AA608 | size: 0xC8  -- PObj class info init (main)
  * Calls hsdInitClassInfo to register lbl_8036CCD0 and installs vtable
  * ========================================================================= */
-void fn_801AA608(void)
+void HSD_PObjInit(void)
 {
     hsdInitClassInfo((HSD_ClassInfo*) lbl_8036CCD0,
                      (HSD_ClassInfo*) lbl_8036C638, (char*) lbl_80274EE0,
@@ -276,7 +281,7 @@ void fn_801AA608(void)
     *(void**)((u8*)lbl_8036CCD0 + 0x3c) = (void*)fn_801AA8BC;
     *(void**)((u8*)lbl_8036CCD0 + 0x40) = (void*)fn_801AABB4;
     *(void**)((u8*)lbl_8036CCD0 + 0x44) = (void*)fn_801AD354;
-    *(void**)((u8*)lbl_8036CCD0 + 0x48) = (void*)fn_801AD678;
+    *(void**)((u8*)lbl_8036CCD0 + 0x48) = (void*)PObjUpdateFunc;
 }
 
 /* =========================================================================
@@ -555,7 +560,7 @@ void fn_801AD044(void* pobj, void* desc)
  * ========================================================================= */
 #pragma push
 #pragma peephole off
-void fn_801AD214(void* pobj)
+void HSD_PObjRemoveAll(HSD_PObj* pobj)
 {
     void* next;
     void* cur = pobj;
@@ -622,11 +627,11 @@ void fn_801AD354(void* pobj_ptr, void* desc)
 
 /* =========================================================================
  * 0x801AD61C | size: 0x5C  -- Walk pobj list, call reqAnim
- * fn_801AD61C(pobj)
+ * HSD_PObjAnimAll(pobj)
  * ========================================================================= */
-void fn_801AD61C(void* pobj)
+void HSD_PObjAnimAll(HSD_PObj* pobj)
 {
-    void* cur;
+    HSD_PObj* cur;
 
     if (pobj == NULL) {
         return;
@@ -638,15 +643,15 @@ void fn_801AD61C(void* pobj)
             void** vtbl = *(void***)cur;
             fn_801C27F4(*(void**)((u8*)cur + 0x18), cur, vtbl[0x48 / 4]);
         }
-        cur = *(void**)((u8*)cur + 0x4);
+        cur = cur->next;
     }
 }
 
 /* =========================================================================
  * 0x801AD678 | size: 0x4C  -- Set shape blend weight
- * fn_801AD678(pobj, idx, f32* weight_ptr)
+ * PObjUpdateFunc(pobj, idx, f32* weight_ptr)
  * ========================================================================= */
-void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr)
+void PObjUpdateFunc(void* pobj, s32 idx, f32* weight_ptr)
 {
     void* p = pobj;
 
@@ -671,10 +676,11 @@ void fn_801AD678(void* pobj, s32 idx, f32* weight_ptr)
 }
 
 /* =========================================================================
- * 0x801AD6C4 | size: 0x74  -- Walk pobj list, call anim
- * fn_801AD6C4(f32 val, pobj, flags)
+ * 0x801AD6C4 | size: 0x74  -- Request PObj animation by flags
  * ========================================================================= */
-void fn_801AD6C4(f32 val, void* pobj, u32 flags)
+#pragma push
+#pragma optimization_level 1
+void HSD_PObjReqAnimAllByFlags(f32 val, void* pobj, u32 flags)
 {
     void* cur;
 
@@ -692,6 +698,7 @@ void fn_801AD6C4(f32 val, void* pobj, u32 flags)
         cur = *(void**)((u8*)cur + 0x4);
     }
 }
+#pragma pop
 
 /* =========================================================================
  * 0x801AD738 | size: 0x94
@@ -733,9 +740,9 @@ void fn_801ADAAC(f32* q1, f32* q2, f32* out)
 }
 
 /* =========================================================================
- * 0x801ADC08 | size: 0x34  -- Deactivate RNG state
+ * 0x801ADC08 | size: 0x34  -- Forget RNG memory state
  * ========================================================================= */
-void fn_801ADC08(void)
+void _HSD_RandForgetMemory(void)
 {
     s32 r = fn_801A6990(lbl_80478C94);
     if (r != 0) {

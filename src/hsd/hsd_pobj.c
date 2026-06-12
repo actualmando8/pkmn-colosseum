@@ -63,7 +63,7 @@ void HSD_PObjAnim(HSD_PObj* pobj)
     /* Shape animation interpolation would go here */
 }
 
-void HSD_PObjAnimAll(HSD_PObj* pobj)
+void HSD_PObjAnimAll_Early(HSD_PObj* pobj)
 {
     HSD_PObj* p;
     for (p = pobj; p != NULL; p = p->next) {
@@ -139,7 +139,7 @@ void HSD_PObjRemove(HSD_PObj* pobj)
     }
 }
 
-void HSD_PObjRemoveAll(HSD_PObj* pobj)
+void HSD_PObjRemoveAll_Early(HSD_PObj* pobj)
 {
     HSD_PObj* next;
     while (pobj != NULL) {

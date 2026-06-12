@@ -38,7 +38,7 @@
  *   fn_8017707C (GSscene_MainUpdate)
  *   fn_801773F4-80177670 (GSscene_Get/Set animation params)
  *   fn_80177760 (GSscene_PlayAnimation)
- *   fn_80177830-801779EC (GSscene_Get/Set small accessors)
+ *   0x80177830-0x801779EC (GSscene_Get/Set small accessors)
  *   fn_80177A64 (GSscene_XFBCapture -- 3064 bytes, HUGE)
  *   fn_8017865C (GSscene_XFBSetupCapture)
  *   fn_801786F4 (GSscene_XFBProcess)
@@ -68,7 +68,7 @@
  *     (GSgfx vector/matrix operations)
  *   - Camera state at lbl_80478C40 (sda21)
  *   - fn_800FF56C (GSfloor get active) called from camera code
- *   - fn_800D207C, fn_800D1F04, fn_800CE2D8 (trig/angle functions)
+ *   - GScameraSetPosition, GScameraLookAt, fn_800CE2D8 (trig/angle functions)
  *
  * Debug strings:
  *   "gs%04d.xfb"
@@ -93,8 +93,8 @@ extern void  fn_800E01F4(void* out, f32 angle, f32 a, f32 b); /* rotation matrix
 extern void  fn_800E0518(void* out, f32 angle);         /* angle to vector */
 extern void  fn_800E019C(void* out, void* a, void* b);  /* cross product */
 extern void  fn_800DFF98(void* out, void* a, void* b);  /* vector subtract */
-extern void  fn_800D207C(void* obj, void* mtx);         /* set model matrix */
-extern void  fn_800D1F04(void* obj, void* tbl, void* pos); /* set joint pos */
+extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
+extern void  GScameraLookAt(void* obj, void* tbl, void* pos); /* set joint pos */
 extern f32   fn_800CE2D8(f32 x, f32 y);                /* atan2 */
 extern void* fn_800FF56C(void);                         /* GSfloor get active */
 
@@ -109,11 +109,11 @@ extern void fn_801026A4(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
 extern void fn_800D13C8(void* a, void* b);
 extern void fn_800D258C(void* a);
 extern void fn_800D1674(void* a, void* b);
-extern void fn_800D203C(void* a, void* b);
-extern void fn_800F0308(void);
+extern void GScameraSetRotation(void* a, void* b);
+extern void _threadSwitch(void);
 extern void* fn_800F9318(u32 a, u32 b);
 extern void* fn_800F92D4(u32 a);
-extern void fn_800D173C(void* a);
+extern void GScameraStopAnimation(void* a);
 extern void fn_800E3D98(void* a, void* b);
 
 /* ===== String constants (rodata) ===== */
@@ -450,7 +450,7 @@ void fn_80176A94(void) {
     if (r == 0)
         r = fn_800F92D4(*(u32*)((u8*)p + 0xD4));
     if (r != 0)
-        fn_800D173C(r);
+        GScameraStopAnimation(r);
 }
 #pragma pop
 #endif
@@ -493,7 +493,7 @@ u32 fn_80176F98(u8 param) {
         return 0;
     nonzero:
         if (param != 0) {
-            fn_800F0308();
+            _threadSwitch();
         } else {
             return 1;
         }
@@ -761,7 +761,7 @@ void fn_80177760(void* unused, u32 a, u32 b, f32 param) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177830(void) {
+asm void GSscene_GetCameraRotationVector(void) {
 #include "src/game/gs_scene_fn_80177830.inc"
 }
 #pragma pop
@@ -769,7 +769,7 @@ asm void fn_80177830(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_80177830(void* dst) {
+void GSscene_GetCameraRotationVector(void* dst) {
     fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x10);
 }
 #pragma pop
@@ -778,15 +778,15 @@ void fn_80177830(void* dst) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177858(void) {
+asm void GSscene_SetCameraRotationVector(void) {
 #include "src/game/gs_scene_fn_80177858.inc"
 }
 #else
-void fn_80177858(void* src) {
+void GSscene_SetCameraRotationVector(void* src) {
     void* handle;
     handle = fn_800F9318(0, 0);
     fn_800E01D0((u8*)lbl_80478C40 + 0x10, src);
-    fn_800D203C(handle, src);
+    GScameraSetRotation(handle, src);
 }
 #endif
 #pragma pop
@@ -794,7 +794,7 @@ void fn_80177858(void* src) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801778B4(void) {
+asm void GSscene_GetCameraDirectionVector(void) {
 #include "src/game/gs_scene_fn_801778B4.inc"
 }
 #pragma pop
@@ -802,7 +802,7 @@ asm void fn_801778B4(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_801778B4(void* dst) {
+void GSscene_GetCameraDirectionVector(void* dst) {
     fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x4);
 }
 #pragma pop
@@ -811,7 +811,7 @@ void fn_801778B4(void* dst) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_801778DC(void) {
+asm void GSscene_SetCameraDirectionVector(void) {
 #include "src/game/gs_scene_fn_801778DC.inc"
 }
 #pragma pop
@@ -819,7 +819,7 @@ asm void fn_801778DC(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_801778DC(void* src) {
+void GSscene_SetCameraDirectionVector(void* src) {
     fn_800E01D0((u8*)lbl_80478C40 + 0x4, src);
 }
 #pragma pop
@@ -828,7 +828,7 @@ void fn_801778DC(void* src) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177908(void) {
+asm void GSscene_GetCameraPositionVector(void) {
 #include "src/game/gs_scene_fn_80177908.inc"
 }
 #pragma pop
@@ -836,7 +836,7 @@ asm void fn_80177908(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_80177908(void* dst) {
+void GSscene_GetCameraPositionVector(void* dst) {
     fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x1C);
 }
 #pragma pop
@@ -845,7 +845,7 @@ void fn_80177908(void* dst) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177930(void) {
+asm void GSscene_SetCameraPositionVector(void) {
 #include "src/game/gs_scene_fn_80177930.inc"
 }
 #pragma pop
@@ -853,7 +853,7 @@ asm void fn_80177930(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_80177930(void* src) {
+void GSscene_SetCameraPositionVector(void* src) {
     fn_800E01D0((u8*)lbl_80478C40 + 0x1C, src);
 }
 #pragma pop
@@ -862,7 +862,7 @@ void fn_80177930(void* src) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_8017795C(void) {
+asm void GSscene_GetCameraViewVector(void) {
 #include "src/game/gs_scene_fn_8017795C.inc"
 }
 #pragma pop
@@ -870,7 +870,7 @@ asm void fn_8017795C(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_8017795C(void* dst) {
+void GSscene_GetCameraViewVector(void* dst) {
     fn_800E01D0(dst, (u8*)lbl_80478C40 + 0x28);
 }
 #pragma pop
@@ -879,7 +879,7 @@ void fn_8017795C(void* dst) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177984(void) {
+asm void GSscene_SetCameraViewVector(void) {
 #include "src/game/gs_scene_fn_80177984.inc"
 }
 #pragma pop
@@ -887,7 +887,7 @@ asm void fn_80177984(void) {
 #pragma pop
 #pragma push
 #pragma optimization_level 4
-void fn_80177984(void* src) {
+void GSscene_SetCameraViewVector(void* src) {
     fn_800E01D0((u8*)lbl_80478C40 + 0x28, src);
 }
 #pragma pop
@@ -932,11 +932,11 @@ void fn_801779CC(u32 a, u32 b) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177A38(void) {
+asm void GSscene_GetMode(void) {
 #include "src/game/gs_scene_fn_80177A38.inc"
 }
 #else
-u32 fn_80177A38(void) {
+u32 GSscene_GetMode(void) {
     return *(u8*)lbl_80478C40;
 }
 #endif
@@ -945,14 +945,16 @@ u32 fn_80177A38(void) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 #if 0
-asm void fn_80177A44(void) {
+asm void GSscene_SetMode(void) {
 #include "src/game/gs_scene_fn_80177A44.inc"
 }
 #else
-u32 fn_80177A44(u32 val) {
-    u32 old = *(u8*)lbl_80478C40;
-    if (old == (u8)val) return val;
-    *(u8*)lbl_80478C40 = val;
+u32 GSscene_SetMode(u32 val) {
+    u8* state = lbl_80478C40;
+    u32 old;
+    if (state[0] == (u8)val) return val;
+    old = state[0];
+    state[0] = val;
     return old;
 }
 #endif

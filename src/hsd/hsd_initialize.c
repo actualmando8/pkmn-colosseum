@@ -149,13 +149,13 @@ u32 fn_8019C7B0(void) {
 extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
 #if 0
-asm void fn_8019C7B8(void) {
+asm void _HSD_MemCheckOwnDefaultCB(void) {
 #include "src/hsd/hsd_initialize_fn_8019C7B8.inc"
 }
 #else
 #pragma peephole off
 #pragma optimization_level 4
-s32 fn_8019C7B8(u32 addr) {
+s32 _HSD_MemCheckOwnDefaultCB(u32 addr) {
     s32 result = 0;
     if (lbl_8047B268 <= addr && addr < lbl_8047B26C) {
         result = 1;
@@ -202,7 +202,7 @@ void fn_8019C7E0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void __assert(void* file, s32 line, void* msg);
+extern void __assert();
 extern void fn_8009AC50(void* xfb);
 extern s32 lbl_8047B288;
 extern u8 lbl_802749E4[];
@@ -283,7 +283,7 @@ void* _HSD_MemAllocDefaultCB(void* buffer) {
 #pragma optimizewithasm off
 extern void fn_8009F3D4(void);
 extern void _HSD_MemSetCallbacks(void);
-extern void fn_801AA538(void);
+extern void HSD_ObjSetHeap(void);
 extern void OSGetArenaLo();
 extern void OSGetArenaHi();
 extern void OSSetArenaLo();

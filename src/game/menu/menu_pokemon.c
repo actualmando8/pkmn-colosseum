@@ -37,7 +37,7 @@
 #include "dolphin/types.h"
 
 /* ===== GS Engine ===== */
-extern void  fn_800F0308(void);           /* GSthread yield */
+extern void  _threadSwitch(void);           /* GSthread yield */
 extern void  fn_800E01D0(void* dst, void* src); /* material copy */
 extern u32   fn_80102568(u32 a, u32 b, u32 c); /* scene load */
 extern u32   fn_8010264C(u32 a, u32 b);        /* scene query */
@@ -54,14 +54,14 @@ extern void* fn_80123FBC(void* obj);            /* people get */
 extern void  fn_8012640C(void* obj);            /* people field update */
 extern void  fn_8011DFE0(void* obj, u32 pos);  /* people position set */
 extern void  fn_8011DF90(void* obj, u32 rot);  /* people rotation set */
-extern void  fn_80177A44(u32 sceneType);        /* scene type set */
+extern void  GSscene_SetMode(u32 sceneType);        /* scene type set */
 extern u32   fn_80105624(u32 a);                /* model state query */
 extern u32   fn_801080CC(u32 a);                /* model anim check */
 extern void  fn_800FA280(void);                 /* field utility */
 extern void  fn_800FA444(void* obj);            /* field model update */
 extern void  fn_800D61E4(void* obj);            /* render setup */
 extern void  fn_800D5CB8(void* obj);            /* render cleanup */
-extern void  fn_800D20CC(void* obj);            /* render matrix */
+extern void  GScameraSetPerspective(void* obj);            /* render matrix */
 extern void  fn_8011F5C8(u32 a);               /* field world query */
 extern void  fn_8011E778(u32 a);               /* field world accessor */
 

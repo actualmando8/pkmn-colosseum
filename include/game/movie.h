@@ -109,7 +109,7 @@ void moviePlayTPCLogo(void);
  * movieWaitForFinish -- Spin-wait until the current THP playback ends.
  *
  * Polls THPPlayerGetState (fn_801E1874) in a loop, yielding via
- * fn_800F0308 (GStextureFlush / GSthread yield) each frame, until
+ * _threadSwitch (GStextureFlush / GSthread yield) each frame, until
  * the state is no longer THP_STATE_PLAYING.
  *
  * This pattern appears at multiple call sites in the movie code.
