@@ -58,6 +58,7 @@ extern void fn_800D9D68(unsigned int x1, unsigned int y1,
                         unsigned int x2, unsigned int y2);
 extern void fn_800DAD10(void* obj);
 extern void fn_801AA568(HSD_PObj* pobj);
+extern void fn_801A6E24(HSD_MObj* mobj);
 extern void GSgfxHostClearPipelineState(unsigned int pipelineId);
 extern void GSgfxHostSetPipelineBlend(unsigned int pipelineId,
                                       unsigned int type,
@@ -2337,6 +2338,7 @@ static int RunRealMaterialDeltaSmoke(void) {
     HSD_MObj* liveMObj = NULL;
     HSD_TExp* loadTExpList = NULL;
     HSD_TExp* loadTExpRoot = NULL;
+    HSD_TExp* setupTExpList = NULL;
     HSD_TExp* fullTExpList = NULL;
     HSD_TExp* fadedTExpList = NULL;
     HSD_TExp* fullTExpRoot = NULL;
@@ -2483,6 +2485,15 @@ static int RunRealMaterialDeltaSmoke(void) {
                 "[pcport_bootstrap] Real material delta live MObj has no make_texp method\n");
         goto cleanup;
     }
+    liveMObj->texp = NULL;
+    fn_801A6E24(liveMObj);
+    setupTExpList = liveMObj->texp;
+    if (setupTExpList == NULL) {
+        fprintf(stderr,
+                "[pcport_bootstrap] Real material delta live MObj setup produced no TExp list (mobj=0x%X)\n",
+                mobjOffset);
+        goto cleanup;
+    }
     loadTExpRoot = HSD_MOBJ_METHOD(liveMObj)->make_texp(liveMObj,
                                                         liveMObj->tobj,
                                                         &loadTExpList);
@@ -2589,7 +2600,7 @@ static int RunRealMaterialDeltaSmoke(void) {
         goto cleanup;
     }
 
-    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
+    printf("[pcport_bootstrap] Real material delta smoke passed (scene=0x%X camera=0x%X joint=0x%X dobj=0x%X mobj=0x%X pobj=0x%X diffPixels=%u full=%u,%u,%u,%u faded=%u,%u,%u,%u fullAlpha=%.3f fadedAlpha=%.3f setupTExp=%p loadTExp=%p fullTExp=%p fadedTExp=%p submitted=%u expanded=%u prim=0x%X)\n",
            sceneOffset,
            translatedCamera.cameraArchiveOffset,
            jointOffset,
@@ -2607,6 +2618,7 @@ static int RunRealMaterialDeltaSmoke(void) {
            fadedSample[3],
            fullMaterial.alpha,
            fadedMaterial.alpha,
+           (void*)setupTExpList,
            (void*)loadTExpRoot,
            (void*)fullTExpRoot,
            (void*)fadedTExpRoot,
