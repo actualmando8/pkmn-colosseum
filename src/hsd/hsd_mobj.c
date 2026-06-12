@@ -20,6 +20,9 @@ static void MObjInfoInit(void);
 #ifdef PCPORT
 HSD_TExp* PCPort_MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top,
                               HSD_TExp** list);
+void PCPort_TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
+                         HSD_TExp** c, HSD_TExp** a, HSD_TExp** list);
+HSD_TExp* fn_801A7128(HSD_MObj* mobj, HSD_TObj* tobj_top, HSD_TExp** list);
 #endif
 
 HSD_MObjInfo hsdMObj = { MObjInfoInit };
@@ -196,7 +199,7 @@ static void MObjInfoInit(void)
     ((HSD_ClassInfo*) &hsdMObj)->amnesia = MObjAmnesia;
     hsdMObj.load = MObjLoad;
 #ifdef PCPORT
-    hsdMObj.make_texp = PCPort_MObjMakeTExp;
+    hsdMObj.make_texp = fn_801A7128;
 #endif
 }
 
