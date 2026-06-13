@@ -15,8 +15,10 @@
 
 static void DObjInfoInit(void);
 
-static HSD_DObjInfo hsdDObj = { DObjInfoInit };
-static HSD_ClassInfo* default_class = NULL;
+static HSD_DObjInfo lbl_8036C7A0 = { DObjInfoInit };
+#define hsdDObj lbl_8036C7A0
+static HSD_ClassInfo* lbl_8047B260 = NULL;
+#define default_class lbl_8047B260
 
 /* ========================================================================= */
 /*  Flag accessors                                                           */
@@ -288,7 +290,7 @@ static void fn_8019905C(HSD_Class* o)
     fn_801A6D08(dobj->mobj);
     HSD_PObjRemoveAll(dobj->pobj);
     fn_801C25E4(dobj->aobj);
-    HSD_PARENT_INFO(&hsdDObj)->init(o);
+    HSD_PARENT_INFO(&hsdDObj)->release(o);
 }
 #endif
 #pragma pop
@@ -403,8 +405,8 @@ void fn_80199264(HSD_DObj* dobj) {
     while (d != NULL) {
         next = d->next;
         if (d != NULL) {
-            HSD_CLASS_METHOD(d)->init((HSD_Class*) d);
             HSD_CLASS_METHOD(d)->release((HSD_Class*) d);
+            HSD_CLASS_METHOD(d)->destroy((HSD_Class*) d);
         }
         d = next;
     }
@@ -437,10 +439,14 @@ HSD_DObj* fn_801992D8(HSD_DObjDesc* desc)
         return NULL;
     }
 
-    if (desc->class_name == NULL
+    if (*(volatile u32*) &desc->class_name == 0
         || (info = fn_80193748(desc->class_name)) == NULL)
     {
-        info = default_class ? default_class : (HSD_ClassInfo*) &hsdDObj;
+        if (*(volatile u32*) &default_class != 0) {
+            info = default_class;
+        } else {
+            info = (HSD_ClassInfo*) &hsdDObj;
+        }
         dobj = (HSD_DObj*) fn_80193828(info);
         if (dobj == NULL) {
             __assert(&lbl_8047DA18, 0x214, &lbl_8047DA20);

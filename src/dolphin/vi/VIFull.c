@@ -574,8 +574,8 @@ extern u32 lbl_8047A8A8;
 extern u32 lbl_80478A18;
 extern u32 lbl_8047A8A4;
 extern u32 lbl_80478A14;
-extern u8 lbl_80478A24[];
-extern u8 lbl_80478A20[];
+extern char lbl_80478A24;
+extern char lbl_80478A20;
 extern u32 lbl_8047A8B8;
 #if 1
 asm void PADTypeAndStatusCallback(void) {
@@ -588,8 +588,8 @@ void PADTypeAndStatusCallback(void) {
     extern u32 lbl_80478A0C;
     extern u32 lbl_80478A14;
     extern u32 lbl_80478A18;
-    extern u8 lbl_80478A20[];
-    extern u8 lbl_80478A24[];
+    extern char lbl_80478A20;
+    extern char lbl_80478A24;
     extern u32 lbl_8047A8A4;
     extern u32 lbl_8047A8A8;
     extern u32 lbl_8047A8AC;
@@ -722,7 +722,7 @@ void PADTypeAndStatusCallback(void) {
             r6 = r30 + tmp;
             r8 = (u32)fn_800AA678;
             r3 = r29 + 0x0;
-            r4 = (u32)lbl_80478A24;
+            r4 = (u32)&lbl_80478A24;
             r5 = 0x3;
             r7 = 0xa;
             r10 = 0x0;
@@ -736,7 +736,7 @@ void PADTypeAndStatusCallback(void) {
         r6 = r30 + tmp;
         r8 = (u32)fn_800AA678;
         r3 = r29 + 0x0;
-        r4 = (u32)lbl_80478A20;
+        r4 = (u32)&lbl_80478A20;
         r5 = 0x1;
         r7 = 0xa;
         r10 = 0x0;
@@ -759,7 +759,7 @@ void PADTypeAndStatusCallback(void) {
                 r6 = r30 + tmp;
                 r8 = (u32)fn_800AA678;
                 r3 = r29 + 0x0;
-                r4 = (u32)lbl_80478A20;
+                r4 = (u32)&lbl_80478A20;
                 r5 = 0x1;
                 r7 = 0xa;
                 r10 = 0x0;
@@ -824,7 +824,7 @@ asm void fn_800AAC00(void) {
 #else
 void fn_800AAC00(void) {
     extern u8 lbl_803FC5E0[];
-    extern u8 lbl_80478A20[];
+    extern char lbl_80478A20;
     extern u32 lbl_8047A8A4;
     extern u32 lbl_8047A8B0;
     extern u32 lbl_8047A8B4;
@@ -880,7 +880,7 @@ void fn_800AAC00(void) {
                                 r6 = tmp + r4;
                                 r8 = (u32)fn_800AA73C;
                                 r3 = r31 + 0x0;
-                                r4 = (u32)lbl_80478A20;
+                                r4 = (u32)&lbl_80478A20;
                                 r5 = 0x1;
                                 r7 = 0xa;
                                 r10 = 0x0;
@@ -1313,7 +1313,7 @@ void fn_800AB150(void) {
     extern u32 lbl_80478A0C;
     extern u32 lbl_80478A18;
     extern u32 lbl_80478A1C;
-    extern u8 lbl_80478A20[];
+    extern char lbl_80478A20;
     extern u32 lbl_8047A8A4;
     extern u32 lbl_8047A8A8;
     extern u32 lbl_8047A8AC;
@@ -1565,7 +1565,7 @@ void fn_800AB150(void) {
             r3 = r21 + 0x0;
             r6 = r24 + 0x0;
             r8 = r30 + 0x0;
-            r4 = (u32)lbl_80478A20;
+            r4 = (u32)&lbl_80478A20;
             r5 = 0x1;
             r7 = 0xa;
             r10 = 0x0;

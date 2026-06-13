@@ -1201,7 +1201,10 @@ void fn_800FF788(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_800FF81C(void* tablePtr, u32 tableCount) {
-    /* TODO: match -- 12 bytes at 0x800FF81C (static name mismatch) */
+    extern void* lbl_8047ACD0;
+    extern u32 lbl_8047ACD4;
+    lbl_8047ACD0 = tablePtr;
+    lbl_8047ACD4 = tableCount;
 }
 #pragma pop
 

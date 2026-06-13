@@ -233,8 +233,7 @@
 extern void  fn_800DD970(const char* fmt, ...);        /* OSReport / GSlog */
 extern void* GScameraGetActiveCamera(void);                        /* HSD_StartRender (acquire context) */
 extern void  fn_800D87AC(s32 mode);                    /* GSgfx_SetInternalMode */
-extern void  fn_800DD174(void* renderObj);              /* HSD render dispatch */
-extern void  fn_800DD174(void* renderObj);
+extern void  GSlightSetupLights(void* renderObj);
 extern void  fn_800D6A5C(void* callbackA, void* callbackB); /* callback dispatch */
 
 /* GSmem */
@@ -776,7 +775,7 @@ void fn_800E3604(u32 flags, u8 slot) {
     fn_801B25C4(0x7f);
     if ((mobj = GScameraGetActiveCamera()) != NULL) {
         if (fn_80195A6C(*(void**)((u8*)mobj + 0xc)) != 0) {
-            fn_800DD174(*(void**)((u8*)mobj + 0xc));
+            GSlightSetupLights(*(void**)((u8*)mobj + 0xc));
             slotMatch = (u8)slot;
             animFlag = flags & 0x10;
             envFlag = flags & 0x1000;
@@ -832,7 +831,7 @@ void fn_800E3760(void* entry, u32 r4) {
         void* r31 = GScameraGetActiveCamera();
         if (r31 != NULL) {
             if (fn_80195A6C(*(void**)((u8*)r31 + 0xc)) != 0) {
-                fn_800DD174(*(void**)((u8*)r31 + 0xc));
+                GSlightSetupLights(*(void**)((u8*)r31 + 0xc));
                 fn_800E9148(entry, 1);
                 {
                     void* mobj;

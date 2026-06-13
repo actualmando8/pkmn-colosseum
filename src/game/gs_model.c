@@ -86,7 +86,7 @@ extern void  fn_800D2738(void);
 extern void* fn_8005DA18(void);    /* linked list head */
 extern void* fn_8005D934(s16 idx); /* node by index */
 extern void* fn_8005D7F8(s32);
-extern u32   fn_8005D798(void*, s32);
+extern u16   fn_8005D798(void*, s32);
 extern void* fn_8005D858(s32);
 extern void  fn_80166A28(void);
 extern s32   fn_800F037C(void);    /* poll/yield -- 0 if pending */
@@ -800,7 +800,7 @@ void fn_80103484(void* p, void* q) {
     void* r3 = fn_8005DA18();
     void* r3c = fn_8005D7F8((s32)(*(u8*)((u8*)r3 + 0x0) & 0x7));
     if (r3c == (void*)0) { return; }
-    if ((u16)fn_8005D798(r3c, r31) == 0) { return; }
+    if (fn_8005D798(r3c, r31) == 0) { return; }
     fn_80166A28();
 }
 #pragma pop

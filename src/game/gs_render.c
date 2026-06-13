@@ -1626,9 +1626,12 @@ asm void fn_800D7468(void) {
 #else
 void fn_800D7468(void) {
     u8 *base = (u8*)lbl_8047AA80;
-    f32 b = *(f32*)(base + 0x4d8);
-    f32 c = *(f32*)(base + 0x4dc);
-    f32 a = *(f32*)(base + 0x4d4);
+    f32 b;
+    f32 c;
+    f32 a;
+    c = *(f32*)(base + 0x4dc);
+    b = *(f32*)(base + 0x4d8);
+    a = *(f32*)(base + 0x4d4);
     *(volatile f32*)0xCC008000 = a;
     *(volatile f32*)0xCC008000 = b;
     *(volatile f32*)0xCC008000 = c;
@@ -3617,7 +3620,7 @@ asm void fn_800DC560(void) {
 #else
 void fn_800DC560(void) { /* TODO */ }
 #endif
-extern void HSD_LObjReqAnimAll(u32, f32);
+extern void HSD_LObjReqAnimAll(void*, f32);
 extern void HSD_LObjAnimAll(void);
 extern u32 lbl_8047AAEC;
 extern u32 lbl_8047CA80;
@@ -3635,8 +3638,8 @@ void fn_800DC6D8(void) { /* TODO */ }
 extern void HSD_LObjSetPosition();
 extern void HSD_LObjSetInterest();
 extern void HSD_LObjRemoveAnimAll(void*);
-extern void HSD_LObjAddAnimAll(u32, u32);
-extern void HSD_ForeachAnim(u32, u32, u32, void*, u32, ...);
+extern void HSD_LObjAddAnimAll(void*, void*);
+extern void HSD_ForeachAnim(void*, u32, u32, void*, u32, ...);
 extern s32 fn_800D37CC(void);
 extern void fn_801C027C(void);
 extern f32 lbl_8047CA78;
@@ -3716,7 +3719,7 @@ void fn_800DCAF0(u8* obj, f32 speed) {
         speed *= lbl_8047CA88;
     }
     *(f32*)(obj + 0x64) = speed;
-    HSD_ForeachAnim(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_801C027C, 1, *(f32*)(obj + 0x64));
+    HSD_ForeachAnim((void*)*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_801C027C, 1, *(f32*)(obj + 0x64));
 }
 #endif
 extern f32 lbl_8047CA78;
@@ -3728,18 +3731,18 @@ asm void fn_800DCB78(void) {
 #else
 void fn_800DCB78(u8* obj, u32 frame) {
     if (!obj[2]) return;
-    HSD_LObjRemoveAnimAll(*(u32*)(obj + 0xc));
+    HSD_LObjRemoveAnimAll((void*)*(u32*)(obj + 0xc));
     if (frame > *(u32*)(obj + 0x58)) return;
     *(u32*)(obj + 0x60) = frame;
     {
         u32 data = *(u32*)(obj + 0x8);
         u32 curFrame = *(u32*)(obj + 0x60);
         u32 frames = *(u32*)(data + 0x4);
-        HSD_LObjAddAnimAll(*(u32*)(obj + 0xc), *(u32*)(frames + curFrame * 4));
+        HSD_LObjAddAnimAll((void*)*(u32*)(obj + 0xc), (void*)*(u32*)(frames + curFrame * 4));
     }
-    HSD_LObjReqAnimAll(*(u32*)(obj + 0xc), lbl_8047CA78);
+    HSD_LObjReqAnimAll((void*)*(u32*)(obj + 0xc), lbl_8047CA78);
     lbl_8047AAF4 = lbl_8047CA78;
-    HSD_ForeachAnim(*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_800DD128, 0);
+    HSD_ForeachAnim((void*)*(u32*)(obj + 0xc), 7, 0xFFFF, (void*)fn_800DD128, 0);
     *(f32*)(obj + 0x6c) = lbl_8047AAF4;
 }
 #endif

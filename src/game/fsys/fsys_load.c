@@ -31,7 +31,7 @@ extern u16  fn_800E2C04(u32 size, u32 alignment);     /* heap alloc */
 extern void* fn_800E27B0(u16 handle);                  /* handle -> ptr */
 
 /* DVD / file operations */
-extern void fn_800CA968(void* dst, const void* src);   /* string copy (path) */
+extern void strcpy(void* dst, const void* src);   /* string copy (path) */
 extern u32  fn_80167F28(const char* path);              /* DVDOpen */
 extern u32  fn_80167E5C(u32 fileInfo);                  /* DVDGetLength */
 extern void fn_80167E64(u32 fileInfo);                  /* DVDClose */
@@ -181,7 +181,7 @@ s32 FSYSInit(u32 numSlots, u32 param2, u32 param3, u32 param4) {
     /* Open and read gsfsys.toc */
     {
         char tocPath[0x80];
-        fn_800CA968(tocPath, "gsfsys.toc");
+        strcpy(tocPath, "gsfsys.toc");
         tocFile = fn_80167F28(tocPath);
         tocSize = fn_80167E5C(tocFile);
 
@@ -1014,7 +1014,7 @@ extern void fn_8017AC30(void);
 extern void fn_8018114C(void);
 extern void fn_800FE834(void);
 extern void fn_80181224(void);
-extern u8 lbl_8047B1E8[];
+extern u32 lbl_8047B1E8;
 extern u32 lbl_8047B1E0;
 extern u32 lbl_8047B1E4;
 extern u8 lbl_80273F80[];

@@ -16,6 +16,7 @@ void PCPort_FObjStartAnim(HSD_FObj* fobj, f32 startframe);
  * Covers both joint SRT anim (jobj->aobj) and material/texture anim
  * (dobj->mobj->{aobj, tobj->aobj}). Defined in hsd_host.c. */
 void PCPort_HSDStartAnimAll(HSD_JObj* root);
+void PCPort_HSDJObjAnimJointOnlyAll(HSD_JObj* root);
 
 typedef struct {
     u8* storage;

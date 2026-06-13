@@ -1,5 +1,7 @@
 param(
     [int]$Port = 8788,
+    [string]$HostAddress = "127.0.0.1",
+    [switch]$Tailscale,
     [switch]$Fresh,
     [switch]$NoOpen
 )
@@ -7,9 +9,29 @@ param(
 $ErrorActionPreference = "Stop"
 $Root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
 
+if ($Tailscale) {
+    $HostAddress = "0.0.0.0"
+}
+
 function Get-DashboardUrl {
     param([int]$CandidatePort)
-    return "http://127.0.0.1:$CandidatePort/"
+    $ClientHost = $HostAddress
+    if ($ClientHost -eq "0.0.0.0") {
+        $ClientHost = "127.0.0.1"
+    }
+    return "http://${ClientHost}:$CandidatePort/"
+}
+
+function Get-TailscaleIPv4 {
+    $Text = (ipconfig | Out-String)
+    $Block = [regex]::Match($Text, "(?s)adapter Tailscale:.*?(?=\r?\n\r?\n)")
+    if ($Block.Success -and $Block.Value -match "IPv4 Address[^\r\n:]*\s*:\s*(100(?:\.\d{1,3}){3})") {
+        return $Matches[1]
+    }
+    if ($Text -match "IPv4 Address[^\r\n:]*\s*:\s*(100(?:\.\d{1,3}){3})") {
+        return $Matches[1]
+    }
+    return $null
 }
 
 function Test-Dashboard {
@@ -43,7 +65,7 @@ foreach ($CandidatePort in $CandidatePorts) {
 
     Start-Process `
         -FilePath "python" `
-        -ArgumentList @("tools\symbolmap\renaming_dashboard.py", "--port", "$CandidatePort") `
+        -ArgumentList @("tools\symbolmap\renaming_dashboard.py", "--host", "$HostAddress", "--port", "$CandidatePort") `
         -WorkingDirectory $Root `
         -WindowStyle Hidden | Out-Null
 
@@ -71,3 +93,9 @@ if (-not $NoOpen) {
 }
 
 Write-Output "Renaming dashboard: $Url"
+if ($HostAddress -eq "0.0.0.0") {
+    $TailscaleIp = Get-TailscaleIPv4
+    if ($TailscaleIp) {
+        Write-Output "Tailscale dashboard: http://${TailscaleIp}:$SelectedPort/"
+    }
+}

@@ -2515,7 +2515,11 @@ void PCPort_FieldAnimTick(f32 frameStep) {
             PCPort_HSDStartAnimAll(g_fieldAnimRoot);
         }
     }
-    HSD_JObjAnimAll(g_fieldAnimRoot);
+    /* Field maps currently need joint/RObj animation for ambient motion. The
+     * host DObj/MObj animation path is still unsafe for some swizzled field
+     * descriptors, so material/texture animation is harvested from already-live
+     * state until the exact material path is recovered. */
+    PCPort_HSDJObjAnimJointOnlyAll(g_fieldAnimRoot);
 
     /* Push updated SRT into the render-side BE archive so RenderJointTree
      * sees the animation.  Uses the same lockstep-write pattern as
@@ -3915,7 +3919,7 @@ static void PCPort_MotionProbeCollectStats(const char* fsysPath,
 
     HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
     PCPort_HSDStartAnimAll(g_charAnimRoot);
-    HSD_JObjAnimAll(g_charAnimRoot);
+    PCPort_HSDJObjAnimJointOnlyAll(g_charAnimRoot);
     prevChecksum = PCPort_ProbeSRTChecksum();
     minChecksum = prevChecksum;
     maxChecksum = prevChecksum;
@@ -3925,7 +3929,7 @@ static void PCPort_MotionProbeCollectStats(const char* fsysPath,
 
     for (f = 1; f < frames; ++f) {
         f32 now, delta;
-        HSD_JObjAnimAll(g_charAnimRoot);
+        PCPort_HSDJObjAnimJointOnlyAll(g_charAnimRoot);
         now = PCPort_ProbeSRTChecksum();
         delta = fabsf(now - prevChecksum);
         if (delta > 1.0e-4f) {
@@ -3965,13 +3969,13 @@ static void PCPort_MotionProbeCollectStats(const char* fsysPath,
 
     HSD_JObjReqAnimAll(g_charAnimRoot, 0.0f);
     PCPort_HSDStartAnimAll(g_charAnimRoot);
-    HSD_JObjAnimAll(g_charAnimRoot);
+    PCPort_HSDJObjAnimJointOnlyAll(g_charAnimRoot);
     PCPort_ProbeSnapshot(g_probeLoopStart);
     if (outStats->endFrame >= 1.0f) {
         int loopFrames = (int)(outStats->endFrame + 0.5f);
         if (loopFrames < 1) loopFrames = 1;
         for (f = 1; f < loopFrames; ++f) {
-            HSD_JObjAnimAll(g_charAnimRoot);
+            PCPort_HSDJObjAnimJointOnlyAll(g_charAnimRoot);
         }
     }
     PCPort_ProbeSnapshot(g_probeLoopEnd);
@@ -6741,7 +6745,7 @@ void PCPort_CharAnimStepAndApply(PCPortHSDArchive* beArchive, u32 beRootJoint,
             PCPort_HSDStartAnimAll(g_charAnimRoot);
         }
     }
-    HSD_JObjAnimAll(g_charAnimRoot);
+    PCPort_HSDJObjAnimJointOnlyAll(g_charAnimRoot);
     PCPort_CharAnimLockstepWrite(beArchive, beRootJoint, g_charAnimRoot, 1,
                                  getenv("PCPORT_CHAR_ROOT_TRANSLATE") != NULL);
     if (getenv("PCPORT_ANIM_DEBUG") != NULL) {

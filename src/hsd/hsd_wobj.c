@@ -318,13 +318,13 @@ extern void fn_8019D9DC(void);
 /* sdata2/rodata string labels referenced by asm incs (symbolmap port) */
 extern u8 lbl_8027448C[];
 extern u8 lbl_80274498[];
-extern u8 lbl_8047D8D8[];
-extern u8 lbl_8047D8E0[];
-extern u8 lbl_8047D8E8[];
-extern u8 lbl_8047D8F0[];
-extern u8 lbl_8047D8F8[];
-extern u8 lbl_8047D900[];
-extern u8 lbl_8047D904[];
+extern char lbl_8047D8D8;
+extern char lbl_8047D8E0;
+extern f64 lbl_8047D8E8;
+extern f32 lbl_8047D8F0;
+extern f64 lbl_8047D8F8;
+extern f32 lbl_8047D900;
+extern char lbl_8047D904;
 #if 1
 asm void fn_80191688(void) {
 #include "src/hsd/hsd_wobj_fn_80191688.inc"

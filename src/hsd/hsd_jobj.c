@@ -429,7 +429,7 @@ void fn_8019CF54(void* info) {
         lbl_8047B29C = 0;
         lbl_8047B2AC = 0;
     }
-    ((HSD_ClassInfo*)lbl_8036C8E0)->head.parent->destroy((HSD_Class*)info);
+    ((HSD_ClassInfo*)lbl_8036C8E0)->head.parent->amnesia(info);
 }
 #endif
 #pragma pop
@@ -464,7 +464,7 @@ extern void fn_801AE50C(void);
 extern void fn_801C25E4(void);
 extern u8 lbl_80274AA0[];
 extern char lbl_8047DB20;
-extern u8 lbl_8047DB28[];
+extern char lbl_8047DB28;
 #if 1
 asm void fn_8019D05C(void) {
 #include "src/hsd/hsd_jobj_fn_8019D05C.inc"
@@ -515,14 +515,14 @@ extern void fn_800A37CC(void);
 extern void fn_800A3B9C(void);
 extern u8 lbl_80274AC4[];
 extern u32 lbl_8047DB30;
-extern u8 lbl_8047DB68[];
+extern char lbl_8047DB68;
 extern u32 lbl_8047DB44;
 extern u32 lbl_8047DB48;
 extern u32 lbl_8047DB50;
 extern u32 lbl_8047DB58;
 extern u32 lbl_8047DB60;
 extern u8 lbl_80478AC0[];
-extern u8 lbl_8047DB6C[];
+extern char lbl_8047DB6C;
 extern u32 lbl_8047DB74;
 extern u32 lbl_8047DB78;
 #if 1
@@ -755,9 +755,9 @@ void fn_801A053C(void* obj) {
         if (ref_CNT_obj(obj) < 0) {
             if (obj != NULL) {
                 info = HSD_CLASS_METHOD(obj);
-                info->init((HSD_Class*)obj);
-                info = HSD_CLASS_METHOD(obj);
                 info->release((HSD_Class*)obj);
+                info = HSD_CLASS_METHOD(obj);
+                info->destroy((HSD_Class*)obj);
             }
         }
     }
@@ -911,9 +911,9 @@ void fn_801A0CE8(void* obj) {
 
     if (obj != NULL) {
         info = HSD_CLASS_METHOD(obj);
-        info->init((HSD_Class*)obj);
-        info = HSD_CLASS_METHOD(obj);
         info->release((HSD_Class*)obj);
+        info = HSD_CLASS_METHOD(obj);
+        info->destroy((HSD_Class*)obj);
     }
 }
 #endif

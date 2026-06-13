@@ -325,7 +325,7 @@ extern void fn_800B5AE0();
 extern void fn_800B5BA4();
 extern void fn_800B5BE4();
 extern void fn_800CA7FC();
-extern void fn_800CA968();
+extern void strcpy();
 extern void fn_800CE2D8();
 extern void fn_800D6A00();
 extern void fn_800D7820();

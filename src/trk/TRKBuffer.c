@@ -73,9 +73,9 @@ u32 fn_800BF080(void) { return 0; }
 u32 fn_800BEF44(s32* indexOut, u8** bufOut) {
     extern u8 lbl_8026F668[];
     extern void fn_800BF33C(const char* msg);
-    s32 i;
-    u32 result;
     u8* buf;
+    s32 result;
+    s32 i;
 
     result = 0x300;
     *bufOut = NULL;
@@ -95,9 +95,7 @@ u32 fn_800BEF44(s32* indexOut, u8** bufOut) {
             *bufOut = buf;
             *indexOut = i;
             result = 0;
-            fn_800C0CC0((void*)buf); /* unlock mutex */
             i = 3; /* break out of loop */
-            continue;
         }
         fn_800C0CC0((void*)buf); /* unlock mutex */
     }
@@ -108,4 +106,3 @@ u32 fn_800BEF44(s32* indexOut, u8** bufOut) {
 
     return result;
 }
-

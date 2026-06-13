@@ -90,6 +90,13 @@
   "src": "src/dolphin/os/OSCache.c",
   "status": "KNOWN"
  },
+ "DVDCancel": {
+  "addr": "0x800A7AFC",
+  "section": ".text",
+  "size": "0xAC",
+  "src": null,
+  "status": "GAP"
+ },
  "DVDGetDriveStatus": {
   "addr": "0x800A7774",
   "section": ".text",
@@ -237,6 +244,475 @@
   "src": "src/dolphin/os/OSInterrupt.c",
   "status": "KNOWN"
  },
+ "GSbezierCalculateVector": {
+  "addr": "0x800E07E4",
+  "section": ".text",
+  "size": "0x128",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GScameraGetActiveCamera": {
+  "addr": "0x800D2584",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetAnimFrame": {
+  "addr": "0x800D172C",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetDistanceVector": {
+  "addr": "0x800D1A40",
+  "section": ".text",
+  "size": "0x30",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetLookAt": {
+  "addr": "0x800D1EB8",
+  "section": ".text",
+  "size": "0x4C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetPerspective": {
+  "addr": "0x800D1FDC",
+  "section": ".text",
+  "size": "0x60",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetPosition": {
+  "addr": "0x800D1F84",
+  "section": ".text",
+  "size": "0x58",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetProjMatrixPtr": {
+  "addr": "0x800D1A70",
+  "section": ".text",
+  "size": "0xCC",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraGetRotation": {
+  "addr": "0x800D1F58",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraHasAnimationEnded": {
+  "addr": "0x800D1734",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraIsAnimating": {
+  "addr": "0x800D1A38",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraLookAt": {
+  "addr": "0x800D1F04",
+  "section": ".text",
+  "size": "0x54",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetAnimFrame": {
+  "addr": "0x800D1860",
+  "section": ".text",
+  "size": "0x9C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetAnimIndex": {
+  "addr": "0x800D1984",
+  "section": ".text",
+  "size": "0xB4",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetAnimRate": {
+  "addr": "0x800D18FC",
+  "section": ".text",
+  "size": "0x88",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetPerspective": {
+  "addr": "0x800D20CC",
+  "section": ".text",
+  "size": "0x84",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetPosition": {
+  "addr": "0x800D207C",
+  "section": ".text",
+  "size": "0x50",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetRotation": {
+  "addr": "0x800D203C",
+  "section": ".text",
+  "size": "0x40",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraSetViewport": {
+  "addr": "0x800D21C8",
+  "section": ".text",
+  "size": "0x80",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraStartAnimation": {
+  "addr": "0x800D1798",
+  "section": ".text",
+  "size": "0xC0",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScameraStopAnimation": {
+  "addr": "0x800D173C",
+  "section": ".text",
+  "size": "0x5C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GScolsys2Draw": {
+  "addr": "0x8010D3C8",
+  "section": ".text",
+  "size": "0x50C",
+  "src": "src/game/gs_colsys.c",
+  "status": "KNOWN"
+ },
+ "GSeffect": {
+  "addr": "0x8013111C",
+  "section": ".text",
+  "size": "0xE4",
+  "src": "src/game/effect/gs_effect.c",
+  "status": "KNOWN"
+ },
+ "GSflagInitBitPos": {
+  "addr": "0x80190C90",
+  "section": ".text",
+  "size": "0x1A4",
+  "src": "src/game/gs_flag.c",
+  "status": "KNOWN"
+ },
+ "GSgfxBeginBackFBCapture": {
+  "addr": "0x800DC390",
+  "section": ".text",
+  "size": "0x1B0",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSgfxEndBackFBCapture": {
+  "addr": "0x800DC298",
+  "section": ".text",
+  "size": "0xF8",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSlightSetType": {
+  "addr": "0x800DCCF0",
+  "section": ".text",
+  "size": "0xA8",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSlightSetupLights": {
+  "addr": "0x800DD174",
+  "section": ".text",
+  "size": "0xFC",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSmaterialCreate": {
+  "addr": "0x800DF7A4",
+  "section": ".text",
+  "size": "0xB0",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSmaterialFindByMObj": {
+  "addr": "0x800E3B6C",
+  "section": ".text",
+  "size": "0x54",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetAmbientPtr": {
+  "addr": "0x800E3CF8",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetDiffusePtr": {
+  "addr": "0x800E3D00",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetPoolCount": {
+  "addr": "0x800E3B3C",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetSpecularPtr": {
+  "addr": "0x800E3CF0",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetTexStage": {
+  "addr": "0x800E3CBC",
+  "section": ".text",
+  "size": "0xC",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetTexture": {
+  "addr": "0x800E3BF8",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetTransformPtr": {
+  "addr": "0x800E3C5C",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialGetUserData": {
+  "addr": "0x800E3BF0",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialHasTransform": {
+  "addr": "0x800E3C64",
+  "section": ".text",
+  "size": "0x30",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialIsActive": {
+  "addr": "0x800E3D08",
+  "section": ".text",
+  "size": "0xC",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialLerpAmbient": {
+  "addr": "0x800E3D6C",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialLerpDiffuse": {
+  "addr": "0x800E3D98",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialLerpPEColor": {
+  "addr": "0x800E3D14",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialLerpSpecular": {
+  "addr": "0x800E3D40",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetCallback": {
+  "addr": "0x800E8F68",
+  "section": ".text",
+  "size": "0xC",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetCustomPEFlag": {
+  "addr": "0x800E3C94",
+  "section": ".text",
+  "size": "0x28",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetDistanceThreshold": {
+  "addr": "0x800E8F74",
+  "section": ".text",
+  "size": "0xC",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetEnvMapFlag": {
+  "addr": "0x800E3CC8",
+  "section": ".text",
+  "size": "0x28",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetFlags": {
+  "addr": "0x800DF550",
+  "section": ".text",
+  "size": "0xB8",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSmaterialSetPEdescr": {
+  "addr": "0x800DF498",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "GSmaterialSetShadowFlag": {
+  "addr": "0x800E3B44",
+  "section": ".text",
+  "size": "0x28",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetTexture": {
+  "addr": "0x800E3C08",
+  "section": ".text",
+  "size": "0x54",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmaterialSetUserData": {
+  "addr": "0x800E3C00",
+  "section": ".text",
+  "size": "0x8",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSmodelGetAnimFrame": {
+  "addr": "0x800EC53C",
+  "section": ".text",
+  "size": "0x2C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSscene_GetCameraDirectionVector": {
+  "addr": "0x801778B4",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_GetCameraPositionVector": {
+  "addr": "0x80177908",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_GetCameraRotationVector": {
+  "addr": "0x80177830",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_GetCameraViewVector": {
+  "addr": "0x8017795C",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_GetMode": {
+  "addr": "0x80177A38",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_SetCameraDirectionVector": {
+  "addr": "0x801778DC",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_SetCameraPositionVector": {
+  "addr": "0x80177930",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_SetCameraRotationVector": {
+  "addr": "0x80177858",
+  "section": ".text",
+  "size": "0x5C",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_SetCameraViewVector": {
+  "addr": "0x80177984",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscene_SetMode": {
+  "addr": "0x80177A44",
+  "section": ".text",
+  "size": "0x20",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "GSscratchStore": {
+  "addr": "0x800EEA98",
+  "section": ".text",
+  "size": "0x9C",
+  "src": null,
+  "status": "GAP"
+ },
+ "GSthread": {
+  "addr": "0x800F09D8",
+  "section": ".text",
+  "size": "0x9C",
+  "src": "src/game/gs_thread.c",
+  "status": "KNOWN"
+ },
+ "GSthreadCreate": {
+  "addr": "0x800F07A8",
+  "section": ".text",
+  "size": "0x230",
+  "src": "src/game/gs_thread.c",
+  "status": "KNOWN"
+ },
  "GXInit": {
   "addr": "0x800B5E8C",
   "section": ".text",
@@ -291,6 +767,846 @@
   "section": ".text",
   "size": "0x298",
   "src": "src/dolphin/si/SI.c",
+  "status": "KNOWN"
+ },
+ "HSD_ArchiveGetPublicAddress": {
+  "addr": "0x80191ECC",
+  "section": ".text",
+  "size": "0x98",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ArchiveParse": {
+  "addr": "0x80191F64",
+  "section": ".text",
+  "size": "0x180",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjAddAnim": {
+  "addr": "0x80196B10",
+  "section": ".text",
+  "size": "0xA8",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjAnim": {
+  "addr": "0x801966FC",
+  "section": ".text",
+  "size": "0x50",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetCurrent": {
+  "addr": "0x801942B8",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetEyeDistance": {
+  "addr": "0x80195794",
+  "section": ".text",
+  "size": "0x104",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetEyePosition": {
+  "addr": "0x80195904",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetFar": {
+  "addr": "0x801944D0",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetInterest": {
+  "addr": "0x801959DC",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetInvViewingMtxPtrDirect": {
+  "addr": "0x80194CF4",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetNear": {
+  "addr": "0x801944F8",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetOrtho": {
+  "addr": "0x801942C0",
+  "section": ".text",
+  "size": "0x5C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetPerspective": {
+  "addr": "0x8019431C",
+  "section": ".text",
+  "size": "0x3C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetProjectionType": {
+  "addr": "0x801943CC",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetUpVector": {
+  "addr": "0x801950D0",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetViewingMtx": {
+  "addr": "0x80194D60",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjGetViewingMtxPtr": {
+  "addr": "0x80194CC4",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjRemoveAnim": {
+  "addr": "0x80196BB8",
+  "section": ".text",
+  "size": "0x84",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjReqAnim": {
+  "addr": "0x80196698",
+  "section": ".text",
+  "size": "0x64",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetAspect": {
+  "addr": "0x80194788",
+  "section": ".text",
+  "size": "0x20",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetEyePosition": {
+  "addr": "0x80195898",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetFar": {
+  "addr": "0x801944C0",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetFov": {
+  "addr": "0x801947A8",
+  "section": ".text",
+  "size": "0x20",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetFrustum": {
+  "addr": "0x8019437C",
+  "section": ".text",
+  "size": "0x24",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetInterest": {
+  "addr": "0x80195970",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetMtxDirty": {
+  "addr": "0x80194D94",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetNear": {
+  "addr": "0x801944E8",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetOrtho": {
+  "addr": "0x80194358",
+  "section": ".text",
+  "size": "0x24",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetPerspective": {
+  "addr": "0x801943A0",
+  "section": ".text",
+  "size": "0x1C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetProjectionType": {
+  "addr": "0x801943BC",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetScissorx4": {
+  "addr": "0x801944A4",
+  "section": ".text",
+  "size": "0x1C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_CObjSetViewportfx4": {
+  "addr": "0x801943E4",
+  "section": ".text",
+  "size": "0x1C",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjAddAnimAll": {
+  "addr": "0x80199654",
+  "section": ".text",
+  "size": "0xB0",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjAnimAll": {
+  "addr": "0x80199568",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjCountVertices": {
+  "addr": "0x80199178",
+  "section": ".text",
+  "size": "0x80",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjReqAnimAllByFlags": {
+  "addr": "0x801995D4",
+  "section": ".text",
+  "size": "0x80",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjResolveRefsAll": {
+  "addr": "0x801991F8",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_DObjSetCurrent": {
+  "addr": "0x80199704",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjAlloc": {
+  "addr": "0x80199738",
+  "section": ".text",
+  "size": "0x5C",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjFree": {
+  "addr": "0x8019970C",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjGetAllocData": {
+  "addr": "0x8019B7B4",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjInitAllocData": {
+  "addr": "0x8019B784",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjRemove": {
+  "addr": "0x8019B750",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjRemoveAll": {
+  "addr": "0x8019B5E8",
+  "section": ".text",
+  "size": "0x168",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjReqAnimAll": {
+  "addr": "0x8019B528",
+  "section": ".text",
+  "size": "0xC0",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FObjStopAnimAll": {
+  "addr": "0x8019B490",
+  "section": ".text",
+  "size": "0x98",
+  "src": "src/hsd/hsd_dobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_FogAdjInit": {
+  "addr": "0x8019B7C0",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_ForeachAnim": {
+  "addr": "0x801C028C",
+  "section": ".text",
+  "size": "0xC94",
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
+ },
+ "HSD_HashSearch": {
+  "addr": "0x8019BFE8",
+  "section": ".text",
+  "size": "0x110",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDGetAllocData": {
+  "addr": "0x8019C3B8",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDGetData": {
+  "addr": "0x801A0BF0",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/hsd/hsd_jobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDGetDataFromTable": {
+  "addr": "0x8019C128",
+  "section": ".text",
+  "size": "0x88",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDInitAllocData": {
+  "addr": "0x8019C388",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDInsertToTable": {
+  "addr": "0x8019C264",
+  "section": ".text",
+  "size": "0xF4",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_IDSetup": {
+  "addr": "0x8019C358",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "HSD_ImageDescAlloc": {
+  "addr": "0x801BBD84",
+  "section": ".text",
+  "size": "0x58",
+  "src": "src/hsd/hsd_tobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ImageDescFree": {
+  "addr": "0x801BBD3C",
+  "section": ".text",
+  "size": "0x24",
+  "src": "src/hsd/hsd_tobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ImageDescRemove": {
+  "addr": "0x801BBD60",
+  "section": ".text",
+  "size": "0x24",
+  "src": "src/hsd/hsd_tobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_Index2PosNrmMtx": {
+  "addr": "0x801BF098",
+  "section": ".text",
+  "size": "0xA0",
+  "src": "src/hsd/hsd_tobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_Index2TevStage": {
+  "addr": "0x801B3338",
+  "section": ".text",
+  "size": "0xD0",
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
+ },
+ "HSD_Index2TexMtx": {
+  "addr": "0x801BBF28",
+  "section": ".text",
+  "size": "0xBC",
+  "src": "src/hsd/hsd_tobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_JObjMtxIsDirty": {
+  "addr": "0x800EA60C",
+  "section": ".text",
+  "size": "0x58",
+  "src": null,
+  "status": "GAP"
+ },
+ "HSD_JObjRef": {
+  "addr": "0x801A0B9C",
+  "section": ".text",
+  "size": "0x54",
+  "src": "src/hsd/hsd_jobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_JObjResolveRefsAll": {
+  "addr": "0x801A0744",
+  "section": ".text",
+  "size": "0x458",
+  "src": "src/hsd/hsd_jobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjAddAnimAll": {
+  "addr": "0x801A426C",
+  "section": ".text",
+  "size": "0xD8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjAnimAll": {
+  "addr": "0x801A6408",
+  "section": ".text",
+  "size": "0x8C",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjClearFlags": {
+  "addr": "0x801A68F8",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjDeleteCurrentAll": {
+  "addr": "0x801A4B00",
+  "section": ".text",
+  "size": "0x220",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetActiveByID": {
+  "addr": "0x801A67BC",
+  "section": ".text",
+  "size": "0x114",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetActiveByIndex": {
+  "addr": "0x801A678C",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetCurrentByType": {
+  "addr": "0x801A4AC4",
+  "section": ".text",
+  "size": "0x3C",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetInterest": {
+  "addr": "0x801A48B0",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetLightMaskAlpha": {
+  "addr": "0x801A68E0",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetLightMaskAttnFunc": {
+  "addr": "0x801A68E8",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetLightMaskDiffuse": {
+  "addr": "0x801A68F0",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetLightMaskSpecular": {
+  "addr": "0x801A68D8",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetNbActive": {
+  "addr": "0x801A68D0",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjGetPosition": {
+  "addr": "0x801A497C",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjRemoveAnimAll": {
+  "addr": "0x801A66E0",
+  "section": ".text",
+  "size": "0xAC",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjReqAnimAll": {
+  "addr": "0x801A6370",
+  "section": ".text",
+  "size": "0x98",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjSetColor": {
+  "addr": "0x801A4A48",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjSetFlags": {
+  "addr": "0x801A6910",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjSetInterest": {
+  "addr": "0x801A48F4",
+  "section": ".text",
+  "size": "0x88",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjSetPosition": {
+  "addr": "0x801A49C0",
+  "section": ".text",
+  "size": "0x88",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_LObjSetup": {
+  "addr": "0x801A4F54",
+  "section": ".text",
+  "size": "0xE78",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjAddTObjNext": {
+  "addr": "0x801A6D5C",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjClearFlags": {
+  "addr": "0x801A8428",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjGetFlags": {
+  "addr": "0x801A8458",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjReqAnimByFlags": {
+  "addr": "0x801A8354",
+  "section": ".text",
+  "size": "0x68",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjSetCurrent": {
+  "addr": "0x801A8470",
+  "section": ".text",
+  "size": "0x8",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjSetFlags": {
+  "addr": "0x801A8440",
+  "section": ".text",
+  "size": "0x18",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MObjSetup": {
+  "addr": "0x801A6E24",
+  "section": ".text",
+  "size": "0x154",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxAlloc": {
+  "addr": "0x801A8524",
+  "section": ".text",
+  "size": "0x4C",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxFree": {
+  "addr": "0x801A84F0",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxGetAllocData": {
+  "addr": "0x801A84A8",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxGetTranslate": {
+  "addr": "0x801A9570",
+  "section": ".text",
+  "size": "0x1C",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxInitAllocData": {
+  "addr": "0x801A8478",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_MtxScaledAdd": {
+  "addr": "0x801A85F0",
+  "section": ".text",
+  "size": "0xC4",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ObjAlloc": {
+  "addr": "0x801AA4CC",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ObjFree": {
+  "addr": "0x801AA498",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_ObjSetHeap": {
+  "addr": "0x801AA538",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_PObjAnimAll": {
+  "addr": "0x801AD61C",
+  "section": ".text",
+  "size": "0x5C",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_PObjInit": {
+  "addr": "0x801AA608",
+  "section": ".text",
+  "size": "0xC8",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_PObjRemoveAll": {
+  "addr": "0x801AD214",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_PObjReqAnimAllByFlags": {
+  "addr": "0x801AD6C4",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_Panic": {
+  "addr": "0x80196D78",
+  "section": ".text",
+  "size": "0x98",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_StateAssignTev": {
+  "addr": "0x801B37A0",
+  "section": ".text",
+  "size": "0xDC",
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
+ },
+ "HSD_StateRegisterTexGen": {
+  "addr": "0x801B38C0",
+  "section": ".text",
+  "size": "0xD8",
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
+ },
+ "HSD_VecAlloc": {
+  "addr": "0x801A85A4",
+  "section": ".text",
+  "size": "0x4C",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_VecFree": {
+  "addr": "0x801A8570",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_VecGetAllocData": {
+  "addr": "0x801A84E4",
+  "section": ".text",
+  "size": "0xC",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_VecInitAllocData": {
+  "addr": "0x801A84B4",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjAddAnim": {
+  "addr": "0x80191DCC",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjAlloc": {
+  "addr": "0x80191628",
+  "section": ".text",
+  "size": "0x60",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjInit": {
+  "addr": "0x8019189C",
+  "section": ".text",
+  "size": "0xB0",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjInterpretAnim": {
+  "addr": "0x801919EC",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjLoadDesc": {
+  "addr": "0x801917D0",
+  "section": ".text",
+  "size": "0xCC",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjRemoveAnim": {
+  "addr": "0x80191E88",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjReqAnim": {
+  "addr": "0x80191E38",
+  "section": ".text",
+  "size": "0x50",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "HSD_WObjSetPosition": {
+  "addr": "0x80191788",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
  "Hu_IsStub": {
@@ -377,11 +1693,32 @@
   "src": "src/dolphin/os/OSCache.c",
   "status": "KNOWN"
  },
+ "LObjUpdateFunc": {
+  "addr": "0x801A6494",
+  "section": ".text",
+  "size": "0x24C",
+  "src": "src/hsd/hsd_lobj.c",
+  "status": "KNOWN"
+ },
  "MEMIntrruptHandler": {
   "addr": "0x8009F41C",
   "section": ".text",
   "size": "0x6C",
   "src": "src/dolphin/os/OSMemory.c",
+  "status": "KNOWN"
+ },
+ "MObjSetupTev": {
+  "addr": "0x801A6F78",
+  "section": ".text",
+  "size": "0x78",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "MObjUpdateFunc": {
+  "addr": "0x801A7E84",
+  "section": ".text",
+  "size": "0x4D0",
+  "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
  "MWTRACE": {
@@ -390,6 +1727,13 @@
   "size": "0x50",
   "src": "src/crt/mwtrace.c",
   "status": "LIKELY"
+ },
+ "MessageSend": {
+  "addr": "0x800BE800",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/trk/TRKNub.c",
+  "status": "KNOWN"
  },
  "OSCancelAlarm": {
   "addr": "0x8009A590",
@@ -559,6 +1903,13 @@
   "src": "src/dolphin/os/OSThread.c",
   "status": "KNOWN"
  },
+ "OSLink": {
+  "addr": "0x8009E7B0",
+  "section": ".text",
+  "size": "0x2BC",
+  "src": null,
+  "status": "GAP"
+ },
  "OSLoadContext": {
   "addr": "0x8009BC50",
   "section": ".text",
@@ -662,6 +2013,34 @@
   "section": ".text",
   "size": "0x30",
   "src": "src/dolphin/os/OSContext.c",
+  "status": "KNOWN"
+ },
+ "OSUnlink": {
+  "addr": "0x8009EDAC",
+  "section": ".text",
+  "size": "0x238",
+  "src": null,
+  "status": "GAP"
+ },
+ "ObjInfoInit_802596A4": {
+  "addr": "0x801AA568",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_mobj.c",
+  "status": "KNOWN"
+ },
+ "PADTypeAndStatusCallback": {
+  "addr": "0x800AA8D4",
+  "section": ".text",
+  "size": "0x32C",
+  "src": "src/dolphin/vi/VI.c",
+  "status": "KNOWN"
+ },
+ "PObjUpdateFunc": {
+  "addr": "0x801AD678",
+  "section": ".text",
+  "size": "0x4C",
+  "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
  "PPCDisableSpeculation": {
@@ -804,6 +2183,13 @@
   "src": "src/dolphin/os/PPCArch.c",
   "status": "KNOWN"
  },
+ "RObjUpdateFunc": {
+  "addr": "0x801B009C",
+  "section": ".text",
+  "size": "0x44",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
  "RealMode": {
   "addr": "0x8009F64C",
   "section": ".text",
@@ -872,6 +2258,13 @@
   "section": ".text",
   "size": "0x228",
   "src": "src/dolphin/os/OSThread.c",
+  "status": "KNOWN"
+ },
+ "SendACK": {
+  "addr": "0x800BF95C",
+  "section": ".text",
+  "size": "0x290",
+  "src": "src/trk/TRKDispatch.c",
   "status": "KNOWN"
  },
  "TRKDestructEvent": {
@@ -1063,6 +2456,20 @@
   "src": "src/trk/TRKTarget.c",
   "status": "KNOWN"
  },
+ "TRKTargetSingleStep": {
+  "addr": "0x800C1610",
+  "section": ".text",
+  "size": "0xAC",
+  "src": "src/trk/TRKTarget.c",
+  "status": "KNOWN"
+ },
+ "TRKTargetStepOutOfRange": {
+  "addr": "0x800C1558",
+  "section": ".text",
+  "size": "0xB8",
+  "src": "src/trk/TRKTarget.c",
+  "status": "KNOWN"
+ },
  "TRKTargetStopped": {
   "addr": "0x800C1338",
   "section": ".text",
@@ -1119,6 +2526,34 @@
   "src": "src/dolphin/vi/VI.c",
   "status": "KNOWN"
  },
+ "WObjAmnesia": {
+  "addr": "0x8019158C",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "WObjLoad": {
+  "addr": "0x8019194C",
+  "section": ".text",
+  "size": "0xA0",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "WObjRelease": {
+  "addr": "0x801915D4",
+  "section": ".text",
+  "size": "0x54",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
+ "WObjUpdateFunc": {
+  "addr": "0x80191A34",
+  "section": ".text",
+  "size": "0x398",
+  "src": "src/hsd/hsd_wobj.c",
+  "status": "KNOWN"
+ },
  "_ExitProcess": {
   "addr": "0x800A2C10",
   "section": ".text",
@@ -1126,10 +2561,73 @@
   "src": "src/crt/__init_cpp_exceptions.c",
   "status": "KNOWN"
  },
+ "_GSmaterialObjInit_800EF33C": {
+  "addr": "0x800DF8CC",
+  "section": ".text",
+  "size": "0x64",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "_HSD_IDForgetMemory": {
+  "addr": "0x8019C0F8",
+  "section": ".text",
+  "size": "0x30",
+  "src": "src/hsd/hsd_fog.c",
+  "status": "KNOWN"
+ },
+ "_HSD_MemAllocDefaultCB": {
+  "addr": "0x8019C8F4",
+  "section": ".text",
+  "size": "0x84",
+  "src": "src/hsd/hsd_initialize.c",
+  "status": "KNOWN"
+ },
+ "_HSD_MemCheckOwnDefaultCB": {
+  "addr": "0x8019C7B8",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/hsd/hsd_initialize.c",
+  "status": "KNOWN"
+ },
+ "_HSD_MemFreeDefaultCB": {
+  "addr": "0x8019C89C",
+  "section": ".text",
+  "size": "0x58",
+  "src": "src/hsd/hsd_initialize.c",
+  "status": "KNOWN"
+ },
+ "_HSD_MemGetRemainDefaultCB": {
+  "addr": "0x8019C854",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/hsd/hsd_initialize.c",
+  "status": "KNOWN"
+ },
+ "_HSD_MemSetCallbacks": {
+  "addr": "0x801A69C0",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/hsd/hsd_memory.c",
+  "status": "LIKELY"
+ },
+ "_HSD_RandForgetMemory": {
+  "addr": "0x801ADC08",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
  "__DBExceptionDestination": {
   "addr": "0x800A2CBC",
   "section": ".text",
   "size": "0x10",
+  "src": "src/dolphin/db/DB.c",
+  "status": "KNOWN"
+ },
+ "__DBExceptionDestinationAux": {
+  "addr": "0x800A2C74",
+  "section": ".text",
+  "size": "0x48",
   "src": "src/dolphin/db/DB.c",
   "status": "KNOWN"
  },
@@ -1469,6 +2967,13 @@
   "src": "src/dolphin/pad/PAD.c",
   "status": "LIKELY"
  },
+ "__assert": {
+  "addr": "0x80196E10",
+  "section": ".text",
+  "size": "0xA4",
+  "src": "src/hsd/hsd_cobj.c",
+  "status": "KNOWN"
+ },
  "__begin_critical_region": {
   "addr": "0x800C7550",
   "section": ".text",
@@ -1501,7 +3006,7 @@
   "addr": "0x800C483C",
   "section": ".text",
   "size": "0xEC",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "__end_critical_region": {
@@ -1606,7 +3111,7 @@
   "addr": "0x800C4A60",
   "section": ".text",
   "size": "0xE4",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "__pformatter": {
@@ -1672,11 +3177,158 @@
   "src": "src/crt/printf.c",
   "status": "KNOWN"
  },
+ "__sys_free": {
+  "addr": "0x800C4D8C",
+  "section": ".text",
+  "size": "0xB8",
+  "src": "src/crt/longlong.c",
+  "status": "LIKELY"
+ },
  "__va_arg": {
   "addr": "0x800C45A0",
   "section": ".text",
   "size": "0xC8",
   "src": "src/crt/__va_arg.c",
+  "status": "KNOWN"
+ },
+ "_distortionEffectUpdateMatrices": {
+  "addr": "0x8013F97C",
+  "section": ".text",
+  "size": "0x264",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "_eyeTexAnimEnded": {
+  "addr": "0x801DEC64",
+  "section": ".text",
+  "size": "0x1B0",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "_gsdvdErrorTask_801879AC": {
+  "addr": "0x80167BE8",
+  "section": ".text",
+  "size": "0x148",
+  "src": "src/game/gs_dvd.c",
+  "status": "KNOWN"
+ },
+ "_leaffxGenerateLeafData": {
+  "addr": "0x80139378",
+  "section": ".text",
+  "size": "0x4A8",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "_lightningRenderMain": {
+  "addr": "0x8013814C",
+  "section": ".text",
+  "size": "0x4E4",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "_matGSmatEnableEnvMapExt": {
+  "addr": "0x800DFABC",
+  "section": ".text",
+  "size": "0x3DC",
+  "src": "src/game/gs_render.c",
+  "status": "KNOWN"
+ },
+ "_modelGetEndFrame": {
+  "addr": "0x800EE08C",
+  "section": ".text",
+  "size": "0x5C",
+  "src": null,
+  "status": "GAP"
+ },
+ "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl": {
+  "addr": "0x801402AC",
+  "section": ".text",
+  "size": "0x2DC",
+  "src": null,
+  "status": "GAP"
+ },
+ "_psListDelete": {
+  "addr": "0x80168CD0",
+  "section": ".text",
+  "size": "0xDC",
+  "src": "src/game/script/pslist.c",
+  "status": "KNOWN"
+ },
+ "_psListGetFirst": {
+  "addr": "0x80168C64",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/game/script/pslist.c",
+  "status": "KNOWN"
+ },
+ "_sndCheckSndWorkALL": {
+  "addr": "0x80167318",
+  "section": ".text",
+  "size": "0x64",
+  "src": "src/game/gs_dvd.c",
+  "status": "KNOWN"
+ },
+ "_threadSwitch": {
+  "addr": "0x800F0308",
+  "section": ".text",
+  "size": "0x64",
+  "src": "src/game/gs_texture.c",
+  "status": "KNOWN"
+ },
+ "_vtrTexDispFunc__Fv": {
+  "addr": "0x801E1368",
+  "section": ".text",
+  "size": "0x368",
+  "src": "src/game/save/save.c",
+  "status": "KNOWN"
+ },
+ "_wazaSequenceParticleEntryStart": {
+  "addr": "0x801D8B38",
+  "section": ".text",
+  "size": "0x6B4",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "applyForceJObj": {
+  "addr": "0x80172BBC",
+  "section": ".text",
+  "size": "0x144",
+  "src": null,
+  "status": "GAP"
+ },
+ "auraEffectStart": {
+  "addr": "0x8013E658",
+  "section": ".text",
+  "size": "0x6C",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "battleGridReplacePokemon": {
+  "addr": "0x801C3D64",
+  "section": ".text",
+  "size": "0xD8",
+  "src": "src/game/battle/battle_grid.c",
+  "status": "LIKELY"
+ },
+ "battleGridReplaceTrainer": {
+  "addr": "0x801C3F10",
+  "section": ".text",
+  "size": "0xAC",
+  "src": "src/game/battle/battle_grid.c",
+  "status": "LIKELY"
+ },
+ "billboardEffectStart": {
+  "addr": "0x8013FDD0",
+  "section": ".text",
+  "size": "0x13C",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "blurEffectStart": {
+  "addr": "0x8013DDCC",
+  "section": ".text",
+  "size": "0xA0",
+  "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
  "cb": {
@@ -1698,6 +3350,13 @@
   "section": ".text",
   "size": "0xE4",
   "src": "src/dolphin/dvd/DVD.c",
+  "status": "KNOWN"
+ },
+ "charNameBiosGetHearFlag": {
+  "addr": "0x80261444",
+  "section": ".text",
+  "size": "0x70",
+  "src": "src/game/colosseum_battle.c",
   "status": "KNOWN"
  },
  "ddh_cc_close": {
@@ -1770,11 +3429,39 @@
   "src": "src/trk/ddh_cc.c",
   "status": "KNOWN"
  },
+ "distortionEffectStart": {
+  "addr": "0x8013F344",
+  "section": ".text",
+  "size": "0xCC",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
  "double2hex": {
   "addr": "0x800C9878",
   "section": ".text",
   "size": "0x338",
   "src": "src/crt/printf.c",
+  "status": "KNOWN"
+ },
+ "electronStartEffect": {
+  "addr": "0x80139820",
+  "section": ".text",
+  "size": "0x78",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "envMapEffectInit": {
+  "addr": "0x8013D804",
+  "section": ".text",
+  "size": "0x104",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "envMapEffectStart": {
+  "addr": "0x8013D908",
+  "section": ".text",
+  "size": "0x7C",
+  "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
  "exit": {
@@ -1784,11 +3471,53 @@
   "src": "src/crt/exit.c",
   "status": "KNOWN"
  },
+ "fflush": {
+  "addr": "0x800C7904",
+  "section": ".text",
+  "size": "0x138",
+  "src": "src/crt/stdio.c",
+  "status": "KNOWN"
+ },
+ "filterStart": {
+  "addr": "0x8013B158",
+  "section": ".text",
+  "size": "0x110",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
  "float2str": {
   "addr": "0x800C9030",
   "section": ".text",
   "size": "0x71C",
   "src": "src/crt/printf.c",
+  "status": "KNOWN"
+ },
+ "floorEventChangeTresure": {
+  "addr": "0x80115E04",
+  "section": ".text",
+  "size": "0x68",
+  "src": "src/game/gs_field_world.c",
+  "status": "KNOWN"
+ },
+ "floorReadCameraPreFunc": {
+  "addr": "0x80114948",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/game/gs_field_resource.c",
+  "status": "KNOWN"
+ },
+ "floorReadMapPreFunc": {
+  "addr": "0x80114CA8",
+  "section": ".text",
+  "size": "0x70",
+  "src": "src/game/gs_field_world.c",
+  "status": "KNOWN"
+ },
+ "floorUpdateFieldCamera": {
+  "addr": "0x80117514",
+  "section": ".text",
+  "size": "0x1B4",
+  "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  },
  "fn_80003458": {
@@ -3202,13 +4931,6 @@
   "addr": "0x800114A4",
   "section": ".text",
   "size": "0x25C",
-  "src": "src/game/gs_npc_interact.c",
-  "status": "LIKELY"
- },
- "menuFightCloseWaza": {
-  "addr": "0x80011700",
-  "section": ".text",
-  "size": "0xBC",
   "src": "src/game/gs_npc_interact.c",
   "status": "LIKELY"
  },
@@ -10156,13 +11878,6 @@
   "src": null,
   "status": "GAP"
  },
- "menuPokeCouponInit": {
-  "addr": "0x8007C2C0",
-  "section": ".text",
-  "size": "0x40",
-  "src": "src/game/menu/menu_pokecoupon.c",
-  "status": "KNOWN"
- },
  "fn_8007C300": {
   "addr": "0x8007C300",
   "section": ".text",
@@ -10268,19 +11983,12 @@
   "src": "src/game/menu/menu_carde_matrix.c",
   "status": "LIKELY"
  },
- "menuCardE_CompareEntryPtrs": {
-  "addr": "0x8007FD64",
-  "section": ".text",
-  "size": "0x58",
-  "src": "src/game/menu/menu_carde_main.c",
-  "status": "LIKELY"
- },
  "fn_8007FDBC": {
   "addr": "0x8007FDBC",
   "section": ".text",
   "size": "0x554",
-  "src": "src/game/menu/menu_carde_main.c",
-  "status": "LIKELY"
+  "src": null,
+  "status": "GAP"
  },
  "fn_80080310": {
   "addr": "0x80080310",
@@ -11668,13 +13376,6 @@
   "src": null,
   "status": "GAP"
  },
- "OSLink": {
-  "addr": "0x8009E7B0",
-  "section": ".text",
-  "size": "0x2BC",
-  "src": null,
-  "status": "GAP"
- },
  "fn_8009EA6C": {
   "addr": "0x8009EA6C",
   "section": ".text",
@@ -11693,13 +13394,6 @@
   "addr": "0x8009ED70",
   "section": ".text",
   "size": "0x3C",
-  "src": null,
-  "status": "GAP"
- },
- "OSUnlink": {
-  "addr": "0x8009EDAC",
-  "section": ".text",
-  "size": "0x238",
   "src": null,
   "status": "GAP"
  },
@@ -12050,13 +13744,6 @@
   "addr": "0x800A2C58",
   "section": ".text",
   "size": "0x1C",
-  "src": "src/dolphin/db/DB.c",
-  "status": "KNOWN"
- },
- "fn_800A2C74": {
-  "addr": "0x800A2C74",
-  "section": ".text",
-  "size": "0x48",
   "src": "src/dolphin/db/DB.c",
   "status": "KNOWN"
  },
@@ -12414,92 +14101,85 @@
   "addr": "0x800A4D28",
   "section": ".text",
   "size": "0x2F4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A501C": {
   "addr": "0x800A501C",
   "section": ".text",
   "size": "0xC8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A50E4": {
   "addr": "0x800A50E4",
   "section": ".text",
   "size": "0x24",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5108": {
   "addr": "0x800A5108",
   "section": ".text",
   "size": "0x160",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5268": {
   "addr": "0x800A5268",
   "section": ".text",
   "size": "0xC4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A532C": {
   "addr": "0x800A532C",
   "section": ".text",
   "size": "0xC0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A53EC": {
   "addr": "0x800A53EC",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A541C": {
   "addr": "0x800A541C",
   "section": ".text",
   "size": "0x118",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5534": {
   "addr": "0x800A5534",
   "section": ".text",
   "size": "0x24",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5558": {
   "addr": "0x800A5558",
   "section": ".text",
   "size": "0x98",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A55F0": {
   "addr": "0x800A55F0",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5620": {
   "addr": "0x800A5620",
   "section": ".text",
   "size": "0x4",
-  "src": null,
-  "status": "GAP"
- },
- "stateReadingFST": {
-  "addr": "0x800A56F0",
-  "section": ".text",
-  "size": "0x94",
-  "src": "src/dolphin/dvd/DVD.c",
-  "status": "KNOWN"
+  "src": "src/dolphin/dvd/DVDFs.c",
+  "status": "LIKELY"
  },
  "fn_800A5784": {
   "addr": "0x800A5784",
@@ -12708,13 +14388,6 @@
   "addr": "0x800A7880",
   "section": ".text",
   "size": "0x27C",
-  "src": null,
-  "status": "GAP"
- },
- "fn_800A7AFC": {
-  "addr": "0x800A7AFC",
-  "section": ".text",
-  "size": "0xAC",
   "src": null,
   "status": "GAP"
  },
@@ -12939,13 +14612,6 @@
   "addr": "0x800AA7FC",
   "section": ".text",
   "size": "0xD8",
-  "src": "src/dolphin/vi/VI.c",
-  "status": "KNOWN"
- },
- "fn_800AA8D4": {
-  "addr": "0x800AA8D4",
-  "section": ".text",
-  "size": "0x32C",
   "src": "src/dolphin/vi/VI.c",
   "status": "KNOWN"
  },
@@ -15140,13 +16806,6 @@
   "src": "src/trk/TRKNub.c",
   "status": "KNOWN"
  },
- "MessageSend": {
-  "addr": "0x800BE800",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/trk/TRKNub.c",
-  "status": "KNOWN"
- },
  "fn_800BE844": {
   "addr": "0x800BE844",
   "section": ".text",
@@ -15284,13 +16943,6 @@
   "addr": "0x800BF8AC",
   "section": ".text",
   "size": "0xB0",
-  "src": "src/trk/TRKDispatch.c",
-  "status": "KNOWN"
- },
- "SendACK": {
-  "addr": "0x800BF95C",
-  "section": ".text",
-  "size": "0x290",
   "src": "src/trk/TRKDispatch.c",
   "status": "KNOWN"
  },
@@ -15508,20 +17160,6 @@
   "addr": "0x800C1548",
   "section": ".text",
   "size": "0x10",
-  "src": "src/trk/TRKTarget.c",
-  "status": "KNOWN"
- },
- "TRKTargetStepOutOfRange": {
-  "addr": "0x800C1558",
-  "section": ".text",
-  "size": "0xB8",
-  "src": "src/trk/TRKTarget.c",
-  "status": "KNOWN"
- },
- "TRKTargetSingleStep": {
-  "addr": "0x800C1610",
-  "section": ".text",
-  "size": "0xAC",
   "src": "src/trk/TRKTarget.c",
   "status": "KNOWN"
  },
@@ -15767,49 +17405,42 @@
   "addr": "0x800C4928",
   "section": ".text",
   "size": "0x138",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4B44": {
   "addr": "0x800C4B44",
   "section": ".text",
   "size": "0x10C",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C50": {
   "addr": "0x800C4C50",
   "section": ".text",
   "size": "0x24",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C74": {
   "addr": "0x800C4C74",
   "section": ".text",
   "size": "0x24",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4C98": {
   "addr": "0x800C4C98",
   "section": ".text",
   "size": "0x28",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4CC0": {
   "addr": "0x800C4CC0",
   "section": ".text",
   "size": "0xCC",
-  "src": "src/crt/math_longlong.c",
-  "status": "LIKELY"
- },
- "__sys_free": {
-  "addr": "0x800C4D8C",
-  "section": ".text",
-  "size": "0xB8",
-  "src": "src/crt/math_longlong.c",
+  "src": "src/crt/longlong.c",
   "status": "LIKELY"
  },
  "fn_800C4F34": {
@@ -15879,13 +17510,6 @@
   "addr": "0x800C7558",
   "section": ".text",
   "size": "0x24",
-  "src": "src/crt/stdio.c",
-  "status": "KNOWN"
- },
- "fn_800C7904": {
-  "addr": "0x800C7904",
-  "section": ".text",
-  "size": "0x138",
   "src": "src/crt/stdio.c",
   "status": "KNOWN"
  },
@@ -16012,13 +17636,6 @@
   "addr": "0x800CA924",
   "section": ".text",
   "size": "0x44",
-  "src": "src/crt/string.c",
-  "status": "KNOWN"
- },
- "fn_800CA968": {
-  "addr": "0x800CA968",
-  "section": ".text",
-  "size": "0xB8",
   "src": "src/crt/string.c",
   "status": "KNOWN"
  },
@@ -16638,80 +18255,10 @@
   "src": null,
   "status": "GAP"
  },
- "GScameraGetAnimFrame": {
-  "addr": "0x800D172C",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraHasAnimationEnded": {
-  "addr": "0x800D1734",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraStopAnimation": {
-  "addr": "0x800D173C",
-  "section": ".text",
-  "size": "0x5C",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraStartAnimation": {
-  "addr": "0x800D1798",
-  "section": ".text",
-  "size": "0xC0",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800D1858": {
   "addr": "0x800D1858",
   "section": ".text",
   "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetAnimFrame": {
-  "addr": "0x800D1860",
-  "section": ".text",
-  "size": "0x9C",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetAnimRate": {
-  "addr": "0x800D18FC",
-  "section": ".text",
-  "size": "0x88",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetAnimIndex": {
-  "addr": "0x800D1984",
-  "section": ".text",
-  "size": "0xB4",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraIsAnimating": {
-  "addr": "0x800D1A38",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetDistanceVector": {
-  "addr": "0x800D1A40",
-  "section": ".text",
-  "size": "0x30",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetProjMatrixPtr": {
-  "addr": "0x800D1A70",
-  "section": ".text",
-  "size": "0xCC",
   "src": null,
   "status": "GAP"
  },
@@ -16729,62 +18276,6 @@
   "src": null,
   "status": "GAP"
  },
- "GScameraGetLookAt": {
-  "addr": "0x800D1EB8",
-  "section": ".text",
-  "size": "0x4C",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraLookAt": {
-  "addr": "0x800D1F04",
-  "section": ".text",
-  "size": "0x54",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetRotation": {
-  "addr": "0x800D1F58",
-  "section": ".text",
-  "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetPosition": {
-  "addr": "0x800D1F84",
-  "section": ".text",
-  "size": "0x58",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetPerspective": {
-  "addr": "0x800D1FDC",
-  "section": ".text",
-  "size": "0x60",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetRotation": {
-  "addr": "0x800D203C",
-  "section": ".text",
-  "size": "0x40",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetPosition": {
-  "addr": "0x800D207C",
-  "section": ".text",
-  "size": "0x50",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraSetPerspective": {
-  "addr": "0x800D20CC",
-  "section": ".text",
-  "size": "0x84",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800D2150": {
   "addr": "0x800D2150",
   "section": ".text",
@@ -16792,24 +18283,10 @@
   "src": null,
   "status": "GAP"
  },
- "GScameraSetViewport": {
-  "addr": "0x800D21C8",
-  "section": ".text",
-  "size": "0x80",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800D2248": {
   "addr": "0x800D2248",
   "section": ".text",
   "size": "0x33C",
-  "src": null,
-  "status": "GAP"
- },
- "GScameraGetActiveCamera": {
-  "addr": "0x800D2584",
-  "section": ".text",
-  "size": "0x8",
   "src": null,
   "status": "GAP"
  },
@@ -18094,20 +19571,6 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "GSgfxEndBackFBCapture": {
-  "addr": "0x800DC298",
-  "section": ".text",
-  "size": "0xF8",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
- "GSgfxBeginBackFBCapture": {
-  "addr": "0x800DC390",
-  "section": ".text",
-  "size": "0x1B0",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800DC540": {
   "addr": "0x800DC540",
   "section": ".text",
@@ -18234,13 +19697,6 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "GSlightSetType": {
-  "addr": "0x800DCCF0",
-  "section": ".text",
-  "size": "0xA8",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800DCD98": {
   "addr": "0x800DCD98",
   "section": ".text",
@@ -18273,13 +19729,6 @@
   "addr": "0x800DD128",
   "section": ".text",
   "size": "0x4C",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
- "fn_800DD174": {
-  "addr": "0x800DD174",
-  "section": ".text",
-  "size": "0xFC",
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
@@ -18444,24 +19893,10 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "GSmaterialSetPEdescr": {
-  "addr": "0x800DF498",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800DF504": {
   "addr": "0x800DF504",
   "section": ".text",
   "size": "0x4C",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
- "GSmaterialSetFlags": {
-  "addr": "0x800DF550",
-  "section": ".text",
-  "size": "0xB8",
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
@@ -18472,13 +19907,6 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "fn_800DF7A4": {
-  "addr": "0x800DF7A4",
-  "section": ".text",
-  "size": "0xB0",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800DF854": {
   "addr": "0x800DF854",
   "section": ".text",
@@ -18486,24 +19914,10 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "_GSmaterialObjInit_800EF33C": {
-  "addr": "0x800DF8CC",
-  "section": ".text",
-  "size": "0x64",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800DF930": {
   "addr": "0x800DF930",
   "section": ".text",
   "size": "0x18C",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
- "_matGSmatEnableEnvMapExt": {
-  "addr": "0x800DFABC",
-  "section": ".text",
-  "size": "0x3DC",
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
@@ -18829,13 +20243,6 @@
   "src": "src/game/gs_render.c",
   "status": "KNOWN"
  },
- "GSbezierCalculateVector": {
-  "addr": "0x800E07E4",
-  "section": ".text",
-  "size": "0x128",
-  "src": "src/game/gs_render.c",
-  "status": "KNOWN"
- },
  "fn_800E090C": {
   "addr": "0x800E090C",
   "section": ".text",
@@ -19039,150 +20446,10 @@
   "src": null,
   "status": "GAP"
  },
- "GSmaterialGetPoolCount": {
-  "addr": "0x800E3B3C",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetShadowFlag": {
-  "addr": "0x800E3B44",
-  "section": ".text",
-  "size": "0x28",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialFindByMObj": {
-  "addr": "0x800E3B6C",
-  "section": ".text",
-  "size": "0x54",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800E3BC0": {
   "addr": "0x800E3BC0",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetUserData": {
-  "addr": "0x800E3BF0",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetTexture": {
-  "addr": "0x800E3BF8",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetUserData": {
-  "addr": "0x800E3C00",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetTexture": {
-  "addr": "0x800E3C08",
-  "section": ".text",
-  "size": "0x54",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetTransformPtr": {
-  "addr": "0x800E3C5C",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialHasTransform": {
-  "addr": "0x800E3C64",
-  "section": ".text",
-  "size": "0x30",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetCustomPEFlag": {
-  "addr": "0x800E3C94",
-  "section": ".text",
-  "size": "0x28",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetTexStage": {
-  "addr": "0x800E3CBC",
-  "section": ".text",
-  "size": "0xC",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetEnvMapFlag": {
-  "addr": "0x800E3CC8",
-  "section": ".text",
-  "size": "0x28",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetSpecularPtr": {
-  "addr": "0x800E3CF0",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetAmbientPtr": {
-  "addr": "0x800E3CF8",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialGetDiffusePtr": {
-  "addr": "0x800E3D00",
-  "section": ".text",
-  "size": "0x8",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialIsActive": {
-  "addr": "0x800E3D08",
-  "section": ".text",
-  "size": "0xC",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialLerpPEColor": {
-  "addr": "0x800E3D14",
-  "section": ".text",
-  "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialLerpSpecular": {
-  "addr": "0x800E3D40",
-  "section": ".text",
-  "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialLerpAmbient": {
-  "addr": "0x800E3D6C",
-  "section": ".text",
-  "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialLerpDiffuse": {
-  "addr": "0x800E3D98",
-  "section": ".text",
-  "size": "0x2C",
   "src": null,
   "status": "GAP"
  },
@@ -19529,20 +20796,6 @@
   "src": null,
   "status": "GAP"
  },
- "GSmaterialSetCallback": {
-  "addr": "0x800E8F68",
-  "section": ".text",
-  "size": "0xC",
-  "src": null,
-  "status": "GAP"
- },
- "GSmaterialSetDistanceThreshold": {
-  "addr": "0x800E8F74",
-  "section": ".text",
-  "size": "0xC",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800E8F80": {
   "addr": "0x800E8F80",
   "section": ".text",
@@ -19652,13 +20905,6 @@
   "addr": "0x800E9E90",
   "section": ".text",
   "size": "0x77C",
-  "src": null,
-  "status": "GAP"
- },
- "fn_800EA60C": {
-  "addr": "0x800EA60C",
-  "section": ".text",
-  "size": "0x58",
   "src": null,
   "status": "GAP"
  },
@@ -19886,13 +21132,6 @@
   "src": null,
   "status": "GAP"
  },
- "GSmodelGetAnimFrame": {
-  "addr": "0x800EC53C",
-  "section": ".text",
-  "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800EC568": {
   "addr": "0x800EC568",
   "section": ".text",
@@ -20082,13 +21321,6 @@
   "src": null,
   "status": "GAP"
  },
- "_modelGetEndFrame": {
-  "addr": "0x800EE08C",
-  "section": ".text",
-  "size": "0x5C",
-  "src": null,
-  "status": "GAP"
- },
  "fn_800EE0E8": {
   "addr": "0x800EE0E8",
   "section": ".text",
@@ -20212,13 +21444,6 @@
   "addr": "0x800EEA6C",
   "section": ".text",
   "size": "0x2C",
-  "src": null,
-  "status": "GAP"
- },
- "GSscratchStore": {
-  "addr": "0x800EEA98",
-  "section": ".text",
-  "size": "0x9C",
   "src": null,
   "status": "GAP"
  },
@@ -20369,27 +21594,6 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "threadLoadGPRRegisters": {
-  "addr": "0x800F0030",
-  "section": ".text",
-  "size": "0x90",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
- "threadLoadFPRRegisters": {
-  "addr": "0x800F00C0",
-  "section": ".text",
-  "size": "0x9C",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
- "threadSaveGPRRegisters": {
-  "addr": "0x800F015C",
-  "section": ".text",
-  "size": "0x94",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
  "fn_800F01F0": {
   "addr": "0x800F01F0",
   "section": ".text",
@@ -20397,24 +21601,10 @@
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
- "threadExecute": {
-  "addr": "0x800F028C",
-  "section": ".text",
-  "size": "0x68",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
  "fn_800F02F4": {
   "addr": "0x800F02F4",
   "section": ".text",
   "size": "0x14",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
- "_threadSwitch": {
-  "addr": "0x800F0308",
-  "section": ".text",
-  "size": "0x64",
   "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
@@ -20514,13 +21704,6 @@
   "section": ".text",
   "size": "0x154",
   "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
- "GSthread": {
-  "addr": "0x800F09D8",
-  "section": ".text",
-  "size": "0x9C",
-  "src": "src/game/gs_thread.c",
   "status": "KNOWN"
  },
  "fn_800F0A74": {
@@ -21804,13 +22987,6 @@
   "src": "src/game/gs_model.c",
   "status": "KNOWN"
  },
- "menuCloseSync": {
-  "addr": "0x80102428",
-  "section": ".text",
-  "size": "0x98",
-  "src": "src/game/gs_model.c",
-  "status": "KNOWN"
- },
  "fn_801024C0": {
   "addr": "0x801024C0",
   "section": ".text",
@@ -22497,13 +23673,6 @@
   "src": "src/game/gs_model.c",
   "status": "KNOWN"
  },
- "menuModelSetMotion": {
-  "addr": "0x80109894",
-  "section": ".text",
-  "size": "0xA0",
-  "src": "src/game/gs_model.c",
-  "status": "KNOWN"
- },
  "fn_80109934": {
   "addr": "0x80109934",
   "section": ".text",
@@ -22837,13 +24006,6 @@
   "addr": "0x8010D20C",
   "section": ".text",
   "size": "0x1BC",
-  "src": "src/game/gs_colsys.c",
-  "status": "KNOWN"
- },
- "fn_8010D3C8": {
-  "addr": "0x8010D3C8",
-  "section": ".text",
-  "size": "0x50C",
   "src": "src/game/gs_colsys.c",
   "status": "KNOWN"
  },
@@ -23810,13 +24972,6 @@
   "addr": "0x80115D64",
   "section": ".text",
   "size": "0xA0",
-  "src": "src/game/gs_field_world.c",
-  "status": "KNOWN"
- },
- "floorEventChangeTresure": {
-  "addr": "0x80115E04",
-  "section": ".text",
-  "size": "0x68",
   "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  },
@@ -30197,13 +31352,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "_lightningRenderMain": {
-  "addr": "0x8013814C",
-  "section": ".text",
-  "size": "0x4E4",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_80138630": {
   "addr": "0x80138630",
   "section": ".text",
@@ -30239,13 +31387,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "leaffxStartEffect": {
-  "addr": "0x80138B00",
-  "section": ".text",
-  "size": "0x74",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_80138B74": {
   "addr": "0x80138B74",
   "section": ".text",
@@ -30278,20 +31419,6 @@
   "addr": "0x80139074",
   "section": ".text",
   "size": "0x304",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "_leaffxGenerateLeafData": {
-  "addr": "0x80139378",
-  "section": ".text",
-  "size": "0x4A8",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "electronStartEffect": {
-  "addr": "0x80139820",
-  "section": ".text",
-  "size": "0x78",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
@@ -30421,13 +31548,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "fn_8013B158": {
-  "addr": "0x8013B158",
-  "section": ".text",
-  "size": "0x110",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013B268": {
   "addr": "0x8013B268",
   "section": ".text",
@@ -30453,13 +31573,6 @@
   "addr": "0x8013B558",
   "section": ".text",
   "size": "0x8C",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "surfEffectStart": {
-  "addr": "0x8013B5E4",
-  "section": ".text",
-  "size": "0x278",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
@@ -30519,13 +31632,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "seaEffectStart": {
-  "addr": "0x8013C718",
-  "section": ".text",
-  "size": "0x330",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013CA48": {
   "addr": "0x8013CA48",
   "section": ".text",
@@ -30582,20 +31688,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "envMapEffectInit": {
-  "addr": "0x8013D804",
-  "section": ".text",
-  "size": "0x104",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "envMapEffectStart": {
-  "addr": "0x8013D908",
-  "section": ".text",
-  "size": "0x7C",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013D984": {
   "addr": "0x8013D984",
   "section": ".text",
@@ -30635,13 +31727,6 @@
   "addr": "0x8013DD7C",
   "section": ".text",
   "size": "0x50",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "blurEffectStart": {
-  "addr": "0x8013DDCC",
-  "section": ".text",
-  "size": "0xA0",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
@@ -30687,13 +31772,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "auraEffectStart": {
-  "addr": "0x8013E658",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013E6C4": {
   "addr": "0x8013E6C4",
   "section": ".text",
@@ -30736,13 +31814,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "distortionEffectStart": {
-  "addr": "0x8013F344",
-  "section": ".text",
-  "size": "0xCC",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013F410": {
   "addr": "0x8013F410",
   "section": ".text",
@@ -30754,20 +31825,6 @@
   "addr": "0x8013F80C",
   "section": ".text",
   "size": "0x170",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "_distortionEffectUpdateMatrices": {
-  "addr": "0x8013F97C",
-  "section": ".text",
-  "size": "0x264",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
- "patchiruTextureStart": {
-  "addr": "0x8013FBE0",
-  "section": ".text",
-  "size": "0x78",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
@@ -30792,13 +31849,6 @@
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
  },
- "billboardEffectStart": {
-  "addr": "0x8013FDD0",
-  "section": ".text",
-  "size": "0x13C",
-  "src": "src/game/effect/effect_visual.c",
-  "status": "KNOWN"
- },
  "fn_8013FF0C": {
   "addr": "0x8013FF0C",
   "section": ".text",
@@ -30819,13 +31869,6 @@
   "size": "0x11C",
   "src": "src/game/effect/effect_visual.c",
   "status": "KNOWN"
- },
- "_pachiruEffectCreateTexture__FP9GStextureP9GStextureUl": {
-  "addr": "0x801402AC",
-  "section": ".text",
-  "size": "0x2DC",
-  "src": null,
-  "status": "GAP"
  },
  "fn_80140588": {
   "addr": "0x80140588",
@@ -32213,13 +33256,6 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "peopleFieldCompare8ByteTableKey": {
-  "addr": "0x801522E0",
-  "section": ".text",
-  "size": "0x10",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
  "fn_801522F0": {
   "addr": "0x801522F0",
   "section": ".text",
@@ -32231,13 +33267,6 @@
   "addr": "0x8015234C",
   "section": ".text",
   "size": "0x5C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldCompare12ByteTableKey": {
-  "addr": "0x801523A8",
-  "section": ".text",
-  "size": "0x10",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -33235,83 +34264,6 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "peopleFieldMotionResolveInput23C": {
-  "addr": "0x8016161C",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput260": {
-  "addr": "0x80161664",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput284": {
-  "addr": "0x801616AC",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput2A8": {
-  "addr": "0x801616F4",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput2CC": {
-  "addr": "0x8016173C",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput2F0": {
-  "addr": "0x80161784",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput338": {
-  "addr": "0x801617CC",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput35C": {
-  "addr": "0x80161814",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput380": {
-  "addr": "0x8016185C",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput3A4": {
-  "addr": "0x801618A4",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "peopleFieldMotionResolveInput3C8": {
-  "addr": "0x801618EC",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
  "fn_80161934": {
   "addr": "0x80161934",
   "section": ".text",
@@ -33361,13 +34313,6 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "sndSin": {
-  "addr": "0x8016208C",
-  "section": ".text",
-  "size": "0x8C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
  "fn_80162118": {
   "addr": "0x80162118",
   "section": ".text",
@@ -33379,13 +34324,6 @@
   "addr": "0x801621BC",
   "section": ".text",
   "size": "0x10",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "sndConvertTicks": {
-  "addr": "0x801621CC",
-  "section": ".text",
-  "size": "0x48",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -33407,13 +34345,6 @@
   "addr": "0x80162370",
   "section": ".text",
   "size": "0xB8",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "hwExit": {
-  "addr": "0x80162428",
-  "section": ".text",
-  "size": "0x34",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -33512,13 +34443,6 @@
   "addr": "0x801628C8",
   "section": ".text",
   "size": "0x3C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "hwKeyOff": {
-  "addr": "0x80162904",
-  "section": ".text",
-  "size": "0x28",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -33886,38 +34810,10 @@
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
- "salGetStartDelay": {
-  "addr": "0x801642AC",
-  "section": ".text",
-  "size": "0x4C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "hwInitIrq": {
-  "addr": "0x801642F8",
-  "section": ".text",
-  "size": "0x2C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
  "fn_80164324": {
   "addr": "0x80164324",
   "section": ".text",
   "size": "0x4",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "hwEnableIrq": {
-  "addr": "0x80164328",
-  "section": ".text",
-  "size": "0x38",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "hwDisableIrq": {
-  "addr": "0x80164360",
-  "section": ".text",
-  "size": "0x38",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -33946,27 +34842,6 @@
   "addr": "0x80164400",
   "section": ".text",
   "size": "0x2C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "sndAuxCallbackReverbHI": {
-  "addr": "0x8016442C",
-  "section": ".text",
-  "size": "0x5C",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "sndAuxCallbackUpdateSettingsReverbHI": {
-  "addr": "0x80164488",
-  "section": ".text",
-  "size": "0x58",
-  "src": "src/game/people/people_field.c",
-  "status": "KNOWN"
- },
- "sndAuxCallbackPrepareReverbHI": {
-  "addr": "0x801644E0",
-  "section": ".text",
-  "size": "0x40",
   "src": "src/game/people/people_field.c",
   "status": "KNOWN"
  },
@@ -34100,13 +34975,6 @@
   "addr": "0x801657D0",
   "section": ".text",
   "size": "0x28",
-  "src": "src/game/sound/sound.c",
-  "status": "KNOWN"
- },
- "soundStop": {
-  "addr": "0x801657F8",
-  "section": ".text",
-  "size": "0x104",
   "src": "src/game/sound/sound.c",
   "status": "KNOWN"
  },
@@ -34446,13 +35314,6 @@
   "src": "src/game/gs_dvd.c",
   "status": "KNOWN"
  },
- "fn_80167318": {
-  "addr": "0x80167318",
-  "section": ".text",
-  "size": "0x64",
-  "src": "src/game/gs_dvd.c",
-  "status": "KNOWN"
- },
  "fn_8016737C": {
   "addr": "0x8016737C",
   "section": ".text",
@@ -34604,13 +35465,6 @@
   "addr": "0x80167BB0",
   "section": ".text",
   "size": "0x38",
-  "src": "src/game/gs_dvd.c",
-  "status": "KNOWN"
- },
- "_gsdvdErrorTask_801879AC": {
-  "addr": "0x80167BE8",
-  "section": ".text",
-  "size": "0x148",
   "src": "src/game/gs_dvd.c",
   "status": "KNOWN"
  },
@@ -34803,20 +35657,6 @@
   "src": "src/game/gs_dvd.c",
   "status": "KNOWN"
  },
- "_psListGetFirst": {
-  "addr": "0x80168C64",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/game/script/pslist.c",
-  "status": "KNOWN"
- },
- "_psListDelete": {
-  "addr": "0x80168CD0",
-  "section": ".text",
-  "size": "0xDC",
-  "src": "src/game/script/pslist.c",
-  "status": "KNOWN"
- },
  "fn_80168DAC": {
   "addr": "0x80168DAC",
   "section": ".text",
@@ -34943,20 +35783,6 @@
   "src": null,
   "status": "GAP"
  },
- "psSetPointJObjNodup": {
-  "addr": "0x8016972C",
-  "section": ".text",
-  "size": "0xD4",
-  "src": null,
-  "status": "GAP"
- },
- "psSetPointJObj": {
-  "addr": "0x80169800",
-  "section": ".text",
-  "size": "0xF8",
-  "src": null,
-  "status": "GAP"
- },
  "fn_801698F8": {
   "addr": "0x801698F8",
   "section": ".text",
@@ -34996,13 +35822,6 @@
   "addr": "0x8016A01C",
   "section": ".text",
   "size": "0x160",
-  "src": null,
-  "status": "GAP"
- },
- "psInitDataBank": {
-  "addr": "0x8016A17C",
-  "section": ".text",
-  "size": "0x154",
   "src": null,
   "status": "GAP"
  },
@@ -35167,13 +35986,6 @@
   "src": null,
   "status": "GAP"
  },
- "psInterpretParticles": {
-  "addr": "0x8016F430",
-  "section": ".text",
-  "size": "0xD0",
-  "src": "src/game/script/psinterpret.c",
-  "status": "KNOWN"
- },
  "fn_8016F500": {
   "addr": "0x8016F500",
   "section": ".text",
@@ -35251,20 +36063,6 @@
   "src": null,
   "status": "GAP"
  },
- "applyForceJObj": {
-  "addr": "0x80172BBC",
-  "section": ".text",
-  "size": "0x144",
-  "src": null,
-  "status": "GAP"
- },
- "setVelToJObj": {
-  "addr": "0x80172D00",
-  "section": ".text",
-  "size": "0x2A8",
-  "src": null,
-  "status": "GAP"
- },
  "fn_80172FA8": {
   "addr": "0x80172FA8",
   "section": ".text",
@@ -35293,33 +36091,12 @@
   "src": null,
   "status": "GAP"
  },
- "psSetBillboardCamera": {
-  "addr": "0x80173624",
-  "section": ".text",
-  "size": "0xF4",
-  "src": null,
-  "status": "GAP"
- },
  "fn_80173718": {
   "addr": "0x80173718",
   "section": ".text",
   "size": "0x880",
   "src": null,
   "status": "GAP"
- },
- "psExecGenerator": {
-  "addr": "0x80173F98",
-  "section": ".text",
-  "size": "0x2B4",
-  "src": null,
-  "status": "GAP"
- },
- "generateParticle_801947D4": {
-  "addr": "0x8017424C",
-  "section": ".text",
-  "size": "0x14E0",
-  "src": "src/game/effect/generator.c",
-  "status": "KNOWN"
  },
  "fn_8017572C": {
   "addr": "0x8017572C",
@@ -35353,13 +36130,6 @@
   "addr": "0x80175DF0",
   "section": ".text",
   "size": "0x98",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "genPosUpdate": {
-  "addr": "0x80175E88",
-  "section": ".text",
-  "size": "0xBC",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
@@ -35664,62 +36434,6 @@
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
- "GSscene_GetCameraRotationVector": {
-  "addr": "0x80177830",
-  "section": ".text",
-  "size": "0x28",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_SetCameraRotationVector": {
-  "addr": "0x80177858",
-  "section": ".text",
-  "size": "0x5C",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_GetCameraDirectionVector": {
-  "addr": "0x801778B4",
-  "section": ".text",
-  "size": "0x28",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_SetCameraDirectionVector": {
-  "addr": "0x801778DC",
-  "section": ".text",
-  "size": "0x2C",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_GetCameraPositionVector": {
-  "addr": "0x80177908",
-  "section": ".text",
-  "size": "0x28",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_SetCameraPositionVector": {
-  "addr": "0x80177930",
-  "section": ".text",
-  "size": "0x2C",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_GetCameraViewVector": {
-  "addr": "0x8017795C",
-  "section": ".text",
-  "size": "0x28",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_SetCameraViewVector": {
-  "addr": "0x80177984",
-  "section": ".text",
-  "size": "0x2C",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
  "fn_801779B0": {
   "addr": "0x801779B0",
   "section": ".text",
@@ -35738,20 +36452,6 @@
   "addr": "0x801779EC",
   "section": ".text",
   "size": "0x4C",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_GetMode": {
-  "addr": "0x80177A38",
-  "section": ".text",
-  "size": "0xC",
-  "src": "src/game/gs_scene.c",
-  "status": "KNOWN"
- },
- "GSscene_SetMode": {
-  "addr": "0x80177A44",
-  "section": ".text",
-  "size": "0x20",
   "src": "src/game/gs_scene.c",
   "status": "KNOWN"
  },
@@ -37554,13 +38254,6 @@
   "src": "src/game/gs_flag.c",
   "status": "KNOWN"
  },
- "GSflagInitBitPos": {
-  "addr": "0x80190C90",
-  "section": ".text",
-  "size": "0x1A4",
-  "src": "src/game/gs_flag.c",
-  "status": "KNOWN"
- },
  "fn_80190E34": {
   "addr": "0x80190E34",
   "section": ".text",
@@ -37631,108 +38324,10 @@
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
- "WObjAmnesia": {
-  "addr": "0x8019158C",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "WObjRelease": {
-  "addr": "0x801915D4",
-  "section": ".text",
-  "size": "0x54",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjAlloc": {
-  "addr": "0x80191628",
-  "section": ".text",
-  "size": "0x60",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
  "fn_80191688": {
   "addr": "0x80191688",
   "section": ".text",
   "size": "0x100",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjSetPosition": {
-  "addr": "0x80191788",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjLoadDesc": {
-  "addr": "0x801917D0",
-  "section": ".text",
-  "size": "0xCC",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjInit": {
-  "addr": "0x8019189C",
-  "section": ".text",
-  "size": "0xB0",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "WObjLoad": {
-  "addr": "0x8019194C",
-  "section": ".text",
-  "size": "0xA0",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjInterpretAnim": {
-  "addr": "0x801919EC",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "fn_80191A34": {
-  "addr": "0x80191A34",
-  "section": ".text",
-  "size": "0x398",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjAddAnim": {
-  "addr": "0x80191DCC",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjReqAnim": {
-  "addr": "0x80191E38",
-  "section": ".text",
-  "size": "0x50",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_WObjRemoveAnim": {
-  "addr": "0x80191E88",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_ArchiveGetPublicAddress": {
-  "addr": "0x80191ECC",
-  "section": ".text",
-  "size": "0x98",
-  "src": "src/hsd/hsd_wobj.c",
-  "status": "KNOWN"
- },
- "HSD_ArchiveParse": {
-  "addr": "0x80191F64",
-  "section": ".text",
-  "size": "0x180",
   "src": "src/hsd/hsd_wobj.c",
   "status": "KNOWN"
  },
@@ -37820,13 +38415,6 @@
   "src": "src/hsd/hsd_class.c",
   "status": "KNOWN"
  },
- "hsdInitClassInfo": {
-  "addr": "0x80193B30",
-  "section": ".text",
-  "size": "0xF4",
-  "src": "src/hsd/hsd_class.c",
-  "status": "KNOWN"
- },
  "fn_80193C24": {
   "addr": "0x80193C24",
   "section": ".text",
@@ -37876,108 +38464,10 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "HSD_CObjGetCurrent": {
-  "addr": "0x801942B8",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetOrtho": {
-  "addr": "0x801942C0",
-  "section": ".text",
-  "size": "0x5C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetPerspective": {
-  "addr": "0x8019431C",
-  "section": ".text",
-  "size": "0x3C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetOrtho": {
-  "addr": "0x80194358",
-  "section": ".text",
-  "size": "0x24",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetFrustum": {
-  "addr": "0x8019437C",
-  "section": ".text",
-  "size": "0x24",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetPerspective": {
-  "addr": "0x801943A0",
-  "section": ".text",
-  "size": "0x1C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetProjectionType": {
-  "addr": "0x801943BC",
-  "section": ".text",
-  "size": "0x10",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetProjectionType": {
-  "addr": "0x801943CC",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetViewportfx4": {
-  "addr": "0x801943E4",
-  "section": ".text",
-  "size": "0x1C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
  "fn_80194400": {
   "addr": "0x80194400",
   "section": ".text",
   "size": "0xA4",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetScissorx4": {
-  "addr": "0x801944A4",
-  "section": ".text",
-  "size": "0x1C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetFar": {
-  "addr": "0x801944C0",
-  "section": ".text",
-  "size": "0x10",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetFar": {
-  "addr": "0x801944D0",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetNear": {
-  "addr": "0x801944E8",
-  "section": ".text",
-  "size": "0x10",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetNear": {
-  "addr": "0x801944F8",
-  "section": ".text",
-  "size": "0x18",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
@@ -38009,20 +38499,6 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "HSD_CObjSetAspect": {
-  "addr": "0x80194788",
-  "section": ".text",
-  "size": "0x20",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetFov": {
-  "addr": "0x801947A8",
-  "section": ".text",
-  "size": "0x20",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
  "fn_801947C8": {
   "addr": "0x801947C8",
   "section": ".text",
@@ -38037,45 +38513,10 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "HSD_CObjGetViewingMtxPtr": {
-  "addr": "0x80194CC4",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetInvViewingMtxPtrDirect": {
-  "addr": "0x80194CF4",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetViewingMtx": {
-  "addr": "0x80194D60",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetMtxDirty": {
-  "addr": "0x80194D94",
-  "section": ".text",
-  "size": "0x10",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
  "fn_80194DA4": {
   "addr": "0x80194DA4",
   "section": ".text",
   "size": "0x32C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetUpVector": {
-  "addr": "0x801950D0",
-  "section": ".text",
-  "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
@@ -38090,41 +38531,6 @@
   "addr": "0x80195590",
   "section": ".text",
   "size": "0x204",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetEyeDistance": {
-  "addr": "0x80195794",
-  "section": ".text",
-  "size": "0x104",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetEyePosition": {
-  "addr": "0x80195898",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetEyePosition": {
-  "addr": "0x80195904",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjSetInterest": {
-  "addr": "0x80195970",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjGetInterest": {
-  "addr": "0x801959DC",
-  "section": ".text",
-  "size": "0x6C",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
@@ -38163,38 +38569,10 @@
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
- "HSD_CObjReqAnim": {
-  "addr": "0x80196698",
-  "section": ".text",
-  "size": "0x64",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjAnim": {
-  "addr": "0x801966FC",
-  "section": ".text",
-  "size": "0x50",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
  "fn_8019674C": {
   "addr": "0x8019674C",
   "section": ".text",
   "size": "0x3C4",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjAddAnim": {
-  "addr": "0x80196B10",
-  "section": ".text",
-  "size": "0xA8",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_CObjRemoveAnim": {
-  "addr": "0x80196BB8",
-  "section": ".text",
-  "size": "0x84",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
@@ -38216,20 +38594,6 @@
   "addr": "0x80196CE0",
   "section": ".text",
   "size": "0x98",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "HSD_Panic": {
-  "addr": "0x80196D78",
-  "section": ".text",
-  "size": "0x98",
-  "src": "src/hsd/hsd_cobj.c",
-  "status": "KNOWN"
- },
- "__assert": {
-  "addr": "0x80196E10",
-  "section": ".text",
-  "size": "0xA4",
   "src": "src/hsd/hsd_cobj.c",
   "status": "KNOWN"
  },
@@ -38387,20 +38751,6 @@
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "HSD_DObjCountVertices": {
-  "addr": "0x80199178",
-  "section": ".text",
-  "size": "0x80",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_DObjResolveRefsAll": {
-  "addr": "0x801991F8",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
  "fn_80199264": {
   "addr": "0x80199264",
   "section": ".text",
@@ -38419,48 +38769,6 @@
   "addr": "0x801993A4",
   "section": ".text",
   "size": "0x1C4",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_DObjAnimAll": {
-  "addr": "0x80199568",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_DObjReqAnimAllByFlags": {
-  "addr": "0x801995D4",
-  "section": ".text",
-  "size": "0x80",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_DObjAddAnimAll": {
-  "addr": "0x80199654",
-  "section": ".text",
-  "size": "0xB0",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_DObjSetCurrent": {
-  "addr": "0x80199704",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjFree": {
-  "addr": "0x8019970C",
-  "section": ".text",
-  "size": "0x2C",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjAlloc": {
-  "addr": "0x80199738",
-  "section": ".text",
-  "size": "0x5C",
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
@@ -38499,55 +38807,6 @@
   "src": "src/hsd/hsd_dobj.c",
   "status": "KNOWN"
  },
- "HSD_FObjStopAnimAll": {
-  "addr": "0x8019B490",
-  "section": ".text",
-  "size": "0x98",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjReqAnimAll": {
-  "addr": "0x8019B528",
-  "section": ".text",
-  "size": "0xC0",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjRemoveAll": {
-  "addr": "0x8019B5E8",
-  "section": ".text",
-  "size": "0x168",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjRemove": {
-  "addr": "0x8019B750",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjInitAllocData": {
-  "addr": "0x8019B784",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FObjGetAllocData": {
-  "addr": "0x8019B7B4",
-  "section": ".text",
-  "size": "0xC",
-  "src": "src/hsd/hsd_dobj.c",
-  "status": "KNOWN"
- },
- "HSD_FogAdjInit": {
-  "addr": "0x8019B7C0",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
  "fn_8019B808": {
   "addr": "0x8019B808",
   "section": ".text",
@@ -38583,59 +38842,10 @@
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
- "fn_8019BFE8": {
-  "addr": "0x8019BFE8",
-  "section": ".text",
-  "size": "0x110",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "_HSD_IDForgetMemory": {
-  "addr": "0x8019C0F8",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "HSD_IDGetDataFromTable": {
-  "addr": "0x8019C128",
-  "section": ".text",
-  "size": "0x88",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
  "fn_8019C1B0": {
   "addr": "0x8019C1B0",
   "section": ".text",
   "size": "0xB4",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "fn_8019C264": {
-  "addr": "0x8019C264",
-  "section": ".text",
-  "size": "0xF4",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "HSD_IDSetup": {
-  "addr": "0x8019C358",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "HSD_IDInitAllocData": {
-  "addr": "0x8019C388",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_fog.c",
-  "status": "KNOWN"
- },
- "HSD_IDGetAllocData": {
-  "addr": "0x8019C3B8",
-  "section": ".text",
-  "size": "0xC",
   "src": "src/hsd/hsd_fog.c",
   "status": "KNOWN"
  },
@@ -38681,38 +38891,10 @@
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
- "_HSD_MemCheckOwnDefaultCB": {
-  "addr": "0x8019C7B8",
-  "section": ".text",
-  "size": "0x28",
-  "src": "src/hsd/hsd_initialize.c",
-  "status": "KNOWN"
- },
  "fn_8019C7E0": {
   "addr": "0x8019C7E0",
   "section": ".text",
   "size": "0x74",
-  "src": "src/hsd/hsd_initialize.c",
-  "status": "KNOWN"
- },
- "_HSD_MemGetRemainDefaultCB": {
-  "addr": "0x8019C854",
-  "section": ".text",
-  "size": "0x48",
-  "src": "src/hsd/hsd_initialize.c",
-  "status": "KNOWN"
- },
- "_HSD_MemFreeDefaultCB": {
-  "addr": "0x8019C89C",
-  "section": ".text",
-  "size": "0x58",
-  "src": "src/hsd/hsd_initialize.c",
-  "status": "KNOWN"
- },
- "_HSD_MemAllocDefaultCB": {
-  "addr": "0x8019C8F4",
-  "section": ".text",
-  "size": "0x84",
   "src": "src/hsd/hsd_initialize.c",
   "status": "KNOWN"
  },
@@ -38923,27 +39105,6 @@
   "addr": "0x801A05EC",
   "section": ".text",
   "size": "0x158",
-  "src": "src/hsd/hsd_jobj.c",
-  "status": "KNOWN"
- },
- "HSD_JObjResolveRefsAll": {
-  "addr": "0x801A0744",
-  "section": ".text",
-  "size": "0x458",
-  "src": "src/hsd/hsd_jobj.c",
-  "status": "KNOWN"
- },
- "HSD_JObjRef": {
-  "addr": "0x801A0B9C",
-  "section": ".text",
-  "size": "0x54",
-  "src": "src/hsd/hsd_jobj.c",
-  "status": "KNOWN"
- },
- "HSD_IDGetData": {
-  "addr": "0x801A0BF0",
-  "section": ".text",
-  "size": "0x2C",
   "src": "src/hsd/hsd_jobj.c",
   "status": "KNOWN"
  },
@@ -39192,13 +39353,6 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "HSD_LObjAddAnimAll": {
-  "addr": "0x801A426C",
-  "section": ".text",
-  "size": "0xD8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
  "fn_801A4344": {
   "addr": "0x801A4344",
   "section": ".text",
@@ -39213,41 +39367,6 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "HSD_LObjGetInterest": {
-  "addr": "0x801A48B0",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjSetInterest": {
-  "addr": "0x801A48F4",
-  "section": ".text",
-  "size": "0x88",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetPosition": {
-  "addr": "0x801A497C",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjSetPosition": {
-  "addr": "0x801A49C0",
-  "section": ".text",
-  "size": "0x88",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjSetColor": {
-  "addr": "0x801A4A48",
-  "section": ".text",
-  "size": "0xC",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
  "fn_801A4A54": {
   "addr": "0x801A4A54",
   "section": ".text",
@@ -39255,31 +39374,10 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "HSD_LObjGetCurrentByType": {
-  "addr": "0x801A4AC4",
-  "section": ".text",
-  "size": "0x3C",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjDeleteCurrentAll": {
-  "addr": "0x801A4B00",
-  "section": ".text",
-  "size": "0x220",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
  "fn_801A4D20": {
   "addr": "0x801A4D20",
   "section": ".text",
   "size": "0x234",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjSetup": {
-  "addr": "0x801A4F54",
-  "section": ".text",
-  "size": "0xE78",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
@@ -39304,97 +39402,6 @@
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
  },
- "HSD_LObjReqAnimAll": {
-  "addr": "0x801A6370",
-  "section": ".text",
-  "size": "0x98",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjAnimAll": {
-  "addr": "0x801A6408",
-  "section": ".text",
-  "size": "0x8C",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "LObjUpdateFunc": {
-  "addr": "0x801A6494",
-  "section": ".text",
-  "size": "0x24C",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjRemoveAnimAll": {
-  "addr": "0x801A66E0",
-  "section": ".text",
-  "size": "0xAC",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetActiveByIndex": {
-  "addr": "0x801A678C",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetActiveByID": {
-  "addr": "0x801A67BC",
-  "section": ".text",
-  "size": "0x114",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetNbActive": {
-  "addr": "0x801A68D0",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetLightMaskSpecular": {
-  "addr": "0x801A68D8",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetLightMaskAlpha": {
-  "addr": "0x801A68E0",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetLightMaskAttnFunc": {
-  "addr": "0x801A68E8",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjGetLightMaskDiffuse": {
-  "addr": "0x801A68F0",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjClearFlags": {
-  "addr": "0x801A68F8",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
- "HSD_LObjSetFlags": {
-  "addr": "0x801A6910",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_lobj.c",
-  "status": "KNOWN"
- },
  "fn_801A6928": {
   "addr": "0x801A6928",
   "section": ".text",
@@ -39415,13 +39422,6 @@
   "size": "0x30",
   "src": "src/hsd/hsd_lobj.c",
   "status": "KNOWN"
- },
- "fn_801A69C0": {
-  "addr": "0x801A69C0",
-  "section": ".text",
-  "size": "0x74",
-  "src": null,
-  "status": "GAP"
  },
  "fn_801A6A34": {
   "addr": "0x801A6A34",
@@ -39465,13 +39465,6 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "HSD_MObjAddTObjNext": {
-  "addr": "0x801A6D5C",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
  "fn_801A6DA0": {
   "addr": "0x801A6DA0",
   "section": ".text",
@@ -39497,20 +39490,6 @@
   "addr": "0x801A6E00",
   "section": ".text",
   "size": "0x24",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjSetup": {
-  "addr": "0x801A6E24",
-  "section": ".text",
-  "size": "0x154",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "MObjSetupTev": {
-  "addr": "0x801A6F78",
-  "section": ".text",
-  "size": "0x78",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
@@ -39556,115 +39535,10 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "MObjUpdateFunc": {
-  "addr": "0x801A7E84",
-  "section": ".text",
-  "size": "0x4D0",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjReqAnimByFlags": {
-  "addr": "0x801A8354",
-  "section": ".text",
-  "size": "0x68",
-  "src": "src/hsd/hsd_mobj_ext.c",
-  "status": "KNOWN"
- },
  "fn_801A83BC": {
   "addr": "0x801A83BC",
   "section": ".text",
   "size": "0x6C",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjClearFlags": {
-  "addr": "0x801A8428",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjSetFlags": {
-  "addr": "0x801A8440",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjGetFlags": {
-  "addr": "0x801A8458",
-  "section": ".text",
-  "size": "0x18",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MObjSetCurrent": {
-  "addr": "0x801A8470",
-  "section": ".text",
-  "size": "0x8",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxInitAllocData": {
-  "addr": "0x801A8478",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxGetAllocData": {
-  "addr": "0x801A84A8",
-  "section": ".text",
-  "size": "0xC",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_VecInitAllocData": {
-  "addr": "0x801A84B4",
-  "section": ".text",
-  "size": "0x30",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_VecGetAllocData": {
-  "addr": "0x801A84E4",
-  "section": ".text",
-  "size": "0xC",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxFree": {
-  "addr": "0x801A84F0",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxAlloc": {
-  "addr": "0x801A8524",
-  "section": ".text",
-  "size": "0x4C",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_VecFree": {
-  "addr": "0x801A8570",
-  "section": ".text",
-  "size": "0x34",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_VecAlloc": {
-  "addr": "0x801A85A4",
-  "section": ".text",
-  "size": "0x4C",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxScaledAdd": {
-  "addr": "0x801A85F0",
-  "section": ".text",
-  "size": "0xC4",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
@@ -39693,13 +39567,6 @@
   "addr": "0x801A8D1C",
   "section": ".text",
   "size": "0x854",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_MtxGetTranslate": {
-  "addr": "0x801A9570",
-  "section": ".text",
-  "size": "0x1C",
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
@@ -39738,46 +39605,11 @@
   "src": "src/hsd/hsd_mobj.c",
   "status": "KNOWN"
  },
- "HSD_ObjFree": {
- "addr": "0x801AA498",
- "section": ".text",
- "size": "0x34",
-  "src": "src/hsd/hsd_pobj_disp.c",
- "status": "KNOWN"
-},
- "HSD_ObjAlloc": {
-  "addr": "0x801AA4CC",
-  "section": ".text",
-  "size": "0x6C",
-  "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_ObjSetHeap": {
- "addr": "0x801AA538",
- "section": ".text",
- "size": "0x30",
-  "src": "src/hsd/hsd_pobj_disp.c",
- "status": "KNOWN"
-},
- "ObjInfoInit_802596A4": {
-  "addr": "0x801AA568",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_pobj_disp.c",
-  "status": "KNOWN"
- },
  "fn_801AA5AC": {
   "addr": "0x801AA5AC",
   "section": ".text",
   "size": "0x5C",
   "src": "src/hsd/hsd_mobj.c",
-  "status": "KNOWN"
- },
- "HSD_PObjInit": {
-  "addr": "0x801AA608",
-  "section": ".text",
-  "size": "0xC8",
-  "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
  "fn_801AA6D0": {
@@ -39864,13 +39696,6 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "fn_801AC4BC": {
-  "addr": "0x801AC4BC",
-  "section": ".text",
-  "size": "0x460",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
  "fn_801AC91C": {
   "addr": "0x801AC91C",
   "section": ".text",
@@ -39899,13 +39724,6 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "HSD_PObjRemoveAll": {
-  "addr": "0x801AD214",
-  "section": ".text",
-  "size": "0x74",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
  "fn_801AD288": {
   "addr": "0x801AD288",
   "section": ".text",
@@ -39920,27 +39738,6 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "HSD_PObjAnimAll": {
-  "addr": "0x801AD61C",
-  "section": ".text",
-  "size": "0x5C",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
- "PObjUpdateFunc": {
-  "addr": "0x801AD678",
-  "section": ".text",
-  "size": "0x4C",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
- "HSD_PObjReqAnimAllByFlags": {
- "addr": "0x801AD6C4",
- "section": ".text",
- "size": "0x74",
-  "src": "src/hsd/hsd_pobj_disp.c",
- "status": "KNOWN"
-},
  "fn_801AD738": {
   "addr": "0x801AD738",
   "section": ".text",
@@ -39962,13 +39759,6 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "_HSD_RandForgetMemory": {
- "addr": "0x801ADC08",
- "section": ".text",
- "size": "0x34",
-  "src": "src/hsd/hsd_pobj_disp.c",
- "status": "KNOWN"
-},
  "fn_801ADC3C": {
   "addr": "0x801ADC3C",
   "section": ".text",
@@ -40137,13 +39927,6 @@
   "src": "src/hsd/hsd_pobj.c",
   "status": "KNOWN"
  },
- "RObjUpdateFunc": {
-  "addr": "0x801B009C",
-  "section": ".text",
-  "size": "0x44",
-  "src": "src/hsd/hsd_pobj.c",
-  "status": "KNOWN"
- },
  "fn_801B00E0": {
   "addr": "0x801B00E0",
   "section": ".text",
@@ -40274,540 +40057,519 @@
   "addr": "0x801B1730",
   "section": ".text",
   "size": "0x124",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B1854": {
   "addr": "0x801B1854",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B1884": {
   "addr": "0x801B1884",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B1890": {
   "addr": "0x801B1890",
   "section": ".text",
   "size": "0x48",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B18D8": {
   "addr": "0x801B18D8",
   "section": ".text",
   "size": "0x1F8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B1AD0": {
   "addr": "0x801B1AD0",
   "section": ".text",
   "size": "0x568",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2038": {
   "addr": "0x801B2038",
   "section": ".text",
   "size": "0x528",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2560": {
   "addr": "0x801B2560",
   "section": ".text",
   "size": "0x64",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B25C4": {
   "addr": "0x801B25C4",
   "section": ".text",
   "size": "0x90",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2654": {
   "addr": "0x801B2654",
   "section": ".text",
   "size": "0xA4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B26F8": {
   "addr": "0x801B26F8",
   "section": ".text",
   "size": "0x20",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2718": {
   "addr": "0x801B2718",
   "section": ".text",
   "size": "0x24",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B273C": {
   "addr": "0x801B273C",
   "section": ".text",
   "size": "0x50",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B278C": {
   "addr": "0x801B278C",
   "section": ".text",
   "size": "0x50",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B27DC": {
   "addr": "0x801B27DC",
   "section": ".text",
   "size": "0x9C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2878": {
   "addr": "0x801B2878",
   "section": ".text",
   "size": "0x40",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B28B8": {
   "addr": "0x801B28B8",
   "section": ".text",
   "size": "0x10",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B28C8": {
   "addr": "0x801B28C8",
   "section": ".text",
   "size": "0x84",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B294C": {
   "addr": "0x801B294C",
   "section": ".text",
   "size": "0x98",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B29E4": {
   "addr": "0x801B29E4",
   "section": ".text",
   "size": "0x538",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B2F1C": {
   "addr": "0x801B2F1C",
   "section": ".text",
   "size": "0x24C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3168": {
   "addr": "0x801B3168",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3174": {
   "addr": "0x801B3174",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B31A4": {
   "addr": "0x801B31A4",
   "section": ".text",
   "size": "0x50",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B31F4": {
   "addr": "0x801B31F4",
   "section": ".text",
   "size": "0x64",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3258": {
   "addr": "0x801B3258",
   "section": ".text",
   "size": "0xE0",
-  "src": null,
-  "status": "GAP"
- },
- "fn_801B3338": {
-  "addr": "0x801B3338",
-  "section": ".text",
-  "size": "0xD0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3408": {
   "addr": "0x801B3408",
   "section": ".text",
   "size": "0x230",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3638": {
   "addr": "0x801B3638",
   "section": ".text",
   "size": "0x138",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3770": {
   "addr": "0x801B3770",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
- },
- "fn_801B37A0": {
-  "addr": "0x801B37A0",
-  "section": ".text",
-  "size": "0xDC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B387C": {
   "addr": "0x801B387C",
   "section": ".text",
   "size": "0x8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3884": {
   "addr": "0x801B3884",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3890": {
   "addr": "0x801B3890",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
- },
- "fn_801B38C0": {
-  "addr": "0x801B38C0",
-  "section": ".text",
-  "size": "0xD8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3998": {
   "addr": "0x801B3998",
   "section": ".text",
   "size": "0x110",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3AA8": {
   "addr": "0x801B3AA8",
   "section": ".text",
   "size": "0x40",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3AE8": {
   "addr": "0x801B3AE8",
   "section": ".text",
   "size": "0x234",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B3D1C": {
   "addr": "0x801B3D1C",
   "section": ".text",
   "size": "0x524",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4240": {
   "addr": "0x801B4240",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B424C": {
   "addr": "0x801B424C",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4258": {
   "addr": "0x801B4258",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4264": {
   "addr": "0x801B4264",
   "section": ".text",
   "size": "0x5C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B42C0": {
   "addr": "0x801B42C0",
   "section": ".text",
   "size": "0x40",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4300": {
   "addr": "0x801B4300",
   "section": ".text",
   "size": "0x2A4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B45A4": {
   "addr": "0x801B45A4",
   "section": ".text",
   "size": "0x70",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4614": {
   "addr": "0x801B4614",
   "section": ".text",
   "size": "0x548",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B4B5C": {
   "addr": "0x801B4B5C",
   "section": ".text",
   "size": "0x564",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B50C0": {
   "addr": "0x801B50C0",
   "section": ".text",
   "size": "0x790",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B5850": {
   "addr": "0x801B5850",
   "section": ".text",
   "size": "0x1B0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B5A00": {
   "addr": "0x801B5A00",
   "section": ".text",
   "size": "0x294",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B5C94": {
   "addr": "0x801B5C94",
   "section": ".text",
   "size": "0x1AC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B5E40": {
   "addr": "0x801B5E40",
   "section": ".text",
   "size": "0xC8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B5F08": {
   "addr": "0x801B5F08",
   "section": ".text",
   "size": "0x104",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B600C": {
   "addr": "0x801B600C",
   "section": ".text",
   "size": "0x4E0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B64EC": {
   "addr": "0x801B64EC",
   "section": ".text",
   "size": "0x104",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B65F0": {
   "addr": "0x801B65F0",
   "section": ".text",
   "size": "0x6E8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B6CD8": {
   "addr": "0x801B6CD8",
   "section": ".text",
   "size": "0xE8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B6DC0": {
   "addr": "0x801B6DC0",
   "section": ".text",
   "size": "0xB4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B6E74": {
   "addr": "0x801B6E74",
   "section": ".text",
   "size": "0xE8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B6F5C": {
   "addr": "0x801B6F5C",
   "section": ".text",
   "size": "0x120",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B707C": {
   "addr": "0x801B707C",
   "section": ".text",
   "size": "0xFC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B7178": {
   "addr": "0x801B7178",
   "section": ".text",
   "size": "0x394",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B750C": {
   "addr": "0x801B750C",
   "section": ".text",
   "size": "0x6C8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B7BD4": {
   "addr": "0x801B7BD4",
   "section": ".text",
   "size": "0x8C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B7C60": {
   "addr": "0x801B7C60",
   "section": ".text",
   "size": "0x40",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B7CA0": {
   "addr": "0x801B7CA0",
   "section": ".text",
   "size": "0x384",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B8024": {
   "addr": "0x801B8024",
   "section": ".text",
   "size": "0x480",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B84A4": {
   "addr": "0x801B84A4",
   "section": ".text",
   "size": "0x518",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B89BC": {
   "addr": "0x801B89BC",
   "section": ".text",
   "size": "0x1C8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B8B84": {
   "addr": "0x801B8B84",
   "section": ".text",
   "size": "0x1D8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B8D5C": {
   "addr": "0x801B8D5C",
   "section": ".text",
   "size": "0x25C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B8FB8": {
   "addr": "0x801B8FB8",
   "section": ".text",
   "size": "0x90",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B9048": {
   "addr": "0x801B9048",
   "section": ".text",
   "size": "0x2D8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801B9320": {
   "addr": "0x801B9320",
   "section": ".text",
   "size": "0x196C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801BAC8C": {
   "addr": "0x801BAC8C",
   "section": ".text",
   "size": "0x838",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801BB4C4": {
   "addr": "0x801BB4C4",
   "section": ".text",
   "size": "0x604",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_texp.c",
+  "status": "LIKELY"
  },
  "fn_801BBAC8": {
   "addr": "0x801BBAC8",
@@ -40837,27 +40599,6 @@
   "src": "src/hsd/hsd_tobj.c",
   "status": "KNOWN"
  },
- "HSD_ImageDescFree": {
- "addr": "0x801BBD3C",
- "section": ".text",
- "size": "0x24",
-  "src": "src/hsd/hsd_tobj_ext.c",
- "status": "KNOWN"
-},
-"HSD_ImageDescRemove": {
- "addr": "0x801BBD60",
- "section": ".text",
- "size": "0x24",
-  "src": "src/hsd/hsd_tobj_ext.c",
- "status": "KNOWN"
-},
- "HSD_ImageDescAlloc": {
-  "addr": "0x801BBD84",
-  "section": ".text",
-  "size": "0x58",
-  "src": "src/hsd/hsd_tobj_ext.c",
-  "status": "KNOWN"
- },
  "fn_801BBDDC": {
   "addr": "0x801BBDDC",
   "section": ".text",
@@ -40883,13 +40624,6 @@
   "addr": "0x801BBED4",
   "section": ".text",
   "size": "0x54",
-  "src": "src/hsd/hsd_tobj.c",
-  "status": "KNOWN"
- },
- "fn_801BBF28": {
-  "addr": "0x801BBF28",
-  "section": ".text",
-  "size": "0xBC",
   "src": "src/hsd/hsd_tobj.c",
   "status": "KNOWN"
  },
@@ -40998,299 +40732,285 @@
   "src": "src/hsd/hsd_tobj.c",
   "status": "KNOWN"
  },
- "fn_801BF098": {
-  "addr": "0x801BF098",
-  "section": ".text",
-  "size": "0xA0",
-  "src": "src/hsd/hsd_tobj.c",
-  "status": "KNOWN"
- },
  "fn_801BF138": {
   "addr": "0x801BF138",
   "section": ".text",
   "size": "0x34",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF16C": {
   "addr": "0x801BF16C",
   "section": ".text",
   "size": "0x84",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF1F0": {
   "addr": "0x801BF1F0",
   "section": ".text",
   "size": "0x2D4",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF4C4": {
   "addr": "0x801BF4C4",
   "section": ".text",
   "size": "0x20",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF4E4": {
   "addr": "0x801BF4E4",
   "section": ".text",
   "size": "0x90",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF574": {
   "addr": "0x801BF574",
   "section": ".text",
   "size": "0x138",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF6AC": {
   "addr": "0x801BF6AC",
   "section": ".text",
   "size": "0x1F4",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BF8A0": {
   "addr": "0x801BF8A0",
   "section": ".text",
   "size": "0x17C",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BFA1C": {
   "addr": "0x801BFA1C",
   "section": ".text",
   "size": "0x284",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BFCA0": {
   "addr": "0x801BFCA0",
   "section": ".text",
   "size": "0x10",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BFCB0": {
   "addr": "0x801BFCB0",
   "section": ".text",
   "size": "0x60",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BFD10": {
   "addr": "0x801BFD10",
   "section": ".text",
   "size": "0x208",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801BFF18": {
   "addr": "0x801BFF18",
   "section": ".text",
   "size": "0x2B0",
-  "src": "src/hsd/hsd_robj.c",
+  "src": "src/hsd/hsd_video.c",
   "status": "LIKELY"
  },
  "fn_801C01C8": {
   "addr": "0x801C01C8",
   "section": ".text",
   "size": "0x54",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C021C": {
   "addr": "0x801C021C",
   "section": ".text",
   "size": "0x54",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C0270": {
   "addr": "0x801C0270",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C027C": {
   "addr": "0x801C027C",
   "section": ".text",
   "size": "0x10",
-  "src": null,
-  "status": "GAP"
- },
- "fn_801C028C": {
-  "addr": "0x801C028C",
-  "section": ".text",
-  "size": "0xC94",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C0F20": {
   "addr": "0x801C0F20",
   "section": ".text",
   "size": "0x354",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C1274": {
   "addr": "0x801C1274",
   "section": ".text",
   "size": "0x59C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C1810": {
   "addr": "0x801C1810",
   "section": ".text",
   "size": "0x6F0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C1F00": {
   "addr": "0x801C1F00",
   "section": ".text",
   "size": "0x6E4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C25E4": {
   "addr": "0x801C25E4",
   "section": ".text",
   "size": "0x8C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2670": {
   "addr": "0x801C2670",
   "section": ".text",
   "size": "0x184",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C27F4": {
   "addr": "0x801C27F4",
   "section": ".text",
   "size": "0x1D0",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C29C4": {
   "addr": "0x801C29C4",
   "section": ".text",
   "size": "0x40",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2A04": {
   "addr": "0x801C2A04",
   "section": ".text",
   "size": "0x5C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2A60": {
   "addr": "0x801C2A60",
   "section": ".text",
   "size": "0x14",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2A74": {
   "addr": "0x801C2A74",
   "section": ".text",
   "size": "0x1C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2A90": {
   "addr": "0x801C2A90",
   "section": ".text",
   "size": "0x1C",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2AAC": {
   "addr": "0x801C2AAC",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2AB8": {
   "addr": "0x801C2AB8",
   "section": ".text",
   "size": "0x30",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2AE8": {
   "addr": "0x801C2AE8",
   "section": ".text",
   "size": "0x44",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2B2C": {
   "addr": "0x801C2B2C",
   "section": ".text",
   "size": "0xB4",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2BE0": {
   "addr": "0x801C2BE0",
   "section": ".text",
   "size": "0x174",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2D54": {
   "addr": "0x801C2D54",
   "section": ".text",
   "size": "0x8",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2D5C": {
   "addr": "0x801C2D5C",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2D68": {
   "addr": "0x801C2D68",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2D74": {
   "addr": "0x801C2D74",
   "section": ".text",
   "size": "0xC",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2D80": {
   "addr": "0x801C2D80",
   "section": ".text",
   "size": "0x180",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C2F00": {
   "addr": "0x801C2F00",
   "section": ".text",
   "size": "0x208",
-  "src": null,
-  "status": "GAP"
+  "src": "src/hsd/hsd_aobj.c",
+  "status": "LIKELY"
  },
  "fn_801C3108": {
   "addr": "0x801C3108",
@@ -41341,24 +41061,10 @@
   "src": "src/game/battle/battle_grid.c",
   "status": "LIKELY"
  },
- "fn_801C3D64": {
-  "addr": "0x801C3D64",
-  "section": ".text",
-  "size": "0xD8",
-  "src": "src/game/battle/battle_grid.c",
-  "status": "LIKELY"
- },
  "fn_801C3E3C": {
   "addr": "0x801C3E3C",
   "section": ".text",
   "size": "0xD4",
-  "src": "src/game/battle/battle_grid.c",
-  "status": "LIKELY"
- },
- "fn_801C3F10": {
-  "addr": "0x801C3F10",
-  "section": ".text",
-  "size": "0xAC",
   "src": "src/game/battle/battle_grid.c",
   "status": "LIKELY"
  },
@@ -43007,38 +42713,10 @@
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
- "fn_801D7E58": {
-  "addr": "0x801D7E58",
-  "section": ".text",
-  "size": "0x374",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
- "fn_801D81CC": {
-  "addr": "0x801D81CC",
-  "section": ".text",
-  "size": "0x328",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
- "fn_801D84F4": {
-  "addr": "0x801D84F4",
-  "section": ".text",
-  "size": "0x2BC",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
  "fn_801D87B0": {
   "addr": "0x801D87B0",
   "section": ".text",
   "size": "0x388",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
- "fn_801D8B38": {
-  "addr": "0x801D8B38",
-  "section": ".text",
-  "size": "0x6B4",
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
@@ -43060,13 +42738,6 @@
   "addr": "0x801D9950",
   "section": ".text",
   "size": "0x2CC",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
- "fn_801D9C1C": {
-  "addr": "0x801D9C1C",
-  "section": ".text",
-  "size": "0x200",
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
@@ -43385,13 +43056,6 @@
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
- "fn_801DB988": {
-  "addr": "0x801DB988",
-  "section": ".text",
-  "size": "0x188",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
  "fn_801DBB10": {
   "addr": "0x801DBB10",
   "section": ".text",
@@ -43574,13 +43238,6 @@
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
- "fn_801DD45C": {
-  "addr": "0x801DD45C",
-  "section": ".text",
-  "size": "0x18C",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
  "fn_801DD5E8": {
   "addr": "0x801DD5E8",
   "section": ".text",
@@ -43655,13 +43312,6 @@
   "addr": "0x801DE698",
   "section": ".text",
   "size": "0x5CC",
-  "src": "src/game/battle/waza.c",
-  "status": "LIKELY"
- },
- "fn_801DEC64": {
-  "addr": "0x801DEC64",
-  "section": ".text",
-  "size": "0x1B0",
   "src": "src/game/battle/waza.c",
   "status": "LIKELY"
  },
@@ -43858,13 +43508,6 @@
   "addr": "0x801E1300",
   "section": ".text",
   "size": "0x68",
-  "src": "src/game/save/save.c",
-  "status": "KNOWN"
- },
- "fn_801E1368": {
-  "addr": "0x801E1368",
-  "section": ".text",
-  "size": "0x368",
   "src": "src/game/save/save.c",
   "status": "KNOWN"
  },
@@ -59135,13 +58778,6 @@
   "src": "src/game/colosseum_battle.c",
   "status": "KNOWN"
  },
- "tableResBiosGetResPtr": {
-  "addr": "0x8025DBD4",
-  "section": ".text",
-  "size": "0x58",
-  "src": "src/game/colosseum_battle.c",
-  "status": "KNOWN"
- },
  "fn_8025DC2C": {
   "addr": "0x8025DC2C",
   "section": ".text",
@@ -59494,13 +59130,6 @@
  },
  "fn_802613D4": {
   "addr": "0x802613D4",
-  "section": ".text",
-  "size": "0x70",
-  "src": "src/game/colosseum_battle.c",
-  "status": "KNOWN"
- },
- "charNameBiosGetHearFlag": {
-  "addr": "0x80261444",
   "section": ".text",
   "size": "0x70",
   "src": "src/game/colosseum_battle.c",
@@ -60024,6 +59653,76 @@
   "src": "src/trk/gdev_cc.c",
   "status": "KNOWN"
  },
+ "genPosUpdate": {
+  "addr": "0x80175E88",
+  "section": ".text",
+  "size": "0xBC",
+  "src": "src/game/gs_scene.c",
+  "status": "KNOWN"
+ },
+ "generateParticle_801947D4": {
+  "addr": "0x8017424C",
+  "section": ".text",
+  "size": "0x14E0",
+  "src": "src/game/effect/generator.c",
+  "status": "KNOWN"
+ },
+ "get_shape_normal_xyz": {
+  "addr": "0x801AC4BC",
+  "section": ".text",
+  "size": "0x460",
+  "src": "src/hsd/hsd_pobj.c",
+  "status": "KNOWN"
+ },
+ "hsdInitClassInfo": {
+  "addr": "0x80193B30",
+  "section": ".text",
+  "size": "0xF4",
+  "src": "src/hsd/hsd_class.c",
+  "status": "KNOWN"
+ },
+ "hwDisableIrq": {
+  "addr": "0x80164360",
+  "section": ".text",
+  "size": "0x38",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "hwEnableIrq": {
+  "addr": "0x80164328",
+  "section": ".text",
+  "size": "0x38",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "hwExit": {
+  "addr": "0x80162428",
+  "section": ".text",
+  "size": "0x34",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "hwInitIrq": {
+  "addr": "0x801642F8",
+  "section": ".text",
+  "size": "0x2C",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "hwKeyOff": {
+  "addr": "0x80162904",
+  "section": ".text",
+  "size": "0x28",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "leaffxStartEffect": {
+  "addr": "0x80138B00",
+  "section": ".text",
+  "size": "0x74",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
  "long2str": {
   "addr": "0x800C9EC4",
   "section": ".text",
@@ -60066,6 +59765,41 @@
   "src": null,
   "status": "SECTION:init"
  },
+ "menuCardE_CompareEntryPtrs": {
+  "addr": "0x8007FD64",
+  "section": ".text",
+  "size": "0x58",
+  "src": null,
+  "status": "GAP"
+ },
+ "menuCloseSync": {
+  "addr": "0x80102428",
+  "section": ".text",
+  "size": "0x98",
+  "src": "src/game/gs_model.c",
+  "status": "KNOWN"
+ },
+ "menuFightCloseWaza": {
+  "addr": "0x80011700",
+  "section": ".text",
+  "size": "0xBC",
+  "src": "src/game/gs_npc_interact.c",
+  "status": "LIKELY"
+ },
+ "menuModelSetMotion": {
+  "addr": "0x80109894",
+  "section": ".text",
+  "size": "0xA0",
+  "src": "src/game/gs_model.c",
+  "status": "KNOWN"
+ },
+ "menuPokeCouponInit": {
+  "addr": "0x8007C2C0",
+  "section": ".text",
+  "size": "0x40",
+  "src": "src/game/menu/menu_pokecoupon.c",
+  "status": "KNOWN"
+ },
  "parse_format": {
   "addr": "0x800CA11C",
   "section": ".text",
@@ -60073,10 +59807,227 @@
   "src": "src/crt/printf.c",
   "status": "KNOWN"
  },
+ "patchiruTextureStart": {
+  "addr": "0x8013FBE0",
+  "section": ".text",
+  "size": "0x78",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldCompare12ByteTableKey": {
+  "addr": "0x801523A8",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldCompare8ByteTableKey": {
+  "addr": "0x801522E0",
+  "section": ".text",
+  "size": "0x10",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput23C": {
+  "addr": "0x8016161C",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput260": {
+  "addr": "0x80161664",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput284": {
+  "addr": "0x801616AC",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput2A8": {
+  "addr": "0x801616F4",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput2CC": {
+  "addr": "0x8016173C",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput2F0": {
+  "addr": "0x80161784",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput338": {
+  "addr": "0x801617CC",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput35C": {
+  "addr": "0x80161814",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput380": {
+  "addr": "0x8016185C",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput3A4": {
+  "addr": "0x801618A4",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "peopleFieldMotionResolveInput3C8": {
+  "addr": "0x801618EC",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "psExecGenerator": {
+  "addr": "0x80173F98",
+  "section": ".text",
+  "size": "0x2B4",
+  "src": null,
+  "status": "GAP"
+ },
+ "psInitDataBank": {
+  "addr": "0x8016A17C",
+  "section": ".text",
+  "size": "0x154",
+  "src": null,
+  "status": "GAP"
+ },
+ "psInterpretParticles": {
+  "addr": "0x8016F430",
+  "section": ".text",
+  "size": "0xD0",
+  "src": "src/game/script/psinterpret.c",
+  "status": "KNOWN"
+ },
+ "psSetBillboardCamera": {
+  "addr": "0x80173624",
+  "section": ".text",
+  "size": "0xF4",
+  "src": null,
+  "status": "GAP"
+ },
+ "psSetPointJObj": {
+  "addr": "0x80169800",
+  "section": ".text",
+  "size": "0xF8",
+  "src": null,
+  "status": "GAP"
+ },
+ "psSetPointJObjNodup": {
+  "addr": "0x8016972C",
+  "section": ".text",
+  "size": "0xD4",
+  "src": null,
+  "status": "GAP"
+ },
+ "salGetStartDelay": {
+  "addr": "0x801642AC",
+  "section": ".text",
+  "size": "0x4C",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "seaEffectStart": {
+  "addr": "0x8013C718",
+  "section": ".text",
+  "size": "0x330",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "sequenceLoad": {
+  "addr": "0x801DD45C",
+  "section": ".text",
+  "size": "0x18C",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "setVelToJObj": {
+  "addr": "0x80172D00",
+  "section": ".text",
+  "size": "0x2A8",
+  "src": null,
+  "status": "GAP"
+ },
+ "sndAuxCallbackPrepareReverbHI": {
+  "addr": "0x801644E0",
+  "section": ".text",
+  "size": "0x40",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "sndAuxCallbackReverbHI": {
+  "addr": "0x8016442C",
+  "section": ".text",
+  "size": "0x5C",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "sndAuxCallbackUpdateSettingsReverbHI": {
+  "addr": "0x80164488",
+  "section": ".text",
+  "size": "0x58",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "sndConvertTicks": {
+  "addr": "0x801621CC",
+  "section": ".text",
+  "size": "0x48",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "sndSin": {
+  "addr": "0x8016208C",
+  "section": ".text",
+  "size": "0x8C",
+  "src": "src/game/people/people_field.c",
+  "status": "KNOWN"
+ },
+ "soundStop": {
+  "addr": "0x801657F8",
+  "section": ".text",
+  "size": "0x104",
+  "src": "src/game/sound/sound.c",
+  "status": "KNOWN"
+ },
  "stateBusy": {
   "addr": "0x800A68B4",
   "section": ".text",
   "size": "0x320",
+  "src": "src/dolphin/dvd/DVD.c",
+  "status": "KNOWN"
+ },
+ "stateReadingFST": {
+  "addr": "0x800A56F0",
+  "section": ".text",
+  "size": "0x94",
   "src": "src/dolphin/dvd/DVD.c",
   "status": "KNOWN"
  },
@@ -60094,11 +60045,60 @@
   "src": "src/crt/string.c",
   "status": "KNOWN"
  },
+ "strcpy": {
+  "addr": "0x800CA968",
+  "section": ".text",
+  "size": "0xB8",
+  "src": "src/crt/string.c",
+  "status": "KNOWN"
+ },
  "strlen": {
   "addr": "0x800CAA20",
   "section": ".text",
   "size": "0x1C",
   "src": "src/crt/string.c",
+  "status": "KNOWN"
+ },
+ "surfEffectStart": {
+  "addr": "0x8013B5E4",
+  "section": ".text",
+  "size": "0x278",
+  "src": "src/game/effect/effect_visual.c",
+  "status": "KNOWN"
+ },
+ "tableResBiosGetResPtr": {
+  "addr": "0x8025DBD4",
+  "section": ".text",
+  "size": "0x58",
+  "src": "src/game/colosseum_battle.c",
+  "status": "KNOWN"
+ },
+ "threadExecute": {
+  "addr": "0x800F028C",
+  "section": ".text",
+  "size": "0x68",
+  "src": "src/game/gs_texture.c",
+  "status": "KNOWN"
+ },
+ "threadLoadFPRRegisters": {
+  "addr": "0x800F00C0",
+  "section": ".text",
+  "size": "0x9C",
+  "src": "src/game/gs_texture.c",
+  "status": "KNOWN"
+ },
+ "threadLoadGPRRegisters": {
+  "addr": "0x800F0030",
+  "section": ".text",
+  "size": "0x90",
+  "src": "src/game/gs_texture.c",
+  "status": "KNOWN"
+ },
+ "threadSaveGPRRegisters": {
+  "addr": "0x800F015C",
+  "section": ".text",
+  "size": "0x94",
+  "src": "src/game/gs_texture.c",
   "status": "KNOWN"
  },
  "udp_cc_close": {
@@ -60178,53 +60178,46 @@
   "src": "src/crt/printf.c",
   "status": "KNOWN"
  },
+ "wazaSequenceEntryStart": {
+  "addr": "0x801D84F4",
+  "section": ".text",
+  "size": "0x2BC",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "wazaSequenceEntryStop": {
+  "addr": "0x801D7E58",
+  "section": ".text",
+  "size": "0x374",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "wazaSequenceEntryUpdate": {
+  "addr": "0x801D81CC",
+  "section": ".text",
+  "size": "0x328",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "wazaSequencePokemonMotionStart": {
+  "addr": "0x801D9C1C",
+  "section": ".text",
+  "size": "0x200",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
+ "wazaSequenceUpdate": {
+  "addr": "0x801DB988",
+  "section": ".text",
+  "size": "0x188",
+  "src": "src/game/battle/waza.c",
+  "status": "LIKELY"
+ },
  "wcstombs": {
   "addr": "0x800C7FB8",
   "section": ".text",
   "size": "0x118",
   "src": "src/crt/wchar.c",
-  "status": "KNOWN"
- },
- "GSeffect": {
-  "addr": "0x8013111C",
-  "section": ".text",
-  "size": "0xE4",
-  "src": "src/game/effect/gs_effect.c",
-  "status": "KNOWN"
- },
- "GStextureCreate": {
-  "addr": "0x800EF5FC",
-  "section": ".text",
-  "size": "0x718",
-  "src": "src/game/gs_texture.c",
-  "status": "KNOWN"
- },
- "GSthreadCreate": {
-  "addr": "0x800F07A8",
-  "section": ".text",
-  "size": "0x230",
-  "src": "src/game/gs_thread.c",
-  "status": "KNOWN"
- },
- "floorReadMapPreFunc": {
-  "addr": "0x80114CA8",
-  "section": ".text",
-  "size": "0x70",
-  "src": "src/game/gs_field_world.c",
-  "status": "KNOWN"
- },
- "floorReadCameraPreFunc": {
-  "addr": "0x80114948",
-  "section": ".text",
-  "size": "0x74",
-  "src": "src/game/gs_field_resource.c",
-  "status": "KNOWN"
- },
- "floorUpdateFieldCamera": {
-  "addr": "0x80117514",
-  "section": ".text",
-  "size": "0x1B4",
-  "src": "src/game/gs_field_world.c",
   "status": "KNOWN"
  }
 }

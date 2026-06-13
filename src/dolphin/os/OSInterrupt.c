@@ -33,6 +33,7 @@ extern void __OSDispatchInterrupt(u8 exception, OSContext* context);
  * unprocessed bits.
  */
 extern u32 __OSSetInterruptMask(u32 mask, u32 globalMask);
+extern void fn_8009E414(void);
 
 /* Forward declaration */
 static void ExternalInterruptHandler(u8 exception, OSContext* context);
@@ -83,15 +84,16 @@ _set:
 #pragma pop
 
 __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler) {
+    __OSInterruptHandler* table = (__OSInterruptHandler*)InterruptHandlerTable_8047A710;
     __OSInterruptHandler old;
 
-    old = InterruptHandlerTable[interrupt];
-    InterruptHandlerTable[interrupt] = handler;
+    old = table[interrupt];
+    table[interrupt] = handler;
     return old;
 }
 
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt) {
-    return InterruptHandlerTable[interrupt];
+    return ((__OSInterruptHandler*)InterruptHandlerTable_8047A710)[interrupt];
 }
 
 void __OSInterruptInit(void) {
@@ -175,7 +177,7 @@ asm static void ExternalInterruptHandler(register u8 exception, register OSConte
     mfspr   r0, GQR7
     stw     r0, 0x01C0(r4)
     stwu    r1, -0x0008(r1)
-    b       __OSDispatchInterrupt
+    b       fn_8009E414
 }
 #pragma pop
 
@@ -390,4 +392,3 @@ void fn_8009E414(void) {
     OSLoadContext((OSContext*)r3);
     return;
 }
-

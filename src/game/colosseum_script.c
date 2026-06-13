@@ -1107,7 +1107,7 @@ u32 fn_80230568(u32 r3,u32 r4)
     extern void fn_80077B3C();
     extern s8 fn_80077B60();
     extern u32 fn_800FA280();
-    extern void fn_8011BBD8();
+    extern void fn_8011BBD8(u32, u32, u32, u32, s16);
     extern void fn_8011BEB4();
     extern s8 fn_80123B5C();
     extern void fn_80132A38();
@@ -1905,7 +1905,7 @@ void fn_80220B8C(void)
     extern u32 fn_801F54A4();
     extern void fn_80265598();
   u32 uVar1;
-  u16 uVar3;
+  u32 uVar3;
   int iVar2;
   s8 cVar4;
 
@@ -2611,22 +2611,22 @@ void fn_80222ADC(void)
     extern u32 fn_801F025C();
   u32 uVar2;
   u16 uVar3;
-  short sVar4;
+  int sVar4;
 
   uVar2 = fn_801F025C(0x11,0);
   uVar2 = (int)fn_8012640C(uVar2,0,0xd9,0);
   uVar3 = fn_8011BEB4(uVar2,0,0x31,0);
   sVar4 = (uVar3 & 0xff) - 1;
-  if (sVar4 < 0) {
+  if ((short)sVar4 < 0) {
     sVar4 = 0;
   }
-  if (sVar4 == 0) {
+  if ((short)sVar4 == 0) {
     lbl_8047B610 = lbl_8047B610 + 5;
   }
   else {
     lbl_8047B610 = *(u32 *)(lbl_8047B610 + 1);
   }
-  fn_8011BBD8(uVar2,0,0x31,0,(int)sVar4);
+  fn_8011BBD8(uVar2,0,0x31,0,(s16)sVar4);
   return;
 }
 /* Address: 0x80222B7C | Size: 0x5c | Ghidra import */
@@ -21183,11 +21183,8 @@ void fn_80217AE4(void)
   return;
 }
 /* Address: 0x80217BD0 | Size: 0x1c | Ghidra import */
-u32 fn_80217BD0(void)
-
+u32 fn_80217BD0(u32 r3)
 {
-    u32 r3;
-
   return (int)((0xff - (r3 & 0xffff)) * 10) / 0x19 & 0xffff;
 }
 /* Address: 0x80217BEC | Size: 0x18 | Ghidra import */
@@ -23822,7 +23819,7 @@ void fn_8021C0F4(void)
   uVar1 = (int)fn_8012640C(uVar1,0,0xd9,0);
   fn_8011BEB4(uVar1,0,0x2d,0);
   uVar2 = fn_8011BEB4(uVar1,0,0x2e,0);
-  iVar3 = -(uVar2 >> 1);
+  iVar3 = -(uVar2 / 2);
   if (iVar3 == 0) {
     iVar3 = -1;
   }
@@ -25114,8 +25111,8 @@ void fn_8021DF80(void)
     extern void fn_80265598();
     extern u32 lbl_8047B618;
   u32 uVar1;
-  u16 uVar3;
   int iVar2;
+  u16 uVar3;
   s8 cVar4;
 
   uVar1 = fn_801F025C(*(u8 *)(*(int *)(lbl_8047B610) + 1),0);
@@ -25144,6 +25141,8 @@ void fn_8021E04C(void)
   u16 uVar3;
   int iVar2;
   u8 cVar4;
+  int iVar7;
+  u16 uVar6;
   u32 iVar5;
   u32 uVar1;
 
@@ -25152,11 +25151,11 @@ void fn_8021E04C(void)
   iVar5 = *(u32 *)(lbl_8047B610 + 2);
   if ((lbl_8047B618 & 0x80) == 0) {
     if (iVar5 == 9) {
-      uVar3 = fn_801F54A4(0,0,0x14,0);
-      iVar2 = (int)fn_8012640C(uVar1,0,0xee,0);
-      if ((iVar2 != 0) && (cVar4 = fn_801DDD28(iVar2,0x34,4,0), cVar4 != 0)) {
-        fn_801DA9E8(iVar2,0x34,4);
-        fn_80265598(uVar1,uVar3,1);
+      uVar6 = fn_801F54A4(0,0,0x14,0);
+      iVar7 = (int)fn_8012640C(uVar1,0,0xee,0);
+      if ((iVar7 != 0) && (cVar4 = fn_801DDD28(iVar7,0x34,4,0), cVar4 != 0)) {
+        fn_801DA9E8(iVar7,0x34,4);
+        fn_80265598(uVar1,uVar6,1);
       }
     }
     if (iVar5 == 0x18) {
@@ -25763,7 +25762,10 @@ void fn_8021F1CC(void)
   u32 uVar2;
 
   uVar1 = fn_801F025C(*(u8 *)(lbl_8047B610 + 1),0);
-  switch (*(s8 *)(lbl_8047B610 + 2)) {
+  switch (*(u8 *)(lbl_8047B610 + 2)) {
+  case 0:
+  case 1:
+    break;
   case 2:
     fn_80132A38(0xd,fn_802037DC());
     uVar1 = fn_80203758(uVar1);

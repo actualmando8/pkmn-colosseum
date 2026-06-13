@@ -19,9 +19,10 @@ SM_DIR = ROOT / "config" / "GC6E01" / "symbolmap"
 SYMBOLS = ROOT / "config" / "GC6E01" / "symbols.txt"
 FUNC_TU_MAP = ROOT / "config" / "GC6E01" / "func_tu_map.json"
 DECOMP_REPORT = ROOT / "report.json"
+DECOMP_STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
 HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
 HISTORY_INTERVAL_SECONDS = 60
-DASHBOARD_VERSION = 2
+DASHBOARD_VERSION = 3
 
 MAP_RE = re.compile(
     r"^(fn_[0-9A-Fa-f]{8})\s*->\s*([A-Za-z_.$][\w.$:@?]*)\s*//\s*(.*?)\s*$"
@@ -199,6 +200,17 @@ def float_pct(value: object) -> float:
         return 0.0
 
 
+def match_status(value: object) -> str:
+    score = float_pct(value)
+    if score >= 99.95:
+        return "matched"
+    if score >= 90.0:
+        return "near"
+    if score > 0:
+        return "partial"
+    return "missing"
+
+
 def classify_provenance(provenance: str) -> str:
     text = provenance.lower()
     if "xd" in text:
@@ -247,6 +259,30 @@ def load_decomp_report(path: Path) -> dict[str, object]:
             metadata = {}
         total_functions = int_value(unit_measures.get("total_functions", 0))
         matched_functions = int_value(unit_measures.get("matched_functions", 0))
+        functions = []
+        status_counts: Counter[str] = Counter()
+        for index, function in enumerate(unit.get("functions", [])):
+            if not isinstance(function, dict):
+                continue
+            fn_pct = float_pct(function.get("fuzzy_match_percent", 0))
+            status = match_status(fn_pct)
+            status_counts[status] += 1
+            functions.append(
+                {
+                    "index": index,
+                    "name": function.get("name", ""),
+                    "size": int_value(function.get("size", 0)),
+                    "fuzzy_pct": fn_pct,
+                    "status": status,
+                }
+            )
+        functions.sort(
+            key=lambda row: (
+                float(row.get("fuzzy_pct", 0)) >= 99.95,
+                -int(row.get("size", 0)),
+                str(row.get("name", "")),
+            )
+        )
         units.append(
             {
                 "name": unit.get("name", ""),
@@ -262,6 +298,8 @@ def load_decomp_report(path: Path) -> dict[str, object]:
                 "total_code": int_value(unit_measures.get("total_code", 0)),
                 "complete": bool(metadata.get("complete"))
                 or float_pct(unit_measures.get("matched_functions_percent", 0)) >= 100.0,
+                "functions": functions,
+                "function_status": dict(status_counts),
             }
         )
     units.sort(
@@ -284,7 +322,65 @@ def load_decomp_report(path: Path) -> dict[str, object]:
         "total_units": int_value(measures.get("total_units", 0)),
         "units": units,
         "source": str(path),
+        "updated_at": time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(path.stat().st_mtime)
+        ),
     }
+
+
+def load_attempt_log(path: Path, limit: int = 400) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    line_re = re.compile(
+        r"^- \*\*(?P<timestamp>[^*]+)\*\*\s+`(?P<agent>[^`]+)`\s+(?P<message>.*)$"
+    )
+    fn_re = re.compile(r"fn_[0-9A-Fa-f]{8}")
+    pct_re = re.compile(r"([0-9]+(?:\.[0-9]+)?)%")
+    file_re = re.compile(r"\bin\s+([^()\s]+\.c|\?\.c)")
+    markers = (
+        "MATCH!",
+        "COMMIT",
+        "REGRESSION",
+        "Claimed",
+        "Completed",
+        "Decision",
+        "Enqueued",
+    )
+    for line in read_text(path).splitlines():
+        match = line_re.match(line.strip())
+        if not match:
+            continue
+        raw_message = match.group("message").strip()
+        message = raw_message
+        for marker in markers:
+            index = raw_message.find(marker)
+            if index >= 0:
+                message = raw_message[index:].strip()
+                break
+        kind = "note"
+        upper = message.upper()
+        if "REGRESSION" in upper:
+            kind = "regression"
+        elif "MATCH!" in upper:
+            kind = "match"
+        elif "COMMIT" in upper:
+            kind = "commit"
+        elif "CLAIMED" in upper:
+            kind = "claim"
+        fn_match = fn_re.search(message)
+        pct_match = pct_re.search(message)
+        file_match = file_re.search(message)
+        rows.append(
+            {
+                "timestamp": match.group("timestamp"),
+                "agent": match.group("agent"),
+                "kind": kind,
+                "function": fn_match.group(0) if fn_match else "",
+                "file": file_match.group(1) if file_match else "",
+                "percent": float_pct(pct_match.group(1)) if pct_match else None,
+                "message": message,
+            }
+        )
+    return rows[-limit:]
 
 
 def load_history() -> list[dict[str, object]]:
@@ -497,6 +593,7 @@ def build_state() -> dict[str, object]:
         )
     )
     decomp = load_decomp_report(DECOMP_REPORT)
+    attempt_log = load_attempt_log(DECOMP_STATUS_LOG)
     return {
         "version": DASHBOARD_VERSION,
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -505,6 +602,7 @@ def build_state() -> dict[str, object]:
         "branch": git_value(["branch", "--show-current"]),
         "recent_commits": recent_commits(),
         "decomp": decomp,
+        "attempt_log": attempt_log,
         "next_target": next_target,
         "counts": {
             "leads": len(leads),
@@ -546,6 +644,8 @@ def build_state() -> dict[str, object]:
             "structural": str(SM_DIR / "structural_applied.txt"),
             "symbols": str(SYMBOLS),
             "tu_map": str(FUNC_TU_MAP),
+            "decomp_report": str(DECOMP_REPORT),
+            "decomp_status_log": str(DECOMP_STATUS_LOG),
         },
     }
 
@@ -555,7 +655,7 @@ HTML = r"""<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GC6E01 Renaming Control</title>
+  <title>GC6E01 Progress Control</title>
   <style>
     :root {
       color-scheme: dark;
@@ -1167,9 +1267,161 @@ HTML = r"""<!doctype html>
       color: var(--quiet);
       padding: 16px;
     }
+    .tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 4px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0f1722;
+    }
+    .tab-btn {
+      height: 34px;
+      min-width: 124px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 780;
+    }
+    .tab-btn.active {
+      color: #06100b;
+      background: linear-gradient(90deg, #39c95e, #f0b35a);
+    }
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
+    }
+    .decomp-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, .42fr);
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .decomp-map {
+      max-height: 620px;
+      grid-auto-rows: 48px;
+    }
+    .tu-tile.selected {
+      outline: 2px solid #eef4fb;
+      outline-offset: 1px;
+    }
+    .decomp-detail {
+      max-height: 620px;
+      overflow: auto;
+    }
+    .decomp-title {
+      font-size: 17px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .decomp-subtitle {
+      margin: 4px 0 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    .mini-stat {
+      padding: 8px;
+      border: 1px solid #263244;
+      border-radius: 6px;
+      background: #101824;
+    }
+    .mini-label {
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+    .mini-value {
+      margin-top: 3px;
+      font-weight: 800;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .function-list,
+    .attempt-list {
+      display: grid;
+      gap: 6px;
+      max-height: 300px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .function-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) 72px 72px 82px;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 8px;
+      border: 1px solid #263244;
+      border-radius: 6px;
+      background: #101824;
+    }
+    .function-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: Consolas, "Courier New", monospace;
+      font-weight: 760;
+    }
+    .function-pct,
+    .function-size {
+      font-family: Consolas, "Courier New", monospace;
+      color: #dce7f3;
+      text-align: right;
+    }
+    .status-chip {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-weight: 780;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, .16);
+    }
+    .status-chip.matched { background: rgba(56, 185, 149, .18); color: #93f0d2; }
+    .status-chip.near { background: rgba(240, 179, 90, .18); color: #ffd28a; }
+    .status-chip.partial { background: rgba(92, 145, 223, .18); color: #a9caff; }
+    .status-chip.missing { background: rgba(224, 113, 113, .18); color: #ffaaaa; }
+    .attempt-row {
+      display: grid;
+      grid-template-columns: 162px 78px 1fr;
+      gap: 9px;
+      align-items: start;
+      padding: 8px 9px;
+      border: 1px solid #263244;
+      background: #101824;
+      border-radius: 7px;
+    }
+    .attempt-time,
+    .attempt-kind {
+      color: var(--quiet);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .attempt-message {
+      color: #dce7f3;
+      overflow-wrap: anywhere;
+    }
+    .history-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .72fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
     @media (max-width: 1180px) {
       .metric-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
-      .overview, .chart-grid, .ops-grid, .workbench { grid-template-columns: 1fr; }
+      .overview, .chart-grid, .ops-grid, .workbench, .decomp-workspace, .history-layout { grid-template-columns: 1fr; }
       .detail-panel { position: static; }
     }
     @media (max-width: 760px) {
@@ -1182,14 +1434,15 @@ HTML = r"""<!doctype html>
       .toolbar { grid-template-columns: 1fr; }
       .tu-toolbar { grid-template-columns: 1fr; }
       .target-line { grid-template-columns: 1fr; }
-      .feed-row, .commit-row { grid-template-columns: 1fr; }
+      .feed-row, .commit-row, .attempt-row, .function-row { grid-template-columns: 1fr; }
+      .mini-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div>
-      <h1>GC6E01 Symbolmap Control</h1>
+      <h1>GC6E01 Progress Control</h1>
       <div class="subtitle">
         <span id="repo"></span>
         <span id="head"></span>
@@ -1204,7 +1457,7 @@ HTML = r"""<!doctype html>
   <main>
     <section class="hud-strip">
       <div class="hud-stats">
-        <span class="hud-project">GC6E01/SYMBOLMAP</span>
+        <span class="hud-project" id="hud-project">GC6E01/DECOMP</span>
         <span><span class="hud-value" id="hud-completion">0%</span> complete</span>
         <span><span class="hud-value hud-good" id="hud-fuzzy">0%</span> fuzzy</span>
         <span><span class="hud-value" id="hud-code">0%</span> code</span>
@@ -1226,135 +1479,166 @@ HTML = r"""<!doctype html>
       </div>
     </section>
 
-    <section class="metric-grid" id="metrics"></section>
+    <nav class="tabs" aria-label="Dashboard views">
+      <button class="tab-btn active" id="tab-decomp" type="button" data-view="decomp">Decomp</button>
+      <button class="tab-btn" id="tab-symbols" type="button" data-view="symbols">Symbol Map</button>
+    </nav>
 
-    <section class="overview">
-      <div class="panel">
-        <div class="panel-title">
-          <h2>Current Target</h2>
-          <span class="panel-note" id="progress-label"></span>
-        </div>
-        <div class="target-line">
-          <div class="target-badge" id="next-rank">NEXT</div>
-          <div>
-            <div class="target-name mono" id="next-name"></div>
-            <div class="target-meta" id="next-detail"></div>
+    <section class="view active" id="view-decomp">
+      <section class="metric-grid" id="decomp-metrics"></section>
+
+      <section class="history-layout">
+        <div class="panel chart-card">
+          <div class="panel-title">
+            <h2>Match Progress Over Time</h2>
+            <span class="panel-note" id="timeline-range"></span>
           </div>
-          <span class="pill needs" id="next-status">Needs wiring</span>
+          <canvas id="history-chart" height="205"></canvas>
         </div>
-        <div class="progress-shell"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="legend" id="status-legend"></div>
-      </div>
-      <div class="panel">
+        <div class="panel chart-card">
+          <div class="panel-title">
+            <h2>Selected File Progress</h2>
+            <span class="panel-note" id="file-history-note"></span>
+          </div>
+          <canvas id="file-history-chart" height="205"></canvas>
+        </div>
+      </section>
+
+      <section class="decomp-workspace">
+        <div class="panel tu-panel">
+          <div class="panel-title">
+            <h2>File Heatmap</h2>
+            <span class="panel-note" id="decomp-note"></span>
+          </div>
+          <div class="tu-toolbar">
+            <input id="decomp-query" type="search" placeholder="Filter file or source">
+            <button class="btn" id="decomp-near" type="button">Near Match</button>
+            <button class="btn" id="decomp-clear" type="button">Clear</button>
+          </div>
+          <div class="tu-map decomp-map" id="decomp-map"></div>
+        </div>
+
+        <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
+      </section>
+
+      <section class="panel">
         <div class="panel-title">
-          <h2>Evidence Mix</h2>
-          <span class="panel-note" id="history-points"></span>
+          <h2>Decomp Attempt Log</h2>
+          <span class="panel-note" id="decomp-log-note"></span>
         </div>
-        <canvas id="provenance-chart" height="205"></canvas>
-        <div class="source-bars" id="source-bars"></div>
-      </div>
+        <div class="attempt-list" id="decomp-log"></div>
+      </section>
     </section>
 
-    <section class="chart-grid">
-      <div class="panel chart-card">
+    <section class="view" id="view-symbols">
+      <section class="metric-grid" id="symbol-metrics"></section>
+
+      <section class="overview">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Current Target</h2>
+            <span class="panel-note" id="progress-label"></span>
+          </div>
+          <div class="target-line">
+            <div class="target-badge" id="next-rank">NEXT</div>
+            <div>
+              <div class="target-name mono" id="next-name"></div>
+              <div class="target-meta" id="next-detail"></div>
+            </div>
+            <span class="pill needs" id="next-status">Needs wiring</span>
+          </div>
+          <div class="progress-shell"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="legend" id="status-legend"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Evidence Mix</h2>
+            <span class="panel-note" id="history-points"></span>
+          </div>
+          <canvas id="provenance-chart" height="205"></canvas>
+          <div class="source-bars" id="source-bars"></div>
+        </div>
+      </section>
+
+      <section class="panel chart-card">
         <div class="panel-title">
           <h2>Status Distribution</h2>
           <span class="panel-note" id="status-total"></span>
         </div>
         <canvas id="status-chart" height="205"></canvas>
-      </div>
-      <div class="panel chart-card">
+      </section>
+
+      <section class="ops-grid">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Live Activity</h2>
+            <span class="panel-note" id="activity-note"></span>
+          </div>
+          <div class="feed" id="activity-feed"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Recent Commits</h2>
+            <span class="panel-note" id="commit-note"></span>
+          </div>
+          <div class="commit-list" id="commit-list"></div>
+        </div>
+      </section>
+
+      <section class="panel tu-panel">
         <div class="panel-title">
-          <h2>Completion Timeline</h2>
-          <span class="panel-note" id="timeline-range"></span>
+          <h2>Translation Units</h2>
+          <span class="panel-note" id="tu-note"></span>
         </div>
-        <canvas id="history-chart" height="205"></canvas>
-      </div>
-    </section>
+        <div class="tu-toolbar">
+          <input id="tu-query" type="search" placeholder="Filter TU name or source">
+          <button class="btn" id="tu-needs" type="button">Needs Wiring</button>
+          <button class="btn" id="tu-clear" type="button">Clear</button>
+        </div>
+        <div class="tu-map" id="tu-map"></div>
+      </section>
 
-    <section class="ops-grid">
-      <div class="panel">
-        <div class="panel-title">
-          <h2>Live Activity</h2>
-          <span class="panel-note" id="activity-note"></span>
+      <section class="workbench">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Targets</h2>
+            <span class="panel-note" id="row-count"></span>
+          </div>
+          <div class="toolbar">
+            <input id="query" type="search" placeholder="Filter symbol, source, evidence">
+            <select id="status-filter">
+              <option value="">All statuses</option>
+              <option value="Needs wiring">Needs wiring</option>
+              <option value="Proposed">Proposed</option>
+              <option value="Recorded">Recorded</option>
+              <option value="Renamed">Renamed</option>
+            </select>
+            <select id="source-filter">
+              <option value="">All sources</option>
+            </select>
+            <button class="btn" id="clear" type="button">Clear</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-sort="status">Status</th>
+                  <th data-sort="fn">Function</th>
+                  <th data-sort="name">Name</th>
+                  <th data-sort="size">Size</th>
+                  <th data-sort="source">Source</th>
+                  <th data-sort="current_symbol">Current</th>
+                  <th data-sort="old_refs">Old Refs</th>
+                  <th data-sort="provenance">Evidence</th>
+                </tr>
+              </thead>
+              <tbody id="targets"></tbody>
+            </table>
+          </div>
         </div>
-        <div class="feed" id="activity-feed"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">
-          <h2>Recent Commits</h2>
-          <span class="panel-note" id="commit-note"></span>
-        </div>
-        <div class="commit-list" id="commit-list"></div>
-      </div>
-    </section>
 
-    <section class="panel tu-panel">
-      <div class="panel-title">
-        <h2>Decomp Match Units</h2>
-        <span class="panel-note" id="decomp-note"></span>
-      </div>
-      <div class="tu-toolbar">
-        <input id="decomp-query" type="search" placeholder="Filter decomp unit or source">
-        <button class="btn" id="decomp-near" type="button">Near Match</button>
-        <button class="btn" id="decomp-clear" type="button">Clear</button>
-      </div>
-      <div class="tu-map" id="decomp-map"></div>
-    </section>
-
-    <section class="panel tu-panel">
-      <div class="panel-title">
-        <h2>Translation Units</h2>
-        <span class="panel-note" id="tu-note"></span>
-      </div>
-      <div class="tu-toolbar">
-        <input id="tu-query" type="search" placeholder="Filter TU name or source">
-        <button class="btn" id="tu-needs" type="button">Needs Wiring</button>
-        <button class="btn" id="tu-clear" type="button">Clear</button>
-      </div>
-      <div class="tu-map" id="tu-map"></div>
-    </section>
-
-    <section class="workbench">
-      <div class="panel">
-        <div class="panel-title">
-          <h2>Targets</h2>
-          <span class="panel-note" id="row-count"></span>
-        </div>
-        <div class="toolbar">
-          <input id="query" type="search" placeholder="Filter symbol, source, evidence">
-          <select id="status-filter">
-            <option value="">All statuses</option>
-            <option value="Needs wiring">Needs wiring</option>
-            <option value="Proposed">Proposed</option>
-            <option value="Recorded">Recorded</option>
-            <option value="Renamed">Renamed</option>
-          </select>
-          <select id="source-filter">
-            <option value="">All sources</option>
-          </select>
-          <button class="btn" id="clear" type="button">Clear</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th data-sort="status">Status</th>
-                <th data-sort="fn">Function</th>
-                <th data-sort="name">Name</th>
-                <th data-sort="size">Size</th>
-                <th data-sort="source">Source</th>
-                <th data-sort="current_symbol">Current</th>
-                <th data-sort="old_refs">Old Refs</th>
-                <th data-sort="provenance">Evidence</th>
-              </tr>
-            </thead>
-            <tbody id="targets"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <aside class="detail-panel" id="details"></aside>
+        <aside class="detail-panel" id="details"></aside>
+      </section>
     </section>
   </main>
   <script>
@@ -1368,6 +1652,8 @@ HTML = r"""<!doctype html>
       attention: false,
       tuNeedsOnly: false,
       decompNearOnly: false,
+      selectedUnitKey: "",
+      activeView: "decomp",
       refreshTimer: null
     };
     const statusClass = {
@@ -1412,6 +1698,28 @@ HTML = r"""<!doctype html>
     }
     function pctText(value) {
       return `${Number(value || 0).toFixed(1)}%`;
+    }
+    function unitKey(row) {
+      return `${row.name || ""}|${row.source || ""}`;
+    }
+    function fileName(source) {
+      if (!source) return "unknown";
+      return String(source).replaceAll("\\", "/").split("/").pop();
+    }
+    function unitDisplayName(row) {
+      return fileName(row.source) !== "unknown" ? fileName(row.source) : (row.name || "unknown");
+    }
+    function functionStatusLabel(status) {
+      if (status === "matched") return "100";
+      if (status === "near") return "near";
+      if (status === "partial") return "partial";
+      return "missing";
+    }
+    function statusChip(status) {
+      const chip = document.createElement("span");
+      chip.className = `status-chip ${status || "missing"}`;
+      setText(chip, functionStatusLabel(status));
+      return chip;
     }
     function metric(label, value, note, color) {
       const box = document.createElement("div");
@@ -1605,15 +1913,83 @@ HTML = r"""<!doctype html>
       ctx.textAlign = "right";
       ctx.fillText(history[history.length - 1].timestamp || "", w - pad.r, h - 8);
     }
+    function relatedAttempts(data, unit) {
+      if (!unit) return data.attempt_log || [];
+      const sourceFile = fileName(unit.source);
+      const shortName = shortSource(unit.source || unit.name);
+      const fnSet = new Set((unit.functions || []).map(row => row.name).filter(Boolean));
+      return (data.attempt_log || []).filter(row => {
+        const rowFile = fileName(row.file || "");
+        if (rowFile !== "unknown" && sourceFile !== "unknown" && rowFile === sourceFile) return true;
+        if (rowFile !== "unknown" && rowFile.replace(/\.c$/, "") === shortName) return true;
+        if (row.function && fnSet.has(row.function)) return true;
+        return false;
+      });
+    }
+    function drawFileHistory(canvas, attempts) {
+      const { ctx, w, h } = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      const points = (attempts || []).filter(row => row.percent != null).map((row, idx) => ({
+        x: idx,
+        y: Number(row.percent || 0),
+        label: row.timestamp || ""
+      }));
+      if (points.length < 2) {
+        return drawEmpty(ctx, w, h, "No selected-file percentage history yet");
+      }
+      const pad = { l: 42, r: 16, t: 18, b: 28 };
+      const maxX = Math.max(...points.map(row => row.x));
+      const minY = Math.max(0, Math.floor(Math.min(...points.map(row => row.y)) / 10) * 10);
+      const maxY = Math.min(100, Math.max(100, Math.ceil(Math.max(...points.map(row => row.y)) / 10) * 10));
+      const x = value => pad.l + (w - pad.l - pad.r) * value / Math.max(1, maxX);
+      const y = value => h - pad.b - (h - pad.t - pad.b) * (value - minY) / Math.max(1, maxY - minY);
+      ctx.strokeStyle = "#2d3a4b";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const gy = pad.t + (h - pad.t - pad.b) * i / 4;
+        ctx.beginPath();
+        ctx.moveTo(pad.l, gy);
+        ctx.lineTo(w - pad.r, gy);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "#f0b35a";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      points.forEach((point, idx) => {
+        const px = x(point.x);
+        const py = y(point.y);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+      ctx.fillStyle = "#f0b35a";
+      for (const point of points) {
+        ctx.beginPath();
+        ctx.arc(x(point.x), y(point.y), 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = "#a8b4c4";
+      ctx.font = "12px Segoe UI, Arial";
+      ctx.textAlign = "right";
+      ctx.fillText(`${maxY}%`, pad.l - 8, y(maxY) + 4);
+      ctx.fillText(`${minY}%`, pad.l - 8, y(minY) + 4);
+      ctx.textAlign = "left";
+      ctx.fillText(points[0].label, pad.l, h - 8);
+      ctx.textAlign = "right";
+      ctx.fillText(points[points.length - 1].label, w - pad.r, h - 8);
+    }
     function renderMetrics(data) {
       const decomp = data.decomp || {};
-      const metrics = $("metrics");
-      metrics.replaceChildren(
-        metric("Completion", `${data.metrics.completion_pct}%`, `${data.metrics.wired_targets}/${data.counts.targets} recorded or renamed`, "#38b995"),
+      $("decomp-metrics").replaceChildren(
         metric("Decomp Fns", pctText(decomp.functions_pct), `${decomp.matched_functions || 0}/${decomp.total_functions || 0} functions at 100%`, "#f0b35a"),
         metric("Decomp Code", pctText(decomp.code_pct), `${(decomp.matched_code || 0).toLocaleString()}/${(decomp.total_code || 0).toLocaleString()} bytes`, "#5c91df"),
         metric("Fuzzy Match", pctText(decomp.fuzzy_pct), "weighted instruction similarity", "#a98ee6"),
         metric("Complete Units", `${decomp.complete_units || 0}/${decomp.total_units || 0}`, "report.json decomp units", "#38b995"),
+        metric("Attempt Log", `${(data.attempt_log || []).length}`, "coordination status entries retained", "#8da0b8"),
+        metric("Report Updated", decomp.updated_at || "unknown", "mtime for report.json", "#38b995")
+      );
+      $("symbol-metrics").replaceChildren(
+        metric("Completion", `${data.metrics.completion_pct}%`, `${data.metrics.wired_targets}/${data.counts.targets} recorded or renamed`, "#38b995"),
         metric("Needs Wiring", data.counts.by_status["Needs wiring"] || 0, "confirmed leads blocking clean rename", "#f0b35a"),
         metric("Renamed", data.counts.by_status.Renamed || 0, `${data.metrics.rename_pct}% fully wired`, "#5c91df"),
         metric("Recorded", data.counts.by_status.Recorded || 0, "evidence captured", "#8da0b8"),
@@ -1970,7 +2346,19 @@ HTML = r"""<!doctype html>
         empty.className = "empty-state";
         setText(empty, decomp.available ? "No decomp units match the current filter" : "No report.json decomp metrics found");
         map.append(empty);
+        const panel = $("decomp-details");
+        panel.replaceChildren();
+        const detailEmpty = document.createElement("div");
+        detailEmpty.className = "empty-state";
+        setText(detailEmpty, decomp.available ? "No matching decomp file selected" : "No report.json decomp metrics found");
+        panel.append(detailEmpty);
+        renderDecompAttemptLog(data, null);
+        drawFileHistory($("file-history-chart"), []);
+        setText($("file-history-note"), "no matching file selected");
         return;
+      }
+      if (!store.selectedUnitKey || !units.some(row => unitKey(row) === store.selectedUnitKey)) {
+        store.selectedUnitKey = unitKey(units[0]);
       }
       const maxFns = Math.max(...units.map(row => Number(row.total_functions || 0)), 1);
       for (const row of units) {
@@ -1980,13 +2368,14 @@ HTML = r"""<!doctype html>
         const tile = document.createElement("button");
         tile.type = "button";
         tile.className = "tu-tile";
+        if (unitKey(row) === store.selectedUnitKey) tile.classList.add("selected");
         tile.style.background = tileColor(pct);
         tile.style.gridColumnEnd = `span ${span}`;
         tile.style.gridRowEnd = `span ${Math.max(1, Math.min(3, Math.ceil(span * .72)))}`;
         tile.title = `${row.name} | ${row.matched_functions}/${row.total_functions} functions | ${pctText(row.code_pct)} code`;
         const name = document.createElement("div");
         name.className = "tu-name";
-        setText(name, row.name || shortSource(row.source));
+        setText(name, unitDisplayName(row));
         const pctNode = document.createElement("div");
         pctNode.className = "tu-pct";
         setText(pctNode, pctText(pct));
@@ -1995,13 +2384,150 @@ HTML = r"""<!doctype html>
         setText(meta, `${row.matched_functions || 0}/${row.total_functions || 0} fns | ${pctText(row.code_pct)} code`);
         tile.append(name, pctNode, meta);
         tile.addEventListener("click", () => {
-          $("query").value = shortSource(row.source || row.name);
-          store.attention = false;
-          $("attention").classList.remove("primary");
-          renderRows();
-          document.querySelector(".workbench").scrollIntoView({ behavior: "smooth", block: "start" });
+          store.selectedUnitKey = unitKey(row);
+          renderDecompMap(data);
+          renderDecompDetail(data);
+          document.querySelector(".decomp-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
         });
         map.append(tile);
+      }
+      renderDecompDetail(data);
+    }
+    function selectedDecompUnit(data) {
+      const units = ((data.decomp || {}).units || []);
+      if (!units.length) return null;
+      return units.find(row => unitKey(row) === store.selectedUnitKey) || units[0];
+    }
+    function renderDecompDetail(data) {
+      const panel = $("decomp-details");
+      panel.replaceChildren();
+      const unit = selectedDecompUnit(data);
+      if (!unit) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No decomp file selected");
+        panel.append(empty);
+        renderDecompAttemptLog(data, null);
+        drawFileHistory($("file-history-chart"), []);
+        setText($("file-history-note"), "no file selected");
+        return;
+      }
+      store.selectedUnitKey = unitKey(unit);
+      const attempts = relatedAttempts(data, unit);
+      const title = document.createElement("div");
+      title.className = "decomp-title mono";
+      setText(title, unitDisplayName(unit));
+      const subtitle = document.createElement("div");
+      subtitle.className = "decomp-subtitle";
+      setText(subtitle, unit.source || unit.name || "unknown source");
+      const stats = document.createElement("div");
+      stats.className = "mini-stats";
+      const matched = (unit.function_status || {}).matched || 0;
+      const near = (unit.function_status || {}).near || 0;
+      const partial = (unit.function_status || {}).partial || 0;
+      const missing = (unit.function_status || {}).missing || 0;
+      stats.append(
+        miniStat("Functions", `${unit.matched_functions || 0}/${unit.total_functions || 0}`),
+        miniStat("Fuzzy", pctText(unit.fuzzy_pct)),
+        miniStat("Code", pctText(unit.code_pct)),
+        miniStat("Mixed", `${near + partial + missing}`)
+      );
+      const mix = document.createElement("div");
+      mix.className = "legend";
+      for (const [label, value, color] of [
+        ["100", matched, "#38b995"],
+        ["near", near, "#f0b35a"],
+        ["partial", partial, "#5c91df"],
+        ["missing", missing, "#e07171"]
+      ]) {
+        const entry = document.createElement("span");
+        entry.className = "legend-item";
+        const swatch = document.createElement("span");
+        swatch.className = "swatch";
+        swatch.style.setProperty("--swatch", color);
+        entry.append(swatch, document.createTextNode(`${label}: ${value}`));
+        mix.append(entry);
+      }
+      const listTitle = document.createElement("div");
+      listTitle.className = "panel-title";
+      const h = document.createElement("h2");
+      setText(h, "Functions");
+      const note = document.createElement("span");
+      note.className = "panel-note";
+      setText(note, `${(unit.functions || []).length} rows from report.json`);
+      listTitle.append(h, note);
+      const list = document.createElement("div");
+      list.className = "function-list";
+      const functions = (unit.functions || []).slice().sort((a, b) => {
+        const ap = Number(a.fuzzy_pct || 0);
+        const bp = Number(b.fuzzy_pct || 0);
+        if (ap !== bp) return ap - bp;
+        return Number(b.size || 0) - Number(a.size || 0);
+      });
+      if (!functions.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No function rows recorded for this file");
+        list.append(empty);
+      }
+      for (const fn of functions) {
+        const row = document.createElement("div");
+        row.className = "function-row";
+        const name = document.createElement("div");
+        name.className = "function-name";
+        setText(name, fn.name || "unknown");
+        const pctNode = document.createElement("div");
+        pctNode.className = "function-pct";
+        setText(pctNode, pctText(fn.fuzzy_pct));
+        const size = document.createElement("div");
+        size.className = "function-size";
+        setText(size, `${Number(fn.size || 0).toLocaleString()}b`);
+        row.append(name, pctNode, size, statusChip(fn.status));
+        list.append(row);
+      }
+      panel.append(title, subtitle, stats, mix, listTitle, list);
+      renderDecompAttemptLog(data, unit);
+      drawFileHistory($("file-history-chart"), attempts);
+      setText($("file-history-note"), attempts.length ? `${attempts.length} related log entries` : "no related attempt entries");
+    }
+    function miniStat(label, value) {
+      const box = document.createElement("div");
+      box.className = "mini-stat";
+      const k = document.createElement("div");
+      k.className = "mini-label";
+      setText(k, label);
+      const v = document.createElement("div");
+      v.className = "mini-value";
+      setText(v, value);
+      box.append(k, v);
+      return box;
+    }
+    function renderDecompAttemptLog(data, unit) {
+      const list = $("decomp-log");
+      list.replaceChildren();
+      const attempts = (unit ? relatedAttempts(data, unit) : (data.attempt_log || [])).slice().reverse();
+      setText($("decomp-log-note"), unit ? `${attempts.length} entries for ${unitDisplayName(unit)}` : `${attempts.length} retained entries`);
+      if (!attempts.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No attempt history found for this selection");
+        list.append(empty);
+        return;
+      }
+      for (const attempt of attempts.slice(0, 80)) {
+        const row = document.createElement("div");
+        row.className = "attempt-row";
+        const time = document.createElement("div");
+        time.className = "attempt-time";
+        setText(time, attempt.timestamp);
+        const kind = document.createElement("div");
+        kind.className = "attempt-kind";
+        setText(kind, attempt.kind);
+        const message = document.createElement("div");
+        message.className = "attempt-message";
+        setText(message, attempt.message);
+        row.append(time, kind, message);
+        list.append(row);
       }
     }
     function renderCharts(data) {
@@ -2009,6 +2535,23 @@ HTML = r"""<!doctype html>
       drawBars($("provenance-chart"), data.charts.provenance || []);
       drawHistory($("history-chart"), data.history || []);
       renderSourceBars(data);
+    }
+    function switchView(view) {
+      store.activeView = view;
+      document.querySelectorAll(".tab-btn").forEach(button => {
+        button.classList.toggle("active", button.dataset.view === view);
+      });
+      document.querySelectorAll(".view").forEach(section => {
+        section.classList.toggle("active", section.id === `view-${view}`);
+      });
+      setText($("hud-project"), view === "symbols" ? "GC6E01/SYMBOLMAP" : "GC6E01/DECOMP");
+      if (location.hash !== `#${view}`) {
+        history.replaceState(null, "", `#${view}`);
+      }
+      if (store.data) {
+        renderCharts(store.data);
+        renderDecompDetail(store.data);
+      }
     }
     function scheduleRefresh() {
       if (store.refreshTimer) {
@@ -2035,6 +2578,7 @@ HTML = r"""<!doctype html>
       renderDecompMap(data);
       renderTreemap(data);
       renderRows();
+      switchView(store.activeView);
     }
     $("query").addEventListener("input", renderRows);
     $("status-filter").addEventListener("change", () => {
@@ -2088,6 +2632,9 @@ HTML = r"""<!doctype html>
       $("decomp-near").classList.remove("primary");
       if (store.data) renderDecompMap(store.data);
     });
+    document.querySelectorAll(".tab-btn").forEach(button => {
+      button.addEventListener("click", () => switchView(button.dataset.view || "decomp"));
+    });
     document.querySelectorAll("th[data-sort]").forEach(th => {
       th.addEventListener("click", () => {
         const key = th.dataset.sort;
@@ -2100,8 +2647,14 @@ HTML = r"""<!doctype html>
       });
     });
     window.addEventListener("resize", () => {
-      if (store.data) renderCharts(store.data);
+      if (store.data) {
+        renderCharts(store.data);
+        renderDecompDetail(store.data);
+      }
     });
+    if (location.hash === "#symbols") {
+      store.activeView = "symbols";
+    }
     refresh();
     scheduleRefresh();
   </script>

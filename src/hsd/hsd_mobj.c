@@ -213,21 +213,19 @@ asm void fn_801A6B24(void) {
 #include "src/hsd/hsd_mobj_fn_801A6B24.inc"
 }
 #else
+#pragma push
+#pragma optimization_level 1
 void fn_801A6B24(void* info) {
-    u32 zero1;
-    u32 zero2;
-
     if (info == (void*)lbl_8047B2D0) {
         lbl_8047B2D0 = 0;
     }
     if (info == (void*)lbl_8036CB30) {
-        zero1 = 0;
-        zero2 = 0;
-        lbl_8047B2D8 = zero1;
-        lbl_8047B2DC = zero2;
+        lbl_8047B2D8 = 0;
+        lbl_8047B2DC = 0;
     }
-    ((HSD_ClassInfo*)lbl_8036CB30)->head.parent->destroy((HSD_Class*)info);
+    ((HSD_ClassInfo*)lbl_8036CB30)->head.parent->amnesia(info);
 }
+#pragma pop
 #endif
 
 /* 0x801A6B8C | 0xA8 */
@@ -381,23 +379,23 @@ u32* fn_801A6DC4(u32* node) {
 #endif
 
 /* 0x801A6DDC | 0x24 */
-#if 0
+#pragma push
+#pragma optimization_level 0
+#pragma optimizewithasm off
+#if 1
 asm void fn_801A6DDC(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DDC.inc"
 }
 #else
 void fn_801A6DDC(HSD_MObj* mobj, f32 val) {
-    if (mobj == NULL) {
-        return;
+    if (mobj != NULL) {
+        if (mobj->mat != NULL) {
+            mobj->mat->alpha = val;
+        }
     }
-    if (mobj->mat != NULL) {
-        goto ok;
-    }
-    return;
-ok:
-    mobj->mat->alpha = val;
 }
 #endif
+#pragma pop
 
 /* 0x801A6E00 | 0x24 */
 #if 0
@@ -489,7 +487,7 @@ extern void fn_801B6E74(void);
 extern void fn_801B6F5C(void);
 extern void fn_801B707C(void);
 extern void fn_801B7C60(void);
-extern u8 lbl_80478C88[];
+extern u32 lbl_80478C88;
 extern u32 lbl_8047DC38;
 #if 1
 asm void fn_801A7128(void) {

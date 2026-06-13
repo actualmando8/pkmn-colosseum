@@ -196,8 +196,8 @@ void TRKEXICallBack(s32 chan, void* ctx) {
  * 0x800C39A0 | size: 0x10
  */
 u8 fn_800C39A0(void) {
-    extern u8 lbl_803FED70;
-    return lbl_803FED70;
+    extern u8 lbl_803FED70[];
+    return lbl_803FED70[0];
 }
 
 /*
@@ -205,8 +205,8 @@ u8 fn_800C39A0(void) {
  * 0x800C39B0 | size: 0xC
  */
 void fn_800C39B0(u8 state) {
-    extern u8 lbl_803FED70;
-    lbl_803FED70 = state;
+    extern u8 lbl_803FED70[];
+    lbl_803FED70[0] = state;
 }
 
 /*
@@ -312,4 +312,3 @@ u32 fn_800C3AFC(u32 unused, u32 length, u32* addrPtr) {
         return 1;
     }
 }
-

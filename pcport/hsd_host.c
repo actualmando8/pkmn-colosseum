@@ -47,6 +47,7 @@
 #include "hsd/hsd_dobj.h"
 #include "hsd/hsd_mobj.h"
 #include "hsd/hsd_tobj.h"
+#include "hsd/hsd_pobj.h"
 #include "hsd/hsd_robj.h"
 #include "hsd/hsd_forward.h"
 #include "real_content_host.h"
@@ -1112,6 +1113,59 @@ HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* desc)
     return first;
 }
 
+HSD_PObj* HSD_PObjLoadDesc(HSD_PObjDesc* desc)
+{
+    HSD_PObj* first = NULL;
+    HSD_PObj* prev = NULL;
+
+    while (desc != NULL) {
+        HSD_PObj* pobj = (HSD_PObj*) HSD_MemAlloc((s32) sizeof(HSD_PObj));
+        if (pobj == NULL) {
+            HSD_PObjRemoveAll(first);
+            return NULL;
+        }
+        memset(pobj, 0, sizeof(HSD_PObj));
+        pobj->verts = desc->verts;
+        pobj->flags = desc->flags;
+        pobj->n_display = desc->n_display;
+        pobj->display = desc->display;
+        pobj->u.jobj = NULL;
+        if (prev != NULL) {
+            prev->next = pobj;
+        } else {
+            first = pobj;
+        }
+        prev = pobj;
+        desc = desc->next;
+    }
+    return first;
+}
+
+HSD_DObj* HSD_DObjLoadDesc(HSD_DObjDesc* desc)
+{
+    HSD_DObj* first = NULL;
+    HSD_DObj* prev = NULL;
+
+    while (desc != NULL) {
+        HSD_DObj* dobj = (HSD_DObj*) HSD_MemAlloc((s32) sizeof(HSD_DObj));
+        if (dobj == NULL) {
+            HSD_DObjRemoveAll(first);
+            return NULL;
+        }
+        memset(dobj, 0, sizeof(HSD_DObj));
+        dobj->mobj = HSD_MObjLoadDesc(desc->mobjdesc);
+        dobj->pobj = HSD_PObjLoadDesc(desc->pobjdesc);
+        if (prev != NULL) {
+            prev->next = dobj;
+        } else {
+            first = dobj;
+        }
+        prev = dobj;
+        desc = desc->next;
+    }
+    return first;
+}
+
 void HSD_TObjRemoveAll(HSD_TObj* tobj)
 {
     while (tobj != NULL) {
@@ -1239,6 +1293,19 @@ void HSD_JObjAnim(HSD_JObj* jobj)
          * single-DObj HSD_DObjAnim, which would skip chained material sets). */
         HSD_DObjAnimAll(jobj->u.dobj);
     }
+}
+
+void PCPort_HSDJObjAnimJointOnlyAll(HSD_JObj* jobj)
+{
+    if (jobj == NULL) {
+        return;
+    }
+    if (jobj->aobj != NULL) {
+        HSD_AObjInterpretAnim(jobj->aobj, jobj, PCPort_JObjUpdateFunc);
+    }
+    HSD_RObjAnimAll(jobj->robj);
+    PCPort_HSDJObjAnimJointOnlyAll(jobj->child);
+    PCPort_HSDJObjAnimJointOnlyAll(jobj->next);
 }
 
 void HSD_JObjSetFlags(HSD_JObj* jobj, u32 flags)

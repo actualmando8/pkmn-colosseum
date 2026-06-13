@@ -19364,11 +19364,11 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
     extern void  fn_800ECCA8(void *a, u32 node);
     extern void* fn_8018D928(void);
     extern void  fn_8018D998(u32 group, u32 handle);
-    extern void  fn_8018F4C8(void *angleObj, u32 *outNode, void *ctxBuf, u32 slot);
+    extern void  fn_8018F4C8(void *angleObj, u32 slot, u32 *outNode, u8 *outLoop);
     extern void *fn_8018F6F4(u32 param);
 
     u32  htbl[2];
-    void *ctxBuf[2];
+    u8   loopFlag;
     f32  arcCurrent;
     f32  arcTotal;
     u32  node4;
@@ -19402,10 +19402,10 @@ void fn_8012C660(void *obj, s32 playerIdx, f32 turnAmount) {
     }
     angleObj = fn_8018F6F4(configParam);
 
-    fn_8018F4C8(angleObj, &node1, ctxBuf, 1);
-    fn_8018F4C8(angleObj, &node2, ctxBuf, 2);
-    fn_8018F4C8(angleObj, &node3, ctxBuf, 3);
-    fn_8018F4C8(angleObj, &node4, ctxBuf, 4);
+    fn_8018F4C8(angleObj, 1, &node1, &loopFlag);
+    fn_8018F4C8(angleObj, 2, &node2, &loopFlag);
+    fn_8018F4C8(angleObj, 3, &node3, &loopFlag);
+    fn_8018F4C8(angleObj, 4, &node4, &loopFlag);
 
     fn_800EC578(obj, &fromNode, &nextNode);
 

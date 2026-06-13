@@ -531,7 +531,7 @@ HSD_Class* fn_80193A94(HSD_ClassInfo* info) {
     if (result != NULL) {
         info->head.nb_exist += 1;
         if (info->head.nb_exist > info->head.nb_peak) {
-            info->head.nb_peak = info->head.nb_exist;
+            info->head.nb_peak = *(u32 volatile*)&info->head.nb_exist;
         }
     }
     return result;

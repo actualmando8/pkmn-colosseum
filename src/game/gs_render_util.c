@@ -298,11 +298,10 @@ void fn_800D13C8(void* dst, void* src) {
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
-        if (*(u8*)((u8*)dst + 0x3) != 0) {
-            *(u8*)((u8*)dst + 0x4) = 1;
-            *(u8*)((u8*)dst + 0x124) = 0;
-            *(u8*)((u8*)dst + 0x125) = 1;
-        }
+        if (*(u8*)((u8*)dst + 0x3) == 0) { goto done; }
+        *(u8*)((u8*)dst + 0x4) = 1;
+        *(u8*)((u8*)dst + 0x124) = 0;
+        *(u8*)((u8*)dst + 0x125) = 1;
         {
             f32 dst_11c = *(f32*)((u8*)dst + 0x11c);
             if (*(u8*)((u8*)dst + 0x3) != 0) {
@@ -313,6 +312,8 @@ void fn_800D13C8(void* dst, void* src) {
                 HSD_ForeachAnim(*(void**)((u8*)dst + 0xc), (u32)2, (u32)0xffff, fn_801C027C, *(f32*)((u8*)dst + 0x118), (u32)1);
             }
         }
+done:
+        ;
     }
 }
 #pragma pop

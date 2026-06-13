@@ -539,7 +539,8 @@ void fn_801128A0(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_801129AC(void) {
-    /* TODO: match -- 32 bytes at 0x801129AC */
+    extern void fn_801D23C0(void);
+    fn_801D23C0();
 }
 #pragma pop
 
@@ -637,8 +638,13 @@ u32 fn_8011394C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8011395C(void) {
-    /* TODO: match -- 16 bytes at 0x8011395C (offset-0 store @l-fold wall) */
+#pragma peephole off
+void fn_8011395C(u32 value) {
+    asm {
+        lis r4, lbl_80408378@ha
+        addi r4, r4, lbl_80408378@l
+        stw r3, 0(r4)
+    }
 }
 #pragma pop
 

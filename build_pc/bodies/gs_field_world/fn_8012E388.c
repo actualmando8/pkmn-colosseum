@@ -16,6 +16,7 @@ void fn_8012E388(s32 playerIdx, f32* outAux)
     extern u8 lbl_80478AC0[];
     extern f32 sqrtf(f32 x);
     extern f32 sinf(f32 x);
+    extern void fn_80177A38(void);
 
     f32 selector[2];
     u32 handle = 0;

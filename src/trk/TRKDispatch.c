@@ -128,8 +128,8 @@ u32 fn_800C0CD0(void) { return 0; }
  * 0x800C04E8 | size: 0xC
  */
 void fn_800C04E8(u32 state) {
-    extern u32 lbl_803FE7D0;
-    lbl_803FE7D0 = state;
+    extern u32 lbl_803FE7D0[];
+    lbl_803FE7D0[0] = state;
 }
 
 /*
@@ -137,8 +137,8 @@ void fn_800C04E8(u32 state) {
  * 0x800C04F4 | size: 0x10
  */
 u32 fn_800C04F4(void) {
-    extern u32 lbl_803FE7D0;
-    return lbl_803FE7D0;
+    extern u32 lbl_803FE7D0[];
+    return lbl_803FE7D0[0];
 }
 
 /*
@@ -156,7 +156,7 @@ void fn_800C0504(u8* data, s32 len) {
 
     for (i = 0; i < len; i++) {
         MWTRACE(8, lbl_8026FA34, data[i]);
-        if ((i & 0xF) == 0xF) {
+        if ((i % 16) == 15) {
             MWTRACE(8, lbl_8026FA3C);
         }
     }
@@ -349,8 +349,9 @@ void fn_800C0DA8(void) {
 }
 
 /* fn_800C0E68 - 0x800C0E68 | size: 0x8 */
-/* Empty function (blr) - no-op placeholder */
+/* Restore MSR from r3. */
 void fn_800C0E68(void) {
+    asm { mtmsr r3 }
 }
 
 /* fn_800C0E70 - 0x800C0E70 | size: 0x3C

@@ -42,7 +42,7 @@ extern void fn_800A50E4();
 extern void fn_800A541C();
 extern void fn_800A7BCC();
 extern void fn_800C8174();
-extern void fn_800CA968();
+extern void strcpy();
 extern void fn_800D0F44();
 extern void fn_800D3088();
 extern void fn_800D37CC();
@@ -2514,7 +2514,7 @@ void fn_8007B114(void) {
     r3 = tmp;
     tmp = r5 << 2;
     r4 = *(u32*)(r4 + tmp);
-    ((void(*)(void))fn_800CA968)();
+    ((void(*)(void))strcpy)();
     r3 = (u32)&lbl_803FADF8;
     r4 = (u32)sp + 0x44;
     r3 = (u32)&lbl_803FADF8;

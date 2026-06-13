@@ -161,6 +161,7 @@ struct HSD_MObjInfo {
     int (*load)(HSD_MObj* mobj, HSD_MObjDesc* desc);
     HSD_TExp* (*make_texp)(HSD_MObj* mobj, HSD_TObj* tobj_top,
                            HSD_TExp** list);
+    void (*unk_48)(void);
     void (*setup_tev)(HSD_MObj* mobj, HSD_TObj* tobj, u32 rendermode);
     void (*unset)(HSD_MObj* mobj, u32 rendermode);
 };

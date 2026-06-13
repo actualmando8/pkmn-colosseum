@@ -19,6 +19,7 @@ extern void C_MTXPerspective();
 extern void OSFillFPUContext();
 extern void fn_801963E0();
 extern void fn_8019674C();
+extern char lbl_80465080[];
 
 static HSD_ClassInfo* default_class;
 static HSD_CObj* current;
@@ -298,11 +299,11 @@ asm void fn_80193CD0(void) {
 void fn_80193CD0(u8* ptr) {
     extern u32 lbl_8047B230;
     extern u32 lbl_8047B234;
-    extern u8 lbl_8036C678[];
+    extern HSD_CObjInfo lbl_8036C678;
     u32 class_info;
     if (ptr == (u8*)lbl_8047B230) { lbl_8047B230 = 0; }
-    if (ptr == lbl_8036C678) { lbl_8047B234 = 0; }
-    class_info = *(u32*)(lbl_8036C678 + 0x14);
+    if (ptr == (u8*)&lbl_8036C678) { lbl_8047B234 = 0; }
+    class_info = *(u32*)((u8*)&lbl_8036C678 + 0x14);
     ((void(*)(u8*))*(u32*)(class_info + 0x38))(ptr);
 }
 #endif
@@ -315,6 +316,9 @@ void fn_80193CD0(u8* ptr) {
 extern void __assert(const char*, u32, const char*);
 extern void HSD_MtxFree(void);
 extern void fn_801C25E4(void);
+extern HSD_CObjInfo lbl_8036C678;
+extern char lbl_8047D958;
+extern char lbl_8047D960;
 #if 1
 asm void fn_80193D30(void) {
 #include "src/hsd/hsd_cobj_fn_80193D30.inc"
@@ -335,15 +339,18 @@ asm void fn_80193EC8(void) {
 #else
 int fn_80193EC8(HSD_CObj* cobj) {
     extern HSD_CObjInfo lbl_8036C678;
-    HSD_ClassInfo* info = HSD_CLASS_INFO(&lbl_8036C678);
-    int result = (int)info->head.parent->alloc((HSD_ClassInfo*)cobj);
+    HSD_WObj* interest;
+    int result;
+    result = HSD_CLASS_INFO(&lbl_8036C678)->head.parent->init((HSD_Class*)cobj);
     if (result < 0) return result;
     if (cobj != NULL) {
         cobj->flags |= 0xC0000000;
     }
-        cobj->eyepos = HSD_WObjAlloc();
-        cobj->interest = HSD_WObjAlloc();
-    return 0;
+    cobj->eyepos = HSD_WObjAlloc();
+    interest = HSD_WObjAlloc();
+    result = 0;
+    cobj->interest = interest;
+    return result;
 }
 #endif
 #pragma pop
@@ -361,23 +368,24 @@ asm void fn_80193F44(void) {
 #else
 void* fn_80193F44(u8* ptr) {
     extern u32 lbl_8047B230;
-    extern u8 lbl_8036C678[];
+    extern HSD_CObjInfo lbl_8036C678;
     extern char lbl_8047D958;
     extern char lbl_8047D960;
     void* cobj_result;
-    u32 tmp;
+    void* alloc_arg;
     HSD_ClassInfo* info;
-    if (ptr == NULL) return NULL;
-    tmp = *(u32*)ptr;
-    if (tmp == 0) goto default_alloc;
-    info = fn_80193748(*(const char**)ptr);
-    if (info != 0) goto do_alloc_from_info;
+    if (ptr == NULL) goto return_null;
+    if (*(u32*)ptr != 0) {
+        info = fn_80193748(*(const char**)ptr);
+        if (info != 0) goto do_alloc_from_info;
+    }
 default_alloc:
     if (lbl_8047B230 != 0) {
-        cobj_result = fn_80193828((void*)lbl_8047B230);
+        alloc_arg = (void*)lbl_8047B230;
     } else {
-        cobj_result = fn_80193828((void*)lbl_8036C678);
+        alloc_arg = (void*)&lbl_8036C678;
     }
+    cobj_result = fn_80193828(alloc_arg);
     if (cobj_result == NULL) {
         __assert(&lbl_8047D958, 0x7a4, &lbl_8047D960);
     }
@@ -393,6 +401,8 @@ setup:
         ((void(*)(void*, u8*))vtable[0x3c / 4])(cobj_result, ptr);
     }
     return cobj_result;
+return_null:
+    return NULL;
 }
 #endif
 #pragma pop
@@ -424,13 +434,13 @@ asm void fn_80194258(void) {
 #else
 void* fn_80194258(void) {
     extern u32 lbl_8047B230;
-    extern const char lbl_8047D958[];
-    extern const char lbl_8047D960[];
+    extern char lbl_8047D958;
+    extern char lbl_8047D960;
     typedef void* (*fn_80193828_t)(void*);
     typedef void (*__assert_t)(const char*, int, const char*);
     void* arg = lbl_8047B230 != 0 ? (void*)lbl_8047B230 : (void*)0x8037C678;
     void* result = ((fn_80193828_t)fn_80193828)(arg);
-    if (result == NULL) ((__assert_t)__assert)(lbl_8047D958, 0x7A4, lbl_8047D960);
+    if (result == NULL) ((__assert_t)__assert)(&lbl_8047D958, 0x7A4, &lbl_8047D960);
     return result;
 }
 #endif
@@ -849,6 +859,7 @@ void fn_801947C8(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+extern f32 lbl_80478AC8;
 #if 1
 asm void fn_80194C2C(void) {
 #include "src/hsd/hsd_cobj_fn_80194C2C.inc"
@@ -1487,6 +1498,9 @@ extern void fn_800BCEBC(void);
 extern void fn_800BD4B4(void);
 extern void fn_800BD554(void);
 extern void fn_801B25C4(void);
+extern u8 lbl_8036C720[];
+extern u8 lbl_8036CBC0[];
+extern u8 lbl_80478C60;
 #if 1
 asm void fn_80196EF8(void) {
 #include "src/hsd/hsd_cobj_fn_80196EF8.inc"

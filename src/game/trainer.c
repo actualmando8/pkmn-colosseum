@@ -2625,7 +2625,7 @@ u32 fn_801F8C00(void* context, void* filter) {
 
 /* 0x801F8D80 | size: 0xB4 */
 void* fn_801F8D80(void* context, void* filter) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern u8 fn_80204928(void* filter, void* pokemon);
     extern u8 fn_80206780(void* ptr);
     void* pokemon;
@@ -3072,7 +3072,7 @@ s32 fn_801F9600(void* context, void* p1, void* p2, void* p3) {
 /* 0x801F9790 | size: 0x8C */
 void fn_801F9790(void* context) {
     extern void fightActionInit(void* ptr);
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
     extern void fn_80207760(void* ptr);
     void* result;
     u16 i;
@@ -5320,7 +5320,7 @@ u8 fn_801FB8F8(void* arg0) {
 
 /* 0x801FB974 | size: 0xB0 */
 void fn_801FB974(void* context, u8 mode) {
-    extern void _threadSwitch(void* ptr);
+    extern void _threadSwitch(void);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5340,7 +5340,7 @@ void fn_801FB974(void* context, u8 mode) {
             if ((u8)fn_801DA94C(data, 0x57, 4) == 0) {
                 return;
             }
-            _threadSwitch(data);
+            _threadSwitch();
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, 0x57, 4);
@@ -5349,7 +5349,7 @@ void fn_801FB974(void* context, u8 mode) {
 
 /* 0x801FBA24 | size: 0xB0 */
 void fn_801FBA24(void* context, u8 mode) {
-    extern void _threadSwitch(void* ptr);
+    extern void _threadSwitch(void);
     extern void fn_801DA8C4(void* ptr, u32 field, u32 size);
     extern u8 fn_801DA94C(void* ptr, u32 field, u32 size);
     extern void fn_801DA9E8(void* ptr, u32 field, u32 size);
@@ -5369,7 +5369,7 @@ void fn_801FBA24(void* context, u8 mode) {
             if ((u8)fn_801DA94C(data, 0x74, 4) == 0) {
                 return;
             }
-            _threadSwitch(data);
+            _threadSwitch();
         } while (1);
     } else if (mode == 3) {
         fn_801DA8C4(data, 0x74, 4);

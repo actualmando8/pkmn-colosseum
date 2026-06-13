@@ -917,8 +917,13 @@ void fn_800D02BC(void) {
  * PADSetSpec - Set the PAD specification version.
  * Configures which PAD data format to use for communication.
  */
-void fn_800D0338(void) {
-    /* Sets a global PAD specification version flag */
+void fn_800D0338(u32 chan, u32 cmd) {
+    asm {
+        mulli r0, r3, 0xc
+        lis r3, 0xcc00
+        addi r3, r3, 0x6400
+        stwx r4, r3, r0
+    }
 }
 
 /*
@@ -926,7 +931,11 @@ void fn_800D0338(void) {
  * PADGetSpec - Get the current PAD specification version.
  */
 void fn_800D034C(void) {
-    /* Returns the current PAD specification version flag */
+    asm {
+        lis r3, 0xcc00
+        lis r0, 0x8000
+        stw r0, 0x6438(r3)
+    }
 }
 
 /*
@@ -1010,4 +1019,3 @@ void fn_800D0DF8(void) {
      * Handles wireless controller identification and fix-bit processing.
      */
 }
-

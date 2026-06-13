@@ -206,7 +206,7 @@ void fn_8019B948(void) {
 extern void fn_80193828(void);
 extern void fn_800BD768(void);
 extern void* memset(void* dst, int val, u32 n);
-extern u8 lbl_8047DA74[];
+extern char lbl_8047DA74;
 extern u8 lbl_8047DA80[];
 extern u8 lbl_8036C828[];
 extern u8 lbl_8047DA7C[];
@@ -257,7 +257,7 @@ void fn_8019BD18(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern u8 lbl_80274800[];
-extern u8 lbl_8047DA98[];
+extern char lbl_8047DA98;
 #if 1
 asm void HSD_HashSearch(void) {
 #include "src/hsd/hsd_fog_HSD_HashSearch.inc"
@@ -368,8 +368,8 @@ void fn_8019C1B0(u32* table, u32 key) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* HSD_ObjAlloc(void* list);
-extern u8 lbl_8047DAA0[];
-extern u8 lbl_8047DAA8[];
+extern char lbl_8047DAA0;
+extern char lbl_8047DAA8;
 #if 1
 asm void HSD_IDInsertToTable(void) {
 #include "src/hsd/hsd_fog_HSD_IDInsertToTable.inc"

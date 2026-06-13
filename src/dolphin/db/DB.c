@@ -117,12 +117,8 @@ asm void DBPrintf(const char* fmt, ...) {
  * Returns NULL if the interface pointer is NULL.
  */
 u32 fn_800A2C58(void) {
-    u32 ptr;
-
-    ptr = *(u32*)__DBInterface;
-    if (ptr == 0) {
+    if (__DBInterface == NULL) {
         return 0;
     }
-    return *(u32*)((u8*)ptr);
+    return *(u32*)__DBInterface;
 }
-

@@ -1227,21 +1227,25 @@ void fn_800C2748(void) {
 }
 
 /* fn_800C29F0 - 0x800C29F0 | size: 0x8 */
-/* Empty function (blr) - TRK no-op placeholder */
+/* TRK support-call trap placeholder */
 void fn_800C29F0(void) {
+    asm { twi 31, r0, 0 }
 }
 
 /* fn_800C29F8 - 0x800C29F8 | size: 0x8 */
-/* Empty function (blr) - TRK no-op placeholder */
+/* TRK support-call trap placeholder */
 void fn_800C29F8(void) {
+    asm { twi 31, r0, 0 }
 }
 
 /* fn_800C2A00 - 0x800C2A00 | size: 0x8 */
-/* Empty function (blr) - TRK no-op placeholder */
+/* TRK support-call trap placeholder */
 void fn_800C2A00(void) {
+    asm { twi 31, r0, 0 }
 }
 
 /* fn_800C2A08 - 0x800C2A08 | size: 0x8 */
-/* Empty function (blr) - TRK no-op placeholder */
+/* TRK support-call trap placeholder */
 void fn_800C2A08(void) {
+    asm { twi 31, r0, 0 }
 }

@@ -215,7 +215,7 @@ static void LObjInfoInit(void)
 extern u32 lbl_8047B2B0;
 extern u8 lbl_8036CA20[];
 extern u32 lbl_8047B2B4;
-#if 0
+#if 1
 asm void fn_801A4098(void) {
 #include "src/hsd/hsd_lobj_fn_801A4098.inc"
 }
@@ -298,8 +298,8 @@ extern void fn_80193828(void);
 extern void __assert();
 extern u32 lbl_8047B2B0;
 extern char lbl_8047DBB8;
-extern u8 lbl_8047DBC0[];
-extern u8 lbl_8047DBC4[];
+extern char lbl_8047DBC0;
+extern char lbl_8047DBC4;
 #if 1
 asm void fn_801A4344(void) {
 #include "src/hsd/hsd_lobj_fn_801A4344.inc"
@@ -316,7 +316,7 @@ extern void OSReport();
 extern void GXInitLightSpot();
 extern void GXInitLightDistAttn();
 extern u8 lbl_80274D94[];
-extern u8 lbl_8047DBC8[];
+extern char lbl_8047DBC8;
 #if 1
 asm void fn_801A4440(void) {
 #include "src/hsd/hsd_lobj_fn_801A4440.inc"
@@ -417,6 +417,11 @@ void HSD_LObjSetColor(HSD_LObj* lobj, u32* color) {
 /* 0x801A4A54 | 0x70 */
 extern void jumptable_8036CA64();
 /* GXLightIndex to GXLightID bitmask */
+#if 1
+asm void fn_801A4A54(void) {
+#include "src/hsd/hsd_lobj_fn_801A4A54.inc"
+}
+#else
 u32 fn_801A4A54(u32 idx) {
     switch (idx) {
     case 0: return 0x1;
@@ -431,6 +436,7 @@ u32 fn_801A4A54(u32 idx) {
     }
     return 0;
 }
+#endif
 
 /* 0x801A4AC4 | 0x3C */
 extern u32 lbl_8047B2B4;
@@ -474,7 +480,7 @@ void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj) {}
 extern void fn_801A3EB4(void);
 extern u8 lbl_80274DD8[];
 extern u8 lbl_80274DE4[];
-extern u8 lbl_8047DBD8[];
+extern char lbl_8047DBD8;
 #if 1
 asm void fn_801A4D20(void) {
 #include "src/hsd/hsd_lobj_fn_801A4D20.inc"

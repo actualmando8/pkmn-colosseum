@@ -528,7 +528,7 @@ extern u8 lbl_8047B398;
 extern u8 lbl_8047B399;
 
 void fn_801C2D54(void) {
-    /* No-op tick callback */
+    asm { lbz r3, lbl_8047B399(r13) }
 }
 
 /**

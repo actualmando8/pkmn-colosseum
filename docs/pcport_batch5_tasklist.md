@@ -2,6 +2,11 @@
 
 Tracked critical-path work after Batch 4C and the HSD host-loader takeover.
 
+## Standing Rule - True Port Only
+
+- Do not invent gameplay, animation, script, story, render, or UI behavior to make the PC port appear farther along. If a path cannot be wired from recovered/decompiled project code yet, mark the exact missing symbol/data contract as a decomp target and keep any host harness code clearly labeled as a smoke-test scaffold.
+- Runtime PC-port bridges are allowed only when they preserve a recovered function contract over real assets/data. They must not replace unknown original logic with guessed behavior.
+
 ## Batch 5A - JObj Graph-Safe Walkers
 
 - [x] Confirm the authoritative PC-port build path is `python tools\pcport_link.py`.
@@ -190,7 +195,7 @@ Verification:
 - [ ] Recover real story unlock/floor availability data and a collision-backed Phenac target.
 - [x] Gate field motion plumbing/facing cases for idle/walk/run while moving north/south/east/west.
 - [x] Link real people field-motion action records into the player motion source (`fn_8018F6F4` key lookup plus `fn_8018F4C8` slot mirror).
-- [x] Replace the host idle/walk/run role projection with the retail action-state caller from `fn_8012CA84` / `fn_8012C660`.
+- [ ] Replace the host idle/walk/run role projection with the true live retail action-state path from `fn_8012CA84` / `fn_8012C660`.
 - [x] Gate host-side START-in-field menu open/close behavior.
 - [ ] Link START-in-field to the real menu/title/message subsystems instead of the host overlay.
 - [x] Add first NPC talk-state coverage through the real `fn_801812E8` people interaction entry.
@@ -218,7 +223,7 @@ Lane result:
 - The worldmap handoff smoke simulates the field-to-worldmap transition target, loads `world_map.fsys`, selects `move_demo`, and renders the scene through the same field scene bridge. This proves the target asset/render path, not the full `gs_worldmap` cursor/select/travel-confirm state machine yet.
 - The worldmap menu smoke drives a host-side worldmap state path over the real `world_map.fsys` render: cursor movement, destination selection, travel confirmation dialog, and accepted travel result. It does not yet run the real `gs_worldmap` state machine, destination availability, or story-gated floor mapping beyond the current host table.
 - Accepted worldmap travel now resolves through the host floor table and renders the selected field target after confirmation. `PYRITE TOWN` maps to `M2_out` and is smoke-gated with WZX collision; `AGATE VILLAGE` maps to `M3_out` and is verified as a render/collision target. `PHENAC CITY` remains route-locked because `M1_out` renders but currently has no discovered WZX mesh.
-- The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the playable walk loop's movement/yaw helpers, and now separates visible idle/walk/run role cycles from turn-node action slots: straight idle/walk/run use the data-derived `ken_b1` motion-bank roles (`1/5/8`), while visible turn cases still come from recovered retail people action record `0x00F30400` through the `fn_8012C660` selector over `fn_8018F4C8` action slots 1-4. Exact HSD blend transitions through `fn_800EC5FC` / `fn_800EC5B8` remain open.
+- The locomotion smoke loads `S1_out` and `field_common.fsys :: ken_b1`, reuses the playable walk loop's movement/yaw helpers, and currently separates visible idle/walk/run role cycles from turn-node action slots: straight idle/walk/run use the data-derived `ken_b1` motion-bank roles (`1/5/8`), while visible turn cases come from recovered retail people action record `0x00F30400` through the `fn_8012C660` selector over `fn_8018F4C8` action slots 1-4. This is not yet the true live retail action-state path because object/model selection and exact HSD blend transitions still depend on unresolved stubs.
 - The message smoke loads `S1_out` and the animated player, renders a host-owned two-page field message over the live scene, and asserts type-in progression, A-to-fast-forward, A-to-next-page, and final close behavior. Real field message dispatch still needs `menu_msgbox` / script callback integration.
 - `fn_801812E8` is now a PC-port C mirror of the 0x190-byte retail people interaction state entry instead of an auto-generated link stub. The first NPC talk smoke host-seeds two `PeopleEntry` records, drives the recovered talk-start and restore branches, renders the field/message path over `S1_out`, and asserts missing-NPC lookup returns 0. Real floor-spawn NPC records and script-owned talk callbacks remain pending.
 - The NPC model smoke reads the real `S1_out.fsys :: FSYS` dependency member list, suffix-resolves the truncated `nt_m_b1` token to `agent_m_b1`, loads that retail actor archive from `S1_out.fsys`, and now requires compact actor marker `0x025D0000` at offset `0x2EC`, action `0x01000011`, position `(56.5,0.0,10.6)` before rendering it over live Outskirt collision/scene state. This gates visible retail model instancing plus the first compact script/actor placement marker.
@@ -228,6 +233,12 @@ Lane result:
 - The START menu smoke loads `S1_out`, renders the animated player, opens a host-owned field menu with START, moves the cursor twice, closes it with START, and the live walk loop now pauses movement/triggers while the menu is open. Real field menu behavior remains pending.
 - The title default now keeps the legacy host title logo/prompt disabled while loading the retail `title.fsys` `t_vs_*` cast cutouts, the title sky/cloud band, and the sand-wind overlay by default. The incomplete archive Pokemon-logo billboard DObj is suppressed until the full retail logo composition is fixed; `PCPORT_TITLE_HOST_UI=1` remains the opt-in diagnostic path for the old host overlay.
 - The boot sequence now supports `PCPORT_BOOT_DUMP_ITEM` alongside `PCPORT_BOOT_DUMP_FRAME`, so Nintendo, The Pokemon Company, and Genius Sonority can be dumped through the actual GL boot presentation path instead of only dumping the first boot item or relying on standalone THP decode.
+
+Current true-runtime player animation blockers:
+
+- `fn_8012C660` now has a PC-generated C body that calls the recovered action-record accessors with the same slot contract as the original assembly, and the PC port now provides decomp-backed definitions for `fn_8018F4C8`, `fn_8018F6F4`, `fn_8018F658`, and `fn_8018F678`.
+- The live field player still is not fully on the original runtime path. The remaining decomp/link targets are object resolution (`fn_800F9318`, `fn_8018D998`, `fn_8018D928`), movement/action setters (`fn_8018790C`, `fn_8018805C`, `fn_801885C4`, `fn_801887D8`), and model/material animation helpers (`GSmodelGetAnimFrame`, `fn_800EC4D0`, `fn_800EC578`, `fn_800EC5B8`, `fn_800EC5FC`, `fn_800EC9DC`, `fn_800ECA78`, `fn_800ECCA8`).
+- Do not mark the player animation gate complete until those helpers are either linked from recovered C or explicitly replaced by decomp-backed PC overlays that preserve the recovered function contract.
 - Boot THP playback now logs audio availability and drains queued waveOut audio for up to one second at natural movie end before closing, avoiding tail truncation without changing skip/window-close teardown.
 - The earlier render-reload hang was fixed by explicitly releasing the prior field scene archive/field animation state before loading the next map and by avoiding repeated field-side `GSgfxInit` calls during an in-process room reload.
 - `S1_shop_1F` currently renders as a static field target; its ambient field animation setup is skipped until that map's animjoint path is recovered.
@@ -239,6 +250,7 @@ Audit correction (2026-06-11):
 - Asset/render/collision backed but still host-orchestrated: field scene load, WZX collision load, field character load, room/world reload mechanics, and worldmap render handoff.
 - Host scaffolds, not game-code correctness: hand-written field warp exits/spawns, host worldmap menu/destination table, host START field menu overlay, host message box pages, and menu New Game smoke skip/autorun.
 - Incorrectly overstated before this audit: `--field-locomotion-smoke` did not prove true directional animation correctness while it treated `fn_8012C660` action slot 1 as straight movement, because `ken_b1`'s visible motion-bank roles are `idle=1`, `walk=5`, `run=8`. The live loop now uses those role cycles for straight/idle movement and reserves recovered action-record slots `2/3/4` for turn cases. Remaining animation gaps are exact HSD blend transitions and replacing the host selector with the real runtime model object.
+- Animation fix follow-up (2026-06-12): the live field/player animation evaluator now interprets JObj AObj/RObj motion only through `PCPort_HSDJObjAnimJointOnlyAll`; the full DObj/MObj material animation walk is still unsafe for some swizzled field descriptors and stays out of live player/field ticking until that path is recovered. Host `HSD_DObjLoadDesc` / `HSD_PObjLoadDesc` overrides are present for descriptor loading, but not used to force unsafe material animation during gameplay smokes.
 - Incorrectly overstated before this audit: title foreground/camera composition included host-made logo/cast/cloud/pan assumptions. The PC front-end now defaults to the real `title.fsys:logo_demo` archive scene plus the retail-backed 2D cast/cloud/sand overlays that were already recovered; legacy host title logo/prompt/camera diagnostics are opt-in. The partial archive Pokemon-logo billboard is suppressed by default until the full retail logo composition is recovered.
 
 Audit verification (2026-06-12 update):
@@ -250,6 +262,11 @@ Audit verification (2026-06-12 update):
 - `PCPORT_LINK_EXE=build_pc\pcport_bootstrap_doorfix.exe python tools\pcport_link.py` -> linked OK with 1687 stubs after widening the dirty-tree generated failures to `hsd_mobj_ext` and `game/gs_field_world`; both failures are outside the scoped PC host door trigger code.
 - `build_pc\pcport_bootstrap_doorfix2.exe --field-world-warp-smoke` -> passed with `S1_out` carrying 4 doorway samples, original sample `(69.0,0.0,-30.0)`, far threshold sample `(106.0,0.0,-4.0)` radius `28.0`, target `S1_shop_1F`, shop `tris=196`, `exit->2`, and spawn `(0.0,0.0,35.0)`.
 - `build_pc\pcport_bootstrap_doorfix2.exe --story-field-smoke` -> passed with New Game -> `S1_out`, `exits=4`, door NPC index `605`, story/cutscene marker `1/2`, trigger point `(51.5,0.0,21.3)`, and warp floor `3` (`S1_shop_1F`).
+- `PCPORT_LINK_EXE=build_pc\pcport_bootstrap_animfix.exe python tools\pcport_link.py` -> `compiled 127 objects; 2 failed to compile: ['hsd_mobj_ext', 'game/gs_field_world']`, round 2 linked OK with 1687 stubs. Both compile failures are known dirty-tree/generated-object failures outside the scoped animation fix.
+- `build_pc\pcport_bootstrap_animfix.exe --field-locomotion-smoke` -> passed with `source=record+heuristic-fill`, key `0x00F30400`, straight role motions `idle=1`, `walk=5`, `run=8`, and turn action slots `1:1 2:2 3:3 4:4`; straight walking no longer reuses action slot 1.
+- `PCPORT_CHARANIM_BANK_PROBE=40 build_pc\pcport_bootstrap_animfix.exe` -> data-derived locomotion map `idle=1`, `walk=5`, `run=8`.
+- `build_pc\pcport_bootstrap_animfix.exe --story-field-smoke` -> passed New Game -> `S1_out`, train-door NPC dialogue/cutscene marker `1/2`, and post-dialogue shop warp floor `3`; this gates the joint-only field/player animation path across longer live field progression.
+- `build_pc\pcport_bootstrap_latest.exe` was refreshed to match the animation-fixed build. The default `build_pc\pcport_bootstrap.exe` remained locked by stale Windows `pcport_bootstrap.exe` smoke processes and could not be overwritten from this session.
 - `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 build_pc\pcport_bootstrap.exe` -> passed and loaded title cast cutouts, drifting-cloud layer, and sand-wind layer while keeping the legacy host title logo/prompt disabled.
 - `PCPORT_NO_BOOT=1 PCPORT_MENU_FRAMES=1 PCPORT_ANIM_TIME=0/5 PCPORT_DUMP=... build_pc\pcport_bootstrap.exe` -> title captures verified no mismatched logo, visible cast/cloud/sand, and animation deltas of `sky_0_190=96985`, `sand_196_432=103654`, `fullDiffPixels=200639`.
 - `PCPORT_BOOT_DUMP_ITEM=0 PCPORT_BOOT_DUMP_FRAME=0 PCPORT_DUMP=build_pc\boot_item0_nintendo.bmp build_pc\pcport_bootstrap.exe` -> dumped the Nintendo boot item through the GL boot path; visual inspection verified the logo is upright and centered.
@@ -287,6 +304,12 @@ Verification:
 - `build_pc\pcport_bootstrap.exe --story-field-smoke` -> passed after the world-warp smoke change.
 - `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
 - `bash tools/decomp_work/build_dol.sh` -> OK, byte-identical `main.dol` (`870e8b9693ca780782d80f22a6a4572d8ba9458f`).
+- Current true-port audit relink: `PCPORT_LINK_EXE=build_pc\pcport_bootstrap_runtimepath.exe python tools\pcport_link.py` -> `compiled 128 objects; 1 failed to compile: ['hsd_mobj_ext']`, round 2 linked OK with 1726 stubs, rebuilt `build_pc\pcport_bootstrap_runtimepath.exe`.
+- Generated stub audit: `fn_8018F4C8`, `fn_8018F6F4`, `fn_8018F658`, `fn_8018F678`, and `fn_8012C660` are no longer generated stubs; the current player-animation blockers remain stubs as listed above.
+- `build_pc\pcport_bootstrap_runtimepath.exe --field-locomotion-smoke` -> passed with `source=record+heuristic-fill`, `key=0x00F30400`, visible roles `1/5/8`, action slots `1:1 2:2 3:3 4:4`, and 6 turn cases. This proves the recovered record/selector is linked for the smoke, not that the full live retail player runtime path is complete.
+- `build_pc\pcport_bootstrap_runtimepath.exe --story-field-smoke` -> passed with menu New Game handoff, `S1_out` floor 2 collision, Wes animation ready, train-door NPC dialogue marker, story/cutscene host markers `1/2`, and warp to `S1_shop_1F` floor 3.
+- `python tools\test_verify_gate.py` -> 12 passed, 0 failed.
+- `git diff --check` -> exit 0; CRLF normalization warnings only for pre-existing edited files.
 
 Integration rules:
 

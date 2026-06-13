@@ -99,15 +99,11 @@ void __EXISetExiInterruptMask(s32 chan, EXIChan* exi) {
 
 /* fn_80098014 - 0x80098014 | size: 0x8 */
 void fn_80098014(void) {
-    u32 r3 = 0;
-
-    /* mtspr HID0, r3 */;
-    return;
+    asm { mtspr HID0, r3 }
 }
 
 /* fn_80098034 - 0x80098034 | size: 0x8 */
 void fn_80098034(void) {
-    /* sc */;
-    return;
+    asm { sc }
 }
 

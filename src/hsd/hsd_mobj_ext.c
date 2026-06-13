@@ -67,7 +67,7 @@ void fn_801A83BC(HSD_MObj* mobj, HSD_MatAnim* matanim) {
     if (matanim == NULL) {
         return;
     }
-    if (mobj->aobj != NULL) {
+    if (*(HSD_AObj* volatile*)&mobj->aobj != NULL) {
         fn_801C25E4(mobj->aobj);
     }
     mobj->aobj = fn_801C2670(matanim->aobjdesc);

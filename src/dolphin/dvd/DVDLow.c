@@ -85,7 +85,7 @@ static void AlarmHandlerForTimeout(OSAlarm* alarm, OSContext* context) {
     cb = Callback_8047A788;
     Callback_8047A788 = NULL;
     if (cb != NULL) {
-        cb(0x10, NULL);
+        ((void (*)(s32))cb)(0x10);
     }
 
     OSClearContext(&exceptionContext);
@@ -337,7 +337,7 @@ BOOL fn_800A4C80(void) {
 #endif
 
 /* fn_800A4C94 - 0x800A4C94 | size: 0x18 */
-#if 0
+#if 1
 asm void fn_800A4C94(void) {
 #include "src/dolphin/dvd/DVDLow_fn_800A4C94.inc"
 }

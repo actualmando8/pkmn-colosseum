@@ -244,14 +244,14 @@ void OSRegisterVersion(const char* id) {
  * =================================================================== */
 
 /* fn_8009A23C - 0x8009A23C | size: 0x14 */
-void fn_8009A23C(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-
-    r3 = 0xCC000000;
-    r3 = r3 + 0x6000;
-    tmp = *(u32*)((u8*)r3 + 0x24);
-    r3 = tmp & 0xFF;
-    return;
+#pragma push
+#pragma peephole off
+u32 fn_8009A23C(void) {
+    asm {
+        lis r3, 0xcc00
+        addi r3, r3, 0x6000
+        lwz r0, 0x24(r3)
+        clrlwi r3, r0, 24
+    }
 }
-
+#pragma pop

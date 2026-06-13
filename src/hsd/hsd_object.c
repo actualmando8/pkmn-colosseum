@@ -53,6 +53,7 @@ extern void fn_800D67BC(void);
 extern void fn_800D6680(void);
 extern void fn_800D5CB8(void);
 extern void fn_800D6728(void);
+extern u8 lbl_80314638[];
 #if 1
 asm void fn_80190E60(void) {
 #include "src/hsd/hsd_object_fn_80190E60.inc"
