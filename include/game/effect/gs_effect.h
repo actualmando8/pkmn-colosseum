@@ -271,17 +271,14 @@ void GSEffectResetState(u32 effectId);
 /**
  * tracefxStartEffect -- Start a trail/trace effect.
  *
- * Allocates an effect slot, initialises the TraceFXWork structure, loads
- * the trail model from the floor resource system, and begins rendering.
+ * Start callback installed into the TraceFX effect descriptor.
  *
- * @param work    Pointer to caller-provided TraceFX parameter block.
- * @param params  Trail configuration parameters.
- * @param frames  Duration in frames.
+ * @param work    TraceFX work/configuration block.
  * @return        1 on success, 0 on failure.
  *
- * Corresponds to fn_80137AA4 (which calls fn_8013735C internally).
+ * Corresponds to fn_80137AA4.
  */
-BOOL tracefxStartEffect(void* work, void* params, u32 frames);
+BOOL tracefxStartEffect(u8* work);
 
 /**
  * tracefxInit -- Initialise the TraceFXWork structure.

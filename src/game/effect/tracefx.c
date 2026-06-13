@@ -237,8 +237,8 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
 }
 
 /* =======================================================================
- *  tracefxStartEffect / fn_80137AA4
- *  Address: 0x80137AA4, Size: 0x270
+ *  tracefxStartEffect_Draft
+ *  Stale high-level reconstruction retained for reference.
  *
  *  Public entry point for starting a trail effect.
  *
@@ -281,7 +281,7 @@ u32 tracefxInit(TraceFXWork* work, void* params, u32 frames) {
  *    bl OSReport
  *    return 0
  * ======================================================================= */
-BOOL tracefxStartEffect(void* work, void* params, u32 frames) {
+BOOL tracefxStartEffect_Draft(void* work, void* params, u32 frames) {
     TraceFXWork* traceWork = (TraceFXWork*)work;
     u8* p = (u8*)params;
     void* startModel;
@@ -653,7 +653,7 @@ void fn_80137A2C(void) {
 /* 0x80137AA4 | 0x270 */
 #pragma push
 #pragma optimization_level 4
-BOOL fn_80137AA4(u8* w) {
+BOOL tracefxStartEffect(u8* w) {
     void* model;
     u16 max_count;
     u8* nodes;
