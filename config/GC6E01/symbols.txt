@@ -5968,7 +5968,7 @@ fn_801BBE3C = .text:0x801BBE3C; // type:function size:0x24
 fn_801BBE60 = .text:0x801BBE60; // type:function size:0x74
 fn_801BBED4 = .text:0x801BBED4; // type:function size:0x54
 HSD_Index2TexMtx = .text:0x801BBF28; // type:function size:0xBC  // XD-struct HIGH n=47
-fn_801BBFE4 = .text:0x801BBFE4; // type:function size:0x358  // lead: HSD_TObjSetup (see config/GC6E01/symbolmap/leads_needs_wiring.md)
+HSD_TObjSetup = .text:0x801BBFE4; // type:function size:0x358
 fn_801BC33C = .text:0x801BC33C; // type:function size:0x580
 fn_801BC8BC = .text:0x801BC8BC; // type:function size:0x674
 fn_801BCF30 = .text:0x801BCF30; // type:function size:0x9A0

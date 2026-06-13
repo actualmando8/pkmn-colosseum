@@ -265,7 +265,7 @@ void HSD_Index2TexMtx(HSD_TObj* tobj, u32 flags) {
 
 #pragma push
 #pragma scheduling on
-void fn_801BBFE4(HSD_TObj* tobj) {
+void HSD_TObjSetup(HSD_TObj* tobj) {
     u8 tlutobj[0x0C];
     u8 texobj[0x20];
     HSD_TlutWork* volatile tluts[8];
@@ -669,9 +669,8 @@ void fn_801BE800(HSD_ImageDesc* desc) {
 /* ========================================================================= */
 
 /*
- * HSD_TObjSetup - 0x801BE85C | Size: 0x60C
- * Main TObj setup entry point for rendering.
- * Configures all GX state needed to render with this texture.
+ * fn_801BE85C - 0x801BE85C | Size: 0x60C
+ * TObj rendering pipeline helper.
  */
 void fn_801BE85C(HSD_TObj* tobj) {
     HSD_TObj* t;

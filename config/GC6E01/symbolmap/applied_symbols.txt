@@ -246,3 +246,4 @@ fn_801778B4 -> GSscene_GetCameraDirectionVector  // GSscene camera-state vector 
 fn_801778DC -> GSscene_SetCameraDirectionVector  // GSscene camera-state vector setter at lbl_80478C40+0x04; battle save/restore callsites pair with direction getter; source C verified 100%
 fn_801993A4 -> DObjLoad  // XD DObj loader vocabulary + recursive desc load body at 0x801993A4; source C verified 100%
 fn_800EF5FC -> GStextureCreate  // XD GStexture vocabulary + existing header/source API and effect env-map callsite; source C verified 100%
+fn_801BBFE4 -> HSD_TObjSetup  // XD HSD TObj vocabulary + header prototype and material setup callsites; source C verified 57.80%

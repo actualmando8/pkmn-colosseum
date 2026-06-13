@@ -400,14 +400,13 @@ ok:
 #endif
 
 /* 0x801A6E00 | 0x24 */
-extern void fn_801BBFE4(void* arg);
 #if 0
 asm void fn_801A6E00(void) {
 #include "src/hsd/hsd_mobj_fn_801A6E00.inc"
 }
 #else
 void fn_801A6E00(void) {
-    fn_801BBFE4(NULL);
+    HSD_TObjSetup(NULL);
 }
 #endif
 
@@ -453,7 +452,7 @@ void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode_arg) {
             tobj_slot = lbl_8047B2D8;
         }
     }
-    fn_801BBFE4((void*)tobj_slot);
+    HSD_TObjSetup((HSD_TObj*)tobj_slot);
     fn_801BDA58((void*)tobj_slot);
     ((void (*)(HSD_MObj*, u32, u32))(HSD_MOBJ_METHOD(mobj)->make_texp))(mobj, tobj_slot, rendermode);
     fn_801B294C(rendermode, mobj->pe);
