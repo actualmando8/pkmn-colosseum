@@ -104,7 +104,7 @@ void HSD_DObjAnimAll_Early(HSD_DObj* dobj)
 /*  Load                                                                     */
 /* ========================================================================= */
 
-static int DObjLoad(HSD_DObj* dobj, HSD_DObjDesc* desc)
+static int DObjLoad_Early(HSD_DObj* dobj, HSD_DObjDesc* desc)
 {
     if (dobj->mobj != NULL) {
         HSD_MObjRemove(dobj->mobj);
@@ -241,7 +241,7 @@ static void DObjInfoInit(void)
                      sizeof(HSD_DObjInfo), sizeof(HSD_DObj));
     ((HSD_ClassInfo*) &hsdDObj)->release = DObjRelease;
     ((HSD_ClassInfo*) &hsdDObj)->amnesia = DObjAmnesia;
-    hsdDObj.load = DObjLoad;
+    hsdDObj.load = DObjLoad_Early;
 }
 
 /* ===================================================================
@@ -477,14 +477,14 @@ extern char lbl_8047DA28;
 extern char lbl_8047DA18;
 extern char lbl_8047DA20;
 #if 0
-asm void fn_801993A4(void) {
+asm void DObjLoad(void) {
 #include "src/hsd/hsd_dobj_fn_801993A4.inc"
 }
 #else
 #pragma optimization_level 4
 #pragma push
 #pragma optimization_level 1
-static int fn_801993A4(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
+static int DObjLoad(HSD_DObj* dobj_arg, HSD_DObjDesc* desc_arg)
 {
     HSD_DObjDesc* desc;
     HSD_DObj* dobj;
