@@ -1405,7 +1405,6 @@ u32 fn_8013D7CC(void* ptr) {
 }
 #endif
 extern void* GStextureCreate(u32 a, u32 b, u32 size, u32 d, u32 e);
-extern void* fn_800EF5FC(u32 a, u32 b, u32 size, u32 d, u32 e); /* GStextureCreate */
 extern u32 lbl_8047AEE0;
 extern u8 lbl_80466BC0[];
 extern u16 lbl_8047AEE4;
@@ -1421,7 +1420,7 @@ u32 envMapEffectInit(void* ptr) {
     if (ptr) {
         if (lbl_8047AEE0 == 0) {
             lbl_8047AEE4 = 0;
-            lbl_8047AEE0 = (u32)fn_800EF5FC(*(u16*)(lbl_80466BC0 + 4), *(u16*)(lbl_80466BC0 + 6), 0x44, 0, 0);
+            lbl_8047AEE0 = (u32)GStextureCreate(*(u16*)(lbl_80466BC0 + 4), *(u16*)(lbl_80466BC0 + 6), 0x44, 0, 0);
             if (lbl_8047AEE0 == 0) {
                 if (ptr) {
                     ptr = *(void**)((u8*)ptr + 0xc);
