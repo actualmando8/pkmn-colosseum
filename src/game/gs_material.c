@@ -1086,15 +1086,16 @@ asm void fn_800E4014(void) {
 }
 #else
 void fn_800E4014(GSmaterialEntry* entry, u8 enable) {
+    extern void fn_80118C20(void* tex, u32 flag);
     if (enable) {
-        entry->flags |= GSMAT_FLAG_VALID;
+        entry->flags |= 0x2u;
         if (entry->texture != NULL) {
-            ((void(*)(void*, u32))fn_80118C20)(entry->texture, 1);
+            fn_80118C20(entry->texture, 1);
         }
     } else {
-        entry->flags &= ~GSMAT_FLAG_VALID;
+        entry->flags &= ~0x2u;
         if (entry->texture != NULL) {
-            ((void(*)(void*, u32))fn_80118C20)(entry->texture, 0);
+            fn_80118C20(entry->texture, 0);
         }
     }
 }
@@ -1915,10 +1916,13 @@ void fn_800E5550(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** ptr = *(void***)((u8*)obj + 0x14c);
-        s32 cnt = *(u16*)((u8*)obj + 0x150);
-        s32 idx = 0;
+        s32 idx;
+        s32 cnt;
+        void** ptr;
+        ptr = *(void***)((u8*)obj + 0x14c);
         count2--;
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
         *(u16*)((u8*)obj + 0x152) = count2;
         while (idx < cnt) {
             void* p = *ptr;
@@ -2142,6 +2146,7 @@ asm void fn_800E59C8(void) {
 }
 #else
 void fn_800E59C8(void* obj, u8* color) {
+    extern u32 fn_800DF240(void*);
     u8 r0;
     if (*(u16*)((u8*)obj + 0x150) == 0) {
         r0 = 0;
@@ -2150,15 +2155,15 @@ void fn_800E59C8(void* obj, u8* color) {
         if (p == NULL) {
             r0 = 0;
         } else {
-            r0 = ((u32(*)(void*))fn_800DF240)(p) & 1;
+            if (fn_800DF240(p) & 1) r0 = 1; else r0 = 0;
         }
     }
     if (r0 & 0xff) {
         fn_800DF11C(*(void**)*(void**)((u8*)obj + 0x14c), color);
     } else {
-        color[0] = 0x7f;
-        color[1] = 0x7f;
         color[2] = 0x7f;
+        color[1] = 0x7f;
+        color[0] = 0x7f;
         color[3] = 0xff;
     }
 }
@@ -2605,10 +2610,13 @@ void fn_800E638C(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** ptr = *(void***)((u8*)obj + 0x14c);
-        s32 cnt = *(u16*)((u8*)obj + 0x150);
-        s32 idx = 0;
+        s32 idx;
+        s32 cnt;
+        void** ptr;
+        ptr = *(void***)((u8*)obj + 0x14c);
         count2--;
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
         *(u16*)((u8*)obj + 0x152) = count2;
         while (idx < cnt) {
             void* p = *ptr;
@@ -2716,10 +2724,13 @@ void fn_800E65CC(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** ptr = *(void***)((u8*)obj + 0x14c);
-        s32 cnt = *(u16*)((u8*)obj + 0x150);
-        s32 idx = 0;
+        s32 idx;
+        s32 cnt;
+        void** ptr;
+        ptr = *(void***)((u8*)obj + 0x14c);
         count2--;
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
         *(u16*)((u8*)obj + 0x152) = count2;
         while (idx < cnt) {
             void* p = *ptr;
@@ -2845,10 +2856,13 @@ void fn_800E68D8(void* obj) {
     u16 count2 = *(u16*)((u8*)obj + 0x152);
     if (count2 == 0) return;
     {
-        void** ptr = *(void***)((u8*)obj + 0x14c);
-        s32 cnt = *(u16*)((u8*)obj + 0x150);
-        s32 idx = 0;
+        s32 idx;
+        s32 cnt;
+        void** ptr;
+        ptr = *(void***)((u8*)obj + 0x14c);
         count2--;
+        cnt = *(u16*)((u8*)obj + 0x150);
+        idx = 0;
         *(u16*)((u8*)obj + 0x152) = count2;
         while (idx < cnt) {
             void* p = *ptr;
@@ -3324,18 +3338,17 @@ asm void fn_800E85E8(void) {
 }
 #else
 void fn_800E85E8(void* obj) {
-    s32 r31 = 0;
-    u16 r30 = *(u16*)((u8*)obj + 0x150);
-    void** r29 = *(void***)((u8*)obj + 0x14c);
-    while (r31 < r30) {
-        void* p = r29[r31];
+    s32 idx = 0;
+    s32 cnt = *(u16*)((u8*)obj + 0x150);
+    void** ptr = *(void***)((u8*)obj + 0x14c);
+    while (idx < cnt) {
+        void* p = *ptr;
         if (p != NULL) fn_800DF608(p);
-        r31++;
+        idx++;
+        ptr++;
     }
-    {
-        u16 handle = *(u16*)((u8*)obj + 0x154);
-        if (handle != 0) { fn_800E24B0(handle); fn_800E209C(handle); }
-    }
+    idx = *(u16*)((u8*)obj + 0x154);
+    if ((u32)idx != 0) { fn_800E24B0(idx); fn_800E209C(idx); }
     *(u16*)((u8*)obj + 0x154) = 0;
     *(u16*)((u8*)obj + 0x150) = 0;
     *(u32*)((u8*)obj + 0x14c) = 0;
@@ -4923,16 +4936,19 @@ asm void fn_800EC208(void) {
 }
 #else
 void fn_800EC208(void* entry, s32 mode) {
+    extern void HSD_ForeachAnim(void*, s32, s32, void*, s32, ...);
     void* mobj = *(void**)((u8*)entry + 0x8);
     if (*(u32*)entry & 0x20000) {
         mobj = *(void**)((u8*)mobj + 0x10);
     }
     *(s32*)((u8*)entry + 0xa4) = mode;
-    mode = *(s32*)((u8*)entry + 0xa4);
-    if (mode == 0) {
+    switch (*(s32*)((u8*)entry + 0xa4)) {
+    case 0:
         HSD_ForeachAnim(mobj, 6, 0x64db, fn_800EE054, 3, 0);
-    } else if (mode == 1) {
+        break;
+    case 1:
         HSD_ForeachAnim(mobj, 6, 0x64db, fn_800EE054, 3, 1);
+        break;
     }
 }
 #endif
@@ -5918,12 +5934,18 @@ asm void fn_800ED6AC(void) {
 }
 #else
 s32 fn_800ED6AC(GSmaterialEntry* entry) {
-    if (entry->flags & 0x800) {
-        return 1;
+    if ((*(u32*)entry & 0x800) == 0x800) {
+        goto _ret1;
     }
-    if (entry->updateState != 0 && *(u32*)((u8*)entry + 0x118) != 0) {
-        return 1;
+    if (*(s32*)((u8*)entry + 0x114) == 0) {
+        goto _ret0;
     }
+    if (*(u32*)((u8*)entry + 0x118) == 0) {
+        goto _ret0;
+    }
+_ret1:
+    return 1;
+_ret0:
     return 0;
 }
 #endif
@@ -6402,9 +6424,9 @@ asm void fn_800EE054(void) {
 #else
 void fn_800EE054(void* obj, u32 mode) {
     if (mode == 0) {
-        ((void(*)(void*, u32))fn_801C2A74)(obj, 0x20000000);
+        fn_801C2A74(obj, 0x20000000);
     } else {
-        ((void(*)(void*, u32))fn_801C2A90)(obj, 0x20000000);
+        fn_801C2A90(obj, 0x20000000);
     }
 }
 #endif
@@ -6540,7 +6562,7 @@ asm void fn_800EE288(void) {
 void fn_800EE288(void* p) {
     void* tbl = *(void**)((u8*)p + 4);
     s32 i = 4;
-    do {
+    while (i-- != 0) {
         u32 val = *(u32*)((u8*)tbl + 0xe8);
         u16 key = *(u16*)((u8*)p + 2);
         if (val == (u32)key) {
@@ -6548,8 +6570,7 @@ void fn_800EE288(void* p) {
             *(u32*)((u8*)tbl + 0xe8) = (u32)-1;
             return;
         }
-        i--;
-    } while (i != 0);
+    }
 }
 #endif
 #if 0
@@ -6558,7 +6579,7 @@ asm void fn_800EC134(void) {
 }
 #else
 void fn_800EC134(void* entry) {
-    ((void(*)(void*))fn_800ED1CC)(entry);
+    fn_800ED1CC(entry);
 }
 #endif
 #if 0

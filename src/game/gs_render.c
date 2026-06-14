@@ -1593,10 +1593,11 @@ asm void fn_800D7420(void) {
 }
 #else
 void fn_800D7420(void) {
+    u8 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u8 c = base[0x4ca];
-    u8 b = base[0x4c9];
-    u8 a = base[0x4c8];
+    c = base[0x4ca];
+    b = base[0x4c9];
+    a = base[0x4c8];
     *(volatile u8*)0xCC008000 = a;
     *(volatile u8*)0xCC008000 = b;
     *(volatile u8*)0xCC008000 = c;
@@ -1609,10 +1610,11 @@ asm void fn_800D7444(void) {
 }
 #else
 void fn_800D7444(void) {
+    u16 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u16 c = *(u16*)(base + 0x4d0);
-    u16 b = *(u16*)(base + 0x4ce);
-    u16 a = *(u16*)(base + 0x4cc);
+    c = *(u16*)(base + 0x4d0);
+    b = *(u16*)(base + 0x4ce);
+    a = *(u16*)(base + 0x4cc);
     *(volatile u16*)0xCC008000 = a;
     *(volatile u16*)0xCC008000 = b;
     *(volatile u16*)0xCC008000 = c;
@@ -1660,9 +1662,10 @@ asm void fn_800D74B4(void) {
 }
 #else
 void fn_800D74B4(void) {
+    u8 a, b;
     u8 *base = (u8*)lbl_8047AA80;
-    u8 b = *(u8*)(base + 0x4ad);
-    u8 a = *(u8*)(base + 0x4ac);
+    b = *(u8*)(base + 0x4ad);
+    a = *(u8*)(base + 0x4ac);
     *(volatile u8*)0xCC008000 = a;
     *(volatile u8*)0xCC008000 = b;
 }
@@ -1674,9 +1677,10 @@ asm void fn_800D74D0(void) {
 }
 #else
 void fn_800D74D0(void) {
+    u8 a, b;
     u8 *base = (u8*)lbl_8047AA80;
-    u8 b = *(u8*)(base + 0x4ad);
-    u8 a = *(u8*)(base + 0x4ac);
+    b = *(u8*)(base + 0x4ad);
+    a = *(u8*)(base + 0x4ac);
     *(volatile u8*)0xCC008000 = a;
     *(volatile u8*)0xCC008000 = b;
 }
@@ -1688,9 +1692,10 @@ asm void fn_800D74EC(void) {
 }
 #else
 void fn_800D74EC(void) {
+    u16 a, b;
     u8 *base = (u8*)lbl_8047AA80;
-    u16 b = *(u16*)(base + 0x4b2);
-    u16 a = *(u16*)(base + 0x4b0);
+    b = *(u16*)(base + 0x4b2);
+    a = *(u16*)(base + 0x4b0);
     *(volatile u16*)0xCC008000 = a;
     *(volatile u16*)0xCC008000 = b;
 }
@@ -1702,9 +1707,10 @@ asm void fn_800D7508(void) {
 }
 #else
 void fn_800D7508(void) {
+    u16 a, b;
     u8 *base = (u8*)lbl_8047AA80;
-    u16 b = *(u16*)(base + 0x4b2);
-    u16 a = *(u16*)(base + 0x4b0);
+    b = *(u16*)(base + 0x4b2);
+    a = *(u16*)(base + 0x4b0);
     *(volatile u16*)0xCC008000 = a;
     *(volatile u16*)0xCC008000 = b;
 }
@@ -1730,10 +1736,11 @@ asm void fn_800D7540(void) {
 }
 #else
 void fn_800D7540(void) {
+    u8 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u8 c = *(u8*)(base + 0x4ae);
-    u8 b = *(u8*)(base + 0x4ad);
-    u8 a = *(u8*)(base + 0x4ac);
+    c = *(u8*)(base + 0x4ae);
+    b = *(u8*)(base + 0x4ad);
+    a = *(u8*)(base + 0x4ac);
     *(volatile u8*)0xCC008000 = a;
     *(volatile u8*)0xCC008000 = b;
     *(volatile u8*)0xCC008000 = c;
@@ -1746,10 +1753,11 @@ asm void fn_800D7564(void) {
 }
 #else
 void fn_800D7564(void) {
+    u8 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u8 c = *(u8*)(base + 0x4ae);
-    u8 b = *(u8*)(base + 0x4ad);
-    u8 a = *(u8*)(base + 0x4ac);
+    c = *(u8*)(base + 0x4ae);
+    b = *(u8*)(base + 0x4ad);
+    a = *(u8*)(base + 0x4ac);
     *(volatile u8*)0xCC008000 = a;
     *(volatile u8*)0xCC008000 = b;
     *(volatile u8*)0xCC008000 = c;
@@ -1762,10 +1770,11 @@ asm void fn_800D7588(void) {
 }
 #else
 void fn_800D7588(void) {
+    u16 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u16 c = *(u16*)(base + 0x4b4);
-    u16 b = *(u16*)(base + 0x4b2);
-    u16 a = *(u16*)(base + 0x4b0);
+    c = *(u16*)(base + 0x4b4);
+    b = *(u16*)(base + 0x4b2);
+    a = *(u16*)(base + 0x4b0);
     *(volatile u16*)0xCC008000 = a;
     *(volatile u16*)0xCC008000 = b;
     *(volatile u16*)0xCC008000 = c;
@@ -1778,10 +1787,11 @@ asm void fn_800D75AC(void) {
 }
 #else
 void fn_800D75AC(void) {
+    u16 a, b, c;
     u8 *base = (u8*)lbl_8047AA80;
-    u16 c = *(u16*)(base + 0x4b4);
-    u16 b = *(u16*)(base + 0x4b2);
-    u16 a = *(u16*)(base + 0x4b0);
+    c = *(u16*)(base + 0x4b4);
+    b = *(u16*)(base + 0x4b2);
+    a = *(u16*)(base + 0x4b0);
     *(volatile u16*)0xCC008000 = a;
     *(volatile u16*)0xCC008000 = b;
     *(volatile u16*)0xCC008000 = c;
