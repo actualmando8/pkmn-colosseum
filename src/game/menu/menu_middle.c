@@ -170,7 +170,7 @@ void fn_8006B0F8(void);
 void fn_8006B154(void);
 u32 fn_8006B1C0(s32 i);
 void fn_8006B1D4(void);
-void fn_8006B1F4(void);
+u32 fn_8006B1F4(s32 index, s32 slot);
 void fn_8006B2A4(void);
 void fn_8006B354(void);
 void fn_8006B3C8(void);
@@ -200,7 +200,7 @@ void fn_8006D98C(void);
 void fn_8006DAE4(void);
 void fn_8006DC28(void);
 void fn_8006E0CC(void);
-void fn_8006E128(void);
+u32 fn_8006E128(u8* p);
 void fn_8006E160(u32 r3);
 void fn_8006E188(void);
 void fn_8006E18C(void);
@@ -1778,53 +1778,49 @@ void fn_8006B1D4(void) {
 }
 
 /* 0x8006B1F4 | size: 0xB0 */
-void fn_8006B1F4(void) {
-    extern void fn_80129280();
-    u8 sp[0x10];
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma push
+#pragma peephole off
+u32 fn_8006B1F4(s32 index, s32 slot) {
+    extern u8* fn_80129280(s32 idx, s32 type);
+    s32 r30;
+    s32 r31;
+    u32 r0;
+    u8* r3;
 
-    
-    r30 = r3;
-    r31 = r4;
-    if ((s32)r30 >= (s32)0x0) {
-        if ((s32)r30 >= (s32)0x7) {
-        }
-        r0 = 0x0;
-
-        } else {
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    r0 = r30 + (0x1 << 16);
-    r3 = r0 + r3;
-    r0 = *(u8*)((u8*)r3 + (-13356));
-        }
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    r30 = index;
+    r31 = slot;
+    if (r30 < 0) {
+        goto invalid_index;
     }
-    if ((s32)r31 < (s32)0x0) { r3 = 0x0; return; }
-    if (r31 >= (u32)0x2) {
-
-        r3 = 0x0;
-        return;
+    if (r30 < 7) {
+        goto valid_index;
     }
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    r4 = r31 + (0x1 << 16);
-    r0 = r30 << 1;
-    r3 = r4 + r3;
-    r3 = r3 + r0;
-    r3 = *(u8*)((u8*)r3 + (-13349));
-
-    return;
+invalid_index:
+    r0 = 0;
+    goto check_enabled;
+valid_index:
+    r3 = fn_80129280(0, 0xe);
+    r0 = *(u8*)(r3 + (r30 + (1 << 16)) - 0x342c);
+check_enabled:
+    r0 = (u8)r0;
+    if (r0 != 0) {
+        goto enabled;
+    }
+    return 0;
+enabled:
+    if (r31 < 0) {
+        goto ret0;
+    }
+    if ((u32)r31 < 2) {
+        goto valid_slot;
+    }
+ret0:
+    return 0;
+valid_slot:
+    r3 = fn_80129280(0, 0xe);
+    return *(u8*)(r3 + (r31 + (1 << 16)) + r30 * 2 - 0x3425);
 }
+#pragma pop
 
 
 /* 0x8006B2A4 | size: 0xB0 */
@@ -4786,7 +4782,7 @@ void fn_8006DC28(void) {
     extern void fn_8011FC74();
     extern void fn_80123FBC();
     extern void fn_8012AC08();
-    extern void fn_8006E128();
+    extern u32 fn_8006E128(u8* p);
     u8 sp[0x30];
     u32 r0 = 0;
     u32 r1 = (u32)sp;
@@ -5140,27 +5136,18 @@ void fn_8006E0CC(void) {
 
 
 /* 0x8006E128 | size: 0x38 */
-void fn_8006E128(void) {
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+u32 fn_8006E128(u8* p) {
+    u32 index;
 
-    
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-        return;
+    if (p == NULL) {
+        return 0;
     }
-    r5 = *(u32*)((u8*)r3 + 0x1C);
-    if (r5 >= (u32)0x7) {
-        r3 = 0x0;
-        return;
+    index = *(u32*)(p + 0x1C);
+    if (index >= 7) {
+        return 0;
     }
-    r4 = r5 + 0x1;
-    r0 = r5 << 2;
-    *(u32*)((u8*)r3 + 0x1C) = r4;
-    r3 = *(u32*)(r3 + r0);
-    return;
+    *(u32*)(p + 0x1C) = index + 1;
+    return *(u32*)(p + index * 4);
 }
 
 
@@ -8420,4 +8407,3 @@ void fn_80070D84(void) {
 
     return;
 }
-
