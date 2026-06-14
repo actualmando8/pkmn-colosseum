@@ -30,7 +30,7 @@ HISTORY_INTERVAL_SECONDS = 60
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 6
+DASHBOARD_VERSION = 7
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -2200,73 +2200,95 @@ HTML = r"""<!doctype html>
         ctx.fillText(String(item.value), left + width + 6, y + 13);
       });
     }
-    function drawHistory(canvas, history) {
+    // ---- Unified time-series chart: fixed elapsed-hours x-axis (anchored at 0,
+    //      does not scroll), % gridline labels on the Y axis, and a hover
+    //      crosshair + tooltip. Drives BOTH the global match-progress chart and
+    //      the per-file/per-fn selected-file chart so they read the same. ------
+    function _chartTip() {
+      let t = document.getElementById("chart-tip");
+      if (!t) {
+        t = document.createElement("div");
+        t.id = "chart-tip";
+        t.style.cssText = "position:fixed;z-index:60;pointer-events:none;display:none;" +
+          "background:#0d131d;border:1px solid #2d3a4b;border-radius:6px;padding:6px 9px;" +
+          "font:12px Segoe UI,Arial;color:#eef4fb;box-shadow:0 4px 14px rgba(0,0,0,.5)";
+        document.body.appendChild(t);
+      }
+      return t;
+    }
+    function _bindChartHover(canvas) {
+      if (canvas._hoverBound) return;
+      canvas._hoverBound = true;
+      canvas.addEventListener("mousemove", evt => {
+        const c = canvas._chart;
+        const tip = _chartTip();
+        if (!c || !c.rows.length) { tip.style.display = "none"; return; }
+        const rect = canvas.getBoundingClientRect();
+        const mx = evt.clientX - rect.left;
+        if (mx < c.pad.l - 6 || mx > c.w - c.pad.r + 6) { tip.style.display = "none"; return; }
+        let bi = 0, bd = 1e9;
+        c.rows.forEach((r, i) => { const d = Math.abs(c.x(Number(r.unix)) - mx); if (d < bd) { bd = d; bi = i; } });
+        const r = c.rows[bi];
+        const lines = c.active.map(it =>
+          `<span style="color:${it.color}">&#9632;</span> ${it.label}: ${Number(r[it.key] || 0).toFixed(2)}%`).join("<br>");
+        tip.innerHTML = `<b>${c.fmtH(r.unix)}</b> &middot; ${fmtTime(r.unix)}<br>${lines}`;
+        tip.style.display = "block";
+        tip.style.left = (evt.clientX + 14) + "px";
+        tip.style.top = (evt.clientY + 14) + "px";
+      });
+      canvas.addEventListener("mouseleave", () => { _chartTip().style.display = "none"; });
+    }
+    function _drawTimeChart(canvas, rows, series, emptyLabel) {
       const { ctx, w, h } = fitCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
-      if (!history || history.length < 2) {
-        return drawEmpty(ctx, w, h, "Timeline starts with the next snapshot");
+      rows = (rows || []).filter(r => r && Number.isFinite(Number(r.unix)));
+      const active = series.filter(it => rows.some(r => Number(r[it.key] || 0) > 0));
+      if (rows.length < 2 || !active.length) { canvas._chart = null; return drawEmpty(ctx, w, h, emptyLabel || "No history yet"); }
+      const pad = { l: 46, r: 16, t: 18, b: 30 };
+      const xs = rows.map(r => Number(r.unix || 0));
+      const ys = rows.flatMap(r => active.map(it => Number(r[it.key] || 0)));
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const maxY = Math.max(100, Math.ceil(Math.max(...ys) / 10) * 10);
+      const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
+      const y = v => h - pad.b - (h - pad.t - pad.b) * v / Math.max(1, maxY);
+      // Y gridlines + percent labels at every step (read the % off the axis)
+      const ystep = maxY <= 100 ? 20 : (maxY <= 200 ? 25 : 50);
+      ctx.lineWidth = 1;
+      for (let v = 0; v <= maxY + 0.01; v += ystep) {
+        const gy = y(v);
+        ctx.strokeStyle = v === 0 ? "#3a4a5e" : "#2d3a4b";
+        ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+        ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
+        ctx.fillText(v + "%", pad.l - 6, gy + 4);
       }
-      const pad = { l: 42, r: 16, t: 18, b: 28 };
-      const xs = history.map(row => Number(row.unix || 0));
-      const series = [
+      // series lines + points
+      active.forEach((it, si) => {
+        ctx.strokeStyle = it.color; ctx.lineWidth = si === 0 ? 2.5 : 2; ctx.beginPath();
+        rows.forEach((r, i) => { const px = x(Number(r.unix)), py = y(Number(r[it.key] || 0)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+        ctx.stroke(); ctx.fillStyle = it.color;
+        rows.forEach(r => { ctx.beginPath(); ctx.arc(x(Number(r.unix)), y(Number(r[it.key] || 0)), 2.2, 0, 6.2832); ctx.fill(); });
+      });
+      // legend
+      let lx = pad.l; ctx.textAlign = "left"; ctx.font = "12px Segoe UI, Arial";
+      active.forEach(it => { ctx.fillStyle = it.color; ctx.fillRect(lx, pad.t - 12, 9, 9); ctx.fillStyle = "#cbd5e3"; ctx.fillText(it.label, lx + 13, pad.t - 3); lx += 64; });
+      // x-axis: elapsed hours from the first sample (fixed origin, does not scroll)
+      const fmtH = ux => { const hr = (Number(ux) - minX) / 3600; return hr < 1 ? Math.round(hr * 60) + "m" : (hr < 10 ? hr.toFixed(1) : String(Math.round(hr))) + "h"; };
+      const spanH = (maxX - minX) / 3600;
+      const ticks = Math.min(12, Math.max(3, Math.round(spanH) || 3));
+      ctx.fillStyle = "#7c8aa0"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "center";
+      for (let i = 0; i <= ticks; i++) { const ux = minX + (maxX - minX) * i / ticks; ctx.fillText(fmtH(ux), x(ux), h - 8); }
+      ctx.fillStyle = "#6b7686"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
+      ctx.fillText("hours since " + fmtTime(rows[0].unix), w - pad.r, pad.t - 3);
+      canvas._chart = { rows, active, x, y, pad, w, h, fmtH };
+      _bindChartHover(canvas);
+    }
+    function drawHistory(canvas, history) {
+      _drawTimeChart(canvas, history, [
         { key: "completion_pct", label: "symbols", color: "#38b995" },
         { key: "decomp_functions_pct", label: "fns", color: "#f0b35a" },
         { key: "decomp_code_pct", label: "code", color: "#5c91df" },
         { key: "decomp_fuzzy_pct", label: "fuzzy", color: "#a98ee6" }
-      ].filter(item => history.some(row => Number(row[item.key] || 0) > 0));
-      const ys = history.flatMap(row => series.map(item => Number(row[item.key] || 0)));
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = 0;
-      const maxY = Math.max(100, Math.ceil(Math.max(...ys) / 10) * 10);
-      const x = value => pad.l + (w - pad.l - pad.r) * (value - minX) / Math.max(1, maxX - minX);
-      const y = value => h - pad.b - (h - pad.t - pad.b) * (value - minY) / Math.max(1, maxY - minY);
-      ctx.strokeStyle = "#2d3a4b";
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const gy = pad.t + (h - pad.t - pad.b) * i / 4;
-        ctx.beginPath();
-        ctx.moveTo(pad.l, gy);
-        ctx.lineTo(w - pad.r, gy);
-        ctx.stroke();
-      }
-      series.forEach((item, sidx) => {
-        ctx.strokeStyle = item.color;
-        ctx.lineWidth = sidx === 0 ? 2.5 : 2;
-        ctx.beginPath();
-        history.forEach((row, idx) => {
-          const px = x(Number(row.unix || 0));
-          const py = y(Number(row[item.key] || 0));
-          if (idx === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.stroke();
-        ctx.fillStyle = item.color;
-        for (const row of history) {
-          ctx.beginPath();
-          ctx.arc(x(Number(row.unix || 0)), y(Number(row[item.key] || 0)), 2.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-      let legendX = pad.l;
-      for (const item of series) {
-        ctx.fillStyle = item.color;
-        ctx.fillRect(legendX, pad.t - 12, 9, 9);
-        ctx.fillStyle = "#cbd5e3";
-        ctx.textAlign = "left";
-        ctx.font = "12px Segoe UI, Arial";
-        ctx.fillText(item.label, legendX + 13, pad.t - 3);
-        legendX += 72;
-      }
-      ctx.fillStyle = "#a8b4c4";
-      ctx.font = "12px Segoe UI, Arial";
-      ctx.textAlign = "right";
-      ctx.fillText("100%", pad.l - 8, y(100) + 4);
-      ctx.fillText("0%", pad.l - 8, y(0) + 4);
-      ctx.textAlign = "left";
-      ctx.fillText(history[0].timestamp || "", pad.l, h - 8);
-      ctx.textAlign = "right";
-      ctx.fillText(history[history.length - 1].timestamp || "", w - pad.r, h - 8);
+      ], "Timeline starts with the next snapshot");
     }
     function relatedAttempts(data, unit) {
       if (!unit) return data.attempt_log || [];
@@ -2291,83 +2313,7 @@ HTML = r"""<!doctype html>
     // Real time-series over unix time. series = [{key,label,color}], rows from
     // the new /api/history/unit or /api/history/fn endpoints.
     function drawTimeSeries(canvas, rows, series, emptyLabel) {
-      const { ctx, w, h } = fitCanvas(canvas);
-      ctx.clearRect(0, 0, w, h);
-      rows = (rows || []).filter(row => row && Number.isFinite(Number(row.unix)));
-      const active = series.filter(item => rows.some(row => Number(row[item.key] || 0) > 0));
-      if (rows.length < 2 || !active.length) {
-        return drawEmpty(ctx, w, h, emptyLabel || "No history recorded yet");
-      }
-      const pad = { l: 42, r: 16, t: 18, b: 28 };
-      const xs = rows.map(row => Number(row.unix || 0));
-      const ys = rows.flatMap(row => active.map(item => Number(row[item.key] || 0)));
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const maxY = Math.max(100, Math.ceil(Math.max(...ys) / 10) * 10);
-      const x = value => pad.l + (w - pad.l - pad.r) * (value - minX) / Math.max(1, maxX - minX);
-      const y = value => h - pad.b - (h - pad.t - pad.b) * value / Math.max(1, maxY);
-      ctx.strokeStyle = "#2d3a4b";
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= 4; i++) {
-        const gy = pad.t + (h - pad.t - pad.b) * i / 4;
-        ctx.beginPath();
-        ctx.moveTo(pad.l, gy);
-        ctx.lineTo(w - pad.r, gy);
-        ctx.stroke();
-      }
-      active.forEach((item, sidx) => {
-        ctx.strokeStyle = item.color;
-        ctx.lineWidth = sidx === 0 ? 2.5 : 2;
-        ctx.beginPath();
-        rows.forEach((row, idx) => {
-          const px = x(Number(row.unix || 0));
-          const py = y(Number(row[item.key] || 0));
-          if (idx === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.stroke();
-        ctx.fillStyle = item.color;
-        for (const row of rows) {
-          ctx.beginPath();
-          ctx.arc(x(Number(row.unix || 0)), y(Number(row[item.key] || 0)), 2.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-      let legendX = pad.l;
-      for (const item of active) {
-        ctx.fillStyle = item.color;
-        ctx.fillRect(legendX, pad.t - 12, 9, 9);
-        ctx.fillStyle = "#cbd5e3";
-        ctx.textAlign = "left";
-        ctx.font = "12px Segoe UI, Arial";
-        ctx.fillText(item.label, legendX + 13, pad.t - 3);
-        legendX += 72;
-      }
-      ctx.fillStyle = "#a8b4c4";
-      ctx.font = "12px Segoe UI, Arial";
-      ctx.textAlign = "right";
-      ctx.fillText(`${maxY}%`, pad.l - 8, y(maxY) + 4);
-      ctx.fillText("0%", pad.l - 8, y(0) + 4);
-      // x-axis in ELAPSED HOURS from the first sample (modest growth-over-time view)
-      const spanHours = (maxX - minX) / 3600;
-      const fmtH = ux => {
-        const hrs = (Number(ux || 0) - minX) / 3600;
-        if (hrs < 1) return Math.round(hrs * 60) + "m";
-        return (hrs < 10 ? hrs.toFixed(1) : String(Math.round(hrs))) + "h";
-      };
-      const ticks = Math.min(12, Math.max(3, Math.round(spanHours) || 3));
-      ctx.fillStyle = "#7c8aa0";
-      ctx.font = "11px Segoe UI, Arial";
-      ctx.textAlign = "center";
-      for (let i = 0; i <= ticks; i++) {
-        const ux = minX + (maxX - minX) * i / ticks;
-        ctx.fillText(fmtH(ux), x(ux), h - 8);
-      }
-      // absolute start timestamp for reference (small, top-right)
-      ctx.fillStyle = "#6b7686";
-      ctx.font = "10px Segoe UI, Arial";
-      ctx.textAlign = "right";
-      ctx.fillText("hours since " + fmtTime(rows[0].unix), w - pad.r, pad.t - 3);
+      _drawTimeChart(canvas, rows, series, emptyLabel || "No history recorded yet");
     }
     function renderMetrics(data) {
       const decomp = data.decomp || {};
@@ -3487,6 +3433,20 @@ def _report_matched():
         return None
 
 
+def _report_units():
+    """{unit_name: (matched, total)} from report.json -> per-file attempt-log attribution."""
+    out = {}
+    try:
+        d = json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace"))
+        for u in d.get("units", []):
+            m = u.get("measures", {})
+            out[u.get("name", "")] = (int(m.get("matched_functions", 0)),
+                                      int(m.get("total_functions", 0)))
+    except Exception:
+        pass
+    return out
+
+
 def _refresh_report_once() -> bool:
     """Regenerate report.json atomically via gen_decomp_report.py."""
     if not GEN_REPORT.exists():
@@ -3512,6 +3472,7 @@ def _refresh_report_once() -> bool:
 
 def _auto_report_loop(interval: int) -> None:
     _auto_state["last_matched"] = _report_matched()
+    _auto_state["units"] = _report_units()
     while True:
         time.sleep(interval)
         if not _refresh_report_once():
@@ -3526,22 +3487,36 @@ def _auto_report_loop(interval: int) -> None:
                 update_fn_history(decomp)
         except Exception:
             pass
-        # on a change, append a live attempt-log line so the activity feed updates
+        # Append live attempt-log lines so the activity feed updates without any
+        # agent writing to status.md: a per-FILE line for every unit whose matched
+        # count moved (this is how codex's work — e.g. menu_middle.c — shows up,
+        # since codex commits to git, not status.md), plus an aggregate line.
         new = _report_matched()
         old = _auto_state["last_matched"]
-        if new is not None and old is not None and new != old:
-            try:
-                d = json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace"))
-                tot = int(d.get("measures", d).get("total_functions", 9120))
-                pct = 100.0 * new / max(1, tot)
-                ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        new_units = _report_units()
+        old_units = _auto_state.get("units") or {}
+        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        try:
+            lines = []
+            for name, (mn, tn) in new_units.items():
+                prev = old_units.get(name)
+                if prev is not None and mn != prev[0]:
+                    sign = "+" if mn > prev[0] else ""
+                    lines.append(f"- **{ts}** `report` - {name} {prev[0]}->{mn}/{tn} "
+                                 f"({sign}{mn - prev[0]} fns)\n")
+            if new is not None and old is not None and new != old:
+                tot = int(json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace"))
+                          .get("measures", {}).get("total_functions", 0)) or 1
+                lines.append(f"- **{ts}** `auto-report` - report.json {old}->{new} / "
+                             f"{tot} ({100.0 * new / tot:.2f}% fns)\n")
+            if lines:
                 with open(STATUS_LOG, "a", encoding="utf-8") as fh:
-                    fh.write(f"- **{ts}** `auto-report` - report.json {old}->{new} / "
-                             f"{tot} ({pct:.2f}% fns)\n")
-            except Exception:
-                pass
+                    fh.writelines(lines)
+        except Exception:
+            pass
         if new is not None:
             _auto_state["last_matched"] = new
+        _auto_state["units"] = new_units
 
 
 def main() -> int:
