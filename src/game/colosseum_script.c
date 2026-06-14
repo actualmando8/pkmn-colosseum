@@ -9241,66 +9241,39 @@ u32 fn_80233DB0(u32 r3, u32 r4, int r5, u16 r6, char r7, int r8)
   u32 *puVar3;
   u32 uVar4;
   u16 uVar9;
-  int iVar5;
-  u32 uVar6;
   int iVar7;
+  u32 uVar15;
+  u32 uVar6;
+  int iVar16;
+  int iVar5;
   u8 cVar11;
   int iVar8;
   u16 uVar10;
-  u16 uVar13;
+  u32 uVar13;
   u32 *puVar12;
   u32 *puVar14;
-  u32 uVar15;
-  int iVar16;
-  u32 uStack_2ec;
-  u32 local_2e8 [84];
-  u32 uStack_198;
-  u32 local_194 [88];
-  
+  struct cpy85 { u32 d[85]; };
+  u32 uStack_198[85];
+  u32 uStack_2ec[85];
+
   uVar9 = fn_801FB1C0(r3,0,0x43,0);
   fn_801FB1C0(0,uVar9,2,0);
-  for (uVar13 = 0; uVar13 < 6; uVar13 = uVar13 + 1) {
-    *(u32 *)(r8 + (u32)uVar13 * 4) = 0;
+  for (uVar13 = 0; (u16)uVar13 < 6; uVar13 = uVar13 + 1) {
+    *(u32 *)(r8 + (u32)(u16)uVar13 * 4) = 0;
   }
   iVar5 = fn_801FB1C0(r3,0,0x45,0);
   if (iVar5 == 0) {
-    uVar6 = 0;
+    return 0;
   }
   else {
     iVar7 = fn_801FB1C0(r3,0,0x45,1);
     if (iVar7 == 0) {
-      uVar6 = 0;
+      return 0;
     }
     else {
-      iVar16 = 0x2a;
-      puVar2 = (u32 *)(iVar5 + -4);
-      puVar3 = &uStack_198;
-      do {
-        puVar14 = puVar3;
-        puVar12 = puVar2;
-        uVar4 = puVar12[2];
-        puVar14[1] = puVar12[1];
-        puVar14[2] = uVar4;
-        iVar16 = iVar16 + -1;
-        puVar2 = puVar12 + 2;
-        puVar3 = puVar14 + 2;
-      } while (iVar16 != 0);
-      puVar14[3] = puVar12[3];
-      iVar16 = 0x2a;
-      puVar2 = (u32 *)(iVar7 + -4);
-      puVar3 = &uStack_2ec;
-      do {
-        puVar14 = puVar3;
-        puVar12 = puVar2;
-        uVar4 = puVar12[2];
-        puVar14[1] = puVar12[1];
-        puVar14[2] = uVar4;
-        iVar16 = iVar16 + -1;
-        puVar2 = puVar12 + 2;
-        puVar3 = puVar14 + 2;
-      } while (iVar16 != 0);
-      puVar14[3] = puVar12[3];
-      for (uVar13 = 0; uVar13 < r6; uVar13 = uVar13 + 1) {
+      *(struct cpy85 *)uStack_198 = *(struct cpy85 *)iVar5;
+      *(struct cpy85 *)uStack_2ec = *(struct cpy85 *)iVar7;
+      for (uVar13 = 0; (u16)uVar13 < r6; uVar13 = uVar13 + 1) {
       }
       uVar6 = 0;
       for (uVar15 = 0; (uVar15 & 0xffff) < 6; uVar15 = uVar15 + 1) {
@@ -9308,24 +9281,29 @@ u32 fn_80233DB0(u32 r3, u32 r4, int r5, u16 r6, char r7, int r8)
         if (((iVar16 != 0) && (cVar11 = fn_80123FBC(), cVar11 != 0)) &&
            (cVar11 = fn_801233F4(iVar16), cVar11 != 0)) {
           uVar13 = 0;
-          while ((uVar13 < r6 &&
-                 ((iVar8 = *(int *)(r5 + uVar13 * 4), iVar8 == 0 || (iVar8 != iVar16)))))
+          goto _wcond;
+_wbody:
+          iVar8 = *(int *)(r5 + (u32)(u16)uVar13 * 4);
+          if ((u32)iVar8 == 0) goto _wincr;
+          if ((u32)iVar8 == (u32)iVar16) goto _wafter;
+_wincr:
+          uVar13 = uVar13 + 1;
+_wcond:
+          if ((u16)uVar13 < r6) goto _wbody;
+_wafter:
+          if ((u16)uVar13 < r6) goto LAB_0023124c;
           {
-            uVar13 = uVar13 + 1;
-          }
-          if (r6 <= uVar13) {
-            uVar4 = fn_801F4804(0);
-            fn_80206AEC(iVar5,iVar16,uVar4);
+            fn_80206AEC(iVar5,iVar16,fn_801F4804(0));
             if (r7 != 0) {
               if (r7 == 1) {
                 fn_801F54A4(0,0,0x14,0);
-                uVar9 = fn_801FB1C0(r3,0,0x43,0);
-                uVar9 = fn_801FB1C0(0,uVar9,2,0);
+                uVar10 = fn_801FB1C0(r3,0,0x43,0);
+                uVar10 = fn_801FB1C0(0,uVar10,2,0);
                 uVar4 = fn_80205BE8(iVar5);
-                uVar10 = (int)fn_8012640C(uVar4,0,0xc9,0);
-                cVar11 = fn_801FB1C0(0,uVar9,0x23,0);
+                uVar9 = (int)fn_8012640C(uVar4,0,0xc9,0);
+                cVar11 = fn_801FB1C0(0,uVar10,0x23,0);
                 if (cVar11 == 1) {
-                  cVar11 = fn_801FB1C0(0,uVar10,0x1c,0);
+                  cVar11 = fn_801FB1C0(0,uVar9,0x1c,0);
                 }
                 else {
                   cVar11 = 0;
@@ -9386,34 +9364,8 @@ LAB_00231240:
         }
 LAB_0023124c: (void)0;
       }
-      iVar16 = 0x2a;
-      puVar2 = &uStack_198;
-      puVar3 = (u32 *)(iVar5 + -4);
-      do {
-        puVar14 = puVar3;
-        puVar12 = puVar2;
-        uVar4 = puVar12[2];
-        puVar14[1] = puVar12[1];
-        puVar14[2] = uVar4;
-        iVar16 = iVar16 + -1;
-        puVar2 = puVar12 + 2;
-        puVar3 = puVar14 + 2;
-      } while (iVar16 != 0);
-      puVar14[3] = puVar12[3];
-      iVar5 = 0x2a;
-      puVar2 = &uStack_2ec;
-      puVar3 = (u32 *)(iVar7 + -4);
-      do {
-        puVar14 = puVar3;
-        puVar12 = puVar2;
-        uVar4 = puVar12[2];
-        puVar14[1] = puVar12[1];
-        puVar14[2] = uVar4;
-        iVar5 = iVar5 + -1;
-        puVar2 = puVar12 + 2;
-        puVar3 = puVar14 + 2;
-      } while (iVar5 != 0);
-      puVar14[3] = puVar12[3];
+      *(struct cpy85 *)iVar5 = *(struct cpy85 *)uStack_198;
+      *(struct cpy85 *)iVar7 = *(struct cpy85 *)uStack_2ec;
     }
   }
   return uVar6;
