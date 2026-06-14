@@ -27,7 +27,7 @@ HISTORY_INTERVAL_SECONDS = 60
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 4
+DASHBOARD_VERSION = 5
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -2345,10 +2345,26 @@ HTML = r"""<!doctype html>
       ctx.textAlign = "right";
       ctx.fillText(`${maxY}%`, pad.l - 8, y(maxY) + 4);
       ctx.fillText("0%", pad.l - 8, y(0) + 4);
-      ctx.textAlign = "left";
-      ctx.fillText(fmtTime(rows[0].unix), pad.l, h - 8);
+      // x-axis in ELAPSED HOURS from the first sample (modest growth-over-time view)
+      const spanHours = (maxX - minX) / 3600;
+      const fmtH = ux => {
+        const hrs = (Number(ux || 0) - minX) / 3600;
+        if (hrs < 1) return Math.round(hrs * 60) + "m";
+        return (hrs < 10 ? hrs.toFixed(1) : String(Math.round(hrs))) + "h";
+      };
+      const ticks = Math.min(6, Math.max(2, Math.round(spanHours) || 2));
+      ctx.fillStyle = "#7c8aa0";
+      ctx.font = "11px Segoe UI, Arial";
+      ctx.textAlign = "center";
+      for (let i = 0; i <= ticks; i++) {
+        const ux = minX + (maxX - minX) * i / ticks;
+        ctx.fillText(fmtH(ux), x(ux), h - 8);
+      }
+      // absolute start timestamp for reference (small, top-right)
+      ctx.fillStyle = "#6b7686";
+      ctx.font = "10px Segoe UI, Arial";
       ctx.textAlign = "right";
-      ctx.fillText(fmtTime(rows[rows.length - 1].unix), w - pad.r, h - 8);
+      ctx.fillText("hours since " + fmtTime(rows[0].unix), w - pad.r, pad.t - 3);
     }
     function renderMetrics(data) {
       const decomp = data.decomp || {};
