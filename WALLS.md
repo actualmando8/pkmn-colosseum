@@ -287,6 +287,85 @@ The W1 entries are candidates if a per-TU allocator lever ever lands; the
 unfolded-branch and li-vs-mr classes look like a *different original compiler
 build/patch-level* fingerprint — flag/version sweeps were inert.
 
+## 2026-06-13 — colosseum_script.c ballistic batch (146→205 byte-exact, +59)
+
+44-agent fleet via the `cs_band.py` private-scratch harness (each agent on its own
+copy + object → no collision on the shared base; `cs_band.py save` only persists
+true 100.00%; `cs_integrate.py` re-compiles + re-measures independently). 59 wins
+integrated, 0 regressions. The near-misses below were pushed high but hit residual
+walls — recorded for re-attack when a reg-coalescing/scheduler lever lands.
+
+### HIGH-VALUE re-attack: the 0x8023Dxxx–0x8023Exxx family (×10) — crack once → +10
+| fns | now | class | note |
+|---|---|---|---|
+| fn_8023D94C / DB98 / DDE4 / E030 / E27C / E4C8 / E714 / E960 / EBAC / EDF8 | 95.20 (was 49.22) | new: **deferred-write-through-r0** | 10 byte-identical fns. Each: result-commit deferred via `mr r0,r3; mr r3,rParam; mr r30,r0` at 4 call sites (target wants `mr r30,r3; mr r3,rParam`) + a count/base reg swap. CW -O4,s scheduler/allocator artifact; same source for all 10. |
+
+### Confirmed reg-alloc / scheduler walls this batch (not C-controllable at -O4,s)
+| fn | now | note |
+|---|---|---|
+| fn_80219838 | 99.73 | coalescer picks first-arg reg (target) vs last-arg reg (ours) for a value dying at a call; both args die simultaneously |
+| fn_80238E30 | 99.73 | two near-identical blocks color shared vars to opposite non-volatile regs (per-block allocation) + inverted return branch |
+| fn_8021847C | 99.71 | target allocates an 8th preserved reg (stmw r24); CW coalesces into 7 |
+| fn_80227C40 | 99.68 | accumulator coalesces into r31 vs target r27 (two simultaneously-freed regs) |
+| fn_80212D6C | 99.56 | defensive `mr r25,r26` relocation; target keeps the reg throughout |
+| fn_80229C90 | 98.81 | 3-cycle r27/r28/r30 permutation |
+| fn_80216410 | 98.69 | scheduler stages the call return through r0 |
+| fn_8023CE60 / fn_8023CFDC | 98.26 | saved-register band off-by-one (twins) [re-confirmed] |
+| fn_80228DAC | 99.18 | 2268-byte: pervasive r26–r29 reassignment [re-confirmed] |
+| fn_80214B68 | 98.95 | sdata2 2-coloring tie-break [re-confirmed] |
+| fn_8021C308 | 98.32 | r24–r29 reshuffle + one extsh. control miss [re-confirmed] |
+| fn_80222ADC | 95.00 | scheduler: `mr r3,r31` call-arg before `extsh r7` [re-confirmed] |
+| fn_80222EF0 | 93.30 | incoming param r3 must claim r31 throughout; CW won't pin it |
+| fn_8023D158 / fn_8023F8C0 | 16.66 / 90.72 | void-pseudo-register-param idiom (3–4 uninit pseudo-reg params on a `void()` sig) |
+
+WINNING levers this batch (folded into the agent cheat-sheet): **narrow-at-def** (declare
+a local `u32` while its source `fn` extern returns `u8`/`u16` → CW masks the call
+result at assignment `clrlwi rN,r3,24/16`, not at the compare); **real-signature**
+(replace `void(void)`+uninit pseudo-reg locals with real `(u32 r3,u32 r4,…)` params —
+cracked the fn_80236Exx ×5 family + several 0x238xxx fns); **direct sda21 lbl**
+(use `lbl_8047B610` as a scalar value, `lbl=*(u32*)(lbl+1); lbl+=5`, not a
+double-deref'd pointer → `@sda21` reloc); **u8 not s8** for unsigned compares
+(`clrlwi/cmplwi` vs `extsb/cmpwi`); **raw-addr→array-extern** for `@ha/@l` relocs.
+
+## 2026-06-13 — colosseum_script.c wave 2 (205→228 byte-exact, +23)
+
+Generic wave fleet (cs_wave_workflow.js + cs_make_wave.py). Wins resumed from
+wave-1 hints. New confirmed reg-coalescing / scheduler-tie walls (all reached
+high % but the residual is rN-only, not C-shape-controllable at -O4,s):
+
+| fn | reached | note |
+|---|---|---|
+| fn_80219354 | 99.73 | divw/mullw/subf/lwzx modulo-index: auStack base wants r5, CW gives r3 (shifts dividend/divisor) |
+| fn_8023CB60 | 99.56 | r27/r28 coalescing swap (divw-result vs return accumulator, reuse different freed slots) |
+| fn_80238060 | 99.49 | saved-band off-by-one: target uVar6→r31 / masked-r5→r29, CW reverses |
+| fn_80229934 | 99.23 | 8-deep non-volatile rotation in else-loop (loop-varying want high regs, invariants low) |
+| fn_80213A78 | 99.16 | target saves 10 callee-saved (stmw r22), CW 9 (stmw r23); entangled with a u16 arg mask |
+| fn_80219964 / fn_80219B2C | 98.77 | uVar2 spanning-temp vs cond-tested var get opposite regs (both die at same call); cascades |
+| fn_80236D60 | 98.67 | uVar1-into-callee-saved-across-call: CW routes via r0 (mr r0,r3;li r3,0;mr r31,r0) vs target direct |
+| fn_802389D4 | 98.08 | narrow-at-def mask lands r0 vs target r3 + u8 loop-counter double-mask |
+
+The 0x8023Dxxx–Exxx family (×10) re-confirmed walled at ~95% (deferred-write-through-r0).
+Accumulated wall set: build/cs_walls.json (43 fns, auto-excluded by cs_make_wave.py).
+
+## 2026-06-14 — colosseum_script.c wave 3 (228→270 byte-exact, +42)
+
+Full-quota window: all 49 agents returned. Cracked many low-tier fns outright
+(several 0%/<20% → 100%) via real-signature + narrow-at-def + direct-sda21 +
+data-symbol relocs. +33 new reg-coalescing/scheduler walls logged (now 110 total
+in build/cs_walls.json, auto-excluded by cs_make_wave.py).
+
+NEW recurring wall sub-pattern — **loop-counter reload register choice**: at a
+loop-back/merge block the target reloads a label byte (e.g. lbl_8047B648) into
+**r6**, CW uses **r3**, because r3 is reserved for an upcoming call-arg `mr r3,rN`.
+Seen on fn_80216F50 (99.8), fn_8021CF3C (99.81), fn_8021D090 (99.9), fn_80223E40
+(99.73). Operand swap / u8 casts / for-loop / temp-local all inert. Not C-controllable.
+Other ties: fn_8022DCB8 (99.99, switch body-layout vs dispatch-displacement — can't
+satisfy both), fn_80232024 (99.83, extsb into fresh reg vs reuse), fn_80220B8C (99.9,
+var-pair first-use coloring).
+
+GATE CATCH: fn_80235B04 saved 100% in its band but only 90.41% bodies-only —
+its win needed an out-of-body pragma; dropped from the commit (hint stored for retry).
+
 ## How to use this ledger
 - **Before** attacking a near-miss: check it isn't already logged here. If it is, skip.
 - **After** confirming a new wall (class match, or a tested-and-didn't-move residual):

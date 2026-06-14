@@ -212,3 +212,4 @@ tools/decomp_work/decomp_work/
 /fifo*.dff
 /nul
 /conflicts_out.txt
+tools/decomp_work/scratch/

@@ -44,6 +44,10 @@
 
 #include "dolphin/types.h"
 
+typedef struct ScriptCallbackStateCopy {
+    u32 data[78];
+} ScriptCallbackStateCopy;
+
 /* ===== GS Engine ===== */
 extern void  fn_80109220(u32 obj, u8 visible);  /* Model visibility */
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d);  /* Sound trigger */
@@ -57,13 +61,38 @@ extern u8    fn_8011E820(void);                /* Pokemon status flag get */
 /* ===== Text / Dialog system (internal) ===== */
 extern void* fn_80057270(void);                /* Text context get (in msgbox.c) */
 extern void  fn_80057DE8(void* ctx);           /* Dialog state set (in dialog.c) */
-extern void  fn_80057E40(void* ctx, u32 a);    /* Dialog show (in dialog.c) */
+extern s32   fn_80057E40(void);                /* Dialog state get (in dialog.c) */
 extern void  fn_80057F94(void* ctx);           /* Dialog update (in dialog.c) */
 extern void  fn_80058F08(void);                /* Text utility (in dialog.c) */
+
+/* ===== Rendering / model helpers ===== */
+extern void  fn_800D88DC(u32 a);
+extern void  fn_800D888C(u32 a);
+extern void  fn_800D6A00(u32 a);
+extern void  fn_800D7820(void* a);
+extern void  fn_800D67BC(u32 a);
+extern void  fn_800D61E4(s32 a, s32 b);
+extern void  fn_800D5CB8(u32 a, u32 b, u32 c, u32 d, u32 e);
+extern void  fn_800D6728(void);
+extern void  fn_800D85D4(u32 a, u32 b);
+extern void  fn_800D59B8(u32 a, f32 b, f32 c);
+extern u8    fn_80109B90(void* obj, u32 wait);
+extern u8    fn_8010A210(void* obj, void* ctx);
+extern u32   fn_80109934(void* obj);
+extern void  fn_80109C88(void* obj, void* ctx);
 
 /* ===== BSS data ===== */
 extern u8    lbl_803A95E8[];   /* Script callback state A (0x138 bytes) */
 extern u8    lbl_803A9720[];   /* Script callback state B (0x48 bytes) */
+extern u8    lbl_80314E08[];
+extern u8    lbl_80314F98[];
+extern f64   lbl_8047BE58;
+extern f32   lbl_8047BE60;
+extern f32   lbl_8047BE64;
+extern f32   lbl_8047BE68;
+extern f32   lbl_8047BE6C;
+extern f32   lbl_8047BE70;
+extern f32   lbl_8047A540;
 
 /*
  * Functions in this translation unit (25 total):
@@ -102,7 +131,80 @@ asm void fn_80053110(void) { nofralloc
 }
 
 /* 0x80053778 | size: 0x2E8 */
-asm void fn_80053778(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/script_callback/fn_80053778.s"
-}
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+#pragma optimization_level 4
+u32 fn_80053778(u32 unused, u8* p) {
+    u32 model;
+    s32 alpha;
+    s32 y;
+    void* msgCtx;
+    f32 scale;
+    f32 fade;
 
+    model = 0;
+    if (fn_80057E40() != 2) {
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D6A00(6);
+        fn_800D7820(lbl_80314E08);
+
+        scale = lbl_8047BE64 * lbl_8047A540;
+        if (scale > lbl_8047BE60) {
+            scale = lbl_8047BE60;
+        }
+        y = (s32)((f32)(s32)*(s16*)(p + 0x56) * scale);
+
+        fade = (*(volatile f32*)&lbl_8047BE64) * (lbl_8047A540 - lbl_8047BE6C);
+        if (fade < lbl_8047BE68) {
+            fade = lbl_8047BE68;
+        }
+        alpha = (s32)(lbl_8047BE70 * (*(volatile f32*)&lbl_8047BE60 - fade));
+
+        fn_800D67BC(4);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0);
+        fn_800D61E4(*(s16*)(p + 0x54), 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0);
+        fn_800D61E4(*(s16*)(p + 0x54), y);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, alpha);
+        fn_800D61E4(0, y);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, alpha);
+        fn_800D6728();
+        return 0;
+    }
+
+    msgCtx = fn_80057270();
+    if (msgCtx == NULL) {
+        return 0;
+    }
+
+    if (fn_80109B90(lbl_803A9720, 0) == 0) {
+        if (fn_8010A210(lbl_803A9720, msgCtx) != 0) {
+            model = fn_80109934(lbl_803A9720);
+        } else {
+            fn_80109C88(lbl_803A9720, msgCtx);
+            *(ScriptCallbackStateCopy*)lbl_803A95E8 = *(ScriptCallbackStateCopy*)msgCtx;
+        }
+    }
+
+    if (model != 0) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, model);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047BE68, lbl_8047BE68);
+        fn_800D61E4(*(s16*)(p + 0x54), *(s16*)(p + 0x56));
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047BE60, lbl_8047BE60);
+        fn_800D6728();
+    }
+
+    return 0;
+}
+#pragma pop
