@@ -75,6 +75,7 @@ extern void  fn_800D37D4(u32 a, u32 b, u32 c, u32 d, u32 e, u16 size);
                                           /* GSmem transfer */
 extern u16   fn_800C46B0(f32 a);         /* float-to-u16 convert */
 extern void  fn_800E01D0(void* dst, void* src);  /* material copy */
+extern void  fn_80177A44(void);          /* gs_scene helper — referenced by asm incs */
 
 /* ===== BSS data ===== */
 extern u8    lbl_803A3E58[];   /* Scene init state (0xE7 bytes) */

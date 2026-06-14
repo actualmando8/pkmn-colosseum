@@ -366,6 +366,26 @@ var-pair first-use coloring).
 GATE CATCH: fn_80235B04 saved 100% in its band but only 90.41% bodies-only —
 its win needed an out-of-body pragma; dropped from the commit (hint stored for retry).
 
+## 2026-06-14 — colosseum_script.c campaign CONVERGED (146 → 277 byte-exact, +131)
+
+Six waves over ~24h (commits ce8219f7 / 5a540e1d / 2931b04c / dcd7793e / b80d4eeb,
++ wave-1 partials). **277/460 byte-exact (60.2%), 0 regressions across the campaign.**
+Wave 6 returned **0 saved wins** from 49 functions — every residual is a CW -O4,s
+register-allocation / scheduler / coalescing tie (94–99.3%, agents confirmed
+"not C-controllable"): callee-saved bank rotations, r29↔r30/r27↔r28 pair swaps,
+frame-size off-by-16, dead-branch the target emits, value-range mask elimination,
+loop-counter-reload r6-vs-r3. **177 walls** accumulated in build/cs_walls.json.
+
+OPEN (not walls — future targeted/structural passes):
+- 8 sub-90% non-wall fns left unattempted-to-completion (large, structural):
+  fn_80213E94, fn_80220868, fn_802226A4, fn_80222BD8, fn_80226914, fn_802317E4,
+  fn_80232110, fn_80233DB0.
+- FILE-SCOPE-PRAGMA batch: a `#pragma optimization_level` region (~src line 21555)
+  compiled at the wrong level vs target; fixing the region could crack
+  fn_80218B6C / fn_8022FE80 / fn_8022FF90 / fn_80218A6C at once (needs a careful
+  multi-function pass + full re-measure — out of scope for the bodies-only loop).
+- The fn_8023D94C..EDF8 family (×10) still ~95% (deferred-write-through-r0).
+
 ## How to use this ledger
 - **Before** attacking a near-miss: check it isn't already logged here. If it is, skip.
 - **After** confirming a new wall (class match, or a tested-and-didn't-move residual):

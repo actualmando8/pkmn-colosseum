@@ -206,3 +206,63 @@ move), it's a wall.
   C doesn't move axis 2 much, but it's the *honest* win and it's what the PC port needs.
 - When in doubt: `decomp.sh walls <fn>` (is it a wall?), `decomp.sh asm <fn>` (what must I
   reproduce?), write C, `match_scan_file.py` (did it work?). Repeat.
+
+---
+
+## 8. Big-file band harness (parallel agents)
+
+When several agents attack ONE big source file at once, they must **not** all edit the same
+`src/<file>.c` (they'd clobber each other's edits and corrupt the shared base object). The
+**band harness** gives each agent a PRIVATE scratch copy of the file and a disjoint set of
+functions ("a band/section") to own. It is `tools/decomp_work/band.py`, exposed as
+`decomp.sh band <args...>`. It is file-parameterized: compiler version, flags, and the
+immutable target object are resolved per file from `config/GC6E01/compile_config.json` (same
+as the real matching build), so it works on ANY `src/**.c`, not just colosseum_script.c.
+
+> The harness is **read-only on canon**: it only reads `src/<file>.c`, writes private scratch
+> to `tools/decomp_work/scratch/band_<tag>.*`, and saves verified wins to
+> `build/band_wins/<tag>.json`. It never edits canonical sources or `*_fn_*.inc`.
+
+### How sections are assigned (the parent/lead does this once)
+
+```bash
+# Split the file's active-asm + near-miss (<100%) fns into 4 disjoint bands.
+bash tools/decomp_work/decomp.sh band sections src/game/<file>.c 4
+```
+
+This compiles the canon, objdiffs it vs the target, ranks the non-100% fns closest-to-100%
+first, tiers them (A>=90, B>=75, C>=50, D<50), and round-robins them into N disjoint bands
+`b0 b1 … b{N-1}`. Hand each agent ONE band's function list and a unique `<tag>`.
+
+### The loop each agent runs (copy/paste — replace `<tag>`, `<file>`, `<fn>`)
+
+```bash
+# (1) INIT a private scratch from the canonical file (remembers flags/target for <tag>).
+bash tools/decomp_work/decomp.sh band init <tag> src/game/<file>.c
+
+# (2) EDIT YOUR SCRATCH ONLY: tools/decomp_work/scratch/band_<tag>.c
+#     Decompile the fns in YOUR band (apply the LEVER CHEAT-SHEET in section 4).
+#     Do NOT touch src/<file>.c or any other agent's scratch.
+
+# (3) CHECK your band's match% (compiles your scratch, objdiffs each fn).
+bash tools/decomp_work/decomp.sh band check <tag> <fn1> <fn2>
+#   (use `band json <tag>` for machine-readable all-fn %; `band diff <tag> <fn>`
+#    for the aligned target-vs-ours asm when a fn is below 100%.)
+
+# (4) SAVE only the byte-exact wins (the harness REJECTS anything below 100%).
+bash tools/decomp_work/decomp.sh band save <tag> <fn1> <fn2>
+#   -> persists verbatim defs to build/band_wins/<tag>.json (trusted-gate: 100% only)
+```
+
+### Parent integration (after agents finish — the parent trust gate)
+
+```bash
+# Merge every tag's saved wins back into its canonical src, RE-COMPILE the integrated
+# file, and RE-MEASURE each fn. Only fns that still hit 100% in the integrated file are
+# kept; any that regressed are reported and dropped. Dry-run by default:
+python tools/decomp_work/band_integrate.py            # writes build/band_<stem>_integrated.c
+python tools/decomp_work/band_integrate.py --apply    # also overwrites src/<file>.c in place
+```
+
+`band_integrate.py` trusts no agent's claim — it recompiles and re-objdiffs in the parent
+before keeping anything, exactly like `cs_integrate.py` did for colosseum_script.c.
