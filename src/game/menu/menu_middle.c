@@ -149,7 +149,7 @@ u16 fn_8006A7D0(u32 r3);
 u16 fn_8006A7D8(u32 r3);
 void fn_8006A7E0(u32 r3, u32 r4);
 u32 fn_8006A7E8(u32 r3);
-void fn_8006A7F0(void);
+void fn_8006A7F0(void* dst, const void* src);
 u32 fn_8006A814(u32 r3);
 void fn_8006A81C(u32 r3, u32 r4);
 void fn_8006A824(void);
@@ -1095,8 +1095,12 @@ u32 fn_8006A7E8(u32 r3) {
 }
 
 /* 0x8006A7F0 | size: 0x24 */
-void fn_8006A7F0(void) {
+#pragma push
+#pragma scheduling off
+void fn_8006A7F0(void* dst, const void* src) {
+    memcpy(dst, src, 0x1660);
 }
+#pragma pop
 
 /* 0x8006A814 | size: 0x8 */
 u32 fn_8006A814(u32 r3) {
