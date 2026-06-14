@@ -213,3 +213,5 @@ tools/decomp_work/decomp_work/
 /nul
 /conflicts_out.txt
 tools/decomp_work/scratch/
+opencode.json
+opencode.config.json

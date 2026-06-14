@@ -1,5 +1,7 @@
 # AGENTS.md — Pokémon Colosseum Decompilation Guardrails
 
+> **New here? Read [`AGENT_ONBOARDING.md`](AGENT_ONBOARDING.md) first** — the quickstart loop, the one authoritative measure command, the lever cheat-sheet, and the hard rules to start decompiling immediately.
+
 This repository is a matching decompilation project for Pokémon Colosseum. The highest priority is preserving or improving byte-for-byte matching of the original `main.dol`. Do not make cosmetic, broad, or speculative changes that risk breaking matching.
 
 ## Project context
