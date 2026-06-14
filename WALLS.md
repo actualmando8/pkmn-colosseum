@@ -27,6 +27,15 @@ C and move on.** This file is how we *stop re-grinding* them.
 Walls live in the gap between C-converted and byte-exact-C. Logging them keeps the
 gap *honest and intentional* instead of an open backlog we keep re-attacking.
 
+## 2026-06-13 — two DVDLow/hsd_mobj walls (un-wrapped from codex's undocumented asm-flips)
+
+Codex commit `2708d871` flipped four functions `#if 0`→`#if 1` (asm-wrapper) without proof or logging. Validation un-wrapped the two that had real C; both were then exhaustively tested and confirmed **genuine C-uncontrollable walls** (now Equivalents in `equivalent.txt`):
+
+- **`fn_800A4C94`** (DVDLow.c, DVDCBCallback read-and-clear getter) — **W-operand-order**, 71.4%. Target's `0xCC006004 = 0` store emits `lis r3`(addr) **before** `li r0`(value); CW emits value-first. Proven invariant across all 7 CW versions (1.1–2.0) and ~20 C phrasings (raw cast, index, pointer var, struct field, comma, register var, reordering). Operand-order-to-fresh-register is not C-controllable.
+- **`fn_801A6DDC`** (hsd_mobj.c, HSD_MObj alpha-setter) — **W-peephole branch-merge**, 77.8% (was 20%; fixed via `#pragma optimization_level 1` + guard-clause — struct offsets were already correct at 0xC/0xC). Residual: CW fuses the inner null-check `bne L; blr` into `beqlr`; the target keeps it un-merged. ~30 source structures tested across 4 CW versions — every clean variant collapses to `beqlr`; the only way to force the split injects an extra non-matching instruction (scores lower).
+
+The other two flipped functions (`fn_801A4098`, `fn_801A4A54`) were already logged HSD walls. Takeaway: codex's *selection* of which functions to wrap was sound, but a wall **with good C is an Equivalent** (real C active), not an asm-wrapper — see policy point 3 above.
+
 <!-- SNAPSHOT:auto — regenerate with: python tools/decomp_work/progress2.py --measure -->
 ## Snapshot — 2026-05-31 (regenerate: `python tools/decomp_work/progress2.py --measure`)
 

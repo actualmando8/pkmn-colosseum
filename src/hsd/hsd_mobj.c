@@ -380,18 +380,19 @@ u32* fn_801A6DC4(u32* node) {
 
 /* 0x801A6DDC | 0x24 */
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 1
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A6DDC(void) {
 #include "src/hsd/hsd_mobj_fn_801A6DDC.inc"
 }
 #else
 void fn_801A6DDC(HSD_MObj* mobj, f32 val) {
-    if (mobj != NULL) {
-        if (mobj->mat != NULL) {
-            mobj->mat->alpha = val;
-        }
+    if (mobj == NULL) {
+        return;
+    }
+    if (mobj->mat != NULL) {
+        mobj->mat->alpha = val;
     }
 }
 #endif

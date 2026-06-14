@@ -28,3 +28,5 @@ fn_800E638C   # gs_material.c — W1 same class as fn_800E5550 (sibling); 99.32%
 fn_800E65CC   # gs_material.c — W1 same class as fn_800E5550 (sibling); 99.32% parent-verified, C is correct
 fn_800E68D8   # gs_material.c — W1 same class as fn_800E5550 (sibling); 99.32% parent-verified, C is correct
 fn_80005E00   # main.c — W1 volatile-FPR rotation + anonymous conversion-literal reloc artifact; 99.39% parent-verified (2 independent agents), TaskRetraceMain C is correct
+fn_800A4C94   # DVDLow.c — W-operand-order: target emits `lis r3`(addr) before `li r0`(value) in the 0xCC006004 store; CW emits value-first across ALL 7 CW versions (1.1–2.0), ~20 phrasings swept; 71.4% parent-verified, DVDCBCallback read-and-clear getter C is correct (un-wrapped from codex's undocumented asm-flip 2708d871)
+fn_801A6DDC   # hsd_mobj.c — W-peephole branch-merge: CW fuses `bne L; blr` -> `beqlr`; target keeps the inner `mat` null-check un-merged; 77.8% parent-verified (20%->77.8% via #pragma optimization_level 1 + guard-clause restructure), HSD_MObj alpha-setter C is correct (un-wrapped from codex 2708d871)
