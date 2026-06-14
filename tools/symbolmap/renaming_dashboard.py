@@ -27,10 +27,13 @@ HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
 UNIT_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_unit_history.json"
 FN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_history.json"
 HISTORY_INTERVAL_SECONDS = 60
+# Ring cap for the global match-progress history. Raised from 500 -> 2000 so the
+# months-long git backfill (one row per report.json commit) is not evicted.
+HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 7
+DASHBOARD_VERSION = 8
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -136,22 +139,87 @@ def git_value(args: list[str]) -> str:
     return proc.stdout.strip()
 
 
-def recent_commits(limit: int = 10) -> list[dict[str, str]]:
+def recent_commits(limit: int = 10) -> list[dict[str, object]]:
     text = git_value(
         [
             "log",
             f"-n{limit}",
             "--date=format:%b %d, %H:%M",
-            "--pretty=format:%h%x09%cd%x09%s",
+            "--pretty=format:%h%x09%cd%x09%ct%x09%s",
         ]
     )
-    rows: list[dict[str, str]] = []
+    rows: list[dict[str, object]] = []
     for line in text.splitlines():
-        parts = line.split("\t", 2)
-        if len(parts) != 3:
+        parts = line.split("\t", 3)
+        if len(parts) != 4:
             continue
-        sha, when, subject = parts
-        rows.append({"sha": sha, "when": when, "subject": subject})
+        sha, when, ct, subject = parts
+        try:
+            unix = int(ct)
+        except ValueError:
+            unix = 0
+        # `when` retained for backwards-compat; `unix` lets the front-end format
+        # the commit time in HST via hstTime().
+        rows.append({"sha": sha, "when": when, "unix": unix, "subject": subject})
+    return rows
+
+
+def recent_commit_attempts(limit: int = 40) -> list[dict[str, object]]:
+    """Derive attempt-log entries from recent git commits that touched src/*.c.
+
+    Codex commits its per-file decomp work to git (not status.md), so without
+    this its progress (e.g. "Advance menu_middle matching" on menu_middle.c)
+    never shows up in the Attempt Log. We emit one entry per changed .c file
+    (capped per commit) in the same shape load_attempt_log() produces so the
+    front-end's reverse-sort and relatedAttempts(unit) filtering both work.
+    """
+    text = git_value(
+        [
+            "log",
+            f"-n{limit}",
+            "--name-only",
+            "--pretty=format:%x01%H%x09%ct%x09%s",
+            "--",
+            "src",
+        ]
+    )
+    rows: list[dict[str, object]] = []
+    # Records are separated by the \x01 we injected at the start of each header.
+    for record in text.split("\x01"):
+        record = record.strip("\n")
+        if not record:
+            continue
+        lines = record.split("\n")
+        header = lines[0].split("\t", 2)
+        if len(header) != 3:
+            continue
+        _sha, ct, subject = header
+        try:
+            unix = int(ct)
+        except ValueError:
+            continue
+        iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(unix))
+        emitted = 0
+        for path in lines[1:]:
+            path = path.strip()
+            if not path or not path.endswith(".c"):
+                continue
+            if emitted >= 3:
+                break
+            emitted += 1
+            base = path.replace("\\", "/").rsplit("/", 1)[-1]
+            rows.append(
+                {
+                    "timestamp": iso,
+                    "unix": unix,
+                    "agent": "git",
+                    "kind": "commit",
+                    "function": "",
+                    "file": base,
+                    "percent": None,
+                    "message": subject,
+                }
+            )
     return rows
 
 
@@ -411,7 +479,7 @@ def load_history() -> list[dict[str, object]]:
 def write_history(history: list[dict[str, object]]) -> None:
     HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
     tmp = HISTORY_FILE.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(history[-500:], indent=2), encoding="utf-8")
+    tmp.write_text(json.dumps(history[-HISTORY_CAP:], indent=2), encoding="utf-8")
     tmp.replace(HISTORY_FILE)
 
 
@@ -483,7 +551,7 @@ def update_history(state: dict[str, object]) -> list[dict[str, object]]:
     if should_record_history(history, snapshot):
         history.append(snapshot)
         write_history(history)
-    return history[-500:]
+    return history[-HISTORY_CAP:]
 
 
 def _load_json_obj(path: Path) -> dict[str, object]:
@@ -784,7 +852,10 @@ def build_state() -> dict[str, object]:
         )
     )
     decomp = load_decomp_report(DECOMP_REPORT)
-    attempt_log = load_attempt_log(DECOMP_STATUS_LOG)
+    # Merge status.md attempt log with git-commit-derived entries so codex's
+    # per-file work (committed to git, not status.md) appears in the log and in
+    # per-unit drill-downs. The front-end reverse-sorts and filters by `file`.
+    attempt_log = load_attempt_log(DECOMP_STATUS_LOG) + recent_commit_attempts()
     return {
         "version": DASHBOARD_VERSION,
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -1750,7 +1821,6 @@ HTML = r"""<!doctype html>
       </div>
     </div>
     <div class="actions">
-      <button class="btn ghost" id="attention" type="button">Needs Wiring</button>
       <button class="btn primary" id="refresh" type="button">Refresh</button>
     </div>
   </header>
@@ -2229,8 +2299,10 @@ HTML = r"""<!doctype html>
         let bi = 0, bd = 1e9;
         c.rows.forEach((r, i) => { const d = Math.abs(c.x(Number(r.unix)) - mx); if (d < bd) { bd = d; bi = i; } });
         const r = c.rows[bi];
-        const lines = c.active.map(it =>
-          `<span style="color:${it.color}">&#9632;</span> ${it.label}: ${Number(r[it.key] || 0).toFixed(2)}%`).join("<br>");
+        const lines = c.active.map(it => {
+          const v = _seriesVal(r, it.key);
+          return `<span style="color:${it.color}">&#9632;</span> ${it.label}: ${Number.isFinite(v) ? v.toFixed(2) + "%" : "-"}`;
+        }).join("<br>");
         tip.innerHTML = `<b>${c.fmtH(r.unix)}</b> &middot; ${fmtTime(r.unix)}<br>${lines}`;
         tip.style.display = "block";
         tip.style.left = (evt.clientX + 14) + "px";
@@ -2238,17 +2310,28 @@ HTML = r"""<!doctype html>
       });
       canvas.addEventListener("mouseleave", () => { _chartTip().style.display = "none"; });
     }
+    // A row's value for a series is finite-or-GAP: backfilled history rows only
+    // carry decomp_* keys, so completion_pct/symbols are missing there. Treat a
+    // missing/non-finite raw value as a gap (NaN) -> skip the point, break the
+    // line -- never plot it as 0 (which would drag the line down to the axis).
+    function _seriesVal(row, key) {
+      const raw = row == null ? undefined : row[key];
+      const n = Number(raw);
+      return (raw === null || raw === undefined || !Number.isFinite(n)) ? NaN : n;
+    }
     function _drawTimeChart(canvas, rows, series, emptyLabel) {
       const { ctx, w, h } = fitCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
       rows = (rows || []).filter(r => r && Number.isFinite(Number(r.unix)));
-      const active = series.filter(it => rows.some(r => Number(r[it.key] || 0) > 0));
+      // Keep a series only if it has at least one finite point somewhere.
+      const active = series.filter(it => rows.some(r => Number.isFinite(_seriesVal(r, it.key))));
       if (rows.length < 2 || !active.length) { canvas._chart = null; return drawEmpty(ctx, w, h, emptyLabel || "No history yet"); }
       const pad = { l: 46, r: 16, t: 18, b: 30 };
       const xs = rows.map(r => Number(r.unix || 0));
-      const ys = rows.flatMap(r => active.map(it => Number(r[it.key] || 0)));
+      const ys = rows.flatMap(r => active.map(it => _seriesVal(r, it.key))).filter(Number.isFinite);
       const minX = Math.min(...xs), maxX = Math.max(...xs);
-      const maxY = Math.max(100, Math.ceil(Math.max(...ys) / 10) * 10);
+      const maxY = Math.max(100, Math.ceil((ys.length ? Math.max(...ys) : 0) / 10) * 10);
+      // FIXED scale: min = first row unix, max = last row unix (does not scroll).
       const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
       const y = v => h - pad.b - (h - pad.t - pad.b) * v / Math.max(1, maxY);
       // Y gridlines + percent labels at every step (read the % off the axis)
@@ -2261,24 +2344,49 @@ HTML = r"""<!doctype html>
         ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
         ctx.fillText(v + "%", pad.l - 6, gy + 4);
       }
-      // series lines + points
+      // series lines + points -- break the line at gaps (NaN), don't plot 0.
       active.forEach((it, si) => {
         ctx.strokeStyle = it.color; ctx.lineWidth = si === 0 ? 2.5 : 2; ctx.beginPath();
-        rows.forEach((r, i) => { const px = x(Number(r.unix)), py = y(Number(r[it.key] || 0)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+        let pen = false;
+        rows.forEach(r => {
+          const val = _seriesVal(r, it.key);
+          if (!Number.isFinite(val)) { pen = false; return; }
+          const px = x(Number(r.unix)), py = y(val);
+          if (pen) ctx.lineTo(px, py); else { ctx.moveTo(px, py); pen = true; }
+        });
         ctx.stroke(); ctx.fillStyle = it.color;
-        rows.forEach(r => { ctx.beginPath(); ctx.arc(x(Number(r.unix)), y(Number(r[it.key] || 0)), 2.2, 0, 6.2832); ctx.fill(); });
+        rows.forEach(r => {
+          const val = _seriesVal(r, it.key);
+          if (!Number.isFinite(val)) return;
+          ctx.beginPath(); ctx.arc(x(Number(r.unix)), y(val), 2.2, 0, 6.2832); ctx.fill();
+        });
       });
       // legend
       let lx = pad.l; ctx.textAlign = "left"; ctx.font = "12px Segoe UI, Arial";
       active.forEach(it => { ctx.fillStyle = it.color; ctx.fillRect(lx, pad.t - 12, 9, 9); ctx.fillStyle = "#cbd5e3"; ctx.fillText(it.label, lx + 13, pad.t - 3); lx += 64; });
-      // x-axis: elapsed hours from the first sample (fixed origin, does not scroll)
+      // x-axis: 6-hour-aligned ticks. <=48h span -> elapsed-hours labels; longer
+      // (days/months) -> HST date labels at a readable cadence (~8-12 max).
       const fmtH = ux => { const hr = (Number(ux) - minX) / 3600; return hr < 1 ? Math.round(hr * 60) + "m" : (hr < 10 ? hr.toFixed(1) : String(Math.round(hr))) + "h"; };
+      const SIXH = 6 * 3600;
       const spanH = (maxX - minX) / 3600;
-      const ticks = Math.min(12, Math.max(3, Math.round(spanH) || 3));
       ctx.fillStyle = "#7c8aa0"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "center";
-      for (let i = 0; i <= ticks; i++) { const ux = minX + (maxX - minX) * i / ticks; ctx.fillText(fmtH(ux), x(ux), h - 8); }
-      ctx.fillStyle = "#6b7686"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
-      ctx.fillText("hours since " + fmtTime(rows[0].unix), w - pad.r, pad.t - 3);
+      if (spanH <= 48) {
+        // Elapsed hours, ticks every 6h from the origin.
+        for (let ux = minX; ux <= maxX + 1; ux += SIXH) ctx.fillText(fmtH(ux), x(ux), h - 8);
+        ctx.fillStyle = "#6b7686"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
+        ctx.fillText("hours since " + fmtTime(rows[0].unix), w - pad.r, pad.t - 3);
+      } else {
+        // Date labels in HST. Choose a 6h-multiple step so we get <=12 ticks.
+        const slots = Math.ceil((maxX - minX) / SIXH);
+        const stepSlots = Math.max(1, Math.ceil(slots / 11));
+        const step = stepSlots * SIXH;
+        // Snap the first tick up to the next 6h UTC boundary so ticks align.
+        const first = Math.ceil(minX / SIXH) * SIXH;
+        const dateLbl = ux => new Date(Number(ux) * 1000).toLocaleString("en-US", { timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric" });
+        for (let ux = first; ux <= maxX + 1; ux += step) ctx.fillText(dateLbl(ux), x(ux), h - 8);
+        ctx.fillStyle = "#6b7686"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
+        ctx.fillText(dateLbl(minX) + " -> " + dateLbl(maxX) + " HST", w - pad.r, pad.t - 3);
+      }
       canvas._chart = { rows, active, x, y, pad, w, h, fmtH };
       _bindChartHover(canvas);
     }
@@ -2303,12 +2411,29 @@ HTML = r"""<!doctype html>
         return false;
       });
     }
+    // HST formatting (Pacific/Honolulu, UTC-10). Accepts a unix-seconds NUMBER
+    // or an ISO-UTC STRING ("2026-06-14T11:00:06Z"). Returns "" for empty input.
+    function hstTime(v) {
+      let ms = NaN;
+      if (typeof v === "number") {
+        ms = v * 1000;
+      } else if (typeof v === "string" && v) {
+        const n = Number(v);
+        ms = Number.isFinite(n) && /^\d+$/.test(v.trim()) ? n * 1000 : Date.parse(v);
+      }
+      if (!Number.isFinite(ms) || !ms) return typeof v === "string" ? v : "";
+      return new Date(ms).toLocaleString("en-US", {
+        timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: false
+      });
+    }
     function fmtTime(unix) {
       const ms = Number(unix || 0) * 1000;
       if (!ms) return "";
-      const d = new Date(ms);
-      const pad2 = n => String(n).padStart(2, "0");
-      return `${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      return new Date(ms).toLocaleString("en-US", {
+        timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric",
+        hour: "2-digit", minute: "2-digit", hour12: false
+      });
     }
     // Real time-series over unix time. series = [{key,label,color}], rows from
     // the new /api/history/unit or /api/history/fn endpoints.
@@ -2561,7 +2686,7 @@ HTML = r"""<!doctype html>
         const delta = prev ? Number(row.completion_pct || 0) - Number(prev.completion_pct || 0) : 0;
         const tag = delta > 0 ? "gain" : "tick";
         rows.push({
-          time: row.timestamp || "",
+          time: Number.isFinite(Number(row.unix)) ? hstTime(Number(row.unix)) : (row.timestamp || ""),
           tag,
           text: `${pctText(row.completion_pct)} complete, ${row.renamed || 0} renamed, ${row.needs_wiring || 0} needs wiring${delta > 0 ? `, +${delta.toFixed(1)}%` : ""}`
         });
@@ -2601,7 +2726,7 @@ HTML = r"""<!doctype html>
         setText(sha, commit.sha);
         const when = document.createElement("div");
         when.className = "commit-when";
-        setText(when, commit.when);
+        setText(when, Number.isFinite(Number(commit.unix)) && Number(commit.unix) > 0 ? hstTime(Number(commit.unix)) : commit.when);
         const subject = document.createElement("div");
         subject.className = "commit-subject";
         setText(subject, commit.subject);
@@ -2656,7 +2781,7 @@ HTML = r"""<!doctype html>
         tile.addEventListener("click", () => {
           $("source-filter").value = row.source || "unknown";
           store.attention = false;
-          $("attention").classList.remove("primary");
+          $("attention")?.classList.remove("primary");
           renderRows();
           document.querySelector(".workbench").scrollIntoView({ behavior: "smooth", block: "start" });
         });
@@ -3087,7 +3212,7 @@ HTML = r"""<!doctype html>
         row.className = "attempt-row";
         const time = document.createElement("div");
         time.className = "attempt-time";
-        setText(time, attempt.timestamp);
+        setText(time, hstTime(Number.isFinite(Number(attempt.unix)) ? Number(attempt.unix) : attempt.timestamp));
         const kind = document.createElement("div");
         kind.className = "attempt-kind";
         setText(kind, attempt.kind);
@@ -3256,7 +3381,7 @@ HTML = r"""<!doctype html>
     $("query").addEventListener("input", renderRows);
     $("status-filter").addEventListener("change", () => {
       store.attention = false;
-      $("attention").classList.remove("primary");
+      $("attention")?.classList.remove("primary");
       renderRows();
     });
     $("source-filter").addEventListener("change", renderRows);
@@ -3265,12 +3390,15 @@ HTML = r"""<!doctype html>
       $("status-filter").value = "";
       $("source-filter").value = "";
       store.attention = false;
-      $("attention").classList.remove("primary");
+      $("attention")?.classList.remove("primary");
       renderRows();
     });
-    $("attention").addEventListener("click", () => {
+    // The "Needs Wiring" pill was removed from the top bar; guard the handler so
+    // it is a no-op when the button is absent (status filter still works via the
+    // Status Map / filter controls).
+    $("attention")?.addEventListener("click", () => {
       store.attention = !store.attention;
-      $("attention").classList.toggle("primary", store.attention);
+      $("attention")?.classList.toggle("primary", store.attention);
       if (store.attention) $("status-filter").value = "";
       renderRows();
     });
