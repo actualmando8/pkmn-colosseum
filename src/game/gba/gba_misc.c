@@ -115,7 +115,7 @@ void fn_80089C84(s32 param);
 void fn_80089CA8(void);
 void fn_80089D30(void);
 void fn_80089D74(s32 param);
-void fn_80089D98(void);
+s32 fn_80089D98(s32 r31);
 void fn_80089E20(void);
 u32 fn_80089F58(u32 v);
 u32 fn_80089F60(u32 v);
@@ -123,12 +123,12 @@ u32 fn_80089F68(u32 v);
 u32 fn_80089F70(u32 v);
 void fn_80089F78(void);
 s32 fn_8008A99C(void);
-void fn_8008A9AC(void);
+int fn_8008A9AC(u32 r3, u8* r4);
 void fn_8008A9E4(void);
 void fn_8008AB20(void);
-void fn_8008AB4C(void);
+void fn_8008AB4C(s32 param0, s32 param1);
 s32 fn_8008AB8C(void);
-void fn_8008ABA0(void);
+u8 fn_8008ABA0(s32 idx);
 void fn_8008ABE4(void);
 void fn_8008AC34(void);
 void fn_8008AE18(void);
@@ -784,38 +784,22 @@ void fn_80089D74(s32 param) {
 #pragma pop
 
 /* 0x80089D98 | size: 0x88 */
-void fn_80089D98(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    ((void(*)(void))fn_80072548)();
-    if ((s32)r3 < 0) {
-        tmp = r31 << 1;
-        r4 = (u32)&lbl_8047A684;
-        r4 = r4 + tmp;
-        tmp = 0x0;
-        *(u16*)((u8*)r4 + (-2)) = tmp;
-        return;
+s32 fn_80089D98(s32 r31) {
+    extern s32 fn_80072548(s32);
+    s32 n;
+    n = fn_80072548(r31 - 1);
+    if (n < 0) {
+        u16 *base = (u16*)&lbl_8047A684;
+        base[r31 - 1] = 0;
+    } else if (n == 1 || n == 2) {
+        u16 *base = (u16*)&lbl_8047A684;
+        u32 v = base[r31 - 1] + 1;
+        base[r31 - 1] = v;
+        if ((u16)v <= 0xa) {
+            n = -1;
+        }
     }
-    if ((s32)r3 != 1) {
-        if ((s32)r3 != 2) return;
-    }
-    tmp = r31 << 1;
-    r4 = (u32)&lbl_8047A684;
-    r5 = r4 + tmp;
-    r4 = *(u16*)((u8*)r5 + (-2));
-    r4 = r4 + 0x1;
-    tmp = r4 & 0xFFFF;
-    *(u16*)((u8*)r5 + (-2)) = r4;
-    if (tmp > 0xa) return;
-    r3 = -0x1;
-
-    return;
+    return n;
 }
 
 /* 0x80089E20 | size: 0x138 */
@@ -1619,32 +1603,19 @@ void fn_80089F78(void) {
 
 /* 0x8008A99C | size: 0x10 */
 s32 fn_8008A99C(void) {
+    lbl_8047A678 = 1;
     return 0;
 }
 
 /* 0x8008A9AC | size: 0x38 */
-void fn_8008A9AC(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-
-    r5 = r3 & 0xF;
-    /* extrwi tmp, r3, 4, 24 */;
-    *(u8*)((u8*)r4 + 0x0) = r5;
-    /* extrwi r7, r3, 4, 20 */;
-    /* extrwi r6, r3, 4, 16 */;
-    /* extrwi r5, r3, 4, 12 */;
-    *(u8*)((u8*)r4 + 0x1) = tmp;
-    /* extrwi tmp, r3, 4, 8 */;
-    r3 = 0x0;
-    *(u8*)((u8*)r4 + 0x2) = r7;
-    *(u8*)((u8*)r4 + 0x3) = r6;
-    *(u8*)((u8*)r4 + 0x4) = r5;
-    *(u8*)((u8*)r4 + 0x5) = tmp;
-    return;
+int fn_8008A9AC(u32 r3, u8* r4) {
+    r4[0] = r3 & 0xF;
+    r4[1] = (r3 >> 4) & 0xF;
+    r4[2] = (r3 >> 8) & 0xF;
+    r4[3] = (r3 >> 12) & 0xF;
+    r4[4] = (r3 >> 16) & 0xF;
+    r4[5] = (r3 >> 20) & 0xF;
+    return 0;
 }
 
 /* 0x8008A9E4 | size: 0x13C */
@@ -1740,20 +1711,12 @@ void fn_8008AB20(void) {
 }
 
 /* 0x8008AB4C | size: 0x40 */
-void fn_8008AB4C(void) {
-    u8 sp[0x790];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r31 = r3;
-    r3 = r4;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_80083D30)();
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_800733D0)();
-    return;
+void fn_8008AB4C(s32 param0, s32 param1) {
+    extern void fn_80083D30(s32, void*);
+    extern void fn_800733D0(s32, void*);
+    u8 buf[0x780];
+    fn_80083D30(param1, buf);
+    fn_800733D0(param0 - 1, buf);
 }
 
 /* 0x8008AB8C | size: 0x14 */
@@ -1762,29 +1725,15 @@ s32 fn_8008AB8C(void) {
 }
 
 /* 0x8008ABA0 | size: 0x44 */
-void fn_8008ABA0(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-
-    r4 = (u32)&lbl_803FB318;
-    r5 = r3 << 2;
-    tmp = (u32)&lbl_803FB318;
-    r4 = 0x0;
-    r3 = tmp + r5;
-    tmp = *(u32*)((u8*)r3 + (-4));
-    if ((s32)tmp != 0) {
-        r3 = (u32)&lbl_803FB308;
-        tmp = (u32)&lbl_803FB308;
-        r3 = tmp + r5;
-        tmp = *(u32*)((u8*)r3 + (-4));
-        if ((s32)tmp == 0) {
-            r4 = 0x1;
+u8 fn_8008ABA0(s32 idx) {
+    u32 r5 = idx << 2;
+    u32 ret = 0;
+    if (*(s32*)((u8*)&lbl_803FB318 + r5 - 4) != 0) {
+        if (*(s32*)((u8*)&lbl_803FB308 + r5 - 4) == 0) {
+            ret = 1;
         }
     }
-    r3 = r4 & 0xFF;
-    return;
+    return (u8)ret;
 }
 
 /* 0x8008ABE4 | size: 0x50 */
