@@ -11,7 +11,7 @@ import time
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,8 +21,18 @@ FUNC_TU_MAP = ROOT / "config" / "GC6E01" / "func_tu_map.json"
 DECOMP_REPORT = ROOT / "report.json"
 DECOMP_STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
 HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
+UNIT_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_unit_history.json"
+FN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_history.json"
 HISTORY_INTERVAL_SECONDS = 60
-DASHBOARD_VERSION = 3
+UNIT_HISTORY_CAP = 300
+FN_HISTORY_CAP = 200
+STATE_CACHE_TTL_SECONDS = 1.8
+DASHBOARD_VERSION = 4
+
+# In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
+# the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
+# it can take ~19s. The 5s front-end auto-refresh would otherwise stack rebuilds.
+_STATE_CACHE: dict[str, object] = {"value": None, "expires": 0.0}
 
 MAP_RE = re.compile(
     r"^(fn_[0-9A-Fa-f]{8})\s*->\s*([A-Za-z_.$][\w.$:@?]*)\s*//\s*(.*?)\s*$"
@@ -471,6 +481,184 @@ def update_history(state: dict[str, object]) -> list[dict[str, object]]:
         history.append(snapshot)
         write_history(history)
     return history[-500:]
+
+
+def _load_json_obj(path: Path) -> dict[str, object]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _write_json_obj(path: Path, data: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(data), encoding="utf-8")
+    tmp.replace(path)
+
+
+def load_unit_history(source: str) -> list[dict[str, object]]:
+    data = _load_json_obj(UNIT_HISTORY_FILE)
+    rows = data.get(source)
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def load_fn_history(name: str) -> list[dict[str, object]]:
+    data = _load_json_obj(FN_HISTORY_FILE)
+    rows = data.get(name)
+    if not isinstance(rows, list):
+        return []
+    return [row for row in rows if isinstance(row, dict)]
+
+
+def update_unit_history(decomp: dict[str, object]) -> None:
+    """Append a per-unit sample only when that unit's functions_pct or code_pct
+    changed (change-gated, like should_record_history but per unit)."""
+    units = decomp.get("units")
+    if not isinstance(units, list) or not units:
+        return
+    store = _load_json_obj(UNIT_HISTORY_FILE)
+    now = int(time.time())
+    dirty = False
+    for unit in units:
+        if not isinstance(unit, dict):
+            continue
+        source = str(unit.get("source") or unit.get("name") or "")
+        if not source:
+            continue
+        fp = float_pct(unit.get("functions_pct", 0))
+        cp = float_pct(unit.get("code_pct", 0))
+        rows = store.get(source)
+        if not isinstance(rows, list):
+            rows = []
+        last = rows[-1] if rows else None
+        if (
+            last is not None
+            and float_pct(last.get("fp", 0)) == fp
+            and float_pct(last.get("cp", 0)) == cp
+        ):
+            continue
+        rows.append(
+            {
+                "unix": now,
+                "fp": fp,
+                "cp": cp,
+                "mc": int_value(unit.get("matched_code", 0)),
+                "mf": int_value(unit.get("matched_functions", 0)),
+                "tf": int_value(unit.get("total_functions", 0)),
+            }
+        )
+        store[source] = rows[-UNIT_HISTORY_CAP:]
+        dirty = True
+    if dirty:
+        _write_json_obj(UNIT_HISTORY_FILE, store)
+
+
+def update_fn_history(decomp: dict[str, object]) -> None:
+    """Append a per-function sample for unmatched (<100%) functions only, when
+    that function's fuzzy_pct changed. Keyed by function name. Capped per fn."""
+    units = decomp.get("units")
+    if not isinstance(units, list) or not units:
+        return
+    store = _load_json_obj(FN_HISTORY_FILE)
+    now = int(time.time())
+    dirty = False
+    seen: set[str] = set()
+    for unit in units:
+        if not isinstance(unit, dict):
+            continue
+        for fn in unit.get("functions", []):
+            if not isinstance(fn, dict):
+                continue
+            name = str(fn.get("name") or "")
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            fp = float_pct(fn.get("fuzzy_pct", 0))
+            if fp >= 99.95:
+                # Drop history for now-matched fns so the file stays small.
+                if name in store:
+                    del store[name]
+                    dirty = True
+                continue
+            rows = store.get(name)
+            if not isinstance(rows, list):
+                rows = []
+            last = rows[-1] if rows else None
+            if last is not None and float_pct(last.get("fuzzy_pct", 0)) == fp:
+                continue
+            rows.append({"unix": now, "fuzzy_pct": fp})
+            store[name] = rows[-FN_HISTORY_CAP:]
+            dirty = True
+    if dirty:
+        _write_json_obj(FN_HISTORY_FILE, store)
+
+
+def load_unit_functions(source: str) -> dict[str, object]:
+    """Lazy endpoint backing: return one unit's functions[] without shipping all
+    units. Matches on metadata.source_path (preferred) or unit name."""
+    if not DECOMP_REPORT.exists() or not source:
+        return {"available": False, "source": source, "functions": []}
+    try:
+        report = json.loads(DECOMP_REPORT.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"available": False, "source": source, "functions": []}
+    norm = source.replace("\\", "/")
+    for unit in report.get("units", []):
+        if not isinstance(unit, dict):
+            continue
+        metadata = unit.get("metadata", {})
+        if not isinstance(metadata, dict):
+            metadata = {}
+        unit_source = str(metadata.get("source_path", "")).replace("\\", "/")
+        if unit_source != norm and str(unit.get("name", "")) != source:
+            continue
+        functions = []
+        for index, function in enumerate(unit.get("functions", [])):
+            if not isinstance(function, dict):
+                continue
+            fn_pct = float_pct(function.get("fuzzy_match_percent", 0))
+            functions.append(
+                {
+                    "index": index,
+                    "name": function.get("name", ""),
+                    "size": int_value(function.get("size", 0)),
+                    "fuzzy_pct": fn_pct,
+                    "status": match_status(fn_pct),
+                }
+            )
+        functions.sort(
+            key=lambda row: (
+                float(row.get("fuzzy_pct", 0)) >= 99.95,
+                -int(row.get("size", 0)),
+                str(row.get("name", "")),
+            )
+        )
+        return {
+            "available": True,
+            "source": unit_source or source,
+            "name": unit.get("name", ""),
+            "functions": functions,
+        }
+    return {"available": False, "source": source, "functions": []}
+
+
+def get_state(force: bool = False) -> dict[str, object]:
+    """Return build_state() through a short TTL cache so the 5s auto-refresh and
+    the slow rebuild stop colliding."""
+    now = time.monotonic()
+    cached = _STATE_CACHE.get("value")
+    if not force and cached is not None and now < float(_STATE_CACHE.get("expires", 0)):
+        return cached  # type: ignore[return-value]
+    state = build_state()
+    _STATE_CACHE["value"] = state
+    _STATE_CACHE["expires"] = now + STATE_CACHE_TTL_SECONDS
+    return state
 
 
 def build_state() -> dict[str, object]:
@@ -1315,6 +1503,115 @@ HTML = r"""<!doctype html>
       max-height: 620px;
       overflow: auto;
     }
+    .treemap-toolbar {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .treemap-controls {
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .area-toggle {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .area-toggle input {
+      width: 14px;
+      height: 14px;
+      min-width: 14px;
+      accent-color: #38b995;
+    }
+    .crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 22px;
+    }
+    .crumbs button {
+      border: 0;
+      background: transparent;
+      color: #76a9ff;
+      font-weight: 760;
+      padding: 0;
+    }
+    .crumbs button:disabled {
+      color: #cdd8e6;
+      cursor: default;
+    }
+    .crumbs .sep {
+      color: var(--quiet);
+    }
+    .treemap-shell {
+      position: relative;
+      border: 1px solid #263244;
+      border-radius: var(--radius);
+      background: #0f1722;
+      overflow: hidden;
+    }
+    #decomp-treemap {
+      width: 100%;
+      height: 560px;
+      display: block;
+      cursor: pointer;
+    }
+    .treemap-tip {
+      position: absolute;
+      z-index: 9;
+      pointer-events: none;
+      max-width: 280px;
+      padding: 7px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: rgba(10, 15, 22, .96);
+      color: var(--ink);
+      font-size: 12px;
+      box-shadow: var(--shadow);
+    }
+    .treemap-tip b {
+      color: #fff;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .files-toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto auto;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    th[data-fsort] { cursor: pointer; }
+    th.num, td.num { text-align: right; font-family: Consolas, "Courier New", monospace; }
+    tfoot td {
+      font-weight: 800;
+      background: #1a2433;
+      border-top: 2px solid var(--line-strong);
+      position: sticky;
+      bottom: 0;
+    }
+    .mini-bar {
+      display: inline-block;
+      vertical-align: middle;
+      width: 46px;
+      height: 7px;
+      margin-left: 6px;
+      border-radius: 999px;
+      background: #0d131d;
+      overflow: hidden;
+    }
+    .mini-bar > span {
+      display: block;
+      height: 100%;
+      background: var(--teal);
+    }
     .decomp-title {
       font-size: 17px;
       font-weight: 800;
@@ -1481,6 +1778,7 @@ HTML = r"""<!doctype html>
 
     <nav class="tabs" aria-label="Dashboard views">
       <button class="tab-btn active" id="tab-decomp" type="button" data-view="decomp">Decomp</button>
+      <button class="tab-btn" id="tab-files" type="button" data-view="files">Files</button>
       <button class="tab-btn" id="tab-symbols" type="button" data-view="symbols">Symbol Map</button>
     </nav>
 
@@ -1507,15 +1805,22 @@ HTML = r"""<!doctype html>
       <section class="decomp-workspace">
         <div class="panel tu-panel">
           <div class="panel-title">
-            <h2>File Heatmap</h2>
+            <h2>Treemap</h2>
             <span class="panel-note" id="decomp-note"></span>
           </div>
-          <div class="tu-toolbar">
-            <input id="decomp-query" type="search" placeholder="Filter file or source">
-            <button class="btn" id="decomp-near" type="button">Near Match</button>
-            <button class="btn" id="decomp-clear" type="button">Clear</button>
+          <div class="treemap-toolbar">
+            <nav class="crumbs" id="decomp-crumbs" aria-label="Treemap breadcrumb"></nav>
+            <div class="treemap-controls">
+              <input id="decomp-query" type="search" placeholder="Filter file or source">
+              <label class="area-toggle"><input id="decomp-area-fns" type="checkbox"> area by fn count</label>
+              <button class="btn" id="decomp-near" type="button">Near Match</button>
+              <button class="btn" id="decomp-clear" type="button">Clear</button>
+            </div>
           </div>
-          <div class="tu-map decomp-map" id="decomp-map"></div>
+          <div class="treemap-shell">
+            <canvas id="decomp-treemap"></canvas>
+            <div class="treemap-tip" id="decomp-tip" hidden></div>
+          </div>
         </div>
 
         <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
@@ -1527,6 +1832,39 @@ HTML = r"""<!doctype html>
           <span class="panel-note" id="decomp-log-note"></span>
         </div>
         <div class="attempt-list" id="decomp-log"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-files">
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Translation Units &amp; File Sizes</h2>
+          <span class="panel-note" id="files-note"></span>
+        </div>
+        <div class="files-toolbar">
+          <input id="files-query" type="search" placeholder="Filter source path">
+          <label class="area-toggle"><input id="files-incomplete" type="checkbox"> only incomplete</label>
+          <button class="btn" id="files-clear" type="button">Clear</button>
+        </div>
+        <div class="table-wrap">
+          <table id="files-table">
+            <thead>
+              <tr>
+                <th data-fsort="source">Source Path</th>
+                <th data-fsort="total_code" class="num">Bytes</th>
+                <th data-fsort="matched_code" class="num">Matched</th>
+                <th data-fsort="code_pct" class="num">Code %</th>
+                <th data-fsort="total_functions" class="num">Fns</th>
+                <th data-fsort="matched_functions" class="num">Matched Fns</th>
+                <th data-fsort="functions_pct" class="num">Fns %</th>
+                <th data-fsort="fuzzy_pct" class="num">Fuzzy %</th>
+                <th data-fsort="complete">Complete</th>
+              </tr>
+            </thead>
+            <tbody id="files-body"></tbody>
+            <tfoot><tr id="files-foot"></tr></tfoot>
+          </table>
+        </div>
       </section>
     </section>
 
@@ -1654,7 +1992,21 @@ HTML = r"""<!doctype html>
       decompNearOnly: false,
       selectedUnitKey: "",
       activeView: "decomp",
-      refreshTimer: null
+      refreshTimer: null,
+      // Treemap drill state. level: "files" -> "unit" -> "fn".
+      tm: {
+        level: "files",
+        rects: [],
+        unitSource: "",
+        unitName: "",
+        unitFns: null,
+        unitFnsSource: "",
+        selectedFn: "",
+        areaByFns: false
+      },
+      filesSort: "total_code",
+      filesDir: -1,
+      fnHistoryCache: {}
     };
     const statusClass = {
       "Needs wiring": "needs",
@@ -1926,23 +2278,31 @@ HTML = r"""<!doctype html>
         return false;
       });
     }
-    function drawFileHistory(canvas, attempts) {
+    function fmtTime(unix) {
+      const ms = Number(unix || 0) * 1000;
+      if (!ms) return "";
+      const d = new Date(ms);
+      const pad2 = n => String(n).padStart(2, "0");
+      return `${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    }
+    // Real time-series over unix time. series = [{key,label,color}], rows from
+    // the new /api/history/unit or /api/history/fn endpoints.
+    function drawTimeSeries(canvas, rows, series, emptyLabel) {
       const { ctx, w, h } = fitCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
-      const points = (attempts || []).filter(row => row.percent != null).map((row, idx) => ({
-        x: idx,
-        y: Number(row.percent || 0),
-        label: row.timestamp || ""
-      }));
-      if (points.length < 2) {
-        return drawEmpty(ctx, w, h, "No selected-file percentage history yet");
+      rows = (rows || []).filter(row => row && Number.isFinite(Number(row.unix)));
+      const active = series.filter(item => rows.some(row => Number(row[item.key] || 0) > 0));
+      if (rows.length < 2 || !active.length) {
+        return drawEmpty(ctx, w, h, emptyLabel || "No history recorded yet");
       }
       const pad = { l: 42, r: 16, t: 18, b: 28 };
-      const maxX = Math.max(...points.map(row => row.x));
-      const minY = Math.max(0, Math.floor(Math.min(...points.map(row => row.y)) / 10) * 10);
-      const maxY = Math.min(100, Math.max(100, Math.ceil(Math.max(...points.map(row => row.y)) / 10) * 10));
-      const x = value => pad.l + (w - pad.l - pad.r) * value / Math.max(1, maxX);
-      const y = value => h - pad.b - (h - pad.t - pad.b) * (value - minY) / Math.max(1, maxY - minY);
+      const xs = rows.map(row => Number(row.unix || 0));
+      const ys = rows.flatMap(row => active.map(item => Number(row[item.key] || 0)));
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const maxY = Math.max(100, Math.ceil(Math.max(...ys) / 10) * 10);
+      const x = value => pad.l + (w - pad.l - pad.r) * (value - minX) / Math.max(1, maxX - minX);
+      const y = value => h - pad.b - (h - pad.t - pad.b) * value / Math.max(1, maxY);
       ctx.strokeStyle = "#2d3a4b";
       ctx.lineWidth = 1;
       for (let i = 0; i <= 4; i++) {
@@ -1952,31 +2312,43 @@ HTML = r"""<!doctype html>
         ctx.lineTo(w - pad.r, gy);
         ctx.stroke();
       }
-      ctx.strokeStyle = "#f0b35a";
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      points.forEach((point, idx) => {
-        const px = x(point.x);
-        const py = y(point.y);
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.stroke();
-      ctx.fillStyle = "#f0b35a";
-      for (const point of points) {
+      active.forEach((item, sidx) => {
+        ctx.strokeStyle = item.color;
+        ctx.lineWidth = sidx === 0 ? 2.5 : 2;
         ctx.beginPath();
-        ctx.arc(x(point.x), y(point.y), 3, 0, Math.PI * 2);
-        ctx.fill();
+        rows.forEach((row, idx) => {
+          const px = x(Number(row.unix || 0));
+          const py = y(Number(row[item.key] || 0));
+          if (idx === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+        ctx.fillStyle = item.color;
+        for (const row of rows) {
+          ctx.beginPath();
+          ctx.arc(x(Number(row.unix || 0)), y(Number(row[item.key] || 0)), 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      let legendX = pad.l;
+      for (const item of active) {
+        ctx.fillStyle = item.color;
+        ctx.fillRect(legendX, pad.t - 12, 9, 9);
+        ctx.fillStyle = "#cbd5e3";
+        ctx.textAlign = "left";
+        ctx.font = "12px Segoe UI, Arial";
+        ctx.fillText(item.label, legendX + 13, pad.t - 3);
+        legendX += 72;
       }
       ctx.fillStyle = "#a8b4c4";
       ctx.font = "12px Segoe UI, Arial";
       ctx.textAlign = "right";
       ctx.fillText(`${maxY}%`, pad.l - 8, y(maxY) + 4);
-      ctx.fillText(`${minY}%`, pad.l - 8, y(minY) + 4);
+      ctx.fillText("0%", pad.l - 8, y(0) + 4);
       ctx.textAlign = "left";
-      ctx.fillText(points[0].label, pad.l, h - 8);
+      ctx.fillText(fmtTime(rows[0].unix), pad.l, h - 8);
       ctx.textAlign = "right";
-      ctx.fillText(points[points.length - 1].label, w - pad.r, h - 8);
+      ctx.fillText(fmtTime(rows[rows.length - 1].unix), w - pad.r, h - 8);
     }
     function renderMetrics(data) {
       const decomp = data.decomp || {};
@@ -2282,7 +2654,7 @@ HTML = r"""<!doctype html>
         return true;
       });
     }
-    function renderTreemap(data) {
+    function renderSymbolTreemap(data) {
       const map = $("tu-map");
       map.replaceChildren();
       const tiles = filteredTuTiles(data);
@@ -2326,94 +2698,281 @@ HTML = r"""<!doctype html>
         map.append(tile);
       }
     }
-    function filteredDecompUnits(data) {
+    // ---- Squarified treemap (decomp.dev-style, single canvas) ----------------
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    // Green = matched fraction, blue = unmatched. Continuous interpolation keyed
+    // on match%, matching the user's decomp.dev screenshot palette.
+    function tmColor(pct) {
+      const t = Math.max(0, Math.min(1, Number(pct || 0) / 100));
+      // unmatched (blue #3a5fa8) -> matched (green #2f9b48)
+      const r = Math.round(lerp(0x3a, 0x2f, t));
+      const g = Math.round(lerp(0x5f, 0x9b, t));
+      const b = Math.round(lerp(0xa8, 0x48, t));
+      return `rgb(${r},${g},${b})`;
+    }
+    // Squarified treemap layout. items: [{value, ...}] -> sets item._rect.
+    function squarify(items, x, y, w, h) {
+      items = items.filter(it => Number(it.value || 0) > 0);
+      const total = items.reduce((s, it) => s + Number(it.value || 0), 0);
+      if (total <= 0 || w <= 0 || h <= 0) return;
+      const scale = (w * h) / total;
+      const nodes = items.map(it => ({ ref: it, area: Number(it.value || 0) * scale }))
+        .sort((a, b) => b.area - a.area);
+      let rx = x, ry = y, rw = w, rh = h;
+      let idx = 0;
+      const worst = (row, side) => {
+        const sum = row.reduce((s, n) => s + n.area, 0);
+        const maxA = Math.max(...row.map(n => n.area));
+        const minA = Math.min(...row.map(n => n.area));
+        const s2 = side * side;
+        const sum2 = sum * sum;
+        return Math.max((s2 * maxA) / sum2, sum2 / (s2 * minA));
+      };
+      while (idx < nodes.length) {
+        const vertical = rw >= rh;
+        const side = vertical ? rh : rw;
+        const row = [nodes[idx]];
+        let j = idx + 1;
+        while (j < nodes.length) {
+          const test = row.concat([nodes[j]]);
+          if (worst(test, side) > worst(row, side)) break;
+          row.push(nodes[j]);
+          j += 1;
+        }
+        const rowArea = row.reduce((s, n) => s + n.area, 0);
+        const thick = rowArea / side;
+        let off = vertical ? ry : rx;
+        for (const n of row) {
+          const len = n.area / thick;
+          if (vertical) {
+            n.ref._rect = { x: rx, y: off, w: thick, h: len };
+            off += len;
+          } else {
+            n.ref._rect = { x: off, y: ry, w: len, h: thick };
+            off += len;
+          }
+        }
+        if (vertical) { rx += thick; rw -= thick; } else { ry += thick; rh -= thick; }
+        idx = j;
+      }
+    }
+    function treemapItems() {
+      const tm = store.tm;
+      const data = store.data || {};
       const q = $("decomp-query").value.trim().toLowerCase();
-      return ((data.decomp || {}).units || []).filter(row => {
-        const haystack = `${row.name} ${row.source}`.toLowerCase();
-        if (q && !haystack.includes(q)) return false;
-        if (store.decompNearOnly && !(Number(row.functions_pct || 0) >= 90 && Number(row.functions_pct || 0) < 100)) return false;
+      const areaFns = tm.areaByFns;
+      if (tm.level === "files") {
+        let units = ((data.decomp || {}).units || []).filter(row => {
+          const haystack = `${row.name} ${row.source}`.toLowerCase();
+          if (q && !haystack.includes(q)) return false;
+          if (store.decompNearOnly && !(Number(row.functions_pct || 0) >= 90 && Number(row.functions_pct || 0) < 100)) return false;
+          return true;
+        });
+        return units.map(u => ({
+          kind: "unit",
+          ref: u,
+          label: unitDisplayName(u),
+          value: areaFns ? Number(u.total_functions || 0) : Number(u.total_code || 0),
+          pct: Number(u.code_pct || 0),
+          tip: `<b>${unitDisplayName(u)}</b><br>${pctText(u.code_pct)} code | ${u.matched_functions || 0}/${u.total_functions || 0} fns<br>${Number(u.total_code || 0).toLocaleString()} bytes`
+        }));
+      }
+      // unit level -> functions
+      const fns = (tm.unitFns || []).filter(fn => {
+        if (q && !String(fn.name || "").toLowerCase().includes(q)) return false;
+        if (store.decompNearOnly && !(Number(fn.fuzzy_pct || 0) >= 90 && Number(fn.fuzzy_pct || 0) < 100)) return false;
         return true;
       });
+      return fns.map(fn => ({
+        kind: "fn",
+        ref: fn,
+        label: fn.name || "",
+        value: Math.max(1, Number(fn.size || 0)),
+        pct: Number(fn.fuzzy_pct || 0),
+        tip: `<b>${fn.name || ""}</b><br>${pctText(fn.fuzzy_pct)} fuzzy | ${Number(fn.size || 0).toLocaleString()} bytes`
+      }));
     }
-    function renderDecompMap(data) {
-      const map = $("decomp-map");
-      map.replaceChildren();
-      const units = filteredDecompUnits(data);
-      const decomp = data.decomp || {};
-      setText($("decomp-note"), decomp.available ? `${units.length}/${(decomp.units || []).length} units | ${pctText(decomp.functions_pct)} fns` : "report.json not available");
-      if (!decomp.available || !units.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty-state";
-        setText(empty, decomp.available ? "No decomp units match the current filter" : "No report.json decomp metrics found");
-        map.append(empty);
-        const panel = $("decomp-details");
-        panel.replaceChildren();
-        const detailEmpty = document.createElement("div");
-        detailEmpty.className = "empty-state";
-        setText(detailEmpty, decomp.available ? "No matching decomp file selected" : "No report.json decomp metrics found");
-        panel.append(detailEmpty);
-        renderDecompAttemptLog(data, null);
-        drawFileHistory($("file-history-chart"), []);
-        setText($("file-history-note"), "no matching file selected");
-        return;
+    function renderTreemap() {
+      const canvas = $("decomp-treemap");
+      const decomp = (store.data || {}).decomp || {};
+      const tm = store.tm;
+      const items = treemapItems();
+      if (tm.level === "files") {
+        setText($("decomp-note"), decomp.available ? `${items.length}/${((decomp.units) || []).length} files | ${pctText(decomp.code_pct)} code` : "report.json not available");
+      } else {
+        const matched = items.filter(it => it.pct >= 99.95).length;
+        setText($("decomp-note"), `${items.length} fns | ${matched} at 100%`);
       }
-      if (!store.selectedUnitKey || !units.some(row => unitKey(row) === store.selectedUnitKey)) {
-        store.selectedUnitKey = unitKey(units[0]);
+      const { ctx, w, h } = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      tm.rects = [];
+      if (!items.length) {
+        return drawEmpty(ctx, w, h, decomp.available ? "No items match the current filter" : "report.json not available");
       }
-      const maxFns = Math.max(...units.map(row => Number(row.total_functions || 0)), 1);
-      for (const row of units) {
-        const totalFns = Number(row.total_functions || 0);
-        const pct = Number(row.functions_pct || 0);
-        const span = Math.max(1, Math.min(5, Math.ceil(Math.sqrt(totalFns / maxFns) * 5)));
-        const tile = document.createElement("button");
-        tile.type = "button";
-        tile.className = "tu-tile";
-        if (unitKey(row) === store.selectedUnitKey) tile.classList.add("selected");
-        tile.style.background = tileColor(pct);
-        tile.style.gridColumnEnd = `span ${span}`;
-        tile.style.gridRowEnd = `span ${Math.max(1, Math.min(3, Math.ceil(span * .72)))}`;
-        tile.title = `${row.name} | ${row.matched_functions}/${row.total_functions} functions | ${pctText(row.code_pct)} code`;
-        const name = document.createElement("div");
-        name.className = "tu-name";
-        setText(name, unitDisplayName(row));
-        const pctNode = document.createElement("div");
-        pctNode.className = "tu-pct";
-        setText(pctNode, pctText(pct));
-        const meta = document.createElement("div");
-        meta.className = "tu-meta";
-        setText(meta, `${row.matched_functions || 0}/${row.total_functions || 0} fns | ${pctText(row.code_pct)} code`);
-        tile.append(name, pctNode, meta);
-        tile.addEventListener("click", () => {
-          store.selectedUnitKey = unitKey(row);
-          renderDecompMap(data);
-          renderDecompDetail(data);
-          document.querySelector(".decomp-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-        map.append(tile);
+      squarify(items, 1, 1, w - 2, h - 2);
+      ctx.font = "11px Consolas, 'Courier New', monospace";
+      ctx.textBaseline = "top";
+      for (const it of items) {
+        const r = it._rect;
+        if (!r || r.w < 0.5 || r.h < 0.5) continue;
+        tm.rects.push({ x: r.x, y: r.y, w: r.w, h: r.h, item: it });
+        ctx.fillStyle = tmColor(it.pct);
+        ctx.fillRect(r.x, r.y, r.w, r.h);
+        ctx.strokeStyle = "rgba(13,17,24,.75)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(r.x + 0.5, r.y + 0.5, Math.max(0, r.w - 1), Math.max(0, r.h - 1));
+        if (r.w > 46 && r.h > 18) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(r.x + 3, r.y + 2, r.w - 6, r.h - 4);
+          ctx.clip();
+          // Light label on the bluer (low-pct) end, dark on the greener end.
+          ctx.fillStyle = it.pct >= 55 ? "rgba(8,14,11,.92)" : "rgba(238,244,251,.96)";
+          ctx.fillText(it.label, r.x + 4, r.y + 3);
+          if (r.h > 32) ctx.fillText(pctText(it.pct), r.x + 4, r.y + 16);
+          ctx.restore();
+        }
       }
-      renderDecompDetail(data);
     }
-    function selectedDecompUnit(data) {
-      const units = ((data.decomp || {}).units || []);
-      if (!units.length) return null;
-      return units.find(row => unitKey(row) === store.selectedUnitKey) || units[0];
+    function treemapHit(evt) {
+      const canvas = $("decomp-treemap");
+      const rect = canvas.getBoundingClientRect();
+      const px = (evt.clientX - rect.left);
+      const py = (evt.clientY - rect.top);
+      for (const r of store.tm.rects) {
+        if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) return r;
+      }
+      return null;
+    }
+    function onTreemapMove(evt) {
+      const tip = $("decomp-tip");
+      const hit = treemapHit(evt);
+      if (!hit) { tip.hidden = true; return; }
+      tip.hidden = false;
+      tip.innerHTML = hit.item.tip;
+      const shell = $("decomp-treemap").parentElement.getBoundingClientRect();
+      let left = evt.clientX - shell.left + 12;
+      let top = evt.clientY - shell.top + 12;
+      if (left + 290 > shell.width) left = shell.width - 290;
+      tip.style.left = `${Math.max(0, left)}px`;
+      tip.style.top = `${Math.max(0, top)}px`;
+    }
+    function onTreemapClick(evt) {
+      const hit = treemapHit(evt);
+      if (!hit) return;
+      const it = hit.item;
+      if (it.kind === "unit") {
+        enterUnit(it.ref);
+      } else if (it.kind === "fn") {
+        enterFn(it.ref);
+      }
+    }
+    function enterUnit(unit) {
+      const tm = store.tm;
+      tm.level = "unit";
+      tm.unitSource = unit.source || "";
+      tm.unitName = unitDisplayName(unit);
+      tm.selectedFn = "";
+      tm.unitFns = null;
+      const wantSource = unit.source || unit.name || "";
+      const url = `/api/unit?source=${encodeURIComponent(wantSource)}`;
+      fetch(url, { cache: "no-store" }).then(r => r.json()).then(payload => {
+        if (store.tm.level !== "unit" || store.tm.unitSource !== (unit.source || "")) return;
+        store.tm.unitFns = (payload.functions || []);
+        store.tm.unitFnsSource = wantSource;
+        renderTreemap();
+        renderDecompDetail(store.data);
+      }).catch(() => {
+        store.tm.unitFns = (unit.functions || []);
+        renderTreemap();
+        renderDecompDetail(store.data);
+      });
+      renderCrumbs();
+      renderDecompDetail(store.data);
+      renderTreemap();
+    }
+    function enterFn(fn) {
+      store.tm.selectedFn = fn.name || "";
+      renderCrumbs();
+      renderDecompDetail(store.data);
+    }
+    function gotoFiles() {
+      const tm = store.tm;
+      tm.level = "files";
+      tm.unitSource = "";
+      tm.unitName = "";
+      tm.unitFns = null;
+      tm.selectedFn = "";
+      renderCrumbs();
+      renderTreemap();
+      renderDecompDetail(store.data);
+    }
+    function gotoUnit() {
+      store.tm.selectedFn = "";
+      renderCrumbs();
+      renderTreemap();
+      renderDecompDetail(store.data);
+    }
+    function renderCrumbs() {
+      const nav = $("decomp-crumbs");
+      nav.replaceChildren();
+      const tm = store.tm;
+      const mk = (label, handler, active) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        setText(b, label);
+        if (active) b.disabled = true;
+        else b.addEventListener("click", handler);
+        return b;
+      };
+      const sep = () => {
+        const s = document.createElement("span");
+        s.className = "sep";
+        s.textContent = "›";
+        return s;
+      };
+      nav.append(mk("All files", gotoFiles, tm.level === "files"));
+      if (tm.level !== "files") {
+        nav.append(sep(), mk(tm.unitName || "unit", gotoUnit, !tm.selectedFn));
+      }
+      if (tm.selectedFn) {
+        nav.append(sep(), mk(tm.selectedFn, () => {}, true));
+      }
     }
     function renderDecompDetail(data) {
       const panel = $("decomp-details");
       panel.replaceChildren();
-      const unit = selectedDecompUnit(data);
-      if (!unit) {
+      const decomp = (data || {}).decomp || {};
+      const tm = store.tm;
+      if (!decomp.available) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        setText(empty, "No decomp file selected");
+        setText(empty, "No report.json decomp metrics found");
         panel.append(empty);
         renderDecompAttemptLog(data, null);
-        drawFileHistory($("file-history-chart"), []);
+        drawTimeSeries($("file-history-chart"), [], [], "No report.json decomp metrics");
+        setText($("file-history-note"), "no report.json");
+        return;
+      }
+      if (tm.level === "files") {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "Click a file in the treemap to drill into its functions.");
+        panel.append(empty);
+        renderDecompAttemptLog(data, null);
+        drawTimeSeries($("file-history-chart"), [], [], "Select a file for its progress history");
         setText($("file-history-note"), "no file selected");
         return;
       }
-      store.selectedUnitKey = unitKey(unit);
-      const attempts = relatedAttempts(data, unit);
+      const units = decomp.units || [];
+      const unit = units.find(u => (u.source || "") === tm.unitSource) || units.find(u => unitDisplayName(u) === tm.unitName);
+      if (!unit) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "Unit not found in current report.");
+        panel.append(empty);
+        return;
+      }
       const title = document.createElement("div");
       title.className = "decomp-title mono";
       setText(title, unitDisplayName(unit));
@@ -2430,7 +2989,7 @@ HTML = r"""<!doctype html>
         miniStat("Functions", `${unit.matched_functions || 0}/${unit.total_functions || 0}`),
         miniStat("Fuzzy", pctText(unit.fuzzy_pct)),
         miniStat("Code", pctText(unit.code_pct)),
-        miniStat("Mixed", `${near + partial + missing}`)
+        miniStat("Bytes", Number(unit.total_code || 0).toLocaleString())
       );
       const mix = document.createElement("div");
       mix.className = "legend";
@@ -2454,11 +3013,12 @@ HTML = r"""<!doctype html>
       setText(h, "Functions");
       const note = document.createElement("span");
       note.className = "panel-note";
-      setText(note, `${(unit.functions || []).length} rows from report.json`);
+      const fnSource = tm.unitFns || (unit.functions || []);
+      setText(note, tm.unitFns ? `${fnSource.length} rows (lazy /api/unit)` : `${fnSource.length} rows`);
       listTitle.append(h, note);
       const list = document.createElement("div");
       list.className = "function-list";
-      const functions = (unit.functions || []).slice().sort((a, b) => {
+      const functions = fnSource.slice().sort((a, b) => {
         const ap = Number(a.fuzzy_pct || 0);
         const bp = Number(b.fuzzy_pct || 0);
         if (ap !== bp) return ap - bp;
@@ -2467,12 +3027,13 @@ HTML = r"""<!doctype html>
       if (!functions.length) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        setText(empty, "No function rows recorded for this file");
+        setText(empty, tm.unitFns ? "No function rows recorded for this file" : "Loading functions...");
         list.append(empty);
       }
       for (const fn of functions) {
         const row = document.createElement("div");
         row.className = "function-row";
+        if (fn.name === tm.selectedFn) row.style.outline = "1px solid #547298";
         const name = document.createElement("div");
         name.className = "function-name";
         setText(name, fn.name || "unknown");
@@ -2483,12 +3044,54 @@ HTML = r"""<!doctype html>
         size.className = "function-size";
         setText(size, `${Number(fn.size || 0).toLocaleString()}b`);
         row.append(name, pctNode, size, statusChip(fn.status));
+        row.style.cursor = "pointer";
+        row.addEventListener("click", () => enterFn(fn));
         list.append(row);
       }
       panel.append(title, subtitle, stats, mix, listTitle, list);
       renderDecompAttemptLog(data, unit);
-      drawFileHistory($("file-history-chart"), attempts);
-      setText($("file-history-note"), attempts.length ? `${attempts.length} related log entries` : "no related attempt entries");
+      // Real time series. If a fn is drilled, prefer /api/history/fn.
+      if (tm.selectedFn) {
+        loadFnHistory(tm.selectedFn);
+      } else {
+        loadUnitHistory(unit.source || unit.name || "");
+      }
+    }
+    function loadUnitHistory(source) {
+      if (!source) {
+        drawTimeSeries($("file-history-chart"), [], [], "No history yet for this file");
+        setText($("file-history-note"), "no source path");
+        return;
+      }
+      fetch(`/api/history/unit?source=${encodeURIComponent(source)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(rows => {
+          if (store.tm.level !== "unit" || store.tm.selectedFn) return;
+          const series = [
+            { key: "fp", label: "fns %", color: "#f0b35a" },
+            { key: "cp", label: "code %", color: "#5c91df" }
+          ];
+          drawTimeSeries($("file-history-chart"), rows, series, "No history recorded for this file yet");
+          setText($("file-history-note"), rows.length ? `${rows.length} recorded changes` : "no changes recorded yet");
+        })
+        .catch(() => {
+          drawTimeSeries($("file-history-chart"), [], [], "History unavailable");
+          setText($("file-history-note"), "history unavailable");
+        });
+    }
+    function loadFnHistory(name) {
+      fetch(`/api/history/fn?name=${encodeURIComponent(name)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(rows => {
+          if (store.tm.selectedFn !== name) return;
+          const series = [{ key: "fuzzy_pct", label: "fuzzy %", color: "#a98ee6" }];
+          drawTimeSeries($("file-history-chart"), rows, series, "No fuzzy-match history for this fn yet");
+          setText($("file-history-note"), rows.length ? `${rows.length} recorded changes for ${name}` : `no history yet for ${name}`);
+        })
+        .catch(() => {
+          drawTimeSeries($("file-history-chart"), [], [], "History unavailable");
+          setText($("file-history-note"), "history unavailable");
+        });
     }
     function miniStat(label, value) {
       const box = document.createElement("div");
@@ -2536,6 +3139,102 @@ HTML = r"""<!doctype html>
       drawHistory($("history-chart"), data.history || []);
       renderSourceBars(data);
     }
+    function miniBar(pct) {
+      const wrap = document.createElement("span");
+      wrap.className = "mini-bar";
+      const fill = document.createElement("span");
+      fill.style.width = `${Math.max(0, Math.min(100, Number(pct || 0)))}%`;
+      wrap.append(fill);
+      return wrap;
+    }
+    function numCell(value, extra) {
+      const cell = document.createElement("td");
+      cell.className = "num";
+      setText(cell, value);
+      if (extra) cell.append(extra);
+      return cell;
+    }
+    function renderFilesTable(data) {
+      const body = $("files-body");
+      const foot = $("files-foot");
+      body.replaceChildren();
+      foot.replaceChildren();
+      const decomp = data.decomp || {};
+      let units = (decomp.units || []).slice();
+      const q = $("files-query").value.trim().toLowerCase();
+      const incompleteOnly = $("files-incomplete").checked;
+      units = units.filter(u => {
+        if (q && !`${u.source} ${u.name}`.toLowerCase().includes(q)) return false;
+        if (incompleteOnly && u.complete) return false;
+        return true;
+      });
+      const key = store.filesSort;
+      const dir = store.filesDir;
+      const numKeys = new Set(["total_code", "matched_code", "code_pct", "total_functions", "matched_functions", "functions_pct", "fuzzy_pct"]);
+      units.sort((a, b) => {
+        let av, bv;
+        if (key === "source") { av = String(a.source || ""); bv = String(b.source || ""); }
+        else if (key === "complete") { av = a.complete ? 1 : 0; bv = b.complete ? 1 : 0; }
+        else { av = Number(a[key] || 0); bv = Number(b[key] || 0); }
+        if (av < bv) return -1 * dir;
+        if (av > bv) return 1 * dir;
+        return 0;
+      });
+      setText($("files-note"), decomp.available ? `${units.length}/${(decomp.units || []).length} units` : "report.json not available");
+      if (!units.length) {
+        const tr = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 9;
+        cell.className = "empty-state";
+        setText(cell, decomp.available ? "No units match the current filter" : "No report.json decomp metrics found");
+        tr.append(cell);
+        body.append(tr);
+        return;
+      }
+      let sumCode = 0, sumMatchedCode = 0, sumFns = 0, sumMatchedFns = 0;
+      for (const u of units) {
+        sumCode += Number(u.total_code || 0);
+        sumMatchedCode += Number(u.matched_code || 0);
+        sumFns += Number(u.total_functions || 0);
+        sumMatchedFns += Number(u.matched_functions || 0);
+        const tr = document.createElement("tr");
+        tr.style.cursor = "pointer";
+        const src = document.createElement("td");
+        src.className = "wrap mono";
+        setText(src, u.source || u.name || "unknown");
+        tr.append(
+          src,
+          numCell(Number(u.total_code || 0).toLocaleString()),
+          numCell(Number(u.matched_code || 0).toLocaleString()),
+          numCell(pctText(u.code_pct), miniBar(u.code_pct)),
+          numCell(Number(u.total_functions || 0).toLocaleString()),
+          numCell(Number(u.matched_functions || 0).toLocaleString()),
+          numCell(pctText(u.functions_pct), miniBar(u.functions_pct)),
+          numCell(pctText(u.fuzzy_pct)),
+          td(u.complete ? "yes" : "-")
+        );
+        tr.addEventListener("click", () => {
+          switchView("decomp");
+          gotoFiles();
+          enterUnit(u);
+          document.querySelector(".decomp-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        body.append(tr);
+      }
+      const codePct = sumCode ? (sumMatchedCode * 100 / sumCode) : 0;
+      const fnPct = sumFns ? (sumMatchedFns * 100 / sumFns) : 0;
+      foot.append(
+        td(`TOTAL (${units.length})`),
+        numCell(sumCode.toLocaleString()),
+        numCell(sumMatchedCode.toLocaleString()),
+        numCell(pctText(codePct)),
+        numCell(sumFns.toLocaleString()),
+        numCell(sumMatchedFns.toLocaleString()),
+        numCell(pctText(fnPct)),
+        numCell(pctText(decomp.fuzzy_pct)),
+        td("")
+      );
+    }
     function switchView(view) {
       store.activeView = view;
       document.querySelectorAll(".tab-btn").forEach(button => {
@@ -2544,13 +3243,20 @@ HTML = r"""<!doctype html>
       document.querySelectorAll(".view").forEach(section => {
         section.classList.toggle("active", section.id === `view-${view}`);
       });
-      setText($("hud-project"), view === "symbols" ? "GC6E01/SYMBOLMAP" : "GC6E01/DECOMP");
+      const labels = { symbols: "GC6E01/SYMBOLMAP", files: "GC6E01/FILES", decomp: "GC6E01/DECOMP" };
+      setText($("hud-project"), labels[view] || "GC6E01/DECOMP");
       if (location.hash !== `#${view}`) {
         history.replaceState(null, "", `#${view}`);
       }
       if (store.data) {
         renderCharts(store.data);
-        renderDecompDetail(store.data);
+        if (view === "decomp") {
+          // Canvas had zero size while hidden; re-layout now that it is visible.
+          renderTreemap();
+          renderDecompDetail(store.data);
+        } else if (view === "files") {
+          renderFilesTable(store.data);
+        }
       }
     }
     function scheduleRefresh() {
@@ -2575,9 +3281,11 @@ HTML = r"""<!doctype html>
       renderCharts(data);
       renderActivity(data);
       renderCommits(data);
-      renderDecompMap(data);
-      renderTreemap(data);
+      renderCrumbs();
+      renderSymbolTreemap(data);
       renderRows();
+      // switchView re-renders the active view's treemap/detail/files table with
+      // correct canvas dimensions.
       switchView(store.activeView);
     }
     $("query").addEventListener("input", renderRows);
@@ -2605,32 +3313,54 @@ HTML = r"""<!doctype html>
     $("auto-refresh").addEventListener("change", scheduleRefresh);
     $("refresh-rate").addEventListener("change", scheduleRefresh);
     $("tu-query").addEventListener("input", () => {
-      if (store.data) renderTreemap(store.data);
+      if (store.data) renderSymbolTreemap(store.data);
     });
     $("tu-needs").addEventListener("click", () => {
       store.tuNeedsOnly = !store.tuNeedsOnly;
       $("tu-needs").classList.toggle("primary", store.tuNeedsOnly);
-      if (store.data) renderTreemap(store.data);
+      if (store.data) renderSymbolTreemap(store.data);
     });
     $("tu-clear").addEventListener("click", () => {
       $("tu-query").value = "";
       store.tuNeedsOnly = false;
       $("tu-needs").classList.remove("primary");
-      if (store.data) renderTreemap(store.data);
+      if (store.data) renderSymbolTreemap(store.data);
     });
     $("decomp-query").addEventListener("input", () => {
-      if (store.data) renderDecompMap(store.data);
+      if (store.data) renderTreemap();
+    });
+    $("decomp-area-fns").addEventListener("change", () => {
+      store.tm.areaByFns = $("decomp-area-fns").checked;
+      if (store.data) renderTreemap();
     });
     $("decomp-near").addEventListener("click", () => {
       store.decompNearOnly = !store.decompNearOnly;
       $("decomp-near").classList.toggle("primary", store.decompNearOnly);
-      if (store.data) renderDecompMap(store.data);
+      if (store.data) renderTreemap();
     });
     $("decomp-clear").addEventListener("click", () => {
       $("decomp-query").value = "";
       store.decompNearOnly = false;
       $("decomp-near").classList.remove("primary");
-      if (store.data) renderDecompMap(store.data);
+      gotoFiles();
+    });
+    $("decomp-treemap").addEventListener("mousemove", onTreemapMove);
+    $("decomp-treemap").addEventListener("mouseleave", () => { $("decomp-tip").hidden = true; });
+    $("decomp-treemap").addEventListener("click", onTreemapClick);
+    $("files-query").addEventListener("input", () => { if (store.data) renderFilesTable(store.data); });
+    $("files-incomplete").addEventListener("change", () => { if (store.data) renderFilesTable(store.data); });
+    $("files-clear").addEventListener("click", () => {
+      $("files-query").value = "";
+      $("files-incomplete").checked = false;
+      if (store.data) renderFilesTable(store.data);
+    });
+    document.querySelectorAll("th[data-fsort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.fsort;
+        if (store.filesSort === key) store.filesDir *= -1;
+        else { store.filesSort = key; store.filesDir = (key === "source" || key === "complete") ? 1 : -1; }
+        if (store.data) renderFilesTable(store.data);
+      });
     });
     document.querySelectorAll(".tab-btn").forEach(button => {
       button.addEventListener("click", () => switchView(button.dataset.view || "decomp"));
@@ -2649,11 +3379,13 @@ HTML = r"""<!doctype html>
     window.addEventListener("resize", () => {
       if (store.data) {
         renderCharts(store.data);
-        renderDecompDetail(store.data);
+        if (store.activeView === "decomp") renderTreemap();
       }
     });
     if (location.hash === "#symbols") {
       store.activeView = "symbols";
+    } else if (location.hash === "#files") {
+      store.activeView = "files";
     }
     refresh();
     scheduleRefresh();
@@ -2674,14 +3406,32 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self) -> None:
-        path = urlparse(self.path).path
+        parsed = urlparse(self.path)
+        path = parsed.path
+        query = parse_qs(parsed.query)
         if path == "/api/state":
-            state = build_state()
+            state = get_state()
             state["history"] = update_history(state)
+            decomp = state.get("decomp", {})
+            if isinstance(decomp, dict):
+                update_unit_history(decomp)
+                update_fn_history(decomp)
             self.send_json(state)
+            return
+        if path == "/api/unit":
+            source = (query.get("source") or query.get("name") or [""])[0]
+            self.send_json(load_unit_functions(source))
             return
         if path == "/api/history":
             self.send_json(load_history())
+            return
+        if path == "/api/history/unit":
+            source = (query.get("source") or query.get("name") or [""])[0]
+            self.send_json(load_unit_history(source))
+            return
+        if path == "/api/history/fn":
+            name = (query.get("name") or [""])[0]
+            self.send_json(load_fn_history(name))
             return
         if path == "/api/health":
             self.send_json({"ok": True, "version": DASHBOARD_VERSION})
@@ -2710,8 +3460,12 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.once:
-        state = build_state()
+        state = get_state(force=True)
         state["history"] = update_history(state)
+        decomp = state.get("decomp", {})
+        if isinstance(decomp, dict):
+            update_unit_history(decomp)
+            update_fn_history(decomp)
         print(json.dumps(state, indent=2))
         return 0
 
