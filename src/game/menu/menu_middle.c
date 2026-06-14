@@ -155,13 +155,13 @@ void fn_8006A81C(u32 r3, u32 r4);
 void fn_8006A824(void);
 void fn_8006A990(void);
 void fn_8006AABC(void);
-void fn_8006AC28(void);
+void fn_8006AC28(void* p, u16 value);
 void fn_8006AC6C(void);
 void fn_8006ACCC(void);
 void fn_8006ADB4(void);
 s32 fn_8006ADEC(void);
 void fn_8006AE18(void);
-void fn_8006AEEC(void);
+u8* fn_8006AEEC(void);
 void fn_8006AF44(void);
 u8* fn_8006AFC4(u8* p);
 void fn_8006AFE4(void);
@@ -1361,23 +1361,13 @@ void fn_8006AABC(void) {
 
 
 /* 0x8006AC28 | size: 0x44 */
-void fn_8006AC28(void) {
-    u8 sp[0x10];
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-
-    
-    r30 = r3;
-    r31 = r4;
-    r4 = 0x0;
-    r5 = 0x1660;
-    memset((void*)r3, (int)r4, (u32)r5);
-    *(u16*)((u8*)r30 + 0x2) = r31;
-    return;
+#pragma push
+#pragma peephole off
+void fn_8006AC28(void* p, u16 value) {
+    memset(p, 0, 0x1660);
+    *(u16*)((u8*)p + 2) = value;
 }
+#pragma pop
 
 
 /* 0x8006AC6C | size: 0x60 */
@@ -1551,32 +1541,24 @@ void fn_8006AE18(void) {
 
 
 /* 0x8006AEEC | size: 0x58 */
-void fn_8006AEEC(void) {
-    extern void fn_80129280();
-    u32 r0 = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
+#pragma push
+#pragma scheduling off
+u8* fn_8006AEEC(void) {
+    extern u8* fn_80129280(s32 idx, s32 type);
+    u8* p;
 
-    
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    r3 = r3 + (0x1 << 16);
-    r0 = *(u8*)((u8*)r3 + (-13944));
-    if (r0 != (u32)0x0) {
-        /* subi r3, r3, 0x4cd8 */;
+    p = fn_80129280(0, 0xe) + 0x10000;
+    if (*(u8*)(p - 0x3678) != 0) {
+        p -= 0x4cd8;
     } else {
-
-        r3 = 0x0;
+        p = NULL;
     }
-    if (r3 == (u32)0x0) {
-        r3 = 0x0;
-    } else {
-
-        r3 = r3 + 0xb44;
+    if (p == NULL) {
+        return NULL;
     }
-    return;
+    return p + 0xb44;
 }
+#pragma pop
 
 
 /* 0x8006AF44 | size: 0x80 */
