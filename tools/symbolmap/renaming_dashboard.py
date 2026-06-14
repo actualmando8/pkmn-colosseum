@@ -5,8 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
+import sys
+import threading
 import time
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -27,7 +30,7 @@ HISTORY_INTERVAL_SECONDS = 60
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 5
+DASHBOARD_VERSION = 6
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -2352,7 +2355,7 @@ HTML = r"""<!doctype html>
         if (hrs < 1) return Math.round(hrs * 60) + "m";
         return (hrs < 10 ? hrs.toFixed(1) : String(Math.round(hrs))) + "h";
       };
-      const ticks = Math.min(6, Math.max(2, Math.round(spanHours) || 2));
+      const ticks = Math.min(12, Math.max(3, Math.round(spanHours) || 3));
       ctx.fillStyle = "#7c8aa0";
       ctx.font = "11px Segoe UI, Arial";
       ctx.textAlign = "center";
@@ -3468,6 +3471,79 @@ class Handler(BaseHTTPRequestHandler):
         return
 
 
+# ---- auto-refresh: periodically regenerate report.json so progress-over-time is
+# captured automatically (the dashboard runs the "progress check" itself). --------
+REPORT_REFRESH_SECONDS = int(os.environ.get("DASH_REPORT_REFRESH", "600"))  # 0 = off
+GEN_REPORT = ROOT / "tools" / "gen_decomp_report.py"
+STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
+_auto_state = {"last_matched": None}
+
+
+def _report_matched():
+    try:
+        d = json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace"))
+        return int(d.get("measures", d).get("matched_functions"))
+    except Exception:
+        return None
+
+
+def _refresh_report_once() -> bool:
+    """Regenerate report.json atomically via gen_decomp_report.py."""
+    if not GEN_REPORT.exists():
+        return False
+    tmp = DECOMP_REPORT.with_name(DECOMP_REPORT.name + ".auto.tmp")
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(GEN_REPORT), "-o", str(tmp)],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=1200,
+        )
+        if proc.returncode == 0 and tmp.exists() and tmp.stat().st_size > 100:
+            os.replace(str(tmp), str(DECOMP_REPORT))
+            return True
+    except Exception:
+        pass
+    try:
+        if tmp.exists():
+            tmp.unlink()
+    except Exception:
+        pass
+    return False
+
+
+def _auto_report_loop(interval: int) -> None:
+    _auto_state["last_matched"] = _report_matched()
+    while True:
+        time.sleep(interval)
+        if not _refresh_report_once():
+            continue
+        # sample the fresh numbers into the time-series history
+        try:
+            state = get_state(force=True)
+            update_history(state)
+            decomp = state.get("decomp", {})
+            if isinstance(decomp, dict):
+                update_unit_history(decomp)
+                update_fn_history(decomp)
+        except Exception:
+            pass
+        # on a change, append a live attempt-log line so the activity feed updates
+        new = _report_matched()
+        old = _auto_state["last_matched"]
+        if new is not None and old is not None and new != old:
+            try:
+                d = json.loads(DECOMP_REPORT.read_text(encoding="utf-8", errors="replace"))
+                tot = int(d.get("measures", d).get("total_functions", 9120))
+                pct = 100.0 * new / max(1, tot)
+                ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+                with open(STATUS_LOG, "a", encoding="utf-8") as fh:
+                    fh.write(f"- **{ts}** `auto-report` - report.json {old}->{new} / "
+                             f"{tot} ({pct:.2f}% fns)\n")
+            except Exception:
+                pass
+        if new is not None:
+            _auto_state["last_matched"] = new
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", default="127.0.0.1")
@@ -3484,6 +3560,13 @@ def main() -> int:
             update_fn_history(decomp)
         print(json.dumps(state, indent=2))
         return 0
+
+    if REPORT_REFRESH_SECONDS > 0 and GEN_REPORT.exists():
+        threading.Thread(
+            target=_auto_report_loop, args=(REPORT_REFRESH_SECONDS,), daemon=True
+        ).start()
+        print(f"  auto-refresh: regenerating report.json every {REPORT_REFRESH_SECONDS}s "
+              f"(set DASH_REPORT_REFRESH=0 to disable)")
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"Renaming dashboard: http://{args.host}:{args.port}/")

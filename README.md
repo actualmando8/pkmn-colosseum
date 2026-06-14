@@ -11,10 +11,10 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~58.2% (5305 / 9120 functions) |
-| Code match | ~48.8% (821,408 / 1,683,396 matched code bytes) |
+| Function match | ~62.4% (4972 / 7969 functions) |
+| Code match | ~52.5% (803,252 / 1,529,024 matched code bytes) |
 
-Last measured 2026-06-13 with `python tools/gen_decomp_report.py -o report.json`
+Last measured 2026-06-14 with `python tools/gen_decomp_report.py -o report.json`
 against the local ROM-extracted target/base objects. The numbers are regenerated locally — public CI
 cannot hold the ROM-derived target objects, so `.github/workflows/progress.yml`
 only gates compilation until the private build container is published. (Note:

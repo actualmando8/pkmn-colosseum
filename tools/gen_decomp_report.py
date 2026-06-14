@@ -156,7 +156,19 @@ def build_report():
     complete_units = 0
 
     base_objects = list(progress.iter_base_objects())
+    seen_rel = set()
     for idx, (rel, o) in enumerate(base_objects, 1):
+        # Skip phantom doubled-path objects: legit base objects live at
+        # base/<game|dolphin|hsd|...>/..., never base/src/... A stale build glitch
+        # produced base/src/<path>.o duplicates that double-count units (and show
+        # up as duplicate treemap tiles). Guard here so report stays correct even
+        # if the artifacts reappear.
+        rel_norm = rel.replace("\\", "/")
+        if rel_norm.startswith("src/"):
+            continue
+        if rel_norm in seen_rel:
+            continue
+        seen_rel.add(rel_norm)
         funcs = measure_cache.diff_funcs(TARGET_O, o)
         if not funcs:  # no fn_ symbols measurable here -> not a report unit
             continue
