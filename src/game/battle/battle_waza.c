@@ -405,7 +405,8 @@ void fn_801D1C20(s32 seqHandle) {
  * fn_801D1CC4 - Waza effect trajectory calculation.
  * Address: 0x801D1CC4 | Size: 0x94
  */
-#pragma scheduling off
+#pragma push
+#pragma peephole off
 BOOL fn_801D1CC4(s32 idx) {
     void* party = fn_80129280(0, 0x0A);
     u16 count;
@@ -430,7 +431,7 @@ BOOL fn_801D1CC4(s32 idx) {
     }
     return TRUE;
 }
-#pragma scheduling on
+#pragma pop
 
 /**
  * fn_801D1D58 - Waza projectile update.
