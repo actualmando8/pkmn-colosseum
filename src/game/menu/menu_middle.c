@@ -163,7 +163,7 @@ s32 fn_8006ADEC(void);
 void fn_8006AE18(void);
 void fn_8006AEEC(void);
 void fn_8006AF44(void);
-s32 fn_8006AFC4(void);
+u8* fn_8006AFC4(u8* p);
 void fn_8006AFE4(void);
 void fn_8006B09C(void);
 void fn_8006B0F8(void);
@@ -1618,7 +1618,11 @@ void fn_8006AF44(void) {
 
 
 /* 0x8006AFC4 | size: 0x20 */
-s32 fn_8006AFC4(void) {
+u8* fn_8006AFC4(u8* p) {
+    p += 0x10000;
+    if (*(u8*)(p - 0x3678) != 0) {
+        return p - 0x4cd8;
+    }
     return 0;
 }
 
