@@ -7431,6 +7431,7 @@ extern void* GScameraGetActiveCamera();
 extern void fn_800E01D0();
 extern u32 lbl_804083D0;
 extern u8 lbl_802727B8[];
+extern void fn_80177A38(void);  /* referenced by asm .inc wrappers (fn_801171C8/80117330/8011791C/8012E388/8012EBD4); was undefined -> broke the TU parse */
 #if 1
 asm void fn_8011791C(void) {
 #include "src/game/gs_field_world_fn_8011791C.inc"
@@ -9721,7 +9722,7 @@ s32 fn_8011A3E4(void* obj, u16 val) {
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     extern u16 fn_8011A090(u8* ptr);
-    extern void fn_8011A018(u8* ptr);
+    extern s32 fn_8011A018(u8* ptr);
     u8* base;
     u16 idx;
     u8 flag;
@@ -9730,8 +9731,8 @@ s32 fn_8011A3E4(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -9768,10 +9769,8 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base == NULL) { goto done; }
-    fn_8011A018(base);
-done:
-    return 0;
+    if (base == NULL) { return 0; }
+    return fn_8011A018(base);
 }
 /* 0x8011A570 | 0x164 */
 #if 0
@@ -10297,8 +10296,8 @@ s32 fn_8011B130(void* obj, u16 val) {
     if (val != 0) { goto body_start; }
     flag = 0; goto flag_check;
 body_start:
-    idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    idx = (u8)fn_80119E90(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -10335,10 +10334,8 @@ flag_check:
 p2_offset:
     base = base + idx * 16;
 p2_check:
-    if (base != NULL) {
-        return (u8)fn_8011A030(base);
-    }
-    return -1;
+    if (base == NULL) { return -1; }
+    return (u8)fn_8011A030(base);
 }
 /* 0x8011B2C0 | 0x184 */
 extern s32 fn_80101AC4(u32);
@@ -10415,18 +10412,18 @@ s32 fn_8011B444(void* obj, u16 val) {
     extern u8* fn_80119F10(u16 val);
     extern u32 fn_80119ED0(u16 val);
     extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
-    extern u16 fn_8011A090(u8* ptr);
+    extern u32 fn_8011A090(u8* ptr);
     extern u8 fn_80119E50(u16 val);
-    extern u16 fn_80119E10(u16 val);
+    extern u16 fn_80119E10(u32 val);
     u8* base;
     u16 idx;
-    u16 entry_val;
-    u8 kind;
+    u32 entry_val;
+    s32 kind;
     u8 flag;
 
     if (val == 0) { return 1; }
     idx = fn_80119E90(val);
-    base = fn_80119F10(val);
+    base = (0, fn_80119F10(val));
     base = statusGetStatus(base, obj, 0, fn_80119ED0(val), 0);
     if (base != NULL) { goto offset_calc; }
     base = NULL;
@@ -10436,19 +10433,23 @@ offset_calc:
 check_base:
     if (base == NULL) { return 0; }
 
-    entry_val = (u16)fn_8011A090(base);
-    kind = fn_80119E50(val);
+    entry_val = fn_8011A090(base);
+    kind = (u8)fn_80119E50(val);
 
     if (kind == 2) { goto case2; }
-    if (kind < 2) {
-        if (kind == 0) { return 2; }
-        return 2;
-    }
+    if (kind >= 2) { goto ge2; }
+    if (kind == 0) { goto case0; }
+    if (kind >= 0) { goto case1; }
+    goto default_case;
+ge2:
     if (kind == 4) { goto case4; }
-    if (kind >= 4) { return 0; }
-    /* kind == 3 */
+    if (kind >= 4) { goto default_case; }
     goto case3;
 
+case0:
+    return 2;
+case1:
+    return 2;
 case2:
     if (base != NULL) { goto case2_check; }
     flag = 0; goto case2_done;
@@ -10470,9 +10471,11 @@ case3_check:
     flag = 1;
 case3_flag_done:
     if ((u8)flag == 0) { return 2; }
-    if ((u16)entry_val == val) { return 1; }
-    if ((u16)fn_80119E10(entry_val) == val) { return 1; }
+    if ((u16)entry_val == val) { goto case3_return1; }
+    if ((u16)fn_80119E10(entry_val) == val) { goto case3_return1; }
     return 2;
+case3_return1:
+    return 1;
 
 case4:
     if (base != NULL) { goto case4_check; }
@@ -10482,9 +10485,14 @@ case4_check:
     flag = 1;
 case4_flag_done:
     if ((u8)flag == 0) { return 2; }
-    if ((u16)entry_val == val) { return 2; }
-    if ((u16)fn_80119E10(entry_val) == val) { return 2; }
+    if ((u16)entry_val == val) { goto case4_return2; }
+    if ((u16)fn_80119E10(entry_val) != val) { goto case4_return1; }
+case4_return2:
+    return 2;
+case4_return1:
     return 1;
+default_case:
+    return 0;
 }
 /* 0x8011B67C | 0x10C */
 s32 fn_8011B67C(void* obj, u16 val) {
@@ -24699,7 +24707,7 @@ asm void fn_80122AE0(void) {
 #else
 #pragma optimization_level 4
 u16 fn_80122AE0(u8* ptr, s32 b) {
-    s32 val;
+    u16 val;
 
     if (ptr == NULL) {
         return 0;
@@ -24708,10 +24716,10 @@ u16 fn_80122AE0(u8* ptr, s32 b) {
         return 0;
     }
     val = (s32)(u16)fn_8012640C(ptr, 0, 0x83, 0) / (s32)(u16)b;
-    if ((u16)val != 0) {
-        return (u16)val;
+    if (val == 0) {
+        val = 1;
     }
-    return 1;
+    return val;
 }
 #endif
 #if 0
@@ -24721,7 +24729,7 @@ asm void fn_80122B50(void) {
 #else
 #pragma optimization_level 4
 u16 fn_80122B50(u8* ptr, s32 b) {
-    s32 val;
+    u16 val;
 
     if (ptr == NULL) {
         return 0;
@@ -24730,10 +24738,10 @@ u16 fn_80122B50(u8* ptr, s32 b) {
         return 0;
     }
     val = (s32)(u16)fn_8012640C(ptr, 0, 0x87, 0) / (s32)(u16)b;
-    if ((u16)val != 0) {
-        return (u16)val;
+    if (val == 0) {
+        val = 1;
     }
-    return 1;
+    return val;
 }
 #endif
 #if 0
