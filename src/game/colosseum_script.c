@@ -2411,56 +2411,45 @@ ctx = (void*)(r9 & 0xFF);
 /* Address: 0x80222844 | Size: 0xC8 (200 bytes) */
 #pragma optimization_level 0
 void fn_80222844(void* ctx, u32 param1, u32 param2, u32 param3) {
-    u32 tmp = 0;
+#pragma optimization_level 4
+    int sel;
+    u32 *base;
+    u32 *pa;
+    u32 vb;
+    u32 nxt;
 
-    param1 = *(u32*)&lbl_8047B610;
-ctx = (void*)*(u8*)((u8*)param1 + 0x1);
-    tmp = param1 + 0xe;
-    param2 = *(u32*)((u8*)param1 + 0x2);
-    param3 = *(u32*)((u8*)param1 + 0x6);
-    param1 = *(u32*)((u8*)param1 + 0xA);
-    *(u32*)&lbl_8047B610 = tmp;
-    if ((s32)ctx != 3) {
-        if ((s32)ctx < 3) {
-            if ((s32)ctx != 1) {
-                if ((s32)ctx < 1) {
-                    if ((s32)ctx < 0) {
-                        return;
-                    }
-                    if ((s32)ctx != 5) {
-                        if ((s32)ctx >= (s32)0x5) return;
-                        goto L_802228E4;
-                        }
-                    tmp = *(u32*)((u8*)param2 + 0x0);
-                    if (tmp != (u32)param3) return;
-                    *(u32*)&lbl_8047B610 = param1;
-                    return;
-                    }
-                tmp = *(u32*)((u8*)param2 + 0x0);
-                if (tmp == (u32)param3) return;
-                *(u32*)&lbl_8047B610 = param1;
-                return;
-                    }
-            tmp = *(u32*)((u8*)param2 + 0x0);
-            if (tmp <= (u32)param3) return;
-            *(u32*)&lbl_8047B610 = param1;
-            return;
-        }
-        tmp = *(u32*)((u8*)param2 + 0x0);
-        if (tmp >= (u32)param3) return;
-        *(u32*)&lbl_8047B610 = param1;
+    base = *(u32**)&lbl_8047B610;
+    sel = *(u8*)((u8*)base + 0x1);
+    pa = *(u32**)((u8*)base + 0x2);
+    vb = *(u32*)((u8*)base + 0x6);
+    nxt = *(u32*)((u8*)base + 0xA);
+    *(u32*)&lbl_8047B610 = (u32)base + 0xe;
+    switch (sel) {
+    case 0:
+        if (*pa != vb) return;
+        *(u32*)&lbl_8047B610 = nxt;
         return;
-    L_802228E4:
-        tmp = *(u32*)((u8*)param2 + 0x0);
-        /* and. tmp, tmp, param3 */;
-        if (tmp == (u32)param3) return;
-        *(u32*)&lbl_8047B610 = param1;
+    case 1:
+        if (*pa == vb) return;
+        *(u32*)&lbl_8047B610 = nxt;
         return;
-                    }
-    tmp = *(u32*)((u8*)param2 + 0x0);
-    /* and. tmp, tmp, param3 */;
-    if (tmp != (u32)param3) return;
-    *(u32*)&lbl_8047B610 = param1;
+    case 2:
+        if (*pa <= vb) return;
+        *(u32*)&lbl_8047B610 = nxt;
+        return;
+    case 3:
+        if (*pa >= vb) return;
+        *(u32*)&lbl_8047B610 = nxt;
+        return;
+    case 4:
+        if ((*pa & vb) == 0) return;
+        *(u32*)&lbl_8047B610 = nxt;
+        return;
+    case 5:
+        if ((*pa & vb) != 0) return;
+        *(u32*)&lbl_8047B610 = nxt;
+        return;
+    }
     return;
 }
 #pragma optimization_level 4
@@ -10495,26 +10484,23 @@ u32 fn_8023565C(u32 r3, u32 r4)
   return (u8)((s32)(u8)uVar4 >= (s32)(uVar3 & 0xffff));
 }
 /* Address: 0x80235714 | Size: 0xb8 | Ghidra import */
-u32 fn_80235714(void)
+u8 fn_80235714(u32 r3, u32 r4)
 
 {
-    u32 r3;
-    u32 r4;
-
     extern u32 fn_801FB1C0();
     extern u32 fn_8020156C();
   u16 uVar1;
   u16 uVar2;
-  u16 uVar3;
+  u32 uVar3;
   u16 uVar4;
-  
+
   uVar1 = fn_801FB1C0(r3,0,0x43,0);
   uVar1 = fn_801FB1C0(0,uVar1,2,0);
   uVar2 = fn_801FB1C0(r3,0,0x43,0);
   fn_801FB1C0(0,uVar2,2,0);
   uVar3 = fn_8020156C(r4);
   uVar4 = fn_801FB1C0(0,uVar1,0x2e,0);
-  return (uVar4 & 0xff) <= uVar3;
+  return (s32)(u8)uVar4 <= (s32)(u16)uVar3;
 }
 /* Address: 0x802357CC | Size: 0xe0 | Ghidra import */
 u8 fn_802357CC(u32 r3, u32 r4)
@@ -20937,16 +20923,13 @@ void fn_802177E4(void)
     extern void fn_8011BBD8();
     extern void fn_80132A38();
     extern u32 fn_801F025C();
-  u32 uVar1;
+  u8 uVar4;
   u32 uVar2;
-  u32 uVar3;
+  u32 uVar1;
+  u8 uVar3;
 
-  u32 uVar4;
-  
-  uVar2 = fn_801F025C(0x11,0);
-  uVar2 = (int)fn_8012640C(uVar2,0,0xd9,0);
-  uVar3 = fn_800E0C54();
-  uVar3 = (uVar3 & 0xffff) % 100;
+  uVar2 = (int)fn_8012640C(fn_801F025C(0x11,0),0,0xd9,0);
+  uVar3 = (u8)((s32)(fn_800E0C54() & 0xffff) % 100);
   if (uVar3 < 5) {
     uVar1 = 10;
     uVar4 = 4;
@@ -20975,9 +20958,9 @@ void fn_802177E4(void)
     uVar1 = 0x96;
     uVar4 = 10;
   }
-  fn_8011BBD8(uVar2,0,0x2f,0,uVar1);
+  fn_8011BBD8(uVar2,0,0x2f,0,uVar1 & 0xffff);
   fn_80132A38(0x2f,uVar4);
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 1;
+  lbl_8047B610 = lbl_8047B610 + 1;
   return;
 }
 /* Address: 0x802178F4 | Size: 0xa8 | Ghidra import */
@@ -24064,7 +24047,7 @@ void fn_8021C900(void)
     extern u32 fn_8011BEB4();
     extern u32 fn_801F025C();
     extern u32 fn_80205B8C();
-  u8 bVar1;
+  int bVar1;
   u32 uVar2;
   u32 uVar3;
   u32 uVar4;
@@ -24076,25 +24059,27 @@ void fn_8021C900(void)
   fn_801F025C(0x12,0);
   uVar4 = fn_80205B8C();
   uVar5 = (int)fn_8012640C(uVar4,0,0x87,0);
-  bVar1 = *(u8 *)(*(int *)(lbl_8047B610) + 1);
-  if (bVar1 == 1) {
-    uVar3 = ((int)uVar3 >> 1) + (u32)((int)uVar3 < 0 && (uVar3 & 1) != 0);
+  bVar1 = *(u8 *)(lbl_8047B610 + 1);
+  switch (bVar1) {
+  case 0:
+    uVar3 = uVar3 * -1;
+    break;
+  case 1:
+    uVar3 = (int)uVar3 / 2;
     if (uVar3 == 0) {
       uVar3 = 1;
     }
-    uVar5 = ((int)uVar5 >> 1) + (u32)((int)uVar5 < 0 && (uVar5 & 1) != 0);
+    uVar5 = (int)uVar5 / 2;
     if ((int)uVar5 < (int)uVar3) {
       uVar3 = uVar5;
     }
-  }
-  else if (bVar1 == 0) {
-    uVar3 = -uVar3;
-  }
-  else if (bVar1 < 3) {
+    break;
+  case 2:
     uVar3 = uVar3 << 1;
+    break;
   }
   fn_8011BBD8(uVar2,0,0x2d,0,uVar3);
-  *(int *)(lbl_8047B610) = *(int *)(lbl_8047B610) + 2;
+  lbl_8047B610 = lbl_8047B610 + 2;
   return;
 }
 /* Address: 0x8021CA00 | Size: 0x158 | Ghidra import */
