@@ -72,29 +72,19 @@ void* fn_801B4264(u32 type) {
     return node;
 }
 
+extern void fn_80193AF0(void* ptr, s32 size);
+
 /*
- * HSD_TExpDepth - 0x801B42C0 | Size: 0x40
- * Calculate the depth of a TExp expression tree.
+ * HSD_TExpFreeList - 0x801B42C0 | Size: 0x40
+ * Walk a linked list of TExp nodes and free each one (size 0x88).
  */
-u32 fn_801B42C0(u8* node) {
-    u32 depth;
-    u32 child_depth;
-
-    if (node == NULL) {
-        return 0;
+void fn_801B42C0(u8* node) {
+    u8* next;
+    while (node != NULL) {
+        next = *(u8**)node;
+        fn_80193AF0(node, 0x88);
+        node = next;
     }
-
-    depth = 1;
-
-    /* Check children */
-    if (*(void**)(node + 0x0C) != NULL) {
-        child_depth = fn_801B42C0(*(u8**)(node + 0x0C));
-        if (child_depth + 1 > depth) {
-            depth = child_depth + 1;
-        }
-    }
-
-    return depth;
 }
 
 /* ========================================================================= */
@@ -564,15 +554,25 @@ void fn_801B7BD4(HSD_GObj* gobj, s32 pass) {
 }
 
 /*
- * HSD_GObjRenderSimple - 0x801B7C60 | Size: 0x40
- * Simple GObj render dispatch.
+ * HSD_TExpGetType - 0x801B7C60 | Size: 0x40
+ * Get the type of a TExp expression.
+ * Returns HSD_TE_ZERO for NULL, HSD_TE_TEX for -1, HSD_TE_RAS for -2,
+ * otherwise returns the type field from the expression.
  */
-void fn_801B7C60(HSD_GObj* gobj, s32 pass) {
-    if (gobj == NULL || gobj->render_cb == NULL) {
-        return;
+#pragma optimization_level 1
+s32 fn_801B7C60(u8* texp) {
+    if (texp == NULL) {
+        return 0;
     }
-    gobj->render_cb(gobj, pass);
+    if ((u32)texp + 0x10000 == 0xFFFF) {
+        return 2;
+    }
+    if ((u32)texp + 0x10000 == 0xFFFE) {
+        return 3;
+    }
+    return *(s32*)texp;
 }
+#pragma optimization_level 4
 
 /*
  * HSD_GObjRenderSorted - 0x801B7CA0 | Size: 0x384
@@ -594,73 +594,329 @@ void fn_801B7CA0(u32 pass) {
 }
 
 /* ========================================================================= */
-/*  GObj system - game object management                                     */
+/*  TExp DAG construction                                                    */
 /* ========================================================================= */
 
+typedef struct HSD_TExpDag {
+    void* tev;
+    u8 idx;
+    u8 nb_dep;
+    u8 nb_ref;
+    u8 dist;
+    struct HSD_TExpDag* depend[8];
+} HSD_TExpDag;
+
+extern s32 fn_801B7C60(u8* texp);
+extern void fn_801B84A4(u8** nodes, s32* dist, u8* root, s32 num, s32 val);
+
 /*
- * GObj_Create - 0x801B8024 | Size: 0x480
- * Allocate and link a new game object.
+ * HSD_TExpMakeDag - 0x801B8024 | Size: 0x480
+ * Build a DAG from a texture expression tree.
+ * Returns the number of nodes in the DAG.
  */
-HSD_GObj* fn_801B8024(u16 classifier, u8 p_link, u8 p_priority,
-                       u8 render_priority) {
-    HSD_GObj* gobj;
-    u32 i;
+s32 fn_801B8024(u8* root, HSD_TExpDag* list) {
+    u8* nodes[32];
+    s32 dist[32];
+    s32 num, saved_num, i, j, k, l, m, last;
+    u8* cur;
+    u8* exp;
+    u8 type;
+    HSD_TExpDag* dag;
 
-    gobj = (HSD_GObj*)hsdAllocMemPiece(sizeof(HSD_GObj));
-    if (gobj == NULL) {
-        return NULL;
+    HSD_ASSERT(0xEE, fn_801B7C60(root) == 1);
+
+    num = 0;
+    nodes[num] = root;
+    num++;
+    j = 0;
+
+    while (j < num) {
+        cur = nodes[j];
+
+        for (i = 0; i < 4; i++) {
+            type = *(u8*)(cur + 0x34 + i * 8);
+            if (type == 1) {
+                exp = *(u8**)(cur + 0x38 + i * 8);
+                for (k = 0; k < num; k++) {
+                    if (nodes[k] == exp) break;
+                }
+                if (k >= num) {
+                    nodes[num] = exp;
+                    num++;
+                }
+            }
+        }
+
+        for (i = 0; i < 4; i++) {
+            type = *(u8*)(cur + 0x54 + i * 8);
+            if (type == 1) {
+                exp = *(u8**)(cur + 0x58 + i * 8);
+                for (k = 0; k < num; k++) {
+                    if (nodes[k] == exp) break;
+                }
+                if (k >= num) {
+                    nodes[num] = exp;
+                    num++;
+                }
+            }
+        }
+
+        j++;
     }
 
-    /* Zero-initialize */
-    {
-        u8* p = (u8*)gobj;
-        for (i = 0; i < sizeof(HSD_GObj); i++) {
-            p[i] = 0;
+    saved_num = num;
+
+    for (i = 0; i < saved_num; i++) {
+        dist[i] = -1;
+    }
+
+    fn_801B84A4(nodes, dist, nodes[0], saved_num, 0);
+
+    for (i = 0; i < saved_num; i++) {
+        for (j = i + 1; j < saved_num; j++) {
+            if (dist[j - 1] > dist[j]) {
+                u8* tmp_node;
+                s32 tmp_dist;
+
+                tmp_node = nodes[j - 1];
+                nodes[j - 1] = nodes[j];
+                nodes[j] = tmp_node;
+
+                tmp_dist = dist[j - 1];
+                dist[j - 1] = dist[j];
+                dist[j] = tmp_dist;
+            }
         }
     }
 
-    gobj->classifier = classifier;
-    gobj->p_link = p_link;
-    gobj->p_priority = p_priority;
-    gobj->render_priority = render_priority;
+    last = saved_num - 1;
+    for (i = last; i >= 0; i--) {
+        dag = &list[i];
+        cur = nodes[i];
 
-    /* Link into process list */
-    if (p_link < 64) {
-        gobj->next = gobj_list[p_link];
-        if (gobj_list[p_link] != NULL) {
-            gobj_list[p_link]->prev = gobj;
+        dag->tev = cur;
+        dag->idx = (u8)i;
+        dag->nb_dep = 0;
+        dag->nb_ref = 0;
+
+        for (j = 0; j < 4; j++) {
+            type = *(u8*)(cur + 0x34 + j * 8);
+            if (type == 1) {
+                exp = *(u8**)(cur + 0x38 + j * 8);
+                for (l = i; l < saved_num; l++) {
+                    if (exp == nodes[l]) {
+                        for (m = 0; m < dag->nb_dep; m++) {
+                            if (dag->depend[m] == &list[l]) break;
+                        }
+                        if (m >= dag->nb_dep) {
+                            dag->depend[dag->nb_dep] = &list[l];
+                            dag->nb_dep++;
+                            list[l].nb_ref++;
+                        }
+                        break;
+                    }
+                }
+            }
         }
-        gobj_list[p_link] = gobj;
+
+        for (j = 0; j < 4; j++) {
+            type = *(u8*)(cur + 0x54 + j * 8);
+            if (type == 1) {
+                exp = *(u8**)(cur + 0x58 + j * 8);
+                for (l = i; l < saved_num; l++) {
+                    if (exp == nodes[l]) {
+                        for (m = 0; m < dag->nb_dep; m++) {
+                            if (dag->depend[m] == &list[l]) break;
+                        }
+                        if (m >= dag->nb_dep) {
+                            dag->depend[dag->nb_dep] = &list[l];
+                            dag->nb_dep++;
+                            list[l].nb_ref++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
 
-    gobj_num_active++;
-    return gobj;
+    return saved_num;
 }
 
 /*
- * GObj_ProcessSystem - 0x801B84A4 | Size: 0x518
- * GObj process system - add/remove/dispatch process callbacks.
+ * fn_801B84A4 - 0x801B84A4 | Size: 0x518
+ * TExp DAG distance computation helper.
+ * 3-level unrolled recursive depth assignment.
  */
-void fn_801B84A4(void) {
-    u32 i;
+void fn_801B84A4(u8** nodes, s32* dist, u8* root, s32 num, s32 val) {
+    s32 i, j, k;
+    u8* exp1;
+    u8* exp2;
+    s32 val1;
+    s32 val2;
 
-    for (i = 0; i < 64; i++) {
-        HSD_GObj* gobj = gobj_list[i];
-        while (gobj != NULL) {
-            HSD_GObj* next = gobj->next;
-            HSD_GObjProc* proc = gobj->proc;
-
-            while (proc != NULL) {
-                HSD_GObjProc* next_proc = proc->next;
-                if (proc->callback != NULL) {
-                    proc->callback(gobj);
-                }
-                proc = next_proc;
-            }
-
-            gobj = next;
+    for (i = 0; i < num; i++) {
+        if (nodes[i] == root) {
+            if (dist[i] >= val) return;
+            dist[i] = val;
+            val++;
+            i = 0;
+            goto level1_check;
         }
     }
+    return;
+
+level1_check:
+    if (i >= 4) return;
+
+    if (*(u8*)(root + 0x34 + i * 8) == 1) {
+        exp1 = *(u8**)(root + 0x38 + i * 8);
+        val1 = val;
+
+        for (j = 0; j < num; j++) {
+            if (nodes[j] == exp1) {
+                if (dist[j] >= val1) goto level1_a_in;
+                dist[j] = val1;
+                val1++;
+                j = 0;
+                goto level2_c_in_check;
+            }
+        }
+        goto level1_a_in;
+
+level2_c_in_check:
+        if (j >= 4) goto level1_a_in;
+
+        if (*(u8*)(exp1 + 0x34 + j * 8) == 1) {
+            exp2 = *(u8**)(exp1 + 0x38 + j * 8);
+            val2 = val1;
+
+            for (k = 0; k < num; k++) {
+                if (nodes[k] == exp2) {
+                    if (dist[k] >= val2) goto level2_c_in_a_in;
+                    dist[k] = val2;
+                    val2++;
+                    k = 0;
+                    goto level3_c_in_check;
+                }
+            }
+            goto level2_c_in_a_in;
+
+level3_c_in_check:
+            if (k >= 4) goto level2_c_in_a_in;
+            if (*(u8*)(exp2 + 0x34 + k * 8) == 1) {
+                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
+            }
+            k++;
+            goto level3_c_in_check;
+        }
+
+level2_c_in_a_in:
+        if (*(u8*)(exp1 + 0x54 + j * 8) == 1) {
+            exp2 = *(u8**)(exp1 + 0x58 + j * 8);
+            val2 = val1;
+
+            for (k = 0; k < num; k++) {
+                if (nodes[k] == exp2) {
+                    if (dist[k] >= val2) goto level2_a_in_next;
+                    dist[k] = val2;
+                    val2++;
+                    k = 0;
+                    goto level3_a_in_check;
+                }
+            }
+            goto level2_a_in_next;
+
+level3_a_in_check:
+            if (k >= 4) goto level2_a_in_next;
+            if (*(u8*)(exp2 + 0x54 + k * 8) == 1) {
+                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
+            }
+            k++;
+            goto level3_a_in_check;
+        }
+
+level2_a_in_next:
+        j++;
+        goto level2_c_in_check;
+    }
+
+level1_a_in:
+    if (*(u8*)(root + 0x54 + i * 8) == 1) {
+        exp1 = *(u8**)(root + 0x58 + i * 8);
+        val1 = val;
+
+        for (j = 0; j < num; j++) {
+            if (nodes[j] == exp1) {
+                if (dist[j] >= val1) goto level1_next;
+                dist[j] = val1;
+                val1++;
+                j = 0;
+                goto level2a_c_in_check;
+            }
+        }
+        goto level1_next;
+
+level2a_c_in_check:
+        if (j >= 4) goto level1_next;
+
+        if (*(u8*)(exp1 + 0x34 + j * 8) == 1) {
+            exp2 = *(u8**)(exp1 + 0x38 + j * 8);
+            val2 = val1;
+
+            for (k = 0; k < num; k++) {
+                if (nodes[k] == exp2) {
+                    if (dist[k] >= val2) goto level2a_c_in_a_in;
+                    dist[k] = val2;
+                    val2++;
+                    k = 0;
+                    goto level3a_c_in_check;
+                }
+            }
+            goto level2a_c_in_a_in;
+
+level3a_c_in_check:
+            if (k >= 4) goto level2a_c_in_a_in;
+            if (*(u8*)(exp2 + 0x34 + k * 8) == 1) {
+                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x38 + k * 8), num, val2);
+            }
+            k++;
+            goto level3a_c_in_check;
+        }
+
+level2a_c_in_a_in:
+        if (*(u8*)(exp1 + 0x54 + j * 8) == 1) {
+            exp2 = *(u8**)(exp1 + 0x58 + j * 8);
+            val2 = val1;
+
+            for (k = 0; k < num; k++) {
+                if (nodes[k] == exp2) {
+                    if (dist[k] >= val2) goto level2a_a_in_next;
+                    dist[k] = val2;
+                    val2++;
+                    k = 0;
+                    goto level3a_a_in_check;
+                }
+            }
+            goto level2a_a_in_next;
+
+level3a_a_in_check:
+            if (k >= 4) goto level2a_a_in_next;
+            if (*(u8*)(exp2 + 0x54 + k * 8) == 1) {
+                fn_801B84A4(nodes, dist, *(u8**)(exp2 + 0x58 + k * 8), num, val2);
+            }
+            k++;
+            goto level3a_a_in_check;
+        }
+
+level2a_a_in_next:
+        j++;
+        goto level2a_c_in_check;
+    }
+
+level1_next:
+    i++;
+    goto level1_check;
 }
 
 /*
