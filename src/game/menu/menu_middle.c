@@ -158,7 +158,7 @@ void fn_8006AABC(void);
 void fn_8006AC28(void* p, u16 value);
 s32 fn_8006AC6C(u32 id);
 void fn_8006ACCC(void);
-void fn_8006ADB4(void);
+void fn_8006ADB4(s32 value);
 s32 fn_8006ADEC(void);
 void fn_8006AE18(void);
 u8* fn_8006AEEC(void);
@@ -1469,21 +1469,14 @@ void fn_8006ACCC(void) {
 
 
 /* 0x8006ADB4 | size: 0x38 */
-void fn_8006ADB4(void) {
-    extern void fn_80129280();
-    u8 sp[0x10];
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+#pragma push
+#pragma peephole off
+void fn_8006ADB4(s32 value) {
+    extern u8* fn_80129280(s32 idx, s32 type);
 
-    
-    r31 = r3;
-    r3 = 0x0;
-    r4 = 0xe;
-    fn_80129280();
-    *(u32*)((u8*)r3 + 0x59A4) = r31;
-    return;
+    *(s32*)(fn_80129280(0, 0xe) + 0x59a4) = value;
 }
+#pragma pop
 
 
 /* 0x8006ADEC | size: 0x2C */
