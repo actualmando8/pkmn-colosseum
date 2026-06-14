@@ -15875,6 +15875,7 @@ u32 fn_8023CDCC(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
   return uVar3;
 }
 /* Address: 0x8023CE60 | Size: 0x17c | Ghidra import */
+#pragma optimization_level 2
 u32 fn_8023CE60(u32 r3, u32 r4, u32 r5, u32 r6)
 {
     extern u32 fn_80205B8C();
@@ -15913,6 +15914,7 @@ u32 fn_8023CE60(u32 r3, u32 r4, u32 r5, u32 r6)
   }
   return uVar6;
 }
+#pragma optimization_level 4
 /* Address: 0x8023CFDC | Size: 0x17c | Ghidra import */
 u32 fn_8023CFDC(u32 r3, u32 r4, u32 r5, u32 r6)
 {
