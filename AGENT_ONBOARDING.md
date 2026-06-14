@@ -234,6 +234,11 @@ This compiles the canon, objdiffs it vs the target, ranks the non-100% fns close
 first, tiers them (A>=90, B>=75, C>=50, D<50), and round-robins them into N disjoint bands
 `b0 b1 … b{N-1}`. Hand each agent ONE band's function list and a unique `<tag>`.
 
+`sections` auto-**SKIPS active asm-wrapper fns** (`#if 1` + `#include "..._fn_*.inc"`):
+they are byte-exact in ROM and their sub-100% objdiff scores are pure reloc-name artifacts
+(`jumptable@ha`, `lbl@sda21` vs raw addr) — NOT real-C targets. Only real-C near-misses are
+banded; the header prints the skipped wrapper count. Never spend attempts on a wrapper.
+
 ### The loop each agent runs (copy/paste — replace `<tag>`, `<file>`, `<fn>`)
 
 ```bash

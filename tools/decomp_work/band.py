@@ -264,6 +264,39 @@ def _tier(m):
     return "A" if m >= 90 else "B" if m >= 75 else "C" if m >= 50 else "D"
 
 
+def active_asm_fns(src_path, fn_names):
+    """Return the subset of fn_names whose `#include "..._<fn>.inc"` is ACTIVE
+    (compiled) in the canon — i.e. an `#if 1` asm-wrapper. These are byte-exact
+    in the real ROM; their sub-100% objdiff scores are pure reloc-name/address
+    artifacts (jumptable@ha, lbl@sda21 vs raw addr). They are NOT real-C targets,
+    so agents must NOT spend attempts on them. Detected by tracking #if 1/#if 0
+    branch state around each .inc include (the generated wrappers use literal
+    1/0 exclusively)."""
+    try:
+        lines = src_path.read_text(errors="ignore").splitlines()
+    except OSError:
+        return set()
+    active, stack = set(), []
+    for raw in lines:
+        s = raw.strip()
+        if s.startswith("#if"):
+            stack.append(s[3:].strip() == "1")          # #if 1 -> True, else False
+        elif s.startswith("#else"):
+            if stack:
+                stack[-1] = not stack[-1]
+        elif s.startswith("#endif"):
+            if stack:
+                stack.pop()
+        elif "#include" in s and s.rstrip().endswith('.inc"'):
+            if stack and all(stack):                      # include is in a live branch
+                stem = s.split('"')[1].rsplit("/", 1)[-1][:-4]   # filename minus .inc
+                for fn in fn_names:
+                    if stem == fn or stem.endswith("_" + fn):
+                        active.add(fn)
+                        break
+    return active
+
+
 def cmd_sections(srcname, nbands):
     """List the file's active-asm + near-miss (<100%) fns split into N disjoint
     bands (tiered A/B/C/D, closest-to-100% first), one band per agent. Reuses
@@ -287,11 +320,16 @@ def cmd_sections(srcname, nbands):
     sz = {x["name"]: x["size"] for x in funcs}
     near = sorted([x for x in funcs if x["match"] < 99.9999],
                   key=lambda x: -x["match"])
-    pool = [x["name"] for x in near]
     rel = str(src_path.relative_to(ROOT)).replace("\\", "/")
 
+    # Drop active asm-wrappers: they are byte-exact in ROM (sub-100% = reloc-name
+    # artifacts only). Agents must not spend attempts on them.
+    asm = active_asm_fns(src_path, {x["name"] for x in near})
+    pool = [x["name"] for x in near if x["name"] not in asm]
+
     if not pool:
-        print(f"{rel}: all {len(funcs)} fn(s) already byte-exact — nothing to band.")
+        print(f"{rel}: all {len(funcs)} fn(s) byte-exact or active asm-wrapper "
+              f"({len(asm)} wrapper artifact(s)) — no real-C targets to band.")
         return
 
     # Tier then chunk into nbands disjoint bands. Distribute tier chunks
@@ -307,11 +345,12 @@ def cmd_sections(srcname, nbands):
     for i, fn in enumerate(ordered):
         buckets[i % nbands].append(fn)
 
-    exact = sum(1 for v in pct.values() if v >= 99.9999) + (len(funcs) - len(pct))
+    byte_exact = sum(1 for v in pct.values() if v >= 99.9999) + (len(funcs) - len(pct))
     print(f"file: {rel}")
     print(f"compiler GC/{version}   target {Path(target_o).name}")
-    print(f"{len(funcs)} fn(s); {len(funcs) - len(pool)} byte-exact; "
-          f"{len(pool)} near-miss/asm to assign across {nbands} band(s)\n")
+    print(f"{len(funcs)} fn(s); {byte_exact} byte-exact; {len(asm)} asm-wrapper "
+          f"artifact(s) [skipped]; {len(pool)} real-C near-miss across "
+          f"{nbands} band(s)\n")
     for bi, names in enumerate(buckets):
         names = sorted(names, key=lambda fn: -pct[fn])
         tag = f"b{bi}"
