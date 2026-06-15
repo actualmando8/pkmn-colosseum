@@ -1822,9 +1822,9 @@ u32 fn_801F2020(u32 obj, u32 r4arg, u32* out) {
     u32 r27;
     u32 r26;
     u32 r28;
+    u32 r31;
     u32 r30;
     u32 r29;
-    u32 r31;
     u32 r25;
     r27 = r4arg;
     r26 = obj;
@@ -1886,9 +1886,9 @@ u32 fn_801F221C(u32 obj) {
     extern u32 fn_801F1170(void);
     extern u32 fn_8012640C(u32, u32, u32, u32);
     u32 a;
-    u32 result;
-    u32 i;
     u32 pkmn;
+    u32 i;
+    u32 result;
     a = obj;
     result = 1;
     i = 0;
@@ -3212,10 +3212,16 @@ void* fn_801F4718(void* obj) {
 /* 0x801F47B4 | size: 0x50 | small */
 void* fn_801F47B4(void* a, u32 b) {
     extern u32 fn_801F54A4(void*, int, int, u32);
+    void *ret;
     u32 result = fn_801F54A4(a, 0, 0x35, b);
-    if ((u8)fn_801F7404(result) == 0)
-        return 0;
-    return (void*)result;
+    if ((u8)fn_801F7404(result) != 0)
+        goto ret_result;
+    ret = 0;
+    goto end;
+ret_result:
+    ret = (void*)result;
+end:
+    return ret;
 }
 
 /* 0x801F4804 | size: 0x5C | small */
