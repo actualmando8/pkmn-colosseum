@@ -29,9 +29,9 @@ extern void fn_80089D30();
 extern void fn_8009F7B4();
 extern void fn_8009F890();
 extern void fn_8009F9E8();
-extern void fn_800A13F8();
+extern u32 fn_800A13F8();
 extern void fn_800A1990();
-extern void fn_800A257C();
+extern void fn_800A257C(u32, u32);
 extern void fn_800C46B0();
 extern void fn_800C4CC0();
 extern void fn_800D59B8();
@@ -110,7 +110,7 @@ extern u8 lbl_803FB380[];
 
 /* ===== Forward declarations ===== */
 void fn_800937F4(void);
-void fn_80093B04(void);
+void fn_80093B04(u32 a, u32 b);
 void fn_80093B4C(void);
 void fn_80093F2C(void);
 void fn_80093F64(void);
@@ -367,22 +367,16 @@ while (1) {
 }
 
 /* 0x80093B04 | size: 0x48 */
-void fn_80093B04(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
-
-    r31 = r4;
-    ((void(*)(void))fn_800A13F8)();
+void fn_80093B04(u32 a, u32 b) {
+    u32 r31;
+    u32 result;
+    r31 = b;
+    result = fn_800A13F8();
     if (r31 != 0) {
-        if (r31 != r3) return;
+        if (r31 != result) return;
     }
-    r4 = 0x10;
-    ((void(*)(void))fn_800A257C)();
-    ((void(*)(void))fn_800A1990)();
-
+    fn_800A257C(result, 0x10);
+    fn_800A1990();
     return;
 }
 

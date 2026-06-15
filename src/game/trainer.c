@@ -1842,13 +1842,13 @@ u8 fn_801FCCAC(u8* ptr) {
 void* fn_801F7F80(void* context, u16 count) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 index);
     extern u8 fn_80206A04(void* ptr);
+    int i;
     void* result;
-    u16 i;
 
     if (context == NULL) {
         return NULL;
     }
-    for (i = 0; i < count; i++) {
+    for (i = 0; (u16)i < count; i++) {
         result = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(result) == 0) {
             return result;
@@ -2119,8 +2119,8 @@ void fn_801F849C(void* arg0, u32 arg1) {
     extern u32 fn_8020ECA4(void*);
     extern void fn_8020EDBC(void*);
     u32 mode;
-    u32 i;
     void* pokemon;
+    u8 i;
 
     if (arg0 == NULL) {
         return;
@@ -2163,8 +2163,8 @@ void* fn_801F8518(void* context, u32 index) {
 
 /* 0x801F85B0 | size: 0x88 */
 s32 fn_801F85B0(void* context, void* target) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    s16 i;
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
+    int i;
 
     if (context == NULL) {
         return -1;
@@ -2182,8 +2182,8 @@ s32 fn_801F85B0(void* context, void* target) {
 
 /* 0x801F8638 | size: 0x88 */
 s32 fn_801F8638(void* context, void* target) {
-    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
-    s16 i;
+    extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u16 idx);
+    int i;
 
     if (context == NULL) {
         return -1;
@@ -3114,16 +3114,14 @@ void* fn_801F986C(void* arg1, u32 arg2) {
 u32 fn_801F98BC(void* arg0) {
     extern void* fn_801FB1C0(void*, u32, u32, u32);
     extern u32 fn_802062FC(void*);
-    u32 i;
+    u8 i;
     u32 count;
 
     count = 0;
-    i = 0;
-    while (i < 2) {
+    for (i = 0; i < 2; i++) {
         if ((u8)fn_802062FC(fn_801FB1C0(arg0, 0, 0x46, i))) {
-            count = (u8)(count + 1);
+            count = ((count & 0xFF) + 1) & 0xFF;
         }
-        i++;
     }
     return count;
 }
@@ -3132,11 +3130,11 @@ u32 fn_801F98BC(void* arg0) {
 void* fn_801F9930(void* context, void* moveData) {
     extern void* fn_801FB1C0(void* ctx, u32 slot, u32 field, u32 idx);
     extern u8 fn_80206A04(void* ptr);
+    int i;
     void* pokemon;
     void* data;
-    u16 i;
 
-    for (i = 0; i < 6; i++) {
+    for (i = 0; (u16)i < 6; i++) {
         pokemon = fn_801FB1C0(context, 0, 0x45, i);
         if ((u8)fn_80206A04(pokemon) != 0) {
             data = fn_8012640C(pokemon, 0, 0xCB, 0);
@@ -9590,16 +9588,16 @@ u16 fn_8020147C(void* context, u16 moveId, u8 slot, u8 updateFlag) {
 
 /* 0x8020156C | size: 0x94 */
 typedef struct { u16 fields[7]; } FieldTable7;
-u16 fn_8020156C(void* context) {
+u32 fn_8020156C(void* context) {
     extern FieldTable7 lbl_80279C80;
     FieldTable7 table;
-    u16 sum;
     u8 i;
+    u32 sum;
 
     table = lbl_80279C80;
     sum = 0;
     for (i = 0; i < 7; i++) {
-        sum = (u16)(sum + (u32)fn_8012640C(context, 0, table.fields[i], 0));
+        sum = (sum + (u32)fn_8012640C(context, 0, table.fields[i], 0)) & 0xFFFF;
     }
     return sum;
 }
