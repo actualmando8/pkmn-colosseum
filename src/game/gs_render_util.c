@@ -1031,19 +1031,21 @@ found:
 #pragma optimization_level 1
 void fn_800D2AD4(u32 count) {
     u32 raw;
+    u32 masked;
     lbl_8047AA70 = count;
     raw = fn_800E3534(count * 0x128);
     lbl_8047AA68 = (u16)raw;
-    if ((u16)raw != 0) {
+    masked = (u16)raw;
+    if (masked != 0) {
+        u32 zero;
         u32 off;
         u32 i;
-        u8 zero;
-        lbl_8047AA6C = fn_800E27B0((u32)(u16)raw);
+        lbl_8047AA6C = fn_800E27B0(masked);
         off = 0;
-        zero = (u8)off;
+        zero = off;
         i = 0;
         while (i < lbl_8047AA70) {
-            *(u8*)((u8*)lbl_8047AA6C + off) = zero;
+            *(u8*)((u8*)lbl_8047AA6C + off) = (u8)zero;
             off += 0x128;
             i++;
         }
