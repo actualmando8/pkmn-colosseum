@@ -116,16 +116,16 @@ void fn_80087C64(void);
 void fn_80088428(void);
 void fn_800884BC(void);
 void fn_800886D0(void);
-void fn_80088964(void);
-void fn_800889A4(void);
+s32 fn_80088964(void);
+s32 fn_800889A4(void);
 void fn_800889E4(void);
 void fn_80088C60(void);
 void fn_80088D84(void);
-void fn_80088EA8(void);
+void fn_80088EA8(u8* p);
 s32 fn_80088F58(void);
 s32 fn_80088F74(void);
 s32 fn_80088F88(void);
-void fn_80088FA4(void);
+s32 fn_80088FA4(void);
 s32 fn_80088FF8(s32 a, s32 b);
 s32 fn_80089028(void);
 void fn_80089030(u8 x);
@@ -4973,47 +4973,23 @@ void fn_80087C64(void) {
 
 /* 0x80088428 | size: 0x94 */
 void fn_80088428(void) {
-    extern void fn_80087C64();
-    extern void fn_80166A28();
-    extern void fn_80176B48();
-    extern void fn_80176E0C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+    #pragma peephole off
+    extern u32 fn_80087C64(void* p);
+    extern void fn_80166A28(s32);
+    extern void cameraWaitSyncAnime(s32);
+    extern void fn_80176E0C(s32, s32, s32, s32);
+    extern void fn_800FF660(void);
+    u32 r31;
 
-    r3 = 0x27;
-    fn_80166A28();
-    r4 = 0x107C0000;
-    r3 = 0x62d;
-    r4 = r4 + 0x1800;
-    r5 = 0x0;
-    r6 = 0x0;
-    fn_80176E0C();
-    r3 = 0x1;
-    fn_80176B48();
-    r3 = (u32)&lbl_803FB2F8;
-    r3 = (u32)&lbl_803FB2F8;
-    fn_80087C64();
-    r31 = r3;
-    r3 = 0x28;
-    fn_80166A28();
-    r4 = 0x107D0000;
-    r3 = 0x62d;
-    r4 = r4 + 0x1800;
-    r5 = 0x0;
-    r6 = 0x0;
-    fn_80176E0C();
-    r3 = 0x1;
-    fn_80176B48();
-    ((void(*)(void))fn_800FF660)();
-    r3 = (u32)&lbl_803FB2F8;
-    r3 = (u32)&lbl_803FB2F8;
-    *(u32*)((u8*)r3 + 0x8) = r31;
-    return;
+    fn_80166A28(0x27);
+    fn_80176E0C(0x62d, 0x107C1800, 0, 0);
+    cameraWaitSyncAnime(1);
+    r31 = fn_80087C64(&lbl_803FB2F8);
+    fn_80166A28(0x28);
+    fn_80176E0C(0x62d, 0x107D1800, 0, 0);
+    cameraWaitSyncAnime(1);
+    fn_800FF660();
+    *(u32*)((u8*)&lbl_803FB2F8 + 0x8) = r31;
 }
 
 /* 0x800884BC | size: 0x214 */
@@ -5319,47 +5295,27 @@ L_80088824:
 }
 
 /* 0x80088964 | size: 0x40 */
-void fn_80088964(void) {
-    extern void fn_801D0748();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+s32 fn_80088964(void) {
+    #pragma peephole off
+    extern s32 fn_801D0748(s32, s32, s32);
 
-    r3 = 0xd;
-    r4 = 0x2;
-    r5 = 0x0;
-    fn_801D0748();
-    if ((s32)r3 == 4) {
-        r3 = 0x0;
+    if (fn_801D0748(0xd, 2, 0) == 4) {
+        return 0;
     } else {
-
-        r3 = -0x1;
+        return -1;
     }
-    return;
 }
 
 /* 0x800889A4 | size: 0x40 */
-void fn_800889A4(void) {
-    extern void fn_801D0748();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
+s32 fn_800889A4(void) {
+    #pragma peephole off
+    extern s32 fn_801D0748(s32, s32, s32);
 
-    r3 = 0x5;
-    r4 = 0x2;
-    r5 = 0x0;
-    fn_801D0748();
-    if ((s32)r3 == 4) {
-        r3 = 0x0;
+    if (fn_801D0748(5, 2, 0) == 4) {
+        return 0;
     } else {
-
-        r3 = -0x1;
+        return -1;
     }
-    return;
 }
 
 /* 0x800889E4 | size: 0x27C */
@@ -5686,52 +5642,30 @@ void fn_80088D84(void) {
 }
 
 /* 0x80088EA8 | size: 0xB0 */
-void fn_80088EA8(void) {
-    extern void fn_8012D2BC();
-    extern void fn_8012D32C();
-    extern void fn_801906A0();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
+void fn_80088EA8(u8* p) {
+    extern void fn_8012D2BC(f32*);
+    extern void fn_8012D32C(f32*);
+    extern u32 fn_800FF56C(void);
+    extern u32 fn_8011394C(void);
+    extern u32 fn_801906A0(s32);
+    f32 a[3];
+    f32 b[3];
 
-    r31 = r3;
-    r3 = (u32)sp + 0x14;
-    fn_8012D32C();
-    r3 = (u32)sp + 0x8;
-    fn_8012D2BC();
-    f0 = *(f32*)(sp + 0x14);
-    *(f32*)((u8*)r31 + 0xC) = f0;
-    f0 = *(f32*)(sp + 0x18);
-    *(f32*)((u8*)r31 + 0x10) = f0;
-    f0 = *(f32*)(sp + 0x1C);
-    *(f32*)((u8*)r31 + 0x14) = f0;
-    f0 = *(f32*)(sp + 0x8);
-    *(f32*)((u8*)r31 + 0x18) = f0;
-    f0 = *(f32*)(sp + 0xC);
-    *(f32*)((u8*)r31 + 0x1C) = f0;
-    f0 = *(f32*)(sp + 0x10);
-    *(f32*)((u8*)r31 + 0x20) = f0;
-    ((void(*)(void))fn_800FF56C)();
-    *(u32*)((u8*)r31 + 0x4) = r3;
-    ((void(*)(void))fn_8011394C)();
-    *(u32*)((u8*)r31 + 0x8) = r3;
-    tmp = 0x1;
-    r3 = 0xafc;
-    *(u8*)((u8*)r31 + 0x0) = tmp;
-    fn_801906A0();
-    *(u32*)((u8*)r31 + 0x24) = r3;
-    r3 = 0xafd;
-    fn_801906A0();
-    *(u32*)((u8*)r31 + 0x28) = r3;
-    r3 = 0xb11;
-    fn_801906A0();
-    *(u32*)((u8*)r31 + 0x2C) = r3;
-    r3 = 0xde1;
-    fn_801906A0();
-    *(u32*)((u8*)r31 + 0x30) = r3;
-    return;
+    fn_8012D32C(a);
+    fn_8012D2BC(b);
+    *(f32*)(p + 0xC) = a[0];
+    *(f32*)(p + 0x10) = a[1];
+    *(f32*)(p + 0x14) = a[2];
+    *(f32*)(p + 0x18) = b[0];
+    *(f32*)(p + 0x1C) = b[1];
+    *(f32*)(p + 0x20) = b[2];
+    *(u32*)(p + 0x4) = fn_800FF56C();
+    *(u32*)(p + 0x8) = fn_8011394C();
+    *(u8*)(p + 0x0) = 1;
+    *(u32*)(p + 0x24) = fn_801906A0(0xafc);
+    *(u32*)(p + 0x28) = fn_801906A0(0xafd);
+    *(u32*)(p + 0x2C) = fn_801906A0(0xb11);
+    *(u32*)(p + 0x30) = fn_801906A0(0xde1);
 }
 
 /* 0x80088F58 | size: 0x1C */
@@ -5741,6 +5675,7 @@ s32 fn_80088F58(void) {
 
 /* 0x80088F74 | size: 0x14 */
 s32 fn_80088F74(void) {
+    *(u32*)&lbl_8047A668 += 1;
     return 0;
 }
 
@@ -5750,26 +5685,18 @@ s32 fn_80088F88(void) {
 }
 
 /* 0x80088FA4 | size: 0x54 */
-void fn_80088FA4(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+s32 fn_80088FA4(void) {
+    #pragma peephole off
+    extern s32 fn_8010264C(s32, s32);
+    extern void fn_80102510(s32);
+    s32 r31;
 
-    r3 = 0x2;
-    r4 = 0x1;
-    ((void(*)(void))fn_8010264C)();
-    r31 = r3;
-    r3 = 0x2;
-    ((void(*)(void))fn_80102510)();
-    if ((s32)r31 >= 0) {
-        tmp = *(u32*)&lbl_8047A660;
-        tmp = tmp + r31;
-        *(u32*)&lbl_8047A660 = tmp;
+    r31 = fn_8010264C(2, 1);
+    fn_80102510(2);
+    if (r31 >= 0) {
+        *(u32*)&lbl_8047A660 += r31;
     }
-    r3 = 0x0;
-    return;
+    return 0;
 }
 
 /* 0x80088FF8 | size: 0x30 */
