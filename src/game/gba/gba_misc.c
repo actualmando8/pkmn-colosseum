@@ -127,7 +127,7 @@ int fn_8008A9AC(u32 r3, u8* r4);
 void fn_8008A9E4(void);
 void fn_8008AB20(void);
 void fn_8008AB4C(s32 param0, s32 param1);
-s32 fn_8008AB8C(void);
+s32 fn_8008AB8C(s32 r3);
 u8 fn_8008ABA0(s32 idx);
 void fn_8008ABE4(void);
 void fn_8008AC34(void);
@@ -1720,8 +1720,9 @@ void fn_8008AB4C(s32 param0, s32 param1) {
 }
 
 /* 0x8008AB8C | size: 0x14 */
-s32 fn_8008AB8C(void) {
-    return 0;
+s32 fn_8008AB8C(s32 r3) {
+    u16 *base = (u16*)&lbl_8047A67C;
+    return base[r3 - 1];
 }
 
 /* 0x8008ABA0 | size: 0x44 */
