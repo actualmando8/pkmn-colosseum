@@ -6,11 +6,12 @@ all the hard-won CodeWarrior matching tricks already exist. **Do not reimplement
 Pick a target, write C, measure, keep it if it byte-matches. This page gets you decompiling
 in five minutes.
 
-> Companions: **`AGENTS.md`** (full guardrails + current campaign), **`WALLS.md`** (the
-> wall ledger — what NOT to grind), **`tools/decomp_work/equivalent.txt`** (logged
-> Equivalents = hard-skip), **`tools/decomp_work/CLAUDE.md`** (the 7 CW-1.3 quirks +
-> Ghidra→CW pipeline). The distilled opus/Fable levers live in the table below — you
-> usually don't need to leave this file.
+> Companions: **`AGENTS.md`** (full guardrails + current campaign), **`tools/decomp_work/HARNESS.md`**
+> (the authoritative AI-free harness spec — architecture, the win lifecycle, the integration
+> gate, how to extend it), **`WALLS.md`** (the wall ledger — what NOT to grind),
+> **`tools/decomp_work/equivalent.txt`** (logged Equivalents = hard-skip),
+> **`tools/decomp_work/CLAUDE.md`** (the 7 CW-1.3 quirks + Ghidra→CW pipeline). The distilled
+> opus/Fable levers live in the table below — you usually don't need to leave this file.
 
 Windows Python (use this exact path in every command):
 `C:\Users\douglaswhittingham\AppData\Local\Programs\Python\Python312\python.exe`
