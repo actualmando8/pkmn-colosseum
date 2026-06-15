@@ -5358,13 +5358,13 @@ asm void fn_800EC918(void) {
 }
 #else
 void fn_800EC918(void) {
-    u32 i;
-    u32 count = gsMatPoolCount;
-    for (i = 0; i < count; i++) {
-        GSmaterialEntry* entry = (GSmaterialEntry*)((u8*)gsMatPool + i * 0x170);
+    u32 i = 0;
+    while (i < lbl_8047AB78) {
+        GSmaterialEntry* entry = (GSmaterialEntry*)((u8*)lbl_8047AB74 + i * 0x170);
         if (entry->flags & GSMAT_FLAG_ACTIVE) {
             entry->flags |= GSMAT_FLAG_ALPHATEST;
         }
+        i++;
     }
 }
 #endif
