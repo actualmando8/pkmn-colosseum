@@ -1,0 +1,32 @@
+{
+  "_comment": "User-maintained agent lockout / rate-limit schedule. The dashboard reads this (GET /api/limits) and renders a 'next reset' countdown panel. Edit the fields below to match reality. Times are ISO-8601 UTC (trailing Z). reset_interval_hours drives the rolling countdown from last_reset; for fixed daily windows leave reset_interval_hours null and set next_reset explicitly.",
+  "agents": [
+    {
+      "name": "codex",
+      "label": "Codex (5h rolling)",
+      "kind": "rolling",
+      "reset_interval_hours": 5,
+      "last_reset": "2026-06-14T20:00:00Z",
+      "next_reset": null,
+      "note": "ChatGPT/Codex 5-hour usage window; set last_reset when the window flips."
+    },
+    {
+      "name": "deepseek-v4-flash",
+      "label": "DeepSeek V4 (daily)",
+      "kind": "daily",
+      "reset_interval_hours": 24,
+      "last_reset": "2026-06-14T00:00:00Z",
+      "next_reset": null,
+      "note": "Daily token quota; flips at 00:00 UTC."
+    },
+    {
+      "name": "mimo",
+      "label": "MiMo (rate limit)",
+      "kind": "rolling",
+      "reset_interval_hours": 1,
+      "last_reset": null,
+      "next_reset": null,
+      "note": "Placeholder — set reset_interval_hours and last_reset to the real cadence."
+    }
+  ]
+}

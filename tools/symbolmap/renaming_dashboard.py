@@ -23,6 +23,23 @@ SYMBOLS = ROOT / "config" / "GC6E01" / "symbols.txt"
 FUNC_TU_MAP = ROOT / "config" / "GC6E01" / "func_tu_map.json"
 DECOMP_REPORT = ROOT / "report.json"
 DECOMP_STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
+# --- v9: reader / wall / agent / token / lockout data sources --------------------
+DECOMP_WORK = ROOT / "tools" / "decomp_work"
+COORD_DIR = DECOMP_WORK / "coordination"
+WALLS_MD = ROOT / "WALLS.md"
+EQUIVALENT_TXT = DECOMP_WORK / "equivalent.txt"
+CS_WALLS_JSON = ROOT / "build" / "cs_walls.json"
+AGENT_STATUS_TXT = COORD_DIR / "agent_status.txt"
+CLAIMS_JSON = COORD_DIR / "claims.json"
+TASKS_JSON = COORD_DIR / "tasks.json"
+AGENT_TOKENS_JSON = ROOT / ".omc" / "agent_tokens.json"
+AGENT_LIMITS_JSON = DECOMP_WORK / "agent_limits.json"
+OPENCODE_STORAGE = Path(
+    os.environ.get(
+        "OPENCODE_STORAGE",
+        str(Path.home() / ".local" / "share" / "opencode" / "storage"),
+    )
+)
 HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_history.json"
 UNIT_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_unit_history.json"
 FN_HISTORY_FILE = ROOT / ".omx" / "state" / "renaming_dashboard_fn_history.json"
@@ -33,7 +50,7 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 8
+DASHBOARD_VERSION = 9
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -909,6 +926,452 @@ def build_state() -> dict[str, object]:
             "decomp_report": str(DECOMP_REPORT),
             "decomp_status_log": str(DECOMP_STATUS_LOG),
         },
+    }
+
+
+# =========================================================================== #
+# v9: decomp.me-style function reader (compile + objdiff, per-instruction)     #
+# =========================================================================== #
+# band.py already encodes the exact compile+objdiff invocation against the
+# immutable target object. We reuse compile_check (per-file flags/version/target)
+# the same way band.py does, then run objdiff-cli in JSON mode and slice out the
+# requested fn's left(TARGET)/right(CURRENT) instruction rows.
+sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "tools" / "decomp_work"))
+try:  # imported lazily-safe: the reader endpoint degrades to an error payload
+    import compile_check as _compile_check  # type: ignore
+except Exception:  # noqa: BLE001
+    _compile_check = None
+_OBJDIFF_CLI = ROOT / "tools" / "objdiff-cli.exe"
+
+# TTL cache keyed by (source, fn). The compile is slow (~seconds), so a hit
+# within the TTL or while the source file is unchanged returns instantly.
+_ASM_CACHE: dict[str, dict[str, object]] = {}
+_ASM_CACHE_TTL_SECONDS = 90.0
+_ASM_LOCK = threading.Lock()
+
+
+def _resolve_source_path(name: str) -> Path | None:
+    """Resolve a stem or repo-relative path to a tracked src/**.c (band.py-style)."""
+    if not name:
+        return None
+    norm = name.replace("\\", "/")
+    cand = ROOT / norm
+    if cand.exists():
+        return cand.resolve()
+    stem = Path(norm).stem
+    matches = sorted((ROOT / "src").rglob(f"{stem}.c"))
+    return matches[0].resolve() if matches else None
+
+
+def _instr_text(ins: object) -> str:
+    if not isinstance(ins, dict):
+        return "---"
+    inner = ins.get("instruction")
+    if isinstance(inner, dict):
+        return str(inner.get("formatted") or inner.get("mnemonic") or "?")
+    return "---"
+
+
+def _row_state(lk: str, rk: str) -> str:
+    """Map objdiff diff_kind pair -> a coarse row colour class."""
+    if lk in ("DIFF_NONE", "") and rk in ("DIFF_NONE", ""):
+        return "same"
+    if lk in ("DIFF_DELETE",) or rk in ("DIFF_INSERT",):
+        return "addrm"
+    return "diff"
+
+
+def compute_asm_diff(source: str, fn: str) -> dict[str, object]:
+    """Compile `source` to its base .o and objdiff vs the target; return the
+    aligned per-instruction rows for `fn`. Shape mirrors band.py cmd_diff."""
+    if _compile_check is None:
+        return {"available": False, "error": "compile_check import failed", "fn": fn, "source": source}
+    src_path = _resolve_source_path(source)
+    if src_path is None:
+        return {"available": False, "error": f"source not found: {source}", "fn": fn, "source": source}
+    if not _OBJDIFF_CLI.exists():
+        return {"available": False, "error": "objdiff-cli not found", "fn": fn, "source": source}
+
+    cache_key = f"{src_path}|{fn}"
+    try:
+        mtime = src_path.stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    now = time.monotonic()
+    with _ASM_LOCK:
+        hit = _ASM_CACHE.get(cache_key)
+        if hit is not None and hit.get("_mtime") == mtime and now < float(hit.get("_expires", 0)):
+            return hit["payload"]  # type: ignore[return-value]
+
+    try:
+        target_o = _compile_check.find_target_obj(src_path)
+        if not Path(target_o).exists():
+            return {"available": False, "error": f"target object missing: {target_o}", "fn": fn, "source": source}
+        base_o = _compile_check.compile_source(src_path, verbose=False)
+    except SystemExit as exc:  # compile_source exits on failure
+        return {"available": False, "error": f"compile failed: {exc}", "fn": fn, "source": source}
+    except Exception as exc:  # noqa: BLE001
+        return {"available": False, "error": f"compile error: {exc}", "fn": fn, "source": source}
+
+    try:
+        proc = subprocess.run(
+            [str(_OBJDIFF_CLI), "diff", "-1", str(target_o), "-2", str(base_o),
+             "-o", "-", "--format", "json",
+             "-c", "ppc.calculatePoolRelocations=false"],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=180,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"available": False, "error": f"objdiff failed: {exc}", "fn": fn, "source": source}
+    if proc.returncode != 0:
+        return {"available": False, "error": "objdiff failed: " + proc.stderr[:300], "fn": fn, "source": source}
+    try:
+        diff = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return {"available": False, "error": "objdiff returned non-JSON", "fn": fn, "source": source}
+
+    def _side(side: str) -> list:
+        for sym in diff.get(side, {}).get("symbols", []):
+            if sym.get("name") == fn:
+                return sym.get("instructions", []) or []
+        return []
+
+    left, right = _side("left"), _side("right")
+    rows = []
+    matched = 0
+    total = 0
+    for idx in range(max(len(left), len(right))):
+        li = left[idx] if idx < len(left) else None
+        ri = right[idx] if idx < len(right) else None
+        lk = (li.get("diff_kind") if isinstance(li, dict) else None) or ("X" if li is None else "DIFF_NONE")
+        rk = (ri.get("diff_kind") if isinstance(ri, dict) else None) or ("X" if ri is None else "DIFF_NONE")
+        state = _row_state(lk, rk)
+        if li is not None and ri is not None:
+            total += 1
+            if state == "same":
+                matched += 1
+        rows.append({"l": _instr_text(li), "r": _instr_text(ri), "state": state})
+    # fuzzy_pct from objdiff symbol match_percent (right side), fallback to ratio
+    fuzzy = 0.0
+    for sym in diff.get("right", {}).get("symbols", []):
+        if sym.get("name") == fn:
+            fuzzy = float(sym.get("match_percent") or 0.0)
+            break
+    if fuzzy == 0.0 and total:
+        fuzzy = round(100.0 * matched / total, 2)
+
+    payload = {
+        "available": True,
+        "fn": fn,
+        "source": str(src_path.relative_to(ROOT)).replace("\\", "/"),
+        "target_obj": Path(target_o).name,
+        "fuzzy_pct": round(fuzzy, 2),
+        "rows": rows,
+        "row_count": len(rows),
+        "matched": matched,
+        "total": total,
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    with _ASM_LOCK:
+        _ASM_CACHE[cache_key] = {"_mtime": mtime, "_expires": now + _ASM_CACHE_TTL_SECONDS, "payload": payload}
+    return payload
+
+
+# =========================================================================== #
+# v9: per-function wall / equivalent / attempt info                           #
+# =========================================================================== #
+_WALL_CLASS_RE = re.compile(r"\b(W-[A-Za-z0-9-]+|W[0-9])\b")
+
+
+def _parse_equivalent(fn: str) -> tuple[bool, str]:
+    """Return (is_equivalent, note) by scanning equivalent.txt for `fn`."""
+    text = read_text(EQUIVALENT_TXT)
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        # `fn_XXXX   # reason`  (whitespace or tab separated)
+        head = re.split(r"[\s#]", stripped, 1)[0]
+        if head == fn:
+            note = ""
+            if "#" in stripped:
+                note = stripped.split("#", 1)[1].strip()
+            return True, note
+    return False, ""
+
+
+def _parse_walls_md(fn: str) -> tuple[str, str]:
+    """Return (wall_class, note) for `fn` from WALLS.md table/bullet entries."""
+    text = read_text(WALLS_MD)
+    for raw in text.splitlines():
+        # match the fn name wrapped in backticks or bare, anywhere on the line
+        if fn not in raw:
+            continue
+        # Skip lines that are pure cross-references in prose (keep table rows + bullets)
+        stripped = raw.strip()
+        if not (stripped.startswith("|") or stripped.startswith("- ")):
+            continue
+        cls_match = _WALL_CLASS_RE.search(raw)
+        wall_class = cls_match.group(1) if cls_match else ""
+        # Trim markdown table pipes / leading bullet for a readable note.
+        note = stripped.strip("|").strip()
+        note = re.sub(r"^[-*]\s*", "", note)
+        # Collapse the leading "`fn_XXXX`" token out of the note for brevity.
+        note = note.replace(f"`{fn}`", "").replace(fn, "").strip(" |-")
+        if len(note) > 360:
+            note = note[:357] + "..."
+        return wall_class, note
+    return "", ""
+
+
+def _parse_cs_walls(fn: str) -> bool:
+    """True if `fn` is listed in build/cs_walls.json (a flat list of fn names)."""
+    if not CS_WALLS_JSON.exists():
+        return False
+    try:
+        data = json.loads(CS_WALLS_JSON.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    if isinstance(data, list):
+        return fn in data
+    if isinstance(data, dict):
+        return fn in data
+    return False
+
+
+def _fn_attempts(fn: str) -> list[dict[str, object]]:
+    """Recent status.md attempt-log lines that name `fn`."""
+    out = []
+    for row in load_attempt_log(DECOMP_STATUS_LOG):
+        if row.get("function") == fn or (fn and fn in str(row.get("message", ""))):
+            out.append({
+                "timestamp": row.get("timestamp"),
+                "kind": row.get("kind"),
+                "percent": row.get("percent"),
+                "message": row.get("message"),
+            })
+    return out[-25:]
+
+
+def load_fn_info(fn: str) -> dict[str, object]:
+    is_equiv, equiv_note = _parse_equivalent(fn)
+    wall_class, wall_note = _parse_walls_md(fn)
+    in_cs_walls = _parse_cs_walls(fn)
+    attempts = _fn_attempts(fn)
+    return {
+        "fn": fn,
+        "wall_class": wall_class,
+        "note": wall_note or equiv_note,
+        "is_equivalent": is_equiv,
+        "in_cs_walls": in_cs_walls,
+        "attempts": attempts,
+        "attempt_count": len(attempts),
+    }
+
+
+# =========================================================================== #
+# v9: agent-activity panel (merge shell dashboards into the web)              #
+# =========================================================================== #
+def load_agents() -> dict[str, object]:
+    """Parse coordination/{agent_status.txt, claims.json, tasks.json} into a
+    who-is-working-on-what view."""
+    agents: dict[str, dict[str, object]] = {}
+
+    # agent_status.txt: e.g. "20:22:58 codex=false opencode=true" (latest line)
+    status_line = ""
+    flags: dict[str, bool] = {}
+    for line in read_text(AGENT_STATUS_TXT).splitlines():
+        line = line.strip()
+        if line:
+            status_line = line
+    if status_line:
+        for tok in status_line.split():
+            if "=" in tok:
+                key, _, val = tok.partition("=")
+                flags[key] = val.strip().lower() in ("true", "1", "yes", "busy", "active")
+
+    # In-flight task lookup: latest 'claimed' status task per function.
+    inflight: dict[str, dict[str, object]] = {}
+    try:
+        tasks = json.loads(TASKS_JSON.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, json.JSONDecodeError):
+        tasks = []
+    if isinstance(tasks, list):
+        for t in tasks:
+            if not isinstance(t, dict):
+                continue
+            if t.get("status") == "claimed":
+                by = str(t.get("claimed_by") or "")
+                if by:
+                    inflight.setdefault(by, t)
+
+    # claims.json: [{agent, function, claimed_at, task_id}]
+    try:
+        claims = json.loads(CLAIMS_JSON.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, json.JSONDecodeError):
+        claims = []
+    rows: list[dict[str, object]] = []
+    if isinstance(claims, list):
+        # newest claim per agent wins for the live table
+        latest: dict[str, dict[str, object]] = {}
+        for c in claims:
+            if not isinstance(c, dict):
+                continue
+            agent = str(c.get("agent") or "")
+            if not agent:
+                continue
+            prev = latest.get(agent)
+            if prev is None or str(c.get("claimed_at", "")) >= str(prev.get("claimed_at", "")):
+                latest[agent] = c
+        for agent, c in latest.items():
+            task = inflight.get(agent) or {}
+            meta = task.get("meta", {}) if isinstance(task.get("meta"), dict) else {}
+            # status flag: prefer the agent_status busy flags, else infer from inflight
+            busy = flags.get(agent.split("-")[0], flags.get(agent, bool(task)))
+            rows.append({
+                "agent": agent,
+                "function": str(c.get("function") or task.get("function") or ""),
+                "file": str(meta.get("file") or ""),
+                "claimed_at": c.get("claimed_at"),
+                "task_status": str(task.get("status") or ""),
+                "busy": bool(busy),
+            })
+    rows.sort(key=lambda r: str(r.get("claimed_at") or ""), reverse=True)
+
+    # token usage (.omc/agent_tokens.json) merged in per agent when names match
+    tokens = _load_json_obj(AGENT_TOKENS_JSON).get("agents", {})
+    if isinstance(tokens, dict):
+        for r in rows:
+            tk = tokens.get(r["agent"])
+            if isinstance(tk, dict):
+                r["tokens_used"] = int_value(tk.get("tokens_used", 0))
+                r["token_limit"] = int_value(tk.get("limit", 0))
+                r["token_status"] = tk.get("status", "")
+
+    return {
+        "available": bool(rows) or bool(flags),
+        "status_line": status_line,
+        "flags": flags,
+        "agents": rows,
+        "queued": sum(1 for t in tasks if isinstance(t, dict) and t.get("status") == "queued") if isinstance(tasks, list) else 0,
+        "claimed": sum(1 for t in tasks if isinstance(t, dict) and t.get("status") == "claimed") if isinstance(tasks, list) else 0,
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+# =========================================================================== #
+# v9: token-expense-over-time (OpenCode session storage) + lockout schedule   #
+# =========================================================================== #
+_TOKENS_CACHE: dict[str, object] = {"value": None, "expires": 0.0}
+_TOKENS_CACHE_TTL = 120.0
+
+
+def load_tokens(hours: int = 72) -> dict[str, object]:
+    """Bucket OpenCode assistant-message token usage into hourly samples.
+
+    Source: <opencode>/storage/message/**/<msg>.json — each assistant message
+    carries time.created (unix ms) + tokens.{input,output,reasoning,cache}. We
+    sum input+output per UTC hour over the trailing `hours` window. This is a
+    REAL data source (no collector required); see DASHBOARD UX notes for the
+    per-model breakdown extension."""
+    now = time.monotonic()
+    cached = _TOKENS_CACHE.get("value")
+    if cached is not None and now < float(_TOKENS_CACHE.get("expires", 0)):
+        return cached  # type: ignore[return-value]
+
+    msg_dir = OPENCODE_STORAGE / "message"
+    if not msg_dir.exists():
+        payload = {"available": False, "reason": f"opencode storage not found: {msg_dir}", "buckets": []}
+        _TOKENS_CACHE["value"] = payload
+        _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
+        return payload
+
+    cutoff_ms = (time.time() - hours * 3600) * 1000.0
+    buckets: dict[int, dict[str, float]] = {}
+    files = 0
+    for path in msg_dir.rglob("*.json"):
+        files += 1
+        try:
+            d = json.loads(path.read_text(encoding="utf-8", errors="replace"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if d.get("role") != "assistant":
+            continue
+        tk = d.get("tokens")
+        if not isinstance(tk, dict):
+            continue
+        created = ((d.get("time") or {}).get("created")) if isinstance(d.get("time"), dict) else None
+        if not isinstance(created, (int, float)) or created < cutoff_ms:
+            continue
+        hour = int(created // 3600000) * 3600  # unix seconds, hour-aligned
+        b = buckets.setdefault(hour, {"in": 0.0, "out": 0.0, "total": 0.0, "n": 0.0})
+        b["in"] += float(tk.get("input") or 0)
+        b["out"] += float(tk.get("output") or 0)
+        b["total"] += float(tk.get("total") or (float(tk.get("input") or 0) + float(tk.get("output") or 0)))
+        b["n"] += 1
+    series = [
+        {"unix": hour, "input": int(v["in"]), "output": int(v["out"]),
+         "total": int(v["total"]), "messages": int(v["n"])}
+        for hour, v in sorted(buckets.items())
+    ]
+    grand = int(sum(s["total"] for s in series))
+    payload = {
+        "available": bool(series),
+        "buckets": series,
+        "window_hours": hours,
+        "grand_total": grand,
+        "scanned_files": files,
+        "source": str(msg_dir),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    _TOKENS_CACHE["value"] = payload
+    _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
+    return payload
+
+
+def _parse_iso(ts: object) -> float:
+    """Parse an ISO-8601 UTC string (trailing Z optional) -> unix seconds, or 0."""
+    if not isinstance(ts, str) or not ts:
+        return 0.0
+    try:
+        return time.mktime(time.strptime(ts.replace("Z", "").split(".")[0], "%Y-%m-%dT%H:%M:%S")) - time.timezone
+    except (ValueError, OverflowError):
+        return 0.0
+
+
+def load_limits() -> dict[str, object]:
+    """Read the user-maintained agent_limits.json and compute next-reset unix
+    timestamps for the countdown panel."""
+    data = _load_json_obj(AGENT_LIMITS_JSON)
+    agents_in = data.get("agents", []) if isinstance(data.get("agents"), list) else []
+    now = time.time()
+    out = []
+    for a in agents_in:
+        if not isinstance(a, dict):
+            continue
+        next_unix = _parse_iso(a.get("next_reset"))
+        if not next_unix:
+            interval = a.get("reset_interval_hours")
+            last = _parse_iso(a.get("last_reset"))
+            if isinstance(interval, (int, float)) and interval and last:
+                step = interval * 3600
+                # roll forward from last_reset to the first reset strictly in the future
+                k = max(0, int((now - last) // step) + 1)
+                next_unix = last + k * step
+        out.append({
+            "name": a.get("name", ""),
+            "label": a.get("label", a.get("name", "")),
+            "kind": a.get("kind", ""),
+            "reset_interval_hours": a.get("reset_interval_hours"),
+            "next_reset_unix": int(next_unix) if next_unix else 0,
+            "seconds_until": int(next_unix - now) if next_unix else 0,
+            "note": a.get("note", ""),
+        })
+    return {
+        "available": bool(out),
+        "source": str(AGENT_LIMITS_JSON),
+        "agents": out,
+        "now_unix": int(now),
     }
 
 
@@ -1790,9 +2253,188 @@ HTML = r"""<!doctype html>
       gap: 12px;
       margin-bottom: 12px;
     }
+    /* ---- v9: decomp.me-style function reader ------------------------------ */
+    .reader-overlay {
+      display: none;
+      margin-bottom: 12px;
+    }
+    .reader-overlay.active { display: block; }
+    .reader-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .reader-fn {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 18px;
+      font-weight: 800;
+      color: #eef4fb;
+    }
+    .reader-pct {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .reader-pct.good { color: #58d889; }
+    .reader-pct.near { color: #f0b35a; }
+    .reader-pct.bad { color: #e07171; }
+    .reader-meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .reader-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(260px, .6fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .asm-pane {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0b1018;
+      overflow: hidden;
+    }
+    .asm-colhead {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr;
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #1b2535;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .asm-colhead span {
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #c4cfdd;
+      letter-spacing: .04em;
+    }
+    .asm-colhead .target { border-right: 1px solid var(--line); }
+    .asm-body {
+      max-height: 560px;
+      overflow: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .asm-line {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr;
+      border-bottom: 1px solid rgba(38, 50, 68, .5);
+    }
+    .asm-line:hover { background: rgba(92, 145, 223, .07); }
+    .asm-num {
+      color: #4d5b70;
+      text-align: right;
+      padding: 1px 6px;
+      user-select: none;
+      background: rgba(0, 0, 0, .18);
+    }
+    .asm-cell {
+      padding: 1px 10px;
+      white-space: pre;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .asm-cell.target { border-right: 1px solid rgba(45, 58, 75, .8); }
+    .asm-line.same .asm-cell { color: #b9c6d6; }
+    .asm-line.diff { background: rgba(224, 113, 113, .10); }
+    .asm-line.diff .asm-cell.current { color: #ff9a9a; }
+    .asm-line.diff .asm-cell.target { color: #ffd28a; }
+    .asm-line.addrm { background: rgba(240, 179, 90, .09); }
+    .asm-line.addrm .asm-cell { color: #c69152; }
+    .asm-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .reader-side { display: grid; gap: 12px; }
+    .wall-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      padding: 12px;
+    }
+    .wall-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .wall-banner.wall { background: rgba(224, 113, 113, .16); color: #ffaaaa; border: 1px solid rgba(224, 113, 113, .4); }
+    .wall-banner.equiv { background: rgba(169, 142, 230, .16); color: #d6c6ff; border: 1px solid rgba(169, 142, 230, .4); }
+    .wall-banner.clear { background: rgba(56, 185, 149, .14); color: #93f0d2; border: 1px solid rgba(56, 185, 149, .35); }
+    .wall-note {
+      color: #cdd8e6;
+      font-size: 12.5px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+    .agent-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .agent-table th, .agent-table td {
+      padding: 7px 9px;
+      border-bottom: 1px solid #263244;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .agent-table th { color: #c4cfdd; font-size: 11px; text-transform: uppercase; }
+    .agent-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .agent-dot.busy { background: #58d889; box-shadow: 0 0 6px #58d889; }
+    .agent-dot.idle { background: #5b6a80; }
+    .limit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .limit-card {
+      border: 1px solid #263244;
+      border-radius: 7px;
+      background: #101824;
+      padding: 11px;
+    }
+    .limit-label { color: var(--muted); font-size: 11px; font-weight: 760; text-transform: uppercase; }
+    .limit-countdown {
+      margin-top: 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 22px;
+      font-weight: 800;
+      color: #f0b35a;
+    }
+    .limit-countdown.soon { color: #e07171; }
+    .limit-note { margin-top: 4px; color: var(--quiet); font-size: 11px; }
+    .ops3-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: start;
+    }
     @media (max-width: 1180px) {
       .metric-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
-      .overview, .chart-grid, .ops-grid, .workbench, .decomp-workspace, .history-layout { grid-template-columns: 1fr; }
+      .overview, .chart-grid, .ops-grid, .ops3-grid, .workbench, .decomp-workspace, .history-layout, .reader-grid { grid-template-columns: 1fr; }
       .detail-panel { position: static; }
     }
     @media (max-width: 760px) {
@@ -1899,12 +2541,74 @@ HTML = r"""<!doctype html>
         <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
       </section>
 
+      <section class="panel reader-overlay" id="reader-overlay">
+        <div class="panel-title">
+          <h2>Function Reader</h2>
+          <button class="btn ghost" id="reader-back" type="button">&#8592; Back to treemap</button>
+        </div>
+        <div class="reader-head">
+          <span class="reader-fn" id="reader-fn">fn_</span>
+          <span class="reader-pct" id="reader-pct">--%</span>
+          <span class="reader-meta" id="reader-meta"></span>
+        </div>
+        <div class="reader-grid">
+          <div>
+            <div class="asm-pane">
+              <div class="asm-colhead">
+                <span></span>
+                <span class="target">Target (aim for)</span>
+                <span class="current">Current build</span>
+              </div>
+              <div class="asm-body" id="asm-body"></div>
+            </div>
+            <div class="asm-legend">
+              <span class="legend-item"><span class="swatch" style="--swatch:#5c91df"></span>match</span>
+              <span class="legend-item"><span class="swatch" style="--swatch:#e07171"></span>differs</span>
+              <span class="legend-item"><span class="swatch" style="--swatch:#f0b35a"></span>insert / delete</span>
+            </div>
+          </div>
+          <aside class="reader-side" id="reader-side"></aside>
+        </div>
+      </section>
+
       <section class="panel">
         <div class="panel-title">
           <h2>Decomp Attempt Log</h2>
           <span class="panel-note" id="decomp-log-note"></span>
         </div>
         <div class="attempt-list" id="decomp-log"></div>
+      </section>
+
+      <section class="ops3-grid">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Agent Activity</h2>
+            <span class="panel-note" id="agents-note"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="agent-table">
+              <thead>
+                <tr><th>Agent</th><th>Function</th><th>File</th><th>Claimed</th><th>State</th></tr>
+              </thead>
+              <tbody id="agents-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Lockout Resets</h2>
+            <span class="panel-note" id="limits-note"></span>
+          </div>
+          <div class="limit-grid" id="limits-grid"></div>
+        </div>
+      </section>
+
+      <section class="panel chart-card">
+        <div class="panel-title">
+          <h2>Token Expense Over Time</h2>
+          <span class="panel-note" id="tokens-note"></span>
+        </div>
+        <canvas id="tokens-chart" height="205"></canvas>
       </section>
     </section>
 
@@ -2079,7 +2783,12 @@ HTML = r"""<!doctype html>
       },
       filesSort: "total_code",
       filesDir: -1,
-      fnHistoryCache: {}
+      fnHistoryCache: {},
+      // v9: function reader + agent/lockout/token panels
+      reader: { open: false, fn: "", source: "" },
+      limits: [],
+      agentsTimer: null,
+      limitsTimer: null
     };
     const statusClass = {
       "Needs wiring": "needs",
@@ -2941,11 +3650,17 @@ HTML = r"""<!doctype html>
       tip.hidden = false;
       tip.innerHTML = hit.item.tip;
       const shell = $("decomp-treemap").parentElement.getBoundingClientRect();
-      let left = evt.clientX - shell.left + 12;
-      let top = evt.clientY - shell.top + 12;
-      if (left + 290 > shell.width) left = shell.width - 290;
-      tip.style.left = `${Math.max(0, left)}px`;
-      tip.style.top = `${Math.max(0, top)}px`;
+      // Measure the tip now that its content is set, then flip it above/left of
+      // the cursor when it would overflow the (overflow:hidden) shell — without
+      // this, tooltips on bottom/right tiles render off-canvas and stay invisible.
+      const tw = tip.offsetWidth || 280;
+      const th = tip.offsetHeight || 60;
+      let left = evt.clientX - shell.left + 14;
+      let top = evt.clientY - shell.top + 14;
+      if (left + tw > shell.width) left = evt.clientX - shell.left - tw - 14;
+      if (top + th > shell.height) top = evt.clientY - shell.top - th - 14;
+      tip.style.left = `${Math.max(0, Math.min(left, shell.width - tw))}px`;
+      tip.style.top = `${Math.max(0, Math.min(top, shell.height - th))}px`;
     }
     function onTreemapClick(evt) {
       const hit = treemapHit(evt);
@@ -2985,6 +3700,163 @@ HTML = r"""<!doctype html>
       store.tm.selectedFn = fn.name || "";
       renderCrumbs();
       renderDecompDetail(store.data);
+      openReader(fn.name || "");
+    }
+    // ---- v9: decomp.me-style function reader --------------------------------
+    function closeReader() {
+      store.reader.open = false;
+      $("reader-overlay").classList.remove("active");
+    }
+    function openReader(fnName) {
+      if (!fnName) return;
+      const source = store.tm.unitFnsSource || store.tm.unitSource || store.tm.unitName || "";
+      store.reader = { open: true, fn: fnName, source };
+      const overlay = $("reader-overlay");
+      overlay.classList.add("active");
+      overlay.scrollIntoView({ behavior: "smooth", block: "start" });
+      setText($("reader-fn"), fnName);
+      setText($("reader-pct"), "...");
+      $("reader-pct").className = "reader-pct";
+      setText($("reader-meta"), "compiling + diffing (first load ~5-8s)...");
+      const body = $("asm-body");
+      body.replaceChildren();
+      const wait = document.createElement("div");
+      wait.className = "empty-state";
+      setText(wait, "Compiling " + shortSource(source) + ".c and running objdiff...");
+      body.append(wait);
+      $("reader-side").replaceChildren();
+      // Fire wall-info and asm-diff in parallel.
+      loadFnInfo(fnName);
+      const url = `/api/asm?source=${encodeURIComponent(source)}&fn=${encodeURIComponent(fnName)}`;
+      fetch(url, { cache: "no-store" }).then(r => r.json()).then(payload => {
+        if (!store.reader.open || store.reader.fn !== fnName) return;
+        renderReaderAsm(payload);
+      }).catch(() => {
+        if (!store.reader.open || store.reader.fn !== fnName) return;
+        renderReaderAsm({ available: false, error: "request failed" });
+      });
+    }
+    function renderReaderAsm(payload) {
+      const body = $("asm-body");
+      body.replaceChildren();
+      if (!payload || !payload.available) {
+        const err = document.createElement("div");
+        err.className = "empty-state";
+        setText(err, (payload && payload.error) ? `Reader unavailable: ${payload.error}` : "No diff data available.");
+        body.append(err);
+        setText($("reader-pct"), "--%");
+        $("reader-pct").className = "reader-pct bad";
+        setText($("reader-meta"), payload && payload.source ? payload.source : "");
+        return;
+      }
+      const pct = Number(payload.fuzzy_pct || 0);
+      setText($("reader-pct"), pct.toFixed(2) + "%");
+      $("reader-pct").className = "reader-pct " + (pct >= 99.95 ? "good" : pct >= 90 ? "near" : "bad");
+      setText($("reader-meta"), `${payload.source} | ${payload.target_obj || ""} | ${payload.matched || 0}/${payload.total || 0} instr match`);
+      const rows = payload.rows || [];
+      if (!rows.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "objdiff returned no instructions for this symbol.");
+        body.append(empty);
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      rows.forEach((row, idx) => {
+        const line = document.createElement("div");
+        line.className = `asm-line ${row.state || "same"}`;
+        const num = document.createElement("div");
+        num.className = "asm-num";
+        num.textContent = String(idx + 1);
+        const target = document.createElement("div");
+        target.className = "asm-cell target";
+        target.textContent = row.l || "";
+        const current = document.createElement("div");
+        current.className = "asm-cell current";
+        current.textContent = row.r || "";
+        line.append(num, target, current);
+        frag.append(line);
+      });
+      body.append(frag);
+    }
+    function loadFnInfo(fnName) {
+      fetch(`/api/fninfo?fn=${encodeURIComponent(fnName)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(info => {
+          if (!store.reader.open || store.reader.fn !== fnName) return;
+          renderFnInfo(info);
+        })
+        .catch(() => {});
+    }
+    function renderFnInfo(info) {
+      const side = $("reader-side");
+      side.replaceChildren();
+      const card = document.createElement("div");
+      card.className = "wall-card";
+      const banner = document.createElement("div");
+      const hasWall = info.wall_class || info.in_cs_walls;
+      if (info.is_equivalent) {
+        banner.className = "wall-banner equiv";
+        setText(banner, "Logged Equivalent");
+      } else if (hasWall) {
+        banner.className = "wall-banner wall";
+        setText(banner, `Known wall${info.wall_class ? ": " + info.wall_class : ""}`);
+      } else {
+        banner.className = "wall-banner clear";
+        setText(banner, "No wall logged");
+      }
+      card.append(banner);
+      if (info.wall_class || info.in_cs_walls) {
+        const tags = document.createElement("div");
+        tags.className = "reader-meta";
+        const bits = [];
+        if (info.wall_class) bits.push(info.wall_class);
+        if (info.in_cs_walls) bits.push("cs_walls.json");
+        if (info.is_equivalent) bits.push("equivalent.txt");
+        setText(tags, bits.join(" | "));
+        tags.style.marginBottom = "8px";
+        card.append(tags);
+      }
+      if (info.note) {
+        const note = document.createElement("div");
+        note.className = "wall-note";
+        setText(note, info.note);
+        card.append(note);
+      } else if (!hasWall && !info.is_equivalent) {
+        const note = document.createElement("div");
+        note.className = "wall-note";
+        setText(note, "Not in WALLS.md, equivalent.txt, or cs_walls.json. If this fn is below 100%, it is an open target.");
+        card.append(note);
+      }
+      side.append(card);
+      // history chart for the fn (reuse existing per-fn endpoint via canvas)
+      const histCard = document.createElement("div");
+      histCard.className = "wall-card";
+      const histTitle = document.createElement("div");
+      histTitle.className = "limit-label";
+      setText(histTitle, `${info.attempt_count || 0} logged attempts`);
+      histCard.append(histTitle);
+      if ((info.attempts || []).length) {
+        const list = document.createElement("div");
+        list.className = "function-list";
+        list.style.maxHeight = "180px";
+        list.style.marginTop = "8px";
+        for (const a of info.attempts.slice().reverse().slice(0, 12)) {
+          const row = document.createElement("div");
+          row.className = "attempt-row";
+          row.style.gridTemplateColumns = "120px 1fr";
+          const t = document.createElement("div");
+          t.className = "attempt-time";
+          setText(t, hstTime(a.timestamp));
+          const m = document.createElement("div");
+          m.className = "attempt-message";
+          setText(m, a.message || a.kind || "");
+          row.append(t, m);
+          list.append(row);
+        }
+        histCard.append(list);
+      }
+      side.append(histCard);
     }
     function gotoFiles() {
       const tm = store.tm;
@@ -3229,6 +4101,172 @@ HTML = r"""<!doctype html>
       drawHistory($("history-chart"), data.history || []);
       renderSourceBars(data);
     }
+    // ---- v9: agent activity ------------------------------------------------
+    function renderAgents(payload) {
+      const body = $("agents-body");
+      body.replaceChildren();
+      const rows = (payload && payload.agents) || [];
+      setText($("agents-note"), payload && payload.available
+        ? `${rows.length} agent(s) | ${payload.claimed || 0} claimed, ${payload.queued || 0} queued`
+        : "coordination data unavailable");
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.className = "empty-state";
+        setText(cell, "No active claims in coordination/claims.json");
+        tr.append(cell);
+        body.append(tr);
+        return;
+      }
+      for (const a of rows) {
+        const tr = document.createElement("tr");
+        const agent = document.createElement("td");
+        agent.className = "mono";
+        setText(agent, a.agent);
+        const fn = document.createElement("td");
+        fn.className = "mono";
+        setText(fn, a.function || "-");
+        const file = document.createElement("td");
+        file.className = "mono";
+        setText(file, a.file ? fileName(a.file) : "-");
+        const claimed = document.createElement("td");
+        claimed.className = "mono";
+        setText(claimed, a.claimed_at ? hstTime(a.claimed_at) : "-");
+        const state = document.createElement("td");
+        const dot = document.createElement("span");
+        dot.className = `agent-dot ${a.busy ? "busy" : "idle"}`;
+        state.append(dot, document.createTextNode(a.busy ? "busy" : (a.task_status || "idle")));
+        tr.append(agent, fn, file, claimed, state);
+        body.append(tr);
+      }
+    }
+    function pollAgents() {
+      fetch("/api/agents", { cache: "no-store" })
+        .then(r => r.json()).then(renderAgents).catch(() => {});
+    }
+    // ---- v9: lockout reset countdowns --------------------------------------
+    function fmtCountdown(secs) {
+      secs = Math.max(0, Math.floor(secs));
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+      if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m`;
+      if (m > 0) return `${m}m ${String(s).padStart(2, "0")}s`;
+      return `${s}s`;
+    }
+    function renderLimits(payload) {
+      store.limits = (payload && payload.agents) || [];
+      setText($("limits-note"), payload && payload.available ? `${store.limits.length} tracked` : "agent_limits.json TODO");
+      tickLimits();
+    }
+    function tickLimits() {
+      const grid = $("limits-grid");
+      grid.replaceChildren();
+      if (!store.limits.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No agents in tools/decomp_work/agent_limits.json");
+        grid.append(empty);
+        return;
+      }
+      const now = Date.now() / 1000;
+      for (const a of store.limits) {
+        const card = document.createElement("div");
+        card.className = "limit-card";
+        const label = document.createElement("div");
+        label.className = "limit-label";
+        setText(label, a.label || a.name);
+        const cd = document.createElement("div");
+        const remaining = a.next_reset_unix ? a.next_reset_unix - now : 0;
+        cd.className = "limit-countdown" + (remaining > 0 && remaining < 1800 ? " soon" : "");
+        setText(cd, a.next_reset_unix ? fmtCountdown(remaining) : "n/a");
+        const note = document.createElement("div");
+        note.className = "limit-note";
+        setText(note, a.next_reset_unix ? `resets ${hstTime(a.next_reset_unix)} HST` : (a.note || "set last_reset"));
+        card.append(label, cd, note);
+        grid.append(card);
+      }
+    }
+    function pollLimits() {
+      fetch("/api/limits", { cache: "no-store" })
+        .then(r => r.json()).then(renderLimits).catch(() => {});
+    }
+    // ---- v9: token-expense bar/area chart over hourly buckets --------------
+    function drawTokens(canvas, payload) {
+      store._tokensPayload = payload || {};
+      const { ctx, w, h } = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      const buckets = (payload && payload.buckets) || [];
+      if (!buckets.length) {
+        return drawEmpty(ctx, w, h, payload && payload.reason ? payload.reason : "No token usage in window");
+      }
+      const pad = { l: 54, r: 16, t: 18, b: 30 };
+      const xs = buckets.map(b => Number(b.unix || 0));
+      const maxTotal = Math.max(...buckets.map(b => Number(b.total || 0)), 1);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
+      const y = v => h - pad.b - (h - pad.t - pad.b) * v / maxTotal;
+      // y gridlines with k-formatted token labels
+      const fmtK = n => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const v = maxTotal * i / 4;
+        const gy = y(v);
+        ctx.strokeStyle = i === 0 ? "#3a4a5e" : "#2d3a4b";
+        ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+        ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
+        ctx.fillText(fmtK(v), pad.l - 6, gy + 4);
+      }
+      // bars (input stacked under output)
+      const n = buckets.length;
+      const slot = (w - pad.l - pad.r) / Math.max(1, n);
+      const bw = Math.max(1, Math.min(22, slot * 0.7));
+      buckets.forEach(b => {
+        const cx = x(Number(b.unix));
+        const inH = (h - pad.t - pad.b) * Number(b.input || 0) / maxTotal;
+        const outH = (h - pad.t - pad.b) * Number(b.output || 0) / maxTotal;
+        const base = h - pad.b;
+        ctx.fillStyle = "#5c91df";
+        ctx.fillRect(cx - bw / 2, base - inH, bw, inH);
+        ctx.fillStyle = "#f0b35a";
+        ctx.fillRect(cx - bw / 2, base - inH - outH, bw, outH);
+      });
+      // legend + x labels
+      ctx.textAlign = "left"; ctx.font = "12px Segoe UI, Arial";
+      ctx.fillStyle = "#5c91df"; ctx.fillRect(pad.l, pad.t - 12, 9, 9);
+      ctx.fillStyle = "#cbd5e3"; ctx.fillText("input", pad.l + 13, pad.t - 3);
+      ctx.fillStyle = "#f0b35a"; ctx.fillRect(pad.l + 64, pad.t - 12, 9, 9);
+      ctx.fillStyle = "#cbd5e3"; ctx.fillText("output", pad.l + 77, pad.t - 3);
+      ctx.fillStyle = "#7c8aa0"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "center";
+      const dateLbl = ux => new Date(Number(ux) * 1000).toLocaleString("en-US", { timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric", hour: "2-digit", hour12: false });
+      const step = Math.max(1, Math.ceil(n / 8));
+      for (let i = 0; i < n; i += step) ctx.fillText(dateLbl(buckets[i].unix), x(Number(buckets[i].unix)), h - 8);
+    }
+    function pollTokens() {
+      // Default window is 96h; if empty (the stored OpenCode sessions may be
+      // weeks/months old), widen progressively so the chart is never silently
+      // blank when data exists further back.
+      const tryHours = [96, 720, 4320, 8760];
+      let i = 0;
+      const attempt = () => {
+        fetch(`/api/tokens?hours=${tryHours[i]}`, { cache: "no-store" })
+          .then(r => r.json())
+          .then(payload => {
+            if (payload && payload.available) {
+              drawTokens($("tokens-chart"), payload);
+              setText($("tokens-note"), `${(payload.grand_total || 0).toLocaleString()} tokens / ${payload.buckets.length} hr-buckets (${tryHours[i]}h window)`);
+            } else if (i < tryHours.length - 1) {
+              i++; attempt();
+            } else {
+              drawTokens($("tokens-chart"), payload);
+              setText($("tokens-note"), (payload && payload.reason) || "no OpenCode token data found");
+            }
+          })
+          .catch(() => { setText($("tokens-note"), "token source unavailable"); });
+      };
+      attempt();
+    }
     function miniBar(pct) {
       const wrap = document.createElement("span");
       wrap.className = "mini-bar";
@@ -3344,6 +4382,9 @@ HTML = r"""<!doctype html>
           // Canvas had zero size while hidden; re-layout now that it is visible.
           renderTreemap();
           renderDecompDetail(store.data);
+          // The token canvas also had zero size while hidden; redraw on show.
+          pollTokens();
+          tickLimits();
         } else if (view === "files") {
           renderFilesTable(store.data);
         }
@@ -3440,6 +4481,10 @@ HTML = r"""<!doctype html>
     $("decomp-treemap").addEventListener("mousemove", onTreemapMove);
     $("decomp-treemap").addEventListener("mouseleave", () => { $("decomp-tip").hidden = true; });
     $("decomp-treemap").addEventListener("click", onTreemapClick);
+    $("reader-back").addEventListener("click", () => {
+      closeReader();
+      document.querySelector(".decomp-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     $("files-query").addEventListener("input", () => { if (store.data) renderFilesTable(store.data); });
     $("files-incomplete").addEventListener("change", () => { if (store.data) renderFilesTable(store.data); });
     $("files-clear").addEventListener("click", () => {
@@ -3480,6 +4525,18 @@ HTML = r"""<!doctype html>
     } else if (location.hash === "#files") {
       store.activeView = "files";
     }
+    // v9: agent activity + lockout panels poll independently of the main refresh
+    // (lighter endpoints, want a faster cadence). Token chart redraws on the
+    // main refresh cadence and on view switch.
+    pollAgents();
+    pollLimits();
+    pollTokens();
+    store.agentsTimer = setInterval(pollAgents, 10000);
+    store.limitsTimer = setInterval(pollLimits, 60000);
+    setInterval(tickLimits, 1000);   // smooth 1s countdown without refetching
+    window.addEventListener("resize", () => {
+      if (store.activeView === "decomp") drawTokens($("tokens-chart"), store._tokensPayload || {});
+    });
     refresh();
     scheduleRefresh();
   </script>
@@ -3525,6 +4582,31 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/history/fn":
             name = (query.get("name") or [""])[0]
             self.send_json(load_fn_history(name))
+            return
+        if path == "/api/asm":
+            source = (query.get("source") or [""])[0]
+            fn = (query.get("fn") or [""])[0]
+            if not source or not fn:
+                self.send_json({"available": False, "error": "source and fn are required"})
+                return
+            self.send_json(compute_asm_diff(source, fn))
+            return
+        if path == "/api/fninfo":
+            fn = (query.get("fn") or [""])[0]
+            self.send_json(load_fn_info(fn))
+            return
+        if path == "/api/agents":
+            self.send_json(load_agents())
+            return
+        if path == "/api/tokens":
+            try:
+                hours = int((query.get("hours") or ["72"])[0])
+            except (TypeError, ValueError):
+                hours = 72
+            self.send_json(load_tokens(max(1, min(hours, 24 * 30))))
+            return
+        if path == "/api/limits":
+            self.send_json(load_limits())
             return
         if path == "/api/health":
             self.send_json({"ok": True, "version": DASHBOARD_VERSION})
