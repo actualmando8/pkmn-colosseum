@@ -1132,7 +1132,7 @@ void fn_80188984(void) { /* TODO: match -- 368 bytes at 0x80188984 */ }
 
 /* SDA data labels referenced by asm incs (symbolmap port), typed by load width */
 extern f32 lbl_8047D8A0;
-extern u8  lbl_8047B1F0[];
+extern u32 lbl_8047B1F0[2];
 extern f32 lbl_8047D8B0;
 
 #pragma push
@@ -1146,14 +1146,11 @@ asm void fn_8018F30C(void) {
 void fn_8018F30C(void) { /* TODO */ }
 #endif
 #pragma pop
-extern u32 sdaBase_0x8018A690[8]; // assuming this array is defined elsewhere
-
 u32 fn_8018F470(u32 r3) {
-    if (r3 < 2) {
-        return sdaBase_0x8018A690[r3];
-    } else {
+    if (r3 >= 2) {
         return 0;
     }
+    return lbl_8047B1F0[r3];
 }
 #pragma push
 #pragma optimization_level 0
