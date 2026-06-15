@@ -44,8 +44,21 @@ import measure_cache  # noqa: E402  (cached objdiff for banding)
 
 WINS = ROOT / "build" / "band_wins"
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
-MWCC_BASE = ROOT / "tools" / "mwcc_compiler" / "GC"
-OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+
+# Tool resolution is platform-aware so the SAME harness runs on the Windows
+# workstation AND a Linux cloud/CI env. On Linux, `configure.py`+`ninja` download
+# the platform-appropriate toolchain into build/ (objdiff-cli, wibo, and the mwcc
+# compilers), and the Windows mwcceppc.exe is run through the wibo PE loader.
+# Windows behaviour is unchanged.
+if os.name == "nt":
+    MWCC_BASE = ROOT / "tools" / "mwcc_compiler" / "GC"
+    OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
+    WIBO = None
+else:
+    MWCC_BASE = ROOT / "build" / "compilers" / "GC"     # configure.py: build/compilers/GC/<ver>/mwcceppc.exe
+    OBJDIFF = ROOT / "build" / "tools" / "objdiff-cli"
+    _wibo = ROOT / "build" / "tools" / "wibo"
+    WIBO = _wibo if _wibo.exists() else None
 
 
 # --------------------------------------------------------------------------- #
@@ -109,9 +122,10 @@ def compile_band(tag):
         sys.exit(f"compiler not found: {mwcc}")
     env = dict(os.environ)
     env["PATH"] = str(mwcc_dir) + os.pathsep + env.get("PATH", "")
-    r = subprocess.run(
-        [str(mwcc), *st["cflags"], "-c", "-o", str(scratch_o(tag)), str(src)],
-        capture_output=True, text=True, env=env, cwd=str(ROOT))
+    # On Linux the Windows mwcceppc.exe runs through wibo (the PE loader ninja uses).
+    cmd = ([str(WIBO)] if WIBO else []) + \
+        [str(mwcc), *st["cflags"], "-c", "-o", str(scratch_o(tag)), str(src)]
+    r = subprocess.run(cmd, capture_output=True, text=True, env=env, cwd=str(ROOT))
     if r.returncode != 0 or not scratch_o(tag).exists():
         print("COMPILE FAILED")
         print(r.stdout[-4000:])
