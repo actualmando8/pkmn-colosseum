@@ -141,6 +141,11 @@ the WALLS.md taxonomy. Levers marked **OPT-GATED** only bite below `optimization
 > before any statement. `u16 chk = fn(...);` mid-block is an `expression syntax error`. When a
 > lever says "add a local", declare it at the block top, then assign below.
 
+> PRAGMAS MUST BE IN-BODY for band integration: put `#pragma peephole off` (etc.) on the line
+> *after* the function's opening `{`, NOT as an external `#pragma push/pop` wrapper around the
+> def. The band splice carries only the function definition, so a wrapping pragma is dropped at
+> integrate time and the win silently regresses. In-body pragma → it travels with the def.
+
 | # | Symptom in the objdiff residual | Fix (lever) |
 |---|---|---|
 | 1 | Only diff is a `bl <name>` / `lis name@ha` **reloc name** (same address, bytes identical) — e.g. `bl fn_80053110` vs `bl dbgMenuFightWazaEditSub` | **Reloc-name rename** (biggest yield, byte-neutral): rename your C identifier to the name in `config/GC6E01/symbols.build.txt` for that address (extern + callsites + same-TU def). Delete any stale K&R `extern void Name();` that collides. |
