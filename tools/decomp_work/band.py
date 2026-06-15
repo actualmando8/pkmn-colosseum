@@ -143,9 +143,14 @@ def _rows(tag, st):
 # --------------------------------------------------------------------------- #
 # Commands                                                                     #
 # --------------------------------------------------------------------------- #
-def cmd_init(tag, srcname):
+def cmd_init(tag, srcname, config_from=None):
     src_path = resolve_source(srcname)
-    version, cflags, target_o = file_config(src_path)
+    # Flags/version/target come from `config_from` when given (e.g. integrating a
+    # build/band_*_integrated.c temp file whose stem isn't in compile_config.json —
+    # resolve its -O4,s/target from the REAL canonical source instead of the
+    # default -O4,p fallback). The scratch CONTENT still comes from srcname.
+    cfg_path = resolve_source(config_from) if config_from else src_path
+    version, cflags, target_o = file_config(cfg_path)
     if not target_o.exists():
         sys.exit(f"target object missing: {target_o}")
     SCRATCH.mkdir(parents=True, exist_ok=True)
@@ -376,8 +381,12 @@ def main():
     tag = sys.argv[2]
     if cmd == "init":
         if len(sys.argv) < 4:
-            sys.exit("usage: band.py init <tag> <src/file.c>")
-        cmd_init(tag, sys.argv[3])
+            sys.exit("usage: band.py init <tag> <src/file.c> [--config-from <src>]")
+        config_from = None
+        if "--config-from" in sys.argv:
+            i = sys.argv.index("--config-from")
+            config_from = sys.argv[i + 1] if i + 1 < len(sys.argv) else None
+        cmd_init(tag, sys.argv[3], config_from)
     elif cmd == "check":
         cmd_check(tag, sys.argv[3:])
     elif cmd == "json":

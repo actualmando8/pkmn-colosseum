@@ -37,11 +37,15 @@ PY = sys.executable
 M = 99.9999
 
 
-def _scratch_json(tag, integrated_c):
+def _scratch_json(tag, integrated_c, config_from):
     """init a private band from the integrated file, compile + measure it,
-    return {fn: pct}. Uses band.py so flags/version/target stay file-correct."""
+    return {fn: pct}. Resolves flags/version/target from the REAL canon source
+    (config_from) — the integrated temp file's stem isn't in compile_config.json,
+    so without this it would fall back to default -O4,p and falsely drop wins on
+    -O4,s TUs (trainer.c, pokemon.c, ...)."""
     inttag = f"_int_{tag}"
-    subprocess.run([PY, str(HERE / "band.py"), "init", inttag, str(integrated_c)],
+    subprocess.run([PY, str(HERE / "band.py"), "init", inttag, str(integrated_c),
+                    "--config-from", str(config_from)],
                    capture_output=True, text=True)
     r = subprocess.run([PY, str(HERE / "band.py"), "json", inttag],
                        capture_output=True, text=True)
@@ -70,7 +74,7 @@ def integrate_source(src_rel, fn_bodies, apply):
         print("  SPLICE FAILED:\n" + r.stderr)
         return None, None
 
-    newm, err = _scratch_json(stem, integrated)
+    newm, err = _scratch_json(stem, integrated, canon)
     if newm is None:
         print("  MEASURE FAILED:\n" + (err or ""))
         return None, None
