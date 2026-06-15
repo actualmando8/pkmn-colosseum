@@ -53,17 +53,31 @@ bash tools/decomp_work/decomp.sh where fn_800DF21C
 bash tools/decomp_work/decomp.sh asm fn_800DF21C
 #   ...or open it directly:  src/<dir>/<stem>_fn_800DF21C.inc
 
-# (3) Find + read the C. The function is in src/<dir>/<stem>.c.
-#     Active asm-wrappers appear as:  #if 0  ...real C...  #else  #include "..._fn_XXXX.inc"  #endif
-#     or as an `asm` function whose body is `#include "..._fn_XXXX.inc"`.
-#     Write/repair the REAL C (in the ACTIVE branch). Apply the LEVER CHEAT-SHEET below.
+# (3) Find + read the C. The function is in src/<dir>/<stem>.c. Two wrapper forms exist
+#     (mind which branch is ACTIVE — `#if 0` is false, so its `#else` is what compiles):
+#       Form A — real C ACTIVE (this is your target; repair the C in the #else):
+#         #if 0
+#           asm void fn_XXXX(...) { #include "..._fn_XXXX.inc" }   // parked, inactive
+#         #else
+#           <real C>                                              // ACTIVE — edit THIS
+#         #endif
+#       Form B — asm ACTIVE (#if 1 + .inc): already byte-exact, a reloc-name artifact at
+#         most. `band sections` auto-skips these. Do NOT make it a target / never flip it.
 
 # (4) MEASURE — the single source of truth. Never assert a % you didn't measure.
 python tools/match_scan_file.py src/game/gs_render.c fn_800DF21C
 #   100.0%  -> keep it. Done.
-#   < 100   -> read the objdiff residual, apply a lever, re-measure. After ~3 honest
-#              tries with no progress, treat it as a wall (see section 5) and move on.
+#   < 100   -> VIEW the residual, apply a lever, re-measure:
+#     bash tools/decomp_work/decomp.sh band init s1 src/game/gs_render.c   # one-time per file
+#     bash tools/decomp_work/decomp.sh band diff s1 fn_800DF21C            # TARGET vs OURS, >>> = differs
+#              After ~3 honest tries with no progress, treat it as a wall (section 5) and move on.
 ```
+
+> MEASUREMENT AUTHORITY: `match_scan_file.py` (= `decomp.sh measure`) and `band check/json`
+> are authoritative (live objdiff). `decomp.sh next` / `equiv_pool.txt` are a CACHE and can be
+> STALE — a fn it lists at 99% may already be 100% (skip it) or measure lower. Always confirm
+> the live % before attacking and before claiming a win. Regenerate the pool (lead only, slow):
+> `python tools/decomp_work/progress2.py --measure`.
 
 `bash tools/decomp_work/decomp.sh asm fn_X` prints nothing/“no .inc” when `fn_X` is
 **already fully decompiled** (real C, no asm form) — that's expected, not an error.
@@ -122,6 +136,10 @@ Read the objdiff residual, find the matching **symptom** row, apply the **fix**,
 This consolidates Fable's levers + the 7 CW-1.3 quirks (`tools/decomp_work/CLAUDE.md`) +
 the WALLS.md taxonomy. Levers marked **OPT-GATED** only bite below `optimization_level 4`
 (at opt4 CW copy-propagates them away).
+
+> CW 1.3 IS A C90 COMPILER: every local **declaration must sit at the top of its block**,
+> before any statement. `u16 chk = fn(...);` mid-block is an `expression syntax error`. When a
+> lever says "add a local", declare it at the block top, then assign below.
 
 | # | Symptom in the objdiff residual | Fix (lever) |
 |---|---|---|
