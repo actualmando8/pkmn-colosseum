@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import re
@@ -11,6 +12,7 @@ import subprocess
 import sys
 import threading
 import time
+import zipfile
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -50,7 +52,19 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 9
+DASHBOARD_VERSION = 10
+# --- v10: token-history collector sources ----------------------------------------
+CLAUDE_PROJECT_DIR = (
+    Path.home()
+    / ".claude"
+    / "projects"
+    / "C--Users-douglaswhittingham-pkmn-colosseum"
+)
+CODEX_HISTORY = Path.home() / ".codex" / "history.jsonl"
+TOKEN_HISTORY_FILE = DECOMP_WORK / "token_history.json"
+# Artifacts served privately over Tailscale (the user's own ROM-derived inputs).
+MAIN_DOL = ROOT / "orig" / "GC6E01" / "sys" / "main.dol"
+TARGET_OBJ_DIR = ROOT / "build" / "GC6E01" / "obj"
 
 # In-process TTL cache for build_state(). The full rebuild runs git x4, reparses
 # the ~646KB report.json, and shells out to rg per Proposed/Needs-wiring row, so
@@ -426,14 +440,18 @@ def load_decomp_report(path: Path) -> dict[str, object]:
     }
 
 
-def load_attempt_log(path: Path, limit: int = 400) -> list[dict[str, object]]:
+def load_attempt_log(path: Path, limit: int = 1000) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     line_re = re.compile(
         r"^- \*\*(?P<timestamp>[^*]+)\*\*\s+`(?P<agent>[^`]+)`\s+(?P<message>.*)$"
     )
     fn_re = re.compile(r"fn_[0-9A-Fa-f]{8}")
     pct_re = re.compile(r"([0-9]+(?:\.[0-9]+)?)%")
+    # `in foo.c` (older format) OR a bare TU path like `game/gs_render_util`
+    # (the auto-report writer emits "<unit> a->b/c"; capture its trailing stem so
+    # the front-end's per-unit `relatedAttempts(unit)` filter still matches it).
     file_re = re.compile(r"\bin\s+([^()\s]+\.c|\?\.c)")
+    unit_re = re.compile(r"^([A-Za-z0-9_./-]+/)?([A-Za-z0-9_]+)\s+\d+->\d+/\d+")
     markers = (
         "MATCH!",
         "COMMIT",
@@ -448,12 +466,16 @@ def load_attempt_log(path: Path, limit: int = 400) -> list[dict[str, object]]:
         if not match:
             continue
         raw_message = match.group("message").strip()
+        # Strip the leading "- " markdown artifact the auto-report writer emits
+        # ("- **ts** `report` - game/foo ...") so the message reads cleanly.
+        raw_message = re.sub(r"^[-*]\s+", "", raw_message)
         message = raw_message
         for marker in markers:
             index = raw_message.find(marker)
             if index >= 0:
                 message = raw_message[index:].strip()
                 break
+        agent = match.group("agent")
         kind = "note"
         upper = message.upper()
         if "REGRESSION" in upper:
@@ -464,16 +486,25 @@ def load_attempt_log(path: Path, limit: int = 400) -> list[dict[str, object]]:
             kind = "commit"
         elif "CLAIMED" in upper:
             kind = "claim"
+        elif agent in ("report", "auto-report"):
+            kind = "report"
         fn_match = fn_re.search(message)
         pct_match = pct_re.search(message)
         file_match = file_re.search(message)
+        file_attr = file_match.group(1) if file_match else ""
+        # Attribute auto-report unit lines ("game/gs_render_util 9->10/21") to a
+        # synthetic "<stem>.c" so relatedAttempts(unit) groups them per file.
+        if not file_attr:
+            unit_match = unit_re.match(message)
+            if unit_match:
+                file_attr = unit_match.group(2) + ".c"
         rows.append(
             {
                 "timestamp": match.group("timestamp"),
-                "agent": match.group("agent"),
+                "agent": agent,
                 "kind": kind,
                 "function": fn_match.group(0) if fn_match else "",
-                "file": file_match.group(1) if file_match else "",
+                "file": file_attr,
                 "percent": float_pct(pct_match.group(1)) if pct_match else None,
                 "message": message,
             }
@@ -872,7 +903,7 @@ def build_state() -> dict[str, object]:
     # Merge status.md attempt log with git-commit-derived entries so codex's
     # per-file work (committed to git, not status.md) appears in the log and in
     # per-unit drill-downs. The front-end reverse-sorts and filters by `file`.
-    attempt_log = load_attempt_log(DECOMP_STATUS_LOG) + recent_commit_attempts()
+    attempt_log = load_attempt_log(DECOMP_STATUS_LOG, limit=1000) + recent_commit_attempts()
     return {
         "version": DASHBOARD_VERSION,
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -1260,73 +1291,271 @@ def load_agents() -> dict[str, object]:
 
 
 # =========================================================================== #
-# v9: token-expense-over-time (OpenCode session storage) + lockout schedule   #
+# v10: token-expense-over-time — multi-source hourly collector                #
+#   (a) CLAUDE   ~/.claude/projects/<repo>/**/*.jsonl  (primary, richest)     #
+#   (b) OPENCODE WSL sqlite (glm/qwen/kimi/deepseek/...) tagged by model      #
+#   (c) CODEX    ~/.codex/history.jsonl  (activity event count, no tokens)    #
+#   + .omc/agent_tokens.json cumulative fallback totals                       #
+# Aggregated buckets persist to tools/decomp_work/token_history.json so the   #
+# chart survives a source rotating; refreshed by the background auto-loop.    #
 # =========================================================================== #
+SOURCE_KEYS = ("claude", "opencode", "codex")
+# Model -> chart source bucket. Anything unmatched falls through to "opencode"
+# (every model in the WSL db is an opencode-run worker).
+_OPENCODE_MODEL_TAGS = ("mimo", "deepseek", "glm", "qwen", "kimi", "nemotron")
+
+
+def _new_bucket() -> dict[str, float]:
+    b: dict[str, float] = {k: 0.0 for k in SOURCE_KEYS}
+    b["claude_cache_read"] = 0.0
+    b["codex_events"] = 0.0
+    return b
+
+
+def _collect_claude(buckets: dict[int, dict[str, float]], cutoff: float,
+                    by_model: dict[str, float]) -> dict[str, object]:
+    """Sum input+output (and cache_read separately) per hour from the Claude
+    project journals. One JSONL line per turn; only lines with `"usage"` count."""
+    if not CLAUDE_PROJECT_DIR.exists():
+        return {"available": False, "files": 0, "total": 0,
+                "reason": f"claude dir not found: {CLAUDE_PROJECT_DIR}"}
+    files = 0
+    total = 0
+    for path in CLAUDE_PROJECT_DIR.rglob("*.jsonl"):
+        files += 1
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    if '"usage"' not in line:
+                        continue
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    msg = d.get("message")
+                    if not isinstance(msg, dict):
+                        continue
+                    usage = msg.get("usage")
+                    if not isinstance(usage, dict):
+                        continue
+                    ts = _parse_iso(d.get("timestamp"))
+                    if not ts or ts < cutoff:
+                        continue
+                    inp = int(usage.get("input_tokens") or 0)
+                    out = int(usage.get("output_tokens") or 0)
+                    cr = int(usage.get("cache_read_input_tokens") or 0)
+                    hour = int(ts // 3600) * 3600
+                    b = buckets.setdefault(hour, _new_bucket())
+                    b["claude"] += inp + out
+                    b["claude_cache_read"] += cr
+                    by_model[str(msg.get("model") or "?")] += inp + out
+                    total += inp + out
+        except OSError:
+            continue
+    return {"available": total > 0, "files": files, "total": total}
+
+
+def _collect_opencode(buckets: dict[int, dict[str, float]], cutoff: float,
+                      by_model: dict[str, float]) -> dict[str, object]:
+    """Query the WSL opencode.db from WSL's own python3 (avoids WAL/lock issues).
+    Each assistant message's `data` blob carries tokens.{input,output} + modelID
+    and time.created (unix ms). Tag by model; bucket by hour."""
+    script = (
+        "import sqlite3,os,json,sys\n"
+        "p=os.path.expanduser('~/.local/share/opencode/opencode.db')\n"
+        "if not os.path.exists(p):\n"
+        "    print(json.dumps({'available':False,'reason':'opencode.db not found'}));sys.exit()\n"
+        "con=sqlite3.connect('file:%s?mode=ro'%p,uri=True)\n"
+        "rows=[]\n"
+        "for tc,data in con.execute('SELECT time_created,data FROM message'):\n"
+        "    try: dd=json.loads(data)\n"
+        "    except Exception: continue\n"
+        "    if dd.get('role')!='assistant': continue\n"
+        "    tk=dd.get('tokens') or {}\n"
+        "    inp=int(tk.get('input') or 0); out=int(tk.get('output') or 0)\n"
+        "    if inp+out<=0: continue\n"
+        "    t=(dd.get('time') or {}).get('created') or tc\n"
+        "    rows.append({'created':t,'model':dd.get('modelID') or '?','tok':inp+out})\n"
+        "print(json.dumps({'available':True,'rows':rows}))\n"
+    )
+    try:
+        proc = subprocess.run(
+            ["wsl", "bash", "-lc", "python3 -"],
+            input=script, capture_output=True, text=True, timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"available": False, "reason": f"wsl call failed: {exc}"}
+    if proc.returncode != 0:
+        return {"available": False, "reason": "wsl python3 failed: " + proc.stderr[:160].strip()}
+    try:
+        data = json.loads(proc.stdout.strip().splitlines()[-1])
+    except (json.JSONDecodeError, IndexError):
+        return {"available": False, "reason": "opencode probe returned non-JSON"}
+    if not data.get("available"):
+        return data
+    total = 0
+    rows = data.get("rows") or []
+    for r in rows:
+        created = r.get("created") or 0
+        if created > 1e12:  # ms -> s
+            created = created / 1000.0
+        if not created or created < cutoff:
+            continue
+        hour = int(created // 3600) * 3600
+        b = buckets.setdefault(hour, _new_bucket())
+        b["opencode"] += int(r.get("tok") or 0)
+        by_model[str(r.get("model") or "?")] += int(r.get("tok") or 0)
+        total += int(r.get("tok") or 0)
+    return {"available": total > 0, "total": total, "rows": len(rows)}
+
+
+def _collect_codex(buckets: dict[int, dict[str, float]], cutoff: float) -> dict[str, object]:
+    """Codex history.jsonl has no token counts — only prompt events (session_id,
+    ts unix, text). Bucket as an ACTIVITY event count so the timeline shows codex
+    is alive even without token precision."""
+    if not CODEX_HISTORY.exists():
+        return {"available": False, "events": 0, "reason": "codex history not found"}
+    events = 0
+    try:
+        with open(CODEX_HISTORY, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                try:
+                    d = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                ts = d.get("ts")
+                if not isinstance(ts, (int, float)) or ts < cutoff:
+                    continue
+                hour = int(ts // 3600) * 3600
+                b = buckets.setdefault(hour, _new_bucket())
+                b["codex_events"] += 1
+                events += 1
+    except OSError:
+        return {"available": False, "events": 0, "reason": "codex history unreadable"}
+    return {"available": events > 0, "events": events}
+
+
 _TOKENS_CACHE: dict[str, object] = {"value": None, "expires": 0.0}
 _TOKENS_CACHE_TTL = 120.0
 
 
-def load_tokens(hours: int = 72) -> dict[str, object]:
-    """Bucket OpenCode assistant-message token usage into hourly samples.
+def collect_tokens(hours: int = 168) -> dict[str, object]:
+    """Aggregate all three live sources into hourly buckets tagged by source.
+    Merges agent_tokens.json cumulative counts into totals as a fallback stat."""
+    cutoff = time.time() - hours * 3600
+    buckets: dict[int, dict[str, float]] = {}
+    by_model: dict[str, float] = Counter()
 
-    Source: <opencode>/storage/message/**/<msg>.json — each assistant message
-    carries time.created (unix ms) + tokens.{input,output,reasoning,cache}. We
-    sum input+output per UTC hour over the trailing `hours` window. This is a
-    REAL data source (no collector required); see DASHBOARD UX notes for the
-    per-model breakdown extension."""
+    claude_meta = _collect_claude(buckets, cutoff, by_model)
+    opencode_meta = _collect_opencode(buckets, cutoff, by_model)
+    codex_meta = _collect_codex(buckets, cutoff)
+
+    series = []
+    for hour in sorted(buckets):
+        b = buckets[hour]
+        claude = int(b["claude"])
+        opencode = int(b["opencode"])
+        codex_ev = int(b["codex_events"])
+        total = claude + opencode
+        series.append({
+            "unix": hour,
+            "by_source": {"claude": claude, "opencode": opencode, "codex": codex_ev},
+            "claude": claude,
+            "opencode": opencode,
+            "codex_events": codex_ev,
+            "cache_read": int(b["claude_cache_read"]),
+            "input": claude + opencode,   # legacy field for older clients
+            "output": 0,
+            "total": total,
+        })
+
+    totals = {
+        "claude": int(claude_meta.get("total", 0)),
+        "opencode": int(opencode_meta.get("total", 0)),
+        "codex_events": int(codex_meta.get("events", 0)),
+        "all_tokens": int(claude_meta.get("total", 0)) + int(opencode_meta.get("total", 0)),
+    }
+    # agent_tokens.json cumulative fallback (per-agent lifetime totals).
+    agent_tokens = _load_json_obj(AGENT_TOKENS_JSON).get("agents", {})
+    if isinstance(agent_tokens, dict):
+        totals["agent_tokens_cumulative"] = sum(
+            int_value(v.get("tokens_used", 0))
+            for v in agent_tokens.values() if isinstance(v, dict)
+        )
+
+    top_models = sorted(by_model.items(), key=lambda kv: -kv[1])[:10]
+    return {
+        "available": bool(series),
+        "window_hours": hours,
+        "buckets": series,
+        "totals": totals,
+        "grand_total": totals["all_tokens"],
+        "by_model": [{"model": m, "tokens": int(v)} for m, v in top_models],
+        "sources": {
+            "claude": claude_meta,
+            "opencode": opencode_meta,
+            "codex": codex_meta,
+        },
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _load_token_history() -> dict[str, object]:
+    return _load_json_obj(TOKEN_HISTORY_FILE)
+
+
+def refresh_token_history() -> dict[str, object]:
+    """Recompute the full window and persist to token_history.json (change-gated
+    on the grand total + bucket count so we don't churn the file every loop)."""
+    payload = collect_tokens(hours=24 * 30)  # 30-day persisted window
+    prev = _load_token_history()
+    changed = (
+        int(prev.get("grand_total", -1)) != int(payload.get("grand_total", 0))
+        or len(prev.get("buckets", []) or []) != len(payload.get("buckets", []))
+    )
+    if changed:
+        try:
+            _write_json_obj(TOKEN_HISTORY_FILE, payload)
+        except OSError:
+            pass
+    return payload
+
+
+def load_tokens(hours: int = 168) -> dict[str, object]:
+    """Front-end entry. Serves the live collector through a short TTL cache,
+    falling back to the persisted token_history.json if collection fails (e.g.
+    WSL unreachable). Slices the persisted window down to the requested hours."""
     now = time.monotonic()
     cached = _TOKENS_CACHE.get("value")
     if cached is not None and now < float(_TOKENS_CACHE.get("expires", 0)):
-        return cached  # type: ignore[return-value]
-
-    msg_dir = OPENCODE_STORAGE / "message"
-    if not msg_dir.exists():
-        payload = {"available": False, "reason": f"opencode storage not found: {msg_dir}", "buckets": []}
-        _TOKENS_CACHE["value"] = payload
-        _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
-        return payload
-
-    cutoff_ms = (time.time() - hours * 3600) * 1000.0
-    buckets: dict[int, dict[str, float]] = {}
-    files = 0
-    for path in msg_dir.rglob("*.json"):
-        files += 1
+        full = cached  # type: ignore[assignment]
+    else:
         try:
-            d = json.loads(path.read_text(encoding="utf-8", errors="replace"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if d.get("role") != "assistant":
-            continue
-        tk = d.get("tokens")
-        if not isinstance(tk, dict):
-            continue
-        created = ((d.get("time") or {}).get("created")) if isinstance(d.get("time"), dict) else None
-        if not isinstance(created, (int, float)) or created < cutoff_ms:
-            continue
-        hour = int(created // 3600000) * 3600  # unix seconds, hour-aligned
-        b = buckets.setdefault(hour, {"in": 0.0, "out": 0.0, "total": 0.0, "n": 0.0})
-        b["in"] += float(tk.get("input") or 0)
-        b["out"] += float(tk.get("output") or 0)
-        b["total"] += float(tk.get("total") or (float(tk.get("input") or 0) + float(tk.get("output") or 0)))
-        b["n"] += 1
-    series = [
-        {"unix": hour, "input": int(v["in"]), "output": int(v["out"]),
-         "total": int(v["total"]), "messages": int(v["n"])}
-        for hour, v in sorted(buckets.items())
-    ]
-    grand = int(sum(s["total"] for s in series))
-    payload = {
-        "available": bool(series),
-        "buckets": series,
-        "window_hours": hours,
-        "grand_total": grand,
-        "scanned_files": files,
-        "source": str(msg_dir),
-        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-    }
-    _TOKENS_CACHE["value"] = payload
-    _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
-    return payload
+            full = collect_tokens(hours=24 * 30)
+        except Exception:  # noqa: BLE001
+            full = None
+        if not full or not full.get("available"):
+            persisted = _load_token_history()
+            if persisted.get("available"):
+                full = persisted
+        if full is None:
+            full = {"available": False, "buckets": [], "reason": "no token sources reachable"}
+        _TOKENS_CACHE["value"] = full
+        _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
+
+    cutoff = time.time() - hours * 3600
+    buckets = [b for b in (full.get("buckets") or []) if Number_ge(b.get("unix"), cutoff)]
+    out = dict(full)
+    out["buckets"] = buckets
+    out["window_hours"] = hours
+    return out
+
+
+def Number_ge(v: object, cutoff: float) -> bool:
+    try:
+        return float(v) >= cutoff
+    except (TypeError, ValueError):
+        return False
 
 
 def _parse_iso(ts: object) -> float:
@@ -2432,12 +2661,78 @@ HTML = r"""<!doctype html>
       margin-bottom: 12px;
       align-items: start;
     }
+    /* ---- v10: token totals stat strip ------------------------------------- */
+    .token-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-bottom: 10px;
+    }
+    .token-stat {
+      padding: 6px 12px;
+      border: 1px solid #263244;
+      border-radius: 6px;
+      background: #101824;
+      min-width: 90px;
+    }
+    .token-stat-value {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .token-stat-label {
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+    /* ---- v10: pinned (tap-to-show) treemap detail panel for touch devices -- */
+    .treemap-pin {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 70;
+      width: min(94vw, 460px);
+      max-height: 60vh;
+      overflow: auto;
+      padding: 14px 16px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: rgba(13, 18, 26, .98);
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, .6);
+      display: none;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .treemap-pin.active { display: block; }
+    .treemap-pin .pin-body b {
+      color: #fff;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 16px;
+    }
+    .treemap-pin-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .treemap-pin-actions .btn {
+      flex: 1 1 auto;
+      height: 44px;
+      font-size: 15px;
+    }
+    .treemap-pin-actions .btn.open {
+      background: #23684f;
+      border-color: #2f9874;
+      color: #eef4fb;
+    }
     @media (max-width: 1180px) {
       .metric-grid { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
       .overview, .chart-grid, .ops-grid, .ops3-grid, .workbench, .decomp-workspace, .history-layout, .reader-grid { grid-template-columns: 1fr; }
       .detail-panel { position: static; }
     }
     @media (max-width: 760px) {
+      html, body { overflow-x: hidden; }
       .topbar { grid-template-columns: 1fr; padding: 14px 12px; }
       .hud-strip { grid-template-columns: 1fr; }
       .actions { justify-content: stretch; }
@@ -2446,9 +2741,32 @@ HTML = r"""<!doctype html>
       .metric-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
       .toolbar { grid-template-columns: 1fr; }
       .tu-toolbar { grid-template-columns: 1fr; }
+      .treemap-controls { grid-template-columns: 1fr; }
+      .files-toolbar { grid-template-columns: 1fr; }
       .target-line { grid-template-columns: 1fr; }
       .feed-row, .commit-row, .attempt-row, .function-row { grid-template-columns: 1fr; }
       .mini-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { display: flex; width: 100%; }
+      .tab-btn { flex: 1 1 0; min-width: 0; padding: 0 8px; }
+      /* Wide data tables: shrink the min-width so the .table-wrap scroller fits
+         the viewport, and drop low-value columns on phones. */
+      table { min-width: 560px; }
+      #files-table { min-width: 640px; }
+      /* Targets table: hide Size, Current, Old Refs (kept in the detail panel). */
+      #view-symbols table th:nth-child(4),
+      #view-symbols table td:nth-child(4),
+      #view-symbols table th:nth-child(6),
+      #view-symbols table td:nth-child(6),
+      #view-symbols table th:nth-child(7),
+      #view-symbols table td:nth-child(7) { display: none; }
+      /* Files table: hide Matched bytes, Matched Fns, Fuzzy %, Complete. */
+      #files-table th:nth-child(3), #files-table td:nth-child(3),
+      #files-table th:nth-child(6), #files-table td:nth-child(6),
+      #files-table th:nth-child(8), #files-table td:nth-child(8),
+      #files-table th:nth-child(9), #files-table td:nth-child(9) { display: none; }
+      /* Agent table: hide Claimed timestamp column. */
+      .agent-table th:nth-child(4), .agent-table td:nth-child(4) { display: none; }
+      .token-stat { flex: 1 1 40%; }
     }
   </style>
 </head>
@@ -2541,6 +2859,14 @@ HTML = r"""<!doctype html>
         <aside class="detail-panel decomp-detail" id="decomp-details"></aside>
       </section>
 
+      <div class="treemap-pin" id="treemap-pin" role="dialog" aria-label="Tile detail">
+        <div class="pin-body" id="treemap-pin-body"></div>
+        <div class="treemap-pin-actions">
+          <button class="btn open" id="treemap-pin-open" type="button">Open &#9656;</button>
+          <button class="btn ghost" id="treemap-pin-close" type="button">Dismiss</button>
+        </div>
+      </div>
+
       <section class="panel reader-overlay" id="reader-overlay">
         <div class="panel-title">
           <h2>Function Reader</h2>
@@ -2608,6 +2934,7 @@ HTML = r"""<!doctype html>
           <h2>Token Expense Over Time</h2>
           <span class="panel-note" id="tokens-note"></span>
         </div>
+        <div class="token-stats" id="tokens-stats"></div>
         <canvas id="tokens-chart" height="205"></canvas>
       </section>
     </section>
@@ -2788,8 +3115,16 @@ HTML = r"""<!doctype html>
       reader: { open: false, fn: "", source: "" },
       limits: [],
       agentsTimer: null,
-      limitsTimer: null
+      limitsTimer: null,
+      // v10: touch two-step treemap + live attempt-log poll
+      isTouch: false,
+      pinnedItem: null,
+      logTimer: null
     };
+    // Touch devices have no hover, so a single tap must NOT immediately drill in
+    // (the user could never read the tile detail). Detect coarse pointers.
+    store.isTouch = (typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches)
+      || ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
     const statusClass = {
       "Needs wiring": "needs",
       "Proposed": "proposed",
@@ -3662,15 +3997,43 @@ HTML = r"""<!doctype html>
       tip.style.left = `${Math.max(0, Math.min(left, shell.width - tw))}px`;
       tip.style.top = `${Math.max(0, Math.min(top, shell.height - th))}px`;
     }
+    function drillItem(it) {
+      if (it.kind === "unit") enterUnit(it.ref);
+      else if (it.kind === "fn") enterFn(it.ref);
+    }
     function onTreemapClick(evt) {
       const hit = treemapHit(evt);
-      if (!hit) return;
-      const it = hit.item;
-      if (it.kind === "unit") {
-        enterUnit(it.ref);
-      } else if (it.kind === "fn") {
-        enterFn(it.ref);
+      if (store.isTouch) {
+        // Two-step: first tap pins the detail, second tap on the SAME tile drills.
+        if (!hit) { closePin(); return; }
+        const it = hit.item;
+        const sameAsPinned = store.pinnedItem
+          && store.pinnedItem.kind === it.kind
+          && (it.ref && store.pinnedItem.ref && (it.ref.name === store.pinnedItem.ref.name && it.ref.source === store.pinnedItem.ref.source));
+        if (sameAsPinned) {
+          closePin();
+          drillItem(it);
+        } else {
+          openPin(it);
+        }
+        return;
       }
+      // Desktop: unchanged single-click drill.
+      if (!hit) return;
+      drillItem(hit.item);
+    }
+    // ---- v10: pinned (tap-to-show) treemap detail for touch -----------------
+    function openPin(it) {
+      store.pinnedItem = it;
+      const pin = $("treemap-pin");
+      $("treemap-pin-body").innerHTML = it.tip || "";
+      const openBtn = $("treemap-pin-open");
+      setText(openBtn, it.kind === "unit" ? "Open file ▸" : "Open function ▸");
+      pin.classList.add("active");
+    }
+    function closePin() {
+      store.pinnedItem = null;
+      $("treemap-pin").classList.remove("active");
     }
     function enterUnit(unit) {
       const tm = store.tm;
@@ -4145,6 +4508,29 @@ HTML = r"""<!doctype html>
       fetch("/api/agents", { cache: "no-store" })
         .then(r => r.json()).then(renderAgents).catch(() => {});
     }
+    // ---- v10: live attempt-log poll (independent of the slow /api/state) ----
+    function pollLog() {
+      fetch("/api/log?limit=1000", { cache: "no-store" })
+        .then(r => r.json())
+        .then(payload => {
+          const merged = (payload && payload.attempt_log) || [];
+          // Render the log even before the (slow) /api/state arrives, so the
+          // Decomp attempt log is never blank just because build_state lagged.
+          if (!store.data) store.data = { attempt_log: merged, decomp: {} };
+          store.data.attempt_log = merged;
+          // Re-render the decomp attempt log against the currently-drilled unit
+          // (so new git-commit + status.md entries appear without a manual reload).
+          const tm = store.tm;
+          let unit = null;
+          if (tm.level === "unit") {
+            const units = (store.data.decomp || {}).units || [];
+            unit = units.find(u => (u.source || "") === tm.unitSource)
+              || units.find(u => unitDisplayName(u) === tm.unitName) || null;
+          }
+          renderDecompAttemptLog(store.data, unit);
+        })
+        .catch(() => {});
+    }
     // ---- v9: lockout reset countdowns --------------------------------------
     function fmtCountdown(secs) {
       secs = Math.max(0, Math.floor(secs));
@@ -4192,7 +4578,17 @@ HTML = r"""<!doctype html>
       fetch("/api/limits", { cache: "no-store" })
         .then(r => r.json()).then(renderLimits).catch(() => {});
     }
-    // ---- v9: token-expense bar/area chart over hourly buckets --------------
+    // ---- v10: token-expense STACKED bar chart, per-source colors ------------
+    const TOKEN_SOURCES = [
+      { key: "claude", label: "Claude", color: "#38b995" },
+      { key: "opencode", label: "OpenCode", color: "#5c91df" }
+    ];
+    const fmtTok = n => {
+      n = Number(n || 0);
+      return n >= 1e9 ? (n / 1e9).toFixed(2) + "B"
+        : n >= 1e6 ? (n / 1e6).toFixed(1) + "M"
+        : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(Math.round(n));
+    };
     function drawTokens(canvas, payload) {
       store._tokensPayload = payload || {};
       const { ctx, w, h } = fitCanvas(canvas);
@@ -4201,14 +4597,15 @@ HTML = r"""<!doctype html>
       if (!buckets.length) {
         return drawEmpty(ctx, w, h, payload && payload.reason ? payload.reason : "No token usage in window");
       }
-      const pad = { l: 54, r: 16, t: 18, b: 30 };
+      const srcVal = (b, key) => Number((b.by_source && b.by_source[key]) || b[key] || 0);
+      const pad = { l: 54, r: 16, t: 22, b: 30 };
       const xs = buckets.map(b => Number(b.unix || 0));
-      const maxTotal = Math.max(...buckets.map(b => Number(b.total || 0)), 1);
+      const maxTotal = Math.max(...buckets.map(b => TOKEN_SOURCES.reduce((s, src) => s + srcVal(b, src.key), 0)), 1);
+      const maxEvents = Math.max(...buckets.map(b => Number(b.codex_events || 0)), 1);
       const minX = Math.min(...xs), maxX = Math.max(...xs);
       const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
-      const y = v => h - pad.b - (h - pad.t - pad.b) * v / maxTotal;
-      // y gridlines with k-formatted token labels
-      const fmtK = n => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+      const plotH = h - pad.t - pad.b;
+      const y = v => h - pad.b - plotH * v / maxTotal;
       ctx.lineWidth = 1;
       for (let i = 0; i <= 4; i++) {
         const v = maxTotal * i / 4;
@@ -4216,51 +4613,94 @@ HTML = r"""<!doctype html>
         ctx.strokeStyle = i === 0 ? "#3a4a5e" : "#2d3a4b";
         ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
         ctx.fillStyle = "#8da0b8"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "right";
-        ctx.fillText(fmtK(v), pad.l - 6, gy + 4);
+        ctx.fillText(fmtTok(v), pad.l - 6, gy + 4);
       }
-      // bars (input stacked under output)
+      // stacked bars per source
       const n = buckets.length;
       const slot = (w - pad.l - pad.r) / Math.max(1, n);
-      const bw = Math.max(1, Math.min(22, slot * 0.7));
+      const bw = Math.max(1, Math.min(22, slot * 0.78));
       buckets.forEach(b => {
         const cx = x(Number(b.unix));
-        const inH = (h - pad.t - pad.b) * Number(b.input || 0) / maxTotal;
-        const outH = (h - pad.t - pad.b) * Number(b.output || 0) / maxTotal;
-        const base = h - pad.b;
-        ctx.fillStyle = "#5c91df";
-        ctx.fillRect(cx - bw / 2, base - inH, bw, inH);
-        ctx.fillStyle = "#f0b35a";
-        ctx.fillRect(cx - bw / 2, base - inH - outH, bw, outH);
+        let base = h - pad.b;
+        for (const src of TOKEN_SOURCES) {
+          const segH = plotH * srcVal(b, src.key) / maxTotal;
+          if (segH > 0) {
+            ctx.fillStyle = src.color;
+            ctx.fillRect(cx - bw / 2, base - segH, bw, segH);
+            base -= segH;
+          }
+        }
+        // codex activity: a small tick marker (scaled to its own max) above axis
+        const ev = Number(b.codex_events || 0);
+        if (ev > 0) {
+          ctx.fillStyle = "#a98ee6";
+          const ty = h - pad.b - 2;
+          const tickH = 4 + 8 * ev / maxEvents;
+          ctx.fillRect(cx - 1.5, ty - tickH, 3, tickH);
+        }
       });
-      // legend + x labels
+      // legend
       ctx.textAlign = "left"; ctx.font = "12px Segoe UI, Arial";
-      ctx.fillStyle = "#5c91df"; ctx.fillRect(pad.l, pad.t - 12, 9, 9);
-      ctx.fillStyle = "#cbd5e3"; ctx.fillText("input", pad.l + 13, pad.t - 3);
-      ctx.fillStyle = "#f0b35a"; ctx.fillRect(pad.l + 64, pad.t - 12, 9, 9);
-      ctx.fillStyle = "#cbd5e3"; ctx.fillText("output", pad.l + 77, pad.t - 3);
+      let lx = pad.l;
+      for (const src of TOKEN_SOURCES) {
+        ctx.fillStyle = src.color; ctx.fillRect(lx, pad.t - 14, 9, 9);
+        ctx.fillStyle = "#cbd5e3"; ctx.fillText(src.label, lx + 13, pad.t - 5);
+        lx += ctx.measureText(src.label).width + 30;
+      }
+      ctx.fillStyle = "#a98ee6"; ctx.fillRect(lx, pad.t - 14, 9, 9);
+      ctx.fillStyle = "#cbd5e3"; ctx.fillText("Codex (activity)", lx + 13, pad.t - 5);
+      // x labels
       ctx.fillStyle = "#7c8aa0"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "center";
       const dateLbl = ux => new Date(Number(ux) * 1000).toLocaleString("en-US", { timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric", hour: "2-digit", hour12: false });
       const step = Math.max(1, Math.ceil(n / 8));
       for (let i = 0; i < n; i += step) ctx.fillText(dateLbl(buckets[i].unix), x(Number(buckets[i].unix)), h - 8);
     }
+    function renderTokenStats(payload) {
+      const strip = $("tokens-stats");
+      if (!strip) return;
+      strip.replaceChildren();
+      const totals = (payload && payload.totals) || {};
+      const items = [
+        ["Claude", fmtTok(totals.claude), "#38b995"],
+        ["OpenCode", fmtTok(totals.opencode), "#5c91df"],
+        ["Codex events", String(totals.codex_events || 0), "#a98ee6"],
+        ["All tokens", fmtTok(totals.all_tokens), "#eef4fb"]
+      ];
+      if (totals.agent_tokens_cumulative) items.push(["Agent (cumulative)", fmtTok(totals.agent_tokens_cumulative), "#8da0b8"]);
+      for (const [label, value, color] of items) {
+        const box = document.createElement("div");
+        box.className = "token-stat";
+        const v = document.createElement("div");
+        v.className = "token-stat-value";
+        v.style.color = color;
+        setText(v, value);
+        const k = document.createElement("div");
+        k.className = "token-stat-label";
+        setText(k, label);
+        box.append(v, k);
+        strip.append(box);
+      }
+    }
     function pollTokens() {
-      // Default window is 96h; if empty (the stored OpenCode sessions may be
-      // weeks/months old), widen progressively so the chart is never silently
-      // blank when data exists further back.
-      const tryHours = [96, 720, 4320, 8760];
+      // Default window 168h (7d); widen progressively if recent buckets empty so
+      // the chart is never silently blank when data exists further back.
+      const tryHours = [168, 720, 2160, 4320, 8760];
       let i = 0;
       const attempt = () => {
         fetch(`/api/tokens?hours=${tryHours[i]}`, { cache: "no-store" })
           .then(r => r.json())
           .then(payload => {
-            if (payload && payload.available) {
+            if (payload && payload.available && (payload.buckets || []).length) {
               drawTokens($("tokens-chart"), payload);
-              setText($("tokens-note"), `${(payload.grand_total || 0).toLocaleString()} tokens / ${payload.buckets.length} hr-buckets (${tryHours[i]}h window)`);
+              renderTokenStats(payload);
+              const t = payload.totals || {};
+              setText($("tokens-note"), `${fmtTok(t.all_tokens)} tokens / ${payload.buckets.length} hr-buckets (${tryHours[i]}h)`);
             } else if (i < tryHours.length - 1) {
               i++; attempt();
             } else {
               drawTokens($("tokens-chart"), payload);
-              setText($("tokens-note"), (payload && payload.reason) || "no OpenCode token data found");
+              renderTokenStats(payload);
+              setText($("tokens-note"), (payload && payload.reason) || "no token data found");
             }
           })
           .catch(() => { setText($("tokens-note"), "token source unavailable"); });
@@ -4365,6 +4805,7 @@ HTML = r"""<!doctype html>
     }
     function switchView(view) {
       store.activeView = view;
+      if (view !== "decomp") closePin();
       document.querySelectorAll(".tab-btn").forEach(button => {
         button.classList.toggle("active", button.dataset.view === view);
       });
@@ -4400,8 +4841,16 @@ HTML = r"""<!doctype html>
       }
     }
     async function refresh() {
-      const response = await fetch("/api/state", { cache: "no-store" });
-      const data = await response.json();
+      let data;
+      try {
+        const response = await fetch("/api/state", { cache: "no-store" });
+        data = await response.json();
+      } catch (err) {
+        // /api/state is a slow single-threaded rebuild; a transient reset under
+        // concurrent polling must not throw an unhandled rejection. Skip this
+        // tick — the live attempt-log / token / agent polls keep the UI moving.
+        return;
+      }
       store.data = data;
       store.rows = data.targets || [];
       renderHud(data);
@@ -4478,9 +4927,28 @@ HTML = r"""<!doctype html>
       $("decomp-near").classList.remove("primary");
       gotoFiles();
     });
-    $("decomp-treemap").addEventListener("mousemove", onTreemapMove);
-    $("decomp-treemap").addEventListener("mouseleave", () => { $("decomp-tip").hidden = true; });
+    // Desktop hover tooltip stays exactly as before; on touch we suppress the
+    // floating hover tip (it has no cursor to follow) and use the pinned panel.
+    if (!store.isTouch) {
+      $("decomp-treemap").addEventListener("mousemove", onTreemapMove);
+      $("decomp-treemap").addEventListener("mouseleave", () => { $("decomp-tip").hidden = true; });
+    }
     $("decomp-treemap").addEventListener("click", onTreemapClick);
+    $("treemap-pin-open").addEventListener("click", () => {
+      const it = store.pinnedItem;
+      closePin();
+      if (it) drillItem(it);
+    });
+    $("treemap-pin-close").addEventListener("click", closePin);
+    // Re-pin position not needed (fixed panel); close pin when leaving decomp view
+    // is handled by switchView. Tapping outside dismisses on touch.
+    document.addEventListener("click", evt => {
+      if (!store.isTouch || !store.pinnedItem) return;
+      const pin = $("treemap-pin");
+      const canvas = $("decomp-treemap");
+      if (pin.contains(evt.target) || canvas.contains(evt.target)) return;
+      closePin();
+    });
     $("reader-back").addEventListener("click", () => {
       closeReader();
       document.querySelector(".decomp-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -4531,8 +4999,10 @@ HTML = r"""<!doctype html>
     pollAgents();
     pollLimits();
     pollTokens();
+    pollLog();   // populate the attempt log immediately (independent of /api/state)
     store.agentsTimer = setInterval(pollAgents, 10000);
     store.limitsTimer = setInterval(pollLimits, 60000);
+    store.logTimer = setInterval(pollLog, 15000);   // live attempt-log refresh
     setInterval(tickLimits, 1000);   // smooth 1s countdown without refetching
     window.addEventListener("resize", () => {
       if (store.activeView === "decomp") drawTokens($("tokens-chart"), store._tokensPayload || {});
@@ -4545,11 +5015,98 @@ HTML = r"""<!doctype html>
 """
 
 
+def _fmt_bytes(n: int) -> str:
+    if n >= 1 << 30:
+        return f"{n / (1 << 30):.2f} GiB"
+    if n >= 1 << 20:
+        return f"{n / (1 << 20):.1f} MiB"
+    if n >= 1 << 10:
+        return f"{n / (1 << 10):.1f} KiB"
+    return f"{n} B"
+
+
 class Handler(BaseHTTPRequestHandler):
     def send_json(self, payload: object) -> None:
         body = json.dumps(payload, indent=2).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    # ---- v10: private artifacts over Tailscale (user's own ROM-derived files)
+    def send_file_stream(self, path: Path, content_type: str, filename: str) -> None:
+        if not path.exists() or not path.is_file():
+            self.send_json({"available": False, "error": f"not found: {path}"})
+            return
+        try:
+            size = path.stat().st_size
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(size))
+            self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            with open(path, "rb") as fh:
+                while True:
+                    chunk = fh.read(1 << 16)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+        except (OSError, BrokenPipeError):
+            return
+
+    def send_target_objects_zip(self) -> None:
+        if not TARGET_OBJ_DIR.exists():
+            self.send_json({"available": False, "error": f"not found: {TARGET_OBJ_DIR}"})
+            return
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            for obj in sorted(TARGET_OBJ_DIR.rglob("*")):
+                if obj.is_file():
+                    arc = "obj/" + str(obj.relative_to(TARGET_OBJ_DIR)).replace("\\", "/")
+                    zf.write(obj, arc)
+        body = buf.getvalue()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Disposition", 'attachment; filename="target-objects.zip"')
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        try:
+            self.wfile.write(body)
+        except BrokenPipeError:
+            return
+
+    def send_artifacts_index(self) -> None:
+        host = self.headers.get("Host", "127.0.0.1:8792")
+        dol_size = MAIN_DOL.stat().st_size if MAIN_DOL.exists() else 0
+        obj_count = sum(1 for p in TARGET_OBJ_DIR.rglob("*") if p.is_file()) if TARGET_OBJ_DIR.exists() else 0
+        obj_size = sum(p.stat().st_size for p in TARGET_OBJ_DIR.rglob("*") if p.is_file()) if TARGET_OBJ_DIR.exists() else 0
+        page = f"""<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GC6E01 private artifacts</title>
+<style>body{{font-family:Consolas,monospace;background:#0d1118;color:#eef4fb;margin:0;padding:24px;line-height:1.5}}
+h1{{font-size:18px}}a{{color:#76a9ff}}.card{{border:1px solid #2d3a4b;border-radius:8px;padding:14px;margin:12px 0;background:#151c28}}
+code{{background:#0c131d;border:1px solid #253143;border-radius:5px;padding:2px 6px;display:inline-block;margin-top:6px}}
+.muted{{color:#a8b4c4;font-size:13px}}</style></head><body>
+<h1>GC6E01 private artifacts (Tailscale)</h1>
+<p class="muted">ROM-derived, copyright-restricted inputs for the remote objdiff / asm-review workflow.
+Serve only over the private tailnet. Not linked from the public dashboard UI.</p>
+<div class="card"><b>main.dol</b> &mdash; {_fmt_bytes(dol_size)}<br>
+<span class="muted">orig/GC6E01/sys/main.dol (the target ROM image)</span><br>
+<code>curl -fL http://{host}/artifacts/main.dol -o orig/GC6E01/sys/main.dol</code></div>
+<div class="card"><b>target-objects.zip</b> &mdash; {_fmt_bytes(obj_size)} ({obj_count} files)<br>
+<span class="muted">build/GC6E01/obj/ &mdash; the per-TU target .o files objdiff diffs against</span><br>
+<code>curl -fL http://{host}/artifacts/target-objects.zip -o /tmp/to.zip &amp;&amp; unzip -o /tmp/to.zip -d build/GC6E01/</code></div>
+<div class="card"><b>fetch both</b><br>
+<code>bash tools/decomp_work/fetch_artifacts.sh {host}</code></div>
+<p class="muted">Server-side asm review (no download needed): <code>GET /api/asm?source=&lt;stem&gt;&amp;fn=&lt;fn_XXXX&gt;</code></p>
+</body></html>"""
+        body = page.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -4600,10 +5157,37 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/tokens":
             try:
-                hours = int((query.get("hours") or ["72"])[0])
+                hours = int((query.get("hours") or ["168"])[0])
             except (TypeError, ValueError):
-                hours = 72
+                hours = 168
             self.send_json(load_tokens(max(1, min(hours, 24 * 30))))
+            return
+        if path == "/api/log":
+            raw = (query.get("limit") or ["1000"])[0]
+            if str(raw).lower() == "all":
+                limit = 10 ** 9
+            else:
+                try:
+                    limit = max(1, min(int(raw), 100000))
+                except (TypeError, ValueError):
+                    limit = 1000
+            merged = load_attempt_log(DECOMP_STATUS_LOG, limit=limit) + recent_commit_attempts()
+            self.send_json({
+                "available": bool(merged),
+                "limit": raw,
+                "count": len(merged),
+                "attempt_log": merged,
+                "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            })
+            return
+        if path == "/artifacts":
+            self.send_artifacts_index()
+            return
+        if path == "/artifacts/main.dol":
+            self.send_file_stream(MAIN_DOL, "application/octet-stream", "main.dol")
+            return
+        if path == "/artifacts/target-objects.zip":
+            self.send_target_objects_zip()
             return
         if path == "/api/limits":
             self.send_json(load_limits())
@@ -4683,8 +5267,19 @@ def _refresh_report_once() -> bool:
 def _auto_report_loop(interval: int) -> None:
     _auto_state["last_matched"] = _report_matched()
     _auto_state["units"] = _report_units()
+    # Seed the persisted token history once at startup so the chart has data even
+    # before the first interval elapses.
+    try:
+        refresh_token_history()
+    except Exception:
+        pass
     while True:
         time.sleep(interval)
+        # v10: persist aggregated token buckets every loop (change-gated write).
+        try:
+            refresh_token_history()
+        except Exception:
+            pass
         if not _refresh_report_once():
             continue
         # sample the fresh numbers into the time-series history

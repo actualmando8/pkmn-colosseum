@@ -90,6 +90,9 @@ build/.harvest_cursor.json
 tools/decomp_work/reports/
 tools/decomp_work/lane_manifest.json
 tools/decomp_work/lane_manifest.json.tmp
+# v10 dashboard runtime artifact (regenerable token-expense aggregation)
+tools/decomp_work/token_history.json
+tools/decomp_work/token_history.json.tmp
 
 # Root-level scratch diff/match JSON dumps (regenerable by pipeline tools)
 /_diff*.json
