@@ -1278,7 +1278,8 @@ typedef struct PeopleFieldMoveSlot {
     u16 field_CE;          /* 0xCE */
     u16 field_D0;          /* 0xD0 */
     u16 field_D2;          /* 0xD2 */
-    u8 pad_D4[0x14];       /* 0xD4 */
+    u8 field_D4;           /* 0xD4 */
+    u8 pad_D5[0x13];       /* 0xD5 */
     u32 field_E8;          /* 0xE8 */
     u8 active;             /* 0xEC */
     u8 field_ED;           /* 0xED */
@@ -1645,9 +1646,10 @@ asm void fn_801628C8(void) {
 }
 #else
 void fn_801628C8(u32 index) {
-    u32 offset = index * 0xF4;
-    ((u8*)lbl_8047B024 + offset)[0xD4] = lbl_8047B050;
-    salActivateVoice((u8*)lbl_8047B024 + offset);
+#define PF (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024)
+    PF[index].field_D4 = lbl_8047B050;
+    salActivateVoice((u8*)&PF[index]);
+#undef PF
 }
 #endif
 #pragma pop
