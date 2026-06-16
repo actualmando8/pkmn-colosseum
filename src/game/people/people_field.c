@@ -1650,14 +1650,42 @@ void hwKeyOff(u32 index) {
     entries[index].flags_24[lbl_8047B050] |= 0x40;
 }
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8016292C(void) {
 #include "src/game/people/people_field_fn_8016292C.inc"
 }
 #else
-void fn_8016292C(void) { /* TODO */ }
+void fn_8016292C(u32 index, u16 value) {
+    typedef struct {
+        u8 pad_00[0x24];      /* 0x00 */
+        u32 words_24[0x30];   /* 0x24 */
+        u8 activeWordIndex;   /* 0xE4 */
+        u8 pad_E5[0x0F];      /* 0xE5 */
+    } PeopleFieldState;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8047B050;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u32 scaledValue;
+
+    if ((u16)value >= 0x4000) {
+        value = 0x3FFF;
+    }
+
+    if (entry->activeWordIndex != 0xFF) {
+        scaledValue = (u16)value << 4;
+        if (entry->words_24[5 + entry->activeWordIndex] == scaledValue) {
+            return;
+        }
+    }
+
+    scaledValue = (u16)value << 4;
+    entry->words_24[5 + lbl_8047B050] = scaledValue;
+    entry->words_24[lbl_8047B050] |= 8;
+    entry->activeWordIndex = lbl_8047B050;
+}
 #endif
 #pragma pop
 #pragma push
