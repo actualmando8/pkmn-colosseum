@@ -2100,12 +2100,21 @@ void fn_801631C0(void) { lbl_8047B014 = 0; }
 #pragma pop
 extern u32 lbl_8047B024;
 
+typedef struct PeopleFieldMoveSlot {
+    u8 pad_00[0xE8];       /* 0x00 */
+    u32 field_E8;          /* 0xE8 */
+    u8 active;             /* 0xEC */
+    u8 pad_ED[0x7];        /* 0xED */
+} PeopleFieldMoveSlot;
+
 u32 fn_801631CC(u32 index) {
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    if (*(u8*)(elem + 0xEC) == 0) {
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+    PeopleFieldMoveSlot* entry = &entries[index];
+
+    if (entry->active == 0) {
         return -1;
     } else {
-        return *(u32*)(elem + 0xE8);
+        return entry->field_E8;
     }
 }
 #pragma push
@@ -2116,9 +2125,8 @@ asm void fn_801631F4(void) {
 }
 #else
 u32 fn_801631F4(u32 index) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    u8 v = *(u8*)(elem + 0xEC);
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+    u8 v = entries[index].active;
     u32 diff = 1 - v;
     return (u32)(diff == 0);
 }
