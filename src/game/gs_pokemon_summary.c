@@ -129,6 +129,22 @@ s32 fn_8001501C(void) {
 /* fn_80015050 - 0x80015050 | size: 0x94 */
 extern u32 fn_80103E68(u32 a);
 extern u8 lbl_80266918[];
+typedef struct SummaryPageEntry {
+    u8 displayColor[3];      /* 0x00, copied to output bytes 0x64-0x66 */
+    u8 unk_03;
+    s32 dataSource;          /* 0x04, -1 uses default party source */
+    u8 unk_08[8];
+    s32 gaugeMatchId;        /* 0x10, compared with output species/id */
+    u8 unk_14[4];
+    void* drawHandler;       /* 0x18 */
+    u32 messageId;           /* 0x1C */
+    u8 unk_20[0x2C];
+} SummaryPageEntry;
+typedef char SummaryPageEntry_size_check[sizeof(SummaryPageEntry) == 0x4C ? 1 : -1];
+#define SUMMARY_PAGE_ENTRY_AT(index) \
+    (*(SummaryPageEntry*)((u8*)lbl_80266918 + (index) * sizeof(SummaryPageEntry)))
+#define SUMMARY_PAGE_DISPLAY_COLOR(index, component) \
+    (lbl_80266918[(index) * sizeof(SummaryPageEntry) + (component)])
 #if 0
 asm void fn_80015050(void) {
 #include "src/game/gs_pokemon_summary_fn_80015050.inc"
@@ -464,9 +480,9 @@ asm void fn_8001793C(void) {
 #pragma push
 #pragma peephole off
 s32 fn_8001793C(u8* src, u8* dst) {
-    dst[0x64] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C];
-    dst[0x65] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 1];
-    dst[0x66] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 2];
+    dst[0x64] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 0);
+    dst[0x65] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 1);
+    dst[0x66] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 2);
     return 0;
 }
 #pragma pop
@@ -482,10 +498,10 @@ asm void fn_80017990(void) {
 #pragma peephole off
 s32 fn_80017990(u8* src, u8* dst) {
     s32 idx = (s32)(s8)src[0x95];
-    if ((s32)*(s16*)(dst + 6) == *(s32*)(&lbl_80266918[idx * 0x4C + 0x10])) {
-        dst[0x64] = lbl_80266918[idx * 0x4C];
-        dst[0x65] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 1];
-        dst[0x66] = lbl_80266918[(s32)(s8)*(volatile u8*)(src + 0x95) * 0x4C + 2];
+    if ((s32)*(s16*)(dst + 6) == SUMMARY_PAGE_ENTRY_AT(idx).gaugeMatchId) {
+        dst[0x64] = SUMMARY_PAGE_DISPLAY_COLOR(idx, 0);
+        dst[0x65] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 1);
+        dst[0x66] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 2);
         dst[0x67] = 0xFF;
     } else {
         dst[0x67] = 0;
