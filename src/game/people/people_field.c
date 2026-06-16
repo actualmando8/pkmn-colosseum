@@ -1776,16 +1776,22 @@ asm void fn_80162D18(void) {
 }
 #else
 void fn_80162D18(u32 index) {
-    typedef struct {
-        u8 bytes[0xF4];       /* 0x00 */
-    } PeopleFieldState;
     extern u32 lbl_8047B024;
     extern void fn_8015D4EC(u8* ptr);
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     fn_8015D4EC((u8*)&entries[index]);
 }
 #endif
 #pragma pop
+typedef struct PeopleStudioState {
+    u8 pad_00[0xAC];       /* 0x00 */
+    u32 field_AC;          /* 0xAC */
+    u32 field_B0;          /* 0xB0 */
+    u32 field_B4;          /* 0xB4 */
+    u32 field_B8;          /* 0xB8 */
+} PeopleStudioState;
+
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -1795,13 +1801,6 @@ asm void fn_80162D44(void) {
 }
 #else
 void fn_80162D44(u8 index, u32 a, u32 b, u32 c, u32 d) {
-    typedef struct {
-        u8 pad_00[0xAC];      /* 0x00 */
-        u32 field_AC;         /* 0xAC */
-        u32 field_B0;         /* 0xB0 */
-        u32 field_B4;         /* 0xB4 */
-        u32 field_B8;         /* 0xB8 */
-    } PeopleStudioState;
     PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
     entries[(u8)index].field_AC = a;
     entries[(u8)index].field_B4 = b;
@@ -1841,9 +1840,6 @@ asm void fn_80162DAC(void) {
 }
 #else
 void fn_80162DAC(u8 index, u32 arg1) {
-    typedef struct {
-        u8 bytes[0xBC];       /* 0x00 */
-    } PeopleStudioState;
     extern void fn_8015D54C(u8*, u32);
     PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
     fn_8015D54C((u8*)&entries[(u8)index], arg1);
@@ -1859,9 +1855,6 @@ asm void fn_80162DE0(void) {
 }
 #else
 void fn_80162DE0(u8 index, u32 arg1) {
-    typedef struct {
-        u8 bytes[0xBC];       /* 0x00 */
-    } PeopleStudioState;
     extern void fn_8015D5F4(u8*, u32);
     PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
     fn_8015D5F4((u8*)&entries[(u8)index], arg1);
