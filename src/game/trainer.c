@@ -6861,7 +6861,7 @@ void fn_801FE91C(void) {
 }
 
 /* 0x801FEC10 | size: 0xC4 */
-typedef struct { u32 data[85]; } CopyBlock_0x154;
+typedef struct { u8 data[0x154]; } CopyBlock_0x154;
 u32 fn_801FEC10(void* context) {
     CopyBlock_0x154* src;
     CopyBlock_0x154* dest;

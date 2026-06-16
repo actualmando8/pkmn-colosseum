@@ -1147,7 +1147,10 @@ void fn_80059BDC(void) {
             }
             {
                 u8* dst = lbl_8047A5A0 + 0x4318;
-                *(SaveImage*)dst = *(SaveImage*)fn_80129280(0, 0xE);
+                SaveImage* dstSaveImage = (SaveImage*)dst;
+                SaveImage* srcSaveImage = (SaveImage*)fn_80129280(0, 0xE);
+
+                *dstSaveImage = *srcSaveImage;
                 prevCmd = (s32)fn_8006AFC4(dst);
                 if ((u8)fn_8006A7BC(dst) != 0 && (u32)prevCmd != 0) {
                     fn_80102568(0xDA, 0, 0);

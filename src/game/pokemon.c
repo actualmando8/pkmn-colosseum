@@ -138,6 +138,20 @@ extern void fn_8020E1BC(void);
 extern void fn_8020E1D4(void);
 extern void fn_8020E1EC(void);
 extern void fn_8020E204(void);
+
+#pragma pack(2)
+typedef struct CopyBuf {
+    u32 a;
+    u32 b;
+    u32 c;
+    u32 d;
+    u32 e;
+    u32 f;
+    u16 g;
+} CopyBuf;
+#pragma pack()
+
+extern const CopyBuf lbl_80279C28;
 extern void fn_8020E230(void);
 extern void fn_8020E248(void);
 extern void fn_8020E260(void);
@@ -3235,17 +3249,13 @@ s16 fn_801F4804(void* obj) {
 
 /* 0x801F4860 | size: 0x260 | large */
 void fn_801F4860(void* obj, u32 param2) {
-    extern u8 lbl_80279C28[];
     extern u32 fn_801F54A4(void*, int, int, int);
     extern void fn_8011B950(u32, u32);
     extern void fn_801F4C14(void*, int, int, int, int);
     extern void fn_801F7530(u32, u32);
     u32 tmp, i, fill;
     u32* zarr;
-    #pragma pack(2)
-    struct CopyBuf { u32 a; u32 b; u32 c; u32 d; u32 e; u32 f; u16 g; };
-    #pragma pack()
-    struct CopyBuf buf;
+    CopyBuf buf;
     u16* tbl;
     if (!obj) return;
     tmp = fn_801F54A4(obj, 0, 9, 0);
@@ -3254,7 +3264,7 @@ void fn_801F4860(void* obj, u32 param2) {
     fn_801F4C14(obj, 0, 0xd, 0, 0);
     tmp = fn_801F54A4(obj, 0, 0x35, 0);
     fn_801F7530(tmp, 2);
-    *(struct CopyBuf*)&buf = *(struct CopyBuf*)lbl_80279C28;
+    buf = lbl_80279C28;
     tbl = (u16*)&buf;
     i = 0;
     while ((i & 0xFFFF) < 0xd) {
@@ -3285,15 +3295,11 @@ void fn_801F4860(void* obj, u32 param2) {
 
 /* 0x801F4AC0 | size: 0x154 | medium */
 void fn_801F4AC0(void* obj) {
-    extern u8 lbl_80279C28[];
     extern void fn_801F4C14(void*, int, int, int, int);
-    #pragma pack(2)
-    struct CopyBuf { u32 a; u32 b; u32 c; u32 d; u32 e; u32 f; u16 g; };
-    #pragma pack()
-    struct CopyBuf buf;
+    CopyBuf buf;
     u16* tbl;
     u32 i;
-    *(struct CopyBuf*)&buf = *(struct CopyBuf*)lbl_80279C28;
+    buf = lbl_80279C28;
     tbl = (u16*)&buf;
     i = 0;
     while ((i & 0xFFFF) < 0xd) {
