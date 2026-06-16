@@ -141,6 +141,11 @@ typedef struct SummaryPageEntry {
     u8 unk_20[0x2C];
 } SummaryPageEntry;
 typedef char SummaryPageEntry_size_check[sizeof(SummaryPageEntry) == 0x4C ? 1 : -1];
+/*
+ * Transitional accessors: direct SummaryPageEntry array indexing changes MWCC
+ * register allocation for fn_80017990. Keep the byte-match spelling isolated
+ * here until the rodata table can be typed without losing the match.
+ */
 #define SUMMARY_PAGE_ENTRY_AT(index) \
     (*(SummaryPageEntry*)((u8*)lbl_80266918 + (index) * sizeof(SummaryPageEntry)))
 #define SUMMARY_PAGE_DISPLAY_COLOR(index, component) \
