@@ -9236,43 +9236,43 @@ u32 fn_80233DB0(u32 r3, u32 r4, int r5, u16 r6, char r7, int r8)
     extern u32 fn_801FB1C0();
     extern u32 fn_80205BE8();
     extern void fn_80206AEC();
+  struct cpy85 { u32 d[85]; };
   u32 uVar1;
   u32 *puVar2;
   u32 *puVar3;
   u32 uVar4;
   u16 uVar9;
-  int iVar7;
+  struct cpy85 *iVar7;
   u32 uVar15;
   u32 uVar6;
   int iVar16;
-  int iVar5;
+  struct cpy85 *iVar5;
   u8 cVar11;
   int iVar8;
   u16 uVar10;
   u32 uVar13;
   u32 *puVar12;
   u32 *puVar14;
-  struct cpy85 { u32 d[85]; };
-  u32 uStack_198[85];
-  u32 uStack_2ec[85];
+  struct cpy85 uStack_198;
+  struct cpy85 uStack_2ec;
 
   uVar9 = fn_801FB1C0(r3,0,0x43,0);
   fn_801FB1C0(0,uVar9,2,0);
   for (uVar13 = 0; (u16)uVar13 < 6; uVar13 = uVar13 + 1) {
     *(u32 *)(r8 + (u32)(u16)uVar13 * 4) = 0;
   }
-  iVar5 = fn_801FB1C0(r3,0,0x45,0);
+  iVar5 = (struct cpy85 *)fn_801FB1C0(r3,0,0x45,0);
   if (iVar5 == 0) {
     return 0;
   }
   else {
-    iVar7 = fn_801FB1C0(r3,0,0x45,1);
+    iVar7 = (struct cpy85 *)fn_801FB1C0(r3,0,0x45,1);
     if (iVar7 == 0) {
       return 0;
     }
     else {
-      *(struct cpy85 *)uStack_198 = *(struct cpy85 *)iVar5;
-      *(struct cpy85 *)uStack_2ec = *(struct cpy85 *)iVar7;
+      uStack_198 = *iVar5;
+      uStack_2ec = *iVar7;
       for (uVar13 = 0; (u16)uVar13 < r6; uVar13 = uVar13 + 1) {
       }
       uVar6 = 0;
@@ -9364,8 +9364,8 @@ LAB_00231240:
         }
 LAB_0023124c: (void)0;
       }
-      *(struct cpy85 *)iVar5 = *(struct cpy85 *)uStack_198;
-      *(struct cpy85 *)iVar7 = *(struct cpy85 *)uStack_2ec;
+      *iVar5 = uStack_198;
+      *iVar7 = uStack_2ec;
     }
   }
   return uVar6;
