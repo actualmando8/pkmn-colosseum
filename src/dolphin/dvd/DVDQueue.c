@@ -54,7 +54,6 @@ void __DVDClearWaitingQueue_803FC3F8(void) {
 BOOL __DVDPushWaitingQueue_803FC3F8(s32 prio, DVDCommandBlock* block) {
     BOOL enabled;
     DVDQueueNode* sentinel;
-    DVDQueueNode* node = (DVDQueueNode*)block;
     DVDQueueNode* tail;
 
     enabled = OSDisableInterrupts();
@@ -63,10 +62,14 @@ BOOL __DVDPushWaitingQueue_803FC3F8(s32 prio, DVDCommandBlock* block) {
     tail = sentinel->prev;
 
     /* Insert before sentinel (at end of queue) */
-    tail->next = node;
-    node->prev = tail;
-    node->next = sentinel;
-    sentinel->prev = node;
+    if (tail == sentinel) {
+        sentinel->next = (DVDQueueNode*)block;
+    } else {
+        ((DVDCommandBlock*)tail)->next = block;
+    }
+    block->prev = (DVDCommandBlock*)tail;
+    block->next = (DVDCommandBlock*)sentinel;
+    sentinel->prev = (DVDQueueNode*)block;
 
     OSRestoreInterrupts(enabled);
     return TRUE;
@@ -82,7 +85,8 @@ BOOL __DVDPushWaitingQueue_803FC3F8(s32 prio, DVDCommandBlock* block) {
 DVDCommandBlock* __DVDPopWaitingQueue_803FC3F8(void) {
     BOOL enabled;
     DVDQueueNode* sentinel;
-    DVDQueueNode* node;
+    DVDCommandBlock* block;
+    DVDCommandBlock* next;
     s32 i;
 
     enabled = OSDisableInterrupts();
@@ -100,19 +104,25 @@ DVDCommandBlock* __DVDPopWaitingQueue_803FC3F8(void) {
         enabled = OSDisableInterrupts();
 
         sentinel = &WaitingQueue_803FC3F8[i];
-        node = sentinel->next;
+        block = (DVDCommandBlock*)sentinel->next;
+        next = block->next;
 
         /* Remove from queue */
-        sentinel->next = node->next;
-        node->next->prev = sentinel;
+        if ((DVDQueueNode*)next == sentinel) {
+            sentinel->next = sentinel;
+            sentinel->prev = sentinel;
+        } else {
+            sentinel->next = (DVDQueueNode*)next;
+            next->prev = (DVDCommandBlock*)sentinel;
+        }
 
         OSRestoreInterrupts(enabled);
 
         /* Clear links */
-        node->next = NULL;
-        node->prev = NULL;
+        block->next = NULL;
+        block->prev = NULL;
 
-        return (DVDCommandBlock*)node;
+        return block;
     }
 
     OSRestoreInterrupts(enabled);

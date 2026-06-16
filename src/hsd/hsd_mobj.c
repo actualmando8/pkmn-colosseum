@@ -247,6 +247,7 @@ void fn_801A6B8C(HSD_MObj* mobj) {
         fn_801B42C0(mobj->tevdesc);
     }
     if (mobj->texp != NULL) {
+        /* Stale inactive C: mobj->texp is HSD_TExp*; keep the asm wrapper authoritative. */
         fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
     }
     if (mobj->pe != NULL) {
@@ -548,6 +549,7 @@ call_setup:
         mobj->tevdesc = NULL;
     }
     if (mobj->texp != NULL) {
+        /* Stale inactive C: the portable PC body clears mobj->texp and rebuilds it via make_texp. */
         fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
         mobj->texp = NULL;
     }

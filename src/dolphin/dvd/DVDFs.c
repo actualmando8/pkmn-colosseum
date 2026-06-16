@@ -492,7 +492,7 @@ BOOL fn_800A532C(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset,
  */
 void fn_800A53EC(s32 result, DVDFileInfo* fileInfo) {
     if (fileInfo->callback) {
-        (fileInfo->callback)(result, (DVDCommandBlock*)fileInfo);
+        (fileInfo->callback)(result, &fileInfo->cb);
     }
 }
 
@@ -580,7 +580,7 @@ BOOL fn_800A5558(DVDFileInfo* fileInfo, s32 offset, DVDCBCallback callback,
  */
 void fn_800A55F0(s32 result, DVDFileInfo* fileInfo) {
     if (fileInfo->callback) {
-        (fileInfo->callback)(result, (DVDCommandBlock*)fileInfo);
+        (fileInfo->callback)(result, &fileInfo->cb);
     }
 }
 
