@@ -1784,9 +1784,13 @@ asm void fn_80162D18(void) {
 }
 #else
 void fn_80162D18(u32 index) {
+    typedef struct {
+        u8 bytes[0xF4];       /* 0x00 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
     extern void fn_8015D4EC(u8* ptr);
-    fn_8015D4EC((u8*)lbl_8047B024 + index * 0xF4);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    fn_8015D4EC((u8*)&entries[index]);
 }
 #endif
 #pragma pop
@@ -1799,11 +1803,18 @@ asm void fn_80162D44(void) {
 }
 #else
 void fn_80162D44(u8 index, u32 a, u32 b, u32 c, u32 d) {
-    u8* elem = lbl_80447E60 + (u32)index * 0xBC;
-    *(u32*)(elem + 0xAC) = a;
-    *(u32*)(elem + 0xB4) = b;
-    *(u32*)(elem + 0xB0) = c;
-    *(u32*)(elem + 0xB8) = d;
+    typedef struct {
+        u8 pad_00[0xAC];      /* 0x00 */
+        u32 field_AC;         /* 0xAC */
+        u32 field_B0;         /* 0xB0 */
+        u32 field_B4;         /* 0xB4 */
+        u32 field_B8;         /* 0xB8 */
+    } PeopleStudioState;
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    entries[(u8)index].field_AC = a;
+    entries[(u8)index].field_B4 = b;
+    entries[(u8)index].field_B0 = c;
+    entries[(u8)index].field_B8 = d;
 }
 #endif
 #pragma pop
