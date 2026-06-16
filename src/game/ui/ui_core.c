@@ -2927,9 +2927,21 @@ asm void fn_8005D8F8(u32 idx, u32 val) {
 #include "src/game/ui/ui_core_fn_8005D8F8.inc"
 }
 #else
+#ifndef PCPORT
 typedef struct { u8 b7:1; u8 rest:7; } UiBits_8005D8F8;
+#endif
 #pragma optimization_level 4
 void fn_8005D8F8(u32 idx, u32 val) {
+#ifdef PCPORT
+    u8* ptr;
+    if (idx >= *(u32*)&lbl_80478968) {
+        ptr = (u8*)0;
+    } else {
+        ptr = &lbl_802EF0A8[idx * 0x1C];
+    }
+    if (ptr == (u8*)0) return;
+    *ptr = (*ptr & 0x7F) | ((val & 1) << 7);
+#else
     UiBits_8005D8F8* ptr;
     if (idx >= *(u32*)&lbl_80478968) {
         ptr = (UiBits_8005D8F8*)0;
@@ -2938,6 +2950,7 @@ void fn_8005D8F8(u32 idx, u32 val) {
     }
     if (ptr == (UiBits_8005D8F8*)0) return;
     ptr->b7 = (u8)val;
+#endif
 }
 #endif
 

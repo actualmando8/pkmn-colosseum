@@ -1020,6 +1020,7 @@ s32 fn_8000CA34(void) {
     return 0;
 }
 
+#ifndef PCPORT
 typedef struct {
     s8 b80 : 1;
     s8 b40 : 1;
@@ -1030,35 +1031,52 @@ typedef struct {
     s8 b02 : 1;
     s8 b01 : 1;
 } PartyFlags8;
+#endif
 
 #pragma push
 #pragma peephole off
 
 /* fn_8000CAA4 - 0x8000CAA4 | size: 0x2c — toggles bit 3 (0x10) of lbl_804673F8[0x8] */
 s32 fn_8000CAA4(void) {
+#ifdef PCPORT
+    lbl_804673F8[8] ^= 0x10;
+#else
     PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
     p->b10 ^= 1;
+#endif
     return 0;
 }
 
 /* fn_8000CAD0 - 0x8000CAD0 | size: 0x2c — toggles bit 2 (0x20) */
 s32 fn_8000CAD0(void) {
+#ifdef PCPORT
+    lbl_804673F8[8] ^= 0x20;
+#else
     PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
     p->b20 ^= 1;
+#endif
     return 0;
 }
 
 /* fn_8000CAFC - 0x8000CAFC | size: 0x2c — toggles bit 1 (0x40) */
 s32 fn_8000CAFC(void) {
+#ifdef PCPORT
+    lbl_804673F8[8] ^= 0x40;
+#else
     PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
     p->b40 ^= 1;
+#endif
     return 0;
 }
 
 /* fn_8000CB28 - 0x8000CB28 | size: 0x2c — toggles bit 0 (0x80) */
 s32 fn_8000CB28(void) {
+#ifdef PCPORT
+    lbl_804673F8[8] ^= 0x80;
+#else
     PartyFlags8* p = (PartyFlags8*)(lbl_804673F8 + 8);
     p->b80 ^= 1;
+#endif
     return 0;
 }
 #pragma pop
