@@ -58,7 +58,7 @@
  *   - If the count (from fn_80143FFC) is 0, shows "no Pokemon here" message
  *     via fn_8002A0B8 (format text) and fn_80106ADC (display)
  *   - Otherwise, opens the detail view with move list, stats, etc.
- *   - References lbl_80266918 event table with 0x4C stride per entry
+ *   - References sSummaryPageEntries event/page table with 0x4C stride per entry
  *
  * fn_8001B1EC (GSpcbox_MainStateMachine) is the largest function (0x8D8 bytes):
  *   - Manages box browse, select, deposit, withdraw, and move states
@@ -4559,6 +4559,7 @@ extern void menuCloseSync(); /* referenced by asm incs */
 extern u32 lbl_8047A2E0;
 extern u32 lbl_8047A2D8;
 extern u8 lbl_80266918[];
+#define sSummaryPageEntries lbl_80266918
 extern u32 lbl_8047A2DC;
 extern u32 lbl_8047A2F8;
 extern u32 lbl_8047A2B8;
@@ -6309,4 +6310,3 @@ void fn_8001E58C(s16 x1, s16 y1, s16 x2, s16 y2, u8* color) {
     fn_800D6728();
 }
 #endif
-
