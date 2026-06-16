@@ -1996,9 +1996,15 @@ asm void fn_80163050(void) {
 #include "src/game/people/people_field_fn_80163050.inc"
 }
 #else
+typedef struct PeopleFieldMoveCommand {
+    u32 field_00;          /* 0x00 */
+    u32 packedSizeWord;    /* 0x04: high byte type, low 24-bit payload */
+} PeopleFieldMoveCommand;
+
 void fn_80163050(u32** src, u32* out) {
     extern u32 fn_80163810(u32 a, u32 b);
-    u32 val = *(u32*)((u8*)*src + 4);
+    PeopleFieldMoveCommand* command = (PeopleFieldMoveCommand*)*src;
+    u32 val = command->packedSizeWord;
     u32 type = val >> 24;
     u32 payload = val & 0xFFFFFF;
     switch (type) {
@@ -2034,7 +2040,8 @@ asm void fn_80163104(void) {
 #else
 void fn_80163104(u8* src, u8* dest) {
     extern void fn_80163BCC(u8* a, u32 b);
-    u32 val = *(u32*)(src + 4);
+    PeopleFieldMoveCommand* command = (PeopleFieldMoveCommand*)src;
+    u32 val = command->packedSizeWord;
     u32 type = val >> 24;
     u32 payload = val & 0xFFFFFF;
     switch (type) {
