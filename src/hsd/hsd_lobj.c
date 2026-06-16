@@ -417,7 +417,7 @@ void HSD_LObjSetColor(HSD_LObj* lobj, u32* color) {
 /* 0x801A4A54 | 0x70 */
 extern void jumptable_8036CA64();
 /* GXLightIndex to GXLightID bitmask */
-#if 1
+#if 0
 asm void fn_801A4A54(void) {
 #include "src/hsd/hsd_lobj_fn_801A4A54.inc"
 }
