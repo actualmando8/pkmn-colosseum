@@ -82,7 +82,7 @@ extern u32   fn_80109934(void* obj);
 extern void  fn_80109C88(void* obj, void* ctx);
 
 /* ===== BSS data ===== */
-extern u8    lbl_803A95E8[];   /* Script callback state A (0x138 bytes) */
+extern ScriptCallbackStateCopy lbl_803A95E8[];   /* Script callback state A (0x138 bytes) */
 extern u8    lbl_803A9720[];   /* Script callback state B (0x48 bytes) */
 extern u8    lbl_80314E08[];
 extern u8    lbl_80314F98[];
@@ -139,7 +139,7 @@ u32 fn_80053778(u32 unused, u8* p) {
     u32 model;
     s32 alpha;
     s32 y;
-    void* msgCtx;
+    ScriptCallbackStateCopy* msgCtx;
     f32 scale;
     f32 fade;
 
@@ -185,7 +185,7 @@ u32 fn_80053778(u32 unused, u8* p) {
             model = fn_80109934(lbl_803A9720);
         } else {
             fn_80109C88(lbl_803A9720, msgCtx);
-            *(ScriptCallbackStateCopy*)lbl_803A95E8 = *(ScriptCallbackStateCopy*)msgCtx;
+            lbl_803A95E8[0] = *msgCtx;
         }
     }
 

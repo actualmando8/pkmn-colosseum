@@ -113,8 +113,11 @@ typedef struct Mtx33f {
  *   0x00: u32  vertexDataOffset / vertexDataPtr (relocated)
  *   0x04: u32  triangleCount
  */
+typedef struct GSColTriangle GSColTriangle;
+typedef struct GSColSubMesh GSColSubMesh;
+
 typedef struct GSColMeshHeader {
-    /* 0x00 */ void*  vertexData;     /**< Pointer to vertex array (relocated) */
+    /* 0x00 */ GSColTriangle* vertexData; /**< Pointer to triangle array (relocated) */
     /* 0x04 */ u32    triangleCount;  /**< Number of triangles in this mesh */
 } GSColMeshHeader;
 
@@ -131,17 +134,17 @@ typedef struct GSColMeshHeader {
  * Attribute fields at 0x24..0x3F contain sub-mesh pointers
  * that are relocated during load.
  */
-typedef struct GSColTriangle {
+struct GSColTriangle {
     /* 0x00 */ Vec3f   v[3];          /**< Triangle vertices */
-    /* 0x24 */ void*   meshGroupA;    /**< Sub-mesh group A (e.g. walkable floor) */
-    /* 0x28 */ void*   meshGroupB;    /**< Sub-mesh group B (e.g. wall surfaces) */
-    /* 0x2C */ void*   meshGroupC;    /**< Sub-mesh group C (e.g. slopes) */
-    /* 0x30 */ void*   meshGroupD;    /**< Sub-mesh group D (e.g. ceiling) */
-    /* 0x34 */ void*   meshGroupE;    /**< Sub-mesh group E (e.g. ramps) */
-    /* 0x38 */ void*   meshGroupF;    /**< Sub-mesh group F (e.g. boundary) */
+    /* 0x24 */ GSColSubMesh* meshGroupA; /**< Sub-mesh group A (e.g. walkable floor) */
+    /* 0x28 */ GSColSubMesh* meshGroupB; /**< Sub-mesh group B (e.g. wall surfaces) */
+    /* 0x2C */ GSColSubMesh* meshGroupC; /**< Sub-mesh group C (e.g. slopes) */
+    /* 0x30 */ GSColSubMesh* meshGroupD; /**< Sub-mesh group D (e.g. ceiling) */
+    /* 0x34 */ GSColSubMesh* meshGroupE; /**< Sub-mesh group E (e.g. ramps) */
+    /* 0x38 */ GSColSubMesh* meshGroupF; /**< Sub-mesh group F (e.g. boundary) */
     /* 0x3C */ u16     flags;         /**< Triangle flags (bit 0 = disabled) */
     /* 0x3E */ u16     pad3E;
-} GSColTriangle;
+};
 
 /**
  * Collision sub-mesh group header.
@@ -158,12 +161,12 @@ typedef struct GSColTriangle {
  *
  * Each group stores a 4-byte color constant for debug visualization.
  */
-typedef struct GSColSubMesh {
+struct GSColSubMesh {
     /* 0x00 */ void*  vertexData;    /**< Pointer to triangle vertex array */
     /* 0x04 */ u32    triangleCount; /**< Number of triangles */
     /* 0x08 */ void*  normalData;    /**< Optional normal data pointer */
     /* 0x0C */ void*  extraData;     /**< Optional extra data pointer */
-} GSColSubMesh;
+};
 
 /**
  * Per-triangle collision state entry -- 0x28 bytes.
@@ -557,12 +560,12 @@ void GScolsys2_InitRenderer(void);
  * through the 4x3 matrix, computes vertex colors from surface type
  * attributes, and submits them as GX triangle primitives.
  *
- * @param meshData  Pointer to the GSColMeshHeader for this group.
+ * @param meshData  Pointer to the GSColSubMesh for this group.
  * @param mtx       Pointer to the 4x3 transform matrix (12 floats).
  *
  * Corresponds to fn_8010D20C.
  */
-void GScolsys2_DrawTriGroup(void* meshData, void* mtx);
+void GScolsys2_DrawTriGroup(GSColSubMesh* meshData, void* mtx);
 
 /**
  * GScolsys2_Draw -- Build a debug display list for all collision meshes.

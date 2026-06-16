@@ -3056,7 +3056,6 @@ s32 fn_80028728(void* r3, u8* r4) {
 /* fn_80028830 - 0x80028830 | size: 0x118 */
 extern void* fn_8005D858(s32);
 extern void fn_80104160(s32, s32, s32, s32, u32, void*, s32, s32);
-extern u8 lbl_803A20DC[];
 extern f64 lbl_8047B948;
 extern f32 lbl_8047B940;
 typedef struct WorldMapOverlay {
@@ -3071,6 +3070,7 @@ typedef struct WorldMapOverlay {
     f32 timer;
     f32 lifetime;
 } WorldMapOverlay;
+extern WorldMapOverlay lbl_803A20DC[];
 #if 0
 asm void fn_80028830(void) {
 #include "src/game/gs_worldmap_fn_80028830.inc"
@@ -3097,7 +3097,7 @@ s32 fn_80028830(void* r3) {
     r27 = r3;
     r29 = *(s16*)((u8*)fn_8005D858(0x98) + 0xc);
     r28 = *(s16*)((u8*)fn_8005D858(0x98) + 0xe);
-    r31 = (WorldMapOverlay*)lbl_803A20DC;
+    r31 = lbl_803A20DC;
     r30 = 0;
     while (r30 < 0x1e) {
         if (r31->active != 0) {
@@ -3138,7 +3138,7 @@ asm void fn_80028948(void) {
  * fn_80028948 - GSmap_MainRenderFrame (0x80028948, size 0x674)
  *
  * Particle/overlay state machine that drives the 30-entry overlay table
- * (((WorldMapOverlay*)lbl_803A20DC), WorldMapOverlay[30]) consumed by the renderer fn_80028830.
+ * (lbl_803A20DC, WorldMapOverlay[30]) consumed by the renderer fn_80028830.
  *
  * Dispatches on the 1-byte mode field at offset 0x01 of the controller
  * object (signed):
@@ -3161,21 +3161,7 @@ asm void fn_80028948(void) {
  */
 s32 fn_80028948(void* r3)
 {
-    typedef struct WorldMapOverlay {
-        s32 active;     /* +0x00 */
-        f32 x;          /* +0x04 */
-        f32 y;          /* +0x08 */
-        f32 scale;      /* +0x0c (per-frame, = baseScale * lifeRatio)        */
-        f32 baseScale;  /* +0x10                                              */
-        u32 color;      /* +0x14                                              */
-        u8  alpha;      /* +0x18                                              */
-        u8  pad19[3];   /* +0x19                                              */
-        f32 timer;      /* +0x1c                                              */
-        f32 lifetime;   /* +0x20                                              */
-    } WorldMapOverlay;
-
     extern f32 fn_800E0BE4(void);            /* random f32 source (-> f1) */
-    extern u8 lbl_803A20DC[];  /* canonical; per-site reinterpret cast */
     extern f32 lbl_8047B958;                 /* spawn threshold           */
     extern f32 lbl_8047B95C;                 /* x scale                   */
     extern f32 lbl_8047B960;                 /* y scale                   */
@@ -3203,7 +3189,7 @@ s32 fn_80028948(void* r3)
 
         /* clear all 30 overlays */
         for (i = 0; i < 30; i++) {
-            ((WorldMapOverlay*)lbl_803A20DC)[i].active = 0;
+            lbl_803A20DC[i].active = 0;
         }
 
         /* 600 priming ticks */
@@ -3211,12 +3197,12 @@ s32 fn_80028948(void* r3)
             if (fn_800E0BE4() <= lbl_8047B958) {
                 /* find first inactive slot */
                 for (slot = 0; slot < 30; slot++) {
-                    if (((WorldMapOverlay*)lbl_803A20DC)[slot].active == 0) {
+                    if (lbl_803A20DC[slot].active == 0) {
                         break;
                     }
                 }
                 if (slot < 30) {
-                    ov = &((WorldMapOverlay*)lbl_803A20DC)[slot];
+                    ov = &lbl_803A20DC[slot];
                     ov->active = 1;
                     ov->x = lbl_8047B95C * fn_800E0BE4();
                     ov->y = lbl_8047B960 * fn_800E0BE4();
@@ -3231,7 +3217,7 @@ s32 fn_80028948(void* r3)
 
             /* update pass over all 30 overlays */
             for (slot = 0; slot < 30; slot++) {
-                ov = &((WorldMapOverlay*)lbl_803A20DC)[slot];
+                ov = &lbl_803A20DC[slot];
                 if (ov->active != 0) {
                     f32 ratio;
                     ov->timer = ov->timer + lbl_8047B934;
@@ -3253,12 +3239,12 @@ s32 fn_80028948(void* r3)
         /* probabilistic single spawn */
         if (fn_800E0BE4() <= lbl_8047B958) {
             for (slot = 0; slot < 30; slot++) {
-                if (((WorldMapOverlay*)lbl_803A20DC)[slot].active == 0) {
+                if (lbl_803A20DC[slot].active == 0) {
                     break;
                 }
             }
             if (slot < 30) {
-                ov = &((WorldMapOverlay*)lbl_803A20DC)[slot];
+                ov = &lbl_803A20DC[slot];
                 ov->active = 1;
                 ov->x = lbl_8047B95C * fn_800E0BE4();
                 ov->y = lbl_8047B960 * fn_800E0BE4();
@@ -3273,7 +3259,7 @@ s32 fn_80028948(void* r3)
 
         /* update pass over all 30 overlays */
         for (slot = 0; slot < 30; slot++) {
-            ov = &((WorldMapOverlay*)lbl_803A20DC)[slot];
+            ov = &lbl_803A20DC[slot];
             if (ov->active != 0) {
                 f32 ratio;
                 ov->timer = ov->timer + lbl_8047B934;

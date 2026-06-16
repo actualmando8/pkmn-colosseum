@@ -1097,9 +1097,8 @@ void GScolsys2_InitRenderer(void)
  *   4. Submit 3 vertices with position and color
  *   5. End the triangle strip
  * =================================================================== */
-void GScolsys2_DrawTriGroup(void* meshData, void* mtx)
+void GScolsys2_DrawTriGroup(GSColSubMesh* mesh, void* mtx)
 {
-    GSColMeshHeader* mesh = (GSColMeshHeader*)meshData;
     u8* triPtr = (u8*)mesh[0].vertexData;
     u32 triCount = mesh[0].triangleCount;
     u32 i;
@@ -1236,7 +1235,7 @@ void* GScolsys2_Draw(void)
     }
 
     /* Get triangle data */
-    triBase = (GSColTriangle*)wzx->vertexData;
+    triBase = wzx->vertexData;
     triCount = wzx->triangleCount;
 
     for (i = 0; i < triCount; i++) {
@@ -1264,8 +1263,8 @@ void* GScolsys2_Draw(void)
             u32 j;
             Vec3f xformed[3];
 
-            subVerts = (u8*)((GSColSubMesh*)tri->meshGroupB)->vertexData;
-            subTriCount = ((GSColSubMesh*)tri->meshGroupB)->triangleCount;
+            subVerts = (u8*)tri->meshGroupB->vertexData;
+            subTriCount = tri->meshGroupB->triangleCount;
 
             for (j = 0; j < subTriCount; j++) {
                 u32 v;
@@ -1299,8 +1298,8 @@ void* GScolsys2_Draw(void)
         /* Draw meshGroupC: wall surfaces (pink) */
         if (tri->meshGroupC != NULL) {
             u32 color = lbl_8047CEBC;  /* 0xFF00FFC0 */
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupC)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupC)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupC->vertexData;
+            u32 subTriCount = tri->meshGroupC->triangleCount;
             u32 j;
 
             fn_800D6A00(3);  /* triangles */
@@ -1322,8 +1321,8 @@ void* GScolsys2_Draw(void)
         /* Draw meshGroupD: slope surfaces (yellow) */
         if (tri->meshGroupD != NULL) {
             u32 color = lbl_8047CEC0;  /* 0xFFFF00C0 */
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupD)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupD)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupD->vertexData;
+            u32 subTriCount = tri->meshGroupD->triangleCount;
             u32 j;
 
             fn_800D6A00(3);
@@ -1350,8 +1349,8 @@ void* GScolsys2_Draw(void)
         /* Draw meshGroupF: boundary surfaces (cyan) */
         if (tri->meshGroupF != NULL) {
             u32 color = lbl_8047CEC4;  /* 0x00FFFFC0 */
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupF)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupF)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupF->vertexData;
+            u32 subTriCount = tri->meshGroupF->triangleCount;
             u32 j;
 
             fn_800D6A00(3);
@@ -1422,7 +1421,7 @@ void GScolsys2_DrawActive(void)
     fn_800DA1E8(1, 2, 1);
     fn_800D9ED8(0);
 
-    triBase = (GSColTriangle*)wzx->vertexData;
+    triBase = wzx->vertexData;
     triCount = wzx->triangleCount;
 
     /* Compute layer entry base */
@@ -1455,8 +1454,8 @@ void GScolsys2_DrawActive(void)
 
         if (tri->meshGroupB != NULL) {
             u32 color = lbl_8047CEB8;
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupB)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupB)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupB->vertexData;
+            u32 subTriCount = tri->meshGroupB->triangleCount;
             u32 j;
             for (j = 0; j < subTriCount; j++) {
                 u32 v;
@@ -1482,8 +1481,8 @@ void GScolsys2_DrawActive(void)
 
         if (tri->meshGroupC != NULL) {
             u32 color = lbl_8047CEBC;
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupC)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupC)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupC->vertexData;
+            u32 subTriCount = tri->meshGroupC->triangleCount;
             u32 j;
             fn_800D6A00(3);
             for (j = 0; j < subTriCount; j++) {
@@ -1503,8 +1502,8 @@ void GScolsys2_DrawActive(void)
 
         if (tri->meshGroupD != NULL) {
             u32 color = lbl_8047CEC0;
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupD)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupD)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupD->vertexData;
+            u32 subTriCount = tri->meshGroupD->triangleCount;
             u32 j;
             fn_800D6A00(3);
             for (j = 0; j < subTriCount; j++) {
@@ -1528,8 +1527,8 @@ void GScolsys2_DrawActive(void)
 
         if (tri->meshGroupF != NULL) {
             u32 color = lbl_8047CEC4;
-            u8* subVerts = (u8*)((GSColSubMesh*)tri->meshGroupF)->vertexData;
-            u32 subTriCount = ((GSColSubMesh*)tri->meshGroupF)->triangleCount;
+            u8* subVerts = (u8*)tri->meshGroupF->vertexData;
+            u32 subTriCount = tri->meshGroupF->triangleCount;
             u32 j;
             fn_800D6A00(3);
             for (j = 0; j < subTriCount; j++) {
