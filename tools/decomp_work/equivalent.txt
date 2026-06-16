@@ -41,3 +41,9 @@ fn_802389D4	# 97.76%
 fn_8023CFDC	# 98.26%
 
 fn_80162FB0   # people_field.c - float-conversion-in-TU: readable typed C active; match_scan 78.3%, single-symbol diff 98.48%; only meaningful residual is CW anonymous @405 u32->f32 magic double vs target lbl_8047D4E8
+
+# === 2026-06-15: 3 colosseum_event walls already confirmed/tested in WALLS.md,
+# === promoted to registry (were missing). Other walltriage-classified walls staged in _wall_candidates.md.
+fn_8020B330   # colosseum_event.c - W1 saved-band tie-break locked at opt4 (7 variants inert) - WALLS.md
+fn_8020341C   # colosseum_event.c - W1 saved-vs-temp tie-break (ANNEAL sweep inert) - WALLS.md
+fn_8020EED4   # colosseum_event.c - W1 saved-band tie-break (comma-op/param-split inert at opt4) - WALLS.md

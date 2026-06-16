@@ -42,6 +42,48 @@ import cs_splice  # noqa: E402  (def-span finder, reused verbatim)
 import compile_check  # noqa: E402  (per-file flags/version/target resolution)
 import measure_cache  # noqa: E402  (cached objdiff for banding)
 
+# Optional fleet-lock integration: `init` takes a whole-file lock for <tag> so two
+# sessions can never grab the same TU; `save` renews it (heartbeat). Best-effort —
+# if locks.py is unavailable the harness behaves exactly as before.
+try:
+    sys.path.insert(0, str(HERE / "coordination"))
+    import locks as _locks  # noqa: E402
+except Exception:  # pragma: no cover - locks are advisory
+    _locks = None
+
+
+def _lock_acquire_file(tag, src_rel):
+    """Take the file lock for <tag>. Warn (don't abort) if another agent owns it —
+    re-running init on your own file just renews, but a foreign owner is a real
+    collision the operator should see."""
+    if _locks is None:
+        return
+    try:
+        r = _locks.acquire(tag, src_rel, scope="file", note=f"band {tag}")
+    except Exception as exc:  # never let an advisory lock break the harness
+        print(f"  (lock: skipped — {exc})")
+        return
+    if r.get("ok"):
+        lk = r.get("lock", {})
+        ttl = lk.get("ttl_remaining")
+        print(f"  lock: {r['action']} file '{src_rel}' for '{tag}'"
+              + (f" (ttl {ttl}s)" if ttl is not None else ""))
+    else:
+        owner = r.get("owner")
+        print(f"  !! LOCK DENIED: '{src_rel}' is owned by '{owner}', not '{tag}'.")
+        print(f"  !! Another session owns this TU -- pick a different file or coordinate.")
+        print(f"  !! (override only if you know it is stale: "
+              f"python tools/decomp_work/coordination/locks.py release-file {owner} {src_rel} --force)")
+
+
+def _lock_renew_file(tag, src_rel):
+    if _locks is None:
+        return
+    try:
+        _locks.acquire(tag, src_rel, scope="file", note=f"band {tag}")  # re-acquire == renew
+    except Exception:
+        pass
+
 WINS = ROOT / "build" / "band_wins"
 SCRATCH = ROOT / "tools" / "decomp_work" / "scratch"
 
@@ -180,6 +222,7 @@ def cmd_init(tag, srcname, config_from=None):
     print(f"created {scratch_c(tag).relative_to(ROOT)} from {state['src']}")
     print(f"  compiler GC/{version}  target {Path(target_o).name}")
     print(f"  cflags: {' '.join(cflags)}")
+    _lock_acquire_file(tag, state["src"])
 
 
 def cmd_check(tag, fns):
@@ -245,6 +288,7 @@ def cmd_save(tag, fns):
     # remember which source this tag's wins belong to (for band_integrate)
     data["_src"] = st["src"]
     out.write_bytes(json.dumps(data, indent=1).encode("utf-8"))
+    _lock_renew_file(tag, st["src"])  # heartbeat: keep the file lock alive during long grinds
     print(f"SAVED {len(saved)}: {' '.join(saved) if saved else '-'}")
     if rejected:
         print(f"REJECTED (not 100%): {'; '.join(rejected)}")

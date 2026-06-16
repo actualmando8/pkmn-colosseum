@@ -37,6 +37,28 @@ extern u8 lbl_80478AB0[8];
 #define CP_BASE      ((volatile u16*)0xCC000000)
 #define PE_BASE      ((volatile u16*)0xCC001000)
 #define PI_FIFO_BASE ((volatile u32*)0xCC003000)
+#define GX_FIFO_U8   (*(volatile u8*)0xCC008000)
+#define GX_FIFO_U32  (*(volatile u32*)0xCC008000)
+
+#define GX_LOAD_BP(regval)       \
+    do {                         \
+        GX_FIFO_U8 = 0x61;       \
+        GX_FIFO_U32 = (regval);  \
+    } while (0)
+
+#define GX_LOAD_XF(reg, regval)  \
+    do {                         \
+        GX_FIFO_U8 = 0x10;       \
+        GX_FIFO_U32 = (reg);     \
+        GX_FIFO_U32 = (regval);  \
+    } while (0)
+
+#define GX_LOAD_CP(reg, regval)  \
+    do {                         \
+        GX_FIFO_U8 = 0x08;       \
+        GX_FIFO_U8 = (reg);      \
+        GX_FIFO_U32 = (regval);  \
+    } while (0)
 
 /* GX internal state (large ~1KB structure) */
 typedef struct GXData {
@@ -7186,6 +7208,7 @@ loadProjDone:
 }
 
 /* fn_800BD91C - 0x800BD91C | size: 0x848 -- GX Display copy / EFB */
+#if 0
 asm void fn_800BD91C(s32 arg0, s32 arg1) {
     nofralloc
     lwz r5, gx(r13)
@@ -7731,6 +7754,271 @@ lbl_000B8B74:
     sth r0, 0x2(r3)
     blr
 }
+#else
+void fn_800BD91C(s32 arg0, s32 arg1) {
+    u8* ctx;
+    s32 old;
+
+    ctx = gx;
+    old = *(s32*)(ctx + 0x4e4);
+    if (old == 0x22) {
+        goto old_fmt_xf;
+    }
+    if (old >= 0x22) {
+        goto old_fmt_done;
+    }
+    if (old >= 0xb) {
+        goto old_fmt_bp;
+    }
+    if (old >= 0) {
+        goto old_fmt_xf;
+    }
+    goto old_fmt_done;
+old_fmt_bp:
+    if (old >= 0x1b) {
+        goto old_fmt_bp24;
+    }
+    goto old_fmt_bp23;
+    goto old_fmt_done;
+old_fmt_xf:
+    GX_LOAD_XF(0x1006, 0);
+    goto old_fmt_done;
+old_fmt_bp23:
+    GX_LOAD_BP(0x23000000u);
+    goto old_fmt_done;
+old_fmt_bp24:
+    GX_LOAD_BP(0x24000000u);
+old_fmt_done:
+
+    ctx = gx;
+    old = *(s32*)(ctx + 0x4e8);
+    if (old == 0x15) {
+        goto old_z_bp;
+    }
+    if (old >= 0x15) {
+        goto old_z_done;
+    }
+    if (old >= 0x9) {
+        goto old_z_mid;
+    }
+    if (old >= 0) {
+        goto old_z_bp;
+    }
+    goto old_z_done;
+old_z_mid:
+    if (old >= 0x11) {
+        goto old_z_cp;
+    }
+    goto old_z_clear;
+    goto old_z_done;
+old_z_bp:
+    GX_LOAD_BP(0x67000000u);
+    goto old_z_done;
+old_z_clear:
+    *(u32*)(ctx + 0x4ec) &= 0xffffff0fu;
+    GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+    goto old_z_done;
+old_z_cp:
+    __cpReg[3] = 0;
+old_z_done:
+
+    ctx = gx;
+    *(s32*)(ctx + 0x4e4) = arg0;
+    switch (*(u32*)(ctx + 0x4e4)) {
+    case 0:
+        GX_LOAD_XF(0x1006, 0x273);
+        break;
+    case 1:
+        GX_LOAD_XF(0x1006, 0x14a);
+        break;
+    case 2:
+        GX_LOAD_XF(0x1006, 0x16b);
+        break;
+    case 3:
+        GX_LOAD_XF(0x1006, 0x84);
+        break;
+    case 4:
+        GX_LOAD_XF(0x1006, 0xc6);
+        break;
+    case 5:
+        GX_LOAD_XF(0x1006, 0x210);
+        break;
+    case 6:
+        GX_LOAD_XF(0x1006, 0x252);
+        break;
+    case 7:
+        GX_LOAD_XF(0x1006, 0x231);
+        break;
+    case 8:
+        GX_LOAD_XF(0x1006, 0x1ad);
+        break;
+    case 9:
+        GX_LOAD_XF(0x1006, 0x1ce);
+        break;
+    case 34:
+        GX_LOAD_XF(0x1006, 0x21);
+        break;
+    case 10:
+        GX_LOAD_XF(0x1006, 0x153);
+        break;
+    case 11:
+        GX_LOAD_BP(0x2300ae7fu);
+        break;
+    case 12:
+        GX_LOAD_BP(0x23008e7fu);
+        break;
+    case 13:
+        GX_LOAD_BP(0x23009e7fu);
+        break;
+    case 14:
+        GX_LOAD_BP(0x23001e7fu);
+        break;
+    case 15:
+        GX_LOAD_BP(0x2300ac3fu);
+        break;
+    case 16:
+        GX_LOAD_BP(0x2300ac7fu);
+        break;
+    case 17:
+        GX_LOAD_BP(0x2300acbfu);
+        break;
+    case 18:
+        GX_LOAD_BP(0x2300acffu);
+        break;
+    case 19:
+        GX_LOAD_BP(0x2300ad3fu);
+        break;
+    case 20:
+        GX_LOAD_BP(0x2300ad7fu);
+        break;
+    case 21:
+        GX_LOAD_BP(0x2300adbfu);
+        break;
+    case 22:
+        GX_LOAD_BP(0x2300adffu);
+        break;
+    case 23:
+        GX_LOAD_BP(0x2300ae3fu);
+        break;
+    case 24:
+        GX_LOAD_BP(0x2300a27fu);
+        break;
+    case 25:
+        GX_LOAD_BP(0x2300a67fu);
+        break;
+    case 26:
+        GX_LOAD_BP(0x2300aa7fu);
+        break;
+    case 27:
+        GX_LOAD_BP(0x2402c0c6u);
+        break;
+    case 28:
+        GX_LOAD_BP(0x2402c16bu);
+        break;
+    case 29:
+        GX_LOAD_BP(0x2402c0e7u);
+        break;
+    case 30:
+        GX_LOAD_BP(0x2402c108u);
+        break;
+    case 31:
+        GX_LOAD_BP(0x2402c129u);
+        break;
+    case 32:
+        GX_LOAD_BP(0x2402c14au);
+        break;
+    case 33:
+        GX_LOAD_BP(0x2402c1adu);
+        break;
+    case 35:
+        break;
+    }
+
+    ctx = gx;
+    *(s32*)(ctx + 0x4e8) = arg1;
+    switch (*(u32*)(ctx + 0x4e8)) {
+    case 0:
+        GX_LOAD_BP(0x67000042u);
+        break;
+    case 1:
+        GX_LOAD_BP(0x67000084u);
+        break;
+    case 2:
+        GX_LOAD_BP(0x67000063u);
+        break;
+    case 3:
+        GX_LOAD_BP(0x67000129u);
+        break;
+    case 8:
+        GX_LOAD_BP(0x67000252u);
+        break;
+    case 21:
+        GX_LOAD_BP(0x67000021u);
+        break;
+    case 4:
+        GX_LOAD_BP(0x6700014bu);
+        break;
+    case 5:
+        GX_LOAD_BP(0x6700018du);
+        break;
+    case 6:
+        GX_LOAD_BP(0x670001cfu);
+        break;
+    case 7:
+        GX_LOAD_BP(0x67000211u);
+        break;
+    case 9:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x20;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 10:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x30;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 11:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x40;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 12:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x50;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 13:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x60;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 14:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x70;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 15:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x90;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 16:
+        *(u32*)(ctx + 0x4ec) = (*(u32*)(ctx + 0x4ec) & 0xffffff0fu) | 0x80;
+        GX_LOAD_CP(0x20, *(u32*)(ctx + 0x4ec));
+        break;
+    case 17:
+        __cpReg[3] = 2;
+        break;
+    case 18:
+        __cpReg[3] = 3;
+        break;
+    case 19:
+        __cpReg[3] = 4;
+        break;
+    case 20:
+        __cpReg[3] = 5;
+        break;
+    case 22:
+        break;
+    }
+
+    ctx = gx;
+    *(u16*)(ctx + 2) = 0;
+}
+#endif
 
 /* fn_800BE164 - 0x800BE164 | size: 0x1A8 -- GX Display copy / EFB */
 asm void fn_800BE164(void) {

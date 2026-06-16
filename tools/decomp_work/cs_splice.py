@@ -37,6 +37,19 @@ TYPE_LINE = re.compile(
     r'[A-Za-z_]\w*\s*\**\s*$')
 
 
+def detect_newline(text):
+    """Return the dominant newline style.
+
+    A source file can contain one stray CRLF in an otherwise LF file. Splitting
+    on CRLF just because it appears once collapses most of the file into one
+    line and makes function lookup fail.
+    """
+    crlf = text.count("\r\n")
+    lf = text.count("\n")
+    bare_lf = lf - crlf
+    return "\r\n" if crlf > bare_lf else "\n"
+
+
 def _active_lines(lines):
     """Boolean per line: is it in a LIVE preprocessor branch? Only a literal
     `#if 0` (and its pre-`#else` body) is treated as dead; every other #if form
@@ -136,7 +149,7 @@ def main():
 
     raw = src.read_bytes()
     text = raw.decode("utf-8", errors="replace")
-    nl = "\r\n" if "\r\n" in text else "\n"
+    nl = detect_newline(text)
     lines = text.split(nl)
 
     errors = []

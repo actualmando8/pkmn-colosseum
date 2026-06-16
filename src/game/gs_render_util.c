@@ -98,7 +98,7 @@ extern void fn_800D7FE4(void* obj);
 extern void fn_800D834C(void);
 extern void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d);
 extern void fn_800D9B58(f32 a, f32 b, f32 c, f32 d);
-extern void* fn_80193F44(void* modelSub);
+extern void* HSD_CObjLoadDesc(void* modelSub);
 extern char lbl_8047C9C4[] __attribute__((section(".sdata2")));
 extern char lbl_8047C9CC[] __attribute__((section(".sdata2")));
 extern f32 lbl_8047C9D4;   /* SDA float constant */
@@ -897,7 +897,7 @@ found:
         return 0;
     }
     *(void**)((u8*)slot + 0x8) = model;
-    *(void**)((u8*)slot + 0xc) = fn_80193F44(*(void**)((u8*)*(void**)((u8*)slot + 0x8) + 0x0));
+    *(void**)((u8*)slot + 0xc) = HSD_CObjLoadDesc(*(void**)((u8*)*(void**)((u8*)slot + 0x8) + 0x0));
     *(u8*)((u8*)slot + 0x0) = 1;
     *(u8*)((u8*)slot + 0x4) = 0;
     if (*(void**)((u8*)*(void**)((u8*)slot + 0x8) + 0x4) != 0) {
@@ -1009,7 +1009,7 @@ found:
     *(f32*)((u8*)slot + 0x64) = f_c9c0;
     *(f32*)((u8*)slot + 0x68) = f_c9d4;
     *(f32*)((u8*)slot + 0x6c) = f_c9d8;
-    *(void**)((u8*)slot + 0xc) = fn_80193F44((u8*)slot + 0x38);
+    *(void**)((u8*)slot + 0xc) = HSD_CObjLoadDesc((u8*)slot + 0x38);
     *(u8*)((u8*)slot + 0x0) = (u8)one;
     *(u8*)((u8*)slot + 0x1) = (u8)zero;
     *(u8*)((u8*)slot + 0x4) = (u8)zero;

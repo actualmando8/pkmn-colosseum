@@ -1874,7 +1874,60 @@ asm void fn_80162E14(void) {
 #include "src/game/people/people_field_fn_80162E14.inc"
 }
 #else
-void fn_80162E14(void) { /* TODO */ }
+/* STAGED SEED (Claude Opus 2026-06-16) — logic verified vs target; NOT 100%.
+ * At #pragma optimization_level 4 the prologue is gone (volatile-only leaf)
+ * and it reaches ~58-60%. Residual is compute-block (case 0/1/4/5) reg-alloc:
+ *   (1) target recomputes the entry base into r3 (`add r3,r6,r5`) then loads
+ *       dim_78/dim_20 via r3, freeing r4 for `lo`; ours loads via the saved r4.
+ *   (2) target emits `cmplwi r4,2; mulli r3,r0,0xe; bltlr` (return m if lo<2);
+ *       ours inverts to `mulli r5,...; ... bgelr` (different reg + polarity).
+ * Cracking needs permuter/band lever search on operand order + the base-recompute
+ * binding. The TU default for this block was opt 0 (prologue/spill => 18.5%);
+ * opt 4 is correct. */
+#pragma optimization_level 4
+u32 fn_80162E14(u32 idx) {
+    /* Local view of the 0xf4-stride people-field entry; only the fields
+     * touched here are named. */
+    typedef struct PeopleFieldEntry_E14 {
+        u8  _00[0x20];   /* 0x00 */
+        u32 dim_20;      /* 0x20 */
+        u8  _24[0x54];   /* 0x24 */
+        u32 dim_78;      /* 0x78 */
+        u8  _7C[0x14];   /* 0x7C */
+        u8  kind_90;     /* 0x90 */
+        u8  _91[0x5B];   /* 0x91 */
+        u8  flag_ec;     /* 0xEC */
+        u8  _ED[0x07];   /* 0xED ... 0xF4 */
+    } PeopleFieldEntry_E14;
+    extern u32 lbl_8047B024;
+    PeopleFieldEntry_E14* entries = (*(PeopleFieldEntry_E14* volatile*)&lbl_8047B024);
+    PeopleFieldEntry_E14* e = &entries[idx];
+
+    if (e->flag_ec != 2) {
+        return 0;
+    }
+    switch (e->kind_90) {
+    case 0:
+    case 1:
+    case 4:
+    case 5: {
+        u32 big = e->dim_20;
+        u32 small = e->dim_78;
+        u32 v = (big - (small << 1)) >> 4;
+        u32 lo = big & 0xF;
+        if (lo < 2) {
+            return v * 0xe;
+        }
+        return lo + v * 0xe - 2;
+    }
+    case 2:
+        return e->dim_20 - (e->dim_78 >> 1);
+    case 3:
+        return e->dim_20 - e->dim_78;
+    default:
+        return idx;
+    }
+}
 #endif
 #pragma pop
 #pragma push

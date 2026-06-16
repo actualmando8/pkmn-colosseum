@@ -394,3 +394,49 @@ OPEN (not walls — future targeted/structural passes):
   `tools/decomp_work/equivalent.txt`.
 - **When a new lever lands** (e.g. `-use_lmw_stmw off` clears W3): re-open *that class*
   only, re-test its logged members, and graduate any that now match.
+
+
+## 2026-06-15 - bulk walltriage batch: 41 W1 wall CANDIDATES classified (3 promoted to registry, 36 staged, 2 already registered)
+
+Automated classification via `tools/decomp_work/ra/walltriage.py --min-mm 1` over the 95-99.99%
+near-miss pool (171 of 267 triaged; 96 BLOCKED in non-compiling TUs, 2 synthetic units). Each fn's
+residual is a **pure physical-register permutation** (W1 class) - the reg-remap is captured in
+`tools/decomp_work/_triage_b1..4.json`. Spot-checked fn_800A541C / fn_80053C00 / fn_800FE38C
+(only r4<->r3 / r0<->r3 / r5<->r3 differ).
+
+**Conservative promotion (per the line-241 lesson):** reg-permutation verdicts CAN hide wrong-C
+(several previously-filed W1+W2 walls were CRACKED to 100% once wrong-C was fixed). So only the
+**3 fns already test-swept elsewhere in this ledger** (fn_8020B330, fn_8020341C, fn_8020EED4 - each
+"variants inert at opt4") were promoted to `tools/decomp_work/equivalent.txt` (they were missing
+from the registry). The other **36 are staged in `tools/decomp_work/_wall_candidates.md`** -
+promote one ONLY after a structural-decomp exhaust (C-rewrite attempts) confirms it does not move,
+matching this file's tested-and-didn't-move policy. 5 are highest-confidence (99%+, 1 reg-pair).
+
+> NOTE: this is operational bookkeeping (fleet routing + honest staging), NOT a headline gain.
+> progress2.py computes the axes purely from the objdiff byte-match join. Headline gains come from
+> the **92 WINNABLE** near-misses (real structural diffs) in `tools/decomp_work/_winnable_queue.md`,
+> esp. the 5 gs_field_world.c sudoku-siblings (fn_8011A280/A570/A9EC/AB50/AFCC @98.6%, struct=1).
+
+| file | count | functions |
+|---|---|---|
+| gs_worldmap.c | 6 | fn_800265C0 fn_80026600 fn_80026640 fn_80026680 fn_800266C0 fn_80026700 |
+| colosseum_event.c | 5 | fn_8020B330 fn_8020341C fn_8020EED4 fn_802032E4 fn_80209960 |
+| effect_util.c | 4 | fn_80135F90 fn_80135FF8 fn_80136024 fn_80135FBC |
+| scene_init.c | 3 | fn_80053C00 fn_80038990 fn_80038138 |
+| gs_model.c | 3 | fn_80103484 fn_80101A70 fn_801096AC |
+| gs_title.c | 3 | fn_80024CDC fn_80024308 fn_80025F84 |
+| people_field.c | 3 | fn_80162370 fn_801628C8 fn_801631AC |
+| gs_pokemon_summary.c | 2 | fn_80016618 fn_80015050 |
+| gs_field_world.c | 2 | fn_8012F150 fn_801171C8 |
+| DVDFs.c | 1 | fn_800A541C |
+| gs_thread.c | 1 | fn_800FE38C |
+| script_callback.c | 1 | fn_80053778 |
+| gs_render.c | 1 | fn_800DB758 |
+| main.c | 1 | fn_80005E00 |
+| gs_event_exec.c | 1 | fn_800138B4 |
+| colosseum_script.c | 1 | fn_80214B68 |
+| ui_core.c | 1 | fn_8005D8F8 |
+| gba_misc.c | 1 | fn_80089D30 |
+| battle_waza.c | 1 | fn_801DD0C8 |
+
+_Full per-fn match% + reg-remap evidence: `tools/decomp_work/_triage_consolidated.json`._

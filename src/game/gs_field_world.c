@@ -5566,7 +5566,7 @@ extern void fn_8012A89C();  /* K&R: typed impl or conflict */
 extern void fn_8012AA64();  /* K&R: typed impl or conflict */
 extern void fn_8012BBA8(void);
 extern void fn_8012BCA4(void);
-extern void fn_8012CA84(void);
+extern void fn_8012CA84();
 extern void fn_80130A88(u32 arg1);
 extern void fn_80130BB0(u32 arg1);
 extern s32 fn_801694E0(u32);
@@ -12829,11 +12829,22 @@ void fn_8011F5E0(u32* dst, u32* src) {
     *dst = *src;
 }
 /* 0x8011F5FC | 0x38 */
+#ifndef PCPORT
 typedef struct { u32 data[0x4E]; } GfwBuf0x138;
+#endif
 void fn_8011F5FC(u32* dst, u32* src) {
+#ifdef PCPORT
+    u32 i;
+#endif
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
+#ifdef PCPORT
+    for (i = 0; i < 0x4E; i++) {
+        dst[i] = src[i];
+    }
+#else
     *(GfwBuf0x138*)dst = *(GfwBuf0x138*)src;
+#endif
 }
 /* 0x8011F634 | 0xA4 */
 #if 0
@@ -17527,11 +17538,22 @@ u32 fn_8012AC54(void* ptr) {
     return 0;
 }
 /* 0x8012AC64 | 0x38 */
+#ifndef PCPORT
 typedef struct { u32 data[0x2C6]; } GfwBuf0xB18;
+#endif
 void fn_8012AC64(u32* dst, u32* src) {
+#ifdef PCPORT
+    u32 i;
+#endif
     if (dst == NULL) { return; }
     if (src == NULL) { return; }
+#ifdef PCPORT
+    for (i = 0; i < 0x2C6; i++) {
+        dst[i] = src[i];
+    }
+#else
     *(GfwBuf0xB18*)dst = *(GfwBuf0xB18*)src;
+#endif
 }
 /* 0x8012AC9C | 0xB4 */
 extern u8 lbl_80426BD0[];
@@ -26248,7 +26270,7 @@ extern f32 lbl_8047D098;
 extern f32 lbl_8047D09C;
 extern f32 lbl_8047D0A0;
 extern f32 lbl_8047D0A4;
-#if 1
+#if 0
 asm void fn_8012CA84(void) {
 #include "src/game/gs_field_world_fn_8012CA84.inc"
 }

@@ -208,6 +208,10 @@ tools/decomp_work/**/*.log
 tools/decomp_work/**/*.done
 tools/decomp_work/**/*_out.txt
 tools/decomp_work/coordination/*.log
+# runtime fleet-lock SQLite DB (locks.py) — local state, never committed
+tools/decomp_work/coordination/locks.db
+tools/decomp_work/coordination/locks.db-wal
+tools/decomp_work/coordination/locks.db-shm
 # accidental nested dirs
 tools/tools/
 tools/decomp_work/decomp_work/
