@@ -1556,9 +1556,14 @@ asm void fn_80162878(void) {
 }
 #else
 u8 fn_80162878(u32 index) {
+    typedef struct {
+        u8 pad_00[0x9C];      /* 0x00 */
+        u8 field_9C;          /* 0x9C */
+        u8 pad_9D[0x57];      /* 0x9D */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u8*)(elem + 0x9C);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    return entries[index].field_9C;
 }
 #endif
 #pragma pop
@@ -1570,9 +1575,14 @@ asm void fn_8016288C(void) {
 }
 #else
 u8 fn_8016288C(u32 index) {
+    typedef struct {
+        u8 pad_00[0x90];      /* 0x00 */
+        u8 field_90;          /* 0x90 */
+        u8 pad_91[0x63];      /* 0x91 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u8*)(elem + 0x90);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    return entries[index].field_90;
 }
 #endif
 #pragma pop
@@ -1584,9 +1594,14 @@ asm void fn_801628A0(void) {
 }
 #else
 u16 fn_801628A0(u32 index) {
+    typedef struct {
+        u8 pad_00[0x70];      /* 0x00 */
+        u16 field_70;         /* 0x70 */
+        u8 pad_72[0x82];      /* 0x72 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u16*)(elem + 0x70);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    return entries[index].field_70;
 }
 #endif
 #pragma pop
@@ -1598,9 +1613,14 @@ asm void fn_801628B4(void) {
 }
 #else
 void fn_801628B4(u32 index, u8 val) {
+    typedef struct {
+        u8 pad_00[0xA0];      /* 0x00 */
+        u8 field_A0;          /* 0xA0 */
+        u8 pad_A1[0x53];      /* 0xA1 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u8*)(elem + 0xA0) = val;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    entries[index].field_A0 = val;
 }
 #endif
 #pragma pop
@@ -1622,11 +1642,12 @@ void fn_801628C8(u32 index) {
 extern u32 lbl_8047B024;
 extern u8 lbl_8047B050;
 void hwKeyOff(u32 index) {
-    u32* p;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    elem += (u32)lbl_8047B050 << 2;
-    p = (u32*)(elem + 0x24);
-    *p |= 0x40;
+    typedef struct {
+        u8 pad_00[0x24];      /* 0x00 */
+        u32 flags_24[0x34];   /* 0x24 */
+    } PeopleFieldState;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    entries[index].flags_24[lbl_8047B050] |= 0x40;
 }
 #pragma push
 #pragma optimization_level 0
@@ -1648,11 +1669,19 @@ asm void fn_801629A4(void) {
 }
 #else
 void fn_801629A4(u32 index, u8 value) {
+    typedef struct {
+        u8 pad_00[0x24];      /* 0x00 */
+        u32 flags_24;         /* 0x24 */
+        u8 pad_28[0xA4];      /* 0x28 */
+        u16 field_CC;         /* 0xCC */
+        u16 field_CE;         /* 0xCE */
+        u8 pad_D0[0x24];      /* 0xD0 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
     extern u16 lbl_80478BF8;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCC) = (&lbl_80478BF8)[(u8)value];
-    *(u32*)(elem + 0x24) |= 0x100;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    entries[index].field_CC = (&lbl_80478BF8)[(u8)value];
+    entries[index].flags_24 |= 0x100;
 }
 #endif
 #pragma pop
@@ -1665,11 +1694,19 @@ asm void fn_801629D0(void) {
 }
 #else
 void fn_801629D0(u32 index, u8 value) {
+    typedef struct {
+        u8 pad_00[0x24];      /* 0x00 */
+        u32 flags_24;         /* 0x24 */
+        u8 pad_28[0xA4];      /* 0x28 */
+        u16 field_CC;         /* 0xCC */
+        u16 field_CE;         /* 0xCE */
+        u8 pad_D0[0x24];      /* 0xD0 */
+    } PeopleFieldState;
     extern u32 lbl_8047B024;
     extern u16 lbl_80478C00;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCE) = (&lbl_80478C00)[(u8)value];
-    *(u32*)(elem + 0x24) |= 0x80;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    entries[index].field_CE = (&lbl_80478C00)[(u8)value];
+    entries[index].flags_24 |= 0x80;
 }
 #endif
 #pragma pop
