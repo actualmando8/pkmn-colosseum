@@ -295,6 +295,13 @@ extern u32 lbl_8047B268;
 extern u32 lbl_8047B26C;
 extern u32 lbl_80478C70;
 extern u32 lbl_8047B284;
+/* Preserved asm include predates the recovered HSD memory callback names. */
+#define fn_8019C7B8 _HSD_MemCheckOwnDefaultCB
+#define fn_8019C854 _HSD_MemGetRemainDefaultCB
+#define fn_8019C89C _HSD_MemFreeDefaultCB
+#define fn_8019C8F4 _HSD_MemAllocDefaultCB
+#define fn_801A69C0 _HSD_MemSetCallbacks
+#define fn_801AA538 HSD_ObjSetHeap
 #if 1
 asm void fn_8019C978(void) {
 #include "src/hsd/hsd_initialize_fn_8019C978.inc"
@@ -304,4 +311,10 @@ void fn_8019C978(void) {
     /* TODO: match -- 504 bytes at 0x8019C978 */
 }
 #endif
+#undef fn_8019C7B8
+#undef fn_8019C854
+#undef fn_8019C89C
+#undef fn_8019C8F4
+#undef fn_801A69C0
+#undef fn_801AA538
 #pragma pop
