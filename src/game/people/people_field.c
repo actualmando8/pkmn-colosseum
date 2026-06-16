@@ -1273,7 +1273,10 @@ typedef struct PeopleFieldMoveSlot {
     u8 field_9C;           /* 0x9C */
     u8 pad_9D[0x3];        /* 0x9D */
     u8 field_A0;           /* 0xA0 */
-    u8 pad_A1[0x47];       /* 0xA1 */
+    u8 pad_A1[0x2B];       /* 0xA1 */
+    u16 field_CC;          /* 0xCC */
+    u16 field_CE;          /* 0xCE */
+    u8 pad_D0[0x18];       /* 0xD0 */
     u32 field_E8;          /* 0xE8 */
     u8 active;             /* 0xEC */
     u8 field_ED;           /* 0xED */
@@ -1648,11 +1651,8 @@ void fn_801628C8(u32 index) {
 extern u32 lbl_8047B024;
 extern u8 lbl_8047B050;
 void hwKeyOff(u32 index) {
-    typedef struct {
-        u8 pad_00[0x24];      /* 0x00 */
-        u32 flags_24[0x34];   /* 0x24 */
-    } PeopleFieldState;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     entries[index].flags_24[lbl_8047B050] |= 0x40;
 }
 #pragma push
@@ -1703,19 +1703,11 @@ asm void fn_801629A4(void) {
 }
 #else
 void fn_801629A4(u32 index, u8 value) {
-    typedef struct {
-        u8 pad_00[0x24];      /* 0x00 */
-        u32 flags_24;         /* 0x24 */
-        u8 pad_28[0xA4];      /* 0x28 */
-        u16 field_CC;         /* 0xCC */
-        u16 field_CE;         /* 0xCE */
-        u8 pad_D0[0x24];      /* 0xD0 */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
     extern u16 lbl_80478BF8;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     entries[index].field_CC = (&lbl_80478BF8)[(u8)value];
-    entries[index].flags_24 |= 0x100;
+    entries[index].flags_24[0] |= 0x100;
 }
 #endif
 #pragma pop
@@ -1728,19 +1720,11 @@ asm void fn_801629D0(void) {
 }
 #else
 void fn_801629D0(u32 index, u8 value) {
-    typedef struct {
-        u8 pad_00[0x24];      /* 0x00 */
-        u32 flags_24;         /* 0x24 */
-        u8 pad_28[0xA4];      /* 0x28 */
-        u16 field_CC;         /* 0xCC */
-        u16 field_CE;         /* 0xCE */
-        u8 pad_D0[0x24];      /* 0xD0 */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
     extern u16 lbl_80478C00;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     entries[index].field_CE = (&lbl_80478C00)[(u8)value];
-    entries[index].flags_24 |= 0x80;
+    entries[index].flags_24[0] |= 0x80;
 }
 #endif
 #pragma pop
