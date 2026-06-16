@@ -29,7 +29,7 @@ from pathlib import Path
 
 THIS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(THIS_DIR))
-from bench_opencode import run_model, normalize  # noqa: E402
+from bench_opencode import run_model, normalize, normalize_model_spec  # noqa: E402
 from bench_compile_match import remote_reward  # noqa: E402
 from bench_via_codex import (  # noqa: E402
     INBOX, OUTBOX, ensure_dirs, send_codex, wait_for_outbox,
@@ -49,6 +49,8 @@ CLOUD_MODELS = [
 
 def _extract_c_safely(raw: str) -> str:
     """Extract C from response — markdown-aware, doesn't truncate nested braces."""
+    if raw.startswith(("HTTP_ERROR_", "URL_ERROR:", "CONFIG_ERROR:", "TIMEOUT", "ERROR:")):
+        return ""
     m = re.search(r"```c?\s*\n(.*?)```", raw, re.DOTALL)
     if m:
         return m.group(1).strip()
@@ -57,14 +59,18 @@ def _extract_c_safely(raw: str) -> str:
 
 def gen_cloud(model: str, prompt: str, max_tokens: int) -> dict:
     start = time.time()
-    raw, elapsed = run_model(model, prompt, max_tokens=max_tokens)
+    routed_model = normalize_model_spec(model)
+    raw, elapsed = run_model(routed_model, prompt, max_tokens=max_tokens)
     code = _extract_c_safely(raw)
-    return {
-        "model": model,
+    result = {
+        "model": routed_model,
         "raw": raw,
         "code": normalize(code) if code else "",
         "elapsed": elapsed,
     }
+    if routed_model != model:
+        result["requested_model"] = model
+    return result
 
 
 def gen_codex(prompt: str, fn_label: str) -> dict:

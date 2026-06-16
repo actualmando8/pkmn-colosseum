@@ -1315,12 +1315,90 @@ void fn_80162494(u32 index, u32 val) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801624A8(void) {
 #include "src/game/people/people_field_fn_801624A8.inc"
 }
 #else
-void fn_801624A8(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 value1C, u32 value18, u32 initFlags, u32 setupFlag, u32 unused) {
+    typedef struct {
+        u8 pad_00[0x18];      /* 0x00 */
+        u32 field_18;         /* 0x18 */
+        u32 field_1C;         /* 0x1C */
+        u8 pad_20[0x4];       /* 0x20 */
+        u32 flags_24[0x13];   /* 0x24 */
+        u16 field_70;         /* 0x70 */
+        u8 pad_72[0x2];       /* 0x72 */
+        u32 words_74[0x8];    /* 0x74 */
+        u32 field_94;         /* 0x94 */
+        u32 field_98;         /* 0x98 */
+        u8 field_9C;          /* 0x9C */
+        u8 pad_9D[0x3];       /* 0x9D */
+        u8 field_A0;          /* 0xA0 */
+        u8 pad_A1[0x3];       /* 0xA1 */
+        u8 field_A4;          /* 0xA4 */
+        u8 pad_A5[0x13];      /* 0xA5 */
+        u32 field_B8;         /* 0xB8 */
+        u32 field_BC;         /* 0xBC */
+        u16 field_C0;         /* 0xC0 */
+        u8 pad_C2[0x2];       /* 0xC2 */
+        u32 field_C4;         /* 0xC4 */
+        u8 pad_C8[0x1C];      /* 0xC8 */
+        u8 bytes_E4[4];       /* 0xE4 */
+        u8 pad_E8[0x8];       /* 0xE8 */
+        u32 field_F0;         /* 0xF0 */
+    } PeopleFieldState;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8047B050;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u32 i;
+    u32 flags = 0;
+    u32* src = (u32*)words74;
+
+    for (i = 0; i < lbl_8047B050; i++) {
+        flags |= entries[0].flags_24[i] & 0x20;
+        entries[0].flags_24[i] = 0;
+    }
+
+    entry->flags_24[0] = flags;
+    entry->field_1C = value1C;
+    entry->field_18 = value18;
+    entry->field_F0 = 0;
+    entry->field_70 = value70;
+
+    entry->words_74[0] = src[0];
+    entry->words_74[1] = src[1];
+    entry->words_74[2] = src[2];
+    entry->words_74[3] = src[3];
+    entry->words_74[4] = src[4];
+    entry->words_74[5] = src[5];
+    entry->words_74[6] = src[6];
+    entry->words_74[7] = src[7];
+
+    if (resetState == 0) {
+        entry->field_A4 = 0;
+        entry->field_B8 = 0;
+        entry->field_BC = 0;
+        entry->field_C0 = 0x7FFF;
+        entry->field_C4 = 0;
+    }
+
+    entry->bytes_E4[0] = 0xFF;
+    entry->bytes_E4[1] = 0xFF;
+    entry->bytes_E4[2] = 0xFF;
+    entry->bytes_E4[3] = 0xFF;
+
+    if (initFlags != 0) {
+        fn_801629A4(index, 0);
+        fn_801629D0(index, 1);
+    }
+
+    fn_801629FC(index, setupFlag);
+}
+#pragma pop
 #endif
 #pragma pop
 #pragma push
@@ -1348,12 +1426,105 @@ void fn_8016265C(u32 index) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801626AC(void) {
 #include "src/game/people/people_field_fn_801626AC.inc"
 }
 #else
-void fn_801626AC(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_801626AC(u32 index, void* ptr, u32 mode) {
+    typedef struct {
+        u8 pad_00[0x18];      /* 0x00 */
+        u32 field_18;         /* 0x18 */
+        u32 field_1C;         /* 0x1C */
+        u8 pad_20[0x4];       /* 0x20 */
+        u32 flags_24[0x13];   /* 0x24 */
+        u16 field_70;         /* 0x70 */
+        u8 pad_72[0x2];       /* 0x72 */
+        u32 words_74[0x8];    /* 0x74 */
+        u32 field_94;         /* 0x94 */
+        u32 field_98;         /* 0x98 */
+        u8 field_9C;          /* 0x9C */
+        u8 pad_9D[0x3];       /* 0x9D */
+        u8 field_A0;          /* 0xA0 */
+        u8 pad_A1[0x3];       /* 0xA1 */
+        u8 field_A4;          /* 0xA4 */
+        u8 pad_A5[0x13];      /* 0xA5 */
+        u32 field_B8;         /* 0xB8 */
+        u32 field_BC;         /* 0xBC */
+        u16 field_C0;         /* 0xC0 */
+        u8 pad_C2[0x2];       /* 0xC2 */
+        u32 field_C4;         /* 0xC4 */
+        u8 pad_C8[0x2];       /* 0xC8 */
+        u8 field_CA;          /* 0xCA */
+        u8 pad_CB[0x19];      /* 0xCB */
+        u8 bytes_E4[4];       /* 0xE4 */
+        u8 pad_E8[0x8];       /* 0xE8 */
+        u32 field_F0;         /* 0xF0 */
+    } PeopleFieldState;
+    typedef struct {
+        u16 field_00;         /* 0x00 */
+        u16 field_02;         /* 0x02 */
+        u16 field_04;         /* 0x04 */
+        u16 field_06;         /* 0x06 */
+    } PeopleFieldMode0Args;
+    typedef struct {
+        u32 field_00;         /* 0x00 */
+        u32 field_04;         /* 0x04 */
+        u16 field_08;         /* 0x08 */
+        u16 field_0A;         /* 0x0A */
+    } PeopleFieldMode12Args;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8036944C[];
+    extern u32 fn_80158CD4(u32);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u8 m = (u8)mode;
+
+    switch (m) {
+    case 0: {
+        PeopleFieldMode0Args* args = ptr;
+        u32 v;
+        entry->field_A4 = 0;
+        entry->field_B8 = args->field_00;
+        entry->field_BC = args->field_02;
+        v = args->field_04 << 3;
+        if (v > 0x7FFF) {
+            v = 0x7FFF;
+        }
+        entry->field_C0 = (u16)v;
+        entry->field_C4 = args->field_06;
+        break;
+    }
+    case 1:
+    case 2:
+        {
+        PeopleFieldMode12Args* args = ptr;
+        entry->field_A4 = 1;
+        entry->field_CA = 0;
+        if (m == 1) {
+            entry->field_B8 = (u16)fn_80158CD4(args->field_00);
+            entry->field_BC = (u16)fn_80158CD4(args->field_04);
+            {
+                s32 idx = args->field_08 >> 2;
+                if ((u32)idx > 0x3FF) {
+                    idx = 0x3FF;
+                }
+                entry->field_C0 = (u16)(0xC1 - lbl_8036944C[idx]);
+            }
+        } else {
+            entry->field_B8 = (u16)args->field_00;
+            entry->field_BC = (u16)args->field_04;
+            entry->field_C0 = args->field_08;
+        }
+        entry->field_C4 = args->field_0A;
+        }
+    }
+
+    entry->flags_24[0] |= 0x10;
+}
+#pragma pop
 #endif
 #pragma pop
 #pragma push
