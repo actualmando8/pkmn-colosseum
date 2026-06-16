@@ -1276,12 +1276,15 @@ typedef struct PeopleFieldMoveSlot {
     u8 pad_A1[0x2B];       /* 0xA1 */
     u16 field_CC;          /* 0xCC */
     u16 field_CE;          /* 0xCE */
-    u8 pad_D0[0x18];       /* 0xD0 */
+    u16 field_D0;          /* 0xD0 */
+    u16 field_D2;          /* 0xD2 */
+    u8 pad_D4[0x14];       /* 0xD4 */
     u32 field_E8;          /* 0xE8 */
     u8 active;             /* 0xEC */
     u8 field_ED;           /* 0xED */
     u8 field_EE;           /* 0xEE */
-    u8 pad_EF[0x5];        /* 0xEF */
+    u8 pad_EF;             /* 0xEF */
+    u32 field_F0;          /* 0xF0 */
 } PeopleFieldMoveSlot;
 
 #pragma pop
@@ -1740,15 +1743,14 @@ asm void fn_801629FC(void) {
  * else clears the hi bit. Base array lbl_8047B024 (stride 0xF4, same as fn_801629A4/D0) is
  * re-read per access (volatile reinterpret) to match the target. byte-match verified 22/22. */
 void fn_801629FC(u32 index, u8 flag) {
-    typedef struct { u8 pad[0xD0]; u16 d0; u16 d2; u8 pad2[0x1C]; u32 f0; } NpcEntry;
     extern u32 lbl_8047B024;
-#define PF (*(NpcEntry* volatile*)&lbl_8047B024)
+#define PF (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024)
     if (flag == 0) {
-        PF[index].f0 |= 0x80000000;
-        PF[index].d0 = 0x10;
-        PF[index].d2 = 0x10;
+        PF[index].field_F0 |= 0x80000000;
+        PF[index].field_D0 = 0x10;
+        PF[index].field_D2 = 0x10;
     } else {
-        PF[index].f0 &= ~0x80000000u;
+        PF[index].field_F0 &= ~0x80000000u;
     }
 #undef PF
 }
