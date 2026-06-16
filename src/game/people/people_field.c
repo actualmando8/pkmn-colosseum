@@ -587,6 +587,8 @@ extern u8 lbl_8047AF90[];
 extern u8 lbl_8043DEF8[];
 extern u32 lbl_8047AF9C;
 extern u32 lbl_8047AF8C;
+/* Early asm includes predate the symbol-map rename at 0x80162118. */
+#define fn_80162118 sndBSearch
 #if 1
 asm void fn_8015211C(void) {
 #include "src/game/people/people_field_fn_8015211C.inc"
@@ -704,6 +706,7 @@ u32 fn_801523B8(u16 arg, u16* out) {
 }
 #endif
 
+#undef fn_80162118
 extern void fn_80160F10(void);
 #if 1
 asm void fn_80153FEC(void) {
@@ -2796,6 +2799,8 @@ void ReverbHICreate(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+/* ReverbHIModify's preserved asm include predates the symbol-map rename. */
+#define fn_80164520 ReverbHICreate
 #if 1
 asm void ReverbHIModify(void) {
 #include "src/game/people/people_field_fn_80164A2C.inc"
@@ -2803,6 +2808,7 @@ asm void ReverbHIModify(void) {
 #else
 void ReverbHIModify(void) { /* TODO */ }
 #endif
+#undef fn_80164520
 #pragma pop
 #pragma push
 #pragma optimization_level 0
