@@ -555,7 +555,7 @@ extern void  fn_800E019C(void* model, void* param);
 extern void  fn_800E0BA0(void* param);
 extern void  fn_800E0BE4(void* param);
 extern void  fn_800E013C(void* param);
-extern void  fn_800C46B0(void* param1, void* param2);
+extern u32   fn_800C46B0(f64 val);
 
 /* Floor/field system */
 extern void* fn_800F9318(u16 group, u16 model, u16 param);
@@ -1945,14 +1945,22 @@ void fn_80162FAC(void) {}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162FB0(void) {
 #include "src/game/people/people_field_fn_80162FB0.inc"
 }
 #else
-void fn_80162FB0(void) { /* TODO */ }
+typedef struct PeopleFieldMoveScale {
+    u32 divisor; /* 0x00 */
+} PeopleFieldMoveScale;
+
+u32 fn_80162FB0(u32 value) {
+    PeopleFieldMoveScale* scale = (PeopleFieldMoveScale*)lbl_80434C50;
+
+    return fn_800C46B0(((f32)value * lbl_8047D4E0) / (f32)scale->divisor);
+}
 #endif
 #pragma pop
 #pragma push

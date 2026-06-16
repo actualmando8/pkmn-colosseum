@@ -39,3 +39,5 @@ fn_80228DAC	# 99.18%
 fn_80229C90	# 96.28%
 fn_802389D4	# 97.76%
 fn_8023CFDC	# 98.26%
+
+fn_80162FB0   # people_field.c - float-conversion-in-TU: readable typed C active; match_scan 78.3%, single-symbol diff 98.48%; only meaningful residual is CW anonymous @405 u32->f32 magic double vs target lbl_8047D4E8
