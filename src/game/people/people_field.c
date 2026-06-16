@@ -1849,8 +1849,12 @@ asm void fn_80162DAC(void) {
 }
 #else
 void fn_80162DAC(u8 index, u32 arg1) {
+    typedef struct {
+        u8 bytes[0xBC];       /* 0x00 */
+    } PeopleStudioState;
     extern void fn_8015D54C(u8*, u32);
-    fn_8015D54C(&lbl_80447E60[index * 0xBC], arg1);
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    fn_8015D54C((u8*)&entries[(u8)index], arg1);
 }
 #endif
 #pragma pop
@@ -1863,8 +1867,12 @@ asm void fn_80162DE0(void) {
 }
 #else
 void fn_80162DE0(u8 index, u32 arg1) {
+    typedef struct {
+        u8 bytes[0xBC];       /* 0x00 */
+    } PeopleStudioState;
     extern void fn_8015D5F4(u8*, u32);
-    fn_8015D5F4(&lbl_80447E60[index * 0xBC], arg1);
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    fn_8015D5F4((u8*)&entries[(u8)index], arg1);
 }
 #endif
 #pragma pop
