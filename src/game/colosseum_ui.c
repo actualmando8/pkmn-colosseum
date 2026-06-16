@@ -32,6 +32,12 @@ extern u32   fn_8010264C(u32 a, u32 b);
 extern void  fn_800E01D0(void* dst, void* src);
 extern void  fn_800FB680(u32 a, u32 b, s32 c, u32 d);
 extern void  fn_80132A38(u32 effectId, u32 param);
+extern u32   lbl_8047A4B4;
+
+typedef struct ColosseumUiDrawContext {
+    u8 unk_00[0x88];
+    s32 color; /* 0x88 */
+} ColosseumUiDrawContext;
 
 /*
  * Functions in this translation unit (12 total):
@@ -51,9 +57,14 @@ extern void  fn_80132A38(u32 effectId, u32 param);
 
 
 /* 0x80039A50 | size: 0x34 */
-asm void fn_80039A50(void) { nofralloc
-    #include "asm/GC6E01/nonmatching/colosseum_ui/fn_80039A50.s"
+/* `peephole off` preserves the target's load/zero scheduling for this leaf wrapper. */
+#pragma push
+#pragma peephole off
+u32 fn_80039A50(ColosseumUiDrawContext* ctx) {
+    fn_800FB680(0, 0, ctx->color, lbl_8047A4B4);
+    return 0;
 }
+#pragma pop
 
 /* 0x80039A84 | size: 0x4C0 */
 asm void fn_80039A84(void) { nofralloc
