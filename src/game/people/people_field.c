@@ -1264,10 +1264,16 @@ typedef struct PeopleFieldMoveSlot {
     u32 field_1C;          /* 0x1C */
     u8 pad_20[0x4];        /* 0x20 */
     u32 flags_24[0x13];    /* 0x24 */
-    u8 pad_70[0x24];       /* 0x70 */
+    u16 field_70;          /* 0x70 */
+    u8 pad_72[0x1E];       /* 0x72 */
+    u8 field_90;           /* 0x90 */
+    u8 pad_91[0x3];        /* 0x91 */
     u32 field_94;          /* 0x94 */
     u32 field_98;          /* 0x98 */
-    u8 pad_9C[0x4C];       /* 0x9C */
+    u8 field_9C;           /* 0x9C */
+    u8 pad_9D[0x3];        /* 0x9D */
+    u8 field_A0;           /* 0xA0 */
+    u8 pad_A1[0x47];       /* 0xA1 */
     u32 field_E8;          /* 0xE8 */
     u8 active;             /* 0xEC */
     u8 field_ED;           /* 0xED */
@@ -1576,13 +1582,8 @@ asm void fn_80162878(void) {
 }
 #else
 u8 fn_80162878(u32 index) {
-    typedef struct {
-        u8 pad_00[0x9C];      /* 0x00 */
-        u8 field_9C;          /* 0x9C */
-        u8 pad_9D[0x57];      /* 0x9D */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     return entries[index].field_9C;
 }
 #endif
@@ -1595,13 +1596,8 @@ asm void fn_8016288C(void) {
 }
 #else
 u8 fn_8016288C(u32 index) {
-    typedef struct {
-        u8 pad_00[0x90];      /* 0x00 */
-        u8 field_90;          /* 0x90 */
-        u8 pad_91[0x63];      /* 0x91 */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     return entries[index].field_90;
 }
 #endif
@@ -1614,13 +1610,8 @@ asm void fn_801628A0(void) {
 }
 #else
 u16 fn_801628A0(u32 index) {
-    typedef struct {
-        u8 pad_00[0x70];      /* 0x00 */
-        u16 field_70;         /* 0x70 */
-        u8 pad_72[0x82];      /* 0x72 */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     return entries[index].field_70;
 }
 #endif
@@ -1633,13 +1624,8 @@ asm void fn_801628B4(void) {
 }
 #else
 void fn_801628B4(u32 index, u8 val) {
-    typedef struct {
-        u8 pad_00[0xA0];      /* 0x00 */
-        u8 field_A0;          /* 0xA0 */
-        u8 pad_A1[0x53];      /* 0xA1 */
-    } PeopleFieldState;
-    extern u32 lbl_8047B024;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
     entries[index].field_A0 = val;
 }
 #endif
