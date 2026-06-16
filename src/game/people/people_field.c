@@ -1262,10 +1262,14 @@ extern u32 lbl_8047B024;
 typedef struct PeopleFieldMoveSlot {
     u8 pad_00[0x1C];       /* 0x00 */
     u32 field_1C;          /* 0x1C */
-    u8 pad_20[0xC8];       /* 0x20 */
+    u8 pad_20[0x4];        /* 0x20 */
+    u32 flags_24[0x13];    /* 0x24 */
+    u8 pad_70[0x78];       /* 0x70 */
     u32 field_E8;          /* 0xE8 */
     u8 active;             /* 0xEC */
-    u8 pad_ED[0x7];        /* 0xED */
+    u8 field_ED;           /* 0xED */
+    u8 field_EE;           /* 0xEE */
+    u8 pad_EF[0x5];        /* 0xEF */
 } PeopleFieldMoveSlot;
 
 #pragma pop
@@ -1423,9 +1427,12 @@ void fn_8016265C(u32 index) {
     extern u32 lbl_8047B024;
     extern u8 lbl_8047B050;
     u32 offset = index * 0xF4;
+    PeopleFieldMoveSlot* entry;
     u8* p;
-    if (*(u8*)((u8*)lbl_8047B024 + offset + 0xEC) == 1 && lbl_8047B050 == 0) {
-        *(u8*)((u8*)lbl_8047B024 + offset + 0xEE) = 1;
+
+    entry = (PeopleFieldMoveSlot*)((u8*)lbl_8047B024 + offset);
+    if (entry->active == 1 && lbl_8047B050 == 0) {
+        entry->field_EE = 1;
     }
     p = (u8*)lbl_8047B024 + offset;
     p += (u32)lbl_8047B050 * 4;
