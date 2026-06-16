@@ -1145,7 +1145,7 @@ extern void fn_8015B250(u32, u32);
 extern void ReverbHICreate(void);
 extern void ReverbHIModify(void);
 extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
-extern void fn_8009B300(void);
+extern void fn_8009B300(void* addr, u32 nBytes);
 extern void fn_800AC02C(u32 a);
 extern void fn_800AC070(u8* ptr, u32 size);
 extern void fn_800ACB44(void);
@@ -1878,14 +1878,32 @@ void fn_80162E14(void) { /* TODO */ }
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162EB8(void) {
 #include "src/game/people/people_field_fn_80162EB8.inc"
 }
 #else
-void fn_80162EB8(void) { /* TODO */ }
+void fn_80162EB8(u8* dstBase, u32 srcOffset, u32 size, u32 streamIndex, u32 arg7, u32 arg8) {
+    u32 unusedOut;
+    register u8* dstBaseReg = dstBase;
+    register u32 srcOffsetReg = srcOffset;
+    register u32 sizeReg = size;
+    register u32 arg7Reg = arg7;
+    register u32 arg8Reg = arg8;
+    u8* srcBase = (u8*)fn_80163DB0(streamIndex, &unusedOut);
+    u32 unaligned = srcOffsetReg & 0x1F;
+    u32 alignedOffset = srcOffsetReg & ~0x1F;
+    u32 alignedSize;
+    u8* dst;
+    sizeReg += unaligned;
+    dst = dstBaseReg + alignedOffset;
+    alignedSize = (sizeReg + 0x1F) & ~0x1F;
+
+    fn_8009B300(dst, alignedSize);
+    aramUploadData(dst, srcBase + alignedOffset, alignedSize, 1, arg7Reg, arg8Reg);
+}
 #endif
 #pragma pop
 #pragma push
