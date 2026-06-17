@@ -3844,9 +3844,11 @@ void fn_800DCD98(u8* r3arg) {
     if (r31 != NULL) {
         r4 = *(u16*)(r31 + 0x4);
         r0 = (r4 == (u16)-1);
-        if (r0 == 0) {
+        switch (r0) {
+        case 0:
             *(u16*)(r31 + 0x4) = r4 - 1;
             r0 = (r4 == 0);
+            break;
         }
         if (r0 != 0) {
             if (r31 != NULL) {

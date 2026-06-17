@@ -36,6 +36,61 @@ Codex commit `2708d871` flipped four functions `#if 0`→`#if 1` (asm-wrapper) w
 
 The other two flipped functions (`fn_801A4098`, `fn_801A4A54`) were already logged HSD walls. Takeaway: codex's *selection* of which functions to wrap was sound, but a wall **with good C is an Equivalent** (real C active), not an asm-wrapper — see policy point 3 above.
 
+## 2026-06-16 — gs_render.c packet wrk2 (1 crack + 3 walls; + a harness fix)
+
+Diff-triage + grind of four gs_render.c near-misses (tag `wrk2`):
+
+- **`fn_800DCD98` — CRACKED → 100.00% (SAVED, integration-verified).** Was logged in-source
+  as `WALL 95.6% bne vs beq+b`. The one-case-`switch` lever (`feedback_switch_one_case_beq_b`)
+  converts CW's fused `bne skip` into the target's un-fused `beq L; b end` — `if (r0==0){...}`
+  → `switch(r0){case 0: ...; break;}`. **This invalidates the prior wall note**; branch-fusion
+  near-misses where the if-body is a *statement block* are now winnable with this lever.
+- **`fn_800DAF60` — WALL, 98.53%** (W2 coupled loop-codegen). mtctr/bdnz free-slot scan; residual
+  is the entry `ble`-vs-`beq` guard **plus** an inner branch-fusion (`bne tail; b found` vs fused
+  `beq`). The switch lever is **inert here** (the case body is a bare in-loop `goto`, which CW
+  re-collapses, and it forces a signed `cmpwi`); `(s32)count>0` regresses the guard. Confirms the
+  prior agent's verdict + the lever boundary. → `equivalent.txt`.
+- **`fn_800E0790` — WALL, 95.24%** (W2 prologue-scheduling). Inline-`__asm` GQR-register-setup
+  function with two C-level `bl` calls, so CW auto-emits a prologue LR-save `stw r0,0x14(r1)`. The
+  manual asm-block store is then a duplicate (95.24%); removing it lands the auto-save before the
+  first asm instr (90.48%). The target interleaves `li r3,0x4` ahead of the save — unreachable
+  without transcribing the whole thing as naked asm (not decompilation). Stays the inline-asm hybrid.
+- **`fn_800DE128` — WALL (not a real target), 99.65%.** Active asm-wrapper (`#if 1` + `.inc`; the
+  `#else` is a `/* TODO */` stub — no real C). Residual is a lost-`@sda21` reloc baked into the
+  `.inc` as `subi r20, r2, 0x6c00` (vs `li r20, lbl_8047CAA0@sda21`) — the **W-SDA-WRAPPER** class.
+  Nothing to grind; `sections` should have auto-skipped it (queue contamination the packet warned of).
+
+**Harness fix (`cs_splice.py` `_active_lines`).** The save/integrate extractor couldn't disambiguate
+the still-wrapped `#if 0 asm #else realC #endif` twin in this file: the whole TU is inside
+`#ifdef PCPORT … #else <real game C> #endif`, and the tracker assumed every non-`#if 0` guard is
+live — so it flipped the `#else` (real C) to *dead* and the live-branch filter returned nothing.
+`PCPORT` is never defined in the matching build, so `#ifdef PCPORT` is now treated as dead (its
+`#else` live) and `#ifndef PCPORT` as live. Without this, **every** still-wrapped near-miss in a
+PCPORT-guarded TU silently fails to save/integrate. Fix verified: `fn_800DCD98` saved and re-held
+100.00% through `band_integrate` (dry-run).
+
+## 2026-06-16 — three gs_title.c "twin" position-writers (W6 conversion-literal reloc)
+
+`fn_80024DBC` / `fn_80024F2C` / `fn_8002509C` (gs_title.c, the fade-aware ±x/±y position
+writers — siblings of the already-known `fn_8002520C`) all sit at **98.75%** with an
+identical two-part residual, confirmed C-uncontrollable (packet `glm1`):
+
+1. **W6 — anonymous int→double conversion-literal reloc (the hard cap).** Each function
+   does two `(f32)(s32)(s16)` conversions; CW's native conversion is **instruction-perfect**
+   vs target but loads its 2^52 bias via a per-TU **anonymous** pool literal (`lfd f3, @257@sda21`)
+   where the target references the shared **named** global `lfd f3, lbl_8047B8B8@sda21`. Same
+   class as `fn_801327E0` (effect_util.c) and `fn_80005E00` (main.c). Manual int→double via the
+   named extern `lbl_8047B8B8` was tested and **regressed to 89.50%** (emits `fsub`+`frsp` with
+   extra stack traffic instead of the fused `fsubs`) — independently reproducing the
+   "manual union makes it worse" result already logged for `fn_801327E0`. No C form yields
+   both the perfect instruction sequence **and** the named symbol.
+2. **W2 — branch-fusion shape (secondary, 1 instr).** The list-walk index match emits a fused
+   `beq LAB` where target keeps the un-fused `bne incr; b LAB`. Tested an `if(!=){++}else{goto}`
+   inversion — CW canonicalizes straight back to the fused `beq`, no movement. Moot anyway,
+   since (1) caps below 100% regardless.
+
+All three have real, correct, active C → added to `equivalent.txt`. Hard-skip.
+
 <!-- SNAPSHOT:auto — regenerate with: python tools/decomp_work/progress2.py --measure -->
 ## Snapshot — 2026-05-31 (regenerate: `python tools/decomp_work/progress2.py --measure`)
 

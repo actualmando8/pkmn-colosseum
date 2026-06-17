@@ -47,3 +47,7 @@ fn_80162FB0   # people_field.c - float-conversion-in-TU: readable typed C active
 fn_8020B330   # colosseum_event.c - W1 saved-band tie-break locked at opt4 (7 variants inert) - WALLS.md
 fn_8020341C   # colosseum_event.c - W1 saved-vs-temp tie-break (ANNEAL sweep inert) - WALLS.md
 fn_8020EED4   # colosseum_event.c - W1 saved-band tie-break (comma-op/param-split inert at opt4) - WALLS.md
+fn_80024DBC   # gs_title         — W6 anon int→f64 conversion-literal reloc (@257 vs lbl_8047B8B8) + W2 branch-fusion; 98.75%, manual-conv regressed to 89.5%; WALLS.md 2026-06-16
+fn_80024F2C   # gs_title         — W6 anon int→f64 conversion-literal reloc (@257 vs lbl_8047B8B8) + W2 branch-fusion; 98.75%, twin of fn_80024DBC; WALLS.md 2026-06-16
+fn_8002509C   # gs_title         — W6 anon int→f64 conversion-literal reloc (@257 vs lbl_8047B8B8) + W2 branch-fusion; 98.75%, twin of fn_80024DBC; WALLS.md 2026-06-16
+fn_800DAF60   # gs_render        — W2 coupled loop-codegen: entry ble-vs-beq guard + inner branch-fusion (bne tail;b found vs fused beq); 98.53%, one-case-switch lever inert here (in-loop goto collapses), (s32)count>0 regresses; WALLS.md 2026-06-16
