@@ -2470,6 +2470,202 @@ def load_leases() -> dict:
     }
 
 
+def _norm_src(path: str) -> str:
+    """Normalize a source path to repo-relative forward-slash form for keying."""
+    p = str(path or "").replace("\\", "/").strip()
+    if not p:
+        return ""
+    # strip an absolute prefix down to the src/... segment when present
+    idx = p.find("src/")
+    if idx > 0:
+        p = p[idx:]
+    return p
+
+
+def _unit_pct_index() -> dict[str, dict[str, object]]:
+    """Map normalized source_path -> live unit metrics from report.json (#3/#4).
+    Cached briefly so the per-file live-% lookups don't reparse the report."""
+    def producer():
+        report = load_decomp_report(DECOMP_REPORT)
+        index: dict[str, dict[str, object]] = {}
+        for unit in report.get("units", []) if isinstance(report, dict) else []:
+            if not isinstance(unit, dict):
+                continue
+            key = _norm_src(str(unit.get("source") or ""))
+            if not key:
+                continue
+            index[key] = {
+                "name": unit.get("name", ""),
+                "source": unit.get("source", ""),
+                "fuzzy_pct": unit.get("fuzzy_pct", 0),
+                "code_pct": unit.get("code_pct", 0),
+                "functions_pct": unit.get("functions_pct", 0),
+                "matched_functions": unit.get("matched_functions", 0),
+                "total_functions": unit.get("total_functions", 0),
+            }
+        return index
+    return _cached("unit_pct_index", 20, producer)
+
+
+def _scratch_active(max_age_s: int = 3 * 3600) -> list[dict[str, object]]:
+    """Band scratch sidecars touched within max_age_s -> active-work signals.
+    Each band_<tag>.c mtime is the freshness; band_<tag>.src "src" key is the TU
+    being worked. Surfaces functional-decomp agents that skip `band init` and so
+    never take a lock (the gap the brief calls out for wrk6/glm6)."""
+    out: list[dict[str, object]] = []
+    if not SCRATCH_DIR.exists():
+        return out
+    now = time.time()
+    try:
+        entries = list(SCRATCH_DIR.glob("band_*.c"))
+    except OSError:
+        return out
+    for c in entries:
+        try:
+            mtime = c.stat().st_mtime
+        except OSError:
+            continue
+        if now - mtime > max_age_s:
+            continue
+        tag = c.stem[len("band_"):]
+        src = ""
+        sidecar = c.with_suffix(".src")
+        if sidecar.exists():
+            try:
+                meta = json.loads(sidecar.read_text(encoding="utf-8", errors="replace"))
+                if isinstance(meta, dict):
+                    src = str(meta.get("src") or "")
+            except (OSError, json.JSONDecodeError):
+                pass
+        # Only surface scratches that map to a real src/ TU; skip integration
+        # blobs / sidecar-less scratch copies that have no report unit.
+        if not _norm_src(src).startswith("src/"):
+            continue
+        out.append({"tag": tag, "src": src, "mtime": round(mtime)})
+    return out
+
+
+def _recent_commit_files(limit: int = 25, max_age_s: int = 12 * 3600) -> list[dict[str, object]]:
+    """Recent commits' touched src/*.c files -> active-work signals (file+author+time)."""
+    text = git_value([
+        "log", f"-n{limit}", "--name-only",
+        "--pretty=format:%x01%H%x09%ct%x09%an%x09%s", "--", "src",
+    ])
+    out: list[dict[str, object]] = []
+    now = time.time()
+    for record in text.split("\x01"):
+        record = record.strip("\n")
+        if not record:
+            continue
+        lines = record.split("\n")
+        header = lines[0].split("\t", 3)
+        if len(header) != 4:
+            continue
+        _sha, ct, author, subject = header
+        try:
+            unix = int(ct)
+        except ValueError:
+            continue
+        if now - unix > max_age_s:
+            continue
+        for path in lines[1:]:
+            path = path.strip()
+            if path.endswith(".c"):
+                out.append({"src": _norm_src(path), "author": author, "unix": unix, "subject": subject})
+    return out
+
+
+def load_active_work() -> dict:
+    """Unified 'who is working on what' view (#3 + #4).
+
+    Unions three independent live signals so an agent shows up even when it skips
+    `band init` (and so holds no lock):
+      1. locks.db leases       -> owner + file + note + age   (load_leases active)
+      2. band scratch sidecars -> tag + src TU + scratch mtime (recently touched)
+      3. recent src commits    -> file + author + commit time
+
+    Entries are keyed by normalized source file and decorated with the live unit
+    match% from report.json (matched/total fns, fuzzy/code %), so the front-end
+    can show a per-file LIVE percentage that moves as the agents land matches.
+    """
+    pct_index = _unit_pct_index()
+    by_src: dict[str, dict[str, object]] = {}
+
+    def touch(src: str) -> dict[str, object] | None:
+        key = _norm_src(src)
+        if not key:
+            return None
+        ent = by_src.get(key)
+        if ent is None:
+            metrics = pct_index.get(key, {})
+            ent = {
+                "src": key,
+                "label": source_label(key),
+                "signals": [],       # which evidence sources flagged this file
+                "owners": [],        # tags/agents/authors seen working it
+                "fn": "",            # best-effort active function
+                "fresh": 0,          # newest unix across all signals
+                "lease": False,
+                "unit": metrics or None,
+            }
+            by_src[key] = ent
+        return ent
+
+    # 1) live leases (band-lock holders)
+    leases = load_leases()
+    for lk in leases.get("active", []):
+        src = lk.get("active_src") or lk.get("file") or ""
+        ent = touch(src)
+        if ent is None:
+            continue
+        ent["lease"] = True
+        if "lease" not in ent["signals"]:
+            ent["signals"].append("lease")
+        owner = str(lk.get("owner") or lk.get("tag") or "")
+        if owner and owner not in ent["owners"]:
+            ent["owners"].append(owner)
+        if lk.get("active_fn") and not ent["fn"]:
+            ent["fn"] = lk.get("active_fn")
+        mt = int_value(lk.get("scratch_mtime"))
+        ent["fresh"] = max(int_value(ent["fresh"]), mt)
+
+    # 2) band scratch sidecars (catches lock-less functional-decomp agents)
+    for s in _scratch_active():
+        ent = touch(s.get("src") or "")
+        if ent is None:
+            continue
+        if "scratch" not in ent["signals"]:
+            ent["signals"].append("scratch")
+        tag = str(s.get("tag") or "")
+        if tag and tag not in ent["owners"]:
+            ent["owners"].append(tag)
+        ent["fresh"] = max(int_value(ent["fresh"]), int_value(s.get("mtime")))
+
+    # 3) recent commits' touched files
+    for c in _recent_commit_files():
+        ent = touch(c.get("src") or "")
+        if ent is None:
+            continue
+        if "commit" not in ent["signals"]:
+            ent["signals"].append("commit")
+        author = str(c.get("author") or "")
+        if author and author not in ent["owners"]:
+            ent["owners"].append(author)
+        ent["fresh"] = max(int_value(ent["fresh"]), int_value(c.get("unix")))
+
+    items = list(by_src.values())
+    # leases first, then freshest; lets the decomp-detail "active files" list lead
+    # with what's being worked RIGHT NOW.
+    items.sort(key=lambda e: (0 if e.get("lease") else 1, -int_value(e.get("fresh"))))
+    return {
+        "available": bool(items),
+        "active": items,
+        "count": len(items),
+        "lease_count": sum(1 for e in items if e.get("lease")),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 def _report_status(row: dict) -> str:
     """Classify an attempt-log entry into an orchestrator-style worker status."""
     kind = row.get("kind")
@@ -2489,13 +2685,24 @@ def _report_status(row: dict) -> str:
 
 
 def load_reports(limit: int = 60) -> dict:
-    """Worker reports: most-recent attempt per (agent, function/unit) with a status."""
+    """Worker reports: most-recent attempt per (agent, function/unit) with a status.
+
+    Surfaces genuinely-recent activity. merged_attempt_log() already returns rows
+    newest-first (status.md + git commits, sorted by timestamp desc), so:
+      * per (agent, fn/unit) key we keep the NEWEST row — the FIRST occurrence in a
+        newest-first list — instead of the old code's last-wins (which kept the
+        OLDEST and let stale April "dashboard REGRESSION" rows survive);
+      * the deduped reports are then sorted STRICTLY by timestamp desc before the
+        [:limit] slice, so the newest rows are guaranteed to be the ones shown
+        (the old [-limit:] over dict-insertion order let old unique keys leak in).
+    """
     merged = merged_attempt_log(limit=1500)
     seen: dict[tuple, dict] = {}
     for row in merged:
         agent = str(row.get("agent") or "?")
         fn = str(row.get("function") or row.get("file") or "")
         key = (agent, fn or row.get("message", "")[:40])
+        row_unix = int_value(row.get("unix")) or timestamp_unix(row.get("timestamp"))
         rep = {
             "agent": agent,
             "function": row.get("function") or "",
@@ -2504,10 +2711,20 @@ def load_reports(limit: int = 60) -> dict:
             "status": _report_status(row),
             "message": row.get("message", ""),
             "timestamp": row.get("timestamp"),
+            "unix": row_unix,
         }
-        seen[key] = rep   # later entries (more recent) win
-    reports = list(seen.values())[-limit:]
-    reports.reverse()
+        prev = seen.get(key)
+        # Keep the newest row for each key. merged is newest-first so the first
+        # seen is usually newest, but guard explicitly on unix in case of ties.
+        if prev is None or row_unix > int_value(prev.get("unix")):
+            seen[key] = rep
+    # Strict newest-first ordering BEFORE the limit slice (this is the actual fix
+    # for the April-data bug: don't let dict-insertion order pick the survivors).
+    reports = sorted(
+        seen.values(),
+        key=lambda r: (int_value(r.get("unix")), str(r.get("timestamp") or "")),
+        reverse=True,
+    )[:limit]
     counts: dict[str, int] = {}
     for r in reports:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
@@ -4961,6 +5178,26 @@ HTML = r"""<!doctype html>
     .range-group { display: flex; gap: 3px; margin-left: auto; }
     .range-btn { height: 22px; padding: 0 8px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; font: 700 10px "Cascadia Mono", monospace; }
     .range-btn.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
+    /* #2: pan/zoom affordances on the history chart */
+    #history-chart { cursor: grab; }
+    #history-chart.grabbing { cursor: grabbing; }
+    .hist-reset { cursor: pointer; color: #e0b24a; border-color: #6e5a26; background: rgba(224,178,74,.08); margin-left: 6px; }
+    /* #3/#4: active-work table + decomp-detail active-files block */
+    .active-work-row.is-lease { box-shadow: inset 2px 0 0 var(--accent); }
+    .active-work-click { cursor: pointer; }
+    .active-work-click:hover { background: rgba(92,145,223,.10); }
+    .sig-chip { display: inline-block; font: 700 9px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .03em; padding: 1px 5px; margin: 0 3px 0 0; border-radius: 3px; border: 1px solid var(--line-strong); color: var(--quiet); }
+    .sig-lease { color: #cdebde; border-color: #2f6e5a; background: rgba(56,185,149,.12); }
+    .sig-scratch { color: #cbe6ff; border-color: #2c4a7f; background: rgba(92,145,223,.12); }
+    .sig-commit { color: #e0c08a; border-color: #6e5a26; background: rgba(224,178,74,.10); }
+    .decomp-active-files { margin-top: 12px; }
+    .active-files-list { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+    .active-file-row { display: grid; grid-template-columns: minmax(0,1fr) 120px 96px 64px; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 3px; font-size: 11px; border: 1px solid transparent; }
+    .active-file-row:hover { border-color: var(--line); background: var(--panel-2); }
+    .af-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+    .af-pct { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .af-who { color: var(--quiet); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; }
+    .af-fresh { color: var(--quiet); text-align: right; font-size: 10px; }
     .attack-board,
     .kg-layout {
       display: grid;
@@ -5337,6 +5574,20 @@ HTML = r"""<!doctype html>
             <table class="agent-table">
               <thead><tr><th>Function</th><th>Priority</th><th>Description</th></tr></thead>
               <tbody id="lease-queued-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- #4: robust who-is-working-on-what (locks + scratch + commits union) -->
+        <div class="panel" id="active-work-panel">
+          <div class="panel-title">
+            <h2>Active Work</h2>
+            <span class="panel-note" id="active-work-note"></span>
+          </div>
+          <div class="table-wrap">
+            <table class="agent-table">
+              <thead><tr><th>File</th><th>Live %</th><th>Who</th><th>Signal</th><th>Fresh</th></tr></thead>
+              <tbody id="active-work-body"></tbody>
             </table>
           </div>
         </div>
@@ -5974,7 +6225,12 @@ HTML = r"""<!doctype html>
       const n = Number(raw);
       return (raw === null || raw === undefined || !Number.isFinite(n)) ? NaN : n;
     }
-    function _drawTimeChart(canvas, rows, series, emptyLabel) {
+    // `domain` (optional) = [xMin,xMax] unix window override for pan/zoom (#2).
+    // When given, the x-scale uses it instead of the data's own min/max, so the
+    // caller can slide/zoom the time axis while the full row set stays available
+    // for hover. Rows are still all drawn; points outside the window just map off
+    // the plot area and are clipped below.
+    function _drawTimeChart(canvas, rows, series, emptyLabel, domain) {
       const { ctx, w, h } = fitCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
       rows = (rows || []).filter(r => r && Number.isFinite(Number(r.unix)));
@@ -5984,9 +6240,14 @@ HTML = r"""<!doctype html>
       const pad = { l: 46, r: 16, t: 18, b: 30 };
       const xs = rows.map(r => Number(r.unix || 0));
       const ys = rows.flatMap(r => active.map(it => _seriesVal(r, it.key))).filter(Number.isFinite);
-      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const dataMinX = Math.min(...xs), dataMaxX = Math.max(...xs);
+      // Window: explicit domain (pan/zoom) clamped to a sane span, else full data.
+      let minX = dataMinX, maxX = dataMaxX;
+      if (Array.isArray(domain) && Number.isFinite(domain[0]) && Number.isFinite(domain[1]) && domain[1] > domain[0]) {
+        minX = domain[0]; maxX = domain[1];
+      }
       const maxY = Math.max(100, Math.ceil((ys.length ? Math.max(...ys) : 0) / 10) * 10);
-      // FIXED scale: min = first row unix, max = last row unix (does not scroll).
+      // Scale over the (possibly windowed) [minX,maxX]; clip drawing to the plot box.
       const x = v => pad.l + (w - pad.l - pad.r) * (v - minX) / Math.max(1, maxX - minX);
       const y = v => h - pad.b - (h - pad.t - pad.b) * v / Math.max(1, maxY);
       // Y gridlines + percent labels at every step (read the % off the axis)
@@ -6000,6 +6261,9 @@ HTML = r"""<!doctype html>
         ctx.fillText(v + "%", pad.l - 6, gy + 4);
       }
       // series lines + points -- break the line at gaps (NaN), don't plot 0.
+      // Clip to the plot box so a zoomed/panned window doesn't draw past the axes.
+      ctx.save();
+      ctx.beginPath(); ctx.rect(pad.l, pad.t - 4, w - pad.l - pad.r, h - pad.t - pad.b + 8); ctx.clip();
       active.forEach((it, si) => {
         ctx.strokeStyle = it.color; ctx.lineWidth = si === 0 ? 2.5 : 2; ctx.beginPath();
         let pen = false;
@@ -6016,6 +6280,7 @@ HTML = r"""<!doctype html>
           ctx.beginPath(); ctx.arc(x(Number(r.unix)), y(val), 2.2, 0, 6.2832); ctx.fill();
         });
       });
+      ctx.restore();
       // legend
       let lx = pad.l; ctx.textAlign = "left"; ctx.font = "12px Segoe UI, Arial";
       active.forEach(it => { ctx.fillStyle = it.color; ctx.fillRect(lx, pad.t - 12, 9, 9); ctx.fillStyle = "#cbd5e3"; ctx.fillText(it.label, lx + 13, pad.t - 3); lx += 64; });
@@ -6042,16 +6307,16 @@ HTML = r"""<!doctype html>
         ctx.fillStyle = "#6b7686"; ctx.font = "10px Segoe UI, Arial"; ctx.textAlign = "right";
         ctx.fillText(dateLbl(minX) + " -> " + dateLbl(maxX) + " HST", w - pad.r, pad.t - 3);
       }
-      canvas._chart = { rows, active, x, y, pad, w, h, fmtH };
+      canvas._chart = { rows, active, x, y, pad, w, h, fmtH, minX, maxX, dataMinX, dataMaxX };
       _bindChartHover(canvas);
     }
-    function drawHistory(canvas, history) {
+    function drawHistory(canvas, history, domain) {
       _drawTimeChart(canvas, history, [
         { key: "decomp_code_pct", label: "code", color: "#5c91df" },
         { key: "decomp_fuzzy_pct", label: "fuzzy", color: "#a98ee6" },
         { key: "decomp_functions_pct", label: "fns", color: "#f0b35a" },
         { key: "c_converted_pct", label: "real C", color: "#38b995" }
-      ], "Timeline starts with the next snapshot");
+      ], "Timeline starts with the next snapshot", domain);
     }
     function relatedAttempts(data, unit) {
       if (!unit) return data.attempt_log || [];
@@ -6248,9 +6513,9 @@ HTML = r"""<!doctype html>
       // #3: report commit-milestone count (what the chart plots), not raw samples.
       const commitPts = collapseHistoryToCommits(data.history || []).length;
       setText($("history-points"), `${commitPts} commit milestones`);
-      const history = data.history || [];
-      const range = history.length ? `${history[0].timestamp} to ${history[history.length - 1].timestamp}` : "no snapshots yet";
-      setText($("timeline-range"), range);
+      // #2: the timeline-range readout (visible window + pan/zoom hint + reset
+      // button) is now owned by updateHistHint() inside drawHistoryRanged(), so
+      // renderLegend no longer overwrites it with a static full-range string.
     }
     function renderSourceFilters(rows) {
       const select = $("source-filter");
@@ -7262,6 +7527,14 @@ HTML = r"""<!doctype html>
         empty.className = "empty-state";
         setText(empty, "Click a file in the treemap to drill into its functions.");
         panel.append(empty);
+        // #3: at the files level, surface the files agents are ACTIVELY working
+        // (locks + fresh scratch + recent commits) with their live match%, so the
+        // detail panel isn't blank and the user can jump straight to live work.
+        const activeHost = document.createElement("div");
+        activeHost.id = "decomp-active-files";
+        activeHost.className = "decomp-active-files";
+        panel.append(activeHost);
+        renderActiveFilesInDetail(store._activeWork);
         renderDecompAttemptLog(data, null);
         drawTimeSeries($("file-history-chart"), [], [], "Select a file for its progress history");
         setText($("file-history-note"), "no file selected");
@@ -7509,19 +7782,110 @@ HTML = r"""<!doctype html>
       }
       return out;
     }
-    // history time-range filter (24h / 3d / 7d / 14d / all)
+    // history time-range filter (24h / 3d / 7d / 14d / all). The collapsed
+    // commit-milestone series is always passed in full; `store.histView` (a
+    // {min,max} unix window set by drag-pan/wheel-zoom, #2) decides what's shown.
+    // When no manual view is active, the range buttons (days) set the window.
     function drawHistoryRanged() {
       // Step the line at commits/milestones (#3) instead of every minute-sample.
       const all = collapseHistoryToCommits(store._history || []);
-      const days = store.historyDays == null ? 14 : store.historyDays;
-      let rows = all;
-      if (days > 0 && all.length) {
-        const nowU = all.reduce((m, r) => Math.max(m, Number(r.unix) || 0), 0);
-        const cutoff = nowU - days * 86400;
-        const sub = all.filter(r => (Number(r.unix) || 0) >= cutoff);
-        if (sub.length >= 2) rows = sub;
+      if (all.length < 2) { drawHistory($("history-chart"), all); updateHistHint(all, null); return; }
+      const dataMin = all.reduce((m, r) => Math.min(m, Number(r.unix) || Infinity), Infinity);
+      const dataMax = all.reduce((m, r) => Math.max(m, Number(r.unix) || 0), 0);
+      let domain;
+      if (store.histView && Number.isFinite(store.histView.min) && Number.isFinite(store.histView.max)) {
+        // Manual pan/zoom window, clamped to the available data extent.
+        let lo = Math.max(dataMin, store.histView.min);
+        let hi = Math.min(dataMax, store.histView.max);
+        if (hi - lo < 1800) { hi = Math.min(dataMax, lo + 1800); lo = Math.max(dataMin, hi - 1800); }
+        store.histView = { min: lo, max: hi };
+        domain = [lo, hi];
+      } else {
+        // Default: the days range-button window (or full when "All").
+        const days = store.historyDays == null ? 14 : store.historyDays;
+        if (days > 0) {
+          const cutoff = dataMax - days * 86400;
+          domain = [Math.max(dataMin, cutoff), dataMax];
+        } else {
+          domain = [dataMin, dataMax];
+        }
       }
-      drawHistory($("history-chart"), rows);
+      drawHistory($("history-chart"), all, domain);
+      updateHistHint(all, domain);
+    }
+    // Small live readout of the visible window + zoom affordance hint (#2).
+    function updateHistHint(all, domain) {
+      const el = $("timeline-range");
+      if (!el) return;
+      if (!all || all.length < 2 || !domain) { setText(el, "no snapshots yet"); return; }
+      const f = u => new Date(Number(u) * 1000).toLocaleString("en-US", { timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+      const manual = !!store.histView;
+      setText(el, `${f(domain[0])} → ${f(domain[1])} HST · drag to pan, scroll to zoom${manual ? " · " : ""}`);
+      // (re)build a tiny reset button after the readout when zoomed/panned.
+      let reset = $("hist-reset");
+      if (manual && !reset) {
+        reset = document.createElement("button");
+        reset.id = "hist-reset"; reset.type = "button"; reset.className = "range-btn hist-reset";
+        setText(reset, "reset zoom");
+        reset.addEventListener("click", () => { store.histView = null; drawHistoryRanged(); });
+        el.append(reset);
+      } else if (!manual && reset) {
+        reset.remove();
+      }
+    }
+    // #2: drag-to-pan + wheel-zoom on the history chart's time axis. Bound once.
+    function bindHistoryPanZoom() {
+      const canvas = $("history-chart");
+      if (!canvas || canvas._panZoomBound) return;
+      canvas._panZoomBound = true;
+      const curWindow = () => {
+        const c = canvas._chart;
+        if (c && Number.isFinite(c.minX) && Number.isFinite(c.maxX)) return { min: c.minX, max: c.maxX, dmin: c.dataMinX, dmax: c.dataMaxX };
+        return null;
+      };
+      // wheel: zoom around the cursor's time position.
+      canvas.addEventListener("wheel", evt => {
+        const c = canvas._chart, win = curWindow();
+        if (!c || !win) return;
+        evt.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const mx = evt.clientX - rect.left;
+        const plotL = c.pad.l, plotR = c.w - c.pad.r;
+        const frac = Math.max(0, Math.min(1, (mx - plotL) / Math.max(1, plotR - plotL)));
+        const span = win.max - win.min;
+        const anchor = win.min + frac * span;
+        const factor = evt.deltaY < 0 ? 0.8 : 1.25;   // up = zoom in
+        let newSpan = Math.max(1800, Math.min(win.dmax - win.dmin, span * factor));
+        let lo = anchor - frac * newSpan;
+        let hi = lo + newSpan;
+        // clamp into data extent without shrinking the span
+        if (lo < win.dmin) { lo = win.dmin; hi = lo + newSpan; }
+        if (hi > win.dmax) { hi = win.dmax; lo = hi - newSpan; }
+        store.histView = { min: Math.max(win.dmin, lo), max: Math.min(win.dmax, hi) };
+        drawHistoryRanged();
+      }, { passive: false });
+      // drag: pan the window left/right.
+      let dragging = false, lastX = 0;
+      canvas.addEventListener("mousedown", evt => {
+        const win = curWindow(); if (!win) return;
+        dragging = true; lastX = evt.clientX; canvas.classList.add("grabbing");
+      });
+      window.addEventListener("mousemove", evt => {
+        if (!dragging) return;
+        const c = canvas._chart, win = curWindow();
+        if (!c || !win) { dragging = false; return; }
+        const plotW = (c.w - c.pad.l - c.pad.r) || 1;
+        const span = win.max - win.min;
+        const dxPx = evt.clientX - lastX;
+        lastX = evt.clientX;
+        const dt = -(dxPx / plotW) * span;   // drag right -> move window earlier
+        let lo = win.min + dt, hi = win.max + dt;
+        if (lo < win.dmin) { lo = win.dmin; hi = lo + span; }
+        if (hi > win.dmax) { hi = win.dmax; lo = hi - span; }
+        store.histView = { min: lo, max: hi };
+        drawHistoryRanged();
+      });
+      window.addEventListener("mouseup", () => { dragging = false; canvas.classList.remove("grabbing"); });
     }
     // ---- v9: agent activity ------------------------------------------------
     function renderAgents(payload) {
@@ -7774,6 +8138,108 @@ HTML = r"""<!doctype html>
       }
     }
     function pollLeases() { fetch("/api/leases", { cache: "no-store" }).then(r => r.json()).then(renderLeases).catch(() => {}); }
+
+    // #3/#4: render the unified active-work table (locks + scratch + commits) with
+    // a LIVE per-file match%. Rows are clickable -> drill into the unit close-out.
+    function fmtFreshAge(unix) {
+      const now = Date.now() / 1000;
+      const s = Math.max(0, Math.floor(now - Number(unix || 0)));
+      if (!unix) return "-";
+      if (s < 90) return s + "s ago";
+      if (s < 5400) return Math.round(s / 60) + "m ago";
+      if (s < 172800) return Math.round(s / 3600) + "h ago";
+      return Math.round(s / 86400) + "d ago";
+    }
+    function renderActiveWork(d) {
+      store._activeWork = d || {};
+      const body = $("active-work-body");
+      setT("active-work-note", d && d.available ? `${d.count} files · ${d.lease_count || 0} leased` : "no active work detected");
+      if (!body) return;
+      body.replaceChildren();
+      const rows = (d && d.active) || [];
+      if (!rows.length) {
+        const tr = document.createElement("tr"); const td = document.createElement("td");
+        td.colSpan = 5; td.className = "empty-state"; setText(td, "No active work (no locks, fresh scratch, or recent commits)");
+        tr.append(td); body.append(tr); return;
+      }
+      for (const e of rows.slice(0, 40)) {
+        const tr = document.createElement("tr"); tr.className = "active-work-row";
+        const u = e.unit || null;
+        // File (+ best-effort fn)
+        const file = document.createElement("td"); file.className = "mono";
+        const fileMain = document.createElement("span"); setText(fileMain, fileName(e.src) + (e.fn ? " → " + e.fn : ""));
+        file.append(fileMain); file.title = e.src;
+        // Live % (functions_pct with matched/total) + a mini bar
+        const pctTd = document.createElement("td"); pctTd.className = "mono";
+        if (u) {
+          const p = Number(u.functions_pct || 0);
+          setText(pctTd, `${pctText(u.functions_pct)} (${u.matched_functions || 0}/${u.total_functions || 0})`);
+          pctTd.append(miniBar(p));
+        } else { setText(pctTd, "-"); }
+        // Who (owners/tags/authors)
+        const who = document.createElement("td"); who.className = "mono"; setText(who, (e.owners || []).join(", ") || "-");
+        // Signal chips
+        const sig = document.createElement("td");
+        for (const s of (e.signals || [])) {
+          const chip = document.createElement("span"); chip.className = "sig-chip sig-" + s; setText(chip, s); sig.append(chip);
+        }
+        if (e.lease) tr.classList.add("is-lease");
+        // Freshness
+        const fresh = document.createElement("td"); fresh.className = "mono"; setText(fresh, fmtFreshAge(e.fresh));
+        tr.append(file, pctTd, who, sig, fresh);
+        if (u && (u.source || e.src)) {
+          tr.classList.add("active-work-click");
+          tr.title = "Open " + e.src + " close-out detail";
+          tr.addEventListener("click", () => drillIntoUnit({ source: u.source || e.src, name: u.name || "" }));
+        }
+        body.append(tr);
+      }
+    }
+    function pollActiveWork() {
+      fetch("/api/active", { cache: "no-store" }).then(r => r.json()).then(payload => {
+        renderActiveWork(payload);
+        renderActiveFilesInDetail(payload);   // #3: feed the decomp-detail active list
+      }).catch(() => {});
+    }
+    // #3: compact "active files + live %" block shown in the decomp detail panel
+    // at the files level. Clicking a row drills into that unit's close-out detail.
+    function renderActiveFilesInDetail(d) {
+      const host = $("decomp-active-files");
+      if (!host) return;   // only present at the files level
+      host.replaceChildren();
+      const rows = (d && d.active) || [];
+      const title = document.createElement("div");
+      title.className = "panel-title";
+      const h = document.createElement("h2"); setText(h, "Active files");
+      const note = document.createElement("span"); note.className = "panel-note";
+      setText(note, rows.length ? `${rows.length} being worked · live %` : "no active files detected");
+      title.append(h, note); host.append(title);
+      if (!rows.length) return;
+      const list = document.createElement("div");
+      list.className = "active-files-list";
+      for (const e of rows.slice(0, 12)) {
+        const u = e.unit || null;
+        const row = document.createElement("div");
+        row.className = "active-file-row";
+        const name = document.createElement("div"); name.className = "af-name mono";
+        setText(name, fileName(e.src) + (e.fn ? " → " + e.fn : ""));
+        const pct = document.createElement("div"); pct.className = "af-pct mono";
+        if (u) { setText(pct, pctText(u.functions_pct)); pct.append(miniBar(Number(u.functions_pct || 0))); }
+        else setText(pct, "-");
+        const who = document.createElement("div"); who.className = "af-who";
+        setText(who, (e.owners || []).slice(0, 3).join(", "));
+        const fresh = document.createElement("div"); fresh.className = "af-fresh";
+        setText(fresh, fmtFreshAge(e.fresh));
+        row.append(name, pct, who, fresh);
+        if (u && (u.source || e.src)) {
+          row.classList.add("active-work-click");
+          row.title = "Open " + e.src;
+          row.addEventListener("click", () => drillIntoUnit({ source: u.source || e.src, name: u.name || "" }));
+        }
+        list.append(row);
+      }
+      host.append(list);
+    }
 
     const REPORT_STATUSES = ["exact", "improved", "committed", "no progress", "needs rework", "tool error"];
     function renderReports(d) {
@@ -8642,7 +9108,7 @@ HTML = r"""<!doctype html>
     pollKg();
     pollCrackJobs();
     pollLog();   // populate the attempt log immediately (independent of /api/state)
-    pollSync(); pollPrs(); pollShip(); pollLeases(); pollReports(); pollQuantum();
+    pollSync(); pollPrs(); pollShip(); pollLeases(); pollReports(); pollQuantum(); pollActiveWork();
     const _gcBtn = $("locks-gc");
     if (_gcBtn) _gcBtn.addEventListener("click", () => lockAction("gc", {}));
 
@@ -8650,13 +9116,16 @@ HTML = r"""<!doctype html>
     store.logFilter = { kind: "all", q: "", limit: 80 };
     store.historyDays = 14;
     store.reportFilter = "all";
-    // Match-Progress time range buttons
+    // Match-Progress time range buttons. Clicking a preset clears any manual
+    // pan/zoom window so the preset takes effect (#2).
     $("history-range")?.addEventListener("click", e => {
       const b = e.target.closest("button[data-days]"); if (!b) return;
       store.historyDays = Number(b.dataset.days);
+      store.histView = null;
       $("history-range").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
       drawHistoryRanged();
     });
+    bindHistoryPanZoom();   // #2: drag-to-pan + wheel-zoom on the history chart
     // Leases active/queued tabs
     $("lease-tabs")?.addEventListener("click", e => {
       const b = e.target.closest("button[data-lease]"); if (!b) return;
@@ -8702,6 +9171,7 @@ HTML = r"""<!doctype html>
     store.agentsTimer = setInterval(pollAgents, 10000);
     store.locksTimer = setInterval(pollLocks, 10000);
     store.leasesTimer = setInterval(pollLeases, 8000);
+    store.activeWorkTimer = setInterval(pollActiveWork, 12000);   // #3/#4 live active-work poll
     store.reportsTimer = setInterval(pollReports, 12000);
     store.syncTimer = setInterval(() => { pollSync(); pollShip(); }, 30000);
     store.prsTimer = setInterval(pollPrs, 60000);
@@ -8950,6 +9420,11 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             return
         if path == "/api/leases":
             self.send_json(load_leases())
+            return
+        if path == "/api/active":
+            # #3/#4: unified active-work view (locks + scratch sidecars + commits)
+            # with live per-file match% from report.json.
+            self.send_json(load_active_work())
             return
         if path == "/api/reports":
             self.send_json(load_reports())
