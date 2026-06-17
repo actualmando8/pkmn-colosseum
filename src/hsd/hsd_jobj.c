@@ -471,19 +471,245 @@ void fn_8019CFBC(HSD_JObj* jobj) {
 #pragma optimizewithasm off
 extern void __assert();
 extern void HSD_Panic(void* file, u32 line, void* msg);
-extern void fn_80199264(void);
-extern void fn_801AE50C(void);
-extern void fn_801C25E4(void);
 extern u8 lbl_80274AA0[];
 extern char lbl_8047DB20;
 extern char lbl_8047DB28;
-#if 1
+typedef struct JObjVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} JObjVec;
+
+extern f32 sqrtf(f32 x);
+extern f64 fn_800CE298(f64 x);
+extern f32 fn_800A3B7C(JObjVec* a, JObjVec* b);
+extern void fn_800A3AC0(JObjVec* src, JObjVec* dst, f32 scale);
+extern void fn_800A3A78(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void fn_800A3A9C(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void fn_800A3B9C(JObjVec* a, JObjVec* b, JObjVec* dst);
+extern void fn_800A3244(f32 mtx[3][4], JObjVec* axis, f32 angle);
+extern void fn_800A37CC(f32 mtx[3][4], JObjVec* src, JObjVec* dst);
+extern HSD_RObj* fn_801B00E0(HSD_RObj* robj, u32 type, u32 subtype);
+extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
+                        HSD_ObjUpdateFunc update_func);
+extern s32 fn_801AFCAC(HSD_RObj* robj, u32 type, JObjVec* out);
+extern void HSD_MtxGetTranslate(f32 mtx[3][4], JObjVec* out);
+
+static void JObjVec_Set(JObjVec* vec, f32 x, f32 y, f32 z)
+{
+    vec->x = x;
+    vec->y = y;
+    vec->z = z;
+}
+
+static void JObjVec_SetOne(JObjVec* vec)
+{
+    JObjVec_Set(vec, 1.0f, 1.0f, 1.0f);
+}
+
+static void JObjVec_SetZero(JObjVec* vec)
+{
+    JObjVec_Set(vec, 0.0f, 0.0f, 0.0f);
+}
+
+static void JObjVec_LoadTranslate(HSD_JObj* jobj, JObjVec* vec)
+{
+    vec->x = jobj->translate_x;
+    vec->y = jobj->translate_y;
+    vec->z = jobj->translate_z;
+}
+
+static void JObjVec_LoadScl(HSD_JObj* jobj, JObjVec* vec)
+{
+    if (jobj != NULL && jobj->scl != NULL) {
+        vec->x = jobj->scl[0];
+        vec->y = jobj->scl[1];
+        vec->z = jobj->scl[2];
+    }
+}
+
+static void JObjMtx_LoadColumn(HSD_JObj* jobj, s32 column, JObjVec* vec)
+{
+    vec->x = jobj->mtx[0][column];
+    vec->y = jobj->mtx[1][column];
+    vec->z = jobj->mtx[2][column];
+}
+
+static void JObjMtx_StoreScaledColumn(HSD_JObj* jobj, s32 column,
+                                      JObjVec* vec, f32 scale)
+{
+    jobj->mtx[0][column] = vec->x * scale;
+    jobj->mtx[1][column] = vec->y * scale;
+    jobj->mtx[2][column] = vec->z * scale;
+}
+
+static void JObjMtx_StoreTranslation(HSD_JObj* jobj, JObjVec* vec)
+{
+    jobj->mtx[0][3] = vec->x;
+    jobj->mtx[1][3] = vec->y;
+    jobj->mtx[2][3] = vec->z;
+}
+
+static f32 JObj_InvSqrt(f32 value)
+{
+    if (value <= 0.0f) {
+        return 0.0f;
+    }
+    return sqrtf(1.0f / value);
+}
+
+static void JObjVec_Normalize(JObjVec* src, JObjVec* dst)
+{
+    f32 dot;
+    f32 scale;
+
+    dot = fn_800A3B7C(src, src);
+    scale = JObj_InvSqrt(1.0e-10f + dot);
+    fn_800A3AC0(src, dst, scale);
+}
+
+static HSD_JObj* JObj_FindEffectType(HSD_JObj* jobj, u32 type)
+{
+    while (jobj != NULL) {
+        if ((jobj->flags & JOBJ_JOINT) == type) {
+            return jobj;
+        }
+        jobj = jobj->next;
+    }
+    return NULL;
+}
+
+static HSD_JObj* JObj_GetEffectorChecked(HSD_JObj* jobj)
+{
+    HSD_JObj* effector;
+
+    effector = JObj_FindEffectType(jobj, JOBJ_EFFECTOR);
+    if (effector == NULL) {
+        __assert(&lbl_8047DB20, 0x82D, &lbl_8047DB28);
+        return NULL;
+    }
+    if (fn_801B00E0(effector->robj, REFTYPE_JOBJ, 1) == NULL) {
+        return NULL;
+    }
+    return effector;
+}
+
+static HSD_JObj* JObj_GetPrev(HSD_JObj* jobj)
+{
+    HSD_JObj* cur;
+
+    if (jobj == NULL || jobj->parent == NULL) {
+        return NULL;
+    }
+    if (jobj->parent->child == jobj) {
+        return NULL;
+    }
+    cur = jobj->parent->child;
+    while (cur != NULL) {
+        if (cur->next == jobj) {
+            return cur;
+        }
+        cur = cur->next;
+    }
+    HSD_Panic(&lbl_8047DB20, 0x5F8, &lbl_8047DB28);
+    return NULL;
+}
+
+static void JObj_RecalcParentRootBits(HSD_JObj* jobj)
+{
+    HSD_JObj* child;
+    u32 flags;
+
+    while (jobj != NULL) {
+        child = jobj->child;
+        flags = ~JOBJ_ROOT_MASK;
+        while (child != NULL) {
+            flags |= (child->flags | (child->flags << 10)) & JOBJ_ROOT_MASK;
+            child = child->next;
+        }
+        if ((jobj->flags & ~flags) == 0) {
+            break;
+        }
+        jobj->flags &= flags;
+        jobj = jobj->next;
+    }
+}
+
+static void JObj_DetachFromParent(HSD_JObj* jobj)
+{
+    HSD_JObj* prev;
+    HSD_JObj* next;
+    HSD_JObj* parent;
+
+    if (jobj == NULL || jobj->parent == NULL) {
+        return;
+    }
+
+    parent = jobj->parent;
+    next = jobj->next;
+    if (parent->child == jobj) {
+        parent->child = next;
+    } else {
+        prev = JObj_GetPrev(jobj);
+        if (prev != NULL) {
+            prev->next = next;
+        } else {
+            __assert(&lbl_8047DB20, 0x57B, &lbl_8047DB28);
+        }
+    }
+    JObj_RecalcParentRootBits(parent);
+    jobj->parent = NULL;
+    jobj->next = NULL;
+}
+
+static BOOL JObj_IsDObjVisible(HSD_JObj* jobj)
+{
+    if (jobj->flags & JOBJ_HIDDEN) {
+        return FALSE;
+    }
+    return union_type_dobj(jobj);
+}
+
+void fn_8019F1C4(HSD_JObj* jobj, s32* total_a, s32* total_b);
+
+#if 0
 asm void fn_8019D05C(void) {
 #include "src/hsd/hsd_jobj_fn_8019D05C.inc"
 }
 #else
-void fn_8019D05C(void) {
-    /* TODO: match -- 1348 bytes at 0x8019D05C */
+void fn_8019D05C(HSD_JObj* jobj) {
+    /* decompiled cdx7: functional */
+    HSD_JObj* child;
+
+    child = jobj->child;
+    if (child != NULL) {
+        if (jobj->flags & JOBJ_INSTANCE) {
+            HSD_JObjUnref(child);
+        } else {
+            child->parent = NULL;
+            HSD_JObjRemoveAll(child);
+        }
+        jobj->child = NULL;
+    }
+
+    if (jobj->parent != NULL) {
+        JObj_DetachFromParent(jobj);
+    }
+
+    if (union_type_dobj(jobj) && jobj->u.dobj != NULL) {
+        HSD_DObjRemoveAll(jobj->u.dobj);
+        jobj->u.dobj = NULL;
+    }
+
+    if (jobj->robj != NULL) {
+        HSD_RObjRemoveAll(jobj->robj);
+        jobj->robj = NULL;
+    }
+
+    if (jobj->aobj != NULL) {
+        HSD_AObjRemove(jobj->aobj);
+        jobj->aobj = NULL;
+    }
 }
 #endif
 #pragma pop
@@ -515,16 +741,6 @@ s32 fn_8019D5A0(HSD_JObj* jobj)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801B00E0(void);
-extern void fn_800A3B7C(void);
-extern void fn_800A3AC0(void);
-extern void fn_800A3A78(void);
-extern void fn_800A3A9C(void);
-extern void fn_800A3ADC(void);
-extern void fn_800CE298(void);
-extern void fn_800A3244(void);
-extern void fn_800A37CC(void);
-extern void fn_800A3B9C(void);
 extern u8 lbl_80274AC4[];
 extern u32 lbl_8047DB30;
 extern char lbl_8047DB68;
@@ -537,13 +753,108 @@ extern u8 lbl_80478AC0[];
 extern char lbl_8047DB6C;
 extern u32 lbl_8047DB74;
 extern u32 lbl_8047DB78;
-#if 1
+#if 0
 asm void fn_8019DD00(void) {
 #include "src/hsd/hsd_jobj_fn_8019DD00.inc"
 }
 #else
-void fn_8019DD00(void) {
-    /* TODO: match -- 1888 bytes at 0x8019DD00 */
+void fn_8019DD00(HSD_JObj* jobj) {
+    /* decompiled cdx7: functional */
+    HSD_JObj* effector;
+    HSD_JObj* parent;
+    HSD_RObj* hint;
+    HSD_RObj* min_limit;
+    HSD_RObj* max_limit;
+    JObjVec scale;
+    JObjVec parent_pos;
+    JObjVec parent_x;
+    JObjVec parent_z;
+    JObjVec joint_pos;
+    JObjVec target_dir;
+    JObjVec bend_axis;
+    JObjVec side_axis;
+    f32 rot_mtx[3][4];
+    f32 x_scale;
+    f32 dot;
+    f32 angle;
+    s32 clamped;
+    s32 flip;
+
+    effector = JObj_GetEffectorChecked(jobj->child);
+    if (effector == NULL || jobj->parent == NULL) {
+        return;
+    }
+
+    JObjVec_SetOne(&scale);
+    JObjVec_LoadScl(jobj, &scale);
+    parent = jobj->parent;
+    HSD_MtxGetTranslate(parent->mtx, &parent_pos);
+    JObjMtx_LoadColumn(parent, 0, &parent_x);
+    JObjVec_Normalize(&parent_x, &parent_x);
+
+    x_scale = 1.0f;
+    if (parent->scl != NULL) {
+        x_scale = parent->scl[0];
+    }
+
+    hint = fn_801B00E0(parent->robj, REFTYPE_IKHINT, 0);
+    if (hint == NULL) {
+        __assert(&lbl_8047DB20, 0x905, &lbl_8047DB6C);
+        return;
+    }
+
+    fn_800A3AC0(&parent_x, &parent_x, hint->u.ik_hint.bone_length * x_scale);
+    fn_800A3A78(&parent_pos, &parent_x, &joint_pos);
+    JObjVec_LoadTranslate(effector, &target_dir);
+    fn_800A3A9C(&target_dir, &joint_pos, &target_dir);
+    JObjVec_Normalize(&target_dir, &target_dir);
+
+    min_limit = fn_801B00E0(jobj->robj, REFTYPE_LIMIT, 5);
+    max_limit = fn_801B00E0(jobj->robj, REFTYPE_LIMIT, 6);
+    if (min_limit != NULL || max_limit != NULL) {
+        clamped = 0;
+        hint = fn_801B00E0(jobj->robj, REFTYPE_IKHINT, 0);
+        if (hint == NULL) {
+            __assert(&lbl_8047DB20, 0x927, &lbl_8047DB6C);
+            return;
+        }
+        flip = (hint->flags & 4) != 0;
+        JObjMtx_LoadColumn(parent, 0, &parent_x);
+        JObjVec_Normalize(&parent_x, &parent_x);
+        dot = fn_800A3B7C(&parent_x, &target_dir);
+        if (dot >= 1.0f) {
+            angle = 0.0f;
+        } else if (dot <= -1.0f) {
+            angle = 3.1415927f;
+        } else {
+            angle = (f32) fn_800CE298(dot);
+        }
+        if (!flip) {
+            angle = -angle;
+        }
+        if (min_limit != NULL && angle < min_limit->u.limit) {
+            angle = min_limit->u.limit;
+            clamped = 1;
+        } else if (max_limit != NULL && max_limit->u.limit < angle) {
+            angle = max_limit->u.limit;
+            clamped = 1;
+        }
+        if (clamped != 0) {
+            JObjMtx_LoadColumn(parent, 2, &parent_z);
+            fn_800A3244(rot_mtx, &parent_z, angle);
+            fn_800A37CC(rot_mtx, &parent_x, &target_dir);
+        }
+    }
+
+    JObjMtx_LoadColumn(parent, 2, &parent_z);
+    fn_800A3B9C(&parent_z, &target_dir, &bend_axis);
+    JObjVec_Normalize(&bend_axis, &bend_axis);
+    fn_800A3B9C(&target_dir, &bend_axis, &side_axis);
+
+    JObjMtx_StoreScaledColumn(jobj, 0, &target_dir, scale.x);
+    JObjMtx_StoreScaledColumn(jobj, 1, &bend_axis, scale.y);
+    JObjMtx_StoreScaledColumn(jobj, 2, &side_axis, scale.z);
+    JObjMtx_StoreTranslation(jobj, &joint_pos);
 }
 #endif
 #pragma pop
@@ -552,9 +863,6 @@ void fn_8019DD00(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801AED88(void);
-extern void HSD_MtxGetTranslate(void);
-extern void fn_801AFCAC(void);
 extern u32 lbl_8047DB48;
 extern char lbl_8047DB34;
 extern char lbl_8047DB3C;
@@ -566,13 +874,154 @@ extern u32 lbl_8047DB58;
 extern u32 lbl_8047DB60;
 extern u32 lbl_8047DB84;
 extern u32 lbl_8047DB80;
-#if 1
+#if 0
 asm void fn_8019E460(void) {
 #include "src/hsd/hsd_jobj_fn_8019E460.inc"
 }
 #else
-void fn_8019E460(void) {
-    /* TODO: match -- 3004 bytes at 0x8019E460 */
+void fn_8019E460(HSD_JObj* jobj) {
+    /* decompiled cdx7: functional */
+    HSD_JObj* joint2;
+    HSD_JObj* effector;
+    HSD_JObj* parent;
+    HSD_RObj* hint;
+    JObjVec scale;
+    JObjVec origin;
+    JObjVec target;
+    JObjVec target_dir;
+    JObjVec bend_axis;
+    JObjVec normal_axis;
+    JObjVec pole;
+    JObjVec pole_hint;
+    JObjVec tmp;
+    JObjVec column;
+    f32 rot_mtx[3][4];
+    f32 rotate_x;
+    f32 first_len;
+    f32 second_len;
+    f32 dist_sq;
+    f32 first_sq;
+    f32 second_sq;
+    f32 diff_sq;
+    f32 height_sq;
+    f32 axial_sq;
+    f32 axial_len;
+    f32 height_len;
+    f32 norm_scale;
+    s32 flip;
+    HSD_ObjUpdateFunc update_func;
+
+    joint2 = JObj_FindEffectType(jobj->child, JOBJ_JOINT2);
+    JObjVec_SetOne(&scale);
+    JObjVec_SetZero(&origin);
+    JObjVec_LoadScl(jobj, &scale);
+
+    hint = fn_801B00E0(jobj->robj, REFTYPE_IKHINT, 0);
+    if (hint == NULL) {
+        __assert(&lbl_8047DB20, 0x85C, &lbl_8047DB3C);
+        return;
+    }
+    rotate_x = hint->u.ik_hint.rotate_x;
+    first_len = hint->u.ik_hint.bone_length * scale.x;
+    second_len = 0.0f;
+    flip = 0;
+
+    if (joint2 != NULL) {
+        hint = fn_801B00E0(joint2->robj, REFTYPE_IKHINT, 0);
+        if (hint == NULL) {
+            __assert(&lbl_8047DB20, 0x867, &lbl_8047DB3C);
+            return;
+        }
+        second_len = hint->u.ik_hint.bone_length * joint2->scale_x * scale.x;
+        flip = (hint->flags & 4) != 0;
+        effector = JObj_GetEffectorChecked(joint2->child);
+    } else {
+        effector = JObj_GetEffectorChecked(jobj->child);
+    }
+
+    if (effector == NULL) {
+        return;
+    }
+
+    if (fn_801B00E0(jobj->robj, REFTYPE_JOBJ, 3) == NULL &&
+        jobj->robj != NULL)
+    {
+        update_func =
+            *(HSD_ObjUpdateFunc*) ((u8*) HSD_JOBJ_METHOD(jobj) + 0x50);
+        fn_801AED88(jobj->robj, jobj, update_func);
+        if (HSD_JObjMtxIsDirty(jobj)) {
+            HSD_JOBJ_METHOD(jobj)->make_mtx(jobj);
+            jobj->flags &= ~JOBJ_MTX_DIRTY;
+        }
+    }
+
+    parent = jobj->parent;
+    if (parent != NULL) {
+        HSD_MtxGetTranslate(parent->mtx, &origin);
+    }
+
+    fn_801AFCAC(effector->robj, 1, &target);
+    effector->translate_x = target.x;
+    effector->translate_y = target.y;
+    effector->translate_z = target.z;
+    fn_800A3A9C(&target, &origin, &target_dir);
+    dist_sq = fn_800A3B7C(&target_dir, &target_dir);
+    first_sq = first_len * first_len;
+    second_sq = second_len * second_len;
+    height_sq = 0.0f;
+    axial_len = 0.0f;
+
+    if (dist_sq > 1.0e-8f) {
+        target = target_dir;
+        if (fn_801AFCAC(jobj->robj, 3, &pole_hint) != 0) {
+            fn_800A3A9C(&pole_hint, &origin, &pole_hint);
+            if (rotate_x != 0.0f) {
+                fn_800A3244(rot_mtx, &target, rotate_x);
+                fn_800A37CC(rot_mtx, &pole_hint, &pole_hint);
+            }
+            fn_800A3B9C(&target, &pole_hint, &normal_axis);
+            fn_800A3B9C(&normal_axis, &target, &pole_hint);
+        } else {
+            JObjMtx_LoadColumn(jobj, 2, &normal_axis);
+            fn_800A3B9C(&normal_axis, &target, &pole_hint);
+            fn_800A3B9C(&target, &pole_hint, &normal_axis);
+        }
+
+        JObjVec_Normalize(&normal_axis, &normal_axis);
+        JObjVec_Normalize(&pole_hint, &bend_axis);
+        diff_sq = first_sq - second_sq;
+        height_sq =
+            0.25f *
+            (((2.0f * (first_sq + second_sq)) - dist_sq) -
+             ((diff_sq * diff_sq) / dist_sq));
+        if (height_sq < 0.0f) {
+            height_sq = 0.0f;
+        }
+        axial_sq = (first_sq - height_sq) / dist_sq;
+        axial_len = axial_sq * JObj_InvSqrt(1.0e-10f + axial_sq);
+        height_len = height_sq * JObj_InvSqrt(1.0e-10f + height_sq);
+    } else {
+        height_len = first_len;
+    }
+
+    if (flip != 0) {
+        height_len = -height_len;
+    }
+    if ((second_sq - height_sq) < dist_sq) {
+        fn_800A3AC0(&target_dir, &tmp, axial_len);
+    } else {
+        fn_800A3AC0(&target_dir, &tmp, -axial_len);
+    }
+    fn_800A3AC0(&bend_axis, &pole, height_len);
+    fn_800A3A78(&tmp, &pole, &tmp);
+    norm_scale = JObj_InvSqrt(1.0e-10f + fn_800A3B7C(&tmp, &tmp));
+    fn_800A3AC0(&tmp, &tmp, norm_scale);
+
+    JObjMtx_StoreScaledColumn(jobj, 0, &tmp, scale.x);
+    fn_800A3B9C(&normal_axis, &tmp, &column);
+    JObjMtx_StoreScaledColumn(jobj, 1, &column, scale.y);
+    JObjMtx_StoreScaledColumn(jobj, 2, &normal_axis, scale.z);
+    JObjMtx_StoreTranslation(jobj, &origin);
 }
 #endif
 #pragma pop
@@ -598,13 +1047,46 @@ u32 fn_8019F01C(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void HSD_DObjCountVertices(HSD_DObj* dobj, s32* total_a, s32* total_b);
-#if 1
+#if 0
 asm void fn_8019F1C4(void) {
 #include "src/hsd/hsd_jobj_fn_8019F1C4.inc"
 }
 #else
-void fn_8019F1C4(void) {
-    /* TODO: match -- 1364 bytes at 0x8019F1C4 */
+void fn_8019F1C4(HSD_JObj* jobj, s32* total_a, s32* total_b) {
+    /* decompiled cdx7: functional */
+    HSD_JObj* child;
+    s32 sum_a;
+    s32 sum_b;
+    s32 child_a;
+    s32 child_b;
+
+    sum_a = 0;
+    sum_b = 0;
+    if (jobj != NULL) {
+        if (jobj->flags & JOBJ_INSTANCE) {
+            fn_8019F1C4(jobj->child, &sum_a, &sum_b);
+        } else {
+            if (JObj_IsDObjVisible(jobj)) {
+                HSD_DObjCountVertices(jobj->u.dobj, &sum_a, &sum_b);
+            }
+            child = jobj->child;
+            while (child != NULL) {
+                child_a = 0;
+                child_b = 0;
+                fn_8019F1C4(child, &child_a, &child_b);
+                sum_a += child_a;
+                sum_b += child_b;
+                child = child->next;
+            }
+        }
+    }
+
+    if (total_a != NULL) {
+        *total_a = sum_a;
+    }
+    if (total_b != NULL) {
+        *total_b = sum_b;
+    }
 }
 #endif
 #pragma pop
