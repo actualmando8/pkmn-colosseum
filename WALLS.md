@@ -36,6 +36,34 @@ Codex commit `2708d871` flipped four functions `#if 0`→`#if 1` (asm-wrapper) w
 
 The other two flipped functions (`fn_801A4098`, `fn_801A4A54`) were already logged HSD walls. Takeaway: codex's *selection* of which functions to wrap was sound, but a wall **with good C is an Equivalent** (real C active), not an asm-wrapper — see policy point 3 above.
 
+## 2026-06-16 — hsd_cobj.c packet wrk3 (NOT-A-TARGET ×3; the TU is band-unmeasurable)
+
+Packet `wrk3` targeted `fn_80194010` / `fn_801963E0` / `fn_80195A6C` as "genuine real-C
+near-misses (95.4–97.4%), NOT the sda2→numeric artifact." **Both halves of that premise are
+false** — recorded so no future packet re-targets them:
+
+1. **All three are active asm-wrappers** (`#if 1` + `#include "..._fn_*.inc"`), with empty
+   `#else void f(){ /* TODO */ }` stubs — **zero real C**. Their 95–97% are objdiff fuzzy
+   scores of the *wrapper* (reloc-name / `@sda21`-vs-numeric address artifacts), i.e. exactly
+   the sda2→numeric measurement artifact the packet said they were not. Same class as wrk2's
+   `fn_800DE128`. To make these real targets requires a from-scratch C decompilation in the
+   `#else`, not band-grinding a near-miss.
+2. **`hsd_cobj.c` does not compile via the band harness at all.** `band init/check/diff/save`
+   and `band_integrate` all run mwcc on the `.c` with the asm-wrappers `#include`d inline;
+   mwcc's inline assembler aborts on the GX-FIFO emitter blocks (`lis rN,0xcc01; st* rX,
+   -0x8000(rN)` → 0xCC008000), first failure in `hsd_cobj_fn_80196EF8.inc:235`
+   (`stfs f28, -0x8000(r6)`) → `declaration syntax error`. This is the documented
+   **W-SDA-WRAPPER inline-asm wall** (this TU is in that set; the full DOL links the
+   dtk-assembled `.o`, it does not mwcc-compile the `.c`). The KG's hsd_cobj percentages come
+   from the ninja/objdiff (`progress2.py --measure`) path, **not** band — so band cannot
+   measure or save anything here, win or not.
+
+**Action items for the fleet:** (a) exclude `hsd_cobj.c` (and the other W-SDA-WRAPPER TUs:
+hsd_dobj/mobj/fog/lobj) from *band* packets — measure them via objdiff/ninja instead; (b) the
+KG rows for these 3 are still `NEARMISS/wall_class=None` — `kg sql` is read-only and there's no
+`record-wall`, so they need a `record-wall` command or a `kg backfill` that ingests this
+WALLS.md entry. Nothing saved; nothing editable reached canon (scratch untouched).
+
 ## 2026-06-16 — gs_render.c packet wrk2 (1 crack + 3 walls; + a harness fix)
 
 Diff-triage + grind of four gs_render.c near-misses (tag `wrk2`):
