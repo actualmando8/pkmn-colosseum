@@ -11,11 +11,16 @@ compiler that Genius Sonority used in 2003.
 
 | Metric | Value |
 |---|---|
-| Function match | ~62.6% (4991 / 7969 functions) |
-| Code match | ~46.0% (706,216 / 1,536,624 matched code bytes) |
+| Function match | ~60.2% (4046 / 6725 functions) |
+| Code match | ~40.6% (542,896 / 1,336,988 matched code bytes) |
 
 Last measured 2026-06-17 with `python tools/gen_decomp_report.py -o report.json`
-against the local ROM-extracted target/base objects. The numbers are regenerated locally — public CI
+against the local ROM-extracted target/base objects, after a full `compile_check
+--all` rebuild and removing four duplicate measurement units that had double-counted
+real TUs (gs_field_world / gs_title were counted twice; gs_render_w2 / pokemon_boss2
+were 94-95% copies of gs_render / pokemon). De-duplication lowered the headline
+~2.4pts (functions) / ~5pts (code) but the number is now honest and locally
+reproducible. The numbers are regenerated locally — public CI
 cannot hold the ROM-derived target objects, so `.github/workflows/progress.yml`
 only gates compilation until the private build container is published. (Note:
 the denominators grew over time as more translation units were unblocked, so

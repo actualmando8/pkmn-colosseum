@@ -31,7 +31,16 @@ TARGET_O = ROOT / "build" / "GC6E01" / "obj" / "auto_01_800055E0_text.o"
 BASE_DIR = ROOT / "build" / "GC6E01" / "base"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 SKIP_BASE_PREFIXES = ("pcport/",)
-SKIP_BASE_NAMES = {"test_va2.o", "test_va3.o"}
+# test_va*: host-only varargs probes. The remaining four are DUPLICATE measurement
+# units that double-count a real TU and inflated the published metric (gs_field_world
+# and gs_title were counted twice — once top-level, once under game/; gs_render_w2 and
+# pokemon_boss2 are 94-95% copies of game/gs_render and game/pokemon). Skip the dup so
+# only the canonical game/-prefixed unit is measured. (Confirmed via function-set overlap.)
+SKIP_BASE_NAMES = {
+    "test_va2.o", "test_va3.o",
+    "gs_field_world.o", "gs_title.o",      # top-level dups of game/gs_field_world, game/gs_title
+    "game/gs_render_w2.o", "pokemon_boss2.o",  # synthetic copies of game/gs_render, game/pokemon
+}
 # Band-harness / integration SCRATCH objects must never be counted as real
 # translation units. band_integrate.py and the band harness drop transient
 # `band_*`, `*_integrated`, `_int_*`, `_evt_*`, `cs_*` objects into base/ for
