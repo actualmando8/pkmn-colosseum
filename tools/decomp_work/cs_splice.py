@@ -62,7 +62,19 @@ def _active_lines(lines):
         s = raw.strip()
         if s.startswith("#if"):
             toks = s[3:].split()
-            stack.append(not (toks and toks[0] == "0"))   # `#if 0` -> dead
+            # `#if 0` -> dead. The PCPORT guard is also dead in the matching
+            # build: PCPORT is only defined for the PC port, never for byte
+            # matching, so `#ifdef PCPORT` is dead (its `#else` holds the real
+            # C) and `#ifndef PCPORT` is live. Without this, every still-wrapped
+            # near-miss in a PCPORT-guarded TU is mis-marked dead and cannot be
+            # disambiguated for save/integrate.
+            if s.startswith("#ifdef") and "PCPORT" in toks:
+                dead = True
+            elif s.startswith("#ifndef") and "PCPORT" in toks:
+                dead = False
+            else:
+                dead = bool(toks) and toks[0] == "0"
+            stack.append(not dead)
         elif s.startswith("#elif"):
             if stack:
                 stack[-1] = True                          # conservatively live
