@@ -1002,20 +1002,26 @@ asm void fn_80179EA4(void) {
 #pragma push
 #pragma optimization_level 4
 void fn_80179EA4(void* src) {
+    u32 src_val;
+    void* saved_src;
     void* ptr;
     void* handle;
+    void* next;
     u8 r0;
-    memcpy(lbl_80478C40, src, 0xFC);
+    src_val = (u32)src;
+    saved_src = (void*)src_val;
+    memcpy(lbl_80478C40, saved_src, 0xFC);
     handle = fn_800F9318(0, 0);
     ptr = lbl_80478C40;
     r0 = *(u8*)ptr;
     if (r0 == 4 || r0 == 8) {
-        handle = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
-        if (handle == 0) {
-            handle = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
+        next = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
+        if (next == 0) {
+            next = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
         }
+        handle = next;
     }
-    fn_800D13C8(handle, (u8*)src + 0xFC);
+    fn_800D13C8(handle, (u8*)saved_src + 0xFC);
     fn_800D258C(handle);
 }
 #pragma pop
