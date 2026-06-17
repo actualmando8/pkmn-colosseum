@@ -150,7 +150,7 @@ static void FogAdjInfoInit(void)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_8019B874(void);
+extern void fn_8019B874(HSD_Fog* o);   /* inferred signature (glm5): FogRelease virtual */
 extern void fn_8019B948(void);
 extern u8 lbl_8036C7E8[];
 extern u8 lbl_8036CC00[];
@@ -168,14 +168,25 @@ void fn_8019B808(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801C25E4(void);
-#if 1
+extern void fn_801C25E4(HSD_AObj* aobj);   /* inferred == HSD_AObjRemove */
+#if 0
 asm void fn_8019B874(void) {
 #include "src/hsd/hsd_fog_fn_8019B874.inc"
 }
 #else
-void fn_8019B874(void) {
-    /* TODO: match -- 212 bytes at 0x8019B874 */
+/* decompiled glm5: functional (TU not byte-measurable) */
+/* FogRelease virtual (vtable 0x30). Signature inferred: arg0 is the HSD_Fog. */
+void fn_8019B874(HSD_Fog* o)
+{
+    HSD_FogAdj* fog_adj = o->fog_adj;
+
+    if (fog_adj != NULL) {
+        if (ref_DEC(fog_adj)) {
+            hsdDelete(fog_adj);
+        }
+    }
+    fn_801C25E4(o->aobj);
+    HSD_OBJECT_PARENT_INFO(&hsdFog)->release((HSD_Class*)o);
 }
 #endif
 #pragma pop
@@ -258,13 +269,49 @@ void fn_8019BD18(void) {
 #pragma optimizewithasm off
 extern u8 lbl_80274800[];
 extern char lbl_8047DA98;
-#if 1
+#if 0
 asm void HSD_HashSearch(void) {
 #include "src/hsd/hsd_fog_HSD_HashSearch.inc"
 }
 #else
-void HSD_HashSearch(void) {
-    /* TODO: match -- 272 bytes at 0x8019BFE8 */
+/* decompiled glm5: functional (TU not byte-measurable) */
+/*
+ * Generic class-based hash-table lookup. No typed header struct exists; layout
+ * inferred from the .inc (same raw-access style as HSD_IDGetDataFromTable):
+ *   table @0x00 HSD_ClassInfo* class_info ; @0x04 void** buckets ; @0x08 u32 nb
+ *   node  @0x00 node* next               ; @0x04 void* key       ; @0x08 void* value
+ *   class_info virtuals: hash @0x3C (idx = hash(table,key)) ;
+ *                        cmp  @0x40 (cmp(table,a,b) == 0 means equal)
+ * Signature inferred (glm5): returns the matched node's value (NULL if absent);
+ * *found = 1 on hit / 0 on miss (only written when found != NULL).
+ */
+typedef u32 (*HashKeyFn)(void* table, void* key);
+typedef u32 (*HashCmpFn)(void* table, void* a, void* b);
+
+void* HSD_HashSearch(void* table, void* key, u32* found)
+{
+    HSD_ClassInfo* info = *(HSD_ClassInfo**)table;
+    u32 idx = ((HashKeyFn) *(void**) ((u8*)info + 0x3C))(table, key);
+    u8* node;
+
+    if (idx >= *(u32*)((u8*)table + 0x08)) {
+        __assert((const char*) &lbl_8047DA98, 0x71, (const char*) lbl_80274800);
+    }
+
+    /* walk the collision chain for buckets[idx] */
+    node = (*(u8***) ((u8*)table + 0x04))[idx];
+    while (node != NULL) {
+        if (((HashCmpFn) *(void**) ((u8*)info + 0x40))
+                (table, *(void**) (node + 0x04), key) == 0) {
+            break;   /* equal key -> found */
+        }
+        node = *(u8**) node;   /* next */
+    }
+
+    if (found != NULL) {
+        *found = (node != NULL);
+    }
+    return (node != NULL) ? *(void**) (node + 0x08) : NULL;
 }
 #endif
 #pragma pop
