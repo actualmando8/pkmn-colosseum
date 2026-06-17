@@ -70,19 +70,31 @@ def main(argv: list[str]) -> int:
             "— aggregate is out of sync with the unit list."
         )
 
-    # 3) Duplicate-signature heuristic: two units with identical (total, matched)
-    #    function counts are very likely the same TU double-counted.
-    seen: dict[tuple[int, int], str] = {}
+    # 3) Phantom double-count detection. A band/scratch phantom is a COPY of a real
+    #    TU, so it carries BOTH the same (total, matched) counts AND (nearly) the same
+    #    function set. Require both signals: the counts are a cheap pre-filter, the
+    #    function-set overlap confirms it is genuinely the same TU. This avoids two
+    #    false positives: (a) different TUs that share counts by coincidence
+    #    (gs_task and people.c can both be 49/53), and (b) pre-existing near-duplicate
+    #    measurement units whose counts already differ (gs_field_world / gs_render_w2).
+    by_sig: dict[tuple[int, int], list[tuple[str, frozenset]]] = {}
     for u in units:
         m = u.get("measures", {}) or {}
         sig = (int(m.get("total_functions", 0) or 0), int(m.get("matched_functions", 0) or 0))
-        if sig[0] >= 50 and sig in seen:
-            problems.append(
-                f"duplicate unit signature {sig} shared by '{seen[sig]}' and "
-                f"'{u.get('name')}' — likely a double-counted TU."
-            )
-        else:
-            seen[sig] = u.get("name", "?")
+        if sig[0] < 50:
+            continue
+        names = frozenset(f.get("name", "") for f in (u.get("functions", []) or []))
+        for prev_name, prev_set in by_sig.get(sig, []):
+            union = len(names | prev_set)
+            jaccard = (len(names & prev_set) / union) if union else 0.0
+            if jaccard >= 0.8:
+                problems.append(
+                    f"duplicate unit signature {sig} with {jaccard:.0%} function-set "
+                    f"overlap shared by '{prev_name}' and '{u.get('name')}' — "
+                    "likely a double-counted TU."
+                )
+                break
+        by_sig.setdefault(sig, []).append((u.get("name", "?"), names))
 
     if problems:
         print("report-sanity: FAIL", file=sys.stderr)
