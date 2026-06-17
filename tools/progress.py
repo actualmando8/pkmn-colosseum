@@ -18,6 +18,7 @@ to a known location, then the README shield syntax becomes:
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from collections import defaultdict
@@ -31,12 +32,33 @@ BASE_DIR = ROOT / "build" / "GC6E01" / "base"
 OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 SKIP_BASE_PREFIXES = ("pcport/",)
 SKIP_BASE_NAMES = {"test_va2.o", "test_va3.o"}
+# Band-harness / integration SCRATCH objects must never be counted as real
+# translation units. band_integrate.py and the band harness drop transient
+# `band_*`, `*_integrated`, `_int_*`, `_evt_*`, `cs_*` objects into base/ for
+# measurement; if collect() enumerates them they become phantom units that
+# duplicate a real TU (e.g. band_trainer_integrated/manual_integrated each
+# duplicated game/trainer's 380 fns) and inflate the denominator — which is
+# exactly what dropped decomp_code_pct 53%->44% with the DOL still byte-exact.
+# The basename (stem, sans ".o") is matched against this pattern.
+SKIP_BASE_SCRATCH = re.compile(
+    r"^(band_|manual_integrated|_int_|_evt_|cs_)|_integrated$",
+    re.IGNORECASE,
+)
+
+
+def _is_scratch_base(rel: str) -> bool:
+    stem = rel.rsplit("/", 1)[-1]
+    if stem.endswith(".o"):
+        stem = stem[:-2]
+    return bool(SKIP_BASE_SCRATCH.search(stem))
 
 
 def iter_base_objects():
     for o in sorted(BASE_DIR.rglob("*.o")):
         rel = o.relative_to(BASE_DIR).as_posix()
         if rel.startswith(SKIP_BASE_PREFIXES) or rel in SKIP_BASE_NAMES:
+            continue
+        if _is_scratch_base(rel):
             continue
         yield rel, o
 

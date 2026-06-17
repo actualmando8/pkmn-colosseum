@@ -1,0 +1,26 @@
+# Report-sanity gate. Pure-Python, no ROM/compiler needed. Fails if the
+# committed report.json contains phantom/scratch units (band-harness leakage)
+# or an inflated denominator. Prevents a recurrence of the 2026-06-16 incident
+# where 3 stray band_*/manual_integrated scratch objects added +783 phantom
+# functions and silently dropped the published code% from ~53% to ~44%.
+
+name: Report Sanity
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  report-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate report.json (no phantom/scratch units, denominator sane)
+        run: python3 tools/check_report_sanity.py report.json
