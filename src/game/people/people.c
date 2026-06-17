@@ -1327,7 +1327,157 @@ extern u32 lbl_8047D7A0;
 extern u32 lbl_8047D834;
 #if 1
 asm void fn_8018B558(void) {
-#include "src/game/people/people_fn_8018B558.inc"
+    nofralloc
+    stwu r1, -0x40(r1)
+    mflr r0
+    stw r0, 0x44(r1)
+    stmw r25, 0x24(r1)
+    mr. r29, r5
+    mr r25, r3
+    mr r26, r4
+    mr r30, r6
+    mr r31, r7
+    blt @L_8018B588
+    cmpwi r30, 0x0
+    bge @L_8018B590
+@L_8018B588:
+    li r3, 0x0
+    b @L_8018B758
+@L_8018B590:
+    cmplwi r31, 0x1
+    bge @L_8018B5A0
+    li r3, 0x0
+    b @L_8018B758
+@L_8018B5A0:
+    li r28, 0x0
+    b @L_8018B5E0
+@L_8018B5A8:
+    mr r3, r28
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_8018B5DC
+    lwz r0, 0x28(r3)
+    cmplw r0, r25
+    bne @L_8018B5DC
+    lwz r0, 0x2c(r3)
+    cmplw r0, r26
+    bne @L_8018B5DC
+    lwz r28, 0x4(r3)
+    b @L_8018B64C
+@L_8018B5DC:
+    addi r28, r28, 0x1
+@L_8018B5E0:
+    bl fn_8018FDB4
+    cmpw r28, r3
+    blt @L_8018B5A8
+    li r27, 0x0
+    b @L_8018B63C
+@L_8018B5F4:
+    mr r3, r27
+    bl fn_8018FD88
+    mr r28, r3
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_8018B638
+    lwz r0, 0x2c(r28)
+    cmplw r0, r26
+    bne @L_8018B638
+    lis r3, lbl_80273FD8@ha
+    mr r4, r25
+    addi r3, r3, lbl_80273FD8@l
+    mr r5, r26
+    crxor 6, 6, 6
+    bl fn_800DD970
+    lwz r28, 0x4(r28)
+    b @L_8018B64C
+@L_8018B638:
+    addi r27, r27, 0x1
+@L_8018B63C:
+    bl fn_8018FDB4
+    cmpw r27, r3
+    blt @L_8018B5F4
+    li r28, 0x0
+@L_8018B64C:
+    li r27, 0x0
+    b @L_8018B680
+@L_8018B654:
+    mr r3, r27
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_8018B67C
+    lwz r0, 0x4(r3)
+    cmplw r0, r28
+    bne @L_8018B67C
+    mr r28, r3
+    b @L_8018B690
+@L_8018B67C:
+    addi r27, r27, 0x1
+@L_8018B680:
+    bl fn_8018FDB4
+    cmpw r27, r3
+    blt @L_8018B654
+    li r28, 0x0
+@L_8018B690:
+    cmplwi r28, 0x0
+    bne @L_8018B6A0
+    li r3, 0x0
+    b @L_8018B758
+@L_8018B6A0:
+    mr r3, r28
+    bl fn_8018FBD4
+    mr. r27, r3
+    bne @L_8018B6B8
+    li r3, 0x0
+    b @L_8018B758
+@L_8018B6B8:
+    lis r0, 0x4330
+    stw r31, 0x14(r1)
+    lfd f1, lbl_8047D7D0(r2)
+    mr r4, r29
+    stw r0, 0x10(r1)
+    mr r5, r30
+    lfs f2, lbl_8047D79C(r2)
+    lfd f0, 0x10(r1)
+    stw r30, 0x48(r28)
+    fsubs f1, f0, f1
+    lfs f0, lbl_8047D7A0(r2)
+    fdivs f1, f2, f1
+    stfs f1, 0xd8(r28)
+    stfs f0, 0xd4(r28)
+    bl fn_800EC5FC
+    lfs f1, lbl_8047D7A0(r2)
+    mr r3, r27
+    bl fn_800ECA78
+    lfs f1, lbl_8047D7A0(r2)
+    mr r3, r27
+    bl fn_800EC9DC
+    lfs f1, 0xd4(r28)
+    mr r3, r27
+    bl fn_800EC5B8
+    mr r3, r27
+    li r4, 0x0
+    bl fn_800ECB74
+    mr r3, r27
+    bl fn_800EC990
+    mr r3, r27
+    addi r4, r1, 0x8
+    li r5, 0x0
+    bl fn_800EC4D0
+    lfs f1, 0x8(r1)
+    mr r3, r27
+    lfs f0, lbl_8047D834(r2)
+    lfs f2, lbl_8047D7A0(r2)
+    fsubs f1, f1, f0
+    bl fn_800EC8C8
+    li r3, 0x1
+@L_8018B758:
+    lmw r25, 0x24(r1)
+    lwz r0, 0x44(r1)
+    mtlr r0
+    addi r1, r1, 0x40
+    blr
 }
 #else
 void fn_8018B558(void) {
@@ -1455,7 +1605,261 @@ extern u32 lbl_8047D7D0;
 extern u32 lbl_8047D89C;
 #if 1
 asm void fn_8018ECEC(void) {
-#include "src/game/people/people_fn_8018ECEC.inc"
+    nofralloc
+    stwu r1, -0xb0(r1)
+    mflr r0
+    stw r0, 0xb4(r1)
+    stfd f31, 0xa0(r1)
+    psq_st f31, 0xa8(r1), 0, 0
+    stfd f30, 0x90(r1)
+    psq_st f30, 0x98(r1), 0, 0
+    stfd f29, 0x80(r1)
+    psq_st f29, 0x88(r1), 0, 0
+    stfd f28, 0x70(r1)
+    psq_st f28, 0x78(r1), 0, 0
+    stfd f27, 0x60(r1)
+    psq_st f27, 0x68(r1), 0, 0
+    stmw r26, 0x48(r1)
+    mr. r31, r3
+    fmr f29, f1
+    li r27, 0x1
+    li r26, 0x0
+    beq @L_8018F050
+    bl fn_8018FBD4
+    mr. r28, r3
+    beq @L_8018F050
+    lwz r0, 0x18(r31)
+    cmplwi r0, 0x0
+    beq @L_8018EF9C
+    lwz r3, 0x30(r31)
+    bl fn_8018F6F4
+    mr r29, r3
+    bl fn_8018F698
+    mr r30, r3
+    mr r3, r29
+    bl fn_8018F678
+    fmr f28, f1
+    mr r3, r29
+    bl fn_8018F658
+    fmr f27, f1
+    mr r3, r29
+    bl fn_8018F638
+    fmr f31, f1
+    mr r3, r29
+    bl fn_8018F618
+    extsb. r0, r30
+    fmr f30, f1
+    blt @L_8018F050
+    mr r3, r28
+    extsb r4, r30
+    bl fn_800EE150
+    addi r4, r1, 0x2c
+    mr r28, r3
+    li r5, 0x0
+    li r6, 0x0
+    bl fn_800EE3BC
+    mr r3, r28
+    bl fn_800EE828
+    mr r3, r31
+    li r4, 0x2
+    bl fn_8018FB94
+    clrlwi. r0, r3, 24
+    beq @L_8018EDE0
+    li r26, 0x1
+    b @L_8018EE10
+@L_8018EDE0:
+    lfs f0, lbl_8047D7A0(r2)
+    fcmpo cr0, f29, f0
+    bge @L_8018EDF4
+    li r26, 0x1
+    b @L_8018EE10
+@L_8018EDF4:
+    lwz r3, 0x18(r31)
+    addi r4, r1, 0x2c
+    bl fn_800E0040
+    fcmpo cr0, f1, f29
+    cror eq, lt, eq
+    bne @L_8018EE10
+    li r26, 0x1
+@L_8018EE10:
+    clrlwi. r0, r26, 24
+    beq @L_8018EF90
+    mr r3, r31
+    addi r4, r1, 0x20
+    bl fn_8018FC2C
+    lfs f29, 0x24(r1)
+    addi r3, r1, 0x8
+    lwz r4, 0x18(r31)
+    addi r5, r1, 0x2c
+    bl fn_800E0168
+    lfs f1, 0x8(r1)
+    lfs f2, 0x10(r1)
+    bl fn_800CE2D8
+    frsp f0, f1
+    lfd f2, lbl_8047D7F0(r2)
+    fsubs f0, f0, f29
+    fadd f1, f2, f0
+    bl fn_800CE318
+    frsp f1, f1
+    lfd f0, lbl_8047D7A8(r2)
+    fcmpo cr0, f1, f0
+    ble @L_8018EE78
+    lfd f0, lbl_8047D7F0(r2)
+    fsub f1, f1, f0
+    frsp f1, f1
+    b @L_8018EE90
+@L_8018EE78:
+    lfd f0, lbl_8047D820(r2)
+    fcmpo cr0, f1, f0
+    bge @L_8018EE90
+    lfd f0, lbl_8047D7F0(r2)
+    fadd f1, f0, f1
+    frsp f1, f1
+@L_8018EE90:
+    fmr f29, f1
+    fcmpo cr0, f1, f28
+    bge @L_8018EEC0
+    mr r3, r31
+    li r4, 0x2
+    bl fn_8018FB94
+    clrlwi. r0, r3, 24
+    beq @L_8018EEB8
+    fmr f29, f28
+    b @L_8018EEE8
+@L_8018EEB8:
+    li r27, 0x0
+    b @L_8018EEE8
+@L_8018EEC0:
+    fcmpo cr0, f1, f27
+    ble @L_8018EEE8
+    mr r3, r31
+    li r4, 0x2
+    bl fn_8018FB94
+    clrlwi. r0, r3, 24
+    beq @L_8018EEE4
+    fmr f29, f27
+    b @L_8018EEE8
+@L_8018EEE4:
+    li r27, 0x0
+@L_8018EEE8:
+    clrlwi. r0, r27, 24
+    beq @L_8018EF80
+    stfs f29, 0xb8(r31)
+    addi r3, r1, 0x14
+    addi r5, r1, 0x2c
+    lwz r4, 0x18(r31)
+    bl fn_800E0168
+    lfs f1, 0x18(r1)
+    lfs f0, lbl_8047D898(r2)
+    lfs f3, 0x1c(r1)
+    fadds f2, f1, f0
+    lfs f0, lbl_8047D7A0(r2)
+    fcmpo cr0, f3, f0
+    stfs f2, 0x18(r1)
+    ble @L_8018EF28
+    b @L_8018EF2C
+@L_8018EF28:
+    fneg f3, f3
+@L_8018EF2C:
+    lfs f1, 0x14(r1)
+    lfs f0, lbl_8047D7A0(r2)
+    fcmpo cr0, f1, f0
+    ble @L_8018EF40
+    b @L_8018EF44
+@L_8018EF40:
+    fneg f1, f1
+@L_8018EF44:
+    fadds f1, f1, f3
+    bl fn_800CE2D8
+    frsp f1, f1
+    lfd f0, lbl_8047D7B0(r2)
+    fsub f0, f1, f0
+    frsp f0, f0
+    fcmpo cr0, f0, f31
+    bge @L_8018EF6C
+    fmr f0, f31
+    b @L_8018EF78
+@L_8018EF6C:
+    fcmpo cr0, f0, f30
+    ble @L_8018EF78
+    fmr f0, f30
+@L_8018EF78:
+    stfs f0, 0xb4(r31)
+    b @L_8018EF9C
+@L_8018EF80:
+    lfs f0, lbl_8047D7A0(r2)
+    stfs f0, 0xb4(r31)
+    stfs f0, 0xb8(r31)
+    b @L_8018EF9C
+@L_8018EF90:
+    lfs f0, lbl_8047D7A0(r2)
+    stfs f0, 0xb4(r31)
+    stfs f0, 0xb8(r31)
+@L_8018EF9C:
+    bl fn_800D3088
+    lis r0, 0x4330
+    stw r3, 0x3c(r1)
+    lfd f2, lbl_8047D7D0(r2)
+    stw r0, 0x38(r1)
+    lfs f0, lbl_8047D89C(r2)
+    lfd f1, 0x38(r1)
+    lfs f3, 0xb4(r31)
+    fsubs f1, f1, f2
+    lfs f2, 0xc(r31)
+    fcmpo cr0, f2, f3
+    fmuls f4, f0, f1
+    ble @L_8018EFEC
+    fsubs f0, f2, f4
+    stfs f0, 0xc(r31)
+    lfs f0, 0xc(r31)
+    fcmpo cr0, f0, f3
+    bge @L_8018F008
+    stfs f3, 0xc(r31)
+    b @L_8018F008
+@L_8018EFEC:
+    bge @L_8018F008
+    fadds f0, f2, f4
+    stfs f0, 0xc(r31)
+    lfs f0, 0xc(r31)
+    fcmpo cr0, f0, f3
+    ble @L_8018F008
+    stfs f3, 0xc(r31)
+@L_8018F008:
+    lfs f1, 0xb8(r31)
+    lfs f0, 0x10(r31)
+    fcmpo cr0, f0, f1
+    ble @L_8018F034
+    fsubs f0, f0, f4
+    stfs f0, 0x10(r31)
+    lfs f0, 0x10(r31)
+    fcmpo cr0, f0, f1
+    bge @L_8018F050
+    stfs f1, 0x10(r31)
+    b @L_8018F050
+@L_8018F034:
+    bge @L_8018F050
+    fadds f0, f0, f4
+    stfs f0, 0x10(r31)
+    lfs f0, 0x10(r31)
+    fcmpo cr0, f0, f1
+    ble @L_8018F050
+    stfs f1, 0x10(r31)
+@L_8018F050:
+    psq_l f31, 0xa8(r1), 0, 0
+    lfd f31, 0xa0(r1)
+    psq_l f30, 0x98(r1), 0, 0
+    lfd f30, 0x90(r1)
+    psq_l f29, 0x88(r1), 0, 0
+    lfd f29, 0x80(r1)
+    psq_l f28, 0x78(r1), 0, 0
+    lfd f28, 0x70(r1)
+    psq_l f27, 0x68(r1), 0, 0
+    lfd f27, 0x60(r1)
+    lmw r26, 0x48(r1)
+    lwz r0, 0xb4(r1)
+    mtlr r0
+    addi r1, r1, 0xb0
+    blr
 }
 #else
 void fn_8018ECEC(void) {
@@ -1880,7 +2284,347 @@ extern u32 lbl_8047D79C;
 extern void fn_80185AAC(void);
 #if 1
 asm void fn_80184D80(void) {
-#include "src/game/people/people_fn_80184D80.inc"
+    nofralloc
+    stwu r1, -0x70(r1)
+    mflr r0
+    stw r0, 0x74(r1)
+    stfd f31, 0x60(r1)
+    psq_st f31, 0x68(r1), 0, 0
+    stmw r27, 0x4c(r1)
+    lis r4, lbl_80273FC0@ha
+    mr r31, r3
+    addi r5, r4, lbl_80273FC0@l
+    lwz r4, 0x0(r5)
+    lwz r3, 0x4(r5)
+    lwz r0, 0x8(r5)
+    stw r4, 0x2c(r1)
+    stw r3, 0x30(r1)
+    stw r0, 0x34(r1)
+    lbz r0, 0x55(r31)
+    cmpwi r0, 0x1
+    beq @L_80184E60
+    bge @L_80184DD8
+    cmpwi r0, 0x0
+    bge @L_80184DE4
+    b @L_80185230
+@L_80184DD8:
+    cmpwi r0, 0x3
+    bge @L_80185230
+    b @L_80185088
+@L_80184DE4:
+    lfs f1, 0x84(r31)
+    lfs f0, lbl_8047D7A0(r2)
+    fcmpo cr0, f1, f0
+    ble @L_80184E58
+    bl fn_800D37CC
+    xoris r3, r3, 0x8000
+    lis r0, 0x4330
+    stw r3, 0x3c(r1)
+    lfd f1, lbl_8047D7C8(r2)
+    stw r0, 0x38(r1)
+    lfd f0, 0x38(r1)
+    fsubs f31, f0, f1
+    bl fn_800D3088
+    lis r0, 0x4330
+    stw r3, 0x44(r1)
+    lfd f3, lbl_8047D7D0(r2)
+    stw r0, 0x40(r1)
+    lfs f1, 0x84(r31)
+    lfd f2, 0x40(r1)
+    lfs f0, lbl_8047D7A0(r2)
+    fsubs f2, f2, f3
+    fdivs f2, f2, f31
+    fsubs f1, f1, f2
+    stfs f1, 0x84(r31)
+    lfs f1, 0x84(r31)
+    fcmpo cr0, f1, f0
+    bge @L_80185230
+    stfs f0, 0x84(r31)
+    b @L_80185230
+@L_80184E58:
+    li r0, 0x1
+    stb r0, 0x55(r31)
+@L_80184E60:
+    bl fn_800E0BE4
+    lfs f2, lbl_8047D7C4(r2)
+    lfs f0, lbl_8047D818(r2)
+    fmuls f1, f2, f1
+    fmuls f31, f0, f1
+    fmr f1, f31
+    bl sin
+    lfs f0, 0x80(r31)
+    fmul f0, f0, f1
+    fmr f1, f31
+    frsp f0, f0
+    stfs f0, 0x2c(r1)
+    bl cos
+    lfs f0, 0x80(r31)
+    addi r3, r31, 0x5c
+    addi r4, r31, 0x74
+    addi r5, r1, 0x2c
+    fmul f0, f0, f1
+    frsp f0, f0
+    stfs f0, 0x34(r1)
+    bl fn_800E019C
+    mr r3, r31
+    bl fn_8018FCBC
+    mr r5, r3
+    addi r3, r1, 0x20
+    addi r4, r31, 0x5c
+    bl fn_800E0168
+    lfs f1, 0x20(r1)
+    lfs f2, 0x28(r1)
+    bl fn_800CE2D8
+    frsp f1, f1
+    lfs f0, lbl_8047D7A0(r2)
+    lfd f2, lbl_8047D7F0(r2)
+    fsubs f0, f1, f0
+    fadd f1, f2, f0
+    bl fn_800CE318
+    frsp f31, f1
+    lfd f0, lbl_8047D7A8(r2)
+    fcmpo cr0, f31, f0
+    ble @L_80184F10
+    lfd f0, lbl_8047D7F0(r2)
+    fsub f31, f31, f0
+    frsp f31, f31
+    b @L_80184F28
+@L_80184F10:
+    lfd f0, lbl_8047D820(r2)
+    fcmpo cr0, f31, f0
+    bge @L_80184F28
+    lfd f0, lbl_8047D7F0(r2)
+    fadd f31, f0, f31
+    frsp f31, f31
+@L_80184F28:
+    lwz r28, 0x2c(r31)
+    li r30, 0x0
+    lwz r29, 0x28(r31)
+    b @L_80184F70
+@L_80184F38:
+    mr r3, r30
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80184F6C
+    lwz r0, 0x28(r3)
+    cmplw r0, r29
+    bne @L_80184F6C
+    lwz r0, 0x2c(r3)
+    cmplw r0, r28
+    bne @L_80184F6C
+    lwz r28, 0x4(r3)
+    b @L_80184FDC
+@L_80184F6C:
+    addi r30, r30, 0x1
+@L_80184F70:
+    bl fn_8018FDB4
+    cmpw r30, r3
+    blt @L_80184F38
+    li r27, 0x0
+    b @L_80184FCC
+@L_80184F84:
+    mr r3, r27
+    bl fn_8018FD88
+    mr r30, r3
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80184FC8
+    lwz r0, 0x2c(r30)
+    cmplw r0, r28
+    bne @L_80184FC8
+    lis r3, lbl_80273FD8@ha
+    mr r4, r29
+    addi r3, r3, lbl_80273FD8@l
+    mr r5, r28
+    crxor 6, 6, 6
+    bl fn_800DD970
+    lwz r28, 0x4(r30)
+    b @L_80184FDC
+@L_80184FC8:
+    addi r27, r27, 0x1
+@L_80184FCC:
+    bl fn_8018FDB4
+    cmpw r27, r3
+    blt @L_80184F84
+    li r28, 0x0
+@L_80184FDC:
+    li r29, 0x0
+    b @L_80185010
+@L_80184FE4:
+    mr r3, r29
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_8018500C
+    lwz r0, 0x4(r3)
+    cmplw r0, r28
+    bne @L_8018500C
+    mr r28, r3
+    b @L_80185020
+@L_8018500C:
+    addi r29, r29, 0x1
+@L_80185010:
+    bl fn_8018FDB4
+    cmpw r29, r3
+    blt @L_80184FE4
+    li r28, 0x0
+@L_80185020:
+    cmplwi r28, 0x0
+    beq @L_80185080
+    mr r3, r28
+    addi r4, r1, 0x14
+    bl fn_8018FC2C
+    lfs f3, lbl_8047D7C0(r2)
+    lis r3, 0x4330
+    lfs f0, 0x18(r1)
+    li r0, 0x1
+    stw r3, 0x38(r1)
+    fdivs f1, f0, f3
+    lfd f2, lbl_8047D7C8(r2)
+    stb r0, 0x22(r28)
+    lfs f0, lbl_8047D79C(r2)
+    fctiwz f1, f1
+    stfd f1, 0x40(r1)
+    lwz r0, 0x44(r1)
+    xoris r0, r0, 0x8000
+    stw r0, 0x3c(r1)
+    lfd f1, 0x38(r1)
+    fsubs f1, f1, f2
+    fmadds f1, f3, f1, f31
+    stfs f1, 0x40(r28)
+    stfs f0, 0x44(r28)
+@L_80185080:
+    li r0, 0x2
+    stb r0, 0x55(r31)
+@L_80185088:
+    mr r3, r31
+    bl fn_80185AAC
+    cmpwi r3, 0x2
+    bne @L_8018520C
+    lfd f1, lbl_8047D7A8(r2)
+    li r30, 0x0
+    lfs f0, 0x40(r31)
+    lwz r29, 0x2c(r31)
+    fadd f31, f1, f0
+    lwz r28, 0x28(r31)
+    frsp f31, f31
+    b @L_801850F0
+@L_801850B8:
+    mr r3, r30
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_801850EC
+    lwz r0, 0x28(r3)
+    cmplw r0, r28
+    bne @L_801850EC
+    lwz r0, 0x2c(r3)
+    cmplw r0, r29
+    bne @L_801850EC
+    lwz r28, 0x4(r3)
+    b @L_8018515C
+@L_801850EC:
+    addi r30, r30, 0x1
+@L_801850F0:
+    bl fn_8018FDB4
+    cmpw r30, r3
+    blt @L_801850B8
+    li r27, 0x0
+    b @L_8018514C
+@L_80185104:
+    mr r3, r27
+    bl fn_8018FD88
+    mr r30, r3
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80185148
+    lwz r0, 0x2c(r30)
+    cmplw r0, r29
+    bne @L_80185148
+    lis r3, lbl_80273FD8@ha
+    mr r4, r28
+    addi r3, r3, lbl_80273FD8@l
+    mr r5, r29
+    crxor 6, 6, 6
+    bl fn_800DD970
+    lwz r28, 0x4(r30)
+    b @L_8018515C
+@L_80185148:
+    addi r27, r27, 0x1
+@L_8018514C:
+    bl fn_8018FDB4
+    cmpw r27, r3
+    blt @L_80185104
+    li r28, 0x0
+@L_8018515C:
+    li r29, 0x0
+    b @L_80185190
+@L_80185164:
+    mr r3, r29
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_8018518C
+    lwz r0, 0x4(r3)
+    cmplw r0, r28
+    bne @L_8018518C
+    mr r28, r3
+    b @L_801851A0
+@L_8018518C:
+    addi r29, r29, 0x1
+@L_80185190:
+    bl fn_8018FDB4
+    cmpw r29, r3
+    blt @L_80185164
+    li r28, 0x0
+@L_801851A0:
+    cmplwi r28, 0x0
+    beq @L_80185200
+    mr r3, r28
+    addi r4, r1, 0x8
+    bl fn_8018FC2C
+    lfs f3, lbl_8047D7C0(r2)
+    lis r3, 0x4330
+    lfs f0, 0xc(r1)
+    li r0, 0x1
+    stw r3, 0x38(r1)
+    fdivs f1, f0, f3
+    lfd f2, lbl_8047D7C8(r2)
+    stb r0, 0x22(r28)
+    lfs f0, lbl_8047D79C(r2)
+    fctiwz f1, f1
+    stfd f1, 0x40(r1)
+    lwz r0, 0x44(r1)
+    xoris r0, r0, 0x8000
+    stw r0, 0x3c(r1)
+    lfd f1, 0x38(r1)
+    fsubs f1, f1, f2
+    fmadds f31, f3, f1, f31
+    stfs f31, 0x40(r28)
+    stfs f0, 0x44(r28)
+@L_80185200:
+    li r0, 0x2
+    stb r0, 0x55(r31)
+    b @L_80185230
+@L_8018520C:
+    cmpwi r3, 0x1
+    bne @L_80185230
+    bl fn_800E0BA0
+    lfs f2, 0x8c(r31)
+    li r0, 0x0
+    lfs f0, 0x88(r31)
+    fmadds f0, f2, f1, f0
+    stfs f0, 0x84(r31)
+    stb r0, 0x55(r31)
+@L_80185230:
+    psq_l f31, 0x68(r1), 0, 0
+    lfd f31, 0x60(r1)
+    lmw r27, 0x4c(r1)
+    lwz r0, 0x74(r1)
+    mtlr r0
+    addi r1, r1, 0x70
+    blr
 }
 #else
 void fn_80184D80(void) { /* TODO: match -- 1228 bytes at 0x80184D80 */ }
@@ -2532,7 +3276,246 @@ extern u32 lbl_8047D834;
 extern u32 lbl_8047D7A4;
 #if 1
 asm void fn_80185B90(void) {
-#include "src/game/people/people_fn_80185B90.inc"
+    nofralloc
+    stwu r1, -0x50(r1)
+    mflr r0
+    stw r0, 0x54(r1)
+    stfd f31, 0x40(r1)
+    psq_st f31, 0x48(r1), 0, 0
+    stmw r25, 0x24(r1)
+    mr r27, r3
+    fmr f31, f1
+    bl fn_8018FBD4
+    mr. r25, r3
+    beq @L_80185ECC
+    lfs f1, lbl_8047D7A0(r2)
+    lfs f0, 0xd8(r27)
+    fcmpu cr0, f1, f0
+    beq @L_80185C20
+    bl fn_800D3088
+    lis r0, 0x4330
+    stw r3, 0x1c(r1)
+    lfd f3, lbl_8047D7D0(r2)
+    stw r0, 0x18(r1)
+    lfs f2, 0xd8(r27)
+    lfd f0, 0x18(r1)
+    lfs f1, 0xd4(r27)
+    fsubs f3, f0, f3
+    lfs f0, lbl_8047D79C(r2)
+    fmadds f1, f2, f3, f1
+    stfs f1, 0xd4(r27)
+    lfs f1, 0xd4(r27)
+    fcmpo cr0, f1, f0
+    ble @L_80185C14
+    stfs f0, 0xd4(r27)
+    lfs f0, lbl_8047D7A0(r2)
+    stfs f0, 0xd8(r27)
+@L_80185C14:
+    lfs f1, 0xd4(r27)
+    mr r3, r25
+    bl fn_800EC5B8
+@L_80185C20:
+    mr r3, r27
+    li r4, 0x8
+    bl fn_8018FB94
+    clrlwi. r0, r3, 24
+    beq @L_80185ECC
+    lfs f0, lbl_8047D830(r2)
+    fcmpo cr0, f31, f0
+    bge @L_80185C48
+    li r3, 0x1
+    b @L_80185C68
+@L_80185C48:
+    cror eq, gt, eq
+    bne @L_80185C64
+    lfs f0, lbl_8047D834(r2)
+    fcmpo cr0, f31, f0
+    bge @L_80185C64
+    li r3, 0x2
+    b @L_80185C68
+@L_80185C64:
+    li r3, 0x3
+@L_80185C68:
+    lwz r0, 0x90(r27)
+    cmpw r0, r3
+    beq @L_80185ECC
+    stw r3, 0x90(r27)
+    lwz r3, 0x30(r27)
+    bl fn_8018F6F4
+    cmplwi r3, 0x0
+    beq @L_80185ECC
+    lwz r0, 0x90(r27)
+    addi r5, r1, 0x14
+    addi r6, r1, 0x8
+    clrlwi r4, r0, 24
+    bl fn_8018F4C8
+    lwz r30, 0x14(r1)
+    cmpwi r30, -0x1
+    beq @L_80185ECC
+    cmpwi r30, 0x0
+    lwz r26, 0x2c(r27)
+    lbz r29, 0x8(r1)
+    li r31, 0x0
+    lwz r27, 0x28(r27)
+    blt @L_80185ECC
+    mr r28, r31
+    b @L_80185D00
+@L_80185CC8:
+    mr r3, r28
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80185CFC
+    lwz r0, 0x28(r3)
+    cmplw r0, r27
+    bne @L_80185CFC
+    lwz r0, 0x2c(r3)
+    cmplw r0, r26
+    bne @L_80185CFC
+    lwz r26, 0x4(r3)
+    b @L_80185D6C
+@L_80185CFC:
+    addi r28, r28, 0x1
+@L_80185D00:
+    bl fn_8018FDB4
+    cmpw r28, r3
+    blt @L_80185CC8
+    li r25, 0x0
+    b @L_80185D5C
+@L_80185D14:
+    mr r3, r25
+    bl fn_8018FD88
+    mr r28, r3
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80185D58
+    lwz r0, 0x2c(r28)
+    cmplw r0, r26
+    bne @L_80185D58
+    lis r3, lbl_80273FD8@ha
+    mr r4, r27
+    addi r3, r3, lbl_80273FD8@l
+    mr r5, r26
+    crxor 6, 6, 6
+    bl fn_800DD970
+    lwz r26, 0x4(r28)
+    b @L_80185D6C
+@L_80185D58:
+    addi r25, r25, 0x1
+@L_80185D5C:
+    bl fn_8018FDB4
+    cmpw r25, r3
+    blt @L_80185D14
+    li r26, 0x0
+@L_80185D6C:
+    li r27, 0x0
+    b @L_80185DA0
+@L_80185D74:
+    mr r3, r27
+    bl fn_8018FD88
+    lbz r0, 0x0(r3)
+    cmplwi r0, 0x0
+    beq @L_80185D9C
+    lwz r0, 0x4(r3)
+    cmplw r0, r26
+    bne @L_80185D9C
+    mr r26, r3
+    b @L_80185DB0
+@L_80185D9C:
+    addi r27, r27, 0x1
+@L_80185DA0:
+    bl fn_8018FDB4
+    cmpw r27, r3
+    blt @L_80185D74
+    li r26, 0x0
+@L_80185DB0:
+    cmplwi r26, 0x0
+    beq @L_80185ECC
+    mr r3, r26
+    bl fn_8018FBD4
+    mr. r28, r3
+    beq @L_80185ECC
+    bl fn_800EC954
+    clrlwi. r0, r3, 24
+    beq @L_80185DDC
+    li r31, 0x1
+    b @L_80185E20
+@L_80185DDC:
+    mr r3, r28
+    bl fn_800EC960
+    clrlwi. r0, r3, 24
+    bne @L_80185DF4
+    li r31, 0x1
+    b @L_80185E20
+@L_80185DF4:
+    mr r3, r28
+    addi r4, r1, 0xc
+    addi r5, r1, 0x10
+    bl fn_800EC578
+    lwz r0, 0xc(r1)
+    cmpw r0, r30
+    bne @L_80185E1C
+    lwz r0, 0x10(r1)
+    cmpwi r0, -0x1
+    beq @L_80185E20
+@L_80185E1C:
+    li r31, 0x1
+@L_80185E20:
+    clrlwi. r0, r31, 24
+    beq @L_80185EA8
+    stw r30, 0x48(r26)
+    mr r3, r28
+    lfs f0, lbl_8047D7A0(r2)
+    mr r4, r30
+    stfs f0, 0xd8(r26)
+    bl fn_800ECCA8
+    lfs f1, lbl_8047D7A0(r2)
+    mr r3, r28
+    bl fn_800ECA78
+    lfs f1, lbl_8047D7A4(r2)
+    mr r3, r28
+    bl fn_800EC9DC
+    mr r3, r28
+    mr r4, r30
+    bl fn_800EC35C
+    lfs f1, lbl_8047D7A0(r2)
+    mr r3, r28
+    bl fn_800EC2A4
+    lfs f1, lbl_8047D7A4(r2)
+    mr r3, r28
+    bl fn_800EC308
+    cmplwi r29, 0x0
+    beq @L_80185E94
+    mr r3, r28
+    li r4, 0x1
+    bl fn_800ECB74
+    b @L_80185EA0
+@L_80185E94:
+    mr r3, r28
+    li r4, 0x0
+    bl fn_800ECB74
+@L_80185EA0:
+    mr r3, r28
+    bl fn_800EC990
+@L_80185EA8:
+    cmplwi r29, 0x0
+    beq @L_80185EC0
+    mr r3, r28
+    li r4, 0x1
+    bl fn_800ECB74
+    b @L_80185ECC
+@L_80185EC0:
+    mr r3, r28
+    li r4, 0x0
+    bl fn_800ECB74
+@L_80185ECC:
+    psq_l f31, 0x48(r1), 0, 0
+    lfd f31, 0x40(r1)
+    lmw r25, 0x24(r1)
+    lwz r0, 0x54(r1)
+    mtlr r0
+    addi r1, r1, 0x50
+    blr
 }
 #else
 void fn_80185B90(void) { /* TODO: match -- 856 bytes at 0x80185B90 */ }
