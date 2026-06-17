@@ -430,12 +430,84 @@ return_null:
 extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
 extern void fn_801947C8(void);
 extern void fn_80194DA4(void);
-#if 1
+extern f32 lbl_8036C6D4[]; /* default up vector (Vec3) */
+#if 0
 asm void fn_80194010(void) {
 #include "src/hsd/hsd_cobj_fn_80194010.inc"
 }
 #else
-void fn_80194010(void) { /* TODO */ }
+/* decompiled wrk6: functional (TU not byte-measurable) — CObj class `load`:
+   initialises a CObj from its descriptor. Copies flags, viewport (s16->f32),
+   scissor and near/far; binds the eye/interest WObjs; sets the orientation
+   from either an explicit up vector or a roll angle; then installs the
+   projection parameters for perspective/frustum/ortho. Asserts on an unknown
+   projection type. Returns 0 (success). The leading null-guards mirror the
+   original's inlined HSD_ASSERT checks. */
+int fn_80194010(HSD_CObj* cobj, HSD_CObjDesc* desc)
+{
+    /* flags: net effect is cobj->flags = desc->flags (the original also does a
+       redundant top-2-bit-preserving rlwimi merge, a no-op for u16 flags). */
+    if (cobj != NULL) {
+        cobj->flags = desc->common.flags;
+    }
+    if (cobj != NULL) {
+        cobj->viewport.xmin = (f32) desc->common.viewport.xmin;
+        cobj->viewport.xmax = (f32) desc->common.viewport.xmax;
+        cobj->viewport.ymin = (f32) desc->common.viewport.ymin;
+        cobj->viewport.ymax = (f32) desc->common.viewport.ymax;
+    }
+    if (cobj != NULL) {
+        cobj->scissor = desc->common.scissor;
+    }
+    HSD_WObjInit(cobj->eyepos, desc->common.eyepos);
+    HSD_WObjInit(cobj->interest, desc->common.interest);
+    if (cobj != NULL) {
+        cobj->near = desc->common.nnear;
+    }
+    if (cobj != NULL) {
+        cobj->far = desc->common.ffar;
+    }
+    if (desc->common.flags & 1) {
+        void* up = desc->common.up_vector;
+        if (up == NULL) {
+            up = lbl_8036C6D4;
+        }
+        ((void (*)(HSD_CObj*, void*)) fn_80194DA4)(cobj, up);
+    } else {
+        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, desc->common.roll);
+    }
+    switch (desc->common.projection_type) {
+    case PROJ_PERSPECTIVE:
+        if (cobj != NULL) {
+            cobj->projection_type = PROJ_PERSPECTIVE;
+            cobj->projection_param.perspective.fov = desc->perspective.fov;
+            cobj->projection_param.perspective.aspect = desc->perspective.aspect;
+        }
+        break;
+    case PROJ_FRUSTUM:
+        if (cobj != NULL) {
+            cobj->projection_type = PROJ_FRUSTUM;
+            cobj->projection_param.frustum.top = desc->frustum.top;
+            cobj->projection_param.frustum.bottom = desc->frustum.bottom;
+            cobj->projection_param.frustum.left = desc->frustum.left;
+            cobj->projection_param.frustum.right = desc->frustum.right;
+        }
+        break;
+    case PROJ_ORTHO:
+        if (cobj != NULL) {
+            cobj->projection_type = PROJ_ORTHO;
+            cobj->projection_param.ortho.top = desc->ortho.top;
+            cobj->projection_param.ortho.bottom = desc->ortho.bottom;
+            cobj->projection_param.ortho.left = desc->ortho.left;
+            cobj->projection_param.ortho.right = desc->ortho.right;
+        }
+        break;
+    default:
+        HSD_ASSERT(2002, 0);
+        break;
+    }
+    return 0;
+}
 #endif
 #pragma pop
 
@@ -740,7 +812,7 @@ extern double fn_800CE220(f32);
 extern f32 lbl_8047D978;
 extern f32 lbl_8047D97C;
 extern f32 lbl_8047D980;
-#if 1
+#if 0
 asm void fn_80194510(void) {
 #include "src/hsd/hsd_cobj_fn_80194510.inc"
 }
@@ -768,7 +840,7 @@ f32 fn_80194510(u8* ptr) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801945B0(void) {
 #include "src/hsd/hsd_cobj_fn_801945B0.inc"
 }
@@ -1050,12 +1122,30 @@ void fn_80194DA4(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void fn_8019513C(void);
-#if 1
+#if 0
 asm void HSD_CObjGetUpVector(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetUpVector.inc"
 }
 #else
-void HSD_CObjGetUpVector(void) { /* TODO */ }
+/* decompiled wrk6: functional (TU not byte-measurable).
+   Returns the camera's up vector. If the CObj stores an explicit up vector
+   (flag bit 0 set), copy its x/y/z out and return 1; otherwise derive the up
+   vector from the stored roll angle via fn_8019513C and return its result.
+   Returns 0 when cobj or the output pointer is NULL.
+   `up` is a 3-float Vec (no Vec type in these headers — inferred f32[3]). */
+int HSD_CObjGetUpVector(HSD_CObj* cobj, f32* up)
+{
+    if (cobj == NULL || up == NULL) {
+        return 0;
+    }
+    if (cobj->flags & 1) {
+        up[0] = cobj->u.up.x;
+        up[1] = cobj->u.up.y;
+        up[2] = cobj->u.up.z;
+        return 1;
+    }
+    return ((int (*)(HSD_CObj*, f32)) fn_8019513C)(cobj, cobj->u.roll);
+}
 #endif
 #pragma pop
 
