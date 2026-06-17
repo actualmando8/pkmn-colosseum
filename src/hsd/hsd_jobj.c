@@ -1276,50 +1276,52 @@ void fn_801A015C(HSD_JObj* jobj, HSD_JObj* child) {
     HSD_JObj* tail;
     HSD_JObj* parent;
     u8* base;
+    u32 flags;
     u32 root_flags;
 
     base = lbl_80274AA0;
-    if (jobj == NULL) {
+    if (jobj == NULL || child == NULL) {
         return;
     }
-    if (child != NULL) {
-        if (child->parent != NULL) {
-            OSReport(base + 0x178);
-            __assert(&lbl_8047DB20, 0x552, base + 0x194);
-        }
-        if (child->next != NULL) {
-            OSReport(base + 0x1AC);
-            __assert(&lbl_8047DB20, 0x553, base + 0x1CC);
-        }
 
-        if (jobj->child == NULL) {
-            jobj->child = child;
-        } else {
-            if (jobj->flags & JOBJ_INSTANCE) {
-                __assert(&lbl_8047DB20, 0x559, base + 0x1E0);
-            }
-            tail = jobj->child;
-            while (tail->next != NULL) {
-                if (tail == child) {
-                    __assert(&lbl_8047DB20, 0x55C, base + 0x200);
-                }
-                tail = tail->next;
-            }
-            tail->next = child;
-        }
+    if (child->parent != NULL) {
+        OSReport(base + 0x178);
+        __assert(&lbl_8047DB20, 0x552, base + 0x194);
+    }
+    if (child->next != NULL) {
+        OSReport(base + 0x1AC);
+        __assert(&lbl_8047DB20, 0x553, base + 0x1CC);
+    }
 
-        child->parent = jobj;
-        root_flags = ((volatile HSD_JObj*) child)->flags;
-        root_flags = ((root_flags << 10) |
-                      ((volatile HSD_JObj*) child)->flags) & JOBJ_ROOT_MASK;
-        parent = jobj;
-        while (parent != NULL) {
-            if ((root_flags & ~((volatile HSD_JObj*) parent)->flags) == 0) {
-                break;
-            }
-            parent->flags = ((volatile HSD_JObj*) parent)->flags | root_flags;
-            parent = parent->parent;
+    if (jobj->child == NULL) {
+        jobj->child = child;
+    } else {
+        if (jobj->flags & JOBJ_INSTANCE) {
+            __assert(&lbl_8047DB20, 0x559, base + 0x1E0);
         }
+        tail = jobj->child;
+        while (tail->next != NULL) {
+            if (tail == child) {
+                __assert(&lbl_8047DB20, 0x55C, base + 0x200);
+            }
+            tail = tail->next;
+        }
+        tail->next = child;
+    }
+
+    child->parent = jobj;
+    flags = ((volatile HSD_JObj*) child)->flags;
+    root_flags = ((volatile HSD_JObj*) child)->flags;
+    flags <<= 10;
+    flags = root_flags | flags;
+    root_flags = flags & JOBJ_ROOT_MASK;
+    parent = jobj;
+    while (parent != NULL) {
+        if ((root_flags & ~((volatile HSD_JObj*) parent)->flags) == 0) {
+            break;
+        }
+        parent->flags = ((volatile HSD_JObj*) parent)->flags | root_flags;
+        parent = parent->parent;
     }
 }
 #endif
@@ -1725,8 +1727,56 @@ extern HSD_ClassInfo* fn_80193748(const char*);
 extern HSD_JObj* fn_80193828(HSD_ClassInfo*);
 extern u32 lbl_8047B298;
 #if 1
-asm void fn_801A0FBC(void) {
-#include "src/hsd/hsd_jobj_fn_801A0FBC.inc"
+HSD_JObj* fn_801A0FBC(HSD_Joint* joint)
+{
+#pragma optimization_level 1
+    HSD_JObj* jobj;
+    HSD_Joint* joint_arg;
+    HSD_ClassInfo* info;
+
+    if (joint == NULL) {
+        jobj = NULL;
+        goto done;
+    }
+
+    if (joint->class_name != NULL) {
+        info = fn_80193748(joint->class_name);
+        if (info != NULL) {
+            goto found;
+        }
+    }
+
+    if (lbl_8047B298 == 0) {
+        goto default_info;
+    }
+    info = (HSD_ClassInfo*) lbl_8047B298;
+    goto got_info;
+
+default_info:
+    info = (HSD_ClassInfo*) lbl_8036C8E0;
+
+got_info:
+    jobj = fn_80193828(info);
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
+    }
+    goto setup;
+
+found:
+    jobj = fn_80193828(info);
+    if (jobj == NULL) {
+        __assert(&lbl_8047DB20, 0x3D5, &lbl_8047DB3C);
+    }
+
+setup:
+    {
+        void** vtable = *(void***) jobj;
+        ((void (*)(HSD_JObj*, HSD_Joint*, HSD_JObj*)) vtable[0x3C / 4])(jobj, joint, NULL);
+    }
+
+done:
+    HSD_JObjResolveRefsAll(jobj, (joint_arg = joint));
+    return jobj;
 }
 #else
 #pragma optimization_level 1
