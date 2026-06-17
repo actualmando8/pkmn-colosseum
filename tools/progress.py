@@ -33,10 +33,13 @@ OBJDIFF = ROOT / "tools" / "objdiff-cli.exe"
 SKIP_BASE_PREFIXES = ("pcport/",)
 SKIP_BASE_NAMES = {"test_va2.o", "test_va3.o"}
 # Band-harness / integration SCRATCH objects must never be counted as real
-# translation units. band_integrate.py drops transient `band_*`, `*_integrated`,
-# `_int_*`, `_evt_*`, `cs_*` objects into base/ for measurement; counting them
-# creates phantom units that duplicate a real TU and inflate the denominator
-# (the band_trainer_integrated/manual_integrated incident dropped code% 53->44).
+# translation units. band_integrate.py and the band harness drop transient
+# `band_*`, `*_integrated`, `_int_*`, `_evt_*`, `cs_*` objects into base/ for
+# measurement; if collect() enumerates them they become phantom units that
+# duplicate a real TU (e.g. band_trainer_integrated/manual_integrated each
+# duplicated game/trainer's 380 fns) and inflate the denominator — which is
+# exactly what dropped decomp_code_pct 53%->44% with the DOL still byte-exact.
+# The basename (stem, sans ".o") is matched against this pattern.
 SKIP_BASE_SCRATCH = re.compile(
     r"^(band_|manual_integrated|_int_|_evt_|cs_)|_integrated$",
     re.IGNORECASE,
