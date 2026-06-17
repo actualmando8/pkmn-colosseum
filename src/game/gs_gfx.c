@@ -539,10 +539,10 @@ void fn_800D3190(void) {
     u8 r30;
     u32 tick;
     u32 div;
-    u32* timing;
-    u32 r29count;
+    s32 r29count;
     u8 r29b;
     u32* s4;
+    u32 chk;
 
     state = (u32*)lbl_8047AA80;
     sc = state[0xC / 4];
@@ -572,9 +572,10 @@ void fn_800D3190(void) {
 
     s4 = (u32*)lbl_8047AA80;
     sc = s4[0xC / 4];
-    r29b = 1;
     if (sc != 0) {
-        if ((u32)(sc + 0x01020000U) != 0xFEFEU) {
+        chk = sc + 0x01020000U;
+        r29b = 1;
+        if (chk != 0xFEFEU) {
             if (((u8*)s4)[0x49D] == 0) {
                 fn_800DC560();
                 fn_801BF8A0(0);
@@ -595,61 +596,49 @@ void fn_800D3190(void) {
             }
         }
     } else {
-        /* @L_800D32A8: shuffle timing counters */
-        timing = (u32*)&lbl_804001F0;
-        {
-            u32 t10 = timing[0x10 / 4];
-            u32 t4  = timing[0x4 / 4];
-            u32 tC  = timing[0xC / 4];
-            timing[0x10 / 4] = t10 + 1;
-            timing[0x0 / 4]  = t4;
-            timing[0x8 / 4]  = tC;
-            timing[0x4 / 4]  = 0;
-            timing[0xC / 4]  = 0;
-        }
+        u32* p = (u32*)&lbl_804001F0;
+        p[0x0 / 4] = p[0x4 / 4];
+        p[0x8 / 4] = p[0xC / 4];
+        p[0x10 / 4] += 1;
+        p[0x4 / 4] = 0;
+        p[0xC / 4] = 0;
     }
 
-    /* Store sentinel 0xFEFEFEFE in state->0xC */
     *(u32*)((u8*)lbl_8047AA80 + 0xC) = 0xFEFEFEFEU;
 
     if (lbl_8047AA90 == 0) {
         return;
     }
 
-    /* fn_800D1070 timing — reload sub ptr each time */
     startTick = OSGetTick();
     fn_800D1070((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
     tick = OSGetTick();
-    timing = (u32*)&lbl_804001F0;
-    timing[0x2C / 4] += tick - startTick;
+    ((u32*)&lbl_804001F0)[0x2C / 4] += tick - startTick;
 
-    /* fn_800DC6D8 timing */
     startTick = OSGetTick();
     fn_800DC6D8((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54));
     tick = OSGetTick();
-    timing[0x30 / 4] += tick - startTick;
+    ((u32*)&lbl_804001F0)[0x30 / 4] += tick - startTick;
 
-    /* fn_800E3884 timing (pass 0) */
     startTick = OSGetTick();
     fn_800E3884((void*)*(u32*)((u8*)lbl_8047AA80 + 0x54), 0);
     tick = OSGetTick();
-    timing[0x34 / 4] += tick - startTick;
+    ((u32*)&lbl_804001F0)[0x34 / 4] += tick - startTick;
 
-    r29count = *(u32*)((u8*)lbl_8047AA80 + 0x54);
-    timing[0x38 / 4] = 0;
+    r29count = *(s32*)((u8*)lbl_8047AA80 + 0x54);
+    ((u32*)&lbl_804001F0)[0x38 / 4] = 0;
 
-    /* inner count loop */
-    do {
+    while (r29count-- != 0) {
         startTick = OSGetTick();
         fn_800E3884((void*)1, 1);
         tick = OSGetTick();
-        timing[0x34 / 4] += tick - startTick;
+        ((u32*)&lbl_804001F0)[0x34 / 4] += tick - startTick;
 
         startTick = OSGetTick();
         fn_801181B0(1);
         tick = OSGetTick();
-        timing[0x38 / 4] += tick - startTick;
-    } while (r29count-- != 0);
+        ((u32*)&lbl_804001F0)[0x38 / 4] += tick - startTick;
+    }
 }
 #endif
 extern void fn_800D13C4(void* a);
