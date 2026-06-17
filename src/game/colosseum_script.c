@@ -2576,7 +2576,7 @@ u32 fn_80222ACC(void) { u32 r = lbl_8047B610; lbl_8047B610 = *(u32 *)(r + 1); re
 void fn_80222ADC(void)
 
 {
-    extern void fn_8011BBD8();
+    extern void fn_8011BBD8(u32, u32, u32, u32, s16);
     extern u32 fn_8011BEB4();
     extern u32 fn_801F025C();
   u32 uVar2;
@@ -23749,15 +23749,15 @@ void fn_8021C308(void)
     extern u8 lbl_80478D78;
   u32 uVar1;
   u32 uVar2;
-  u32 uVar3;
-  u16 uVar7;
-  u16 uVar8;
   u8 cVar10;
   short sVar9;
   u32 uVar4;
+  u32 uVar11;
+  u32 uVar3;
+  u16 uVar7;
+  u16 uVar8;
   u32 uVar5;
   int iVar6;
-  u32 uVar11;
 
   uVar11 = *(u32 *)(lbl_8047B610 + 1);
   uVar1 = fn_801F025C(0x11,0);
@@ -23774,7 +23774,7 @@ void fn_8021C308(void)
   }
   uVar4 = fn_801F025C(0x12,0);
   uVar5 = fn_801F025C(2,uVar4);
-  if (sVar9 < 1) {
+  if (sVar9 <= 0) {
     lbl_8047B610 = uVar11;
   }
   else {
