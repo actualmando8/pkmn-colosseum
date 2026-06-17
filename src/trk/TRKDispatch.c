@@ -360,14 +360,23 @@ void fn_800C0E68(void) {
  * from src to dst, toggling address translation via MSR.
  */
 void fn_800C0E70(u8* dst, u8* src, s32 len, u32 readMSR, u32 writeMSR) {
-    s32 i;
-
-    for (i = 0; i < len; i++) {
-        /* In the original, MSR is toggled between reads and writes
-         * to access physical memory. The C version just does a copy. */
-        dst[i] = src[i];
+    asm {
+        mfmsr r8
+        li r10, 0
+loop:
+        cmpw r10, r5
+        beq done
+        mtmsr r7
+        sync
+        lbzx r9, r10, r4
+        mtmsr r6
+        sync
+        stbx r9, r10, r3
+        addi r10, r10, 1
+        b loop
+done:
+        mtmsr r8
+        sync
     }
-    /* sync */;
-    return;
 }
 
