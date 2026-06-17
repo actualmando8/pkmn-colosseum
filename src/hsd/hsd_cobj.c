@@ -319,12 +319,28 @@ extern void fn_801C25E4(void);
 extern HSD_CObjInfo lbl_8036C678;
 extern char lbl_8047D958;
 extern char lbl_8047D960;
-#if 1
+#if 0
 asm void fn_80193D30(void) {
 #include "src/hsd/hsd_cobj_fn_80193D30.inc"
 }
 #else
-void fn_80193D30(void) { /* TODO */ }
+/* decompiled wrk5: functional (TU not byte-measurable) — CObj destructor:
+   removes its anim, releases the eye/interest WObjs (ref-counted), frees the
+   projection matrix, then chains to the parent class destroy method. */
+void fn_80193D30(HSD_CObj* cobj) {
+    ((void (*)(HSD_AObj*)) fn_801C25E4)(cobj->aobj);
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    HSD_WObjUnref(cobj->eyepos);
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    HSD_WObjUnref(cobj->interest);
+    if (cobj->proj_mtx != NULL) {
+        ((void (*)(f32*)) HSD_MtxFree)(cobj->proj_mtx);
+    }
+    {
+        u32 class_info = *(u32*)((u8*)&lbl_8036C678 + 0x14);
+        ((void (*)(HSD_CObj*)) *(u32*)(class_info + 0x30))(cobj);
+    }
+}
 #endif
 #pragma pop
 
@@ -879,7 +895,7 @@ extern void fn_800CE718(void);
 extern void fn_80194C2C(void);
 extern void HSD_CObjSetMtxDirty(HSD_CObj*);
 extern void fn_8019513C(void);
-extern void fn_80195590(void);
+extern f32 fn_80195590(HSD_CObj*, f32*);
 extern void HSD_CObjGetEyePosition(HSD_CObj*, void*);
 extern void HSD_CObjGetInterest(HSD_CObj*, void*);
 #if 1
@@ -937,7 +953,7 @@ extern void __assert(const char*, u32, const char*);
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_80195F0C(u8*);
+extern void fn_80195F0C(HSD_CObj*);
 #if 0
 asm void HSD_CObjGetViewingMtxPtr(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjGetViewingMtxPtr.inc"
@@ -945,7 +961,7 @@ asm void HSD_CObjGetViewingMtxPtr(void) {
 #else
 f32* HSD_CObjGetViewingMtxPtr(HSD_CObj* cobj)
 {
-    fn_80195F0C((u8*) cobj);
+    fn_80195F0C(cobj);
     return cobj->view_mtx[0];
 }
 #endif
@@ -1064,12 +1080,74 @@ void fn_8019513C(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern f32 fn_800A3B38(void*);
-#if 1
+extern void __assert(const char*, u32, const char*);
+extern void fn_80191688(HSD_WObj*, void*);
+extern void fn_800A3A9C(void*, void*, void*);
+extern void fn_800A3ADC(void);
+extern void fn_800A3820(void);
+extern void fn_800A3B7C(void);
+extern void fn_800CE2D8(void);
+extern f32 lbl_80478AC8;
+extern char lbl_8047D958;
+extern char lbl_8047D960;
+extern f32 lbl_8036C6BC[];
+extern f32 lbl_8036C6C8[];
+#if 0
 asm void fn_80195590(void) {
 #include "src/hsd/hsd_cobj_fn_80195590.inc"
 }
 #else
-void fn_80195590(void) { /* TODO */ }
+/* decompiled wrk5: functional (TU not byte-measurable) — computes a roll/twist
+   angle for the camera. Builds the eye->interest direction; bails (returns 0)
+   if it is degenerate (near-zero length, or nearly parallel to `arg`). Otherwise
+   builds a reference look-at frame and returns the twist angle of `arg` about it.
+   INFERRED: `arg` (r4) typed as f32* (matrix/vector — exact type uncertain);
+   the +/-PI/2 constants below are anonymous SDA2 float literals (r2-0x5CDC /
+   r2-0x5CD8) reconstructed by value. Both flagged for orchestrator review. */
+f32 fn_80195590(HSD_CObj* cobj, f32* arg) {
+    f32 eye[3];        /* sp+0x08 */
+    f32 interest[3];   /* sp+0x14 */
+    f32 dir[3];        /* sp+0x20 */
+    f32 mtx[3][4];     /* sp+0x38 */
+    f32 out[3];        /* sp+0x2c */
+    int ok;
+
+    if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
+        ok = 0;
+    } else {
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        fn_80191688(cobj->eyepos, eye);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        fn_80191688(cobj->interest, interest);
+        fn_800A3A9C(interest, eye, dir);
+        if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= lbl_80478AC8 &&
+            (dir[1] < 0.0f ? -dir[1] : dir[1]) <= lbl_80478AC8 &&
+            (dir[2] < 0.0f ? -dir[2] : dir[2]) <= lbl_80478AC8) {
+            ok = 0; /* direction ~= 0: unusable */
+        } else {
+            ((void (*)(f32*, f32*)) fn_800A3ADC)(dir, dir); /* normalize in place */
+            ok = 1;
+        }
+    }
+    if (!ok) {
+        return 0.0f;
+    }
+    {
+        f32 dot = ((f32 (*)(f32*, f32*)) fn_800A3B7C)(arg, dir);
+        f32 absdot = dot < 0.0f ? -dot : dot;
+        if (1.0f - absdot < lbl_80478AC8) {
+            return 0.0f; /* dir nearly parallel to arg: unusable */
+        }
+    }
+    C_MTXLookAt(mtx, lbl_8036C6BC, lbl_8036C6C8, dir);
+    ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], arg, out);
+    if (out[1] == 0.0f) {
+        return (-out[0] >= 0.0f) ? 1.5707964f : -1.5707964f; /* +/-PI/2 */
+    }
+    return ((f32 (*)(f32, f32)) fn_800CE2D8)(-out[0], out[1]);
+}
 #endif
 #pragma pop
 
@@ -1236,12 +1314,59 @@ void fn_80195A6C(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void HSD_CObjGetUpVector(void);
-#if 1
+extern void __assert(const char*, u32, const char*);
+extern void fn_80191688(HSD_WObj*, void*);
+extern char lbl_8047D958;
+extern char lbl_8047D960;
+#if 0
 asm void fn_80195F0C(u8* ptr) {
 #include "src/hsd/hsd_cobj_fn_80195F0C.inc"
 }
 #else
-void fn_80195F0C(u8* ptr) { /* TODO */ }
+/* decompiled wrk5: functional (TU not byte-measurable) — recomputes the camera
+   viewing matrix via C_MTXLookAt when it (or its eye/interest WObjs) is dirty.
+   flags: 0x2 = up-to-date, 0x40000000 = force-recompute, 0x80000000 = updated. */
+void fn_80195F0C(HSD_CObj* cobj) {
+    f32 eye[3];
+    f32 up[3];
+    f32 interest[3];
+    int update;
+
+    if (cobj->flags & 0x2) {
+        return;
+    }
+    update = 1;
+    if (!(cobj->flags & 0x40000000)) {
+        int eye_dirty =
+            (cobj->eyepos != NULL) && (cobj->eyepos->flags & 0x2);
+        int interest_dirty =
+            (cobj->interest != NULL) && (cobj->interest->flags & 0x2);
+        update = eye_dirty || interest_dirty;
+    }
+    if (!update) {
+        return;
+    }
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+    fn_80191688(cobj->eyepos, eye);
+    if (((int (*)(HSD_CObj*, f32*)) HSD_CObjGetUpVector)(cobj, up) == 0) {
+        up[0] = 0.0f;
+        up[1] = 1.0f;
+        up[2] = 0.0f;
+    }
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+    if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+    fn_80191688(cobj->interest, interest);
+    C_MTXLookAt(cobj->view_mtx, eye, up, interest);
+    cobj->eyepos->flags &= ~0x2;
+    cobj->interest->flags &= ~0x2;
+    if (cobj != NULL) {
+        cobj->flags &= ~0x40000000;
+    }
+    if (cobj != NULL) {
+        cobj->flags |= 0x80000000;
+    }
+}
 #endif
 #pragma pop
 
