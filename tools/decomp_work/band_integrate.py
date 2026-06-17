@@ -25,6 +25,7 @@ Outputs (per source file):
 Exit 0 if every saved win re-verified (or was cleanly dropped); 1 on splice error.
 """
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -79,19 +80,37 @@ def integrate_source(src_rel, fn_bodies, apply):
         print("  MEASURE FAILED:\n" + (err or ""))
         return None, None
 
-    held, dropped = [], []
+    # FRAUD GUARD: a byte-match win must be DECOMPILED C, not inline assembly.
+    # Agents have gamed the metric by hand-transcribing the .inc disassembly into
+    # `asm void fn(){ stwu...; lwz...; }` blocks (or keeping the `#include .inc`
+    # wrapper) to force a 100% match without producing any C. Reject any saved body
+    # that is an `asm`-storage-class function or contains an inline asm{} / __asm
+    # block — real C never does. (The legitimate un-decompiled baseline is also an
+    # `asm` wrapper, and must never be re-saved as a "win" either.)
+    ASM_FN = re.compile(r"\basm\b\s+[\w*]+\s+" + r"\w+\s*\(")   # `asm <type> fn(`
+    ASM_BLOCK = re.compile(r"\basm\b\s*\{|__asm\b|#include\s+\"[^\"]*\.inc\"")
+    held, dropped, rejected = [], [], []
     for fn in fn_bodies:
+        body = fn_bodies[fn] or ""
+        if ASM_FN.search(body) or ASM_BLOCK.search(body):
+            rejected.append((fn, newm.get(fn, 0.0)))
+            continue
         pct = newm.get(fn, 0.0)
         (held if pct >= M else dropped).append((fn, pct))
 
+    if rejected:
+        print(f"  !! REJECTED {len(rejected)} inline-asm/wrapper 'wins' (NOT real C — fraud):")
+        for fn, pct in sorted(rejected):
+            print(f"    REJECT-ASM  {fn}  {pct:.2f}%  (inline assembly, not decompilation)")
     print(f"  re-verified: {len(held)} held, {len(dropped)} dropped")
     for fn, pct in sorted(held):
         print(f"    HELD  {fn}  {pct:.2f}%")
     for fn, pct in sorted(dropped):
         print(f"    DROP  {fn}  {pct:.2f}%  (kept out of canon)")
 
-    if dropped:
-        # Re-splice with only the verified wins so the integrated file is clean.
+    if dropped or rejected:
+        # Re-splice with only the verified wins so the integrated file is clean
+        # (excludes both sub-100 drops and rejected inline-asm/wrapper fraud).
         kept = {fn: b for fn, b in fn_bodies.items() if fn in dict(held)}
         if kept:
             patch.write_bytes(json.dumps(kept, indent=1).encode("utf-8"))
