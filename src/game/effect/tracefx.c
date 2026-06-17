@@ -10,7 +10,7 @@
  *   fn_8013796C (tracefxStartUpdate)     -- Begin trail update cycle
  *   fn_801379E4 (tracefxSetTrailParam)   -- Set a trail parameter
  *   fn_80137A2C (tracefxSetTrailColor)   -- Set trail RGBA colour
- *   fn_80137AA4 (tracefxStartEffect)     -- Public start API
+ *   tracefxStartEffect (tracefxStartEffect)     -- Public start API
  *   fn_80137D14 (tracefxAddSegment)      -- Add segments to a running trail
  *   fn_80137F58 (tracefxUpdate)          -- Per-frame trail logic update
  *

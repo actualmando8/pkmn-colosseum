@@ -492,7 +492,7 @@ extern char lbl_8047DA18;
 extern char lbl_8047DA20;
 #if 0
 asm void DObjLoad(void) {
-#include "src/hsd/hsd_dobj_fn_801993A4.inc"
+#include "src/hsd/hsd_dobj_DObjLoad.inc"
 }
 #else
 #pragma optimization_level 4
