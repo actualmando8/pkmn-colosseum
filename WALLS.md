@@ -27,6 +27,33 @@ C and move on.** This file is how we *stop re-grinding* them.
 Walls live in the gap between C-converted and byte-exact-C. Logging them keeps the
 gap *honest and intentional* instead of an open backlog we keep re-attacking.
 
+## 2026-06-17 — GXInit.c fn_800BD91C (W-rmw-temp-r0 + schedule; the 145th fn, TU stays 144/145)
+
+Packet `cmpB` — "GXInit is 144/145, crack `fn_800BD91C` (94.90%) and the TU is DONE."
+**Confirmed genuine C-uncontrollable wall** at **94.90%** (real, correct C — now an Equivalent).
+This is the old/new pixel-fmt + z-fmt dispatch (`gx+0x4e4/0x4e8/0x4ec`, 2112 B). Every
+instruction is present and semantically correct; the residual ~26 mismatches are all register
+numbering / dead-code the compiler refuses to emit:
+
+1. **W-rmw-temp-r0 (dominant, 8 cases).** The z-fmt switch cases 9–16 each do
+   `*(p) = (*(p) & 0xffffff0f) | 0xNN; GX_LOAD_CP(0x20, *(p));`. Target loads/masks/ors/stores
+   the RMW value **in `r0`**, then reuses `r0` for the `li r0,0x20` CP-addr and the reload.
+   CW (ours) colors the RMW temp to a fresh `rN` (r6/r7) and schedules `li r0,0x20` **early**
+   into the load-use stall slot — so r0 is busy and the value spills to rN. The two are
+   circular (register choice ↔ schedule slot) and not separable from C.
+2. **gx-ptr r7-vs-r8 cascade.** In the first dispatch's `old_z_clear`, the same RMW-temp→rN
+   pushes the cached `gx` pointer from r7 (target) to r8 (ours). Fixes itself iff #1 fixes.
+3. **2 dead `b` branches** CW eliminates. Target keeps an unreachable `b <done>` after a
+   `goto`/`if-else` arm in each of the two if-goto dispatch blocks; `if/else`, bare-`goto`,
+   and `do{}while(0)` phrasings **all** let CW dead-code-eliminate it — no reachable C emits it.
+4. **jumptable slwi/addi schedule** (×2): target `lis;addi;slwi;lwzx`, ours interleaves
+   `slwi` between `lis`/`addi`. Pure scheduler placement.
+
+**Tested, 0 movement:** `#pragma peephole off`, `#pragma scheduling on` (and `off` → 72.3%,
+proving target uses scheduling), OR-operand-order flip on all 8 RMW cases, if/else + do-while(0)
+control-flow phrasings, and the **permuter** (`anneal_one.sh`, 4 jobs, ~1300 iterations — stuck
+at base score 1525, never improved). Class: **W-rmw-temp-r0 / W-schedule**. Hard-skip.
+
 ## 2026-06-13 — two DVDLow/hsd_mobj walls (un-wrapped from codex's undocumented asm-flips)
 
 Codex commit `2708d871` flipped four functions `#if 0`→`#if 1` (asm-wrapper) without proof or logging. Validation un-wrapped the two that had real C; both were then exhaustively tested and confirmed **genuine C-uncontrollable walls** (now Equivalents in `equivalent.txt`):
@@ -520,6 +547,7 @@ matching this file's tested-and-didn't-move policy. 5 are highest-confidence (99
 | colosseum_script.c | 1 | fn_80214B68 |
 | ui_core.c | 1 | fn_8005D8F8 |
 | gba_misc.c | 1 | fn_80089D30 |
+| GXInit.c | 1 | fn_800BD91C |
 | battle_waza.c | 1 | fn_801DD0C8 |
 
 _Full per-fn match% + reg-remap evidence: `tools/decomp_work/_triage_consolidated.json`._

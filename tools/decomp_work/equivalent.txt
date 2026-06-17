@@ -54,3 +54,7 @@ fn_800DAF60   # gs_render        — W2 coupled loop-codegen: entry ble-vs-beq g
 fn_800263B0   # gs_worldmap      — reg-coalescing li-vs-mr for default 0xff; 95.56%; not C-controllable (cdx2 triage 2026-06-16)
 fn_8002A1C4   # gs_worldmap      — schedule-only slwi r0,r3,2 vs lwz ordering; 96.97%; not C-controllable (cdx2 triage 2026-06-16)
 fn_8002A2CC   # gs_worldmap      — schedule-only slwi/SDA-load ordering (twin of fn_8002A1C4); 96.97%; not C-controllable (cdx2 triage 2026-06-16)
+fn_80194400   # hsd_cobj  — 99.51% byte-exact; residual = (f32)(s16) conversion-literal reloc (anon vs named @sda21); named-symbol regressed to 68.9%; W6 wall (wrk9 2026-06-16)
+fn_80194510   # hsd_cobj  — 99.50% byte-exact; residual = f1<->f2 register-coloring swap after call; reg-alloc wall (wrk9 2026-06-16)
+fn_801945B0   # hsd_cobj  — 99.51% byte-exact; residual = f1<->f2 register-coloring swap after call; reg-alloc wall (wrk9 2026-06-16)
+fn_800BD91C   # GXInit    — 94.90% byte-exact (GXSetPixelFmt old/new fmt dispatch, 2112B); residual = CW won't reuse r0 for the `*(p)=(*(p)&mask)|c` RMW temp (picks rN), cascades to gx-ptr r7-vs-r8 in the z-fmt block + 2 CW-eliminated dead `b` branches + jumptable slwi/addi schedule; pragma-sweep (peephole/scheduling) + OR-operand-flip + permuter(1300 iters, stuck at base 1525) all 0 movement; reg-alloc/schedule wall (cmpB 2026-06-17)
