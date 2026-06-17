@@ -439,16 +439,28 @@ void fn_8019CF54(void* info) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
-extern void fn_8019C1B0(void);
-extern void HSD_VecFree(void);
-extern void HSD_MtxFree(void);
-#if 1
+extern void fn_8019C1B0(void* table, u32 key);
+extern void HSD_VecFree(void* data);
+extern void HSD_MtxFree(void* data);
+#if 0
 asm void fn_8019CFBC(void) {
 #include "src/hsd/hsd_jobj_fn_8019CFBC.inc"
 }
 #else
-void fn_8019CFBC(void) {
-    /* TODO: match -- 160 bytes at 0x8019CFBC */
+#pragma optimization_level 4
+void fn_8019CFBC(HSD_JObj* jobj) {
+    HSD_JOBJ_METHOD(jobj)->release_child(jobj);
+
+    if (HSD_IDGetDataFromTable(NULL, jobj->id, NULL) == jobj) {
+        fn_8019C1B0(NULL, jobj->id);
+    }
+    if (((volatile HSD_JObj*) jobj)->scl != NULL) {
+        HSD_VecFree(jobj->scl);
+    }
+    if (((volatile HSD_JObj*) jobj)->envelopemtx != NULL) {
+        HSD_MtxFree(jobj->envelopemtx);
+    }
+    ((HSD_ClassInfo*) lbl_8036C8E0)->head.parent->release((HSD_Class*) jobj);
 }
 #endif
 #pragma pop
@@ -458,7 +470,7 @@ void fn_8019CFBC(void) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void __assert();
-extern void HSD_Panic(void);
+extern void HSD_Panic(void* file, u32 line, void* msg);
 extern void fn_80199264(void);
 extern void fn_801AE50C(void);
 extern void fn_801C25E4(void);
@@ -679,13 +691,89 @@ ok:
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern u8 lbl_80274B28[];
-#if 1
+#if 0
 asm void fn_8019FF74(void) {
 #include "src/hsd/hsd_jobj_fn_8019FF74.inc"
 }
 #else
-void fn_8019FF74(void) {
-    /* TODO: match -- 488 bytes at 0x8019FF74 */
+#pragma optimization_level 4
+void fn_8019FF74(HSD_JObj* jobj, HSD_JObj* next) {
+    /* decompiled cdx5: functional (non-byte-exact) */
+    HSD_JObj* old_next;
+    HSD_JObj* prev;
+    HSD_JObj* scan;
+    HSD_JObj* parent;
+    u32 root_flags;
+    u32 keep_flags;
+
+    if (jobj == NULL || next == NULL) {
+        return;
+    }
+
+    if (next != NULL) {
+        if (next->parent != NULL) {
+            old_next = next->next;
+            if (next->parent->child == next) {
+                next->parent->child = old_next;
+            } else {
+                prev = NULL;
+                if (next != NULL && next->parent != NULL &&
+                    next->parent->child != next)
+                {
+                    prev = next->parent->child;
+                    while (prev != NULL) {
+                        if (prev->next == next) {
+                            break;
+                        }
+                        prev = prev->next;
+                    }
+                    if (prev == NULL) {
+                        HSD_Panic(&lbl_8047DB20, 0x5F8, lbl_80274B28);
+                    }
+                }
+
+                if (prev == NULL) {
+                    __assert(&lbl_8047DB20, 0x57B, &lbl_8047DB28);
+                }
+                prev->next = old_next;
+            }
+
+            parent = next->parent;
+            while (parent != NULL) {
+                keep_flags = 0x8FFFFFFF;
+                scan = parent->child;
+                while (scan != NULL) {
+                    root_flags = ((scan->flags << 10) | scan->flags) &
+                                 JOBJ_ROOT_MASK;
+                    keep_flags |= root_flags;
+                    scan = scan->next;
+                }
+                if ((parent->flags & ~keep_flags) == 0) {
+                    break;
+                }
+                parent->flags &= keep_flags;
+                parent = parent->next;
+            }
+            next->parent = NULL;
+        }
+        next->next = NULL;
+    }
+
+    next->parent = jobj->parent;
+    next->next = jobj->next;
+    jobj->next = next;
+
+    if (jobj->parent != NULL) {
+        root_flags = ((next->flags << 10) | next->flags) & JOBJ_ROOT_MASK;
+        parent = jobj->parent;
+        while (parent != NULL) {
+            if ((root_flags & ~parent->flags) == 0) {
+                break;
+            }
+            parent->flags |= root_flags;
+            parent = parent->parent;
+        }
+    }
 }
 #endif
 #pragma pop
@@ -694,14 +782,63 @@ void fn_8019FF74(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void OSReport();
-#if 1
+extern void OSReport(void* fmt, ...);
+#if 0
 asm void fn_801A015C(void) {
 #include "src/hsd/hsd_jobj_fn_801A015C.inc"
 }
 #else
-void fn_801A015C(void) {
-    /* TODO: match -- 340 bytes at 0x801A015C */
+#pragma optimization_level 4
+void fn_801A015C(HSD_JObj* jobj, HSD_JObj* child) {
+    /* decompiled cdx5: functional (non-byte-exact) */
+    HSD_JObj* tail;
+    HSD_JObj* parent;
+    u8* base;
+    u32 root_flags;
+
+    base = lbl_80274AA0;
+    if (jobj == NULL) {
+        return;
+    }
+    if (child != NULL) {
+        if (child->parent != NULL) {
+            OSReport(base + 0x178);
+            __assert(&lbl_8047DB20, 0x552, base + 0x194);
+        }
+        if (child->next != NULL) {
+            OSReport(base + 0x1AC);
+            __assert(&lbl_8047DB20, 0x553, base + 0x1CC);
+        }
+
+        if (jobj->child == NULL) {
+            jobj->child = child;
+        } else {
+            if (jobj->flags & JOBJ_INSTANCE) {
+                __assert(&lbl_8047DB20, 0x559, base + 0x1E0);
+            }
+            tail = jobj->child;
+            while (tail->next != NULL) {
+                if (tail == child) {
+                    __assert(&lbl_8047DB20, 0x55C, base + 0x200);
+                }
+                tail = tail->next;
+            }
+            tail->next = child;
+        }
+
+        child->parent = jobj;
+        root_flags = ((volatile HSD_JObj*) child)->flags;
+        root_flags = ((root_flags << 10) |
+                      ((volatile HSD_JObj*) child)->flags) & JOBJ_ROOT_MASK;
+        parent = jobj;
+        while (parent != NULL) {
+            if ((root_flags & ~((volatile HSD_JObj*) parent)->flags) == 0) {
+                break;
+            }
+            parent->flags = ((volatile HSD_JObj*) parent)->flags | root_flags;
+            parent = parent->parent;
+        }
+    }
 }
 #endif
 #pragma pop
@@ -772,17 +909,23 @@ void fn_801A053C(void* obj) {
 extern void __assert();
 extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void* HSD_IDGetDataFromTable(void* table, u32 key, u32* found);
+extern void fn_80196E10(void* file, u32 line, void* expr);
+extern void fn_801991F8(HSD_DObj* dobj, HSD_DObjDesc* desc);
+extern void* fn_8019C128(void* table, u32 key, u32* found);
 extern void fn_801A05EC(void);
 extern void HSD_JObjRef(HSD_JObj* jobj);
 extern void* HSD_IDGetData(u32 key, u32* found);
+extern void fn_801A0B9C(HSD_JObj* jobj);
+extern void* fn_801A0BF0(u32 key, u32* found);
 extern void fn_801A0C1C();
 extern BOOL fn_801A0C68(HSD_Obj*);
 extern void fn_801A0C9C();
 extern void fn_801A0CE8(void*);
 extern s32 fn_801A0D3C();
 extern BOOL fn_801A0D48(void*);
-extern void fn_801A0D94(void);
-extern void fn_801AEBE4(void);
+extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
+extern void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint);
+extern void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc);
 #if 1
 asm void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
 #include "src/hsd/hsd_jobj_fn_801A0744.inc"
@@ -962,13 +1105,58 @@ BOOL fn_801A0D48(void* o) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A0D94(void) {
 #include "src/hsd/hsd_jobj_fn_801A0D94.inc"
 }
 #else
-void fn_801A0D94(void) {
-    /* TODO: match -- 552 bytes at 0x801A0D94 */
+#pragma optimization_level 4
+void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint) {
+    /* decompiled cdx5: functional (non-byte-exact) */
+    HSD_JObj* child;
+    u8* base;
+
+    base = lbl_80274AA0;
+    if (jobj == NULL || joint == NULL) {
+        return;
+    }
+
+    fn_801AEBE4(jobj->robj, joint->robjdesc);
+    if (jobj->flags & JOBJ_INSTANCE) {
+        child = jobj->child;
+        if (child != NULL) {
+            if (ref_DEC(child) != 0) {
+                if (child->object.ref_count_individual < 1) {
+                    if (child != NULL) {
+                        HSD_CLASS_METHOD(child)->release((HSD_Class*) child);
+                        HSD_CLASS_METHOD(child)->destroy((HSD_Class*) child);
+                    }
+                } else {
+                    iref_INC(child);
+                    HSD_JOBJ_METHOD(child)->release_child(child);
+                    if (iref_DEC(child) != 0) {
+                        if (child != NULL) {
+                            HSD_CLASS_METHOD(child)->release((HSD_Class*) child);
+                            HSD_CLASS_METHOD(child)->destroy((HSD_Class*) child);
+                        }
+                    }
+                }
+            }
+        }
+
+        jobj->child =
+            HSD_IDGetDataFromTable(NULL, (u32) joint->child, NULL);
+        if (jobj->child == NULL) {
+            __assert(&lbl_8047DB20, 0x45F, base + 0x210);
+        }
+        if (jobj->child != NULL) {
+            HSD_JObjRef(jobj->child);
+        }
+    }
+
+    if (!union_type_ptcl(jobj) && !union_type_spline(jobj)) {
+        HSD_DObjResolveRefsAll(jobj->u.dobj, joint->u.dobjdesc);
+    }
 }
 #endif
 #pragma pop
