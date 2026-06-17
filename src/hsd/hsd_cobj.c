@@ -614,12 +614,23 @@ void HSD_CObjSetViewportfx4(HSD_CObj* cobj, f32 f1, f32 f2, f32 f3, f32 f4) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80194400(void) {
 #include "src/hsd/hsd_cobj_fn_80194400.inc"
 }
 #else
-void fn_80194400(void) { /* TODO */ }
+/* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
+ * Set the camera viewport from an s16 rect (signed lha + xoris/0x8000 magic
+ * => (f32)(s16) on each of the four halfwords). */
+void fn_80194400(HSD_CObj* cobj, HSD_RectS16* rect) {
+    if (cobj == NULL) {
+        return;
+    }
+    cobj->viewport.xmin = (f32) rect->xmin;
+    cobj->viewport.xmax = (f32) rect->xmax;
+    cobj->viewport.ymin = (f32) rect->ymin;
+    cobj->viewport.ymax = (f32) rect->ymax;
+}
 #endif
 #pragma pop
 
@@ -796,12 +807,37 @@ f32 fn_80194654(u8* ptr) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801946F0(void) {
 #include "src/hsd/hsd_cobj_fn_801946F0.inc"
 }
 #else
-void fn_801946F0(void) { /* TODO */ }
+/* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
+ * Get the top extent of the view frustum. Twin of fn_80194654 (which returns
+ * the bottom, i.e. -near*tan); this returns +near*tan(D97C * D980 * fov) for
+ * perspective, the +0x40 field for frustum/ortho, else the default. */
+f32 fn_801946F0(HSD_CObj* cobj) {
+    extern f32 lbl_8047D978; /* default (no/invalid camera) */
+    extern f32 lbl_8047D97C; /* deg->rad scale            */
+    extern f32 lbl_8047D980; /* 0.5 (half-fov)            */
+    extern double fn_800CE220(f32); /* tan */
+    if (cobj == NULL) {
+        return lbl_8047D978;
+    }
+    switch (cobj->projection_type) {
+    case PROJ_PERSPECTIVE:
+        return cobj->near *
+               (f32) fn_800CE220(lbl_8047D97C *
+                                 (lbl_8047D980 *
+                                  cobj->projection_param.perspective.fov));
+    case PROJ_FRUSTUM:
+        return cobj->projection_param.frustum.top;
+    case PROJ_ORTHO:
+        return cobj->projection_param.ortho.top;
+    default:
+        return lbl_8047D978;
+    }
+}
 #endif
 #pragma pop
 
@@ -860,12 +896,30 @@ void fn_801947C8(void) { /* TODO */ }
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern f32 lbl_80478AC8;
-#if 1
+extern void fn_800A3ADC(void);
+#if 0
 asm void fn_80194C2C(void) {
 #include "src/hsd/hsd_cobj_fn_80194C2C.inc"
 }
 #else
-void fn_80194C2C(void) { /* TODO */ }
+/* decompiled wrk4 2026-06-16: functional (TU not byte-measurable).
+ * Degenerate-vector guard: if every component of the 3-vector is within the
+ * epsilon lbl_80478AC8 the direction is unusable -> return -1. Otherwise run
+ * fn_800A3ADC on (vec,out) (the asm leaves r3=vec/r4=out live across the call,
+ * inferred (f32*,void*) signature) and report success (0). */
+int fn_80194C2C(f32* vec, void* out) {
+    f32 epsilon = lbl_80478AC8;
+    if (vec == NULL || out == NULL) {
+        return -1;
+    }
+    if ((vec[0] < 0.0f ? -vec[0] : vec[0]) <= epsilon &&
+        (vec[1] < 0.0f ? -vec[1] : vec[1]) <= epsilon &&
+        (vec[2] < 0.0f ? -vec[2] : vec[2]) <= epsilon) {
+        return -1;
+    }
+    ((void (*)(f32*, void*)) fn_800A3ADC)(vec, out);
+    return 0;
+}
 #endif
 #pragma pop
 
