@@ -934,10 +934,13 @@ loop_body:
 inner_body:
     if ((s32)val == (s32)j) { goto inner_next; }
     check = (s32)fn_801666BC(*(u16*)((u32)lbl_80478E24 + joff));
-    if (check >= 4) { goto inner_next; }
-    if (check >= 1) { goto do_call824; } else { goto inner_next; }
-do_call824:
-    fn_80166B18(*(u16*)((u32)lbl_80478E24 + joff));
+    switch (check) {
+    case 1:
+    case 2:
+    case 3:
+        fn_80166B18(*(u16*)((u32)lbl_80478E24 + joff));
+        break;
+    }
 inner_next:
     joff += 2; j++;
 inner_check:
@@ -979,10 +982,13 @@ loop_body:
 inner_body:
     if ((s32)val == (s32)j) { goto inner_next; }
     check = (s32)fn_801666BC(*(u16*)((u32)lbl_80478E2C + joff));
-    if (check >= 4) { goto inner_next; }
-    if (check >= 1) { goto do_call92c; } else { goto inner_next; }
-do_call92c:
-    fn_80166B18(*(u16*)((u32)lbl_80478E2C + joff));
+    switch (check) {
+    case 1:
+    case 2:
+    case 3:
+        fn_80166B18(*(u16*)((u32)lbl_80478E2C + joff));
+        break;
+    }
 inner_next:
     joff += 2; j++;
 inner_check:
