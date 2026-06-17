@@ -17,7 +17,7 @@
 extern void C_MTXLookAt();
 extern void C_MTXPerspective();
 extern void OSFillFPUContext();
-extern void fn_801963E0();
+extern int fn_801963E0();   /* wrk7: was `void` asm-wrapper decl; typed-C returns int */
 extern void fn_8019674C();
 extern char lbl_80465080[];
 
@@ -429,7 +429,7 @@ return_null:
 #pragma optimizewithasm off
 extern void HSD_WObjInit(HSD_WObj*, HSD_WObjDesc*);
 extern void fn_801947C8(void);
-extern void fn_80194DA4(void);
+extern void fn_80194DA4();   /* wrk7: was `(void)`; typed-C takes (HSD_CObj*, f32*) */
 extern f32 lbl_8036C6D4[]; /* default up vector (Vec3) */
 #if 0
 asm void fn_80194010(void) {
@@ -1108,12 +1108,113 @@ extern void fn_800A3B7C(void);
 extern void fn_800CE2D8(void);
 extern void fn_80191688(HSD_WObj*, void*);
 extern void __assert(const char*, u32, const char*);
-#if 1
+#if 0
 asm void fn_80194DA4(void) {
 #include "src/hsd/hsd_cobj_fn_80194DA4.inc"
 }
 #else
-void fn_80194DA4(void) { /* TODO */ }
+/* decompiled wrk7: functional (TU not byte-measurable) — HSD_CObjSetUpVector,
+   the storage twin of the getter fn_80195590. Sets the camera up-vector / roll
+   from `up` (r4, a 3-float Vec; inferred f32*).
+   - Explicit-up mode (flags & 1 set): guard `up` against the degenerate epsilon
+     lbl_80478AC8; if degenerate, warn (OSReport + __assert); else normalize it and,
+     when it differs from the stored cobj->u.up, mark the matrices dirty
+     (flags |= 0xC0000000) and store it.
+   - Roll mode (flags & 1 clear): rebuild the eye->interest direction and derive a
+     roll angle exactly as fn_80195590 does, then commit it via fn_801947C8.
+   The +/-PI/2 results below are anonymous SDA2 literals reconstructed by value;
+   flagged for orchestrator review. */
+void fn_80194DA4(HSD_CObj* cobj, f32* up)
+{
+    extern f32 lbl_80478AC8;    /* degenerate-vector epsilon */
+    extern f32 lbl_8036C6BC[];  /* look-at reference eye vector (shared with fn_80195590) */
+    extern f32 lbl_8036C6C8[];  /* look-at reference up vector  (shared with fn_80195590) */
+    extern char lbl_8027464C;   /* OSReport fmt: up-vector degenerate warning */
+    extern char lbl_80274654;   /* up-path __assert message (SDA2 r2-23864) — INFERRED name */
+    f32 epsilon = lbl_80478AC8;
+
+    if (cobj == NULL) {
+        return;
+    }
+    if (up == NULL) {
+        return;
+    }
+
+    if (cobj->flags & 1) {
+        /* ---- explicit up-vector path ---- */
+        f32 newup[3];
+        int ok;
+
+        if (up == NULL) {
+            ok = -1;
+        } else if ((up[0] < 0.0f ? -up[0] : up[0]) <= epsilon &&
+                   (up[1] < 0.0f ? -up[1] : up[1]) <= epsilon &&
+                   (up[2] < 0.0f ? -up[2] : up[2]) <= epsilon) {
+            ok = -1; /* degenerate up-vector */
+        } else {
+            ((void (*)(f32*, f32*)) fn_800A3ADC)(up, newup); /* normalize -> newup */
+            ok = 0;
+        }
+        if (ok != 0) {
+            OSReport(&lbl_8027464C);
+            __assert(&lbl_8047D958, 0x3e4, &lbl_80274654);
+        }
+        if (cobj->u.up.x != newup[0] || cobj->u.up.y != newup[1] ||
+            cobj->u.up.z != newup[2]) {
+            cobj->flags |= 0xC0000000;
+            cobj->u.up.x = newup[0];
+            cobj->u.up.y = newup[1];
+            cobj->u.up.z = newup[2];
+        }
+    } else {
+        /* ---- roll path (twin of fn_80195590) ---- */
+        f32 eye[3];
+        f32 interest[3];
+        f32 dir[3];
+        f32 mtx[3][4];
+        f32 out[3];
+        f32 roll;
+        int ok;
+
+        if (cobj == NULL || cobj->eyepos == NULL || cobj->interest == NULL) {
+            ok = 0;
+        } else {
+            if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+            if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+            fn_80191688(cobj->eyepos, eye);
+            if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+            if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+            fn_80191688(cobj->interest, interest);
+            fn_800A3A9C(interest, eye, dir);
+            if ((dir[0] < 0.0f ? -dir[0] : dir[0]) <= epsilon &&
+                (dir[1] < 0.0f ? -dir[1] : dir[1]) <= epsilon &&
+                (dir[2] < 0.0f ? -dir[2] : dir[2]) <= epsilon) {
+                ok = 0; /* direction ~= 0: unusable */
+            } else {
+                ((void (*)(f32*, f32*)) fn_800A3ADC)(dir, dir); /* normalize in place */
+                ok = 1;
+            }
+        }
+        if (!ok) {
+            roll = 0.0f;
+        } else {
+            f32 dot = ((f32 (*)(f32*, f32*)) fn_800A3B7C)(up, dir);
+            f32 absdot = dot < 0.0f ? -dot : dot;
+            if (1.0f - absdot < epsilon) {
+                roll = 0.0f; /* up nearly parallel to dir: unusable */
+            } else {
+                C_MTXLookAt(mtx, lbl_8036C6BC, lbl_8036C6C8, dir);
+                ((void (*)(f32*, f32*, f32*)) fn_800A3820)(&mtx[0][0], up, out);
+                if (out[1] == 0.0f) {
+                    roll = (-out[0] >= 0.0f) ? 1.5707964f : -1.5707964f; /* +/-PI/2 */
+                } else {
+                    roll = ((f32 (*)(f32, f32)) fn_800CE2D8)(-out[0], out[1]);
+                }
+            }
+        }
+        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, roll);
+    }
+}
 #endif
 #pragma pop
 
@@ -1385,8 +1486,8 @@ extern void fn_800A39E0(void);
 extern void fn_800BD2E0(void);
 extern void fn_800BD7A0(void);
 extern void fn_800C46B0(void);
-extern void fn_801960C4(void);
-extern void fn_801963E0(void);
+extern int fn_801960C4();   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
+extern int fn_801963E0();   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
 extern void HSD_Panic(const char*, u32, const char*);
 extern void fn_80197400(void);
 extern void fn_8019C7B0(void);
@@ -1464,12 +1565,118 @@ void fn_80195F0C(HSD_CObj* cobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801960C4(void) {
 #include "src/hsd/hsd_cobj_fn_801960C4.inc"
 }
 #else
-void fn_801960C4(void) { /* TODO */ }
+/* decompiled wrk7: functional (TU not byte-measurable) — near-twin of fn_801963E0
+   that ALSO programs the GX scissor box. Reads the GX render-mode scan height
+   (lbl_80466BC0 + 6, u16) and a guard band `vfilter = height - 8`; returns 0 if the
+   viewport bottom is above the band. Clamps cobj->scissor (u16 left/right/top/
+   bottom at 0x1C..0x22) to the band and commits it via fn_800BD7A0; clamps the
+   viewport, invokes the viewport callback (lbl_80478C58, default fn_80196C54),
+   computes the visible-height ratio, then builds and loads the projection matrix
+   (1 perspective / 2 frustum via fn_800A3874, 3 ortho via fn_800A39E0, then
+   fn_800BD2E0). Returns 1.
+   SDA2 constants resolved by address (see NOTES): lbl_8047D998/lbl_8047D9C8 are
+   doubles (half-fov / deg->rad), lbl_8047D9D4/lbl_8047D9D0 the perspective
+   recenter terms, lbl_8047D978/lbl_8047D9B0 the callback constants. */
+int fn_801960C4(HSD_CObj* cobj)
+{
+    extern u8 lbl_80466BC0[];   /* GX render-mode global; +6 = u16 scan/EFB height */
+    extern u32 lbl_80478C58;    /* viewport/scissor callback (default fn_80196C54) */
+    extern f32 lbl_8047D978;    /* callback const A */
+    extern f32 lbl_8047D9B0;    /* callback const B */
+    extern double lbl_8047D998; /* perspective half-fov scale */
+    extern double lbl_8047D9C8; /* perspective deg->rad scale */
+    extern f32 lbl_8047D9D4;    /* perspective ratio scale (D3) */
+    extern f32 lbl_8047D9D0;    /* perspective recenter base (D0) */
+
+    int vfilter;
+    f32 fvfilter;
+    f32 ratio;
+    f32 mtx[3][4];
+    int ortho_flag;
+
+    vfilter = (int) *(u16*)(lbl_80466BC0 + 6) - 8;
+    fvfilter = (f32)(u32) vfilter;
+    if (cobj->viewport.ymax < fvfilter) {
+        return 0;
+    }
+
+    /* ---- GX scissor box, clamped to the guard band ---- */
+    {
+        f32 sc_left = (f32)(u16) cobj->scissor.left;
+        f32 sc_right = (f32)(u16) cobj->scissor.right;
+        u16 clamped_top = (cobj->scissor.top <= (u16) vfilter)
+                              ? (u16) vfilter : cobj->scissor.top;
+        f32 top_off = (f32)(u32) ((int) clamped_top - vfilter);
+        f32 bottom_off = (f32)(u32) ((int) cobj->scissor.bottom - vfilter);
+        f32 sc_width = sc_right - sc_left;
+        f32 sc_height = bottom_off - top_off;
+        ((void (*)(int, int, int, int)) fn_800BD7A0)(
+            ((int (*)(f32)) fn_800C46B0)(sc_left),
+            ((int (*)(f32)) fn_800C46B0)(top_off),
+            ((int (*)(f32)) fn_800C46B0)(sc_width),
+            ((int (*)(f32)) fn_800C46B0)(sc_height));
+    }
+
+    /* ---- viewport rect + callback + visible-height ratio ---- */
+    {
+        f32 vp_xmin = cobj->viewport.xmin;
+        f32 vp_width = cobj->viewport.xmax - cobj->viewport.xmin;
+        f32 vp_ymax = cobj->viewport.ymax;
+        f32 vp_ymin_clamped =
+            (cobj->viewport.ymin <= fvfilter) ? fvfilter : cobj->viewport.ymin;
+        f32 top_off = vp_ymin_clamped - fvfilter;
+        f32 visible_h = vp_ymax - vp_ymin_clamped;
+        ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
+            0, vp_xmin, top_off, vp_width, visible_h, lbl_8047D978, lbl_8047D9B0);
+        ratio = visible_h / (vp_ymax - cobj->viewport.ymin);
+    }
+
+    /* ---- build & load the projection matrix ---- */
+    ortho_flag = 0;
+    switch (cobj->projection_type) {
+    case PROJ_PERSPECTIVE: {
+        f32 t = (f32) fn_800CE220(
+                    (f32) (lbl_8047D9C8 *
+                           (lbl_8047D998 * cobj->projection_param.perspective.fov)));
+        f32 nt = cobj->near * t;
+        f32 off = lbl_8047D9D4 * ratio + lbl_8047D9D0;
+        f32 aspect = cobj->projection_param.perspective.aspect;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
+            &mtx[0][0], nt * off, -nt, -(nt * aspect), nt * aspect,
+            cobj->near, cobj->far);
+        break;
+    }
+    case PROJ_FRUSTUM: {
+        f32 top = cobj->projection_param.frustum.top;
+        f32 bottom = cobj->projection_param.frustum.bottom;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
+            &mtx[0][0], ratio * (top - bottom) + bottom, bottom,
+            cobj->projection_param.frustum.left,
+            cobj->projection_param.frustum.right, cobj->near, cobj->far);
+        break;
+    }
+    case PROJ_ORTHO: {
+        f32 top = cobj->projection_param.ortho.top;
+        f32 bottom = cobj->projection_param.ortho.bottom;
+        ortho_flag = 1;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A39E0)(
+            &mtx[0][0], ratio * (top - bottom) + bottom, bottom,
+            cobj->projection_param.ortho.left,
+            cobj->projection_param.ortho.right, cobj->near, cobj->far);
+        break;
+    }
+    default:
+        break;
+    }
+
+    ((void (*)(f32*, int)) fn_800BD2E0)(&mtx[0][0], ortho_flag);
+    return 1;
+}
 #endif
 #pragma pop
 
@@ -1477,12 +1684,107 @@ void fn_801960C4(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801963E0(void) {
 #include "src/hsd/hsd_cobj_fn_801963E0.inc"
 }
 #else
-void fn_801963E0(void) { /* TODO */ }
+/* decompiled wrk7: functional (TU not byte-measurable) — programs the camera's
+   GX viewport and projection matrix for the frame (the CObj setup path).
+   Returns 0 if the viewport is clipped past the EFB top (viewport.ymin >= EFB
+   height); otherwise sets the GX viewport (fn_800BD7A0), invokes the viewport
+   callback (lbl_80478C58, default fn_80196C54), builds the projection matrix on
+   the stack per projection_type (1 perspective / 2 frustum via fn_800A3874,
+   3 ortho via fn_800A39E0), loads it with fn_800BD2E0, and returns 1. `ratio`
+   shrinks the frustum vertically to the visible fraction of a partially
+   off-screen viewport. lbl_80466BC0 = active GX render-mode global (+6 = u16 EFB
+   height). SDA2 constants resolved by address (see NOTES). */
+int fn_801963E0(HSD_CObj* cobj)
+{
+    extern u8 lbl_80466BC0[];   /* GX render-mode global; +6 = u16 EFB height */
+    extern u32 lbl_80478C58;    /* viewport/scissor callback (default fn_80196C54) */
+    extern f32 lbl_8047D978;    /* callback const A */
+    extern f32 lbl_8047D9B0;    /* const B (perspective recenter base) */
+    extern double lbl_8047D998; /* perspective half-fov scale */
+    extern double lbl_8047D9C8; /* perspective deg->rad scale */
+    extern f32 lbl_8047D9D4;    /* perspective ratio scale (D3) */
+
+    f32 efb_h;
+    f32 clamped_ymax;
+    f32 vheight;
+    f32 vwidth;
+    f32 ratio;
+    f32 mtx[3][4];
+    int ortho_flag;
+
+    efb_h = (f32)(u16) *(u16*)(lbl_80466BC0 + 6);
+    if (cobj->viewport.ymin >= efb_h) {
+        return 0;
+    }
+
+    /* program the GX viewport box (float coords -> fixed via fn_800C46B0) */
+    efb_h = (f32)(u16) *(u16*)(lbl_80466BC0 + 6);
+    clamped_ymax = (cobj->viewport.ymax < efb_h) ? cobj->viewport.ymax : efb_h;
+    vheight = clamped_ymax - cobj->viewport.ymin;
+    vwidth = cobj->viewport.xmax - cobj->viewport.xmin;
+    ((void (*)(int, int, int, int)) fn_800BD7A0)(
+        ((int (*)(f32)) fn_800C46B0)(cobj->viewport.xmin),
+        ((int (*)(f32)) fn_800C46B0)(cobj->viewport.ymin),
+        ((int (*)(f32)) fn_800C46B0)(vwidth),
+        ((int (*)(f32)) fn_800C46B0)(vheight));
+
+    /* recompute clamp + visible-height ratio for the projection */
+    efb_h = (f32)(u16) *(u16*)(lbl_80466BC0 + 6);
+    clamped_ymax = (cobj->viewport.ymax < efb_h) ? cobj->viewport.ymax : efb_h;
+    vheight = clamped_ymax - cobj->viewport.ymin;
+    vwidth = cobj->viewport.xmax - cobj->viewport.xmin;
+    ratio = vheight / (cobj->viewport.ymax - cobj->viewport.ymin);
+
+    /* viewport/scissor offset callback */
+    ((void (*)(int, f32, f32, f32, f32, f32, f32)) lbl_80478C58)(
+        0, cobj->viewport.xmin, cobj->viewport.ymin, vwidth, vheight,
+        lbl_8047D978, lbl_8047D9B0);
+
+    ortho_flag = 0;
+    switch (cobj->projection_type) {
+    case PROJ_PERSPECTIVE: {
+        f32 t = (f32) fn_800CE220(
+                    (f32) (lbl_8047D9C8 *
+                           (lbl_8047D998 * cobj->projection_param.perspective.fov)));
+        f32 nt = cobj->near * t;
+        f32 off = lbl_8047D9B0 - lbl_8047D9D4 * ratio;
+        f32 aspect = cobj->projection_param.perspective.aspect;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
+            &mtx[0][0], nt, nt * off, -(nt * aspect), nt * aspect,
+            cobj->near, cobj->far);
+        break;
+    }
+    case PROJ_FRUSTUM: {
+        f32 top = cobj->projection_param.frustum.top;
+        f32 bottom = cobj->projection_param.frustum.bottom;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A3874)(
+            &mtx[0][0], top, top - ratio * (top - bottom),
+            cobj->projection_param.frustum.left,
+            cobj->projection_param.frustum.right, cobj->near, cobj->far);
+        break;
+    }
+    case PROJ_ORTHO: {
+        f32 top = cobj->projection_param.ortho.top;
+        f32 bottom = cobj->projection_param.ortho.bottom;
+        ortho_flag = 1;
+        ((void (*)(f32*, f32, f32, f32, f32, f32, f32)) fn_800A39E0)(
+            &mtx[0][0], top, top - ratio * (top - bottom),
+            cobj->projection_param.ortho.left,
+            cobj->projection_param.ortho.right, cobj->near, cobj->far);
+        break;
+    }
+    default:
+        break;
+    }
+
+    ((void (*)(f32*, int)) fn_800BD2E0)(&mtx[0][0], ortho_flag);
+    return 1;
+}
 #endif
 #pragma pop
 
@@ -1527,12 +1829,102 @@ void HSD_CObjAnim(HSD_CObj* cobj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8019674C(void) {
 #include "src/hsd/hsd_cobj_fn_8019674C.inc"
 }
 #else
-void fn_8019674C(void) { /* TODO */ }
+/* decompiled wrk7: functional (TU not byte-measurable) — the CObj `update` method
+   installed by CObjInfoInit. Dispatches on an animation channel `type` (jumptable
+   jumptable_8036C6E0, valid 0..0xC) and applies *(f32*)value to the matching
+   camera property. Index->case mapping taken from the jumptable .data dump; bodies
+   match the .inc faithfully. NOTE: interest channels 5/6/7 all overwrite component
+   0 in the original asm (eye channels 1/2/3 write X/Y/Z) — reproduced verbatim,
+   FLAGGED for review (likely an original-game copy/paste artefact). */
+void fn_8019674C(HSD_CObj* cobj, u32 type, void* value)
+{
+    f32 v[3];
+
+    if (cobj == NULL || type > 0xC) {
+        return;
+    }
+    switch (type) {
+    case 1: /* eye position, component X */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        fn_80191688(cobj->eyepos, v);
+        v[0] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->eyepos, v);
+        break;
+    case 2: /* eye position, component Y */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        fn_80191688(cobj->eyepos, v);
+        v[1] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->eyepos, v);
+        break;
+    case 3: /* eye position, component Z */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x318, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        fn_80191688(cobj->eyepos, v);
+        v[2] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x324, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2e8, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->eyepos, v);
+        break;
+    case 5: /* interest position (asm writes component 0) */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        fn_80191688(cobj->interest, v);
+        v[0] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->interest, v);
+        break;
+    case 6: /* interest position (asm writes component 0) */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        fn_80191688(cobj->interest, v);
+        v[0] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->interest, v);
+        break;
+    case 7: /* interest position (asm writes component 0) */
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x300, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        fn_80191688(cobj->interest, v);
+        v[0] = *(f32*)value;
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x30c, &lbl_8047D960);
+        if (cobj == NULL) __assert(&lbl_8047D958, 0x2d0, &lbl_8047D960);
+        HSD_WObjSetPosition(cobj->interest, v);
+        break;
+    case 9: /* roll */
+        ((void (*)(HSD_CObj*, f32)) fn_801947C8)(cobj, *(f32*)value);
+        break;
+    case 10: /* field of view (perspective only) */
+        if (cobj != NULL && cobj->projection_type == PROJ_PERSPECTIVE) {
+            cobj->projection_param.perspective.fov = *(f32*)value;
+        }
+        break;
+    case 11: /* near clip plane */
+        if (cobj != NULL) {
+            cobj->near = *(f32*)value;
+        }
+        break;
+    case 12: /* far clip plane */
+        if (cobj != NULL) {
+            cobj->far = *(f32*)value;
+        }
+        break;
+    default: /* 0, 4, 8: no-op */
+        break;
+    }
+}
 #endif
 #pragma pop
 
