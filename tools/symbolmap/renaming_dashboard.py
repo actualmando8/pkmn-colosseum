@@ -32,6 +32,7 @@ DECOMP_STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md
 DECOMP_WORK = ROOT / "tools" / "decomp_work"
 COORD_DIR = DECOMP_WORK / "coordination"
 PROGRESS2 = DECOMP_WORK / "progress2.py"
+SCRATCH_DIR = DECOMP_WORK / "scratch"  # band_<tag>.c / .src live here (#5 lease fn derivation)
 WALLS_MD = ROOT / "WALLS.md"
 EQUIVALENT_TXT = DECOMP_WORK / "equivalent.txt"
 CS_WALLS_JSON = ROOT / "build" / "cs_walls.json"
@@ -817,6 +818,65 @@ def load_history() -> list[dict[str, object]]:
     if not isinstance(data, list):
         return []
     return [row for row in data if isinstance(row, dict)]
+
+
+# The %-keys the commit-history view tracks. A commit is plotted only when one of
+# these actually moves, so the line steps at real milestones, not every minute.
+_HISTORY_PCT_KEYS = (
+    "decomp_code_pct",
+    "decomp_fuzzy_pct",
+    "decomp_functions_pct",
+    "c_converted_pct",
+)
+
+
+def collapse_history_to_commits(
+    history: list[dict[str, object]] | None = None,
+) -> list[dict[str, object]]:
+    """Collapse the per-minute history ring into one point per COMMIT.
+
+    The raw history (`load_history`) is time-sampled roughly every minute, so the
+    "match progress over time" line is noisy and the x-axis isn't tied to real
+    checkpoints. Each history row already carries the `head` (commit) it was taken
+    at, so we:
+
+      1. keep, for each consecutive run of the same `head`, the LAST sample — that
+         row holds the final measures recorded for that commit (the within-commit
+         minute-samples collapse to a single milestone point);
+      2. drop any commit whose tracked %-values are identical to the previously
+         kept commit, so a no-op commit (or a re-measure that didn't move the
+         numbers) doesn't add a flat step.
+
+    The returned rows keep their real `unix`/`timestamp`, so the chart still plots
+    against wall-clock time — it just steps at commits instead of at minutes.
+    """
+    rows = history if history is not None else load_history()
+    rows = [r for r in rows if isinstance(r, dict)]
+    if not rows:
+        return []
+
+    # 1) collapse consecutive same-head runs to that run's last (newest) sample.
+    per_commit: list[dict[str, object]] = []
+    for row in rows:
+        head = str(row.get("head") or "")
+        if per_commit and str(per_commit[-1].get("head") or "") == head and head:
+            per_commit[-1] = row  # newer sample of the same commit wins
+        else:
+            per_commit.append(row)
+
+    # 2) drop commits whose tracked %s match the previously kept one.
+    def pct_sig(row: dict[str, object]) -> tuple:
+        return tuple(round(float_pct(row.get(k, 0)), 4) for k in _HISTORY_PCT_KEYS)
+
+    collapsed: list[dict[str, object]] = []
+    last_sig: tuple | None = None
+    for row in per_commit:
+        sig = pct_sig(row)
+        if last_sig is not None and sig == last_sig:
+            continue
+        collapsed.append(row)
+        last_sig = sig
+    return collapsed
 
 
 def write_history(history: list[dict[str, object]]) -> None:
@@ -2303,15 +2363,91 @@ def load_ship() -> dict:
     return _cached("ship", 25, producer)
 
 
+_BAND_TAG_RE = re.compile(r"band\s+([A-Za-z0-9_]+)")
+
+
+def _band_tag_for(owner: str, note: str) -> str:
+    """The band scratch tag for a lock. The note (e.g. "band cdx3") names it
+    explicitly; otherwise the owner IS the tag (the band harness sets owner=tag)."""
+    m = _BAND_TAG_RE.search(str(note or ""))
+    if m:
+        return m.group(1)
+    return str(owner or "").strip()
+
+
+def _attempt_log_cache() -> list[dict[str, object]]:
+    """Cached newest-first attempt-log rows for cheap per-lease fn lookups (#5).
+    25s TTL mirrors the other lease-adjacent caches so a refresh doesn't reparse
+    status.md once per lock row."""
+    def producer():
+        return load_attempt_log(DECOMP_STATUS_LOG, limit=4000)
+    return _cached("attempt_log_for_leases", 25, producer)
+
+
+def derive_active_work(owner: str, note: str, file: str) -> dict[str, object]:
+    """Best-effort, READ-ONLY derivation of WHICH function/file a lease is working.
+
+    The lock row only carries owner + file + note ("band <tag>") — the active fn
+    isn't recorded there. We derive it without touching band.py:
+
+      * src_file  — from the band scratch sidecar tools/decomp_work/scratch/
+                    band_<tag>.src (its "src" key, the TU the harness is banding).
+                    Falls back to the lock's own `file`.
+      * fn        — the most recent attempt-log line by this owner/tag that names
+                    an fn_XXXXXXXX. status.md is the only place the live fn surfaces;
+                    if the owner hasn't logged an fn yet this stays "" (and the
+                    caller shows file+tag+age with a note instead).
+      * fresh     — mtime of band_<tag>.c, so the UI can show how fresh the scratch
+                    is even when no fn was logged.
+    """
+    tag = _band_tag_for(owner, note)
+    out: dict[str, object] = {"tag": tag, "src_file": "", "fn": "", "fresh": None}
+    if not tag:
+        out["src_file"] = file or ""
+        return out
+    # source file + scratch freshness from the sidecar / scratch copy
+    src_path = SCRATCH_DIR / f"band_{tag}.src"
+    if src_path.exists():
+        try:
+            meta = json.loads(src_path.read_text(encoding="utf-8", errors="replace"))
+            if isinstance(meta, dict) and meta.get("src"):
+                out["src_file"] = str(meta.get("src"))
+        except (OSError, json.JSONDecodeError):
+            pass
+    scratch_c = SCRATCH_DIR / f"band_{tag}.c"
+    if scratch_c.exists():
+        try:
+            out["fresh"] = round(scratch_c.stat().st_mtime)
+        except OSError:
+            pass
+    if not out["src_file"]:
+        out["src_file"] = file or ""
+    # active fn: newest attempt-log line for this owner/tag that names an fn_.
+    log = _attempt_log_cache()
+    for row in reversed(log):
+        if str(row.get("agent") or "") != tag:
+            continue
+        fn = str(row.get("function") or "")
+        if fn:
+            out["fn"] = fn
+            break
+    return out
+
+
 def load_leases() -> dict:
     """Active leases (live locks) + queued work (coordination tasks.json)."""
     locks = load_locks()
     active = []
     for lk in locks.get("locks", []):
+        # #5: surface WHICH function/file the lease is working, derived read-only
+        # from the band scratch sidecar + attempt log (the lock row lacks the fn).
+        work = derive_active_work(lk.get("owner") or "", lk.get("note") or "", lk.get("file") or "")
         active.append({
             "scope": lk.get("scope"), "key": lk.get("key"), "owner": lk.get("owner"),
             "file": lk.get("file"), "elapsed": lk.get("age"),
             "ttl_remaining": lk.get("ttl_remaining"), "note": lk.get("note"),
+            "tag": work.get("tag"), "active_src": work.get("src_file"),
+            "active_fn": work.get("fn"), "scratch_mtime": work.get("fresh"),
         })
     queued = []
     try:
@@ -3464,6 +3600,8 @@ HTML = r"""<!doctype html>
     }
     .lock-scope.file { color: #cfe0ff; background: rgba(92, 145, 223, .16); border-color: #3a567f; }
     .lock-scope.fn { color: #cdebde; background: rgba(56, 185, 149, .15); border-color: #2f6e5a; }
+    /* #5: subtle "fn pending in log" annotation in the lease key cell */
+    .lease-hint { color: var(--quiet); font-size: 10px; font-style: italic; }
     .lock-actions { white-space: nowrap; text-align: right; }
     .lock-actions .btn + .btn { margin-left: 5px; }
     .lock-table td { vertical-align: middle; }
@@ -4796,6 +4934,17 @@ HTML = r"""<!doctype html>
     .report-card.s-exact { border-left-color: var(--accent); }
     .report-meta { font-size: 10.5px; color: var(--quiet); margin-top: 3px; font-family: "Cascadia Mono", Consolas, monospace; }
     .report-msg { font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* #4: inline report timestamp + click-to-expand detail panel */
+    .report-ts { font: 600 10px "Cascadia Mono", monospace; color: var(--quiet); white-space: nowrap; margin-left: auto; }
+    .report-clickable { cursor: pointer; }
+    .report-clickable:hover { border-left-color: var(--accent-dim); background: var(--panel); }
+    .report-detail { display: none; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); }
+    .report-card.expanded .report-detail { display: block; }
+    .report-card.expanded .report-msg { white-space: normal; }
+    .report-dl { display: flex; gap: 8px; font-size: 10.5px; line-height: 1.5; }
+    .report-dk { color: var(--quiet); min-width: 64px; text-transform: uppercase; letter-spacing: .03em; font-size: 9.5px; padding-top: 1px; }
+    .report-dv { color: var(--muted); font-family: "Cascadia Mono", Consolas, monospace; word-break: break-word; }
+    .report-full { white-space: pre-wrap; }
 
     /* ---- comprehensive log ---- */
     .log-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 9px; }
@@ -4867,6 +5016,10 @@ HTML = r"""<!doctype html>
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    /* #1: clickable Attack Matrix cells drill into the unit close-out detail */
+    .attack-target-click { cursor: pointer; border-radius: 3px; transition: background .12s ease, color .12s ease; }
+    .attack-target-click:hover { background: rgba(92, 145, 223, .14); color: #eaf2ff; }
+    .attack-target-click:hover .mono { color: #bcd6ff; }
     .attack-command {
       margin-top: 9px;
       color: #8da0b8;
@@ -5976,6 +6129,17 @@ HTML = r"""<!doctype html>
       setText($("hud-openfns"), openFns.toLocaleString());
       setText($("hud-units"), `${decomp.complete_units || 0}/${decomp.total_units || 0}`);
     }
+    // #1/#2: shared drill-in used by the Attack Matrix cards. Mirrors the units
+    // table click (switchView -> gotoFiles -> enterUnit -> scroll) so a matrix
+    // cell lands in the exact same unit close-out detail the treemap drill uses.
+    function drillIntoUnit(unitRef) {
+      if (!unitRef || (!unitRef.source && !unitRef.name)) return;
+      try { switchView("decomp"); } catch (e) {}
+      try { gotoFiles(); } catch (e) {}
+      enterUnit(unitRef);
+      const ws = document.querySelector(".decomp-workspace");
+      if (ws) ws.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
     function renderAttackMatrix(data) {
       const matrix = (data && data.attack_matrix) || {};
       const lanes = matrix.lanes || [];
@@ -6010,7 +6174,7 @@ HTML = r"""<!doctype html>
           row.className = "attack-target";
           const name = document.createElement("span");
           name.className = "mono";
-          setText(name, t.source || t.name || "");
+          setText(name, t.label || t.source || t.name || "");
           const val = document.createElement("span");
           const bits = lane.id === "near"
             ? `${t.near || 0} near`
@@ -6019,6 +6183,13 @@ HTML = r"""<!doctype html>
               : `${Number(t.open_code || 0).toLocaleString()}b`;
           setText(val, bits);
           row.append(name, val);
+          // #1/#2: drill into this unit's close-out detail on click, reusing the
+          // SAME path the treemap/units-table use (switchView+gotoFiles+enterUnit).
+          if (t.source || t.name) {
+            row.classList.add("attack-target-click");
+            row.title = "Open " + (t.source || t.name) + " close-out detail";
+            row.addEventListener("click", () => drillIntoUnit({ source: t.source || "", name: t.name || "" }));
+          }
           targets.append(row);
         }
         const cmd = document.createElement("div");
@@ -6074,7 +6245,9 @@ HTML = r"""<!doctype html>
         legend.append(entry);
       }
       setText($("status-total"), `${data.counts.targets} tracked rows`);
-      setText($("history-points"), `${(data.history || []).length} snapshots`);
+      // #3: report commit-milestone count (what the chart plots), not raw samples.
+      const commitPts = collapseHistoryToCommits(data.history || []).length;
+      setText($("history-points"), `${commitPts} commit milestones`);
       const history = data.history || [];
       const range = history.length ? `${history[0].timestamp} to ${history[history.length - 1].timestamp}` : "no snapshots yet";
       setText($("timeline-range"), range);
@@ -7309,9 +7482,37 @@ HTML = r"""<!doctype html>
       drawHistoryRanged();
       renderSourceBars(data);
     }
+    // #3: collapse the per-minute history ring into one point per COMMIT so the
+    // "match progress over time" line steps at real milestones, not every minute.
+    // Mirrors the server-side collapse_history_to_commits(): keep each commit's
+    // last (newest) sample, then drop commits whose tracked %s didn't change.
+    const HISTORY_PCT_KEYS = ["decomp_code_pct", "decomp_fuzzy_pct", "decomp_functions_pct", "c_converted_pct"];
+    function collapseHistoryToCommits(rows) {
+      rows = (rows || []).filter(r => r && typeof r === "object");
+      if (!rows.length) return [];
+      // 1) consecutive same-head runs collapse to the run's last sample.
+      const perCommit = [];
+      for (const r of rows) {
+        const head = String(r.head || "");
+        const prev = perCommit[perCommit.length - 1];
+        if (prev && head && String(prev.head || "") === head) perCommit[perCommit.length - 1] = r;
+        else perCommit.push(r);
+      }
+      // 2) drop commits whose tracked %s match the previously kept one.
+      const sig = r => HISTORY_PCT_KEYS.map(k => Number(r[k] || 0).toFixed(4)).join("|");
+      const out = [];
+      let last = null;
+      for (const r of perCommit) {
+        const s = sig(r);
+        if (last !== null && s === last) continue;
+        out.push(r); last = s;
+      }
+      return out;
+    }
     // history time-range filter (24h / 3d / 7d / 14d / all)
     function drawHistoryRanged() {
-      const all = store._history || [];
+      // Step the line at commits/milestones (#3) instead of every minute-sample.
+      const all = collapseHistoryToCommits(store._history || []);
       const days = store.historyDays == null ? 14 : store.historyDays;
       let rows = all;
       if (days > 0 && all.length) {
@@ -7536,7 +7737,23 @@ HTML = r"""<!doctype html>
         for (const l of (d.active || [])) {
           const tr = document.createElement("tr");
           const scope = document.createElement("td"); const tag = document.createElement("span"); tag.className = `lock-scope ${l.scope}`; setText(tag, l.scope); scope.append(tag);
-          const key = document.createElement("td"); key.className = "mono"; setText(key, l.scope === "file" ? fileName(l.key) : l.key); key.title = l.key;
+          // #5: the lock only names a file; show the active WORK ("tag → file.c → fn_…")
+          // derived read-only from the band scratch sidecar + attempt log when we
+          // have it, else fall back to the plain lock key. Title carries the full path.
+          const key = document.createElement("td"); key.className = "mono";
+          const srcFile = l.active_src ? fileName(l.active_src) : (l.scope === "file" ? fileName(l.key) : l.key);
+          const parts = [];
+          if (l.tag) parts.push(l.tag);
+          if (srcFile) parts.push(srcFile);
+          if (l.active_fn) parts.push(l.active_fn);
+          const lead = parts.length ? parts.join(" → ") : (l.scope === "file" ? fileName(l.key) : l.key);
+          const leadSpan = document.createElement("span"); setText(leadSpan, lead); key.append(leadSpan);
+          if (!l.active_fn && (l.tag || srcFile)) {
+            // No fn surfaced in status.md yet for this owner — say where it'd come from.
+            const hint = document.createElement("span"); hint.className = "lease-hint";
+            setText(hint, " (fn pending in log)"); key.append(hint);
+          }
+          key.title = [l.active_src || l.key, l.active_fn || "", l.note || ""].filter(Boolean).join("  ·  ");
           const owner = document.createElement("td"); owner.className = "mono"; setText(owner, l.owner || "-");
           const el = document.createElement("td"); el.className = "mono"; setText(el, l.elapsed == null ? "-" : fmtCountdown(l.elapsed));
           const ttl = document.createElement("td"); ttl.className = "mono"; setText(ttl, l.ttl_remaining == null ? "∞" : fmtCountdown(l.ttl_remaining));
@@ -7588,17 +7805,43 @@ HTML = r"""<!doctype html>
       if (want !== "all") reps = reps.filter(r => r.status === want);
       if (!reps.length) { const e = document.createElement("div"); e.className = "empty-state"; setText(e, "No worker reports"); body.append(e); return; }
       for (const r of reps.slice(0, 40)) {
-        const card = document.createElement("div"); card.className = "report-card";
+        const card = document.createElement("div"); card.className = "report-card report-clickable";
         const top = document.createElement("div"); top.className = "report-top";
         const fn = document.createElement("span"); fn.className = "report-fn mono"; setText(fn, r.function || r.file || "—");
+        // #4: show the report's timestamp inline (HST), right-aligned in the header.
+        const ts = document.createElement("span"); ts.className = "report-ts";
+        setText(ts, r.timestamp ? hstTime(r.timestamp) : "");
         const chip = document.createElement("span"); chip.className = "report-chip s-" + r.status.replace(/\s+/g, "-"); setText(chip, r.status);
-        top.append(fn, chip);
+        top.append(fn, ts, chip);
         const meta = document.createElement("div"); meta.className = "report-meta";
         const who = r.agent || "?"; const where = r.file ? ` · ${fileName(r.file)}` : "";
         const pct = (r.percent != null) ? ` · ${Number(r.percent).toFixed(2)}%` : "";
         setText(meta, `${who}${where}${pct}`);
         const msg = document.createElement("div"); msg.className = "report-msg"; setText(msg, r.message || "");
-        card.append(top, meta, msg); body.append(card);
+        card.append(top, meta, msg);
+        // #4: click-to-summarize — expand a detail panel with the full message,
+        // exact timestamp, agent, status and percent in place. Toggles per-card.
+        const detail = document.createElement("div"); detail.className = "report-detail";
+        const dl = (k, v) => {
+          if (v == null || v === "") return;
+          const row = document.createElement("div"); row.className = "report-dl";
+          const kk = document.createElement("span"); kk.className = "report-dk"; setText(kk, k);
+          const vv = document.createElement("span"); vv.className = "report-dv"; setText(vv, String(v));
+          row.append(kk, vv); detail.append(row);
+        };
+        dl("when", r.timestamp ? `${hstTime(r.timestamp)}  (${r.timestamp})` : "");
+        dl("agent", r.agent || "");
+        dl("status", r.status || "");
+        dl("function", r.function || "");
+        dl("file", r.file ? fileName(r.file) : "");
+        dl("percent", r.percent != null ? `${Number(r.percent).toFixed(2)}%` : "");
+        const full = document.createElement("div"); full.className = "report-dl";
+        const fk = document.createElement("span"); fk.className = "report-dk"; setText(fk, "message");
+        const fv = document.createElement("span"); fv.className = "report-dv report-full"; setText(fv, r.message || "");
+        full.append(fk, fv); detail.append(full);
+        card.append(detail);
+        card.addEventListener("click", () => card.classList.toggle("expanded"));
+        body.append(card);
       }
     }
     function pollReports() { fetch("/api/reports", { cache: "no-store" }).then(r => r.json()).then(renderReports).catch(() => {}); }
@@ -8673,6 +8916,11 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
             return
         if path == "/api/history":
             self.send_json(load_history())
+            return
+        if path == "/api/history/commits":
+            # Milestone-spaced view: one point per commit that moved a %, not the
+            # per-minute ring. Backs the "match progress over time" chart (#3).
+            self.send_json(collapse_history_to_commits())
             return
         if path == "/api/history/unit":
             source = (query.get("source") or query.get("name") or [""])[0]
