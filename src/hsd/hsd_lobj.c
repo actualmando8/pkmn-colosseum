@@ -245,8 +245,8 @@ void fn_801A4098(void* param) {
     {
         void* ptr = (void*)lbl_8036CA20;
         void* vtable = *(void**)((u8*)ptr + 0x14);
-        void (*func)(void) = *(void(**)(void))((u8*)vtable + 0x38);
-        func();
+        void (*func)(void*) = *(void(**)(void*))((u8*)vtable + 0x38);
+        func(param);
     }
 }
 #pragma pop
