@@ -378,8 +378,14 @@ void fn_801019F8(void) {
 
 /* 0x80101A70 | 0x2C */
 void* fn_80101A70(u32 index) {
+    struct Entry {
+        void* start;
+        void* end;
+    };
+    struct Entry* table;
     if (index >= lbl_80478B20) { return (void*)0; }
-    return *(void**)(lbl_80315690 + index * 8 + 4);
+    table = (struct Entry*)lbl_80315690;
+    return table[index].end;
 }
 
 /* 0x80101A9C | 0x28 */
