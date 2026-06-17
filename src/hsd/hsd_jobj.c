@@ -847,13 +847,79 @@ void fn_801A015C(HSD_JObj* jobj, HSD_JObj* child) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801A02B0(void) {
 #include "src/hsd/hsd_jobj_fn_801A02B0.inc"
 }
 #else
-void fn_801A02B0(void) {
-    /* TODO: match -- 652 bytes at 0x801A02B0 */
+#pragma optimization_level 4
+HSD_JObj* fn_801A02B0(HSD_JObj* jobj)
+{
+    /* decompiled cdx6: functional */
+    HSD_JObj* child;
+    HSD_JObj* replacement;
+    HSD_JObj* prev;
+    u8* base;
+
+    base = lbl_80274AA0;
+    if (jobj == NULL) {
+        return NULL;
+    }
+
+    child = jobj->child;
+    if (child != NULL && child->next != NULL) {
+        __assert(&lbl_8047DB20, 0x4CB, base + 0x1CC);
+    }
+
+    replacement = child != NULL ? child : jobj->next;
+
+    if (jobj == NULL || jobj->parent == NULL) {
+        prev = NULL;
+    } else if (jobj->parent->child == jobj) {
+        prev = NULL;
+    } else {
+        prev = jobj->parent->child;
+        while (prev != NULL) {
+            if (prev->next == jobj) {
+                break;
+            }
+            prev = prev->next;
+        }
+        if (prev == NULL) {
+            HSD_Panic(&lbl_8047DB20, 0x5F8, base + 0x88);
+        }
+    }
+
+    if (prev != NULL) {
+        prev->next = replacement;
+    } else if (jobj->parent != NULL) {
+        jobj->parent->child = replacement;
+    }
+
+    if (replacement != NULL && replacement == child) {
+        replacement->next = jobj->next;
+        replacement->parent = jobj->parent;
+    }
+
+    jobj->parent = NULL;
+    jobj->child = NULL;
+    jobj->next = NULL;
+
+    if (ref_DEC(jobj) != 0) {
+        if (jobj->object.ref_count_individual < 1) {
+            HSD_CLASS_METHOD(jobj)->release((HSD_Class*) jobj);
+            HSD_CLASS_METHOD(jobj)->destroy((HSD_Class*) jobj);
+        } else {
+            iref_INC(jobj);
+            HSD_JOBJ_METHOD(jobj)->release_child(jobj);
+            if (iref_DEC(jobj) != 0) {
+                HSD_CLASS_METHOD(jobj)->release((HSD_Class*) jobj);
+                HSD_CLASS_METHOD(jobj)->destroy((HSD_Class*) jobj);
+            }
+        }
+    }
+
+    return child;
 }
 #endif
 #pragma pop
@@ -926,15 +992,23 @@ extern BOOL fn_801A0D48(void*);
 extern void fn_801A0744(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801A0D94(HSD_JObj* jobj, HSD_Joint* joint);
 extern void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc);
-#if 1
+#if 0
 asm void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
 #include "src/hsd/hsd_jobj_fn_801A0744.inc"
 }
 #else
-void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint) {
-    (void)jobj;
-    (void)joint;
-    /* TODO: match -- 1112 bytes at 0x801A0744 */
+#pragma optimization_level 4
+void HSD_JObjResolveRefsAll(HSD_JObj* jobj, HSD_Joint* joint)
+{
+    /* decompiled cdx6: functional */
+    while (jobj != NULL && joint != NULL) {
+        fn_801A0D94(jobj, joint);
+        if (!(jobj->flags & JOBJ_INSTANCE)) {
+            HSD_JObjResolveRefsAll(jobj->child, joint->child);
+        }
+        jobj = jobj->next;
+        joint = joint->next;
+    }
 }
 #endif
 #pragma pop
@@ -1225,20 +1299,146 @@ done:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801992D8(void);
-extern void fn_801AE5E8(void);
-extern void fn_800A2D38(void);
-extern void HSD_MtxAlloc(void);
-extern void HSD_IDInsertToTable(void);
+extern HSD_DObj* fn_801992D8(HSD_DObjDesc* desc);
+extern HSD_RObj* fn_801AE5E8(HSD_RObjDesc* desc);
+extern void fn_800A2D38(f32 mtx[3][4]);
+extern f32* HSD_MtxAlloc(void);
+extern void HSD_IDInsertToTable(void* table, u32 key, u32 value);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern u32 lbl_8047B298;
-#if 1
+#if 0
 asm void fn_801A1098(void) {
 #include "src/hsd/hsd_jobj_fn_801A1098.inc"
 }
 #else
-void fn_801A1098(void) {
-    /* TODO: match -- 820 bytes at 0x801A1098 */
+#pragma optimization_level 4
+s32 fn_801A1098(HSD_JObj* jobj, HSD_Joint* joint, HSD_JObj* parent)
+{
+    /* decompiled cdx6: functional */
+    HSD_JObj* child;
+    HSD_Joint* child_joint;
+    HSD_ClassInfo* info;
+    HSD_SList* ptcl;
+    HSD_JObj* tail;
+    HSD_JObj* ancestor;
+    u32 root_flags;
+    u8* base;
+
+    (void) parent;
+    base = lbl_80274AA0;
+
+    jobj->child = NULL;
+    jobj->next = NULL;
+    jobj->parent = NULL;
+    jobj->flags |= joint->flags;
+
+    if (jobj->flags & JOBJ_SPLINE) {
+        jobj->u.spline = joint->u.spline;
+    } else if (jobj->flags & JOBJ_PTCL) {
+        jobj->u.ptcl = joint->u.ptcl;
+        ptcl = jobj->u.ptcl;
+        while (ptcl != NULL) {
+            *(u32*) &ptcl->data |= 0x80000000u;
+            ptcl = ptcl->next;
+        }
+    } else {
+        jobj->u.dobj = (HSD_DObj*) fn_801992D8(joint->u.dobjdesc);
+    }
+
+    jobj->robj = (HSD_RObj*) fn_801AE5E8(joint->robjdesc);
+    jobj->rotate_x = joint->rotation_x;
+    jobj->rotate_y = joint->rotation_y;
+    jobj->rotate_z = joint->rotation_z;
+    jobj->scale_x = joint->scale_x;
+    jobj->scale_y = joint->scale_y;
+    jobj->scale_z = joint->scale_z;
+    jobj->translate_x = joint->position_x;
+    jobj->translate_y = joint->position_y;
+    jobj->translate_z = joint->position_z;
+    fn_800A2D38(jobj->mtx);
+    jobj->scl = NULL;
+
+    if (joint->mtx != NULL) {
+        jobj->envelopemtx = HSD_MtxAlloc();
+        memcpy(jobj->envelopemtx, joint->mtx, 0x30);
+    }
+
+    HSD_IDInsertToTable(NULL, (u32) joint, (u32) jobj);
+    jobj->id = (u32) joint;
+
+    if (joint->flags & JOBJ_INSTANCE) {
+        return 0;
+    }
+
+    child_joint = joint->child;
+    while (child_joint != NULL) {
+        if (child_joint->class_name != NULL) {
+            info = fn_80193748(child_joint->class_name);
+            if (info != NULL) {
+                child = fn_80193828(info);
+                if (child == NULL) {
+                    __assert(&lbl_8047DB20, 0x3D5, &lbl_8047DB3C);
+                }
+                goto load_child;
+            }
+        }
+
+        if (lbl_8047B298 != 0) {
+            info = (HSD_ClassInfo*) lbl_8047B298;
+        } else {
+            info = (HSD_ClassInfo*) lbl_8036C8E0;
+        }
+        child = fn_80193828(info);
+        if (child == NULL) {
+            __assert(&lbl_8047DB20, 0x7DF, &lbl_8047DB3C);
+        }
+
+load_child:
+        HSD_JOBJ_METHOD(child)->load(child, child_joint, jobj);
+        if (child == NULL) {
+            return -1;
+        }
+
+        if (child->parent != NULL) {
+            OSReport(base + 0x178);
+            __assert(&lbl_8047DB20, 0x552, base + 0x194);
+        }
+        if (child->next != NULL) {
+            OSReport(base + 0x1AC);
+            __assert(&lbl_8047DB20, 0x553, base + 0x1CC);
+        }
+
+        if (jobj->child == NULL) {
+            jobj->child = child;
+        } else {
+            if (jobj->flags & JOBJ_INSTANCE) {
+                __assert(&lbl_8047DB20, 0x559, base + 0x1E0);
+            }
+            tail = jobj->child;
+            while (tail->next != NULL) {
+                if (tail == child) {
+                    __assert(&lbl_8047DB20, 0x55C, base + 0x200);
+                }
+                tail = tail->next;
+            }
+            tail->next = child;
+        }
+
+        child->parent = jobj;
+        root_flags = ((child->flags << 10) | child->flags) & JOBJ_ROOT_MASK;
+        ancestor = jobj;
+        while (ancestor != NULL) {
+            if ((root_flags & ~ancestor->flags) == 0) {
+                break;
+            }
+            ancestor->flags |= root_flags;
+            ancestor = ancestor->parent;
+        }
+
+        child_joint = child_joint->next;
+    }
+
+    return 0;
 }
 #endif
 #pragma pop
