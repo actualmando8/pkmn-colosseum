@@ -555,7 +555,7 @@ extern void  fn_800E019C(void* model, void* param);
 extern void  fn_800E0BA0(void* param);
 extern void  fn_800E0BE4(void* param);
 extern void  fn_800E013C(void* param);
-extern void  fn_800C46B0(void* param1, void* param2);
+extern u32   fn_800C46B0(f64 val);
 
 /* Floor/field system */
 extern void* fn_800F9318(u16 group, u16 model, u16 param);
@@ -587,6 +587,8 @@ extern u8 lbl_8047AF90[];
 extern u8 lbl_8043DEF8[];
 extern u32 lbl_8047AF9C;
 extern u32 lbl_8047AF8C;
+/* Early asm includes predate the symbol-map rename at 0x80162118. */
+#define fn_80162118 sndBSearch
 #if 1
 asm void fn_8015211C(void) {
 #include "src/game/people/people_field_fn_8015211C.inc"
@@ -704,6 +706,7 @@ u32 fn_801523B8(u16 arg, u16* out) {
 }
 #endif
 
+#undef fn_80162118
 extern void fn_80160F10(void);
 #if 1
 asm void fn_80153FEC(void) {
@@ -1142,7 +1145,7 @@ extern void fn_8015B250(u32, u32);
 extern void ReverbHICreate(void);
 extern void ReverbHIModify(void);
 extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
-extern void fn_8009B300(void);
+extern void fn_8009B300(void* addr, u32 nBytes);
 extern void fn_800AC02C(u32 a);
 extern void fn_800AC070(u8* ptr, u32 size);
 extern void fn_800ACB44(void);
@@ -1259,6 +1262,35 @@ void hwExit(void) {
 extern u8  lbl_8047B050;
 extern u32 lbl_8047B028;
 extern u32 lbl_8047B024;
+typedef struct PeopleFieldMoveSlot {
+    u8 pad_00[0x1C];       /* 0x00 */
+    u32 field_1C;          /* 0x1C */
+    u8 pad_20[0x4];        /* 0x20 */
+    u32 flags_24[0x13];    /* 0x24 */
+    u16 field_70;          /* 0x70 */
+    u8 pad_72[0x1E];       /* 0x72 */
+    u8 field_90;           /* 0x90 */
+    u8 pad_91[0x3];        /* 0x91 */
+    u32 field_94;          /* 0x94 */
+    u32 field_98;          /* 0x98 */
+    u8 field_9C;           /* 0x9C */
+    u8 pad_9D[0x3];        /* 0x9D */
+    u8 field_A0;           /* 0xA0 */
+    u8 pad_A1[0x2B];       /* 0xA1 */
+    u16 field_CC;          /* 0xCC */
+    u16 field_CE;          /* 0xCE */
+    u16 field_D0;          /* 0xD0 */
+    u16 field_D2;          /* 0xD2 */
+    u8 field_D4;           /* 0xD4 */
+    u8 pad_D5[0x13];       /* 0xD5 */
+    u32 field_E8;          /* 0xE8 */
+    u8 active;             /* 0xEC */
+    u8 field_ED;           /* 0xED */
+    u8 field_EE;           /* 0xEE */
+    u8 pad_EF;             /* 0xEF */
+    u32 field_F0;          /* 0xF0 */
+} PeopleFieldMoveSlot;
+
 #pragma pop
 #pragma push
 #pragma optimization_level 0
@@ -1284,8 +1316,9 @@ u8 fn_80162464(void) { return lbl_8047B050; }
 #pragma pop
 extern u32 lbl_8047B024;
 u32 fn_8016246C(u32 index) {
-    u8 (*entries)[0xF4] = (u8 (*)[0xF4])lbl_8047B024;
-    return entries[index][0xEC] != 0;
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+
+    return entries[index].active != 0;
 }
 #pragma push
 #pragma optimization_level 0
@@ -1306,21 +1339,99 @@ asm void fn_80162494(void) {
 }
 #else
 void fn_80162494(u32 index, u32 val) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u32*)(elem + 0x1C) = val;
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+
+    entries[index].field_1C = val;
 }
 #endif
 #pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801624A8(void) {
 #include "src/game/people/people_field_fn_801624A8.inc"
 }
 #else
-void fn_801624A8(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 value1C, u32 value18, u32 initFlags, u32 setupFlag, u32 unused) {
+    typedef struct {
+        u8 pad_00[0x18];      /* 0x00 */
+        u32 field_18;         /* 0x18 */
+        u32 field_1C;         /* 0x1C */
+        u8 pad_20[0x4];       /* 0x20 */
+        u32 flags_24[0x13];   /* 0x24 */
+        u16 field_70;         /* 0x70 */
+        u8 pad_72[0x2];       /* 0x72 */
+        u32 words_74[0x8];    /* 0x74 */
+        u32 field_94;         /* 0x94 */
+        u32 field_98;         /* 0x98 */
+        u8 field_9C;          /* 0x9C */
+        u8 pad_9D[0x3];       /* 0x9D */
+        u8 field_A0;          /* 0xA0 */
+        u8 pad_A1[0x3];       /* 0xA1 */
+        u8 field_A4;          /* 0xA4 */
+        u8 pad_A5[0x13];      /* 0xA5 */
+        u32 field_B8;         /* 0xB8 */
+        u32 field_BC;         /* 0xBC */
+        u16 field_C0;         /* 0xC0 */
+        u8 pad_C2[0x2];       /* 0xC2 */
+        u32 field_C4;         /* 0xC4 */
+        u8 pad_C8[0x1C];      /* 0xC8 */
+        u8 bytes_E4[4];       /* 0xE4 */
+        u8 pad_E8[0x8];       /* 0xE8 */
+        u32 field_F0;         /* 0xF0 */
+    } PeopleFieldState;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8047B050;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u32 i;
+    u32 flags = 0;
+    u32* src = (u32*)words74;
+
+    for (i = 0; i < lbl_8047B050; i++) {
+        flags |= entries[0].flags_24[i] & 0x20;
+        entries[0].flags_24[i] = 0;
+    }
+
+    entry->flags_24[0] = flags;
+    entry->field_1C = value1C;
+    entry->field_18 = value18;
+    entry->field_F0 = 0;
+    entry->field_70 = value70;
+
+    entry->words_74[0] = src[0];
+    entry->words_74[1] = src[1];
+    entry->words_74[2] = src[2];
+    entry->words_74[3] = src[3];
+    entry->words_74[4] = src[4];
+    entry->words_74[5] = src[5];
+    entry->words_74[6] = src[6];
+    entry->words_74[7] = src[7];
+
+    if (resetState == 0) {
+        entry->field_A4 = 0;
+        entry->field_B8 = 0;
+        entry->field_BC = 0;
+        entry->field_C0 = 0x7FFF;
+        entry->field_C4 = 0;
+    }
+
+    entry->bytes_E4[0] = 0xFF;
+    entry->bytes_E4[1] = 0xFF;
+    entry->bytes_E4[2] = 0xFF;
+    entry->bytes_E4[3] = 0xFF;
+
+    if (initFlags != 0) {
+        fn_801629A4(index, 0);
+        fn_801629D0(index, 1);
+    }
+
+    fn_801629FC(index, setupFlag);
+}
+#pragma pop
 #endif
 #pragma pop
 #pragma push
@@ -1335,9 +1446,12 @@ void fn_8016265C(u32 index) {
     extern u32 lbl_8047B024;
     extern u8 lbl_8047B050;
     u32 offset = index * 0xF4;
+    PeopleFieldMoveSlot* entry;
     u8* p;
-    if (*(u8*)((u8*)lbl_8047B024 + offset + 0xEC) == 1 && lbl_8047B050 == 0) {
-        *(u8*)((u8*)lbl_8047B024 + offset + 0xEE) = 1;
+
+    entry = (PeopleFieldMoveSlot*)((u8*)lbl_8047B024 + offset);
+    if (entry->active == 1 && lbl_8047B050 == 0) {
+        entry->field_EE = 1;
     }
     p = (u8*)lbl_8047B024 + offset;
     p += (u32)lbl_8047B050 * 4;
@@ -1348,12 +1462,105 @@ void fn_8016265C(u32 index) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_801626AC(void) {
 #include "src/game/people/people_field_fn_801626AC.inc"
 }
 #else
-void fn_801626AC(void) { /* TODO */ }
+#pragma push
+#pragma peephole off
+void fn_801626AC(u32 index, void* ptr, u32 mode) {
+    typedef struct {
+        u8 pad_00[0x18];      /* 0x00 */
+        u32 field_18;         /* 0x18 */
+        u32 field_1C;         /* 0x1C */
+        u8 pad_20[0x4];       /* 0x20 */
+        u32 flags_24[0x13];   /* 0x24 */
+        u16 field_70;         /* 0x70 */
+        u8 pad_72[0x2];       /* 0x72 */
+        u32 words_74[0x8];    /* 0x74 */
+        u32 field_94;         /* 0x94 */
+        u32 field_98;         /* 0x98 */
+        u8 field_9C;          /* 0x9C */
+        u8 pad_9D[0x3];       /* 0x9D */
+        u8 field_A0;          /* 0xA0 */
+        u8 pad_A1[0x3];       /* 0xA1 */
+        u8 field_A4;          /* 0xA4 */
+        u8 pad_A5[0x13];      /* 0xA5 */
+        u32 field_B8;         /* 0xB8 */
+        u32 field_BC;         /* 0xBC */
+        u16 field_C0;         /* 0xC0 */
+        u8 pad_C2[0x2];       /* 0xC2 */
+        u32 field_C4;         /* 0xC4 */
+        u8 pad_C8[0x2];       /* 0xC8 */
+        u8 field_CA;          /* 0xCA */
+        u8 pad_CB[0x19];      /* 0xCB */
+        u8 bytes_E4[4];       /* 0xE4 */
+        u8 pad_E8[0x8];       /* 0xE8 */
+        u32 field_F0;         /* 0xF0 */
+    } PeopleFieldState;
+    typedef struct {
+        u16 field_00;         /* 0x00 */
+        u16 field_02;         /* 0x02 */
+        u16 field_04;         /* 0x04 */
+        u16 field_06;         /* 0x06 */
+    } PeopleFieldMode0Args;
+    typedef struct {
+        u32 field_00;         /* 0x00 */
+        u32 field_04;         /* 0x04 */
+        u16 field_08;         /* 0x08 */
+        u16 field_0A;         /* 0x0A */
+    } PeopleFieldMode12Args;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8036944C[];
+    extern u32 fn_80158CD4(u32);
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u8 m = (u8)mode;
+
+    switch (m) {
+    case 0: {
+        PeopleFieldMode0Args* args = ptr;
+        u32 v;
+        entry->field_A4 = 0;
+        entry->field_B8 = args->field_00;
+        entry->field_BC = args->field_02;
+        v = args->field_04 << 3;
+        if (v > 0x7FFF) {
+            v = 0x7FFF;
+        }
+        entry->field_C0 = (u16)v;
+        entry->field_C4 = args->field_06;
+        break;
+    }
+    case 1:
+    case 2:
+        {
+        PeopleFieldMode12Args* args = ptr;
+        entry->field_A4 = 1;
+        entry->field_CA = 0;
+        if (m == 1) {
+            entry->field_B8 = (u16)fn_80158CD4(args->field_00);
+            entry->field_BC = (u16)fn_80158CD4(args->field_04);
+            {
+                s32 idx = args->field_08 >> 2;
+                if ((u32)idx > 0x3FF) {
+                    idx = 0x3FF;
+                }
+                entry->field_C0 = (u16)(0xC1 - lbl_8036944C[idx]);
+            }
+        } else {
+            entry->field_B8 = (u16)args->field_00;
+            entry->field_BC = (u16)args->field_04;
+            entry->field_C0 = args->field_08;
+        }
+        entry->field_C4 = args->field_0A;
+        }
+    }
+
+    entry->flags_24[0] |= 0x10;
+}
+#pragma pop
 #endif
 #pragma pop
 #pragma push
@@ -1367,12 +1574,12 @@ void fn_80162858(u32 index, u32 val1, u32 val2) {
     extern u32 lbl_8047B024;
     u32 offset = index * 0xF4;
     {
-        u8* elem1 = (u8*)lbl_8047B024 + offset;
-        *(u32*)(elem1 + 0x94) = val1;
+        PeopleFieldMoveSlot* entry1 = (PeopleFieldMoveSlot*)((u8*)lbl_8047B024 + offset);
+        entry1->field_94 = val1;
     }
     {
-        u8* elem2 = (u8*)lbl_8047B024 + offset;
-        *(u32*)(elem2 + 0x98) = val2;
+        PeopleFieldMoveSlot* entry2 = (PeopleFieldMoveSlot*)((u8*)lbl_8047B024 + offset);
+        entry2->field_98 = val2;
     }
 }
 #endif
@@ -1385,9 +1592,9 @@ asm void fn_80162878(void) {
 }
 #else
 u8 fn_80162878(u32 index) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u8*)(elem + 0x9C);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    return entries[index].field_9C;
 }
 #endif
 #pragma pop
@@ -1399,9 +1606,9 @@ asm void fn_8016288C(void) {
 }
 #else
 u8 fn_8016288C(u32 index) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u8*)(elem + 0x90);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    return entries[index].field_90;
 }
 #endif
 #pragma pop
@@ -1413,9 +1620,9 @@ asm void fn_801628A0(void) {
 }
 #else
 u16 fn_801628A0(u32 index) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    return *(u16*)(elem + 0x70);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    return entries[index].field_70;
 }
 #endif
 #pragma pop
@@ -1427,9 +1634,9 @@ asm void fn_801628B4(void) {
 }
 #else
 void fn_801628B4(u32 index, u8 val) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u8*)(elem + 0xA0) = val;
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    entries[index].field_A0 = val;
 }
 #endif
 #pragma pop
@@ -1442,30 +1649,57 @@ asm void fn_801628C8(void) {
 }
 #else
 void fn_801628C8(u32 index) {
-    u32 offset = index * 0xF4;
-    ((u8*)lbl_8047B024 + offset)[0xD4] = lbl_8047B050;
-    salActivateVoice((u8*)lbl_8047B024 + offset);
+#define PF (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024)
+    PF[index].field_D4 = lbl_8047B050;
+    salActivateVoice((u8*)&PF[index]);
+#undef PF
 }
 #endif
 #pragma pop
 extern u32 lbl_8047B024;
 extern u8 lbl_8047B050;
 void hwKeyOff(u32 index) {
-    u32* p;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    elem += (u32)lbl_8047B050 << 2;
-    p = (u32*)(elem + 0x24);
-    *p |= 0x40;
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    entries[index].flags_24[lbl_8047B050] |= 0x40;
 }
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_8016292C(void) {
 #include "src/game/people/people_field_fn_8016292C.inc"
 }
 #else
-void fn_8016292C(void) { /* TODO */ }
+void fn_8016292C(u32 index, u16 value) {
+    typedef struct {
+        u8 pad_00[0x24];      /* 0x00 */
+        u32 words_24[0x30];   /* 0x24 */
+        u8 activeWordIndex;   /* 0xE4 */
+        u8 pad_E5[0x0F];      /* 0xE5 */
+    } PeopleFieldState;
+    extern u32 lbl_8047B024;
+    extern u8 lbl_8047B050;
+    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
+    PeopleFieldState* entry = &entries[index];
+    u32 scaledValue;
+
+    if ((u16)value >= 0x4000) {
+        value = 0x3FFF;
+    }
+
+    if (entry->activeWordIndex != 0xFF) {
+        scaledValue = (u16)value << 4;
+        if (entry->words_24[5 + entry->activeWordIndex] == scaledValue) {
+            return;
+        }
+    }
+
+    scaledValue = (u16)value << 4;
+    entry->words_24[5 + lbl_8047B050] = scaledValue;
+    entry->words_24[lbl_8047B050] |= 8;
+    entry->activeWordIndex = lbl_8047B050;
+}
 #endif
 #pragma pop
 #pragma push
@@ -1477,11 +1711,11 @@ asm void fn_801629A4(void) {
 }
 #else
 void fn_801629A4(u32 index, u8 value) {
-    extern u32 lbl_8047B024;
     extern u16 lbl_80478BF8;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCC) = (&lbl_80478BF8)[(u8)value];
-    *(u32*)(elem + 0x24) |= 0x100;
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    entries[index].field_CC = (&lbl_80478BF8)[(u8)value];
+    entries[index].flags_24[0] |= 0x100;
 }
 #endif
 #pragma pop
@@ -1494,11 +1728,11 @@ asm void fn_801629D0(void) {
 }
 #else
 void fn_801629D0(u32 index, u8 value) {
-    extern u32 lbl_8047B024;
     extern u16 lbl_80478C00;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    *(u16*)(elem + 0xCE) = (&lbl_80478C00)[(u8)value];
-    *(u32*)(elem + 0x24) |= 0x80;
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    entries[index].field_CE = (&lbl_80478C00)[(u8)value];
+    entries[index].flags_24[0] |= 0x80;
 }
 #endif
 #pragma pop
@@ -1514,15 +1748,14 @@ asm void fn_801629FC(void) {
  * else clears the hi bit. Base array lbl_8047B024 (stride 0xF4, same as fn_801629A4/D0) is
  * re-read per access (volatile reinterpret) to match the target. byte-match verified 22/22. */
 void fn_801629FC(u32 index, u8 flag) {
-    typedef struct { u8 pad[0xD0]; u16 d0; u16 d2; u8 pad2[0x1C]; u32 f0; } NpcEntry;
     extern u32 lbl_8047B024;
-#define PF (*(NpcEntry* volatile*)&lbl_8047B024)
+#define PF (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024)
     if (flag == 0) {
-        PF[index].f0 |= 0x80000000;
-        PF[index].d0 = 0x10;
-        PF[index].d2 = 0x10;
+        PF[index].field_F0 |= 0x80000000;
+        PF[index].field_D0 = 0x10;
+        PF[index].field_D2 = 0x10;
     } else {
-        PF[index].f0 &= ~0x80000000u;
+        PF[index].field_F0 &= ~0x80000000u;
     }
 #undef PF
 }
@@ -1550,10 +1783,20 @@ asm void fn_80162D18(void) {
 void fn_80162D18(u32 index) {
     extern u32 lbl_8047B024;
     extern void fn_8015D4EC(u8* ptr);
-    fn_8015D4EC((u8*)lbl_8047B024 + index * 0xF4);
+    PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
+
+    fn_8015D4EC((u8*)&entries[index]);
 }
 #endif
 #pragma pop
+typedef struct PeopleStudioState {
+    u8 pad_00[0xAC];       /* 0x00 */
+    u32 field_AC;          /* 0xAC */
+    u32 field_B0;          /* 0xB0 */
+    u32 field_B4;          /* 0xB4 */
+    u32 field_B8;          /* 0xB8 */
+} PeopleStudioState;
+
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -1563,11 +1806,11 @@ asm void fn_80162D44(void) {
 }
 #else
 void fn_80162D44(u8 index, u32 a, u32 b, u32 c, u32 d) {
-    u8* elem = lbl_80447E60 + (u32)index * 0xBC;
-    *(u32*)(elem + 0xAC) = a;
-    *(u32*)(elem + 0xB4) = b;
-    *(u32*)(elem + 0xB0) = c;
-    *(u32*)(elem + 0xB8) = d;
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    entries[(u8)index].field_AC = a;
+    entries[(u8)index].field_B4 = b;
+    entries[(u8)index].field_B0 = c;
+    entries[(u8)index].field_B8 = d;
 }
 #endif
 #pragma pop
@@ -1603,7 +1846,8 @@ asm void fn_80162DAC(void) {
 #else
 void fn_80162DAC(u8 index, u32 arg1) {
     extern void fn_8015D54C(u8*, u32);
-    fn_8015D54C(&lbl_80447E60[index * 0xBC], arg1);
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    fn_8015D54C((u8*)&entries[(u8)index], arg1);
 }
 #endif
 #pragma pop
@@ -1617,7 +1861,8 @@ asm void fn_80162DE0(void) {
 #else
 void fn_80162DE0(u8 index, u32 arg1) {
     extern void fn_8015D5F4(u8*, u32);
-    fn_8015D5F4(&lbl_80447E60[index * 0xBC], arg1);
+    PeopleStudioState* entries = (PeopleStudioState*)lbl_80447E60;
+    fn_8015D5F4((u8*)&entries[(u8)index], arg1);
 }
 #endif
 #pragma pop
@@ -1629,18 +1874,89 @@ asm void fn_80162E14(void) {
 #include "src/game/people/people_field_fn_80162E14.inc"
 }
 #else
-void fn_80162E14(void) { /* TODO */ }
+/* STAGED SEED (Claude Opus 2026-06-16) — logic verified vs target; NOT 100%.
+ * At #pragma optimization_level 4 the prologue is gone (volatile-only leaf)
+ * and it reaches ~58-60%. Residual is compute-block (case 0/1/4/5) reg-alloc:
+ *   (1) target recomputes the entry base into r3 (`add r3,r6,r5`) then loads
+ *       dim_78/dim_20 via r3, freeing r4 for `lo`; ours loads via the saved r4.
+ *   (2) target emits `cmplwi r4,2; mulli r3,r0,0xe; bltlr` (return m if lo<2);
+ *       ours inverts to `mulli r5,...; ... bgelr` (different reg + polarity).
+ * Cracking needs permuter/band lever search on operand order + the base-recompute
+ * binding. The TU default for this block was opt 0 (prologue/spill => 18.5%);
+ * opt 4 is correct. */
+#pragma optimization_level 4
+u32 fn_80162E14(u32 idx) {
+    /* Local view of the 0xf4-stride people-field entry; only the fields
+     * touched here are named. */
+    typedef struct PeopleFieldEntry_E14 {
+        u8  _00[0x20];   /* 0x00 */
+        u32 dim_20;      /* 0x20 */
+        u8  _24[0x54];   /* 0x24 */
+        u32 dim_78;      /* 0x78 */
+        u8  _7C[0x14];   /* 0x7C */
+        u8  kind_90;     /* 0x90 */
+        u8  _91[0x5B];   /* 0x91 */
+        u8  flag_ec;     /* 0xEC */
+        u8  _ED[0x07];   /* 0xED ... 0xF4 */
+    } PeopleFieldEntry_E14;
+    extern u32 lbl_8047B024;
+    PeopleFieldEntry_E14* entries = (*(PeopleFieldEntry_E14* volatile*)&lbl_8047B024);
+    PeopleFieldEntry_E14* e = &entries[idx];
+
+    if (e->flag_ec != 2) {
+        return 0;
+    }
+    switch (e->kind_90) {
+    case 0:
+    case 1:
+    case 4:
+    case 5: {
+        u32 big = e->dim_20;
+        u32 small = e->dim_78;
+        u32 v = (big - (small << 1)) >> 4;
+        u32 lo = big & 0xF;
+        if (lo < 2) {
+            return v * 0xe;
+        }
+        return lo + v * 0xe - 2;
+    }
+    case 2:
+        return e->dim_20 - (e->dim_78 >> 1);
+    case 3:
+        return e->dim_20 - e->dim_78;
+    default:
+        return idx;
+    }
+}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162EB8(void) {
 #include "src/game/people/people_field_fn_80162EB8.inc"
 }
 #else
-void fn_80162EB8(void) { /* TODO */ }
+void fn_80162EB8(u8* dstBase, u32 srcOffset, u32 size, u32 streamIndex, u32 arg7, u32 arg8) {
+    u32 unusedOut;
+    register u8* dstBaseReg = dstBase;
+    register u32 srcOffsetReg = srcOffset;
+    register u32 sizeReg = size;
+    register u32 arg7Reg = arg7;
+    register u32 arg8Reg = arg8;
+    u8* srcBase = (u8*)fn_80163DB0(streamIndex, &unusedOut);
+    u32 unaligned = srcOffsetReg & 0x1F;
+    u32 alignedOffset = srcOffsetReg & ~0x1F;
+    u32 alignedSize;
+    u8* dst;
+    sizeReg += unaligned;
+    dst = dstBaseReg + alignedOffset;
+    alignedSize = (sizeReg + 0x1F) & ~0x1F;
+
+    fn_8009B300(dst, alignedSize);
+    aramUploadData(dst, srcBase + alignedOffset, alignedSize, 1, arg7Reg, arg8Reg);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1690,14 +2006,22 @@ void fn_80162FAC(void) {}
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
-#if 1
+#if 0
 asm void fn_80162FB0(void) {
 #include "src/game/people/people_field_fn_80162FB0.inc"
 }
 #else
-void fn_80162FB0(void) { /* TODO */ }
+typedef struct PeopleFieldMoveScale {
+    u32 divisor; /* 0x00 */
+} PeopleFieldMoveScale;
+
+u32 fn_80162FB0(u32 value) {
+    PeopleFieldMoveScale* scale = (PeopleFieldMoveScale*)lbl_80434C50;
+
+    return fn_800C46B0(((f32)value * lbl_8047D4E0) / (f32)scale->divisor);
+}
 #endif
 #pragma pop
 #pragma push
@@ -1733,9 +2057,15 @@ asm void fn_80163050(void) {
 #include "src/game/people/people_field_fn_80163050.inc"
 }
 #else
+typedef struct PeopleFieldMoveCommand {
+    u32 field_00;          /* 0x00 */
+    u32 packedSizeWord;    /* 0x04: high byte type, low 24-bit payload */
+} PeopleFieldMoveCommand;
+
 void fn_80163050(u32** src, u32* out) {
     extern u32 fn_80163810(u32 a, u32 b);
-    u32 val = *(u32*)((u8*)*src + 4);
+    PeopleFieldMoveCommand* command = (PeopleFieldMoveCommand*)*src;
+    u32 val = command->packedSizeWord;
     u32 type = val >> 24;
     u32 payload = val & 0xFFFFFF;
     switch (type) {
@@ -1771,7 +2101,8 @@ asm void fn_80163104(void) {
 #else
 void fn_80163104(u8* src, u8* dest) {
     extern void fn_80163BCC(u8* a, u32 b);
-    u32 val = *(u32*)(src + 4);
+    PeopleFieldMoveCommand* command = (PeopleFieldMoveCommand*)src;
+    u32 val = command->packedSizeWord;
     u32 type = val >> 24;
     u32 payload = val & 0xFFFFFF;
     switch (type) {
@@ -1831,11 +2162,13 @@ void fn_801631C0(void) { lbl_8047B014 = 0; }
 extern u32 lbl_8047B024;
 
 u32 fn_801631CC(u32 index) {
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    if (*(u8*)(elem + 0xEC) == 0) {
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+    PeopleFieldMoveSlot* entry = &entries[index];
+
+    if (entry->active == 0) {
         return -1;
     } else {
-        return *(u32*)(elem + 0xE8);
+        return entry->field_E8;
     }
 }
 #pragma push
@@ -1846,9 +2179,8 @@ asm void fn_801631F4(void) {
 }
 #else
 u32 fn_801631F4(u32 index) {
-    extern u32 lbl_8047B024;
-    u8* elem = (u8*)lbl_8047B024 + index * 0xF4;
-    u8 v = *(u8*)(elem + 0xEC);
+    PeopleFieldMoveSlot* entries = (PeopleFieldMoveSlot*)lbl_8047B024;
+    u8 v = entries[index].active;
     u32 diff = 1 - v;
     return (u32)(diff == 0);
 }
@@ -2538,6 +2870,8 @@ void ReverbHICreate(void) { /* TODO */ }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
+/* ReverbHIModify's preserved asm include predates the symbol-map rename. */
+#define fn_80164520 ReverbHICreate
 #if 1
 asm void ReverbHIModify(void) {
 #include "src/game/people/people_field_fn_80164A2C.inc"
@@ -2545,6 +2879,7 @@ asm void ReverbHIModify(void) {
 #else
 void ReverbHIModify(void) { /* TODO */ }
 #endif
+#undef fn_80164520
 #pragma pop
 #pragma push
 #pragma optimization_level 0

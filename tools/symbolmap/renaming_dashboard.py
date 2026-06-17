@@ -8,12 +8,15 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
 import time
+import uuid
 import zipfile
 from collections import Counter
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -28,12 +31,17 @@ DECOMP_STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md
 # --- v9: reader / wall / agent / token / lockout data sources --------------------
 DECOMP_WORK = ROOT / "tools" / "decomp_work"
 COORD_DIR = DECOMP_WORK / "coordination"
+PROGRESS2 = DECOMP_WORK / "progress2.py"
 WALLS_MD = ROOT / "WALLS.md"
 EQUIVALENT_TXT = DECOMP_WORK / "equivalent.txt"
 CS_WALLS_JSON = ROOT / "build" / "cs_walls.json"
 AGENT_STATUS_TXT = COORD_DIR / "agent_status.txt"
 CLAIMS_JSON = COORD_DIR / "claims.json"
 TASKS_JSON = COORD_DIR / "tasks.json"
+CRACK_QUEUE_JSON = COORD_DIR / "crack_queue.json"
+HARD_TARGETS_MD = ROOT / "docs" / "hardest_regalloc_functions.md"
+TMUX_CONTROL = DECOMP_WORK / "tmux_control"
+LOCKS_DB = Path(os.environ.get("DECOMP_LOCKS_DB", COORD_DIR / "locks.db"))
 AGENT_TOKENS_JSON = ROOT / ".omc" / "agent_tokens.json"
 AGENT_LIMITS_JSON = DECOMP_WORK / "agent_limits.json"
 OPENCODE_STORAGE = Path(
@@ -52,7 +60,7 @@ HISTORY_CAP = 2000
 UNIT_HISTORY_CAP = 300
 FN_HISTORY_CAP = 200
 STATE_CACHE_TTL_SECONDS = 1.8
-DASHBOARD_VERSION = 10
+DASHBOARD_VERSION = 13
 # --- v10: token-history collector sources ----------------------------------------
 CLAUDE_PROJECT_DIR = (
     Path.home()
@@ -61,7 +69,9 @@ CLAUDE_PROJECT_DIR = (
     / "C--Users-douglaswhittingham-pkmn-colosseum"
 )
 CODEX_HISTORY = Path.home() / ".codex" / "history.jsonl"
+CODEX_SESSIONS_DIR = Path.home() / ".codex" / "sessions"
 TOKEN_HISTORY_FILE = DECOMP_WORK / "token_history.json"
+KG_DB = DECOMP_WORK / "kg" / "kg.db"
 # Artifacts served privately over Tailscale (the user's own ROM-derived inputs).
 MAIN_DOL = ROOT / "orig" / "GC6E01" / "sys" / "main.dol"
 TARGET_OBJ_DIR = ROOT / "build" / "GC6E01" / "obj"
@@ -81,6 +91,58 @@ SYMBOL_RE = re.compile(
     r"^([A-Za-z_.$][\w.$:@?]*)\s*=\s*(\.\w+):(0x[0-9A-Fa-f]+);"
     r"\s*//\s*type:(\w+)\s*size:(0x[0-9A-Fa-f]+)(.*)$"
 )
+FUNCTION_NAME_RE = re.compile(r"^[A-Za-z_.$][\w.$:@?]*$")
+CRACK_LANES = [
+    {
+        "id": "codex-gpt55-high",
+        "label": "Codex 5.5 high",
+        "provider": "codex",
+        "model": "gpt-5.5",
+        "launch": "tmux-codex",
+        "note": "interactive Codex TUI lane",
+    },
+    {
+        "id": "claude-opus",
+        "label": "Claude Opus",
+        "provider": "claude-code",
+        "model": "opus",
+        "launch": "queue",
+        "note": "queue until Claude launcher is connected",
+    },
+    {
+        "id": "glm-52",
+        "label": "GLM 5.2",
+        "provider": "glm",
+        "model": "glm-5.2",
+        "launch": "queue",
+        "note": "queue until GLM launcher is connected",
+    },
+    {
+        "id": "opencode-deepseek-v4-flash",
+        "label": "OpenCode DeepSeek V4 Flash",
+        "provider": "opencode",
+        "model": "deepseek-v4-flash",
+        "launch": "queue",
+        "note": "queue for low-cost OpenCode/DeepSeek drain",
+    },
+]
+CRACK_STRATEGIES = [
+    {
+        "id": "contenders",
+        "label": "Contenders",
+        "note": "independent attempts; best default for one function",
+    },
+    {
+        "id": "split",
+        "label": "Split giant",
+        "note": "coordinated slice plan; use only for structural giants",
+    },
+    {
+        "id": "repair",
+        "label": "Repair best",
+        "note": "start from current/previous near-match C and iterate",
+    },
+]
 
 
 def read_text(path: Path) -> str:
@@ -239,12 +301,21 @@ def recent_commit_attempts(limit: int = 40) -> list[dict[str, object]]:
                 break
             emitted += 1
             base = path.replace("\\", "/").rsplit("/", 1)[-1]
+            lower_subject = subject.lower()
+            kind = "match" if (
+                "byte-exact" in lower_subject
+                or "byte-match" in lower_subject
+                or "100%" in lower_subject
+                or "match " in lower_subject
+                or "matched" in lower_subject
+                or re.search(r"\+\d+\s+(?:byte|fn|function|match)", lower_subject)
+            ) else "commit"
             rows.append(
                 {
                     "timestamp": iso,
                     "unix": unix,
                     "agent": "git",
-                    "kind": "commit",
+                    "kind": kind,
                     "function": "",
                     "file": base,
                     "percent": None,
@@ -310,6 +381,140 @@ def float_pct(value: object) -> float:
         return round(float(value), 2)
     except (TypeError, ValueError):
         return 0.0
+
+
+def timestamp_unix(value: object) -> int:
+    """Parse dashboard timestamps to unix seconds for stable merge sorting."""
+    if isinstance(value, (int, float)):
+        return int(value)
+    if not isinstance(value, str) or not value:
+        return 0
+    text = value.strip()
+    if text.isdigit():
+        return int(text)
+    # Most coordination rows are UTC ISO strings. Some historical rows are plain
+    # local dashboard snapshots; keep those sortable best-effort.
+    for fmt, utc in (
+        ("%Y-%m-%dT%H:%M:%SZ", True),
+        ("%Y-%m-%dT%H:%M:%S", True),
+        ("%Y-%m-%d %H:%M:%S", False),
+    ):
+        try:
+            parsed = datetime.strptime(text.split(".")[0].replace("Z", ""), fmt.replace("Z", ""))
+        except ValueError:
+            continue
+        if utc:
+            return int(parsed.replace(tzinfo=timezone.utc).timestamp())
+        return int(time.mktime(parsed.timetuple()))
+    return 0
+
+
+_HARD_TARGET_CACHE: dict[str, object] = {"mtime": None, "entries": None, "by_fn": None}
+
+
+def _clean_md_cell(value: str) -> str:
+    return re.sub(r"`([^`]*)`", r"\1", value).strip()
+
+
+def _parse_size_value(value: str) -> int:
+    text = _clean_md_cell(value).replace(",", "").strip()
+    if not text or text.lower() == "n/a":
+        return 0
+    try:
+        return int(text, 16) if text.lower().startswith("0x") else int(text)
+    except ValueError:
+        return 0
+
+
+def _section_key(section: str) -> str:
+    lower = section.lower()
+    if "confirmed" in lower:
+        return "wall"
+    if "asm" in lower:
+        return "asm"
+    if "real-c" in lower or "near" in lower:
+        return "near"
+    if "structural" in lower:
+        return "giant"
+    return re.sub(r"[^a-z0-9]+", "-", lower).strip("-") or "other"
+
+
+def load_hard_targets() -> dict[str, object]:
+    """Parse docs/hardest_regalloc_functions.md into dashboard metadata."""
+    if not HARD_TARGETS_MD.exists():
+        return {"available": False, "entries": [], "by_fn": {}, "counts": {}, "source": str(HARD_TARGETS_MD)}
+    try:
+        mtime = HARD_TARGETS_MD.stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    if _HARD_TARGET_CACHE.get("mtime") == mtime and _HARD_TARGET_CACHE.get("entries") is not None:
+        return {
+            "available": True,
+            "entries": _HARD_TARGET_CACHE["entries"],
+            "by_fn": _HARD_TARGET_CACHE["by_fn"],
+            "counts": dict(Counter(str(e.get("section_key", "other")) for e in _HARD_TARGET_CACHE["entries"])),  # type: ignore[arg-type]
+            "source": str(HARD_TARGETS_MD),
+        }
+
+    entries: list[dict[str, object]] = []
+    section = ""
+    for raw in read_text(HARD_TARGETS_MD).splitlines():
+        line = raw.strip()
+        if line.startswith("## "):
+            section = line.removeprefix("## ").strip()
+            continue
+        if not line.startswith("|") or "---" in line or "File / TU" in line:
+            continue
+        cells = [_clean_md_cell(c) for c in line.strip("|").split("|")]
+        if len(cells) < 5 or not section:
+            continue
+        section_key = _section_key(section)
+        rank = None
+        if cells[0].strip().isdigit() and len(cells) >= 6:
+            rank = int(cells[0].strip())
+            file_cell, fn, size_cell, match_cell, note_cell = cells[1], cells[2], cells[3], cells[4], cells[5]
+        else:
+            file_cell, fn, size_cell, match_cell, note_cell = cells[0], cells[1], cells[2], cells[3], cells[4]
+        file_match = re.search(r"(src/[^\s|]+\.c)", file_cell.replace("\\", "/"))
+        source = file_match.group(1) if file_match else ""
+        match_pct = None
+        pct_match = re.search(r"([0-9]+(?:\.[0-9]+)?)", match_cell)
+        if pct_match:
+            match_pct = float_pct(pct_match.group(1))
+        entries.append({
+            "section": section,
+            "section_key": section_key,
+            "rank": rank,
+            "source": source,
+            "function": fn.strip(),
+            "size": _parse_size_value(size_cell),
+            "match_pct": match_pct,
+            "note": note_cell.strip(),
+        })
+
+    def entry_sort(entry: dict[str, object]) -> tuple[int, int, int, str]:
+        section_weight = {"wall": 0, "asm": 1, "near": 2, "giant": 3}.get(str(entry.get("section_key")), 9)
+        rank_value = int_value(entry.get("rank")) or 9999
+        size_value = int_value(entry.get("size"))
+        return (section_weight, rank_value, -size_value, str(entry.get("function") or ""))
+
+    entries.sort(key=entry_sort)
+    by_fn: dict[str, dict[str, object]] = {}
+    for entry in entries:
+        fn = str(entry.get("function") or "")
+        if fn and fn not in by_fn:
+            by_fn[fn] = entry
+    counts = Counter(str(e.get("section_key") or "other") for e in entries)
+    _HARD_TARGET_CACHE["mtime"] = mtime
+    _HARD_TARGET_CACHE["entries"] = entries
+    _HARD_TARGET_CACHE["by_fn"] = by_fn
+    return {"available": True, "entries": entries, "by_fn": by_fn, "counts": dict(counts), "source": str(HARD_TARGETS_MD)}
+
+
+def hard_target_for(fn: str) -> dict[str, object] | None:
+    data = load_hard_targets()
+    by_fn = data.get("by_fn") if isinstance(data, dict) else {}
+    return by_fn.get(fn) if isinstance(by_fn, dict) else None
 
 
 def match_status(value: object) -> str:
@@ -440,6 +645,64 @@ def load_decomp_report(path: Path) -> dict[str, object]:
     }
 
 
+_CONVERSION_CACHE: dict[str, object] = {"value": None, "expires": 0.0}
+_CONVERSION_CACHE_TTL = 60.0
+
+
+def load_conversion_scan() -> dict[str, object]:
+    """Fast progress2 scan axis: real C vs asm wrappers vs stubs."""
+    now = time.monotonic()
+    cached = _CONVERSION_CACHE.get("value")
+    if cached is not None and now < float(_CONVERSION_CACHE.get("expires", 0)):
+        return cached  # type: ignore[return-value]
+    empty = {
+        "available": False,
+        "real_c": 0,
+        "asm_wrappers": 0,
+        "stubs": 0,
+        "source_total": 0,
+        "converted_pct": 0.0,
+    }
+    if not PROGRESS2.exists():
+        return empty
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(PROGRESS2)],
+            cwd=str(ROOT),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return empty
+    if proc.returncode != 0:
+        return empty
+    text = proc.stdout
+
+    def grab(pattern: str) -> int:
+        match = re.search(pattern, text)
+        return int(match.group(1)) if match else 0
+
+    real_c = grab(r"REAL_C \(decompiled\):\s+(\d+)")
+    asm = grab(r"ASM-wrapper \(ROM-only\):\s+(\d+)")
+    stubs = grab(r"STUB \(TODO/empty\):\s+(\d+)")
+    total = grab(r"source functions total:\s+(\d+)")
+    converted = 100.0 * real_c / total if total else 0.0
+    payload = {
+        "available": True,
+        "real_c": real_c,
+        "asm_wrappers": asm,
+        "stubs": stubs,
+        "source_total": total,
+        "converted_pct": round(converted, 2),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    _CONVERSION_CACHE["value"] = payload
+    _CONVERSION_CACHE["expires"] = now + _CONVERSION_CACHE_TTL
+    return payload
+
+
 def load_attempt_log(path: Path, limit: int = 1000) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     line_re = re.compile(
@@ -501,6 +764,7 @@ def load_attempt_log(path: Path, limit: int = 1000) -> list[dict[str, object]]:
         rows.append(
             {
                 "timestamp": match.group("timestamp"),
+                "unix": timestamp_unix(match.group("timestamp")),
                 "agent": agent,
                 "kind": kind,
                 "function": fn_match.group(0) if fn_match else "",
@@ -510,6 +774,37 @@ def load_attempt_log(path: Path, limit: int = 1000) -> list[dict[str, object]]:
             }
         )
     return rows[-limit:]
+
+
+def attempt_sort_key(row: dict[str, object]) -> tuple[int, str, str]:
+    unix = int_value(row.get("unix")) or timestamp_unix(row.get("timestamp"))
+    return (unix, str(row.get("timestamp") or ""), str(row.get("message") or ""))
+
+
+def merged_attempt_log(limit: int | None = 1000) -> list[dict[str, object]]:
+    """Merge status.md and git-derived attempts newest-first.
+
+    Returning a mixed or chronological concat is why old April rows could
+    surface above newer match work in the Activity Log match filter.
+    """
+    status_limit = 100000 if limit is None else max(limit * 4, 1000)
+    commit_limit = 240 if limit is None or limit > 1000 else 80
+    merged = load_attempt_log(DECOMP_STATUS_LOG, limit=status_limit) + recent_commit_attempts(limit=commit_limit)
+    deduped: dict[tuple[object, object, object, object, object], dict[str, object]] = {}
+    for row in merged:
+        row.setdefault("unix", timestamp_unix(row.get("timestamp")))
+        key = (
+            row.get("timestamp"),
+            row.get("agent"),
+            row.get("kind"),
+            row.get("file"),
+            row.get("message"),
+        )
+        deduped[key] = row
+    rows = sorted(deduped.values(), key=attempt_sort_key, reverse=True)
+    if limit is not None and limit > 0:
+        rows = rows[:limit]
+    return rows
 
 
 def load_history() -> list[dict[str, object]]:
@@ -541,6 +836,9 @@ def snapshot_for_history(state: dict[str, object]) -> dict[str, object]:
     decomp = state.get("decomp", {})
     if not isinstance(decomp, dict):
         decomp = {}
+    conversion = decomp.get("conversion", {})
+    if not isinstance(conversion, dict):
+        conversion = {}
     now = time.time()
     return {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -564,6 +862,7 @@ def snapshot_for_history(state: dict[str, object]) -> dict[str, object]:
         "decomp_fuzzy_pct": decomp.get("fuzzy_pct", 0),
         "decomp_code_pct": decomp.get("code_pct", 0),
         "decomp_functions_pct": decomp.get("functions_pct", 0),
+        "c_converted_pct": conversion.get("converted_pct", 0),
         "decomp_matched_functions": decomp.get("matched_functions", 0),
         "decomp_total_functions": decomp.get("total_functions", 0),
         "old_ref_total": metrics.get("old_ref_total", 0),
@@ -584,6 +883,7 @@ def should_record_history(history: list[dict[str, object]], snapshot: dict[str, 
         "decomp_fuzzy_pct",
         "decomp_code_pct",
         "decomp_functions_pct",
+        "c_converted_pct",
         "decomp_matched_functions",
         "old_ref_total",
         "head",
@@ -742,15 +1042,18 @@ def load_unit_functions(source: str) -> dict[str, object]:
             if not isinstance(function, dict):
                 continue
             fn_pct = float_pct(function.get("fuzzy_match_percent", 0))
-            functions.append(
-                {
-                    "index": index,
-                    "name": function.get("name", ""),
-                    "size": int_value(function.get("size", 0)),
-                    "fuzzy_pct": fn_pct,
-                    "status": match_status(fn_pct),
-                }
-            )
+            name = str(function.get("name", ""))
+            row = {
+                "index": index,
+                "name": name,
+                "size": int_value(function.get("size", 0)),
+                "fuzzy_pct": fn_pct,
+                "status": match_status(fn_pct),
+            }
+            hard = hard_target_for(name)
+            if hard:
+                row["difficulty"] = hard
+            functions.append(row)
         functions.sort(
             key=lambda row: (
                 float(row.get("fuzzy_pct", 0)) >= 99.95,
@@ -900,10 +1203,13 @@ def build_state() -> dict[str, object]:
         )
     )
     decomp = load_decomp_report(DECOMP_REPORT)
+    if isinstance(decomp, dict):
+        decomp["conversion"] = load_conversion_scan()
     # Merge status.md attempt log with git-commit-derived entries so codex's
     # per-file work (committed to git, not status.md) appears in the log and in
     # per-unit drill-downs. The front-end reverse-sorts and filters by `file`.
-    attempt_log = load_attempt_log(DECOMP_STATUS_LOG, limit=1000) + recent_commit_attempts()
+    attempt_log = merged_attempt_log(limit=1000)
+    attack_matrix = load_attack_matrix(decomp if isinstance(decomp, dict) else {})
     return {
         "version": DASHBOARD_VERSION,
         "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -913,6 +1219,7 @@ def build_state() -> dict[str, object]:
         "recent_commits": recent_commits(),
         "decomp": decomp,
         "attempt_log": attempt_log,
+        "attack_matrix": attack_matrix,
         "next_target": next_target,
         "counts": {
             "leads": len(leads),
@@ -982,17 +1289,86 @@ _ASM_CACHE_TTL_SECONDS = 90.0
 _ASM_LOCK = threading.Lock()
 
 
-def _resolve_source_path(name: str) -> Path | None:
-    """Resolve a stem or repo-relative path to a tracked src/**.c (band.py-style)."""
+def _source_defines_fn(path: Path, fn: str) -> bool:
+    """Return true when `path` contains a likely C definition for `fn`.
+
+    Generated band rows can name non-existent files, and many symbols are also
+    present as externs or calls in unrelated TUs. Prefer the source file with a
+    function body so the reader compiles the unit that owns the selected symbol.
+    """
+    if not fn:
+        return False
+    try:
+        lines = path.read_text(errors="ignore").splitlines()
+    except OSError:
+        return False
+
+    needle = f"{fn}("
+    spaced_needle = f"{fn} ("
+    for idx, line in enumerate(lines):
+        if needle not in line and spaced_needle not in line:
+            continue
+        stripped = line.strip()
+        if not stripped or stripped.startswith("*") or stripped.startswith("//"):
+            continue
+        if stripped.startswith("extern ") or stripped.endswith(";"):
+            continue
+
+        sig = stripped
+        for extra in lines[idx + 1:idx + 8]:
+            if "{" in sig or ";" in sig:
+                break
+            sig += " " + extra.strip()
+
+        brace_at = sig.find("{")
+        semi_at = sig.find(";")
+        if brace_at >= 0 and (semi_at < 0 or brace_at < semi_at):
+            return True
+    return False
+
+
+def _resolve_source_path(name: str, fn: str = "") -> Path | None:
+    """Resolve a stem/report path to a tracked src/**.c.
+
+    report.json can contain generated band units such as `src/band_mtool.c`.
+    Those do not exist on disk, so function-reader clicks need a final fallback:
+    find the real source file that contains the selected fn symbol.
+    """
     if not name:
-        return None
+        name = ""
     norm = name.replace("\\", "/")
     cand = ROOT / norm
-    if cand.exists():
+    if norm and cand.exists() and cand.is_file():
         return cand.resolve()
     stem = Path(norm).stem
-    matches = sorted((ROOT / "src").rglob(f"{stem}.c"))
-    return matches[0].resolve() if matches else None
+    if stem:
+        matches = sorted((ROOT / "src").rglob(f"{stem}.c"))
+        if matches:
+            return matches[0].resolve()
+    if fn:
+        found_paths: list[Path] = []
+        try:
+            proc = subprocess.run(
+                ["rg", "-l", "--fixed-strings", fn, "src", "--glob", "*.c", "--glob", "!*.inc"],
+                cwd=str(ROOT),
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            proc = None
+        if proc is not None and proc.returncode == 0:
+            for line in proc.stdout.splitlines():
+                found = (ROOT / line.strip()).resolve()
+                if found.exists():
+                    found_paths.append(found)
+            for found in found_paths:
+                if _source_defines_fn(found, fn):
+                    return found
+            if found_paths:
+                return found_paths[0]
+    return None
 
 
 def _instr_text(ins: object) -> str:
@@ -1018,7 +1394,7 @@ def compute_asm_diff(source: str, fn: str) -> dict[str, object]:
     aligned per-instruction rows for `fn`. Shape mirrors band.py cmd_diff."""
     if _compile_check is None:
         return {"available": False, "error": "compile_check import failed", "fn": fn, "source": source}
-    src_path = _resolve_source_path(source)
+    src_path = _resolve_source_path(source, fn)
     if src_path is None:
         return {"available": False, "error": f"source not found: {source}", "fn": fn, "source": source}
     if not _OBJDIFF_CLI.exists():
@@ -1173,10 +1549,11 @@ def _parse_cs_walls(fn: str) -> bool:
 def _fn_attempts(fn: str) -> list[dict[str, object]]:
     """Recent status.md attempt-log lines that name `fn`."""
     out = []
-    for row in load_attempt_log(DECOMP_STATUS_LOG):
+    for row in merged_attempt_log(limit=1500):
         if row.get("function") == fn or (fn and fn in str(row.get("message", ""))):
             out.append({
                 "timestamp": row.get("timestamp"),
+                "unix": row.get("unix"),
                 "kind": row.get("kind"),
                 "percent": row.get("percent"),
                 "message": row.get("message"),
@@ -1184,19 +1561,101 @@ def _fn_attempts(fn: str) -> list[dict[str, object]]:
     return out[-25:]
 
 
+def load_fn_kg_context(fn: str) -> dict[str, object]:
+    if not KG_DB.exists():
+        return {"available": False, "error": "kg.db not found"}
+    import sqlite3
+    try:
+        conn = sqlite3.connect(str(KG_DB), timeout=5.0)
+        conn.row_factory = sqlite3.Row
+        def has_table(name: str) -> bool:
+            return conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+                (name,),
+            ).fetchone() is not None
+        if not (has_table("function_calls") and has_table("function_tags") and has_table("name_evidence")):
+            conn.close()
+            return {"available": False, "error": "callgraph tables not built"}
+        tags = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT tag, kind, confidence, round(score, 2) AS score, evidence
+                FROM function_tags
+                WHERE symbol=?
+                ORDER BY score DESC, kind, tag
+                LIMIT 10
+                """,
+                (fn,),
+            )
+        ]
+        evidence = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT candidate, source, confidence, round(score, 2) AS score, evidence
+                FROM name_evidence
+                WHERE symbol=?
+                ORDER BY score DESC, source, candidate
+                LIMIT 10
+                """,
+                (fn,),
+            )
+        ]
+        callees = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT callee AS fn, callee_tu AS tu, confidence, source, evidence
+                FROM function_calls
+                WHERE caller=?
+                ORDER BY CASE confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+                         source, fn
+                LIMIT 10
+                """,
+                (fn,),
+            )
+        ]
+        callers = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT caller AS fn, caller_tu AS tu, confidence, source, evidence
+                FROM function_calls
+                WHERE callee=?
+                ORDER BY CASE confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+                         source, fn
+                LIMIT 10
+                """,
+                (fn,),
+            )
+        ]
+        conn.close()
+    except sqlite3.Error as exc:
+        return {"available": False, "error": str(exc)}
+    return {
+        "available": True,
+        "tags": tags,
+        "name_evidence": evidence,
+        "callees": callees,
+        "callers": callers,
+    }
+
+
 def load_fn_info(fn: str) -> dict[str, object]:
     is_equiv, equiv_note = _parse_equivalent(fn)
     wall_class, wall_note = _parse_walls_md(fn)
     in_cs_walls = _parse_cs_walls(fn)
     attempts = _fn_attempts(fn)
+    jobs = [job for job in load_crack_jobs(limit=200).get("jobs", []) if isinstance(job, dict) and job.get("fn") == fn]
     return {
         "fn": fn,
         "wall_class": wall_class,
         "note": wall_note or equiv_note,
         "is_equivalent": is_equiv,
         "in_cs_walls": in_cs_walls,
+        "difficulty": hard_target_for(fn),
+        "crack_jobs": jobs[:8],
+        "crack_job_count": len(jobs),
         "attempts": attempts,
         "attempt_count": len(attempts),
+        "kg": load_fn_kg_context(fn),
     }
 
 
@@ -1269,6 +1728,49 @@ def load_agents() -> dict[str, object]:
             })
     rows.sort(key=lambda r: str(r.get("claimed_at") or ""), reverse=True)
 
+    # --- union: make ALL known agents visible, not just those with a live claim.
+    # Old behaviour derived the agent list from claims.json (-> only glm/codex).
+    # Merge in (a) live lock owners, (b) agent_limits roster, (c) token-tracked
+    # agents, (d) a static roster, so claude/deepseek/mimo/qwen also appear.
+    def base_name(a: str) -> str:
+        a = (a or "").lower()
+        for stem in AGENT_ROSTER:
+            if a.startswith(stem):
+                return stem
+        return a.split("-")[0]
+
+    present = {base_name(str(r.get("agent"))) for r in rows}
+    # (a) lock owners — show what file/fn they're holding as current work
+    try:
+        for lk in load_locks().get("locks", []):
+            owner = str(lk.get("owner") or "")
+            if not owner or base_name(owner) in present:
+                continue
+            rows.append({
+                "agent": owner,
+                "function": lk.get("key") if lk.get("scope") == "fn" else "",
+                "file": lk.get("file") or (lk.get("key") if lk.get("scope") == "file" else ""),
+                "claimed_at": None, "task_status": "lease", "busy": True,
+            })
+            present.add(base_name(owner))
+    except Exception:
+        pass
+    # (b/c/d) idle roster members so the fleet is always fully represented
+    extra_names: list[str] = list(AGENT_ROSTER)
+    try:
+        lim = _load_json_obj(AGENT_LIMITS_JSON).get("agents", [])
+        extra_names += [str(a.get("name")) for a in lim if isinstance(a, dict)]
+    except Exception:
+        pass
+    extra_names += list((_load_json_obj(AGENT_TOKENS_JSON).get("agents", {}) or {}).keys())
+    for name in extra_names:
+        bn = base_name(name)
+        if bn and bn not in present:
+            rows.append({"agent": bn, "function": "", "file": "",
+                         "claimed_at": None, "task_status": "idle",
+                         "busy": flags.get(bn, False)})
+            present.add(bn)
+
     # token usage (.omc/agent_tokens.json) merged in per agent when names match
     tokens = _load_json_obj(AGENT_TOKENS_JSON).get("agents", {})
     if isinstance(tokens, dict):
@@ -1290,6 +1792,937 @@ def load_agents() -> dict[str, object]:
     }
 
 
+def load_locks() -> dict[str, object]:
+    """Read the SQLite fleet-lock DB (coordination/locks.db) for the live who-owns-what
+    view. Read-only and best-effort: missing DB / no sqlite3 just yields an empty table,
+    never an error. Expired rows are filtered out (and dropped) like the CLI does."""
+    import sqlite3  # stdlib; local import keeps the dashboard importable if ever absent
+
+    if not LOCKS_DB.exists():
+        return {"available": False, "locks": [], "files": [], "fns": [],
+                "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+    now = time.time()
+    rows: list[dict[str, object]] = []
+    try:
+        conn = sqlite3.connect(str(LOCKS_DB), timeout=5.0)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA busy_timeout=5000")
+        # reclaim expired rows opportunistically so the dashboard never shows ghosts
+        try:
+            conn.execute("DELETE FROM locks WHERE expires_at != 0 AND expires_at <= ?", (now,))
+            conn.commit()
+        except sqlite3.Error:
+            pass
+        cur = conn.execute("SELECT * FROM locks ORDER BY scope, acquired_at DESC")
+        for r in cur.fetchall():
+            d = dict(r)
+            exp = float(d.get("expires_at") or 0)
+            d["ttl_remaining"] = None if exp == 0 else max(0, round(exp - now))
+            d["age"] = round(now - float(d.get("acquired_at") or now))
+            rows.append(d)
+        conn.close()
+    except sqlite3.Error as exc:
+        return {"available": False, "error": str(exc), "locks": [],
+                "files": [], "fns": [], "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+    files = [r for r in rows if r.get("scope") == "file"]
+    fns = [r for r in rows if r.get("scope") == "fn"]
+    owners = sorted({str(r.get("owner") or "") for r in rows if r.get("owner")})
+    return {
+        "available": True,
+        "locks": rows,
+        "files": files,
+        "fns": fns,
+        "owners": owners,
+        "file_count": len(files),
+        "fn_count": len(fns),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+_LOCKS_MOD = None
+_CRACK_QUEUE_LOCK = threading.Lock()
+
+
+def locks_module():
+    """Import coordination/locks.py once (cached) so the dashboard's POST controls
+    reuse the exact same atomic acquire/release/renew/gc logic as the CLI."""
+    global _LOCKS_MOD
+    if _LOCKS_MOD is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("decomp_locks", COORD_DIR / "locks.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _LOCKS_MOD = mod
+    return _LOCKS_MOD
+
+
+def _read_json_list(path: Path) -> list[dict[str, object]]:
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if isinstance(data, list):
+        return [row for row in data if isinstance(row, dict)]
+    if isinstance(data, dict) and isinstance(data.get("jobs"), list):
+        return [row for row in data["jobs"] if isinstance(row, dict)]
+    return []
+
+
+def _write_json_list(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def load_crack_jobs(limit: int = 80) -> dict[str, object]:
+    rows = _read_json_list(CRACK_QUEUE_JSON)
+    rows.sort(key=lambda row: int_value(row.get("created_unix")) or timestamp_unix(row.get("created")), reverse=True)
+    counts = Counter(str(row.get("status") or "queued") for row in rows)
+    return {
+        "available": True,
+        "source": str(CRACK_QUEUE_JSON),
+        "lanes": CRACK_LANES,
+        "strategies": CRACK_STRATEGIES,
+        "counts": dict(counts),
+        "jobs": rows[:limit],
+        "total": len(rows),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _find_bash() -> str | None:
+    for env_name in ("BASH", "GIT_BASH"):
+        value = os.environ.get(env_name)
+        if value and Path(value).exists():
+            return value
+    for candidate in (
+        r"C:\Program Files\Git\usr\bin\bash.exe",
+        r"C:\Program Files\Git\bin\bash.exe",
+        r"C:\Program Files (x86)\Git\bin\bash.exe",
+    ):
+        if Path(candidate).exists():
+            return candidate
+    found = shutil.which("bash") or shutil.which("bash.exe")
+    return found
+
+
+def _run_tmux_script(script: str, args: list[str], timeout: int = 20) -> dict[str, object]:
+    bash = _find_bash()
+    script_path = TMUX_CONTROL / script
+    if not bash:
+        return {"ok": False, "error": "bash.exe not found"}
+    if not script_path.exists():
+        return {"ok": False, "error": f"tmux control script not found: {script}"}
+    try:
+        proc = subprocess.run(
+            [bash, str(script_path), *args],
+            cwd=str(ROOT),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"ok": False, "error": str(exc)}
+    return {
+        "ok": proc.returncode == 0,
+        "returncode": proc.returncode,
+        "stdout": (proc.stdout or "")[-8000:],
+        "stderr": (proc.stderr or "")[-3000:],
+    }
+
+
+def capture_tmux_pane(pane: str = "codex", lines: int = 80) -> dict[str, object]:
+    if pane not in {"codex", "claude", "status", "watcher", "pokedex"}:
+        return {"available": False, "error": "unknown pane", "pane": pane}
+    result = _run_tmux_script("capture_pane.sh", [pane, str(max(10, min(lines, 400)))], timeout=10)
+    return {
+        "available": bool(result.get("ok")),
+        "pane": pane,
+        "text": result.get("stdout", ""),
+        "error": result.get("error") or result.get("stderr", ""),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _crack_lane(lane_id: str) -> dict[str, object]:
+    for lane in CRACK_LANES:
+        if lane["id"] == lane_id:
+            return lane
+    return CRACK_LANES[0]
+
+
+def _crack_strategy(strategy_id: str) -> dict[str, object]:
+    for strategy in CRACK_STRATEGIES:
+        if strategy["id"] == strategy_id:
+            return strategy
+    return CRACK_STRATEGIES[0]
+
+
+def _find_fn_inc(src_path: Path, fn: str) -> str:
+    try:
+        text = src_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        text = ""
+    include_re = re.compile(rf'#include\s+"([^"]*{re.escape(fn)}[^"]*)"')
+    match = include_re.search(text)
+    if match:
+        inc = (src_path.parent / match.group(1)).resolve()
+        try:
+            return inc.relative_to(ROOT).as_posix()
+        except ValueError:
+            return str(inc)
+    guess = src_path.with_name(f"{src_path.stem}_fn_{fn.removeprefix('fn_')}.inc")
+    if guess.exists():
+        return guess.relative_to(ROOT).as_posix()
+    return ""
+
+
+def build_crack_prompt(job: dict[str, object]) -> str:
+    difficulty = job.get("difficulty") if isinstance(job.get("difficulty"), dict) else {}
+    diff_note = ""
+    if isinstance(difficulty, dict) and difficulty:
+        diff_note = (
+            f"\nDifficulty catalog: {difficulty.get('section')} rank {difficulty.get('rank') or 'n/a'}, "
+            f"size 0x{int_value(difficulty.get('size')):X}, current match {difficulty.get('match_pct')}%.\n"
+            f"Catalog note: {difficulty.get('note')}\n"
+        )
+    strategy = job.get("strategy_label") or job.get("strategy")
+    source = str(job.get("source") or "")
+    fn = str(job.get("fn") or "")
+    inc = str(job.get("inc") or "")
+    gs_field_warning = ""
+    if source.replace("\\", "/") == "src/game/gs_field_world.c":
+        gs_field_warning = "\nWARNING: AGENTS says gs_field_world.c is owned by a live codex session. Do not edit it unless ownership has changed; report the conflict instead.\n"
+    return (
+        f"Dashboard crack-lab job {job.get('id')}: attack {fn} in {source}.\n"
+        f"Lane: {job.get('lane_label')} ({job.get('lane_model')}). Strategy: {strategy}.\n"
+        f"{diff_note}{gs_field_warning}\n"
+        "Goal: improve honest decompilation/matching. Real C beats asm wrappers; never edit *_fn_*.inc; never fake-match by flipping real C back to an asm wrapper.\n\n"
+        "Suggested workflow:\n"
+        f"1. Inspect `{source}` around `{fn}` and sibling functions. Use existing externs/signatures first.\n"
+        f"2. If present, read target include `{inc}` only as truth material; do not edit it.\n"
+        f"3. Use `python tools/decompctx.py {source}` if context is needed.\n"
+        f"4. Measure with `python tools/match_scan_file.py {source} {fn}`; for claimed wins, run it twice.\n"
+        "5. Keep edits scoped to the source file and matching pragmas/types needed for this function.\n"
+        "6. Report raw match output, whether the function compiled, and any wall evidence.\n\n"
+        "If the strategy is `split giant`, first produce a slice/ownership plan and only edit after the plan is clear. "
+        "If the strategy is `contenders`, make an independent full-function attempt and preserve your reasoning in the final report."
+    )
+
+
+def send_crack_to_codex(job: dict[str, object]) -> dict[str, object]:
+    prompt = build_crack_prompt(job)
+    result = _run_tmux_script("send_to_codex_tui.sh", [prompt, "--capture-first"], timeout=25)
+    return result
+
+
+def open_tmux_window(pane: str = "codex") -> dict[str, object]:
+    if pane not in {"codex", "claude", "status", "watcher", "pokedex"}:
+        return {"ok": False, "error": "unknown pane"}
+    bash = _find_bash()
+    if not bash:
+        return {"ok": False, "error": "bash.exe not found"}
+    wt = shutil.which("wt") or shutil.which("wt.exe")
+    if not wt:
+        for candidate in (
+            Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "WindowsApps" / "wt.exe",
+            Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "WindowsApps" / "wt.exe",
+        ):
+            if candidate.exists():
+                wt = str(candidate)
+                break
+    if not wt:
+        return {"ok": False, "error": "Windows Terminal (wt.exe) not found"}
+    attach_script = TMUX_CONTROL / "attach_pane.sh"
+    if not attach_script.exists():
+        return {"ok": False, "error": "attach_pane.sh not found"}
+    try:
+        subprocess.Popen(
+            [wt, "new-tab", "--title", f"decomp {pane}", "-d", str(ROOT), bash, str(attach_script), pane],
+            cwd=str(ROOT),
+        )
+    except OSError as exc:
+        return {"ok": False, "error": str(exc)}
+    return {"ok": True, "pane": pane}
+
+
+def enqueue_crack_job(body: dict[str, object]) -> dict[str, object]:
+    fn = str(body.get("fn") or body.get("function") or "").strip()
+    if not fn or not FUNCTION_NAME_RE.match(fn):
+        return {"ok": False, "error": "valid function name required"}
+    source_in = str(body.get("source") or "").strip()
+    src_path = _resolve_source_path(source_in, fn)
+    if src_path is None:
+        return {"ok": False, "error": f"source not found for {fn}: {source_in}"}
+    try:
+        source = src_path.relative_to(ROOT).as_posix()
+    except ValueError:
+        source = str(src_path)
+    lane = _crack_lane(str(body.get("lane") or CRACK_LANES[0]["id"]))
+    strategy = _crack_strategy(str(body.get("strategy") or CRACK_STRATEGIES[0]["id"]))
+    now = time.time()
+    hard = hard_target_for(fn)
+    job = {
+        "id": f"crack-{time.strftime('%Y%m%d-%H%M%S', time.gmtime(now))}-{fn}-{uuid.uuid4().hex[:6]}",
+        "fn": fn,
+        "source": source,
+        "stem": src_path.stem,
+        "inc": _find_fn_inc(src_path, fn),
+        "lane": lane["id"],
+        "lane_label": lane["label"],
+        "lane_provider": lane["provider"],
+        "lane_model": lane["model"],
+        "strategy": strategy["id"],
+        "strategy_label": strategy["label"],
+        "status": "queued",
+        "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+        "created_unix": int(now),
+        "difficulty": hard,
+        "note": str(body.get("note") or ""),
+        "origin": "dashboard",
+    }
+    dry_run = bool(body.get("dry_run"))
+    if not dry_run:
+        with _CRACK_QUEUE_LOCK:
+            rows = _read_json_list(CRACK_QUEUE_JSON)
+            rows.append(job)
+            rows = rows[-500:]
+            _write_json_list(CRACK_QUEUE_JSON, rows)
+    launch = bool(body.get("launch"))
+    launch_result = None
+    if launch and not dry_run:
+        if lane.get("launch") == "tmux-codex":
+            launch_result = send_crack_to_codex(job)
+            job["status"] = "launched" if launch_result.get("ok") else "launch_error"
+            job["launch"] = {
+                "target": "codex",
+                "ok": launch_result.get("ok"),
+                "returncode": launch_result.get("returncode"),
+                "stderr": launch_result.get("stderr"),
+                "stdout": str(launch_result.get("stdout") or "")[-1200:],
+                "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
+        else:
+            job["status"] = "queued"
+            job["launch"] = {"ok": False, "error": f"{lane['label']} launcher is not wired yet"}
+        with _CRACK_QUEUE_LOCK:
+            rows = _read_json_list(CRACK_QUEUE_JSON)
+            for idx, row in enumerate(rows):
+                if row.get("id") == job["id"]:
+                    rows[idx] = job
+                    break
+            _write_json_list(CRACK_QUEUE_JSON, rows)
+    return {"ok": True, "job": job, "dry_run": dry_run, "launch": launch_result}
+
+
+# =========================================================================== #
+# Orchestrator data: SYNC / RUN / SHIP / PRS / leases / worker reports / quantum #
+# =========================================================================== #
+BAND_WINS_DIR = ROOT / "build" / "band_wins"
+PERMUTER_STATE = ROOT / ".omc" / "permuter_state.json"
+
+# Roster: agents that should ALWAYS appear in Agent Activity even with no live
+# claim (the old view only showed agents present in claims.json -> glm/codex).
+AGENT_ROSTER = ["claude", "codex", "deepseek", "glm", "mimo", "qwen", "opencode"]
+
+
+def _find_gh() -> str | None:
+    """Locate gh.exe — it's installed but not on PATH in this environment."""
+    import shutil as _sh
+    cand = _sh.which("gh")
+    if cand:
+        return cand
+    for p in (
+        Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "GitHub CLI" / "gh.exe",
+        Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")) / "GitHub CLI" / "gh.exe",
+        Path(os.environ.get("LOCALAPPDATA", "")) / "GitHubCLI" / "gh.exe",
+    ):
+        if p.exists():
+            return str(p)
+    return None
+
+
+GH_EXE = _find_gh()
+
+
+def _find_git() -> str:
+    """Resolve git.exe absolutely — the dashboard server is launched without git
+    on PATH (PowerShell Start-Process), unlike an interactive shell."""
+    import shutil as _sh
+    cand = _sh.which("git")
+    if cand:
+        return cand
+    for p in (
+        Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Git" / "cmd" / "git.exe",
+        Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Git" / "bin" / "git.exe",
+        Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Git" / "cmd" / "git.exe",
+    ):
+        if p.exists():
+            return str(p)
+    return "git"  # last resort: hope it's on PATH
+
+
+GIT_EXE = _find_git()
+# Put git's dir on PATH so gh (and any child) can find git even when the server
+# was launched without it on PATH.
+if GIT_EXE not in ("git", None) and os.path.dirname(GIT_EXE):
+    os.environ["PATH"] = os.path.dirname(GIT_EXE) + os.pathsep + os.environ.get("PATH", "")
+
+_CMD_CACHE: dict[str, tuple[float, object]] = {}
+
+
+def _cached(key: str, ttl: float, producer):
+    """Tiny TTL cache so per-request git/gh shell-outs don't slow the dashboard."""
+    now = time.time()
+    hit = _CMD_CACHE.get(key)
+    if hit and hit[0] > now:
+        return hit[1]
+    try:
+        val = producer()
+    except Exception as exc:  # never let a shell-out break a panel
+        val = {"available": False, "error": str(exc)}
+    _CMD_CACHE[key] = (now + ttl, val)
+    return val
+
+
+def _git(*args: str, timeout: int = 8) -> str:
+    proc = subprocess.run([GIT_EXE, *args], cwd=str(ROOT), capture_output=True,
+                          text=True, timeout=timeout)
+    return proc.stdout.strip()
+
+
+def _gh_json(args: list[str], timeout: int = 12):
+    if not GH_EXE:
+        raise RuntimeError("gh CLI not found")
+    env = dict(os.environ, GH_PROMPT_DISABLED="1", GH_PAGER="cat")
+    proc = subprocess.run([GH_EXE, *args], cwd=str(ROOT), capture_output=True,
+                          text=True, timeout=timeout, env=env)
+    if proc.returncode != 0:
+        raise RuntimeError((proc.stderr or "gh failed").strip()[:200])
+    return json.loads(proc.stdout or "[]")
+
+
+def load_sync() -> dict:
+    """Git posture vs origin/master: branch, ahead/behind, dirty, last fetch."""
+    def producer():
+        branch = _git("rev-parse", "--abbrev-ref", "HEAD") or "detached"
+        head = _git("rev-parse", "--short", "HEAD")
+        # ahead/behind vs the tracked remote master
+        ab = _git("rev-list", "--left-right", "--count", "origin/master...HEAD") or "0\t0"
+        try:
+            behind, ahead = (int(x) for x in ab.split())
+        except ValueError:
+            behind, ahead = 0, 0
+        dirty = len([l for l in _git("status", "--porcelain").splitlines() if l.strip()])
+        fetch_head = ROOT / ".git" / "FETCH_HEAD"
+        last_fetch = None
+        if fetch_head.exists():
+            last_fetch = int(now_minus(fetch_head.stat().st_mtime))
+        on_master = branch == "master"
+        up = "up to date with origin/master" if (ahead == 0 and behind == 0) \
+            else f"{ahead} ahead, {behind} behind origin/master"
+        return {
+            "available": True, "branch": branch, "head": head,
+            "ahead": ahead, "behind": behind, "dirty": dirty,
+            "on_master": on_master, "summary": up,
+            "last_fetch_secs": last_fetch,
+        }
+    return _cached("sync", 20, producer)
+
+
+def now_minus(ts: float) -> float:
+    return time.time() - ts
+
+
+def load_prs() -> dict:
+    """Open + recently-merged GitHub PRs via gh."""
+    def producer():
+        if not GH_EXE:
+            return {"available": False, "error": "gh CLI not found", "open": [], "merged": []}
+        fields = "number,title,state,headRefName,isDraft,reviewDecision,updatedAt,url"
+        opn = _gh_json(["pr", "list", "--state", "open", "--limit", "30", "--json", fields])
+        mrg = _gh_json(["pr", "list", "--state", "merged", "--limit", "10", "--json", fields])
+        repo = _cached("ghrepo", 600, lambda: _gh_json(["repo", "view", "--json", "nameWithOwner"]))
+        return {
+            "available": True,
+            "repo": (repo or {}).get("nameWithOwner", ""),
+            "open": opn, "merged": mrg,
+            "open_count": len(opn), "merged_count": len(mrg),
+            "draft_count": sum(1 for p in opn if p.get("isDraft")),
+        }
+    return _cached("prs", 45, producer)
+
+
+def load_band_wins() -> tuple[int, list[dict[str, object]]]:
+    confirmed = 0
+    files = []
+    if BAND_WINS_DIR.exists():
+        for f in sorted(BAND_WINS_DIR.glob("*.json")):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(d, dict):
+                continue
+            fns = [k for k in d if k != "_src"]
+            confirmed += len(fns)
+            if fns:
+                files.append({
+                    "file": f.name,
+                    "source": d.get("_src", ""),
+                    "count": len(fns),
+                    "functions": fns[:12],
+                })
+    return confirmed, files
+
+
+def load_ship() -> dict:
+    """Handoff readiness: confirmed band wins, regressions, branch posture."""
+    def producer():
+        confirmed, files = load_band_wins()
+        log = load_attempt_log(DECOMP_STATUS_LOG, limit=400)
+        regressions = sum(1 for r in log if r.get("kind") == "regression")
+        sync = load_sync()
+        ready = (not sync.get("on_master")) and confirmed > 0 and regressions == 0
+        if sync.get("on_master"):
+            state = "blocked: master"
+        elif regressions:
+            state = "blocked: regressions"
+        else:
+            state = "pr_ready" if ready else "no wins yet"
+        return {
+            "available": True, "confirmed": confirmed, "regressions": regressions,
+            "branch": sync.get("branch"), "on_master": sync.get("on_master"),
+            "state": state, "ready": ready, "files": files,
+        }
+    return _cached("ship", 25, producer)
+
+
+def load_leases() -> dict:
+    """Active leases (live locks) + queued work (coordination tasks.json)."""
+    locks = load_locks()
+    active = []
+    for lk in locks.get("locks", []):
+        active.append({
+            "scope": lk.get("scope"), "key": lk.get("key"), "owner": lk.get("owner"),
+            "file": lk.get("file"), "elapsed": lk.get("age"),
+            "ttl_remaining": lk.get("ttl_remaining"), "note": lk.get("note"),
+        })
+    queued = []
+    try:
+        tasks = json.loads(TASKS_JSON.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError):
+        tasks = []
+    if isinstance(tasks, list):
+        for t in tasks:
+            if isinstance(t, dict) and t.get("status") == "queued":
+                queued.append({
+                    "function": t.get("function"), "description": t.get("description"),
+                    "priority": t.get("priority", "normal"), "created": t.get("created"),
+                })
+    prio = {"high": 0, "normal": 1, "low": 2}
+    queued.sort(key=lambda q: (prio.get(q.get("priority"), 1), str(q.get("created") or "")))
+    return {
+        "available": True, "active": active, "queued": queued,
+        "active_count": len(active), "queued_count": len(queued),
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _report_status(row: dict) -> str:
+    """Classify an attempt-log entry into an orchestrator-style worker status."""
+    kind = row.get("kind")
+    msg = str(row.get("message", "")).upper()
+    pct = row.get("percent")
+    if kind == "regression" or "REGRESSION" in msg:
+        return "needs rework"
+    if kind == "match" or "MATCH!" in msg or (pct is not None and pct >= 100):
+        return "exact"
+    if kind == "commit" or "COMMIT" in msg:
+        return "committed"
+    if any(w in msg for w in ("ERROR", "FAILED", "TIMEOUT")):
+        return "tool error"
+    if "->" in msg or (pct is not None and pct > 0):
+        return "improved"
+    return "no progress"
+
+
+def load_reports(limit: int = 60) -> dict:
+    """Worker reports: most-recent attempt per (agent, function/unit) with a status."""
+    merged = merged_attempt_log(limit=1500)
+    seen: dict[tuple, dict] = {}
+    for row in merged:
+        agent = str(row.get("agent") or "?")
+        fn = str(row.get("function") or row.get("file") or "")
+        key = (agent, fn or row.get("message", "")[:40])
+        rep = {
+            "agent": agent,
+            "function": row.get("function") or "",
+            "file": row.get("file") or "",
+            "percent": row.get("percent"),
+            "status": _report_status(row),
+            "message": row.get("message", ""),
+            "timestamp": row.get("timestamp"),
+        }
+        seen[key] = rep   # later entries (more recent) win
+    reports = list(seen.values())[-limit:]
+    reports.reverse()
+    counts: dict[str, int] = {}
+    for r in reports:
+        counts[r["status"]] = counts.get(r["status"], 0) + 1
+    return {"available": bool(reports), "reports": reports, "counts": counts,
+            "total": len(reports), "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+
+def load_quantum() -> dict:
+    """Surface the decomp-permuter annealing swarm state (quantum_dash data)."""
+    if not PERMUTER_STATE.exists():
+        return {"available": False}
+    try:
+        d = json.loads(PERMUTER_STATE.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError) as exc:
+        return {"available": False, "error": str(exc)}
+    if not isinstance(d, dict):
+        return {"available": False}
+    return {"available": True, "state": d, "generated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+
+
+def load_attack_matrix(decomp: dict[str, object]) -> dict[str, object]:
+    """Rank work by unit so the dashboard directs the next attack, not just observes."""
+    units = decomp.get("units") if isinstance(decomp, dict) else []
+    if not isinstance(units, list):
+        units = []
+    enriched = []
+    for unit in units:
+        if not isinstance(unit, dict):
+            continue
+        counts = unit.get("function_status", {})
+        if not isinstance(counts, dict):
+            counts = {}
+        total_fns = int_value(unit.get("total_functions", 0))
+        matched_fns = int_value(unit.get("matched_functions", 0))
+        open_fns = max(0, total_fns - matched_fns)
+        open_code = max(0, int_value(unit.get("total_code", 0)) - int_value(unit.get("matched_code", 0)))
+        near = int_value(counts.get("near", 0))
+        partial = int_value(counts.get("partial", 0))
+        missing = int_value(counts.get("missing", 0))
+        if open_fns <= 0 and open_code <= 0:
+            continue
+        score = near * 12 + partial * 5 + missing * 2 + min(open_code / 2000.0, 20.0)
+        enriched.append({
+            "name": unit.get("name", ""),
+            "source": unit.get("source", ""),
+            "label": source_label(str(unit.get("source") or unit.get("name") or "")),
+            "code_pct": float_pct(unit.get("code_pct", 0)),
+            "fuzzy_pct": float_pct(unit.get("fuzzy_pct", 0)),
+            "functions_pct": float_pct(unit.get("functions_pct", 0)),
+            "open_fns": open_fns,
+            "open_code": open_code,
+            "near": near,
+            "partial": partial,
+            "missing": missing,
+            "score": round(score, 1),
+        })
+
+    def top_rows(predicate, key, limit=5):
+        return sorted([r for r in enriched if predicate(r)], key=key)[:limit]
+
+    near_targets = top_rows(lambda r: r["near"] > 0, lambda r: (-int(r["near"]), -float(r["fuzzy_pct"]), -int(r["open_code"])))
+    bulk_targets = top_rows(lambda r: r["missing"] + r["partial"] > 0, lambda r: (-int(r["open_code"]), -int(r["open_fns"])))
+    finish_targets = top_rows(lambda r: r["functions_pct"] >= 80 and r["open_fns"] > 0, lambda r: (int(r["open_fns"]), -float(r["functions_pct"])))
+    lanes = [
+        {
+            "id": "near",
+            "title": "Near-match finishers",
+            "count": sum(int(r["near"]) for r in enriched),
+            "note": "90-99.95% functions; highest ROI for byte-exact wins",
+            "command": "python tools/decomp_work/kg/bestof.py targets 12 --real-c-only",
+            "targets": near_targets,
+        },
+        {
+            "id": "bulk",
+            "title": "Bulk code-percent files",
+            "count": sum(int(r["open_code"]) for r in enriched),
+            "note": "largest unmatched byte pools; improves code percent fastest",
+            "command": "python tools/decomp_work/progress2.py --measure",
+            "targets": bulk_targets,
+        },
+        {
+            "id": "close",
+            "title": "Unit closeouts",
+            "count": len(finish_targets),
+            "note": "fewest functions left in already-strong units",
+            "command": "python tools/match_scan_file.py <src/file.c>",
+            "targets": finish_targets,
+        },
+    ]
+    try:
+        leases = load_leases()
+    except Exception:
+        leases = {}
+    try:
+        reports = load_reports(limit=30)
+    except Exception:
+        reports = {}
+    try:
+        ship = load_ship()
+    except Exception:
+        ship = {}
+    pipeline = [
+        {"stage": "Scout", "count": sum(1 for r in enriched if int(r["near"]) > 0), "note": "KG / report targets"},
+        {"stage": "Claim", "count": int_value(leases.get("queued_count", 0)), "note": "queued work"},
+        {"stage": "Work", "count": int_value(leases.get("active_count", 0)), "note": "active leases"},
+        {"stage": "Verify", "count": int_value((reports.get("counts") or {}).get("exact", 0)) if isinstance(reports.get("counts"), dict) else 0, "note": "exact reports"},
+        {"stage": "Ship", "count": int_value(ship.get("confirmed", 0)), "note": ship.get("state", "")},
+    ]
+    return {
+        "available": bool(enriched),
+        "lanes": lanes,
+        "pipeline": pipeline,
+        "top_units": sorted(enriched, key=lambda r: (-float(r["score"]), -int(r["open_code"])))[:12],
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def load_kg() -> dict[str, object]:
+    """Summarize the SQLite decomp knowledge graph for the web cockpit."""
+    import sqlite3
+
+    if not KG_DB.exists():
+        return {"available": False, "error": f"not found: {KG_DB}"}
+    try:
+        conn = sqlite3.connect(str(KG_DB), timeout=5.0)
+        conn.row_factory = sqlite3.Row
+        def has_table(name: str) -> bool:
+            return conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+                (name,),
+            ).fetchone() is not None
+
+        def scalar(sql: str, default: int = 0) -> int:
+            try:
+                row = conn.execute(sql).fetchone()
+            except sqlite3.Error:
+                return default
+            return int(row[0]) if row and row[0] is not None else default
+
+        counts = {
+            "functions": scalar("SELECT count(*) FROM functions"),
+            "levers": scalar("SELECT count(*) FROM levers"),
+            "cracked_edges": scalar("SELECT count(*) FROM cracked_by"),
+            "externals": scalar("SELECT count(*) FROM externals"),
+            "walls": scalar("SELECT count(*) FROM walls"),
+            "near": scalar("SELECT count(*) FROM functions WHERE byte_pct >= 90 AND byte_pct < 99.95"),
+            "calls": scalar("SELECT count(*) FROM function_calls") if has_table("function_calls") else 0,
+            "calltags": scalar("SELECT count(*) FROM function_tags") if has_table("function_tags") else 0,
+            "name_evidence": scalar("SELECT count(*) FROM name_evidence") if has_table("name_evidence") else 0,
+        }
+        top_levers = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT l.slug, l.title, l.opt_gated, count(c.id) AS cracks
+                FROM levers l
+                LEFT JOIN cracked_by c ON c.lever_slug = l.slug
+                GROUP BY l.slug
+                ORDER BY cracks DESC, l.slug
+                LIMIT 8
+                """
+            )
+        ]
+        wall_load = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT coalesce(nullif(wall_class, ''), '(none)') AS wall,
+                       count(*) AS n,
+                       round(avg(byte_pct), 1) AS avg_pct
+                FROM functions
+                WHERE status != 'DONE'
+                GROUP BY wall
+                ORDER BY n DESC, wall
+                LIMIT 8
+                """
+            )
+        ]
+        targets = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT addr, tu, round(byte_pct, 2) AS pct,
+                       status, coalesce(wall_class, '') AS wall_class
+                FROM functions
+                WHERE byte_pct >= 90 AND byte_pct < 99.95
+                ORDER BY byte_pct DESC, addr
+                LIMIT 12
+                """
+            )
+        ]
+        calltags = []
+        name_evidence = []
+        call_edges = []
+        relationship_graph = {"nodes": [], "edges": []}
+        if has_table("function_tags"):
+            calltags = [
+                dict(row) for row in conn.execute(
+                    """
+                    SELECT tag, confidence, count(*) AS functions,
+                           round(avg(score), 2) AS avg_score
+                    FROM function_tags
+                    WHERE kind='calltag'
+                    GROUP BY tag, confidence
+                    ORDER BY avg_score DESC, functions DESC, tag
+                    LIMIT 10
+                    """
+                )
+            ]
+        if has_table("name_evidence"):
+            name_evidence = [
+                dict(row) for row in conn.execute(
+                    """
+                    SELECT symbol, candidate, source, confidence,
+                           round(score, 2) AS score, evidence
+                    FROM name_evidence
+                    WHERE source IN ('calltag','tu','tu-neighbor','symbolmap-proposed','symbolmap-applied')
+                    ORDER BY score DESC, confidence DESC, symbol
+                    LIMIT 12
+                    """
+                )
+            ]
+        if has_table("function_calls"):
+            call_edges = [
+                dict(row) for row in conn.execute(
+                    """
+                    SELECT caller, callee, caller_tu, callee_tu,
+                           confidence, source, evidence
+                    FROM function_calls
+                    ORDER BY
+                      CASE confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+                      CASE source WHEN 'src-c' THEN 0 ELSE 1 END,
+                      caller, callee
+                    LIMIT 16
+                    """
+                )
+            ]
+            graph_edges = [
+                dict(row) for row in conn.execute(
+                    """
+                    SELECT caller, callee, caller_tu, callee_tu,
+                           confidence, source
+                    FROM function_calls
+                    WHERE caller_tu IS NOT NULL AND caller_tu != ''
+                    ORDER BY
+                      CASE confidence WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+                      caller, callee
+                    LIMIT 24
+                    """
+                )
+            ]
+            nodes: dict[str, dict[str, object]] = {}
+            graph: list[dict[str, object]] = []
+            for row in graph_edges:
+                caller = str(row.get("caller") or "")
+                callee = str(row.get("callee") or "")
+                caller_tu = str(row.get("caller_tu") or "")
+                callee_tu = str(row.get("callee_tu") or "")
+                for tu, fn in ((caller_tu, caller), (callee_tu, callee)):
+                    if tu:
+                        nodes.setdefault(f"tu:{tu}", {
+                            "id": f"tu:{tu}", "label": tu.rsplit("/", 1)[-1],
+                            "kind": "class", "tu": tu,
+                        })
+                    if fn:
+                        nodes.setdefault(fn, {
+                            "id": fn, "label": fn,
+                            "kind": "named" if not fn.startswith("fn_") else "function",
+                            "tu": tu,
+                        })
+                    if tu and fn:
+                        graph.append({"from": f"tu:{tu}", "to": fn, "kind": "contains", "confidence": "high"})
+                if caller and callee:
+                    graph.append({
+                        "from": caller, "to": callee, "kind": "calls",
+                        "confidence": row.get("confidence") or "", "source": row.get("source") or "",
+                    })
+            relationship_graph = {"nodes": list(nodes.values())[:48], "edges": graph[:72]}
+        tu_rollup = [
+            dict(row) for row in conn.execute(
+                """
+                SELECT tu,
+                       count(*) AS total,
+                       sum(CASE WHEN status = 'DONE' THEN 1 ELSE 0 END) AS done,
+                       sum(CASE WHEN byte_pct >= 90 AND byte_pct < 99.95 THEN 1 ELSE 0 END) AS near,
+                       sum(CASE WHEN status = 'WALL' THEN 1 ELSE 0 END) AS walls,
+                       round(avg(byte_pct), 1) AS avg_pct
+                FROM functions
+                GROUP BY tu
+                ORDER BY near DESC, total DESC
+                LIMIT 8
+                """
+            )
+        ]
+        conn.close()
+    except sqlite3.Error as exc:
+        return {"available": False, "error": str(exc)}
+    return {
+        "available": True,
+        "counts": counts,
+        "top_levers": top_levers,
+        "wall_load": wall_load,
+        "targets": targets,
+        "calltags": calltags,
+        "name_evidence": name_evidence,
+        "call_edges": call_edges,
+        "relationship_graph": relationship_graph,
+        "tu_rollup": tu_rollup,
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def prepare_handoff() -> dict:
+    """Push the current (non-master) branch and open/show its GitHub PR.
+
+    Enforces the PR workflow: refuses to operate from master (agents must branch).
+    Commits nothing — only pushes existing commits and opens the PR for review."""
+    branch = _git("rev-parse", "--abbrev-ref", "HEAD")
+    if branch == "master":
+        return {"ok": False, "error": "On master — create a feature branch first; "
+                "agents must commit to a branch and open a PR, not master."}
+    if not GH_EXE:
+        return {"ok": False, "error": "gh CLI not found"}
+    try:
+        ahead = int(_git("rev-list", "--count", "origin/master..HEAD") or "0")
+    except ValueError:
+        ahead = 0
+    if ahead == 0:
+        return {"ok": False, "error": f"Branch '{branch}' has no commits ahead of origin/master."}
+    env = dict(os.environ, GH_PROMPT_DISABLED="1", GH_PAGER="cat")
+    try:
+        push = subprocess.run([GIT_EXE, "push", "-u", "origin", branch], cwd=str(ROOT),
+                              capture_output=True, text=True, timeout=120)
+        if push.returncode != 0:
+            return {"ok": False, "error": ("git push failed: " + (push.stderr or ""))[:240]}
+        view = subprocess.run([GH_EXE, "pr", "view", "--json", "url", "-q", ".url"],
+                              cwd=str(ROOT), capture_output=True, text=True, timeout=30, env=env)
+        url = (view.stdout or "").strip()
+        if not url:
+            create = subprocess.run([GH_EXE, "pr", "create", "--fill", "--head", branch],
+                                    cwd=str(ROOT), capture_output=True, text=True, timeout=60, env=env)
+            url = ""
+            for line in (create.stdout or "").splitlines():
+                if line.startswith("http"):
+                    url = line.strip()
+            if create.returncode != 0 and not url:
+                return {"ok": False, "error": (create.stderr or "pr create failed")[:240]}
+        for k in ("prs", "sync", "ship"):
+            _CMD_CACHE.pop(k, None)
+        return {"ok": True, "branch": branch, "ahead": ahead, "url": url}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 # =========================================================================== #
 # v10: token-expense-over-time — multi-source hourly collector                #
 #   (a) CLAUDE   ~/.claude/projects/<repo>/**/*.jsonl  (primary, richest)     #
@@ -1303,11 +2736,16 @@ SOURCE_KEYS = ("claude", "opencode", "codex")
 # Model -> chart source bucket. Anything unmatched falls through to "opencode"
 # (every model in the WSL db is an opencode-run worker).
 _OPENCODE_MODEL_TAGS = ("mimo", "deepseek", "glm", "qwen", "kimi", "nemotron")
+try:
+    OPENCODE_PROBE_TIMEOUT_SECONDS = float(os.environ.get("DASH_OPENCODE_TIMEOUT_SECONDS", "8"))
+except ValueError:
+    OPENCODE_PROBE_TIMEOUT_SECONDS = 8.0
 
 
 def _new_bucket() -> dict[str, float]:
     b: dict[str, float] = {k: 0.0 for k in SOURCE_KEYS}
     b["claude_cache_read"] = 0.0
+    b["codex_cache_read"] = 0.0
     b["codex_events"] = 0.0
     return b
 
@@ -1381,7 +2819,7 @@ def _collect_opencode(buckets: dict[int, dict[str, float]], cutoff: float,
     try:
         proc = subprocess.run(
             ["wsl", "bash", "-lc", "python3 -"],
-            input=script, capture_output=True, text=True, timeout=30,
+            input=script, capture_output=True, text=True, timeout=OPENCODE_PROBE_TIMEOUT_SECONDS,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         return {"available": False, "reason": f"wsl call failed: {exc}"}
@@ -1409,34 +2847,168 @@ def _collect_opencode(buckets: dict[int, dict[str, float]], cutoff: float,
     return {"available": total > 0, "total": total, "rows": len(rows)}
 
 
-def _collect_codex(buckets: dict[int, dict[str, float]], cutoff: float) -> dict[str, object]:
-    """Codex history.jsonl has no token counts — only prompt events (session_id,
-    ts unix, text). Bucket as an ACTIVITY event count so the timeline shows codex
-    is alive even without token precision."""
-    if not CODEX_HISTORY.exists():
-        return {"available": False, "events": 0, "reason": "codex history not found"}
-    events = 0
+def _path_is_in_repo(value: object) -> bool:
+    if not isinstance(value, str) or not value:
+        return False
     try:
-        with open(CODEX_HISTORY, encoding="utf-8", errors="replace") as fh:
-            for line in fh:
-                try:
-                    d = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                ts = d.get("ts")
-                if not isinstance(ts, (int, float)) or ts < cutoff:
-                    continue
-                hour = int(ts // 3600) * 3600
-                b = buckets.setdefault(hour, _new_bucket())
-                b["codex_events"] += 1
-                events += 1
-    except OSError:
-        return {"available": False, "events": 0, "reason": "codex history unreadable"}
-    return {"available": events > 0, "events": events}
+        root = os.path.normcase(str(ROOT.resolve()))
+        candidate = os.path.normcase(os.path.abspath(value))
+    except (OSError, ValueError):
+        return False
+    return candidate == root or candidate.startswith(root + os.sep)
+
+
+def _codex_payload_matches_repo(payload: dict[str, object]) -> bool:
+    if _path_is_in_repo(payload.get("cwd")):
+        return True
+    roots = payload.get("workspace_roots")
+    if not isinstance(roots, list):
+        return False
+    for item in roots:
+        if isinstance(item, str) and _path_is_in_repo(item):
+            return True
+        if isinstance(item, dict):
+            for key in ("root", "path", "cwd"):
+                if _path_is_in_repo(item.get(key)):
+                    return True
+    return False
+
+
+def _codex_payload_model(payload: dict[str, object]) -> str:
+    model = payload.get("model")
+    if isinstance(model, str) and model:
+        return model
+    mode = payload.get("collaboration_mode")
+    if isinstance(mode, dict):
+        settings = mode.get("settings")
+        if isinstance(settings, dict):
+            model = settings.get("model")
+            if isinstance(model, str) and model:
+                return model
+    return ""
+
+
+def _usage_total_tokens(usage: dict[str, object]) -> int:
+    total = int_value(usage.get("total_tokens"))
+    if total > 0:
+        return total
+    return int_value(usage.get("input_tokens")) + int_value(usage.get("output_tokens"))
+
+
+def _collect_codex(buckets: dict[int, dict[str, float]], cutoff: float,
+                   by_model: dict[str, float]) -> dict[str, object]:
+    """Bucket Codex prompt activity plus real token usage from session JSONL logs.
+
+    history.jsonl still only has prompt events; recent session rollouts also emit
+    payload.info.last_token_usage after each model response, which is the per-turn
+    token count we can safely sum without double-counting cumulative totals.
+    """
+    events = 0
+    history_reason = ""
+    if CODEX_HISTORY.exists():
+        try:
+            with open(CODEX_HISTORY, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    try:
+                        d = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    ts = d.get("ts")
+                    if not isinstance(ts, (int, float)) or ts < cutoff:
+                        continue
+                    hour = int(ts // 3600) * 3600
+                    b = buckets.setdefault(hour, _new_bucket())
+                    b["codex_events"] += 1
+                    events += 1
+        except OSError:
+            history_reason = "codex history unreadable"
+    else:
+        history_reason = "codex history not found"
+
+    files = 0
+    project_files = 0
+    token_events = 0
+    total = 0
+    if CODEX_SESSIONS_DIR.exists():
+        for path in CODEX_SESSIONS_DIR.rglob("*.jsonl"):
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            if stat.st_mtime < cutoff - 86400:
+                continue
+            files += 1
+            project_session = None
+            counted_project_file = False
+            current_model = "codex"
+            try:
+                with open(path, encoding="utf-8", errors="replace") as fh:
+                    for line in fh:
+                        try:
+                            d = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        payload = d.get("payload")
+                        if not isinstance(payload, dict):
+                            continue
+                        if d.get("type") in ("session_meta", "turn_context"):
+                            if _codex_payload_matches_repo(payload):
+                                project_session = True
+                                if not counted_project_file:
+                                    project_files += 1
+                                    counted_project_file = True
+                            elif project_session is None and payload.get("cwd"):
+                                project_session = False
+                            model = _codex_payload_model(payload)
+                            if model:
+                                current_model = model
+                        if project_session is False:
+                            continue
+                        info = payload.get("info")
+                        if not isinstance(info, dict):
+                            continue
+                        usage = info.get("last_token_usage")
+                        if not isinstance(usage, dict):
+                            continue
+                        ts = _parse_iso(d.get("timestamp"))
+                        if not ts or ts < cutoff:
+                            continue
+                        tok = _usage_total_tokens(usage)
+                        if tok <= 0:
+                            continue
+                        if project_session is None:
+                            project_session = True
+                            if not counted_project_file:
+                                project_files += 1
+                                counted_project_file = True
+                        hour = int(ts // 3600) * 3600
+                        b = buckets.setdefault(hour, _new_bucket())
+                        b["codex"] += tok
+                        b["codex_cache_read"] += int_value(usage.get("cached_input_tokens"))
+                        by_model[current_model] += tok
+                        token_events += 1
+                        total += tok
+            except OSError:
+                continue
+
+    meta: dict[str, object] = {
+        "available": total > 0 or events > 0,
+        "events": events,
+        "token_events": token_events,
+        "total": total,
+        "files": files,
+        "project_files": project_files,
+    }
+    if history_reason and not meta["available"]:
+        meta["reason"] = history_reason
+    if not CODEX_SESSIONS_DIR.exists():
+        meta["sessions_reason"] = "codex sessions dir not found"
+    return meta
 
 
 _TOKENS_CACHE: dict[str, object] = {"value": None, "expires": 0.0}
 _TOKENS_CACHE_TTL = 120.0
+_TOKENS_CACHE_LOCK = threading.Lock()
 
 
 def collect_tokens(hours: int = 168) -> dict[str, object]:
@@ -1448,23 +3020,25 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
 
     claude_meta = _collect_claude(buckets, cutoff, by_model)
     opencode_meta = _collect_opencode(buckets, cutoff, by_model)
-    codex_meta = _collect_codex(buckets, cutoff)
+    codex_meta = _collect_codex(buckets, cutoff, by_model)
 
     series = []
     for hour in sorted(buckets):
         b = buckets[hour]
         claude = int(b["claude"])
         opencode = int(b["opencode"])
+        codex = int(b["codex"])
         codex_ev = int(b["codex_events"])
-        total = claude + opencode
+        total = claude + opencode + codex
         series.append({
             "unix": hour,
-            "by_source": {"claude": claude, "opencode": opencode, "codex": codex_ev},
+            "by_source": {"claude": claude, "opencode": opencode, "codex": codex},
             "claude": claude,
             "opencode": opencode,
+            "codex": codex,
             "codex_events": codex_ev,
             "cache_read": int(b["claude_cache_read"]),
-            "input": claude + opencode,   # legacy field for older clients
+            "input": total,   # legacy field for older clients
             "output": 0,
             "total": total,
         })
@@ -1472,8 +3046,13 @@ def collect_tokens(hours: int = 168) -> dict[str, object]:
     totals = {
         "claude": int(claude_meta.get("total", 0)),
         "opencode": int(opencode_meta.get("total", 0)),
+        "codex": int(codex_meta.get("total", 0)),
         "codex_events": int(codex_meta.get("events", 0)),
-        "all_tokens": int(claude_meta.get("total", 0)) + int(opencode_meta.get("total", 0)),
+        "all_tokens": (
+            int(claude_meta.get("total", 0))
+            + int(opencode_meta.get("total", 0))
+            + int(codex_meta.get("total", 0))
+        ),
     }
     # agent_tokens.json cumulative fallback (per-agent lifetime totals).
     agent_tokens = _load_json_obj(AGENT_TOKENS_JSON).get("agents", {})
@@ -1530,24 +3109,32 @@ def load_tokens(hours: int = 168) -> dict[str, object]:
     if cached is not None and now < float(_TOKENS_CACHE.get("expires", 0)):
         full = cached  # type: ignore[assignment]
     else:
-        try:
-            full = collect_tokens(hours=24 * 30)
-        except Exception:  # noqa: BLE001
-            full = None
-        if not full or not full.get("available"):
-            persisted = _load_token_history()
-            if persisted.get("available"):
-                full = persisted
-        if full is None:
-            full = {"available": False, "buckets": [], "reason": "no token sources reachable"}
-        _TOKENS_CACHE["value"] = full
-        _TOKENS_CACHE["expires"] = now + _TOKENS_CACHE_TTL
+        with _TOKENS_CACHE_LOCK:
+            now = time.monotonic()
+            cached = _TOKENS_CACHE.get("value")
+            if cached is not None and now < float(_TOKENS_CACHE.get("expires", 0)):
+                full = cached  # type: ignore[assignment]
+            else:
+                try:
+                    full = collect_tokens(hours=24 * 30)
+                except Exception:  # noqa: BLE001
+                    full = None
+                if not full or not full.get("available"):
+                    persisted = _load_token_history()
+                    if persisted.get("available"):
+                        full = persisted
+                if full is None:
+                    full = {"available": False, "buckets": [], "reason": "no token sources reachable"}
+                _TOKENS_CACHE["value"] = full
+                _TOKENS_CACHE["expires"] = time.monotonic() + _TOKENS_CACHE_TTL
 
     cutoff = time.time() - hours * 3600
     buckets = [b for b in (full.get("buckets") or []) if Number_ge(b.get("unix"), cutoff)]
     out = dict(full)
     out["buckets"] = buckets
     out["window_hours"] = hours
+    out["totals"] = _series_token_totals(buckets, out.get("totals") if isinstance(out.get("totals"), dict) else None)
+    out["grand_total"] = out["totals"]["all_tokens"]
     return out
 
 
@@ -1558,6 +3145,25 @@ def Number_ge(v: object, cutoff: float) -> bool:
         return False
 
 
+def _series_token_totals(series: list[dict[str, object]],
+                         base_totals: dict[str, object] | None = None) -> dict[str, int]:
+    totals = dict(base_totals or {})
+    claude = sum(int_value(b.get("claude")) for b in series)
+    opencode = sum(int_value(b.get("opencode")) for b in series)
+    codex = sum(int_value(b.get("codex")) for b in series)
+    codex_events = sum(int_value(b.get("codex_events")) for b in series)
+    window_totals = {
+        "claude": claude,
+        "opencode": opencode,
+        "codex": codex,
+        "codex_events": codex_events,
+        "all_tokens": claude + opencode + codex,
+    }
+    if "agent_tokens_cumulative" in totals:
+        window_totals["agent_tokens_cumulative"] = int_value(totals.get("agent_tokens_cumulative"))
+    return window_totals
+
+
 def _parse_iso(ts: object) -> float:
     """Parse an ISO-8601 UTC string (trailing Z optional) -> unix seconds, or 0."""
     if not isinstance(ts, str) or not ts:
@@ -1566,6 +3172,49 @@ def _parse_iso(ts: object) -> float:
         return time.mktime(time.strptime(ts.replace("Z", "").split(".")[0], "%Y-%m-%dT%H:%M:%S")) - time.timezone
     except (ValueError, OverflowError):
         return 0.0
+
+
+HST = timezone(timedelta(hours=-10))
+
+
+def next_hst_reset(hour: int, minute: int = 0) -> int:
+    now_utc = datetime.now(timezone.utc)
+    now_hst = now_utc.astimezone(HST)
+    candidate = now_hst.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    if candidate <= now_hst:
+        candidate += timedelta(days=1)
+    return int(candidate.astimezone(timezone.utc).timestamp())
+
+
+def next_utc_reset(hour: int, minute: int = 0) -> int:
+    now_utc = datetime.now(timezone.utc)
+    candidate = now_utc.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    if candidate <= now_utc:
+        candidate += timedelta(days=1)
+    return int(candidate.timestamp())
+
+
+def default_limit_agents() -> list[dict[str, object]]:
+    return [
+        {
+            "name": "claude-code",
+            "label": "Claude Code",
+            "kind": "daily",
+            "next_reset_unix": next_hst_reset(7),
+            "note": "Project plan expects Claude to refresh around 07:00 HST.",
+            "models": ["claude-opus", "claude-sonnet", "claude-fable"],
+            "assumed": True,
+        },
+        {
+            "name": "glm-coding-plan",
+            "label": "GLM Coding Plan",
+            "kind": "daily",
+            "next_reset_unix": next_utc_reset(0),
+            "note": "Assumed daily coding-plan reset at 00:00 UTC; edit agent_limits.json if provider cadence differs.",
+            "models": ["glm-5.1", "glm-5.1:cloud", "glm-5.2"],
+            "assumed": True,
+        },
+    ]
 
 
 def load_limits() -> dict[str, object]:
@@ -1587,6 +3236,12 @@ def load_limits() -> dict[str, object]:
                 # roll forward from last_reset to the first reset strictly in the future
                 k = max(0, int((now - last) // step) + 1)
                 next_unix = last + k * step
+        if not next_unix:
+            name = str(a.get("name") or "").lower()
+            if name == "claude-code":
+                next_unix = next_hst_reset(7)
+            elif name == "glm-coding-plan":
+                next_unix = next_utc_reset(0)
         out.append({
             "name": a.get("name", ""),
             "label": a.get("label", a.get("name", "")),
@@ -1595,6 +3250,26 @@ def load_limits() -> dict[str, object]:
             "next_reset_unix": int(next_unix) if next_unix else 0,
             "seconds_until": int(next_unix - now) if next_unix else 0,
             "note": a.get("note", ""),
+            "models": a.get("models", []),
+            "assumed": bool(a.get("assumed", False)),
+        })
+    present = {str(a.get("name") or "").lower() for a in out}
+    for a in default_limit_agents():
+        name = str(a.get("name") or "").lower()
+        family = name.split("-", 1)[0]
+        if name in present or family in present:
+            continue
+        next_unix = int_value(a.get("next_reset_unix"))
+        out.append({
+            "name": a.get("name", ""),
+            "label": a.get("label", a.get("name", "")),
+            "kind": a.get("kind", ""),
+            "reset_interval_hours": a.get("reset_interval_hours"),
+            "next_reset_unix": next_unix,
+            "seconds_until": int(next_unix - now) if next_unix else 0,
+            "note": a.get("note", ""),
+            "models": a.get("models", []),
+            "assumed": bool(a.get("assumed", False)),
         })
     return {
         "available": bool(out),
@@ -1628,8 +3303,8 @@ HTML = r"""<!doctype html>
       --red: #e07171;
       --violet: #a98ee6;
       --steel: #8da0b8;
-      --shadow: 0 18px 42px rgba(0, 0, 0, .28);
-      --radius: 8px;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .22);
+      --radius: 4px;
     }
     * { box-sizing: border-box; }
     body {
@@ -1638,10 +3313,7 @@ HTML = r"""<!doctype html>
       font-size: 14px;
       line-height: 1.35;
       letter-spacing: 0;
-      background:
-        linear-gradient(180deg, rgba(240, 179, 90, .08), transparent 220px),
-        radial-gradient(circle at 12% -20%, rgba(56, 185, 149, .14), transparent 260px),
-        var(--bg);
+      background: var(--bg);
       color: var(--ink);
     }
     button, input, select {
@@ -1759,6 +3431,42 @@ HTML = r"""<!doctype html>
     .btn.ghost {
       background: transparent;
     }
+    .btn.xs {
+      height: 24px;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+    }
+    .btn.danger {
+      border-color: #6e3030;
+      color: #f0b4b4;
+    }
+    .btn.danger:hover { background: #3a1e1e; }
+    .btn.panel-action {
+      height: 24px;
+      padding: 0 9px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: auto;
+    }
+    .lock-scope {
+      display: inline-block;
+      min-width: 34px;
+      text-align: center;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      border: 1px solid var(--line-strong);
+    }
+    .lock-scope.file { color: #cfe0ff; background: rgba(92, 145, 223, .16); border-color: #3a567f; }
+    .lock-scope.fn { color: #cdebde; background: rgba(56, 185, 149, .15); border-color: #2f6e5a; }
+    .lock-actions { white-space: nowrap; text-align: right; }
+    .lock-actions .btn + .btn { margin-left: 5px; }
+    .lock-table td { vertical-align: middle; }
     main {
       padding: 18px 24px 30px;
       max-width: 1680px;
@@ -1771,7 +3479,7 @@ HTML = r"""<!doctype html>
       margin-bottom: 12px;
     }
     .metric, .panel, .detail-panel {
-      background: linear-gradient(180deg, rgba(255, 255, 255, .03), transparent), var(--panel);
+      background: var(--panel);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -2276,7 +3984,7 @@ HTML = r"""<!doctype html>
     }
     .treemap-controls {
       display: grid;
-      grid-template-columns: minmax(160px, 1fr) auto auto auto;
+      grid-template-columns: minmax(160px, 1fr) minmax(150px, 210px) auto auto auto;
       gap: 8px;
       align-items: center;
     }
@@ -2421,7 +4129,7 @@ HTML = r"""<!doctype html>
     }
     .function-row {
       display: grid;
-      grid-template-columns: minmax(150px, 1fr) 72px 72px 82px;
+      grid-template-columns: minmax(150px, 1fr) 72px 72px 82px minmax(70px, .55fr);
       gap: 8px;
       align-items: center;
       padding: 7px 8px;
@@ -2593,6 +4301,125 @@ HTML = r"""<!doctype html>
       background: var(--panel-2);
       padding: 12px;
     }
+    .crack-card {
+      border-color: #31513e;
+      background:
+        linear-gradient(135deg, rgba(63,185,80,.10), rgba(13,20,31,.20) 42%),
+        var(--panel-2);
+    }
+    .crack-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .crack-title b {
+      color: #eef4fb;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .crack-title span {
+      color: var(--quiet);
+      font: 10.5px Consolas, "Courier New", monospace;
+    }
+    .crack-field {
+      margin-top: 9px;
+    }
+    .crack-field label {
+      display: block;
+      color: var(--quiet);
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .crack-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+    }
+    .crack-choice {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #0d141f;
+      color: #cbd7e6;
+      font: 700 10.5px Consolas, "Courier New", monospace;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .crack-choice.active {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      background: rgba(63,185,80,.12);
+      box-shadow: inset 0 0 0 1px rgba(63,185,80,.15);
+    }
+    .crack-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .crack-status {
+      min-height: 18px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+    .crack-job-list {
+      display: grid;
+      gap: 5px;
+      max-height: 150px;
+      overflow: auto;
+      margin-top: 8px;
+    }
+    .crack-job {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 6px;
+      border-top: 1px solid var(--line);
+      padding-top: 5px;
+      font-size: 11px;
+    }
+    .crack-job span:first-child {
+      color: var(--accent);
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .terminal-card pre {
+      max-height: 220px;
+      overflow: auto;
+      margin: 8px 0 0;
+      padding: 9px;
+      border: 1px solid #263244;
+      border-radius: 4px;
+      background: #05080d;
+      color: #9ee6ba;
+      font: 11px/1.35 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+    .difficulty-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      border: 1px solid #314157;
+      border-radius: 4px;
+      padding: 2px 5px;
+      color: #cbd7e6;
+      font: 10px Consolas, "Courier New", monospace;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .difficulty-chip.wall { color: #ffaaaa; border-color: rgba(224,113,113,.45); }
+    .difficulty-chip.asm { color: #ffd28a; border-color: rgba(240,179,90,.45); }
+    .difficulty-chip.near { color: #a9caff; border-color: rgba(92,145,223,.45); }
+    .difficulty-chip.giant { color: #d6c6ff; border-color: rgba(169,142,230,.45); }
     .wall-banner {
       display: inline-flex;
       align-items: center;
@@ -2768,61 +4595,564 @@ HTML = r"""<!doctype html>
       .agent-table th:nth-child(4), .agent-table td:nth-child(4) { display: none; }
       .token-stat { flex: 1 1 40%; }
     }
+
+    /* ===================================================================== */
+    /* ORCHESTRATOR RESKIN — near-black, monospace, single-green accent,      */
+    /* sharp rectangular cards, 3-column app shell. Appended last so these    */
+    /* rules win over the originals without editing each in place.           */
+    /* ===================================================================== */
+    :root {
+      --bg: #080b10;
+      --band: #0c111a;
+      --panel: #0e141d;
+      --panel-2: #0a0e15;
+      --ink: #d4dee9;
+      --muted: #8593a6;
+      --quiet: #5d6b7d;
+      --line: #1a2330;
+      --line-strong: #2a3644;
+      --accent: #3fb950;
+      --accent-dim: #2ea043;
+      --shadow: none;
+      --radius: 3px;
+    }
+    body { background: var(--bg); font-size: 13px; }
+    h1, h2, .rail-card-head, .rail-head, .panel-title h2, .metric-label,
+    .stat-k, .stat-v, .agent-table th, .tab-btn, .lock-scope, .panel-note {
+      font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    }
+    h2, .panel-title h2 { letter-spacing: .07em; font-size: 12px; color: var(--ink); }
+
+    /* ---- app shell ---- */
+    .app {
+      display: grid;
+      grid-template-columns: 296px minmax(0, 1fr) 360px;
+      align-items: start;
+      min-height: 100vh;
+    }
+    .rail {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      padding: 13px;
+      background: var(--panel-2);
+      border-right: 1px solid var(--line);
+    }
+    .rail-right { border-right: 0; border-left: 1px solid var(--line); }
+    main.work { max-width: none; margin: 0; padding: 14px 16px 26px; min-width: 0; }
+
+    /* ---- left rail cards ---- */
+    .rail-brand {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 11px; border-bottom: 1px solid var(--line);
+    }
+    .rail-brand-mark {
+      width: 26px; height: 26px; flex: 0 0 26px;
+      display: grid; place-items: center;
+      border: 1px solid var(--accent-dim); border-radius: 3px;
+      color: var(--accent); font-size: 14px;
+    }
+    .rail-brand h1 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+    .rail-brand .subtitle { font-size: 10px; color: var(--quiet); display: block; }
+    .rail-brand .subtitle span { display: inline; margin-right: 6px; }
+    .rail-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 10px;
+    }
+    .rail-card-head {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 9px;
+    }
+    .rail-num {
+      display: inline-grid; place-items: center;
+      width: 15px; height: 15px; flex: 0 0 15px;
+      border: 1px solid var(--line-strong); border-radius: 3px;
+      font-size: 9px; color: var(--accent);
+    }
+    .stat-list { display: flex; flex-direction: column; gap: 4px; }
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 10px; padding: 2px 0;
+      border-bottom: 1px dotted var(--line);
+    }
+    .stat-row:last-child { border-bottom: 0; }
+    .stat-k { color: var(--quiet); font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; }
+    .stat-v { color: var(--ink); font-weight: 700; font-size: 13px; }
+    .stat-v.hud-good { color: var(--accent); }
+    .stat-v.hud-warn { color: #d2a24a; }
+    .stat-v.hud-bad  { color: #d56a6a; }
+    .ctl-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .ctl-row select { height: 26px; }
+    .btn.block { width: 100%; justify-content: center; display: inline-flex; align-items: center; }
+    .proj-name { font: 700 14px "Cascadia Mono", Consolas, monospace; color: var(--ink); }
+    .proj-sub { font-size: 11px; color: var(--quiet); margin-top: 3px; }
+
+    /* vertical tabs inside the VIEW card */
+    .rail .tabs { display: flex; flex-direction: column; gap: 4px; }
+    .rail .tab-btn {
+      width: 100%; text-align: left; height: 30px; border-radius: 3px;
+      border: 1px solid transparent; background: transparent; color: var(--muted);
+      padding: 0 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .rail .tab-btn:hover { background: #121a24; color: var(--ink); }
+    .rail .tab-btn.active {
+      background: rgba(63, 185, 80, .12);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      box-shadow: none;
+    }
+
+    /* ---- right rail ---- */
+    .rail-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); padding: 2px 2px 9px; border-bottom: 1px solid var(--line);
+    }
+    .rail-head-note { color: var(--quiet); letter-spacing: .02em; }
+    .rail-right .panel { border-radius: var(--radius); }
+
+    /* ---- cards / panels: sharp + flat ---- */
+    .metric, .panel, .detail-panel, .hud-strip, .rail-card {
+      box-shadow: none;
+      border-radius: var(--radius);
+    }
+    .panel { border-color: var(--line); }
+    #decomp-metrics { display: none; }   /* numbers live in the left STATUS card now */
+    .btn { border-radius: 3px; }
+    .btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #06140a; }
+    .agent-table th { color: var(--muted); }
+
+    @media (max-width: 1200px) {
+      .app { grid-template-columns: 1fr; }
+      .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+      .rail-right { border-left: 0; }
+    }
+
+    /* ---- rail kv rows / sync / run / ship / prs ---- */
+    .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 2px 0; font: 11.5px "Cascadia Mono", Consolas, monospace; border-bottom: 1px dotted var(--line); }
+    .kv:last-of-type { border-bottom: 0; }
+    .kv-k { color: var(--quiet); text-transform: uppercase; font-size: 10px; letter-spacing: .03em; }
+    .kv-v { color: var(--ink); font-weight: 700; }
+    .rc-note { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--quiet); text-transform: none; letter-spacing: 0; }
+    .rc-note.good { color: var(--accent); }
+    .rc-note.warn { color: #d2a24a; }
+    .rc-hint { margin-top: 7px; font-size: 10.5px; color: var(--quiet); line-height: 1.35; }
+    .btn.sm { height: 26px; font-size: 11px; padding: 0 9px; margin-top: 8px; }
+    .run-controls { display: flex; gap: 5px; margin-bottom: 8px; }
+    .run-controls .btn { flex: 1 1 0; margin-top: 0; padding: 0 4px; font-size: 10.5px; }
+    .btn[disabled] { opacity: .42; cursor: not-allowed; }
+    .rail-link { display: inline-block; margin-top: 8px; color: var(--accent); font-size: 11px; text-decoration: none; }
+    .rail-link:hover { text-decoration: underline; }
+    .pr-list { display: flex; flex-direction: column; gap: 4px; }
+    .pr-row { display: grid; grid-template-columns: auto 1fr auto; gap: 7px; align-items: baseline; padding: 5px 6px; border: 1px solid var(--line); border-radius: 3px; background: var(--panel-2); text-decoration: none; color: var(--ink); }
+    .pr-row:hover { border-color: var(--line-strong); }
+    .pr-num { color: var(--quiet); font-size: 11px; }
+    .pr-title { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pr-state { font: 700 9px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .04em; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--line-strong); color: var(--muted); }
+    .pr-state.approved { color: var(--accent); border-color: var(--accent-dim); }
+    .pr-state.draft { color: #8a8f98; }
+    .pr-state.open { color: #c7d4ff; border-color: #2c4a7f; }
+
+    /* ---- leases + quantum center row ---- */
+    .leases-quantum { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 1000px) { .leases-quantum { grid-template-columns: 1fr; } }
+    .lease-tabs { display: flex; gap: 4px; margin-left: auto; }
+    .lease-tab { height: 24px; padding: 0 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; font: 700 10.5px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .04em; }
+    .lease-tab.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
+    .lease-tab span { color: inherit; opacity: .8; }
+    .prio { font: 700 9.5px "Cascadia Mono", monospace; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; border: 1px solid var(--line-strong); color: var(--muted); }
+    .prio-high { color: #d56a6a; border-color: #6e3030; }
+    .prio-normal { color: #cbd6e4; }
+    .prio-low { color: var(--quiet); }
+    .quantum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .q-cell { border: 1px solid var(--line); border-radius: 3px; padding: 8px; background: var(--panel-2); }
+    .q-k { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--quiet); }
+    .q-v { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 3px; }
+
+    /* ---- worker reports ---- */
+    .report-filters { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+    .chip-btn { height: 21px; padding: 0 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; font: 700 10px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .03em; }
+    .chip-btn.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
+    .report-list { display: flex; flex-direction: column; gap: 5px; max-height: 460px; overflow-y: auto; }
+    .report-card { border: 1px solid var(--line); border-left: 2px solid var(--line-strong); border-radius: 3px; padding: 7px 8px; background: var(--panel-2); }
+    .report-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .report-fn { font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .report-chip { font: 700 9px "Cascadia Mono", monospace; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 3px; white-space: nowrap; border: 1px solid var(--line-strong); color: var(--muted); }
+    .report-chip.s-exact { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
+    .report-chip.s-improved { color: #cbe6ff; border-color: #2c4a7f; background: rgba(92,145,223,.1); }
+    .report-chip.s-committed { color: #b7c4d4; }
+    .report-chip.s-needs-rework { color: #e0b24a; border-color: #6e5a26; background: rgba(224,178,74,.08); }
+    .report-chip.s-no-progress { color: #98a3b3; }
+    .report-chip.s-tool-error { color: #d56a6a; border-color: #6e3030; background: rgba(213,106,106,.08); }
+    .report-card.s-exact { border-left-color: var(--accent); }
+    .report-meta { font-size: 10.5px; color: var(--quiet); margin-top: 3px; font-family: "Cascadia Mono", Consolas, monospace; }
+    .report-msg { font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ---- comprehensive log ---- */
+    .log-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 9px; }
+    .log-toolbar input[type="search"] { height: 28px; flex: 1 1 200px; min-width: 140px; }
+    .log-kinds { display: flex; flex-wrap: wrap; gap: 4px; }
+    .log-toolbar select { height: 28px; }
+    .attempt-list.comprehensive .attempt-row { grid-template-columns: 78px 96px 92px 1fr; }
+    .attempt-agent { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .attempt-row.k-match .attempt-kind { color: var(--accent); }
+    .attempt-row.k-regression .attempt-kind { color: #d56a6a; }
+    .attempt-row.k-commit .attempt-kind { color: #cbe6ff; }
+
+    /* ---- match-progress range buttons ---- */
+    .range-group { display: flex; gap: 3px; margin-left: auto; }
+    .range-btn { height: 22px; padding: 0 8px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; font: 700 10px "Cascadia Mono", monospace; }
+    .range-btn.active { color: var(--accent); border-color: var(--accent-dim); background: rgba(63,185,80,.1); }
+    .attack-board,
+    .kg-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: stretch;
+    }
+    .attack-lanes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .attack-lane {
+      min-width: 0;
+      border: 1px solid #263244;
+      border-radius: 7px;
+      background: #101824;
+      padding: 10px;
+    }
+    .attack-lane h3 {
+      margin: 0 0 5px;
+      color: #e8f1fb;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+    .attack-count {
+      font: 800 22px Consolas, "Courier New", monospace;
+      color: var(--amber);
+    }
+    .attack-note {
+      min-height: 32px;
+      color: var(--quiet);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .attack-targets {
+      display: grid;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .attack-target {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      color: #cbd7e6;
+      font-size: 11px;
+      border-top: 1px solid rgba(38, 50, 68, .72);
+      padding-top: 5px;
+    }
+    .attack-target .mono {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .attack-command {
+      margin-top: 9px;
+      color: #8da0b8;
+      font: 11px Consolas, "Courier New", monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .pipe-step {
+      position: relative;
+      min-height: 92px;
+      border: 1px solid #263244;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #111b28, #0d141f);
+      padding: 9px;
+      overflow: hidden;
+    }
+    .pipe-step::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3px;
+      background: var(--accent, var(--cobalt));
+    }
+    .pipe-k {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .pipe-v {
+      margin-top: 7px;
+      color: #eef4fb;
+      font: 800 26px Consolas, "Courier New", monospace;
+    }
+    .pipe-note {
+      margin-top: 2px;
+      color: var(--quiet);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+    .ship-wins {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      max-height: 180px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .ship-win {
+      border-top: 1px solid #263244;
+      padding-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .ship-win b {
+      color: #dfe8f4;
+      font-family: Consolas, "Courier New", monospace;
+    }
+    .ship-win .mono {
+      display: block;
+      margin-top: 2px;
+      color: #8da0b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .limit-models,
+    .model-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 7px;
+    }
+    .model-chip {
+      border: 1px solid #314157;
+      border-radius: 999px;
+      padding: 2px 6px;
+      color: #cbd7e6;
+      background: #0d141f;
+      font: 10.5px Consolas, "Courier New", monospace;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .model-chip.assumed { border-color: rgba(240,179,90,.55); color: #ffd28a; }
+    #kg-graph {
+      height: 300px;
+      background: radial-gradient(circle at 50% 50%, rgba(56,185,149,.10), rgba(13,17,24,0) 58%);
+      border: 1px solid #263244;
+      border-radius: 7px;
+    }
+    .kg-side {
+      display: grid;
+      gap: 10px;
+    }
+    .kg-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+    }
+    .kg-stat {
+      border: 1px solid #263244;
+      border-radius: 6px;
+      background: #101824;
+      padding: 8px;
+    }
+    .kg-stat b {
+      display: block;
+      color: #eef4fb;
+      font: 800 18px Consolas, "Courier New", monospace;
+    }
+    .kg-stat span {
+      color: var(--quiet);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      font-weight: 760;
+    }
+    .kg-list {
+      display: grid;
+      gap: 5px;
+      max-height: 190px;
+      overflow: auto;
+    }
+    .kg-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 5px 0;
+      border-top: 1px solid #263244;
+      color: #cbd7e6;
+      font-size: 11px;
+    }
+    .kg-row:first-child { border-top: 0; }
+    .kg-row .mono {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 1180px) {
+      .attack-board,
+      .kg-layout { grid-template-columns: 1fr; }
+      .attack-lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pipeline-flow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .attack-lanes,
+      .pipeline-flow,
+      .kg-stats { grid-template-columns: 1fr; }
+      #kg-graph { height: 240px; }
+    }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>GC6E01 Progress Control</h1>
-      <div class="subtitle">
-        <span id="repo"></span>
-        <span id="head"></span>
-        <span id="updated"></span>
+  <div class="app">
+    <aside class="rail rail-left">
+      <div class="rail-brand">
+        <span class="rail-brand-mark">&#9707;</span>
+        <div>
+          <h1>Decomp Control</h1>
+          <div class="subtitle">
+            <span id="repo"></span>
+            <span id="head"></span>
+            <span id="updated"></span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="actions">
-      <button class="btn primary" id="refresh" type="button">Refresh</button>
-    </div>
-  </header>
-  <main>
-    <section class="hud-strip">
-      <div class="hud-stats">
-        <span class="hud-project" id="hud-project">GC6E01/DECOMP</span>
-        <span><span class="hud-value" id="hud-completion">0%</span> complete</span>
-        <span><span class="hud-value hud-good" id="hud-fuzzy">0%</span> fuzzy</span>
-        <span><span class="hud-value" id="hud-code">0%</span> code</span>
-        <span><span class="hud-value hud-good" id="hud-fns">0%</span> fns</span>
-        <span><span class="hud-value" id="hud-units">0/0</span> units</span>
-        <span><span class="hud-value hud-good" id="hud-renamed">0</span> renamed</span>
-        <span><span class="hud-value hud-warn" id="hud-active">0</span> active</span>
-        <span><span class="hud-value hud-bad" id="hud-oldrefs">0</span> old refs</span>
-        <span id="hud-next">next: -</span>
-      </div>
-      <div class="hud-controls">
-        <label><input id="auto-refresh" type="checkbox" checked> live</label>
-        <span>every</span>
-        <select id="refresh-rate">
-          <option value="5000">5 sec</option>
-          <option value="15000">15 sec</option>
-          <option value="30000">30 sec</option>
-        </select>
-      </div>
-    </section>
 
-    <nav class="tabs" aria-label="Dashboard views">
-      <button class="tab-btn active" id="tab-decomp" type="button" data-view="decomp">Decomp</button>
-      <button class="tab-btn" id="tab-files" type="button" data-view="files">Files</button>
-      <button class="tab-btn" id="tab-symbols" type="button" data-view="symbols">Symbol Map</button>
-    </nav>
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">1</span> Status</div>
+        <div class="stat-list">
+          <div class="stat-row"><span class="stat-k">code</span><span class="stat-v hud-good" id="hud-code">0%</span></div>
+          <div class="stat-row"><span class="stat-k">fuzzy</span><span class="stat-v" id="hud-fuzzy">0%</span></div>
+          <div class="stat-row"><span class="stat-k">fns</span><span class="stat-v" id="hud-fns">0%</span></div>
+          <div class="stat-row"><span class="stat-k">C converted</span><span class="stat-v" id="hud-converted">0%</span></div>
+          <div class="stat-row"><span class="stat-k">open fns</span><span class="stat-v hud-warn" id="hud-openfns">0</span></div>
+          <div class="stat-row"><span class="stat-k">units</span><span class="stat-v" id="hud-units">0/0</span></div>
+          <div class="stat-row"><span class="stat-k">leases</span><span class="stat-v" id="hud-active-leases">0</span></div>
+          <div class="stat-row"><span class="stat-k">queued</span><span class="stat-v" id="hud-queued">0</span></div>
+        </div>
+      </div>
 
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">2</span> Controls</div>
+        <button class="btn primary block" id="refresh" type="button">Refresh now</button>
+        <label class="ctl-row"><input id="auto-refresh" type="checkbox" checked> live auto-refresh</label>
+        <label class="ctl-row">every
+          <select id="refresh-rate">
+            <option value="5000">5 sec</option>
+            <option value="15000">15 sec</option>
+            <option value="30000">30 sec</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">3</span> View</div>
+        <nav class="tabs" aria-label="Dashboard views">
+          <button class="tab-btn active" id="tab-decomp" type="button" data-view="decomp">Decomp</button>
+          <button class="tab-btn" id="tab-files" type="button" data-view="files">Files</button>
+          <button class="tab-btn" id="tab-symbols" type="button" data-view="symbols">Symbol Map</button>
+        </nav>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">1</span> Sync <span class="rc-note" id="sync-summary"></span></div>
+        <div class="kv"><span class="kv-k">branch</span><span class="kv-v mono" id="sync-branch">-</span></div>
+        <div class="kv"><span class="kv-k">head</span><span class="kv-v mono" id="sync-head">-</span></div>
+        <div class="kv"><span class="kv-k">ahead/behind</span><span class="kv-v mono" id="sync-ab">-</span></div>
+        <div class="kv"><span class="kv-k">dirty files</span><span class="kv-v mono" id="sync-dirty">-</span></div>
+        <button class="btn ghost block sm" id="sync-fetch" type="button">Fetch origin</button>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">2</span> Run <span class="rc-note" id="run-note">display-only</span></div>
+        <div class="run-controls">
+          <button class="btn ghost sm" type="button" disabled title="Wire your fleet launcher to enable">&#9654; Resume</button>
+          <button class="btn ghost sm" type="button" disabled title="Wire your fleet launcher to enable">&#10073;&#10073; Pause</button>
+          <button class="btn ghost sm" type="button" disabled title="Wire your fleet launcher to enable">&#9211; Kill</button>
+        </div>
+        <div class="kv"><span class="kv-k">active leases</span><span class="kv-v mono" id="run-active">0</span></div>
+        <div class="kv"><span class="kv-k">queued</span><span class="kv-v mono" id="run-queued">0</span></div>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">3</span> Ship <span class="rc-note" id="ship-state"></span></div>
+        <div class="kv"><span class="kv-k">confirmed wins</span><span class="kv-v mono" id="ship-confirmed">0</span></div>
+        <div class="kv"><span class="kv-k">regressions</span><span class="kv-v mono" id="ship-regress">0</span></div>
+        <button class="btn primary block sm" id="ship-handoff" type="button" title="Push current branch and open a PR">&#9094; Prepare handoff (PR)</button>
+        <div class="rc-hint" id="ship-hint"></div>
+        <div class="ship-wins" id="ship-wins"></div>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head"><span class="rail-num">4</span> PRs <span class="rc-note" id="prs-note"></span></div>
+        <div class="pr-list" id="pr-list"></div>
+        <button class="btn ghost block sm" id="prs-refresh" type="button">Sync PR status</button>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-card-head">Project</div>
+        <div class="proj-name" id="hud-project">GC6E01/DECOMP</div>
+        <div class="proj-sub">Pok&eacute;mon Colosseum &middot; CodeWarrior 1.3 &middot; -O4,p</div>
+        <a class="rail-link" id="link-pokedex" href="#" target="_blank" rel="noopener">&#9656; Pok&eacute;dex dashboard</a>
+      </div>
+    </aside>
+
+    <main class="work">
     <section class="view active" id="view-decomp">
       <section class="metric-grid" id="decomp-metrics"></section>
+
+      <section class="attack-board">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Attack Matrix</h2>
+            <span class="panel-note" id="attack-note"></span>
+          </div>
+          <div class="attack-lanes" id="attack-lanes"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Pipeline</h2>
+            <span class="panel-note" id="pipeline-note"></span>
+          </div>
+          <div class="pipeline-flow" id="pipeline-flow"></div>
+        </div>
+      </section>
 
       <section class="history-layout">
         <div class="panel chart-card">
           <div class="panel-title">
             <h2>Match Progress Over Time</h2>
             <span class="panel-note" id="timeline-range"></span>
+            <div class="range-group" id="history-range" role="group" aria-label="Time range">
+              <button class="range-btn" type="button" data-days="1">24h</button>
+              <button class="range-btn" type="button" data-days="3">3d</button>
+              <button class="range-btn" type="button" data-days="7">7d</button>
+              <button class="range-btn active" type="button" data-days="14">14d</button>
+              <button class="range-btn" type="button" data-days="0">All</button>
+            </div>
           </div>
           <canvas id="history-chart" height="205"></canvas>
         </div>
@@ -2832,6 +5162,38 @@ HTML = r"""<!doctype html>
             <span class="panel-note" id="file-history-note"></span>
           </div>
           <canvas id="file-history-chart" height="205"></canvas>
+        </div>
+      </section>
+
+      <section class="leases-quantum">
+        <div class="panel">
+          <div class="panel-title">
+            <h2>Leases</h2>
+            <div class="lease-tabs" id="lease-tabs" role="tablist">
+              <button class="lease-tab active" type="button" data-lease="active">Active <span id="lease-active-n">0</span></button>
+              <button class="lease-tab" type="button" data-lease="queued">Queued <span id="lease-queued-n">0</span></button>
+            </div>
+          </div>
+          <div class="table-wrap lease-pane" id="lease-active-pane">
+            <table class="agent-table">
+              <thead><tr><th>Scope</th><th>Key</th><th>Owner</th><th>Elapsed</th><th>TTL</th></tr></thead>
+              <tbody id="lease-active-body"></tbody>
+            </table>
+          </div>
+          <div class="table-wrap lease-pane" id="lease-queued-pane" hidden>
+            <table class="agent-table">
+              <thead><tr><th>Function</th><th>Priority</th><th>Description</th></tr></thead>
+              <tbody id="lease-queued-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" id="quantum-panel">
+          <div class="panel-title">
+            <h2>Annealer</h2>
+            <span class="panel-note" id="quantum-note">permuter swarm</span>
+          </div>
+          <div class="quantum-grid" id="quantum-grid"></div>
         </div>
       </section>
 
@@ -2845,6 +5207,14 @@ HTML = r"""<!doctype html>
             <nav class="crumbs" id="decomp-crumbs" aria-label="Treemap breadcrumb"></nav>
             <div class="treemap-controls">
               <input id="decomp-query" type="search" placeholder="Filter file or source">
+              <select id="decomp-difficulty" title="Filter function rows by hardest-target catalog">
+                <option value="all">All difficulty</option>
+                <option value="hard">Hardest catalog</option>
+                <option value="asm">Asm giants</option>
+                <option value="near">Real-C near misses</option>
+                <option value="wall">Confirmed walls</option>
+                <option value="giant">Structural giants</option>
+              </select>
               <label class="area-toggle"><input id="decomp-area-fns" type="checkbox"> area by fn count</label>
               <button class="btn" id="decomp-near" type="button">Near Match</button>
               <button class="btn" id="decomp-clear" type="button">Clear</button>
@@ -2899,34 +5269,27 @@ HTML = r"""<!doctype html>
 
       <section class="panel">
         <div class="panel-title">
-          <h2>Decomp Attempt Log</h2>
+          <h2>Activity Log</h2>
           <span class="panel-note" id="decomp-log-note"></span>
         </div>
-        <div class="attempt-list" id="decomp-log"></div>
-      </section>
-
-      <section class="ops3-grid">
-        <div class="panel">
-          <div class="panel-title">
-            <h2>Agent Activity</h2>
-            <span class="panel-note" id="agents-note"></span>
+        <div class="log-toolbar">
+          <input id="log-query" type="search" placeholder="Filter message, fn, agent">
+          <div class="log-kinds" id="log-kinds">
+            <button class="chip-btn active" type="button" data-kind="all">all</button>
+            <button class="chip-btn" type="button" data-kind="match">match</button>
+            <button class="chip-btn" type="button" data-kind="commit">commit</button>
+            <button class="chip-btn" type="button" data-kind="regression">regression</button>
+            <button class="chip-btn" type="button" data-kind="report">report</button>
+            <button class="chip-btn" type="button" data-kind="claim">claim</button>
           </div>
-          <div class="table-wrap">
-            <table class="agent-table">
-              <thead>
-                <tr><th>Agent</th><th>Function</th><th>File</th><th>Claimed</th><th>State</th></tr>
-              </thead>
-              <tbody id="agents-body"></tbody>
-            </table>
-          </div>
+          <select id="log-limit" title="Rows shown">
+            <option value="80">80 rows</option>
+            <option value="200">200 rows</option>
+            <option value="500">500 rows</option>
+            <option value="100000">all</option>
+          </select>
         </div>
-        <div class="panel">
-          <div class="panel-title">
-            <h2>Lockout Resets</h2>
-            <span class="panel-note" id="limits-note"></span>
-          </div>
-          <div class="limit-grid" id="limits-grid"></div>
-        </div>
+        <div class="attempt-list comprehensive" id="decomp-log"></div>
       </section>
 
       <section class="panel chart-card">
@@ -2936,6 +5299,41 @@ HTML = r"""<!doctype html>
         </div>
         <div class="token-stats" id="tokens-stats"></div>
         <canvas id="tokens-chart" height="205"></canvas>
+      </section>
+
+      <section class="kg-layout">
+        <div class="panel chart-card">
+          <div class="panel-title">
+            <h2>Knowledge Graph</h2>
+            <span class="panel-note" id="kg-note"></span>
+          </div>
+          <canvas id="kg-graph" height="300"></canvas>
+        </div>
+        <div class="panel kg-side">
+          <div>
+            <div class="panel-title">
+              <h2>KG Targets</h2>
+              <span class="panel-note" id="kg-target-note"></span>
+            </div>
+            <div class="kg-stats" id="kg-stats"></div>
+          </div>
+          <div>
+            <div class="limit-label">Top reusable levers</div>
+            <div class="kg-list" id="kg-levers"></div>
+          </div>
+          <div>
+            <div class="limit-label">Calltags / name evidence</div>
+            <div class="kg-list" id="kg-tags"></div>
+          </div>
+          <div>
+            <div class="limit-label">Near-match targets</div>
+            <div class="kg-list" id="kg-targets"></div>
+          </div>
+          <div>
+            <div class="limit-label">Call relationships</div>
+            <div class="kg-list" id="kg-edges"></div>
+          </div>
+        </div>
       </section>
     </section>
 
@@ -3082,7 +5480,61 @@ HTML = r"""<!doctype html>
         <aside class="detail-panel" id="details"></aside>
       </section>
     </section>
-  </main>
+    </main>
+
+    <aside class="rail rail-right">
+      <div class="rail-head"><span>Details</span><span class="rail-head-note">worker reports</span></div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Worker Reports</h2>
+          <span class="panel-note" id="reports-note"></span>
+        </div>
+        <div class="report-filters" id="report-filters"></div>
+        <div class="report-list" id="reports-body"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Agent Activity</h2>
+          <span class="panel-note" id="agents-note"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="agent-table">
+            <thead>
+              <tr><th>Agent</th><th>Function</th><th>File</th><th>Claimed</th><th>State</th></tr>
+            </thead>
+            <tbody id="agents-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Fleet Locks</h2>
+          <span class="panel-note" id="locks-note"></span>
+          <button class="btn ghost panel-action" id="locks-gc" type="button"
+                  title="Purge expired locks from the DB">Purge expired</button>
+        </div>
+        <div class="table-wrap">
+          <table class="agent-table lock-table">
+            <thead>
+              <tr><th>Scope</th><th>Key</th><th>Owner</th><th>TTL</th><th></th></tr>
+            </thead>
+            <tbody id="locks-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <h2>Lockout Resets</h2>
+          <span class="panel-note" id="limits-note"></span>
+        </div>
+        <div class="limit-grid" id="limits-grid"></div>
+      </div>
+    </aside>
+  </div>
   <script>
     const store = {
       data: null,
@@ -3106,19 +5558,25 @@ HTML = r"""<!doctype html>
         unitFns: null,
         unitFnsSource: "",
         selectedFn: "",
-        areaByFns: false
+        areaByFns: false,
+        difficultyFilter: "all"
       },
       filesSort: "total_code",
       filesDir: -1,
       fnHistoryCache: {},
       // v9: function reader + agent/lockout/token panels
       reader: { open: false, fn: "", source: "" },
+      crack: { lane: "codex-gpt55-high", strategy: "contenders", jobs: [], terminalPane: "codex" },
       limits: [],
       agentsTimer: null,
       limitsTimer: null,
+      crackTimer: null,
+      kgTimer: null,
       // v10: touch two-step treemap + live attempt-log poll
       isTouch: false,
       pinnedItem: null,
+      _logData: null,
+      _logUnit: null,
       logTimer: null
     };
     // Touch devices have no hover, so a single tap must NOT immediately drill in
@@ -3436,10 +5894,10 @@ HTML = r"""<!doctype html>
     }
     function drawHistory(canvas, history) {
       _drawTimeChart(canvas, history, [
-        { key: "completion_pct", label: "symbols", color: "#38b995" },
-        { key: "decomp_functions_pct", label: "fns", color: "#f0b35a" },
         { key: "decomp_code_pct", label: "code", color: "#5c91df" },
-        { key: "decomp_fuzzy_pct", label: "fuzzy", color: "#a98ee6" }
+        { key: "decomp_fuzzy_pct", label: "fuzzy", color: "#a98ee6" },
+        { key: "decomp_functions_pct", label: "fns", color: "#f0b35a" },
+        { key: "c_converted_pct", label: "real C", color: "#38b995" }
       ], "Timeline starts with the next snapshot");
     }
     function relatedAttempts(data, unit) {
@@ -3485,14 +5943,17 @@ HTML = r"""<!doctype html>
       _drawTimeChart(canvas, rows, series, emptyLabel || "No history recorded yet");
     }
     function renderMetrics(data) {
+      if (!data || !data.metrics) return;   // skip the cold-start stub
       const decomp = data.decomp || {};
+      const conv = decomp.conversion || {};
+      const openFns = Math.max(0, Number(decomp.total_functions || 0) - Number(decomp.matched_functions || 0));
       $("decomp-metrics").replaceChildren(
-        metric("Decomp Fns", pctText(decomp.functions_pct), `${decomp.matched_functions || 0}/${decomp.total_functions || 0} functions at 100%`, "#f0b35a"),
-        metric("Decomp Code", pctText(decomp.code_pct), `${(decomp.matched_code || 0).toLocaleString()}/${(decomp.total_code || 0).toLocaleString()} bytes`, "#5c91df"),
+        metric("Byte-Exact Code", pctText(decomp.code_pct), `${(decomp.matched_code || 0).toLocaleString()}/${(decomp.total_code || 0).toLocaleString()} bytes`, "#5c91df"),
+        metric("C-Converted", pctText(conv.converted_pct), `${(conv.real_c || 0).toLocaleString()}/${(conv.source_total || 0).toLocaleString()} source fns`, "#38b995"),
         metric("Fuzzy Match", pctText(decomp.fuzzy_pct), "weighted instruction similarity", "#a98ee6"),
-        metric("Complete Units", `${decomp.complete_units || 0}/${decomp.total_units || 0}`, "report.json decomp units", "#38b995"),
-        metric("Attempt Log", `${(data.attempt_log || []).length}`, "coordination status entries retained", "#8da0b8"),
-        metric("Report Updated", decomp.updated_at || "unknown", "mtime for report.json", "#38b995")
+        metric("Byte-Exact Fns", pctText(decomp.functions_pct), `${decomp.matched_functions || 0}/${decomp.total_functions || 0} functions`, "#f0b35a"),
+        metric("Open Fns", openFns.toLocaleString(), `${(conv.asm_wrappers || 0).toLocaleString()} asm wrappers, ${(conv.stubs || 0).toLocaleString()} stubs`, "#e07171"),
+        metric("Complete Units", `${decomp.complete_units || 0}/${decomp.total_units || 0}`, "report.json decomp units", "#8da0b8")
       );
       $("symbol-metrics").replaceChildren(
         metric("Completion", `${data.metrics.completion_pct}%`, `${data.metrics.wired_targets}/${data.counts.targets} recorded or renamed`, "#38b995"),
@@ -3504,19 +5965,89 @@ HTML = r"""<!doctype html>
       );
     }
     function renderHud(data) {
-      const next = data.next_target;
+      if (!data || !data.metrics) return;   // skip the cold-start stub (no /api/state yet)
       const decomp = data.decomp || {};
-      setText($("hud-completion"), pctText(data.metrics.completion_pct));
-      setText($("hud-fuzzy"), pctText(decomp.fuzzy_pct));
+      const conv = decomp.conversion || {};
+      const openFns = Math.max(0, Number(decomp.total_functions || 0) - Number(decomp.matched_functions || 0));
       setText($("hud-code"), pctText(decomp.code_pct));
+      setText($("hud-fuzzy"), pctText(decomp.fuzzy_pct));
       setText($("hud-fns"), pctText(decomp.functions_pct));
+      setText($("hud-converted"), pctText(conv.converted_pct));
+      setText($("hud-openfns"), openFns.toLocaleString());
       setText($("hud-units"), `${decomp.complete_units || 0}/${decomp.total_units || 0}`);
-      setText($("hud-renamed"), data.counts.by_status.Renamed || 0);
-      setText($("hud-active"), data.metrics.active_targets || 0);
-      setText($("hud-oldrefs"), data.metrics.old_ref_total || 0);
-      setText($("hud-next"), next ? `next: ${next.fn} -> ${next.name}` : "next: none");
+    }
+    function renderAttackMatrix(data) {
+      const matrix = (data && data.attack_matrix) || {};
+      const lanes = matrix.lanes || [];
+      const laneWrap = $("attack-lanes");
+      const pipeWrap = $("pipeline-flow");
+      if (!laneWrap || !pipeWrap) return;
+      laneWrap.replaceChildren();
+      pipeWrap.replaceChildren();
+      setText($("attack-note"), matrix.available ? `${(matrix.top_units || []).length} ranked units` : "waiting for report.json");
+      if (!lanes.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No attack lanes available");
+        laneWrap.append(empty);
+      }
+      for (const lane of lanes) {
+        const card = document.createElement("div");
+        card.className = "attack-lane";
+        const title = document.createElement("h3");
+        setText(title, lane.title || "");
+        const count = document.createElement("div");
+        count.className = "attack-count";
+        const countValue = lane.id === "bulk" ? Number(lane.count || 0).toLocaleString() : lane.count || 0;
+        setText(count, countValue);
+        const note = document.createElement("div");
+        note.className = "attack-note";
+        setText(note, lane.note || "");
+        const targets = document.createElement("div");
+        targets.className = "attack-targets";
+        for (const t of (lane.targets || []).slice(0, 5)) {
+          const row = document.createElement("div");
+          row.className = "attack-target";
+          const name = document.createElement("span");
+          name.className = "mono";
+          setText(name, t.source || t.name || "");
+          const val = document.createElement("span");
+          const bits = lane.id === "near"
+            ? `${t.near || 0} near`
+            : lane.id === "close"
+              ? `${t.open_fns || 0} open`
+              : `${Number(t.open_code || 0).toLocaleString()}b`;
+          setText(val, bits);
+          row.append(name, val);
+          targets.append(row);
+        }
+        const cmd = document.createElement("div");
+        cmd.className = "attack-command";
+        setText(cmd, lane.command || "");
+        card.append(title, count, note, targets, cmd);
+        laneWrap.append(card);
+      }
+      const colors = ["#38b995", "#5c91df", "#a98ee6", "#f0b35a", "#e07171"];
+      for (const [idx, step] of (matrix.pipeline || []).entries()) {
+        const card = document.createElement("div");
+        card.className = "pipe-step";
+        card.style.setProperty("--accent", colors[idx % colors.length]);
+        const k = document.createElement("div");
+        k.className = "pipe-k";
+        setText(k, step.stage || "");
+        const v = document.createElement("div");
+        v.className = "pipe-v";
+        setText(v, Number(step.count || 0).toLocaleString());
+        const n = document.createElement("div");
+        n.className = "pipe-note";
+        setText(n, step.note || "");
+        card.append(k, v, n);
+        pipeWrap.append(card);
+      }
+      setText($("pipeline-note"), matrix.generated_at ? `updated ${matrix.generated_at}` : "");
     }
     function renderTop(data) {
+      if (!data || !data.metrics) return;   // skip the cold-start stub
       const row = data.next_target;
       setText($("repo"), data.repo);
       setText($("head"), `${data.branch || "detached"} @ ${data.head || "unknown"}`);
@@ -3530,6 +6061,7 @@ HTML = r"""<!doctype html>
       nextStatus.id = "next-status";
     }
     function renderLegend(data) {
+      if (!data || !data.charts || !data.charts.status) return;   // skip the cold-start stub
       const legend = $("status-legend");
       legend.replaceChildren();
       for (const item of data.charts.status) {
@@ -4142,6 +6674,234 @@ HTML = r"""<!doctype html>
       });
       body.append(frag);
     }
+    function difficultyChip(diff) {
+      const chip = document.createElement("span");
+      const key = diff && diff.section_key ? String(diff.section_key) : "";
+      chip.className = `difficulty-chip ${key || "none"}`;
+      if (!diff) {
+        setText(chip, "-");
+        return chip;
+      }
+      const rank = diff.rank ? `#${diff.rank}` : key;
+      setText(chip, `${key || "hard"} ${rank}`);
+      chip.title = `${diff.section || "hard target"}: ${diff.note || ""}`;
+      return chip;
+    }
+    function functionMatchesDifficulty(fn) {
+      const f = store.tm.difficultyFilter || "all";
+      const diff = fn && fn.difficulty;
+      if (f === "all") return true;
+      if (f === "hard") return !!diff;
+      return !!diff && diff.section_key === f;
+    }
+    function selectedCrackPayload(launch) {
+      return {
+        fn: store.reader.fn,
+        source: store.reader.source,
+        lane: store.crack.lane,
+        strategy: store.crack.strategy,
+        launch: !!launch
+      };
+    }
+    function setCrackStatus(text, good) {
+      const el = $("crack-status");
+      if (!el) return;
+      setText(el, text || "");
+      el.style.color = good ? "var(--accent)" : "";
+    }
+    function crackAction(launch) {
+      const label = launch ? "Launching in Codex tmux..." : "Queued.";
+      setCrackStatus(label, false);
+      return fetch("/api/crack/enqueue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedCrackPayload(launch)),
+        cache: "no-store"
+      }).then(r => r.json()).then(payload => {
+        if (!payload || !payload.ok) {
+          setCrackStatus((payload && payload.error) || "crack request failed", false);
+          return;
+        }
+        const job = payload.job || {};
+        const launchInfo = job.launch || {};
+        if (launch && launchInfo.ok === false) {
+          setCrackStatus(`Queued; launch not available: ${launchInfo.error || "adapter error"}`, false);
+        } else {
+          setCrackStatus(`${job.status || "queued"} ${job.id || ""}`, true);
+        }
+        pollCrackJobs();
+        loadFnInfo(store.reader.fn);
+      }).catch(() => setCrackStatus("crack request failed", false));
+    }
+    function renderTerminalCapture(payload) {
+      const pre = $("terminal-capture");
+      if (!pre) return;
+      if (!payload || !payload.available) {
+        setText(pre, (payload && payload.error) || "terminal capture unavailable");
+        return;
+      }
+      setText(pre, payload.text || "(no terminal output)");
+    }
+    function pollTerminal() {
+      fetch(`/api/crack/terminal?pane=${encodeURIComponent(store.crack.terminalPane || "codex")}&lines=120`, { cache: "no-store" })
+        .then(r => r.json()).then(renderTerminalCapture).catch(() => renderTerminalCapture({ available: false, error: "terminal endpoint failed" }));
+    }
+    function pollCrackJobs() {
+      fetch("/api/crack/jobs?limit=80", { cache: "no-store" })
+        .then(r => r.json()).then(payload => {
+          store.crack.jobs = (payload && payload.jobs) || [];
+          if (store.reader.open) {
+            const info = { fn: store.reader.fn, crack_jobs: store.crack.jobs.filter(j => j.fn === store.reader.fn), crack_job_count: store.crack.jobs.filter(j => j.fn === store.reader.fn).length };
+            const list = $("crack-job-list");
+            if (list) renderCrackJobList(list, info.crack_jobs);
+          }
+        }).catch(() => {});
+    }
+    function renderCrackJobList(list, jobs) {
+      list.replaceChildren();
+      if (!jobs || !jobs.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        setText(empty, "No crack jobs for this function yet");
+        list.append(empty);
+        return;
+      }
+      for (const job of jobs.slice(0, 8)) {
+        const row = document.createElement("div");
+        row.className = "crack-job";
+        const state = document.createElement("span");
+        setText(state, job.status || "queued");
+        const desc = document.createElement("div");
+        setText(desc, `${job.lane_label || job.lane} / ${job.strategy_label || job.strategy}`);
+        row.append(state, desc);
+        list.append(row);
+      }
+    }
+    function renderCrackLab(info, side) {
+      const card = document.createElement("div");
+      card.className = "wall-card crack-card";
+      const title = document.createElement("div");
+      title.className = "crack-title";
+      const b = document.createElement("b");
+      setText(b, "Crack Lab");
+      const sub = document.createElement("span");
+      setText(sub, "queue / tmux");
+      title.append(b, sub);
+      card.append(title);
+      const diff = info && info.difficulty;
+      if (diff) {
+        const note = document.createElement("div");
+        note.className = "wall-note";
+        setText(note, `${diff.section || "Hard target"} ${diff.rank ? "#" + diff.rank : ""}: ${diff.note || ""}`);
+        card.append(note);
+      }
+      const laneField = document.createElement("div");
+      laneField.className = "crack-field";
+      const laneLabel = document.createElement("label");
+      setText(laneLabel, "Model lane");
+      const laneGrid = document.createElement("div");
+      laneGrid.className = "crack-grid";
+      for (const lane of [
+        ["codex-gpt55-high", "Codex 5.5 high"],
+        ["claude-opus", "Claude Opus"],
+        ["glm-52", "GLM 5.2"],
+        ["opencode-deepseek-v4-flash", "DeepSeek V4 Flash"]
+      ]) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crack-choice" + (store.crack.lane === lane[0] ? " active" : "");
+        btn.dataset.lane = lane[0];
+        setText(btn, lane[1]);
+        btn.onclick = () => {
+          store.crack.lane = lane[0];
+          renderFnInfo(info);
+        };
+        laneGrid.append(btn);
+      }
+      laneField.append(laneLabel, laneGrid);
+      card.append(laneField);
+      const stratField = document.createElement("div");
+      stratField.className = "crack-field";
+      const stratLabel = document.createElement("label");
+      setText(stratLabel, "Strategy");
+      const stratGrid = document.createElement("div");
+      stratGrid.className = "crack-grid";
+      for (const strat of [
+        ["contenders", "Contenders"],
+        ["repair", "Repair best"],
+        ["split", "Split giant"]
+      ]) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "crack-choice" + (store.crack.strategy === strat[0] ? " active" : "");
+        btn.dataset.strategy = strat[0];
+        setText(btn, strat[1]);
+        btn.onclick = () => {
+          store.crack.strategy = strat[0];
+          renderFnInfo(info);
+        };
+        stratGrid.append(btn);
+      }
+      stratField.append(stratLabel, stratGrid);
+      card.append(stratField);
+      const canTmux = store.crack.lane === "codex-gpt55-high";
+      const actions = document.createElement("div");
+      actions.className = "crack-actions";
+      const queue = document.createElement("button");
+      queue.className = "btn ghost";
+      queue.type = "button";
+      setText(queue, "Queue");
+      queue.onclick = () => crackAction(false);
+      const launch = document.createElement("button");
+      launch.className = "btn primary";
+      launch.type = "button";
+      setText(launch, canTmux ? "Send to tmux" : "Queue lane");
+      launch.title = canTmux ? "Queue and send to the Codex tmux pane" : "This lane is queued; its direct launcher is not wired yet";
+      launch.onclick = () => crackAction(canTmux);
+      actions.append(queue, launch);
+      card.append(actions);
+      const status = document.createElement("div");
+      status.id = "crack-status";
+      status.className = "crack-status";
+      setText(status, canTmux
+        ? "Independent contenders are the default; split only for structural giants."
+        : "This lane queues the job for now; direct launch adapter is not wired yet.");
+      card.append(status);
+      const jobs = document.createElement("div");
+      jobs.id = "crack-job-list";
+      jobs.className = "crack-job-list";
+      renderCrackJobList(jobs, (info && info.crack_jobs) || []);
+      card.append(jobs);
+      side.append(card);
+
+      const term = document.createElement("div");
+      term.className = "wall-card terminal-card";
+      const termTitle = document.createElement("div");
+      termTitle.className = "crack-title";
+      const tb = document.createElement("b");
+      setText(tb, "Codex terminal");
+      const refresh = document.createElement("button");
+      refresh.type = "button";
+      refresh.className = "btn ghost xs";
+      setText(refresh, "Refresh");
+      refresh.onclick = pollTerminal;
+      termTitle.append(tb, refresh);
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "btn ghost block sm";
+      setText(open, "Open tmux window");
+      open.disabled = !canTmux;
+      open.title = canTmux ? "Open/attach the Codex tmux pane" : "Only the Codex lane has a tmux pane adapter right now";
+      open.onclick = () => postJSON("/api/crack/open-terminal", { pane: "codex" }).then(r => {
+        setCrackStatus(r && r.ok ? "Opened tmux window" : ((r && r.error) || "Could not open tmux window"), !!(r && r.ok));
+      }).catch(() => setCrackStatus("Could not open tmux window", false));
+      const pre = document.createElement("pre");
+      pre.id = "terminal-capture";
+      setText(pre, canTmux ? "Terminal capture not loaded" : "Terminal is Codex-only for now; this lane will stay queued.");
+      term.append(termTitle, open, pre);
+      side.append(term);
+      if (canTmux) pollTerminal();
+    }
     function loadFnInfo(fnName) {
       fetch(`/api/fninfo?fn=${encodeURIComponent(fnName)}`, { cache: "no-store" })
         .then(r => r.json())
@@ -4192,6 +6952,51 @@ HTML = r"""<!doctype html>
         card.append(note);
       }
       side.append(card);
+      const kg = (info && info.kg) || {};
+      if (kg.available) {
+        const kgCard = document.createElement("div");
+        kgCard.className = "wall-card";
+        const kgTitle = document.createElement("div");
+        kgTitle.className = "limit-label";
+        setText(kgTitle, "KG relationships");
+        kgCard.append(kgTitle);
+        const kgList = document.createElement("div");
+        kgList.className = "kg-list";
+        kgList.style.maxHeight = "240px";
+        kgList.style.marginTop = "8px";
+        const addKgRow = (left, right) => {
+          const row = document.createElement("div");
+          row.className = "kg-row";
+          const a = document.createElement("span");
+          a.className = "mono";
+          setText(a, left);
+          const b = document.createElement("span");
+          setText(b, right || "");
+          row.append(a, b);
+          kgList.append(row);
+        };
+        for (const row of (kg.tags || []).slice(0, 5)) {
+          addKgRow(`#${row.tag || ""}`, `${row.confidence || ""} ${row.score || ""}`);
+        }
+        for (const row of (kg.name_evidence || []).slice(0, 4)) {
+          addKgRow(`name ${row.candidate || ""}`, `${row.source || ""} ${row.score || ""}`);
+        }
+        for (const row of (kg.callees || []).slice(0, 5)) {
+          addKgRow(`calls ${row.fn || ""}`, row.confidence || "");
+        }
+        for (const row of (kg.callers || []).slice(0, 5)) {
+          addKgRow(`from ${row.fn || ""}`, row.confidence || "");
+        }
+        if (!kgList.children.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          setText(empty, "No KG relationships mined for this function yet");
+          kgList.append(empty);
+        }
+        kgCard.append(kgList);
+        side.append(kgCard);
+      }
+      renderCrackLab(info, side);
       // history chart for the fn (reuse existing per-fn endpoint via canvas)
       const histCard = document.createElement("div");
       histCard.className = "wall-card";
@@ -4339,20 +7144,29 @@ HTML = r"""<!doctype html>
       const note = document.createElement("span");
       note.className = "panel-note";
       const fnSource = tm.unitFns || (unit.functions || []);
+      const diffFilter = store.tm.difficultyFilter || "all";
       setText(note, tm.unitFns ? `${fnSource.length} rows (lazy /api/unit)` : `${fnSource.length} rows`);
       listTitle.append(h, note);
       const list = document.createElement("div");
       list.className = "function-list";
-      const functions = fnSource.slice().sort((a, b) => {
+      const functions = fnSource.slice().filter(functionMatchesDifficulty).sort((a, b) => {
+        const ad = a.difficulty || {};
+        const bd = b.difficulty || {};
+        const ar = Number(ad.rank || 9999);
+        const br = Number(bd.rank || 9999);
+        if (diffFilter !== "all" && diffFilter !== "hard" && ar !== br) return ar - br;
         const ap = Number(a.fuzzy_pct || 0);
         const bp = Number(b.fuzzy_pct || 0);
         if (ap !== bp) return ap - bp;
         return Number(b.size || 0) - Number(a.size || 0);
       });
+      if (diffFilter !== "all") {
+        setText(note, `${functions.length}/${fnSource.length} ${diffFilter}`);
+      }
       if (!functions.length) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        setText(empty, tm.unitFns ? "No function rows recorded for this file" : "Loading functions...");
+        setText(empty, diffFilter !== "all" ? "No functions match the difficulty filter for this file" : (tm.unitFns ? "No function rows recorded for this file" : "Loading functions..."));
         list.append(empty);
       }
       for (const fn of functions) {
@@ -4368,7 +7182,7 @@ HTML = r"""<!doctype html>
         const size = document.createElement("div");
         size.className = "function-size";
         setText(size, `${Number(fn.size || 0).toLocaleString()}b`);
-        row.append(name, pctNode, size, statusChip(fn.status));
+        row.append(name, pctNode, size, statusChip(fn.status), difficultyChip(fn.difficulty));
         row.style.cursor = "pointer";
         row.addEventListener("click", () => enterFn(fn));
         list.append(row);
@@ -4431,38 +7245,82 @@ HTML = r"""<!doctype html>
       return box;
     }
     function renderDecompAttemptLog(data, unit) {
+      const activeData = data || store._logData || { attempt_log: [] };
+      const activeUnit = unit || null;
+      store._logData = activeData;
+      store._logUnit = activeUnit;
       const list = $("decomp-log");
       list.replaceChildren();
-      const attempts = (unit ? relatedAttempts(data, unit) : (data.attempt_log || [])).slice().reverse();
-      setText($("decomp-log-note"), unit ? `${attempts.length} entries for ${unitDisplayName(unit)}` : `${attempts.length} retained entries`);
-      if (!attempts.length) {
+      const attemptTime = row => {
+        const u = Number(row && row.unix);
+        if (Number.isFinite(u) && u > 0) return u;
+        const p = Date.parse((row && row.timestamp) || "");
+        return Number.isFinite(p) ? p / 1000 : 0;
+      };
+      let attempts = (activeUnit ? relatedAttempts(activeData, activeUnit) : (activeData.attempt_log || []))
+        .slice()
+        .sort((a, b) => attemptTime(b) - attemptTime(a));
+      // comprehensive filters (kind / free-text / row cap)
+      const f = store.logFilter || { kind: "all", q: "", limit: 80 };
+      const total = attempts.length;
+      if (f.kind && f.kind !== "all") attempts = attempts.filter(a => (a.kind || "") === f.kind);
+      if (f.q) {
+        const q = f.q.toLowerCase();
+        attempts = attempts.filter(a =>
+          `${a.message || ""} ${a.function || ""} ${a.agent || ""} ${a.file || ""}`.toLowerCase().includes(q));
+      }
+      const cap = f.limit || 80;
+      const shown = attempts.slice(0, cap);
+      const scope = activeUnit ? ` for ${unitDisplayName(activeUnit)}` : "";
+      const filtered = (f.kind !== "all" || f.q) ? ` (filtered from ${total})` : "";
+      setText($("decomp-log-note"), `${shown.length}${attempts.length > cap ? "/" + attempts.length : ""} entries${scope}${filtered}`);
+      if (!shown.length) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        setText(empty, "No attempt history found for this selection");
+        setText(empty, "No log entries match this filter");
         list.append(empty);
         return;
       }
-      for (const attempt of attempts.slice(0, 80)) {
+      for (const attempt of shown) {
         const row = document.createElement("div");
-        row.className = "attempt-row";
+        row.className = `attempt-row k-${attempt.kind || "note"}`;
         const time = document.createElement("div");
         time.className = "attempt-time";
         setText(time, hstTime(Number.isFinite(Number(attempt.unix)) ? Number(attempt.unix) : attempt.timestamp));
+        const agent = document.createElement("div");
+        agent.className = "attempt-agent mono";
+        setText(agent, attempt.agent || "");
         const kind = document.createElement("div");
         kind.className = "attempt-kind";
         setText(kind, attempt.kind);
         const message = document.createElement("div");
         message.className = "attempt-message";
         setText(message, attempt.message);
-        row.append(time, kind, message);
+        row.append(time, agent, kind, message);
         list.append(row);
       }
     }
     function renderCharts(data) {
-      drawDonut($("status-chart"), data.charts.status || []);
-      drawBars($("provenance-chart"), data.charts.provenance || []);
-      drawHistory($("history-chart"), data.history || []);
+      if (data.charts) {
+        drawDonut($("status-chart"), data.charts.status || []);
+        drawBars($("provenance-chart"), data.charts.provenance || []);
+      }
+      store._history = data.history || store._history || [];
+      drawHistoryRanged();
       renderSourceBars(data);
+    }
+    // history time-range filter (24h / 3d / 7d / 14d / all)
+    function drawHistoryRanged() {
+      const all = store._history || [];
+      const days = store.historyDays == null ? 14 : store.historyDays;
+      let rows = all;
+      if (days > 0 && all.length) {
+        const nowU = all.reduce((m, r) => Math.max(m, Number(r.unix) || 0), 0);
+        const cutoff = nowU - days * 86400;
+        const sub = all.filter(r => (Number(r.unix) || 0) >= cutoff);
+        if (sub.length >= 2) rows = sub;
+      }
+      drawHistory($("history-chart"), rows);
     }
     // ---- v9: agent activity ------------------------------------------------
     function renderAgents(payload) {
@@ -4508,6 +7366,269 @@ HTML = r"""<!doctype html>
       fetch("/api/agents", { cache: "no-store" })
         .then(r => r.json()).then(renderAgents).catch(() => {});
     }
+    // ---- fleet locks (SQLite coordination/locks.db) ------------------------
+    function lockAction(action, payload) {
+      return fetch(`/api/locks/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload || {}),
+        cache: "no-store",
+      }).then(r => r.json()).then(() => pollLocks()).catch(() => {});
+    }
+    function renderLocks(payload) {
+      const body = $("locks-body");
+      if (!body) return;
+      body.replaceChildren();
+      const rows = (payload && payload.locks) || [];
+      setText($("locks-note"), payload && payload.available
+        ? `${payload.file_count || 0} file, ${payload.fn_count || 0} fn`
+        : "no lock DB yet");
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.className = "empty-state";
+        setText(cell, "No active locks");
+        tr.append(cell);
+        body.append(tr);
+        return;
+      }
+      for (const lk of rows) {
+        const tr = document.createElement("tr");
+        const scope = document.createElement("td");
+        const tag = document.createElement("span");
+        tag.className = `lock-scope ${lk.scope}`;
+        setText(tag, lk.scope);
+        scope.append(tag);
+        const key = document.createElement("td");
+        key.className = "mono";
+        setText(key, lk.scope === "file" ? fileName(lk.key) : lk.key);
+        key.title = lk.key + (lk.note ? ` — ${lk.note}` : "");
+        const owner = document.createElement("td");
+        owner.className = "mono";
+        setText(owner, lk.owner || "-");
+        const ttl = document.createElement("td");
+        ttl.className = "mono";
+        setText(ttl, lk.ttl_remaining == null ? "∞" : fmtCountdown(lk.ttl_remaining));
+        if (lk.ttl_remaining != null && lk.ttl_remaining < 120) ttl.classList.add("hud-warn");
+        const act = document.createElement("td");
+        act.className = "lock-actions";
+        const renew = document.createElement("button");
+        renew.className = "btn ghost xs";
+        setText(renew, "Renew");
+        renew.onclick = () => lockAction("renew", { agent: lk.owner, key: lk.key, scope: lk.scope });
+        const rel = document.createElement("button");
+        rel.className = "btn ghost xs danger";
+        setText(rel, "Release");
+        rel.title = "Force-release this lock";
+        rel.onclick = () => lockAction("release", { agent: lk.owner, key: lk.key, scope: lk.scope, force: true });
+        act.append(renew, rel);
+        tr.append(scope, key, owner, ttl, act);
+        body.append(tr);
+      }
+    }
+    function pollLocks() {
+      fetch("/api/locks", { cache: "no-store" })
+        .then(r => r.json()).then(renderLocks).catch(() => {});
+    }
+
+    // ===== orchestrator panels: sync / prs / ship / leases / reports / quantum =====
+    function setT(id, v) { const e = $(id); if (e) setText(e, v); }
+    function postJSON(url, body) {
+      return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body || {}), cache: "no-store" }).then(r => r.json());
+    }
+    function renderSync(d) {
+      if (!d) return;
+      setT("sync-summary", d.available ? d.summary : "git unavailable");
+      setT("sync-branch", d.branch || "-");
+      setT("sync-head", d.head || "-");
+      setT("sync-ab", `${d.ahead || 0} ahead / ${d.behind || 0} behind`);
+      setT("sync-dirty", d.dirty == null ? "-" : String(d.dirty));
+      const s = $("sync-summary");
+      if (s) s.className = "rc-note " + (d.on_master ? "warn" : "good");
+    }
+    function pollSync() { fetch("/api/sync", { cache: "no-store" }).then(r => r.json()).then(renderSync).catch(() => {}); }
+
+    function renderPrs(d) {
+      if (!d) return;
+      setT("prs-note", d.available
+        ? `${d.open_count || 0} open · ${d.draft_count || 0} draft · ${d.merged_count || 0} merged`
+        : "gh unavailable");
+      const link = $("link-pokedex");
+      const list = $("pr-list");
+      if (!list) return;
+      list.replaceChildren();
+      const open = (d.open || []);
+      if (!d.available) { const e = document.createElement("div"); e.className = "empty-state"; setText(e, d.error || "gh CLI not found"); list.append(e); return; }
+      if (!open.length) { const e = document.createElement("div"); e.className = "empty-state"; setText(e, "No open PRs"); list.append(e); }
+      for (const pr of open.slice(0, 8)) {
+        const row = document.createElement("a");
+        row.className = "pr-row"; row.href = pr.url || "#"; row.target = "_blank"; row.rel = "noopener";
+        const num = document.createElement("span"); num.className = "pr-num mono"; setText(num, `#${pr.number}`);
+        const title = document.createElement("span"); title.className = "pr-title"; setText(title, pr.title || pr.headRefName || "");
+        const st = document.createElement("span");
+        const dec = (pr.reviewDecision || (pr.isDraft ? "DRAFT" : "OPEN")).toLowerCase().replace(/_/g, " ");
+        st.className = "pr-state " + (pr.isDraft ? "draft" : (pr.reviewDecision === "APPROVED" ? "approved" : "open"));
+        setText(st, dec);
+        row.append(num, title, st);
+        list.append(row);
+      }
+    }
+    function pollPrs() { fetch("/api/prs", { cache: "no-store" }).then(r => r.json()).then(renderPrs).catch(() => {}); }
+
+    function renderShip(d) {
+      if (!d) return;
+      setT("ship-state", d.state || "");
+      setT("ship-confirmed", d.confirmed || 0);
+      setT("ship-regress", d.regressions || 0);
+      const st = $("ship-state"); if (st) st.className = "rc-note " + (d.ready ? "good" : "warn");
+      const hint = $("ship-hint");
+      if (hint) setText(hint, d.on_master
+        ? "Blocked on master. Create/use a feature branch before Prepare handoff."
+        : (d.ready ? `Branch ${d.branch} - ${d.confirmed} wins ready to PR.` : `Branch ${d.branch || "-"} - not ready.`));
+      const wins = $("ship-wins");
+      if (wins) {
+        wins.replaceChildren();
+        for (const f of (d.files || []).slice(0, 8)) {
+          const row = document.createElement("div");
+          row.className = "ship-win";
+          const head = document.createElement("b");
+          setText(head, `${f.file}: ${f.count} win${Number(f.count) === 1 ? "" : "s"}`);
+          const src = document.createElement("div");
+          setText(src, f.source || "");
+          const funcs = document.createElement("span");
+          funcs.className = "mono";
+          setText(funcs, (f.functions || []).join(", "));
+          row.append(head, src, funcs);
+          wins.append(row);
+        }
+        if (!(d.files || []).length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          setText(empty, "No non-empty band-win bundles");
+          wins.append(empty);
+        }
+      }
+      const handoff = $("ship-handoff");
+      if (handoff) {
+        handoff.disabled = !d.ready;
+        handoff.title = d.ready ? "Push current branch and open a PR" : "Not ready for handoff";
+      }
+      setT("run-active", (store._leases && store._leases.active_count) || 0);
+      setT("run-queued", (store._leases && store._leases.queued_count) || 0);
+    }
+    function pollShip() { fetch("/api/ship", { cache: "no-store" }).then(r => r.json()).then(renderShip).catch(() => {}); }
+
+    function renderLeases(d) {
+      store._leases = d || {};
+      const aN = $("lease-active-n"), qN = $("lease-queued-n");
+      if (aN) setText(aN, d.active_count || 0);
+      if (qN) setText(qN, d.queued_count || 0);
+      setT("run-active", d.active_count || 0);
+      setT("run-queued", d.queued_count || 0);
+      setT("hud-active-leases", d.active_count || 0);
+      setT("hud-queued", d.queued_count || 0);
+      const ab = $("lease-active-body");
+      if (ab) {
+        ab.replaceChildren();
+        if (!(d.active || []).length) { const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 5; td.className = "empty-state"; setText(td, "No active leases right now"); tr.append(td); ab.append(tr); }
+        for (const l of (d.active || [])) {
+          const tr = document.createElement("tr");
+          const scope = document.createElement("td"); const tag = document.createElement("span"); tag.className = `lock-scope ${l.scope}`; setText(tag, l.scope); scope.append(tag);
+          const key = document.createElement("td"); key.className = "mono"; setText(key, l.scope === "file" ? fileName(l.key) : l.key); key.title = l.key;
+          const owner = document.createElement("td"); owner.className = "mono"; setText(owner, l.owner || "-");
+          const el = document.createElement("td"); el.className = "mono"; setText(el, l.elapsed == null ? "-" : fmtCountdown(l.elapsed));
+          const ttl = document.createElement("td"); ttl.className = "mono"; setText(ttl, l.ttl_remaining == null ? "∞" : fmtCountdown(l.ttl_remaining));
+          tr.append(scope, key, owner, el, ttl); ab.append(tr);
+        }
+      }
+      const qb = $("lease-queued-body");
+      if (qb) {
+        qb.replaceChildren();
+        if (!(d.queued || []).length) { const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 3; td.className = "empty-state"; setText(td, "Queue empty"); tr.append(td); qb.append(tr); }
+        for (const q of (d.queued || []).slice(0, 200)) {
+          const tr = document.createElement("tr");
+          const fn = document.createElement("td"); fn.className = "mono"; setText(fn, q.function || "-");
+          const pr = document.createElement("td"); const tag = document.createElement("span"); tag.className = `prio prio-${q.priority || "normal"}`; setText(tag, q.priority || "normal"); pr.append(tag);
+          const desc = document.createElement("td"); setText(desc, q.description || "");
+          tr.append(fn, pr, desc); qb.append(tr);
+        }
+      }
+    }
+    function pollLeases() { fetch("/api/leases", { cache: "no-store" }).then(r => r.json()).then(renderLeases).catch(() => {}); }
+
+    const REPORT_STATUSES = ["exact", "improved", "committed", "no progress", "needs rework", "tool error"];
+    function renderReports(d) {
+      store._reports = d || {};
+      const filt = $("report-filters");
+      const counts = (d && d.counts) || {};
+      if (filt && !filt.dataset.built) {
+        filt.dataset.built = "1";
+        const all = document.createElement("button"); all.className = "chip-btn active"; all.dataset.rstatus = "all"; setText(all, "all"); filt.append(all);
+        for (const s of REPORT_STATUSES) {
+          const b = document.createElement("button"); b.className = "chip-btn"; b.dataset.rstatus = s; setText(b, s); filt.append(b);
+        }
+        filt.addEventListener("click", e => {
+          const btn = e.target.closest("button[data-rstatus]"); if (!btn) return;
+          store.reportFilter = btn.dataset.rstatus;
+          filt.querySelectorAll("button").forEach(x => x.classList.toggle("active", x === btn));
+          renderReports(store._reports);
+        });
+      }
+      if (filt) filt.querySelectorAll("button[data-rstatus]").forEach(b => {
+        const s = b.dataset.rstatus; const n = s === "all" ? (d && d.total) || 0 : (counts[s] || 0);
+        b.dataset.n = n; b.style.opacity = (s !== "all" && !n) ? ".4" : "1";
+      });
+      setT("reports-note", d && d.available ? `${d.total} reports` : "no reports");
+      const body = $("reports-body"); if (!body) return;
+      body.replaceChildren();
+      const want = store.reportFilter || "all";
+      let reps = (d && d.reports) || [];
+      if (want !== "all") reps = reps.filter(r => r.status === want);
+      if (!reps.length) { const e = document.createElement("div"); e.className = "empty-state"; setText(e, "No worker reports"); body.append(e); return; }
+      for (const r of reps.slice(0, 40)) {
+        const card = document.createElement("div"); card.className = "report-card";
+        const top = document.createElement("div"); top.className = "report-top";
+        const fn = document.createElement("span"); fn.className = "report-fn mono"; setText(fn, r.function || r.file || "—");
+        const chip = document.createElement("span"); chip.className = "report-chip s-" + r.status.replace(/\s+/g, "-"); setText(chip, r.status);
+        top.append(fn, chip);
+        const meta = document.createElement("div"); meta.className = "report-meta";
+        const who = r.agent || "?"; const where = r.file ? ` · ${fileName(r.file)}` : "";
+        const pct = (r.percent != null) ? ` · ${Number(r.percent).toFixed(2)}%` : "";
+        setText(meta, `${who}${where}${pct}`);
+        const msg = document.createElement("div"); msg.className = "report-msg"; setText(msg, r.message || "");
+        card.append(top, meta, msg); body.append(card);
+      }
+    }
+    function pollReports() { fetch("/api/reports", { cache: "no-store" }).then(r => r.json()).then(renderReports).catch(() => {}); }
+
+    function renderQuantum(d) {
+      const grid = $("quantum-grid"); if (!grid) return;
+      grid.replaceChildren();
+      if (!d || !d.available) {
+        const e = document.createElement("div"); e.className = "empty-state";
+        setText(e, "Permuter idle (no .omc/permuter_state.json)"); grid.append(e);
+        setT("quantum-note", "idle"); return;
+      }
+      const s = d.state || {};
+      setT("quantum-note", s.fn || s["function"] || "permuter swarm");
+      const cells = [
+        ["best %", s.best != null ? Number(s.best).toFixed(2) : (s.best_pct != null ? Number(s.best_pct).toFixed(2) : "-")],
+        ["energy", s.energy != null ? Number(s.energy).toFixed(1) : "-"],
+        ["temp", s.temperature != null ? Number(s.temperature).toFixed(3) : (s.temp != null ? Number(s.temp).toFixed(3) : "-")],
+        ["iters", s.iterations != null ? s.iterations : (s.iters != null ? s.iters : "-")],
+        ["queue", Array.isArray(s.queue) ? s.queue.length : (s.queue != null ? s.queue : "-")],
+        ["workers", s.workers != null ? s.workers : "-"],
+      ];
+      for (const [k, v] of cells) {
+        const c = document.createElement("div"); c.className = "q-cell";
+        const kv = document.createElement("div"); kv.className = "q-k"; setText(kv, k);
+        const vv = document.createElement("div"); vv.className = "q-v mono"; setText(vv, String(v));
+        c.append(kv, vv); grid.append(c);
+      }
+    }
+    function pollQuantum() { fetch("/api/quantum", { cache: "no-store" }).then(r => r.json()).then(renderQuantum).catch(() => {}); }
     // ---- v10: live attempt-log poll (independent of the slow /api/state) ----
     function pollLog() {
       fetch("/api/log?limit=1000", { cache: "no-store" })
@@ -4516,6 +7637,7 @@ HTML = r"""<!doctype html>
           const merged = (payload && payload.attempt_log) || [];
           // Render the log even before the (slow) /api/state arrives, so the
           // Decomp attempt log is never blank just because build_state lagged.
+          store._logData = { attempt_log: merged, decomp: (store.data && store.data.decomp) || {} };
           if (!store.data) store.data = { attempt_log: merged, decomp: {} };
           store.data.attempt_log = merged;
           // Re-render the decomp attempt log against the currently-drilled unit
@@ -4569,8 +7691,27 @@ HTML = r"""<!doctype html>
         setText(cd, a.next_reset_unix ? fmtCountdown(remaining) : "n/a");
         const note = document.createElement("div");
         note.className = "limit-note";
-        setText(note, a.next_reset_unix ? `resets ${hstTime(a.next_reset_unix)} HST` : (a.note || "set last_reset"));
+        const assumed = a.assumed ? " (assumed)" : "";
+        setText(note, a.next_reset_unix ? `resets ${hstTime(a.next_reset_unix)} HST${assumed}` : (a.note || "set last_reset"));
         card.append(label, cd, note);
+        const models = Array.isArray(a.models) ? a.models : [];
+        if (models.length || a.assumed) {
+          const chips = document.createElement("div");
+          chips.className = "limit-models";
+          for (const model of models.slice(0, 5)) {
+            const chip = document.createElement("span");
+            chip.className = "model-chip" + (a.assumed ? " assumed" : "");
+            setText(chip, model);
+            chips.append(chip);
+          }
+          if (a.assumed) {
+            const chip = document.createElement("span");
+            chip.className = "model-chip assumed";
+            setText(chip, "editable");
+            chips.append(chip);
+          }
+          card.append(chips);
+        }
         grid.append(card);
       }
     }
@@ -4581,7 +7722,8 @@ HTML = r"""<!doctype html>
     // ---- v10: token-expense STACKED bar chart, per-source colors ------------
     const TOKEN_SOURCES = [
       { key: "claude", label: "Claude", color: "#38b995" },
-      { key: "opencode", label: "OpenCode", color: "#5c91df" }
+      { key: "opencode", label: "OpenCode", color: "#5c91df" },
+      { key: "codex", label: "Codex", color: "#a98ee6" }
     ];
     const fmtTok = n => {
       n = Number(n || 0);
@@ -4597,7 +7739,9 @@ HTML = r"""<!doctype html>
       if (!buckets.length) {
         return drawEmpty(ctx, w, h, payload && payload.reason ? payload.reason : "No token usage in window");
       }
-      const srcVal = (b, key) => Number((b.by_source && b.by_source[key]) || b[key] || 0);
+      const srcVal = (b, key) => key === "codex"
+        ? Number(b.codex || 0)
+        : Number((b.by_source && b.by_source[key]) || b[key] || 0);
       const pad = { l: 54, r: 16, t: 22, b: 30 };
       const xs = buckets.map(b => Number(b.unix || 0));
       const maxTotal = Math.max(...buckets.map(b => TOKEN_SOURCES.reduce((s, src) => s + srcVal(b, src.key), 0)), 1);
@@ -4630,10 +7774,10 @@ HTML = r"""<!doctype html>
             base -= segH;
           }
         }
-        // codex activity: a small tick marker (scaled to its own max) above axis
+        // codex prompt activity: a small tick marker (scaled to its own max) above axis
         const ev = Number(b.codex_events || 0);
         if (ev > 0) {
-          ctx.fillStyle = "#a98ee6";
+          ctx.fillStyle = "#cab8ff";
           const ty = h - pad.b - 2;
           const tickH = 4 + 8 * ev / maxEvents;
           ctx.fillRect(cx - 1.5, ty - tickH, 3, tickH);
@@ -4647,8 +7791,8 @@ HTML = r"""<!doctype html>
         ctx.fillStyle = "#cbd5e3"; ctx.fillText(src.label, lx + 13, pad.t - 5);
         lx += ctx.measureText(src.label).width + 30;
       }
-      ctx.fillStyle = "#a98ee6"; ctx.fillRect(lx, pad.t - 14, 9, 9);
-      ctx.fillStyle = "#cbd5e3"; ctx.fillText("Codex (activity)", lx + 13, pad.t - 5);
+      ctx.fillStyle = "#cab8ff"; ctx.fillRect(lx, pad.t - 14, 9, 9);
+      ctx.fillStyle = "#cbd5e3"; ctx.fillText("Codex events", lx + 13, pad.t - 5);
       // x labels
       ctx.fillStyle = "#7c8aa0"; ctx.font = "11px Segoe UI, Arial"; ctx.textAlign = "center";
       const dateLbl = ux => new Date(Number(ux) * 1000).toLocaleString("en-US", { timeZone: "Pacific/Honolulu", month: "numeric", day: "numeric", hour: "2-digit", hour12: false });
@@ -4663,9 +7807,10 @@ HTML = r"""<!doctype html>
       const items = [
         ["Claude", fmtTok(totals.claude), "#38b995"],
         ["OpenCode", fmtTok(totals.opencode), "#5c91df"],
-        ["Codex events", String(totals.codex_events || 0), "#a98ee6"],
+        ["Codex", fmtTok(totals.codex), "#a98ee6"],
         ["All tokens", fmtTok(totals.all_tokens), "#eef4fb"]
       ];
+      if (totals.codex_events) items.push(["Codex events", String(totals.codex_events || 0), "#cab8ff"]);
       if (totals.agent_tokens_cumulative) items.push(["Agent (cumulative)", fmtTok(totals.agent_tokens_cumulative), "#8da0b8"]);
       for (const [label, value, color] of items) {
         const box = document.createElement("div");
@@ -4680,6 +7825,20 @@ HTML = r"""<!doctype html>
         box.append(v, k);
         strip.append(box);
       }
+      const modelStrip = document.createElement("div");
+      modelStrip.className = "model-strip";
+      modelStrip.style.flexBasis = "100%";
+      for (const row of ((payload && payload.by_model) || []).slice(0, 10)) {
+        const chip = document.createElement("span");
+        chip.className = "model-chip";
+        const model = row.model || "?";
+        if (String(model).toLowerCase().includes("claude")) chip.style.borderColor = "rgba(56,185,149,.7)";
+        if (String(model).toLowerCase().includes("glm")) chip.style.borderColor = "rgba(92,145,223,.75)";
+        if (String(model).toLowerCase().includes("gpt")) chip.style.borderColor = "rgba(169,142,230,.75)";
+        setText(chip, `${model}: ${fmtTok(row.tokens)}`);
+        modelStrip.append(chip);
+      }
+      if (modelStrip.children.length) strip.append(modelStrip);
     }
     function pollTokens() {
       // Default window 168h (7d); widen progressively if recent buckets empty so
@@ -4706,6 +7865,231 @@ HTML = r"""<!doctype html>
           .catch(() => { setText($("tokens-note"), "token source unavailable"); });
       };
       attempt();
+    }
+    function drawKgGraph(canvas, kg) {
+      const { ctx, w, h } = fitCanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+      if (!kg || !kg.available) return drawEmpty(ctx, w, h, kg && kg.error ? kg.error : "Knowledge graph unavailable");
+      const c = kg.counts || {};
+      const rel = kg.relationship_graph || {};
+      const relNodes = (rel.nodes || []).slice(0, 36);
+      const relEdges = (rel.edges || []).slice(0, 72);
+      if (relNodes.length) {
+        const pos = {};
+        const classes = relNodes.filter(n => n.kind === "class").slice(0, 10);
+        const fns = relNodes.filter(n => n.kind !== "class").slice(0, 26);
+        classes.forEach((n, i) => {
+          const step = h / Math.max(2, classes.length + 1);
+          pos[n.id] = { x: w * .20, y: step * (i + 1), node: n };
+        });
+        fns.forEach((n, i) => {
+          const angle = (Math.PI * 2 * i) / Math.max(1, fns.length);
+          const rx = Math.max(80, w * .25);
+          const ry = Math.max(55, h * .30);
+          pos[n.id] = {
+            x: w * .64 + Math.cos(angle) * rx,
+            y: h * .52 + Math.sin(angle) * ry,
+            node: n
+          };
+        });
+        ctx.lineWidth = 1.2;
+        for (const e of relEdges) {
+          const a = pos[e.from], b = pos[e.to];
+          if (!a || !b) continue;
+          const isCall = e.kind === "calls";
+          ctx.strokeStyle = isCall ? "rgba(92,145,223,.58)" : "rgba(56,185,149,.32)";
+          if (e.confidence === "medium") ctx.strokeStyle = isCall ? "rgba(240,179,90,.55)" : "rgba(56,185,149,.24)";
+          ctx.setLineDash(isCall ? [] : [4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          const mx = (a.x + b.x) / 2;
+          const my = (a.y + b.y) / 2 - (isCall ? 12 : 0);
+          ctx.quadraticCurveTo(mx, my, b.x, b.y);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        for (const item of Object.values(pos)) {
+          const n = item.node;
+          const isClass = n.kind === "class";
+          const isNamed = n.kind === "named";
+          const color = isClass ? "#38b995" : (isNamed ? "#a98ee6" : "#5c91df");
+          if (isClass) {
+            ctx.fillStyle = "#101824";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(item.x - 58, item.y - 15, 116, 30, 6);
+            else ctx.rect(item.x - 58, item.y - 15, 116, 30);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = "#101824";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(item.x, item.y, isNamed ? 12 : 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.fillStyle = "#dfe8f4";
+          ctx.textAlign = "center";
+          ctx.font = isClass ? "10px Segoe UI, Arial" : "9.5px Consolas, 'Courier New', monospace";
+          ctx.fillText(n.label || n.id, item.x, item.y + (isClass ? 4 : 24), isClass ? 104 : 92);
+        }
+        ctx.fillStyle = "#8da0b8";
+        ctx.textAlign = "left";
+        ctx.font = "11px Segoe UI, Arial";
+        ctx.fillText(`${relNodes.length} nodes / ${relEdges.length} edges`, 10, h - 12);
+        return;
+      }
+      const cx = w / 2, cy = h / 2;
+      const nodes = [
+        { id: "functions", label: "functions", value: c.functions || 0, x: cx, y: cy, r: 34, color: "#5c91df" },
+        { id: "levers", label: "levers", value: c.levers || 0, x: w * .24, y: h * .30, r: 25, color: "#38b995" },
+        { id: "walls", label: "walls", value: c.walls || 0, x: w * .76, y: h * .30, r: 24, color: "#e07171" },
+        { id: "near", label: "near", value: c.near || 0, x: w * .25, y: h * .74, r: 27, color: "#f0b35a" },
+        { id: "externals", label: "external tech", value: c.externals || 0, x: w * .76, y: h * .74, r: 24, color: "#a98ee6" },
+        { id: "cracks", label: "cracks", value: c.cracked_edges || 0, x: cx, y: h * .16, r: 22, color: "#8da0b8" }
+      ];
+      const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
+      const edges = [
+        ["levers", "functions"], ["cracks", "functions"], ["walls", "functions"],
+        ["near", "functions"], ["externals", "levers"], ["externals", "cracks"],
+        ["near", "levers"], ["walls", "near"]
+      ];
+      ctx.lineWidth = 1.4;
+      for (const [a, b] of edges) {
+        const A = byId[a], B = byId[b];
+        const grad = ctx.createLinearGradient(A.x, A.y, B.x, B.y);
+        grad.addColorStop(0, A.color);
+        grad.addColorStop(1, B.color);
+        ctx.strokeStyle = grad;
+        ctx.globalAlpha = .45;
+        ctx.beginPath();
+        ctx.moveTo(A.x, A.y);
+        const mx = (A.x + B.x) / 2;
+        const my = (A.y + B.y) / 2 - 18;
+        ctx.quadraticCurveTo(mx, my, B.x, B.y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      for (const n of nodes) {
+        const glow = ctx.createRadialGradient(n.x, n.y, 2, n.x, n.y, n.r * 1.9);
+        glow.addColorStop(0, n.color + "aa");
+        glow.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 1.9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#101824";
+        ctx.strokeStyle = n.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#eef4fb";
+        ctx.textAlign = "center";
+        ctx.font = "800 15px Consolas, 'Courier New', monospace";
+        ctx.fillText(Number(n.value || 0).toLocaleString(), n.x, n.y - 2);
+        ctx.fillStyle = "#a8b4c4";
+        ctx.font = "10px Segoe UI, Arial";
+        ctx.fillText(n.label, n.x, n.y + 14);
+      }
+    }
+    function renderKg(kg) {
+      store._kgPayload = kg || {};
+      drawKgGraph($("kg-graph"), store._kgPayload);
+      setText($("kg-note"), kg && kg.available ? `kg.db updated ${kg.generated_at}` : "kg.db unavailable");
+      const stats = $("kg-stats");
+      const levers = $("kg-levers");
+      const targets = $("kg-targets");
+      const tags = $("kg-tags");
+      const edges = $("kg-edges");
+      if (!stats || !levers || !targets) return;
+      stats.replaceChildren(); levers.replaceChildren(); targets.replaceChildren();
+      if (tags) tags.replaceChildren();
+      if (edges) edges.replaceChildren();
+      const c = (kg && kg.counts) || {};
+      for (const [label, value] of [
+        ["functions", c.functions || 0], ["near", c.near || 0], ["cracks", c.cracked_edges || 0],
+        ["calls", c.calls || 0], ["tags", c.calltags || 0], ["evidence", c.name_evidence || 0],
+        ["levers", c.levers || 0], ["walls", c.walls || 0], ["external", c.externals || 0]
+      ]) {
+        const box = document.createElement("div");
+        box.className = "kg-stat";
+        const v = document.createElement("b");
+        setText(v, Number(value || 0).toLocaleString());
+        const k = document.createElement("span");
+        setText(k, label);
+        box.append(v, k);
+        stats.append(box);
+      }
+      for (const row of ((kg && kg.top_levers) || []).slice(0, 8)) {
+        const el = document.createElement("div");
+        el.className = "kg-row";
+        const a = document.createElement("span");
+        a.className = "mono";
+        setText(a, row.slug || row.title || "");
+        const b = document.createElement("span");
+        setText(b, `${row.cracks || 0}`);
+        el.append(a, b);
+        levers.append(el);
+      }
+      if (tags) {
+        const tagRows = ((kg && kg.calltags) || []).slice(0, 6);
+        for (const row of tagRows) {
+          const el = document.createElement("div");
+          el.className = "kg-row";
+          const a = document.createElement("span");
+          a.className = "mono";
+          setText(a, `${row.tag || ""} ${row.confidence || ""}`);
+          const b = document.createElement("span");
+          setText(b, `${row.functions || 0} @ ${row.avg_score || 0}`);
+          el.append(a, b);
+          tags.append(el);
+        }
+        for (const row of ((kg && kg.name_evidence) || []).slice(0, Math.max(0, 8 - tagRows.length))) {
+          const el = document.createElement("div");
+          el.className = "kg-row";
+          const a = document.createElement("span");
+          a.className = "mono";
+          setText(a, `${row.symbol || ""} -> ${row.candidate || ""}`);
+          const b = document.createElement("span");
+          setText(b, `${row.score || 0}`);
+          el.append(a, b);
+          tags.append(el);
+        }
+      }
+      for (const row of ((kg && kg.targets) || []).slice(0, 10)) {
+        const el = document.createElement("div");
+        el.className = "kg-row";
+        const a = document.createElement("span");
+        a.className = "mono";
+        setText(a, `${row.addr} ${fileName(row.tu || "")}`);
+        const b = document.createElement("span");
+        setText(b, pctText(row.pct));
+        el.append(a, b);
+        targets.append(el);
+      }
+      if (edges) {
+        for (const row of ((kg && kg.call_edges) || []).slice(0, 10)) {
+          const el = document.createElement("div");
+          el.className = "kg-row";
+          const a = document.createElement("span");
+          a.className = "mono";
+          setText(a, `${row.caller || ""} -> ${row.callee || ""}`);
+          const b = document.createElement("span");
+          setText(b, row.confidence || "");
+          el.append(a, b);
+          edges.append(el);
+        }
+      }
+      setText($("kg-target-note"), `${((kg && kg.targets) || []).length} targets`);
+    }
+    function pollKg() {
+      fetch("/api/kg", { cache: "no-store" })
+        .then(r => r.json()).then(renderKg).catch(() => renderKg({ available: false, error: "kg endpoint unavailable" }));
     }
     function miniBar(pct) {
       const wrap = document.createElement("span");
@@ -4825,6 +8209,7 @@ HTML = r"""<!doctype html>
           renderDecompDetail(store.data);
           // The token canvas also had zero size while hidden; redraw on show.
           pollTokens();
+          drawKgGraph($("kg-graph"), store._kgPayload || {});
           tickLimits();
         } else if (view === "files") {
           renderFilesTable(store.data);
@@ -4855,6 +8240,7 @@ HTML = r"""<!doctype html>
       store.rows = data.targets || [];
       renderHud(data);
       renderMetrics(data);
+      renderAttackMatrix(data);
       renderTop(data);
       renderLegend(data);
       renderSourceFilters(store.rows);
@@ -4916,6 +8302,13 @@ HTML = r"""<!doctype html>
       store.tm.areaByFns = $("decomp-area-fns").checked;
       if (store.data) renderTreemap();
     });
+    $("decomp-difficulty").addEventListener("change", () => {
+      store.tm.difficultyFilter = $("decomp-difficulty").value || "all";
+      if (store.data) {
+        renderDecompDetail(store.data);
+        renderTreemap();
+      }
+    });
     $("decomp-near").addEventListener("click", () => {
       store.decompNearOnly = !store.decompNearOnly;
       $("decomp-near").classList.toggle("primary", store.decompNearOnly);
@@ -4923,6 +8316,8 @@ HTML = r"""<!doctype html>
     });
     $("decomp-clear").addEventListener("click", () => {
       $("decomp-query").value = "";
+      $("decomp-difficulty").value = "all";
+      store.tm.difficultyFilter = "all";
       store.decompNearOnly = false;
       $("decomp-near").classList.remove("primary");
       gotoFiles();
@@ -4987,6 +8382,7 @@ HTML = r"""<!doctype html>
         renderCharts(store.data);
         if (store.activeView === "decomp") renderTreemap();
       }
+      if (store.activeView === "decomp") drawKgGraph($("kg-graph"), store._kgPayload || {});
     });
     if (location.hash === "#symbols") {
       store.activeView = "symbols";
@@ -4997,15 +8393,84 @@ HTML = r"""<!doctype html>
     // (lighter endpoints, want a faster cadence). Token chart redraws on the
     // main refresh cadence and on view switch.
     pollAgents();
+    pollLocks();
     pollLimits();
     pollTokens();
+    pollKg();
+    pollCrackJobs();
     pollLog();   // populate the attempt log immediately (independent of /api/state)
+    pollSync(); pollPrs(); pollShip(); pollLeases(); pollReports(); pollQuantum();
+    const _gcBtn = $("locks-gc");
+    if (_gcBtn) _gcBtn.addEventListener("click", () => lockAction("gc", {}));
+
+    // ---- orchestrator control wiring ----
+    store.logFilter = { kind: "all", q: "", limit: 80 };
+    store.historyDays = 14;
+    store.reportFilter = "all";
+    // Match-Progress time range buttons
+    $("history-range")?.addEventListener("click", e => {
+      const b = e.target.closest("button[data-days]"); if (!b) return;
+      store.historyDays = Number(b.dataset.days);
+      $("history-range").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+      drawHistoryRanged();
+    });
+    // Leases active/queued tabs
+    $("lease-tabs")?.addEventListener("click", e => {
+      const b = e.target.closest("button[data-lease]"); if (!b) return;
+      const which = b.dataset.lease;
+      $("lease-tabs").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+      $("lease-active-pane").hidden = which !== "active";
+      $("lease-queued-pane").hidden = which !== "queued";
+    });
+    // Comprehensive log filters
+    const applyLog = () => {
+      const data = store.data || store._logData;
+      if (data) renderDecompAttemptLog(data, store._logUnit || null);
+    };
+    $("log-query")?.addEventListener("input", () => { store.logFilter.q = $("log-query").value.trim(); applyLog(); });
+    $("log-limit")?.addEventListener("change", () => { store.logFilter.limit = Number($("log-limit").value) || 80; applyLog(); });
+    $("log-kinds")?.addEventListener("click", e => {
+      const b = e.target.closest("button[data-kind]"); if (!b) return;
+      store.logFilter.kind = b.dataset.kind;
+      $("log-kinds").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+      applyLog();
+    });
+    // Sync / PRs / Ship actions
+    $("sync-fetch")?.addEventListener("click", () => {
+      const b = $("sync-fetch"); const old = b.textContent; b.textContent = "Fetching…"; b.disabled = true;
+      postJSON("/api/git/fetch", {}).then(r => { b.textContent = r && r.ok ? "Fetched ✓" : "Fetch failed"; })
+        .catch(() => { b.textContent = "Fetch failed"; })
+        .finally(() => setTimeout(() => { b.textContent = old; b.disabled = false; pollSync(); pollPrs(); }, 1500));
+    });
+    $("prs-refresh")?.addEventListener("click", () => pollPrs());
+    $("ship-handoff")?.addEventListener("click", () => {
+      if (!confirm("Push the current branch and open a PR for the confirmed wins?")) return;
+      const b = $("ship-handoff"); const old = b.textContent; b.textContent = "Preparing…"; b.disabled = true;
+      postJSON("/api/ship/prepare", {}).then(r => {
+        if (r && r.ok) { b.textContent = "PR opened ✓"; if (r.url) window.open(r.url, "_blank"); }
+        else { b.textContent = (r && r.error) ? "Failed" : "Failed"; alert((r && r.error) || "Handoff failed"); }
+      }).catch(() => { b.textContent = "Failed"; })
+        .finally(() => setTimeout(() => { b.textContent = old; b.disabled = false; pollShip(); pollPrs(); pollSync(); }, 2000));
+    });
+    // Pokédex dashboard link (separate server on its own port if running)
+    const pdx = $("link-pokedex");
+    if (pdx) pdx.href = `http://${location.hostname}:8793/`;
+
     store.agentsTimer = setInterval(pollAgents, 10000);
+    store.locksTimer = setInterval(pollLocks, 10000);
+    store.leasesTimer = setInterval(pollLeases, 8000);
+    store.reportsTimer = setInterval(pollReports, 12000);
+    store.syncTimer = setInterval(() => { pollSync(); pollShip(); }, 30000);
+    store.prsTimer = setInterval(pollPrs, 60000);
+    store.quantumTimer = setInterval(pollQuantum, 10000);
     store.limitsTimer = setInterval(pollLimits, 60000);
+    store.kgTimer = setInterval(pollKg, 30000);
+    store.crackTimer = setInterval(pollCrackJobs, 15000);
     store.logTimer = setInterval(pollLog, 15000);   // live attempt-log refresh
     setInterval(tickLimits, 1000);   // smooth 1s countdown without refetching
     window.addEventListener("resize", () => {
       if (store.activeView === "decomp") drawTokens($("tokens-chart"), store._tokensPayload || {});
+      if (store.activeView === "decomp") drawKgGraph($("kg-graph"), store._kgPayload || {});
     });
     refresh();
     scheduleRefresh();
@@ -5112,6 +8577,83 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
         self.end_headers()
         self.wfile.write(body)
 
+    def _read_json_body(self) -> dict:
+        try:
+            n = int(self.headers.get("Content-Length", 0) or 0)
+        except (TypeError, ValueError):
+            n = 0
+        if n <= 0:
+            return {}
+        raw = self.rfile.read(n)
+        try:
+            data = json.loads(raw.decode("utf-8") or "{}")
+            return data if isinstance(data, dict) else {}
+        except (ValueError, UnicodeDecodeError):
+            return {}
+
+    def do_POST(self) -> None:
+        """Agent controls. Localhost-only mutating actions over the fleet-lock DB.
+        All routes return {ok, ...}. Unknown routes -> 404 JSON."""
+        parsed = urlparse(self.path)
+        path = parsed.path
+        # Git/ship actions (safe, read-ish): fetch origin, prepare a PR handoff.
+        if path == "/api/git/fetch":
+            try:
+                _git("fetch", "origin", timeout=40)
+                _CMD_CACHE.pop("sync", None); _CMD_CACHE.pop("prs", None)
+                self.send_json({"ok": True})
+            except Exception as exc:
+                self.send_json({"ok": False, "error": str(exc)})
+            return
+        if path == "/api/ship/prepare":
+            self.send_json(prepare_handoff())
+            return
+        if path == "/api/crack/enqueue":
+            self.send_json(enqueue_crack_job(self._read_json_body()))
+            return
+        if path == "/api/crack/open-terminal":
+            body = self._read_json_body()
+            pane = str(body.get("pane") or "codex")
+            self.send_json(open_tmux_window(pane))
+            return
+        if not path.startswith("/api/locks/"):
+            self.send_response(404)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"ok": false, "error": "no such endpoint"}')
+            return
+        body = self._read_json_body()
+        try:
+            lk = locks_module()
+        except Exception as exc:  # locks.py missing/broken — surface, don't crash
+            self.send_json({"ok": False, "error": f"locks unavailable: {exc}"})
+            return
+        agent = str(body.get("agent") or "dashboard")
+        scope = str(body.get("scope") or "fn")
+        key = str(body.get("key") or "")
+        try:
+            if path == "/api/locks/release":
+                r = lk.release(agent, key, scope=scope, force=bool(body.get("force")))
+            elif path == "/api/locks/acquire":
+                r = lk.acquire(agent, key, scope=scope,
+                               ttl=int(body.get("ttl", lk.DEFAULT_TTL)),
+                               file=body.get("file"), note=body.get("note"))
+            elif path == "/api/locks/renew":
+                r = lk.renew(agent, key=key or None, scope=(scope if key else None),
+                             ttl=int(body.get("ttl", lk.DEFAULT_TTL)))
+            elif path == "/api/locks/gc":
+                r = {"ok": True, "purged": lk.gc()}
+            else:
+                self.send_response(404)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"ok": false, "error": "no such lock action"}')
+                return
+        except Exception as exc:
+            self.send_json({"ok": False, "error": str(exc)})
+            return
+        self.send_json(r)
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path
@@ -5155,6 +8697,27 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
         if path == "/api/agents":
             self.send_json(load_agents())
             return
+        if path == "/api/locks":
+            self.send_json(load_locks())
+            return
+        if path == "/api/leases":
+            self.send_json(load_leases())
+            return
+        if path == "/api/reports":
+            self.send_json(load_reports())
+            return
+        if path == "/api/sync":
+            self.send_json(load_sync())
+            return
+        if path == "/api/prs":
+            self.send_json(load_prs())
+            return
+        if path == "/api/ship":
+            self.send_json(load_ship())
+            return
+        if path == "/api/quantum":
+            self.send_json(load_quantum())
+            return
         if path == "/api/tokens":
             try:
                 hours = int((query.get("hours") or ["168"])[0])
@@ -5165,13 +8728,13 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
         if path == "/api/log":
             raw = (query.get("limit") or ["1000"])[0]
             if str(raw).lower() == "all":
-                limit = 10 ** 9
+                limit = None
             else:
                 try:
                     limit = max(1, min(int(raw), 100000))
                 except (TypeError, ValueError):
                     limit = 1000
-            merged = load_attempt_log(DECOMP_STATUS_LOG, limit=limit) + recent_commit_attempts()
+            merged = merged_attempt_log(limit=limit)
             self.send_json({
                 "available": bool(merged),
                 "limit": raw,
@@ -5179,6 +8742,36 @@ Serve only over the private tailnet. Not linked from the public dashboard UI.</p
                 "attempt_log": merged,
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
             })
+            return
+        if path == "/api/kg":
+            self.send_json(load_kg())
+            return
+        if path == "/api/hardest":
+            data = load_hard_targets()
+            entries = data.get("entries") if isinstance(data, dict) else []
+            self.send_json({
+                "available": bool(data.get("available")) if isinstance(data, dict) else False,
+                "source": data.get("source") if isinstance(data, dict) else "",
+                "counts": data.get("counts") if isinstance(data, dict) else {},
+                "entries": entries[:300] if isinstance(entries, list) else [],
+                "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            })
+            return
+        if path == "/api/crack/jobs":
+            raw = (query.get("limit") or ["80"])[0]
+            try:
+                limit = max(1, min(int(raw), 500))
+            except (TypeError, ValueError):
+                limit = 80
+            self.send_json(load_crack_jobs(limit=limit))
+            return
+        if path == "/api/crack/terminal":
+            pane = (query.get("pane") or ["codex"])[0]
+            try:
+                lines = int((query.get("lines") or ["100"])[0])
+            except (TypeError, ValueError):
+                lines = 100
+            self.send_json(capture_tmux_pane(pane, lines))
             return
         if path == "/artifacts":
             self.send_artifacts_index()

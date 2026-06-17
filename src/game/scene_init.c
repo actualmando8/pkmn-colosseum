@@ -7823,7 +7823,10 @@ asm void fn_80057458(void) {
 #pragma optimization_level 4
 void fn_80057458(u8* src) {
     s32 next = (s32)(*(u32*)(lbl_803A9768 + 0x278) + 1) % 2;
-    *(Tbl78*)(lbl_803A9768 + next * 0x138 + 8) = *(Tbl78*)src;
+    Tbl78* dstState = (Tbl78*)(lbl_803A9768 + next * 0x138 + 8);
+    Tbl78* srcState = (Tbl78*)src;
+
+    *dstState = *srcState;
 }
 #endif
 
@@ -7865,7 +7868,10 @@ asm void fn_800574FC(void) {
 #pragma optimization_level 4
 void fn_800574FC(u8* src) {
     u32 slot = *(u32*)(lbl_803A9768 + 0x278);
-    *(Tbl78*)(lbl_803A9768 + slot * 0x138 + 8) = *(Tbl78*)src;
+    Tbl78* dstState = (Tbl78*)(lbl_803A9768 + slot * 0x138 + 8);
+    Tbl78* srcState = (Tbl78*)src;
+
+    *dstState = *srcState;
 }
 #endif
 
@@ -8121,9 +8127,14 @@ void fn_80057A64(u8* state, u32 b) {
         i++;
     }
     if (state != NULL) {
+        Tbl78* dstState;
+        Tbl78* srcState;
+
         base = (u8*)lbl_803A9768;
         *(u32*)(base + 0) = 3;
-        *(Tbl78*)(base + 8) = *(Tbl78*)state;
+        dstState = (Tbl78*)(base + 8);
+        srcState = (Tbl78*)state;
+        *dstState = *srcState;
     }
     lbl_8047A58C = lbl_8047BF00;
     lbl_8047A588 = lbl_8047BEF4;

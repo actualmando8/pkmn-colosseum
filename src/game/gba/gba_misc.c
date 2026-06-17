@@ -8,25 +8,64 @@
 
 #include "dolphin/types.h"
 
+typedef struct GbaMiscContext {
+    u8 unk_0000[0x4000];
+    u8 state_4000;       /* 0x4000 */
+    u8 unk_4001[0x135];
+    u8 tableKey_4136;    /* 0x4136 */
+} GbaMiscContext;
+
+/*
+ * Source-level names only: the macros preserve the original fn_* linker
+ * symbols for objdiff while documenting the recovered behavior.
+ */
+#define GbaMisc_GetMappedContextByte fn_80089B8C
+#define GbaMisc_HasActiveContextState fn_80089C10
+#define GbaMisc_PollEntryStatusA fn_80089CA8
+#define GbaMisc_ResetEntryStatusA fn_80089D30
+#define GbaMisc_GetEntryStatus fn_8008A9E4
+#define GbaMisc_SendPackedEntryStatus fn_8008AB20
+#define GbaMisc_SetEntryState fn_8008ABE4
+#define GbaMisc_RunFlagDispatch fn_8008C700
+
+#define GBA_MISC_ENTRY_WORD_OFFSET(idx) ((idx) << 2)
+#define GBA_MISC_ENTRY_HALF_OFFSET(idx) ((idx) << 1)
+#define GbaMisc_EntryStateAtWordOffset(offset) \
+    (*(s32*)((u8*)&lbl_803FB318 + (offset) + (-4)))
+#define GbaMisc_EntryCachedStatusAtWordOffset(offset) \
+    (*(s32*)((u8*)&lbl_803FB308 + (offset) + (-4)))
+#define GbaMisc_EntryCounterAAtHalfOffset(offset) \
+    (*(u16*)((u8*)&lbl_8047A684 + (offset) + (-2)))
+#define GbaMisc_EntryCounterBAtHalfOffset(offset) \
+    (*(u16*)((u8*)&lbl_8047A67C + (offset) + (-2)))
+#define GbaMisc_EntryState(idx) \
+    GbaMisc_EntryStateAtWordOffset(GBA_MISC_ENTRY_WORD_OFFSET(idx))
+#define GbaMisc_EntryCachedStatus(idx) \
+    GbaMisc_EntryCachedStatusAtWordOffset(GBA_MISC_ENTRY_WORD_OFFSET(idx))
+#define GbaMisc_EntryCounterA(idx) \
+    GbaMisc_EntryCounterAAtHalfOffset(GBA_MISC_ENTRY_HALF_OFFSET(idx))
+#define GbaMisc_EntryCounterB(idx) \
+    GbaMisc_EntryCounterBAtHalfOffset(GBA_MISC_ENTRY_HALF_OFFSET(idx))
+
 /* ===== External function declarations ===== */
 extern void fn_8001E184();
 extern void fn_80071700();
 extern void fn_800719A8();
-extern void fn_80071AE4();
+extern s32 fn_80071AE4();
 extern void fn_800722A0();
 extern void fn_80072548();
-extern void fn_800726A8();
+extern s32 fn_800726A8();
 extern void fn_80072A00();
 extern void fn_80072C74();
 extern void fn_80072D58();
-extern void _AGB_EntryGetStatus__FlPUl();
+extern s32 _AGB_EntryGetStatus__FlPUl(s32, u32*);
 extern void fn_800730F8();
 extern void fn_800733D0();
 extern void fn_80073990();
 extern void fn_80073A44();
 extern void fn_800830A4();
 extern void fn_80083BF8();
-extern void fn_80083CFC();
+extern GbaMiscContext* fn_80083CFC();
 extern void fn_80083D30();
 extern void fn_80083ECC();
 extern void fn_800C46B0();
@@ -108,15 +147,15 @@ void fn_800896D8(u32 v);
 void fn_800896E0(u32 v);
 void fn_800896E8(void);
 void fn_80089978(void);
-void fn_80089B8C(void);
-void fn_80089C10(void);
+u8 GbaMisc_GetMappedContextByte(void);
+s32 GbaMisc_HasActiveContextState(void);
 s32 fn_80089C54(void);
 void fn_80089C84(s32 param);
-void fn_80089CA8(void);
-void fn_80089D30(void);
+s32 GbaMisc_PollEntryStatusA(s32 r31);
+s32 GbaMisc_ResetEntryStatusA(s32 param);
 void fn_80089D74(s32 param);
 s32 fn_80089D98(s32 r31);
-void fn_80089E20(void);
+s32 fn_80089E20(s32 idx, void* obj, u32 packedStatus, u32 highHalf);
 u32 fn_80089F58(u32 v);
 u32 fn_80089F60(u32 v);
 u32 fn_80089F68(u32 v);
@@ -124,18 +163,18 @@ u32 fn_80089F70(u32 v);
 void fn_80089F78(void);
 s32 fn_8008A99C(void);
 int fn_8008A9AC(u32 r3, u8* r4);
-void fn_8008A9E4(void);
-void fn_8008AB20(void);
+s32 GbaMisc_GetEntryStatus(s32 idx, u32* out);
+void GbaMisc_SendPackedEntryStatus(s32 param0, u32 param1, u32 param2);
 void fn_8008AB4C(s32 param0, s32 param1);
 s32 fn_8008AB8C(s32 r3);
 u8 fn_8008ABA0(s32 idx);
-void fn_8008ABE4(void);
+s32 GbaMisc_SetEntryState(s32 idx, s32 value);
 void fn_8008AC34(void);
 void fn_8008AE18(void);
 void fn_8008BBDC(void);
 void fn_8008C5D4(void);
 void fn_8008C6FC(void);
-void fn_8008C700(void);
+void GbaMisc_RunFlagDispatch(void);
 s32 fn_8008C78C(void);
 void fn_8008C7B0(void);
 void fn_8008CACC(void);
@@ -642,66 +681,47 @@ void fn_80089978(void) {
 }
 
 /* 0x80089B8C | size: 0x84 */
-void fn_80089B8C(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
+#pragma push
+#pragma peephole off
+u8 GbaMisc_GetMappedContextByte(void) {
+    GbaMiscContext* ptr;
+    u32 value;
+    u8* table;
+    u32 index;
+    u32 count;
 
-    r3 = 0x0;
-    ((void(*)(void))fn_80083CFC)();
-    if (r3 != 0) {
-        r4 = *(u8*)((u8*)r3 + 0x4136);
+    ptr = fn_80083CFC(0);
+    if (ptr != 0) {
+        value = ptr->tableKey_4136;
     } else {
-
-        r4 = 0x0;
+        value = 0;
     }
-    r3 = (u32)&lbl_802EEB98;
-    r5 = 0x0;
-    r3 = (u32)&lbl_802EEB98;
-    tmp = 0x10;
-    ctr_fn = (void(*)(void))tmp;
-    do {
-        tmp = *(u8*)((u8*)r3 + 0x1);
-        if (r4 == tmp) {
-            r3 = (u32)&lbl_802EEB98;
-            tmp = r5 << 1;
-            r3 = (u32)&lbl_802EEB98;
-            r3 = *(u8*)(r3 + tmp);
-            return;
+    for (table = lbl_802EEB98, index = 0, count = 0x10; count != 0; count--) {
+        if (value == table[1]) {
+            return lbl_802EEB98[index << 1];
         }
-        r3 = r3 + 0x2;
-        r5 = r5 + 0x1;
-    } while (--ctr != 0);
-    r3 = (u32)&lbl_802EEB98;
-    r3 = (u32)&lbl_802EEB98;
-    r3 = *(u8*)((u8*)r3 + 0x0);
-
-    return;
+        table += 2;
+        index++;
+    }
+    return lbl_802EEB98[0];
 }
+#pragma pop
 
 /* 0x80089C10 | size: 0x44 */
-void fn_80089C10(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
+#pragma push
+#pragma scheduling off
+s32 GbaMisc_HasActiveContextState(void) {
+    GbaMiscContext* ptr;
 
-    r3 = 0x0;
-    ((void(*)(void))fn_80083CFC)();
-    if (r3 != 0) {
-        tmp = *(u8*)((u8*)r3 + 0x4000);
-        if (tmp != 0) {
-            r3 = 0x1;
-            return;
+    ptr = fn_80083CFC(0);
+    if (ptr != 0) {
+        if (ptr->state_4000 != 0) {
+            return 1;
+        }
     }
-    }
-    r3 = 0x0;
-
-    return;
+    return 0;
 }
+#pragma pop
 
 /* 0x80089C54 | size: 0x30 */
 #pragma push
@@ -722,57 +742,43 @@ void fn_80089C84(s32 param) {
 #pragma pop
 
 /* 0x80089CA8 | size: 0x88 */
-void fn_80089CA8(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
+s32 GbaMisc_PollEntryStatusA(s32 r31) {
+    extern s32 fn_800719A8(s32);
+    s32 n;
 
-    r31 = r3;
-    ((void(*)(void))fn_800719A8)();
-    if ((s32)r3 < 0) {
-        tmp = r31 << 1;
-        r4 = (u32)&lbl_8047A684;
-        r4 = r4 + tmp;
-        tmp = 0x0;
-        *(u16*)((u8*)r4 + (-2)) = tmp;
-        return;
+    n = fn_800719A8(r31 - 1);
+    if (n < 0) {
+        u16 *base = (u16*)&lbl_8047A684;
+        base[r31 - 1] = 0;
+    } else if (n == 1 || n == 2) {
+        u16 *base = (u16*)&lbl_8047A684;
+        u32 v = base[r31 - 1] + 1;
+        base[r31 - 1] = v;
+        if ((u16)v <= 0xa) {
+            n = -1;
+        }
     }
-    if ((s32)r3 != 1) {
-        if ((s32)r3 != 2) return;
-    }
-    tmp = r31 << 1;
-    r4 = (u32)&lbl_8047A684;
-    r5 = r4 + tmp;
-    r4 = *(u16*)((u8*)r5 + (-2));
-    r4 = r4 + 0x1;
-    tmp = r4 & 0xFFFF;
-    *(u16*)((u8*)r5 + (-2)) = r4;
-    if (tmp > 0xa) return;
-    r3 = -0x1;
-
-    return;
+    return n;
 }
 
 /* 0x80089D30 | size: 0x44 */
-void fn_80089D30(void) {
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r31 = 0;
+#pragma push
+#pragma peephole off
+s32 GbaMisc_ResetEntryStatusA(s32 param) {
+    extern s32 fn_80071AE4(s32);
+    s32 ret;
+    u32 tmp;
+    u32 r4;
 
-    r31 = r3;
-    ((void(*)(void))fn_80071AE4)();
-    tmp = r31 << 1;
+    ret = fn_80071AE4(param - 1);
+    tmp = GBA_MISC_ENTRY_HALF_OFFSET(param);
     r4 = (u32)&lbl_8047A684;
     r4 = r4 + tmp;
-    tmp = 0x0;
+    tmp = 0;
     *(u16*)((u8*)r4 + (-2)) = tmp;
-    return;
+    return ret;
 }
+#pragma pop
 
 /* 0x80089D74 | size: 0x24 */
 #pragma push
@@ -803,24 +809,20 @@ s32 fn_80089D98(s32 r31) {
 }
 
 /* 0x80089E20 | size: 0x138 */
-void fn_80089E20(void) {
-    extern void fn_8008AE18();
-    extern void fn_8011E868();
-    extern void fn_8011F5C8();
-    extern void fn_80265F14();
-    u8 sp[0x90];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma push
+#pragma peephole off
+s32 fn_80089E20(s32 r30, void* r31, u32 r5, u32 r29) {
+    extern void fn_8008AE18(void*, void*);
+    extern u8 fn_8011E868(void*);
+    extern u16 fn_8011F5C8(void*);
+    extern u8 fn_80265F14(s32);
+    u8 sp[0x78];
+    u32 tmp;
+    u32 r3;
+    u32 r4;
+    u32 r6;
+    s32 ret;
 
-    r30 = r3;
-    r31 = r4;
-    r29 = r6;
     tmp = r5 & 0x0000FF00;
     r4 = r5 & 0x00FF0000;
     r3 = r5 << 24;
@@ -828,62 +830,45 @@ void fn_80089E20(void) {
     tmp = tmp << 8;
     r4 = (u32)r4 >> 8;
     tmp = r3 | tmp;
-    r3 = r31;
     tmp = r4 | tmp;
     tmp = r5 | tmp;
-    *(u32*)(sp + 0x8) = tmp;
-    fn_8011F5C8();
+    *(u32*)(sp + 0x0) = tmp;
+    r3 = fn_8011F5C8(r31);
     r3 = r3 & 0xFFFF;
     tmp = r29 << 16;
     r6 = tmp | r3;
-    r3 = r31;
     tmp = r6 & 0x0000FF00;
-    r5 = r6 & 0x00FF0000;
-    r4 = r6 << 24;
+    r4 = r6 & 0x00FF0000;
+    r5 = r6 << 24;
     tmp = tmp << 8;
     r6 = (u32)r6 >> 24;
-    r5 = (u32)r5 >> 8;
-    tmp = r4 | tmp;
+    r4 = (u32)r4 >> 8;
     tmp = r5 | tmp;
+    tmp = r4 | tmp;
     tmp = r6 | tmp;
-    *(u32*)(sp + 0xC) = tmp;
-    fn_8011F5C8();
-    tmp = r3 & 0xFFFF;
-    if (tmp == 0x181) {
-        r3 = r31;
-        fn_8011E868();
-        tmp = r3 & 0xFF;
-        r3 = r31;
-        tmp = __cntlzw(tmp);
+    *(u32*)(sp + 0x4) = tmp;
+    if (fn_8011F5C8(r31) == 0x181) {
+        tmp = fn_8011E868(r31);
+        tmp = __cntlzw(tmp & 0xFF);
         tmp = (u32)tmp >> 5;
         r4 = tmp & 0xFF;
-        ((void(*)(void))fn_8011D504)();
+        fn_8011D504(r31, r4);
     }
-    r3 = r31;
-    r4 = (u32)sp + 0x10;
-    fn_8008AE18();
-    r31 = (u32)sp + 0x74;
-    r4 = 0x0;
-    r3 = r31;
-    r5 = 0xc;
-    memset((void*)r3, (int)r4, (u32)r5);
-    r29 = 0x0;
-    do {
-        r3 = r29;
-        fn_80265F14();
-        *(u8*)((u8*)r31 + 0x0) = r3;
-        r31 = r31 + 0x1;
-        r29 = r29 + 0x1;
-    } while ((s32)r29 < 0xb);
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))fn_800726A8)();
-    tmp = r30 << 1;
+    fn_8008AE18(r31, sp + 0x8);
+    r31 = sp + 0x6C;
+    memset(r31, 0, 0xc);
+    for (r29 = 0; (s32)r29 < 0xb; r31 = (u8*)r31 + 1, r29++) {
+        *(u8*)r31 = fn_80265F14(r29);
+    }
+    ret = fn_800726A8(r30 - 1, sp + 0x0);
+    r3 = r30 << 1;
     r4 = (u32)&lbl_8047A684;
-    r4 = r4 + tmp;
-    tmp = 0x0;
-    *(u16*)((u8*)r4 + (-2)) = tmp;
-    return;
+    r4 = r4 + r3;
+    r3 = 0;
+    *(u16*)((u8*)r4 + (-2)) = r3;
+    return ret;
 }
+#pragma pop
 
 /* 0x80089F58 | size: 0x8 */
 u32 fn_80089F58(u32 v) {
@@ -1619,55 +1604,35 @@ int fn_8008A9AC(u32 r3, u8* r4) {
 }
 
 /* 0x8008A9E4 | size: 0x13C */
-void fn_8008A9E4(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+#pragma push
+#pragma peephole off
+s32 GbaMisc_GetEntryStatus(s32 idx, u32* out) {
+    u32 status;
+    u32 tmp;
+    u32 r3;
+    u32 r4;
+    u32 r5;
+    u32 offset32;
+    u32 offset16;
+    s32 ret;
 
-    r31 = r3;
-    r30 = r4;
-    tmp = 0x2000000;
-    *(u32*)((u8*)r30 + 0x0) = tmp;
-    r4 = (u32)sp + 0x8;
-    ((void(*)(void))_AGB_EntryGetStatus__FlPUl)();
-    if ((s32)r3 < 0) {
-        tmp = 0x2000000;
-        *(u32*)(sp + 0x8) = tmp;
-        r3 = 0x0;
-        return;
+    *out = 0x2000000;
+    ret = _AGB_EntryGetStatus__FlPUl(idx - 1, &status);
+    if (ret < 0) {
+        status = 0x2000000;
+        goto returnZero;
     }
-    if ((s32)r3 != 0) {
-        tmp = 0x3000000;
-        r5 = (u32)&lbl_803FB318;
-        r4 = (u32)&lbl_803FB308;
-        *(u32*)((u8*)r30 + 0x0) = tmp;
-        r6 = (u32)&lbl_803FB318;
-        r7 = r31 << 2;
-        r5 = (u32)&lbl_803FB308;
-        r10 = r31 << 1;
-        r4 = (u32)&lbl_8047A684;
-        tmp = (u32)&lbl_8047A67C;
-        r8 = r6 + r7;
-        r9 = 0x1;
-        r6 = r5 + r7;
-        r7 = 0x0;
-        r5 = r4 + r10;
-        r4 = tmp + r10;
-        *(u32*)((u8*)r8 + (-4)) = r9;
-        *(u32*)((u8*)r6 + (-4)) = r7;
-        *(u16*)((u8*)r5 + (-2)) = r7;
-        *(u16*)((u8*)r4 + (-2)) = r7;
-        return;
+    if (ret != 0) {
+        *out = 0x3000000;
+        offset32 = GBA_MISC_ENTRY_WORD_OFFSET(idx);
+        offset16 = GBA_MISC_ENTRY_HALF_OFFSET(idx);
+        GbaMisc_EntryStateAtWordOffset(offset32) = 1;
+        GbaMisc_EntryCachedStatusAtWordOffset(offset32) = 0;
+        GbaMisc_EntryCounterAAtHalfOffset(offset16) = 0;
+        GbaMisc_EntryCounterBAtHalfOffset(offset16) = 0;
+        return ret;
     }
+    r5 = *(volatile u32*)&status;
     tmp = r5 & 0x0000FF00;
     r4 = r5 & 0x00FF0000;
     r3 = r5 << 24;
@@ -1677,38 +1642,33 @@ void fn_8008A9E4(void) {
     tmp = r3 | tmp;
     tmp = r4 | tmp;
     tmp = r5 | tmp;
-    *(u32*)((u8*)r30 + 0x0) = tmp;
-    tmp = *(u32*)((u8*)r30 + 0x0);
-    tmp = (u32)tmp >> 24;
-    if (tmp != 0) { r3 = 0x0; return; }
-    r4 = (u32)&lbl_803FB318;
-    r3 = (u32)&lbl_803FB308;
-    r5 = (u32)&lbl_803FB318;
-    r6 = r31 << 2;
-    r4 = (u32)&lbl_803FB308;
-    r9 = r31 << 1;
-    r3 = (u32)&lbl_8047A684;
-    tmp = (u32)&lbl_8047A67C;
-    r7 = r5 + r6;
-    r8 = 0x1;
-    r5 = r4 + r6;
-    r6 = 0x0;
-    r4 = r3 + r9;
-    r3 = tmp + r9;
-    *(u32*)((u8*)r7 + (-4)) = r8;
-    *(u32*)((u8*)r5 + (-4)) = r6;
-    *(u16*)((u8*)r4 + (-2)) = r6;
-    *(u16*)((u8*)r3 + (-2)) = r6;
-
-    r3 = 0x0;
-
-    return;
+    *out = tmp;
+    tmp = *out >> 24;
+    if (tmp != 0) {
+        goto returnZero;
+    }
+    offset32 = GBA_MISC_ENTRY_WORD_OFFSET(idx);
+    offset16 = GBA_MISC_ENTRY_HALF_OFFSET(idx);
+    GbaMisc_EntryStateAtWordOffset(offset32) = 1;
+    GbaMisc_EntryCachedStatusAtWordOffset(offset32) = 0;
+    GbaMisc_EntryCounterAAtHalfOffset(offset16) = 0;
+    GbaMisc_EntryCounterBAtHalfOffset(offset16) = 0;
+returnZero:
+    return 0;
 }
+#pragma pop
 
 /* 0x8008AB20 | size: 0x2C */
-void fn_8008AB20(void) {
-    fn_800730F8();
+#pragma push
+#pragma peephole off
+void GbaMisc_SendPackedEntryStatus(s32 param0, u32 param1, u32 param2) {
+    u32 packed;
+
+    packed = param2 << 24;
+    param0--;
+    fn_800730F8(param0, packed | param1);
 }
+#pragma pop
 
 /* 0x8008AB4C | size: 0x40 */
 void fn_8008AB4C(s32 param0, s32 param1) {
@@ -1727,10 +1687,9 @@ s32 fn_8008AB8C(s32 r3) {
 
 /* 0x8008ABA0 | size: 0x44 */
 u8 fn_8008ABA0(s32 idx) {
-    u32 r5 = idx << 2;
     u32 ret = 0;
-    if (*(s32*)((u8*)&lbl_803FB318 + r5 - 4) != 0) {
-        if (*(s32*)((u8*)&lbl_803FB308 + r5 - 4) == 0) {
+    if (GbaMisc_EntryState(idx) != 0) {
+        if (GbaMisc_EntryCachedStatus(idx) == 0) {
             ret = 1;
         }
     }
@@ -1738,36 +1697,37 @@ u8 fn_8008ABA0(s32 idx) {
 }
 
 /* 0x8008ABE4 | size: 0x50 */
-void fn_8008ABE4(void) {
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
+s32 GbaMisc_SetEntryState(s32 idx, s32 value) {
+    u32 r0;
+    u32 r5;
+    u32 r6;
+    u32 r7;
+    u32 r8;
+    u32 r9;
+    u32 r10;
+    s32 old;
 
     r6 = (u32)&lbl_803FB318;
-    r7 = r3 << 2;
-    tmp = (u32)&lbl_803FB318;
+    r7 = idx << 2;
+    r0 = r6;
     r5 = (u32)&lbl_803FB308;
-    r9 = tmp + r7;
-    r10 = r3 << 1;
-    r6 = (u32)&lbl_803FB308;
-    r3 = *(u32*)((u8*)r9 + 0x0);
+    r9 = r0 + r7;
+    r10 = idx << 1;
+    idx = r10;
+    r9 = r9 - 4;
+    r6 = r5;
+    old = *(s32*)r9;
     r5 = (u32)&lbl_8047A684;
     r7 = r6 + r7;
-    r8 = 0x0;
-    r6 = r5 + r10;
-    tmp = (u32)&lbl_8047A67C;
-    r5 = tmp + r10;
-    *(u32*)((u8*)r9 + 0x0) = r4;
+    r8 = 0;
+    r6 = r5 + idx;
+    r0 = (u32)&lbl_8047A67C;
+    r5 = r0 + idx;
+    *(s32*)r9 = value;
     *(u32*)((u8*)r7 + (-4)) = r8;
     *(u16*)((u8*)r6 + (-2)) = r8;
     *(u16*)((u8*)r5 + (-2)) = r8;
-    return;
+    return old;
 }
 
 /* 0x8008AC34 | size: 0x1E4 */
@@ -3676,44 +3636,33 @@ void fn_8008C6FC(void) {
 }
 
 /* 0x8008C700 | size: 0x8C */
-void fn_8008C700(void) {
-    extern void fn_801906A0();
-    extern void fn_8019075C();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r12 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    void (*ctr_fn)(void) = 0;
+#pragma push
+#pragma peephole off
+void GbaMisc_RunFlagDispatch(void) {
+    extern s32 fn_80113F48(void);
+    extern s32 fn_801906A0(s32);
+    extern void fn_8019075C(s32, s32);
+    s32 arg;
+    u32 state;
+    u32 offset;
+    void (*handler)(s32);
+    s32 nextState;
 
-    tmp = 0x0;
-    r3 = (u32)&lbl_8047A694;
-    *(u32*)&lbl_8047A694 = tmp;
-    *(u32*)((u8*)r3 + 0x4) = tmp;
-    *(u32*)&lbl_8047A690 = tmp;
-    ((void(*)(void))fn_80113F48)();
-    tmp = r3;
-    r3 = 0xb5d;
-    r30 = tmp;
-    fn_801906A0();
-    r31 = r3;
-    r4 = (u32)&lbl_802EEC70;
-    tmp = r31 << 2;
-    r3 = r30;
-    r4 = (u32)&lbl_802EEC70;
-    r12 = *(u32*)(r4 + tmp);
-    ctr_fn = (void(*)(void))r12;
-    ctr_fn();
-    r4 = r31 + 0x1;
-    if (r4 >= 0x1f) {
-        r4 = 0x0;
+    *(u32*)&lbl_8047A694 = 0;
+    *(u32*)((u8*)&lbl_8047A694 + 0x4) = 0;
+    *(u32*)&lbl_8047A690 = 0;
+    arg = fn_80113F48();
+    state = fn_801906A0(0xb5d);
+    offset = state << 2;
+    handler = *(void (**)(s32))((u8*)lbl_802EEC70 + offset);
+    handler(arg);
+    nextState = state + 1;
+    if ((u32)nextState >= 0x1f) {
+        nextState = 0;
     }
-    r3 = 0xb5d;
-    fn_8019075C();
-    return;
+    fn_8019075C(0xb5d, nextState);
 }
+#pragma pop
 
 /* 0x8008C78C | size: 0x24 */
 #pragma push

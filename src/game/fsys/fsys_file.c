@@ -82,6 +82,11 @@ extern FSYSDecompContext gLZSSContext;
 /* lbl_80452FC8 -- LZSS sliding window */
 extern u8 gLZSSWindow[];
 
+/* FSYS stores a fixed 0x28-byte entry header followed by a runtime sub-entry trailer. */
+static FSYSSubEntry* FSYSFileEntry_GetSubEntry(FSYSFileEntry* entry) {
+    return (FSYSSubEntry*)((u8*)entry + 0x28);
+}
+
 /* ===================================================================
  * fn_8017B07C: FSYSCheckFileLoaded
  *
@@ -129,7 +134,7 @@ s32 FSYSCheckFileLoaded(u32 fileHandle, u32 nameHash) {
         }
 
         if (entry != NULL) {
-            FSYSSubEntry* sub = (FSYSSubEntry*)&entry->subEntry[0];
+            FSYSSubEntry* sub = FSYSFileEntry_GetSubEntry(entry);
 
             if (entry->nameHash == nameHash) {
                 if (sub->state == 6) {
@@ -223,7 +228,7 @@ s32 FSYSProcessEntry(FSYSSlot* slot) {
             if (fileEntry != NULL) {
                 /* Compare entry nameHash against slot requestID */
                 if (fileEntry->nameHash == slot->requestID) {
-                    subEntry = (FSYSSubEntry*)((u8*)fileEntry + 0x28);
+                    subEntry = FSYSFileEntry_GetSubEntry(fileEntry);
                     found = 1;
                     break;
                 }

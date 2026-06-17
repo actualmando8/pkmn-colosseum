@@ -103,9 +103,20 @@ python tools/match_scan_file.py src/game/gs_render.c fn_800DF21C
 5. **Don't touch `config/GC6E01/symbols.build.txt`, jump-table labels, struct layout, field
    signedness, or function signatures** unless the change *is* the matching fix and you've
    validated it. Keep diffs minimal.
-6. **Coordination:** `src/game/gs_field_world.c` is owned by a separate live session — **do
-   not touch it.** Stay in your assigned file. When you finish, the parent re-measures before
-   trusting/committing.
+6. **Coordination — take a lock before you edit.** Before editing a file or attacking a
+   function, claim it atomically: `python tools/decomp_work/coordination/locks.py
+   acquire-file <agent> src/game/<file>.c` (whole-file) or `… acquire <agent> fn_XXXX
+   --file src/game/<file>.c` (one fn). Exit 1 = DENIED → someone else owns it, pick another
+   target. `renew <agent>` periodically (locks auto-expire after 30 min); `release` when
+   done. See `tools/decomp_work/coordination/LOCKS.md`. When you finish, the parent
+   re-measures before trusting/committing.
+7. **NEVER push to master. Work on a branch and open a PR.** Direct pushes to `master`
+   are **hard-blocked** by a `pre-push` git hook (`.githooks/pre-push`, enabled via
+   `core.hooksPath`). Your workflow is: `git switch -c decomp/<agent>-<topic>`, commit your
+   verified wins there, then `bash tools/decomp_work/handoff.sh` (pushes the branch + opens
+   a GitHub PR for review) — or click **Ship → Prepare handoff** in the dashboard. Every
+   change is reviewed as a PR, not written blindly to origin/master. (Human override for an
+   intentional master push only: `ALLOW_MASTER_PUSH=1 git push ...`.)
 
 ---
 
@@ -257,6 +268,11 @@ bash tools/decomp_work/decomp.sh band sections src/game/<file>.c 4
 This compiles the canon, objdiffs it vs the target, ranks the non-100% fns closest-to-100%
 first, tiers them (A>=90, B>=75, C>=50, D<50), and round-robins them into N disjoint bands
 `b0 b1 … b{N-1}`. Hand each agent ONE band's function list and a unique `<tag>`.
+
+> **Lock the file first.** Each band agent should `acquire-file <tag> src/game/<file>.c`
+> (see `coordination/LOCKS.md`) so two sessions can never pick the same TU — the SQLite
+> lock is atomic where the old `claims.json` was not. Renew it during long grinds; release
+> when the band is integrated.
 
 `sections` auto-**SKIPS active asm-wrapper fns** (`#if 1` + `#include "..._fn_*.inc"`):
 they are byte-exact in ROM and their sub-100% objdiff scores are pure reloc-name artifacts

@@ -104,7 +104,7 @@ extern void GSthreadCreate(s32 priority, void* stack, s32 stackSize,
  * Data tables
  * ========================================================================= */
 
-/* lbl_80266918: Event handler table
+/* sSummaryPageEntries: Event/page handler table
  * Array of structures, each 0x4C bytes:
  *   +0x00: Event type ID (s32)
  *   +0x04: Handler function pointer (or -1 for default)
@@ -499,6 +499,7 @@ extern s32 fn_80143C68(void*);
 extern s32 fn_80129A78(u32, s32, s32, s32);
 extern void fn_8012959C(u32, s32, s32, s16);
 extern u8 lbl_80266918[];
+#define sSummaryPageEntries lbl_80266918
 extern u32 lbl_8047A2F8;
 #pragma push
 #pragma peephole off
@@ -511,7 +512,7 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     void* list;
     s32   idx;
     s32   i;
-    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
@@ -561,7 +562,7 @@ s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
     void* list;
     s32   idx;
     s32   i;
-    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
@@ -632,7 +633,7 @@ s32 fn_80013DFC(s32 entry_idx, s32 target_n, s32* out) {
     s32   idx;
     s32   i;
     s32   x;
-    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
@@ -693,7 +694,7 @@ s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
     s32   r;
     s32   retval;
     u16   id;
-    entry = (u8*)lbl_80266918 + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);

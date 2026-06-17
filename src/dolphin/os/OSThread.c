@@ -421,7 +421,7 @@ BOOL OSCreateThread(OSThread* thread, void* (*func)(void*), void* param,
     thread->val = (u32)-1;
     thread->mutex = NULL;
     OSInitThreadQueue(&thread->queueJoin);
-    OSInitThreadQueue((OSThreadQueue*)&thread->queueMutex);
+    thread->queueMutex.head = thread->queueMutex.tail = NULL;
     sp = (u32)stack;
     sp &= ~7;
     sp -= 8;

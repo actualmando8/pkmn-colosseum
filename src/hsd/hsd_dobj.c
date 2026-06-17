@@ -398,6 +398,14 @@ asm void fn_80199264(void) {
 }
 #else
 #pragma optimization_level 4
+
+/* inc-label externs, hoisted before asm blocks (add_inc_externs.py) */
+extern u8 lbl_80274758[];
+extern u8 lbl_802747AC[];
+extern HSD_DObjInfo lbl_8036C7A0;
+extern u8 lbl_80465378[];
+extern HSD_ClassInfo* lbl_8047B260;
+
 void fn_80199264(HSD_DObj* dobj) {
     HSD_DObj* next;
     HSD_DObj* d;

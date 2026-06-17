@@ -44,7 +44,7 @@
  *   fn_80017CB8  GSpokeSummary_DrawBackground   -- 0x1D4 bytes, background gradient
  *   fn_80017E8C  GSpokeSummary_Init             -- 0x338 bytes, full initialization
  *
- * The page drawing system uses a function pointer table at lbl_80266918.
+ * The page drawing system uses a function pointer table at sSummaryPageEntries.
  * Each page entry is 0x4C bytes and contains:
  *   +0x04: Pokemon index for data source (s32, -1 = use party default)
  *   +0x18: Draw handler function pointer
@@ -65,7 +65,7 @@
  *   lbl_8047A2F8: Pokemon data table pointer
  *
  * Rodata:
- *   lbl_80266918: Page handler/data table (used by DrawHandler at +0x18)
+ *   sSummaryPageEntries: Page handler/data table (used by DrawHandler at +0x18)
  *   lbl_8047B748: Float constant 0.0f (stick deadzone)
  *   lbl_8047B8B8: Float constant for int-to-float conversion (0x43300000)
  */
@@ -129,6 +129,7 @@ s32 fn_8001501C(void) {
 /* fn_80015050 - 0x80015050 | size: 0x94 */
 extern u32 fn_80103E68(u32 a);
 extern u8 lbl_80266918[];
+#define sSummaryPageEntries lbl_80266918
 typedef struct SummaryPageEntry {
     u8 displayColor[3];      /* 0x00, copied to output bytes 0x64-0x66 */
     u8 unk_03;
@@ -141,10 +142,30 @@ typedef struct SummaryPageEntry {
     u8 unk_20[0x2C];
 } SummaryPageEntry;
 typedef char SummaryPageEntry_size_check[sizeof(SummaryPageEntry) == 0x4C ? 1 : -1];
+
+typedef struct SummaryPageContext {
+    u8 unk_00[0x95];
+    s8 pageIndex;            /* 0x95, selected summary page/table slot */
+} SummaryPageContext;
+
+typedef struct SummaryDrawItem {
+    u8 unk_00[0x06];
+    s16 speciesId;           /* 0x06, compared against table ids */
+    u8 unk_08[0x5C];
+    u8 color[4];             /* 0x64-0x67, RGB + alpha */
+} SummaryDrawItem;
+
+#define SUMMARY_PAGE_INDEX(ctx) ((s32)((ctx)->pageIndex))
+#define SUMMARY_PAGE_INDEX_VOLATILE(ctx) ((s32)*(volatile s8*)&(ctx)->pageIndex)
+/*
+ * Transitional accessors: direct SummaryPageEntry array indexing changes MWCC
+ * register allocation for fn_80017990. Keep the byte-match spelling isolated
+ * here until the rodata table can be typed without losing the match.
+ */
 #define SUMMARY_PAGE_ENTRY_AT(index) \
-    (*(SummaryPageEntry*)((u8*)lbl_80266918 + (index) * sizeof(SummaryPageEntry)))
+    (*(SummaryPageEntry*)((u8*)sSummaryPageEntries + (index) * sizeof(SummaryPageEntry)))
 #define SUMMARY_PAGE_DISPLAY_COLOR(index, component) \
-    (lbl_80266918[(index) * sizeof(SummaryPageEntry) + (component)])
+    (sSummaryPageEntries[(index) * sizeof(SummaryPageEntry) + (component)])
 #if 0
 asm void fn_80015050(void) {
 #include "src/game/gs_pokemon_summary_fn_80015050.inc"
@@ -156,7 +177,7 @@ typedef s32 (*DrawHandlerFn)(u8*, u8*, s16*);
 s32 fn_80015050(u8* src, u8* param) {
     DrawHandlerFn fp;
     u16 tmp;
-    u8* entry = (u8*)lbl_80266918 + (s32)(s8)src[0x95] * 0x4C;
+    u8* entry = (u8*)sSummaryPageEntries + (s32)(s8)src[0x95] * 0x4C;
     fp = *(DrawHandlerFn*)(entry + 0x18);
     if (fp != NULL) {
         tmp = fn_80103E68((u16)*(u32*)(entry + 0x1C)) >> 16;
@@ -295,7 +316,7 @@ asm void fn_80016618(void) {
 #pragma peephole off
 s32 fn_80016618(u8* src, u8* dst) {
     u16 tmp;
-    tmp = (u16)(fn_80103E68((u16)*(u32*)(&lbl_80266918[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
+    tmp = (u16)(fn_80103E68((u16)*(u32*)(&sSummaryPageEntries[(s32)(s8)src[0x95] * 0x4C + 0x1C])) >> 16);
     if ((s32)(s8)*(u8*)&tmp > 0 && (s32)lbl_8047A2D8 == -1) {
         dst[0x67] = *(f32*)&lbl_8047B740 * (*(f32*)&lbl_8047B744 - *(f32*)&lbl_8047A2C4);
     } else {
@@ -479,10 +500,10 @@ asm void fn_8001793C(void) {
 #else
 #pragma push
 #pragma peephole off
-s32 fn_8001793C(u8* src, u8* dst) {
-    dst[0x64] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 0);
-    dst[0x65] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 1);
-    dst[0x66] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 2);
+s32 fn_8001793C(SummaryPageContext* ctx, SummaryDrawItem* item) {
+    item->color[0] = SUMMARY_PAGE_DISPLAY_COLOR(SUMMARY_PAGE_INDEX_VOLATILE(ctx), 0);
+    item->color[1] = SUMMARY_PAGE_DISPLAY_COLOR(SUMMARY_PAGE_INDEX_VOLATILE(ctx), 1);
+    item->color[2] = SUMMARY_PAGE_DISPLAY_COLOR(SUMMARY_PAGE_INDEX_VOLATILE(ctx), 2);
     return 0;
 }
 #pragma pop
@@ -496,15 +517,15 @@ asm void fn_80017990(void) {
 #else
 #pragma push
 #pragma peephole off
-s32 fn_80017990(u8* src, u8* dst) {
-    s32 idx = (s32)(s8)src[0x95];
-    if ((s32)*(s16*)(dst + 6) == SUMMARY_PAGE_ENTRY_AT(idx).gaugeMatchId) {
-        dst[0x64] = SUMMARY_PAGE_DISPLAY_COLOR(idx, 0);
-        dst[0x65] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 1);
-        dst[0x66] = SUMMARY_PAGE_DISPLAY_COLOR((s32)(s8)*(volatile u8*)(src + 0x95), 2);
-        dst[0x67] = 0xFF;
+s32 fn_80017990(SummaryPageContext* ctx, SummaryDrawItem* item) {
+    s32 idx = SUMMARY_PAGE_INDEX(ctx);
+    if ((s32)item->speciesId == SUMMARY_PAGE_ENTRY_AT(idx).gaugeMatchId) {
+        item->color[0] = SUMMARY_PAGE_DISPLAY_COLOR(idx, 0);
+        item->color[1] = SUMMARY_PAGE_DISPLAY_COLOR(SUMMARY_PAGE_INDEX_VOLATILE(ctx), 1);
+        item->color[2] = SUMMARY_PAGE_DISPLAY_COLOR(SUMMARY_PAGE_INDEX_VOLATILE(ctx), 2);
+        item->color[3] = 0xFF;
     } else {
-        dst[0x67] = 0;
+        item->color[3] = 0;
     }
     return 0;
 }

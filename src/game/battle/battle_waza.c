@@ -1473,15 +1473,12 @@ void fn_801DB1CC(void* obj) {
         }
 
         if (matches == 1) {
-            s32 waitId = id;
-            s32 releaseId = id;
-
-            while (fn_8017B2CC(waitId) == 1) {
+            while (fn_8017B2CC(id) == 1) {
                 _threadSwitch();
             }
 
-            fn_800F915C(releaseId);
-            fn_8017B1CC(releaseId);
+            fn_800F915C(id);
+            fn_8017B1CC(id);
         }
 
         *(u16*)((u8*)obj + 0x72) = 0;

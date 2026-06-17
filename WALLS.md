@@ -198,6 +198,7 @@ All four below have correct C and are in `tools/decomp_work/equivalent.txt`.
 | `fn_800AB4FC` | VIFull.c | W1 `addi rD,rS,0` param-move idiom + `stw-lr`-pre-`stwu` spill-interleaved prologue (same class as OSMemory, `feedback_osmemory_msgqueue_addi_move_wall`) | 83% (GC/1.3, exact size 184) | no (asm-wrapper; C correct) | SI-poll loop logic byte-correct; target emits `addi r30,r3,0`/`addi r3,r29,0` where CW emits `mr`, plus a late-`stwu` 0x28 frame vs CW's `stwu`-first 0x20 — both reg-alloc-internal. GC/1.2.5n gives 88% but at WRONG size 200 (the brief's "100% at 1.2.5n" was a standalone hallucination). All CW versions swept on this idiom for OSMemory; hard wall. |
 | `fn_801327E0` | effect_util.c | float-conversion-in-TU (CW's auto `(f32)(s32)` int→float emits a per-TU **anonymous** 2^52 magic-double pool constant; target references the shared **named** `lbl_8047D0E0(r2)` sdata2 global) | 57% (GC/1.3, exact size 84) | no (asm-wrapper; C correct) | `*(f32*)(p+0xC)=*(f32*)(p+4)` + `field10 += field64*(f32)((u8)p[0x23]+(s8)p[0x42])` is logically byte-correct; auto-conversion's magic-build matches but its constant is anonymous (objdiff name-mismatch under `calculatePoolRelocations=false`) + scheduling of the magic-build differs. Manual union conversion via `lbl_8047D0E0` made it WORSE (50%, size 88). The brief's flagged "float-conversion fails in-TU" class, confirmed. |
 | `fn_801CA728` | battle_scene.c | float-conversion-in-TU — SAME class as `fn_801327E0` (anonymous 2^52 magic-double pool constant vs target's shared named `(r2)` sdata2 global) | 93.79% (GC/1.3, exact size 132) | no (asm-wrapper; C correct) | `base + (s32)((f32)param * fn_8025D0A8())` with the int→float + `fctiwz` is byte-identical EXCEPT the single `lfd f2` magic-constant reloc (mine anonymous `@263`, target named `-21888(r2)`); diff persists even with `calculatePoolRelocations=true` (genuine, not a pool-scoring artifact). Manual union conversion via `lbl_8047D0E0` made it WORSE (88%, size 136). Block-scope shadow decls (`s32 fn_8006ADEC()`, `f32 fn_8025D0A8()`) resolve the void-return caller-decl conflicts cleanly. |
+| `fn_80162FB0` | people_field.c | float-conversion-in-TU, same anonymous conversion-literal class as `fn_801327E0`: readable C emits CW's auto u32-to-f32 magic double as local `@405`, while target references named `lbl_8047D4E8@sda21`; fpr names rotate around that constant | 78.3% by `match_scan_file.py` / 98.48% by single-symbol diff with pool relocation suppression | yes | 2026-06-16 Codex pass: active asm wrapper replaced with typed C using `PeopleFieldMoveScale->divisor`, no raw base+offset arithmetic. Manual named-bias union conversions via `lbl_8047D4E8` were materially worse (44.0% and 51.9% by `match_scan_file.py`) and introduced less-portable type-punning. Leave readable C active; do not re-grind without a new conversion-literal lever. -> equivalent.txt |
 | `fn_800F7DE4` / `fn_800F7E40` / `fn_800F7E9C` (family) | input.c | W1 reg-alloc: **`lwzu`-in-place-increment vs separate-sentinel-register are mutually exclusive in CW 1.3.** The 4-way pad-by-id lookup (`lbl_80401C10`, stride 0x6c) needs the early-return-of-pointer form to emit the target's `lwzu r0,0x6c(r5)` in-place walk + un-merged `bne next; b end` (achieved via a `static inline` helper that returns `pad` directly). But that form makes CW fold the not-found sentinel to `li r5,0` at the miss, where the **target keeps `li r6,0` hoisted early + `mr r5,r6`**. Any form that keeps the sentinel in a separate live register (result-var, comma-`else if`) instead emits absolute-offset `lwz`+`addi` (loses `lwzu`). | ~92% (objdiff reports **0.0%** — alignment artifact: the single early `li r6,0` displaces the LCS) | no (asm-active; correct C staged + shared `PADInput_FindPad` helper) | swept ≥10 source forms: early-return / goto-hit / result-var+goto / nul-as-param-with-second-use / `static const` sentinel / named local / peephole off (breaks `lwzu`) / opt-level 0–4. `lwzu`+folded-`li r5,0` is locked; separate-`r6` only with absolute loads. Sentinel hoist-vs-fold is internal to the allocator. The float-storing cousins `fn_800F7C8C`/`fn_800F7D38` add the `fn_801327E0` float-conversion wall on top. |
 | `fn_800EC4D0` | gs_material.c | W2 branch-reorder + REG-IMM offset swap (then/else block order in `if (flag) {out0=a0; out1=a0+cc} else {out0=a0+a0; out1=a0_const}`) | 84.19% (objdiff 68.97%) | no (C active) | Target emits then-block first (`lfs f0, 0xa0(r3)`), CW emits else-block first (`lfs f0, 0xcc(r3)`). The offset swap (`0xa0↔0xcc`) is a W2 structural reorder. Also has `clrlwi.` vs `clrlwi` idiom (dot-record in target, separate test in base). |
 | `fn_800EC208` | gs_material.c | W2 branch inversion (`cmpwi r0, 0x1` first vs `cmpwi r0, 0x0` first in if/else chain) | 79.21% (objdiff 75.61%) | no (C active) | Target tests `mode==1` first with compound branch (`beq .L1; bge .Lelse; cmpwi 0x0`), CW tests `mode==0` first (`cmpwi 0x0; bne .Lcheck1; ...`). Not C-controllable: compiler chooses branch order. |
@@ -393,3 +394,49 @@ OPEN (not walls — future targeted/structural passes):
   `tools/decomp_work/equivalent.txt`.
 - **When a new lever lands** (e.g. `-use_lmw_stmw off` clears W3): re-open *that class*
   only, re-test its logged members, and graduate any that now match.
+
+
+## 2026-06-15 - bulk walltriage batch: 41 W1 wall CANDIDATES classified (3 promoted to registry, 36 staged, 2 already registered)
+
+Automated classification via `tools/decomp_work/ra/walltriage.py --min-mm 1` over the 95-99.99%
+near-miss pool (171 of 267 triaged; 96 BLOCKED in non-compiling TUs, 2 synthetic units). Each fn's
+residual is a **pure physical-register permutation** (W1 class) - the reg-remap is captured in
+`tools/decomp_work/_triage_b1..4.json`. Spot-checked fn_800A541C / fn_80053C00 / fn_800FE38C
+(only r4<->r3 / r0<->r3 / r5<->r3 differ).
+
+**Conservative promotion (per the line-241 lesson):** reg-permutation verdicts CAN hide wrong-C
+(several previously-filed W1+W2 walls were CRACKED to 100% once wrong-C was fixed). So only the
+**3 fns already test-swept elsewhere in this ledger** (fn_8020B330, fn_8020341C, fn_8020EED4 - each
+"variants inert at opt4") were promoted to `tools/decomp_work/equivalent.txt` (they were missing
+from the registry). The other **36 are staged in `tools/decomp_work/_wall_candidates.md`** -
+promote one ONLY after a structural-decomp exhaust (C-rewrite attempts) confirms it does not move,
+matching this file's tested-and-didn't-move policy. 5 are highest-confidence (99%+, 1 reg-pair).
+
+> NOTE: this is operational bookkeeping (fleet routing + honest staging), NOT a headline gain.
+> progress2.py computes the axes purely from the objdiff byte-match join. Headline gains come from
+> the **92 WINNABLE** near-misses (real structural diffs) in `tools/decomp_work/_winnable_queue.md`,
+> esp. the 5 gs_field_world.c sudoku-siblings (fn_8011A280/A570/A9EC/AB50/AFCC @98.6%, struct=1).
+
+| file | count | functions |
+|---|---|---|
+| gs_worldmap.c | 6 | fn_800265C0 fn_80026600 fn_80026640 fn_80026680 fn_800266C0 fn_80026700 |
+| colosseum_event.c | 5 | fn_8020B330 fn_8020341C fn_8020EED4 fn_802032E4 fn_80209960 |
+| effect_util.c | 4 | fn_80135F90 fn_80135FF8 fn_80136024 fn_80135FBC |
+| scene_init.c | 3 | fn_80053C00 fn_80038990 fn_80038138 |
+| gs_model.c | 3 | fn_80103484 fn_80101A70 fn_801096AC |
+| gs_title.c | 3 | fn_80024CDC fn_80024308 fn_80025F84 |
+| people_field.c | 3 | fn_80162370 fn_801628C8 fn_801631AC |
+| gs_pokemon_summary.c | 2 | fn_80016618 fn_80015050 |
+| gs_field_world.c | 2 | fn_8012F150 fn_801171C8 |
+| DVDFs.c | 1 | fn_800A541C |
+| gs_thread.c | 1 | fn_800FE38C |
+| script_callback.c | 1 | fn_80053778 |
+| gs_render.c | 1 | fn_800DB758 |
+| main.c | 1 | fn_80005E00 |
+| gs_event_exec.c | 1 | fn_800138B4 |
+| colosseum_script.c | 1 | fn_80214B68 |
+| ui_core.c | 1 | fn_8005D8F8 |
+| gba_misc.c | 1 | fn_80089D30 |
+| battle_waza.c | 1 | fn_801DD0C8 |
+
+_Full per-fn match% + reg-remap evidence: `tools/decomp_work/_triage_consolidated.json`._

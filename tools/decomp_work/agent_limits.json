@@ -26,7 +26,29 @@
       "reset_interval_hours": 1,
       "last_reset": null,
       "next_reset": null,
-      "note": "Placeholder — set reset_interval_hours and last_reset to the real cadence."
+      "note": "Placeholder - set reset_interval_hours and last_reset to the real cadence."
+    },
+    {
+      "name": "claude-code",
+      "label": "Claude Code (daily)",
+      "kind": "daily",
+      "reset_interval_hours": null,
+      "last_reset": null,
+      "next_reset": null,
+      "models": ["claude-opus", "claude-sonnet", "claude-fable"],
+      "assumed": true,
+      "note": "Project plan expects Claude to refresh around 07:00 HST; set next_reset explicitly when lockout is observed."
+    },
+    {
+      "name": "glm-coding-plan",
+      "label": "GLM Coding Plan",
+      "kind": "daily",
+      "reset_interval_hours": null,
+      "last_reset": null,
+      "next_reset": null,
+      "models": ["glm-5.1", "glm-5.1:cloud", "glm-5.2"],
+      "assumed": true,
+      "note": "Assumed daily coding-plan reset at 00:00 UTC; set next_reset explicitly if provider cadence differs."
     }
   ]
 }

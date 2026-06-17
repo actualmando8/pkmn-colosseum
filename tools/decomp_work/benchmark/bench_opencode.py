@@ -13,6 +13,7 @@ Provider routing:
   ollama-local/* -> http://127.0.0.1:11434/v1   (no auth)
 """
 import json
+import os
 import socket
 import sys
 import time
@@ -36,6 +37,9 @@ PROVIDER_TIMEOUTS = {
     "opencode": 120,
     "moonshot": 90,
     "deepseek": 120,
+    "mimo": 200,
+    "kimi": 200,
+    "glm": 240,
     "openrouter": 180,
 }
 
@@ -53,6 +57,19 @@ MOONSHOT_MODEL_MAP = {
     "kimi-k2-turbo-preview": "moonshot-v1-128k",
     "kimi-k2.6": "kimi-k2.6",
 }
+
+MODEL_SPEC_ALIASES = {
+    # Historical queue rows and ad-hoc retry commands used these names. Keep
+    # accepting them so old artifacts can be replayed against the working APIs.
+    "kimi/kimi-k2": "kimi/kimi-k2.6",
+    "moonshot/kimi-k2": "moonshot/kimi-k2.6",
+    "mimo/mimo-vl-7b": "mimo/mimo-v2.5-pro",
+}
+
+
+def normalize_model_spec(model_spec: str) -> str:
+    """Return the currently routable provider/model spec for known stale aliases."""
+    return MODEL_SPEC_ALIASES.get(model_spec.strip(), model_spec.strip())
 
 
 def load_keyfile() -> dict[str, str]:
@@ -90,6 +107,7 @@ def get_provider_config(model_spec: str) -> tuple[str, str, str]:
     """
     Parse 'provider/model' spec and return (base_url, api_key, model_id).
     """
+    model_spec = normalize_model_spec(model_spec)
     if "/" not in model_spec:
         raise ValueError(f"Model spec must be 'provider/model', got: {model_spec}")
 
@@ -122,6 +140,24 @@ def get_provider_config(model_spec: str) -> tuple[str, str, str]:
         if not api_key:
             raise ValueError("DeepSeek API key missing — add `deepseek: sk-...` to openrouterkey.txt")
         return "https://api.deepseek.com/v1", api_key, model_id
+
+    if provider == "mimo":
+        api_key = _KEYS.get("mimo", "")
+        if not api_key:
+            raise ValueError("Mimo API key missing - add `mimo: ...` to openrouterkey.txt")
+        return "https://api.xiaomimimo.com/v1", api_key, model_id
+
+    if provider == "kimi":
+        api_key = _KEYS.get("kimi", "")
+        if not api_key:
+            raise ValueError("Kimi API key missing - add `kimi: ...` to openrouterkey.txt")
+        return "https://api.moonshot.ai/v1", api_key, model_id
+
+    if provider == "glm":
+        api_key = _KEYS.get("glm5.2", "") or _KEYS.get("glm", "")
+        if not api_key:
+            raise ValueError("GLM API key missing - add `glm5.2: ...` to openrouterkey.txt")
+        return "https://api.z.ai/api/paas/v4", api_key, model_id
 
     if provider == "openrouter":
         api_key = _KEYS.get("openrouter", "")
@@ -166,6 +202,9 @@ def call_api(
         payload_obj["temperature"] = 0.6
         payload_obj["thinking"] = {"type": "disabled"}
     lower_model = model_id.lower()
+    if model_id != "kimi-k2.6" and (lower_model.startswith("kimi-") or "kimi-k2.7" in lower_model):
+        # Kimi code models reject low temperatures and require normal reasoning.
+        payload_obj["temperature"] = 1
     if lower_model.startswith("qwen3") or "qwen3.6" in lower_model:
         payload_obj["chat_template_kwargs"] = {"enable_thinking": False}
     if "deepseek-v4" in lower_model or "deepseek/deepseek-v4" in lower_model:
@@ -237,6 +276,7 @@ def run_model(
     extra_body: dict | None = None,
 ) -> tuple[str, float]:
     """Run a prompt through the appropriate provider. Returns (response, elapsed)."""
+    model_spec = normalize_model_spec(model_spec)
     try:
         base_url, api_key, model_id = get_provider_config(model_spec)
     except Exception as ex:
@@ -244,7 +284,9 @@ def run_model(
 
     provider = model_spec.split("/", 1)[0]
     if timeout <= 0:
-        timeout = PROVIDER_TIMEOUTS.get(provider, 120)
+        env_key = f"BENCH_{provider.replace('-', '_').upper()}_TIMEOUT"
+        env_timeout = os.environ.get(env_key) or os.environ.get("BENCH_PROVIDER_TIMEOUT")
+        timeout = int(env_timeout) if env_timeout else PROVIDER_TIMEOUTS.get(provider, 120)
 
     return call_api(
         base_url,

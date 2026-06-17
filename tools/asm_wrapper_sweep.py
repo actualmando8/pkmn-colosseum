@@ -152,9 +152,15 @@ def _fix_sda21(instr):
     li rX, sym@sda21 -> la rX, sym(r13/r2) [symbolic form always]
     """
     # Handle load/store: sym@sda21(r0/r13/r2) -> sym(r13) or sym(r2)
+    # For SDA2 (r2) CW asm{} does NOT accept sym(r2) (see note above); emit the
+    # numeric offset (sym_addr - _SDA2_BASE_) instead. r13 keeps the symbolic form.
     def _ls_replacer(m):
         sym = m.group(1)
         reg = _sda_reg(sym)
+        if reg == 'r2':
+            off = _sda2_numeric_offset(sym)
+            if off is not None:
+                return f'{off}({reg})'
         return f'{sym}({reg})'
     instr = re.sub(r'([a-zA-Z_][a-zA-Z0-9_]*)@sda21\(r\d+\)', _ls_replacer, instr)
 
@@ -164,7 +170,14 @@ def _fix_sda21(instr):
         rx = m.group(2)
         sym = m.group(3)
         reg = _sda_reg(sym)
-        instr = f'la {rx}, {sym}({reg})'
+        if reg == 'r2':
+            off = _sda2_numeric_offset(sym)
+            if off is not None:
+                instr = f'la {rx}, {off}(r2)'
+            else:
+                instr = f'la {rx}, {sym}({reg})'
+        else:
+            instr = f'la {rx}, {sym}({reg})'
 
     return instr
 

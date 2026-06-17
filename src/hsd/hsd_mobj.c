@@ -247,7 +247,7 @@ void fn_801A6B8C(HSD_MObj* mobj) {
         fn_801B42C0(mobj->tevdesc);
     }
     if (mobj->texp != NULL) {
-        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
+        fn_801B42C0(mobj->texp);
     }
     if (mobj->pe != NULL) {
         fn_80193AF0(mobj->pe, 0xc);
@@ -548,7 +548,7 @@ call_setup:
         mobj->tevdesc = NULL;
     }
     if (mobj->texp != NULL) {
-        fn_801B7178((HSD_TObj*)mobj->texp, 7, 1);
+        fn_801B42C0(mobj->texp);
         mobj->texp = NULL;
     }
     tobj_slot = (u32)mobj->tobj;
