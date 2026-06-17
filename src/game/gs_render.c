@@ -4542,8 +4542,17 @@ asm s32 fn_800DFE98(u8* obj) {
 }
 #else
 s32 fn_800DFE98(u8* obj) {
-    s32 r = ((s32(*)(u8*))*(u32*)((u8*)lbl_8036CB30 + 0x40))(obj);
-    if (!r) { *(u32*)(obj + 0x20) = 0; return 0; }
+    u8* table;
+    s32 r;
+    u32 arg;
+
+    table = lbl_8036CB30;
+    r = ((s32(*)(u8*, u32))*(u32*)(table + 0x40))(obj, arg);
+    switch (r) {
+        case 0:
+            *(u32*)(obj + 0x20) = 0;
+            return 0;
+    }
     return r;
 }
 #endif
