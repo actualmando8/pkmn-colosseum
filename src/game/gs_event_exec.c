@@ -556,13 +556,14 @@ extern void fn_80129650(u32, s32, s32, s32);
 #pragma push
 #pragma peephole off
 s32 fn_800138B4(s32 entry_idx, s32 target_n, s32* out) {
-    s32   buf[5];
+    s32   buf[4];
     u8*   entry;
     s32   flag;
-    void* list;
     s32   idx;
     s32   i;
-    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
+    void* list;
+    entry = (u8*)sSummaryPageEntries;
+    entry += entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
@@ -684,17 +685,18 @@ extern MusicFp fn_80143DCC(void);
 #pragma push
 #pragma peephole off
 s32 fn_80013F80(s32 entry_idx, s32 target_n, s32* out) {
-    s32   buf[5];
+    s32   buf[4];
     u8*   entry;
     s32   flag;
-    void* list;
     s32   idx;
     s32   i;
+    void* list;
     MusicFp fp;
     s32   r;
     s32   retval;
     u16   id;
-    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries;
+    entry += entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = fn_80129BC8(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);
@@ -734,7 +736,6 @@ after:
     case 0: retval = 0; break;
     case 1: retval = 3; break;
     case 2: retval = 4; break;
-    default: retval = 0; break;
     }
     return retval;
 }
