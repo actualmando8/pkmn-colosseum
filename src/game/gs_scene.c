@@ -975,16 +975,22 @@ asm void fn_80179E04(void) {
 #pragma optimization_level 1
 void fn_80179E04(void* dst) {
     void* ptr;
+    void* out;
     void* handle;
+    u32 mode;
+    out = dst;
     handle = fn_800F9318(0, 0);
     ptr = lbl_80478C40;
-    if (*(u8*)ptr == 4 || *(u8*)ptr == 8) {
-        handle = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
-        if (handle == 0)
-            handle = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
+    mode = *(u8*)ptr;
+    if (mode == 4 || mode == 8) {
+        void* next;
+        next = fn_800F9318(*(u32*)((u8*)ptr + 0xD0), *(u32*)((u8*)ptr + 0xD4));
+        if (next == 0)
+            next = fn_800F92D4(*(u32*)((u8*)ptr + 0xD4));
+        handle = next;
     }
-    memcpy(dst, lbl_80478C40, 0xFC);
-    fn_800D1674(handle, (u8*)dst + 0xFC);
+    memcpy(out, lbl_80478C40, 0xFC);
+    fn_800D1674(handle, (u8*)out + 0xFC);
 }
 #pragma pop
 #pragma pop
