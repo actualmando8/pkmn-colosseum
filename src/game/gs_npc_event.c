@@ -1875,7 +1875,7 @@ void fn_800330B8(s32 arg0, u8* arg1) {
     fn_801FC7D4(arg0, *(u8*)(arg1 + 0x3));
     walk = arg1;
     for (i = 0; i < 4; i++) {
-        fn_801FC744(arg0, i & 0xFF, *(u16*)(walk + 0x4));
+        fn_801FC744(arg0, (u8)i, *(u16*)(walk + 0x4));
         walk += 2;
     }
     fn_801FC784(arg0, *(u16*)(arg1 + 0xC));
