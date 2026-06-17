@@ -3303,16 +3303,12 @@ void fn_800CDA74(void) {
 }
 
 /* fn_800CDBB8 - 0x800CDBB8 | size: 0x28 */
-void fn_800CDBB8(void) {
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-
-    tmp = (tmp & ~0x7FFFFFFF) | (((r3 << 0) | ((u32)r3 >> 32)) & 0x7FFFFFFF);
-    *(u32*)(sp + 0x8) = tmp;
-    return;
+f64 fn_800CDBB8(f64 x, f64 y) {
+    u32 hx = *(u32*)&x;
+    u32 hy = *(u32*)&y;
+    u32 r = (hx & 0x7FFFFFFF) | (hy & 0x80000000);
+    *(u32*)&x = r;
+    return x;
 }
 
 /* cos - 0x800CDBE0 | size: 0xD4 */
@@ -3734,37 +3730,18 @@ L_800CE200:
 }
 
 /* fn_800CE220 - 0x800CE220 | size: 0x78 */
-void fn_800CE220(void) {
+f64 fn_800CE220(f64 x) {
     extern f64 lbl_8047C960;
-    extern void fn_800CC2C0();
-    extern void fn_800CD648();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
+    extern f64 __kernel_tan();
+    extern s32 __ieee754_rem_pio2();
+    f64 y[2];
+    s32 n, ix;
 
-    r3 = 0x3FE90000;
-    tmp = r3 + 0x21fb;
-    r3 = r3 & 0x7FFFFFFF;
-    if ((s32)r3 <= (s32)tmp) {
-        f2 = lbl_8047C960;
-        r3 = 0x1;
-        fn_800CD648();
-        return;
-    }
-    tmp = 0x7FF00000;
-    if ((s32)r3 >= (s32)tmp) {
-        f1 = f1 - f1;
-        return;
-    }
-    r3 = (u32)sp + 0x10;
-    fn_800CC2C0();
-    r3 = 0x1 - tmp;
-    fn_800CD648();
-
-    return;
+    ix = *(s32*)&x & 0x7FFFFFFF;
+    if (ix <= 0x3FE921FB) return __kernel_tan(x, lbl_8047C960, 1);
+    if (ix >= 0x7FF00000) return x - x;
+    n = __ieee754_rem_pio2(x, y);
+    return __kernel_tan(y[0], y[1], 1 - ((n & 1) << 1));
 }
 
 /* fn_800CE298 - 0x800CE298 | size: 0x20 */
