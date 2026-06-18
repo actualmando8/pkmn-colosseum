@@ -54,7 +54,8 @@ for c in SRC.rglob('*.c'):
     for fn,size in active_asm_in(c):
         results.append((size if size is not None else 999, fn, rel))
 results.sort(key=lambda x:(x[0], x[2]))
+LIM=int(sys.argv[1]) if len(sys.argv)>1 and sys.argv[1].isdigit() else 40
 print(f"total active asm-wrappers (non-wall): {len(results)}")
-print("smallest 40 (instr-count, fn, tu):")
-for sz,fn,tu in results[:40]:
+print(f"smallest {LIM} (instr-count, fn, tu):")
+for sz,fn,tu in results[:LIM]:
     print(f"  {sz:3d}  {fn}  {tu}")

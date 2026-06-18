@@ -498,7 +498,7 @@ void OSCancelThread(OSThread* thread) {
 }
 
 extern void fn_800A238C(OSThreadQueue* queue);
-extern void fn_800A1528(void);
+extern OSThread* fn_800A1528(OSThread* thread, s32 priority);
 extern s32 fn_800A14EC(OSThread* thread);
 extern void fn_800A1484(OSThread* thread);
 #if 1
@@ -900,7 +900,7 @@ s32 fn_800A14EC(OSThread* thread) {
 }
 #endif
 #if 1
-asm void fn_800A1528(void) {
+asm OSThread* fn_800A1528(OSThread* thread, s32 priority) {
 #include "src/dolphin/os/OSThread_fn_800A1528.inc"
 }
 #else

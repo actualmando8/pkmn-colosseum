@@ -1019,14 +1019,16 @@ u32 fn_801619E8(u8 idx, u8 r4, u32 r5, u32 r6) {
 #endif
 #pragma pop
 #pragma push
-#pragma optimization_level 0
+#pragma optimization_level 4
 #pragma optimizewithasm off
 #if 1
 asm void fn_80161D20(void) {
 #include "src/game/people/people_field_fn_80161D20.inc"
 }
 #else
-/* W6: 99.64% — only residual is anonymous @174@ha/l vs named jumptable_80369CB0@ha/l (not C-controllable). */
+/* WALL (w_sg2 2026-06-18, measured 99.64% @ opt_level 4): only residual is anonymous
+   jumptable @174@ha/l vs named jumptable_80369CB0@ha/l (numeric-vs-named reloc artifact,
+   not C-controllable). asm wrapper byte-matches; keep #if 1. NOTE: needs opt_level 4 (opt 0 = 58%). */
 u32 fn_80161D20(u32 r3) {
     u32 key = r3 & 0xFF;
     switch (key) {

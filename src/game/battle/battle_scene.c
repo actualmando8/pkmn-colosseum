@@ -292,8 +292,8 @@ extern void fn_800056D4();
 extern void fn_800057A0();
 extern void fn_800057A8();
 extern void fn_8006A718();
-extern void fn_8006ADB4();
-extern void fn_8006ADEC();
+extern void fn_8006ADB4(s32);
+extern s32 fn_8006ADEC(void);
 extern void fn_8006AF44();
 extern void fn_80072A00();
 extern void fn_80089D74();
@@ -406,7 +406,7 @@ extern void fn_801902E0();
 extern void fn_80190528();
 extern void fn_801C40F0();
 extern void fn_801EEAD0();
-extern void fn_8025D0A8();
+extern f32 fn_8025D0A8(void);
 extern void fn_8025D164();
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void CARDUnmount();
@@ -455,13 +455,25 @@ void fn_801C6760(f32 intensity, f32 duration) {
  * fn_801C680C - Camera shake update.
  * Address: 0x801C680C | Size: 0xC8
  */
-#if 1
+#if 0
 asm void fn_801C680C(void) {
 #include "src/game/battle/battle_scene_fn_801C680C.inc"
 }
 #else
-void fn_801C680C(void) {
-    /* TODO: Camera shake update per frame (0xC8 bytes) */
+void fn_801C680C(s32 arg0) {
+    fn_800D9ED8(1);
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    fn_800D9B58(*(f32*)&lbl_8047DFE0, *(f32*)&lbl_8047DFE0,
+                *(f32*)&lbl_8047DFF4, *(f32*)&lbl_8047DFF8);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA1E8(0, 1, 1);
+    fn_800DA100(0, 7, 0, 1, 7, 0);
+    fn_800DA028(0);
+    fn_800D6A00(4);
+    fn_800D7820(lbl_80314AE8);
+    fn_800D85D4(0, arg0);
 }
 #endif
 
@@ -854,13 +866,23 @@ void fn_801CA708(void) {
  * fn_801CA728 - Scene effect render pass.
  * Address: 0x801CA728 | Size: 0x84
  */
+/* WALL (w_sg2 2026-06-18): structure exact. asm wrapper itself measures only 98.18%
+   (the .inc's numeric `lfd -21888(r2)` vs target's named `lbl_8047E120@sda21` =
+   W-SDA-RELOC artifact; bytes are byte-exact ROM, only the reloc symbol differs).
+   Best real C = 93.79%: same const-reloc artifact (anonymous @263 vs named) PLUS one
+   post-call epilogue scheduler tie (mr r3,r31 vs lwz r0 swap). asm% > best C% and the
+   ceiling is a measurement artifact, not C-controllable; keep #if 1. */
 #if 1
 asm void fn_801CA728(void) {
 #include "src/game/battle/battle_scene_fn_801CA728.inc"
 }
 #else
-void fn_801CA728(void) {
-    /* TODO: Scene effect render pass (0x84 bytes) */
+s32 fn_801CA728(s32 arg0) {
+    s32 base = fn_8006ADEC();
+    fn_80129280(0, 2);
+    base += (s32)((f32)arg0 * fn_8025D0A8());
+    fn_8006ADB4(base);
+    return base;
 }
 #endif
 
@@ -876,7 +898,7 @@ u32 fn_801CA7AC(void) {
  * fn_801CA7CC - Scene increment render frame.
  * Address: 0x801CA7CC | Size: 0x20
  */
-extern void fn_8006ADEC(void);
+extern s32 fn_8006ADEC(void);
 void fn_801CA7CC(void) {
     fn_8006ADEC();
 }

@@ -724,12 +724,10 @@ asm void fn_8019D5A0(void) {
 #else
 s32 fn_8019D5A0(HSD_JObj* jobj)
 {
-    if ((s32) ((HSD_ClassInfo*) lbl_8036C8E0)->head.parent->alloc((HSD_ClassInfo*) jobj) >= 0) {
-        f32 a = *(f32*) &lbl_8047DB30;
-        f32 b = *(f32*) &lbl_8047DB30;
+    if ((s32) ((HSD_ClassInfo*) lbl_8036C8E0)->head.parent->init((HSD_Class*) jobj) >= 0) {
         jobj->flags = JOBJ_MTX_DIRTY;
-        jobj->scale_x = a;
-        jobj->scale_y = b;
+        jobj->scale_x = *(f32*) &lbl_8047DB30;
+        jobj->scale_y = *(f32*) &lbl_8047DB30;
         jobj->scale_z = *(f32*) &lbl_8047DB30;
         return 0;
     }

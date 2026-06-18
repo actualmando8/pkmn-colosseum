@@ -386,7 +386,7 @@ typedef struct TypeMatchup {
 /* fn_801C6688 */ void fn_801C6688(f32 angle);
 /* fn_801C673C */ void fn_801C673C(void);
 /* fn_801C6760 */ void fn_801C6760(f32 intensity, f32 duration);
-/* fn_801C680C */ void fn_801C680C(void);
+/* fn_801C680C */ void fn_801C680C(s32 arg0);
 /* fn_801C68D4 */ u8   fn_801C68D4(void);
 /* fn_801C6908 */ void fn_801C6908(void);
 /* fn_801C6928 */ u8   fn_801C6928(void);
