@@ -34,8 +34,40 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 WINS = ROOT / "build" / "band_wins"
 BUILD = ROOT / "build"
+EQUIV_FILE = HERE / "equivalent.txt"
+WALLS_FILE = ROOT / "WALLS.md"
 PY = sys.executable
 M = 99.9999
+
+
+def _register_equivalent(equiv_fns, src_rel):
+    """Append salvaged functional-C functions to equivalent.txt (the C-converted
+    axis registry read by progress2.py) and a stub line to WALLS.md. The asm DOL
+    build is unaffected (it builds from the dtk split, not the C source), so this
+    only moves the C-CONVERTED axis, never the byte-exact DOL. Idempotent."""
+    if not equiv_fns:
+        return
+    existing = set()
+    if EQUIV_FILE.exists():
+        existing = {l.split("#")[0].strip()
+                    for l in EQUIV_FILE.read_text(encoding="utf-8").splitlines()
+                    if l.split("#")[0].strip()}
+    stem = Path(src_rel).stem
+    eq_lines, wall_lines = [], []
+    for fn, pct in sorted(equiv_fns):
+        if fn in existing:
+            continue
+        eq_lines.append(f"{fn}   # {stem} — {pct:.2f}% functional real C, salvaged "
+                        f"(asm active for byte-match; counts on C-converted axis)\n")
+        wall_lines.append(f"- `{fn}` ({stem}, {pct:.2f}%): SALVAGE — faithful real C "
+                          f"active, did not reach byte-exact; registered Equivalent.\n")
+    if eq_lines:
+        with EQUIV_FILE.open("a", encoding="utf-8") as f:
+            f.writelines(eq_lines)
+        with WALLS_FILE.open("a", encoding="utf-8") as f:
+            f.write("\n")
+            f.writelines(wall_lines)
+        print(f"  REGISTERED {len(eq_lines)} fn(s) as Equivalent (equivalent.txt + WALLS.md)")
 
 
 def _scratch_json(tag, integrated_c, config_from):
@@ -56,9 +88,11 @@ def _scratch_json(tag, integrated_c, config_from):
     return json.loads(line[-1]), None
 
 
-def integrate_source(src_rel, fn_bodies, apply):
+def integrate_source(src_rel, fn_bodies, apply, min_pct=M, equivalent=False):
     """Splice fn_bodies into a fresh copy of src_rel, recompile, re-verify each
-    fn is still >=100%. Returns (held, dropped) lists of (fn, pct)."""
+    fn. Byte-exact mode (default): keep only fns that re-measure >=100%.
+    Equivalent mode (min_pct<100): also keep faithful real-C fns that re-measure
+    >=min_pct (they get registered in equivalent.txt). Returns (held, dropped)."""
     canon = ROOT / src_rel
     if not canon.exists():
         print(f"  SKIP: canonical source missing: {src_rel}")
@@ -89,29 +123,37 @@ def integrate_source(src_rel, fn_bodies, apply):
     # `asm` wrapper, and must never be re-saved as a "win" either.)
     ASM_FN = re.compile(r"\basm\b\s+[\w*]+\s+" + r"\w+\s*\(")   # `asm <type> fn(`
     ASM_BLOCK = re.compile(r"\basm\b\s*\{|__asm\b|#include\s+\"[^\"]*\.inc\"")
-    held, dropped, rejected = [], [], []
+    held, equiv_held, dropped, rejected = [], [], [], []
     for fn in fn_bodies:
         body = fn_bodies[fn] or ""
         if ASM_FN.search(body) or ASM_BLOCK.search(body):
             rejected.append((fn, newm.get(fn, 0.0)))
             continue
         pct = newm.get(fn, 0.0)
-        (held if pct >= M else dropped).append((fn, pct))
+        if pct >= M:
+            held.append((fn, pct))
+        elif equivalent and pct >= min_pct:
+            equiv_held.append((fn, pct))      # faithful real C, salvaged
+        else:
+            dropped.append((fn, pct))
 
     if rejected:
         print(f"  !! REJECTED {len(rejected)} inline-asm/wrapper 'wins' (NOT real C — fraud):")
         for fn, pct in sorted(rejected):
             print(f"    REJECT-ASM  {fn}  {pct:.2f}%  (inline assembly, not decompilation)")
-    print(f"  re-verified: {len(held)} held, {len(dropped)} dropped")
+    print(f"  re-verified: {len(held)} byte-exact, {len(equiv_held)} equivalent, {len(dropped)} dropped")
     for fn, pct in sorted(held):
-        print(f"    HELD  {fn}  {pct:.2f}%")
+        print(f"    HELD   {fn}  {pct:.2f}%  (byte-exact)")
+    for fn, pct in sorted(equiv_held):
+        print(f"    EQUIV  {fn}  {pct:.2f}%  (functional real C -> Equivalent)")
     for fn, pct in sorted(dropped):
-        print(f"    DROP  {fn}  {pct:.2f}%  (kept out of canon)")
+        print(f"    DROP   {fn}  {pct:.2f}%  (kept out of canon)")
 
+    keep_set = dict(held + equiv_held)
     if dropped or rejected:
-        # Re-splice with only the verified wins so the integrated file is clean
-        # (excludes both sub-100 drops and rejected inline-asm/wrapper fraud).
-        kept = {fn: b for fn, b in fn_bodies.items() if fn in dict(held)}
+        # Re-splice with only the kept fns so the integrated file is clean
+        # (excludes sub-threshold drops and rejected inline-asm/wrapper fraud).
+        kept = {fn: b for fn, b in fn_bodies.items() if fn in keep_set}
         if kept:
             patch.write_bytes(json.dumps(kept, indent=1).encode("utf-8"))
             subprocess.run([PY, str(HERE / "cs_splice.py"), str(canon),
@@ -121,15 +163,33 @@ def integrate_source(src_rel, fn_bodies, apply):
             integrated.write_bytes(canon.read_bytes())
 
     print(f"  integrated -> {integrated.relative_to(ROOT)}")
-    if apply and held:
+    if apply and (held or equiv_held):
         canon.write_bytes(integrated.read_bytes())
         print(f"  APPLIED to {src_rel}")
-    return held, dropped
+        if equiv_held:
+            _register_equivalent(equiv_held, src_rel)
+    return held + equiv_held, dropped
 
 
 def main():
-    args = [a for a in sys.argv[1:] if a != "--apply"]
-    apply = "--apply" in sys.argv[1:]
+    raw = sys.argv[1:]
+    apply = "--apply" in raw
+    equivalent = "--equivalent" in raw
+    min_pct = M
+    if "--min-pct" in raw:
+        i = raw.index("--min-pct")
+        try:
+            min_pct = float(raw[i + 1])
+        except (IndexError, ValueError):
+            print("--min-pct needs a number, e.g. --min-pct 90")
+            return 2
+    if equivalent and min_pct >= M:
+        min_pct = 90.0  # sensible default salvage floor
+    skip = {"--apply", "--equivalent", "--min-pct", str(min_pct)}
+    args = [a for a in raw if a not in skip]
+    if equivalent:
+        print(f"[equivalent mode] salvaging faithful real C with pct >= {min_pct:.1f}% "
+              f"(byte-exact still requires 100%)")
     if not WINS.exists():
         print("no build/band_wins/ — nothing to integrate.")
         return 0
@@ -167,7 +227,7 @@ def main():
     total_held = total_dropped = 0
     for src_rel, fn_bodies in sorted(by_src.items()):
         print(f"\n=== {src_rel}  ({len(fn_bodies)} saved win(s)) ===")
-        held, dropped = integrate_source(src_rel, fn_bodies, apply)
+        held, dropped = integrate_source(src_rel, fn_bodies, apply, min_pct, equivalent)
         if held is None:
             rc = 1
             continue

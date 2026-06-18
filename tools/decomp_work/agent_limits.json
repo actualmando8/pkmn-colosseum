@@ -1,54 +1,60 @@
 {
-  "_comment": "User-maintained agent lockout / rate-limit schedule. The dashboard reads this (GET /api/limits) and renders a 'next reset' countdown panel. Edit the fields below to match reality. Times are ISO-8601 UTC (trailing Z). reset_interval_hours drives the rolling countdown from last_reset; for fixed daily windows leave reset_interval_hours null and set next_reset explicitly.",
+  "_comment": "Agent lockout / rate-limit schedule. The dashboard renders a 'next reset' countdown per window (GET /api/limits). LIVE data, when available, comes from the proxy's usage_limits.json (tools/llm-proxy/usage_limits.json) which captures real provider rate-limit headers for every pane routed through the proxy (Claude/Sonnet/GLM). Codex is direct (not proxied) so its windows stay manual here. Times are ISO-8601 UTC (trailing Z).",
+  "_live_source": "tools/llm-proxy/usage_limits.json",
+  "_policy": "Prefer Codex lanes when Claude headroom is low (weekly especially). Throttle GLM (lighter packets, low concurrency) so it does not hit its plan cap.",
   "agents": [
     {
-      "name": "codex",
-      "label": "Codex (5h rolling)",
+      "name": "claude-5h",
+      "label": "Claude (5h)",
       "kind": "rolling",
       "reset_interval_hours": 5,
-      "last_reset": "2026-06-14T20:00:00Z",
+      "last_reset": null,
       "next_reset": null,
-      "note": "ChatGPT/Codex 5-hour usage window; set last_reset when the window flips."
+      "models": ["claude-opus", "claude-sonnet"],
+      "live": {"upstream": "Anthropic", "match": "5h"},
+      "note": "Live from proxy anthropic-ratelimit unified 5h header once Claude panes route through the proxy."
     },
     {
-      "name": "deepseek-v4-flash",
-      "label": "DeepSeek V4 (daily)",
-      "kind": "daily",
-      "reset_interval_hours": 24,
-      "last_reset": "2026-06-14T00:00:00Z",
-      "next_reset": null,
-      "note": "Daily token quota; flips at 00:00 UTC."
-    },
-    {
-      "name": "mimo",
-      "label": "MiMo (rate limit)",
+      "name": "claude-weekly",
+      "label": "Claude (weekly)",
       "kind": "rolling",
-      "reset_interval_hours": 1,
+      "reset_interval_hours": 168,
       "last_reset": null,
       "next_reset": null,
-      "note": "Placeholder - set reset_interval_hours and last_reset to the real cadence."
-    },
-    {
-      "name": "claude-code",
-      "label": "Claude Code (daily)",
-      "kind": "daily",
-      "reset_interval_hours": null,
-      "last_reset": null,
-      "next_reset": null,
-      "models": ["claude-opus", "claude-sonnet", "claude-fable"],
+      "models": ["claude-opus", "claude-sonnet"],
+      "live": {"upstream": "Anthropic", "match": "7d"},
       "assumed": true,
-      "note": "Project plan expects Claude to refresh around 07:00 HST; set next_reset explicitly when lockout is observed."
+      "note": "~60% of weekly used (observed 2026-06-18). Live from proxy 7d/weekly header when present."
     },
     {
-      "name": "glm-coding-plan",
+      "name": "codex-5h",
+      "label": "Codex (5h)",
+      "kind": "rolling",
+      "reset_interval_hours": 5,
+      "last_reset": "2026-06-18T15:00:00Z",
+      "next_reset": null,
+      "note": "ChatGPT/Codex 5h window. Direct (not proxied) — manual; ~8% weekly used, lots of headroom."
+    },
+    {
+      "name": "codex-weekly",
+      "label": "Codex (weekly)",
+      "kind": "rolling",
+      "reset_interval_hours": 168,
+      "last_reset": "2026-06-15T00:00:00Z",
+      "next_reset": null,
+      "note": "Codex weekly window; ~8% used — primary headroom, lean on Codex lanes."
+    },
+    {
+      "name": "glm-plan",
       "label": "GLM Coding Plan",
-      "kind": "daily",
-      "reset_interval_hours": null,
+      "kind": "rolling",
+      "reset_interval_hours": 5,
       "last_reset": null,
       "next_reset": null,
-      "models": ["glm-5.1", "glm-5.1:cloud", "glm-5.2"],
+      "models": ["glm-5.2"],
+      "live": {"upstream": "GLM", "match": "any"},
       "assumed": true,
-      "note": "Assumed daily coding-plan reset at 00:00 UTC; set next_reset explicitly if provider cadence differs."
+      "note": "z.ai coding-plan prompt window. Live from proxy GLM headers. THROTTLE: keep GLM on light single-file work, low concurrency — must not rate-limit out and die."
     }
   ]
 }

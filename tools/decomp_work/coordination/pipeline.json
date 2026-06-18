@@ -1,0 +1,164 @@
+{
+  "files": {
+    "src/game/gs_model.c": {
+      "stage": "A",
+      "owner": "WORKER",
+      "tag": "pl_model",
+      "fns": {
+        "fn_80105FB0": {
+          "pct": 5.56,
+          "status": "todo"
+        },
+        "fn_80104530": {
+          "pct": 3.33,
+          "status": "todo"
+        },
+        "fn_80105410": {
+          "pct": 2.38,
+          "status": "todo"
+        },
+        "fn_80105C68": {
+          "pct": 1.79,
+          "status": "todo"
+        },
+        "fn_801043A4": {
+          "pct": 1.33,
+          "status": "todo"
+        },
+        "fn_80106394": {
+          "pct": 1.2,
+          "status": "todo"
+        }
+      }
+    },
+    "src/game/battle/battle_waza.c": {
+      "stage": "A",
+      "owner": "CODEX-1",
+      "tag": "pl_waza",
+      "fns": {
+        "fn_801D1338": {
+          "pct": 36.64,
+          "status": "todo"
+        },
+        "fn_801D147C": {
+          "pct": 35.24,
+          "status": "todo"
+        },
+        "fn_801D142C": {
+          "pct": 28.24,
+          "status": "todo"
+        },
+        "fn_801D14C0": {
+          "pct": 28.24,
+          "status": "todo"
+        },
+        "fn_801D1504": {
+          "pct": 28.24,
+          "status": "todo"
+        }
+      }
+    },
+    "src/game/colosseum_battle.c": {
+      "stage": "A",
+      "owner": "CODEX-2",
+      "tag": "pl_battle",
+      "fns": {
+        "fn_8024064C": {
+          "pct": 59.32,
+          "status": "todo"
+        },
+        "fn_8026153C": {
+          "pct": 57.24,
+          "status": "todo"
+        },
+        "fn_8025D164": {
+          "pct": 56.99,
+          "status": "todo"
+        },
+        "fn_8025D744": {
+          "pct": 55.82,
+          "status": "todo"
+        },
+        "fn_802564C8": {
+          "pct": 55.56,
+          "status": "todo"
+        }
+      }
+    },
+    "src/game/gs_render.c": {
+      "stage": "B",
+      "owner": "SONNET",
+      "tag": "pl_render",
+      "fns": {
+        "fn_800DB758": {
+          "pct": 99.55,
+          "status": "todo"
+        },
+        "fn_800DAF60": {
+          "pct": 98.53,
+          "status": "todo"
+        },
+        "fn_800E0790": {
+          "pct": 95.24,
+          "status": "todo"
+        }
+      }
+    },
+    "src/game/trainer.c": {
+      "stage": "B",
+      "owner": "CODEX-4",
+      "tag": "pl_trainer",
+      "fns": {
+        "fn_801F8E34": {
+          "pct": 95.92,
+          "status": "todo"
+        },
+        "fn_801FEC10": {
+          "pct": 95.06,
+          "status": "todo"
+        },
+        "fn_801FE5D4": {
+          "pct": 95.04,
+          "status": "todo"
+        }
+      }
+    }
+  },
+  "lanes": {
+    "WORKER": {
+      "stage": "A",
+      "model": "opus",
+      "file": "src/game/gs_model.c"
+    },
+    "CODEX-1": {
+      "stage": "A",
+      "model": "gpt-5.5",
+      "file": "src/game/battle/battle_waza.c"
+    },
+    "CODEX-2": {
+      "stage": "A",
+      "model": "gpt-5.5",
+      "file": "src/game/colosseum_battle.c"
+    },
+    "CODEX-3": {
+      "stage": "A",
+      "model": "gpt-5.5",
+      "file": null
+    },
+    "CODEX-4": {
+      "stage": "B",
+      "model": "gpt-5.5",
+      "file": "src/game/trainer.c"
+    },
+    "SONNET": {
+      "stage": "B",
+      "model": "sonnet",
+      "file": "src/game/gs_render.c"
+    },
+    "GLM": {
+      "stage": "B",
+      "model": "glm",
+      "file": null
+    }
+  }
+}

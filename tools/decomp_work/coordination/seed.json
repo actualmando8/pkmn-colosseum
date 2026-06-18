@@ -1,0 +1,15 @@
+[
+  {"file": "src/game/gs_model.c", "tag": "pl_model", "stage": "A",
+   "fns": {"fn_80105FB0": 5.56, "fn_80104530": 3.33, "fn_80105410": 2.38,
+           "fn_80105C68": 1.79, "fn_801043A4": 1.33, "fn_80106394": 1.20}},
+  {"file": "src/game/battle/battle_waza.c", "tag": "pl_waza", "stage": "A",
+   "fns": {"fn_801D1338": 36.64, "fn_801D147C": 35.24, "fn_801D142C": 28.24,
+           "fn_801D14C0": 28.24, "fn_801D1504": 28.24}},
+  {"file": "src/game/colosseum_battle.c", "tag": "pl_battle", "stage": "A",
+   "fns": {"fn_8024064C": 59.32, "fn_8026153C": 57.24, "fn_8025D164": 56.99,
+           "fn_8025D744": 55.82, "fn_802564C8": 55.56}},
+  {"file": "src/game/gs_render.c", "tag": "pl_render", "stage": "B",
+   "fns": {"fn_800DB758": 99.55, "fn_800DAF60": 98.53, "fn_800E0790": 95.24}},
+  {"file": "src/game/trainer.c", "tag": "pl_trainer", "stage": "B",
+   "fns": {"fn_801F8E34": 95.92, "fn_801FEC10": 95.06, "fn_801FE5D4": 95.04}}
+]
