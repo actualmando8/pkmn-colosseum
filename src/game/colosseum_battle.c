@@ -4815,12 +4815,14 @@ void fn_802405C0(void* ctx, u32 param1, u32 param2) {
 }
 
 /* Address: 0x8024064C | Size: 0x13C (316 bytes) */
-void fn_8024064C(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fn_8011BEB4();
-    extern void fn_80205B8C();
-    extern void fn_80236520();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
+u32 fn_8024064C(void* ctx, u32 param1, u32 param2, u32 param3) {
+#pragma optimize_for_size on
+    typedef void (*BattleScriptCallback)();
+    extern BattleScriptCallback fn_8011BEB4(u32, u16, u32, u32);
+    extern u32 fn_80205B8C(u32);
+    extern u16 fn_80236520(void*, u32);
+    extern u32 fn_80239984(u32, void*, u32);
+    extern void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     extern void fn_80242E4C();
     extern void fn_80242FEC();
     extern void fn_802430E4();
@@ -4829,88 +4831,25 @@ void fn_8024064C(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern void fn_80243390();
     extern void fn_8024349C();
     extern void fn_8024E52C();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+    BattleScriptCallback callback;
+    u32 setup;
+    u16 species;
 
-    r29 = r4;
-    r28 = r3;
-    r30 = r5;
-    r4 = r6;
-    r31 = 0x0;
-    fn_80236520();
-    r0 = r3 & 0xFFFF;
-    if ((s32)r0 == (s32)0) { r3 = r31; return; }
-    if (r0 == (u32)0xffff) { r3 = r31; return; }
-    if (r0 == (u32)0x165) { r3 = r31; return; }
-    if (r0 == (u32)0x163) { r3 = r31; return; }
-    r4 = r3;
-    r3 = 0x0;
-    r5 = 0x1c;
-    r6 = 0x0;
-    fn_8011BEB4();
-    if (r3 == (u32)0x0) {
-        r3 = (u32)fn_8024E52C;
-        r3 = (u32)fn_8024E52C;
+    setup = 0;
+    species = fn_80236520(ctx, param3);
+    if ((species != 0) && (species != 0xffff) && (species != 0x165) && (species != 0x163)) {
+        callback = fn_8011BEB4(0, species, 0x1c, 0);
+        if (callback == NULL) {
+            callback = fn_8024E52C;
+        }
+        if ((callback == fn_8024349C) || (callback == fn_80243390) || (callback == fn_80243284)
+            || (callback == fn_80243178) || (callback == fn_802430E4) || (callback == fn_80242FEC)
+            || (callback == fn_80242E4C)) {
+            setup = fn_80239984(0, ctx, 0x1c2);
+            fn_80239EE8(0xec64, ctx, fn_80205B8C(param1), 0, 0, param2, 0, 0x1c2);
+        }
     }
-    r4 = (u32)fn_8024349C;
-    r0 = (u32)fn_8024349C;
-    if (r3 != (u32)r0) {
-        r4 = (u32)fn_80243390;
-        r0 = (u32)fn_80243390;
-        if (r3 != (u32)r0) {
-            r4 = (u32)fn_80243284;
-            r0 = (u32)fn_80243284;
-            if (r3 != (u32)r0) {
-                r4 = (u32)fn_80243178;
-                r0 = (u32)fn_80243178;
-                if (r3 != (u32)r0) {
-                    r4 = (u32)fn_802430E4;
-                    r0 = (u32)fn_802430E4;
-                    if (r3 != (u32)r0) {
-                        r4 = (u32)fn_80242FEC;
-                        r0 = (u32)fn_80242FEC;
-                        if (r3 != (u32)r0) {
-                            r4 = (u32)fn_80242E4C;
-                            r0 = (u32)fn_80242E4C;
-                            if (r3 != (u32)r0) { r3 = r31; return; }
-    }
-    }
-    }
-    }
-    }
-    }
-    r4 = r28;
-    r3 = 0x0;
-    r5 = 0x1c2;
-    fn_80239984();
-    r0 = r3;
-    r3 = r29;
-    r31 = r0;
-    fn_80205B8C();
-    r6 = (0x1 << 16);
-    r5 = r3;
-    r4 = r28;
-    r8 = r30;
-    r6 = 0x0;
-    r7 = 0x0;
-    r9 = 0x0;
-    r10 = 0x1c2;
-    fn_80239EE8();
-
-    r3 = r31;
-    return;
+    return setup;
 }
 
 /* Address: 0x80240788 | Size: 0x448 (1096 bytes) */
@@ -38290,36 +38229,51 @@ int fn_802614B4(void)
 }
 
 /* Address: 0x8026153C | Size: 0xB8 | Ghidra import */
-void fn_8026153C(u16 *r3)
-
+void fn_8026153C(void *rawOut)
 {
-    extern u32 fn_801C3108();
-    extern int fn_801C3114();
-  u16 uVar1;
-  u32 uVar2;
-  u8 local_18;
-  u8 local_17;
-  u16 local_16;
-  u16 *local_14;
-  u16 *local_10;
-  
-  uVar2 = fn_801C3108();
-  fn_800054F4(r3 + 2,uVar2,0x44);
-  local_10 = r3 + 0x24;
-  local_18 = 1;
-  local_17 = 1;
-  local_16 = 0;
-  local_14 = r3 + 2;
-  fn_801F2B5C(0,0x8026184c,&local_18,0);
-  uVar1 = local_16;
-  local_16 = 0;
-  fn_801F37B0(0,0x80261708,&local_18,0);
-  *r3 = uVar1;
-  r3[1] = local_16;
-  fn_801EF8F4(1);
-  fn_801C3114();
-  fn_801DAC90();
-  return;
+#pragma optimize_for_size on
+    typedef struct BattleScanOutput {
+        u16 firstCount;
+        u16 secondCount;
+        u8 entries[0x44];
+    } BattleScanOutput;
+    typedef struct BattleScanContext {
+        u8 collectEntries;
+        u8 consumeEntries;
+        u16 count;
+        u8 *entries;
+        u8 *nextEntry;
+    } BattleScanContext;
+    typedef u32 (*BattleScanCallback)(u32, u32, char *);
+    extern void *fn_801C3108(void);
+    extern void fn_801F2B5C(u32, BattleScanCallback, void *, u32);
+    extern void fn_801F37B0(u32, BattleScanCallback, void *, u32);
+    extern u32 fn_80261708(u32, u32, char *);
+    extern u32 fn_8026184C(u32, u32, char *);
+    BattleScanOutput *out;
+    BattleScanContext scan;
+    u16 firstCount;
+    u16 secondCount;
+    u8 *entries;
+
+    out = rawOut;
+    entries = out->entries;
+    memcpy(entries, fn_801C3108(), 0x44);
+    scan.collectEntries = 1;
+    scan.consumeEntries = 1;
+    scan.count = 0;
+    scan.entries = entries;
+    scan.nextEntry = entries + 0x44;
+    fn_801F2B5C(0, fn_8026184C, &scan, 0);
+    firstCount = scan.count;
+    scan.count = 0;
+    fn_801F37B0(0, fn_80261708, &scan, 0);
+    secondCount = scan.count;
+    out->firstCount = firstCount;
+    out->secondCount = secondCount;
+    fn_801EF8F4(1);
+    fn_801C3114();
+    fn_801DAC90();
 }
 
 /* Address: 0x802615F4 | Size: 0x114 | Ghidra import */
