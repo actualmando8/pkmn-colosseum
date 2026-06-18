@@ -551,3 +551,33 @@ matching this file's tested-and-didn't-move policy. 5 are highest-confidence (99
 | battle_waza.c | 1 | fn_801DD0C8 |
 
 _Full per-fn match% + reg-remap evidence: `tools/decomp_work/_triage_consolidated.json`._
+
+## 2026-06-17 - hsd_aobj bytecode evaluator hard wall
+
+- `src/hsd/hsd_aobj.c::fn_801920E4` - real C exists under the inactive `#else`
+  body and compiles in band `d6`, but tops out at 88.62% in the byte harness.
+  Tested levers: O3 baseline, O4, `peephole off`, `scheduling on`,
+  scheduling+peephole, target-label literal substitution, declaration-order
+  shift, and bytecode-pointer local split. None improved over baseline.
+  Residual class: giant stack-machine register allocation plus hard-stop
+  CodeWarrior patterns (`frsqrte` Newton expansion, `cntlzw` boolean lowering,
+  broad saved-register coloring drift). No inline asm is allowed by packet d6.
+
+## 2026-06-17 - why_diff re-triage of the near-miss queue
+
+Ran `why_diff.py` over the worker's 5-fn blind near-miss queue. 0/5 were valid
+worker reg-alloc cracks. See `tools/decomp_work/coordination/why_diff_retriage_jun17.md`.
+
+- `fn_80209960` / `fn_80211A78` (colosseum_event.c): CONFIRM existing W3/W2 walls.
+  why_diff reports MATCH (or `@sda21`-vs-absolute) — residual is reloc/section
+  placement, not C. Rule: **why_diff MATCH + objdiff < 100% = reloc-artifact wall.**
+- `fn_801839A0` (people.c): NOT a near-miss — active C is a 1-insn STUB (frame 0x0,
+  0 calls) vs a 105-insn target; the 98.86% was an asm-wrapper artifact. Needs full
+  Phase-1 decomp, not a crack.
+- `fn_8020E7AC` (colosseum_event.c, 96.44%): filed 2026-06-10 as a W1 saved-band
+  reg-alloc tie-break, but why_diff shows the FIRST divergence is an EXPRESSION
+  (`clrlwi. r0,r0,24;bne` vs `cmplwi r0,0;beq` — byte-test + branch sense). The
+  filed wall cause is wrong; RE-OPENED for a bool-test expression attempt
+  (`u8 bVar1` lever tested and regressed to 95.97 — the masked value is not bVar1).
+- `fn_80034DC0` (gs_npc_event.c, 95.27%): SCHEDULE class (`li r6,0x3CC8` hoist,
+  5 same-insn blocks) -> routed to the permuter pragma sweep, not a worker.
