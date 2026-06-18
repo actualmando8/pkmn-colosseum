@@ -1220,11 +1220,10 @@ asm void fn_8013C670(void) {
 u32 fn_8013C670(void* arg) {
     void* ptr;
     void* inner;
-    u16 val;
 
     if (arg != 0) {
-        inner = *(void**)arg;
         ptr = arg;
+        inner = *(void**)ptr;
         fn_800EC1D4(inner);
         if (inner != 0) {
             fn_800E4014(inner, 0);
@@ -1233,16 +1232,19 @@ u32 fn_8013C670(void* arg) {
         fn_800B856C();
         fn_8013CE58(inner, ptr);
 
-        val = *(u16*)((u8*)ptr + 0x1c);
-        if (val != 0) {
-            fn_800E24B0(val);
-            fn_800E209C(val);
+        {
+            u16 val;
+            val = *(u16*)((u8*)ptr + 0x1c);
+            if (val != 0) {
+                fn_800E24B0(val);
+                fn_800E209C(val);
+            }
         }
 
-        val = *(u16*)((u8*)ptr + 0x8c);
-        if (val != 0) {
-            fn_800E24B0(val);
-            fn_800E209C(val);
+        ptr = (void*)(u32)*(u16*)((u8*)ptr + 0x8c);
+        if (ptr != 0) {
+            fn_800E24B0((u32)ptr);
+            fn_800E209C((u32)ptr);
         }
     }
     return 1;
@@ -1740,7 +1742,7 @@ u32 fn_8013E54C(void* arg) {
     void* ptr;
     if (arg != 0) {
         ptr = arg;
-        if (*(void**)((u8*)arg + 4) != 0) {
+        if (*(void**)((u8*)ptr + 4) != 0) {
             fn_800B8DF4();
             fn_800B856C();
             fn_800EF5A4(*(void**)((u8*)ptr + 4));
