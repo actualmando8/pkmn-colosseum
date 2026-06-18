@@ -36,3 +36,29 @@ stubs, or permuter cases. Route by why_diff BEFORE assigning a worker.
 - 4 reg-renames + 4 structural blocks remain past the first divergence; the
   expression fix may not reach 100% alone, but it is the correct first move and
   it re-opens the wall.
+
+## Top-30 queue routed (routed_worklist.md, commit after this)
+Honest buckets after SDA-wall detection: **7 permuter, 3 worker-ex, 2 worker-fr,
+7 stubs, 11 reloc-wall.** 60% (walls+stubs) are NOT worker-actionable.
+- permuter (autonomous): 5-fn gs_field_world REG-RENAME cluster (fn_8011A280/570/
+  9EC/AB50/AFCC, identical `mr r27` @ insn 17) + fn_800330B8 (gs_npc_event SCHEDULE)
+  + fn_80068738 (ui_core REG-RENAME). [anneal_pragma on fn_8011A280 running]
+- worker-ex (genuine expression): fn_8004B598 (scene_init), fn_800218BC (gs_title),
+  fn_80057DE8 (scene_init).
+- worker-fr (reduce our frame): fn_80128E38 (gs_field_world 0x40->0x30, +2 extra
+  calls too), fn_80008868 (gs_task 0x60->0x30).
+- stubs (NOT near-misses — empty C, % was asm-wrapper artifact; full decomp):
+  fn_80040308, fn_8004B7EC (scene_init), fn_800DE128, fn_800E0790 (gs_render),
+  fn_800109A0, fn_8000ED34, fn_8000F964 (gs_npc_interact).
+
+## HIGH-LEVERAGE FINDING — the @sda21 wall class is ONE build-level root cause
+10 of the 11 reloc-walls (whole gs_title cluster fn_80024DBC/F2C/509C/520C/537C/
+25490, gs_party_access fn_8000C824/C92C, colosseum fn_80211A78/fn_8021C308) are the
+SAME artifact: target reads a small global via `lwz rX, lbl@sda21(r13)`; ours emits
+absolute `lis/lwz @ha/@l`. Root cause (verified): these `lbl_XXXX` globals are plain
+`extern u32` resolved as ABSOLUTE linker symbols, never defined as real `.sdata`
+section data — so CW cannot emit @sda21 (it's not section-relative), despite `-sdata 8`
+making a u32 SDA-eligible. **A BSS/sdata reconstruction campaign (define these small
+globals in real .sdata) could crack the ENTIRE @sda21 wall class at once** — far higher
+leverage than per-fn grinding. Large + risky (touches symbol layout across all TUs);
+needs its own validated campaign. Until then these stay filed as W-SDA-RELOC walls.
