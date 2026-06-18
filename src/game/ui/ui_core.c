@@ -38,6 +38,7 @@ extern void fn_8006ADEC();
 extern void fn_8006AF44();
 extern void fn_8006AFC4();
 extern void fn_8006AFE4();
+extern void fn_800626CC();
 extern void fn_8006B09C();
 extern void fn_8006B0F8();
 extern s32 fn_8006B1D4();
@@ -129,6 +130,7 @@ extern void fn_800FF56C();
 extern void fn_800FF58C();
 extern void fn_801022B8();
 extern void menuCloseSync();
+extern void fn_80102428();
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void floorChangePos();
 extern void GScharCmp();
@@ -148,7 +150,7 @@ extern void fn_801043A4();
 extern void fn_801045A8();
 extern void fn_801046B8();
 extern void fn_80104704();
-extern void fn_80105624();
+extern u8* fn_80105624(void);
 extern void fn_801069FC();
 extern void fn_80106D3C();
 extern void fn_801070F4();
@@ -395,7 +397,7 @@ s32 fn_8005D4F4(void* a, void* b);
 s32 fn_8005D53C(void* a, void* b);
 s32 fn_8005D584(void* a, void* b);
 void fn_8005D5CC(void);
-void fn_8005D6A8(void);
+void fn_8005D6A8(u8* ctx);
 u8   fn_8005D738(u8 arg);
 u16  fn_8005D798(u8 *base, u8 sel);
 void* fn_8005D7F8(u32 idx);
@@ -427,7 +429,7 @@ void fn_80060A28(void);
 void fn_80060D70();
 void fn_80060EF4();
 u32 fn_80061018(void);
-void fn_80061028(void);
+void fn_80061028(u32 arg);
 void fn_8006106C();
 void fn_80061240(void);
 void fn_80061454();
@@ -2726,54 +2728,28 @@ void fn_8005D5CC(void) {
 
 
 /* 0x8005D6A8 | size: 0x90 */
-#if 1
+#if 0
 asm void fn_8005D6A8(void) {
 #include "src/game/ui/ui_core_fn_8005D6A8.inc"
 }
 #else
-void fn_8005D6A8(void) {
-    extern void fn_80102ED4();
-    extern void fn_80105624();
-    extern void fn_80166A50();
-    u8 sp[0x20];
-    u32 r0 = 0;
-    u32 r1 = (u32)sp;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r31 = 0;
+void fn_8005D6A8(u8* ctx) {
+#pragma peephole off
+    u32 table;
+    u8 bytes[4];
+    u8* result;
+    s32 idx;
 
-    
-    r31 = r3;
-    fn_80105624();
-    r4 = *(u8*)((u8*)r31 + 0x95);
-    r0 = *(u32*)&lbl_8047BF40;
-    r4 = (s8)r4;
-    *(u32*)(sp + 0x8) = r0;
-    if ((s32)r4 >= (s32)0x0) {
-        if ((s32)r4 <= (s32)0x3) {
-            r0 = *(u16*)((u8*)r3 + 0x4);
-            r0 = r0 & 0x00000010;
-            if ((s32)r0 != (s32)0x0) {
-                r3 = (u32)sp + 0x8;
-                r6 = *(u8*)&lbl_8047A5A8;
-                r0 = *(u8*)(r3 + r4);
-                r3 = 0x3c6;
-                r4 = 0x0;
-                r5 = 0xff;
-                r0 = r6 ^ r0;
-                r6 = 0x0;
-                *(u8*)&lbl_8047A5A8 = r0;
-                fn_80166A50();
-                return;
+    result = fn_80105624();
+    idx = (s8)ctx[0x95];
+    table = *(u32*)&lbl_8047BF40;
+    *(u32*)bytes = table;
+    if (idx >= 0 && idx <= 3 && (*(u16*)(result + 4) & 0x10) != 0) {
+        lbl_8047A5A8 ^= bytes[idx];
+        fn_80166A50(0x3C6, 0, 0xFF, 0);
+    } else {
+        fn_80102ED4(ctx);
     }
-    }
-    }
-    r3 = r31;
-    fn_80102ED4();
-
-    return;
 }
 #endif
 
@@ -5886,29 +5862,15 @@ u32 fn_80061018(void) {
 }
 
 /* 0x80061028 | size: 0x44 */
-#if 1
+#if 0
 asm void fn_80061028(void) {
 #include "src/game/ui/ui_core_fn_80061028.inc"
 }
 #else
-void fn_80061028(void) {
-    extern void fn_80102568();
-    u8 sp[0x10];
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r31 = 0;
-
-    
-    r31 = r3;
-    r3 = 0xba;
-    r4 = 0x0;
-    r5 = 0x1;
-    fn_80102568();
-    r3 = (u32)&lbl_803A9A60;
-    r3 = (u32)&lbl_803A9A60;
-    *(u32*)((u8*)r3 + 0x4) = r31;
-    return;
+void fn_80061028(u32 arg) {
+#pragma peephole off
+    fn_80102568(0xBA, 0, 1);
+    *(u32*)(lbl_803A9A60 + 4) = arg;
 }
 #endif
 
@@ -6795,20 +6757,25 @@ void fn_80061A2C(void) {
 
 
 /* 0x80061B74 | size: 0x48 */
-#if 1
+#if 0
 asm void fn_80061B74(void) {
 #include "src/game/ui/ui_core_fn_80061B74.inc"
 }
 #else
-void fn_80061B74(void) {
-    s32 state;
-    u8 *base;
-
-    base = (u8 *)&lbl_803A9A60;
-    state = *(s32 *)(base + 0x4);
-    if (state == 0 || state == 1) {
-        *(u8 *)(base + 0x4) = (s8)(*(u8 *)(base + 0x4) & ~0x02);
+void fn_80061B74(void* unused, s8* entry) {
+#pragma peephole off
+    s32 state = *(s32*)(lbl_803A9A60 + 4);
+    if (state != 1) {
+        if (state >= 1) {
+            return;
+        }
+        if (state < 0) {
+            return;
+        }
+        entry[4] = (s8)(entry[4] & ~2);
+        return;
     }
+    entry[4] = (s8)(entry[4] & ~2);
 }
 #endif
 
@@ -14287,15 +14254,14 @@ void fn_80069664(void) {
 
 
 /* 0x800697C4 | size: 0x30 */
-#if 1
+#if 0
 asm s32 fn_800697C4(void) {
 #include "src/game/ui/ui_core_fn_800697C4.inc"
 }
 #else
-#pragma optimization_level 4
 s32 fn_800697C4(void) {
+#pragma peephole off
     fn_8010B01C(0, fn_800697F4, 0);
-    return 0;
 }
 #endif
 
@@ -14477,14 +14443,16 @@ void fn_80069944(void) {
 
 
 /* 0x80069A08 | size: 0x58 */
-#if 1
+#if 0
 asm s32 fn_80069A08(s32 a, s32 b, s32 c, s32 d) {
 #include "src/game/ui/ui_core_fn_80069A08.inc"
 }
 #else
-#pragma optimization_level 4
 s32 fn_80069A08(s32 a, s32 b, s32 c, s32 d) {
-    u8* entry = &lbl_803A9F08[c * 0x48 + d * 0xC + 0x30];
+#pragma peephole off
+    u8* entry = lbl_803A9F08 + c * 0x48;
+    entry += d * 0xC;
+    entry = (u8*)((u32)entry + 0x30);
     if (entry[0] != 0) {
         fn_8010B9E8(a, b, *(u16*)(entry + 2));
         return 1;
