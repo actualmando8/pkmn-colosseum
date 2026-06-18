@@ -6,6 +6,15 @@ is the target — every fn shares the model / joint / TObj / DObj / PObj structs
 type you reverse-engineer helps every other lane. THIS is where the KG cooperative
 sharing actually pays off.
 
+## RULE 0 — PRESERVE CANON SIGNATURES (do this or your win won't integrate)
+Before writing any C, read the fn's CURRENT signature in canon:
+  grep -nE 'fn_XXXXXXXX *\(' src/<file>.c
+KEEP that EXACT signature — return type, parameter types AND names. Do NOT invent a
+new one (e.g. canon `f32 fn_801D14C0(void* entry)` must NOT become `s32 fn(s32 idx)`).
+The integrator splices your BODY against canon's signature; a changed signature leaves
+your locals undefined and the win is rejected. If you believe canon's signature is wrong,
+REPORT it (one line) — do not change it. We ground every lane to canon so the wins merge.
+
 ## Per-function loop
 1. m2c first draft:
      python3 tools/decomp_work/m2c_draft.py <fn> src/game/gs_model.c

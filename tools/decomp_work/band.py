@@ -32,6 +32,7 @@ import shutil
 import subprocess
 import sys
 import collections
+import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -225,6 +226,24 @@ def cmd_init(tag, srcname, config_from=None):
     _lock_acquire_file(tag, state["src"])
 
 
+STATUS_LOG = ROOT / "tools" / "decomp_work" / "coordination" / "status.md"
+
+
+def _log_attempt(tag, fn, pct, src):
+    """Append one per-fn attempt to coordination/status.md in the format the
+    renaming dashboard's load_attempt_log() parses. This populates the dashboard's
+    active-fn derivation and per-function attempt counter ("tokens spent" view):
+    every `band check <tag> <fn>` is one logged attempt."""
+    ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    src_rel = str(src or "").replace("\\", "/")
+    line = f"- **{ts}** `{tag}` band-check {fn} {pct:.2f}% in {src_rel}\n"
+    try:
+        with STATUS_LOG.open("a", encoding="utf-8") as f:
+            f.write(line)
+    except OSError:
+        pass
+
+
 def cmd_check(tag, fns):
     st = compile_band(tag)
     rows = _rows(tag, st)
@@ -234,6 +253,9 @@ def cmd_check(tag, fns):
         if fn in rows:
             mark = "MATCH" if rows[fn] >= 100.0 - 1e-6 else ""
             print(f"  {fn}  {rows[fn]:.2f}%  {mark}")
+            # log ONLY explicitly-checked fns (an attempt); skip bulk views.
+            if fns:
+                _log_attempt(tag, fn, rows[fn], st.get("src"))
         else:
             print(f"  {fn}  NOT FOUND in object")
 

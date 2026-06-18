@@ -2437,6 +2437,13 @@ def derive_active_work(owner: str, note: str, file: str) -> dict[str, object]:
 def load_leases() -> dict:
     """Active leases (live locks) + queued work (coordination tasks.json)."""
     locks = load_locks()
+    # Per-function attempt counts from the attempt log (every `band check <fn>` logs
+    # one row) — the "how much we waste per fn / tokens spent" signal.
+    fn_attempts: dict[str, int] = {}
+    for r in _attempt_log_cache():
+        fnm = str(r.get("function") or "")
+        if fnm:
+            fn_attempts[fnm] = fn_attempts.get(fnm, 0) + 1
     active = []
     for lk in locks.get("locks", []):
         # #5: surface WHICH function/file the lease is working, derived read-only
@@ -2448,6 +2455,7 @@ def load_leases() -> dict:
             "ttl_remaining": lk.get("ttl_remaining"), "note": lk.get("note"),
             "tag": work.get("tag"), "active_src": work.get("src_file"),
             "active_fn": work.get("fn"), "scratch_mtime": work.get("fresh"),
+            "attempts": fn_attempts.get(work.get("fn") or "", 0),
         })
     queued = []
     try:
@@ -5566,7 +5574,7 @@ HTML = r"""<!doctype html>
           </div>
           <div class="table-wrap lease-pane" id="lease-active-pane">
             <table class="agent-table">
-              <thead><tr><th>Scope</th><th>Key</th><th>Owner</th><th>Elapsed</th><th>TTL</th></tr></thead>
+              <thead><tr><th>Scope</th><th>Agent</th><th>File</th><th>Function</th><th>Att</th><th>Elapsed</th><th>TTL</th></tr></thead>
               <tbody id="lease-active-body"></tbody>
             </table>
           </div>
@@ -8097,31 +8105,24 @@ HTML = r"""<!doctype html>
       const ab = $("lease-active-body");
       if (ab) {
         ab.replaceChildren();
-        if (!(d.active || []).length) { const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 5; td.className = "empty-state"; setText(td, "No active leases right now"); tr.append(td); ab.append(tr); }
+        if (!(d.active || []).length) { const tr = document.createElement("tr"); const td = document.createElement("td"); td.colSpan = 7; td.className = "empty-state"; setText(td, "No active leases right now"); tr.append(td); ab.append(tr); }
         for (const l of (d.active || [])) {
           const tr = document.createElement("tr");
           const scope = document.createElement("td"); const tag = document.createElement("span"); tag.className = `lock-scope ${l.scope}`; setText(tag, l.scope); scope.append(tag);
-          // #5: the lock only names a file; show the active WORK ("tag → file.c → fn_…")
-          // derived read-only from the band scratch sidecar + attempt log when we
-          // have it, else fall back to the plain lock key. Title carries the full path.
-          const key = document.createElement("td"); key.className = "mono";
-          const srcFile = l.active_src ? fileName(l.active_src) : (l.scope === "file" ? fileName(l.key) : l.key);
-          const parts = [];
-          if (l.tag) parts.push(l.tag);
-          if (srcFile) parts.push(srcFile);
-          if (l.active_fn) parts.push(l.active_fn);
-          const lead = parts.length ? parts.join(" → ") : (l.scope === "file" ? fileName(l.key) : l.key);
-          const leadSpan = document.createElement("span"); setText(leadSpan, lead); key.append(leadSpan);
-          if (!l.active_fn && (l.tag || srcFile)) {
-            // No fn surfaced in status.md yet for this owner — say where it'd come from.
-            const hint = document.createElement("span"); hint.className = "lease-hint";
-            setText(hint, " (fn pending in log)"); key.append(hint);
-          }
-          key.title = [l.active_src || l.key, l.active_fn || "", l.note || ""].filter(Boolean).join("  ·  ");
-          const owner = document.createElement("td"); owner.className = "mono"; setText(owner, l.owner || "-");
+          // Separate columns (agent / file / function / attempts), derived read-only
+          // from the lock owner + band scratch sidecar + attempt log.
+          const agent = document.createElement("td"); agent.className = "mono"; setText(agent, l.owner || l.tag || "-");
+          const fileTd = document.createElement("td"); fileTd.className = "mono";
+          const srcFile = l.active_src ? fileName(l.active_src) : (l.scope === "file" ? fileName(l.key) : "");
+          setText(fileTd, srcFile || "-"); fileTd.title = l.active_src || l.key || "";
+          const fnTd = document.createElement("td"); fnTd.className = "mono";
+          if (l.active_fn) { setText(fnTd, l.active_fn); }
+          else { const hint = document.createElement("span"); hint.className = "lease-hint"; setText(hint, "(pending in log)"); fnTd.append(hint); }
+          const att = document.createElement("td"); att.className = "mono"; setText(att, String(l.attempts || 0));
+          if ((l.attempts || 0) >= 8) att.style.color = "#ff7a7a";  // high-waste fn
           const el = document.createElement("td"); el.className = "mono"; setText(el, l.elapsed == null ? "-" : fmtCountdown(l.elapsed));
           const ttl = document.createElement("td"); ttl.className = "mono"; setText(ttl, l.ttl_remaining == null ? "∞" : fmtCountdown(l.ttl_remaining));
-          tr.append(scope, key, owner, el, ttl); ab.append(tr);
+          tr.append(scope, agent, fileTd, fnTd, att, el, ttl); ab.append(tr);
         }
       }
       const qb = $("lease-queued-body");

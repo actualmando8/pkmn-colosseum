@@ -90,7 +90,7 @@ $codexCmd  = $cdRepo + ' && codex'
 $glmCmd    = $cdRepo + ' && set "CLAUDE_CONFIG_DIR=' + $glmConfigDir + '" && set "ANTHROPIC_BASE_URL=http://127.0.0.1:' + $Port + '" && set "ANTHROPIC_API_KEY=zai-proxy" && claude --model "glm-5.2[1m]" --dangerously-skip-permissions'
 # Sonnet + Opus run DIRECT (Max OAuth ignores the proxy; routing them through it is
 # pointless and risks the dual-auth conflict). Default ~/.claude config = Max login.
-$sonnetCmd = $cdRepo + ' && claude --model "sonnet[1m]" --dangerously-skip-permissions'
+$sonnetCmd = $cdRepo + ' && claude --model "sonnet" --dangerously-skip-permissions'   # NOT sonnet[1m] — the 1m beta throws an API error on this account
 $workerCmd = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # worker Opus (dispatched)
 $orchCmd   = $cdRepo + ' && claude --model "opus[1m]" --dangerously-skip-permissions'   # orchestrator Opus (you type here)
 
@@ -103,69 +103,77 @@ if ($DryRun) {
   $orchCmd   = 'echo [DRYRUN] pane8 = CLAUDE OPUS orchestrator'
 }
 
-# psmux ignores custom pane titles, so panes are identified by index:
-#   0 = PROXY  1-4 = CODEX x4  5 = GLM  6 = SONNET  7 = OPUS worker  8 = OPUS orchestrator
-# Send keys literally (-l) so '&&', quotes and [1m] are typed verbatim, then Enter.
-function Send($cmd) { & $tm send-keys -t $Session -l $cmd; & $tm send-keys -t $Session "Enter" }
+# Explicit positioned splits to match the cockpit diagram (NOT tiled). We capture
+# each pane id at creation, so the registry is robust to psmux index shuffles.
+# Send keys literally (-l) to a SPECIFIC pane id, then Enter.
+function Send($target, $cmd) { & $tm send-keys -t $target -l $cmd; & $tm send-keys -t $target "Enter" }
+function SplitH($target, $pct) { return ([string](& $tm split-window -h -p $pct -t $target -P -F '#{pane_id}' "cmd")).Trim() }
+function SplitV($target, $pct) { return ([string](& $tm split-window -v -p $pct -t $target -P -F '#{pane_id}' "cmd")).Trim() }
 
 # --- (re)build session ---
 & $tm kill-session -t $Session 2>$null
 & $tm new-session -d -s $Session "cmd"
 Start-Sleep -Milliseconds 1300          # psmux server start race
 & $tm set -t $Session pane-border-status top  2>$null
-& $tm set -t $Session pane-border-format ' pane #{pane_index} ' 2>$null
+& $tm set -t $Session pane-border-format ' #{pane_title} ' 2>$null
 
-# pane 0: proxy (initial pane)
-Send $proxyCmd
-Start-Sleep -Milliseconds 700
+# Initial pane becomes col1-top (GLM proxy) after we carve everything off it.
+$P0 = ([string](& $tm list-panes -t $Session -F '#{pane_id}' | Select-Object -First 1)).Trim()
 
-# panes 1-8: split + re-tile after each (survives small terminals). Each new pane is
-# active, so Send (which targets the active pane) reaches the just-created pane.
-foreach ($step in @(
-    @{ cmd = $codexCmd  },   # pane 1: codex-1
-    @{ cmd = $codexCmd  },   # pane 2: codex-2
-    @{ cmd = $codexCmd  },   # pane 3: codex-3
-    @{ cmd = $codexCmd  },   # pane 4: codex-4
-    @{ cmd = $glmCmd    },   # pane 5: glm
-    @{ cmd = $sonnetCmd },   # pane 6: sonnet
-    @{ cmd = $workerCmd },   # pane 7: worker opus
-    @{ cmd = $orchCmd   }    # pane 8: orchestrator opus
-  )) {
-  & $tm split-window -h -t $Session "cmd" 2>$null
-  Start-Sleep -Milliseconds 600
-  Send $step.cmd
-  & $tm select-layout -t $Session tiled 2>$null
-}
+# Layout (matches the cockpit diagram):
+#   col1: GLM proxy (top) / GLM agent (below)    col2: Opus worker (top) / Sonnet (below)
+#   middle: Opus orchestrator (full height)      right: 2x2 Codex (1 2 / 3 4)
+$REST     = SplitH $P0 66      # P0 = left group (~34%), REST = right (~66%)
+$RIGHT    = SplitH $REST 62    # REST = middle/orchestrator (~25%), RIGHT = codex group (~41%)
+$ORCH     = $REST
+$COL2     = SplitH $P0 48      # P0 = col1, COL2 = col2
+$GLMAGENT = SplitV $P0 84      # P0 = GLM proxy (top ~16%), GLMAGENT = GLM agent (bottom)
+$PROXY    = $P0
+$SONNET   = SplitV $COL2 52    # COL2 = Opus worker (top), SONNET = Sonnet (bottom)
+$OPUS     = $COL2
+$CODEXBL  = SplitV $RIGHT 50   # RIGHT = top row, CODEXBL = bottom row
+$CODEX2   = SplitH $RIGHT 50   # RIGHT = codex1 (TL), CODEX2 = codex2 (TR)
+$CODEX4   = SplitH $CODEXBL 50 # CODEXBL = codex3 (BL), CODEX4 = codex4 (BR)
+$CODEX1   = $RIGHT
+$CODEX3   = $CODEXBL
+Start-Sleep -Milliseconds 400
 
-# --- write the control-lib pane registry (deterministic: we know each role) ---
+# Launch each role in its captured pane.
+Send $PROXY    $proxyCmd
+Send $GLMAGENT $glmCmd
+Send $OPUS     $workerCmd
+Send $SONNET   $sonnetCmd
+Send $ORCH     $orchCmd
+Send $CODEX1   $codexCmd
+Send $CODEX2   $codexCmd
+Send $CODEX3   $codexCmd
+Send $CODEX4   $codexCmd
+
+# --- registry from CAPTURED ids (robust to layout/index shuffles) ---
 if (-not $DryRun) {
-  $ids = @{}
-  foreach ($line in (& $tm list-panes -t $Session -F '#{pane_index} #{pane_id}')) {
-    $p = $line.Trim().Split(' '); if ($p.Count -eq 2) { $ids[$p[0]] = $p[1] }
-  }
   $reg = Join-Path $repo 'tools\decomp_work\tmux_control\panes.env'
   $regBody = @(
-    '# panes.env - decomp cockpit registry (written by launch-decomp.ps1).',
+    '# panes.env - decomp cockpit registry (written by launch-decomp.ps1 from captured pane ids).',
     '# claude=orchestrator Opus (self) | worker=Opus | sonnet=Sonnet | glm=GLM | codex/codex2..4=Codex',
-    ('CLAUDE_PANE="'  + $ids['8'] + '"'),
-    ('WORKER_PANE="'  + $ids['7'] + '"'),
-    ('SONNET_PANE="'  + $ids['6'] + '"'),
-    ('GLM_PANE="'     + $ids['5'] + '"'),
-    ('CODEX_PANE="'   + $ids['1'] + '"'),
-    ('CODEX2_PANE="'  + $ids['2'] + '"'),
-    ('CODEX3_PANE="'  + $ids['3'] + '"'),
-    ('CODEX4_PANE="'  + $ids['4'] + '"'),
-    ('PROXY_PANE="'   + $ids['0'] + '"')
+    ('CLAUDE_PANE="'  + $ORCH     + '"'),
+    ('WORKER_PANE="'  + $OPUS     + '"'),
+    ('SONNET_PANE="'  + $SONNET   + '"'),
+    ('GLM_PANE="'     + $GLMAGENT + '"'),
+    ('CODEX_PANE="'   + $CODEX1   + '"'),
+    ('CODEX2_PANE="'  + $CODEX2   + '"'),
+    ('CODEX3_PANE="'  + $CODEX3   + '"'),
+    ('CODEX4_PANE="'  + $CODEX4   + '"'),
+    ('PROXY_PANE="'   + $PROXY    + '"')
   ) -join "`n"
   [System.IO.File]::WriteAllText($reg, $regBody + "`n")
   Write-Host "Wrote control registry: $reg" -ForegroundColor DarkGray
 }
 
-# land the user in the orchestrator pane (index 8)
-& $tm select-pane -t ($Session + ":0.8") 2>$null
+# land the user in the orchestrator pane (captured id)
+& $tm select-pane -t $ORCH 2>$null
 
 Write-Host ""
-Write-Host "decomp cockpit built (0=proxy 1-4=codex 5=glm 6=sonnet 7=opus-worker 8=opus-orchestrator):" -ForegroundColor Green
+Write-Host "decomp cockpit built — diagram layout (col1 glm-proxy/glm-agent | col2 opus/sonnet | mid orchestrator | right 2x2 codex):" -ForegroundColor Green
 & $tm list-panes -t $Session -F '  pane #{pane_index}: @#{pane_left},#{pane_top} #{pane_id} cmd=#{pane_current_command}'
 Write-Host ""
 
